@@ -398,20 +398,26 @@ uint32_t avg_bitrate;
   	setMatrix();
    	_codec->setLogFile(_logname);
    	//_codec->setLogFile("/tmp/dummylog.txt");
+	if(_settings.maxBitrate)
+		if(avg_bitrate>_settings.maxBitrate)
+			avg_bitrate=_settings.maxBitrate;
    	_codec->init (avg_bitrate,_fps);  
   	printf ("\n FF:ready to encode in 2pass (%s)\n",_logname);
   	_frametogo=0;
   	return 1;
   }
   // If we use Xvid...
+  	_xrc->setVBVInfo(_settings.maxBitrate,_settings.minBitrate,_settings.bufferSize);
   	_xrc->startPass2(_param.finalsize,_totalframe);
-	_xrc->setVBVInfo(_settings.maxBitrate,_settings.minBitrate,_settings.bufferSize);
+	
 	
  	_codec= new  ffmpegEncoderVBRExternal (_w, _h,_id); //0 -> external 1 -> internal (_w, _h);
 	
   	FFcodecSetting tmp;
 	memcpy(&tmp,&_settings,sizeof(_settings));
-	tmp.maxBitrate=tmp.minBitrate=0; //tmp.bufferSize=0;
+	tmp.maxBitrate=tmp.minBitrate=0; // Disable internal, vbv buffer size is set nonethless
+	
+	
 	_codec->setConfig(&tmp);
 	
 	setMatrix();
