@@ -1224,6 +1224,7 @@ void putseq_next( int *type,int *quant )
 #endif
 
 		next_seq_state( &ss );
+		alignbits(); //MEANX we want to finish on a start state bitwise
 		++frame_num;
 	}
 }

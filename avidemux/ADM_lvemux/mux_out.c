@@ -28,7 +28,7 @@
 //=====================
 //== LOCAL Functions ==
 //=====================
-
+//#define VERBOSE
 //== bit buffering stuff ==
 //=========================
 
@@ -701,7 +701,7 @@ void mux_close(PackStream *ps)
 //
 int mean_update_gop(PackStream *ps, uint8_t *ptr)
 {
-double oldms;
+//double oldms;
 double newms;
 double news,rel;
 uint8_t a1,a2,a3,a4;
@@ -721,9 +721,9 @@ uint32_t hh,mm,ss,ff;
 	mm=((a1&3)<<4)+(a2>>4);
 	ss=((a2&7)<<3)+(a3>>5);
 	ff=((a3&0x1f)<<1)+(a4>>7);
-	
-	//printf("Old : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
-	
+#ifdef VERBOSE	
+	printf("Old : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
+#endif	
 	
 	// Rebuild gop timestamp
 	news=newms/1000.;
@@ -753,11 +753,11 @@ uint32_t hh,mm,ss,ff;
 	mm=((a1&3)<<4)+(a2>>4);
 	ss=((a2&7)<<3)+(a3>>5);
 	ff=((a3&0x1f)<<1)+(a4>>7);
+#ifdef VERBOSE		
+	printf("Fixed : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
+#endif	
 	
-	//printf("Fixed : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
-	
-	
-	
+	return 1;
 
 }
 /*
@@ -821,14 +821,14 @@ int mux_write_packet(PackStream *ps,
     //-------------------------------------------------
     if (pkt_id == VIDEO_ID) 
     {
-#if 0    
+#ifdef VERBOSE    
       //
       switch(pkt_buf[3])
       {
       	case MX_GOP_CODE: printf("Gop\n");break;
 	case MX_SEQ_CODE: printf("Seq\n");break;
 	case 0: printf("Img\n");break;
-	default: printf("--> %x\n",pkt_buf[3]);
+	default: printf("--> %x %x %x %x %x\n",pkt_buf[0],pkt_buf[1],pkt_buf[2],pkt_buf[3],pkt_buf[4]);
 	}
 #endif      
       
@@ -846,7 +846,12 @@ int mux_write_packet(PackStream *ps,
 			if(!memcmp(pkt_buf, gop_start_code, 4))
 					ptr=pkt_buf+4;
 				else
+				{
+#ifdef VERBOSE					
+					printf("Searching startcode\n");
+#endif					
 					ptr=mean_lookup_gop(pkt_buf,pkt_len);
+				}
 			if(ptr)
 			{
 				mean_update_gop(ps,ptr);			
