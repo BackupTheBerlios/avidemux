@@ -60,9 +60,10 @@
     printf(" Using %ld bytes of extra header data\n",l);
 		 if (avcodec_open(_context, &wmav2_decoder) < 0) 
 		      {
-					printf("\n WMA decoder init failed !\n");								
-					ADM_assert(0);
-				}
+				printf("\n WMA decoder init failed !\n");
+				ADM_assert(0);
+			}
+	printf("FFwma init successful (blockalign %d)\n",info->blockalign);
 }
  ADM_AudiocodecWMA::~ADM_AudiocodecWMA()
  {

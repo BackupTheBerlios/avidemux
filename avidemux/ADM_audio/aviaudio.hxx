@@ -104,6 +104,8 @@ class AVDMGenericAudioStream
 									uint32_t *samples);
 					uint8_t		getPacketPCM(uint8_t *dest, uint32_t *len, 
 								uint32_t *samples);
+					uint8_t		getPacketWMA(uint8_t *dest, uint32_t *len, 
+								uint32_t *samples);
 					uint8_t		getPacketAAC(uint8_t *dest, uint32_t *len, 
 								uint32_t *samples);
 

@@ -141,3 +141,8 @@ uint32_t AVDMEditAudioStream::read (uint32_t len, uint8_t * buffer)
   return len - done;
 
 }
+//-----------------------------------------
+uint8_t		AVDMEditAudioStream::extraData(uint32_t *l,uint8_t **d)
+{
+		return video_body->getAudioExtra (l, d);
+}

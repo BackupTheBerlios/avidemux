@@ -55,6 +55,7 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 	ADM_assert(_wavheader);
 	shrink();
 	instock=packetTail-packetHead;
+	
 	while(instock<MINSTOCK)
 	{
 		rd=read(MINSTOCK,&packetBuffer[packetTail]);
@@ -91,6 +92,10 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 		case WAV_AC3:
 				return getPacketAC3(dest,len,samples);
 				break;
+				
+		case WAV_WMA:
+				return getPacketWMA(dest,len,samples);
+				break;
 		default:
 				printf("Unsupported!\n");
 				return 0;
@@ -111,6 +116,33 @@ uint8_t AVDMGenericAudioStream::shrink( void )
 	
 	return 1;
 }
+//___________________________
+uint8_t		AVDMGenericAudioStream::getPacketWMA(uint8_t *dest, uint32_t *len, 
+								uint32_t *samples)
+{
+	uint32_t align=_wavheader->blockalign;
+	uint32_t avail;
+	
+	
+	avail=packetTail-packetHead;
+	
+	if(avail>=align)
+	{
+		//printf("WMA: %lu\n",align);
+		memcpy(dest,&packetBuffer[packetHead],align);
+		packetHead+=align;
+		*samples=1024; 
+		#warning FIXME
+		*len=align;
+		return 1;
+	}
+	*len=0;
+	*samples=0;
+	printf("Packetizer wma: no more data\n");
+	return 0;
+
+}
+//___________________________
 uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len, 
 								uint32_t *samples)
 {

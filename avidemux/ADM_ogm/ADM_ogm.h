@@ -55,6 +55,7 @@ class oggAudio :  public AVDMGenericAudioStream
 			    uint32_t			_lastFrag;
 			    uint32_t 			_extraLen;
 			    uint8_t  			*_extraData;
+			    uint64_t			_lastPos;
 			    
  			
 				
@@ -63,18 +64,12 @@ class oggAudio :  public AVDMGenericAudioStream
 			virtual 	~oggAudio() ;
 			virtual uint8_t goTo(uint32_t offset);
 			virtual uint32_t read(uint32_t size,uint8_t *ptr);
-			virtual uint32_t readPacket(uint32_t *size, uint8_t *data,uint32_t *flags);
-			virtual	uint8_t	 extraData(uint32_t *l,uint8_t **d)
-									{
-										*l=_extraLen;
-										*d=_extraData;
-										return 1;
-									}		
+			virtual uint32_t readPacket(uint32_t *size, uint8_t *data,uint32_t *flags,uint64_t *position);
 			//virtual uint32_t readDecompress( uint32_t size,uint8_t *ptr );
 			virtual uint8_t	 goToTime(uint32_t mstime);
 			virtual uint8_t	getPacket(uint8_t *dest, uint32_t *len, 
 						uint32_t *samples);
-
+			virtual uint8_t	extraData(uint32_t *l,uint8_t **d);
 };
 
 

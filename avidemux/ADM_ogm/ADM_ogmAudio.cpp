@@ -52,6 +52,7 @@ oggAudio::~ oggAudio()
 
 oggAudio::oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx )
 {
+uint64_t f;
 	_tracks=tracks;
 	_trackIndex=trkidx;
 	
@@ -93,13 +94,13 @@ oggAudio::oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx )
 		tmp1=new uint8_t[64*1024];
 		tmp2=new uint8_t[64*1024];
 	
-		readPacket(&size,tmp,&flags);
+		readPacket(&size,tmp,&flags,&f);
 		printf("1st header of %lu bytes stored as extra data (%lx flags)\n",size,flags);
 	
-		readPacket(&size1,tmp1,&flags);
+		readPacket(&size1,tmp1,&flags,&f);
 		printf("Comment follow (%lx as flags)\n",flags);
 	
-		readPacket(&size2,tmp2,&flags);
+		readPacket(&size2,tmp2,&flags,&f);
 		printf("cook book follow (%lx as flags)\n",flags);
 	
 		// 
@@ -180,16 +181,24 @@ uint64_t f;
 	return 0;
 
 }
-
+//______________________________________
+uint8_t	oggAudio::extraData(uint32_t *l,uint8_t **d)
+{
+	*l=_extraLen;
+	*d=_extraData;
+	if(_extraLen) return 1;
+	else	return 0;
+}
+//___________________________________
 uint32_t oggAudio::read(uint32_t size, uint8_t *data)
 {
 uint32_t i;
-
+uint64_t f;
 	if(_wavheader->encoding==WAV_OGG)
 	{
 
 		if(!_inBuffer)
-			readPacket(&_inBuffer,_buffer,&i);
+			readPacket(&_inBuffer,_buffer,&i,&f);
 		if(!_inBuffer) return 0;
 		if(size<_inBuffer)
 		{
@@ -217,7 +226,7 @@ uint32_t i;
 	uint8_t lenbyte;
 
 	//
-	ssize=readPacket(&cursize,data,&flags);
+	ssize=readPacket(&cursize,data,&flags,&f);
 	// First byte is len stuff
 	lenbyte=data[0];
 	lenbyte=(lenbyte>>6)+((lenbyte&2)<<1);
@@ -238,6 +247,7 @@ uint8_t		oggAudio::getPacket(uint8_t *dest, uint32_t *len,
 						uint32_t *samples)
 {
 uint32_t f;
+uint64_t pos;
 
 //	printf("OggAudio::getPacket");
 	if(_wavheader->encoding!=WAV_OGG)
@@ -247,8 +257,12 @@ uint32_t f;
 	//printf("OggAudio::Get Vorbis packet\n");
 	*len=0;
 	*samples=0;
-	readPacket(len,dest,&f);
-	*samples=1024; // FIXME
+	pos=_lastPos;
+	if(!readPacket(len,dest,&f,&pos)) return 0;
+	//*samples=1024; // FIXME
+	//printf("%llu pos %llu lastpos\n",pos,_lastPos);
+	*samples=pos-_lastPos;
+	_lastPos=pos;
 	return 1;
 }
 
@@ -257,12 +271,11 @@ uint32_t f;
 //	Used for VBR interface, use it use it use it
 //	It is a bit recursive due to excessive laziness
 
-uint32_t oggAudio::readPacket(uint32_t *size, uint8_t *data,uint32_t *flags)
+uint32_t oggAudio::readPacket(uint32_t *size, uint8_t *data,uint32_t *flags,uint64_t *position)
 {
 uint32_t i;
 uint8_t *frags,frag;
 uint32_t cursize;
-uint64_t f;
 uint32_t fl;
 
 
@@ -288,13 +301,13 @@ uint32_t fl;
 				}
 			}
 			_lastFrag=NO_FRAG;
-			readPacket(&cursize,data,flags);
+			readPacket(&cursize,data,flags,position);
 			*size+=cursize;
 			return *size;
 		}
 
 		// We need a fresh packet
-		while(_demuxer->readHeaderOfType(_currentTrack->audioTrack,&cursize,flags,&f))
+		while(_demuxer->readHeaderOfType(_currentTrack->audioTrack,&cursize,flags,position))
 		{
 			_demuxer->getLace(&frag,&frags);
 			for(uint32_t i=0;i<frag;i++)
@@ -313,7 +326,7 @@ uint32_t fl;
 				}
 			}
 			_lastFrag=NO_FRAG;
-			readPacket(&cursize,data,flags);
+			readPacket(&cursize,data,flags,position);
 			*size+=cursize;
 			return *size;	
 		
@@ -360,7 +373,7 @@ OgAudioIndex *idx;
 	val/=1000; // in seconds
 	aprintf("OGM:Looking for %lu ms\n",mstime);
 	aprintf("Looking for %llu sample\n",val);
-	
+	_lastPos=0;
 	
 	//
 	idx=_currentTrack->index;
@@ -383,7 +396,10 @@ OgAudioIndex *idx;
 					_lastFrag=0;
 					// Clear the cross page packet if any
 					if((flags & OG_CONTINUE_PACKET))
-						readPacket(&cursize,_buffer,&flags);
+					{
+						readPacket(&cursize,_buffer,&flags,&f);
+					}
+					_lastPos=f;
 					return 1;
 				
 				}

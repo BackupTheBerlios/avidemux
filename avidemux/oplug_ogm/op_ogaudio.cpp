@@ -83,9 +83,10 @@ WAVHeader	*info=NULL;
 		if(audioProcessMode)
 		{
 			uint16_t fcc;
+			
 			audioFilter=  buildAudioFilter (currentaudiostream,
-							video_body->getTime (frameStart),
-				  			0xffffffff);
+					video_body->getTime (frameStart),
+					0xffffffff);
 			fcc=audioFilter->getInfo()->encoding;
 			encoding_gui->setAudioCodec(getStrFromAudioCodec(fcc));
 		}
@@ -93,8 +94,20 @@ WAVHeader	*info=NULL;
 		{
 			 int32_t shift=0;
       			if(audioDelay && audioShift) shift=audioDelay;
-      			audioFilter=buildRawAudioFilter( video_body->getTime (frameStart), 
-      				0xffffffff, shift);
+			
+			// In case of ogm we cannot use the
+			// shift filter as it would override the getpacket specific
+			// to ogm container and destroy needed infos
+			if(currentaudiostream->getInfo()->encoding==WAV_OGG)
+			{
+				audioFilter=currentaudiostream;
+				currentaudiostream->goToTime(video_body->getTime (frameStart));
+			}
+			else
+			{
+      				audioFilter=buildRawAudioFilter( video_body->getTime (frameStart), 
+      					0xffffffff, shift);
+			}
 			encoding_gui->setAudioCodec("Copy");
 			
 		}
@@ -173,7 +186,14 @@ WAVHeader	*info=NULL;
 		{
 			uint32_t exlen;
 			uint8_t  *exdata;
+			if(!audioProcessMode)
+			{
+			currentaudiostream->extraData(&exlen,&exdata);
+			}
+			else
+			{
 			audioFilter->extraData(&exlen,&exdata);
+			}
 			uint32_t *p;
 			p=(uint32_t *)exdata;
 			
@@ -183,7 +203,7 @@ WAVHeader	*info=NULL;
 				audioFilter=NULL;
 				delete audioStream;
 				audioStream=NULL;
-				printf("Vorbis audio setup failed\n");
+				printf("Vorbis audio setup failed (len:%lu)\n",exlen);
 				return 0;
 			}
 			
