@@ -17,6 +17,14 @@ codecs.mpeg2enc.svcd.ExtraParams,	STRING,	""
 codecs.mpeg2enc.dvd.maxbitrate,		UINT,	9500,	0,	9800
 codecs.mpeg2enc.dvd.quantisation,	UINT,	7,	2,	31
 codecs.mpeg2enc.dvd.ExtraParams,	STRING,	""
+filters.subtitle.fontname,		STRING, "/usr/X11R6/lib/X11/fonts/truetype/arial.ttf"
+filters.subtitle.charset,		STRING, "ASCII"
+filters.subtitle.fontsize,		UINT,	24,	1,	576
+filters.subtitle.ypercent,		UINT,	255,	0,	255
+filters.subtitle.upercent,		UINT,	0,	0,	255
+filters.subtitle.vpercent,		UINT,	0,	0,	255
+filters.subtitle.selfadjustable,	UINT,	0,	0,	1
+filters.subtitle.usebackgroundcolor,	UINT,	0,	0,	1
 test.string,	STRING,	"abcdhfgd"
 test.int,	INT,	0,	-3,	3
 test.uint,	UINT,	1,	0,	3

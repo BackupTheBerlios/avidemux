@@ -56,7 +56,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "prototype.h"
-
+#include "prefs.h"
 
 typedef struct unicd
 {
@@ -175,6 +175,14 @@ uint32_t l,f;
 
 				loadSubtitle();
 				loadFont();
+				prefs->set(FILTERS_SUBTITLE_FONTNAME,_conf->_fontname);
+				prefs->set(FILTERS_SUBTITLE_CHARSET,_conf->_charset);
+				prefs->set(FILTERS_SUBTITLE_FONTSIZE,_conf->_fontsize);
+                                prefs->set(FILTERS_SUBTITLE_YPERCENT,_conf->_Y_percent);
+                                prefs->set(FILTERS_SUBTITLE_UPERCENT,_conf->_U_percent);
+                                prefs->set(FILTERS_SUBTITLE_VPERCENT,_conf->_V_percent);
+                                prefs->set(FILTERS_SUBTITLE_SELFADJUSTABLE,_conf->_selfAdjustable);
+                                prefs->set(FILTERS_SUBTITLE_USEBACKGROUNDCOLOR,_conf->_useBackgroundColor);
 				ret=1;
 		}
 		delete [] sourceImage;

@@ -43,6 +43,14 @@ static opt_def opt_defs [] = {
 	{"codecs.mpeg2enc.dvd.maxbitrate",		UINT,	"9500",	NULL,	"0",	"9800"	},
 	{"codecs.mpeg2enc.dvd.quantisation",		UINT,	"7",	NULL,	"2",	"31"	},
 	{"codecs.mpeg2enc.dvd.ExtraParams",		STRING,"",	NULL, NULL, NULL },
+	{"filters.subtitle.fontname",		STRING,"/usr/X11R6/lib/X11/fonts/truetype/arial.ttf",NULL, NULL, NULL },
+	{"filters.subtitle.charset",            STRING,"ASCII",NULL, NULL, NULL },
+	{"filters.subtitle.fontsize",		UINT,	"24",	"1",	"576"	},
+	{"filters.subtitle.ypercent",		UINT,	"255",	"0",	"255"	},
+	{"filters.subtitle.upercent",		UINT,	"0",	"0",	"255"	},
+	{"filters.subtitle.vpercent",		UINT,	"0",	"0",	"255"	},
+	{"filters.subtitle.selfadjustable",	UINT,	"0",	"0",	"1"	},
+	{"filters.subtitle.usebackgroundcolor",	UINT,	"0",	"0",	"1"	},
 	{"test.string",		STRING,"abcdhfgd",NULL, NULL, NULL },
 	{"test.int",		INT,	"0",	NULL,	"-3",	"3"	},
 	{"test.uint",		UINT,	"1",	NULL,	"0",	"3"	},
@@ -68,7 +76,7 @@ static opt_def opt_defs [] = {
 	{"feature.saveprefsonexit",		UINT,	"1",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 29;
+int num_opts = 37;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2
