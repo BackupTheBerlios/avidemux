@@ -41,6 +41,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_encoder/adm_encConfig.h"
+#include "ADM_gui2/GUI_ui.h"
 #include "ADM_assert.h"
 #include "prefs.h"
 
@@ -107,8 +108,9 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 
 	fprintf(fd,"Video start-end : %lu %lu\n",frameStart,frameEnd);
 	
-// All done
 
+  fprintf(fd,"container :%d\n", UI_GetCurrentFormat());
+  // All done
   fclose (fd);
   // try to load filters
   tmp = (char *) ADM_alloc (strlen (name) + 10);
@@ -124,7 +126,14 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 
   saveVideoCodecConf(tmp);
   
-  ADM_dealloc (tmp);
+  ADM_dealloc(tmp);
+  
+  
+ 
+  
+  
+  
+  
   return 1;
 
 
@@ -254,6 +263,11 @@ uint8_t ADM_Composer::loadWorbench (char *name)
 	{
 		_haveMarkers=0;
 	}
+	int cont;
+	if(1==fscanf(fd,"container :%d\n", &cont))
+	{
+		UI_SetCurrentFormat( (ADM_OUT_FORMAT) cont );
+	}
 //***
     printf(" .. all loaded\n");
   fclose (fd);
@@ -287,3 +301,4 @@ uint8_t ADM_Composer::loadWorbench (char *name)
   return 1;
 
 }
+//EOF
