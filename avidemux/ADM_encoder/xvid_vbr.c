@@ -678,6 +678,8 @@ static int vbr_finish_2pass1(void *sstate)
 
 	}while(i < 2);
 
+	fseek(state->pass1_file,0,SEEK_CUR);	// Needed for win32/Mingw
+	
 	/* Overwrite the frame field - safe as we have written extra spaces */
 	fprintf(state->pass1_file, "# frames    : %.10d\n", state->nb_frames);
 
