@@ -283,7 +283,12 @@ UNUSED_ARG(mode);
 						return addFile (tmpname, 0);
 					} // else goto GUI_Question
 				} // else goto GUI_Question
-			} // else goto GUI_Question
+			}else{ // no audio stream
+				if(indexMpeg (name,tmpname,0)){
+					printf("\n re-opening %s\n",tmpname);
+					return addFile (tmpname, 0);
+				} // else goto GUI_Question
+			}
 		}
 	}
       if (GUI_Question ("This looks like mpeg\n Do you want to index it?"))
