@@ -135,7 +135,6 @@ _mainaviheader.dwMicroSecPerFrame=0;
 	    {
 	    abt:
 	      GUI_Alert ("Aborting!");
-	      guiStop ();
 	      delete[]buffer;
 	      return 0;
 	    }
