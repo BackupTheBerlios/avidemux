@@ -67,14 +67,15 @@ static void 		frame_changed( void );
 
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 
-static ADMImage *imgsrc,*imgdst;
+static ADMImage *imgsrc,*imgdst,*imgdisplay;
 static GtkWidget *dialog=NULL;
 static uint32_t scaler[256];
-static uint32_t points[8];
+static int32_t points[8];
 static uint32_t w,h;
 static uint32_t *rgbbuffer=NULL;
 static uint32_t *bargraph=NULL;
 static uint32_t *histogram=NULL;
+static uint32_t *histogramout=NULL;
 static AVDMGenericVideoStream *incoming;
 static const int cross[8]= {0,36,73,109,
 			146,182,219,255};
@@ -91,7 +92,8 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 {
 	int ret;
 	uint32_t l,f;
-	
+	uint32_t max=in->getInfo()->nb_frames;
+        
 	incoming=in;
 	// Allocate space for green-ised video
 	w=in->getInfo()->width;
@@ -99,23 +101,28 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 	
 	rgbbuffer=new uint32_t[w*h];
 	bargraph=new uint32_t [256*256];
-	histogram=new uint32_t [256*256];
+	histogram=new uint32_t [256*128];
+        histogramout=new uint32_t [256*128];
 	
 	imgdst=new ADMImage(w,h);
 	imgsrc=new ADMImage(w,h);
+        imgdisplay=new ADMImage(w,h);
 	
-	ADM_assert(in->getFrameNumberNoAlloc(0, &l, imgsrc,&f));
-
+        if(curframe<max) max=curframe;
+        
+	ADM_assert(in->getFrameNumberNoAlloc(max, &l, imgsrc,&f));
+        memcpy(imgdisplay->data+w*h,imgsrc->data+w*h,(w*h)>>1);
 	// init local equalizer
 	memcpy(points,param->_points,8*sizeof(uint32_t));	
-	equalizerBuildScaler((uint32_t *)points,(uint32_t *)scaler);
+	equalizerBuildScaler((int32_t *)points,(uint32_t *)scaler);
 
 	dialog=create_dialog1();
 	gtk_register_dialog(dialog);
 
 	gtk_widget_set_usize(WID(drawingarea1), w,h);
 	gtk_widget_set_usize(WID(histogram), 256,256);
-	gtk_widget_set_usize(WID(drawingarea3), 256,256);
+	gtk_widget_set_usize(WID(drawingarea_histin), 256,128);
+        gtk_widget_set_usize(WID(drawingarea_histout), 256,128);
 	
 	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonCancel), GTK_RESPONSE_CANCEL);
 	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button3),      GTK_RESPONSE_OK);
@@ -159,15 +166,20 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 	
 	delete imgdst;
 	delete imgsrc;
+        delete imgdisplay;
 	delete [] rgbbuffer;
 	delete [] bargraph;
 	delete [] histogram;
+        delete [] histogramout;
+        
 	histogram=NULL;
+        histogramout=NULL;
 	bargraph=NULL;
 	rgbbuffer=NULL;
 	imgdst=NULL;
 	imgsrc=NULL;
 	dialog=NULL;
+        imgdisplay=NULL;
 	return ret;
 
 }
@@ -191,6 +203,7 @@ GtkAdjustment *adj;
 	if(new_frame>=max) new_frame=max-1;
 	
 	ADM_assert(incoming->getFrameNumberNoAlloc(new_frame, &l, imgsrc,&f));
+         memcpy(imgdisplay->data+w*h,imgsrc->data+w*h,(w*h)>>1);
 	compute_histogram();
 	update();
 
@@ -200,6 +213,7 @@ void spinner(void)
 		read();
 		recalc();
 		upload();
+                compute_histogram();
 		update();
 }
 void recalc( void )
@@ -207,7 +221,7 @@ void recalc( void )
 uint32_t y,tgt;
 	// compute the in-between field & display them
 	
-	equalizerBuildScaler((uint32_t *)points,(uint32_t *)scaler);
+	equalizerBuildScaler((int32_t *)points,(uint32_t *)scaler);
 	// Show bargraph
 	memset(bargraph,0,256*256*sizeof(uint32_t));
 	for(uint32_t x=0;x<256;x++)
@@ -230,6 +244,10 @@ uint32_t y,tgt;
 	for(uint32_t i=0;i<8;i++)
 		drawCross(cross[i],points[i]);
 	// and draw
+        
+        
+        
+        
 	draw();
 }
 void drawCross(uint32_t x,uint32_t y)
@@ -247,37 +265,70 @@ uint32_t tgt=(255-y)*256+x;
 }
 void update( void)
 {
-	uint8_t *src,*dst;
+	uint8_t *src,*dst,*disp;
 	src=imgsrc->data;
 	dst=imgdst->data;
 	// Only do left side of target
 	for(int y=0;y<h;y++)
 	{
-		for(int x=0;x<w>>1;x++)
+		for(int x=0;x<w;x++)
 		{
 			*dst=scaler[*src];
 			dst++;
 			src++;
-		}
-		memcpy(dst,src,w>>1);
-		dst+=w>>1;
-		src+=w>>1;
+		}		
 	}
+        // Img src = 10
+        //           01
+        // Img dst= 01
+        //          10
+        uint32_t half=w>>1;
+        
+        dst=imgdst->data;
+        src=imgsrc->data;
+        disp=imgdisplay->data;
+        
+        for(int y=0;y<h;y++)
+        {
+                if(y>h/2)
+                {
+                        memcpy(disp,src,half);
+                        memcpy(disp+half,dst+half,half);
+                
+                
+                }
+                else
+                {
+                
+                        memcpy(disp,dst,half);
+                        memcpy(disp+half,src+half,half);
+                }
+                src+=w;
+                dst+=w;
+                disp+=w;
+        
+        }
 	// udate u & v
-	uint32_t s=w*h;
-	memcpy(imgdst->data+s,imgsrc->data+s,s>>1);
 	// now convert to rgb
-	COL_yv12rgb(  w,   h,imgdst->data,(uint8_t *)rgbbuffer );
+	COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
 	draw();
 }
 // Compute histogram
+// Top is histogram in, bottom is histogram out
 void compute_histogram(void)
 {
 	uint32_t value[256];
+        uint32_t valueout[256];
+        uint8_t v;
+        
 	memset(value,0,256*sizeof(uint32_t));
+        memset(valueout,0,256*sizeof(uint32_t));
+        // In
 	for(uint32_t t=0;t<w*h;t++)
 	{
-		value[imgsrc->data[t]]++;	
+                v=imgsrc->data[t];
+		value[v]++;	
+                valueout[scaler[v]]++;
 	}
 	// normalize
 	double d,a;
@@ -289,23 +340,41 @@ void compute_histogram(void)
 		d/=a;
 		value[i]=(uint32_t)floor(d+0.49);
 		
-		if(value[i]>255) value[i]=255;
+		if(value[i]>127) value[i]=127;
+                
+                d=valueout[i];
+                d*=256*ZOOM_FACTOR;
+                d/=a;
+                valueout[i]=(uint32_t)floor(d+0.49);
+                
+                if(valueout[i]>127) valueout[i]=127;
+                
+                
 	}
 	// Draw
-	memset(histogram,0,256*256*sizeof(uint32_t));
-	uint32_t y,tgt;
+	memset(histogram,0,256*128*sizeof(uint32_t));
+        memset(histogramout,0,256*128*sizeof(uint32_t));
+	uint32_t y,tgt,yout;
 	for(uint32_t i=0;i<256;i++)
 	{
 		y=value[i];
+                
 		for(uint32_t u=0;u<=y;u++)
 		{
-			tgt=i+(255-u)*256;
+			tgt=i+(127-u)*256;
 			histogram[tgt]=0xFFFFFFFF;
 		}
+                
+                y=valueout[i];
+                
+                for(uint32_t u=0;u<=y;u++)
+                {
+                        tgt=i+(127-u)*256;
+                        histogramout[tgt]=0xFFFFFFFF;
+                }
 	}
 
-
-
+        
 }
 /*---------------------------------------------------------------------------
 	Actually draw the working frame on screen
@@ -322,9 +391,12 @@ gboolean draw (void)
 	draw=WID(histogram);
 	GUI_RGBDisplay((uint8_t *)bargraph, 256,256, (void *)draw);
 	
-	draw=WID(drawingarea3);
-	GUI_RGBDisplay((uint8_t *)histogram, 256,256, (void *)draw);
+	draw=WID(drawingarea_histin);
+	GUI_RGBDisplay((uint8_t *)histogram, 256,128, (void *)draw);
 	
+        draw=WID(drawingarea_histout);
+        GUI_RGBDisplay((uint8_t *)histogramout, 256,128, (void *)draw);
+        
 	return true;
 }
 
@@ -354,6 +426,7 @@ void upload(void)
 	
 }
 
+
 GtkWidget*
 create_dialog1 (void)
 {
@@ -381,7 +454,9 @@ create_dialog1 (void)
   GtkObject *spinbutton8_adj;
   GtkWidget *spinbutton8;
   GtkWidget *label1;
-  GtkWidget *drawingarea3;
+  GtkWidget *vbox3;
+  GtkWidget *drawingarea_histin;
+  GtkWidget *drawingarea_histout;
   GtkWidget *hbox1;
   GtkWidget *buttonCancel;
   GtkWidget *buttonApply;
@@ -417,49 +492,49 @@ create_dialog1 (void)
   gtk_widget_show (vbox2);
   gtk_container_add (GTK_CONTAINER (frame1), vbox2);
 
-  spinbutton1_adj = gtk_adjustment_new (1, 0, 255, 1, 10, 10);
+  spinbutton1_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
   spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 0);
   gtk_widget_show (spinbutton1);
   gtk_box_pack_start (GTK_BOX (vbox2), spinbutton1, FALSE, FALSE, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton1), TRUE);
 
-  spinbutton2_adj = gtk_adjustment_new (1, 0, 255, 1, 10, 10);
+  spinbutton2_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
   spinbutton2 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton2_adj), 1, 0);
   gtk_widget_show (spinbutton2);
   gtk_box_pack_start (GTK_BOX (vbox2), spinbutton2, FALSE, FALSE, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton2), TRUE);
 
-  spinbutton3_adj = gtk_adjustment_new (1, 0, 255, 1, 10, 10);
+  spinbutton3_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
   spinbutton3 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton3_adj), 1, 0);
   gtk_widget_show (spinbutton3);
   gtk_box_pack_start (GTK_BOX (vbox2), spinbutton3, FALSE, FALSE, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton3), TRUE);
 
-  spinbutton4_adj = gtk_adjustment_new (1, 0, 255, 1, 10, 10);
+  spinbutton4_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
   spinbutton4 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton4_adj), 1, 0);
   gtk_widget_show (spinbutton4);
   gtk_box_pack_start (GTK_BOX (vbox2), spinbutton4, FALSE, FALSE, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton4), TRUE);
 
-  spinbutton5_adj = gtk_adjustment_new (1, 0, 255, 1, 10, 10);
+  spinbutton5_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
   spinbutton5 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton5_adj), 1, 0);
   gtk_widget_show (spinbutton5);
   gtk_box_pack_start (GTK_BOX (vbox2), spinbutton5, FALSE, FALSE, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton5), TRUE);
 
-  spinbutton6_adj = gtk_adjustment_new (1, 0, 255, 1, 10, 10);
+  spinbutton6_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
   spinbutton6 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton6_adj), 1, 0);
   gtk_widget_show (spinbutton6);
   gtk_box_pack_start (GTK_BOX (vbox2), spinbutton6, FALSE, FALSE, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton6), TRUE);
 
-  spinbutton7_adj = gtk_adjustment_new (1, 0, 255, 1, 10, 10);
+  spinbutton7_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
   spinbutton7 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton7_adj), 1, 0);
   gtk_widget_show (spinbutton7);
   gtk_box_pack_start (GTK_BOX (vbox2), spinbutton7, FALSE, FALSE, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton7), TRUE);
 
-  spinbutton8_adj = gtk_adjustment_new (1, 0, 255, 1, 10, 10);
+  spinbutton8_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
   spinbutton8 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton8_adj), 1, 0);
   gtk_widget_show (spinbutton8);
   gtk_box_pack_start (GTK_BOX (vbox2), spinbutton8, FALSE, FALSE, 0);
@@ -470,10 +545,17 @@ create_dialog1 (void)
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label1);
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
 
-  drawingarea3 = gtk_drawing_area_new ();
-  gtk_widget_show (drawingarea3);
-  gtk_box_pack_start (GTK_BOX (hbox2), drawingarea3, TRUE, TRUE, 0);
-  gtk_widget_set_size_request (drawingarea3, 256, 256);
+  vbox3 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox3);
+  gtk_box_pack_start (GTK_BOX (hbox2), vbox3, TRUE, TRUE, 0);
+
+  drawingarea_histin = gtk_drawing_area_new ();
+  gtk_widget_show (drawingarea_histin);
+  gtk_box_pack_start (GTK_BOX (vbox3), drawingarea_histin, TRUE, TRUE, 0);
+
+  drawingarea_histout = gtk_drawing_area_new ();
+  gtk_widget_show (drawingarea_histout);
+  gtk_box_pack_start (GTK_BOX (vbox3), drawingarea_histout, TRUE, TRUE, 0);
 
   hbox1 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox1);
@@ -521,7 +603,9 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, spinbutton7, "spinbutton7");
   GLADE_HOOKUP_OBJECT (dialog1, spinbutton8, "spinbutton8");
   GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
-  GLADE_HOOKUP_OBJECT (dialog1, drawingarea3, "drawingarea3");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox3, "vbox3");
+  GLADE_HOOKUP_OBJECT (dialog1, drawingarea_histin, "drawingarea_histin");
+  GLADE_HOOKUP_OBJECT (dialog1, drawingarea_histout, "drawingarea_histout");
   GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
   GLADE_HOOKUP_OBJECT (dialog1, buttonCancel, "buttonCancel");
   GLADE_HOOKUP_OBJECT (dialog1, buttonApply, "buttonApply");

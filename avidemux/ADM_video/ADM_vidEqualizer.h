@@ -11,7 +11,7 @@
 //
 typedef struct EqualizerParam
 {
-	uint32_t _points[8];
+	int32_t  _points[8];
 	uint32_t _scaler[256];
 }EqualizerParam;
 
@@ -36,6 +36,6 @@ typedef struct EqualizerParam
 							
  }     ;
  
- uint8_t equalizerBuildScaler(uint32_t *p,uint32_t *s);
+ uint8_t equalizerBuildScaler(int32_t *p,uint32_t *s);
  
 //EOF

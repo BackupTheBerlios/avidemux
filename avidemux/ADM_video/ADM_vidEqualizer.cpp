@@ -68,7 +68,7 @@ static const int cross[8]= {0,36,73,109,
 // conversion table
 //_____________________________________________
 #if 1 // Linear
-uint8_t equalizerBuildScaler(uint32_t *p,uint32_t *s)
+uint8_t equalizerBuildScaler(int32_t *p,uint32_t *s)
 {
 double alpha,r;
 int32_t deltax,deltay;
@@ -82,7 +82,12 @@ int32_t deltax,deltay;
 		if(deltay==0) // flat line
 		{
 			for(uint32_t x=cross[i];x<cross[i+1];x++)
-				s[x]=p[i];		
+                        {
+                                if(p[i]>=0)
+				    s[x]=p[i];		
+                                else
+                                    s[x]=0;
+                        }
 		}	
 		else
 		{
@@ -92,17 +97,23 @@ int32_t deltax,deltay;
 			{
 				r=(x-cross[i])*alpha;
 				r+=p[i];
-				if(r<0) r=0;
+                                if(r<0) r=0;
+				
 				s[x]=(uint32_t)floor(r+0.49);			
 			}
 		}
 	}
-	// And clip the ouput
-	for(uint32_t x=0;x<255;x++)
-		if(s[x]>255) s[x]=255;
+	for(int i=0;i<256;i++)
+        {
+                                if(s[i]<0) s[i]=0;
+                                if(s[i]>255) s[i]=255;
+        
+        }
+	
+		
 }	
 #else // X3+X+Y
-uint8_t equalizerBuildScaler(uint32_t *p,uint32_t *s)
+uint8_t equalizerBuildScaler(int32_t *p,uint32_t *s)
 {
 double r;
 int32_t deltax,deltay;
@@ -155,6 +166,7 @@ double y1,y2;
 					r*=xx;
 					r+=p[i-1];
 					if(r<0) r=0;
+                                        if(r>255) r=255;
 					s[x]=(uint32_t)floor(r+0.49);			
 				}
 			
@@ -163,9 +175,6 @@ double y1,y2;
 		
 		}
 	}
-	// And clip the ouput
-	for(uint32_t x=0;x<255;x++)
-		if(s[x]>255) s[x]=255;
 }	
 
 #endif
@@ -211,7 +220,7 @@ vidEqualizer::vidEqualizer(AVDMGenericVideoStream *in,CONFcouple *couples)
 				_param->_points[7]=255;
 
 		}
-		equalizerBuildScaler((uint32_t *)_param->_points,(uint32_t *)_param->_scaler); 
+		equalizerBuildScaler((int32_t *)_param->_points,(uint32_t *)_param->_scaler); 
 				
 		
 
