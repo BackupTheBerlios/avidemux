@@ -200,6 +200,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 		if(0>ret && !_context->hurry_up)
 		{
 					printf("\n error in FFMP43/mpeg4!\n");
+					printf("Err: %d, size :%d\n",ret,len);
 					return 0;
 		}
 		if(!got_picture && !_context->hurry_up)
@@ -207,7 +208,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 				// Some encoder code a vop header with the 
 				// vop flag set to 0
 				// it is meant to mean frame skipped but very dubious
-				if(len<8)
+				if(len<=8)
 					{
 						printf("Probably pseudo black frame...\n");
 						out->_Qp=2;
@@ -228,6 +229,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 					return 1;
 
 				}
+					printf("Err: %d, size :%d\n",ret,len);
 					printf("\n error in FFMP43/mpeg4!: got picture \n");
 					//GUI_Alert("Please retry with misc->Turbo off");
 					//return 1;
