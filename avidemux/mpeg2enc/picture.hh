@@ -118,6 +118,8 @@ public:
 	double SQ;
 	double avg_act;
 	double sum_avg_act;
+	/* MEANX : Average quant factor */
+	int	averageQuant;
 
 };
 

@@ -1186,7 +1186,8 @@ void putseq_next( int *type,int *quant )
 			stencodeworker( cur_picture );
 
 		*type=cur_picture->pict_type;
-		*quant=(int) floor(cur_picture->AQ+0.49);
+		//*quant=(int) floor(cur_picture->AQ+0.49);
+		*quant=cur_picture->averageQuant;
 
 #ifdef DEBUG
 		writeframe(cur_picture->temp_ref+ss.gop_start_frame,cur_picture->curref);

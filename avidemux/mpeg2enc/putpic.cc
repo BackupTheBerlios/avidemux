@@ -48,6 +48,7 @@
 
 #include <config.h>
 #include <stdio.h>
+#include <math.h>
 #include "global.h"
 #include "simd.h"
 #include "ratectl.hh"
@@ -401,6 +402,8 @@ void Picture::QuantiseAndPutEncoding(RateCtl &ratectl)
 	int i, j, k;
 	int MBAinc;
 	MacroBlock *cur_mb = 0;
+	// MEANX
+	int totalQuant=0;
     
 	/* picture header and picture coding extension */
     PutHeader();
@@ -440,6 +443,7 @@ void Picture::QuantiseAndPutEncoding(RateCtl &ratectl)
 			/* quantize macroblock : N.b. the MB_PATTERN bit may be
                set as a side-effect of this call. */
             cur_mb->Quantize();
+	    totalQuant+=cur_mb->mquant;
 
 			/* output mquant if it has changed */
 			if (cur_mb->cbp && mquant_pred!=cur_mb->mquant)
@@ -512,6 +516,11 @@ void Picture::QuantiseAndPutEncoding(RateCtl &ratectl)
     } /* Slice loop */
 
 	ratectl.UpdatePict(*this);
+	
+	double db;
+	db=mb_width*mb_height;
+	db=totalQuant/db+0.49;
+	this->averageQuant= (int)floor(db);
 }
 
 
