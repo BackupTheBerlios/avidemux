@@ -127,7 +127,7 @@ int ADMfont::fontSetCharSet (char *charset)
 
 	sin=1;
 	sout=4;
-#if defined( ADM_BSD_FAMILY) || defined(ICONV_NEED_CONST)
+#if  defined(ICONV_NEED_CONST)
  	sz=iconv(_conv,(const char **)&in,&sin,&out,&sout);
  #else
  	sz=iconv(_conv,&in,&sin,&out,&sout);
@@ -184,7 +184,7 @@ size_t sz;
 
 	sin=1;
 	sout=4;
-#if defined (ADM_BSD_FAMILY) || defined(ADM_SPARC)
+#if  defined(ICONV_NEED_CONST)
        sz=iconv(_conv,(const char **)&in,&sin,&out,&sout);
 #else
 	sz=iconv(_conv, &in,&sin,&out,&sout);

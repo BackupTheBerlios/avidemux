@@ -294,6 +294,7 @@ uint8_t *dist;
 				
 				ref=*src;
 				dist=distMatrix[ref];
+#undef CHECK				
 #define CHECK(x) cur=*x;if(dist[cur]<=_param->luma) {coef++;val+=cur;}x++;					
 					CHECK(c0);
 					CHECK(c0);

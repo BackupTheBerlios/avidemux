@@ -181,7 +181,7 @@ int i;
 	  printf("resample: rate ratio %ld:%ld, coeff interpolation not needed\n", r->a, r->b);
 	} else {
 	  r->dhb = Np;  /* Fixed-point Filter sampling-time-increment */
-	  if (r->Factor<1.0) r->dhb = r->Factor*Np + 0.5;
+	  if (r->Factor<1.0) r->dhb =(long int)floor( r->Factor*Np + 0.5);
 	  r->Xh = (r->Nwing<<La)/r->dhb;
 	  /* (Xh * dhb)>>La is max index into Imp[] */
 	}
@@ -206,7 +206,7 @@ int i;
 		return (0);
 	}
 	
-	r->Xsize = 2*Xoff + i/(1.0+r->Factor);
+	r->Xsize = (int)floor(2.*Xoff + i/(1.0+r->Factor));
 	r->Ysize = BUFFSIZE - r->Xsize;
 	/* st_report("Xsize %d, Ysize %d, Xoff %d",r->Xsize,r->Ysize,r->Xoff); */
 
@@ -240,7 +240,7 @@ int sox_run(	ResampleStruct *r,
 
 	i = (r->Ysize < *osamp)? r->Ysize : *osamp;
 	if (Nproc * r->Factor >= i)
-	  Nproc = i / r->Factor;
+	  Nproc = (int)floor(i / r->Factor);
 
 	Nx = Nproc - r->Xread; /* space for right-wing future-data */
 	if (Nx <= 0)
@@ -299,7 +299,7 @@ int sox_run(	ResampleStruct *r,
 		/* Advance by number of samples processed */
 		r->Xp += Nproc;
 		/* Calc time accumulation in Time */
-		creep = r->Time - r->Xoff; 
+		creep = (int)floor(r->Time - r->Xoff); 
 		if (creep)
 		{
 		  r->Time -= creep;   /* Remove time accumulation   */
@@ -892,7 +892,7 @@ int makeFilter(Float Imp[], long Nwing, double Froll, double Beta,
 
    /* it does help accuracy a bit to have the window stop at
     * a zero-crossing of the sinc function */
-   Mwing = (long)floor((double)Nwing/(((double)Num)/Froll))*(((double)Num)/Froll) +0.5;
+   Mwing = (long)(floor((double)Nwing/(((double)Num)/Froll))*(((double)Num)/Froll) +0.5);
    if (Mwing==0)
       return(-4);
 
