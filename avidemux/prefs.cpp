@@ -99,10 +99,11 @@ static opt_def opt_defs [] = {
 	{"feature.ignoresavedmarkers",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.use_lavcodec_mpeg",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.disable_nuv_resync",		UINT,	"0",	NULL,	"0",	"1"	},
-	{"feature.tryautoidx",		UINT,	"0",	NULL,	"0",	"1"	}
+	{"feature.tryautoidx",		UINT,	"0",	NULL,	"0",	"1"	},
+	{"feature.use_odml",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 60;
+int num_opts = 61;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2
