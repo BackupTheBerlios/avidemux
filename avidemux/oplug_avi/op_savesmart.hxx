@@ -23,18 +23,23 @@
      #warning HARDCODED MAX IMAGE SIZE
      				
 				ADMImage	*aImage;
+				uint32_t	_nextip;
 				uint8_t 	initEncoder(uint32_t qz );
 				uint8_t 	stopEncoder(void  );
        				uint32_t 	encoderReady;
               			uint32_t 	compEngaged;
 	virtual 		uint8_t 	setupVideo( char *name  );
  	virtual 		uint8_t 	writeVideoChunk(uint32_t frame );
+				uint8_t		 writeVideoChunk_recode (uint32_t frame);
+				uint8_t		 writeVideoChunk_copy (uint32_t frame);
               			encoder 	*_encoder;
               			uint8_t 	_cqReenc          ;
+				
      public:
      							
      						GenericAviSaveSmart(uint32_t qfactor);		
                           virtual 		~GenericAviSaveSmart();
+			  uint8_t 		seekNextRef(uint32_t frame,uint32_t *nextip);
    };
 
 

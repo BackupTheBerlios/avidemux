@@ -181,6 +181,9 @@ class ADM_Composer
 										uint32_t *flags=0,  uint8_t *seq=0);
 	          				uint32_t 	getTime(uint32_t fn);
 						uint32_t 	getFlags(uint32_t frame,uint32_t *flags);
+						uint8_t   	isSequential (uint32_t framenum);
+								// B follow A with just Bframes in between
+						uint8_t 	sequentialFramesB(uint32_t frameA,uint32_t frameB);
 						uint32_t 	getFlagsAndSeg (uint32_t frame, 
 									uint32_t * flags,uint32_t *segs);
 						uint8_t  	setFlag(uint32_t frame,uint32_t flags);

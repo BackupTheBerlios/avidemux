@@ -50,17 +50,21 @@ extern "C" {
 #include "oplug_avi/op_aviwrite.hxx"
 #include "oplug_avi/op_avisave.h"
 #include "oplug_avi/op_savesmart.hxx"
+
 #ifdef USE_FFMPEG		
- 
 #include "ADM_codecs/ADM_ffmpeg.h"		
 #endif
-#ifdef USE_DIVX
 
-#endif
+
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_EDITOR
+#include "ADM_toolkit/ADM_debug.h"
 GenericAviSaveSmart::GenericAviSaveSmart(uint32_t qf) : GenericAviSave()
 {
 	_cqReenc=qf;
 	ADM_assert(qf>=2 && qf<32);
+	_nextip=0;
+	encoderReady=0;
 }
 uint8_t	GenericAviSaveSmart::setupVideo (char *name)
 {
@@ -129,74 +133,151 @@ GenericAviSaveSmart::writeVideoChunk (uint32_t frame)
 {
   uint32_t    len;
   uint8_t     ret1, seq;
-//static char str[200];
 
+  frame+=frameStart;
   if (compEngaged)		// we were re-encoding
     {
-      video_body->getFlags (frameStart + frame, &_videoFlag);
-      if (_videoFlag & AVI_KEY_FRAME)
+    	return writeVideoChunk_recode(frame);
+    }
+    return writeVideoChunk_copy(frame);
+}
+//_________________________________________________________
+uint8_t GenericAviSaveSmart::writeVideoChunk_recode (uint32_t frame)
+{
+uint32_t len;
+	aprintf("Frame %lu encoding\n",frame);
+	video_body->getFlags ( frame, &_videoFlag);
+	if (_videoFlag & AVI_KEY_FRAME)
 	{
+	  aprintf("Smart: Stopping encoder\n");
 	  // It is a kf, go back to copy mode
 	  compEngaged = 0;
 	  stopEncoder ();	// Tobias F
 	  delete	    _encoder;
 	  _encoder = NULL;
-	  goto cpmod;
+	  return writeVideoChunk_copy(frame);
 	}
-    prmod:
-      printf ("\n %lu encoding", frame);
-      // Else encode it ....
-      //1-Read it
-      ret1 = video_body->getUncompressedFrame (frameStart + frame, aImage);
-      if (!ret1)
-	return 0;
-      // 2-encode it
-      if (!_encoder->encode (aImage, vbuffer, &len, &_videoFlag))
-	return 0;
-      // 3-write it
-      return writter->saveVideoFrame (len, _videoFlag, vbuffer);
-
-
-    }
-
-cpmod:
-  // Do we have to re-encode ?
-  ret1 = video_body->getFrameNoAlloc (frameStart + frame, vbuffer, &len,
-				      &_videoFlag, &seq);
-
-  if (!ret1)
-    return 0;
-
-  // if it is neither a keyframe and there is a flow cut.....
-
-  if (!(_videoFlag & AVI_KEY_FRAME) && !seq)
-    {
-      compEngaged = 1;
-      // Reinit encoder
-      initEncoder (_cqReenc);
-      goto prmod;
-    }
-  // else just write it...
-  printf ("\n %lu copying", frame);
-    if(muxSize)
-      	{
-				 		// we overshot the limit and it is a key frame
-				   	// start a new chunk
-				  	if(handleMuxSize() && (_videoFlag & AVI_KEY_FRAME))
-				   	{		
-					 	uint8_t *extraData;
-						uint32_t extraLen;
-
-   							video_body->getExtraHeaderData(&extraLen,&extraData);
-					   
-							if(!reigniteChunk(extraLen,extraData)) return 0;
-						
-						}
-				 }
-  return writter->saveVideoFrame (len, _videoFlag, vbuffer);
-
+	// Else encode it ....
+	//1-Read it
+	if (! video_body->getUncompressedFrame (frame, aImage))
+		return 0;
+	// 2-encode it
+	if (!_encoder->encode (aImage, vbuffer, &len, &_videoFlag))
+		return 0;
+	// 3-write it
+	return writter->saveVideoFrame (len, _videoFlag, vbuffer);
 }
+//_________________________________________________________
+uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
+{
+  // Check flags and seq
+  uint32_t myseq=0;
+  uint32_t nextip,len;
+  uint8_t seq;
+  
+  	aprintf("Frame %lu copying\n",frame);
+  	// all gop should be closed, so it should be safe to do it here
+	if(muxSize)
+      	{
+		// we overshot the limit and it is a key frame
+		// start a new chunk
+		if(handleMuxSize() && (_videoFlag & AVI_KEY_FRAME))
+		{		
+		 	uint8_t *extraData;
+			uint32_t extraLen;
+
+   			video_body->getExtraHeaderData(&extraLen,&extraData);
+					   
+			if(!reigniteChunk(extraLen,extraData)) return 0;
+		}
+	}
+  
+  	video_body->getFlags( frame,&_videoFlag);	
+	
+	
+  	if(_videoFlag & AVI_B_FRAME) // lookup next I/P frame
+	{
+		if(_nextip<frame) // new forward frame
+		{
+			aprintf("Smart:New forward frame\n");
+			if(!seekNextRef(frame,&nextip))
+			{
+				aprintf("Smart:B Frame without reference frame\n");
+				return 1;
+			}
+			// check if that the frame -1,....,next forward ref are all sequential
+			if(!video_body->sequentialFramesB(frame-1,nextip)&&!(_videoFlag &AVI_KEY_FRAME )) 
+			{
+				aprintf("Smart:There is a broken reference, encoding\n");
+				compEngaged = 1;
+				initEncoder (_cqReenc);
+				return writeVideoChunk_recode(frame);
+			}
+			
+			aprintf("Smart : using %lu as next\n",nextip);
+			// Seems ok, write it and mark it
+			if (! video_body->getFrameNoAlloc (nextip, vbuffer, &len,
+				      &_videoFlag, &seq))
+    				return 0;
+			_nextip=nextip;
+			return writter->saveVideoFrame (len, _videoFlag, vbuffer);
+		}
+		else
+		{	// Nth B frame
+			aprintf("Smart:Next B frame\n");
+			if (!video_body->getFrameNoAlloc (frame-1, vbuffer, &len,
+				      &_videoFlag, &seq))
+    				return 0;
+			return writter->saveVideoFrame (len, _videoFlag, vbuffer);
+		}
+	}
+	// Not a bframe
+	// Is it the frame we sent previously ?
+	if(frame==_nextip && _nextip)
+	{
+		// Send the last B frame instead
+		aprintf("Smart finishing B frame %lu\n",frame-1);
+		if (! video_body->getFrameNoAlloc (frame-1, vbuffer, &len,
+		      &_videoFlag, &seq))
+    			return 0;
+		return writter->saveVideoFrame (len, _videoFlag, vbuffer);
+	
+	}
+	// Regular frame
+	// just copy it
+	if(frame)
+		if(!video_body->sequentialFramesB(_nextip,frame)&&!(_videoFlag &AVI_KEY_FRAME ))  // Need to re-encode
+		{
+			aprintf("Seq broken..\n");
+			compEngaged = 1;
+			initEncoder (_cqReenc);
+			return writeVideoChunk_recode(frame);
+		}
+	_nextip=frame;
+	aprintf("Smart: regular\n");
+	if(! video_body->getFrameNoAlloc (frame, vbuffer, &len,
+				      &_videoFlag, &seq)) return 0;
  
+	
+	
+	return writter->saveVideoFrame (len, _videoFlag, vbuffer);
+}
+//_________________________________________________________
+uint8_t GenericAviSaveSmart::seekNextRef(uint32_t frame,uint32_t *nextip)
+{
+uint32_t flags;
+	for(uint32_t i=frame+1;i<frameEnd;i++)
+	{
+		video_body->getFlags( i,&flags);
+		if(!(flags & AVI_B_FRAME)) 
+		{
+			*nextip=i;
+			return 1;
+		}
+	
+	}
+	return 0;
+}
  //
  //
 uint8_t

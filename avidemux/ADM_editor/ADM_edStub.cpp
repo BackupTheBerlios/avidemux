@@ -123,6 +123,70 @@ uint8_t
   return _videos[ref]._aviheader->getFrameNoAlloc (relframe, ptr,
 						   framelen, flags);
 }
+// 
+// Check that the 2 frames are sequential with just B frames in between
+// B > A!
+// Return 1 if they are in sequence
+// 0 if not
+uint8_t ADM_Composer::sequentialFramesB(uint32_t frameA,uint32_t frameB)
+{
+	uint32_t relframeA,segA;
+	uint32_t relframeB,segB,ref;
+	uint32_t flags;
+	
+	ADM_assert(frameB>frameA);
+	
+	if (!convFrame2Seg (frameA, &segA, &relframeA))
+  	{	
+  		printf("Editor: seq : convFrame2seg failed!\n");
+    		return 0;
+  	}
+  	if (!convFrame2Seg (frameB, &segB, &relframeB))
+  	{	
+  		printf("Editor: seq : convFrame2seg failed!\n");
+    		return 0;
+  	}
+  	if(segA!=segB)
+	{
+	// printf("%lu %lu -> seg differs: %lu,%lu\n",frameA,frameB,segA,segB);
+	 return 0;
+	}
+	
+	 ref = _segments[segA]._reference;
+	
+	for(uint32_t i=relframeA+1;i<relframeB;i++)
+	{
+		_videos[ref]._aviheader->getFlags(i,&flags);
+		if(!(flags&AVI_B_FRAME)) 
+		{
+	//		printf("Start: %lu ko:%lu end:%lu\n",relframeA+1,i,relframeB);
+			return 0;		// There is not only B frame between A & B
+		}
+	}
+	
+	return 1;
+
+}
+//_________________________________________________________________
+uint8_t   ADM_Composer::isSequential (uint32_t framenum)
+{
+  uint32_t relframe;
+  uint32_t seg;
+  static uint32_t lastseg = 0, lastframe = 0;
+  uint32_t ref;
+
+  // convert frame to block, relative frame
+  if (!convFrame2Seg (framenum, &seg, &relframe))
+  {
+  	printf("Editor: seq : convFrame2seg failed!\n");
+    return 0;
+  }
+  
+	if ((lastseg == seg) && ((lastframe + 1) == relframe))
+	  return 1;
+	else
+	return 0;
+}
 
 
 //
