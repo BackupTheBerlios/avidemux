@@ -202,6 +202,7 @@ void mpeg_passthrough(  char *name )
 // 	{
 //   		PACK_AUDIO(0)
 // 	}
+  PACK_AUDIO(0)
   uint32_t cur=0;
   for (uint32_t i = frameStart; i < frameEnd; i++)
     {
