@@ -106,6 +106,7 @@ int	  ret=1;
 					sprintf(scriptError,"Unknown error");
 					break;
 		}
+		printf("** Script error : %s, command :****\n",scriptError);
 		dumpStack(value,pushed,args);	
 	}
 	

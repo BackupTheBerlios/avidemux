@@ -86,8 +86,8 @@ void A_saveImg (char *name);
 void A_saveBunchJpg( char *name);
 void A_requantize(void);
 void A_saveJpg (char *name);
-void A_loadWave (char *name);
-void A_loadAC3 (char *name);
+int A_loadWave (char *name);
+int A_loadAC3 (char *name);
 void A_saveAudioDecodedTest (char *name);
 void A_openBrokenAvi (char *name);
 int A_openAvi2 (char *name, uint8_t mode);
@@ -97,6 +97,7 @@ void HandleAction (Action action);
 void A_rebuildKeyFrame (void);
 extern int GUI_handleFilter (void);
 extern void filterCleanUp (void);
+int A_audioSave(char *name);
 static void ReSync (void);
 static void cleanUp (void);
 extern uint8_t getPreviewToggleStatus (void);
@@ -489,26 +490,9 @@ case ACT_Pipe2Other:
       GUI_FileSelRead ("Select AVI file to append...", A_appendAvi);
       break;
     case ACT_SaveWave:
-      if (currentaudiostream)	// yes it is checked 2 times so what ?
-	{
-	  if (audioProcessMode)
-	    {
-	      if (currentaudiostream->isCompressed ())
-		if (!currentaudiostream->isDecompressable ())
-		  {
-		    GUI_Alert
-		      ("Cannot decompress the requested audio stream\nPlease switch to Audio Copy mode");
-		    break;
-		  }
-	      // if we get here, either not compressed
-	      // or decompressable
-	      GUI_FileSelWrite ("Select WAV file to save ",
-				A_saveAudioDecodedTest);
-	    }
-	  else			// copy mode...
-	    {
-	      GUI_FileSelWrite ("Select MP3 file to save ", A_saveAudio);
-	    }
+      	{
+	GUI_FileSelWrite ("Select file to save audio",(SELFILE_CB *)A_audioSave);
+	
 	}
       break;
 
@@ -653,13 +637,13 @@ case ACT_Pipe2Other:
       break;
 
     case ACT_AudioSourceMP3:
-      GUI_FileSelRead ("Select MP3 to load ", GUI_loadMP3);
+      GUI_FileSelRead ("Select MP3 to load ", (SELFILE_CB *)GUI_loadMP3);
       break;
     case ACT_AudioSourceAC3:
-      GUI_FileSelRead ("Select AC3 to load ", A_loadAC3);
+      GUI_FileSelRead ("Select AC3 to load ", (SELFILE_CB *)A_loadAC3);
       break;
     case ACT_AudioSourceWAV:
-      GUI_FileSelRead ("Select WAV to load ", A_loadWave);
+      GUI_FileSelRead ("Select WAV to load ",(SELFILE_CB *) A_loadWave);
       break;
     case ACT_AudioSourceNone:
       //currentaudiostream=(AVDMGenericAudioStream *)NULL;
@@ -1456,11 +1440,11 @@ sz = avifileinfo->width* avifileinfo->height * 3;
 //
 //
 //_____________________________________________________________
-void
+int
 A_loadAC3 (char *name)
 {
   if (!avifileinfo)
-    return;
+    return 0;
 
 
   AVDMAC3AudioStream *ac3 = new AVDMAC3AudioStream ();
@@ -1470,11 +1454,12 @@ A_loadAC3 (char *name)
       GUI_Alert ("Failed to open this file \n (Not a WAV file?)\n");
       printf ("WAV open file failed...");
       delete ac3;
-      return;
+      return 0;
     }
   //currentaudiostream=wav;
   changeAudioStream (ac3, AudioAC3);
   wavinfo = currentaudiostream->getInfo ();
+  return 1;
 }
 
 //_____________________________________________________________
@@ -1483,11 +1468,11 @@ A_loadAC3 (char *name)
 //              
 //
 //_____________________________________________________________
-void
+int
 A_loadWave (char *name)
 {
   if (!avifileinfo)
-    return;
+    return 0;
   AVDMWavAudioStream *wav = new AVDMWavAudioStream ();
 
   if (wav->open (name) == 0)
@@ -1495,11 +1480,12 @@ A_loadWave (char *name)
       GUI_Alert ("Failed to open this file \n (Not a WAV?)\n");
       printf ("WAV open file failed...");
       delete wav;
-      return;
+      return 0;
     }
   //currentaudiostream=wav;
   changeAudioStream (wav, AudioWav);
   wavinfo = currentaudiostream->getInfo ();
+  return 1;
 }
 
 //________________________________________________________
@@ -2182,6 +2168,29 @@ else
 	GUI_GoToFrame(curframe);
 
 }
-
+//___________ save audio _____________
+int A_audioSave(char *name)
+{
+	if (!currentaudiostream)	// yes it is checked 2 times so what ?
+	return 0;
+	if (audioProcessMode)
+	{
+		if (currentaudiostream->isCompressed ())
+			if (!currentaudiostream->isDecompressable ())
+		  	{
+		    		GUI_Alert
+		      ("Cannot decompress the requested audio stream\nPlease switch to Audio Copy mode");
+		   		return 0;
+		  	}
+		// if we get here, either not compressed
+		// or decompressable
+		GUI_FileSelWrite ("Select WAV file to save ",A_saveAudioDecodedTest);
+	    }
+	else			// copy mode...
+	    {
+	      GUI_FileSelWrite ("Select MP3 file to save ", A_saveAudio);
+	    }
+	return 1;
+}
 // EOF
 

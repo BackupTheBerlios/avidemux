@@ -53,9 +53,9 @@ extern void A_saveAudio(char *name);
 extern void A_saveAudioDecodedTest(char *name);
 extern uint8_t indexMpeg(char *mpeg,char *file,uint8_t aid);
 extern void A_SaveAudioNVideo(char *name);
-extern void GUI_loadMP3(char *name);
-extern void A_loadAC3(char *name);
-extern void A_loadWave(char *name);
+extern int GUI_loadMP3(char *name);
+extern int A_loadAC3(char *name);
+extern int A_loadWave(char *name);
 extern void GUI_Quiet( void);
 extern void parseScript(char *name);
 extern void GUI_Verbose( void);
@@ -156,9 +156,9 @@ AUTOMATON reaction_table[]=
 		{"append",		1	,"append video",	A_appendAvi},
 		{"load-workbench",	1	,"load workbench file",	load_workbench},
 		{"save",		1	,"save avi",		save},		
-		{"external-mp3",	1	,"load external mpeg audio as audio track",GUI_loadMP3},
-		{"external-ac3",	1	,"load external ac3 audio as audio track",A_loadAC3},
-		{"external-wav",	1	,"load external wav audio as audio track",A_loadWave},
+		{"external-mp3",	1	,"load external mpeg audio as audio track",(one_arg_type)GUI_loadMP3},
+		{"external-ac3",	1	,"load external ac3 audio as audio track",(one_arg_type)A_loadAC3},
+		{"external-wav",	1	,"load external wav audio as audio track",(one_arg_type)A_loadWave},
 		{"audio-delay",		1	,"set audio time shift in ms (+ or -)",	call_setAudio},
 		{"audio-map",		0	,"build audio map (MP3 VBR)",	call_buildtimemap},
 		{"audio-bitrate",	1	,"set audio encoding bitrate",	call_audiobitrate},

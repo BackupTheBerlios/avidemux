@@ -131,21 +131,22 @@ void rebuild_status_bar(void)
 //              -> use mad ?
 //
 //_____________________________________________________________
-void GUI_loadMP3(char *name)
+int GUI_loadMP3(char *name)
 {
     if (!avifileinfo)
-	return;
+	return 0;
     AVDMMP3AudioStream *mp3 = new AVDMMP3AudioStream();
 
     if (mp3->open(name) == 0)
       {
 	  printf("MP3 open file failed...");
 	  delete mp3;
-	  return;
+	  return 0;
       }
     //currentaudiostream=mp3;
     changeAudioStream(mp3, AudioMP3);
     wavinfo = currentaudiostream->getInfo();
+    return 1;
 }
 
 

@@ -226,34 +226,33 @@ void GUI_GoToKFrame(uint32_t frame)
 }
 
 //_____________________________________________________________
-void GUI_GoToFrame(uint32_t frame)
+int GUI_GoToFrame(uint32_t frame)
 {
 uint32_t flags;
 
-    if (playing)
-	return;
+	if (playing)
+		return 0;
 
-       if (avifileinfo)
-      {
+      if (!avifileinfo)
+      		return 0;
+      
 
-        	if( !video_body->getUncompressedFrame(frame ,rdr_decomp_buffer,&flags))
-        	{
-            	GUI_Alert("Decompressing Error GF");
-          	 }
-           else
-           {
-             			curframe = frame;
-   			    	renderUpdateImage(rdr_decomp_buffer);
+	if( !video_body->getUncompressedFrame(frame ,rdr_decomp_buffer,&flags))
+	{
+		GUI_Alert("Decompressing Error GF");
+		return 0;
+	}
 
-                           	 if(mode_preview)
-          				editorUpdatePreview( curframe)       ;
+	curframe = frame;
+	renderUpdateImage(rdr_decomp_buffer);
 
-              			update_status_bar(flags);
-				UI_purge();
-	  	
-	  }
-     }
-    update_status_bar(flags);
+	if(mode_preview)
+		editorUpdatePreview( curframe);
+
+	update_status_bar(flags);
+	UI_purge();
+	
+    	return 1;
 
 }
 

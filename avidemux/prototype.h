@@ -13,10 +13,10 @@ uint8_t	GUI_XvRedraw(void);
 // GUI
 
 
-void GUI_loadMP3(char *name);
+int GUI_loadMP3(char *name);
 
 void GUI_GoToKFrame(uint32_t frame); // same as below execpt																			// closest previous frame
-void GUI_GoToFrame(uint32_t frame);
+int GUI_GoToFrame(uint32_t frame);
 
 void 			changeAudioStream(AVDMGenericAudioStream *newaudio,AudioSource so);
 void 			GUI_UpdateAudioToggle(AudioSource nwsource);

@@ -21,7 +21,7 @@
 void 		PathSplit(char *str, char **root, char **ext);
 void			PathStripName(char *str);
 char 		*PathCanonize(const char *tmpname);
-
+void		LowerCase(char *string);
 void 		GUI_Alert(const char *alertstring);
 int 			GUI_Question(const char *alertstring);
 void			GUI_Sleep(uint32_t ms);

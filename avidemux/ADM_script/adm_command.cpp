@@ -12,6 +12,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <ctype.h>
 #include <string.h>
 #include <assert.h>
@@ -30,14 +31,69 @@ int scriptVideoProcess(Arg *args);
 int scriptAudioDownsample(Arg *args);
 int scriptAudioResample(Arg *args);
 int scriptAudioNormalize(Arg *args);
+
+int scriptLoadAudio(Arg *args);
+int scriptSaveAudio(Arg *args);
+int scriptGoto(Arg *args);
+
+int scriptSleep(Arg *args);
+
 #include "adm_command.h" 
 void ADS_commandList( void );
 ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg);
+
+//_________Sleep in ms________________
+int scriptSleep(Arg *args)
+{
+	usleep(args[0].arg.integer*1000);
+	return 1;
+
+}
+//________________________________________________
+extern int A_audioSave(char *name);
+int scriptSaveAudio(Arg *args)
+{
+	return A_audioSave(args[0].arg.string);
+}
+//________________________________________________
+extern int GUI_loadMP3(char *name);
+extern int A_loadAC3(char *name);
+extern int A_loadWave(char *name);
+int scriptLoadAudio(Arg *args)
+{	
+	char *type=args[0].arg.string;
+	
+	LowerCase(type);
+	if(!strcmp(type,"mp3") )
+	{
+		return GUI_loadMP3(args[1].arg.string);
+		
+	}
+	if(!strcmp(type,"wav") )
+	{
+		return A_loadWave(args[1].arg.string);
+		
+	}
+	if(!strcmp(type,"ac3") )
+	{
+		return A_loadAC3(args[1].arg.string);
+		
+	}	
+	return 0;
+}
 //________________________________________________
 int scriptAudioProcess(Arg *args)
 {	
 	UI_setAProcessToggleStatus( args[0].arg.integer );
 	return 1;
+}
+//________________________________________________
+extern int GUI_GoToFrame(uint32_t frame);
+int scriptGoto(Arg *args)
+{	
+	if( args[0].arg.integer<0) return 0;
+	return GUI_GoToFrame( args[0].arg.integer );
+	
 }
 //________________________________________________
 int scriptVideoProcess(Arg *args)
@@ -99,10 +155,7 @@ ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg)
 int found=-1;
 	assert(nb<MAXPRM);
 	// First go to lowercase
-	for(int i=strlen(cmd)-1;i>=0;i--)
-	{
-		cmd[i]=tolower(cmd[i]);
-	}
+	LowerCase(cmd);
 	// 1- lookup the command
 	//_______________________
 	for(int i=sizeof(myCommands)/sizeof(admCommand)-1;i>=0;i--)

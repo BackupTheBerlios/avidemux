@@ -22,6 +22,7 @@
 #include <time.h>
 #include <math.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <sys/time.h>
 #include <gtk/gtk.h>
 
@@ -321,5 +322,13 @@ uint8_t ms2time(uint32_t ms, uint32_t *h,uint32_t *m, uint32_t *s)
 				*s=ss;
 	return 1;
 }
+// Convert everything to lowercase
+void		LowerCase(char *string)
+{
+	for(int i=strlen(string)-1;i>=0;i--)
+	{
+		string[i]=tolower(string[i]);
+	}
 
+}
 //EOF
