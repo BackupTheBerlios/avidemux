@@ -76,11 +76,6 @@ const  vector signed short multGu=(vector signed short)(MULGu,0,MULGu,0, MULGu,0
 const  vector signed short multGv=(vector signed short)(MULGV,0,MULGV,0, MULGV,0,MULGV,0);
 const  vector signed short conv2Signed=(vector signed short)(-128,-128,-128,-128,  									-128,-128,-128,-128);	
 const vecbyte maskR=(vecbyte)(2,0x12,6,0x16,10,0x1a,14,0x1e,  0,0,0,0,0,0,0,0);
-const vecbyte maskRG1=(vecbyte)(0,0x10,0,1, 0x11,0,2,0x12,  0,3,0x13,0 ,4,0x14,0,5);
-const vecbyte maskB1=(vecbyte)(0,1,0x10,3,  4,0x11,6,7,     0x12,9,10,0x13, 12,13,0x14,15);
-		
-const vecbyte maskRG2=(vecbyte)(0x15,5,0,0x16,  6,0,0x17,7,     0,0,0,0,0,0,0,0);
-const vecbyte maskB2=(vecbyte) (0,1,0x16,3,  4,0x17,6,7,  0,0,0,0,0,0,0,0);
 
 //____________________________________
 //	We handle 8 pixels at a time
@@ -123,21 +118,6 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		dest= vec_perm(MSQ, MSQ, mask); 
 
 		
-#define STORE_ALIGN(register,adr) \
-		MSQ = vec_ld(0, adr); \
-		LSQ = vec_ld(16, adr);\
-		align = vec_lvsr(0, adr); \
-		zero = vec_splat_u8( 0 ); \
-		neg1 = (vecbyte)vec_splat_s8( -1 ); \
-		mask=vec_perm(zero,neg1,align); \
-		register=vec_perm(register,register,align ); \
-		MSQ = vec_sel( MSQ, register, mask ); \
-		LSQ = vec_sel( register, LSQ, mask ); \
-		vec_st( MSQ, 0, adr ); \
-		vec_st( LSQ, 16, adr ); 
-	
-
-
 		
 	// We do 8 pixels at a time
 	int count=w;
@@ -244,42 +224,57 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 				
 		// aligned write (?)
 		
+		vecbyte merge0,merge1;
+		vecshort merge2;
+
+		merge0=vec_mergeh(nullVect,R);
+		merge1=vec_mergeh(G,B);
+		merge2=vec_mergeh( (vecshort) merge0,(vecshort )merge1);
+		printf("0:%vd\n",merge0);
+		printf("1:%vd\n",merge1);
+		printf("2:%vd\n",merge2);
 		
-		
-		
-		
-		
-			OUT=vec_perm(R,G,maskRG1);
-			aprintf("OUT0:%vd\n",OUT);
-			OUT=vec_perm(OUT,B,maskB1);
-			
-			aprintf("OUT1:%vd\n",OUT);
-		
-			STORE_ALIGN(OUT,ptr2);
+		printf("R:%vd\n",merge2);
 				
-			vec_splat(OUT,0);
-			OUT=vec_perm(B,G,maskRG2);
-			aprintf("OUT21:%vd\n",OUT);
-			OUT=vec_perm(OUT,R,maskB2);
-			
-			aprintf("OUT22:%vd\n",OUT);
-			STORE_ALIGN(OUT,ptr2+16);
+		vec_st((vecbyte)merge2,0,ptr2);
+		merge2=vec_mergel( (vecshort) merge0,(vecshort )merge1);
 		
-		// Now do y2_______________________
+		printf("0:%vd\n",merge0);
+		printf("1:%vd\n",merge1);
+		printf("2:%vd\n",merge2);
+		vec_st((vecbyte)merge2,16,ptr2);
+		
+		// and do y2________________________________
+		
+		R0=vec_add(sv16e,Ra);
+		R1=vec_add(sv16o,Ra);
+		G0=vec_add(sv16e,Ga);
+		G1=vec_add(sv16o,Ga);
+		B0=vec_add(sv16e,Ba);
+		B1=vec_add(sv16o,Ba);
+
 		
 		
-		// so now we add Y to Ra to get R, Y+Ga=G, Y+Ba=B
-		R0=vec_add(sz16e,Ra);
-		R1=vec_add(sz16o,Ra);
-		G0=vec_add(sz16e,Ga);
-		G1=vec_add(sz16o,Ga);
-		B0=vec_add(sz16e,Ba);
-		B1=vec_add(sz16o,Ba);
+		aprintf("R0:%vld\n",R0);
+		aprintf("R0b:%vd\n",(vecbyte)R0);
+		aprintf("R1:%vld\n",R1);
+		aprintf("R1b:%vd\n",(vecbyte)R1);
+		
+		aprintf("B0:%vld\n",B0);
+		aprintf("B1:%vld\n",B1);
+				
+		
+		// now time to pack the result		
+		// R0 G0 B0 R1 G1 B1 for each pack
+		// Merge 0/1 to get packed R G B
 		
 		
-		// Pack both to single packed bytes
-		// Do saturation here too
-		
+
+		// Interleav R0 and G0
+		// We done do clipping (yet)
+		// Saturate
+		#define SAT(x) \
+			x=vec_max(x,(vector signed int)nullVect);
 		SAT(R0);
 		SAT(R1);
 		SAT(G0);
@@ -287,37 +282,46 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		SAT(B0);
 		SAT(B1);
 		
+		
+		
 		R=vec_perm((vecbyte)R0,(vecbyte)R1,maskR);
 		G=vec_perm((vecbyte)G0,(vecbyte)G1,maskR);
 		B=vec_perm((vecbyte)B0,(vecbyte)B1,maskR);
 		
+		aprintf("R:%vd\n",R);
+		aprintf("G:%vd\n",G);
+		aprintf("B:%vd\n",B);
 				
 		// aligned write (?)
 		
+		vecbyte merge0,merge1;
+		vecshort merge2;
+
+		merge0=vec_mergeh(nullVect,R);
+		merge1=vec_mergeh(G,B);
+		merge2=vec_mergeh( (vecshort) merge0,(vecshort )merge1);
+		printf("0:%vd\n",merge0);
+		printf("1:%vd\n",merge1);
+		printf("2:%vd\n",merge2);
 		
-			OUT=vec_perm(R,G,maskRG1);
-			aprintf("OUT0:%vd\n",OUT);
-			OUT=vec_perm(OUT,B,maskB1);
-			
-			aprintf("OUT1:%vd\n",OUT);
-		
-			STORE_ALIGN(OUT,ptr3);
+		printf("R:%vd\n",merge2);
 				
-			vec_splat(OUT,0);
-			OUT=vec_perm(B,G,maskRG2);
-			aprintf("OUT21:%vd\n",OUT);
-			OUT=vec_perm(OUT,R,maskB2);
-			
-			aprintf("OUT22:%vd\n",OUT);
-			STORE_ALIGN(OUT,ptr3+16);
+		vec_st((vecbyte)merge2,0,ptr3);
+		merge2=vec_mergel( (vecshort) merge0,(vecshort )merge1);
 		
-		// and do y2________________________________
+		printf("0:%vd\n",merge0);
+		printf("1:%vd\n",merge1);
+		printf("2:%vd\n",merge2);
+		vec_st((vecbyte)merge2,16,ptr3);
+		
+		
+		//
 		count--;
 		ptr_y+=8;
 		ptr_u+=4;
 		ptr_v+=4;
-		ptr2+=24;	
-		ptr3+=24;
+		ptr2+=32;	
+		ptr3+=32;
 
 	}
 	

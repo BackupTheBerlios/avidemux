@@ -82,7 +82,7 @@ uint8_t renderResize(uint32_t w, uint32_t h)
 			delete [] screenBuffer;
 			screenBuffer=NULL;
 		}
-	assert(screenBuffer=new uint8_t [(w*h*3)]);		// RGB -> *3
+	assert(screenBuffer=new uint8_t [(w*h*4)]);		// RGB -> *3
 	updateWindowSize( draw,w,h);
 	UI_purge();
 	return 1;

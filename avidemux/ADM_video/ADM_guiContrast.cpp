@@ -45,7 +45,7 @@
 #include "ADM_toolkit/toolkit_gtk_include.h"
 
 
-extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
+#include "prototype.h"
 
 
 static int 					getContrastParams(	void);
@@ -83,11 +83,11 @@ uint8_t r;
 							h= _in->getInfo()->height;
 						
 
-							video2=(uint8_t *)malloc(w*h*3);							
+							video2=(uint8_t *)malloc(w*h*4);							
 							assert(video2);
-							video1=(uint8_t *)malloc(w*h*3);							
+							video1=(uint8_t *)malloc(w*h*4);							
 							assert(video1);
-    					video3=(uint8_t *)malloc(w*h*3);							
+    					video3=(uint8_t *)malloc(w*h*4);							
 							assert(video1);
 
 							
@@ -96,7 +96,7 @@ uint8_t r;
           																				video1,&f));
 						
 							// From now we work in RGB !
-							memcpy(video2,video1,w*h*3);
+							memcpy(video2,video1,w*h*4);
 							
               COL_yv12rgb(w,h,video2,video3);
 				
@@ -214,7 +214,7 @@ uint32_t sz;
          			buildContrastTable( par.coef,par.offset,
   								tableluma,tablechroma);
 
-       memcpy(video2,video1,sh*sw*3);
+       memcpy(video2,video1,sh*sw*4);
        if( par.doLuma)
        		{
 					  doContrast(video1,video2,

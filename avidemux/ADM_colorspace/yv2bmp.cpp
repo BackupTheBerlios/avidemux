@@ -213,10 +213,10 @@ uint8_t  COL_yv12rgb(uint32_t w, uint32_t h,uint8_t * ptr, uint8_t * ptr2 )
 	  slowYV12RGB(y+w, u, v, e+3*w, w);
 #endif
 
-   	   y += w<<1;
+		y += w<<1;
 		u += w >> 1;
 		v += w >> 1;
-	   e += 6 * w;
+		e += 8 * w;
       }
   return 1;
 }

@@ -77,9 +77,9 @@ uint8_t *video1,*video2;
 
 							printf("\n Crop in : %lu  x %lu\n",w,h);
 
-							video2=(uint8_t *)malloc(w*h*3);							
+							video2=(uint8_t *)malloc(w*h*4);							
 							assert(video2);
-							video1=(uint8_t *)malloc(w*h*3);							
+							video1=(uint8_t *)malloc(w*h*4);							
 							assert(video1);
 
 							// ask current frame from previous filter

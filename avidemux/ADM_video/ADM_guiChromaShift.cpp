@@ -62,7 +62,7 @@
 
 
 
-extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
+#include "prototype.h"
 
 #define SPIN_GET(x,y) {y= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(dialog,#x))) ;\
 				printf(#x":%d\n", y);}
@@ -106,7 +106,7 @@ uint32_t l,f;
 							video_working=new uint8_t [ww*hh*2];
 							assert(video_working);
 
-							video_rgb=new uint8_t [ww*hh*3];
+							video_rgb=new uint8_t [ww*hh*4];
 							assert(video_rgb);
 
 

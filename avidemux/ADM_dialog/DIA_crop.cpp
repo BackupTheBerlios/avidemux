@@ -79,18 +79,15 @@ static uint32_t left,right,top,bottom,width,height;
 
 */
 
-static char str[100];
-static gint r;
-#define FILL_ENTRY(widget_name,value)           {sprintf(str,"%ld",value);r=-1;   \
-gtk_editable_delete_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), 0,-1);\
-gtk_editable_insert_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), str, strlen(str), &r);}
+
+#define FILL_ENTRY(widget_name,value) gtk_write_entry(WID(widget_name),  value)
 
 int DIA_getCropParams(		uint32_t *w,uint32_t 	*w2, uint32_t *h,uint32_t *h2,uint32_t tw,uint32_t th,
 									uint8_t *video)
 {
 	// Allocate space for green-ised video
-	working=new uint8_t [tw*(th)*3];
-	memcpy(working,video,tw*th*3);
+	working=new uint8_t [tw*(th)*4];
+	memcpy(working,video,tw*th*4);
 
 
 	uint8_t ret=0;
@@ -162,38 +159,53 @@ void update( uint8_t *buffer,uint32_t w,uint32_t h)
 		for(x=0;x<w;x++)
 		{
 			*in++=0;
+			
+			
 			*in++=0xff;
+			
+			*in++=0;
 			*in++=0;
 		}
 	}
 	// bottom
-	in=buffer+(w*3)*(h-bottom);
+	in=buffer+(w*4)*(h-bottom);
 	for(y=0;y<bottom;y++)
 	{
 		for(x=0;x<w;x++)
 		{
 			*in++=0;
+			
+			
 			*in++=0xff;
+			*in++=0;
 			*in++=0;
 		}
 	}
 	// left
 	in=buffer;
+	uint32_t stride=4*w-4;
 	for(y=0;y<h;y++)
 	{
 		for(x=0;x<left;x++)
 		{
-			*(in+3*x)=0;
-			*(in+3*x+1)=0xff;
-			*(in+3*x+2)=0;
+			*(in+4*x)=0;
+			
+			
+			*(in+4*x+1)=0xff;
+			*(in+4*x+2)=0;
+			*(in+4*x+3)=0;
 		}
 		for(x=0;x<right;x++)
 		{
-			*(in-3*x-3+3*w)=0;
-			*(in-3*x-2+3*w)=0xff;
-			*(in-3*x-1+3*w)=0;
+			*(in-4*x+stride-4)=0;
+			
+			
+			*(in-4*x+stride-3)=0xff;
+			*(in-4*x+stride-2)=0;
+			*(in-4*x+stride-1)=0;
+			
 		}
-		in+=3*w;
+		in+=4*w;
 
 	}
 
@@ -288,7 +300,7 @@ void autocrop( void )
 	{
 		sum=blackLine(in,width);
 		top=y;
-		printf("%d : %ld / %ld\n",y,sum,width);
+		printf("%d : %lu / %lu\n",y,sum,width);
 		// if black is more than 90 % it is ok
 		// 90%*width< sum
 
@@ -334,7 +346,7 @@ uint32_t sum=0;
 			{
 				sum++;
 			}
-			in+=3;
+			in+=4;
 		}
 	return sum;
 }

@@ -210,14 +210,17 @@ movq      %%mm6, (%3)   # Store ARGB1 ARGB0                                 \n\
 movq      %%mm0, %%mm6  #                 B7 B6 B5 B4 B3 B2 B1 B0           \n\
 punpcklbw %%mm2, %%mm6  #                 G3 B3 G2 B2 G1 B1 G0 B0           \n\
 punpckhwd %%mm7, %%mm6  #                 00 R3 G3 B3 00 R2 B3 G2           \n\
+#psllq	  $8,    %%mm6 	#		  R3 G3 B3 00 R2 B2 G2 00	    \n\
 movq      %%mm6, 8(%3)  # Store ARGB3 ARGB2                                 \n\
 punpckhbw %%mm2, %%mm4  #                 G7 B7 G6 B6 G5 B5 G4 B4           \n\
 punpckhbw %%mm3, %%mm5  #                 00 R7 00 R6 00 R5 00 R4           \n\
 punpcklwd %%mm5, %%mm4  #                 00 R5 B5 G5 00 R4 B4 G4           \n\
+#psllq	  $8,    %%mm4 #		  R3 G3 B3 00 R2 B2 G2 00	    \n\
 movq      %%mm4, 16(%3) # Store ARGB5 ARGB4                                 \n\
 movq      %%mm0, %%mm4  #                 B7 B6 B5 B4 B3 B2 B1 B0           \n\
 punpckhbw %%mm2, %%mm4  #                 G7 B7 G6 B6 G5 B5 G4 B4           \n\
 punpckhwd %%mm5, %%mm4  #                 00 R7 G7 B7 00 R6 B6 G6           \n\
+#psllq	  $8,    %%mm4	#		  R3 G3 B3 00 R2 B2 G2 00	    \n\
 movq      %%mm4, 24(%3) # Store ARGB7 ARGB6                                 \n\
                                                                             \n\
 "
@@ -265,6 +268,7 @@ void fastYV12RGB_mmx ( uint8_t * py,
             }
 	__asm__ ("EMMS");
 
+	#if 0
 	// now pack it
 	uint8_t *in,*out;
 
@@ -281,6 +285,7 @@ void fastYV12RGB_mmx ( uint8_t * py,
 					
 					
 		}
+	#endif
 }
 
 

@@ -37,7 +37,7 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_colorspace/colorspace.h"
-
+#include "prototype.h"
 static GtkWidget	*create_dialog1 (void);
 
 static void 			previewRender(void);
@@ -66,7 +66,7 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
 			printf("\n Warning rgb render not null...\n");
 			free(rgb_render);
 		}
-      assert(rgb_render=(uint8_t *)malloc(w*h*3));
+      assert(rgb_render=(uint8_t *)malloc(w*h*4));
        uw=w;
        uh=h;
 
@@ -148,17 +148,11 @@ void GUI_PreviewEnd(void)
 }
 void previewRender(void)
 {
-GtkWidget *win;
+
 if(!dialog) return;
-win=(lookup_widget(dialog,"drawingarea1"));
-gdk_draw_rgb_image(					win->window,
-         								win->style->fg_gc[GTK_STATE_NORMAL], 0,	// X
-								       0,	// y
-								       uw,	//width
-								       uh,	//h*2, // heigth
-								       GDK_RGB_DITHER_NONE,
-								       (guchar *) rgb_render,	// buffer
-								       uw * 3);
+GUI_RGBDisplay(rgb_render, uw, uh ,lookup_widget(dialog,"drawingarea1"));
+
+
 }
 // Called when the exit button is pushed
 //

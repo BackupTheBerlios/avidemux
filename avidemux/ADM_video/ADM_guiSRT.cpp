@@ -56,6 +56,8 @@
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_toolkit/ADM_debug.h"
 
+#include "prototype.h"
+
 
 typedef struct unicd
 {
@@ -75,7 +77,7 @@ static unicd  names[]=
 	,{(char *)"UTF"	,(char *)"UTF8"}		// UTF8
 };
 
-extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
+
 
 static void on_callback_sub(GtkButton * button, gpointer user_data);
 static void on_callback_font(GtkButton * button, gpointer user_data);
@@ -136,7 +138,7 @@ uint32_t l,f;
 
 		sourceImage		=new uint8_t[_w*_h*2];
 		targetImage		=new uint8_t[_w*_h*2];
-		targetImageRGB	=new uint8_t[_w*_h*3];
+		targetImageRGB	=new uint8_t[_w*_h*4];
 
 		assert(instream->getFrameNumberNoAlloc(curframe,
 						&l,
