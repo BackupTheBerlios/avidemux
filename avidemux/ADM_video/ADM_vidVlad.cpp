@@ -43,6 +43,10 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidVlad.h"
+#include "ADM_filter/video_filters.h"
+
+
+
 
 static  uint64_t _full_f = 0xFFFFFFFFFFFFFFFFLL;
 static  uint64_t _keep_right_luma = 0x00FF00FF00FF00FFLL;
@@ -72,7 +76,10 @@ static void ProcessYPlane( unsigned char *source, long int pitch_source,
 				    uint64_t  threshold);				   
 #define EXPAND(x) { x=x+(x<<8)+(x<<16)+(x<<24)+(x<<32)+(x<<40) \
 										+(x<<48)+(x<<56);}
+static FILTER_PARAM vladParam={2,{"ythresholdMask","cthresholdMask"}};
 
+
+SCRIPT_CREATE(vladsmooth_script,AVDMVideoVlad,vladParam);
 BUILD_CREATE(vladsmooth_create,AVDMVideoVlad);
 
 

@@ -66,8 +66,8 @@ printf(  "*********************\n");
 	REGISTERX("decimate","Decomb decimate",VF_DECIMATE,1,decimate_create,decimate_script);
 	
 	REGISTER("palsmart","PAL-SMART",VF_TELECIDE,1,telecide_create);
-/**/	REGISTER("deinterlace","Deinterlace",VF_DEINTERLACE,1,deinterlace_create);
-/**/	REGISTER("lavdeint","Lavcodec Deinterlacer",VF_LAVDEINT,1,lavdeint_create);
+	REGISTERX("deinterlace","Deinterlace",VF_DEINTERLACE,1,deinterlace_create,deinterlace_script);
+	REGISTERX("lavdeint","Lavcodec Deinterlacer",VF_LAVDEINT,1,lavdeint_create,lavdeint_script);
 	REGISTERX("palfieldshift","Pal Field shift",VF_PALSHIFT,1,addPALShift_create,addPALShift_script);
 	
 	REGISTERX("drop","Drop",VF_DROPOUT,1,dropout_create,dropout_script);
@@ -106,23 +106,23 @@ printf(  "*********************\n");
 		
 	registerFilter("-------------- Smoother -------------",VF_INVALID,2,NULL,NULL);
 		
-/**/	REGISTER("stabilize","Stabilize",VF_STABILIZE,1,stabilize_create);
-/**/	REGISTER("denoise","Denoise",VF_DENOISE,1,denoise_create);
-/**/	REGISTER("fluxsmooth","FluxSmooth",VF_FLUXSMOOTH,1,fluxsmooth_create);
-/**/	REGISTER("smoothclean","Smooth Clean",VF_SMOOTHCLEAN,0,smooth_create);
+	REGISTERX("stabilize","Stabilize",VF_STABILIZE,1,stabilize_create,stabilize_script);
+	REGISTERX("denoise","Denoise",VF_DENOISE,1,denoise_create,denoise_script);
+	REGISTERX("fluxsmooth","FluxSmooth",VF_FLUXSMOOTH,1,fluxsmooth_create,fluxsmooth_script);
+	REGISTERX("smoothclean","Smooth Clean",VF_SMOOTHCLEAN,0,smooth_create,smooth_script);
 #ifdef USE_MMX
-    	REGISTER("temporalcleaner","Temporal Cleaner",VF_VLADSMOOTH,1,vladsmooth_create);
+    	REGISTERX("temporalcleaner","Temporal Cleaner",VF_VLADSMOOTH,1,vladsmooth_create,vladsmooth_script);
 #endif
 
-/**/	REGISTER("mpdenoise3d","Mplayer Denoise3D",VF_MPLLQD3D,1,MPD3Dlow_create);
+	REGISTERX("mpdenoise3d","Mplayer Denoise3D",VF_MPLLQD3D,1,MPD3Dlow_create,MPD3Dlow_script);
 
-/**/	REGISTER("mphqdenoise3d","Mplayer HQDenoise3D",VF_MPLHQD3D,1,MPD3D_create);
+	REGISTERX("mphqdenoise3d","Mplayer HQDenoise3D",VF_MPLHQD3D,1,MPD3D_create,MPD3D_script);
 	REGISTERX("msmooth","Msmooth by Donald Graft",VF_MSMOOTH,1,create_msmooth,msmooth_script);
-/**/	REGISTER("forcedpp","Forced PostProcessing",VF_FORCEDPP,1,forcedpp_create);
-/**/	REGISTER("soften","Soften",VF_SOFTEN,1,soften_create);
+	REGISTERX("forcedpp","Forced PostProcessing",VF_FORCEDPP,1,forcedpp_create,forcedpp_script);
+	REGISTERX("soften","Soften",VF_SOFTEN,1,soften_create,soften_script);
 #ifdef USE_FREETYPE   
 	registerFilter("----------------- Misc --------------",VF_INVALID,2,NULL,NULL);
-	REGISTER("subtitle","Subtitler",VF_SUBTILE,1,subtitle_create);
+	REGISTERX("subtitle","Subtitler",VF_SUBTILE,1,subtitle_create,subtitle_script);
 #endif
 	REGISTER("","Remove Salt",VF_SALT,0,salt_create);
  printf("\n");

@@ -39,6 +39,14 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidDenoise.h"
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM denoiseParam={5,{"lumaLock","lumaThreshold","chromaLock","chromaThreshold",
+					"sceneChange"}};
+
+
+SCRIPT_CREATE(denoise_script,ADMVideoDenoise,denoiseParam);
 
 uint8_t distMatrix[256][256];
 uint32_t fixMul[16];

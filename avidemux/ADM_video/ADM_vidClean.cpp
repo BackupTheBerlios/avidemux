@@ -31,6 +31,13 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidClean.h"
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM smoothParam={2,{"radius","blend"}};
+
+
+SCRIPT_CREATE(smooth_script,AVDMVideoSmooth,smoothParam);
 
  char *AVDMVideoSmooth::printConf(void)
 {

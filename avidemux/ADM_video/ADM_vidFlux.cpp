@@ -35,6 +35,13 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidFlux.h"
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM fluxParam={2,{"temporal_threshold","spatial_threshold"}};
+
+
+SCRIPT_CREATE(fluxsmooth_script,ADMVideoFlux,fluxParam);
 
 //#define ASM_FLUX
 BUILD_CREATE(fluxsmooth_create,ADMVideoFlux);

@@ -44,7 +44,13 @@
 
 #include "ADM_vidSoften.h"
 #include "ADM_dialog/DIA_enter.h"
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM softParam={3,{"radius","luma","chroma"}};
+
+
+SCRIPT_CREATE(soften_script,ADMVideoMaskedSoften,softParam);
 BUILD_CREATE(soften_create,ADMVideoMaskedSoften);
 
 extern uint8_t distMatrix[256][256];

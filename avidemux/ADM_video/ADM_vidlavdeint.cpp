@@ -31,7 +31,13 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidlavdeint.h"
 //static void decimate(uint8_t *src,uint8_t *target, uint32_t linessrc, uint32_t width);
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM nullParam={0,{""}};
+
+
+SCRIPT_CREATE(lavdeint_script,AVDMVideoLavDeint,nullParam);
 BUILD_CREATE(lavdeint_create,AVDMVideoLavDeint);
 
 

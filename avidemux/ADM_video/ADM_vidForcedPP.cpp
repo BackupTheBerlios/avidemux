@@ -40,7 +40,13 @@
 
 #include "ADM_vidForcedPP.h"
 #include "ADM_dialog/DIA_enter.h"
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM ppParam={3,{"postProcType","postProcStrength","forcedQuant"}};
+
+
+SCRIPT_CREATE(forcedpp_script,ADMVideoForcedPP,ppParam);
 BUILD_CREATE(forcedpp_create,ADMVideoForcedPP);
 
 extern int DIA_getMPParams( int *pplevel, int *ppstrength,int *swap);

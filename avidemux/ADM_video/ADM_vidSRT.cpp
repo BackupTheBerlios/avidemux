@@ -41,6 +41,15 @@
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_toolkit/ADM_debug.h"
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM subParam={14,{"_fontsize","_subname","_fontname","_charset",
+				"_baseLine","_Y_percent","_U_percent","_V_percent",
+				"_selfAdjustable","_delay","_useBackgroundColor","_bg_Y_percent",
+      				"_bg_U_percent","_bg_V_percent"}};
+
+SCRIPT_CREATE(subtitle_script,ADMVideoSubtitle,subParam);
 
 static const char *FONTNAME="/usr/X11R6/lib/X11/fonts/truetype/arial.ttf";
 
@@ -102,8 +111,8 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 			GET(_delay);
 			GET(_useBackgroundColor);
 			GET(_bg_Y_percent);
-      GET(_bg_U_percent);
-      GET(_bg_V_percent);
+      			GET(_bg_U_percent);
+      			GET(_bg_V_percent);
 
 			if(_conf->_baseLine>_info.height-_conf->_fontsize*SRT_MAX_LINE)
 					_conf->_baseLine=_conf->_fontsize*SRT_MAX_LINE;

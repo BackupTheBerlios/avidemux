@@ -33,7 +33,13 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidStabilize.h"
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM stabParam={1,{"param"}};
+
+
+SCRIPT_CREATE(stabilize_script,ADMVideoStabilize,stabParam);
 extern uint8_t distMatrix[256][256];
 extern uint32_t fixMul[16];
 

@@ -40,8 +40,13 @@
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include"ADM_video/ADM_vidDeinterlace.h"
+#include "ADM_filter/video_filters.h"
 
 
+static FILTER_PARAM deintParam={2,{"motion_trigger","blend_trigger"}};
+
+
+SCRIPT_CREATE(deinterlace_script,ADMVideoDeinterlace,deintParam);
 BUILD_CREATE(deinterlace_create,ADMVideoDeinterlace);
 //_______________________________________________________________
 
