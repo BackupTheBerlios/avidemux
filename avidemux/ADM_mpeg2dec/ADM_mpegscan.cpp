@@ -192,7 +192,11 @@ uint8_t			mpeg2decHeader::open(char *name)
 				of=0;
 				sz=0;
 				abs=0;
+#ifndef CYG_MANGLING				
 				sscanf(string,"%c %llX %u",
+#else
+				sscanf(string,"%c %I64X %u",
+#endif				
 				  &t,	 	&of,    	&sz);
 				if(t!=(uint8_t)'I')
 				   { 
@@ -204,7 +208,11 @@ uint8_t			mpeg2decHeader::open(char *name)
 			        }
 			        else
 			        {
+#ifndef CYG_MANGLING				
 						  sscanf(string,"%c %llX %llX %X %u",
+#else
+						sscanf(string,"%c %I64X %I64X %X %u",
+#endif						  
 														  &t,	 	&of, &abs,&dummy,   	&sz);
 
 					audio=dummy;

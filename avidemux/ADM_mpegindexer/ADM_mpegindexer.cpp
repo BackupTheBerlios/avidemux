@@ -372,12 +372,19 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 								image_start=lastGop-4;
 								image_absStart=lastAbsGop-4;
 							}
-							
-							fprintf(out,"%c %010llX",Type[ftype],image_start);
-														          							if(ftype==1) // I frame
+#ifndef CYG_MANGLING							
+							fprintf(out,"%c %010llX",
+#else
+							fprintf(out,"%c %010I64X",
+#endif							
+								Type[ftype],image_start);
+							if(ftype==1) // I frame
 							{
-								
+#ifndef CYG_MANGLING								
 								fprintf(out," %010llX %10lx",
+#else
+								fprintf(out," %I64X %10lx",
+#endif								
 								image_absStart,demuxer->getOtherSize()); 	
 							}
 							if(gop_seen)

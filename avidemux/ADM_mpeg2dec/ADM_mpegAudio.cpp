@@ -130,7 +130,11 @@ AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 			     fgets(string,1023,file);     
 			     if(string[0]=='I')
 		        {
+#ifndef CYG_MANGLING			
 				if(5!=sscanf(string,"%c %llX %llX %lX %lu",
+#else
+				if(5!=sscanf(string,"%c %I64X %I64X %lX %lu",
+#endif				
 					&t,&of, &abs,&dummy,&sz))
 				  {
 					printf("\n not enought infos : %s", string);

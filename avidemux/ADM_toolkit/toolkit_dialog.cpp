@@ -70,8 +70,12 @@ void		gtk_transient(GtkWidget *widget)
 GtkWidget *top;
 	assert(widgetCount);
 	top=widgetStack[widgetCount-1];
-	
+		
+	// The father is no longer modal
+	gtk_window_set_modal(GTK_WINDOW(top), 0);
+	// But we are
 	gtk_window_set_modal(GTK_WINDOW(widget), 1);
+	
 	gtk_window_set_transient_for (GTK_WINDOW(widget),GTK_WINDOW(top));
 	
 	
