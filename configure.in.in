@@ -204,7 +204,7 @@ AC_DEFINE(USE_LIBXML2,1,[LibXML2 is available])
 fi
 
 dnl ______________ pthread _____________
-AC_CHECK_LIB(pthread,pthread_create,,AC_MSG_ERROR([*** no pthread found !! ***]),-lm)
+dnl AC_CHECK_LIB(pthread,pthread_create,,AC_MSG_ERROR([*** no pthread found !! ***]),-lm)
 dnl AC_CHECK_LIB(gthread,g_thread_init)
 
 dnl __________________divx______________
@@ -848,7 +848,7 @@ if test "x$use_cygwin" = "xyes"; then
 	#AC_DEFINE(link(x,y),-1,"")	
 	CXXFLAGS=" $CXXFLAGS -mno-cygwin -mms-bitfields"
 	CFLAGS=" $CFLAGS -mno-cygwin -mms-bitfields"
-	echo "CFLAGS=\" -mno-cygwin -mms-bitfields \" " >> adm_libavcodec/config.cpu
+	echo "CFLAGS= -mno-cygwin -mms-bitfields -I/usr/include/mingw -I/rot/include " >> adm_lavcodec/config.cpu
 fi
 dnl ________________NASM__________________
 AC_SUBST(AS)

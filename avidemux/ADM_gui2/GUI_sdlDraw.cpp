@@ -15,9 +15,10 @@
 #include <stdio.h>         
 #include <stdlib.h>
 #include <math.h>
-#include <unistd.h>
+#include <string.h>
 #include <assert.h>
-
+#include "ADM_library/default.h"
+#ifndef CYG_MANGLING
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
@@ -25,17 +26,20 @@
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkx.h>
+#include "ADM_toolkit/toolkit_gtk.h"
+#else
+#define GtkWidget void
+#endif
+
 #include <time.h>
 #include <sys/time.h>
 
-#include "avi_vars.h"
-#include "prototype.h"
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_gui2/GUI_render.h"
 
 #include "ADM_gui2/GUI_accelRender.h"
 #include "ADM_gui2/GUI_sdlDraw.h"
-#include "ADM_toolkit/toolkit_gtk.h"
+
 
 extern "C" {
 #include "SDL/SDL.h"
@@ -89,7 +93,7 @@ int flags;
 	disp.y=0;
 
 	/* Hack to get SDL to use GTK window, ugly but works */
-#if !defined(CONFIG_DARWIN)
+#if !defined(CONFIG_DARWIN) && !defined(CYG_MANGLING)
 	{ char SDL_windowhack[32];
 		sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",
 			GDK_WINDOW_XWINDOW(window->window));

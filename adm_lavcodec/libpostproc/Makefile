@@ -11,7 +11,7 @@ PPLIB = libpostproc.a
 PPOBJS=postprocess.o
 SPPOBJS=postprocess_pic.o
 
-CFLAGS  = $(OPTFLAGS) $(MLIB_INC) -I. -I.. $(EXTRA_INC) -I/usr/include/malloc
+CFLAGS  += $(OPTFLAGS) $(MLIB_INC) -I. -I.. $(EXTRA_INC) -I/usr/include/malloc
 # -I/usr/X11R6/include/
 
 .SUFFIXES: .c .o

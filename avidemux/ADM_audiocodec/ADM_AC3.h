@@ -14,9 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef          HAVE_LIBPTHREAD
-          #error config.h not included
-#endif
+
 #ifdef USE_AC3
 
 uint8_t 	    ADM_AC3Init(void );

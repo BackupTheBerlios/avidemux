@@ -383,7 +383,12 @@ char *PathCanonize(const char *tmpname)
 		strcpy(out,path);
 		strcat(out,"/");
 		printf("\n Canonizing null string ??? (%s)\n",out);
-	}else if(tmpname[0]=='/')
+	}else if(tmpname[0]=='/'
+#if defined(CYG_MANGLING)
+		|| tmpname[1]==':'
+#endif	
+	
+	)
 	{
 		out=new char[strlen(tmpname)+1];
 		strcpy(out,tmpname);

@@ -38,6 +38,7 @@
 #include "prefs.h"
 #include "gtkgui.h"
 
+#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME  MODULE_COMMANDLINE
 #include "ADM_toolkit/ADM_debug.h"

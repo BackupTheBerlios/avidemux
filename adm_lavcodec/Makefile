@@ -8,7 +8,7 @@ include ./config.cpu
 VPATH=$(SRC_PATH)/libavcodec
 
 # NOTE: -I.. is needed to include config.h
-CFLAGS= $(OPTFLAGS) -g -Wall -O2 -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
+CFLAGS+= $(OPTFLAGS) -g -Wall -O2 -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 # used by darwin, useless for others
 CFLAGS+=-I/usr/include/malloc
 LDFLAGS= -g

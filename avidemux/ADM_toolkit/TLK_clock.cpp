@@ -74,7 +74,7 @@ uint32_t Clock::getElapsedMS(void )
 uint32_t getAbsTime( void )
 {
      struct timeval timev;     
-     struct timezone timez;
+     TIMZ timez;
 
     int32_t tt;
 

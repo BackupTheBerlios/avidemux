@@ -48,16 +48,18 @@ void 		ADM_usleep(unsigned long us);
 
 
 #ifdef CYG_MANGLING
-typedef struct timespec
-{
-	time_t tv_sec;
-	long int tv_nsec;
-};
+	typedef struct timespec
+	{
+		time_t tv_sec;
+		long int tv_nsec;
+	};
 
-void gettimeofday(struct timeval *p, void *tz);
-#define timezone int
-#define usleep ADM_usleep
-
+	void gettimeofday(struct timeval *p, void *tz);
+	#define timezone int
+	#define usleep ADM_usleep
+	#define TIMZ int
+#else
+	#define TIMZ struct timezone
 #endif
 
 #define FRAME_PAL 1

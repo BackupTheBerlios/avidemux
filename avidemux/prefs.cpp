@@ -189,7 +189,11 @@ int preferences::load(){
    char rcfile[1024];
    char *home;
    char buf[1024];
-	if( ! (home=getenv("HOME")) ){
+	if( ! (home=getenv("HOME")) )
+#if defined(CYG_MANGLING)
+		if(!(home=getenv("PWD")))
+#endif
+	{
 		fprintf(stderr,"can't determine $HOME.\n");
 		return RC_FAILED;
 	}
@@ -323,7 +327,28 @@ int preferences::save_xml_to_file(){
    char *home;
    char rcfile[1024];
    char rcfilenew[1024];
-	if( !(home=getenv("HOME")) ){
+#if defined(CYG_MANGLING)
+	home=getenv("HOME");
+	if(!home)
+		home=getenv("PWD");
+   	if(!home)
+		{
+
+		fprintf(stderr,"can't determine $PWD.\n");
+		return RC_FAILED;
+		}
+	snprintf(rcfile,1024,"%s/.avidemuxrc",home);
+	rcfile[1023] = '\0';
+	xmlSetDocCompressMode(xdoc,9);
+	if( xmlSaveFormatFile(rcfile,xdoc,1) == -1 ){
+           fprintf(stderr,"\ncan't save xml tree to file. Filesystem full?\n\n");
+	   return RC_FAILED;
+	}
+	return RC_OK;
+
+#else
+	if( !(home=getenv("HOME")) )
+	{
 		fprintf(stderr,"can't getenv(HOME).\n");
 		return RC_FAILED;
 	}
@@ -353,6 +378,7 @@ int preferences::save_xml_to_file(){
         }
         unlink(rcfilenew); // rc/errno handling is done on next call ;-)
 	return RC_OK;
+#endif
 }
 #endif
 

@@ -17,16 +17,20 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#ifndef CYG_MANGLING
 #include <unistd.h>
+#include <gtk/gtk.h>
+#endif
 #include <ctype.h>
 #include <sys/time.h>
-#include <gtk/gtk.h>
 
-#include "config.h"
+
+
 
 #include "avi_vars.h"
 #include "toolkit.hxx"
@@ -136,7 +140,7 @@ uint32_t getTime(int called)
     static struct timeval timev_s;
 
     static struct timeval timev;
-    static struct timezone timez;
+    static TIMZ timez;
 
     int32_t tt;
 
@@ -157,7 +161,7 @@ uint32_t getTimeOfTheDay(void)
   
 
      struct timeval timev;
-     struct timezone timez;
+     TIMZ timez;
 
     int32_t tt;
 
@@ -370,11 +374,11 @@ void ADM_usleep(unsigned long us)
 #ifdef CYG_MANGLING
 void gettimeofday(struct timeval *p, void *tz)
 {
-	UNTIME tme;
+	//UNTIME tme;
 	//GetSystemTimeAsFileTime(&(tme.ft));
-	tme.ns100=0;
-	p->tv_usec=(long int)((tme.ns100/10LL)% 1000000LL);
-	p->tv_sec=(long int)((tme.ns100-(116444736000000000LL))/10000000LL);
+	//tme.ns100=0;
+	//p->tv_usec=(long int)((tme.ns100/10LL)% 1000000LL);
+	//p->tv_sec=(long int)((tme.ns100-(116444736000000000LL))/10000000LL);
 	return;
   
 	
