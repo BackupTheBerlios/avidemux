@@ -68,8 +68,10 @@ ADM_ogmWrite::ADM_ogmWrite(void)
 _audioBuffer=_videoBuffer=NULL;
 videoStream=videoStream=NULL;
 encoding_gui=NULL;
+audioFilter=NULL;
 _fd=NULL;
 _togo=0;
+_packet=0;
 }
 
 //_______________________________________________
@@ -83,6 +85,8 @@ ADM_ogmWrite::~ADM_ogmWrite()
 	FREE_IF(videoStream);
 	FREE_IF(videoStream);
 	FREE_IF(encoding_gui);
+	FREE_IF(audioFilter);
+	
 	if(_fd) fclose(_fd);
 	_fd=NULL;
 
@@ -95,8 +99,7 @@ uint8_t ADM_ogmWrite::save(char *name)
 uint8_t *bufr;
 uint32_t len,flags;
 uint8_t error=0;
-double audioTarget,audioCurrent,audioInc;
-WAVHeader	*info=NULL;
+
 
 		_fd=fopen(name,"wb");
 		if(!_fd)
@@ -105,13 +108,8 @@ WAVHeader	*info=NULL;
 			return 0;
 		}
 
-		videoStream=new ogm_page(_fd,0);
-	/*
-		if(currentaudiostream)
-		{
-			audioStream=new ogm_page(fd,1);
-		}
-	*/
+		videoStream=new ogm_page(_fd,1);
+	
 		encoding_gui=new DIA_encoding(25000);
 		//______________ Write headers..._____________________
 		
@@ -123,50 +121,15 @@ WAVHeader	*info=NULL;
 			return 0;
 		
 		}
-#if 0		
-		//______________ Write headers/ Audio..._____________________
-		if(audioStream)
+		if(!initAudio())
 		{
-		char string[40];
-		stream_header header;
+			fclose(_fd);
+			_fd=NULL;
+			GUI_Alert("Troubles initializing audio\n");
+			return 0;
 		
-		info=currentaudiostream->getInfo();
-		memset(&header,0,sizeof(header));
-		
-		memcpy(&(header.streamtype),"audio\0\0\0",8);
-		memset(&(header.subtype),0,4);
-		sprintf(string,"%04X",info->encoding);
-		//memcpy(&(header.subtype),&(info->encoding),2);
-		memcpy(&(header.subtype),string,4);
-		printf("audio encoding:%x\n",info->encoding);
-		header.size=sizeof(header);
-		header.audio.channels=info->channels;
-		header.audio.blockalign=info->blockalign;
-		header.audio.avgbytespersec=info->byterate;
-		// Timing .. FIXME
-		double duration; // duration in 10us
-		duration=avifileinfo->fps1000;
-		duration=1000./duration;
-		duration*=1000*1000;
-		duration*=10;
-		
-		header.time_unit=(int64_t)duration;
-		header.samples_per_unit=1;
-		
-		header.buffersize=0x10000;
-		header.bits_per_sample=16;
-		
-		
-		audioStream->writeHeaders(sizeof(header),(uint8_t *)&header); // +4 ?
-		audioInc=info->byterate;
-		audioInc*=1000;
-		audioInc/=avifileinfo->fps1000;
-		audioCurrent=0;
-		audioTarget=0;
 		}
-		uint32_t chunk,red;
-		double audioPcm;
-#endif		
+
 		encoding_gui->setFps(_fps1000);
 		encoding_gui->reset();
 		// ___________________Then body_______________________
@@ -178,36 +141,16 @@ WAVHeader	*info=NULL;
 				error=1;
 				continue;
 			}
+			if(!writeAudio(j)) error=1;
 			if(!writeVideo(j)) error=1;
-#if 0			
-			//
-			if(audioStream)
-			{
-				audioTarget+=audioInc;
-				chunk=(uint32_t)floor(audioTarget-audioCurrent);
-				//printf("This chunk :%d\n",chunk);
-				red=currentaudiostream->read(chunk, bufr);
-				if(red==MINUS_ONE)
-				{
-					printf("Read failed\n");
-					error=1;
-					continue;
-				}
-				
-				audioPcm=audioCurrent;
-				audioCurrent+=red;				
-				audioPcm/=1152; // Hardcoded to MP3 as of now
-				
-				audioStream->write(red,bufr,0,(uint64_t)floor(audioPcm));
-				
-			}
-#endif			
+			
+
 		}
 		delete encoding_gui;
 		encoding_gui=NULL;
 		//________________ Flush______________________
 		videoStream->flush();
-		//if(audioStream) audioStream->flush();
+		endAudio();		
 		// ____________Close____________________
 		fclose(_fd);
 		_fd=NULL;

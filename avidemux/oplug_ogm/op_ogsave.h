@@ -18,8 +18,11 @@
 class ADM_ogmWrite
 {
 	protected:
-			
+		
+			double			_audioTarget,_oneRound;
+			uint32_t		_audioHead,_audioTail,_audioCurrent;	
 			uint32_t		_togo;
+			uint64_t		_packet;			
 			FILE			*_fd;
 			uint32_t		_fps1000;
 			uint8_t 		*_audioBuffer;
@@ -28,10 +31,16 @@ class ADM_ogmWrite
 			ogm_page 		*videoStream;
 			ogm_page		*audioStream;
 			
-			//virtual uint8_t	initAudio(void)=0;
+				uint8_t		initAudio(void);
+				uint8_t		writeAudio(uint32_t j);
+				uint8_t		endAudio( void);
+				uint32_t 	putAC3( uint32_t j );
+				
+				AVDMGenericAudioStream	*audioFilter;
+				
 			virtual uint8_t		initVideo(void);
-			//virtual uint8_t	writeAudio(void)=0;
-			virtual uint8_t	writeVideo(uint32_t frame);	
+			virtual uint8_t		writeVideo(uint32_t frame);
+					
 	public:
 					ADM_ogmWrite(void);				
 					~ADM_ogmWrite(void);
