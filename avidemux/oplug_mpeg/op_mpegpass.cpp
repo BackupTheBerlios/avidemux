@@ -31,6 +31,7 @@
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_editor/ADM_outputfmt.h"
 #include "ADM_lavformat/ADM_lavformat.h"
 
 #include "ADM_lvemux/ADM_muxer.h"
@@ -68,7 +69,7 @@
 
 uint8_t isMpeg12Compatible(uint32_t fourcc);
  
-void mpeg_passthrough(  char *name )
+void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
 {
   uint32_t len, flags;
   AVDMGenericAudioStream *audio=NULL;
@@ -81,10 +82,7 @@ void mpeg_passthrough(  char *name )
   double total_wanted=0;
   double total_got=0;
  
- //#define MYMUXER MpegMuxer
- //#define MYMUXER lavMuxer
- #define MYMUXER mplexMuxer
-  MYMUXER *muxer=NULL;
+  ADMMpegMuxer *muxer=NULL;
   
   	printf("Saving as mpg PS to file %s\n",name);
   
@@ -142,42 +140,58 @@ void mpeg_passthrough(  char *name )
 		isMpeg1=0;
 	
 	}
-	if(isMpeg1)
-	{
-		if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
-		{
-			GUI_Alert("This is not compatible with VCD mpeg.\n");
-			return ;
-		}
-		mux=MUXER_VCD;
-		printf("PassThrought: Using VCD PS\n");
 	
-	}else
-	{    
-		aviInfo info;
-		video_body->getVideoInfo(&info);
-		if(hdr->frequency==44100 && info.width==480&&hdr->encoding == WAV_MP2 ) // SVCD ?
-		{
-			mux=MUXER_SVCD;
-			printf("PassThrought: Using SVCD PS\n");
-		}
-		else
-		{
-			 // mpeg2, we do only DVD right now
-			if(hdr->frequency!=48000 || 
-			(hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
-			{
-				deleteAudioFilter();
-				GUI_Alert("Audio track is not suitable!\n");
-				return ;
-			}
-		mux=MUXER_DVD;
-		printf("PassThrought: Using DVD PS\n");
-		}
-	}
-	
-	
-  	muxer=new MYMUXER();
+	switch(format)
+        {
+        case ADM_PS:	
+                if(isMpeg1)
+                {
+                        if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
+                        {
+                                GUI_Alert("This is not compatible with VCD mpeg.\n");
+                                return ;
+                        }
+                        mux=MUXER_VCD;
+                        printf("PassThrought: Using VCD PS\n");        
+                        }else
+                {    
+                        aviInfo info;
+                        video_body->getVideoInfo(&info);
+                        if(hdr->frequency==44100 && info.width==480&&hdr->encoding == WAV_MP2 ) // SVCD ?
+                        {
+                                mux=MUXER_SVCD;
+                                printf("PassThrought: Using SVCD PS\n");
+                        }
+                        else
+                        {
+                                 // mpeg2, we do only DVD right now
+                                if(hdr->frequency!=48000 || 
+                                (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
+                                {
+                                        deleteAudioFilter();
+                                        GUI_Alert("Audio track is not suitable!\n");
+                                        return ;
+                                }
+                                mux=MUXER_DVD;
+                                printf("PassThrought: Using DVD PS\n");
+                        }
+                }
+  	        muxer=new mplexMuxer();
+                break;
+        case ADM_TS:     
+             printf("Using TS output format\n");   
+             muxer=new lavMuxer();
+             mux=MUXER_TS;
+             break;
+        default:
+                ADM_assert(0);
+                break;
+        }
+        if(!muxer)
+         {
+                 printf("No muxer ?\n");
+                 return ;
+        }
 	if(!muxer->open(name,0,mux,avifileinfo,audio->getInfo()))
 	{
 		delete muxer;

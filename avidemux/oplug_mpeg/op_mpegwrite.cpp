@@ -116,12 +116,12 @@ mpegWritter::mpegWritter( void )
 	_audio=NULL;
 	_audioBuffer=NULL;
 	_muxer=NULL;
-	_outputAsPs=0;
+	_outputAs=MUXER_NONE;        
 	audioWanted=audioGot=0;
 	_ratecontrol=NULL;
 
 }
-mpegWritter::mpegWritter( uint8_t ps )
+mpegWritter::mpegWritter( ADM_MUXER_TYPE ps )
 {	
 	_w=_h=0;
 	_fps1000=0;
@@ -132,7 +132,8 @@ mpegWritter::mpegWritter( uint8_t ps )
 	_audio=NULL;
 	_audioBuffer=NULL;
 	_muxer=NULL;
-	_outputAsPs=ps;
+        _outputAs=ps;
+        
 	audioWanted=audioGot=0;
 	_ratecontrol=NULL;
 
@@ -148,11 +149,12 @@ mpegWritter::~mpegWritter(  )
 /*---------------------------------------------------------------------------------------*/
 uint8_t  mpegWritter::save_svcd(char *name)
 {
-	if(_outputAsPs)
+	if(_outputAs)
 	{
-		switch(_outputAsPs)
+		switch(_outputAs)
 		{
-			case 2:
+                        
+			case MUXER_SVCD:
 				if(!initLveMux(name,MUXER_SVCD))
 					return 0;
 				break;
@@ -225,11 +227,15 @@ AVDMGenericAudioStream 	*tmp=NULL;
 WAVHeader		*info=NULL,tmpinfo;	
 
 	// look if we have a suitable audio
-	if(_outputAsPs)
+	if(_outputAs)
 	{
-		switch(_outputAsPs)
+		switch(_outputAs)
 		{
-			case 1:
+                        case MUXER_TS:
+                                if(!initLveMux(name,MUXER_TS))
+                                        return 0;
+                                break;
+			case MUXER_DVD:
 				if(!initLveMux(name,MUXER_DVD))
 					return 0;
 				break;
@@ -287,11 +293,11 @@ uint8_t  mpegWritter::save_vcd(char *name)
 {
 
 // look if we have a suitable audio
-	if(_outputAsPs)
+	if(_outputAs)
 	{
-		switch(_outputAsPs)
+		switch(_outputAs)
 		{
-			case 2:
+			case MUXER_VCD:
 				if(!initLveMux(name,MUXER_VCD))
 					return 0;
 				break;
@@ -1035,7 +1041,10 @@ uint32_t fps1000;
 					// enough, even with the buffering
 	printf("----- Audio Track for mpeg Ready.------\n");
 
-	_muxer=new mplexMuxer();	
+        if(type!=MUXER_TS)
+	       _muxer=new mplexMuxer();	
+        else
+               _muxer=new lavMuxer();
         
 	// open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHeader *audioheader,float need);
 	aviInfo info;

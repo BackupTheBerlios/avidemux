@@ -75,6 +75,7 @@ extern MPEG2ENCConfig mpeg2encDVDConfig;
 
 static void oplug_mpeg_dvd_run(char *name);
 static void oplug_mpeg_vcd_run(char *name);
+static void oplug_mpeg_ts_run(char *name);
 //************************************************
 void oplug_mpeg_vcd(char *inname)
 {
@@ -247,7 +248,7 @@ AVDMGenericAudioStream *stream;
 		name=inname;
 	}
 	
-	mpegWritter *mpg = new mpegWritter(2);
+	mpegWritter *mpg = new mpegWritter(MUXER_SVCD);
 	ADM_assert(mpg);
 
 	if( mpg->save_svcd(name))
@@ -351,7 +352,7 @@ WAVHeader *info=NULL,tmpinfo;
 //_______________________________________
 void oplug_mpeg_dvd_run(char *name)
 {
-   	mpegWritter *mpg = new mpegWritter(1);
+   	mpegWritter *mpg = new mpegWritter(MUXER_DVD);
 	ADM_assert(mpg);
 
 	if( mpg->save_dvd(name))
@@ -362,10 +363,87 @@ void oplug_mpeg_dvd_run(char *name)
 	delete(mpg);
 
 }
+//
+// Save a TS stream : DVD into Ts wrapper
+//_______________________________________
+void oplug_mpeg_ts(char *inname)
+{
+char *name=NULL;
+WAVHeader *info=NULL,tmpinfo;
+
+        // do some check on audio & video
+        // audio must be either AC3 or mp2 at 48 khz
+        
+        // First check audio
+        if(!currentaudiostream)
+        {
+                GUI_Alert("We need an audio track!");
+                return;
+        }
+        if(audioProcessMode)
+        {
+          AVDMGenericAudioStream *audio=NULL;
+                audio = buildFakeAudioFilter (currentaudiostream,0,0x1000);
+                info=audio->getInfo();
+                memcpy(&tmpinfo,info,sizeof(tmpinfo));
+                info=&tmpinfo;
+                deleteAudioFilter();
+        
+        }
+        else
+        {
+                info=currentaudiostream->getInfo();
+        }
+        if(info->frequency!=48000 )
+        {
+                GUI_Alert("audio must be 48khz for DVD PS!");
+                return;
+        }
+        if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3))
+        {
+                printf("Encoding : %d\n",info->encoding);
+                GUI_Alert("audio must be MP2 or AC3 for DVD PS!");
+                return;
+        }
+        
+        // Second, check video
+        if(strcmp(videoCodecGetName(),"DVD"))// && strcmp(videoCodecGetName(),"XSVCD"))
+        {
+                GUI_Alert("You need to select DVD as video codec!");
+                return;
+        }
+        
+        if(!inname)
+        {
+                GUI_FileSelWrite("DVD file to save", &name);
+                if(!name) return;
+        }
+        else
+        {
+                name=inname;
+        }
+        oplug_mpeg_ts_run(name);
+
+
+}
+//_______________________________________
+void oplug_mpeg_ts_run(char *name)
+{
+        mpegWritter *mpg = new mpegWritter(MUXER_TS);
+        ADM_assert(mpg);
+
+        if( mpg->save_dvd(name))
+                GUI_Alert("Success !");
+        else
+                GUI_Alert("Failed !");
+
+        delete(mpg);
+
+}
 //_______________________________________
 void oplug_mpeg_vcd_run(char *name)
 {
-   	mpegWritter *mpg = new mpegWritter(2);
+   	mpegWritter *mpg = new mpegWritter(MUXER_VCD);
 	ADM_assert(mpg);
 
 	if( mpg->save_vcd(name))

@@ -100,6 +100,9 @@ uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, 
 	_fps1000=info->fps1000;
 	switch(_type)
 	{
+                case MUXER_TS:
+                        fmt=guess_format("mpegts", NULL, NULL);
+                        break;
 		case MUXER_DVD:
 			fmt = guess_format("dvd", NULL, NULL);
 			break;
@@ -138,6 +141,17 @@ uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, 
 	c = &video_st->codec;
 	switch(_type)
 	{
+                case MUXER_TS:
+                        c->codec_id = CODEC_ID_MPEG2VIDEO;
+                        c->rc_buffer_size=8*1024*224;
+                        c->rc_max_rate=9500*1000;
+                        c->rc_min_rate=0;
+                        if(!inbitrate)
+                                c->bit_rate=9000*1000;
+                        else
+                                c->bit_rate=inbitrate;
+        
+                        break;
 		case MUXER_DVD:
 			c->codec_id = CODEC_ID_MPEG2VIDEO;
 			c->rc_buffer_size=8*1024*224;
@@ -232,6 +246,8 @@ uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, 
 //----------------------
 	switch(_type)
 	{
+                case MUXER_TS:
+                        break;
 		case MUXER_DVD:
 			oc->packet_size=2048;
 			oc->mux_rate=10080*1000;

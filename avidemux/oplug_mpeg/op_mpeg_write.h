@@ -35,7 +35,7 @@ class	mpegWritter
 				uint32_t 		_w,_h,_page;
 				uint32_t		_fps1000;
 				uint32_t		_total;
-				uint8_t			_outputAsPs;
+				ADM_MUXER_TYPE	        _outputAs;                                
 				ADMImage		*aImage;
 				uint8_t			*_buffer_out;
 				uint8_t			init(char *name,ADM_MPEGTYPE type,
@@ -68,14 +68,14 @@ class	mpegWritter
 								uint8_t widescreen);
 				uint8_t 		initLveMux( char *name,ADM_MUXER_TYPE type );
 				AVDMGenericAudioStream	*_audio;
-				mplexMuxer		*_muxer;
+				ADMMpegMuxer		*_muxer;
 				double			_audioOneFrame;
 				uint8_t			*_audioBuffer;
 				
 				double			audioWanted, audioGot;
 	public:
 							mpegWritter( void );
-							mpegWritter( uint8_t ps_stream );	
+							mpegWritter( ADM_MUXER_TYPE ps  );	
 							~mpegWritter();
 			uint8_t 			save_vcd(char *name);
 			uint8_t 			save_svcd(char *name);

@@ -5,7 +5,7 @@ noinst_LIBRARIES = libADM_lavformat.a
 libADM_lavformat_a_METASOURCES = AUTO
 
 libADM_lavformat_a_SOURCES =  mpeg.c utils.c avio.c ADM_lavformat.cpp \
-aviobuf.c cutils.c img2.c file.c
+aviobuf.c cutils.c img2.c file.c mpegtsenc.c
 
 
 EXTRA_DIST = 

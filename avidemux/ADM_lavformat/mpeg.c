@@ -1668,7 +1668,7 @@ static AVOutputFormat mpeg2dvd_mux = {
 };
 
 #endif //CONFIG_ENCODERS
-
+extern AVOutputFormat mpegts_mux;
 AVInputFormat mpegps_demux = {
     "mpeg",
     "MPEG PS format",
@@ -1692,7 +1692,9 @@ int mpegps_init(void)
     av_register_output_format(&mpeg2vob_mux);
     av_register_output_format(&mpeg2svcd_mux);
     av_register_output_format(&mpeg2dvd_mux);
+    
 #endif //CONFIG_ENCODERS
+    av_register_output_format(&mpegts_mux);
     av_register_input_format(&mpegps_demux);
     return 0;
 }

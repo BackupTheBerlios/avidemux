@@ -68,7 +68,7 @@ extern void oplug_mpeg_svcd(char *name);
 extern void oplug_mpeg_dvd(char *name);
 extern void oplug_mpeg_svcdConf( void );
 extern void oplug_mpeg_dvdConf( void );
-extern void mpeg_passthrough(  char *name );
+//extern void mpeg_passthrough(  char *name );
 
 extern void UI_PrintCurrentVCodec(const char *str);
 extern void oplug_mpegff_conf(void);
@@ -718,11 +718,18 @@ uint8_t raw;
 		case ADM_PS:
 				raw=0;
 				break;
+                case ADM_TS:
+                                raw=2;
+                                break;
 		default:
 				GUI_Alert("Please select mpeg output");
 				return;
 	}
-	
+	if(current_codec!=CodecDVD && raw==2)
+        {
+                GUI_Alert("Please select DVD to export as mpeg TS");
+                return;
+        }
 	switch(current_codec)
 	{
 		case CodecVCD:
@@ -738,11 +745,13 @@ uint8_t raw;
 					oplug_mpeg_svcd_ps(name);
 				break;
 		case CodecDVD:
-				if(raw)
-					oplug_mpeg_dvd(name);
-				else
-					oplug_mpeg_dvd_ps(name);
-				
+                                switch(raw)
+                                {
+                                        case 2:oplug_mpeg_ts(name);break;
+                                        case 1:oplug_mpeg_dvd(name);break;
+                                        case 0:oplug_mpeg_dvd_ps(name);break;
+                                        default : ADM_assert(0);
+                                }
 				break;
 		default:ADM_assert(0);
 	}

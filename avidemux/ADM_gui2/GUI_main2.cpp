@@ -176,7 +176,8 @@ create_mainWindow (void)
   GtkWidget *avi1;
   GtkWidget *ogm1;
   GtkWidget *mpeg_video_only1;
-  GtkWidget *mpeg_a_v1;
+  GtkWidget *mpeg_ps1;
+  GtkWidget *mpeg_ts1;
   GtkWidget *avi_dual_audio1;
   GtkWidget *avi_unpacked_vop1;
   GtkWidget *label17;
@@ -1127,10 +1128,15 @@ create_mainWindow (void)
   gtk_widget_show (mpeg_video_only1);
   gtk_container_add (GTK_CONTAINER (menu1), mpeg_video_only1);
 
-  mpeg_a_v1 = gtk_menu_item_new_with_mnemonic (_("Mpeg A+V"));
-  gtk_widget_set_name (mpeg_a_v1, "mpeg_a_v1");
-  gtk_widget_show (mpeg_a_v1);
-  gtk_container_add (GTK_CONTAINER (menu1), mpeg_a_v1);
+  mpeg_ps1 = gtk_menu_item_new_with_mnemonic (_("Mpeg A+V (PS)"));
+  gtk_widget_set_name (mpeg_ps1, "mpeg_ps1");
+  gtk_widget_show (mpeg_ps1);
+  gtk_container_add (GTK_CONTAINER (menu1), mpeg_ps1);
+
+  mpeg_ts1 = gtk_menu_item_new_with_mnemonic (_("Mpeg A+V (TS)"));
+  gtk_widget_set_name (mpeg_ts1, "mpeg_ts1");
+  gtk_widget_show (mpeg_ts1);
+  gtk_container_add (GTK_CONTAINER (menu1), mpeg_ts1);
 
   avi_dual_audio1 = gtk_menu_item_new_with_mnemonic (_("Avi, 2 audio"));
   gtk_widget_set_name (avi_dual_audio1, "avi_dual_audio1");
@@ -1617,7 +1623,8 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, avi1, "avi1");
   GLADE_HOOKUP_OBJECT (mainWindow, ogm1, "ogm1");
   GLADE_HOOKUP_OBJECT (mainWindow, mpeg_video_only1, "mpeg_video_only1");
-  GLADE_HOOKUP_OBJECT (mainWindow, mpeg_a_v1, "mpeg_a_v1");
+  GLADE_HOOKUP_OBJECT (mainWindow, mpeg_ps1, "mpeg_ps1");
+  GLADE_HOOKUP_OBJECT (mainWindow, mpeg_ts1, "mpeg_ts1");
   GLADE_HOOKUP_OBJECT (mainWindow, avi_dual_audio1, "avi_dual_audio1");
   GLADE_HOOKUP_OBJECT (mainWindow, avi_unpacked_vop1, "avi_unpacked_vop1");
   GLADE_HOOKUP_OBJECT (mainWindow, label17, "label17");

@@ -150,12 +150,14 @@ extern void encoderSetLogFile (char *name);
 extern void videoCodecSelect (void);
 extern uint8_t DIA_about( void );
 extern uint8_t DIA_RecentFiles( char **name );
-extern void mpeg_passthrough(  char *name );
+extern void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format );
 static void A_videoCheck( void);
 extern void parseScript(char *scriptname);
 int A_saveDVDPS(char *name);
 static void	A_setPostproc( void );
 extern uint8_t ogmSave(char  *name);
+//
+static uint8_t A_pass(char *name);
 //__________
 extern uint8_t ogmSave(char *fd);
 extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
@@ -2167,12 +2169,17 @@ int A_saveDVDPS(char *name)
 				}
 				printf("Using pass through\n");
 				if(!name)
-					GUI_FileSelWrite ("Select Mpeg file...", mpeg_passthrough);
+					GUI_FileSelWrite ("Select Mpeg file...", (SELFILE_CB *)A_pass);
 				else
-					mpeg_passthrough(name);
+					mpeg_passthrough(name,ADM_PS);
 			}
 
 	return 1;
+}
+uint8_t A_pass(char *name)
+{
+        mpeg_passthrough(name,ADM_PS);
+        return 1;
 }
 int A_delete(uint32_t start, uint32_t end)
 {

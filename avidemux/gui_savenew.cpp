@@ -58,7 +58,7 @@ static void  A_SaveAudioNVideo(char *name);
  extern void ogmSave(char *name);
  extern void ADM_saveRaw(char *name);
  void A_SaveAudioDualAudio(char *name);
- extern void mpeg_passthrough(char *name);
+ extern void mpeg_passthrough(char *name,ADM_OUT_FORMAT format);
 
 int A_Save( char *name)
 {
@@ -70,7 +70,7 @@ uint32_t end;
 	if(!videoProcessMode)
 	{
 		family=CodecFamilyAVI;
-		if( UI_GetCurrentFormat()==ADM_PS)  // exception
+		if( UI_GetCurrentFormat()==ADM_PS ||UI_GetCurrentFormat()==ADM_TS )  // exception
 		{
 			family=CodecFamilyMpeg;
 		}
@@ -181,7 +181,15 @@ uint32_t end;
 					{
 						
 						printf("Using pass through\n");
-						mpeg_passthrough(name);
+                                                switch(UI_GetCurrentFormat())
+                                                {
+                                                  case ADM_PS:
+                                                  case ADM_TS:
+						          mpeg_passthrough(name,UI_GetCurrentFormat());
+                                                          break;
+                                                  default:
+                                                        GUI_Alert("Output format is not compatible!");
+                                                }
 					}
 					else
 					{
@@ -189,6 +197,7 @@ uint32_t end;
 						{
 							case ADM_PS:
 							case ADM_ES:
+                                                        case ADM_TS:
 								EncoderSaveMpeg(name);
 								break;
 							default:
