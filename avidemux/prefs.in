@@ -50,7 +50,7 @@ test.long,	LONG,	1,	-4,	999999999999
 test.ulong,	ULONG,	2,	0,	999999999999
 test.float,	FLOAT,	0.0,	-0.35,	0.35
 # codec metasettings for mpeg2enc based
-settings.mpegsplit, UINT,790,	400,	900
+settings.mpegsplit, UINT,790,	400,	5000
 # codec settings
 codecs.preferredcodec,			STRING,	FFmpeg4
 device.audiodevice,			STRING,	OSS

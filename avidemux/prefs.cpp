@@ -78,7 +78,7 @@ static opt_def opt_defs [] = {
 	{"test.long",		LONG,	"1",	NULL,	"-4",	"999999999999"},
 	{"test.ulong",		ULONG,	"2",	NULL,	"0",	"999999999999"},
 	{"test.float",	FLOAT,	"0.0",	NULL,	"-0.35","0.35"	},
-	{"settings.mpegsplit",	UINT,	"790",	NULL,	"400",	"900"	},
+	{"settings.mpegsplit",	UINT,	"790",	NULL,	"400",	"5000"	},
 	{"codecs.preferredcodec",		STRING,"FFmpeg4",NULL, NULL, NULL },
 	{"device.audiodevice",	STRING,"OSS",	NULL, NULL, NULL },
 	{"device.audio.alsa_device",		STRING,"plughw:0,0",NULL, NULL, NULL },
