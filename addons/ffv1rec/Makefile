@@ -5,7 +5,7 @@ OBJS= ffv1video.o ffv1rec.o ffv1audio.o ffv1color.o ffv1codec.o ffv1write.o
 IFLAGS= \
 -I../../avidemux \
 -I../../ \
--I../../avidemux/ADM_library
+-I../../avidemux/ADM_library     
 
 
 COPTSRT= -O3 -Wall -DMMX -mcpu=pentium -funroll-loops -fexpensive-optimizations -finline-functions

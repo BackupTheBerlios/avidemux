@@ -25,6 +25,7 @@
 #include <time.h>
 #include <assert.h>
 #include <xvid.h>
+#include "../../config.h"
 #include "avcodec.h"
 
 #include "ffv1.h"
@@ -35,12 +36,24 @@ AVFrame		_frame;
 int				pagesize=0;
 void				YU_YV12_mmx(unsigned char *in,unsigned char *out, int w,int h);
 /**********Xvid **********/
+#ifdef USE_XVID_4
+static 	xvid_gbl_init_t xvid_gbl_init2;
+static 	xvid_enc_create_t xvid_enc_create;
+static  xvid_plugin_single_t single;
+static  xvid_enc_plugin_t plugins[7];
+static  xvid_enc_frame_t xvid_enc_frame;
+static 	xvid_enc_stats_t xvid_enc_stats;
+static  xvid_gbl_info_t xvid_gbl_info;
+#define MMSET(x) memset(&x,0,sizeof(x))
+#else
 static XVID_ENC_FRAME 	fr;
 static XVID_ENC_PARAM 	xparam;
 static XVID_ENC_STATS 	xstats;
+#endif
 static void *xvid_handle=0;
 static int nextIsKF=0;
 static v4linfo	vinfo;
+#ifndef USE_XVID_4
 static int const divx4_motion_presets[7] = {
 	0,
 	PMV_EARLYSTOP16,
@@ -53,6 +66,7 @@ static int const divx4_motion_presets[7] = {
 	PMV_EARLYSTOP16 | PMV_HALFPELREFINE16 | PMV_EXTSEARCH16 | PMV_EARLYSTOP8 |
 		PMV_HALFPELREFINE8
 };
+
 static int const divx4_general_presets[7] = {
 	0,
 	0,
@@ -63,7 +77,7 @@ static int const divx4_general_presets[7] = {
 	0 | XVID_INTER4V | XVID_HALFPEL
 };
 
-
+#endif
 
 /*----------------------*/
 typedef enum
@@ -113,6 +127,58 @@ unsigned int i;
 
 ***************************************/
 
+#ifdef USE_XVID_4
+int FFV1_XvidCompress(unsigned char *in,unsigned char *out,uint32_t  *outlen)
+{
+int ret;
+
+	MMSET(xvid_enc_frame);
+	MMSET(xvid_enc_stats);
+	
+	xvid_enc_frame.version = XVID_VERSION;	
+	xvid_enc_stats.version = XVID_VERSION;
+	xvid_enc_frame.length = 0;
+	xvid_enc_frame.vop_flags|=XVID_VOP_HALFPEL;	
+	
+	
+	xvid_enc_frame.input.csp = XVID_CSP_YV12;
+	xvid_enc_frame.input.stride[0] = _w;
+	xvid_enc_frame.input.stride[1] = _w>>1;
+	xvid_enc_frame.input.stride[2] = _w>>1;
+	xvid_enc_frame.type = XVID_TYPE_AUTO;
+	
+	
+	/* Set up motion estimation flags */
+	xvid_enc_frame.input.plane[0] = in;
+	xvid_enc_frame.input.plane[1] = in+(_w*_h);
+	xvid_enc_frame.input.plane[2] = in+((_w*_h*5)>>2);
+	
+	xvid_enc_frame.quant = vinfo.quality;
+	xvid_enc_frame.bitstream = out;	
+	
+	xvid_enc_frame.quant = vinfo.quality;
+
+	if(nextIsKF)
+	{
+    		xvid_enc_frame.type = XVID_TYPE_IVOP; // let the codec decide between I-frame (1) and P-frame (0)
+		nextIsKF=0;
+	}
+	else
+	{
+    		xvid_enc_frame.type = XVID_TYPE_VOL; // let the codec decide between I-frame (1) and P-frame (0)
+	}
+
+
+	ret = xvid_encore(xvid_handle, XVID_ENC_ENCODE, &xvid_enc_frame,
+					  &xvid_enc_stats);
+	*outlen = xvid_enc_frame.length;
+ 	
+	
+	return 1;
+
+}
+
+#else //xvid 0.9
 
 int FFV1_XvidCompress(unsigned char *in,unsigned char *out,uint32_t  *outlen)
 {
@@ -153,6 +219,7 @@ int FFV1_XvidCompress(unsigned char *in,unsigned char *out,uint32_t  *outlen)
 	return 1;
 
 }
+#endif
 /*-------------------------------------------------------------------------*/
 int FFV1_Compress(unsigned char *in,unsigned char *out,uint32_t *outlen)
 {
@@ -214,6 +281,67 @@ static char tmp[720*576*3];
 
 __________________________________________
 */
+
+#ifdef USE_XVID_4
+int FFV1_XvidInit(v4linfo *info)
+{
+int err;
+	printf("Initializing Xvid4 with width =%d, height = %d in YUV420P format\n",info->width,info->height);
+
+	
+	MMSET(xvid_gbl_init2);
+	MMSET(xvid_gbl_info);
+	
+	printf("Initializing global xvid 4\n");
+	xvid_gbl_init2.version = XVID_VERSION;
+	xvid_global(NULL, XVID_GBL_INIT, &xvid_gbl_init2, NULL);
+	xvid_gbl_info.version = XVID_VERSION;
+	xvid_global(NULL, XVID_GBL_INFO, &xvid_gbl_info, NULL);
+	if(xvid_gbl_info.build)
+		{
+			printf("\txvid build:%s\n",xvid_gbl_info.build);
+		}
+	printf("\txvid thread:%d\n",xvid_gbl_info.num_threads);
+	printf("\txvid SIMD supported:(%x)\n",xvid_gbl_info.cpu_flags);
+	
+	
+	//
+	MMSET(xvid_enc_create);
+	xvid_enc_create.version = XVID_VERSION;
+	xvid_enc_create.width = info->width;
+	xvid_enc_create.height = info->height;
+	MMSET(single);
+	
+
+	plugins[0].func = xvid_plugin_single;
+	plugins[0].param = &single;
+	
+	single.version = XVID_VERSION;
+	single.bitrate = 1500;
+
+	xvid_enc_create.plugins = plugins;
+	xvid_enc_create.num_plugins = 1;
+	if(info->ntsc)
+   		xvid_enc_create.fbase =29970;
+	else
+   		xvid_enc_create.fbase =25000;
+	//Framerate
+	xvid_enc_create.fincr = 1000;
+	err = xvid_encore(NULL, XVID_ENC_CREATE, &xvid_enc_create, NULL);
+	if(err<0)
+	{
+		printf("Xvid-4 init error :%d\n",err);
+		return 0;
+	
+	}
+	
+	xvid_handle = xvid_enc_create.handle;
+
+	printf("Xvid-4 CQ init Ok\n");	
+ 	return 1;
+
+}
+#else
 int FFV1_XvidInit(v4linfo *info)
 {
 int err;
@@ -248,7 +376,7 @@ int err;
  	return 1;
 
 }
-
+#endif
 int FFV1_Init(v4linfo *info)
 {
 int res;
