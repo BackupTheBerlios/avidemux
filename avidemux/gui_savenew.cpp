@@ -57,6 +57,7 @@ static void  A_SaveAudioNVideo(char *name);
  extern void ogmSave(char *name);
  extern void ADM_saveRaw(char *name);
  void A_SaveAudioDualAudio(char *name);
+ extern void mpeg_passthrough(char *name);
 
 int A_Save( char *name)
 {
@@ -66,7 +67,13 @@ uint32_t end;
 	family= videoCodecGetFamily();
 	// in case of copy mode, we stick to avi file format
 	if(!videoProcessMode)
+	{
 		family=CodecFamilyAVI;
+		if( UI_GetCurrentFormat()==ADM_PS)  // exception
+		{
+			family=CodecFamilyMpeg;
+		}
+	}
 	printf("**saving:**\n");
 	// Check if we need to do a sanity B frame check
 	if(!videoProcessMode)
@@ -118,7 +125,25 @@ uint32_t end;
 					break;
 		case CodecFamilyMpeg:
 					printf(" Mpeg family\n");
-					EncoderSaveMpeg(name);
+					if(!videoProcessMode)
+					{
+						
+						printf("Using pass through\n");
+						mpeg_passthrough(name);
+					}
+					else
+					{
+						switch(UI_GetCurrentFormat())
+						{
+							case ADM_PS:
+							case ADM_ES:
+								EncoderSaveMpeg(name);
+								break;
+							default:
+								GUI_Alert("Output format is not compatible!");
+						}
+					
+					}
 					break;
 		case CodecFamilyXVCD:
 					printf(" Xvcd family\n");

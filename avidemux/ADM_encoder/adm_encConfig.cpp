@@ -68,6 +68,7 @@ extern void oplug_mpeg_svcd(char *name);
 extern void oplug_mpeg_dvd(char *name);
 extern void oplug_mpeg_svcdConf( void );
 extern void oplug_mpeg_dvdConf( void );
+extern void mpeg_passthrough(  char *name );
 
 extern void UI_PrintCurrentVCodec(const char *str);
 extern void oplug_mpegff_conf(void);
@@ -638,7 +639,7 @@ uint8_t raw;
 				GUI_Alert("Please select mpeg output");
 				return;
 	}
-
+	
 	switch(current_codec)
 	{
 		case CodecVCD:
