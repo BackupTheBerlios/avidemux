@@ -64,7 +64,7 @@ uint16_t dur16;
 		memset(&header,0,sizeof(header));
 		
 		memcpy(&(header.streamtype),"video\0\0\0",8);
-		memcpy(&(header.subtype),&(avifileinfo->fcc),4);
+		MEMCPY(&(header.subtype),&(avifileinfo->fcc),4);
 		
 		encoding_gui->setCodec((char *)"Copy");
 		encoding_gui->setPhasis((char *)"Saving...");

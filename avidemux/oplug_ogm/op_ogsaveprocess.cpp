@@ -154,7 +154,7 @@ uint32_t w,h,fps1000,fcc;
 		memset(&header,0,sizeof(header));
 		
 		memcpy(&(header.streamtype),"video\0\0\0",8);
-		memcpy(&(header.subtype),&fcc,4);
+		MEMCPY(&(header.subtype),&fcc,4);
 		
 		//header.size=sizeof(header);
 		dur32=sizeof(header);
