@@ -559,7 +559,7 @@ uint32_t x,y;
 		workp[w-1] = srcp[w-1];
         for (x = 1; x < w - 1; x++)
 		{
-			workp[x] = (srcpp[x] + srcp[x]*2 + srcpn[x]) >>2;
+			workp[x] = (srcpp[x] + srcp[x] + srcpn[x]) /3;
 		}
         srcpp += w;
         srcp += w;
@@ -588,7 +588,8 @@ void  Msmooth::EdgeMaskYV12(const unsigned char *srcp, unsigned char *blurp, uns
 	int y1, y2, y3, y4;
 
 	/* Blur the source image prior to detail detection. */
-	#if USE_MMX
+	#if defined(USE_MMX)
+		//printf("MMX\n");
 		Blur_MMX((uint8_t *)srcp,(uint8_t *)workp,row_size,height);
 		Blur_MMX((uint8_t *)workp,(uint8_t *)blurp,row_size,height);
 	#endif
