@@ -13,7 +13,7 @@ COPTSRT= -O3 -Wall -DMMX -mcpu=pentium -funroll-loops -fexpensive-optimizations 
 #COPTSRT= -O0 -g3
 
 
-LIBS= ../../avidemux/ADM_codecs/libADM_codecs.a ../../adm_lavcodec/libavcodec.a  -lm -lxvidcore -lpthread -ldl -lz
+LIBS= ../../avidemux/ADM_memsupport.o ../../avidemux/ADM_codecs/libADM_codecs.a ../../adm_lavcodec/libavcodec.a  -lm -lxvidcore -lpthread -ldl -lz
 
 V4LDIR=/usr/src/linux/drivers/char/
 
