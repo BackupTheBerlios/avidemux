@@ -121,6 +121,10 @@ void *av_malloc(unsigned int size)
  */
 void *av_realloc(void *ptr, unsigned int newsize)
 {
+	return ADM_realloc(ptr,newsize);
+}
+void *ADM_realloc(void *ptr, unsigned int newsize)
+{
   void *nalloc;
     
     if(!ptr) return ADM_alloc(newsize);
