@@ -149,8 +149,8 @@ _mainaviheader.dwMicroSecPerFrame=0;
 	   encoding_gui->feedFrame(len);		
 	}
 //      guiStop ();
-      	delete[]buffer;
-	guiStop();
+	encoding_gui->reset();
+      	delete[]buffer;	
      	aprintf("**Pass 1:done\n");
     }// End of reuse
 

@@ -480,7 +480,12 @@ GenericAviSave::guiStop (void)
   	encoding_gui=NULL;
 
 }
-
+void GenericAviSave::guiSetPhasis(char *str)
+{
+	assert(encoding_gui);
+	encoding_gui->setPhasis(str);
+	
+}
 uint8_t
 GenericAviSave::guiUpdate (uint32_t nb, uint32_t total)
 {
