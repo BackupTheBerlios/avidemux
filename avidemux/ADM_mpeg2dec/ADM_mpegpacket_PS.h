@@ -38,10 +38,11 @@
 	                  uint8_t	_nextPacket(void);	
 	                  uint32_t  _skipPacketHeader( uint8_t sid,uint8_t *subid,uint32_t *pts );
 			  
-    
+                         uint32_t       _currentPts;    
 	  public:
 	  				ADM_mpegDemuxerProgramStream(uint8_t stream,uint8_t stream2) ;
-					~ADM_mpegDemuxerProgramStream() ;	       
+					~ADM_mpegDemuxerProgramStream() ;
+                           uint32_t     getPTS(void) { return _currentPts;}
 	        virtual    uint32_t 	read(uint8_t *w,uint32_t len);
 	        virtual    uint8_t 	goTo(uint64_t offset);	            	 
 	        virtual    uint8_t   	open(char *name);
