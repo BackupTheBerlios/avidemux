@@ -101,6 +101,7 @@ uint8_t isMpeg12Compatible(uint32_t fourcc)
     uint8_t mpeg=0;	
     	CHECK("MPEG");
 	CHECK("mpg1");
+	CHECK("mpg2");
 	SWAP32(fourcc);
         if(fourcc==0x10000002) mpeg=1;
          return mpeg;
