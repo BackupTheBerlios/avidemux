@@ -37,12 +37,16 @@ extern int detect_altivec();
    illegal instruction errors.
 */
 #define RETSIGTYPE void //MEANX : FIXME
+#ifndef CYG_MANGLING
 static sigjmp_buf sigill_recover;
+#endif
 typedef RETSIGTYPE (*__sig_t)(int);
 
 static RETSIGTYPE sigillhandler(int sig )
 {
+#ifndef CYG_MANGLING
 	siglongjmp( sigill_recover, 1 );
+#endif	
 }
 
 
@@ -50,7 +54,7 @@ static RETSIGTYPE sigillhandler(int sig )
 static int testsseill()
 {
 	int illegal;
-#if defined(__CYGWIN__)
+#if defined(CYG_MANGLING)
 	/* SSE causes a crash on CYGWIN, apparently.
 	   Perhaps the wrong signal is being caught or something along
 	   those line ;-) or maybe SSE itself won't work...

@@ -137,7 +137,7 @@ void myDeintASM(void)
 				"mov "Mangle(_l_p)",	%%ebx\n\t"
 				"mov "Mangle(_l_n)",	%%ecx\n\t"
 				"mov "Mangle(_l_all)",	%%esi\n\t"
-				"deintloop__%=:"
+				"7:"
 				"movd (%%eax),	%%mm0\n\t"
 				"movd (%%ebx),	%%mm1\n\t"
 				"movd (%%ecx),	%%mm2\n\t"
@@ -163,7 +163,7 @@ void myDeintASM(void)
 				"addl 	$4,	"Mangle(_l_e)"\n\t"
 				"addl 	$4,	"Mangle(_l_e2)"\n\t"
 				"subl 	$1,	%%esi\n\t"
-				"jnz deintloop__%=\n\t"
+				"jnz 7b\n\t"
 
 				:
 				:

@@ -137,7 +137,7 @@ pxor_r2r(mm7,mm7);
 				"mov "Mangle(_l_p)",	%%ebx\n\t"
 				"mov "Mangle(_l_n)",	%%ecx\n\t"
 				"mov "Mangle(_l_h)",	%%edx\n\t"
-				"admlloopp%=: \n\t"
+				"8: \n\t"
 				"movd (%%eax),	%%mm0\n\t"
 				"movd (%%ebx),	%%mm1\n\t"
 				"movd (%%ecx),	%%mm2\n\t"
@@ -152,7 +152,7 @@ pxor_r2r(mm7,mm7);
 				"addl $4	,	%%ebx\n\t"
 				"addl $4,		%%ecx\n\t"
 				"subl $1,		%%edx\n\t"
-				"jnz 		admlloopp%=\n\t"
+				"jnz 		8b\n\t"
 				:
 				:
 				: "eax", "ebx", "ecx", "edx"

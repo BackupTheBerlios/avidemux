@@ -365,37 +365,6 @@ struct _stream_state
 
 typedef struct _stream_state stream_state_s;
 
-static void create_threads( pthread_t *threads, int num, void *(*start_routine)(void *) )
-{
-	int i;
-	pthread_attr_t *pattr = NULL;
-
-	/* For some Unixen we get a ridiculously small default stack size.
-	   Hence we need to beef this up if we can.
-	*/
-#ifdef HAVE_PTHREADSTACKSIZE
-#define MINSTACKSIZE 200000
-	pthread_attr_t attr;
-	size_t stacksize;
-
-	pthread_attr_init(&attr);
-	pthread_attr_getstacksize(&attr, &stacksize);
-
-	if (stacksize < MINSTACKSIZE) {
-		pthread_attr_setstacksize(&attr, MINSTACKSIZE);
-	}
-
-	pattr = &attr;
-#endif
-	for(i = 0; i < num; ++i )
-	{
-		if( pthread_create( &threads[i], pattr, start_routine, NULL ) != 0 )
-		{
-			mjpeg_error_exit1( "worker thread creation failed: %s", strerror(errno) );
-		}
-	}
-}
-
 static void gop_start( stream_state_s *ss )
 {
 
@@ -1113,7 +1082,7 @@ static	int cur_ref_idx ;
 static	int cur_b_idx ;
 static	Picture b_pictures[B_PICS];
 static	Picture ref_pictures[R_PICS];
-static	pthread_t worker_threads[MAX_WORKER_THREADS];
+
 static	Picture *cur_picture, *old_picture;
 static	Picture *new_ref_picture, *old_ref_picture;
 void putseq_init(void)
@@ -1129,8 +1098,8 @@ void putseq_init(void)
     /* DEBUG */
 
 	init_pictures( ref_pictures, b_pictures );
-	if( ctl->max_encoding_frames > 1 )
-		create_threads( worker_threads, 2, parencodeworker );
+	//if( ctl->max_encoding_frames > 1 )
+	//	create_threads( worker_threads, 2, parencodeworker );
 
 	/* Initialize image dependencies and synchronisation.  The
 	   first frame encoded has no predecessor whose completion it

@@ -43,6 +43,7 @@ uint32_t 		swap32(uint32_t in);
 uint16_t 		swap16(uint16_t in);
 inline uint32_t 		dontswap(uint32_t in) {return in;};
 char 		*ADM_rindex(const char *s, int c);
+char 		*ADM_index(const char *s, int c);
 
 
 #define FRAME_PAL 1

@@ -16,7 +16,7 @@
  ***************************************************************************/
 #include "config.h"
 
-#ifdef OSS_SUPPORT 
+#if defined( OSS_SUPPORT ) && !defined(CYG_MANGLING)
 
 #include <stdio.h>
 #include <stdlib.h>

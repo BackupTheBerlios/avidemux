@@ -346,4 +346,18 @@ char 		*ADM_rindex(const char *s, int c)
 
 
 }
+// Does not exist in cygwin
+char 		*ADM_index(const char *s, int c)
+{
+	if(!s) return NULL;
+	if(!*s) return NULL;
+	uint32_t m=strlen(s);
+	uint32_t l=0;
+	while(l<m)
+	{
+		if(s[l]==c) return (char *)(s+l);
+		l++;
+	}
+	return NULL;
+}
 //EOF

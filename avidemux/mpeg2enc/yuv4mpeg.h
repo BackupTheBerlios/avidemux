@@ -314,10 +314,10 @@ y4m_xtag_list_t *y4m_fi_xtags(y4m_frame_info_t *fi);
  ************************************************************************/
 
 /* read len bytes from fd into buf */
-ssize_t y4m_read(int fd, void *buf, size_t len);
+//ssize_t y4m_read(int fd, void *buf, size_t len);
 
 /* write len bytes from fd into buf */
-ssize_t y4m_write(int fd, const void *buf, size_t len);
+//ssize_t y4m_write(int fd, const void *buf, size_t len);
 
 
 
