@@ -1,0 +1,310 @@
+/***************************************************************************
+                          filter_saveload.cpp  -  description
+                             -------------------
+	Save/load filter
+
+    begin                : Wed Apr 12 2003
+    copyright            : (C) 2002 by mean
+    email                : fixounet@free.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <assert.h>
+
+#include "config.h"
+#include "fourcc.h"
+#include "avio.hxx"
+
+#include "ADM_toolkit/toolkit.hxx"
+#include "ADM_editor/ADM_edit.hxx"
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_filter/video_filters.h"
+#include "ADM_video/ADM_vidPartial.h"
+#include "ADM_video/ADM_confCouple.h"
+#include "avi_vars.h"
+#ifdef USE_LIBXML2
+	#include <libxml/tree.h>
+	#include <libxml/parser.h>
+#endif
+// exported vars
+extern uint32_t nb_video_filter;
+extern uint32_t nb_active_filter;
+extern FILTER_ENTRY allfilters[MAX_FILTER];
+extern FILTER  videofilters[MAX_FILTER];
+
+extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, AVDMGenericVideoStream *in);
+extern void filterCleanUp( void );
+/*
+
+  	Try to rebuild filter from text file
+
+
+*/
+#ifdef USE_LIBXML2
+static int32_t getIntegerAttribute(xmlNodePtr node, char *name, char *atrname);
+static xmlNodePtr nextByName(xmlNodePtr node,char *name);
+static CONFcouple *buildCouple(uint32_t nb, xmlNodePtr node);
+
+/**
+	Xml Read/write ConfCouple from files
+*/
+void filterSaveXml(char *docname)
+{
+	filterSaveXml(docname,0);
+}
+
+void filterSaveXml(char *docname,uint8_t silent)
+{
+ xmlDocPtr xdoc;
+ xmlNodePtr node;
+ xmlAttrPtr attr;
+ char tmpstring[1024];
+VF_FILTERS tag;
+int max;
+		UNUSED_ARG(silent);
+		if( ! (xdoc = xmlNewDoc((const xmlChar *)"1.0")) ) {printf("Problem creating xml doc\n");	return ;}
+		if( ! (xdoc->children = xmlNewNode(NULL,(xmlChar *)"filters")) )
+			{
+				xmlFreeDoc(xdoc);
+				xdoc = NULL;
+				return ;
+			}
+		// we add # of filteras as attribute to the first children
+		max=nb_active_filter;
+		if(max) max--;
+		sprintf(tmpstring,"%d",max);
+		attr=xmlNewProp(xdoc->children,(xmlChar *)"FilterNumber",(xmlChar *)tmpstring);
+		if(max)
+		for(uint32_t curFilter=1;curFilter<nb_active_filter;curFilter++)
+		{
+			// for each filter we create a new node
+
+			node= xmlNewChild(xdoc->children,NULL,(xmlChar *)"Filter",NULL );
+
+			tag=videofilters[curFilter].tag;
+
+			// and fill-up some informations
+			sprintf(tmpstring,"%d",tag);
+			attr=xmlNewProp(node,(xmlChar *)"Tag",(xmlChar *)tmpstring);
+
+			attr=xmlNewProp(node,(xmlChar *)"Conf",(xmlChar *)videofilters[curFilter].filter->printConf());
+
+			// now we create a child containing the config
+			CONFcouple *setup;
+
+			if( videofilters[curFilter].filter->getCoupledConf(&setup))
+			{
+				// we create a new child parameters with # of parameter as attribute
+				 xmlNodePtr nodeConf; //,tmpnode;
+// 				 xmlAttrPtr attrConf;
+
+
+				 char *nm,*val;
+
+					nodeConf= xmlNewChild(node,NULL,(xmlChar *)"Parameters",NULL );
+					sprintf(tmpstring,"%lu",setup->getNumber());
+					xmlNewProp(nodeConf,(xmlChar *)"Number",(xmlChar *)tmpstring);
+
+					// and write each attribute
+					for(uint32_t i=0;i<setup->getNumber();i++)
+					{
+						assert(setup->getEntry(i,&nm,&val));
+						xmlNewChild(nodeConf,NULL,(xmlChar *)nm,(xmlChar *)val );
+					}
+				delete setup;
+			}
+
+		}
+
+		xmlSetDocCompressMode(xdoc,0);  // we want pure text
+		if( xmlSaveFormatFile(docname,xdoc,1) == -1 )
+		{
+			GUI_Alert("Error writing XML file");
+			return ;
+		}
+		xmlFreeDoc(xdoc);
+	return ;
+}
+void filterLoadXml(char *docname)
+{
+	filterLoadXml(docname,0);
+}
+
+void filterLoadXml(char *docname,uint8_t silent)
+{
+ xmlDocPtr xdoc;
+ xmlNodePtr node,subnode;
+int32_t nb_filters,itag;
+CONFcouple *couple;
+//uint16_t s16;
+			UNUSED_ARG(silent);
+			xdoc=xmlParseFile(docname);
+			if(!xdoc)
+				{
+					GUI_Alert("Problem reading xml filters!");
+					return;
+				}
+			node=xdoc->children;
+			nb_filters=getIntegerAttribute(node,(  char *)"filters",(  char *)"FilterNumber");
+			if(nb_filters==-1)
+					{
+							xmlFreeDoc(xdoc);
+							GUI_Alert("No filter found!");
+							return;
+					}
+
+			if(1<nb_active_filter)
+			{
+					  filterCleanUp();
+			}
+
+			// if there is no active filter
+			// Create at least the editor output one
+
+			if(!nb_active_filter)
+			{
+				// avoid going down
+				aviInfo aviinf;
+  				// now build infos
+  				video_body->getVideoInfo(&aviinf);
+				frameStart=0;
+				frameEnd=aviinf.nb_frames-1;
+  		 		videofilters[0].filter=  new AVDMVideoStreamNull(video_body,0,frameEnd);
+
+    			}
+			nb_active_filter=1;
+
+			// now ready to add new ones
+
+			subnode=node->children;
+			for(uint32_t curFilter=0;curFilter<(uint32_t)nb_filters;curFilter++)
+			{
+				// lookup next filter_saveload
+				subnode=nextByName(subnode ,(char *)"Filter");
+				if(!node)
+					{
+						GUI_Alert("Error searching Filter");
+						return;
+					}
+
+				itag=getIntegerAttribute(subnode,(char *)"Filter",(char *)"Tag");
+				if(itag==-1)
+					{
+							xmlFreeDoc(xdoc);
+							GUI_Alert("No tag found!");
+							return;
+					}
+				// now we got the tag
+				printf("\n %lu tag \n",itag);
+
+				// and we can build a CONFCouple if necessary
+				xmlNodePtr conf;
+				conf=subnode->children;
+				conf=nextByName(conf ,(char *)"Parameters");
+				if(!conf)
+					{ // no paramaters needed
+						couple=NULL;
+					}
+				else
+					{
+						int32_t args=getIntegerAttribute(conf,(char *)"Parameters",(char *)"Number");
+			//			printf("\n ** needs %d param :\n",args);
+
+						conf=conf->children;
+						assert(conf);
+						assert(args);
+						couple=buildCouple(args,conf);
+
+					}
+
+				// once we have tag and CONFcouple we can build the filter
+			//	if(couple) couple->dump();
+				videofilters[nb_active_filter].filter= filterCreateFromTag( (VF_FILTERS)itag,
+													couple,
+													videofilters[nb_active_filter-1].filter);
+				videofilters[nb_active_filter].tag=(VF_FILTERS)itag;
+				videofilters[nb_active_filter].conf=couple;;
+				nb_active_filter++;
+
+
+				couple=NULL;
+				// next filter please!
+				subnode=subnode->next;
+			}
+			printf("\n found : %lu filters\n",nb_filters);
+	xmlFreeDoc(xdoc);
+	return ;
+}
+CONFcouple *buildCouple(uint32_t nb, xmlNodePtr node)
+{
+char *val,*nm;
+	CONFcouple *couple=new CONFcouple(nb);
+	while(node)
+	{
+		nm=(char *)node->name;
+		if(!xmlStrcmp((xmlChar *)nm,(xmlChar *)"text"))
+			{
+				node=node->next;
+			 	continue;
+			 }
+		val=(char *)xmlNodeGetContent(node);
+
+		assert(val);
+		assert(couple->setCouple(nm,val));
+	//	printf("\n --> :%s: %s \n",nm,val);
+		nb--;
+		node=node->next;
+
+	};
+	assert(nb==0);
+	return couple;
+
+}
+xmlNodePtr nextByName(xmlNodePtr node,char *name)
+{
+// lookup next filter_saveload
+				if(!node) return NULL;
+				while(1)
+				{
+				//	printf("\n %d %s\n",curFilter,subnode->name);
+					if(!xmlStrcmp(node->name,(const xmlChar *)name)) break;
+					node=node->next;
+					if(!node)
+					{
+						GUI_Alert("Node not found");
+						return NULL;
+					}
+				};
+				return node;
+
+}
+int32_t getIntegerAttribute(xmlNodePtr node, char *name, char *atrname)
+{
+
+			if(!xmlStrcmp(node->name,(const xmlChar *)name))
+			{
+				// found
+				char *str;
+				str=(char *)xmlGetProp(node,(const xmlChar *)atrname);
+				return atoi(str);
+			}
+			printf("\n %s was the name\n",node->name);
+
+
+
+	return -1;
+}
+
+#endif

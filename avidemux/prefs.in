@@ -1,0 +1,46 @@
+#
+# this file will be used as input for pref.h and pref.cpp
+#
+
+# option_name :: name without '-'; the dot is the separator used for the xml tree
+#		 '.' will be changed to '_'
+#		 all letters will be changed to there upper case equivalents
+# type        :: ( UINT | INT | ULONG | LONG | FLOAT | STRING )
+# value       :: default value; used if no xml value available
+# minimum     :: the smallest value this option can have (ignored for STRING)
+# maximum     :: the largest  value this option can have (ignored for STRING)
+
+# option name				type	value	minimum	maximum (incl.)
+codecs.mpeg2enc.svcd.maxbitrate,	UINT,	2600,	0,	2500
+codecs.mpeg2enc.svcd.quantisation,	UINT,	10,	2,	31
+codecs.mpeg2enc.svcd.ExtraParams,	STRING,	""
+codecs.mpeg2enc.dvd.maxbitrate,		UINT,	9500,	0,	9800
+codecs.mpeg2enc.dvd.quantisation,	UINT,	7,	2,	31
+codecs.mpeg2enc.dvd.ExtraParams,	STRING,	""
+test.string,	STRING,	"abcdhfgd"
+test.int,	INT,	0,	-3,	3
+test.uint,	UINT,	1,	0,	3
+test.long,	LONG,	1,	-4,	999999999999
+test.ulong,	ULONG,	2,	0,	999999999999
+test.float,	FLOAT,	0.0,	-0.35,	0.35
+# codec settings
+codecs.preferredcodec,			STRING,	FFmpeg4
+device.audiodevice,			STRING,	OSS
+# lastfiles
+lastfiles.file1,			STRING,	""
+lastfiles.file2,			STRING,	""
+lastfiles.file3,			STRING,	""
+lastfiles.file4,			STRING,	""
+lastdir,				STRING,	""
+# lame
+lame_cli,				STRING, ""
+pipe_cmd,				STRING, ""
+pipe_param,				STRING, ""
+lame_path,				STRING, ""
+toolame_path,				STRING, ""
+lvemux_path,				STRING, ""
+requant_path,				STRING, ""
+# feature
+feature.swap_if_A_greater_than_B,	UINT,   1,      0,      1
+feature.svcdres.preferedsourceratio,	STRING, "1:1"
+feature.saveprefsonexit,		UINT,	1,	0,	1

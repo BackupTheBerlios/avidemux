@@ -1,0 +1,133 @@
+/***************************************************************************
+                          adm_encoder.h  -  description
+                             -------------------
+
+	This class defines the encoder.
+	Encoder is the middle man between the actual codec and the user
+
+	It is up to the encoder to deal with dual pass.
+	That way it can be used for any codec.
+
+
+    begin                : Sun Jul 14 2002
+    copyright            : (C) 2002 by mean
+    email                : fixounet@free.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+#ifndef __ADM_encoder__
+#define __ADM_encoder__
+typedef enum
+{
+
+	enc_CQ=1,
+	enc_CBR,
+	enc_Pass1,
+	enc_Pass2,
+	enc_Invalid
+
+}encoderState;
+
+
+typedef struct entry_s
+	/* max 28 bytes/frame or 5 Mb for 2-hour movie */
+	{
+		int quant;
+		int text_bits;
+		int motion_bits;
+		int total_bits;
+		float mult;
+		int is_key_frame;
+		int drop;
+	} entry;
+
+
+class Encoder
+{
+ 	
+	protected:
+				encoderState 		_state;
+				uint32_t		_w,_h;
+				uint8_t			*_vbuffer;
+             			 AVDMGenericVideoStream *_in;
+				char 			_logname[500];
+				COMPRES_PARAMS 		_param;
+
+	// VBR
+				FILE 			*fd;
+                    		uint32_t		_frametogo;
+                        	entry			*entries;
+ 				double 			m_fQuant;
+                          	long long  		m_lEncodedBits,m_lExpectedBits;
+                          	long long		old_bits;
+
+                         	uint8_t 		computeParameters( void );
+				uint8_t  		getQuantVBR(   uint32_t frame,   int64_t previousbits,
+								uint16_t *oquant,uint8_t *qf);
+// -- vbr
+
+	public:
+				Encoder	( void ) { _w=_h=0; _vbuffer=NULL;entries=NULL;};
+				virtual ~Encoder( void );
+				virtual uint8_t isDualPass( void )=0;
+				virtual uint8_t configure(AVDMGenericVideoStream *instream)=0;
+				virtual uint8_t encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags)=0;
+				virtual uint8_t stop( void)=0;
+				virtual uint8_t getLastQz( void) { return 31;};
+				virtual uint8_t setLogFile( const char *o,uint32_t frames)=0;
+				virtual uint8_t startPass1( void )=0;		
+				virtual uint8_t startPass2( void )=0;	
+				virtual uint8_t hasExtraHeaderData( uint32_t *l,uint8_t **data)
+					{
+						*data=NULL;
+						*l= 0;
+						return 1;
+					}
+			        virtual const char *getCodecName(void ) =0;
+              			virtual const char *getFCCHandler(void ) =0;
+              			virtual const char *getDisplayName(void ) =0;
+              
+
+}   ; 
+Encoder *getVideoEncoder( uint32_t w,uint32_t h );
+
+typedef enum
+{
+	CodecDivx	,
+	CodecXvid	,
+	CodecFF,
+	CodecMjpeg,
+	CodecH263,
+	CodecH263P,
+	CodecFFV1,
+	CodecHuff,
+	CodecVCD,
+	CodecSVCD,
+	CodecDVD,
+	CodecXVCD,
+	CodecXSVCD,
+	CodecXvid4,
+	CodecDummy	
+}SelectCodecType;
+
+typedef enum
+{
+	CodecFamilyAVI,
+	CodecFamilyMpeg,
+	CodecFamilyXVCD
+}CodecFamilty;
+
+extern  CodecFamilty videoCodecGetFamily( void );
+extern void videoCodecConfigure( void );
+extern void videoCodecSelect( void );
+extern void videoCodecSetcodec(SelectCodecType codec);
+extern void EncoderSaveMpeg(char *name);
+#endif
+

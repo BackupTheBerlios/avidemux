@@ -1,0 +1,943 @@
+# Makefile.in generated automatically by automake 1.5 from Makefile.am.
+# KDE tags expanded automatically by am_edit - $Revision: 1.1 $ 
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
+# Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+@SET_MAKE@
+
+####### kdevelop will overwrite this part!!! (begin)##########
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+top_builddir = ../..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_HEADER = $(INSTALL_DATA)
+transform = @program_transform_name@
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+build_alias = @build_alias@
+build_triplet = @build@
+host_alias = @host_alias@
+host_triplet = @host@
+target_alias = @target_alias@
+target_triplet = @target@
+ADM_LOCALEDIR = @ADM_LOCALEDIR@
+ALTIVEC_SWITCH = @ALTIVEC_SWITCH@
+AMTAR = @AMTAR@
+ARTSCCONFIG = @ARTSCCONFIG@
+ARTS_CFLAGS = @ARTS_CFLAGS@
+ARTS_LIBS = @ARTS_LIBS@
+ART_CONFIG = @ART_CONFIG@
+AS = @AS@
+ASFLAGS = @ASFLAGS@
+AS_FLAGS = @AS_FLAGS@
+AUTODIRS = @AUTODIRS@
+AWK = @AWK@
+BUILD_INCLUDED_LIBINTL = @BUILD_INCLUDED_LIBINTL@
+CATOBJEXT = @CATOBJEXT@
+CC = @CC@
+CONF_FILES = @CONF_FILES@
+CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+DATADIRNAME = @DATADIRNAME@
+DCOPIDL = @DCOPIDL@
+DCOPIDL2CPP = @DCOPIDL2CPP@
+DCOP_DEPENDENCIES = @DCOP_DEPENDENCIES@
+DEPDIR = @DEPDIR@
+DLLTOOL = @DLLTOOL@
+DOXYGEN = @DOXYGEN@
+DOXYGEN_PROJECT_NAME = @DOXYGEN_PROJECT_NAME@
+DOXYGEN_PROJECT_NUMBER = @DOXYGEN_PROJECT_NUMBER@
+DPMSINC = @DPMSINC@
+DPMSLIB = @DPMSLIB@
+ECHO = @ECHO@
+EXEEXT = @EXEEXT@
+FRAMEWORK_COREAUDIO = @FRAMEWORK_COREAUDIO@
+FREETYPE_CFLAGS = @FREETYPE_CFLAGS@
+FREETYPE_CONFIG = @FREETYPE_CONFIG@
+FREETYPE_LIBS = @FREETYPE_LIBS@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
+GENCAT = @GENCAT@
+GLIBC21 = @GLIBC21@
+GLINC = @GLINC@
+GLLIB = @GLLIB@
+GMSGFMT = @GMSGFMT@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_LIBS = @GTK_LIBS@
+GTK_VERSION = @GTK_VERSION@
+HAVE_LIB = @HAVE_LIB@
+IDL = @IDL@
+IDL_DEPENDENCIES = @IDL_DEPENDENCIES@
+INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INSTOBJEXT = @INSTOBJEXT@
+INTLBISON = @INTLBISON@
+INTLLIBS = @INTLLIBS@
+INTLOBJS = @INTLOBJS@
+INTL_LIBTOOL_SUFFIX_PREFIX = @INTL_LIBTOOL_SUFFIX_PREFIX@
+JAR = @JAR@
+JAVAC = @JAVAC@
+JAVAH = @JAVAH@
+JVMLIBS = @JVMLIBS@
+KDECONFIG = @KDECONFIG@
+KDE_EXTRA_RPATH = @KDE_EXTRA_RPATH@
+KDE_HAS_DOXYGEN = @KDE_HAS_DOXYGEN@
+KDE_HAVE_DOT = @KDE_HAVE_DOT@
+KDE_INCLUDES = @KDE_INCLUDES@
+KDE_LDFLAGS = @KDE_LDFLAGS@
+KDE_MT_LDFLAGS = @KDE_MT_LDFLAGS@
+KDE_MT_LIBS = @KDE_MT_LIBS@
+KDE_PLUGIN = @KDE_PLUGIN@
+KDE_RPATH = @KDE_RPATH@
+KDE_USE_CLOSURE_FALSE = @KDE_USE_CLOSURE_FALSE@
+KDE_USE_CLOSURE_TRUE = @KDE_USE_CLOSURE_TRUE@
+KDE_USE_FINAL_FALSE = @KDE_USE_FINAL_FALSE@
+KDE_USE_FINAL_TRUE = @KDE_USE_FINAL_TRUE@
+KDE_XSL_STYLESHEET = @KDE_XSL_STYLESHEET@
+LEX = @LEX@
+LEXLIB = @LEXLIB@
+LIB = @LIB@
+LIBCOMPAT = @LIBCOMPAT@
+LIBCRYPT = @LIBCRYPT@
+LIBDL = @LIBDL@
+LIBGEN = @LIBGEN@
+LIBICONV = @LIBICONV@
+LIBINTL = @LIBINTL@
+LIBJPEG = @LIBJPEG@
+LIBMICO = @LIBMICO@
+LIBOBJS = @LIBOBJS@
+LIBPNG = @LIBPNG@
+LIBPTHREAD = @LIBPTHREAD@
+LIBPYTHON = @LIBPYTHON@
+LIBQIMGIO = @LIBQIMGIO@
+LIBRESOLV = @LIBRESOLV@
+LIBSHADOW = @LIBSHADOW@
+LIBSM = @LIBSM@
+LIBSOCKET = @LIBSOCKET@
+LIBTIFF = @LIBTIFF@
+LIBTOOL = @LIBTOOL@
+LIBUCB = @LIBUCB@
+LIBUTIL = @LIBUTIL@
+LIBXINERAMA = @LIBXINERAMA@
+LIBZ = @LIBZ@
+LIB_KAB = @LIB_KAB@
+LIB_KDECORE = @LIB_KDECORE@
+LIB_KDEPRINT = @LIB_KDEPRINT@
+LIB_KDEUI = @LIB_KDEUI@
+LIB_KFILE = @LIB_KFILE@
+LIB_KFM = @LIB_KFM@
+LIB_KHTML = @LIB_KHTML@
+LIB_KIMGIO = @LIB_KIMGIO@
+LIB_KIO = @LIB_KIO@
+LIB_KPARTS = @LIB_KPARTS@
+LIB_KSPELL = @LIB_KSPELL@
+LIB_KSYCOCA = @LIB_KSYCOCA@
+LIB_POLL = @LIB_POLL@
+LIB_QPE = @LIB_QPE@
+LIB_QT = @LIB_QT@
+LIB_QTOPIA = @LIB_QTOPIA@
+LIB_SMB = @LIB_SMB@
+LIB_X11 = @LIB_X11@
+LIB_XEXT = @LIB_XEXT@
+LMPG_OPT = @LMPG_OPT@
+LN_S = @LN_S@
+LTLIB = @LTLIB@
+LTLIBICONV = @LTLIBICONV@
+LTLIBINTL = @LTLIBINTL@
+MCOPIDL = @MCOPIDL@
+MEINPROC = @MEINPROC@
+MICO_INCLUDES = @MICO_INCLUDES@
+MICO_LDFLAGS = @MICO_LDFLAGS@
+MKINSTALLDIRS = @MKINSTALLDIRS@
+MOC = @MOC@
+MSGFMT = @MSGFMT@
+NASM_CONFIG = @NASM_CONFIG@
+NOOPT_CFLAGS = @NOOPT_CFLAGS@
+NOOPT_CXXFLAGS = @NOOPT_CXXFLAGS@
+NOREPO = @NOREPO@
+OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
+PACKAGE = @PACKAGE@
+PAMLIBS = @PAMLIBS@
+PASSWDLIBS = @PASSWDLIBS@
+PKG_CONFIG = @PKG_CONFIG@
+POSUB = @POSUB@
+PYTHONINC = @PYTHONINC@
+PYTHONLIB = @PYTHONLIB@
+PYTHONMODDIR = @PYTHONMODDIR@
+QTDOCDIR = @QTDOCDIR@
+QTE_NORTTI = @QTE_NORTTI@
+QTOPIA_INCLUDES = @QTOPIA_INCLUDES@
+QT_INCLUDES = @QT_INCLUDES@
+QT_LDFLAGS = @QT_LDFLAGS@
+RANLIB = @RANLIB@
+RC = @RC@
+REPO = @REPO@
+SETUIDFLAGS = @SETUIDFLAGS@
+STRIP = @STRIP@
+TOPSUBDIRS = @TOPSUBDIRS@
+UIC = @UIC@
+UIC_TR = @UIC_TR@
+USER_INCLUDES = @USER_INCLUDES@
+USER_LDFLAGS = @USER_LDFLAGS@
+USE_EXCEPTIONS = @USE_EXCEPTIONS@
+USE_INCLUDED_LIBINTL = @USE_INCLUDED_LIBINTL@
+USE_NLS = @USE_NLS@
+USE_RTTI = @USE_RTTI@
+USE_THREADS = @USE_THREADS@
+VERSION = @VERSION@
+WOVERLOADED_VIRTUAL = @WOVERLOADED_VIRTUAL@
+XGETTEXT = @XGETTEXT@
+XML2_CONFIG = @XML2_CONFIG@
+XML_CFLAGS = @XML_CFLAGS@
+XML_CONFIG = @XML_CONFIG@
+XML_LIBS = @XML_LIBS@
+XPMINC = @XPMINC@
+XPMLIB = @XPMLIB@
+X_EXTRA_LIBS = @X_EXTRA_LIBS@
+X_INCLUDES = @X_INCLUDES@
+X_LDFLAGS = @X_LDFLAGS@
+X_PRE_LIBS = @X_PRE_LIBS@
+all_includes = @all_includes@
+all_libraries = @all_libraries@
+am__include = @am__include@
+am__quote = @am__quote@
+idldir = @idldir@
+install_sh = @install_sh@
+jni_includes = @jni_includes@
+kde_appsdir = @kde_appsdir@
+kde_bindir = @kde_bindir@
+kde_confdir = @kde_confdir@
+kde_datadir = @kde_datadir@
+kde_htmldir = @kde_htmldir@
+kde_icondir = @kde_icondir@
+kde_includes = @kde_includes@
+kde_libraries = @kde_libraries@
+kde_libs_htmldir = @kde_libs_htmldir@
+kde_libs_prefix = @kde_libs_prefix@
+kde_locale = @kde_locale@
+kde_mimedir = @kde_mimedir@
+kde_moduledir = @kde_moduledir@
+kde_qtver = @kde_qtver@
+kde_servicesdir = @kde_servicesdir@
+kde_servicetypesdir = @kde_servicetypesdir@
+kde_sounddir = @kde_sounddir@
+kde_styledir = @kde_styledir@
+kde_templatesdir = @kde_templatesdir@
+kde_wallpaperdir = @kde_wallpaperdir@
+kde_widgetdir = @kde_widgetdir@
+micodir = @micodir@
+qt_includes = @qt_includes@
+qt_libraries = @qt_libraries@
+x_includes = @x_includes@
+x_libraries = @x_libraries@
+
+noinst_LIBRARIES = libADM_video.a
+
+#>- libADM_video_a_METASOURCES = AUTO
+
+libADM_video_a_SOURCES = ADM_vidFields.cpp ADM_vidDeintASM.cpp ADM_vidVlad.cpp ADM_guiMedianBig.cpp ADM_vidLargeMedian.cpp ADM_vidSalt.cpp ADM_vidCached.cpp ADM_vidFlux.cpp ADM_vidPartial.cpp ADM_guiSRT.cpp ADM_vidFont.cpp ADM_vidSRT.cpp ADM_guiDenoise.cpp ADM_vidDenoise.cpp ADM_guiConv.cpp ADM_vidFastConvolution.cpp ADM_vidFlipV.cpp ADM_vidStabilize.cpp ADM_guiContrast.cpp ADM_vidContrast.cpp ADM_resizeter.cpp ADM_vidConvolution.cpp ADM_vidCrop.cpp ADM_vidDeinterlace.cpp ADM_vidLuma.cpp ADM_vidNull.cpp ADM_vidPalShift.cpp ADM_vidpreview.cpp ADM_vidResize.cpp ADM_vidTelecide.cpp ADM_vidTempSmooth.cpp ADM_vidUVSwap.cpp ADM_vidClean.cpp ADM_vidChroma.cpp ADM_vidBSmear.cpp ADM_vidAddBorder.cpp ADM_resizebis.cpp ADM_guiResize.cpp ADM_guiCrop.cpp ADM_guiClean.cpp ADM_guiBSMear.cpp ADM_guiAddBorder.cpp ADM_genvideo.cpp ADM_guiRotate.cpp ADM_vidRotate.cpp ADM_vidRotate.h ADM_vidDropOut.cpp ADM_vidDropOut.h ADM_vidResize25.cpp ADM_vidSwapFields.cpp ADM_vidSwapFields.h ADM_vidSeparateField.cpp ADM_vidFieldUtil.cpp ADM_vidFieldUtil.h ADM_vidSeparateField.h ADM_confCouples.cpp ADM_confCouple.h ADM_vidCommonFilter.h ADM_vidChromaShift.h ADM_vidChromaShift.cpp ADM_vidSwapSmart.cpp ADM_vidSwapSmart.h swscale.c ADM_vidMPLResize.cpp ADM_vidIVTC.cpp ADM_vidIVTC.h ADM_interlaced.cpp ADM_interlaced.h ADM_vidPulldown.h ADM_vidPulldown.cpp ADM_vidMPLD3D.cpp ADM_vidMPLD3D.h ADM_vidMPLD3Dlow.h ADM_vidMPLD3Dlow.cpp ADM_vidBlend.cpp ADM_vidRaw.cpp ADM_vidSRTRender.cpp ADM_vidSRTload.cpp ADM_guiChromaShift.cpp ADM_vidlavdeint.cpp ADM_mpdetc.cpp ADM_vidKernelDeint.cpp ADM_vidForcedPP.cpp ADM_vidSoften.cpp
+
+EXTRA_DIST = ADM_genvideo.cpp ADM_genvideo.hxx ADM_guiAddBorder.cpp ADM_guiBSMear.cpp ADM_guiClean.cpp ADM_guiCrop.cpp ADM_guiResize.cpp ADM_resizebis.cpp ADM_resizebis.hxx ADM_vidAddBorder.cpp ADM_vidAddBorder.h ADM_vidBSmear.cpp ADM_vidChroma.cpp ADM_vidChroma.h ADM_vidClean.cpp ADM_vidClean.h ADM_vidUVSwap.h ADM_vidUVSwap.cpp ADM_vidTempSmooth.h ADM_vidTempSmooth.cpp ADM_vidTelecide.h ADM_vidTelecide.cpp ADM_vidResize.cpp ADM_vidpreview.cpp ADM_vidPalShift.h ADM_vidPalShift.cpp ADM_vidNull.cpp ADM_vidLuma.h ADM_vidLuma.cpp ADM_vidDeinterlace.h ADM_vidDeinterlace.cpp ADM_vidCrop.cpp ADM_vidConvolution.hxx ADM_vidConvolution.cpp ADM_resizeter.cpp ADM_vidContrast.cpp ADM_vidContrast.h ADM_guiContrast.cpp ADM_vidStabilize.cpp ADM_vidStabilize.h ADM_vidFlipV.h ADM_vidFlipV.cpp ADM_vidFastConvolution.cpp ADM_guiConv.cpp ADM_vidDenoise.h ADM_vidDenoise.cpp ADM_guiDenoise.cpp ADM_vidSRT.cpp ADM_vidSRT.h ADM_vidFont.cpp ADM_vidFont.h ADM_guiSRT.cpp ADM_vidPartial.h ADM_vidPartial.cpp ADM_vidFlux.cpp ADM_vidFlux.h ADM_vidCached.cpp ADM_vidCached.h ADM_vidSalt.cpp ADM_vidSalt.h ADM_vidLargeMedian.cpp ADM_vidLargeMedian.h ADM_guiMedianBig.cpp ADM_vidVlad.cpp ADM_vidVlad.h ADM_vidDeintASM.cpp ADM_vidFields.cpp ADM_vidField.h 
+
+####### kdevelop will overwrite this part!!! (end)############
+INCLUDES = $(all_includes) $(GTK_CFLAGS) $(FREETYPE_CFLAGS)
+noinst_HEADERS = ADM_vidlavdeint.h ADM_mpdetc.h ADM_vidKernelDeint.h ADM_vidForcedPP.h ADM_vidSoften.h
+subdir = avidemux/ADM_video
+mkinstalldirs = $(SHELL) $(top_srcdir)/admin/mkinstalldirs
+CONFIG_HEADER = $(top_builddir)/config.h
+CONFIG_CLEAN_FILES =
+LIBRARIES = $(noinst_LIBRARIES)
+
+libADM_video_a_AR = $(AR) cru
+libADM_video_a_LIBADD =
+am_libADM_video_a_OBJECTS = ADM_vidFields.$(OBJEXT) \
+	ADM_vidDeintASM.$(OBJEXT) ADM_vidVlad.$(OBJEXT) \
+	ADM_guiMedianBig.$(OBJEXT) ADM_vidLargeMedian.$(OBJEXT) \
+	ADM_vidSalt.$(OBJEXT) ADM_vidCached.$(OBJEXT) \
+	ADM_vidFlux.$(OBJEXT) ADM_vidPartial.$(OBJEXT) \
+	ADM_guiSRT.$(OBJEXT) ADM_vidFont.$(OBJEXT) ADM_vidSRT.$(OBJEXT) \
+	ADM_guiDenoise.$(OBJEXT) ADM_vidDenoise.$(OBJEXT) \
+	ADM_guiConv.$(OBJEXT) ADM_vidFastConvolution.$(OBJEXT) \
+	ADM_vidFlipV.$(OBJEXT) ADM_vidStabilize.$(OBJEXT) \
+	ADM_guiContrast.$(OBJEXT) ADM_vidContrast.$(OBJEXT) \
+	ADM_resizeter.$(OBJEXT) ADM_vidConvolution.$(OBJEXT) \
+	ADM_vidCrop.$(OBJEXT) ADM_vidDeinterlace.$(OBJEXT) \
+	ADM_vidLuma.$(OBJEXT) ADM_vidNull.$(OBJEXT) \
+	ADM_vidPalShift.$(OBJEXT) ADM_vidpreview.$(OBJEXT) \
+	ADM_vidResize.$(OBJEXT) ADM_vidTelecide.$(OBJEXT) \
+	ADM_vidTempSmooth.$(OBJEXT) ADM_vidUVSwap.$(OBJEXT) \
+	ADM_vidClean.$(OBJEXT) ADM_vidChroma.$(OBJEXT) \
+	ADM_vidBSmear.$(OBJEXT) ADM_vidAddBorder.$(OBJEXT) \
+	ADM_resizebis.$(OBJEXT) ADM_guiResize.$(OBJEXT) \
+	ADM_guiCrop.$(OBJEXT) ADM_guiClean.$(OBJEXT) \
+	ADM_guiBSMear.$(OBJEXT) ADM_guiAddBorder.$(OBJEXT) \
+	ADM_genvideo.$(OBJEXT) ADM_guiRotate.$(OBJEXT) \
+	ADM_vidRotate.$(OBJEXT) ADM_vidDropOut.$(OBJEXT) \
+	ADM_vidResize25.$(OBJEXT) ADM_vidSwapFields.$(OBJEXT) \
+	ADM_vidSeparateField.$(OBJEXT) ADM_vidFieldUtil.$(OBJEXT) \
+	ADM_confCouples.$(OBJEXT) ADM_vidChromaShift.$(OBJEXT) \
+	ADM_vidSwapSmart.$(OBJEXT) swscale.$(OBJEXT) \
+	ADM_vidMPLResize.$(OBJEXT) ADM_vidIVTC.$(OBJEXT) \
+	ADM_interlaced.$(OBJEXT) ADM_vidPulldown.$(OBJEXT) \
+	ADM_vidMPLD3D.$(OBJEXT) ADM_vidMPLD3Dlow.$(OBJEXT) \
+	ADM_vidBlend.$(OBJEXT) ADM_vidRaw.$(OBJEXT) \
+	ADM_vidSRTRender.$(OBJEXT) ADM_vidSRTload.$(OBJEXT) \
+	ADM_guiChromaShift.$(OBJEXT) ADM_vidlavdeint.$(OBJEXT) \
+	ADM_mpdetc.$(OBJEXT) ADM_vidKernelDeint.$(OBJEXT) \
+	ADM_vidForcedPP.$(OBJEXT) ADM_vidSoften.$(OBJEXT)
+#>- libADM_video_a_OBJECTS = $(am_libADM_video_a_OBJECTS)
+#>+ 38
+libADM_video_a_final_OBJECTS = swscale.o libADM_video_a.all_cpp.o 
+libADM_video_a_nofinal_OBJECTS = ADM_vidFields.$(OBJEXT) \
+	ADM_vidDeintASM.$(OBJEXT) ADM_vidVlad.$(OBJEXT) \
+	ADM_guiMedianBig.$(OBJEXT) ADM_vidLargeMedian.$(OBJEXT) \
+	ADM_vidSalt.$(OBJEXT) ADM_vidCached.$(OBJEXT) \
+	ADM_vidFlux.$(OBJEXT) ADM_vidPartial.$(OBJEXT) \
+	ADM_guiSRT.$(OBJEXT) ADM_vidFont.$(OBJEXT) ADM_vidSRT.$(OBJEXT) \
+	ADM_guiDenoise.$(OBJEXT) ADM_vidDenoise.$(OBJEXT) \
+	ADM_guiConv.$(OBJEXT) ADM_vidFastConvolution.$(OBJEXT) \
+	ADM_vidFlipV.$(OBJEXT) ADM_vidStabilize.$(OBJEXT) \
+	ADM_guiContrast.$(OBJEXT) ADM_vidContrast.$(OBJEXT) \
+	ADM_resizeter.$(OBJEXT) ADM_vidConvolution.$(OBJEXT) \
+	ADM_vidCrop.$(OBJEXT) ADM_vidDeinterlace.$(OBJEXT) \
+	ADM_vidLuma.$(OBJEXT) ADM_vidNull.$(OBJEXT) \
+	ADM_vidPalShift.$(OBJEXT) ADM_vidpreview.$(OBJEXT) \
+	ADM_vidResize.$(OBJEXT) ADM_vidTelecide.$(OBJEXT) \
+	ADM_vidTempSmooth.$(OBJEXT) ADM_vidUVSwap.$(OBJEXT) \
+	ADM_vidClean.$(OBJEXT) ADM_vidChroma.$(OBJEXT) \
+	ADM_vidBSmear.$(OBJEXT) ADM_vidAddBorder.$(OBJEXT) \
+	ADM_resizebis.$(OBJEXT) ADM_guiResize.$(OBJEXT) \
+	ADM_guiCrop.$(OBJEXT) ADM_guiClean.$(OBJEXT) \
+	ADM_guiBSMear.$(OBJEXT) ADM_guiAddBorder.$(OBJEXT) \
+	ADM_genvideo.$(OBJEXT) ADM_guiRotate.$(OBJEXT) \
+	ADM_vidRotate.$(OBJEXT) ADM_vidDropOut.$(OBJEXT) \
+	ADM_vidResize25.$(OBJEXT) ADM_vidSwapFields.$(OBJEXT) \
+	ADM_vidSeparateField.$(OBJEXT) ADM_vidFieldUtil.$(OBJEXT) \
+	ADM_confCouples.$(OBJEXT) ADM_vidChromaShift.$(OBJEXT) \
+	ADM_vidSwapSmart.$(OBJEXT) swscale.$(OBJEXT) \
+	ADM_vidMPLResize.$(OBJEXT) ADM_vidIVTC.$(OBJEXT) \
+	ADM_interlaced.$(OBJEXT) ADM_vidPulldown.$(OBJEXT) \
+	ADM_vidMPLD3D.$(OBJEXT) ADM_vidMPLD3Dlow.$(OBJEXT) \
+	ADM_vidBlend.$(OBJEXT) ADM_vidRaw.$(OBJEXT) \
+	ADM_vidSRTRender.$(OBJEXT) ADM_vidSRTload.$(OBJEXT) \
+	ADM_guiChromaShift.$(OBJEXT) ADM_vidlavdeint.$(OBJEXT) \
+	ADM_mpdetc.$(OBJEXT) ADM_vidKernelDeint.$(OBJEXT) \
+	ADM_vidForcedPP.$(OBJEXT) ADM_vidSoften.$(OBJEXT)
+@KDE_USE_FINAL_FALSE@libADM_video_a_OBJECTS = $(libADM_video_a_nofinal_OBJECTS)
+@KDE_USE_FINAL_TRUE@libADM_video_a_OBJECTS = $(libADM_video_a_final_OBJECTS)
+
+DEFS = @DEFS@
+DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
+CPPFLAGS = @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+depcomp = $(SHELL) $(top_srcdir)/admin/depcomp
+#>- @AMDEP_TRUE@DEP_FILES = $(DEPDIR)/ADM_confCouples.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_genvideo.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_guiAddBorder.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_guiBSMear.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_guiChromaShift.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_guiClean.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_guiContrast.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_guiConv.Po $(DEPDIR)/ADM_guiCrop.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_guiDenoise.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_guiMedianBig.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_guiResize.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_guiRotate.Po $(DEPDIR)/ADM_guiSRT.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_interlaced.Po $(DEPDIR)/ADM_mpdetc.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_resizebis.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_resizeter.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidAddBorder.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidBSmear.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidBlend.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidCached.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidChroma.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidChromaShift.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidClean.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidContrast.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidConvolution.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidCrop.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidDeintASM.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidDeinterlace.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidDenoise.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidDropOut.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidFastConvolution.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidFieldUtil.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidFields.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidFlipV.Po $(DEPDIR)/ADM_vidFlux.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidFont.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidForcedPP.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidIVTC.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidKernelDeint.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidLargeMedian.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidLuma.Po $(DEPDIR)/ADM_vidMPLD3D.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidMPLD3Dlow.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidMPLResize.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidNull.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidPalShift.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidPartial.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidPulldown.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidRaw.Po $(DEPDIR)/ADM_vidResize.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidResize25.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidRotate.Po $(DEPDIR)/ADM_vidSRT.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidSRTRender.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidSRTload.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidSalt.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidSeparateField.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidSoften.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidStabilize.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidSwapFields.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidSwapSmart.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidTelecide.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidTempSmooth.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidUVSwap.Po $(DEPDIR)/ADM_vidVlad.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidlavdeint.Po \
+#>- @AMDEP_TRUE@	$(DEPDIR)/ADM_vidpreview.Po $(DEPDIR)/swscale.Po
+#>+ 123
+@AMDEP_TRUE@@KDE_USE_FINAL_TRUE@DEP_FILES =   $(DEPDIR)/libADM_video_a.all_cpp.P  $(DEPDIR)/ADM_confCouples.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_genvideo.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiAddBorder.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiBSMear.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiChromaShift.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiClean.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiContrast.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiConv.Po $(DEPDIR)/ADM_guiCrop.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiDenoise.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiMedianBig.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiResize.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiRotate.Po $(DEPDIR)/ADM_guiSRT.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_interlaced.Po $(DEPDIR)/ADM_mpdetc.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_resizebis.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_resizeter.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidAddBorder.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidBSmear.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidBlend.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidCached.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidChroma.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidChromaShift.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidClean.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidContrast.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidConvolution.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidCrop.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidDeintASM.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidDeinterlace.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidDenoise.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidDropOut.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidFastConvolution.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidFieldUtil.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidFields.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidFlipV.Po $(DEPDIR)/ADM_vidFlux.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidFont.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidForcedPP.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidIVTC.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidKernelDeint.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidLargeMedian.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidLuma.Po $(DEPDIR)/ADM_vidMPLD3D.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidMPLD3Dlow.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidMPLResize.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidNull.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidPalShift.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidPartial.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidPulldown.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidRaw.Po $(DEPDIR)/ADM_vidResize.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidResize25.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidRotate.Po $(DEPDIR)/ADM_vidSRT.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSRTRender.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSRTload.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSalt.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSeparateField.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSoften.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidStabilize.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSwapFields.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSwapSmart.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidTelecide.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidTempSmooth.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidUVSwap.Po $(DEPDIR)/ADM_vidVlad.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidlavdeint.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidpreview.Po $(DEPDIR)/swscale.Po
+@AMDEP_TRUE@@KDE_USE_FINAL_FALSE@DEP_FILES =   $(DEPDIR)/ADM_confCouples.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_genvideo.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiAddBorder.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiBSMear.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiChromaShift.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiClean.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiContrast.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiConv.Po $(DEPDIR)/ADM_guiCrop.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiDenoise.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiMedianBig.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiResize.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_guiRotate.Po $(DEPDIR)/ADM_guiSRT.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_interlaced.Po $(DEPDIR)/ADM_mpdetc.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_resizebis.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_resizeter.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidAddBorder.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidBSmear.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidBlend.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidCached.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidChroma.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidChromaShift.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidClean.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidContrast.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidConvolution.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidCrop.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidDeintASM.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidDeinterlace.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidDenoise.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidDropOut.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidFastConvolution.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidFieldUtil.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidFields.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidFlipV.Po $(DEPDIR)/ADM_vidFlux.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidFont.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidForcedPP.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidIVTC.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidKernelDeint.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidLargeMedian.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidLuma.Po $(DEPDIR)/ADM_vidMPLD3D.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidMPLD3Dlow.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidMPLResize.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidNull.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidPalShift.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidPartial.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidPulldown.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidRaw.Po $(DEPDIR)/ADM_vidResize.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidResize25.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidRotate.Po $(DEPDIR)/ADM_vidSRT.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSRTRender.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSRTload.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSalt.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSeparateField.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSoften.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidStabilize.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSwapFields.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidSwapSmart.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidTelecide.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidTempSmooth.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidUVSwap.Po $(DEPDIR)/ADM_vidVlad.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidlavdeint.Po \
+	@AMDEP_TRUE@	$(DEPDIR)/ADM_vidpreview.Po $(DEPDIR)/swscale.Po
+
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
+	$(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+CFLAGS = @CFLAGS@
+#>- CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+#>- $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+#>+ 2
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS)
+#>- LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
+#>- $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+#>- $(AM_CXXFLAGS) $(CXXFLAGS)
+#>+ 3
+LTCXXCOMPILE = $(LIBTOOL) --mode=compile --tag=CXX $(CXX) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS)
+CXXLD = $(CXX)
+#>- CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+#>- $(AM_LDFLAGS) $(LDFLAGS) -o $@
+#>+ 2
+CXXLINK = $(LIBTOOL) --mode=link --tag=CXX $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(KDE_CXXFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+CXXFLAGS = @CXXFLAGS@
+DIST_SOURCES = $(libADM_video_a_SOURCES)
+HEADERS = $(noinst_HEADERS)
+
+DIST_COMMON = $(noinst_HEADERS) Makefile.am Makefile.in
+SOURCES = $(libADM_video_a_SOURCES)
+
+#>- all: all-am
+#>+ 1
+all: docs-am  all-am
+
+.SUFFIXES:
+.SUFFIXES: .c .cpp .lo .o .obj
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+	-rm -f libtool
+$(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
+#>- 	cd $(top_srcdir) && \
+#>- $(AUTOMAKE) --gnu  avidemux/ADM_video/Makefile
+#>+ 3
+	cd $(top_srcdir) && \
+	$(AUTOMAKE) --gnu  avidemux/ADM_video/Makefile
+	cd $(top_srcdir) && perl admin/am_edit avidemux-2.0.21-1/avidemux/ADM_video/Makefile.in
+Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) && \
+	CONFIG_HEADERS= CONFIG_LINKS= \
+	CONFIG_FILES=$(subdir)/$@ $(SHELL) ./config.status
+
+AR = ar
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libADM_video.a: $(libADM_video_a_OBJECTS) $(libADM_video_a_DEPENDENCIES) 
+	-rm -f libADM_video.a
+	$(libADM_video_a_AR) libADM_video.a $(libADM_video_a_OBJECTS) $(libADM_video_a_LIBADD)
+	$(RANLIB) libADM_video.a
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT) core *.core
+
+distclean-compile:
+	-rm -f *.tab.c
+
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_confCouples.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_genvideo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiAddBorder.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiBSMear.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiChromaShift.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiClean.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiContrast.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiConv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiCrop.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiDenoise.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiMedianBig.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiResize.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiRotate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_guiSRT.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_interlaced.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_mpdetc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_resizebis.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_resizeter.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidAddBorder.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidBSmear.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidBlend.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidCached.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidChroma.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidChromaShift.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidClean.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidContrast.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidConvolution.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidCrop.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidDeintASM.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidDeinterlace.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidDenoise.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidDropOut.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidFastConvolution.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidFieldUtil.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidFields.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidFlipV.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidFlux.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidFont.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidForcedPP.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidIVTC.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidKernelDeint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidLargeMedian.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidLuma.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidMPLD3D.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidMPLD3Dlow.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidMPLResize.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidNull.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidPalShift.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidPartial.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidPulldown.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidRaw.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidResize.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidResize25.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidRotate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidSRT.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidSRTRender.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidSRTload.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidSalt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidSeparateField.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidSoften.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidStabilize.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidSwapFields.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidSwapSmart.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidTelecide.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidTempSmooth.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidUVSwap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidVlad.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidlavdeint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ADM_vidpreview.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/swscale.Po@am__quote@
+
+distclean-depend:
+	-rm -rf $(DEPDIR)
+
+.c.o:
+@AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<
+
+.c.obj:
+@AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(COMPILE) -c `cygpath -w $<`
+
+.c.lo:
+@AMDEP_TRUE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LTCOMPILE) -c -o $@ `test -f $< || echo '$(srcdir)/'`$<
+CCDEPMODE = @CCDEPMODE@
+
+.cpp.o:
+@AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXXCOMPILE) -c -o $@ `test -f $< || echo '$(srcdir)/'`$<
+
+.cpp.obj:
+@AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXXCOMPILE) -c -o $@ `cygpath -w $<`
+
+.cpp.lo:
+@AMDEP_TRUE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LTCXXCOMPILE) -c -o $@ `test -f $< || echo '$(srcdir)/'`$<
+CXXDEPMODE = @CXXDEPMODE@
+uninstall-info-am:
+
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
+	list='$(SOURCES) $(HEADERS) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	done | \
+	$(AWK) '    { files[$$0] = 1; } \
+	END { for (i in files) print i; }'`; \
+	mkid -fID $$unique $(LISP)
+
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+	$(TAGS_FILES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	done | \
+	$(AWK) '    { files[$$0] = 1; } \
+	END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	|| etags $(ETAGS_ARGS) $$tags  $$unique $(LISP)
+
+GTAGS:
+	here=`CDPATH=: && cd $(top_builddir) && pwd` \
+	&& cd $(top_srcdir) \
+	&& gtags -i $(GTAGS_ARGS) $$here
+
+distclean-tags:
+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH
+
+#>- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+#>+ 4
+KDE_DIST=ADM_vidSoften.try ASM_vidDenoise.cpp ADM_separateField.cpp stesRziM swscale_template.txt swscale.h ADM_vidMPresize.c DIA_kerneldeint.cpp 
+
+DISTFILES= $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) $(KDE_DIST)
+
+
+top_distdir = ../..
+distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
+	if test "$$dir" != "$$file" && test "$$dir" != "."; then \
+	$(mkinstalldirs) "$(distdir)/$$dir"; \
+	fi; \
+	if test -d $$d/$$file; then \
+	cp -pR $$d/$$file $(distdir) \
+	|| exit 1; \
+	else \
+	test -f $(distdir)/$$file \
+	|| cp -p $$d/$$file $(distdir)/$$file \
+	|| exit 1; \
+	fi; \
+	done
+check-am: all-am
+check: check-am
+all-am: Makefile $(LIBRARIES) $(HEADERS)
+
+installdirs:
+
+install: install-am
+install-exec: install-exec-am
+install-data: install-data-am
+uninstall: uninstall-am
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+
+installcheck: installcheck-am
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+	`test -z '$(STRIP)' || \
+	echo "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'"` install
+mostlyclean-generic:
+
+clean-generic:
+
+distclean-generic:
+	-rm -f Makefile $(CONFIG_CLEAN_FILES) stamp-h stamp-h[0-9]*
+
+maintainer-clean-generic:
+	@echo "This command is intended for maintainers to use"
+	@echo "it deletes files that may require special tools to rebuild."
+#>- clean: clean-am
+#>+ 1
+clean: kde-rpo-clean  clean-am
+
+#>- clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
+#>- mostlyclean-am
+#>+ 2
+clean-am: clean-final  clean-generic clean-libtool clean-noinstLIBRARIES \
+	mostlyclean-am
+
+distclean: distclean-am
+
+distclean-am: clean-am distclean-compile distclean-depend \
+	distclean-generic distclean-libtool distclean-tags
+
+dvi: dvi-am
+
+dvi-am:
+
+info: info-am
+
+info-am:
+
+install-data-am:
+
+install-exec-am:
+
+install-info: install-info-am
+
+install-man:
+
+installcheck-am:
+
+maintainer-clean: maintainer-clean-am
+
+maintainer-clean-am: distclean-am maintainer-clean-generic
+
+mostlyclean: mostlyclean-am
+
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
+
+uninstall-am: uninstall-info-am
+
+.PHONY: GTAGS all all-am check check-am clean clean-generic \
+	clean-libtool clean-noinstLIBRARIES distclean distclean-compile \
+	distclean-depend distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am info info-am install \
+	install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	tags uninstall uninstall-am uninstall-info-am
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:
+
+
+#>+ 2
+docs-am:
+
+#>+ 6
+force-reedit:
+		cd $(top_srcdir) && \
+	$(AUTOMAKE) --gnu  avidemux/ADM_video/Makefile
+	cd $(top_srcdir) && perl admin/am_edit avidemux-2.0.21-1/avidemux/ADM_video/Makefile.in
+
+
+#>+ 11
+libADM_video_a.all_cpp.cpp: $(srcdir)/Makefile.in  $(srcdir)/ADM_vidFields.cpp $(srcdir)/ADM_vidDeintASM.cpp $(srcdir)/ADM_vidVlad.cpp $(srcdir)/ADM_guiMedianBig.cpp $(srcdir)/ADM_vidLargeMedian.cpp $(srcdir)/ADM_vidSalt.cpp $(srcdir)/ADM_vidCached.cpp $(srcdir)/ADM_vidFlux.cpp $(srcdir)/ADM_vidPartial.cpp $(srcdir)/ADM_guiSRT.cpp $(srcdir)/ADM_vidFont.cpp $(srcdir)/ADM_vidSRT.cpp $(srcdir)/ADM_guiDenoise.cpp $(srcdir)/ADM_vidDenoise.cpp $(srcdir)/ADM_guiConv.cpp $(srcdir)/ADM_vidFastConvolution.cpp $(srcdir)/ADM_vidFlipV.cpp $(srcdir)/ADM_vidStabilize.cpp $(srcdir)/ADM_guiContrast.cpp $(srcdir)/ADM_vidContrast.cpp $(srcdir)/ADM_resizeter.cpp $(srcdir)/ADM_vidConvolution.cpp $(srcdir)/ADM_vidCrop.cpp $(srcdir)/ADM_vidDeinterlace.cpp $(srcdir)/ADM_vidLuma.cpp $(srcdir)/ADM_vidNull.cpp $(srcdir)/ADM_vidPalShift.cpp $(srcdir)/ADM_vidpreview.cpp $(srcdir)/ADM_vidResize.cpp $(srcdir)/ADM_vidTelecide.cpp $(srcdir)/ADM_vidTempSmooth.cpp $(srcdir)/ADM_vidUVSwap.cpp $(srcdir)/ADM_vidClean.cpp $(srcdir)/ADM_vidChroma.cpp $(srcdir)/ADM_vidBSmear.cpp $(srcdir)/ADM_vidAddBorder.cpp $(srcdir)/ADM_resizebis.cpp $(srcdir)/ADM_guiResize.cpp $(srcdir)/ADM_guiCrop.cpp $(srcdir)/ADM_guiClean.cpp $(srcdir)/ADM_guiBSMear.cpp $(srcdir)/ADM_guiAddBorder.cpp $(srcdir)/ADM_genvideo.cpp $(srcdir)/ADM_guiRotate.cpp $(srcdir)/ADM_vidRotate.cpp $(srcdir)/ADM_vidDropOut.cpp $(srcdir)/ADM_vidResize25.cpp $(srcdir)/ADM_vidSwapFields.cpp $(srcdir)/ADM_vidSeparateField.cpp $(srcdir)/ADM_vidFieldUtil.cpp $(srcdir)/ADM_confCouples.cpp $(srcdir)/ADM_vidChromaShift.cpp $(srcdir)/ADM_vidSwapSmart.cpp $(srcdir)/ADM_vidMPLResize.cpp $(srcdir)/ADM_vidIVTC.cpp $(srcdir)/ADM_interlaced.cpp $(srcdir)/ADM_vidPulldown.cpp $(srcdir)/ADM_vidMPLD3D.cpp $(srcdir)/ADM_vidMPLD3Dlow.cpp $(srcdir)/ADM_vidBlend.cpp $(srcdir)/ADM_vidRaw.cpp $(srcdir)/ADM_vidSRTRender.cpp $(srcdir)/ADM_vidSRTload.cpp $(srcdir)/ADM_guiChromaShift.cpp $(srcdir)/ADM_vidlavdeint.cpp $(srcdir)/ADM_mpdetc.cpp $(srcdir)/ADM_vidKernelDeint.cpp $(srcdir)/ADM_vidForcedPP.cpp $(srcdir)/ADM_vidSoften.cpp 
+	@echo 'creating libADM_video_a.all_cpp.cpp ...'; \
+	rm -f libADM_video_a.all_cpp.files libADM_video_a.all_cpp.final; \
+	echo "#define KDE_USE_FINAL 1" >> libADM_video_a.all_cpp.final; \
+	for file in ADM_vidFields.cpp ADM_vidDeintASM.cpp ADM_vidVlad.cpp ADM_guiMedianBig.cpp ADM_vidLargeMedian.cpp ADM_vidSalt.cpp ADM_vidCached.cpp ADM_vidFlux.cpp ADM_vidPartial.cpp ADM_guiSRT.cpp ADM_vidFont.cpp ADM_vidSRT.cpp ADM_guiDenoise.cpp ADM_vidDenoise.cpp ADM_guiConv.cpp ADM_vidFastConvolution.cpp ADM_vidFlipV.cpp ADM_vidStabilize.cpp ADM_guiContrast.cpp ADM_vidContrast.cpp ADM_resizeter.cpp ADM_vidConvolution.cpp ADM_vidCrop.cpp ADM_vidDeinterlace.cpp ADM_vidLuma.cpp ADM_vidNull.cpp ADM_vidPalShift.cpp ADM_vidpreview.cpp ADM_vidResize.cpp ADM_vidTelecide.cpp ADM_vidTempSmooth.cpp ADM_vidUVSwap.cpp ADM_vidClean.cpp ADM_vidChroma.cpp ADM_vidBSmear.cpp ADM_vidAddBorder.cpp ADM_resizebis.cpp ADM_guiResize.cpp ADM_guiCrop.cpp ADM_guiClean.cpp ADM_guiBSMear.cpp ADM_guiAddBorder.cpp ADM_genvideo.cpp ADM_guiRotate.cpp ADM_vidRotate.cpp ADM_vidDropOut.cpp ADM_vidResize25.cpp ADM_vidSwapFields.cpp ADM_vidSeparateField.cpp ADM_vidFieldUtil.cpp ADM_confCouples.cpp ADM_vidChromaShift.cpp ADM_vidSwapSmart.cpp ADM_vidMPLResize.cpp ADM_vidIVTC.cpp ADM_interlaced.cpp ADM_vidPulldown.cpp ADM_vidMPLD3D.cpp ADM_vidMPLD3Dlow.cpp ADM_vidBlend.cpp ADM_vidRaw.cpp ADM_vidSRTRender.cpp ADM_vidSRTload.cpp ADM_guiChromaShift.cpp ADM_vidlavdeint.cpp ADM_mpdetc.cpp ADM_vidKernelDeint.cpp ADM_vidForcedPP.cpp ADM_vidSoften.cpp ; do \
+	  echo "#include \"$$file\"" >> libADM_video_a.all_cpp.files; \
+	  test ! -f $(srcdir)/$$file || egrep '^#pragma +implementation' $(srcdir)/$$file >> libADM_video_a.all_cpp.final; \
+	done; \
+	cat libADM_video_a.all_cpp.final libADM_video_a.all_cpp.files > libADM_video_a.all_cpp.cpp; \
+	rm -f libADM_video_a.all_cpp.final libADM_video_a.all_cpp.files
+
+#>+ 3
+clean-final:
+	-rm -f libADM_video_a.all_cpp.cpp
+
+#>+ 2
+final:
+	$(MAKE) libADM_video_a_OBJECTS="$(libADM_video_a_final_OBJECTS)" all-am
+#>+ 2
+final-install:
+	$(MAKE) libADM_video_a_OBJECTS="$(libADM_video_a_final_OBJECTS)" install-am
+#>+ 2
+no-final:
+	$(MAKE) libADM_video_a_OBJECTS="$(libADM_video_a_nofinal_OBJECTS)" all-am
+#>+ 2
+no-final-install:
+	$(MAKE) libADM_video_a_OBJECTS="$(libADM_video_a_nofinal_OBJECTS)" install-am
+#>+ 3
+cvs-clean:
+	$(MAKE) admindir=$(top_srcdir)/admin -f $(top_srcdir)/admin/Makefile.common cvs-clean
+
+#>+ 3
+kde-rpo-clean:
+	-rm -f *.rpo

@@ -1,0 +1,125 @@
+/***************************************************************************
+                          adm_encmjpeg.cpp  -  description
+                             -------------------
+    begin                : Tue Jul 23 2002
+    copyright            : (C) 2002 by mean
+    email                : fixounet@free.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <unistd.h>
+
+#include <time.h>
+#include <sys/time.h>
+#include "config.h"
+#ifdef USE_FFMPEG
+#include "ADM_lavcodec.h"
+#include "fourcc.h"
+#include "avi_vars.h"
+#include "ADM_toolkit/toolkit.hxx"
+
+#include "ADM_encoder/ADM_vidEncode.hxx"
+
+
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_codecs/ADM_ffmpeg.h"
+
+#include "ADM_encoder/adm_encoder.h"
+
+
+
+#include "ADM_codecs/ADM_mjpegEncode.h"
+
+
+#include "ADM_encoder/adm_encmjpeg.h"
+
+extern int getMjpegCompressParams(int *qual,int *swap);
+
+/*_________________________________________________*/
+EncoderMjpeg::EncoderMjpeg	(  MJPEGConfig *conf)
+		{
+			 	_codec=NULL;
+				fd=NULL;
+				entries=NULL;
+				strcpy(_logname,"");
+       				_frametogo=0;
+				_q=conf->qual;
+				_swapped=conf->swapped;
+		} ;
+//--------------------------------
+uint8_t EncoderMjpeg::configure( AVDMGenericVideoStream *instream)
+
+{
+        ADV_Info 			*info;	
+//         int q,s;
+
+   		assert(instream);
+		_in=instream;
+
+		info=instream->getInfo(  );
+		_w=info->width;
+		_h=info->height;
+
+		
+		_vbuffer=new uint8_t[_w*_h*3];
+		assert(_vbuffer);
+
+   //	_codec=new mjpegEncoder(_w,_h);
+  	_codec=new  ffmpegEncoderFFMjpeg( _w,_h,FF_MJPEG)  ;
+
+		_codec->init( _q,_swapped);
+
+	return 1;
+}
+
+                           	
+
+
+
+//______________________________
+uint8_t EncoderMjpeg::encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags)
+{
+uint32_t l,f;
+
+
+		assert(_codec);
+		assert(_in);
+
+		if(!_in->getFrameNumberNoAlloc(frame,&l,_vbuffer,&f))
+		{
+				printf("\n Error : Cannot read incoming frame !");
+				return 0;
+		}
+
+ 	
+							return _codec->encode(   _vbuffer,out,len,flags);
+	}
+
+//_______________________________
+uint8_t EncoderMjpeg::stop( void)
+{
+ 	delete _codec;
+	_codec=0;
+	return 1;
+
+}
+
+uint8_t EncoderMjpeg::setLogFile( const char *p,uint32_t fr) { // for dual pass only
+
+UNUSED_ARG(p);
+UNUSED_ARG(fr);
+	return 1;
+}
+#endif		
+	

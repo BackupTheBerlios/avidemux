@@ -1,0 +1,311 @@
+/***************************************************************************
+                          op_saveprocess.cpp  -  description
+                             -------------------
+    begin                : Fri May 3 2002
+    copyright            : (C) 2002 by mean
+    email                : fixounet@free.fr
+
+
+
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <unistd.h>
+
+#include <time.h>
+#include <sys/time.h>
+#include "config.h"
+#include "fourcc.h"
+#include "avi_vars.h"
+#include "ADM_toolkit/toolkit.hxx"
+#include "subchunk.h"
+#include "avilist.h"
+
+#include "ADM_audio/aviaudio.hxx"
+#include "ADM_audiofilter/audioprocess.hxx"
+
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_gui/GUI_encoder.h"
+#include "ADM_filter/video_filters.h"
+#include "ADM_encoder/ADM_vidEncode.hxx"
+
+#include "oplug_avi/op_aviwrite.hxx"
+#include "oplug_avi/op_avisave.h"
+
+#include "ADM_encoder/adm_encoder.h"
+#include "oplug_avi/op_saveprocess.h"
+
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_SAVE_AVI
+#include "ADM_toolkit/ADM_debug.h"
+
+extern char TwoPassLogFile[300];
+
+uint8_t
+GenericAviSaveProcess::setupVideo (char *name)
+{
+	_notnull=0;
+	_incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
+ 	frametogo=_incoming->getInfo()->nb_frames;
+
+	// anish
+ 	if(_incoming->getInfo()->width%8)
+		{
+		if(!GUI_Question("Width is not a multiple of 8\n continue anyway ?"))
+			return 0;
+
+		}
+
+  _encode = getVideoEncoder (_incoming->getInfo()->width,_incoming->getInfo()->height);
+  if (!_encode)
+    return 0;
+
+  // init compressor
+   
+ 	_encode->setLogFile(TwoPassLogFile,frametogo);
+  if (!_encode->configure (_incoming))
+    {
+      delete 	_encode;
+      _encode = NULL;
+      GUI_Alert ("Init of filter failed");
+      return 0;
+    };
+ 
+  memcpy (&_bih, video_body->getBIH (), sizeof (_bih));
+  _bih.biWidth = _incoming->getInfo ()->width;
+  _bih.biHeight = _incoming->getInfo ()->height;
+  _bih.biSize=sizeof(_bih);
+  _bih.biXPelsPerMeter=_bih.biClrUsed=_bih.biYPelsPerMeter=0;
+
+  _mainaviheader.dwTotalFrames= _incoming->getInfo ()->nb_frames;
+_mainaviheader.dwMicroSecPerFrame=0;
+
+  printf("\n Saved as %ld x %ld\n",_bih.biWidth,_bih.biHeight);
+  _bih.biCompression=fourCC::get((uint8_t *)_encode->getCodecName());
+   
+  // init save avi
+//-----------------------VBR--------------------------------------
+  if (_encode->isDualPass ())
+    {
+      uint8_t *buffer;
+      uint32_t len, flag;
+      FILE *tmp;
+	uint8_t reuse=0;
+
+ 	aprintf("\n** Dual pass encoding**\n");
+
+	if((tmp=fopen(TwoPassLogFile,"rt")))
+	{
+		fclose(tmp);
+		if(GUI_Question("\n Reuse the existing log-file ?"))
+		{
+			reuse=1;
+		}
+	}
+	
+	if(!reuse)
+ 	{
+	guiStart();
+      	guiSetPhasis ("1st Pass");
+      	aprintf("**Pass 1:%lu\n",frametogo);
+     	buffer = new uint8_t[_incoming->getInfo ()->width *
+		    _incoming->getInfo ()->height * 3];
+
+      	_encode->startPass1 ();
+      //__________________________________
+      //   now go to main loop.....
+      //__________________________________
+
+      	for (uint32_t cf = 0; cf < frametogo; cf++)
+	{
+	  if (guiUpdate (cf, frametogo))
+	    {
+	    abt:
+	      GUI_Alert ("Aborting!");
+	      guiStop ();
+	      delete[]buffer;
+	      return 0;
+	    }
+
+	  if (!_encode->encode (cf, &len, buffer, &flag))
+		{
+			printf("\n Encoding of frame %lu failed !\n",cf);
+	    		goto abt;
+		}
+	   encoding_gui->setQuant(_encode->getLastQz());
+	   encoding_gui->feedFrame(len);		
+	}
+//      guiStop ();
+      	delete[]buffer;
+	guiStop();
+     	aprintf("**Pass 1:done\n");
+    }// End of reuse
+
+      if(!_encode->startPass2 ())
+      {
+      	printf("Pass2 ignition failed\n");
+      	return 0;
+	}
+   }   //-------------------------/VBR-----------------------------------
+  // init save avi
+
+// now we build the new stream !
+    	aprintf("**main pass:\n");
+
+		memcpy(&_videostreamheader,video_body->getVideoStreamHeader (),sizeof(_videostreamheader));
+		memcpy(&_videostreamheader.fccHandler	,_encode->getFCCHandler(),4);
+		_videostreamheader.fccType	=fourCC::get((uint8_t *)"vids");
+		_videostreamheader.dwScale=1000;
+		_videostreamheader.dwRate= _incoming->getInfo ()->fps1000;
+
+    		memcpy(&_mainaviheader	,video_body->getMainHeader (),sizeof(_mainaviheader));
+
+
+  		  _mainaviheader.dwWidth=_bih.biWidth;
+    		_mainaviheader.dwHeight=_bih.biHeight;
+    		_videostreamheader.dwQuality=10000;
+
+    uint8_t *data;
+    uint32_t dataLen=0;
+
+    _encode->hasExtraHeaderData( &dataLen,&data);
+  	if (!writter->saveBegin (name,
+			   &_mainaviheader,
+			   frameEnd - frameStart + 1,
+			   &_videostreamheader,
+			   &_bih,
+			   data,dataLen,
+			   (AVDMGenericAudioStream *) audio_filter,
+			   NULL))
+    	{
+      		return 0;
+    	}
+  aprintf("Setup video done\n");
+  return 1;
+  //---------------------
+}
+
+//
+//      Just to keep gcc happy....
+//
+GenericAviSaveProcess::~GenericAviSaveProcess ()
+{
+  if (_encode)
+    delete      _encode;
+  	_encode=NULL;
+}
+
+// copy mode
+// Basically ask a video frame and send it to writter
+uint8_t
+GenericAviSaveProcess::writeVideoChunk (uint32_t frame)
+{
+  uint32_t    len1;
+  uint8_t    	ret1;
+
+
+  // CBR or CQ
+
+
+  if (frame == 0)
+	{
+	  encoding_gui->setCodec((char *)_encode->getDisplayName())  ;
+    	if (!_encode->isDualPass ())
+      	{
+				guiSetPhasis ("Encoding");
+	      }
+    	else
+      		{
+				guiSetPhasis ("Encoding, 2nd pass");
+	      }
+	}
+  // first read
+  ret1 = _encode->encode ( frame, &len1, vbuffer, &_videoFlag);
+  if (!ret1)
+    return 0;
+  // check for split
+     // check for auto split
+      // if so, we re-write the last I frame
+      if(muxSize)
+      	{
+				 		// we overshot the limit and it is a key frame
+				   	// start a new chunk
+				  	if(handleMuxSize() && (_videoFlag & AVI_KEY_FRAME))
+				   	{		
+					  	uint8_t *data;
+    						uint32_t dataLen=0;
+
+    							_encode->hasExtraHeaderData( &dataLen,&data);	   
+							if(!reigniteChunk(dataLen,data)) return 0;
+						}
+				 }
+	encoding_gui->feedFrame(len1);	
+	encoding_gui->setQuant(_encode->getLastQz());	
+        // If we have several null B frames dont write them
+	if(len1) _notnull=1;
+	else	if( !_notnull)
+	{
+		printf("Frame : %lu dropped\n",frame);
+	 	return 1;			 
+	 }
+  	return writter->saveVideoFrame (len1, _videoFlag, vbuffer);
+
+}
+
+void
+GenericAviSaveProcess::guiStart (void)
+{
+//  GUI_encoderStart ();
+//  GUI_encoderSetFrame (0, 100);
+	encoding_gui=new DIA_encoding(_incoming->getInfo ()->fps1000);
+	encoding_gui->setCodec(_encode->getDisplayName());
+	encoding_gui->setFrame (0, 100);
+}
+void
+GenericAviSaveProcess::guiSetSize (uint32_t size)
+{
+
+	assert(encoding_gui);
+	//encoding_gui->setSize (size);
+}
+
+void
+GenericAviSaveProcess::guiStop (void)
+{
+  //GUI_encoderStop ();
+  assert(encoding_gui);
+  delete encoding_gui;
+  encoding_gui=NULL;
+
+}
+
+void
+GenericAviSaveProcess::guiSetPhasis (const char *n)
+{
+  //GUI_encoderSetPhasis (n);
+  encoding_gui->setPhasis(n);
+}
+
+uint8_t
+GenericAviSaveProcess::guiUpdate (uint32_t nb, uint32_t total)
+{
+  assert(encoding_gui);
+  encoding_gui->setFrame (nb, total);
+  if ( encoding_gui->isAlive () == 1)
+    return 0;
+  return 1;
+
+}
+
+// EOF

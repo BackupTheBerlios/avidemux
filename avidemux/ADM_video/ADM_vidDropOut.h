@@ -1,0 +1,41 @@
+/***************************************************************************
+                          ADM_vidDropOut.h  -  description
+                             -------------------
+    begin                : Mon Oct 7 2002
+    copyright            : (C) 2002 by mean
+    email                : RON
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+#ifndef __DROPOUT__
+#define __DROPOUT__   
+#include "ADM_video/ADM_vidCached.h" 
+ class  ADMVideoDropOut:public ADMVideoCached
+ {
+
+ protected:
+    		
+        uint32_t						*_param;
+        virtual char 					*printConf(void);
+	       
+
+ public:
+ 		
+  					
+					ADMVideoDropOut(  AVDMGenericVideoStream *in,CONFcouple *setup);
+
+  					 ~ADMVideoDropOut();
+		          		virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+          																	uint8_t *data,uint32_t *flags);
+
+					virtual uint8_t configure( AVDMGenericVideoStream *instream);
+					virtual uint8_t getCoupledConf( CONFcouple **couples);
+ }     ;
+#endif

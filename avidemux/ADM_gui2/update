@@ -1,0 +1,2 @@
+cp ~/Projects/gtk_jakub/src/interface.c ./GUI_main2.cpp
+bash patch.bash

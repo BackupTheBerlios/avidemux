@@ -1,0 +1,124 @@
+//
+//
+// C++ Interface: ADM_openDML
+//
+// Description: 
+//
+//
+// Author: mean <fixounet@free.fr>, (C) 2003
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
+
+
+#ifndef __ODMLHEADER__
+#define __ODMLHEADER__
+#include "avifmt.h"
+#include "avifmt2.h"
+
+#include "ADM_editor/ADM_Video.h"
+#include "ADM_openDML/ADM_riff.h"
+
+class AVDMGenericAudioStream;
+
+typedef struct odmlIndex
+{
+	uint64_t offset;
+	uint64_t size;
+	uint32_t  intra;
+
+}odmlIndex;
+
+typedef struct odmlTrack
+{
+	odmlIndex strf;
+	odmlIndex strh;
+	odmlIndex indx;
+}odmlTrack;
+
+class OpenDMLHeader         :public vidHeader
+{
+protected:
+       				
+	  uint64_t			_fileSize;
+	  FILE 				*_fd;
+	  odmlIndex 			*_idx;
+	  odmlIndex 			*_audioIdx;
+	  AVDMGenericAudioStream	*_audioTrack;
+	  WAVHeader			_wavHeader;
+	  
+	  void 				walk(riffParser *p) ;
+	  uint32_t			_nbTrack;
+	  //_________________________________________
+	  // This is temporary stuff to read the avi
+	  //_________________________________________
+	  odmlTrack			_Tracks[10];
+	  odmlIndex			_regularIndex;
+	  odmlIndex			_movi;
+	  //_________________________________________
+	  // Extra data for audio & video track
+	  //_________________________________________	  
+	  
+	  uint32_t			_nbAudioChunk;
+	  uint32_t			_audioExtraLen;
+	  uint8_t			*_audioExtraData;
+	  uint8_t			_reordered;	/// set to DTS ?
+	  
+	  
+	  
+	  uint32_t 			countAudioTrack( void );
+	  uint32_t  			searchAudioTrack(uint32_t which);
+	  // _____________________________________________
+	  //		indexer, vanilla, odml and others
+	  // _____________________________________________
+	  uint8_t			indexODML(uint32_t vidTrack,uint32_t audTrack,uint32_t audioTrackNumber);
+	  uint8_t 			indexRegular(uint32_t vidTrack,uint32_t audTrack,uint32_t audioTrackNumber);
+	  uint8_t 			indexReindex(uint32_t vidTrack,uint32_t audTrack,
+	  					uint32_t audioTrackNumber);	
+					// scan one track for openDML						
+	  uint8_t			scanIndex(uint32_t track,odmlIndex **index,uint32_t *nbElem);
+	  uint32_t			read32( void );	
+	  uint8_t			reorder( void );
+	  uint8_t			isReordered( void );
+	  	  	
+public:
+
+virtual   void 				Dump(void) ;
+virtual   uint32_t 			getNbStream(void) ;
+virtual   uint8_t 			needDecompress(void) { return 1;};
+
+					OpenDMLHeader( void ) ;
+       		    			~OpenDMLHeader(  ) ;
+// AVI io
+virtual 	uint8_t			open(char *name);
+virtual 	uint8_t			close(void) ;
+  //__________________________
+  //				 Info
+  //__________________________
+
+  //__________________________
+  //				 Audio
+  //__________________________
+
+virtual 	WAVHeader 	*getAudioInfo(void ); 
+virtual 	uint8_t		getAudioStream(AVDMGenericAudioStream **audio);
+
+// Frames
+  //__________________________
+  //				 video
+  //__________________________
+
+virtual 	uint8_t  setFlag(uint32_t frame,uint32_t flags);
+virtual 	uint32_t getFlags(uint32_t frame,uint32_t *flags);
+virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
+												uint32_t *flags);
+virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)	;
+virtual 	uint8_t  getFrameSize(uint32_t frame,uint32_t *size) ;
+	     	 		
+virtual	  uint8_t			getExtraHeaderData(uint32_t *len, uint8_t **data);
+};
+
+#endif
+
+
