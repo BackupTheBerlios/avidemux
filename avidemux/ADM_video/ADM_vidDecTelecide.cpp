@@ -154,8 +154,8 @@ Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples)
 				_param->y0 = 0;		// Zone to try (avoid subs)
 				_param->y1 = 0;
 				_param->hints = true;
-				_param->show = true;
-				_param->debug = true; 
+				_param->show = false;
+				_param->debug = false; 
 
 		}
 				 

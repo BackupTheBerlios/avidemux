@@ -26,7 +26,10 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_cache.h"
 
-#define aprintf printf
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_FILTER
+#include "ADM_toolkit/ADM_debug.h"
+
 
 VideoCache::VideoCache(uint32_t nb,AVDMGenericVideoStream *in)
 {
@@ -125,7 +128,7 @@ uint32_t len,flags;
 	// using a simple scheme
 	uint32_t count=0;
 	aprintf("Cache : Cache miss %d\n",frame);
-	for(uint32_t i=0;i<nbEntry;i++) printf("%d(%d) ",frameNum[i],frameLock[i]);printf("\n");
+	//for(uint32_t i=0;i<nbEntry;i++) printf("%d(%d) ",frameNum[i],frameLock[i]);printf("\n");
 	while(tryz)
 	{
 		if(!frameLock[(lastUsed+count)%nbEntry])
