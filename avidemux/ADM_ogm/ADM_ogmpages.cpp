@@ -42,6 +42,7 @@ OGMDemuxer::OGMDemuxer(void )
 		_fd=NULL;
 		_payload=0;
 		_filesize=0;
+
 }
 
 uint8_t OGMDemuxer::open(char *name)
@@ -108,6 +109,7 @@ uint8_t		OGMDemuxer::readHeader(uint32_t *paySize, uint32_t *flags, uint64_t *fr
 {
 uint8_t gotcha=0,c=0;
 uint32_t total=0,failed=0;
+uint64_t seq;
 
 
 	*frame=0;
@@ -119,8 +121,21 @@ uint32_t total=0,failed=0;
 		_hdrpos=ftello(_fd);
 		if(fread(&_page,sizeof(_page),1,_fd)!=1) return 0;
 
-		assert(fourCC::check(_page.sig,(uint8_t *)"OggS"));
+		if(!fourCC::check(_page.sig,(uint8_t *)"OggS"))
+		{
+			printf("Bad at offset :%lu 0x %x\n",_hdrpos,_hdrpos);
+			assert(0);
+		}
 		*id=fourCC::get(_page.serial);
+		//
+		
+		seq=_page.page_sequence[0]+(_page.page_sequence[1]<<8);
+		//printf("seq:%x \n",seq);
+		uint64_t *ll;
+		ll=(uint64_t *)_page.abs_pos;		
+		printf("abs:%llx \n",*ll);
+		
+		//
 		//if(fourCC::check(_trackId,_page.serial)) // got it
 		{
 			gotcha=1;

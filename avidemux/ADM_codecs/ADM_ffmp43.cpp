@@ -183,6 +183,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
  uint8_t *oBuff[3];
  int strideTab[3];
  int strideTab2[3];
+ int ret=0;
 
 
 		if(len==0 && !_allowNull) // Null frame, silently skipped
@@ -192,17 +193,23 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
 					return 1;
 				}
 
-		 if(0> avcodec_decode_video(_context,
-			  			&_frame,
-             					&got_picture, in, len) && !_context->hurry_up)
-             {
-
-
+		ret= avcodec_decode_video(_context,&_frame,&got_picture, in, len);
+		
+		if(0>ret && !_context->hurry_up)
+		{
 					printf("\n error in FFMP43/mpeg4!\n");
 					return 0;
-				}
+		}
 		if(!got_picture && !_context->hurry_up)
 		{
+				// Some encoder code a vop header with the 
+				// vop flag set to 0
+				// it is meant to mean frame skipped but very dubious
+				if(len<8)
+					{
+						printf("Probably pseudo black frame...\n");
+						return 1;
+					}
 				// allow null means we allow null frame in and so potentially
 				// have no frame out for a time
 				// in that case silently fill with black and returns it as KF

@@ -35,7 +35,19 @@ void fourCC::print(uint32_t fourcc)
     printf("%s (%08X)", s,fourcc);
 
 }
+void fourCC::printBE(uint32_t fourcc)
+{
+    char s[5];
+    s[4] = 0;
 
+	s[0]=((fourcc & 0xff000000)>>24)&0xff;
+	s[1]=((fourcc & 0xff0000)>>16)&0xff;
+	s[2]=((fourcc & 0xff00)>>8)&0xff;
+	s[3]=((fourcc & 0xff)>>0)&0xff;
+
+    printf("%s (%08X)", s,fourcc);
+
+}
 char *fourCC::tostring(uint32_t fourcc)
 {
     static char s[5];

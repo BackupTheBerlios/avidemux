@@ -58,16 +58,14 @@ oggAudio::oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx )
 	
 	_wavheader=new   WAVHeader;
 	memset(  _wavheader,0,sizeof( WAVHeader));
-			
+	_currentTrack=&_tracks[_trackIndex];		
 	// put some default value
 	_wavheader->bitspersample=16;
 	_wavheader->blockalign = 4;
-	_wavheader->byterate=224000/8;
-	_wavheader->channels=2;
+	_wavheader->byterate=_currentTrack->byterate;
+	_wavheader->channels=_currentTrack->channels;
 	_wavheader->frequency=44100;
-	_wavheader->encoding=WAV_OGG;
-	
-	
+	_wavheader->encoding=_currentTrack->encoding;
 	
 	_length=_tracks[_trackIndex].trackSize;
 	
@@ -80,51 +78,53 @@ oggAudio::oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx )
 	_extraLen=0;
 	_extraData=NULL;
 	
-	_currentTrack=&_tracks[_trackIndex];
 	
 	
-	// now take the 1st page as header
-	uint8_t *tmp,*tmp1,*tmp2,*ptr;
-	uint32_t size,size2,size1,flags;
+	if(_wavheader->encoding==WAV_OGG)
+	{
+		// now take the 1st page as header
+		uint8_t *tmp,*tmp1,*tmp2,*ptr;
+		uint32_t size,size2,size1,flags;
 	
-	tmp=new uint8_t[64*1024];
-	tmp1=new uint8_t[64*1024];
-	tmp2=new uint8_t[64*1024];
+		tmp=new uint8_t[64*1024];
+		tmp1=new uint8_t[64*1024];
+		tmp2=new uint8_t[64*1024];
 	
-	readPacket(&size,tmp,&flags);
-	printf("1st header of %lu bytes stored as extra data (%lx flags)\n",size,flags);
+		readPacket(&size,tmp,&flags);
+		printf("1st header of %lu bytes stored as extra data (%lx flags)\n",size,flags);
 	
-	readPacket(&size1,tmp1,&flags);
-	printf("Comment follow (%lx as flags)\n",flags);
+		readPacket(&size1,tmp1,&flags);
+		printf("Comment follow (%lx as flags)\n",flags);
 	
-	readPacket(&size2,tmp2,&flags);
-	printf("cook book follow (%lx as flags)\n",flags);
+		readPacket(&size2,tmp2,&flags);
+		printf("cook book follow (%lx as flags)\n",flags);
 	
-	// 
-	// We need all 3 packets to properly initialize it
-	// 
-	_extraLen=size+size1+size2+3*sizeof(uint32_t);
-	_extraData=new uint8_t [_extraLen];
+		// 
+		// We need all 3 packets to properly initialize it
+		// 
+		_extraLen=size+size1+size2+3*sizeof(uint32_t);
+		_extraData=new uint8_t [_extraLen];
 	
-	ptr=_extraData+3*sizeof(uint32_t );
-	memcpy(ptr,tmp,size);
-	ptr+=size;
-	memcpy(ptr,tmp1,size1);
-	ptr+=size1;
-	memcpy(ptr,tmp2,size2);
+		ptr=_extraData+3*sizeof(uint32_t );
+		memcpy(ptr,tmp,size);
+		ptr+=size;
+		memcpy(ptr,tmp1,size1);
+		ptr+=size1;
+		memcpy(ptr,tmp2,size2);
 	
-	delete [] tmp;
-	delete [] tmp1;
-	delete [] tmp2;
+		delete [] tmp;
+		delete [] tmp1;
+		delete [] tmp2;
 	
-	uint32_t *idnx;
+		uint32_t *idnx;
 	
-	idnx=(uint32_t *)_extraData;
-	*idnx++=size;
-	*idnx++=size1;
-	*idnx++=size2;
+		idnx=(uint32_t *)_extraData;
+		*idnx++=size;
+		*idnx++=size1;
+		*idnx++=size2;
 		
-	printf("Ogg audio init done\n");
+		printf("Ogg audio init done\n");
+	}	
 	
 }
 

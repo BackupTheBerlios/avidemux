@@ -22,6 +22,7 @@ class fourCC
 public:
   static int  			check(uint8_t *,uint8_t *);
 	static void 			print(uint32_t four);
+	static void 			printBE(uint32_t four);
 	static int  			check(uint32_t in,uint8_t *cc);
 	static int  			check(uint8_t *cc,uint32_t in);
 	static  uint32_t 	get(uint8_t *in)   ;

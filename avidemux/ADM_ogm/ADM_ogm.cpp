@@ -203,7 +203,7 @@ uint8_t oggHeader::open(char *name)
 		demux->readBytes(1,&firstByte);
 		if(firstByte!=1) // not a header ?
 			{
-				printf("\n First packet : not a header ?\n");
+				printf("\n First packet : not a header %x?\n",firstByte);
 				break;
 			}
 		// Grab headers
@@ -224,16 +224,48 @@ uint8_t oggHeader::open(char *name)
 				fourcc=fourCC::get((uint8_t *)&(header->subtype[0]))   ;
 			}
 			if(!strcmp(str,"vorbi"))
-			if( _audioTracks[0].audioTrack==0xff)
 			{
-				_audioTracks[0].audioTrack=id;
-				printf("Taking that track as audio track 1\n");
+				if( _audioTracks[0].audioTrack==0xff)
+				{
+					_audioTracks[0].audioTrack=id;
+					_audioTracks[0].encoding=WAV_OGG;
+					_audioTracks[0].channels=header->audio.channels;
+					_audioTracks[0].byterate=header->audio.avgbytespersec;
+					printf("Taking that track as audio track 1\n");
+				}
+				else
+				if(_audioTracks[1].audioTrack==0xff)
+				{
+					_audioTracks[1].audioTrack=id;
+					_audioTracks[1].encoding=WAV_OGG;
+					_audioTracks[1].channels=header->audio.channels;
+					_audioTracks[1].byterate=header->audio.avgbytespersec;
+					printf("Taking that track as audio track 2\n");
+				}
 			}
-			else
-			if(_audioTracks[1].audioTrack==0xff)
+			if(!strcmp(str,"audio"))
 			{
-				_audioTracks[1].audioTrack=id;
-				printf("Taking that track as audio track 2\n");
+				uint32_t codec;
+				OINFO(subtype,4);
+				sscanf(str,"%x",&codec);
+				printf("Audio fourcc:%d (%x)\n",codec,codec);
+				if( _audioTracks[0].audioTrack==0xff)
+				{
+					_audioTracks[0].audioTrack=id;
+					_audioTracks[0].encoding=codec;
+					_audioTracks[0].channels=header->audio.channels;
+					_audioTracks[0].byterate=header->audio.avgbytespersec;
+					printf("Taking that track as audio track 1\n");
+				}
+				else
+				if(_audioTracks[1].audioTrack==0xff)
+				{
+					_audioTracks[1].audioTrack=id;
+					_audioTracks[1].encoding=codec;
+					_audioTracks[1].channels=header->audio.channels;
+					_audioTracks[1].byterate=header->audio.avgbytespersec;
+					printf("Taking that track as audio track 2\n");
+				}
 			}
 			OINFO(subtype,4); // fourcc
 	}
@@ -320,7 +352,7 @@ double fps;
 			}
 			else
 			{
-				_audio=new oggAudio( name, &_audioTracks[0],0 );
+				_audio=new oggAudio( name, &_audioTracks[0],0  );
 			}
 		
 		

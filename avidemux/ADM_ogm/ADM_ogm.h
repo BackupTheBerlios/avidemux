@@ -28,6 +28,9 @@ typedef struct OgAudioIndex
 typedef struct OgAudioTrack
 {	
 	uint32_t			audioTrack;
+	uint16_t			encoding;
+	uint16_t			channels;
+	uint32_t			byterate;
 	uint32_t			nbAudioPacket;	// nb of packet
 	uint32_t			trackSize;	// size in bytes 
 	OgAudioIndex			*index;	// indexes

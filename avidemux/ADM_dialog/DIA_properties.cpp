@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -103,7 +104,11 @@ void DIA_properties( void )
 		// Duration in seconds too
 		if(currentaudiostream && wavinfo->byterate>1)
 		{
-			ms2time((currentaudiostream->getLength()*1000)/wavinfo->byterate,
+			double du;
+			du=currentaudiostream->getLength();
+			du*=1000;
+			du/=wavinfo->byterate;
+			ms2time((uint32_t)floor(du),
 				 &hh, &mm, &ss, &ms);
 	      		sprintf(text, "%02d:%02d:%02d.%03d (%lu MBytes)", hh, mm, ss, ms
 				,currentaudiostream->getLength()>>20);

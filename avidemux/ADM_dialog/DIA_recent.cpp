@@ -27,12 +27,14 @@
 #define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
   g_object_set_data (G_OBJECT (component), name, widget)
 
+static void on_action( void);  
+  
 static GtkWidget	*create_dialog1 (void);
 static GtkListStore 	*store;
-
+static GtkWidget *dialog,*tree;
 uint8_t DIA_RecentFiles( char **name )
 {
-GtkWidget *dialog,*tree;
+
 uint8_t ret=0;
 uint32_t nb_item;
 const char **names;
@@ -41,7 +43,10 @@ GtkTreeIter   iter;
 	dialog=create_dialog1();
 	gtk_transient(dialog);
 	tree=lookup_widget(dialog,"treeview1");
-
+	gtk_signal_connect (GTK_OBJECT (lookup_widget(dialog,"treeview1")),
+				"row-activated", 
+				GTK_SIGNAL_FUNC (on_action), 
+				(void *)dialog);
 	names=prefs->get_lastfiles();
 // count
 	for( nb_item=0;nb_item<4;nb_item++)
@@ -70,7 +75,12 @@ GtkTreeIter   iter;
 
 	return ret;
 }
+void on_action( void)
+{
+	gtk_dialog_response           (GTK_DIALOG(dialog),GTK_RESPONSE_OK);
 
+
+}
 GtkWidget*
 create_dialog1 (void)
 {
