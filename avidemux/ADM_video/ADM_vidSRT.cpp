@@ -77,7 +77,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 
   _uncompressed=NULL;
   _font=NULL;
-  _utf16=0;
+
 
   _in=in;
   memcpy(&_info,_in->getInfo(),sizeof(_info));
@@ -177,21 +177,17 @@ unsigned char c,d;
 				GUI_Alert("Could not open subtitle file");
 				return 0;
 			}
-			// Try to detect utf16 files
+			// Try to detect utf16 files			
 			c=fgetc(_fd);
-			d=fgetc(_fd);
-			if(c==0xFF && 0xfe==d)
+			// Skip utf identifier if any
+			if(c==0xff)
 			{
-				printf("UTF16 file detected\n");
-				_utf16=1;
 				c=fgetc(_fd);
+				if(c==0xfe)
+				{
+					c=fgetc(_fd);
+				}
 			}
-			else
-			{
-				_utf16=0;
-				fseek(_fd,0,SEEK_SET);
-			}
-
 			switch(c)
 			{
 			case '{' :
@@ -301,9 +297,22 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 		{
 				for(uint32_t i=0;i<_line;i++)
 				{
-						if(_subs[i].string)
-							delete [] _subs[i].string;
-						_subs[i].string=NULL;
+					if(_subs[i].nbLine)
+					{
+					for(uint32_t k=0;k<_subs[i].nbLine;k++)
+					{					
+						if(_subs[i].string[k])
+						{
+							delete [] _subs[i].string[k];
+							_subs[i].string[k]=NULL;
+						}
+					}					
+					
+					delete _subs[i].string;
+					_subs[i].string=NULL;
+					delete _subs[i].lineSize;
+					_subs[i].lineSize=NULL;
+					}
 				}
 				delete [] _subs;
 				_subs=NULL;

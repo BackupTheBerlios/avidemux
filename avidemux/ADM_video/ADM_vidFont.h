@@ -22,7 +22,7 @@
  class ADMfont
  {
  private:
- 		  iconv_t 		_conv; // =(iconv_t)-1;;
+ 		  
 		   FT_Face    _face;
 		   int			_faceAllocated;
 		   uint8_t		_use2bytes;

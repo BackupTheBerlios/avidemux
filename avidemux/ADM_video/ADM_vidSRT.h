@@ -22,16 +22,26 @@
 #define SRT_MAX_LINE 3
 #define SRT_MAX_LINE_LENGTH 512
 
- typedef struct subLine
- {
-  //  uint8_t               isReachable;   /*Debug only*/
-		uint32_t 		startTime;
-		uint32_t 		endTime;
-		char			*string;
-	}subLine;
+#define ADM_GLYPH_T uint16_t 
+// UTF16 -> Ascii
+#ifdef ADM_BIG_ENDIAN
+#define ADM_ASC(x) (x>>8)
+#else
+#define ADM_ASC(x) x
+#endif
+typedef struct subLine
+{
+  
+	uint32_t 		startTime;
+	uint32_t 		endTime;
+	uint32_t		nbLine;
+	uint32_t		*lineSize;
+	ADM_GLYPH_T		**string;
 	
-	typedef struct SUBCONF
-	{
+}subLine;
+	
+typedef struct SUBCONF
+{
 		uint32_t _fontsize;
 		uint32_t _baseLine;
 
@@ -39,7 +49,7 @@
 		int32_t    _Y_percent;
 		int32_t    _U_percent;
 		int32_t    _V_percent;
-		char		*_fontname;
+		char	   *_fontname;
 		char		*_subname;
 		char 		*_charset;
 		uint32_t	_selfAdjustable;   /** Automatic line breaks */
@@ -64,8 +74,7 @@
 
  protected:
 
-	    	SUBCONF					*_conf;
-		uint8_t 				_utf16;
+	    	SUBCONF					*_conf;		
        virtual char 					*printConf(void) ;
         FILE						*_fd;
         uint8_t						loadSubTitle( void );
@@ -76,11 +85,11 @@
         uint32_t					_oldline;
         uint32_t					_bitmap;
         uint32_t					search(uint32_t time);
-        void 						displayString(char *string);
+        void 						displayString(subLine *string);
 	void 						displayString_autoadj(char *string);
         void 						displayChar(uint32_t w,uint32_t h,char c);
-  uint32_t						displayLine(char *string,uint32_t line, uint32_t len);
-  uint32_t						displayLine(char *string,uint32_t line, uint32_t len, uint32_t *suggestedLen);
+  	uint32_t					displayLine(ADM_GLYPH_T *string,uint32_t line, uint32_t len);
+  
 	uint8_t 					lowPass(uint8_t *src, uint8_t *dst, uint32_t w, uint32_t h);
 	uint8_t 					decimate(uint8_t *src, uint8_t *dst, uint32_t w, uint32_t h);
 
