@@ -182,6 +182,7 @@ uint32_t chunk;
 	//
 	
 	_page[0]=0x01; 	// header
+	_timestamp=0;
 	memcpy(_page+1,data,size);
 	size++;
 	_current_lacing=0;
