@@ -120,6 +120,8 @@ buttonCallBack_S buttonCallback[]=
 	{"buttonRecent"			,"clicked"		,ACT_RecentFiles},
 	{"buttonPrevBlack"		,"clicked"		,ACT_PrevBlackFrame},
 	{"buttonNextBlack"		,"clicked"		,ACT_NextBlackFrame},
+	{"buttonGotoA"			,"clicked"		,ACT_GotoMarkA},
+	{"buttonGotoB"			,"clicked"		,ACT_GotoMarkB},	
 
 	{"togglebuttonPreview"		,"toggled"		,ACT_PreviewToggle},
 	{"toggleOutput"			,"toggled"		,ACT_OuputToggle},
@@ -457,9 +459,9 @@ int UI_looseFocus( void)
 void UI_setMarkers(uint32_t a, uint32_t b )
 {
 char string[500];
-		sprintf(string,"A: %06lu",a);
+		sprintf(string," %06lu",a);
         	gtk_label_set_text(GTK_LABEL(guiMarkA),string);
-		sprintf(string,"B: %06lu",b);
+		sprintf(string," %06lu",b);
         	gtk_label_set_text(GTK_LABEL(guiMarkB),string);
 }
 ///

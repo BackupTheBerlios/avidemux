@@ -199,10 +199,11 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
   ADM_assert (0 == encoderReady);
   encoderReady = 1;
   uint8_t ret=0;
-  FFcodecSetting myConfig={
+  FFcodecSetting myConfig=
+	 {
 	 ME_EPZS,//	ME
 	 0, // 		GMC	
-	 0,//		_4MV;
+	 1,	// 4MV
 	 0,//		_QPEL;	 
 	 0,//		_TREILLIS_QUANT
 	 2,//		qmin;
@@ -210,17 +211,33 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
 	 3,//		max_qdiff;
 	 0,//		max_b_frames;
 	 0, //		mpeg_quant;
-	 1,//
+	 1, //
 	 -2, // 		luma_elim_threshold;
 	 1,//
-	 -5, // 		chroma_elim_threshold;		 
-	 0.05,//		lumi_masking;
-	 1,
-	 0.01,//		dark_masking; 
-	 1,
- 	 0.5,// 	qcompress;  /* amount of qscale change between easy & hard scenes (0.0-1.0)*/
-    	 0.5,// 	qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
-
+	 -5, 		// chroma_elim_threshold;
+	 0.05,		//lumi_masking;
+	 1,		// is lumi
+	 0.01,		//dark_masking; 
+	 1,		// is dark
+ 	 0.5,		// qcompress amount of qscale change between easy & hard scenes (0.0-1.0
+    	 0.5,		// qblur;    amount of qscale smoothing over time (0.0-1.0) 
+	0,		// min bitrate in kB/S
+	0,		// max bitrate
+	0, 		// default matrix
+	0, 		// no gop size
+	NULL,
+	NULL,
+	0,		// interlaced
+	0,		// WLA: bottom-field-first
+	0,		// wide screen
+	2,		// mb eval = distortion
+	8000,		// vratetol 8Meg
+	0,		// is temporal
+	0.0,		// temporal masking
+	0,		// is spatial
+	0.0,		// spatial masking
+	0,		// NAQ
+	0		// DUMMY 
  	} ;
 
 
@@ -235,6 +252,7 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
 // 	uint8_t				setConfig(FFcodecSetting *set);	
 			ffmpegEncoderCQ *tmp;		
 			tmp = new ffmpegEncoderCQ (info.width, info.height,FF_MPEG4);					
+			
 			tmp->setConfig(&myConfig);
 			printf("\n init qz %ld\n",qz);
 	    		ret= tmp->init (qz,25000);

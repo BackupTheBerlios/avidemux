@@ -197,7 +197,11 @@ create_mainWindow (void)
   GtkWidget *labelFrameType;
   GtkWidget *frame1;
   GtkWidget *vbox4;
+  GtkWidget *hbox18;
+  GtkWidget *buttonGotoA;
   GtkWidget *labelMarkA;
+  GtkWidget *hbox19;
+  GtkWidget *buttonGotoB;
   GtkWidget *labelMarkB;
   GtkWidget *label16;
   extern GtkAccelGroup *accel_group;
@@ -1266,16 +1270,42 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (frame1), vbox4);
   gtk_container_set_border_width (GTK_CONTAINER (vbox4), 3);
 
-  labelMarkA = gtk_label_new (_("A: 0000000"));
+  hbox18 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_set_name (hbox18, "hbox18");
+  gtk_widget_show (hbox18);
+  gtk_box_pack_start (GTK_BOX (vbox4), hbox18, FALSE, FALSE, 0);
+
+  buttonGotoA = gtk_button_new_with_mnemonic (_("A:"));
+  gtk_widget_set_name (buttonGotoA, "buttonGotoA");
+  gtk_widget_show (buttonGotoA);
+  gtk_box_pack_start (GTK_BOX (hbox18), buttonGotoA, FALSE, FALSE, 0);
+  gtk_widget_set_size_request (buttonGotoA, -1, 20);
+  GTK_WIDGET_UNSET_FLAGS (buttonGotoA, GTK_CAN_FOCUS);
+  gtk_tooltips_set_tip (tooltips, buttonGotoA, _("Go to marker A"), NULL);
+
+  labelMarkA = gtk_label_new (_(" 0000000"));
   gtk_widget_set_name (labelMarkA, "labelMarkA");
   gtk_widget_show (labelMarkA);
-  gtk_box_pack_start (GTK_BOX (vbox4), labelMarkA, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox18), labelMarkA, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (labelMarkA), GTK_JUSTIFY_LEFT);
 
-  labelMarkB = gtk_label_new (_("B: 0000000"));
+  hbox19 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_set_name (hbox19, "hbox19");
+  gtk_widget_show (hbox19);
+  gtk_box_pack_start (GTK_BOX (vbox4), hbox19, FALSE, FALSE, 0);
+
+  buttonGotoB = gtk_button_new_with_mnemonic (_("B:"));
+  gtk_widget_set_name (buttonGotoB, "buttonGotoB");
+  gtk_widget_show (buttonGotoB);
+  gtk_box_pack_start (GTK_BOX (hbox19), buttonGotoB, FALSE, FALSE, 0);
+  gtk_widget_set_size_request (buttonGotoB, -1, 20);
+  GTK_WIDGET_UNSET_FLAGS (buttonGotoB, GTK_CAN_FOCUS);
+  gtk_tooltips_set_tip (tooltips, buttonGotoB, _("Go to marker B"), NULL);
+
+  labelMarkB = gtk_label_new (_(" 0000000"));
   gtk_widget_set_name (labelMarkB, "labelMarkB");
   gtk_widget_show (labelMarkB);
-  gtk_box_pack_start (GTK_BOX (vbox4), labelMarkB, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox19), labelMarkB, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (labelMarkB), GTK_JUSTIFY_LEFT);
 
   label16 = gtk_label_new (_("Selection"));
@@ -1452,7 +1482,11 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, labelFrameType, "labelFrameType");
   GLADE_HOOKUP_OBJECT (mainWindow, frame1, "frame1");
   GLADE_HOOKUP_OBJECT (mainWindow, vbox4, "vbox4");
+  GLADE_HOOKUP_OBJECT (mainWindow, hbox18, "hbox18");
+  GLADE_HOOKUP_OBJECT (mainWindow, buttonGotoA, "buttonGotoA");
   GLADE_HOOKUP_OBJECT (mainWindow, labelMarkA, "labelMarkA");
+  GLADE_HOOKUP_OBJECT (mainWindow, hbox19, "hbox19");
+  GLADE_HOOKUP_OBJECT (mainWindow, buttonGotoB, "buttonGotoB");
   GLADE_HOOKUP_OBJECT (mainWindow, labelMarkB, "labelMarkB");
   GLADE_HOOKUP_OBJECT (mainWindow, label16, "label16");
   GLADE_HOOKUP_OBJECT_NO_REF (mainWindow, tooltips, "tooltips");
