@@ -113,10 +113,11 @@ extern uint8_t ADM_aviSetSplitSize(uint32_t size);
 extern uint8_t ogmSave(char *fd);
 static void set_autoindex(char *p);
 extern int A_SaveUnpackedVop( char *name);
+extern int A_saveDVDPS(char *name);
 //
 static int call_bframe(void);
 static int call_packedvop(void);
-
+static int call_saveDVD(char *a);
 //_________________________________________________________________________
 
 extern uint8_t audioShift;
@@ -162,7 +163,7 @@ AUTOMATON reaction_table[]=
 
 		{"begin",		1,"set start frame",			setBegin},
 		{"end",			1,"set end frame",			setEnd},
-		
+		{"save-dvd",		2,"save as dvd ps stream",		(one_arg_type)call_saveDVD},
 		{"save-unpacked-vop",	1,"save avi, unpacking vop",(one_arg_type)A_SaveUnpackedVop},		
 		{"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
 		{"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
@@ -320,6 +321,12 @@ void call_videoproc   (char *p) { UNUSED_ARG(p); HandleAction(ACT_VideoModeProce
 extern  int  audioNormalizeMode;
 extern void audioForceDownSample( void );
 extern void audioSetResample(uint32_t fq);
+int call_saveDVD(char *a)
+{
+	
+	A_saveDVDPS(a);
+}
+
 void call_normalize   (char *p)
 {
 	audioNormalizeMode=1; // Ugly
