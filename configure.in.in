@@ -38,7 +38,7 @@ AC_CANONICAL_HOST
 dnl Perform program name transformation
 AC_ARG_PROGRAM
 dnl Automake doc recommends to do this only here. (Janos)
-AM_INIT_AUTOMAKE(avidemux,2.0.33cv)
+AM_INIT_AUTOMAKE(avidemux,2.0.35cvs)
 
 dnl almost the same like KDE_SET_PEFIX but the path is /usr/local
 dnl
@@ -196,13 +196,6 @@ AC_PATH_PROG(XML_CONFIG, xml2-config, no)
     if test "x$have_xml2" = "xno"; then
     	AC_MSG_WARN(no parser.h valid header found for xml2)
     fi
-    if test "x$have_xml2" = "xyes"; then
-		AM_PATH_XML2(2.0.0,have_xml2=yes,have_xml2=no)
-		if test "x$have_xml2" = "xyes"; then
-			AC_DEFINE(HAVE_LIBXML2,1,"[Use libxml2 to load/save .avidemuxrc]")
-		fi    
-    fi
-	  CPPFLAGS=$old_flags
  fi
 if test "x$have_xml2" = "xyes"; then
 AC_DEFINE(USE_LIBXML2,1,[LibXML2 is available])
