@@ -39,7 +39,7 @@ dnl Perform program name transformation
 AC_ARG_PROGRAM
 
 dnl Automake doc recommends to do this only here. (Janos)
-AM_INIT_AUTOMAKE(avidemux,2.0.21-2)
+AM_INIT_AUTOMAKE(avidemux,2.0.22)
 
 dnl almost the same like KDE_SET_PEFIX but the path is /usr/local
 dnl
@@ -333,12 +333,32 @@ AC_TRY_COMPILE([
 int arg = 0;
 ],[
 have_alsa=yes
+have_alsa_1=no
 ])
+dnl __ if it fails, try alsa 1.0 ___
+if test "x$have_alsa" = "xno"; then
+AC_TRY_COMPILE([
+#include <alsa/asoundlib.h>
+],
+[
+#if SND_LIB_MAJOR!=1 || SND_LIB_MINOR!=0
+#error Not alsa 1.0!
+#endif
+int arg = 0;
+],[
+have_alsa=yes
+have_alsa_1=yes
+])
+fi
 AC_CHECK_LIB(asound,snd_pcm_hw_params_set_channels,,have_alsa=no,-lm)
 fi
 if test "x$have_alsa" = "xyes"; then				
 	AC_DEFINE(ALSA_SUPPORT,1,"[Use alsa as possible audio device]")
 fi
+if test "x$have_alsa_1" = "xyes"; then				
+	AC_DEFINE(ALSA_1_0_SUPPORT,1,"[Alsa is 1.0]")
+fi
+
 dnl __________________/ALSA______________
 
 
