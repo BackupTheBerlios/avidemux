@@ -365,7 +365,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_widget_set_size_request (label4, 75, -2);
+  gtk_widget_set_size_request (label4, 75, -1);
   gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
@@ -426,7 +426,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table2), label10, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_widget_set_size_request (label10, 75, -2);
+  gtk_widget_set_size_request (label10, 75, -1);
   gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
 
@@ -520,7 +520,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table3), label15, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_widget_set_size_request (label15, 75, -2);
+  gtk_widget_set_size_request (label15, 75, -1);
   gtk_label_set_justify (GTK_LABEL (label15), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label15), 0, 0.5);
 

@@ -44,8 +44,8 @@ uint8_t DIA_Paused( void )
 	while(ret==2)
 	{
 		dialog=create_dialog1();
-		  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button1), GTK_RESPONSE_CANCEL);
-		  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button2), GTK_RESPONSE_OK);
+		//  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button1), GTK_RESPONSE_CANCEL);
+		//  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button2), GTK_RESPONSE_OK);
 		//gtk_transient(dialog);
 		int i=gtk_dialog_run(GTK_DIALOG(dialog));
 		switch(i)
@@ -66,7 +66,8 @@ uint8_t DIA_Paused( void )
 }
 
 
-GtkWidget	*create_dialog1 (void)
+GtkWidget*
+create_dialog1 (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
@@ -91,7 +92,7 @@ GtkWidget	*create_dialog1 (void)
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, TRUE, 0);
 
-  label1 = gtk_label_new (_("Encoding is paused.\nYou can either resume \nor Abort it."));
+  label1 = gtk_label_new (_("Encoding is paused."));
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (hbox1), label1, TRUE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
@@ -102,12 +103,12 @@ GtkWidget	*create_dialog1 (void)
 
   button1 = gtk_button_new_with_mnemonic (_("Resume"));
   gtk_widget_show (button1);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), button1, 0);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), button1, GTK_RESPONSE_CANCEL);
   GTK_WIDGET_SET_FLAGS (button1, GTK_CAN_DEFAULT);
 
   button2 = gtk_button_new_with_mnemonic (_("Abort"));
   gtk_widget_show (button2);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), button2, 0);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), button2, GTK_RESPONSE_OK);
   GTK_WIDGET_SET_FLAGS (button2, GTK_CAN_DEFAULT);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
