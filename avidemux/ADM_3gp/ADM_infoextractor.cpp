@@ -82,7 +82,7 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
                 if(get_bits(&s,1)) // VO od 
                 {
                       skip_bits(&s,4); // Ver
-                      skip_bits(&s,4);  // Priority
+                      skip_bits(&s,3);  // Priority
                 }
                 if(get_bits(&s,4)==15) // custom A/R
                 {
@@ -98,7 +98,7 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
                         skip_bits(&s,16);
                         skip_bits(&s,16);
                         skip_bits(&s,16);
-                        skip_bits(&s,16);
+                        skip_bits(&s,15);
                         skip_bits(&s,16);
                       }
                   }
