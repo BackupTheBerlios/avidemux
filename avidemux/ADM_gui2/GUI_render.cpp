@@ -156,6 +156,9 @@ char *displ;
 	// First check if local
 	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
 	// in that case we do not even try to use accel
+	
+	// Win32 does not have display
+#ifndef CYG_MANGLING	
 	displ=getenv("DISPLAY");
 	if(!displ)
 	{
@@ -166,6 +169,7 @@ char *displ;
 		printf("Looks like remote display, no Xv :%s\n",displ);
 		return 1;
 	}
+#endif	
 	#if defined(USE_XV)
 	
 		accel_mode=new XvAccelRender();
