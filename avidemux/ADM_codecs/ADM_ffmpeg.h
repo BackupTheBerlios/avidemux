@@ -49,6 +49,7 @@ class ffmpegEncoder:public encoder
   AVCodecContext *_context;
   AVFrame _frame;
   FF_CODEC_ID _id;
+  uint32_t _last_coded_frame;
   void mplayer_init (void);
   uint8_t initContext (void);
   uint8_t gopMpeg1 (void);
@@ -85,6 +86,7 @@ class ffmpegEncoder:public encoder
   uint8_t getExtraData (uint32_t * l, uint8_t ** d);
   virtual uint8_t setCustomMatrices (uint16_t * intra, uint16_t * inter);
   virtual uint8_t setGopSize (uint32_t size);	// !!! IT DOES NOT WORK, DONE TOO LATE!!!!
+  	  uint32_t getCodedFrame(void);
 };
 
 class ffmpegEncoderCQ:public ffmpegEncoder

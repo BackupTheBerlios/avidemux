@@ -332,7 +332,10 @@ ffmpegEncoderCQ::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   return initContext ();
 }
 
-
+uint32_t ffmpegEncoder::getCodedFrame(void)
+{
+	return _last_coded_frame;
+}
 
 uint8_t
   ffmpegEncoderCQ::encode (ADMImage * in,
@@ -348,7 +351,7 @@ uint8_t
 
   if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
     return 0;
-
+  _last_coded_frame=_context->real_pict_num;
   *len = (uint32_t) sz;
   f = frameType ();
   if (flags)
@@ -430,7 +433,7 @@ uint8_t
 
   if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
     return 0;
-
+  _last_coded_frame=_context->real_pict_num;
   *len = (uint32_t) sz;
   res.out_quantizer =
     (int) floor (_context->coded_frame->quality / (float) FF_QP2LAMBDA);
@@ -475,7 +478,7 @@ uint8_t
 
   if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
     return 0;
-
+  _last_coded_frame=_context->real_pict_num;
   *len = (uint32_t) sz;
   if (flags)
     *flags = frameType ();
@@ -573,7 +576,7 @@ uint8_t
   _frame.quality = (int) floor (FF_QP2LAMBDA * nq + 0.5);
   if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
     return 0;
-
+  _last_coded_frame=_context->real_pict_num;
   *len = (uint32_t) sz;
   f = frameType ();
   if (flags)
@@ -818,7 +821,7 @@ uint8_t
 
   if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
     return 0;
-
+  _last_coded_frame=_context->real_pict_num;
   *len = (uint32_t) sz;
   if (flags)
     *flags = AVI_KEY_FRAME;
@@ -876,7 +879,7 @@ uint8_t
 
   if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
     return 0;
-
+  _last_coded_frame=_context->real_pict_num;
   *len = (uint32_t) sz;
   if (flags)
     *flags = AVI_KEY_FRAME;
@@ -930,7 +933,7 @@ uint8_t
 
   if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
     return 0;
-
+  _last_coded_frame=_context->real_pict_num;
   *len = (uint32_t) sz;
   if (flags)
     *flags = AVI_KEY_FRAME;

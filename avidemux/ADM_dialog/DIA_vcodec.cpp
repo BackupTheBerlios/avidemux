@@ -61,8 +61,9 @@ extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
 	{CodecSVCD,"SVCD"},
 	{CodecDVD,"DVD"},
 #endif
-	{CodecXVCD,"XVCD"},
-	{CodecXSVCD,"DVD (lavcodec)"}
+	{CodecXVCD,"XVCD (lav)"},
+	{CodecXSVCD,"XSVCD (lav)"},
+	{CodecXDVD,"DVD (lavcodec)"}
 	
  };
  void okCallback(GtkButton * button, gpointer user_data)

@@ -51,7 +51,8 @@
 
 #include "ADM_toolkit/filesel.h"
 #include "ADM_gui2/GUI_ui.h"
-extern void oplug_mpegff(char *name);
+#include "oplug_mpegFF/oplug_vcdff.h"
+
 static void  A_SaveAudioNVideo(char *name);
  extern int A_SaveUnpackedVop( char *name);
  extern void ogmSave(char *name);
@@ -146,8 +147,17 @@ uint32_t end;
 					}
 					break;
 		case CodecFamilyXVCD:
-					printf(" Xvcd family\n");
-					oplug_mpegff(name);
+					switch(UI_GetCurrentFormat())
+						{
+							case ADM_PS:
+								oplug_mpegff(name,1);;
+								break;
+							case ADM_ES:
+								oplug_mpegff(name,0);;
+								break;
+							default:
+								GUI_Alert("Output format is not compatible!");
+						}
 					break;
 		default:
 					ADM_assert(0);

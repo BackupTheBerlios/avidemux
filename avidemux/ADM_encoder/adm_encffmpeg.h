@@ -105,10 +105,11 @@ private:
 
 public:
 
-
+	
   	uint32_t			_totalframe;
 	uint32_t			_pass1Done;
 	uint8_t  			updateStats (uint32_t len);
+	uint32_t 			getDTS( void );
 	uint8_t				_use_xvid_ratecontrol;	
 
 public:

@@ -210,7 +210,7 @@ extern  uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
  	}
   };
   FFMPEGConfig ffmpegMpeg2Config={
-  	{COMPRESS_CBR,4,1500000,700},
+  	{COMPRESS_CBR,4,1500*1000,700},
 	{
 	 ME_EPZS,//	ME
 	 0, // 		GMC
@@ -221,6 +221,52 @@ extern  uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 	 31,//		qmax;
 	 3,//		max_qdiff;
 	 0,//		max_b_frames;
+	 1, //		mpeg_quant;
+	 1,//
+	 -2, // 		luma_elim_threshold;
+	 1,//
+	 -5, // 		chroma_elim_threshold;
+	 0.05,//		lumi_masking;
+	 1,
+	 0.01,//		dark_masking;
+	 1,
+ 	 0.5,// 	qcompress;  /* amount of qscale change between easy & hard scenes (0.0-1.0)*/
+    	 0.5,// 	qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
+	0,		// min bitrate in kB/S
+	(2500*1000)>>3,		// max bitrate
+	0,					// user_matrix 0->default, 1 tmpg, 2 animé , 3 kvcd
+	12,					// Safe gop size limit
+	NULL,				// inter & intra matrix, will be set depending on user_matrix
+	NULL,
+	0,		// interlaced
+	0,		// WLA: bottom-field-first
+	0,		// wide screen
+	2,		// mb eval = distortion
+	8000,		// vratetol
+	0,
+	0.5,		// temporal masking
+	0,
+	0.5,		// spatial masking
+	0,		// NAQ
+	0,		// Use xvid ratecontrol
+	112,		// buffersize 240 KB for Mpeg2 /
+	0		// DUMMY
+	
+	
+ 	}
+  };
+   FFMPEGConfig ffmpegMpeg2ConfigDVD={
+  	{COMPRESS_CBR,4,4*100*1000,3000},
+	{
+	 ME_EPZS,//	ME
+	 0, // 		GMC
+	 0,//		_4MV;
+	 0,//		_QPEL;
+	 1,//		_TREILLIS_QUANT
+	 2,//		qmin;
+	 31,//		qmax;
+	 3,//		max_qdiff;
+	 2,//		max_b_frames;
 	 1, //		mpeg_quant;
 	 1,//
 	 -2, // 		luma_elim_threshold;
@@ -819,8 +865,6 @@ static const codecEnumByName mycodec[]=
 #ifdef USE_XVID_4
 	{CodecXvid4	,"Xvid4","Xvid4"},
 #endif
-
-
 	{CodecMjpeg	,"MJpeg","Mjpeg"},
 #ifdef USE_MJPEG
 	{CodecVCD	,"VCD","VCD"},
@@ -828,7 +872,8 @@ static const codecEnumByName mycodec[]=
 	{CodecDVD	,"DVD","DVD"},
 #endif
 	{CodecXVCD	,"XVCD","XVCD"},
-	{CodecXSVCD	,"DVD (lavc)","XSVCD"},
+	{CodecXSVCD	,"SVCD (lavc)","XSVCD"},
+	{CodecXSVCD	,"DVD (lavc)","XDVD"},
 	{CodecFF	,"Lav Mpeg4","FFmpeg4"},
 	{CodecH263	,"H263","H263"},
 	{CodecH263P	,"H263+","H263+"},

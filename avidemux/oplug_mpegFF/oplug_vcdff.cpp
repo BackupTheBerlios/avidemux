@@ -310,7 +310,7 @@ ADM_MUXER_TYPE mux;
 					uint32_t samples; 
 					uint32_t dts=encoder->getDTS();
 					
-					printf("%lu %lu\n",i,dts);
+					//printf("%lu %lu\n",i,dts);
 					
 					muxer->writeVideoPacket(len,_outbuffer,
 							i,dts);

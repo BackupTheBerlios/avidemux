@@ -74,7 +74,10 @@ EncoderFFMPEGMpeg1::EncoderFFMPEGMpeg1 (FF_CODEC_ID id, FFMPEGConfig *config)
  _use_xvid_ratecontrol=0;
  
 };
-
+uint32_t EncoderFFMPEGMpeg1::getDTS( void )
+{
+	return _codec->getCodedFrame();
+}
 uint8_t EncoderFFMPEGMpeg1::encode (uint32_t frame, uint32_t * len, uint8_t * out,
 			  uint32_t * flags)
 {
