@@ -723,6 +723,9 @@ FILE			*fd=NULL;
 uint64_t		total_size=0;
 uint32_t		len,flags,type,outquant,audiolen;
 
+uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+	#define PRINT_QUANT_STAT {unsigned int i=2,sum=0,total=0;for(;i<32;i++){printf("Quant % 2u: % 7u times\n",i,quantstat[i]);sum+=i*quantstat[i];total+=quantstat[i];}printf("\nQuant over all: %2.2f\n",(float)sum/(float)total);}
 
    	incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
 	if(!_audio)
@@ -845,6 +848,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 		{
 
 			_codec->encode(aImage,_buffer_out , &len,&flags,&outquant);	
+			quantstat[outquant]++;
 			continue;
 		}
 		encoding->feedFrame(len); // Set
@@ -855,6 +859,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 			_codec->setQuantize(q);
 		}
 		_codec->encode(aImage,_buffer_out , &len,&flags,&outquant);
+		quantstat[outquant]++;
 		encoding->setQuant(outquant);
 		if(flags & AVI_KEY_FRAME) intra=1;
 		else			intra=0;
@@ -900,6 +905,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 				
 		if(!encoding->isAlive())
 		{
+			 PRINT_QUANT_STAT
 			 end();
 			 fclose(fd);
 			 return 0;
@@ -914,6 +920,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 		q=vbrGetQuant(&mpegvbr);
 		_codec->setQuantize(q);
 		_codec->encode(		aImage,_buffer_out , &len,&flags,&outquant);
+		quantstat[outquant]++;
 		encoding->setQuant(outquant);
 		if(flags & AVI_KEY_FRAME) intra=1;
 			else		intra=0;
@@ -969,6 +976,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 		_muxer=NULL;	
 	}
 
+	PRINT_QUANT_STAT
 	 end();
 	return 1;
 }
