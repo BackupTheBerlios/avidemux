@@ -180,7 +180,7 @@ int kern;
 #ifdef FT_FACE_FLAG_KERNING
 	if(prevchar && FT_HAS_KERNING( _face ))
 	{		
-		FT_Get_Kerning( _face,glyph_prev, glyph_index,  FT_KERNING_DEFAULT, &delta );	
+		FT_Get_Kerning( _face,glyph_prev, glyph_index, 0 /*FT_KERNING_DEFAULT*/, &delta );	
 		correction=delta.x/64;
 	}
 	else
