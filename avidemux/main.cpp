@@ -31,6 +31,7 @@
 #endif
 #include "interface.h"
 #include "support.h"
+
 #define __DECLARE__
 #include "avi_vars.h"
 //#include "ADM_gui/GUI_vars.h"
@@ -57,6 +58,7 @@ typedef void *FCT_VOID(void *);
 	#include "SDL/SDL.h"
 	}
 #endif
+#include "ADM_toolkit/ADM_cpuCap.h"
 void onexit( void );
 //extern void automation(int argc, char **argv);
 extern int automation(void );
@@ -136,6 +138,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #ifdef USE_XVID_4
 	xvid4_init();
 #endif
+	CpuCaps::init();
    if(!initGUI())
     	{
 		printf("\n Fatal : could not init GUI\n");
