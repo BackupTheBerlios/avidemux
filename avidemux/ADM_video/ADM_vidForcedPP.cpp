@@ -153,59 +153,60 @@ uint8_t ADMVideoForcedPP::getFrameNumberNoAlloc(uint32_t frame,
 		*len=(page*3)>>1;
 		if(frame>=_info.nb_frames) return 0;		
 		
-		if(_postproc.postProcType && _postproc.postProcStrength)
-			{ 	// we do postproc !
-				// keep
-				uint8_t *iBuff[3],*oBuff[3];
-				int strideTab[3],strideTab2[3];			
-				
-				
-				if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags))
-				 		return 0;
-
-		 		oBuff[0]=YPLANE(data);
-		 		oBuff[1]=UPLANE(data);
- 		 		oBuff[2]=VPLANE(data);
-				
-				iBuff[0]=YPLANE(_uncompressed);
-		 		iBuff[1]=UPLANE(_uncompressed);
- 		 		iBuff[2]=VPLANE(_uncompressed);
-				
-				
-		            	strideTab[0]=strideTab2[0]=_info.width;
-				strideTab[1]=strideTab2[1]=_info.width>>1;
-				strideTab[2]=strideTab2[2]=_info.width>>1;
-	
-				int type;
-				if(_uncompressed->flags&AVI_KEY_FRAME)
-						type=1;
-					else if(_uncompressed->flags & AVI_B_FRAME)
-							type=3;
-						else
-							type=2;
-		 		pp_postprocess(
-		      			iBuff,
-		        		strideTab,
-		          		oBuff,
-		         		strideTab2,
-		      			_info.width,
-		        		_info.height,
-		          		NULL,
-		          		0,
-		         		_postproc.ppMode,
-		          		_postproc.ppContext,
-		          		type); // I ?
-			  	
-			}
-		else
+		if(!(_postproc.postProcType && _postproc.postProcStrength) )
 		{
+			// disabled
 			if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
 				
 			return 1;
 		
-		}			
+		}
+			// we do postproc !
+			// keep
+			uint8_t *iBuff[3],*oBuff[3];
+			int strideTab[3],strideTab2[3];			
+				
+				
+			if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags))
+			 		return 0;
+
+			oBuff[0]=YPLANE(data);
+			oBuff[1]=UPLANE(data);
+ 			oBuff[2]=VPLANE(data);
+				
+			iBuff[0]=YPLANE(_uncompressed);
+		 	iBuff[1]=UPLANE(_uncompressed);
+ 		 	iBuff[2]=VPLANE(_uncompressed);
+				
+				
+		        strideTab[0]=strideTab2[0]=_info.width;
+			strideTab[1]=strideTab2[1]=_info.width>>1;
+			strideTab[2]=strideTab2[2]=_info.width>>1;
+	
+			int type;
+			if(_uncompressed->flags&AVI_KEY_FRAME)
+					type=1;
+			else if(_uncompressed->flags & AVI_B_FRAME)
+					type=3;
+				else
+					type=2;
+		 	pp_postprocess(
+		      		iBuff,
+		        	strideTab,
+		        	oBuff,
+		        	strideTab2,
+				_info.width,
+		        	_info.height,
+		        	NULL,
+		          	0,
+		         	_postproc.ppMode,
+		          	_postproc.ppContext,
+		          	type); // I ?
+			  	
+			
 		
-		data->copyInfo(_uncompressed);	
+			data->copyInfo(_uncompressed);	
+			//printf("Type:%d\n",type);
 	return 1;
 }
 

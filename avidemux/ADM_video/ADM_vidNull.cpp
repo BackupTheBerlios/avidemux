@@ -142,8 +142,16 @@ uint8_t AVDMVideoStreamNull::getFrameNumberNoAlloc(uint32_t frame,
 				int	strideTab2[3];
 
 						iBuff[0]= YPLANE(_uncompressed);
+					if(!filterDefaultPPSwap)
+					{
 		 				iBuff[1]= UPLANE(_uncompressed);
  		 				iBuff[2]= VPLANE(_uncompressed);
+					}
+					else
+					{
+		 				iBuff[2]= UPLANE(_uncompressed);
+ 		 				iBuff[1]= VPLANE(_uncompressed);
+					}
 		 				oBuff[0]= YPLANE(data);
 		 				oBuff[1]= UPLANE(data);
  		 				oBuff[2]= VPLANE(data);

@@ -19,7 +19,7 @@
  ***************************************************************************/
 #ifdef USE_FFMPEG
 
-#include "ADM_pp.h"
+
  class decoderFF : public decoders
 {
      protected:

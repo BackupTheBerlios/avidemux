@@ -1286,14 +1286,14 @@ create_mainWindow (void)
   labelTotalTime = gtk_label_new (_("/00:00:00,000"));
   gtk_widget_set_name (labelTotalTime, "labelTotalTime");
   gtk_widget_show (labelTotalTime);
-  gtk_box_pack_start (GTK_BOX (hbox16), labelTotalTime, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox16), labelTotalTime, TRUE, TRUE, 0);
   gtk_label_set_justify (GTK_LABEL (labelTotalTime), GTK_JUSTIFY_LEFT);
   gtk_misc_set_padding (GTK_MISC (labelTotalTime), 5, 0);
 
   labelFrameType = gtk_label_new (_("Frame: ?"));
   gtk_widget_set_name (labelFrameType, "labelFrameType");
   gtk_widget_show (labelFrameType);
-  gtk_box_pack_start (GTK_BOX (hbox16), labelFrameType, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox16), labelFrameType, TRUE, TRUE, 0);
   gtk_label_set_justify (GTK_LABEL (labelFrameType), GTK_JUSTIFY_LEFT);
 
   frame1 = gtk_frame_new (NULL);

@@ -19,6 +19,7 @@ typedef struct ADM_PP
  	uint32_t			postProcType;
 	uint32_t			postProcStrength;
 	uint32_t			forcedQuant;
+	uint32_t			fastMode;
 	uint32_t			w,h;
 
 }ADM_PP;
