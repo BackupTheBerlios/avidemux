@@ -101,7 +101,10 @@ aviInfo    info;
 	  				vi->_aviheader->getFrameNoAlloc (j,
 							 compBuffer,
 							 &len, &flags);
-		    			vi->decoder->uncompress (compBuffer, prepBuffer, len, &flags);
+					if(len)
+		    				vi->decoder->uncompress (compBuffer, prepBuffer, len, &flags);
+					else
+						flags=0;
 	  				vi->_aviheader->setFlag(j,flags);
 					if(flags & AVI_B_FRAME)
 						bframe++;
