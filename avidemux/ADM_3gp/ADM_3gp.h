@@ -58,6 +58,7 @@ public:
         virtual uint32_t 		read(uint32_t len,uint8_t *buffer);
         virtual uint8_t  		goTo(uint32_t newoffset);
 		   uint8_t			getNbChunk(uint32_t *ch);
+	virtual uint8_t 		getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
 
 };
 
