@@ -137,7 +137,7 @@ GtkWidget	*create_dialogAudioCodec (void)
   GtkWidget *vorbis;
   #endif
 
-  #ifdef HAVE_LIBMP3LAME
+#ifdef USE_FAAC
   GtkWidget *faac;
 #endif
   GtkWidget *toolame,*libtoolame;
