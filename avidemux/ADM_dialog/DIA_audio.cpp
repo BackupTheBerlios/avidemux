@@ -30,15 +30,15 @@
  static GtkWidget	*create_dialogAudio (void);
  
  int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
-  			 int *shiftvalue, int *drc,int *freqvalue);
+  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv);
 			 
   int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
-  			 int *shiftvalue, int *drc,int *freqvalue)
+  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv)
   {
   GtkWidget *dialog;
   gint result;
   int ret=0;
-  char buff[80];
+
   	dialog=create_dialogAudio();
 	gtk_transient(dialog);
 
@@ -62,12 +62,19 @@
 		case RESAMPLING_CUSTOM:			RADIO_SET(radiobuttonSox,1);break;
 		default:assert(0);
 	}
+	switch(*filmconv)
+	{	
+		case FILMCONV_NONE:		RADIO_SET(radiobutton_fpsnone,1);break;
+		case FILMCONV_FILM2PAL:		RADIO_SET(radiobutton_fpsfilm,1);break;
+		case FILMCONV_PAL2FILM:		RADIO_SET(radiobutton_fpsPAL,1);break;
+		default:assert(0);
+	}
 	result=gtk_dialog_run(GTK_DIALOG(dialog));
 			
 	switch(result)
 	{
 		case GTK_RESPONSE_OK:
-					const gchar  *s;
+
 					ret= 1;
 					#define SET(a,b)	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(dialog,#a)))) \
 							{ *b=1;;} else *b=0;
@@ -85,6 +92,13 @@
 							*downsamplingmethod=RESAMPLING_CUSTOM; 
 							else
 								assert(0);
+					if(RADIO_GET(radiobutton_fpsnone)) *filmconv=FILMCONV_NONE;
+					else if(RADIO_GET(radiobutton_fpsfilm)) 
+						*filmconv=FILMCONV_FILM2PAL;
+						else if(RADIO_GET(radiobutton_fpsPAL))
+							*filmconv=FILMCONV_PAL2FILM; 
+							else
+								assert(0);
 					
 					break;
 		default:
@@ -97,7 +111,8 @@
   }
   
 
-GtkWidget	*create_dialogAudio (void)
+GtkWidget*
+create_dialogAudio (void)
 {
   GtkWidget *dialogAudio;
   GtkWidget *dialog_vbox1;
@@ -116,6 +131,13 @@ GtkWidget	*create_dialogAudio (void)
   GtkWidget *radiobuttonSox;
   GtkWidget *entryFrequency;
   GtkWidget *label3;
+  GtkWidget *frame2;
+  GtkWidget *vbox5;
+  GtkWidget *radiobutton_fpsnone;
+  GSList *radiobutton_fpsnone_group = NULL;
+  GtkWidget *radiobutton_fpsfilm;
+  GtkWidget *radiobutton_fpsPAL;
+  GtkWidget *label4;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
@@ -189,6 +211,36 @@ GtkWidget	*create_dialogAudio (void)
   gtk_widget_show (label3);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label3);
 
+  frame2 = gtk_frame_new (NULL);
+  gtk_widget_show (frame2);
+  gtk_box_pack_start (GTK_BOX (vbox3), frame2, TRUE, TRUE, 0);
+
+  vbox5 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox5);
+  gtk_container_add (GTK_CONTAINER (frame2), vbox5);
+
+  radiobutton_fpsnone = gtk_radio_button_new_with_mnemonic (NULL, _("None"));
+  gtk_widget_show (radiobutton_fpsnone);
+  gtk_box_pack_start (GTK_BOX (vbox5), radiobutton_fpsnone, FALSE, FALSE, 0);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton_fpsnone), radiobutton_fpsnone_group);
+  radiobutton_fpsnone_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton_fpsnone));
+
+  radiobutton_fpsfilm = gtk_radio_button_new_with_mnemonic (NULL, _("Film -> PAL"));
+  gtk_widget_show (radiobutton_fpsfilm);
+  gtk_box_pack_start (GTK_BOX (vbox5), radiobutton_fpsfilm, FALSE, FALSE, 0);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton_fpsfilm), radiobutton_fpsnone_group);
+  radiobutton_fpsnone_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton_fpsfilm));
+
+  radiobutton_fpsPAL = gtk_radio_button_new_with_mnemonic (NULL, _("PAL->Film"));
+  gtk_widget_show (radiobutton_fpsPAL);
+  gtk_box_pack_start (GTK_BOX (vbox5), radiobutton_fpsPAL, FALSE, FALSE, 0);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton_fpsPAL), radiobutton_fpsnone_group);
+  radiobutton_fpsnone_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton_fpsPAL));
+
+  label4 = gtk_label_new (_("Fps convert"));
+  gtk_widget_show (label4);
+  gtk_frame_set_label_widget (GTK_FRAME (frame2), label4);
+
   dialog_action_area1 = GTK_DIALOG (dialogAudio)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
@@ -220,6 +272,12 @@ GtkWidget	*create_dialogAudio (void)
   GLADE_HOOKUP_OBJECT (dialogAudio, radiobuttonSox, "radiobuttonSox");
   GLADE_HOOKUP_OBJECT (dialogAudio, entryFrequency, "entryFrequency");
   GLADE_HOOKUP_OBJECT (dialogAudio, label3, "label3");
+  GLADE_HOOKUP_OBJECT (dialogAudio, frame2, "frame2");
+  GLADE_HOOKUP_OBJECT (dialogAudio, vbox5, "vbox5");
+  GLADE_HOOKUP_OBJECT (dialogAudio, radiobutton_fpsnone, "radiobutton_fpsnone");
+  GLADE_HOOKUP_OBJECT (dialogAudio, radiobutton_fpsfilm, "radiobutton_fpsfilm");
+  GLADE_HOOKUP_OBJECT (dialogAudio, radiobutton_fpsPAL, "radiobutton_fpsPAL");
+  GLADE_HOOKUP_OBJECT (dialogAudio, label4, "label4");
   GLADE_HOOKUP_OBJECT_NO_REF (dialogAudio, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialogAudio, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialogAudio, okbutton1, "okbutton1");

@@ -28,6 +28,8 @@
 #include "audioprocess.hxx"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
+#include "ADM_audiofilter/audioeng_film2pal.h"
+
 //#include "ADM_gui/GUI_mp3.h"
 #include "ADM_audiofilter/audioeng_ffmp2.h"
 #include "ADM_audiofilter/audioeng_libtoolame.h"
@@ -77,7 +79,7 @@ static int  audioDRC = 0;
 int 	   audioShift = 0;
 int	   audioDelay=0;
 
-
+FILMCONV audioFilmConv=FILMCONV_NONE;
 
 
 // MP3 parameters
@@ -91,11 +93,13 @@ void audioFilter_SetBitrate( int i)
 	audioMP3bitrate=i;
 }
 
-extern int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
-  			 int *shiftvalue, int *drc,int *freqvalue);
+extern  int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
+  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv);
+
 void audioFilter_configureFilters( void )
 {
-	 DIA_getAudioFilter(&audioNormalizeMode,&audioResampleMode,&audioShift,&audioDelay,&audioDRC,&audioFreq );
+	 DIA_getAudioFilter(&audioNormalizeMode,&audioResampleMode,&audioShift,&audioDelay,&audioDRC,&audioFreq,
+	 		&audioFilmConv );
 
 }
 
@@ -376,7 +380,23 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 	
 		
       	}
-      		
+	
+      switch(audioFilmConv)
+      {
+      	default:
+      	case FILMCONV_NONE: break;
+	
+	case FILMCONV_FILM2PAL:
+		AVDMProcessAudio_Film2Pal *f2p;
+		printf("\n Film2pal\n");
+		
+		f2p = new AVDMProcessAudio_Film2Pal(lastFilter);
+		lastFilter = f2p;
+		filters[filtercount++] = lastFilter;	
+		break;
+	
+		
+      	}      		
 	
 	
 //_______________________________________________________

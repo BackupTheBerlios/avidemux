@@ -55,6 +55,14 @@ typedef enum RESAMPLING
 	RESAMPLING_LAST
 }RESAMPLING;
 
+typedef enum FILMCONV
+{
+	FILMCONV_NONE=0,
+	FILMCONV_FILM2PAL=1,
+	FILMCONV_PAL2FILM=2,
+	FILMCONV_LAST
+}FILMCONV;
+
 void audioCodecSetcodec(AUDIOENCODER codec);
 
 /*  for job/workspace stuff  */

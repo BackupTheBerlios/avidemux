@@ -14,8 +14,8 @@ class AVDMProcessAudio_Film2Pal : public AVDMBufferedAudioStream
 {
 protected:
 			       
-				 uint32_t  _current;				
-				 uint32_t  _target;
+				 double  _current;				
+				 double  _target;
 				 uint8_t  _bufferin[PROCESS_BUFFER_SIZE];
         	    		 uint32_t 	grab(uint8_t *obuffer);
 		

@@ -73,17 +73,46 @@ AVDMProcessAudio_Film2Pal::AVDMProcessAudio_Film2Pal(AVDMGenericAudioStream * in
 //___________________________________________
 uint32_t 	AVDMProcessAudio_Film2Pal::grab(uint8_t *obuffer)
 {
-    uint32_t rd, i,len;
-    int16_t *s;
-   
+    uint32_t rd,rendered;
+    uint8_t *out=NULL,*copy=NULL;
+    uint32_t min;
+    
     rd = _instream->readDecompress(8192*4, _bufferin);
-    
-    _current+=rd;
-    
-    // we dupe as needed (at least 4 bytes at a time to handle stereo case)
-    
+    if(!rd) return MINUS_ONE;        
+   
     
    
-    return rd;
+    min=_wavheader->channels*2;
+    
+    rendered=0;
+    
+    // copy four by four
+    copy=_bufferin;
+    out=obuffer;
+    while(rd>min)
+    {
+    	for(uint32_t i=0;i<min;i++)
+	{
+		*out++=*copy++;
+		rendered++;
+		rd--;
+		
+	}	
+	_target+=(25.-23.976)/23.976;
+	
+#define ALIGN	25.
+	while(_target>1.)
+	{
+		for(uint32_t i=0;i<min;i++)
+		{
+			*out++=*(copy-min+i);
+			rendered++;
+		
+		}			
+		_target=_target-1.0;
+	}
+    }
+    
+    return rendered;
 
 };
