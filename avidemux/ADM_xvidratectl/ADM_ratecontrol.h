@@ -104,7 +104,7 @@ protected:
 			
 			uint8_t 	project(uint32_t framenum, uint32_t q, ADM_rframe frame);
 			uint8_t 	checkVBV(uint32_t framenum, uint32_t q, ADM_rframe frame);
-			int 		sizePrediction(uint32_t frame,uint32_t original_size,uint32_t qp);
+			float 		getRatio(uint32_t newq, uint32_t oldq, float alpha);
 			float 		getComp(int oldbits, int qporg, int newbits, int qpused);
 			
 public:

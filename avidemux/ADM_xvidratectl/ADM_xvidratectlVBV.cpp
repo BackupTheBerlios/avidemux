@@ -93,6 +93,8 @@ uint8_t ADM_newXvidRcVBV::startPass2( uint32_t size,uint32_t nbFrame )
 	_lastSize=new uint32_t[_roundup];
 	memset(_lastSize,0,_roundup*sizeof(uint32_t));
 	_frame=0;
+	for(uint32_t i=0;i<AVG_LOOKUP;i++)
+		_compr[i]=1.0;
 	printf("Rc: Byte per image : %lu \n",_byte_per_image);
 	return 1;
 }
@@ -124,7 +126,7 @@ uint8_t ADM_newXvidRcVBV::logPass2(uint32_t qz, ADM_rframe ftype,uint32_t size)
 		rank=_frame%AVG_LOOKUP;
 		_compr[rank]=getComp(_stat[_frame].size,_stat[_frame].quant,size,qz);
 	//
-	printf("Frame %08lu vbv fullness %u, kbytes :%lu\n",_frame,(100*_vbv_fullness)/_vbvsize,_vbv_fullness/1024);
+	aprintf("Frame %08lu size %d type:%d vbv fullness %u, kbytes :%lu qz used :%d\n",_frame,size, ftype,(100*_vbv_fullness)/_vbvsize,_vbv_fullness/1024,qz);
 	// compute instantaneous br
 	uint32_t br=0;
 	for(uint32_t i=0;i<_roundup;i++)
@@ -133,7 +135,7 @@ uint8_t ADM_newXvidRcVBV::logPass2(uint32_t qz, ADM_rframe ftype,uint32_t size)
 	}
 	br*=8;
 	br/=1000;
-	printf("br : %lu\n",br);
+	aprintf("br : %lu\n",br);
 	_frame++;
 	return rc->logPass2(qz,ftype,size);
 }
@@ -159,7 +161,7 @@ uint8_t ADM_newXvidRcVBV::project(uint32_t framenum, uint32_t q, ADM_rframe fram
 }
 uint8_t ADM_newXvidRcVBV::checkVBV(uint32_t framenum, uint32_t q, ADM_rframe frame)
 {
-
+	float ratio;
 	// Project the next frames with the same Q factor reduction as now
 	// and check
 	
@@ -171,34 +173,34 @@ uint8_t ADM_newXvidRcVBV::checkVBV(uint32_t framenum, uint32_t q, ADM_rframe fra
 		uint32_t framesize;
 		
 		// Q increase ratio
-		uint32_t start;
+		
 		float comp=0,size,qr;
-			start=_frame;;
-			start+=_roundup;
-			start-=AVG_LOOKUP;
-			start%=_roundup;
+			
 	
 			for(uint32_t i=0;i<AVG_LOOKUP;i++)
 			{
-				comp+=_compr[start];
-				start++;
-				start%=AVG_LOOKUP;
+				comp+=_compr[i];
 			}
+			
 			comp=comp/AVG_LOOKUP;	// Average compression ratio
-			qr=q;
-			qr=qr/_stat[framenum].quant;	// average size reduction
-			qr=pow(qr,-comp);
+			ratio=getRatio(q,_stat[framenum].quant,comp);
+			
 		
 		for(uint32_t i=0;i<_roundup>>1;i++)
 		{
 		
-			size=qr;
+			size=ratio;
 			size*=_stat[framenum+i].size;
 			framesize=(uint32_t)floor(size);	// predicted size
 			
+			if(!i && frame==RF_I) // less compression ratio ~1.5 
+				framesize=(framesize*3)>>1;
+			
+			aprintf("\t Org: %lu projected :%d VBV:%d q:%d ratio:%f alpha:%f\n",_stat[framenum+i].size,framesize,
+					projected_vbv/1024,q,ratio,comp);
 			if(projected_vbv<framesize)
 			{
-				printf("potential underflow at %d + %d , q:%d\n",framenum,i,q);
+				aprintf("potential underflow at %d + %d , q:%d\n",framenum,i,q);
 				return 0;
 			}
 			projected_vbv-=framesize;
@@ -224,7 +226,7 @@ uint8_t ADM_newXvidRcVBV::checkVBV(uint32_t framenum, uint32_t q, ADM_rframe fra
 float ADM_newXvidRcVBV::getComp(int oldbits, int qporg, int newbits, int qpused)
 {
 	float comp;
-	
+/*	
 	comp=newbits;
 	comp/=oldbits;
 	comp=log(comp);
@@ -235,6 +237,19 @@ float ADM_newXvidRcVBV::getComp(int oldbits, int qporg, int newbits, int qpused)
 	if(comp>3) comp=3;
 	if(comp<0.5) comp=0.5;
 	return comp;
+*/
+	// Linear
+	// comp=(Nb*Nq)/(Ob*Oq);
+	comp=newbits;
+	comp*=qpused;
+	comp/=qporg;
+	comp/=oldbits;
+	// Clamp between max alpha/min alpha
+	#define MAX_ALPHA 6
+	#define MIN_ALPHA (1.0/MAX_ALPHA)
+	if(comp>MAX_ALPHA) comp=MAX_ALPHA;
+	if(comp<MIN_ALPHA) comp=MIN_ALPHA;
+	return comp;
 }
 /*_______________________________________________________________
 	Predict the size of the image
@@ -243,31 +258,25 @@ float ADM_newXvidRcVBV::getComp(int oldbits, int qporg, int newbits, int qpused)
 	Idea by Peter Cheat
 __________________________________________________________________
 */
-int ADM_newXvidRcVBV::sizePrediction(uint32_t frame,uint32_t original_size,uint32_t qp)
+float ADM_newXvidRcVBV::getRatio(uint32_t newq, uint32_t oldq, float alpha)
 {
  // Peter Cheat formula :Pridicted Bits Frame 10 Will Use = (Bits Used At Quantiser 1) * (New Quantiser ^ -Compressibility)
  // avg lookup compressibility
- 	int start;
-	int pred,i;
-	float comp=0;
-		
-	start=_frame;;
-	start+=_roundup;
-	start-=AVG_LOOKUP;
-	start%=_roundup;
+ /*			exponential
+ 			qr=q;
+			qr=qr/_stat[framenum].quant;	// average size reduction
+			qr=pow(qr,-comp);
+ */
+ 	// Linear
+	// Ob*Oq*alpha=Nb*Nq
+	// Nb/Ob=Oq/Nq*alpha
+	alpha=1;
+	float comp;
 	
-	for(i=0;i<AVG_LOOKUP;i++)
-	{
-		comp+=_compr[start];
-		start++;
-		start%=AVG_LOOKUP;
-	}
-	comp=comp/AVG_LOOKUP;
-	
-	
-	printf("Avg comp: %f initial size : %d predicted size:%d\n",comp,original_size,pred);
-	return pred;
-
+	comp=oldq;	
+	comp/=newq;
+	comp*=alpha;
+	return comp;
 }
 
 //EOF
