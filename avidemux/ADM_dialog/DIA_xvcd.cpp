@@ -46,7 +46,10 @@ uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 #define WID(x) lookup_widget(dialog,#x)
 #define CHECK_GET(x,y) {y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
 #define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),y);}		
-
+	ret=-1;
+	while(ret==-1)
+	{
+	
 	dialog=create_dialog1();
 	gtk_transient(dialog);	
   	gtk_window_set_title (GTK_WINDOW (dialog), title);
@@ -77,9 +80,6 @@ uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 	gtk_option_menu_set_history (GTK_OPTION_MENU (WID(optionmenu1)),conf->user_matrix);
  	gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton1)),(float)conf->gop_size) ;
 	CHECK_SET(checkbuttonxvid,conf->use_xvid_ratecontrol);
-	ret=-1;
-	while(ret==-1)
-	{
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
 	{
 			int r,value=0;

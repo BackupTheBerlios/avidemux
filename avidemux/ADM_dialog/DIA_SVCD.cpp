@@ -39,14 +39,14 @@
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 
-#include "ADM_codecs/ADM_ffmpegConfig.h"
+#include "mpeg2enc/ADM_mpeg2enc.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 static GtkWidget	*create_dialog1 (void);
 static void 		updateMode( void );
 static int 		cb_mod(GtkObject * object, gpointer user_data);
-static void 		upload(GtkWidget *dialog, FFcodecSetting *conf);
-static void 		download(GtkWidget *dialog, FFcodecSetting *conf);
+static void 		upload(GtkWidget *dialog, Mpeg2encParam *conf);
+static void 		download(GtkWidget *dialog, Mpeg2encParam *conf);
 
 static GtkWidget 	*dialog=NULL;		      
 static uint32_t 	mQ,mB,mS;
@@ -54,7 +54,7 @@ static COMPRESSION_MODE mMode;
 
 
 uint8_t DIA_SVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
-		   	  uint32_t * br,uint32_t *fsize,FFcodecSetting *conf)
+		   	  uint32_t * br,uint32_t *fsize,Mpeg2encParam *conf)
 {	
 	int ret=0;
 	gint b;
@@ -158,7 +158,7 @@ uint8_t DIA_SVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 }	
 
 
-void upload(GtkWidget *dialog, FFcodecSetting *conf)
+void upload(GtkWidget *dialog, Mpeg2encParam *conf)
 {
  	gtk_option_menu_set_history (GTK_OPTION_MENU (WID(optionmenu2)),conf->user_matrix);
 // 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton1)),(float)conf->gop_size) ;
@@ -176,7 +176,7 @@ void upload(GtkWidget *dialog, FFcodecSetting *conf)
 	gtk_write_entry(WID(entryMax),(conf->maxBitrate*8)/1000);
 	
 }
-void download(GtkWidget *dialog, FFcodecSetting *conf)
+void download(GtkWidget *dialog, Mpeg2encParam *conf)
 {
 	SPIN_GET(spinbuttonGop,gop_size);
 	conf->user_matrix=getRangeInMenu(WID(optionmenu2));
