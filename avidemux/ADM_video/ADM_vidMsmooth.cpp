@@ -525,7 +525,7 @@ uint32_t off;
 			"packuswb %%mm2,%%mm4\n"
 			"movq %%mm4,(%3)\n" //
 			
-			:: "r" (srcpn+off),
+			: : "r" (srcpn+off),
 			   "r" (srcp+off), "r" (srcpp+off), "r" (workp+off)
 			);
 			
@@ -541,7 +541,7 @@ uint32_t off;
 	// due to 16 byte alignment
 	memcpy(out, in, w);
 	memcpy(out + (h-1)*w, in + (h-1)*w, w);
-	__asm__ ("emms\n" ::);
+	__asm__ ("emms\n" : :);
 	
 }
 #endif

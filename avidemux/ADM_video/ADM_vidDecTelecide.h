@@ -68,16 +68,7 @@ struct PREDICTION
 	unsigned int predicted_metric;
 };
 
-#define GETFRAME(g, fp) \
-{ \
-	int GETFRAMEf; \
-	uint32_t len,flags;\
-	GETFRAMEf = (g); \
-	if (GETFRAMEf < 0) GETFRAMEf = 0; \
-	else if (GETFRAMEf >= _info.nb_frames) GETFRAMEf = _info.nb_frames - 1; \
-	_in->getFrameNumberNoAlloc(GETFRAMEf, &len, \
-				fp,&flags); \
-}
+#define GETFRAME(g, fp) { int GETFRAMEf; uint32_t len,flags;GETFRAMEf = (g); if (GETFRAMEf < 0) GETFRAMEf = 0; 	else if (GETFRAMEf >= _info.nb_frames) GETFRAMEf = _info.nb_frames - 1; _in->getFrameNumberNoAlloc(GETFRAMEf, &len, fp,&flags); }
 #include "ADM_video/ADM_vidDecTel_param.h"
 class Telecide : public AVDMGenericVideoStream
 {
