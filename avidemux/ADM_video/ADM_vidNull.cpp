@@ -39,20 +39,7 @@
 
 #include "ADM_filter/video_filters.h"
 
-extern int DIA_getMPParams( int *pplevel, int *ppstrength,int *swap);
 
-int filterDefaultPPType=7;
-int filterDefaultPPStrength=5;
-int filterDefaultPPSwap=0;
-//
-void	filterSetPostProc( void )
-{
-	if(DIA_getMPParams( &filterDefaultPPType, &filterDefaultPPStrength,&filterDefaultPPSwap))
-	{
-		getFirstVideoFilter();
-	}
-
-}
 //_______________________________________________________________
 
 AVDMVideoStreamNull::AVDMVideoStreamNull(ADM_Composer *in,uint32_t start, uint32_t nb)
@@ -72,23 +59,18 @@ aviInfo aviinf;
 	_info.fps1000=aviinf.fps1000;
 	_info.orgFrame=start;
 //  	_uncompressed=(uint8_t *)malloc(3*aviinf.width*aviinf.height);
-	_uncompressed=new ADMImage(aviinf.width,aviinf.height);
+//	_uncompressed=new ADMImage(aviinf.width,aviinf.height);
 
-  	ADM_assert(_uncompressed);
+  //	ADM_assert(_uncompressed);
 	ADM_assert(start+nb<=aviinf.nb_frames);
 
-	initPostProc(&_pp,_info.width,_info.height);
-	_pp.postProcType=filterDefaultPPType;
-	_pp.postProcStrength=filterDefaultPPStrength;
-	_pp.forcedQuant=0;
-	updatePostProc(&_pp);	    	
-  	aprintf("\n Null stream initialized with start frame = %lu, nbframe=%lu \n",_start,nb);
+	aprintf("\n Null stream initialized with start frame = %lu, nbframe=%lu \n",_start,nb);
   	
 }
 AVDMVideoStreamNull::~AVDMVideoStreamNull()
 {
 
- 	delete _uncompressed;	
+ //	delete _uncompressed;	
 	
 }
 //
@@ -112,82 +94,9 @@ uint8_t AVDMVideoStreamNull::getFrameNumberNoAlloc(uint32_t frame,
 			// read uncompressed frame
 
 	// 1 get it
-    	if(!_in->getUncompressedFrame(_start+frame,_uncompressed)     )
+    	if(!_in->getUncompressedFrame(_start+frame,data)     )
      			return 0;
-	if(flags)
-		*flags=_uncompressed->flags;
-	// Quant table available ?
-	if(_uncompressed->quant && _uncompressed->_qStride)
-	{
-		// Compute average quant
-		// Optimize!
-		int64_t sum=0;
-		int type;
-		
-		for(uint32_t z=0;z<_uncompressed->_qSize;z++)
-			sum+=_uncompressed->quant[z];
-		sum+=(_uncompressed->_qSize-1);
-		sum/=_uncompressed->_qSize;
-		_uncompressed->_Qp=sum;
-		//printf("Q:%d\n",_uncompressed->_Qp);
-		#warning FIXME should be FF_I_TYPE/B/P
-		if(_uncompressed->flags & AVI_KEY_FRAME) type=1;
-			else if(_uncompressed->flags & AVI_B_FRAME) type=3;
-				else type=2;
-		if(_pp.postProcType && _pp.postProcStrength)
-			{ 	// we do postproc !
-				// keep
-				uint8_t *oBuff[3],*iBuff[3];
-				int	strideTab[3];
-				int	strideTab2[3];
-
-						iBuff[0]= YPLANE(_uncompressed);
-					if(!filterDefaultPPSwap)
-					{
-		 				iBuff[1]= UPLANE(_uncompressed);
- 		 				iBuff[2]= VPLANE(_uncompressed);
-					}
-					else
-					{
-		 				iBuff[2]= UPLANE(_uncompressed);
- 		 				iBuff[1]= VPLANE(_uncompressed);
-					}
-		 				oBuff[0]= YPLANE(data);
-		 				oBuff[1]= UPLANE(data);
- 		 				oBuff[2]= VPLANE(data);
-        			
-			            strideTab[0]=strideTab2[0]=_info.width;
-				    strideTab[1]=strideTab2[1]=_info.width>>1;
-				    strideTab[2]=strideTab2[2]=_info.width>>1;
-            			
-		 		   pp_postprocess(
-		      			iBuff,
-		        		strideTab,
-		          		oBuff,
-		         		strideTab2,
-		      			_info.width,
-		        		_info.height,
-		          		(int8_t *)_uncompressed->quant,
-		          		_uncompressed->_qStride,
-		         		_pp.ppMode,
-		          		_pp.ppContext,
-		          		type);			// img type
-				// update some infos
-				data->copyInfo(_uncompressed);
-
-			}
-		else
-			data->duplicate(_uncompressed);
-
-		
-	}
-	else
-	{
-		data->duplicate(_uncompressed);
-	}
-        return 1;
-
-
+	return 1;
 }
 
 uint8_t AVDMVideoStreamNull::configure( AVDMGenericVideoStream *instream){

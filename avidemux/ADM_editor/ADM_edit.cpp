@@ -51,6 +51,8 @@ extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
 extern uint8_t loadVideoCodecConf( char *name);
 //
 //
+int filterDefaultPPType=3;
+int filterDefaultPPStrength=3;
 
 #define TEST_MPEG2DEC
 
@@ -66,7 +68,13 @@ ADM_Composer::ADM_Composer (void)
   _cached = 1;
   _nb_clipboard=0;
   _haveMarkers=0; // only edl have markers
-
+  // Initialize a default postprocessing (dummy)
+  initPostProc(&_pp,16,16);
+  _pp.postProcType=filterDefaultPPType;
+  _pp.postProcStrength=filterDefaultPPStrength;
+  _pp.forcedQuant=0;
+  updatePostProc(&_pp);
+  _imageBuffer=NULL;    
 }
 /**
 	Remap 1:1 video to segments
@@ -162,6 +170,10 @@ ADM_Composer::deleteAllVideos (void)
     }
 
   memset (_videos, 0, sizeof (_videos));
+  
+  if(_imageBuffer)
+  	delete _imageBuffer;
+  _imageBuffer=NULL;
 
 }
 
@@ -169,6 +181,10 @@ ADM_Composer::~ADM_Composer ()
 {
   deleteAllSegments ();
   deleteAllVideos ();
+  deletePostProc(&_pp);
+  if(_imageBuffer)
+  	delete _imageBuffer;
+  _imageBuffer=NULL;
 
 }
 
@@ -282,10 +298,29 @@ UNUSED_ARG(mode);
 	_aviheader;;
       return 0;
     }
-
+ 
   // else update info
   _videos[_nb_video]._aviheader->getVideoInfo (&info);
   _videos[_nb_video]._aviheader->setMyName (name);
+  // 1st if it is our first video we update postproc
+ if(!_nb_video)
+ {
+ 	
+	deletePostProc(&_pp );
+ 	initPostProc(&_pp,info.width,info.height);
+	_pp.postProcType=filterDefaultPPType;
+	_pp.postProcStrength=filterDefaultPPStrength;
+	_pp.forcedQuant=0;
+	updatePostProc(&_pp);
+
+	if(_imageBuffer) delete _imageBuffer;
+	_imageBuffer=new ADMImage(info.width,info.height);
+ 	_imageBuffer->_qSize= ((info.width+15)>>4)*((info.height+15)>>4);
+	_imageBuffer->quant=new uint8_t[_imageBuffer->_qSize];
+	_imageBuffer->_qStride=(info.width+15)>>4;
+ }
+    
+ 
 //    fourCC::print( info.fcc );
   _total_frames += info.nb_frames;
   _videos[_nb_video]._nb_video_frames = info.nb_frames;

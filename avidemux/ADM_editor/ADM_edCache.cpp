@@ -29,9 +29,9 @@ EditorCache::EditorCache(uint32_t size,uint32_t w, uint32_t h)
 	{
 		_elem[i].image=new ADMImage(w,h);
 		
-		_elem[i].image->_qSize= ((w+15)>>4)*((h+15)>>4);
-		_elem[i].image->quant=new uint8_t[_elem[i].image->_qSize];
-		_elem[i].image->_qStride=(w+15)>>4;
+// 		_elem[i].image->_qSize= ((w+15)>>4)*((h+15)>>4);
+// 		_elem[i].image->quant=new uint8_t[_elem[i].image->_qSize];
+// 		_elem[i].image->_qStride=(w+15)>>4;
 		
 		_elem[i].frameNum=0x0fffffff;
 		_elem[i].lastUse=0x0ffffff;

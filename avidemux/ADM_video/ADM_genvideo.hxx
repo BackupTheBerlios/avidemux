@@ -37,7 +37,7 @@
 #define INT int32_t
 #include "ADM_video/ADM_confCouple.h"
 #include "ADM_library/ADM_image.h"
-#include "ADM_pp.h"
+
 
 void GUI_PreviewInit(uint32_t w , uint32_t h);
 uint8_t 	GUI_PreviewUpdate(uint8_t *data);
@@ -135,7 +135,7 @@ class  AVDMVideoStreamNull :public AVDMGenericVideoStream
  protected:
 				ADM_Composer 			*_in;
 				uint32_t			_start;
-				ADM_PP				_pp;
+
 				
 				
 

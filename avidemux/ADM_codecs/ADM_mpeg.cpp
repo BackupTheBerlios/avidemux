@@ -40,7 +40,7 @@
 #include "ADM_codecs/ADM_mpeg.h"
 
 #define MPEG2DEC  ((mpeg2dec_t *)_decoder)
-extern int DIA_getMPParams( int *pplevel, int *ppstrength,int *swap);
+
 extern "C"
 {
 #include "libMpeg2Dec/video_out.h"

@@ -33,6 +33,7 @@
  #include "ADM_codecs/ADM_codec.h"
  #include "ADM_library/ADM_image.h"
  #include "ADM_editor/ADM_edCache.h"
+ #include "ADM_pp.h"
  
 #define MAX_SEG  	100 // Should be enougth
 #define MAX_VIDEO   100
@@ -90,6 +91,8 @@ typedef struct
 class ADM_Composer
 {
   private:
+  					ADM_PP 		_pp;
+					ADMImage	*_imageBuffer;
   					uint8_t		decodeCache(uint32_t frame,uint32_t seg, ADMImage *image);
   					uint32_t 	_nb_segment;
 					uint32_t 	_nb_video;
@@ -210,13 +213,18 @@ class ADM_Composer
               				uint8_t			searchNextKeyFrame(uint32_t in,uint32_t *oseg, uint32_t * orel);
                  			uint8_t			searchPreviousKeyFrame(uint32_t in,uint32_t *oseg, uint32_t * orel);
 
-					uint8_t   			rebuildFrameType ( void);
+					uint8_t   		rebuildFrameType ( void);
                   // kludg
-                  			void 				propagateBuildMap( void );
-                  			uint32_t			readPCMeq(uint32_t lenasked,
-                  										uint8_t *out,uint32_t *lenout);
+                  			void 			propagateBuildMap( void );
+                  			uint32_t		readPCMeq(uint32_t lenasked,
+                  								uint8_t *out,uint32_t *lenout);
 			virtual 	uint8_t			audioGoToTime(uint32_t mstime,uint32_t *off);
-					uint8_t getMarkers(uint32_t *start, uint32_t *end); // get markers from file
+					uint8_t 		getMarkers(uint32_t *start, uint32_t *end);
+								 // get markers from file
+					uint8_t 		setPostProc( int type, int strength, 
+										int swapuv);
+					uint8_t 		getPostProc( int *type, int *strength, 
+										int *swapuv);
 										
 
 };

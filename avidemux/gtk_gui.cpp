@@ -152,6 +152,7 @@ extern void mpeg_passthrough(  char *name );
 static void A_videoCheck( void);
 extern void parseScript(char *scriptname);
 int A_saveDVDPS(char *name);
+static void	A_setPostproc( void );
 extern uint8_t ogmSave(char  *name);
 //__________
 extern uint8_t ogmSave(char *fd);
@@ -574,7 +575,7 @@ case ACT_Pipe2Other:
 	GUI_PlayAvi ();
       break;
     case ACT_SetPostProcessing:
-      filterSetPostProc();
+      A_setPostproc();
       break;
 
     case ACT_NextFrame:
@@ -1008,19 +1009,22 @@ void  updateLoaded ()
   // Init renderer
   renderResize (avifileinfo->width, avifileinfo->height);
   curframe = 0;
-  rebuild_status_bar ();
+  
 
   // Draw first frame
-  if (!video_body->getUncompressedFrame (curframe, rdr_decomp_buffer))
-    {
+  rebuild_status_bar (); 
+  getFirstVideoFilter(); // Rebuild filter if needed
+  if(!GUI_getFrame( curframe, rdr_decomp_buffer,NULL))
+  {
       GUI_Alert ("Problem decompressing frame!");
     }
   else
     {
       renderUpdateImage (rdr_decomp_buffer->data);
       renderRefresh ();
+      update_status_bar(rdr_decomp_buffer);
     }
-    
+   
    printf("\n** conf updated **\n");
 }
 
@@ -2223,7 +2227,23 @@ uint32_t count;
 
 
 }
+extern int DIA_getMPParams( int *pplevel, int *ppstrength,int *swap);
 
+
+//
+void	A_setPostproc( void )
+{
+int type,strength,swap;
+	if(!avifileinfo) return;
+	
+	video_body->getPostProc(&type,&strength,&swap);
+
+ 	if(DIA_getMPParams( &type, &strength,&swap))
+ 	{
+		video_body->setPostProc(type,strength,swap);
+ 	}
+
+}
 
 // EOF
 

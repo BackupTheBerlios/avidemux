@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <ADM_assert.h>
 
 #include "config.h"
@@ -36,8 +37,11 @@
 #define MODULE_NAME MODULE_EDITOR
 #include "ADM_toolkit/ADM_debug.h"
 
+#include "ADM_pp.h"
+
 // FIXME BADLY !!!
 static uint8_t compBuffer[MAXIMUM_SIZE * MAXIMUM_SIZE * 3];
+
 
 
 uint8_t
@@ -113,7 +117,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 	if((result=cache->getImage(relframe)))
 	{
 		aprintf(">>frame %lu is cached...\n",relframe);
-		out->duplicateFull(result);
+		out->duplicate(result);
 		if(flagz)
 			*flagz=result->flags;
 		return 1;
@@ -148,7 +152,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 	  _lastframe = relframe;
 	  if(flagz)
 	  	*flagz=result->flags;
-	  out->duplicateFull(result);
+	  out->duplicate(result);
 	  return (1);
     }
   
@@ -203,7 +207,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 				}
 				if(seeked==relframe)
 				{
-					 out->duplicateFull(result);
+					 out->duplicate(result);
 					 if(flagz) *flagz=result->flags;
 				}
 				seeked++;
@@ -222,7 +226,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 			}
 	if(flagz)
 		*flagz=result->flags;	
-	out->duplicateFull(result);
+	out->duplicate(result);
 	_lastframe=relframe;
 	_lastseg = seg;
 	return 1;	 
@@ -274,7 +278,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 			}
 		if(flagz)
 			*flagz=result->flags;	
-		out->duplicateFull(result);
+		out->duplicate(result);
 		_lastframe=relframe;
 		_lastseg=seg;
 		return 1;	
@@ -309,7 +313,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 		}
 		if(seeked==relframe)
 		{
-			 out->duplicateFull(result);
+			 out->duplicate(result);
 			 if(flagz) *flagz=result->flags;
 		}
 		seeked++;
@@ -325,10 +329,13 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 //
 //
 //________________________________________________________________
+ //*****
 uint8_t		ADM_Composer::decodeCache(uint32_t frame,uint32_t seg, ADMImage *image)
 {
 uint32_t len;
 uint32_t flags;
+float	 sum;
+EditorCache *cache=_videos[seg]._videoCache;	
 	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,
 						     compBuffer,
 						     &len, &flags))
@@ -336,16 +343,110 @@ uint32_t flags;
 	  printf ("\nEditor: last decoding failed.%ld)\n",   frame );
 	  return 0;
 	}
-	if (!_videos[seg].decoder->uncompress (compBuffer, image, len, &flags))
+	ADM_assert(_imageBuffer);
+	// Do pp, and use imageBuffer as intermediate buffer
+	if (!_videos[seg].decoder->uncompress (compBuffer, _imageBuffer, len, &flags))
 	    {
 	      printf ("\nEditor: Last Decoding2 failed for frame %lu\n",frame);
 	      return 0;
 	    }
-	   
-	    image->flags=flags;	    	   
-	    _videos[seg]._videoCache->updateFrameNum(image,frame);	 
-	   return 1;
+	// Quant ?
+	if(!_imageBuffer->quant || !_imageBuffer->_qStride)
+	{
+		_imageBuffer->_Qp=2;
+		image->duplicate(_imageBuffer);
+		cache->updateFrameNum(image,frame);
+		aprintf("EdCache: No quant avail\n");
+		return 1;
+	}
+	// We got everything, let's go
+	// 1 compute average quant
+	for(uint32_t z=0;z<_imageBuffer->_qSize;z++)
+			sum+=_imageBuffer->quant[z];
+	sum+=(_imageBuffer->_qSize-1);
+	sum*=2;
+	sum/=_imageBuffer->_qSize;
+	if(sum>31) sum=31;
+	if(sum<1) sum=1;
+		
+	_imageBuffer->_Qp=(uint32_t)floor(sum);
+	
+	// Pp deactivated ?
+	if(!_pp.postProcType || !_pp.postProcStrength)
+	{
+		image->duplicate(_imageBuffer);
+		cache->updateFrameNum(image,frame);
+		aprintf("EdCache: Postproc disabled\n");
+		return 1;	
+	}
+	
+	int type;	
+	#warning FIXME should be FF_I_TYPE/B/P
+	if(_imageBuffer->flags & AVI_KEY_FRAME) type=1;
+		else if(_imageBuffer->flags & AVI_B_FRAME) type=3;
+			else type=2;
+	
+	// we do postproc !
+	// keep
+	uint8_t *oBuff[3],*iBuff[3];
+	int	strideTab[3];
+	int	strideTab2[3];
+	aviInfo _info;
+		
+		getVideoInfo(&_info);
+		iBuff[0]= YPLANE((_imageBuffer));
+		if(1)
+		{
+			iBuff[1]= UPLANE((_imageBuffer));
+ 			iBuff[2]= VPLANE((_imageBuffer));
+		}
+		else
+		{
+			iBuff[2]= UPLANE((_imageBuffer));
+ 			iBuff[1]= VPLANE((_imageBuffer));
+		}
+			oBuff[0]= YPLANE(image);
+			oBuff[1]= UPLANE(image);
+ 			oBuff[2]= VPLANE(image);
+        			
+			strideTab[0]=strideTab2[0]=_info.width;
+			strideTab[1]=strideTab2[1]=_info.width>>1;
+			strideTab[2]=strideTab2[2]=_info.width>>1;
+            			
+		 pp_postprocess(
+		 		iBuff,
+		 		strideTab,
+		 		oBuff,
+		 		strideTab2,
+		 		_info.width,
+		        	_info.height,
+		          	(int8_t *)(_imageBuffer->quant),
+		          	_imageBuffer->_qStride,
+		         	_pp.ppMode,
+		          	_pp.ppContext,
+		          	type);			// img type
+				// update some infos
+		image->copyInfo(_imageBuffer);
+		cache->updateFrameNum(image,frame);
+		aprintf("EdCache: Postproc done\n");
+		return 1;	
 
+}
+uint8_t ADM_Composer::setPostProc( int type, int strength, int swapuv)
+{
+	if(!_nb_video) return 0;
+	_pp.postProcType=type;
+	_pp.postProcStrength=strength;
+	updatePostProc(&_pp); // DeletePostproc/ini missing ?
+	return 1;
+}
+uint8_t ADM_Composer::getPostProc( int *type, int *strength, int *swapuv)
+{
+	if(!_nb_video) return 0;
+	*type=_pp.postProcType;
+	*strength=_pp.postProcStrength;
+	*swapuv=0;
+	return 1;
 }
 //______________________________________________
 //_______________________________________________
