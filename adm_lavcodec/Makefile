@@ -50,7 +50,7 @@ OBJS += \
 	ppc/fdct_altivec.o \
 	ppc/mpegvideo_altivec.o 
 
-CFLAGS+=-maltivec -mabi=altivec	
+CFLAGS+=-maltivec -mabi=altivec	 -faltivec
 endif
 
 
