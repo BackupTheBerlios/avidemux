@@ -43,6 +43,11 @@
 #include "ADM_audiodevice/ADM_deviceSDL.h"
 #endif
 
+#ifdef CYG_MANGLING
+#include "ADM_audiodevice/ADM_deviceWin32.h"
+#endif
+
+
 #include "gui_action.hxx"
 #include "audio_out.h"
 
@@ -124,6 +129,7 @@ AUDIO_DEVICE id;
 			case DEVICE_ALSA:
 			case DEVICE_COREAUDIO:
 			case DEVICE_SDL:
+			case DEVICE_WIN32:
 			
 						printf("Using real audio device\n");
 						AVDM_switch(id);
@@ -145,8 +151,12 @@ AUDIO_DEVICE id;
 			AVDM_switch(DEVICE_OSS);			
 			printf("\n Using OSS\n");
 		#else
+			#ifdef CYG_MANGLING
+			AVDM_switch(DEVICE_WIN32);
+			#else
 			AVDM_switch(DEVICE_DUMMY);
 			printf("\n Using dummy\n");
+			#endif
 		#endif
 		}
 }
@@ -197,7 +207,12 @@ void AVDM_switch(AUDIO_DEVICE action)
 								break;
 #endif
 
-
+#ifdef CYG_MANGLING
+		case DEVICE_WIN32:
+								device=new win32AudioDevice;
+								currentDevice=DEVICE_WIN32;
+								break;
+#endif
 
 
 		 case  DEVICE_DUMMY:
