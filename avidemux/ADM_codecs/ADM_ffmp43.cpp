@@ -84,6 +84,7 @@ decoderFF::decoderFF(uint32_t w,uint32_t h) :decoders(w,h)
 //				memset(&_context,0,sizeof(_context));
 				_allowNull=0;
 				_context=NULL;
+                                _refCopy=0;
 #if LIBAVCODEC_BUILD >= 4624
    	_context=avcodec_alloc_context();
 #else
@@ -223,8 +224,11 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 				if(_allowNull)
 				{
 					if(flagz) *flagz=AVI_KEY_FRAME;
-					memset(out->data,0,_w*_h);
-					memset(out->data+_w*_h,128,(_w*_h)>>1);
+                                        if(!_refCopy)
+                                        {
+					   memset(out->data,0,_w*_h);
+					   memset(out->data+_w*_h,128,(_w*_h)>>1);
+                                        }
 					printf("\n ignoring got pict ==0\n");
 					return 1;
 
@@ -303,7 +307,43 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 		// Default is YV12 or I420
 		// In that case depending on swap u/v
 		// we do it or not
-	
+	                        if(_refCopy)
+                                {
+                                        uint32_t u,v;
+                                        out->_planes[0]=(uint8_t *)_frame.data[0];
+                                        out->_planeStride[0]=_frame.linesize[0];
+                                        if(_swapUV)
+                                        {
+                                                u=1;v=2;
+                                        }else
+                                        {
+                                                u=2;v=1;
+                                        }
+                                        out->_planes[1]=(uint8_t *)_frame.data[u];
+                                        out->_planeStride[1]=_frame.linesize[u];
+                                        out->_planes[2]=(uint8_t *)_frame.data[v];
+                                        out->_planeStride[2]=_frame.linesize[v];
+
+                                        _lastQ=0; //_context->quality;
+                                        out->_Qp=(_frame.quality*32)/FF_LAMBDA_MAX;
+                                        out->flags=frameType();
+                                        if(flagz)
+                                                *flagz=out->flags;
+                                        // Quant ?
+                                        if(_frame.qstride && _frame.qscale_table)    
+                                        {
+                                                out->quant=(uint8_t *)_frame.qscale_table;
+                                                out->_qStride=_frame.qstride;
+                                                out->_qSize=(_w+15)>>4;
+                                                out->_qSize*=(_h+15)>>4;
+                                        }
+                                        else
+                                        {
+                                                out->_qSize=out->_qStride=0;
+                                                out->quant=NULL;
+                                        }
+                                        return 1;
+                                }
 				//printf("420p\n");
 				src= (uint8_t **) _frame.data;
 				
@@ -331,33 +371,6 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 				}
 				else out->_qStride=0;
 
-#if 0
-			if(_postproc.postProcType && _postproc.postProcStrength)
-			{ 	// we do postproc !
-				// keep
-
-		 				oBuff[0]=_internalBuffer;
-		 				oBuff[1]=_internalBuffer+_frame.linesize[0]*_h;
- 		 				oBuff[2]=oBuff[1]+((_frame.linesize[1]*_h)>>1);
-        			for(uint32_t s=0;s<3;s++)
-	          		{
-			            strideTab[s]=strideTab2[s]=_frame.linesize[s];
-            			}
-		 		   pp_postprocess(
-		      			_frame.data,
-		        		strideTab,
-		          		oBuff,
-		         		strideTab2,
-		      			_w,
-		        		_h,
-		          		_frame.qscale_table,
-		          		_frame.qstride,
-		         		_postproc.ppMode,
-		          		_postproc.ppContext,
-		          		_frame.pict_type);
-			  	src= (uint8_t **)oBuff;
-			}
-#endif
 			break;
 /*
 uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *oy2, 
@@ -476,6 +489,7 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 
 decoderFFDiv3::decoderFFDiv3(uint32_t w,uint32_t h)    :decoderFF(w,h) 
 {
+                      _refCopy=1; // YUV420 only
 		      if (avcodec_open(_context, &msmpeg4v3_decoder) < 0) 
 		      {
 					printf(" Decoder init: FFMpeg MS MPEG43 video decoder failed!\n");
@@ -489,7 +503,7 @@ decoderFFMpeg4VopPacked::decoderFFMpeg4VopPacked(uint32_t w,uint32_t h)       :d
 {
 // force low delay as avidemux don't handle B-frames
 
-
+      _refCopy=1; // YUV420 only
       if (avcodec_open(_context,& mpeg4_decoder) < 0)
 	      {
 				printf(" Decoder init: FFMpeg MPEG4 video decoder failed!\n");
@@ -505,6 +519,7 @@ decoderFFMpeg4::decoderFFMpeg4(uint32_t w,uint32_t h)       :decoderFF(w,h)
 // force low delay as avidemux don't handle B-frames
 
 		  _context->flags|=CODEC_FLAG_LOW_DELAY;
+                  _refCopy=1; // YUV420 only
  		//  _context->flags|=FF_DEBUG_VIS_MV;
       if (avcodec_open(_context,& mpeg4_decoder) < 0)
 	      {
@@ -531,6 +546,7 @@ decoderFFDV:: decoderFFDV(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)        :d
 }
 decoderFFMP42::decoderFFMP42(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
+      _refCopy=1; // YUV420 only
       if (avcodec_open(_context,& msmpeg4v2_decoder) < 0)
 	      {
 					printf(" Decoder init: FFMpeg MP42 video decoder failed!\n");
@@ -546,6 +562,7 @@ decoderFFMpeg12::decoderFFMpeg12(uint32_t w,uint32_t h,uint32_t extraLen,uint8_t
 {
 int got_picture=0;
   	_context->flags|=CODEC_FLAG_LOW_DELAY;
+        _refCopy=1; // YUV420 only
       if (avcodec_open(_context,& mpeg1video_decoder) < 0)
 	      {
 					printf(" Decoder init: FFMpeg Mpeg1/2 video decoder failed!\n");
@@ -578,6 +595,7 @@ int got_picture=0;
 
 decoderFFH263::decoderFFH263(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
+      _refCopy=1; // YUV420 only
       if (avcodec_open(_context,& h263_decoder) < 0)
 	      {
 					printf(" Decoder init: FFMpeg h263 video decoder failed!\n");
@@ -590,6 +608,7 @@ decoderFFH263::decoderFFH263(uint32_t w,uint32_t h)       :decoderFF(w,h)
 }
 decoderFFV1::decoderFFV1(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
+      _refCopy=1; // YUV420 only
       if (avcodec_open(_context,& ffv1_decoder) < 0)
 	      {
 					printf(" Decoder init: FFMpeg ffV1 video decoder failed!\n");
@@ -617,6 +636,7 @@ decoderFF_ffhuff::decoderFF_ffhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d) 
 }
 decoderFFH264::decoderFFH264(uint32_t w,uint32_t h)  :decoderFF(w,h) 
 {
+  _refCopy=1; // YUV420 only
   printf("Initializing lavcodec H264 decoder\n");
   if (avcodec_open(_context,& h264_decoder) < 0)
   {

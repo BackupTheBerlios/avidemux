@@ -473,15 +473,16 @@ uint8_t refOnly=0;
 			iBuff[1]= UPLANE((tmpImage));
  			iBuff[2]= VPLANE((tmpImage));
 		
-                	oBuff[0]= YPLANE(image);
-			oBuff[1]= UPLANE(image);
- 			oBuff[2]= VPLANE(image);
+                	
                                                                 
                         strideTab[0]=strideTab2[0]=_info.width;
                         strideTab[1]=strideTab2[1]=_info.width>>1;
                         strideTab[2]=strideTab2[2]=_info.width>>1;
                 }
-        			
+        	        oBuff[0]= YPLANE(image);
+                        oBuff[1]= UPLANE(image);
+                        oBuff[2]= VPLANE(image);		
+
 		 pp_postprocess(
 		 		iBuff,
 		 		strideTab,

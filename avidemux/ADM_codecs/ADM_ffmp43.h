@@ -23,6 +23,7 @@
  class decoderFF : public decoders
 {
      protected:
+                                        uint8_t                 _refCopy;
 					AVCodecContext  	*_context;
 					AVFrame			_frame;
 					uint8_t 		*_internalBuffer;					
@@ -32,8 +33,10 @@
 					
 					uint32_t		_showMv;
      public:
+                                        
      					decoderFF(uint32_t w,uint32_t h);
          		virtual		~decoderFF();
+                        virtual         uint8_t dontcopy(void) { return _refCopy;}   
     			virtual 	uint8_t 	uncompress(uint8_t *in,ADMImage *out,
 						uint32_t len,uint32_t *flag=NULL) 		;
    		       virtual 		void 	setParam( void );
