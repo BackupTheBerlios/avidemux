@@ -93,7 +93,7 @@ extern uint8_t audioShift;
 extern int32_t audioDelay;
 // IF set do 1st pass with CBR with max bitrate = average bitrate AND disabling padding
 // else do 1st pass with constant Q=6
-#define ADM_1PASS_CBR 1
+//#define ADM_1PASS_CBR 1
 #define MAXAUDIO 56000
 
 extern const char *getStrFromAudioCodec( uint32_t codec);
@@ -545,7 +545,7 @@ int intra,q;
 	assert(  _buffer);
 	assert(  _buffer_out);
 
-	q=6; // q=2
+	q=2; // q=2
 	encoding->setPhasis("1st Pass");
 	bitrate=0; // we dont care in pass 1 ...
 
