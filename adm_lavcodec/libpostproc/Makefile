@@ -13,6 +13,9 @@ SPPOBJS=postprocess_pic.o
 
 CFLAGS  += $(OPTFLAGS) $(MLIB_INC) -I. -I.. $(EXTRA_INC) -I/usr/include/malloc
 # -I/usr/X11R6/include/
+ifeq ($(TARGET_ALTIVEC),yes)
+CFLAGS+=-maltivec -mabi=altivec	 -faltivec
+endif
 
 .SUFFIXES: .c .o
 

@@ -68,6 +68,9 @@ char stringFQ[60];
 		ADD(3DNOW,3DNOW);
 		ADD(MMXEXT,MMX2);
 #endif		
+#ifdef HAVE_ALTIVEC
+		ppCaps|=PP_CPU_CAPS_ALTIVEC;
+#endif	
 			pp->ppContext=pp_get_context(pp->w, pp->h,          			
          			ppCaps
 			   );		
