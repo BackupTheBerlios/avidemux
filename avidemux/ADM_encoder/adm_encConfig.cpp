@@ -559,6 +559,7 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 					case  CodecH263:
 					case  CodecH263P:
 					case  CodecHuff:
+                                        case  CodecFFhuff:
 					case  CodecFFV1:
 					case  CodecSnow:
 											MAKECONF(ffmpegConfig);
@@ -629,6 +630,7 @@ const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
 					case  CodecH263:
 					case  CodecH263P:
 					case  CodecHuff:
+                                        case  CodecFFhuff:
 					case  CodecFFV1:
 					case CodecSnow:
 
@@ -883,6 +885,7 @@ static const codecEnumByName mycodec[]=
 	{CodecXDVD	,"DVD (lavc)","XDVD"},
 	{CodecFF	,"Lav Mpeg4","FFmpeg4"},
 	{CodecH263	,"H263","H263"},
+        {CodecFFhuff    ,"FF Huffyuv","FFHUFF"},
 	{CodecH263P	,"H263+","H263+"},
 	{CodecHuff	,"Huffyuv","Huffyuv"},
 	{CodecFFV1	,"FFV1","FFV1"},
@@ -1087,6 +1090,7 @@ void videoCodecConfigureUI( void )
 #endif
 #ifdef USE_FFMPEG	
 		case CodecHuff:
+                case CodecFFhuff:
 				break;
 		case CodecFFV1:
 				break;
@@ -1185,6 +1189,7 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param, uint32_t ex
 					case  CodecH263:
 					case  CodecH263P:
 					case  CodecHuff:
+                                        case  CodecFFhuff:
 					case  CodecFFV1:
 					case  CodecSnow:
 
@@ -1263,6 +1268,9 @@ Encoder *e=NULL;
 #endif		
 
 #ifdef USE_FFMPEG
+                case   CodecFFhuff:             
+                                        e=new   EncoderFFMPEGFFHuff(&ffmpegConfig);
+                                        break;
 		case   CodecHuff:
 					e=new   EncoderFFMPEGHuff(&ffmpegConfig);
 				    	break;

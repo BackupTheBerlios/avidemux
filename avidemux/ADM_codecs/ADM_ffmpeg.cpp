@@ -263,6 +263,9 @@ ffmpegEncoder::initContext (void)
     case FF_MJPEG:
       res = avcodec_open (_context, &mjpeg_encoder);
       break;
+    case FF_FFHUFF:
+        res=avcodec_open (_context, &ffvhuff_encoder);
+        break;
     case FF_SNOW:
       res = avcodec_open (_context, &snow_encoder);
       break;
@@ -840,7 +843,52 @@ uint8_t
   return 1;
 
 }
+//__________________________________
+//------------------------------
+uint8_t
+ffmpegEncoderFFHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
+{
+  UNUSED_ARG (val);
+  UNUSED_ARG (vbr);
+  mplayer_init ();
 
+  _context->frame_rate_base = 1000;
+  _context->frame_rate = fps1000;
+
+
+  _context->bit_rate = 0;
+  _context->bit_rate_tolerance = 1024 * 8 * 1000;
+  _context->gop_size = 250;
+
+  return initContext ();
+}
+
+
+
+uint8_t
+  ffmpegEncoderFFHuff::encode (ADMImage * in,
+                             uint8_t * out, uint32_t * len, uint32_t * flags)
+{
+  int32_t sz = 0;
+
+  encodePreamble (in->data);
+
+
+
+  //_context->quality=_qual;
+
+  if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
+    return 0;
+  _last_coded_frame=_context->real_pict_num;
+  *len = (uint32_t) sz;
+  if (flags)
+    *flags = AVI_KEY_FRAME;
+  res.is_key_frame = _frame.key_frame;
+  return 1;
+
+}
+
+//_______________________________________
 uint8_t
 ffmpegEncoder::getExtraData (uint32_t * l, uint8_t ** d)
 {

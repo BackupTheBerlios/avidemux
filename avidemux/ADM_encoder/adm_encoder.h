@@ -118,6 +118,7 @@ typedef enum
 	CodecXSVCD,
 	CodecXDVD,
 	CodecXvid4,
+        CodecFFhuff,
 	CodecDummy	
 }SelectCodecType;
 

@@ -135,6 +135,15 @@ class decoderFFhuff : public decoderFF
      				         	decoderFFhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d) ;
 
 }   ;
+class decoderFF_ffhuff : public decoderFF
+{
+           protected:
+                                
+                        
+     public:
+                                                decoderFF_ffhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d) ;
+
+}   ;
 class decoderFFWMV2 : public decoderFF
 {
 	   protected:

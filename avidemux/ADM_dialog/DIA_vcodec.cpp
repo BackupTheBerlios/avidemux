@@ -43,6 +43,7 @@ extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
 	{CodecH263,"Lavcodec H263"},
 	{CodecH263P,"Lavcodec H263+"},
 	{CodecHuff,"Huffyuv"},
+        {CodecFFhuff,"FF Huffyuv"},
 	{CodecFFV1,"FFV1"},
 	{CodecSnow,"Snow"},
 #ifdef USE_XVID_4	

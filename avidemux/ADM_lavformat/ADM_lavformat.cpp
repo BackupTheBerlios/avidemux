@@ -124,7 +124,7 @@ uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, 
 		return 0;
 	}
 	oc->oformat = fmt;
-	sprintf(oc->filename,"file://%s",filename);
+	snprintf(oc->filename,1000,"file://%s",filename);
 	// Video
 	//________
 	

@@ -185,7 +185,11 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 
 			  	     	return(decoders *)( new decoderFFhuff(w,h,extraLen,extraData));
 	   }
+  if(fourCC::check(fcc,(uint8_t *)"FFVH"))
+          {
 
+                                        return(decoders *)( new decoderFF_ffhuff(w,h,extraLen,extraData));
+           }
     if(fourCC::check(fcc,(uint8_t *)"SVQ3"))
           {
 

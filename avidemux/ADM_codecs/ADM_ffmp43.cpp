@@ -600,6 +600,21 @@ decoderFFV1::decoderFFV1(uint32_t w,uint32_t h)       :decoderFF(w,h)
 				}
 
 }
+decoderFF_ffhuff::decoderFF_ffhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)       :decoderFF(w,h) 
+{
+      _context->extradata=(void *)d;
+      _context->extradata_size=(int)l;
+      printf("FFhuff: We have :%d bytes of extra data\n",l);
+      if (avcodec_open(_context,& ffvhuff_decoder) < 0)
+              {
+                                        printf(" Decoder init: FFMpeg ffhuff video decoder failed!\n");
+                                }
+                                else
+                                {
+                                        printf(" Decoder init: FFMpeg ffhuff video decoder initialized!\n");
+                                }
+        
+}
 
 decoderFFhuff::decoderFFhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)       :decoderFF(w,h) 
 {

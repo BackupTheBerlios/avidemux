@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "avformat.h"
-//MEANX #include "bitstream.h"
+#include "bitstream.h"
 
 #define MAX_PAYLOAD_SIZE 4096
 //#define DEBUG_SEEK
@@ -1031,13 +1031,11 @@ static int output_packet(AVFormatContext *ctx, int flush){
     int best_i= -1;
     int best_score= INT_MIN;
     int ignore_constraints=0;
-    int data_present;
     int64_t scr= s->last_scr;
     PacketDesc *timestamp_packet;
     const int64_t max_delay= av_rescale(ctx->max_delay, 90000, AV_TIME_BASE);
 
 retry:
-    data_present=0;
     for(i=0; i<ctx->nb_streams; i++){
         AVStream *st = ctx->streams[i];
         StreamInfo *stream = st->priv_data;
@@ -1051,7 +1049,7 @@ retry:
         if(avail_data==0)
             continue;
         assert(avail_data>0);
-	data_present++;
+
         if(space < s->packet_size && !ignore_constraints)
             continue;
             
@@ -1075,7 +1073,6 @@ retry:
             if(pkt_desc && pkt_desc->dts < best_dts)
                 best_dts= pkt_desc->dts;
         }
-	if(!data_present && flush) return 0; // Meanx : avoid being stuck in there
 
 #if 0
         av_log(ctx, AV_LOG_DEBUG, "bumping scr, scr:%f, dts:%f\n", 
@@ -1164,7 +1161,6 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, AVPacket *pkt)
 
     if(pts != AV_NOPTS_VALUE) pts += preload;
     if(dts != AV_NOPTS_VALUE) dts += preload;
-	//printf("st:%d Pts:%lld Dts:%lld \n",pkt->stream_index, pkt->pts,pkt->dts);
 
 //av_log(ctx, AV_LOG_DEBUG, "dts:%f pts:%f flags:%d stream:%d nopts:%d\n", dts/90000.0, pts/90000.0, pkt->flags, pkt->stream_index, pts != AV_NOPTS_VALUE);
     *stream->next_packet=
@@ -1178,7 +1174,7 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, AVPacket *pkt)
     stream->next_packet= &pkt_desc->next;
 
     fifo_realloc(&stream->fifo, fifo_size(&stream->fifo, NULL) + size + 1);
- 
+
     if (s->is_dvd){
         if (is_iframe) {
             stream->fifo_iframe_ptr = stream->fifo.wptr;
@@ -1688,7 +1684,8 @@ AVInputFormat mpegps_demux = {
 int mpegps_init(void)
 {
  //meanx
-       register_protocol(&file_protocol);
+        register_protocol(&file_protocol);
+
 #ifdef CONFIG_ENCODERS
     av_register_output_format(&mpeg1system_mux);
     av_register_output_format(&mpeg1vcd_mux);

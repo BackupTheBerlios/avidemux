@@ -22,12 +22,6 @@
 #undef NDEBUG
 #include <assert.h>
 
-#if 0
-#include <errno.h>
-#include <err.h>
-#include <error.h>
-#endif //MEANX
-
 AVInputFormat *first_iformat = NULL;
 AVOutputFormat *first_oformat = NULL;
 AVImageFormat *first_image_format = NULL;
@@ -64,7 +58,7 @@ int match_ext(const char *filename, const char *extensions)
         p = extensions;
         for(;;) {
             q = ext1;
-            while (*p != '\0' && *p != ',') 
+            while (*p != '\0' && *p != ',' && q-ext1<sizeof(ext1)-1) 
                 *q++ = *p++;
             *q = '\0';
             if (!strcasecmp(ext1, ext)) 
@@ -187,7 +181,10 @@ static void av_destruct_packet(AVPacket *pkt)
  */
 int av_new_packet(AVPacket *pkt, int size)
 {
-    void *data = av_malloc(size + FF_INPUT_BUFFER_PADDING_SIZE);
+    void *data;
+    if((unsigned)size > (unsigned)size + FF_INPUT_BUFFER_PADDING_SIZE)
+        return AVERROR_NOMEM;        
+    data = av_malloc(size + FF_INPUT_BUFFER_PADDING_SIZE);
     if (!data)
         return AVERROR_NOMEM;
     memset(data + size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
@@ -207,6 +204,8 @@ int av_dup_packet(AVPacket *pkt)
         uint8_t *data;
         /* we duplicate the packet and don't forget to put the padding
            again */
+        if((unsigned)pkt->size > (unsigned)pkt->size + FF_INPUT_BUFFER_PADDING_SIZE)
+            return AVERROR_NOMEM;        
         data = av_malloc(pkt->size + FF_INPUT_BUFFER_PADDING_SIZE);
         if (!data) {
             return AVERROR_NOMEM;
@@ -239,7 +238,7 @@ void fifo_free(FifoBuffer *f)
 int fifo_size(FifoBuffer *f, uint8_t *rptr)
 {
     int size;
-
+    
     if(!rptr)
         rptr= f->rptr;
 
@@ -260,7 +259,6 @@ int fifo_read(FifoBuffer *f, uint8_t *buf, int buf_size, uint8_t **rptr_ptr)
     if(!rptr_ptr)
         rptr_ptr= &f->rptr;
     rptr = *rptr_ptr;
-
 
     if (f->wptr >= rptr) {
         size = f->wptr - rptr;
@@ -284,9 +282,10 @@ int fifo_read(FifoBuffer *f, uint8_t *buf, int buf_size, uint8_t **rptr_ptr)
     *rptr_ptr = rptr;
     return 0;
 }
-void fifo_realloc(FifoBuffer *f, int new_size){
-    int old_size= f->end - f->buffer;
 
+void fifo_realloc(FifoBuffer *f, unsigned int new_size){
+    unsigned int old_size= f->end - f->buffer;
+    
     if(old_size < new_size){
         uint8_t *old= f->buffer;
 
@@ -664,7 +663,7 @@ static int is_intra_only(AVCodecContext *enc){
         case CODEC_ID_RAWVIDEO:
         case CODEC_ID_DVVIDEO:
         case CODEC_ID_HUFFYUV:
-       //MEANX case CODEC_ID_FFVHUFF:
+        case CODEC_ID_FFVHUFF:
         case CODEC_ID_ASV1:
         case CODEC_ID_ASV2:
         case CODEC_ID_VCR1:
@@ -1014,10 +1013,16 @@ int av_add_index_entry(AVStream *st,
     AVIndexEntry *entries, *ie;
     int index;
     
+    if((unsigned)st->nb_index_entries + 1 >= UINT_MAX / sizeof(AVIndexEntry))
+        return -1;
+    
     entries = av_fast_realloc(st->index_entries,
                               &st->index_entries_allocated_size,
                               (st->nb_index_entries + 1) * 
                               sizeof(AVIndexEntry));
+    if(!entries)
+        return -1;
+
     st->index_entries= entries;
 
     index= av_index_search_timestamp(st, timestamp, 0);
@@ -1630,15 +1635,12 @@ static void av_estimate_timings(AVFormatContext *ic)
             file_size = 0;
     }
     ic->file_size = file_size;
-#if 0 //MEANX
-    if ((ic->iformat == &mpegps_demux || ic->iformat == &mpegts_demux) && file_size && !ic->pb.is_streamed) {
+
+    //MEANX : only PS /if ((ic->iformat == &mpegps_demux || ic->iformat == &mpegts_demux) && file_size && !ic->pb.is_streamed) {
+    if ((ic->iformat == &mpegps_demux ) && file_size && !ic->pb.is_streamed) {
         /* get accurate estimate from the PTSes */
         av_estimate_timings_from_pts(ic);
-    }
-#else
-	if(0) {}
-#endif //MEANX
-    else if (av_has_timings(ic)) {
+    } else if (av_has_timings(ic)) {
         /* at least one components has timings - we use them for all
            the components */
         fill_all_stream_timings(ic);
@@ -1835,14 +1837,12 @@ int av_find_stream_info(AVFormatContext *ic)
              st->codec.codec_id == CODEC_ID_H261 ||
              st->codec.codec_id == CODEC_ID_VORBIS ||
              st->codec.codec_id == CODEC_ID_MJPEG ||
-#if 0 //MEANX	     
              st->codec.codec_id == CODEC_ID_PNG ||
              st->codec.codec_id == CODEC_ID_PAM ||
              st->codec.codec_id == CODEC_ID_PGM ||
              st->codec.codec_id == CODEC_ID_PGMYUV ||
              st->codec.codec_id == CODEC_ID_PBM ||
              st->codec.codec_id == CODEC_ID_PPM ||
-#endif	     
              (st->codec.codec_id == CODEC_ID_MPEG4 && !st->need_parsing)))
             try_decode_frame(st, pkt->data, pkt->size);
         
@@ -1893,7 +1893,7 @@ int av_find_stream_info(AVFormatContext *ic)
                        higher level as it can change in a film */
                     if (coded_frame_rate >= 24.97 && 
                         (est_frame_rate >= 23.5 && est_frame_rate < 24.5)) {
-                        st->r_frame_rate = 24024;
+                        st->r_frame_rate = 24000;
                         st->r_frame_rate_base = 1001;
                     }
                 }
@@ -1957,7 +1957,7 @@ int av_read_pause(AVFormatContext *s)
         return AVERROR_NOTSUPP;
     return s->iformat->read_pause(s);
 }
-#endif // MEANX
+#endif //MEANX
 /**
  * Close a media file (but not its codecs)
  *
@@ -2142,7 +2142,7 @@ static int compute_pkt_fields2(AVStream *st, AVPacket *pkt){
         return -1;
     }
     if(pkt->dts != AV_NOPTS_VALUE && pkt->pts != AV_NOPTS_VALUE && pkt->pts < pkt->dts){
-        av_log(NULL, AV_LOG_ERROR, "error, pts < dts (%lu / %lu)\n",pkt->pts, pkt->dts);
+        av_log(NULL, AV_LOG_ERROR, "error, pts < dts\n");
         return -1;
     }
 

@@ -111,6 +111,64 @@ uint8_t EncoderFFMPEGHuff::configure (AVDMGenericVideoStream * instream)
 
 
 }
+
+//_________________ffhuff_______________________________
+EncoderFFMPEGFFHuff::EncoderFFMPEGFFHuff(FFMPEGConfig *config) :
+        EncoderFFMPEG(FF_FFHUFF,config)
+{
+        _id=FF_FFHUFF;
+        _frametogo=0;
+
+
+}
+uint8_t EncoderFFMPEGFFHuff::encode (uint32_t frame, uint32_t * len, uint8_t * out,
+                          uint32_t * flags)
+{
+uint32_t l,f;
+  ADM_assert (_codec);
+  ADM_assert (_in);
+
+  if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
+    {
+      printf ("\n Error : Cannot read incoming frame !");
+      return 0;
+    }
+
+      return _codec->encode (_vbuffer, out, len, flags);
+}
+ uint8_t EncoderFFMPEGFFHuff::hasExtraHeaderData( uint32_t *l,uint8_t **data)
+{
+uint8_t r=0;
+        r=_codec->getExtraData(l,data);
+        printf("Huff has %d extra bytes\n",*l);
+        return r;
+
+}       
+uint8_t EncoderFFMPEGFFHuff::configure (AVDMGenericVideoStream * instream)
+{
+ ADM_assert (instream);
+  ADV_Info *info;
+
+
+
+  info = instream->getInfo ();
+  _fps=info->fps1000;
+  _w = info->width;
+  _h = info->height;
+ // _vbuffer = new uint8_t[_w * _h * 3];
+ _vbuffer=new ADMImage(_w,_h);
+  ADM_assert (_vbuffer);
+  _in = instream;
+
+  _codec = new ffmpegEncoderCQ (_w, _h,_id);
+  _codec->init (_param.qz,_fps,0);
+  return 1;
+
+
+
+}
+
+
 //-------------------ffv1------------------
 EncoderFFMPEGFFV1::EncoderFFMPEGFFV1(FFMPEGConfig *config) :
 	EncoderFFMPEG(FF_HUFF,config)
@@ -231,6 +289,9 @@ const char *EncoderFFMPEG::getCodecName(void )
 {
   switch(_id)
   {
+                case FF_FFHUFF:
+                                        return "FFVH";
+                                        break;
   		case FF_HUFF:
 					return "HFYU";
 					break;

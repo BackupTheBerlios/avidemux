@@ -32,7 +32,8 @@ typedef enum
   FF_FFV1 = 7,
   FF_MJPEG = 8,
   FF_MPEG2 = 9,
-  FF_SNOW = 10
+  FF_SNOW = 10,
+  FF_FFHUFF= 11,
 } FF_CODEC_ID;
 
 /*
@@ -213,6 +214,28 @@ class ffmpegEncoderHuff:public ffmpegEncoder
 
   }
 };
+class ffmpegEncoderFFHuff:public ffmpegEncoder
+{
+  protected:public:ffmpegEncoderFFHuff (uint32_t width, uint32_t height,
+                                      FF_CODEC_ID id):ffmpegEncoder (width,
+                                                                     height,
+                                                                     id)
+  {
+
+  };
+
+  virtual uint8_t init (uint32_t val, uint32_t fps1000, uint8_t vbr = 0);
+
+  virtual uint8_t encode (ADMImage * in,
+                          uint8_t * out, uint32_t * len, uint32_t * flags);
+
+  virtual ~ ffmpegEncoderFFHuff ()
+  {
+    stopEncoder ();
+
+  }
+};
+
 
 class ffmpegEncoderFFV1:public ffmpegEncoder
 {

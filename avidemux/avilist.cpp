@@ -46,7 +46,7 @@ AviList::AviList(const char *name, ADMFile * f)
     ADM_assert(_fcc);
     _ff = f;
     ADM_assert(_ff);
-    //_begin=_end=(fpos_t )0;
+    _begin=_end=0;
 }
 
 // Mark begin
