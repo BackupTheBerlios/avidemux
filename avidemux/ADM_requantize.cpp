@@ -129,7 +129,26 @@ void A_requantize( void )
 	
 	A_requantize2(percent,quality,out_name);
 }
-
+#if 1
+#define PACK_AUDIO \
+{ \
+	uint32_t samples; \
+	uint32_t fill=0; \
+	uint32_t audiolen; \
+	audioWanted+=audioInc; \
+	while(audioGot <audioWanted) \
+	{				\
+		if(!audio->getPacket(audioBuffer+fill, &audiolen, &samples))	\
+		{ \
+			break; \
+		}\
+		fill+=audiolen; \
+		audioGot+=audiolen; \
+	} \
+	if(fill) muxer->writeAudioPacket(fill,audioBuffer); \
+	else	printf("requant: frame %lu : no more audio\n",i);\
+}
+#else
 #define PACK_AUDIO 	{ uint32_t audiolen=0, audioread=0;	\
 				audioWanted+=audioInc; \
 				if(muxer->audioEmpty()) \
@@ -140,6 +159,7 @@ void A_requantize( void )
 				if(audioread!=audiolen) printf("Mmm not enough audio..\n"); \
 				muxer->writeAudioPacket(audioread,audioBuffer);\
 				audioGot+=audioread;}
+#endif				
 #define PACK_FRAME(i) \
 			video_body->getRaw (i, buffer, &len); \
 			Mrequant_frame(buffer,  len,outbuffer, &lenout); \

@@ -185,7 +185,7 @@ uint8_t  mpegWritter::save_svcd(char *name)
 	return 0;
 }
 
-
+#if 0
 #define PACK_AUDIO 	{ uint32_t audiolen=0, audioread=0;	\
 				 { \
 				audioWanted+=_audioOneFrame; \
@@ -200,7 +200,27 @@ uint8_t  mpegWritter::save_svcd(char *name)
 				audioGot+=audioread;\
 				}\
 			}
-				
+#else
+#define PACK_AUDIO \
+{ \
+	uint32_t samples; \
+	uint32_t fill=0; \
+	audioWanted+=_audioOneFrame; \
+	while(audioGot <audioWanted) \
+	{				\
+		if(!_audio->getPacket(_audioBuffer+fill, &audiolen, &samples))	\
+		{ \
+			break; \
+		}\
+		fill+=audiolen; \
+		audioGot+=audiolen; \
+	} \
+	if(fill) _muxer->writeAudioPacket(fill,_audioBuffer); \
+	else	printf("Mpeg Encoding: frame %lu : no more audio\n",i);\
+}
+
+
+#endif
 /*---------------------------------------------------------------------------------------*/
 uint8_t  mpegWritter::save_dvd(char *name)
 {
