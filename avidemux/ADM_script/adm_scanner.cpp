@@ -35,7 +35,8 @@ static uint32_t pushed;
 static Arg args[MAXPARAM];
 void dumpStack( char *cmd, int nb, Arg *arg);
 extern ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg,uint8_t fake);
-
+extern void GUI_Quiet( void );
+extern void GUI_Verbose( void );
 static char scriptError[1024];
 static uint8_t thisIsADrill;
 //_____________________________________
@@ -74,7 +75,9 @@ int i;
 		exit(0) ;	
 	}
 	pushed=0;
+	GUI_Quiet();
 	i=yyparse();
+	GUI_Verbose();
 	fclose(yyin);
 	if(!i)
 		{
