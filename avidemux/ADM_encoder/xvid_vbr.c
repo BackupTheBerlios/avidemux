@@ -99,6 +99,8 @@ static vbr_finish_function vbr_finish_2pass2;
 
 
 */
+static int vbr_predict(vbr_control_t *state,int original_size,int qp);
+static float vbr_get_comp(int oldbits, int qporg, int newbits, int qpused);
 static int  vbr_make_variance(vbr_control_t *state, float compression,  int *variance,int *bitrate);
 static int vbr_getstuff(vbr_control_t *state, int dbytes,double diff);
 static int  vbr_make_clipping(vbr_control_t *state, float compression);
@@ -1267,6 +1269,12 @@ _AGAIN_:
 	/* Initialize the frame counter */
 	state->cur_frame = 0;
 	state->last_keyframe = 0;
+	/* Reset compressibility to 0 = linear scale */
+	{
+		int j;
+		for(j=0;j<AVG_LOOKUP;j++)
+			state->compr[j]=0;
+	}
 
 	// VBV buffer init
 	state->vbv_fullness=state->vbv_buffer_size;
@@ -1559,15 +1567,19 @@ static int vbr_getquant_2pass2(void *sstate)
 	tryme=20;
 	ok=0;
 	
-	quant+=state->qinc;	
+	//quant+=state->qinc;	
 	orgquant=quant;
 _requant:
 	while(tryme && !ok)
 	{
+		int frame;
+		
 		projected_vbv=state->vbv_fullness;
  		for( i=0;i<state->roundup>>1;i++)
 		{
-			projected_vbv-=state->size[state->cur_frame+i]*2*8/quant;
+			frame=vbr_predict(state,state->size[state->cur_frame+i]*2,quant);
+			frame*=8;
+			projected_vbv-=frame;
 			if(projected_vbv<0)
 			{
 				aprintf("underflow at %d + %d\n",state->cur_frame,i);
@@ -1592,6 +1604,7 @@ _requant:
 	{
 		printf("Could not compensate underflow!\n");
 	}
+	aprintf("Predicted size : %d\n",vbr_predict(state,state->size[state->cur_frame]*2,quant));
 	aprintf("Orgquant:%d finalQuant:%d\n",orgquant,quant);
 	if(quant-orgquant>2) state->qinc+=1+(quant-orgquant)>>1;
 	if(state->qinc) state->qinc--;	
@@ -1743,6 +1756,8 @@ static int vbr_update_2pass2(void *sstate,
 /* Update vbv */
 	if(state->maxAllowedBitrate && state->cur_frame<state->nb_frames-state->roundup)
 	{
+		int rank,old;
+		float comp;
 			state->vbv_fullness-=total_bytes*8;
 			state->vbv_fullness+=state->bits_per_image;
 			if(state->vbv_fullness>state->vbv_buffer_size)
@@ -1754,6 +1769,11 @@ static int vbr_update_2pass2(void *sstate,
 				printf("** Buffer undeflow: %d at frame :%d **\n",state->vbv_fullness,state->cur_frame);
 				state->vbv_fullness=0;
 			}
+			// Update compressility
+			old=state->cur_frame-1;
+			rank=old%AVG_LOOKUP;
+			state->compr[rank]=vbr_get_comp(state->size[old],2,total_bytes,quant);
+			aprintf(">>Size : %d\n",total_bytes);
 			aprintf("Buffer fullness:%d\n",100*state->vbv_fullness/state->vbv_buffer_size);
 	}		
 
@@ -1851,6 +1871,59 @@ static int vbr_getquant_fixedquant(void *sstate)
 		
 	/* No credit frame - return fixed quant */
 	return(state->fixed_quant);
+
+}
+/*__________________________________________________________________
+
+	Reverse the below formula
+	newbits/oldbuts=newquang^ -comp
+	log(newq^ -comp)=log(newbit/oldbits)
+	comp=-log(newbits/oldbits)/log(newq/oldq)
+*/
+float vbr_get_comp(int oldbits, int qporg, int newbits, int qpused)
+{
+	float comp;
+	
+	comp=newbits;
+	comp/=oldbits;
+	comp=log(comp);
+	comp/=log(qpused/qporg);
+	aprintf("Old q:%d new q : %d oldBits:%d newbits:%d comp:%f\n",
+			qporg,qpused,oldbits,newbits,-comp);
+	return -comp;
+}
+/*_______________________________________________________________
+	Predict the size of the image
+	Using a exp(-comp) formula instead of linear formula
+	
+	Idea by Peter Cheat
+__________________________________________________________________
+*/
+int vbr_predict(vbr_control_t *state,int original_size,int qp)
+{
+ // Peter Cheat formula :Pridicted Bits Frame 10 Will Use = (Bits Used At Quantiser 1) * (New Quantiser ^ -Compressibility)
+ // avg lookup compressibility
+ 	int start;
+	int pred,i;
+	float comp=0;
+		
+	start=state->cur_frame;
+	start+=state->roundup;
+	start-=AVG_LOOKUP;
+	start%=state->roundup;
+	
+	for(i=0;i<AVG_LOOKUP;i++)
+	{
+		comp+=state->compr[start];
+		start++;
+		start%=AVG_LOOKUP;
+	}
+	comp=comp/AVG_LOOKUP;
+	
+	pred=original_size;
+	pred=pred*pow(qp/2,-comp);
+	aprintf("Avg comp: %f initial size : %d predicted size:%d\n",comp,original_size,pred);
+	return pred;
 
 }
 /*

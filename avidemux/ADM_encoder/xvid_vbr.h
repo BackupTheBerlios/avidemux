@@ -27,7 +27,7 @@
 #define __XVID_VBR_H__
 
 #define VBR_VERSION 0
-
+#define AVG_LOOKUP 5
 /******************************************************************************
  * Function types used in the vbr controler
  *****************************************************************************/
@@ -199,6 +199,7 @@ typedef struct _vbr_control_t
 	int  vbv_buffer_size;			// <- MUST BE FILLED BY USER
 	int  vbv_fullness;			//
 	int  bits_per_image;			//
+	float compr[AVG_LOOKUP];
 }vbr_control_t;
 #define THRESH_UNDERFLOW ((700*1000)>>3) // in BYTES ! around 600 kbits
 //#define BOOST_KF  1 // allow KF boots for mpeg1/2
