@@ -53,6 +53,9 @@ OBJS += \
 
 CFLAGS+=-maltivec -mabi=altivec	 -faltivec
 endif
+ifeq ($(TARGET_DARWIN),yes)
+       CFLAGS+=-force_cpusubtype_ALL
+endif
 
 
 
