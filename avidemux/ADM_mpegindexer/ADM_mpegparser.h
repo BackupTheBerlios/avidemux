@@ -17,6 +17,7 @@
 #ifndef MPARSER_
 #define MPARSER_
 #define MP_BUFFER 4096
+#define MP_NOINLINE
  class mParser
 {
 	private:
@@ -32,16 +33,16 @@
 	public:
 					     mParser(void);
 							 ~mParser();					     
-	     	uint8_t open(char *name);
-	     	uint8_t forward(uint64_t u);
-	      	uint8_t sync(uint8_t *t );
+	     	 virtual uint8_t open(char *name);
+	     	 virtual uint8_t forward(uint64_t u);
+	      	virtual uint8_t sync(uint8_t *t );
 	     	uint8_t getpos(uint64_t *o);
        		uint8_t setpos(uint64_t o);
 
        		uint8_t nearEnd(uint32_t w);
-       		uint64_t getSize( void ) ;
-		uint8_t read32(uint32_t l, uint8_t *buffer);
-
+       		virtual uint64_t getSize( void ) ;
+		virtual uint8_t read32(uint32_t l, uint8_t *buffer);
+#ifndef MP_NOINLINE
        			uint32_t read32i(void )
 			{
 					uint32_t v;
@@ -66,10 +67,35 @@
 					read32(1,(uint8_t *)&u);
 					return u;
 			}
+#else
+			uint32_t read32i(void );
+			uint16_t read16i(void );
+			uint8_t read8i(void );
+#endif			
 
 
 } ;
-
+#define TS_PACKET 188
+ class mParserTS : public mParser
+{
+	private:
+	 	uint8_t		 bufferTS[TS_PACKET];
+	   	uint32_t	 _tsPos,_tsSize;
+		mParser		*parser;
+		
+		uint8_t  	fillTsBuffer( void );
+	   
+	public:
+			     mParserTS(void);
+			     ~mParserTS();
+	     	
+	     //	virtual uint8_t forward(uint64_t u);
+	      	virtual uint64_t getSize( void ) { return parser->getSize();}
+		virtual uint8_t read32(uint32_t l, uint8_t *buffer);       			
+		virtual uint8_t open(char *name);
+		virtual uint8_t forward(uint64_t u);// { return parser->forward(u);}
+		virtual uint8_t sync(uint8_t *t );
+} ;
 typedef struct mpegAudioTrack
 {
 	uint32_t presence;

@@ -49,7 +49,8 @@ mParser::~mParser()
 	{
 		 for(uint32_t i=0;i<_nbFd;i++)
 	  	 {
-				fclose(_fd[i]);	
+		 		if(_fd[i])
+					fclose(_fd[i]);	
 		 }
 		delete [] _fd;
 		delete [] _sizeFd;
@@ -115,7 +116,11 @@ char *tmp=new char[l+1];
 	  for(uint32_t i=0;i<_nbFd;i++)
 	  {
 	 		 _fd[i]=fopen(tmp,"rb");
-	  	 assert(_fd[i]);
+			if(!_fd[i])
+			{
+				delete [] tmp;
+				return 0;
+			}
 			// Get size
 			fseeko( _fd[i],0,SEEK_END);
 			_sizeFd[i]=ftello(_fd[i]);  
@@ -126,7 +131,7 @@ char *tmp=new char[l+1];
 			tmp[l-5]++;					
 		}	
 		printf("Done\n");	
-  	delete [] tmp;		
+		delete [] tmp;		
 		return 1;	
 }
 /*----------------------------------------
@@ -279,3 +284,29 @@ uint32_t r;
 	return read32(l,buffer);
 	
 }	
+#ifdef MP_NOINLINE
+uint32_t mParser::read32i(void )
+			{
+					uint32_t v;
+					uint8_t c[4];
+					read32(4,c);
+
+					v= (c[0]<<24)+(c[1]<<16)+(c[2]<<8)+c[3];
+					return v;
+			}
+			uint16_t mParser::read16i(void )
+			{
+					uint16_t v;
+					uint8_t c[2];
+
+					read32(2,c);
+					v= (c[0]<<8)+c[1];
+					return v;
+			}
+			uint8_t mParser::read8i(void )
+			{
+					uint8_t u;
+					read32(1,(uint8_t *)&u);
+					return u;
+			}
+#endif

@@ -46,6 +46,7 @@
 #include "ADM_mpegindexer/ADM_mpegparser.h"
 #include "ADM_mpeg2dec/ADM_mpegpacket.h"
 #include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
+//#include "ADM_mpeg2dec/ADM_mpegpacket_TS.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
@@ -109,21 +110,21 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 	mParser *parser;
 	uint32_t nbAC3=0,nbMpeg=0,nbLPCM=0;
 	int32_t pts;
-	
+	uint8_t token;
 	// clear it before using it. Default = not present.
 	memset(audioTrack,0,sizeof(mpegAudioTrack)*24);
-
+	printf("audio Id: %x\n",audiostreamid);
+	
 	parser=new mParser();
 
-	printf("audio Id: %x\n",audiostreamid);
+	
 	if(!parser->open(name))
 		{
 				GUI_Alert("Error reading mpeg !");
 				delete parser;
 				return 0;
 		}
-		uint8_t token;
-
+		
 	parser->sync(&token);
 
 	// first identify stream type (ES/PS)
@@ -143,7 +144,7 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 								return 0;
 
 		}
-
+	
 	printf("Program stream");
 	// check for ac3 ,  i.e track 0
 		
@@ -261,21 +262,46 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 	uint64_t lastGop=0;
 	uint64_t lastAbsGop=0;
 	
-    uint8_t streamid,audiostreamid=0x00;
+    	uint8_t streamid,audiostreamid=0x00;
 	mParser *parser;
 	ADM_mpegDemuxer *demuxer;
-
+	uint8_t token;
+	
+	char *realname=PathCanonize(mpeg);
+	
 	audiostreamid=audioid;
 	parser=new mParser();
-
-	printf("audio Id: %x\n",audiostreamid);
-	if(!parser->open(mpeg))
+	if(!parser->open(realname))
 		{
 				GUI_Alert("Error reading mpeg !");
 				delete parser;
+				delete [] realname;
 				return 0;
 		}
-		uint8_t token;
+	token=parser->read8i();
+	delete parser;
+	parser=NULL;
+	if(token==0x47)
+	{
+		//demuxer=new ADM_mpegDemuxerTransportStream(0xe0,audiostreamid);;
+		//GUI_Alert("This is mpeg TS, no supported !\n");
+		//return 0;
+		printf("Mpeg TS detected\n");
+		demuxer=  new ADM_mpegDemuxerProgramStream(0xe0,audiostreamid);
+	}
+	else
+	{
+	parser=new mParser();
+
+	printf("audio Id: %x\n",audiostreamid);
+	if(!parser->open(realname))
+		{
+				GUI_Alert("Error reading mpeg !");
+				delete parser;
+				delete [] realname;
+				return 0;
+		}
+	
 
 	parser->sync(&token);
 
@@ -297,13 +323,15 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 						printf("\n unrecognized stream\n");
 						return 0;	
 		}
+	}
 	// ok now we have it.
-	demuxer->open(mpeg);
+	demuxer->open(realname);
 	out=fopen(file,"wt");
 	if(!out)
 	{
 			printf("\n Error : cannot open index !");
 			delete demuxer;
+			delete [] realname;
 			return 0;
 	}
 	fprintf(out,"IDXM ");
@@ -311,7 +339,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 	else   fprintf(out,"P XX\n");
 	fprintf(out,"000000000000\n");
 	fprintf(out,"1\n");
-	fprintf(out,"%s\n",mpeg);
+	fprintf(out,"%s\n",realname);
 
 	DIA_working 	*work;
 	uint32_t	gop_forward=0;
@@ -510,6 +538,7 @@ stop_found:
 	  	GUI_Alert(string);
 	  }
 	  delete demuxer;
+	  delete [] realname;
 	  return 1;
 }
 
