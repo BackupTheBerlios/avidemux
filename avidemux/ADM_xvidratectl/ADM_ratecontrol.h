@@ -4,9 +4,9 @@
 // Description: 
 //
 //
-// Author: %{AUTHOR} <%{EMAIL}>, (C) %{YEAR}
+// Author: Mean (fixounet@free.fr)
 //
-// Copyright: See COPYING file that comes with this distribution
+// Copyright: See COPYING file that comes with this distribution GPL.
 //
 // FIXME : We need total frame # to do only pass2
 //
@@ -73,6 +73,7 @@ public:
 class ADM_newXvidRc :public ADM_ratecontrol
 {
 protected:
+			uint32_t _totalFrame;
 public:
 			ADM_newXvidRc(uint32_t fps1000, char *logname);
 	virtual 	~ADM_newXvidRc() ;
@@ -87,12 +88,25 @@ public:
 			uint8_t getInfo(uint32_t framenum, uint32_t *qz, uint32_t *size);
 
 };
+#define AVG_LOOKUP 5
 class ADM_newXvidRcVBV :public ADM_ratecontrol
 {
 protected:
 			ADM_newXvidRc	*rc;
 			uint32_t	_minbr,_maxbr,_vbvsize;
 			ADM_pass_stat  *_stat;
+			uint32_t	*_lastSize;
+			uint32_t	_roundup;
+			uint32_t	_frame;
+			uint32_t	_vbv_fullness;
+			uint32_t	_byte_per_image;
+			double		_compr[AVG_LOOKUP];
+			
+			uint8_t 	project(uint32_t framenum, uint32_t q, ADM_rframe frame);
+			uint8_t 	checkVBV(uint32_t framenum, uint32_t q, ADM_rframe frame);
+			int 		sizePrediction(uint32_t frame,uint32_t original_size,uint32_t qp);
+			float 		getComp(int oldbits, int qporg, int newbits, int qpused);
+			
 public:
 			ADM_newXvidRcVBV(uint32_t fps1000, char *logname);
 	virtual 	~ADM_newXvidRcVBV() ;

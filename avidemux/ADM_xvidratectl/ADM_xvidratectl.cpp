@@ -28,7 +28,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: ADM_xvidratectl.cpp,v 1.4 2004/12/17 18:25:11 mean Exp $
+ * $Id: ADM_xvidratectl.cpp,v 1.5 2004/12/17 21:51:37 mean Exp $
  *
  *****************************************************************************/
 
@@ -310,7 +310,7 @@ xvid_plg_destroy_t data;
 ADM_newXvidRc::ADM_newXvidRc(uint32_t fps1000, char *logname) : ADM_ratecontrol(fps1000,logname)
 {
   
-	
+	_totalFrame=0;
 	
 }
 //
@@ -372,7 +372,7 @@ xvid_plg_data_t  data;
 uint8_t ADM_newXvidRc::getInfo(uint32_t framenum, uint32_t *qz, uint32_t *size)
 {
 rc_2pass2_t * rc;
-	ADM_assert(framenum<_nbFrames);
+	ADM_assert(framenum<_totalFrame);
 	ADM_assert(_state==RS_PASS2);
 	
 	rc=(rc_2pass2_t *)myHandle;
@@ -399,7 +399,7 @@ xvid_plg_create_t	create;
 		myHandle=NULL;
 	}
 	
-	_nbFrames=nbFrame;
+	_totalFrame=_nbFrames=nbFrame;
 	memset(&data,0,sizeof(data));
 	memset(&create,0,sizeof(create));
 	
