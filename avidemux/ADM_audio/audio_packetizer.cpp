@@ -103,7 +103,7 @@ uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 			if(packetTail-packetHead<count)
 			{
 				count=packetTail-packetHead;
-				count%=4;
+				count&=0xffffffC;
 			}
 			memcpy(dest,&packetBuffer[packetHead],count);
 			packetHead+=count;
