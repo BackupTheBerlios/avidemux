@@ -88,8 +88,13 @@ decoderMpeg::~decoderMpeg ()
 	kill_codec();
 	delete [] unpackBuffer;
 }
-
-
+//____________________________________
+uint8_t decoderMpeg::isMpeg1( void)
+{
+ mpeg2_decoder_t *dec;
+  dec=&((MPEG2DEC)->decoder);
+   return (dec->mpeg1);
+}
 //____________________-un init ____________________
 uint8_t decoderMpeg::kill_codec (void)
 {

@@ -47,6 +47,7 @@
 								uint32_t len,uint32_t *flag=NULL);
 			virtual 	uint8_t	 	bFramePossible(void) { return 1;}
 			virtual 	void 		setParam( void );
+					uint8_t 	isMpeg1(void);
 
 }   ;
 
