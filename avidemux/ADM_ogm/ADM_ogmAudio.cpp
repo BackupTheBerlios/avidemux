@@ -322,29 +322,29 @@ uint32_t fl;
 		return 0;
 
 }
-uint32_t	oggAudio::readDecompress( uint32_t size,uint8_t *ptr )
-{
-uint32_t flags,nbout=0;
-	// Read packet
-	printf("oggAudio:\n");
-	if(!readPacket(&size,internalBuffer,&flags))
-	{
-		printf("Cannot read packet\n");
-		 return 0;
-	}
-	if(!_codec)
-	{
-		printf("No codec\n");
-		return 0;
-	}
-	if(!_codec->run( internalBuffer, size, ptr,  &nbout)) 
-	{
-		printf("Error decoding\n");
-		return 0;
-	}
-	return nbout;
-
-}
+// uint32_t	oggAudio::readDecompress( uint32_t size,uint8_t *ptr )
+// {
+// uint32_t flags,nbout=0;
+// 	// Read packet
+// 	printf("oggAudio:\n");
+// 	if(!readPacket(&size,internalBuffer,&flags))
+// 	{
+// 		printf("Cannot read packet\n");
+// 		 return 0;
+// 	}
+// 	if(!_codec)
+// 	{
+// 		printf("No codec\n");
+// 		return 0;
+// 	}
+// 	if(!_codec->run( internalBuffer, size, ptr,  &nbout)) 
+// 	{
+// 		printf("Error decoding\n");
+// 		return 0;
+// 	}
+// 	return nbout;
+// 
+// }
 // 1/16 sec is close enough
 #define CLOSE_ENOUGH (44100>>16)
 // we will use the pcm equ to find where to jump
