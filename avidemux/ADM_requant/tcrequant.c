@@ -263,7 +263,7 @@ static uint64 cnt_b_i, cnt_b_ni;
 		exit(0);
 
 #else
-
+#if 0
 	#define RETURN \
 		assert(rbuf >= cbuf);\
 		mloka1 = rbuf - cbuf;\
@@ -275,6 +275,8 @@ static uint64 cnt_b_i, cnt_b_ni;
 		owbuf=NULL; \
 		printf("Return invoked\n"); \
 		return 0;
+#endif
+	#define RETURN goto _req_exit;		
 	
 #endif
 	
@@ -2119,7 +2121,7 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 	mean_read=in;
 	mean_read_available=len;
 
-	while(mean_read_available>0)
+	while(mean_read_available+(rbuf-cbuf)>10)
 	{
 		// get next start code prefix
 		found = 0;
@@ -2222,7 +2224,7 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 		else if ((ID >= 0x01) && (ID <= 0xAF) && validPicHeader && validSeqHeader && validExtHeader) // slice
 		{
 			uint8 *outTemp = wbuf, *inTemp = cbuf;
-			
+//			printf("Processing slice %d\n",ID);
 			quant_corr = (((inbytecnt - (rbuf - cbuf)) / fact_x) - (outbytecnt + (wbuf - owbuf))) / REACT_DELAY;
 			
 			if 	(		((picture_coding_type == B_TYPE) && (quant_corr < 2.5f)) // don't recompress if we're in advance!
@@ -2329,6 +2331,7 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 	}
 
 	// Flush incoming & outgoing buffers
+_req_exit:	
 	WRITE;
 	FORCE_LOCK();
 	assert(!mean_available);

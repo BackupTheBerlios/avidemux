@@ -87,6 +87,10 @@ extern "C"
 	#include "ADM_requant/tcrequant.h"
 }
 #include "ADM_lvemux/ADM_muxer.h"
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_REQUANT
+#include "ADM_toolkit/ADM_debug.h"
+
 
 uint8_t DIA_Requant(float *perce,uint32_t *quality,uint64_t init);
 void A_requantize2( float percent, uint32_t quality, char *out_name )	;
@@ -145,6 +149,7 @@ void A_requantize( void )
 			video_body->getRaw (i, buffer, &len); \
 			Mrequant_frame(buffer,  len,outbuffer, &lenout); \
 			encoding->feedFrame(lenout);	\
+			aprintf("%lu in:%03lu out:%03lu\n",i,len>>10,lenout>>10); \
 			if(!muxer) \
 	  			fwrite (outbuffer, lenout, 1, file); \
 			else\
@@ -249,8 +254,10 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 			if(i==frameStart)
 			{
 				video_body->getRaw (i, buffer, &len);
+				
 				if(buffer[0]==0 && buffer[1]==0 && buffer[2]==1 && buffer[3]==0xb3) // Seq start
 				{	
+					printf("1st frame contains the seq header\n");
 					Mrequant_frame(buffer,  len,outbuffer, &lenout); 	
 					encoding->feedFrame(lenout);	
 					if(!muxer) 
@@ -258,6 +265,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 					else
 					{
 						muxer->writeVideoPacket(lenout,outbuffer); 
+						aprintf("in:%03lu out:%03lu\n",len>>10,lenout>>10); \
 						PACK_AUDIO; 
 					}
 				}
@@ -265,8 +273,11 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 				{
 					uint32_t seq;
 					video_body->getRawStart (frameStart, buffer, &seq);	
-	  				video_body->getRaw (i, buffer+seq, &len);
+					printf("Adding seq header (%lu)\n",seq);
 					
+	  				video_body->getRaw (i, buffer+seq, &len);
+					printf("Stat : %x %x %x %x\n",buffer[seq],buffer[seq+1],buffer[seq+2],
+								buffer[seq+3]);
 					Mrequant_frame(buffer,  len+seq,outbuffer, &lenout);
 					encoding->feedFrame(lenout);	 
 	  				if(!muxer) 
@@ -275,6 +286,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 					{
 						muxer->writeVideoPacket(lenout,outbuffer); 
 						PACK_AUDIO; 
+						aprintf("in:%03lu out:%03lu\n",len>>10,lenout>>10); \
 					}
 				}
 			}
@@ -293,6 +305,7 @@ _abt:
 			muxer=NULL;
 		   }
 	Mrequant_end();
+	deleteAudioFilter();
 	GUI_Alert("Done!");
 
 }
