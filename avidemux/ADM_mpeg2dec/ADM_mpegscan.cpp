@@ -129,8 +129,8 @@ uint8_t			mpeg2decHeader::open(char *name)
 		}
 		
 	  	fgets(string,1023,file);   	// # of I frames
-	  	sscanf(string,"%lX",&_nbFrames);
-	  	printf(" %ld I-Frames\n", _nbFrames);	  			
+	  	sscanf(string,"%X",&_nbFrames);
+	  	printf(" %d I-Frames\n", _nbFrames);	  			
 		
 		fgets(string,1023,file);   	// nb file
 		printf(" Nb files : %s\n",string);
@@ -159,8 +159,8 @@ uint8_t			mpeg2decHeader::open(char *name)
 				return 0;
 		}
 		fgets(string,1023,file);   	// Size x*y
-		sscanf(string,"%lu %lu %lu",&w,&h,&fps);
-		printf(" %ld x %ld %lu format \n",w,h,fps);
+		sscanf(string,"%u %u %u",&w,&h,&fps);
+		printf(" %d x %d %u format \n",w,h,fps);
 
 		_indexMpegPTS=new MFrame[_nbFrames+1];
 		if(!_indexMpegPTS)
@@ -181,7 +181,7 @@ uint8_t			mpeg2decHeader::open(char *name)
 		{
 		     fgets(string,1023,file);     
 
-				  sscanf(string,"%c %llX %lu",
+				  sscanf(string,"%c %llX %u",
 				  &t,	 	&of,    	&sz);
 				   if(t!=(uint8_t)'I')
 				   { 
@@ -193,7 +193,7 @@ uint8_t			mpeg2decHeader::open(char *name)
 			        }
 			        else
 			        {
-						  sscanf(string,"%c %llX %llX %lX %lu",
+						  sscanf(string,"%c %llX %llX %X %u",
 														  &t,	 	&of, &abs,&dummy,   	&sz);
 
 					audio=dummy;
@@ -219,7 +219,7 @@ uint8_t			mpeg2decHeader::open(char *name)
 					_nbFrames--;
 					dropped++;
 			}
-			printf("Dropping %ld last B/P frames\n",dropped);			
+			printf("Dropping %d last B/P frames\n",dropped);			
 			printf(" Creating start sequence (%llu)..\n",_indexMpegPTS[0].offset);
 			
 			//
@@ -252,7 +252,7 @@ uint8_t			mpeg2decHeader::open(char *name)
 				_startSeqLen=count-4;
 				_startSeq=new uint8_t[_startSeqLen];
 				memcpy(_startSeq,tmp,_startSeqLen);
-				printf("seqLen : %lu seq %x %x %x %x\n",
+				printf("seqLen : %u seq %x %x %x %x\n",
 					_startSeqLen, _startSeq[0],
 							_startSeq[1],
 							_startSeq[2],
@@ -278,7 +278,7 @@ uint8_t			mpeg2decHeader::open(char *name)
 			
       			demuxer->goTo(0);
 
-			if(audio) printf("Audio bytes : %lu\n",audio);                        								
+			if(audio) printf("Audio bytes : %u\n",audio);                        								
 		 _isaudiopresent=0; 
 		 _isvideopresent=1; 
 	 	 _videostream.dwScale=1000;
@@ -359,7 +359,7 @@ uint8_t  mpeg2decHeader::renumber(uint32_t nob)
 #endif								
 								break;
 						default:
-								printf("Frame : %lu / %lu , type %d\n",
+								printf("Frame : %u / %u , type %d\n",
 										c,_nbFrames,_indexMpegPTS[c].type);
 				
 								assert(0);
