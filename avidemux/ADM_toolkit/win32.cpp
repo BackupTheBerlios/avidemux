@@ -3,11 +3,12 @@
 #include <stdlib.h>
 #include <math.h>
 #include "default.h" 
-#include "ADM_assert.h" 
+
 
 #ifdef CYG_MANGLING
 #include "windows.h"
 #include "winbase.h"
+#include "ADM_assert.h" 
 void ADM_usleep(unsigned long us)
 {
 	Sleep(us/1000);
