@@ -151,6 +151,7 @@ uint8_t     ffmpegEncoder::gopMpeg1(void)
 	_context->rc_initial_cplx=3;
 	_context->qmin		= 2;
     	_context->qmax		= 31;
+	_context->gop_size=_settings.gop_size;
 	//
 	//_context->dsp_mask= FF_MM_FORCE;
 

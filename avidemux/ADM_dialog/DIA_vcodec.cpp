@@ -228,7 +228,7 @@ xvcd = gtk_menu_item_new_with_mnemonic (_("XVCD"));
   gtk_widget_show (xvcd);
   gtk_container_add (GTK_CONTAINER (menu1), xvcd);
 
-xsvcd = gtk_menu_item_new_with_mnemonic (_("XSVCD"));
+xsvcd = gtk_menu_item_new_with_mnemonic (_("DVD (ffmpeg)"));
   gtk_widget_show (xsvcd);
   gtk_container_add (GTK_CONTAINER (menu1), xsvcd);
 
