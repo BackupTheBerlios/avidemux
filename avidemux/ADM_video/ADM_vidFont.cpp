@@ -176,12 +176,15 @@ int kern;
 	target+=stride*(size-slot->bitmap_top);
 	
 	int correction;
+// If kerning is available from freetype
+#ifdef FT_FACE_FLAG_KERNING
 	if(prevchar && FT_HAS_KERNING( _face ))
 	{		
 		FT_Get_Kerning( _face,glyph_prev, glyph_index,  FT_KERNING_DEFAULT, &delta );	
 		correction=delta.x/64;
 	}
 	else
+#endif	
 		correction=0;
 	target+=correction;
 	
