@@ -164,7 +164,7 @@ char *ADM_strdup(const char *in)
 {
 	uint32_t l=strlen(in);
 	char	*out;
-	ADM_assert(l);
+	//ADM_assert(l);
 	out=(char *)ADM_alloc(l+1);
 	memcpy(out,in,l+1);
 	return out;
