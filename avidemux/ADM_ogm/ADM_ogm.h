@@ -12,6 +12,7 @@ typedef struct OgIndex
 	uint32_t flags;
 	uint64_t pos;
 	uint32_t size;
+	uint32_t frame_index; // Frame number as seen in the stream. When no reordering=frame #
 }OgIndex;
 
 typedef struct OgAudioIndex
@@ -90,7 +91,7 @@ protected:
 				uint32_t			_lastImage;
 				uint32_t			_lastFrag;
 				oggAudio			*_audio;
-
+				uint8_t				_reordered;
 				uint8_t  			dumpHeader(stream_header *header,uint8_t isaudio);
 public:
 
@@ -119,7 +120,8 @@ virtual 	uint8_t			getAudioStream(AVDMGenericAudioStream **audio);
   //				 video
   //__________________________
 virtual 	uint8_t  getFrameSize(uint32_t frame,uint32_t *size) ;
-
+virtual		uint8_t  reorder( void );
+virtual		uint8_t	 isReordered( void ) { return _reordered;} // by default we don"t do frame re-ordering
 virtual 	uint8_t  setFlag(uint32_t frame,uint32_t flags);
 virtual 	uint32_t getFlags(uint32_t frame,uint32_t *flags) ;
 virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
