@@ -13,22 +13,22 @@
 
 typedef struct TelecideParam
 {
-	int 	order;
-	int 	back;
-	int	back_saved;
-	int 	guide;
-	float 	gthresh;
-	int 	post;
-	int 	chroma;
-	float 	vthresh;
-	float	vthresh_saved;
-	float 	bthresh;
-	float 	dthresh;
-	int 	blend;
-	int 	nt;
-	int 	y0;
-	int 	y1;
-	int 	hints;
-	int 	show;
-	int 	debug;
+	uint32_t 	order;
+	uint32_t 	back;
+	uint32_t	back_saved;
+	uint32_t 	guide;
+	double	 	gthresh;
+	uint32_t 	post;
+	uint32_t 	chroma;
+	double 		vthresh;
+	double		vthresh_saved;
+	double 		bthresh;
+	double 		dthresh;
+	uint32_t 	blend;
+	uint32_t 	nt;
+	uint32_t 	y0;
+	uint32_t 	y1;
+	uint32_t 	hints;
+	uint32_t 	show;
+	uint32_t 	debug;
 };

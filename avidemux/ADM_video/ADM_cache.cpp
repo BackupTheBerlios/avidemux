@@ -150,5 +150,6 @@ uint32_t len,flags;
 		count++;		
 	}
 	printf("Could not find empty slot in cache\n");
+	for(uint32_t i=0;i<nbEntry;i++) printf("%d(%d) ",frameNum[i],frameLock[i]);printf("\n");
 	assert(0);
 }
