@@ -6,16 +6,41 @@
 			+ Fix smart copy with B-frame support
 			+ Should add ColorSpace and Aspect ratio to video filter chain
 
-			+ Fix memory leak induced by raw shift<<<===
-			
-	+ Complete OGM audio suport (ogg)
-		
-			+ Pass through broken because lvemux looks for gop header at the beginning
-				and we put them at the end in pass through mode
+			+ Fix memory leak induced by raw shift<<<===			
 			
        *********************** /TODO ***************************
+       24.02.2004
+       		- Fixed a/v sync correction that was disabled due to silent parameters
+       22.02.2004
+       		- Fix requant to complete the current frame and not delay datas to the next
+		- aprintf is C friendly 
+		- Requant must have its timecode redone too.
+       21.02.2004
+       		- Applied JSC patch
+		- Synced with FFmpeg
+		- Updated ffv1rec to xvid4 compatible stuff
+       17.02.2004
+       		- Fixed 2Gb on save mpeg PS spotted by wildsack
+		- More tcrequant stuff
+		- Store seq header in extra data, use it if needed in pass through mode
+		- Added mjpa to mjpeg synonyms
+		
+       16/02/2004
+       		- fixed the alignBits stuff
+		- began injecting tcrequant
+       15/02/2004
+       		- Changed (again) the way the mpeg2 index is built
+		- Fixed the gop duplicate bug when saving in DVD ps mode
+		- Updated the Gop restamp code in lvemux
+       12/02/2004
+       		- Fixed audio split into audio frames
+		- Found (?) a bug in lvemux at 384 kbps
+       11/02/2004
+       		- Fixed gop update , only first packet is seen as async for AC3.
+       10/02/2004
+       		- Began fixing the way the audio is written -> gop_update is bugged!
        09/02/2004
-       		- Added a/v shift to save mpeg PS
+       		- Added a/v shift to save mpeg PS when audio in copy mode
        08/02/2004
        		- fixed drift in mpeg
 		- Recompute gop header in case of copy to DVD ps
