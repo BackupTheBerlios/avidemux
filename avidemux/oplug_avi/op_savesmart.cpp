@@ -53,15 +53,16 @@ extern "C" {
 #ifdef USE_DIVX
 
 #endif
-
+GenericAviSaveSmart::GenericAviSaveSmart(uint32_t qf) : GenericAviSave()
+{
+	_cqReenc=qf;
+	ADM_assert(qf>=2 && qf<32);
+}
 uint8_t	GenericAviSaveSmart::setupVideo (char *name)
 {
 
 int value=4;;
-	  if( ! GUI_getIntegerValue(&value, 2, 31, "Q Factor (set 4)"))
-	  			return 0;
-
-		_cqReenc= (uint8_t )floor(value);
+	 
 
 		printf("\n Q: %u",_cqReenc);
   // init save avi

@@ -8,7 +8,7 @@ avidemux2_SOURCES = gui_keyframes.cpp support.cpp guiplay.cpp gui_xv.cpp gui_sav
 
 SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs ADM_colorspace ADM_editor ADM_encoder ADM_filter ADM_gui ADM_inpics ADM_nuv ADM_toolkit oplug_mpeg xpm ADM_video oplug_avi ADM_audiodevice ADM_vp32 ADM_mpeg2dec ADM_mpegindexer libMpeg2Dec oplug_mpegFF  ADM_h263 ADM_gui2 ADM_dialog ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame ADM_requant ADM_script oplug_ogm
 
-EXTRA_DIST = main.cpp avi_vars.h avilist.cpp avilist.h callbacks.cpp callbacks.h gtk_gui.cpp gtkgui.h gui_action.hxx gui_navigate.cpp  gui_rgb.cpp gui_savenew.cpp gui_xv.cpp guiplay.cpp interface.h support.cpp support.h gui_keyframes.cpp prototype.h ADM_lavcodec.h  prefs.h prefs.cpp prefs.in mmx_macros.h
+EXTRA_DIST = main.cpp avi_vars.h avilist.cpp avilist.h callbacks.cpp callbacks.h gtk_gui.cpp gtkgui.h gui_action.hxx gui_navigate.cpp  gui_rgb.cpp gui_savenew.cpp gui_xv.cpp guiplay.cpp interface.h support.cpp support.h gui_keyframes.cpp prototype.h ADM_lavcodec.h  prefs.h prefs.cpp prefs.in mmx_macros.h ADM_assert.h
 
 ####### kdevelop will overwrite this part!!! (end)############
 # set the include path found by configure

@@ -31,7 +31,7 @@
               uint8_t _cqReenc          ;
      public:
      							
-     							
+     					GenericAviSaveSmart(uint32_t qfactor);		
                           virtual ~GenericAviSaveSmart();
    };
 
