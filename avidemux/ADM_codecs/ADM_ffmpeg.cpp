@@ -137,7 +137,14 @@ uint8_t     ffmpegEncoder::gopMpeg1(void)
 	_context->max_b_frames=2;
 #endif	
 	printf("\n Using 2 b frames \n");
-	_context->mpeg_quant=1; //1; // Should be mpeg quant §
+	if(_id==FF_MPEG2)
+	{
+		_context->mpeg_quant=1; //1; // Should be mpeg quant §
+	}
+	else
+	{
+		_context->mpeg_quant=0; //1; // Should be mpeg quant §
+	}
 	if(_settingsPresence)
 	{
 		_context->rc_max_rate=_settings.maxBitrate*8; //1800*1000;// 2400 max, 700 min
