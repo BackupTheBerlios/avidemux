@@ -42,11 +42,11 @@
 #ifdef USE_MMX
 extern "C" {
 #include "../../adm_lavcodec/avcodec.h"
-#include "../../adm_lavcodec/dsputil.h"
 }
 #endif
 
 #include "ADM_video/swscale.h"
+#include "ADM_toolkit/ADM_cpuCap.h"
 
 
 typedef struct alg
@@ -183,8 +183,8 @@ uint8_t AVDMVideoStreamMPResize::reset(uint32_t nw, uint32_t old,uint32_t algo)
 
 					}
 #ifdef USE_MMX
-		uint32_t  mm=mm_support();	
-	#define ADD(x,y) if( mm & MM_##x) flags|=SWS_CPU_CAPS_##y;
+		
+		#define ADD(x,y) if( CpuCaps::has##x()) flags|=SWS_CPU_CAPS_##y;
 		ADD(MMX,MMX);		
 		ADD(3DNOW,3DNOW);
 		ADD(MMXEXT,MMX2);

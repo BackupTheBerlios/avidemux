@@ -62,14 +62,7 @@
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_toolkit/ADM_debug.h"
 
-
-#if defined(USE_MMX) && defined(HAVE_BUILTIN_VECTOR)
-	#define DECIMATE_MMX_BUILD_PLANE 1
-	extern "C"
-	{
-	#include "adm_lavcodec/dsputil.h"
-	}
-#endif
+#include "ADM_toolkit/ADM_cpuCap.h"
 
 #define UPLANE(x) (x+_info.width*_info.height)
 #define VPLANE(x) (x+((_info.width*_info.height*5)>>2))
@@ -85,14 +78,19 @@ extern  void 	DrawString(uint8_t *dst, int x, int y, const char *s);
 extern  void 	DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
 
-
+#ifdef USE_SSE
+	#define DECIMATE_MMX_BUILD_PLANE 1
+	#define DECIMATE_MMX_BUILD	 1
+#endif
 
 #ifdef DECIMATE_MMX_BUILD_PLANE
 static void isse_blend_decimate_plane(uint8_t * dst, uint8_t* src,  uint8_t* src_next, 
 			int w, int h);
+int isse_scenechange_32(const uint8_t *c_plane,const  uint8_t *tplane, int height, int width) ;	
+int isse_scenechange_16(const uint8_t *c_plane,const  uint8_t *tplane, int height, int width) ;
+int isse_scenechange_8(const uint8_t *c_plane,const  uint8_t *tplane, int height, int width) ;
 #endif
 
-static uint8_t sseCapable=0;
 
 #define OutputDebugString(x) aprintf("%s\n",x)
 //________________________________
@@ -204,18 +202,16 @@ Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples)
 		_uncompressed=NULL;		
   		_info.encoding=1;
 		
-		//
-#ifdef	DECIMATE_MMX_BUILD_PLANE	
-		sseCapable=mm_support();
-		printf("\nDecimate: MMX :%d\n",sseCapable & MM_MMX);		
-		printf("\nDecimate: SSE :%d\n",sseCapable & MM_SSE);		
-		printf("\nDecimate: ALL :%x\n",sseCapable );		
-		sseCapable&=MM_SSE;
-#endif		
-		printf("\nDecimate: SSE enabled :%d\n",sseCapable);		
+		//		
 		// Init here
 		debug=0;
 		show=0;		
+#ifdef USE_SSE	
+		if(CpuCaps::hasSSE())
+		{
+			printf("Decimate:SSE enabled\n");
+		}
+#endif
 		//
 		_param=new DECIMATE_PARAM;
 		if(couples)
@@ -547,7 +543,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		nextrpY = (unsigned char *) next; //next->GetReadPtr(PLANAR_Y);
 		dstwpY = (unsigned char *) dst; //dst->GetWritePtr(PLANAR_Y);
 #ifdef DECIMATE_MMX_BUILD_PLANE
-		if (sseCapable) 
+		if (CpuCaps::hasSSE()) 
 		{
 			isse_blend_decimate_plane(dstwpY, srcrpY, nextrpY, wY, hY);
 		} else {
@@ -569,7 +565,8 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 	    nextrpU = (unsigned char *) UPLANE(next);//->GetReadPtr(PLANAR_U);
 	    dstwpU = (unsigned char *) UPLANE(dst);//->GetWritePtr(PLANAR_U);
 #ifdef DECIMATE_MMX_BUILD_PLANE
-		if (sseCapable) {
+		if (CpuCaps::hasSSE()) 
+		{
 			isse_blend_decimate_plane(dstwpU, srcrpU, nextrpU, wUV, hUV);
 		} else {
 #endif
@@ -591,7 +588,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 	    dstwpV = (unsigned char *) VPLANE(dst);//->GetWritePtr(PLANAR_V);
 
 #ifdef DECIMATE_MMX_BUILD_PLANE
-		if (sseCapable) {
+		if (CpuCaps::hasSSE()) { 
 			isse_blend_decimate_plane(dstwpV, srcrpV, nextrpV, wUV, hUV );
 		} else {
 #endif
@@ -781,7 +778,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			nextrpY = (unsigned char *) next; //next->GetReadPtr(PLANAR_Y);
 			dstwpY = (unsigned char *) dst; //dst->GetWritePtr(PLANAR_Y);
 #ifdef DECIMATE_MMX_BUILD_PLANE
-			if (sseCapable) {
+			if (CpuCaps::hasSSE()) { 
 				isse_blend_decimate_plane(dstwpY, srcrpY, nextrpY, wY, hY);
 			} else {
 #endif
@@ -802,7 +799,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			nextrpU = (unsigned char *)UPLANE( next);//->GetReadPtr(PLANAR_U);
 			dstwpU = (unsigned char *) UPLANE(dst);//->GetWritePtr(PLANAR_U);
 #ifdef DECIMATE_MMX_BUILD_PLANE
-			if (sseCapable) {
+			if (CpuCaps::hasSSE()) { 
 				isse_blend_decimate_plane(dstwpU, srcrpU, nextrpU, wUV, hUV);
 			} else {
 #endif
@@ -823,7 +820,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			nextrpV = (unsigned char *)VPLANE( next);//->GetReadPtr(PLANAR_V);
 			dstwpV = (unsigned char *) VPLANE(dst);//->GetWritePtr(PLANAR_V);
 #ifdef DECIMATE_MMX_BUILD_PLANE
-			if (sseCapable) {
+			if (CpuCaps::hasSSE()) { 
 				isse_blend_decimate_plane(dstwpV, srcrpV, nextrpV, wUV, hUV);
 			} else {
 #endif
@@ -927,7 +924,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 	}
 
 #ifdef DECIMATE_MMX_BUILD
-	if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
+	if (CpuCaps::hasSSE()) { 
 		/* Compare each frame to its predecessor. */
 		for (f = 1; f <= _param->cycle; f++)
 		{
@@ -935,11 +932,11 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 			currY = storepY[f];
 			count[f-1] = 0;
 			if ((!(row_sizeY&31)) || (_param->quality<=1)) {
-				count[f-1] = isse_scenechange_32(currY, prevY, heightY, row_sizeY, pitchY, pitchY);
+				count[f-1] = isse_scenechange_32(currY, prevY, heightY, row_sizeY);
 			} else if (!(row_sizeY&15)) {
-				count[f-1] = isse_scenechange_16(currY, prevY, heightY, row_sizeY, pitchY, pitchY);
+				count[f-1] = isse_scenechange_16(currY, prevY, heightY, row_sizeY);
 			} else {
-				count[f-1] = isse_scenechange_8(currY, prevY, heightY, row_sizeY, pitchY, pitchY);
+				count[f-1] = isse_scenechange_8(currY, prevY, heightY, row_sizeY);
 			}
 			if (_param->quality == 3) {
 				prevU = storepU[f-1];
@@ -947,14 +944,14 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 				currU = storepU[f];
 				currV = storepV[f];
 				if (!(row_sizeUV&31)) {
-					count[f-1] += isse_scenechange_32(currU, prevU, heightUV, row_sizeUV, pitchUV, pitchUV);
-					count[f-1] += isse_scenechange_32(currV, prevV, heightUV, row_sizeUV, pitchUV, pitchUV);
+					count[f-1] += isse_scenechange_32(currU, prevU, heightUV, row_sizeUV);
+					count[f-1] += isse_scenechange_32(currV, prevV, heightUV, row_sizeUV);
 				} else if (!(row_sizeY&15)) {
-					count[f-1] += isse_scenechange_16(currU, prevU, heightUV, row_sizeUV, pitchUV, pitchUV);
-					count[f-1] += isse_scenechange_16(currV, prevV, heightUV, row_sizeUV, pitchUV, pitchUV);
+					count[f-1] += isse_scenechange_16(currU, prevU, heightUV, row_sizeUV);
+					count[f-1] += isse_scenechange_16(currV, prevV, heightUV, row_sizeUV);
 				} else {
-					count[f-1] += isse_scenechange_8(currU, prevU, heightUV, row_sizeUV, pitchUV, pitchUV);
-					count[f-1] += isse_scenechange_8(currV, prevV, heightUV, row_sizeUV, pitchUV, pitchUV);
+					count[f-1] += isse_scenechange_8(currU, prevU, heightUV, row_sizeUV);
+					count[f-1] += isse_scenechange_8(currV, prevV, heightUV, row_sizeUV);
 				}			
 			}
 			showmetrics[f-1] = (count[f-1] * 100.0) / div;
@@ -1478,4 +1475,146 @@ uint32_t x;
     	__asm__("emms");
   
 }
+int isse_scenechange_32(const uint8_t *c_plane, const uint8_t *tplane, int height, int width) 
+{
+  int wp=width>>5;
+  int hp=height;
+  int returnvalue=0xbadbad00;
+    
+    __asm__(
+    ".align 16\n"
+    "pxor %%mm6,%%mm6\n"
+    "pxor %%mm7,%%mm7\n"
+    ::);
+    for(uint32_t y=0;y<hp;y++)
+    {
+	for(uint32_t x=0;x<wp;x++)
+	{
+		__asm__(
+    		".align 16\n"
+    		"movq (%0),%%mm0 \n"
+		"movq 8(%0),%%mm2 \n"
+		"movq (%1),%%mm1 \n"
+		"movq 8(%1),%%mm3 \n"
+		"psadbw %%mm1,%%mm0\n"
+		"psadbw %%mm3,%%mm2\n"
+		"paddd %%mm0,%%mm6 \n"
+		"paddd %%mm2,%%mm7 \n"
+		
+		"movq 16(%0),%%mm0 \n"
+		"movq 24(%0),%%mm2 \n"
+		"movq 16(%1),%%mm1 \n"
+		"movq 24(%1),%%mm3 \n"
+		"psadbw %%mm1,%%mm0\n"
+		"psadbw %%mm3,%%mm2\n"
+		"paddd %%mm0,%%mm6 \n"
+		"paddd %%mm2,%%mm7 \n"
+		
+		
+		: : "r" (c_plane) , "r" (tplane)
+		);
+		c_plane+=32;
+		tplane+=32;
+	}    
+    
+    	c_plane+=width-wp*32;
+	tplane+=width-wp*32;
+    }
+    __asm__(
+    ".align 16\n"
+    "paddd %%mm6,%%mm7\n"
+    "movd %%mm7,(%0)\n"
+    "emms \n"
+    : : "r" (&returnvalue)
+    );
+  
+  return returnvalue;
+}
+int isse_scenechange_16(const uint8_t *c_plane, const uint8_t *tplane, int height, int width) 
+{
+  int wp=width>>4;
+  int hp=height;
+  int returnvalue=0xbadbad00;
+    
+    __asm__(
+    ".align 16\n"
+    "pxor %%mm6,%%mm6\n"
+    "pxor %%mm7,%%mm7\n"
+    ::);
+    for(uint32_t y=0;y<hp;y++)
+    {
+	for(uint32_t x=0;x<wp;x++)
+	{
+		__asm__(
+    		".align 16\n"
+    		"movq (%0),%%mm0 \n"
+		"movq 8(%0),%%mm2 \n"
+		"movq (%1),%%mm1 \n"
+		"movq 8(%1),%%mm3 \n"
+		"psadbw %%mm1,%%mm0\n"
+		"psadbw %%mm3,%%mm2\n"
+		"paddd %%mm0,%%mm6 \n"
+		"paddd %%mm2,%%mm7 \n"				
+		
+		
+		: : "r" (c_plane) , "r" (tplane)
+		);
+		c_plane+=16;
+		tplane+=16;
+	}    
+    
+    	c_plane+=width-wp*16;
+	tplane+=width-wp*16;
+    }
+    __asm__(
+    ".align 16\n"
+    "paddd %%mm6,%%mm7\n"
+    "movd %%mm7,(%0)\n"
+    "emms \n"
+    : : "r" (&returnvalue)
+    );
+  
+  return returnvalue;
+}
+int isse_scenechange_8(const uint8_t *c_plane, const uint8_t *tplane, int height, int width) 
+{
+  int wp=width>>3;
+  int hp=height;
+  int returnvalue=0xbadbad00;
+    
+    __asm__(
+    ".align 16\n"
+    "pxor %%mm6,%%mm6\n"
+    "pxor %%mm7,%%mm7\n"
+    ::);
+    for(uint32_t y=0;y<hp;y++)
+    {
+	for(uint32_t x=0;x<wp;x++)
+	{
+		__asm__(
+    		".align 16\n"
+    		"movq (%0),%%mm0 \n"		
+		"movq (%1),%%mm1 \n"		
+		"psadbw %%mm1,%%mm0\n"		
+		"paddd %%mm0,%%mm6 \n"
+		
+		: : "r" (c_plane) , "r" (tplane)
+		);
+		c_plane+=8;
+		tplane+=8;
+	}    
+    
+    	c_plane+=width-wp*8;
+	tplane+=width-wp*8;
+    }
+    __asm__(
+    ".align 16\n"    
+    "movd %%mm6,(%0)\n"
+    "emms \n"
+    : : "r" (&returnvalue)
+    );
+  
+  return returnvalue;
+}
+
 #endif
