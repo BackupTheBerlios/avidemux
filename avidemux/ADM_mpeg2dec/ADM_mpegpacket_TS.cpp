@@ -280,6 +280,7 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 	uint32_t pts=0;
 	uint32_t pid,adapt,start;
 	uint32_t peslen;
+	uint64_t sync;
 	
 		if(_lastErr) return 0;	 
 	   	_packetOffset+=_packetLen;
@@ -298,15 +299,15 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 				return 0;
 			}
 			// used to mark first packet && async jump
-			parser->getpos(& _lastSync);
+			parser->getpos(& sync);
 			
 			// check we are not at the end of the stream
-			if(_lastSync==_size) 
+			if(sync==_size) 
 				{
 					printf("End of file reached\n");
 					return 0;				
 				}
-			_lastSync-=TS_PACKET;
+			sync-=TS_PACKET;
 			// get pid
 			pid=((_TSbuffer[1]<<8)+_TSbuffer[2]) & 0x1FFF;
 			
@@ -343,6 +344,13 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 			}
 			if(pid==_otherPid)
 			{
+				_otherPesRead+=len;				
+				if(_otherPesRead>_otherPesLen)
+				{
+					len=len-(_otherPesRead-_otherPesLen);
+					_otherPesRead=_otherPesLen;
+					//printf("Overshot : %d\n",_pesRead-_pesLen);
+				}
 				_otherLen+=len;
 			 	continue;
 			}
@@ -363,7 +371,7 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 				
 			}
 				
-			
+			_lastSync=sync;
 			_packetLen=len;
 			memcpy(_buffer,_TSbuffer+start,len);			
 			_currentOffset=0;
@@ -403,6 +411,10 @@ uint32_t headerlen=0;
 		{
 			printf("TS: No 00 00 01 xx as PES header\n");		
 			return 0;
+		}
+		if(_TSbuffer[start+3]!=0xE0 && _TSbuffer[start+3]!=0xbd)
+		{
+			printf(">> %x\n",_TSbuffer[start+3]);
 		}
 		// 00 00 01 E0	
 		totallen-=4;
@@ -549,7 +561,7 @@ uint8_t	ADM_mpegDemuxerTransportStream::_asyncJump(uint64_t relative,uint64_t ab
 		parser->setpos(backward+search);
 		//  we have the absolute position of the end marker
 		//  end is the last byte of the current TS packet
-		uint64_t end=backward+search+TS_PACKET-1;
+		uint64_t end=backward+search+TS_PACKET;
 		// delta is the # of bytes left in current packet AFTER sync point
 		uint64_t delta=end-absolute;
 		// fill packet

@@ -160,6 +160,7 @@ uint8_t  mpeg2decHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t
 					return 0;
 			}
 		getFlags(framenum,flags);
+		
 		if(_indexMpegPTS[framenum].type=='I')
 				asyncJump(framenum);
 		else
