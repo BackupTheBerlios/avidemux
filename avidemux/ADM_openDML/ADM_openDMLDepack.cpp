@@ -33,14 +33,25 @@
 #ifdef ADM_DEBUG
 	//#define OPENDML_VERBOSE
 #endif
-static uint32_t searchVop(uint8_t *begin, uint8_t *end);
 
+typedef struct vopS
+{
+	uint32_t offset;
+	uint32_t type;
+}vopS;
 
+static uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop);
+
+static const char *s_voptype[4]={"I frame","P frame","B frame","D frame"};
 uint8_t OpenDMLHeader::unpackPacked( void )
 {
 	uint32_t len,nbFrame;
 	uint8_t ret=0;
+	uint32_t firstType, secondType,thirdType;
+	uint32_t targetIndex=0,nbVop;
+	uint32_t nbDuped=0;
 	
+	vopS	myVops[10]; // should be enough
 	// here we got the vidHeader to get the file easily
 	// we only deal with avi now, so cast it to its proper type (i.e. avi)
 		
@@ -58,11 +69,12 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	
 	odmlIndex *newIndex=new odmlIndex[nbFrame];
 	ADM_assert(newIndex);
-	uint32_t newTotal=0;
+	
 	printf("Trying to unpack the stream\n");
 	DIA_working *working=new DIA_working("Unpacking packed bitstream");
 	
-	for(uint32_t img=0;img<nbFrame;img++)
+	uint32_t img=0;
+	while(img<nbFrame)
 	{
 		working->update(img,nbFrame);
 		if(!getFrameNoAlloc(img,buffer,&len))
@@ -70,71 +82,84 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 				printf("Error could not get frame %lu\n",img);
 				goto _abortUnpack;
 			}
-		aprintf("--Frame:%lu/%lu, len %lu\n",img,nbFrame,len);			
-		if(len<=8)
+		aprintf("--Frame:%lu/%lu, len %lu\n",img,nbFrame,len);
+		
+		
+		if(len<9) // ??
+		{
+			if(nbDuped)
 			{
-				aprintf("    Dummy frame, skipped\n");
-				continue;
+				nbDuped--;
 			}
+			else
+			{
+				memcpy(&newIndex[targetIndex],&_idx[img],sizeof(_idx[0]));
+				aprintf("TOO SMALL\n");
+				targetIndex++;
+			}
+			img++;
+			continue;
+		}
+		
 		// now search vop header in this
 		// Search first vop
 		
 		uint8_t *lastPos=buffer;
 		uint8_t *endPos=buffer+len;
+		aprintf("Frame :%lu",img);
+		searchVop(buffer,endPos,&nbVop,myVops);
 		
-		uint32_t firstVopOffset=0,secondVopOffset=0;
 		
-		//updateUserData(buffer,len);
+		if(!nbVop) goto _abortUnpack;
 		
-		firstVopOffset=searchVop(buffer,endPos);
-		secondVopOffset=searchVop(buffer+firstVopOffset,endPos);
-		
-		if(!firstVopOffset)
+		if(nbVop==1) // only one vop
 		{
-			aprintf("Did not find a single vop....aborting\n");
-			goto _abortUnpack;			
-		}
-		// If there is nno secondVop, take the whole frame
-		firstVopOffset-=4;
-		aprintf("Frame 1 dump %lu :\n",firstVopOffset);
-		//mixDump(buffer+firstVopOffset,8);
-		aprintf("\n");
-		
-		if(!secondVopOffset)
-		{
-			memcpy(&newIndex[newTotal],&_idx[img],sizeof(_idx[0]));
-			newTotal++;
+			memcpy(&newIndex[targetIndex],&_idx[img],sizeof(_idx[0]));
+			newIndex[targetIndex].intra=myVops[0].type;
 			aprintf("Only one frame found\n");
+			targetIndex++;
+			img++;
+			continue;
+		
 		}
-		else
+		nbDuped++;
+		// more than one vop, do up to the n-1th
+		// the 1st image starts at 0
+		myVops[0].offset=0;
+		myVops[nbVop].offset=len;
+				
+		
+		uint32_t place;
+		for(uint32_t j=0;j<nbVop;j++)
 		{
-			
-			aprintf("Frame 2 dump %lu :\n",secondVopOffset);
-			//mixDump(buffer+secondVopOffset,8);
-			aprintf("\n");
-			
-			// split it
-			memcpy(&newIndex[newTotal],&_idx[img],sizeof(_idx[0]));
-			newIndex[newTotal].size=secondVopOffset;
-			newTotal++;
-			aprintf(" one frame found:%lu\n",secondVopOffset);
-			// second part, most probably a  B Frame
-			newIndex[newTotal].offset=_idx[img].offset+secondVopOffset;
-			newIndex[newTotal].size=len-secondVopOffset;
-			newIndex[newTotal].intra=AVI_B_FRAME;
-			newTotal++;
-			aprintf(" two frame found:%lu\n",len-secondVopOffset);
-		}
+
+			place=targetIndex+j;
+			 if(!j)
+				newIndex[place].intra=myVops[j].type;
+			else
+				newIndex[place].intra=AVI_B_FRAME;
+			newIndex[place].size=myVops[j+1].offset-myVops[j].offset;
+			newIndex[place].offset=_idx[img].offset+myVops[j].offset;
+				
+		}				
+		targetIndex+=nbVop;	
+		img++;
 		
 	}
 	ret=1;
 _abortUnpack:
 	delete [] buffer;
 	delete working;
+#if 0	
+	for(uint32_t k=0;k<nbFrame;k++)
+	{
+		printf("%d old:%lu new: %lu \n",_idx[k].size,newIndex[k].size);
+	}	
+#endif	
 	if(ret=1)
 	{
 		printf("Sucessfully unpacked the bitstream\n");
-		printf("Originally %lu frames, now %lu frames\n",nbFrame,newTotal);
+		
 		delete [] _idx;
 		_idx=newIndex;
 	}
@@ -146,20 +171,36 @@ _abortUnpack:
 	return ret;
 }
 // Search a start vop in it
-uint32_t searchVop(uint8_t *begin, uint8_t *end)
+// and return also the vop type
+// needed to update the index
+uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop)
 {
 	uint32_t startCode=0xffffffff;
 	uint32_t off=0;
+	uint32_t voptype;
+	*nb=0;
 	while(begin<end-3)
 	{
 		startCode=(startCode<<8)+*begin;
 		if((startCode & 0xffffff00) == 0x100)
 		{
-			aprintf("Startcode : %d\n",*begin);
 			if(*begin==0xb6)
 			{
+				// Analyse a bit the vop header
+				uint8_t coding_type=begin[1];
+				coding_type>>=6;
+				aprintf("\t %d Img type:%s\n",*nb,s_voptype[coding_type]);
+				switch(coding_type)
+				{
+					case 0: voptype=AVI_KEY_FRAME;break;
+					case 1: voptype=0;break;
+					case 2: voptype=AVI_B_FRAME;break;
+					case 3: printf("Glouglou\n");voptype=0;break;
 				
-				return off+1;
+				}
+				vop[*nb].offset=off-3;
+				vop[*nb].type=voptype;
+				*nb=(*nb)+1;
 			
 			}	
 		}
