@@ -19,7 +19,6 @@
 #include <stdlib.h>
 
 #include <errno.h>
-#include <ADM_assert.h>
   
 #include "fourcc.h" 
  
@@ -28,12 +27,13 @@
 #include <pthread.h>
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_audiodevice/ADM_deviceoss.h"
 #include <CoreServices/CoreServices.h>
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/DefaultAudioOutput.h>
 
+#include <ADM_assert.h>
+#include "ADM_audiodevice/ADM_deviceoss.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME  MODULE_ADEVICE
 #include "ADM_toolkit/ADM_debug.h"

@@ -23,10 +23,10 @@
 	 
 	 public:
 	 			audioDevice(void ) { _fq=0;_rate=0;}
-	    		virtual uint8_t init( uint32_t channel,uint32_t fq ) { assert(0);return 0;}
-	      		virtual uint8_t stop( void ) { assert(0);return 0;}
+	    		virtual uint8_t init( uint32_t channel,uint32_t fq ) { ADM_assert(0);return 0;}
+	      		virtual uint8_t stop( void ) { ADM_assert(0);return 0;}
 	      
-	    		virtual uint8_t play( uint32_t len, uint8_t *data ) { assert(0);return 0;}					    	 
+	    		virtual uint8_t play( uint32_t len, uint8_t *data ) { ADM_assert(0);return 0;}					    	 
 	 }   ;
 	 class dummyAudioDevice : public audioDevice
 	 {
