@@ -388,7 +388,7 @@ static int rv20_decode_picture_header(MpegEncContext *s)
 //            return -1;
         }
         seq= get_bits(&s->gb, 15);
-        if (s->avctx->sub_id == 0x20201002 && get_bits(&s->gb, 1)){
+        if (s->avctx->sub_id == 0x20201002 && 0 && get_bits(&s->gb, 1)){
             av_log(s->avctx, AV_LOG_ERROR, "unknown bit4 set\n");
 //            return -1;
         }
@@ -528,15 +528,9 @@ static int rv10_decode_packet(AVCodecContext *avctx,
                              uint8_t *buf, int buf_size)
 {
     MpegEncContext *s = avctx->priv_data;
-    int i, mb_count, mb_pos, left;
+    int mb_count, mb_pos, left;
 
     init_get_bits(&s->gb, buf, buf_size*8);
-#if 0
-    for(i=0; i<buf_size*8 && i<200; i++)
-        printf("%d", get_bits1(&s->gb));
-    printf("\n");
-    return 0;
-#endif
     if(s->codec_id ==CODEC_ID_RV10)
         mb_count = rv10_decode_picture_header(s);
     else
@@ -562,10 +556,6 @@ static int rv10_decode_packet(AVCodecContext *avctx,
     if ((s->mb_x == 0 && s->mb_y == 0) || s->current_picture_ptr==NULL) {
         if(MPV_frame_start(s, avctx) < 0)
             return -1;
-    }
-
-    if(s->pict_type == B_TYPE){ //FIXME remove after cleaning mottion_val indexing
-        memset(s->current_picture.motion_val[0], 0, sizeof(int16_t)*2*(s->mb_width*2+2)*(s->mb_height*2+2));
     }
 
 #ifdef DEBUG
@@ -600,9 +590,9 @@ static int rv10_decode_packet(AVCodecContext *avctx,
     s->block_wrap[0]=
     s->block_wrap[1]=
     s->block_wrap[2]=
-    s->block_wrap[3]= s->mb_width*2 + 2;
+    s->block_wrap[3]= s->b8_stride;
     s->block_wrap[4]=
-    s->block_wrap[5]= s->mb_width + 2;
+    s->block_wrap[5]= s->mb_stride;
     ff_init_block_index(s);
     /* decode each macroblock */
 
@@ -655,7 +645,6 @@ static int rv10_decode_frame(AVCodecContext *avctx,
 
     /* no supplementary picture */
     if (buf_size == 0) {
-        *data_size = 0;
         return 0;
     }
 
@@ -677,10 +666,6 @@ static int rv10_decode_frame(AVCodecContext *avctx,
             return -1;
     }
     
-    if(s->pict_type == B_TYPE){ //FIXME remove after cleaning mottion_val indexing
-        memset(s->current_picture.motion_val[0], 0, sizeof(int16_t)*2*(s->mb_width*2+2)*(s->mb_height*2+2));
-    }
-
     if(s->mb_y>=s->mb_height){
         MPV_frame_end(s);
     
@@ -693,8 +678,6 @@ static int rv10_decode_frame(AVCodecContext *avctx,
         }
         
         *data_size = sizeof(AVFrame);
-    }else{
-        *data_size = 0;
     }
 
     return buf_size;

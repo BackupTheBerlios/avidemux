@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2002 Brian Foley
  * Copyright (c) 2002 Dieter Shirley
+ * Copyright (c) 2003-2004 Romain Dolbeau <romain@dolbeau.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -59,6 +60,9 @@ static unsigned char* perfname[] = {
   "put_no_rnd_pixels8_xy2_altivec",
   "put_pixels16_xy2_altivec",
   "put_no_rnd_pixels16_xy2_altivec",
+  "hadamard8_diff8x8_altivec",
+  "hadamard8_diff16_altivec",
+  "avg_pixels8_xy2_altivec",
   "clear_blocks_dcbz32_ppc",
   "clear_blocks_dcbz128_ppc"
 };
@@ -129,11 +133,11 @@ POWERPC_PERF_START_COUNT(powerpc_clear_blocks_dcbz32, 1);
       i += 16;
     }
     for ( ; i < sizeof(DCTELEM)*6*64 ; i += 32) {
-//#ifndef __MWERKS__
+#ifndef __MWERKS__
       asm volatile("dcbz %0,%1" : : "b" (blocks), "r" (i) : "memory");
-//#else
-      //__dcbz( blocks, i );
-//#endif
+#else
+      __dcbz( blocks, i );
+#endif
     }
     if (misal) {
       ((unsigned long*)blocks)[188] = 0L;
@@ -262,19 +266,22 @@ void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx)
         c->add_bytes= add_bytes_altivec;
 #endif /* 0 */
         c->put_pixels_tab[0][0] = put_pixels16_altivec;
-        /* the tow functions do the same thing, so use the same code */
+        /* the two functions do the same thing, so use the same code */
         c->put_no_rnd_pixels_tab[0][0] = put_pixels16_altivec;
         c->avg_pixels_tab[0][0] = avg_pixels16_altivec;
-// next one disabled as it's untested.
-#if 0
         c->avg_pixels_tab[1][0] = avg_pixels8_altivec;
-#endif /* 0 */
+	c->avg_pixels_tab[1][3] = avg_pixels8_xy2_altivec;
         c->put_pixels_tab[1][3] = put_pixels8_xy2_altivec;
         c->put_no_rnd_pixels_tab[1][3] = put_no_rnd_pixels8_xy2_altivec;
         c->put_pixels_tab[0][3] = put_pixels16_xy2_altivec;
         c->put_no_rnd_pixels_tab[0][3] = put_no_rnd_pixels16_xy2_altivec;
         
 	c->gmc1 = gmc1_altivec;
+
+#ifdef CONFIG_DARWIN // ATM gcc-3.3 and gcc-3.4 fail to compile these in linux...
+	c->hadamard8_diff[0] = hadamard8_diff16_altivec;
+	c->hadamard8_diff[1] = hadamard8_diff8x8_altivec;
+#endif
 
 #ifdef CONFIG_ENCODERS
 	if (avctx->dct_algo == FF_DCT_AUTO ||

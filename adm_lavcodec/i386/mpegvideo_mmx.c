@@ -109,7 +109,7 @@ asm volatile(
 static void dct_unquantize_h263_inter_mmx(MpegEncContext *s,
                                   DCTELEM *block, int n, int qscale)
 {
-    int level, qmul, qadd, nCoeffs;
+    int qmul, qadd, nCoeffs;
 
     qmul = qscale << 1;
     qadd = (qscale - 1) | 1;
@@ -710,11 +710,10 @@ void MPV_common_init_mmx(MpegEncContext *s)
 	}
 
         if(dct_algo==FF_DCT_AUTO || dct_algo==FF_DCT_MMX){
-	/* MEANX*/
-#if 0	
+#if 0 //MEANX
             if(mm_flags & MM_SSE2){
                 s->dct_quantize= dct_quantize_SSE2;
-            } else 
+            } else
 #endif	    
 	    if(mm_flags & MM_MMXEXT){
                 s->dct_quantize= dct_quantize_MMX2;
