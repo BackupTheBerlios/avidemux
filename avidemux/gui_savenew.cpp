@@ -51,7 +51,7 @@ extern void oplug_mpegff(char *name);
 static void  A_SaveAudioNVideo(char *name);
 
 
-void A_Save( char *name)
+int A_Save( char *name)
 {
 	// depending on the type we save a avi, a mpeg or a XVCD
 	CodecFamilty family;
@@ -76,7 +76,9 @@ void A_Save( char *name)
 					break;
 		default:
 					assert(0);
+					return 0;
 	}
+	return 1;
 }
 void  A_SaveAudioDualAudio(void)
 {

@@ -85,7 +85,7 @@ void A_handleSecondTrack (int tracktype);
 void A_saveImg (char *name);
 void A_saveBunchJpg( char *name);
 void A_requantize(void);
-void A_saveJpg (char *name);
+int A_saveJpg (char *name);
 int A_loadWave (char *name);
 int A_loadAC3 (char *name);
 void A_saveAudioDecodedTest (char *name);
@@ -120,7 +120,7 @@ static void secondTrackAC3 (char *name);
 
 static void updateSecondAudioTrack (void);
 
-extern void A_Save( char *name);
+extern int A_Save( char *name);
 static uint32_t getAudioByteCount( uint32_t start, uint32_t end);
 extern void mpegToIndex (char *name);
 static void A_mpegIndexer (void);
@@ -128,7 +128,7 @@ extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
 void ADM_cutWizard (void);
 void computeIT (int size, int nb, int brate, uint32_t * frame,
 		uint32_t * rsize);
-void ADM_saveRaw (char *name);
+int ADM_saveRaw (char *name);
 static void A_saveWorkbench (char *name);
 void A_loadWorkbench (char *name);
 void updateLoaded (void);
@@ -465,7 +465,7 @@ case ACT_Pipe2Other:
 		break;
 	
     case ACT_SaveRaw:
-      GUI_FileSelWrite ("Select raw file to save ", ADM_saveRaw);
+      GUI_FileSelWrite ("Select raw file to save ", (SELFILE_CB *)ADM_saveRaw);
       break;
     case ACT_CutWizard:
       ADM_cutWizard ();
@@ -532,7 +532,7 @@ case ACT_Pipe2Other:
       //GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       break;
     case ACT_SaveJPG :
-    	GUI_FileSelWrite ("Select Jpeg to save ", A_saveJpg);
+    	GUI_FileSelWrite ("Select Jpeg to save ", (SELFILE_CB *)A_saveJpg);
       	//GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       	break;
     
@@ -697,7 +697,7 @@ case ACT_Pipe2Other:
       break;
 //----------------------test-----------------------
     case ACT_SaveAvi:
-      GUI_FileSelWrite ("Select  file to save ",A_Save); // A_SaveAudioNVideo);
+      GUI_FileSelWrite ("Select  file to save ",(SELFILE_CB *)A_Save); // A_SaveAudioNVideo);
       break;
 //---------------------------------------------------
     case ACT_Copy:
@@ -1182,7 +1182,7 @@ A_playAvi (void)
 /**________________________________________________________
  Save a Jpg image from current display buffer
 ________________________________________________________*/
-void A_saveJpg (char *name)
+int A_saveJpg (char *name)
 {
   ffmpegEncoderFFMjpeg *codec=NULL;
   uint32_t sz,fl;
@@ -1205,7 +1205,7 @@ void A_saveJpg (char *name)
 				GUI_Alert("Problem encoding that frame!");
 				delete [] buffer;
 				delete codec;
-				return ;
+				return 0;
 			}
 
 	fd=fopen(name,"wb");
@@ -1214,7 +1214,7 @@ void A_saveJpg (char *name)
 				GUI_Alert("Problem opening file!");
 				delete [] buffer;
 				delete codec;
-				return ;
+				return 0;
 
 	}
 	fwrite (buffer, sz, 1, fd);
@@ -1222,6 +1222,7 @@ void A_saveJpg (char *name)
     	delete [] buffer;
 	delete codec;
   	GUI_Alert ("Done.");
+	return 1;
 }
 #else
 
@@ -1921,7 +1922,7 @@ A_mpegIndexer (void)
 	Usefull to cut mpeg stream or extract raw h263/mpeg4 stream
 
 */
-void ADM_saveRaw (char *name)
+int ADM_saveRaw (char *name)
 {
   uint32_t len, flags;
   FILE *fd, *fi;
@@ -1935,7 +1936,7 @@ void ADM_saveRaw (char *name)
   fd = fopen (name, "wb");
   fi = fopen (idx, "wt");
   if (!fd)
-    return;
+    return 0;
   work=new DIA_working("Saving raw video stream");
 
   // preamble
@@ -1987,6 +1988,7 @@ _abt:
   fclose (fd);
   fclose (fi);
   delete work;
+  return 1;
 
 }
 

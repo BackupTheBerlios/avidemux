@@ -25,6 +25,8 @@
 #include "avi_vars.h"
 #include "gui_action.hxx"
 
+//_________________________
+
 int scriptLoad(Arg *args);
 int scriptExit(Arg *args);
 int scriptAppend(Arg *args);
@@ -48,11 +50,34 @@ int scriptScanVbr(Arg *args);
 int scriptAudioDelay(Arg *args);
 int scriptFilm2Pal(Arg *args);
 int scriptAudioCodec(Arg *args);
+int scriptLoadCodec(Arg *args);
+int scriptSavejpeg(Arg *args);
+int scriptRaw(Arg *args);
+int scriptSave(Arg *args);
 
 extern void HandleAction(Action act);
+//_________________________
 #include "adm_command.h" 
 void ADS_commandList( void );
 ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg);
+//_______________________
+extern int A_Save (char *name);
+int scriptSave(Arg *args)
+{
+	return A_Save(args[0].arg.string);
+}
+//_______________________
+extern int ADM_saveRaw (char *name);
+int scriptRaw(Arg *args)
+{
+	return ADM_saveRaw(args[0].arg.string);
+}
+//_______________________
+extern int A_saveJpg (char *name);
+int scriptSavejpeg(Arg *args)
+{
+	return A_saveJpg(args[0].arg.string);
+}
 //_______________________
 int scriptAudioCodec(Arg *args)
 {
@@ -63,6 +88,12 @@ char *name=args[0].arg.string;
 	// set set bitrate
 	audioFilter_SetBitrate( args[1].arg.integer);
 	return 1;
+}
+//_______________________
+extern uint8_t loadVideoCodecConf( char *name);
+int scriptLoadCodec(Arg *args)
+{
+	return loadVideoCodecConf(args[0].arg.string);
 }
 //_______________________
 int scriptFilm2Pal(Arg *args)
@@ -98,6 +129,7 @@ int	f=args[0].arg.integer;
 	return 1;
 
 }
+//_________Sleep in ms________________
 int scriptSetMarkerB(Arg *args)
 {
 int	f=args[0].arg.integer;

@@ -45,7 +45,7 @@
 #include "ADM_filter/vidVCD.h"
 extern void ADS_commandList( void );
 extern uint8_t loadVideoCodecConf( char *name);
-extern void A_saveJpg (char *name);
+extern int A_saveJpg (char *name);
 extern void filterLoadXml(char *n);
 extern void A_openAvi(char *name);
 extern void A_appendAvi (char *name);
