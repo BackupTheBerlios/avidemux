@@ -694,6 +694,11 @@ int videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
 						compmode=COMPRESS_2PASS;
 						aprintf("2pass\n");
 				}
+			if(!strcasecmp(cs,"follow"))
+				{
+						compmode=COMPRESS_SAME;
+						aprintf("Follow mode\n");
+				}
 			// search for other options
 			if(!strcasecmp(cs,"mbr")){
 			   compmode = NO_COMPRESSION_MODE;
@@ -1116,6 +1121,9 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param, uint32_t ex
 	  generic->mode=mode;
 	  switch(mode)
 	  {
+	  			case COMPRESS_SAME:
+								aprintf("Same as input\n");
+								break;
 				case COMPRESS_CBR:
 								aprintf("CBR : %lu kbps\n",param);
 								generic->bitrate=param;
