@@ -15,25 +15,26 @@ EXTEND_MMX =
 X_MMX_FLAGS = 
 endif
 
-if BUILD_PPC
-	EXTEND_MMX = 
-	X_MMX_FLAGS = 
+if BUILD_ALTIVEC
+EXTEND_PPC=ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c ppc/dsputil_altivec.c \
+	ppc/fft_altivec.c \
+	ppc/gmc_altivec.c \
+	ppc/idct_altivec.c \
+	ppc/fdct_altivec.c \
+	ppc/mpegvideo_altivec.c
 
-	if BUILD_ALTIVEC
-		EXTEND_PPC=ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c ppc/dsputil_altivec.c \
-			ppc/fft_altivec.c \
-			ppc/gmc_altivec.c \
-			ppc/idct_altivec.c \
-			ppc/fdct_altivec.c \
-			ppc/mpegvideo_altivec.c
-		if BUILD_DARWIN
-			X_PPC_FLAGS=-maltivec -mabi=altivec	 -faltivec
-		else
-			X_PPC_FLAGS=-maltivec -mabi=altivec	 
-		endif
-	else
-		EXTEND_PPC=ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c 
-		X_PPC_FLAGS=
+if BUILD_DARWIN
+X_PPC_FLAGS=-maltivec -mabi=altivec	 -faltivec
+else
+X_PPC_FLAGS=-maltivec -mabi=altivec	 
+endif
+
+else
+
+if BUILD_PPC
+EXTEND_PPC=ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c 
+endif
+
 endif
 
 
@@ -77,7 +78,6 @@ libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c \
 	svq1.c \
 	utils.c \
 	wmadec.c \
-	golomb.c \
 	indeo3.c \
 	vp3.c \
 	vp3dsp.c \

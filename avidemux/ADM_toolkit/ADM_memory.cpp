@@ -40,7 +40,11 @@ void *av_realloc(void *ptr, unsigned int size);
 void *ADM_alloc(size_t size)
 {
 void *c;
+#ifdef CONFIG_DARWIN
+	c=malloc(size);
+#else
 	ADM_assert(!posix_memalign(&c,16,size));
+#endif
 	return c;
 
 }
