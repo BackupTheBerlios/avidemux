@@ -171,8 +171,10 @@ int ret;
 
 	ret = xvid_encore(xvid_handle, XVID_ENC_ENCODE, &xvid_enc_frame,
 					  &xvid_enc_stats);
-	*outlen = xvid_enc_frame.length;
- 	
+	*outlen = ret;
+ #ifdef ADM_DEBUG
+	printf("Outlen: %lu\n",*outlen);
+ #endif
 	
 	return 1;
 
