@@ -164,6 +164,8 @@ uint8_t    _3GPHeader::close( void )
 	DEL(Sc);
 	DEL(Sn);
 	DEL(Sync);
+	DEL(SttsN);
+	DEL(SttsC);
  	return 1;
 }
 //
@@ -185,6 +187,8 @@ _3GPHeader::_3GPHeader(void)
 	 Sc=NULL;
 	 Sn=NULL;
 	 Sync=NULL;
+	 SttsN=NULL;
+	 SttsC=NULL;
 
 
 }
@@ -279,7 +283,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 	static uint32_t duration;
 	static uint32_t _lastW, _lastH;
 	static uint32_t nest=0;
-
+	static uint32_t nbStts;
+	static uint32_t myScale=1000;
 	uint32_t type;
 	uint32_t n=0,j,wh,i,l=0;
 	uint32_t tag=0xff;
@@ -338,7 +343,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					duration=tom.read32();
 					if(scale!=1000)
 					{
-						printf("Warning : scale is not in ms!\n");
+						myScale=scale;
+						printf("Warning : scale is not in ms %lu !\n",myScale);
 						if(scale)
 						{
 								duration=1000*duration;
@@ -346,8 +352,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 						}
 						scale=1000;
 					}
-					else
-						printf("Duration : %lu ms\n",duration);
+					
+					printf("Duration : %lu ms\n",duration);
 					if(!duration) duration=1000;
 					
 				}
@@ -402,7 +408,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					tom.skipBytes(8);
 					_rdWav=new WAVHeader;
 					memset(_rdWav,0,sizeof(WAVHeader));
-					_rdWav->encoding=WAV_MP4;
+					_rdWav->encoding=WAV_AAC;
 					
 					#warning !!!!!!!!!!!!!!!
 					#warning decode MP4 audio header!
@@ -430,6 +436,27 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					
 					tom.skipAtom();
 					break;					
+			case MKFCCR('s','t','t','s'): // time sample table stts
+				
+				printf("stts:%lu\n",tom.read32()); // version & flags
+				nbStts=tom.read32();
+				printf("Time stts atom found (%lu)\n",nbStts);
+				printf("Using myscale %lu\n",myScale);
+				SttsN=new uint32_t[nbStts];
+				SttsC=new uint32_t[nbStts];
+				double dur;
+				for(i=0;i<nbStts;i++)
+				{
+					
+					SttsN[i]=tom.read32();
+					SttsC[i]=tom.read32();
+					printf("stts: count:%u size:%u (unscaled)\n",SttsN[i],SttsC[i]);	
+					//dur*=1000.*1000.;; // us
+					//dur/=myScale;
+				}
+				tom.skipAtom();
+				break;	
+				
 			case MKFCCR('s','t','s','s'): //'stss':
 				printf("Sync atom found\n");
 				tom.read32();
@@ -451,6 +478,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				nbCo=0;
 				nbSc=0;
 				nbSync=0;
+				nbStts=0;
+				//myScale=1000;
 				parseAtomTree(&tom);
 				switch(current)
 				{
@@ -459,13 +488,17 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
            				_videostream.dwLength= _mainaviheader.dwTotalFrames=nbSz;
 					if(duration)
               				_videostream.dwRate=(1000*1000*_videostream.dwLength)/duration;;
-					buildIndex(&_idx,nbSz,Sz,nbCo,Co,nbSc,Sc,Sn,&nbo);
+					buildIndex(&_idx,myScale,
+							nbSz,Sz,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
+							Sn,&nbo);
 					if(nbSync)
 						sync(_idx,nbSz,nbSync,Sync);
 					break;
 				case 2:
 
-					buildIndex(&_audioIdx,nbSz,Sz,nbCo,Co,nbSc,Sc,Sn,&nbo);
+					buildIndex(&_audioIdx,myScale,
+							nbSz,Sz,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
+							Sn,&nbo);
 					if(nbo)
 						_nbAudioChunk=nbo;
 					else
@@ -477,10 +510,31 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				DEL(Sc);
 				DEL(Sn);
 				DEL(Sync);
+				DEL(SttsC);
+				DEL(SttsN);
 
 				break;
 		// misc atom that needs special care
-
+			case MKFCCR('m','d','h','d'): //mdhd
+				//
+				{
+				uint32_t tmpscale;
+				double duration;
+				printf("Decoding mdhd\n");
+				tom.skipBytes(4); // flags + version
+				tom.skipBytes(4); // creation time
+				tom.skipBytes(4); // mod time
+				tmpscale=tom.read32(); //
+				printf("Myscale in mdhd:%lu\n",tmpscale);
+				if(!tmpscale) tmpscale=600; // default
+				duration=tom.read32();
+				printf("duration in mdhd:%f (unscaled)\n",duration);
+				duration=(duration*1000.)/tmpscale;
+				printf("duration in mdhd:%f (scaled ms)\n",duration);
+				tom.skipAtom();
+				myScale=tmpscale;
+				}
+				break;
 			case MKFCCR('h','d','l','r'): //'hdlr':
 				tom.read32();
 				tom.read32();
@@ -513,7 +567,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				tom.skipBytes(12);
 				printf("Track Id: %lu\n",tom.read32());
 				tom.skipBytes(4);
-				printf("Duration: %lu\n",tom.read32());
+				printf("Duration: %lu (ms)\n",(tom.read32()*1000)/myScale);
 				tom.skipBytes(8);
 				tom.skipBytes(4); // layers
 				tom.skipBytes(40); // layers
@@ -732,9 +786,11 @@ http://developer.apple.com/documentation/QuickTime/QTFF/QTFFChap2/chapter_3_sect
 */
 uint8_t	_3GPHeader::buildIndex(
 				_3gpIndex **idx,
+				uint32_t myScale,
 				uint32_t nbSz,	uint32_t *Sz,
 				uint32_t nbCo ,		uint32_t *Co,
 				uint32_t nbSc,		uint32_t *Sc,
+				uint32_t nbStts,	uint32_t *SttsN,uint32_t *SttsC,
 				uint32_t *Sn, 			uint32_t *outNbChunk)
 
 {
@@ -778,6 +834,25 @@ uint32_t i,j,cur;
 			ix[i].offset=Co[i];;
 			aprintf("Size : %lu offset : %lu\n",ix[i].size,ix[i].offset);
 		}
+		// Time to update audio (as we are probably in audio)
+		// they should be all the same duration
+		ADM_assert(nbStts==1);
+		ADM_assert(SttsC[0]==1); // 
+		printf("created %u blocks\n",nbCo);
+		// update timestamps on block
+		double dur=SttsN[0];
+		double total=0;
+		
+			dur=dur/myScale;
+			dur/=nbCo;		// we got the duration of one block
+			dur*=1000*1000.;	// in us now
+		for(uint32_t i=0;i<nbCo;i++)
+		{
+			(*idx)[i].time=(uint64_t)floor(total);
+			total+=dur;
+		
+		}
+		return 1;
 #else
 		*idx=new _3gpIndex[nbPacket];
 		_3gpIndex *ix=*idx;
@@ -800,20 +875,22 @@ uint32_t i,j,cur;
 				cur_entry++;
 			}
 		}
-#endif
 		return 1;
-
+#endif
+		
+		
 	}
-
-	*idx=new _3gpIndex[nbSz];
-	memset(*idx,0,nbSz*sizeof(_3gpIndex));
-
-	for(i=0;i<nbSz;i++)
+	else
 	{
-		(*idx)[i].size=Sz[i];
-		aprintf("\t size : %d : %lu\n",i,Sz[i]);
-	}
-// if no sample to chunk we map directly
+		*idx=new _3gpIndex[nbSz];
+		memset(*idx,0,nbSz*sizeof(_3gpIndex));
+
+		for(i=0;i<nbSz;i++)
+		{
+			(*idx)[i].size=Sz[i];
+			aprintf("\t size : %d : %lu\n",i,Sz[i]);
+		}
+		// if no sample to chunk we map directly
 	{	// first build the # of sample per chunk table
 		for(i=0;i<nbSc;i++)
 		{
@@ -845,9 +922,59 @@ uint32_t i,j,cur;
 
 
 		}
-
-
-
+		*outNbChunk=cur;;
+	}
+	}
+	// Now deal with duration
+	// the unit is us FIXME, probably said in header
+	// we put each sample duration in the time entry
+	// then sum them up to get the absolute time position
+_3gp_time:	
+	uint32_t nbChunk=*outNbChunk;
+	if(nbStts)		//uint32_t nbStts,	uint32_t *SttsN,uint32_t SttsC,
+	{
+		uint32_t start=0;
+		if(nbStts>1)
+		{
+			for(uint32_t i=0;i<nbStts;i++)
+			{
+				for(uint32_t j=0;j<SttsN[i];j++)
+				{
+					(*idx)[start].time=(uint64_t)SttsC[i];
+					start++;
+					ADM_assert(start<=nbChunk);
+				}	
+			}
+		}
+		else
+		{
+			// All same duration
+			for(uint32_t i=0;i<nbChunk;i++)
+				(*idx)[i].time=(uint64_t)SttsC[0]; // this is not an error!
+		
+		}
+		// now collapse
+		uint64_t total=0;
+		float    ftot;
+		uint32_t thisone;
+		for(uint32_t i=0;i<nbChunk;i++)
+		{
+			thisone=(*idx)[i].time;
+			ftot=total;
+			ftot*=1000.*1000.;
+			ftot/=myScale;
+			(*idx)[i].time=(uint32_t)floor(ftot);
+			total+=thisone;
+			aprintf("Audio chunk : %lu time :%lu\n",i,(*idx)[i].time);
+		}
+		// Time is now built, it is in us
+	
+	
+	}
+	else // there is not ssts
+	{
+		GUI_Alert("No stts table !");
+		ADM_assert(0);	
 	}
 	return 1;
 }

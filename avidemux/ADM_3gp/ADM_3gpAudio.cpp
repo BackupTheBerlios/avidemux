@@ -79,9 +79,33 @@ _3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *inco
 	printf("Frequency :%d\n",_wavheader->frequency);
 	printf("Encoding   :%d\n",_wavheader->encoding);
 	printf("Channels   :%d\n",_wavheader->channels);
-    	goTo(0);
+    	goToTime(0);
 
 
+}
+ uint8_t	_3gpAudio::goToTime(uint32_t mstime)
+{
+uint64_t target=mstime;
+		target*=1000; // us
+		if(target>_index[_nb_chunks-1].time)
+		{
+			printf("3GP: going out of time asked %lu : avail %lu\n",mstime,_index[_nb_chunks-1].time/1000);
+			_current_index=_nb_chunks-1;
+			return 1;
+		}
+		for(uint32_t i=0;i<_nb_chunks;i++)
+		{
+			if(_index[i].time >= target)
+			{
+				_current_index=i;
+				printf("3gp Go to time succeeded chunk :%lu time ask:%lu time get:%lu\n",i,mstime,
+						_index[i].time/1000);
+				return 1;
+			}
+		
+		}
+		printf("3GP: gototime Failed\n");
+		return 0;
 }
 //_______________________________________________________
 //
@@ -89,37 +113,7 @@ _3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *inco
 //_______________________________________________________
 uint8_t _3gpAudio::goTo(uint32_t newoffset)
 {
-    uint32_t len;
-    len = newoffset;
-    if(len>=_length)
-    	{
-       	printf("\n Out of bound !\n");
-     		return 0;
-       }
-    _current_index = 0;	// start at beginning
-    do
-      {
-	  if (len >= _index[_current_index].size)	// skip whole subchunk
-	    {
-		len -= _index[_current_index].size;
-		_current_index++;
-  		if(_current_index>=_nb_chunks)
-    			{
-                  printf("\n idx : %lu max: %lu len:%lu\n",  _current_index,_nb_chunks,len);
-                  return 0;
-       		};
-		_rel_position = 0;
-	  } else		// we got the last one
-	    {
-		_rel_position = len;
-		len = 0;
-	    }
-	  //printf("\n %lu len bytes to go",len);
-      }
-    while (len);
-    	_abs_position = _index[_current_index].offset;
-	ADM_assert(_current_index<_nb_chunks);
-    	_pos=newoffset;
+   ADM_assert(0);
     return 1;
 }
 //______________________________________
@@ -131,9 +125,26 @@ uint32_t r=0;
 	
 	  fseeko(_fd,_index[_current_index].offset,SEEK_SET);
 	  r=fread(dest,1,_index[_current_index].size,_fd);
+	  if(_current_index==_nb_chunks-1)
+	  {
+	  	printf("3gp: Last sample\n");
+	  	*samples=1024;
+	  }
+	  else
+	  {
+	  	double delta;
+		delta=_index[_current_index+1].time-_index[_current_index].time;
+		
+		// delta is the duration of the current chunk in us
+		delta*=_wavheader->frequency;
+		delta/=1000.*1000.; // us -> second
+		*samples=(uint32_t)floor(delta);
+	  
+	  }
 	  _current_index++;
 	  *len=r;
-	  *samples=1024;
+	  
+	  
 	  return 1;
 
 
@@ -145,96 +156,10 @@ uint32_t r=0;
 //_______________________________________________________
 uint32_t _3gpAudio::read(uint32_t len,uint8_t *buffer)
 {
-    uint32_t togo;
-    uint32_t avail, rd;
-
-    // just to be sure....
-
-   fseeko(_fd,_abs_position+_rel_position,SEEK_SET);
-
-    togo = len;
-
-#ifdef VERBOSE_L3
-    printf("\n ABS: %lu rel:%lu len:%lu", _abs_position, _rel_position,
-	   len);
-#endif
-
-     do
-     {
-	  avail = _index[_current_index].size - _rel_position;	// how much available ?
-
-	  if (avail > togo)	// we can grab all in one move
-	    {
-			if(togo!= fread( (uint8_t *) buffer,1,togo,_fd))
-			{
-				printf("\n ***WARNING : incomplete chunk ***\n");
-			}
-
-#ifdef VERBOSE_L3
-
-		printf("\n REL: %lu rel:%lu len:%lu", _abs_position,
-		       _rel_position, togo);
-#endif
-
-		_rel_position += togo;
-#ifdef VERBOSE_L3
-
-		printf("\n FINISH: %lu rel:%lu len:%lu", _abs_position,
-		       _rel_position, togo);
-#endif
-
-		buffer += togo;
-		togo = 0;
-	  } else		// read the whole subchunk and go to next one
-	    {
-#ifdef VERBOSE_L3
-
-		printf("\n CONT: %lu rel:%lu len:%lu", _abs_position,
-		       _rel_position, togo);
-#endif
-		rd = fread( buffer,1,avail,_fd);
-		if (rd != avail)
-		  {
-		      printf("\n Error : Expected :%lu bytes read :%lu \n",     rd, avail);
-		      //ADM_assert(0);
-		      return rd;
-
-		  }
-		buffer += avail;
-		togo -= avail;
-
-		_current_index++;
-		if (_current_index>=_nb_chunks)
-		  {
-#ifdef VERBOSE_L3
-
-		printf("\n OVR: %lu rel:%lu len:%lu", _abs_position,
-		       _rel_position, togo);
-#endif
-		      _abs_position =_index[0].offset ;
-            		_rel_position = 0;
-		      ADM_assert(len >= togo);
-        	  	_pos+=len;
-            		_pos-=togo;
-		      return (len - togo);
-
-		  }
-    	else
-     	{
-#ifdef VERBOSE_L3
-		printf("\n CONT: %lu rel:%lu len:%lu", _abs_position,
-		       _rel_position, togo);
-#endif
-		_abs_position = _index[_current_index].offset;
-		_rel_position = 0;
-		//_riff->goTo(_abs_position);
-		fseeko(_fd,_abs_position,SEEK_SET);
-	    }
-      }
-    }
-    while (togo);
-    _pos+=len;
-    return len;
+    uint32_t size,samples;
+    if(!getPacket(buffer,&size,&samples)) return 0;
+    return size;
+    
 
 }
 //_______________________________________________________
@@ -246,7 +171,8 @@ uint32_t _3gpAudio::read(uint32_t len,uint8_t *buffer)
 _3gpAudio::~_3gpAudio()
 {
 	// nothing special to do...
-
+	delete _wavheader;
+	_wavheader=NULL;
 }
 //_______________________________________________________
 uint8_t _3gpAudio::getNbChunk(uint32_t *ch)

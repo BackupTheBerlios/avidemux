@@ -31,6 +31,7 @@ typedef struct _3gpIndex
 	uint64_t offset;
 	uint64_t size;
 	uint8_t  intra;
+	uint64_t time;
 
 }_3gpIndex;
 //
@@ -59,6 +60,7 @@ public:
         virtual uint8_t  		goTo(uint32_t newoffset);
 		   uint8_t			getNbChunk(uint32_t *ch);
 	virtual uint8_t 		getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
+	virtual uint8_t 		goToTime(uint32_t mstime);
 
 };
 
@@ -80,13 +82,17 @@ protected:
 
 	 uint32_t *Sz,*Co,*Sc;
 	 uint32_t *Sn,*Sync;
+	 uint32_t *SttsN,*SttsC;
 
 
 	uint8_t		buildIndex(	_3gpIndex **idx,
+					uint32_t scale,
 					uint32_t nbSz,		uint32_t *Sz,
 					uint32_t nbChunk ,	uint32_t *Chunk,
 					uint32_t nbSc,		uint32_t *Sc,
-					uint32_t *Sn,			uint32_t *outNbChunk);
+					uint32_t nbStts,uint32_t *SttsN,uint32_t *SttsC,
+					uint32_t *Sn,			uint32_t *outNbChunk
+					);
 	uint32_t 		readPackedLen(adm_atom *tom );
 	WAVHeader		*_rdWav;
 public:
