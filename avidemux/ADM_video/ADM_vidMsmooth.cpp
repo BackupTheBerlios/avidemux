@@ -496,8 +496,8 @@ uint32_t off;
 			"pxor  %%mm7,%%mm7\n"
 			"movq  (%0),%%mm0\n"
 			"movq  %%mm0,%%mm6\n"
-			"punpckhbw %%mm7,%%mm0\n"
-			"punpcklbw %%mm7,%%mm6\n"
+			"punpckhbw %%mm7,%%mm0\n" // High part extended to 16 bits
+			"punpcklbw %%mm7,%%mm6\n" // low part ditto
 			
 			"movq  (%1),%%mm1\n"
 			"movq  %%mm1,%%mm5\n"
@@ -517,8 +517,9 @@ uint32_t off;
 			
 			"paddw %%mm0,%%mm2\n"
 			"paddw %%mm6,%%mm4\n"
-			
-			"packsswb %%mm2,%%mm4\n"
+			"psrlw $2, %%mm4\n"
+			"psrlw $2, %%mm2\n"
+			"packuswb %%mm2,%%mm4\n"
 			"movq %%mm4,(%3)\n" //
 			
 			:: "r" (srcpn+off),
@@ -537,6 +538,7 @@ uint32_t off;
 	// due to 16 byte alignment
 	memcpy(out, in, w);
 	memcpy(out + (h-1)*w, in + (h-1)*w, w);
+	__asm__ ("emms\n" ::);
 	
 }
 #endif
@@ -590,8 +592,12 @@ void  Msmooth::EdgeMaskYV12(const unsigned char *srcp, unsigned char *blurp, uns
 	/* Blur the source image prior to detail detection. */
 	#if defined(USE_MMX)
 		//printf("MMX\n");
+	if(1)
+	{
 		Blur_MMX((uint8_t *)srcp,(uint8_t *)workp,row_size,height);
 		Blur_MMX((uint8_t *)workp,(uint8_t *)blurp,row_size,height);
+	}
+	else
 	#endif
 	#ifdef HAVE_ALTIVEC
 	#define ISALIGNED(x) (!( ((long long)x)&15 ))
