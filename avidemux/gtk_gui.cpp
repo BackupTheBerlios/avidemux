@@ -240,7 +240,8 @@ HandleAction (Action action)
       prefs->save ();
       return;
     case ACT_SetLogFile:
-      GUI_FileSelWrite ("Select log File to use", encoderSetLogFile);
+//      GUI_FileSelWrite ("Select log File to use", encoderSetLogFile);
+	GUI_Alert("Obsolete!");
       return;
       break;
     case ACT_LoadWork:

@@ -72,6 +72,7 @@ audioFilter=NULL;
 _fd=NULL;
 _togo=0;
 _packet=0;
+TwoPassLogFile=NULL;
 }
 
 //_______________________________________________
@@ -89,6 +90,9 @@ ADM_ogmWrite::~ADM_ogmWrite()
 	
 	if(_fd) fclose(_fd);
 	_fd=NULL;
+	if(TwoPassLogFile)
+		delete [] TwoPassLogFile;
+	TwoPassLogFile=NULL;
 
 
 }
@@ -113,7 +117,7 @@ uint8_t error=0;
 		encoding_gui=new DIA_encoding(25000);
 		//______________ Write headers..._____________________
 		
-		if(!initVideo())
+		if(!initVideo(name))
 		{
 			fclose(_fd);
 			_fd=NULL;
@@ -159,7 +163,7 @@ uint8_t error=0;
 	return !error;
 }
 // Dummy ones
-uint8_t	ADM_ogmWrite::initVideo(void)
+uint8_t	ADM_ogmWrite::initVideo(char *name)
 {
 		ADM_assert(0);
 		return 0;

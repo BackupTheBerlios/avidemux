@@ -398,7 +398,7 @@ static MJPEGConfig mjpegConfig={90,0};
 
 extern uint8_t DIA_mjpegCodecSetting( int *qual, int *swap );
 #endif
-char TwoPassLogFile[300]; 
+
 
 
 ///////////////////////////////////////////
@@ -730,48 +730,7 @@ int videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
 
 		return 1;
 }
-#if 0
-void videoCodecConfigureMpeg(  char *cmdString)
-{
-// We accept 3 parameters
-		// mbr    : max bitrate in kbps
-		// quant : quant in kbps
-		// Other : Free string
-			char *i=cmdString;
-		        if( current_codec == CodecSVCD || current_codec ==CodecDVD ){
-				while( i && *i ){
-					if( !strncmp(i,"mbr=",4) ){
-					   unsigned int br;
-						i+=4;
-						br = atoi(i);
-						prefs->set( (current_codec==CodecSVCD ? CODECS_MPEG2ENC_SVCD_MAXBITRATE : CODECS_MPEG2ENC_DVD_MAXBITRATE), br );
-						i = index(i,','); if( i ) i++;
-						continue;
-					}
-					if( !strncmp(i,"quant=",6) ){
-					   unsigned int q;
-						i+=6;
-						q = atoi(i);
-						prefs->set( (current_codec==CodecSVCD ? CODECS_MPEG2ENC_SVCD_QUANTISATION : CODECS_MPEG2ENC_DVD_QUANTISATION), q );
-						i = index(i,','); if( i ) i++;
-						continue;
-					}
-					if( !strncmp(i,"other=",6) ){
-						i+=6;
-						prefs->set( (current_codec==CodecSVCD ? CODECS_MPEG2ENC_SVCD_EXTRAPARAMS : CODECS_MPEG2ENC_DVD_EXTRAPARAMS), i );
-						i = index(i,','); if( i ) i++;
-						continue;
-					}
-					break;
-				}
-			}
-			if( i && *i )
-				fprintf(stderr,"ignoring trailing \"%s\"\n",i);
-			return;
 
-
-}
-#endif
 int videoCodecConfigure(  char *cmdString,uint32_t optionSize,uint8_t  *option)
 {
 		CodecFamilty family;
@@ -798,11 +757,6 @@ int videoCodecConfigure(  char *cmdString,uint32_t optionSize,uint8_t  *option)
 
 }
 
-void encoderSetLogFile(char *name)
-{
-		strcpy( TwoPassLogFile,name);
-		printf("\n Log file is now :%s\n",TwoPassLogFile);
-}
 //___________________________________________________
 typedef struct codecEnumByName
 {
@@ -898,7 +852,8 @@ const char *videoCodecGetName( void )
 
 void initEncoders( void)
 {
-		strcpy( TwoPassLogFile,"/tmp/Xvid2passLog");
+//		strcpy( TwoPassLogFile,"/tmp/Xvid2passLog");
+		printf("**********OBSOLETE*********\n");
 }
 ///
 ///  Prompt for a codec and allow configuration

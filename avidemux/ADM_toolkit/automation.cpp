@@ -176,7 +176,7 @@ AUTOMATON reaction_table[]=
 		{"audio-toolame",	1	,"pipe audio to toolame and save to file",call_toolame},
 		{"video-codec",		1	,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD)",				call_videocodec},
 		{"video-conf",		1	,"set video codec conf (cq=q|cbr=br|2pass=size)[,mbr=br][,matrix=(0|1|2|3)]",				call_videoconf},
-		{"2pass-log",		1	,"select the log file for 2 passes mode",				encoderSetLogFile},
+//		{"2pass-log",		1	,"select the log file for 2 passes mode",				encoderSetLogFile},
 		{"set-pp",		2	,"set post processing default value, value(1=hdeblok|2=vdeblock|4=dering) and strength (0-5)",	(one_arg_type )	call_setPP},
 
 		{"autosplit",		1	,"split every N MBytes",call_autosplit},

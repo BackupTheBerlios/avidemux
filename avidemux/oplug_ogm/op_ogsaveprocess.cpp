@@ -50,9 +50,9 @@
 #include "oplug_ogm/op_ogsave.h"
 
 #define aprintf printf
-extern char TwoPassLogFile[300];
+
 //________________________________________________
-uint8_t	ADM_ogmWriteProcess::initVideo(void)
+uint8_t	ADM_ogmWriteProcess::initVideo(char *name)
 {		
 uint32_t w,h,fps1000,fcc;
 		
@@ -61,10 +61,13 @@ uint32_t w,h,fps1000,fcc;
   	_encode = getVideoEncoder (_incoming->getInfo()->width,_incoming->getInfo()->height);
 	if (!_encode)
     		return 0;
-
-  
+ 	
+	TwoPassLogFile=new char[strlen(name)+6];
+  	strcpy(TwoPassLogFile,name);
+  	strcat(TwoPassLogFile,".stat"); 	  
    
  	_encode->setLogFile(TwoPassLogFile,_togo);
+	
   	if (!_encode->configure (_incoming))
     	{
       		delete 	_encode;

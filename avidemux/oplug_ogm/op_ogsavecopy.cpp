@@ -43,7 +43,7 @@
 #define MODULE_NAME 0
 #include "ADM_toolkit/ADM_debug.h"
 
-uint8_t	ADM_ogmWriteCopy::initVideo(void)
+uint8_t	ADM_ogmWriteCopy::initVideo(char *name)
 {
 		
 		_togo=frameEnd-frameStart;

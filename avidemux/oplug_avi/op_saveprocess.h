@@ -26,14 +26,14 @@
 					    
 			Encoder 	*_encode;
 			uint8_t		_notnull;
-                       	
+                       	char 		*TwoPassLogFile;
 
 			virtual uint8_t	setupVideo( char *name  );
 			virtual uint8_t	writeVideoChunk(uint32_t frame );
                          
      public:
-     			GenericAviSaveProcess( void ) {_incoming=NULL;_encode=NULL;_videoProcess=1;};
-                          virtual ~GenericAviSaveProcess();
+     					GenericAviSaveProcess( void ) ;
+                          virtual 	~GenericAviSaveProcess();
    };
 
 

@@ -1,18 +1,181 @@
      ************************ TODO****************************
 	Todo :
-			
-			+ Add complete flag support for Ogg <<--
+						
 			+ Rebuild all audio @ editor level
-			+ Fix smart copy with B-frame support
-			+ Should add ColorSpace and Aspect ratio to video filter chain
+			+ Fix smart copy with B-frame support			
 
 			+ Fix memory leak induced by raw shift<<<===			
 			
+			
 		ALTIVEC
-				
+			- in progress : Ogm read/write	
 												
        *********************** /TODO ***************************
-       06/05/05
+       18 /19
+       		- log file is stored in xxx.stat, not in /tmp/xxx anymore
+		-  USe less prefill for mpeg2enc (30->6)
+       17/07/04
+       		- more ui stuff
+		- rgb32 fix from ffmpeg
+		- win32: /tmp does not exist for default log file!
+       15/07/04
+       		- Jakub UI Job
+		- Began to move i18n to sub frontend, and do only unicode in font display
+		- Fixed xvid 0.9/ADM_assert (Tigs)
+		- i18n ok (?) Workish
+       14/07/04
+       		- added go to A & goto B buttons
+       13/07/04
+       		- ask quant for smart copy right away (for ron)
+		- prettier integer input/question/alert dialog box
+       ____________________2.0.28___________________________
+       11/07/04
+       		- centralized cpu cap for mpeg2enc
+       09/07/04
+       		- fixed XVCD
+		- added ulaw audio codec
+		- more win32 stuff
+       08/07/04
+       		- assert -> ADM_assert
+		- some win32 fix
+       04/07/04
+       		- Faster pass1 for 2 pass SVCD/DVD
+		- Couple of win32 fix
+       03/07/04
+       		- Better 2 pass for SVCD
+		- Fixed -g missing when --with-debug is set
+		- sscanf weirdness spotted on win32 & fixed
+       02/07/04
+       		- E Strickland : -t for ffv1rec
+		
+       -----------------------------------------------------
+       28/07/04
+       		- audio for win32 (skeleton)
+       27/07/04
+       		- more cyg/ming stuff.
+       24/07/04 - some toto%=: fix to allow -funroll-loop
+       		- more mingw fix
+       23/07/04 - Began merging win32
+       
+       _____________2 0 26 ------------------------
+       17/07/04
+       		- OGM demuxer : ditto for audio track
+		- Tried to put back Xvid ratecontrol for s/x vcd
+       16/07/04
+       		- OGM demuxer : handles ok video track made by ogmtools
+       14/07/04
+       		- OGM demuxer : better handle non vorbis audio track (hackish)
+       13/07/04
+       		- OGM Muxer : B frames support for video 
+       11/07/04
+       		- Better audio muxer for OGM, makes mplayer crash for ac3 :(
+       10/07/04
+       		- OGM writter skeleton, gui and copy/process mode. No audio.
+		- Bit of audio
+       09/07/04
+       		- added PTS info + stream info audio audio stream in TS (not 100% ok)
+		- fix bug when mpeg audio never goes back to zero
+       08/07/04
+       		- began adding PTS infos for TS stream (bugged / incomplete)
+       05/07/04
+       		- OGM reader: Handles better non vorbis audio in ogm, not perfect thought
+		- OGM muxer : Audio ok in copy mode, the abs_pos field is not ok (makes vlc go crazy)
+				+ Do B frame
+				+ Do encoding mode
+				+ Fix reading of output of ogmmerge (?)
+		- Fix TS when pid > 0x100
+       04/07/04	
+       		- a bit more on ogm writter, It is just a prototype ATM
+		
+       02/07/04
+       		- began writting ogm writter
+       28/06/04
+       		- fixed audio duration computation (overflow)
+		- double click on recent brings it forward
+       27/06/04
+       		- BE/LE in atom name
+		- display correct thing about mp4a and amr nb
+		- libfaad interface (incomplete/bugged)
+       26/06/04
+       		- faad autoconf'ed / class added/ no code for now
+       25/06/04
+       		- fixed vop not coded (small header imageless)
+-------------------------No DSL------------------------
+       23/06/04
+       		- clean up of audio detection. Faster & go more deeply
+       21/06/04
+       		- Fixed double bug in mpeg TS demuxer, still visual glitch for cnn.ts
+       18/06/04
+       		- Allow pid selection in Ts stream (ok with trailers, not ok with DVB)
+       15/06/04
+       		- removed padding for audio stream /mpeg TS. clean up a bit
+		- fix for crash when null mpeg frames (mencoder files)
+       13/06/04
+       		- added audio for mpeg TS, still harcoded
+       12/06/04
+       		- disabled VBR packetizing, not legit for DVD ?
+       11/06/04
+       		- put absolute path in mpeg index
+		- removeFrame function
+		- began adding support for mencoder new way of 'mpeg in avi' 
+       08/06/04
+       		- VBR muxing for mpeg writter
+		- fixed smart copy for divx3
+       31/05/04
+       		- skeleton for video filter scriptability
+		- save current filters as script
+       30/05/04
+       		- began to add video filters to script
+       29/05/04
+       		- fix openDML reader when the !keyframe flag is set
+		- more scripting videocodec/savedvd/save. Parser bugged.
+       28/05/04
+       		- Dont save file in copy mode with starting/ending B frame
+		- Warn if B frames loose their fw/bw reference (not sure it is a good
+				idea (tm) )
+       27/05/04
+       		- more scripting
+       20/05/04
+       		- Msmooth from donald graft
+		- First step of scripting engine
+		
+       18/05/04
+       		- proper AC3 cut on packet boundaries
+		- dropped dependancies on liba52 except for decoding
+		- wrap CPU features around CpuCap class
+		- sse for decimate
+		
+       17/05/04
+       		- Redone crop ui + autocrop. Code is ugly but it will do for now.
+       16/05/04
+       		- UI for decomb
+		- Do not preview out of scope frame (for frame changing filter : ivtc, mergefield...)
+		- Decomb decimate + UI, not debugged
+       15/05/04
+       		- Added decomb telecide filter
+		- Added general purpose cache frame mechanism (need a better cache eviction method)
+       13/05/04
+       		- Fixed audio playback on big endian cpu
+       
+       12/05/04
+       		- added audio through SDL
+		- Fixed video/SDL init so that it is only a subsystem and moved SDL_init to main
+		- altivec yuv422 colors still wrong 
+       10/05/04
+       		- fixed mjpeg
+		- correcly place SDL window on top of GDK window
+		- rewrite MMX yv12_422
+		- optimize altivec yv12_422, still buggy
+       09/05/04
+       		- SDL ok on macOsX
+		- Fixed endiannes problem on mad decoder (my fault)
+       08/05/04
+       		- trying to guess FILM mpeg2
+		- cleanup on xv to add libSDL (mainly for win32/darwin)
+		- added libSDL for configure step
+		
+________________________2.0.24_________________________       
+       06/05/04
        		  - tarballing for 2.0.24
        05/05/04
        		 - Fix segault when requantizing without audio

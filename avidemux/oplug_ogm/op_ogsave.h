@@ -18,7 +18,8 @@
 class ADM_ogmWrite
 {
 	protected:
-		
+			char 			*TwoPassLogFile;	
+	
 			double			_audioTarget,_oneRound;
 			
 			uint32_t		_audioHead,_audioTail,_audioCurrent;	
@@ -40,7 +41,7 @@ class ADM_ogmWrite
 				
 				AVDMGenericAudioStream	*audioFilter;
 				
-			virtual uint8_t		initVideo(void);
+			virtual uint8_t		initVideo(char *name);
 			virtual uint8_t		writeVideo(uint32_t frame);
 					
 	public:
@@ -53,7 +54,7 @@ class ADM_ogmWriteCopy : public ADM_ogmWrite
 {
 protected:
 			
-			virtual uint8_t		initVideo(void);			
+			virtual uint8_t		initVideo(char *name);			
 			virtual uint8_t		writeVideo(uint32_t frame);
 			uint32_t 		searchForward(uint32_t startframe);
 			uint32_t		_lastIPFrameSent;	
@@ -67,7 +68,7 @@ class ADM_ogmWriteProcess : public ADM_ogmWrite
 protected:
 			AVDMGenericVideoStream  *_incoming;
 			Encoder 		*_encode;
-			virtual uint8_t	initVideo(void);			
+			virtual uint8_t	initVideo(char *name);			
 			virtual uint8_t	writeVideo(uint32_t frame);	
 public:
 			ADM_ogmWriteProcess(void);

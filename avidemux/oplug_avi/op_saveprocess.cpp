@@ -50,7 +50,13 @@
 #define MODULE_NAME MODULE_SAVE_AVI
 #include "ADM_toolkit/ADM_debug.h"
 
-extern char TwoPassLogFile[300];
+GenericAviSaveProcess::GenericAviSaveProcess( void ) 
+{
+	TwoPassLogFile=NULL;
+	_incoming=NULL;
+	_encode=NULL;
+	_videoProcess=1;
+};
 
 uint8_t
 GenericAviSaveProcess::setupVideo (char *name)
@@ -72,8 +78,12 @@ GenericAviSaveProcess::setupVideo (char *name)
     return 0;
 
   // init compressor
-   
- 	_encode->setLogFile(TwoPassLogFile,frametogo);
+  TwoPassLogFile=new char[strlen(name)+6];
+  strcpy(TwoPassLogFile,name);
+  strcat(TwoPassLogFile,".stat");
+ _encode->setLogFile(TwoPassLogFile,frametogo);
+ 
+ 
   if (!_encode->configure (_incoming))
     {
       delete 	_encode;
@@ -107,6 +117,8 @@ _mainaviheader.dwMicroSecPerFrame=0;
 
  	aprintf("\n** Dual pass encoding**\n");
 
+	
+	
 	if((tmp=fopen(TwoPassLogFile,"rt")))
 	{
 		fclose(tmp);
@@ -205,6 +217,11 @@ GenericAviSaveProcess::~GenericAviSaveProcess ()
   if (_encode)
     delete      _encode;
   	_encode=NULL;
+  if(TwoPassLogFile)
+  {
+  	delete [] TwoPassLogFile;
+  	TwoPassLogFile=NULL;
+  }
 }
 
 // copy mode

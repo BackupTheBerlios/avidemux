@@ -64,6 +64,8 @@ uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 
 extern SelectCodecType  current_codec;
 
+static char *twoPass=NULL;
+static char *twoFake=NULL;
 
 void oplug_mpegff_conf( void )
 {
@@ -86,6 +88,13 @@ uint32_t _w,_h,_fps1000,_page,total;
 
 uint32_t len,flags;
 uint32_t size;
+	
+	twoPass=new char[strlen(name)+6];
+	twoFake=new char[strlen(name)+6];
+
+	strcpy(twoPass,name);
+	strcat(twoPass,".stat");
+	strcat(twoFake,".fake");
 	
 		
 	_incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
@@ -126,7 +135,7 @@ uint32_t size;
 		default:
 		ADM_assert(0);
 	}
-  	encoder->setLogFile("/tmp/mpegVBR.txt",total);
+  	encoder->setLogFile(twoPass,total);
   	if(!encoder->configure(_incoming))
   	{
 		delete encoder;
@@ -160,7 +169,7 @@ uint32_t size;
      	{
 			FILE *fd;
 			uint8_t reuse=0;
-			fd=fopen("/tmp/mpegVBR.txt","rt");
+			fd=fopen(twoPass,"rt");
 			if(fd)
 			{
 				if(GUI_Question("Reuse log file ?"))
@@ -233,7 +242,12 @@ void end (void)
 	_buffer		=NULL;
 	_outbuffer=NULL;
 	
-	}	
+	if(twoPass) delete [] twoPass;
+	if(twoFake) delete [] twoFake;
+	
+	twoPass=twoFake=NULL;
+	
+}	
 	
 #endif	
 // EOF
