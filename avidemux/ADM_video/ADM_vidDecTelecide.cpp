@@ -81,7 +81,7 @@ static uint8_t GetHintingData(unsigned char *video, unsigned int *hint);
 static void BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
             int src_pitch, int row_size, int height);
 static void DrawString(uint8_t *dst, int x, int y, const char *s);
-static void DrawStringYUY2(uint8_t *dst, int x, int y, const char *s);
+static void DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
 Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples)
 {
@@ -96,18 +96,16 @@ Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples)
   		_info.encoding=1;
 		_info.fps1000=(_info.fps1000*4)/5;
 		_info.nb_frames=(_info.nb_frames*4)/5;
-		
-   		_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  		assert(_uncompressed);
-  		_param=NULL;
+		lc=lp=fn=fc=fp=NULL;
+		_param=NULL;
   		{
 			 	_param=NEW(TelecideParam);
-			 	_param->order = 2; // illegal order value to force user specification
-				_param-> back = NO_BACK;
-				_param->chroma = true;
-				_param->guide = GUIDE_NONE;
+			 	_param->order = 0; // illegal order value to force user specification
+				_param->back = NO_BACK;
+				_param->chroma = false;
+				_param->guide = GUIDE_32;
 				_param->gthresh = 10.0;
-				_param->post = POST_FULL;
+				_param->post = POST_NONE;
 				_param->vthresh = 50.0;
 				_param->bthresh = 50.0;
 				_param->dthresh = 7.0;
@@ -116,12 +114,16 @@ Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples)
 				_param->y0 = 0;
 				_param->y1 = 0;
 				_param->hints = true;
-				_param->show = false;
-				_param->debug = false; 
+				_param->show = true;
+				_param->debug = true; 
 
 		}
 		
-		
+		 fp=new uint8_t[_info.width*_info.height*2];
+		 fc=new uint8_t[_info.width*_info.height*2];
+		 fn=new uint8_t[_info.width*_info.height*2];
+		 lc=new uint8_t[_info.width*_info.height*2];
+		 lp=new uint8_t[_info.width*_info.height*2];
 		
 				
 		tff = (_param->order == 0 ? false : true);	
@@ -183,6 +185,12 @@ Telecide::~Telecide()
 		if (sump != NULL) free(sump);
 		if (sumc != NULL) free(sumc);
 
+#define RELEASE(x) if(x) { delete [] x;x=NULL;}
+		RELEASE(fn);
+		RELEASE(fc);
+		RELEASE(fp);
+		RELEASE(lc);
+		RELEASE(lp);
 		
 }
 void Telecide::Show(PVideoFrame &dst, int frame)
@@ -290,7 +298,7 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 	hminus2= h - 2;
 //	dst = env->NewVideoFrame(vi);
 	dst=data;
-	dpitch = _info.width>>1;
+	dpitch = _info.width;
 
 	// Ensure that the metrics for the frames
 	// after the current frame are in the cache. They will be used for
@@ -609,9 +617,9 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			{
 				for (x = 0; x < w; x++)
 				{
-					v1 = (int) dstp[x] - _param->dthresh;
+					v1 = (int)( dstp[x] - _param->dthresh);
 					if (v1 < 0) v1 = 0; 
-					v2 = (int) dstp[x] + _param->dthresh;
+					v2 = (int)( dstp[x] + _param->dthresh);
 					if (v2 > 235) v2 = 235; 
 					if ((v1 > dstpp[x] && v1 > dstpn[x]) || (v2 < dstpp[x] && v2 < dstpn[x]))
 					{
@@ -686,9 +694,9 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 					{
 						for (x = 0; x < wover2; x++)
 						{
-							v1 = (int) dstp[x] - _param->dthresh;
+							v1 = (int)( dstp[x] - _param->dthresh);
 							if (v1 < 0) v1 = 0; 
-							v2 = (int) dstp[x] + _param->dthresh;
+							v2 = (int)( dstp[x] + _param->dthresh);
 							if (v2 > 235) v2 = 235; 
 							if ((v1 > dstpp[x] && v1 > dstpn[x]) || (v2 < dstpp[x] && v2 < dstpn[x]))
 							{
@@ -723,9 +731,9 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		{
 			for (x = 0; x < w; x++)
 			{
-				v1 = (int) dstp[x] - _param->dthresh;
+				v1 = (int)( dstp[x] - _param->dthresh);
 				if (v1 < 0) v1 = 0; 
-				v2 = (int) dstp[x] + _param->dthresh;
+				v2 = (int)( dstp[x] + _param->dthresh);
 				if (v2 > 235) v2 = 235; 
 				if ((v1 > dstpp[x] && v1 > dstpn[x]) || (v2 < dstpp[x] && v2 < dstpn[x]))
 				{
@@ -758,9 +766,9 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 				{
 					for (x = 0; x < wover2; x++)
 					{
-						v1 = (int) dstp[x] - _param->dthresh;
+						v1 = (int)( dstp[x] - _param->dthresh);
 						if (v1 < 0) v1 = 0; 
-						v2 = (int) dstp[x] + _param->dthresh;
+						v2 = (int)( dstp[x] + _param->dthresh);
 						if (v2 > 235) v2 = 235; 
 						if ((v1 > dstpp[x] && v1 > dstpn[x]) || (v2 < dstpp[x] && v2 < dstpn[x]))
 						{
@@ -1552,9 +1560,16 @@ uint8_t GetHintingData(unsigned char *video, unsigned int *hint)
 	}
 	return error;
 }
- void BitBlt(uint8_t* dstp, int dst_pitch, const uint8_t* srcp,
+void BitBlt(uint8_t* dstp, int dst_pitch, const uint8_t* srcp,
             int src_pitch, int row_size, int height)
 {
+	for(uint32_t y=0;y<height;y++)
+	{
+		memcpy(dstp,srcp,row_size);
+		dstp+=dst_pitch;
+		srcp+=src_pitch;
+	}
+
 
 }	    	
 void DrawString(uint8_t *dst, int x, int y, const char *s)
