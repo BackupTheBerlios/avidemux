@@ -210,38 +210,20 @@ uint32_t i;
 	uint64_t stamp=0;
 	uint8_t *frags,frag;
 	uint32_t ssize=0;
-	while(_demuxer->readHeaderOfType(_currentTrack->audioTrack,&cursize,&flags,&stamp))
-		{
-			_demuxer->getLace(&frag,&frags);
-			for(uint32_t i=0;i<frag;i++)
-			{
-				cursize=frags[i];
-				if(!i && !(flags&1)) // fresh packet -> skip one byte
-				{
-					_demuxer->readBytes(1,data);
-					assert(cursize);
-					cursize--;
-					_demuxer->readBytes(cursize,data);
-				}
-				else
-				{
-					_demuxer->readBytes(cursize,data);
-				}
-				data+=cursize;
-				_lastFrag=i;
-				ssize+=cursize;	
-				if(frags[i]!=0xff )
-				{
-					if(i==frag-1) _lastFrag=NO_FRAG;
-					return ssize;
-				}
-			}
-			// Else skip it, should not happen
-			printf("OGM : Failed reading non vorbis\n");
-			return 0;
-			
+	uint32_t red=0;
+	uint8_t lenbyte;
+
+	//
+	ssize=readPacket(&cursize,data,&flags);
+	// First byte is len stuff
+	lenbyte=data[0];
+	lenbyte=(lenbyte>>6)+((lenbyte&2)<<1);
+	lenbyte=1+lenbyte;
+	assert(ssize>=lenbyte);
+	ssize-=lenbyte;
+	memmove(data,data+lenbyte,ssize);
+	return ssize;
 		
-		}
 	printf("OGM : Failed reading non vorbis\n");
 	return 0;
 	

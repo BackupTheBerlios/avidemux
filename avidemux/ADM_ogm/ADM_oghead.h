@@ -65,6 +65,10 @@ Bit5   unused
 Bit6   Bit 0 of lenbytes
 Bit7   Bit 1 of lenbytes indicates data packet
 
+lenbytes is the bytes of data to follow
+It is the number of byte on which the size is coded
+For example, 2 means 16 bits len
+
 */
 #define OG_KEYFRAME 8
 
