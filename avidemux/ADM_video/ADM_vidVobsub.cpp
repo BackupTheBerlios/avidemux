@@ -330,7 +330,10 @@ uint8_t ADMVideoVobSub::getCoupledConf( CONFcouple **couples)
                         *couples=new CONFcouple(3);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
-                        CSET(subname);
+                        if(_param->subname)
+                                CSET(subname);
+                        else
+                          (*couples)->setCouple("subname","none") ;
                         CSET(index);
                         CSET(subShift);
                         
