@@ -18,18 +18,12 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <unistd.h>
 
-
-#  include <config.h>
-
-#include <gtk/gtk.h>
-#include <time.h>
-#include <sys/time.h>
 
 #include "callbacks.h"
 #include "interface.h"
@@ -38,6 +32,9 @@
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/filesel.h"
+
+#include "ADM_assert.h"
+
 #include "prototype.h"
 #include "ADM_audiodevice/audio_out.h"
 #include "ADM_audio/aviaudio.hxx"
@@ -59,7 +56,7 @@ uint32_t len;
 
 	//return video_body->getUncompressedFrame(frameno,image,flags);
 	AVDMGenericVideoStream *filter=getFirstCurrentVideoFilter( );
-	
+	ADM_assert(filter);
 	return filter->getFrameNumberNoAlloc(frameno,&len,image,flags);
 	
 
