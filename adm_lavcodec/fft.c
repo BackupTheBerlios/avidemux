@@ -62,7 +62,7 @@ int ff_fft_init(FFTContext *s, int nbits, int inverse)
         int has_vectors = 0;
 
 #if defined(HAVE_MMX)
-        has_vectors = mm_support() & MM_SSE;
+        has_vectors = mm_support() & MM_SSE & 0 ; //MEANX : DISABLE
 #endif
 #if defined(HAVE_ALTIVEC) && !defined(ALTIVEC_USE_REFERENCE_C_CODE)
         has_vectors = mm_support() & MM_ALTIVEC;
@@ -94,7 +94,7 @@ int ff_fft_init(FFTContext *s, int nbits, int inverse)
             } while (nblocks != 0);
             av_freep(&s->exptab);
 #if defined(HAVE_MMX)
-          //  s->fft_calc = ff_fft_calc_sse;
+            s->fft_calc = ff_fft_calc_sse;
 #else
             s->fft_calc = ff_fft_calc_altivec;
 #endif
