@@ -126,9 +126,7 @@ uint32_t nfq,fqindex,brindex,index;
 				{	
 					return 0;
 				}
-/*			printf("Packet found : at :%d level:%d layer:%d fq:%d bitrate:%d mode:%d\n",
-					start-1,mpegInfo->level,mpegInfo->layer,mpegInfo->samplerate,
-					mpegInfo->bitrate,mpegInfo->mode);*/
+/*	*/
 			// Sample in the packet
 			if(1==mpegInfo->layer) 
 				mpegInfo->samples=384;
@@ -138,6 +136,7 @@ uint32_t nfq,fqindex,brindex,index;
 			
 			// Packet size
 			//L1:FrameLengthInBytes = (12 * BitRate / SampleRate + Padding) * 4
+		
 			switch(mpegInfo->layer)
 			{
 				case 1:
@@ -148,13 +147,19 @@ uint32_t nfq,fqindex,brindex,index;
 				default:
 				//FrameLengthInBytes = 144 * BitRate / SampleRate + Padding
 					mpegInfo->size=(144*mpegInfo->bitrate*1000)/mpegInfo->samplerate;
-					mpegInfo+=mpegInfo->padding+2*mpegInfo->protect+4;
-			
+					mpegInfo->size+=mpegInfo->padding;			
 			}
+#if 0			
+			printf("Packet found : at :%d level:%d layer:%d fq:%d bitrate:%d mode:%d\n",
+					start-1,mpegInfo->level,mpegInfo->layer,mpegInfo->samplerate,
+					mpegInfo->bitrate,mpegInfo->mode);
+			printf("Padd:%lu, crc on:%lu size:%lu\n",mpegInfo->padding,mpegInfo->protect,
+								mpegInfo->size);
+#endif					
 			return 1;
 			
 
-	return 0;
+	
 
 }
 //____________

@@ -40,6 +40,68 @@
 #define AUDIOSEG 	_segments[_audioseg]._reference
 #define SEG 		_segments[seg]._reference
 
+
+
+uint8_t		 ADM_Composer::audioFlushPacket(void)
+{
+	for(uint32_t i=0;i<_nb_video;i++)
+		_videos[i]._audiostream->flushPacket();
+	return 1;
+
+}
+uint8_t ADM_Composer::getAudioPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
+{
+uint8_t r;	
+uint32_t ref; 
+_VIDEOS *currentVideo;
+	currentVideo=&_videos[AUDIOSEG];
+	
+	if(_audioSample<_segments[_audioseg]._audio_duration)
+	{
+		r=currentVideo->_audiostream->getPacket(dest,len,samples);
+		if(r)
+		{
+			// ok we update the current sample count and go on
+			_audioSample+=*samples;
+			return r;		
+		}
+		// could not get the cound, rewind and retry
+		printf("Editor:Read failed; retrying\n");
+		currentVideo->_audiostream->goToTime(0);
+		r=currentVideo->_audiostream->getPacket(dest,len,samples);
+		if(r)
+		{
+			// read it again sam
+			_audioSample+=*samples;
+		}
+		return r;
+	}
+	// We have to switch seg
+	// We may have overshot a bit, but...
+	
+	// this is the end ?
+	if(_audioseg == (_nb_segment - 1))
+	{
+		
+		printf("Editor : End of stream\n");
+		return 0;
+	}
+	// switch segment
+	// We adjust the audiosample to avoid adding cumulative shift
+	/*_audioSample=-_audioSample;
+	_audioSample+=_segments[_audioseg]._audio_duration;	
+	*/
+	_audioSample=0;
+	_audioseg++;
+	// Compute new start time
+	uint32_t starttime;
+	
+	starttime= _videos[AUDIOSEG]._aviheader->getTime (_segments[_audioseg]._start_frame);
+	_videos[AUDIOSEG]._audiostream->goToTime(starttime);	
+	; // Fresh start samuel
+	aprintf("AudioEditor : switching to segment %lu\n",_audioseg);
+	return getAudioPacket(dest, len, samples);
+}
 //__________________________________________________
 //
 //  Go to the concerned segment and concerned offset
@@ -47,6 +109,7 @@
 // Should never be called normally...
 //
 //__________________________________________________
+
 uint8_t ADM_Composer::audioGoTo (uint32_t offset)
 {
   uint32_t
@@ -55,7 +118,7 @@ uint8_t ADM_Composer::audioGoTo (uint32_t offset)
   AVDMGenericAudioStream *
     as;
 
-    aprintf("Editor: audio go to : seg %lu offset %lu \n",_audioseg,_audiooffset);
+    aprintf("************Editor: audio go to : seg %lu offset %lu \n",_audioseg,_audiooffset);
   seg = 0;
   while (1)
     {
@@ -101,7 +164,7 @@ uint32_t ADM_Composer::audioRead (uint32_t len, uint8_t * buffer)
 
   // Offset of last byte in this seg...
   end_offset =    _segments[_audioseg]._audio_start + _segments[_audioseg]._audio_size;
-
+  printf("***AUDIO READ CALLED*************************************\n");
   // we are beyond the end mark   or to the end mark
   if (end_offset <= _audiooffset)
     {
@@ -126,7 +189,7 @@ uint32_t ADM_Composer::audioRead (uint32_t len, uint8_t * buffer)
 	  return 0;
 	}
       _audiooffset = _segments[_audioseg]._audio_start;
-      _videos[_segments[_audioseg]._reference]._audiostream->goToSync (_audiooffset);
+      _videos[AUDIOSEG]._audiostream->goToSync (_audiooffset);
       return audioRead (len, buffer);
     }
 
@@ -203,10 +266,12 @@ uint8_t ADM_Composer::audioGoToTime (uint32_t mstime, uint32_t * off)
   uint32_t	    cumul_offset =    0;
   uint32_t    frames =    0,    fi =    0;
   aviInfo    info;
-
+  uint64_t   sample;
   double    fn;
 
   getVideoInfo (&info);
+ // audioFlushPacket();
+  
   fn = mstime;
   fn = fn * info.fps1000;
   fn /= 1000000.;
@@ -241,15 +306,27 @@ uint8_t ADM_Composer::audioGoToTime (uint32_t mstime, uint32_t * off)
   jump = mstime - time_masked;
   jump = jump + time_start;
 
-  aprintf (" Editor audio time start : %lu\n", time_start);
-  aprintf (" Editor audio time masked : %lu\n", time_masked);
-  aprintf (" Editor audio time jump : %lu\n", jump);
+  aprintf (" Editor audio time start   : %lu\n", time_start);
+  aprintf (" Editor audio time masked  : %lu\n", time_masked);
+  aprintf (" Editor audio time jump    : %lu\n", jump);
+  aprintf (" Editor audio seg          : %lu\n", seg);
 
   _audioseg = seg;
   _videos[AUDIOSEG]._audiostream->goToTime (jump);
+  _videos[AUDIOSEG]._audiostream->flushPacket();
   _audiooffset = _videos[AUDIOSEG]._audiostream->getPos ();
   *off = cumul_offset + _videos[AUDIOSEG]._audiostream->getPos ()
     - _segments[seg]._audio_start;
+    
+  // Get current duration
+  // To compute how much is left in current segment
+  
+  float duration;
+  	duration=mstime-time_masked; // Time left in current seg	
+	duration/=1000;		    // how much we are in the current seg in second
+	duration*=_videos[AUDIOSEG]._audiostream->getInfo()->frequency;
+   _audioSample=(uint64_t)floor(duration);
+   aprintf("Editor audio : we are at %llu in seg which has %llu sample\n",_audioSample,_segments[_audioseg]._audio_duration);
 
   return 1;
 }

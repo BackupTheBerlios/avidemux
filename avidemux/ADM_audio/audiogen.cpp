@@ -65,6 +65,7 @@ uint8_t AVDMGenericAudioStream::goToSync(uint32_t offset)
     uint32_t tryz;
     
     ADM_assert(_wavheader);
+    flushPacket();
     // can't deal with something not mp3...
   //  printf("syncing asked : %lu",offset);
     switch(  _wavheader->encoding )
@@ -250,37 +251,33 @@ uint8_t AVDMGenericAudioStream::beginDecompress(void)
 uint32_t AVDMGenericAudioStream::readDecompress(uint32_t size,
 						uint8_t * ptr)
 {
-    uint32_t rd = 0, d = 0, in = 0;
+    uint32_t rd = 0, d = 0, in = 0,samples=0;
+    uint8_t r=0;
     // Paranoia check
     ADM_assert(_wavheader);
     ADM_assert(_codec);
     ADM_assert(isDecompressable());
 
-
-  if(!_codec->isCompressed())
-    	{
-        	// no need to make things harder
-         	return read(size&0xfffffffe,ptr);
- 	}
+  
         while(rd<size)
-        	{
+        {
            	// Read from stream
-				in=read(1152,internalBuffer);           		
-		        if(!in)
-          			{
+		r=getPacket(internalBuffer, &in, &samples);           		
+		if(!r)
+          	{
 drop:
-                       printf(" read failed, end of stream ? \n");
-		    	  		  return rd;
+			printf(" read failed, end of stream ? \n");
+			return rd;
                	}
-                	if(!_codec->run(internalBuffer,in,ptr+rd,&d))
-                 	{
-                    		printf("\n Codec error !!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-                 			goto drop;
-                  }
-                 if(d)
-						rd+=d;
-      		}
-		    return rd;
+		if(!_codec->run(internalBuffer,in,ptr+rd,&d))
+		{
+			printf("\n Codec error !!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+			goto drop;
+		}
+		if(d)
+			rd+=d;
+      	}
+	return rd;
 
 
 }
@@ -323,6 +320,7 @@ uint8_t AVDMGenericAudioStream::goToTime(uint32_t timeoffset)
     packetHead=packetHead=0;
     offset = convTime2Offset(timeoffset);
       aprintf("\n Time Offset : %lu", timeoffset);
+      flushPacket();
    if( _audioMap)
    	{
       		// dichotomic search

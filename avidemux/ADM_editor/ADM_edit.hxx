@@ -66,7 +66,7 @@ typedef struct
   	decoders							*decoder;
 
 	uint32_t  							_audio_size;
-	uint32_t							_audio_duration;
+	uint64_t							_audio_duration; //! IN SAMPLE
 	AVDMGenericAudioStream 						*_audiostream;
 	uint8_t								_isAudioVbr;
 	WAVHeader							*_wavheader;
@@ -83,6 +83,7 @@ typedef struct
  	uint32_t							_start_frame;
 	uint32_t							_nb_frames;
 	uint32_t  							_audio_size;
+	uint64_t							_audio_duration; //! IN SAMPLE
 	uint32_t							_seg_audio_duration;
 	uint32_t							_seg_video_duration;
  	uint32_t  							_audio_start;
@@ -102,6 +103,7 @@ class ADM_Composer
   					// _audiooffset points to the offset / the total segment
   					// not the used part !
   					uint32_t  _audioseg;
+					int64_t  _audioSample;
   					uint32_t  _audiooffset;
        					uint8_t    _cached;
 					uint8_t	   _haveMarkers; // used for load/save edl
@@ -194,6 +196,7 @@ class ADM_Composer
 					uint8_t			getAudioStream(AVDMGenericAudioStream **audio);
 					uint8_t			getAudioExtra(uint32_t *l,uint8_t **d);
 					uint8_t			audioGoTo(uint32_t offset);
+					uint8_t			audioFlushPacket(void);
 					uint32_t			audioRead(uint32_t len,uint8_t *buffer);
 					uint8_t 			audioGoToFn(uint32_t seg,uint32_t fn,uint32_t *noff);
 					uint8_t 			audioFnToOff(uint32_t seg,uint32_t fn,uint32_t *noff);
@@ -225,6 +228,6 @@ class ADM_Composer
 					uint8_t 		getPostProc( int *type, int *strength, 
 										int *swapuv);
 										
-
+					uint8_t 		getAudioPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
 };
 #endif

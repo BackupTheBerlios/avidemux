@@ -117,22 +117,20 @@ public:
      		
 };
 //_____________________________________________
-class AVDMProcessAudio_Null : public AVDMProcessAudioStream
+class AVDMProcessAudio_Null : public AVDMBufferedAudioStream
 {
 protected:
 				 uint32_t _served;
-         uint32_t _start_time;
-         uint32_t _size;
-         uint8_t  _buffer[PROCESS_BUFFER_SIZE];
-				 uint32_t  _bufferlen;
+         			uint32_t _start_time;
+         			uint32_t _size;
+        
+	
 public:
 						
 				~AVDMProcessAudio_Null();
-        AVDMProcessAudio_Null(AVDMGenericAudioStream *instream
-								,uint32_t time_offset, uint32_t length);		
-        uint32_t 					read(uint32_t len,uint8_t *buffer);
-				virtual uint8_t  	goToTime(uint32_t newoffset);
-			  virtual uint32_t 	readDecompress(uint32_t len,uint8_t *buffer);
+        			AVDMProcessAudio_Null(AVDMGenericAudioStream *instream
+						,uint32_t time_offset, uint32_t length);
+       		virtual uint32_t 	grab(uint8_t *obuffer);
      		
 };
 //_______________________________________________________________

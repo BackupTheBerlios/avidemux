@@ -44,7 +44,11 @@ to generic audio stream
 
 
 extern ADM_Composer *video_body;
+uint8_t		AVDMEditAudioStream::flushPacket(void)
+{
 
+	return 1;//video_body->audioFlushPacket();
+}
 // Build information
 //
 
@@ -76,7 +80,7 @@ AVDMEditAudioStream::AVDMEditAudioStream (ADM_Composer * father)
 
 uint8_t AVDMEditAudioStream::goTo (uint32_t newoffset)
 {
- aprintf("Editor audio : Goto %lu\n",newoffset);
+ aprintf("*****Editor audio : Goto %lu\n",newoffset);
   if (video_body->audioGoTo (newoffset))
     {
       _pos = newoffset;
@@ -85,6 +89,11 @@ uint8_t AVDMEditAudioStream::goTo (uint32_t newoffset)
 
   return 0;
 }
+uint8_t		AVDMEditAudioStream::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
+{
+	return video_body->getAudioPacket(dest, len, samples);
+}
+
 
 uint8_t AVDMEditAudioStream::buildAudioTimeLine (void)
 {
@@ -114,6 +123,7 @@ uint32_t AVDMEditAudioStream::read (uint32_t len, uint8_t * buffer)
   do
     {
       ck = video_body->audioRead (done, buffer);
+      aprintf("**** Audio Editor : read\n");
       // printf("\n\t read : asked : %lu %lu",done,ck);
       if (!ck)
 	return len - done;

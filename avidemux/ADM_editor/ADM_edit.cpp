@@ -16,6 +16,7 @@
  ***************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include <ADM_assert.h>
 
@@ -63,6 +64,7 @@ ADM_Composer::ADM_Composer (void)
   _total_frames = 0;
   _audioseg = 0;
   _audiooffset = 0;
+  _audioSample=0;
   _lastseg = 99;
   _lastframe = 99;
   _cached = 1;
@@ -89,6 +91,7 @@ uint8_t ADM_Composer::resetSeg( void )
   		_segments[i]._audio_size = _videos[i]._audio_size;
   		_segments[i]._audio_start = 0;
   		_segments[i]._start_frame = 0;
+		_segments[i]._audio_duration = 0;		
 		_segments[i]._nb_frames   =   _videos[i]._nb_video_frames ;
 		_total_frames+=_segments[i]._nb_frames  ;
 		updateAudioTrack (i);
@@ -336,11 +339,16 @@ UNUSED_ARG(mode);
     }
   else
     {
-
+float duration;
       _videos[_nb_video]._aviheader->getAudioStream (&_videos[_nb_video].
 						     _audiostream);
-      _videos[_nb_video]._audio_size =
-	_videos[_nb_video]._audiostream->getLength ();
+      _videos[_nb_video]._audio_size =_videos[_nb_video]._audiostream->getLength ();
+      duration=_videos[_nb_video]._nb_video_frames;
+      duration/=info.fps1000;
+      duration*=1000;			// duration in seconds
+      duration*=_wavinfo->frequency;  	// In sample
+      _videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
+      
 	// For mpeg2, try to guess if it is pulldowned material
 	double duration_a, duration_v;
 	double rdirect, rpulldown;
@@ -401,6 +409,7 @@ UNUSED_ARG(mode);
   //
   _segments[_nb_segment]._reference = _nb_video;
   _segments[_nb_segment]._audio_size = _videos[_nb_video]._audio_size;
+  _segments[_nb_segment]._audio_duration =_videos[_nb_video]._audio_duration;;
   _segments[_nb_segment]._audio_start = 0;
   _segments[_nb_segment]._start_frame = 0;
   _segments[_nb_segment]._nb_frames   =   _videos[_nb_video]._nb_video_frames ;
@@ -905,8 +914,8 @@ ADM_Composer::dumpSeg (void)
   printf ("\n________Video______________");
   for (seg = 0; seg < _nb_video; seg++)
     {
-      printf ("\n Video : %lu, nb video  :%lu, audio size:%lu",
-	      seg, _videos[seg]._nb_video_frames, _videos[seg]._audio_size);
+      printf ("\n Video : %lu, nb video  :%lu, audio size:%lu  audioDuration:%lu",
+	      seg, _videos[seg]._nb_video_frames, _videos[seg]._audio_size,_videos[seg]._audio_duration);
 
     }
 
@@ -914,20 +923,23 @@ ADM_Composer::dumpSeg (void)
   for (seg = 0; seg < _nb_segment; seg++)
     {
       printf
-	("\n Seg : %lu, ref: %lu start :%lu, size:%lu audio size : %lu audio start : %lu",
+	("\n Seg : %lu, ref: %lu start :%lu, size:%lu audio size : %lu audio start : %lu duration:%lu",
 	 seg, _segments[seg]._reference, _segments[seg]._start_frame,
 	 _segments[seg]._nb_frames, _segments[seg]._audio_size,
-	 _segments[seg]._audio_start);
+	 _segments[seg]._audio_start,
+	  _segments[seg]._audio_duration
+	 );
 
     }
   printf ("\n_________Clipboard_____________");
   for (seg = 0; seg < _nb_clipboard; seg++)
     {
       printf
-	("\n Seg : %lu, ref: %lu start :%lu, size:%lu audio size : %lu audio start : %lu\n",
+	("\n Seg : %lu, ref: %lu start :%lu, size:%lu audio size : %lu audio start : %lu  duration:%lu\n",
 	 seg, _clipboard[seg]._reference, _clipboard[seg]._start_frame,
 	 _clipboard[seg]._nb_frames, _clipboard[seg]._audio_size,
-	 _clipboard[seg]._audio_start);
+	 _clipboard[seg]._audio_start,
+	 _segments[seg]._audio_duration);
 
     }
 
@@ -981,6 +993,7 @@ uint8_t
 //
 //      Update the real size of audio track by computing the
 // delta between sync @end and sync@begin
+// We also upate the duration of the selected part
 //
 
 uint8_t ADM_Composer::updateAudioTrack (uint32_t seg)
@@ -998,6 +1011,18 @@ uint8_t ADM_Composer::updateAudioTrack (uint32_t seg)
   // Mika
   if (!_videos[reference]._audiostream)
     return 1;
+  // Compute the resulting duration
+  // Of the segment
+  double duration;
+  aviInfo info;
+  	_videos[reference]._aviheader->getVideoInfo(&info);
+  	duration= _segments[seg]._nb_frames;
+	ADM_assert(info.fps1000);
+	duration/=info.fps1000;
+	duration*=1000*_videos[reference]._audiostream->getInfo()->frequency;
+	
+  _segments[seg]._audio_duration = (uint64_t)floor(duration);
+
   // If we cannot go to sync point start --> no need to continue
   // It can happen if audio track is shorter than video
   if (!audioGoToFn (seg, _segments[seg]._start_frame, &off))
@@ -1024,7 +1049,7 @@ uint8_t ADM_Composer::updateAudioTrack (uint32_t seg)
 
   _segments[seg]._audio_size = pos_end - pos_start;
   _segments[seg]._audio_start = pos_start;
-
+  
   printf (" Audio start : %lu end : %lu size : %lu\n", pos_start, pos_end,
 	  _segments[seg]._audio_size);
 

@@ -41,7 +41,11 @@ Split a stream into packet(s)
 #define MINUS_ONE 0xffffffff	
 
 //
-
+uint8_t AVDMGenericAudioStream::flushPacket(void)
+{
+	packetTail=packetHead=0;
+	return 1;
+}
 uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len, 
 						uint32_t *samples)
 {
@@ -70,6 +74,9 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 		case WAV_MP3:
 				return getPacketMP3(dest,len,samples);
 				break;
+		case WAV_PCM:
+				return getPacketPCM(dest,len,samples);
+				break;
 		case WAV_AC3:
 				return getPacketAC3(dest,len,samples);
 				break;
@@ -80,6 +87,34 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 	return 0;
 
 }
+uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len, 
+								uint32_t *samples)
+{
+// Take ~ 10 m packets
+//
+	uint32_t count;
+			count=_wavheader->frequency/100;
+			count*=2;
+			count*=_wavheader->channels;
+			if(packetTail-packetHead<count)
+			{
+				count=packetTail-packetHead;
+				count%=4;
+			}
+			memcpy(&packetBuffer[packetHead],dest,count);
+			packetHead+=count;
+			*samples=_wavheader->frequency/100;
+			*len=count;
+			if(packetTail>SIZE_INTERNAL)
+			{
+				// Wrap
+				memmove(packetBuffer,&packetBuffer[packetHead],packetTail-packetHead);
+				packetTail-=packetHead;
+				packetHead=0;
+			}
+			return 1;
+}
+	
 uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len, 
 								uint32_t *samples)
 {
@@ -123,6 +158,10 @@ uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 					memcpy(dest,&packetBuffer[start],size);
 					packetHead=start+size;
 					found=1;
+					break;
+				}
+				else
+				{	// not enought data left
 					break;
 				}
 			
@@ -180,6 +219,11 @@ uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 				// Error decoding mpeg
 				printf("MPInfo:** CANNOT FIND MPEG START CODE**\n");
 				packetHead+=4;
+				return 0;
+			}
+			if(packetHead+startOffset+mpegInfo.size>packetTail)
+			{
+				printf("MP3 packetizer: not enough data\n");
 				return 0;
 			}
 			memcpy(dest,&packetBuffer[packetHead+startOffset],

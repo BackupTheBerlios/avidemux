@@ -100,15 +100,20 @@ class AVDMGenericAudioStream
 										uint32_t *samples);
 					uint8_t		getPacketAC3(uint8_t *dest, uint32_t *len, 
 									uint32_t *samples);
+					uint8_t		getPacketPCM(uint8_t *dest, uint32_t *len, 
+								uint32_t *samples);
+
        protected:
 				       	uint8_t  	readc( uint8_t *c);
 			      
 		public:
-					AVDMGenericAudioStream( void ){_codec=NULL;_current=0;_audioMap=NULL;_wavheader=NULL;_LAll=NULL;_mpegSync[0]=_mpegSync[1]=_mpegSync[2]=0;packetHead=packetTail=0;}
+					AVDMGenericAudioStream( void)
+					{_codec=NULL;_current=0;_audioMap=NULL;_wavheader=NULL;_LAll=NULL;_mpegSync[0]=_mpegSync[1]=_mpegSync[2]=0;packetHead=packetTail=0;}
 			virtual 				~AVDMGenericAudioStream() ;
           				uint8_t			beginDecompress( void );
         		     		uint32_t		getPos( void ) {return _pos;};
 	             		virtual	uint8_t			buildAudioTimeLine( void );
+				virtual		uint8_t 	flushPacket(void);
                
                
 				  	uint8_t			endDecompress( void );
@@ -140,7 +145,7 @@ class AVDMGenericAudioStream
 										return 0;
 									}
 					// Get Packet
-				uint8_t				getPacket(uint8_t *dest, uint32_t *len, 
+			virtual	uint8_t				getPacket(uint8_t *dest, uint32_t *len, 
 										uint32_t *samples);
 									
 }
