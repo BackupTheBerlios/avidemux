@@ -235,13 +235,14 @@ uint32_t extraLen=0;
 		
 			double len;
 			len=_videostream.dwLength;
-#if 0			
+#if 1			
 			len/=_videostream.dwRate;
 			len*=_videostream.dwScale;			
 			len*=wav->frequency;
 			len/=1024;
-#endif			
+#else		
 			header->dwLength= floor(len);//_videostream.dwLength; 
+#endif			
 		 // AAC is mostly VBR
 		 header->dwFlags=1;
 		 header->dwInitialFrames=0;
