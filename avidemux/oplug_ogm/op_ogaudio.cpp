@@ -55,7 +55,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 extern const char *getStrFromAudioCodec( uint32_t codec);	
-
+extern int audioDelay,audioShift;
 //__________________________________________________
 uint8_t		ADM_ogmWrite::initAudio(void)
 {
@@ -64,6 +64,9 @@ WAVHeader	*info=NULL;
 
 		if(!currentaudiostream)
 		{
+			audioFilter=NULL;
+			audioStream=NULL;
+			_audioBuffer=NULL;
 			encoding_gui->setAudioCodec("None");
 			return 1;
 		}
@@ -85,11 +88,12 @@ WAVHeader	*info=NULL;
 			fcc=audioFilter->getInfo()->encoding;
 			encoding_gui->setAudioCodec(getStrFromAudioCodec(fcc));
 		}
-		else
+		else	// Copymode
 		{
-			audioFilter= (AVDMGenericAudioStream *) currentaudiostream;
-			tstart = video_body->getTime (frameStart);
-	  		audioFilter->goToTime (tstart);
+			 int32_t shift=0;
+      			if(audioDelay && audioShift) shift=audioDelay;
+      			audioFilter=buildRawAudioFilter( video_body->getTime (frameStart), 
+      				0xffffffff, shift);
 			encoding_gui->setAudioCodec("Copy");
 			
 		}
@@ -154,6 +158,7 @@ uint32_t len,packetLen,packets=0;
 uint32_t totalsample=0;
 uint32_t lastPacket;
 	if(!audioStream) return 1; // nothing to do
+	if(!audioFilter) return 1;
 		
 	tgt=vframe+1;
 	tgt/=_fps1000;

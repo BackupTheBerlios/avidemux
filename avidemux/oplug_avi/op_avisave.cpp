@@ -186,11 +186,16 @@ GenericAviSave::setupAudio (void)
   _audioInBuffer = 0;
   _audioTarget=_audioCurrent=0;
   _audioTotal=0;
-  printf ("\n mux mode : %d mux param %d", muxMode, muxParam);
+  audio_filter=NULL;
+   if(!currentaudiostream) 
+   {
+   	encoding_gui->setAudioCodec("None");
+	return 1;
+   }
+  printf (" mux mode : %d mux param %d\n", muxMode, muxParam);
 
-  if (audioProcessMode && currentaudiostream)	// else Raw copy mode
+  if (audioProcessMode)	// else Raw copy mode
     {
-//Process mode
       if (currentaudiostream->isCompressed ())
 	{
 	  if (!currentaudiostream->isDecompressable ())
@@ -204,63 +209,25 @@ GenericAviSave::setupAudio (void)
       	audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart),
 				  (uint32_t) 0xffffffff);
 
-      if ((audio_filter)->getInfo ()->encoding == WAV_PCM)
-	if (!GUI_Question ("Audio stream is not compressed\n Continue?"))
-	  {
-	    deleteAudioFilter ();
-	    return 0;
-	  }
+//       if ((audio_filter)->getInfo ()->encoding == WAV_PCM)
+// // 	if (!GUI_Question ("Audio stream is not compressed\n Continue?"))
+// // 	  {
+// // 	    deleteAudioFilter ();
+// // 	    return 0;
+// // 	  }
 	  encoding_gui->setAudioCodec(getStrFromAudioCodec(audio_filter->getInfo()->encoding));
     }
-  else
+  else // copymode
     {
       // else prepare the incoming raw stream
       // audio copy mode here
-      audio_filter = (AVDMGenericAudioStream *) currentaudiostream;
-      if (currentaudiostream)
-	{
-	  uint32_t   tstart;
-	  encoding_gui->setAudioCodec("Copy");
-	  tstart = video_body->getTime (frameStart);
-	  (audio_filter)->goToTime (tstart);
-	  printf ("\n delay : %ld shift  : %d", audioDelay, audioShift);
-	  if (audioDelay)
-	    {
-	      if (audioShift)
-		{
-		  AVDMProcessAudio_RawShift *
-		    ts;
-		  ts = new AVDMProcessAudio_RawShift (audio_filter,
-						      audioDelay, tstart);
-
-		  audio_filter = (AVDMProcessAudioStream *) ts;;
-		  printf ("\n Raw Time shift activated with %ld ms",
-			  audioDelay);
-		}
-	    }
-
-	}
+      int32_t shift=0;
+      if(audioDelay && audioShift) shift=audioDelay;
+      audio_filter=buildRawAudioFilter( video_body->getTime (frameStart), 
+      		0xffffffff, shift);
     }
 
-  //
-  //  Now that the filter is ready compute the duration of a audio chunk
-  //
-  // cbr only for now
-  if (currentaudiostream)
-    {
-      WAVHeader *wav = NULL;    
-      has_audio_vbr = audio_filter->isVBR ();
-      if (has_audio_vbr)	//VBR
-			{
-	  			wav->blockalign = 1152;	// Trick ala nandub
-			}
-    	  else			// CBR
-			{
-	  		//wav->blockalign = 1;
-			}
-    }
-
-    if(!currentaudiostream) encoding_gui->setAudioCodec("None");
+   
   return 1;
 }
 
@@ -300,12 +267,12 @@ GenericAviSave::writeAudioChunk (uint32_t frame)
 		_audioCurrent+=sample;		
 		packets++;
 	}
-  	printf("Aviwr:Fq:%lu fps1000:%lu frame:%lu Found %lu packet for %lu bytes , cur=%lu target=%lu total:%llu\n",
-					audio_filter->getInfo()->frequency,
-					fps1000,
-					frame,packets,_audioInBuffer,
-					_audioCurrent,_audioTarget,_audioTotal);
-  
+//   	printf("Aviwr:Fq:%lu fps1000:%lu frame:%lu Found %lu packet for %lu bytes , cur=%lu target=%lu total:%llu\n",
+// 					audio_filter->getInfo()->frequency,
+// 					fps1000,
+// 					frame,packets,_audioInBuffer,
+// 					_audioCurrent,_audioTarget,_audioTotal);
+//   
       switch (muxMode)
 	{
 

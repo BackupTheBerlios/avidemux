@@ -192,6 +192,7 @@ uint8_t audioCodecSetConf(char *name )
 
 	Read(audioMP3mode);
 	Read(audioMP3bitrate);
+	Read(audioMP3preset);
 	UI_setAProcessToggleStatus( newmode );
 	return 1;
 }
@@ -204,6 +205,7 @@ const char *audioCodecGetConf( void )
 	Add(audioProcessMode);
 	Add(audioMP3mode);
 	Add(audioMP3bitrate);
+	Add(audioMP3preset);
 
 	return conf;
 
@@ -676,6 +678,7 @@ AVDMProcessAudioStream *firstFilter = NULL;
 AVDMProcessAudioStream *lastFilter = NULL;
  
 	// Start from a clean state
+	printf("Building raw audio filter with start:%lu duration:%lu shift:%d\n",startTime,duration,shift);
 	deleteAudioFilter();	
 	
 	// No shift
