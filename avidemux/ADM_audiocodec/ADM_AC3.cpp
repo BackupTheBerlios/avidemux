@@ -34,6 +34,7 @@ extern "C"
  };
 
  #include "ADM_audiocodec/ADM_AC3.h"
+ //#include "ADM_audio/ADM_a52info.h"
 
 
 static a52_state_t		*ac3_handle=NULL;
@@ -255,55 +256,7 @@ static uint8_t sync[8];
                  }
                return 1;
 }
-//
-//	Exctract infos from AC3 stream (used when muxing with external AC3)
-//
-uint8_t ADM_AC3GetInfo(uint8_t *buf, uint32_t len, uint32_t *fq, uint32_t *br, uint32_t *chan)
-{
-uint32_t l;
-int ibr,ifq,flags;
-	
-		if(!init_done)
-  			ADM_AC3Init(); 
 
-     	printf("\n Syncing on %lu b",len);
-		memcpy(buffer,buf,len);
-  		inbuffer=len;
-    	l=AC3_Resync();
-     	if(l==0)
-      	{
-         	printf("\n no sync!\n");
-         	inbuffer=0;
-      		return l;
-        }
-      	if(l>inbuffer)
-       {
-                	printf("\n AC3;not enough datas to get syncinfo !\n");
-                 	inbuffer=0;
-			       return 0;
-       }
-       l=a52_syncinfo (buffer,&flags, &ifq, &ibr);
-       *fq=(uint32_t)ifq;
-       *br=(uint32_t)ibr>>3;
-       *chan=2;
-        flags=flags & A52_CHANNEL_MASK;
-#define LOOK(x,y) if(flags ==x) *chan=y;       
-       
-	LOOK(A52_MONO,1);
-	
-  	LOOK(A52_STEREO ,2);
-  	LOOK(A52_3F  ,3);
-  	LOOK(A52_2F1R,3);
-  	LOOK(A52_3F1R,4);
-  	LOOK(A52_2F2R,4);
-  	LOOK(A52_3F2R,5);
-
-	
-	
-       inbuffer=0;
-       assert(l);
-       return 1;
-}
 
 #endif
 // EOF

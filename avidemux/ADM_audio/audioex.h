@@ -32,7 +32,7 @@ class AVDMWavAudioStream  : public AVDMFileStream
          		~AVDMWavAudioStream() { abort();}
            	virtual uint8_t open(char *name);
 }  ;
-#ifdef USE_AC3
+
 class AVDMAC3AudioStream  : public AVDMFileStream
 {
  public:
@@ -40,4 +40,4 @@ class AVDMAC3AudioStream  : public AVDMFileStream
          		~AVDMAC3AudioStream() { abort();}
            	virtual uint8_t open(char *name);
 }  ;
-#endif
+

@@ -33,6 +33,7 @@
 #include "fourcc.h"
 #include "aviaudio.hxx"
 #include "avilist.h"
+#include "ADM_audio/ADM_a52info.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO
@@ -59,12 +60,34 @@ AVDMGenericAudioStream::~AVDMGenericAudioStream()
 uint8_t AVDMGenericAudioStream::goToSync(uint32_t offset)
 {
     static uint8_t a,b, c;
+    #define SYNCAC3 8192
+    uint8_t	syncbuff[SYNCAC3];
     uint32_t suboffset = 0,byterate;
     assert(_wavheader);
     // can't deal with something not mp3...
   //  printf("syncing asked : %lu",offset);
     switch(  _wavheader->encoding )
     {
+
+    		case WAV_AC3:
+					{
+					  uint32_t fq,br,chan;
+					  if(!goTo(offset)) return 0;
+					  if(SYNCAC3!=read(SYNCAC3,syncbuff))
+					  {
+					  	printf("Cannot read enough bytes!\n");
+						return 0;					  
+					  }
+					
+					  if(!ADM_AC3GetInfo(syncbuff, SYNCAC3,&fq, &br, &chan,&suboffset))
+					  {
+					  	return 0;
+					  }
+					  if(!goTo(offset+suboffset)) return 0;
+					  printf("A52 sync found at %lu + %lu\n",offset,suboffset);		
+					  }
+					  return 1;
+					  break;
 		case WAV_WMA:
 					uint32_t wmaoffset;
 					if(_wavheader->blockalign)
@@ -474,4 +497,7 @@ gotit:
 
              	return lr;
 }
+
+
+
 //

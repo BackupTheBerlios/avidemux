@@ -23,6 +23,8 @@ uint8_t 	    ADM_AC3Init(void );
 uint8_t 	    ADM_AC3End(void );
 uint8_t 		ADM_AC3Run(uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut);
 uint32_t 		AC3_Resync(void);
-uint8_t 		ADM_AC3GetInfo(uint8_t *buf, uint32_t len, uint32_t *fq, uint32_t *br, uint32_t *chan)   ;
 
 #endif
+
+
+

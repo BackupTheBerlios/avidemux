@@ -28,13 +28,13 @@
 #include "aviaudio.hxx"
 #include "ADM_audio/audioex.h"
 
-#ifdef USE_AC3
-#include "ADM_audiocodec/ADM_AC3.h"
+#include "ADM_audio/ADM_a52info.h"
 
 uint8_t AVDMAC3AudioStream::open(char *name)
 {
 uint8_t syncbuff[10*1024];
 uint32_t fq,br,l,chan;
+uint32_t syncoff;
 
 
     fd = fopen(name, "rb");
@@ -50,7 +50,7 @@ uint32_t fq,br,l,chan;
     // read wavheader
     _wavheader = new WAVHeader;
     assert(_wavheader);
-    if(! 		ADM_AC3GetInfo(syncbuff, 10*1024,&fq, &br,&chan)   )
+    if(! 		ADM_AC3GetInfo(syncbuff, 10*1024,&fq, &br,&chan,&syncoff)   )
     		{
             	abort();
              	printf("\n could not sync ac3!\n");
@@ -75,5 +75,5 @@ uint32_t fq,br,l,chan;
     return 1;
 
 }
-#endif
+
 

@@ -40,13 +40,11 @@
 #include "ADM_mpeg2dec/ADM_mpegAudio.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-#include "ADM_audiocodec/ADM_AC3.h"
-
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_MPEG_DEMUX
 #include "ADM_toolkit/ADM_debug.h"
 
-
+#include "ADM_audio/ADM_a52info.h"
 
 //___________________________________________________																
 //___________________________________________________																
@@ -306,9 +304,9 @@ uint8_t 			AVDMMpeg2decAudioStream::getAudioSpec(void)
  #define SEARCH	8*1024 
  uint8_t 			AVDMMpeg2decAudioStream::getAC3AudioSpec(void)
 {
-#ifdef USE_AC3	
+
    uint8_t buffer[SEARCH],*ptr;
-   uint32_t rd,fq,br,ch;
+   uint32_t rd,fq,br,ch,syncoff;
    
    
    
@@ -318,13 +316,9 @@ uint8_t 			AVDMMpeg2decAudioStream::getAudioSpec(void)
 		printf("\n read failed\n");
 		return 0;	
 	}
-	if(! ADM_AC3GetInfo(ptr, SEARCH, &fq, &br,&ch)) return 0;
+	if(! ADM_AC3GetInfo(ptr, SEARCH, &fq, &br,&ch,&syncoff)) return 0;
 	_wavheader->frequency=fq;
 	_wavheader->byterate=br;
-#else
-		printf("\n Liba52 not installed, cannot handle AC3 stream !!\n");
-		return 0;
-#endif	
         return 1;
  }
 

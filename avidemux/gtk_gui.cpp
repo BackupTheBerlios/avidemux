@@ -114,9 +114,9 @@ extern void saveMpegFile (char *name);
 //static void A_selectEncoder ( void );
 extern void A_SaveAudioDualAudio (void);
 static void secondTrackMP3 (char *name);
-#ifdef USE_AC3
+
 static void secondTrackAC3 (char *name);
-#endif
+
 static void updateSecondAudioTrack (void);
 
 extern void A_Save( char *name);
@@ -465,11 +465,7 @@ case ACT_Pipe2Other:
       ADM_cutWizard ();
       break;
     case ACT_SecondAudioAC3:
-#ifdef USE_AC3
-      A_handleSecondTrack (2);
-#else
-      GUI_Alert ("No AC3 support compiled");
-#endif
+	      A_handleSecondTrack (2);
       break;
     case ACT_SecondAudioMP3:
       A_handleSecondTrack (1);
@@ -655,11 +651,7 @@ case ACT_Pipe2Other:
       GUI_FileSelRead ("Select MP3 to load ", GUI_loadMP3);
       break;
     case ACT_AudioSourceAC3:
-#ifndef USE_AC3
-      GUI_Alert ("AC3 Not enabled at compilation time !");
-#else
       GUI_FileSelRead ("Select AC3 to load ", A_loadAC3);
-#endif
       break;
     case ACT_AudioSourceWAV:
       GUI_FileSelRead ("Select WAV to load ", A_loadWave);
@@ -1464,7 +1456,7 @@ A_loadAC3 (char *name)
   if (!avifileinfo)
     return;
 
-#ifdef USE_AC3
+
   AVDMAC3AudioStream *ac3 = new AVDMAC3AudioStream ();
 
   if (ac3->open (name) == 0)
@@ -1477,11 +1469,6 @@ A_loadAC3 (char *name)
   //currentaudiostream=wav;
   changeAudioStream (ac3, AudioAC3);
   wavinfo = currentaudiostream->getInfo ();
-#else
-  fprintf (stderr,
-	   "A_loadAC3(%s) not implemented. Install liba52 and rebuild avidemux.\n",
-	   (name ? name : "NULL"));
-#endif
 }
 
 //_____________________________________________________________
@@ -1731,7 +1718,7 @@ A_handleSecondTrack (int tracktype)
       secondaudiostream_isac3 = 0;
       GUI_FileSelRead ("Select MP3", secondTrackMP3);
       break;
-#ifdef USE_AC3
+
     case 2:			// AC3
       if (secondaudiostream && secondaudiostream_isac3 == 1)
 	return;
@@ -1746,14 +1733,14 @@ A_handleSecondTrack (int tracktype)
       secondaudiostream_isac3 = 1;
       GUI_FileSelRead ("Select AC3", secondTrackAC3);
       break;
-#endif
+
 
 
     }
 
 }
 
-#ifdef USE_AC3
+
 void
 secondTrackAC3 (char *name)
 {
@@ -1773,7 +1760,7 @@ secondTrackAC3 (char *name)
     }
   updateSecondAudioTrack ();
 }
-#endif
+
 
 void
 secondTrackMP3 (char *name)

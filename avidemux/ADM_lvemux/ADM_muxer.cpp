@@ -33,19 +33,15 @@
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_lvemux/ADM_muxer.h"
+#include "ADM_audio/ADM_a52info.h"
+
 
 extern "C" {
 	#include "ADM_lvemux/mux_out.h"
 };
 
-#ifdef USE_AC3
 
 #include "avi_vars.h"
-extern "C"
-{
-#include "a52dec/a52.h"
-}
-#endif
 
 
 MpegMuxer::MpegMuxer( void )
@@ -80,14 +76,6 @@ float bn,sn;
 	// lookup audio info from wavheader
 	abitrate=audioheader->byterate*8;
 	
-#ifndef USE_AC3
-	if(audioheader->encoding==WAV_AC3)
-	{
-		GUI_Alert("I need liba52 to write mpeg/ac3 !");
-		return 0;
-		
-	}
-#endif	
 	this->frequency=frequency=audioheader->frequency;
 	audioBitrate=(audioheader->byterate*8)/1000;
 	switch(audioheader->encoding)
@@ -197,9 +185,6 @@ uint32_t n;
 //
 uint8_t MpegMuxer::muxAC3(void)
 {
-#ifndef USE_AC3
-	assert(0);
-#else
 	uint8_t *end=&buffer[byteTail];	
 	uint8_t *ptr=&buffer[byteHead];	
 	uint8_t *pos=NULL;
@@ -212,7 +197,7 @@ uint8_t MpegMuxer::muxAC3(void)
 	while(ptr+8<end)
 	{
 		// look for a new AC3 sync word
-		 if( (len=a52_syncinfo (ptr,&flags, &samprate, &bitrate))>0)
+		 if( (len=ADM_a52_syncinfo (ptr,&flags, &samprate, &bitrate))>0)
 		 {
 		 	pos=ptr;
 			ptr+=len;
@@ -233,7 +218,6 @@ uint8_t MpegMuxer::muxAC3(void)
 	mux_write_packet((PackStream *)packStream, 
                               AUDIO_ID_AC3, &buffer[byteHead], off); 
 	byteHead+=off;
-#endif	
 	return 1;
 }
 //

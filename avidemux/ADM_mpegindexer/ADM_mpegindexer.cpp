@@ -51,7 +51,7 @@
 #include "ADM_toolkit/filesel.h"
 #include "ADM_dialog/DIA_working.h"
 
-#include "ADM_audiocodec/ADM_AC3.h"
+#include "ADM_audio/ADM_a52info.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_MPEG
@@ -206,11 +206,11 @@ uint8_t tryAudioTrack(char *name,uint8_t id,int32_t *ptsShift)
 		}
 	return 0;
 }
-#ifdef USE_AC3
+
 uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitrate)
 {
 #define AMOUNT 4*1024
-	uint32_t fq=0;
+	uint32_t fq=0,syncoff;
 	uint8_t r=0;
 	uint8_t streamid;
 	uint8_t buff[AMOUNT];
@@ -222,7 +222,7 @@ uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitra
 
 	if(demuxer->read(buff,AMOUNT))	
 	{			
-		if( ADM_AC3GetInfo(buff, AMOUNT, &fq, bitrate,chan)) 
+		if( ADM_AC3GetInfo(buff, AMOUNT, &fq, bitrate,chan,&syncoff)) 
 		{
 			aprintf("**Track %d : Bitrate %lu\n",id,*bitrate);			
 			r=1;
@@ -236,12 +236,6 @@ uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitra
 	delete demuxer;
 	return r;
 }
-#else
-uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitrate)
-{
-	return 0;
-}	
-#endif	
 	
 
 uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
