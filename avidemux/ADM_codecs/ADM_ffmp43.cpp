@@ -104,16 +104,16 @@ decoderFF::decoderFF(uint32_t w,uint32_t h) :decoders(w,h)
 
 		  		_context->width=_w;
 				_context->height=_h;
-			  	_context->pix_fmt				=PIX_FMT_YUV420P;
+			  	_context->pix_fmt=PIX_FMT_YUV420P;//PIX_FMT_RGBA32
 				//_context->debug=1;
 
 			    _internalBuffer=new uint8_t[w*h*3];
 			   
 			    _swapUV=0;
-
+				//_context->strict_std_compliance=-1;
 	   		    initPostProc(&_postproc,w,h);			    
-			    _postproc.postProcType=3;
-			    _postproc.postProcStrength=5;
+			    _postproc.postProcType=PP_DefaultValue;
+			    _postproc.postProcStrength=PP_DefaultStrength;
 			    updatePostProc(&_postproc);
 			    printf("FFMpeg build : %d\n", LIBAVCODEC_BUILD);
 }
@@ -239,7 +239,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
 		uint8_t **src;
 		uint32_t stridex[3];
 		uint8_t  *inx[3];
-
+		//printf("cspace %d\n", _context->pix_fmt);
 
 		switch(_context->pix_fmt)
 		{
@@ -285,8 +285,9 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
 			_frame.linesize[1 ]=_w>>1;
 			_frame.linesize[2 ]=_w>>1;
 			break;
-		default:
-
+		
+		case PIX_FMT_YUV420P:
+		case PIX_FMT_YUVJ420P:
 		// Default is YV12 or I420
 		// In that case depending on swap u/v
 		// we do it or not
@@ -320,6 +321,47 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
 			}
 #endif
 			break;
+/*
+uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *oy2, 
+				uint8_t *u, uint8_t *v,uint32_t lineSize)
+*/			
+		case PIX_FMT_RGBA32:
+				{
+				uint32_t stride;
+				uint8_t *data1,*data2;
+				uint8_t *oy,*oy2,*u,*v;
+				
+						
+						stride=	_frame.linesize[0 ];
+						data1=(uint8_t *)_frame.data[0];
+						data2=(uint8_t *)_frame.data[0]+stride;
+						oy=out;
+						oy2=out+_w;
+						if(!_swapUV)
+						{
+							u=out+(_w*_h);
+							v=out+((_w*_h*5)>>2);
+						
+						}
+						else
+						{
+							v=out+(_w*_h);
+							u=out+((_w*_h*5)>>2);	
+						}
+						
+						 COL_RawRGB32toYV12(data1,data2, oy,oy2, 
+							u, v,_w,_h,stride)	;
+						_lastQ=0; //_context->quality;	
+						if(flagz)
+						{
+							*flagz=frameType();
+						}
+ 						return 1;
+				}
+		default:
+				printf("\n Unhandled colorspace:%d\n",_context->pix_fmt);
+				return 0;
+				
 		}
 		uint8_t *tmp;
 		tmp=src[0];
