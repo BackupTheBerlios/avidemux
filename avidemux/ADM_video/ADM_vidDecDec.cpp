@@ -63,7 +63,13 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 
-#if 1 || TEST_DECOMB
+#if defined(USE_MMX) && defined(HAVE_BUILTIN_VECTOR)
+	#define DECIMATE_MMX_BUILD_PLANE 1
+	extern "C"
+	{
+	#include "adm_lavcodec/dsputil.h"
+	}
+#endif
 
 #define UPLANE(x) (x+_info.width*_info.height)
 #define VPLANE(x) (x+((_info.width*_info.height*5)>>2))
@@ -78,6 +84,15 @@ extern void 	BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
 extern  void 	DrawString(uint8_t *dst, int x, int y, const char *s);
 extern  void 	DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
+
+
+
+#ifdef DECIMATE_MMX_BUILD_PLANE
+static void isse_blend_decimate_plane(uint8_t * dst, uint8_t* src,  uint8_t* src_next, 
+			int w, int h);
+#endif
+
+static uint8_t sseCapable=0;
 
 #define OutputDebugString(x) aprintf("%s\n",x)
 //________________________________
@@ -189,6 +204,15 @@ Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples)
 		_uncompressed=NULL;		
   		_info.encoding=1;
 		
+		//
+#ifdef	DECIMATE_MMX_BUILD_PLANE	
+		sseCapable=mm_support();
+		printf("\nDecimate: MMX :%d\n",sseCapable & MM_MMX);		
+		printf("\nDecimate: SSE :%d\n",sseCapable & MM_SSE);		
+		printf("\nDecimate: ALL :%x\n",sseCapable );		
+		sseCapable&=MM_SSE;
+#endif		
+		printf("\nDecimate: SSE enabled :%d\n",sseCapable);		
 		// Init here
 		debug=0;
 		show=0;		
@@ -522,10 +546,10 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		
 		nextrpY = (unsigned char *) next; //next->GetReadPtr(PLANAR_Y);
 		dstwpY = (unsigned char *) dst; //dst->GetWritePtr(PLANAR_Y);
-#ifdef DECIMATE_MMX_BUILD
-		if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) 
+#ifdef DECIMATE_MMX_BUILD_PLANE
+		if (sseCapable) 
 		{
-			isse_blend_decimate_plane(dstwpY, srcrpY, nextrpY, wY, hY, dpitchY, pitchY, pitchY);
+			isse_blend_decimate_plane(dstwpY, srcrpY, nextrpY, wY, hY);
 		} else {
 #endif
 			for (y = 0; y < hY; y++)
@@ -538,15 +562,15 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 				nextrpY += pitchY;
 				dstwpY += dpitchY;
 			}
-#ifdef DECIMATE_MMX_BUILD
+#ifdef DECIMATE_MMX_BUILD_PLANE
 		}
 #endif
 		srcrpU = (unsigned char *) UPLANE(src);//->GetReadPtr(PLANAR_U);
 	    nextrpU = (unsigned char *) UPLANE(next);//->GetReadPtr(PLANAR_U);
 	    dstwpU = (unsigned char *) UPLANE(dst);//->GetWritePtr(PLANAR_U);
-#ifdef DECIMATE_MMX_BUILD
-		if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
-			isse_blend_decimate_plane(dstwpU, srcrpU, nextrpU, wUV, hUV, dpitchUV, pitchUV, pitchUV);
+#ifdef DECIMATE_MMX_BUILD_PLANE
+		if (sseCapable) {
+			isse_blend_decimate_plane(dstwpU, srcrpU, nextrpU, wUV, hUV);
 		} else {
 #endif
 			for (y = 0; y < hUV; y++)
@@ -559,16 +583,16 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 				nextrpU += pitchUV;
 				dstwpU += dpitchUV;
 			}
-#ifdef DECIMATE_MMX_BUILD
+#ifdef DECIMATE_MMX_BUILD_PLANE
 		}
 #endif
 	    srcrpV = (unsigned char *) VPLANE(src);//->GetReadPtr(PLANAR_V);
 	    nextrpV = (unsigned char *) VPLANE(next);//->GetReadPtr(PLANAR_V);
 	    dstwpV = (unsigned char *) VPLANE(dst);//->GetWritePtr(PLANAR_V);
 
-#ifdef DECIMATE_MMX_BUILD
-		if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
-			isse_blend_decimate_plane(dstwpV, srcrpV, nextrpV, wUV, hUV, dpitchUV, pitchUV, pitchUV);
+#ifdef DECIMATE_MMX_BUILD_PLANE
+		if (sseCapable) {
+			isse_blend_decimate_plane(dstwpV, srcrpV, nextrpV, wUV, hUV );
 		} else {
 #endif
 			for (y = 0; y < hUV; y++)
@@ -581,7 +605,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 				nextrpV += pitchUV;
 				dstwpV += dpitchUV;
 			}
-#ifdef DECIMATE_MMX_BUILD
+#ifdef DECIMATE_MMX_BUILD_PLANE
 		}
 #endif
 		if (show == true)
@@ -756,9 +780,9 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		    srcrpY = (unsigned char *) src; //src->GetReadPtr(PLANAR_Y);
 			nextrpY = (unsigned char *) next; //next->GetReadPtr(PLANAR_Y);
 			dstwpY = (unsigned char *) dst; //dst->GetWritePtr(PLANAR_Y);
-#ifdef DECIMATE_MMX_BUILD
-			if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
-				isse_blend_decimate_plane(dstwpY, srcrpY, nextrpY, wY, hY, dpitchY, pitchY, pitchY);
+#ifdef DECIMATE_MMX_BUILD_PLANE
+			if (sseCapable) {
+				isse_blend_decimate_plane(dstwpY, srcrpY, nextrpY, wY, hY);
 			} else {
 #endif
 				for (y = 0; y < hY; y++)
@@ -771,15 +795,15 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 					nextrpY += pitchY;
 					dstwpY += dpitchY;
 				}
-#ifdef DECIMATE_MMX_BUILD
+#ifdef DECIMATE_MMX_BUILD_PLANE
 			}
 #endif
 			srcrpU = (unsigned char *) UPLANE(src);//->GetReadPtr(PLANAR_U);
 			nextrpU = (unsigned char *)UPLANE( next);//->GetReadPtr(PLANAR_U);
 			dstwpU = (unsigned char *) UPLANE(dst);//->GetWritePtr(PLANAR_U);
-#ifdef DECIMATE_MMX_BUILD
-			if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
-				isse_blend_decimate_plane(dstwpU, srcrpU, nextrpU, wUV, hUV, dpitchUV, pitchUV, pitchUV);
+#ifdef DECIMATE_MMX_BUILD_PLANE
+			if (sseCapable) {
+				isse_blend_decimate_plane(dstwpU, srcrpU, nextrpU, wUV, hUV);
 			} else {
 #endif
 				for (y = 0; y < hUV; y++)
@@ -792,15 +816,15 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 					nextrpU += pitchUV;
 					dstwpU += dpitchUV;
 				}
-#ifdef DECIMATE_MMX_BUILD
+#ifdef DECIMATE_MMX_BUILD_PLANE
 			}
 #endif
 			srcrpV = (unsigned char *) VPLANE(src);//->GetReadPtr(PLANAR_V);
 			nextrpV = (unsigned char *)VPLANE( next);//->GetReadPtr(PLANAR_V);
 			dstwpV = (unsigned char *) VPLANE(dst);//->GetWritePtr(PLANAR_V);
-#ifdef DECIMATE_MMX_BUILD
-			if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
-				isse_blend_decimate_plane(dstwpV, srcrpV, nextrpV, wUV, hUV, dpitchUV, pitchUV, pitchUV);
+#ifdef DECIMATE_MMX_BUILD_PLANE
+			if (sseCapable) {
+				isse_blend_decimate_plane(dstwpV, srcrpV, nextrpV, wUV, hUV);
 			} else {
 #endif
 				for (y = 0; y < hUV; y++)
@@ -813,7 +837,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 					nextrpV += pitchUV;
 					dstwpV += dpitchUV;
 				}
-#ifdef DECIMATE_MMX_BUILD
+#ifdef DECIMATE_MMX_BUILD_PLANE
 			}
 #endif
 			DrawShow(dst, 0, forced, dropframe, metric, inframe);
@@ -878,16 +902,15 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 		heightUV = _info.height>>1;//store[0]->GetHeight(PLANAR_V);
 	}
 
+	int use_quality=_param->quality;
 #ifdef DECIMATE_MMX_BUILD
-	int old_quality=0;
-	if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
-		old_quality = _param->quality;
-		if (_param->quality < 2)
-			_param->quality += 2;
-	}
+	
+		if (use_quality < 2)
+			use_quality += 2;
+	
 #endif
 
-	switch (_param->quality)
+	switch (use_quality)
 	{
 	case 0: // subsample, luma only
 		div = (heightY * row_sizeY / 4) * 219;
@@ -911,7 +934,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 			prevY = storepY[f-1];
 			currY = storepY[f];
 			count[f-1] = 0;
-			if ((!(row_sizeY&31)) || (old_quality<=1)) {
+			if ((!(row_sizeY&31)) || (_param->quality<=1)) {
 				count[f-1] = isse_scenechange_32(currY, prevY, heightY, row_sizeY, pitchY, pitchY);
 			} else if (!(row_sizeY&15)) {
 				count[f-1] = isse_scenechange_16(currY, prevY, heightY, row_sizeY, pitchY, pitchY);
@@ -1425,5 +1448,34 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 			OutputDebugString(buf);
 		}
 	}
+}
+#ifdef DECIMATE_MMX_BUILD_PLANE
+//
+//
+//
+//
+void isse_blend_decimate_plane(uint8_t * dst, uint8_t* src,  uint8_t* src_next, 
+			int w, int h)
+{
+uint32_t x;
+	if (!h) return;  // Height == 0 - avoid silly crash.
+	
+	x=w>>3; // 8 pixels at a time
+	for(;x>0;x--)
+	{
+	 __asm__( ".align 16\n"
+	 	"movq  (%1), %%mm0 \n"
+		"movq  (%2), %%mm2 \n"
+		"pavgb %%mm0,%%mm1 \n"
+		"movq  %%mm1,(%0) \n"
+
+                   : : "r" (dst), "r" (src), "r" (src_next));
+		
+		dst+=8;
+		src+=8;
+		src_next+=8;
+  	}
+    	__asm__("emms");
+  
 }
 #endif
