@@ -84,6 +84,8 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 		
 		uint32_t firstVopOffset=0,secondVopOffset=0;
 		
+		//updateUserData(buffer,len);
+		
 		firstVopOffset=searchVop(buffer,endPos);
 		secondVopOffset=searchVop(buffer+firstVopOffset,endPos);
 		

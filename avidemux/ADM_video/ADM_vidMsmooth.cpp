@@ -394,6 +394,7 @@ void Blur_Altivec(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h)
 uint8_t *srcp,*srcpn,*srcpp;
 uint8_t *workp;
 uint32_t x,y;
+int16_t  v16[8];
 
     vect16 pp,pc,pn,res,res2;
 	vect16 rp,rc,rn,resl;

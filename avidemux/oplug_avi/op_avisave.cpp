@@ -457,4 +457,7 @@ const char *getStrFromAudioCodec( uint32_t codec)
 	return (const char *)"Unknown codec";
 
 }
+
+//---------------------------------------
+
 // EOF

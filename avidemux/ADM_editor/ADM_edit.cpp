@@ -588,8 +588,10 @@ TryAgain:
 									count++;	
 									dml=(OpenDMLHeader *)vid->_aviheader;
 									// Can we repack it ?
-									if(dml->unpackPacked())	
+									if(dml->unpackPacked())
+									{
 										goto TryAgain;
+									}
 									GUI_Alert("Could not unpack it\n, using backup decoder= not frame accurate.");
 									}
 								}

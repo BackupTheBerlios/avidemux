@@ -158,7 +158,7 @@ extern uint8_t ogmSave(char  *name);
 //__________
 extern uint8_t ogmSave(char *fd);
 extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
-
+extern void A_SaveUnpackedVop( char *name);
 
 extern int ignore_change;
 
@@ -406,6 +406,13 @@ HandleAction (Action action)
   // we have an AVI loaded
   switch (action)
     {
+    case ACT_SaveUnpackedMpeg4:
+    			if(GUI_Question("This is to be used to undo packed vop on mpeg4.\nContinue ?"))
+			{ 
+				GUI_FileSelWrite ("Select Avi file to write", (SELFILE_CB *)A_SaveUnpackedVop);
+				
+			}
+    			break;
 #ifdef TEST_UNPACK
     case ACT_Requant:
     			video_body->unpackPacked();

@@ -48,6 +48,10 @@
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_SAVE_AVI
 #include "ADM_toolkit/ADM_debug.h"
+
+
+static void updateUserData(uint8_t *start, uint32_t len);
+
 uint8_t GenericAviSaveCopy::setupVideo (char *name)
 {
   //  Setup avi file output, all is coming from original avi
@@ -188,6 +192,67 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
 						}
 				 }
   encoding_gui->feedFrame(len);  
+  if(_needUserDataUpdate)
+  	updateUserData(vbuffer,len);
   return writter->saveVideoFrame (len, _videoFlag, vbuffer);
 
+}
+//_____________________________________________________
+// Update the user data field that is used to 
+// detect in windows world if it is packed or not
+//_____________________________________________________
+void updateUserData(uint8_t *start, uint32_t len)
+{
+	// lookup startcode
+	uint32_t sync;
+	
+	while(len)
+	{
+		sync=0xFFFFFFFF;
+		while(len)
+		{
+			sync=sync<<8;
+			sync+=*start++;
+			sync&=0xFFFFFF;	// suboptimal...
+			len--;
+			if(sync==0x000001)
+			{
+				break;
+			}	
+		}
+		if(*start==0xb2 && len)
+		{
+			printf("User data found\n");
+			start++; //skip the b2
+			len--;
+			// looks ok ?
+			if(strncmp((char *)start,"DivX",len))
+			{
+				// looks for a p while not null
+				// if there isnt we will reach a new startcode
+				// and it will stop
+				while((*start!='p') && len) 
+				{
+					if(!*start)
+					{
+						len=0;
+					}
+					else
+					{
+						len--;
+						start++;
+					}
+				}
+				if(!len) 
+					{
+						printf("Unpacketizer:packed marker not found!\n");
+					}
+				else	*start=0; // remove 'p'
+				*start=0;
+				return;
+			
+			}
+			
+		}
+	}
 }

@@ -31,6 +31,7 @@ typedef enum
   ACT_SaveJPG,
   ACT_SaveBunchJPG,
   ACT_SaveDVDPS,
+  ACT_SaveUnpackedMpeg4,
   ACT_RecentFiles,
 
   ACT_SaveDualAudio,

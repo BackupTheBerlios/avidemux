@@ -14,6 +14,7 @@ CALLBACK(save_as_dual_audio_avi1 		,ACT_SaveDualAudio);
 CALLBACK(avi_muxer_options1 			,ACT_SetMuxParam);
 CALLBACK(save_raw_video_stream1			,ACT_SaveRaw);
 CALLBACK(save_as_dvd_ps1			,ACT_SaveDVDPS);
+CALLBACK(unpacked				,ACT_SaveUnpackedMpeg4);
 
 CALLBACK(load_project         			,ACT_OpenAvi); 
 CALLBACK(save_project_as1              		,ACT_SaveWork);

@@ -23,10 +23,16 @@
 			
 		          virtual uint8_t 	setupVideo( char *name  );
                           virtual uint8_t 	writeVideoChunk(uint32_t frame );
+			  	  uint8_t	_needUserDataUpdate;
 
      public:
      						GenericAviSaveCopy()  :     GenericAviSave()
 										{
+											_needUserDataUpdate=0;
+										};
+						GenericAviSaveCopy(uint8_t pack)  :     GenericAviSave()
+										{
+											_needUserDataUpdate=pack;
 										};	
                           virtual ~GenericAviSaveCopy();
    };

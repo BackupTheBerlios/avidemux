@@ -169,7 +169,7 @@ WAVHeader *info=NULL,tmpinfo;
 	if(audioProcessMode)
 	{
 	  AVDMGenericAudioStream *audio=NULL;
-		audio = buildAudioFilter (currentaudiostream,0,1000);
+		audio = buildAudioFilter (currentaudiostream,0,0x1000);
 		info=audio->getInfo();
 		memcpy(&tmpinfo,info,sizeof(tmpinfo));
 		info=&tmpinfo;
