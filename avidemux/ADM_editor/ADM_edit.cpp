@@ -587,12 +587,14 @@ TryAgain:
 
 
 							//if(vid->decoder->isDivxPacked())
-							if(vid->decoder->isDivxPacked())
+							uint8_t forced= getEnv(ENV_EDITOR_PVOP);
+							if(vid->decoder->isDivxPacked() ||forced)
 							{
+								
 								// can only unpack avi
 								if(!count && type==AVI_FileType)
 								{
-									if(getEnv(ENV_EDITOR_PVOP)|| GUI_Question(
+									if( forced || GUI_Question(
 									"It looks like Vop packed divx.\n"
 									"Do you want me to unpack it ?"))
 									{
