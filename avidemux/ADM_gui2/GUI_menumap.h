@@ -10,11 +10,11 @@ CALLBACK( open_video1         			,ACT_OpenAvi);
 CALLBACK( append_video1     			,ACT_AppendAvi);
 CALLBACK( save_audio1         			,ACT_SaveWave);
 CALLBACK( save_as_avi1       			,ACT_SaveAvi);
-CALLBACK(save_as_dual_audio_avi1 		,ACT_SaveDualAudio);
+//CALLBACK(save_as_dual_audio_avi1 		,ACT_SaveDualAudio);
 CALLBACK(avi_muxer_options1 			,ACT_SetMuxParam);
-CALLBACK(save_raw_video_stream1			,ACT_SaveRaw);
-CALLBACK(save_as_dvd_ps1			,ACT_SaveDVDPS);
-CALLBACK(unpacked				,ACT_SaveUnpackedMpeg4);
+//CALLBACK(save_raw_video_stream1			,ACT_SaveRaw);
+//CALLBACK(save_as_dvd_ps1			,ACT_SaveDVDPS);
+//CALLBACK(unpacked				,ACT_SaveUnpackedMpeg4);
 
 CALLBACK(load_project         			,ACT_OpenAvi); 
 CALLBACK(save_project_as1              		,ACT_SaveWork);
@@ -34,7 +34,7 @@ CALLBACK(to_other1 				,ACT_Pipe2Other);
  CALLBACK(save_image1               		 ,ACT_SaveImg);
  CALLBACK(save_jpg_image1              		 ,ACT_SaveJPG);
  CALLBACK(save_selection_as_jpegs1		  ,ACT_SaveBunchJPG);
- CALLBACK(save_as_ogm1				  ,ACT_SaveOGM);
+ //CALLBACK(save_as_ogm1				  ,ACT_SaveOGM);
 
  CALLBACK( play_video1         			,ACT_PlayAvi);
  CALLBACK( decoder_options1         		,ACT_DecoderOption);
