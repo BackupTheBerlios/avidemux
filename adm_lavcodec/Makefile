@@ -34,7 +34,8 @@ ifeq ($(TARGET_MMX),yes)
 OBJS += i386/fdct_mmx.o i386/cputest.o \
 	i386/dsputil_mmx.o i386/mpegvideo_mmx.o \
 	i386/idct_mmx.o i386/motion_est_mmx.o \
-	i386/simple_idct_mmx.o 
+	i386/simple_idct_mmx.o \
+	i386/vp3dsp_mmx.o
 ifeq ($(TARGET_BUILTIN_VECTOR),yes)	
 	OBJS+=i386/fft_sse.o
 	CFLAGS+=-msse
