@@ -129,6 +129,7 @@ dnl AC_DEFINE(USE_MP3,0,[libmad])
 dnl AC_DEFINE(USE_MPEG,0,[libmpeg3])
 dnl AC_DEFINE(OSS_SUPPORT,0,[OSS])
 dnl AC_DEFINE(USE_XVID,0,[XVID_AS_DIVX])
+dnl AC_DEFINE(USE_SDL,0,[XVID_AS_DIVX])
 dnl AC_DEFINE(USE_XX_XVID,0,[XVID_AS_XVID])
 dnl AC_DEFINE(USE_DIVX,0,[DIVX is present])
 dnl ___________________________________
@@ -162,6 +163,7 @@ have_altivec=no
 have_malloc=no
 have_darwin=no
 have_amd64=no
+have_sdl=yes;
 dnl _________________ malloc.h ___________________
 
 AC_CHECK_HEADERS(malloc.h,have_malloc_h=yes)
@@ -536,7 +538,26 @@ fi
 if test "x$have_xv" = "xyes"; then
 AC_CHECK_LIB(Xv,XvShmPutImage,,have_xv=no,-L/usr/X11R6/lib -lXext -lX11 -lm)
 fi
-dnl __________________/XV______________
+if test "x$have_xv" = "xyes"; then
+	AC_DEFINE(USE_XV,1,[Try to use Xv extension])
+fi
+dnl __________________SDL______________
+
+AC_MSG_CHECKING(libSDL support)
+AC_PATH_PROG(SDL_CONFIG, sdl-config, no)
+ if test "SDL_CONFIG" = "no" ; then
+	   	SDL_LIBS=""
+    		SDL_CFLAGS=""
+      		have_sdl=no
+	else
+
+ 		SDL_CFLAGS=$SDL_CONFIG  --cflags`
+ 		SDL_LIBS=$SDL_CONFIG  --libs`    		
+    		CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
+    		have_sdl=yes
+ fi
+
+dnl __________________/SDL______________
 
 dnl ____________ free type 2________________
  AC_MSG_CHECKING(Freetype2 support)
@@ -838,6 +859,8 @@ dnl ______________________________________________________
 
   AC_SUBST(XML_CFLAGS)
   AC_SUBST(XML_LIBS)
+  
+  AC_SUBST(SDL_LIBS)
 
    AC_SUBST(ARTS_CFLAGS)
    AC_SUBST(ARTS_LIBS)
@@ -854,6 +877,7 @@ echo " Xvid 1.0 Codec      : $have_xvid4"
 echo " Mad decoder         : $have_mad"
 echo " OSS                 : $have_oss"
 echo " ALSA                : $have_alsa"
+echo " SDL                 : $have_sdl"
 echo " Xvideo              : $have_xv"
 echo " Lame                : $have_lame"
 echo " Ogg Vorbis          : $have_vorbis"
