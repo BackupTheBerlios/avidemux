@@ -21,12 +21,10 @@ protected:
 				uint8_t _vbr;				
 public:
 								
-        AVDMEditAudioStream(ADM_Composer *father);
-        virtual uint32_t 		read(uint32_t len,uint8_t *buffer);
-        virtual uint8_t  		goTo(uint32_t newoffset);
-			  virtual uint8_t			buildAudioTimeLine( void );
-         virtual  uint32_t						 readPCMeq(uint32_t lenasked,
-                  										uint8_t *out,uint32_t *lenout);
-				virtual 	uint8_t			isVBR(void )   { return _vbr;}
-				virtual uint8_t 			goToTime(uint32_t mstime);
+        			AVDMEditAudioStream(ADM_Composer *father);
+        virtual uint32_t 	read(uint32_t len,uint8_t *buffer);
+        virtual uint8_t  	goTo(uint32_t newoffset);
+	virtual uint8_t		buildAudioTimeLine( void );
+	virtual uint8_t		isVBR(void )   { return _vbr;}
+	virtual uint8_t 	goToTime(uint32_t mstime);
 };

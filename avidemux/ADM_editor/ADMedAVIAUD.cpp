@@ -89,44 +89,6 @@ uint8_t ADM_Composer::audioGoTo (uint32_t offset)
 //__________________________________________________
 //
 //
-uint32_t
-  ADM_Composer::readPCMeq (uint32_t lenasked, uint8_t * out,
-			   uint32_t * lenout)
-{
-  // ask in curent seg...
-
-  uint32_t end_offset, read;
-
-  // Offset of last byte in this seg...
-
-  if (_audioseg == _nb_segment)
-    {
-      _audioseg = 0;
-      _audiooffset = 0;
-      return 0;
-    }
-  end_offset =
-    _segments[_audioseg]._audio_start + _segments[_audioseg]._audio_size;
-
-  read =
-    _videos[_segments[_audioseg]._reference]._audiostream->
-    readPCMeq (lenasked, out, lenout);
-
-  _audiooffset += read;
-
-  if (_audiooffset > end_offset)	// time to switch seg
-    {
-      _audioseg++;
-      if (_audioseg < _nb_segment)
-	// recalibrate, may cause plop
-	{
-	  _audiooffset = _segments[_audioseg]._audio_start;
-	  _videos[_segments[_audioseg]._reference]._audiostream->
-	    goToSync (_audiooffset);
-	}
-    }
-  return read;
-}
 
 /*
 		Read sequentially audio

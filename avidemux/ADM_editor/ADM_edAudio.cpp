@@ -102,20 +102,6 @@ aprintf("Editor audio : Gototime  %lu\n",mstime);
   return video_body->audioGoToTime (mstime, &_pos);
 }
 
-uint32_t
-  AVDMEditAudioStream::readPCMeq (uint32_t lenasked,
-				  uint8_t * out, uint32_t * lenout)
-{
-  // we will have to ask each part to the father 
-  // and keep sync
-  uint32_t got;
-  ADM_assert (_vbr);
-
-  got = video_body->readPCMeq (lenasked, out, lenout);
-  _pos += got;
-  return got;
-
-}
 
 uint32_t AVDMEditAudioStream::read (uint32_t len, uint8_t * buffer)
 {

@@ -132,9 +132,7 @@ class AVDMGenericAudioStream
             	virtual 	uint8_t				isVBR(void ) { if( _audioMap) return 1; else return 0;};
                  		uint32_t			nbFrameSlice( void )
                  						{ if(!_audioMap) {printf("OOOOpppps!");return 1000;}; return  _nbMap;}
-//___________________
-                 virtual  	uint32_t			 readPCMeq(uint32_t lenasked,
-                  							uint8_t *out,uint32_t *lenout);
+//___________________                 
 		virtual 	uint8_t				extraData(uint32_t *l,uint8_t **d)
 									{
 										*l=0;

@@ -38,17 +38,16 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_dialog/DIA_working.h"
 
-
+#include "ADM_audio/ADM_mp3info.h"
 
 #define ATOM 100 //1152>>1
+#define BIG_BUFFER (128*1024)
 
 uint8_t AVDMGenericAudioStream::buildAudioTimeLine(void)
 {
-#ifndef USE_MP3
-     return 0;
-#else
+
 uint32_t in,d=0,rd=0,ms10,offset=0,index=0; //,left=0,len=0;;
-uint8_t *ptr;
+
 		// we do nothing in case of WAV or unhandler stream
   		// that left only MP3 for now ...
      if (_wavheader->encoding != WAV_MP3 &&_wavheader->encoding != WAV_MP2 )
@@ -65,22 +64,23 @@ uint8_t *ptr;
       goTo(0);  //rewind
       printf("\n scanning timeline\n");
       // ms10 is the raw length of 10 ms of uncompressed audio
-      ms10=_wavheader->channels*_wavheader->frequency*2;
-      ms10=ms10/100; // 16 bits per sample
-      printf("\n 10 ms is %lu\n",ms10);
-      ptr=(uint8_t *)malloc(2*64*1024); // should be enough
-		_audioMap=new ST_point[100*3600*4]; // 4 hours / 6 Megs
-      ADM_assert(ptr);
+      // in sample
+      ms10=_wavheader->frequency/100;
+      
+      
+     
+     _audioMap=new ST_point[100*3600*4]; // 4 hours / 6 Megs
+
+     
       ADM_assert(_audioMap);
-
-      // Initialize MAD decoding engine
-      AVDM_MadInit();
-
+     
       DIA_working *work;
 
       work=new DIA_working("Building VBR map");
 
       goTo(0);
+      uint32_t Mul=2*_wavheader->channels;
+      uint32_t len,sample;
       while(offset<_length)
       	{
               			work->update(offset,_length);
@@ -91,34 +91,25 @@ uint8_t *ptr;
 					work->update(offset,_length);
 				}
                 
-                		// read a big chunk
-						if (!(in = read(ATOM,internalBuffer)))	// FIXME
-		  				{
-					      printf(" read failed, end of stream ? \n");
-					      goto end;
-		      			}		      					         	   
-			        	offset+=ATOM;
-			      		AVDM_MadRun(internalBuffer, in, ptr, &d);
-						if (d)
-					  		{
-			    		  	rd += d;
-      						_audioMap[index].foffset=offset;
-      						_audioMap[index++].woffset=rd;
-            			//	printf("\n At : %lu , w: %lu",offset,rd);
-			  				}
-         				
-
+                		// read a packet
+				if(!getPacket(internalBuffer, &len,&sample))
+				{
+					printf("MapVBR:Get packet failed\n");
+					continue;
+				}		  
+			        offset+=len;
+			      	rd += sample*Mul;
+      				_audioMap[index].foffset=offset;
+      				_audioMap[index++].woffset=rd;
          }
 
 end:         
       _nbMap=index;
+      _wavheader->blockalign=1152; // Mark it as VBR
       printf("\n Nb entries in timeline : %lu\n",_nbMap);
       delete work;
-      AVDM_MadEnd();
-
-      free(ptr);    
+      goTo(0);	// Purge
      return 1;
-#endif
 }
 
 //

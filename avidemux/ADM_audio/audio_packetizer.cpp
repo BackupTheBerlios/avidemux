@@ -164,7 +164,7 @@ uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 			ADM_assert(_wavheader->encoding==WAV_MP2||_wavheader->encoding==WAV_MP3);
 			if(packetTail<packetHead+4)
 			{
-				printf("PKTZ:Buffer empty\n");
+				printf("PKTZ:Buffer empty:%lu / %lu\n",packetHead,packetTail);
 				return 0;
 			}
 			// Build template, only fq ATM
