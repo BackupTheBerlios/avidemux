@@ -32,7 +32,7 @@
 #include <errno.h>
 
 
-#include <ADM_assert.h>
+
   
 #include "fourcc.h" 
  
@@ -42,6 +42,7 @@
 
 
 #include "ADM_toolkit/toolkit.hxx"
+#include <ADM_assert.h>
 #include "ADM_audiodevice/ADM_deviceoss.h"
 #include "ADM_audiodevice/ADM_deviceWin32.h"
 #include "ADM_toolkit/ADM_debugID.h"
