@@ -58,10 +58,10 @@ char *c;
 uint64_t l,lorg;
 uint32_t *backdoor;
 
-	c=(char *)malloc(size+32);
+	l=(uint64_t)malloc(size+32);
 	// Get next boundary
-	lorg=l=(uint64_t )c;
-	l=(l+15)& 0xfffffff0;
+	lorg=l;
+	l=(l+15)& 0xfffffffffffffff0LL;
 	l+=16;
 	c=(char *)l;
 	backdoor=(uint32_t *)(c-8);
