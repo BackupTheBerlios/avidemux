@@ -56,7 +56,7 @@
 static uint64_t _lastSync;
 
 extern void mixDump(uint8_t *ptr,uint32_t len);
-
+#define TELL_ME_ALL
 //#define PRINT_PTS
 //_______________________________________________________
 //_______________________________________________________
@@ -76,7 +76,7 @@ extern void mixDump(uint8_t *ptr,uint32_t len);
 		 _firstPTS=_otherPTS=MINUS_ONE;
 		_otherLen=0;
 		_muxTypeMpeg2=0;
-		if((stream<8) || (stream<0xA8 && stream>=0xA0))
+		if((stream<8) || (stream<0xA8 && stream>=0xA0) || ((stream<0x28 && stream>=0x20)))
 		{
 				_streamId=PRIVATE_STREAM_1;
 				_streamSubId=stream;
@@ -373,7 +373,7 @@ uint8_t  ADM_mpegDemuxerProgramStream::	_nextPacket(void)
 					{
 
 							case PACK_START_CODE :
-												parser->forward(8);
+												parser->forward(10);
 												break; // pack start
 							case SYSTEM_START_CODE : // system header
 							case PRIVATE_STREAM_2:
@@ -523,7 +523,7 @@ uint32_t  ADM_mpegDemuxerProgramStream::_skipPacketHeader( uint8_t sid,uint8_t *
 {
 //uint32_t un ,deux;
 uint64_t size=0;
-uint8_t c;
+uint8_t c,d;
 uint8_t align=0;
 			
 		*subid=0xff;
@@ -539,7 +539,7 @@ uint8_t align=0;
 			||(size==SYSTEM_START_CODE)
 			) // special case, no header
 			{
-											return(size);				
+				return(size);
 			}
 				
 			// 	remove padding if any						
@@ -549,26 +549,26 @@ uint8_t align=0;
 									size--;
 				//					printf(" padding\n");
 								}
-			//----------------------------------------------------------------------------------------------					
-			//-------------------------------MPEG-2 PES packet style----------------------					
-			//----------------------------------------------------------------------------------------------													
-			if(((c&0xC0)==0x80))								//mpeg 2
-			{
-				uint32_t ptsdts,len;
-			//	printf("\n mpeg2 type \n");
-				_muxTypeMpeg2=1;
-					// c			= copyright and stuff	
-				//	printf(" %x align\n",c);	
-					if(c & 4) align=1;						
-					c=parser->read8i();		// PTS/DTS		
-				//	printf("%x ptsdts\n",c
-					ptsdts=c>>6;
-					// header len
-		   			len=parser->read8i();
-   			      		size-=3;  
+//----------------------------------------------------------------------------
+//-------------------------------MPEG-2 PES packet style----------------------
+//----------------------------------------------------------------------------
+                        if(((c&0xC0)==0x80))
+                        {
+                                uint32_t ptsdts,len;
+                               //printf("\n mpeg2 type \n");
+                                _muxTypeMpeg2=1;
+                                // c= copyright and stuff	
+                                //printf(" %x align\n",c);	
+                                if(c & 4) align=1;	
+                                c=parser->read8i();     // PTS/DTS
+                                //printf("%x ptsdts\n",c
+                                ptsdts=c>>6;
+                                // header len
+                                len=parser->read8i();
+                                size-=3;  
 
-			      switch(ptsdts)
-			      {
+                                switch(ptsdts)
+                                {
 							case 2: // PTS=1 DTS=0
 								if(len>=5)
 								{
@@ -627,74 +627,57 @@ uint8_t align=0;
 					}  
 // Extension bit	
 // >stealthdave<				
-					if(c & 0xf) // extension flag ? (PSTD/CRC/...)
-						{
-#ifdef TELL_ME_ALL						
-								printf("\n Other info : %x %x",c&0xf,sid);
-#endif								
-								if(c&1)  // extension flag set ?
-								{
-									c=parser->read8i();
-#ifdef TELL_ME_ALL										
-									printf("\n  extension : %x",c);
-#endif									
-									size--;
-									if(c& 0x10) //  P-STD buffer, others ignored for now
-									{
-										
-										uint16_t psdt;
-										psdt=parser->read16i() & 0x1FFF;																				
-#ifdef TELL_ME_ALL							
-										printf("\n  pstd : %d (%x )",psdt,psdt);
-#endif												
-										size-=2;
-										len-=2+1;	
-#ifdef TELL_ME_ALL											
-										printf("\n size: %d",size);																													
-#endif												
-									}
-								}				
-						}		
-					    
-					if(len) 
-						{
-							parser->forward(len);
-							size=size-len;	
-							
-						}
+
+                                // Skip remaining headers if any
+                                if(len) 
+                                {
+                                        parser->forward(len);
+                                        size=size-len;
+                                }
+                                
        		if(sid==PRIVATE_STREAM_1)
-				{
-					if(size>5)
-					{
-                      // read sub id
-                      *subid=parser->read8i();
+                {
+                        if(size>5)
+                        {
+                        // read sub id
+                               *subid=parser->read8i();
   //                    printf("\n Subid : %x",*subid);
-  		       switch(*subid)
-		       {
-		       		case 0x80:case 0x81:case 0x82:case 0x83:
-				case 0x84:case 0x85:case 0x86:case 0x87:
-							*subid=*subid-0x80;
-							break;
-							// PCM
-				case 0xA0:case 0xA1:case 0xa2:case 0xa3:
-				case 0xA4:case 0xA5:case 0xa6:case 0xa7:
-							// we have an additionnal header
-							// of 3 bytes
-							parser->forward(3);
-							size-=3;
-							break;
-				default:
-						*subid=0xff;
-			}
-                      // skip audio header
-                      parser->forward(3);
-                      size-=4;
-      				}
-				}
+                                switch(*subid)
+                                {
+                                //AC3
+                                        case 0x80:case 0x81:case 0x82:case 0x83:
+                                        case 0x84:case 0x85:case 0x86:case 0x87:
+                                                *subid=*subid-0x80;
+                                                break;
+                                // PCM
+                                        case 0xA0:case 0xA1:case 0xa2:case 0xa3:
+                                        case 0xA4:case 0xA5:case 0xa6:case 0xa7:
+                                                // we have an additionnal header
+                                                // of 3 bytes
+                                                parser->forward(3);
+                                                size-=3;
+                                                break;
+                                // Subs
+                                case 0x20:case 0x21:case 0x22:case 0x23:
+                                case 0x24:case 0x25:case 0x26:case 0x27:
+                                                break;
+                             
+                                default:
+                                                *subid=0xff;
+                                }
+                                // skip audio header (if not sub)
+                                if(*subid>0x26 || *subid<0x20)
+                                {
+                                        parser->forward(3);
+                                        size-=3;
+                                }
+                                size--;
+                        }
+                }
 	       //    printf(" pid %x size : %x len %x\n",sid,size,len);
 
-					return size;
-			}
+                return size;
+        }
 //----------------------------------------------------------------------------------------------		
 //-------------------------------MPEG-1 PES packet style----------------------					
 //----------------------------------------------------------------------------------------------					
