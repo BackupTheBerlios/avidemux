@@ -38,7 +38,7 @@ typedef struct nuvIndex
 class nuvAudio : public AVDMGenericAudioStream
 {
 protected:
-
+		
            	uint32_t 					_nb_chunks;
 		uint64_t					_abs_position;
 		uint32_t					_rel_position;
@@ -65,6 +65,7 @@ class nuvHeader         :public vidHeader
 {
 protected:
              			FILE 		*_fd;
+				uint32_t		_audioResync;
 				uint32_t		_audio_frequency;
 				uint32_t		_ffv1_fourcc;
 				uint32_t		_ffv1_extraLen;

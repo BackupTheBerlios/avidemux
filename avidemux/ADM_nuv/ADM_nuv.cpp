@@ -83,7 +83,7 @@ extern "C"
 #define MODULE_NAME MODULE_NUV
 #include "ADM_toolkit/ADM_debug.h"
 
-
+#include "prefs.h"
 #include "ADM_dialog/DIA_working.h"
 
 	#define DXFIELD(x) ((rtfileheader *)_nuv_header)->x
@@ -664,7 +664,7 @@ uint32_t rcount=0;
 #ifdef VERBOSE_SOUND
           					printf("\n Frame %lu, overshot %ld",v,overshot);
 #endif
-						if((overshot < -THRESHOLD)&&(_isPCM))
+						if(  (overshot < -THRESHOLD)&& _isPCM &&_audioResync)
 						{
 						// we insert a dummy packet in audio chain to compensate
 												
@@ -1070,7 +1070,9 @@ uint32_t rcount=0;
 // Constructor , does nothing except insure null pointers
 nuvHeader::nuvHeader(void )
 {
+uint32_t sync;
 
+_audioResync=1;
 _videoIndex=NULL;
 _audioIndex=NULL;
 _tableIndex=NULL;
@@ -1095,6 +1097,14 @@ _ffv1_fourcc=0;
 _ffv1_extraLen=0;
 _ffv1_extraData=NULL;
 _audio_frequency=44100;
+if(prefs->get(FEATURE_DISABLE_NUV_RESYNC,&sync))
+{
+	if(sync) 
+	{
+		printf("******** AUDIO RESYNC DISABLED *************\n");
+		_audioResync=0;
+	}
+}
 
 }
 nuvHeader::~nuvHeader( )
