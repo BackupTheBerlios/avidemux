@@ -53,6 +53,7 @@ ogm_page::ogm_page(FILE *fd,uint32_t streamId)
 	_stream=streamId;
 	ADM_assert(fd);
 	reset();
+	_first=1;
 }
 //_________________________________________________________
 ogm_page::~ogm_page()
@@ -96,8 +97,7 @@ uint32_t chunk;
 		chunk=min(size,255);
 		size-=chunk;
 		push(chunk,size);
-	}	
-	_first=1;
+	}
 	flush();
 	return 1;
 }
@@ -192,8 +192,7 @@ uint32_t chunk;
 		chunk=min(size,255);
 		size-=chunk;
 		push(chunk,size);
-	}	
-	_first=1;
+	}		
 	flush();
 	return 1;
 }
@@ -289,7 +288,11 @@ uint8_t *data;
 	memcpy(&_header,"OggS",4);
 	
 	if(!_fresh) _header.header_type=1;
-	if(_first)  _header.header_type=OG_FIRST_PAGE;
+	if(_first)
+	{
+	  _header.header_type=OG_FIRST_PAGE;
+	  _first=0;
+	}
 	
 	
 	//	
