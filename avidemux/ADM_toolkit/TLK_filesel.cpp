@@ -101,6 +101,8 @@ DIR *dir=NULL;
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
 	{
 			selected_filename= (gchar *) 	gtk_file_selection_get_filename(GTK_FILE_SELECTION(dialog));
+			if(strlen(selected_filename))
+			{
 			last=selected_filename[strlen(selected_filename) - 1]; 
 			 if (last == '/' || last =='\\' )
 			 {
@@ -120,6 +122,7 @@ DIR *dir=NULL;
 						// Finally we accept it :)
 						ret=1;
 					}
+			}
 			}
 	}	
 	gtk_widget_destroy(dialog);
@@ -181,7 +184,11 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	{
 
 			selected_filename= (gchar *) 	gtk_file_selection_get_filename(GTK_FILE_SELECTION(dialog));
+#ifdef CYG_MANGLING
+			if (*(selected_filename + strlen(selected_filename) - 1) == '\\'){
+#else			
 			 if (*(selected_filename + strlen(selected_filename) - 1) == '/'){
+#endif			 
       	  					GUI_Alert("Cannot open directory as file !");
 			}
 			else
@@ -298,8 +305,11 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
   	{
     		selected_filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));    
-  	
+#ifdef CYG_MANGLING
+	if (*(selected_filename + strlen(selected_filename) - 1) == '\\')
+#else  	
 	 if (*(selected_filename + strlen(selected_filename) - 1) == '/')
+#endif	 
       	  					GUI_Alert("Cannot open directory as file !");
 			else
 			{
