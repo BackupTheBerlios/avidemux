@@ -261,7 +261,7 @@ uint8_t oggHeader::open(char *name)
                 _videostream.dwRate=25000;
 
 #ifdef ADM_BIG_ENDIAN
-	#define SWAP64(x) { uint64_t y=x;x=R32(y>>32)+(R32(y&0xfffffffff)<<32);}
+	#define SWAP64(x) { uint64_t y=x;x=R32((y>>16)>>16)+((R32(y&0x0ffffffff)<<16)<<16);}
 	#define SWAP32(x) x=R32(x)
 	#define SWAP16(x) x=R16(x)
 #else

@@ -47,13 +47,19 @@ extern "C"
 #include "libMpeg2Dec/mpeg2.h"
 #include "libMpeg2Dec/mpeg2_internal.h"
 
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_CODEC
+#include "ADM_toolkit/ADM_debug.h"
+
 
 extern void 			mpeg2_pop(mpeg2dec_t *m);
 extern void 			mpeg2_popI(mpeg2dec_t *m);
 static vo_instance_t 	*yv12_open (void);
 static void 			yv12_close (vo_instance_t * _instance);
-static int 				yv12_setup (vo_instance_t * _instance, int width, int height,vo_setup_result_t *result);
-static void 			yv12_setup_fbuf (vo_instance_t * _instance,			    uint8_t ** buf, void ** id);
+static int 			yv12_setup (vo_instance_t * _instance, unsigned int width, 	
+					unsigned int height,unsigned  int chroma_w, 
+					unsigned int chroma_h,vo_setup_result_t *result);
+static void 			yv12_setup_fbuf (vo_instance_t * _instance, uint8_t ** buf, void ** id);
 extern int 			mpeg2_cleanup(mpeg2dec_t * mpeg2dec);
 };
 
@@ -94,7 +100,7 @@ uint8_t decoderMpeg::init_codec (void)
 //____________________-un init ____________________
 uint8_t decoderMpeg::kill_codec (void)
 {
-  decoder_t *dec;
+  mpeg2_decoder_t *dec;
   dec=&((MPEG2DEC)->decoder);
   
   if(dec->quant)
@@ -136,7 +142,7 @@ ________________________________________________________________________________
 decoderMpeg::decoderMpeg(uint32_t w,uint32_t h,uint32_t extraLen, uint8_t *extraData)
 	: decoders(w,h)
 {
-decoder_t *dec;
+mpeg2_decoder_t *dec;
 uint32_t wmb,hmb;
 			_seqLen=extraLen;
 			if(extraLen)
@@ -267,25 +273,39 @@ void  decoderMpeg::decode_mpeg2 (uint8_t * current, uint8_t * end)
 {
     const mpeg2_info_t * info;
     int state;
+    int loop=0;
 
     mpeg2_buffer (MPEG2DEC, current, end);
 
     info = mpeg2_info (MPEG2DEC);
     while (1) {
+    	
 	state = mpeg2_parse (MPEG2DEC);
+	aprintf("Mpeg2dec : %d \n",state);
 	switch (state) {
+	case STATE_BUFFER:
+			loop++;
+			if(loop>2)
+				{
+					aprintf("Mpeg2dec: Running empty...\n");
+					return;
+				}
+			break;
 	case -1:
 	    return;
 	case STATE_SEQUENCE:
 	    /* might set nb fbuf, convert format, stride */
 	    /* might set fbufs */
 	    printf("\n Seq found\n");
+	    
 	    vo_setup_result_t res;
 	    if(!_seqFound)
 	    {
 	    	if (output->setup (output,
 	    			info->sequence->width,
 			       	info->sequence->height,
+	    			info->sequence->width>>1,
+			       	info->sequence->height>>1,
 				&res))
 			{
 					fprintf (stderr, "display setup failed\n");
@@ -352,7 +372,7 @@ vo_instance_t * yv12_open (void)
 /**
 		yv12_setup : Nothing to do
 */
-int yv12_setup (vo_instance_t * _instance, int width, int height,vo_setup_result_t *result)
+int yv12_setup (vo_instance_t * _instance, unsigned int width, unsigned int height,unsigned int chroma_w,unsigned  int chroma_h,vo_setup_result_t *result)
 {
 	yv12_instance_t *ins;
 
