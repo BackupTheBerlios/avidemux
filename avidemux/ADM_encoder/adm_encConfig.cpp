@@ -629,7 +629,7 @@ void EncoderSaveMpeg(char *name)
 	stuff and will be merged with xml stuff to allow
 	save config / load config
 */
-void videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
+int videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
 {
 #define UNSET_COMPRESSION_MODE (COMPRESSION_MODE)0xff
 #define NO_COMPRESSION_MODE    (COMPRESSION_MODE)0xfe
@@ -651,31 +651,31 @@ void videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
 			if(equal==0xfff)
 			{
 				printf("\n i did not understood the args for video conf\n");
-				return;
+				return 0;
 			}
 			go = cs+equal+1;
 			*(cs+equal)=0;
 			iparam=atoi(cs+equal+1);
 			printf("codec conf is %s\n",cs);
 			// search the codec
-			if(!strcmp(cs,"cq"))
+			if(!strcasecmp(cs,"cq"))
 				{
 						compmode=COMPRESS_CQ;
 						aprintf("cq Mode\n");
 				}
-			if(!strcmp(cs,"cbr"))
+			if(!strcasecmp(cs,"cbr"))
 				{
 						compmode=COMPRESS_CBR;
 						iparam*=1000;
 						aprintf("cbr Mode\n");
 				}
-			if(!strcmp(cs,"2pass"))
+			if(!strcasecmp(cs,"2pass"))
 				{
 						compmode=COMPRESS_2PASS;
 						aprintf("2pass\n");
 				}
 			// search for other options
-			if(!strcmp(cs,"mbr")){
+			if(!strcasecmp(cs,"mbr")){
 			   compmode = NO_COMPRESSION_MODE;
 			   iparam = (iparam*1000)>>3;
 			   switch( current_codec ){
@@ -689,7 +689,7 @@ void videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
 			         break;
 			   }
 			}
-			if(!strcmp(cs,"matrix")){
+			if(!strcasecmp(cs,"matrix")){
 			   compmode = NO_COMPRESSION_MODE;
 			   switch( current_codec ){
 			      case CodecSVCD:
@@ -706,7 +706,7 @@ void videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
 			if(compmode==UNSET_COMPRESSION_MODE)
 			{
 				printf("\n ***** Unknown mode for video codec (%s)\n",cmdString);
-				return;
+				return 0;
 			}
 
 			if( compmode != NO_COMPRESSION_MODE ){
@@ -723,7 +723,7 @@ void videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
                         }
 		}
 
-		return;
+		return 1;
 }
 #if 0
 void videoCodecConfigureMpeg(  char *cmdString)
@@ -767,11 +767,11 @@ void videoCodecConfigureMpeg(  char *cmdString)
 
 }
 #endif
-void videoCodecConfigure(  char *cmdString,uint32_t optionSize,uint8_t  *option)
+int videoCodecConfigure(  char *cmdString,uint32_t optionSize,uint8_t  *option)
 {
 		CodecFamilty family;
 
-		if(!cmdString) return;
+		if(!cmdString) return 0;
 
 		family=videoCodecGetFamily();
 		switch(family)
@@ -779,7 +779,7 @@ void videoCodecConfigure(  char *cmdString,uint32_t optionSize,uint8_t  *option)
 			case CodecFamilyAVI:
 			case CodecFamilyXVCD:
 			case CodecFamilyMpeg:
-				videoCodecConfigureAVI(cmdString,optionSize,option);
+				return videoCodecConfigureAVI(cmdString,optionSize,option);
 				break;
 /*			case CodecFamilyMpeg :
 				videoCodecConfigureMpeg(cmdString);			
@@ -787,7 +787,9 @@ void videoCodecConfigure(  char *cmdString,uint32_t optionSize,uint8_t  *option)
 */				
 			default:
 				printf("This codec family does not accept paramaters\n");
+				return 0;
 		}
+		return 0;
 
 }
 
@@ -854,15 +856,15 @@ void loadEncoderConfig ( void )
 		}
 		videoCodecSelectByName(name);
 }
-void videoCodecSelectByName(const char *name)
+int videoCodecSelectByName(const char *name)
 {
 		for(uint32_t i=0;i<sizeof(mycodec)/sizeof(codecEnumByName);i++)
 		{
-			if(!strcmp(name,mycodec[i].name))
+			if(!strcasecmp(name,mycodec[i].name))
 			{
 				printf("\n Codec %s found\n",name);
 				videoCodecSetcodec(mycodec[i].type);
-				return;
+				return 1;
 			}
 
 		}
@@ -872,6 +874,7 @@ void videoCodecSelectByName(const char *name)
 		{
 			printf("%s\n",mycodec[i].name);
 		}
+		return 0;
 }
 
 const char *videoCodecGetName( void )
@@ -909,7 +912,7 @@ void videoCodecSetcodec(SelectCodecType codec)
 	current_codec=codec;
 
 }
-void videoCodecConfigure( void )
+void videoCodecConfigureUI( void )
 {
 	printf("\n configuring codec :%d\n",current_codec);
 	switch(current_codec)

@@ -24,6 +24,15 @@
 #include "adm_scanner.h" 
 #include "avi_vars.h"
 #include "gui_action.hxx"
+#include "ADM_encoder/ADM_vidEncode.hxx"
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_encoder/adm_encoder.h"
+#include "ADM_encoder/adm_encConfig.h"
+
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_SCRIPT
+#include "ADM_toolkit/ADM_debug.h"
+
 
 //_________________________
 
@@ -54,17 +63,66 @@ int scriptLoadCodec(Arg *args);
 int scriptSavejpeg(Arg *args);
 int scriptRaw(Arg *args);
 int scriptSave(Arg *args);
+int scriptSaveDVD(Arg *args);
+int scriptVideoCodec(Arg *args);
+int scriptVideoCodec2(Arg *args);
+int scriptSave(Arg *args);
+int scriptLoadFilter(Arg *args);
 
 extern void HandleAction(Action act);
 //_________________________
 #include "adm_command.h" 
 void ADS_commandList( void );
-ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg);
+ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg,uint8_t fake);
+//_______________________
+
+extern int filterLoadXml(char *docname,uint8_t silent);
+int scriptLoadFilter(Arg *args)
+{
+	return filterLoadXml(args[0].arg.string,0);
+}
+
 //_______________________
 extern int A_Save (char *name);
 int scriptSave(Arg *args)
 {
 	return A_Save(args[0].arg.string);
+}
+//_______________________
+
+int scriptVideoCodec(Arg *args)
+{
+char *codec,*conf;
+	codec=args[0].arg.string;
+	conf=args[1].arg.string;
+	if(!videoCodecSelectByName(codec)) 
+	{
+		return 0;
+	}
+	// now do the conf
+	// format CBR=bitrate in kbits
+	//	  CQ=Q
+	//	  2 Pass=size
+	// We have to replace 
+	if(!videoCodecConfigure(conf,0,NULL))
+		return 0;	
+	return 1;
+}
+extern uint8_t loadVideoCodecConf( char *name);
+int scriptVideoCodec2(Arg *args)
+{
+
+	
+	// Load codec specific file
+	if(! loadVideoCodecConf( args[2].arg.string)) return 0;
+	return scriptVideoCodec(args);
+
+}
+//_______________________
+extern int A_saveDVDPS(char *name);
+int scriptSaveDVD(Arg *args)
+{
+	return A_saveDVDPS(args[0].arg.string);
 }
 //_______________________
 extern int ADM_saveRaw (char *name);
@@ -275,9 +333,10 @@ int scriptExit(Arg *args)
 //		- invoke the caller function
 //	
 //_____________________________________________
-ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg)
+ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg,uint8_t fake)
 {
 int found=-1;
+int candidate=-1;
 	assert(nb<MAXPRM);
 	// First go to lowercase
 	LowerCase(cmd);
@@ -287,22 +346,22 @@ int found=-1;
 	{
 		if(!strcmp(cmd,myCommands[i].command))
 		{
-			found=i;
-			break;
+			candidate=i;
+			if(nb==myCommands[i].nbArgs)
+			{
+				found=i;
+				break;
+			}
+			
 		}
 	}
 	if(found==-1)
-	{
-		
-		return ASC_UNKNOWN_FUNC;
-	}
-	// 2- check # of parameters
-	//_______________________
-	if(nb!=myCommands[found].nbArgs)
-	{
-		
-		return ASC_BAD_NUM_PARAM;
-	}
+	{		
+		if(candidate==-1)
+			return ASC_UNKNOWN_FUNC;
+		else
+			return ASC_BAD_NUM_PARAM;
+	}	
 	// 3- check parameters type
 	//_________________________
 	for(int i=0;i<nb;i++)
@@ -315,6 +374,8 @@ int found=-1;
 	}
 	// 4- Exec
 	//___________________________	
+	if(fake)
+		return ASC_OK;
 	if( myCommands[found].func(arg))
 		return ASC_OK;
 	else

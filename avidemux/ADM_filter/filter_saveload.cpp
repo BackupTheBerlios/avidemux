@@ -142,7 +142,7 @@ void filterLoadXml(char *docname)
 	filterLoadXml(docname,0);
 }
 
-void filterLoadXml(char *docname,uint8_t silent)
+int filterLoadXml(char *docname,uint8_t silent)
 {
  xmlDocPtr xdoc;
  xmlNodePtr node,subnode;
@@ -154,7 +154,7 @@ CONFcouple *couple;
 			if(!xdoc)
 				{
 					GUI_Alert("Problem reading xml filters!");
-					return;
+					return 0;
 				}
 			node=xdoc->children;
 			nb_filters=getIntegerAttribute(node,(  char *)"filters",(  char *)"FilterNumber");
@@ -162,7 +162,7 @@ CONFcouple *couple;
 					{
 							xmlFreeDoc(xdoc);
 							GUI_Alert("No filter found!");
-							return;
+							return 0;
 					}
 
 			if(1<nb_active_filter)
@@ -196,7 +196,7 @@ CONFcouple *couple;
 				if(!node)
 					{
 						GUI_Alert("Error searching Filter");
-						return;
+						return 0;
 					}
 
 				itag=getIntegerAttribute(subnode,(char *)"Filter",(char *)"Tag");
@@ -204,7 +204,7 @@ CONFcouple *couple;
 					{
 							xmlFreeDoc(xdoc);
 							GUI_Alert("No tag found!");
-							return;
+							return 0;
 					}
 				// now we got the tag
 				printf("\n %lu tag \n",itag);
@@ -245,7 +245,7 @@ CONFcouple *couple;
 			}
 			printf("\n found : %lu filters\n",nb_filters);
 	xmlFreeDoc(xdoc);
-	return ;
+	return 1;
 }
 CONFcouple *buildCouple(uint32_t nb, xmlNodePtr node)
 {

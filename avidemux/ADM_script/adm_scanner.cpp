@@ -34,9 +34,10 @@ static void CleanParam(void);
 static uint32_t pushed;
 static Arg args[MAXPARAM];
 void dumpStack( char *cmd, int nb, Arg *arg);
-extern ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg);
+extern ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg,uint8_t fake);
 
 static char scriptError[1024];
+static uint8_t thisIsADrill;
 //_____________________________________
 void parseScript(char *scriptname);
 //_____________________________________
@@ -44,11 +45,33 @@ void parseScript(char *scriptname)
 {
 int i;
 	//yydebug=1;
+	// Do it one time to check syntax/grammar
+	//_______________________________________
+	thisIsADrill=1;
+	printf("Checking syntax/grammar...\n");
 	yyin=fopen(scriptname,"rt");
 	if(!yyin) 
 	{
 		GUI_Alert("Cannot open that file");
-		return ;	
+		exit(0) ;	
+	}
+	pushed=0;
+	i=yyparse();
+	fclose(yyin);
+	if(i)
+	{
+		printf("Error %s at line %d\n",scriptError,yylineno);
+		exit(0);
+	}
+	// Now do it for real
+	//_______________________________________
+	printf("Syntax/grammar ok, executing\n");
+	thisIsADrill=0;
+	yyin=fopen(scriptname,"rt");
+	if(!yyin) 
+	{
+		GUI_Alert("Cannot open that file");
+		exit(0) ;	
 	}
 	pushed=0;
 	i=yyparse();
@@ -56,11 +79,11 @@ int i;
 	if(!i)
 		{
 			printf("Parsing successfull\n");
-			return ;
+			exit(0); ;
 		}
 	
-	printf("Error %s at line %d\n",scriptError,yylineno);
-	return ;
+	
+	exit(-1) ;
 }
 //______________________________
 void yyerror(const char *str)
@@ -84,7 +107,7 @@ ASC_ERROR status;
 int	  ret=1;
 	
 	
-	status=ADS_execCommand(value,pushed,args);
+	status=ADS_execCommand(value,pushed,args,thisIsADrill);
 	if(status!=ASC_OK)
 	{
 		ret=0;

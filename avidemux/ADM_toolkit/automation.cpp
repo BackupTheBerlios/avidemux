@@ -62,7 +62,7 @@ extern void GUI_Verbose( void);
 extern void audioFilter_SetBitrate( int i);
 extern void A_Save(char *name);
 extern void videoCodecSelectByName(const char *name);
-extern void videoCodecConfigure(char *p,uint32_t i, uint8_t  *c);
+extern int videoCodecConfigure(char *p,uint32_t i, uint8_t  *c);
 #include "oplug_mpeg/op_mpeg.h"
 extern void encoderSetLogFile(char *name)     ;
 extern void A_loadWorkbench(char *name)     ;

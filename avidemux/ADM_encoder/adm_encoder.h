@@ -125,7 +125,8 @@ typedef enum
 }CodecFamilty;
 
 extern  CodecFamilty videoCodecGetFamily( void );
-extern void videoCodecConfigure( void );
+extern void videoCodecConfigureUI( void );
+extern int videoCodecConfigure(char *p,uint32_t i, uint8_t  *c);
 extern void videoCodecSelect( void );
 extern void videoCodecSetcodec(SelectCodecType codec);
 extern void EncoderSaveMpeg(char *name);

@@ -5,7 +5,7 @@ void saveEncoderConfig( void );
 void loadEncoderConfig( void );
 
 const char 	*videoCodecGetName( void );
-void 		videoCodecSelectByName( const char *name);
+int 		videoCodecSelectByName( const char *name);
 
 
 void 		videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData);

@@ -96,11 +96,11 @@
 void filterSaveXml(char *name);
 void filterSaveXml(char *name,uint8_t silent);
 void filterLoadXml(char *name);
- void filterLoadXml(char *name,uint8_t silent);
+int  filterLoadXml(char *name,uint8_t silent);
 #endif
  void filterSave(char *name);
  void filterLoad(char *name);
- void filterLoad(char *name,uint8_t silent);
+ int filterLoad(char *name,uint8_t silent);
  void filterSave(char *name,uint8_t silent);
 
 void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable,

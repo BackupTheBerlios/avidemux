@@ -152,7 +152,7 @@ uint8_t use_fast_ffmpeg = 0;
 #else
 uint8_t use_fast_ffmpeg = 0;
 #endif
-
+int A_saveDVDPS(char *name);
 //__________
 
 
@@ -422,27 +422,7 @@ HandleAction (Action action)
 #endif
 			
     case ACT_SaveDVDPS:
-    			// if we are in process mode
-			if(videoProcessMode)
-			{
-    				oplug_mpeg_dvd_ps(NULL);
-			}
-			else // copy mode
-			{
-			// do some sanitu check first
-				uint32_t fatal;
-				uint32_t end;
-				end=frameEnd;
-				if(end==avifileinfo->nb_frames-1) end++;
-				video_body->sanityCheckRef(frameStart,end,&fatal);
-				if(fatal)
-				{
-					GUI_Alert("There is a lonely Bframe at start/end\nPlease remove it");
-					break;
-				}
-				printf("Using pass through\n");
-				GUI_FileSelWrite ("Select Mpeg file...", mpeg_passthrough);
-			}
+    			A_saveDVDPS(NULL);
     			break;			
     case ACT_FrameChanged:
     			printf("FrameChanged\n");
@@ -2203,6 +2183,36 @@ int A_audioSave(char *name)
 	    {
 	       A_saveAudio(name);
 	    }
+	return 1;
+}
+//_____________________________
+int A_saveDVDPS(char *name)
+{
+// if we are in process mode
+			if(videoProcessMode)
+			{
+    				oplug_mpeg_dvd_ps(name);
+			}
+			else // copy mode
+			{
+			// do some sanitu check first
+				uint32_t fatal;
+				uint32_t end;
+				end=frameEnd;
+				if(end==avifileinfo->nb_frames-1) end++;
+				video_body->sanityCheckRef(frameStart,end,&fatal);
+				if(fatal)
+				{
+					GUI_Alert("There is a lonely Bframe at start/end\nPlease remove it");
+					return 0;
+				}
+				printf("Using pass through\n");
+				if(!name)
+					GUI_FileSelWrite ("Select Mpeg file...", mpeg_passthrough);
+				else
+					mpeg_passthrough(name);
+			}
+
 	return 1;
 }
 // EOF

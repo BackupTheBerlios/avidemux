@@ -32,6 +32,10 @@ static const admCommand myCommands[]=
 	{"savejpg",		scriptSavejpeg,1,APM_STRING},
 	{"saverawvideo",	scriptRaw,1,APM_STRING},
 	
+	{"savedvd",		scriptSaveDVD,1,APM_STRING},
+	{"save",		scriptSave,1,APM_STRING},
+	
+	
 	{"normalize",		scriptAudioNormalize,1,APM_NUM},
 	{"downsample",		scriptAudioDownsample,1,APM_NUM},
 	{"resample",		scriptAudioResample,1,APM_NUM},
@@ -39,11 +43,16 @@ static const admCommand myCommands[]=
 	{"film2pal",		scriptFilm2Pal,1,APM_NUM},
 	
 	{"loadaudio",		scriptLoadAudio,2,APM_STRING,APM_STRING},
+	
 	{"saveaudio",		scriptSaveAudio,1,APM_STRING},
 	{"audiocodec",		scriptAudioCodec,2,APM_STRING,APM_NUM},
+	{"videocodec",		scriptVideoCodec,2,APM_STRING,APM_STRING},
+	{"videocodec",		scriptVideoCodec2,3,APM_STRING,APM_STRING,APM_STRING},
+	
+	{"loadfilter",		scriptLoadFilter,1,APM_STRING},
 	
 	{"scanvbr",		scriptScanVbr,0},
-	{"loadcodec",		scriptLoadCodec,1,APM_STRING},
+	//{"loadcodec",		scriptLoadCodec,1,APM_STRING},
 	
 	{"goto",		scriptGoto,1,APM_NUM},
 	

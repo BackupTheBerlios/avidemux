@@ -70,7 +70,7 @@
 	//	printf("Callback called\n");
 		cur=findCodec();
 		videoCodecSetcodec(cur);
-		videoCodecConfigure();
+		videoCodecConfigureUI();
 
 }
 uint8_t DIA_videoCodec( SelectCodecType *codec )
