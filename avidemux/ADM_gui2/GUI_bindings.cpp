@@ -62,6 +62,9 @@ static GtkWidget *guiPreviewToggle=NULL;
 static GtkWidget *guiOutputToggle=NULL;
 static GtkWidget *guiAudioToggle=NULL;
 static GtkWidget *guiVideoToggle=NULL;
+static GdkCursor *guiCursorBusy=NULL;
+static GdkCursor *guiCursorNormal=NULL;
+static gint	  guiCursorEvtMask=0;
 
 // heek !
 static  GtkAdjustment *sliderAdjustment;
@@ -78,6 +81,9 @@ static gboolean  on_drawingarea1_expose_event(GtkWidget * widget,  GdkEventExpos
 // Currentframe taking/loosing focus
 static int  UI_grabFocus( void);
 static int  UI_looseFocus( void);
+static void GUI_initCursor( void );
+ void UI_BusyCursor( void );
+ void UI_NormalCursor( void );
 // Global
 GtkAccelGroup *accel_group;
 //
@@ -147,6 +153,7 @@ uint8_t ret=0;
 		// Set it as always low level
 		//gtk_window_set_keep_below(GTK_WINDOW(guiRootWindow), 1);
 		renderInit();
+		GUI_initCursor(  );
 		
 	return ret;
 }
@@ -586,4 +593,30 @@ void UI_iconify( void )
 void UI_deiconify( void )
 {
 	gtk_window_deiconify(GTK_WINDOW(guiRootWindow));
+}
+void GUI_initCursor( void )
+{
+	
+	guiCursorBusy=gdk_cursor_new(GDK_WATCH);
+	guiCursorNormal=gdk_cursor_new(GDK_X_CURSOR);
+}
+// Change cursor and drop all events
+void UI_BusyCursor( void )
+{
+	 gdk_window_set_cursor((guiRootWindow->window),
+                                          guiCursorBusy);
+/*					  
+	guiCursorEvtMask=gtk_widget_get_events(guiRootWindow);
+	gtk_widget_set_events(guiRootWindow,0);
+*/	
+
+	
+}
+void UI_NormalCursor( void )
+{
+//	gtk_widget_set_events(guiRootWindow,guiCursorEvtMask);
+	gdk_window_set_cursor((guiRootWindow->window),
+                                          NULL); //guiCursorNormal);
+
+	
 }

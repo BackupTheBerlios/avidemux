@@ -43,6 +43,8 @@
 static GtkWidget	*create_dialog1 (void);
 static GtkWidget *busy=NULL;
 static gint on_destroy_abort(GtkObject * object, gpointer user_data);
+extern  void UI_BusyCursor( void );
+extern void UI_NormalCursor( void );
 
 gint on_destroy_abort(GtkObject * object, gpointer user_data)
 {
@@ -54,6 +56,8 @@ gint on_destroy_abort(GtkObject * object, gpointer user_data)
 
 void DIA_StartBusy( void )
 {
+	UI_BusyCursor();
+#if 0	
 	busy=create_dialog1();
 	gtk_window_set_modal(GTK_WINDOW(busy), 1);
 	gtk_transient(busy);
@@ -61,11 +65,16 @@ void DIA_StartBusy( void )
 	gtk_signal_connect(GTK_OBJECT(busy), "delete_event",
 		       GTK_SIGNAL_FUNC(on_destroy_abort), (void *) NULL);
 	gtk_widget_show(busy);
+#endif		
 	UI_purge();
+
+	
 }
 
 void DIA_StopBusy( void )
 {
+	UI_NormalCursor();
+#if 0	
 	if(busy)
 	{
 		gtk_widget_destroy(busy);
@@ -76,7 +85,7 @@ void DIA_StopBusy( void )
 		printf("\n Busy was not null ???\n");
 	}
 
-
+#endif
 }
 
 
