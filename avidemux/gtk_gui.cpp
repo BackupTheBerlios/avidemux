@@ -1105,46 +1105,74 @@ A_saveAudio (char *name)
   DIA_working *work;
   FILE *out;
 
-#define BITT 500
-  uint8_t buffer[BITT];
+#define ONE_STRIKE (64*1024)
+  uint8_t *buffer=NULL;
 
   if (!currentaudiostream)
     return;
   if (!currentaudiostream->isCompressed ())
     {
       GUI_Alert
-	("The audio is wav PCM. \nPlease select Audio Process mode \notherwise the audio stream will be\n unreadable (raw PCM))");
+	("The audio is wav PCM. \nPlease select Audio Process mode \n"
+	"otherwise the audio stream will be\n unreadable (raw PCM))");
       return;
     }
 
-  work=new DIA_working("Saving audio");
+  
   out = fopen (name, "wb");
-  ADM_assert (out);
+  if (!out) return;
+  
+  work=new DIA_working("Saving audio");
+  
+  uint32_t timeEnd,timeStart,sample,hold,len;
+  uint64_t tgt_sample,cur_sample;
+  double   duration;
 
-// compute start position
-  currentaudiostream->goToTime (video_body->getTime (frameStart));
-// compute max bytes to write (with little margin)
-  max =
-    currentaudiostream->convTime2Offset (video_body->
-					 getTime (frameEnd + 1)) -
-    currentaudiostream->convTime2Offset (video_body->getTime (frameStart));
-  written = 0;
-  while (1)
+  // compute start position and duration in samples
+    
+   timeStart=video_body->getTime (frameStart);
+   timeEnd=video_body->getTime (frameEnd+1);
+
+   currentaudiostream->goToTime (timeStart);
+   duration=timeEnd-timeStart;
+   printf("Duration:%f ms\n",duration);
+   if(duration<0) duration=-duration;
+  
+   duration/=1000;   
+   duration*=currentaudiostream->getInfo()->frequency;
+   
+   tgt_sample=(uint64_t)floor(duration);  
+   
+   cur_sample=0;
+   written = 0;
+   hold=0;
+   buffer=new uint8_t[ONE_STRIKE*2];
+   while (1)
     {
-      len2 = currentaudiostream->read (BITT, (uint8_t *) buffer);
-      fwrite (buffer, len2, 1, out);
-      if (len2 != BITT)
-	break;
-      written += len2;
-      if (written > max)
-	break;			// we wrote everything !
-
-      work->update(written, max);
+    	if(!currentaudiostream->getPacket(buffer+hold,&len,&sample)) break;
+	hold+=len;
+	written+=len;
+	cur_sample+=sample;
+	if(hold>ONE_STRIKE)
+	{
+		fwrite(buffer,hold,1,out);
+		hold=0;		
+	}
+	if(cur_sample>tgt_sample)
+		break;   
+      work->update(cur_sample>>10, tgt_sample>>10);
       if(!work->isAlive()) break;
     };
+  if(hold)
+  {
+  	fwrite(buffer,hold,1,out);
+	hold=0;  
+  }
+  
   fclose (out);
   delete work;
-  printf ("\n wanted %u bytes, written %u\n", max, written);
+  delete buffer;
+  printf ("\n wanted %llu samples, goto %llu samples, written %u bytes\n", tgt_sample,cur_sample, written);
 
 
 }
