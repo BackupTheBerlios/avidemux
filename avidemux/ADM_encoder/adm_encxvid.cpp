@@ -86,7 +86,7 @@ EncoderXvid::configure (AVDMGenericVideoStream * instream)
   _w = info->width;
   _h = info->height;
   printf("Configuting xvif encoder (%dx%d)\n",_w,_h);
-  _vbuffer = new uint8_t[_w * _h * 3];
+  _vbuffer = new ADMImage(_w,_h);
   ADM_assert (_vbuffer);
   _in = instream;
 
