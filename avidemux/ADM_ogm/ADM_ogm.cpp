@@ -260,6 +260,19 @@ uint8_t oggHeader::open(char *name)
     		_videostream.dwScale=1000;
                 _videostream.dwRate=25000;
 
+#ifdef ADM_BIG_ENDIAN
+	#define SWAP64(x) { uint64_t y=x;x=R32(y>>32)+(R32(y&0xfffffffff)<<32);}
+	#define SWAP32(x) x=R32(x)
+	#define SWAP16(x) x=R16(x)
+#else
+	#define SWAP64(x) ;
+	#define SWAP32(x) ;
+	#define SWAP16(x) ;
+#endif
+
+		SWAP32(header->video.width);
+		SWAP32(header->video.height);
+		SWAP64(header->time_unit);
 
               _mainaviheader.dwMicroSecPerFrame=header->time_unit;;     // assuming per sample=1
 
@@ -269,6 +282,7 @@ double fps;
 		fps=1/fps;
 		fps=fps*10000000*1000;
 		  _videostream.dwRate=(uint32_t )floor(fps);;
+
 
               _videostream.fccType=fourCC::get((uint8_t *)"vids");
               memset( &_video_bih,0,sizeof(_video_bih));
