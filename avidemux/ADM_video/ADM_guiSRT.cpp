@@ -75,6 +75,8 @@ static unicd  names[]=
 	{(char *)"Czech"	,(char *)"ISO-8859-2"},	// cz
 	{(char *)"German"	,(char *)"ISO-8859-9"}		// german ?
 	,{(char *)"Slovene"	,(char *)"CP1250"}		// UTF8
+	,{(char *)"Chinese Traditionnal(Big5)"	,(char *)"CP950"}		// UTF8
+	,{(char *)"Chinese Simplified (GB2312)"	,(char *)"CP936"}		// UTF8
 };
 
 

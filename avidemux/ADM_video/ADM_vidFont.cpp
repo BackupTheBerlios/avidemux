@@ -19,6 +19,7 @@
 #include <iconv.h>
 #include <string.h> // thanks !
 #include "config.h"
+#include <errno.h>
 #include "ADM_library/default.h"
 
  #ifdef USE_FREETYPE
@@ -29,10 +30,14 @@ static    FT_Library   	library;   		/* handle to library     */
 static    int 			initialized=0; 	// 0 No init at all, 1 engine inited
 
 
+
 ADMfont::ADMfont ( void )
 {
 	_conv=(iconv_t)-1;;
 	_faceAllocated=0;
+	_use2bytes=0;
+	_hold=0;
+	_value=0;
 
 }
 
@@ -95,13 +100,14 @@ int error;
               16 );   /* pixel_height                     */
 
 	printf("\n **  FreeType Initialized **\n");
+	_hold=0;
    	return 1;
 }
 //____________________________________________________
 int ADMfont::fontSetCharSet (char *charset)
 {
 //int error;
-
+	printf("Setting charset:%s\n",charset);
 	//
 	if(!strcmp(charset,"UNICODE")
 	//||!strcmp(charset,"UTF-8")
@@ -139,6 +145,12 @@ int ADMfont::fontSetCharSet (char *charset)
 		printf("Something went wrong with iconv...\n");
 // -- dummy
 	if(charset) printf("Iconv initialized, using charset :%s \n",charset);
+	if(!strcmp(charset,"CP950") || !strcmp(charset,"CP936"))
+	{
+		_use2bytes=1;
+		printf("Using multibytes sequence\n");
+	
+	}
 	return 1;
 
 
@@ -170,29 +182,70 @@ FT_GlyphSlot  slot = _face->glyph;  // a small shortcut
 int  glyph_index,error;
 int carac=0;
 size_t sz;
+char incoming[4];
+uint8_t outgoing[4];
 
+	*ww=0;
        if((unsigned char)(c)==0x92) c='\''; // replace '
-	// special french stuff
-	/*
-	if(( char)(c)=='é') c='e'; // replace '
-	if(( char)(c)=='è') c='e'; // replace '
-	if(( char)(c)=='à') c='a'; // replace '
-	if(( char)(c)=='ç') c='c'; // replace ' */
-
+	
 	if((int)_conv!=-1)
 	{
 	char *in,*out;
 	size_t sin,sout;
 
-	in=(char *)&c;
-	out=(char *)&carac;
-
-	sin=1;
-	sout=4;
+	in=incoming;
+	out=(char *)outgoing;
+	memset(outgoing,0,4);
+	if(_use2bytes)
+	{
+		if(c>=0x80 && !_hold)
+		{
+			_hold=1;
+			_value=(int)c;	
+			return 1;
+		}
+	 
+		if(_hold)
+		{
+			sin=2;
+			sout=4;
+			incoming[0]=(uint8_t)_value;
+			incoming[1]=(uint8_t)c;
+			_hold=0;
+		}
+		else
+		{
+			sin=1;
+			sout=4;
+			incoming[0]=(uint8_t)c;
+	
+		}
+	}
+	else
+	{
+		sin=1;
+		sout=4;
+		incoming[0]=(uint8_t)c;	
+	}
+	/* TAIST */
+	// A1BE->U+25BD (triangle)
+#if 0	
+	sin=2;
+		sout=4;
+		incoming[0]=0xA1;
+		incoming[1]=0xBE;
+		hold=0;
+#endif
 #if  defined(ICONV_NEED_CONST)
        sz=iconv(_conv,(const char **)&in,&sin,&out,&sout);
 #else
-	sz=iconv(_conv, &in,&sin,&out,&sout);
+	sz=iconv(_conv, &in,&sin,&out,&sout);	
+#endif	
+	carac=outgoing[0]+(outgoing[1]<<8);
+#if 0
+	printf("sz : %d, out :%x %x\n",sz,outgoing[0],outgoing[1]);
+	
+	printf("car:%x\n",carac);
 #endif	
 	}
 	else
@@ -200,6 +253,15 @@ size_t sz;
 		carac=c;
 		//printf("\n no iconv initialized..\n");
 	}
+	if(sz<0)
+		{
+			
+					int e=errno;
+					
+					printf("Error char converted :%x (errno:%d)\n",c,e);
+					printf("Err:%s\n",strerror(e));
+				
+		}
 	//carac=0x0414; //c+256*3; //0x470; // russian phic;
 	//printf("%c->%d\n",c,carac);
 	    	glyph_index = FT_Get_Char_Index( _face, carac );
