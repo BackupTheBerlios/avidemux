@@ -108,7 +108,9 @@ dnl    AC_PATH_PROG(PKG_CONFIG,pkg-config, AC_MSG_ERROR([*** pkg-config not foun
 
    GTK_LIBS=`$PKG_CONFIG  gtk+-2.0 --libs`
    GLIB_LIBS=`$PKG_CONFIG  glib-2.0 --libs`
-   GTK_LIBS="$GTK_LIBS $GLIB_LIBS"
+   GTHREAD_LIBS=`$PKG_CONFIG  gthread-2.0  --libs`
+
+   GTK_LIBS="$GTK_LIBS $GLIB_LIBS $GTHREAD_LIBS"
    GTK_CFLAGS=`$PKG_CONFIG  gtk+-2.0 --cflags` 
 
    AC_SUBST(GTK_CFLAGS)
