@@ -49,7 +49,7 @@
 #define BACK_ON_COMBED 1
 #define ALWAYS_BACK 2
 
-#define OutputDebugString(x) printf("%s\n",x)
+#define OutputDebugString(x) aprintf("%s\n",x)
 typedef uint8_t* PVideoFrame ;
 
 

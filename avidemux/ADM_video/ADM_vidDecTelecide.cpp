@@ -47,6 +47,9 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include"ADM_video/ADM_vidField.h"
 
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_FILTER
+#include "ADM_toolkit/ADM_debug.h"
 
 
 #if 1 || TEST_DECOMB

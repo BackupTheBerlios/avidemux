@@ -58,6 +58,10 @@
 #include"ADM_video/ADM_vidField.h"
 #include"ADM_video/ADM_cache.h"
 
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_FILTER
+#include "ADM_toolkit/ADM_debug.h"
+
 
 #if 1 || TEST_DECOMB
 
@@ -67,17 +71,16 @@
 #define MAGIC_NUMBER (0xdeadbeef)
 #define IN_PATTERN   0x00000002
 
-extern uint8_t PutHintingData(unsigned char *video, unsigned int hint);
-extern uint8_t GetHintingData(unsigned char *video, unsigned int *hint);
-extern void BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
-            int src_pitch, int row_size, int height);
-extern  void DrawString(uint8_t *dst, int x, int y, const char *s);
-extern  void DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
-#define OutputDebugString(x) printf("%s\n",x)
+extern uint8_t 	PutHintingData(unsigned char *video, unsigned int hint);
+extern uint8_t 	GetHintingData(unsigned char *video, unsigned int *hint);
+extern void 	BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
+            		int src_pitch, int row_size, int height);
+extern  void 	DrawString(uint8_t *dst, int x, int y, const char *s);
+extern  void 	DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
 
-
-
+#define OutputDebugString(x) aprintf("%s\n",x)
+//________________________________
 #define MAX_CYCLE_SIZE 25
 #define MAX_BLOCKS 50
 
@@ -89,13 +92,17 @@ extern  void DrawStringYUY2(uint8_t *dst, int x, int y, const char *s);
 	if (GETFRAMEf > num_frames_hi - 1) GETFRAMEf = num_frames_hi - 1; \
 	(fp) = vidCache->getImage(GETFRAMEf); \
 }
-
+//________________________________
+#include "ADM_vidDecDec_param.h"
+extern uint8_t DIA_getDecombDecimate(DECIMATE_PARAM *param);
+//________________________________
 /* Decimate 1-in-N implementation. */
 class Decimate : public AVDMGenericVideoStream
 {
-	int num_frames_hi, cycle, mode, quality;
-	double threshold, threshold2;
-	const char *ovr;
+	int 			num_frames_hi;
+	
+	DECIMATE_PARAM 		*_param;
+	
 	int last_request, last_result;
 	bool last_forced;
 	double last_metric;
@@ -153,7 +160,8 @@ threshold2(_threshold2), quality(_quality), ovr(_ovr), show(_show), debug(_debug
 uint8_t Decimate::configure(AVDMGenericVideoStream *in)
 {
 	_in=in;
-	return 1;
+	assert(_param);
+	return  DIA_getDecombDecimate(_param);
 	
 }
 
@@ -161,8 +169,8 @@ char *Decimate::printConf( void )
 {
  	static char buf[50];
 
-
- 	sprintf((char *)buf," Decomb Decimate");
+	assert(_param);
+ 	sprintf((char *)buf," Decomb Decimate cycle:%d",_param->cycle);
         return buf;
 }
 
@@ -182,22 +190,37 @@ Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples)
   		_info.encoding=1;
 		
 		// Init here
-		
-		cycle=5;
-		mode=1;
-		
+		debug=0;
+		show=0;		
 		//
+		_param=new DECIMATE_PARAM;
+		if(couples)
+		{
+			GET(cycle);
+			GET(mode);
+			GET(quality);
+			GET(threshold);
+			GET(threshold2);
+			
+		}
+		else // Default
+  		{
+			_param->cycle=5;
+			_param->mode=0;
+			_param->quality=2;
+			_param->threshold=0;
+			_param->threshold2=3.0;
+		}
 		
+		assert(_param->cycle);
+		vidCache=new VideoCache(_param->cycle+2,in);
 		
-		assert(cycle);
-		vidCache=new VideoCache(cycle+2,in);
-		
-		if (mode == 0 || mode == 2 || mode == 3)
+		if (_param->mode == 0 || _param->mode == 2 || _param->mode == 3)
 		{
 			num_frames_hi = _info.nb_frames;
-			_info.nb_frames = _info.nb_frames * (cycle - 1) / cycle;
-			_info.fps1000=_info.fps1000*(cycle-1);
-			_info.fps1000=(uint32_t)(_info.fps1000/cycle);
+			_info.nb_frames = _info.nb_frames * (_param->cycle - 1) / _param->cycle;
+			_info.fps1000=_info.fps1000*(_param->cycle-1);
+			_info.fps1000=(uint32_t)(_info.fps1000/_param->cycle);
 			
 		}
 		last_request = -1;
@@ -218,6 +241,15 @@ Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples)
 uint8_t	Decimate::getCoupledConf( CONFcouple **couples)
 {
 	*couples=NULL;
+	*couples=new CONFcouple(5);
+#define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
+	
+	CSET(cycle);
+	CSET(mode);
+	CSET(quality);
+	CSET(threshold);
+	CSET(threshold2);
+
 	return 1;
 }
 //________________________________________________________
@@ -225,6 +257,7 @@ Decimate::~Decimate(void)
 {
 		if (sum != NULL) free(sum);
 		if(vidCache) delete vidCache;
+		if(_param) delete _param;
 
 }
 //________________________________________________________
@@ -232,7 +265,7 @@ void Decimate::DrawShow(uint8_t  *src, int useframe, bool forced, int dropframe,
 						double metric, int inframe)
 {
 	char buf[80];
-	int start = (useframe / cycle) * cycle;
+	int start = (useframe / _param->cycle) * _param->cycle;
 
 	if (show == true)
 	{
@@ -270,7 +303,7 @@ void Decimate::DrawShow(uint8_t  *src, int useframe, bool forced, int dropframe,
 	}
 	if (debug)
 	{
-		if (!(inframe%cycle))
+		if (!(inframe%_param->cycle))
 		{
 			sprintf(buf,"Decimate: %d: %3.2f\n", start, showmetrics[0]);
 			OutputDebugString(buf);
@@ -317,16 +350,16 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 
 	*len=(_info.width*_info.height*3)>>1;
 	
-	if (mode == 0)
+	if (_param->mode == 0)
 	{
 		bool forced = false;
 		int start;
 
 		/* Normal decimation. Remove the frame most similar to its preceding frame. */
 		/* Determine the correct frame to use and get it. */
-		useframe = inframe + inframe / (cycle - 1);
-		start = (useframe / cycle) * cycle;
-		FindDuplicate((useframe / cycle) * cycle, &dropframe, &metric, &forced);
+		useframe = inframe + inframe / (_param->cycle - 1);
+		start = (useframe /  _param->cycle) * _param->cycle;
+		FindDuplicate((useframe / _param->cycle) * _param->cycle, &dropframe, &metric, &forced);
 		if (useframe >= dropframe) useframe++;
 		GETFRAME(useframe, src);
 		if (show == true)
@@ -352,7 +385,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		}
 		if (debug)
 		{	
-			if (!(inframe % cycle))
+			if (!(inframe % _param->cycle))
 			{
 				sprintf(buf,"Decimate: %d: %3.2f\n", start, showmetrics[0]);
 				OutputDebugString(buf);
@@ -375,10 +408,10 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		vidCache->unlockAll();
 		return 1;
 	}
-	else if (mode == 1)
+	else if (_param->mode == 1)
 	{
 		bool forced = false;
-		int start = (inframe / cycle) * cycle;
+		int start = (inframe / _param->cycle) * _param->cycle;
 		unsigned int hint, film = 1;
 
 		GETFRAME(inframe, src);
@@ -393,8 +426,8 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		/* Find the most similar frame as above but replace it with a blend of
 		   the preceding and following frames. */
 		num_frames_hi = _in->getInfo()->nb_frames; /* FIXME MEANX */
-		FindDuplicate((inframe / cycle) * cycle, &dropframe, &metric, &forced);
-		if (!film || inframe != dropframe || (threshold && metric > threshold))
+		FindDuplicate((inframe / _param->cycle) * _param->cycle, &dropframe, &metric, &forced);
+		if (!film || inframe != dropframe || (_param->threshold && metric > _param->threshold))
 		{
 			if (show == true)
 			{
@@ -423,7 +456,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			}
 			if (debug)
 			{
-				if (!(inframe % cycle))
+				if (!(inframe % _param->cycle))
 				{
 					sprintf(buf,"Decimate: %d: %3.2f\n", start, showmetrics[0]);
 					OutputDebugString(buf);
@@ -455,7 +488,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			nextfrm = _in->getInfo()->nb_frames - 1;
 		if (debug)
 		{
-			if (!(inframe % cycle))
+			if (!(inframe % _param->cycle))
 			{
 				sprintf(buf,"Decimate: %d: %3.2f\n", start, showmetrics[0]);
 				OutputDebugString(buf);
@@ -581,18 +614,18 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		vidCache->unlockAll();		
 		return 1;
 	}
-	else if (mode == 2)
+	else if (_param->mode == 2)
 	{
 		bool forced = false;
 
 		/* Delete the duplicate in the longest string of duplicates. */
-		useframe = inframe + inframe / (cycle - 1);
-		FindDuplicate2((useframe / cycle) * cycle, &dropframe, &forced);
+		useframe = inframe + inframe / (_param->cycle - 1);
+		FindDuplicate2((useframe / _param->cycle) * _param->cycle, &dropframe, &forced);
 		if (useframe >= dropframe) useframe++;
 		GETFRAME(useframe, src);
 		if (show == true)
 		{
-			int start = (useframe / cycle) * cycle;
+			int start = (useframe / _param->cycle) * _param->cycle;
 
 
 			sprintf(buf, "Decimate %s", VERSION);
@@ -629,26 +662,26 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		vidCache->unlockAll();
 		return 1;
 	}
-	else if (mode == 3)
+	else if (_param->mode == 3)
 	{
 		bool forced = false;
 
 		/* Decimate by removing a duplicate from film cycles and doing a
 		   blend rate conversion on the video cycles. */
-		if (cycle != 5)//	env->ThrowError("Decimate: mode=3 requires cycle=5");
+		if (_param->cycle != 5)//	env->ThrowError("Decimate: mode=3 requires cycle=5");
 		{
 			printf("Decimate: mode=3 requires cycle=5\n");
 			return 0;
 		}
-		useframe = inframe + inframe / (cycle - 1);
-		FindDuplicate((useframe / cycle) * cycle, &dropframe, &metric, &forced);
+		useframe = inframe + inframe / (_param->cycle - 1);
+		FindDuplicate((useframe / _param->cycle) * _param->cycle, &dropframe, &metric, &forced);
 		/* Use hints from Telecide about film versus video. Also use the difference
 		   metric of the most similar frame in the cycle; if it exceeds threshold,
 		   assume it's a video cycle. */
 		if (!(inframe % 4))
 		{
 			all_video_cycle = false;
-			if (threshold && metric > threshold)
+			if (_param->threshold && metric > _param->threshold)
 			{
 				all_video_cycle = true;
 			}
@@ -800,7 +833,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 	/* Avoid compiler warning. */
 	return 0;
 }
-
+//____________________________________________________
 void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *forced)
 {
 	int f;
@@ -823,12 +856,12 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 	last_request = frame;
 
 	/* Get cycle+1 frames starting at the one before the asked-for one. */
-	for (f = 0; f <= cycle; f++)
+	for (f = 0; f <= _param->cycle; f++)
 	{
 		GETFRAME(frame + f - 1, store[f]);
 		storepY[f] = store[f];//->GetReadPtr(PLANAR_Y);
 		hints_invalid = GetHintingData((unsigned char *) storepY[f], &hints[f]);
-		if (quality == 1 || quality == 3)
+		if (_param->quality == 1 || _param->quality == 3)
 		{
 			storepU[f] = UPLANE(store[f]);//->GetReadPtr(PLANAR_U);
 			storepV[f] = VPLANE(store[f]);//->GetReadPtr(PLANAR_V);
@@ -838,7 +871,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
     pitchY = _info.width; //store[0]->GetPitch(PLANAR_Y);
     row_sizeY = _info.width; //store[0]->GetRowSize(PLANAR_Y);
     heightY = _info.height; //store[0]->GetHeight(PLANAR_Y);
-	if (quality == 1 || quality == 3)
+	if (_param->quality == 1 || _param->quality == 3)
 	{
 		pitchUV = _info.width>>1; //store[0]->GetPitch(PLANAR_V);
 		row_sizeUV = _info.width>>1;//store[0]->GetRowSize(PLANAR_V);
@@ -848,13 +881,13 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 #ifdef DECIMATE_MMX_BUILD
 	int old_quality=0;
 	if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
-		old_quality = quality;
-		if (quality < 2)
-			quality += 2;
+		old_quality = _param->quality;
+		if (_param->quality < 2)
+			_param->quality += 2;
 	}
 #endif
 
-	switch (quality)
+	switch (_param->quality)
 	{
 	case 0: // subsample, luma only
 		div = (heightY * row_sizeY / 4) * 219;
@@ -873,7 +906,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 #ifdef DECIMATE_MMX_BUILD
 	if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
 		/* Compare each frame to its predecessor. */
-		for (f = 1; f <= cycle; f++)
+		for (f = 1; f <= _param->cycle; f++)
 		{
 			prevY = storepY[f-1];
 			currY = storepY[f];
@@ -885,7 +918,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 			} else {
 				count[f-1] = isse_scenechange_8(currY, prevY, heightY, row_sizeY, pitchY, pitchY);
 			}
-			if (quality == 3) {
+			if (_param->quality == 3) {
 				prevU = storepU[f-1];
 				prevV = storepV[f-1];
 				currU = storepU[f];
@@ -906,7 +939,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 	} else {
 #endif
 		/* Compare each frame to its predecessor. */
-		for (f = 1; f <= cycle; f++)
+		for (f = 1; f <= _param->cycle; f++)
 		{
 			prevY = storepY[f-1];
 			currY = storepY[f];
@@ -917,7 +950,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 				{
 					count[f-1] += abs((int)currY[x] - (int)prevY[x]);
 					x++;
-					if (quality == 0 || quality == 1)
+					if (_param->quality == 0 || _param->quality == 1)
 					{
 						if (!(x%4)) x += 12;
 					}
@@ -925,7 +958,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 				prevY += pitchY;
 				currY += pitchY;
 			}
-			if (quality == 1 || quality == 3)
+			if (_param->quality == 1 || _param->quality == 3)
 			{
 				prevU = storepU[f-1];
 				prevV = storepV[f-1];
@@ -938,7 +971,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 						count[f-1] += abs((int)currU[x] - (int)prevU[x]);
 						count[f-1] += abs((int)currV[x] - (int)prevV[x]);
 						x++;
-						if (quality == 1)
+						if (_param->quality == 1)
 						{
 							if (!(x%4)) x += 12;
 						}
@@ -966,7 +999,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 		lowest = count[0];
 		lowest_index = 0;
 	}
-	for (x = 1; x < cycle; x++)
+	for (x = 1; x < _param->cycle; x++)
 	{
 		if (count[x] < lowest)
 		{
@@ -975,7 +1008,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 		}
 	}
 	last_result = frame + lowest_index;
-	if (quality == 1 || quality == 3)
+	if (_param->quality == 1 || _param->quality == 3)
 		last_metric = (lowest * 100.0) / div;
 	else
 		last_metric = (lowest * 100.0) / div;
@@ -992,7 +1025,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 		*forced = last_forced = true;
 	}
 }
-
+//____________________________________________________
 void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 {
 	int f, g, fsum, bsum, highest, highest_index;
@@ -1024,17 +1057,17 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 		for (f = 0; f < MAX_CYCLE_SIZE; f++) Dprev[f] = -1;
 		GETFRAME(frame, store[0]);
 		storepY[0] = store[0];//->GetReadPtr(PLANAR_Y);
-		if (quality == 1 || quality == 3)
+		if (_param->quality == 1 || _param->quality == 3)
 		{
 			storepU[0] = UPLANE(store[0]);//->GetReadPtr(PLANAR_U);
 			storepV[0] = VPLANE(store[0]);//->GetReadPtr(PLANAR_V);
 		}
 
-		for (f = 1; f <= cycle; f++)
+		for (f = 1; f <= _param->cycle; f++)
 		{
 			GETFRAME(frame + f - 1, store[f]);
 			storepY[f] = store[f];//->GetReadPtr(PLANAR_Y);
-			if (quality == 1 || quality == 3)
+			if (_param->quality == 1 || _param->quality == 3)
 			{
 				storepU[f] = UPLANE(store[f]);//->GetReadPtr(PLANAR_U);
 				storepV[f] = VPLANE(store[f]);//->GetReadPtr(PLANAR_V);
@@ -1044,13 +1077,13 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 		pitchY = _info.width; //store[0]->GetPitch(PLANAR_Y);
 		row_sizeY = _info.width; //store[0]->GetRowSize(PLANAR_Y);
 		heightY = _info.height; //store[0]->GetHeight(PLANAR_Y);
-		if (quality == 1 || quality == 3)
+		if (_param->quality == 1 || _param->quality == 3)
 		{
 			pitchUV = _info.width>>1; //store[0]->GetPitch(PLANAR_V);
 			row_sizeUV = _info.width>>1; //store[0]->GetRowSize(PLANAR_V);
 			heightUV = _info.height>>1; //store[0]->GetHeight(PLANAR_V);
 		}
-		switch (quality)
+		switch (_param->quality)
 		{
 		case 0: // subsample, luma only
 			div = (BLKSIZE * BLKSIZE / 4) * 219;
@@ -1071,7 +1104,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 		if (heightY % BLKSIZE) yblocks++;
 
 		/* Compare each frame to its predecessor. */
-		for (f = 1; f <= cycle; f++)
+		for (f = 1; f <= _param->cycle; f++)
 		{
 			for (y = 0; y < yblocks; y++)
 			{
@@ -1088,7 +1121,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 				{
 					sum[(y/BLKSIZE)*xblocks+x/BLKSIZE] += abs((int)currY[x] - (int)prevY[x]);
 					x++;
-					if (quality == 0 || quality == 1)
+					if (_param->quality == 0 || _param->quality == 1)
 					{
 						if (!(x%4)) x += 12;
 					}
@@ -1096,7 +1129,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 				prevY += pitchY;
 				currY += pitchY;
 			}
-			if (quality == 1 || quality == 3)
+			if (_param->quality == 1 || _param->quality == 3)
 			{
 				prevU = storepU[f-1];
 				currU = storepU[f];
@@ -1109,7 +1142,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 						sum[((2*y)/BLKSIZE)*xblocks+(2*x)/BLKSIZE] += abs((int)currU[x] - (int)prevU[x]);
 						sum[((2*y)/BLKSIZE)*xblocks+(2*x)/BLKSIZE] += abs((int)currV[x] - (int)prevV[x]);
 						x++;
-						if (quality == 0 || quality == 1)
+						if (_param->quality == 0 || _param->quality == 1)
 						{
 							if (!(x%4)) x += 12;
 						}
@@ -1135,9 +1168,9 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 		}
 
 		Dcurr[0] = 1;
-		for (f = 1; f < cycle; f++)
+		for (f = 1; f < _param->cycle; f++)
 		{
-			if (metrics[f] < threshold2) Dcurr[f] = 0;
+			if (metrics[f] < _param->threshold2) Dcurr[f] = 0;
 			else Dcurr[f] = 1;
 		}
 
@@ -1152,7 +1185,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 	{
 		GETFRAME(num_frames_hi - 1, store[0]);
 		storepY[0] = store[0];//->GetReadPtr(PLANAR_Y);
-		if (quality == 1 || quality == 3)
+		if (_param->quality == 1 || _param->quality == 3)
 		{
 			storepU[0] = UPLANE(store[0]);//->GetReadPtr(PLANAR_U);
 			storepV[0] = VPLANE(store[0]);//->GetReadPtr(PLANAR_V);
@@ -1162,9 +1195,9 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 	}
 	else
 	{
-		GETFRAME(frame + cycle - 1, store[0]);
+		GETFRAME(frame + _param->cycle - 1, store[0]);
 		storepY[0] = store[0];//->GetReadPtr(PLANAR_Y);
-		if (quality == 1 || quality == 3)
+		if (_param->quality == 1 || _param->quality == 3)
 		{
 			storepU[0] = UPLANE(store[0]);//->GetReadPtr(PLANAR_U);
 			storepV[0] = VPLANE(store[0]);//->GetReadPtr(PLANAR_V);
@@ -1175,11 +1208,11 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 	for (f = 0; f < MAX_CYCLE_SIZE; f++) Dshow[f] = Dcurr[f];
 	for (f = 0; f < MAX_CYCLE_SIZE; f++) showmetrics[f] = metrics[f];
 
-	for (f = 1; f <= cycle; f++)
+	for (f = 1; f <= _param->cycle; f++)
 	{
-		GETFRAME(frame + f + cycle - 1, store[f]);
+		GETFRAME(frame + f + _param->cycle - 1, store[f]);
 		storepY[f] = store[f];//->GetReadPtr(PLANAR_Y);
-		if (quality == 1 || quality == 3)
+		if (_param->quality == 1 || _param->quality == 3)
 		{
 			storepU[f] = UPLANE(store[f]);//->GetReadPtr(PLANAR_U);
 			storepV[f] = VPLANE(store[f]);//->GetReadPtr(PLANAR_V);
@@ -1187,7 +1220,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 	}
 
 	/* Compare each frame to its predecessor. */
-	for (f = 1; f <= cycle; f++)
+	for (f = 1; f <= _param->cycle; f++)
 	{
 		prevY = storepY[f-1];
 		currY = storepY[f];
@@ -1204,7 +1237,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 			{
 				sum[(y/BLKSIZE)*xblocks+x/BLKSIZE] += abs((int)currY[x] - (int)prevY[x]);
 				x++;
-				if (quality == 0 || quality == 1)
+				if (_param->quality == 0 || _param->quality == 1)
 				{
 					if (!(x%4)) x += 12;
 				}
@@ -1212,7 +1245,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 			prevY += pitchY;
 			currY += pitchY;
 		}
-		if (quality == 1 || quality == 3)
+		if (_param->quality == 1 || _param->quality == 3)
 		{
 			prevU = storepU[f-1];
 			currU = storepU[f];
@@ -1225,7 +1258,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 					sum[((2*y)/BLKSIZE)*xblocks+(2*x)/BLKSIZE] += abs((int)currU[x] - (int)prevU[x]);
 					sum[((2*y)/BLKSIZE)*xblocks+(2*x)/BLKSIZE] += abs((int)currV[x] - (int)prevV[x]);
 					x++;
-					if (quality == 0 || quality == 1)
+					if (_param->quality == 0 || _param->quality == 1)
 					{
 						if (!(x%4)) x += 12;
 					}
@@ -1262,7 +1295,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 		lowest = metrics[0];
 		lowest_index = 0;
 	}
-	for (f = 1; f < cycle; f++)
+	for (f = 1; f < _param->cycle; f++)
 	{
 		if (metrics[f] < lowest)
 		{
@@ -1271,9 +1304,9 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 		}
 	}
 
-	for (f = 0; f < cycle; f++)
+	for (f = 0; f < _param->cycle; f++)
 	{
-		if (metrics[f] < threshold2) Dnext[f] = 0;
+		if (metrics[f] < _param->threshold2) Dnext[f] = 0;
 		else Dnext[f] = 1;
 	}
 
@@ -1297,7 +1330,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 
 	/* Find the longest strings of duplicates and decimate a frame from it. */
 	highest = -1;
-	for (f = 0; f < cycle; f++)
+	for (f = 0; f < _param->cycle; f++)
 	{
 		if (Dcurr[f] == 1)
 		{
@@ -1318,7 +1351,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 			}
 			if (g < 0)
 			{
-				g = cycle;
+				g = _param->cycle;
 				while (--g >= 0)
 				{
 					if (Dprev[g] == 0)
@@ -1330,7 +1363,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 			}
 			fsum = 1;
 			g = f;
-			while (++g < cycle)
+			while (++g < _param->cycle)
 			{
 				if (Dcurr[g] == 0)
 				{
@@ -1338,10 +1371,10 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 				}
 				else break;
 			}
-			if (g >= cycle)
+			if (g >= _param->cycle)
 			{
 				g = -1;
-				while (++g < cycle)
+				while (++g < _param->cycle)
 				{
 					if (Dnext[g] == 0)
 					{
