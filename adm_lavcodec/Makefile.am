@@ -23,12 +23,6 @@ EXTEND_PPC=ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c ppc/dsputil_altivec.c \
 	ppc/fdct_altivec.c \
 	ppc/mpegvideo_altivec.c
 
-if BUILD_DARWIN
-X_PPC_FLAGS=-maltivec -mabi=altivec	 -faltivec
-else
-X_PPC_FLAGS=-maltivec -mabi=altivec	 
-endif
-
 else
 
 if BUILD_PPC
@@ -112,6 +106,6 @@ libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c \
 EXTRA_DIST = 
 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES = $(all_includes)   -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) $(X_PPC_FLAGS) -O3
+INCLUDES = $(all_includes)   -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3
 noinst_HEADERS =  
 
