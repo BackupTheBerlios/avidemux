@@ -14,6 +14,8 @@
 #include <libxml/parser.h>
 #endif
 
+extern char *PathCanonize(const char *tmpname);
+
 // <prefs_gen>
 typedef enum {
 	UINT,
@@ -670,12 +672,20 @@ const char * preferences::get_str_max(options option){
 #define PRT_LAFI(x,y,z) fprintf(stderr,"Prefs: %s%u %s\n",x,y,(z?z:"NULL"))
 
 int preferences::set_lastfile(const char* file){
+   char *internal_file;
 	if( ! file ){
 		fprintf(stderr,"Prefs: set_lastfile(NULL) called\n");
 		return RC_FAILED;
 	}
+	internal_file = PathCanonize(file);
+	if( !internal_file ){
+		fprintf(stderr,"Prefs: set_lastfile(): PathCanonize() returns NULL\n");
+		return RC_FAILED;
+        }
 #ifdef DEBUG_PREFS
 	fprintf(stderr,"Prefs: set_lastfile(%s)\n",file);
+	if( strcmp(file,internal_file) )
+		fprintf(stderr,"Prefs: set_lastfile(%s) (with appended current dir)\n",internal_file);
 	PRT_LAFI("<= LASTFILES_",1,opt_defs[LASTFILES_FILE1].current_val);
 	PRT_LAFI("<= LASTFILES_",2,opt_defs[LASTFILES_FILE2].current_val);
 	PRT_LAFI("<= LASTFILES_",3,opt_defs[LASTFILES_FILE3].current_val);
@@ -689,25 +699,25 @@ int preferences::set_lastfile(const char* file){
 	// * a call with a file new to lastfiles will drop LASTFILE_4, move all
 	//   one step down and add the file as LASTFILE_1
 	if( opt_defs[LASTFILES_FILE4].current_val &&
-	    !strncmp(opt_defs[LASTFILES_FILE4].current_val,file,strlen(opt_defs[LASTFILES_FILE4].current_val)) ){
+	    !strncmp(opt_defs[LASTFILES_FILE4].current_val,internal_file,strlen(opt_defs[LASTFILES_FILE4].current_val)) ){
 	  char *x = opt_defs[LASTFILES_FILE4].current_val;
 		opt_defs[LASTFILES_FILE4].current_val = opt_defs[LASTFILES_FILE3].current_val;
 		opt_defs[LASTFILES_FILE3].current_val = opt_defs[LASTFILES_FILE2].current_val;
 		opt_defs[LASTFILES_FILE2].current_val = opt_defs[LASTFILES_FILE1].current_val;
 		opt_defs[LASTFILES_FILE1].current_val = x;
 	}else if( opt_defs[LASTFILES_FILE3].current_val &&
-            !strncmp(opt_defs[LASTFILES_FILE3].current_val,file,strlen(opt_defs[LASTFILES_FILE3].current_val)) ){
+            !strncmp(opt_defs[LASTFILES_FILE3].current_val,internal_file,strlen(opt_defs[LASTFILES_FILE3].current_val)) ){
           char *x = opt_defs[LASTFILES_FILE3].current_val;
 		opt_defs[LASTFILES_FILE3].current_val = opt_defs[LASTFILES_FILE2].current_val;
                 opt_defs[LASTFILES_FILE2].current_val = opt_defs[LASTFILES_FILE1].current_val;
                 opt_defs[LASTFILES_FILE1].current_val = x;
         }else if( opt_defs[LASTFILES_FILE2].current_val &&
-            !strncmp(opt_defs[LASTFILES_FILE2].current_val,file,strlen(opt_defs[LASTFILES_FILE2].current_val)) ){
+            !strncmp(opt_defs[LASTFILES_FILE2].current_val,internal_file,strlen(opt_defs[LASTFILES_FILE2].current_val)) ){
           char *x = opt_defs[LASTFILES_FILE2].current_val;
 		opt_defs[LASTFILES_FILE2].current_val = opt_defs[LASTFILES_FILE1].current_val;
 		opt_defs[LASTFILES_FILE1].current_val = x;
 	}else if( opt_defs[LASTFILES_FILE1].current_val &&
-            !strncmp(opt_defs[LASTFILES_FILE1].current_val,file,strlen(opt_defs[LASTFILES_FILE1].current_val)) ){
+            !strncmp(opt_defs[LASTFILES_FILE1].current_val,internal_file,strlen(opt_defs[LASTFILES_FILE1].current_val)) ){
 		; // nothing to do - always on top
 	}else{
 		if( opt_defs[LASTFILES_FILE4].current_val )
@@ -715,7 +725,7 @@ int preferences::set_lastfile(const char* file){
 		opt_defs[LASTFILES_FILE4].current_val = opt_defs[LASTFILES_FILE3].current_val;
 		opt_defs[LASTFILES_FILE3].current_val = opt_defs[LASTFILES_FILE2].current_val;
 		opt_defs[LASTFILES_FILE2].current_val = opt_defs[LASTFILES_FILE1].current_val;
-		opt_defs[LASTFILES_FILE1].current_val = strdup(file);
+		opt_defs[LASTFILES_FILE1].current_val = strdup(internal_file);
 	}
 
 #ifdef USE_LIBXML2
@@ -760,6 +770,7 @@ int preferences::set_lastfile(const char* file){
 	PRT_LAFI("=> LASTFILES_",3,opt_defs[LASTFILES_FILE3].current_val);
 	PRT_LAFI("=> LASTFILES_",4,opt_defs[LASTFILES_FILE4].current_val);
 #endif
+	free(internal_file);
 	return RC_OK;
 }
 

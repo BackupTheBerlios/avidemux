@@ -22,6 +22,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <errno.h>
 
 #include "config.h"
 
@@ -340,6 +341,29 @@ UNUSED_ARG(widget);
     return TRUE;
 }
 
+/*
+** note: it modifies it's first argument
+*/
+void simplify_path(char **buf){
+   unsigned int last1slash = 0;
+   unsigned int last2slash = 0;
+	while( !strncmp(*buf,"/../",4) )
+		memmove(*buf,*buf+3,strlen(*buf+3)+1);
+	for(unsigned int i=0;i<strlen(*buf)-2;i++)
+		while( !strncmp(*buf+i,"/./",3) )
+			memmove(*buf+i,*buf+i+2,strlen(*buf+i+2)+1);
+	for(unsigned int i=0;i<strlen(*buf)-3;i++){
+		if( *(*buf+i) == '/' ){
+			last2slash = last1slash;
+			last1slash = i;
+		}
+		if( !strncmp(*buf+i,"/../",4) ){
+			memmove(*buf+last2slash,*buf+i+3,strlen(*buf+i+3)+1);
+			return simplify_path(buf);
+		}
+	}
+}
+
 //
 //	Make it absolute
 //
@@ -348,27 +372,30 @@ char *PathCanonize(const char *tmpname)
 	char path[300];
 	char *out ;
 
-	getcwd(path,300);
+	if( ! getcwd(path,300) ){
+		fprintf(stderr,"\ngetcwd() failed with: %s (%u)\n",
+		               strerror(errno), errno );
+		path[0] = '\0';
+	}
 	if(!tmpname || tmpname[0]==0)
 	{
 		out=new char [strlen(path)+2];
 		strcpy(out,path);
 		strcat(out,"/");
 		printf("\n Canonizing null string ??? (%s)\n",out);
-		return out;
-	}
-	if(tmpname[0]=='/')
+	}else if(tmpname[0]=='/')
 	{
 		out=new char[strlen(tmpname)+1];
 		strcpy(out,tmpname);
 		return out;
-	}
+	}else{
 		out=new char[strlen(path)+strlen(tmpname)+2];
 		strcpy(out,path);
 		strcat(out,"/");
 		strcat(out,tmpname);
-		return out;
-
+	}
+	simplify_path(&out);
+	return out;
 }
 /*
 	Strip the path and only keep the name

@@ -956,11 +956,19 @@ void A_openAvi2 (char *name, uint8_t mode)
       GUI_Alert ("Problem opening that file!");
       return;
     }
-// remember this file
-  prefs->set_lastfile(name);
-  updateLoaded ();
-  UI_setTitle(name);
-  
+	{ char *longname = PathCanonize(name);
+	  int i;
+		// remember this file
+		prefs->set_lastfile(longname);
+		updateLoaded ();
+		for(i=strlen(longname);i>=0;i--)
+			if( longname[i] == '/' ){
+				i++;
+				break;
+			}
+		UI_setTitle(longname+i);
+		free(longname);
+	}
 }
 
 void  updateLoaded ()
