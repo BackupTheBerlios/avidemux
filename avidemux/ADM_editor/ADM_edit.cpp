@@ -400,11 +400,7 @@ float duration;
       _videos[_nb_video]._aviheader->getAudioStream (&_videos[_nb_video].
 						     _audiostream);
       _videos[_nb_video]._audio_size =_videos[_nb_video]._audiostream->getLength ();
-      duration=_videos[_nb_video]._nb_video_frames;
-      duration/=info.fps1000;
-      duration*=1000;			// duration in seconds
-      duration*=_wavinfo->frequency;  	// In sample
-      _videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
+     
       
 	// For mpeg2, try to guess if it is pulldowned material
 	double duration_a, duration_v;
@@ -435,13 +431,18 @@ float duration;
 			printf("Probably pulldowned, switching to 23.976 \n");
 			 AVIStreamHeader *ily =	_videos[_nb_video]._aviheader->	getVideoStreamHeader ();
       				ily->dwRate = 23976;
-      				ily->dwScale = 1000;			
+      				ily->dwScale = 1000;
+				info.fps1000=23976;	
 		
 		}
 		
 	
 	}
-	
+	duration=_videos[_nb_video]._nb_video_frames;
+	duration/=info.fps1000;
+	duration*=1000;			// duration in seconds
+	duration*=_wavinfo->frequency;  	// In sample
+	_videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
 
     }
 
