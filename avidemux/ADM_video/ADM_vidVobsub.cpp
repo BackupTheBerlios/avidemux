@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <ADM_assert.h>
 
 #include "config.h"
@@ -328,7 +329,7 @@ uint32_t sub;
                 in=src->_bitmap;
                 mask=src->_alphaMask;
                
-                out=data->data;
+                out=data->data+_info.width*src->placeTop;
                 
                 for(uint32_t y=0;y<yy;y++)
                 {
@@ -341,12 +342,16 @@ uint32_t sub;
 #define ACOEF alp
 #define BCOEF (15-alp)                               
 #else
-#define BCOEF alp
+#define BCOEF (alp)
 #define ACOEF (15-alp)                               
 #endif
+                                if(alp) 
+                                {
+                                  if(alp>7)  nw=old*(16-alp-1)+(alp+1)*nw;
+                                        else nw=old*(16-alp)+(alp)*nw;
+                                  out[x]=nw>>4;                                         
+                                }
 
-                               nw=old*(ACOEF)+(BCOEF)*nw;
-                               out[x]=nw>>4;
                                //out[x]=nw;
                         }
                         //memcpy(out,in,len);
@@ -376,9 +381,9 @@ uint8_t ADMVideoVobSub::Palettte2Display( void )
         uint32_t ox,oy;
         uint32_t sx,sy;
         /*
-                Fx, fy : Final size of the image
-                ox,oy  : Original size of the image
-                sx,sy  : Size of the original sub
+                Fx, fy : Final size of the image (i.e size of the current picture)
+                ox,oy  : Original size of the image where the sub is coming from
+                sx,sy  : Size of the  sub
         
                 And we want the final size of the sub
                         + coordinates but that we will do later
@@ -393,6 +398,36 @@ uint8_t ADMVideoVobSub::Palettte2Display( void )
         
         sx=_subW;
         sy=_subH;
+        
+        // Search the 1st/last non null line
+        uint32_t top=0,bottom=0;
+        while(top<oy && !_original->_dirty[top]) top++;
+        
+        bottom=_original->_height-1;
+        while(bottom && !_original->_dirty[bottom]) bottom--;
+        
+        //
+        //  The useful part is between top & bottom lines
+        //
+        
+        // Shrink factor
+        double scale,l;
+        scale=fx;
+        scale/=ox;
+        printf("top %lu : bottom :%lu Scale :%f ox:%lu oy:%lu fx:%lu \n",top,bottom,scale,ox,oy,fx);
+        // Compute the new width/height of the sub
+        // as if it was not cropped, that is the width match, not the height
+        
+        l=scale;
+        l=l*sx;
+        sx=(uint32_t )floor(l);
+        
+        // We only rescale the used part, not the full image
+        //
+        l=scale;
+        l=l*(bottom-top);
+        sy=(uint32_t )floor(l);
+        
 
         /*
                 Simple formula, assume sx ~ ox
@@ -400,7 +435,21 @@ uint8_t ADMVideoVobSub::Palettte2Display( void )
         
         */
         
-        _original->subResize(&_resampled,fx,fy);
+        _original->subResize(&_resampled,sx,sy,top, bottom-top);
+                
+        uint32_t tail;
+        
+        tail=16+sy;
+        
+        if(tail>fy) tail=0;
+        else
+        {
+            tail=fy-tail;           
+        }
+        
+        _resampled->placeTop=tail;
+        
+        
         return 1;
 }
 

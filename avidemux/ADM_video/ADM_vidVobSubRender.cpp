@@ -201,7 +201,7 @@ uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start)
               //memset(ptr,color,run);
               memset(ptr,_colors[color],run);
               memset(alpha,_alpha[color],run);
-              if(run!=stride) _original->_dirty[y]=1;
+              if(run!=stride) _original->_dirty[y*2+start]=1;
               x+=run;
               ptr+=run;
               alpha+=run;
@@ -404,12 +404,18 @@ uint8_t vobSubBitmap::buildYUV( int16_t *palette )
   return 1;
 }
 //***********************************************************
+//
+//      Resample the square beginning at position = oldtop with a height of oldheigh
+//        to a square of size new, newy
+//
 //***********************************************************
-uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy)
+uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy,uint32_t oldtop, uint32_t oldheight)
 {
   int flags=0;
   SwsContext *ctx=NULL;
   int er=0;
+  
+  printf("Sub Resize : top %lu height %lu -> %lu %lu\n",oldtop, oldheight,newx, newy);
   
 #if 0  
 //#ifdef USE_MMX
@@ -432,8 +438,25 @@ uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy)
     *tgt=NULL;
     *tgt=new  vobSubBitmap(newx,newy);    
   }
+  
+  // Need to resize ?
+  if(oldheight==newy && _width==newx)
+  {
+    uint8_t *src,*dst;
+    printf("No need to resize\n");
+    src=_bitmap+oldtop*_width;
+    dst=(*tgt)->_bitmap;
+    memcpy(dst,src,newx*newy); 
+    
+    src=_alphaMask+oldtop*_width;
+    dst=(*tgt)->_alphaMask;
+    memcpy(dst,src,newx*newy); 
+    
+    return 1;    
+  }
+  
   ctx=sws_getContext(
-  _width,_height,
+  _width,oldheight,
   IMGFMT_Y8,
   newx,newy,
   IMGFMT_Y8,
@@ -447,19 +470,18 @@ uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy)
   uint8_t *dst[3];
   int ssrc[3];
   int ddst[3];
-
-  uint32_t page;
+  
 
   //resize bitmap
-  page=_width*_height;
-  src[0]=_bitmap;
+  
+  src[0]=_bitmap+oldtop*_width;
   src[1]=NULL;
   src[2]=NULL;
 
   ssrc[0]=_width;
   ssrc[1]=ssrc[2]=0;
 
-  page=newx*newy;
+  
   dst[0]=(*tgt)->_bitmap;
   dst[1]=NULL;
   dst[2]=NULL;
@@ -467,11 +489,11 @@ uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy)
   ddst[0]=newx;
   ddst[1]=ddst[2]=0;
 
-  er=sws_scale(ctx,src,ssrc,0,_height,dst,ddst);
+  er=sws_scale(ctx,src,ssrc,0,oldheight,dst,ddst);
   printf("Er:%d\n",er);
   
   // And alpha
-  src[0]=_alphaMask;  
+  src[0]=_alphaMask+oldtop*_width;  
   dst[0]=(*tgt)->_alphaMask;
   er=sws_scale(ctx,src,ssrc,0,_height,dst,ddst);
   printf("Er:%d\n",er);

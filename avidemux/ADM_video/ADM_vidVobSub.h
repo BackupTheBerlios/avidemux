@@ -28,7 +28,7 @@ class vobSubBitmap
 {
   public:
         uint32_t                        _width,_height;
-        uint32_t                        top, left;
+        uint32_t                        placeTop, placeHeight;     /// Position of the sub
       
         uint8_t                         *_bitmap;                  /// YUV image
         uint8_t                         *_alphaMask;               /// alpha mask 
@@ -41,7 +41,8 @@ class vobSubBitmap
                                         /// Convert palette bitmap to yuv&mask bitmap
         uint8_t                         buildYUV( int16_t *palette ); 
                                         /// Generate the final bitmap (resized)
-        uint8_t                         subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy);
+        uint8_t                         subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy,
+                                                uint32_t oldtop, uint32_t oldheight);
 };
 //************************************
 class  ADMVideoVobSub:public AVDMGenericVideoStream
