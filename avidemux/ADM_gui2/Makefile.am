@@ -12,3 +12,4 @@ EXTRA_DIST = GUI_main2.cpp support.cpp support.h
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES= $(all_includes) $(GTK_CFLAGS)
+noinst_HEADERS =  GUI_accelRender.h

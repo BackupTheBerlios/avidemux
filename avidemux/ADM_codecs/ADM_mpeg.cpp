@@ -235,6 +235,7 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 		// get it in t, post process it to out
 		if(flag)
 		{
+			*flag=0;
 			//switch(_seen)
 			switch(MPEG2DEC->decoder.coding_type)
 			{
@@ -246,6 +247,10 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 					//assert(0);
 					//return 0;
 					*flag=0;
+			}
+			if(MPEG2DEC->ext_state & PIC_FLAG_PROGRESSIVE_FRAME)
+			{
+				aprintf("Progressive\n");
 			}
 		}
 

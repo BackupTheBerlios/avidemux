@@ -101,7 +101,7 @@ void DIA_properties( void )
 		sprintf(text, "%s ", getStrFromAudioCodec(wavinfo->encoding));
 	     	FILL_ENTRY(label1_audiofourcc);
 		// Duration in seconds too
-		if(currentaudiostream)
+		if(currentaudiostream && wavinfo->byterate>1)
 		{
 			ms2time((currentaudiostream->getLength()*1000)/wavinfo->byterate,
 				 &hh, &mm, &ss, &ms);

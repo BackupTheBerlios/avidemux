@@ -826,7 +826,7 @@ case ACT_Pipe2Other:
 
       	if (DIA_GetFloatValue (&fps, 1., 60., "Change Frame per Second","New FPS ?"))
 	{
-
+	
 	  info.fps1000 = (uint32_t) (floor (fps * 1000.+0.49));
 	  video_body->updateVideoInfo (&info);
 	  // update display

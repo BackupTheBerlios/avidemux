@@ -22,7 +22,7 @@
 #include <string.h>
 #include "config.h"
 
-#ifdef HAVE_LIBXV
+#ifdef USE_XV
 //#define VERBOSE_XV
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -39,9 +39,40 @@
 #include "config.h"
 #include "avi_vars.h"
 #include "ADM_colorspace/colorspace.h"
+#include "ADM_gui2/GUI_render.h"
 
-uint8_t GUI_XvList(Display * dis, uint32_t port, uint32_t * fmt);
+#include "ADM_gui2/GUI_accelRender.h"
+#include "ADM_gui2/GUI_xvDraw.h"
 
+static uint8_t 	GUI_XvList(Display * dis, uint32_t port, uint32_t * fmt);
+static uint8_t 	GUI_XvInit(GtkWidget * window, uint32_t w, uint32_t h);
+static void 	GUI_XvEnd( void );
+static uint8_t 	GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h);
+static uint8_t 	GUI_XvSync(void);
+
+
+//________________Wrapper around Xv_______________
+XvAccelRender::XvAccelRender( void ) 
+{
+
+}
+uint8_t XvAccelRender::init( GtkWidget * window, uint32_t w, uint32_t h)
+{
+	printf("Xv start\n");
+	return  GUI_XvInit( window,  w,  h);
+}
+uint8_t XvAccelRender::end(void)
+{
+	 GUI_XvEnd( );
+	 printf("Xv end\n");
+	 return 1;
+}
+
+uint8_t XvAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h)
+{
+	return GUI_XvDisplay(ptr, w, h);
+}
+//________________Wrapper around Xv_______________
 
 static unsigned int xv_port;
 static uint32_t xv_format;
@@ -55,6 +86,8 @@ static uint8_t GUI_XvExpose( void );
 //
 //	Free all ressources allocated by xv
 //
+
+
 void GUI_XvEnd( void )
 {
 	assert(xv_port);

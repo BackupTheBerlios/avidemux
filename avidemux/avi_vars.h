@@ -32,11 +32,6 @@
 #define EXTERN extern
 #endif
 
-// Check thi sif you want to try to use Xv
-#ifdef HAVE_LIBXV
-	#define USE_XV
-#endif
-
 //
 #define DEBUG
 #define DEBUG_L2
