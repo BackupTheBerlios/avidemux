@@ -53,10 +53,14 @@
 
 #include "ADM_vidVobSub.h"
 
-extern uint8_t DIA_vobsub(char **name, uint32_t *idx);
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_FILTER
+#include "ADM_toolkit/ADM_debug.h"
+
+
+extern uint8_t DIA_vobsub(vobSubParam *param);
 
 static FILTER_PARAM vobsubParam={1,{"subname"}};
-#define aprintf printf
 //*************************************************************
 //
 
@@ -68,7 +72,7 @@ uint8_t ADMVideoVobSub::configure(AVDMGenericVideoStream *in)
 {
 
        
-  if(DIA_vobsub(&(_param->subname),&(_param->index)))
+  if(DIA_vobsub(_param))
        {
                 cleanup();
                 setup();
@@ -104,6 +108,7 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
         {                 
                 GET(subname);
                 GET(index);                               
+                GET(subShift);  
         }
         else
         {
@@ -112,7 +117,8 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
 #else                
                 _param->subname =NULL;
 #endif                
-                _param->index = 0;                
+                _param->index = 0;   
+                _param->subShift=0;             
         }
         
         setup();
@@ -245,11 +251,12 @@ ADMVideoVobSub::~ADMVideoVobSub()
 uint8_t ADMVideoVobSub::getCoupledConf( CONFcouple **couples)
 {
                         ADM_assert(_param);
-                        *couples=new CONFcouple(2);
+                        *couples=new CONFcouple(3);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
                         CSET(subname);
                         CSET(index);
+                        CSET(subShift);
                         
 
                         return 1;
@@ -522,17 +529,23 @@ uint8_t ADMVideoVobSub::Palettte2Display( void )
 //
 uint32_t ADMVideoVobSub::lookupSub(uint64_t time)
 {
+int64_t head,tail, cur;
 int32_t i;
+        cur=(int64_t)time;
         i=0;
         while(i<_vobSubInfo->nbLines-1)
         {
-                if(_vobSubInfo->lines[i].startTime<=time && _vobSubInfo->lines[i].stopTime>time)
+                head=(int64_t)_vobSubInfo->lines[i].startTime;
+                tail=(int64_t) _vobSubInfo->lines[i].stopTime;
+                head+=_param->subShift;
+                tail+=_param->subShift;
+                if(head<=cur &&tail>cur)
                 {
-                        aprintf("Matching for time %llu : sub %lu starting at :%lu\n",
-                                        time,i,_vobSubInfo->lines[i].startTime);
+                  aprintf("Matching for time %llu : sub %lu starting at :%lu (shift %lu)\n",
+                                        time,i,_vobSubInfo->lines[i].startTime,_param->subShift);
                         return i; 
                 }   
-                if(   _vobSubInfo->lines[i].startTime > time) return NOSUB;                   
+                if(head>cur) return NOSUB;                   
                 i++;       
         }
         return NOSUB;

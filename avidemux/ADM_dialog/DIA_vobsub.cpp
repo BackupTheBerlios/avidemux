@@ -38,7 +38,15 @@
 #define CHECK_GET(x,y) {*y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
 #define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),*y);}   
 
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_filter/video_filters.h"
+
+#include "ADM_mpeg2dec/ADM_mpegpacket.h"
+#include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
+
+
 #include "ADM_video/ADM_vobsubinfo.h"
+#include "ADM_video/ADM_vidVobSub.h"
 
 static GtkWidget        *create_dialog1 (void);
 static GtkWidget        **fq;
@@ -46,18 +54,19 @@ static GtkWidget        *dialog;
 
 static void update(char *name,int i);
 
-uint8_t DIA_vobsub(char **name, uint32_t *idx);
-uint8_t DIA_vobsub(char **name, uint32_t *idx)
+uint8_t DIA_vobsub(vobSubParam *param);
+uint8_t DIA_vobsub(vobSubParam *param)
 {
-      
- 
+  char *name=NULL; 
+  int32_t shift;     
   int ret,ext,r;
-
-        
-  
         
   ret=0;
   ext=0;
+  
+  if(param->subname)
+    name=ADM_strdup(param->subname);
+  shift=param->subShift;
   
   while(!ext)
   {
@@ -65,39 +74,51 @@ uint8_t DIA_vobsub(char **name, uint32_t *idx)
     
     gtk_transient(dialog);
     gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonSelect), GTK_RESPONSE_APPLY);
+    
+    
     fq=new GtkWidget*[20];
   
         // Upload if any
-        if(*name)
+        if(name)
         {
-                update(*name,*idx);
+                update(name,param->index);
         }
         else
         {
                 gtk_label_set_text(GTK_LABEL(WID(labelVobsub)),"none");     
         }
+        gtk_write_entry(WID(entryShift),shift);
         r=gtk_dialog_run(GTK_DIALOG(dialog));
-            switch(r)
-            {
+        shift=gtk_read_entry(WID(entryShift));
+        switch(r)
+        {
               case GTK_RESPONSE_APPLY:
               {
                 char *file;
                         GUI_FileSelRead("Select .idx file",&file); 
                         if(file)
                         {
-                          if(*name) ADM_dealloc(*name);
-                          *name=NULL;
-                          *name=ADM_strdup(file); // Leak ?                      
+                          if(name) ADM_dealloc(name);
+                          name=NULL;
+                          name=ADM_strdup(file); // Leak ?                      
                         }                                
               }
                 break;
               case GTK_RESPONSE_OK:
                 ret=1;
                 ext=1;
-                if(*name)
-                        ADM_dealloc(*name);
-                *name=ADM_strdup(gtk_label_get_text(GTK_LABEL(WID(labelVobsub))));
-                *idx=getRangeInMenu(WID(optionmenu1));
+                if(name)
+                {
+                        ADM_dealloc(name);
+                }
+                name=ADM_strdup(gtk_label_get_text(GTK_LABEL(WID(labelVobsub))));
+                if(param->subname)      
+                        ADM_dealloc(param->subname);
+                param->subname=name;                                        
+                //
+                
+                param->index=getRangeInMenu(WID(optionmenu1));
+                param->subShift=shift;
                 break;
               case GTK_RESPONSE_CANCEL:
                 ret=0;
@@ -105,9 +126,9 @@ uint8_t DIA_vobsub(char **name, uint32_t *idx)
                 break;
               default:
                 break;
-            }
-       delete [] fq;          
-       gtk_widget_destroy(dialog);
+        }
+        delete [] fq;          
+        gtk_widget_destroy(dialog);
   
   }
      
@@ -142,22 +163,34 @@ void update(char *name,int idx)
   vobSubDestroyLanguage(lang);
 }
 //*****************************************************
+
 GtkWidget*
     create_dialog1 (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox1;
-  GtkWidget *hbox1;
-  GtkWidget *labelVobsub;
+  GtkWidget *frame1;
+  GtkWidget *table1;
   GtkWidget *buttonSelect;
+  GtkWidget *labelVobsub;
+  GtkWidget *label4;
   GtkWidget *optionmenu1;
+  GtkWidget *label2;
+  GtkWidget *frame2;
+  GtkWidget *table2;
+  GtkWidget *label6;
+  GtkObject *spinbutton1_adj;
+  GtkWidget *spinbutton1;
+  GtkWidget *label7;
+  GtkWidget *entryShift;
+  GtkWidget *label5;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("VobSub settings"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), _("VobSub Settings"));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -166,22 +199,88 @@ GtkWidget*
   gtk_widget_show (vbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
 
-  hbox1 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox1);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, TRUE, TRUE, 0);
+  frame1 = gtk_frame_new (NULL);
+  gtk_widget_show (frame1);
+  gtk_box_pack_start (GTK_BOX (vbox1), frame1, TRUE, TRUE, 0);
 
-  labelVobsub = gtk_label_new (_("label1"));
-  gtk_widget_show (labelVobsub);
-  gtk_box_pack_start (GTK_BOX (hbox1), labelVobsub, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (labelVobsub), GTK_JUSTIFY_LEFT);
+  table1 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_show (table1);
+  gtk_container_add (GTK_CONTAINER (frame1), table1);
 
-  buttonSelect = gtk_button_new_with_mnemonic (_("Select idx"));
+  buttonSelect = gtk_button_new_with_mnemonic (_("Select .idx"));
   gtk_widget_show (buttonSelect);
-  gtk_box_pack_start (GTK_BOX (hbox1), buttonSelect, FALSE, FALSE, 0);
+  gtk_table_attach (GTK_TABLE (table1), buttonSelect, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  labelVobsub = gtk_label_new (_("None"));
+  gtk_widget_show (labelVobsub);
+  gtk_table_attach (GTK_TABLE (table1), labelVobsub, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelVobsub), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelVobsub), 0, 0.5);
+
+  label4 = gtk_label_new (_("Select Language :"));
+  gtk_widget_show (label4);
+  gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
   optionmenu1 = gtk_option_menu_new ();
   gtk_widget_show (optionmenu1);
-  gtk_box_pack_start (GTK_BOX (vbox1), optionmenu1, FALSE, FALSE, 0);
+  gtk_table_attach (GTK_TABLE (table1), optionmenu1, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  label2 = gtk_label_new (_("Select Sub"));
+  gtk_widget_show (label2);
+  gtk_frame_set_label_widget (GTK_FRAME (frame1), label2);
+  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
+
+  frame2 = gtk_frame_new (NULL);
+  gtk_widget_show (frame2);
+  gtk_box_pack_start (GTK_BOX (vbox1), frame2, TRUE, TRUE, 0);
+
+  table2 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_show (table2);
+  gtk_container_add (GTK_CONTAINER (frame2), table2);
+
+  label6 = gtk_label_new (_("Extra Shrink Factor :"));
+  gtk_widget_show (label6);
+  gtk_table_attach (GTK_TABLE (table2), label6, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
+
+  spinbutton1_adj = gtk_adjustment_new (1, 1, 2, 0.1, 0.2, 0.2);
+  spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 0);
+  gtk_widget_show (spinbutton1);
+  gtk_table_attach (GTK_TABLE (table2), spinbutton1, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  label7 = gtk_label_new (_("Shift (ms) :"));
+  gtk_widget_show (label7);
+  gtk_table_attach (GTK_TABLE (table2), label7, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
+
+  entryShift = gtk_entry_new ();
+  gtk_widget_show (entryShift);
+  gtk_table_attach (GTK_TABLE (table2), entryShift, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  label5 = gtk_label_new (_("Extra Settings"));
+  gtk_widget_show (label5);
+  gtk_frame_set_label_widget (GTK_FRAME (frame2), label5);
+  gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -201,10 +300,20 @@ GtkWidget*
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, labelVobsub, "labelVobsub");
+  GLADE_HOOKUP_OBJECT (dialog1, frame1, "frame1");
+  GLADE_HOOKUP_OBJECT (dialog1, table1, "table1");
   GLADE_HOOKUP_OBJECT (dialog1, buttonSelect, "buttonSelect");
+  GLADE_HOOKUP_OBJECT (dialog1, labelVobsub, "labelVobsub");
+  GLADE_HOOKUP_OBJECT (dialog1, label4, "label4");
   GLADE_HOOKUP_OBJECT (dialog1, optionmenu1, "optionmenu1");
+  GLADE_HOOKUP_OBJECT (dialog1, label2, "label2");
+  GLADE_HOOKUP_OBJECT (dialog1, frame2, "frame2");
+  GLADE_HOOKUP_OBJECT (dialog1, table2, "table2");
+  GLADE_HOOKUP_OBJECT (dialog1, label6, "label6");
+  GLADE_HOOKUP_OBJECT (dialog1, spinbutton1, "spinbutton1");
+  GLADE_HOOKUP_OBJECT (dialog1, label7, "label7");
+  GLADE_HOOKUP_OBJECT (dialog1, entryShift, "entryShift");
+  GLADE_HOOKUP_OBJECT (dialog1, label5, "label5");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
@@ -212,5 +321,3 @@ GtkWidget*
   return dialog1;
 }
 
-
-//********

@@ -22,6 +22,7 @@ typedef struct vobSubParam
 {
         char            *subname;
         uint32_t        index;
+        int32_t         subShift;
 }vobSubParam;
 //************************************
 class vobSubBitmap
