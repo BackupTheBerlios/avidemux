@@ -43,10 +43,11 @@ extern "C"
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/ADM_a52info.h"
-#include "ADM_lavformat.h"
+
 #include "ADM_codecs/ADM_codec.h"
+#include "ADM_editor/ADM_Video.h"
 
-
+#include "ADM_lavformat.h"
 
 
 static    AVOutputFormat *fmt;
@@ -65,6 +66,7 @@ lavMuxer::lavMuxer( void )
 	_audioByterate=0;
 	_total=0;
 	_frameNo=0;
+	_running=0;
 }
 //___________________________________________________________________________
 lavMuxer::~lavMuxer()
@@ -72,10 +74,10 @@ lavMuxer::~lavMuxer()
 	close();
 }
 //___________________________________________________________________________
-uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, uint32_t fps1000, WAVHeader *audioheader,float need)
+uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHeader *audioheader,float need)
 {
  AVCodecContext *c;
-	_fps1000=fps1000;
+	_fps1000=info->fps1000;
 	fmt = guess_format("dvd", NULL, NULL);
 	if (!fmt) 
 	{
@@ -104,11 +106,11 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, uint32_t fps1000, WAV
 	c->codec_id = CODEC_ID_MPEG2VIDEO;
 	c->codec_type = CODEC_TYPE_VIDEO;
 	c->flags=CODEC_FLAG_QSCALE;   
-	c->width = 720;  //FIXME
-	c->height = 576; //FIXME
-	c->bit_rate=0;
+	c->width = info->width;  
+	c->height = info->height; 
+	
     
-	if(fps1000==23976 || fps1000==29970)
+	if(_fps1000==23976 || _fps1000==29970)
 	{
 		c->frame_rate = 30000;  
 		c->frame_rate_base = 1001;
@@ -121,6 +123,11 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, uint32_t fps1000, WAV
 	c->gop_size=15;
 	c->max_b_frames=2;
 
+	c->rc_buffer_size=8*1024*224;
+	c->rc_max_rate=9000*1000;
+	c->rc_min_rate=0;
+	c->bit_rate=6000*1000;
+	
 	// Audio
 	//________
 	audio_st = av_new_stream(oc, 1);
@@ -132,16 +139,22 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, uint32_t fps1000, WAV
 
 		
 	c = &audio_st->codec;
-	c->codec_id = CODEC_ID_MP2;
+	if(audioheader->encoding==WAV_AC3)
+		c->codec_id = CODEC_ID_AC3;
+	else
+		c->codec_id = CODEC_ID_MP2;
 	c->codec_type = CODEC_TYPE_AUDIO;
 	
 	c->bit_rate = audioheader->byterate*8;
 	c->sample_rate = audioheader->frequency;
 	c->channels = audioheader->channels;
 	
+	
+	
 //----------------------
 	oc->packet_size=2048;
 	oc->mux_rate=10080*1000;
+	oc->preload=AV_TIME_BASE/10; // 100 ms preloading
 	
 	if (av_set_parameters(oc, NULL) < 0) 
 	{
@@ -159,6 +172,7 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, uint32_t fps1000, WAV
 
 
 	printf("lavformat mpeg muxer initialized\n");
+	_running=1;
 	_audioByterate=audioheader->byterate;
 	return 1;
 }
@@ -172,7 +186,7 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 	
             av_init_packet(&pkt);
 	    
-            pkt.flags |= PKT_FLAG_KEY;
+           // pkt.flags |= PKT_FLAG_KEY;
 	    
 	    f=_total;
 	    f*=1000.*1000.;
@@ -236,10 +250,22 @@ uint8_t lavMuxer::forceRestamp(void)
 //___________________________________________________________________________
 uint8_t lavMuxer::close( void )
 {
+	if(_running)
+	{
+		_running=0;
+		// Flush
+		av_write_trailer(oc);
+		url_fclose(&oc->pb);
+
+	}
 	if(audio_st)
+	{
 		 av_free(audio_st);
+	}
 	if(video_st)
+	{
 		 av_free(video_st);
+	}
 	video_st=NULL;
 	audio_st=NULL;
 	if(oc)
