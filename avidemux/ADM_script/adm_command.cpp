@@ -65,6 +65,23 @@ const ADM_CONTAINER container[]=
 };    
 #define NB_CONT sizeof(container)/sizeof(ADM_CONTAINER)
 
+
+extern uint8_t indexMpeg(char *mpeg,char *file,uint8_t aid);
+int scriptIndexMpeg(int n,Arg *args)
+{
+  char *in,*out;
+  uint32_t aid;
+  
+  aid=args[2].arg.integer;
+  
+  in=args[0].arg.string; 
+  out=args[1].arg.string;
+  
+  return indexMpeg(in,out,aid);
+  
+  
+  
+}
 int scriptOutputFormat(int n, Arg *args)
 {
     const char *str=args[0].arg.string;
