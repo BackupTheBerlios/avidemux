@@ -47,8 +47,13 @@ mParser::~mParser()
 {
 	if(_nbFd)
 	{
+		 for(uint32_t i=0;i<_nbFd;i++)
+	  	 {
+				fclose(_fd[i]);	
+		 }
 		delete [] _fd;
 		delete [] _sizeFd;
+		 
 		
 	}
 	
