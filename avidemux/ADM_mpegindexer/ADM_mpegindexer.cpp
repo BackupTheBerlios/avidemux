@@ -56,6 +56,7 @@
 void mpegToIndex2(char *name);
 void mpegToIndex(char *name)  ;
 //static void mpegPictureScan2(char *name);
+extern uint8_t ADM_TsParse(char *file,uint32_t *nbTrack, uint32_t **token);
 
 uint8_t indexMpeg(char *mpeg,char *file);
 
@@ -78,8 +79,6 @@ static const uint32_t FPS[16]={
 		0			// 15
 	};
 
-static uint8_t tryAudioTrack(char *name,uint8_t id,int32_t *pts);
-static uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitrate);
 
 //static char *outname;
 //static char *inname;
@@ -97,141 +96,6 @@ uint8_t bfe[720*576*2];
 		16+	00..07 -> LPCM audio
 
 */
-uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
-{
-
-    	uint8_t streamid,audiostreamid=0x00;
-	mParser *parser;
-	uint32_t nbAC3=0,nbMpeg=0,nbLPCM=0;
-	int32_t pts;
-	uint8_t token;
-	// clear it before using it. Default = not present.
-	memset(audioTrack,0,sizeof(mpegAudioTrack)*24);
-	printf("audio Id: %x\n",audiostreamid);
-	
-	parser=new mParser();
-
-	
-	if(!parser->open(name))
-		{
-				GUI_Alert("Error reading mpeg !");
-				delete parser;
-				return 0;
-		}
-	
-	parser->sync(&token);
-
-	// first identify stream type (ES/PS)
-	delete parser;
-
-	switch(token)
-		{
-				case 0xb3: // video es
-									// no audio in video es
-									printf("video es, no audio\n");
-									return 0;
-									break;
-				case 0xba : // program stream ?	(vob/mpeg/VCD)
-									break;
-				default:
-								printf("\n unrecognized stream\n");
-								return 0;
-
-		}
-	
-	printf("Program stream");
-	// check for ac3 ,  i.e track 0
-		
-		for(uint32_t i=0;i<8;i++)
-		{			
-			if(tryAudioTrack(name,i,&pts))
-			{
-				printf("AC3 %d is present\n",i);
-				audioTrack[i+8].presence=1;
-				audioTrack[i+8].shift=pts;
-				// Try to get info about it
-				getAudioTrackInfo(name,i, &audioTrack[i+8].channels, 
-								&audioTrack[i+8].bitrate);
-				nbAC3++;
-			}
-			if(tryAudioTrack(name,0xc0+i,&pts))
-			{	
-				printf("Mpeg %d is present \n",i);
-				audioTrack[i].presence=1;
-				audioTrack[i].shift=pts;
-				nbMpeg++;
-			}
-			if(tryAudioTrack(name,0xA0+i,&pts))
-			{
-				printf("LPCM %d is present \n",i);
-				audioTrack[i+16].presence= 1;
-				audioTrack[i+16].shift=pts;
-				nbLPCM++;
-			}
-		}
-		printf("Found %d ac3  tracks\n",nbAC3);
-		printf("Found %d mpg  tracks\n",nbMpeg);
-		printf("Found %d lpcm tracks\n",nbLPCM);
-		if(nbAC3+nbLPCM+nbMpeg==0) 
-			{
-				printf("could not find audio track\n");	
-				return 0;
-			}
-			
-		return 1;
-}
-uint8_t tryAudioTrack(char *name,uint8_t id,int32_t *ptsShift)
-{
-	uint32_t count=0,audio=0;
-	uint8_t streamid;
-	ADM_mpegDemuxer *demuxer;
-
-	demuxer=new ADM_mpegDemuxerProgramStream(0xe0,id);
-	demuxer->open(name);
-
-	while(demuxer->sync(&streamid) && count<1000) count++;
-
-	audio=demuxer->getOtherSize();
-	*ptsShift=demuxer->getPTSDelta();
-	delete demuxer;
-	printf("When trying track : %x, found : %lu bytes\n",id,audio);
-	if(audio > 2000)
-		{
-				return 1; 
-		}
-	return 0;
-}
-
-uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitrate)
-{
-#define AMOUNT 4*1024
-	uint32_t fq=0,syncoff;
-	uint8_t r=0;
-	uint8_t streamid;
-	uint8_t buff[AMOUNT];
-	
-	ADM_mpegDemuxer *demuxer;
-	aprintf("Creating audio demuxer for stream %d\n",id);
-	demuxer=new ADM_mpegDemuxerProgramStream(id,0xe0);
-	demuxer->open(name);
-
-	if(demuxer->read(buff,AMOUNT))	
-	{			
-		if( ADM_AC3GetInfo(buff, AMOUNT, &fq, bitrate,chan,&syncoff)) 
-		{
-			aprintf("**Track %d : Bitrate %lu\n",id,*bitrate);			
-			r=1;
-		}
-	}
-	else
-	{
-		printf("*cannot read track : %d\n",id);
-	}
-	aprintf("/Creating audio demuxer for stream %d\n",id);
-	delete demuxer;
-	return r;
-}
-	
 
 uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 {
@@ -282,7 +146,24 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 		//GUI_Alert("This is mpeg TS, no supported !\n");
 		//return 0;
 		printf("Mpeg TS detected\n");
-		demuxer=new ADM_mpegDemuxerTransportStream(0xe0,audiostreamid);
+		uint32_t apid,vpid;
+		if(! ADM_matchPid(mpeg, audiostreamid,&vpid, &apid))
+		{
+			GUI_Alert("Problem with that file");
+			return 0;
+		}
+		if(!vpid) 
+			{
+				GUI_Alert("No video track found");
+				return 0;
+			}
+		if(!apid)
+		{
+			printf("MMm no matching audio pid found...\n");
+			apid=0xff;
+		}
+		//audiostreamid=apid;
+		demuxer=new ADM_mpegDemuxerTransportStream(vpid,apid);
 		
 	}
 	else
@@ -546,4 +427,58 @@ stop_found:
 	  delete [] realname;
 	  return 1;
 }
+//
+//	Do the translation track id to pid
+//
+uint8_t ADM_matchPid(char *file, uint32_t audioin, uint32_t *Ovidpid, uint32_t *Oaudpid)
+{
+		// in case of mpeg Ts we rescan it to get the proper stream id
+		// we assume the user has done a scan before (...)
+		uint32_t nb,*info;
+		uint32_t vidpid=0,audpid=0;
+		if(!ADM_TsParse(file,&nb,&info))
+		{			
+			return 0;
+		}
+				
+		uint32_t nbvid=0;
+		uint32_t id;
+		uint32_t nbAC3=0,nbMpeg=0;
+		
+		printf("Found %d tracks\n",nb);
+		for(uint32_t i=0;i<nb;i++)
+		{
+			id=info[i]&0xffff;
+			printf("Id:%x\n",id);
+			if(id>=0xc0 && id<=0xcf)
+			{
+				if((nbMpeg==(audioin-0xc0)) && !audpid)
+				{
+					audpid=info[i]>>16;
+				}				
+				nbMpeg++;
+			}
+			else
+			if(id==0xbd) // private stream
+			{
+				if((nbAC3==audioin) && !audpid)
+				{
+					audpid=info[i]>>16;
+				}
+				nbAC3++;
+			}
+			else if(id>=0xE0 && id<=0xEF)
+			{
+				if(!vidpid)
+				{
+					vidpid=info[i]>>16;
+					printf("Video is pid : %x\n",vidpid);
+				}
+				nbvid++;
+			}
+		}
+	*Ovidpid=vidpid;
+	*Oaudpid=audpid;
+	return 1;
 
+}
