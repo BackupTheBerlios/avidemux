@@ -21,18 +21,11 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include "config.h"
 #include <stdio.h>
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-#ifdef __FreeBSD__
-          #include <sys/types.h>
-#endif
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include "config.h"
 #include <math.h>
 
 #include "ADM_library/default.h"
@@ -45,8 +38,9 @@
 #include "ADM_library/fourcc.h"
 #include "ADM_mpegindexer/ADM_mpegparser.h"
 #include "ADM_mpeg2dec/ADM_mpegpacket.h"
+#include "ADM_mpeg2dec/ADM_mpegpacket_TS.h"
 #include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
-//#include "ADM_mpeg2dec/ADM_mpegpacket_TS.h"
+
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
@@ -124,7 +118,7 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 				delete parser;
 				return 0;
 		}
-		
+	
 	parser->sync(&token);
 
 	// first identify stream type (ES/PS)
@@ -279,30 +273,21 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 				return 0;
 		}
 	token=parser->read8i();
-	delete parser;
-	parser=NULL;
+	
 	if(token==0x47)
 	{
+		delete parser;
+		parser=NULL;
 		//demuxer=new ADM_mpegDemuxerTransportStream(0xe0,audiostreamid);;
 		//GUI_Alert("This is mpeg TS, no supported !\n");
 		//return 0;
 		printf("Mpeg TS detected\n");
-		demuxer=  new ADM_mpegDemuxerProgramStream(0xe0,audiostreamid);
+		demuxer=new ADM_mpegDemuxerTransportStream(0xe0,audiostreamid);
+		
 	}
 	else
 	{
-	parser=new mParser();
-
-	printf("audio Id: %x\n",audiostreamid);
-	if(!parser->open(realname))
-		{
-				GUI_Alert("Error reading mpeg !");
-				delete parser;
-				delete [] realname;
-				return 0;
-		}
-	
-
+	parser->setpos(0);	
 	parser->sync(&token);
 
 	// first identify stream type (ES/PS)
@@ -324,6 +309,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 						return 0;	
 		}
 	}
+	
 	// ok now we have it.
 	demuxer->open(realname);
 	out=fopen(file,"wt");
@@ -335,8 +321,17 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 			return 0;
 	}
 	fprintf(out,"IDXM ");
-	if(token==0xb3) fprintf(out,"E XX\n");
-	else   fprintf(out,"P XX\n");
+	switch(token)
+	{
+		case 0xb3: fprintf(out,"E XX\n");break;
+		case 0x47: fprintf(out,"T XX\n");break;
+		case 0xba: fprintf(out,"P XX\n");break;
+		default:
+			printf("Unknown token / mpeg type\n");
+			return 0;
+	}
+	
+	
 	fprintf(out,"000000000000\n");
 	fprintf(out,"1\n");
 	fprintf(out,"%s\n",realname);
@@ -403,6 +398,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 						break;
 					case 0xb8: // GOP
 						//	printf("GOP\n");
+						if(!seq_found) continue;
 						uint32_t gop;	
 						demuxer->forward(3);	
 						gop=demuxer->read8i();
@@ -436,6 +432,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 						uint8_t ftype;
 						uint8_t temporal_ref;
 						
+						if(!seq_found) continue;
 						total_frame++;
 						val=demuxer->read16i();
 						temporal_ref=val>>6;
@@ -520,12 +517,20 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 stop_found:
 //	 	fprintf(out," %d\n\n",demuxer->getSize()-lastPic-4);
 	 	fprintf(out," 0 \n\n");
-       printf("\n end of stream...\n");
-	  // update # of frames
-	    fseek(out,0,SEEK_SET);
-	  	fprintf(out,"IDXM ");
-		if(token==0xb3) fprintf(out,"E %02x\n",audiostreamid);
-			else   fprintf(out,"P %02x\n",audiostreamid);
+		printf("\n end of stream...\n");
+		// update # of frames
+		fseek(out,0,SEEK_SET);
+		fprintf(out,"IDXM ");
+		
+		switch(token)
+		{
+			case 0xb3: fprintf(out,"E %02x\n",audiostreamid);;break;
+			case 0x47: fprintf(out,"T %02x\n",audiostreamid);break;
+			case 0xba: fprintf(out,"P %02x\n",audiostreamid);;break;
+			default:
+				printf("Unknown token / mpeg type\n");
+				return 0;
+		}
 		fprintf(out,"%012lX\n",nb_iframe);
 
 		fclose(out);

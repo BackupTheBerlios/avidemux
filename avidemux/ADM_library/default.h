@@ -16,6 +16,13 @@
  ***************************************************************************/
 #ifndef __ZDEFAULT
 #define __ZDEFAULT
+/*
+   	The maximum width/height is MAXIMUM_SIZE 768*768 for now
+*/
+#define MAXIMUM_SIZE 2048
+
+
+
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #else

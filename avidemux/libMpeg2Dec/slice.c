@@ -152,7 +152,7 @@ static void updateQscale (const mpeg2_decoder_t * decoder)
  y=(decoder->v_offset)>>4;
  q=decoder->qz;
  
- if(x<1 || y<0 || x>64 || y>64 ||decoder->quant_stride>64 )
+ if(x<1 || y<0 || x>120 || y>120 ||decoder->quant_stride>120 ) // 120 -> 1920
  {
  	printf("Ooops\nOOppps\nooops\n(did i say oops ?\n");
 	return;

@@ -75,27 +75,7 @@
 
 
 } ;
-#define TS_PACKET 188
- class mParserTS : public mParser
-{
-	private:
-	 	uint8_t		 bufferTS[TS_PACKET];
-	   	uint32_t	 _tsPos,_tsSize;
-		mParser		*parser;
-		
-		uint8_t  	fillTsBuffer( void );
-	   
-	public:
-			     mParserTS(void);
-			     ~mParserTS();
-	     	
-	     //	virtual uint8_t forward(uint64_t u);
-	      	virtual uint64_t getSize( void ) { return parser->getSize();}
-		virtual uint8_t read32(uint32_t l, uint8_t *buffer);       			
-		virtual uint8_t open(char *name);
-		virtual uint8_t forward(uint64_t u);// { return parser->forward(u);}
-		virtual uint8_t sync(uint8_t *t );
-} ;
+
 typedef struct mpegAudioTrack
 {
 	uint32_t presence;

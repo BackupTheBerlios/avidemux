@@ -5,7 +5,7 @@ INCLUDES = $(all_includes)
 
 libADM_mpegindexer_a_METASOURCES = AUTO
 
-libADM_mpegindexer_a_SOURCES = ADM_mpegparser.cpp ADM_mpegindexer.cpp ADM_mpegparser_TS.cpp
+libADM_mpegindexer_a_SOURCES = ADM_mpegparser.cpp ADM_mpegindexer.cpp
 
 
 EXTRA_DIST = ADM_mpegindexer.cpp ADM_mpegparser.cpp ADM_mpegparser.h 

@@ -41,6 +41,7 @@
 #include "ADM_library/fourcc.h"
 #include "ADM_mpeg2dec/ADM_mpegscan.h"
 #include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
+#include "ADM_mpeg2dec/ADM_mpegpacket_TS.h"
 #include "ADM_mpeg2dec/ADM_mpegAudio.h"
 
 #include "ADM_toolkit/toolkit.hxx"
@@ -121,7 +122,7 @@ uint8_t			mpeg2decHeader::open(char *name)
 		fgets(string,1023,file);   	// File header
 	   	sscanf(string,"IDXM %c",&type);
 	   // not an elementary stream nor program stream -> WTF
-	   	if((type!='E' ) && (type!='P'))
+	   	if((type!='E' ) && (type!='P')&& (type!='T'))
 	   	{
 			printf(" Unknown stream type\n");
 			fclose(file);
@@ -146,6 +147,10 @@ uint8_t			mpeg2decHeader::open(char *name)
 			case 'P':			
 							// video as primary, audio as secondary
 							demuxer=new ADM_mpegDemuxerProgramStream(0xe0,0xc0);
+							break;
+			case 'T':			
+							// video as primary, audio as secondary
+							demuxer=new ADM_mpegDemuxerTransportStream(0xe0,0xc0);
 							break;
 			default: assert(0);
 		}
@@ -229,8 +234,12 @@ uint8_t			mpeg2decHeader::open(char *name)
 			uint32_t firstPic=_indexMpegPTS[0].size;
 			uint8_t *tmp=new uint8_t[firstPic];
 			
-			
 			demuxer->goTo(0);
+			
+			demuxer->_asyncJump(_indexMpegPTS[0].offset,
+                                           _indexMpegPTS[0].absoffset);
+			
+			//demuxer->goTo(_indexMpegPTS[0].absoffset);
 			demuxer->read(tmp,firstPic);
 			_startSeqLen=0;
 			_startSeq=NULL;

@@ -78,10 +78,10 @@ uint8_t isMpeg4Compatible( uint32_t fourcc)
 
     		CHECK("DIVX");
       		CHECK("divx");
-	       CHECK("DX50");
-	       CHECK("xvid");
-	       CHECK("XVID");
-          CHECK("BLZ0");
+	       	CHECK("DX50");
+	       	CHECK("xvid");
+	       	CHECK("XVID");
+          	CHECK("BLZ0");
 
           return divx4;
 
@@ -255,7 +255,7 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
          {
 							printf("\n using Theora codec\n");
 			       	return(decoders *)( new decoderTheora(w,h));
-			    }
+	}
 #else
    if(fourCC::check(fcc,(uint8_t *)"VP31"))
          {
@@ -267,7 +267,7 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 	{         
 		printf("\n using Mpeg1/2 codec (libmpeg2)\n");
 	    	return(decoders *)( new decoderMpeg(w,h,extraLen,extraData));
-	     // 	return(decoders *)( new decoderFFMpeg12(w,h,extraLen,extraData));
+	    //  	return(decoders *)( new decoderFFMpeg12(w,h,extraLen,extraData));
 	}
 
         // default : null decoder

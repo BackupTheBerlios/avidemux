@@ -118,7 +118,10 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
     }
 
   if (				// fixme: put a mask
-       (magic[0] == R32(0xba010000)) || (magic[0] == R32(0xb3010000)))
+       (magic[0] == R32(0xba010000)) || (magic[0] == R32(0xb3010000)) ||
+       ( (id &0xff)==0x47)       
+       
+       )
     {
       printf (" \n Mpeg file detected...\n");
       *type = Mpeg_FileType;

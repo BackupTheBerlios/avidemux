@@ -21,31 +21,21 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-#ifdef __FreeBSD__
-          #include <sys/types.h>
-#endif
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include "config.h"
+
 #include <math.h>
 
 #include "ADM_library/default.h"
-#include "avifmt.h"
-#include "avifmt2.h"
-
-#include "ADM_editor/ADM_Video.h"
-#include "ADM_audio/aviaudio.hxx"
-
-#include "ADM_library/fourcc.h"
-#include "ADM_mpeg2dec/ADM_mpegpacket.h"
-#include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
 
 #include "ADM_mpegindexer/ADM_mpegparser.h"
+
+#include "ADM_mpeg2dec/ADM_mpegpacket.h"
+#include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 
@@ -65,12 +55,13 @@
 #define SYSTEM_END_CODE					0xb9
 static uint64_t _lastSync;
 
+extern void mixDump(uint8_t *ptr,uint32_t len);
 
 //#define PRINT_PTS
 //_______________________________________________________
 //_______________________________________________________
 //_______________________________________________________
-//											Program stream demuxer
+//		Program stream demuxer
 //_______________________________________________________
 //_______________________________________________________
 //_______________________________________________________

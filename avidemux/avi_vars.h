@@ -12,10 +12,7 @@
 
 #define HAVE_ENCODER
 
-/*
-   	The maximum width/height is MAXIMUM_SIZE 768*768 for now
-*/
-#define MAXIMUM_SIZE 768
+
 //----------------------
 //----------------------
 //----------------------
