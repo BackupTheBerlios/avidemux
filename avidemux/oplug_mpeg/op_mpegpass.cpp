@@ -39,8 +39,24 @@
 	Usefull for editing PVR captured files for example
 
 */
-
-
+#define PACK_AUDIO(x) \
+{ \
+	uint32_t samples; \
+	uint32_t fill=0; \
+	total_wanted+=pcm; \
+	while(total_got <total_wanted) \
+	{				\
+		if(!audio->getPacket(buffer+fill, &audiolen, &samples))	\
+		{ \
+			break; \
+		}\
+		fill+=audiolen; \
+		total_got+=audiolen; \
+	} \
+	if(fill) muxer->writeAudioPacket(fill,buffer); \
+	else	printf("PassThrough: frame %lu : no more audio\n",i);\
+}
+#if 0
  #define PACK_AUDIO(x) {\
  			total_wanted+=pcm; \
  			if(muxer->audioEmpty()) \
@@ -49,9 +65,13 @@
  				audiolen=(uint32_t)floor(total_wanted-total_got);\
  			audiolen = audio->read (audiolen,buffer); \
 			total_got+=audiolen; \
-			muxer->writeAudioPacket(audiolen,buffer); }
+			if(audiolen) \
+				muxer->writeAudioPacket(audiolen,buffer); \
+			else \
+				printf("No audio %lu ?\n",i); \
+			}
 			
-    
+#endif 
  uint8_t isMpeg12Compatible(uint32_t fourcc);
  
 void mpeg_passthrough(  char *name )
