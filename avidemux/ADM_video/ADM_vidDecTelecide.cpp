@@ -7,6 +7,7 @@
 
     Port of Donal Graft Telecide which is (c) Donald Graft
     http://www.neuron2.net
+    http://puschpull.org/avisynth/decomb_reference_manual.html
 
  ***************************************************************************/
 /*
@@ -45,6 +46,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include"ADM_video/ADM_vidField.h"
+#include"ADM_video/ADM_vidCached.h"
 
 
 #if 1 || TEST_DECOMB
@@ -63,7 +65,7 @@ char *Telecide::printConf( void )
  	static char buf[50];
 
   	assert(_param); 	
- 	sprintf((char *)buf," decomb ");
+ 	sprintf((char *)buf," Decomb Telecide");
         return buf;
 }
 
@@ -83,52 +85,81 @@ static void BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
 static void DrawString(uint8_t *dst, int x, int y, const char *s);
 static void DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
-Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples)
+Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples) 
 {
 
 		int i;		
 		int count;
 		char *d, *dsaved;
 		unsigned int *p, *x;
+		_lastFrame=0xfffffff0;
 		
+   		
 		_in=in;		
-   		memcpy(&_info,_in->getInfo(),sizeof(_info));  			 	
+   		memcpy(&_info,_in->getInfo(),sizeof(_info));    
   		_info.encoding=1;
-		_info.fps1000=(_info.fps1000*4)/5;
-		_info.nb_frames=(_info.nb_frames*4)/5;
-		lc=lp=fn=fc=fp=NULL;
-		_param=NULL;
+		_uncompressed=NULL;
+		vidCache=new VideoCache(12,in);
+				 	
+  		_info.encoding=1;
+
+		
+		pitch = _info.width;
+		dpitch = _info.width;
+		pitchover2 = pitch >> 1;
+		pitchtimes4 = pitch << 2;
+		w = _info.width;
+		h = _info.height;
+		wover2 = w/2;
+		hover2 = h/2;
+		hplus1over2 = (h+1)/2;
+		hminus2= h - 2;
+		_param=NEW(TelecideParam);
+		if(couples)
+		{
+			GET(order);
+			GET(back);
+			GET(chroma);
+			GET(guide);
+			GET(gthresh);
+			GET(post);
+			GET(vthresh);
+			GET(bthresh);
+			GET(dthresh);
+			GET(blend);
+			GET(nt);
+			GET(y0);
+			GET(y1);
+			GET(hints);
+			GET(show);
+			GET(debug);
+		}
+		else // Default
   		{
-			 	_param=NEW(TelecideParam);
-			 	_param->order = 0; // illegal order value to force user specification
-				_param->back = NO_BACK;
+			 	
+			 	_param->order = 1; 		// 0 Field ok, 1 field reverted 0 BFF/1 TFF
+				_param->back = NO_BACK; // 0 Never, 1 when bad, 2 always tried MUST Have post !=0
 				_param->chroma = false;
-				_param->guide = GUIDE_32;
+				_param->guide = GUIDE_32;// 0 / NONE - 1 GUIDE_32/ivtc-2 GUIDE 22/PAL-3 PAL/NTSC
 				_param->gthresh = 10.0;
 				_param->post = POST_NONE;
 				_param->vthresh = 50.0;
 				_param->bthresh = 50.0;
 				_param->dthresh = 7.0;
 				_param->blend = false;
-				_param->nt = 10;
-				_param->y0 = 0;
+				_param->nt = 10;	// Noise tolerance
+				_param->y0 = 0;		// Zone to try (avoid subs)
 				_param->y1 = 0;
 				_param->hints = true;
 				_param->show = true;
 				_param->debug = true; 
 
 		}
-		
-		 fp=new uint8_t[_info.width*_info.height*2];
-		 fc=new uint8_t[_info.width*_info.height*2];
-		 fn=new uint8_t[_info.width*_info.height*2];
-		 lc=new uint8_t[_info.width*_info.height*2];
-		 lp=new uint8_t[_info.width*_info.height*2];
-		
+				 
 				
 		tff = (_param->order == 0 ? false : true);	
 
-		back_saved = _param->back;
+		_param->back_saved = _param->back;
 
 		// Set up pattern guidance.
 		cache = (struct CACHE_ENTRY *) malloc(CACHE_SIZE * sizeof(struct CACHE_ENTRY));
@@ -156,7 +187,7 @@ Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples)
 
 		// Get needed dynamic storage.
 		vmetric = 0;
-		vthresh_saved = _param->vthresh;
+		_param->vthresh_saved = _param->vthresh;
 		xblocks = (_info.width+BLKSIZE-1) / BLKSIZE;
 		yblocks = (_info.height+BLKSIZE-1) / BLKSIZE;
 #ifdef WINDOWED_MATCH
@@ -172,7 +203,7 @@ Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples)
 
 		
 }
-
+//____________________________________________________________________
 Telecide::~Telecide()
 {
 		unsigned int *p;
@@ -185,14 +216,12 @@ Telecide::~Telecide()
 		if (sump != NULL) free(sump);
 		if (sumc != NULL) free(sumc);
 
-#define RELEASE(x) if(x) { delete [] x;x=NULL;}
-		RELEASE(fn);
-		RELEASE(fc);
-		RELEASE(fp);
-		RELEASE(lc);
-		RELEASE(lp);
+		delete vidCache;
+		vidCache=NULL;
+		
 		
 }
+//____________________________________________________________________
 void Telecide::Show(PVideoFrame &dst, int frame)
 {
 	char use;
@@ -231,7 +260,7 @@ void Telecide::Show(PVideoFrame &dst, int frame)
 		_param->guide != GUIDE_NONE ? status : "");
 	DrawString(dst, 0, 5 + (_param->post != POST_NONE) + (_param->guide != GUIDE_NONE), buf);
 }
-
+//______________________________________________________________
 void Telecide::Debug(int frame)
 {
 	char use;
@@ -252,14 +281,51 @@ void Telecide::Debug(int frame)
 	OutputDebugString(buf);
 }
 
-
+//______________________________________________________________
 uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 				uint8_t *data,uint32_t *flags)
 {
+uint32_t framep,framen;
+uint8_t * fp,* fc, *fn, *dst, *final;
+uint8_t * lc,* lp;
+
+unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
+	unsigned char *fprpU, *fcrpU, *fnrpU;//, *fcrp_savedU
+	unsigned char *fprpV, *fcrpV,  *fnrpV;//*fcrp_savedV
+	unsigned char *dstp, *finalp;
+	unsigned char *dstpU, *dstpV;
+	
+	unsigned char *crp, *prp;
+	unsigned char *crpU, *prpU;
+	unsigned char *crpV, *prpV;
+
+
+	*len=(_info.width*_info.height*5)>>2;
+	
+	
+//	dst = env->NewVideoFrame(vi);
+	dst=data;
 	// Get the current frame.
-	if (frame < 0) frame = 0;
+	
 	if (frame > _info.nb_frames - 1) frame = _info.nb_frames - 1;
-	GETFRAME(frame, fc);
+	
+	framep=framen=frame;
+	if(frame) framep=frame-1;
+	if(frame<_info.nb_frames-1) framen=frame+1;
+	
+	
+	//GETFRAME(pframe, fp);
+	fp=vidCache->getImage(framep);
+	assert(fp);
+	fprp = (unsigned char *) fp;
+	
+	{
+		fprpU = (unsigned char *)  UPLANE(fp);
+		fprpV = (unsigned char *) VPLANE(fp );
+	}
+	
+	fc=vidCache->getImage(frame);
+	assert(fc);
 	fcrp = (unsigned char *) fc;
 	
 	{
@@ -267,39 +333,19 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		fcrpV = (unsigned char *) VPLANE(fc );
 	}
 
-	// Get the previous frame.
-	pframe = frame == 0 ? 0 : frame - 1;
-	GETFRAME(pframe, fp);
-	fprp = (unsigned char *) fp;
-	
-	{
-		fprpU = (unsigned char *)  UPLANE(fp);
-		fprpV = (unsigned char *) VPLANE(fp );
-	}
-
-	// Get the next frame metrics if we might need them.
-	nframe = frame >= _info.nb_frames - 1 ? _info.nb_frames - 1 : frame + 1;
-	GETFRAME(nframe, fn);
+		
+	//GETFRAME(nframe, fn);
+	fn=vidCache->getImage(framen);
+	assert(fn);
 	fnrp = (unsigned char *) fn;
 	
 	{
 		fnrpU = (unsigned char *)  UPLANE(fn);
 		fnrpV = (unsigned char *) VPLANE(fn );
 	}
-
-	pitch = _info.width;
-	pitchover2 = pitch >> 1;
-	pitchtimes4 = pitch << 2;
-	w = _info.width;
-	h = _info.height;
-	wover2 = w/2;
-	hover2 = h/2;
-	hplus1over2 = (h+1)/2;
-	hminus2= h - 2;
-//	dst = env->NewVideoFrame(vi);
-	dst=data;
-	dpitch = _info.width;
-
+/*________________________________________________________________+++ */
+	
+/*________________________________________________________________+++ */
 	// Ensure that the metrics for the frames
 	// after the current frame are in the cache. They will be used for
 	// pattern guidance.
@@ -310,31 +356,38 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			if (y >_info.nb_frames- 1) break;
 			if (CacheQuery(y, &p, &pblock, &c, &cblock) == false)
 			{
-				GETFRAME(y, lc);
-				crp = (unsigned char *) lc;
-				{
-					crpU = (unsigned char *)  UPLANE(lc);
-					crpV = (unsigned char *) VPLANE(lc );
-				}
-				GETFRAME(y == 0 ? 1 : y - 1, lp);
+				
+				
+				//GETFRAME(y == 0 ? 1 : y - 1, lp);
+				lp=vidCache->getImage(y == 0 ? 1 : y - 1);
+				assert(lp);
 				prp = (unsigned char *) lp;
 				{
 					prpU = (unsigned char *)  UPLANE(lp);
 					prpV = (unsigned char *) VPLANE(lp );
 				}
+				//GETFRAME(y, lc);
+				lc=vidCache->getImage(y);
+				assert(lc);
+				crp = (unsigned char *) lc;
+				{
+					crpU = (unsigned char *) UPLANE(lc);
+					crpV = (unsigned char *) VPLANE(lc);
+				}
 				CalculateMetrics(y, crp, crpU, crpV, prp, prpU, prpV);
+				vidCache->unlock(lp);
+				vidCache->unlock(lc);
 			}
 		}
 	}
-
-	/* Check for manual overrides of the field matching. */
+/* Check for manual overrides of the field matching. */
 
 	found = false;
 	film = true;
 	override = false;
 	inpattern = false;
-	_param->vthresh = vthresh_saved;
-	_param->back = back_saved;
+	_param->vthresh = _param->vthresh_saved;
+	_param->back = _param->back_saved;
 	
 
 	// Get the metrics for the current-previous (p), current-current (c), and current-next (n) match
@@ -344,10 +397,10 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		CalculateMetrics(frame, fcrp, fcrpU, fcrpV, fprp, fprpU, fprpV);
 		CacheQuery(frame, &p, &pblock, &c, &cblock);
 	}
-	if (CacheQuery(nframe, &np, &npblock, &nc, &ncblock) == false)
+	if (CacheQuery(framen, &np, &npblock, &nc, &ncblock) == false)
 	{
-		CalculateMetrics(nframe, fnrp, fnrpU, fnrpV, fcrp, fcrpU, fcrpV);
-		CacheQuery(nframe, &np, &npblock, &nc, &ncblock);
+		CalculateMetrics(framen, fnrp, fnrpU, fnrpV, fcrp, fcrpU, fcrpV);
+		CacheQuery(framen, &np, &npblock, &nc, &ncblock);
 	}
 
 	// Determine the best candidate match.
@@ -488,7 +541,7 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			}
 		}
 	}
-	_param->vthresh = vthresh_saved;
+	_param->vthresh = _param->vthresh_saved;
 
 	// Setup strings for debug info.
 	if (inpattern == true && override == false) strcpy(status, "[in-pattern]");
@@ -719,6 +772,8 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			if (_param->show == true) Show(final, frame);
 			if (_param->debug == true) Debug(frame);
 			if (_param->hints == true) WriteHints(final, film, inpattern);
+			
+			vidCache->unlockAll();
 			return 1;
 		}
 
@@ -791,6 +846,7 @@ uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 	if (_param->show == true) Show(dst, frame);
 	if (_param->debug == true) Debug(frame);
 	if (_param->hints == true) WriteHints(dst, film, inpattern);
+	vidCache->unlockAll();
 	return 1;
 }
 
@@ -1102,176 +1158,7 @@ if (frame == 44 && matchc[y * xblocks + x] > 2500)
 	CacheInsert(frame, p, highest_sump, c, highest_sumc);
 #endif
 }
-#if CREATE_FAKE_DEF
-AVSValue __cdecl Telecide::Create_Telecide(AVSValue args, void* user_data, IScriptEnvironment* env)
-{
-	char path[1024], buf[255];
-	char *p;
-	int order = 2; // illegal order value to force user specification
-	int back = NO_BACK;
-	bool chroma = true;
-	int guide = GUIDE_NONE;
-	int gthresh = 10.0;
-	int post = POST_FULL;
-	int vthresh = 50.0;
-	int bthresh = 50.0;
-	int dthresh = 7.0;
-	bool blend = false;
-	int nt = 10;
-	int y0 = 0;
-	int y1 = 0;
-	bool hints = true;
-	bool show = false;
-	bool debug = false;
-	char ovr[255], *ovrp;
-	FILE *f;
 
-	try
-	{
-		const char* plugin_dir = env->GetVar("$PluginDir$").AsString();
-		strcpy(path, plugin_dir);
-		strcat(path, "\\Telecide.def");
-		if ((f = fopen(path, "r")) != NULL)
-		{
-			while(fgets(buf, 80, f) != 0)
-			{
-				if (strncmp(buf, "order=", 6) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					order = atoi(p);
-				}
-				if (strncmp(buf, "back=", 5) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					back = atoi(p);
-				}
-				if (strncmp(buf, "chroma=", 7) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					chroma = (*p == 't' ? true : false);
-				}
-				if (strncmp(buf, "guide=", 6) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					guide = atoi(p);
-				}
-				if (strncmp(buf, "gthresh=", 8) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					gthresh = atof(p);
-				}
-				if (strncmp(buf, "post=", 5) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					post = atoi(p);
-				}
-				if (strncmp(buf, "vthresh=", 8) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					vthresh = atof(p);
-				}
-				if (strncmp(buf, "bthresh=", 8) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					bthresh = atof(p);
-				}
-				if (strncmp(buf, "dthresh=", 8) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					dthresh = atof(p);
-				}
-				if (strncmp(buf, "blend=", 6) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					blend = (*p == 't' ? true : false);
-				}
-				if (strncmp(buf, "nt=", 3) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					nt = atoi(p);
-				}
-				if (strncmp(buf, "y0=", 3) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					y0 = atoi(p);
-				}
-				if (strncmp(buf, "y1=", 3) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					y1 = atoi(p);
-				}
-				if (strncmp(buf, "hints=", 6) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					hints = (*p == 't' ? true : false);
-				}
-				ovrp = ovr;
-				*ovrp = 0;
-				if (strncmp(buf, "ovr=", 4) == 0)
-				{
-					p = buf;
-					while(*p++ != '"');
-					while(*p != '\n' && *p != '\r' && *p != 0 && *p != EOF && *p != '"') *ovrp++ = *p++;
-					*ovrp = 0;
-				}
-				if (strncmp(buf, "show=", 5) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					if (*p == 't') show = true;
-					else show = false;
-				}
-				if (strncmp(buf, "debug=", 6) == 0)
-				{
-					p = buf;
-					while(*p++ != '=');
-					if (*p == 't') debug = true;
-					else debug = false;
-				}
-			}
-			fclose(f);
-		}
-	}
-	catch (...)
-	{
-		// plugin directory not set
-	}
-
-    return new Telecide(args[0].AsClip(),
-						args[1].AsInt(order),		// field order
-						args[2].AsInt(back),		// match mode
-						args[3].AsInt(guide),		// guidance mode
-						args[4].AsFloat(gthresh),	// guidance threshold
-						args[5].AsInt(post),		// postprocessing mode
-						args[6].AsBool(chroma),		// include chroma in match calculations
-						args[7].AsFloat(vthresh),	// film versus video threshold
-						args[8].AsFloat(bthresh),	// backward matching threshold
-						args[9].AsFloat(dthresh),	// deinterlacing threshold
-						args[10].AsBool(blend),		// blend instead of interpolate
-						args[11].AsInt(nt),			// noise threshold
-						args[12].AsInt(y0),			// y0
-						args[13].AsInt(y1),			// y1
-						args[14].AsBool(hints),		// pass hints to Decimate()
-						args[15].AsString(ovr),		// overrides file
-						args[16].AsBool(show),		// overlay debug info on frames
-						args[17].AsBool(debug),		// send debug info to console
-						env);
-}
-#endif
 struct PREDICTION *Telecide::PredictSoftYUY2(int frame)
 	{
 		// Use heuristics to look forward for a match.
@@ -1504,7 +1391,10 @@ void Telecide::PutChosen(int frame, unsigned int chosen)
 
 		f = frame % CACHE_SIZE;
 		if (frame < 0 || frame > _info.nb_frames - 1)
+		{
+			printf("Frame %d is out! (%d)\n",frame,_info.nb_frames-1);
 			assert(0);
+		}
 		if (cache[f].frame != frame)
 		{
 			return false;
@@ -1575,6 +1465,34 @@ void BitBlt(uint8_t* dstp, int dst_pitch, const uint8_t* srcp,
 void DrawString(uint8_t *dst, int x, int y, const char *s)
 {
 	printf("Decomb:%s\n",s);
+}
+
+uint8_t	Telecide::getCoupledConf( CONFcouple **couples)
+{
+
+			assert(_param);
+			*couples=new CONFcouple(16);
+
+#define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
+	CSET(order);
+	CSET(back);
+	CSET(chroma);
+	CSET(guide);
+	CSET(gthresh);
+	CSET(post);
+	CSET(vthresh);
+	CSET(bthresh);
+	CSET(dthresh);
+	CSET(blend);
+	CSET(nt);
+	CSET(y0);
+	CSET(y1);
+	CSET(hints);
+	CSET(show);
+	CSET(debug);
+	
+	return 1;
+
 }
 
 #endif

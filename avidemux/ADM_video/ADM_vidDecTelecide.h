@@ -18,7 +18,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
+#include "ADM_video/ADM_cache.h"
 #undef DEBUG_PATTERN_GUIDANCE
 
 #undef WINDOWED_MATCH
@@ -74,40 +74,17 @@ struct PREDICTION
 	uint32_t len,flags;\
 	GETFRAMEf = (g); \
 	if (GETFRAMEf < 0) GETFRAMEf = 0; \
-	else if (GETFRAMEf > _info.nb_frames) GETFRAMEf = _info.nb_frames - 1; \
-	getFrameNumberNoAlloc(GETFRAMEf, &len, \
+	else if (GETFRAMEf >= _info.nb_frames) GETFRAMEf = _info.nb_frames - 1; \
+	_in->getFrameNumberNoAlloc(GETFRAMEf, &len, \
 				fp,&flags); \
 }
-
-typedef struct TelecideParam
-{
-	int 	order;
-	int 	back;
-	int 	guide;
-	float 	gthresh;
-	int 	post;
-	bool 	chroma;
-	float 	vthresh;
-	float 	bthresh;
-	float 	dthresh;
-	bool 	blend;
-	int 	nt;
-	int 	y0;
-	int 	y1;
-	bool 	hints;
-	bool 	show;
-	bool 	debug;
-};
-
+#include "ADM_video/ADM_vidDecTel_param.h"
 class Telecide : public AVDMGenericVideoStream
 {
 private:
-	TelecideParam *_param;
-		
-	bool tff;
-	
-	float  	vthresh_saved;
-	int 	back_saved;
+	TelecideParam *_param;		
+	bool tff;	
+	uint32_t _lastFrame;	
 	int pitch, dpitch, pitchover2, pitchtimes4;
 	int w, h, wover2, hover2, hplus1over2, hminus2;
 	int xblocks, yblocks;
@@ -120,22 +97,13 @@ private:
 	bool film, override, inpattern, found;
 	int force;
 
-	// Used by field matching.
-	PVideoFrame fp, fc, fn, dst, final;
-	unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
-	unsigned char *fprpU, *fcrpU, *fcrp_savedU, *fnrpU;
-	unsigned char *fprpV, *fcrpV, *fcrp_savedV, *fnrpV;
-	unsigned char *dstp, *finalp;
-	unsigned char *dstpU, *dstpV;
+	
 	int chosen;
 	unsigned int p, c, pblock, cblock, lowest, predicted, predicted_metric;
-	unsigned int np, nc, npblock, ncblock, nframe;
+	unsigned int np, nc, npblock, ncblock;
 	float mismatch;
-	int pframe, x, y;
-	PVideoFrame lc, lp;
-	unsigned char *crp, *prp;
-	unsigned char *crpU, *prpU;
-	unsigned char *crpV, *prpV;
+	int  x, y;
+	
 	bool hard;
 	char status[80];
 
@@ -148,6 +116,8 @@ private:
 
 	// For output message formatting.
 	char buf[255];
+	
+	VideoCache	*vidCache;
 
 public:
 	
@@ -178,4 +148,5 @@ public:
 				uint8_t *data,uint32_t *flags);
 	char *Telecide::printConf( void );
 	uint8_t Telecide::configure(AVDMGenericVideoStream *in);
+	uint8_t	Telecide::getCoupledConf( CONFcouple **couples);
 };
