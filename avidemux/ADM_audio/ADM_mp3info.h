@@ -16,9 +16,11 @@ typedef struct MpegAudioInfo
 	uint32_t size;		// Packet size including header
 	uint32_t samples;	// # of sample in this packet
 	uint32_t protect;	// protected
+        uint32_t privatebit;    // Private bit
 	uint32_t padding;	// Padding slot
 	uint32_t mode;		// 0 /1 : stereo j sterero   10 dual mono 11 single (mono)
-
+        uint32_t lsf;           // Used to compute frame length
+        uint32_t mode_extension;
 }MpegAudioInfo;
 
 uint8_t	getMpegFrameInfo(uint8_t *stream,uint32_t maxSearch, MpegAudioInfo *mpegInfo,MpegAudioInfo *templ,

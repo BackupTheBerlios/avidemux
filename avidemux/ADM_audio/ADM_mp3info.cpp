@@ -76,7 +76,9 @@ uint32_t nfq,fqindex,brindex,index;
 					if(mpegInfo->level==4) mpegInfo->level=3;
 					mpegInfo->protect=(a[1]&1)^1;
 					mpegInfo->padding=(a[2]>>1)&1;
+                                        mpegInfo->privatebit=(a[2]&1);
 					mpegInfo->mode=(a[3])>>6;
+                                        mpegInfo->mode_extension=((a[3])>>4)&3;
 										
 					fqindex=(a[2]>>2)&3;
 					brindex=(a[2]>>4);
@@ -84,6 +86,13 @@ uint32_t nfq,fqindex,brindex,index;
 					// Remove impossible case
 					if(mpegInfo->layer==0) continue;
 					// Check fq
+                                        if((a[1]>>4)&1)
+                                        {
+                                          mpegInfo->lsf=0;                                          
+                                        }
+                                        else
+                                          mpegInfo->lsf=1;
+                                        //
 					switch(mpegInfo->level)
 					{
 						case 1: mpegInfo->samplerate=MP3Fq[fqindex];break;
@@ -158,7 +167,10 @@ uint32_t nfq,fqindex,brindex,index;
 					break;
 				default:
 				//FrameLengthInBytes = 144 * BitRate / SampleRate + Padding
-					mpegInfo->size=(144*mpegInfo->bitrate*1000)/mpegInfo->samplerate;
+                                  uint32_t slot_per_frame;
+                                        if(mpegInfo->layer==3 && mpegInfo->lsf)  slot_per_frame=72; 
+                                                else slot_per_frame=144;
+                                        mpegInfo->size=(slot_per_frame*mpegInfo->bitrate*1000)/mpegInfo->samplerate;
 					mpegInfo->size+=mpegInfo->padding;			
 			}
 			if(*offset)
@@ -166,11 +178,13 @@ uint32_t nfq,fqindex,brindex,index;
 					printf("MP3: Skipped %lu bytes\n",*offset);
 					
 				}
-#if 0			
+#if 0		
 			printf("%02x %02x %02x %02x\n",a[0],a[1],a[2],a[3]);
 			printf("Packet found : at :%d level:%d layer:%d fq:%d bitrate:%d mode:%d\n",
 					start-1,mpegInfo->level,mpegInfo->layer,mpegInfo->samplerate,
 					mpegInfo->bitrate,mpegInfo->mode);
+                        printf("Private :%d cop:%d ext:%d ",mpegInfo->privatebit,
+                               0,mpegInfo->mode_extension);
 			printf("Padd:%lu, crc on:%lu size:%lu\n",mpegInfo->padding,mpegInfo->protect,
 								mpegInfo->size);
 #endif				

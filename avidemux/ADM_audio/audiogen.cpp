@@ -221,6 +221,7 @@ rebranch2:
          	  case 0xfc:
          	  case 0xfd:
    		  case 0xf3:
+                  case 0xf4:
 	     	  case 0xf5:
 		  	// For mpeg1/2 layer 1/2 (svcd/VCD/DVD)
 			// We make some extra check to avoid cutting
@@ -237,13 +238,15 @@ rebranch2:
 			    		return 0;
 				suboffset++;
 				if(b==0xff) goto rebranch2;
+                                a&=0xfd; // ignore padding bit
 				if(c==_mpegSync[0]&& a==_mpegSync[1] && b==_mpegSync[2])
 				{
 					suboffset-=2;
 					goto contact2;
 				}
 				// Failed
-				printf("False header, continuing..\n");
+				printf("False header, continuing..(%x %x %x expected %x %x %x\n",c,a,b,
+                                       _mpegSync[0],_mpegSync[1],_mpegSync[2]);
 				continue;
          		}
 		      goto contact2;
