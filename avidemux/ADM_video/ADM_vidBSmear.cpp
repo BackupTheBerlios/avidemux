@@ -40,17 +40,23 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM cropParam={4,{"left","right","top","bottom"}};
+
+
+SCRIPT_CREATE(bsmear_script,AVDMVideoStreamBSMear,cropParam);
 
 char *AVDMVideoStreamBSMear::printConf( void )
 {
  	static char buf[50];
  	
  	sprintf((char *)buf," Black l:%lu  r:%lu  u:%lu x d:%lu",
- 				_param->cropx,
- 					_param->cropx2,
- 					_param->cropy,
- 					_param->cropy2);
+ 				_param->left,
+ 					_param->right,
+ 					_param->top,
+ 					_param->bottom);
         return buf;
 }
 
@@ -66,16 +72,16 @@ AVDMVideoStreamBSMear::AVDMVideoStreamBSMear(  	AVDMGenericVideoStream *in,CONFc
 		if(couples)
 		{
 			_param=NEW(CROP_PARAMS);
-			GET(cropx);
-			GET(cropx2);
-			GET(cropy);
-			GET(cropy2);
+			GET(left);
+			GET(right);
+			GET(top);
+			GET(bottom);
 		}	
 			else 	
 		{	// default parameter	
 				_param=NEW(CROP_PARAMS);
-				_param->cropx=_param->cropy=
-						_param->cropx2=_param->cropy2=0;
+				_param->left=_param->top=
+						_param->right=_param->bottom=0;
 		}										
  	
   _info.encoding=1;
@@ -90,10 +96,10 @@ uint8_t	AVDMVideoStreamBSMear::getCoupledConf( CONFcouple **couples)
 			*couples=new CONFcouple(4);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
-	CSET(cropx);
-	CSET(cropx2);
-	CSET(cropy);
-	CSET(cropy2);
+	CSET(left);
+	CSET(right);
+	CSET(top);
+	CSET(bottom);
 			return 1;
 
 }
@@ -128,7 +134,7 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
        		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       			
        		  // blacken top
        		  uint8_t *srcY=data;
-       		  uint32_t bytes=_info.width*_param->cropy;
+       		  uint32_t bytes=_info.width*_param->top;
 		  uint32_t page=_info.width*_info.height;
        		
        		  memset(srcY,0x00,bytes);
@@ -138,15 +144,15 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
        		  uint32_t stride=_info.width;
        		  for(uint32_t y=_info.height;y>0;y--)
        		  {
-       		        memset(srcY,0,_param->cropx);
-       		        memset(srcY+stride-_param->cropx2,0,_param->cropx2);       		
+       		        memset(srcY,0,_param->left);
+       		        memset(srcY+stride-_param->right,0,_param->right);       		
        		        srcY+=stride;       		
        		  }
        		
        		  // backen bottom
        		  srcY=data+_info.width*_info.height-1;
        		
-       		 bytes=_info.width*_param->cropy2;
+       		 bytes=_info.width*_param->bottom;
        	 	 srcY-=bytes;
        		 memset(srcY,0x00,bytes);
 		// chroma

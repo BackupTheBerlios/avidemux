@@ -107,6 +107,14 @@ int isse_scenechange_8(const uint8_t *c_plane,const  uint8_t *tplane, int height
 }
 //________________________________
 #include "ADM_vidDecDec_param.h"
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM decdecParam={5,{"cycle","mode","quality","threshold","threshold2"}};
+
+
+
+
 extern uint8_t DIA_getDecombDecimate(DECIMATE_PARAM *param);
 
 #define BLKSIZE 32
@@ -172,6 +180,7 @@ PClip _child, int _cycle, int _mode, double _threshold, double _threshold2,
 GenericVideoFilter(_child), cycle(_cycle), mode(_mode), threshold(_threshold),
 threshold2(_threshold2), quality(_quality), ovr(_ovr), show(_show), debug(_debug)
 */	
+SCRIPT_CREATE(decimate_script,Decimate,decdecParam);
 uint8_t Decimate::configure(AVDMGenericVideoStream *in)
 {
 	_in=in;

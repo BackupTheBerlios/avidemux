@@ -47,7 +47,7 @@ extern "C" {
 
 #include "ADM_video/swscale.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
-
+#include "ADM_filter/video_filters.h"
 
 typedef struct alg
 {
@@ -91,7 +91,10 @@ class  AVDMVideoStreamMPResize:public AVDMGenericVideoStream
 
 
  }     ;
+static FILTER_PARAM mpresizeParam={3,{"w","h","algo"}};
+
 BUILD_CREATE(mpresize_create,AVDMVideoStreamMPResize);
+SCRIPT_CREATE(mpresize_script,AVDMVideoStreamMPResize,mpresizeParam);
 
 extern uint8_t DIA_resize(uint32_t *width,uint32_t *height,uint32_t *algo,uint32_t originalw, uint32_t originalh,uint32_t fps);
 static int getResizeParams(uint32_t * w, uint32_t * h, uint32_t * algo,uint32_t ow,uint32_t oh,uint32_t fps);

@@ -44,7 +44,13 @@
 
 
 //static void decimate(uint8_t *src,uint8_t *target, uint32_t linessrc, uint32_t width);
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM flipParam={0,{""}};
+
+
+SCRIPT_CREATE(mpdetc_script,AVDMVideoMPDetc,flipParam);
 BUILD_CREATE(mpdetc_create,AVDMVideoMPDetc);
 
 

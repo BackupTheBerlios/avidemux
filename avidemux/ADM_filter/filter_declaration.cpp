@@ -37,88 +37,93 @@
 #include "ADM_filter/video_filters.h"
 
 #define FILTERDEC(x) extern   AVDMGenericVideoStream *x(AVDMGenericVideoStream *in, CONFcouple *param)
-#define REGISTER(a,b,c,d) {FILTERDEC(d);registerFilter(a,b,c,d);}
+#define FILTERDECX(x) extern   AVDMGenericVideoStream *x(AVDMGenericVideoStream *in, int n,Arg *args)
+#define REGISTER(e,a,b,c,d) {FILTERDEC(d);registerFilterEx(a,b,c,d,e,NULL);}
+#define REGISTERX(e,a,b,c,d,f) {\
+FILTERDECX(f);\
+FILTERDEC(d);registerFilterEx(a,b,c,d,e,f);\
+}
 
 void registerVideoFilters( void )
 {
 printf("\n Registering Filters\n");
 printf(  "*********************\n");
 
-	registerFilter("---- Image size/border alteration----",VF_INVALID,2,NULL);
-	REGISTER("Crop",VF_CROP,1,crop_create);
-	REGISTER("Resize",VF_RESIZE,1,res_create);
+	registerFilter("---- Image size/border alteration----",VF_INVALID,2,NULL,NULL);
+	REGISTERX("crop","Crop",VF_CROP,1,crop_create,crop_script);
+	REGISTERX("resize","Resize",VF_RESIZE,1,res_create,resize_script);
 
-	REGISTER("Mplayer Resize",VF_MPLAYERRESIZE,1,mpresize_create);
+	REGISTERX("mpresize","Mplayer Resize",VF_MPLAYERRESIZE,1,mpresize_create,mpresize_script);
 
-    	REGISTER("Blacken Borders",VF_BLACKEN,1,bsmear_create);
-  	REGISTER("Add black border",VF_ADDBORDER,1,addBorder_create);
-  	REGISTER("Flip Vertical",VF_FLIP,1,flipv_create);
-	REGISTER("Rotate",VF_ROTATE,1,rotate_create);
-	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL);
+    	REGISTERX("blacken","Blacken Borders",VF_BLACKEN,1,bsmear_create,bsmear_script);
+  	REGISTERX("addblack","Add black border",VF_ADDBORDER,1,addBorder_create,addBorder_script);
+  	REGISTERX("vflip","Flip Vertical",VF_FLIP,1,flipv_create,flipv_script);
+/***/	REGISTER("rotate","Rotate",VF_ROTATE,1,rotate_create);
+	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
-	REGISTER("Mplayer ivtc",VF_MPDETC,1,mpdetc_create);	
-	REGISTER("Decomb telecide",VF_DECOMB,1,decomb_create);
-	REGISTER("Decomb decimate",VF_DECIMATE,1,decimate_create);
+	REGISTERX("mpivtc","Mplayer ivtc",VF_MPDETC,1,mpdetc_create,mpdetc_script);	
+	REGISTERX("telecide","Decomb telecide",VF_DECOMB,1,decomb_create,decomb_script);
+	REGISTERX("decimate","Decomb decimate",VF_DECIMATE,1,decimate_create,decimate_script);
 	
-	REGISTER("PAL-SMART",VF_TELECIDE,1,telecide_create);
-	REGISTER("Deinterlace",VF_DEINTERLACE,1,deinterlace_create);
-	REGISTER("Lavcodec Deinterlacer",VF_LAVDEINT,1,lavdeint_create);
-   	REGISTER("Pal Field shift",VF_PALSHIFT,1,addPALShift_create);
+	REGISTER("palsmart","PAL-SMART",VF_TELECIDE,1,telecide_create);
+	REGISTER("deinterlace","Deinterlace",VF_DEINTERLACE,1,deinterlace_create);
+	REGISTER("lavdeint","Lavcodec Deinterlacer",VF_LAVDEINT,1,lavdeint_create);
+   	REGISTER("palfieldshift","Pal Field shift",VF_PALSHIFT,1,addPALShift_create);
 	
-        REGISTER("Drop",VF_DROPOUT,1,dropout_create);
-	REGISTER("SwapFields",VF_SWAPFIELDS,1,swapfield_create);
-	REGISTER("Smart SwapFields",VF_SMARTSWAPFIELDS,1,swapsmart_create);
+        REGISTER("drop","Drop",VF_DROPOUT,1,dropout_create);
+	REGISTER("swapfields","SwapFields",VF_SWAPFIELDS,1,swapfield_create);
+	REGISTER("smartswapfield","Smart SwapFields",VF_SMARTSWAPFIELDS,1,swapsmart_create);
 
-	REGISTER("Keep even fields",VF_KEEPEVEN,1,keepeven_create);
-	REGISTER("Keep odd fields",VF_KEEPODD,1,keepodd_create);
-	REGISTER("Separate Fields",VF_SEPARATEFIELDS,1,separatefield_create);
-	REGISTER("Merge Fields",VF_MERGEFIELDS,1,mergefield_create);
-	REGISTER("PullDown",VF_PULLDOWN,1,pulldown_create);
+	REGISTER("keepevenfield","Keep even fields",VF_KEEPEVEN,1,keepeven_create);
+	REGISTER("keepoddfield","Keep odd fields",VF_KEEPODD,1,keepodd_create);
+	REGISTER("separatefields","Separate Fields",VF_SEPARATEFIELDS,1,separatefield_create);
+	REGISTER("mergefield","Merge Fields",VF_MERGEFIELDS,1,mergefield_create);
+	REGISTER("pulldown","PullDown",VF_PULLDOWN,1,pulldown_create);
 	
-	REGISTER("D. Graft Kernel deint",VF_KRNDEINT,1,kerneldeint_create);
+	REGISTER("kerneldeint","D. Graft Kernel deint",VF_KRNDEINT,1,kerneldeint_create);
 	
 
-	REGISTER("Partial",VF_PARTIAL,0,partial_create);
-	registerFilter("-------- Convolution Kernel ---------",VF_INVALID,2,NULL);
-	REGISTER("Sharpen",VF_SHARPEN,1,sharpen_create);
-   	REGISTER("Mean",VF_MEAN,1,mean_create);
-   	REGISTER("Median",VF_MEDIAN,1,median_create);
-	REGISTER("Median (5x5)",VF_LARGEMEDIAN,1,largeMedian_create);
-    	REGISTER("Gauss Smooth",VF_GAUSSIAN,1,Gaussian_create);
+	REGISTER("","Partial",VF_PARTIAL,0,partial_create);
+	registerFilter("-------- Convolution Kernel ---------",VF_INVALID,2,NULL,NULL);
+	REGISTER("shartpen","Sharpen",VF_SHARPEN,1,sharpen_create);
+   	REGISTER("mean","Mean",VF_MEAN,1,mean_create);
+   	REGISTER("median","Median",VF_MEDIAN,1,median_create);
+	REGISTER("largemedian","Median (5x5)",VF_LARGEMEDIAN,1,largeMedian_create);
+    	REGISTER("gaussian","Gauss Smooth",VF_GAUSSIAN,1,Gaussian_create);
        	
     //   registerFilter("Temporal smoother",tempsmooth_create);
-	registerFilter("------------ Luma/Chroma ------------",VF_INVALID,2,NULL);
+	registerFilter("------------ Luma/Chroma ------------",VF_INVALID,2,NULL,NULL);
 	      
- 	REGISTER("Swap u & v",VF_SWAPUV,1,swapuv_create);
-	REGISTER("Chroma shift",VF_CHROMASHIFT,1,create_chromashift);
+ 	REGISTER("swapuv","Swap u & v",VF_SWAPUV,1,swapuv_create);
+	REGISTER("chromashift","Chroma shift",VF_CHROMASHIFT,1,create_chromashift);
 
-	REGISTER("Contrast",VF_CONTRAST,1,contrast_create);
+	REGISTER("contrast","Contrast",VF_CONTRAST,1,contrast_create);
 
-	REGISTER("Luma only",VF_LUMA,1,luma_create);
-	REGISTER("Chroma U only",VF_CHROMAU,1,chromaU_create);
-	REGISTER("Chroma V only",VF_CHROMAV,1,chromaV_create);
+	REGISTER("lumaonly","Luma only",VF_LUMA,1,luma_create);
+	REGISTER("chromauonly","Chroma U only",VF_CHROMAU,1,chromaU_create);
+	REGISTER("chromavonly","Chroma V only",VF_CHROMAV,1,chromaV_create);
 		
-	registerFilter("-------------- Smoother -------------",VF_INVALID,2,NULL);
+	registerFilter("-------------- Smoother -------------",VF_INVALID,2,NULL,NULL);
 		
-	REGISTER("Stabilize",VF_STABILIZE,1,stabilize_create);
- 	REGISTER("Denoise",VF_DENOISE,1,denoise_create);
-	REGISTER("FluxSmooth",VF_FLUXSMOOTH,1,fluxsmooth_create);
-    	REGISTER("Smooth Clean",VF_SMOOTHCLEAN,0,smooth_create);
+	REGISTER("stabilize","Stabilize",VF_STABILIZE,1,stabilize_create);
+ 	REGISTER("denoise","Denoise",VF_DENOISE,1,denoise_create);
+	REGISTER("fluxsmooth","FluxSmooth",VF_FLUXSMOOTH,1,fluxsmooth_create);
+    	REGISTER("smoothclean","Smooth Clean",VF_SMOOTHCLEAN,0,smooth_create);
 #ifdef USE_MMX
-    	REGISTER("Temporal Cleaner",VF_VLADSMOOTH,1,vladsmooth_create);
+    	REGISTER("temporalcleaner","Temporal Cleaner",VF_VLADSMOOTH,1,vladsmooth_create);
 #endif
 
-	REGISTER("Mplayer Denoise3D",VF_MPLLQD3D,1,MPD3Dlow_create);
+	REGISTER("mpdenoise3d","Mplayer Denoise3D",VF_MPLLQD3D,1,MPD3Dlow_create);
 
-	REGISTER("Mplayer HQDenoise3D",VF_MPLHQD3D,1,MPD3D_create);
-	REGISTER("Msmooth by Donald Graft",VF_MSMOOTH,1,create_msmooth);
-	REGISTER("Forced PostProcessing",VF_FORCEDPP,1,forcedpp_create);
-	REGISTER("Soften",VF_SOFTEN,1,soften_create);
+	REGISTER("mphqdenoise3d","Mplayer HQDenoise3D",VF_MPLHQD3D,1,MPD3D_create);
+	REGISTERX("msmooth","Msmooth by Donald Graft",VF_MSMOOTH,1,create_msmooth,msmooth_script);
+	REGISTER("forcedpp","Forced PostProcessing",VF_FORCEDPP,1,forcedpp_create);
+	REGISTER("soften","Soften",VF_SOFTEN,1,soften_create);
 #ifdef USE_FREETYPE   
-	registerFilter("----------------- Misc --------------",VF_INVALID,2,NULL);
-	REGISTER("Subtitler",VF_SUBTILE,1,subtitle_create);
+	registerFilter("----------------- Misc --------------",VF_INVALID,2,NULL,NULL);
+	REGISTER("subtitle","Subtitler",VF_SUBTILE,1,subtitle_create);
 #endif
-	REGISTER("Remove Salt",VF_SALT,0,salt_create);
+	REGISTER("","Remove Salt",VF_SALT,0,salt_create);
  printf("\n");
 }		
 

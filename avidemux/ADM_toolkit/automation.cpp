@@ -43,6 +43,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "ADM_filter/vidVCD.h"
+extern void filterListAll(void );
 extern void ADS_commandList( void );
 extern uint8_t loadVideoCodecConf( char *name);
 extern int A_saveJpg (char *name);
@@ -128,7 +129,8 @@ typedef struct AUTOMATON
 
 AUTOMATON reaction_table[]=
 {	
-		{"list",		0,"list functions available for scripting",(one_arg_type)ADS_commandList}, 
+		{"list",		0,"list functions available for scripting",(one_arg_type)ADS_commandList},
+		{"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
 		{"run",			1,"load and run a script",		parseScript},
 		{"audio-process",	0,"activate audio processing",		call_audioproc},
 		{"audio-normalize",	0,"activate normalization",		call_normalize},

@@ -40,8 +40,12 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_resizebis.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
+#include "ADM_filter/video_filters.h"
 
-//BUILD_CREATE(partial_create,ADMVideoPartial);
+
+static FILTER_PARAM mpresizeParam={3,{"w","h","algo"}};
+SCRIPT_CREATE(resize_script,AVDMVideoStreamResize,mpresizeParam);
+BUILD_CREATE(resize_create,AVDMVideoStreamResize);
 
 char *AVDMVideoStreamResize::printConf( void )
 {

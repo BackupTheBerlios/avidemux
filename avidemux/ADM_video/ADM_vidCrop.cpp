@@ -37,8 +37,13 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
+#include "ADM_filter/video_filters.h"
 
 
+static FILTER_PARAM cropParam={4,{"left","right","top","bottom"}};
+
+
+SCRIPT_CREATE(crop_script,AVDMVideoStreamCrop,cropParam);
 
 char *AVDMVideoStreamCrop::printConf( void )
 {
@@ -65,31 +70,31 @@ AVDMVideoStreamCrop::AVDMVideoStreamCrop(
 		if(couples)
 		{
 			_param=	NEW(CROP_PARAMS);
-			GET(cropx);
-			GET(cropx2);
-			GET(cropy);
-			GET(cropy2);
+			GET(left);
+			GET(right);
+			GET(top);
+			GET(bottom);
 				// Consistency check
-				if(  _in->getInfo()->width<(_param->cropx2+_param->cropx))
+				if(  _in->getInfo()->width<(_param->right+_param->left))
 						{
                       		printf("\n Warning Cropping too much width ! Width reseted !\n");
-								_param->cropx2=_param->cropx=0;
+								_param->right=_param->left=0;
 						}
-				if(  _in->getInfo()->height<(_param->cropy2+_param->cropy))
+				if(  _in->getInfo()->height<(_param->bottom+_param->top))
 						{
                       		printf("\n Warning Cropping too much height ! Height reseted !\n");
-								_param->cropy2=_param->cropy=0;
+								_param->bottom=_param->top=0;
 						}
 
-			_info.width=_in->getInfo()->width-_param->cropx2-_param->cropx;		
-			_info.height=_in->getInfo()->height-_param->cropy2-_param->cropy;	
+			_info.width=_in->getInfo()->width-_param->right-_param->left;		
+			_info.height=_in->getInfo()->height-_param->bottom-_param->top;	
 			
 		}	
 			else 			
 		{	// default parameter	
 				_param=	NEW(CROP_PARAMS); ;
-				_param->cropx=_param->cropy=
-				_param->cropx2=_param->cropy2=0;
+				_param->left=_param->top=
+				_param->right=_param->bottom=0;
 		}				
 					
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
@@ -129,7 +134,7 @@ uint8_t AVDMVideoStreamCrop::getFrameNumberNoAlloc(uint32_t frame,
        		y=_in->getInfo()->height;
        		x=_in->getInfo()->width;
        		line=_info.width;
-       		src=_uncompressed+_param->cropy*x+_param->cropx;
+       		src=_uncompressed+_param->top*x+_param->left;
        		dest=data;
        		
        		for(uint32_t k=_info.height;k>0;k--)
@@ -139,7 +144,7 @@ uint8_t AVDMVideoStreamCrop::getFrameNumberNoAlloc(uint32_t frame,
        			 	    dest+=line;
        			}
        		 // Crop U  & V
-       		 	src=_uncompressed+y*x+(x*_param->cropy>>2)+(_param->cropx>>1);
+       		 	src=_uncompressed+y*x+(x*_param->top>>2)+(_param->left>>1);
        		 	src2=src+(x*y>>2);
        		 	line>>=1;
        		 	x>>=1;       		       		 	
@@ -170,10 +175,10 @@ uint8_t	AVDMVideoStreamCrop::getCoupledConf( CONFcouple **couples)
 			*couples=new CONFcouple(4);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
-			CSET(cropx);
-			CSET(cropx2);
-			CSET(cropy);
-			CSET(cropy2);
+			CSET(left);
+			CSET(right);
+			CSET(top);
+			CSET(bottom);
 			return 1;
 
 }

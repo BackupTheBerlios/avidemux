@@ -51,11 +51,11 @@ CROP_PARAMS *par;
 
      	par=_param;
 
-	 if(DIA_4entries((char *)"Add black borders",&par->cropx,&par->cropx2,&par->cropy,&par->cropy2))
+	 if(DIA_4entries((char *)"Add black borders",&par->left,&par->right,&par->top,&par->bottom))
 	 {
 	 		memcpy(&_info,_in->getInfo(),sizeof(_info));
-			_info.width+=_param->cropx2+_param->cropx;
-			_info.height+=_param->cropy2+_param->cropy;
+			_info.width+=_param->right+_param->left;
+			_info.height+=_param->bottom+_param->top;
 	 }
 	return 1;
 

@@ -2,7 +2,8 @@
 	Type used by scanner
 
 */
-
+#ifndef ADMSCANNER
+#define ADMSCANNER
 typedef enum 
 {
 	APM_NUM,
@@ -40,6 +41,7 @@ typedef struct Arg
 	ArgI	 arg;
 
 };
-#define MAXPARAM 20
+#define MAXPARAM 40
+#endif
 //END
 

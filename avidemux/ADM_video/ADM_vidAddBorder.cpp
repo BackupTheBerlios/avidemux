@@ -33,7 +33,13 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidAddBorder.h"
 #include "ADM_video/ADM_vidCommonFilter.h"
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM cropParam={4,{"left","right","top","bottom"}};
+
+
+SCRIPT_CREATE(addBorder_script,AVDMVideoAddBorder,cropParam);
 BUILD_CREATE(addBorder_create,AVDMVideoAddBorder);
 
 char *AVDMVideoAddBorder::printConf( void )
@@ -59,18 +65,18 @@ AVDMVideoAddBorder::AVDMVideoAddBorder(  AVDMGenericVideoStream *in,CONFcouple *
 
 			 _param=NEW(CROP_PARAMS);
 
-				GET(cropx);
-				GET(cropx2);
-				GET(cropy);
-				GET(cropy2);
-				_info.width+=_param->cropx2+_param->cropx;
-				_info.height+=_param->cropy2+_param->cropy;
+				GET(left);
+				GET(right);
+				GET(top);
+				GET(bottom);
+				_info.width+=_param->right+_param->left;
+				_info.height+=_param->bottom+_param->top;
 		}	
 			else 			
 		{	// default parameter	
 				_param=NEW(CROP_PARAMS);
-				_param->cropx=_param->cropy=
-				_param->cropx2=_param->cropy2=0;
+				_param->left=_param->top=
+				_param->right=_param->bottom=0;
 		}				
 					
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
@@ -91,12 +97,12 @@ AVDMVideoAddBorder::AVDMVideoAddBorder(  AVDMGenericVideoStream *in,uint32_t x,u
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
 
 				_param=NEW(CROP_PARAMS);
-				_param->cropx=x;
-				_param->cropy=y;
-				_param->cropx2=x2;
-				_param->cropy2=y2;
-	_info.width+=_param->cropx2+_param->cropx;
-	_info.height+=_param->cropy2+_param->cropy;
+				_param->left=x;
+				_param->top=y;
+				_param->right=x2;
+				_param->bottom=y2;
+	_info.width+=_param->right+_param->left;
+	_info.height+=_param->bottom+_param->top;
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
  	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
   assert(_uncompressed);
@@ -112,10 +118,10 @@ uint8_t	AVDMVideoAddBorder::getCoupledConf( CONFcouple **couples)
 			*couples=new CONFcouple(4);
 
 
-	CSET(cropx);
-	CSET(cropx2);
-	CSET(cropy);
-	CSET(cropy2);
+	CSET(left);
+	CSET(right);
+	CSET(top);
+	CSET(bottom);
 			return 1;
 
 }
@@ -156,7 +162,7 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
        		line=x;
 				lineout=_info.width;
        		src=_uncompressed;
-       		dest=data+_param->cropx+_info.width*_param->cropy;
+       		dest=data+_param->left+_info.width*_param->top;
        		
        		for(uint32_t k=y;k>0;k--)
        			{
@@ -172,7 +178,7 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
        		 	src_v=src_u+(x*y>>2);
        		 	line>>=1;
        		 	lineout>>=1;       		       		 	
-					dst_u= data+_info.width*_info.height+(_info.width*_param->cropy>>2)+(_param->cropx>>1);;
+					dst_u= data+_info.width*_info.height+(_info.width*_param->top>>2)+(_param->left>>1);;
 					dst_v= dst_u+(_info.width*_info.height>>2);
 
        		 		for(uint32_t k=y>>1;k>0;k--)

@@ -79,11 +79,11 @@ int i;
 	if(!i)
 		{
 			printf("Parsing successfull\n");
-			exit(0); ;
+	//		exit(0); ;
 		}
 	
 	
-	exit(-1) ;
+	//exit(-1) ;
 }
 //______________________________
 void yyerror(const char *str)

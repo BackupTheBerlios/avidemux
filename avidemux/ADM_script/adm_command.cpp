@@ -28,6 +28,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encConfig.h"
+#include "ADM_filter/video_filters.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_SCRIPT
@@ -36,61 +37,71 @@
 
 //_________________________
 
-int scriptLoad(Arg *args);
-int scriptExit(Arg *args);
-int scriptAppend(Arg *args);
-int scriptAudioProcess(Arg *args);
-int scriptVideoProcess(Arg *args);
+int scriptLoad(int n,Arg *args);
+int scriptExit(int n,Arg *args);
+int scriptAppend(int n,Arg *args);
+int scriptAudioProcess(int n,Arg *args);
+int scriptVideoProcess(int n,Arg *args);
 
-int scriptAudioDownsample(Arg *args);
-int scriptAudioResample(Arg *args);
-int scriptAudioNormalize(Arg *args);
+int scriptAudioDownsample(int n,Arg *args);
+int scriptAudioResample(int n,Arg *args);
+int scriptAudioNormalize(int n,Arg *args);
 
-int scriptLoadAudio(Arg *args);
-int scriptSaveAudio(Arg *args);
-int scriptGoto(Arg *args);
+int scriptLoadAudio(int n,Arg *args);
+int scriptSaveAudio(int n,Arg *args);
+int scriptGoto(int n,Arg *args);
 
-int scriptSetFps(Arg *args);
+int scriptSetFps(int n,Arg *args);
 
-int scriptSleep(Arg *args);
-int scriptSetMarkerA(Arg *args);
-int scriptSetMarkerB(Arg *args);
-int scriptScanVbr(Arg *args);
-int scriptAudioDelay(Arg *args);
-int scriptFilm2Pal(Arg *args);
-int scriptAudioCodec(Arg *args);
-int scriptLoadCodec(Arg *args);
-int scriptSavejpeg(Arg *args);
-int scriptRaw(Arg *args);
-int scriptSave(Arg *args);
-int scriptSaveDVD(Arg *args);
-int scriptVideoCodec(Arg *args);
-int scriptVideoCodec2(Arg *args);
-int scriptSave(Arg *args);
-int scriptLoadFilter(Arg *args);
-
+int scriptSleep(int n,Arg *args);
+int scriptSetMarkerA(int n,Arg *args);
+int scriptSetMarkerB(int n,Arg *args);
+int scriptScanVbr(int n,Arg *args);
+int scriptAudioDelay(int n,Arg *args);
+int scriptFilm2Pal(int n,Arg *args);
+int scriptAudioCodec(int n,Arg *args);
+int scriptLoadCodec(int n,Arg *args);
+int scriptSavejpeg(int n,Arg *args);
+int scriptRaw(int n,Arg *args);
+int scriptSave(int n,Arg *args);
+int scriptSaveDVD(int n,Arg *args);
+int scriptVideoCodec(int n,Arg *args);
+int scriptVideoCodec2(int n,Arg *args);
+int scriptSave(int n,Arg *args);
+int scriptLoadFilter(int n,Arg *args);
+int scriptAddVideoFilter(int n,Arg *args);
 extern void HandleAction(Action act);
 //_________________________
 #include "adm_command.h" 
 void ADS_commandList( void );
 ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg,uint8_t fake);
 //_______________________
-
+extern VF_FILTERS 	filterGetTagFromName(char *inname);
+int scriptAddVideoFilter(int n,Arg *args)
+{
+VF_FILTERS filter;
+		filter=filterGetTagFromName(args[0].arg.string);
+		if(filter==VF_DUMMY) return 0;
+		printf("Filter tag :%d\n",filter);
+		return (filterAddScript(filter,n,args));
+		
+}
+//_______________________
 extern int filterLoadXml(char *docname,uint8_t silent);
-int scriptLoadFilter(Arg *args)
+int scriptLoadFilter(int n,Arg *args)
 {
 	return filterLoadXml(args[0].arg.string,0);
 }
 
 //_______________________
 extern int A_Save (char *name);
-int scriptSave(Arg *args)
+int scriptSave(int n,Arg *args)
 {
 	return A_Save(args[0].arg.string);
 }
 //_______________________
 
-int scriptVideoCodec(Arg *args)
+int scriptVideoCodec(int n,Arg *args)
 {
 char *codec,*conf;
 	codec=args[0].arg.string;
@@ -109,35 +120,33 @@ char *codec,*conf;
 	return 1;
 }
 extern uint8_t loadVideoCodecConf( char *name);
-int scriptVideoCodec2(Arg *args)
+int scriptVideoCodec2(int n,Arg *args)
 {
-
-	
 	// Load codec specific file
 	if(! loadVideoCodecConf( args[2].arg.string)) return 0;
-	return scriptVideoCodec(args);
+	return scriptVideoCodec(n,args);
 
 }
 //_______________________
 extern int A_saveDVDPS(char *name);
-int scriptSaveDVD(Arg *args)
+int scriptSaveDVD(int n,Arg *args)
 {
 	return A_saveDVDPS(args[0].arg.string);
 }
 //_______________________
 extern int ADM_saveRaw (char *name);
-int scriptRaw(Arg *args)
+int scriptRaw(int n,Arg *args)
 {
 	return ADM_saveRaw(args[0].arg.string);
 }
 //_______________________
 extern int A_saveJpg (char *name);
-int scriptSavejpeg(Arg *args)
+int scriptSavejpeg(int n,Arg *args)
 {
 	return A_saveJpg(args[0].arg.string);
 }
 //_______________________
-int scriptAudioCodec(Arg *args)
+int scriptAudioCodec(int n,Arg *args)
 {
 char *name=args[0].arg.string;
 	LowerCase(name);
@@ -149,29 +158,29 @@ char *name=args[0].arg.string;
 }
 //_______________________
 extern uint8_t loadVideoCodecConf( char *name);
-int scriptLoadCodec(Arg *args)
+int scriptLoadCodec(int n,Arg *args)
 {
 	return loadVideoCodecConf(args[0].arg.string);
 }
 //_______________________
-int scriptFilm2Pal(Arg *args)
+int scriptFilm2Pal(int n,Arg *args)
 {
 	return audioFilterFilm2Pal(args[0].arg.integer);
 }
 //_________Sleep in ms________________
-int scriptAudioDelay(Arg *args)
+int scriptAudioDelay(int n,Arg *args)
 {
 		return audioFilterDelay(args[0].arg.integer);				
 }
 //_________Sleep in ms________________
-int scriptScanVbr(Arg *args)
+int scriptScanVbr(int n,Arg *args)
 {
 	HandleAction(ACT_AudioMap);
 	return 1;
 
 }
 //_________Sleep in ms________________
-int scriptSetMarkerA(Arg *args)
+int scriptSetMarkerA(int n,Arg *args)
 {
 int	f=args[0].arg.integer;
 	
@@ -188,7 +197,7 @@ int	f=args[0].arg.integer;
 
 }
 //_________Sleep in ms________________
-int scriptSetMarkerB(Arg *args)
+int scriptSetMarkerB(int n,Arg *args)
 {
 int	f=args[0].arg.integer;
 	
@@ -206,7 +215,7 @@ int	f=args[0].arg.integer;
 }
 
 //_________Sleep in ms________________
-int scriptSetFps(Arg *args)
+int scriptSetFps(int n,Arg *args)
 {
 	float fps;
 	aviInfo info;
@@ -226,7 +235,7 @@ int scriptSetFps(Arg *args)
 }
 
 //_________Sleep in s________________
-int scriptSleep(Arg *args)
+int scriptSleep(int n,Arg *args)
 {
 	usleep(args[0].arg.integer*1000);
 	return 1;
@@ -234,7 +243,7 @@ int scriptSleep(Arg *args)
 }
 //________________________________________________
 extern int A_audioSave(char *name);
-int scriptSaveAudio(Arg *args)
+int scriptSaveAudio(int n,Arg *args)
 {
 	return A_audioSave(args[0].arg.string);
 }
@@ -242,7 +251,7 @@ int scriptSaveAudio(Arg *args)
 extern int GUI_loadMP3(char *name);
 extern int A_loadAC3(char *name);
 extern int A_loadWave(char *name);
-int scriptLoadAudio(Arg *args)
+int scriptLoadAudio(int n,Arg *args)
 {	
 	char *type=args[0].arg.string;
 	
@@ -265,40 +274,40 @@ int scriptLoadAudio(Arg *args)
 	return 0;
 }
 //________________________________________________
-int scriptAudioProcess(Arg *args)
+int scriptAudioProcess(int n,Arg *args)
 {	
 	UI_setAProcessToggleStatus( args[0].arg.integer );
 	return 1;
 }
 //________________________________________________
 extern int GUI_GoToFrame(uint32_t frame);
-int scriptGoto(Arg *args)
+int scriptGoto(int n,Arg *args)
 {	
 	if( args[0].arg.integer<0) return 0;
 	return GUI_GoToFrame( args[0].arg.integer );
 	
 }
 //________________________________________________
-int scriptVideoProcess(Arg *args)
+int scriptVideoProcess(int n,Arg *args)
 {	
 	UI_setVProcessToggleStatus( args[0].arg.integer );
 	return 1;
 }
 //________________________________________________
-int scriptAudioNormalize(Arg *args)
+int scriptAudioNormalize(int n,Arg *args)
 {	
 	audioFilterNormalize(1);
 	return 1;
 }
 //________________________________________________
-int scriptAudioDownsample(Arg *args)
+int scriptAudioDownsample(int n,Arg *args)
 {	
 	audioFilterDownsample( args[0].arg.integer );
 	return 1;
 }
 	
 	//________________________________________________
-int scriptAudioResample(Arg *args)
+int scriptAudioResample(int n,Arg *args)
 {	
 	audioFilterResample( args[0].arg.integer );
 	return 1;
@@ -307,19 +316,19 @@ int scriptAudioResample(Arg *args)
 //________________________________________________
 extern uint8_t addFile(char *name);
 extern int A_openAvi2 (char *name, uint8_t mode);
-int scriptAppend(Arg *args)
+int scriptAppend(int n,Arg *args)
 {
 	return A_openAvi2 (args[0].arg.string,0);
 	
 }
 //________________________________________________
 
-int scriptLoad(Arg *args)
+int scriptLoad(int n,Arg *args)
 {	
 	return A_openAvi2 (args[0].arg.string,0);
 }
 //________________________________________________
-int scriptExit(Arg *args)
+int scriptExit(int n,Arg *args)
 {
 	exit(0);
 	return 1;
@@ -337,7 +346,7 @@ ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg,uint8_t fake)
 {
 int found=-1;
 int candidate=-1;
-	assert(nb<MAXPRM);
+	assert(nb<MAXPARAM);
 	// First go to lowercase
 	LowerCase(cmd);
 	// 1- lookup the command
@@ -347,10 +356,21 @@ int candidate=-1;
 		if(!strcmp(cmd,myCommands[i].command))
 		{
 			candidate=i;
-			if(nb==myCommands[i].nbArgs)
+			if(myCommands[i].nbArgs>=0x100)
 			{
-				found=i;
-				break;
+				if(nb>=(myCommands[i].nbArgs&0xff))
+				{
+					found=i;
+					break;
+				}
+			}
+			else
+			{
+				if(nb==myCommands[i].nbArgs)
+				{
+					found=i;
+					break;
+				}
 			}
 			
 		}
@@ -364,7 +384,15 @@ int candidate=-1;
 	}	
 	// 3- check parameters type
 	//_________________________
-	for(int i=0;i<nb;i++)
+	uint32_t check;
+	check=myCommands[found].nbArgs;
+	if(check>0x100)
+	{
+		check=check & 0xff;
+	}
+	else
+		check=nb;
+	for(int i=0;i<check;i++)
 	{
 		if(arg[i].type!=myCommands[found].args[i])
 		{
@@ -376,7 +404,7 @@ int candidate=-1;
 	//___________________________	
 	if(fake)
 		return ASC_OK;
-	if( myCommands[found].func(arg))
+	if( myCommands[found].func(nb,arg))
 		return ASC_OK;
 	else
 		return ASC_EXEC_FAILED;

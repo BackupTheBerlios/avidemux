@@ -63,15 +63,15 @@ uint8_t *video1;
 						
 		par=_param;
 		
-    	 	switch(DIA_getCropParams("Crop Settings",&par->cropx,&par->cropx2,&par->cropy,&par->cropy2,
+    	 	switch(DIA_getCropParams("Crop Settings",&par->left,&par->right,&par->top,&par->bottom,
      							w,h,(uint8_t *)video1 ))
 		{
 			case 0:
 		      		printf("cancelled\n");
 				break;
 			case 1:
-				_info.width=_in->getInfo()->width-_param->cropx-_param->cropx2;
-				_info.height=_in->getInfo()->height-_param->cropy-_param->cropy2;
+				_info.width=_in->getInfo()->width-_param->left-_param->right;
+				_info.height=_in->getInfo()->height-_param->top-_param->bottom;
 				ret=1;
 				break;
 			default:

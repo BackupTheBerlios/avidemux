@@ -91,7 +91,9 @@ typedef enum gui_act
   A_SAVE,
   A_PREVIEW,
   A_PARTIAL,
-  A_DOUBLECLICK
+  A_SCRIPT,
+  A_DOUBLECLICK,
+  
 };
 
 //___________________________________________
@@ -146,6 +148,7 @@ getLastVideoFilter(); // expand video to full size
 	CALLME(buttonPreview	,A_PREVIEW);
 	CALLME(buttonPartial	,A_PARTIAL);
 	CALLME(buttonHaldD1	,A_HALFD1);
+	CALLME(buttonScript	,A_SCRIPT);
 	// Add double click
 	gtk_signal_connect (GTK_OBJECT (lookup_widget(dialog,"treeview1")),
 				"row-activated", 
@@ -186,6 +189,9 @@ dummy=(int)user_data;
 
   switch (action)
 	    {
+	    case A_SCRIPT:
+	    		GUI_FileSelWrite ("Save as script", filterSaveScript);
+	    		break;
 	    case A_DOUBLECLICK:
 	    		printf("Double clicked..");
 			break;

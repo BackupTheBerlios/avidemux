@@ -10,16 +10,18 @@
 //
 //
 
-#define MAXPRM 10
-typedef int (*dummy_func)(Arg *args);
+
+typedef int (*dummy_func)(int n,Arg *args);
 typedef struct admCommand
 {
 	char 		*command;
 	dummy_func	func;
 	uint32_t	nbArgs;
-	APM_TYPE	args[MAXPRM];	// 10 params should be enough
+	APM_TYPE	args[MAXPARAM];	// 10 params should be enough
 };
 // All comment must be in lower case!
+// A number of param > 0x100 means variable, at least yy with value = yy+0x100
+// For video, we need at least one : The video filter name
 static const admCommand myCommands[]=
 {
 	
@@ -62,6 +64,8 @@ static const admCommand myCommands[]=
 	
 	{"setmarkera",		scriptSetMarkerA,1,APM_NUM},
 	{"setmarkerb",		scriptSetMarkerB,1,APM_NUM},
+	
+	{"addvideofilter",	scriptAddVideoFilter,0x101,APM_STRING},
 	
 	{"exit", 		scriptExit,0}
 };

@@ -76,14 +76,70 @@ void filterCleanUp( void )
    nb_active_filter=0;
    preview=NULL;
 }
-void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable,
-		AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *))
+void filterListAll( void )
+{
+char *name;
+	printf("\n Video filters\n");
+	for(uint32_t i=0;i<nb_video_filter;i++)
+	{
+		name=allfilters[ i].filtername;
+		if(allfilters[ i].viewable)
+		{
+			if(name)
+				printf("\t%s\n",name);
+		}
+	}
+
+}
+VF_FILTERS filterGetTagFromName(char *inname)
+{
+char *name;
+	VF_FILTERS filter=VF_DUMMY;
+	for(uint32_t i=0;i<nb_video_filter;i++)
+	{
+		name=allfilters[ i].filtername;
+		if(allfilters[ i].viewable)
+		{
+			if(name)
+			{
+				if(strlen(name))
+				{
+					if(!strcasecmp(name,inname))
+						return allfilters[ i].tag; 
+				}
+			}
+		}
+	}
+	return filter;
+}
+void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable
+		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
+		,char *filtername)
 {
         assert(nb_video_filter<(MAX_FILTER-1));
         allfilters[ nb_video_filter].name=name;
         allfilters[ nb_video_filter].create=create;
         allfilters[ nb_video_filter].tag=tag;
         allfilters[ nb_video_filter].viewable=viewable;
+	allfilters[ nb_video_filter].filtername=filtername;
+        nb_video_filter ++;
+
+        if(viewable==1)
+	{
+        	aprintf("\n Registred filter %lu: %s",nb_video_filter,name);
+	}
+}
+void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
+		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
+		,char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args))
+{
+        assert(nb_video_filter<(MAX_FILTER-1));
+        allfilters[ nb_video_filter].name=name;
+        allfilters[ nb_video_filter].create=create;
+        allfilters[ nb_video_filter].tag=tag;
+        allfilters[ nb_video_filter].viewable=viewable;
+	allfilters[ nb_video_filter].filtername=filtername;
+	allfilters[ nb_video_filter].create_from_script=create_from_script;
         nb_video_filter ++;
 
         if(viewable==1)
@@ -278,3 +334,133 @@ void editorUpdatePreview(uint32_t framenum)
 //          																				uint8_t *data,uint32_t *flags)=0;
 
 }
+//______________________________________________________
+// Check and build a confCouple from the args
+// the filter_param arg is a template for that filter
+//______________________________________________________
+CONFcouple *filterBuildCouple(FILTER_PARAM *param,uint32_t nb,Arg *args)
+{
+int found,l;
+int trans[MAXPARAM];
+	if(nb!=param->nb)
+	{
+		printf("# of parameters mismatch\n");
+		return NULL;
+	}
+	// For each param check we are ok
+	// the generic form is name=value
+	// name should be the same as in the param array
+	for(int i=0;i<nb;i++)
+	{
+		l=strlen(param->param[i]);
+		assert(l);
+		found=-1;
+		for(int j=0;j<nb;j++)
+		{
+			if(!strncasecmp(param->param[i],args[j].arg.string,l))
+			{
+				if(strlen(args[j].arg.string)>l+1 && args[j].arg.string[l]=='=')
+				{
+					found=j;
+					trans[i]=j;
+					break;
+				}
+			}
+		}
+		if(found==-1)
+		{	
+			printf("Param : %s not found or incorrect\n",param->param[i]);
+			 return NULL;
+		}
+	}
+	// if we get here, it means we found each param, time to build the couples
+	CONFcouple *couple;
+	couple=new CONFcouple(nb);
+	for(int i=0;i<nb;i++)
+	{
+		l=strlen(param->param[i]);
+		if(!couple->setCouple(param->param[i],args[ trans[i]].arg.string+l+1))
+			{
+				printf("Set couple failed\n");
+				delete couple;
+				return NULL;
+			}
+	}
+	return couple;
+}
+uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
+{
+	// 1- searc filter
+	int found=-1;
+	aviInfo info;
+
+	video_body->getVideoInfo(&info);
+
+	for(unsigned int i=0;i<nb_video_filter;i++)
+	{
+		if(tag==allfilters[i].tag)
+		{
+			if(nb_active_filter<1)
+			{
+  		 		nb_active_filter=1;
+  		 		videofilters[0].filter=  new AVDMVideoStreamNull(video_body,0,info.nb_frames);	
+			}
+			AVDMGenericVideoStream *filter=NULL;
+			CONFcouple *setup=NULL;
+			if(!allfilters[i].create_from_script)
+			{
+				printf("That filter cannot be created from script\n");
+				return 0;
+			}
+			filter=allfilters[i].create_from_script(videofilters[0].filter,n-1,&(args[1]));
+			if(!filter) return 0;
+			videofilters[nb_active_filter].filter=filter;
+			videofilters[nb_active_filter].tag=tag;						
+			filter->getCoupledConf(&setup);
+			videofilters[nb_active_filter].conf=setup;
+			nb_active_filter++;
+			return 1;
+		}
+	}
+	printf("Tag not found\n");
+	return 0;
+}
+// Save the current filter list as a script sample
+//
+void filterSaveScript(char *name)
+{
+FILE *f;
+
+		f=fopen(name,"wt");
+		if(!f)
+		{ 	GUI_Alert("Cannot write file!");
+			return;
+		}
+		for(int i=1;i<nb_active_filter;i++)
+		{
+			VF_FILTERS tag=videofilters[i].tag;
+			fprintf(f,"AddVideoFilter(");
+			for(unsigned int j=0;j<nb_video_filter;j++)
+				{
+					if(tag==allfilters[j].tag)
+					{	
+						fprintf(f,allfilters[j].filtername);
+						break;	
+					}
+				}
+			// get args
+			CONFcouple *couple;
+			char *arg,*value;
+			assert(videofilters[i].filter->getCoupledConf( &couple));
+			for(int j=0;j<couple->getNumber();j++)
+			{
+				 couple->getEntry(j, &arg,&value);
+				 fprintf(f,",%s=%s",arg,value);
+			}
+			delete couple;
+			fprintf(f,");\n");			
+		
+		}
+		fclose(f);
+}		
+// EOF

@@ -64,8 +64,8 @@ typedef struct
 
 typedef struct
 {
- 	uint32_t cropx,cropx2;
- 	uint32_t cropy,cropy2;
+ 	uint32_t left,right;
+ 	uint32_t top,bottom;
 }CROP_PARAMS;
 
 typedef struct {
@@ -177,6 +177,21 @@ class  AVDMVideoStreamRaw :public AVDMGenericVideoStream
 #define CREATOR(x,clss)  return new clss(in,x);
 #define BUILD_CREATE(name,clss) AVDMGenericVideoStream *name(AVDMGenericVideoStream *in, CONFcouple *conf) \
 {		CREATOR(conf,clss); }
+
+#define SCRIPT_CREATE(name,clss,tmplate) \
+AVDMGenericVideoStream *name (AVDMGenericVideoStream *in, int n,Arg *args); \
+AVDMGenericVideoStream *name (AVDMGenericVideoStream *in, int n,Arg *args) \
+{ 							\
+CONFcouple		*couple; 			\
+AVDMGenericVideoStream *filter; 			\
+	couple=filterBuildCouple(&tmplate,n,args);	\
+	if(!couple) { printf("Filter built failed\n");return NULL;}\
+	filter= new clss(in,couple);			\
+	delete couple;					\
+	return filter;					\
+}
+
+
 
 #define GET(x) assert(couples->getCouple((char *)#x,&(_param->x)))
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))

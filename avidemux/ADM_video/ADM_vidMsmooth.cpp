@@ -51,7 +51,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "ADM_toolkit/ADM_cpuCap.h"
-
+#include "ADM_filter/video_filters.h"
 #ifdef HAVE_ALTIVEC_H
 #include "altivec.h"
 #endif
@@ -113,7 +113,10 @@ public:
 };
 
 BUILD_CREATE(create_msmooth,Msmooth);
+static FILTER_PARAM msmoothParam={4,{"showmask", "highq","threshold", "strength"}};
 
+
+SCRIPT_CREATE(msmooth_script,Msmooth,msmoothParam);
 //_______________________________________________
 
 Msmooth::Msmooth(AVDMGenericVideoStream *in,CONFcouple *couples)

@@ -33,6 +33,13 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidFlipV.h"
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM flipParam={0,{""}};
+
+
+SCRIPT_CREATE(flipv_script,ADMVideoFlipV,flipParam);
 BUILD_CREATE(flipv_create,ADMVideoFlipV);
  
 

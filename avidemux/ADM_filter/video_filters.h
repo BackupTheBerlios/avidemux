@@ -18,7 +18,7 @@
  #define  __VIDEO_FILTERS__
 
  #define MAX_FILTER 60
-
+#include "ADM_script/adm_scanner.h"
  	typedef enum
  	{
 		VF_INVALID=0,
@@ -78,7 +78,9 @@
        		const char 		*name;
 		AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *);
 		VF_FILTERS 	tag;
-		uint8_t		viewable;	
+		uint8_t		viewable;
+		char		*filtername;
+		AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args);	
    }FILTER_ENTRY;
  	
  typedef struct
@@ -88,6 +90,13 @@
 		CONFcouple				*conf;
 
    }FILTER; 	
+   
+   typedef struct
+   {
+   		uint32_t nb;
+		char 	*param[20];
+   }FILTER_PARAM;
+   
   AVDMGenericVideoStream *getLastVideoFilter( uint32_t frameStart, uint32_t nbFrame);
     AVDMGenericVideoStream *getLastVideoFilter( void );
  AVDMGenericVideoStream *getFirstVideoFilter( uint32_t frameStart, uint32_t nbFrame);
@@ -102,10 +111,16 @@ int  filterLoadXml(char *name,uint8_t silent);
  void filterLoad(char *name);
  int filterLoad(char *name,uint8_t silent);
  void filterSave(char *name,uint8_t silent);
-
+CONFcouple *filterBuildCouple(FILTER_PARAM *param,uint32_t n,Arg *args);
+void filterSaveScript(char *name);
 void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable,
-		AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *));
-
+			AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *),char *fname);
+void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
+		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
+		,char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args));
+void 		filterListAll( void );
+VF_FILTERS 	filterGetTagFromName(char *inname);
+uint8_t 	filterAddScript(VF_FILTERS tags,uint32_t n,Arg *args);
 //AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,uint8_t *conf, AVDMGenericVideoStream *in) ;
 
  #endif

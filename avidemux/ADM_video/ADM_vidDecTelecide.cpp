@@ -54,9 +54,14 @@
 
 #if 1 || TEST_DECOMB
 #include "ADM_vidDecTelecide.h"
-
+#include "ADM_filter/video_filters.h"
+static FILTER_PARAM decomb_template={16,{"order","back","guide",
+	 	 	"gthresh","post","chroma","vthresh",
+			"bthresh","dthresh","blend",
+			"nt","y0","y1","hints",
+			"show","debug"}};
 BUILD_CREATE(decomb_create,Telecide);
-
+SCRIPT_CREATE(decomb_script,Telecide,decomb_template);
 extern uint8_t DIA_getDecombTelecide(TelecideParam *param);
 
 uint8_t Telecide::configure(AVDMGenericVideoStream *in)
