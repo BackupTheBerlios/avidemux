@@ -80,6 +80,8 @@ uint8_t isMpeg4Compatible( uint32_t fourcc)
 
     uint8_t divx4=0;
 
+    		CHECK("FMP4");
+    		CHECK("fmp4");
     		CHECK("DIVX");
       		CHECK("divx");
 	       	CHECK("DX50");
