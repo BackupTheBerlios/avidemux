@@ -1,16 +1,120 @@
      ************************ TODO****************************
 	Todo :
 						
-			+ Rebuild all audio @ editor level
-			+ Fix smart copy with B-frame support			
-
+			
+			+ Fix smart copy with B-frame support	
 			+ Fix memory leak induced by raw shift<<<===			
 			
 			
 		ALTIVEC
 			
-												
+	
+	
+		Audio API : 	Grab returns MINUS_ONE when cannot read anymore
+				Read returns 0
+				getPacket returns 0
        *********************** /TODO ***************************
+       03/11/03
+       		- Correct header when encoding mp3 VBR
+		- fix round up for timeshift on wave
+       02/11/04
+       		- cleaned up rawshift*
+		- fixed wav packetizer going empty
+       01/11/04
+       		- handle reordering in ogm
+		- fixed fresh packet bit in ogm header
+		- fixed timestamps in ogm header
+		- avoid scratch at startup of vorbis track
+		- 
+       30/10/04
+       		- fixed vop not coded + xvid for unpacker
+		- mp3 vbr fixed
+       29/10/04
+       		- removed the -msse when mmx is on (DUH!)
+		- masquerade as dx50 change divx****p to divx****n in user data segment
+		- fixed raw copy of vorbis in ogm (with limitations)
+		
+       28/10/04
+       		- try to pass through vorbis . Raw copy is ok, need to add timeseek capability
+		- support for wma, playback is screwy
+       27/10/04
+       		- fixed bad start stream bit for ogm
+		- fixed \ vs / on win32
+       26/10/04
+       		- crocodil enhanced bitrate calculator
+       		- unpacker : update user data field
+		- scan deeper for  B frmes
+		- Jens : autoindex for nuv
+		- Jens : gcc fix for ffv1
+		
+       ----------------2.0.32-------------------------
+       19/10/04
+       		- rotate bug
+		- amd64 cpu asm code resynced with ffmpeg
+		- all mmx cpu does not compile nicely with -msse
+		- altivec x1 ok
+		- divx unpacker skeleton
+       18/10/04
+       		- reverted to regular horizX1 for altivec
+		- fixed a bug in normalize + save as DVD PS
+       17/10/04
+       		- X1postproc altivec : VertX1 ok, horizX1 not ok
+       16/10/04 - null pointer crash protection (C Clayton)
+       		- fixed faac/faad
+		- pcm bug
+       -------------2.0.30----------------------
+       13/10/04
+       		- fixed bad memcpy in crop and contrast
+		- Jens : --autoidx
+		- packetizer for ulaw & LPCM
+       11/10/04
+       		- Began to merge x86 code compatible with both 32&64 bits
+       10/10/04
+       		- Fix read error with vbr map + mp3
+		- Display also avg bitrate + returns it in calculator
+       09/10/04
+       		- fixed avi audio so that they don't wrap around
+		- use packet even for read
+		- video codecs menu not hardcoded anymore
+		- began to do calculator
+       06/10/04
+       		- fixed display filter after partial save
+       03/10/04
+       		- fixed audio api for ogm
+		- incomplete header for ogm
+		- fixed vorbis reading
+       02/10/04
+       		- began to fix seeking/reading for ogm
+		- fixed 1st timestamp of header too high
+		- fixed ac3 packetizer
+		- fixed seeking in ogm for non vorbis stream
+		
+       01/10/04
+       		- Fixed vbv header when using external 2 pass encoding (hint from Janne Grunau)
+       30/09/04
+       		- more PPC stuff
+		- fix bug in ogg muxer 
+		- Mitja Vodopivec : Support for interlaced DVD (ffmpeg)
+		- Janne Grunau : Fix in buffer size 
+       25/09/04
+       		- more altivec/macOs
+		- accept xvid 4.1 as xvid 4.0
+       24/09/04
+       		- fixed macOsX / altivec libtoolization
+		- black frame
+		- fixed display of audio size (ogm)
+		- pad with silence end of ogm (ogm)
+       21/09/04
+       		- began libtoolization of libavcodec
+       20/09/04
+       		- unified 16 bytes aligned  alloc/Free
+		- fixed free/delete mixup
+		- works on ibookG4 / debian
+       19/09/04
+       		- same encoding for xvid
+       18/09/04
+       		- same encoding
+		- fixed overflow in save audio in processed mode
        16/09/04
        		- vorbis : fixed header/comment/codebook writing
 		- vorbis : muxing in ogm ok, nice overhead though
