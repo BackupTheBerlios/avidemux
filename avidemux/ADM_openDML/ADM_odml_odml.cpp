@@ -67,7 +67,11 @@ typedef struct OPENML_SECONDARY_INDEX
 	uint32_t	chunkId;
 	uint64_t	base;
 	uint32_t	reserver;
-};
+}
+#ifdef CYG_MANGLING
+__attribute__ ((packed))
+#endif
+;
 
 /*
 	Try to index if it is/was an openDML file
