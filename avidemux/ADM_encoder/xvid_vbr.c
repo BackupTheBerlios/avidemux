@@ -568,6 +568,7 @@ static int vbr_init_2pass1(void *sstate)
 	if(state->filename == NULL || state->filename[0] == '\0')
 		return(-1);
 
+	printf("XvidVBR: initialized with file :%s, pass 1\n",state->filename);
 	/* Initialize safe defaults for 2pass 1 */ 
 	state->pass1_file = NULL;
 	state->nb_frames = 0;
@@ -728,6 +729,7 @@ static int vbr_init_2pass2(void *sstate)
 	if((f = fopen(state->filename, "r")) == NULL)
 		return(-1);
 
+	printf("XvidVBR: initialized with file :%s, pass 2\n",state->filename);
 	state->pass1_file = f;
 
 	/* Get the file version and check against current version */
@@ -877,8 +879,8 @@ _AGAIN_:
 
 	/*-----------------------------------------------------------------------------------------*/
 		printf("__________________\n");
-		printf("desired size : %lld\n",state->desired_size);
-		printf("pass1   size :  %lld\n",total_bytes);
+		printf("desired size : %09lld\n",state->desired_size);
+		printf("pass1   size : %09lld\n",total_bytes);
 		printf("__________________\n");
 	// 3- lookup cap
 /*-----------------------------------------------------------------------------------
@@ -900,9 +902,10 @@ _AGAIN_:
 		{		
 		vbr_make_variance(state,i,&var,&bitrate);
 		out_bitrate[i]=bitrate;
-		printf("out bit: %d\n",out_bitrate[i]);
+		printf("Qz : %d Size: %d Ratio:%f\n",i,out_bitrate[i],(float)out_bitrate[i]/(float)state->desired_bitrate);
 		}
 		// search best match
+		// 20% margin
 		index=0;
 		error=30*1000*1000;
 		
@@ -915,7 +918,7 @@ _AGAIN_:
 				index=i;
 			}	
 		}
-		printf("Best match found : Quantizer = %d\n",index);
+		printf("Best match found : Quantizer scale = %d\n",index);
 		if(index)
 		{
 			vbr_make_clipping(state,index);
@@ -1578,6 +1581,7 @@ static int vbr_getquant_2pass2(void *sstate)
 		}
 	// now we look ahead the 12 next frames assuming we will encode them
 	// with the same quantizer
+	
 	if((state->qinc<2)&& (state->cur_frame < (state->nb_frames-13)))
 	{
 		int ahead[60];
@@ -2107,7 +2111,7 @@ int  vbr_make_clipping(vbr_control_t *state, float compression)
 			before=state->size[i];
 			state->size[i]=state->size[i]*final_mod[i]*compression/2;
 			after=state->size[i];
-			printf("%d --> %d (%f)\n",before,after,final_mod[i]*50);
+			//printf("%d --> %d (%f)\n",before,after,final_mod[i]*50);
 		}
 		free(cur_mod);		
 		free(final_mod);	

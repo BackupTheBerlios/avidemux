@@ -109,6 +109,7 @@ public:
   	uint32_t			_totalframe;
 	uint32_t			_pass1Done;
 	uint8_t  			updateStats (uint32_t len);
+	uint8_t				_use_xvid_ratecontrol;	
 
 public:
     			EncoderFFMPEGMpeg1 ( FF_CODEC_ID id, FFMPEGConfig *config);

@@ -189,7 +189,11 @@ extern int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 	0,
 	0.5,		// spatial masking
 	0,		// NAQ
+	0,		// Use xvid ratecontrol
+	0,		// buffersize
 	0		// DUMMY
+	
+	
  	}
   };
  FFMPEGConfig mpeg2encSVCDConfig={
