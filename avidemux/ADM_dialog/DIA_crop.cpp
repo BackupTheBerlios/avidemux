@@ -232,19 +232,17 @@ void draw (GtkWidget *dialog,uint32_t w,uint32_t h )
 void read ( GtkWidget *dialog )
 {
 
-gchar *s;
 
-#define READ_ENTRY(widget_name)   gtk_editable_get_chars(GTK_EDITABLE (WID(widget_name)), 0, -1);
-
-			s=READ_ENTRY(entryLeft);;
-			left=(uint32_t)atoi(s);
-			s=READ_ENTRY(entryRight);;
-			right=(uint32_t)atoi(s);
-			s=READ_ENTRY(entryTop);;
-			top=(uint32_t)atoi(s);
-			s=READ_ENTRY(entryBottom);;
-			bottom=(uint32_t)atoi(s);
-
+			left=gtk_read_entry(WID(entryLeft));
+			right=gtk_read_entry(WID(entryRight));
+			top=gtk_read_entry(WID(entryTop));
+			bottom=gtk_read_entry(WID(entryBottom));
+			
+			left&=0xffffe;
+			right&=0xffffe;
+			top&=0xffffe;
+			bottom&=0xffffe;
+			
 			if((top+bottom)>height)
 				{
 					top=bottom=0;
@@ -253,7 +251,7 @@ gchar *s;
 				{
 					left=right=0;
 				}
-
+			upload(dialog);
 }
 
 void upload(GtkWidget *dialog)
