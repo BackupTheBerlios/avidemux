@@ -636,7 +636,7 @@ fi
 
 
 dnl ____________________ CPU____________________________
-
+echo "Checking cpu/system type"
 adm_cpu=`uname -m`;
 dnl reset config.cpu, avoid weird bugs
 echo "CPU type : $adm_cpu"
@@ -683,6 +683,7 @@ d
 			else
 				ASFLAGS="-f win32 -DPREFIX"
 			fi
+			CCASFLAGS=$ASFLAGS
 			echo "TARGET_MMX_NASM=yes" >> adm_lavcodec/config.cpu
 			AC_DEFINE(HAVE_ASM_NASM,1,"Use MMX acceleration")
 			echo "nasm found : $NASM_CONFIG"
@@ -735,6 +736,10 @@ d
 			have_little_endian=no;
   			AC_DEFINE(ADM_BSD_FAMILY,1,[BSD os specific ifdef])
 			LMPG_OPT="";
+			LDFLAGS="$LDFLAGS  \
+				/System/Library/Frameworks/CoreServices.framework/CoreServices \
+				/System/Library/Frameworks/CoreAudio.framework/CoreAudio  \
+				/System/Library/Frameworks/AudioUnit.framework/AudioUnit"  
 			touch adm_lavcodec/config.cpu
 			echo "TARGET_DARWIN=yes" >> adm_lavcodec/config.cpu
 			echo "TARGET_PPC=yes" >> adm_lavcodec/config.cpu
@@ -752,7 +757,10 @@ d
 		esac
 esac
 ALTIVEC_SWITCH=''
+AC_MSG_CHECKING(for Altivec )
+AC_MSG_RESULT($have_altivec)
 if test "x$have_altivec" = "xyes"; then
+		echo "Altivec enabled";
 		echo "TARGET_ALTIVEC=yes" >> adm_lavcodec/config.cpu		
 		AC_DEFINE(HAVE_ALTIVEC,1,[Enable altivec by default])
 		if test "x$have_darwin" = "xno"; then
@@ -769,8 +777,6 @@ fi
 echo "cpu done"
 dnl ____________________ /CPU____________________________
 dnl ________________NASM__________________
-ASFLAGS="-f elf"
-CCASFLAGS="-f elf"
 AC_SUBST(AS)
 AC_SUBST(AS_FLAGS)
 AM_PROG_AS
