@@ -90,7 +90,18 @@ uint8_t
 
 }
 
+decoders 		*ADM_Composer::rawGetDecoder(uint32_t frame)
+{
+ uint32_t relframe;
+  uint32_t seg;
+  uint32_t ref;
 
+  // convert frame to block, relative frame
+  if (!convFrame2Seg (frame, &seg, &relframe))
+    return 0;
+   ref = _segments[seg]._reference;
+    return _videos[ref].decoder;
+}
 
 uint8_t
   ADM_Composer::getFrameNoAlloc (uint32_t framenum, uint8_t * ptr,

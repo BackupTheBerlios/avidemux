@@ -242,5 +242,6 @@ class ADM_Composer
 									*samples);
 					uint8_t			setEnv(_ENV_EDITOR_FLAGS newflag);
 					uint8_t			getEnv(_ENV_EDITOR_FLAGS newflag);
+					decoders 		*rawGetDecoder(uint32_t frame);
 };
 #endif
