@@ -50,8 +50,8 @@
  static uint8_t *_l_p,*_l_c,*_l_n;
  static uint8_t *_l_e,*_l_e2;
 #define EXPAND(x) (x)+((x)<<16)+((x)<<32) +((x)<<48)
-static uint64_t _mmTHRESH1=EXPAND((uint64_t )THRES1);
-static uint64_t full_ones=0xFFFFFFFFFFFFFFFFLL;
+static uint64_t  __attribute__((used)) _mmTHRESH1=EXPAND((uint64_t )THRES1);
+static uint64_t  __attribute__((used)) full_ones=0xFFFFFFFFFFFFFFFFLL;
 
 
 static void myBlendASM(void);
