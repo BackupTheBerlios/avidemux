@@ -458,7 +458,10 @@ case ACT_Pipe2Other:
     case ACT_SaveWork:
       GUI_FileSelWrite ("Select workbench to save ", A_saveWorkbench);
       break;
-
+   case ACT_SaveCurrentWork:
+   		GUI_Alert("Jens told he would code that part\n");
+		break;
+   	break;
 	case ACT_JumpToFrame: 
 		// read value	
 			printf("Jump!\n");	 

@@ -142,6 +142,7 @@ ACT_OuputToggle,
 ACT_VideoConfigure,
 
 ACT_SaveWork,
+ACT_SaveCurrentWork,
 ACT_LoadWork,
 ACT_ResetSegments,
 
