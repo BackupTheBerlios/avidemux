@@ -72,6 +72,7 @@ AC_SUBST(all_libraries)
 dnl avoid po mess
 AC_SUBST(AUTODIRS)
 
+
 dnl ___ added to ease install in uncommon place __
 
 CPPFLAGS="  $USER_INCLUDES  $CPPFLAGS"
@@ -158,6 +159,18 @@ have_xml2=yes
 have_bsd=no
 have_nasm=no
 have_altivec=no
+have_malloc=no
+
+dnl _________________ malloc.h ___________________
+
+AC_CHECK_HEADERS(malloc.h,have_malloc_h=yes)
+AC_CHECK_HEADERS(malloc/malloc.h,have_malloc_h=yes)
+if test "x$have_malloc_h" = "xyes"; then
+	CPPFLAGS="$CPPFLAGS -I/usr/include/malloc"
+	AC_DEFINE(HAVE_MALLOC_H,1,[have malloc.h])
+	
+fi
+
 dnl ______________ libxml2 _____________
 AC_PATH_PROG(XML_CONFIG, xml2-config, no)
  if test "XML_CONFIG" = "no" ; then
@@ -586,7 +599,7 @@ echo "" > adm_lavcodec/config.cpu
 echo "CPU type : $adm_cpu"
 use_mmx=0
 case $adm_cpu in
-	i386|i486|i586|i686|x86_64)
+	i386|i486|i586|i686)
 		use_mmx=1
 		have_little_endian=yes;
 		AC_DEFINE(CONFIG_X86,1,[FFMPEG])
@@ -595,10 +608,7 @@ case $adm_cpu in
 		have_x86=yes
 		AC_ARG_ENABLE(mmx,[  --disable-mmx           don't use MMX acceleration],use_mmx=0)
 		
-dnl no MMX for athlon 64, as we may be in 64 bits mode
-		if test "x$adm_cpu" = "xx86_64"; then
-				use_mmx=0;
-		fi
+d
 
 		if test "x$use_mmx" = "x1"; then
 		AC_DEFINE(USE_MMX,1,"Use MMX acceleration")
@@ -630,6 +640,9 @@ dnl no MMX for athlon 64, as we may be in 64 bits mode
 		else
 		touch adm_lavcodec/config.cpu
 		fi;;
+	x86_64)
+		have_little_endian=yes;
+		echo "ADM64";;
 	sparc|sparc64)
 		have_little_endian=no;
 		LMPG_OPT="";
