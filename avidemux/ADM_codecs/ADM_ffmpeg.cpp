@@ -158,7 +158,12 @@ ffmpegEncoder::gopMpeg1 (void)
   if (_settingsPresence)
     {
       _context->rc_max_rate = _settings.maxBitrate * 8;	//1800*1000;// 2400 max, 700 min
-      _context->rc_buffer_size = _settings.bufferSize * 8 * 1024;
+      _context->rc_buffer_size_header=_settings.bufferSize * 8 * 1024;
+      // If we don't have a maxrate, don't set buffer_size
+      if(_context->rc_max_rate)
+      {
+      	_context->rc_buffer_size = _settings.bufferSize * 8 * 1024;
+	}
       _context->gop_size = _settings.gop_size;
 
     }

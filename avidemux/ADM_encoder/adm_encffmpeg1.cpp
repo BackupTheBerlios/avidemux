@@ -446,7 +446,7 @@ uint32_t avg_bitrate;
 	
   	FFcodecSetting tmp;
 	memcpy(&tmp,&_settings,sizeof(_settings));
-	tmp.maxBitrate=tmp.minBitrate=tmp.bufferSize=0;
+	tmp.maxBitrate=tmp.minBitrate=0; //tmp.bufferSize=0;
 	_codec->setConfig(&tmp);
 	
 	setMatrix();

@@ -1008,6 +1008,7 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int rc_buffer_size;
+    int rc_buffer_size_header; // MEANX
     float rc_buffer_aggressivity;
 
     /**

@@ -312,9 +312,10 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             }else{
                 v= 0x3FFFF;
             }
-
-            if(s->avctx->rc_buffer_size)
-                vbv_buffer_size = s->avctx->rc_buffer_size;
+		// MEANX we use rc_buffer_size_header here to force
+		// a correct rc_buffer_size
+            if(s->avctx->rc_buffer_size_header)
+                vbv_buffer_size = s->avctx->rc_buffer_size_header;
             else
                 /* VBV calculation: Scaled so that a VCD has the proper VBV size of 40 kilobytes */
                 vbv_buffer_size = (( 20 * s->bit_rate) / (1151929 / 2)) * 8 * 1024;
