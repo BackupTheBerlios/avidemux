@@ -119,6 +119,7 @@ int ff_h263_decode_end(AVCodecContext *avctx)
 int av_is_voppacked(AVCodecContext *avctx, int *vop_packed, int *gmc, int *qpel)
 {
     MpegEncContext *s = avctx->priv_data;
+    if(avctx->codec->id!=CODEC_ID_MPEG4) return 0;
     	*qpel=*gmc=*vop_packed=0;
   	*vop_packed=(s->divx_packed);
 	*qpel=s->quarter_sample;
