@@ -95,11 +95,22 @@ lavMuxer::~lavMuxer()
 	close();
 }
 //___________________________________________________________________________
-uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHeader *audioheader)
+uint8_t lavMuxer::open( char *filename, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader)
 {
  AVCodecContext *c;
+ 	_type=type;
 	_fps1000=info->fps1000;
-	fmt = guess_format("dvd", NULL, NULL);
+	switch(_type)
+	{
+		case MUXER_DVD:
+			fmt = guess_format("dvd", NULL, NULL);
+			break;
+		case MUXER_VCD:
+			fmt = guess_format("vcd", NULL, NULL);
+			break;
+		default:
+			fmt=NULL;
+	}
 	if (!fmt) 
 	{
         	printf("Lav:Cannot guess format\n");
@@ -124,7 +135,29 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHea
 	}	
 	
 	c = &video_st->codec;
-	c->codec_id = CODEC_ID_MPEG2VIDEO;
+	switch(_type)
+	{
+		case MUXER_DVD:
+			c->codec_id = CODEC_ID_MPEG2VIDEO;
+			c->rc_buffer_size=8*1024*224;
+			c->rc_max_rate=9000*1000;
+			c->rc_min_rate=0;
+			c->bit_rate=9000*1000;
+	
+			break;
+		case MUXER_VCD:
+			c->codec_id = CODEC_ID_MPEG1VIDEO;
+
+			c->rc_buffer_size=8*1024*40;
+			c->rc_max_rate=1152*1000;
+			c->rc_min_rate=152*1000;
+			c->bit_rate=1152*1000;
+
+			break;
+		default:
+			ADM_assert(0);
+	}
+	
 	c->codec_type = CODEC_TYPE_VIDEO;
 	c->flags=CODEC_FLAG_QSCALE;   
 	c->width = info->width;  
@@ -154,10 +187,6 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHea
 	c->max_b_frames=2;
 	c->has_b_frames=1;
 
-	c->rc_buffer_size=8*1024*224;
-	c->rc_max_rate=9000*1000;
-	c->rc_min_rate=0;
-	c->bit_rate=9000*1000;
 	
 	// Audio
 	//________
@@ -183,10 +212,24 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHea
 	
 	
 //----------------------
-	oc->packet_size=2048;
-	oc->mux_rate=10080*1000;
-	oc->preload=AV_TIME_BASE/10; // 100 ms preloading
-	oc->max_delay=500*1000; // 500 ms
+	switch(_type)
+	{
+		case MUXER_DVD:
+			oc->packet_size=2048;
+			oc->mux_rate=10080*1000;
+			oc->preload=AV_TIME_BASE/10; // 100 ms preloading
+			oc->max_delay=200*1000; // 500 ms
+			break;
+		case MUXER_VCD:
+			oc->packet_size=2324;
+			oc->mux_rate=2352 * 75 * 8;
+			oc->preload=AV_TIME_BASE/10; // 100 ms preloading
+			oc->max_delay=200*1000; // 500 ms
+			break;
+		default:
+			ADM_assert(0);
+	}
+
 	
 	if (av_set_parameters(oc, NULL) < 0) 
 	{

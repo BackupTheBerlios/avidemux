@@ -66,7 +66,7 @@ class	mpegWritter
 								int matrix,uint8_t interlaced,
 								uint8_t bff, // WLA
 								uint8_t widescreen);
-				uint8_t 		initLveMux( char *name );								
+				uint8_t 		initLveMux( char *name,ADM_MUXER_TYPE type );
 				AVDMGenericAudioStream	*_audio;
 				lavMuxer		*_muxer;
 				double			_audioOneFrame;

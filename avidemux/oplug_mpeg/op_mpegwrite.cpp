@@ -132,7 +132,7 @@ mpegWritter::mpegWritter( uint8_t ps )
 	_audio=NULL;
 	_audioBuffer=NULL;
 	_muxer=NULL;
-	_outputAsPs=1;
+	_outputAsPs=ps;
 	audioWanted=audioGot=0;
 	_ratecontrol=NULL;
 
@@ -211,10 +211,17 @@ WAVHeader		*info=NULL,tmpinfo;
 	// look if we have a suitable audio
 	if(_outputAsPs)
 	{
-		if(!initLveMux(name))
+		switch(_outputAsPs)
 		{
-			return 0;
-		}				
+			case 1:
+				if(!initLveMux(name,MUXER_DVD))
+					return 0;
+				break;
+			
+			default:
+				ADM_assert(0);
+				break;
+		}
 	}
 
 	switch(mpeg2encDVDConfig.generic.mode)
@@ -262,7 +269,22 @@ WAVHeader		*info=NULL,tmpinfo;
 
 uint8_t  mpegWritter::save_vcd(char *name)
 {
-//	return save_regular(name,ADM_VCD,1,1,0,0,0);
+
+// look if we have a suitable audio
+	if(_outputAsPs)
+	{
+		switch(_outputAsPs)
+		{
+			case 2:
+				if(!initLveMux(name,MUXER_VCD))
+					return 0;
+				break;
+			
+			default:
+				ADM_assert(0);
+				break;
+		}
+	}
 	return save_regular(name,ADM_VCD,1,1,0,0,0,0); // WLA
 
 }
@@ -962,7 +984,7 @@ int dummy_func_mpeg( int i )
 //
 //	Set up the audio chain for audio+video writting
 //
-uint8_t mpegWritter::initLveMux( char *name )
+uint8_t mpegWritter::initLveMux( char *name,ADM_MUXER_TYPE type )
 {
 double one_pcm_audio_frame;
 uint32_t fps1000;
@@ -987,7 +1009,7 @@ uint32_t fps1000;
 	info.width=getLastVideoFilter()->getInfo()->width;
 	info.height=getLastVideoFilter()->getInfo()->height;
 	info.fps1000=getLastVideoFilter()->getInfo()->fps1000;
-	if(!_muxer->open(name,(uint32_t )0,&info,_audio->getInfo()))
+	if(!_muxer->open(name,type,&info,_audio->getInfo()))
 	{
 		delete _muxer;
 		_muxer=NULL;
@@ -1003,7 +1025,7 @@ uint32_t fps1000;
 AVDMGenericAudioStream *mpt_getAudioStream(void)
 {
 AVDMGenericAudioStream *audio=NULL;
-	if (audio)	// else Raw copy mode
+	if (audioProcessMode)	// else Raw copy mode
 	{
 		if (currentaudiostream->isCompressed ())
 		{

@@ -74,7 +74,8 @@ extern MPEG2ENCConfig mpeg2encSVCDConfig;
 extern MPEG2ENCConfig mpeg2encDVDConfig;
 
 static void oplug_mpeg_dvd_run(char *name);
-
+static void oplug_mpeg_vcd_run(char *name);
+//************************************************
 void oplug_mpeg_vcd(char *inname)
 {
 	char *name;
@@ -84,7 +85,7 @@ void oplug_mpeg_vcd(char *inname)
 
 	if(!inname)
 	{
-	 	GUI_FileSelWrite("DVD file to save", &name);
+	 	GUI_FileSelWrite("VCD file to save", &name);
 		if(!name) return;
 	}	
 	else
@@ -100,7 +101,70 @@ void oplug_mpeg_vcd(char *inname)
 
 	delete(mpg);
 }
+//_______________________________________
+void oplug_mpeg_vcd_ps(char *inname)
+{
+	
+	char *name=NULL;
+	WAVHeader *info=NULL,tmpinfo;
 
+	// do some check on audio & video
+	// audio must be either AC3 or mp2 at 48 khz
+	
+	// First check audio
+	if(!currentaudiostream)
+	{
+		GUI_Alert("We need an audio track!");
+		return;
+	}
+	if(audioProcessMode)
+	{
+	  AVDMGenericAudioStream *audio=NULL;
+		audio = buildAudioFilter (currentaudiostream,0,0x1000);
+		info=audio->getInfo();
+		memcpy(&tmpinfo,info,sizeof(tmpinfo));
+		info=&tmpinfo;
+		deleteAudioFilter();
+	
+	}
+	else
+	{
+		info=currentaudiostream->getInfo();
+	}
+	if(info->frequency!=44100 )
+	{
+		GUI_Alert("audio must be 44.1khz for VCD PS!");
+		return;
+	}
+	if( info->encoding!=WAV_MP2 )
+	{
+		printf("Encoding : %d\n",info->encoding);
+		GUI_Alert("audio must be MP2 VCD PS!");
+		return;
+	}
+	
+	// Second, check video
+	if(strcmp(videoCodecGetName(),"VCD"))// && strcmp(videoCodecGetName(),"XSVCD"))
+	{
+		GUI_Alert("You need to select VCD as video codec!");
+		return;
+	}
+	
+ 	if(!inname)
+	{
+	 	GUI_FileSelWrite("VCD file to save", &name);
+		if(!name) return;
+	}
+	else
+	{
+		name=inname;
+	}
+	oplug_mpeg_vcd_run(name);
+
+	
+	
+}
+//_______________________________________
 void oplug_mpeg_svcd(char *inname)
 {
 	char *name;
@@ -126,6 +190,7 @@ void oplug_mpeg_svcd(char *inname)
 
 	delete(mpg);
 }
+//_______________________________________
 void oplug_mpeg_dvd(char *inname)
 {
 char *name=NULL;
@@ -152,6 +217,7 @@ char *name=NULL;
 	delete(mpg);
 }
 // Save a PS stream : Mpeg2 video + MP2 or AC3 audio
+//_______________________________________
 void oplug_mpeg_dvd_ps(char *inname)
 {
 char *name=NULL;
@@ -212,6 +278,7 @@ WAVHeader *info=NULL,tmpinfo;
 
 
 }
+//_______________________________________
 void oplug_mpeg_dvd_run(char *name)
 {
    	mpegWritter *mpg = new mpegWritter(1);
@@ -225,6 +292,21 @@ void oplug_mpeg_dvd_run(char *name)
 	delete(mpg);
 
 }
+//_______________________________________
+void oplug_mpeg_vcd_run(char *name)
+{
+   	mpegWritter *mpg = new mpegWritter(2);
+	ADM_assert(mpg);
+
+	if( mpg->save_vcd(name))
+		GUI_Alert("Success !");
+	else
+		GUI_Alert("Failed !");
+
+	delete(mpg);
+
+}
+//_______________________________________
 void oplug_mpeg_svcdConf( void )
 {
 	if( mpeg2encSVCDConfig.configured == 0 ){
@@ -273,6 +355,7 @@ void oplug_mpeg_svcdConf( void )
 	prefs->get( CODECS_SVCD_MAXBITRATE, &mpeg2encSVCDConfig.specific.maxBitrate);
 	mpeg2encSVCDConfig.specific.maxBitrate = (mpeg2encSVCDConfig.specific.maxBitrate*1000) >> 3;
 }
+//_______________________________________
 void oplug_mpeg_dvdConf( void )
 {
 	if( mpeg2encDVDConfig.configured == 0 ){
@@ -321,4 +404,4 @@ void oplug_mpeg_dvdConf( void )
 	prefs->get( CODECS_DVD_MAXBITRATE, &mpeg2encDVDConfig.specific.maxBitrate);
 	mpeg2encDVDConfig.specific.maxBitrate = (mpeg2encDVDConfig.specific.maxBitrate*1000) >> 3;
 }
-
+//EOF

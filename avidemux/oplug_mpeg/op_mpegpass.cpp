@@ -48,6 +48,7 @@
 	{				\
 		if(!audio->getPacket(buffer, &audiolen, &samples))	\
 		{ \
+			printf("passthrough:Could not get audio\n"); \
 			break; \
 		}\
 		if(audiolen) \
@@ -109,7 +110,7 @@ void mpeg_passthrough(  char *name )
 	}
 	
   	muxer=new MYMUXER();
-	if(!muxer->open(name,MUX_MPEG_VRATE,avifileinfo,audio->getInfo()))
+	if(!muxer->open(name,MUXER_DVD,avifileinfo,audio->getInfo()))
 	{
 		delete muxer;
 		muxer=NULL;

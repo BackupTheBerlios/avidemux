@@ -52,7 +52,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "ADM_dialog/DIA_enter.h"
-
+#include "oplug_mpeg/op_mpeg.h"
 extern void UI_setVProcessToggleStatus( uint8_t status );
 extern void GUI_setVideoCodec(Action action );
 static void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param,
@@ -628,7 +628,7 @@ void EncoderSaveMpeg(char *name)
 	switch(current_codec)
 	{
 		case CodecVCD:
-				oplug_mpeg_vcd(name);
+				oplug_mpeg_vcd_ps(name);
 				break;
 		case CodecSVCD:
 				oplug_mpeg_svcd(name);

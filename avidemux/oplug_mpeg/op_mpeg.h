@@ -14,11 +14,11 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifdef USE_MJPEG
+
 
 void oplug_mpeg_vcd(char *name);
+void oplug_mpeg_vcd_ps(char *name);
 void oplug_mpeg_svcd(char *name=NULL);
 void oplug_mpeg_dvd(char *name=NULL);
 void oplug_mpeg_dvd_ps(char *name=NULL);
 
-#endif

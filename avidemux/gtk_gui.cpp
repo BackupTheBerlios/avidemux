@@ -857,19 +857,7 @@ case ACT_Pipe2Other:
   // gtk_widget_grab_focus(sb_frame);
 }
 
-#ifdef USE_MJPEG
 
-
-void
-A_saveMpeg (char *name)
-{
-
-  oplug_mpeg_vcd (name);
-
-}
-
-
-#endif
 
 //_____________________________________________________________
 //
