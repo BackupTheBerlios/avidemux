@@ -24,6 +24,10 @@
 #ifdef HAVE_ALTIVEC_H
 #include "altivec.h"
 #endif
+#ifdef HAVE_ALTIVEC
+static void YV12_422_Altivec( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h);
+#endif
+
 #ifdef USE_MMX
 /*
 		0-> y1
@@ -139,14 +143,14 @@ uint32_t dx,dy;
 }
 void YV12_422( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h)
 {
-#ifdef USE_ALTIVEC && 0
-	if( !(w&7)
+#ifdef HAVE_ALTIVEC 
+	if( !(w&7))
 		return YV12_422_Altivec(in,out,w,h);
 #endif	
 	YV12_422_C(in,out,w,h);
 
 }
-#ifdef USE_ALTIVEC && 0
+#ifdef HAVE_ALTIVEC 
 
 #define LOAD_ALIGN(dest,src) \
 		MSQ = vec_ld(0, src); \
@@ -158,11 +162,12 @@ void YV12_422_Altivec( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h)
 {
 uint8_t *y,*y2,*u,*v,*out2;
 uint32_t dx,dy;
-vector unsigned char vecy,vecy2,vecu,vecv;
+vector unsigned char vecy,vecy2,vecu,vecv,MSQ,mask;
 vector unsigned char vecout,vecout2;
-static const vector unsigned char zero;
+vector unsigned char zero;
 
 #define VEC16 vector unsigned short
+#define VEC8 vector unsigned char
 	out2=out+w*2;
 	y=in;
 	y2=in+w;
@@ -172,7 +177,7 @@ static const vector unsigned char zero;
 	for(dy=h>>1;dy>0;dy--)
 	{
 		// We do 4 pix in a raw
-		for(dx=w>>4;dx>0;dx--)
+		for(dx=w>>3;dx>0;dx--)
 		{
 			LOAD_ALIGN(vecy,y); // expand
 			LOAD_ALIGN(vecy2,y); // expand
@@ -180,23 +185,22 @@ static const vector unsigned char zero;
 			LOAD_ALIGN(vecv,u); // expand
 			
 			// expand y's, keep 8 pixel
-			vecy=vec_mergeh(vecy,zero);
-			vecy2=vec_mergeh(vecy2,zero);
+			vecy=(VEC8)vec_mergeh(vecy,zero); // 0 Y0 0 Y1
+			vecy2=(VEC8)vec_mergeh(vecy2,zero);
 			
 			// expand u and v, keep 4 pixels
-			vecu=vec_mergeh(zero,vecu);
-			vecu=vec_mergeh((VEC16)vecu,(VEC16)zero);
-			vecv=vec_mergeh(zero,vecu);
-			vecv=vec_mergeh((VEC16)vecu,(VEC16)zero);
-			
+			vecu=(VEC8)vec_mergeh(zero,vecu); // U0 0 U1
+			vecu=(VEC8)vec_mergeh((VEC16)zero,(VEC16)vecu);  //  U0 0 0 0 U1 00
+			vecv=(VEC8)vec_mergeh(zero,vecv); // V0 0 V1
+			vecv=(VEC8)vec_mergeh((VEC16)vecv,(VEC16)zero); // 0 0 V0 0 0 0 0 V1
+		
+			vecu=vec_or(vecu,vecv);	
 			vecy=vec_or(vecy,vecu);
-			vecy=vec_or(vecy,vecv);
 			vecy2=vec_or(vecy2,vecu);
-			vecy2=vec_or(vecy2,vecv);
 			
 			// Store
-			vec_st((vecbyte)out,0,vecy); 
-			vec_st((vecbyte)out2,0,vecy2); 
+			vec_st(vecy,0,out); 
+			vec_st(vecy2,0,out2); 
 			// next
 			out2+=16;
 			out+=16;
