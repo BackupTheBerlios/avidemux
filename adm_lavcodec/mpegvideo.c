@@ -969,13 +969,13 @@ int MPV_encode_init(AVCodecContext *avctx)
         
         av_log(avctx, AV_LOG_INFO, "Warning vbv_delay will be set to 0xFFFF (=VBR) as the specified vbv buffer is too large for the given bitrate!\n");
     }
-       
+#if 0  //MEANX      
     if((s->flags & CODEC_FLAG_4MV) && s->codec_id != CODEC_ID_MPEG4 
        && s->codec_id != CODEC_ID_H263 && s->codec_id != CODEC_ID_H263P && s->codec_id != CODEC_ID_FLV1){
         av_log(avctx, AV_LOG_ERROR, "4MV not supported by codec\n");
         return -1;
     }
-        
+#endif        
     if(s->obmc && s->avctx->mb_decision != FF_MB_DECISION_SIMPLE){
         av_log(avctx, AV_LOG_ERROR, "OBMC is only supported with simple mb decission\n");
         return -1;

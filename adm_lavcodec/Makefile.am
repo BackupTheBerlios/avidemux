@@ -33,14 +33,15 @@ EXTEND_PPC=ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c
 endif
 
 endif
-
+EXTEND_AMR=	amr_float/interf_dec.c amr_float/sp_dec.c \
+		amr_float/interf_enc.c amr_float/sp_enc.c
 # for SSE we need special compil flags
 fft_sse.o:i386/fft_sse.c
 	$(CC) -o $@ $< -c $(CFLAGS) $(all_includes)   -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -msse
 vp3dsp_sse2.o:i386/vp3dsp_sse2.c
 	$(CC) -o $@ $< -c  $(CFLAGS) $(all_includes)   -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -msse
 
-libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) $(EXTEND_A64) ac3enc.c \
+libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) $(EXTEND_A64) ac3enc.c $(EXTEND_AMR) \
 		adpcm.c 	allcodecs.c 	cyuv.c 	dsputil.c 	dv.c \
 		error_resilience.c 	eval.c 	fdctref.c 	fft.c 	h263.c 	h263dec.c 	huffyuv.c 	imgconvert.c \
 		imgresample.c 	jfdctfst.c 	jfdctint.c 	jrevdct.c 	mace.c 	mdct.c 	mem.c 	mjpeg.c \
@@ -51,7 +52,7 @@ libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) $(EXTEND_A64) ac3enc.c \
 		roqvideo.c 	xan.c 	rpza.c 	msrle.c 	msvideo1.c 	cinepak.c 	vqavideo.c \
 		idcinvideo.c 	smc.c 	flicvideo.c 	interplayvideo.c 	dpcm.c 	8bps.c vmdav.c \
 	truemotion1.c flac.c g726.c 	qtrle.c lcl.c 	snow.c integer.c \
-		rangecoder.c bitstream.c h264idct.c h261.c
+		rangecoder.c bitstream.c h264idct.c h261.c amr.c
 	
 
 EXTRA_DIST = 

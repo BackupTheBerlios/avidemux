@@ -100,6 +100,17 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #define memalign(a,b) malloc(b)
 #endif
 
+/* MEANX : Use common alloc / free */
+extern void *ADM_alloc(size_t size);
+extern void *ADM_realloc(void *in,size_t size);
+extern void ADM_dezalloc(void *ptr);
+extern char *ADM_strdup( const char *in);
+
+#define free(x) ADM_dezalloc(x)
+#define memalign(y,x) ADM_alloc(x)
+#define malloc(x) ADM_alloc(x)
+
+/* MEANX */
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
 #define MAX(a,b) ((a) < (b) ? (b) : (a))
 #define ABS(a) ((a) > 0 ? (a) : (-(a)))
