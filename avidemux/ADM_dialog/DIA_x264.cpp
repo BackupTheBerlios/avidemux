@@ -82,7 +82,9 @@ uint8_t DIA_x264(X264Config *config)
         
         if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
         {
-          memcpy(&(config->generic),&generic,sizeof(generic));
+          uint32_t b;
+          
+          
           SPIN_GET(spinbuttonQmin,qmin);
           SPIN_GET(spinbuttonQmax,qmax);
         
@@ -93,6 +95,24 @@ uint8_t DIA_x264(X264Config *config)
         
           CHECK_GET(checkbuttonCabac,cabac);
           ret=1;
+          ENTRY_GET(entryQz,b);
+          switch(generic.mode)
+          {
+            case COMPRESS_CBR:
+              generic.bitrate=b*1000;
+              break;
+
+            case COMPRESS_2PASS:              
+              b=generic.finalsize=b;
+              break;
+
+            case COMPRESS_CQ:              
+              generic.qz=b;
+              break;            
+            default:
+              ADM_assert(0);
+          }
+          memcpy(&(config->generic),&generic,sizeof(generic));
         }
         
         gtk_widget_destroy(dialog);
