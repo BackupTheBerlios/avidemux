@@ -106,6 +106,9 @@ uint16_t dur16;
 		//header.default_len=1;
 		dur32=1;
 		MEMCPY(&header.default_len,&dur32,4);
+		
+		_lastIPFrameSent=0xfffffff;
+		
 		return videoStream->writeHeaders(sizeof(header),(uint8_t *)&header); // +4 ?
 
 }
@@ -172,7 +175,8 @@ uint8_t ret1=0;
 
 				}
 			}
-
+		encoding_gui->feedFrame(len);
+		return videoStream->write(len,_videoBuffer,flags,frame);
 		return ret1;
 
 }
