@@ -39,6 +39,13 @@
 
 
 // misc dump functions
+extern "C" 
+{
+	void mixDump_c(uint8_t * ptr, uint32_t len)
+	{
+		mixDump(ptr,len);
+	}
+}
 void mixDump(uint8_t * ptr, uint32_t len)
 {
     char string[200];
