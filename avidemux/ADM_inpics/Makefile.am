@@ -5,7 +5,7 @@ INCLUDES = $(all_includes)
 
 libADM_inpics_a_METASOURCES = AUTO
 
-libADM_inpics_a_SOURCES = ADM_pics.cpp 
+libADM_inpics_a_SOURCES = ADM_pics.cpp bitmap.h
 
 
 EXTRA_DIST = ADM_pics.cpp ADM_pics.h 

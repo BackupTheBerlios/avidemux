@@ -11,4 +11,4 @@ EXTRA_DIST =
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES = $(all_includes) -g   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 
-noinst_HEADERS =  tcrequant.h
+noinst_HEADERS =  tcrequant.h putvlc.h getvlc.h
