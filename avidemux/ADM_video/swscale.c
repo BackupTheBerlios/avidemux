@@ -68,6 +68,8 @@ untested special converters
 #include "../../adm_lavcodec/bswap.h" //MEANX
 //#include "../libvo/img_format.h"
 
+#define memalign(y,x) malloc(x)
+
 //#include "rgb2rgb.h"
 //#include "../libvo/fastmemcpy.h"
 //MEANX
