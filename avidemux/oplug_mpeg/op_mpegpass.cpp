@@ -34,6 +34,9 @@
 #include "ADM_lavformat/ADM_lavformat.h"
 #include "ADM_lvemux/ADM_muxer.h"
 
+// To have access to low level infos 
+#include "ADM_codecs/ADM_mpeg.h"
+
 
 /**
 	Save a cut and audio edited to mpeg-PS
@@ -67,7 +70,7 @@ void mpeg_passthrough(  char *name )
   uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3];
   
   DIA_working *work;
-  
+  ADM_MUXER_TYPE mux;
   
   double total_wanted=0;
   double total_got=0;
@@ -93,6 +96,11 @@ void mpeg_passthrough(  char *name )
 	
 	
   	audio=mpt_getAudioStream();
+	
+	// Have to check the type
+	// If it is mpeg2 we use DVD-PS
+	// If it is mpeg1 we use VCD-PS
+	// Later check if it is SVCD
 	if(!audio)
 	{
 		GUI_Alert("Audio track is  not suitable!\n");
@@ -100,17 +108,36 @@ void mpeg_passthrough(  char *name )
 	}
 	// Check
 	WAVHeader *hdr=audio->getInfo();
-	if(hdr->frequency!=48000 || 
-		(hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
-	{
-		deleteAudioFilter();
-		GUI_Alert("Audio track is not suitable!\n");
-		return ;
 	
+	decoderMpeg *mpeghdr;
+	
+	mpeghdr=(decoderMpeg *)video_body->rawGetDecoder(0);
+	if(mpeghdr->isMpeg1())
+	{
+		if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
+		{
+			GUI_Alert("This is not compatible with VCD mpeg.\n");
+			return ;
+		}
+		mux=MUXER_VCD;
+		printf("PassThrought: Using VCD PS\n");
+	
+	}else
+	{     // mpeg2, we do only DVD right now
+		if(hdr->frequency!=48000 || 
+		(hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
+		{
+			deleteAudioFilter();
+			GUI_Alert("Audio track is not suitable!\n");
+			return ;
+		}
+		mux=MUXER_DVD;
+		printf("PassThrought: Using DVD PS\n");
 	}
 	
+	
   	muxer=new MYMUXER();
-	if(!muxer->open(name,0,MUXER_DVD,avifileinfo,audio->getInfo()))
+	if(!muxer->open(name,0,mux,avifileinfo,audio->getInfo()))
 	{
 		delete muxer;
 		muxer=NULL;
