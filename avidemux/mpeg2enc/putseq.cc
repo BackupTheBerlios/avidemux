@@ -635,9 +635,9 @@ static void init_pict_data( Picture *picture )
     }
 
 
-	picture->curref = new (uint8_t *)[3];
-	picture->curorg = new (uint8_t *)[3];
-	picture->pred   = new (uint8_t *)[3];
+	picture->curref = new uint8_t *[3]; 
+	picture->curorg = new uint8_t *[3];
+	picture->pred   = new uint8_t *[3];
 
 	for( i = 0 ; i<3; i++)
 	{
