@@ -48,6 +48,45 @@ extern "C"
 {
 int av_is_voppacked(AVCodecContext *avctx, int *vop_packed, int *gmc, int *qpel);
 };
+
+uint8_t decoderFF::clonePic(AVFrame *src,ADMImage *out)
+{
+uint32_t u,v;
+                                        out->_planes[0]=(uint8_t *)src->data[0];
+                                        out->_planeStride[0]=src->linesize[0];
+                                        if(_swapUV)
+                                        {
+                                                u=1;v=2;
+                                        }else
+                                        {
+                                                u=2;v=1;
+                                        }
+                                        out->_planes[1]=(uint8_t *)src->data[u];
+                                        out->_planeStride[1]=src->linesize[u];
+
+                                        out->_planes[2]=(uint8_t *)src->data[v];
+                                        out->_planeStride[2]=src->linesize[v];
+
+                                        _lastQ=0; //_context->quality;
+                                        out->_Qp=(src->quality*32)/FF_LAMBDA_MAX;
+                                        out->flags=frameType();
+                                        
+                                        // Quant ?
+                                        if(src->qstride && src->qscale_table)    
+                                        {
+                                                out->quant=(uint8_t *)src->qscale_table;
+                                                out->_qStride=src->qstride;
+                                                out->_qSize=(_w+15)>>4;
+                                                out->_qSize*=(_h+15)>>4; // FixME?
+                                        }
+                                        else
+                                        {
+                                                out->_qSize=out->_qStride=0;
+                                                out->quant=NULL;
+                                        }
+
+}
+
 uint8_t  decoderFF::isDivxPacked( void )
 {
 	int vop, gmc,qpel;
@@ -65,7 +104,8 @@ uint32_t decoderFF::getSpecificMpeg4Info( void )
 	av_is_voppacked(_context,&vop,&gmc,&qpel);
 	
 	if(qpel) out+=ADM_QPEL_ON;
-	if(gmc)  out+=ADM_GMC_ON;
+        if(_gmc) out+=ADM_GMC_ON;
+	
 	
 	return out;
 }
@@ -83,6 +123,7 @@ decoderFF::decoderFF(uint32_t w,uint32_t h) :decoders(w,h)
 
 //				memset(&_context,0,sizeof(_context));
 				_allowNull=0;
+                                _gmc=0;
 				_context=NULL;
                                 _refCopy=0;
 #if LIBAVCODEC_BUILD >= 4624
@@ -138,12 +179,14 @@ uint32_t  decoderFF::frameType( void )
 				if(_frame.key_frame)
 					aprintf("\n But keyframe is  set\n");
 				break;
-		case FF_S_TYPE:
+		
 		case FF_I_TYPE:
 				SET(AVI_KEY_FRAME);
 				if(!_frame.key_frame)
 					aprintf("\n But keyframe is not set\n");
 				break;
+                case FF_S_TYPE:
+                                _gmc=1; // No break, just inform that gmc is there
 		case FF_P_TYPE:
 				SET(AVI_P_FRAME);
 				if(_frame.key_frame)
@@ -195,7 +238,15 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
               				printf("\n ff4: null frame\n");
                                         if(dontcopy())
                                         {
-                                                out->_noPicture=1;                                                
+                                                // search the last image
+                                                if(_context->coded_frame->data)
+                                                {
+                                                        clonePic(_context->coded_frame,out);
+                                                        if(flagz)
+                                                               *flagz=out->flags;
+                                                }
+                                                else                                                
+                                                        out->_noPicture=1;                                                
                                         }
 					return 1;
 				}
@@ -218,6 +269,8 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 						printf("Probably pseudo black frame...\n");
 						out->_Qp=2;
 						out->flags=0; // assume P ?
+                                                if(dontcopy())
+                                                        clonePic(_context->coded_frame,out);
 						if(flagz)
 							*flagz=out->flags;
 						return 1;
@@ -317,40 +370,9 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 		// we do it or not
 	                        if(dontcopy())
                                 {
-                                        uint32_t u,v;
-                                        out->_planes[0]=(uint8_t *)_frame.data[0];
-                                        out->_planeStride[0]=_frame.linesize[0];
-                                        if(_swapUV)
-                                        {
-                                                u=1;v=2;
-                                        }else
-                                        {
-                                                u=2;v=1;
-                                        }
-                                        out->_planes[1]=(uint8_t *)_frame.data[u];
-                                        out->_planeStride[1]=_frame.linesize[u];
-
-                                        out->_planes[2]=(uint8_t *)_frame.data[v];
-                                        out->_planeStride[2]=_frame.linesize[v];
-
-                                        _lastQ=0; //_context->quality;
-                                        out->_Qp=(_frame.quality*32)/FF_LAMBDA_MAX;
-                                        out->flags=frameType();
+                                        clonePic(&_frame,out);
                                         if(flagz)
-                                                *flagz=out->flags;
-                                        // Quant ?
-                                        if(_frame.qstride && _frame.qscale_table)    
-                                        {
-                                                out->quant=(uint8_t *)_frame.qscale_table;
-                                                out->_qStride=_frame.qstride;
-                                                out->_qSize=(_w+15)>>4;
-                                                out->_qSize*=(_h+15)>>4; // FixME?
-                                        }
-                                        else
-                                        {
-                                                out->_qSize=out->_qStride=0;
-                                                out->quant=NULL;
-                                        }
+                                                               *flagz=out->flags;
                                         return 1;
                                 }
 				//printf("420p\n");

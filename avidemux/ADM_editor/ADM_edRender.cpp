@@ -385,21 +385,8 @@ uint8_t refOnly=0;
 
         if(!len & refOnly)      // Size is null = no image and we only got a pointer
                                 // copy the previous one
-        {
-                // should do something more intelligent here...
-                // look up in 
-                if(frame)
-                {
-                        ADMImage *nw;
-                        if(nw=cache->getImage(frame-1))
-                        {
-                                image->duplicate(nw);
-                                cache->updateFrameNum(image,frame);
-                                return 1;                        
-                        }
-                }
-                // The previous image is not in the cache
-                // We are in deep trouble
+        {                
+                // First image
                 
                 uint32_t page=_imageBuffer->_width*_imageBuffer->_height;
                         memset(YPLANE(image),0,page);

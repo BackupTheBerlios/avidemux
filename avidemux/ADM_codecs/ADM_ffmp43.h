@@ -30,8 +30,9 @@
 					uint8_t			_allowNull; 	
 					uint32_t		_swapUV;	
 					uint32_t  		frameType( void );
-					
+					uint8_t                 clonePic(AVFrame *src,ADMImage *out);
 					uint32_t		_showMv;
+                                        uint32_t                _gmc;
      public:
                                         
      					decoderFF(uint32_t w,uint32_t h);
