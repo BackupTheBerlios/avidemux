@@ -120,7 +120,7 @@ void prepare( void )
 	track1=0;
 	if(audioProcessMode && currentaudiostream)
 	{
-		stream=buildAudioFilter(currentaudiostream,
+		stream=buildFakeAudioFilter(currentaudiostream,
 				0, 0xffffffff);
 	
 		if(stream)

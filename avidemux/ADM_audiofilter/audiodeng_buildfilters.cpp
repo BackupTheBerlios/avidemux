@@ -617,9 +617,27 @@ void audioSetResample(uint32_t fq)
 	audioResampleMode=RESAMPLING_CUSTOM;
 	audioFreq=fq;
 }
+/*
+	Build a fake filter chain without normalizer
+		to avoid to have to scan the file to get the max amplitude value
+
+*/
+AVDMProcessAudioStream *buildFakeAudioFilter(AVDMGenericAudioStream *currentaudiostream,
+				uint32_t starttime, uint32_t size)
+{
+	uint8_t stored_norm;
+	AVDMProcessAudioStream *out;
+		stored_norm=audioNormalizeMode;	// Temporarily disable normalizing
+		
+		audioNormalizeMode=0;
+		out=buildAudioFilter(currentaudiostream,starttime,size);
+		audioNormalizeMode=stored_norm;
+		return out;
+}
 /**
 		Build filter to save
 */
+
 AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t size)
 {
