@@ -109,6 +109,7 @@ uint8_t		OGMDemuxer::readHeader(uint32_t *paySize, uint32_t *flags, uint64_t *fr
 uint8_t gotcha=0,c=0;
 uint32_t total=0,failed=0;
 
+
 	*frame=0;
 
 	if(_payload) fseeko(_fd,_payload,SEEK_CUR);
@@ -139,10 +140,17 @@ uint32_t total=0,failed=0;
 
 		if(gotcha)
 		{
-			/*printf("n : %lu\n",fourCC::get( (uint8_t *)_page.page_sequence));*/
-			//printf("a : %llu\n",*(unsigned long long *)_page.abs_pos); // frame #
-#warning DOES NOT WORK ON BIGENDIAN
+#if 0		
 			*frame=*(unsigned long long *)_page.abs_pos;
+#else			
+			*frame+=_page.abs_pos[4]+(_page.abs_pos[5]<<8)+(_page.abs_pos[6]<<16)+
+					(_page.abs_pos[7]<<24);
+			*frame=(*frame)<<32;
+			*frame=_page.abs_pos[0]+(_page.abs_pos[1]<<8)+(_page.abs_pos[2]<<16)+
+					(_page.abs_pos[3]<<24);
+			
+			
+#endif			
 			*flags=_page.header_type;
 			*paySize=total;
 			_payload=total;
