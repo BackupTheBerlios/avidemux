@@ -8,7 +8,52 @@
 
 			+ Fix memory leak induced by raw shift<<<===			
 			
+		ALTIVEC
+				
+			
+							
        *********************** /TODO ***************************
+       21.03.2004
+       		- better reindex openDML files 
+		- reindex takes track number into account
+		- fixed save bmp
+		- Jens: Better handling of disapearing old dir
+		- dont crash when resampling to the same fq
+       20.03.2004
+       		- altivec to rgb32 too
+		- fixed 2 pass (x86)
+		- fixed display phasis
+		- swap uv broken on g4
+		- save bmp broken
+		- Jens : Search file also in edl/curdir
+		
+       18/03/2004
+       		- cleanup for linuxppc & altivec
+		- fixed save jpeg
+		- added save as bunch of jpeg
+		- internal switch from RGB24 to RGB32 (faster and more suited for altivec :) )
+       17/03/2004
+       		- Jens : Fix openDML read with multiple riff header
+		- yv12rgb altivec= ok on macOsX
+       16/03/2004
+       		- First version of YV12 to rgb altivec code, spotted lots of mistake for macOsX / altivec
+       14/03/2004
+       		- Fixed and finished more output video
+       13/03/2004
+       		- more detail output (video / audio size)
+       11.03.2004
+       		- fixed ffv1rec
+       09.03.2004
+       		- fixed init of internal toolame
+       08.03.2004
+       		- ADM64 patch by axel arnold
+       06.03.2004
+       		- fixed import BMP
+		- Raise back video filter list after adding
+		- Double click = ok for filter list / filters
+		- Began support of UTF16 subs
+       04.03.2004
+       		- Fixed 2 pass reusing old log file with Xvid
        03.03.2004
        		- finished update of libmpeg2dec
        02.03.2004
