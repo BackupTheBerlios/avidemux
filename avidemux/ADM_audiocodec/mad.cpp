@@ -221,7 +221,8 @@ signed int r;
     /* quantize */
     r= sample >> (MAD_F_FRACBITS + 1 - 16);	
 // this was wrong    
-#ifdef ADM_BIG_ENDIAN  
+//#ifdef ADM_BIG_ENDIAN && 0 
+#if defined(ADM_BIG_ENDIAN)   && 0
 	r= (r>>8)+((r&0xff)<<8);	
 #endif
   return r;
