@@ -660,6 +660,7 @@ PackStream *mux_open(char *fn,
     else
     	ps->audio_encoded_fs=(int)ceil(( MP2_FRAME_SIZE*a_bit_rate)/(8*sample_rate));
 	
+	printf("Audio encoded fs: %d\n",ps->audio_encoded_fs);	
      ps->a_pts_ofs = A_PTS_MIN;
      ps->v_pts_ofs = A_PTS_MIN;
 	

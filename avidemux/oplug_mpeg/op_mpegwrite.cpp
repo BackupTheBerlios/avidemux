@@ -95,7 +95,7 @@ extern int32_t audioDelay;
 // else do 1st pass with constant Q=6
 #define ADM_1PASS_CBR 1
 #define MAXAUDIO 56000
-extern AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *mypcm);
+extern AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm);
 // ______________________________________________
 // 								Initialise all variables
 // ______________________________________________
@@ -113,6 +113,7 @@ mpegWritter::mpegWritter( void )
 	_audioBuffer=NULL;
 	_muxer=NULL;
 	_outputAsPs=0;
+	audioWanted=audioGot=0;
 
 }
 mpegWritter::mpegWritter( uint8_t ps )
@@ -178,6 +179,15 @@ uint8_t  mpegWritter::save_svcd(char *name)
 	assert(0);
 	return 0;
 }
+
+
+#define PACK_AUDIO 	{ uint32_t audiolen=0;	\
+				audioWanted+=_audioOneFrame; \
+				audiolen=(uint32_t)ceil(audioWanted-audioGot); \
+				audiolen = _audio->read (audiolen,_audioBuffer); \
+				_muxer->writeAudioPacket(audiolen,_audioBuffer);\
+				audioGot+=audiolen;}
+				
 /*---------------------------------------------------------------------------------------*/
 uint8_t  mpegWritter::save_dvd(char *name)
 {
@@ -374,13 +384,8 @@ DIA_encoding		*encoding;
 				if(!len) continue;
 				if(_muxer)
 				{		
-				uint32_t audiolen;		
-						// write video
 						_muxer->writeVideoPacket(len,_buffer_out);
-						
-						audiolen=_audioOneFrame;
-						audiolen = _audio->read (audiolen,_audioBuffer);
-						_muxer->writeAudioPacket(audiolen,_audioBuffer);
+						PACK_AUDIO;
 						
 				}else
 				{
@@ -409,12 +414,8 @@ DIA_encoding		*encoding;
 					fwrite(_buffer_out,len,1,fd);
 				else
 				{
-					// write video
 					_muxer->writeVideoPacket(len,_buffer_out);
-						
-					audiolen=_audioOneFrame;
-					audiolen = _audio->read (audiolen,_audioBuffer);
-					_muxer->writeAudioPacket(audiolen,_audioBuffer);
+					PACK_AUDIO;
 				}
 
 				//	printf("\n pipe opened %ld\n",i);
@@ -867,12 +868,11 @@ uint32_t		len,flags,type,outquant,audiolen;
 			}
 		else
 			{
+				
 				// write video
 				_muxer->writeVideoPacket(len,_buffer_out);
 						
-				audiolen=_audioOneFrame;
-				audiolen = _audio->read (audiolen,_audioBuffer);
-				_muxer->writeAudioPacket(audiolen,_audioBuffer);
+				PACK_AUDIO;
 			}
 		
 				
@@ -928,11 +928,9 @@ uint32_t		len,flags,type,outquant,audiolen;
 		else
 		{
 			// write video
-			_muxer->writeVideoPacket(len,_buffer_out);
-						
-			audiolen=_audioOneFrame;
-			audiolen = _audio->read (audiolen,_audioBuffer);
-			_muxer->writeAudioPacket(audiolen,_audioBuffer);
+			_muxer->writeVideoPacket(len,_buffer_out);		
+			PACK_AUDIO;
+
 		}
 		
 		//	printf("\n pipe opened %ld\n",i);
@@ -1011,7 +1009,7 @@ int dummy_func_mpeg( int i )
 //
 uint8_t mpegWritter::initLveMux( char *name )
 {
-uint32_t one_pcm_audio_frame;
+double one_pcm_audio_frame;
 uint32_t fps1000;
 
 	_audio=mpt_getAudioStream(&one_pcm_audio_frame);
@@ -1022,7 +1020,7 @@ uint32_t fps1000;
 	}
 	fps1000=getLastVideoFilter()->getInfo()->fps1000;
 	
-  	printf (" One audio frame : %lu bytes\n", one_pcm_audio_frame);
+  	printf (" One audio frame : %f bytes\n", one_pcm_audio_frame);
   	_audioOneFrame=one_pcm_audio_frame;
 	_audioBuffer=new uint8_t[MAXAUDIO]; // equivalent to 1 sec @ 448 kbps, should be more than
 					// enough, even with the buffering
@@ -1042,7 +1040,7 @@ uint32_t fps1000;
 }
 
 
-AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *mypcm)
+AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm)
 {
 
 // Second check the audio track
@@ -1125,14 +1123,9 @@ AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *mypcm)
 
 
 	  one_frame = (uint32_t) floor (one_frame_double+0.5);
-	printf (" one coded audio frame is %lu bytes (%f) \n", one_frame,one_frame_double);
-  	if (one_frame & 1)
-    		one_frame++;
-  	one_delta_frame = one_frame_double - one_frame;
-  	// Real ? correction of hitokiri bug
-  	one_delta_frame *= 1000;
+	printf (" one coded audio frame is %lu bytes (%f) \n", one_frame,one_frame_double);  	
   	
-	*mypcm=one_frame;
+	*mypcm=one_frame_double;
 	return _audio;
 }
 

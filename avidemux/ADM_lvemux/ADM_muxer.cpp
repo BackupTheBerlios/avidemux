@@ -32,10 +32,8 @@
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_audiofilter/audioprocess.hxx"
-
-
-
 #include "ADM_lvemux/ADM_muxer.h"
+
 extern "C" {
 	#include "ADM_lvemux/mux_out.h"
 };
@@ -94,7 +92,9 @@ float bn,sn;
 	bytes_needed=(int)floor(bn+0.5);
 	
 	printf("Sample per frame : %d %f, bytes per frame :%d %f\n",samples_needed,sn,bytes_needed,bn);
-	_packSize=bytes_needed;	  
+	//_packSize=bytes_needed;	  
+	_packSize=pack->audio_encoded_fs;
+	printf("Pack size:%d\n",_packSize);
   
 	return 1;
 
@@ -103,19 +103,27 @@ float bn,sn;
 uint8_t MpegMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 {
 int r;
+uint32_t t=0;
+uint32_t n;
 	assert(packStream);
 	memcpy(buffer+byteTail,buf,len);
 	byteTail+=len;
-	while(byteTail-byteHead>=_packSize)
+	
+	
+	n=(byteTail-byteHead)/_packSize;
+	if(n)
+	
 	{
 		r=mux_write_packet((PackStream *)packStream, 
-                               audioType, buffer+byteHead, _packSize); 
-		byteHead+=_packSize;
+                               audioType, buffer+byteHead, n*_packSize); 
+		byteHead+=n*_packSize;
+		t+=n*_packSize;
 	}
-			       
+			     
+	//aprintf("This round : %lu\n",t);  
 	if(byteTail>=MUX_BUFFER_SIZE)
 	{
-		memmove(buffer+byteHead,buffer,byteTail-byteHead);
+		memmove(buffer,buffer+byteHead,byteTail-byteHead);
 		byteTail-=byteHead;
 		byteHead=0;
 	

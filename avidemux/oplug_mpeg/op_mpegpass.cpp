@@ -41,16 +41,28 @@
 	Usefull for editing PVR captured files for example
 
 */
- AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *pcm);
+ extern AVDMGenericAudioStream *mpt_getAudioStream(double *pcm);
 
+ #define PACK_AUDIO audiolen = audio->read ((uint32_t)floor(total_wanted-total_got),buffer); \
+		total_got+=audiolen; \
+		if(audiolen)	\
+			muxer->writeAudioPacket(audiolen,buffer); 
+    
+ 
+ 
 void mpeg_passthrough(  char *name )
 {
   uint32_t len, flags;
   AVDMGenericAudioStream *audio=NULL;
-  uint32_t pcm,audiolen;
+  uint32_t audiolen;
   uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3];
   
   DIA_working *work;
+  double pcm=0;
+  
+  double total_wanted=0;
+  double total_got=0;
+  
   MpegMuxer *muxer=NULL;
   
   	printf("Saving as mpg PS to file %s\n",name);
@@ -99,6 +111,8 @@ void mpeg_passthrough(  char *name )
 
   for (uint32_t i = frameStart; i < frameEnd; i++)
     {
+      total_wanted+=pcm;
+      
       work->update (i - frameStart, frameEnd - frameStart);
       if(!work->isAlive()) goto _abt;
       assert (video_body->getFlags (i, &flags));
@@ -120,32 +134,23 @@ void mpeg_passthrough(  char *name )
 	if (!found)	    goto _abt;
 	  // Write the found frame
 	video_body->getRaw (found, buffer, &len);
-	muxer->writeVideoPacket (len,buffer);
-	audiolen=pcm;
-	audiolen = audio->read (audiolen,buffer);
-	if(audiolen)
-		muxer->writeAudioPacket(audiolen,buffer);
+	muxer->writeVideoPacket (len,buffer);	
+	PACK_AUDIO
 	  
 	  // and the B frames
 	for (uint32_t j = i; j < found; j++)
 	    {
 		video_body->getRaw (j, buffer, &len);
 		muxer->writeVideoPacket (len,buffer);
-		audiolen=pcm;
-		audiolen = audio->read (audiolen,buffer);
-		if(audiolen)
-			muxer->writeAudioPacket(audiolen,buffer);
-	    }
+		PACK_AUDIO
+    	    }
 	  i = found;		// Will be plussed by for
 	}
       else			// P or I frame
 	{
 	  	video_body->getRaw (i, buffer, &len);
 		muxer->writeVideoPacket (len,buffer);
-		audiolen=pcm;
-		audiolen = audio->read (audiolen,buffer);
-		if(audiolen)
-			muxer->writeAudioPacket(audiolen,buffer);
+		PACK_AUDIO
 	}
 
     }

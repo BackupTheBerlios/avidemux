@@ -65,6 +65,8 @@
 #define SYSTEM_END_CODE					0xb9
 static uint64_t _lastSync;
 
+
+//#define PRINT_PTS
 //_______________________________________________________
 //_______________________________________________________
 //_______________________________________________________
@@ -566,7 +568,7 @@ uint8_t align=0;
 									*pts+=pts2>>1;
 									*pts+=(((pts0&6)>>1)<<30);
 #ifdef PRINT_PTS									
-									printf("PTS: %lx\n",*pts,sid);
+									printf("PTS: %lx %lx\n",*pts,sid);
 #endif									
 								}
 								break;

@@ -68,9 +68,10 @@ class	mpegWritter
 				uint8_t 		initLveMux( char *name );								
 				AVDMGenericAudioStream	*_audio;
 				MpegMuxer		*_muxer;
-				uint32_t		_audioOneFrame;
+				double			_audioOneFrame;
 				uint8_t			*_audioBuffer;
-							  									
+				
+				double			audioWanted, audioGot;
 	public:
 							mpegWritter( void );
 							mpegWritter( uint8_t ps_stream );	
