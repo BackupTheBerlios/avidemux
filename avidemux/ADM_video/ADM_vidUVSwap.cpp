@@ -65,10 +65,10 @@ UNUSED_ARG(setup);
 ADMVideoUVSwap::~ADMVideoUVSwap()
 {
 		if(_buf)
-			{
-            	delete _buf;
-				_buf=NULL;
-			}
+		{
+            		delete []_buf;
+			_buf=NULL;
+		}
 }
 uint8_t ADMVideoUVSwap::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *len,
@@ -76,22 +76,23 @@ uint8_t ADMVideoUVSwap::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 
-			ADM_assert(frame<_info.nb_frames);
-
-
-			// read uncompressed frame
+		ADM_assert(frame<_info.nb_frames);
+		// read uncompressed frame
        		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
 
 		uint32_t sz;
 		uint8_t *start;
-					sz=_info.width*_info.height;
-					start=data->data+sz;
-					sz>>=2;
-
-					memcpy(_buf,start,sz);
-					memcpy(start,start+sz,sz);
-					memcpy(start+sz,_buf,sz);
-
+					
+			sz=_info.width*_info.height;
+			sz>>=2;
+				
+			start=UPLANE(data);
+			memcpy(_buf,start,sz);
+					
+			memcpy(UPLANE(data),VPLANE(data),sz);
+			memcpy(VPLANE(data),_buf,sz);
+			
+			data->_qStride=0;
 
       return 1;
 }

@@ -44,8 +44,9 @@ BUILD_CREATE(Gaussian_create,AVDMFastVideoGauss);
 uint8_t	AVDMFastVideoConvolution::getCoupledConf( CONFcouple **couples)
 {
 
-			ADM_assert(_param);
-			*couples=new CONFcouple(2);
+	ADM_assert(_param);
+	
+	*couples=new CONFcouple(2);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
 	CSET(chroma);
@@ -57,24 +58,21 @@ uint8_t	AVDMFastVideoConvolution::getCoupledConf( CONFcouple **couples)
 //_______________________________________________________________
 
 AVDMFastVideoConvolution::AVDMFastVideoConvolution(
-									AVDMGenericVideoStream *in,CONFcouple *couples)
+			AVDMGenericVideoStream *in,CONFcouple *couples)
 {
 
 
-  	_in=in;		
-   	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
-
-					
-// 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-  ADM_assert(_uncompressed); 
-  _info.encoding=1;
-  if(couples==NULL)
-  {
-			_param=NEW( CONV_PARAM);
-			_param->chroma=1;
-			_param->luma=1;	
-			printf("\n Creating from null\n");				
+	_in=in;		
+	memcpy(&_info,_in->getInfo(),sizeof(_info));
+	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);	
+	ADM_assert(_uncompressed); 
+	_info.encoding=1;
+	if(couples==NULL)
+	{
+		_param=NEW( CONV_PARAM);
+		_param->chroma=1;
+		_param->luma=1;	
+		printf("\n Creating from null\n");				
 	}
 	else
 	{
@@ -87,7 +85,9 @@ AVDMFastVideoConvolution::AVDMFastVideoConvolution(
 }
 AVDMFastVideoConvolution::~AVDMFastVideoConvolution()
 {
- 	delete []_uncompressed;
+	if(_uncompressed)
+ 		delete _uncompressed;
+	_uncompressed=NULL;
  	DELETE(_param);
 }
 
@@ -105,90 +105,86 @@ uint8_t AVDMFastVideoConvolution::getFrameNumberNoAlloc(uint32_t frame,
 uint8_t *x1,*x2,*x3,*o1;
 uint32_t stride,page;
 
-			ADM_assert(frame<_info.nb_frames);
-			ADM_assert(_uncompressed);					
-			stride=_info.width;
-			page=(stride*_info.height)>>2;
-																
-			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;               
+	ADM_assert(frame<_info.nb_frames);
+	ADM_assert(_uncompressed);					
+	stride=_info.width;
+	page=(stride*_info.height)>>2;
+	
+	data->_qStride=0;
+	
+	// read uncompressed frame
+	if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;               
          
-          if(!_param->luma)
-          {
-						memcpy(data,_uncompressed,page*4);						
-					}
-					else
-					{
-	         	o1=data->data+stride;
-  	        x1=_uncompressed->data;
-    	      x2=x1+stride;
-      	    x3=x2+stride;
+	if(!_param->luma)
+	{
+		memcpy(YPLANE(data),YPLANE(_uncompressed),page*4);
+	}
+	else
+	{
+		o1=YPLANE(data)+stride;
+		x1=YPLANE(_uncompressed);
+		x2=x1+stride;
+		x3=x2+stride;
 
-	          // first and last line
-	          memcpy(data->data,_uncompressed->data,stride);
-	          memcpy(data->data+page*4-stride,_uncompressed->data+page*4-stride,stride);          
-	          // Luma
-	          for(int32_t y=1;y<(int32_t)_info.height-1;y++)
-	  				{
-	         		doLine(x1,x2,x3,o1,stride);
-            	x1=x2;
-             	x2=x3;
-             	x3+=stride; 
-              o1+=stride;                 
-	      		}
-	        }
+		// first and last line
+		memcpy(YPLANE(data),YPLANE(_uncompressed),stride);
+		memcpy(YPLANE(data)+page*4-stride,YPLANE(_uncompressed)+page*4-stride,stride);          
+		// Luma
+		for(int32_t y=1;y<(int32_t)_info.height-1;y++)
+		{
+			doLine(x1,x2,x3,o1,stride);
+			x1=x2;
+			x2=x3;
+			x3+=stride; 
+			o1+=stride;                 
+		}
+	}
       	// chroma u & v
-         if(!_param->chroma)
-          {
-	        	memcpy(data->data+page*4,_uncompressed->data+page*4,page*2);
-					}
-					else
-					{
-						stride>>=1;
-						// chroma u
-						
-	         	o1=data->data+page*4+stride;
-  	        x1=_uncompressed->data+page*4;
-    	      x2=x1+stride;
-      	    x3=x2+stride;
-
-	          // first and last line
-	          memcpy(data->data+page*4,_uncompressed->data+page*4,stride);
-	          memcpy(data->data+page*5-stride,_uncompressed->data+page*5-stride,stride);          
-	          // Luma
-	          for(int32_t y=1;y<(int32_t)(_info.height>>1)-1;y++)
-	  				{
-	         		doLine(x1,x2,x3,o1,stride);
-            	x1=x2;
-             	x2=x3;
-             	x3+=stride; 
-              o1+=stride;                 
-	      		}
-						// chroma V
-						
-	         	o1=data->data+page*5+stride;
-  	        x1=_uncompressed->data+page*5;
-    	      x2=x1+stride;
-      	    x3=x2+stride;
-
-	          // first and last line
-	          memcpy(data->data+page*5,_uncompressed->data+page*5,stride);
-	          memcpy(data->data+page*6-stride,_uncompressed->data+page*6-stride,stride);          
-	          // Luma
-	          for(int32_t y=1;y<(int32_t)(_info.height>>1)-1;y++)
-	  				{
-	         		doLine(x1,x2,x3,o1,stride);
-            	x1=x2;
-             	x2=x3;
-             	x3+=stride; 
-              o1+=stride;                 
-	      		}
-						
-						
-						
-					}
-				
-		      return 1;
+	if(!_param->chroma)
+	{
+		memcpy(UPLANE(data),UPLANE(_uncompressed),page);
+		memcpy(VPLANE(data),VPLANE(_uncompressed),page);
+	}
+	else
+	{
+		stride>>=1;
+		// chroma u
+		o1=UPLANE(data)+stride;
+		x1=UPLANE(_uncompressed);
+		x2=x1+stride;
+		x3=x2+stride;
+		// first and last line
+		memcpy(UPLANE(data),UPLANE(_uncompressed),stride);
+		memcpy(UPLANE(data)+page-stride,UPLANE(_uncompressed)+page-stride,stride);          
+		// Luma
+		for(int32_t y=1;y<(int32_t)(_info.height>>1)-1;y++)
+		{
+			doLine(x1,x2,x3,o1,stride);
+			x1=x2;
+			x2=x3;
+			x3+=stride; 
+			o1+=stride;                 
+		}
+		
+		// chroma V
+		o1=VPLANE(data)+stride;
+		x1=VPLANE(_uncompressed);
+		x2=x1+stride;
+		x3=x2+stride;
+		// first and last line
+		memcpy(VPLANE(data),VPLANE(_uncompressed),stride);
+		memcpy(VPLANE(data)+page-stride,VPLANE(_uncompressed)+page-stride,stride);          
+		// Luma
+		for(int32_t y=1;y<(int32_t)(_info.height>>1)-1;y++)
+		{
+			doLine(x1,x2,x3,o1,stride);
+			x1=x2;
+			x2=x3;
+			x3+=stride; 
+			o1+=stride;                 
+		}
+	}
+      return 1;
 }
 //
 //	Run the convolution kernel on a whole line
@@ -200,7 +196,7 @@ uint32_t stride,page;
 //----------------------------------------------------------------
 //----------------------------------------------------------------
 
-char 							*AVDMFastVideoMean::printConf(void)
+char 	*AVDMFastVideoMean::printConf(void)
 {
 		static char str[]="Mean(fast)";
 		return (char *)str;

@@ -80,18 +80,16 @@ uint8_t ADMVideoLuma::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 
-			ADM_assert(frame<_info.nb_frames);
-						
-								
-			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
+	ADM_assert(frame<_info.nb_frames);
+	// read uncompressed frame
+	if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
 
-		uint32_t sz;
+	uint32_t sz;
 			
-					sz=_info.width*_info.height;
-					memset(data->data+sz,128,sz>>1);
-
-
+	sz=_info.width*_info.height;
+	memset(UPLANE(data),128,sz>>2);
+	memset(VPLANE(data),128,sz>>2);
+	data->_qStride=0;
       return 1;
 }
 

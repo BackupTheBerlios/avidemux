@@ -59,18 +59,16 @@ ADMVideoChromaU::ADMVideoChromaU(
 {
     UNUSED_ARG(setup);
 
-  	_in=in;		
-   	memcpy(&_info,_in->getInfo(),sizeof(_info));  			 	
-  _info.encoding=1;
-   //	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-   	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-  ADM_assert(_uncompressed);
+	_in=in;		
+	memcpy(&_info,_in->getInfo(),sizeof(_info));  			 	
+	_info.encoding=1;
+	
   	  	
 }
 ADMVideoChromaU::~ADMVideoChromaU()
 {
  	
-	delete _uncompressed;
+	
  	
 }
 
@@ -81,39 +79,41 @@ ADMVideoChromaU::~ADMVideoChromaU()
 				uint32_t *len,
    				ADMImage *data,
 				uint32_t *flags)
-{
-   uint32_t x,w;
-			ADM_assert(frame<_info.nb_frames);
-								
-			
-       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
-       		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       			
+{				
+uint32_t w,x;
+uint32_t page;
+		ADM_assert(frame<_info.nb_frames);
+       		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
+		
+		page= _info.width*_info.height;
+		*len=(page*3)>>1;
 
-				// remove y & v
-               memset(data->data+_info.width*_info.height,128,(_info.width*_info.height)>>2);
 
-				// now expand  u
-				uint8_t *y,*v;
+		// now expand  u
+		uint8_t *y,*v,*y2;
 
-				y=data->data;
-				v=_uncompressed->data+  _info.width*_info.height;
-
-				for(w= _info.height>>1;w>0;w--)
-				{
-				for(x= _info.width>>1;x>0;x--)
-						{
-                      	*y=*v;
-			               *(y+_info.width)=*v;
-							 y++;		
-                      	*y=*v;
-			               *(y+_info.width)=*v++;
-							 y++;		
-
-								
-						}
+		y=YPLANE(data);
+		y2=y+_info.width;
+		v=UPLANE(data);
+		for(w= _info.height>>1;w>0;w--)
+		{
+			for(x= _info.width>>1;x>0;x--)
+			{
+				*y=*v;
+				*y2=*v;
+				*(y+1)=*v;
+				*(y2+1)=*v;
+				v++;
+				y+=2;
+				y2+=2;
+			}
                 	y+=_info.width;
-       		 }        		       		
-      return 1;
+			y2+=_info.width;
+       		 }
+		 data->_qStride=0;
+		 // Remove chroma u & v
+		 memset(UPLANE(data),0x80,page>>2);
+		 memset(VPLANE(data),0x80,page>>2);
 }
 
 //---______________________________________________---------v--------------
@@ -143,18 +143,16 @@ ADMVideoChromaV::ADMVideoChromaV(
 {
     UNUSED_ARG(setup);
 
-  	_in=in;
-   	memcpy(&_info,_in->getInfo(),sizeof(_info));
-  _info.encoding=1;
-   //	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-   	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-  ADM_assert(_uncompressed);
+	_in=in;
+	memcpy(&_info,_in->getInfo(),sizeof(_info));
+	_info.encoding=1;
+ 
 
 }
 ADMVideoChromaV::~ADMVideoChromaV()
 {
 
-	delete  _uncompressed;
+	
 
 }
 
@@ -166,37 +164,39 @@ ADMVideoChromaV::~ADMVideoChromaV()
    				ADMImage *data,
 				uint32_t *flags)
 {
-   uint32_t x,w;
-			ADM_assert(frame<_info.nb_frames);
+uint32_t w,x;
+uint32_t page;
+		ADM_assert(frame<_info.nb_frames);
+       		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
+		
+		page= _info.width*_info.height;
+		*len=(page*3)>>1;
 
 
-       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
-       		  *len= _info.width*_info.height+(_info.width*_info.height>>1);
+		// now expand  u
+		uint8_t *y,*v,*y2;
 
-				// remove y & v
-               memset(data->data+_info.width*_info.height,128,(_info.width*_info.height)>>2);
-
-				// now expand  u
-				uint8_t *y,*v;
-
-				y=data->data;
-				v=_uncompressed->data+  _info.width*_info.height+(_info.width*_info.height>>2);
-
-				for(w= _info.height>>1;w>0;w--)
-				{
-				for(x= _info.width>>1;x>0;x--)
-						{
-                      	*y=*v;
-			               *(y+_info.width)=*v;
-							 y++;
-                      	*y=*v;
-			               *(y+_info.width)=*v++;
-							 y++;
-
-
-						}
+		y=YPLANE(data);
+		y2=y+_info.width;
+		v=VPLANE(data);
+		for(w= _info.height>>1;w>0;w--)
+		{
+			for(x= _info.width>>1;x>0;x--)
+			{
+				*y=*v;
+				*y2=*v;
+				*(y+1)=*v;
+				*(y2+1)=*v;
+				v++;
+				y+=2;
+				y2+=2;
+			}
                 	y+=_info.width;
+			y2+=_info.width;
        		 }
-      return 1;
+		 data->_qStride=0;
+		 // Remove chroma u & v
+		 memset(UPLANE(data),0x80,page>>2);
+		 memset(VPLANE(data),0x80,page>>2);
 }
 

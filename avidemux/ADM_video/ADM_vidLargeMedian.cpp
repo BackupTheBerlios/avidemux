@@ -53,21 +53,17 @@ ADMVideoLargeMedian::ADMVideoLargeMedian(
 {
 
 
-  _in=in;		
-  memcpy(&_info,_in->getInfo(),sizeof(_info));  		
-	
-					
- 	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-	// uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  ADM_assert(_uncompressed);
-  
-  _info.encoding=1;
-  if(couples==NULL)
-  {
-			_param=NEW( CONV_PARAM);
-			_param->chroma=1;
-			_param->luma=1;
-			printf("\n Creating from null\n");
+	_in=in;		
+	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
+	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
+	ADM_assert(_uncompressed);
+	_info.encoding=1;
+	if(couples==NULL)
+	{
+		_param=NEW( CONV_PARAM);
+		_param->chroma=1;
+		_param->luma=1;
+		printf("\n Creating from null\n");
 	}
 	else
 	{
@@ -93,7 +89,9 @@ uint8_t	ADMVideoLargeMedian::getCoupledConf( CONFcouple **couples)
 }
 ADMVideoLargeMedian::~ADMVideoLargeMedian()
 {
- 	delete []_uncompressed;
+	if(_uncompressed)
+ 		delete _uncompressed;
+	_uncompressed=NULL;
 	DELETE(_param);
 }
 char *ADMVideoLargeMedian::printConf(void)
@@ -114,96 +112,97 @@ uint8_t ADMVideoLargeMedian::getFrameNumberNoAlloc(uint32_t frame,
 uint8_t *x1,*x2,*x3,*x4,*x5,*o1;
 uint32_t stride,page;
 
-			ADM_assert(frame<_info.nb_frames);
-			ADM_assert(_uncompressed);					
-			stride=_info.width;
-			page=(stride*_info.height)>>2;
+	ADM_assert(frame<_info.nb_frames);
+	ADM_assert(_uncompressed);					
+	stride=_info.width;
+	page=(stride*_info.height)>>2;
 																
-			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;               
+	// read uncompressed frame
+	if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;               
          
-           if(!_param->luma)
-           {
-						memcpy(data,_uncompressed,page*4);						
-					 }
-					 else
-					 {
-						memcpy(data,_uncompressed,stride*2);
-	          memcpy(data->data+page*4-stride*2,_uncompressed+page*4-2*stride,2*stride);          
+	if(!_param->luma)
+	{
+		memcpy(YPLANE(data),YPLANE(_uncompressed),page*4);						
+	}
+	else
+	{
+		memcpy(YPLANE(data),YPLANE(_uncompressed),stride*2);
+		memcpy(YPLANE(data)+page*4-stride*2,YPLANE(_uncompressed)+page*4-2*stride,2*stride);          
 	         
-		o1=data->data+stride*2;;
-  	        x1=_uncompressed->data;
-    	      x2=x1+stride;
-      	    x3=x2+stride;
-            x4=x3+stride;
-            x5=x4+stride;
-           // Luma
-	          for(int32_t y=2;y<(int32_t)(_info.height)-2;y++)
-	  				{
-	         		doLine(x1,x2,x3,x4,x5,o1,stride);
-            	x1=x2;
-             	x2=x3;
-              x3=x4;
-              x4=x5;
-             	x5+=stride; 
-              o1+=stride;                 
-	      		}
-			     }
+		o1=YPLANE(data)+stride*2;;
+		x1=YPLANE(_uncompressed);
+		x2=x1+stride;
+		x3=x2+stride;
+		x4=x3+stride;
+		x5=x4+stride;
+		// Luma
+		for(int32_t y=2;y<(int32_t)(_info.height)-2;y++)
+		{
+			doLine(x1,x2,x3,x4,x5,o1,stride);
+			x1=x2;
+			x2=x3;
+			x3=x4;
+			x4=x5;
+			x5+=stride; 
+			o1+=stride;                 
+		}
+	}
 					
       	
-						stride>>=1;
-					if(!_param->chroma)
-					{
-						 	memcpy(data->data+page*4,_uncompressed->data+page*4,page*2);			
-					}	
-					else
-					{
-	          // first and last line
-	          memcpy(data->data+page*4,_uncompressed->data+page*4,stride*2);
-	          memcpy(data->data+page*5-stride*2,_uncompressed->data+page*5-2*stride,2*stride);          						
-						// chroma u						
-	         	o1=data->data+page*4+stride*2;
-  	        x1=_uncompressed->data+page*4;
-    	      x2=x1+stride;
-      	    x3=x2+stride;
-            x4=x3+stride;
-            x5=x4+stride;
+	stride>>=1;
+	if(!_param->chroma)
+	{
+	 	memcpy(UPLANE(data),UPLANE(_uncompressed),page*2);			
+	}	
+	else
+	{
+		// first and last line
+		memcpy(UPLANE(data),UPLANE(_uncompressed),stride*2);
+		memcpy(UPLANE(data)+page-stride*2,UPLANE(_uncompressed)+page-2*stride,2*stride);
+		// chroma u	
+		o1=UPLANE(data)+stride*2;
+		x1=UPLANE(_uncompressed);
+		x2=x1+stride;
+		x3=x2+stride;
+		x4=x3+stride;
+		x5=x4+stride;
 	          
-	          for(int32_t y=2;y<(int32_t)(_info.height>>1)-2;y++)
-	  				{
-	         		doLine(x1,x2,x3,x4,x5,o1,stride);
-            	x1=x2;
-             	x2=x3;
-              x3=x4;
-              x4=x5;
-             	x5+=stride; 
-              o1+=stride;                 
-	      		}
-						// chroma V
-						 // first and last line
-	          memcpy(data->data+page*5,_uncompressed->data+page*5,stride*2);
-	          memcpy(data->data+page*6-2*stride,_uncompressed->data+page*6-2*stride,2*stride);          
+		for(int32_t y=2;y<(int32_t)(_info.height>>1)-2;y++)
+		{
+			doLine(x1,x2,x3,x4,x5,o1,stride);
+			x1=x2;
+			x2=x3;
+			x3=x4;
+			x4=x5;
+			x5+=stride; 
+			o1+=stride;                 
+		}
+		// chroma V
+		// first and last line
+		memcpy(VPLANE(data),VPLANE(_uncompressed),stride*2);
+		memcpy(VPLANE(data)+page-2*stride,VPLANE(_uncompressed)+page-2*stride,2*stride);          
 	          
-	         	o1=data->data+page*5+stride*2;
-  	        x1=_uncompressed->data+page*5;
-    	      x2=x1+stride;
-      	    x3=x2+stride;
-            x4=x3+stride;
-            x5=x4+stride;
+		o1=VPLANE(data)+stride*2;
+		x1=VPLANE(_uncompressed);
+		x2=x1+stride;
+		x3=x2+stride;
+		x4=x3+stride;
+		x5=x4+stride;
 
 	         
-	          for(int32_t y=2;y<(int32_t)(_info.height>>1)-2;y++)
-	  				{
-	      			doLine(x1,x2,x3,x4,x5,o1,stride);
-            	x1=x2;
-             	x2=x3;
-              x3=x4;
-              x4=x5;
-             	x5+=stride; 
-              o1+=stride;                      
-	      		}
-	        }
-		      return 1;
+		for(int32_t y=2;y<(int32_t)(_info.height>>1)-2;y++)
+		{
+			doLine(x1,x2,x3,x4,x5,o1,stride);
+			x1=x2;
+			x2=x3;
+			x3=x4;
+			x4=x5;
+			x5+=stride; 
+			o1+=stride;                      
+	      	}
+	}
+	data->_qStride=0;
+	return 1;
 }
 //________________________________________________________________________
 uint8_t ADMVideoLargeMedian::doLine(uint8_t  *pred2,uint8_t  *pred1,

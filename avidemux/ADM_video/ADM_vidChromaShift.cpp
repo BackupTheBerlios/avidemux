@@ -69,49 +69,28 @@ ADMVideoChromaShift::ADMVideoChromaShift(  AVDMGenericVideoStream *in,CONFcouple
 				_param->v=0;
 		}
 
- 	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
- 	//_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
 	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-  	ADM_assert(_uncompressed);
-  	_info.encoding=1;
+	ADM_assert(_uncompressed);
+	_info.encoding=1;
 }
 
 
 uint8_t	ADMVideoChromaShift::getCoupledConf( CONFcouple **couples)
 {
 
-			ADM_assert(_param);
-			*couples=new CONFcouple(2);
-
-
-	CSET(u);
-	CSET(v);
-
-			return 1;
+		ADM_assert(_param);
+		*couples=new CONFcouple(2);
+		CSET(u);
+		CSET(v);
+		return 1;
 
 }
-/*
- uint8_t 	ADMVideoChromaShift::configure( AVDMGenericVideoStream *instream)
- {
-	int i;
-	UNUSED_ARG(instream);
-	  i=(int)_param->u;
-	  if(GUI_getIntegerValue(&i,-32,32,"U shift"))
-	  {
-		_param->u=(int32_t )i;
-	  }
 
-	  i=(int)_param->v;
-	  if(GUI_getIntegerValue(&i,-32,32,"V shift"))
-	  {
-		_param->v=(int32_t )i;
-	  }
-	return 1;
- }
-*/
 ADMVideoChromaShift::~ADMVideoChromaShift()
 {
- 	delete []_uncompressed;
+	if(_uncompressed)
+ 		delete _uncompressed;
+	_uncompressed=NULL;
 	DELETE(_param);
 
 }
@@ -121,10 +100,10 @@ uint8_t ADMVideoChromaShift::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 
-			ADM_assert(frame<_info.nb_frames);
-			ADM_assert(_param);									
+		ADM_assert(frame<_info.nb_frames);
+		ADM_assert(_param);									
 								
-			// read uncompressed frame
+		// read uncompressed frame
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 
 		// copy luma as it is left untouched
@@ -134,28 +113,29 @@ uint8_t ADMVideoChromaShift::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t page;
 
 		page=(w*h);
-		memcpy(data->data,_uncompressed->data,page);
+		data->_qStride=0;
+		memcpy(YPLANE(data),YPLANE(_uncompressed),page);
 
 		if(!_param->u)
 			{
-				memcpy(data->data+page,_uncompressed->data+page,page>>2);
+				memcpy(UPLANE(data),UPLANE(_uncompressed),page>>2);
 			}
 		else
-		{
-			shift(data->data+page,_uncompressed->data+page,w>>1,h>>1,_param->u);
-		}
+			{
+				shift(UPLANE(data),UPLANE(_uncompressed),w>>1,h>>1,_param->u);
+			}
 		if(!_param->v)
 			{
-				memcpy(data->data+page+(page>>2),_uncompressed->data+page+(page>>2),page>>2);
+				memcpy(VPLANE(data),VPLANE(_uncompressed),page>>2);
 			}
 		else
-		{
-			shift(data->data+page+(page>>2),_uncompressed->data+page+(page>>2),w>>1,h>>1,_param->v);
-		}
+			{
+				shift(VPLANE(data),VPLANE(_uncompressed),w>>1,h>>1,_param->v);
+			}
 		if(_param->u)
-			fixup(data->data,w,h,_param->u*2);
+			fixup(YPLANE(data),w,h,_param->u*2);
 		if(_param->v)
-			fixup(data->data,w,h,_param->v*2);
+			fixup(YPLANE(data),w,h,_param->v*2);
 
       return 1;
 }

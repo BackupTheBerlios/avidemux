@@ -51,10 +51,8 @@ printf(  "*********************\n");
 
 	registerFilter("---- Image size/border alteration----",VF_INVALID,2,NULL,NULL);
 	REGISTERX("crop","Crop",VF_CROP,1,crop_create,crop_script);
-	REGISTERX("resize","Resize",VF_RESIZE,1,res_create,resize_script);
-
 	REGISTERX("mpresize","Mplayer Resize",VF_MPLAYERRESIZE,1,mpresize_create,mpresize_script);
-
+	REGISTERX("resize","Resize",VF_RESIZE,1,res_create,resize_script);
 	REGISTERX("blacken","Blacken Borders",VF_BLACKEN,1,bsmear_create,bsmear_script);
   	REGISTERX("addblack","Add black border",VF_ADDBORDER,1,addBorder_create,addBorder_script);
   	REGISTERX("vflip","Flip Vertical",VF_FLIP,1,flipv_create,flipv_script);
@@ -62,8 +60,8 @@ printf(  "*********************\n");
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
 //	REGISTERX("mpivtc","Mplayer ivtc",VF_MPDETC,1,mpdetc_create,mpdetc_script);	
-//	REGISTERX("telecide","Decomb telecide",VF_DECOMB,1,decomb_create,decomb_script);
-//	REGISTERX("decimate","Decomb decimate",VF_DECIMATE,1,decimate_create,decimate_script);
+	REGISTERX("telecide","Decomb telecide",VF_DECOMB,1,decomb_create,decomb_script);
+	REGISTERX("decimate","Decomb decimate",VF_DECIMATE,1,decimate_create,decimate_script);
 	
 //	REGISTER("palsmart","PAL-SMART",VF_TELECIDE,1,telecide_create);
 //	REGISTERX("deinterlace","Deinterlace",VF_DEINTERLACE,1,deinterlace_create,deinterlace_script);
@@ -86,23 +84,23 @@ printf(  "*********************\n");
 
 //	REGISTER("","Partial",VF_PARTIAL,0,partial_create);
 	registerFilter("-------- Convolution Kernel ---------",VF_INVALID,2,NULL,NULL);
-//	REGISTERX("sharpen","Sharpen",VF_SHARPEN,1,sharpen_create,sharpen_script);
-//   	REGISTERX("mean","Mean",VF_MEAN,1,mean_create,mean_script);
-//   	REGISTERX("median","Median",VF_MEDIAN,1,median_create,median_script);
-//	REGISTERX("largemedian","Median (5x5)",VF_LARGEMEDIAN,1,largeMedian_create,largeMedian_script);
-//    	REGISTERX("gaussian","Gauss Smooth",VF_GAUSSIAN,1,Gaussian_create,gaussian_script);
+	REGISTERX("sharpen","Sharpen",VF_SHARPEN,1,sharpen_create,sharpen_script);
+   	REGISTERX("mean","Mean",VF_MEAN,1,mean_create,mean_script);
+   	REGISTERX("median","Median",VF_MEDIAN,1,median_create,median_script);
+	REGISTERX("largemedian","Median (5x5)",VF_LARGEMEDIAN,1,largeMedian_create,largeMedian_script);
+    	REGISTERX("gaussian","Gauss Smooth",VF_GAUSSIAN,1,Gaussian_create,gaussian_script);
        	
     //   registerFilter("Temporal smoother",tempsmooth_create);
 	registerFilter("------------ Luma/Chroma ------------",VF_INVALID,2,NULL,NULL);
 	      
-// 	REGISTERX("swapuv","Swap u & v",VF_SWAPUV,1,swapuv_create,swapuv_script);
-//	REGISTERX("chromashift","Chroma shift",VF_CHROMASHIFT,1,create_chromashift,chromashift_script);
+ 	REGISTERX("swapuv","Swap u & v",VF_SWAPUV,1,swapuv_create,swapuv_script);
+	REGISTERX("chromashift","Chroma shift",VF_CHROMASHIFT,1,create_chromashift,chromashift_script);
 
 //	REGISTERX("contrast","Contrast",VF_CONTRAST,1,contrast_create,contrast_script);
 
-//	REGISTERX("lumaonly","Luma only",VF_LUMA,1,luma_create,luma_script);
-//	REGISTERX("chromauonly","Chroma U only",VF_CHROMAU,1,chromaU_create,chromaU_script);
-//	REGISTERX("chromavonly","Chroma V only",VF_CHROMAV,1,chromaV_create,chromaV_script);
+	REGISTERX("lumaonly","Luma only",VF_LUMA,1,luma_create,luma_script);
+	REGISTERX("chromauonly","Chroma U only",VF_CHROMAU,1,chromaU_create,chromaU_script);
+	REGISTERX("chromavonly","Chroma V only",VF_CHROMAV,1,chromaV_create,chromaV_script);
 		
 	registerFilter("-------------- Smoother -------------",VF_INVALID,2,NULL,NULL);
 		
