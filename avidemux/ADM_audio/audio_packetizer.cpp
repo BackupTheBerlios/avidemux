@@ -83,7 +83,9 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 		case WAV_AAC:
 				return getPacketAAC(dest,len,samples);
 				break;
+		case WAV_LPCM:
 		case WAV_PCM:
+		case WAV_ULAW:
 				return getPacketPCM(dest,len,samples);
 				break;
 		case WAV_AC3:
@@ -115,9 +117,12 @@ uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 // Take ~ 10 m packets
 //
 	uint32_t count,sample;
-			sample=_wavheader->frequency/100;
-			count=sample*2;	// 16 bits
+			sample=_wavheader->frequency/100;			
 			count*=_wavheader->channels;
+			if(_wavheader->encoding!=WAV_ULAW)
+			{
+				count*=2;			
+			}
 			if(packetTail-packetHead<count)
 			{
 				count=packetTail-packetHead;
@@ -125,7 +130,17 @@ uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 			}
 			memcpy(dest,&packetBuffer[packetHead],count);
 			packetHead+=count;
-			*samples=sample;
+			
+			// now revert to sample
+			sample=count/_wavheader->channels;
+			if(_wavheader->encoding!=WAV_ULAW)
+			{
+				*samples=sample/2;
+			}
+			else
+			{
+				*samples=sample;
+			}
 			*len=count;
 			return 1;
 }
