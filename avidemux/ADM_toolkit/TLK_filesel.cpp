@@ -59,6 +59,7 @@ void GUI_FileSelWrite(const char *label, char * * name)
     GUI_FileSel(label, NULL, 1,name);
 }
 
+#if (GTK_MINOR_VERSION*10+GTK_MICRO_VERSION)<34
 
 void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 {				/* Create the selector */
@@ -162,7 +163,124 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	}
 
 }
+#else
+//
+//	Gtk 2.4 Using fileChooser instead of fileselect
+//
+void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
+{				/* Create the selector */
 
+    	GtkWidget *dialog;
+	char *name=NULL;
+	char *tmpname;
+	gchar *selected_filename;
+	GtkFileChooserAction action;
+	
+	if(rname)
+		*rname=NULL;
+
+	if(!rw) 	action=GTK_FILE_CHOOSER_ACTION_OPEN;
+		else 	action=GTK_FILE_CHOOSER_ACTION_SAVE;
+
+	dialog = gtk_file_chooser_dialog_new (label,
+				      NULL,
+				      action,
+				      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+				      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+				      NULL);
+				      
+	if( prefs->get(LASTDIR,&tmpname))
+	{
+		char *str=PathCanonize(tmpname);
+		PathStripName(str);
+		
+		printf("Current folder : *%s*\n",str);
+		if(str)
+		{	// remove last /
+			str[strlen(str)-1]=0;
+	 		gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(dialog), str);
+		}
+		delete [] str;
+	}				      
+	
+			      
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+  	{
+    		selected_filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));    
+  	
+	 if (*(selected_filename + strlen(selected_filename) - 1) == '/')
+      	  					GUI_Alert("Cannot open directory as file !");
+			else
+			{
+						name=strdup(selected_filename);
+
+						char *str=PathCanonize(name);
+						PathStripName(str);
+						prefs->set(LASTDIR,str);			
+						delete [] str;
+
+	}		}
+	gtk_widget_destroy (dialog);
+	
+	if(name)
+	{
+
+		if(cb)
+		{
+
+			if(rw==0) // read
+			{
+				// try to open it..
+				FILE *fd;
+				fd=fopen(name,"rb");
+				if(!fd)
+				{
+						GUI_Alert("Cannot open this file !");
+						return;
+				}
+				fclose(fd);
+				cb(name);
+				free(name);
+
+			}
+			else // write
+			{
+				FILE *fd;
+				fd=fopen(name,"rb");
+				if(fd)
+					{
+							fclose(fd);
+							if(!GUI_Question("Overwrite file ?"))
+								return;
+					}
+				// check we have right access to it
+				fd=fopen(name,"wb");
+				if(!fd)
+					{
+						GUI_Alert("No write access to that file !");
+						return;
+					}
+				fclose(fd);
+
+
+				cb(name);
+				free(name);
+			}
+		} // no callback -> return value
+		else
+		{
+
+			*rname=name;
+
+
+		}
+
+
+	}
+
+}
+
+#endif
 
 
 
