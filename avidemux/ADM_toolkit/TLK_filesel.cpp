@@ -21,6 +21,7 @@
 #include <gtk/gtk.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <dirent.h>
 
 #include "config.h"
 
@@ -77,6 +78,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	gtk_transient(dialog);
 	if( prefs->get(LASTDIR,&tmpname))
 	{
+		DIR *dir;
 	//	printf("tmpname : %s\n",tmpname);
 		char *str=PathCanonize(tmpname);
 
@@ -84,15 +86,20 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 		PathStripName(str);
 
 	//	printf("tmpname : *%s*\n",str);
-		gtk_file_selection_set_filename(GTK_FILE_SELECTION(dialog),(gchar *)str);
+		/* LASTDIR may have gone; then do nothing and use current dir instead (implied) */
+		if( (dir=opendir(str)) ){
+			closedir(dir);
+			gtk_file_selection_set_filename(GTK_FILE_SELECTION(dialog),(gchar *)str);
+		}
 		delete [] str;
 	}
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
 	{
 
 			selected_filename= (gchar *) 	gtk_file_selection_get_filename(GTK_FILE_SELECTION(dialog));
-			 if (*(selected_filename + strlen(selected_filename) - 1) == '/')
+			 if (*(selected_filename + strlen(selected_filename) - 1) == '/'){
       	  					GUI_Alert("Cannot open directory as file !");
+			}
 			else
 			{
 						name=strdup(selected_filename);
@@ -356,7 +363,7 @@ char *PathCanonize(const char *tmpname)
 		strcpy(out,tmpname);
 		return out;
 	}
-		out=new char[strlen(tmpname)+2];
+		out=new char[strlen(path)+strlen(tmpname)+2];
 		strcpy(out,path);
 		strcat(out,"/");
 		strcat(out,tmpname);
