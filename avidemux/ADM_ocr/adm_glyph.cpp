@@ -92,7 +92,7 @@ admGlyph *head=startGlyph->next;
 admGlyph *clippedGlyph(admGlyph *in)
 {
 uint32_t w,h,lonecount,lone;
-uint32_t top,bottom,left,right;
+int32_t top,bottom,left,right;
 admGlyph *nw=NULL;
             w=in->width;
             h=in->height;

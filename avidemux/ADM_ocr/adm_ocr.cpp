@@ -102,6 +102,8 @@ uint8_t ADM_ocr_engine( void)
     ADMVideoVobSub *vobsub=NULL;
     uint32_t startTime,endTime;
     uint32_t w,h,oldw=0,oldh=0;
+    uint32_t oldbitmapw=0;
+    uint32_t oldbitmaph=0;
     uint32_t first,last;
     uint32_t seqNum;
     char     text[1024];
@@ -175,16 +177,27 @@ _again:
         goto _again;
      }
     seqNum=1;   // Sub number in srt file
+    oldw=oldh=0;
+    
+    
     for(uint32_t i=0;i<nbSub;i++)
     {
             first=last=0;
             bitmap=vobsub->getBitmap(i,&startTime, &endTime,&first,&last);
             // Update display
             if(!bitmap) break;
-            if(!workArea)
+            // If the bitmap size changed or does not exist yet...
+            if(!workArea || oldbitmapw!=bitmap->_width || oldbitmaph!=bitmap->_height)
             {
-                workArea=new uint8_t[bitmap->_width*bitmap->_height];
+              if(workArea) 
+              {
+                delete [] workArea;
+                workArea=NULL; 
+              }
+              workArea=new uint8_t[bitmap->_width*(bitmap->_height)];
             }
+            oldbitmaph=bitmap->_height;
+            oldbitmapw=bitmap->_width;
            // 
            w=bitmap->_width;
            h=last-first+1;
