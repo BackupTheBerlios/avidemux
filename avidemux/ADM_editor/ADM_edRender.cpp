@@ -107,10 +107,12 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 	cache=_videos[ref]._videoCache;
 	ADM_assert(cache);
 	
+	aprintf("Ed: Request for frame %lu seg %lu, old frame:%lu old seg:%lu\n",relframe,seg,_lastframe,_lastseg);
+	
 	// First look in the cache
 	if((result=cache->getImage(relframe)))
 	{
-		aprintf("frame %lu is cached...\n",relframe);
+		aprintf(">>frame %lu is cached...\n",relframe);
 		out->duplicate(result);
 		if(flagz)
 			*flagz=result->flags;
@@ -125,6 +127,9 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 //	Prepare the destination...
 	result=cache->getFreeImage();
   
+	
+	
+	cache->dump();
   // now we got segment and frame
   //*************************
   // Is is a key frame ?
@@ -218,7 +223,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 	if(flagz)
 		*flagz=result->flags;	
 	out->duplicate(result);
-	_lastframe++;
+	_lastframe=relframe;
 	_lastseg = seg;
 	return 1;	 
     }
@@ -226,7 +231,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
   // completly async frame
   // rewind
   //*************************
-  aprintf("async  frame\n");
+  aprintf("async  frame, wanted : %lu last %lu (%lu - %lu seg)\n",relframe,_lastframe,seg,_lastseg);
   uint32_t rewind;
   uint32_t seekFlag=0;
   
@@ -269,7 +274,9 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 			}
 		if(flagz)
 			*flagz=result->flags;	
-		out->duplicate(result);	
+		out->duplicate(result);
+		_lastframe=relframe;
+		_lastseg=seg;
 		return 1;	
       
       }
@@ -306,7 +313,9 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 			 if(flagz) *flagz=result->flags;
 		}
 		seeked++;
-	}  
+	} 
+	_lastframe=nextIp;
+	_lastseg=seg;
   	return 1;
 }
 

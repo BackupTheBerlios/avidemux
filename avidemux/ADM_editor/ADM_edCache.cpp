@@ -105,3 +105,10 @@ uint8_t		EditorCache::updateFrameNum(ADMImage *image,uint32_t frameno)
 	ADM_assert(0);
 
 }
+void EditorCache::dump( void)
+{
+	for(int i=0;i<_nbImage;i++)
+	{
+		aprintf("Edcache content:%d %lu\n",i,_elem[i].frameNum);
+	}
+}

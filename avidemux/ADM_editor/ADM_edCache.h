@@ -31,6 +31,6 @@ class EditorCache
 			ADMImage	*getFreeImage(void);	
 			ADMImage 	*getImage(uint32_t no);
 			uint8_t		updateFrameNum(ADMImage *image,uint32_t frame);
-
+			void		dump(void);
 };
 #endif
