@@ -377,7 +377,43 @@ uint8_t refOnly=0;
 	  return 0;
 	}
         ADM_assert(_imageBuffer);
+
+        // if len is 0 then take the previous image                 
+        //
+
         refOnly=_videos[seg].decoder->dontcopy(); // can we skip one memcpy ?
+
+        if(!len & refOnly)      // Size is null = no image and we only got a pointer
+                                // copy the previous one
+        {
+                // should do something more intelligent here...
+                // look up in 
+                if(frame)
+                {
+                        ADMImage *nw;
+                        if(nw=cache->getImage(frame-1))
+                        {
+                                image->duplicate(nw);
+                                cache->updateFrameNum(image,frame);
+                                return 1;                        
+                        }
+                }
+                // The previous image is not in the cache
+                // We are in deep trouble
+                
+                uint32_t page=_imageBuffer->_width*_imageBuffer->_height;
+                        memset(YPLANE(image),0,page);
+                        memset(UPLANE(image),128,page>>2);
+                        memset(VPLANE(image),128,page>>2);
+                        if(!frame)
+                                image->flags=AVI_KEY_FRAME;
+                        else            
+                                image->flags=AVI_P_FRAME;
+                        image->_Qp=2;
+                        image->_qStride=0;
+                        return 1;        
+        }
+
         if(refOnly)
         {       // This is only an empty Shell
                 tmpImage=new ADMImage(_imageBuffer->_width,_imageBuffer->_height,1);

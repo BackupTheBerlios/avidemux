@@ -193,6 +193,10 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 				{
             				if(flagz) *flagz=AVI_KEY_FRAME;
               				printf("\n ff4: null frame\n");
+                                        if(dontcopy())
+                                        {
+                                                out->_noPicture=1;                                                
+                                        }
 					return 1;
 				}
 
