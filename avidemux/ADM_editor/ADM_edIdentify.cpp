@@ -103,7 +103,9 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
       return 0;
     }
 
-  if (fourCC::check (id, (uint8_t *) "IDXM"))
+  if (fourCC::check (id, (uint8_t *) "IDXM")
+      || fourCC::check (id, (uint8_t *) "IDXI")
+      )
     {
       printf (" \n DVD2AVI Mpeg file detected...\n");
       *type = MpegIdx_FileType;

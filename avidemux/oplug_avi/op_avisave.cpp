@@ -225,6 +225,7 @@ GenericAviSave::setupAudio (void)
       // audio copy mode here
       int32_t shift=0;
       if(audioDelay && audioShift) shift=audioDelay;
+      encoding_gui->setAudioCodec("Copy");
       audio_filter=buildRawAudioFilter( video_body->getTime (frameStart), 
       		0xffffffff, shift);
     }

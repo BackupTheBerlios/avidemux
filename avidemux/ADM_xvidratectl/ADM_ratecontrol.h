@@ -102,6 +102,7 @@ protected:
 			uint32_t	_vbv_fullness;
 			uint32_t	_byte_per_image;
 			double		_compr[3][AVG_LOOKUP];  
+			uint32_t   _idxI,_idxP,_idxB;
 			
 			uint8_t 	project(uint32_t framenum, uint32_t q, ADM_rframe frame);
 			uint8_t 	checkVBV(uint32_t framenum, uint32_t q, ADM_rframe frame);

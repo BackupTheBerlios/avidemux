@@ -223,7 +223,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 	DIA_working 	*work;
 	uint32_t	gop_forward=0;
 	uint64_t	image_length,image_start,image_absStart;;
-
+	uint32_t    pic_progressive=0,pic_interlaced=0,pic_unknown=0;
 	work=new DIA_working("Indexing mpeg");
 
 	while(1)
@@ -257,6 +257,22 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
                                         		goto stop_found;
                                         		break;
 					*/
+#if 0					
+					case 0xB5:  // Extension start code, used to check if interlaced or not
+					          {
+					              uint16_t a,b;
+					                                 a=demuxer->read16i(); // Fw & Bw reference code
+					                                 if((a&0xf)==8)  // coding Id correct ?
+					                                 {
+                                                       b=demuxer->read16i(); // back 4, Dc 2, pict stuct 2
+					                                   b=(b>>6)&3;
+					                                   if(3==b) pic_progressive++;
+					                                    else if(!b) pic_unknown++;
+  					                                      else pic_interlaced++;
+                                                       }                                                               
+    					          }    
+                              break;
+#endif                              
 					case 0xB3: // sequence start
 						gop_seen=1;
 						// Memorize gop position
@@ -411,6 +427,8 @@ stop_found:
 		printf("\n end of stream...\n");
 		// update # of frames
 		fseek(out,0,SEEK_SET);
+		printf("Progressive :%lu, interlaced :%lu unknown :%lu\n",
+		    pic_progressive,pic_interlaced,pic_unknown);
 		fprintf(out,"IDXM ");
 		
 		switch(token)

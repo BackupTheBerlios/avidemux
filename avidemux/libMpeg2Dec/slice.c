@@ -158,6 +158,14 @@ static void updateQscale (const mpeg2_decoder_t * decoder)
 	return;
  }
  x--;
+ #if 1
+ if(decoder->picture_structure==BOTTOM_FIELD)
+ { // This is slighty wrong but it does not matter
+     y+=decoder->height>>5;  // so that we can fill the 2nd half
+                         // of the qscale table in case of interlaced
+                         // content (field encoded).
+ }    
+ #endif
  offset=y*decoder->quant_stride+x;
  
 	if(decoder->quant )

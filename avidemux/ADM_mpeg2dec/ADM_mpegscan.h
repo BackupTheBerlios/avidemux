@@ -31,6 +31,11 @@ typedef struct
 	uint64_t absoffset;  // offset / file
 	uint32_t size;		
 }MFrame;
+typedef struct
+{
+        uint32_t indexA;
+        uint32_t indexB;
+}ADM_Field;    
 typedef struct 
 {
 	uint32_t index,real;
@@ -41,6 +46,13 @@ typedef struct
 {
 protected:
 	uint8_t			asyncJump(uint32_t frame)	;
+    uint8_t         _fieldEncoded;
+	ADM_Field        *_fields;
+	uint32_t        _syncPoints;    // # of entries in the index, if interlaced =2*nbImage
+    uint8_t         fieldShrink(void); 
+    uint8_t          getFrameMpeg(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
+												uint32_t *flags);
+
 public:
 
 				mpeg2decHeader(void);
@@ -95,6 +107,7 @@ private:
 			uint32_t 					_nbIFrame;
 
 		        uint8_t					renumber(uint32_t nb);
+                uint8_t                 renumberField(void);
 
 		      class AVDMMpeg2decAudioStream *_audioStream;
 

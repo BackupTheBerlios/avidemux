@@ -105,12 +105,12 @@ uint32_t mpeg2decHeader::getFlags(uint32_t frame,uint32_t *flags)
 {
 	//uint32_t j=0;
 	*flags=0;
-	if(frame>=(uint32_t)_videostream.dwLength)
+	if(frame>=(uint32_t)_syncPoints)
 		{
-				printf("\n out of bound !");
+				printf(" out of bound (%lu/%lu/%lu)!\n",frame,_videostream.dwLength,_syncPoints);
 				return 0;
 		}
-		
+	if(_fieldEncoded) frame=_fields[frame].indexA;
 	switch(_indexMpegPTS[frame].type)
 	{
 			case 'I': *flags=AVI_KEY_FRAME; break;
@@ -138,26 +138,37 @@ uint8_t  	mpeg2decHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_
 //
 //
 //-----------------------------------
-
 uint8_t  mpeg2decHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
 												uint32_t *flags)
 {
-
-		aprintf("\t\tMpeg: get frame req for %lu\n",framenum);
-		*framelen=0;
-		if(flags)
-			{
-					*flags=0;
-			}
-
-				// here we go, first check
-		if(framenum>= _nbFrames)
+    if(framenum>= _nbFrames)
 			{
 					printf("\n Mpeg out of bound ! (%ld/%ld)\n",framenum,_nbFrames);
 					return 0;
 			}
-		getFlags(framenum,flags);
-		
+					// here we go, first check
+        if(flags)
+        {
+                *flags=0;
+  		        getFlags(framenum,flags);
+         } 		
+            if(!_fieldEncoded) return getFrameMpeg(framenum,ptr,framelen,flags);
+      
+    uint32_t len,dummyflag;
+            if(!getFrameMpeg(_fields[framenum].indexA,ptr,&len,flags)) return 0;
+            
+            if(!getFrameMpeg(_fields[framenum].indexB,ptr+len,framelen,&dummyflag)) return 0;
+            
+            *framelen+=len;
+            return 1;
+}
+uint8_t  mpeg2decHeader::getFrameMpeg(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
+												uint32_t *flags)
+{
+        ADM_assert(framenum<_syncPoints);
+		aprintf("\t\tMpeg: get frame req for %lu\n",framenum);
+		*framelen=0;
+
 		if(_indexMpegPTS[framenum].type=='I')
 				asyncJump(framenum);
 		else
@@ -170,15 +181,6 @@ uint8_t  mpeg2decHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t
 		}
 		*framelen+=_indexMpegPTS[framenum].size;
 		demuxer->read(_indexMpegPTS[framenum].size,ptr);
-		if(flags)
-		{
-			getFlags(framenum,flags);
-			aprintf( "type : %x\n",*flags);
-		}
-		else
-		{
-			aprintf("\n");
-		}
 		return 1;
 
 }

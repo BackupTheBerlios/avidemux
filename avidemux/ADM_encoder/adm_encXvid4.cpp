@@ -206,7 +206,7 @@ EncoderXvid4::encode (uint32_t frame, uint32_t * len, uint8_t * out,
 				 *flags=AVI_KEY_FRAME;
 				 printf("Forcing keyframe for B frame\n");
 			}
-			q=_vbuffer->_Qp>>1;
+			q=_vbuffer->_Qp;
 			if(q<2 || q>31)
 			{
 				printf("Out of bound incoming q:%d\n",q);

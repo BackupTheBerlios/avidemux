@@ -73,11 +73,48 @@ int scriptLoadFilter(int n,Arg *args);
 int scriptAddVideoFilter(int n,Arg *args);
 int scriptRemoveFrame(int n,Arg *args);
 int scriptSaveOgm(int n, Arg *args);
+int scriptOutputFormat(int n, Arg *srgs);
 extern void HandleAction(Action act);
 //_________________________
 #include "adm_command.h" 
 void ADS_commandList( void );
 ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg,uint8_t fake);
+//_______________________
+#include "ADM_editor/ADM_outputfmt.h"
+#include "ADM_gui2/GUI_ui.h"
+typedef struct ADM_CONTAINER
+{
+    ADM_OUT_FORMAT type;
+    const char     *name;
+}ADM_CONTAINER;
+#define MK_CONT(x) {ADM_##x,#x}
+
+const ADM_CONTAINER container[]=
+{
+  MK_CONT(AVI),
+  MK_CONT(OGM),
+  MK_CONT(ES),
+  MK_CONT(PS),
+  MK_CONT(AVI_DUAL),
+  MK_CONT(AVI_UNP),
+  MK_CONT(FMT_DUMMY)  
+};    
+#define NB_CONT sizeof(container)/sizeof(ADM_CONTAINER)
+
+int scriptOutputFormat(int n, Arg *args)
+{
+    const char *str=args[0].arg.string;
+    for(int i=0;i<NB_CONT;i++)
+    {
+        if(!strcmp(str,container[i].name))
+        {
+                 UI_SetCurrentFormat(container[i].type);
+                 return 1;   
+        }    
+    }    
+    printf("\n Cannot set output format\n");
+    return 0;
+}    
 //_______________________
 extern VF_FILTERS 	filterGetTagFromName(char *inname);
 int scriptAddVideoFilter(int n,Arg *args)

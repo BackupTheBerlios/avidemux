@@ -37,7 +37,7 @@ ADM_newXvidRcVBV::ADM_newXvidRcVBV(uint32_t fps1000, char *logname) : ADM_rateco
 	_stat=NULL;
 	_lastSize=NULL;
 	
-
+    _idxI=_idxP=_idxB=0;
 }
 ADM_newXvidRcVBV::~ADM_newXvidRcVBV()
 {
@@ -126,7 +126,14 @@ uint8_t ADM_newXvidRcVBV::logPass2(uint32_t qz, ADM_rframe ftype,uint32_t size)
 	}
 	// update compr
 	uint32_t rank;
-		rank=_frame%AVG_LOOKUP;
+#define BLEND(x) case RF_##x: rank=_idx##x;_idx##x=_idx##x+1;_idx##x%=AVG_LOOKUP;break;	
+	switch(ftype)
+	{
+	    BLEND(I)
+	    BLEND(P)
+	    BLEND(B)
+	    default: ADM_assert(0);
+	}    
 		_compr[ftype-1][rank]=getComp(_stat[_frame].size,_stat[_frame].quant,size,qz);
 	//
 	aprintf("Frame %08lu size %d type:%d vbv fullness %u, kbytes :%lu qz used :%d\n",_frame,size, ftype,(100*_vbv_fullness)/_vbvsize,_vbv_fullness/1024,qz);

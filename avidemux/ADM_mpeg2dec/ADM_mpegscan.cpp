@@ -58,6 +58,9 @@ mpeg2decHeader::mpeg2decHeader  (void)
 		_startSeq=NULL;
 		_indexMpegPTS=NULL;
 		_audioStream=NULL;
+		_fieldEncoded=0;
+		_fields=NULL;
+		_syncPoints=0;
 }
 //
 // Delete everything associated (cache...demuxer...)
@@ -69,7 +72,7 @@ mpeg2decHeader::~mpeg2decHeader  ()
 	  
 	  FREE(demuxer);
 	  FREETAB(_indexMpegPTS);
-
+	  FREETAB(_fields);
 	  #undef FREE
 	  #undef FREETAB
 
@@ -104,7 +107,7 @@ uint8_t			mpeg2decHeader::open(char *name)
 		uint32_t dummy,audio=0;
 	  	
 	  	char string[1024]; //,str[1024];;
-	
+        uint8_t interlac=0;
 			
 		printf("\n  opening d2v file : %s\n",name);
 		file=fopen(name,"rt");
@@ -115,7 +118,8 @@ uint8_t			mpeg2decHeader::open(char *name)
 			}
 		
 		fgets(string,1023,file);   	// File header
-	   	sscanf(string,"IDXM %c",&type);
+	   	sscanf(string,"IDX%c %c",&interlac,&type);
+	   	if(interlac=='I') _fieldEncoded=1;
 	   // not an elementary stream nor program stream -> WTF
 	   	if((type!='E' ) && (type!='P')&& (type!='T'))
 	   	{
@@ -286,7 +290,9 @@ uint8_t			mpeg2decHeader::open(char *name)
 		 	
 			demuxer->goTo(0);
       			
-			
+			 if(_fieldEncoded)
+                  fieldShrink();
+    
 
       			// switch DTS->PTS
       			if(!renumber(0))
@@ -329,15 +335,37 @@ uint8_t			mpeg2decHeader::open(char *name)
 				_audioStream=NULL;
 		}
      printf("Mpeg index file successfully read\n");         
-
      return 1; 
 }
+// concatenate 2 fields into one image
+uint8_t  mpeg2decHeader::fieldShrink( void)
+{
+    ADM_assert(_fieldEncoded);
+    printf("Shrinking field encoded mpeg (%lu)\n",_nbFrames);
+    uint32_t nbImage=0,cur=0;
+    _fields=new ADM_Field[_nbFrames];
+    while(cur<_nbFrames-1)
+    {
+                    {
+                          
+                                      _fields[nbImage].indexA=cur;
+                                      _fields[nbImage].indexB=cur+1;
+                                      cur+=2;    
+                                      nbImage++;
+                    }    
+     }
+     printf("Nb fields :%lu, nb Image :%lu\n",_nbFrames,nbImage);        
+     _syncPoints=_nbFrames;
+     _nbFrames=nbImage;
+     
+}    
 //
 //	Create GOP renumbering and PTS index entry
 //
 uint8_t  mpeg2decHeader::renumber(uint32_t nob)
 {
             UNUSED_ARG(nob);
+            if(_fieldEncoded) return renumberField();
 
 			 MFrame *tmp=new  MFrame[_nbFrames+2];;
 			//__________________________________________
@@ -391,9 +419,73 @@ uint8_t  mpeg2decHeader::renumber(uint32_t nob)
 					sizeof(MFrame));
 
 
-			_nbFrames=_videostream.dwLength= _mainaviheader.dwTotalFrames=curPTS+1;;
+			_syncPoints=_nbFrames=_videostream.dwLength= _mainaviheader.dwTotalFrames=curPTS+1;;
 			delete [] _indexMpegPTS;
 			_indexMpegPTS=tmp;
+			return 1;
+
+}
+//
+//			Same as above with field encoding
+//
+uint8_t  mpeg2decHeader::renumberField(void)
+{
+            ADM_assert(_fields);
+            ADM_assert(_syncPoints);
+            ADM_Field *tmp=new  ADM_Field[_nbFrames+2];;
+			//__________________________________________
+			// the direct index is in DTS time (i.e. decoder time)
+			// we will now do the PTS index, so that frame numbering is done
+			// according to the frame # as they are seen by editor / user			
+			// I1 P0 B0 B1 P1 B2 B3 I2 B7 B8
+			// xx I1 B0 B1 P0 B2 B3 P1 B7 B8               
+			//__________________________________________
+			uint32_t forward=0;			
+			uint32_t curPTS=0;
+			uint32_t dropped=0;
+			for(uint32_t c=1;c<_nbFrames;c++)
+			{
+				switch(_indexMpegPTS[_fields[c].indexA].type)
+					{
+						case 'P':
+						case 'I':
+								memcpy(&tmp[curPTS],
+										&_fields[forward],
+										sizeof(ADM_Field));
+								forward=c;
+								curPTS++;
+								dropped++;
+								break;
+						case 'B' : // we copy as is
+								if(dropped>=1)
+								{
+								memcpy(&tmp[curPTS],
+										&_fields[c],
+										sizeof(ADM_Field));
+								curPTS++;
+								}
+#if 1								
+								else
+								{ 
+								  printf("Frame dropped\n");
+								}
+#endif								
+								break;
+						default:
+								printf("Frame : %u / %u , type %d\n",
+										c,_nbFrames,_indexMpegPTS[_fields[c].indexA].type);
+				
+								ADM_assert(0);
+						}
+			}
+			// put back last frame we had in store
+			memcpy(&tmp[curPTS],
+					&_fields[forward],
+					sizeof(ADM_Field));
+
+            _nbFrames=_videostream.dwLength= _mainaviheader.dwTotalFrames=curPTS+1;;
+			delete [] _fields;
+			_fields=tmp;
 			return 1;
 
 }
@@ -446,6 +538,9 @@ uint8_t  mpeg2decHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 uint8_t mpeg2decHeader::getFrameSize(uint32_t frame,uint32_t *size) {
 
 	if(frame>=_nbFrames ) return 0;
+	if(_fieldEncoded)
+	  *size=_indexMpegPTS[_fields[frame].indexA].size+
+	        _indexMpegPTS[_fields[frame].indexB].size;
 	*size=_indexMpegPTS[frame].size;
 	return 1;
 

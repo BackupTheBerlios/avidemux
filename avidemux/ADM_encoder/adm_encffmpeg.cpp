@@ -417,7 +417,7 @@ EncoderFFMPEG::encode (uint32_t frame, uint32_t * len, uint8_t * out,
 				else		  *flags=0;
 			inq=_vbuffer->_Qp;
 			
-			inq>>=1; 	// ?
+		//	inq>>=1; 	// ?
 			
       			*flags+=(inq<<16);
 			

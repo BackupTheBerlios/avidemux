@@ -58,7 +58,7 @@ extern "C" {
 
 static uint8_t *_buffer=NULL,*_outbuffer=NULL;
 static void  end (void);
-
+extern const char *getStrFromAudioCodec( uint32_t codec);
 extern FFMPEGConfig ffmpegMpeg1Config;
 extern FFMPEGConfig ffmpegMpeg2Config;
 extern FFMPEGConfig ffmpegMpeg2ConfigDVD;
@@ -99,6 +99,7 @@ AVDMGenericAudioStream	*audio;
 uint32_t len,flags;
 uint32_t size;
 ADM_MUXER_TYPE mux;
+uint32_t  audio_encoding=0;
 	
 	twoPass=new char[strlen(name)+6];
 	twoFake=new char[strlen(name)+6];
@@ -147,7 +148,7 @@ ADM_MUXER_TYPE mux;
 		// Check
 		WAVHeader *hdr=audio->getInfo();
 	
-	
+			audio_encoding=hdr->encoding;
 	
 	
 		if(current_codec==CodecXVCD)
@@ -292,6 +293,9 @@ ADM_MUXER_TYPE mux;
 		else
 			encoding->setPhasis ("Encoding");
 
+         // Set info for audio if any
+         if(muxer)
+                  encoding->setAudioCodec(getStrFromAudioCodec(audio_encoding));
 		// 2nd or Uniq Pass
 		for(uint32_t i=0;i<total;i++)
 			{

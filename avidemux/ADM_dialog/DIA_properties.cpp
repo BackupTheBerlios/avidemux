@@ -46,7 +46,7 @@ void DIA_properties( void )
  uint16_t hh, mm, ss, ms;
  GtkWidget *dialog;
  uint8_t gmc, qpel,vop;
- uint32_t info;
+ uint32_t info=0;
  
     if (playing)
 	return;

@@ -333,7 +333,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 uint8_t		ADM_Composer::decodeCache(uint32_t frame,uint32_t seg, ADMImage *image)
 {
 uint32_t len;
-uint32_t flags;
+uint32_t flags,sumit;
 float	 sum;
 EditorCache *cache=_videos[seg]._videoCache;	
 	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,
@@ -361,12 +361,16 @@ EditorCache *cache=_videos[seg]._videoCache;
 	}
 	// We got everything, let's go
 	// 1 compute average quant
+	int qz;
+	sumit=0;
 	for(uint32_t z=0;z<_imageBuffer->_qSize;z++)
 	{
-			sum+=_imageBuffer->quant[z];
+            qz=(int)_imageBuffer->quant[z];
+			sumit+=qz;
 	}
-	sum+=(_imageBuffer->_qSize-1);
-	sum*=2;
+	sumit+=(_imageBuffer->_qSize-1);
+//	sumit*=2;
+	sum=(float)sumit;
 	sum/=_imageBuffer->_qSize;
 	if(sum>31) sum=31;
 	if(sum<1) sum=1;

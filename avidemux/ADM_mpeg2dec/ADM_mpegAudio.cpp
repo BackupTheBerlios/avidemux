@@ -62,7 +62,7 @@ AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 		uint64_t abs;
 		uint32_t dummy;//,audio=0;
 		char string[1025]; //,str[1024];;
-	
+			uint8_t interlaced;
 		_sync= NULL;
 		_wavheader=NULL;
 		
@@ -75,7 +75,7 @@ AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 			}
 		
 		fgets(string,1023,file);   	// File header
-		sscanf(string,"IDXM %c %x",(char*)&ctype,&id);
+		sscanf(string,"IDX%c %c %x",&interlaced,(char*)&ctype,&id);
 		type=ctype;
 		fgets(string,1023,file);   	// # of  frames	 		
 		fgets(string,1023,file);   	// nb file

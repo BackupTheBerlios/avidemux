@@ -112,7 +112,7 @@ extern int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 extern  uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 		   				   uint32_t * br,uint32_t *fsize,
 						   FFcodecSetting *conf);
-
+#define FF_TRELLIS 0 // use treillis for mpeg1 encoding
 /*
   	Codec settings here
 
@@ -262,7 +262,7 @@ extern  uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 	 0, // 		GMC
 	 0,//		_4MV;
 	 0,//		_QPEL;
-	 1,//		_TREILLIS_QUANT
+	 FF_TRELLIS,//		_TREILLIS_QUANT
 	 2,//		qmin;
 	 31,//		qmax;
 	 3,//		max_qdiff;
