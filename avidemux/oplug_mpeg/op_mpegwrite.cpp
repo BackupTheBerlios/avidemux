@@ -181,12 +181,16 @@ uint8_t  mpegWritter::save_svcd(char *name)
 }
 
 
-#define PACK_AUDIO 	{ uint32_t audiolen=0;	\
+#define PACK_AUDIO 	{ uint32_t audiolen=0, audioread=0;	\
 				audioWanted+=_audioOneFrame; \
-				audiolen=(uint32_t)ceil(audioWanted-audioGot); \
-				audiolen = _audio->read (audiolen,_audioBuffer); \
-				_muxer->writeAudioPacket(audiolen,_audioBuffer);\
-				audioGot+=audiolen;}
+				if(_muxer->audioEmpty()) \
+	 				audiolen=(uint32_t)floor(8+audioWanted-audioGot);\
+				else \
+ 					audiolen=(uint32_t)floor(audioWanted-audioGot);\
+				audioread = _audio->read (audiolen,_audioBuffer); \
+				if(audioread!=audiolen) printf("Mmm not enough audio..\n"); \
+				_muxer->writeAudioPacket(audioread,_audioBuffer);\
+				audioGot+=audioread;}
 				
 /*---------------------------------------------------------------------------------------*/
 uint8_t  mpegWritter::save_dvd(char *name)

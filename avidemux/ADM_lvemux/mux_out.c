@@ -514,8 +514,6 @@ static int mux_put_av_pack(PackStream *ps)
     header_data_len -= 5;
   }
   
-  ps->pts = -1.0;  // caller must set pts again to activate timestamping
-    
   //-- stuffing rest of header data len --
   for(i=0;i<header_data_len;i++) put_byte(bp, 0xff);
 
@@ -588,7 +586,7 @@ static int mux_flush_packs(PackStream *ps)
     put_bits(bp,  9, 0);    // set remainder of SCR (because of simplicity to 0) 
     put_bits(bp,  1, 1);    // marker 
 
-    //-- next SCR in next pack --
+    //-- next SCR in next pack --   
     ps->scr += scr_step;
     start   += ps->pack_size;
   }
@@ -773,6 +771,7 @@ int mux_write_packet(PackStream *ps,
     ps->pkt_id  = pkt_id;    // 0xC0=MP2-Audio, 0x80=AC3 Audio, 0xE0=Video 
     ps->pkt_buf = pkt_buf;
     ps->pkt_len = pkt_len; 
+    ps->pts     = -1.0;
 
     //-- different handling for video and audio data -- 
     //-------------------------------------------------
@@ -803,7 +802,6 @@ int mux_write_packet(PackStream *ps,
         
           //-- every sequence/GOP packet will by PTS timestamped --
           ps->pts = ps->frame_no * ps->pict_duration + ps->v_pts_ofs; // with videoffset
-          //ps->audio_pts = ps->pts;
         }
       }
       if(pkt_len>50) // Do not take isolated pack start
@@ -815,7 +813,8 @@ int mux_write_packet(PackStream *ps,
           
       ps->audio_blocks = pkt_len/(double)ps->audio_encoded_fs;
       
-      //fprintf(stderr, "*** (%1.4f/%d) ***\n", ps->audio_blocks, ps->audio_encoded_fs);
+      //fprintf(stderr, "*** (%1.4f/%d len=%d) ***\n", 
+      //        ps->audio_blocks, ps->audio_encoded_fs, pkt_len);
 
       if (ps->audio_id == AUDIO_ID_MP2) 
         pts_step = ps->audio_blocks * 24;
@@ -841,6 +840,15 @@ int mux_write_packet(PackStream *ps,
       
       ps->pkt_buf += payload_size;
       ps->pkt_len -= payload_size;
+
+      //-- in assumption, that audio data will be fit  into --
+      //-- at max 2 packs and ALL sync words will occur in  --
+      //-- 1st. pack the 2nd. pack can be timestamped with  --
+      //-- the same value prepared for next function call.  --
+      if (ps->pkt_id < VIDEO_ID)
+        ps->pts = ps->audio_pts + ps->a_pts_ofs + ps->audio_delay;
+      else
+        ps->pts = -1.0;  
     }  
 
     //-- after audio data -> update all pack SCRs and write unit -- 
