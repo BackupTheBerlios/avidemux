@@ -73,7 +73,9 @@ AVDMProcessAudio_Lame::~AVDMProcessAudio_Lame()
 //                              1 : init succeeded
 //_______________________________________________
 uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
-					uint32_t mode, uint32_t bitrate)
+					uint32_t mode, 
+					uint32_t bitrate,
+					ADM_LAME_PRESET preset)
 {
 
     int ret, ratio;
@@ -107,7 +109,7 @@ uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
     printf("\n output frequency : %lu\n", frequence);
     ret = lame_set_out_samplerate(myflags, frequence);
 
-    ret = lame_set_quality(myflags, 0);	//max quality);
+    ret = lame_set_quality(myflags, 2);	//max quality);
     if (_instream->getInfo()->channels == 2)
       {
 	  switch (mode)
@@ -142,6 +144,22 @@ uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
     // update bitrate in header
     _wavheader->byterate = (bitrate >> 3) * 1000;
    
+    // configure CBR/ABR/...
+    switch(preset)
+    {
+    	default:
+    	case ADM_LAME_PRESET_CBR: break;
+	case ADM_LAME_PRESET_ABR:
+	  lame_set_preset( myflags, bitrate);
+
+	 break;
+	case ADM_LAME_PRESET_EXTREME: 
+	  lame_set_preset( myflags, EXTREME);	
+	break;
+    
+    
+    }
+    
     lame_print_config(myflags);
     lame_print_internals(myflags);
 

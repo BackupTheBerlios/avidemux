@@ -64,7 +64,7 @@ static CODECLIST myCodecList[]=
 		{"toolame", AUDIOENC_2LAME},
 		{"none", AUDIOENC_NONE}
 };
-
+extern int DIA_getLameSettings(int *pmode, int *pbitrate,ADM_LAME_PRESET *preset);
 #define MAX_AUDIO_FILTER 10
 static AVDMProcessAudioStream *filters[MAX_AUDIO_FILTER];
 static uint32_t filtercount = 0;
@@ -84,7 +84,7 @@ FILMCONV audioFilmConv=FILMCONV_NONE;
 
 // MP3 parameters
  int audioMP3mode = 0, audioMP3bitrate = 128;
-
+ ADM_LAME_PRESET audioMP3preset=ADM_LAME_PRESET_CBR;
 //
 static AUDIOENCODER  activeAudioEncoder=  AUDIOENC_NONE;
 
@@ -280,21 +280,20 @@ void audioCodecSelect( void )
 void audioCodecConfigure( void )
 {
 	int mode,bitrate;
+	ADM_LAME_PRESET preset;
 	bitrate= audioMP3bitrate;
+	preset=audioMP3preset;
 	mode=audioMP3mode;
+	
 	switch(activeAudioEncoder)
 	{
 		case AUDIOENC_NONE:
 								return;
 #ifdef HAVE_LIBMP3LAME								
 		case AUDIOENC_MP3:
-						
-							if (DIA_audioEncoder(&mode, &bitrate,"MP3 parameter"))
-								{
-									audioMP3mode=mode;
-									audioMP3bitrate=bitrate;										
-								}
-								return;
+						DIA_getLameSettings(&audioMP3mode, &audioMP3bitrate,&audioMP3preset);
+						return;
+						break;
 #endif
 
 		case AUDIOENC_MP2:
@@ -560,7 +559,8 @@ uint8_t init;
 				printf("\n Init of lame with bitrate %d , mode %d ",
 							 audioMP3bitrate, audioMP3mode);
 			  	init = plame->initLame(0, 	(uint32_t) audioMP3mode,
-			      					(uint32_t) audioMP3bitrate);
+			      					(uint32_t) audioMP3bitrate,
+								audioMP3preset);
 
 			  	if (init)
 			    	{

@@ -79,6 +79,9 @@ class AVDMGenericAudioStream
    	protected:
     #define SIZE_INTERNAL 64*1024 
 					uint8_t 	internalBuffer[2 * SIZE_INTERNAL];
+					uint8_t 	packetBuffer[2 * SIZE_INTERNAL];
+					uint32_t	packetHead,packetTail;
+					
             				WAVHeader	*_wavheader;
                 			ADM_Audiocodec 	*_codec;
 					uint32_t	_length;
@@ -93,11 +96,15 @@ class AVDMGenericAudioStream
             				uint32_t	_nbMap;
                         		uint32_t	_current;
 					uint8_t		_mpegSync[3];
+					uint8_t		getPacketMP3(uint8_t *dest, uint32_t *len, 
+										uint32_t *samples);
+					uint8_t		getPacketAC3(uint8_t *dest, uint32_t *len, 
+									uint32_t *samples);
        protected:
 				       	uint8_t  	readc( uint8_t *c);
 			      
 		public:
-					AVDMGenericAudioStream( void ){_codec=NULL;_current=0;_audioMap=NULL;_wavheader=NULL;_LAll=NULL;_mpegSync[0]=_mpegSync[1]=_mpegSync[2]=0;}
+					AVDMGenericAudioStream( void ){_codec=NULL;_current=0;_audioMap=NULL;_wavheader=NULL;_LAll=NULL;_mpegSync[0]=_mpegSync[1]=_mpegSync[2]=0;packetHead=packetTail=0;}
 			virtual 				~AVDMGenericAudioStream() ;
           				uint8_t			beginDecompress( void );
         		     		uint32_t		getPos( void ) {return _pos;};
@@ -134,6 +141,10 @@ class AVDMGenericAudioStream
 										*d=NULL;
 										return 0;
 									}
+					// Get Packet
+				uint8_t				getPacket(uint8_t *dest, uint32_t *len, 
+										uint32_t *samples);
+									
 }
 ;
 

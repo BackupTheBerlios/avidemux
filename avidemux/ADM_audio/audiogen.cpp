@@ -42,7 +42,6 @@
 extern uint16_t MP1L2Bitrate[2][16];
 extern uint16_t MP2L1Bitrate[2][16];
 
-
 AVDMGenericAudioStream::~AVDMGenericAudioStream()
 {
 	if(_codec)
@@ -321,6 +320,7 @@ uint8_t AVDMGenericAudioStream::goToTime(uint32_t timeoffset)
 {
 
     uint32_t offset;
+    packetHead=packetHead=0;
     offset = convTime2Offset(timeoffset);
       aprintf("\n Time Offset : %lu", timeoffset);
    if( _audioMap)
@@ -532,7 +532,4 @@ gotit:
 
              	return lr;
 }
-
-
-
 //

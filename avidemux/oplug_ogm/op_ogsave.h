@@ -20,9 +20,9 @@ class ADM_ogmWrite
 	protected:
 			char 			*TwoPassLogFile;	
 	
-			double			_audioTarget,_oneRound;
+			uint32_t		_audioTarget,_audioCurrent;
 			
-			uint32_t		_audioHead,_audioTail,_audioCurrent;	
+			
 			uint32_t		_togo;
 			uint64_t		_packet;			
 			FILE			*_fd;

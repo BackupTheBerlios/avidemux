@@ -13,4 +13,5 @@ EXTRA_DIST = audioeng_44sample.cpp audioeng_6dbpress.cpp audioeng_buff.cpp audio
 ####### kdevelop will overwrite this part!!! (end)############
 
 INCLUDES= $(all_includes) $(GTK_CFLAGS) -DTOOLAME='"'$(TOOLAME)'"' -DEXLAME='"'$(EXLAME)'"'
-noinst_HEADERS = audioeng_sox.h audioeng_libtoolame.h audioeng_film2pal.h
+noinst_HEADERS = audioeng_sox.h audioeng_libtoolame.h audioeng_film2pal.h \
+	audioeng_lame.h

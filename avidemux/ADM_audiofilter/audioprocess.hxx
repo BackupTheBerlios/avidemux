@@ -238,28 +238,6 @@ public:
   	virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer);
      		
 };
-#ifdef HAVE_LIBMP3LAME
-//_____________________________________________
-class AVDMProcessAudio_Lame : public AVDMBufferedAudioStream
-{
-protected:
-         uint32_t _mode;
-         uint32_t _bitrate;
-         uint32_t _fq;
-         uint32_t _size;
-				 uint8_t  _bufferin[PROCESS_BUFFER_SIZE];
-          virtual uint32_t 	grab(uint8_t *obuffer);
-		
-public:
-						
-				~AVDMProcessAudio_Lame();
-				uint8_t	initLame(uint32_t frequence,
-												 uint32_t mode,
-												 uint32_t bitrate);
-
-        AVDMProcessAudio_Lame(AVDMGenericAudioStream *instream	);		
-     		
-};
-#endif
+#include "ADM_audiofilter/audioeng_lame.h"
 #endif
 // EOF

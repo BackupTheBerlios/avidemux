@@ -50,6 +50,10 @@
 // should be enougth, at 500 kbps / 25 fps -> 3kbyte per slice
 #define OGM_AUDIO_BUFFER 64000
 
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_OGM_WRITE
+#include "ADM_toolkit/ADM_debug.h"
+
 extern const char *getStrFromAudioCodec( uint32_t codec);	
 
 //__________________________________________________
@@ -134,156 +138,61 @@ WAVHeader	*info=NULL;
 		header.default_len=1;
 		
 		audioStream->writeHeaders(sizeof(header),(uint8_t *)&header); // +4 ?
-		_oneRound=info->byterate;
-		_oneRound*=1000;
-		_oneRound/=_fps1000;
-		_audioCurrent=0;
-		_audioTarget=0;
+		_audioTarget=_audioCurrent=0;
 		
-		_audioHead=_audioTail=0;
-		printf("One video frame is %f audio bytes, fps is %d, byterate is %lu fq is %lu \n",_oneRound,_fps1000,info->byterate,info->frequency);
+		
+		
 		return 1;	
 	
 }
 //__________________________________________________
 uint8_t		ADM_ogmWrite::writeAudio(uint32_t vframe)
 {
-uint32_t chunk,red;
+uint32_t chunk,red,sample;
+double tgt;
+uint32_t len,packetLen,packets=0;
+uint32_t totalsample=0;
+uint32_t lastPacket;
 	if(!audioStream) return 1; // nothing to do
 		
-	// Do some sanity check / cleanup on the buffer
+	tgt=vframe+1;
+	tgt/=_fps1000;
+	tgt*=1000*audioFilter->getInfo()->frequency;
 	
-	ADM_assert(_audioTail>=_audioHead);
+	_audioTarget=(uint32_t )floor(tgt);
 	
-	//
-	if(_audioTail>OGM_AUDIO_BUFFER)
+	len=0;
+	sample=0;
+	// _audioTarget is the # of sample we want
+	while(_audioCurrent<_audioTarget)
 	{
-		memmove(_audioBuffer,_audioBuffer+_audioHead,_audioTail-_audioHead);
-		_audioTail-=_audioHead;
-		_audioHead=0;
+		if(!audioFilter->getPacket(_audioBuffer+len,&packetLen,&sample))
+		{
+			printf("OGMWR:Could not read packet\n");
+			break;
+		}
+		len+=packetLen;
+		_audioCurrent+=sample;
+		totalsample+=sample;
+		packets++;
 	}
-	ADM_assert((_audioTail-_audioHead)<(OGM_AUDIO_BUFFER>>1));
-	
-	
-	// Fill buffer (CBR)
-	
-	_audioTarget+=_oneRound;
-	//if(!vframe) _audioTarget+=_oneRound;
-	if(_audioCurrent<_audioTarget)
+	lastPacket=_audioCurrent-sample;
+	if(len)
 	{
-		chunk=(uint32_t)floor(_audioTarget-_audioCurrent);
-		
-		red=audioFilter->read(chunk, _audioBuffer+_audioTail);
-		if(red==MINUS_ONE)
-		{
-			printf("OGM muxer:Read failed\n");
-			return 0;
-		}
-					
-		if(red>chunk)
-		{
-			printf("Bonanza!\n");
-		}
-		_audioTail+=red;
-	}
-	uint32_t wrote;
-	// Try to write complete audio frames
-	//if(_audioCurrent>2000)  // else don't bother
-	{
-		switch(audioFilter->getInfo()->encoding)
-		{
-			//case WAV_AC3:
-			case WAV_MP3:
-					wrote=putMP3(vframe);
-					_audioHead+=wrote;
-					_audioCurrent+=wrote;
-					break;
-			default:
-					
-					wrote=putAC3(vframe);
-					_audioHead+=wrote;
-					_audioCurrent+=wrote;
-					break;
-						
-		}
-	}
+		aprintf("OGMW: Found %lu packet sample :%lu len=%lu, curoffset:%lu targetoffset=%lu\n",
+			packets,totalsample,len,_audioCurrent,_audioTarget);
+			
+		audioStream->write(len,_audioBuffer,AVI_KEY_FRAME,(uint64_t)(_audioCurrent));
+	
+	}	
 	return 1;
 }
-// We assume it starts aligned
-uint32_t ADM_ogmWrite::putAC3( uint32_t vframe )
-{
-uint8_t *start=_audioBuffer+_audioHead;
-uint8_t *sstart=start;
-uint32_t left=_audioTail-_audioHead;
-int flags, sample_rate,bit_rate;
-int size=0;
 
-		
-		while(size+6<left)
-		{
-			if(start[0]!=0x0b || start[1]!=0x77)
-			{
-				printf("Head: %d  Tail:%d x:%x %x\n",_audioHead,_audioTail,start[0],start[1]);
-				printf("Left:%d\n",left);
-				return 0;
-			}
-			
-			size= ADM_a52_syncinfo (start, &flags, &sample_rate, &bit_rate);
-			//printf("This round%d %d\n",size,sample_rate);
-			if(!size)
-			{
-				printf("OGM: Cannot sync\n");
-				printf("%x %x, packet %x\n",start[0],start[1],_packet);
-				printf("left :%d\n",left);
-				return 0;
-			}
-			if(size+6<left)
-			{
-				_packet++;			
-				start+=size;
-				left-=(size);
-			}
-			
-		}
-		uint32_t put=start-sstart;		
-		// nothing to write
-		if(!put) return 0;
-		
-		double l;
-		l=_audioCurrent+put;		
-		l=l/audioFilter->getInfo()->byterate;
-		l=l*audioFilter->getInfo()->frequency;
-		
-		audioStream->write(put,_audioBuffer+_audioHead,AVI_KEY_FRAME,(uint64_t)(floor(l)));
-		return put;
-
-}
-//______________________________________________
-uint32_t ADM_ogmWrite::putMP3( uint32_t vframe )
-{
-		uint32_t n=_audioTail-_audioHead,t;
-		n=n/1152;
-		n*=1152;
-		//printf("Tail :%lu Head :%lu n:%lu\n",_audioTail,_audioHead,n);
-		t=_audioCurrent+n;
-		if(!n) return 0;
-		double l;
-		
-		l=t;
-		l=l/audioFilter->getInfo()->byterate;
-		l=l*audioFilter->getInfo()->frequency;
-		
-
-		audioStream->write(n,_audioBuffer+_audioHead,AVI_KEY_FRAME,(uint64_t)(floor(l)));
-		
-		return n;
-
-}
 //________________________________________
 uint8_t		ADM_ogmWrite::endAudio(void)
 {
 	if(!audioStream) return 1;
-		
+#if 0		
 		double l;
 		
 		l=_audioCurrent+_audioTail-_audioHead;
@@ -291,6 +200,7 @@ uint8_t		ADM_ogmWrite::endAudio(void)
 		l=l*audioFilter->getInfo()->frequency;
 		
 	audioStream->write(_audioTail-_audioHead,_audioBuffer+_audioHead,AVI_KEY_FRAME,(uint64_t)(floor(l)));
+#endif	
 	if(audioStream) audioStream->flush();
 	return 1;
 
