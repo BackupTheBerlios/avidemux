@@ -66,8 +66,9 @@ typedef struct FFcodecSetting
 	int		_NORMALIZE_AQP;		// normalize adap quantiz
 	
 	//
-	int		use_xvid_ratecontrol;
+	int		use_xvid_ratecontrol;	
 	int		bufferSize;			// in KBYTES !!!!
+	int		override_ratecontrol;
 	int		dummy;
 	
 }FFcodecSetting;

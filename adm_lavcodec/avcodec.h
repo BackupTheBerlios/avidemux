@@ -994,7 +994,7 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int rc_max_rate;
-    
+    int rc_max_rate_header; /*< That one is set in the header MEANX */
     /**
      * minimum bitrate.
      * - encoding: set by user.
@@ -1008,7 +1008,7 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int rc_buffer_size;
-    int rc_buffer_size_header; // MEANX
+    int rc_buffer_size_header;  /*< That one is set in the header MEANX*/
     float rc_buffer_aggressivity;
 
     /**

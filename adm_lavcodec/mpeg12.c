@@ -300,24 +300,13 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             // /MEANX pulldown
 
            // put_bits(&s->pb, 4, s->frame_rate_index);
-            if(s->avctx->rc_max_rate){
-                v = (s->avctx->rc_max_rate + 399) / 400;
+            if(s->avctx->rc_max_rate_header){ //MEANX
+                v = (s->avctx->rc_max_rate_header + 399) / 400;
                 if (v > 0x3ffff && s->codec_id == CODEC_ID_MPEG1VIDEO)
                     v = 0x3ffff;
             }else{
                 v= 0x3FFFF;
-            }
-  	  if(s->avctx->rc_max_rate){
-	    //MEANX: Target DVD bitrate
-	    	if(s->codec_id == CODEC_ID_MPEG2VIDEO)
-			v=20000; // 8 Mbps
-		else
-                	v = (s->avctx->rc_max_rate + 399) / 400;
-                if (v > 0x3ffff && s->codec_id == CODEC_ID_MPEG1VIDEO)
-                    v = 0x3ffff;
-            }else{
-                v= 0x3FFFF;
-            }
+           }
 		// MEANX we use rc_buffer_size_header here to force
 		// a correct rc_buffer_size
             if(s->avctx->rc_buffer_size_header)

@@ -222,6 +222,7 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
       				_state = enc_CQ;
 				setMatrix(); //_settings.user_matrix,_settings.gop_size);
      				_codec = new ffmpegEncoderCQ (_w, _h,_id);
+				_settings.override_ratecontrol=0;
      				_codec->setConfig(&_settings);
       				_codec->init (_param.qz,_fps,0);
       				break;
@@ -230,6 +231,7 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
       				_state = enc_CBR;
 				setMatrix();
      				_codec = new ffmpegEncoderCBR (_w, _h,_id);				
+				_settings.override_ratecontrol=0;
 				_codec->setConfig(&_settings);			
 				flag1=1;
      				_codec->init (_param.bitrate,_fps,flag1);
@@ -237,6 +239,7 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
       				break;
     case COMPRESS_2PASS:
 				{
+				_settings.override_ratecontrol=1;
 				ffmpegEncoderCQ *cdec=NULL;
 						if(_use_xvid_ratecontrol)
 						{
@@ -255,10 +258,7 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 							setMatrix();
 							cdec = new ffmpegEncoderCQ (_w, _h,_id); // Pass1
 							
-							FFcodecSetting tmp;
-							memcpy(&tmp,&_settings,sizeof(_settings));
-							tmp.maxBitrate=tmp.minBitrate=tmp.bufferSize=0;
-			    				cdec->setConfig(&tmp);
+							cdec->setConfig(&_settings);
 							
 							cdec->init (FIRST_PASS_QUANTIZER,_fps,1);
 							_codec=cdec;
@@ -269,10 +269,8 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 							printf("\n ffmpeg dual size: %lu",_param.finalsize);
 							setMatrix();
 							cdec = new ffmpegEncoderCQ (_w, _h,_id); // Pass1
-			    				FFcodecSetting tmp;
-							memcpy(&tmp,&_settings,sizeof(_settings));
-							tmp.maxBitrate=tmp.minBitrate=tmp.bufferSize=0;
-			    				cdec->setConfig(&tmp);
+			    				
+			    				cdec->setConfig(&_settings);
 							cdec->setLogFile(_logname);
 							cdec->init (FIRST_PASS_QUANTIZER,_fps,1);
 							_codec=cdec;
@@ -392,7 +390,7 @@ uint32_t avg_bitrate;
   	
   
   	_codec=  new ffmpegEncoderVBR (_w, _h,0 ,_id); //0 -> external 1 -> internal
-	
+	_settings.override_ratecontrol=0;
 	_codec->setConfig(&_settings);
 	  	
   	setMatrix();
@@ -413,12 +411,8 @@ uint32_t avg_bitrate;
 	
  	_codec= new  ffmpegEncoderVBRExternal (_w, _h,_id); //0 -> external 1 -> internal (_w, _h);
 	
-  	FFcodecSetting tmp;
-	memcpy(&tmp,&_settings,sizeof(_settings));
-	tmp.maxBitrate=tmp.minBitrate=0; // Disable internal, vbv buffer size is set nonethless
-	
-	
-	_codec->setConfig(&tmp);
+	_settings.override_ratecontrol=1;  	
+	_codec->setConfig(&_settings);
 	
 	setMatrix();
 	_codec->setLogFile("/tmp/dummylog.txt");
