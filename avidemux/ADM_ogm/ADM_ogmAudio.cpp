@@ -237,16 +237,19 @@ uint32_t i;
 uint8_t		oggAudio::getPacket(uint8_t *dest, uint32_t *len, 
 						uint32_t *samples)
 {
+uint32_t f;
 
 //	printf("OggAudio::getPacket");
 	if(_wavheader->encoding!=WAV_OGG)
 	{
 		return AVDMGenericAudioStream::getPacket(dest,len,samples);
 	}
-	printf("OggAudio::Get Vorbis packet\n");
+	//printf("OggAudio::Get Vorbis packet\n");
 	*len=0;
 	*samples=0;
-	return 0;
+	readPacket(len,dest,&f);
+	*samples=1024; // FIXME
+	return 1;
 }
 
 //
