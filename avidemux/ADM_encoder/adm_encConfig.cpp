@@ -776,37 +776,38 @@ int videoCodecConfigure(  char *cmdString,uint32_t optionSize,uint8_t  *option)
 typedef struct codecEnumByName
 {
 	SelectCodecType type;
+	const char	*displayName;
 	const char	*name;
 }codecEnumByName;
 
 static const codecEnumByName mycodec[]=
 {
 #ifdef USE_DIVX
-	{CodecDivx	,"Divx"},
+	{CodecDivx	,"Divx","Divx"},
 #endif
 #ifdef USE_XX_XVID
-	{CodecXvid	,"Xvid"},
+	{CodecXvid	,"Xvid","Xvid"},
 #endif
 
 #ifdef USE_XVID_4
-	{CodecXvid4	,"Xvid4"},
+	{CodecXvid4	,"Xvid4","Xvid4"},
 #endif
 
 
-	{CodecMjpeg	,"Mjpeg"},
+	{CodecMjpeg	,"MJpeg","Mjpeg"},
 #ifdef USE_MJPEG
-	{CodecVCD	,"VCD"},
-	{CodecSVCD	,"SVCD"},
-	{CodecDVD	,"DVD"},
+	{CodecVCD	,"VCD","VCD"},
+	{CodecSVCD	,"SVCD","SVCD"},
+	{CodecDVD	,"DVD","DVD"},
 #endif
-	{CodecXVCD	,"XVCD"},
-	{CodecXSVCD	,"XSVCD"},
-	{CodecFF	,"FFmpeg4"},
-	{CodecH263	,"H263"},
-	{CodecH263P	,"H263+"},
-	{CodecHuff	,"Huffyuv"},
-	{CodecFFV1	,"FFV1"},
-	{CodecSnow	,"Snow"}
+	{CodecXVCD	,"XVCD","XVCD"},
+	{CodecXSVCD	,"DVD (lavc)","XSVCD"},
+	{CodecFF	,"Lav Mpeg4","FFmpeg4"},
+	{CodecH263	,"H263","H263"},
+	{CodecH263P	,"H263+","H263+"},
+	{CodecHuff	,"Huffyuv","Huffyuv"},
+	{CodecFFV1	,"FFV1","FFV1"},
+	{CodecSnow	,"Snow","Snow"}
 };
 uint32_t encoderGetNbEncoder(void)
 {
@@ -815,7 +816,7 @@ uint32_t encoderGetNbEncoder(void)
 const char* encoderGetIndexedName(uint32_t i)
 {
 	ADM_assert(i<sizeof(mycodec)/sizeof(codecEnumByName));
-	return mycodec[i].name;
+	return mycodec[i].displayName;
 }
 void videoCodecChanged(int newcodec)
 {
