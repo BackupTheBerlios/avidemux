@@ -40,8 +40,7 @@
 	Usefull for editing PVR captured files for example
 
 */
-
-static AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *pcm);
+ AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *pcm);
 
 void mpeg_passthrough(  char *name )
 {

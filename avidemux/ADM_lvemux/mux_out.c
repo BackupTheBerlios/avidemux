@@ -650,7 +650,19 @@ PackStream *mux_open(char *fn,
     ps->audio_delay = 0; //(audio_id == 0x80)? 200:0;
     ps->audio_max_buf_size = 4 * 1024;
     ps->audio_pts   = 0;
-   
+    // MEANX
+    if(audio_id==AUDIO_ID_MP2)
+    	ps->audio_encoded_fs=(int)ceil(( MP2_FRAME_SIZE*a_bit_rate)/(8*sample_rate));
+    else // AC3
+    	ps->audio_encoded_fs=(int)ceil((AC3_FRAME_SIZE *a_bit_rate)/(8*sample_rate));
+      
+#if 0    
+      ap.size_pf = (int)( (ap.samples_pf * ap.br) / (8.0 * ap.sr) + 0.5);
+    fprintf(stderr, "\naudio stream type (%s) detected \n", (ap.id==AUDIO_ID_MP2)? "MP2":"AC3");
+    fprintf(stderr, "- sample rate (%d Hz)\n- bitrate (%d bps)\n- frame size (%d bytes)\n",
+            ap.sr, ap.br, ap.size_pf);
+#endif	    
+	// MEANX
     put_init_bp(&ps->bit_pack, ps->stream_buf); // equal to pack_start now
     
     return ps;   

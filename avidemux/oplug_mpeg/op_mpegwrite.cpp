@@ -95,6 +95,7 @@ extern int32_t audioDelay;
 // else do 1st pass with constant Q=6
 #define ADM_1PASS_CBR 1
 #define MAXAUDIO 56000
+extern AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *mypcm);
 // ______________________________________________
 // 								Initialise all variables
 // ______________________________________________
@@ -1010,102 +1011,19 @@ int dummy_func_mpeg( int i )
 //
 uint8_t mpegWritter::initLveMux( char *name )
 {
-	char *lvemux;
-	char cmd[256];
-	uint32_t fps1000;
-	uint32_t one_pcm_audio_frame;
-	int err;
-	
-	printf("----- Preparing audio track.------\n");
-// ________________prepare audio________________________
-	    
-     
-      	// compute the number of bytes in the incoming stream
-      	// to feed the filter chain
-      	double	byt;
-      	byt =	video_body->getTime (frameEnd + 1) - video_body->getTime (frameStart);
-      	byt *= currentaudiostream->getInfo ()->frequency;
-      	byt *= currentaudiostream->getInfo ()->channels;
-      	byt *= 2;
-      	byt /= 1000.;
+uint32_t one_pcm_audio_frame;
+uint32_t fps1000;
 
-	if(audioProcessMode)
+	_audio=mpt_getAudioStream(&one_pcm_audio_frame);
+	if(!_audio)
 	{
-      		_audio = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart),
-				  (uint32_t) floor (byt));
+		printf("Cannot initialize lvemux\n");
+		return 0;
 	}
-	else
-	{
+	fps1000=getLastVideoFilter()->getInfo()->fps1000;
 	
-        	uint32_t    tstart;
-	  	tstart = video_body->getTime (frameStart);
-		_audio = (AVDMGenericAudioStream *) currentaudiostream;
-	  	_audio->goToTime (tstart);	  
-	}
-   	
-	//________________
-	uint32_t one_frame;
-  	aviInfo   info;
-	double    one_frame_double, one_delta_frame;
-  	WAVHeader *wav = NULL;
-
-  	assert (_audio);
-
-  	wav = _audio->getInfo ();
-  
-  	video_body->getVideoInfo (&info);
-
-  	// In case of process, we must take
-  	// the output fps in case the filter alters
-  	// the fps. Else we would end up with a badly muxed
-  	// file as the audio and video won't have the same 
-  	// clockrate.
-  	if(1) //_videoProcess)
-  	{
-		ADV_Info *lastInfo;
-  		lastInfo=getLastVideoFilter()->getInfo ();
-		fps1000=lastInfo->fps1000;
-  	} // else in copy mode we take it from source
-  	else
-  	{
-  		fps1000 = info.fps1000;
-  	}
-  	// compute duration of a audio frame
-  	// in ms
-  	assert (fps1000);
-  	printf (" fps : %lu\n", fps1000);
-  	one_frame_double = (double) fps1000;
-  	one_frame_double = 1. / one_frame_double;
-  	// now we have 1/1000*fps=1/1000*duration of a frame in second
-  	one_frame_double *= 1000000.;
-  	// in ms now;
-  	one_frame = (uint32_t) floor (one_frame_double);
-  	printf (" One audio frame : %lu ms\n", one_frame);
-
-
-  	double    pcm;
-  	// *2 because one sample is 16 bits
-  	// fix hitokiri bug part 1.
-  	pcm = one_frame_double * 2 * wav->frequency * wav->channels;
-  	pcm /= 1000;
-  	one_pcm_audio_frame = (uint32_t) floor (pcm);
-  	printf (" one PCM audio frame is %lu bytes \n", one_pcm_audio_frame);
-
-  	// get the equivalent in bytes
-  	assert (wav);
-  	one_frame_double /= 1000.;	// go back to seconds
-  	one_frame_double *= wav->byterate;
-
-
-	  one_frame = (uint32_t) floor (one_frame_double);
-
-  	if (one_frame & 1)
-    		one_frame--;
-  	one_delta_frame = one_frame_double - one_frame;
-  	// Real ? correction of hitokiri bug
-  	one_delta_frame *= 1000;
-  	printf (" One audio frame : %lu bytes\n", one_frame);
-  	_audioOneFrame=one_frame;
+  	printf (" One audio frame : %lu bytes\n", one_pcm_audio_frame);
+  	_audioOneFrame=one_pcm_audio_frame;
 	_audioBuffer=new uint8_t[MAXAUDIO]; // equivalent to 1 sec @ 448 kbps, should be more than
 					// enough, even with the buffering
 	printf("----- Audio Track for mpeg Ready.------\n");
