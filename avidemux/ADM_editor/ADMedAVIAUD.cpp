@@ -166,7 +166,7 @@ uint32_t ADM_Composer::audioRead (uint32_t len, uint8_t * buffer)
 
   // Offset of last byte in this seg...
   end_offset =    _segments[_audioseg]._audio_start + _segments[_audioseg]._audio_size;
-  printf("***AUDIO READ CALLED*************************************\n");
+//  printf("***AUDIO READ CALLED*************************************\n");
   // we are beyond the end mark   or to the end mark
   if (end_offset <= _audiooffset)
     {

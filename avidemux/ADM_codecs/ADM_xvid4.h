@@ -81,6 +81,31 @@
 						uint32_t 	*len,
 						uint32_t 	*flags);
    };
+      class xvid4EncoderVBRExternal : public    xvid4Encoder
+  {
+     	protected :
+      				
+             		uint32_t _q;              
+	
+          public :
+          		xvid4EncoderVBRExternal(uint32_t width,uint32_t height) : xvid4Encoder(width,height)
+             				{
+
+                   			} ;
+			
+            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );	
+            		virtual 	uint8_t encode(
+        	  				ADMImage 	*in,
+					 	uint8_t 	*out,
+						uint32_t 	*len,
+						uint32_t 	*flags);
+					uint8_t encodeVBR(
+        	  				ADMImage 	*in,
+					 	uint8_t 	*out,
+						uint32_t 	*len,
+						uint32_t	quant,
+						uint32_t 	*flags);
+   };
    class xvid4EncoderCBR : public    xvid4Encoder
   {
      	protected :

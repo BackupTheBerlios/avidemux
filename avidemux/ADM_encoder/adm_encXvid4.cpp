@@ -91,6 +91,16 @@ uint8_t		EncoderXvid4::configure (AVDMGenericVideoStream * instream)
   _fps1000=info->fps1000;
   switch (_param.mode)
     {
+     case COMPRESS_SAME:
+    			printf("Xvid4 in follow quant mode\n");
+			_state=enc_Same;
+			_codec = new xvid4EncoderVBRExternal (_w, _h);
+      			if(!_codec->init(2,info->fps1000,&encparam))
+			{
+				printf("Error initi Xvid4 Follow mode\n");
+				return 0;
+			}
+      			break;
     case COMPRESS_CQ:
 		printf("\n Xvid4 cq mode: %ld",_param.qz);
       		_state = enc_CQ;
@@ -173,7 +183,7 @@ uint8_t
 EncoderXvid4::encode (uint32_t frame, uint32_t * len, uint8_t * out,
 		     uint32_t * flags)
 {
-  uint32_t l, f;
+  uint32_t l, f,q;
   //ENC_RESULT enc;
 
   ADM_assert (_codec);
@@ -187,6 +197,23 @@ EncoderXvid4::encode (uint32_t frame, uint32_t * len, uint8_t * out,
 
   switch (_state)
     {
+    case enc_Same:
+    			*flags=_vbuffer->flags;
+    			*flags&=0xffff;
+			if(frame<(encparam.bframes+1))
+			{
+				 *flags=AVI_KEY_FRAME;
+				 printf("Forcing keyframe for B frame\n");
+			}
+			q=_vbuffer->_Qp>>1;
+			if(q<2 || q>31)
+			{
+				printf("Out of bound incoming q:%d\n",q);
+				if(q<2) q=2;
+				if(q>31) q=31;
+			}
+			*flags+=(q<<16);
+			
     case enc_CBR:
     case enc_CQ:
     case enc_Pass1:

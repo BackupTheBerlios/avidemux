@@ -105,6 +105,9 @@ int ret=0;
            					}
 						gtk_label_set_text(GTK_LABEL(WID(label11)),"Size (MBytes):");
             					break;
+				case 3:
+						*mode=COMPRESS_SAME;
+						break;
 		  		default:
 		      				ADM_assert(0);
 				}
@@ -263,6 +266,13 @@ uint32_t b;
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),1);
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbuttonQuant)),(gfloat)mQ);
 			break;
+		case COMPRESS_SAME:
+			HIST_SET(3);
+			gtk_widget_set_sensitive(WID(entryEntry),0);
+			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
+			
+			break;
+
 		}
 }		
 int cb_mod(GtkObject * object, gpointer user_data)
@@ -274,6 +284,7 @@ int r;
 		case 0: mMode=COMPRESS_CBR ;break;
 		case 1: mMode=COMPRESS_CQ ;break;
 		case 2: mMode=COMPRESS_2PASS ;break;
+		case 3: mMode=COMPRESS_SAME;break;
 	
 	}
 	updateMode();
@@ -303,6 +314,7 @@ create_dialog1 (void)
   GtkWidget *one_pass_cbr1;
   GtkWidget *one_pass_quantizer1;
   GtkWidget *two_pass1;
+  GtkWidget *same_qz_as_input1;
   GtkWidget *entryEntry;
   GtkObject *spinbuttonQuant_adj;
   GtkWidget *spinbuttonQuant;
@@ -393,7 +405,7 @@ create_dialog1 (void)
   GtkWidget *spinbuttonPMax;
   GtkObject *spinbuttonBMax_adj;
   GtkWidget *spinbuttonBMax;
-//  GtkWidget *label26;
+
   GtkWidget *label3;
   GtkWidget *vbox15;
   GtkWidget *frame4;
@@ -469,16 +481,19 @@ create_dialog1 (void)
   label10 = gtk_label_new (_("Encoding type:"));
   gtk_widget_show (label10);
   gtk_box_pack_start (GTK_BOX (vbox21), label10, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
 
   label11 = gtk_label_new (_("Bitrate (kb/s):"));
   gtk_widget_show (label11);
   gtk_box_pack_start (GTK_BOX (vbox21), label11, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
 
   label12 = gtk_label_new (_("Quantizer:"));
   gtk_widget_show (label12);
   gtk_box_pack_start (GTK_BOX (vbox21), label12, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label12), 0, 0.5);
 
   vbox22 = gtk_vbox_new (FALSE, 5);
@@ -504,6 +519,10 @@ create_dialog1 (void)
   gtk_widget_show (two_pass1);
   gtk_container_add (GTK_CONTAINER (menu1), two_pass1);
 
+  same_qz_as_input1 = gtk_menu_item_new_with_mnemonic (_("Same Qz as input"));
+  gtk_widget_show (same_qz_as_input1);
+  gtk_container_add (GTK_CONTAINER (menu1), same_qz_as_input1);
+
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenuType), menu1);
 
   entryEntry = gtk_entry_new ();
@@ -521,6 +540,7 @@ create_dialog1 (void)
   label9 = gtk_label_new (_("Variable bitrate mode"));
   gtk_widget_show (label9);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label9);
+  gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
 
   hbox7 = gtk_hbox_new (FALSE, 10);
   gtk_widget_show (hbox7);
@@ -571,6 +591,7 @@ create_dialog1 (void)
   label8 = gtk_label_new (_("Main"));
   gtk_widget_show (label8);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), label8);
+  gtk_label_set_justify (GTK_LABEL (label8), GTK_JUSTIFY_LEFT);
 
   vbox6 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox6);
@@ -590,6 +611,7 @@ create_dialog1 (void)
   label13 = gtk_label_new (_("Motion search precision:"));
   gtk_widget_show (label13);
   gtk_box_pack_start (GTK_BOX (vbox8), label13, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label13), GTK_JUSTIFY_LEFT);
 
   label14 = gtk_label_new (_("VHQ mode:"));
   gtk_widget_show (label14);
@@ -693,6 +715,7 @@ create_dialog1 (void)
   label15 = gtk_label_new (_("I-frame interval - Min:"));
   gtk_widget_show (label15);
   gtk_box_pack_start (GTK_BOX (hbox9), label15, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label15), GTK_JUSTIFY_LEFT);
 
   spinbuttonIMinPeriod_adj = gtk_adjustment_new (1, 1, 9, 1, 10, 10);
   spinbuttonIMinPeriod = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonIMinPeriod_adj), 1, 0);
@@ -703,6 +726,7 @@ create_dialog1 (void)
   label16 = gtk_label_new (_("Max:"));
   gtk_widget_show (label16);
   gtk_box_pack_start (GTK_BOX (hbox9), label16, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label16), GTK_JUSTIFY_LEFT);
 
   spinbuttonIMaxPeriod_adj = gtk_adjustment_new (250, 1, 500, 1, 10, 10);
   spinbuttonIMaxPeriod = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonIMaxPeriod_adj), 1, 0);
@@ -726,6 +750,7 @@ create_dialog1 (void)
   label18 = gtk_label_new (_("Number of B-frames:"));
   gtk_widget_show (label18);
   gtk_box_pack_start (GTK_BOX (hbox11), label18, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label18), GTK_JUSTIFY_LEFT);
 
   spinbuttonBFrame_adj = gtk_adjustment_new (1, 0, 3, 1, 1, 1);
   spinbuttonBFrame = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonBFrame_adj), 1, 0);
@@ -750,10 +775,12 @@ create_dialog1 (void)
   label17 = gtk_label_new (_("Advanced Simple Profile"));
   gtk_widget_show (label17);
   gtk_frame_set_label_widget (GTK_FRAME (frame2), label17);
+  gtk_label_set_justify (GTK_LABEL (label17), GTK_JUSTIFY_LEFT);
 
   label2 = gtk_label_new (_("Motion Estimation"));
   gtk_widget_show (label2);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), label2);
+  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
 
   vbox10 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox10);
@@ -767,6 +794,7 @@ create_dialog1 (void)
   label19 = gtk_label_new (_("Quantization type:"));
   gtk_widget_show (label19);
   gtk_box_pack_start (GTK_BOX (hbox13), label19, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label19), GTK_JUSTIFY_LEFT);
 
   radiobuttonH263 = gtk_radio_button_new_with_mnemonic (NULL, _("_H.263"));
   gtk_widget_show (radiobuttonH263);
@@ -803,16 +831,19 @@ create_dialog1 (void)
   label20 = gtk_label_new (_("I-frame quantizer - Min:"));
   gtk_widget_show (label20);
   gtk_box_pack_start (GTK_BOX (vbox11), label20, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label20), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label20), 0, 0.5);
 
   label21 = gtk_label_new (_("P-frame quantizer - Min:"));
   gtk_widget_show (label21);
   gtk_box_pack_start (GTK_BOX (vbox11), label21, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label21), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label21), 0, 0.5);
 
   label22 = gtk_label_new (_("B-frame quantizer - Min:"));
   gtk_widget_show (label22);
   gtk_box_pack_start (GTK_BOX (vbox11), label22, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label22), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label22), 0, 0.5);
 
   vbox12 = gtk_vbox_new (FALSE, 5);
@@ -844,16 +875,19 @@ create_dialog1 (void)
   label24 = gtk_label_new (_("Max:"));
   gtk_widget_show (label24);
   gtk_box_pack_start (GTK_BOX (vbox13), label24, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label24), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label24), 0, 0.5);
 
   label25 = gtk_label_new (_("Max:"));
   gtk_widget_show (label25);
   gtk_box_pack_start (GTK_BOX (vbox13), label25, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label25), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label25), 0, 0.5);
 
   label26 = gtk_label_new (_("Max:"));
   gtk_widget_show (label26);
   gtk_box_pack_start (GTK_BOX (vbox13), label26, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label26), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label26), 0, 0.5);
 
   vbox14 = gtk_vbox_new (FALSE, 5);
@@ -881,10 +915,12 @@ create_dialog1 (void)
   label26 = gtk_label_new (_("Quantizer restrictions"));
   gtk_widget_show (label26);
   gtk_frame_set_label_widget (GTK_FRAME (frame3), label26);
+  gtk_label_set_justify (GTK_LABEL (label26), GTK_JUSTIFY_LEFT);
 
   label3 = gtk_label_new (_("Quantization"));
   gtk_widget_show (label3);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), label3);
+  gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
 
   vbox15 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox15);
@@ -913,26 +949,31 @@ create_dialog1 (void)
   label30 = gtk_label_new (_("I-frame boost (%):"));
   gtk_widget_show (label30);
   gtk_box_pack_start (GTK_BOX (vbox17), label30, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label30), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label30), 0, 0.5);
 
   label31 = gtk_label_new (_("I-frames closer than ... frames..."));
   gtk_widget_show (label31);
   gtk_box_pack_start (GTK_BOX (vbox17), label31, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label31), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label31), 0, 0.5);
 
   label32 = gtk_label_new (_("...are reduced by (%):"));
   gtk_widget_show (label32);
   gtk_box_pack_start (GTK_BOX (vbox17), label32, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label32), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label32), 0, 0.5);
 
   label28 = gtk_label_new (_("Max overflow improvement (%):"));
   gtk_widget_show (label28);
   gtk_box_pack_start (GTK_BOX (vbox17), label28, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label28), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label28), 0, 0.5);
 
   label29 = gtk_label_new (_("Max overflow degradation (%):"));
   gtk_widget_show (label29);
   gtk_box_pack_start (GTK_BOX (vbox17), label29, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label29), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label29), 0, 0.5);
 
   vbox18 = gtk_vbox_new (FALSE, 5);
@@ -947,7 +988,7 @@ create_dialog1 (void)
   entryIInterv = gtk_entry_new ();
   gtk_widget_show (entryIInterv);
   gtk_box_pack_start (GTK_BOX (vbox18), entryIInterv, FALSE, FALSE, 0);
-  gtk_widget_set_size_request (entryIInterv, 158, -1);
+  gtk_widget_set_size_request (entryIInterv, 158, -2);
   gtk_tooltips_set_tip (tooltips, entryIInterv, _("I-frames appearing in the range below this value will be treated as consecutive keyframes"), NULL);
 
   entryIreduction = gtk_entry_new ();
@@ -968,6 +1009,7 @@ create_dialog1 (void)
   label27 = gtk_label_new (_("Two pass tuning"));
   gtk_widget_show (label27);
   gtk_frame_set_label_widget (GTK_FRAME (frame4), label27);
+  gtk_label_set_justify (GTK_LABEL (label27), GTK_JUSTIFY_LEFT);
 
   frame5 = gtk_frame_new (NULL);
   gtk_widget_show (frame5);
@@ -985,16 +1027,19 @@ create_dialog1 (void)
   label37 = gtk_label_new (_("High bitrate scenes (%):"));
   gtk_widget_show (label37);
   gtk_box_pack_start (GTK_BOX (vbox19), label37, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label37), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label37), 0, 0.5);
 
   label38 = gtk_label_new (_("Low bitrate scenes (%):"));
   gtk_widget_show (label38);
   gtk_box_pack_start (GTK_BOX (vbox19), label38, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label38), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label38), 0, 0.5);
 
   label39 = gtk_label_new (_("Overflow control strength (%):"));
   gtk_widget_show (label39);
   gtk_box_pack_start (GTK_BOX (vbox19), label39, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label39), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label39), 0, 0.5);
 
   vbox20 = gtk_vbox_new (FALSE, 5);
@@ -1019,10 +1064,12 @@ create_dialog1 (void)
   label36 = gtk_label_new (_("Curve compression"));
   gtk_widget_show (label36);
   gtk_frame_set_label_widget (GTK_FRAME (frame5), label36);
+  gtk_label_set_justify (GTK_LABEL (label36), GTK_JUSTIFY_LEFT);
 
   label4 = gtk_label_new (_("Second Pass"));
   gtk_widget_show (label4);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 3), label4);
+  gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -1037,53 +1084,8 @@ create_dialog1 (void)
   gtk_widget_show (okbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), okbutton1, GTK_RESPONSE_OK);
   GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
-#if 0
-  g_signal_connect ((gpointer) one_pass_cbr1, "activate",
-                    G_CALLBACK (on_one_pass_cbr1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) one_pass_quantizer1, "activate",
-                    G_CALLBACK (on_one_pass_quantizer1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) two_pass1, "activate",
-                    G_CALLBACK (on_two_pass1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _0___none1, "activate",
-                    G_CALLBACK (on_0___none1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _1___very_low1, "activate",
-                    G_CALLBACK (on_1___very_low1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _2___low2, "activate",
-                    G_CALLBACK (on_2___low2_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _3___medium1, "activate",
-                    G_CALLBACK (on_3___medium1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _4___high1, "activate",
-                    G_CALLBACK (on_4___high1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _5___very_high1, "activate",
-                    G_CALLBACK (on_5___very_high1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _6___ultra_high1, "activate",
-                    G_CALLBACK (on_6___ultra_high1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _0___off1, "activate",
-                    G_CALLBACK (on_0___off1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _1___mode_decision1, "activate",
-                    G_CALLBACK (on_1___mode_decision1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _2___limited_search1, "activate",
-                    G_CALLBACK (on_2___limited_search1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _3___medium_search1, "activate",
-                    G_CALLBACK (on_3___medium_search1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _4___wide_search1, "activate",
-                    G_CALLBACK (on_4___wide_search1_activate),
-                    NULL);
-#endif
+
+
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
@@ -1102,6 +1104,7 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, one_pass_cbr1, "one_pass_cbr1");
   GLADE_HOOKUP_OBJECT (dialog1, one_pass_quantizer1, "one_pass_quantizer1");
   GLADE_HOOKUP_OBJECT (dialog1, two_pass1, "two_pass1");
+  GLADE_HOOKUP_OBJECT (dialog1, same_qz_as_input1, "same_qz_as_input1");
   GLADE_HOOKUP_OBJECT (dialog1, entryEntry, "entryEntry");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonQuant, "spinbuttonQuant");
   GLADE_HOOKUP_OBJECT (dialog1, label9, "label9");
@@ -1219,7 +1222,6 @@ create_dialog1 (void)
 
   return dialog1;
 }
-
 
 
 #endif

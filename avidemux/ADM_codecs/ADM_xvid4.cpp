@@ -426,6 +426,112 @@ int ret;
 }
 // *************************************************
 // *************************************************
+//		CQ but Q is controlled externally
+// *************************************************
+// *************************************************
+
+uint8_t xvid4EncoderVBRExternal::init(uint32_t q,uint32_t fps1000, xvid4EncParam *param)
+{
+    int xerr;
+    	printf("Using Xvid 4 codec with CQ mode = %lu (%dx%d)\n",q,_w,_h);
+    	_q=q;
+	_fps1000=fps1000;	
+	memcpy(&_param,param,sizeof(_param));
+	dump();
+	// Here we go...
+	MMSET(xvid_enc_create);
+	xvid_enc_create.version = XVID_VERSION;
+	xvid_enc_create.width = _w;
+	xvid_enc_create.height = _h;
+	MMSET(single);
+	
+
+	plugins[0].func = xvid_plugin_single;
+	plugins[0].param = &single;
+	
+	single.version = XVID_VERSION;
+	single.bitrate = 1500;
+
+	xvid_enc_create.plugins = plugins;
+	xvid_enc_create.num_plugins = 1;
+	
+	//Framerate
+	xvid_enc_create.fincr = 1000;
+	xvid_enc_create.fbase = _fps1000;
+	//
+	createUpdate();
+	xerr = xvid_encore(NULL, XVID_ENC_CREATE, &xvid_enc_create, NULL);
+	if(xerr<0)
+	{
+		printf("Xvid-4 init error :%d\n",xerr);
+		return 0;
+	
+	}
+	
+	_handle = xvid_enc_create.handle;
+
+	printf("Xvid-4 CQ init Ok\n");
+
+ 	return 1;
+}
+
+
+uint8_t xvid4EncoderVBRExternal::encode(
+			ADMImage * in,
+			uint8_t * out,
+			uint32_t * len,
+       			uint32_t * flags)
+{
+int q;
+	q=(*flags)>>16;
+	*flags&=0xFFFF;
+	return encodeVBR(in,out,len,q,flags);
+}
+
+uint8_t xvid4EncoderVBRExternal::encodeVBR(
+			ADMImage * in,
+			uint8_t * out,
+			uint32_t * len,
+			uint32_t q,
+       			uint32_t * flags)
+{	
+int  ret;
+	preAmble(in->data);
+	
+	xvid_enc_frame.quant = q;
+	xvid_enc_frame.bitstream = out;	
+	if(*flags & AVI_KEY_FRAME)
+	{
+		xvid_enc_frame.type=XVID_TYPE_IVOP;
+	}
+	else if(*flags & AVI_B_FRAME)
+	{
+		xvid_enc_frame.type=XVID_TYPE_BVOP;
+	}
+	else
+	{	//P
+			xvid_enc_frame.type=XVID_TYPE_PVOP;
+	}
+	
+	/* Encode the frame */
+	ret = xvid_encore(_handle, XVID_ENC_ENCODE, &xvid_enc_frame,
+					  &xvid_enc_stats);
+	if(ret<0)
+		{
+			printf("Error calling xvid4 %d\n",ret);
+			return 0;
+			
+		}
+	postAmble(flags);
+	
+	*len=xvid_res.total_bits=ret;
+	xvid_res.total_bits*=8;
+	
+	return 1;
+
+}
+// *************************************************
+// *************************************************
 //		CBR
 // *************************************************
 // *************************************************
