@@ -235,7 +235,7 @@ extern int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
  	}
   };
   FFMPEGConfig mpeg2encDVDConfig={
-  	{COMPRESS_CBR,4,1500,700},
+  	{COMPRESS_CBR,4,1500000,700},
 	{
 	 ME_EPZS,//	ME
 	 0, // 		GMC
