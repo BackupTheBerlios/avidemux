@@ -39,7 +39,7 @@ typedef struct vopS
 	uint32_t offset;
 	uint32_t type;
 }vopS;
-
+#define MAX_VOP 10
 static uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop);
 
 static const char *s_voptype[4]={"I frame","P frame","B frame","D frame"};
@@ -51,7 +51,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	uint32_t targetIndex=0,nbVop;
 	uint32_t nbDuped=0;
 	
-	vopS	myVops[10]; // should be enough
+	vopS	myVops[MAX_VOP]; // should be enough
 	// here we got the vidHeader to get the file easily
 	// we only deal with avi now, so cast it to its proper type (i.e. avi)
 		
@@ -67,7 +67,8 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	
 	nbFrame=getMainHeader()->dwTotalFrames;
 	
-	odmlIndex *newIndex=new odmlIndex[nbFrame];
+	odmlIndex *newIndex=new odmlIndex[nbFrame+MAX_VOP]; // Due to the packed vop, we may end up with more images
+							// Assume MAX_VOP Bframes maximum
 	ADM_assert(newIndex);
 	
 	printf("Trying to unpack the stream\n");
@@ -169,6 +170,9 @@ _abortUnpack:
 		delete [] newIndex;
 		printf("Could not unpack this...\n");
 	}
+	printf("Initial # of images : %lu, now we have %lu \n",nbFrame,targetIndex);
+	nbFrame=targetIndex;
+	
 	return ret;
 }
 // Search a start vop in it
