@@ -51,10 +51,8 @@
  				audiolen=(uint32_t)floor(total_wanted-total_got);\
  			audiolen = audio->read (audiolen,buffer); \
 			total_got+=audiolen; \
-			if(audiolen)	\
-				muxer->writeAudioPacket(audiolen,buffer); \
-			else\
-			printf("Cant get audio!\n");}
+			muxer->writeAudioPacket(audiolen,buffer); }
+			
     
  
  
