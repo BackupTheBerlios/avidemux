@@ -425,8 +425,9 @@ void ff_mpeg1_encode_slice_header(MpegEncContext *s){
 
 void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
 {
+int tff,rff; //MEANX
     mpeg1_encode_sequence_header(s);
-	int tff,rff; //MEANX
+	
 
     /* mpeg1 picture header */
     put_header(s, PICTURE_START_CODE);

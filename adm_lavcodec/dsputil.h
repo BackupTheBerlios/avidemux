@@ -27,7 +27,7 @@
 
 #ifndef DSPUTIL_H
 #define DSPUTIL_H
-
+#include <math.h>
 #include "common.h"
 #include "avcodec.h"
 
@@ -407,7 +407,7 @@ void put_signed_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int li
 
 static inline void emms(void)
 {
-    __asm __volatile ("emms;":::"memory");
+    __asm __volatile ("emms;");
 }
 
 
