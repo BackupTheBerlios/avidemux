@@ -202,7 +202,7 @@ uint8_t  COL_yv12rgb(uint32_t w, uint32_t h,uint8_t * ptr, uint8_t * ptr2 )
 #ifdef USE_MMX
 	  fastYV12RGB_mmx(y, u, v, e, w);
 	  //fastYV12RGB_mmx(y+w, u, v, e+3*w, w);
-#elif HAVE_ALTIVEC
+#elif defined(HAVE_ALTIVEC) && defined(CONFIG_DARWIN)
 
 	 altivecYV12RGB(y,
 		    	u,

@@ -35,7 +35,10 @@ S
 #include "ADM_toolkit/ADM_debug.h"
 
 
-#ifdef HAVE_ALTIVEC
+#if defined(HAVE_ALTIVEC) && defined(CONFIG_DARWIN)
+#ifdef HAVE_ALTIVEC_H
+#include "altivec.h"
+#endif
 // Protoyping
 
 
