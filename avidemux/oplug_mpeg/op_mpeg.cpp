@@ -139,7 +139,13 @@ void oplug_mpeg_vcd_ps(char *inname)
 	if( info->encoding!=WAV_MP2 )
 	{
 		printf("Encoding : %d\n",info->encoding);
-		GUI_Alert("audio must be MP2 VCD PS!");
+		GUI_Alert("audio must be MP2 for VCD PS!");
+		return;
+	}
+	if( info->channels!=2 )
+	{
+		
+		GUI_Alert("audio must be stereo for VCD PS!");
 		return;
 	}
 	
@@ -190,6 +196,70 @@ void oplug_mpeg_svcd(char *inname)
 
 	delete(mpg);
 }
+//_______________________________________
+void oplug_mpeg_svcd_ps(char *inname)
+{
+char *name=NULL;
+WAVHeader info;
+AVDMGenericAudioStream *stream;	
+	
+	//*****
+	// First check audio
+	if(!currentaudiostream)
+	{
+		GUI_Alert("We need an audio track!");
+		return;
+	}
+	stream=mpt_getAudioStream();
+	memcpy(&info,stream->getInfo(),sizeof(info));
+	
+	deleteAudioFilter();
+	printf("Incoming audio:\n");
+	printf("fq :%d\n",info.frequency);
+	printf("co :%x\n",info.encoding);
+	printf("ch :%x\n",info.channels);
+	if(info.frequency!=44100 )
+	{
+		GUI_Alert("audio must be 44.1khz for SVCD PS!");
+		return;
+	}
+	if( (info.encoding!=WAV_MP2 ))
+	{
+		printf("Encoding : %d\n",info.encoding);
+		GUI_Alert("audio must be MP2 for SVCD PS!");
+		return;
+	}
+	
+	// Second, check video
+	if(strcmp(videoCodecGetName(),"SVCD"))// && strcmp(videoCodecGetName(),"XSVCD"))
+	{
+		GUI_Alert("You need to select SVCD as video codec!");
+		return;
+	}
+	
+ 	if(!inname)
+	{
+	 	GUI_FileSelWrite("SVCD file to save", &name);
+		if(!name) return;
+	}
+	else
+	{
+		name=inname;
+	}
+	
+	mpegWritter *mpg = new mpegWritter(2);
+	ADM_assert(mpg);
+
+	if( mpg->save_svcd(name))
+		GUI_Alert("Success !");
+	else
+		GUI_Alert("Failed !");
+
+	delete(mpg);
+	
+
+}
+
 //_______________________________________
 void oplug_mpeg_dvd(char *inname)
 {

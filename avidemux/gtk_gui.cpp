@@ -126,7 +126,7 @@ uint8_t GUI_getDoubleValue (double *valye, float min, float max,
 extern void GUI_setMarks (uint32_t a, uint32_t b);
 extern void saveMpegFile (char *name);
 //static void A_selectEncoder ( void );
-extern void A_SaveAudioDualAudio (void);
+extern void A_SaveAudioDualAudio (char *a);
 
 extern uint8_t ADM_aviUISetMuxer(  void );
 
@@ -552,7 +552,7 @@ case ACT_Pipe2Other:
 
     case ACT_SaveDualAudio:
       //GUI_FileSelWrite ("Select AVI to save ",
-      A_SaveAudioDualAudio();
+      A_SaveAudioDualAudio(NULL);
       break;
 
     case ACT_SaveBunchJPG:

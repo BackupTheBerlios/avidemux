@@ -53,6 +53,8 @@
 
 #include "ADM_dialog/DIA_enter.h"
 #include "oplug_mpeg/op_mpeg.h"
+#include "ADM_gui2/GUI_ui.h"
+
 extern void UI_setVProcessToggleStatus( uint8_t status );
 extern void GUI_setVideoCodec(Action action );
 static void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param,
@@ -624,23 +626,42 @@ const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
 //%
 void EncoderSaveMpeg(char *name)
 {
-#ifdef USE_MJPEG
+uint8_t raw;
+	switch(UI_GetCurrentFormat())
+	{
+		case ADM_ES: 	raw=1;
+				break;
+		case ADM_PS:
+				raw=0;
+				break;
+		default:
+				GUI_Alert("Please select mpeg output");
+				return;
+	}
+
 	switch(current_codec)
 	{
 		case CodecVCD:
-				oplug_mpeg_vcd_ps(name);
+				if(raw)
+					oplug_mpeg_vcd(name);
+				else
+					oplug_mpeg_vcd_ps(name);
 				break;
 		case CodecSVCD:
-				oplug_mpeg_svcd(name);
+				if(raw)
+					oplug_mpeg_svcd(name);
+				else	
+					oplug_mpeg_svcd_ps(name);
 				break;
 		case CodecDVD:
-				oplug_mpeg_dvd(name);
+				if(raw)
+					oplug_mpeg_dvd(name);
+				else
+					oplug_mpeg_dvd_ps(name);
+				
 				break;
 		default:ADM_assert(0);
 	}
-#else
-	GUI_Alert("** NO MPEG ENCODING SUPPORT**");
-#endif
 
 }
 

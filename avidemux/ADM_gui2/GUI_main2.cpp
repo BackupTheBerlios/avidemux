@@ -36,20 +36,15 @@ create_mainWindow (void)
   GtkWidget *menuitem1;
   GtkWidget *menuitem1_menu;
   GtkWidget *open_video1;
-  GtkWidget *image2003;
+  GtkWidget *image2019;
   GtkWidget *run_script1;
-  GtkWidget *image2004;
+  GtkWidget *image2020;
   GtkWidget *append_video1;
-  GtkWidget *image2005;
+  GtkWidget *image2021;
   GtkWidget *separator1;
   GtkWidget *save_stuff;
   GtkWidget *save_stuff_menu;
   GtkWidget *save_as_avi1;
-  GtkWidget *unpacked;
-  GtkWidget *save_as_dvd_ps1;
-  GtkWidget *save_as_ogm1;
-  GtkWidget *save_raw_video_stream1;
-  GtkWidget *save_as_dual_audio_avi1;
   GtkWidget *save_images1;
   GtkWidget *save_images1_menu;
   GtkWidget *save_image1;
@@ -59,16 +54,16 @@ create_mainWindow (void)
   GtkWidget *project1;
   GtkWidget *project1_menu;
   GtkWidget *load_project;
-  GtkWidget *image2006;
+  GtkWidget *image2022;
   GtkWidget *save_project_as1;
-  GtkWidget *image2007;
+  GtkWidget *image2023;
   GtkWidget *save_current_project;
-  GtkWidget *image2008;
+  GtkWidget *image2024;
   GtkWidget *avi_muxer_options1;
   GtkWidget *video_informations1;
-  GtkWidget *image2009;
+  GtkWidget *image2025;
   GtkWidget *quit1;
-  GtkWidget *image2010;
+  GtkWidget *image2026;
   GtkWidget *play_1;
   GtkWidget *play_1_menu;
   GtkWidget *play_video1;
@@ -76,26 +71,26 @@ create_mainWindow (void)
   GtkWidget *set_postprocessing1;
   GtkWidget *separator9;
   GtkWidget *next_frame1;
-  GtkWidget *image2011;
+  GtkWidget *image2027;
   GtkWidget *previous_frame1;
-  GtkWidget *image2012;
+  GtkWidget *image2028;
   GtkWidget *next_intra_frame1;
-  GtkWidget *image2013;
+  GtkWidget *image2029;
   GtkWidget *previous_intra_frame1;
-  GtkWidget *image2014;
+  GtkWidget *image2030;
   GtkWidget *search_next_black_frame1;
   GtkWidget *search_previous_black_frame1;
   GtkWidget *jum_to_frame1;
-  GtkWidget *image2015;
+  GtkWidget *image2031;
   GtkWidget *menuitem2;
   GtkWidget *menuitem2_menu;
   GtkWidget *cut1;
-  GtkWidget *image2016;
+  GtkWidget *image2032;
   GtkWidget *copy1;
-  GtkWidget *image2017;
+  GtkWidget *image2033;
   GtkWidget *paste1;
   GtkWidget *delete1;
-  GtkWidget *image2018;
+  GtkWidget *image2034;
   GtkWidget *separator5;
   GtkWidget *set_marker_a1;
   GtkWidget *set_marker_b1;
@@ -104,7 +99,7 @@ create_mainWindow (void)
   GtkWidget *go_to_marker_b1;
   GtkWidget *separator10;
   GtkWidget *reset_edits1;
-  GtkWidget *image2019;
+  GtkWidget *image2035;
   GtkWidget *audio_source1;
   GtkWidget *audio_source1_menu;
   GtkWidget *source1;
@@ -173,6 +168,16 @@ create_mainWindow (void)
   GtkWidget *buttonAudioFilter;
   GtkWidget *togglebuttonAudio;
   GtkWidget *Audio;
+  GtkWidget *frame4;
+  GtkWidget *optionmenu1;
+  GtkWidget *menu1;
+  GtkWidget *avi1;
+  GtkWidget *ogm1;
+  GtkWidget *mpeg_video_only1;
+  GtkWidget *mpeg_a_v1;
+  GtkWidget *avi_dual_audio1;
+  GtkWidget *avi_unpacked_vop1;
+  GtkWidget *label17;
   GtkWidget *guiDrawing;
   GtkWidget *sliderNavigate;
   GtkWidget *hbox17;
@@ -264,20 +269,20 @@ create_mainWindow (void)
                               GDK_O, GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
 
-  image2003 = gtk_image_new_from_stock ("gtk-open", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2003, "image2003");
-  gtk_widget_show (image2003);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (open_video1), image2003);
+  image2019 = gtk_image_new_from_stock ("gtk-open", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2019, "image2019");
+  gtk_widget_show (image2019);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (open_video1), image2019);
 
   run_script1 = gtk_image_menu_item_new_with_mnemonic (_("_Run Script..."));
   gtk_widget_set_name (run_script1, "run_script1");
   gtk_widget_show (run_script1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), run_script1);
 
-  image2004 = gtk_image_new_from_stock ("gtk-execute", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2004, "image2004");
-  gtk_widget_show (image2004);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (run_script1), image2004);
+  image2020 = gtk_image_new_from_stock ("gtk-execute", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2020, "image2020");
+  gtk_widget_show (image2020);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (run_script1), image2020);
 
   append_video1 = gtk_image_menu_item_new_with_mnemonic (_("_Append Video..."));
   gtk_widget_set_name (append_video1, "append_video1");
@@ -287,10 +292,10 @@ create_mainWindow (void)
                               GDK_A, GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
 
-  image2005 = gtk_image_new_from_stock ("gtk-add", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2005, "image2005");
-  gtk_widget_show (image2005);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (append_video1), image2005);
+  image2021 = gtk_image_new_from_stock ("gtk-add", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2021, "image2021");
+  gtk_widget_show (image2021);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (append_video1), image2021);
 
   separator1 = gtk_menu_item_new ();
   gtk_widget_set_name (separator1, "separator1");
@@ -314,31 +319,6 @@ create_mainWindow (void)
   gtk_widget_add_accelerator (save_as_avi1, "activate", accel_group,
                               GDK_S, GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
-
-  unpacked = gtk_menu_item_new_with_mnemonic (_("Save _Unpacked MPEG-4 Video..."));
-  gtk_widget_set_name (unpacked, "unpacked");
-  gtk_widget_show (unpacked);
-  gtk_container_add (GTK_CONTAINER (save_stuff_menu), unpacked);
-
-  save_as_dvd_ps1 = gtk_menu_item_new_with_mnemonic (_("Save as _DVD PS..."));
-  gtk_widget_set_name (save_as_dvd_ps1, "save_as_dvd_ps1");
-  gtk_widget_show (save_as_dvd_ps1);
-  gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_as_dvd_ps1);
-
-  save_as_ogm1 = gtk_menu_item_new_with_mnemonic (_("Save as _OGM..."));
-  gtk_widget_set_name (save_as_ogm1, "save_as_ogm1");
-  gtk_widget_show (save_as_ogm1);
-  gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_as_ogm1);
-
-  save_raw_video_stream1 = gtk_menu_item_new_with_mnemonic (_("Save _Raw Video Stream..."));
-  gtk_widget_set_name (save_raw_video_stream1, "save_raw_video_stream1");
-  gtk_widget_show (save_raw_video_stream1);
-  gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_raw_video_stream1);
-
-  save_as_dual_audio_avi1 = gtk_menu_item_new_with_mnemonic (_("Save as Dual _Audio AVI..."));
-  gtk_widget_set_name (save_as_dual_audio_avi1, "save_as_dual_audio_avi1");
-  gtk_widget_show (save_as_dual_audio_avi1);
-  gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_as_dual_audio_avi1);
 
   save_images1 = gtk_menu_item_new_with_mnemonic (_("Save _Images"));
   gtk_widget_set_name (save_images1, "save_images1");
@@ -395,20 +375,20 @@ create_mainWindow (void)
                               GDK_O, GDK_MOD1_MASK,
                               GTK_ACCEL_VISIBLE);
 
-  image2006 = gtk_image_new_from_stock ("gtk-open", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2006, "image2006");
-  gtk_widget_show (image2006);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (load_project), image2006);
+  image2022 = gtk_image_new_from_stock ("gtk-open", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2022, "image2022");
+  gtk_widget_show (image2022);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (load_project), image2022);
 
   save_project_as1 = gtk_image_menu_item_new_with_mnemonic (_("Save Project _as ..."));
   gtk_widget_set_name (save_project_as1, "save_project_as1");
   gtk_widget_show (save_project_as1);
   gtk_container_add (GTK_CONTAINER (project1_menu), save_project_as1);
 
-  image2007 = gtk_image_new_from_stock ("gtk-save-as", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2007, "image2007");
-  gtk_widget_show (image2007);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (save_project_as1), image2007);
+  image2023 = gtk_image_new_from_stock ("gtk-save-as", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2023, "image2023");
+  gtk_widget_show (image2023);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (save_project_as1), image2023);
 
   save_current_project = gtk_image_menu_item_new_with_mnemonic (_("_Save Project"));
   gtk_widget_set_name (save_current_project, "save_current_project");
@@ -418,10 +398,10 @@ create_mainWindow (void)
                               GDK_S, GDK_MOD1_MASK,
                               GTK_ACCEL_VISIBLE);
 
-  image2008 = gtk_image_new_from_stock ("gtk-save", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2008, "image2008");
-  gtk_widget_show (image2008);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (save_current_project), image2008);
+  image2024 = gtk_image_new_from_stock ("gtk-save", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2024, "image2024");
+  gtk_widget_show (image2024);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (save_current_project), image2024);
 
   avi_muxer_options1 = gtk_menu_item_new_with_mnemonic (_("AVI _Muxer Options"));
   gtk_widget_set_name (avi_muxer_options1, "avi_muxer_options1");
@@ -439,20 +419,20 @@ create_mainWindow (void)
                               GDK_I, GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
 
-  image2009 = gtk_image_new_from_stock ("gtk-dialog-question", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2009, "image2009");
-  gtk_widget_show (image2009);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (video_informations1), image2009);
+  image2025 = gtk_image_new_from_stock ("gtk-dialog-question", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2025, "image2025");
+  gtk_widget_show (image2025);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (video_informations1), image2025);
 
   quit1 = gtk_image_menu_item_new_with_mnemonic (_("_Quit"));
   gtk_widget_set_name (quit1, "quit1");
   gtk_widget_show (quit1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), quit1);
 
-  image2010 = gtk_image_new_from_stock ("gtk-quit", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2010, "image2010");
-  gtk_widget_show (image2010);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (quit1), image2010);
+  image2026 = gtk_image_new_from_stock ("gtk-quit", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2026, "image2026");
+  gtk_widget_show (image2026);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (quit1), image2026);
 
   play_1 = gtk_menu_item_new_with_mnemonic (_("_Play "));
   gtk_widget_set_name (play_1, "play_1");
@@ -502,10 +482,10 @@ create_mainWindow (void)
                               GDK_6, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
-  image2011 = gtk_image_new_from_stock ("gtk-go-forward", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2011, "image2011");
-  gtk_widget_show (image2011);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (next_frame1), image2011);
+  image2027 = gtk_image_new_from_stock ("gtk-go-forward", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2027, "image2027");
+  gtk_widget_show (image2027);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (next_frame1), image2027);
 
   previous_frame1 = gtk_image_menu_item_new_with_mnemonic (_("_Previous Frame"));
   gtk_widget_set_name (previous_frame1, "previous_frame1");
@@ -515,10 +495,10 @@ create_mainWindow (void)
                               GDK_4, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
-  image2012 = gtk_image_new_from_stock ("gtk-undo", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2012, "image2012");
-  gtk_widget_show (image2012);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (previous_frame1), image2012);
+  image2028 = gtk_image_new_from_stock ("gtk-undo", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2028, "image2028");
+  gtk_widget_show (image2028);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (previous_frame1), image2028);
 
   next_intra_frame1 = gtk_image_menu_item_new_with_mnemonic (_("N_ext Intra Frame"));
   gtk_widget_set_name (next_intra_frame1, "next_intra_frame1");
@@ -528,10 +508,10 @@ create_mainWindow (void)
                               GDK_8, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
-  image2013 = gtk_image_new_from_stock ("gtk-goto-last", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2013, "image2013");
-  gtk_widget_show (image2013);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (next_intra_frame1), image2013);
+  image2029 = gtk_image_new_from_stock ("gtk-goto-last", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2029, "image2029");
+  gtk_widget_show (image2029);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (next_intra_frame1), image2029);
 
   previous_intra_frame1 = gtk_image_menu_item_new_with_mnemonic (_("P_revious Intra Frame"));
   gtk_widget_set_name (previous_intra_frame1, "previous_intra_frame1");
@@ -541,10 +521,10 @@ create_mainWindow (void)
                               GDK_2, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
-  image2014 = gtk_image_new_from_stock ("gtk-goto-first", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2014, "image2014");
-  gtk_widget_show (image2014);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (previous_intra_frame1), image2014);
+  image2030 = gtk_image_new_from_stock ("gtk-goto-first", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2030, "image2030");
+  gtk_widget_show (image2030);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (previous_intra_frame1), image2030);
 
   search_next_black_frame1 = gtk_menu_item_new_with_mnemonic (_("Search Next _Black Frame"));
   gtk_widget_set_name (search_next_black_frame1, "search_next_black_frame1");
@@ -564,10 +544,10 @@ create_mainWindow (void)
                               GDK_G, GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
 
-  image2015 = gtk_image_new_from_stock ("gtk-jump-to", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2015, "image2015");
-  gtk_widget_show (image2015);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (jum_to_frame1), image2015);
+  image2031 = gtk_image_new_from_stock ("gtk-jump-to", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2031, "image2031");
+  gtk_widget_show (image2031);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (jum_to_frame1), image2031);
 
   menuitem2 = gtk_menu_item_new_with_mnemonic (_("_Edit"));
   gtk_widget_set_name (menuitem2, "menuitem2");
@@ -586,10 +566,10 @@ create_mainWindow (void)
                               GDK_X, GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
 
-  image2016 = gtk_image_new_from_stock ("gtk-cut", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2016, "image2016");
-  gtk_widget_show (image2016);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (cut1), image2016);
+  image2032 = gtk_image_new_from_stock ("gtk-cut", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2032, "image2032");
+  gtk_widget_show (image2032);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (cut1), image2032);
 
   copy1 = gtk_image_menu_item_new_with_mnemonic (_("_Copy"));
   gtk_widget_set_name (copy1, "copy1");
@@ -599,10 +579,10 @@ create_mainWindow (void)
                               GDK_C, GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
 
-  image2017 = gtk_image_new_from_stock ("gtk-copy", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2017, "image2017");
-  gtk_widget_show (image2017);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (copy1), image2017);
+  image2033 = gtk_image_new_from_stock ("gtk-copy", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2033, "image2033");
+  gtk_widget_show (image2033);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (copy1), image2033);
 
   paste1 = gtk_menu_item_new_with_mnemonic (_("_Paste"));
   gtk_widget_set_name (paste1, "paste1");
@@ -620,10 +600,10 @@ create_mainWindow (void)
                               GDK_Delete, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
-  image2018 = gtk_image_new_from_stock ("gtk-remove", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2018, "image2018");
-  gtk_widget_show (image2018);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (delete1), image2018);
+  image2034 = gtk_image_new_from_stock ("gtk-remove", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2034, "image2034");
+  gtk_widget_show (image2034);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (delete1), image2034);
 
   separator5 = gtk_menu_item_new ();
   gtk_widget_set_name (separator5, "separator5");
@@ -680,10 +660,10 @@ create_mainWindow (void)
   gtk_widget_show (reset_edits1);
   gtk_container_add (GTK_CONTAINER (menuitem2_menu), reset_edits1);
 
-  image2019 = gtk_image_new_from_stock ("gtk-undo", GTK_ICON_SIZE_MENU);
-  gtk_widget_set_name (image2019, "image2019");
-  gtk_widget_show (image2019);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (reset_edits1), image2019);
+  image2035 = gtk_image_new_from_stock ("gtk-undo", GTK_ICON_SIZE_MENU);
+  gtk_widget_set_name (image2035, "image2035");
+  gtk_widget_show (image2035);
+  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (reset_edits1), image2035);
 
   audio_source1 = gtk_menu_item_new_with_mnemonic (_("_Audio"));
   gtk_widget_set_name (audio_source1, "audio_source1");
@@ -1106,6 +1086,58 @@ create_mainWindow (void)
   gtk_label_set_justify (GTK_LABEL (Audio), GTK_JUSTIFY_LEFT);
   gtk_misc_set_padding (GTK_MISC (Audio), 0, 3);
 
+  frame4 = gtk_frame_new (NULL);
+  gtk_widget_set_name (frame4, "frame4");
+  gtk_widget_show (frame4);
+  gtk_box_pack_start (GTK_BOX (vbox6), frame4, TRUE, TRUE, 0);
+
+  optionmenu1 = gtk_option_menu_new ();
+  gtk_widget_set_name (optionmenu1, "optionmenu1");
+  gtk_widget_show (optionmenu1);
+  gtk_container_add (GTK_CONTAINER (frame4), optionmenu1);
+
+  menu1 = gtk_menu_new ();
+  gtk_widget_set_name (menu1, "menu1");
+
+  avi1 = gtk_menu_item_new_with_mnemonic (_("Avi"));
+  gtk_widget_set_name (avi1, "avi1");
+  gtk_widget_show (avi1);
+  gtk_container_add (GTK_CONTAINER (menu1), avi1);
+
+  ogm1 = gtk_menu_item_new_with_mnemonic (_("OGM"));
+  gtk_widget_set_name (ogm1, "ogm1");
+  gtk_widget_show (ogm1);
+  gtk_container_add (GTK_CONTAINER (menu1), ogm1);
+
+  mpeg_video_only1 = gtk_menu_item_new_with_mnemonic (_("Mpeg video"));
+  gtk_widget_set_name (mpeg_video_only1, "mpeg_video_only1");
+  gtk_widget_show (mpeg_video_only1);
+  gtk_container_add (GTK_CONTAINER (menu1), mpeg_video_only1);
+
+  mpeg_a_v1 = gtk_menu_item_new_with_mnemonic (_("Mpeg A+V"));
+  gtk_widget_set_name (mpeg_a_v1, "mpeg_a_v1");
+  gtk_widget_show (mpeg_a_v1);
+  gtk_container_add (GTK_CONTAINER (menu1), mpeg_a_v1);
+
+  avi_dual_audio1 = gtk_menu_item_new_with_mnemonic (_("Avi, 2 audio"));
+  gtk_widget_set_name (avi_dual_audio1, "avi_dual_audio1");
+  gtk_widget_show (avi_dual_audio1);
+  gtk_container_add (GTK_CONTAINER (menu1), avi_dual_audio1);
+
+  avi_unpacked_vop1 = gtk_menu_item_new_with_mnemonic (_("Avi, unp. vop"));
+  gtk_widget_set_name (avi_unpacked_vop1, "avi_unpacked_vop1");
+  gtk_widget_show (avi_unpacked_vop1);
+  gtk_container_add (GTK_CONTAINER (menu1), avi_unpacked_vop1);
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu1), menu1);
+
+  label17 = gtk_label_new (_("<b>Outp. fmt</b>"));
+  gtk_widget_set_name (label17, "label17");
+  gtk_widget_show (label17);
+  gtk_frame_set_label_widget (GTK_FRAME (frame4), label17);
+  gtk_label_set_use_markup (GTK_LABEL (label17), TRUE);
+  gtk_label_set_justify (GTK_LABEL (label17), GTK_JUSTIFY_LEFT);
+
   guiDrawing = gtk_drawing_area_new ();
   gtk_widget_set_name (guiDrawing, "guiDrawing");
   gtk_widget_show (guiDrawing);
@@ -1432,20 +1464,15 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, menuitem1, "menuitem1");
   GLADE_HOOKUP_OBJECT (mainWindow, menuitem1_menu, "menuitem1_menu");
   GLADE_HOOKUP_OBJECT (mainWindow, open_video1, "open_video1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2003, "image2003");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2019, "image2019");
   GLADE_HOOKUP_OBJECT (mainWindow, run_script1, "run_script1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2004, "image2004");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2020, "image2020");
   GLADE_HOOKUP_OBJECT (mainWindow, append_video1, "append_video1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2005, "image2005");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2021, "image2021");
   GLADE_HOOKUP_OBJECT (mainWindow, separator1, "separator1");
   GLADE_HOOKUP_OBJECT (mainWindow, save_stuff, "save_stuff");
   GLADE_HOOKUP_OBJECT (mainWindow, save_stuff_menu, "save_stuff_menu");
   GLADE_HOOKUP_OBJECT (mainWindow, save_as_avi1, "save_as_avi1");
-  GLADE_HOOKUP_OBJECT (mainWindow, unpacked, "unpacked");
-  GLADE_HOOKUP_OBJECT (mainWindow, save_as_dvd_ps1, "save_as_dvd_ps1");
-  GLADE_HOOKUP_OBJECT (mainWindow, save_as_ogm1, "save_as_ogm1");
-  GLADE_HOOKUP_OBJECT (mainWindow, save_raw_video_stream1, "save_raw_video_stream1");
-  GLADE_HOOKUP_OBJECT (mainWindow, save_as_dual_audio_avi1, "save_as_dual_audio_avi1");
   GLADE_HOOKUP_OBJECT (mainWindow, save_images1, "save_images1");
   GLADE_HOOKUP_OBJECT (mainWindow, save_images1_menu, "save_images1_menu");
   GLADE_HOOKUP_OBJECT (mainWindow, save_image1, "save_image1");
@@ -1455,16 +1482,16 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, project1, "project1");
   GLADE_HOOKUP_OBJECT (mainWindow, project1_menu, "project1_menu");
   GLADE_HOOKUP_OBJECT (mainWindow, load_project, "load_project");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2006, "image2006");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2022, "image2022");
   GLADE_HOOKUP_OBJECT (mainWindow, save_project_as1, "save_project_as1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2007, "image2007");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2023, "image2023");
   GLADE_HOOKUP_OBJECT (mainWindow, save_current_project, "save_current_project");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2008, "image2008");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2024, "image2024");
   GLADE_HOOKUP_OBJECT (mainWindow, avi_muxer_options1, "avi_muxer_options1");
   GLADE_HOOKUP_OBJECT (mainWindow, video_informations1, "video_informations1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2009, "image2009");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2025, "image2025");
   GLADE_HOOKUP_OBJECT (mainWindow, quit1, "quit1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2010, "image2010");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2026, "image2026");
   GLADE_HOOKUP_OBJECT (mainWindow, play_1, "play_1");
   GLADE_HOOKUP_OBJECT (mainWindow, play_1_menu, "play_1_menu");
   GLADE_HOOKUP_OBJECT (mainWindow, play_video1, "play_video1");
@@ -1472,26 +1499,26 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, set_postprocessing1, "set_postprocessing1");
   GLADE_HOOKUP_OBJECT (mainWindow, separator9, "separator9");
   GLADE_HOOKUP_OBJECT (mainWindow, next_frame1, "next_frame1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2011, "image2011");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2027, "image2027");
   GLADE_HOOKUP_OBJECT (mainWindow, previous_frame1, "previous_frame1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2012, "image2012");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2028, "image2028");
   GLADE_HOOKUP_OBJECT (mainWindow, next_intra_frame1, "next_intra_frame1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2013, "image2013");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2029, "image2029");
   GLADE_HOOKUP_OBJECT (mainWindow, previous_intra_frame1, "previous_intra_frame1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2014, "image2014");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2030, "image2030");
   GLADE_HOOKUP_OBJECT (mainWindow, search_next_black_frame1, "search_next_black_frame1");
   GLADE_HOOKUP_OBJECT (mainWindow, search_previous_black_frame1, "search_previous_black_frame1");
   GLADE_HOOKUP_OBJECT (mainWindow, jum_to_frame1, "jum_to_frame1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2015, "image2015");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2031, "image2031");
   GLADE_HOOKUP_OBJECT (mainWindow, menuitem2, "menuitem2");
   GLADE_HOOKUP_OBJECT (mainWindow, menuitem2_menu, "menuitem2_menu");
   GLADE_HOOKUP_OBJECT (mainWindow, cut1, "cut1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2016, "image2016");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2032, "image2032");
   GLADE_HOOKUP_OBJECT (mainWindow, copy1, "copy1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2017, "image2017");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2033, "image2033");
   GLADE_HOOKUP_OBJECT (mainWindow, paste1, "paste1");
   GLADE_HOOKUP_OBJECT (mainWindow, delete1, "delete1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2018, "image2018");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2034, "image2034");
   GLADE_HOOKUP_OBJECT (mainWindow, separator5, "separator5");
   GLADE_HOOKUP_OBJECT (mainWindow, set_marker_a1, "set_marker_a1");
   GLADE_HOOKUP_OBJECT (mainWindow, set_marker_b1, "set_marker_b1");
@@ -1500,7 +1527,7 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, go_to_marker_b1, "go_to_marker_b1");
   GLADE_HOOKUP_OBJECT (mainWindow, separator10, "separator10");
   GLADE_HOOKUP_OBJECT (mainWindow, reset_edits1, "reset_edits1");
-  GLADE_HOOKUP_OBJECT (mainWindow, image2019, "image2019");
+  GLADE_HOOKUP_OBJECT (mainWindow, image2035, "image2035");
   GLADE_HOOKUP_OBJECT (mainWindow, audio_source1, "audio_source1");
   GLADE_HOOKUP_OBJECT (mainWindow, audio_source1_menu, "audio_source1_menu");
   GLADE_HOOKUP_OBJECT (mainWindow, source1, "source1");
@@ -1569,6 +1596,16 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, buttonAudioFilter, "buttonAudioFilter");
   GLADE_HOOKUP_OBJECT (mainWindow, togglebuttonAudio, "togglebuttonAudio");
   GLADE_HOOKUP_OBJECT (mainWindow, Audio, "Audio");
+  GLADE_HOOKUP_OBJECT (mainWindow, frame4, "frame4");
+  GLADE_HOOKUP_OBJECT (mainWindow, optionmenu1, "optionmenu1");
+  GLADE_HOOKUP_OBJECT (mainWindow, menu1, "menu1");
+  GLADE_HOOKUP_OBJECT (mainWindow, avi1, "avi1");
+  GLADE_HOOKUP_OBJECT (mainWindow, ogm1, "ogm1");
+  GLADE_HOOKUP_OBJECT (mainWindow, mpeg_video_only1, "mpeg_video_only1");
+  GLADE_HOOKUP_OBJECT (mainWindow, mpeg_a_v1, "mpeg_a_v1");
+  GLADE_HOOKUP_OBJECT (mainWindow, avi_dual_audio1, "avi_dual_audio1");
+  GLADE_HOOKUP_OBJECT (mainWindow, avi_unpacked_vop1, "avi_unpacked_vop1");
+  GLADE_HOOKUP_OBJECT (mainWindow, label17, "label17");
   GLADE_HOOKUP_OBJECT (mainWindow, guiDrawing, "guiDrawing");
   GLADE_HOOKUP_OBJECT (mainWindow, sliderNavigate, "sliderNavigate");
   GLADE_HOOKUP_OBJECT (mainWindow, hbox17, "hbox17");

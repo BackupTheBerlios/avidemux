@@ -199,7 +199,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 		muxer=new lavMuxer;
 		aviInfo info;
 		video_body->getVideoInfo(&info);
-		if(!muxer->open(out_name,MUXER_DVD,&info,audio->getInfo()))
+		if(!muxer->open(out_name,0,MUXER_DVD,&info,audio->getInfo()))
 		//if(!muxer->open(out_name,0,fps1000,audio->getInfo(),(float)audioInc))
 		{
 			GUI_Alert("Muxer init failed\n");

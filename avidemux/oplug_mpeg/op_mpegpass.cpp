@@ -110,7 +110,7 @@ void mpeg_passthrough(  char *name )
 	}
 	
   	muxer=new MYMUXER();
-	if(!muxer->open(name,MUXER_DVD,avifileinfo,audio->getInfo()))
+	if(!muxer->open(name,0,MUXER_DVD,avifileinfo,audio->getInfo()))
 	{
 		delete muxer;
 		muxer=NULL;

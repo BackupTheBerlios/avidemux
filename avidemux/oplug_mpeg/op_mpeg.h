@@ -21,4 +21,5 @@ void oplug_mpeg_vcd_ps(char *name);
 void oplug_mpeg_svcd(char *name=NULL);
 void oplug_mpeg_dvd(char *name=NULL);
 void oplug_mpeg_dvd_ps(char *name=NULL);
+void oplug_mpeg_svcd_ps(char *inname=NULL);
 

@@ -13,4 +13,4 @@ libADM_editor_a_SOURCES = ADM_Video.cpp ADMedAVIAUD.cpp ADM_edStub.cpp \
 EXTRA_DIST = ADM_edAudio.cpp ADM_edAudio.hxx ADM_edit.cpp ADM_edit.hxx ADM_edRender.cpp ADM_edSearch.cpp ADM_edStub.cpp ADMedAVIAUD.cpp ADM_Video.h ADM_Video.cpp 
 
 ####### kdevelop will overwrite this part!!! (end)############
-noinst_HEADERS = ADM_edCache.h
+noinst_HEADERS = ADM_edCache.h ADM_outputfmt.h

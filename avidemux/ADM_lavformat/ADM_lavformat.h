@@ -15,6 +15,7 @@ typedef enum
 {
 	MUXER_DVD,
 	MUXER_VCD,
+	MUXER_SVCD,
 	MUXER_DUMMY
 }ADM_MUXER_TYPE;
 class lavMuxer
@@ -31,7 +32,9 @@ public:
 		lavMuxer(void );
 		~lavMuxer(  );
 	uint8_t needAudio( void );
-	uint8_t open( char *filename, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
+			// Inbitrate is in bps,  0 means let the muxer takes default 
+			// value
+	uint8_t open( char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
 	uint8_t writeAudioPacket(uint32_t len, uint8_t *buf);
 	uint8_t writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe );
 	uint8_t forceRestamp(void);

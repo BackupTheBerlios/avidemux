@@ -1,4 +1,7 @@
+#ifndef ADM_GUI
+#define ADM_GUI
 
+#include "ADM_editor/ADM_outputfmt.h"
 
 void UI_updateFrameCount(uint32_t curFrame);
 void UI_setFrameCount(uint32_t curFrame,uint32_t total);
@@ -30,4 +33,7 @@ int 	UI_getCurrentVCodec(void);
 void UI_setAudioCodec( int i);
 void UI_setVideoCodec( int i);
 
- 
+ADM_OUT_FORMAT 	UI_GetCurrentFormat( void );
+uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt );
+#endif
+// EOF

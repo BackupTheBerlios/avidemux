@@ -148,7 +148,20 @@ mpegWritter::~mpegWritter(  )
 /*---------------------------------------------------------------------------------------*/
 uint8_t  mpegWritter::save_svcd(char *name)
 {
-
+	if(_outputAsPs)
+	{
+		switch(_outputAsPs)
+		{
+			case 2:
+				if(!initLveMux(name,MUXER_SVCD))
+					return 0;
+				break;
+			
+			default:
+				ADM_assert(0);
+				break;
+		}
+	}
 	switch(mpeg2encSVCDConfig.generic.mode)
 	{
 		case COMPRESS_CBR:
@@ -1009,7 +1022,7 @@ uint32_t fps1000;
 	info.width=getLastVideoFilter()->getInfo()->width;
 	info.height=getLastVideoFilter()->getInfo()->height;
 	info.fps1000=getLastVideoFilter()->getInfo()->fps1000;
-	if(!_muxer->open(name,type,&info,_audio->getInfo()))
+	if(!_muxer->open(name,0,type,&info,_audio->getInfo()))
 	{
 		delete _muxer;
 		_muxer=NULL;

@@ -50,9 +50,13 @@
 #include "ADM_filter/video_filters.h"
 
 #include "ADM_toolkit/filesel.h"
+#include "ADM_gui2/GUI_ui.h"
 extern void oplug_mpegff(char *name);
 static void  A_SaveAudioNVideo(char *name);
- int A_SaveUnpackedVop( char *name);
+ extern int A_SaveUnpackedVop( char *name);
+ extern void ogmSave(char *name);
+ extern void ADM_saveRaw(char *name);
+ void A_SaveAudioDualAudio(char *name);
 
 int A_Save( char *name)
 {
@@ -91,7 +95,26 @@ uint32_t end;
 	{
 		case CodecFamilyAVI:
 					printf(" Avi family\n");
-					A_SaveAudioNVideo(name);
+					switch(UI_GetCurrentFormat())
+					{
+						case ADM_AVI:
+								A_SaveAudioNVideo(name);
+								break;
+						case ADM_OGM:
+								ogmSave(name);
+								break;
+						case ADM_ES:
+								ADM_saveRaw(name);
+								break;
+						case ADM_AVI_DUAL:
+								A_SaveAudioDualAudio(name);
+								break;
+						case ADM_AVI_UNP:
+								A_SaveUnpackedVop(name);
+								break;
+						default:
+								GUI_Alert("Output format is not compatible!");
+					}
 					break;
 		case CodecFamilyMpeg:
 					printf(" Mpeg family\n");
@@ -108,7 +131,7 @@ uint32_t end;
 	getFirstVideoFilter(0,avifileinfo->nb_frames);
 	return 1;
 }
-void  A_SaveAudioDualAudio(void)
+void  A_SaveAudioDualAudio(char *inname)
 {
 GenericAviSaveCopyDualAudio *nw;
 char *name;
@@ -118,8 +141,11 @@ char *name;
 				 	GUI_Alert("Please select a second track in misc menu!");
 				  	return;
 		}
-
-		GUI_FileSelWrite("Select dual audio AVI to write", & name);
+		if(!inname)
+			GUI_FileSelWrite("Select dual audio AVI to write", & name);
+		else
+			name=inname;
+			
 		if(!name) return;
 
      		nw=new   GenericAviSaveCopyDualAudio(secondaudiostream);

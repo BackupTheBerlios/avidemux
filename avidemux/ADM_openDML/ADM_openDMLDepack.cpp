@@ -146,6 +146,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 		img++;
 		
 	}
+	newIndex[0].intra=AVI_KEY_FRAME; // Force
 	ret=1;
 _abortUnpack:
 	delete [] buffer;

@@ -41,6 +41,7 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 
 #include "ADM_codecs/ADM_codec.h"
+#include "ADM_gui2/GUI_ui.h"
 
 void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
 	   uint16_t * ss, uint16_t * ms);
@@ -512,7 +513,7 @@ uint8_t UI_getPreviewToggleStatus( void )
 ///
 ///	Update the preview button toggle
 ///
-void UI_setPreviewToggleStatus( uint8_t status )
+uint8_t UI_setPreviewToggleStatus( uint8_t status )
 {
 gint b;
 	 if(status) b=TRUE;
@@ -654,4 +655,16 @@ void UI_PrintCurrentVCodec(const char *str)
  	
 
 }
+ADM_OUT_FORMAT UI_GetCurrentFormat( void )
+{
+
+	return (ADM_OUT_FORMAT) getRangeInMenu(lookup_widget(guiRootWindow,"optionmenu1"));
+}
+uint8_t UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
+{
+
+	gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,"optionmenu1")), fmt);
+	return 1;
+}
+
 // EOF
