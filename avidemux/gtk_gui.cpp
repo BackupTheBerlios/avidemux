@@ -98,6 +98,7 @@ void A_requantize(void);
 int A_saveJpg (char *name);
 int A_loadWave (char *name);
 int A_loadAC3 (char *name);
+int A_loadNone( void );
 void A_saveAudioDecodedTest (char *name);
 void A_openBrokenAvi (char *name);
 int A_openAvi2 (char *name, uint8_t mode);
@@ -1422,7 +1423,10 @@ A_loadAC3 (char *name)
   wavinfo = currentaudiostream->getInfo ();
   return 1;
 }
-
+int A_loadNone( void )
+{
+ 	changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone);
+}
 //_____________________________________________________________
 //
 //              Load wave
