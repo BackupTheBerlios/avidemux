@@ -366,7 +366,7 @@ uint32_t len;
 uint32_t flags,sumit;
 float	 sum;
 EditorCache *cache=_videos[seg]._videoCache;	
-ADMImage *tmpImage;
+ADMImage *tmpImage=NULL;
 uint8_t refOnly=0;
 
 	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,
@@ -490,8 +490,8 @@ uint8_t refOnly=0;
 		 		strideTab2,
 		 		_info.width,
 		        	_info.height,
-		          	(int8_t *)(_imageBuffer->quant),
-		          	_imageBuffer->_qStride,
+		          	(int8_t *)(tmpImage->quant),
+		          	tmpImage->_qStride,
 		         	_pp.ppMode,
 		          	_pp.ppContext,
 		          	type);			// img type

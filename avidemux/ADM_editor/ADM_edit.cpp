@@ -506,12 +506,16 @@ TryAgain:
 				uint32_t 		len,flags,flag2;
 				uint8_t 		bframe=0, bconsistency=1;
 				uint32_t		scanned=12;
+                                ADMImage                *buffer=NULL;
 				//buffer=new uint8_t [info.width* info.height*2];
 				if(vid->_nb_video_frames>50) scanned=50;
 				else				scanned=vid->_nb_video_frames;
 				
 				bufferin=new uint8_t [info.width* info.height*2];
-				ADMImage *buffer=new ADMImage(info.width,info.height);
+                                if(vid->decoder->dontcopy())
+                                        buffer=new ADMImage(info.width,info.height,1);
+                                else
+				        buffer=new ADMImage(info.width,info.height);
 				// we decode 5 frames..should be enough to get an opinion
 				for(uint32_t i=0;i<scanned;i++)  //10
 				{
