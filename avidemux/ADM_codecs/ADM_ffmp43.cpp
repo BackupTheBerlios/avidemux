@@ -307,7 +307,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 		// Default is YV12 or I420
 		// In that case depending on swap u/v
 		// we do it or not
-	                        if(_refCopy)
+	                        if(dontcopy())
                                 {
                                         uint32_t u,v;
                                         out->_planes[0]=(uint8_t *)_frame.data[0];
@@ -321,6 +321,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
                                         }
                                         out->_planes[1]=(uint8_t *)_frame.data[u];
                                         out->_planeStride[1]=_frame.linesize[u];
+
                                         out->_planes[2]=(uint8_t *)_frame.data[v];
                                         out->_planeStride[2]=_frame.linesize[v];
 
@@ -335,7 +336,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
                                                 out->quant=(uint8_t *)_frame.qscale_table;
                                                 out->_qStride=_frame.qstride;
                                                 out->_qSize=(_w+15)>>4;
-                                                out->_qSize*=(_h+15)>>4;
+                                                out->_qSize*=(_h+15)>>4; // FixME?
                                         }
                                         else
                                         {

@@ -187,9 +187,13 @@ uint8_t 	decoderMpeg::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t
 		
 		if(out->quant && MPEG2DEC->decoder.quant_stride>=out->_qStride)
 		{
+                        
+
                         if(dontcopy())
                         {
-                             out->quant=(uint8_t *)MPEG2DEC->decoder.quant;
+                             out->_qSize=((_w+15)>>4)*((_h+15)>>4);
+                             out->_qStride=(_w+15)>>4;
+                             out->quant=(uint8_t *)MPEG2DEC->decoder.quant;                             
                         }
                         else
 			     memcpy(out->quant,MPEG2DEC->decoder.quant,out->_qSize);
