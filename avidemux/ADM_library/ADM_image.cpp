@@ -50,6 +50,7 @@ void    ADMImage::commonInit(uint32_t w,uint32_t h)
         
         imgCurNb++;
         _planes[0]=_planes[1]=_planes[2]=NULL;
+        _noPicture=0;
 
 }
 ADMImage::ADMImage(uint32_t width, uint32_t height)
@@ -114,7 +115,17 @@ uint8_t ADMImage::duplicate(ADMImage *src)
 	       memcpy(VPLANE(this),VPLANE(src),(_width*_height)>>2);
         }
         else
-        {       // The source is a reference
+        {
+                if(src->_noPicture)
+                {
+                        // no pic available, blacken it
+                        memset(YPLANE(this),0,_width*_height);
+                        memset(UPLANE(this),128,(_width*_height)>>2);
+                        memset(VPLANE(this),128,(_width*_height)>>2);
+                        return 1;
+                        
+                }
+               // The source is a reference
                 // We have to use the alternate informations
                 // to copy & compact at the same time
                 //
@@ -122,6 +133,10 @@ uint8_t ADMImage::duplicate(ADMImage *src)
                 ADM_assert(src->_planeStride[0]);
                 ADM_assert(src->_planeStride[1]);
                 ADM_assert(src->_planeStride[2]);
+
+                ADM_assert(src->_planes[0]);
+                ADM_assert(src->_planes[1]);
+                ADM_assert(src->_planes[2]);
 
                 uint8_t *in,*out;
                 uint32_t w,h,stride;

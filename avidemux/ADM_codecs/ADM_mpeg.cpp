@@ -184,7 +184,7 @@ uint8_t 	decoderMpeg::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t
 		t=(uint8_t *) MPEG2DEC->fbuf[0]->buf[0];
 		mpeg2_cleanup(MPEG2DEC);
 		info= mpeg2_info (MPEG2DEC);
-		
+		out->_noPicture=0;    // For mpeg1/2 we ALWAYS have a picture
 		if(out->quant && MPEG2DEC->decoder.quant_stride>=out->_qStride)
 		{
                         

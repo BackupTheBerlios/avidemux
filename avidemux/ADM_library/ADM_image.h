@@ -44,6 +44,7 @@ public:
 	uint32_t	flags;		/// Flags for this image (AVI_KEY_FRAME/AVI_B_FRAME)
 
 	uint8_t         _isRef;         /// If True means the datas are just a link to data we don't own!
+        uint8_t         _noPicture;     /// No picture to display
         void            commonInit(uint32_t w,uint32_t h); /// sub constructor
 public:
 

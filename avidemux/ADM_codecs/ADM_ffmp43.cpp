@@ -176,7 +176,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
  int strideTab[3];
  int strideTab2[3];
  int ret=0;
-
+                out->_noPicture=0;
  		if(_showMv) 
 		{
 			_context->debug_mv 	|= FF_SHOW;
@@ -228,6 +228,10 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
                                         {
 					   memset(out->data,0,_w*_h);
 					   memset(out->data+_w*_h,128,(_w*_h)>>1);
+                                        }
+                                        else
+                                        {
+                                           out->_noPicture=1;
                                         }
 					printf("\n ignoring got pict ==0\n");
 					return 1;
