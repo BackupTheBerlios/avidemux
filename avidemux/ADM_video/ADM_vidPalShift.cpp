@@ -107,7 +107,7 @@ ADMImage *cur,*next;
 		// for first or last frame do nothing
 		if(!frame || frame==_info.nb_frames-1)
 		{
-			cur->_qStride=0; // Remove quant
+
 			data->duplicate(cur);
 			vidCache->unlockAll();
 			return 1;	
@@ -151,6 +151,7 @@ ADMImage *cur,*next;
 		}
 		
 	vidCache->unlockAll();
+			data->copyInfo(cur);
       return 1;
 }
 

@@ -237,6 +237,7 @@ UNUSED_ARG(flags);
 				// store for future use
 				memcpy(_stored->data,data->data,*len);
 				_last=frame;
+				
 				return 1;
 			}
 			ADM_assert(frame<_info.nb_frames);
@@ -290,6 +291,7 @@ UNUSED_ARG(flags);
 	memcpy(YPLANE(_stored),YPLANE(data),W*H);
 	memcpy(UPLANE(_stored),UPLANE(data),(W*H)>>2);
 	memcpy(VPLANE(_stored),VPLANE(data),(W*H)>>2);
+	data->copyInfo(_uncompressed);
 	return 1;
 
 

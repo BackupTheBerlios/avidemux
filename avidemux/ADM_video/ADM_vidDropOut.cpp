@@ -221,6 +221,7 @@ ADMImage	*_current;
 		else
 			memcpy(zout,incur,_info.width);
 	}
+	data->copyInfo(_current);
 	vidCache->unlockAll();
 return 1;
 }

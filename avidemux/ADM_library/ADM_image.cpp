@@ -83,16 +83,62 @@ uint8_t ADMImage::duplicate(ADMImage *src)
 	_qStride=0;	
 	_qSize=0;
 	
-	_Qp=src->_Qp;
-	flags=src->flags;
-	_qSize=src->_qSize;
-	_aspect=src->_aspect;
-	_qStride=src->_qStride;
-	if(_qSize)
-	{
-		quant=new uint8_t[_qSize];
-		memcpy(quant,src->quant,_qSize);
-	}
-	memcpy(data,src->data,(_width*_height*3)>>1);
+	copyInfo(src);
+	memcpy(YPLANE(this),YPLANE(src),_width*_height);
+	memcpy(UPLANE(this),UPLANE(src),(_width*_height)>>2);
+	memcpy(VPLANE(this),VPLANE(src),(_width*_height)>>2);
 	return 1;
 }
+uint8_t ADMImage::duplicateFull(ADMImage *src)
+{
+	// Sanity check
+	ADM_assert(src->_width==_width);
+	ADM_assert(src->_height==_height);
+	
+	
+	copyInfo(src);
+	memcpy(YPLANE(this),YPLANE(src),_width*_height);
+	memcpy(UPLANE(this),UPLANE(src),(_width*_height)>>2);
+	memcpy(VPLANE(this),VPLANE(src),(_width*_height)>>2);
+	copyQuantInfo(src);
+	
+	return 1;
+}
+uint8_t ADMImage::copyInfo(ADMImage *src)
+{
+	_Qp=src->_Qp;
+	flags=src->flags;
+	_aspect=src->_aspect;
+}
+//
+//	By design the reallocation of quant should happen at startup
+//	but not in processing itself (reuse already allocated quant)
+//	It may seem shoddy, but it adds flexibility
+//
+uint8_t ADMImage::copyQuantInfo(ADMImage *src)
+{
+	if(!src->_qStride || !src->_qSize)  // No (usable) quant
+	{
+		_qStride=0;
+		return 1;
+	}
+	// Reuse Quant memory ?
+	if(!quant)
+	{	// need a new quant
+		quant=new uint8_t[src->_qSize];
+		_qSize=src->_qSize;
+	
+	}
+	
+	// Same size ?
+	ADM_assert(_qSize==src->_qSize);		
+	_qStride=src->_qStride;		
+	memcpy(quant,src->quant,_qSize);	
+	
+	return 1;
+}
+
+
+
+
+

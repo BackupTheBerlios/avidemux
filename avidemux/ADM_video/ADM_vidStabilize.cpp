@@ -134,10 +134,10 @@ ADMImage	*_current;
 		if(frame> _info.nb_frames-1) return 0;
 		_current=vidCache->getImage(frame);
 		if(!_current) return 0;
-		
+		data->copyInfo(_current);
 		if(!frame || (frame==_info.nb_frames-1))
 		{
-			_current->_qStride=0;
+
 			data->duplicate(_current);
 			vidCache->unlockAll();
 			return 1;

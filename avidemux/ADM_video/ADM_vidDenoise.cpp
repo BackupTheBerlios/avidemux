@@ -311,7 +311,7 @@ uint8_t ADMVideoDenoise::getFrameNumberNoAlloc(uint32_t frame,
 			memcpy(UPLANE(_locked),UPLANE(_uncompressed),page>>2);
 			memcpy(VPLANE(_locked),VPLANE(_uncompressed),page>>2);
 	}
-           
+      data->copyInfo(_uncompressed);  
       return 1;
 }
 

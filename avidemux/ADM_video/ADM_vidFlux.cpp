@@ -169,8 +169,9 @@ ADMImage	*image,*next,*prev;
 			
 			if(!frame || (frame==_info.nb_frames-1))
 			{
-				image->_qStride=0;
+
 				data->duplicate(image);
+				data->copyInfo(image);
 				vidCache->unlockAll();
 				return 1;
 			}
@@ -269,7 +270,7 @@ ADMImage	*image,*next,*prev;
 		DoFilter_C(currp, prevp, nextp, src_pitch,
 			destp, dst_pitch, row_size, height - 2);
 	#endif
-
+	data->copyInfo(image);
 	vidCache->unlockAll();
 	return 1;
 }	                           

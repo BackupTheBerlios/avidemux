@@ -106,6 +106,7 @@ ADMImage *ptr;
 			 vidFieldKeepOdd(_info.width,_info.height,ptr->data,data->data);
 		else
 			 vidFieldKeepEven(_info.width,_info.height,ptr->data,data->data);
+		data->copyInfo(ptr);	
 		vidCache->unlockAll();
       return 1;
 }
@@ -214,7 +215,7 @@ ADMImage *ptr1,*ptr2;
 		 if(!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags)) return 0;
 		 
 		  vidFielStack(_info.width ,_info.height,YPLANE(_uncompressed),YPLANE(data));
-		
+		data->copyInfo(_uncompressed);	
       return 1;
 }
 

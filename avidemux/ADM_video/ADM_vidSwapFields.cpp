@@ -153,6 +153,7 @@ uint8_t AVDMVideoSwapField::getFrameNumberNoAlloc(uint32_t frame,
 			odd+=stride;
 			even+=stride;
 		}
+		data->copyInfo(_uncompressed);
 
       return 1;
 }
@@ -170,7 +171,7 @@ uint8_t AVDMVideoKeepOdd::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t h=_info.height;
 
 		vidFieldKeepOdd(  w,  h, YPLANE(_uncompressed),YPLANE(data));
-
+		data->copyInfo(_uncompressed);
 
       return 1;
 }
@@ -191,7 +192,7 @@ uint8_t AVDMVideoKeepEven::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t h=_info.height;
 
 
-
+		data->copyInfo(_uncompressed);
 		vidFieldKeepEven(  w,  h, YPLANE(_uncompressed),YPLANE(data));
       return 1;
 }

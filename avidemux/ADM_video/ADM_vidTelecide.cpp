@@ -120,10 +120,10 @@ ADMImage	*cur,*next;
 		
 		cur=vidCache->getImage(frame);
 		if(!cur) return 0;
-		
+		data->copyInfo(cur);
 		if(!frame || frame==_info.nb_frames-1)
 		{
-			cur->_qStride=0;
+
 			data->duplicate(cur);
 			vidCache->unlockAll();
 			return 1;

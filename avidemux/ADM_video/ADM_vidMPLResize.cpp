@@ -346,7 +346,7 @@ uint8_t AVDMVideoStreamMPResize::getFrameNumberNoAlloc(uint32_t frame,
 			ddst[1]=ddst[2]=_info.width>>1;
 
 			sws_scale(_context,src,ssrc,0,_in->getInfo()->height,dst,ddst);
-			data->_qStride=0;
+			data->copyInfo(_uncompressed);
 	return 1;
 }
 

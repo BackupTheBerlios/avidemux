@@ -84,12 +84,12 @@ uint8_t AVDMVideoLavDeint::getFrameNumberNoAlloc(uint32_t frame,
 
 		// read uncompressed frame
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
-
+		data->copyInfo(_uncompressed);
 		// if not %4 -> skip
 		if((_info.width&03) || (_info.height & 3))
 		{
 			printf("\n WIDTH & HEIGHT must be multiple of 4!!\n");
-			_uncompressed->_qStride=0;
+
 			data->duplicate(_uncompressed);
 			return 1;
 		}
@@ -115,7 +115,7 @@ uint8_t AVDMVideoLavDeint::getFrameNumberNoAlloc(uint32_t frame,
 			printf("Error in avpicture deinterlace!\n");
 			return 0;
 		} 	
-		data->_qStride=0;	
+
 
       return 1;
 }

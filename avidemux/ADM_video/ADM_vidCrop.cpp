@@ -101,6 +101,7 @@ AVDMVideoStreamCrop::AVDMVideoStreamCrop(
 	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   	ADM_assert(_uncompressed);
   	_info.encoding=1;
+	  
 
   	  	
 }
@@ -164,7 +165,7 @@ uint8_t AVDMVideoStreamCrop::getFrameNumberNoAlloc(uint32_t frame,
        		 		}	
        		  *flags=0;
        		  *len= _info.width*_info.height+(_info.width*_info.height>>1);
-		  data->_qStride=0; // drop quant info
+		  data->copyInfo(_uncompressed);
       return 1;
 }
 /**

@@ -161,9 +161,9 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
        		y=_in->getInfo()->height;
        		x=_in->getInfo()->width;
        		line=x;
-				lineout=_info.width;
-       		src=_uncompressed->data;
-       		dest=data->data+_param->left+_info.width*_param->top;
+		lineout=_info.width;
+       		src=YPLANE(_uncompressed);
+       		dest=YPLANE(data)+_param->left+_info.width*_param->top;
        		
        		for(uint32_t k=y;k>0;k--)
        			{
@@ -172,16 +172,16 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
        			 	    dest+=lineout;
        			}
        		 // Crop U  & V
-					uint8_t *src_u,*src_v;
-					uint8_t *dst_u,*dst_v;
+			uint8_t *src_u,*src_v;
+			uint8_t *dst_u,*dst_v;
 
-       		 	src_u=_uncompressed->data+y*x;
-       		 	src_v=src_u+(x*y>>2);
+       		 	src_u=UPLANE(_uncompressed);
+       		 	src_v=VPLANE(_uncompressed);
        		 	line>>=1;
        		 	lineout>>=1;       		       		 	
-					dst_u= data->data+_info.width*_info.height+(_info.width*_param->top>>2)+
-							(_param->left>>1);;
-					dst_v= dst_u+(_info.width*_info.height>>2);
+			dst_u=UPLANE( data)+(_info.width*_param->top>>2)+
+						(_param->left>>1);;
+			dst_v= UPLANE( data);
 
        		 		for(uint32_t k=y>>1;k>0;k--)
        		 		{
@@ -195,7 +195,8 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
        			 	    	dst_v+=lineout;
 
        		 		}
-       		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       			
+       		  *len= _info.width*_info.height+(_info.width*_info.height>>1);
+		  data->copyInfo(_uncompressed);
       return 1;
 }
 

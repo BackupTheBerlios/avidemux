@@ -113,7 +113,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 	if((result=cache->getImage(relframe)))
 	{
 		aprintf(">>frame %lu is cached...\n",relframe);
-		out->duplicate(result);
+		out->duplicateFull(result);
 		if(flagz)
 			*flagz=result->flags;
 		return 1;
@@ -148,7 +148,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 	  _lastframe = relframe;
 	  if(flagz)
 	  	*flagz=result->flags;
-	  out->duplicate(result);
+	  out->duplicateFull(result);
 	  return (1);
     }
   
@@ -203,7 +203,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 				}
 				if(seeked==relframe)
 				{
-					 out->duplicate(result);
+					 out->duplicateFull(result);
 					 if(flagz) *flagz=result->flags;
 				}
 				seeked++;
@@ -222,7 +222,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 			}
 	if(flagz)
 		*flagz=result->flags;	
-	out->duplicate(result);
+	out->duplicateFull(result);
 	_lastframe=relframe;
 	_lastseg = seg;
 	return 1;	 
@@ -274,7 +274,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 			}
 		if(flagz)
 			*flagz=result->flags;	
-		out->duplicate(result);
+		out->duplicateFull(result);
 		_lastframe=relframe;
 		_lastseg=seg;
 		return 1;	
@@ -309,7 +309,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 		}
 		if(seeked==relframe)
 		{
-			 out->duplicate(result);
+			 out->duplicateFull(result);
 			 if(flagz) *flagz=result->flags;
 		}
 		seeked++;
@@ -347,6 +347,8 @@ uint32_t flags;
 	   return 1;
 
 }
+//______________________________________________
+//_______________________________________________
 //
 //      Render previous kf
 //

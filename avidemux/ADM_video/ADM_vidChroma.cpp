@@ -110,7 +110,7 @@ uint32_t page;
                 	y+=_info.width;
 			y2+=_info.width;
        		 }
-		 data->_qStride=0;
+
 		 // Remove chroma u & v
 		 memset(UPLANE(data),0x80,page>>2);
 		 memset(VPLANE(data),0x80,page>>2);
@@ -194,7 +194,7 @@ uint32_t page;
                 	y+=_info.width;
 			y2+=_info.width;
        		 }
-		 data->_qStride=0;
+
 		 // Remove chroma u & v
 		 memset(UPLANE(data),0x80,page>>2);
 		 memset(VPLANE(data),0x80,page>>2);

@@ -165,8 +165,8 @@ uint8_t AVDMVideoStreamNull::getFrameNumberNoAlloc(uint32_t frame,
 		          		_pp.ppContext,
 		          		type);			// img type
 				// update some infos
-				data->_Qp=_uncompressed->_Qp;
-				data->flags=_uncompressed->flags;
+				data->copyInfo(_uncompressed);
+
 			}
 		else
 			data->duplicate(_uncompressed);

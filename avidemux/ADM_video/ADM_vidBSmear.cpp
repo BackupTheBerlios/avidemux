@@ -176,7 +176,7 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
 		 srcV-=bytes>>2;
        		 memset(srcV,0x80,bytes>>2);
 		 
-       		data->_qStride=0;
+		  
        		  	
        		         		       		
       return 1;

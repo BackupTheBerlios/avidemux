@@ -113,7 +113,7 @@ uint8_t ADMVideoChromaShift::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t page;
 
 		page=(w*h);
-		data->_qStride=0;
+
 		memcpy(YPLANE(data),YPLANE(_uncompressed),page);
 
 		if(!_param->u)
@@ -136,7 +136,7 @@ uint8_t ADMVideoChromaShift::getFrameNumberNoAlloc(uint32_t frame,
 			fixup(YPLANE(data),w,h,_param->u*2);
 		if(_param->v)
 			fixup(YPLANE(data),w,h,_param->v*2);
-
+		  data->copyInfo(_uncompressed);
       return 1;
 }
 /*

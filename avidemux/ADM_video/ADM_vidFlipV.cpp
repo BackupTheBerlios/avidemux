@@ -80,7 +80,7 @@ uint8_t ADMVideoFlipV::getFrameNumberNoAlloc(uint32_t frame,
          uint32_t h=_info.height;
          uint32_t page,qpage;
         
-	 data->_qStride=0;
+
 	  
          page=stride*h;
          qpage=page>>2;
@@ -116,6 +116,7 @@ uint8_t ADMVideoFlipV::getFrameNumberNoAlloc(uint32_t frame,
 		 in+=stride;
 		 out-=stride;
 	}   
+	data->copyInfo(_uncompressed);
 	return 1;
 }
 

@@ -394,6 +394,7 @@ uint8_t AVDMVideoVlad::getFrameNumberNoAlloc(uint32_t frame,
 		cur=vidCache->getImage(frame);
 		if(!cur) 
 				return 0;
+		data->copyInfo(cur);
 		if(!frame)
 		{
 			

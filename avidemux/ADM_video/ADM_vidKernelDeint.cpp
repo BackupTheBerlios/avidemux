@@ -239,6 +239,7 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 			memcpy(UPLANE(data),UPLANE(mysrc),page>>2);
 			memcpy(VPLANE(data),VPLANE(mysrc),page>>2);
 			vidCache->unlockAll();
+			data->copyInfo(mysrc);
 			return 1;
 		}
 		else
@@ -391,6 +392,7 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 			dstp  += 2*dst_pitch;
 		}
 	}
+	data->copyInfo(mysrc);
 	vidCache->unlockAll();
 	return 1;
 }

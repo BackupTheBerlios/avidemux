@@ -279,6 +279,7 @@ uint8_t Msmooth::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		}
 		//return mask;
 		memcpy(data->data,mask->data,(_info.width*_info.height*3)>>1);
+		data->copyInfo(src);
 		vidCache->unlockAll();
 		return 1;
 	}
@@ -374,6 +375,7 @@ done:
 	}
 	memcpy(data->data,deliver->data,(_info.width*_info.height*3)>>1);
 	//return(deliver);
+	data->copyInfo(src);
 	vidCache->unlockAll();
 	return 1;
 }

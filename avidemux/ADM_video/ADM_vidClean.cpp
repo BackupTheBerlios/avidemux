@@ -193,5 +193,6 @@ uint8_t *dst,*dstu,*dstv,*src,*srcu,*srcv;
                   	}          // end for x
            		
               }     // end for y
+	        data->copyInfo(_uncompressed);
               return 1;
 }

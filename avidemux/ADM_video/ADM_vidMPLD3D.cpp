@@ -318,7 +318,7 @@ UNUSED_ARG(flags);
 
 	// n is out....
 	_last=frame;
-	data->_qStride=0;
+	data->copyInfo(_storage);
 	return 1;
 
 

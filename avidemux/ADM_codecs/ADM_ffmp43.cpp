@@ -165,7 +165,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 				}
 
 		ret= avcodec_decode_video(_context,&_frame,&got_picture, in, len);
-		
+		out->_qStride=0; //Default = no quant
 		if(0>ret && !_context->hurry_up)
 		{
 					printf("\n error in FFMP43/mpeg4!\n");
@@ -233,8 +233,8 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 			_frame.linesize[0 ]=_w;
 			_frame.linesize[1 ]=_w>>1;
 			_frame.linesize[2 ]=_w>>1;
-			// No pp
-			out->_qStride=0;
+			
+			
 			break;
 
 		case PIX_FMT_YUV422P:
@@ -257,8 +257,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 			_frame.linesize[0 ]=_w;
 			_frame.linesize[1 ]=_w>>1;
 			_frame.linesize[2 ]=_w>>1;
-			// No pp
-			out->_qStride=0;
+		
 			
 			break;
 		
@@ -273,18 +272,14 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 #if 1				
 				if(out->quant)
 				{
-					if(_frame.qstride<out->_qStride || ! out->_qStride)
-					{
-						printf("FF43: Stride differs %d %d\n",
-								_frame.qstride,out->_qStride);
-						out->_qStride=0;
-					}
-					else
 					{
 						uint8_t *src,*dst;
 						src=(uint8_t *)_frame.qscale_table;
 						dst=out->quant;
 						// Pack them
+						// /16 width = >>4
+						// /16 height= >>4
+						out->_qStride=(_w+15)>>4;
 						for(uint32_t y=0;y<((_h+15)>>4);y++)
 						{				
 							memcpy(dst,src,out->_qStride);
@@ -358,7 +353,7 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 						{
 							*flagz=frameType();
 						}
-						out->_qStride=0;
+						
  						return 1;
 				}
 		default:

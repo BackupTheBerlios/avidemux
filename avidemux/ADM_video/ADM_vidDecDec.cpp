@@ -435,9 +435,10 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		}
 	    //return src;
 	        //memcpy(data,src,*len);
-		src->_qStride=0;
+
 		data->duplicate(src);
 		vidCache->unlockAll();
+		  
 		return 1;
 	}
 	else if (_param->mode == 1)
@@ -511,7 +512,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			}
 			//return src;
 			//memcpy(data,src,*len);
-			src->_qStride=0;
+
 			data->duplicate(src);
 			vidCache->unlockAll();
 			return 1;
@@ -646,7 +647,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		}
 		//return dst;
 		//memcpy(data,dst,*len);
-		dst->_qStride=0;
+
 		data->duplicate(dst);
 		vidCache->unlockAll();		
 		return 1;
@@ -696,7 +697,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		}
 	    //return src;
 	    	//memcpy(data,src,*len);
-		src->_qStride=0;
+
 		data->duplicate(src);
 		vidCache->unlockAll();
 		return 1;
@@ -741,7 +742,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			GETFRAME(useframe, src);
 			DrawShow(src->data, useframe, forced, dropframe, metric, inframe);			
 			//memcpy(data,src,*len);
-			src->_qStride=0;
+
 			data->duplicate(src);
 		
 			vidCache->unlockAll();		
@@ -754,7 +755,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			DrawShow(src->data, 0, forced, dropframe, metric, inframe);
 			//return src;
 			//memcpy(data,src,*len);
-			src->_qStride=0;
+
 			data->duplicate(src);
 		
 			vidCache->unlockAll();		
@@ -767,7 +768,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			DrawShow(src->data, 0, forced, dropframe, metric, inframe);
 			//return src;
 			//memcpy(data,src,*len);
-			src->_qStride=0;
+
 			data->duplicate(src);
 		
 			vidCache->unlockAll();		
@@ -868,14 +869,14 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			vidCache->unlockAll();
 			//return dst;
 			//memcpy(data,dst,*len);
-			dst->_qStride=0;
+
 			data->duplicate(dst);
 			vidCache->unlockAll();		
 			return 1; // return src;			
 		}
 		//return src;
 		//memcpy(data,src,*len);
-		src->_qStride=0;
+
 		data->duplicate(src);
 		vidCache->unlockAll();		
 		return 1; // return src;			

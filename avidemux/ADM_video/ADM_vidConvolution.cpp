@@ -160,7 +160,8 @@ uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
                }
 //
            	  *flags=0;
-       		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       			
+       		  *len= _info.width*_info.height+(_info.width*_info.height>>1); 
+		    data->copyInfo(_uncompressed);
       return 1;
 }
 

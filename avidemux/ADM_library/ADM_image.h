@@ -11,6 +11,14 @@
 //
 //	This is the base time for image exchanged between codec/filters/...
 //
+//	We (optionnally) can carry extra informations
+//		- aspect ratio
+//		- frame type
+//		- quantizer for each macroblock (16x16 pixels)
+//	For the latter 3 infos are used
+//		quant which leads to the int8 quant array
+//		qstride = stride of array. Usually width+15)/16. 0 MEANS NOT USABLE
+//		qsize = size of the array (needed to be able to copy it)
 //
 #ifndef ADM_IMAGE
 #define ADM_IMAGE
@@ -27,7 +35,7 @@ public:
 	uint8_t		*data;		/// Pointer to actual image data
 	uint32_t	_width;		/// Width of image
 	uint32_t	_height;	/// Height of image
-	uint32_t	_qStride;	/// Stride of Q infos, usually about width/8
+	uint32_t	_qStride;	/// Stride of Q infos, usually about width/8 <- ***if 0 means no quant usable***
 	uint8_t		*quant;		/// Byte representing quantize used for this block
 	uint32_t	_Qp;		/// Average quantizer for this image, Default=2
 	uint32_t	_qSize;		/// Size of the *quant bitfield
@@ -37,8 +45,10 @@ public:
 public:
 		ADMImage(uint32_t width, uint32_t height);
 		~ADMImage();
-	uint8_t duplicate(ADMImage *src);	/// copy an image to ourself
-
+	uint8_t duplicate(ADMImage *src);	/// copy an image to ourself, including info
+	uint8_t duplicateFull(ADMImage *src);	/// copy an image to ourself, including info
+	uint8_t copyInfo(ADMImage *src);	/// copy all the flags, not the data themselves
+	uint8_t copyQuantInfo(ADMImage *src);	/// copy quant table if any
 
 };
 #define YPLANE(x) (x->data)

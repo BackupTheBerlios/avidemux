@@ -92,7 +92,7 @@ uint8_t ADMVideoUVSwap::getFrameNumberNoAlloc(uint32_t frame,
 			memcpy(UPLANE(data),VPLANE(data),sz);
 			memcpy(VPLANE(data),_buf,sz);
 			
-			data->_qStride=0;
+
 
       return 1;
 }

@@ -110,7 +110,7 @@ uint32_t stride,page;
 	stride=_info.width;
 	page=(stride*_info.height)>>2;
 	
-	data->_qStride=0;
+
 	
 	// read uncompressed frame
 	if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;               
@@ -184,6 +184,7 @@ uint32_t stride,page;
 			o1+=stride;                 
 		}
 	}
+	data->copyInfo(_uncompressed);
       return 1;
 }
 //

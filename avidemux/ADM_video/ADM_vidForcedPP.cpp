@@ -200,11 +200,12 @@ uint8_t ADMVideoForcedPP::getFrameNumberNoAlloc(uint32_t frame,
 		else
 		{
 			if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
+				
 			return 1;
 		
 		}			
 		
-		
+		data->copyInfo(_uncompressed);	
 	return 1;
 }
 

@@ -201,7 +201,7 @@ uint32_t stride,page;
 			o1+=stride;                      
 	      	}
 	}
-	data->_qStride=0;
+	data->copyInfo(_uncompressed);
 	return 1;
 }
 //________________________________________________________________________

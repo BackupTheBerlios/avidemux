@@ -172,7 +172,8 @@ uint8_t ADMVideoMaskedSoften::getFrameNumberNoAlloc(uint32_t frame,
 
 		uint8_t *src,*dst;
 		uint32_t val,cur,coef;
-		
+		//
+		data->copyInfo(_uncompressed);
 		// optimized one
 		if(radius==2) return radius5(YPLANE(_uncompressed),YPLANE(data));
 		if(radius==1) return radius3(YPLANE(_uncompressed),YPLANE(data));

@@ -129,7 +129,7 @@ uint8_t ADMVideoRotate::getFrameNumberNoAlloc(uint32_t frame,
 
   *flags=_uncompressed->flags;
   *len= (_info.width * _info.height) + ((_info.width * _info.height) / 2);
-  data->_qStride=0;
+   data->copyInfo(_uncompressed);	
   return 1;
 }
 
