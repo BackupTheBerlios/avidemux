@@ -1094,8 +1094,14 @@ static	Picture ref_pictures[R_PICS];
 
 static	Picture *cur_picture, *old_picture;
 static	Picture *new_ref_picture, *old_ref_picture;
+static  uint32_t mean_dts_picture;
+uint32_t mpeg2GetDts( void )
+{
+	return mean_dts_picture;
+}
 void putseq_init(void)
 {
+	mean_dts_picture=0;
 	bits_after_mux=0;
 	frame_periods=0;
 	cur_picture=old_picture=NULL;
@@ -1180,6 +1186,7 @@ void putseq_next( int *type,int *quant )
 		}
 
 //		sync_guard_update( &cur_picture->completion, 0 );
+		mean_dts_picture=cur_picture->temp_ref+ss.gop_start_frame;
 #ifdef PUSH
 		assert(0==pushframe(cur_picture->temp_ref+ss.gop_start_frame,
 					cur_picture->curorg));

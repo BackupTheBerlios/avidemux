@@ -441,7 +441,8 @@ DIA_encoding		*encoding;
 				if(!len) continue;
 				if(_muxer)
 				{		
-						_muxer->writeVideoPacket(len,_buffer_out,i-MPEG_PREFILL,i-MPEG_PREFILL+1);
+						_muxer->writeVideoPacket(len,_buffer_out,
+							i-MPEG_PREFILL,_codec->getCodedPictureNumber());
 						PACK_AUDIO;
 						
 				}else
@@ -471,8 +472,8 @@ DIA_encoding		*encoding;
 					fwrite(_buffer_out,len,1,fd);
 				else
 				{
-					_muxer->writeVideoPacket(len,_buffer_out,_total-MPEG_PREFILL+i,
-							_total-MPEG_PREFILL+i+1);
+					_muxer->writeVideoPacket(len,_buffer_out,
+							_total-MPEG_PREFILL+i,_codec->getCodedPictureNumber());
 					PACK_AUDIO;
 				}
 
@@ -866,7 +867,7 @@ uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 			{
 				
 				// write video
-				_muxer->writeVideoPacket(len,_buffer_out,i-MPEG_PREFILL,i+1-MPEG_PREFILL);
+				_muxer->writeVideoPacket(len,_buffer_out,i-MPEG_PREFILL,_codec->getCodedPictureNumber());
 						
 				PACK_AUDIO;
 			}
@@ -914,7 +915,7 @@ uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 		else
 		{
 			// write video
-			_muxer->writeVideoPacket(len,_buffer_out,_total+i-MPEG_PREFILL,_total+i-MPEG_PREFILL+1);
+			_muxer->writeVideoPacket(len,_buffer_out,_total+i-MPEG_PREFILL,_codec->getCodedPictureNumber());
 			PACK_AUDIO;
 
 		}

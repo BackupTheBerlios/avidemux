@@ -57,8 +57,9 @@ class Mpeg2enc: public encoder
 			       						uint32_t 	*flags,
 									uint32_t *quant);
 		virtual 	uint8_t setMatrix(int matrix);	
-				uint8_t	disablePadding( void );		
-     };
+				uint8_t	disablePadding( void );
+				uint32_t getCodedPictureNumber( void );
+};
 
 
 class Mpeg2encVCD: public Mpeg2enc

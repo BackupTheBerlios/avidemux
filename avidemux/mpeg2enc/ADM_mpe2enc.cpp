@@ -46,6 +46,11 @@
 static uint8_t mpeg2_running=0;
 #define MAX_BR_M 50000*1000
 //#define TEST_NOB 1 // disable B frames
+
+
+extern uint32_t mpeg2GetDts( void );
+
+
 Mpeg2enc::Mpeg2enc( uint32_t width,uint32_t height) :encoder(width,height)
              				{
 							memset(&_settings,0,sizeof(_settings));
@@ -54,7 +59,10 @@ Mpeg2enc::Mpeg2enc( uint32_t width,uint32_t height) :encoder(width,height)
 							_settings.searchrad=16; // speed up
 
                    			} ;
-		
+uint32_t Mpeg2enc::getCodedPictureNumber( void )
+{
+	return mpeg2GetDts();
+}
 uint8_t Mpeg2enc::disablePadding( void )
 {
 	_settings.noPadding=1;
