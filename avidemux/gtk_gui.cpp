@@ -137,6 +137,7 @@ extern uint8_t DIA_about( void );
 extern uint8_t DIA_RecentFiles( char **name );
 extern void mpeg_passthrough(  char *name );
 static void A_videoCheck( void);
+extern void parseScript(char *scriptname);
 #define USE_FFMPEG_AS_DEFAULT
 #ifdef USE_FFMPEG
 //uint8_t       use_fast_ffmpeg=1;
@@ -185,6 +186,10 @@ HandleAction (Action action)
 
   switch (action)
     {
+    case ACT_RunScript:
+    			 GUI_FileSelRead ("Select script to load ", parseScript);
+    		return;
+		
     case ACT_RecentFiles:
     	char *file;
 		if(		DIA_RecentFiles(&file))
