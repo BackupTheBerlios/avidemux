@@ -77,6 +77,7 @@
         uint32_t					_bitmap;
         uint32_t					search(uint32_t time);
         void 						displayString(char *string);
+	void 						displayString_autoadj(char *string);
         void 						displayChar(uint32_t w,uint32_t h,char c);
   uint32_t						displayLine(char *string,uint32_t line, uint32_t len);
   uint32_t						displayLine(char *string,uint32_t line, uint32_t len, uint32_t *suggestedLen);

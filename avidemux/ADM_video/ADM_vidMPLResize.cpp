@@ -27,7 +27,6 @@
 
 #include "config.h"
 
-#ifdef USE_MMX
 
 #include "fourcc.h"
 #include "avio.hxx"
@@ -42,6 +41,14 @@ extern "C"
 {
 #include "ADM_video/swscale.h"
 };
+
+#ifdef USE_MMX
+extern "C" {
+#include "../../adm_lavcodec/dsputil.h"
+}
+#endif
+
+
 typedef struct alg
 {
 					int in;
@@ -58,7 +65,6 @@ alg algs[]={
 				DECLARE(BICUBIC),
 				DECLARE(LANCZOS)
 		};
-
 
 
 
@@ -145,7 +151,7 @@ uint8_t AVDMVideoStreamMPResize::clean(void)
 {
 		if(_context)
 		{
-			freeSwsContext(_context);
+			sws_freeContext(_context);
 		}
 		_context=NULL;
 		return 1;
@@ -153,24 +159,42 @@ uint8_t AVDMVideoStreamMPResize::clean(void)
 
 uint8_t AVDMVideoStreamMPResize::reset(uint32_t nw, uint32_t old,uint32_t algo)
 {
- 				 SwsFilter 		    *srcFilter;
-				 SwsFilter		    *dstFilter;
+ 				 SwsFilter 		    *srcFilter=NULL;
+				 SwsFilter		    *dstFilter=NULL;
 				 int 			   flags=0;
 
 
 				clean();
 
-				  swsGetFlagsAndFilterFromCmdLine(&flags, &srcFilter, &dstFilter);
+				 // swsGetFlagsAndFilterFromCmdLine(&flags, &srcFilter, &dstFilter);
 
 //SwsContext *getSwsContextFromCmdLine(int srcW, int srcH, int srcFormat, int dstW, int dstH, int dstFormat);
 
-					flags=algs[algo].in;
+					flags=algo;
+					switch(flags)
+					{
+						case 0: //bilinear
+								flags=SWS_BILINEAR;break;
+						case 1: //bicubic
+								flags=SWS_BICUBIC;break;
+						case 2: //Lanczos
+								flags=SWS_LANCZOS;break;
+						default:assert(0);
 
-				    _context=getSwsContext(
+					}
+#ifdef USE_MMX
+		uint32_t  mm=mm_support();	
+	#define ADD(x,y) if( mm & MM_##x) flags|=SWS_CPU_CAPS_##y;
+		ADD(MMX,MMX);		
+		ADD(3DNOW,3DNOW);
+		ADD(MMXEXT,MMX2);
+#endif	
+
+				    _context=sws_getContext(
 				    		_in->getInfo()->width,_in->getInfo()->height,
-						99,
+						IMGFMT_YV12,
 		 				nw,old,
-	   					99,
+	   					IMGFMT_YV12,
 	    					flags, srcFilter, dstFilter);
 
 				if(!_context) return 0;
@@ -309,12 +333,14 @@ uint8_t AVDMVideoStreamMPResize::getFrameNumberNoAlloc(uint32_t frame,
 			dst[2]=data+page+(page>>2);;
 			ddst[0]=_info.width;
 			ddst[1]=ddst[2]=_info.width>>1;
-
+/*
 			_context->swScale(_context,
 							src,ssrc,
 							0,
 							_in->getInfo()->height,
 							dst,ddst);
+*/
+			sws_scale(_context,src,ssrc,0,_in->getInfo()->height,dst,ddst);
 
 //void (*swScale)(struct SwsContext *context, uint8_t* src[], int srcStride[], int srcSliceY,
 //             int srcSliceH, uint8_t* dst[], int dstStride[]);
@@ -322,4 +348,3 @@ uint8_t AVDMVideoStreamMPResize::getFrameNumberNoAlloc(uint32_t frame,
       return 1;
 }
 
-#endif

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001-2002 Michael Niedermayer <michaelni@gmx.at>
+    Copyright (C) 2001-2003 Michael Niedermayer <michaelni@gmx.at>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,10 +15,22 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifdef ADM_BSD_FAMILY
-       #define memalign(align,size) malloc (size)
+
+#ifndef SWSCALE_H
+#define SWSCALE_H
+
+/**
+ * @file swscale.h
+ * @brief 
+ *     external api for the swscale stuff
+ */
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+//MEANX: taken from mplayer
+typedef enum { IMGFMT_RGB_MASK , IMGFMT_RGB , IMGFMT_RGB1  , IMGFMT_RGB4  , IMGFMT_RG4B  , IMGFMT_RGB8  , IMGFMT_RGB15 , IMGFMT_RGB16 , IMGFMT_RGB24 , IMGFMT_RGB32 , IMGFMT_BGR_MASK , IMGFMT_BGR , IMGFMT_BGR1 , IMGFMT_BGR4 , IMGFMT_BG4B , IMGFMT_BGR8 , IMGFMT_BGR15 , IMGFMT_BGR16 , IMGFMT_BGR24 , IMGFMT_BGR32 , IMGFMT_IS_RGB, IMGFMT_IS_BGR, IMGFMT_RGB_DEPTH, IMGFMT_BGR_DEPTH, IMGFMT_YVU9 , IMGFMT_IF09 , IMGFMT_YV12 , IMGFMT_I420 , IMGFMT_IYUV , IMGFMT_CLPL , IMGFMT_Y800 , IMGFMT_Y8   , IMGFMT_NV12 , IMGFMT_NV21 , IMGFMT_444P , IMGFMT_422P , IMGFMT_411P , IMGFMT_HM12 , IMGFMT_IUYV , IMGFMT_IY41 , IMGFMT_IYU1 , IMGFMT_IYU2 , IMGFMT_UYVY , IMGFMT_UYNV , IMGFMT_cyuv , IMGFMT_Y422 , IMGFMT_YUY2 , IMGFMT_YUNV , IMGFMT_YVYU , IMGFMT_Y41P , IMGFMT_Y211 , IMGFMT_Y41T , IMGFMT_Y42T , IMGFMT_V422 , IMGFMT_V655 , IMGFMT_CLJR , IMGFMT_YUVP , IMGFMT_UYVP , IMGFMT_MPEGPES , IMGFMT_ZRMJPEGNI  , IMGFMT_ZRMJPEGIT , IMGFMT_ZRMJPEGIB}BLAH; 
 
 /* values for the flags, the stuff on the command line is different */
 #define SWS_FAST_BILINEAR 1
@@ -48,69 +60,21 @@
 #define SWS_FULL_CHR_H_INP	0x4000
 #define SWS_DIRECT_BGR		0x8000
 
+#define SWS_CPU_CAPS_MMX   0x80000000
+#define SWS_CPU_CAPS_MMX2  0x20000000
+#define SWS_CPU_CAPS_3DNOW 0x40000000
 
 #define SWS_MAX_REDUCE_CUTOFF 0.002
 
-/* this struct should be aligned on at least 32-byte boundary */
-typedef struct SwsContext{
-	int srcW, srcH, dstW, dstH;
-	int chrSrcW, chrSrcH, chrDstW, chrDstH;
-	int lumXInc, chrXInc;
-	int lumYInc, chrYInc;
-	int dstFormat, srcFormat;
-	int chrSrcHSubSample, chrSrcVSubSample;
-	int chrIntHSubSample, chrIntVSubSample;
-	int chrDstHSubSample, chrDstVSubSample;
-	int vChrDrop;
+#define SWS_CS_ITU709		1
+#define SWS_CS_FCC 		4
+#define SWS_CS_ITU601		5
+#define SWS_CS_ITU624		5
+#define SWS_CS_SMPTE170M 	5
+#define SWS_CS_SMPTE240M 	7
+#define SWS_CS_DEFAULT 		5
 
-	int16_t **lumPixBuf;
-	int16_t **chrPixBuf;
-	int16_t *hLumFilter;
-	int16_t *hLumFilterPos;
-	int16_t *hChrFilter;
-	int16_t *hChrFilterPos;
-	int16_t *vLumFilter;
-	int16_t *vLumFilterPos;
-	int16_t *vChrFilter;
-	int16_t *vChrFilterPos;
 
-// Contain simply the values from v(Lum|Chr)Filter just nicely packed for mmx
-	int16_t  *lumMmxFilter;
-	int16_t  *chrMmxFilter;
-	uint8_t formatConvBuffer[4000]; //FIXME dynamic alloc, but we have to change alot of code for this to be usefull
-
-	int hLumFilterSize;
-	int hChrFilterSize;
-	int vLumFilterSize;
-	int vChrFilterSize;
-	int vLumBufSize;
-	int vChrBufSize;
-
-	uint8_t __attribute__((aligned(32))) funnyYCode[10000];
-	uint8_t __attribute__((aligned(32))) funnyUVCode[10000];
-	int32_t *lumMmx2FilterPos;
-	int32_t *chrMmx2FilterPos;
-	int16_t *lumMmx2Filter;
-	int16_t *chrMmx2Filter;
-
-	int canMMX2BeUsed;
-
-	int lastInLumBuf;
-	int lastInChrBuf;
-	int lumBufIndex;
-	int chrBufIndex;
-	int dstY;
-	int flags;
-	void * yuvTable;
-	void * table_rV[256];
-	void * table_gU[256];
-	int    table_gV[256];
-	void * table_bU[256];
-
-	void (*swScale)(struct SwsContext *context, uint8_t* src[], int srcStride[], int srcSliceY,
-             int srcSliceH, uint8_t* dst[], int dstStride[]);
-} SwsContext;
-//FIXME check init (where 0)
 
 // when used for filters they must have an odd number of elements
 // coeffs cannot be shared between vectors
@@ -127,38 +91,42 @@ typedef struct {
 	SwsVector *chrV;
 } SwsFilter;
 
+struct SwsContext;
 
-// *** bilinear scaling and yuv->rgb & yuv->yuv conversion of yv12 slices:
-// *** Note: it's called multiple times while decoding a frame, first time y==0
-// dstbpp == 12 -> yv12 output
-// will use sws_flags
-void SwScale_YV12slice(unsigned char* src[],int srcStride[], int srcSliceY,
-			     int srcSliceH, uint8_t* dst[], int dstStride, int dstbpp,
-			     int srcW, int srcH, int dstW, int dstH);
+void sws_freeContext(struct SwsContext *swsContext);
 
-// Obsolete, will be removed soon
-void SwScale_Init();
-
-
-
-void freeSwsContext(SwsContext *swsContext);
-
-SwsContext *getSwsContextFromCmdLine(int srcW, int srcH, int srcFormat, int dstW, int dstH, int dstFormat);
-SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH, int dstFormat, int flags,
+struct SwsContext *sws_getContext(int srcW, int srcH, int srcFormat, int dstW, int dstH, int dstFormat, int flags,
 			 SwsFilter *srcFilter, SwsFilter *dstFilter);
-void swsGetFlagsAndFilterFromCmdLine(int *flags, SwsFilter **srcFilterParam, SwsFilter **dstFilterParam);
+int sws_scale(struct SwsContext *context, uint8_t* src[], int srcStride[], int srcSliceY,
+                           int srcSliceH, uint8_t* dst[], int dstStride[]);
+int sws_scale_ordered(struct SwsContext *context, uint8_t* src[], int srcStride[], int srcSliceY,
+                           int srcSliceH, uint8_t* dst[], int dstStride[]);
 
-SwsVector *getGaussianVec(double variance, double quality);
-SwsVector *getConstVec(double c, int length);
-SwsVector *getIdentityVec(void);
-void scaleVec(SwsVector *a, double scalar);
-void normalizeVec(SwsVector *a, double height);
-void convVec(SwsVector *a, SwsVector *b);
-void addVec(SwsVector *a, SwsVector *b);
-void subVec(SwsVector *a, SwsVector *b);
-void shiftVec(SwsVector *a, int shift);
-SwsVector *cloneVec(SwsVector *a);
 
-void printVec(SwsVector *a);
-void freeVec(SwsVector *a);
+int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4], int srcRange, const int table[4], int dstRange, int brightness, int contrast, int saturation);
+int sws_getColorspaceDetails(struct SwsContext *c, int **inv_table, int *srcRange, int **table, int *dstRange, int *brightness, int *contrast, int *saturation);
+SwsVector *sws_getGaussianVec(double variance, double quality);
+SwsVector *sws_getConstVec(double c, int length);
+SwsVector *sws_getIdentityVec(void);
+void sws_scaleVec(SwsVector *a, double scalar);
+void sws_normalizeVec(SwsVector *a, double height);
+void sws_convVec(SwsVector *a, SwsVector *b);
+void sws_addVec(SwsVector *a, SwsVector *b);
+void sws_subVec(SwsVector *a, SwsVector *b);
+void sws_shiftVec(SwsVector *a, int shift);
+SwsVector *sws_cloneVec(SwsVector *a);
 
+void sws_printVec(SwsVector *a);
+void sws_freeVec(SwsVector *a);
+
+SwsFilter *sws_getDefaultFilter(float lumaGBlur, float chromaGBlur, 
+				float lumaSarpen, float chromaSharpen,
+				float chromaHShift, float chromaVShift,
+				int verbose);
+void sws_freeFilter(SwsFilter *filter);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

@@ -1,10 +1,5 @@
-// just removed some unused bits and tweaked some parts so that it fits in avidemux & config.h
-// as always a pleasure to re-use Michael Niedermayer  code :)
-// Mean.
-
-
 /*
-    Copyright (C) 2001-2002 Michael Niedermayer <michaelni@gmx.at>
+    Copyright (C) 2001-2003 Michael Niedermayer <michaelni@gmx.at>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,11 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    // Ported & crippled to avidemux2 by mean
 */
 
 /*
   supported Input formats: YV12, I420/IYUV, YUY2, UYVY, BGR32, BGR24, BGR16, BGR15, RGB32, RGB24, Y8/Y800, YVU9/IF09
-  supported output formats: YV12, I420/IYUV, YUY2, {BGR,RGB}{1,4,8,15,16,24,32}, Y8/Y800, YVU9/IF09
+  supported output formats: YV12, I420/IYUV, YUY2, UYVY, {BGR,RGB}{1,4,8,15,16,24,32}, Y8/Y800, YVU9/IF09
   {BGR,RGB}{1,4,8,15,16} support dithering
   
   unscaled special converters (YV12=I420=IYUV, Y800=Y8)
@@ -58,32 +55,7 @@ untested special converters
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
-/* MEAN#include "../config.h"
-#include "../mangle.h"
-*/
 #include "config.h"
-#undef RUNTIME_CPUDETECT // MEANX : FIXME ASAP!
-#ifdef USE_MMX
-/* cpuCaps combined from cpudetect and whats actually compiled in
-   (if there is no support for something compiled in it wont appear here) */
-   typedef struct CpuCaps
-{
-	int hasMMX,hasMMX2,has3DNow;
-}CpuCaps;
-
-static CpuCaps gCpuCaps=
-#if  1 // start with plain C please USE_MMX
-	{1,0,0};
-	#define ARCH_X86
-	#define HAVE_MMX
-	#define COMPILE_MMX
-#else
-	{0,0,0};
-#endif
-static CpuCaps cpuCaps={0,0,0};
-
-
-// / mean
 #include <assert.h>
 #ifdef HAVE_MALLOC_H
 #include <malloc.h>
@@ -91,34 +63,21 @@ static CpuCaps cpuCaps={0,0,0};
 #include <stdlib.h>
 #endif
 #include "swscale.h"
-//#include "../cpudetect.h"
-#include "../../adm_lavcodec/bswap.h"
+#include "swscale_internal.h"
+//#include "../../adm_lavcodec/cpudetect.h"
+#include "../../adm_lavcodec/bswap.h" //MEANX
 //#include "../libvo/img_format.h"
+
 //#include "rgb2rgb.h"
 //#include "../libvo/fastmemcpy.h"
-//#include "../mp_msg.h"
-/*
-#define MSG_WARN(args...) mp_msg(MSGT_SWS,MSGL_WARN, ##args )
-#define MSG_FATAL(args...) mp_msg(MSGT_SWS,MSGL_FATAL, ##args )
-#define MSG_ERR(args...) mp_msg(MSGT_SWS,MSGL_ERR, ##args )
-#define MSG_V(args...) mp_msg(MSGT_SWS,MSGL_V, ##args )
-#define MSG_DBG2(args...) mp_msg(MSGT_SWS,MSGL_DBG2, ##args )
-#define MSG_INFO(args...) mp_msg(MSGT_SWS,MSGL_INFO, ##args )
-*/
+//MEANX
+#ifdef __CYGWIN__ // CYGWIN
+	#define MANGLE(x) "_" #x
+#else
+	#define MANGLE(x) #x
+#endif
+//MEANX
 
-/* -- Mean : Merge it nicely inside avidemux */
-#define MSG_WARN(args...) {}
-#define MSG_FATAL(args...) {}
-#define MSG_ERR(args...) {}
-#define MSG_V(args...) {}
-#define MSG_DBG2(args...) {}
-#define MSG_INFO(args...) {}
-#define mp_msg(args...) {}
-
-
-#define IMGFMT_YV12 99
-
-/* /Mean */
 #undef MOVNTQ
 #undef PAVGB
 
@@ -144,44 +103,27 @@ static CpuCaps cpuCaps={0,0,0};
 #else
 #define PI 3.14159265358979323846
 #endif
+// MEANX
 
+//
 //FIXME replace this with something faster
-// Mean : yes...
-#if 0
-#define isPlanarYUV(x) ((x)==IMGFMT_YV12 || (x)==IMGFMT_I420 || (x)==IMGFMT_YVU9 \
+#define isPlanarYUV(x) ((x)==IMGFMT_YV12 || (x)==IMGFMT_YVU9 \
 			|| (x)==IMGFMT_444P || (x)==IMGFMT_422P || (x)==IMGFMT_411P)
 #define isYUV(x)       ((x)==IMGFMT_UYVY || (x)==IMGFMT_YUY2 || isPlanarYUV(x))
 #define isGray(x)      ((x)==IMGFMT_Y800)
 #define isRGB(x)       (((x)&IMGFMT_RGB_MASK)==IMGFMT_RGB)
 #define isBGR(x)       (((x)&IMGFMT_BGR_MASK)==IMGFMT_BGR)
-#define isSupportedIn(x)  ((x)==IMGFMT_YV12 || (x)==IMGFMT_I420 || (x)==IMGFMT_YUY2 || (x)==IMGFMT_UYVY\
+#define isSupportedIn(x)  ((x)==IMGFMT_YV12 || (x)==IMGFMT_YUY2 || (x)==IMGFMT_UYVY\
 			|| (x)==IMGFMT_BGR32|| (x)==IMGFMT_BGR24|| (x)==IMGFMT_BGR16|| (x)==IMGFMT_BGR15\
 			|| (x)==IMGFMT_RGB32|| (x)==IMGFMT_RGB24\
 			|| (x)==IMGFMT_Y800 || (x)==IMGFMT_YVU9\
 			|| (x)==IMGFMT_444P || (x)==IMGFMT_422P || (x)==IMGFMT_411P)
-#define isSupportedOut(x) ((x)==IMGFMT_YV12 || (x)==IMGFMT_I420 || (x)==IMGFMT_YUY2\
+#define isSupportedOut(x) ((x)==IMGFMT_YV12 || (x)==IMGFMT_YUY2 || (x)==IMGFMT_UYVY\
 			|| (x)==IMGFMT_444P || (x)==IMGFMT_422P || (x)==IMGFMT_411P\
 			|| isRGB(x) || isBGR(x)\
 			|| (x)==IMGFMT_Y800 || (x)==IMGFMT_YVU9)
 #define isPacked(x)    ((x)==IMGFMT_YUY2 || (x)==IMGFMT_UYVY ||isRGB(x) || isBGR(x))
-#endif
 
-#define isPlanarYUV(...) 1
-#define isYUV(...) 0
-#define isGray(...) 0
-#define isRGB(...) 0
-#define isBGR(...) 0
-#define isSupportedIn(...) 1
-#define isSupportedOut(...) 1
-#define isPacked(...) 0
-#    if defined(__MINGW32__) || defined(__CYGWIN__) || \
-        defined(__OS2__) || defined (__OpenBSD__)
-#        define MANGLE(a) "_" #a
-#    else
-#        define MANGLE(a) #a
-#    endif
-
-// /mean
 #define RGB2YUV_SHIFT 16
 #define BY ((int)( 0.098*(1<<RGB2YUV_SHIFT)+0.5))
 #define BV ((int)(-0.071*(1<<RGB2YUV_SHIFT)+0.5))
@@ -193,7 +135,7 @@ static CpuCaps cpuCaps={0,0,0};
 #define RV ((int)( 0.439*(1<<RGB2YUV_SHIFT)+0.5))
 #define RU ((int)(-0.148*(1<<RGB2YUV_SHIFT)+0.5))
 
-static int verbose; // defined in mplayer.c
+
 /*
 NOTES
 Special versions: fast Y 1:1 scaling (no interpolation in y direction)
@@ -207,7 +149,6 @@ add support for Y8 output
 optimize bgr24 & bgr32
 add BGR4 output support
 write special BGR->BGR scaler
-deglobalize yuv2rgb*.c
 */
 
 #define ABS(a) ((a) > 0 ? (a) : (-(a)))
@@ -215,19 +156,8 @@ deglobalize yuv2rgb*.c
 #define MAX(a,b) ((a) < (b) ? (b) : (a))
 
 #ifdef ARCH_X86
-#define CAN_COMPILE_X86_ASM
-#endif
-
-#ifdef CAN_COMPILE_X86_ASM
-static uint64_t __attribute__((aligned(8))) yCoeff=    0x2568256825682568LL;
-static uint64_t __attribute__((aligned(8))) vrCoeff=   0x3343334333433343LL;
-static uint64_t __attribute__((aligned(8))) ubCoeff=   0x40cf40cf40cf40cfLL;
-static uint64_t __attribute__((aligned(8))) vgCoeff=   0xE5E2E5E2E5E2E5E2LL;
-static uint64_t __attribute__((aligned(8))) ugCoeff=   0xF36EF36EF36EF36ELL;
 static uint64_t __attribute__((aligned(8))) bF8=       0xF8F8F8F8F8F8F8F8LL;
 static uint64_t __attribute__((aligned(8))) bFC=       0xFCFCFCFCFCFCFCFCLL;
-static uint64_t __attribute__((aligned(8))) w400=      0x0400040004000400LL;
-static uint64_t __attribute__((aligned(8))) w80=       0x0080008000800080LL;
 static uint64_t __attribute__((aligned(8))) w10=       0x0010001000100010LL;
 static uint64_t __attribute__((aligned(8))) w02=       0x0002000200020002LL;
 static uint64_t __attribute__((aligned(8))) bm00001111=0x00000000FFFFFFFFLL;
@@ -276,79 +206,69 @@ static const uint64_t w1111       __attribute__((aligned(8))) = 0x00010001000100
 // clipping helper table for C implementations:
 static unsigned char clip_table[768];
 
-//global sws_flags from the command line
-int sws_flags=2;
+static SwsVector *sws_getConvVec(SwsVector *a, SwsVector *b);
+		  
+const uint8_t  __attribute__((aligned(8))) dither_2x2_8[2][8]={
+{  6,   2,   6,   2,   6,   2,   6,   2, },
+{  0,   4,   0,   4,   0,   4,   0,   4, },
+};
 
-//global srcFilter
-SwsFilter src_filter= {NULL, NULL, NULL, NULL};
+const uint8_t  __attribute__((aligned(8))) dither_2x2_4[2][8]={
+{  1,   3,   1,   3,   1,   3,   1,   3, },
+{  2,   0,   2,   0,   2,   0,   2,   0, },
+};
 
-float sws_lum_gblur= 0.0;
-float sws_chr_gblur= 0.0;
-int sws_chr_vshift= 0;
-int sws_chr_hshift= 0;
-float sws_chr_sharpen= 0.0;
-float sws_lum_sharpen= 0.0;
+const uint8_t  __attribute__((aligned(8))) dither_8x8_73[8][8]={
+{  0,  55,  14,  68,   3,  58,  17,  72, },
+{ 37,  18,  50,  32,  40,  22,  54,  35, },
+{  9,  64,   5,  59,  13,  67,   8,  63, },
+{ 46,  27,  41,  23,  49,  31,  44,  26, },
+{  2,  57,  16,  71,   1,  56,  15,  70, },
+{ 39,  21,  52,  34,  38,  19,  51,  33, },
+{ 11,  66,   7,  62,  10,  65,   6,  60, },
+{ 48,  30,  43,  25,  47,  29,  42,  24, },
+};
+const uint8_t  __attribute__((aligned(8))) dither_8x8_32[8][8]={
+{ 17,   9,  23,  15,  16,   8,  22,  14, },
+{  5,  29,   3,  27,   4,  28,   2,  26, },
+{ 21,  13,  19,  11,  20,  12,  18,  10, },
+{  0,  24,   6,  30,   1,  25,   7,  31, },
+{ 16,   8,  22,  14,  17,   9,  23,  15, },
+{  4,  28,   2,  26,   5,  29,   3,  27, },
+{ 20,  12,  18,  10,  21,  13,  19,  11, },
+{  1,  25,   7,  31,   0,  24,   6,  30, },
+};
+const uint8_t  __attribute__((aligned(8))) dither_8x8_220[8][8]={
+{117,  62, 158, 103, 113,  58, 155, 100, },
+{ 34, 199,  21, 186,  31, 196,  17, 182, },
+{144,  89, 131,  76, 141,  86, 127,  72, },
+{  0, 165,  41, 206,  10, 175,  52, 217, },
+{110,  55, 151,  96, 120,  65, 162, 107, },
+{ 28, 193,  14, 179,  38, 203,  24, 189, },
+{138,  83, 124,  69, 148,  93, 134,  79, },
+{  7, 172,  48, 213,   3, 168,  45, 210, },
+};
+const int32_t Inverse_Table_6_9[8][4] = {
+    {117504, 138453, 13954, 34903}, /* no sequence_display_extension */
+    {117504, 138453, 13954, 34903}, /* ITU-R Rec. 709 (1990) */
+    {104597, 132201, 25675, 53279}, /* unspecified */
+    {104597, 132201, 25675, 53279}, /* reserved */
+    {104448, 132798, 24759, 53109}, /* FCC */
+    {104597, 132201, 25675, 53279}, /* ITU-R Rec. 624-4 System B, G */
+    {104597, 132201, 25675, 53279}, /* SMPTE 170M */
+    {117579, 136230, 16907, 35559}  /* SMPTE 240M (1987) */
+};
 
 
-void (*swScale)(SwsContext *context, uint8_t* src[], int srcStride[], int srcSliceY,
-             int srcSliceH, uint8_t* dst[], int dstStride[])=NULL;
-
-static SwsVector *getConvVec(SwsVector *a, SwsVector *b);
-static inline void orderYUV(int format, uint8_t * sortedP[], int sortedStride[], uint8_t * p[], int stride[]);
-void *yuv2rgb_c_init (unsigned bpp, int mode, void *table_rV[256], void *table_gU[256], int table_gV[256], void *table_bU[256]);
-
-extern const uint8_t dither_2x2_4[2][8];
-extern const uint8_t dither_2x2_8[2][8];
-extern const uint8_t dither_8x8_32[8][8];
-extern const uint8_t dither_8x8_73[8][8];
-extern const uint8_t dither_8x8_220[8][8];
-
-#ifdef CAN_COMPILE_X86_ASM
+#ifdef ARCH_X86
 void in_asm_used_var_warning_killer()
 {
- volatile int i= yCoeff+vrCoeff+ubCoeff+vgCoeff+ugCoeff+bF8+bFC+w400+w80+w10+
+ volatile int i= bF8+bFC+w10+
  bm00001111+bm00000111+bm11111000+b16Mask+g16Mask+r16Mask+b15Mask+g15Mask+r15Mask+
  M24A+M24B+M24C+w02 + b5Dither+g5Dither+r5Dither+g6Dither+dither4[0]+dither8[0]+bm01010101;
  if(i) i=0;
 }
 #endif
-
-/*static int testFormat[]={
-IMGFMT_YVU9,
-IMGFMT_YV12,
-//IMGFMT_IYUV,
-IMGFMT_I420,
-IMGFMT_BGR15,
-IMGFMT_BGR16,
-IMGFMT_BGR24,
-IMGFMT_BGR32,
-IMGFMT_RGB24,
-IMGFMT_RGB32,
-//IMGFMT_Y8,
-IMGFMT_Y800,
-//IMGFMT_YUY2,
-0
-};*/
-static int testFormat[]={
-IMGFMT_YV12,
-0
-};
-
-
-
-static uint64_t getSSD(uint8_t *src1, uint8_t *src2, int stride1, int stride2, int w, int h){
-	int x,y;
-	uint64_t ssd=0;
-
-	for(y=0; y<h; y++){
-		for(x=0; x<w; x++){
-			int d= src1[x + y*stride1] - src2[x + y*stride2];
-			ssd+= d*d;
-		}
-	}
-	return ssd;
-}
-
 
 static inline void yuv2yuvXinC(int16_t *lumFilter, int16_t **lumSrc, int lumFilterSize,
 				    int16_t *chrFilter, int16_t **chrSrc, int chrFilterSize,
@@ -358,7 +278,7 @@ static inline void yuv2yuvXinC(int16_t *lumFilter, int16_t **lumSrc, int lumFilt
 	int i;
 	for(i=0; i<dstW; i++)
 	{
-		int val=0;
+		int val=1<<18;
 		int j;
 		for(j=0; j<lumFilterSize; j++)
 			val += lumSrc[j][i] * lumFilter[j];
@@ -369,8 +289,8 @@ static inline void yuv2yuvXinC(int16_t *lumFilter, int16_t **lumSrc, int lumFilt
 	if(uDest != NULL)
 		for(i=0; i<chrDstW; i++)
 		{
-			int u=0;
-			int v=0;
+			int u=1<<18;
+			int v=1<<18;
 			int j;
 			for(j=0; j<chrFilterSize; j++)
 			{
@@ -387,10 +307,10 @@ static inline void yuv2yuvXinC(int16_t *lumFilter, int16_t **lumSrc, int lumFilt
 #define YSCALE_YUV_2_PACKEDX_C(type) \
 		for(i=0; i<(dstW>>1); i++){\
 			int j;\
-			int Y1=0;\
-			int Y2=0;\
-			int U=0;\
-			int V=0;\
+			int Y1=1<<18;\
+			int Y2=1<<18;\
+			int U=1<<18;\
+			int V=1<<18;\
 			type *r, *b, *g;\
 			const int i2= 2*i;\
 			\
@@ -639,6 +559,14 @@ static inline void yuv2yuvXinC(int16_t *lumFilter, int16_t **lumSrc, int lumFilt
 			((uint8_t*)dest)[2*i2+3]= V;\
 		}		\
 		break;\
+	case IMGFMT_UYVY:\
+		func2\
+			((uint8_t*)dest)[2*i2+0]= U;\
+			((uint8_t*)dest)[2*i2+1]= Y1;\
+			((uint8_t*)dest)[2*i2+2]= V;\
+			((uint8_t*)dest)[2*i2+3]= Y2;\
+		}		\
+		break;\
 	}\
 
 
@@ -646,7 +574,6 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 				    int16_t *chrFilter, int16_t **chrSrc, int chrFilterSize,
 				    uint8_t *dest, int dstW, int y)
 {
-#if 0
 	int i;
 	switch(c->dstFormat)
 	{
@@ -750,8 +677,8 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 			int acc=0;
 			for(i=0; i<dstW-1; i+=2){
 				int j;
-				int Y1=0;
-				int Y2=0;
+				int Y1=1<<18;
+				int Y2=1<<18;
 
 				for(j=0; j<lumFilterSize; j++)
 				{
@@ -784,9 +711,15 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 			((uint8_t*)dest)[2*i2+3]= V;
 		}
                 break;
+	case IMGFMT_UYVY:
+		YSCALE_YUV_2_PACKEDX_C(void)
+			((uint8_t*)dest)[2*i2+0]= U;
+			((uint8_t*)dest)[2*i2+1]= Y1;
+			((uint8_t*)dest)[2*i2+2]= V;
+			((uint8_t*)dest)[2*i2+3]= Y2;
+		}
+                break;
 	}
-	#endif
-	assert(0); // Mean : We only need YV12 for avidemux
 }
 
 
@@ -796,7 +729,7 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 #define COMPILE_C
 #endif
 
-#ifdef CAN_COMPILE_X86_ASM
+#ifdef ARCH_X86
 
 #if (defined (HAVE_MMX) && !defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
 #define COMPILE_MMX
@@ -809,7 +742,7 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 #if (defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
 #define COMPILE_3DNOW
 #endif
-#endif //CAN_COMPILE_X86_ASM
+#endif //ARCH_X86
 
 #undef HAVE_MMX
 #undef HAVE_MMX2
@@ -823,7 +756,7 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 #include "swscale_template.txt"
 #endif
 
-#ifdef CAN_COMPILE_X86_ASM
+#ifdef ARCH_X86
 
 //X86 versions
 /*
@@ -852,7 +785,7 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 #define HAVE_MMX2
 #undef HAVE_3DNOW
 #define RENAME(a) a ## _MMX2
-#include "swscale_template.c"
+#include "swscale_template.txt"
 #endif
 
 //3DNOW versions
@@ -862,146 +795,12 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 #undef HAVE_MMX2
 #define HAVE_3DNOW
 #define RENAME(a) a ## _3DNow
-#include "swscale_template.c"
+#include "swscale_template.txt"
 #endif
 
-#endif //CAN_COMPILE_X86_ASM
+#endif //ARCH_X86
 
-// minor note: the HAVE_xyz is messed up after that line so dont use it
-
-
-// old global scaler, dont use for new code
-// will use sws_flags from the command line
-void SwScale_YV12slice(unsigned char* src[], int srcStride[], int srcSliceY ,
-			     int srcSliceH, uint8_t* dst[], int dstStride, int dstbpp,
-			     int srcW, int srcH, int dstW, int dstH){
-
-	static SwsContext *context=NULL;
-	int dstFormat;
-	int dstStride3[3]= {dstStride, dstStride>>1, dstStride>>1};
-
-	switch(dstbpp)
-	{
-	/*
-		case 8 : dstFormat= IMGFMT_Y8;		break;
-		case 12: dstFormat= IMGFMT_YV12;	break;
-		case 15: dstFormat= IMGFMT_BGR15;	break;
-		case 16: dstFormat= IMGFMT_BGR16;	break;
-		case 24: dstFormat= IMGFMT_BGR24;	break;
-		case 32: dstFormat= IMGFMT_BGR32;	break;
-		default: return;
-		Mean : Only YV12*/
-		case 12: dstFormat= IMGFMT_YV12;	break;
-		default: assert(0);
-	}
-
-	if(!context) context=getSwsContextFromCmdLine(srcW, srcH, IMGFMT_YV12, dstW, dstH, dstFormat);
-
-	context->swScale(context, src, srcStride, srcSliceY, srcSliceH, dst, dstStride3);
-}
-
-void swsGetFlagsAndFilterFromCmdLine(int *flags, SwsFilter **srcFilterParam, SwsFilter **dstFilterParam)
-{
-	static int firstTime=1;
-	*flags=0;
-
-#ifdef ARCH_X86
-	if(gCpuCaps.hasMMX)
-		asm volatile("emms\n\t"::: "memory"); //FIXME this shouldnt be required but it IS (even for non mmx versions)
-#endif
-	if(firstTime)
-	{
-		firstTime=0;
-		*flags= SWS_PRINT_INFO;
-	}
-	else if(verbose>1) *flags= SWS_PRINT_INFO;
-
-	if(src_filter.lumH) freeVec(src_filter.lumH);
-	if(src_filter.lumV) freeVec(src_filter.lumV);
-	if(src_filter.chrH) freeVec(src_filter.chrH);
-	if(src_filter.chrV) freeVec(src_filter.chrV);
-
-	if(sws_lum_gblur!=0.0){
-		src_filter.lumH= getGaussianVec(sws_lum_gblur, 3.0);
-		src_filter.lumV= getGaussianVec(sws_lum_gblur, 3.0);
-	}else{
-		src_filter.lumH= getIdentityVec();
-		src_filter.lumV= getIdentityVec();
-	}
-
-	if(sws_chr_gblur!=0.0){
-		src_filter.chrH= getGaussianVec(sws_chr_gblur, 3.0);
-		src_filter.chrV= getGaussianVec(sws_chr_gblur, 3.0);
-	}else{
-		src_filter.chrH= getIdentityVec();
-		src_filter.chrV= getIdentityVec();
-	}
-
-	if(sws_chr_sharpen!=0.0){
-		SwsVector *g= getConstVec(-1.0, 3);
-		SwsVector *id= getConstVec(10.0/sws_chr_sharpen, 1);
-		g->coeff[1]=2.0;
-		addVec(id, g);
-		convVec(src_filter.chrH, id);
-		convVec(src_filter.chrV, id);
-		freeVec(g);
-		freeVec(id);
-	}
-
-	if(sws_lum_sharpen!=0.0){
-		SwsVector *g= getConstVec(-1.0, 3);
-		SwsVector *id= getConstVec(10.0/sws_lum_sharpen, 1);
-		g->coeff[1]=2.0;
-		addVec(id, g);
-		convVec(src_filter.lumH, id);
-		convVec(src_filter.lumV, id);
-		freeVec(g);
-		freeVec(id);
-	}
-
-	if(sws_chr_hshift)
-		shiftVec(src_filter.chrH, sws_chr_hshift);
-
-	if(sws_chr_vshift)
-		shiftVec(src_filter.chrV, sws_chr_vshift);
-
-	normalizeVec(src_filter.chrH, 1.0);
-	normalizeVec(src_filter.chrV, 1.0);
-	normalizeVec(src_filter.lumH, 1.0);
-	normalizeVec(src_filter.lumV, 1.0);
-
-	if(verbose > 1) printVec(src_filter.chrH);
-	if(verbose > 1) printVec(src_filter.lumH);
-
-	switch(sws_flags)
-	{
-		case 0: *flags|= SWS_FAST_BILINEAR; break;
-		case 1: *flags|= SWS_BILINEAR; break;
-		case 2: *flags|= SWS_BICUBIC; break;
-		case 3: *flags|= SWS_X; break;
-		case 4: *flags|= SWS_POINT; break;
-		case 5: *flags|= SWS_AREA; break;
-		case 6: *flags|= SWS_BICUBLIN; break;
-		case 7: *flags|= SWS_GAUSS; break;
-		case 8: *flags|= SWS_SINC; break;
-		case 9: *flags|= SWS_LANCZOS; break;
-		case 10:*flags|= SWS_SPLINE; break;
-		default:*flags|= SWS_BILINEAR; break;
-	}
-	
-	*srcFilterParam= &src_filter;
-	*dstFilterParam= NULL;
-}
-
-// will use sws_flags & src_filter (from cmd line)
-SwsContext *getSwsContextFromCmdLine(int srcW, int srcH, int srcFormat, int dstW, int dstH, int dstFormat)
-{
-	int flags;
-	SwsFilter *dstFilterParam, *srcFilterParam;
-	swsGetFlagsAndFilterFromCmdLine(&flags, &srcFilterParam, &dstFilterParam);
-
-	return getSwsContext(srcW, srcH, srcFormat, dstW, dstH, dstFormat, flags, srcFilterParam, dstFilterParam);
-}
+// minor note: the HAVE_xyz is messed up after that line so don't use it
 
 static double getSplineCoeff(double a, double b, double c, double d, double dist)
 {
@@ -1025,7 +824,7 @@ static inline void initFilter(int16_t **outFilter, int16_t **filterPos, int *out
 	double *filter=NULL;
 	double *filter2=NULL;
 #ifdef ARCH_X86
-	if(gCpuCaps.hasMMX)
+	if(flags & SWS_CPU_CAPS_MMX)
 		asm volatile("emms\n\t"::: "memory"); //FIXME this shouldnt be required but it IS (even for non mmx versions)
 #endif
 
@@ -1222,7 +1021,7 @@ static inline void initFilter(int16_t **outFilter, int16_t **filterPos, int *out
 		scaleFilter.coeff= filter + i*filterSize;
 		scaleFilter.length= filterSize;
 
-		if(srcFilter) outVec= getConvVec(srcFilter, &scaleFilter);
+		if(srcFilter) outVec= sws_getConvVec(srcFilter, &scaleFilter);
 		else	      outVec= &scaleFilter;
 
 		ASSERT(outVec->length == filter2Size)
@@ -1235,7 +1034,7 @@ static inline void initFilter(int16_t **outFilter, int16_t **filterPos, int *out
 
 		(*filterPos)[i]+= (filterSize-1)/2 - (filter2Size-1)/2;
 
-		if(outVec != &scaleFilter) freeVec(outVec);
+		if(outVec != &scaleFilter) sws_freeVec(outVec);
 	}
 	free(filter); filter=NULL;
 
@@ -1256,7 +1055,7 @@ static inline void initFilter(int16_t **outFilter, int16_t **filterPos, int *out
 
 			if(cutOff > SWS_MAX_REDUCE_CUTOFF) break;
 
-			/* preserve Monotonicity because the core cant handle the filter otherwise */
+			/* preserve Monotonicity because the core can't handle the filter otherwise */
 			if(i<dstW-1 && (*filterPos)[i] >= (*filterPos)[i+1]) break;
 
 			// Move filter coeffs left
@@ -1341,8 +1140,10 @@ static inline void initFilter(int16_t **outFilter, int16_t **filterPos, int *out
 	for(i=0; i<dstW; i++)
 	{
 		int j;
+		double error=0;
 		double sum=0;
 		double scale= one;
+
 		for(j=0; j<filterSize; j++)
 		{
 			sum+= filter[i*filterSize + j];
@@ -1350,7 +1151,10 @@ static inline void initFilter(int16_t **outFilter, int16_t **filterPos, int *out
 		scale/= sum;
 		for(j=0; j<*outFilterSize; j++)
 		{
-			(*outFilter)[i*(*outFilterSize) + j]= (int)(filter[i*filterSize + j]*scale);
+			double v= filter[i*filterSize + j]*scale + error;
+			int intV= floor(v + 0.5);
+			(*outFilter)[i*(*outFilterSize) + j]= intV;
+			error = v - intV;
 		}
 	}
 	
@@ -1537,10 +1341,6 @@ static void initMMX2HScaler(int dstW, int xInc, uint8_t *funnyCode, int16_t *fil
 }
 #endif // ARCH_X86
 
-//FIXME remove
-void SwScale_Init(){
-}
-
 static void globalInit(){
     // generating tables:
     int i;
@@ -1548,43 +1348,39 @@ static void globalInit(){
 	int c= MIN(MAX(i-256, 0), 255);
 	clip_table[i]=c;
     }
+}
 
-cpuCaps= gCpuCaps;
-
+static SwsFunc getSwsFunc(int flags){
+    
 #ifdef RUNTIME_CPUDETECT
-#ifdef CAN_COMPILE_X86_ASM
+#ifdef ARCH_X86
 	// ordered per speed fasterst first
-	if(gCpuCaps.hasMMX2)
-		swScale= swScale_MMX2;
-	else if(gCpuCaps.has3DNow)
-		swScale= swScale_3DNow;
-	else if(gCpuCaps.hasMMX)
-		swScale= swScale_MMX;
+	if(flags & SWS_CPU_CAPS_MMX2)
+		return swScale_MMX2;
+	else if(flags & SWS_CPU_CAPS_3DNOW)
+		return swScale_3DNow;
+	else if(flags & SWS_CPU_CAPS_MMX)
+		return swScale_MMX;
 	else
-		swScale= swScale_C;
+		return swScale_C;
 
 #else
-	swScale= swScale_C;
-	cpuCaps.hasMMX2 = cpuCaps.hasMMX = cpuCaps.has3DNow = 0;
+	return swScale_C;
 #endif
 #else //RUNTIME_CPUDETECT
 #ifdef HAVE_MMX2
-	swScale= swScale_MMX2;
-	cpuCaps.has3DNow = 0;
+	return swScale_MMX2;
 #elif defined (HAVE_3DNOW)
-	swScale= swScale_3DNow;
-	cpuCaps.hasMMX2 = 0;
+	return swScale_3DNow;
 #elif defined (HAVE_MMX)
-	swScale= swScale_MMX;
-	cpuCaps.hasMMX2 = cpuCaps.has3DNow = 0;
+	return swScale_MMX;
 #else
-	swScale= swScale_C;
-	cpuCaps.hasMMX2 = cpuCaps.hasMMX = cpuCaps.has3DNow = 0;
+	return swScale_C;
 #endif
 #endif //!RUNTIME_CPUDETECT
 }
-#if 0
-static void PlanarToNV12Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+
+static int PlanarToNV12Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
              int srcSliceH, uint8_t* dstParam[], int dstStride[]){
 	uint8_t *dst=dstParam[0] + dstStride[0]*srcSliceY;
 	/* Copy Y plane */
@@ -1603,38 +1399,31 @@ static void PlanarToNV12Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], 
 		}
 	}
 	dst = dstParam[1] + dstStride[1]*srcSliceY;
-	if(c->srcFormat==IMGFMT_YV12)
-		interleaveBytes( src[1],src[2],dst,c->srcW,srcSliceH,srcStride[1],srcStride[2],dstStride[0] );
-	else /* I420 & IYUV */
-		interleaveBytes( src[2],src[1],dst,c->srcW,srcSliceH,srcStride[2],srcStride[1],dstStride[0] );
+	// MEANX interleaveBytes( src[1],src[2],dst,c->srcW,srcSliceH,srcStride[1],srcStride[2],dstStride[0] );
+
+	return srcSliceH;
 }
 
-#endif
-/* Warper functions for yuv2bgr */
+static int PlanarToYuy2Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+             int srcSliceH, uint8_t* dstParam[], int dstStride[]){
+	uint8_t *dst=dstParam[0] + dstStride[0]*srcSliceY;
+
+	// MEANX yv12toyuy2( src[0],src[1],src[2],dst,c->srcW,srcSliceH,srcStride[0],srcStride[1],dstStride[0] );
+
+	return srcSliceH;
+}
+
+static int PlanarToUyvyWrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+             int srcSliceH, uint8_t* dstParam[], int dstStride[]){
+	uint8_t *dst=dstParam[0] + dstStride[0]*srcSliceY;
 #if 0
-static void planarYuvToBgr(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
-             int srcSliceH, uint8_t* dstParam[], int dstStride[]){
-	uint8_t *dst=dstParam[0] + dstStride[0]*srcSliceY;
-
-	if(c->srcFormat==IMGFMT_YV12)
-		yuv2rgb( dst,src[0],src[1],src[2],c->srcW,srcSliceH,dstStride[0],srcStride[0],srcStride[1] );
-	else /* I420 & IYUV */
-		yuv2rgb( dst,src[0],src[2],src[1],c->srcW,srcSliceH,dstStride[0],srcStride[0],srcStride[1] );
+	yv12touyvy( src[0],src[1],src[2],dst,c->srcW,srcSliceH,srcStride[0],srcStride[1],dstStride[0] );
+#endif //MEANX
+	return srcSliceH;
 }
-
-static void PlanarToYuy2Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
-             int srcSliceH, uint8_t* dstParam[], int dstStride[]){
-	uint8_t *dst=dstParam[0] + dstStride[0]*srcSliceY;
-
-	if(c->srcFormat==IMGFMT_YV12)
-		yv12toyuy2( src[0],src[1],src[2],dst,c->srcW,srcSliceH,srcStride[0],srcStride[1],dstStride[0] );
-	else /* I420 & IYUV */
-		yv12toyuy2( src[0],src[2],src[1],dst,c->srcW,srcSliceH,srcStride[0],srcStride[1],dstStride[0] );
-}
-#endif
+#if 0 //MEANX
 /* {RGB,BGR}{15,16,24,32} -> {RGB,BGR}{15,16,24,32} */
-#if 0
-static void rgb2rgbWrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+static int rgb2rgbWrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
 			   int srcSliceH, uint8_t* dst[], int dstStride[]){
 	const int srcFormat= c->srcFormat;
 	const int dstFormat= c->dstFormat;
@@ -1645,7 +1434,8 @@ static void rgb2rgbWrapper(SwsContext *c, uint8_t* src[], int srcStride[], int s
 	void (*conv)(const uint8_t *src, uint8_t *dst, unsigned src_size)=NULL;
 
 	/* BGR -> BGR */
-	if(isBGR(srcFormat) && isBGR(dstFormat)){
+	if(   (isBGR(srcFormat) && isBGR(dstFormat))
+	   || (isRGB(srcFormat) && isRGB(dstFormat))){
 		switch(srcId | (dstId<<4)){
 		case 0x34: conv= rgb16to15; break;
 		case 0x36: conv= rgb24to15; break;
@@ -1662,7 +1452,8 @@ static void rgb2rgbWrapper(SwsContext *c, uint8_t* src[], int srcStride[], int s
 		default: MSG_ERR("swScaler: internal error %s -> %s converter\n", 
 				 vo_format_name(srcFormat), vo_format_name(dstFormat)); break;
 		}
-	}else if(isBGR(srcFormat) && isRGB(dstFormat)){
+	}else if(   (isBGR(srcFormat) && isRGB(dstFormat))
+		 || (isRGB(srcFormat) && isBGR(dstFormat))){
 		switch(srcId | (dstId<<4)){
 		case 0x33: conv= rgb15tobgr15; break;
 		case 0x34: conv= rgb16tobgr15; break;
@@ -1683,45 +1474,11 @@ static void rgb2rgbWrapper(SwsContext *c, uint8_t* src[], int srcStride[], int s
 		default: MSG_ERR("swScaler: internal error %s -> %s converter\n", 
 				 vo_format_name(srcFormat), vo_format_name(dstFormat)); break;
 		}
-	}else if(isRGB(srcFormat) && isRGB(dstFormat)){
-		switch(srcId | (dstId<<4)){
-		case 0x34: conv= rgb16to15; break;
-		case 0x36: conv= rgb24to15; break;
-		case 0x38: conv= rgb32to15; break;
-		case 0x43: conv= rgb15to16; break;
-		case 0x46: conv= rgb24to16; break;
-		case 0x48: conv= rgb32to16; break;
-		case 0x63: conv= rgb15to24; break;
-		case 0x64: conv= rgb16to24; break;
-		case 0x68: conv= rgb32to24; break;
-		case 0x83: conv= rgb15to32; break;
-		case 0x84: conv= rgb16to32; break;
-		case 0x86: conv= rgb24to32; break;
-		default: MSG_ERR("swScaler: internal error %s -> %s converter\n", 
-				 vo_format_name(srcFormat), vo_format_name(dstFormat)); break;
-		}
-	}else if(isRGB(srcFormat) && isBGR(dstFormat)){
-		switch(srcId | (dstId<<4)){
-		case 0x33: conv= rgb15tobgr15; break;
-		case 0x34: conv= rgb16tobgr15; break;
-		case 0x36: conv= rgb24tobgr15; break;
-		case 0x38: conv= rgb32tobgr15; break;
-		case 0x43: conv= rgb15tobgr16; break;
-		case 0x44: conv= rgb16tobgr16; break;
-		case 0x46: conv= rgb24tobgr16; break;
-		case 0x48: conv= rgb32tobgr16; break;
-		case 0x63: conv= rgb15tobgr24; break;
-		case 0x64: conv= rgb16tobgr24; break;
-		case 0x66: conv= rgb24tobgr24; break;
-		case 0x68: conv= rgb32tobgr24; break;
-		case 0x83: conv= rgb15tobgr32; break;
-		case 0x84: conv= rgb16tobgr32; break;
-		case 0x86: conv= rgb24tobgr32; break;
-		case 0x88: conv= rgb32tobgr32; break;
-		default: MSG_ERR("swScaler: internal error %s -> %s converter\n", 
-				 vo_format_name(srcFormat), vo_format_name(dstFormat)); break;
-		}
+	}else{
+		MSG_ERR("swScaler: internal error %s -> %s converter\n", 
+			 vo_format_name(srcFormat), vo_format_name(dstFormat));
 	}
+
 	if(dstStride[0]*srcBpp == srcStride[0]*dstBpp)
 		conv(src[0], dst[0] + dstStride[0]*srcSliceY, srcSliceH*srcStride[0]);
 	else
@@ -1737,11 +1494,13 @@ static void rgb2rgbWrapper(SwsContext *c, uint8_t* src[], int srcStride[], int s
 			dstPtr+= dstStride[0];
 		}
 	}     
+	return srcSliceH;
 }
+#endif
 
-static void bgr24toyv12Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+static int bgr24toyv12Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
              int srcSliceH, uint8_t* dst[], int dstStride[]){
-
+#if 0
 	rgb24toyv12(
 		src[0], 
 		dst[0]+ srcSliceY    *dstStride[0], 
@@ -1749,9 +1508,11 @@ static void bgr24toyv12Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], i
 		dst[2]+(srcSliceY>>1)*dstStride[2],
 		c->srcW, srcSliceH, 
 		dstStride[0], dstStride[1], srcStride[0]);
+#endif //MEANX
+	return srcSliceH;
 }
 
-static void yvu9toyv12Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+static int yvu9toyv12Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
              int srcSliceH, uint8_t* dst[], int dstStride[]){
 	int i;
 
@@ -1769,7 +1530,7 @@ static void yvu9toyv12Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], in
 			dstPtr+= dstStride[0];
 		}
 	}
-
+#if 0
 	if(c->dstFormat==IMGFMT_YV12){
 		planar2x(src[1], dst[1], c->chrSrcW, c->chrSrcH, srcStride[1], dstStride[1]);
 		planar2x(src[2], dst[2], c->chrSrcW, c->chrSrcH, srcStride[2], dstStride[2]);
@@ -1777,66 +1538,48 @@ static void yvu9toyv12Wrapper(SwsContext *c, uint8_t* src[], int srcStride[], in
 		planar2x(src[1], dst[2], c->chrSrcW, c->chrSrcH, srcStride[1], dstStride[2]);
 		planar2x(src[2], dst[1], c->chrSrcW, c->chrSrcH, srcStride[2], dstStride[1]);
 	}
+#endif //MEANX
+	return srcSliceH;
 }
-#endif
-/* Mean : Only YV12 -> YV12 */
 
 /**
  * bring pointers in YUV order instead of YVU
  */
-static inline void orderYUV(int format, uint8_t * sortedP[], int sortedStride[], uint8_t * p[], int stride[])
-{
-// mean only YV12
-		sortedP[0]= p[0];
-		sortedP[1]= p[1];
-		sortedP[2]= p[2];
-		sortedStride[0]= stride[0];
-		sortedStride[1]= stride[1];
-		sortedStride[2]= stride[2];
-/*
+static inline void sws_orderYUV(int format, uint8_t * sortedP[], int sortedStride[], uint8_t * p[], int stride[]){
 	if(format == IMGFMT_YV12 || format == IMGFMT_YVU9
            || format == IMGFMT_444P || format == IMGFMT_422P || format == IMGFMT_411P){
-		sortedP[0]= p[0];
-		sortedP[1]= p[1];
-		sortedP[2]= p[2];
-		sortedStride[0]= stride[0];
-		sortedStride[1]= stride[1];
-		sortedStride[2]= stride[2];
-	}
-	else if(isPacked(format) || isGray(format))
-	{
-		sortedP[0]= p[0];
-		sortedP[1]=
-		sortedP[2]= NULL;
-		sortedStride[0]= stride[0];
-		sortedStride[1]=
-		sortedStride[2]= 0;
-	}
-	else if(format == IMGFMT_I420)
-	{
 		sortedP[0]= p[0];
 		sortedP[1]= p[2];
 		sortedP[2]= p[1];
 		sortedStride[0]= stride[0];
 		sortedStride[1]= stride[2];
 		sortedStride[2]= stride[1];
+	}
+	else if(isPacked(format) || isGray(format) || format == IMGFMT_Y8)
+	{
+		sortedP[0]= p[0];
+		sortedP[1]= 
+		sortedP[2]= NULL;
+		sortedStride[0]= stride[0];
+		sortedStride[1]= 
+		sortedStride[2]= 0;
+	}
+	else if(format == IMGFMT_I420 || format == IMGFMT_IYUV)
+	{
+		sortedP[0]= p[0];
+		sortedP[1]= p[1];
+		sortedP[2]= p[2];
+		sortedStride[0]= stride[0];
+		sortedStride[1]= stride[1];
+		sortedStride[2]= stride[2];
 	}else{
 		MSG_ERR("internal error in orderYUV\n");
 	}
-*/
 }
 
 /* unscaled copy like stuff (assumes nearly identical formats) */
-static void simpleCopy(SwsContext *c, uint8_t* srcParam[], int srcStrideParam[], int srcSliceY,
-             int srcSliceH, uint8_t* dstParam[], int dstStrideParam[]){
-
-	int srcStride[3];
-	int dstStride[3];
-	uint8_t *src[3];
-	uint8_t *dst[3];
-
-	orderYUV(c->srcFormat, src, srcStride, srcParam, srcStrideParam);
-	orderYUV(c->dstFormat, dst, dstStride, dstParam, dstStrideParam);
+static int simpleCopy(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+             int srcSliceH, uint8_t* dst[], int dstStride[]){
 
 	if(isPacked(c->srcFormat))
 	{
@@ -1895,25 +1638,22 @@ static void simpleCopy(SwsContext *c, uint8_t* srcParam[], int srcStrideParam[],
 			}
 		}
 	}
+	return srcSliceH;
 }
 
 static int remove_dup_fourcc(int fourcc)
 {
 	switch(fourcc)
 	{
-/* Mean	    case IMGFMT_IYUV: return IMGFMT_I420;
+	    case IMGFMT_I420:
+	    case IMGFMT_IYUV: return IMGFMT_YV12;
 	    case IMGFMT_Y8  : return IMGFMT_Y800;
 	    case IMGFMT_IF09: return IMGFMT_YVU9;
-*/
 	    default: return fourcc;
 	}
 }
 
 static void getSubSampleFactors(int *h, int *v, int format){
-
-		*h=1;
-		*v=1;
-/* Mean
 	switch(format){
 	case IMGFMT_UYVY:
 	case IMGFMT_YUY2:
@@ -1921,7 +1661,6 @@ static void getSubSampleFactors(int *h, int *v, int format){
 		*v=0;
 		break;
 	case IMGFMT_YV12:
-	case IMGFMT_I420:
 	case IMGFMT_Y800: //FIXME remove after different subsamplings are fully implemented
 		*h=1;
 		*v=1;
@@ -1947,28 +1686,128 @@ static void getSubSampleFactors(int *h, int *v, int format){
 		*v=0;
 		break;
 	}
-*/
 }
 
-SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH, int dstFormat, int flags,
-                         SwsFilter *srcFilter, SwsFilter *dstFilter)
-{
+static uint16_t roundToInt16(int64_t f){
+	int r= (f + (1<<15))>>16;
+	     if(r<-0x7FFF) return 0x8000;
+	else if(r> 0x7FFF) return 0x7FFF;
+	else               return r;
+}
+
+/**
+ * @param inv_table the yuv2rgb coeffs, normally Inverse_Table_6_9[x]
+ * @param fullRange if 1 then the luma range is 0..255 if 0 its 16..235
+ * @return -1 if not supported
+ */
+int sws_setColorspaceDetails(SwsContext *c, const int inv_table[4], int srcRange, const int table[4], int dstRange, int brightness, int contrast, int saturation){
+	int64_t crv =  inv_table[0];
+	int64_t cbu =  inv_table[1];
+	int64_t cgu = -inv_table[2];
+	int64_t cgv = -inv_table[3];
+	int64_t cy  = 1<<16;
+	int64_t oy  = 0;
+
+	if(isYUV(c->dstFormat) || isGray(c->dstFormat)) return -1;
+	memcpy(c->srcColorspaceTable, inv_table, sizeof(int)*4);
+	memcpy(c->dstColorspaceTable,     table, sizeof(int)*4);
+
+	c->brightness= brightness;
+	c->contrast  = contrast;
+	c->saturation= saturation;
+	c->srcRange  = srcRange;
+	c->dstRange  = dstRange;
+
+	c->uOffset=   0x0400040004000400LL;
+	c->vOffset=   0x0400040004000400LL;
+
+	if(!srcRange){
+		cy= (cy*255) / 219;
+		oy= 16<<16;
+	}
+
+	cy = (cy *contrast             )>>16;
+	crv= (crv*contrast * saturation)>>32;
+	cbu= (cbu*contrast * saturation)>>32;
+	cgu= (cgu*contrast * saturation)>>32;
+	cgv= (cgv*contrast * saturation)>>32;
+
+	oy -= 256*brightness;
+
+	c->yCoeff=    roundToInt16(cy *8192) * 0x0001000100010001ULL;
+	c->vrCoeff=   roundToInt16(crv*8192) * 0x0001000100010001ULL;
+	c->ubCoeff=   roundToInt16(cbu*8192) * 0x0001000100010001ULL;
+	c->vgCoeff=   roundToInt16(cgv*8192) * 0x0001000100010001ULL;
+	c->ugCoeff=   roundToInt16(cgu*8192) * 0x0001000100010001ULL;
+	c->yOffset=   roundToInt16(oy *   8) * 0x0001000100010001ULL;
+
+	// MEANX yuv2rgb_c_init_tables(c, inv_table, srcRange, brightness, contrast, saturation);
+
+	//FIXME factorize
+	
+	return 0;
+}
+
+/**
+ * @return -1 if not supported
+ */
+int sws_getColorspaceDetails(SwsContext *c, int **inv_table, int *srcRange, int **table, int *dstRange, int *brightness, int *contrast, int *saturation){
+	if(isYUV(c->dstFormat) || isGray(c->dstFormat)) return -1;
+
+	*inv_table = c->srcColorspaceTable;
+	*table     = c->dstColorspaceTable;
+	*srcRange  = c->srcRange;
+	*dstRange  = c->dstRange;
+	*brightness= c->brightness;
+	*contrast  = c->contrast;
+	*saturation= c->saturation;
+	
+	return 0;	
+}
+
+SwsContext *sws_getContext(int srcW, int srcH, int origSrcFormat, int dstW, int dstH, int origDstFormat, int flags,
+                         SwsFilter *srcFilter, SwsFilter *dstFilter){
 
 	SwsContext *c;
 	int i;
-	int usesFilter;
+	int usesVFilter, usesHFilter;
 	int unscaled, needsDither;
+	int srcFormat, dstFormat;
 	SwsFilter dummyFilter= {NULL, NULL, NULL, NULL};
 #ifdef ARCH_X86
-	if(gCpuCaps.hasMMX)
+	if(flags & SWS_CPU_CAPS_MMX)
 		asm volatile("emms\n\t"::: "memory");
 #endif
-	if(swScale==NULL) globalInit();
-//srcFormat= IMGFMT_Y800;
-//dstFormat= IMGFMT_Y800;
-	/* avoid dupplicate Formats, so we dont need to check to much */
-	srcFormat = remove_dup_fourcc(srcFormat);
-	dstFormat = remove_dup_fourcc(dstFormat);
+
+#ifndef RUNTIME_CPUDETECT //ensure that the flags match the compiled variant if cpudetect is off
+	flags &= ~(SWS_CPU_CAPS_MMX|SWS_CPU_CAPS_MMX2|SWS_CPU_CAPS_3DNOW);
+#ifdef HAVE_MMX2
+	flags |= SWS_CPU_CAPS_MMX|SWS_CPU_CAPS_MMX2;
+#elif defined (HAVE_3DNOW)
+	flags |= SWS_CPU_CAPS_MMX|SWS_CPU_CAPS_3DNOW;
+#elif defined (HAVE_MMX)
+	flags |= SWS_CPU_CAPS_MMX;
+#endif
+#endif
+	//MEANX
+		#define PRTCAP(x) if(flags & SWS_CPU_CAPS_##x) printf("Resize with "#x"\n");
+			PRTCAP(MMX);
+			PRTCAP(3DNOW);
+			PRTCAP(MMX2);
+		#undef PRTCAP
+		#define PRTCAP(x) if(flags & SWS_##x) printf("Resize with "#x"\n");
+			PRTCAP(BILINEAR);
+			PRTCAP(BICUBIC);
+			PRTCAP(LANCZOS);
+		#undef PRTCAP
+
+	//MEANX
+	if(clip_table[512] != 255) globalInit();
+	// MEANX if(rgb15to16 == NULL) sws_rgb2rgb_init(flags);
+
+	/* avoid duplicate Formats, so we don't need to check to much */
+	srcFormat = remove_dup_fourcc(origSrcFormat);
+	dstFormat = remove_dup_fourcc(origDstFormat);
 
 	unscaled = (srcW == dstW && srcH == dstH);
 	needsDither= (isBGR(dstFormat) || isRGB(dstFormat)) 
@@ -1997,7 +1836,7 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 	if(!dstFilter) dstFilter= &dummyFilter;
 	if(!srcFilter) srcFilter= &dummyFilter;
 
-	c= (SwsContext *)memalign(64, sizeof(SwsContext));
+	c= memalign(64, sizeof(SwsContext));
 	memset(c, 0, sizeof(SwsContext));
 
 	c->srcW= srcW;
@@ -2009,16 +1848,19 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 	c->flags= flags;
 	c->dstFormat= dstFormat;
 	c->srcFormat= srcFormat;
+	c->origDstFormat= origDstFormat;
+	c->origSrcFormat= origSrcFormat;
+        c->vRounder= 4* 0x0001000100010001ULL;
 
-	usesFilter=0;
-	if(dstFilter->lumV!=NULL && dstFilter->lumV->length>1) usesFilter=1;
-	if(dstFilter->lumH!=NULL && dstFilter->lumH->length>1) usesFilter=1;
-	if(dstFilter->chrV!=NULL && dstFilter->chrV->length>1) usesFilter=1;
-	if(dstFilter->chrH!=NULL && dstFilter->chrH->length>1) usesFilter=1;
-	if(srcFilter->lumV!=NULL && srcFilter->lumV->length>1) usesFilter=1;
-	if(srcFilter->lumH!=NULL && srcFilter->lumH->length>1) usesFilter=1;
-	if(srcFilter->chrV!=NULL && srcFilter->chrV->length>1) usesFilter=1;
-	if(srcFilter->chrH!=NULL && srcFilter->chrH->length>1) usesFilter=1;
+	usesHFilter= usesVFilter= 0;
+	if(dstFilter->lumV!=NULL && dstFilter->lumV->length>1) usesVFilter=1;
+	if(dstFilter->lumH!=NULL && dstFilter->lumH->length>1) usesHFilter=1;
+	if(dstFilter->chrV!=NULL && dstFilter->chrV->length>1) usesVFilter=1;
+	if(dstFilter->chrH!=NULL && dstFilter->chrH->length>1) usesHFilter=1;
+	if(srcFilter->lumV!=NULL && srcFilter->lumV->length>1) usesVFilter=1;
+	if(srcFilter->lumH!=NULL && srcFilter->lumH->length>1) usesHFilter=1;
+	if(srcFilter->chrV!=NULL && srcFilter->chrV->length>1) usesVFilter=1;
+	if(srcFilter->chrH!=NULL && srcFilter->chrH->length>1) usesHFilter=1;
 
 	getSubSampleFactors(&c->chrSrcHSubSample, &c->chrSrcVSubSample, srcFormat);
 	getSubSampleFactors(&c->chrDstHSubSample, &c->chrDstVSubSample, dstFormat);
@@ -2036,79 +1878,33 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 
 	c->chrIntHSubSample= c->chrDstHSubSample;
 	c->chrIntVSubSample= c->chrSrcVSubSample;
-	
+
 	// note the -((-x)>>y) is so that we allways round toward +inf
 	c->chrSrcW= -((-srcW) >> c->chrSrcHSubSample);
 	c->chrSrcH= -((-srcH) >> c->chrSrcVSubSample);
 	c->chrDstW= -((-dstW) >> c->chrDstHSubSample);
 	c->chrDstH= -((-dstH) >> c->chrDstVSubSample);
-#if 0
-	if(isBGR(dstFormat))
-		c->yuvTable= yuv2rgb_c_init(dstFormat & 0xFF, MODE_RGB, c->table_rV, c->table_gU, c->table_gV, c->table_bU);
-	if(isRGB(dstFormat))
-		c->yuvTable= yuv2rgb_c_init(dstFormat & 0xFF, MODE_BGR, c->table_rV, c->table_gU, c->table_gV, c->table_bU);
-#endif
+
+	sws_setColorspaceDetails(c, Inverse_Table_6_9[SWS_CS_DEFAULT], 0, Inverse_Table_6_9[SWS_CS_DEFAULT] /* FIXME*/, 0, 0, 1<<16, 1<<16); 
+
 	/* unscaled special Cases */
-	if(unscaled && !usesFilter)
+	if(unscaled && !usesHFilter && !usesVFilter)
 	{
-#if 0
+	#if 0 //MEANX
 		/* yv12_to_nv12 */
-		if((srcFormat == IMGFMT_YV12||srcFormat==IMGFMT_I420)&&dstFormat == IMGFMT_NV12)
+		if(srcFormat == IMGFMT_YV12 && dstFormat == IMGFMT_NV12)
 		{
 			c->swScale= PlanarToNV12Wrapper;
-
-			if(flags&SWS_PRINT_INFO)
-				MSG_INFO("SwScaler: using unscaled %s -> %s special converter\n", 
-					vo_format_name(srcFormat), vo_format_name(dstFormat));
-			return c;
 		}
 		/* yuv2bgr */
-		if((srcFormat==IMGFMT_YV12 || srcFormat==IMGFMT_I420) && isBGR(dstFormat))
+		if((srcFormat==IMGFMT_YV12 || srcFormat==IMGFMT_422P) && (isBGR(dstFormat) || isRGB(dstFormat)))
 		{
-			// FIXME multiple yuv2rgb converters wont work that way cuz that thing is full of globals&statics
-			//FIXME rgb vs. bgr ? 
-#ifdef WORDS_BIGENDIAN
-			if(dstFormat==IMGFMT_BGR32)
-				yuv2rgb_init( dstFormat&0xFF /* =bpp */, MODE_BGR);
-			else
-				yuv2rgb_init( dstFormat&0xFF /* =bpp */, MODE_RGB);
-#else
-			yuv2rgb_init( dstFormat&0xFF /* =bpp */, MODE_RGB);
-#endif
-			c->swScale= planarYuvToBgr;
-
-			if(flags&SWS_PRINT_INFO)
-				MSG_INFO("SwScaler: using unscaled %s -> %s special converter\n", 
-					vo_format_name(srcFormat), vo_format_name(dstFormat));
-			return c;
+			c->swScale= yuv2rgb_get_func_ptr(c);
 		}
-#endif
-		/* simple copy */
-		if(   srcFormat == dstFormat
-/*		   || (srcFormat==IMGFMT_YV12 && dstFormat==IMGFMT_I420)
-		   || (srcFormat==IMGFMT_I420 && dstFormat==IMGFMT_YV12)
-		   || (isPlanarYUV(srcFormat) && isGray(dstFormat))
-		   || (isPlanarYUV(dstFormat) && isGray(srcFormat))
-*/
-		  )
-		{
-			c->swScale= simpleCopy;
-
-			if(flags&SWS_PRINT_INFO)
-				MSG_INFO("SwScaler: using unscaled %s -> %s special converter\n", 
-					vo_format_name(srcFormat), vo_format_name(dstFormat));
-			return c;
-		}
-
-#if 0
-		if( srcFormat==IMGFMT_YVU9 && (dstFormat==IMGFMT_YV12 || dstFormat==IMGFMT_I420) )
+		
+		if( srcFormat==IMGFMT_YVU9 && dstFormat==IMGFMT_YV12 )
 		{
 			c->swScale= yvu9toyv12Wrapper;
-
-			if(flags&SWS_PRINT_INFO)
-				MSG_INFO("SwScaler: using unscaled %s -> %s special converter\n", 
-					vo_format_name(srcFormat), vo_format_name(dstFormat));
-			return c;
 		}
 
 		/* bgr24toYV12 */
@@ -2123,26 +1919,32 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 
 		/* LQ converters if -sws 0 or -sws 4*/
 		if(c->flags&(SWS_FAST_BILINEAR|SWS_POINT)){
-
 			/* rgb/bgr -> rgb/bgr (dither needed forms) */
 			if(  (isBGR(srcFormat) || isRGB(srcFormat))
-			  && (isBGR(dstFormat) || isRGB(dstFormat))
+			  && (isBGR(dstFormat) || isRGB(dstFormat)) 
 			  && needsDither)
 				c->swScale= rgb2rgbWrapper;
 
 			/* yv12_to_yuy2 */
-			if((srcFormat == IMGFMT_YV12||srcFormat==IMGFMT_I420)&&dstFormat == IMGFMT_YUY2)
+			if(srcFormat == IMGFMT_YV12 && 
+			    (dstFormat == IMGFMT_YUY2 || dstFormat == IMGFMT_UYVY))
 			{
-				c->swScale= PlanarToYuy2Wrapper;
-
-				if(flags&SWS_PRINT_INFO)
-					MSG_INFO("SwScaler: using unscaled %s -> %s special converter\n",
-						vo_format_name(srcFormat), vo_format_name(dstFormat));
-				return c;
+				if (dstFormat == IMGFMT_YUY2)
+				    c->swScale= PlanarToYuy2Wrapper;
+				else
+				    c->swScale= PlanarToUyvyWrapper;
 			}
-
 		}
-#endif
+	#endif //MEANX
+		/* simple copy */
+		if(   srcFormat == dstFormat
+		   || (isPlanarYUV(srcFormat) && isGray(dstFormat))
+		   || (isPlanarYUV(dstFormat) && isGray(srcFormat))
+		  )
+		{
+			c->swScale= simpleCopy;
+		}
+
 		if(c->swScale){
 			if(flags&SWS_PRINT_INFO)
 				MSG_INFO("SwScaler: using unscaled %s -> %s special converter\n", 
@@ -2151,7 +1953,7 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 		}
 	}
 
-	if(cpuCaps.hasMMX2)
+	if(flags & SWS_CPU_CAPS_MMX2)
 	{
 		c->canMMX2BeUsed= (dstW >=srcW && (dstW&31)==0 && (srcW&15)==0) ? 1 : 0;
 		if(!c->canMMX2BeUsed && dstW >=srcW && (srcW&15)==0 && (flags&SWS_FAST_BILINEAR))
@@ -2159,6 +1961,7 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 			if(flags&SWS_PRINT_INFO)
 				MSG_INFO("SwScaler: output Width is not a multiple of 32 -> no MMX2 scaler\n");
 		}
+		if(usesHFilter) c->canMMX2BeUsed=0;
 	}
 	else
 		c->canMMX2BeUsed=0;
@@ -2179,8 +1982,8 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 			c->lumXInc+= 20;
 			c->chrXInc+= 20;
 		}
-		//we dont use the x86asm scaler if mmx is available
-		else if(cpuCaps.hasMMX)
+		//we don't use the x86asm scaler if mmx is available
+		else if(flags & SWS_CPU_CAPS_MMX)
 		{
 			c->lumXInc = ((srcW-2)<<16)/(dstW-2) - 20;
 			c->chrXInc = ((c->chrSrcW-2)<<16)/(c->chrDstW-2) - 20;
@@ -2189,7 +1992,7 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 
 	/* precalculate horizontal scaler filter coefficients */
 	{
-		const int filterAlign= cpuCaps.hasMMX ? 4 : 1;
+		const int filterAlign= (flags & SWS_CPU_CAPS_MMX) ? 4 : 1;
 
 		initFilter(&c->hLumFilter, &c->hLumFilterPos, &c->hLumFilterSize, c->lumXInc,
 				 srcW      ,       dstW, filterAlign, 1<<14,
@@ -2201,7 +2004,7 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 				 srcFilter->chrH, dstFilter->chrH);
 
 #ifdef ARCH_X86
-// cant downscale !!!
+// can't downscale !!!
 		if(c->canMMX2BeUsed && (flags & SWS_FAST_BILINEAR))
 		{
 			c->lumMmx2Filter   = (int16_t*)memalign(8, (dstW        /8+8)*sizeof(int16_t));
@@ -2227,7 +2030,7 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 			(flags&SWS_BICUBLIN) ? (flags|SWS_BILINEAR) : flags,
 			srcFilter->chrV, dstFilter->chrV);
 
-	// Calculate Buffer Sizes so that they wont run out while handling these damn slices
+	// Calculate Buffer Sizes so that they won't run out while handling these damn slices
 	c->vLumBufSize= c->vLumFilterSize;
 	c->vChrBufSize= c->vChrFilterSize;
 	for(i=0; i<dstH; i++)
@@ -2235,7 +2038,9 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 		int chrI= i*c->chrDstH / dstH;
 		int nextSlice= MAX(c->vLumFilterPos[i   ] + c->vLumFilterSize - 1,
 				 ((c->vChrFilterPos[chrI] + c->vChrFilterSize - 1)<<c->chrSrcVSubSample));
-		nextSlice&= ~3; // Slices start at boundaries which are divisable through 4
+
+		nextSlice>>= c->chrSrcVSubSample;
+		nextSlice<<= c->chrSrcVSubSample;
 		if(c->vLumFilterPos[i   ] + c->vLumBufSize < nextSlice)
 			c->vLumBufSize= nextSlice - c->vLumFilterPos[i   ];
 		if(c->vChrFilterPos[chrI] + c->vChrBufSize < (nextSlice>>c->chrSrcVSubSample))
@@ -2256,20 +2061,7 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 	for(i=0; i<c->vChrBufSize; i++) memset(c->chrPixBuf[i], 64, 8000);
 
 	ASSERT(c->chrDstH <= dstH)
-
-	// pack filter data for mmx code
-	if(cpuCaps.hasMMX)
-	{
-		c->lumMmxFilter= (int16_t*)memalign(8, c->vLumFilterSize*      dstH*4*sizeof(int16_t));
-		c->chrMmxFilter= (int16_t*)memalign(8, c->vChrFilterSize*c->chrDstH*4*sizeof(int16_t));
-		for(i=0; i<c->vLumFilterSize*dstH; i++)
-			c->lumMmxFilter[4*i]=c->lumMmxFilter[4*i+1]=c->lumMmxFilter[4*i+2]=c->lumMmxFilter[4*i+3]=
-				c->vLumFilter[i];
-		for(i=0; i<c->vChrFilterSize*c->chrDstH; i++)
-			c->chrMmxFilter[4*i]=c->chrMmxFilter[4*i+1]=c->chrMmxFilter[4*i+2]=c->chrMmxFilter[4*i+3]=
-				c->vChrFilter[i];
-	}
-/*
+#if 0 //MEANX
 	if(flags&SWS_PRINT_INFO)
 	{
 #ifdef DITHER1XBPP
@@ -2277,7 +2069,6 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 #else
 		char *dither= "";
 #endif
-
 		if(flags&SWS_FAST_BILINEAR)
 			MSG_INFO("\nSwScaler: FAST_BILINEAR scaler, ");
 		else if(flags&SWS_BILINEAR)
@@ -2303,30 +2094,26 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 		else
 			MSG_INFO("\nSwScaler: ehh flags invalid?! ");
 
-
 		if(dstFormat==IMGFMT_BGR15 || dstFormat==IMGFMT_BGR16)
-			MSG_INFO("from %s to%s %s ",
+			MSG_INFO("from %s to%s %s ", 
 				vo_format_name(srcFormat), dither, vo_format_name(dstFormat));
 		else
-
-			MSG_INFO("from %s to %s ",
+			MSG_INFO("from %s to %s ", 
 				vo_format_name(srcFormat), vo_format_name(dstFormat));
 
-		if(cpuCaps.hasMMX2)
+		if(flags & SWS_CPU_CAPS_MMX2)
 			MSG_INFO("using MMX2\n");
-		else if(cpuCaps.has3DNow)
+		else if(flags & SWS_CPU_CAPS_3DNOW)
 			MSG_INFO("using 3DNOW\n");
-		else if(cpuCaps.hasMMX)
+		else if(flags & SWS_CPU_CAPS_MMX)
 			MSG_INFO("using MMX\n");
 		else
 			MSG_INFO("using C\n");
-
 	}
-*/
-/*
-	if((flags & SWS_PRINT_INFO) && verbose>0)
+
+	if(flags & SWS_PRINT_INFO)
 	{
-		if(cpuCaps.hasMMX)
+		if(flags & SWS_CPU_CAPS_MMX)
 		{
 			if(c->canMMX2BeUsed && (flags&SWS_FAST_BILINEAR))
 				MSG_V("SwScaler: using FAST_BILINEAR MMX2 scaler for horizontal scaling\n");
@@ -2347,9 +2134,7 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 					MSG_V("SwScaler: using n-tap MMX scaler for horizontal chrominance scaling\n");
 			}
 		}
-
 		else
-
 		{
 #ifdef ARCH_X86
 			MSG_V("SwScaler: using X86-Asm scaler for horizontal scaling\n");
@@ -2363,57 +2148,144 @@ SwsContext *getSwsContext(int srcW, int srcH, int srcFormat, int dstW, int dstH,
 		if(isPlanarYUV(dstFormat))
 		{
 			if(c->vLumFilterSize==1)
-				MSG_V("SwScaler: using 1-tap %s \"scaler\" for vertical scaling (YV12 like)\n", cpuCaps.hasMMX ? "MMX" : "C");
+				MSG_V("SwScaler: using 1-tap %s \"scaler\" for vertical scaling (YV12 like)\n", (flags & SWS_CPU_CAPS_MMX) ? "MMX" : "C");
 			else
-				MSG_V("SwScaler: using n-tap %s scaler for vertical scaling (YV12 like)\n", cpuCaps.hasMMX ? "MMX" : "C");
+				MSG_V("SwScaler: using n-tap %s scaler for vertical scaling (YV12 like)\n", (flags & SWS_CPU_CAPS_MMX) ? "MMX" : "C");
 		}
 		else
 		{
 			if(c->vLumFilterSize==1 && c->vChrFilterSize==2)
 				MSG_V("SwScaler: using 1-tap %s \"scaler\" for vertical luminance scaling (BGR)\n"
-				       "SwScaler:       2-tap scaler for vertical chrominance scaling (BGR)\n",cpuCaps.hasMMX ? "MMX" : "C");
+				       "SwScaler:       2-tap scaler for vertical chrominance scaling (BGR)\n",(flags & SWS_CPU_CAPS_MMX) ? "MMX" : "C");
 			else if(c->vLumFilterSize==2 && c->vChrFilterSize==2)
-				MSG_V("SwScaler: using 2-tap linear %s scaler for vertical scaling (BGR)\n", cpuCaps.hasMMX ? "MMX" : "C");
+				MSG_V("SwScaler: using 2-tap linear %s scaler for vertical scaling (BGR)\n", (flags & SWS_CPU_CAPS_MMX) ? "MMX" : "C");
 			else
-				MSG_V("SwScaler: using n-tap %s scaler for vertical scaling (BGR)\n", cpuCaps.hasMMX ? "MMX" : "C");
+				MSG_V("SwScaler: using n-tap %s scaler for vertical scaling (BGR)\n", (flags & SWS_CPU_CAPS_MMX) ? "MMX" : "C");
 		}
-*/
-/*
+
 		if(dstFormat==IMGFMT_BGR24)
 			MSG_V("SwScaler: using %s YV12->BGR24 Converter\n",
-				cpuCaps.hasMMX2 ? "MMX2" : (cpuCaps.hasMMX ? "MMX" : "C"));
+				(flags & SWS_CPU_CAPS_MMX2) ? "MMX2" : ((flags & SWS_CPU_CAPS_MMX) ? "MMX" : "C"));
 		else if(dstFormat==IMGFMT_BGR32)
-			MSG_V("SwScaler: using %s YV12->BGR32 Converter\n", cpuCaps.hasMMX ? "MMX" : "C");
+			MSG_V("SwScaler: using %s YV12->BGR32 Converter\n", (flags & SWS_CPU_CAPS_MMX) ? "MMX" : "C");
 		else if(dstFormat==IMGFMT_BGR16)
-			MSG_V("SwScaler: using %s YV12->BGR16 Converter\n", cpuCaps.hasMMX ? "MMX" : "C");
+			MSG_V("SwScaler: using %s YV12->BGR16 Converter\n", (flags & SWS_CPU_CAPS_MMX) ? "MMX" : "C");
 		else if(dstFormat==IMGFMT_BGR15)
-			MSG_V("SwScaler: using %s YV12->BGR15 Converter\n", cpuCaps.hasMMX ? "MMX" : "C");
+			MSG_V("SwScaler: using %s YV12->BGR15 Converter\n", (flags & SWS_CPU_CAPS_MMX) ? "MMX" : "C");
 
 		MSG_V("SwScaler: %dx%d -> %dx%d\n", srcW, srcH, dstW, dstH);
-
 	}
-*/	
-	if((flags & SWS_PRINT_INFO) && verbose>1)
+	if(flags & SWS_PRINT_INFO)
 	{
 		MSG_DBG2("SwScaler:Lum srcW=%d srcH=%d dstW=%d dstH=%d xInc=%d yInc=%d\n",
 			c->srcW, c->srcH, c->dstW, c->dstH, c->lumXInc, c->lumYInc);
 		MSG_DBG2("SwScaler:Chr srcW=%d srcH=%d dstW=%d dstH=%d xInc=%d yInc=%d\n",
 			c->chrSrcW, c->chrSrcH, c->chrDstW, c->chrDstH, c->chrXInc, c->chrYInc);
 	}
+#endif //MEANX
 
-	c->swScale= swScale;
+	c->swScale= getSwsFunc(flags);
 	return c;
+}
+
+/**
+ * swscale warper, so we don't need to export the SwsContext.
+ * assumes planar YUV to be in YUV order instead of YVU
+ */
+int sws_scale_ordered(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+                           int srcSliceH, uint8_t* dst[], int dstStride[]){
+	//copy strides, so they can safely be modified
+	int srcStride2[3]= {srcStride[0], srcStride[1], srcStride[2]};
+	int dstStride2[3]= {dstStride[0], dstStride[1], dstStride[2]};
+	return c->swScale(c, src, srcStride2, srcSliceY, srcSliceH, dst, dstStride2);
+}
+
+/**
+ * swscale warper, so we don't need to export the SwsContext
+ */
+int sws_scale(SwsContext *c, uint8_t* srcParam[], int srcStrideParam[], int srcSliceY,
+                           int srcSliceH, uint8_t* dstParam[], int dstStrideParam[]){
+	int srcStride[3];
+	int dstStride[3];
+	uint8_t *src[3];
+	uint8_t *dst[3];
+	sws_orderYUV(c->origSrcFormat, src, srcStride, srcParam, srcStrideParam);
+	sws_orderYUV(c->origDstFormat, dst, dstStride, dstParam, dstStrideParam);
+//printf("sws: slice %d %d\n", srcSliceY, srcSliceH);
+
+	return c->swScale(c, src, srcStride, srcSliceY, srcSliceH, dst, dstStride);
+}
+
+SwsFilter *sws_getDefaultFilter(float lumaGBlur, float chromaGBlur, 
+				float lumaSharpen, float chromaSharpen,
+				float chromaHShift, float chromaVShift,
+				int verbose)
+{
+	SwsFilter *filter= malloc(sizeof(SwsFilter));
+
+	if(lumaGBlur!=0.0){
+		filter->lumH= sws_getGaussianVec(lumaGBlur, 3.0);
+		filter->lumV= sws_getGaussianVec(lumaGBlur, 3.0);
+	}else{
+		filter->lumH= sws_getIdentityVec();
+		filter->lumV= sws_getIdentityVec();
+	}
+
+	if(chromaGBlur!=0.0){
+		filter->chrH= sws_getGaussianVec(chromaGBlur, 3.0);
+		filter->chrV= sws_getGaussianVec(chromaGBlur, 3.0);
+	}else{
+		filter->chrH= sws_getIdentityVec();
+		filter->chrV= sws_getIdentityVec();
+	}
+
+	if(chromaSharpen!=0.0){
+		SwsVector *g= sws_getConstVec(-1.0, 3);
+		SwsVector *id= sws_getConstVec(10.0/chromaSharpen, 1);
+		g->coeff[1]=2.0;
+		sws_addVec(id, g);
+		sws_convVec(filter->chrH, id);
+		sws_convVec(filter->chrV, id);
+		sws_freeVec(g);
+		sws_freeVec(id);
+	}
+
+	if(lumaSharpen!=0.0){
+		SwsVector *g= sws_getConstVec(-1.0, 3);
+		SwsVector *id= sws_getConstVec(10.0/lumaSharpen, 1);
+		g->coeff[1]=2.0;
+		sws_addVec(id, g);
+		sws_convVec(filter->lumH, id);
+		sws_convVec(filter->lumV, id);
+		sws_freeVec(g);
+		sws_freeVec(id);
+	}
+
+	if(chromaHShift != 0.0)
+		sws_shiftVec(filter->chrH, (int)(chromaHShift+0.5));
+
+	if(chromaVShift != 0.0)
+		sws_shiftVec(filter->chrV, (int)(chromaVShift+0.5));
+
+	sws_normalizeVec(filter->chrH, 1.0);
+	sws_normalizeVec(filter->chrV, 1.0);
+	sws_normalizeVec(filter->lumH, 1.0);
+	sws_normalizeVec(filter->lumV, 1.0);
+
+	if(verbose) sws_printVec(filter->chrH);
+	if(verbose) sws_printVec(filter->lumH);
+
+        return filter;
 }
 
 /**
  * returns a normalized gaussian curve used to filter stuff
  * quality=3 is high quality, lowwer is lowwer quality
  */
-
-SwsVector *getGaussianVec(double variance, double quality){
+SwsVector *sws_getGaussianVec(double variance, double quality){
 	const int length= (int)(variance*quality + 0.5) | 1;
 	int i;
-	double *coeff= (double *)memalign(sizeof(double), length*sizeof(double));
+	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	double middle= (length-1)*0.5;
 	SwsVector *vec= malloc(sizeof(SwsVector));
 
@@ -2426,14 +2298,14 @@ SwsVector *getGaussianVec(double variance, double quality){
 		coeff[i]= exp( -dist*dist/(2*variance*variance) ) / sqrt(2*variance*PI);
 	}
 
-	normalizeVec(vec, 1.0);
+	sws_normalizeVec(vec, 1.0);
 
 	return vec;
 }
 
-SwsVector *getConstVec(double c, int length){
+SwsVector *sws_getConstVec(double c, int length){
 	int i;
-	double *coeff= (double *)  memalign(sizeof(double), length*sizeof(double));
+	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	SwsVector *vec= malloc(sizeof(SwsVector));
 
 	vec->coeff= coeff;
@@ -2446,8 +2318,8 @@ SwsVector *getConstVec(double c, int length){
 }
 
 
-SwsVector *getIdentityVec(void){
-	double *coeff=  (double *) memalign(sizeof(double), sizeof(double));
+SwsVector *sws_getIdentityVec(void){
+	double *coeff= memalign(sizeof(double), sizeof(double));
 	SwsVector *vec= malloc(sizeof(SwsVector));
 	coeff[0]= 1.0;
 
@@ -2457,7 +2329,7 @@ SwsVector *getIdentityVec(void){
 	return vec;
 }
 
-void normalizeVec(SwsVector *a, double height){
+void sws_normalizeVec(SwsVector *a, double height){
 	int i;
 	double sum=0;
 	double inv;
@@ -2471,16 +2343,16 @@ void normalizeVec(SwsVector *a, double height){
 		a->coeff[i]*= inv;
 }
 
-void scaleVec(SwsVector *a, double scalar){
+void sws_scaleVec(SwsVector *a, double scalar){
 	int i;
 
 	for(i=0; i<a->length; i++)
 		a->coeff[i]*= scalar;
 }
 
-static SwsVector *getConvVec(SwsVector *a, SwsVector *b){
+static SwsVector *sws_getConvVec(SwsVector *a, SwsVector *b){
 	int length= a->length + b->length - 1;
-	double *coeff= (double *)  memalign(sizeof(double), length*sizeof(double));
+	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	int i, j;
 	SwsVector *vec= malloc(sizeof(SwsVector));
 
@@ -2500,9 +2372,9 @@ static SwsVector *getConvVec(SwsVector *a, SwsVector *b){
 	return vec;
 }
 
-static SwsVector *sumVec(SwsVector *a, SwsVector *b){
+static SwsVector *sws_sumVec(SwsVector *a, SwsVector *b){
 	int length= MAX(a->length, b->length);
-	double *coeff=  (double *) memalign(sizeof(double), length*sizeof(double));
+	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	int i;
 	SwsVector *vec= malloc(sizeof(SwsVector));
 
@@ -2517,9 +2389,9 @@ static SwsVector *sumVec(SwsVector *a, SwsVector *b){
 	return vec;
 }
 
-static SwsVector *diffVec(SwsVector *a, SwsVector *b){
+static SwsVector *sws_diffVec(SwsVector *a, SwsVector *b){
 	int length= MAX(a->length, b->length);
-	double *coeff=  (double *) memalign(sizeof(double), length*sizeof(double));
+	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	int i;
 	SwsVector *vec= malloc(sizeof(SwsVector));
 
@@ -2535,9 +2407,9 @@ static SwsVector *diffVec(SwsVector *a, SwsVector *b){
 }
 
 /* shift left / or right if "shift" is negative */
-static SwsVector *getShiftedVec(SwsVector *a, int shift){
+static SwsVector *sws_getShiftedVec(SwsVector *a, int shift){
 	int length= a->length + ABS(shift)*2;
-	double *coeff=  (double *) memalign(sizeof(double), length*sizeof(double));
+	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	int i;
 	SwsVector *vec= malloc(sizeof(SwsVector));
 
@@ -2554,40 +2426,40 @@ static SwsVector *getShiftedVec(SwsVector *a, int shift){
 	return vec;
 }
 
-void shiftVec(SwsVector *a, int shift){
-	SwsVector *shifted= getShiftedVec(a, shift);
+void sws_shiftVec(SwsVector *a, int shift){
+	SwsVector *shifted= sws_getShiftedVec(a, shift);
 	free(a->coeff);
 	a->coeff= shifted->coeff;
 	a->length= shifted->length;
 	free(shifted);
 }
 
-void addVec(SwsVector *a, SwsVector *b){
-	SwsVector *sum= sumVec(a, b);
+void sws_addVec(SwsVector *a, SwsVector *b){
+	SwsVector *sum= sws_sumVec(a, b);
 	free(a->coeff);
 	a->coeff= sum->coeff;
 	a->length= sum->length;
 	free(sum);
 }
 
-void subVec(SwsVector *a, SwsVector *b){
-	SwsVector *diff= diffVec(a, b);
+void sws_subVec(SwsVector *a, SwsVector *b){
+	SwsVector *diff= sws_diffVec(a, b);
 	free(a->coeff);
 	a->coeff= diff->coeff;
 	a->length= diff->length;
 	free(diff);
 }
 
-void convVec(SwsVector *a, SwsVector *b){
-	SwsVector *conv= getConvVec(a, b);
-	free(a->coeff);
+void sws_convVec(SwsVector *a, SwsVector *b){
+	SwsVector *conv= sws_getConvVec(a, b);
+	free(a->coeff);  
 	a->coeff= conv->coeff;
 	a->length= conv->length;
 	free(conv);
 }
 
-SwsVector *cloneVec(SwsVector *a){
-	double *coeff= (double *)memalign(sizeof(double), a->length*sizeof(double));
+SwsVector *sws_cloneVec(SwsVector *a){
+	double *coeff= memalign(sizeof(double), a->length*sizeof(double));
 	int i;
 	SwsVector *vec= malloc(sizeof(SwsVector));
 
@@ -2599,7 +2471,7 @@ SwsVector *cloneVec(SwsVector *a){
 	return vec;
 }
 
-void printVec(SwsVector *a){
+void sws_printVec(SwsVector *a){
 	int i;
 	double max=0;
 	double min=0;
@@ -2622,7 +2494,7 @@ void printVec(SwsVector *a){
 	}
 }
 
-void freeVec(SwsVector *a){
+void sws_freeVec(SwsVector *a){
 	if(!a) return;
 	if(a->coeff) free(a->coeff);
 	a->coeff=NULL;
@@ -2630,7 +2502,18 @@ void freeVec(SwsVector *a){
 	free(a);
 }
 
-void freeSwsContext(SwsContext *c){
+void sws_freeFilter(SwsFilter *filter){
+	if(!filter) return;
+
+	if(filter->lumH) sws_freeVec(filter->lumH);
+	if(filter->lumV) sws_freeVec(filter->lumV);
+	if(filter->chrH) sws_freeVec(filter->chrH);
+	if(filter->chrV) sws_freeVec(filter->chrV);
+	free(filter);
+}
+
+
+void sws_freeContext(SwsContext *c){
 	int i;
 	if(!c) return;
 
@@ -2674,11 +2557,6 @@ void freeSwsContext(SwsContext *c){
 	if(c->hChrFilterPos) free(c->hChrFilterPos);
 	c->hChrFilterPos = NULL;
 
-	if(c->lumMmxFilter) free(c->lumMmxFilter);
-	c->lumMmxFilter = NULL;
-	if(c->chrMmxFilter) free(c->chrMmxFilter);
-	c->chrMmxFilter = NULL;
-
 	if(c->lumMmx2Filter) free(c->lumMmx2Filter);
 	c->lumMmx2Filter=NULL;
 	if(c->chrMmx2Filter) free(c->chrMmx2Filter);
@@ -2693,5 +2571,3 @@ void freeSwsContext(SwsContext *c){
 	free(c);
 }
 
-
-#endif

@@ -123,18 +123,18 @@ uint32_t	ADMVideoSubtitle::search(uint32_t time)
 //
 //	Display up to 3 lines of text centered on screen
 //  Each line is separated by a |
+// It is the basic version that tries to use only 2 lines
+// in most cases, 3 when needed
 //______________________________________
 void ADMVideoSubtitle::displayString(char *string)
 {
-  char workStr[SRT_MAX_LINE_LENGTH];
-  if (string) {
-    SAFE_STRCPY(workStr,SRT_MAX_LINE_LENGTH,string,strlen(string));
-  } else {
-    workStr[0]='\0';
-  }
-
-	uint32_t base,last=0,line=0;
-	double bbase;
+ 
+	uint32_t base,last=0,line=0;	
+	char *ptr=NULL;
+	uint32_t nbLine=0;
+	uint32_t i=0;
+	uint32_t suggestedLen=0;
+	
 
       aprintf("%s\n",string);
 
@@ -150,10 +150,112 @@ void ADMVideoSubtitle::displayString(char *string)
   	memset(_bgBitmapBuffer,0,(_info.height*_info.width)>>1);
   	memset(_bgMaskBuffer,0,_info.height*_info.width);
 
-							{
+	if(_conf->_selfAdjustable) 
+		{
+			displayString_autoadj(string);
+			return;
+		}
+		
+	const uint32_t workStrLen=strlen(string);	
+	// First scan to see how many line we will display
+	ptr=string;	
+	while(*(ptr))
+	{
+		if(*ptr=='|') nbLine++;
+		ptr++;
+	}
+	
+	switch(nbLine)
+	{
+		case 0:
+			base=2*_conf->_fontsize;; // 1 or 2 lines we dont use the upper line		
+			break;
+		case 1:
+			base=_conf->_fontsize;; // 1 or 2 lines we dont use the upper line		
+			break;
+		default:break;
+		
+	}	
+		
+							
+ 
+  
+  	last=0;
+	// scan and display each line
+	for(i=0;i<workStrLen && line<SRT_MAX_LINE;i++)
+	{
+		if( string[i]=='|') // Found
+		{
+			
+			if(i)
+			{
+				displayLine(string+last,base,i-last,&suggestedLen);
+				last=i+1;
+				base+=_conf->_fontsize;
+				line++;
+			}
+							
+		}	
+	}
+
+    	if(line>SRT_MAX_LINE || line==SRT_MAX_LINE && last<workStrLen)
+	{
+        	//index range [0,1,2]
+        	printf("\nText is too big: \"%s\".\n",string);		
+        	printf("Maximum %d lines!\n",SRT_MAX_LINE);
+		
+	}
+
+	// Else display the remaining
+	if(last<workStrLen-1)
+		displayLine(string+last,base,i-last,&suggestedLen);
+	
+	
+	// now blur bitmap into mask..
+	memset(_maskBuffer,0,SRT_MAX_LINE*_conf->_fontsize*_info.width);
+
+	uint32_t off;
+	uint8_t *src,*dst;
+
+	off=0;
+
+	src=_bitmapBuffer;
+	dst=_maskBuffer;
+
+
+	// We shrink it down for u & v by 2x2
+	// mask buffer->bitmap buffer
+
+	uint8_t tmp[_info.width*_info.height];
+
+	decimate(src,tmp,_info.width,_info.height);
+	lowPass(src,dst,_info.width,_info.height);
+	lowPass(tmp,src,_info.width>>1,_info.height>>1);
+
+  	if (_conf->_useBackgroundColor) 
+	{
+    		decimate(_bgMaskBuffer,_bgBitmapBuffer,_info.width,_info.height);
+    		//lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
+  	}
+  
+}
+// Same but with autosplit
+// We loos the ability to use the amount of frames though
+//____________________________________________________________
+void ADMVideoSubtitle::displayString_autoadj(char *string)
+{
+ char workStr[SRT_MAX_LINE_LENGTH];
+  if (string) {
+    SAFE_STRCPY(workStr,SRT_MAX_LINE_LENGTH,string,strlen(string));
+  } else {
+    workStr[0]='\0';
+  }
+
+								
+{
     const uint32_t workStrLen=strlen(workStr);
     uint32_t i=0;
-    uint32_t suggestedLen=0;
+    uint32_t suggestedLen=0,last=0,line=0,base=0;
     
     while (last<workStrLen && line<SRT_MAX_LINE) {
       uint8_t lineBreakFound=0;
@@ -226,8 +328,8 @@ void ADMVideoSubtitle::displayString(char *string)
 	printf("Remaining chars: \"%s\"\n",remainChars);
         printf("Maximum %d lines!\n",SRT_MAX_LINE);
 	//return;
-									}
-							}
+		}
+	}
 
 	// now blur bitmap into mask..
 	memset(_maskBuffer,0,SRT_MAX_LINE*_conf->_fontsize*_info.width);
@@ -258,6 +360,8 @@ void ADMVideoSubtitle::displayString(char *string)
 
   //decimate(_bgBitmapBuffer,tmp,_info.width,_info.height);
   //lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
+
+
 }
 // Display a full line centered on screen. It returns the
 // number of displayed chars.
@@ -439,9 +543,18 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	double alpha,alpha2;
 
 
-	hei=SRT_MAX_LINE*_conf->_fontsize*_info.width;  // max height of our subtitle
+	hei=(SRT_MAX_LINE+1)*_conf->_fontsize;
+	if(hei>=_info.height-1) hei=_info.height-1;
+	hei*=_info.width;  // max height of our subtitle
+	
 
 	aprintf("Sub:Rendering : %d %d %d (yuv)\n",_conf->_Y_percent,_conf->_U_percent,_conf->_V_percent);
+	
+	// keep a little margin for renderin
+	// to render f y or g
+	if((baseLine) > _conf->_fontsize)
+		baseLine-=_conf->_fontsize>>1;
+	
 	start=_info.width*baseLine;  // base line in final image
 
 	chromatarget=(int8_t *)(target+(_info.width*_info.height));
