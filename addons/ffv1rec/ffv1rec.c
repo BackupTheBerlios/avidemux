@@ -118,7 +118,7 @@ void usage()
    fprintf(stderr, "         -s ............ SECAM\n");
    fprintf(stderr, "         -Q ............ shut up\n");
    fprintf(stderr, "         -z ............ video only (i.e. no audio)\n");
-   fprintf(stderr, "         -C ............ select video codec (MJPEG|HUFFYU|FFV1|MPEG4|XVID)\n");
+   fprintf(stderr, "         -C ............ select video codec (MJPEG|HUFFYUV|FFV1|MPEG4|XVID)\n");
    fprintf(stderr, "         -b ............ set the audio frequency [44100]\n");
    fprintf(stderr, "         -2 ............ split every  2 Gbytes [NO]\n");
    fprintf(stderr, "         -h ............ this help\n");
