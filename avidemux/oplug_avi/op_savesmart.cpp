@@ -57,7 +57,7 @@ extern "C" {
 
 
 #include "ADM_toolkit/ADM_debugID.h"
-#define MODULE_NAME MODULE_EDITOR
+#define MODULE_NAME MODULE_SAVE_AVI
 #include "ADM_toolkit/ADM_debug.h"
 GenericAviSaveSmart::GenericAviSaveSmart(uint32_t qf) : GenericAviSave()
 {
@@ -176,6 +176,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
   uint8_t seq;
   
   	aprintf("Frame %lu copying\n",frame);
+        
   	// all gop should be closed, so it should be safe to do it here
 	if(muxSize)
       	{
@@ -193,7 +194,17 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
 	}
   
   	video_body->getFlags( frame,&_videoFlag);	
-	
+        if(frame==frameStart)
+        {
+          if(!(_videoFlag & AVI_KEY_FRAME))
+          {
+            aprintf("1st frame is not a kef:There is a broken reference, encoding\n");
+            compEngaged = 1;
+            initEncoder (_cqReenc);
+            return writeVideoChunk_recode(frame);
+            
+          }
+        }
 	
   	if(_videoFlag & AVI_B_FRAME) // lookup next I/P frame
 	{
@@ -293,7 +304,7 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
 	 {
 	 ME_EPZS,//	ME
 	 0, // 		GMC	
-	 1,	// 4MV
+	 0,	// 4MV
 	 0,//		_QPEL;	 
 	 0,//		_TREILLIS_QUANT
 	 2,//		qmin;
