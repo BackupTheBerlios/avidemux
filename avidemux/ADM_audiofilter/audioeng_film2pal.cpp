@@ -55,6 +55,7 @@ AVDMProcessAudio_Film2Pal::AVDMProcessAudio_Film2Pal(AVDMGenericAudioStream * in
     
     d/=25.;
     d*=23.976;
+    d*=1.05; // Add 5 % margin
     
     _length=(uint32_t)floor(d);
     printf("Film 2 pal : %lu\n",(unsigned long int)_length);
