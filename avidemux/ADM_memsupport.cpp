@@ -119,11 +119,8 @@ void *av_malloc(unsigned int size)
  * identical to malloc(size). If size is zero, it is identical to
  * free(ptr) and NULL is returned.  
  */
-void *av_realloc(void *ptr, unsigned int newsize)
-{
-	return ADM_realloc(ptr,newsize);
-}
-void *ADM_realloc(void *ptr, unsigned int newsize)
+
+void *ADM_realloc(void *ptr, size_t newsize)
 {
   void *nalloc;
     
@@ -158,7 +155,10 @@ void *ADM_realloc(void *ptr, unsigned int newsize)
 	ADM_dealloc(ptr);
 	return nalloc;
 }
-
+void *av_realloc(void *ptr, unsigned int newsize)
+{
+	return ADM_realloc(ptr,newsize);
+}
 /* NOTE: ptr = NULL is explicetly allowed */
 void av_free(void *ptr)
 {
