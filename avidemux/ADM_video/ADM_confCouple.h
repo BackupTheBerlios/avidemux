@@ -33,21 +33,21 @@ class CONFcouple
 			char 		**value;
 			uint8_t	cur;
 
-			int32_t lookupName(char *myname);
+			int32_t lookupName(const char *myname);
 	public:
 			CONFcouple(uint32_t nb);
 			~CONFcouple();
-			uint8_t setCouple(char *name,uint32_t value);
-			uint8_t setCouple(char *name,int32_t value);
-			uint8_t setCouple(char *name,char *value);
-			uint8_t setCouple(char *name,double value);
-			uint8_t setCouple(char *name,float value);
+			uint8_t setCouple(const char *name,uint32_t value);
+			uint8_t setCouple(const char *name,int32_t value);
+			uint8_t setCouple(const char *name,const char *value);
+			uint8_t setCouple(const char *name,double value);
+			uint8_t setCouple(const char *name,float value);
 
-			uint8_t getCouple(char *name,int32_t *value);
-			uint8_t getCouple(char *name,uint32_t *value);
-			uint8_t getCouple(char *name,char **value);
-			uint8_t getCouple(char *name,double *value);
-			uint8_t getCouple(char *name,float *value);
+			uint8_t getCouple(const char *name,int32_t *value);
+			uint8_t getCouple(const char *name,uint32_t *value);
+			uint8_t getCouple(const char *name,char **value);
+			uint8_t getCouple(const char *name,double *value);
+			uint8_t getCouple(const char *name,float *value);
 			uint32_t getNumber(void) { return nb;};
 			uint8_t getEntry(uint32_t n, char **nm, char **val)
 				 { assert(n<nb); *nm=name[n];*val=value[n];return 1;};

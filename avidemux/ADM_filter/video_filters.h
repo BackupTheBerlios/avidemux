@@ -94,7 +94,7 @@
    typedef struct
    {
    		uint32_t nb;
-		char 	*param[20];
+		const char 	*param[20];
    }FILTER_PARAM;
    
   AVDMGenericVideoStream *getLastVideoFilter( uint32_t frameStart, uint32_t nbFrame);

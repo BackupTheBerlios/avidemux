@@ -58,7 +58,7 @@ CONFcouple::~CONFcouple()
 
 };
 
-uint8_t CONFcouple::setCouple(char *myname,uint32_t val)
+uint8_t CONFcouple::setCouple(const char *myname,uint32_t val)
 {
 	ADM_assert(cur<nb);
 
@@ -68,7 +68,7 @@ uint8_t CONFcouple::setCouple(char *myname,uint32_t val)
 	cur++;
 	return 1;
 }
-uint8_t CONFcouple::setCouple(char *myname,float val)
+uint8_t CONFcouple::setCouple(const char *myname,float val)
 {
 	ADM_assert(cur<nb);
 
@@ -78,7 +78,7 @@ uint8_t CONFcouple::setCouple(char *myname,float val)
 	cur++;
 	return 1;
 }
-uint8_t CONFcouple::setCouple(char *myname,double val)
+uint8_t CONFcouple::setCouple(const char *myname,double val)
 {
 	ADM_assert(cur<nb);
 
@@ -88,7 +88,7 @@ uint8_t CONFcouple::setCouple(char *myname,double val)
 	cur++;
 	return 1;
 }
-uint8_t CONFcouple::setCouple(char *myname,int32_t val)
+uint8_t CONFcouple::setCouple(const char *myname,int32_t val)
 {
 	ADM_assert(cur<nb);
 
@@ -98,7 +98,7 @@ uint8_t CONFcouple::setCouple(char *myname,int32_t val)
 	cur++;
 	return 1;
 }
-uint8_t CONFcouple::setCouple(char *myname,char *val)
+uint8_t CONFcouple::setCouple(const char *myname,const char *val)
 {
 	ADM_assert(cur<nb);
 
@@ -109,7 +109,7 @@ uint8_t CONFcouple::setCouple(char *myname,char *val)
 }
 
 
-uint8_t CONFcouple::getCouple(char *myname,uint32_t *val)
+uint8_t CONFcouple::getCouple(const char *myname,uint32_t *val)
 {
 	int32_t index=lookupName(myname);
 
@@ -118,7 +118,7 @@ uint8_t CONFcouple::getCouple(char *myname,uint32_t *val)
 	*val=(int)atoi(value[index]);
 	return 1;
 }
-uint8_t CONFcouple::getCouple(char *myname,int32_t *val)
+uint8_t CONFcouple::getCouple(const char *myname,int32_t *val)
 {
 	int32_t index=lookupName(myname);
 
@@ -127,7 +127,7 @@ uint8_t CONFcouple::getCouple(char *myname,int32_t *val)
 	*val=(int)atoi(value[index]);
 	return 1;
 }
-uint8_t CONFcouple::getCouple(char *myname,char **val)
+uint8_t CONFcouple::getCouple(const char *myname,char **val)
 {
 	int32_t index=lookupName(myname);
 
@@ -136,7 +136,7 @@ uint8_t CONFcouple::getCouple(char *myname,char **val)
 	*val=value[index];
 	return 1;
 }
-uint8_t CONFcouple::getCouple(char *myname,float *val)
+uint8_t CONFcouple::getCouple(const char *myname,float *val)
 {
 int32_t index=lookupName(myname);
 
@@ -145,7 +145,7 @@ int32_t index=lookupName(myname);
 	sscanf(value[index],"%f",val);;
 	return 1;
 }
-uint8_t CONFcouple::getCouple(char *myname,double *val)
+uint8_t CONFcouple::getCouple(const char *myname,double *val)
 {
 	int32_t index=lookupName(myname);
 
@@ -155,7 +155,7 @@ uint8_t CONFcouple::getCouple(char *myname,double *val)
 	return 1;
 }
 
-int32_t CONFcouple::lookupName(char *myname)
+int32_t CONFcouple::lookupName(const char *myname)
 {
 	for(uint32_t i=0;i<nb;i++)
 	{
