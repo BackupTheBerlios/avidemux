@@ -35,7 +35,8 @@ class Mpeg2enc: public encoder
                   virtual    uint8_t stopEncoder(void );
 		  virtual	uint8_t init(uint32_t a, uint32_t b) {return 1;};
                   virtual 	uint8_t init(  uint32_t qz, uint32_t maxbr, uint32_t fps1000,
-									uint8_t interlaced, uint8_t bff, uint8_t wide); // WLA
+						uint8_t interlaced, uint8_t bff, uint8_t wide,
+						uint8_t fast); // WLA
 
                   virtual    uint8_t  getResult( void *ress);
 		  virtual	uint8_t setQuantize( uint32_t quant) {return 0;};;
@@ -62,7 +63,8 @@ class Mpeg2encVCD: public Mpeg2enc
           			Mpeg2encVCD(uint32_t width,uint32_t height);
 				  virtual	uint8_t setQuantize( uint32_t quant) {return 0;};
     				virtual 	uint8_t init(  uint32_t qz, uint32_t maxbr, uint32_t fps1000,
-									uint8_t interlaced, uint8_t bff, uint8_t wide); // WLA
+									uint8_t interlaced, uint8_t bff, uint8_t wide,
+									uint8_t fast); // WLA
 
      };
 class Mpeg2encSVCD: public Mpeg2enc
@@ -73,7 +75,8 @@ class Mpeg2encSVCD: public Mpeg2enc
           public :
           			Mpeg2encSVCD(uint32_t width,uint32_t height);
   				virtual 	uint8_t init( uint32_t qz, uint32_t maxbr, uint32_t fps1000,
-									uint8_t interlaced, uint8_t bff, uint8_t wide); // WLA
+									uint8_t interlaced, uint8_t bff, uint8_t wide,
+									uint8_t fast); // WLA
 				  virtual	uint8_t setQuantize( uint32_t quant);
      };
 class Mpeg2encDVD: public Mpeg2enc
@@ -84,7 +87,8 @@ class Mpeg2encDVD: public Mpeg2enc
           public :
           			Mpeg2encDVD(uint32_t width,uint32_t height);
   				virtual 	uint8_t init( uint32_t qz, uint32_t maxbr, uint32_t fps1000,
-									uint8_t interlaced, uint8_t bff, uint8_t wide); // WLA
+									uint8_t interlaced, uint8_t bff, uint8_t wide,
+									uint8_t fast); // WLA
 				virtual	uint8_t setQuantize( uint32_t quant);
      };
 

@@ -92,7 +92,7 @@ Mpeg2enc::~Mpeg2enc()
 ---------------------------------------------------------
 */
 uint8_t Mpeg2enc::init(  uint32_t qz, uint32_t maxbr, uint32_t fps1000,
-									uint8_t interlaced, uint8_t bff, uint8_t wide) // WLA
+			uint8_t interlaced, uint8_t bff, uint8_t wide,uint8_t fast) // WLA
 {
 		if(!wide)
 			_settings.aspect_ratio=MPG_4_3;
@@ -162,7 +162,7 @@ Mpeg2encSVCD::Mpeg2encSVCD( uint32_t width,uint32_t height) : Mpeg2enc(width,hei
 		_settings.seq_length_limit=790;
 }
 uint8_t Mpeg2encVCD::init(  uint32_t qz, uint32_t maxbr, uint32_t fps1000,
-									uint8_t interlaced, uint8_t bff, uint8_t wide) // WLA
+			uint8_t interlaced, uint8_t bff, uint8_t wide,uint8_t fast) // WLA
 {
 		if(!wide)
 			_settings.aspect_ratio=MPG_4_3;
@@ -174,7 +174,9 @@ uint8_t Mpeg2encVCD::init(  uint32_t qz, uint32_t maxbr, uint32_t fps1000,
 
 
 }
-uint8_t Mpeg2encSVCD::init( uint32_t qz, uint32_t maxbr ,uint32_t fps1000,									uint8_t interlaced, uint8_t bff, uint8_t wide) // WLA
+uint8_t Mpeg2encSVCD::init( uint32_t qz, uint32_t maxbr ,uint32_t fps1000,
+			uint8_t interlaced, uint8_t bff, uint8_t wide,
+			uint8_t fast) // WLA
 {
 		if(!wide)
 			_settings.aspect_ratio=MPG_4_3;
@@ -200,6 +202,11 @@ uint8_t Mpeg2encSVCD::init( uint32_t qz, uint32_t maxbr ,uint32_t fps1000,						
 		}
 		_settings.quant=qz;
 		mpeg2_running=1;
+		if(fast)
+		{
+			_settings._44_red=_settings._22_red=4;	// Turbo pass 1
+		}
+		
 #ifdef TEST_NOB		
 		_settings.Bgrp_size=1;
 #endif		
@@ -219,7 +226,8 @@ Mpeg2encDVD::Mpeg2encDVD( uint32_t width,uint32_t height) : Mpeg2enc(width,heigh
 		_settings.format=9;
 }
 uint8_t Mpeg2encDVD::init( uint32_t qz, uint32_t maxbr ,uint32_t fps1000
-				,uint8_t interlaced, uint8_t bff, uint8_t wide) // WLA
+				,uint8_t interlaced, uint8_t bff, uint8_t wide,
+				uint8_t fast) // WLA
 {
 		if(!wide)
 			_settings.aspect_ratio=MPG_4_3;
@@ -245,6 +253,10 @@ uint8_t Mpeg2encDVD::init( uint32_t qz, uint32_t maxbr ,uint32_t fps1000
 		
 		//printf("Dvd bt: %lu\n",maxbr);
 		_settings.quant=qz;
+		if(fast)
+		{
+			_settings._44_red=_settings._22_red=4;	// Turbo pass 1
+		}
 		mpeg2_running=1;
 		return (uint8_t ) mpegenc_init(&_settings,(int) _w, (int)_h, (int) fps1000);
 

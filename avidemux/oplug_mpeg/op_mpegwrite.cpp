@@ -336,7 +336,7 @@ DIA_encoding		*encoding;
 					Mpeg2encVCD *dec;
 					dec=new Mpeg2encVCD(_w,_h);
 //					dec->init(1,0,_fps1000,interlaced,widescreen);
-					dec->init(1,0,_fps1000,interlaced,bff,widescreen); // WLA
+					dec->init(1,0,_fps1000,interlaced,bff,widescreen,0); // WLA
 					_codec=dec;
 					}
 					break;
@@ -346,7 +346,7 @@ DIA_encoding		*encoding;
 					dec=new Mpeg2encSVCD(_w,_h);
 					dec->setMatrix(matrix);
 //					dec->init(qz,bitrate,_fps1000,interlaced,widescreen);
-					dec->init(qz,bitrate,_fps1000,interlaced,bff,widescreen); 
+					dec->init(qz,bitrate,_fps1000,interlaced,bff,widescreen,0); 
 					// WLA
 					_codec=dec;
 					encoding->setCodec("SVCD.");
@@ -359,7 +359,7 @@ DIA_encoding		*encoding;
 					dec=new Mpeg2encDVD(_w,_h);
 					dec->setMatrix(matrix);
 //					dec->init(qz,bitrate,_fps1000,interlaced,widescreen);
-					dec->init(qz,bitrate,_fps1000,interlaced,bff,widescreen); 
+					dec->init(qz,bitrate,_fps1000,interlaced,bff,widescreen,0); 
 					// WLA
 					_codec=dec;
 					encoding->setCodec("DVD.");
@@ -579,10 +579,10 @@ int intra,q;
 				dec->disablePadding();	
 				//dec->init(qz,bitrate,_fps1000,interlaced,widescreen);	
 //				dec->init(0,avg*1000,_fps1000,interlaced,widescreen);
-				dec->init(0,avg*1000,_fps1000,interlaced,bff,widescreen); // WLA
+				dec->init(0,avg*1000,_fps1000,interlaced,bff,widescreen,1); // WLA
 #else
 //				dec->init(q,0,_fps1000,interlaced,widescreen);
-				dec->init(q,0,_fps1000,interlaced,bff,widescreen); // WLA
+				dec->init(q,0,_fps1000,interlaced,bff,widescreen,1); // WLA
 #endif						
 				 // 6 Megabits should be enough
 				//dec->init(0,avg,_fps1000); // 6 Megabits should be enough
@@ -599,10 +599,10 @@ int intra,q;
 #ifdef ADM_1PASS_CBR
 				dec->disablePadding();
 //						dec->init(0,avg*1000,_fps1000,interlaced,widescreen);
-				dec->init(0,avg*1000,_fps1000,interlaced,bff,widescreen); // WLA
+				dec->init(0,avg*1000,_fps1000,interlaced,bff,widescreen,1); // WLA
 #else						
 //				dec->init(q,0,_fps1000,interlaced,widescreen);
-				dec->init(q,0,_fps1000,interlaced,bff,widescreen); // WLA
+				dec->init(q,0,_fps1000,interlaced,bff,widescreen,1); // WLA
 #endif						
 				_codec=dec;
 				encoding->setCodec("DVD");;
@@ -797,7 +797,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 				dec=new Mpeg2encSVCD(_w,_h);
 				dec->setMatrix(matrix);
 //				dec->init(q,bitrate,_fps1000,interlaced,widescreen);
-				dec->init(q,bitrate,_fps1000,interlaced,bff,widescreen); // WLA
+				dec->init(q,bitrate,_fps1000,interlaced,bff,widescreen,0); // WLA
 				_codec=dec;
 				encoding->setCodec("SVCD");
 				printf("Svcd  max bitrate : %d\n",bitrate);
@@ -809,7 +809,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 				dec=new Mpeg2encDVD(_w,_h);
 				dec->setMatrix(matrix);
 //			dec->init(q,bitrate,_fps1000,interlaced,widescreen);
-				dec->init(q,bitrate,_fps1000,interlaced,bff,widescreen); // WLA
+				dec->init(q,bitrate,_fps1000,interlaced,bff,widescreen,0); // WLA
 				_codec=dec;
 				printf("DVD  max bitrate : %d\n",bitrate);
 				encoding->setCodec("DVD");

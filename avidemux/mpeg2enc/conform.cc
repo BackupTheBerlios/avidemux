@@ -277,10 +277,10 @@ void profile_and_level_checks(void)
 	  /* Table 8-12 */
   
     }      
-
+/* MEANX
 if (opt->bit_rate> 1.0e6 * maxval->opt_bit_rate)
     mjpeg_error_exit1("Bit rate is greater than permitted in specified Level");
-
+*/
   /* Table 8-13 */
   if (opt->vbv_buffer_code > maxval->vbv_buffer_size)
     mjpeg_error_exit1("vbv_buffer_size exceeds High Level limit");
