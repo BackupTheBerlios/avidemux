@@ -97,7 +97,8 @@ void *av_realloc(void *ptr, unsigned int size)
 /* NOTE: ptr = NULL is explicetly allowed */
 void av_free(void *ptr)
 {
-	ADM_dealloc(ptr);  
+	if(ptr)
+		ADM_dealloc(ptr);  
 }
 
 
