@@ -24,8 +24,8 @@
 #include <math.h>
 #ifndef CYG_MANGLING
 #include <unistd.h>
-#include <gtk/gtk.h>
 #endif
+#include <gtk/gtk.h>
 #include <ctype.h>
 #include <sys/time.h>
 

@@ -17,16 +17,19 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
+#include "config.h"
 #include <stdlib.h>
 #include <glib.h>
 #include <signal.h>
+#ifndef CYG_MANGLING
 #include <unistd.h>
+#endif
 #include <math.h>
 #include "config.h"
 
 #include <gtk/gtk.h>
 
-#include "config.h"
 
 #include "interface.h"
 #include "support.h"

@@ -17,7 +17,7 @@
 
 #ifndef __TOOLKIT__
 #define __TOOLKIT__
-
+#include "time.h"
 void 		PathSplit(char *str, char **root, char **ext);
 void			PathStripName(char *str);
 char 		*PathCanonize(const char *tmpname);

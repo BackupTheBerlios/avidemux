@@ -16,15 +16,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <gtk/gtk.h>
 
-#include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
-
-#include "config.h"
+#ifndef CYG_MANGLING
+	#include <unistd.h>
+#endif
 
 #include "avi_vars.h"
 #include "toolkit.hxx"
