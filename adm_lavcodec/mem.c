@@ -22,6 +22,7 @@
  * default memory allocator for libavcodec.
  */
  
+#if 0 //MEANX 
 #include "avcodec.h"
 
 /* here we can use OS dependant allocation functions */
@@ -116,3 +117,4 @@ void av_free(void *ptr)
 #endif
 }
 
+#endif //MEANX
