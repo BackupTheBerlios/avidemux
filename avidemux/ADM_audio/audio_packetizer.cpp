@@ -58,7 +58,7 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 	while(instock<MINSTOCK)
 	{
 		rd=read(MINSTOCK,&packetBuffer[packetTail]);
-		if(rd!=MINUS_ONE)
+		if(rd)
 		{
 			 instock+=rd;
 			 packetTail+=rd;
@@ -66,9 +66,14 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 		else
 		{
 			printf("**PKTZ:READ ERROR\n");
+			break;
 		}
 	}
-			
+	if(!instock)
+	{
+		printf("Pkt : incoming buffer empty\n");
+		return 0;
+	}
 	switch(_wavheader->encoding)
 	{
 		case WAV_MP2:

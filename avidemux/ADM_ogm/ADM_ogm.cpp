@@ -324,8 +324,8 @@ double fps;
               memset( &_video_bih,0,sizeof(_video_bih));
                _video_bih.biBitCount=24;
 
-              _videostream.fccHandler=fourcc;
-              _video_bih.biCompression=0;
+              
+              _video_bih.biCompression=_videostream.fccHandler=fourcc;
 
               _videostream.dwLength= _mainaviheader.dwTotalFrames=1; // ??
                _videostream.dwInitialFrames= 0;

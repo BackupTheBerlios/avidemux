@@ -225,7 +225,7 @@ uint32_t i;
 	if(ssize<lenbyte)
 	{
 		printf("Oops:ssize %lu, lenbyte %d\n",ssize,lenbyte);
-		return MINUS_ONE;
+		return 0;
 		
 	}
 	ssize-=lenbyte;
