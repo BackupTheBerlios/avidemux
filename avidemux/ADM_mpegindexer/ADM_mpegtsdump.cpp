@@ -169,10 +169,32 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 		}
 	
 	printf("Program stream");
-	// check for ac3 ,  i.e track 0
-		
-		for(uint32_t i=0;i<8;i++)
-		{			
+	// First we do a quick pick to find what is present in the stream
+	//
+	ADM_mpegDemuxerProgramStream *parser;
+	uint8_t id;
+	
+	parser=new ADM_mpegDemuxerProgramStream(0xE0,0xFF);
+	if(!parser->open(name)) 
+	{
+		delete parser;
+		return 0;
+	}
+	
+	uint32_t count=5000; // =~ 10 Mbytes scanned
+	while(count>0)
+	{
+		if(!parser->peekPacket(&id)) break;
+		if(id>=0xC0 && id<=0xc7) audioTrack[id-0xC0].presence=1;
+		if(id>=0xA0 && id<=0xA7) audioTrack[id-0xA0+16].presence=1;
+		if(id<=0x7) audioTrack[id+8].presence=1;
+		count--;
+	}
+	delete parser;
+	// Then we do get more info on the present stream(s)
+	for(uint32_t i=0;i<8;i++)
+		{		
+			if(audioTrack[i+8].presence)	
 			if(tryAudioTrack(name,i,&pts))
 			{
 				printf("AC3 %d is present\n",i);
@@ -183,6 +205,7 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 								&audioTrack[i+8].bitrate);
 				nbAC3++;
 			}
+			if(audioTrack[i].presence)
 			if(tryAudioTrack(name,0xc0+i,&pts))
 			{	
 				printf("Mpeg %d is present \n",i);
@@ -190,6 +213,7 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 				audioTrack[i].shift=pts;
 				nbMpeg++;
 			}
+			if(audioTrack[i+16].presence)
 			if(tryAudioTrack(name,0xA0+i,&pts))
 			{
 				printf("LPCM %d is present \n",i);
@@ -198,6 +222,7 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 				nbLPCM++;
 			}
 		}
+		
 		printf("Found %d ac3  tracks\n",nbAC3);
 		printf("Found %d mpg  tracks\n",nbMpeg);
 		printf("Found %d lpcm tracks\n",nbLPCM);
@@ -206,7 +231,8 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 				printf("could not find audio track\n");	
 				return 0;
 			}
-	}		
+
+	}	
 	return 1;
 }
 //

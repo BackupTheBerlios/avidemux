@@ -57,5 +57,6 @@
              virtual uint32_t			getOtherSize(void) { return _otherLen;};  
                               virtual void dump( void ) ;
 	     virtual int32_t 	getPTSDelta( void ) ;
+	     uint8_t  		peekPacket(uint8_t *sid);
 	};
 

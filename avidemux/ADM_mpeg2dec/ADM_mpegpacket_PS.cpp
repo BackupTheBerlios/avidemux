@@ -264,6 +264,42 @@ uint8_t ADM_mpegDemuxerProgramStream::forward(uint32_t f)
 		return 1;
 		
 }
+uint8_t  ADM_mpegDemuxerProgramStream::peekPacket(uint8_t *sid)
+{
+uint8_t stream,subid;
+uint32_t pts,len;
+*sid=0xff;
+
+while(1)
+{
+	if(!parser->sync(&stream)) return 0;
+	if(stream==0xE0 || stream==0xC0 || stream==PRIVATE_STREAM_1)
+	{		
+		len=  _skipPacketHeader(stream,&subid,&pts);
+		if(!len)
+		{
+			printf("+");
+			continue;
+		}
+		parser->forward(len);
+		if(stream==PRIVATE_STREAM_1)
+		{
+			*sid=subid;
+			return 1;
+		}
+		if(stream>=0xE0 && stream<=0xEF)
+		{
+			*sid=stream;
+			return 1;
+		}
+		if(stream>=0xC0 && stream<=0xCF)
+		{
+			*sid=stream;
+			return 1;
+		}	
+	}
+}
+}
 //	
 //  		Search the next packet
 //
@@ -510,7 +546,7 @@ uint8_t align=0;
 //			printf("\n ___syncpos : %lx",pos);
 						
 					
-		  size=parser->read16i();
+			size=parser->read16i();
 			if((sid==0xbe) || (sid==PRIVATE_STREAM_2)
 			||(size==SYSTEM_START_CODE)
 			) // special case, no header
