@@ -83,6 +83,10 @@ uint8_t mParser::open( char *filename )
 		{ decimals++; }
 	decimals--;
 
+        // Nuv files can have 20 decimals
+        // Keep it down to 10000
+        if(decimals>4) decimals=4;
+        
 	// no number sequence
 	if( decimals == 0 )
 	{
