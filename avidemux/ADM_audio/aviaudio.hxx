@@ -63,7 +63,8 @@ typedef struct
 #define WAV_MP2 	80
 #define WAV_WMA 	353
 #define WAV_PCM 	1
-#define WAV_LPCM 	2
+#define WAV_MSADPCM 	2
+#define WAV_LPCM 	3
 #define WAV_AC3 	0x2000
 #define WAV_OGG 0x676f
 #define WAV_8BITS 	53 // dummy id

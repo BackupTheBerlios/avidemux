@@ -450,12 +450,16 @@ TryAgain:
 								// can only unpack avi
 								if(!count && type==AVI_FileType)
 								{
+									if(GUI_Question("It looks like Vop packed divx.\nDo you want me to unpack it ?"))
+									{
 									OpenDMLHeader *dml=NULL;
 									count++;	
 									dml=(OpenDMLHeader *)vid->_aviheader;
 									// Can we repack it ?
 									if(dml->unpackPacked())	
 										goto TryAgain;
+									GUI_Alert("Could not unpack it\n, using backup decoder= not frame accurate.");
+									}
 								}
 #if  1 //def USE_DIVX
 

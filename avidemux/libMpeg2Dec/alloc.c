@@ -31,6 +31,7 @@ static int (* free_hook) (void * buf) = NULL;
 
 void * mpeg2_malloc (unsigned size, mpeg2_alloc_t reason)
 {
+
     char * buf;
 
     if (malloc_hook) {
@@ -51,15 +52,20 @@ void * mpeg2_malloc (unsigned size, mpeg2_alloc_t reason)
 	}
     }
     return NULL;
+    
+    //return memalign(64,size+64);
 }
 
 void mpeg2_free (void * buf)
 {
+
     if (free_hook && free_hook (buf))
 	return;
 
     if (buf)
 	free (*(((void **)buf) - 1));
+	
+	//free(buf);
 }
 
 void mpeg2_malloc_hooks (void * malloc (unsigned, mpeg2_alloc_t),
