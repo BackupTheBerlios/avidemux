@@ -35,10 +35,12 @@
  static GtkWidget	*create_dialogAudio (void);
  
  int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
-  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv);
+  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv,
+			 CHANNELCONV *channel);
 			 
   int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
-  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv)
+  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv,
+			 CHANNELCONV *channel)
   {
   GtkWidget *dialog;
   gint result;
@@ -74,6 +76,14 @@
 		case FILMCONV_PAL2FILM:		RADIO_SET(radiobutton_fpsPAL,1);break;
 		default:ADM_assert(0);
 	}
+	switch(*channel)
+	{	
+		case CHANNELCONV_NONE:		RADIO_SET(radiobutton_2to2,1);break;
+		case CHANNELCONV_2to1:		RADIO_SET(radiobutton2to1,1);break;
+		case CHANNELCONV_1to2:		RADIO_SET(radiobutton1to2,1);break;
+		default:ADM_assert(0);
+	}
+	
 	result=gtk_dialog_run(GTK_DIALOG(dialog));
 			
 	switch(result)
@@ -104,6 +114,14 @@
 							*filmconv=FILMCONV_PAL2FILM; 
 							else
 								ADM_assert(0);
+								
+					if(RADIO_GET(radiobutton2to1)) *channel=CHANNELCONV_2to1;
+					else if(RADIO_GET(radiobutton1to2)) 
+						*channel=CHANNELCONV_1to2;
+						else if(RADIO_GET(radiobutton_2to2))
+							*channel=CHANNELCONV_NONE; 
+							else
+								ADM_assert(0);			
 					
 					break;
 		default:
@@ -122,11 +140,14 @@ create_dialogAudio (void)
   GtkWidget *dialogAudio;
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox3;
+  GtkWidget *frame3;
+  GtkWidget *vbox6;
   GtkWidget *checkbuttonNormalize;
   GtkWidget *checkbuttonDRC;
-  GtkWidget *hbox1;
+  GtkWidget *hbox3;
   GtkWidget *checkbuttonTimeShift;
   GtkWidget *entryTimeshift;
+  GtkWidget *label5;
   GtkWidget *frame1;
   GtkWidget *vbox4;
   GtkWidget *radiobuttonNone;
@@ -143,6 +164,13 @@ create_dialogAudio (void)
   GtkWidget *radiobutton_fpsfilm;
   GtkWidget *radiobutton_fpsPAL;
   GtkWidget *label4;
+  GtkWidget *frame4;
+  GtkWidget *vbox7;
+  GtkWidget *radiobutton_2to2;
+  GSList *radiobutton_2to2_group = NULL;
+  GtkWidget *radiobutton2to1;
+  GtkWidget *radiobutton1to2;
+  GtkWidget *label6;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
@@ -157,30 +185,44 @@ create_dialogAudio (void)
   gtk_widget_show (vbox3);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox3, TRUE, TRUE, 0);
 
+  frame3 = gtk_frame_new (NULL);
+  gtk_widget_show (frame3);
+  gtk_box_pack_start (GTK_BOX (vbox3), frame3, FALSE, FALSE, 0);
+
+  vbox6 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox6);
+  gtk_container_add (GTK_CONTAINER (frame3), vbox6);
+
   checkbuttonNormalize = gtk_check_button_new_with_mnemonic (_("Normalize"));
   gtk_widget_show (checkbuttonNormalize);
-  gtk_box_pack_start (GTK_BOX (vbox3), checkbuttonNormalize, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox6), checkbuttonNormalize, FALSE, FALSE, 0);
 
   checkbuttonDRC = gtk_check_button_new_with_mnemonic (_("DRC"));
   gtk_widget_show (checkbuttonDRC);
-  gtk_box_pack_start (GTK_BOX (vbox3), checkbuttonDRC, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox6), checkbuttonDRC, FALSE, FALSE, 0);
 
-  hbox1 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox1);
-  gtk_box_pack_start (GTK_BOX (vbox3), hbox1, TRUE, TRUE, 0);
+  hbox3 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox3);
+  gtk_box_pack_start (GTK_BOX (vbox6), hbox3, TRUE, TRUE, 0);
 
   checkbuttonTimeShift = gtk_check_button_new_with_mnemonic (_("Timeshift"));
   gtk_widget_show (checkbuttonTimeShift);
-  gtk_box_pack_start (GTK_BOX (hbox1), checkbuttonTimeShift, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox3), checkbuttonTimeShift, FALSE, FALSE, 0);
 
   entryTimeshift = gtk_entry_new ();
   gtk_widget_show (entryTimeshift);
-  gtk_box_pack_start (GTK_BOX (hbox1), entryTimeshift, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox3), entryTimeshift, TRUE, TRUE, 0);
   gtk_entry_set_max_length (GTK_ENTRY (entryTimeshift), 5);
+
+  label5 = gtk_label_new (_("<b>Misc</b>"));
+  gtk_widget_show (label5);
+  gtk_frame_set_label_widget (GTK_FRAME (frame3), label5);
+  gtk_label_set_use_markup (GTK_LABEL (label5), TRUE);
+  gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
 
   frame1 = gtk_frame_new (NULL);
   gtk_widget_show (frame1);
-  gtk_box_pack_start (GTK_BOX (vbox3), frame1, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox3), frame1, FALSE, FALSE, 0);
 
   vbox4 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox4);
@@ -212,9 +254,11 @@ create_dialogAudio (void)
   gtk_widget_show (entryFrequency);
   gtk_box_pack_start (GTK_BOX (hbox2), entryFrequency, TRUE, TRUE, 0);
 
-  label3 = gtk_label_new (_("Resampling"));
+  label3 = gtk_label_new (_("<b>Resampling</b>"));
   gtk_widget_show (label3);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label3);
+  gtk_label_set_use_markup (GTK_LABEL (label3), TRUE);
+  gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
 
   frame2 = gtk_frame_new (NULL);
   gtk_widget_show (frame2);
@@ -242,9 +286,43 @@ create_dialogAudio (void)
   gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton_fpsPAL), radiobutton_fpsnone_group);
   radiobutton_fpsnone_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton_fpsPAL));
 
-  label4 = gtk_label_new (_("Fps convert"));
+  label4 = gtk_label_new (_("<b>Fps convert</b>"));
   gtk_widget_show (label4);
   gtk_frame_set_label_widget (GTK_FRAME (frame2), label4);
+  gtk_label_set_use_markup (GTK_LABEL (label4), TRUE);
+  gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
+
+  frame4 = gtk_frame_new (NULL);
+  gtk_widget_show (frame4);
+  gtk_box_pack_start (GTK_BOX (vbox3), frame4, TRUE, TRUE, 0);
+
+  vbox7 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox7);
+  gtk_container_add (GTK_CONTAINER (frame4), vbox7);
+
+  radiobutton_2to2 = gtk_radio_button_new_with_mnemonic (NULL, _("None"));
+  gtk_widget_show (radiobutton_2to2);
+  gtk_box_pack_start (GTK_BOX (vbox7), radiobutton_2to2, FALSE, FALSE, 0);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton_2to2), radiobutton_2to2_group);
+  radiobutton_2to2_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton_2to2));
+
+  radiobutton2to1 = gtk_radio_button_new_with_mnemonic (NULL, _("Stereo to Mono"));
+  gtk_widget_show (radiobutton2to1);
+  gtk_box_pack_start (GTK_BOX (vbox7), radiobutton2to1, FALSE, FALSE, 0);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton2to1), radiobutton_2to2_group);
+  radiobutton_2to2_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton2to1));
+
+  radiobutton1to2 = gtk_radio_button_new_with_mnemonic (NULL, _("Mono to Stereo"));
+  gtk_widget_show (radiobutton1to2);
+  gtk_box_pack_start (GTK_BOX (vbox7), radiobutton1to2, FALSE, FALSE, 0);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton1to2), radiobutton_2to2_group);
+  radiobutton_2to2_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton1to2));
+
+  label6 = gtk_label_new (_("<b>Channels</b>"));
+  gtk_widget_show (label6);
+  gtk_frame_set_label_widget (GTK_FRAME (frame4), label6);
+  gtk_label_set_use_markup (GTK_LABEL (label6), TRUE);
+  gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
 
   dialog_action_area1 = GTK_DIALOG (dialogAudio)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -264,11 +342,14 @@ create_dialogAudio (void)
   GLADE_HOOKUP_OBJECT_NO_REF (dialogAudio, dialogAudio, "dialogAudio");
   GLADE_HOOKUP_OBJECT_NO_REF (dialogAudio, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (dialogAudio, vbox3, "vbox3");
+  GLADE_HOOKUP_OBJECT (dialogAudio, frame3, "frame3");
+  GLADE_HOOKUP_OBJECT (dialogAudio, vbox6, "vbox6");
   GLADE_HOOKUP_OBJECT (dialogAudio, checkbuttonNormalize, "checkbuttonNormalize");
   GLADE_HOOKUP_OBJECT (dialogAudio, checkbuttonDRC, "checkbuttonDRC");
-  GLADE_HOOKUP_OBJECT (dialogAudio, hbox1, "hbox1");
+  GLADE_HOOKUP_OBJECT (dialogAudio, hbox3, "hbox3");
   GLADE_HOOKUP_OBJECT (dialogAudio, checkbuttonTimeShift, "checkbuttonTimeShift");
   GLADE_HOOKUP_OBJECT (dialogAudio, entryTimeshift, "entryTimeshift");
+  GLADE_HOOKUP_OBJECT (dialogAudio, label5, "label5");
   GLADE_HOOKUP_OBJECT (dialogAudio, frame1, "frame1");
   GLADE_HOOKUP_OBJECT (dialogAudio, vbox4, "vbox4");
   GLADE_HOOKUP_OBJECT (dialogAudio, radiobuttonNone, "radiobuttonNone");
@@ -283,6 +364,12 @@ create_dialogAudio (void)
   GLADE_HOOKUP_OBJECT (dialogAudio, radiobutton_fpsfilm, "radiobutton_fpsfilm");
   GLADE_HOOKUP_OBJECT (dialogAudio, radiobutton_fpsPAL, "radiobutton_fpsPAL");
   GLADE_HOOKUP_OBJECT (dialogAudio, label4, "label4");
+  GLADE_HOOKUP_OBJECT (dialogAudio, frame4, "frame4");
+  GLADE_HOOKUP_OBJECT (dialogAudio, vbox7, "vbox7");
+  GLADE_HOOKUP_OBJECT (dialogAudio, radiobutton_2to2, "radiobutton_2to2");
+  GLADE_HOOKUP_OBJECT (dialogAudio, radiobutton2to1, "radiobutton2to1");
+  GLADE_HOOKUP_OBJECT (dialogAudio, radiobutton1to2, "radiobutton1to2");
+  GLADE_HOOKUP_OBJECT (dialogAudio, label6, "label6");
   GLADE_HOOKUP_OBJECT_NO_REF (dialogAudio, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialogAudio, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialogAudio, okbutton1, "okbutton1");
