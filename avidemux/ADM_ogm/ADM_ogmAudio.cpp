@@ -330,8 +330,7 @@ OgAudioIndex *idx;
 	aprintf("Looking for %llu sample\n",val);
 	idx=_currentTrack->index;
 	for(uint32_t i=0;i<_currentTrack->nbAudioPacket;i++)
-	{
-		
+	{		
 		cur=idx[i].sampleCount;
 		if(cur>val)
 		{

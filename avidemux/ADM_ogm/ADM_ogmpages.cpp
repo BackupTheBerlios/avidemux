@@ -133,7 +133,7 @@ uint64_t seq;
 		//printf("seq:%x \n",seq);
 		uint64_t *ll;
 		ll=(uint64_t *)_page.abs_pos;		
-		printf("abs:%llx \n",*ll);
+		//printf("abs:%llx \n",*ll);
 		
 		//
 		//if(fourCC::check(_trackId,_page.serial)) // got it
