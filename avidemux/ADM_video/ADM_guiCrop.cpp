@@ -38,29 +38,8 @@
 
 #include "ADM_colorspace/colorspace.h"
 
-
-extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
-
-static void 				gui_ko(GtkButton * button, gpointer user_data);
-static void 				gui_ok(GtkButton * button, gpointer user_data);
 extern  int 				DIA_getCropParams(	uint32_t *w,uint32_t 	*w2, uint32_t *h,uint32_t *h2,uint32_t tw,
 											uint32_t th,uint8_t *in);
-static GtkWidget  *create_dialog4 (void);
-static gboolean  			gui_draw(GtkWidget * widget,
-			     GdkEventExpose * event, gpointer user_data);
-static void gui_update(GtkButton * button, gpointer user_data);
-
-static int croplock;
-
-static   GtkWidget *entry_x, *entryy,*entry_x2,*entry_y2;
-static  GtkWidget *drawingarea9=NULL;;
-
-// Ugly !
-static uint32_t globalw=0,globalh=0;
-static uint8_t *globalvideo,*globalsource;
-
-static void gui_autocrop(GtkButton * button, gpointer user_data);
-
 uint8_t AVDMVideoStreamCrop::configure( AVDMGenericVideoStream *instream)
 
 {

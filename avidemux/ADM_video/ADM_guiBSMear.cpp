@@ -41,18 +41,52 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
 
+#include "ADM_colorspace/colorspace.h"
 
-extern uint8_t DIA_4entries(char *title,uint32_t *left,uint32_t *right,uint32_t *top,uint32_t *bottom);
+extern int DIA_getBSMearParams(uint32_t *w,uint32_t *w2,uint32_t *h,uint32_t *h2,uint32_t tw,uint32_t th,uint8_t *in);
 
 uint8_t AVDMVideoStreamBSMear::configure( AVDMGenericVideoStream *instream)
 {
 UNUSED_ARG(instream);
 
 CROP_PARAMS *par;
+uint32_t w,h,l,f;
+uint8_t ret=0;
+uint8_t *video1,*video2;
+
+	// Get info from previous filter
+	w=_in->getInfo()->width;
+	h= _in->getInfo()->height;
+	printf("\n AddBlackBorder in : %u  x %u\n",w,h);
+
+	video1=(uint8_t *)malloc(w*h*4);
+	assert(video1);
+	video2=(uint8_t *)malloc(w*h*4);   
+	assert(video2);
+
+	// ask current frame from previous filter
+	assert(instream->getFrameNumberNoAlloc(curframe, &l, video2,&f));
+
+	// From now we work in RGB !
+	COL_yv12rgb(w,h,video2,video1);
 
      	par=_param;
 
-	return ( DIA_4entries((char *)"Blacken Border",&par->cropx,&par->cropx2,&par->cropy,&par->cropy2));
+	switch(DIA_getBSMearParams(&par->cropx,&par->cropx2,&par->cropy,&par->cropy2,w,h,(uint8_t *)video1 )){
+		case 0:  printf("cancelled\n");
+		         break;
+		case 1:  _info.width=_in->getInfo()->width-_param->cropx-_param->cropx2;
+		         _info.height=_in->getInfo()->height-_param->cropy-_param->cropy2;
+		         ret=1;
+		         break;
+		default: assert(0);
+	}
+
+	free(video1);
+	free(video2);
+
+	return ret;
 
 }
+
 #endif

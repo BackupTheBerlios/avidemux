@@ -45,8 +45,6 @@
 #include "ADM_filter/vidVCD.h"
 #include "prefs.h"
 
-extern AVDMGenericVideoStream *addBorder_create(AVDMGenericVideoStream *in, void *param);
-
 //___________________________________________
 extern FILTER_ENTRY allfilters[MAX_FILTER];
 extern uint32_t nb_video_filter;
