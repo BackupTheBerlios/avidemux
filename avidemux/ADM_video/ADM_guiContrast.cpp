@@ -221,7 +221,7 @@ gui_update (GtkButton * button, gpointer user_data)
 
   buildContrastTable (par.coef, par.offset, tableluma, tablechroma);
 
-  memcpy (video2, aImage->data, sh * sw * 4);
+  memcpy (video2, aImage->data, (sh * sw * 3)>>1);
   if (par.doLuma)
     {
       doContrast (aImage->data, video2, tableluma, sw, sh);

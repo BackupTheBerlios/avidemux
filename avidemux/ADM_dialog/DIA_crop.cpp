@@ -128,7 +128,7 @@ int DIA_getCropParams(	char *name,uint32_t *w,uint32_t *w2, uint32_t *h,uint32_t
 	{
 
 		read(dialog);
-		memcpy(working,video,tw*th*4);
+		memcpy(working,video,(tw*th*3)>>1);
 		update(working, tw,th);
 		draw(dialog,tw,th);
 	}
