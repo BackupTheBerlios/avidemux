@@ -722,6 +722,25 @@ int intra,q;
 	return 1;
 }
 /*--------------------------------------------------------------------*/
+uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+void print_quant_stat(const char *n){
+  char *str = (char*)ADM_alloc( strlen(n) + 4 );
+  unsigned int i=2,sum=0,total=0;
+  FILE *fd;
+   ADM_assert( str );
+   strcpy(str,n);
+   strcat(str,".qs");
+   if( (fd=fopen(str,"wb")) ){
+      for(;i<32;i++){
+         fprintf(fd,"Quant % 2u: % 7u times\n",i,quantstat[i]);
+         sum+=i*quantstat[i];
+         total+=quantstat[i];
+      }
+      fprintf(fd,"\nQuant over all: %2.2f\n",(float)sum/(float)total);
+      fclose(fd);
+   }
+   ADM_dealloc( str );
+}
 uint8_t  mpegWritter::dopass2(char *name,char *statname,uint32_t final_size,uint32_t bitrate,
 				ADM_MPEGTYPE mpegtype,int matrix,uint8_t interlaced,
 					uint8_t bff,        // WLA
@@ -734,10 +753,6 @@ AVDMGenericVideoStream	*incoming;
 FILE			*fd=NULL;
 uint64_t		total_size=0;
 uint32_t		len,flags,type,outquant,audiolen;
-
-uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
-	#define PRINT_QUANT_STAT {unsigned int i=2,sum=0,total=0;for(;i<32;i++){printf("Quant % 2u: % 7u times\n",i,quantstat[i]);sum+=i*quantstat[i];total+=quantstat[i];}printf("\nQuant over all: %2.2f\n",(float)sum/(float)total);}
 
    	incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
 	if(!_audio)
@@ -876,7 +891,7 @@ uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 				
 		if(!encoding->isAlive())
 		{
-			 PRINT_QUANT_STAT
+			 print_quant_stat(name);
 			 end();
 			 fclose(fd);
 			 return 0;
@@ -935,7 +950,7 @@ uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 		_muxer=NULL;	
 	}
 
-	PRINT_QUANT_STAT
+	print_quant_stat(name);
 	 end();
 	return 1;
 }

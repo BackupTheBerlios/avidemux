@@ -144,7 +144,7 @@ void computeIT (int size, int nb, int brate, uint32_t * frame,
 		uint32_t * rsize);
 int ADM_saveRaw (char *name);
 static char * actual_workbench_file;
-static void A_saveWorkbench (char *name);
+void A_saveWorkbench (char *name);
 void updateLoaded (void);
 extern void encoderSetLogFile (char *name);
 extern void videoCodecSelect (void);

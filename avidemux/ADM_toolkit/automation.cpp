@@ -76,11 +76,9 @@ extern void videoCodecSelectByName(const char *name);
 extern int videoCodecConfigure(char *p,uint32_t i, uint8_t  *c);
 #include "oplug_mpeg/op_mpeg.h"
 extern void encoderSetLogFile(char *name)     ;
-extern void A_loadWorkbench(char *name)     ;
 extern void updateLoaded( void );
 extern void setPostProc(int v,int s);
 extern void HandleAction(Action action) ;
-static  void load_workbench(char *name);;
 static void call_buildtimemap( char *p);
 static void call_audioproc(char *p) ;
 static void call_videoproc(char *p) ;
@@ -90,6 +88,8 @@ static void setEnd(char *p)      ;
 //static void saveRawAudio(char *p)      ;
 static void call_normalize(char *p) ;
 static void call_resample(char *p) 	;
+static void call_mono2stereo(char *p);
+static void call_stereo2mono(char *p);
 static void call_downsample(char *p) 	;
 static void call_help(char *p) 	;
 static void call_setAudio(char *p) 	;
@@ -104,7 +104,6 @@ static void call_videoconf(char *p) ;
 static int searchReactionTable(char *string);
 static void call_setPP(char *v,char *s);
 static void call_toolame(char *p);
-extern void A_loadWorkbench( char *name);
 extern void updateLoaded(void );
 extern void A_requantize2( float percent, uint32_t quality, char *out_name );
 static void save(char*name);
@@ -117,6 +116,7 @@ extern uint8_t ogmSave(char *fd);
 static void set_autoindex(char *p);
 extern int A_SaveUnpackedVop( char *name);
 extern int A_saveDVDPS(char *name);
+extern void A_saveWorkbench (char *name);
 //
 static int call_bframe(void);
 static int call_packedvop(void);
@@ -155,6 +155,8 @@ AUTOMATON reaction_table[]=
 		{"audio-normalize",	0,"activate normalization",		call_normalize},
 		{"audio-downsample",	0,"activate 48->44 downsampling",	call_downsample},
 		{"audio-resample",	1,"resample to x hz",			call_resample},
+		{"audio-mono2stereo",	0,"channel: convert mono to stereo",	call_mono2stereo},
+		{"audio-stereo2mono",	0,"channel: convert stereo tp mono",	call_stereo2mono},
 		
 		{"video-process",	0,"activate video processing",		call_videoproc},	
 		{"filters",		1,"load a filter preset",		filterLoadXml}   ,
@@ -175,10 +177,11 @@ AUTOMATON reaction_table[]=
 		{"save-uncompressed-audio",1,"save uncompressed audio",A_saveAudioDecodedTest},
 		{"index-mpeg",		3,"create index of vob/mpeg : vob.vob index.index audio#",
 								((one_arg_type )call_indexMpeg)},
-                {"load",		1,"load video",		(one_arg_type )A_openAvi},
-                {"append",		1,"append video",	(one_arg_type)A_appendAvi},
-		{"load-workbench",	1,"load workbench file",	load_workbench},
-		{"save",		1,"save avi",		save},		
+		{"load",		1,"load video or workbench",		(one_arg_type )A_openAvi},
+		{"load-workbench",	1,"load workbench file",		(one_arg_type)A_openAvi},
+		{"append",		1,"append video",			(one_arg_type)A_appendAvi},
+		{"save",		1,"save avi",				save},		
+		{"save-workbench",	1,"save workbench file",		(one_arg_type)A_saveWorkbench},
 		
 		{"force-b-frame",	0,"Force detection of bframe in next loaded file", (one_arg_type)call_bframe},
 		{"force-unpack",	0,"Force detection of packed vop in next loaded file"
@@ -501,11 +504,6 @@ void call_requant(char *p, char *q, char *n)
 	i=atoi(q);
 	A_requantize2( f,i, n )	;
 }
-void load_workbench(char*name){
-   ADM_assert(name);
-   A_openAvi(name);
- //  updateLoaded();
-}
 
 void save(char*name)
 {
@@ -595,6 +593,14 @@ int set_output_format(const char *str){
 	rc = scriptOutputFormat(-1,&map);
 	ADM_dealloc( map.arg.string );
 	return(rc);
+}
+
+void call_mono2stereo(char *p){
+   audioFilterMono2Stereo(1);
+}
+
+void call_stereo2mono(char *p){
+   audioFilterStereo2Mono(1);
 }
 
 //EOF
