@@ -288,7 +288,7 @@ uint32_t extraLen=0;
 		  header->dwScale = 1;
 	  	  header->dwInitialFrames = 1;
     
-		  if (wav->blockalign ==1152)	// VBR audio
+		  if (stream->isVBR()) //wav->blockalign ==1152)	// VBR audio
 			{			// We do like nandub do
 		  	//ADM_assert (audiostream->asTimeTrack ());
 		  	wav->blockalign = 1152;	// just a try
@@ -304,21 +304,13 @@ uint32_t extraLen=0;
 		  	// use extended headers
 		  	//		
 		  	//
-#if 0			
-		  	double	    nb;
-		  	nb = stream->getLength ();
-		  	nb/= _videostream.dwLength;
-		  	// avg value of a block (i.e. a mpeg frame)
-		  	mp3vbr.nblocksize = (uint32_t) floor (nb);			
-		  	mp3vbr.nblocksize = R16(mp3vbr.nblocksize); 
-#else
-			mp3vbr.nblocksize=1152;
-#endif			
+			mp3vbr.nblocksize=1152;	
+			extra=(uint8_t *)&mp3vbr;
+			extraLen=sizeof(mp3vbr);
 		   }	
 		   else wav->blockalign=1;
 
-			extra=(uint8_t *)&mp3vbr;
-			extraLen=sizeof(mp3vbr);
+			
 
 			  break;
 	
