@@ -208,6 +208,9 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 		 f=f/total;
 		gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
+		sprintf(string,"Done : %02d%%",(int)(100*f));
+		   gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
+		
 		_lastFrame=nb;
 
 	   	UI_purge();
