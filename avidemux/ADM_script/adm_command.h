@@ -36,6 +36,7 @@ static const admCommand myCommands[]=
 	
 	{"savedvd",		scriptSaveDVD,1,APM_STRING},
 	{"save",		scriptSave,1,APM_STRING},
+	{"saveogm",		scriptSaveOgm,1,APM_STRING},
 	
 	
 	{"normalize",		scriptAudioNormalize,1,APM_NUM},

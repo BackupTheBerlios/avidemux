@@ -118,6 +118,7 @@ WAVHeader	*info=NULL;
 		if(!initVideo())
 		{
 			fclose(_fd);
+			_fd=NULL;
 			GUI_Alert("Troubles initializing video\n");
 			return 0;
 		
@@ -209,6 +210,7 @@ WAVHeader	*info=NULL;
 		//if(audioStream) audioStream->flush();
 		// ____________Close____________________
 		fclose(_fd);
+		_fd=NULL;
 
 	return !error;
 }

@@ -103,6 +103,7 @@ extern void show_info(char *p);
 extern const char *getStrFromAudioCodec( uint32_t codec);
 extern void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm, uint16_t * ss, uint16_t * ms);
 extern uint8_t ADM_aviSetSplitSize(uint32_t size);
+extern uint8_t ogmSave(char *fd);
 //_________________________________________________________________________
 
 extern uint8_t audioShift;
@@ -149,6 +150,7 @@ AUTOMATON reaction_table[]=
 		{"begin",		1,"set start frame",			setBegin},
 		{"end",			1,"set end frame",			setEnd},
 		
+		{"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
 		{"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
 		{"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	ADM_saveRaw},
 		{"save-uncompressed-audio",1,"save uncompressed audio",A_saveAudioDecodedTest},

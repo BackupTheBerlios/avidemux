@@ -31,7 +31,7 @@
 
 // put here the module you want to be verbose (MODULE_xxx + MODULE_yyyy+  ....)
 #ifndef masked
-#define masked  (0) //(MODULE_AUDIO_EDITOR) MODULE_OGM_AUDIO MODULE_REQUANT MODULE_CODEC
+#define masked  (0+MODULE_AUDIO_EDITOR) //(MODULE_AUDIO_EDITOR) MODULE_OGM_AUDIO MODULE_REQUANT MODULE_CODEC
 #endif
 
 // If the entitty is in masked we actually print the string

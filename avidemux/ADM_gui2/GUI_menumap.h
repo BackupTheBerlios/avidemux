@@ -30,6 +30,7 @@ CALLBACK(to_other1 				,ACT_Pipe2Other);
  CALLBACK(save_image1               		 ,ACT_SaveImg);
  CALLBACK(save_jpg_image1              		 ,ACT_SaveJPG);
  CALLBACK(save_selection_as_jpegs1		  ,ACT_SaveBunchJPG);
+ CALLBACK(save_as_ogm1				  ,ACT_SaveOGM);
 
  CALLBACK( play_video1         			,ACT_PlayAvi);
  CALLBACK( decoder_options1         		,ACT_DecoderOption);

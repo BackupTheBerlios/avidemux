@@ -71,6 +71,7 @@ int scriptSave(int n,Arg *args);
 int scriptLoadFilter(int n,Arg *args);
 int scriptAddVideoFilter(int n,Arg *args);
 int scriptRemoveFrame(int n,Arg *args);
+int scriptSaveOgm(int n, Arg *args);
 extern void HandleAction(Action act);
 //_________________________
 #include "adm_command.h" 
@@ -86,6 +87,14 @@ VF_FILTERS filter;
 		printf("Filter tag :%d\n",filter);
 		return (filterAddScript(filter,n,args));
 		
+}
+//___________________________
+extern int ogmSave(char *name);
+int scriptSaveOgm(int n,Arg *args)
+{
+char *a;
+		a=args[0].arg.string;
+		return ogmSave(a);
 }
 //___________________________
 extern int A_delete(uint32_t start, uint32_t end);
