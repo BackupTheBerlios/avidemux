@@ -77,9 +77,21 @@ uint8_t sdlAccelRender::init( GtkWidget * window, uint32_t w, uint32_t h)
 {
 int bpp;
 int flags;
-GdkWindow *win=NULL;
-Window sdl_win;
-Display *sdl_windisplay;
+
+	// Ask for the position of the drawing window at start
+	//_______________________________________________________
+	
+	disp.w=w;
+	disp.h=h;
+	disp.x=1;
+	disp.y=1;
+
+	/* Hack to get SDL to use GTK window, ugly but works */
+	{ char SDL_windowhack[32];
+		sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",
+			GDK_WINDOW_XWINDOW(window->window));
+		putenv(SDL_windowhack);
+	}
 
 	 if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) 
 	 {
@@ -98,20 +110,7 @@ Display *sdl_windisplay;
 	
 	}
 	
-	// Ask for the position of the drawing window at start
-	//_______________________________________________________
-	gint x,y;
-	win=  gtk_widget_get_parent_window(window);
-	gdk_window_get_position         (win,
-                                            &x,
-                                             &y);
-	sdl_win = GDK_WINDOW_XWINDOW(GTK_WIDGET(window)->window);
-	sdl_windisplay = GDK_WINDOW_XDISPLAY(win);
-	disp.w=w;
-	disp.h=h;
-	disp.x=1;
-	disp.y=1;
-	printf("Sdl win :%d %d\n",x,y);
+	
 	//_______________________________________________________
 	sdl_overlay=SDL_CreateYUVOverlay(w,h,
 #if defined(CONFIG_DARWIN) || defined(TEST_YU2)	
@@ -126,18 +125,32 @@ Display *sdl_windisplay;
 		printf("Cannot create SDL overlay\n");
 		return 0;
 	}
-	
-// 	sdl_overlay->planes=3;
-// 	sdl_overlay->pitches[0]=w;
-// 	sdl_overlay->pitches[1]=w>>1;
-// 	sdl_overlay->pitches[2]=w>>1;
-	// Put the window on top of the previous one
+#if 0	// Does not work...
+	// Put the window on top of the previous one	
 	SDL_SysWMinfo info;
-
-	SDL_VERSION(&info.version);
-	// FIXME : Does not work....
-	 //XMoveWindow(info.info.x11.display, info.info.x11.wmwindow,x,y);
-	
+	SDL_VERSION(&(info.version));
+    	if ( -1 == SDL_GetWMInfo(&info) ) 
+	{
+        	printf("Error getting WM info: %s\n", SDL_GetError());
+        	end();
+		return 0;
+    	}	
+	// 
+	 GdkWindow *gdkwin;
+	 Display *sdl_display;
+	 Window parent; 
+	 
+	  gdkwin = gtk_widget_get_parent_window(window);
+    	  sdl_display = GDK_WINDOW_XDISPLAY(gdkwin);
+	  
+    	  parent = GDK_WINDOW_XWINDOW(GTK_WIDGET(window)->window);
+	  //parent = GDK_WINDOW_XWINDOW(gdkwin);
+	                      
+          XReparentWindow(sdl_display,
+                        info.info.x11.wmwindow,
+                        parent,
+                        0,0);
+#endif		
 	printf("SDL_init ok, type is : %d,planes :%d\n",sdl_overlay->hw_overlay,sdl_overlay->planes);
 	return 1;
 }
