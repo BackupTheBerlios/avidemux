@@ -92,7 +92,7 @@ uint8_t DIA_videoCodec( SelectCodecType *codec )
 
 	uint8_t ret=0;
 	SelectCodecType old=*codec;
-	GtkWidget *widget[10];
+	GtkWidget *widget[sizeof(myTab)/sizeof(myVideoCodec)]; 
 	dialog=create_dialogVideoCodec();
 	//gtk_transient(dialog);	
 	gtk_register_dialog(dialog);
