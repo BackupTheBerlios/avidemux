@@ -3840,7 +3840,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 
 #else
 				if(mode & H_X1_FILTER)
-#ifdef HAVE_ALTIVEC
+#if 0 //&& definded( HAVE_ALTIVEC)
 				{ //MEANX
 					unsigned char __attribute__ ((aligned(16))) tempBlock[272];
 					transpose_16x8_char_toPackedAlign_altivec(tempBlock, dstBlock - 4 , stride);
@@ -3849,8 +3849,9 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 					//horizX1Filter_altivec(dstBlock-4, stride, QP);
 				}
 #else				
-					horizX1Filter(dstBlock-4, stride, QP);
-#endif					
+					horizX1Filter(dstBlock-4, stride, QP); // Faster than altivec version
+#endif //altivec
+
 				else if(mode & H_DEBLOCK)
 				{
 #ifdef HAVE_ALTIVEC
