@@ -213,7 +213,8 @@ gint answer;
 	printf("In:Y:%d U:%d V:%d\n",*coly,*colu,*colv);
 
        	dialog = create_dialog1();
-
+	
+	
 	if(sub)    	strcpy( subString, sub);
 	if(font) 	 strcpy( fontString, font);
 
@@ -285,12 +286,14 @@ gint answer;
 
 
 	ret=0;
+	gtk_register_dialog(dialog);
 	while( (answer=gtk_dialog_run(GTK_DIALOG(dialog)))==GTK_RESPONSE_APPLY)
 	{
 		read();
 		update(glob_base);
 		draw();
 	}
+	gtk_unregister_dialog(dialog);
 	if(answer==GTK_RESPONSE_OK)
 	{
 				strcpy(sub,subString);
@@ -310,7 +313,7 @@ gint answer;
 				*delay= (int32_t)gtk_read_entry(WID(entry_delay));
 				ret=1;
 	}
-
+	
 	gtk_widget_destroy(dialog);
 	dialog=NULL;
 	return ret;
@@ -409,9 +412,14 @@ void read ( void )
 void update(uint32_t value)
 {
 uint32_t h;
+uint32_t page=_w*_h;
 	//printf("\n Updating with %lu base line\n",value);
 	// grab it
-	memcpy(targetImage,sourceImage,(_w*_h*3)>>1);
+	
+	memcpy(targetImage,YPLANE(sourceImage),(_w*_h));
+	memcpy(targetImage+page,UPLANE(sourceImage),(_w*_h)>>2);
+	memcpy(targetImage+((page*5)>>2),VPLANE(sourceImage),(_w*_h)>>2);
+	
 	h=glob_font;
 	if(h>8) h-=4;
 
