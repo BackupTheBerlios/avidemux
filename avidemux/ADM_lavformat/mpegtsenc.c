@@ -173,7 +173,7 @@ int mpegts_write_section1(MpegTSSection *s, int tid, int id,
 /*********************************************/
 /* mpegts writer */
 
-#define DEFAULT_PMT_START_PID   0x0040  //0x1000 MEANX
+#define DEFAULT_PMT_START_PID   0x1000 // 0x0040  //0x1000 MEANX
 #define DEFAULT_START_PID       0x0031 // 0x100 MEANX
 #define DEFAULT_AUDIO_START_PID 0x0034 // 0x100 MEANX
 #define DEFAULT_PROVIDER_NAME   "FFmpeg"
