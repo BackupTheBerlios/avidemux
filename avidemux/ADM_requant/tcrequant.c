@@ -88,6 +88,9 @@ static int verbose = 2;
 #ifdef CYG_MANGLING
 	#define uint unsigned int
 #endif
+#ifdef ADM_BSD_FAMILY
+	#define uint uint32_t
+#endif
 typedef unsigned char		uint8;
 typedef unsigned short		uint16;
 typedef unsigned int		uint32;
