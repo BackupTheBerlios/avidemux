@@ -84,6 +84,8 @@ uint8_t AVDMProcessAudio_Normalize::preprocess(void)
     // For unknow length just give a big number
     while (1)
       {
+      	  if(scanned>llength)
+	  	break;
 	  ch = _instream->readDecompress(BF, buffer);
 	  if (!ch)
 	      break;
@@ -92,13 +94,15 @@ uint8_t AVDMProcessAudio_Normalize::preprocess(void)
 	  current+=ch;
 	  if(current>percent)
 	  {
-				windowWorking->update(scanned,llength);
+	  			if(scanned<llength)
+					windowWorking->update(scanned,llength);
 				if(!windowWorking->isAlive() )
 					{
 						// cannot be aborted
 						delete windowWorking;
 						windowWorking=new DIA_working("Normalize : Scanning");;
-						windowWorking->update(scanned,llength);
+						if(scanned<llength)
+							windowWorking->update(scanned,llength);
 					}
 		}
 	  rd += ch;
@@ -114,7 +118,7 @@ uint8_t AVDMProcessAudio_Normalize::preprocess(void)
 
       }
     delete windowWorking;
-    printf("\n min %d, max: %d\n", min, max);
+    printf("\n min %d, max: %d (%lu)\n", min, max,scanned);
     min = -min;
     if (min > max)
 	max = min;
@@ -178,6 +182,10 @@ uint8_t AVDMProcessAudio_Normalize::preprocess(void)
     _scanned = 1;
     strcpy(_name, "PROC:NORM");
     printf("\n table build");
+    // Go to the beginning...
+    //
+    _instream->goToTime(0);
+
     return 0;
 }
 
