@@ -880,7 +880,7 @@ static const codecEnumByName mycodec[]=
 #endif
 	{CodecXVCD	,"XVCD","XVCD"},
 	{CodecXSVCD	,"SVCD (lavc)","XSVCD"},
-	{CodecXSVCD	,"DVD (lavc)","XDVD"},
+	{CodecXDVD	,"DVD (lavc)","XDVD"},
 	{CodecFF	,"Lav Mpeg4","FFmpeg4"},
 	{CodecH263	,"H263","H263"},
 	{CodecH263P	,"H263+","H263+"},
@@ -1044,6 +1044,13 @@ void videoCodecConfigureUI( void )
 								&ffmpegMpeg2Config.generic.bitrate,
 								&ffmpegMpeg2Config.generic.finalsize,
 								&ffmpegMpeg2Config.specific);
+						break;
+		case CodecXDVD :
+			 			DIA_DVDffParam(&ffmpegMpeg2ConfigDVD.generic.mode,
+								&ffmpegMpeg2ConfigDVD.generic.qz,
+								&ffmpegMpeg2ConfigDVD.generic.bitrate,
+								&ffmpegMpeg2ConfigDVD.generic.finalsize,
+								&ffmpegMpeg2ConfigDVD.specific);
 						break;
 		case CodecXVCD :
 						oplug_mpegff_conf();
