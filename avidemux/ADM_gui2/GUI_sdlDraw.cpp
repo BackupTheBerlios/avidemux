@@ -9,6 +9,9 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#include "config.h"
+#if defined(USE_SDL)
+
 #include <stdio.h>         
 #include <stdlib.h>
 #include <math.h>
@@ -25,8 +28,6 @@
 #include <time.h>
 #include <sys/time.h>
 
-
-#include "config.h"
 #include "avi_vars.h"
 #include "prototype.h"
 #include "ADM_colorspace/colorspace.h"
@@ -36,7 +37,6 @@
 #include "ADM_gui2/GUI_sdlDraw.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 
-#if defined(USE_SDL)
 extern "C" {
 #include "SDL/SDL.h"
 #include "SDL/SDL_syswm.h"
