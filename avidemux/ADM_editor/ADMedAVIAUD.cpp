@@ -58,6 +58,13 @@ _VIDEOS *currentVideo;
 	
 	if(_audioSample<_segments[_audioseg]._audio_duration)
 	{
+                if( !currentVideo->_audiostream)
+                {
+                        printf("No soundtrack");        
+                        *len=0;
+                        *samples=0;
+                        return 0;
+                }
 		r=currentVideo->_audiostream->getPacket(dest,len,samples);
 		if(r)
 		{
@@ -99,10 +106,18 @@ _VIDEOS *currentVideo;
 	_audioSample=0;
 #endif	
 	_audioseg++;
-	
+	// Next audio seg has audio ?
+        
 	// Compute new start time
 	uint32_t starttime;
-	
+	if(!_videos[AUDIOSEG]._audiostream)
+        {
+                printf("No soundtrack\n");
+                *len=0;
+                *samples=0;
+               // _audioseg--; // Stay in a valid one to avoid crash later
+                return 0;
+        }
 	starttime= _videos[AUDIOSEG]._aviheader->getTime (_segments[_audioseg]._start_frame);
 	_videos[AUDIOSEG]._audiostream->goToTime(starttime);	
 	; // Fresh start samuel
