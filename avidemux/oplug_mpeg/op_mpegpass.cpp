@@ -98,7 +98,12 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
 		return ;
   	}
   
-	
+	ADM_assert (video_body->getFlags (frameStart, &flags));
+        if(!(flags&AVI_KEY_FRAME))
+        {
+                GUI_Alert("The first frame must be intra\nin copy mode!\n");
+                return ;
+        }
 	
   	audio=mpt_getAudioStream();
 	
