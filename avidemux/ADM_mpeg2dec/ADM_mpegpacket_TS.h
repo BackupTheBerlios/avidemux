@@ -10,7 +10,7 @@
 //
 //
 #define TS_PACKET 188
-
+uint8_t ADM_matchPid(char *file, uint32_t audioin, uint32_t *Ovidpid, uint32_t *Oaudpid);
 class ADM_mpegDemuxerTransportStream : public   ADM_mpegDemuxer
 {
 	  private : 

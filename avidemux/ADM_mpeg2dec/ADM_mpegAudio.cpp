@@ -92,9 +92,14 @@ AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 				// we take the 0xc0 streamid->audio
 				break;
 		case 'T':
-				demuxer=new ADM_mpegDemuxerTransportStream(0xbd,0xe0); 
+			{
+				uint32_t opid=0, ovid=0;
+				ADM_matchPid(string, id, &ovid, &opid);
+				printf("Audio Stream id : %x\n",opid);
+				demuxer=new ADM_mpegDemuxerTransportStream(opid,0xff); 
 				// we take the 0xc0 streamid->audio
 				break;
+			}
 		default:
 				assert(0);
 		}

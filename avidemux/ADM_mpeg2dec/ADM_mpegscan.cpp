@@ -149,8 +149,12 @@ uint8_t			mpeg2decHeader::open(char *name)
 							demuxer=new ADM_mpegDemuxerProgramStream(0xe0,0xc0);
 							break;
 			case 'T':			
-							// video as primary, audio as secondary
-							demuxer=new ADM_mpegDemuxerTransportStream(0xe0,0xc0);
+						{	// video as primary, audio as secondary
+							uint32_t opid=0, ovid=0;
+							ADM_matchPid(string, 0xff, &ovid, &opid);
+							//printf(">< %x <>\n",ovid);
+							demuxer=new ADM_mpegDemuxerTransportStream(ovid,0xff);
+						}
 							break;
 			default: assert(0);
 		}

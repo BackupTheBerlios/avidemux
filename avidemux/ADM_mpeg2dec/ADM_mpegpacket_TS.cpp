@@ -98,17 +98,9 @@ ADM_mpegDemuxerTransportStream::ADM_mpegDemuxerTransportStream(uint8_t stream,ui
 		_otherPesLen=_otherPesRead=0;
 		
 		
-		if(stream==0xE0)
-		{
-			_otherPid=0x11;
-			_thisPid=0x10;
-		}
-		else
-		{
-			_otherPid=0x10;
-			_thisPid=0x11;		
-		}
-
+			_otherPid=stream2;
+			_thisPid=stream;
+		
 		printf(" Internal  pid 1 = %x",_thisPid);		
 		printf(" Internal  pid 2 = %x",_otherPid);
 		
@@ -364,11 +356,12 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 			{
 				if(_pesRead>_pesLen)
 				{
+					printf("Clamped :%d\n",_pesRead-_pesLen);
 					len=len-(_pesRead-_pesLen);
 					_pesRead=_pesLen;
-					//printf("Overshot : %d\n",_pesRead-_pesLen);
+					
 				}
-				
+				printf("Read : %d/%d\n",_pesRead,_pesLen);
 			}
 				
 			_lastSync=sync;
@@ -401,6 +394,7 @@ uint32_t  ADM_mpegDemuxerTransportStream::_skipPacketHeader( uint32_t *pts,uint8
 uint8_t align=0;
 uint16_t tag,ptsdts;
 uint32_t headerlen=0;
+uint32_t mid=0;
 		// We got fitst 00 00 01 ID	
 		;
 		*pts=MINUS_ONE;
@@ -412,9 +406,10 @@ uint32_t headerlen=0;
 			printf("TS: No 00 00 01 xx as PES header\n");		
 			return 0;
 		}
-		if(_TSbuffer[start+3]!=0xE0 && _TSbuffer[start+3]!=0xbd)
+		mid=_TSbuffer[start+3];
+		if( !(mid>=0xE0&&mid<=0xEF) && !(mid==0xbd) && !(mid>=0xC0 && mid<=0xcf))		
 		{
-			printf(">> %x\n",_TSbuffer[start+3]);
+			printf(">> %x\n",mid);
 		}
 		// 00 00 01 E0	
 		totallen-=4;
