@@ -198,13 +198,15 @@ uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, 
     	switch(_fps1000)
 	{
 		case 25000:
-			c->frame_rate = 25000;  
-			c->frame_rate_base = 1000;	
+			c->frame_rate = 25025;  
+			c->frame_rate_base = 1001;	
 			break;
 		case 23976:
+/*
 			c->frame_rate = 24000;  
 			c->frame_rate_base = 1001;	
 			break;
+*/
 		case  29970:
 			c->frame_rate = 30000;  
 			c->frame_rate_base = 1001;	
@@ -247,6 +249,7 @@ uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, 
 	switch(_type)
 	{
                 case MUXER_TS:
+                        oc->mux_rate=10080*1000;
                         break;
 		case MUXER_DVD:
 			oc->packet_size=2048;
@@ -296,7 +299,7 @@ uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, 
 //___________________________________________________________________________
 uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 {
-
+        
 	int ret;
   	AVPacket pkt;
 	double f;
@@ -315,7 +318,8 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 	  //  pkt.flags |= PKT_FLAG_KEY; 
             pkt.data= buf;
             pkt.size= len;
-            aprintf("A: frame  pts%d\n",pkt.pts);    
+            aprintf("A: frame  pts%d\n",pkt.pts); 
+                
             ret = av_write_frame(oc, &pkt);
 	    if(ret) 
 			{
