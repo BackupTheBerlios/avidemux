@@ -41,6 +41,7 @@
 #include "ADM_encoder/adm_encffmatrix.h"
 
 #include "ADM_library/default.h"
+#include "prefs.h"
 
 
 static uint8_t mpeg2_running=0;
@@ -160,17 +161,29 @@ uint8_t Mpeg2enc::stopEncoder(void )
 
 Mpeg2encVCD::Mpeg2encVCD( uint32_t width,uint32_t height) : Mpeg2enc(width,height)
 {
+uint32_t autosplit=0;
+		if(!prefs->get(SETTINGS_MPEGSPLIT, &autosplit))
+		{
+			autosplit=690;		
+		}
+
 		// VCD
 		_settings.format=1;
 		_settings.fieldenc=0; // VCD are always progressive
-		_settings.seq_length_limit=790;
+		_settings.seq_length_limit=autosplit;
 }
 
 Mpeg2encSVCD::Mpeg2encSVCD( uint32_t width,uint32_t height) : Mpeg2enc(width,height)
 {
+uint32_t autosplit=0;
+		if(!prefs->get(SETTINGS_MPEGSPLIT, &autosplit))
+		{
+			autosplit=690;		
+		}
+
 		// SVCD
 		_settings.format=4;
-		_settings.seq_length_limit=790;
+		_settings.seq_length_limit=autosplit;
 }
 uint8_t Mpeg2encVCD::init(  uint32_t qz, uint32_t maxbr, uint32_t fps1000,
 			uint8_t interlaced, uint8_t bff, uint8_t wide,uint8_t fast) // WLA

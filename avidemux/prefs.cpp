@@ -78,6 +78,7 @@ static opt_def opt_defs [] = {
 	{"test.long",		LONG,	"1",	NULL,	"-4",	"999999999999"},
 	{"test.ulong",		ULONG,	"2",	NULL,	"0",	"999999999999"},
 	{"test.float",	FLOAT,	"0.0",	NULL,	"-0.35","0.35"	},
+	{"settings.mpegsplit",	UINT,	"690",	NULL,	"400",	"900"	},
 	{"codecs.preferredcodec",		STRING,"FFmpeg4",NULL, NULL, NULL },
 	{"device.audiodevice",	STRING,"OSS",	NULL, NULL, NULL },
 	{"lastfiles.file1",		STRING,"",	NULL, NULL, NULL },
@@ -101,7 +102,7 @@ static opt_def opt_defs [] = {
 	{"feature.tryautoidx",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 59;
+int num_opts = 60;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

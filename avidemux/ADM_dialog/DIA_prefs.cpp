@@ -29,16 +29,17 @@
 #include "ADM_audiodevice/audio_out.h"
 
 static GtkWidget	*create_dialog1 (void);
-static void on_callback_lame(GtkButton * button, gpointer user_data);
+
 static void on_callback_toolame(GtkButton * button, gpointer user_data);
-static void on_callback_lvemux(GtkButton * button, gpointer user_data);
-static void on_callback_requant(GtkButton * button, gpointer user_data);
 static void on_callback_audio(GtkButton * button, gpointer user_data);
+
 static GtkWidget *dialog=NULL;
 
 extern void 		AVDM_audioPref( void );
 
 uint8_t DIA_Preferences(void);
+
+
 uint8_t DIA_Preferences(void)
 {
 uint8_t ret=0;
@@ -47,6 +48,7 @@ char *str;
 const char *nullstring="";
 AUDIO_DEVICE olddevice,newdevice;
 uint32_t	lavcodec_mpeg=0;
+uint32_t	autosplit=0;
 GtkWidget *wids[10];
 uint32_t k;
 	
@@ -58,7 +60,7 @@ uint32_t k;
 	#define CONNECT(A,B)  gtk_signal_connect (GTK_OBJECT(lookup_widget(dialog,#A)), "clicked", \
 		      GTK_SIGNAL_FUNC (B), (void *) NULL);
 
-	CONNECT(buttonLame,on_callback_lame);
+	
 	CONNECT(buttonToolame,on_callback_toolame);
 	
 	// prepare
@@ -69,13 +71,12 @@ uint32_t k;
 	}
 	
 	gtk_write_entry_string(WID(entryToolame), str);
-	
-		
-	if(!prefs->get(LAME_PATH, &str))
+
+	if(!prefs->get(SETTINGS_MPEGSPLIT, &autosplit))
 	{
-		str=(char *)nullstring;		
+		autosplit=690;		
 	}
-	gtk_write_entry_string(WID(entryLame), str);
+			
 	if(!prefs->get(FEATURE_USE_LAVCODEC_MPEG, &lavcodec_mpeg))
 	{
 		lavcodec_mpeg=0;		
@@ -96,6 +97,8 @@ uint32_t k;
 	}		
 	 gtk_option_menu_set_menu (GTK_OPTION_MENU (WID(optionmenu1)), WID(menu1));
 	 gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenu1)), k);
+	 // Fill entry
+	 gtk_write_entry(WID(entry_mpeg2enc), (int) autosplit);
 	// run
 
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
@@ -103,8 +106,6 @@ uint32_t k;
 		ret=1;
 		str =	gtk_editable_get_chars(GTK_EDITABLE (WID(entryToolame)), 0, -1);			
 		prefs->set(TOOLAME_PATH, str);
-		str =	gtk_editable_get_chars(GTK_EDITABLE (WID(entryLame)), 0, -1);			
-		prefs->set(LAME_PATH, str);
 		// Get device
 		k=getRangeInMenu(WID(optionmenu1));
 		newdevice=audioDeviceList[k].id;
@@ -114,6 +115,8 @@ uint32_t k;
 		}
 		lavcodec_mpeg=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbutton_lavcodec)));
 		prefs->set(FEATURE_USE_LAVCODEC_MPEG, lavcodec_mpeg);
+		autosplit=gtk_read_entry(WID(entry_mpeg2enc));
+		prefs->set(SETTINGS_MPEGSPLIT, autosplit);
 		
 	}
 
@@ -121,7 +124,7 @@ uint32_t k;
 	dialog=NULL;
 	return ret;
 }
-
+/*
 void on_callback_lame(GtkButton * button, gpointer user_data)
 {
 char *lame=NULL;
@@ -134,7 +137,7 @@ char *lame=NULL;
 	 }
 
 }
-
+*/
 void on_callback_toolame(GtkButton * button, gpointer user_data)
 {
 char *lame=NULL;
@@ -159,18 +162,18 @@ create_dialog1 (void)
   GtkWidget *table1;
   GtkWidget *buttonToolame;
   GtkWidget *entryToolame;
-  GtkWidget *entryLame;
   GtkWidget *label7;
-  GtkWidget *label8;
-  GtkWidget *buttonLame;
-  GtkWidget *label12;
-  GtkWidget *hseparator1;
-  GtkWidget *checkbutton_lavcodec;
   GtkWidget *label1;
   GtkWidget *hbox2;
   GtkWidget *label11;
   GtkWidget *optionmenu1;
   GtkWidget *menu1;
+  GtkWidget *checkbutton_lavcodec;
+  GtkWidget *frame2;
+  GtkWidget *hbox3;
+  GtkWidget *label13;
+  GtkWidget *entry_mpeg2enc;
+  GtkWidget *label12;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
@@ -195,7 +198,7 @@ create_dialog1 (void)
   gtk_widget_show (alignment1);
   gtk_container_add (GTK_CONTAINER (frame1), alignment1);
 
-  table1 = gtk_table_new (3, 3, FALSE);
+  table1 = gtk_table_new (1, 3, FALSE);
   gtk_widget_show (table1);
   gtk_container_add (GTK_CONTAINER (alignment1), table1);
   gtk_container_set_border_width (GTK_CONTAINER (table1), 5);
@@ -207,20 +210,15 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), buttonToolame, 2, 3, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_sensitive (buttonToolame, FALSE);
 
   entryToolame = gtk_entry_new ();
   gtk_widget_show (entryToolame);
   gtk_table_attach (GTK_TABLE (table1), entryToolame, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_sensitive (entryToolame, FALSE);
   gtk_entry_set_width_chars (GTK_ENTRY (entryToolame), 25);
-
-  entryLame = gtk_entry_new ();
-  gtk_widget_show (entryLame);
-  gtk_table_attach (GTK_TABLE (table1), entryLame, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_entry_set_width_chars (GTK_ENTRY (entryLame), 25);
 
   label7 = gtk_label_new (_("tooLAME:"));
   gtk_widget_show (label7);
@@ -229,40 +227,6 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
-
-  label8 = gtk_label_new (_("LAME:"));
-  gtk_widget_show (label8);
-  gtk_table_attach (GTK_TABLE (table1), label8, 0, 1, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label8), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label8), 0, 0.5);
-
-  buttonLame = gtk_button_new_with_mnemonic (_("Browse..."));
-  gtk_widget_show (buttonLame);
-  gtk_table_attach (GTK_TABLE (table1), buttonLame, 2, 3, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-
-  label12 = gtk_label_new (_("Mpeg decoder:"));
-  gtk_widget_show (label12);
-  gtk_table_attach (GTK_TABLE (table1), label12, 0, 1, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label12), 0, 0.5);
-
-  hseparator1 = gtk_hseparator_new ();
-  gtk_widget_show (hseparator1);
-  gtk_table_attach (GTK_TABLE (table1), hseparator1, 2, 3, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-
-  checkbutton_lavcodec = gtk_check_button_new_with_mnemonic (_("Use lavcodec mpeg decoder"));
-  gtk_widget_show (checkbutton_lavcodec);
-  gtk_table_attach (GTK_TABLE (table1), checkbutton_lavcodec, 1, 2, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
 
   label1 = gtk_label_new (_("Paths"));
   gtk_widget_show (label1);
@@ -287,6 +251,33 @@ create_dialog1 (void)
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu1), menu1);
 
+  checkbutton_lavcodec = gtk_check_button_new_with_mnemonic (_("Use lavcodec mpeg decoder"));
+  gtk_widget_show (checkbutton_lavcodec);
+  gtk_box_pack_start (GTK_BOX (vbox1), checkbutton_lavcodec, FALSE, FALSE, 0);
+
+  frame2 = gtk_frame_new (NULL);
+  gtk_widget_show (frame2);
+  gtk_box_pack_start (GTK_BOX (vbox1), frame2, TRUE, TRUE, 0);
+
+  hbox3 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox3);
+  gtk_container_add (GTK_CONTAINER (frame2), hbox3);
+
+  label13 = gtk_label_new (_("Set marker for splitting every (MB) :"));
+  gtk_widget_show (label13);
+  gtk_box_pack_start (GTK_BOX (hbox3), label13, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label13), GTK_JUSTIFY_LEFT);
+
+  entry_mpeg2enc = gtk_entry_new ();
+  gtk_widget_show (entry_mpeg2enc);
+  gtk_box_pack_start (GTK_BOX (hbox3), entry_mpeg2enc, TRUE, TRUE, 0);
+  gtk_entry_set_width_chars (GTK_ENTRY (entry_mpeg2enc), 4);
+
+  label12 = gtk_label_new (_("VCD/SVCD - non lavcodec"));
+  gtk_widget_show (label12);
+  gtk_frame_set_label_widget (GTK_FRAME (frame2), label12);
+  gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
+
   dialog_action_area1 = GTK_DIALOG (dialog)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
@@ -310,18 +301,18 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog, table1, "table1");
   GLADE_HOOKUP_OBJECT (dialog, buttonToolame, "buttonToolame");
   GLADE_HOOKUP_OBJECT (dialog, entryToolame, "entryToolame");
-  GLADE_HOOKUP_OBJECT (dialog, entryLame, "entryLame");
   GLADE_HOOKUP_OBJECT (dialog, label7, "label7");
-  GLADE_HOOKUP_OBJECT (dialog, label8, "label8");
-  GLADE_HOOKUP_OBJECT (dialog, buttonLame, "buttonLame");
-  GLADE_HOOKUP_OBJECT (dialog, label12, "label12");
-  GLADE_HOOKUP_OBJECT (dialog, hseparator1, "hseparator1");
-  GLADE_HOOKUP_OBJECT (dialog, checkbutton_lavcodec, "checkbutton_lavcodec");
   GLADE_HOOKUP_OBJECT (dialog, label1, "label1");
   GLADE_HOOKUP_OBJECT (dialog, hbox2, "hbox2");
   GLADE_HOOKUP_OBJECT (dialog, label11, "label11");
   GLADE_HOOKUP_OBJECT (dialog, optionmenu1, "optionmenu1");
   GLADE_HOOKUP_OBJECT (dialog, menu1, "menu1");
+  GLADE_HOOKUP_OBJECT (dialog, checkbutton_lavcodec, "checkbutton_lavcodec");
+  GLADE_HOOKUP_OBJECT (dialog, frame2, "frame2");
+  GLADE_HOOKUP_OBJECT (dialog, hbox3, "hbox3");
+  GLADE_HOOKUP_OBJECT (dialog, label13, "label13");
+  GLADE_HOOKUP_OBJECT (dialog, entry_mpeg2enc, "entry_mpeg2enc");
+  GLADE_HOOKUP_OBJECT (dialog, label12, "label12");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog, okbutton1, "okbutton1");
