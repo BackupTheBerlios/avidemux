@@ -132,7 +132,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 			_conf->_subname=(char *)malloc(500);
 			_conf->_charset=(char *)malloc(500);
 			_conf->_baseLine=_info.height-24*SRT_MAX_LINE;
-			_conf->_selfAdjustable=1;
+			_conf->_selfAdjustable=0;
 			_conf->_delay=0;
 			
 			_conf->_useBackgroundColor=0;

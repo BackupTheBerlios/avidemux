@@ -139,21 +139,22 @@ void ADMVideoSubtitle::displayString(char *string)
       aprintf("%s\n",string);
 
 
-					// bbase is the final position in line
-					// in the image
+// bbase is the final position in line
+// in the image
 
 
-					base=0;
+	base=0;
 
-					memset(_bitmapBuffer,0,_info.height*_info.width);
-					memset(_maskBuffer,0,_info.height*_info.width);
-  memset(_bgBitmapBuffer,0,(_info.height*_info.width)>>1);
-  memset(_bgMaskBuffer,0,_info.height*_info.width);
+	memset(_bitmapBuffer,0,_info.height*_info.width);
+	memset(_maskBuffer,0,_info.height*_info.width);
+  	memset(_bgBitmapBuffer,0,(_info.height*_info.width)>>1);
+  	memset(_bgMaskBuffer,0,_info.height*_info.width);
 
 							{
     const uint32_t workStrLen=strlen(workStr);
     uint32_t i=0;
     uint32_t suggestedLen=0;
+    
     while (last<workStrLen && line<SRT_MAX_LINE) {
       uint8_t lineBreakFound=0;
       while (!lineBreakFound) {
@@ -228,31 +229,32 @@ void ADMVideoSubtitle::displayString(char *string)
 									}
 							}
 
-				// now blur bitmap into mask..
-				memset(_maskBuffer,0,SRT_MAX_LINE*_conf->_fontsize*_info.width);
+	// now blur bitmap into mask..
+	memset(_maskBuffer,0,SRT_MAX_LINE*_conf->_fontsize*_info.width);
 
-				uint32_t off;
-				uint8_t *src,*dst;
+	uint32_t off;
+	uint8_t *src,*dst;
 
-				off=0;
+	off=0;
 
-				src=_bitmapBuffer;
-				dst=_maskBuffer;
+	src=_bitmapBuffer;
+	dst=_maskBuffer;
 
 
-		// We shrink it down for u & v by 2x2
-		// mask buffer->bitmap buffer
+	// We shrink it down for u & v by 2x2
+	// mask buffer->bitmap buffer
 
-uint8_t tmp[_info.width*_info.height];
+	uint8_t tmp[_info.width*_info.height];
 
-				decimate(src,tmp,_info.width,_info.height);
-				lowPass(src,dst,_info.width,_info.height);
-				lowPass(tmp,src,_info.width>>1,_info.height>>1);
+	decimate(src,tmp,_info.width,_info.height);
+	lowPass(src,dst,_info.width,_info.height);
+	lowPass(tmp,src,_info.width>>1,_info.height>>1);
 
-  if (_conf->_useBackgroundColor) {
-    decimate(_bgMaskBuffer,_bgBitmapBuffer,_info.width,_info.height);
-    //lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
-  }
+  	if (_conf->_useBackgroundColor) 
+	{
+    		decimate(_bgMaskBuffer,_bgBitmapBuffer,_info.width,_info.height);
+    		//lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
+  	}
 
   //decimate(_bgBitmapBuffer,tmp,_info.width,_info.height);
   //lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
@@ -434,6 +436,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	uint32_t y;
 	uint32_t val;
 	int32_t ssigned;
+	double alpha,alpha2;
 
 
 	hei=SRT_MAX_LINE*_conf->_fontsize*_info.width;  // max height of our subtitle
@@ -446,7 +449,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	// mask out left and right
 
 	mask=_maskBuffer;
-  bgMask=_bgMaskBuffer;
+  	bgMask=_bgMaskBuffer;
  	target+=start;
   	for( y=hei;y>0;y--)
 	{
@@ -475,7 +478,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	hei>>=2;
 
 	mask=_bitmapBuffer;
-  bgMask=_bgBitmapBuffer;
+  	bgMask=_bgBitmapBuffer;
 	ctarget=chromatarget+start;
 	target=(uint8_t *)ctarget;
 
@@ -485,56 +488,49 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
   uint8_t bg_val=(uint8_t) _conf->_bg_U_percent+128;
 
 //#define MAXVAL(x) {val=*mask*(x)+127;val>>=8;*ctarget=(uint8_t)(val&0xff);}
+
+#define BLEND_LEVEL 	30
+#define BLEND_PERCENT 	60
+
 #define MAXVAL(x)  *target=(uint8_t )ssigned
 #define DOIT if(*mask) \
 		{ \
-			if(*mask==1) \
-				*target=128; \
-			else \
-				MAXVAL(_conf->_U_percent); \
+			alpha=*mask; \
+			if(alpha>BLEND_LEVEL) \
+				*target=(uint8_t)ssigned; \
+			else			\
+			{			\
+				alpha2=(100-BLEND_PERCENT)*(*target-128); \
+				alpha=BLEND_PERCENT*(ssigned-128); \
+				alpha=(alpha2+alpha)/100; \
+				*target=(uint8_t)(alpha+128) ;\
+			} \
                 } \
              else if (_conf->_useBackgroundColor && *bgMask) {*target=(uint8_t)bg_val;}
-	//if(_conf->_U_percent!=128)
-	if(1)
-  	for( y=hei;y>0;y--)
-	{
-		DOIT;
-		ctarget++;
-		target++;
-		mask++;
-	bgMask++;
-	}
-	else
-	{
-		aprintf("No U\n");
-	}
-
+	     
+#define RENDER	     \
+	\
+	for( y=hei;y>0;y--) \
+	{ \
+		DOIT; \
+		ctarget++; \
+		target++; \
+		mask++; \
+	bgMask++; \
+	} \
+	
+	RENDER;
 
 	mask=_bitmapBuffer;
-  bgMask=_bgBitmapBuffer;
+  	bgMask=_bgBitmapBuffer;
 	ctarget=chromatarget+start+((_info.width*_info.height)>>2);;
 	target=(uint8_t *)ctarget;
 	ssigned=_conf->_V_percent;
 	ssigned+=128;
 
-  bg_val=(uint8_t) _conf->_bg_V_percent+128;
+  	bg_val=(uint8_t) _conf->_bg_V_percent+128;
 
-	//if(_conf->_V_percent)
-	if(1)
-  	for( y=hei;y>0;y--)
-	{
-
-		DOIT;
-		ctarget++;
-		target++;
-		mask++;
-	bgMask++;
-	}
-	else
-	{
-		aprintf("No V\n");
-	}
-
+	RENDER;
 
 
 	return 1;
