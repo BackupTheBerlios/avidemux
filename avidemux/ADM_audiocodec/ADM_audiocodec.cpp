@@ -43,7 +43,11 @@ ADM_Audiocodec *out;
    			{
 				case WAV_PCM:
     					printf("\n Audio codec:  WAV\n");
-    					out= (ADM_Audiocodec *)new ADM_AudiocodecWav(fourcc);
+#ifdef ADM_BIG_ENDIAN				
+    					out= (ADM_Audiocodec *)new ADM_AudiocodecWavSwapped(fourcc);
+#else
+					out= (ADM_Audiocodec *)new ADM_AudiocodecWav(fourcc);
+#endif					
                   			break;
 				case WAV_8BITS:
 					printf("\n 8 BIts pseudo codec\n");
@@ -54,8 +58,12 @@ ADM_Audiocodec *out;
     					out= (ADM_Audiocodec *)new ADM_Audiocodec8Bits(fourcc);
 					break;		
 		  		case WAV_LPCM:
-    					printf("\n Audio codec:  LPCM swapped\n");
+					printf("\n Audio codec:  LPCM swapped\n");
+#ifndef ADM_BIG_ENDIAN				
     					out= (ADM_Audiocodec *)new ADM_AudiocodecWavSwapped(fourcc);
+#else
+					out= (ADM_Audiocodec *)new ADM_AudiocodecWav(fourcc);
+#endif					
                   		break;
 #ifdef USE_AC3
 				case WAV_AC3:
