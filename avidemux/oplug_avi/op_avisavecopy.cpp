@@ -89,6 +89,8 @@ uint8_t GenericAviSaveCopy::setupVideo (char *name)
 		printf("Second audio track absent\n");
 	}
  _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
+ encoding_gui->setFps(_incoming->getInfo()->fps1000);
+ encoding_gui->setPhasis("Saving");
   return 1;
 }
 
@@ -185,7 +187,7 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
 							if(!reigniteChunk(extraLen,extraData)) return 0;
 						}
 				 }
-    
+  encoding_gui->feedFrame(len);  
   return writter->saveVideoFrame (len, _videoFlag, vbuffer);
 
 }

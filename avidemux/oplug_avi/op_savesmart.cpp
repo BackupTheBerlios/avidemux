@@ -90,6 +90,8 @@ int value=4;;
   encoderReady = 0;
   _encoder = NULL;
   _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
+  encoding_gui->setFps(_incoming->getInfo()->fps1000);
+  encoding_gui->setPhasis("Smart Copy");
   //
   return 1;
   //---------------------

@@ -57,8 +57,7 @@
                     virtual void guiStart(void);
                     virtual void guiStop(void);
                     virtual void guiSetPhasis(char *str) {UNUSED_ARG(str);};
-                    virtual uint8_t guiUpdate(uint32_t nb,uint32_t total);
-		    virtual void guiSetSize(uint32_t size);
+                    virtual uint8_t guiUpdate(uint32_t nb,uint32_t total);		    
                     uint8_t	handleMuxSize(void ) ; // auto chop
                     uint8_t reigniteChunk( uint32_t len, uint8_t *data );
 		    uint32_t searchForward(uint32_t startframe);

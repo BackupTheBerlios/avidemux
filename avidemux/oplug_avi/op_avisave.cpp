@@ -52,6 +52,8 @@ extern int muxParam;
 extern uint8_t audioShift;
 extern int32_t audioDelay;
 
+const char *getStrFromAudioCodec( uint32_t codec);
+
 GenericAviSave::GenericAviSave ()
 {
 
@@ -95,8 +97,10 @@ uint32_t size;
   frametogo=0;
   writter = new aviWrite ();
     // 1- setup audio
+  guiStart();
   if (!setupAudio ())
     {
+      guiStop();
       GUI_Alert ("Error initalizing audio filters");
 	   deleteAudioFilter ();
 		delete writter;
@@ -107,6 +111,7 @@ uint32_t size;
    
    if (!setupVideo (name))
     {
+      guiStop();
       GUI_Alert ("Error initalizing video filters");
       deleteAudioFilter ();
       delete   	writter;
@@ -115,11 +120,9 @@ uint32_t size;
      // guiStop();
       return 0;
     }
-  guiStart();
-   if(guiUpdate(0,100))
-		   guiStart();
+  
   // 3- setup video
- frametogo=_incoming->getInfo()->nb_frames;
+  frametogo=_incoming->getInfo()->nb_frames;
   printf ("\n writing %lu frames\n", frametogo);
 
   //__________________________________
@@ -128,11 +131,8 @@ uint32_t size;
   for (uint32_t cf = 0; cf < frametogo; cf++) 
     {
 			
-			// update size
-			size=writter->getPos();
-			size=size/(1024*1024);				 
-			guiSetSize( size);	 
-			// update other fields
+			
+			
       			if (guiUpdate (cf, frametogo))
 					goto abortme;
       			//   printf("\n %lu / %lu",cf,frametogo);
@@ -208,6 +208,7 @@ GenericAviSave::setupAudio (void)
 	    deleteAudioFilter ();
 	    return 0;
 	  }
+	  encoding_gui->setAudioCodec(getStrFromAudioCodec(audio_filter->getInfo()->encoding));
     }
   else
     {
@@ -216,8 +217,8 @@ GenericAviSave::setupAudio (void)
       audio_filter = (AVDMGenericAudioStream *) currentaudiostream;
       if (currentaudiostream)
 	{
-	  uint32_t
-	    tstart;
+	  uint32_t   tstart;
+	  encoding_gui->setAudioCodec("Copy");
 	  tstart = video_body->getTime (frameStart);
 	  (audio_filter)->goToTime (tstart);
 	  printf ("\n delay : %ld shift  : %d", audioDelay, audioShift);
@@ -262,6 +263,7 @@ GenericAviSave::setupAudio (void)
 			}
     }
 
+    if(!currentaudiostream) encoding_gui->setAudioCodec("None");
   return 1;
 }
 
@@ -464,17 +466,12 @@ GenericAviSave::writeAudioChunk (void)
 void
 GenericAviSave::guiStart (void)
 {
-	encoding_gui=new DIA_encoding(_incoming->getInfo ()->fps1000);
+	encoding_gui=new DIA_encoding(25000);
 	encoding_gui->setCodec("Copy");
 	encoding_gui->setFrame (0, 100);
 
 }
-void
-GenericAviSave::guiSetSize (uint32_t size)
-{
-	
 
-}
 void
 GenericAviSave::guiStop (void)
 {
@@ -574,5 +571,16 @@ uint32_t GenericAviSave::searchForward(uint32_t startframe)
 			}
 }
 
+const char *getStrFromAudioCodec( uint32_t codec)
+{
+	switch(codec)
+	{
+		case WAV_PCM: return (const char *)"PCM";
+		case WAV_MP2: return (const char *)"MP2";
+		case WAV_MP3: return (const char *)"MP3";
+	}
 
+	return (const char *)"Unknown codec";
+
+}
 // EOF

@@ -58,7 +58,7 @@ GenericAviSaveProcess::setupVideo (char *name)
 	_notnull=0;
 	_incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
  	frametogo=_incoming->getInfo()->nb_frames;
-
+	encoding_gui->setFps(_incoming->getInfo()->fps1000);
 	// anish
  	if(_incoming->getInfo()->width%8)
 		{
@@ -94,6 +94,8 @@ _mainaviheader.dwMicroSecPerFrame=0;
   printf("\n Saved as %ld x %ld\n",_bih.biWidth,_bih.biHeight);
   _bih.biCompression=fourCC::get((uint8_t *)_encode->getCodecName());
    
+  encoding_gui->setCodec(_encode->getDisplayName());
+  
   // init save avi
 //-----------------------VBR--------------------------------------
   if (_encode->isDualPass ())
@@ -116,7 +118,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
 	
 	if(!reuse)
  	{
-	guiStart();
+	
       	guiSetPhasis ("1st Pass");
       	aprintf("**Pass 1:%lu\n",frametogo);
      	buffer = new uint8_t[_incoming->getInfo ()->width *
@@ -263,49 +265,5 @@ GenericAviSaveProcess::writeVideoChunk (uint32_t frame)
 
 }
 
-void
-GenericAviSaveProcess::guiStart (void)
-{
-//  GUI_encoderStart ();
-//  GUI_encoderSetFrame (0, 100);
-	encoding_gui=new DIA_encoding(_incoming->getInfo ()->fps1000);
-	encoding_gui->setCodec(_encode->getDisplayName());
-	encoding_gui->setFrame (0, 100);
-}
-void
-GenericAviSaveProcess::guiSetSize (uint32_t size)
-{
-
-	assert(encoding_gui);
-	//encoding_gui->setSize (size);
-}
-
-void
-GenericAviSaveProcess::guiStop (void)
-{
-  //GUI_encoderStop ();
-  assert(encoding_gui);
-  delete encoding_gui;
-  encoding_gui=NULL;
-
-}
-
-void
-GenericAviSaveProcess::guiSetPhasis (const char *n)
-{
-  //GUI_encoderSetPhasis (n);
-  encoding_gui->setPhasis(n);
-}
-
-uint8_t
-GenericAviSaveProcess::guiUpdate (uint32_t nb, uint32_t total)
-{
-  assert(encoding_gui);
-  encoding_gui->setFrame (nb, total);
-  if ( encoding_gui->isAlive () == 1)
-    return 0;
-  return 1;
-
-}
 
 // EOF

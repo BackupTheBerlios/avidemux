@@ -27,6 +27,8 @@ public:
 		void reset( void );
 		void setPhasis(const char *n);
 		void setCodec(const char *n);
+		void setAudioCodec(const char *n);
+		void setFps(uint32_t fps);
 		void feedFrame(uint32_t br);		
 		void feedAudioFrame(uint32_t br);		
 		void setQuant(uint32_t quant);

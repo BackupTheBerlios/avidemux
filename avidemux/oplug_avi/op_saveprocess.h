@@ -28,14 +28,9 @@
 			uint8_t		_notnull;
                        	
 
-		                  virtual uint8_t setupVideo( char *name  );
-                          virtual uint8_t writeVideoChunk(uint32_t frame );
-                            virtual void guiStart(void);
-                          virtual void guiStop(void);
-                            virtual void guiSetPhasis(const char *str) ;
-                          virtual uint8_t guiUpdate(uint32_t nb,uint32_t total);
-			  virtual void guiSetSize(uint32_t size);
-//                           uint8_t doPassOne( void ) ;
+			virtual uint8_t	setupVideo( char *name  );
+			virtual uint8_t	writeVideoChunk(uint32_t frame );
+                         
      public:
      			GenericAviSaveProcess( void ) {_incoming=NULL;_encode=NULL;_videoProcess=1;};
                           virtual ~GenericAviSaveProcess();
