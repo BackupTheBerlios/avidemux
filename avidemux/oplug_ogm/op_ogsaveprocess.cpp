@@ -148,7 +148,7 @@ uint32_t w,h,fps1000,fcc;
 		memset(&header,0,sizeof(header));
 		
 		memcpy(&(header.streamtype),"video\0\0\0",8);
-		memcpy(&(header.subtype),&(avifileinfo->fcc),4);
+		memcpy(&(header.subtype),&fcc,4);
 		header.size=sizeof(header);
 		header.video.width=w;
 		header.video.height=h;
