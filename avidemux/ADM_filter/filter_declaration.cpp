@@ -112,10 +112,10 @@ printf(  "*********************\n");
 //    	REGISTERX("temporalcleaner","Temporal Cleaner",VF_VLADSMOOTH,1,vladsmooth_create,vladsmooth_script);
 #endif
 
-//	REGISTERX("mpdenoise3d","Mplayer Denoise3D",VF_MPLLQD3D,1,MPD3Dlow_create,MPD3Dlow_script);
+	REGISTERX("mpdenoise3d","Mplayer Denoise3D",VF_MPLLQD3D,1,MPD3Dlow_create,MPD3Dlow_script);
 
-//	REGISTERX("mphqdenoise3d","Mplayer HQDenoise3D",VF_MPLHQD3D,1,MPD3D_create,MPD3D_script);
-//	REGISTERX("msmooth","Msmooth by Donald Graft",VF_MSMOOTH,1,create_msmooth,msmooth_script);
+//BUG 	REGISTERX("mphqdenoise3d","Mplayer HQDenoise3D",VF_MPLHQD3D,1,MPD3D_create,MPD3D_script);
+	REGISTERX("msmooth","Msmooth by Donald Graft",VF_MSMOOTH,1,create_msmooth,msmooth_script);
 //	REGISTERX("forcedpp","Forced PostProcessing",VF_FORCEDPP,1,forcedpp_create,forcedpp_script);
 //	REGISTERX("soften","Soften",VF_SOFTEN,1,soften_create,soften_script);
 #ifdef USE_FREETYPE   

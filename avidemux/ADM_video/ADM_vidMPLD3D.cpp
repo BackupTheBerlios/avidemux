@@ -245,7 +245,7 @@ UNUSED_ARG(flags);
 					 	return 0;
 					}
 				 	unsigned short* dst=_uncompressed;
-	    				unsigned char* src=data->data;
+	    				unsigned char* src=YPLANE(data);
 					for (int Y = 0; Y < (W*H*3)>>1; Y++)
 						{
 	    						 	*(dst++)=*(src++)<<8;
@@ -254,20 +254,20 @@ UNUSED_ARG(flags);
 					return 1;
 
 			}
-			ADM_assert(frame<_info.nb_frames);
-			// read uncompressed frame
-			// else we fill previous/current/next
-			if(!_in->getFrameNumberNoAlloc(frame, &dlen,_storage,&dflags))
-			{
-				return 0;
-			}
+		ADM_assert(frame<_info.nb_frames);
+		// read uncompressed frame
+		// else we fill previous/current/next
+		if(!_in->getFrameNumberNoAlloc(frame, &dlen,_storage,&dflags))
+		{
+			return 0;
+		}
 
 		uint8_t *c,*n;
 		unsigned short *ant;
 
-		ant=_uncompressed;
-		n=data->data;
-		c=_storage->data;
+		ant=(_uncompressed);
+		n=YPLANE(data);
+		c=YPLANE(_storage);
 //
    		deNoise(c, n,
 			Line,ant, W, H,
@@ -277,10 +277,9 @@ UNUSED_ARG(flags);
                 	(int *)Coefs[1]);
 
 
-		ant=ant+W*H;
-		n=n+W*H;
-		c=c+W*H;
-
+		ant=(_uncompressed)+W*H;
+		n=UPLANE(data);
+		c=UPLANE(_storage);
 
 		deNoise(c, n,
 			Line, ant, cw, ch,
@@ -290,9 +289,9 @@ UNUSED_ARG(flags);
                 	(int *)Coefs[3]);
 
 
-		ant=ant+((W*H)>>2);
-		n=n+((W*H)>>2);
-		c=c+((W*H)>>2);
+		ant=_uncompressed+((W*H*3)>>1);
+		n=VPLANE(data);
+		c=VPLANE(_storage);
 
 		deNoise(c, n,
 			Line, ant, cw, ch,
@@ -303,6 +302,7 @@ UNUSED_ARG(flags);
 
 	// n is out....
 	_last=frame;
+	data->_qStride=0;
 	return 1;
 
 

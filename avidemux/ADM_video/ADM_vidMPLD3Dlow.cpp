@@ -226,7 +226,7 @@ UNUSED_ARG(flags);
 
   		if(frame> _info.nb_frames-1) return 0;
 		*len=(W*H*3)>>1;
-  // First and last frame we don"t modify.
+		// First and last frame we don"t modify.
 		if(!frame || (frame!=_last+1))
 			{
 				aprintf("D3D: First /last frame\n");
@@ -249,9 +249,9 @@ UNUSED_ARG(flags);
 
 		uint8_t *c,*d,*p;
 
-		d=data->data;
-		c=_uncompressed->data;
-		p=_stored->data;
+		d=YPLANE(data);
+		c=YPLANE(_uncompressed);
+		p=YPLANE(_stored);
 //
 
    	deNoise(c,p, d,
@@ -262,9 +262,9 @@ UNUSED_ARG(flags);
                 Coefs[1] + 256);
 
 	uint32_t page=W*H;
-	c+=page;
-	d+=page;
-	p+=page;
+		d=UPLANE(data);
+		c=UPLANE(_uncompressed);
+		p=UPLANE(_stored);
 
 	deNoise(c,p, d,
 		Line, cw, ch,
@@ -274,9 +274,9 @@ UNUSED_ARG(flags);
                 Coefs[3] + 256);
 
 	page=page>>2;		
-	c+=page;
-	d+=page;
-	p+=page;
+		d=VPLANE(data);
+		c=VPLANE(_uncompressed);
+		p=VPLANE(_stored);
 
 	deNoise(c,p, d,
 		Line, cw, ch,
@@ -287,7 +287,9 @@ UNUSED_ARG(flags);
 
 
 	_last=frame;
-	memcpy(_stored->data,data->data,(W*H*3)>>1);
+	memcpy(YPLANE(_stored),YPLANE(data),W*H);
+	memcpy(UPLANE(_stored),UPLANE(data),(W*H)>>2);
+	memcpy(VPLANE(_stored),VPLANE(data),(W*H)>>2);
 	return 1;
 
 

@@ -66,9 +66,6 @@
 	if (GETFRAMEf > num_frames_hi - 1) GETFRAMEf = num_frames_hi - 1; \
 	(fp) = vidCache->getImage(GETFRAMEf); \
 }
-#define YPLANE(x) (x->data)
-#define UPLANE(x) (x->data+_info.width*_info.height)
-#define VPLANE(x) (x->data+((_info.width*_info.height*5)>>2))
 
 #include "ADM_video/ADM_vidMSmooth_param.h"
 
@@ -175,7 +172,7 @@ Msmooth::~Msmooth(void)
 	if(vidCache) delete vidCache;
 	if(_param) delete _param;
 #undef NW
-#define NW(x) if(x) {delete [] x;x=NULL;}
+#define NW(x) if(x) {delete  x;x=NULL;}
 	NW(blur);
 	NW(work);
 	NW(mask);
