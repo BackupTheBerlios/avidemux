@@ -37,9 +37,8 @@ AC_CANONICAL_HOST
 
 dnl Perform program name transformation
 AC_ARG_PROGRAM
-
 dnl Automake doc recommends to do this only here. (Janos)
-AM_INIT_AUTOMAKE(avidemux,2.0.25cvs)
+AM_INIT_AUTOMAKE(avidemux,2.0.29cvs)
 
 dnl almost the same like KDE_SET_PEFIX but the path is /usr/local
 dnl
@@ -47,7 +46,9 @@ unset CDPATH
 dnl make /usr/local the default for the installation
 AC_PREFIX_DEFAULT(/usr/local)
 
-
+dnl Ranlib
+AC_PROG_RANLIB
+AC_PROG_CXX
 dnl without this order in this file, automake will be confused!
 dnl
 AM_CONFIG_HEADER(config.h)

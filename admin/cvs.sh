@@ -174,7 +174,7 @@ for i in $mfs; do
     fi
   fi
   if test "$i" = "."; then
-     echo "AC_CONFIG_FILES([ po/Makefile  ])" >> configure.in.new
+     #echo "AC_CONFIG_FILES([ po/Makefile  ])" >> configure.in.new
      echo "AC_CONFIG_FILES([ Makefile  ])" >> configure.in.new
   else
      echo "AC_CONFIG_FILES([ $i/Makefile ])" >> configure.in.new
