@@ -699,9 +699,13 @@ if test "x$have_altivec" = "xyes"; then
 		AC_DEFINE(HAVE_ALTIVEC,1,[Enable altivec by default])
 		if "x$adm_cpu" = "xppc"; then
 			AC_DEFINE(HAVE_ALTIVEC_H,1,[Enable altivec by default])
+			ALTIVEC_SWITCH='-mabi=altivec -maltivec'
+		else
+			dnl we are using macOsX, deal with how they do stuff
+			ALTIVEC_SWITCH='-mabi=altivec -maltivec -faltivec -force_cpusubtype_ALL'
+			AC_DEFINE(CONFIG_DARWIN,0,[Say to ffmpeg we are using darwin macOsX])
 		fi
 		AC_DEFINE(ARCH_PPC,1,[Altivec for libmpeg2])
-		ALTIVEC_SWITCH='-mabi=altivec -maltivec'
 		dnl AC_DEFINE(USE_ALTIVEC,1,[Altivec for mpeg2enc]) 
 
 fi
