@@ -53,7 +53,7 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
         uint8_t                         readbyte(void);         /// Read a byte from buffer
         uint16_t                        readword(void);         /// Read a 16 bits word from buffer
         uint8_t                         forward(uint32_t v);    /// Read a 16 bits word from buffer
-        uint8_t                         decodeRLE(uint32_t off,uint32_t evenline);
+        uint8_t                         decodeRLE(uint32_t off,uint32_t start,uint32_t end);
         uint8_t                         setup(void);            /// Rebuild internal info
         uint8_t                         cleanup(void);          /// Destroy all internal info
         uint8_t                         paletteYUV( void );     /// Convert RGB Pallette to yuv

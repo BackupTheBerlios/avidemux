@@ -336,6 +336,9 @@ uint32_t sub;
                 mask=src->_alphaMask;
                
                 out=data->data+_info.width*src->placeTop;
+                // auto center
+                uint32_t center=_info.width-src->_width;
+                out+=(center>>2)*2;
                 
                 for(uint32_t y=0;y<yy;y++)
                 {
@@ -344,13 +347,7 @@ uint32_t sub;
                                old=out[x];
                                nw=in[x];
                                alp=mask[x];
-#if 0                               
-#define ACOEF alp
-#define BCOEF (15-alp)                               
-#else
-#define BCOEF (alp)
-#define ACOEF (15-alp)                               
-#endif
+
                                 if(alp) 
                                 {
                                   if(alp>7)  nw=old*(16-alp-1)+(alp+1)*nw;
@@ -367,6 +364,8 @@ uint32_t sub;
                 }
                 
                 // Now do chroma u & chroma V
+#define DOCHROMA                
+#if defined(DOCHROMA)                
                 uint32_t crosspage=(_info.width*_info.height)>>2;
                 
                 strideout=_info.width>>1;
@@ -375,8 +374,8 @@ uint32_t sub;
                 out=data->data+_info.width*_info.height;
                 out+=(src->placeTop>>1)*(_info.width>>1);
                 mask=_chromaResampled->_alphaMask;
-                
-                
+                // Center
+                out+=(center>>2)*1;
                 if(strideout>stridein) xx=stridein;
                 else            xx=strideout;
                 
@@ -409,6 +408,7 @@ uint32_t sub;
                    out+=strideout;
                    mask+=stridein;
                 }
+#endif                
         }
         return 1;
 }

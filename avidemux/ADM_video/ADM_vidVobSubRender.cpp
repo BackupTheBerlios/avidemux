@@ -142,7 +142,7 @@ uint32_t value;
 
 //***********************************************************
 // RLE code inspired from mplayer
-uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start)
+uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start,uint32_t end)
 {
         uint32_t oldoffset=_curOffset;
         uint32_t stride=_subW;
@@ -167,7 +167,11 @@ uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start)
         }
         x=0;
         y=0;
-        while(_curOffset<_dataSize && y<(_subH>>1))
+        while(
+               (_curOffset<_dataSize)
+            && (y<(_subH>>1)) 
+            && ((!end) || (_curOffset<end))
+        )
         {
                NEXTNIBBLE(a);
                if(a<4)
@@ -344,8 +348,8 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
                                         uint32_t odd,even;
                                         odd=readword();
                                         even=readword();
-                                        decodeRLE(odd,0);
-                                        decodeRLE(even,1);
+                                        decodeRLE(odd,0,even);
+                                        decodeRLE(even,1,0);
                                         }
                                         break;                
                         } //End switch command     

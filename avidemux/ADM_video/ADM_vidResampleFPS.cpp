@@ -36,6 +36,7 @@
 #include "ADM_video/ADM_vidFlipV.h"
 #include "ADM_filter/video_filters.h"
 #include "ADM_dialog/DIA_enter.h"
+#include "ADM_video/ADM_cache.h"
 
 static FILTER_PARAM ResampParam={1,{"newfps"}};
 typedef struct FPS_Param
@@ -48,7 +49,8 @@ class  ADMVideoResampleFPS:public AVDMGenericVideoStream
   protected:
     AVDMGenericVideoStream  *_in;           
     virtual char            *printConf(void);
-                            FPS_Param   *_param;     
+            FPS_Param       *_param;    
+            VideoCache      *vidCache; 
   public:
                 
                         ADMVideoResampleFPS(  AVDMGenericVideoStream *in,CONFcouple *setup);
@@ -112,11 +114,13 @@ ADMVideoResampleFPS::ADMVideoResampleFPS(  AVDMGenericVideoStream *in,CONFcouple
   newlength*=_param->newfps;
   _info.nb_frames=(uint32_t)floor(newlength);
   _info.fps1000=_param->newfps;
+  vidCache=new VideoCache(3,_in);
   
 }
 ADMVideoResampleFPS::~ADMVideoResampleFPS()
 {
   delete _param;
+  delete vidCache;
   
 }
 uint8_t ADMVideoResampleFPS::getCoupledConf( CONFcouple **couples)
@@ -135,12 +139,14 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
                                              ADMImage *data,
                                              uint32_t *flags)
 {
+  ADMImage *mysrc=NULL;
 
   ADM_assert(frame<_info.nb_frames);
   // read uncompressed frame
   
   // What frame are we seeking ?
   double f;
+  uint32_t page=_info.width*_info.height;
   
   f=frame;
   f*=_in->getInfo()->fps1000;
@@ -151,7 +157,17 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
   nw=(uint32_t)floor(f+0.4);
   if(nw>_in->getInfo()->nb_frames-1)
     nw=_in->getInfo()->nb_frames-1;
-  if(!_in->getFrameNumberNoAlloc(nw, len,data,flags)) return 0;
+  printf("Old:%lu new:%lu\n",frame,nw);
+  mysrc=vidCache->getImage(nw);
+  if(!mysrc) return 0;
+  
+  memcpy(YPLANE(data),YPLANE(mysrc),page);
+  memcpy(UPLANE(data),UPLANE(mysrc),page>>2);
+  memcpy(VPLANE(data),VPLANE(mysrc),page>>2);
+ 
+  vidCache->unlockAll();
+  
+  
   return 1;
  
 }
