@@ -49,21 +49,29 @@
 static FILTER_PARAM vobsubParam={0,{""}};
 #define aprintf printf
 //*************************************************************
+//
 class  ADMVideoVobSub:public AVDMGenericVideoStream
  {
 
  protected:
         virtual char                    *printConf(void);
         ADM_mpegDemuxerProgramStream    *_parser;
-        uint32_t                        *_display;              /// bitmap
+        uint8_t                        *_palettized;              /// bitmap
         uint8_t                         *_data;                 /// Data for packet
         uint32_t                        _x1,_y1,_x2,_y2;        /// sub boxing
+        uint32_t                        _subW,_subH;
         uint8_t                         _displaying;            ///  Is display active
         uint32_t                        _curOffset;
         uint8_t                         readbyte(void);         /// Read a byte from buffer
         uint16_t                        readword(void);         /// Read a 16 bits word from buffer
         uint8_t                         forward(uint32_t v);    /// Read a 16 bits word from buffer
+        uint8_t                         decodeRLE(uint32_t off,uint32_t evenline);
         uint32_t                        _subSize;
+        uint32_t                        _dataSize;              /// Size of the data chunk
+        uint32_t                        _palette[16];           /// The full palette, stored in .idx ?
+        uint8_t                         _colors[4];             /// Colors palette
+        uint8_t                         _alpha[4];              /// Colors alpha
+        
         
  public:
                 
@@ -105,7 +113,7 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *setup)
         _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
         ADM_assert(_uncompressed); 
         _parser=NULL;  
-        _display=NULL;   
+        _palettized=NULL;   
         
         _parser=new ADM_mpegDemuxerProgramStream(0x20,0xe0);
         if(!_parser->open(VOBSUB))
@@ -117,6 +125,7 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *setup)
         _x1=_y1=_x2=_y2=0;
         _data=new uint8_t [VS_MAXPACKET];
         _subSize=0;
+        _subW=_subH=0;
                 
 }
 //*************************************************************
@@ -126,12 +135,13 @@ ADMVideoVobSub::ADMVideoVobSub()
         _uncompressed=NULL;
         if(_parser) delete _parser;
         _parser=NULL;
-        if(_display) delete [] _display;
-        _display=NULL;
+        if(_palettized) delete [] _palettized;
+        _palettized=NULL;
         if(_data) delete [] _data;
         _data=NULL;
   
 }
+//*************************************************************
 uint8_t ADMVideoVobSub::forward(uint32_t v)
 {
         aprintf("Current : %lu forwarding : %lu\n",_curOffset,v);
@@ -140,12 +150,14 @@ uint8_t ADMVideoVobSub::forward(uint32_t v)
          return 1;
 
 }
+//*************************************************************
 uint8_t ADMVideoVobSub::readbyte( void )
 {
         ADM_assert(_curOffset<_subSize);
         return _data[_curOffset++];
 
 }
+//*************************************************************
 uint16_t ADMVideoVobSub::readword( void )
 {
 uint16_t w;
@@ -155,7 +167,7 @@ uint16_t w;
         _curOffset+=2;
         return w;
 }
-
+//*************************************************************
 uint8_t ADMVideoVobSub::getCoupledConf( CONFcouple **couples)
 {
         return 0;
@@ -167,7 +179,7 @@ uint8_t ADMVideoVobSub::getFrameNumberNoAlloc(uint32_t frame,
                                 uint32_t *flags)
 {
 
-uint16_t date,next,datasize;
+uint16_t date,next,dum;
 uint8_t  command;
         _subSize=0;
 
@@ -187,10 +199,10 @@ uint8_t  command;
         // We got the full packet
         // now scan it
         _curOffset=2;
-        datasize=readword();
-        aprintf("data block=%lu\n",datasize);
-        ADM_assert(datasize>4);
-        forward(datasize-4);    // go to the command block
+        _dataSize=readword();
+        aprintf("data block=%lu\n",_dataSize);
+        ADM_assert(_dataSize>4);
+        forward(_dataSize-4);    // go to the command block
         
         
         while(1)
@@ -212,13 +224,21 @@ uint8_t  command;
                                 case 02: // stop date
                                         break;
                                 case 03: // Pallette 4 nibble= 16 bits
-                                        readword();
+                                         dum=readword();
+                                        _colors[0]=dum>>12;
+                                        _colors[1]=0xf & (dum>>8);
+                                        _colors[2]=0xf & (dum>>4);
+                                        _colors[3]=0xf & (dum);
                                         break;          
                                 case 0xff:
                                         break;
                                 case 04: // alpha channel
                                          //4 nibble= 16 bits
-                                        readword();
+                                        dum=readword();
+                                        _alpha[0]=dum>>12;
+                                        _alpha[1]=0xf & (dum>>8);
+                                        _alpha[2]=0xf & (dum>>4);
+                                        _alpha[3]=0xf & (dum);
                                         break;
                                 case 05:
                                         // Coordinates 12 bits per entry X1/X2/Y1/Y2
@@ -233,21 +253,130 @@ uint8_t  command;
                                                 _y1=((b&0xf)<<4)+(c>>12);
                                                 _y2=c&0xfff;
                                                 aprintf("vobsuv: x1:%d x2:%d y1:%d y2:%d\n",_x1,_x2,_y1,_y2);
+                                                if(_palettized) delete [] _palettized;
+                                                _subW=_x2-_x1;
+                                                _subH=_y2-_y1;
+                                                _palettized=new uint8_t [_subW*_subH];
+                                                memset(_palettized,0,_subW*_subH);
                                                                         
                                         }
                                         break;
                                 case 06: // RLE offset 
                                         // 2*16 bits : odd offset, even offset
-                                        readword();
+                                        {
+                                        uint32_t odd,even;
+                                        odd=readword();
+                                        even=readword();
+                                        decodeRLE(odd,0);
+                                        decodeRLE(even,1);
+                                        }
                                         break;                
                         } //End switch command     
                 }// end while
         }
         data->copyInfo(_uncompressed);
+        // All black
+        uint32_t page=_info.width*_info.height;
+        memset(data->data+page,127,page/2);
+        if(_palettized)
+        {
+                uint32_t stridein,strideout,len;
+                uint8_t *in,*out;
+                
+                stridein=_x2-_x1;
+                strideout=_info.width;
+                
+                if(strideout>stridein) len=stridein;
+                                else    len=strideout;
+                in=_palettized;
+                out=data->data;
+                for(uint32_t y=0;y<_y2-_y1;y++)
+                {
+                        for(uint32_t x=0;x<len;x++)
+                        {
+                                if(in[x]) out[x]=255;
+                                else out[x]=129;
+                        }
+                        //memcpy(out,in,len);
+                        out+=strideout;
+                        in+=stridein;
+                }
+        }
         return 1;
 }
-
-
+//***********************************************************
+// RLE code inspired from mplayer
+uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start)
+{
+        uint32_t oldoffset=_curOffset;
+        uint32_t stride=_subW;
+        uint32_t x,y;
+        uint8_t *ptr=_palettized;
+        uint32_t a,b;
+        int     nibbleparity=0;
+        int     nibble=0;
+        
+        int run,color;
+        
+#define SKIPNIBBLE        {nibbleparity=0;}
+#define NEXTNIBBLE(x) if(nibbleparity){ x=nibble&0xf;nibbleparity=0;}else {nibble=readbyte();nibbleparity=1;x=nibble>>4;}
+       
+        _curOffset=off;
+        aprintf("Vobsub: Rle at offset :%d datasize:%d (stride:%d)\n",off,_dataSize,stride);
+        if(!ptr)
+        {
+                printf("Vobsub:No infos yet RLE data...\n");
+                 return 1;
+        }
+        x=0;
+        y=0;
+        while(_curOffset<_dataSize && y<(_subH>>1))
+        {
+               NEXTNIBBLE(a);
+               if(a<4)
+               {
+                 a<<=4;
+                 NEXTNIBBLE(b);
+                 a|=b;
+                 if(a<0x10)
+                 {
+                        a<<=4;
+                        NEXTNIBBLE(b);
+                        a|=b;
+                        if(a<0x40)
+                        {
+                                a<<=4;
+                                NEXTNIBBLE(b);
+                                a|=b;
+                                if(a<4)
+                                {
+                                        a|=(stride-x)<<2;
+                                }
+                        }
+                 }
+              }
+              run=a>>2;
+              color=3-(a&0x3);
+             // aprintf("Vobsub: Run:%d color:%d\n",run,color);
+              if((run>stride-x) || !run)
+                run=stride-x;
+              
+              memset(ptr,color,run);
+              x+=run;
+              ptr+=run;
+              //  aprintf("x:%d y:%d\n",x,y);
+              if(x>=stride)
+              {
+                        
+                     y++;
+                     x=0;
+                     ptr=_palettized+(y*2+start)*stride;
+                     SKIPNIBBLE;
+              }
+        }
+        aprintf("vobsub End :%d y:%d\n",_curOffset,y); 
+        _curOffset=oldoffset;
+} 
 
 //EOF
 
