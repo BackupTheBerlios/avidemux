@@ -150,8 +150,9 @@ uint8_t ADMVideoPartial::configure( AVDMGenericVideoStream *instream)
 {
         UNUSED_ARG(instream);
 		//uint8_t  GUI_getIntegerValue(int *valye, int min, int max, char *title)
-		GUI_getIntegerValue((int *)&_param->_start, 0, 0xffff, "Start frame ?")    ;
-		GUI_getIntegerValue((int *)&_param->_end, 0, 0xffff, "End frame ?") ;
+               GUI_getIntegerValue((int *)&_param->_start, 0, avifileinfo->nb_frames-1, "Start frame ?")    ;
+               GUI_getIntegerValue((int *)&_param->_end, 0, avifileinfo->nb_frames-1, "End frame ?") ; 
+		
 		if(_param->_end<_param->_start) _param->_end=_param->_start;
 
 	 return 1;
