@@ -162,7 +162,7 @@ char *displ;
 		printf("Looks like remote display, no Xv :%s\n",displ);
 		return 1;
 	}
-	#if defined(USE_XV)
+	#if defined(USE_XV) 
 	
 		accel_mode=new XvAccelRender();
 		if(!accel_mode->init(draw,renderW,renderH))

@@ -47,7 +47,9 @@ static uint8_t sdl_running=0;
 static SDL_Overlay *sdl_overlay=NULL;
 static SDL_Surface *sdl_display=NULL;
 static SDL_Rect disp;
+#define TEST_YU2 1
 
+extern void YV12_422( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h);
 sdlAccelRender::sdlAccelRender( void)
 {
 
@@ -111,7 +113,13 @@ Display *sdl_windisplay;
 	disp.y=1;
 	printf("Sdl win :%d %d\n",x,y);
 	//_______________________________________________________
-	sdl_overlay=SDL_CreateYUVOverlay(w,h,SDL_YV12_OVERLAY,sdl_display);
+	sdl_overlay=SDL_CreateYUVOverlay(w,h,
+#if defined(CONFIG_DARWIN) || defined(TEST_YU2)	
+		SDL_YUY2_OVERLAY
+#else		
+		SDL_YV12_OVERLAY
+#endif		
+		,sdl_display);
 	if(!sdl_overlay)
 	{
 		end();
@@ -130,7 +138,7 @@ Display *sdl_windisplay;
 	// FIXME : Does not work....
 	 //XMoveWindow(info.info.x11.display, info.info.x11.wmwindow,x,y);
 	
-	printf("SDL_init ok, type is : %d\n",sdl_overlay->hw_overlay);
+	printf("SDL_init ok, type is : %d,planes :%d\n",sdl_overlay->hw_overlay,sdl_overlay->planes);
 	return 1;
 }
 uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h)
@@ -141,9 +149,13 @@ uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h)
 	/*sdl_overlay->pixels[0]=ptr;
 	sdl_overlay->pixels[1]=ptr+(w*h);
 	sdl_overlay->pixels[2]=ptr+((w*h*5)>>2);*/
+#if defined(CONFIG_DARWIN) || defined(TEST_YU2)	
+	YV12_422( ptr, sdl_overlay->pixels[0],   w,  h);
+#else
 	memcpy(sdl_overlay->pixels[0],ptr,w*h);
 	memcpy(sdl_overlay->pixels[1],ptr+h*w,(w*h)>>2);
 	memcpy(sdl_overlay->pixels[2],ptr+((w*h*5)>>2),(w*h)>>2);
+#endif		
 	SDL_UnlockYUVOverlay(sdl_overlay);
 	SDL_DisplayYUVOverlay(sdl_overlay,&disp);
 	//printf("*\n");
