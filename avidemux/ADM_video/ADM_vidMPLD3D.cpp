@@ -74,9 +74,12 @@ ADMVideoMPD3D::~ADMVideoMPD3D()
 {
 
  	DELETE(_param);
-	delete [] _uncompressed;
-	delete [] Line;
-	delete  _storage;
+	if(_uncompressed)
+		delete [] _uncompressed;
+	if(Line)
+		delete [] Line;
+	if(_storage)
+		delete  _storage;
 
 	_storage=NULL;
 	Line=NULL;
@@ -194,7 +197,7 @@ ADMVideoMPD3D::ADMVideoMPD3D(
 			_param->param2=PARAM2_DEFAULT;
 			_param->param3=PARAM3_DEFAULT;
 	}
-	_uncompressed=new unsigned short[(_info.width*_info.height*3)>>1];
+	_uncompressed=new uint16_t[(_info.width*_info.height*3)>>1];
 	_storage=new ADMImage(_info.width,_info.height);
 	setup();
 
@@ -246,10 +249,23 @@ UNUSED_ARG(flags);
 					}
 				 	unsigned short* dst=_uncompressed;
 	    				unsigned char* src=YPLANE(data);
-					for (int Y = 0; Y < (W*H*3)>>1; Y++)
+					for (int Y = 0; Y < W*H; Y++)
 						{
 	    						 	*(dst++)=*(src++)<<8;
 						}
+					src=UPLANE(data);
+					dst=_uncompressed+(W*H);
+					for (int Y = 0; Y < (W*H)>>2; Y++)
+						{
+	    						 	*(dst++)=*(src++)<<8;
+						}
+					src=VPLANE(data);
+					dst=_uncompressed+((5*W*H)>>2);
+					for (int Y = 0; Y < (W*H)>>2; Y++)
+						{
+	    						 	*(dst++)=*(src++)<<8;
+						}
+					
 					_last=frame;
 					return 1;
 

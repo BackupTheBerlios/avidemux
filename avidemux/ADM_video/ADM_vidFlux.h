@@ -17,7 +17,7 @@
  
 #ifndef __FLUX__
 #define __FLUX__   
-#include "ADM_video/ADM_vidCached.h"
+#include "ADM_video/ADM_cache.h"
 typedef struct FLUX_PARAM
 {
 	uint32_t temporal_threshold;
@@ -25,21 +25,21 @@ typedef struct FLUX_PARAM
 	
 }FLUX_PARAM;
 
-class  ADMVideoFlux:public ADMVideoCached
+class  ADMVideoFlux:public AVDMGenericVideoStream
  {
 
  protected:
     	
-        			FLUX_PARAM									*_param;
+        			FLUX_PARAM		*_param;
 
 				void DoFilter_C( uint8_t * currp,  uint8_t * prevp, uint8_t * nextp, 
-												 int src_pitch, uint8_t * destp,  int dst_pitch,
-												 int row_size,  int height);
+							 int src_pitch, uint8_t * destp,  int dst_pitch,
+							 int row_size,  int height);
 				void DoFilter_MMX( uint8_t * currp,  uint8_t * prevp, uint8_t * nextp, 
-												 int src_pitch, uint8_t * destp,  int dst_pitch,
-												 int row_size,  int height);												 
+							 int src_pitch, uint8_t * destp,  int dst_pitch,
+							 int row_size,  int height);	 
 				int32_t num_frame;
-												 
+		 		VideoCache		*vidCache;
 			
  public:
  		
@@ -48,10 +48,10 @@ class  ADMVideoFlux:public ADMVideoCached
 
   						 ~ADMVideoFlux();
 		        virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags);
+          						ADMImage *data,uint32_t *flags);
 
 			virtual uint8_t 	configure( AVDMGenericVideoStream *instream);
-     			virtual char 	*printConf(void);
+     			virtual char 		*printConf(void);
 			virtual uint8_t 	getCoupledConf( CONFcouple **couples);
 							
  }     ;

@@ -5,7 +5,7 @@
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
-#if 0
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -46,13 +46,13 @@ BUILD_CREATE(stabilize_create,ADMVideoStabilize);
 
 
 
- char 								*ADMVideoStabilize::printConf(void)
- {
-	  	static char buf[50];
+char 	*ADMVideoStabilize::printConf(void)
+{
+  static char buf[50];
 
- 				sprintf((char *)buf," Stabilize :%ld",*_param);
+ 	sprintf((char *)buf," Stabilize :%ld",*_param);
         return buf;
-	}
+}
 uint8_t  GUI_getIntegerValue(int *valye, int min, int max, char *title);
 uint8_t ADMVideoStabilize::configure(AVDMGenericVideoStream *instream)
 {
@@ -95,6 +95,7 @@ ADMVideoStabilize::~ADMVideoStabilize()
  
  	DELETE(_param);
 	if(vidCache) delete vidCache;
+	vidCache=NULL;
 }
 
 
@@ -124,37 +125,47 @@ UNUSED_ARG(flags);
 uint32_t uvlen;
 uint32_t dlen,dflags;
 
-uint8_t										*_next;
-uint8_t										*_previous;  	
-uint8_t										*_current;
-	//		printf("\n Stabilize : %lu\n",frame);
-
+ADMImage	*_next;
+ADMImage	*_previous;  	
+ADMImage	*_current;
 		
-					
-			
-			uvlen=    _info.width*_info.height;
-			*len=uvlen+(uvlen>>1);
-		    if(frame> _info.nb_frames-1) return 0;
-			_current=vidCache->getImage(frame);
-			ADM_assert(_current);
-			if(!frame || (frame==_info.nb_frames-1))
-			{
-					memcpy(data,_current,*len);
-					vidCache->unlockAll();
-					return 1;
-			}	 
+		uvlen=    _info.width*_info.height;
+		*len=uvlen+(uvlen>>1);
+		if(frame> _info.nb_frames-1) return 0;
+		_current=vidCache->getImage(frame);
+		if(!_current) return 0;
+		
+		if(!frame || (frame==_info.nb_frames-1))
+		{
+			_current->_qStride=0;
+			data->duplicate(_current);
+			vidCache->unlockAll();
+			return 1;
+		}	 
    		_previous=vidCache->getImage(frame-1);		
+		if(!_previous)
+		{
+			vidCache->unlockAll();
+			return 0;
+		}
    		_next=vidCache->getImage(frame+1);
+		if(!_next)
+		{
+			vidCache->unlockAll();
+			return 0;
+		}
+		
            // for u & v , no action -> copy it as is
-           memcpy(data+uvlen,_current+uvlen,uvlen>>1);
-               							   				
+           memcpy(UPLANE(data),UPLANE(_current),uvlen>>2);
+	   memcpy(VPLANE(data),VPLANE(_current),uvlen>>2);
+
            uint8_t *inprev,*innext,*incur,*zout;
               
-              inprev=_previous+1+_info.width;
-              innext=_next+1+_info.width;
-              incur =_current+1+_info.width;
+              inprev=YPLANE(_previous)+1+_info.width;
+              innext=YPLANE(_next)+1+_info.width;
+              incur =YPLANE(_current)+1+_info.width;
               
-              zout=data->data+_info.width+1;
+              zout=YPLANE(data)+_info.width+1;
               
              
               uint8_t *nl,*pl,*nc,*pc;
@@ -200,5 +211,4 @@ uint8_t										*_current;
 }
 
 
-#endif
 #endif

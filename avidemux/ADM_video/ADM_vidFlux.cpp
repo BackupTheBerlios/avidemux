@@ -54,7 +54,7 @@ void initScaleTab( void )
 							  (((uint64_t)scaletab[(i >> 12) & 15]) << 48);
 		}
 }
- #if 0
+ 
 #include "ADM_video/ADM_vidFlux.h"
 #include "ADM_filter/video_filters.h"
 
@@ -82,10 +82,11 @@ static	 uint8_t * _l_destp;
 static uint32_t size;
 
 ADMVideoFlux::ADMVideoFlux(AVDMGenericVideoStream *in,CONFcouple *couples)
-			: ADMVideoCached(in,couples)
+			
 {
   
-	
+	_in=in;
+	memcpy(&_info,in->getInfo(),sizeof(_info));
 	if(couples)
 	{
 		_param=NEW( FLUX_PARAM );
@@ -98,7 +99,8 @@ ADMVideoFlux::ADMVideoFlux(AVDMGenericVideoStream *in,CONFcouple *couples)
 		 _param->spatial_threshold=7;
 		 _param->temporal_threshold=7;
 	}
-  num_frame=0xffff0000;
+  	num_frame=0xffff0000;
+	vidCache=new VideoCache(5,in);
 }
 
 uint8_t	ADMVideoFlux::getCoupledConf( CONFcouple **couples)
@@ -133,6 +135,9 @@ int i;
 ADMVideoFlux::~ADMVideoFlux()
 {
 	DELETE(_param);
+	if(vidCache)
+		delete vidCache;
+	vidCache=NULL;
 }
 
 char	*ADMVideoFlux::printConf( void) 
@@ -146,51 +151,54 @@ char	*ADMVideoFlux::printConf( void)
 	
 }
 uint8_t ADMVideoFlux::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags)
+          			ADMImage *data,uint32_t *flags)
 {
 UNUSED_ARG(flags);
 uint32_t dlen,dflags;
 uint32_t plane=_info.width*_info.height;
-
+ADMImage	*image,*next,*prev;
 
 
 			*len=(plane*3)>>1;
 			
 			size=(_info.width*_info.height*3)>>1;
 			if(frame>_info.nb_frames-1) return 0;
-			// check if it the 1st frame
-			if(frame> _info.nb_frames-1) return 0;
+			
+			image=vidCache->getImage(frame);
+			if(!image) return 0;
+			
 			if(!frame || (frame==_info.nb_frames-1))
 			{
-				 if(!_in->getFrameNumberNoAlloc(frame, &dlen,_buffer[0],&dflags))
-				 {
-					 	return 0;
-					}
-				 _bufnum[0]=frame;
-					memcpy(data,_buffer[0],size);
-					return 1;
-			}	    
-			
-			switch(fillCache( frame))
+				image->_qStride=0;
+				data->duplicate(image);
+				vidCache->unlockAll();
+				return 1;
+			}
+			next=vidCache->getImage(frame+1);
+			if(!next)
 			{
-				 case 0: return 0; break;
-				 case 1: memcpy(data,_buffer[index_c],size); return 1; break;
-				 case 2: break;
-				 default:ADM_assert(0);
-			}				 
+				vidCache->unlockAll();
+				return 0;
+			}
+			prev=vidCache->getImage(frame-1);
+			if(!prev)
+			{
+				vidCache->unlockAll();
+				return 0;
+			}	    
 				
-//	printf("\n Action\n");		
+
 		   			
 // now we have everything
-int dst_pitch = _info.width,
+		int dst_pitch = _info.width,
 		src_pitch = _info.width,
 		row_size  = _info.width,
 		height    = _info.height;
 		
- uint8_t   *currp = _buffer[index_c],
-								*prevp = _buffer[index_p],
-								*nextp = _buffer[index_n];
-	uint8_t				*destp = data;
+ uint8_t   		*currp = YPLANE(image),
+			*prevp = YPLANE(prev),
+			*nextp = YPLANE(next);;
+	uint8_t		*destp = YPLANE(data);
 
 	// line 1 and last
 	memcpy(destp, currp, row_size);
@@ -212,10 +220,11 @@ int dst_pitch = _info.width,
 	src_pitch = _info.width>>1;
   row_size  = _info.width>>1;
 	height = _info.height>>1;
-	currp = _buffer[index_c]+plane;
-	prevp = _buffer[index_p]+plane;
-	nextp = _buffer[index_n]+plane;
-	destp = data+plane;
+	
+	currp = UPLANE(image);
+	prevp = UPLANE(prev);
+	nextp = UPLANE(next);
+	destp = UPLANE(data);;
 
 	memcpy(destp, currp, row_size);
 	memcpy(destp + dst_pitch * (height - 1),
@@ -237,10 +246,11 @@ int dst_pitch = _info.width,
 	src_pitch = _info.width>>1;
   row_size  = _info.width>>1;
 	height = _info.height>>1;
-	currp = _buffer[index_c]+plane;
-	prevp = _buffer[index_p]+plane;
-	nextp = _buffer[index_n]+plane;
-	destp = data+plane;
+	
+	currp = VPLANE(image);
+	prevp = VPLANE(prev);
+	nextp = VPLANE(next);
+	destp = VPLANE(data);;
 
 	memcpy(destp, currp, row_size);
 	memcpy(destp + dst_pitch * (height - 1),
@@ -260,6 +270,7 @@ int dst_pitch = _info.width,
 			destp, dst_pitch, row_size, height - 2);
 	#endif
 
+	vidCache->unlockAll();
 	return 1;
 }	                           
 
@@ -403,7 +414,7 @@ void ADMVideoFlux::DoFilter_C(
 
 void ADMVideoFlux::DoFilter_MMX(
 uint8_t * currp, 
- uint8_t * prevp,								  								  
+ uint8_t * prevp,
  uint8_t * nextp, 
  int src_pitch,
  uint8_t * destp, 
@@ -630,4 +641,3 @@ CHECK_AND_ADD(temp_thresh)
 }
 #endif
 //
-#endif

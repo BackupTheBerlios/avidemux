@@ -163,26 +163,26 @@ uint8_t ADMVideoForcedPP::getFrameNumberNoAlloc(uint32_t frame,
 				if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags))
 				 		return 0;
 
-		 		oBuff[0]=data->data;
-		 		oBuff[1]=data->data+page;
- 		 		oBuff[2]=oBuff[1]+(page>>2);
+		 		oBuff[0]=YPLANE(data);
+		 		oBuff[1]=UPLANE(data);
+ 		 		oBuff[2]=VPLANE(data);
 				
-				iBuff[0]=_uncompressed->data;
-		 		iBuff[1]=_uncompressed->data+page;
- 		 		iBuff[2]=iBuff[1]+(page>>2);
+				iBuff[0]=YPLANE(_uncompressed);
+		 		iBuff[1]=UPLANE(_uncompressed);
+ 		 		iBuff[2]=VPLANE(_uncompressed);
 				
 				
 		            	strideTab[0]=strideTab2[0]=_info.width;
 				strideTab[1]=strideTab2[1]=_info.width>>1;
 				strideTab[2]=strideTab2[2]=_info.width>>1;
-/*
-void  pp_postprocess(uint8_t * src[3], int srcStride[3],
-                 uint8_t * dst[3], int dstStride[3],
-                 int horizontalSize, int verticalSize,
-                 QP_STORE_T *QP_store,  int QP_stride,
-		 pp_mode_t *mode, pp_context_t *ppContext, int pict_type);
-
-*/				
+	
+				int type;
+				if(_uncompressed->flags&AVI_KEY_FRAME)
+						type=1;
+					else if(_uncompressed->flags & AVI_B_FRAME)
+							type=3;
+						else
+							type=2;
 		 		pp_postprocess(
 		      			iBuff,
 		        		strideTab,
@@ -194,7 +194,7 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 		          		0,
 		         		_postproc.ppMode,
 		          		_postproc.ppContext,
-		          		1); // I ?
+		          		type); // I ?
 			  	
 			}
 		else

@@ -17,7 +17,7 @@
  #ifndef __VIDEO_FILTERS__
  #define  __VIDEO_FILTERS__
 
- #define MAX_FILTER 60
+ #define MAX_FILTER 80
 #include "ADM_script/adm_scanner.h"
  	typedef enum
  	{

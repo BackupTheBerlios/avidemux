@@ -99,7 +99,7 @@ ADMVideoDenoise::ADMVideoDenoise(
     
   _info.encoding=1;
   
-  page= 3*_in->getInfo()->width*_in->getInfo()->height;
+  page= _in->getInfo()->width*_in->getInfo()->height;
   
 //  _uncompressed=new uint8_t [page];
   _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
@@ -111,10 +111,12 @@ ADMVideoDenoise::ADMVideoDenoise(
  
 //	_lockcount=new uint8_t [page];
 
-  ADM_assert(_lockcount);  
+
   
    _lockcount=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-  memset(_lockcount,0,page);  
+  memset(YPLANE(_lockcount),0,page);  
+  memset(UPLANE(_lockcount),0,page>>2);  
+  memset(VPLANE(_lockcount),0,page>>2);  
         
   _param=NULL;
   
@@ -160,9 +162,9 @@ uint8_t	ADMVideoDenoise::getCoupledConf( CONFcouple **couples)
 ADMVideoDenoise::~ADMVideoDenoise()
 {
  	
-	delete [] _uncompressed;
- 	delete [] _locked;
-  delete [] _lockcount;
+	delete  _uncompressed;
+ 	delete  _locked;
+  	delete  _lockcount;
   DELETE(_param);
   
   _uncompressed=_locked=_lockcount=NULL;
@@ -179,26 +181,33 @@ uint8_t ADMVideoDenoise::getFrameNumberNoAlloc(uint32_t frame,
    //uint32_t x,w;
   	uint32_t page; 
    		ADM_assert(_param);
-			ADM_assert(frame<_info.nb_frames);
+		ADM_assert(frame<_info.nb_frames);
 								
 			
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
-       		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       			
-                     
-           //uint32_t sz=_info.width*_info.height;
 
-          if((_lastFrame+1)!=frame) // async jump
-          {
-							// just copy it 
-								memcpy(data,_uncompressed,*len);
-								memcpy(_locked,_uncompressed,*len);
-								_lastFrame=frame;
-								return 1;
-					}          
-				_lastFrame=frame;
+		
+		page=_info.width*_info.height;  
+		*len=(page*3)>>1;           
+
+	if((_lastFrame+1)!=frame) // async jump
+	{
+			// just copy it 
+			memcpy(YPLANE(data),YPLANE(_uncompressed),page);
+			memcpy(UPLANE(data),UPLANE(_uncompressed),page>>2);
+			memcpy(VPLANE(data),VPLANE(_uncompressed),page>>2);
+			
+			memcpy(YPLANE(_locked),YPLANE(_uncompressed),page);
+			memcpy(UPLANE(_locked),UPLANE(_uncompressed),page>>2);
+			memcpy(VPLANE(_locked),VPLANE(_uncompressed),page>>2);
+			
+			_lastFrame=frame;
+			return 1;
+	}          
+	_lastFrame=frame;
           
           // copy chroma for now
-          page=  _info.width*_info.height>>2;
+        
          
           
           //
@@ -213,20 +222,20 @@ uint8_t ADMVideoDenoise::getFrameNumberNoAlloc(uint32_t frame,
           // init all
           
           // luma
-          nb=_lockcount->data;
-          lock=_locked->data;
-          in=_uncompressed->data;
-          out=data->data;
+          nb=YPLANE(_lockcount);
+          lock=YPLANE(_locked);
+          in=YPLANE(_uncompressed);
+          out=YPLANE(data);
           // u
-          unb=nb+page*4;
-          ulock=lock+page*4;
-          uin=in+page*4;
-          uout=data->data+page*4;
+          unb=UPLANE(_lockcount);
+          ulock=UPLANE(_locked);
+          uin=UPLANE(_uncompressed);
+          uout=UPLANE(data);
           // v
-          vnb=unb+page;
-          vlock=ulock+page;
-          vin=uin+page;
-          vout=uout+page;
+          vnb=VPLANE(_lockcount);
+          vlock=VPLANE(_locked);
+          vin=VPLANE(_uncompressed);
+          vout=VPLANE(data);
           
           
           uint32_t xx,yy/*,dl*/,du,dv;
@@ -235,69 +244,73 @@ uint8_t ADMVideoDenoise::getFrameNumberNoAlloc(uint32_t frame,
           {
 	          for(xx=_info.width>>1;xx>0;xx--)          
   	        {
-								du=distMatrix[*uin][*ulock];														
-								dv=distMatrix[*vin][*vlock];														
+			du=distMatrix[*uin][*ulock];	
+			dv=distMatrix[*vin][*vlock];		
 						
-								// if chroma is locked , we try to lock luma
-								if( (du<_param->chromaLock)
-									 && (dv<_param->chromaLock))
-									 {  
-										 			*uout=*ulock;
- 										 			*vout=*vlock;
+			// if chroma is locked , we try to lock luma
+			if( (du<_param->chromaLock)
+				 && (dv<_param->chromaLock))
+			 {  
+				*uout=*ulock;
+ 				*vout=*vlock;
 
-#define PIX(z) 		doOnePix(in+z,out+z,lock+z,nb+z)									 
-										 			locked+=PIX(0)+	PIX(1)+ 	PIX(_info.width)+
-										     	PIX(_info.width+1);										      										 
-										}
-										else
-								  // if chroma is blended, we blend luma
+#define PIX(z) 		doOnePix(in+z,out+z,lock+z,nb+z) 
+				locked+=PIX(0)+	PIX(1)+ PIX(_info.width)+PIX(_info.width+1);
+			}
+			else
+			 // if chroma is blended, we blend luma
 #undef PIX								  
 #define PIX(z) 		doBlend(in+z,out+z,lock+z,nb+z)									 
-									if( (du<_param->chromaThreshold)
-									 && (dv<_param->chromaThreshold))
-										{
-											 		PIX(0);
-										    	PIX(1);
-										     	PIX(_info.width);
-										     	PIX(_info.width+1);															
-										      *uout=*ulock=(*uin+*uin)>>1;
- 										 			*vout=*vlock=(*vin+*vin)>>1;
-										}
+				if( (du<_param->chromaThreshold)
+					 && (dv<_param->chromaThreshold))
+				{
+			 		PIX(0);
+				    	PIX(1);
+				     	PIX(_info.width);
+				     	PIX(_info.width+1);	
+				      *uout=*ulock=(*uin+*uin)>>1;
+ 					*vout=*vlock=(*vin+*vin)>>1;
+				}
 #undef PIX											
 										
-										else
-										{
-#define PIX(z) *(out+z)=*(lock+z)=*(in+z);*(nb+z)=0											
+			else
+			{
+#define PIX(z) *(out+z)=*(lock+z)=*(in+z);*(nb+z)=0			
 											
-													PIX(0);
-										    	PIX(1);
-										     	PIX(_info.width);
-										     	PIX(_info.width+1);		
-										 			*uout=*ulock=*uin;
- 										 			*vout=*vlock=*vin;
-											
-#undef PIX											
-										}
+				PIX(0);
+				PIX(1);
+				PIX(_info.width);
+				PIX(_info.width+1);		
+				*uout=*ulock=*uin;
+ 				*vout=*vlock=*vin;
+				
+#undef PIX		
+			}
 								  
 											                        				                        
-							uin++;uout++;ulock++;unb++;   
-							vin++;vout++;vlock++;vnb++;   
-							in++;out++;lock++;nb++;   
-							in++;out++;lock++;nb++;   
+			uin++;uout++;ulock++;unb++;   
+			vin++;vout++;vlock++;vnb++;   
+			in++;out++;lock++;nb++;   
+			in++;out++;lock++;nb++;   
 							
-						}
+		}
             // 
             in+=_info.width;
             out+=_info.width;
             lock+=_info.width;
             nb+=_info.width;            						
-					};
+	};
           
-          if(locked>page*3) // if more than 75% pixel not locked -> scene change
+          if(locked>((page*3)>>2)) // if more than 75% pixel not locked -> scene change
           {
-						  	memcpy(data,_uncompressed,*len);
-								memcpy(_locked,_uncompressed,*len);
-					}
+			memcpy(YPLANE(data),YPLANE(_uncompressed),page);
+			memcpy(UPLANE(data),UPLANE(_uncompressed),page>>2);
+			memcpy(VPLANE(data),VPLANE(_uncompressed),page>>2);
+			
+			memcpy(YPLANE(_locked),YPLANE(_uncompressed),page);
+			memcpy(UPLANE(_locked),UPLANE(_uncompressed),page>>2);
+			memcpy(VPLANE(_locked),VPLANE(_uncompressed),page>>2);
+	}
            
       return 1;
 }
@@ -310,39 +323,39 @@ uint8_t ADMVideoDenoise::getFrameNumberNoAlloc(uint32_t frame,
 uint8_t ADMVideoDenoise::doOnePix(uint8_t *in,uint8_t *out,uint8_t *lock,uint8_t *nb)
 {
 unsigned int d;
-							d=distMatrix[*(in)][*(lock)]; 
-							if(d<_param->lumaLock)         
-							{								                
-								if(*(nb)>30)  // out of scope -> copy new                   
-								{  						// too much copy ->                              
-										*(nb)=0;                       
-										*(out)=(*(in)+*(lock))>>1;
-										*(lock)=*(out);    										
-										return DN_COPY;      
-								}                                 
-								else                               
-								{                                   
-									*(out)=*(lock);		
-									*nb += 1; // *(nb)++;	
-									return DN_LOCK;		
-								}                  
-							}                     
-							else if(d< _param->lumaThreshold) 
-							{                                  
-								 *(nb)=0;                           
-									*(out)=(*(in)+*(lock))>>1;	
-									return DN_BLEND;							
-							}
-							else   // too big delta
-							{    
-								 *(nb)=0; 
-									*(out)=*(in);	  
-									*(lock)=*(in);    
-									return DN_COPY;
-							}                     
+		d=distMatrix[*(in)][*(lock)]; 
+		if(d<_param->lumaLock)         
+		{								                
+			if(*(nb)>30)  // out of scope -> copy new                   
+			{  	// too much copy ->                              
+				*(nb)=0;                       
+				*(out)=(*(in)+*(lock))>>1;
+				*(lock)=*(out);    	
+				return DN_COPY;      
+			}                                 
+			else                               
+			{                                   
+				*(out)=*(lock);		
+				*nb += 1; // *(nb)++;	
+				return DN_LOCK;		
+			}                  
+		}                     
+		else if(d< _param->lumaThreshold) 
+			{                                  
+				 *(nb)=0;                           
+				*(out)=(*(in)+*(lock))>>1;	
+				return DN_BLEND;
+			}
+			else   // too big delta
+			{    
+				 *(nb)=0; 
+				*(out)=*(in);	  
+				*(lock)=*(in);    
+				return DN_COPY;
+			}                     
 					                           
-							ADM_assert(0);
-							return 0;
+			ADM_assert(0);
+			return 0;
 
 }
 uint8_t ADMVideoDenoise::doBlend(uint8_t *in,uint8_t *out,uint8_t *lock,uint8_t *nb)

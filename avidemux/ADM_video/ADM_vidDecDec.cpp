@@ -434,7 +434,9 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			OutputDebugString(buf);
 		}
 	    //return src;
-	        memcpy(data,src,*len);
+	        //memcpy(data,src,*len);
+		src->_qStride=0;
+		data->duplicate(src);
 		vidCache->unlockAll();
 		return 1;
 	}
@@ -508,7 +510,9 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 				OutputDebugString(buf);
 			}
 			//return src;
-			memcpy(data,src,*len);
+			//memcpy(data,src,*len);
+			src->_qStride=0;
+			data->duplicate(src);
 			vidCache->unlockAll();
 			return 1;
 		}
@@ -550,8 +554,8 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		wUV = _info.width>>1;//src->GetRowSize(PLANAR_V);
 		hUV = _info.height>>1;//src->GetHeight(PLANAR_V);
 		
-		nextrpY = (unsigned char *) next; //next->GetReadPtr(PLANAR_Y);
-		dstwpY = (unsigned char *) dst; //dst->GetWritePtr(PLANAR_Y);
+		nextrpY = YPLANE(next); //next->GetReadPtr(PLANAR_Y);
+		dstwpY = YPLANE( dst); //dst->GetWritePtr(PLANAR_Y);
 #ifdef DECIMATE_MMX_BUILD_PLANE
 		if (CpuCaps::hasSSE()) 
 		{
@@ -571,9 +575,9 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 #ifdef DECIMATE_MMX_BUILD_PLANE
 		}
 #endif
-		srcrpU = (unsigned char *) UPLANE(src);//->GetReadPtr(PLANAR_U);
-	    nextrpU = (unsigned char *) UPLANE(next);//->GetReadPtr(PLANAR_U);
-	    dstwpU = (unsigned char *) UPLANE(dst);//->GetWritePtr(PLANAR_U);
+		srcrpU =   UPLANE(src);//->GetReadPtr(PLANAR_U);
+		nextrpU =   UPLANE(next);//->GetReadPtr(PLANAR_U);
+		dstwpU =  UPLANE(dst);//->GetWritePtr(PLANAR_U);
 #ifdef DECIMATE_MMX_BUILD_PLANE
 		if (CpuCaps::hasSSE()) 
 		{
@@ -593,9 +597,9 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 #ifdef DECIMATE_MMX_BUILD_PLANE
 		}
 #endif
-	    srcrpV = (unsigned char *) VPLANE(src);//->GetReadPtr(PLANAR_V);
-	    nextrpV = (unsigned char *) VPLANE(next);//->GetReadPtr(PLANAR_V);
-	    dstwpV = (unsigned char *) VPLANE(dst);//->GetWritePtr(PLANAR_V);
+		srcrpV =   VPLANE(src);//->GetReadPtr(PLANAR_V);
+		nextrpV =   VPLANE(next);//->GetReadPtr(PLANAR_V);
+		dstwpV =   VPLANE(dst);//->GetWritePtr(PLANAR_V);
 
 #ifdef DECIMATE_MMX_BUILD_PLANE
 		if (CpuCaps::hasSSE()) { 
@@ -641,7 +645,9 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			DrawString(dst->data, 0, 9, buf);
 		}
 		//return dst;
-		memcpy(data,dst,*len);
+		//memcpy(data,dst,*len);
+		dst->_qStride=0;
+		data->duplicate(dst);
 		vidCache->unlockAll();		
 		return 1;
 	}
@@ -689,7 +695,9 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			OutputDebugString(buf);
 		}
 	    //return src;
-	    	memcpy(data,src,*len);
+	    	//memcpy(data,src,*len);
+		src->_qStride=0;
+		data->duplicate(src);
 		vidCache->unlockAll();
 		return 1;
 	}
@@ -732,7 +740,10 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			if (useframe >= dropframe) useframe++;
 			GETFRAME(useframe, src);
 			DrawShow(src->data, useframe, forced, dropframe, metric, inframe);			
-			memcpy(data,src,*len);
+			//memcpy(data,src,*len);
+			src->_qStride=0;
+			data->duplicate(src);
+		
 			vidCache->unlockAll();		
 			return 1; // return src;
 		}
@@ -742,7 +753,10 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			GETFRAME(useframe, src);
 			DrawShow(src->data, 0, forced, dropframe, metric, inframe);
 			//return src;
-			memcpy(data,src,*len);
+			//memcpy(data,src,*len);
+			src->_qStride=0;
+			data->duplicate(src);
+		
 			vidCache->unlockAll();		
 			return 1; // return src;
 		}
@@ -752,7 +766,10 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			GETFRAME(useframe+1, src);
 			DrawShow(src->data, 0, forced, dropframe, metric, inframe);
 			//return src;
-			memcpy(data,src,*len);
+			//memcpy(data,src,*len);
+			src->_qStride=0;
+			data->duplicate(src);
+		
 			vidCache->unlockAll();		
 			return 1; // return src;
 		}
@@ -784,9 +801,9 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			wUV = _info.width>>1; //src->GetRowSize(PLANAR_V);
 			hUV = _info.height>>1; //src->GetHeight(PLANAR_V);
 			
-		    srcrpY = (unsigned char *) src; //src->GetReadPtr(PLANAR_Y);
-			nextrpY = (unsigned char *) next; //next->GetReadPtr(PLANAR_Y);
-			dstwpY = (unsigned char *) dst; //dst->GetWritePtr(PLANAR_Y);
+			srcrpY = YPLANE( src); //src->GetReadPtr(PLANAR_Y);
+			nextrpY = YPLANE( next); //next->GetReadPtr(PLANAR_Y);
+			dstwpY = YPLANE( dst); //dst->GetWritePtr(PLANAR_Y);
 #ifdef DECIMATE_MMX_BUILD_PLANE
 			if (CpuCaps::hasSSE()) { 
 				isse_blend_decimate_plane(dstwpY, srcrpY, nextrpY, wY, hY);
@@ -805,9 +822,9 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 #ifdef DECIMATE_MMX_BUILD_PLANE
 			}
 #endif
-			srcrpU = (unsigned char *) UPLANE(src);//->GetReadPtr(PLANAR_U);
-			nextrpU = (unsigned char *)UPLANE( next);//->GetReadPtr(PLANAR_U);
-			dstwpU = (unsigned char *) UPLANE(dst);//->GetWritePtr(PLANAR_U);
+			srcrpU =   UPLANE(src);//->GetReadPtr(PLANAR_U);
+			nextrpU =  UPLANE( next);//->GetReadPtr(PLANAR_U);
+			dstwpU =   UPLANE(dst);//->GetWritePtr(PLANAR_U);
 #ifdef DECIMATE_MMX_BUILD_PLANE
 			if (CpuCaps::hasSSE()) { 
 				isse_blend_decimate_plane(dstwpU, srcrpU, nextrpU, wUV, hUV);
@@ -826,9 +843,9 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 #ifdef DECIMATE_MMX_BUILD_PLANE
 			}
 #endif
-			srcrpV = (unsigned char *) VPLANE(src);//->GetReadPtr(PLANAR_V);
-			nextrpV = (unsigned char *)VPLANE( next);//->GetReadPtr(PLANAR_V);
-			dstwpV = (unsigned char *) VPLANE(dst);//->GetWritePtr(PLANAR_V);
+			srcrpV =   VPLANE(src);//->GetReadPtr(PLANAR_V);
+			nextrpV =  VPLANE( next);//->GetReadPtr(PLANAR_V);
+			dstwpV =   VPLANE(dst);//->GetWritePtr(PLANAR_V);
 #ifdef DECIMATE_MMX_BUILD_PLANE
 			if (CpuCaps::hasSSE()) { 
 				isse_blend_decimate_plane(dstwpV, srcrpV, nextrpV, wUV, hUV);
@@ -850,12 +867,16 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			DrawShow(dst->data, 0, forced, dropframe, metric, inframe);
 			vidCache->unlockAll();
 			//return dst;
-			memcpy(data,dst,*len);
+			//memcpy(data,dst,*len);
+			dst->_qStride=0;
+			data->duplicate(dst);
 			vidCache->unlockAll();		
 			return 1; // return src;			
 		}
 		//return src;
-		memcpy(data,src,*len);
+		//memcpy(data,src,*len);
+		src->_qStride=0;
+		data->duplicate(src);
 		vidCache->unlockAll();		
 		return 1; // return src;			
 	}

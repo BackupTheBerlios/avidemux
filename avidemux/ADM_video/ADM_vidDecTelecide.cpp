@@ -346,7 +346,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 	//GETFRAME(nframe, fn);
 	fn=vidCache->getImage(framen);
 	ADM_assert(fn);
-	YPLANE( fn);
+	fnrp=YPLANE( fn);
 	
 	{
 		fnrpU = (unsigned char *)  UPLANE(fn);
@@ -370,7 +370,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 				//GETFRAME(y == 0 ? 1 : y - 1, lp);
 				lp=vidCache->getImage(y == 0 ? 1 : y - 1);
 				ADM_assert(lp);
-				prp = (unsigned char *) lp;
+				prp = YPLANE( lp);
 				{
 					prpU = (unsigned char *)  UPLANE(lp);
 					prpV = (unsigned char *) VPLANE(lp );
@@ -378,7 +378,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 				//GETFRAME(y, lc);
 				lc=vidCache->getImage(y);
 				ADM_assert(lc);
-				crp = (unsigned char *) lc;
+				crp = YPLANE( lc);
 				{
 					crpU = (unsigned char *) UPLANE(lc);
 					crpV = (unsigned char *) VPLANE(lc);
@@ -654,7 +654,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 		if (_param->blend == true)
 		{
 			// Blend mode.
-			final = data; //env->NewVideoFrame(vi);
+			final = (data); //env->NewVideoFrame(vi);
 			// Do first and last lines.
 			finalp = YPLANE(final);
 			dstp = YPLANE(dst);
@@ -860,7 +860,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 }
 
 void Telecide::CalculateMetrics(int frame, unsigned char *fcrp, unsigned char *fcrpU, unsigned char *fcrpV,
-									unsigned char *fprp, unsigned char *fprpU, unsigned char *fprpV)
+			unsigned char *fprp, unsigned char *fprpU, unsigned char *fprpV)
 {
 	int x, y, p, c, tmp1, tmp2, skip;
 	bool vc;

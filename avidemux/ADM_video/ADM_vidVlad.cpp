@@ -78,14 +78,14 @@ SCRIPT_CREATE(vladsmooth_script,AVDMVideoVlad,vladParam);
 BUILD_CREATE(vladsmooth_create,AVDMVideoVlad);
 
 
-char 								*AVDMVideoVlad::printConf(void)
- {
-	  	static char buf[50];
+char *AVDMVideoVlad::printConf(void)
+{
+	static char buf[50];
  	
- 				sprintf((char *)buf," Temporal Cleaner : Y: %02lu / c: %02lu",_param->ythresholdMask,
-     												_param->cthresholdMask	);
+	sprintf((char *)buf," Temporal Cleaner : Y: %02lu / c: %02lu",_param->ythresholdMask,
+				_param->cthresholdMask	);
         return buf;
-	}
+}
 
 
 uint8_t AVDMVideoVlad::configure( AVDMGenericVideoStream *instream)
@@ -129,21 +129,16 @@ AVDMVideoVlad::AVDMVideoVlad(  AVDMGenericVideoStream *in,CONFcouple *couples)
 	  _param->ythresholdMask=5;
  	  _param->cthresholdMask=0;
    }
-    _mask=new uint8_t[_info.width*_info.height*3];
-//	  _uncompressed=new uint8_t[_info.width*_info.height*3];
-//    _prev=new uint8_t[_info.width*_info.height*3];   
-	 _uncompressed=new ADMImage(_info.width,_info.height); 
-	  _prev=new ADMImage(_info.width,_info.height);
-	  
-	  ADM_assert(_mask);ADM_assert(_uncompressed);ADM_assert(_prev);
-	  memset(_mask,0,	_info.width*_info.height*3);
+    	_mask=new uint8_t[_info.width*_info.height*3];
+  	memset(_mask,0,	_info.width*_info.height*3);
 	  
 	   ythresholdMask=0;
 	   ythresholdMask = (uint64_t)_param->ythresholdMask;
 	   cthresholdMask = (uint64_t)_param->cthresholdMask;	   
 
 		EXPAND(	ythresholdMask);
-		EXPAND(	cthresholdMask);												            
+		EXPAND(	cthresholdMask);
+	vidCache=new VideoCache(5,in);
 }
 
 
@@ -162,9 +157,8 @@ uint8_t	AVDMVideoVlad::getCoupledConf( CONFcouple **couples)
 AVDMVideoVlad::~AVDMVideoVlad()
 {
 		delete [] _mask;
-		delete [] _prev;
-		delete [] _uncompressed;
 		DELETE(_param);
+		delete vidCache;
 }  									
 
 void ProcessYPlane( unsigned char *source, long int pitch_source,
@@ -389,77 +383,79 @@ uint8_t AVDMVideoVlad::getFrameNumberNoAlloc(uint32_t frame,
    				ADMImage *data,
 				uint32_t *flags)
 {
-	uint32_t n;
-	uint32_t page=_info.width*_info.height;
 	
-		if(n>(_info.nb_frames-1)) return 0;
+	uint32_t page=_info.width*_info.height;
+	ADMImage *cur,*prev;
+	
+		if(frame>(_info.nb_frames-1)) return 0;
 		
 		*len=(page*3)>>1;
 		
-		if(!n)
-			 {
-				 if(!	_in->getFrameNumberNoAlloc(0,	len,_prev,flags)) return 0;
-				 memcpy(data,_prev,(page*3)>>1);
-				 return 1  ;
-				}
+		cur=vidCache->getImage(frame);
+		if(!cur) 
+				return 0;
+		if(!frame)
+		{
+			
+			data->duplicate(cur);
+			vidCache->unlockAll();
+			return 1  ;
+		}
 	
-	  if(n!=num_frame+1) // random access
-	  {						
-		if(!_in->getFrameNumberNoAlloc( n-1,len,_prev,flags)) return 0;
-		num_frame=n-1;
+	 	prev=vidCache->getImage(frame-1);
+		if(!prev)
+		{
+			vidCache->unlockAll();
+			return 0  ;
 		}
 		
-		if(!_in->getFrameNumberNoAlloc( n,len,_uncompressed,flags)) return 0;
 		
 		
 			  
-			_threshold= ythresholdMask;
-			ProcessYPlane (_uncompressed->data,
-								_info.width,
-						   		_prev->data,     	
-   						   		 _prev->data, 
-				   				data->data, 
-				   				_mask, 
-				   				_info.width, 
-						       		_info.height,
-				   				ythresholdMask);
-/*     
-			printf("n y_threshold : %lx\n",ythresholdMask);
-			printf("n c_threshold : %lx\n",cthresholdMask);
-*/			
-			if (0==_param->cthresholdMask)
-			{
-				memcpy(data->data+page,_uncompressed->data+page,page>>1);
-			}
-			else
-			{
-				uint32_t of=page;
-				_threshold= cthresholdMask;
-				ProcessCPlane (_uncompressed->data+of,
+		_threshold= ythresholdMask;
+		ProcessYPlane (YPLANE(cur),
+				_info.width,
+				YPLANE(prev),     	
+   				YPLANE(prev), 
+				YPLANE(data), 
+				_mask, 
+				_info.width, 
+		       		_info.height,
+				ythresholdMask);
+		if (0==_param->cthresholdMask)
+		{
+			//memcpy(data->data+page,_uncompressed->data+page,page>>1);
+			memcpy(UPLANE(data),UPLANE(cur),page>>2);
+			memcpy(VPLANE(data),VPLANE(cur),page>>2);
+		}
+		else
+		{
+			
+			_threshold= cthresholdMask;
+				ProcessCPlane (UPLANE(cur),
 							_info.width>>1,
-							_prev->data+of, 
-   							_prev->data+of, 
-							data->data+of, 
+							UPLANE(prev),     	
+   							UPLANE(prev),  
+							UPLANE(data), 
 							_mask, 
 							_info.width>>1, 
 							_info.height>>1,
 							cthresholdMask);       
 				
-				of=of+(of>>2);	       
-				
-				ProcessCPlane (_uncompressed->data+of,
+			
+				ProcessCPlane (VPLANE(cur),
 							_info.width>>1,
-							_prev->data+of, 
-							_prev->data+of, 
-							data->data+of, 
+							VPLANE(prev),     	
+   							VPLANE(prev),  
+							VPLANE(data), 
 							_mask, 
 							_info.width>>1, 
 							_info.height>>1,
-							cthresholdMask);
+							cthresholdMask);       				
 			
 			}
 		
-		num_frame = n;		
+		vidCache->unlockAll();
 		return 1;
 
 }

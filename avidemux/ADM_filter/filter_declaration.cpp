@@ -60,8 +60,8 @@ printf(  "*********************\n");
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
 //	REGISTERX("mpivtc","Mplayer ivtc",VF_MPDETC,1,mpdetc_create,mpdetc_script);	
-//BG	REGISTERX("telecide","Decomb telecide",VF_DECOMB,1,decomb_create,decomb_script);
-//BG	REGISTERX("decimate","Decomb decimate",VF_DECIMATE,1,decimate_create,decimate_script);
+	REGISTERX("telecide","Decomb telecide",VF_DECOMB,1,decomb_create,decomb_script);
+	REGISTERX("decimate","Decomb decimate",VF_DECIMATE,1,decimate_create,decimate_script);
 	
 	REGISTER("palsmart","PAL-SMART",VF_TELECIDE,1,telecide_create);
 	REGISTERX("deinterlace","Deinterlace",VF_DEINTERLACE,1,deinterlace_create,deinterlace_script);
@@ -83,7 +83,7 @@ printf(  "*********************\n");
 	REGISTERX("kerneldeint","D. Graft Kernel deint",VF_KRNDEINT,1,kerneldeint_create,kerneldeint_script);
 	
 
-//	REGISTER("","Partial",VF_PARTIAL,0,partial_create);
+	REGISTER("","Partial",VF_PARTIAL,0,partial_create);
 	registerFilter("-------- Convolution Kernel ---------",VF_INVALID,2,NULL,NULL);
 	REGISTERX("sharpen","Sharpen",VF_SHARPEN,1,sharpen_create,sharpen_script);
    	REGISTERX("mean","Mean",VF_MEAN,1,mean_create,mean_script);
@@ -91,7 +91,7 @@ printf(  "*********************\n");
 	REGISTERX("largemedian","Median (5x5)",VF_LARGEMEDIAN,1,largeMedian_create,largeMedian_script);
     	REGISTERX("gaussian","Gauss Smooth",VF_GAUSSIAN,1,Gaussian_create,gaussian_script);
        	
-    //   registerFilter("Temporal smoother",tempsmooth_create);
+    
 	registerFilter("------------ Luma/Chroma ------------",VF_INVALID,2,NULL,NULL);
 	      
  	REGISTERX("swapuv","Swap u & v",VF_SWAPUV,1,swapuv_create,swapuv_script);
@@ -104,21 +104,21 @@ printf(  "*********************\n");
 	REGISTERX("chromavonly","Chroma V only",VF_CHROMAV,1,chromaV_create,chromaV_script);
 		
 	registerFilter("-------------- Smoother -------------",VF_INVALID,2,NULL,NULL);
-		
-//	REGISTERX("stabilize","Stabilize",VF_STABILIZE,1,stabilize_create,stabilize_script);
-//	REGISTERX("denoise","Denoise",VF_DENOISE,1,denoise_create,denoise_script);
-//	REGISTERX("fluxsmooth","FluxSmooth",VF_FLUXSMOOTH,1,fluxsmooth_create,fluxsmooth_script);
-//	REGISTERX("smoothclean","Smooth Clean",VF_SMOOTHCLEAN,0,smooth_create,smooth_script);
+	//   registerFilter("Temporal smoother",tempsmooth_create);	
+	REGISTERX("stabilize","Stabilize",VF_STABILIZE,1,stabilize_create,stabilize_script);
+	REGISTERX("denoise","Denoise",VF_DENOISE,1,denoise_create,denoise_script);
+	REGISTERX("fluxsmooth","FluxSmooth",VF_FLUXSMOOTH,1,fluxsmooth_create,fluxsmooth_script);
+	
 #ifdef USE_MMX
-//    	REGISTERX("temporalcleaner","Temporal Cleaner",VF_VLADSMOOTH,1,vladsmooth_create,vladsmooth_script);
+    	REGISTERX("temporalcleaner","Temporal Cleaner",VF_VLADSMOOTH,1,vladsmooth_create,vladsmooth_script);
 #endif
 
 	REGISTERX("mpdenoise3d","Mplayer Denoise3D",VF_MPLLQD3D,1,MPD3Dlow_create,MPD3Dlow_script);
-
-//BUG 	REGISTERX("mphqdenoise3d","Mplayer HQDenoise3D",VF_MPLHQD3D,1,MPD3D_create,MPD3D_script);
+//BG	REGISTERX("mphqdenoise3d","Mplayer HQDenoise3D",VF_MPLHQD3D,1,MPD3D_create,MPD3D_script);
 	REGISTERX("msmooth","Msmooth by Donald Graft",VF_MSMOOTH,1,create_msmooth,msmooth_script);
-//	REGISTERX("forcedpp","Forced PostProcessing",VF_FORCEDPP,1,forcedpp_create,forcedpp_script);
+	REGISTERX("forcedpp","Forced PostProcessing",VF_FORCEDPP,1,forcedpp_create,forcedpp_script);
 	REGISTERX("soften","Soften",VF_SOFTEN,1,soften_create,soften_script);
+	REGISTERX("smoothclean","Smooth Clean",VF_SMOOTHCLEAN,0,smooth_create,smooth_script);
 #ifdef USE_FREETYPE   
 	registerFilter("----------------- Misc --------------",VF_INVALID,2,NULL,NULL);
 	REGISTERX("subtitle","Subtitler",VF_SUBTILE,1,subtitle_create,subtitle_script);

@@ -69,7 +69,7 @@ AVDMVideoSmooth::AVDMVideoSmooth(
         }
 
 					
-  //_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+  
   _uncompressed=new ADMImage (_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed);
   _info.encoding=1;
@@ -92,6 +92,7 @@ AVDMVideoSmooth::~AVDMVideoSmooth()
 {
  	delete _uncompressed;
  	DELETE(_param);
+	_uncompressed=NULL;
 }
 
 uint8_t AVDMVideoSmooth::getFrameNumberNoAlloc(uint32_t frame,
@@ -107,19 +108,19 @@ uint8_t *dst,*dstu,*dstv,*src,*srcu,*srcv;
               int16_t	ldelta,udelta,vdelta;
               int16_t   threshold=10,su=0,sv=0;
 
-			ADM_assert(frame<_info.nb_frames);
+			if(frame>=_info.nb_frames) return 0;
 			ADM_assert(_uncompressed);					
 								
-			// read uncompressed frame
+		// read uncompressed frame
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 
-         		src=_uncompressed->data;
-           	srcu=_uncompressed->data+_info.width*_info.height;
-           	srcv=srcu+((_info.width*_info.height)>>2);
+         	src=YPLANE(_uncompressed);
+           	srcu=UPLANE(_uncompressed);;
+           	srcv=VPLANE(_uncompressed);;
 
-              dst=data->data;
-              dstu=data->data+_info.width*_info.height;;
-              dstv=dstu+((_info.width*_info.height)>>2);;
+              dst=YPLANE(data);
+              dstu=UPLANE(data);
+              dstv=VPLANE(data);
 
               int16_t radius=_param->radius;
 

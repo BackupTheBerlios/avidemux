@@ -16,7 +16,7 @@
  ***************************************************************************/
 #ifndef __VLAD__
 #define __VLAD__   
-#include "ADM_video/ADM_vidCached.h" 
+#include "ADM_video/ADM_cache.h" 
 typedef struct VLAD_PARAM
 {
 	uint32_t ythresholdMask;
@@ -30,7 +30,7 @@ typedef struct VLAD_PARAM
         			VLAD_PARAM	*_param;
         			virtual char 	*printConf(void);
 	      			uint8_t		*_mask;
-	      			ADMImage	*_prev;
+	      			VideoCache	*vidCache;
 	      			
         			uint64_t		ythresholdMask;
 				uint64_t 		cthresholdMask;
@@ -41,7 +41,7 @@ typedef struct VLAD_PARAM
 						AVDMVideoVlad(  AVDMGenericVideoStream *in,CONFcouple *setup);
   					 	~AVDMVideoVlad();
 		        virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	ADMImage *data,uint32_t *flags);
+          							ADMImage *data,uint32_t *flags);
 
 			virtual uint8_t 	configure( AVDMGenericVideoStream *instream);
 			virtual uint8_t	getCoupledConf( CONFcouple **couples)		;
