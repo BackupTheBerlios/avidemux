@@ -75,6 +75,7 @@
 		VF_EQUALIZER,
                 VF_VOBSUB,
                 VF_CHFPS,
+                VF_RESAMPLE_FPS,
 		VF_DUMMY
  	 }VF_FILTERS;
  	
