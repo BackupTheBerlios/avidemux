@@ -55,6 +55,7 @@ AVDMProcessAudio_Lame::AVDMProcessAudio_Lame(AVDMGenericAudioStream * instream):
     strcpy(_name, "PROC:LAME");
     _instream->goToTime(0);	// rewind
     _length = _instream->getLength();
+  
     
 };
 
@@ -150,10 +151,12 @@ uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
     	default:
     	case ADM_LAME_PRESET_CBR: break;
 	case ADM_LAME_PRESET_ABR:
+	  
 	  lame_set_preset( myflags, bitrate);
-
+	  _wavheader->blockalign=1152;
 	 break;
 	case ADM_LAME_PRESET_EXTREME: 
+	  _wavheader->blockalign=1152;
 	  lame_set_preset( myflags, EXTREME);	
 	break;
     

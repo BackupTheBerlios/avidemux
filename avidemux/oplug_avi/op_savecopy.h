@@ -35,16 +35,13 @@
  {
      protected :
 
-			uint32_t		two_audio_frame_full;
-                 	uint32_t		two_audio_frame_left;
-                    	uint32_t 		two_pcm_audio_frame;
-                        int32_t  		two_audio_stock;
+			
                         char				*_trackname;
 
 
 
 		                   virtual uint8_t setupAudio( void);
-                        	 virtual uint8_t writeAudioChunk(void );
+                        	 virtual uint8_t writeAudioChunk(uint32_t frame );
 				 //virtual uint8_t setupVideo (char *name);
      public:
                                      GenericAviSaveCopyDualAudio(AVDMGenericAudioStream	*track);

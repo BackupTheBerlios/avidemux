@@ -26,21 +26,21 @@
  class GenericAviSave
  {
      protected :
+     		uint32_t		_audioTarget;
+		uint32_t		_audioCurrent;
+		uint64_t		_audioTotal;
+		
      		DIA_encoding		*encoding_gui;
-      	 	AVDMGenericVideoStream  	*_incoming;
-     		DIA_working	*dialog_work;
+      	 	AVDMGenericVideoStream  *_incoming;
+     		DIA_working		*dialog_work;
      		uint8_t 		has_audio_track;
-           	uint8_t		stored_audio_frame;
+           	uint8_t			stored_audio_frame;
            	uint8_t 		has_audio_vbr;
-               	uint32_t		one_audio_frame_full;
-                uint32_t		one_audio_frame_left;
-                uint32_t 		one_pcm_audio_frame;
-                int32_t  		one_audio_stock;
-               	uint32_t  		fps1000;
+                	uint32_t  	fps1000;
                 uint32_t 		frametogo;
                 char			_name[500];
 		uint32_t		_videoProcess;
-                uint8_t		_part;
+                uint8_t			_part;
                 AVDMGenericAudioStream	*audio_filter;
                 AVDMGenericAudioStream	*audio_filter2;
 
@@ -48,12 +48,13 @@
                 aviWrite		*writter;
                 uint8_t			*vbuffer;
                 uint8_t			*abuffer;
+		uint32_t		_audioInBuffer;
                 uint32_t		_videoFlag;
 		uint32_t  	 	_lastIPFrameSent;
 
                			virtual uint8_t setupAudio( void);
 		                virtual uint8_t setupVideo( char *name )=0;
-                    virtual uint8_t writeAudioChunk(void );
+                    virtual uint8_t writeAudioChunk(uint32_t  f);
                     virtual uint8_t writeVideoChunk(uint32_t frame )=0;
                     virtual void guiStart(void);
                     virtual void guiStop(void);

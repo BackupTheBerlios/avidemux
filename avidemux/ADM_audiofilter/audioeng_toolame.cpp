@@ -50,6 +50,7 @@ AVDMProcessAudio_Piper::AVDMProcessAudio_Piper(AVDMGenericAudioStream * instream
     _instream->goToTime(0);	// rewind
     _length = _instream->getLength();
     _pipe=NULL;
+    
 
 };
 

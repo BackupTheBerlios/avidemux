@@ -73,8 +73,6 @@ GenericAviSave::GenericAviSave ()
 {
 
   has_audio_track = has_audio_vbr = 0;
-  one_audio_stock = 0;
-
  vbuffer = new uint8_t[MAXIMUM_SIZE * MAXIMUM_SIZE * 3];
 //  vbuffer=new ADMImage(MAXIMUM_SIZE,MAXIMUM_SIZE);
   abuffer = new uint8_t[96000];
@@ -90,6 +88,8 @@ GenericAviSave::GenericAviSave ()
   _incoming=NULL;
   encoding_gui=NULL;
   _videoProcess=0;
+  _audioCurrent=_audioTarget=0;
+ _audioTotal=0;  
 }
 
 GenericAviSave::~GenericAviSave ()
@@ -104,8 +104,7 @@ GenericAviSave::~GenericAviSave ()
 //
 //___________________________________________________________
 //
-uint8_t
-GenericAviSave::saveAvi (char *name)
+uint8_t  GenericAviSave::saveAvi (char *name)
 {
 uint32_t size;
   strcpy(_name,name);
@@ -139,6 +138,7 @@ uint32_t size;
   
   // 3- setup video
   frametogo=_incoming->getInfo()->nb_frames;
+  fps1000=_incoming->getInfo()->fps1000;
   printf ("\n writing %lu frames\n", frametogo);
 
   //__________________________________
@@ -153,7 +153,7 @@ uint32_t size;
 					goto abortme;
       			//   printf("\n %lu / %lu",cf,frametogo);
       			writeVideoChunk (cf);
-      			writeAudioChunk ();
+      			writeAudioChunk (cf);
 			writter->sync();
      
      
@@ -183,7 +183,9 @@ GenericAviSave::setupAudio (void)
 // 1- Prepare audio filter
 //__________________________
 
-  stored_audio_frame = 0;
+  _audioInBuffer = 0;
+  _audioTarget=_audioCurrent=0;
+  _audioTotal=0;
   printf ("\n mux mode : %d mux param %d", muxMode, muxParam);
 
   if (audioProcessMode && currentaudiostream)	// else Raw copy mode
@@ -198,25 +200,9 @@ GenericAviSave::setupAudio (void)
 	    }
 	}
 
-/* shut up ...      if (!GUI_Question ("Audio Processing is activated \n Continue?"))
-	{
-	  return 0;
-	}
-*/
-      double
-	byt;
-      byt =
-	video_body->getTime (frameEnd + 1) - video_body->getTime (frameStart);
-      byt *= currentaudiostream->getInfo ()->frequency;
-      byt *= currentaudiostream->getInfo ()->channels;
-      byt *= 2;
-      byt /= 1000.;
-
-
-
-
-      audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart),
-				  (uint32_t) floor (byt));
+	
+      	audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart),
+				  (uint32_t) 0xffffffff);
 
       if ((audio_filter)->getInfo ()->encoding == WAV_PCM)
 	if (!GUI_Question ("Audio stream is not compressed\n Continue?"))
@@ -262,13 +248,8 @@ GenericAviSave::setupAudio (void)
   // cbr only for now
   if (currentaudiostream)
     {
-      WAVHeader *
-	wav = NULL;
-
-      wav = audio_filter->getInfo ();
+      WAVHeader *wav = NULL;    
       has_audio_vbr = audio_filter->isVBR ();
-      computeAudioCBR ();
-
       if (has_audio_vbr)	//VBR
 			{
 	  			wav->blockalign = 1152;	// Trick ala nandub
@@ -285,105 +266,46 @@ GenericAviSave::setupAudio (void)
 
 
 
-//
-//      Compute the duration of an audio chunk in cbr mode
-//
-uint8_t
-GenericAviSave::computeAudioCBR (void)
-{
-  uint32_t
-    one_frame;
-  aviInfo
-    info;
-
-  double
-    one_frame_double, one_delta_frame;
-  WAVHeader *
-    wav = NULL;
-
-  ADM_assert (audio_filter);
-
-  wav = audio_filter->getInfo ();
-  //
-  video_body->getVideoInfo (&info);
-
-  // In case of process, we must take
-  // the output fps in case the filter alters
-  // the fps. Else we would end up with a badly muxed
-  // file as the audio and video won't have the same 
-  // clockrate.
-  if(_videoProcess)
-  {	ADV_Info *lastInfo;
-  	lastInfo=getLastVideoFilter()->getInfo ();
-	fps1000=lastInfo->fps1000;
-  } // else in copy mode we take it from source
-  else
-  {
-  	fps1000 = info.fps1000;
-  }
-  // compute duration of a audio frame
-  // in ms
-  ADM_assert (fps1000);
-  printf ("\n fps : %lu\n", fps1000);
-  one_frame_double = (double) fps1000;
-  one_frame_double = 1. / one_frame_double;
-  // now we have 1/1000*fps=1/1000*duration of a frame in second
-  one_frame_double *= 1000000.;
-  // in ms now;
-  one_frame = (uint32_t) floor (one_frame_double);
-  printf ("\n One audio frame : %lu ms\n", one_frame);
-
-
-  double
-    pcm;
-  // *2 because one sample is 16 bits
-  // fix hitokiri bug part 1.
-  pcm = one_frame_double * 2 * wav->frequency * wav->channels;
-  pcm /= 1000;
-  one_pcm_audio_frame = (uint32_t) floor (pcm);
-  printf ("\n one PCM audio frame is %lu bytes \n", one_pcm_audio_frame);
-
-  // get the equivalent in bytes
-  ADM_assert (wav);
-  one_frame_double /= 1000.;	// go back to seconds
-  one_frame_double *= wav->byterate;
-
-
-  one_frame = (uint32_t) floor (one_frame_double);
-
-  if (one_frame & 1)
-    one_frame--;
-  one_delta_frame = one_frame_double - one_frame;
-  // Real ? correction of hitokiri bug
-  one_delta_frame *= 1000;
-  printf ("\n One audio frame : %lu bytes", one_frame);
-  printf ("\n audio byterate  : %lu bytes/sec", wav->byterate);
-//    one_frame = one_frame * 10 + (uint32_t) floor(one_delta_frame);
-  one_audio_frame_full = one_frame;
-  one_audio_frame_left = (uint32_t) floor (one_delta_frame);
-  printf ("\n One partial audio frame : %lu ms\n", one_audio_frame_left);
-  return 1;
-}
 
 //---------------------------------------------------------------------------
 uint8_t
-GenericAviSave::writeAudioChunk (void)
+GenericAviSave::writeAudioChunk (uint32_t frame)
 {
-  uint32_t
-    len;
+  uint32_t    len;
   // if there is no audio, we do nothing
   if (!audio_filter)
     return 1;
-  //******************************
-  // Audio CBR
-  //******************************
-  if (!has_audio_vbr)
-    {
-
-      len = 0;
-      one_audio_stock += one_audio_frame_left;
-      one_audio_stock += 1000 * one_audio_frame_full;
-
+    
+  double t;
+  
+  t=frame+1;
+  t=t/fps1000;
+  t=t*1000*audio_filter->getInfo()->frequency;
+  _audioTarget=(uint32_t )floor(t);
+  
+  	uint32_t sample,packetLen,packets=0;
+	
+  	
+	sample=0;
+	// _audioTarget is the # of sample we want
+	while(_audioCurrent<_audioTarget)
+	{
+		if(!audio_filter->getPacket(abuffer+_audioInBuffer,&packetLen,&sample))
+		{
+			printf("AVIWR:Could not read packet\n");
+			break;
+		}
+		_audioInBuffer+=packetLen;
+		_audioTotal+=packetLen;
+		_audioCurrent+=sample;		
+		packets++;
+	}
+  	printf("Aviwr:Fq:%lu fps1000:%lu frame:%lu Found %lu packet for %lu bytes , cur=%lu target=%lu total:%llu\n",
+					audio_filter->getInfo()->frequency,
+					fps1000,
+					frame,packets,_audioInBuffer,
+					_audioCurrent,_audioTarget,_audioTotal);
+  
       switch (muxMode)
 	{
 
@@ -394,89 +316,26 @@ GenericAviSave::writeAudioChunk (void)
 	  stored_audio_frame = 0;
 	case MUX_REGULAR:
 
-	  while (one_audio_stock > 1000)
-	    {
-	      len++;
-	      one_audio_stock -= 1000;
-	    }
+	 
 	  break;
 	case MUX_N_BYTES:
-	  if (one_audio_stock < 1000 * muxParam)
-	    return 1;
-	  while (one_audio_stock > 1000 * muxParam)
-	    {
-	      len += muxParam;
-	      one_audio_stock -= 1000 * muxParam;
-	    }
+	  	if(_audioInBuffer<muxParam) return 1;
+		break;
 	  break;
 	default:
 	  ADM_assert (0);
 	}
-
-      if (len & 1)
-	{
-	  len--;
-	  one_audio_stock += 1000;
-	}
-
-
-      // dumb me !!!!
-      // hitokiri fix 2
-      //uint32_t len2=len;
-
-      //printf("\n audio  asked : %lu",len);
-      len = audio_filter->read (len, abuffer);
-      //printf("\n audio  got : %lu",len);
-      //printf("\n stock  : %lu",one_audio_stock);
-
-      if(len&1)
-      	{ printf("Odd!\n");}
       
-      if (len)
+     
+      
+      if (_audioInBuffer)
 	{
-	  writter->saveAudioFrame (len, abuffer);
-	  encoding_gui->feedAudioFrame(len);
+	  writter->saveAudioFrame (_audioInBuffer, abuffer);
+	  encoding_gui->feedAudioFrame(_audioInBuffer);
+	  _audioInBuffer=0;
 	}
       return 1;
-
-
-
-    }
-  //******************************
-  // Audio VBR
-  //******************************
-
-  // Here we deal with VBR audio
-  // The principle :
-  // we think in term of *DECODED* PCM length
-  // and ask for the equivalent to audio stream
-  // In that case one_audio_stock can be negative
-  // It represents the bucket of PCM frame
-  // ask for
-  uint32_t real, compressed;
-
-
-  one_audio_stock = one_pcm_audio_frame + one_audio_stock;
-  do
-    {
-      compressed = audio_filter->readPCMeq (0, abuffer, &real);
-//     printf("\n asked  pcm: %lu got %lu pcm, soit %lu compressed",
-      //                                                                    len,real,compressed);
-      // compressed is what we have to write actually
-      if (compressed)
-	{
-	  writter->saveAudioFrame (compressed, abuffer);
-	}
-      // now "real" is the PCM equivalent we got
-      // and we asked len, store the delta to prevent error from
-      // propagating
-      one_audio_stock -= real;
-    }
-  while (one_audio_stock > 0 && (compressed));
-  return 1;
-
-
-
+  
 }
 
 void

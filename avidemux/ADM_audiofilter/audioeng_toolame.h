@@ -20,8 +20,9 @@
 class AVDMProcessAudio_Piper : public AVDMProcessAudioStream
 {
 protected:
-				FILE 	*_pipe;
-				 uint8_t  	_bufferin[PROCESS_BUFFER_SIZE];
+				FILE 		*_pipe;
+				uint8_t  	_bufferin[PROCESS_BUFFER_SIZE];
+				
 
 
 public:
@@ -32,7 +33,7 @@ public:
 
  		virtual uint32_t read(uint32_t len,uint8_t *buffer);
 		virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer);
-
+		
 };
 
 
