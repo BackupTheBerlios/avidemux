@@ -466,13 +466,15 @@ FILE *f;
 			// get args
 			CONFcouple *couple;
 			char *arg,*value;
-			ADM_assert(videofilters[i].filter->getCoupledConf( &couple));
-			for(int j=0;j<couple->getNumber();j++)
+			if(videofilters[i].filter->getCoupledConf( &couple))
 			{
-				 couple->getEntry(j, &arg,&value);
-				 fprintf(f,",%s=%s",arg,value);
+				for(int j=0;j<couple->getNumber();j++)
+				{
+					 couple->getEntry(j, &arg,&value);
+				 	fprintf(f,",%s=%s",arg,value);
+				}
+				delete couple;
 			}
-			delete couple;
 			fprintf(f,");\n");			
 		
 		}
