@@ -69,6 +69,7 @@ typedef struct
 #define WAV_OGG 0x676f
 #define WAV_8BITS 	53 // dummy id
 #define WAV_MP4 	54 // dummy id
+#define WAV_AAC 	0xff // dummy id
 #define WAV_8BITS_UNSIGNED 	55 // dummy id
 #define WAV_AMRNB 	56 // dummy id
 #define WAV_ULAW	57 // dummy id

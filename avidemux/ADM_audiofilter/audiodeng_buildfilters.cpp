@@ -33,6 +33,9 @@
 //#include "ADM_gui/GUI_mp3.h"
 #include "ADM_audiofilter/audioeng_ffmp2.h"
 #include "ADM_audiofilter/audioeng_libtoolame.h"
+#ifdef USE_FAAC
+	#include "ADM_audiofilter/audioeng_faac.h"
+#endif
 #ifdef HAVE_LIBMP3LAME
 	#include "lame/lame.h"
 #endif
@@ -291,6 +294,11 @@ void audioCodecConfigure( void )
 	{
 		case AUDIOENC_NONE:
 								return;
+#ifdef USE_FAAC
+		case AUDIOENC_FAAC:
+						audioMP3bitrate=192;
+						return;
+#endif		
 #ifdef HAVE_LIBMP3LAME								
 		case AUDIOENC_MP3:
 						DIA_getLameSettings(&audioMP3mode, &audioMP3bitrate,&audioMP3preset);
@@ -551,7 +559,25 @@ uint8_t init;
  				filters[filtercount++] = lastFilter;
 			#endif
 			break;
-
+#ifdef USE_FAAC
+		case AUDIOENC_FAAC:
+		{
+				AVDMProcessAudio_Faac *faac;
+				faac = new AVDMProcessAudio_Faac(lastFilter);
+				if(faac->init(audioMP3bitrate))
+				{
+					lastFilter = faac;
+					filters[filtercount++] = lastFilter;
+				}
+ 				else
+				{
+					delete faac;
+					GUI_Alert("FAAC initialization failed\n"
+							" NOT ACTIVATED");
+				}
+		}
+		break;
+#endif		
 #ifdef HAVE_LIBMP3LAME
 		case AUDIOENC_MP3:
         		{
