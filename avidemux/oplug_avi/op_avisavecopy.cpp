@@ -236,8 +236,10 @@ void updateUserData(uint8_t *start, uint32_t len)
 			// looks ok ?
 			if(strncmp((char *)start,"DivX",len))
 			{
+#if 0						
 				memset(start,0,4); // should work better
-#if 0			
+#else				
+
 				// looks for a p while not null
 				// if there isnt we will reach a new startcode
 				// and it will stop
@@ -257,7 +259,7 @@ void updateUserData(uint8_t *start, uint32_t len)
 					{
 						printf("Unpacketizer:packed marker not found!\n");
 					}
-				else	*start=0; // remove 'p'
+				else	*start='n'; // remove 'p'
 				*start=0;
 				return;
 #endif				
