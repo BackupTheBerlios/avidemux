@@ -171,7 +171,10 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 			  gtk_timeout_add( 300, (GtkFunction )automation, NULL );
 				//automation();				
 		}
-   
+   #ifdef USE_SDL
+   	printf("Global SDL init...\n");
+   	SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
+   #endif
     gtk_main();
     return 0;
 }
