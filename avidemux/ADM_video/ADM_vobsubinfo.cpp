@@ -89,6 +89,7 @@ uint8_t         success=0;
 uint32_t        line=0,l;
 char            str[1024];
 char            *dup;
+int             language=0;
 
         if(!filename)
         {
@@ -138,8 +139,21 @@ char            *dup;
                                 fillLine(str,sub,line);
                                 line++;
                         }
+                        else
+                        {
+                                if(!strncmp(str,"id:",3))       // Catch language/index
+                                {
+                                      language++;
+                                      if(language>1) break;
+                                        
+                                
+                                }
+                                
+                        
+                        }
                 }
         }
+subSuccess:        
         success=1;
 subAbort:        
         if(success)

@@ -51,6 +51,8 @@
 #define VOBSUB "/capture/sub/phone.sub"
 #define VS_MAXPACKET 128*1024
 
+#define NOSUB 0xffffffff
+
 static FILTER_PARAM vobsubParam={1,{"subname"}};
 #define aprintf printf
 //*************************************************************
@@ -77,6 +79,7 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
         uint8_t                         Palettte2Display( void ); /// Convert the RLE to YUV bitmap
         uint8_t                         handleSub( void );      /// Decode a sub packet
         uint8_t                         buildDisplay( void );   /// Convert palette to yuv bitmap
+        uint32_t                        lookupSub(uint64_t time);/// Return sub index corresponding to time
         
         ADM_mpegDemuxerProgramStream    *_parser;
         uint8_t                        *_palettized;            /// bitmap
@@ -96,6 +99,7 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
         uint8_t                         _colors[4];             /// Colors palette
         uint8_t                         _alpha[4];              /// Colors alpha
         int16_t                         _YUVPalette[16][3];
+        uint32_t                        _currentSub;            ///
  public:
                 
                         ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *setup);
@@ -197,6 +201,7 @@ uint8_t ADMVideoVobSub::setup(void)
         
         _bitmap=NULL;
         _alphaMask=NULL;
+        _currentSub=NOSUB;
                 
 
 }
@@ -277,6 +282,8 @@ uint8_t ADMVideoVobSub::getFrameNumberNoAlloc(uint32_t frame,
                                 uint32_t *flags)
 {
 
+uint64_t time;
+uint32_t sub;
 
         ADM_assert(frame<_info.nb_frames);
         // read uncompressed frame
@@ -290,9 +297,25 @@ uint8_t ADMVideoVobSub::getFrameNumberNoAlloc(uint32_t frame,
                 return 1;
         
         }
-           
-        // Should we re-use the current one ?
-        handleSub();
+        
+        time=(frame+_info.orgFrame);
+        time=(time*1000*1000)/_info.fps1000;
+        
+        sub=lookupSub(time);  
+        // Should we re-use the current one ? 
+        if(sub==NOSUB)
+        {
+                printf("No matching sub for time %llu frame%lu\n",time,frame);
+                return 1;
+        }
+        if(sub!=_currentSub )
+        {                
+                 _parser->_asyncJump2(0,_vobSubInfo->lines[sub].fileOffset);
+                 handleSub();
+                _currentSub=sub;
+                
+        }                
+        
         // Next one
         if(_palettized)
         {
@@ -592,6 +615,26 @@ uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start)
         aprintf("vobsub End :%d y:%d\n",_curOffset,y); 
         _curOffset=oldoffset;
 } 
+//
+//      Return the index in the sub table of the sub matching the time
+//
+uint32_t ADMVideoVobSub::lookupSub(uint64_t time)
+{
+int32_t i;
+        i=_vobSubInfo->nbLines-2;
+        while(i>=0)
+        {
+                if(_vobSubInfo->lines[i].startTime<=time && _vobSubInfo->lines[i+1].startTime>time)
+                {
+                        printf("Matching for time %llu : sub %lu starting at :%lu\n",
+                                        time,i,_vobSubInfo->lines[i].startTime);
+                        return i; 
+                }                        
+                i--;       
+        }
+        return NOSUB;
 
+
+}
 //EOF
 
