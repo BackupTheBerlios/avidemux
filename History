@@ -10,7 +10,29 @@
 			
 	+ Complete OGM audio suport (ogg)
 		
+			+ Pass through broken because lvemux looks for gop header at the beginning
+				and we put them at the end in pass through mode
+			
        *********************** /TODO ***************************
+       09/02/2004
+       		- Added a/v shift to save mpeg PS
+       08/02/2004
+       		- fixed drift in mpeg
+		- Recompute gop header in case of copy to DVD ps
+		- More subs from daniel
+		- Fixed passthrough mode
+       06 &07 / 02/2004
+       		- Fixed c++ism in muxout spotted by anish
+		- Changed the way the index is built to be compatible with pass through
+       05/02/2004
+       		- Added mpeg2 sync for external mpegaudio
+       04/02/2004
+       		- More subtitle from Daniel
+		- Fixed fps in case of fps changing filter + encoding to mpeg PS
+		- Fixed ffmpeg audio not setting the byterate field (!)
+       03/02/2004
+       		- Factorized some code between mpeg encoding & pass through
+		- Fixed code for AC3 in lvemux
        01/02/2004
        		- another endianness fix ogm
        31/01/2004

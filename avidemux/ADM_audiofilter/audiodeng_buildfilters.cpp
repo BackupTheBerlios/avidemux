@@ -575,3 +575,33 @@ void deleteAudioFilter(void)
 	currentaudiostream->endDecompress();
 
 }
+// Build a simple filter chain
+// That is starting from startTime in ms, has a duration of duration ms and is shifter
+// by shift ms
+
+AVDMGenericAudioStream *buildRawAudioFilter( uint32_t startTime, uint32_t duration, int32_t shift)
+{
+AVDMProcessAudioStream *firstFilter = NULL;
+AVDMProcessAudioStream *lastFilter = NULL;
+ 
+	// Start from a clean state
+	deleteAudioFilter();	
+	
+	// No shift
+	if(shift<=0)
+	{	
+	
+		lastFilter=new AVDMProcessAudio_RawShift(currentaudiostream,0,startTime-shift);
+		filters[filtercount++] = lastFilter;
+		return lastFilter;	
+	}
+	// had to add a loop filter
+	if(startTime>shift)
+		lastFilter=new AVDMProcessAudio_RawShift(currentaudiostream,0,startTime-shift);
+	else
+		lastFilter=new AVDMProcessAudio_RawShift(currentaudiostream,shift,startTime);
+	filters[filtercount++] = lastFilter;
+	return lastFilter;
+	
+	
+}

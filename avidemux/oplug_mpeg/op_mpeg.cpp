@@ -82,7 +82,8 @@ void oplug_mpeg_vcd(char *inname)
 	if(!inname)
 	{
 	 	GUI_FileSelWrite("DVD file to save", &name);
-	}
+		if(!name) return;
+	}	
 	else
 	{
 		name=inname;
@@ -104,6 +105,7 @@ void oplug_mpeg_svcd(char *inname)
 	if(!inname)
 	{
 	 	GUI_FileSelWrite("SVCD file to save", &name);
+		if(!name) return;
 	}
 	else
 	{
@@ -128,6 +130,7 @@ char *name=NULL;
  	if(!inname)
 	{
 	 	GUI_FileSelWrite("DVD file to save", &name);
+		if(!name) return;
 	}
 	else
 	{
@@ -196,6 +199,7 @@ WAVHeader *info=NULL,tmpinfo;
  	if(!inname)
 	{
 	 	GUI_FileSelWrite("DVD file to save", &name);
+		if(!name) return;
 	}
 	else
 	{

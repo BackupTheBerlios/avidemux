@@ -1064,12 +1064,19 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm)
 				  (uint32_t) floor (byt));
 	}
 	else
-	{
-	
-        	uint32_t    tstart;
-	  	tstart = video_body->getTime (frameStart);
-		_audio = (AVDMGenericAudioStream *) currentaudiostream;
-	  	_audio->goToTime (tstart);	  
+	{				
+        	uint32_t    tstart,tend;
+		int32_t shift=0;
+		
+		if(!  DIA_GetIntegerValue((int*)&shift, -1000, +1000, "Audio/video shift", "Audio Video Shift (ms):"))
+		{
+			return 0;		
+		}
+		
+	  	tstart = video_body->getTime (frameStart);		
+		tend = video_body->getTime (frameEnd);
+		deleteAudioFilter();
+		_audio=buildRawAudioFilter(  tstart, tend-tstart, shift);
 	}
    	
 	if(_audio->getInfo()->encoding!=WAV_MP2 && _audio->getInfo()->encoding!=WAV_AC3)

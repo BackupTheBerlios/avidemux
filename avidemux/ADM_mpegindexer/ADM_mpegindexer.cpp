@@ -382,6 +382,9 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 						gop>>=6; // skip padding
 						gop&=1;
 						gop_seen=1;
+						// Memorize gop position
+						// as it will be the real start of the
+						// next I Frame
 						lastGop=pos;
 						lastAbsGop=abspos;
 						// 25 bits = time code

@@ -186,18 +186,14 @@ protected:
 		
 public:
 						
-				~AVDMProcessAudio_RawShift();
-				uint8_t	initLame(uint32_t frequence,
-												 uint32_t mode,
-												 uint32_t bitrate);
-
-        AVDMProcessAudio_RawShift(AVDMGenericAudioStream *instream,
-															int32_t msoffset,
-               											uint32_t starttime	);		 // offset in ms
-        virtual uint32_t read(uint32_t len,uint8_t *buffer);
-				virtual uint8_t  goTo(uint32_t newoffset);
-		    	virtual uint8_t  goToTime(uint32_t newoffset);
-			  virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer);
+			~AVDMProcessAudio_RawShift();
+        		AVDMProcessAudio_RawShift(AVDMGenericAudioStream *instream,
+				int32_t msoffset,
+               			uint32_t starttime	);		 // offset in ms
+        	virtual uint32_t read(uint32_t len,uint8_t *buffer);
+		virtual uint8_t  goTo(uint32_t newoffset);
+		virtual uint8_t  goToTime(uint32_t newoffset);
+		virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer);
      		
 };
  //_____________________________________________
