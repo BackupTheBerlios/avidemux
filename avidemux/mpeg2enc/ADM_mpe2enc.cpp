@@ -211,7 +211,14 @@ uint8_t Mpeg2encSVCD::init( uint32_t qz, uint32_t maxbr ,uint32_t fps1000,
 			_settings.format=3;	
 			_settings.video_buffer_size=1000;
 		}
-		
+		if(fps1000==25000)	//PAL
+		{
+			_settings.min_GOP_size=_settings.max_GOP_size=15;
+		}
+		else
+		{
+			_settings.min_GOP_size=_settings.max_GOP_size=18;
+		}
 #ifdef TEST_NOB		
 		_settings.Bgrp_size=1;
 #endif		
@@ -265,6 +272,14 @@ uint8_t Mpeg2encDVD::init( uint32_t qz, uint32_t maxbr ,uint32_t fps1000
 			_settings.video_buffer_size=1000;
 		}
 		mpeg2_running=1;
+		if(fps1000==25000)	//PAL
+		{
+			_settings.min_GOP_size=_settings.max_GOP_size=15;
+		}
+		else
+		{
+			_settings.min_GOP_size=_settings.max_GOP_size=18;
+		}
 		return (uint8_t ) mpegenc_init(&_settings,(int) _w, (int)_h, (int) fps1000);
 
 

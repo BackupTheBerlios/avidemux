@@ -440,6 +440,7 @@ static void gop_start( stream_state_s *ss )
 	*/
 	if( ctl->M-1 > 0 )
 	{
+		//printf("Drop1\n");
 		ss->bs_short = (ctl->M - ((ss->gop_length-(ss->i==0)) % ctl->M))%ctl->M;
 		ss->next_b_drop = ((double)ss->gop_length) / (double)(ss->bs_short+1)-1.0 ;
 	}
@@ -450,6 +451,7 @@ static void gop_start( stream_state_s *ss )
 	}
 	
 	/* We aim to spread the dropped B's evenly across the GOP */
+	//printf("Spread\n");
 	ss->bigrp_length = (ctl->M-1);
 	
 	/* number of P frames */
@@ -553,7 +555,11 @@ static void next_seq_state( stream_state_s *ss )
 	++(ss->i);
 	++(ss->g);
 	++(ss->b);	
-
+#if 0	
+	printf("i %d g%d b%d big:%d short:%d nextdrop:%d"
+	,ss->i,ss->g,ss->b,ss->bigrp_length,ss->bs_short,ss->next_b_drop);;
+	printf("Gop length %d\n",ss->gop_length);
+#endif	
 	/* Are we starting a new B group */
 	if( ss->b >= ss->bigrp_length )
 	{
@@ -562,9 +568,12 @@ static void next_seq_state( stream_state_s *ss )
 		   come out right ? */
 		if( ss->bs_short != 0 && ss->g > (int)ss->next_b_drop )
 		{
+			printf("** SHORT**\n");
 			ss->bigrp_length = ctl->M - 1;
 			if( ss->bs_short )
+			{
 				ss->next_b_drop += ((double)ss->gop_length) / (double)(ss->bs_short+1) ;
+			}
 		}
 		else
 			ss->bigrp_length = ctl->M;
@@ -1110,7 +1119,7 @@ void putseq_init(void)
 	cur_picture = old_ref_picture;
 
 	bitrate_controller->InitSeq(false);
-
+#if 0
 	ss.i = 0;		                /* Index in current MPEG sequence */
 	ss.g = 0;						/* Index in current GOP */
 	ss.b = 0;						/* B frames since last I/P */
@@ -1119,6 +1128,8 @@ void putseq_init(void)
 	ss.seq_start_frame = 0;		/* Index start current sequence in
 								   input stream */
 	ss.gop_start_frame = 0;		/* Index start current gop in input stream */
+#endif	
+	memset(&ss,0,sizeof(ss));	
 	ss.seq_split_length = ((int64_t)ctl->seq_length_limit)*(8*1024*1024);
 	ss.next_split_point = BITCOUNT_OFFSET + ss.seq_split_length;
 	mjpeg_debug( "Split len = %%llu", ss.seq_split_length );
