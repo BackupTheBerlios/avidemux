@@ -2593,13 +2593,13 @@ static int encode_init(AVCodecContext *avctx)
     SnowContext *s = avctx->priv_data;
     int i;
     int level, orientation, plane_index;
-
+#if 0 //MEANX
     if(avctx->strict_std_compliance >= 0){
         av_log(avctx, AV_LOG_ERROR, "this codec is under development, files encoded with it wont be decodeable with future versions!!!\n"
                "use vstrict=-1 to use it anyway\n");
         return -1;
     }
- 
+#endif 
     common_init(avctx);
  
     s->version=0;
