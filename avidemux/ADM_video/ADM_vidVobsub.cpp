@@ -42,6 +42,10 @@
 #include "ADM_mpeg2dec/ADM_mpegpacket.h"
 #include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
 
+#include "ADM_toolkit/filesel.h"
+
+#include "ADM_colorspace/colorspace.h"
+
 #include "ADM_vobsubinfo.h"
 
 #define VOBSUB "/capture/sub/phone.sub"
@@ -67,10 +71,18 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
         uint16_t                        readword(void);         /// Read a 16 bits word from buffer
         uint8_t                         forward(uint32_t v);    /// Read a 16 bits word from buffer
         uint8_t                         decodeRLE(uint32_t off,uint32_t evenline);
-   
+        uint8_t                         setup(void);            /// Rebuild internal info
+        uint8_t                         cleanup(void);          /// Destroy all internal info
+        uint8_t                         paletteYUV( void );     /// Convert RGB Pallette to yuv
+        uint8_t                         Palettte2Display( void ); /// Convert the RLE to YUV bitmap
+        uint8_t                         handleSub( void );      /// Decode a sub packet
+        uint8_t                         buildDisplay( void );   /// Convert palette to yuv bitmap
+        
         ADM_mpegDemuxerProgramStream    *_parser;
-        uint8_t                        *_palettized;              /// bitmap
+        uint8_t                        *_palettized;            /// bitmap
         uint8_t                         *_data;                 /// Data for packet
+        uint8_t                         *_bitmap;               /// YUV image
+        uint8_t                         *_alphaMask;               /// alpha mask
         VobSubInfo                      *_vobSubInfo;           /// Info of the index file
         vobSubParam                     *_param;
         
@@ -83,7 +95,7 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
         
         uint8_t                         _colors[4];             /// Colors palette
         uint8_t                         _alpha[4];              /// Colors alpha
-        
+        int16_t                         _YUVPalette[16][3];
  public:
                 
                         ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *setup);
@@ -95,15 +107,23 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
                                                         
 };
 //*************************************************************
-
 SCRIPT_CREATE(vobsub_script,ADMVideoVobSub,vobsubParam);
 BUILD_CREATE(vobsub_create,ADMVideoVobSub);
 //*************************************************************
 uint8_t ADMVideoVobSub::configure(AVDMGenericVideoStream *in)
 {
+char *name;
+       GUI_FileSelRead("Select .sub file to load, NOT .idx", &name);        
+       if(name)
+       {
+                cleanup();
+                if(_param->subname) ADM_dealloc(_param->subname);
+                _param->subname=name;
+                setup();
+                return 1;
+       }
         
-        return 1;
-        
+        return 0;        
 }
  
 //*************************************************************
@@ -121,8 +141,6 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
         _in=in;         
         memcpy(&_info,_in->getInfo(),sizeof(_info));    
         _info.encoding=1;       
-        _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-        ADM_assert(_uncompressed); 
         _parser=NULL;  
         _palettized=NULL;   
         
@@ -135,7 +153,7 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
         }
         else
         {
-#ifdef ADM_DEBUG
+#ifdef KK_ADM_DEBUG
                 _param->subname=ADM_strdup(VOBSUB);
 #else                
                 _param->subname =NULL;
@@ -143,7 +161,13 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
                 _param->index = 0x20;                
         }
         
-        if(_param->subname)
+        setup();
+}
+//************************************
+uint8_t ADMVideoVobSub::setup(void)
+{
+   _vobSubInfo=NULL;
+   if(_param->subname)
         {
                 printf("Opening %s\n",_param->subname);
                 if(vobSubRead(_param->subname,&_vobSubInfo))
@@ -170,14 +194,16 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
         _data=new uint8_t [VS_MAXPACKET];
         _subSize=0;
         _subW=_subH=0;
-        _vobSubInfo=NULL;
+        
+        _bitmap=NULL;
+        _alphaMask=NULL;
                 
+
 }
 //*************************************************************
-ADMVideoVobSub::~ADMVideoVobSub()
+uint8_t ADMVideoVobSub::cleanup(void)
 {
-        delete  _uncompressed;  
-        _uncompressed=NULL;
+
         if(_parser) delete _parser;
         _parser=NULL;
         if(_palettized) delete [] _palettized;
@@ -186,7 +212,19 @@ ADMVideoVobSub::~ADMVideoVobSub()
         _data=NULL;
         if(_vobSubInfo) destroySubInfo( _vobSubInfo);
         _vobSubInfo=NULL;
-        if(_param)
+        if(_bitmap) delete [] _bitmap;
+        _bitmap=NULL;
+        
+       if(_alphaMask) delete [] _alphaMask;
+        _alphaMask=NULL;
+        
+
+}
+//*************************************************************
+ADMVideoVobSub::~ADMVideoVobSub()
+{
+        cleanup();
+         if(_param)
         {
                 if(_param->subname)  ADM_dealloc(_param->subname);
                 DELETE(_param);
@@ -239,23 +277,77 @@ uint8_t ADMVideoVobSub::getFrameNumberNoAlloc(uint32_t frame,
                                 uint32_t *flags)
 {
 
-uint16_t date,next,dum;
-uint8_t  command;
-        _subSize=0;
 
         ADM_assert(frame<_info.nb_frames);
         // read uncompressed frame
-        if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
+        if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
 
         if(!_parser)        
         {
                 //
                 printf("No valid vobsub to process\n");
-                data->duplicate(_uncompressed);
+                
                 return 1;
         
         }
-        
+           
+        // Should we re-use the current one ?
+        handleSub();
+        // Next one
+        if(_palettized)
+        {
+                Palettte2Display(); // Create the bitmap
+                
+                // Merge
+                
+                uint32_t stridein,strideout,len;
+                uint8_t *in,*out,*mask,*in2;
+                uint16_t old,nw,alp;
+                
+                stridein=_x2-_x1;
+                strideout=_info.width;
+                
+                if(strideout>stridein) len=stridein;
+                                else    len=strideout;
+                                
+                in=_bitmap;
+                mask=_alphaMask;
+               
+                out=data->data+_y1*strideout+_x1;
+                
+                for(uint32_t y=_y1;y<_y2;y++)
+                {
+                        for(uint32_t x=_x1;x<_x2;x++)
+                        {
+                               old=out[x];
+                               nw=in[x];
+                               alp=mask[x];
+#if 0                               
+#define ACOEF alp
+#define BCOEF (15-alp)                               
+#else
+#define BCOEF alp
+#define ACOEF (15-alp)                               
+#endif
+                               nw=old*(ACOEF)+(BCOEF)*nw;
+                               out[x]=nw>>4;
+                        }
+                        //memcpy(out,in,len);
+                        out+=strideout;
+                        in+=stridein;
+                        mask+=stridein;
+                }
+        }
+        return 1;
+}
+//***********************************************        
+
+uint8_t  ADMVideoVobSub::handleSub( void )
+{       
+uint16_t date,next,dum;
+uint8_t  command;
+        _subSize=0;
+
         // Read data
         _subSize=_parser->read16i();
         ADM_assert(_subSize);
@@ -325,8 +417,14 @@ uint8_t  command;
                                                 if(_palettized) delete [] _palettized;
                                                 _subW=_x2-_x1;
                                                 _subH=_y2-_y1;
+                                                
                                                 _palettized=new uint8_t [_subW*_subH];
+                                                _bitmap=new uint8_t [_subW*_subH];
+                                                _alphaMask=new uint8_t [_subW*_subH];
+                                                
                                                 memset(_palettized,0,_subW*_subH);
+                                                memset(_bitmap,0,_subW*_subH);
+                                                memset(_alphaMask,0,_subW*_subH);
                                                                         
                                         }
                                         break;
@@ -343,35 +441,83 @@ uint8_t  command;
                         } //End switch command     
                 }// end while
         }
-        data->copyInfo(_uncompressed);
-        // All black
-        uint32_t page=_info.width*_info.height;
-        memset(data->data+page,127,page/2);
-        if(_palettized)
+     
+}
+//*********************************************************
+// Convert the palette display into YUV bitmap
+//*********************************************************
+uint8_t ADMVideoVobSub::buildDisplay( void )
+{
+
+uint8_t *ptrin, *ptrout,*maskout;
+
+int     color;
+int     alpha;
+int     old,nw,cur;
+
+        ADM_assert(_bitmap);
+        ADM_assert(_palettized);
+
+        ptrin=_palettized;
+        ptrout=_bitmap;
+        maskout=_alphaMask;
+        
+        
+        for(uint32_t y=0;y<_subH;y++)
+        for(uint32_t x=0;x<_subW;x++)
         {
-                uint32_t stridein,strideout,len;
-                uint8_t *in,*out;
+                // Alpha blend it
                 
-                stridein=_x2-_x1;
-                strideout=_info.width;
+                color=*ptrin;
+                alpha=_alpha[color];
+                nw=_YUVPalette[color][0];
                 
-                if(strideout>stridein) len=stridein;
-                                else    len=strideout;
-                in=_palettized;
-                out=data->data;
-                for(uint32_t y=0;y<_y2-_y1;y++)
-                {
-                        for(uint32_t x=0;x<len;x++)
-                        {
-                                if(in[x]) out[x]=255;
-                                else out[x]=129;
-                        }
-                        //memcpy(out,in,len);
-                        out+=strideout;
-                        in+=stridein;
-                }
+                *ptrout=nw;
+                *maskout=alpha;
+        
+                
+                ptrin++;
+                ptrout++;
+                maskout++;
         }
         return 1;
+}
+//***********************************************************
+uint8_t ADMVideoVobSub::Palettte2Display( void )
+{
+        ADM_assert(_parser);
+        ADM_assert(_vobSubInfo);
+        // First convert all the palette from RGB to YUV
+        paletteYUV();
+        // Then Process the RLE Datas
+        // To get the _bitmap yuv data
+        buildDisplay();
+
+        return 1;
+}
+//***********************************************************
+uint8_t ADMVideoVobSub::paletteYUV( void )
+{
+uint8_t r,g,b,a;
+uint8_t y;
+int8_t u,v;
+uint32_t value;
+        for(int i=0;i<16;i++)
+        {
+               value=_vobSubInfo->Palette[i];
+               r=(value>>16)&0xff;
+               g=(value>>8)&0xff; 
+               b=(value)&0xff;
+               
+               COL_RgbToYuv(b,  g,  r, &y, &u,&v);
+               
+                _YUVPalette[i][0]=y;
+                _YUVPalette[i][1]=u;
+                _YUVPalette[i][2]=v;
+        
+        }
+        return 1;
+
 }
 //***********************************************************
 // RLE code inspired from mplayer
