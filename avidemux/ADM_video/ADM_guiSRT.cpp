@@ -146,7 +146,7 @@ uint32_t l,f;
 						&l,
 						sourceImage,
 						&f));
-
+				
 		 if(GUI_subtitleParam(	_conf->_fontname,
 		 					_conf->_subname,
 							&charset,
@@ -175,6 +175,7 @@ uint32_t l,f;
 
 				loadSubtitle();
 				loadFont();
+				
 				prefs->set(FILTERS_SUBTITLE_FONTNAME,_conf->_fontname);
 				prefs->set(FILTERS_SUBTITLE_CHARSET,_conf->_charset);
 				prefs->set(FILTERS_SUBTITLE_FONTSIZE,_conf->_fontsize);
@@ -183,6 +184,7 @@ uint32_t l,f;
                                 prefs->set(FILTERS_SUBTITLE_VPERCENT,_conf->_V_percent);
                                 prefs->set(FILTERS_SUBTITLE_SELFADJUSTABLE,_conf->_selfAdjustable);
                                 prefs->set(FILTERS_SUBTITLE_USEBACKGROUNDCOLOR,_conf->_useBackgroundColor);
+				
 				ret=1;
 		}
 		delete [] sourceImage;
@@ -206,6 +208,9 @@ gint answer;
 #define WID(x) lookup_widget(dialog,#x)
 #define CHECK_GET(x,y) {y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
 #define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),y);}		
+
+	printf("In:Y:%d U:%d V:%d\n",*coly,*colu,*colv);
+
        	dialog = create_dialog1();
 
 	if(sub)    	strcpy( subString, sub);
@@ -298,6 +303,7 @@ gint answer;
 				*coly=myY;
 				*colu=myU;
 				*colv=myV;
+				printf("Y:%d U:%d V:%d\n",*coly,*colu,*colv);
 				CHECK_GET(checkbutton_autosplit,*autocut);
 				CHECK_GET(checkbuttonbg,*bgcolor);
 				*delay= (int32_t)gtk_read_entry(WID(entry_delay));

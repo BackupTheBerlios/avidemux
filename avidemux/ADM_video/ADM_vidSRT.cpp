@@ -134,30 +134,44 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 			_conf->_fontname=(char *)malloc(500);
 			_conf->_subname=(char *)malloc(500);
 			_conf->_charset=(char *)malloc(500);
+			_conf->_fontname[0]=0;
+			_conf->_subname[0]=0;
+			_conf->_charset[0]=0;
+			
+			
 			_conf->_baseLine=_info.height-24*SRT_MAX_LINE;
+			_conf->_Y_percent=255;
+			_conf->_U_percent=0;
+			_conf->_V_percent=0;
+                        _conf->_fontsize=24; 
+			_conf->_selfAdjustable=0;
 			_conf->_delay=0;
+			_conf->_useBackgroundColor=0;
 			
 			_conf->_bg_Y_percent=0;
 			_conf->_bg_U_percent=0;
 			_conf->_bg_V_percent=0;
-                        
+
+
 			prefs->get(FILTERS_SUBTITLE_FONTSIZE,&(_conf->_fontsize));
 			prefs->get(FILTERS_SUBTITLE_YPERCENT,&(_conf->_Y_percent));
 			prefs->get(FILTERS_SUBTITLE_UPERCENT,&(_conf->_U_percent));
 			prefs->get(FILTERS_SUBTITLE_VPERCENT,&(_conf->_V_percent));
-			prefs->get(FILTERS_SUBTITLE_SELFADJUSTABLE,&(_conf->_selfAdjustable));
+			prefs->get(FILTERS_SUBTITLE_SELFADJUSTABLE,&(_conf->_selfAdjustable));			
 			prefs->get(FILTERS_SUBTITLE_USEBACKGROUNDCOLOR,&(_conf->_useBackgroundColor));
+			
 			// _conf->_fontname, ... are used as memory for a dialog
 			// later. we can't used the length of the current string
 			{ char *tmp;
 			   prefs->get(FILTERS_SUBTITLE_FONTNAME,&tmp);
 			   strcpy(_conf->_fontname,tmp);
 			   free(tmp);
+			   
 			   prefs->get(FILTERS_SUBTITLE_CHARSET,&tmp);
 			   strcpy(_conf->_charset,tmp); 
                            free(tmp);
 			}
-			strcpy(_conf->_subname,"");
+			
 	}
 
   
