@@ -52,7 +52,7 @@
 #include "ADM_toolkit/filesel.h"
 extern void oplug_mpegff(char *name);
 static void  A_SaveAudioNVideo(char *name);
- void A_SaveUnpackedVop( char *name);
+ int A_SaveUnpackedVop( char *name);
 
 int A_Save( char *name)
 {
@@ -133,7 +133,7 @@ char *name;
 
 }
 //___________________________________
-void A_SaveUnpackedVop( char *name)
+int A_SaveUnpackedVop( char *name)
 {
   aviInfo info;
 GenericAviSave	*nw;
@@ -142,7 +142,7 @@ GenericAviSave	*nw;
 	if( !isMpeg4Compatible(  info.fcc))
 	{
 		GUI_Alert("This cannot have packed vop!");
-		return;
+		return 0;
         }
 	//
 	nw=new   GenericAviSaveCopy(1);
@@ -154,6 +154,7 @@ GenericAviSave	*nw;
         	GUI_Alert(" Saved successfully");
 
 	delete nw;
+	return 1;
 }
 //___________________________________
 void  A_SaveAudioNVideo(char *name)

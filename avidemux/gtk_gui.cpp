@@ -158,7 +158,7 @@ extern uint8_t ogmSave(char  *name);
 //__________
 extern uint8_t ogmSave(char *fd);
 extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
-extern void A_SaveUnpackedVop( char *name);
+extern int A_SaveUnpackedVop( char *name);
 
 extern int ignore_change;
 

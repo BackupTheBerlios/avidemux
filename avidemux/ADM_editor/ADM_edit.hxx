@@ -54,7 +54,13 @@ typedef enum
 		DUMMY_FILETYPE=99
 }fileType;
 
-
+typedef enum
+{
+	ENV_EDITOR_NONE=   0x0000,
+	ENV_EDITOR_BFRAME= 0x0001,
+	ENV_EDITOR_PVOP=   0x0002,
+	ENV_EDITOR_LAST=   0x8000
+}_ENV_EDITOR_FLAGS;
 //
 //  The start frame correspond to the frame 0 of the segment (quite obvisous)
 //  _nb_video_frames is the number of active frame in the segment
@@ -92,6 +98,7 @@ typedef struct
 class ADM_Composer
 {
   private:
+  					uint32_t	_internalFlags;
   					ADM_PP 		_pp;
 					ADMImage	*_imageBuffer;
   					uint8_t		decodeCache(uint32_t frame,uint32_t seg, ADMImage *image);
@@ -228,6 +235,9 @@ class ADM_Composer
 					uint8_t 		getPostProc( int *type, int *strength, 
 										int *swapuv);
 										
-					uint8_t 		getAudioPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
+					uint8_t 		getAudioPacket(uint8_t *dest, uint32_t *len, uint32_t
+									*samples);
+					uint8_t			setEnv(_ENV_EDITOR_FLAGS newflag);
+					uint8_t			getEnv(_ENV_EDITOR_FLAGS newflag);
 };
 #endif

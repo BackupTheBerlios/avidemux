@@ -78,6 +78,7 @@ ADM_Composer::ADM_Composer (void)
   _pp.forcedQuant=0;
   updatePostProc(&_pp);
   _imageBuffer=NULL;    
+  _internalFlags=0;
 }
 /**
 	Remap 1:1 video to segments
@@ -542,6 +543,13 @@ TryAgain:
 
 				delete  buffer;
 				delete [] bufferin;
+				if(getEnv(ENV_EDITOR_BFRAME))
+				{
+					printf("Forcing Bframe present and incorrect\n");
+					bframe=1;
+					bconsistency=0;
+					
+				}
 				if(bframe)
 				{
 					printf("\n Mmm this appear to have b-frame...\n");
@@ -584,7 +592,9 @@ TryAgain:
 								// can only unpack avi
 								if(!count && type==AVI_FileType)
 								{
-									if(GUI_Question("It looks like Vop packed divx.\nDo you want me to unpack it ?"))
+									if(getEnv(ENV_EDITOR_PVOP)|| GUI_Question(
+									"It looks like Vop packed divx.\n"
+									"Do you want me to unpack it ?"))
 									{
 									OpenDMLHeader *dml=NULL;
 									count++;	
@@ -594,7 +604,8 @@ TryAgain:
 									{
 										goto TryAgain;
 									}
-									GUI_Alert("Could not unpack it\n, using backup decoder= not frame accurate.");
+									GUI_Alert("Could not unpack it\n"
+									", using backup decoder= not frame accurate.");
 									}
 								}
 #if  1 //def USE_DIVX
@@ -1179,6 +1190,24 @@ uint8_t need_update=0;
     }
 
 }
+//_________________________________________
+uint8_t		ADM_Composer::setEnv(_ENV_EDITOR_FLAGS newflag)
+{
+	_internalFlags|=newflag;
+	return 1;
 
+}
+//_________________________________________
+//	Return 1 if the flag was set
+//		The flag is reset in all cases!!!!!!!!!!!!!
+uint8_t		ADM_Composer::getEnv(_ENV_EDITOR_FLAGS newflag)
+{
+uint8_t r=0;
+		if(_internalFlags&newflag) r=1;
+		_internalFlags&=~newflag;
+		if(r) { printf("Env override %d used\n",newflag);}
+		return r;
+
+}
 //
 //

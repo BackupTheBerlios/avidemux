@@ -112,6 +112,11 @@ extern void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * m
 extern uint8_t ADM_aviSetSplitSize(uint32_t size);
 extern uint8_t ogmSave(char *fd);
 static void set_autoindex(char *p);
+extern int A_SaveUnpackedVop( char *name);
+//
+static int call_bframe(void);
+static int call_packedvop(void);
+
 //_________________________________________________________________________
 
 extern uint8_t audioShift;
@@ -158,27 +163,34 @@ AUTOMATON reaction_table[]=
 		{"begin",		1,"set start frame",			setBegin},
 		{"end",			1,"set end frame",			setEnd},
 		
+		{"save-unpacked-vop",	1,"save avi, unpacking vop",(one_arg_type)A_SaveUnpackedVop},		
 		{"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
 		{"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
 		{"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	ADM_saveRaw},
 		{"save-uncompressed-audio",1,"save uncompressed audio",A_saveAudioDecodedTest},
 		{"index-mpeg",		3,"create index of vob/mpeg : vob.vob index.index audio#",
 								((one_arg_type )call_indexMpeg)},
-		{"load",		1	,"load video",		A_openAvi},
-		{"append",		1	,"append video",	A_appendAvi},
-		{"load-workbench",	1	,"load workbench file",	load_workbench},
-		{"save",		1	,"save avi",		save},		
-		{"external-mp3",	1	,"load external mpeg audio as audio track",(one_arg_type)GUI_loadMP3},
-		{"external-ac3",	1	,"load external ac3 audio as audio track",(one_arg_type)A_loadAC3},
-		{"external-wav",	1	,"load external wav audio as audio track",(one_arg_type)A_loadWave},
-		{"no-audio",		0	,"load external wav audio as audio track",(one_arg_type)A_loadNone},
-		{"audio-delay",		1	,"set audio time shift in ms (+ or -)",	call_setAudio},
-		{"audio-map",		0	,"build audio map (MP3 VBR)",	call_buildtimemap},
-		{"audio-bitrate",	1	,"set audio encoding bitrate",	call_audiobitrate},
+		{"load",		1,"load video",		A_openAvi},
+		{"append",		1,"append video",	A_appendAvi},
+		{"load-workbench",	1,"load workbench file",	load_workbench},
+		{"save",		1,"save avi",		save},		
+		
+		{"force-b-frame",	0,"Force detection of bframe in next loaded file", (one_arg_type)call_bframe},
+		{"force-unpack",	0,"Force detection of packed vop in next loaded file"
+								,(one_arg_type)call_packedvop},
+		
+		
+		{"external-mp3",	1,"load external mpeg audio as audio track",(one_arg_type)GUI_loadMP3},
+		{"external-ac3",	1,"load external ac3 audio as audio track",(one_arg_type)A_loadAC3},
+		{"external-wav",	1,"load external wav audio as audio track",(one_arg_type)A_loadWave},
+		{"no-audio",		0,"load external wav audio as audio track",(one_arg_type)A_loadNone},
+		{"audio-delay",		1,"set audio time shift in ms (+ or -)",	call_setAudio},
+		{"audio-map",		0,"build audio map (MP3 VBR)",	call_buildtimemap},
+		{"audio-bitrate",	1,"set audio encoding bitrate",	call_audiobitrate},
 		{"fps",	1	,"set frames per second",	call_fps},
-		{"audio-codec",		1	,"set audio codec (MP2/MP3/AC3/NONE/TOOLAME)",call_audiocodec},
-		{"audio-toolame",	1	,"pipe audio to toolame and save to file",call_toolame},
-		{"video-codec",		1	,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD)",				call_videocodec},
+		{"audio-codec",		1,"set audio codec (MP2/MP3/AC3/NONE/TOOLAME)",call_audiocodec},
+		{"audio-toolame",	1,"pipe audio to toolame and save to file",call_toolame},
+		{"video-codec",		1,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD)",				call_videocodec},
 		{"video-conf",		1	,"set video codec conf (cq=q|cbr=br|2pass=size)[,mbr=br][,matrix=(0|1|2|3)]",				call_videoconf},
 //		{"2pass-log",		1	,"select the log file for 2 passes mode",				encoderSetLogFile},
 		{"set-pp",		2	,"set post processing default value, value(1=hdeblok|2=vdeblock|4=dering) and strength (0-5)",	(one_arg_type )	call_setPP},
@@ -542,6 +554,17 @@ void show_info(char *p){
    {
    	printf("Nothing to get infos from\n");
    }
+}
+int call_bframe(void)
+{
+	video_body->setEnv(ENV_EDITOR_BFRAME);
+	return 1;
+}
+
+int call_packedvop(void)
+{
+	video_body->setEnv(ENV_EDITOR_PVOP);
+	return 1;
 }
 
 //EOF
