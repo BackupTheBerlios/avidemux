@@ -105,6 +105,7 @@ uint32_t end;
 					ADM_assert(0);
 					return 0;
 	}
+	getFirstVideoFilter(0,avifileinfo->nb_frames);
 	return 1;
 }
 void  A_SaveAudioDualAudio(void)
