@@ -97,7 +97,7 @@ static uint32_t glob_base=0;
 
 
 static int  GUI_subtitleParam(char *font,char *sub,int  *charset,int *size,uint32_t *baseline,
-				int32_t *coly,int32_t *colu,int32_t *colv);
+				int32_t *coly,int32_t *colu,int32_t *colv,uint32_t *autocut);
 
 static gboolean gui_draw( void );
 static void draw( void);
@@ -148,7 +148,9 @@ uint32_t l,f;
 		 					&(_conf->_baseLine),
 							&(_conf->_Y_percent),
 							&(_conf->_U_percent),
-							&(_conf->_V_percent)))
+							&(_conf->_V_percent),
+							&(_conf->_selfAdjustable)
+							))
 		 {
 			 	printf("\n Font : %s", _conf->_fontname);
 			 	printf("\n Sub  : %s", _conf->_subname);
@@ -177,12 +179,14 @@ uint32_t l,f;
 }
 
 int  GUI_subtitleParam(char *font,char *sub,int  *charset,int *size,uint32_t *baseline,
-				int32_t *coly,int32_t *colu,int32_t *colv)
+				int32_t *coly,int32_t *colu,int32_t *colv,uint32_t *autocut)
 {
 
 int ret=0;
 gint answer;
 #define WID(x) lookup_widget(dialog,#x)
+#define CHECK_GET(x,y) {y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
+#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),y);}		
        	dialog = create_dialog1();
 
 	if(sub)    	strcpy( subString, sub);
@@ -197,7 +201,8 @@ gint answer;
         gtk_label_set_text(GTK_LABEL(WID(label_sub)),sub);
         gtk_label_set_text(GTK_LABEL(WID(label_font)),font);
         gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton_fontsize)),(gfloat)*size) ;
-
+	CHECK_SET(checkbutton_autosplit,*autocut);
+	
 	int nb=sizeof(names)/sizeof(unicd);
 
 	GtkWidget *w;
@@ -271,6 +276,7 @@ gint answer;
 				*coly=myY;
 				*colu=myU;
 				*colv=myV;
+				CHECK_GET(checkbutton_autosplit,*autocut);
 
 				ret=1;
 	}
@@ -399,6 +405,8 @@ uint32_t h;
 	Almost straigh out of glade2
 
 */
+
+
 GtkWidget*
 create_dialog1 (void)
 {
@@ -429,7 +437,9 @@ create_dialog1 (void)
   GtkObject *spinbutton_fontsize_adj;
   GtkWidget *spinbutton_fontsize;
   GtkWidget *label5;
+  GtkWidget *hbox4;
   GtkWidget *button_color;
+  GtkWidget *checkbutton_autosplit;
   GtkWidget *hbox3;
   GtkWidget *drawingarea1;
   GtkWidget *vscale1;
@@ -457,7 +467,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
   label2 = gtk_label_new (_("Font (TTF)"));
@@ -465,7 +474,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
   label3 = gtk_label_new (_("Encoding "));
@@ -473,7 +481,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
   label4 = gtk_label_new (_("Font Size"));
@@ -481,7 +488,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
   hbox1 = gtk_hbox_new (FALSE, 0);
@@ -493,7 +499,6 @@ create_dialog1 (void)
   label_sub = gtk_label_new (_("sub"));
   gtk_widget_show (label_sub);
   gtk_box_pack_start (GTK_BOX (hbox1), label_sub, TRUE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label_sub), GTK_JUSTIFY_LEFT);
 
   button_sub = gtk_button_new ();
   gtk_widget_show (button_sub);
@@ -512,7 +517,6 @@ create_dialog1 (void)
   label_font = gtk_label_new (_("font"));
   gtk_widget_show (label_font);
   gtk_box_pack_start (GTK_BOX (hbox2), label_font, TRUE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label_font), GTK_JUSTIFY_LEFT);
 
   button_font = gtk_button_new ();
   gtk_widget_show (button_font);
@@ -534,6 +538,7 @@ create_dialog1 (void)
   gtk_widget_show (enc_ascii);
   gtk_container_add (GTK_CONTAINER (menu1), enc_ascii);
 /*
+
   enc_8859 = gtk_menu_item_new_with_mnemonic (_("Iso 8859-1 (Czech...)"));
   gtk_widget_show (enc_8859);
   gtk_container_add (GTK_CONTAINER (menu1), enc_8859);
@@ -561,14 +566,21 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 4, 5,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
+
+  hbox4 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox4);
+  gtk_table_attach (GTK_TABLE (table1), hbox4, 1, 2, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
 
   button_color = gtk_button_new_with_mnemonic (_("Select"));
   gtk_widget_show (button_color);
-  gtk_table_attach (GTK_TABLE (table1), button_color, 1, 2, 4, 5,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
+  gtk_box_pack_start (GTK_BOX (hbox4), button_color, FALSE, FALSE, 0);
+
+  checkbutton_autosplit = gtk_check_button_new_with_mnemonic (_("Auto split"));
+  gtk_widget_show (checkbutton_autosplit);
+  gtk_box_pack_start (GTK_BOX (hbox4), checkbutton_autosplit, FALSE, FALSE, 0);
 
   hbox3 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox3);
@@ -629,7 +641,9 @@ create_dialog1 (void)
   */
   GLADE_HOOKUP_OBJECT (dialog1, spinbutton_fontsize, "spinbutton_fontsize");
   GLADE_HOOKUP_OBJECT (dialog1, label5, "label5");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox4, "hbox4");
   GLADE_HOOKUP_OBJECT (dialog1, button_color, "button_color");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbutton_autosplit, "checkbutton_autosplit");
   GLADE_HOOKUP_OBJECT (dialog1, hbox3, "hbox3");
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
   GLADE_HOOKUP_OBJECT (dialog1, vscale1, "vscale1");
@@ -640,6 +654,8 @@ create_dialog1 (void)
 
   return dialog1;
 }
+
+
 
 
 #endif

@@ -38,6 +38,10 @@
 #include "ADM_video/ADM_vidFont.h"
 #include "ADM_video/ADM_vidSRT.h"
 
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_FILTER
+#include "ADM_toolkit/ADM_debug.h"
+
 static const char *FONTNAME="/usr/X11R6/lib/X11/fonts/truetype/arial.ttf";
 
 BUILD_CREATE(subtitle_create,ADMVideoSubtitle);
@@ -52,7 +56,7 @@ char 								*ADMVideoSubtitle::printConf(void)
  {
 	  	static char buf[50];
  	
- 				sprintf((char *)buf,"Subtitle (experimental)");
+ 				sprintf((char *)buf,"Subtitle ");
         return buf;
 	}
 
@@ -94,6 +98,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(
 			GET(_Y_percent);
 			GET(_U_percent);
 			GET(_V_percent);
+			GET(_selfAdjustable);
 
 			if(_conf->_baseLine>_info.height-_conf->_fontsize*SRT_MAX_LINE)
 					_conf->_baseLine=_conf->_fontsize*SRT_MAX_LINE;
@@ -122,12 +127,13 @@ ADMVideoSubtitle::ADMVideoSubtitle(
 			_conf->_subname=(char *)malloc(500);
 			_conf->_charset=(char *)malloc(500);
 			_conf->_baseLine=_info.height-24*SRT_MAX_LINE;
+			_conf->_selfAdjustable=1;
 			strcpy(_conf->_fontname,FONTNAME);
 			strcpy(_conf->_subname,"");
 			strcpy(_conf->_charset,"UNICODE");
 	}
 
-  _conf->_selfAdjustable=1;
+  
 
   	_info.encoding=1;
 
@@ -175,7 +181,7 @@ SUBCONF *_param;
 
 			_param=_conf; // keep macro happy
 			assert(_param);
-			*couples=new CONFcouple(8);
+			*couples=new CONFcouple(9);
 
 			CSET(_fontsize);
 			CSET(_subname);
@@ -185,6 +191,7 @@ SUBCONF *_param;
 			CSET(_Y_percent);
 			CSET(_U_percent);
 			CSET(_V_percent);
+			CSET(_selfAdjustable);
 
 		return 1;
 

@@ -34,10 +34,10 @@
 		int32_t    _U_percent;
 		int32_t    _V_percent;
 
-		char		 *_fontname;
-		char		 *_subname;
-		char 	*_charset;
-  uint8_t _selfAdjustable;
+		char		*_fontname;
+		char		*_subname;
+		char 		*_charset;
+  		uint32_t	_selfAdjustable;
 
 
 	}SUBCONF;

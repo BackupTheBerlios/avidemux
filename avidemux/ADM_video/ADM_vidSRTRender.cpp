@@ -165,7 +165,7 @@ void ADMVideoSubtitle::displayString(char *string)
       }
       
       uint32_t couldDisplay=displayLine(string+last,base,i-last,&suggestedLen);
-      //printf("[debug] couldDisplay=%d suggestedLen=%d\n",couldDisplay,suggestedLen);
+      aprintf("[debug] couldDisplay=%d suggestedLen=%d\n",couldDisplay,suggestedLen);
       if (! couldDisplay && _conf->_selfAdjustable && suggestedLen>0) {
 	// Try to fit
 	uint32_t newSuggLen=suggestedLen;
@@ -173,11 +173,11 @@ void ADMVideoSubtitle::displayString(char *string)
 	  newSuggLen--;
 	}
 	if (newSuggLen>0){ suggestedLen=newSuggLen; }
-	//printf("[debug] suggestedLen=%d\n",suggestedLen);
+	aprintf("[debug] suggestedLen=%d\n",suggestedLen);
 	couldDisplay = displayLine(string+last,base,suggestedLen);
 	last+=suggestedLen;
 	if (i<=last){i++;}
-	//printf("[debug] last=%d i=%d\n",last,i);
+	aprintf("[debug] last=%d i=%d\n",last,i);
       } else {
 	if (! couldDisplay) {
 	  printf("line is too big.\n");
