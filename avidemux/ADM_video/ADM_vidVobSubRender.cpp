@@ -367,7 +367,11 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
                                         decodeRLE(odd,0,even);
                                         decodeRLE(even,1,0);
                                         }
-                                        break;                
+                                        break;   
+                                default:                                                     
+                                        printf("Unknown command:%d\n",command);
+                                        return 0;
+                                  
                         } //End switch command     
                 }// end while
         }
