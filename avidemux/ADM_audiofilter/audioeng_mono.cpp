@@ -107,7 +107,7 @@ AVDMBufferedAudioStream    (instream)
 	
     _wavheader = new WAVHeader;
     memcpy(_wavheader, _instream->getInfo(), sizeof(WAVHeader));
-    if(_instream->getInfo()->channels==2)
+    if(_wavheader->channels==2)
     {
     	_wavheader->channels=1;
     	_wavheader->byterate/=2;
@@ -133,7 +133,8 @@ AVDMProcessStereo2Mono::~AVDMProcessStereo2Mono()
 uint32_t AVDMProcessStereo2Mono::grab( uint8_t * buffer)
 {
 
-int16_t o,*in,*out;
+int16_t *in,*out;
+int32_t o;
 
 	// convert mono to stereo
 
@@ -158,7 +159,7 @@ int16_t o,*in,*out;
 		o=*in++;
 		o+=*in++;
 		o=o/2;
-        	*(out++)=o;
+        	*out++=o;
        }
 	return osize;
 
