@@ -71,7 +71,7 @@
 #else
 #define __EXTERN
 #endif
-
+#define MAX_PACK 100
 typedef struct
 {
   uint8_t *buf;
@@ -98,6 +98,8 @@ typedef struct
   uint8_t   forceRestamp; // Meanx : If set force gop timestamp recomputation
   //--   pack'ed output stream buffer --
   uint8_t   stream_buf[256*1024];
+  int	    pack_psize[MAX_PACK];
+  int	    pack_level;
   int       buf_level;
   uint8_t   *pack_start;
   BitPack   bit_pack;

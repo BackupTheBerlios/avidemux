@@ -23,6 +23,7 @@
 #define  _MUX_OUT 1
 #include <stdio.h>
 #include <math.h>
+#include <assert.h>
 #include "mux_out.h"
 
 //=====================
@@ -351,6 +352,9 @@ static int put_bp_system_header(PackStream *ps, int is_vobu)
   bp->buf[byte_ofs_old+4] = (size - 6) >> 8;
   bp->buf[byte_ofs_old+5] = (size - 6) & 0xff;
     
+  //
+  
+  //
   return size;
 }
 
@@ -375,7 +379,11 @@ static int mux_put_vobu_pack(PackStream *ps)
   //-- TODO --
   if (size != ps->pack_size) 
     fprintf(stderr, "\nERR: vobu pack size (%d) mismatch\n", size);
-  
+    //MEANX
+  ps->pack_psize[ps->pack_level]=  size;
+  ps->pack_level++;
+  assert(ps->pack_level<MAX_PACK);
+  //--MEANX
   return size;
 }
 
@@ -404,7 +412,8 @@ static int mux_put_av_pack(PackStream *ps)
   uint8_t  pts_dts_flag = 0x00;
   uint8_t  pts_intro    = 0x00;
   double   dts          = -1.0;
-
+  
+  
   memset(ps->pack_start, 0, ps->pack_size);
   put_init_bp(bp, ps->pack_start); 
 
@@ -457,16 +466,25 @@ static int mux_put_av_pack(PackStream *ps)
   
   if (ps->pkt_len < payload_size)
   {
-    available_size = ps->pkt_len;
-    padding_size   = payload_size - available_size;
-      
-    if ( (padding_size < 7) && (padding_size > 0) ) 
-    {
-      header_data_len += padding_size;
-      padding_size     = 0;
-    }
-    else
-      padding_size -= 6;
+     	available_size = ps->pkt_len;
+	padding_size   = payload_size - available_size; 
+	// If there is a bit of padding, keep it
+	if(1) //ps->pkt_id >= AUDIO_ID_MP2)
+	{
+				padding_size = 0;	
+	}
+	else	
+	{
+		if ( (padding_size < 7) && (padding_size > 0) ) 
+		{
+			header_data_len += padding_size;
+			padding_size     = 0;
+    		}
+    		else
+		{			
+			padding_size -= 6;
+    		}
+	}
   }
   else
   {
@@ -477,7 +495,6 @@ static int mux_put_av_pack(PackStream *ps)
   //-- PES startcode (4) and PES packet len (2) --
   put_qword(bp, startcode); 
   put_word(bp, available_size + header_len + header_data_len + sub_hdr_len);
-    
   //-- mpeg2 needs 3 byte header -- 
   put_byte(bp, 0x80);            /* mpeg2 id */	
   put_byte(bp, pts_dts_flag);    /* flags    */   
@@ -545,13 +562,19 @@ static int mux_put_av_pack(PackStream *ps)
     put_word(bp, padding_size);
     for(i=0; i<padding_size;i++) put_byte(bp, 0xff);  
   }
-
   size = bp->byte_ofs;
+  //MEANX
+  ps->pack_psize[ps->pack_level]=  size;
+  ps->pack_level++;
+  assert(ps->pack_level<MAX_PACK);
+  //
+  
   
   //-- TODO --
-  if (size != ps->pack_size) 
+  /*
+  if (size != ps->pack_size &&  ps->pkt_id != VIDEO_ID) 
     fprintf(stderr, "\nERR: pack size (%d) mismatch\n", size);
-  
+  */
   ps->pack_cnt++;
   ps->pack_start += size;
   ps->buf_level  += size;
@@ -569,6 +592,7 @@ static int mux_flush_packs(PackStream *ps)
   double  scr_step = ps->pack_size * ps->pict_duration / ps->buf_level;
   int64_t timestamp;
   int n;
+  int cur_pack=0;
   
   while (start < end)
   {
@@ -590,9 +614,12 @@ static int mux_flush_packs(PackStream *ps)
 
     //-- next SCR in next pack --   
     ps->scr += scr_step;
-    start   += ps->pack_size;
+    start   += ps->pack_psize[cur_pack]; //ps->pack_size;
+    //printf(">> %d %d\n",ps->pack_psize[cur_pack],ps->pack_size);
+    cur_pack++;
   }
-  
+  //printf("cur : %d %d\n",cur_pack,ps->pack_level);
+  ps->pack_level=0;
   n = fwrite(ps->stream_buf, 1, ps->buf_level, ps->fp);
 
   //-- start in front of buffer again --  
@@ -658,7 +685,7 @@ PackStream *mux_open(char *fn,
     // We set clean default value...
     ps->audio_pts   = 0;
     ps->forceRestamp= 0;
-    
+    ps->pack_level=0;
     compute=a_bit_rate;
     compute/=(float)sample_rate;
     compute/=8;
