@@ -374,7 +374,7 @@ OgAudioIndex *idx;
 	aprintf("OGM:Looking for %lu ms\n",mstime);
 	aprintf("Looking for %llu sample\n",val);
 	_lastPos=0;
-	
+	idx=_currentTrack->index;
 	if(!mstime)
 	{
 			_demuxer->setPos(idx[0].pos);
@@ -385,7 +385,7 @@ OgAudioIndex *idx;
 			return 1;
 	}
 	//
-	idx=_currentTrack->index;
+	
 	for(uint32_t i=0;i<_currentTrack->nbAudioPacket;i++)
 	{		
 		cur=idx[i].sampleCount;
