@@ -32,6 +32,8 @@ typedef struct VobSubInfo
 {
         uint32_t        Palette[16];
         uint32_t        nbLines;
+        uint32_t        width;
+        uint32_t        height;
         vobSubLine      *lines;
 }VobSubInfo;
 

@@ -148,8 +148,15 @@ int             language=0;
                                         
                                 
                                 }
+                                else
+                                {
+                                        if(!strncmp(str,"id:",3))       // Catch original screen dimension
+                                        {
+                                                sscanf(str,"size:%lux%lu",&(sub->width),&(sub->height));
+                                        }
                                 
-                        
+                                }
+                                
                         }
                 }
         }
