@@ -256,8 +256,13 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 							memcpy(&tmp,&_settings,sizeof(_settings));
 							tmp.maxBitrate=tmp.minBitrate=tmp.bufferSize=0;
 			    				cdec->setConfig(&tmp);
+							{
+							char dummy[strlen(_logname)+10];
+							strcpy(dummy,_logname);
+							strcat(dummy,".fake");
 							
-							cdec->setLogFile("/tmp/dummylog.txt");
+							cdec->setLogFile(dummy);
+							}
 							cdec->init (FIRST_PASS_QUANTIZER,_fps,1);
 							_codec=cdec;
 									
