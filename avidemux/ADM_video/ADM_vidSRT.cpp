@@ -152,7 +152,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 #define BITMAP_SIZE _info.width*_conf->_fontsize*SRT_MAX_LINE
 	_bitmapBuffer=new uint8_t[_info.width*_info.height];
 	_maskBuffer=new uint8_t[_info.width*_info.height];
-	_bgBitmapBuffer=new uint8_t[_info.width*_info.height];
+  _bgBitmapBuffer=new uint8_t[(_info.width*_info.height)>>1];
 	_bgMaskBuffer=new uint8_t[_info.width*_info.height];
 	assert(_bitmapBuffer);
 	assert(_maskBuffer);

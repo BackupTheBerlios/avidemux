@@ -147,7 +147,7 @@ void ADMVideoSubtitle::displayString(char *string)
 
 					memset(_bitmapBuffer,0,_info.height*_info.width);
 					memset(_maskBuffer,0,_info.height*_info.width);
-  memset(_bgBitmapBuffer,0,_info.height*_info.width);
+  memset(_bgBitmapBuffer,0,(_info.height*_info.width)>>1);
   memset(_bgMaskBuffer,0,_info.height*_info.width);
 
 							{
@@ -250,8 +250,8 @@ uint8_t tmp[_info.width*_info.height];
 				lowPass(tmp,src,_info.width>>1,_info.height>>1);
 
   if (_conf->_useBackgroundColor) {
-    decimate(_bgMaskBuffer,tmp,_info.width,_info.height);
-    lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
+    decimate(_bgMaskBuffer,_bgBitmapBuffer,_info.width,_info.height);
+    //lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
   }
 
   //decimate(_bgBitmapBuffer,tmp,_info.width,_info.height);
@@ -283,6 +283,19 @@ uint32_t ADMVideoSubtitle::displayLine(char *string,uint32_t line, uint32_t len,
 		printf("\n null string\n");
       return 0;
 	}
+
+
+  if (_conf->_selfAdjustable && _conf->_useBackgroundColor) {
+    // It will remove ' ' chars (trim like) because background color make them visible
+    char *stringLim=string+(len-1);
+    while (string!=stringLim && string[0]==' ') {
+      string++;
+    }
+    
+    while (len>0 && string[len-1]==' ') {
+      len--;
+    }
+  }
 
 	uint32_t w=0;
 	int ww;
@@ -421,7 +434,6 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	uint32_t y;
 	uint32_t val;
 	int32_t ssigned;
-  int32_t bg_ssigned;
 
 
 	hei=SRT_MAX_LINE*_conf->_fontsize*_info.width;  // max height of our subtitle
@@ -433,26 +445,21 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 
 	// mask out left and right
 
-  uint32_t bg_val=128*_conf->_bg_Y_percent+128;
-  bg_val>>=8;
-
 	mask=_maskBuffer;
   bgMask=_bgMaskBuffer;
  	target+=start;
   	for( y=hei;y>0;y--)
 	{
       if(*mask) {
-			if(*mask>LUMA_LEVEL)
+	if(*mask>LUMA_LEVEL || _conf->_useBackgroundColor)
 			{
 				val=*mask*_conf->_Y_percent+128;
 				val>>=8;
 				*target=(uint8_t )val;
 			}
-			else *target=0;
-		}
-
-      if(_conf->_useBackgroundColor && (*bgMask || *target==0)) {
-	*target=(uint8_t )bg_val;
+	else { *target=0; }
+      } else if(_conf->_useBackgroundColor && *bgMask) {
+	*target=(uint8_t )_conf->_bg_Y_percent;
       }	  
       
 		target++;
@@ -475,8 +482,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	ssigned=_conf->_U_percent;
 	ssigned+=128;
 
-  bg_ssigned=_conf->_bg_U_percent;
-  bg_ssigned+=128;
+  uint8_t bg_val=(uint8_t) _conf->_bg_U_percent+128;
 
 //#define MAXVAL(x) {val=*mask*(x)+127;val>>=8;*ctarget=(uint8_t)(val&0xff);}
 #define MAXVAL(x)  *target=(uint8_t )ssigned
@@ -487,7 +493,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 			else \
 				MAXVAL(_conf->_U_percent); \
                 } \
-             else if (_conf->_useBackgroundColor && *bgMask) { if(*bgMask==1) {*target=128;} else {*target=(uint8_t)bg_ssigned;} }
+             else if (_conf->_useBackgroundColor && *bgMask) {*target=(uint8_t)bg_val;}
 	//if(_conf->_U_percent!=128)
 	if(1)
   	for( y=hei;y>0;y--)
@@ -511,8 +517,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	ssigned=_conf->_V_percent;
 	ssigned+=128;
 
-  bg_ssigned=_conf->_bg_V_percent;
-  bg_ssigned+=128;
+  bg_val=(uint8_t) _conf->_bg_V_percent+128;
 
 	//if(_conf->_V_percent)
 	if(1)
