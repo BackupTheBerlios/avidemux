@@ -948,7 +948,7 @@ STATIC int bsumsq(
  * SIZE is a multiple of 8.
  */
 void variance(uint8_t *p, int size,	int rowstride,
-			 unsigned int *p_var, unsigned int *p_mean)
+			 uint32_t *p_var,uint32_t  *p_mean)
 {
 	int i,j;
 	unsigned int v,s,s2;

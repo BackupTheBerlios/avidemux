@@ -63,6 +63,11 @@ B = Y + 1.772U              3716153
 
 
 #ifdef USE_MMX
+#ifdef __CYGWIN__ // CYGWIN
+	#define Mangle(x) "_" #x
+#else
+	#define Mangle(x) #x
+#endif
 
 /* hope these constant values are cache line aligned */
 static volatile uint64_t mmx_80w = 0x0080008000800080LL;
@@ -84,7 +89,6 @@ static volatile uint64_t mmx_bluemask = 0xf8f8f8f8f8f8f8f8LL;
 
 static volatile uint64_t mmx_grnshift = 0x03;
 static volatile uint64_t mmx_blueshift =  0x03;
-
 void no_warning_2(void);
 
 void no_warning_2(void)
@@ -130,27 +134,27 @@ movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
 # convert the chroma part                                                   \n\
 punpcklbw %%mm4, %%mm0          # scatter 4 Cb    00 u3 00 u2 00 u1 00 u0   \n\
 punpcklbw %%mm4, %%mm1          # scatter 4 Cr    00 v3 00 v2 00 v1 00 v0   \n\
-psubsw    mmx_80w, %%mm0        # Cb -= 128                                 \n\
-psubsw    mmx_80w, %%mm1        # Cr -= 128                                 \n\
+psubsw    "Mangle(mmx_80w)", %%mm0        # Cb -= 128                                 \n\
+psubsw    "Mangle(mmx_80w)", %%mm1        # Cr -= 128                                 \n\
 psllw     $3, %%mm0             # Promote precision                         \n\
 psllw     $3, %%mm1             # Promote precision                         \n\
 movq      %%mm0, %%mm2          # Copy 4 Cb       00 u3 00 u2 00 u1 00 u0   \n\
 movq      %%mm1, %%mm3          # Copy 4 Cr       00 v3 00 v2 00 v1 00 v0   \n\
-pmulhw    mmx_U_green, %%mm2    # Mul Cb with green coeff -> Cb green       \n\
-pmulhw    mmx_V_green, %%mm3    # Mul Cr with green coeff -> Cr green       \n\
-pmulhw    mmx_U_blue, %%mm0     # Mul Cb -> Cblue 00 b3 00 b2 00 b1 00 b0   \n\
-pmulhw    mmx_V_red, %%mm1      # Mul Cr -> Cred  00 r3 00 r2 00 r1 00 r0   \n\
+pmulhw    "Mangle(mmx_U_green)", %%mm2    # Mul Cb with green coeff -> Cb green       \n\
+pmulhw    "Mangle(mmx_V_green)", %%mm3    # Mul Cr with green coeff -> Cr green       \n\
+pmulhw    "Mangle(mmx_U_blue)", %%mm0     # Mul Cb -> Cblue 00 b3 00 b2 00 b1 00 b0   \n\
+pmulhw    "Mangle(mmx_V_red)", %%mm1      # Mul Cr -> Cred  00 r3 00 r2 00 r1 00 r0   \n\
 paddsw    %%mm3, %%mm2          # Cb green + Cr green -> Cgreen             \n\
                                                                             \n\
 # convert the luma part                                                     \n\
-psubusb   mmx_10w, %%mm6        # Y -= 16                                   \n\
+psubusb   "Mangle(mmx_10w)", %%mm6        # Y -= 16                                   \n\
 movq      %%mm6, %%mm7          # Copy 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
-pand      mmx_00ffw, %%mm6      # get Y even      00 Y6 00 Y4 00 Y2 00 Y0   \n\
+pand      "Mangle(mmx_00ffw)", %%mm6      # get Y even      00 Y6 00 Y4 00 Y2 00 Y0   \n\
 psrlw     $8, %%mm7             # get Y odd       00 Y7 00 Y5 00 Y3 00 Y1   \n\
 psllw     $3, %%mm6             # Promote precision                         \n\
 psllw     $3, %%mm7             # Promote precision                         \n\
-pmulhw    mmx_Y_coeff, %%mm6    # Mul 4 Y even    00 y6 00 y4 00 y2 00 y0   \n\
-pmulhw    mmx_Y_coeff, %%mm7    # Mul 4 Y odd     00 y7 00 y5 00 y3 00 y1   \n\
+pmulhw    "Mangle(mmx_Y_coeff)", %%mm6    # Mul 4 Y even    00 y6 00 y4 00 y2 00 y0   \n\
+pmulhw    "Mangle(mmx_Y_coeff)", %%mm7    # Mul 4 Y odd     00 y7 00 y5 00 y3 00 y1   \n\
 "
 /*
  * Do the addition part of the conversion for even and odd pixels,

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-
+#if 0
 #include <config.h>
 
 #include <unistd.h>
@@ -63,6 +63,7 @@ int y4m_allow_unknown_tags(int yn)
 
 ssize_t y4m_read(int fd, void *buf, size_t len)
 {
+#if 0
    ssize_t n;
    uint8_t *ptr = (uint8_t *)buf;
 
@@ -78,12 +79,14 @@ ssize_t y4m_read(int fd, void *buf, size_t len)
      ptr += n;
      len -= n;
    }
+#endif
    return 0;
 }
 
 
 ssize_t y4m_write(int fd, const void *buf, size_t len)
 {
+#if 0
    ssize_t n;
    const uint8_t *ptr = (const uint8_t *)buf;
 
@@ -94,6 +97,7 @@ ssize_t y4m_write(int fd, const void *buf, size_t len)
      len -= n;
    }
    return 0;
+#endif
 }
 
 
@@ -798,4 +802,4 @@ const char *y4m_strerr(int err)
   }
 }
 
-
+#endif

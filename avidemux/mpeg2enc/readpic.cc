@@ -177,7 +177,7 @@ int luminance_mean(uint8_t *frame, int w, int h )
 
 #endif
 // MEANX
-
+#if 0
 int piperead(int fd, uint8_t *buf, int len)
 {
    int n, r;
@@ -192,6 +192,7 @@ int piperead(int fd, uint8_t *buf, int len)
    }
    return r;
 }
+#endif
 
 
 #ifndef PUSH

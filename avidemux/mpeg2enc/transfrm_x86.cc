@@ -170,7 +170,7 @@ int field_dct_best_mmx( uint8_t *cur_lum_mb, uint8_t *pred_lum_mb)
 	 */
 	double r,d;
 	int rowoffs = 0;
-	int sumtop, sumbot, sumsqtop, sumsqbot, sumbottop;
+	int32_t sumtop, sumbot, sumsqtop, sumsqbot, sumbottop;
 	int j;
 	int dct_type;
 	int topvar, botvar;

@@ -494,7 +494,7 @@ void MacroBlock::FrameME()
 	   quantisations... ;-)
 	 */
 
-    pvariance(ssmb.mb,16,opt->phy_width, &lum_variance, &lum_mean );
+    pvariance(ssmb.mb,16,opt->phy_width, (uint32_t *)&lum_variance,(uint32_t *) &lum_mean );
 	intravar = lum_variance + chrom_var_sum(&ssmb,16,opt->phy_width);
 
 
@@ -949,7 +949,7 @@ void MacroBlock::FrameMEs()
 	   quantisations... ;-)
 	 */
 
-    pvariance(ssmb.mb,16,opt->phy_width, &lum_variance, &lum_mean );
+    pvariance(ssmb.mb,16,opt->phy_width,(uint32_t *) &lum_variance,(uint32_t *) &lum_mean );
 	int intravar = lum_variance + chrom_var_sum(&ssmb,16,opt->phy_width);
 
 
@@ -1233,7 +1233,7 @@ void MacroBlock::FieldME()
 		ssmb.qmb += (opt->phy_width >> 2);
 	}
 
-    pvariance( ssmb.mb, 16, w2, &lum_variance, &lum_mean );
+    pvariance( ssmb.mb, 16, w2, (uint32_t *)&lum_variance, (uint32_t *)&lum_mean );
 	intravar = lum_variance + chrom_var_sum(&ssmb,16,w2);
         
 	if(picture.pict_type==I_TYPE)

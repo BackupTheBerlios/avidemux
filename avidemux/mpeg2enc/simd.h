@@ -29,6 +29,11 @@
 #define __SIMD_H__
 #include <config.h>
 #include "mjpeg_types.h"
+#ifdef __CYGWIN__ // CYGWIN
+	#define Mangle(x) "_" #x
+#else
+	#define Mangle(x) #x
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -75,8 +80,8 @@ int cpuid_flags();
 
 void iquant_non_intra_m1_extmmx(int16_t *src, int16_t *dst, uint16_t *qmat) __asm__ ("iquant_non_intra_m1_extmmx");
 void iquant_non_intra_m1_mmx(int16_t *src, int16_t *dst, uint16_t *qmat) __asm__ ("iquant_non_intra_m1_mmx");
-void iquant_non_intra_m2_extmmx(int16_t *src, int16_t *dst, uint16_t *qmat) __asm__ ("iquant_non_intra_extmmx");
-void iquant_non_intra_m2_mmx(int16_t *src, int16_t *dst, uint16_t *qmat) __asm__ ("iquant_non_intra_mmx");
+void iquant_non_intra_m2_extmmx(int16_t *src, int16_t *dst, uint16_t *qmat) __asm__ (Mangle(iquant_non_intra_extmmx));
+void iquant_non_intra_m2_mmx(int16_t *src, int16_t *dst, uint16_t *qmat) __asm__ (Mangle(iquant_non_intra_mmx));
 
 void iquant_non_intra_extmmx(int16_t *src, int16_t *dst, int mquant );
 void iquant_non_intra_mmx(int16_t *src, int16_t *dst, int mquant );
