@@ -464,6 +464,7 @@ static X264Config  x264Config
   2,    //uint32_t nbBframe;  
   } 
 };
+extern uint8_t DIA_x264(X264Config *config);
 #endif
 
 ///////////////////////////////////////////
@@ -538,6 +539,7 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 #endif
 #ifdef USE_X264
                 case CodecX264:
+                                MAKECONF(x264Config);
                                 break;
 #endif
 #ifdef USE_XX_XVID
@@ -622,8 +624,8 @@ const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
 	{
 #ifdef USE_X264
                                 case CodecX264:
-                                        *data=NULL;
-                                        *optSize=0;
+                                        *data=(uint8_t *)&x264Config;
+                                        *optSize=sizeof(x264Config);
                                          break;
 #endif          
 #ifdef USE_XX_XVID
@@ -1136,7 +1138,8 @@ void videoCodecConfigureUI( void )
 					break;
 #ifdef USE_X264
                 case CodecX264:
-                            break;
+                                        DIA_x264(&x264Config);
+                                        break;
 #endif
 		case  CodecH263P:                  
 					printf("\n H263P\n");					
@@ -1205,6 +1208,9 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param, uint32_t ex
 #endif
 #ifdef USE_X264
                                 case CodecX264:
+                                                generic=&x264Config.generic;
+                                                specific=&x264Config.specific;
+                                                specSize=sizeof(x264Config.specific);
                                         break;
 #endif
 #ifdef  USE_FFMPEG
@@ -1309,7 +1315,7 @@ Encoder *e=NULL;
 #endif		
 #ifdef USE_X264
                 case CodecX264:
-                                        e=new EncoderX264(NULL);
+                                        e=new EncoderX264(&x264Config);
                                         break;
 #endif
 #ifdef USE_FFMPEG
