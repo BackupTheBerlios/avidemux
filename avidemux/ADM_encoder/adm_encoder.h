@@ -107,6 +107,7 @@ typedef enum
 	CodecH263,
 	CodecH263P,
 	CodecFFV1,
+	CodecSnow,
 	CodecHuff,
 	CodecVCD,
 	CodecSVCD,

@@ -129,5 +129,25 @@ public:
 
 };
 
+class EncodeFFMPEGSNow:public EncoderFFMPEG
+{
 
+protected:
+
+
+public:
+    			EncodeFFMPEGSNow (FFMPEGConfig *config);
+			~EncodeFFMPEGSNow() { stop();}; // can be called twice if needed ..
+  virtual uint8_t isDualPass (void) { return 0;};
+  virtual uint8_t configure (AVDMGenericVideoStream * instream);
+  virtual uint8_t setLogFile (const char *p, uint32_t fr)  { UNUSED_ARG(p); UNUSED_ARG(fr); return 1;};
+  virtual uint8_t startPass2 (void) { return 1;};
+  virtual uint8_t startPass1 (void) { return 1;};
+  virtual const char *getDisplayName(void ) {return "LavCodec Snow";}
+  virtual const char *getFCCHandler(void ) {return "SNOW";}
+  virtual uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
+			  uint32_t * flags);
+  virtual uint8_t hasExtraHeaderData( uint32_t *l,uint8_t **data);
+
+};
 #endif

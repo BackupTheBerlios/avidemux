@@ -163,6 +163,62 @@ uint8_t EncoderFFMPEGFFV1::configure (AVDMGenericVideoStream * instream)
 
 
 //--------------end------------
+//************************* SNOW **************************
+EncodeFFMPEGSNow::EncodeFFMPEGSNow(FFMPEGConfig *config) :
+	EncoderFFMPEG(FF_HUFF,config)
+{
+	_id=FF_SNOW;
+	_frametogo=0;
+
+
+}
+uint8_t EncodeFFMPEGSNow::encode (uint32_t frame, uint32_t * len, uint8_t * out,
+			  uint32_t * flags)
+{
+uint32_t l,f;
+  ADM_assert (_codec);
+  ADM_assert (_in);
+
+  if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
+    {
+      printf ("\n Error : Cannot read incoming frame !");
+      return 0;
+    }
+
+      return _codec->encode (_vbuffer, out, len, flags);
+}
+ uint8_t EncodeFFMPEGSNow::hasExtraHeaderData( uint32_t *l,uint8_t **data)
+{
+	*l=0;
+	*data=NULL;
+	return 0;
+
+}	
+uint8_t EncodeFFMPEGSNow::configure (AVDMGenericVideoStream * instream)
+{
+ ADM_assert (instream);
+  ADV_Info *info;
+
+
+
+  info = instream->getInfo ();
+  _fps=info->fps1000;
+  _w = info->width;
+  _h = info->height;
+  _vbuffer = new uint8_t[_w * _h * 3];
+  ADM_assert (_vbuffer);
+  _in = instream;
+
+  _codec = new ffmpegEncoderCQ (_w, _h,_id);
+  _codec->init (_param.qz,_fps,0);
+  return 1;
+
+
+
+}
+
+
+//************************* SNOW **************************
 // return codec name as seen in avi header
 //
 const char *EncoderFFMPEG::getCodecName(void )
@@ -182,6 +238,10 @@ const char *EncoderFFMPEG::getCodecName(void )
 		case FF_FFV1:
 					return "FFV1";
 					break;
+		case FF_SNOW:
+					return "SNOW";
+					break;
+					
 		default:
 				ADM_assert(0);
 

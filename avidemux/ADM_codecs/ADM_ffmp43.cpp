@@ -614,6 +614,19 @@ decoderFFMJPEG::decoderFFMJPEG(uint32_t w,uint32_t h)       :decoderFF(w,h)
 				}
 
 }
+decoderSnow::decoderSnow(uint32_t w,uint32_t h)       :decoderFF(w,h)
+{
 
+
+      if (avcodec_open(_context,& snow_decoder) < 0)
+	      			{
+					printf(" Decoder init: FFMpeg snow video decoder failed!\n");
+				}
+				else
+				{
+					printf(" Decoder init: FFMpeg snow video decoder initialized!\n");
+				}
+
+}
 
 #endif

@@ -495,6 +495,7 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 					case  CodecH263P:
 					case  CodecHuff:
 					case  CodecFFV1:
+					case  CodecSnow:
 											MAKECONF(ffmpegConfig);
 											break;
 					case CodecXSVCD:
@@ -561,6 +562,7 @@ const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
 					case  CodecH263P:
 					case  CodecHuff:
 					case  CodecFFV1:
+					case CodecSnow:
 
 
 											*data=(uint8_t *)&ffmpegConfig;
@@ -787,7 +789,8 @@ static const codecEnumByName mycodec[]=
 	{CodecH263	,	"H263"},
 	{CodecH263P	,"H263+"},
 	{CodecHuff		,"Huffyuv"},
-	{CodecFFV1		,"FFV1"}
+	{CodecFFV1		,"FFV1"},
+	{CodecSnow		,"Snow"}
 };
 //___________________________________________________
 void saveEncoderConfig( void )
@@ -935,6 +938,10 @@ void videoCodecConfigureUI( void )
 				break;
 		case CodecFFV1:
 				break;
+		case CodecSnow:
+					ffmpegConfig.generic.mode=COMPRESS_CQ;
+					ffmpegConfig.generic.qz=4;
+					break;
 
 		case  CodecH263P:
 					printf("\n H263P\n");					
@@ -1020,6 +1027,7 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param, uint32_t ex
 					case  CodecH263P:
 					case  CodecHuff:
 					case  CodecFFV1:
+					case  CodecSnow:
 
 									generic=&ffmpegConfig.generic ;
 									specific=&ffmpegConfig.specific;
@@ -1099,6 +1107,9 @@ Encoder *e=NULL;
 		case   CodecFFV1:
 					e=new   EncoderFFMPEGFFV1(&ffmpegConfig);
 				    	break;
+		case   CodecSnow:
+					e=new EncodeFFMPEGSNow(&ffmpegConfig);
+					break;
 		case   CodecH263P:
 					e=new   EncoderFFMPEG(FF_H263P,&ffmpegConfig);
 				    	break;		

@@ -37,6 +37,7 @@ static uint8_t slowYV12RGB(uint8_t * ptr_y,
 		    uint8_t * ptr_u,
 		    uint8_t * ptr_v, uint8_t * ptr2, uint32_t w);
 
+
 extern void fastYV12RGB_mmx ( uint8_t * py,
 			       uint8_t * pu, uint8_t * pv,  uint8_t * image,
 			       int h_size);

@@ -162,6 +162,15 @@ class decoderFFMJPEG : public decoderFF
      						          	decoderFFMJPEG(uint32_t w,uint32_t h) ;
 
 }   ;
+class decoderSnow : public decoderFF
+{
+	   protected:
+
+
+     public:
+     						          	decoderSnow(uint32_t w,uint32_t h) ;
+
+}   ;
 class decoderFFcyuv : public decoderFF
 {
 	   protected:

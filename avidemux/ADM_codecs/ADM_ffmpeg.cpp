@@ -194,6 +194,7 @@ uint8_t     ffmpegEncoder::initContext(  void )
 			case FF_HUFF:		res=  avcodec_open(_context, &huffyuv_encoder);break;
 			case FF_FFV1:		res=  avcodec_open(_context, &ffv1_encoder);break;
 			case FF_MJPEG:	res=  avcodec_open(_context, &mjpeg_encoder);break;
+			case FF_SNOW: 	res=  avcodec_open(_context, &snow_encoder);break;
 			default: ADM_assert(0);
 		}
 

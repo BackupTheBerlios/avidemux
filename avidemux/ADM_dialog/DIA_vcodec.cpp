@@ -42,6 +42,7 @@
 	CodecH263P,
 	CodecHuff,
 	CodecFFV1,
+	CodecSnow,
 #ifdef USE_XVID_4	
  	CodecXvid4	,
 #endif	
@@ -60,6 +61,7 @@
 #endif
 	CodecXVCD,
 	CodecXSVCD,
+	
  };
 
  void okCallback(GtkButton * button, gpointer user_data)
@@ -130,6 +132,7 @@ GtkWidget	*create_dialogVideoCodec (void)
   GtkWidget *ffmpeg_h263p;
   GtkWidget *ffmpeg_huffyuv;
   GtkWidget *ffmpeg_ffv1;
+   GtkWidget *ffmpeg_snow;
 #ifdef USE_XX_XVID
   GtkWidget *xvid;
 #endif
@@ -187,6 +190,10 @@ GtkWidget *xvcd,*xsvcd;;
 ffmpeg_ffv1 = gtk_menu_item_new_with_mnemonic (_("FFmpeg FFV1"));
   gtk_widget_show (ffmpeg_ffv1);
   gtk_container_add (GTK_CONTAINER (menu1), ffmpeg_ffv1);
+  
+  ffmpeg_snow = gtk_menu_item_new_with_mnemonic (_("FFmpeg Snow"));
+  gtk_widget_show (ffmpeg_snow);
+  gtk_container_add (GTK_CONTAINER (menu1), ffmpeg_snow);
 
 
 #ifdef USE_XX_XVID
