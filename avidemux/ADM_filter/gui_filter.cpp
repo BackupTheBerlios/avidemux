@@ -68,6 +68,7 @@
 static VF_FILTERS new_filter (void);
 //static void  on_configure (GtkButton * button, gpointer user_data);
 static void on_action (GtkButton * button, gpointer user_data);
+static void  on_action_double_click (GtkButton * button, gpointer user_data);
 static void updateFilterList( void );
 //__________________________________________
 
@@ -89,7 +90,8 @@ typedef enum gui_act
   A_LOAD,
   A_SAVE,
   A_PREVIEW,
-  A_PARTIAL
+  A_PARTIAL,
+  A_DOUBLECLICK
 };
 
 //___________________________________________
@@ -104,6 +106,7 @@ extern ADM_Composer *video_body;
 extern GtkWidget		*create_filterMain (void);
 extern GtkListStore 		*storeMainFilter;
 static  GtkWidget *dialog;
+static  GtkWidget *dialog2;
 int GUI_handleFilter (void)
 {
 
@@ -143,7 +146,11 @@ getLastVideoFilter(); // expand video to full size
 	CALLME(buttonPreview	,A_PREVIEW);
 	CALLME(buttonPartial	,A_PARTIAL);
 	CALLME(buttonHaldD1	,A_HALFD1);
-
+	// Add double click
+	gtk_signal_connect (GTK_OBJECT (lookup_widget(dialog,"treeview1")),
+				"row-activated", 
+				GTK_SIGNAL_FUNC (on_action), 
+				(void *)A_DOUBLECLICK);
 
 	updateFilterList();
 
@@ -179,9 +186,15 @@ dummy=(int)user_data;
 
   switch (action)
 	    {
+	    case A_DOUBLECLICK:
+	    		printf("Double clicked..");
+			break;
 	      // Add
 	    case A_ADD:
 	      tag = new_filter ();
+	      // Raise back the old window
+	      gtk_widget_grab_focus(dialog);
+	      //
 	      if (tag != VF_INVALID)
 		{
 		CONFcouple *couple;
@@ -195,6 +208,7 @@ dummy=(int)user_data;
 		  ;
 		  nb_active_filter++;
 		  updateFilterList();
+		   gdk_window_raise(dialog->window);
 		}
 	      break;
 	    case A_VCD:
@@ -213,6 +227,7 @@ dummy=(int)user_data;
 	      	setHalfD1 ();
 	      	updateFilterList();
 	      break;
+	    default:
 	    case A_CONFIGURE:
 //	      void *p;
 	      if (action_parameter)
@@ -228,6 +243,9 @@ dummy=(int)user_data;
 			getFirstVideoFilter();
 			updateFilterList();
 		    }
+		    // Raise back dialog
+		    //gtk_window_set_focus(GTK_WINDOW(dialog));
+		    gdk_window_raise(dialog->window);
 		}
 	      break;
 	    case A_PARTIAL:
@@ -375,9 +393,11 @@ dummy=(int)user_data;
 
 #endif
 	      break;
-
+#if 0
 	    default:
+	    	printf("Unknown action :%d, action param %d\n",action,action_parameter);
 	      assert (0);
+#endif	      
 	    }
 	//updateFilterList();
 
@@ -393,7 +413,7 @@ extern GtkListStore 	*storeFilterList;
 */
 VF_FILTERS new_filter (void)
 {
-  GtkWidget *dialog;
+  
 //  GtkObject *selected;
   int position=0;
   uint32_t sel,max=0;
@@ -403,9 +423,9 @@ GtkTreeIter   iter;
 uint8_t ret=0;
 
 
-  dialog = create_dialogList ();
+  dialog2 = create_dialogList ();
 
-  tree=lookup_widget(dialog,"treeview2");
+  tree=lookup_widget(dialog2,"treeview2");
   gtk_widget_set_size_request (tree, 400, 400);
   for (uint32_t i = 0; i < nb_video_filter; i++)
     {
@@ -416,7 +436,12 @@ uint8_t ret=0;
 		max++;
      }
     }
-	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+        // Add double click
+	gtk_signal_connect (GTK_OBJECT (lookup_widget(dialog2,"treeview2")),
+				"row-activated", 
+				GTK_SIGNAL_FUNC (on_action_double_click), 
+				(void *)dialog);
+	if(gtk_dialog_run(GTK_DIALOG(dialog2))==GTK_RESPONSE_OK)
 	{
 			if(( ret=getSelectionNumber(max,tree  , storeFilterList,&sel)))
 			{
@@ -434,7 +459,7 @@ uint8_t ret=0;
 					}
 			}
 	}
-	gtk_widget_destroy(dialog);
+	gtk_widget_destroy(dialog2);
 
 	return tag;
 }
@@ -450,4 +475,11 @@ GtkTreeIter   iter;
     }
 
 }
+void  on_action_double_click (GtkButton * button, gpointer user_data)
+{
+	
+    		gtk_dialog_response(GTK_DIALOG(dialog2), GTK_RESPONSE_OK);
+    		
+}
+
 #endif
