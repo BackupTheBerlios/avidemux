@@ -90,7 +90,7 @@ void oplug_mpegff(char *name, uint8_t ps_stream)
 AVDMGenericVideoStream *_incoming;
 EncoderFFMPEGMpeg1  *encoder;
 
-lavMuxer	*muxer=NULL;
+mplexMuxer	*muxer=NULL;
 FILE 		*file=NULL;
 uint8_t		audioBuffer[48000];
 uint32_t	audioLen=0;
@@ -188,7 +188,7 @@ uint32_t  real_framenum=0;
 		}
 	
 		// Create muxer
-		muxer=new lavMuxer();
+		muxer=new mplexMuxer();
 		if(!muxer->open(name,0,mux,avifileinfo,audio->getInfo()))
 		{
 			delete muxer;

@@ -27,7 +27,7 @@ void mjpeg_log(log_level_t level, const char format[], ...)
 }
 void mjpeg_info( const char format[], ...)
 {
-#ifndef SILENT
+#if !defined( SILENT) || 0
   static char print_buffer[1024];
   	va_list 	list;
 		va_start(list,	format);
@@ -39,14 +39,14 @@ void mjpeg_info( const char format[], ...)
 }
 void mjpeg_warn( const char format[], ...)
 {
-#ifndef SILENT
+#if  !defined( SILENT) || 1
  static char print_buffer[1024];
   	va_list 	list;
 		va_start(list,	format);
 		vsnprintf(print_buffer,1023,format,list);
 		va_end(list);
 		print_buffer[1023]=0; // ensure the string is terminated
-		printf("%s\n",print_buffer);
+		printf("[MPLEX]%s\n",print_buffer);
 #endif
 
 }

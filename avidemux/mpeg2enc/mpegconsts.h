@@ -140,6 +140,17 @@ mpeg_guess_sample_aspect_ratio(int mpeg_version,
 			       int frame_width, int frame_height);
 
 
+int
+mpeg_valid_framerate_code( mpeg_framerate_code_t code );
+
+int
+mpeg_valid_aspect_code( int mpeg_version, mpeg_aspect_code_t code );
+
+int
+mpeg_valid_framerate_code( mpeg_framerate_code_t code );
+
+
+
 #ifdef __cplusplus
 };
 #endif

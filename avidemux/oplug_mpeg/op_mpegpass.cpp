@@ -80,7 +80,8 @@ void mpeg_passthrough(  char *name )
   double total_got=0;
  
  //#define MYMUXER MpegMuxer
- #define MYMUXER lavMuxer
+ //#define MYMUXER lavMuxer
+ #define MYMUXER mplexMuxer
   MYMUXER *muxer=NULL;
   
   	printf("Saving as mpg PS to file %s\n",name);

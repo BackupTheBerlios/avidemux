@@ -177,7 +177,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	double 		audioInc=0;
 	double		audioWanted=0,audioGot=0;
 	uint32_t	audioLen;
-	lavMuxer	*muxer=NULL;
+	mplexMuxer	*muxer=NULL;
 	uint32_t	fps1000=0;
 	
 	
@@ -196,7 +196,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	if(audio)
 	{
 		fps1000=avifileinfo->fps1000;
-		muxer=new lavMuxer;
+		muxer=new mplexMuxer;
 		aviInfo info;
 		video_body->getVideoInfo(&info);
 		if(!muxer->open(out_name,0,MUXER_DVD,&info,audio->getInfo()))

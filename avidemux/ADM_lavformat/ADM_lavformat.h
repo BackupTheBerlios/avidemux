@@ -18,6 +18,7 @@ typedef enum
 	MUXER_SVCD,
 	MUXER_DUMMY
 }ADM_MUXER_TYPE;
+
 class lavMuxer
 {
 protected:
@@ -42,5 +43,32 @@ public:
 	uint8_t audioEmpty( void);
 
 };
+
+class mplexMuxer
+{
+protected:
+                uint32_t _frameNo;
+                uint32_t _fps1000;
+                uint32_t _audioByterate;
+                uint32_t _total;
+                uint32_t _running;
+                ADM_MUXER_TYPE _type;
+                uint8_t  _restamp;
+
+public:
+                mplexMuxer(void );
+                ~mplexMuxer(  );
+        uint8_t needAudio( void );
+                        // Inbitrate is in bps,  0 means let the muxer takes default 
+                        // value
+        uint8_t open( char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
+        uint8_t writeAudioPacket(uint32_t len, uint8_t *buf);
+        uint8_t writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe );
+        uint8_t forceRestamp(void);
+        uint8_t close( void );
+        uint8_t audioEmpty( void);
+
+};
+
 //EOF
 

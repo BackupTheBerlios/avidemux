@@ -1019,8 +1019,9 @@ uint32_t fps1000;
 	_audioBuffer=new uint8_t[MAXAUDIO]; // equivalent to 1 sec @ 448 kbps, should be more than
 					// enough, even with the buffering
 	printf("----- Audio Track for mpeg Ready.------\n");
-	
-	_muxer=new lavMuxer();	
+
+	_muxer=new mplexMuxer();	
+        
 	// open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHeader *audioheader,float need);
 	aviInfo info;
 	info.width=getLastVideoFilter()->getInfo()->width;
