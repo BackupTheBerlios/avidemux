@@ -92,18 +92,18 @@ uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 {
 // Take ~ 10 m packets
 //
-	uint32_t count;
-			count=_wavheader->frequency/100;
-			count*=2;
+	uint32_t count,sample;
+			sample=_wavheader->frequency/100;
+			count=sample*2;	// 16 bits
 			count*=_wavheader->channels;
 			if(packetTail-packetHead<count)
 			{
 				count=packetTail-packetHead;
 				count%=4;
 			}
-			memcpy(&packetBuffer[packetHead],dest,count);
+			memcpy(dest,&packetBuffer[packetHead],count);
 			packetHead+=count;
-			*samples=_wavheader->frequency/100;
+			*samples=sample;
 			*len=count;
 			if(packetTail>SIZE_INTERNAL)
 			{

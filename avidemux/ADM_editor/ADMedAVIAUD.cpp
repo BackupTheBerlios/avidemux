@@ -88,11 +88,14 @@ _VIDEOS *currentVideo;
 	}
 	// switch segment
 	// We adjust the audiosample to avoid adding cumulative shift
-	/*_audioSample=-_audioSample;
+#if 0	
+	_audioSample=-_audioSample;
 	_audioSample+=_segments[_audioseg]._audio_duration;	
-	*/
+#else	
 	_audioSample=0;
+#endif	
 	_audioseg++;
+	
 	// Compute new start time
 	uint32_t starttime;
 	
