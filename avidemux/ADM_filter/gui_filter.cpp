@@ -253,19 +253,26 @@ dummy=(int)user_data;
 		  CONFcouple *conf;
 
 		  conf=videofilters[action_parameter].conf;
-		  replace =new ADMVideoPartial (	videofilters[action_parameter - 1].filter,
+                  if(videofilters[action_parameter].tag==VF_PARTIAL) // cannot recurse
+                  {
+                        GUI_Alert("Cannot partial-ize a partial filter !");
+                  }
+                  else
+                  {
+		      replace =new ADMVideoPartial (	videofilters[action_parameter - 1].filter,
 										 videofilters[action_parameter].tag,
 					 					conf);
-		  replace->configure (videofilters[action_parameter - 1].filter);
-		  delete videofilters[action_parameter].filter;
-		  if(conf) delete conf;
-		  videofilters[action_parameter].filter = replace;
-		  replace->getCoupledConf(&conf);
-		  videofilters[action_parameter].conf = conf;
-		  videofilters[action_parameter].tag = VF_PARTIAL;
+		      replace->configure (videofilters[action_parameter - 1].filter);
+		      delete videofilters[action_parameter].filter;
+		      if(conf) delete conf;
+		      videofilters[action_parameter].filter = replace;
+		      replace->getCoupledConf(&conf);
+		      videofilters[action_parameter].conf = conf;
+		      videofilters[action_parameter].tag = VF_PARTIAL;
 //		  updateVideoFilters ();
 			getFirstVideoFilter();
 			updateFilterList();
+                  }
 		}
 	      break;
 	    case A_UP:
