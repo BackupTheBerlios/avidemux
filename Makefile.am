@@ -7,7 +7,7 @@
 ####### kdevelop will overwrite this part!!! (end)############
 # not a GNU package. You can remove this line, if
 # have all needed files, that a GNU package needs
-SUBDIRS =  po m4  adm_lavcodec avidemux  addons adm_lavcodec
+SUBDIRS =  po m4  avidemux  addons adm_lavcodec
 EXTRA_DIST = admin/config.rpath   admin AUTHORS COPYING ChangeLog INSTALL README TODO History  configure.in.in Makefile.dist
 
 AUTOMAKE_OPTIONS = foreign
