@@ -834,13 +834,8 @@ int z=0
 AC_MSG_RESULT(use_builtin)
 if test "x$use_builtin" = "xyes"; then
 	AC_DEFINE(HAVE_BUILTIN_VECTOR,1,[Enable altivec by default])
-	if(test "x$use_mmx" = "x1"); then
-	CFLAGS="$CFLAGS -msse"
-	CXXFLAGS="$CXXFLAGS -msse"
-	fi
-fi
 fi 
-
+fi
 dnl ________________NASM__________________
 AC_SUBST(AS)
 AC_SUBST(AS_FLAGS)
