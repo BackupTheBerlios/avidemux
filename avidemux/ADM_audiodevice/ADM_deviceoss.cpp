@@ -31,7 +31,7 @@
 #include "audio_out.h"
 
 #include  "ADM_audiodevice/ADM_deviceoss.h"
-
+#include "ADM_toolkit/toolkit.hxx"
 #if defined(ADM_BSD_FAMILY) && !defined(__FreeBSD__)
 	#include <soundcard.h>
 	const char *dsp = DEVOSSAUDIO;;
@@ -68,7 +68,12 @@ uint8_t ossAudioDevice::init(uint32_t channel, uint32_t fq)
     // open OSS device
     oss_fd = open(dsp, O_WRONLY | O_NONBLOCK);
     if (oss_fd == -1) {
-        printf("\n Error initializing OSS: Error : %d", errno);
+	if( errno == EACCES )
+	{
+           GUI_Alert("There is permission problem on /dev/dsp");
+	  }
+	else
+           printf("\n Error initializing OSS: Error : %d", errno);
         return 0;
     }
     // seems ok, set up audio 
