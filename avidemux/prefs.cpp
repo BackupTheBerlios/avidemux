@@ -16,9 +16,7 @@
 #endif
 #include <ADM_assert.h>
 
-#define free(x) ADM_dealloc(x)
-#define malloc(x) ADM_alloc(x)
-#define strdup(x) ADM_strdup(x)
+#undef free
 
 extern char *PathCanonize(const char *tmpname);
 
@@ -160,7 +158,7 @@ xmlNodePtr goto_node_with_create(xmlNodePtr cur, const char *str){
 
 void set_content(const char *option, xmlNodePtr x){
    int idx = -1;
-   char *str;
+   char *str,*str2;
 	for( int i=0; i < num_opts; i++ ){
 		if( !strcmp(opt_defs[i].name,option) ){
 			idx = i;
@@ -175,9 +173,14 @@ void set_content(const char *option, xmlNodePtr x){
 		fprintf(stderr,"no content in xmlNode for option \"%s\".\n",option);
 		return;
 	}
+	
+	str2=(char *)ADM_alloc(strlen(str)+1);
+	strcpy(str2,str);
+	free(str);
+	
 	if( opt_defs[idx].current_val )
-		free(opt_defs[idx].current_val);
-	opt_defs[idx].current_val = str;
+		ADM_dealloc(opt_defs[idx].current_val);
+	opt_defs[idx].current_val = str2;
 	#ifdef DEBUG_PREFS
 	fprintf(stderr,"Prefs: %s => %s\n",opt_defs[idx].name,opt_defs[idx].current_val);
 	#endif
@@ -199,7 +202,7 @@ preferences::~preferences(){
   unsigned int idx;
 	for( idx=0; idx < 4; idx++ ){
 		if( internal_lastfiles[idx] )
-			free(internal_lastfiles[idx]);
+			ADM_dealloc(internal_lastfiles[idx]);
 	}
 	#ifdef USE_LIBXML2
 	if( xdoc )
@@ -503,7 +506,7 @@ int preferences::get(options option, char **val){
 		p = opt_defs[option].default_val;
 	// no type check : every value can be represented by a string
 	// not an error -> it's a magic feature
-	if( (*val = strdup(p) ) )
+	if( (*val = ADM_strdup(p) ) )
 		return RC_OK;
 	return RC_FAILED; // strdup() out of memory
 }
@@ -539,10 +542,10 @@ int preferences::set(options option, const unsigned int val){
 	}
 	// set value
 	if( opt_defs[option].current_val )
-		free(opt_defs[option].current_val);
+		ADM_dealloc(opt_defs[option].current_val);
 	snprintf(buf,1024,"%u",v);
 	buf[1023] = '\0';
-	opt_defs[option].current_val = strdup(buf);
+	opt_defs[option].current_val = ADM_strdup(buf);
 	if( ! opt_defs[option].current_val )
 		return RC_FAILED;
 	return RC_OK;
@@ -578,10 +581,10 @@ int preferences::set(options option, const int val){
 	}
 	// set value
 	if( opt_defs[option].current_val )
-		free(opt_defs[option].current_val);
+		ADM_dealloc(opt_defs[option].current_val);
 	snprintf(buf,1024,"%d",v);
 	buf[1023] = '\0';
-	opt_defs[option].current_val = strdup(buf);
+	opt_defs[option].current_val = ADM_strdup(buf);
 	if( ! opt_defs[option].current_val )
 		return RC_FAILED;
 	return RC_OK;
@@ -618,10 +621,10 @@ int preferences::set(options option, const unsigned long val){
 	}
 	// set value
 	if( opt_defs[option].current_val )
-		free(opt_defs[option].current_val);
+		ADM_dealloc(opt_defs[option].current_val);
 	snprintf(buf,1024,"%lu",v);
 	buf[1023] = '\0';
-	opt_defs[option].current_val = strdup(buf);
+	opt_defs[option].current_val = ADM_strdup(buf);
 	if( ! opt_defs[option].current_val )
 		return RC_FAILED;
 	return RC_OK;
@@ -658,10 +661,10 @@ int preferences::set(options option, const long val){
 	}
 	// set value
 	if( opt_defs[option].current_val )
-		free(opt_defs[option].current_val);
+		ADM_dealloc(opt_defs[option].current_val);
 	snprintf(buf,1024,"%ld",v);
 	buf[1023] = '\0';
-	opt_defs[option].current_val = strdup(buf);
+	opt_defs[option].current_val = ADM_strdup(buf);
 	if( ! opt_defs[option].current_val )
 		return RC_FAILED;
 	return RC_OK;
@@ -698,10 +701,10 @@ int preferences::set(options option, const float val){
 	}
 	// set value
 	if( opt_defs[option].current_val )
-		free(opt_defs[option].current_val);
+		ADM_dealloc(opt_defs[option].current_val);
 	snprintf(buf,1024,"%f",v);
 	buf[1023] = '\0';
-	opt_defs[option].current_val = strdup(buf);
+	opt_defs[option].current_val = ADM_strdup(buf);
 	if( ! opt_defs[option].current_val )
 		return RC_FAILED;
 	return RC_OK;
@@ -719,8 +722,8 @@ int preferences::set(options option, const char * val){
 		return RC_FAILED;
 	// set value
 	if( opt_defs[option].current_val )
-		free(opt_defs[option].current_val);
-	opt_defs[option].current_val = strdup(val);
+		ADM_dealloc(opt_defs[option].current_val);
+	opt_defs[option].current_val = ADM_strdup(val);
 	if( ! opt_defs[option].current_val )
 		return RC_FAILED;
 	return RC_OK;
@@ -786,11 +789,11 @@ int preferences::set_lastfile(const char* file){
 		; // nothing to do - always on top
 	}else{
 		if( opt_defs[LASTFILES_FILE4].current_val )
-			free(opt_defs[LASTFILES_FILE4].current_val);
+			ADM_dealloc(opt_defs[LASTFILES_FILE4].current_val);
 		opt_defs[LASTFILES_FILE4].current_val = opt_defs[LASTFILES_FILE3].current_val;
 		opt_defs[LASTFILES_FILE3].current_val = opt_defs[LASTFILES_FILE2].current_val;
 		opt_defs[LASTFILES_FILE2].current_val = opt_defs[LASTFILES_FILE1].current_val;
-		opt_defs[LASTFILES_FILE1].current_val = strdup(internal_file);
+		opt_defs[LASTFILES_FILE1].current_val = ADM_strdup(internal_file);
 	}
 
 #ifdef USE_LIBXML2
@@ -835,7 +838,7 @@ int preferences::set_lastfile(const char* file){
 	PRT_LAFI("=> LASTFILES_",3,opt_defs[LASTFILES_FILE3].current_val);
 	PRT_LAFI("=> LASTFILES_",4,opt_defs[LASTFILES_FILE4].current_val);
 #endif
-	free(internal_file);
+	ADM_dealloc(internal_file);
 	return RC_OK;
 }
 
@@ -849,18 +852,18 @@ const char **preferences::get_lastfiles(void){
 #endif
 	for( idx=0; idx < 4; idx++ ){
 		if( internal_lastfiles[idx] ){
-			free(internal_lastfiles[idx]);
+			ADM_dealloc(internal_lastfiles[idx]);
 			internal_lastfiles[idx] = NULL;
 		}
 	}
 	if( opt_defs[LASTFILES_FILE1].current_val )
-		internal_lastfiles[0] = strdup(opt_defs[LASTFILES_FILE1].current_val);
+		internal_lastfiles[0] = ADM_strdup(opt_defs[LASTFILES_FILE1].current_val);
 	if( opt_defs[LASTFILES_FILE2].current_val )
-		internal_lastfiles[1] = strdup(opt_defs[LASTFILES_FILE2].current_val);
+		internal_lastfiles[1] = ADM_strdup(opt_defs[LASTFILES_FILE2].current_val);
 	if( opt_defs[LASTFILES_FILE3].current_val )
-		internal_lastfiles[2] = strdup(opt_defs[LASTFILES_FILE3].current_val);
+		internal_lastfiles[2] = ADM_strdup(opt_defs[LASTFILES_FILE3].current_val);
 	if( opt_defs[LASTFILES_FILE4].current_val )
-		internal_lastfiles[3] = strdup(opt_defs[LASTFILES_FILE4].current_val);
+		internal_lastfiles[3] = ADM_strdup(opt_defs[LASTFILES_FILE4].current_val);
 	internal_lastfiles[4] = NULL;
 
 #ifdef DEBUG_PREFS
