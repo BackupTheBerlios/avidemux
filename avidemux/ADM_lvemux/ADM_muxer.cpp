@@ -119,7 +119,7 @@ uint32_t n;
 	if(n)
 	
 	{
-		printf("Writing :%d bytes\n",n*_packSize);
+		//printf("Writing :%d bytes\n",n*_packSize);
 		r=mux_write_packet((PackStream *)packStream, 
                                audioType, buffer+byteHead, n*_packSize); 
 		byteHead+=n*_packSize;

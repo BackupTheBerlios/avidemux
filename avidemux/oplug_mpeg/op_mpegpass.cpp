@@ -43,10 +43,13 @@
 */
  extern AVDMGenericAudioStream *mpt_getAudioStream(double *pcm);
 
- #define PACK_AUDIO audiolen = audio->read ((uint32_t)floor(total_wanted-total_got),buffer); \
-		total_got+=audiolen; \
-		if(audiolen)	\
-			muxer->writeAudioPacket(audiolen,buffer); 
+ #define PACK_AUDIO {\
+ 			total_wanted+=pcm; \
+ 			audiolen=(uint32_t)floor(total_wanted-total_got);\
+ 			audiolen = audio->read (audiolen,buffer); \
+			total_got+=audiolen; \
+			if(audiolen)	\
+				muxer->writeAudioPacket(audiolen,buffer); }
     
  
  
@@ -112,7 +115,7 @@ void mpeg_passthrough(  char *name )
 
   for (uint32_t i = frameStart; i < frameEnd; i++)
     {
-      total_wanted+=pcm;
+      
       
       work->update (i - frameStart, frameEnd - frameStart);
       if(!work->isAlive()) goto _abt;

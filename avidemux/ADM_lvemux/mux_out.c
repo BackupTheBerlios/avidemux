@@ -718,7 +718,7 @@ uint32_t hh,mm,ss,ff;
 	ss=((a2&7)<<3)+(a3>>5);
 	ff=((a3&0x1f)<<1)+(a4>>7);
 	
-	printf("Old : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
+	//printf("Old : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
 	
 	
 	// Rebuild gop timestamp
@@ -728,7 +728,7 @@ uint32_t hh,mm,ss,ff;
 	mm=floor( rel/60.);
 	rel=rel-mm*60.;
 	ss=floor( rel);
-	printf("new : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
+	//printf("new : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
 	
 	*(ptr+0)=(hh<<2)+(mm>>4);
 	*(ptr+1)=((mm&0xf)<<4)+8+(ss>>3);
@@ -744,7 +744,7 @@ uint32_t hh,mm,ss,ff;
 	ss=((a2&7)<<3)+(a3>>5);
 	ff=((a3&0x1f)<<1)+(a4>>7);
 	
-	printf("Fixed : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
+	//printf("Fixed : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
 	
 	
 	
