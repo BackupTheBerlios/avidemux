@@ -128,8 +128,9 @@ uint8_t	AVDMVideoAddBorder::getCoupledConf( CONFcouple **couples)
 }
 AVDMVideoAddBorder::~AVDMVideoAddBorder()
 {
- 	delete []_uncompressed;
+ 	delete _uncompressed;
 	DELETE(_param);
+	_uncompressed=NULL;
  	
 }
 uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
@@ -150,9 +151,9 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
        		
 				// blacken screen
-				memset(data->data,0,_info.width*_info.height);
-				memset(data->data+_info.width*_info.height,128,_info.width*_info.height>>1);
-
+				memset(YPLANE(data),0,_info.width*_info.height);
+				memset(UPLANE(data),128,(_info.width*_info.height)>>2);
+				memset(VPLANE(data),128,(_info.width*_info.height)>>2);
 
 				// do luma
 				uint8_t *src,*dest;
@@ -162,39 +163,43 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
        		x=_in->getInfo()->width;
        		line=x;
 		lineout=_info.width;
+		
+		// copy Luma
        		src=YPLANE(_uncompressed);
        		dest=YPLANE(data)+_param->left+_info.width*_param->top;
        		
        		for(uint32_t k=y;k>0;k--)
-       			{
-       			 	    memcpy(dest,src,line);
-       			 	    src+=line;
-       			 	    dest+=lineout;
-       			}
-       		 // Crop U  & V
-			uint8_t *src_u,*src_v;
-			uint8_t *dst_u,*dst_v;
+       		{
+       		 	    memcpy(dest,src,line);
+       		 	    src+=line;
+       		 	    dest+=lineout;
+       		}
+       		 
+		// U and V now
+		uint8_t *src_u,*src_v;
+		uint8_t *dst_u,*dst_v;
 
-       		 	src_u=UPLANE(_uncompressed);
-       		 	src_v=VPLANE(_uncompressed);
-       		 	line>>=1;
-       		 	lineout>>=1;       		       		 	
-			dst_u=UPLANE( data)+(_info.width*_param->top>>2)+
+       		src_u=UPLANE(_uncompressed);
+       		src_v=VPLANE(_uncompressed);
+       		line>>=1;
+       		lineout>>=1;       		       		 	
+		dst_u=UPLANE( data)+(_info.width*_param->top>>2)+
 						(_param->left>>1);;
-			dst_v= UPLANE( data);
+		dst_v= VPLANE( data)+(_info.width*_param->top>>2)+
+						(_param->left>>1);;
 
-       		 		for(uint32_t k=y>>1;k>0;k--)
-       		 		{
-       		 	    	  	memcpy(dst_u,src_u,line);
-       		 	    	  	memcpy(dst_v,src_v,line);
+       		 for(uint32_t k=y>>1;k>0;k--)
+       		 {
+       		 	memcpy(dst_u,src_u,line);
+       		 	memcpy(dst_v,src_v,line);
 
-       			 	    	src_u+=line;
-       			 	    	src_v+=line;
+       			src_u+=line;
+       			src_v+=line;
 
-       			 	    	dst_u+=lineout;
-       			 	    	dst_v+=lineout;
+       			dst_u+=lineout;
+       		    	dst_v+=lineout;
 
-       		 		}
+       		 }
        		  *len= _info.width*_info.height+(_info.width*_info.height>>1);
 		  data->copyInfo(_uncompressed);
       return 1;
