@@ -211,7 +211,10 @@ uint8_t  mpegWritter::save_svcd(char *name)
 			break; \
 		}\
 		if(audiolen) \
+		{\
 			_muxer->writeAudioPacket(audiolen,_audioBuffer); \
+			encoding->feedAudioFrame(audiolen); \
+		}\
 		audioGot+=audiolen; \
 	} \
 }
