@@ -416,6 +416,7 @@ uint32_t avg_bitrate;
 			return 0;
 	vbrstate.fps=_fps/1000.;
   	vbrstate.desired_bitrate= avg_bitrate;
+	vbrstate.vbv_buffer_size=_settings.bufferSize*9*1024;
   	vbrstate.debug=0;
  	vbrstate.filename=_logname;//XvidInternal2pass_statfile;
 	vbrstate.mode=VBR_MODE_2PASS_2;

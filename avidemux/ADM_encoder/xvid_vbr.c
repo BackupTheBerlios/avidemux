@@ -56,7 +56,10 @@
 #define DEFAULT_XVID_DBG_FILE   "xvid.dbg"
 #define DEFAULT_XVID_STATS_FILE "xvid.stats"
 
-#define aprintf printf
+//#define aprintf printf
+#include "../ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME 0
+#include "../ADM_toolkit/ADM_debug.h"
 /******************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -293,7 +296,7 @@ int vbrInit(vbr_control_t *state)
 
 // MeanX
 	state->roundup=(int)floor(state->fps+0.99);
-	memset(state->b_per_sec,0,sizeof(int)*60);
+
 	state->size   = NULL;
 	state->kf   = NULL;
 	state->type   = NULL;
@@ -889,7 +892,7 @@ _AGAIN_:
 ---------------------------------------------------------------------------------------*/
 /* Meanx*/
 	/* Here we check if there is a cap influence */
-#if 1
+#if 0
 	if(state->maxAllowedBitrate && !precalced) // maxAllowedBitrte is in BYTE/second not bit/s
 	{
 		float var;
@@ -1265,6 +1268,14 @@ _AGAIN_:
 	state->cur_frame = 0;
 	state->last_keyframe = 0;
 
+	// VBV buffer init
+	state->vbv_fullness=state->vbv_buffer_size;
+	state->bits_per_image=(state->maxAllowedBitrate*8)/state->roundup; // Fixme, small error here
+	printf("Xvid 2 pass Bitrate enforcement\n");
+	printf("===============================\n");
+	printf("Xvid:Using a buffer of %d kByte\n",state->vbv_buffer_size/(8*1024));
+	printf("Xvid:Using a bitrate   %d kbps\n",state->maxAllowedBitrate*8/1000);
+	printf("Xvid:Bits per image    %d bits\n",state->bits_per_image);
 	return(0);
 
 }
@@ -1284,6 +1295,9 @@ static int vbr_getquant_2pass2(void *sstate)
 	int target;
 	int projected ;
 	double r;
+	int projected_vbv;
+	
+	int tryme,ok,orgquant;
 
 	 state= (vbr_control_t	* )sstate;
 	 target=state->cur_frame%state->roundup;
@@ -1532,111 +1546,59 @@ static int vbr_getquant_2pass2(void *sstate)
 		}
 	}
 
-	// check that we are withing max Q
-	// meanX
-	state->underflow_warning=0;
-
-	for( i=0;i<state->roundup;i++)
-	{
-		if(i!=target)
-			sum+=state->b_per_sec[i];
-	}
+	
 
 	// we make a rough estimation of the size this frame will be...
-	projected=state->size[state->cur_frame]*2/(state->qinc+quant);
-	sum+=projected;
-	state->avg_br=(sum*8)/1000;
-	//aprintf("avg_br: %d\n",state->avg_br);
-
-	if(state->maxAllowedBitrate)
-	{
-	if(state->cur_frame>15 && sum< state->thresh_underflow)
-	// If we are under THRESHOLD kbits we warn that we may reach underflow
-	{
-		state->underflow_warning=state->thresh_underflow-sum;
-		aprintf("Average bitrate underflow : bitrate lacks %d bytes\n",state->underflow_warning);
-	}
-
-	r=sum*10.;
-	r/=state->maxAllowedBitrate;
-	ratio=(int)floor(r);
-	if(ratio>9) ratio=9;
-	printf("Bitrate consumed : %d %%\n",ratio*10);
-	switch(ratio)
-	{
-		case 9: // between 90 and > 100 % bitrate used
-			aprintf("\n Max bitrate reached for frame %i \n",state->cur_frame );
-			aprintf(" Q %d Size : %d\n",quant, projected);
-			state->qinc+=LIMITER_MAX_INC;
-			if(state->qinc>20) state->qinc=20;
-   			aprintf("==> Qinc %d Size : %d\n",state->qinc, state->size[state->cur_frame]*2/(quant+state->qinc));
-			aprintf("==> %d versus max %d\n",sum,state->maxAllowedBitrate);
-			break;
-		case 8:
-				state->qinc=LIMITER_WARNING;
-				break;
-		case 7: // 70 % to
-				state->qinc=LIMITER_LOW_WARNING;
-				break;
-		default:
-				break;
-		}
-	// now we look ahead the 12 next frames assuming we will encode them
-	// with the same quantizer
 	
-	if((state->qinc<2)&& (state->cur_frame < (state->nb_frames-13)))
+
+	if(state->maxAllowedBitrate && state->cur_frame+state->roundup<state->nb_frames)
 	{
-		int ahead[60];
-		int j,k,msum;
-		memcpy(ahead,state->b_per_sec,60*sizeof(int));
-		for(k=0;k<12;k++)
+	//*******************************************************************************	
+	// meanX
+	//*******************************************************************************
+	tryme=20;
+	ok=0;
+	
+	quant+=state->qinc;	
+	orgquant=quant;
+_requant:
+	while(tryme && !ok)
+	{
+		projected_vbv=state->vbv_fullness;
+ 		for( i=0;i<state->roundup>>1;i++)
 		{
-			j=state->cur_frame+k;
-			ahead[ (j)% state->roundup]=(state->size[j]*2)/(state->qinc+quant);
-		}
-		msum=0;
-		for(k=0;k<state->roundup;k++)
-		{
-				msum+=ahead[k];
-		}
-		if(10*msum>9*state->maxAllowedBitrate)
-		{
-			// anticipating a future bitrate peak
-			aprintf("\n Frame %d : anticipating bitrate peak\n",state->cur_frame);
-			state->qinc=LIMITER_ANTICIPATING;
-			state->underflow_warning=0;
-		}
-	}
-
-	if(state->qinc)
-		{
-			quant+=state->qinc;
-			state->qinc--;
-			aprintf("Qinc: %d\n",state->qinc);
-			if(quant>31) quant=31;
-		}
-
-		// we now ponderate
-		if(quant>31) quant=31;
-		if(state->allow_quant_skew)
-		{
-			aprintf("Type %d , Initial quant : %d ---",state->type[state->cur_frame],quant);
-			switch(state->type[state->cur_frame])
+			projected_vbv-=state->size[state->cur_frame+i]*2*8/quant;
+			if(projected_vbv<0)
 			{
-				case 3: // B break;
-					quant=quant_B_modifier[quant];
-					break;
-				case 1:case 2: // I & P
-				default:
-					assert(0);
+				aprintf("underflow at %d + %d\n",state->cur_frame,i);
+				quant++;
+				if(quant>31)
+				{
+					 quant=31;
+					 tryme=1;
+				}
+				tryme--;
+				goto _requant;
 			}
-			aprintf("-> %d\n",quant);
+			projected_vbv+=state->bits_per_image;
+			if(projected_vbv>state->vbv_buffer_size)
+			{
+				projected_vbv=state->vbv_buffer_size;
+			}
 		}
-
-
-	} // maxAllowed
-
-
+		ok=1;
+	}
+	if(!ok)
+	{
+		printf("Could not compensate underflow!\n");
+	}
+	aprintf("Orgquant:%d finalQuant:%d\n",orgquant,quant);
+	if(quant-orgquant>2) state->qinc+=1+(quant-orgquant)>>1;
+	if(state->qinc) state->qinc--;	
+	if(quant>31) quant=31;
+	}
+	
+	// MEANX
 	return(quant);
 
 }
@@ -1765,7 +1727,7 @@ static int vbr_update_2pass2(void *sstate,
 		state->last_keyframe = state->cur_frame;
 
 		target=state->cur_frame%state->roundup;
-		state->b_per_sec[target]=total_bytes;
+		
 
 		if(ublocks!=state->type[state->cur_frame])
 		{
@@ -1778,6 +1740,22 @@ static int vbr_update_2pass2(void *sstate,
 		state->pass1_bytes=state->size[state->cur_frame];;
 		state->pass1_intra=state->kf[state->cur_frame];
 		state->pass1_quant=2;
+/* Update vbv */
+	if(state->maxAllowedBitrate && state->cur_frame<state->nb_frames-state->roundup)
+	{
+			state->vbv_fullness-=total_bytes*8;
+			state->vbv_fullness+=state->bits_per_image;
+			if(state->vbv_fullness>state->vbv_buffer_size)
+			{
+				state->vbv_fullness=state->vbv_buffer_size;
+			}
+			if(state->vbv_fullness<0)
+			{
+				printf("** Buffer undeflow: %d at frame :%d **\n",state->vbv_fullness,state->cur_frame);
+				state->vbv_fullness=0;
+			}
+			aprintf("Buffer fullness:%d\n",100*state->vbv_fullness/state->vbv_buffer_size);
+	}		
 
 	return(0);
 

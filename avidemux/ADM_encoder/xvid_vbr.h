@@ -187,15 +187,18 @@ typedef struct _vbr_control_t
 	/*------------ Meanx Bitrate clipping ---------------------*/
 	int roundup;					// round-up of fps : 24/25/30
 	int maxAllowedBitrate;			// max allowed bitrate in byte / sec
-	int b_per_sec[60];				//
+	//int b_per_sec[60];				//
 	int *size;						// we will store size of frames here
 	int *kf;
 	int *type;						// I=1 P =2 B=3
 	int qinc;
-	int underflow_warning;			// Means we get under thresh underflow
-	int  thresh_underflow;			// Level in byte to underflow (~ 700 kbytes/s for SVCD)
-	int allow_quant_skew;			// allow diff between I / P / B quant mods
-	int avg_br;					// average bitrate
+	//int underflow_warning;			// Means we get under thresh underflow
+	//int  thresh_underflow;			// Level in byte to underflow (~ 700 kbytes/s for SVCD)
+	//int allow_quant_skew;			// allow diff between I / P / B quant mods
+	//int avg_br;					// average bitrate
+	int  vbv_buffer_size;			// <- MUST BE FILLED BY USER
+	int  vbv_fullness;			//
+	int  bits_per_image;			//
 }vbr_control_t;
 #define THRESH_UNDERFLOW ((700*1000)>>3) // in BYTES ! around 600 kbits
 //#define BOOST_KF  1 // allow KF boots for mpeg1/2

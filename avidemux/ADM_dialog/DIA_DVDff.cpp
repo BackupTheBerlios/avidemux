@@ -63,6 +63,18 @@ static int 		cb_mod(GtkObject * object, gpointer user_data);
 static void 		upload(GtkWidget *dialog, FFcodecSetting *conf);
 static void 		download(GtkWidget *dialog, FFcodecSetting *conf);
 
+typedef struct bufferSize
+{
+	int num;
+	int size;
+}bufferSize;
+
+bufferSize myBuffer[3]=
+{
+	{0,40},
+	{1,112},
+	{2,240}
+};
 //____________________________________________
 
 uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
@@ -155,6 +167,17 @@ void upload(GtkWidget *dialog, FFcodecSetting *conf)
 	gtk_write_entry(WID(entry_maxbitrate),(conf->maxBitrate*8)/1000);
 	gtk_write_entry(WID(entry_minbitrate),(conf->minBitrate*8)/1000);
 	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbutton_xvid)),conf->use_xvid_ratecontrol);
+	// Search closer 
+	int h;
+	int vbv=conf->bufferSize;
+	
+	printf("incoming vbv:%d\n",vbv);
+	if(vbv>(myBuffer[2].size+myBuffer[1].size)/2) h=2;
+	else
+		if(vbv>(myBuffer[1].size+myBuffer[0].size)/2) h=1;
+		else
+			h=0;
+	gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenu1)),h);
 	
 }
 void download(GtkWidget *dialog, FFcodecSetting *conf)
@@ -174,6 +197,8 @@ void download(GtkWidget *dialog, FFcodecSetting *conf)
 	conf->minBitrate=(gtk_read_entry(WID(entry_minbitrate))/8)*1000;
 	conf->gop_size=(gtk_read_entry(WID(entry_gopsize)));
 	conf->use_xvid_ratecontrol=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbutton_xvid)));
+	
+	conf->bufferSize=myBuffer[getRangeInMenu((WID(optionmenu1)))].size;
 }
 
 int cb_mod(GtkObject * object, gpointer user_data)
@@ -227,6 +252,7 @@ uint32_t b;
 }
 
 //
+
 GtkWidget*
 create_dialog1 (void)
 {
@@ -255,6 +281,12 @@ create_dialog1 (void)
   GtkWidget *entry_maxbitrate;
   GtkWidget *label8;
   GtkWidget *checkbutton_xvid;
+  GtkWidget *label14;
+  GtkWidget *optionmenu1;
+  GtkWidget *menu3;
+  GtkWidget *vcd;
+  GtkWidget *svcd;
+  GtkWidget *dvd;
   GtkWidget *label5;
   GtkWidget *hbox1;
   GtkWidget *frame3;
@@ -371,7 +403,7 @@ create_dialog1 (void)
   gtk_widget_show (frame2);
   gtk_box_pack_start (GTK_BOX (vbox1), frame2, TRUE, TRUE, 0);
 
-  table2 = gtk_table_new (3, 2, FALSE);
+  table2 = gtk_table_new (4, 2, FALSE);
   gtk_widget_show (table2);
   gtk_container_add (GTK_CONTAINER (frame2), table2);
 
@@ -416,6 +448,36 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table2), checkbutton_xvid, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+
+  label14 = gtk_label_new (_("VBV buffer size"));
+  gtk_widget_show (label14);
+  gtk_table_attach (GTK_TABLE (table2), label14, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label14), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label14), 0, 0.5);
+
+  optionmenu1 = gtk_option_menu_new ();
+  gtk_widget_show (optionmenu1);
+  gtk_table_attach (GTK_TABLE (table2), optionmenu1, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  menu3 = gtk_menu_new ();
+
+  vcd = gtk_menu_item_new_with_mnemonic (_("VCD: 40 kB"));
+  gtk_widget_show (vcd);
+  gtk_container_add (GTK_CONTAINER (menu3), vcd);
+
+  svcd = gtk_menu_item_new_with_mnemonic (_("SVCD: 112 kB"));
+  gtk_widget_show (svcd);
+  gtk_container_add (GTK_CONTAINER (menu3), svcd);
+
+  dvd = gtk_menu_item_new_with_mnemonic (_("DVD: 240 kB"));
+  gtk_widget_show (dvd);
+  gtk_container_add (GTK_CONTAINER (menu3), dvd);
+
+  gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu1), menu3);
 
   label5 = gtk_label_new (_("<b>RateControl</b>"));
   gtk_widget_show (label5);
@@ -563,6 +625,12 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, entry_maxbitrate, "entry_maxbitrate");
   GLADE_HOOKUP_OBJECT (dialog1, label8, "label8");
   GLADE_HOOKUP_OBJECT (dialog1, checkbutton_xvid, "checkbutton_xvid");
+  GLADE_HOOKUP_OBJECT (dialog1, label14, "label14");
+  GLADE_HOOKUP_OBJECT (dialog1, optionmenu1, "optionmenu1");
+  GLADE_HOOKUP_OBJECT (dialog1, menu3, "menu3");
+  GLADE_HOOKUP_OBJECT (dialog1, vcd, "vcd");
+  GLADE_HOOKUP_OBJECT (dialog1, svcd, "svcd");
+  GLADE_HOOKUP_OBJECT (dialog1, dvd, "dvd");
   GLADE_HOOKUP_OBJECT (dialog1, label5, "label5");
   GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
   GLADE_HOOKUP_OBJECT (dialog1, frame3, "frame3");
@@ -592,5 +660,4 @@ create_dialog1 (void)
 
   return dialog1;
 }
-
 
