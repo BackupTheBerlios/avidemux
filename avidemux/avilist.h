@@ -37,12 +37,13 @@ Especially AVI in our case
 
 #ifndef __AVILIST__
 #define __AVILIST__
+#include "ADM_library/ADM_fileio.h"
 class AviList
 {
 protected:
-		FILE 		*_ff;
-		uint32_t _fcc,_begin_tell;
-		fpos_t _begin,_end;
+		ADMFile		*_ff;
+		uint32_t _fcc;
+		uint64_t _begin,_end;
 
 public:
 
@@ -54,7 +55,7 @@ uint8_t Write(uint8_t *p,uint32_t len);
 uint8_t WriteChunk(uint8_t *chunkid,uint32_t len,uint8_t *p);
 
 
-					AviList(const char *name,FILE *ff);
+					AviList(const char *name,ADMFile *ff);
 
 uint32_t  Tell(void );    		// glue for index.... ugly
 uint32_t  TellBegin(void );   // same story here

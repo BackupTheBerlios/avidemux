@@ -42,6 +42,19 @@
 extern uint16_t MP1L2Bitrate[2][16];
 extern uint16_t MP2L1Bitrate[2][16];
 
+AVDMGenericAudioStream::AVDMGenericAudioStream(void)
+{
+
+        _codec=NULL;
+        _current=0;
+        _audioMap=NULL;
+        _wavheader=NULL;
+        _file=NULL;
+        _LAll=NULL;
+        _mpegSync[0]=_mpegSync[1]=_mpegSync[2]=0;
+        packetHead=packetTail=0;
+        
+}
 AVDMGenericAudioStream::~AVDMGenericAudioStream()
 {
 	if(_codec)
@@ -425,12 +438,18 @@ uint32_t AVDMGenericAudioStream::convTime2Offset(uint32_t time)
 uint8_t AVDMGenericAudioStream::writeHeader(FILE * out)
 {
     WAVHeader wh, *last_wave;
+    
+    
+    
     last_wave = getInfo();
-    if (last_wave->encoding != WAV_PCM)
-			return 1;
-    _LAll = new AviList("RIFF", out);
-    _LAll->Begin("WAVE");
-    memcpy(&wh, last_wave, sizeof(WAVHeader));
+    if (last_wave->encoding != WAV_PCM)    
+                return 1;
+                
+        _file=new ADMFile();                        
+        if(!_file->open(out)) return 0;
+        _LAll = new AviList("RIFF", _file);
+        _LAll->Begin("WAVE");
+        memcpy(&wh, last_wave, sizeof(WAVHeader));
     // update Header
    
     wh.encoding = WAV_PCM;
@@ -459,6 +478,8 @@ uint8_t AVDMGenericAudioStream::endWrite(FILE * out, uint32_t len)
     fwrite(&len, 4, 1, out);
     delete _LAll;
     _LAll = NULL;
+    delete _file;
+    _file=NULL;
     return 1;
 
 }

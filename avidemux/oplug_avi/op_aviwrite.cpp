@@ -38,6 +38,7 @@
 #include "avilist.h"
 #include "op_aviwrite.hxx"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_library/ADM_fileio.h"
 //------------
 typedef struct
 {
@@ -57,12 +58,13 @@ aviWrite::aviWrite( void )
 	LAll=NULL;
 	LMovie=NULL;
 	LMain=NULL;
+        _file=NULL;
 		
 }
 uint8_t aviWrite::sync( void )
 {
-	ADM_assert(_out);
-	fflush(_out);
+	ADM_assert(_file);
+	_file->flush();
 	return 1;
 
 }
@@ -76,15 +78,17 @@ uint8_t aviWrite::updateHeader (MainAVIHeader * mainheader,
 {
   UNUSED_ARG(astream);
 
-  fseek (_out, 32, SEEK_SET);
+        ADM_assert(_file);
+        
+        _file->seek(32);
 // Update main header
 #ifdef ADM_BIG_ENDIAN
 	MainAVIHeader ma;
 	memcpy(&ma,mainheader,sizeof(MainAVIHeader));
 	Endian_AviMainHeader(&ma);		
-  	fwrite (&ma, sizeof (ma), 1, _out);
+  	_file->write ((uint8_t *)&ma, sizeof (ma));
 #else
-  	fwrite (mainheader, sizeof (MainAVIHeader), 1, _out);
+  	_file->write ((uint8_t *)mainheader, sizeof (MainAVIHeader));
 #endif
 // now update video stream header
   fseek (_out, 0x6c, SEEK_SET);
@@ -93,9 +97,9 @@ uint8_t aviWrite::updateHeader (MainAVIHeader * mainheader,
 	AVIStreamHeader as;
 	memcpy(&as,videostream,sizeof(as));
 	Endian_AviStreamHeader(&as);		
-  	fwrite (&as, sizeof (as), 1, _out);
+  	_file->write ((uint8_t *)&as, sizeof (as));
 #else
-  fwrite (videostream, sizeof (AVIStreamHeader), 1, _out);
+        _file->write ((uint8_t *)videostream, sizeof (AVIStreamHeader));
 #endif
   // should do audio too, but i's relatively harmless...
   // Yes, indeed it helps for VBR audio :)
@@ -111,15 +115,15 @@ uint8_t aviWrite::updateHeader (MainAVIHeader * mainheader,
 uint8_t aviWrite::writeMainHeader( void )
 {
 
-  ADM_assert (_out);
+  ADM_assert (_file);
   ADM_assert (LAll == NULL);
+  _file->seek(0);
+  
 
-  fseek (_out, 0, SEEK_SET);	// rewind
-
-  LAll = new AviList ("RIFF", _out);
+  LAll = new AviList ("RIFF", _file);
   LAll->Begin ("AVI ");
   // Header chunk
-  LMain = new AviList ("LIST", _out);
+  LMain = new AviList ("LIST", _file);
   LMain->Begin ("hdrl");
   LMain->Write32 ("avih");
   LMain->Write32 (sizeof (MainAVIHeader));
@@ -141,7 +145,7 @@ uint8_t aviWrite::writeMainHeader( void )
 uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
 {
 
-  ADM_assert (_out);
+  ADM_assert (_file);
 
       _videostream.fccType = fourCC::get ((uint8_t *) "vids");
       _bih.biSize=sizeof(_bih)+extraLen;
@@ -154,12 +158,12 @@ uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
 	Endian_AviStreamHeader(&as);		
 	memcpy(&b,&_bih,sizeof(_bih));
 	Endian_BitMapInfo( &b );
-  	setStreamInfo (_out, (uint8_t *) &as,
+  	setStreamInfo (_file, (uint8_t *) &as,
 		  (uint8_t *)&b,sizeof(BITMAPINFOHEADER),
 		  extra,extraLen, 	 
 		 0x1000);
 #else
-  	setStreamInfo (_out, (uint8_t *) &_videostream,
+  	setStreamInfo (_file, (uint8_t *) &_videostream,
 		  (uint8_t *)&_bih,sizeof(BITMAPINFOHEADER),
 		  extra,extraLen, 	 
 		 0x1000);
@@ -338,13 +342,13 @@ uint32_t extraLen=0;
 	Endian_AviStreamHeader(&as);		
 	memcpy(&w,wav,sizeof(w));
 	Endian_WavHeader( &w );
-  	setStreamInfo (_out, 
+  	setStreamInfo (_file, 
 		(uint8_t *) &as,
 		  (uint8_t *)&w,sizeof(WAVHeader),
 		  extra,extraLen, 	 
 		 0x1000);
 #else
-	setStreamInfo (_out,
+	setStreamInfo (_file,
 			(uint8_t *) header,
 	 		(uint8_t *) wav, sizeof (WAVHeader),
 			extra,extraLen, 0x1000);
@@ -374,31 +378,40 @@ uint8_t aviWrite::saveBegin (char 	*name,
 	asize=asize2=0;
 
 //  Sanity Check
-  	ADM_assert (_out == NULL);
-  	if (!(_out = fopen (name, "wb")))
-  {
-		printf("Problem writing : %s\n",name);
-    return 0;
-    }
-  curindex = 0;
-  vframe = asize = 0;
-  nb_audio=0;
+        ADM_assert (_out == NULL);
+        if (!(_out = fopen (name, "wb")))
+        {
+                printf("Problem writing : %s\n",name);
+                return 0;
+        }
+        _file=new ADMFile();
+        if(!_file->open(_out))
+        {
+                printf("Cannot create ADMfileio\n");
+                delete _file;
+                _file=NULL;
+                return 0;
+        }
+        curindex = 0;
+        vframe = asize = 0;
+        nb_audio=0;
+        
 // update avi header according to the information WE want
 //
-  	memcpy (&_mainheader, inmainheader, sizeof (MainAVIHeader));
-  	_mainheader.dwFlags = AVIF_HASINDEX + AVIF_ISINTERLEAVED;
-	if(!_mainheader.dwMicroSecPerFrame)
-	{
-		_mainheader.dwMicroSecPerFrame=40000;
-	}
-  // update main header codec with video codev
-  if (inaudiostream)
-  {
-    		_mainheader.dwStreams = 2;
-		nb_audio=1;
-  }
-  else
-    		_mainheader.dwStreams = 1;
+        memcpy (&_mainheader, inmainheader, sizeof (MainAVIHeader));
+        _mainheader.dwFlags = AVIF_HASINDEX + AVIF_ISINTERLEAVED;
+        if(!_mainheader.dwMicroSecPerFrame)
+        {
+                _mainheader.dwMicroSecPerFrame=40000;
+        }
+// update main header codec with video codev
+        if (inaudiostream)
+        {
+                _mainheader.dwStreams = 2;
+                nb_audio=1;
+        }
+        else
+                _mainheader.dwStreams = 1;
 
 	if(inaudiostream2)
 	{
@@ -431,7 +444,10 @@ uint8_t aviWrite::saveBegin (char 	*name,
   //
 
   ADM_assert (!LMovie);
-  	LMovie = new AviList ("LIST", _out);
+  _file=new ADMFile();
+  _file->open(_out);
+  
+  LMovie = new AviList ("LIST", _file);
   LMovie->Begin ("movi");
   curindex = 0;
   // the *2 is for audio and video
@@ -532,7 +548,9 @@ uint8_t aviWrite::setEnd (void)
 	printf("\n End of movie, \n video frames : %lu\n audio frames : %lu",vframe,asize);
   // need to update headers now
   // AUDIO SIZE ->TODO
-
+  delete _file;
+  _file=NULL;
+  
   fclose (_out);
   _out = NULL;
   return 1;
@@ -542,7 +560,7 @@ uint8_t aviWrite::setEnd (void)
 //
 //
 //
-uint8_t aviWrite::setStreamInfo (FILE * fo,
+uint8_t aviWrite::setStreamInfo (ADMFile * fo,
 			 uint8_t * stream,
 			 uint8_t * info, uint32_t infolen, 
 			 uint8_t * extra, uint32_t extraLen,
@@ -603,8 +621,8 @@ uint32_t pos;
 	 // we take size of file + index
 	 // with 32 bytes per index entry
 	 // 
-	 ADM_assert(_out);
-	 pos=ftello(_out);
+	 ADM_assert(_file);
+	 pos=_file->tell();
 	 return pos+curindex*4*4;	 	
 }
 // EOF

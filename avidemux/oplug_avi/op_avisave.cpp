@@ -30,7 +30,7 @@
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "subchunk.h"
-#include "avilist.h"
+//#include "avilist.h"
 
 #include "ADM_video/ADM_genvideo.hxx"
 
@@ -92,6 +92,7 @@ GenericAviSave::GenericAviSave ()
   _videoProcess=0;
   _audioCurrent=_audioTarget=0;
  _audioTotal=0;  
+ _file=NULL;
 }
 
 GenericAviSave::~GenericAviSave ()
@@ -99,6 +100,7 @@ GenericAviSave::~GenericAviSave ()
   delete vbuffer;
   delete[]abuffer;
   _incoming=NULL;
+  ADM_assert(!_file);
 }
 
 //___________________________________________________________

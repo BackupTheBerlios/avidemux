@@ -21,11 +21,13 @@
  #include "ADM_dialog/DIA_working.h"
  #include "ADM_dialog/DIA_encoding.h"
  #include "ADM_library/ADM_image.h"
- 
+ #include "ADM_library/ADM_fileio.h"
 
  class GenericAviSave
  {
      protected :
+                ADMFile                 *_file;
+                
      		uint32_t		_audioTarget;
 		uint32_t		_audioCurrent;
 		uint64_t		_audioTotal;

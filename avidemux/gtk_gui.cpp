@@ -52,8 +52,8 @@
 #include "prototype.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"
-#include "subchunk.h"
-#include "avilist.h"
+//#include "subchunk.h"
+//#include "avilist.h"
 
 
 

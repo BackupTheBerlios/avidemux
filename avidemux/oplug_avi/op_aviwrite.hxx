@@ -21,6 +21,8 @@
  {
  protected:
 		FILE 		*_out;
+                ADMFile         *_file;
+                
 		MainAVIHeader	_mainheader;
 		AVIStreamHeader _videostream;
 		BITMAPINFOHEADER _bih;
@@ -44,7 +46,7 @@
 		uint8_t writeVideoHeader( uint8_t *extra, uint32_t extraLen );
 		uint8_t writeAudioHeader (	AVDMGenericAudioStream * stream, AVIStreamHeader *header );
 
-	uint8_t setStreamInfo(FILE *fo,
+	uint8_t setStreamInfo(ADMFile *fo,
 							uint8_t 	*stream,
                    					uint8_t 	*info,
 							uint32_t 	infolen,

@@ -74,7 +74,7 @@ typedef struct
 #define WAV_AMRNB 	56 // dummy id
 #define WAV_ULAW	57 // dummy id
 #include "ADM_audiocodec/ADM_audiocodec.h"
-
+#include "ADM_library/ADM_fileio.h"
 class AVDMGenericAudioStream
 {
    	protected:
@@ -92,6 +92,7 @@ class AVDMGenericAudioStream
          					// This is for writing..
 			              	uint32_t	_dlen;
 					AviList		*_LAll;
+                                        ADMFile         *_file;
        					// This is for VBR MP3
        					ST_point	*_audioMap;
             				uint32_t	_nbMap;
@@ -113,8 +114,7 @@ class AVDMGenericAudioStream
 				       	uint8_t  	readc( uint8_t *c);
 			      
 		public:
-					AVDMGenericAudioStream( void)
-					{_codec=NULL;_current=0;_audioMap=NULL;_wavheader=NULL;_LAll=NULL;_mpegSync[0]=_mpegSync[1]=_mpegSync[2]=0;packetHead=packetTail=0;}
+					                           AVDMGenericAudioStream( void);
 			virtual 				~AVDMGenericAudioStream() ;
           				uint8_t			beginDecompress( void );
         		     		uint32_t		getPos( void ) {return _pos;};

@@ -171,7 +171,7 @@ ffmpegEncoder::gopMpeg1 (void)
       _context->rc_max_rate_header = _settings.maxBitrate * 8;	//1800*1000;// 2400 max, 700 min
       _context->rc_buffer_size_header=_settings.bufferSize * 8 * 1024;
       // If we don't have a maxrate, don't set buffer_size
-      if(!_settings.override_ratecontrol) // FIXME
+      if(1 && !_settings.override_ratecontrol) // FIXME
       
       {
       		_context->rc_buffer_size = _context->rc_buffer_size_header;
