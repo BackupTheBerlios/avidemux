@@ -32,10 +32,9 @@ static const unsigned long long int mm_wone __attribute__ ((aligned(8))) = 0x000
 
 
 static void dct_unquantize_h263_intra_a64_mmx(MpegEncContext *s,
-                                  DCTELEM *block, int n, long int qscale)
+                                  DCTELEM *block, int n, int qscale)
 {
     long int level, qmul, qadd, nCoeffs;
-
     qmul = qscale << 1;
 
     assert(s->block_last_index[n]>=0 || s->h263_aic);
@@ -107,7 +106,7 @@ asm volatile(
 
 
 static void dct_unquantize_h263_inter_a64_mmx(MpegEncContext *s,
-                                  DCTELEM *block, int n,long int qscale)
+                                  DCTELEM *block, int n,int qscale)
 {
     long int level, qmul, qadd, nCoeffs;
    
@@ -199,9 +198,9 @@ asm volatile(
  high3 += tlow1
 */
 static void dct_unquantize_mpeg1_intra_a64_mmx(MpegEncContext *s,
-                                     DCTELEM *block, int n,long int qscale)
+                                     DCTELEM *block, int n,int qscale)
 {
-    long int nCoeffs;
+    long int nCoeffs,lqscale=(long int)qscale;
     const uint16_t *quant_matrix;
     int block0;
 
@@ -268,10 +267,11 @@ asm volatile(
 }
 
 static void dct_unquantize_mpeg1_inter_a64_mmx(MpegEncContext *s,
-                                     DCTELEM *block, int n, long int qscale)
+                                     DCTELEM *block, int n, int qscale)
 {
     long int nCoeffs;
     const uint16_t *quant_matrix;
+    long int lqscale=(long int)qscale;
 
     assert(s->block_last_index[n]>=0);
 
@@ -328,17 +328,18 @@ asm volatile(
 
 		"add $16, %%rax		\n\t"
 		"js 1b				\n\t"
-		::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "g" (qscale), "g" (-2*nCoeffs)
+		::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "g" (lqscale), "g" (-2*nCoeffs)
 		: "%rax", "memory"
 	);
 }
 
 static void dct_unquantize_mpeg2_intra_a64_mmx(MpegEncContext *s,
-                                     DCTELEM *block, int n, long int qscale)
+                                     DCTELEM *block, int n, int qscale)
 {
     long int nCoeffs;
     const uint16_t *quant_matrix;
     int block0;
+    long int lqscale=(long int)qscale;
     
     assert(s->block_last_index[n]>=0);
 
@@ -392,7 +393,7 @@ asm volatile(
 
 		"add $16, %%rax		\n\t"
 		"jng 1b				\n\t"
-		::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "g" (qscale), "g" (-2*nCoeffs)
+		::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "g" (lqscale), "g" (-2*nCoeffs)
 		: "%rax", "memory"
 	);    
     block[0]= block0;
@@ -404,6 +405,7 @@ static void dct_unquantize_mpeg2_inter_a64_mmx(MpegEncContext *s,
 {
     long int nCoeffs;
     const uint16_t *quant_matrix;
+    long int lqscale=(long int)qscale;
     
     assert(s->block_last_index[n]>=0);
 
@@ -471,17 +473,21 @@ asm volatile(
                 "pxor %%mm7, %%mm0		\n\t"
                 "movd %%mm0, 124(%0, %3)	\n\t"
                 
-		::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "g" (qscale), "r" (-2*nCoeffs)
+		::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "g" (lqscale), "r" (-2*nCoeffs)
 		: "%rax", "memory"
 	);
 }
 
 /* draw the edges of width 'w' of an image of size width, height 
    this mmx version can only handle w==8 || w==16 */
-static void draw_edges_a64_mmx(uint8_t *buf, long int wrap, long int width, long int height, long int w)
+static void draw_edges_a64_mmx(uint8_t *buf, int wrap, int width, int height, int w)
 {
     uint8_t *ptr, *last_line;
     int i;
+	long int lw=(long int)w;
+	long int lheight=(long int)height;
+	long int lwidth=(long int)width;
+	long int lwrap=(long int)wrap;
 
     last_line = buf + (height - 1) * wrap;
     /* left and right */
@@ -504,7 +510,7 @@ static void draw_edges_a64_mmx(uint8_t *buf, long int wrap, long int width, long
 		"cmp %3, %0			\n\t"
 		" jb 1b				\n\t"
 		: "+r" (ptr)
-		: "r" (wrap), "r" (width), "r" (ptr + wrap*height)
+		: "r" (lwrap), "r" (lwidth), "r" (ptr + lwrap*lheight)
 	);
     }
     else
@@ -527,7 +533,7 @@ static void draw_edges_a64_mmx(uint8_t *buf, long int wrap, long int width, long
 		"cmp %3, %0			\n\t"
 		" jb 1b				\n\t"		
 		: "+r" (ptr)
-		: "r" (wrap), "r" (width), "r" (ptr + wrap*height)
+		: "r" (lwrap), "r" (lwidth), "r" (ptr + lwrap*lheight)
 	);
     }
     
@@ -545,9 +551,9 @@ static void draw_edges_a64_mmx(uint8_t *buf, long int wrap, long int width, long
 		"cmp %4, %0			\n\t"
 		" jb 1b				\n\t"
 		: "+r" (ptr)
-		: "r" ((int)buf - (int)ptr - w), "r" (-wrap), "r" (-wrap*3), "r" (ptr+width+2*w)
+		: "r" ((int)buf - (int)ptr - lw), "r" (-lwrap), "r" (-lwrap*3), "r" (ptr+lwidth+2*lw)
 	);
-	ptr= last_line + (i + 1) * wrap - w;
+	ptr= last_line + (i + 1) * lwrap - lw;
 	asm volatile(
 		"1:				\n\t"
 		"movq (%1, %0), %%mm0		\n\t"
@@ -559,7 +565,7 @@ static void draw_edges_a64_mmx(uint8_t *buf, long int wrap, long int width, long
 		"cmp %4, %0			\n\t"
 		" jb 1b				\n\t"
 		: "+r" (ptr)
-		: "r" ((int)last_line - (int)ptr - w), "r" (wrap), "r" (wrap*3), "r" (ptr+width+2*w)
+		: "r" ((int)last_line - (int)ptr - lw), "r" (lwrap), "r" (lwrap*3), "r" (ptr+lwidth+2*lw)
 	);
     }
 }

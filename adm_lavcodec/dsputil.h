@@ -429,6 +429,12 @@ void ff_fdct_a64_mmx(DCTELEM *block);
 void ff_fdct_a64_mmx2(DCTELEM *block);
 void ff_fdct_a64_sse2(DCTELEM *block);
 
+void vp3_dsp_init_a64_mmx(void);
+void vp3_idct_put_a64_mmx(int16_t *input_data, int16_t *dequant_matrix,
+    int coeff_count, uint8_t *dest, int stride);
+void vp3_idct_add_a64_mmx(int16_t *input_data, int16_t *dequant_matrix,
+    int coeff_count, uint8_t *dest, int stride);
+
 
 static inline void emms(void)
 {

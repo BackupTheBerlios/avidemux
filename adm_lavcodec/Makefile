@@ -68,6 +68,7 @@ ifeq ($(TARGET_X86_64),yes)
 	x86_64/simple_idct_a64.o \
 	x86_64/fdct_a64.o \
 	x86_64/motion_est_a64.o 	 \
+	x86_64/vp3dsp_a64.o 	 \
 	x86_64/mpegvideo_a64.o 	
 endif
 
@@ -130,6 +131,7 @@ clean:
 	   ppc/*.o ppc/*~ \
 	   ps2/*.o ps2/*~ \
 	   liba52/*.o liba52/*~ \
+	   libpostproc/*.o libpostproc/*.a \
 	   apiexample $(TESTS)
 
 distclean: clean
