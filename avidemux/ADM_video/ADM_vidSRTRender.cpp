@@ -124,10 +124,16 @@ uint32_t	ADMVideoSubtitle::search(uint32_t time)
 //______________________________________
 void ADMVideoSubtitle::displayString(char *string)
 {
+  char *workStr=0;
+  if (string) {
+    workStr=new char[strlen(string)+1];
+    strcpy(workStr,string);
+  }
+
 	uint32_t base,last=0,line=0;
 	double bbase;
 
-//	printf("%s\n",string);
+  //    printf("%s\n",workStr);
 
 
 					// bbase is the final position in line
@@ -140,42 +146,62 @@ void ADMVideoSubtitle::displayString(char *string)
 					memset(_maskBuffer,0,_info.height*_info.width);
 
 
-  // When selfAdjustable is on, break lines must be ignored
-  const char chBreakLine = _conf->_selfAdjustable ? ' ' : '|';
-
 							{
-    const uint32_t stringLen=strlen(string);
+    const uint32_t workStrLen=strlen(workStr);
     uint32_t i=0;
     uint32_t suggestedLen=0;
-    while (last<stringLen && line<3) {
+    while (last<workStrLen && line<3) {
+      uint8_t lineBreakFound=0;
+      while (!lineBreakFound) {
       // search for | char
-      while (*(string+i)!='|' && i<stringLen) {
+	while (*(workStr+i)!='|' && i<workStrLen) {
 	i++;
       }
       
-      if (i<stringLen) {
+	if (i<workStrLen) {
 	// found | char
-	string[i]=chBreakLine;
+	  workStr[i]=' ';
+	}
+
+	if (!_conf->_selfAdjustable) {
+	  lineBreakFound=1;
+	}
+	else {
+	  // will skip spaces and tabs
+	  while ((workStr[i]==' ' || workStr[i]=='\t') && i<workStrLen) {
+	    i++;
+	  }
+
+	  if (i>=workStrLen){
+	    lineBreakFound=1;
+	  } else if (workStr[i]=='-') {
+	    i--;
+	    lineBreakFound=1;
+	  } else {
+	    i++;
+	  }
+	}
+      
       }
       
-      uint32_t couldDisplay=displayLine(string+last,base,i-last,&suggestedLen);
+      uint32_t couldDisplay=displayLine(workStr+last,base,i-last,&suggestedLen);
       aprintf("[debug] couldDisplay=%d suggestedLen=%d\n",couldDisplay,suggestedLen);
       if (! couldDisplay && _conf->_selfAdjustable && suggestedLen>0) {
 	// Try to fit
 	uint32_t newSuggLen=suggestedLen;
-	while (newSuggLen>0 && string[last+newSuggLen-1]!=' '){
+        while (newSuggLen>0 && workStr[last+newSuggLen-1]!=' '){
 	  newSuggLen--;
 	}
 	if (newSuggLen>0){ suggestedLen=newSuggLen; }
 	aprintf("[debug] suggestedLen=%d\n",suggestedLen);
-	couldDisplay = displayLine(string+last,base,suggestedLen);
+        couldDisplay = displayLine(workStr+last,base,suggestedLen);
 	last+=suggestedLen;
 	if (i<=last){i++;}
 	aprintf("[debug] last=%d i=%d\n",last,i);
       } else {
 	if (! couldDisplay) {
 	  char lineStr [100];
-	  SAFE_STRCPY(lineStr,100,string+last,i-last);
+          SAFE_STRCPY(lineStr,100,workStr+last,i-last);
           printf("Line is too big: \"%s\".\n",lineStr);
 	}
 									last=i+1;
@@ -186,18 +212,19 @@ void ADMVideoSubtitle::displayString(char *string)
 									line++;
     }
 
-    if(line>3 || line==3 && last<stringLen)
+    if(line>3 || line==3 && last<workStrLen)
 									{
 	char remainChars[500];
-	SAFE_STRCPY(remainChars,500,string+last,stringLen);
+        SAFE_STRCPY(remainChars,500,workStr+last,workStrLen);
 	//index range [0,1,2]
-	printf("\nText is too big: \"%s\".\n",string);
+        printf("\nText is too big: \"%s\".\n",workStr);
 	printf("Remaining chars: \"%s\"\n",remainChars);
         printf("Maximum 3 lines!\n");
 	//return;
 									}
 							}
 
+  if (workStr) {delete []workStr;}
 
 				// now blur bitmap into mask..
 				memset(_maskBuffer,0,SRT_MAX_LINE*_conf->_fontsize*_info.width);
