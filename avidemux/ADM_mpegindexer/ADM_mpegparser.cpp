@@ -199,7 +199,7 @@ uint8_t mParser::open( char *filename )
 		printf( " found %d files \n", count );
 		printf( "Done \n" );
 	} // if( decimals == 0 )
-
+		return 1;
 } // mParser::open()
 
 
