@@ -24,6 +24,8 @@
 
 #ifdef HAVE_ALTIVEC
 #include "dsputil_altivec.h"
+#else
+#define NO_DCBZL 
 #endif
 
 extern void fdct_altivec(int16_t *block);
