@@ -517,7 +517,7 @@ uint8_t
   uint16_t q;
   uint8_t kf;
 
-  q = (*flags) >> 8;
+  q = (*flags) >> 16;
   kf = (*flags) & 1;
 
   return encodeVBR (in, out, len, flags, q, kf);

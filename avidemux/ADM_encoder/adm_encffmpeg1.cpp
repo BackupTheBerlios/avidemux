@@ -140,7 +140,7 @@ uint32_t l,f;
 							nq=MPEG1_MAX_Q;
 					}
 			     		//printf("asked :%d ",nq);
-					*flags=	(nq<<8)+nf; // ugly but help to keep interface
+					*flags=	(nq<<16)+nf; // ugly but help to keep interface
                                 	if(!_codec->encode(_vbuffer,		out,len,flags)) return 0;
 //#define ALLOW_PADDING
 
