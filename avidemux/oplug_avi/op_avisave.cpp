@@ -584,9 +584,10 @@ const char *getStrFromAudioCodec( uint32_t codec)
 		case WAV_MP2: return (const char *)"MP2";
 		case WAV_MP3: return (const char *)"MP3";
 		case (WAV_WMA):  return (const char *)"WMA";
-         	case (WAV_LPCM): return (const char *)"LPCM";	
-         	case (WAV_AC3):  return (const char *)"AC3";
-         	case (WAV_OGG): return (const char *)"Ogg Vorbis";
+		case (WAV_LPCM): return (const char *)"LPCM";	
+		case (WAV_AC3):  return (const char *)"AC3";
+		case (WAV_OGG): return (const char *)"Ogg Vorbis";
+		case (WAV_MSADPCM): return (const char *)"MSADPCM";
 	}
 
 	return (const char *)"Unknown codec";
