@@ -303,7 +303,22 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
     printf("\n Audio codec : %d",activeAudioEncoder);
 // In fact it is more a decompress filter than a null filter
 //
+/* Mean: Ugly hack, in case of Film2Pal filter, the filter will need
+		more samples in than out (assuming we changed the fps)
+	So we correct the filter length beforehand to avoid the 24/25 too short audio */
+	
 
+	
+/*   */
+	if(audioFilmConv==FILMCONV_FILM2PAL)	
+	{
+		double d;
+		d=size;
+		d*=25000;
+		d/=23976;
+		size=(uint32_t)floor(d);
+		size=(size+1)&0xfffffffe;
+	}
     firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
 					    starttime, size);
     filtercount = 0;
@@ -474,7 +489,6 @@ AVDMProcessAudioStream *lastFilter=NULL;
     			filters[filtercount++] = lastFilter;
 			return lastFilter;
 	}
-
 
 
 
