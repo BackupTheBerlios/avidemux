@@ -86,25 +86,19 @@ FileOutputStream::SegmentSize()
 void 
 FileOutputStream::NextSegment( )
 {
-/*
-    auto_ptr<char> prev_filename_buf( new char[strlen(cur_filename)+1] );
-    char *prev_filename = prev_filename_buf.get();
+
+    
         fclose(strm);
         ++segment_num;
-    strcpy( prev_filename, cur_filename );
-        snprintf( cur_filename, MAXPATHLEN, filename_pat, segment_num );
-        if( strcmp( prev_filename, cur_filename ) == 0 )
-        {
-                mjpeg_error_exit1( 
-                        "Need to split output but there appears to be no %%d in the filename pattern %s", filename_pat );
-        }
+    
+        cur_filename[strlen(cur_filename)-1]++; // increase
         strm = fopen( cur_filename, "wb" );
         if( strm == NULL )
         {
                 mjpeg_error_exit1( "Could not open for writing: %s", cur_filename );
         }
-*/
-        ADM_assert(0);        
+
+        
 }
 
 void
