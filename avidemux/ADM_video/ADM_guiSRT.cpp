@@ -69,7 +69,7 @@ typedef struct unicd
 //
 static unicd  names[]=
 {
-	{(char *)"Ascii"	,(char *)"ASCII"},
+	{(char *)"Ascii"	,(char *)"ISO-8859-1"},
 	{(char *)"Cyrillic"	,(char *)"WINDOWS-1251"}, // ru
 	{(char *)"Czech"	,(char *)"ISO-8859-2"},	// cz
 	{(char *)"German"	,(char *)"ISO-8859-9"}		// german ?

@@ -262,7 +262,9 @@ uint32_t ADMVideoSubtitle::displayLine(ADM_GLYPH_T *string,uint32_t line, uint32
 			{
 				ww=0;
 				car=string[i];
-
+				// Change ' to "
+				//if(ADM_ASC(car)==0x27)
+				//	car=0x22;
 	        		if(!_font->fontDraw((char *)(target+1+w),car , _info.width,_conf->_fontsize,&ww))
 				{
 					printf("Font error\n");
@@ -381,6 +383,37 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	if((baseLine) > _conf->_fontsize)
 		baseLine-=_conf->_fontsize>>1;
 	
+		
+	//__________________________
+		
+		// Shadow ..
+		uint8_t *shadow=target;
+		uint32_t shadow_pos;
+		
+		shadow_pos=_conf->_fontsize>>3;
+		start=_info.width*baseLine;  // base line in final image
+		// mask out left and right
+		mask=_maskBuffer; 
+				
+ 		shadow+=start+(1+_info.width)*shadow_pos;
+  		for( y=hei;y>0;y--)
+		{
+     		 if(*mask) 
+		 {
+				if(*mask>LUMA_LEVEL)
+				{
+					val=*shadow;
+					val>>=2;
+					*shadow=(uint8_t )val;
+				}				
+     		 } 	  
+      
+		shadow++;
+		mask++;
+		}
+	
+	// /Shadow
+	//__________________________
 	start=_info.width*baseLine;  // base line in final image
 
 	chromatarget=(int8_t *)(target+(_info.width*_info.height));
@@ -408,6 +441,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 		mask++;
       bgMask++;
 	}
+	
 
 // do u & v
 	int8_t *ctarget;
