@@ -200,7 +200,7 @@ psycho_4_mem *psycho_4_init (int sfreq, toolame_options *glopts)
      Line 512 should be the nyquist freq  */
   for (i=0; i<HBLKSIZE; i++) {
     FLOAT freq = i * (FLOAT)sfreq/(FLOAT)BLKSIZE;
-    bark[i] = freq2bark(freq);
+    bark[i] = MEANX_freq2bark(freq);
     /* The ath tables in the dist10 code seem to be a little out of kilter. 
        they seem to start with index 0 corresponding to (sampling freq)/1024.
        When in doubt, i'm going to assume that the dist10 code is wrong. MFC Feb2003  */

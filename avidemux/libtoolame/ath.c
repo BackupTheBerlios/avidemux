@@ -73,7 +73,7 @@ FLOAT ATH_energy(FLOAT freq, FLOAT value) {
 /* Convert a frequency (in Hz) to a bark value
    Taken from LAME. MFC Feb 2003 
    see for example "Zwicker: Psychoakustik, 1982; ISBN 3-540-11401-7 */
-FLOAT freq2bark(FLOAT freq)
+FLOAT MEANX_freq2bark(FLOAT freq)
 {
     if (freq<0) freq=0;
     freq = freq * 0.001;

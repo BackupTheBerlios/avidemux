@@ -389,7 +389,7 @@ psycho_3_mem *psycho_3_init(toolame_options *glopts, frame_header *header) {
   sfreq = (FLOAT)header->sampling_frequency;
   for (i=1;i<HBLKSIZE; i++) {
     FLOAT freq = i * sfreq/BLKSIZE;
-    bark[i] = freq2bark(freq);
+    bark[i] = MEANX_freq2bark(freq);
     ath[i] = ATH_dB(freq,glopts->athlevel);
   }
   
