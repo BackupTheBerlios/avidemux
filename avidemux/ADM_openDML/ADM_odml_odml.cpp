@@ -171,7 +171,12 @@ uint32_t 	i,j;
 		fseeko(_fd,superEntries[i].offset,SEEK_SET);
 		fcc=read32();
 		len=read32();
-                aprintf("subindex : %lu size %lu (%lx)",i,len,len);              
+                aprintf("subindex : %lu size %lu (%lx)",i,len,len); 
+#ifdef CYG_MANGLING
+                aprintf("Seeking to %I64x\n",superEntries[i].offset);
+#else                             
+                aprintf("Seeking to %llx\n",superEntries[i].offset);
+#endif                
 		fourCC::print(fcc);aprintf("\n");
 		if(1!=fread(&second,sizeof(second),1,_fd))
 		{
