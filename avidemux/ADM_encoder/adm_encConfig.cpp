@@ -566,6 +566,9 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 					case CodecXSVCD:
 									MAKECONF(ffmpegMpeg2Config);
 									break;
+					case CodecXDVD:
+									MAKECONF(ffmpegMpeg2ConfigDVD);
+									break;
 					case CodecXVCD:
 									MAKECONF(ffmpegMpeg1Config);
 									break;
@@ -636,6 +639,10 @@ const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
 					case CodecXSVCD:
 									*data=(uint8_t *)&ffmpegMpeg2Config;
 									*optSize=sizeof(ffmpegMpeg2Config);
+									break;
+					case CodecXDVD:
+									*data=(uint8_t *)&ffmpegMpeg2ConfigDVD;
+									*optSize=sizeof(ffmpegMpeg2ConfigDVD);
 									break;
 					case CodecXVCD:
 
