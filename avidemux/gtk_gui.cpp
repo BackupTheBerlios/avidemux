@@ -127,9 +127,9 @@ extern void GUI_setMarks (uint32_t a, uint32_t b);
 extern void saveMpegFile (char *name);
 //static void A_selectEncoder ( void );
 extern void A_SaveAudioDualAudio (void);
-static void secondTrackMP3 (char *name);
+
 extern uint8_t ADM_aviUISetMuxer(  void );
-static void secondTrackAC3 (char *name);
+
 
 static void updateSecondAudioTrack (void);
 
@@ -1717,136 +1717,67 @@ void
 A_handleSecondTrack (int tracktype)
 {
   /* lock which one is selected in GUI */
-
-
-
-  switch (tracktype)
-    {
-
-    case 0:
-      if (secondaudiostream)
+char *trackName=NULL;
+	 if (secondaudiostream)
 	{
 	  delete secondaudiostream;
 	  secondaudiostream = NULL;
 	  printf ("\n second audio stream destroyed\n");
 	}
-      updateSecondAudioTrack ();
-
-      break;
-    case 1:			// MP3
-      if (secondaudiostream && secondaudiostream_isac3 == 0)
-	return;
-      if (secondaudiostream)
+	GUI_FileSelRead("Second Track", &trackName);
+	if(!trackName)
+		{
+			printf("Cancelled\n");
+			return ;
+		}
+	switch(tracktype)
 	{
-	  delete secondaudiostream;
-	  secondaudiostream = NULL;
-	  printf ("\n second audio stream destroyed\n");
+		case 0:
+			return;
+			break;
+		case 1: //MP3
+		{
+			 AVDMMP3AudioStream *tmp;
+
+  			tmp = new AVDMMP3AudioStream ();
+  			if (!tmp->open (trackName))
+    			{
+      				delete tmp;
+      				printf ("\n Cancelled MP3 load\n");
+    			}
+  			else
+    			{
+      				secondaudiostream = tmp;      
+      				printf ("\n MP3 loaded\n");
+				GUI_Alert("Second track loaded.");
+    			}
+		}
+			break;
+		case 2: //AC3
+			{
+			AVDMAC3AudioStream *tmp;
+
+  			tmp = new AVDMAC3AudioStream ();
+  			if (!tmp->open (trackName))
+    			{
+      				delete tmp;
+      				printf ("\n Cancelled AC3 load\n");
+    			}
+  			else
+    			{
+      				secondaudiostream = tmp;
+      				printf ("\n AC3 loaded\n");
+				GUI_Alert("Second track loaded.");
+    			}
+			}
+			break;
+		default: ADM_assert(0);
 	}
-
-      secondaudiostream_isac3 = 0;
-      GUI_FileSelRead ("Select MP3", secondTrackMP3);
-      break;
-
-    case 2:			// AC3
-      if (secondaudiostream && secondaudiostream_isac3 == 1)
-	return;
-
-      if (secondaudiostream)
-	{
-	  delete secondaudiostream;
-	  secondaudiostream = NULL;
-	  printf ("\n second audio stream destroyed\n");
-	}
-
-      secondaudiostream_isac3 = 1;
-      GUI_FileSelRead ("Select AC3", secondTrackAC3);
-      break;
-
-
-
-    }
-
 }
 
-
-void
-secondTrackAC3 (char *name)
-{
-  AVDMAC3AudioStream *tmp;
-
-  tmp = new AVDMAC3AudioStream ();
-  if (!tmp->open (name))
-    {
-      delete tmp;
-      printf ("\n Cancelled AC3 load\n");
-    }
-  else
-    {
-      secondaudiostream = tmp;
-      secondaudiostream_isac3 = 1;
-      printf ("\n AC3 loaded\n");
-    }
-  updateSecondAudioTrack ();
-}
-
-
-void
-secondTrackMP3 (char *name)
-{
-  AVDMMP3AudioStream *tmp;
-
-  tmp = new AVDMMP3AudioStream ();
-  if (!tmp->open (name))
-    {
-      delete tmp;
-      printf ("\n Cancelled MP3 load\n");
-    }
-  else
-    {
-      secondaudiostream = tmp;
-      secondaudiostream_isac3 = 0;
-      printf ("\n MP3 loaded\n");
-    }
-  updateSecondAudioTrack ();
-
-}
-
-void
-updateSecondAudioTrack (void)
-{
-  return;
-#if 0
-//#define GOGLE(x,y) gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (x), y)
-#define GOGLE(x,y) {gtk_check_menu_item_set_show_toggle (GTK_CHECK_MENU_ITEM (x), y);}
-
-
-  if (!secondaudiostream)
-    {
-      GOGLE (second_track_none, TRUE);
-      GOGLE (second_track_ac3, FALSE);
-      GOGLE (second_track_mp3, FALSE);
-
-    }
-  else
-    {
-      GOGLE (second_track_none, FALSE);
-
-      if (secondaudiostream_isac3)
-	{
-	  GOGLE (second_track_ac3, TRUE);
-	  GOGLE (second_track_mp3, FALSE);
-
-	}
-      else
-	{
-	  GOGLE (second_track_ac3, FALSE);
-	  GOGLE (second_track_mp3, TRUE);
-	}
-    }
-#endif
 
 #warning fixme
-}
+
 
 extern void getCutPoints (int br);
 void
