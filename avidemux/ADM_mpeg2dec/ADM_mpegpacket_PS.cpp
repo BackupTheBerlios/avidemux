@@ -56,7 +56,7 @@
 static uint64_t _lastSync;
 
 extern void mixDump(uint8_t *ptr,uint32_t len);
-#define TELL_ME_ALL
+//#define TELL_ME_ALL
 //#define PRINT_PTS
 //_______________________________________________________
 //_______________________________________________________
@@ -70,7 +70,13 @@ extern void mixDump(uint8_t *ptr,uint32_t len);
  {
 		printf("\n Program stream demuxer initialized with stream 1 = %x",stream);
 		printf("stream 2 = %x\n",stream2);
-	 
+
+                
+                 _firstPacketOffset=0;
+                _packetOffset=0;
+                _packetLen=0;
+                _currentOffset=0;        
+                                                            
 		parser=NULL;	 
 		 _otherStream=stream2;
 		 _firstPTS=_otherPTS=MINUS_ONE;
@@ -348,6 +354,7 @@ uint8_t  ADM_mpegDemuxerProgramStream::	_nextPacket(void)
 							_firstPTS=pts;
 							printf(">>>First PTS = %lu\n",_firstPTS);
 						}
+                                                _currentPts=pts;
 					
 					}
 				      return 1;
@@ -373,7 +380,7 @@ uint8_t  ADM_mpegDemuxerProgramStream::	_nextPacket(void)
 					{
 
 							case PACK_START_CODE :
-												parser->forward(10);
+												parser->forward(8);
 												break; // pack start
 							case SYSTEM_START_CODE : // system header
 							case PRIVATE_STREAM_2:
