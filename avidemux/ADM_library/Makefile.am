@@ -5,7 +5,7 @@ INCLUDES = $(all_includes)
 
 libADM_library_a_METASOURCES = AUTO
 
-libADM_library_a_SOURCES = subchunk.cpp riffparser.cpp fourcc.cpp broken.cpp aviio.cpp aviindexer.cpp aviframe.cpp avidemutils.cpp 
+libADM_library_a_SOURCES = subchunk.cpp riffparser.cpp fourcc.cpp broken.cpp aviio.cpp aviindexer.cpp aviframe.cpp avidemutils.cpp
 
 
 EXTRA_DIST = avidemutils.cpp aviframe.cpp aviindexer.cpp aviio.cpp avifmt2.h avifmt.h avio.hxx broken.cpp default.h fourcc.cpp fourcc.h indexer.hxx riffparser.cpp riffparser.h subchunk.cpp subchunk.h 

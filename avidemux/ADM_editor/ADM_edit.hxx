@@ -205,6 +205,7 @@ class ADM_Composer
                   										uint8_t *out,uint32_t *lenout);
 			virtual 	uint8_t			audioGoToTime(uint32_t mstime,uint32_t *off);
 					uint8_t getMarkers(uint32_t *start, uint32_t *end); // get markers from file
+										
 
 };
 #endif

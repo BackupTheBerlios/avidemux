@@ -400,12 +400,21 @@ HandleAction (Action action)
 	}
       return;
     }
+
+//#define TEST_UNPACK    
   // we have an AVI loaded
   switch (action)
     {
+#ifdef TEST_UNPACK
+    case ACT_Requant:
+    			video_body->unpackPacked();
+			break;
+#else    
     case ACT_Requant:
     			A_requantize();
 			break;
+#endif
+			
     case ACT_SaveDVDPS:
     			// if we are in process mode
 			if(videoProcessMode)

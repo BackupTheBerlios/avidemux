@@ -346,7 +346,8 @@ UNUSED_ARG(mode);
 // 1-  check for B _ frame  existence
 // 2- check  for consistency with reported flags
 //______________________________________
-
+	uint8_t count=0;
+TryAgain:	
 	_VIDEOS 	*vid;
 	uint32_t err=0;
 
@@ -438,13 +439,24 @@ UNUSED_ARG(mode);
 						printf("\n But the  index is not up to date \n");
 						uint32_t ispacked=0;
 						// If it is Divx 5.0.xxx use divx decoder
-						if(fourCC::check(info.fcc,(uint8_t *)"DX50"))
+						if(fourCC::check(info.fcc,(uint8_t *)"DX50")
+						|| fourCC::check(info.fcc,(uint8_t *)"XVID" ))
 						{
 
 
 							//if(vid->decoder->isDivxPacked())
 							if(vid->decoder->isDivxPacked())
 							{
+								// can only unpack avi
+								if(!count && type==AVI_FileType)
+								{
+									OpenDMLHeader *dml=NULL;
+									count++;	
+									dml=(OpenDMLHeader *)vid->_aviheader;
+									// Can we repack it ?
+									if(dml->unpackPacked())	
+										goto TryAgain;
+								}
 #if  1 //def USE_DIVX
 
 								printf("\n Switching codec...\n");
