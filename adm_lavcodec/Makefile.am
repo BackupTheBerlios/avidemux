@@ -8,7 +8,7 @@ EXTEND_MMX = i386/cputest.c           \
 			i386/vp3dsp_sse2.c \
 			i386/fdct_mmx.c     i386/motion_est_mmx.c  i386/simple_idct_mmx.c \
 			i386/fft_sse.c 
-X_MMX_FLAGS = -msse
+X_MMX_FLAGS = 
 X_PPC_FLAGS=
 else
 EXTEND_MMX = 
