@@ -218,11 +218,14 @@ uint32_t 	i,j;
 					(*index)[count].intra=AVI_KEY_FRAME;
 #ifdef CYG_MANGLING
                                 aprintf("Frame.off : %I64x, size %I64x\n",
+                                        _idx[count].offset,
+                                        _idx[count].size);
 #else                                        
 				aprintf("Frame.off : %llx, size %llx\n",
+                                        _idx[count].offset,
+                                        _idx[count].size);
 #endif                                
-                                                                        _idx[count].offset,
-									_idx[count].size);
+                                                                        
 				count++;									
 			
 			}
