@@ -454,11 +454,6 @@ AVDMProcessAudioStream *lastFilter;
 
 	    				}
 			}
-#ifdef ADM_BIG_ENDIAN
-
- 	lastFilter = new AVDMProcessAudio_LEBE(lastFilter);
- 	filters[filtercount++] = lastFilter;
-#endif
 	return lastFilter;
 }
 void audioForceDownSample( void)
@@ -472,7 +467,7 @@ void audioSetResample(uint32_t fq)
 	audioFreq=fq;
 }
 /**
-
+		Build filter to save
 */
 AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t size)
@@ -497,12 +492,19 @@ AVDMProcessAudioStream *lastFilter=NULL;
 			lastFilter=filters[filtercount-1];
 // and add encoder...
 
+
 //_______________________________________________________
 uint8_t init;
 
 		switch(activeAudioEncoder)
 		{
 		case 	AUDIOENC_NONE:
+			// If we are dealing with big endian and using raw wav
+			// we have to swap the endianness 
+			#ifdef ADM_BIG_ENDIAN						
+ 				lastFilter = new AVDMProcessAudio_LEBE(lastFilter);
+ 				filters[filtercount++] = lastFilter;
+			#endif
 			break;
 
 #ifdef HAVE_LIBMP3LAME
