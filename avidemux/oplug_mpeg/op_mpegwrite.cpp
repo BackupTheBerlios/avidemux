@@ -109,10 +109,8 @@ mpegWritter::mpegWritter( void )
 	_buffer=NULL;
 	_buffer_out=NULL;
 	_audio=NULL;
-	_audioFifo=NULL;
-	_videoFifo=NULL;
-	_lvepipe=NULL;
 	_audioBuffer=NULL;
+	_muxer=NULL;
 	_outputAsPs=0;
 
 }
@@ -126,10 +124,8 @@ mpegWritter::mpegWritter( uint8_t ps )
 	_buffer=NULL;
 	_buffer_out=NULL;
 	_audio=NULL;
-	_audioFifo=NULL;
-	_videoFifo=NULL;
-	_lvepipe=NULL;
 	_audioBuffer=NULL;
+	_muxer=NULL;
 	_outputAsPs=1;
 
 }
@@ -263,7 +259,7 @@ FILE			*fd=NULL;
 uint64_t		total_size=0;
 uint32_t		len,flags;
 uint32_t 		outquant;
-
+uint32_t		audiolen=0;
 DIA_encoding		*encoding;
 
    	incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
@@ -283,10 +279,8 @@ DIA_encoding		*encoding;
 	}
 	else
 	{
-		assert(_audioOneFrame);
-		assert(_audioBuffer);
-		assert(_audioFifo);
-		assert(_videoFifo);
+		assert(_muxer);
+		
 
 	}
 
@@ -377,19 +371,16 @@ DIA_encoding		*encoding;
 				// Null frame are only possible
 				// when in prefill state for mpeg-X
 				if(!len) continue;
-				if(_audio)
+				if(_muxer)
 				{		
 				uint32_t audiolen;		
 						// write video
-						fwrite(_buffer_out,len,1,_videoFifo);
-						fflush(_videoFifo);
+						_muxer->writeVideoPacket(len,_buffer_out);
+						
 						audiolen=_audioOneFrame;
 						audiolen = _audio->read (audiolen,_audioBuffer);
-						assert(audiolen<MAXAUDIO);
-						fwrite(_audioBuffer,audiolen,1,_audioFifo);	
-						fflush(_audioFifo);
-						aprintf("Audio :%lu Video:%lu (%lu)\n",audiolen,len,
-							_audioOneFrame);
+						_muxer->writeAudioPacket(audiolen,_audioBuffer);
+						
 				}else
 				{
 					fwrite(_buffer_out,len,1,fd);
@@ -413,14 +404,16 @@ DIA_encoding		*encoding;
 				_codec->encode(_buffer,_buffer_out , &len,&flags);
 				total_size+=len;
 				encoding->feedFrame(len);
-				if(!_audio)
+				if(!_muxer)
 					fwrite(_buffer_out,len,1,fd);
 				else
 				{
-					fwrite(_buffer_out,len,1,_videoFifo);
-					len=_audioOneFrame;
-					len = _audio->read (len, _audioBuffer);
-					fwrite(_audioBuffer,len,1,_audioFifo);
+					// write video
+					_muxer->writeVideoPacket(len,_buffer_out);
+						
+					audiolen=_audioOneFrame;
+					audiolen = _audio->read (audiolen,_audioBuffer);
+					_muxer->writeAudioPacket(audiolen,_audioBuffer);
 				}
 
 				//	printf("\n pipe opened %ld\n",i);
@@ -429,28 +422,13 @@ DIA_encoding		*encoding;
 			}
 			delete encoding;
 			
-			if(!_audio)
+			if(!_muxer)
 				fclose(fd);
 			else
 			{
-				fflush(_audioFifo);
-				fflush(_videoFifo);
-				if(_audioFifo)
-				{
-					fclose(_audioFifo);
-					_audioFifo=NULL;
-				}
-				if(_videoFifo)
-				{
-					fclose(_videoFifo);
-					_videoFifo=NULL;
-				}
-				if(_lvepipe)
-				{
-					printf("Killing lvemux (main loop)\n");
-				 	pclose(_lvepipe);
-			 		_lvepipe=NULL;
-				}
+				_muxer->close();
+				delete _muxer;
+				_muxer=NULL;
 				deleteAudioFilter();
 				_audio=NULL;				
 			}
@@ -724,7 +702,7 @@ AVDMGenericVideoStream	*incoming;
 
 FILE			*fd=NULL;
 uint64_t		total_size=0;
-uint32_t		len,flags,type,outquant;
+uint32_t		len,flags,type,outquant,audiolen;
 
 
    	incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
@@ -881,19 +859,19 @@ uint32_t		len,flags,type,outquant;
 
 		total_size+=len;
 	
-		if(!_audio)
+		if(!_muxer)
 			{			
 				fwrite(_buffer_out,len,1,fd);
 				fflush(fd);
 			}
 		else
 			{
-				fwrite(_buffer_out,len,1,_videoFifo);
-				fflush(_videoFifo);
-				len=_audioOneFrame;
-				len = _audio->read (len, _audioBuffer);
-				fwrite(_audioBuffer,len,1,_audioFifo);		
-				fflush(_audioFifo);
+				// write video
+				_muxer->writeVideoPacket(len,_buffer_out);
+						
+				audiolen=_audioOneFrame;
+				audiolen = _audio->read (audiolen,_audioBuffer);
+				_muxer->writeAudioPacket(audiolen,_audioBuffer);
 			}
 		
 				
@@ -941,19 +919,19 @@ uint32_t		len,flags,type,outquant;
 				type);
 
 		total_size+=len;
-		if(!_audio)
+		if(!_muxer)
 		{		
 			fwrite(_buffer_out,len,1,fd);
 			fflush(fd);
 		}
 		else
 		{
-			fwrite(_buffer_out,len,1,_videoFifo);
-			fflush(_videoFifo);
-			len=_audioOneFrame;
-			len = _audio->read (len, _audioBuffer);
-			fwrite(_audioBuffer,len,1,_audioFifo);
-			fflush(_audioFifo);
+			// write video
+			_muxer->writeVideoPacket(len,_buffer_out);
+						
+			audiolen=_audioOneFrame;
+			audiolen = _audio->read (audiolen,_audioBuffer);
+			_muxer->writeAudioPacket(audiolen,_audioBuffer);
 		}
 		
 		//	printf("\n pipe opened %ld\n",i);
@@ -962,28 +940,13 @@ uint32_t		len,flags,type,outquant;
 		
 	}
 //--			
-	if(!_audio)	
+	if(!_muxer)	
 		fclose(fd);
 	else
 	{
-		fflush(_audioFifo);
-		fflush(_videoFifo);
-		if(_audioFifo)
-		{
-			fclose(_audioFifo);
-			_audioFifo=NULL;
-		}
-		if(_videoFifo)
-		{
-			fclose(_videoFifo);
-			_videoFifo=NULL;
-		}
-		if(_lvepipe)
-			{
-				printf("Killing lvemux (main loop)\n");
-			 	pclose(_lvepipe);
-		 		_lvepipe=NULL;
-			}				
+		_muxer->close();
+		delete _muxer;
+		_muxer=NULL;	
 	}
 
 	 end();
@@ -1026,22 +989,11 @@ uint8_t mpegWritter::end( void )
 		delete [] _audioBuffer;
 		_audioBuffer=NULL;
 	}
-	if(_audioFifo)
+	if(_muxer)
 	{
-		fflush(_audioFifo);
-		fclose(_audioFifo);
-		_audioFifo=NULL;
-	}
-	if(_videoFifo)
-	{
-		fflush(_videoFifo);
-		fclose(_videoFifo);
-		_videoFifo=NULL;
-	}
-	if(_lvepipe)
-	{
-		 pclose(_lvepipe);
-		 _lvepipe=NULL;
+		_muxer->close();
+		delete _muxer;
+		_muxer=NULL;
 	}
       return 1;
 }
@@ -1064,57 +1016,8 @@ uint8_t mpegWritter::initLveMux( char *name )
 	uint32_t one_pcm_audio_frame;
 	int err;
 	
-#define VIDEOF "/tmp/videofifo"	
-#define AUDIOF "/tmp/audiofifo"
-
-	if(!prefs->get(LVEMUX_PATH, &lvemux) || !strlen(lvemux))
-		{
-			GUI_Alert("Use misc->prefs to tell where lvemux is\n");
-			return 0;
-		}
 	printf("----- Preparing audio track.------\n");
-	// open audio and video fifo
-		err=mkfifo(AUDIOF, S_IREAD+S_IWRITE);
-		
-		if(err && EEXIST!=errno)
-		{
-			GUI_Alert("Trouble creating  "AUDIOF);
-			return 0;
-		}
-		err=mkfifo(VIDEOF, S_IREAD+S_IWRITE);
-		if(err && EEXIST!=errno)
-		{
-			GUI_Alert("Trouble creating  "VIDEOF);
-			return 0;
-		}
-		printf("Opening audio\n");
-		_audioFifo=fopen(AUDIOF,"w+");
-		if(!_audioFifo)
-		{
-			GUI_Alert("Trouble opening  "AUDIOF);
-			return 0;
-		}
-		printf("Opening video\n");
-		_videoFifo=fopen(VIDEOF,"w+");
-		if(!_videoFifo)
-		{
-			GUI_Alert("Trouble opening  "VIDEOF);
-			return 0;
-		}
-	// Try to open lvemux
-		sprintf(cmd,"%s -p -v "VIDEOF" -a "AUDIOF" -o %s",lvemux,name);
-		free(lvemux);
-		printf("Spawning lvemux with cmd : *%s*\n",cmd);
-		_lvepipe=popen(cmd,"w");
-	// open lvemux
-		if(!_lvepipe)
-		{
-			GUI_Alert("Problem spawning lvemux");
-			printf("%d errno\n",errno);
-			perror(NULL);
-			return 0;			
-		}
-	// ________________prepare audio________________________
+// ________________prepare audio________________________
 	    
      
       	// compute the number of bytes in the incoming stream
@@ -1206,5 +1109,16 @@ uint8_t mpegWritter::initLveMux( char *name )
 	_audioBuffer=new uint8_t[MAXAUDIO]; // equivalent to 1 sec @ 448 kbps, should be more than
 					// enough, even with the buffering
 	printf("----- Audio Track for mpeg Ready.------\n");
+	
+	_muxer=new MpegMuxer();
+	if(!_muxer->open(name,8000,fps1000,_audio->getInfo()))
+	{
+		delete _muxer;
+		_muxer=NULL;
+		printf("Muxer init failed\n");
+		return 0;
+		
+	}
+	printf("Muxer ready\n");
   	return 1;	
 }

@@ -14,7 +14,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#ifndef __MPEG_WRITE_H
+#define __MPEG_WRITE_H
+#include "ADM_lvemux/ADM_muxer.h"
 
 typedef enum
 {
@@ -65,9 +67,7 @@ class	mpegWritter
 								uint8_t widescreen);
 				uint8_t 		initLveMux( char *name );								
 				AVDMGenericAudioStream	*_audio;
-				FILE			*_lvepipe;
-				FILE			*_audioFifo;
-				FILE			*_videoFifo;
+				MpegMuxer		*_muxer;
 				uint32_t		_audioOneFrame;
 				uint8_t			*_audioBuffer;
 							  									
@@ -79,4 +79,4 @@ class	mpegWritter
 			uint8_t 			save_svcd(char *name);
 			uint8_t 			save_dvd(char *name);
 };
-
+#endif
