@@ -264,7 +264,7 @@ typedef struct MpegEncContext {
     int strict_std_compliance; ///< strictly follow the std (MPEG4, ...) 
     int workaround_bugs;       ///< workaround bugs in encoders which cannot be detected automatically 
     /* the following fields are managed internally by the encoder */
-
+    int frameNumber;	//MEANX : Ugly but used for pulldown
     /** bit output */
     PutBitContext pb;
 

@@ -215,6 +215,8 @@ static int encode_init(AVCodecContext *avctx)
 {
     MpegEncContext *s = avctx->priv_data;
 
+    s->frameNumber=0; //MEANX
+    
     if(MPV_encode_init(avctx) < 0)
         return -1;
 
@@ -290,7 +292,11 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             //put_bits(&s->pb, 4, s->frame_rate_index);
             
             if(s->avctx->rc_max_rate){
-                v = (s->avctx->rc_max_rate + 399) / 400;
+	    //MEANX: Target DVD bitrate
+	    	if(s->codec_id == CODEC_ID_MPEG2VIDEO)
+			v=20000; // 8 Mbps
+		else
+                	v = (s->avctx->rc_max_rate + 399) / 400;
                 if (v > 0x3ffff && s->codec_id == CODEC_ID_MPEG1VIDEO)
                     v = 0x3ffff;
             }else{
@@ -323,29 +329,6 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             ff_write_quant_matrix(&s->pb, s->avctx->inter_matrix);
 
             if(s->codec_id == CODEC_ID_MPEG2VIDEO){
-	    /* MEANX -- Pulldown */
-    	if(s->flags2 & CODEC_FLAG2_32_PULLDOWN)
-	{
-		switch(s->picture_number%4)
-		{
-			case 0:
-				s->repeat_first_field=1;
-				s->top_field_first=1;
-				break;
-			case 1:
-				s->repeat_first_field=0;
-				s->top_field_first=0;
-				break;
-			case 2:
-				s->repeat_first_field=1;
-				s->top_field_first=0;
-				break;
-			case 3:
-				s->repeat_first_field=0;
-				s->top_field_first=1;
-				break;
-		}		
-	}
     /* MEANX -- /Pulldown */
 
                 put_header(s, EXT_START_CODE);
@@ -400,6 +383,7 @@ int i;
     s->y_dc_scale_table=
     s->c_dc_scale_table= ff_mpeg1_dc_scale_table;
 
+    s->pict_type=I_TYPE;
     if(!s->encoding)    
     for(i=0;i<64;i++)
        s->dsp.idct_permutation[i]=i;
@@ -422,6 +406,8 @@ void ff_mpeg1_encode_slice_header(MpegEncContext *s){
 
 void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
 {
+	int tff,rff;
+	
     mpeg1_encode_sequence_header(s);
 
     /* mpeg1 picture header */
@@ -458,6 +444,49 @@ void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
 
     s->frame_pred_frame_dct = 1;
     if(s->codec_id == CODEC_ID_MPEG2VIDEO){
+    
+    /* MEANX -- Pulldown */
+    	if(s->flags2 & CODEC_FLAG2_32_PULLDOWN)
+	{
+	
+		switch(s->frameNumber%4)
+		{
+			case 0:
+			default:
+				rff=1;
+				tff=1;
+				break;
+			case 1:
+				rff=0;
+				tff=1;
+				break;
+			case 2:
+				rff=0;
+				tff=0;
+				break;
+			case 3:
+				rff=1;
+				tff=0;
+				break;
+		}		
+		s->frameNumber++;
+	}
+	else
+	{
+		if (s->progressive_sequence) 
+		{
+            		tff=0; /* no repeat */
+        	} else 
+		{
+            		tff= s->current_picture_ptr->top_field_first;
+        	}
+		rff=s->repeat_first_field;
+        
+	}
+    /* MEANX -- Pulldown */
+
+    
+    
         put_header(s, EXT_START_CODE);
         put_bits(&s->pb, 4, 8); //pic ext
         if (s->pict_type == P_TYPE || s->pict_type == B_TYPE) {
@@ -476,11 +505,9 @@ void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
         
         assert(s->picture_structure == PICT_FRAME);
         put_bits(&s->pb, 2, s->picture_structure);
-        if (s->progressive_sequence) {
-            put_bits(&s->pb, 1, 0); /* no repeat */
-        } else {
-            put_bits(&s->pb, 1, s->current_picture_ptr->top_field_first);
-        }
+       
+            put_bits(&s->pb, 1, tff); /* no repeat */ //MEANX PULLDOWN
+	    
         /* XXX: optimize the generation of this flag with entropy
            measures */
         s->frame_pred_frame_dct = s->progressive_sequence;
@@ -490,7 +517,7 @@ void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
         put_bits(&s->pb, 1, s->q_scale_type);
         put_bits(&s->pb, 1, s->intra_vlc_format);
         put_bits(&s->pb, 1, s->alternate_scan);
-        put_bits(&s->pb, 1, s->repeat_first_field);
+        put_bits(&s->pb, 1, rff);
         put_bits(&s->pb, 1, s->chroma_420_type=1);
         s->progressive_frame = s->progressive_sequence;
         put_bits(&s->pb, 1, s->progressive_frame);
