@@ -42,7 +42,7 @@ static const DEVICELIST audioDeviceList[]=
 #ifdef CONFIG_DARWIN
 	MKADID(COREAUDIO),
 #endif
-#ifdef USE_SDL	
+#if	defined(USE_SDL) && !defined(CYG_MANGLING)	
 	MKADID(SDL),
 #endif	
 #ifdef CYG_MANGLING	
