@@ -198,6 +198,11 @@ void  frame2time(	uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
     UNUSED_ARG(fps);
     uint32_t len2;
     len2 = video_body->getTime(frame);
+    ms2time(len2,hh,mm,ss,ms);
+}
+void ms2time(uint32_t len2,uint16_t * hh, uint16_t * mm,
+	 			uint16_t * ss, uint16_t * ms)
+{
     *hh = (uint32_t) floor(len2 / (3600.F * 1000.F));
     len2 -= (uint32_t) floor(*hh * 3600.F * 1000.F);
     *mm = (uint32_t) floor(len2 / (60.F * 1000.F));

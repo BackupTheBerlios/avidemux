@@ -34,6 +34,8 @@ uint8_t  		GUI_getIntegerValue(int *valye, int min, int max, const char *title);
 
 void 		frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
 				uint16_t * ss, uint16_t * ms);
+void 		ms2time(uint32_t len2,uint16_t * hh, uint16_t * mm,
+	 			uint16_t * ss, uint16_t * ms);				
 uint32_t 		getTimeOfTheDay(void);
 /** return 1 if we are in silent mode */
 uint8_t		isQuiet(void);
