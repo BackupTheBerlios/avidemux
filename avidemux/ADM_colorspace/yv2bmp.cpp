@@ -213,7 +213,7 @@ uint8_t  COL_yv12rgb(uint32_t w, uint32_t h,uint8_t * ptr, uint8_t * ptr2 )
     u = v + ((w * h) >> 2);
     e = ptr2;
 
-    for (i = (h>>1)-1; i > 0; i--)
+    for (i = (h>>1); i > 0; i--)
       {
 #ifdef USE_MMX
 	  fastYV12RGB_mmx(y, u, v, e, w);
