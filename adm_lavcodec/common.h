@@ -18,6 +18,10 @@
 //#define A32_BITSTREAM_READER
 #define LIBMPEG2_BITSTREAM_READER_HACK //add BERO
 
+#ifndef M_PI
+#define M_PI    3.14159265358979323846
+#endif
+
 #ifdef HAVE_AV_CONFIG_H
 /* only include the following when compiling package */
 #    include "config.h"
@@ -36,10 +40,6 @@
 #    ifndef ENODATA
 #        define ENODATA  61
 #    endif
-
-#ifndef M_PI
-#define M_PI    3.14159265358979323846
-#endif
 
 #include <stddef.h>
 #ifndef offsetof
@@ -82,6 +82,29 @@ extern const struct AVOption avoptions_workaround_bug[11];
 #    define always_inline inline
 #endif
 
+#ifndef EMULATE_INTTYPES
+#   include <inttypes.h>
+#else
+    typedef signed char  int8_t;
+    typedef signed short int16_t;
+    typedef signed int   int32_t;
+    typedef unsigned char  uint8_t;
+    typedef unsigned short uint16_t;
+    typedef unsigned int   uint32_t;
+
+#   ifdef CONFIG_WIN32
+        typedef signed __int64   int64_t;
+        typedef unsigned __int64 uint64_t;
+#   else /* other OS */
+        typedef signed long long   int64_t;
+        typedef unsigned long long uint64_t;
+#   endif /* other OS */
+#endif /* HAVE_INTTYPES_H */
+
+#ifndef INT64_MAX
+#define INT64_MAX 9223372036854775807LL
+#endif
+
 #ifdef EMULATE_FAST_INT
 /* note that we don't emulate 64bit ints */
 typedef signed char int_fast8_t;
@@ -101,15 +124,6 @@ static inline float floorf(float f) {
 #ifdef CONFIG_WIN32
 
 /* windows */
-
-typedef unsigned short uint16_t;
-typedef signed short int16_t;
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef unsigned __int64 uint64_t;
-typedef signed char int8_t;
-typedef signed int int32_t;
-typedef signed __int64 int64_t;
 
 #    ifndef __MINGW32__
 #        define int64_t_C(c)     (c ## i64)
@@ -137,8 +151,6 @@ typedef signed __int64 int64_t;
 #elif defined (CONFIG_OS2)
 /* OS/2 EMX */
 
-#include <inttypes.h>
-
 #ifndef int64_t_C
 #define int64_t_C(c)     (c ## LL)
 #define uint64_t_C(c)    (c ## ULL)
@@ -158,8 +170,6 @@ typedef signed __int64 int64_t;
 #else
 
 /* unix */
-
-#include <inttypes.h>
 
 #ifndef int64_t_C
 #define int64_t_C(c)     (c ## LL)
@@ -278,10 +288,10 @@ typedef struct PutBitContext {
 
 void init_put_bits(PutBitContext *s, uint8_t *buffer, int buffer_size);
 
-int get_bit_count(PutBitContext *s); /* XXX: change function name */
+int put_bits_count(PutBitContext *s);
 void align_put_bits(PutBitContext *s);
 void flush_put_bits(PutBitContext *s);
-void put_string(PutBitContext * pbc, char *s);
+void put_string(PutBitContext * pbc, char *s, int put_zero);
 
 /* bit input */
 
@@ -463,6 +473,28 @@ static inline uint8_t* pbBufPtr(PutBitContext *s)
 #else
 	return s->buf_ptr;
 #endif
+}
+
+/**
+ *
+ * PutBitContext must be flushed & aligned to a byte boundary before calling this.
+ */
+static inline void skip_put_bytes(PutBitContext *s, int n){
+        assert((put_bits_count(s)&7)==0);
+#ifdef ALT_BITSTREAM_WRITER
+        FIXME may need some cleaning of the buffer
+	s->index += n<<3;
+#else
+        assert(s->bit_left==32);
+	s->buf_ptr += n;
+#endif    
+}
+
+/**
+ * Changes the end of the buffer.
+ */
+static inline void set_put_bits_buffer_size(PutBitContext *s, int size){
+    s->buf_end= s->buf + size;
 }
 
 /* Bitstream reader API docs:
@@ -1006,23 +1038,31 @@ static inline int av_log2_16bit(unsigned int v)
     return n;
 }
 
-
 /* median of 3 */
 static inline int mid_pred(int a, int b, int c)
 {
-    int vmin, vmax;
-    vmax = vmin = a;
-    if (b < vmin)
-        vmin = b;
-    else
-	vmax = b;
+#if 0
+    int t= (a-b)&((a-b)>>31);
+    a-=t;
+    b+=t;
+    b-= (b-c)&((b-c)>>31);
+    b+= (a-b)&((a-b)>>31);
 
-    if (c < vmin)
-        vmin = c;
-    else if (c > vmax)
-        vmax = c;
-
-    return a + b + c - vmin - vmax;
+    return b;
+#else
+    if(a>b){
+        if(c>b){
+            if(c>a) b=a;
+            else    b=c;
+        }
+    }else{
+        if(b>c){
+            if(c>a) b=c;
+            else    b=a;
+        }
+    }
+    return b;
+#endif
 }
 
 static inline int clip(int a, int amin, int amax)
@@ -1124,7 +1164,7 @@ uint64_t tstart= rdtsc();\
 
 #define STOP_TIMER(id) \
 tend= rdtsc();\
-if(tcount<2 || tend - tstart < 4*tsum/tcount){\
+if(tcount<2 || tend - tstart < 8*tsum/tcount){\
     tsum+= tend - tstart;\
     tcount++;\
 }else\

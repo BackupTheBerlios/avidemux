@@ -1,6 +1,7 @@
 /*
  * RV10 codec
  * Copyright (c) 2000,2001 Fabrice Bellard.
+ * Copyright (c) 2002-2004 Michael Niedermayer
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -448,6 +449,12 @@ static int rv10_decode_init(AVCodecContext *avctx)
         s->h263_long_vectors=0;
         s->low_delay=1;
         break;
+    case 0x10002000:
+        s->rv10_version= 3;
+        s->h263_long_vectors=1;
+        s->low_delay=1;
+        s->obmc=1;
+        break;
     case 0x10003000:
         s->rv10_version= 3;
         s->h263_long_vectors=1;
@@ -473,8 +480,6 @@ static int rv10_decode_init(AVCodecContext *avctx)
         av_log(s->avctx, AV_LOG_ERROR, "unknown header %X\n", avctx->sub_id);
     }
 //printf("ver:%X\n", avctx->sub_id);
-    s->flags= avctx->flags;
-
     if (MPV_common_init(s) < 0)
         return -1;
 
@@ -546,6 +551,10 @@ static int rv10_decode_packet(AVCodecContext *avctx,
             return -1;
     }
 
+    if(s->pict_type == B_TYPE){ //FIXME remove after cleaning mottion_val indexing
+        memset(s->current_picture.motion_val[0], 0, sizeof(int16_t)*2*(s->mb_width*2+2)*(s->mb_height*2+2));
+    }
+
 #ifdef DEBUG
     printf("qscale=%d\n", s->qscale);
 #endif
@@ -574,7 +583,7 @@ static int rv10_decode_packet(AVCodecContext *avctx,
     s->rv10_first_dc_coded[0] = 0;
     s->rv10_first_dc_coded[1] = 0;
     s->rv10_first_dc_coded[2] = 0;
-
+//printf("%d %X %X\n", s->pict_type, s->current_picture.motion_val[0], s->current_picture.motion_val[1]);
     s->block_wrap[0]=
     s->block_wrap[1]=
     s->block_wrap[2]=
@@ -583,13 +592,14 @@ static int rv10_decode_packet(AVCodecContext *avctx,
     s->block_wrap[5]= s->mb_width + 2;
     ff_init_block_index(s);
     /* decode each macroblock */
-    for(i=0;i<mb_count;i++) {
+
+    for(s->mb_num_left= mb_count; s->mb_num_left>0; s->mb_num_left--) {
         int ret;
         ff_update_block_index(s);
 #ifdef DEBUG
         printf("**mb x=%d y=%d\n", s->mb_x, s->mb_y);
 #endif
-        
+
 	s->dsp.clear_blocks(s->block[0]);
         s->mv_dir = MV_DIR_FORWARD;
         s->mv_type = MV_TYPE_16X16; 
@@ -599,7 +609,8 @@ static int rv10_decode_packet(AVCodecContext *avctx,
             av_log(s->avctx, AV_LOG_ERROR, "ERROR at MB %d %d\n", s->mb_x, s->mb_y);
             return -1;
         }
-        ff_h263_update_motion_val(s);
+        if(s->pict_type != B_TYPE)
+            ff_h263_update_motion_val(s);
         MPV_decode_mb(s, s->block);
         if(s->loop_filter)
             ff_h263_loop_filter(s);
@@ -634,7 +645,7 @@ static int rv10_decode_frame(AVCodecContext *avctx,
         *data_size = 0;
         return 0;
     }
-    
+
     if(avctx->slice_count){
         for(i=0; i<avctx->slice_count; i++){
             int offset= avctx->slice_offset[i];

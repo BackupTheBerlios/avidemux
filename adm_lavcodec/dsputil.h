@@ -1,6 +1,7 @@
 /*
  * DSP utils
  * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -44,6 +45,7 @@ void j_rev_dct (DCTELEM *data);
 
 void ff_fdct_mmx(DCTELEM *block);
 void ff_fdct_mmx2(DCTELEM *block);
+void ff_fdct_sse2(DCTELEM *block);
 
 /* encoding scans */
 extern const uint8_t ff_alternate_horizontal_scan[64];
@@ -138,21 +140,22 @@ typedef struct DSPContext {
     int (*pix_norm1)(uint8_t * pix, int line_size);
 // 16x16 8x8 4x4 2x2 16x8 8x4 4x2 8x16 4x8 2x4
     
-    me_cmp_func sad[4]; /* identical to pix_absAxA except additional void * */
-    me_cmp_func sse[4];
-    me_cmp_func hadamard8_diff[4];
-    me_cmp_func dct_sad[4];
-    me_cmp_func quant_psnr[4];
-    me_cmp_func bit[4];
-    me_cmp_func rd[4];
-    int (*hadamard8_abs )(uint8_t *src, int stride, int mean);
+    me_cmp_func sad[5]; /* identical to pix_absAxA except additional void * */
+    me_cmp_func sse[5];
+    me_cmp_func hadamard8_diff[5];
+    me_cmp_func dct_sad[5];
+    me_cmp_func quant_psnr[5];
+    me_cmp_func bit[5];
+    me_cmp_func rd[5];
+    me_cmp_func vsad[5];
+    me_cmp_func vsse[5];
 
     me_cmp_func me_pre_cmp[5];
     me_cmp_func me_cmp[5];
     me_cmp_func me_sub_cmp[5];
     me_cmp_func mb_cmp[5];
+    me_cmp_func ildct_cmp[5]; //only width 16 used
 
-    /* maybe create an array for 16/8/4/2 functions */
     /**
      * Halfpel motion compensation with rounding (a+b+1)>>1.
      * this is an array[4][4] of motion compensation funcions for 4 
@@ -282,6 +285,11 @@ typedef struct DSPContext {
 #define FF_SIMPLE_IDCT_PERM 3
 #define FF_TRANSPOSE_IDCT_PERM 4
 
+    int (*try_8x8basis)(int16_t rem[64], int16_t weight[64], int16_t basis[64], int scale);
+    void (*add_8x8basis)(int16_t rem[64], int16_t basis[64], int scale);
+#define BASIS_SHIFT 16
+#define RECON_SHIFT 6
+
 } DSPContext;
 
 void dsputil_static_init(void);
@@ -292,6 +300,8 @@ void dsputil_init(DSPContext* p, AVCodecContext *avctx);
  * @param last last non zero element in scantable order
  */
 void ff_block_permute(DCTELEM *block, uint8_t *permutation, const uint8_t *scantable, int last);
+
+void ff_set_cmp(DSPContext* c, me_cmp_func *cmp, int type);
 
 #define	BYTE_VEC32(c)	((c)*0x01010101UL)
 

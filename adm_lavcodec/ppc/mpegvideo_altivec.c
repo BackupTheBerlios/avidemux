@@ -100,7 +100,6 @@ do { \
 // slower, for dumb non-apple GCC
 #define FOUROF(a) {a,a,a,a}
 #endif
-#if 0 // MEANX Gcc problems
 int dct_quantize_altivec(MpegEncContext* s, 
                         DCTELEM* data, int n,
                         int qscale, int* overflow)
@@ -514,7 +513,6 @@ int dct_quantize_altivec(MpegEncContext* s,
 
     return lastNonZero;
 }
-#endif //MEANX
 #undef FOUROF
 
 /*

@@ -1,7 +1,7 @@
 /*
  * Rate control for video encoders
  *
- * Copyright (c) 2002-2003 Michael Niedermayer <michaelni@gmx.at>
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,6 +34,8 @@
 #define M_E 2.718281828
 #endif
 #define MEANX
+
+static double bitrate_constraint(MpegEncContext *s, RateControlEntry *rce, double q, int frame_num);
 static int init_pass2(MpegEncContext *s);
 static double get_qscale(MpegEncContext *s, RateControlEntry *rce, double rate_factor, int frame_num);
 
@@ -391,7 +393,8 @@ static void get_qminmax(int *qmin_ret, int *qmax_ret, MpegEncContext *s, int pic
     *qmin_ret= qmin;
     *qmax_ret= qmax;
 }
-static double bitrate_constraint(MpegEncContext *s, RateControlEntry *rce, double q, int frame_num)
+// MEANX
+double bitrate_constraint(MpegEncContext *s, RateControlEntry *rce, double q, int frame_num)
 {
   const double buffer_size= s->avctx->rc_buffer_size;
   const double fps= (double)s->avctx->frame_rate / (double)s->avctx->frame_rate_base;
@@ -434,13 +437,17 @@ static double bitrate_constraint(MpegEncContext *s, RateControlEntry *rce, doubl
 	return q;
 
 }
-static double modify_qscale(MpegEncContext *s, RateControlEntry *rce, double q, int frame_num)
-{
+// /MEANX
+static double modify_qscale(MpegEncContext *s, RateControlEntry *rce, double q, int frame_num){
     RateControlContext *rcc= &s->rc_context;
     int qmin, qmax;
     double bits;
     const int pict_type= rce->new_pict_type;
-  
+    const double buffer_size= s->avctx->rc_buffer_size;
+    const double fps= (double)s->avctx->frame_rate / (double)s->avctx->frame_rate_base;
+    const double min_rate= s->avctx->rc_min_rate / fps;
+    const double max_rate= s->avctx->rc_max_rate / fps;
+    
     get_qminmax(&qmin, &qmax, s, pict_type);
 
     /* modulation */
@@ -450,7 +457,7 @@ static double modify_qscale(MpegEncContext *s, RateControlEntry *rce, double q, 
     bits= qp2bits(rce, q);
 //printf("q:%f\n", q);
     /* buffer overflow/underflow protection */
-    if(s->avctx->rc_buffer_size 
+    if(buffer_size
 #ifdef MEANX    
     	&& !(s->flags&CODEC_FLAG_PASS1)
 #endif	
@@ -458,7 +465,7 @@ static double modify_qscale(MpegEncContext *s, RateControlEntry *rce, double q, 
      // MEANX : Dont do min/max in pass 1
     {
       q=bitrate_constraint(s, rce, q, frame_num);
-    }
+  }
 //printf("q:%f max:%f min:%f size:%f index:%d bits:%f agr:%f\n", q,max_rate, min_rate, buffer_size, rcc->buffer_index, bits, s->avctx->rc_buffer_aggressivity);
     if(s->avctx->rc_qsquish==0.0 || qmin==qmax){
         if     (q<qmin) q=qmin;
@@ -559,9 +566,10 @@ static void adaptive_quantization(MpegEncContext *s, double q){
 
     /* handle qmin/qmax cliping */
     if(s->flags&CODEC_FLAG_NORMALIZE_AQP){
+        float factor= bits_sum/cplx_sum;
         for(i=0; i<s->mb_num; i++){
             float newq= q*cplx_tab[i]/bits_tab[i];
-            newq*= bits_sum/cplx_sum;
+            newq*= factor;
 
             if     (newq > qmax){
                 bits_sum -= bits_tab[i];
@@ -572,6 +580,8 @@ static void adaptive_quantization(MpegEncContext *s, double q){
                 cplx_sum -= cplx_tab[i]*q/qmin;
             }
         }
+        if(bits_sum < 0.001) bits_sum= 0.001;
+        if(cplx_sum < 0.001) cplx_sum= 0.001;
     }
    
     for(i=0; i<s->mb_num; i++){
@@ -641,19 +651,20 @@ float ff_rate_estimate_qscale(MpegEncContext *s)
     var= pict_type == I_TYPE ? pic->mb_var_sum : pic->mc_mb_var_sum;
     
     short_term_q = 0; /* avoid warning */
-    if(s->flags&CODEC_FLAG_PASS2)
-    {
+    if(s->flags&CODEC_FLAG_PASS2){
         if(pict_type!=I_TYPE)
             assert(pict_type == rce->new_pict_type);
 
         q= rce->new_qscale / br_compensation;
-	//MEANX, take also constraint in pass 2
+
+//MEANX, take also constraint in pass 2
 #ifdef MEANX	
 	if(s->avctx->rc_buffer_size)
 	{
 	  q=bitrate_constraint(s, rce, q, picture_number);
 	}
 #endif	
+
 //printf("%f %f %f last:%d var:%d type:%d//\n", q, rce->new_qscale, br_compensation, s->frame_bits, var, pict_type);
     }else{
         rce->pict_type= 

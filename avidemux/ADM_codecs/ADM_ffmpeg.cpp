@@ -126,7 +126,7 @@ uint8_t     ffmpegEncoder::gopMpeg1(void)
 		if(FRAME_FILM==identMovieType(_context->frame_rate))
 		{
 			printf("\nPulldown activated...\n");
-			_context->flags|=CODEC_FLAG_32_PULLDOWN;		
+			_context->flags2|=CODEC_FLAG2_32_PULLDOWN;		
 		}		
 	}
 #ifdef  TEST_NOB  // disable B frames

@@ -24,7 +24,7 @@ OBJS= common.o utils.o mem.o allcodecs.o \
       4xm.o cabac.o asv1.o vcr1.o cljr.o faandct.o rational.o parser.o \
       roqvideo.o xan.o rpza.o  msrle.o  msvideo1.o \
       cinepak.o vqavideo.o idcinvideo.o smc.o flicvideo.o interplayvideo.o dpcm.o \
-      8bps.o vmdav.o truemotion1.o
+      8bps.o vmdav.o truemotion1.o flac.o g726.o qtrle.o lcl.o
 
 ASM_OBJS=
 
@@ -268,7 +268,8 @@ DISTFILES= $(DIST386) $(DISTPPC) $(DIST_PP) \
 	flicvideo.c  \
 	interplayvideo.c \
 	dpcm.c \
-	8bps.c vmdav.c truemotion1.c  truemotion1data.h
+	8bps.c vmdav.c truemotion1.c  truemotion1data.h flac.c g726.c \
+	qtrle.c lcl.c
 
 srcdir= .
 distdir: $(DISTFILES)

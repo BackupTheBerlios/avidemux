@@ -71,9 +71,7 @@ void MPV_common_init_ppc(MpegEncContext *s)
         if ((s->avctx->dct_algo == FF_DCT_AUTO) ||
                 (s->avctx->dct_algo == FF_DCT_ALTIVEC))
         {
-#if 0 //MEANX : Gcc problems
             s->dct_quantize = dct_quantize_altivec;
-#endif
             s->dct_unquantize_h263_intra = dct_unquantize_h263_altivec;
             s->dct_unquantize_h263_inter = dct_unquantize_h263_altivec;
         }
