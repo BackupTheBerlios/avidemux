@@ -164,6 +164,7 @@ have_malloc=no
 have_darwin=no
 have_amd64=no
 have_sdl=no;
+have_faad=yes;
 dnl _________________ malloc.h ___________________
 
 AC_CHECK_HEADERS(malloc.h,have_malloc_h=yes)
@@ -475,6 +476,20 @@ AC_DEFINE(USE_MP3,1,[libmad])
 
 fi
 dnl __________________/mad______________
+dnl ____________ faad ?________________
+ AC_MSG_CHECKING(faad2 library) 
+ AC_CHECK_HEADERS(faad.h,,have_faad=no)
+    
+    if test "x$have_faad" = "xyes"; then
+		AC_CHECK_LIB( faad,faacDecInit,,have_faad=no, -lm )
+		if test "x$have_faad" = "xyes"; then
+	  		AC_DEFINE(USE_FAAD,1,"[Use faad audio decoder]")
+		fi  
+    fi     
+    AC_MSG_RESULT($have_faad)
+  
+
+dnl _________________ /freetype 2 _________________
 dnl __________________ac3______________
 AC_CHECK_HEADERS(a52dec/a52.h,,have_ac3=no)
 if test "x$have_ac3" = "xyes"; then
@@ -560,6 +575,10 @@ if test "x$have_sdl" = "xyes" ;  then
 	AC_DEFINE(USE_SDL,1,[Use SDL ])
 fi
 dnl __________________/SDL______________
+
+
+
+
 
 dnl ____________ free type 2________________
  AC_MSG_CHECKING(Freetype2 support)
@@ -887,6 +906,7 @@ echo " SDL                 : $have_sdl"
 echo " Xvideo              : $have_xv"
 echo " Lame                : $have_lame"
 echo " Ogg Vorbis          : $have_vorbis"
+echo " Faad2               : $have_faad"
 echo " A52/AC3             : $have_ac3"
 echo " FFMPEG              : $have_ff"
 echo " ARTS                : $have_arts"
