@@ -24,18 +24,26 @@ typedef struct OgAudioIndex
 	uint32_t dataSum;	// accumulative data seen for track1/2 in usefull payload
 				// handy for seeking
 }OgAudioIndex;
+
+typedef struct OgAudioTrack
+{	
+	uint32_t			audioTrack;
+	uint32_t			nbAudioPacket;	// nb of packet
+	uint32_t			trackSize;	// size in bytes 
+	OgAudioIndex			*index;	// indexes
+}OgAudioTrack;
+
 #define NO_FRAG 0xFFFF
 class oggAudio :  public AVDMGenericAudioStream
 {
 
 		protected:
+			    
 			    OGMDemuxer			*_demuxer;			    
-			    OgAudioIndex		*_audioIndex[2];
-			    uint32_t			_audioCount[2];
-			    uint8_t			_track;
 			    uint8_t			_trackIndex;
 			    
-			    uint32_t			_nbIndex[2];  
+			    OgAudioTrack		*_tracks;
+			    OgAudioTrack		*_currentTrack;
 			    uint8_t			_buffer[64*1025];
 			    uint32_t			_inBuffer; 
 			    uint64_t			_pos;
@@ -47,10 +55,7 @@ class oggAudio :  public AVDMGenericAudioStream
  
 				
 		public:
-					oggAudio( char *name,uint32_t nbsync[2],
-						OgAudioIndex *idx[2],
-						uint32_t     sizeCount[2],
-						uint8_t trk,uint8_t trkidx );
+					oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx );
 			virtual 	~oggAudio() ;
 			virtual uint8_t goTo(uint32_t offset);
 			virtual uint32_t read(uint32_t size,uint8_t *ptr);
@@ -74,17 +79,15 @@ protected:
              			FILE 			*_fd;
 				uint64_t 			_filesize;
 				uint32_t			_videoTrack;
-				uint32_t			_audioTrack2;
-				uint32_t			_audioTrack;
+				
+				OgAudioTrack			_audioTracks[2];	
+				
 				void				_dump(void);
 				OGMDemuxer 			*_demux;				
 				uint8_t 			buildIndex(uint32_t  *nb);
 				OgIndex				*_index;				
 				uint32_t			_lastImage;
 				uint32_t			_lastFrag;
-				uint32_t			_nbAudioPacket[2];	// nb of packet
-				uint32_t			_audioTrackSize[2];	// size in bytes 
-				OgAudioIndex			*_audioIndex[2];	// indexes
 				oggAudio			*_audio;
 
 public:

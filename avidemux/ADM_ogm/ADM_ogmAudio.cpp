@@ -47,22 +47,14 @@ oggAudio::~ oggAudio()
 
 }
 
-oggAudio::oggAudio( char *name,uint32_t nbsync[2],OgAudioIndex *idx[2],uint32_t trackLength[2],
-				uint8_t trk,uint8_t trkidx )
+oggAudio::oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx )
 {
-	_track=trk;
+	_tracks=tracks;
 	_trackIndex=trkidx;
 	
-	_audioIndex[0]=idx[0];
-	_audioIndex[1]=idx[1];
 	_demuxer=new OGMDemuxer();
 	
 	assert(_demuxer->open(name));
-	_nbIndex[0]=nbsync[0];
-	_nbIndex[1]=nbsync[1];
-	
-	_audioCount[0]=trackLength[0];
-	_audioCount[1]=trackLength[1];
 	
 	_wavheader=new   WAVHeader;
 	memset(  _wavheader,0,sizeof( WAVHeader));
@@ -77,16 +69,18 @@ oggAudio::oggAudio( char *name,uint32_t nbsync[2],OgAudioIndex *idx[2],uint32_t 
 	
 	
 	
-	_length=_audioCount[_trackIndex];
+	_length=_tracks[_trackIndex].trackSize;
 	
 	_destroyable=1;
 	_inBuffer=0;
 	_lastFrag=NO_FRAG;
 	strcpy(_name,"ogg audio");
-	printf("Ogg audio created for track :%u\n",trk);
+	printf("Ogg audio created for track :%u\n",trkidx);
 	_demuxer->setPos(0);
 	_extraLen=0;
 	_extraData=NULL;
+	
+	_currentTrack=&_tracks[_trackIndex];
 	
 	
 	// now take the 1st page as header
@@ -129,6 +123,8 @@ oggAudio::oggAudio( char *name,uint32_t nbsync[2],OgAudioIndex *idx[2],uint32_t 
 	*idnx++=size;
 	*idnx++=size1;
 	*idnx++=size2;
+		
+	printf("Ogg audio init done\n");
 	
 }
 
@@ -145,13 +141,13 @@ uint8_t oggAudio::goTo(uint32_t offset)
 		_inBuffer=0;
 		return 1;
 	}
-	for(uint32_t i=0;i<_nbIndex[_trackIndex]-1;i++)
+	for(uint32_t i=0;i<_currentTrack->nbAudioPacket;i++)
 	{
-		if(_audioIndex[_trackIndex][i].dataSum>offset)
+		if(_currentTrack->index[i].dataSum>offset)
 		{
 			aprintf("matching frame %lu \n",i);
 			// is i
-			_demuxer->setPos(_audioIndex[_trackIndex][i].pos);
+			_demuxer->setPos(_currentTrack->index[i].pos);
 			// search next packet			
 			_inBuffer=0;
 			return fillBuffer();
@@ -167,7 +163,7 @@ uint8_t oggAudio::fillBuffer( void )
 uint32_t size,sizehdr,flags;
 uint64_t f;
 
-	while(_demuxer->readHeaderOfType(_track,&size,&flags,&f))
+	while(_demuxer->readHeaderOfType(_currentTrack->audioTrack,&size,&flags,&f))
 	{
 		aprintf("\n page : %lu\n",f);		
 		_demuxer->dumpHeaders(_buffer+_inBuffer,&sizehdr);
@@ -267,7 +263,7 @@ uint32_t fl;
 		}
 
 		// We need a fresh packet
-		while(_demuxer->readHeaderOfType(_track,&cursize,flags,&f))
+		while(_demuxer->readHeaderOfType(_currentTrack->audioTrack,&cursize,flags,&f))
 		{
 			_demuxer->getLace(&frag,&frags);
 			for(uint32_t i=0;i<frag;i++)
@@ -332,8 +328,8 @@ OgAudioIndex *idx;
 	val/=1000; // in seconds
 	aprintf("OGM:Looking for %lu ms\n",mstime);
 	aprintf("Looking for %llu sample\n",val);
-	idx=_audioIndex[_trackIndex];
-	for(uint32_t i=0;i<_nbIndex[_trackIndex];i++)
+	idx=_currentTrack->index;
+	for(uint32_t i=0;i<_currentTrack->nbAudioPacket;i++)
 	{
 		
 		cur=idx[i].sampleCount;
@@ -344,7 +340,7 @@ OgAudioIndex *idx;
 			_inBuffer=0;
 			_lastFrag=NO_FRAG;
 			// Now we forward till the next header is > value
-			while(_demuxer->readHeaderOfType(_track,&cursize,&flags,&f))
+			while(_demuxer->readHeaderOfType(_currentTrack->audioTrack,&cursize,&flags,&f))
 			{
 				if(f>val || abs(f-val)<CLOSE_ENOUGH)
 				{
