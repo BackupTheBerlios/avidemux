@@ -127,6 +127,8 @@ ADMVideoSubtitle::ADMVideoSubtitle(
 			strcpy(_conf->_charset,"UNICODE");
 	}
 
+  _conf->_selfAdjustable=1;
+
   	_info.encoding=1;
 
 
@@ -234,3 +236,4 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 	}
 }
 #endif
+

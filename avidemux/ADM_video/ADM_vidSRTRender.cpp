@@ -132,24 +132,72 @@ void ADMVideoSubtitle::displayString(char *string)
 
 					memset(_bitmapBuffer,0,_info.height*_info.width);
 					memset(_maskBuffer,0,_info.height*_info.width);
-					// search for | char
-					for(uint32_t i=0;i<strlen(string);i++)
-					{
-						if( *(string+i)=='|')
+
+
+//   // search for | char
+//   for(uint32_t i=0;i<strlen(string);i++)
+//     {
+//       if( *(string+i)=='|')
+// 	{
+// 	  displayLine(string+last,base,i-last);
+// 	  last=i+1;
+// 	  base+=_conf->_fontsize;
+// 	  line++;
+// 	  if(line>3)
+// 	    {
+// 	      printf("\n Maximum 3 lines!\n");
+// 	      return;
+// 	    }
+// 	}
+//     }
+//   //printf("\len :%d\n",strlen(string)-last);
+//   displayLine(string+last,base,strlen(string)-last);
+
+
 							{
-									displayLine(string+last,base,i-last);
+    const uint32_t stringLen=strlen(string);
+    uint32_t i=0;
+    uint32_t suggestedLen=0;
+    while (last<stringLen && line<3) {
+      // search for | char
+      while (*(string+i)!='|' && i<stringLen) {
+	i++;
+      }
+      
+      uint32_t couldDisplay=displayLine(string+last,base,i-last,&suggestedLen);
+      //printf("[debug] couldDisplay=%d suggestedLen=%d\n",couldDisplay,suggestedLen);
+      if (! couldDisplay && _conf->_selfAdjustable && suggestedLen>0) {
+	// Try to fit
+	uint32_t newSuggLen=suggestedLen;
+	while (newSuggLen>0 && string[last+newSuggLen-1]!=' '){
+	  newSuggLen--;
+	}
+	if (newSuggLen>0){ suggestedLen=newSuggLen; }
+	//printf("[debug] suggestedLen=%d\n",suggestedLen);
+	couldDisplay = displayLine(string+last,base,suggestedLen);
+	last+=suggestedLen;
+	if (i<=last){i++;}
+	//printf("[debug] last=%d i=%d\n",last,i);
+      } else {
+	if (! couldDisplay) {
+	  printf("line is too big.\n");
+	}
 									last=i+1;
+	i++;
+      }
+      
 									base+=_conf->_fontsize;
 									line++;
-									if(line>3)
+    }
+
+    if(line>=3)
 									{
+	//index range [0,1,2]
 											printf("\n Maximum 3 lines!\n");
-										 	return;
+	//return;
 									}
 							}
-					}
-				//printf("\len :%d\n",strlen(string)-last);
-				displayLine(string+last,base,strlen(string)-last);
+
 
 				// now blur bitmap into mask..
 				memset(_maskBuffer,0,SRT_MAX_LINE*_conf->_fontsize*_info.width);
@@ -174,10 +222,20 @@ uint8_t tmp[_info.width*_info.height];
 
 
 }
-// Display a full line centered on screen
+// Display a full line centered on screen. It returns the
+// number of displayed chars.
 //____________________________________________________________
-void ADMVideoSubtitle::displayLine(char *string,uint32_t line, uint32_t len)
+uint32_t ADMVideoSubtitle::displayLine(char *string,uint32_t line, uint32_t len) {
+  uint32_t i;
+  return displayLine(string,line,len,&i);
+}
+
+// It also returns the suggested len for this line string (just when display fail)
+uint32_t ADMVideoSubtitle::displayLine(char *string,uint32_t line, uint32_t len, uint32_t *suggestedLen)
 {
+  // n first chars in string that can "fit" in this line
+  (*suggestedLen) = 0;
+
 	//uint32_t pixstart;
 	uint8_t *target;
 	int car;
@@ -188,7 +246,7 @@ void ADMVideoSubtitle::displayLine(char *string,uint32_t line, uint32_t len)
 	if(!len)
 	{
 		printf("\n null string\n");
-		return;
+      return 0;
 	}
 
 	uint32_t w=0;
@@ -211,7 +269,7 @@ void ADMVideoSubtitle::displayLine(char *string,uint32_t line, uint32_t len)
 	        		if(!_font->fontDraw((char *)(target+1+w),car , _info.width,_conf->_fontsize,&ww))
 				{
 					printf("Font error\n");
-					return;
+              return 0;
 				}
 				if((ww<0)||(ww>64))
 				{
@@ -220,11 +278,17 @@ void ADMVideoSubtitle::displayLine(char *string,uint32_t line, uint32_t len)
 				}
 				w=w+ww+2;
 			}
-          	if(w>(_info.width-_conf->_fontsize*2)) return;
+      if(w>(_info.width-_conf->_fontsize*2)) {
+	// try i-1 chars
+	(*suggestedLen) = i>0 ? i-1 : 0;
+	return 0;
+      }
 	}
 
 	//Now we can render it at its final position
 	target=_bitmapBuffer+_info.width*line+((_info.width-w)>>1);
+
+  //printf("[debug] line %s\n",string);
 
 	ww=0;
 	w=0;
@@ -243,7 +307,7 @@ void ADMVideoSubtitle::displayLine(char *string,uint32_t line, uint32_t len)
 	        		if(!_font->fontDraw((char *)(target+1+w),car , _info.width,_conf->_fontsize,&ww))
 				{
 					printf("Font error\n");
-					return;
+              return 0;
 				}
 				if((ww<0)||(ww>64))
 				{
@@ -252,15 +316,23 @@ void ADMVideoSubtitle::displayLine(char *string,uint32_t line, uint32_t len)
 				}
 				w=w+ww+2;
 			}
-          	if(w>(_info.width-_conf->_fontsize*2)) break;
+      if(w>(_info.width-_conf->_fontsize*2)) {
+	(*suggestedLen) = i>0? i-1: 0;
+	break;
+      }
 	}
 	// now w is the real width to displayString
 	// memcpy it to its real position
 	if(w>_info.width)
 		{
-			printf(" line too long\n"); return;
+      uint32_t r=(*suggestedLen);
+      (*suggestedLen)=0;
+      printf(" line too long\n");
+      return r;
 		}
 
+  (*suggestedLen)=0;
+  return len;
 }
 //--------------------------------------------------------------------
 //

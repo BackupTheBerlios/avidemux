@@ -20,6 +20,7 @@
 
  typedef struct subLine
  {
+  //  uint8_t               isReachable;   /*Debug only*/
 		uint32_t 		startTime;
 		uint32_t 		endTime;
 		char			*string;
@@ -36,6 +37,7 @@
 		char		 *_fontname;
 		char		 *_subname;
 		char 	*_charset;
+  uint8_t _selfAdjustable;
 
 
 	}SUBCONF;
@@ -60,7 +62,8 @@
         uint32_t							search(uint32_t time);
         void 									displayString(char *string);
         void 									displayChar(uint32_t w,uint32_t h,char c);
-        void 									displayLine(char *string,uint32_t line, uint32_t len);
+  uint32_t							displayLine(char *string,uint32_t line, uint32_t len);
+  uint32_t							displayLine(char *string,uint32_t line, uint32_t len, uint32_t *suggestedLen);
 	uint8_t 							lowPass(uint8_t *src, uint8_t *dst, uint32_t w, uint32_t h);
 	uint8_t 							decimate(uint8_t *src, uint8_t *dst, uint32_t w, uint32_t h);
 
