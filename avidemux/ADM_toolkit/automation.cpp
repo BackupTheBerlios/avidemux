@@ -49,6 +49,9 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "ADM_filter/vidVCD.h"
+
+#include "ADM_script/adm_command.h"
+
 extern void filterListAll(void );
 extern void ADS_commandList( void );
 extern uint8_t loadVideoCodecConf( char *name);
@@ -118,6 +121,7 @@ extern int A_saveDVDPS(char *name);
 static int call_bframe(void);
 static int call_packedvop(void);
 static int call_saveDVD(char *a);
+static int set_output_format(const char *str);
 //_________________________________________________________________________
 
 extern uint8_t audioShift;
@@ -201,6 +205,7 @@ AUTOMATON reaction_table[]=
 										(one_arg_type )call_requant},
 		{"info",		0	,"show information about loaded video and audio streams", show_info},
 		{"autoindex",		0	,"try to generate required index files", set_autoindex},
+		{"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
 		
 		{"help",		0,"print this",		call_help},
 		{"quit",		0,"exit avidemux",	call_quit}
@@ -572,6 +577,24 @@ int call_packedvop(void)
 {
 	video_body->setEnv(ENV_EDITOR_PVOP);
 	return 1;
+}
+
+int set_output_format(const char *str){
+  Arg map;
+  int rc;
+	/* map to adm_script function and args */
+	/*
+	** JSC: have to change (const char*) to (char *) with max compatibility
+	** there are many dependencies if map.arg.string is changed to (char *) native
+	**    won't check them all :-)
+	*/
+	map.type = APM_STRING;
+	map.arg.string  = (char *)ADM_alloc(strlen(str)+1);
+	assert( map.arg.string );
+	strcpy( map.arg.string, str );
+	rc = scriptOutputFormat(-1,&map);
+	ADM_dealloc( map.arg.string );
+	return(rc);
 }
 
 //EOF

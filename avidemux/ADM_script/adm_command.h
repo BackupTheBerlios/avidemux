@@ -10,6 +10,7 @@
 //
 //
 
+#include "ADM_script/adm_scanner.h"
 
 typedef int (*dummy_func)(int n,Arg *args);
 typedef struct admCommand
@@ -19,6 +20,45 @@ typedef struct admCommand
 	uint32_t	nbArgs;
 	APM_TYPE	args[MAXPARAM];	// 10 params should be enough
 };
+
+int scriptLoad(int n,Arg *args);
+int scriptExit(int n,Arg *args);
+int scriptAppend(int n,Arg *args);
+int scriptAudioProcess(int n,Arg *args);
+int scriptVideoProcess(int n,Arg *args);
+
+int scriptAudioDownsample(int n,Arg *args);
+int scriptAudioResample(int n,Arg *args);
+int scriptAudioNormalize(int n,Arg *args);
+
+int scriptLoadAudio(int n,Arg *args);
+int scriptSaveAudio(int n,Arg *args);
+int scriptGoto(int n,Arg *args);
+
+int scriptSetFps(int n,Arg *args);
+
+int scriptSleep(int n,Arg *args);
+int scriptSetMarkerA(int n,Arg *args);
+int scriptSetMarkerB(int n,Arg *args);
+int scriptScanVbr(int n,Arg *args);
+int scriptAudioDelay(int n,Arg *args);
+int scriptFilm2Pal(int n,Arg *args);
+int scriptAudioCodec(int n,Arg *args);
+int scriptLoadCodec(int n,Arg *args);
+int scriptSavejpeg(int n,Arg *args);
+int scriptRaw(int n,Arg *args);
+int scriptSave(int n,Arg *args);
+int scriptSaveDVD(int n,Arg *args);
+int scriptVideoCodec(int n,Arg *args);
+int scriptVideoCodec2(int n,Arg *args);
+int scriptSave(int n,Arg *args);
+int scriptLoadFilter(int n,Arg *args);
+int scriptAddVideoFilter(int n,Arg *args);
+int scriptRemoveFrame(int n,Arg *args);
+int scriptSaveOgm(int n, Arg *args);
+
+int scriptOutputFormat(int n, Arg *srgs);
+
 // All comment must be in lower case!
 // A number of param > 0x100 means variable, at least yy with value = yy+0x100
 // For video, we need at least one : The video filter name
