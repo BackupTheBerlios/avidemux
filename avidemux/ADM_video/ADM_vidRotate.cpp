@@ -76,7 +76,7 @@ ADMVideoRotate::ADMVideoRotate(AVDMGenericVideoStream *in, CONFcouple *couples)
     _param->width = _info.width;
     _param->height = _info.height;
   }
- _uncompressed=new ADMImage(_param->width,_param->height);
+ _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   printf("New Rotate %ld %ld %f\n", _info.width, _info.height, _param->angle);
   ADM_assert(_uncompressed);    	  	
 
