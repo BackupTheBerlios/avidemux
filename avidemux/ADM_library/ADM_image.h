@@ -44,6 +44,7 @@ public:
 	uint32_t	flags;		/// Flags for this image (AVI_KEY_FRAME/AVI_B_FRAME)
 
 	uint8_t         _isRef;         /// If True means the datas are just a link to data we don't own!
+        void            commonInit(uint32_t w,uint32_t h); /// sub constructor
 public:
 
         uint8_t         *_planes[3];     /// In case of linked data store y/u/v pointers
@@ -51,6 +52,8 @@ public:
 
 		ADMImage(uint32_t width, uint32_t height);
                 ADMImage(uint32_t width, uint32_t height,uint32_t dummy); /// To create linked datas image        
+
+                
 		~ADMImage();
 	uint8_t duplicate(ADMImage *src);	/// copy an image to ourself, including info
 	uint8_t duplicateFull(ADMImage *src);	/// copy an image to ourself, including info

@@ -37,39 +37,38 @@ void ADMImage_stat( void )
 //
 //	Allocate and initialize everything to default values
 //
-ADMImage::ADMImage(uint32_t width, uint32_t height)
+void    ADMImage::commonInit(uint32_t w,uint32_t h)
 {
-	_width=width;
-        _isRef=0;
-	_height=height;
-	data=new uint8_t [ ((width+15)&0xffffff0)*((height+15)&0xfffffff0)*2];
-	ADM_assert(data);
-	quant=NULL;
-	_qStride=0;
-	_Qp=2;
-	flags=0;
-	_qSize=0;
-	_aspect=ADM_ASPECT_1_1;
-	imgCurMem+=(width*height*3)>>1;
-	imgCurNb++;
-	
-	if(imgCurMem>imgMaxMem) imgMaxMem=imgCurMem;
-	if(imgCurNb>imgMaxNb) imgMaxNb=imgCurNb;
-};
-// Create a fake image with external datas
-ADMImage::ADMImage(uint32_t width, uint32_t height,uint32_t dummy)
-{
-        _width=width;
-        _isRef=1;
-        _height=height;
-        data=NULL;        
+        _width=w;        
+        _height=h;
         quant=NULL;
         _qStride=0;
         _Qp=2;
         flags=0;
         _qSize=0;
-        _aspect=ADM_ASPECT_1_1;        
+        _aspect=ADM_ASPECT_1_1;
+        
         imgCurNb++;
+        _planes[0]=_planes[1]=_planes[2]=NULL;
+
+}
+ADMImage::ADMImage(uint32_t width, uint32_t height)
+{
+        commonInit(width,height);
+        _isRef=0;
+        data=new uint8_t [ ((width+15)&0xffffff0)*((height+15)&0xfffffff0)*2];
+        ADM_assert(data);
+        imgCurMem+=(width*height*3)>>1;
+        if(imgCurMem>imgMaxMem) imgMaxMem=imgCurMem;
+        if(imgCurNb>imgMaxNb) imgMaxNb=imgCurNb;
+
+};
+// Create a fake image with external datas
+ADMImage::ADMImage(uint32_t width, uint32_t height,uint32_t dummy)
+{       
+        commonInit(width,height); 
+        _isRef=1;
+        data=NULL;                
                 
 };
 //
@@ -97,10 +96,14 @@ uint8_t ADMImage::duplicate(ADMImage *src)
 	// Sanity check
 	ADM_assert(src->_width==_width);
 	ADM_assert(src->_height==_height);
+
+        ADM_assert(!_isRef); // could not duplicate to a linked data image
+
 	// cleanup if needed
 	if(quant) delete [] quant;
 	quant=NULL;
-	_qStride=0;	
+ 
+       _qStride=0;	
 	_qSize=0;
 	
 	copyInfo(src);
@@ -156,6 +159,8 @@ uint8_t ADMImage::duplicateFull(ADMImage *src)
 	
 	
 	copyInfo(src);
+        ADM_assert(!_isRef);
+
 	memcpy(YPLANE(this),YPLANE(src),_width*_height);
 	memcpy(UPLANE(this),UPLANE(src),(_width*_height)>>2);
 	memcpy(VPLANE(this),VPLANE(src),(_width*_height)>>2);
