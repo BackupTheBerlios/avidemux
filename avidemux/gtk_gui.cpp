@@ -134,6 +134,7 @@ extern void encoderSetLogFile (char *name);
 extern void videoCodecSelect (void);
 extern uint8_t DIA_about( void );
 extern uint8_t DIA_RecentFiles( char **name );
+extern void mpeg_passthrough(  char *name );
 static void A_videoCheck( void);
 #define USE_FFMPEG_AS_DEFAULT
 #ifdef USE_FFMPEG
@@ -405,7 +406,16 @@ HandleAction (Action action)
     			A_requantize();
 			break;
     case ACT_SaveDVDPS:
-    			oplug_mpeg_dvd_ps(NULL);
+    			// if we are in process mode
+			if(videoProcessMode)
+			{
+    				oplug_mpeg_dvd_ps(NULL);
+			}
+			else // copy mode
+			{
+				printf("Using pass through\n");
+				GUI_FileSelWrite ("Select Mpeg file...", mpeg_passthrough);
+			}
     			break;			
     case ACT_FrameChanged:
     			printf("FrameChanged\n");
@@ -2068,5 +2078,6 @@ else
 	GUI_GoToFrame(curframe);
 
 }
+
 // EOF
 
