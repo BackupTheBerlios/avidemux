@@ -74,6 +74,7 @@
 		VF_WHIRL,
 		VF_EQUALIZER,
                 VF_VOBSUB,
+                VF_CHFPS,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

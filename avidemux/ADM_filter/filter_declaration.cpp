@@ -49,6 +49,7 @@ void registerVideoFilters( void )
 printf("\n Registering Filters\n");
 printf(  "*********************\n");
 
+	
 	registerFilter("---- Image size/border alteration----",VF_INVALID,2,NULL,NULL);
 	REGISTERX("crop","Crop",VF_CROP,1,crop_create,crop_script);
 	REGISTERX("mpresize","Mplayer Resize",VF_MPLAYERRESIZE,1,mpresize_create,mpresize_script);
@@ -57,6 +58,7 @@ printf(  "*********************\n");
   	REGISTERX("addblack","Add black border",VF_ADDBORDER,1,addBorder_create,addBorder_script);
   	REGISTERX("vflip","Flip Vertical",VF_FLIP,1,flipv_create,flipv_script);
 	REGISTERX("rotate","Rotate",VF_ROTATE,1,rotate_create,rotate_script);
+        REGISTERX("chfps","Change FPS",VF_CHFPS,1,chfps_create,chfps_script);
 	REGISTERX("whirl","Whirl",VF_WHIRL,1,whirl_create,whirl_script);
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
