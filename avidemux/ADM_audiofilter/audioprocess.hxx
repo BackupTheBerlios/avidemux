@@ -131,6 +131,7 @@ public:
         			AVDMProcessAudio_Null(AVDMGenericAudioStream *instream
 						,uint32_t time_offset, uint32_t length);
        		virtual uint32_t 	grab(uint8_t *obuffer);
+		virtual uint8_t  goToTime(uint32_t newoffset);
      		
 };
 //_______________________________________________________________

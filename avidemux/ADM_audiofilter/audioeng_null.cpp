@@ -74,6 +74,14 @@ uint32_t rdall=0;
 	      return MINUS_ONE;	// we could not get a single byte ! End of stream
   return rdall;
 }
+uint8_t  AVDMProcessAudio_Null::goToTime(uint32_t newoffset)
+{
+	 _instream->goToTime(_start_time);
+	 if(newoffset)
+	 {
+	 	printf("AFNull: MMm Null not going to 0 ?\n");
+	 }
 
+}
 
 // EOF
