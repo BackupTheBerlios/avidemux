@@ -115,7 +115,7 @@ uint16_t dur16;
 //___________________________________________________
 uint8_t	ADM_ogmWriteCopy::writeVideo(uint32_t frame)
 {
-uint32_t len,flags_s,flags;
+uint32_t len,flags;
 uint32_t forward;
 uint8_t ret1=0;
 
@@ -131,8 +131,8 @@ uint8_t ret1=0;
 		
 		// we DO have b frame
 		// 
-		video_body->getFlags (frameStart + frame, &flags_s);
-		if(flags_s & AVI_B_FRAME)
+		video_body->getFlags (frameStart + frame, &flags);
+		if(flags & AVI_B_FRAME)
 			{ 	// search if we have to send a I/P frame in adance
 				
 				uint32_t forward;
@@ -142,7 +142,7 @@ uint8_t ret1=0;
 				{
 					aprintf("\tP Frame not sent, sending it :%lu\n",forward);
 					ret1 = video_body->getFrameNoAlloc (forward, _videoBuffer, &len,
-				      		&flags_s);
+				      		&flags);
 					_lastIPFrameSent=forward;
 
 				}
@@ -152,7 +152,7 @@ uint8_t ret1=0;
 					// send n-1
 					aprintf("\tP Frame already, sending  :%lu\n",frameStart+frame-1);
 					ret1 = video_body->getFrameNoAlloc (frameStart+frame-1, _videoBuffer, &len,
-				      	&flags_s);
+				      	&flags);
 
 				}
 
@@ -164,14 +164,14 @@ uint8_t ret1=0;
 				{
 					aprintf("\tSending Last B-frame :(%lu)\n",frameStart + frame-1);
 					ret1 = video_body->getFrameNoAlloc (frameStart + frame-1, _videoBuffer, &len,
-				      		&flags_s);
+				      		&flags);
 
 				}
 				else
 				{
 					aprintf("\tJust sending it :(%lu)-(%lu)\n",frameStart + frame,_lastIPFrameSent);
 					ret1 = video_body->getFrameNoAlloc (frameStart + frame, _videoBuffer, &len,
-				      		&flags_s);
+				      		&flags);
 
 				}
 			}

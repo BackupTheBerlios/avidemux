@@ -93,6 +93,7 @@ uint32_t chunk;
 	_current_lacing=0;
 	_current_off=size;
 	_fresh=1;
+	_timestamp=0;
 	while(size>0)
 	{
 		chunk=min(size,255);

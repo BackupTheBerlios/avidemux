@@ -59,7 +59,7 @@ uint64_t f;
 	_demuxer=new OGMDemuxer();
 	
 	ADM_assert(_demuxer->open(name));
-	
+	_lastPos=0;
 	_wavheader=new   WAVHeader;
 	memset(  _wavheader,0,sizeof( WAVHeader));
 	_currentTrack=&_tracks[_trackIndex];		
@@ -260,7 +260,7 @@ uint64_t pos;
 	pos=_lastPos;
 	if(!readPacket(len,dest,&f,&pos)) return 0;
 	//*samples=1024; // FIXME
-	//printf("%llu pos %llu lastpos\n",pos,_lastPos);
+	//printf("%llu pos %llu lastpos\n",pos,_lastPos);	
 	*samples=pos-_lastPos;
 	_lastPos=pos;
 	return 1;
@@ -278,7 +278,7 @@ uint8_t *frags,frag;
 uint32_t cursize;
 uint32_t fl;
 
-
+	
 	*size=0;
 	*flags=0;
 		// if _lastFrag=0 it means there is some data left
@@ -375,6 +375,15 @@ OgAudioIndex *idx;
 	aprintf("Looking for %llu sample\n",val);
 	_lastPos=0;
 	
+	if(!mstime)
+	{
+			_demuxer->setPos(idx[0].pos);
+			f=0;
+			_inBuffer=0;
+			_lastFrag=NO_FRAG;
+			_lastPos=0;
+			return 1;
+	}
 	//
 	idx=_currentTrack->index;
 	for(uint32_t i=0;i<_currentTrack->nbAudioPacket;i++)
@@ -384,6 +393,7 @@ OgAudioIndex *idx;
 		{
 			aprintf("Gotcha at frame %lu\n",i);
 			_demuxer->setPos(idx[i].pos);
+			f=idx[i].sampleCount;
 			_inBuffer=0;
 			_lastFrag=NO_FRAG;
 			// Now we forward till the next header is > value
@@ -400,6 +410,7 @@ OgAudioIndex *idx;
 						readPacket(&cursize,_buffer,&flags,&f);
 					}
 					_lastPos=f;
+					printf(" got %llu\n",f);
 					return 1;
 				
 				}

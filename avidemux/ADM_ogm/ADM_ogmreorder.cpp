@@ -100,6 +100,7 @@ uint32_t nbFrame= _videostream.dwLength;
 			_index=newindex;;
 			// last frame cannot be B frame
 			_index[last].flags&=~AVI_B_FRAME;
+			_index[0].flags=AVI_KEY_FRAME;
 			 _reordered=ret;
 			 if(ret)
 			 	printf("Ogm reordering ok\n");

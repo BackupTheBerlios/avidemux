@@ -158,6 +158,11 @@ uint64_t seq;
 			*frame=(*frame)<<32;
 			*frame=_page.abs_pos[0]+(_page.abs_pos[1]<<8)+(_page.abs_pos[2]<<16)+
 					(_page.abs_pos[3]<<24);
+			if(*frame>48000*3 && seq==3)
+			{
+				printf("Fixing stupid abs_pos\n");
+				*frame=0;
+			}
 			
 			
 #endif			
