@@ -542,14 +542,18 @@ decoderFFSVQ3::decoderFFSVQ3(uint32_t w,uint32_t h,uint32_t extraLen,uint8_t *ex
 	    :decoderFF(w,h)
 {
 int got_picture=0;
+	
   	_context->flags|=CODEC_FLAG_LOW_DELAY;
+	 _context->extradata=(void *)extraData;
+      _context->extradata_size=(int)extraLen;
       if (avcodec_open(_context,& svq3_decoder) < 0)
 	      {
 					printf(" Decoder init: FFMpeg SVQ3 video decoder failed!\n");
 				}
 				else
 				{
-					printf(" Decoder init: FFMpeg SVQ3 video decoder initialized!\n");
+					printf(" Decoder init: FFMpeg SVQ3 video decoder initialized"
+						" (%lu bytes of extra)!\n",extraLen);
 				}
 
 }
