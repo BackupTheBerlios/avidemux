@@ -408,7 +408,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 						    audioDelay);
 		tshift = (AVDMProcessAudioStream *) ts;
 		lastFilter = tshift;
-		printf("\n Time shift activated with %d ms", audioShift);
+		printf("\n Time shift activated with %d %d ms", audioShift,audioDelay);
 		filters[filtercount++] = lastFilter;
 	    }
       }
@@ -522,7 +522,7 @@ AVDMProcessAudioStream *lastFilter;
 						ts = new AVDMProcessAudio_TimeShift(lastFilter,    audioDelay);
 
 						lastFilter = ts;
-						printf("\n Time shift activated with %d ms", audioShift);
+						printf("\n Time shift activated with %d %d ms", audioShift,audioDelay);
 						filters[filtercount++] = lastFilter;
 
 	    				}
