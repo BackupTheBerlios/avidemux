@@ -429,6 +429,17 @@ HandleAction (Action action)
 			}
 			else // copy mode
 			{
+			// do some sanitu check first
+				uint32_t fatal;
+				uint32_t end;
+				end=frameEnd;
+				if(end==avifileinfo->nb_frames-1) end++;
+				video_body->sanityCheckRef(frameStart,end,&fatal);
+				if(fatal)
+				{
+					GUI_Alert("There is a lonely Bframe at start/end\nPlease remove it");
+					break;
+				}
 				printf("Using pass through\n");
 				GUI_FileSelWrite ("Select Mpeg file...", mpeg_passthrough);
 			}
