@@ -150,8 +150,8 @@ int ret;
 	
 	/* Set up motion estimation flags */
 	xvid_enc_frame.input.plane[0] = in;
-	xvid_enc_frame.input.plane[1] = in+(_w*_h);
-	xvid_enc_frame.input.plane[2] = in+((_w*_h*5)>>2);
+	xvid_enc_frame.input.plane[2] = in+(_w*_h);
+	xvid_enc_frame.input.plane[1] = in+((_w*_h*5)>>2);
 	
 	xvid_enc_frame.quant = vinfo.quality;
 	xvid_enc_frame.bitstream = out;	
