@@ -72,6 +72,8 @@ class oggAudio :  public AVDMGenericAudioStream
 									}		
 			virtual uint32_t readDecompress( uint32_t size,uint8_t *ptr );
 			virtual uint8_t	 goToTime(uint32_t mstime);
+			virtual uint8_t	getPacket(uint8_t *dest, uint32_t *len, 
+						uint32_t *samples);
 
 };
 

@@ -230,14 +230,25 @@ uint32_t i;
 	}
 	ssize-=lenbyte;
 	memmove(data,data+lenbyte,ssize);
-	return ssize;
-		
-	printf("OGM : Failed reading non vorbis\n");
-	return 0;
-	
+	return ssize;	
 
 
 }
+uint8_t		oggAudio::getPacket(uint8_t *dest, uint32_t *len, 
+						uint32_t *samples)
+{
+
+//	printf("OggAudio::getPacket");
+	if(_wavheader->encoding!=WAV_OGG)
+	{
+		return AVDMGenericAudioStream::getPacket(dest,len,samples);
+	}
+	printf("OggAudio::Get Vorbis packet\n");
+	*len=0;
+	*samples=0;
+	return 0;
+}
+
 //
 //	Get the next packet and strip the header if any
 //	Used for VBR interface, use it use it use it
@@ -260,7 +271,7 @@ uint32_t fl;
 		{
 			for(uint32_t i=_lastFrag+1;i<frag;i++)
 			{
-				aprintf("\t cont :%lu -> %02d \n",i,frags[i]);
+				//aprintf("\t cont :%lu -> %02d \n",i,frags[i]);
 				cursize=frags[i];
 				// get the frame ?
 				_demuxer->readBytes(cursize,data);
@@ -285,7 +296,7 @@ uint32_t fl;
 			_demuxer->getLace(&frag,&frags);
 			for(uint32_t i=0;i<frag;i++)
 			{
-				aprintf("\t cont :%lu -> %02d\n",i,frags[i]);
+				//aprintf("\t cont :%lu -> %02d\n",i,frags[i]);
 				cursize=frags[i];
 				// get the frame ?
 				_demuxer->readBytes(cursize,data);
@@ -341,6 +352,7 @@ uint32_t flags,cursize;
 OgAudioIndex *idx;
 
 	val=mstime;
+	packetHead=packetHead=0;
 	val*=_wavheader->frequency;
 	val/=1000; // in seconds
 	aprintf("OGM:Looking for %lu ms\n",mstime);
