@@ -20,9 +20,9 @@ codecs.mpeg2enc.dvd.ExtraParams,	STRING,	""
 filters.subtitle.fontname,		STRING, "/usr/X11R6/lib/X11/fonts/truetype/arial.ttf"
 filters.subtitle.charset,		STRING, "ASCII"
 filters.subtitle.fontsize,		UINT,	24,	1,	576
-filters.subtitle.ypercent,		UINT,	255,	0,	255
-filters.subtitle.upercent,		UINT,	0,	0,	255
-filters.subtitle.vpercent,		UINT,	0,	0,	255
+filters.subtitle.ypercent,		INT,	255,	0,	255
+filters.subtitle.upercent,		INT,	0,	0,	255
+filters.subtitle.vpercent,		INT,	0,	0,	255
 filters.subtitle.selfadjustable,	UINT,	0,	0,	1
 filters.subtitle.usebackgroundcolor,	UINT,	0,	0,	1
 test.string,	STRING,	"abcdhfgd"
