@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <errno.h>
 
 
 #include "fourcc.h"
@@ -81,7 +81,11 @@ printf("\n **Saving workbench **\n");
 
   FILE *    fd;
 
-  fd = fopen (name, "wt");
+  if( !(fd = fopen (name, "wt")) ){
+    fprintf(stderr,"\ncan't open workbench file \"%s\" for writing: %u (%s)\n",
+                   name, errno, strerror(errno));
+    return 1;
+  }
 
   fprintf (fd, "ADMW0002\n");
   fprintf (fd,"%02ld videos\n", _nb_video);
