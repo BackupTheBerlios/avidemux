@@ -98,6 +98,25 @@ uint8_t *dst1,*dst2;
 	}
 	
 }
+//
+//
+//
+static void unstack(uint32_t w,uint32_t h,uint8_t *src,uint8_t *target)
+{
+uint8_t *dst,*src1,*src2;
+        src1=src;
+        src2=src+((w*h)>>1); 
+        dst=target;
+        for(uint32_t y=h>>1;y>0;y--)
+        {
+                memcpy(dst,src1,w);
+                memcpy(dst+w,src2,w);
+                dst+=2*w;
+                src1+=w;
+                src2+=w;
+        }
+        
+}
 
 //
 //	Put field 1 on top of field2
@@ -123,6 +142,31 @@ uint32_t page=w*h;
 	stack(w>>1,h>>1,s,d);
 	
 	return 1;
+}
+//
+//      Put field 1 on top of field2
+//
+uint8_t vidFielUnStack(uint32_t w,uint32_t h,uint8_t *src,uint8_t *target)
+{
+uint8_t *d,*s;
+//uint32_t y;
+
+// interleave Y
+uint32_t page=w*h;
+        d=target;
+        s=src;
+        
+        unstack(w,h,s,d);
+        
+        d=target+page;
+        s=src+page;
+        unstack(w>>1,h>>1,s,d);
+        
+        d=target+((page*5)>>2);
+        s=src+((page*5)>>2);
+        unstack(w>>1,h>>1,s,d);
+        
+        return 1;
 }
 	
 

@@ -82,10 +82,12 @@ printf(  "*********************\n");
 
 	REGISTERX("keepevenfield","Keep even fields",VF_KEEPEVEN,1,keepeven_create,keepeven_script);
 	REGISTERX("keepoddfield","Keep odd fields",VF_KEEPODD,1,keepodd_create,keepodd_script);
-	REGISTERX("separatefields","Separate Fields",VF_SEPARATEFIELDS,1,
-							separatefield_create,separatefield_script);
-	REGISTERX("stackfield","Stack Fields",VF_STACKFIELD,1,stackfield_create,stackfield_script);
+	REGISTERX("separatefields","Separate Fields",VF_SEPARATEFIELDS,1, separatefield_create,separatefield_script);
 	REGISTERX("mergefield","Merge Fields",VF_MERGEFIELDS,1,mergefield_create,mergefield_script);
+
+	REGISTERX("stackfield","Stack Fields",VF_STACKFIELD,1,stackfield_create,stackfield_script);
+        REGISTERX("unstackfield","UnStack Fields",VF_UNSTACK_FIELD,1,unstackfield_create,unstackfield_script);
+	
 	REGISTERX("pulldown","PullDown",VF_PULLDOWN,1,pulldown_create,pulldown_script);
 	
 	REGISTERX("kerneldeint","D. Graft Kernel deint",VF_KRNDEINT,1,kerneldeint_create,kerneldeint_script);

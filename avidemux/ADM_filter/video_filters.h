@@ -77,6 +77,7 @@
                 VF_CHFPS,
                 VF_RESAMPLE_FPS,
                 VF_LAVPP_DEINT,
+                VF_UNSTACK_FIELD,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

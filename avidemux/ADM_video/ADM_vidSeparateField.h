@@ -54,4 +54,21 @@
 			virtual uint8_t configure( AVDMGenericVideoStream *instream) {return 0;};
 
  }     ;
+   class  AVDMVideoUnStackField:public AVDMGenericVideoStream
+ {
+
+ protected:
+
+                                
+                         virtual char           *printConf(void) ;
+
+ public:
+                                                AVDMVideoUnStackField(  AVDMGenericVideoStream *in,CONFcouple *setup);
+                                                AVDMVideoUnStackField();
+                      virtual uint8_t   getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+                                                                                ADMImage *data,uint32_t *flags);
+
+                        virtual uint8_t configure( AVDMGenericVideoStream *instream) {return 0;};
+
+ }     ;
 

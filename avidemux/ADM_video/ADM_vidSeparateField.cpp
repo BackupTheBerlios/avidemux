@@ -45,10 +45,12 @@ static FILTER_PARAM swapParam={0,{""}};
 SCRIPT_CREATE(separatefield_script,AVDMVideoSeparateField,swapParam);
 SCRIPT_CREATE(mergefield_script,AVDMVideoMergeField,swapParam);
 SCRIPT_CREATE(stackfield_script,AVDMVideoStackField,swapParam);
+SCRIPT_CREATE(unstackfield_script,AVDMVideoUnStackField,swapParam);
 
 BUILD_CREATE(separatefield_create,AVDMVideoSeparateField);
 BUILD_CREATE(mergefield_create,AVDMVideoMergeField);
 BUILD_CREATE(stackfield_create,AVDMVideoStackField);
+BUILD_CREATE(unstackfield_create,AVDMVideoUnStackField);
 
 char *AVDMVideoSeparateField::printConf( void )
 {
@@ -219,3 +221,49 @@ ADMImage *ptr1,*ptr2;
       return 1;
 }
 
+/****/
+//_______________________Stack Fields_______________________
+
+char *AVDMVideoUnStackField::printConf( void )
+{
+        static char buf[50];
+
+        sprintf((char *)buf," UnStack fields");
+        return buf;
+}
+
+//_______________________________________________________________
+AVDMVideoUnStackField::AVDMVideoUnStackField(       AVDMGenericVideoStream *in,CONFcouple *setup)
+{
+UNUSED_ARG(setup);
+        _in=in;
+        memcpy(&_info,_in->getInfo(),sizeof(_info));    
+        _uncompressed=new ADMImage(_info.width,_info.height);   
+
+}
+
+// ___ destructor_____________
+AVDMVideoUnStackField::AVDMVideoUnStackField()
+{
+                delete _uncompressed;
+                _uncompressed=NULL;
+}
+
+/**
+        Interleave frame*2 and frame*2+1
+*/
+uint8_t AVDMVideoUnStackField::getFrameNumberNoAlloc(uint32_t frame,
+                                uint32_t *len,
+                                ADMImage *data,
+                                uint32_t *flags)
+{
+uint32_t ref,ref2;
+ADMImage *ptr1,*ptr2;
+                if(frame>=_info.nb_frames) return 0;
+
+                 if(!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags)) return 0;
+                 
+                  vidFielUnStack(_info.width ,_info.height,YPLANE(_uncompressed),YPLANE(data));
+                data->copyInfo(_uncompressed);  
+      return 1;
+}
