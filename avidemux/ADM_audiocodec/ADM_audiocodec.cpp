@@ -36,7 +36,9 @@ ADM_Audiocodec *out;
 			{
 				if(info)
 					if(info->bitspersample==8)
-						fourcc=WAV_8BITS_UNSIGNED;
+                                        {
+                                                info->encoding=fourcc=WAV_8BITS_UNSIGNED;
+                                        }
 			
 			}
  		switch(fourcc)

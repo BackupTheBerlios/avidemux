@@ -237,7 +237,7 @@ uint8_t aviWrite::writeAudioHeader (	AVDMGenericAudioStream * stream, AVIStreamH
 // MOD Feb 2005 by GMV: audio super index length
 uint32_t odml_super_idx_size=24+odml_nbrof_index*16;
 // END MOD Feb 2005 by GMV
-WAVHeader *wav=NULL;
+WAVHeader wav;
 // pre compute some headers with extra data in...
 uint8_t wmaheader[12];
 VBRext  mp3vbr;
@@ -256,20 +256,20 @@ uint32_t extraLen=0;
 	wmaheader[24-16]=0x74;
 	wmaheader[25-16]=01;
 
-        wav = stream->getInfo ();
-      ADM_assert (wav);
+        memcpy(&wav,stream->getInfo (),sizeof(wav));
+      
 
       memset (header, 0, sizeof (AVIStreamHeader));
       header->fccType = fourCC::get ((uint8_t *) "auds");
       header->dwInitialFrames = 0;
       header->dwStart = 0;
-      header->dwRate = wav->byterate;
+      header->dwRate = wav.byterate;
       header->dwSampleSize = 1;
       header->dwQuality = 0xffffffff;
       header->dwSuggestedBufferSize = 8000;
       header->dwLength = stream->getLength ();
       
-	switch(wav->encoding)
+	switch(wav.encoding)
 	{
 		case WAV_AAC:
 		{
@@ -280,7 +280,7 @@ uint32_t extraLen=0;
 #if 1			
 			len/=_videostream.dwRate;
 			len*=_videostream.dwScale;			
-			len*=wav->frequency;
+			len*=wav.frequency;
 			len/=1024;
 #else		
 			header->dwLength= floor(len);//_videostream.dwLength; 
@@ -288,7 +288,7 @@ uint32_t extraLen=0;
 		 // AAC is mostly VBR
 		 header->dwFlags=1;
 		 header->dwInitialFrames=0;
-		 header->dwRate=wav->frequency;
+		 header->dwRate=wav.frequency;
 		 
 		 	
 		 
@@ -298,18 +298,18 @@ uint32_t extraLen=0;
 		 header->dwInitialFrames = 0;	 
 		
 		// header->dwLength= _videostream.dwLength; 
-		 wav->blockalign=1024;	  
-		 wav->bitspersample = 0; 
+		 wav.blockalign=1024;	  
+		 wav.bitspersample = 0; 
 		 
 		//*b++ = (BYTE)((profile +1) << 3 | (SRI >> 1));
 		//*b++ = (BYTE)(((SRI & 0x1) << 7) | (aacsource->GetChannelCount() << 3));
 		
 		int SRI=4;	// Default 44.1 khz
-		for(int i=0;i<16;i++) if(wav->frequency==aacBitrate[i]) SRI=i;
+		for(int i=0;i<16;i++) if(wav.frequency==aacBitrate[i]) SRI=i;
 		aacHeader[0]=0x2;
 		aacHeader[1]=0x0;
 		aacHeader[2]=(2<<3)+(SRI>>1); // Profile LOW
-		aacHeader[3]=((SRI&1)<<7)+((wav->channels)<<3);
+		aacHeader[3]=((SRI&1)<<7)+((wav.channels)<<3);
 		
 
 		extra=&(aacHeader[0]);
@@ -324,7 +324,7 @@ uint32_t extraLen=0;
 	    	  mp3vbr.nframesperblock = R16(1);
 		  mp3vbr.ncodecdelay = 0;
 		  
-		  wav->bitspersample = 0;
+		  wav.bitspersample = 0;
 		  mp3vbr.nblocksize=R16(0x180); //383; // ??
     
 		  header->dwScale = 1;
@@ -333,11 +333,11 @@ uint32_t extraLen=0;
 		  if (stream->isVBR()) //wav->blockalign ==1152)	// VBR audio
 			{			// We do like nandub do
 		  	//ADM_assert (audiostream->asTimeTrack ());
-		  	wav->blockalign = 1152;	// just a try
-		     	wav->bitspersample = 16;
+		  	wav.blockalign = 1152;	// just a try
+		     	wav.bitspersample = 16;
 		  
-		    	header->dwRate 	= wav->frequency;	//wav->byterate;
-			header->dwScale = wav->blockalign;
+		    	header->dwRate 	= wav.frequency;	//wav->byterate;
+			header->dwScale = wav.blockalign;
 			header->dwLength= _videostream.dwLength;
 		   
   			header->dwSampleSize = 0;
@@ -350,7 +350,7 @@ uint32_t extraLen=0;
 			extra=(uint8_t *)&mp3vbr;
 			extraLen=sizeof(mp3vbr);
 		   }	
-		   else wav->blockalign=1;
+		   else wav.blockalign=1;
 
 			
 
@@ -358,17 +358,23 @@ uint32_t extraLen=0;
 	
 					 
 	case WAV_WMA:
-			header->dwScale 	= wav->blockalign;
-			header->dwSampleSize 	= wav->blockalign;
+			header->dwScale 	= wav.blockalign;
+			header->dwSampleSize 	= wav.blockalign;
 			header->dwInitialFrames =1;				
-			header->dwSuggestedBufferSize=10*wav->blockalign;				
+			header->dwSuggestedBufferSize=10*wav.blockalign;				
 			
 			extra=(uint8_t *)&wmaheader;
 			extraLen=12;
 			break;
+          case WAV_8BITS_UNSIGNED:
+                        wav.encoding=WAV_PCM;
+                        wav.bitspersample=8;
+                        break;
+                        
+                        
 	default:
 			header->dwScale = 1;  
-			wav->blockalign=1;	
+			wav.blockalign=1;	
 			break;
     }
 #ifdef ADM_BIG_ENDIAN
@@ -378,7 +384,7 @@ uint32_t extraLen=0;
 	WAVHeader w;
 	memcpy(&as,header,sizeof(as));
 	Endian_AviStreamHeader(&as);		
-	memcpy(&w,wav,sizeof(w));
+	memcpy(&w,&wav,sizeof(w));
 	Endian_WavHeader( &w );
   	setStreamInfo (_file, 
 		(uint8_t *) &as,
@@ -391,7 +397,7 @@ uint32_t extraLen=0;
 #else
 	setStreamInfo (_file,
 			(uint8_t *) header,
-	 		(uint8_t *) wav, sizeof (WAVHeader),
+	 		(uint8_t *) &wav, sizeof (WAVHeader),
 			// MOD Feb 2005 by GMV: ODML support
 			odml_super_idx_size,odml_stream_nbr,
 			// END MOD Feb 2005 by GMV
