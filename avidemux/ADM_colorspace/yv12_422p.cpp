@@ -93,3 +93,47 @@ void fastYV12_422_mmx( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h)
 	__asm__ ("EMMS");
 }
 #endif
+
+// Convert yv12 planar to yuv422 i
+
+void YV12_422_C( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h)
+{
+uint8_t *y,*y2,*u,*v,*out2;
+uint32_t dx,dy;
+
+	out2=out+w*2;
+	y=in;
+	y2=in+w;
+	u=in+w*h;
+	v=in+((w*h*5)>>2);
+	for(dy=h>>1;dy>0;dy--)
+	{
+		for(dx=w>>1;dx>0;dx--)
+		{
+
+			*(out+0)=*y++;
+			*(out+1)=*v;
+			*(out+2)=*y++;
+			*(out+3)=*u;
+
+
+			*(out2+0)=*y2++;
+			*(out2+1)=*v++;	
+			*(out2+2)=*y2++;
+			*(out2+3)=*u++;	
+
+			out2+=4;
+			out+=4;
+		}
+		out+=w*2;
+		out2+=w*2;
+		y+=w;
+		y2+=w;
+		
+	
+	}
+}
+void YV12_422( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h)
+{
+	YV12_422_C(in,out,w,h);
+}
