@@ -104,10 +104,11 @@ uint32_t  ffmpegEncoder::frameType( void )
 	k=_context->coded_frame->key_frame;
 	t=_context->coded_frame->pict_type;
 	
-//	printf(" Kf: %d type :%d \n",k,t);
+	//printf(" Kf: %d type :%d \n",k,t);
 	if(k==1) return AVI_KEY_FRAME;
 	if(t==FF_B_TYPE) return AVI_B_FRAME;
-	else return 0;
+	//if(t==FF_I_TYPE) return AVI_KEY_FRAME;
+	return 0;
 
 }
 /*
@@ -140,18 +141,20 @@ uint8_t     ffmpegEncoder::gopMpeg1(void)
 	if(_settingsPresence)
 	{
 		_context->rc_max_rate=_settings.maxBitrate*8; //1800*1000;// 2400 max, 700 min
+		_context->rc_buffer_size=_settings.bufferSize;
 		//_context->rc_max_rate=1800*1000;
-		printf("Max rate : %lu kbps\n",(_context->rc_max_rate)/1000);
+		printf("FF Max rate : %lu kbps\n",(_context->rc_max_rate)/1000);
 	}
 	//_context->rc_min_rate=700*1000;
 	//_context->rc_min_rate=500*1000;
 
-	_context->rc_buffer_size=224*1000*8; // 40 for VCD  & 200 for SVCD
+	_context->rc_buffer_size=_settings.bufferSize; // 40 for VCD  & 200 for SVCD
 	_context->rc_buffer_aggressivity=1.0;
 	_context->rc_initial_cplx=3;
 	_context->qmin		= 2;
     	_context->qmax		= 31;
 	_context->gop_size=_settings.gop_size;
+	_context->scenechange_threshold=0xfffffff; // Don't insert I frame out of order
 	//
 	//_context->dsp_mask= FF_MM_FORCE;
 
@@ -252,7 +255,7 @@ uint8_t ffmpegEncoderCQ::encode(	uint8_t 	*in,
 					uint32_t 	*flags)
 {
   int32_t sz=0;
-
+  uint32_t f;
     	encodePreamble(in);
 
        _frame.quality=(int)floor(FF_QP2LAMBDA * _qual + 0.5);
@@ -266,9 +269,12 @@ uint8_t ffmpegEncoderCQ::encode(	uint8_t 	*in,
 		return 0;
 
        *len=(uint32_t)sz;
+       f=frameType();
 	if(flags)
-		*flags=frameType();
-	res.is_key_frame=_frame.key_frame;
+		*flags=f;
+	res.is_key_frame=0;
+	if(f==AVI_KEY_FRAME)
+		res.is_key_frame=1;
 	res.texture_bits=_context->i_tex_bits + _context->p_tex_bits;
 	res.motion_bits=_context->mv_bits;
 	res.total_bits=sz*8; // bytes -> bits
@@ -475,7 +481,7 @@ uint8_t ffmpegEncoderVBRExternal::encodeVBR(
   UNUSED_ARG(nq);
   UNUSED_ARG(forcekey);
   int32_t sz=0;
-
+  uint32_t f;
     	encodePreamble(in);
 
 
@@ -489,9 +495,14 @@ uint8_t ffmpegEncoderVBRExternal::encodeVBR(
 									return 0;
 
        *len=(uint32_t)sz;
+       f=frameType();
 	if(flags)
-		*flags=frameType();
+		*flags=f;
 	res.out_quantizer=(int)floor(_context->coded_frame->quality / (float)FF_QP2LAMBDA);
+	if(f==AVI_KEY_FRAME)
+		res.is_key_frame=1;
+	else
+		res.is_key_frame=0;
 	return 1;
 
 
@@ -508,11 +519,11 @@ uint8_t ffmpegEncoderVBRExternal::init( uint32_t val,uint32_t fps1000)
 	_qual=val;
  	mplayer_init();
 
-	_context->frame_rate_base	=1000;
+	_context->frame_rate_base		=1000;
 	_context->frame_rate         		= fps1000;
 	_context->flags              		|=   CODEC_FLAG_QSCALE;;
   	_context->bit_rate           		= 0;
-    	_context->bit_rate_tolerance 	= 1024 * 8 * 1000;
+    	_context->bit_rate_tolerance 		= 1024 * 8 * 1000;
 	_context->max_qdiff			=10;
 
 	// since this is used only for mpeg1 ...

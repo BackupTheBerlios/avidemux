@@ -64,6 +64,10 @@ typedef struct FFcodecSetting
 	int		is_spatial_cplx_masking;	// spatial masking 0--1
 	float		spatial_cplx_masking;	// spatial masking 0--1
 	int		_NORMALIZE_AQP;		// normalize adap quantiz
+	
+	//
+	int		use_xvid_ratecontrol;
+	int		bufferSize;
 	int		dummy;
 	
 }FFcodecSetting;
