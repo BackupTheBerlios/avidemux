@@ -89,20 +89,7 @@ public:
         virtual uint8_t  goToTime(uint32_t newoffset);
 
 };
-//_____________________________________________
-class AVDMProcessMono2Stereo : public AVDMProcessAudioStream
-{
-protected:
-               uint8_t _buffer[PROCESS_BUFFER_SIZE];
-public:
-						
-        AVDMProcessMono2Stereo(AVDMGenericAudioStream *instream);
-        ~AVDMProcessMono2Stereo();						
-        virtual uint32_t read(uint32_t len,uint8_t *buffer);
-		 virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer);
-        virtual uint8_t  goToTime(uint32_t newoffset);
-     		
-};
+
 //_______________________________________________________________
 class AVDMProcessAudio_Compress : public AVDMBufferedAudioStream
 {
@@ -116,6 +103,30 @@ public:
 
      		
 };
+//_____________________________________________
+class AVDMProcessMono2Stereo : public AVDMBufferedAudioStream
+{
+protected:
+                virtual uint32_t 	grab(uint8_t *obuffer);	
+			uint8_t		_engaged;
+public:
+						
+        AVDMProcessMono2Stereo(AVDMGenericAudioStream *instream);
+        ~AVDMProcessMono2Stereo();
+     		
+};
+class AVDMProcessStereo2Mono : public AVDMBufferedAudioStream
+{
+protected:
+                virtual uint32_t 	grab(uint8_t *obuffer);	
+			uint8_t		_engaged;
+public:
+						
+        AVDMProcessStereo2Mono(AVDMGenericAudioStream *instream);
+        ~AVDMProcessStereo2Mono();
+     		
+};
+
 //_____________________________________________
 class AVDMProcessAudio_Null : public AVDMBufferedAudioStream
 {

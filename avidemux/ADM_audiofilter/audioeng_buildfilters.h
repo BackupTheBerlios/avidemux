@@ -65,6 +65,14 @@ typedef enum FILMCONV
 	FILMCONV_LAST
 }FILMCONV;
 
+typedef enum CHANNELCONV
+{
+	CHANNELCONV_NONE=0,
+	CHANNELCONV_2to1=1,
+	CHANNELCONV_1to2=2,
+	CHANNELCONV_last
+}CHANNELCONV;
+
 void audioCodecSetcodec(AUDIOENCODER codec);
 
 /*  for job/workspace stuff  */
@@ -84,6 +92,9 @@ void audioFilterDownsample(uint8_t onoff);
 void audioFilterResample(uint32_t onoff);
 uint8_t audioFilterDelay(int32_t delay);
 uint8_t audioFilterFilm2Pal(uint8_t onoff);
+
+uint8_t audioFilterMono2Stereo(uint8_t onoff);
+uint8_t audioFilterStereo2Mono(uint8_t onoff);
 
 void audioFilter_SetBitrate( int i);
 

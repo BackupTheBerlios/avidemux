@@ -100,7 +100,7 @@ int 	   audioShift = 0;
 int	   audioDelay=0;
 
 FILMCONV audioFilmConv=FILMCONV_NONE;
-
+CHANNELCONV audioChannelConv=CHANNELCONV_NONE;
 
 // MP3 parameters
  int audioMP3mode = 0, audioMP3bitrate = 128;
@@ -144,6 +144,23 @@ uint8_t audioFilterDelay(int32_t delay)
 	return 1;
 
 }
+uint8_t audioFilterMono2Stereo(uint8_t onoff)
+{
+	if(onoff)
+		audioChannelConv=CHANNELCONV_1to2;
+	else
+		audioChannelConv=CHANNELCONV_NONE;
+	return 1;
+}
+uint8_t audioFilterStereo2Mono(uint8_t onoff)
+{
+	if(onoff)
+		audioChannelConv=CHANNELCONV_2to1;
+	else
+		audioChannelConv=CHANNELCONV_NONE;
+	return 1;
+}
+
 uint8_t audioFilterFilm2Pal(uint8_t onoff)
 {
 	if(onoff) audioFilmConv=FILMCONV_FILM2PAL;
@@ -175,12 +192,12 @@ void audioFilter_SetBitrate( int i)
 }
 
 extern  int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
-  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv);
+  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv,CHANNELCONV *channel);
 
 void audioFilter_configureFilters( void )
 {
 	 DIA_getAudioFilter(&audioNormalizeMode,&audioResampleMode,&audioShift,&audioDelay,&audioDRC,&audioFreq,
-	 		&audioFilmConv );
+	 		&audioFilmConv,&audioChannelConv );
 
 }
 
@@ -271,6 +288,7 @@ uint8_t audioFilterSetByName( const char *name)
 	Read(audioShift);
 	Read(audioDelay);
 	Read(audioFreq);
+	Read(audioChannelConv);
 	return 1;
 }
 
@@ -287,6 +305,7 @@ const char *audioFilterGetName( void )
 	Add(audioShift);
 	Add(audioDelay);
 	Add(audioFreq);
+	Add(audioChannelConv);
 	return conf;
 
 }
@@ -534,7 +553,27 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 		break;
 	
 		
-      	}      		
+      	}   
+	switch(audioChannelConv)
+	{
+		case CHANNELCONV_NONE:break;
+		case CHANNELCONV_2to1:
+				AVDMProcessStereo2Mono *s2m;
+				s2m = new AVDMProcessStereo2Mono(lastFilter);
+				lastFilter = s2m;
+				filters[filtercount++] = lastFilter;	
+				break;
+		case CHANNELCONV_1to2:
+				AVDMProcessMono2Stereo *m2s;
+				m2s = new AVDMProcessMono2Stereo(lastFilter);
+				lastFilter = m2s;
+				filters[filtercount++] = lastFilter;	
+				break;
+		default:
+				ADM_assert(0);
+	
+	
+	}   		
 	
 	
 //_______________________________________________________
