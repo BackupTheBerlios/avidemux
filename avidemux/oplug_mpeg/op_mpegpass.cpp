@@ -31,6 +31,7 @@
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_lavformat/ADM_lavformat.h"
 #include "ADM_lvemux/ADM_muxer.h"
 
 
@@ -43,36 +44,19 @@
 { \
 	uint32_t samples; \
 	uint32_t fill=0; \
-	total_wanted+=pcm; \
-	while(total_got <total_wanted) \
+	while(muxer->needAudio()) \
 	{				\
-		if(!audio->getPacket(buffer+fill, &audiolen, &samples))	\
+		if(!audio->getPacket(buffer, &audiolen, &samples))	\
 		{ \
 			break; \
 		}\
-		fill+=audiolen; \
+		if(audiolen) \
+			muxer->writeAudioPacket(audiolen,buffer); \
 		total_got+=audiolen; \
 	} \
-	if(fill) muxer->writeAudioPacket(fill,buffer); \
-	else	printf("PassThrough: frame %lu : no more audio\n",i);\
 }
-#if 0
- #define PACK_AUDIO(x) {\
- 			total_wanted+=pcm; \
- 			if(muxer->audioEmpty()) \
-	 			audiolen=(uint32_t)floor(8+total_wanted-total_got);\
-			else \
- 				audiolen=(uint32_t)floor(total_wanted-total_got);\
- 			audiolen = audio->read (audiolen,buffer); \
-			total_got+=audiolen; \
-			if(audiolen) \
-				muxer->writeAudioPacket(audiolen,buffer); \
-			else \
-				printf("No audio %lu ?\n",i); \
-			}
-			
-#endif 
- uint8_t isMpeg12Compatible(uint32_t fourcc);
+
+uint8_t isMpeg12Compatible(uint32_t fourcc);
  
 void mpeg_passthrough(  char *name )
 {
@@ -82,12 +66,14 @@ void mpeg_passthrough(  char *name )
   uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3];
   
   DIA_working *work;
-  double pcm=0;
+  
   
   double total_wanted=0;
   double total_got=0;
-  
-  MpegMuxer *muxer=NULL;
+ 
+ //#define MYMUXER MpegMuxer
+ #define MYMUXER lavMuxer
+  MYMUXER *muxer=NULL;
   
   	printf("Saving as mpg PS to file %s\n",name);
   
@@ -103,21 +89,27 @@ void mpeg_passthrough(  char *name )
 		return ;
   	}
   
-  	audio=mpt_getAudioStream(&pcm);
+	
+	
+  	audio=mpt_getAudioStream();
 	if(!audio)
 	{
-		GUI_Alert("Audio track is not suitable!\n");
+		GUI_Alert("Audio track is  not suitable!\n");
 		return;
 	}
-		
-	if(!pcm)
+	// Check
+	WAVHeader *hdr=audio->getInfo();
+	if(hdr->frequency!=48000 || 
+		(hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
 	{
-		GUI_Alert("Audio track is not suitable(2)!\n");
-		return;
+		deleteAudioFilter();
+		GUI_Alert("Audio track is not suitable!\n");
+		return ;
+	
 	}
 	
-  	muxer=new MpegMuxer();
-	if(!muxer->open(name,MUX_MPEG_VRATE,avifileinfo->fps1000,audio->getInfo(),pcm))
+  	muxer=new MYMUXER();
+	if(!muxer->open(name,MUX_MPEG_VRATE,avifileinfo,audio->getInfo()))
 	{
 		delete muxer;
 		muxer=NULL;
@@ -135,6 +127,11 @@ void mpeg_passthrough(  char *name )
   video_body->getRawStart (frameStart, buffer, &len);
   muxer->writeVideoPacket (len,buffer);
 */
+// 	while(total_got<3000)
+// 	{
+//   		PACK_AUDIO(0)
+// 	}
+  uint32_t cur=0;
   for (uint32_t i = frameStart; i < frameEnd; i++)
     {
       
@@ -160,15 +157,19 @@ void mpeg_passthrough(  char *name )
 	if (!found)	    goto _abt;
 	  // Write the found frame
 	video_body->getRaw (found, buffer, &len);
-	muxer->writeVideoPacket (len,buffer);	
+	
+	muxer->writeVideoPacket (len,buffer,cur++,found-frameStart);	
 	PACK_AUDIO(0)
+	
 	  
 	  // and the B frames
 	for (uint32_t j = i; j < found; j++)
 	    {
 		video_body->getRaw (j, buffer, &len);
-		muxer->writeVideoPacket (len,buffer);
+		
+		muxer->writeVideoPacket (len,buffer,cur++,j-frameStart);
 		PACK_AUDIO(0)
+		
     	    }
 	  i = found;		// Will be plussed by for
 	}
@@ -180,23 +181,29 @@ void mpeg_passthrough(  char *name )
 			video_body->getRaw (i, buffer, &len);
 			if(buffer[0]==0 && buffer[1]==0 && buffer[2]==1 && buffer[3]==0xb3) // Seq start
 			{
-				muxer->writeVideoPacket (len,buffer);		
+				muxer->writeVideoPacket (len,buffer,cur++,i-frameStart);
 				PACK_AUDIO(0)
+				
+				
 			}
 			else // need to add seq start
 			{
 				uint32_t seq;
 				video_body->getRawStart (frameStart, buffer, &seq);  		
 	  			video_body->getRaw (i, buffer+seq, &len);
-				muxer->writeVideoPacket (len+seq,buffer);
+				
+				muxer->writeVideoPacket (len+seq,buffer,cur++,i-frameStart);
 				PACK_AUDIO(0)
+				
 			}
 		}
 		else
 		{
 			video_body->getRaw (i, buffer, &len);
-			muxer->writeVideoPacket (len,buffer);		
+			
+			muxer->writeVideoPacket (len,buffer,cur++,i-frameStart);
 			PACK_AUDIO(0)
+			
 		}
 	}
 

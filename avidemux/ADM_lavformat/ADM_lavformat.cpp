@@ -95,7 +95,7 @@ lavMuxer::~lavMuxer()
 	close();
 }
 //___________________________________________________________________________
-uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHeader *audioheader,float need)
+uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHeader *audioheader)
 {
  AVCodecContext *c;
 	_fps1000=info->fps1000;
@@ -194,7 +194,8 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHea
 	dump_format(oc, 0, filename, 1);
 
 
-	aprintf("lavformat mpeg muxer initialized\n");
+	printf("lavformat mpeg muxer initialized\n");
+	
 	_running=1;
 	_audioByterate=audioheader->byterate;
 	one=(1000*1000*1000)/_fps1000;
@@ -224,14 +225,14 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 	  //  pkt.flags |= PKT_FLAG_KEY; 
             pkt.data= buf;
             pkt.size= len;
-            
+            aprintf("A: frame  pts%d\n",pkt.pts);    
             ret = av_write_frame(oc, &pkt);
 	    if(ret) 
 			{
 				printf("Error writing audio packet\n");
 				return 0;
 			}
-	aprintf("A: frame %lu pts%d\n",_frameNo,pkt.pts);
+	
 	return 1;
 }
 //___________________________________________________________________________
@@ -245,9 +246,12 @@ uint8_t lavMuxer::needAudio( void )
 	    	f/=_audioByterate;
 		f+=2000;
 		dts=(uint64_t)floor(f);
-		
+		aprintf("Need audio  ?: %llu / %llu\n",dts,_curDTS);
 		if((dts>=_curDTS) && (dts<=_curDTS+one)) return 1;
-		ADM_assert(dts>_curDTS);
+		if(dts<=_curDTS)
+		{
+			printf("LavMuxer:Audio DTS is too low %llu / %llu!\n",dts,_curDTS);
+		}
 		return 0;
 }
 //___________________________________________________________________________
@@ -274,7 +278,7 @@ double p,d;
 	
 	pkt.dts=(int64_t)floor(d);
 	pkt.pts=(int64_t)floor(p);
-	
+	aprintf("Lavformat : Pts :%llu dts:%llu",pkt.pts,pkt.dts);
 	pkt.stream_index=0;
            
 	pkt.data= buf;
@@ -293,7 +297,7 @@ double p,d;
 		printf("Error writing video packet\n");
 		return 0;
 	}
-	aprintf("V: frame %lu pts%d\n",_frameNo,pkt.pts);
+	aprintf("V: frame %lu pts%d\n",frameno,pkt.pts);
 	
 	return 1;
 }
@@ -310,7 +314,7 @@ uint8_t lavMuxer::close( void )
 		_running=0;
 		// Flush
 		// Cause deadlock :
-		av_write_trailer(oc);
+		//av_write_trailer(oc);
 		url_fclose(&oc->pb);
 
 	}

@@ -86,6 +86,7 @@
 #include "ADM_encoder/adm_encffmpeg.h"
 
 
+
 #warning FIXME: Duplicate define with mpeg2enc -> bad
 #define MPEG_PREFILL 5
 
@@ -185,42 +186,22 @@ uint8_t  mpegWritter::save_svcd(char *name)
 	return 0;
 }
 
-#if 0
-#define PACK_AUDIO 	{ uint32_t audiolen=0, audioread=0;	\
-				 { \
-				audioWanted+=_audioOneFrame; \
-				if(_muxer->audioEmpty()) \
-	 				audiolen=(uint32_t)floor(8+audioWanted-audioGot);\
-				else \
- 					audiolen=(uint32_t)floor(audioWanted-audioGot);\
-				audioread = _audio->read (audiolen,_audioBuffer); \
-				if(audioread!=audiolen) printf("Mmm not enough audio..\n"); \
-					_muxer->writeAudioPacket(audioread,_audioBuffer);\
-				encoding->feedAudioFrame(audioread); \
-				audioGot+=audioread;\
-				}\
-			}
-#else
+
+
 #define PACK_AUDIO \
 { \
 	uint32_t samples; \
-	uint32_t fill=0; \
-	audioWanted+=_audioOneFrame; \
-	while(audioGot <audioWanted) \
+	while(_muxer->needAudio()) \
 	{				\
-		if(!_audio->getPacket(_audioBuffer+fill, &audiolen, &samples))	\
+		if(!_audio->getPacket(_audioBuffer, &audiolen, &samples))	\
 		{ \
 			break; \
 		}\
-		fill+=audiolen; \
+		if(audiolen) \
+			_muxer->writeAudioPacket(audiolen,_audioBuffer); \
 		audioGot+=audiolen; \
 	} \
-	if(fill) _muxer->writeAudioPacket(fill,_audioBuffer); \
-	else	printf("Mpeg Encoding: frame %lu : no more audio\n",i);\
 }
-
-
-#endif
 /*---------------------------------------------------------------------------------------*/
 uint8_t  mpegWritter::save_dvd(char *name)
 {
@@ -422,7 +403,7 @@ DIA_encoding		*encoding;
 				if(!len) continue;
 				if(_muxer)
 				{		
-						_muxer->writeVideoPacket(len,_buffer_out);
+						_muxer->writeVideoPacket(len,_buffer_out,i-MPEG_PREFILL,i-MPEG_PREFILL+1);
 						PACK_AUDIO;
 						
 				}else
@@ -452,7 +433,8 @@ DIA_encoding		*encoding;
 					fwrite(_buffer_out,len,1,fd);
 				else
 				{
-					_muxer->writeVideoPacket(len,_buffer_out);
+					_muxer->writeVideoPacket(len,_buffer_out,_total-MPEG_PREFILL+i,
+							_total-MPEG_PREFILL+i+1);
 					PACK_AUDIO;
 				}
 
@@ -846,7 +828,7 @@ uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 			{
 				
 				// write video
-				_muxer->writeVideoPacket(len,_buffer_out);
+				_muxer->writeVideoPacket(len,_buffer_out,i-MPEG_PREFILL,i+1-MPEG_PREFILL);
 						
 				PACK_AUDIO;
 			}
@@ -894,7 +876,7 @@ uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 		else
 		{
 			// write video
-			_muxer->writeVideoPacket(len,_buffer_out);		
+			_muxer->writeVideoPacket(len,_buffer_out,_total+i-MPEG_PREFILL,_total+i-MPEG_PREFILL+1);
 			PACK_AUDIO;
 
 		}
@@ -985,7 +967,7 @@ uint8_t mpegWritter::initLveMux( char *name )
 double one_pcm_audio_frame;
 uint32_t fps1000;
 
-	_audio=mpt_getAudioStream(&one_pcm_audio_frame);
+	_audio=mpt_getAudioStream();
 	if(!_audio)
 	{
 		printf("Cannot initialize lvemux\n");
@@ -993,14 +975,19 @@ uint32_t fps1000;
 	}
 	fps1000=getLastVideoFilter()->getInfo()->fps1000;
 	
-  	printf (" One audio frame : %f bytes\n", one_pcm_audio_frame);
-  	_audioOneFrame=one_pcm_audio_frame;
+  	
+  	
 	_audioBuffer=new uint8_t[MAXAUDIO]; // equivalent to 1 sec @ 448 kbps, should be more than
 					// enough, even with the buffering
 	printf("----- Audio Track for mpeg Ready.------\n");
 	
-	_muxer=new MpegMuxer();
-	if(!_muxer->open(name,MUX_MPEG_VRATE,fps1000,_audio->getInfo(),(float)one_pcm_audio_frame))
+	_muxer=new lavMuxer();	
+	// open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHeader *audioheader,float need);
+	aviInfo info;
+	info.width=getLastVideoFilter()->getInfo()->width;
+	info.height=getLastVideoFilter()->getInfo()->height;
+	info.fps1000=getLastVideoFilter()->getInfo()->fps1000;
+	if(!_muxer->open(name,(uint32_t )0,&info,_audio->getInfo()))
 	{
 		delete _muxer;
 		_muxer=NULL;
@@ -1013,118 +1000,31 @@ uint32_t fps1000;
 }
 
 
-AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm,uint8_t silent)
+AVDMGenericAudioStream *mpt_getAudioStream(void)
 {
-
-// Second check the audio track
-  	uint32_t fps1000;
-	uint32_t one_pcm_audio_frame;
-	int err;
-	AVDMGenericAudioStream *_audio=NULL;
-     
-	
-	if(!currentaudiostream) return NULL;
-	
-      	// compute the number of bytes in the incoming stream
-      	// to feed the filter chain
-      	double	byt;
-      	byt =	video_body->getTime (frameEnd + 1) - video_body->getTime (frameStart);
-      	byt *= currentaudiostream->getInfo ()->frequency;
-      	byt *= currentaudiostream->getInfo ()->channels;
-      	byt *= 2;
-      	byt /= 1000.;
-
-	if(audioProcessMode)
+AVDMGenericAudioStream *audio=NULL;
+	if (audio)	// else Raw copy mode
 	{
-      		_audio = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart),
-				  (uint32_t) floor (byt));
-	}
-	else
-	{				
-        	uint32_t    tstart,tend;
-		int32_t shift=0;
-		
-		if(!silent)
+		if (currentaudiostream->isCompressed ())
 		{
-			if(!  DIA_GetIntegerValue((int*)&shift, -1000, +1000, "Audio/video shift", 
-				"Audio Video Shift (ms):"))
+			if (!currentaudiostream->isDecompressable ())
 			{
-				return 0;		
+				return NULL;
 			}
 		}
-		else
-		{
-			shift=0;
-		}
-		
-	  	tstart = video_body->getTime (frameStart);		
-		tend = video_body->getTime (frameEnd);
-		deleteAudioFilter();
-		_audio=buildRawAudioFilter(  tstart, tend-tstart, shift);
+	      	audio = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart),
+				  (uint32_t) 0xffffffff);
 	}
-   	
-	if(_audio->getInfo()->encoding!=WAV_MP2 && _audio->getInfo()->encoding!=WAV_AC3)
+  	else // copymode
 	{
-		deleteAudioFilter();
-		return NULL;
+	// else prepare the incoming raw stream
+	// audio copy mode here
+	int32_t shift=0;
+	if(audioDelay && audioShift) shift=audioDelay;
+	audio=buildRawAudioFilter( video_body->getTime (frameStart), 
+		0xffffffff, shift);
 	}
-	//________________
-	uint32_t one_frame;
-  	aviInfo   info;
-	double    one_frame_double, one_delta_frame;
-  	WAVHeader *wav = NULL;
-
-  	ADM_assert (_audio);
-
-  	wav = _audio->getInfo ();
-  
-	if(videoProcessMode)
-	{
-  		fps1000 = getLastVideoFilter()->getInfo()->fps1000;
-	}else
-	{
-		fps1000 = avifileinfo->fps1000;
-	}
-  	
-  	// compute duration of a audio frame
-  	// in ms
-  	ADM_assert (fps1000);
-  	printf (" fps : %lu\n", fps1000);
-  	one_frame_double = (double) fps1000;
-  	one_frame_double = 1. / one_frame_double;
-  	// now we have 1/1000*fps=1/1000*duration of a frame in second
-  	one_frame_double *= 1000000.;
-  	// in ms now;
-  	one_frame = (uint32_t) floor (one_frame_double);
-  	printf (" One audio frame : %lu (%f) ms\n", one_frame,one_frame_double);
-
-
-  	double    pcm;
-  	// *2 because one sample is 16 bits
-  	// fix hitokiri bug part 1.
-  	pcm = one_frame_double * 2.;
-	pcm*= wav->frequency;
-	pcm*= wav->channels;
-  	pcm/= 1000.;
-  	one_pcm_audio_frame = (uint32_t) floor (pcm+0.5);
-  	printf (" one PCM audio frame is %lu bytes (%f) \n", one_pcm_audio_frame,pcm);
-
-  	// get the equivalent in bytes
-  	ADM_assert (wav);
-  	one_frame_double /= 1000.;	// go back to seconds
-  	one_frame_double *= wav->byterate;
-
-
-	  one_frame = (uint32_t) floor (one_frame_double+0.5);
-	
-  	#define SCALE 100.
-	*mypcm=one_frame_double;
-	// do some round up if needed, 100 is enough (?)
-	one_pcm_audio_frame=(uint32_t)floor(SCALE*(*mypcm)+0.5);
-	*mypcm=one_pcm_audio_frame;
-	*mypcm/=SCALE;
-	printf (" one coded audio frame is %lu bytes (%f was %f \n", one_frame,*mypcm,one_frame_double);  	
-	
-	return _audio;
+	return audio;
 }
+// EOF
 

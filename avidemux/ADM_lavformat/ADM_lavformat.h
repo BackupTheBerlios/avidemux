@@ -11,6 +11,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+
 class lavMuxer
 {
 protected:
@@ -24,7 +25,7 @@ public:
 		lavMuxer(void );
 		~lavMuxer(  );
 	uint8_t needAudio( void );
-	uint8_t open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHeader *audioheader,float need);
+	uint8_t open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHeader *audioheader);
 	uint8_t writeAudioPacket(uint32_t len, uint8_t *buf);
 	uint8_t writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe );
 	uint8_t forceRestamp(void);
