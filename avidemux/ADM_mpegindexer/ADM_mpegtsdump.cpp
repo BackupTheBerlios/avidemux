@@ -271,6 +271,7 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 			if(tryAudioTrack(name,0xA0+i,&audioTrack[i+16]))
 			{
 				printf("LPCM %d is present \n",i);
+				nbLPCM++;
 			}
 		}
 		
@@ -297,6 +298,14 @@ int32_t ptsShift=0;
 	uint8_t streamid;
 	ADM_mpegDemuxer *demuxer;
 
+	// If packets have been detected assume lpcm is there
+	if(id>=0xA0 && id<=0xA7)
+	{
+		track->channels=2;
+		track->bitrate=1536;
+		return 1;
+	}
+	
 	demuxer=new ADM_mpegDemuxerProgramStream(0xe0,id);
 	demuxer->open(name);
 
@@ -306,6 +315,7 @@ int32_t ptsShift=0;
 	ptsShift=demuxer->getPTSDelta();
 	delete demuxer;
 	printf("When trying track : %x, found : %lu bytes\n",id,audio);
+	
 	if(audio > 2000)
 		{
 				// now read it
