@@ -60,6 +60,6 @@ EXTRA_DIST =
 	
 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES = $(all_includes)   -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3
+INCLUDES = $(all_includes)   -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -Iamr_float
 noinst_HEADERS = 
 
