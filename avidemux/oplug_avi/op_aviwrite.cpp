@@ -191,7 +191,7 @@ WAVHeader *wav=NULL;
 // pre compute some headers with extra data in...
 uint8_t wmaheader[12];
 VBRext  mp3vbr;
-
+uint8_t aacHeader[12];
 uint8_t *extra=NULL;
 uint32_t extraLen=0;
      
@@ -221,7 +221,31 @@ uint32_t extraLen=0;
       
 	switch(wav->encoding)
 	{
-		case WAV_MP3:							
+		case WAV_AAC:
+		 // AAC is mostly VBR
+		 header->dwFlags=1;
+		 header->dwInitialFrames=0;
+		 header->dwRate=wav->frequency;
+		 header->dwScale=1536; //1024;		 
+		 header->dwSampleSize = 0;
+		 header->dwSuggestedBufferSize=8192;
+		 header->dwInitialFrames = 0;	   
+		 header->dwLength= _videostream.dwLength;
+		 wav->blockalign=4096;	  
+		 wav->bitspersample = 0; 
+		 
+		//*b++ = (BYTE)((profile +1) << 3 | (SRI >> 1));
+		//*b++ = (BYTE)(((SRI & 0x1) << 7) | (aacsource->GetChannelCount() << 3));
+		aacHeader[0]=0x2;
+		aacHeader[1]=0x0;
+		aacHeader[2]=0x11;
+		aacHeader[3]=0x90;
+		
+
+		extra=&(aacHeader[0]);
+		extraLen=4;
+		break;
+	case WAV_MP3:							
 		  // then update VBR fields
 		  mp3vbr.cbsize = R16(12);
 		  mp3vbr.wId = R16(1);

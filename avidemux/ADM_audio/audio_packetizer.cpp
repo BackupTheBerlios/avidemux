@@ -36,6 +36,7 @@ Split a stream into packet(s)
 
 #include "ADM_audio/ADM_a52info.h"
 #include "ADM_audio/ADM_mp3info.h"
+#include "ADM_audio/ADM_aacinfo.h"
 
 #define MINSTOCK 5000
 #define MINUS_ONE 0xffffffff	
@@ -73,6 +74,9 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 		case WAV_MP2:
 		case WAV_MP3:
 				return getPacketMP3(dest,len,samples);
+				break;
+		case WAV_AAC:
+				return getPacketAAC(dest,len,samples);
 				break;
 		case WAV_PCM:
 				return getPacketPCM(dest,len,samples);
@@ -241,3 +245,45 @@ uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 			return 1;
 }		
 //---
+uint8_t		AVDMGenericAudioStream::getPacketAAC(uint8_t *dest, uint32_t *len, 
+								uint32_t *samples)
+{
+	uint32_t instock,rd;
+	uint32_t startOffset,endOffset;
+	AacAudioInfo mpegInfo,mpegTemp;
+	
+				
+			ADM_assert(_wavheader->encoding==WAV_AAC);
+			if(packetTail<packetHead+8)
+			{
+				printf("PKTZ:Buffer empty\n");
+				return 0;
+			}
+			if(!getAACFrameInfo(&(packetBuffer[packetHead]),packetTail-packetHead,
+						&mpegInfo,&mpegTemp,&startOffset))
+			{
+				// Error decoding mpeg
+				printf("AACInfo:** CANNOT FIND AAC/ADTS START CODE**\n");
+				packetHead+=8;
+				return 0;
+			}
+			if(packetHead+startOffset+mpegInfo.size>packetTail)
+			{
+				printf("AAC packetizer: not enough data\n");
+				return 0;
+			}
+			memcpy(dest,&packetBuffer[packetHead+startOffset],
+					mpegInfo.size);
+			*len=mpegInfo.size;
+			*samples=mpegInfo.samples;
+			packetHead+=startOffset+mpegInfo.size;
+			if(packetTail>SIZE_INTERNAL)
+			{
+				// Wrap
+				memmove(packetBuffer,&packetBuffer[packetHead],packetTail-packetHead);
+				packetTail-=packetHead;
+				packetHead=0;
+			}
+			return 1;
+}
+//

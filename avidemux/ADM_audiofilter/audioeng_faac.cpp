@@ -38,7 +38,7 @@
 #include "faac.h"
 #include "ADM_audiofilter/audioeng_faac.h"
 
-
+static uint16_t remap[4096];
 // Ctor: Duplicate
 //__________
 
@@ -82,7 +82,7 @@ faacEncConfigurationPtr cfg;
      _handle = faacEncOpen(_wavheader->frequency,
                                  _wavheader->channels,
                                  &samples_input,
-				 &samples_input);
+				 &max_bytes_output);
     if(!_handle)
     {
     	printf("Cannot open faac with fq=%lu chan=%lu br=%lu\n",
@@ -99,15 +99,31 @@ faacEncConfigurationPtr cfg;
     cfg->useTns = 0;
     cfg->allowMidside = 1;
     cfg->bitRate = bitrate*1000;
-    cfg->outputFormat = 0;
+    cfg->outputFormat = 0; // 0 Raw 1 ADTS
     cfg->inputFormat = FAAC_INPUT_16BIT;
-	_wavheader->byterate=(bitrate*1000)/8;
+    cfg->useLfe=1;	
     if (!faacEncSetConfiguration(_handle, cfg)) 
     {
         printf("FAAC: Cannot set conf for faac with fq=%lu chan=%lu br=%lu\n",
 				_wavheader->frequency,_wavheader->channels,bitrate);
 	return 0;
     }
+    // update
+    _wavheader->byterate=(bitrate*1000)/8;
+//    _wavheader->dwScale=1024;
+//    _wavheader->dwSampleSize=0;
+    _wavheader->blockalign=4096;
+    _wavheader->bitspersample=0;
+    
+    printf("Faac init*zes\n");
+    
+    printf("Version        : %s\n",cfg->name);
+    printf("Bitrate        : %lu\n",cfg->bitRate);
+    printf("Mpeg2 (1)/4(0) : %u\n",cfg->mpegVersion);
+    printf("Use lfe      ) : %u\n",cfg->useLfe);
+    printf("Sample output  : %lu\n",_incoming_frame);
+
+    
     return 1;
 }
 
@@ -115,8 +131,9 @@ faacEncConfigurationPtr cfg;
 uint32_t AVDMProcessAudio_Faac::grab(uint8_t * obuffer)
 {
 uint32_t len,sam;
+	//printf("Faac: Read\n");
 	if(getPacket(obuffer,&len,&sam))
-		return sam;
+		return len;
 	return MINUS_ONE;
 }
 //______________________________________________
@@ -124,26 +141,51 @@ uint8_t	AVDMProcessAudio_Faac::getPacket(uint8_t *dest, uint32_t *len,
 					uint32_t *samples)
 {				
 uint8_t  *buf=dropBuffer;
+uint32_t nbSample=0;
 uint32_t rdall=0,asked,rd;
 int wr;
 
-	asked=_incoming_frame*_wavheader->channels*2;
+	asked=_incoming_frame*2*_wavheader->channels;
 	rd=_instream->read(asked,buf);
-	printf("Faac: asked :%lu got %lu",asked,rd);
+	
 	if(rd==0)
-		return MINUS_ONE;
+		return 0;
+	if(rd==MINUS_ONE)
+		return 0;		
 	    
   // Now encode
-  
-   wr = faacEncEncode(_handle,
+  	nbSample= rd/(2*_wavheader->channels);
+	switch(_wavheader->channels)
+	{
+	case 1:
+        	wr = faacEncEncode(_handle,
                       (int32_t *)buf,
-                      rd/(2*_wavheader->channels),
+                      nbSample, // Nb sample for all channels
                       dest,
                       64*1024
 		      );
+		break;
+	case 2:
+		// remap
+		uint16_t *in;
+		in=(uint16_t *)buf;
+		for(int i=0;i<nbSample;i++)
+		{
+			remap[i]=in[2*i];
+			remap[i+nbSample]=in[2*i+1];
+		}
+		wr = faacEncEncode(_handle,
+                      (int32_t *)buf,
+                      nbSample*2, // Nb sample for all channels
+                      dest,
+                      64*1024
+		      );
+		break;
+	}
+		     
 	*len=wr;
-	*samples=rd/(2*_wavheader->channels);
-		printf("Faac:  out:%d\n",wr);
+	*samples=nbSample;
+	printf("Faac: asked :%lu got %lu out len:%d sample:%d\n",asked,rd,wr,nbSample);
 	return 1;
 }
 
