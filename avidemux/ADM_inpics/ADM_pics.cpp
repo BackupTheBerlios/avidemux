@@ -56,7 +56,7 @@ uint8_t  picHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 	assert(framenum<=_nb_file);
 
  	fseek(_fd[framenum],_offset,SEEK_SET);
- 	fread(ptr,_imgSize[framenum],	_imgSize[framenum]-_offset,_fd[framenum]);
+ 	fread(ptr,_imgSize[framenum]-_offset,1,_fd[framenum]);
   	*framelen=_imgSize[framenum]-_offset;;
  	return 1;
 }
@@ -191,7 +191,7 @@ uint32_t			w=0,h=0;
        _first=atoi(end);
        printf("\n First : %lu, num digit :%lu",_first,nnum);
        *(end)=0;
-       printf("\n Path : %s",name);
+       printf("\n Path : %s\n",name);
 
        char realname[250];
        char realstring[250];
@@ -378,7 +378,7 @@ uint32_t			w=0,h=0;
 		 {
   				_video_bih.biCompression=_videostream.fccHandler=0;
 		 }
-
+		printf("Offset : %lu\n",_offset);
        return 1;
 }
 

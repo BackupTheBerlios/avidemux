@@ -103,7 +103,10 @@ int ADMfont::fontSetCharSet (char *charset)
 //int error;
 
 	//
-	if(!strcmp(charset,"UNICODE"))
+	if(!strcmp(charset,"UNICODE")
+	//||!strcmp(charset,"UTF-8")
+	
+	)
 		{
 			printf("\n Ascii, nothing to do\n");
 			return 1;
@@ -132,6 +135,8 @@ int ADMfont::fontSetCharSet (char *charset)
  #else
  	sz=iconv(_conv,&in,&sin,&out,&sout);
 #endif
+	if(sz==-1)
+		printf("Something went wrong with iconv...\n");
 // -- dummy
 	if(charset) printf("Iconv initialized, using charset :%s \n",charset);
 	return 1;
