@@ -59,6 +59,14 @@ int64_t startOfData;
 		flags=read32();
 		offset=read32();
 		len=read32();	
+		
+		if(fcc==MKFCC('r','e','c',' '))
+		{
+			_recHack=1;
+			count--;
+			continue;
+		}
+		
 		trackId=((fcc>>8) & 0xFF) -'0';;
 		if(trackId>3) trackId=0;
 	  	ccType=fcc >>16;
@@ -118,6 +126,7 @@ int64_t startOfData;
 	if(audioTrack!=0xff)  audiototal=audioCount[audioTrack];
 	while(count<total || audiocount<audiototal)
 	{
+_again:
 		fcc=len=0;
 		fcc=read32();
 		flags=read32();
@@ -132,7 +141,16 @@ int64_t startOfData;
 			// Its offset + startoff data should be there
 			startOfData=_movi.offset+8;
 			startOfData-=offset;
+			if(_recHack)
+			{
+				startOfData+=4+4+4;
+			}
 		
+		}
+		if(fcc==MKFCC('r','e','c',' '))
+		{
+			_recHack=1;
+			continue;
 		}
 		switch(ccType)
 		{
@@ -165,8 +183,10 @@ int64_t startOfData;
 				audiocount++;	
 			}
 			break;	
+		
+				
 		default:
-			printf("Unknown fcc:");fourCC::print(fcc);printf("\n");
+			printf("Idx Regulat: Unknown fcc:");fourCC::print(fcc);printf("\n");
 		}		
 		
 	}

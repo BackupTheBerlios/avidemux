@@ -50,6 +50,7 @@ protected:
 	  
 	  void 				walk(riffParser *p) ;
 	  uint32_t			_nbTrack;
+	  uint8_t			_recHack;
 	  //_________________________________________
 	  // This is temporary stuff to read the avi
 	  //_________________________________________
