@@ -160,11 +160,21 @@ void mpeg_passthrough(  char *name )
 	{
 		if(i==frameStart) // Pack sequ_start with the frame
 		{
-			uint32_t seq;
-			video_body->getRawStart (frameStart, buffer, &seq);  		
-	  		video_body->getRaw (i, buffer+seq, &len);
-			muxer->writeVideoPacket (len+seq,buffer);
-			PACK_AUDIO(0)
+			// Check if seq header is there..
+			video_body->getRaw (i, buffer, &len);
+			if(buffer[0]==0 && buffer[1]==0 && buffer[2]==1 && buffer[3]==0xb3) // Seq start
+			{
+				muxer->writeVideoPacket (len,buffer);		
+				PACK_AUDIO(0)
+			}
+			else // need to add seq start
+			{
+				uint32_t seq;
+				video_body->getRawStart (frameStart, buffer, &seq);  		
+	  			video_body->getRaw (i, buffer+seq, &len);
+				muxer->writeVideoPacket (len+seq,buffer);
+				PACK_AUDIO(0)
+			}
 		}
 		else
 		{

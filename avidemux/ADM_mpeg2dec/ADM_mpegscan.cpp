@@ -221,13 +221,52 @@ uint8_t			mpeg2decHeader::open(char *name)
 			}
 			printf("Dropping %ld last B/P frames\n",dropped);			
 			printf(" Creating start sequence (%llu)..\n",_indexMpegPTS[0].offset);
-
-
-		 	_startSeqLen=_indexMpegPTS[0].offset;
- 			_startSeq=new uint8_t[_startSeqLen];
- 		  	assert(  _startSeq );
-
-      		
+			
+			//
+			
+			uint32_t scancode=0;
+			uint32_t count=0,found=0;
+			uint32_t firstPic=_indexMpegPTS[0].size;
+			uint8_t *tmp=new uint8_t[firstPic];
+			
+			
+			demuxer->goTo(0);
+			demuxer->read(tmp,firstPic);
+			_startSeqLen=0;
+			_startSeq=NULL;
+			// lookup up gop start
+			while(count<firstPic)
+			{
+				scancode<<=8;
+				scancode+=tmp[count];
+				count++;
+				if(scancode==0x000001b8 || scancode==0x00000100)
+				{
+					found=1;
+					break;
+				}							
+			}
+			if(found && count>4)
+			{
+				
+				_startSeqLen=count-4;
+				_startSeq=new uint8_t[_startSeqLen];
+				memcpy(_startSeq,tmp,_startSeqLen);
+				printf("seqLen : %lu seq %x %x %x %x\n",
+					_startSeqLen, _startSeq[0],
+							_startSeq[1],
+							_startSeq[2],
+							_startSeq[3]);      					
+			}
+			else
+			{
+				printf("Mmm cound not find a gop start.....\n");
+			}
+			delete [] tmp;
+		 	
+			demuxer->goTo(0);
+      			
+			
 
       			// switch DTS->PTS
       			if(!renumber(0))
@@ -236,13 +275,7 @@ uint8_t			mpeg2decHeader::open(char *name)
 				return 0;
 			}
 			// Feed start seq
-			demuxer->goTo(0);
-      			demuxer->read(_startSeq,_startSeqLen);
-			printf("seqLen : %lu seq %x %x %x %x\n",
-					_startSeqLen, _startSeq[0],
-							_startSeq[1],
-							_startSeq[2],
-							_startSeq[3]);
+			
       			demuxer->goTo(0);
 
 			if(audio) printf("Audio bytes : %lu\n",audio);                        								

@@ -192,7 +192,7 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 						  //	return(decoders *)( new decoderDIVX(w,h));
 	}
 
-          if(fourCC::check(fcc,(uint8_t *)"MJPG"))
+          if(fourCC::check(fcc,(uint8_t *)"MJPG") || fourCC::check(fcc,(uint8_t *)"mjpa"))
           {
 #if  0
  //#ifdef USE_MJPEG

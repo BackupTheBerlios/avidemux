@@ -383,14 +383,16 @@ void call_fps(char *p)
 		float fps;
 		aviInfo info;
 
-		if (video_body) {
+		if (avifileinfo)
+		{
 			video_body->getVideoInfo(&info);
 			sscanf(p,"%f",&fps);
 			printf("\n Frames per Second %f\n",fps);
 			info.fps1000 = (uint32_t) (floor (fps * 1000.+0.49));
 			video_body->updateVideoInfo (&info);
 			video_body->getVideoInfo (avifileinfo);
-		} else {
+		} else 
+		{
 			printf("\n No Video loaded; ignoring --fps\n");
 		}
 }
