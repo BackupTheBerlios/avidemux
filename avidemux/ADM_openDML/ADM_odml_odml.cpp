@@ -178,6 +178,7 @@ uint32_t 	i,j;
 			return 0;
 		}	
 		aprintf("Base : %llx\n",second.base);
+		uint32_t sizeflag;
 		for( j=0;j<second.nbEntryInUse;j++)
 		{
 			if(second.indexSubType) // field
@@ -189,8 +190,12 @@ uint32_t 	i,j;
 				
 				(*index)[count].offset=read32();
 				(*index)[count].offset+=second.base;
-				(*index)[count].size=read32();
-				(*index)[count].intra=AVI_KEY_FRAME;
+				sizeflag=read32();
+				(*index)[count].size=sizeflag&0x7fffffff;
+				if(sizeflag & 0x80000000)
+					(*index)[count].intra=0;
+				else 
+					(*index)[count].intra=AVI_KEY_FRAME;
 				aprintf("Frame.off : %llx, size %llx\n",_idx[count].offset,
 									_idx[count].size);
 				count++;									
