@@ -21,6 +21,7 @@
 #include <glib.h>
 #include <signal.h>
 #include <unistd.h>
+#include <math.h>
 #include "config.h"
 
 #include <gtk/gtk.h>
@@ -83,6 +84,7 @@ static void call_setAudio(char *p) 	;
 static void call_indexMpeg(char *in,char *out,char *aid) 	;
 static void call_autosplit(char *p) 	;
 static void call_audiobitrate(char *p) 	;
+static void call_fps(char *p) 	;
 static void call_audiocodec(char *p) 	;
 static void call_videocodec(char *p) ;
 static void call_videoconf(char *p) ;
@@ -153,6 +155,7 @@ AUTOMATON reaction_table[]=
 		{"audio-delay",		1	,"set audio time shift in ms (+ or -)",	call_setAudio},
 		{"audio-map",		0	,"build audio map (MP3 VBR)",	call_buildtimemap},
 		{"audio-bitrate",	1	,"set audio encoding bitrate",	call_audiobitrate},
+		{"fps",	1	,"set frames per second",	call_fps},
 		{"audio-codec",		1	,"set audio codec (MP2/MP3/AC3/NONE/TOOLAME)",call_audiocodec},
 		{"audio-toolame",	1	,"pipe audio to toolame and save to file",call_toolame},
 		{"video-codec",		1	,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD)",				call_videocodec},
@@ -373,6 +376,23 @@ void call_audiobitrate(char *p)
 		sscanf(p,"%ld",&i);
 		printf("\n Audio bitrate %ld\n",i);
 		audioFilter_SetBitrate(i);
+}
+void call_fps(char *p)
+{
+
+		float fps;
+		aviInfo info;
+
+		if (video_body) {
+			video_body->getVideoInfo(&info);
+			sscanf(p,"%f",&fps);
+			printf("\n Frames per Second %f\n",fps);
+			info.fps1000 = (uint32_t) (floor (fps * 1000.+0.49));
+			video_body->updateVideoInfo (&info);
+			video_body->getVideoInfo (avifileinfo);
+		} else {
+			printf("\n No Video loaded; ignoring --fps\n");
+		}
 }
 void call_autosplit(char *p)
 {
