@@ -72,7 +72,7 @@ static unicd  names[]=
 	{(char *)"Cyrillic"	,(char *)"WINDOWS-1251"}, // ru
 	{(char *)"Czech"	,(char *)"ISO-8859-2"},	// cz
 	{(char *)"German"	,(char *)"ISO-8859-9"}		// german ?
-	,{(char *)"UTF-16"	,(char *)"UTF-16"}		// UTF8
+	,{(char *)"UTF"	,(char *)"UTF8"}		// UTF8
 };
 
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);

@@ -65,6 +65,7 @@
  protected:
 
 	    	SUBCONF					*_conf;
+		uint8_t 				_utf16;
        virtual char 					*printConf(void) ;
         FILE						*_fd;
         uint8_t						loadSubTitle( void );

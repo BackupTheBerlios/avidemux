@@ -122,7 +122,7 @@ int ADMfont::fontSetCharSet (char *charset)
 // do a dummy conversion
 
 	char *in,*out;
-	size_t sin,sout,sz;
+	size_t sin,sout=120,sz;
 	uint32_t cin=65,cout;
 
 	in=(char *)&cin;

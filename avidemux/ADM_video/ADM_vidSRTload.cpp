@@ -34,7 +34,7 @@
 #include "config.h"
 
 #ifdef USE_FREETYPE
-
+#define __STDC_ISO_10646__
 #include "fourcc.h"
 #include "avio.hxx"
 
@@ -48,238 +48,344 @@
 #include "ADM_video/ADM_vidSRT.h"
 
 
-uint8_t ADMVideoSubtitle::loadFont( void )
+static void utf16_init(void);
+static void utf16_end(void);
+static void utf16_string( char *string);
+
+static iconv_t myIconv=(iconv_t)-1;
+
+uint8_t
+ADMVideoSubtitle::loadFont (void)
 {
- if(!_font->initFreeType(_conf->_fontname))
+  if (!_font->initFreeType (_conf->_fontname))
+    {
+      printf ("\n Free type init failed for font %s!", _conf->_fontname);
+    }
+  else
+    {
+      _font->fontSetSize (_conf->_fontsize);
+      if (!_font->fontSetCharSet (_conf->_charset))
 	{
-			printf("\n Free type init failed for font %s!",_conf->_fontname);
+	  GUI_Alert
+	    ("There was a problem with unicode/font\n continuing anyway...");
 	}
-	else
-	{
-		_font->fontSetSize(_conf->_fontsize);
-		if(!_font->fontSetCharSet(_conf->_charset))
-			{
-				GUI_Alert("There was a problem with unicode/font\n continuing anyway...");
-			}
-	}
-	return 1;
+    }
+  return 1;
 }
+
 //
-//	Load subtitles in .sub format i.e. {xx}{yy} |   |
+//      Load subtitles in .sub format i.e. {xx}{yy} |   |
 //
 // {3610}{3656}Pripravená uvíta» ich|v na¹om dome s primeranou úctou.
 //__________________________________________________________________
-uint8_t  ADMVideoSubtitle::loadSubTitle( void )
+uint8_t
+ADMVideoSubtitle::loadSubTitle (void)
 {
-char string[500];
-uint32_t current_line=0;
-	// first cound how many line
-	_line=0;
-	while(fgets(string,200,_fd))
-	{
-		_line++;
-	}
-	printf("\n subs : %ld lines\n",_line);
-	// rewind
-	fseek(_fd,0,SEEK_SET);
-	//
-	_subs=new subLine[_line];
-	if(!_subs) return 0;
-	memset(_subs,0,sizeof(subLine)*_line);
+  char string[500];
+  uint32_t current_line = 0;
+  // first cound how many line
+  _line = 0;
+  while (fgets (string, 200, _fd))
+    {
+      _line++;
+    }
+  printf ("\n subs : %ld lines\n", _line);
+  // rewind
+  fseek (_fd, 0, SEEK_SET);
+  //
+  _subs = new subLine[_line];
+  if (!_subs)
+    return 0;
+  memset (_subs, 0, sizeof (subLine) * _line);
 
-	for(uint32_t i=0;i<_line;i++)
-	{
-		 fgets(string,200,_fd);
-		 //printf("\n in : %s ",string);
-		 if(string[0]!='{') continue;
-		 subParse((subLine *)&(_subs[ current_line]),string);
-		 current_line++;
-	}
-	// the effective number of line we have
-	_line=current_line;
-	return 1;
-}
-//
-//	split the incoming string in start time/end time and string itself
-//
-uint8_t ADMVideoSubtitle::subParse( subLine *in, char *string )
-{
-	char *start,*end,*text;
-	uint32_t j,textlen,totallen;
-	float f;
-
-		 j=1;
-		 totallen=strlen(string);
-		 assert(totallen);
-		while(string[j]!='}' && j<totallen) j++;
-		string[j]=0;
-		start=&string[1];
-		j+=2; // skip }{
-		end=&string[j];
-		while(string[j]!='}'&& j<totallen) j++;
-		string[j]=0;
-
-		text=&string[j+1];
-
-		if(j==totallen-1)
-		{
-			printf("***ERR: Suspicious line !!!\n");
-			return 0;
-
-		}
-
-		// convert frame -> time in ms
-		 f=atoi(start);
-		 f=f*1000000./_info.fps1000;
-		in->startTime=(uint32_t)floor(f);
-
-		 f=atoi(end);
-		 f=f*1000000./_info.fps1000;
-		 in->endTime=(uint32_t)floor(f);
-
-		 textlen=strlen(text);
-		 if(!textlen)
-		 {
-			in->string=new char[1];
- 			strcpy(in->string,"");
-		}
-		else
-		{
-
-
-			end=text+textlen-1;
-			while((*end==0x0a || *end==0x0d)&&end>text)
-			{
-				textlen--;
-				*end=0;
-				end--;
-			}
-
-		 in->string=new char[textlen+1];
-		 strcpy(in->string,text);
-		// we scrap \n\r at the end
-
-
-		 }
-
-	return 1;
+  for (uint32_t i = 0; i < _line; i++)
+    {
+      fgets (string, 200, _fd);
+      //printf("\n in : %s ",string);
+      if (string[0] != '{')
+	continue;
+      subParse ((subLine *) & (_subs[current_line]), string);
+      current_line++;
+    }
+  // the effective number of line we have
+  _line = current_line;
+  return 1;
 }
 
 //
-//	Load subtitles in .srt format i.e. {xx}{yy} |   |
+//      split the incoming string in start time/end time and string itself
+//
+uint8_t
+ADMVideoSubtitle::subParse (subLine * in, char *string)
+{
+  char *start, *end, *text;
+  uint32_t j, textlen, totallen;
+  float f;
+
+  j = 1;
+  totallen = strlen (string);
+  assert (totallen);
+  while (string[j] != '}' && j < totallen)
+    j++;
+  string[j] = 0;
+  start = &string[1];
+  j += 2;			// skip }{
+  end = &string[j];
+  while (string[j] != '}' && j < totallen)
+    j++;
+  string[j] = 0;
+
+  text = &string[j + 1];
+
+  if (j == totallen - 1)
+    {
+      printf ("***ERR: Suspicious line !!!\n");
+      return 0;
+
+    }
+
+  // convert frame -> time in ms
+  f = atoi (start);
+  f = f * 1000000. / _info.fps1000;
+  in->startTime = (uint32_t) floor (f);
+
+  f = atoi (end);
+  f = f * 1000000. / _info.fps1000;
+  in->endTime = (uint32_t) floor (f);
+
+  textlen = strlen (text);
+  if (!textlen)
+    {
+      in->string = new char[1];
+      strcpy (in->string, "");
+    }
+  else
+    {
+
+
+      end = text + textlen - 1;
+      while ((*end == 0x0a || *end == 0x0d) && end > text)
+	{
+	  textlen--;
+	  *end = 0;
+	  end--;
+	}
+
+      in->string = new char[textlen + 1];
+      strcpy (in->string, text);
+      // we scrap \n\r at the end
+
+
+    }
+
+  return 1;
+}
+
+//
+//      Load subtitles in .srt format i.e. {xx}{yy} |   |
 //__________________________________________________________________
-uint8_t  ADMVideoSubtitle::loadSRT( void )
+uint8_t
+ADMVideoSubtitle::loadSRT (void)
 {
-char string[500],text[500];
-uint32_t line;
-	// first cound how many line
-	line=0;
-	_line=0;
-	while(fgets(string,300,_fd)) line++;
-	printf("\n subs : %ld lines\n",line);
-	// rewind
-	fseek(_fd,0,SEEK_SET);
-	//
-	_subs=new subLine[line];
+  char string[500], text[500];
+  uint32_t line;
+  char *wrkstring;
+  uint32_t len;
+  
+  if(_utf16)
+  	{
+		utf16_init();
+	}
+  // first cound how many line
+  line = 0;
+  _line = 0;
+  while (fgets (string, 300, _fd))
+    line++;
+  printf ("\n subs : %ld lines\n", line);
+  // rewind
+  fseek (_fd, 0, SEEK_SET);
+  //
+  _subs = new subLine[line];
 
-	if(!_subs) return 0;
-	memset(_subs,0,sizeof(subLine)*line);
-	// read and allocate
-	//double f;
-	uint32_t j;
-	int state=0;
+  if (!_subs)
+    return 0;
+  memset (_subs, 0, sizeof (subLine) * line);
+  // read and allocate
+  //double f;
+  uint32_t j;
+  int state = 0;
 
-	for(uint32_t i=0;i<line;i++)
+  for (uint32_t i = 0; i < line; i++)
+    {
+//                      printf(" %d - %d\n",i,line);
+      fgets (string, 200, _fd);
+//               printf(" state : %d line : %s\n",state,string);
+      switch (state)
 	{
-//			printf(" %d - %d\n",i,line);
-		 fgets(string,200,_fd);
-//		 printf(" state : %d line : %s\n",state,string);
-		 switch(state)
-		 {
-			 	case 0: // waiting for number
+	case 0:		// waiting for number
+	  if(_utf16)
+	  {
+	  	utf16_string(string);
+	  }
+	  j = atoi (string);
+	  if (j == _line + 1)
+	    {
+	      state = 1;
+	    }
+	  break;
+	case 1:		// waiting for time
+	  uint32_t sh, sm, ss, ms;
+	  uint32_t dh, dm, ds, md;
+	  // 00:00:00,040 --> 00:00:00,120
+	  if(_utf16)
+	  {
+	  	utf16_string(string);
+	  }
+	  
+	  if (8 !=
+	      sscanf (string,
+		      "%02lu:%02lu:%02lu,%03lu --> %02lu:%02lu:%02lu,%03lu",
+		      &sh, &sm, &ss, &ms, &dh, &dm, &ds, &md))
+	    {
+	      sscanf (string,
+		      "%02lu:%02lu:%02lu.%03lu --> %02lu:%02lu:%02lu.%03lu",
+		      &sh, &sm, &ss, &ms, &dh, &dm, &ds, &md);
+	    }
 
-			      		j=atoi(string);
-			          if(j==_line+1)
-			          	{
-									 	state=1;
-									}
-								break;
-				case 1: // waiting for time
-								uint32_t sh,sm,ss,ms;
-								uint32_t dh,dm,ds,md;
-								// 00:00:00,040 --> 00:00:00,120
-
-			  				if(8!=sscanf(string,"%02lu:%02lu:%02lu,%03lu --> %02lu:%02lu:%02lu,%03lu",
-			        						&sh,&sm,&ss,&ms,
-			              						&dh,&dm,&ds,&md))
-							{
-			                 			sscanf(string,"%02lu:%02lu:%02lu.%03lu --> %02lu:%02lu:%02lu.%03lu",
-			        						&sh,&sm,&ss,&ms,
-			              						&dh,&dm,&ds,&md);
-							}
-
-			           _subs[_line].startTime=ms+1000*(ss+sm*60+sh*3600);
-			           _subs[_line].endTime=md+1000*(ds+dm*60+dh*3600);
-			         /*  printf(" start : %d end :%d \n",
-							           _subs[_line].startTime,
-							           _subs[_line].endTime);
-				*/
-			           state=2;
-			           text[0]=0;
-			           break;
-			 case 2:// looking for text
+	  _subs[_line].startTime = ms + 1000 * (ss + sm * 60 + sh * 3600);
+	  _subs[_line].endTime = md + 1000 * (ds + dm * 60 + dh * 3600);
+	  /*  printf(" start : %d end :%d \n",
+	     _subs[_line].startTime,
+	     _subs[_line].endTime);
+	   */
+	  state = 2;
+	  text[0] = 0;
+	  break;
+	case 2:		
+	   // looking for text
+	   // We append each line to text with a | to separate the lines
 	  //printf("[debug] State 2 line %d : %s\n",_line,string);
-			 	       if(strlen(string)<3)
-			         	{
-										 _subs[_line].string=new char[strlen(text)+1];
-										 memcpy(_subs[_line].string,text,strlen(text)+1);
-              //printf("[debug] State 2 line %d added\n",_line);
-										_line++;
-										state=0;
-										break;
-								}
-								else
-								{
-										uint32_t l=strlen(string)-1;
-
-									while( string[l]==0xd || string[l]==0xa)
-										 {
-											 			string[l]=0;
-											    	l--;
-												};
-              if(text[0]) {
-                strcat(text,"|");
-	      }
-										strcat(text,string);
-										if(strlen(text)>300)
-										{
-												assert(0);
-										}
-								}
-			 
-			 					break;
-			 
+	  
+	  if(_utf16)
+	  {
+	  	utf16_string(string);
+	  }
+	  
+	  {
+	  	// Plain ascii/ ISO 88
+	 	wrkstring=string;
+	  	len=0;	
+		while(wrkstring[len]!='\n'&& wrkstring[len]!='\r' && len<500) len++;
+	  	if(len==500) continue;
+		wrkstring[len]=0;
+	  	// Last line ?
+	  	if (len < 2)
+	    	{
+	      		_subs[_line].string = new char[strlen (text) + 1];
+	      		strcpy (_subs[_line].string, text);			
+	      		//printf("[debug] State 2 line %d added\n",_line);
+	      		_line++;
+	      		state = 0;
+	      		break;
+	    	}
+	  	else
+	    	{
+	      		if (text[0])
+			{
+		  		strcat (text, "|");
 			}
-		
-	}	
+	      		strcat (text, string);
+	      		if (strlen (text) > 300)
+			{
+		  		assert (0);
+			}
+	    	}
+	  }
+	  break;
 
-   if (line > 0 && text) {
-    // Add last line
-    //printf("[debug] Last line : %s\n",text);
-    _subs[_line].string=new char[strlen(text)+1];
-    memcpy(_subs[_line].string,text,strlen(text)+1);
-    _line++;
-  }
+	}
+
+    }
+
+  if (line > 0 && text)
+    {
+      // Add last line
+      //printf("[debug] Last line : %s\n",text);
+      _subs[_line].string = new char[strlen (text) + 1];
+      memcpy (_subs[_line].string, text, strlen (text) + 1);
+      _line++;
+    }
 
 
-   // checks contents
+  // checks contents
   //  for(uint32_t i=0;i<line;i++) {
 //      printf("[debug] (%d) At %d %d : %s\n",i, _subs[i].startTime,
-// 	    _subs[i].endTime, _subs[i].string);
+//          _subs[i].endTime, _subs[i].string);
 //    }
 
+    if(_utf16)
+  	{
+		utf16_end();
+	}
+  
 
-
-	return 1;
+  return 1;
 }
+
+void utf16_init(void)
+{
+
+	myIconv=iconv_open("UTF8","UTF16LE"); //"WINDOWS-1251");
+	if((int)myIconv==-1)
+	{
+		printf("\n Error initializing iconv...\n");		
+	}
+
+}
+void utf16_end(void)
+{
+	if(myIconv==(iconv_t)-1) return;
+	iconv_close(myIconv);
+	myIconv=(iconv_t)-1;
+}
+#define MAXIC 4096
+void utf16_string( char *string)
+{
+	static char icc[MAXIC];
+	uint32_t len=0;
+	uint32_t sout=MAXIC>>1;
+	unsigned char c;
+	char *out;
+	char *wrkstring;
+	int cv;
+	
+	
+	out=(char *)icc;
+	
+	c=(unsigned char)string[0];
+	// skip unicode tag
+	switch(c)
+	{
+		case 0: wrkstring=string+1;break;
+		case 0xff: wrkstring=string+2;break;
+		default: wrkstring=string;break;
+	}
+	if(myIconv==(iconv_t)-1) return;
+	
+	while(wrkstring[len]!='\n' && len<MAXIC) len++;
+	if(len==MAXIC) return;
+	
+	memset(out,0,MAXIC);
+#if  defined(ICONV_NEED_CONST)	
+	cv=iconv(myIconv,(const char **)&wrkstring,&len,&out,&sout);
+#else
+	cv=iconv(myIconv,(char **)&wrkstring,&len,&out,&sout);
+#endif
+	// the ouput is always smaller than input in that case
+	
+	strcpy(string,icc);		
+//	aprintf("String :%d %s\n",cv,string);
+
+}
+
 #endif

@@ -136,7 +136,7 @@ void ADMVideoSubtitle::displayString(char *string)
 	uint32_t base,last=0,line=0;
 	double bbase;
 
-  //    printf("%s\n",workStr);
+      aprintf("%s\n",string);
 
 
 					// bbase is the final position in line

@@ -69,6 +69,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 
   _uncompressed=NULL;
   _font=NULL;
+  _utf16=0;
 
   _in=in;
   memcpy(&_info,_in->getInfo(),sizeof(_info));
@@ -161,15 +162,27 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 }
 uint8_t	ADMVideoSubtitle::loadSubtitle( void )
 {
-char c;
+unsigned char c,d;
 			_fd=fopen(_conf->_subname,"rt");
 			if(!_fd)
 			{
 				GUI_Alert("Could not open subtitle file");
 				return 0;
 			}
+			// Try to detect utf16 files
 			c=fgetc(_fd);
-			fseek(_fd,0,SEEK_SET);
+			d=fgetc(_fd);
+			if(c==0xFF && 0xfe==d)
+			{
+				printf("UTF16 file detected\n");
+				_utf16=1;
+				c=fgetc(_fd);
+			}
+			else
+			{
+				_utf16=0;
+				fseek(_fd,0,SEEK_SET);
+			}
 
 			switch(c)
 			{
