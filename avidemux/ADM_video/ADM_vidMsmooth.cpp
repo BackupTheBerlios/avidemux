@@ -85,7 +85,9 @@ static void Blur_C(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h) ;
 #ifdef HAVE_ALTIVEC
 void Blur_Altivec(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h);
 #endif
-
+#ifdef USE_MMX
+void Blur_MMX(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h);
+#endif
 class Msmooth : public AVDMGenericVideoStream
 {
 private:
@@ -469,6 +471,76 @@ uint32_t x,y;
 	
 }
 #endif
+
+#ifdef USE_MMX
+//______________________
+void Blur_MMX(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h)
+{
+uint8_t *srcp,*srcpn,*srcpp;
+uint8_t *workp;
+uint32_t x,y;
+uint32_t off;
+	
+	srcpp = in;
+	srcp  = srcpp + w;
+	srcpn = srcp + w;
+	workp = out + w;
+	for (y = 1; y < h - 1; y++)
+	{
+		for (x =  (w>>3);x>0; x--)
+		{
+			off=x<<3;
+			
+			__asm__(
+			".align 16\n"
+			"pxor  %%mm7,%%mm7\n"
+			"movq  (%0),%%mm0\n"
+			"movq  %%mm0,%%mm6\n"
+			"punpckhbw %%mm7,%%mm0\n"
+			"punpcklbw %%mm7,%%mm6\n"
+			
+			"movq  (%1),%%mm1\n"
+			"movq  %%mm1,%%mm5\n"
+			"punpckhbw %%mm7,%%mm1\n"
+			"punpcklbw %%mm7,%%mm5\n"
+			
+			"movq  (%2),%%mm2\n"
+			"movq  %%mm2,%%mm4\n"
+			"punpckhbw %%mm7,%%mm2\n"
+			"punpcklbw %%mm7,%%mm4\n"
+			
+			"paddw %%mm1,%%mm0\n"
+			"paddw %%mm5,%%mm6\n"
+			
+			"paddw %%mm1,%%mm2\n"
+			"paddw %%mm5,%%mm4\n"
+			
+			"paddw %%mm0,%%mm2\n"
+			"paddw %%mm6,%%mm4\n"
+			
+			"packsswb %%mm2,%%mm4\n"
+			"movq %%mm4,(%3)\n" //
+			
+			:: "r" (srcpn+off),
+			   "r" (srcp+off), "r" (srcpp+off), "r" (workp+off)
+			);
+			
+		}
+		workp[0]=srcp[0];
+		workp[w-1]=srcp[w-1];
+		srcpp += w;
+        	srcp += w;
+        	srcpn += w;
+        	workp += w;
+    }
+	// Do it at the end as it may have been scratched
+	// due to 16 byte alignment
+	memcpy(out, in, w);
+	memcpy(out + (h-1)*w, in + (h-1)*w, w);
+	
+}
+#endif
+
 //______________________
 void Blur_C(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h)
 {
@@ -516,6 +588,10 @@ void  Msmooth::EdgeMaskYV12(const unsigned char *srcp, unsigned char *blurp, uns
 	int y1, y2, y3, y4;
 
 	/* Blur the source image prior to detail detection. */
+	#if USE_MMX
+		Blur_MMX((uint8_t *)srcp,(uint8_t *)workp,row_size,height);
+		Blur_MMX((uint8_t *)workp,(uint8_t *)blurp,row_size,height);
+	#endif
 	#ifdef HAVE_ALTIVEC
 	#define ISALIGNED(x) (!( ((long long)x)&15 ))
 		if( ISALIGNED(srcp) && ISALIGNED(blurp) && ISALIGNED(workp) && ISALIGNED(maskp) && !(src_pitch&15))
