@@ -10,15 +10,89 @@
 			
 		ALTIVEC
 				
-			
-							
+												
        *********************** /TODO ***************************
+       06/05/05
+       		  - tarballing for 2.0.24
+       05/05/04
+       		 - Fix segault when requantizing without audio
+		 - Fix segault when not enough audio in pass through mode
+       04/05/04
+       		 - cleanup on amd64 by Peter Niemayer
+		 - more gcc 3.4 fix
+		 - fixed makefile.am for distfile that was borked by newer autoconf/gideon
+       03/05/04
+       		- gcc 3.4 fix (x3)
+		- preparing for distclean package (duh! was a long time)
+		
+       02/05/04
+       		- busy having sex
+       01/05/04
+       		- removed some assert in filters
+		- jens : Fix autcrop
+       28/04/04
+       		- even better sub settings
+		- synced with mplayer resize of 1.0pre3
+		- Allow mplayer resize on non MMX
+		- Default resize is now mplayer
+		- Fixed Xv being disabled often
+       27/04/04
+       		- better chroma blending for sub
+		- better sub settings
+       25/04/04
+       		- Fixed external wav / big endian
+		- Do not attempt to run Xv in remote X mode
+		- Dynamically use best PP, do the same for swscale **** fixme *****!
+       23/04/04
+       		- Fixed freeze when there is not enough audio on mpeg PS write (was lvemux)
+		- Fixed display name for some audio types
+       22/04/04
+       		- Really fixed pulldown
+       21/04/04
+       		- Fixed pulldown for ffmpeg
+		- B frame still not working for mpeg
+       20/04/04
+       		- Fixed autoconf for macOsX -*** DROPPED I18N fixme ***
+       18/04/04
+       		- macOsX: Added audio support :), and some quartz stuff but not committed 
+		- some nasm stuff for cygwin
+		- decoder option for each segment (needed for swap uv)
+       14/04/04
+       		- fixed audio too short with pal2film
+		- since we are in rgb32 now, fully convert yv12->rgb
+				and do no drop last 2 lines
+       11/04/04
+       		- created x86_64 for ffmpeg + assembly
+		- jens: UI for bordersmear/blacken border
+		
+       09/04/04
+       		- changed busy to busyicon
+		- update to ffmpeg cvs
+       08/04/04
+       	
+       		- Fixed display frame
+		- Allow going to last frame (Jens)
+		- Check Parity for crop/add borders
+       07/04/04
+       		- Merged cygwin patch
+       27-30		
+       		- cygwin port/fix
+       26.03.2004
+       		- fixed unpacked for divx5 case
+		- cygwin fix
+		- fixed C version of yv12->RGB
+       24.03.2004
+       		- completed auto bitstream unpacker
+       23.03.2004
+       		- Jens : Add --info 
+		
        21.03.2004
        		- better reindex openDML files 
 		- reindex takes track number into account
 		- fixed save bmp
 		- Jens: Better handling of disapearing old dir
 		- dont crash when resampling to the same fq
+		- added pal2film and film2pal audiofilter
        20.03.2004
        		- altivec to rgb32 too
 		- fixed 2 pass (x86)
