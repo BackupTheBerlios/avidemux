@@ -615,6 +615,7 @@ PackStream *mux_open(char *fn,
   
   uint32_t muxrate = v_bit_rate + a_bit_rate + 2000;   
   PackStream   *ps = &_ps;
+  float compute;
   
   if (!v_bit_rate) muxrate = 10080000; // fixed defined for DVD
   
@@ -657,14 +658,18 @@ PackStream *mux_open(char *fn,
     // We set clean default value...
     ps->audio_pts   = 0;
     ps->forceRestamp= 0;
-    if(audio_id==AUDIO_ID_AC3)
-    	ps->audio_encoded_fs=(int)ceil((AC3_FRAME_SIZE *a_bit_rate)/(8*sample_rate));
-    else
-    	ps->audio_encoded_fs=(int)ceil(( MP2_FRAME_SIZE*a_bit_rate)/(8*sample_rate));
-	
-	printf("Audio encoded fs: %d\n",ps->audio_encoded_fs);	
-     ps->a_pts_ofs = A_PTS_MIN;
-     ps->v_pts_ofs = V_PTS_MIN;
+    
+    compute=a_bit_rate;
+    compute/=(float)sample_rate;
+    compute/=8;
+    if(audio_id==AUDIO_ID_AC3) compute*=AC3_FRAME_SIZE;
+    	else			compute*=MP2_FRAME_SIZE;
+   
+    //ps->audio_encoded_fs=(int)ceil((AC3_FRAME_SIZE *a_bit_rate)/(8*sample_rate));
+    ps->audio_encoded_fs=(int)ceil(compute);
+    printf("Audio encoded fs: %d\n",ps->audio_encoded_fs);	
+    ps->a_pts_ofs = A_PTS_MIN;
+    ps->v_pts_ofs = V_PTS_MIN;
 	
   
 #if 0    
@@ -801,7 +806,8 @@ int mux_write_packet(PackStream *ps,
           //ps->audio_pts = ps->pts;
         }
       }
-      ps->framecount++; //MEANX
+      if(pkt_len>50) // Do not take isolated pack start
+      	ps->framecount++; //MEANX
     }
     else if (pkt_len)
     {

@@ -44,7 +44,8 @@ static int BTR[] = {		// see interface.c if you change this !
     		128,
    		 160,
     		192,
-   		 224
+   		 224,
+		 384
 };
 int DIA_audioEncoder(int *pmode, int *pbitrate,const char *title)
 {

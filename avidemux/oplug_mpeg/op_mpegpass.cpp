@@ -43,13 +43,18 @@
 */
  extern AVDMGenericAudioStream *mpt_getAudioStream(double *pcm);
 
- #define PACK_AUDIO {\
+ #define PACK_AUDIO(x) {\
  			total_wanted+=pcm; \
- 			audiolen=(uint32_t)floor(total_wanted-total_got);\
+ 			if(muxer->audioEmpty()) \
+	 			audiolen=(uint32_t)floor(8+total_wanted-total_got);\
+			else \
+ 				audiolen=(uint32_t)floor(total_wanted-total_got);\
  			audiolen = audio->read (audiolen,buffer); \
 			total_got+=audiolen; \
 			if(audiolen)	\
-				muxer->writeAudioPacket(audiolen,buffer); }
+				muxer->writeAudioPacket(audiolen,buffer); \
+			else\
+			printf("Cant get audio!\n");}
     
  
  
@@ -96,7 +101,7 @@ void mpeg_passthrough(  char *name )
 	}
 	
   	muxer=new MpegMuxer();
-	if(!muxer->open(name,MUX_MPEG_VRATE,avifileinfo->fps1000,audio->getInfo()))
+	if(!muxer->open(name,MUX_MPEG_VRATE,avifileinfo->fps1000,audio->getInfo(),pcm))
 	{
 		delete muxer;
 		muxer=NULL;
@@ -110,9 +115,10 @@ void mpeg_passthrough(  char *name )
   work=new DIA_working("Saving MpegPS stream");
 
   // preamble
+  /*
   video_body->getRawStart (frameStart, buffer, &len);
   muxer->writeVideoPacket (len,buffer);
-
+*/
   for (uint32_t i = frameStart; i < frameEnd; i++)
     {
       
@@ -139,22 +145,33 @@ void mpeg_passthrough(  char *name )
 	  // Write the found frame
 	video_body->getRaw (found, buffer, &len);
 	muxer->writeVideoPacket (len,buffer);	
-	PACK_AUDIO
+	PACK_AUDIO(0)
 	  
 	  // and the B frames
 	for (uint32_t j = i; j < found; j++)
 	    {
 		video_body->getRaw (j, buffer, &len);
 		muxer->writeVideoPacket (len,buffer);
-		PACK_AUDIO
+		PACK_AUDIO(0)
     	    }
 	  i = found;		// Will be plussed by for
 	}
       else			// P or I frame
 	{
-	  	video_body->getRaw (i, buffer, &len);
-		muxer->writeVideoPacket (len,buffer);
-		PACK_AUDIO
+		if(i==frameStart) // Pack sequ_start with the frame
+		{
+			uint32_t seq;
+			video_body->getRawStart (frameStart, buffer, &seq);  		
+	  		video_body->getRaw (i, buffer+seq, &len);
+			muxer->writeVideoPacket (len+seq,buffer);
+			PACK_AUDIO(0)
+		}
+		else
+		{
+			video_body->getRaw (i, buffer, &len);
+			muxer->writeVideoPacket (len,buffer);		
+			PACK_AUDIO(0)
+		}
 	}
 
     }

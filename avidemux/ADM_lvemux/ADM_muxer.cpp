@@ -63,7 +63,7 @@ uint8_t MpegMuxer::forceRestamp(void)
 	((PackStream *)packStream)->forceRestamp=1;
 	return 1;
 }
-uint8_t MpegMuxer::open(char *filename, uint32_t vbitrate, uint32_t fps1000, WAVHeader *audioheader)
+uint8_t MpegMuxer::open(char *filename, uint32_t vbitrate, uint32_t fps1000, WAVHeader *audioheader,float need)
 {
 
 double fps;
@@ -121,6 +121,8 @@ float bn,sn;
 	//_packSize=bytes_needed;	  
 	_packSize=pack->audio_encoded_fs;
 	printf("Pack size:%d\n",_packSize);
+	needPerFrame=need;
+	printf("Will take %f bytes per frame\n",needPerFrame);
   
 	return 1;
 
@@ -232,11 +234,10 @@ uint8_t MpegMuxer::muxMP2(void)
 	uint8_t *ptr=&buffer[byteHead];	
 	uint8_t *pos=NULL;
 	
-	
-	uint16_t startcode=0;
+	uint16_t startcode=0,layer;
 	static uint16_t longword;
 	
-	while(ptr+4<end)
+	while(ptr+1<end)
 	{
 		startcode=(startcode<<8)+*ptr;
 		if(startcode==0xfff || ((startcode&0xfff0)==0xfff0))
@@ -244,12 +245,15 @@ uint8_t MpegMuxer::muxMP2(void)
 			// grab bitrate & frequency
 			longword=(startcode<<8)+*(ptr+1);
 			if(startcode==0xfff)  longword<<=4;
-			if(sr[((longword & 0xC) >> 2)&3]==frequency)
-				if(br[((longword & 0xF0) >> 4)&0xF]==audioBitrate)
-				{
-					pos=ptr-1;				
-					ptr+=3;
-				}	
+			layer=((longword>>8)&0xc);
+			
+			if(layer==0xc)
+				if(sr[((longword & 0xC) >> 2)&3]==frequency)
+					if(br[((longword & 0xF0) >> 4)&0xF]==audioBitrate)
+					{
+						pos=ptr-1;				
+						ptr+=3;
+					}	
 		}
 		ptr++;
 	}
@@ -269,4 +273,9 @@ uint8_t MpegMuxer::muxMP2(void)
 	return 1;
 
 }
+uint8_t MpegMuxer::audioEmpty( void)
+{
+	if(byteHead==byteTail) return 1;
+	return 0;
 
+}

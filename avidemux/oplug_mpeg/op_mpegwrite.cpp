@@ -1027,7 +1027,7 @@ uint32_t fps1000;
 	printf("----- Audio Track for mpeg Ready.------\n");
 	
 	_muxer=new MpegMuxer();
-	if(!_muxer->open(name,MUX_MPEG_VRATE,fps1000,_audio->getInfo()))
+	if(!_muxer->open(name,MUX_MPEG_VRATE,fps1000,_audio->getInfo(),(float)one_pcm_audio_frame))
 	{
 		delete _muxer;
 		_muxer=NULL;
@@ -1068,7 +1068,8 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm)
         	uint32_t    tstart,tend;
 		int32_t shift=0;
 		
-		if(!  DIA_GetIntegerValue((int*)&shift, -1000, +1000, "Audio/video shift", "Audio Video Shift (ms):"))
+		if(!  DIA_GetIntegerValue((int*)&shift, -1000, +1000, "Audio/video shift", 
+				"Audio Video Shift (ms):"))
 		{
 			return 0;		
 		}
@@ -1118,8 +1119,10 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm)
   	double    pcm;
   	// *2 because one sample is 16 bits
   	// fix hitokiri bug part 1.
-  	pcm = one_frame_double * 2 * wav->frequency * wav->channels;
-  	pcm /= 1000;
+  	pcm = one_frame_double * 2.;
+	pcm*= wav->frequency;
+	pcm*= wav->channels;
+  	pcm/= 1000.;
   	one_pcm_audio_frame = (uint32_t) floor (pcm+0.5);
   	printf (" one PCM audio frame is %lu bytes (%f) \n", one_pcm_audio_frame,pcm);
 
@@ -1130,9 +1133,15 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm)
 
 
 	  one_frame = (uint32_t) floor (one_frame_double+0.5);
-	printf (" one coded audio frame is %lu bytes (%f) \n", one_frame,one_frame_double);  	
-  	
+	
+  	#define SCALE 100.
 	*mypcm=one_frame_double;
+	// do some round up if needed, 100 is enough (?)
+	one_pcm_audio_frame=(uint32_t)floor(SCALE*(*mypcm)+0.5);
+	*mypcm=one_pcm_audio_frame;
+	*mypcm/=SCALE;
+	printf (" one coded audio frame is %lu bytes (%f was %f \n", one_frame,*mypcm,one_frame_double);  	
+	
 	return _audio;
 }
 
