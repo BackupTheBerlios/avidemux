@@ -421,49 +421,13 @@ static inline void doHorizLowPass_C(uint8_t dst[], int stride, PPContext *c)
  * MMX2 version does correct clipping C version doesnt
  * not identical with the vertical one
  */
-static inline void horizX1Filter(uint8_t *src, int stride, int QP)
+
+static  inline void horizX1Filter(uint8_t *src, int stride, int QP)
 {
 	int y;
-	static uint64_t *lut= NULL;
-	if(lut==NULL)
-	{
-		int i;
-		lut= (uint64_t*)memalign(8, 256*8);
-		for(i=0; i<256; i++)
-		{
-			int v= i < 128 ? 2*i : 2*(i-256);
-/*
-//Simulate 112242211 9-Tap filter
-			uint64_t a= (v/16) & 0xFF;
-			uint64_t b= (v/8) & 0xFF;
-			uint64_t c= (v/4) & 0xFF;
-			uint64_t d= (3*v/8) & 0xFF;
-*/
-//Simulate piecewise linear interpolation
-			uint64_t a= (v/16) & 0xFF;
-			uint64_t b= (v*3/16) & 0xFF;
-			uint64_t c= (v*5/16) & 0xFF;
-			uint64_t d= (7*v/16) & 0xFF;
-			uint64_t A= (0x100 - a)&0xFF;
-			uint64_t B= (0x100 - b)&0xFF;
-			uint64_t C= (0x100 - c)&0xFF;
-			uint64_t D= (0x100 - c)&0xFF;
-
-			lut[i]   = (a<<56) | (b<<48) | (c<<40) | (d<<32) |
-				(D<<24) | (C<<16) | (B<<8) | (A);
-			//lut[i] = (v<<32) | (v<<24);
-		}
-	}
-#if defined(TEST_ALTIVEC)
-#define VEC16 vector unsigned short
-#define VECS16 vector signed short
-#define VEC8 vector unsigned char
-#define VECS8 vector signed char
-
-	VEC8 vec_zero=vec_splat_u8(0);
-	VECS8 vec_m=VECS8(0,0,0,1,0,2,0,3,0,-3,0,-2,0,-1,0,0);
 	
-#endif
+				
+
 	for(y=0; y<BLOCK_SIZE; y++)
 	{
 		int a= src[1] - src[2];
@@ -474,37 +438,15 @@ static inline void horizX1Filter(uint8_t *src, int stride, int QP)
 
 		if(d < QP)
 		{
-			int v = d * SIGN(-b);
-#if defined(TEST_ALTIVEC)
-#define LOAD_ALIGN(dest,src) \
-		dest = (VECTS8)vec_ld(0, src); 
-#define STORE_ALIGN(dest,src) \
-		vec_st(src,0,dest); 
-		
-			VECS8 vec_src;
-			VECS16 vec_v,vec_src16,vec_v16;
-			
-			v=v/8; //Small round down error
-			LOAD_ALIGN(vec_src);	
-			vec_src16=vec_mergeh((VECS8)zero,src); // 8 left bytes in src16
-			vec_src2=vec_mergel((VECS8)zero,src);  // 8 right bytes in src2
-			
-			// Build the adder/subber
-			vec_v=vec_splat_s16(v)
-			vec_v16=vec_mulo((VECS8)vec_v,(VECS8)vec_m); // Mul lower byte of each short
-			// add
-			vec_src16=vec_add(vec_v16,vec_src16);	     // Add to source
-			// pack
-			STORE_ALIGN( vec_packs(vec_src16,vec_src2),src); // post back
-#else
-			
+
+
+			int v = (d * SIGN(-b));
 			src[1] +=v/8;
 			src[2] +=v/4;
 			src[3] +=3*v/8;
 			src[4] -=3*v/8;
 			src[5] -=v/4;
-			src[6] -=v/8;
-#endif			
+			src[6] -=v/8;		
 
 		}
 		src+=stride;

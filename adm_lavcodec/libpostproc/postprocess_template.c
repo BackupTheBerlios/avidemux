@@ -569,6 +569,11 @@ static inline void RENAME(vertX1Filter)(uint8_t *src, int stride, PPContext *co)
 	);
 #else
 
+#ifdef HAVE_ALTIVEC
+	//MEANX: Altivec version including clipping
+	//
+#else
+
  	const int l1= stride;
 	const int l2= stride + l1;
 	const int l3= stride + l2;
@@ -604,6 +609,7 @@ static inline void RENAME(vertX1Filter)(uint8_t *src, int stride, PPContext *co)
 		}
 		src++;
 	}
+#endif
 #endif
 }
 
@@ -3715,7 +3721,11 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 
 #else
 				if(mode & H_X1_FILTER)
+#ifdef HAVE_ALTIVEC
+					horizX1Filter_altivec(dstBlock-4, stride, QP);
+#else				
 					horizX1Filter(dstBlock-4, stride, QP);
+#endif					
 				else if(mode & H_DEBLOCK)
 				{
 #ifdef HAVE_ALTIVEC

@@ -16,6 +16,8 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    
+    Mean: Added HorizX1 with proper clipping
 */
 
 
@@ -1194,3 +1196,103 @@ static inline void transpose_8x16_char_fromPackedAlign_altivec(unsigned char* ds
   STORE_DOUBLE_LINE(4,5);
   STORE_DOUBLE_LINE(6,7);
 }
+// MEANX
+// Not much faster but have clipping
+// The src pointer is *always* unaligned
+// Hence the complicated load/store
+static  inline void horizX1Filter_altivec(uint8_t *src, int stride, int QP)
+{
+	int y;
+	int16_t v;	
+				
+
+#define VEC16 vector unsigned short
+#define VECS16 vector signed short
+#define VEC8 vector unsigned char
+#define VECS8 vector signed char
+#define VECS32 vector signed int
+#define LOAD_ALIGN(dest,src) \
+		MSQ=vec_ld(0, (unsigned char *)src);	\
+		LSQ= vec_ld(16, (unsigned char *)src);	\
+		dest=(VEC8)vec_perm(MSQ,LSQ, vec_lvsl(0, (unsigned char *)src))
+		
+		
+#define STORE_ALIGN(target,src) \
+	align = vec_lvsr(0, (unsigned char *)target); \
+	mask=vec_perm((VEC8 )vec_zero,(VEC8 )neg1,(VEC8)align); \
+	src=vec_perm((VEC8 )src,(VEC8)src,(VEC8)align ); \
+	MSQ = vec_sel( MSQ, (VEC8 )src, mask ); \
+	LSQ = vec_sel( (VEC8 )src, LSQ, mask ); \
+	vec_st( MSQ, 0, target ); \
+	vec_st( LSQ, 16, target ); 
+	
+
+
+	const VECS16 vec_m=(VECS16)(0,1,2,3,3,2,1,0);
+	const VECS16 vec_m2=(VECS16)(0,-1,0,2,0,-1,0,0);
+	const VECS16 vec_sign=(VECS16)(0,1,1,1,-1,-1,-1,0);
+	const VECS16 vec_sign2=(VECS16)(0,-1,-1,-1,1,1,1,0);
+
+	const VEC16 vec_const=(VEC16)(4,0x11,0xFFFF,0,0,0,0,0);
+
+	const VECS8   neg1=(VECS8)vec_splat(vec_const,2);		// -1
+	const VEC16	vec_shift=vec_splat(vec_const,0); 		// 3
+	const VEC16	vec_shift2=vec_splat(vec_const,1); 		// 0x11
+	const VEC8 	vec_zero=(VEC8)vec_splat(vec_const,3);		//0
+	VEC8 	vec_src;
+	VEC8	MSQ,LSQ,mask,align,final;
+	VECS16 	vec_v,vec_src16,vec_v16,vec_src2,vec_src1,vec_vsign,vec_u16;	
+	
+	int16_t v16[8];
+	
+
+	for(y=0; y<BLOCK_SIZE; y++)
+	{
+		//Small round down error
+		LOAD_ALIGN(vec_src,src);
+		vec_src16=(VECS16)vec_mergeh((VEC8)vec_zero,(VEC8)vec_src); // 8 left bytes in src16
+		vec_src2=(VECS16)vec_mergel((VEC8)vec_zero,(VEC8)vec_src);  // 8 right bytes in src2
+		
+		vec_v16=vec_src16;						// 0 1 2 3 4 5 6 7 
+		vec_u16=vec_slo(vec_src16,(VEC8)vec_shift2);			// 1 2 3 4 5 6 7 0
+		
+		vec_src1=vec_abs(vec_sub(vec_v16,vec_u16));     		// abs(0-1) abs(1-2) abs(2-3) ..
+		vec_u16=(VECS16)vec_mulo(vec_src1,vec_m2);			//  0 -a 0 2b 0 -c 0 0 0 0 
+		vec_v16=(VECS16)vec_sums((VECS32)vec_u16,(VECS32)vec_zero); 	// 2d 2d 2d 2d
+		vec_u16=(VECS16)vec_max((VECS32)vec_zero,(VECS32)vec_v16);	// 2d 2d 2d 2d
+// Pack
+		vec_v16=vec_pack((VECS32)vec_u16,(VECS32)vec_u16);   	// 2d 2d 2d 2d 2d 2d 2d 2D
+		vec_st(vec_v16,0,v16);		//Store it for comp
+		if(v16[7] < 2*QP)
+		{
+
+			if(src[3]>src[4]) // neg
+			{
+				vec_vsign=vec_sign2;
+
+			}
+			else // positive
+			{
+				vec_vsign=vec_sign;
+			}															
+			// Multiply to get the tap
+			vec_v=vec_splat(vec_v16,7);
+			vec_u16=(VECS16)vec_mulo((VEC8)vec_v,(VEC8)vec_m); // Mul lower byte of each short
+			vec_v16=vec_sr(vec_u16,vec_shift);		   // divide by 8
+			// put sign back
+			vec_u16=vec_mulo((VECS8)vec_v16,(VECS8)vec_vsign);   // add sign
+
+			// add
+			vec_src16=vec_adds(vec_u16,vec_src16);	     // Add to source
+			
+			// pack			
+			final=(VEC8)vec_pack(vec_src16,vec_src2);
+
+			STORE_ALIGN( src,final); // post back	
+
+		}
+		src+=stride;
+	}
+}
+
+
