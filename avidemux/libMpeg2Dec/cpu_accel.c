@@ -29,6 +29,9 @@
 #include "attributes.h"
 #include "mpeg2_internal.h"
 
+
+typedef void (*sighandler_t)(int); // MEANX RETSIGTYPE
+ 
 #ifdef ACCEL_DETECT
 #ifdef ARCH_X86
 static inline uint32_t arch_accel (void)
@@ -115,7 +118,7 @@ static inline uint32_t arch_accel (void)
 static sigjmp_buf jmpbuf;
 static volatile sig_atomic_t canjump = 0;
 
-static RETSIGTYPE sigill_handler (int sig)
+static sighandler_t sigill_handler (int sig)
 {
     if (!canjump) {
 	signal (sig, SIG_DFL);
@@ -129,7 +132,7 @@ static RETSIGTYPE sigill_handler (int sig)
 #ifdef ARCH_PPC
 static inline uint32_t arch_accel (void)
 {
-    static RETSIGTYPE (* oldsig) (int);
+    static sighandler_t oldsig;
 
     oldsig = signal (SIGILL, sigill_handler);
     if (sigsetjmp (jmpbuf, 1)) {
@@ -159,7 +162,7 @@ static inline uint32_t arch_accel (void)
 #ifdef ARCH_SPARC
 static inline uint32_t arch_accel (void)
 {
-    static RETSIGTYPE (* oldsig) (int);
+    static sighandler_t (* oldsig) (int);
 
     oldsig = signal (SIGILL, sigill_handler);
     if (sigsetjmp (jmpbuf, 1)) {
