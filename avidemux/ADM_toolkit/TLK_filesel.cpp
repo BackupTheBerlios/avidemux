@@ -147,6 +147,49 @@ void GUI_FileSelWrite(const char *label, char * * name)
     GUI_FileSel(label, NULL, 1,name);
 }
 
+// CYB 2005.02.23: DND
+void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
+{
+
+	if(name)
+	{
+		if(cb)
+		{
+			FILE *fd;
+			fd=fopen(name,"rb");
+			if(rw==0) // read
+			{
+				// try to open it..
+				if(!fd)
+				{
+					GUI_Alert("Cannot open this file !");
+					return;
+				}
+			}
+			else // write
+			{
+				if(fd)
+				{
+					fclose(fd);
+					if(!GUI_Question("Overwrite file ?"))
+						return;
+				}
+				// check we have right access to it
+				fd=fopen(name,"wb");
+				if(!fd)
+				{
+					GUI_Alert("No write access to that file !");
+					return;
+				}
+			}
+			fclose(fd);
+			cb(name);
+			ADM_dealloc(name);
+		} // no callback -> return value
+	}
+}
+// CYB 2005.02.23: DND
+
 #if 1 || (GTK_MINOR_VERSION*10+GTK_MICRO_VERSION)<34
 
 void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
@@ -204,62 +247,8 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	}
 	gtk_widget_destroy(dialog);
 
-	if(name)
-	{
-
-		if(cb)
-		{
-
-			if(rw==0) // read
-			{
-				// try to open it..
-				FILE *fd;
-				fd=fopen(name,"rb");
-				if(!fd)
-				{
-						GUI_Alert("Cannot open this file !");
-						return;
-				}
-				fclose(fd);
-				cb(name);
-				ADM_dealloc(name);
-
-			}
-			else // write
-			{
-				FILE *fd;
-				fd=fopen(name,"rb");
-				if(fd)
-					{
-							fclose(fd);
-							if(!GUI_Question("Overwrite file ?"))
-								return;
-					}
-				// check we have right access to it
-				fd=fopen(name,"wb");
-				if(!fd)
-					{
-						GUI_Alert("No write access to that file !");
-						return;
-					}
-				fclose(fd);
-
-
-				cb(name);
-				ADM_dealloc(name);
-			}
-		} // no callback -> return value
-		else
-		{
-
-			*rname=name;
-
-
-		}
-
-
-	}
-
+// CYB 2005.02.23
+    fileReadWrite(cb, rw, name);
 }
 #else
 //
@@ -323,62 +312,8 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	}		}
 	gtk_widget_destroy (dialog);
 	
-	if(name)
-	{
-
-		if(cb)
-		{
-
-			if(rw==0) // read
-			{
-				// try to open it..
-				FILE *fd;
-				fd=fopen(name,"rb");
-				if(!fd)
-				{
-						GUI_Alert("Cannot open this file !");
-						return;
-				}
-				fclose(fd);
-				cb(name);
-				ADM_dealloc(name);
-
-			}
-			else // write
-			{
-				FILE *fd;
-				fd=fopen(name,"rb");
-				if(fd)
-					{
-							fclose(fd);
-							if(!GUI_Question("Overwrite file ?"))
-								return;
-					}
-				// check we have right access to it
-				fd=fopen(name,"wb");
-				if(!fd)
-					{
-						GUI_Alert("No write access to that file !");
-						return;
-					}
-				fclose(fd);
-
-
-				cb(name);
-				ADM_dealloc(name);
-			}
-		} // no callback -> return value
-		else
-		{
-
-			*rname=name;
-
-
-		}
-
-
-	}
-
+// CYB 2005.02.23
+    fileReadWrite(cb, rw, name);
 }
 
 #endif

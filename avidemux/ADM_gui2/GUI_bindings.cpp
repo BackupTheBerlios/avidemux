@@ -43,6 +43,9 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_gui2/GUI_ui.h"
 
+#include "ADM_toolkit/filesel.h"
+#include "ADM_editor/ADM_Video.h"
+
 void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
 	   uint16_t * ss, uint16_t * ms);
 
@@ -68,12 +71,44 @@ static gint	  guiCursorEvtMask=0;
 
 // heek !
 static  GtkAdjustment *sliderAdjustment;
+// Needed for DND
+extern void A_openAvi (char *name);
+extern void A_appendAvi (char *name);
 
 
+
+//
+enum 
+{
+        TARGET_STRING,
+        TARGET_ROOTWIN,
+        TARGET_URL
+};
+enum 
+{
+   TARGET_URI_LIST
+};
+ 
+static GtkTargetEntry target_table[] = 
+{
+  { "STRING",     0, TARGET_STRING },
+  { "text/plain", 0, TARGET_STRING },
+  { "text/uri-list", 0, TARGET_URL },
+  { "application/x-rootwin-drop", 0, TARGET_ROOTWIN }
+};
+// CYB 2005.02.22: DND (END)
+
+
+static void DNDDataReceived( GtkWidget *widget, GdkDragContext *dc,
+                             gint x, gint y, GtkSelectionData *selection_data, guint info, guint t);
+
+extern aviInfo   *avifileinfo;
 extern GtkWidget	*create_mainWindow (void);
 extern void guiCallback(GtkMenuItem * menuitem, gpointer user_data);
 extern void HandleAction(Action act);
 extern void UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_data);
+extern void fileReadWrite(SELFILE_CB cb, int rw, char *name);
+
 // To build vcodec
 extern uint32_t encoderGetNbEncoder(void);
 extern const char* encoderGetIndexedName(uint32_t i);
@@ -311,7 +346,17 @@ uint8_t  bindGUI( void )
   			gtk_container_add (GTK_CONTAINER (menua), audWidget[i]);
 		}
 	 gtk_option_menu_set_menu (GTK_OPTION_MENU (lookup_widget(guiRootWindow,"optionACodec")), menua);
-
+    //
+    //
+    //CYB 2005.02.22: DND (START)
+    // Set up avidemux as an available drag'n'drop target.
+    gtk_drag_dest_set(guiRootWindow,
+        GTK_DEST_DEFAULT_ALL,
+        target_table,sizeof(target_table)/sizeof(GtkTargetEntry),
+        (GdkDragAction)(GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_DEFAULT));
+    g_signal_connect(GTK_OBJECT(guiRootWindow), "drag_data_received",
+        GTK_SIGNAL_FUNC(DNDDataReceived),NULL);
+    //CYB 2005.02.22: DND (END)
     return 1;
 
 }
@@ -665,6 +710,56 @@ uint8_t UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
 
 	gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,"optionmenu1")), fmt);
 	return 1;
+}
+// DND CYB
+void DNDDataReceived( GtkWidget *widget, GdkDragContext *dc,
+                                  gint x, gint y, GtkSelectionData *selection_data, guint info, guint t)
+{
+   void *filename;
+   char *start,*end;
+   int cont;
+
+    if (info == TARGET_URI_LIST)
+    {
+     start = strstr((char*)selection_data->data,"file://");
+     cont = 0;
+     do
+     {
+       if (start)
+       {
+        end = strstr((char*)start+1,"file://");
+        if (!end)
+        {
+                      end = start + strlen(start);
+                      cont = 1;
+                      continue;
+        }
+        filename = ADM_alloc(end-start); 
+        if (filename)
+        {
+              memset(filename,0,end-start);
+              memcpy(filename,start+7,end-start-7-2);
+              if (avifileinfo) 
+              {
+                    // Append video when there's already something
+                    fileReadWrite(A_appendAvi, 0, (char*)filename);
+               }
+               else
+               {
+                    fileReadWrite(A_openAvi, 0, (char*)filename);
+               }
+         } 
+         ADM_dealloc(filename);
+         start = end;
+       }
+       else
+       {
+           cont=1;
+       } 
+     } //do
+     while (!cont);  
+    }
+    gtk_drag_finish(dc,TRUE,FALSE,t);
 }
 
 // EOF
