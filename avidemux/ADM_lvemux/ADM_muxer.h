@@ -26,6 +26,7 @@ class MpegMuxer
 	uint8_t muxMP2(void);
 	uint32_t frequency;
 	uint32_t audioBitrate;
+	uint32_t keepGoing;	// Set to 0 if a null frame is met
 	float	needPerFrame;
 public:
 		MpegMuxer(void );

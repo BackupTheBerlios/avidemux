@@ -52,6 +52,7 @@ MpegMuxer::MpegMuxer( void )
 {
 	packStream=NULL;
 	byteHead=byteTail=0;
+	keepGoing=1;
 }
 MpegMuxer::~MpegMuxer(  )
 {
@@ -131,7 +132,13 @@ uint8_t MpegMuxer::writeVideoPacket(uint32_t len, uint8_t *buf)
 {
 int r;
 	assert(packStream);
-	r=mux_write_packet((PackStream *)packStream, 
+	if(!len)
+		{
+			 keepGoing=0;
+			 printf("Stopping packet\n");
+		}
+	if(keepGoing)
+		r=mux_write_packet((PackStream *)packStream, 
                                VIDEO_ID, buf, (int) len); 
 	return 1;
 
@@ -151,6 +158,12 @@ int r;
 uint32_t t=0;
 uint32_t n;
 	assert(packStream);
+	if(!len)
+	{
+		printf("Stopping packet\n"); 
+		keepGoing=0;
+	}
+	if(!keepGoing) return 1;
 	memcpy(buffer+byteTail,buf,len);
 	byteTail+=len;
 	

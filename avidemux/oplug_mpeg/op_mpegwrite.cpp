@@ -96,13 +96,14 @@ extern int32_t audioDelay;
 #define ADM_1PASS_CBR 1
 #define MAXAUDIO 56000
 
+extern const char *getStrFromAudioCodec( uint32_t codec);
+
 // ______________________________________________
 // 								Initialise all variables
 // ______________________________________________
 
 mpegWritter::mpegWritter( void )
-{
-
+{	
 	_w=_h=0;
 	_fps1000=0;
 	_page=0;
@@ -117,8 +118,7 @@ mpegWritter::mpegWritter( void )
 
 }
 mpegWritter::mpegWritter( uint8_t ps )
-{
-
+{	
 	_w=_h=0;
 	_fps1000=0;
 	_page=0;
@@ -182,6 +182,7 @@ uint8_t  mpegWritter::save_svcd(char *name)
 
 
 #define PACK_AUDIO 	{ uint32_t audiolen=0, audioread=0;	\
+				 { \
 				audioWanted+=_audioOneFrame; \
 				if(_muxer->audioEmpty()) \
 	 				audiolen=(uint32_t)floor(8+audioWanted-audioGot);\
@@ -189,9 +190,11 @@ uint8_t  mpegWritter::save_svcd(char *name)
  					audiolen=(uint32_t)floor(audioWanted-audioGot);\
 				audioread = _audio->read (audiolen,_audioBuffer); \
 				if(audioread!=audiolen) printf("Mmm not enough audio..\n"); \
-				_muxer->writeAudioPacket(audioread,_audioBuffer);\
+					_muxer->writeAudioPacket(audioread,_audioBuffer);\
 				encoding->feedAudioFrame(audioread); \
-				audioGot+=audioread;}
+				audioGot+=audioread;\
+				}\
+			}
 				
 /*---------------------------------------------------------------------------------------*/
 uint8_t  mpegWritter::save_dvd(char *name)
@@ -367,6 +370,10 @@ DIA_encoding		*encoding;
 	}
 
 	printf("\n--encoding started--\n");
+	if(_muxer)
+	{
+		 encoding->setAudioCodec(getStrFromAudioCodec(_audio->getInfo()->encoding));	
+	}
 	for(uint32_t i=0;i<_total;i++)
 			{
             			if(!incoming->getFrameNumberNoAlloc(i, &size,
@@ -813,6 +820,10 @@ uint32_t		len,flags,type,outquant,audiolen;
 				break;
 	}
 	encoding->setPhasis("2nd Pass");
+	if(_muxer)
+	{
+		encoding->setAudioCodec(getStrFromAudioCodec(_audio->getInfo()->encoding));	
+	}
 	for(uint32_t i=0;i<_total;i++)
 	{
         	if(!incoming->getFrameNumberNoAlloc(i, &size,(uint8_t *) _buffer,&flags))
