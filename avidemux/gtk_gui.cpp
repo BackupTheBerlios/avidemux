@@ -993,6 +993,27 @@ void  updateLoaded ()
     }
   else
     {
+      /*
+      ** <JSC> Sat Feb 21 15:30:15 CET 2004
+      ** problem: second edl load will raise a crash
+      ** why: 1) the last run generates aviaudiostream [video_body->getAudioStream()]
+      **         which is set to currentaudiostream    [changeAudioStream()]
+      **      2) second call of video_body->getAudioStream() will free(aviaudiostream)
+      **         which is the same as free(currentaudiostream)
+      **      3) following changeAudioStream() call will use the free()'d memory
+      **         [currentaudiostream->isDestroyable()]
+      **      efence with EF_PROTECT_FREE=1 will raise SIGSEGV and show you
+      **      currentaudiostream is not accessable
+      **      warning: without efense it will crash somethere other
+      **
+      ** I'm not sure why aviaudiostream is global. This issue will not
+      ** occure if aviaudiostream is local and be lost at end of this block.
+      ** nasty workaround: only the raise condition will be fixed
+      */
+      if( currentaudiostream == aviaudiostream ){
+         aviaudiostream = NULL; // free of memory done in changeAudioStream()
+      }
+      /* </JSC> */
       video_body->getAudioStream (&aviaudiostream);
       changeAudioStream (aviaudiostream, AudioAvi);
       if (aviaudiostream)
