@@ -80,7 +80,7 @@ extern void mixDump(uint8_t *i,uint32_t l);
 //_______________________________________________________
 //_______________________________________________________
 //_______________________________________________________
-ADM_mpegDemuxerTransportStream::ADM_mpegDemuxerTransportStream(uint8_t stream,uint8_t stream2) 
+ADM_mpegDemuxerTransportStream::ADM_mpegDemuxerTransportStream(uint16_t stream,uint16_t stream2) 
  {
 		printf("\n Transport stream demuxer initialized with stream 1 = %x",stream);
 		printf("stream 2 = %x\n",stream2);

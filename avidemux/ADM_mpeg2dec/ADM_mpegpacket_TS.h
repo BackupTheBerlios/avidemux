@@ -25,8 +25,8 @@ class ADM_mpegDemuxerTransportStream : public   ADM_mpegDemuxer
 	              	uint64_t 	_packetLen;
 	               	uint64_t 	_currentOffset;	
 	                              
-			uint8_t  	_otherPid;			
-			uint8_t 	_thisPid;			
+			uint16_t  	_otherPid;			
+			uint16_t 	_thisPid;			
 	                  	                
 			uint8_t		_buffer[TS_PACKET];
 			uint8_t		_TSbuffer[TS_PACKET];
@@ -40,7 +40,7 @@ class ADM_mpegDemuxerTransportStream : public   ADM_mpegDemuxer
 			uint32_t  	_otherPTS;
     
 	  public:
-	  				ADM_mpegDemuxerTransportStream(uint8_t stream,uint8_t stream2) ;
+	  				ADM_mpegDemuxerTransportStream(uint16_t stream,uint16_t stream2) ;
 		virtual			~ADM_mpegDemuxerTransportStream();       
 	        virtual    uint32_t 	read(uint8_t *w,uint32_t len);
 	        virtual    uint8_t 	goTo(uint64_t offset);	            	 
