@@ -81,11 +81,17 @@ void ADM_dezalloc(void *ptr)
 
 	backdoor=(uint32_t *)ptr;
 	backdoor-=2;
-	
+	if(*backdoor==0xbeefbeef)
+        {
+                printf("Double free gotcha!\n");
+                ADM_assert(0);
+        }
 	ADM_assert(((*backdoor)>>16)==0xdead);
+        
 	
 	offset=backdoor[0]&0xffff;
 	size=backdoor[1];
+        *backdoor=0xbeefbeef; // Scratch sig
 	free(c-offset);
 	ADM_consumed-=size;
 }
