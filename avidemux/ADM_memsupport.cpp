@@ -49,7 +49,7 @@ void ADM_memStat( void );
 void ADM_memStat( void )
 {
 	printf("Global mem stat\n");
-	printf("\tMemory consumed :%lu (MB)\n",ADM_consumed>>10);
+	printf("\tMemory consumed :%lu (MB)\n",ADM_consumed>>20);
 
 }
 void *ADM_alloc(size_t size)
