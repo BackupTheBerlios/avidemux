@@ -150,7 +150,7 @@ class ADM_AudiocodecWavSwapped : public     ADM_Audiocodec
                  virtual			uint8_t isCompressed( void ){ return 1;};
                  virtual			uint8_t isDecompressable(void ){ return 1;};
 		 virtual 			uint8_t beginDecompress( void ) { return 1;};
-                 virtual 			uint8_t endDecompress( void ) { return 1;};
+                 virtual 			uint8_t endDecompress( void );
           
 
    };

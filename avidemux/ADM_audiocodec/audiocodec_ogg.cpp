@@ -62,6 +62,7 @@
 		delete o;
 	}
 	_contextVoid=NULL;
+	_init=0;
  
  }
  
@@ -199,6 +200,17 @@ int	nb_synth;
 	 aprintf("This round : in %d bytes, out %d bytes\n",nbIn,*nbOut);
 	return 1;
 	
-}								
+}	
+// Try to flush the buffer
+// unsuccessfully :(
+  uint8_t ADM_vorbis::endDecompress( void ) 
+  {
+  float **sample_pcm;
+  ogg_packet packet;
+  
+  	//vorbis_synthesis_blockin(&STRUCT->vdsp,&STRUCT->vblock);
+  	vorbis_synthesis_pcmout(&STRUCT->vdsp,&sample_pcm);
+  	return 1;
+  }
 #endif
 
