@@ -17,6 +17,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include "interact.hpp"
 
 #undef malloc
 #undef realloc
@@ -36,7 +37,6 @@
 #include "mjpeg_logging.h"
 #include "mpegconsts.h"
 
-#include "interact.hpp"
 #include "bits.hpp"
 #include "outputstrm.hpp"
 #include "multiplexor.hpp"
