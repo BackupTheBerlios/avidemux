@@ -111,7 +111,7 @@ dnl    AC_PATH_PROG(PKG_CONFIG,pkg-config, AC_MSG_ERROR([*** pkg-config not foun
    AC_SUBST(GTK_LIBS)
    AC_SUBST(GTK_VERSION)
 
-   ASFLAGS=-f elf
+   
    AC_SUBST(AS)
    AC_SUBST(ASFLAGS)
 
@@ -592,6 +592,23 @@ else
 CXXFLAGS="  -I.. -IADM_library -I../ADM_library  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -O $CXXFLAGS -O2"
 
 fi
+dnl ____________________ Cygwin / mingwin ? ___________
+use_cygwin=no
+AC_MSG_CHECKING(win32 host)
+
+
+AC_TRY_COMPILE([
+	#if !defined(__CYGWIN__) &&!defined(__MINGW32__)
+		#error
+	#endif
+
+],
+int z=0
+,[
+  use_cygwin=yes
+])
+
+AC_MSG_RESULT($use_cygwin)
 dnl ____________________ CPU____________________________
 
 adm_cpu=`uname -m`;
@@ -631,6 +648,11 @@ d
 		else
 			AS="$NASM_CONFIG"
 			CCAS=$AS
+			if test "x$use_cygwin" = "xno"; then
+				ASFLAGS="-f elf"
+			else
+				ASFLAGS="-f win32 -DPREFIX"
+			fi
 			echo "TARGET_MMX_NASM=yes" >> adm_lavcodec/config.cpu
 			AC_DEFINE(HAVE_ASM_NASM,1,"Use MMX acceleration")
 			echo "nasm found : $NASM_CONFIG"
@@ -793,6 +815,7 @@ fi
 echo " Altivec             : $have_altivec"
 echo " MacOsX(Darwin)      : $have_darwin"
 echo " nasm                : $have_nasm ( $AS )"
+echo " Cygwin              : $use_cygwin"
  if test "x$have_xml2" = "xno"; then
  	echo "************ LIBXML2 IS MANDATORY ***************"
  	echo "************ get it from http://www.xmlsoft.org*********"
