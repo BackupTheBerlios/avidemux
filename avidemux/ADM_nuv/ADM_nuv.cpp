@@ -1179,7 +1179,7 @@ uint8_t nuvHeader::saveIndex( const char *name,const char *org)
 	fprintf(fd,"ADNV\n"); // mark it as a avidemux index
 	fprintf(fd,"File: %s\n",org ); // mark it as a avidemux index
 	fprintf(fd,"wh: %lu %lu\n",DXFIELD(width), DXFIELD(height) ); // mark it as a avidemux index
-	fprintf(fd,"fps: %lu",_videostream.dwRate);
+	fprintf(fd,"fps: %lu\n",_videostream.dwRate);
 	fprintf(fd,"Lzo Pos:%llu\n",_lzo_pos);
 	fprintf(fd,"Lzo Size:%llu\n",_lzo_size);
 	fprintf(fd,"\n");
@@ -1187,6 +1187,13 @@ uint8_t nuvHeader::saveIndex( const char *name,const char *org)
 	fprintf(fd,"Xvid:%d\n",_isXvid);
 	fprintf(fd,"FFV1:%d\n",_isFFV1);
 	fprintf(fd,"ff4c:%x\n",_ffv1_fourcc);
+	fprintf(fd,"extr:%x\n",_ffv1_extraLen);
+	if(_ffv1_extraLen)
+	{
+		for(uint32_t i=0;i<_ffv1_extraLen;i++)
+			fprintf(fd,"%02x ",_ffv1_extraData[i]);
+		fprintf(fd,"\n");
+	}
 	fprintf(fd,"PCM:%d\n",_isPCM);
 	fprintf(fd,"Fq:%d\n",_audio_frequency);
 	fprintf(fd,"%lu video frames\n",_mainaviheader.dwTotalFrames);
@@ -1233,6 +1240,8 @@ uint8_t nuvHeader::saveIndex( const char *name,const char *org)
 /**
 		Load  as quick index for easy access
 */
+extern uint8_t mk_hex(uint8_t a,uint8_t b);
+
 uint8_t nuvHeader::loadIndex( const char *name)
 {
 char str[1024];
@@ -1310,6 +1319,27 @@ FILE *fd;
 	fscanf(fd,"Xvid:%d\n",&_isXvid);
 	fscanf(fd,"FFV1:%d\n",&_isFFV1);
 	fscanf(fd,"ff4c:%x\n",&_ffv1_fourcc);	
+	
+	fscanf(fd,"extr:%x\n",&_ffv1_extraLen);
+	if(_ffv1_extraLen)
+	{
+		char *start;
+		char *str=new char[_ffv1_extraLen*3+4];
+		
+		fgets(str,_ffv1_extraLen*3+3,fd);
+		
+		_ffv1_extraData=new uint8_t[_ffv1_extraLen];
+		
+		start=str;
+		for(uint32_t i=0;i<_ffv1_extraLen;i++)
+		{
+			_ffv1_extraData[i]=mk_hex(*start,*(start+1));
+			start+=3;
+		}
+		delete(str);
+		
+	}
+	
 	fscanf(fd,"PCM:%d\n",&_isPCM);
 	fscanf(fd,"Fq:%d\n",&_audio_frequency);
 	fscanf(fd,"%lu video frames\n",&nb);
@@ -1391,7 +1421,7 @@ FILE *fd;
 			fseeko(_fd,_lzo_pos,SEEK_SET);
 			fread(str,_lzo_size,1,_fd);
 			_rtjpeg->InitLong((char *)str, DXFIELD(width), DXFIELD(height) );
-			aprintf("Jpeg : %llu , %llu\n",_lzo_pos,_lzo_size);
+			printf("Jpeg : %llu , %llu\n",_lzo_pos,_lzo_size);
 		}
 
 
