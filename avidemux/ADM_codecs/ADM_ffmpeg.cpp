@@ -38,7 +38,7 @@
 #include "ADM_codecs/ADM_ffmpeg.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-#define TEST_NOB 1
+//#define TEST_NOB 1
 
 static char LogName[500];
 
@@ -57,6 +57,7 @@ static myENC_RESULT res;
 								
 		assert(_context);
 		memset(   &_frame,0,sizeof(_frame));
+		_frame.pts=AV_NOPTS_VALUE;
 		_context->width=_w;
 		_context->height=_h;
 		_frame.linesize[0]=_w;
@@ -150,7 +151,8 @@ uint8_t     ffmpegEncoder::gopMpeg1(void)
 	_context->rc_initial_cplx=3;
 	_context->qmin		= 2;
     	_context->qmax		= 31;
-	
+	//
+	//_context->dsp_mask= FF_MM_FORCE;
 
 	return 1;
 }
@@ -237,7 +239,7 @@ uint8_t ffmpegEncoderCQ::init( uint32_t val,	uint32_t fps1000,uint8_t vbr)
 
        	_context->bit_rate           	= 0;
     	_context->bit_rate_tolerance 	= 1024 * 8 * 1000;       	
-
+	
 	return initContext();
 }
 
