@@ -189,14 +189,15 @@ int preferences::load(){
    char rcfile[1024];
    char *home;
    char buf[1024];
-	if( ! (home=getenv("HOME")) )
 #if defined(CYG_MANGLING)
-		if(!(home=getenv("PWD")))
-#endif
+	home="c:/";
+#else
+	if( ! (home=getenv("HOME")) )
 	{
 		fprintf(stderr,"can't determine $HOME.\n");
 		return RC_FAILED;
 	}
+#endif
 	snprintf(rcfile, 1024, "%s/.avidemuxrc", home);
 	rcfile[1023] = '\0';
 	if( access(rcfile,R_OK) == -1 ){
@@ -328,15 +329,7 @@ int preferences::save_xml_to_file(){
    char rcfile[1024];
    char rcfilenew[1024];
 #if defined(CYG_MANGLING)
-	home=getenv("HOME");
-	if(!home)
-		home=getenv("PWD");
-   	if(!home)
-		{
-
-		fprintf(stderr,"can't determine $PWD.\n");
-		return RC_FAILED;
-		}
+	home="c:/";
 	snprintf(rcfile,1024,"%s/.avidemuxrc",home);
 	rcfile[1023] = '\0';
 	xmlSetDocCompressMode(xdoc,9);
