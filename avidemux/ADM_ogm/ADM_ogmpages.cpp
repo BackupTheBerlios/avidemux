@@ -195,7 +195,12 @@ uint8_t		OGMDemuxer::readPayload( uint8_t *data)
 uint8_t		OGMDemuxer::readBytes(uint32_t size, uint8_t *data)
 {
 
-		assert(size<=_payload);
+		if(size>_payload)
+		{
+			printf("Oops: %lu size, %lu payload\n",size,_payload);
+			exit(0);
+		
+		}
 		fread(data,1,size,_fd);
 		_payload-=size;
 		return 1;
