@@ -1040,3 +1040,99 @@ uint32_t fps1000;
 	printf("Muxer ready\n");
   	return 1;	
 }
+
+
+AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *mypcm)
+{
+
+// Second check the audio track
+  	uint32_t fps1000;
+	uint32_t one_pcm_audio_frame;
+	int err;
+	AVDMGenericAudioStream *_audio=NULL;
+     
+      	// compute the number of bytes in the incoming stream
+      	// to feed the filter chain
+      	double	byt;
+      	byt =	video_body->getTime (frameEnd + 1) - video_body->getTime (frameStart);
+      	byt *= currentaudiostream->getInfo ()->frequency;
+      	byt *= currentaudiostream->getInfo ()->channels;
+      	byt *= 2;
+      	byt /= 1000.;
+
+	if(audioProcessMode)
+	{
+      		_audio = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart),
+				  (uint32_t) floor (byt));
+	}
+	else
+	{
+	
+        	uint32_t    tstart;
+	  	tstart = video_body->getTime (frameStart);
+		_audio = (AVDMGenericAudioStream *) currentaudiostream;
+	  	_audio->goToTime (tstart);	  
+	}
+   	
+	if(_audio->getInfo()->encoding!=WAV_MP2 && _audio->getInfo()->encoding!=WAV_AC3)
+	{
+		deleteAudioFilter();
+		return NULL;
+	}
+	//________________
+	uint32_t one_frame;
+  	aviInfo   info;
+	double    one_frame_double, one_delta_frame;
+  	WAVHeader *wav = NULL;
+
+  	assert (_audio);
+
+  	wav = _audio->getInfo ();
+  
+	if(videoProcessMode)
+	{
+  		fps1000 = getLastVideoFilter()->getInfo()->fps1000;
+	}else
+	{
+		fps1000 = avifileinfo->fps1000;
+	}
+  	
+  	// compute duration of a audio frame
+  	// in ms
+  	assert (fps1000);
+  	printf (" fps : %lu\n", fps1000);
+  	one_frame_double = (double) fps1000;
+  	one_frame_double = 1. / one_frame_double;
+  	// now we have 1/1000*fps=1/1000*duration of a frame in second
+  	one_frame_double *= 1000000.;
+  	// in ms now;
+  	one_frame = (uint32_t) floor (one_frame_double);
+  	printf (" One audio frame : %lu ms\n", one_frame);
+
+
+  	double    pcm;
+  	// *2 because one sample is 16 bits
+  	// fix hitokiri bug part 1.
+  	pcm = one_frame_double * 2 * wav->frequency * wav->channels;
+  	pcm /= 1000;
+  	one_pcm_audio_frame = (uint32_t) floor (pcm);
+  	printf (" one PCM audio frame is %lu bytes \n", one_pcm_audio_frame);
+
+  	// get the equivalent in bytes
+  	assert (wav);
+  	one_frame_double /= 1000.;	// go back to seconds
+  	one_frame_double *= wav->byterate;
+
+
+	  one_frame = (uint32_t) floor (one_frame_double);
+
+  	if (one_frame & 1)
+    		one_frame--;
+  	one_delta_frame = one_frame_double - one_frame;
+  	// Real ? correction of hitokiri bug
+  	one_delta_frame *= 1000;
+  	
+	*mypcm=one_frame;
+	return _audio;
+}
+

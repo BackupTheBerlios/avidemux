@@ -85,7 +85,7 @@ uint8_t AVDMProcessAudio_FFmpeg::init( uint32_t bitrate)
         	
     _context=( void *)avcodec_alloc_context();
          
-      
+    _wavheader->byterate=(bitrate*1000)>>3;  
     
     comp=_instream->getLength();
     comp/=2; // 16 bits sample
