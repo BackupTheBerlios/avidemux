@@ -69,3 +69,4 @@ feature.saveprefsonexit,		UINT,	1,	0,	1
 feature.ignoresavedmarkers,		UINT,	0,	0,	1
 feature.use_lavcodec_mpeg,		UINT,	0,	0,	1
 feature.disable_nuv_resync,		UINT,	0,	0,	1
+feature.tryautoidx,			UINT,	0,	0,	1

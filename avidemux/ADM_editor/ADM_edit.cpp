@@ -37,6 +37,7 @@
 #include "ADM_dialog/DIA_working.h"
 #include "ADM_ogm/ADM_ogm.h"
 #include "ADM_assert.h"
+#include "prefs.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_EDITOR
@@ -251,6 +252,40 @@ UNUSED_ARG(mode);
 	strcat(tmpname,".idx");
 	if(addFile(tmpname)) return 1;
       // then propose to index it
+	{ unsigned int autoidx = 0;
+		prefs->get(FEATURE_TRYAUTOIDX,&autoidx);
+		if( autoidx ){
+		   mpegAudioTrack track[24];
+		   int tracknum = -1;
+		   int trackcount = 0;
+			if(MpegaudoDetectAudio(name,track)){
+				for(int i=0;i<8;i++){
+					if(track[i+8].presence){
+						tracknum = i;
+						trackcount++;
+					}
+					if(track[i].presence){
+						tracknum = 0xC0 | i;
+						trackcount++;
+					}
+					if(track[i+16].presence){
+						tracknum = 0xA0 | i;
+						trackcount++;
+					}
+				}
+				if( trackcount == 0 ){
+					printf("\nNo audio tracks found. Autoindex aborted ...\n");
+				}else if( trackcount > 1 ){
+					printf("\nMore than one audio track found. Autoindex aborted ...\n");
+				}else{
+					if(indexMpeg (name,tmpname,(uint8_t)tracknum)){
+						printf("\n re-opening %s\n",tmpname);
+						return addFile (tmpname, 0);
+					} // else goto GUI_Question
+				} // else goto GUI_Question
+			} // else goto GUI_Question
+		}
+	}
       if (GUI_Question ("This looks like mpeg\n Do you want to index it?"))
 	{
 	  char *	  idx, *	    mname;

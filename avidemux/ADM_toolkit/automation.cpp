@@ -111,6 +111,7 @@ extern const char *getStrFromAudioCodec( uint32_t codec);
 extern void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm, uint16_t * ss, uint16_t * ms);
 extern uint8_t ADM_aviSetSplitSize(uint32_t size);
 extern uint8_t ogmSave(char *fd);
+static void set_autoindex(char *p);
 //_________________________________________________________________________
 
 extern uint8_t audioShift;
@@ -186,6 +187,7 @@ AUTOMATON reaction_table[]=
 		{"requant",		3	,"requantize mpeg2 : percent quality[0..3] output_name",
 										(one_arg_type )call_requant},
 		{"info",		0	,"show information about loaded video and audio streams", show_info},
+		{"autoindex",		0	,"try to generate required index files", set_autoindex},
 		
 		{"help",		0,"print this",		call_help},
 		{"quit",		0,"exit avidemux",	call_quit}
@@ -489,6 +491,11 @@ void save(char*name)
 void call_toolame(char *file)
 {
 	A_Pipe(P_TOOLAME,file);
+}
+
+void set_autoindex(char *p){
+	UNUSED_ARG(p);
+	prefs->set(FEATURE_TRYAUTOIDX,(unsigned int)1);
 }
 
 void show_info(char *p){
