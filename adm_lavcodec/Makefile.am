@@ -31,8 +31,17 @@ endif
 
 endif
 
+if BUILD_A64
+ EXTEND_A64 = x86_64/idct_a64.o \
+	x86_64/dsputil_a64.o \
+	x86_64/simple_idct_a64.o \
+	x86_64/fdct_a64.o \
+	x86_64/motion_est_a64.o 	 \
+	x86_64/vp3dsp_a64.o 	 \
+	x86_64/mpegvideo_a64.o 	
+endif
 
-libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c \
+libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) $(EXTEND_A64) ac3enc.c \
 	adpcm.c \
 	allcodecs.c \
 	avcodec.c \
