@@ -57,6 +57,7 @@ int scriptAddVideoFilter(int n,Arg *args);
 int scriptRemoveFrame(int n,Arg *args);
 int scriptSaveOgm(int n, Arg *args);
 int scriptIndexMpeg(int n, Arg *args);
+int scriptScanBlackFrames(int n, Arg *args);
 
 int scriptOutputFormat(int n, Arg *srgs);
 
@@ -111,6 +112,7 @@ static const admCommand myCommands[]=
 	{"removeframes",	scriptRemoveFrame,2,APM_NUM,APM_NUM},
         
         {"indexmpeg",           scriptIndexMpeg,3,APM_STRING,APM_STRING,APM_NUM},
-	
+	{"scanblackframes",     scriptScanBlackFrames,1,APM_STRING},
+
 	{"exit", 		scriptExit,0}
 };

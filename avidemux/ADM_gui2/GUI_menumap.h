@@ -54,8 +54,9 @@ CALLBACK(to_other1 				,ACT_Pipe2Other);
  CALLBACK( go_to_marker_a1  			,ACT_GotoMarkA);
  CALLBACK( go_to_marker_b1 			,ACT_GotoMarkB);
 
- CALLBACK( search_previous_black_frame1  			,ACT_PrevBlackFrame);
- CALLBACK( search_next_black_frame1 			,ACT_NextBlackFrame);
+ CALLBACK( search_previous_black_frame1  	,ACT_PrevBlackFrame);
+ CALLBACK( search_next_black_frame1		,ACT_NextBlackFrame);
+ CALLBACK( scan_for_black_frames1               ,ACT_AllBlackFrames);
 
  
 CALLBACK(reset_edits1                		,ACT_ResetSegments);

@@ -108,6 +108,13 @@ VF_FILTERS filter;
 		
 }
 //___________________________
+extern uint8_t A_ListAllBlackFrames( char *file );
+int scriptScanBlackFrames(int n, Arg *args)
+{
+
+    return A_ListAllBlackFrames( args[0].arg.string );
+}
+//___________________________
 extern int ogmSave(char *name);
 int scriptSaveOgm(int n,Arg *args)
 {
