@@ -248,7 +248,7 @@ extern  uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 	0,
 	0.5,		// spatial masking
 	0,		// NAQ
-	0,		// Use xvid ratecontrol
+	1,		// Use xvid ratecontrol
 	112,		// buffersize 240 KB for Mpeg2 /
 	0		// DUMMY
 	
@@ -294,7 +294,7 @@ extern  uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 	0,
 	0.5,		// spatial masking
 	0,		// NAQ
-	0,		// Use xvid ratecontrol
+	1,		// Use xvid ratecontrol
 	240,		// buffersize 240 KB for Mpeg2 /
 	0		// DUMMY
 	

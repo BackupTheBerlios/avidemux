@@ -206,8 +206,8 @@ ffmpegEncoder::gopMpeg1 (void)
   //_context->dsp_mask= FF_MM_FORCE;
   printf ("Mpeg12 settings:\n____________\n");
   printf ("FF Max rate    : %lu kbps\n", (_context->rc_max_rate) / 1000);
-  printf ("FF Buffer Size : %lu bits / %lu kB\n", (_context->rc_buffer_size),
-	  _context->rc_buffer_size / (8 * 1024));
+  printf ("FF Buffer Size : %lu bits / %lu kB\n", (_context->rc_buffer_size_header),
+	  _context->rc_buffer_size_header / (8 * 1024));
   printf ("FF GOP Size    : %lu\n", _context->gop_size);
   return 1;
 }
