@@ -133,6 +133,7 @@ mpegWritter::mpegWritter( uint8_t ps )
 	_audioBuffer=NULL;
 	_muxer=NULL;
 	_outputAsPs=1;
+	audioWanted=audioGot=0;
 
 }
 //_______________________________________
