@@ -1289,6 +1289,7 @@ tend= rdtsc();\
 #define CLAMP_TO_8BIT(d) ((d > 0xff) ? 0xff : (d < 0) ? 0 : d)
 
 /* avoid usage of various functions */
+#if 0 //MEANX
 #define malloc please_use_av_malloc
 #define free please_use_av_free
 #define realloc please_use_av_realloc
@@ -1299,7 +1300,7 @@ tend= rdtsc();\
 #define printf please_use_av_log
 #define fprintf please_use_av_log
 #endif
-
+#endif //MEANX
 #define CHECKED_ALLOCZ(p, size)\
 {\
     p= av_mallocz(size);\
