@@ -147,15 +147,27 @@ uint8_t         X264Encoder::encode( ADMImage        *in,
           size+= x264_nal_encode(out + size, &sizemax, 1, &nal[i]);          
         }
         *len=size;
-        
-        if(pic_out.i_type==X264_TYPE_IDR)  x_res.is_key_frame=1;
-              else x_res.is_key_frame=0;
-        x_res.out_quantizer=pic_out.i_qpplus1;
-        if(flags)
+        x_res.is_key_frame=0;
+        switch(pic_out.i_type)
         {
-                *flags=x_res.is_key_frame;
-        }
-
+          case X264_TYPE_IDR:   //FIXME: Only works if nb ref frame==1
+          case X264_TYPE_I:
+                        x_res.is_key_frame=1;            
+                        if(flags) *flags=AVI_KEY_FRAME;
+                        break;
+          case X264_TYPE_P:
+                        if(flags) *flags=AVI_P_FRAME;
+                        break;
+          case X264_TYPE_B:
+          case X264_TYPE_BREF:
+                        if(flags) *flags=AVI_B_FRAME;
+                        break;
+          default:   
+            printf("X264 :Unknown image type:%d\n",pic_out.i_type);
+            //ADM_assert(0);
+          
+        }       
+        x_res.out_quantizer=pic_out.i_qpplus1;        
         return 1;  
 }
 //**************************************
@@ -189,9 +201,9 @@ uint8_t         X264EncoderCBR::init( uint32_t val,uint32_t fps1000,ADM_x264Para
   memset(&param,0,sizeof(param));
   x264_param_default( &param );
   param.rc.b_cbr=1;
-  param.rc.i_bitrate=val;  
-  param.rc.i_rc_buffer_size=val;
-  param.rc.i_rc_init_buffer=val>>1;
+  param.rc.i_bitrate=val/1000;  
+  param.rc.i_rc_buffer_size=val/1000;
+  param.rc.i_rc_init_buffer=(val/1000)>>1;
   return preamble(fps1000,zparam); 
 }
 X264EncoderCBR::~X264EncoderCBR()
