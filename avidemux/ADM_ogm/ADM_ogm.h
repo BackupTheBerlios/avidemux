@@ -55,7 +55,7 @@ class oggAudio :  public AVDMGenericAudioStream
 			    uint32_t 			_extraLen;
 			    uint8_t  			*_extraData;
 			    
- 
+ 			
 				
 		public:
 					oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx );
@@ -93,6 +93,7 @@ protected:
 				uint32_t			_lastFrag;
 				oggAudio			*_audio;
 
+				uint8_t  			dumpHeader(stream_header *header,uint8_t isaudio);
 public:
 
 virtual   void 			Dump(void) ;

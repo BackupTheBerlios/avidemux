@@ -38,6 +38,10 @@
 
 #include "oplug_ogm/op_ogsave.h"
 
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME 0
+#include "ADM_toolkit/ADM_debug.h"
+
 uint8_t	ADM_ogmWriteCopy::initVideo(void)
 {
 		
@@ -74,6 +78,7 @@ uint8_t	ADM_ogmWriteCopy::initVideo(void)
 		header.buffersize=0x10000;
 		header.bits_per_sample=24;
 		
+		header.default_len=1;
 		
 		return videoStream->writeHeaders(sizeof(header),(uint8_t *)&header); // +4 ?
 
@@ -81,19 +86,101 @@ uint8_t	ADM_ogmWriteCopy::initVideo(void)
 //___________________________________________________
 uint8_t	ADM_ogmWriteCopy::writeVideo(uint32_t frame)
 {
-uint32_t len,flags;
+uint32_t len,flags_s,flags;
+uint32_t forward;
+uint8_t ret1=0;
 
-		if(!  video_body->getFrameNoAlloc (frameStart+frame, _videoBuffer, &len,     &flags)) return 0;	
-		
-		encoding_gui->feedFrame(len);
-		
-		return videoStream->write(len,_videoBuffer,flags,frame);
+		// Check for B_frames
+		if(!video_body->isReordered(frameStart+frame))
+		{
 
+			if(!  video_body->getFrameNoAlloc (frameStart+frame, _videoBuffer, &len,     &flags)) 
+				return 0;		
+			encoding_gui->feedFrame(len);
+			return videoStream->write(len,_videoBuffer,flags,frame);
+		}
+		
+		// we DO have b frame
+		// 
+		video_body->getFlags (frameStart + frame, &flags_s);
+		if(flags_s & AVI_B_FRAME)
+			{ 	// search if we have to send a I/P frame in adance
+				
+				uint32_t forward;
+				forward=searchForward(frameStart+frame);
+				// if we did not sent it, do it now
+				if(forward!=_lastIPFrameSent)
+				{
+					aprintf("\tP Frame not sent, sending it :%lu\n",forward);
+					ret1 = video_body->getFrameNoAlloc (forward, _videoBuffer, &len,
+				      		&flags_s);
+					_lastIPFrameSent=forward;
+
+				}
+				else
+				{
+					// we already sent it :)
+					// send n-1
+					aprintf("\tP Frame already, sending  :%lu\n",frameStart+frame-1);
+					ret1 = video_body->getFrameNoAlloc (frameStart+frame-1, _videoBuffer, &len,
+				      	&flags_s);
+
+				}
+
+			}
+			else // it is not a B frame and we have nothing on hold, sent it..
+			{
+				// send n-1 if we reach the fwd reference frame
+				if((frame+frameStart)==_lastIPFrameSent)
+				{
+					aprintf("\tSending Last B-frame :(%lu)\n",frameStart + frame-1);
+					ret1 = video_body->getFrameNoAlloc (frameStart + frame-1, _videoBuffer, &len,
+				      		&flags_s);
+
+				}
+				else
+				{
+					aprintf("\tJust sending it :(%lu)-(%lu)\n",frameStart + frame,_lastIPFrameSent);
+					ret1 = video_body->getFrameNoAlloc (frameStart + frame, _videoBuffer, &len,
+				      		&flags_s);
+
+				}
+			}
+
+		return ret1;
+
+}
+// Return the next non B frame
+// 0 if not found
+//___________________________________________________
+uint32_t ADM_ogmWriteCopy::searchForward(uint32_t startframe)
+{
+		uint32_t fw=startframe;
+		uint32_t flags;
+		uint8_t r;
+
+			while(1)
+			{
+				fw++;
+				r=video_body->getFlags (fw, &flags);
+				if(!(flags & AVI_B_FRAME))
+				{
+					return fw;
+
+				}
+				assert(r);
+				if(!r)
+				{
+					printf("\n Could not locate last non B frame \n");
+					return 0;
+				}
+
+			}
 }
 //___________________________________________________
 ADM_ogmWriteCopy::ADM_ogmWriteCopy( void)
 {
-
+	_lastIPFrameSent=0;
 
 }
 //___________________________________________________

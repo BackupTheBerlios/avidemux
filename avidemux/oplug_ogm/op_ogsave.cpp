@@ -141,8 +141,9 @@ uint8_t error=0;
 				error=1;
 				continue;
 			}
-			if(!writeAudio(j)) error=1;
 			if(!writeVideo(j)) error=1;
+			if(!writeAudio(j)) error=1;
+			
 			
 
 		}

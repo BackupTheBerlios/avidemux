@@ -216,12 +216,14 @@ uint8_t oggHeader::open(char *name)
 
 			OINFO(streamtype,8);
 			str[5]=0;
-
+			
 			// if it is a video track we keep it handy
 			if(!strcmp(str,"video"))
 			{
 				_videoTrack=id;
 				fourcc=fourCC::get((uint8_t *)&(header->subtype[0]))   ;
+				dumpHeader(header,0);
+				
 			}
 			if(!strcmp(str,"vorbi"))
 			{
@@ -242,6 +244,7 @@ uint8_t oggHeader::open(char *name)
 					_audioTracks[1].byterate=header->audio.avgbytespersec;
 					printf("Taking that track as audio track 2\n");
 				}
+				dumpHeader(header,1);
 			}
 			if(!strcmp(str,"audio"))
 			{
@@ -266,6 +269,7 @@ uint8_t oggHeader::open(char *name)
 					_audioTracks[1].byterate=header->audio.avgbytespersec;
 					printf("Taking that track as audio track 2\n");
 				}
+				dumpHeader(header,1);
 			}
 			OINFO(subtype,4); // fourcc
 	}
@@ -676,4 +680,32 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 	_lastImage=0xffffff;
 	_lastFrag=0xffffff;
 	return 0;
+}
+uint8_t  oggHeader::dumpHeader(stream_header	*header,uint8_t isaudio)
+{
+	
+char 	st[10];
+uint32_t *ub32;
+	memcpy(st,&(header->streamtype),8);
+	st[9]=0;
+	printf("Stream Type : %s\n",st);
+	ub32=(uint32_t *)&(header->subtype);
+	printf("Sub    Type : %04x\n",*ub32);
+	printf("header size : %d\n",header->size);
+	printf("Time unit   : %llu\n",header->time_unit);
+	printf("sample unit : %llu\n",header->samples_per_unit);
+	printf("Default len : %llu\n",header->default_len);
+	printf("Buffer size : %llu\n",header->buffersize);
+	printf("Bits per sam: %llu\n",header->bits_per_sample);
+
+	if(isaudio)
+	{
+			printf("Channels        : %llu\n",header->audio.channels);
+			printf("Blockalign      : %llu\n",header->audio.blockalign);
+			printf("Avgbytespersec  : %llu\n",header->audio.avgbytespersec);
+	
+	
+	}	
+
+	return 1;
 }

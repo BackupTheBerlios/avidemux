@@ -164,6 +164,8 @@ uint32_t w,h,fps1000,fcc;
 		
 		header.buffersize=0x10000;
 		header.bits_per_sample=24;
+		
+		header.default_len=1;
 				
 		return videoStream->writeHeaders(sizeof(header),(uint8_t *)&header); // +4 ?
 

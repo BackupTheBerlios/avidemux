@@ -102,4 +102,5 @@ uint16_t bits_per_sample;
 		// Audio specific
 		stream_header_audio audio;
 	};
+uint16_t	padd;
 } stream_header;
