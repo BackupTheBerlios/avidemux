@@ -9,6 +9,11 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+
+/*
+* MODIFIED BY GMV 30.1.05: prepared for ODML
+*/
+
 #include "config.h"
 
 #include <stdio.h>
@@ -65,7 +70,11 @@ uint8_t ADMFile::flush(void)
 uint64_t ADMFile::tell(void)
 {
  ADM_assert(_fill<ADM_FILE_BUFFER);
-        uint32_t c;
+	// MOD Feb 2005 by GMV
+	// uint32_t c;
+	uint64_t c;
+	// END MOD Feb 2005 by GMV
+        
      
         flush();
 #ifdef ADMF_DEBUG           

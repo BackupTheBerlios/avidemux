@@ -14,6 +14,11 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ 
+ /*
+* MODIFIED BY GMV 30.1.05: prepared for ODML
+*/
+ 
 #include "config.h"
 
 #include <stdio.h>
@@ -382,6 +387,10 @@ uint8_t  GenericAviSave::handleMuxSize ( void )
 //
 uint8_t   GenericAviSave::reigniteChunk( uint32_t dataLen, uint8_t *data )
 {
+	// MOD Feb 2005 by GMV: ODML exit
+	if(writter->doODML!=aviWrite::NO)return 1;	// exit if odml has to be used
+	// END MOD Feb 2005 by GMV
+	
 	    // first end up the current chunk
 	     	writter->setEnd ();
   			delete       writter;

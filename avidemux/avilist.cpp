@@ -17,6 +17,11 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ 
+ /*
+* MODIFIED BY GMV 30.1.05: prepared for ODML
+*/
+ 
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -63,17 +68,20 @@ uint8_t AviList::Begin(const char *subchunk)
 // Mark End
 uint8_t AviList::End(void)
 {
-    uint32_t len, b, e;
-
+// MOD Feb 2005 by GMV: prepared for ODML
+    //uint32_t len, b, e;
+	uint64_t len, b, e;
+// END MOD Feb 2005 by GMV
     
 
     e=_ff->tell();
     _ff->seek(_begin);
     b=_ff->tell();
-
-    len = (1 + e - b) & 0xfffffffe;
-    len -= 8;
-
+// MOD Feb 2005 by GMV: prepared for ODML
+    //len = (1 + e - b) & 0xfffffffe;
+    //len -= 8;
+	len=e-b-8;	// is this causing trouble? 'list' content has to include any padding
+// END MOD Feb 2005 by GMV
 
 
     Write32((_fcc));
@@ -82,8 +90,8 @@ uint8_t AviList::End(void)
     return 1;
 
 }
-
-uint32_t AviList::TellBegin(void)
+// MOD Feb 2005 by GMV: prepared for ODML
+/*uint32_t AviList::TellBegin(void)
 {
     return _begin;
 
@@ -93,11 +101,44 @@ uint32_t AviList::Tell(void)
 {
         return _ff->tell();
 
+}*/
+uint64_t AviList::TellBegin(void)
+{
+    return _begin;
+
 }
+
+uint64_t AviList::Tell(void)
+{
+	return _ff->tell();
+}
+// END MOD Feb 2005 by GMV
+
 
 //
 //  Io stuff
 //
+// MOD Feb 2005 by GMV: prepared for ODML
+// I placed the extended writing functions here to avoid dupicated code.
+// But since I am writing data without using Begin or End it may be necessary
+// or even just more strait to duplicate these functions and implement them
+// into aviwrite directly
+void AviList::Write64(uint64_t val){
+#ifdef ADM_BIG_ENDIAN
+	val=R64(val);
+#endif
+        _ff->write((uint8_t *)&val,8);
+}
+void AviList::Write16(uint16_t val){
+#ifdef ADM_BIG_ENDIAN
+	val=R16(val);
+#endif
+        _ff->write((uint8_t *)&val,2);
+}
+void AviList::Write8(uint8_t val){
+        _ff->write((uint8_t *)&val,1);
+}
+// END MOD Feb 2005 by GMV
 uint8_t AviList::Write32(uint32_t val)
 {
 #ifdef ADM_BIG_ENDIAN
