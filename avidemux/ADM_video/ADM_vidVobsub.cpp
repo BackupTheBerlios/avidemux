@@ -77,7 +77,7 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
         uint8_t                         cleanup(void);          /// Destroy all internal info
         uint8_t                         paletteYUV( void );     /// Convert RGB Pallette to yuv
         uint8_t                         Palettte2Display( void ); /// Convert the RLE to YUV bitmap
-        uint8_t                         handleSub( void );      /// Decode a sub packet
+        uint8_t                         handleSub( uint32_t idx );/// Decode a sub packet
         uint8_t                         buildDisplay( void );   /// Convert palette to yuv bitmap
         uint32_t                        lookupSub(uint64_t time);/// Return sub index corresponding to time
         
@@ -100,6 +100,7 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
         uint8_t                         _alpha[4];              /// Colors alpha
         int16_t                         _YUVPalette[16][3];
         uint32_t                        _currentSub;            ///
+        uint32_t                        _initialPts;
  public:
                 
                         ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *setup);
@@ -202,6 +203,7 @@ uint8_t ADMVideoVobSub::setup(void)
         _bitmap=NULL;
         _alphaMask=NULL;
         _currentSub=NOSUB;
+        _initialPts=0;
                 
 
 }
@@ -305,13 +307,14 @@ uint32_t sub;
         // Should we re-use the current one ? 
         if(sub==NOSUB)
         {
-                printf("No matching sub for time %llu frame%lu\n",time,frame);
+                aprintf("No matching sub for time %llu frame%lu\n",time,frame);
                 return 1;
         }
         if(sub!=_currentSub )
         {                
                  _parser->_asyncJump2(0,_vobSubInfo->lines[sub].fileOffset);
-                 handleSub();
+                 _initialPts=_parser->getPTS();
+                 handleSub(sub);
                 _currentSub=sub;
                 
         }                
@@ -365,13 +368,17 @@ uint32_t sub;
 }
 //***********************************************        
 
-uint8_t  ADMVideoVobSub::handleSub( void )
+uint8_t  ADMVideoVobSub::handleSub( uint32_t idx )
 {       
 uint16_t date,next,dum;
 uint8_t  command;
         _subSize=0;
-
+uint32_t pts;
         // Read data
+printf("**Cur:%llx next:%llx\n",_parser->getAbsPos(),_vobSubInfo->lines[idx+1].fileOffset);        
+while(_parser->getAbsPos()<_vobSubInfo->lines[idx+1].fileOffset)
+{        
+        printf("**Cur:%llx next:%llx\n",_parser->getAbsPos(),_vobSubInfo->lines[idx+1].fileOffset);
         _subSize=_parser->read16i();
         ADM_assert(_subSize);
         
@@ -389,7 +396,7 @@ uint8_t  command;
         forward(_dataSize-4);    // go to the command block
         
         
-        while(1)
+        while(2)
         {
              
                 date=readword();
@@ -401,11 +408,26 @@ uint8_t  command;
                         aprintf("vobsub:Command : %d date:%d next:%d cur:%lu\n",command,date,next,_curOffset);
                         switch(command)
                         {
-                                case 0: _displaying=1;
+                                case 00: _displaying=1;
                                         break;
                                 case 01: // start date
                                         break;
                                 case 02: // stop date
+                                        pts=_parser->getPTS();
+                                        if(!_vobSubInfo->lines[idx].stopTime)
+                                        {
+                                                double comp;
+                                           
+                                                comp=pts-_initialPts;
+                                                comp=comp/90;     // 90khz
+                                                comp+=date*10;    // 1/100th of a second
+                                                 _vobSubInfo->lines[idx].stopTime=(uint32_t)comp;
+                                                printf("****Sub: idx : %lu starts at :%lu end at :%lu\n",
+                                                        idx,
+                                                        _vobSubInfo->lines[idx].startTime, 
+                                                        _vobSubInfo->lines[idx].stopTime);
+                                        
+                                        }
                                         break;
                                 case 03: // Pallette 4 nibble= 16 bits
                                          dum=readword();
@@ -464,7 +486,7 @@ uint8_t  command;
                         } //End switch command     
                 }// end while
         }
-     
+  }     
 }
 //*********************************************************
 // Convert the palette display into YUV bitmap

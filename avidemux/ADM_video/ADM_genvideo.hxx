@@ -70,6 +70,11 @@ typedef struct
  	uint32_t top,bottom;
 }CROP_PARAMS;
 
+typedef struct
+{
+ 	uint32_t newfps, precision;
+}CHFPS_PARAMS;
+
 typedef struct {
     int pixel;
     double weight;
