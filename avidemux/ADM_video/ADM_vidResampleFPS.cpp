@@ -38,6 +38,8 @@
 #include "ADM_dialog/DIA_enter.h"
 #include "ADM_video/ADM_cache.h"
 
+#include "admmangle.h"
+
 static FILTER_PARAM ResampParam={2,{"newfps","use_linear"}};
 typedef struct FPS_Param
 {
@@ -147,7 +149,60 @@ uint8_t ADMVideoResampleFPS::getCoupledConf( CONFcouple **couples)
                 CSET(use_linear);
                 return 1;
 }
+#ifdef USE_MMX
+static uint64_t low,high;
+static void blendMMX(uint8_t *src, uint8_t *src2, uint8_t *dst, uint8_t alpha, uint8_t beta,uint32_t count)
+{
+uint32_t left=count&3;
+#define EXPAND(x) (x)+((x)<<16)+((x)<<32) +((x)<<48)
+        high=alpha;
+        low=beta;
+        high=EXPAND(high);
+        low=EXPAND(low);
+        count>>=2;
+         __asm__ __volatile__ (
+                                "movq "Mangle(high)", %%mm0\n"
+                                "movq "Mangle(low)",  %%mm1\n"                                
+                                "pxor %%mm7        ,  %%mm7\n"
+                                :: );
 
+        while(count>0)
+        {
+                __asm__ __volatile__ (
+                               
+                                "movd      (%0),  %%mm2\n"
+                                "movd      (%1),  %%mm3\n"                               
+
+                                "punpcklbw %%mm7, %%mm2\n"
+                                "punpcklbw %%mm7, %%mm3\n"
+
+                                "pmullw   %%mm0, %%mm2\n"
+                                "pmullw   %%mm1, %%mm3\n"
+                
+                                "paddw    %%mm3, %%mm2\n"
+
+                                "psrlw    $8,    %%mm2 \n"
+
+                                "packuswb %%mm2,%%mm2\n"
+                                "movd     %%mm2, (%2)\n"
+
+                                :: "r" (src), "r" (src2), "r" (dst) );
+                                
+                src+=4;
+                src2+=4;
+                dst+=4;
+                count--;
+        }
+        __asm__ __volatile__ (
+                                "emms\n"
+                                :: );
+        for(uint32_t i=0;i<left;i++)
+        {
+                dst[i] = ((src[i]*alpha) + (src2[i]*beta))>>8;
+        }
+}
+
+#endif
 
 uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
                                              uint32_t *len,
@@ -233,17 +288,23 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
       out = YPLANE(data);
       in1 = YPLANE(mysrc1);
       in2 = YPLANE(mysrc2);
+        
       count = page;
+
+#ifdef USE_MMX
+      blendMMX(in1,in2,out,lowweight,highweight,(count*3)>>1);
+#else
+      
       for(idx = 0; idx < count; ++idx)
 	out[idx] = ((in1[idx]*lowweight) + (in2[idx]*highweight))>>8;
-      
+
       out = UPLANE(data);
       in1 = UPLANE(mysrc1);
       in2 = UPLANE(mysrc2);
       count = page>>2;
 
       for(idx = 0; idx < count; ++idx)
-	out[idx] = ((in1[idx]*lowweight) + (in2[idx]*highweight))>>8;
+        out[idx] = ((in1[idx]*lowweight) + (in2[idx]*highweight))>>8;      
 
 
       out = VPLANE(data);
@@ -253,7 +314,7 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
 
       for(idx = 0; idx < count; ++idx)
 	out[idx] = ((in1[idx]*lowweight) + (in2[idx]*highweight))>>8;
-
+#endif
 
       vidCache->unlockAll();
     }
