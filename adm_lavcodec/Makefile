@@ -71,11 +71,7 @@ tags:
 tests: apiexample cpuid_test $(TESTS)
 
 libpostproc/libpostproc.a:
-	ifeq ($(OSTYPE),FreeBSD) 
 		cd libpostproc && make && cd ..
-	else
-		cd libpostproc && make && cd ..
-	endif
 
 $(LIB): $(OBJS)
 	rm -f $@
