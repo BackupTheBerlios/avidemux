@@ -19,6 +19,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,22 +27,17 @@
 #include <math.h>
 #include <assert.h>
 
-#include "config.h"
-
-
 #include "fourcc.h"
 #include "avio.hxx"
 #include "avi_vars.h"
-
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
-extern "C"
-{
-#include "ADM_video/swscale.h"
-};
+
+
+
 
 #ifdef USE_MMX
 extern "C" {
@@ -49,6 +45,8 @@ extern "C" {
 #include "../../adm_lavcodec/dsputil.h"
 }
 #endif
+
+#include "ADM_video/swscale.h"
 
 
 typedef struct alg
