@@ -51,6 +51,12 @@ Skip factor=2
 
 #include "mmx_macros.h"
 
+#ifdef __CYGWIN__ // CYGWIN
+	#define Mangle(x) "_" #x
+#else
+	#define Mangle(x) #x
+#endif
+
 
 #define SKIP_FACTOR 2   // 2^SKIPFACTOR=SKIP_LINEAR+1
 #define SKIP_LINEAR   3
@@ -131,10 +137,10 @@ pxor_r2r(mm7,mm7);
 	for(y=h>>SKIP_FACTOR;  y >2 ; y--)
 		{
 			__asm__ __volatile__(
-				"mov _l_c,	%%eax\n\t"
-				"mov _l_p,	%%ebx\n\t"
-				"mov _l_n,	%%ecx\n\t"
-				"mov _l_h,	%%edx\n\t"
+				"mov "Mangle(_l_c)",	%%eax\n\t"
+				"mov "Mangle(_l_p)",	%%ebx\n\t"
+				"mov "Mangle(_l_n)",	%%ecx\n\t"
+				"mov "Mangle(_l_h)",	%%edx\n\t"
 				"admlloopp: \n\t"
 				"movd (%%eax),	%%mm0\n\t"
 				"movd (%%ebx),	%%mm1\n\t"
@@ -166,7 +172,7 @@ pxor_r2r(mm7,mm7);
 		// retrieve mm7 containg the total
 
 		__asm__ __volatile__(
-		"mov 	$_total,		%%eax\n\t"
+		"mov 	$"Mangle(_total)",		%%eax\n\t"
 		"movd 	%%mm7,	(%%eax)\n\t"
 		"emms\n\t"
 		:
@@ -204,10 +210,10 @@ pxor_r2r(mm7,mm7);
 			for(x=w>>2;x>0;x--)
 			{
 			__asm__ __volatile__(
-				"mov _l_c,	%%eax\n\t"
-				"mov _l_p,	%%ebx\n\t"
-				"mov _l_n,	%%ecx\n\t"
-				"mov _l_h,	%%edx\n\t"
+				"mov "Mangle(_l_c)",	%%eax\n\t"
+				"mov "Mangle(_l_p)",	%%ebx\n\t"
+				"mov "Mangle(_l_n)",	%%ecx\n\t"
+				"mov "Mangle(_l_h)",	%%edx\n\t"
 				"movd (%%eax),	%%mm0\n\t"
 				"movd (%%ebx),	%%mm1\n\t"
 				"movd (%%ecx),	%%mm2\n\t"
@@ -231,7 +237,7 @@ pxor_r2r(mm7,mm7);
 		// retrieve mm7 containg the total
 
 		__asm__ __volatile__(
-		"mov 	$_total,		%%eax\n\t"
+		"mov 	$"Mangle(_total)",		%%eax\n\t"
 		"movd 	%%mm7,	(%%eax)\n\t"
 		"emms\n\t"
 		:

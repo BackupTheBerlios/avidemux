@@ -38,6 +38,14 @@
 
 #include"ADM_video/ADM_vidField.h"
 
+#ifdef __CYGWIN__ // CYGWIN
+	#define Mangle(x) "_" #x
+#else
+	#define Mangle(x) #x
+#endif
+
+
+
  static int32_t _l_w,_l_h;
  static uint8_t *_l_p,*_l_c,*_l_n;
  static uint8_t *_l_e,*_l_e2;
@@ -100,16 +108,16 @@ void myBlendASM(void)
 "push 				%%eax\n\t"
 
 "movl (%0), %%eax \n\t"
-"movl _l_p, %%eax \n\t"
-"movl _l_c, %%ebx \n\t"
-"movl _l_n, %%ecx \n\t"
-"movl _l_e, %%esi \n\t"
-"movl _l_e2, %%edi \n\t"
-"movq full_ones,%%mm7 \n\t"
+"movl "Mangle(_l_p)", %%eax \n\t"
+"movl "Mangle(_l_c)", %%ebx \n\t"
+"movl "Mangle(_l_n)", %%ecx \n\t"
+"movl "Mangle(_l_e)", %%esi \n\t"
+"movl "Mangle(_l_e2)", %%edi \n\t"
+"movq "Mangle(full_ones)",%%mm7 \n\t"
 "pxor	   %%mm6,%%mm6 \n\t"
 
 "DHCOLB%=: \n\t" // loop
-"movl _l_w, %%edx \n\t"                // loop one line
+"movl "Mangle(_l_w)", %%edx \n\t"                // loop one line
 
 "DHLineB%=:  \n\t"
 
@@ -172,7 +180,7 @@ void myBlendASM(void)
 "addl       $4,%%edi \n\t"
 "subl       $1,%%edx			\n\t"
 "jne        DHLineB%= \n\t"   // next
-"subl       $1,_l_h  \n\t" // next line
+"subl       $1,"Mangle(_l_h)"  \n\t" // next line
 "jne        DHCOLB%= \n\t"
 "pop 				%%eax\n\t"
 "pop 				%%esi\n\t"

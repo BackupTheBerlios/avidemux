@@ -364,6 +364,11 @@ void ADMVideoFlux::DoFilter_C(
 
 }
 #ifdef USE_MMX
+#ifdef __CYGWIN__ // CYGWIN
+	#define Mangle(x) "_" #x
+#else
+	#define Mangle(x) #x
+#endif
 /*
 	__asm movq mm2, mm0 \
 	__asm movq mm3, mm1 \
@@ -380,14 +385,15 @@ void ADMVideoFlux::DoFilter_C(
 "psubusw %%mm1, %%mm2 \n\t" \
 "psubusw %%mm0, %%mm3 \n\t" \
 "por     %%mm3, %%mm2				\n\t" /* mm2 = abs diff */ \
-"pcmpgtw "#threshold", %%mm2	\n\t "/* Compare with threshold */ \
+"pcmpgtw "Mangle(threshold)", %%mm2	\n\t "/* Compare with threshold */ \
 "paddw   %%mm2, %%mm6	\n\t	"/* -1 from counter if not within */ \
 "pandn   %%mm1, %%mm2 \n\t" \
 "paddw   %%mm2, %%mm5	\n\t" /* Add to sum */ 
 
 #define EXPAND(x) { x=x+(x<<8)+(x<<16)+(x<<24)+(x<<32)+(x<<40) \
 										+(x<<48);}
-										
+
+
 void ADMVideoFlux::DoFilter_MMX(
 uint8_t * currp, 
  uint8_t * prevp,								  								  
@@ -421,8 +427,8 @@ UNUSED_ARG(_l_prev_pels);
 UNUSED_ARG(_l_next_pels);
 asm(
 "								 movl (%0),%%esi \n\t"
-"                movl _l_currp, %%esi \n\t"
-"                movl _l_destp, %%edi \n\t"
+"                movl "Mangle(_l_currp)", %%esi \n\t"
+"                movl "Mangle(_l_destp)", %%edi \n\t"
 "                pxor %%mm7,%%mm7 \n\t"
 " \n\t"
 "yloop:  \n\t"
@@ -439,7 +445,7 @@ asm(
 "                movd (%%esi,%%ecx),%%mm0 \n\t"
 "                punpcklbw %%mm7,%%mm0 \n\t"
 "                movq %%mm0,%%mm5 \n\t"
-"                movq _l_counter_init,%%mm6 \n\t"
+"                movq "Mangle(_l_counter_init)",%%mm6 \n\t"
 " \n\t"
 "                # Middle left \n\t"
 " \n\t"
@@ -466,7 +472,7 @@ CHECK_AND_ADD(spat_thresh)
 "                # Top left \n\t"
 " \n\t"
 "                movl %%esi,%%eax \n\t"
-"                subl _l_src_pitch, %%eax \n\t"
+"                subl "Mangle(_l_src_pitch)", %%eax \n\t"
 "                movd (%%eax,%%ecx),%%mm1 \n\t"
 "                punpcklbw %%mm7,%%mm1 \n\t"
 "                psllq $16,%%mm1 \n\t"
@@ -497,7 +503,7 @@ CHECK_AND_ADD(spat_thresh)
 "                # Bottom left \n\t"
 " \n\t"
 "                movl %%esi,%%eax \n\t"
-"                addl _l_src_pitch, %%eax \n\t"
+"                addl "Mangle(_l_src_pitch)", %%eax \n\t"
 "                movd (%%eax,%%ecx),%%mm1 \n\t"
 "                punpcklbw %%mm7,%%mm1 \n\t"
 "                psllq $16,%%mm1 \n\t"
@@ -527,19 +533,19 @@ CHECK_AND_ADD(spat_thresh)
 " \n\t"
 "                # Previous frame \n\t"
 " \n\t"
-"                movl _l_prevp, %%eax \n\t"
+"                movl "Mangle(_l_prevp)", %%eax \n\t"
 "                movd (%%eax,%%ecx),%%mm1 \n\t"
 "                punpcklbw %%mm7,%%mm1 \n\t"
-"                movq %%mm1, _l_prev_pels \n\t"
+"                movq %%mm1, "Mangle(_l_prev_pels)" \n\t"
 " \n\t"
 CHECK_AND_ADD(temp_thresh)
 " \n\t"
 "                # Next frame \n\t"
 " \n\t"
-"                movl _l_nextp, %%eax \n\t"
+"                movl "Mangle(_l_nextp)", %%eax \n\t"
 "                movd (%%eax,%%ecx),%%mm1 \n\t"
 "                punpcklbw %%mm7,%%mm1 \n\t"
-"                movq %%mm1, _l_next_pels \n\t"
+"                movq %%mm1, "Mangle(_l_next_pels)" \n\t"
 " \n\t"
 CHECK_AND_ADD(temp_thresh)
 " \n\t"
@@ -548,10 +554,10 @@ CHECK_AND_ADD(temp_thresh)
 "                psllw $1,%%mm5                                  # sum *= 2 \n\t"
 "                paddw %%mm6,%%mm5                               # sum += count \n\t"
 " \n\t"
-"                pmaddwd _l_indexer,%%mm6                  # Make index into lookup \n\t"
+"                pmaddwd "Mangle(_l_indexer)",%%mm6                  # Make index into lookup \n\t"
 "                movq %%mm6,%%mm1 \n\t"
 "                punpckhdq %%mm6,%%mm6 \n\t"
-"                movl scaletab_MMX, %%eax \n\t"
+"                movl "Mangle(scaletab_MMX)", %%eax \n\t"
 "                paddd %%mm6,%%mm1 \n\t"
 "                movd %%mm1,%%ebx \n\t"
 " \n\t"
@@ -561,9 +567,9 @@ CHECK_AND_ADD(temp_thresh)
 "                # Apply smoothing only to fluctuating pels \n\t"
 " \n\t"
 "                movq %%mm0,%%mm1 \n\t"
-"                movq _l_prev_pels,%%mm2 \n\t"
+"                movq "Mangle(_l_prev_pels)",%%mm2 \n\t"
 "                movq %%mm0,%%mm3 \n\t"
-"                movq _l_next_pels,%%mm4 \n\t"
+"                movq "Mangle(_l_next_pels)",%%mm4 \n\t"
 " \n\t"
 "                pcmpgtw %%mm2,%%mm1                             # curr > prev \n\t"
 "                pcmpgtw %%mm4,%%mm3                             # curr > next \n\t"
@@ -587,7 +593,7 @@ CHECK_AND_ADD(temp_thresh)
 "                # Advance \n\t"
 " \n\t"
 "                addl $4,%%ecx \n\t"
-"                cmpl _l_xmax, %%ecx \n\t"
+"                cmpl "Mangle(_l_xmax)", %%ecx \n\t"
 "                jl xloop \n\t"
 " \n\t"
 "                # Copy last dword \n\t"
@@ -597,16 +603,16 @@ CHECK_AND_ADD(temp_thresh)
 " \n\t"
 "                # Next row \n\t"
 " \n\t"
-"                addl _l_src_pitch, %%esi \n\t"
-"                movl _l_prevp, %%eax \n\t"
-"                addl _l_src_pitch, %%eax \n\t"
-"                movl %%eax, _l_prevp \n\t"
-"                movl _l_nextp, %%ebx \n\t"
-"                addl _l_src_pitch, %%ebx \n\t"
-"                movl %%ebx, _l_nextp \n\t"
-"                addl _l_dst_pitch, %%edi \n\t"
+"                addl "Mangle(_l_src_pitch)", %%esi \n\t"
+"                movl "Mangle(_l_prevp)", %%eax \n\t"
+"                addl "Mangle(_l_src_pitch)", %%eax \n\t"
+"                movl %%eax, "Mangle(_l_prevp)" \n\t"
+"                movl "Mangle(_l_nextp)", %%ebx \n\t"
+"                addl "Mangle(_l_src_pitch)", %%ebx \n\t"
+"                movl %%ebx, "Mangle(_l_nextp)" \n\t"
+"                addl "Mangle(_l_dst_pitch)", %%edi \n\t"
 " \n\t"
-"                sub $1, ycnt \n\t"
+"                sub $1, "Mangle(ycnt)" \n\t"
 "                jnz yloop \n\t"
 " \n\t"
 //"MISMATCH: "                sfence" \n\t"

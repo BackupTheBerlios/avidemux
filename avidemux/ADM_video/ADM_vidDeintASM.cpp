@@ -42,6 +42,11 @@
 //	#define DEBUG_DEINT 1
 //	#define MMX_TRACE 1
 	#include "mmx_macros.h"
+#ifdef __CYGWIN__ // CYGWIN
+	#define Mangle(x) "_" #x
+#else
+	#define Mangle(x) #x
+#endif
 
  void myDeintASM(void);
 
@@ -132,10 +137,10 @@ void myDeintASM(void)
         	{
 
 			__asm__ __volatile__ (
-				"mov _l_c,	%%eax\n\t"
-				"mov _l_p,	%%ebx\n\t"
-				"mov _l_n,	%%ecx\n\t"
-				"mov _l_all,	%%esi\n\t"
+				"mov "Mangle(_l_c)",	%%eax\n\t"
+				"mov "Mangle(_l_p)",	%%ebx\n\t"
+				"mov "Mangle(_l_n)",	%%ecx\n\t"
+				"mov "Mangle(_l_all)",	%%esi\n\t"
 				"deintloop__:"
 				"movd (%%eax),	%%mm0\n\t"
 				"movd (%%ebx),	%%mm1\n\t"
@@ -150,17 +155,17 @@ void myDeintASM(void)
 				/* store result in e, e2 */
 
 			__asm__ __volatile__(
-				"mov 	_l_e,	%%edx\n\t"
+				"mov 	"Mangle(_l_e)",	%%edx\n\t"
 				"movd	%%mm3,(%%edx)\n\t"
 
-				"mov 	_l_e2,	%%edx\n\t"
+				"mov 	"Mangle(_l_e2)",	%%edx\n\t"
 				"movd	%%mm0,(%%edx)\n\t"
 
 				"addl 	$4,	%%eax\n\t"
 				"addl 	$4,	%%ebx\n\t"
 				"addl 	$4,	%%ecx\n\t"
-				"addl 	$4,	_l_e\n\t"
-				"addl 	$4,	_l_e2\n\t"
+				"addl 	$4,	"Mangle(_l_e)"\n\t"
+				"addl 	$4,	"Mangle(_l_e2)"\n\t"
 				"subl 	$1,	%%esi\n\t"
 				"jnz deintloop__\n\t"
 

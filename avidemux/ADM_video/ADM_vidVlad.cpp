@@ -33,6 +33,11 @@
 #include "avi_vars.h"
 #ifdef USE_MMX
 //#define LOOP
+#ifdef __CYGWIN__ // CYGWIN
+	#define Mangle(x) "_" #x
+#else
+	#define Mangle(x) #x
+#endif
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
@@ -50,7 +55,7 @@ static volatile uint8_t *_l_dest ;
 static volatile uint8_t *_l_mask ;
 static volatile uint64_t  _threshold;
 static volatile long int _pitch_source;
-static volatile long int _w8;
+static volatile long int w8;
 static void ProcessCPlane(unsigned char *source, int pitch_source,
 				   unsigned char *prev, 
 				   unsigned char *save_prev, 
@@ -178,11 +183,11 @@ void ProcessYPlane( unsigned char *source, long int pitch_source,
 			_pitch_source=pitch_source;
 		
 
-	_w8 = (width >> 3);
-//	_w8 = -_w8;
+	w8 = (width >> 3);
+//	w8 = -w8;
 	h2 = (height >> 1);
 #ifndef LOOP	
-  _w8=(height*width)>>3;
+  w8=(height*width)>>3;
 #else  
 	for (int y = 0; y < height; y++)
 	{
@@ -195,16 +200,16 @@ UNUSED_ARG(_keep_left_luma);
 		
 __asm__ __volatile__(
 "StartASM1: \n\t"
-"movl _l_source,%%esi \n\t"
-"movl _l_dest, %%edi \n\t"
+"movl "Mangle(_l_source)",%%esi \n\t"
+"movl "Mangle(_l_dest)", %%edi \n\t"
 
-"movl _l_prev, %%eax \n\t"
-"movl _l_sprev, %%ebx \n\t"
-"movl _l_mask, %%edx \n\t"
-"movq _threshold,%%mm6 \n\t"
+"movl "Mangle(_l_prev)", %%eax \n\t"
+"movl "Mangle(_l_sprev)", %%ebx \n\t"
+"movl "Mangle(_l_mask)", %%edx \n\t"
+"movq "Mangle(_threshold)",%%mm6 \n\t"
 "pxor %%mm7,%%mm7 \n\t"
 " \n\t"
-"movl _w8, %%ecx \n\t"                // -width/8
+"movl "Mangle(w8)", %%ecx \n\t"                // -width/8
 "prefetchnta -128(%%esi) \n\t"        // preload cache
 "prefetchnta -128(%%eax) \n\t"
 "HLine:  \n\t"
@@ -222,15 +227,15 @@ __asm__ __volatile__(
 "movq %%mm0,%%mm1 \n\t"               // maskded diff -> m1 
 " \n\t"
 "movq %%mm0,%%mm4 \n\t"               // masked diff >m4
-"pand _keep_left_luma,%%mm4 \n\t"     // left bytes m4
+"pand "Mangle(_keep_left_luma)",%%mm4 \n\t"     // left bytes m4
 "psrlw $8,%%mm4 \n\t"                 // shift
-"pand _keep_right_luma,%%mm1 \n\t"    // right bytes
+"pand "Mangle(_keep_right_luma)",%%mm1 \n\t"    // right bytes
 "pand %%mm1,%%mm4 \n\t"               // if right & left triggered
 "packuswb %%mm4,%%mm4 \n\t"           // packed to 4 bytes
 "movq %%mm0,%%mm1 \n\t"               // mm0 -> mm1 (invert diff to thresh)
 "movd %%mm4,(%%edx,%%ecx,4) \n\t"     // store mask m4->mask+ecx*4
 " \n\t"
-"pxor _full_f,%%mm1 \n\t"             // iinvert m1 
+"pxor "Mangle(_full_f)",%%mm1 \n\t"             // iinvert m1 
 "pand %%mm3,%%mm0 \n\t"               // mm0=old and mask diff
 "pand %%mm2,%%mm1 \n\t"               // mm1= source and invert diff
 "por %%mm1,%%mm0 \n\t"                // m0 = mix
@@ -245,23 +250,23 @@ __asm__ __volatile__(
 		_l_dest += _pitch_source;
 		_l_mask +=_pitch_source>>1;
 		*/
-"movl _l_source,%%esi \n\t"
-"movl _l_prev,  %%eax \n\t"
-"movl _l_sprev, %%ebx \n\t"
-"movl _l_dest,  %%edi \n\t"
-"movl _l_mask,  %%edx \n\t"
-"movl _pitch_source,%%ecx \n\t"
+"movl "Mangle(_l_source)",%%esi \n\t"
+"movl "Mangle(_l_prev)",  %%eax \n\t"
+"movl "Mangle(_l_sprev)", %%ebx \n\t"
+"movl "Mangle(_l_dest)",  %%edi \n\t"
+"movl "Mangle(_l_mask)",  %%edx \n\t"
+"movl "Mangle(_pitch_source)",%%ecx \n\t"
 "addl  %%ecx,%%esi \n\t"
 "addl  %%ecx,%%eax \n\t"
 "addl  %%ecx,%%ebx \n\t"
 "addl  %%ecx,%%edi \n\t"
-"movl  %%esi, _l_source \n\t"
-"movl  %%eax, _l_prev \n\t"
-"movl  %%ebx, _l_sprev \n\t"
-"movl  %%edi, _l_dest \n\t"
+"movl  %%esi, "Mangle(_l_source)" \n\t"
+"movl  %%eax, "Mangle(_l_prev)" \n\t"
+"movl  %%ebx, "Mangle(_l_sprev)" \n\t"
+"movl  %%edi, "Mangle(_l_dest)" \n\t"
 "sar   $1,%%ecx \n\t"
 "addl  %%ecx,%%edx \n\t"
-"movl  %%edx,_l_mask   \n\t"
+"movl  %%edx,"Mangle(_l_mask)"   \n\t"
 
 #endif	
  : /* no output */
@@ -291,26 +296,26 @@ void ProcessCPlane(unsigned char *source, int pitch_source,
 	_l_mask = mask ;
 	_threshold=threshold;
 	_pitch_source=pitch_source;
-	_w8 = (width >> 3);
-//	_w8 = -_w8;
+	w8 = (width >> 3);
+//	w8 = -w8;
 #ifdef LOOP
 	for (int y = 0; y < height; y++)
 	{
 #else
-   _w8=_w8*height;
+   w8=w8*height;
 #endif
 
 
 __asm__ __volatile__ (
-"movl _l_source, %%esi \n\t"
-"movl _l_dest, %%edi \n\t"
-"movl _l_prev, %%eax \n\t"
-"movl _l_sprev, %%ebx \n\t"
-"movl _l_mask, %%edx \n\t"
-"movq _threshold,%%mm6 \n\t"
+"movl "Mangle(_l_source)", %%esi \n\t"
+"movl "Mangle(_l_dest)", %%edi \n\t"
+"movl "Mangle(_l_prev)", %%eax \n\t"
+"movl "Mangle(_l_sprev)", %%ebx \n\t"
+"movl "Mangle(_l_mask)", %%edx \n\t"
+"movq "Mangle(_threshold)",%%mm6 \n\t"
 "pxor %%mm7,%%mm7 \n\t"
 " \n\t"
-"movl _w8, %%ecx \n\t"
+"movl "Mangle(w8)", %%ecx \n\t"
 "Lfoo%=:  \n\t"
 "movq (%%esi,%%ecx,8),%%mm0 \n\t"
 "movq (%%eax,%%ecx,8),%%mm1 \n\t"
@@ -328,7 +333,7 @@ __asm__ __volatile__ (
 "pand %%mm4,%%mm0 \n\t"
 "movq %%mm0,%%mm1 \n\t"
 " \n\t"
-"pxor _full_f,%%mm1 \n\t"
+"pxor "Mangle(_full_f)",%%mm1 \n\t"
 "pand %%mm3,%%mm0 \n\t"
 "pand %%mm2,%%mm1 \n\t"
 "por %%mm1,%%mm0 \n\t"
@@ -344,22 +349,22 @@ __asm__ __volatile__ (
 		_l_dest += _pitch_source;
 		_l_mask +=_pitch_source>>1;
 		*/
-"movl _l_source,%%esi \n\t"
-"movl _l_prev,  %%eax \n\t"
-"movl _l_sprev, %%ebx \n\t"
-"movl _l_dest,  %%edi \n\t"
-"movl _l_mask,  %%edx \n\t"
-"movl _pitch_source,%%ecx \n\t"
+"movl "Mangle(_l_source)",%%esi \n\t"
+"movl "Mangle(_l_prev)",  %%eax \n\t"
+"movl "Mangle(_l_sprev)", %%ebx \n\t"
+"movl "Mangle(_l_dest)",  %%edi \n\t"
+"movl "Mangle(_l_mask)",  %%edx \n\t"
+"movl "Mangle(_pitch_source)",%%ecx \n\t"
 "addl  %%ecx,%%esi \n\t"
 "addl  %%ecx,%%eax \n\t"
 "addl  %%ecx,%%ebx \n\t"
 "addl  %%ecx,%%edi \n\t"
 "addl  %%ecx,%%edx \n\t"
-"movl  %%esi, _l_source \n\t"
-"movl  %%eax, _l_prev \n\t"
-"movl  %%ebx, _l_sprev \n\t"
-"movl  %%edi, _l_dest \n\t"
-"movl  %%edx,_l_mask   \n\t"
+"movl  %%esi,"Mangle( _l_source)" \n\t"
+"movl  %%eax,"Mangle( _l_prev)" \n\t"
+"movl  %%ebx,"Mangle( _l_sprev)" \n\t"
+"movl  %%edi,"Mangle( _l_dest)" \n\t"
+"movl  %%edx,"Mangle(_l_mask)"   \n\t"
 
 #endif	
  : /* no output */
