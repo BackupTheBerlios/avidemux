@@ -25,7 +25,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_toolkit/ADM_debugID.h"
-#define MODULE_NAME MODULE_ODML
+#define MODULE_NAME MODULE_UNPACKER
 #include "ADM_toolkit/ADM_debug.h"
 #ifdef ADM_DEBUG
 	//#define OPENDML_VERBOSE
@@ -67,7 +67,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 				goto _abortUnpack;
 			}
 		aprintf("--Frame:%lu/%lu, len %lu\n",img,nbFrame,len);			
-		if(len<7)
+		if(len<=8)
 			{
 				aprintf("    Dummy frame, skipped\n");
 				continue;
