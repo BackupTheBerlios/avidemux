@@ -43,21 +43,26 @@
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_library/default.h"
-
+#include "ADM_library/ADM_image.h"
+#include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_colorspace/colorspace.h"
+#include "ADM_assert.h"
 
 static GtkWidget	*create_dialog1 (void);
-static void  		read ( GtkWidget *dialog );
-static void  		update ( uint8_t *buffer ,uint32_t w,uint32_t h);
+static void  		ui_read ( void);
+static void  		ui_update ( void);
 static void 		draw (GtkWidget *dialog,uint32_t w,uint32_t h );
 static gboolean 	gui_draw( void );
 static void 		autocrop (void );
 static void 		reset( void );
-static void 		upload(GtkWidget *dialog);
+static void 		ui_upload(void);
+static gboolean		ui_changed(void);
 
 static uint8_t 		Metrics( uint8_t *in, uint32_t width,uint32_t *avg, uint32_t *eqt);
 static uint8_t 		MetricsV( uint8_t *in, uint32_t width,uint32_t *avg, uint32_t *eqt);
 
+static void		prepare(uint32_t img);
+static void 		frame_changed( void );
 
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 
@@ -66,6 +71,11 @@ static uint8_t *working=NULL;
 static uint8_t *original=NULL;
 static GtkWidget *dialog=NULL;
 static uint32_t left,right,top,bottom,width,height;
+
+static AVDMGenericVideoStream *incoming=NULL;
+static ADMImage *imgsrc=NULL;
+
+static int lock=0;
 /*
 	W: Left
 	W2: Right
@@ -80,83 +90,223 @@ static uint32_t left,right,top,bottom,width,height;
 */
 
 
-#define FILL_ENTRY(widget_name,value) gtk_write_entry(WID(widget_name),  value)
+
 //
 //	Video is in YV12 Colorspace
 //
 //
-int DIA_getCropParams(	char *name,uint32_t *w,uint32_t *w2, uint32_t *h,uint32_t *h2,
-			uint32_t tw,uint32_t th,uint8_t *video)
+int DIA_getCropParams(	char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in)
 {
 	// Allocate space for green-ised video
-	working=new uint8_t [tw*(th)*4];	
+	width=in->getInfo()->width;
+	height=in->getInfo()->height;
+	
+	
+	working=new uint8_t [width*height*4];	
+	original=NULL;
 
 	uint8_t ret=0;
 
 	dialog=create_dialog1();
 	gtk_transient(dialog);
-	original=video;
-	left=*w;
-	right=*w2;
-	top=*h;
-	bottom=*h2;
-	width=tw;
-	height=th;
-
-	gtk_widget_set_usize(WID(drawingarea1), tw,th);
+	
+	left=param->left;
+	right=param->right;
+	top=param->top;
+	bottom=param->bottom;
+	
+	imgsrc=new ADMImage(width,height);
+	incoming=in;
+	
+	
+	
+	gtk_widget_set_usize(WID(drawingarea1), width,height);
 	gtk_window_set_title (GTK_WINDOW (dialog), name);
+	prepare(0);
 	gtk_widget_show(dialog);
 	
 
-	upload(dialog);
+	ui_upload();
 
-	update(working, tw,th);
-	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
-		       GTK_SIGNAL_FUNC(gui_draw),
-		       NULL);
+	ui_update();
+	
+#define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y,GTK_SIGNAL_FUNC(z),   NULL);
 
-	gtk_signal_connect(GTK_OBJECT(WID(buttonAutoCrop)), "clicked",
-                      GTK_SIGNAL_FUNC(autocrop),                   NULL);
-	gtk_signal_connect(GTK_OBJECT(WID(buttonReset)), "clicked",
-                      GTK_SIGNAL_FUNC(reset),                   NULL);
-
-	draw(dialog,tw,th);
+	CONNECT(drawingarea1,expose_event,gui_draw);
+	CONNECT(buttonAutocrop,clicked,autocrop);
+	CONNECT(buttonReset,clicked,reset);
+	CONNECT(scale,value_changed,frame_changed);
+			      
+	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonCancel), GTK_RESPONSE_CANCEL);
+	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonOk),      GTK_RESPONSE_OK);
+	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonApply),  GTK_RESPONSE_APPLY);
+		      
+#define CONNECT_SPIN(x) CONNECT(spinbutton##x, value_changed,ui_changed)
+      	  
+	  CONNECT_SPIN(Top);
+	  CONNECT_SPIN(Left);
+	  CONNECT_SPIN(Right);
+	  CONNECT_SPIN(Bottom);
+	  
+	  
+	draw(dialog,width,height);
 
 	ret=0;
 	int response;
 	while( (response=gtk_dialog_run(GTK_DIALOG(dialog)))==GTK_RESPONSE_APPLY)
 	{
-
-		read(dialog);
-		memcpy(working,video,(tw*th*3)>>1);
-		update(working, tw,th);
-		draw(dialog,tw,th);
+		ui_changed();
+		
 	}
 	if(response==GTK_RESPONSE_OK)
         {
-		read(dialog);
-		*w=left;
-		*w2=right;
-		*h=top;
-		*h2=bottom;
+		ui_read( );
+		param->left=left;
+		param->right=right;
+		param->top=top;
+		param->bottom=bottom;
 		ret=1;
 	}
 
 	gtk_widget_destroy(dialog);
-	delete working;
+	delete working;	
+	delete imgsrc;
 	working=NULL;
 	dialog=NULL;
 	original=NULL;
+	imgsrc=NULL;
 	return ret;
+}
+void frame_changed( void )
+{
+uint32_t new_frame,max,l,f;
+double   percent;
+GtkWidget *wid;	
+GtkAdjustment *adj;
+	
+	max=incoming->getInfo()->nb_frames;
+	wid=WID(scale);
+	adj=gtk_range_get_adjustment (GTK_RANGE(wid));
+	new_frame=0;
+	
+	percent=(double)GTK_ADJUSTMENT(adj)->value;
+	percent*=max;
+	percent/=100.;
+	new_frame=(uint32_t)floor(percent);
+	
+	if(new_frame>=max) new_frame=max-1;
+	
+	prepare(new_frame);
+	ui_update();
+	gui_draw();
+	
+
+}
+void prepare(uint32_t img)
+{
+	uint32_t l,f;
+	
+	ADM_assert(incoming->getFrameNumberNoAlloc(img,&l,imgsrc,&f));
+	original=imgsrc->data;
+	
+
+}
+gboolean ui_changed(void)
+{
+	if(!lock)
+	{
+		ui_read();
+		memcpy(working,original,(width*height*3)>>1);
+		ui_update();
+		draw(dialog,width,height);
+	}
+		return true;
+}
+
+
+/*---------------------------------------------------------------------------
+	Actually draw the working frame on screen
+*/
+gboolean gui_draw( void )
+{
+	draw(dialog,width,height);
+	return true;
+}
+void draw (GtkWidget *dialog,uint32_t w,uint32_t h )
+{
+	GtkWidget *draw;
+	draw=WID(drawingarea1);
+
+	GUI_RGBDisplay(working, w,h, (void *)draw);
+}
+/*---------------------------------------------------------------------------
+	Read entried from dialog box
+*/
+
+#define SPIN_GET(x,y) {x= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(WID(spinbutton##y))) ;}
+#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton##y)),(gfloat)x) ;}
+
+
+void ui_read (void )
+{
+	int reject=0;
+	
+			SPIN_GET(left,Left);
+			SPIN_GET(right,Right);
+			SPIN_GET(top,Top);
+			SPIN_GET(bottom,Bottom);
+			
+			printf("%d %d %d %d\n",left,right,top,bottom);
+			
+			left&=0xffffe;
+			right&=0xffffe;
+			top&=0xffffe;
+			bottom&=0xffffe;
+			
+			if((top+bottom)>height)
+				{
+					top=bottom=0;
+					reject=1;
+				}
+			if((left+right)>width)
+				{
+					left=right=0;
+					reject=1;
+				}
+			if(reject)
+				ui_upload();
+}
+
+void ui_upload(void)
+{
+	lock++;
+	SPIN_SET(left,Left);
+	SPIN_SET(right,Right);
+	SPIN_SET(top,Top);
+	SPIN_SET(bottom,Bottom);
+	lock--;
+}
+//____________________________________
+void reset( void )
+{
+	
+	top=bottom=left=right=0;
+	ui_upload();
+	ui_update();
+	gui_draw();
+	
 
 }
 /*---------------------------------------------------------------------------
 	Green-ify the displayed frame on cropped parts
 */
-void update( uint8_t *buffer,uint32_t w,uint32_t h)
+void ui_update( )
 {
 	uint32_t x,y;
 	uint8_t  *in;
+	uint32_t w=width,h=height;
+	uint8_t *buffer=working;
+	
 	//
 	COL_yv12rgb(  w,   h,original,buffer );
 	// do top
@@ -218,66 +368,7 @@ void update( uint8_t *buffer,uint32_t w,uint32_t h)
 
 	//right
 }
-/*---------------------------------------------------------------------------
-	Actually draw the working frame on screen
-*/
-gboolean gui_draw( void )
-{
-	draw(dialog,width,height);
-	return true;
-}
-void draw (GtkWidget *dialog,uint32_t w,uint32_t h )
-{
-	GtkWidget *draw;
-	draw=WID(drawingarea1);
 
-	GUI_RGBDisplay(working, w,h, (void *)draw);
-}
-/*---------------------------------------------------------------------------
-	Read entried from dialog box
-*/
-void read ( GtkWidget *dialog )
-{
-
-
-			left=gtk_read_entry(WID(entryLeft));
-			right=gtk_read_entry(WID(entryRight));
-			top=gtk_read_entry(WID(entryTop));
-			bottom=gtk_read_entry(WID(entryBottom));
-			
-			left&=0xffffe;
-			right&=0xffffe;
-			top&=0xffffe;
-			bottom&=0xffffe;
-			
-			if((top+bottom)>height)
-				{
-					top=bottom=0;
-				}
-			if((left+right)>width)
-				{
-					left=right=0;
-				}
-			upload(dialog);
-}
-
-void upload(GtkWidget *dialog)
-{
-	FILL_ENTRY(entryLeft,left);
-	FILL_ENTRY(entryRight,right);
-	FILL_ENTRY(entryTop,top);
-	FILL_ENTRY(entryBottom,bottom);
-
-}
-//____________________________________
-void reset( void )
-{
-	COL_yv12rgb(  width,   height,original,working );
-	top=bottom=left=right=0;
-	draw(dialog,width,height);
-	upload(dialog);
-
-}
 /*----------------------------------
   autocrop
 -----------------------------------*/
@@ -295,7 +386,7 @@ uint32_t y,avg,eqt;
 	{
 		Metrics(in,width,&avg,&eqt);
 		in+=width;
-		printf("LineT :%d avg: %d eqt: %d\n",y,avg,eqt);
+		//printf("LineT :%d avg: %d eqt: %d\n",y,avg,eqt);
 		if(avg> THRESH_AVG || eqt > THRESH_EQT)
 			break;
 	}
@@ -310,7 +401,7 @@ uint32_t y,avg,eqt;
 	{
 		Metrics(in,width,&avg,&eqt);
 		in-=width;
-		printf("Line B :%d avg: %d eqt: %d\n",y,avg,eqt);
+		//printf("Line B :%d avg: %d eqt: %d\n",y,avg,eqt);
 		if(avg> THRESH_AVG || eqt > THRESH_EQT)
 				break;
 	}
@@ -327,7 +418,7 @@ uint32_t y,avg,eqt;
 	{
 		MetricsV(in,height,&avg,&eqt);
 		in++;
-		printf("Line L :%d avg: %d eqt: %d\n",y,avg,eqt);
+		//printf("Line L :%d avg: %d eqt: %d\n",y,avg,eqt);
 		if(avg> THRESH_AVG || eqt > THRESH_EQT)
 				break;
 	}
@@ -342,7 +433,7 @@ uint32_t y,avg,eqt;
 	{
 		MetricsV(in,height,&avg,&eqt);
 		in--;
-		printf("Line R :%d avg: %d eqt: %d\n",y,avg,eqt);
+		//printf("Line R :%d avg: %d eqt: %d\n",y,avg,eqt);
 		if(avg> THRESH_AVG || eqt > THRESH_EQT)
 				break;
 	}
@@ -356,8 +447,8 @@ uint32_t y,avg,eqt;
 	// Update display
 	top=top & 0xfffe;
 	bottom=bottom & 0xfffe;
-	upload(dialog);
-	update(working, width,height);
+	ui_upload();
+	ui_update();
 	draw(dialog,width,height);
 	
 	
@@ -412,38 +503,43 @@ uint8_t v;
 		*eqt=eq;
 		return 1;
 }
-
+//--------------------------------------------
 GtkWidget*
 create_dialog1 (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox1;
-  GtkWidget *drawingarea1;
-  GtkWidget *frame1;
+  GtkWidget *hbuttonbox1;
+  GtkWidget *buttonCancel;
+  GtkWidget *buttonApply;
+  GtkWidget *buttonOk;
+  GtkWidget *hbuttonbox2;
+  GtkWidget *buttonAutocrop;
+  GtkWidget *buttonReset;
+  GtkWidget *alignment1;
+  GtkWidget *hbox1;
+  GtkWidget *image1;
+  GtkWidget *label1;
   GtkWidget *table1;
   GtkWidget *label2;
   GtkWidget *label3;
   GtkWidget *label4;
   GtkWidget *label5;
-  GtkWidget *entryLeft;
-  GtkWidget *entryRight;
-  GtkWidget *entryTop;
-  GtkWidget *entryBottom;
-  GtkWidget *label1;
-  GtkWidget *frame2;
-  GtkWidget *vbox2;
-  GtkWidget *buttonAutoCrop;
-  GtkWidget *buttonReset;
-  GtkWidget *hseparator2;
-  GtkWidget *label6;
+  GtkObject *spinbuttonLeft_adj;
+  GtkWidget *spinbuttonLeft;
+  GtkObject *spinbuttonTop_adj;
+  GtkWidget *spinbuttonTop;
+  GtkObject *spinbuttonBottom_adj;
+  GtkWidget *spinbuttonBottom;
+  GtkObject *spinbuttonRight_adj;
+  GtkWidget *spinbuttonRight;
+  GtkWidget *scale;
+  GtkWidget *drawingarea1;
   GtkWidget *dialog_action_area1;
-  GtkWidget *cancelbutton1;
-  GtkWidget *applybutton1;
-  GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Crop"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), _("Crop Settings"));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -452,149 +548,166 @@ create_dialog1 (void)
   gtk_widget_show (vbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
 
-  drawingarea1 = gtk_drawing_area_new ();
-  gtk_widget_show (drawingarea1);
-  gtk_box_pack_start (GTK_BOX (vbox1), drawingarea1, TRUE, TRUE, 0);
+  hbuttonbox1 = gtk_hbutton_box_new ();
+  gtk_widget_show (hbuttonbox1);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbuttonbox1, FALSE, TRUE, 0);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox1), GTK_BUTTONBOX_END);
 
-  frame1 = gtk_frame_new (NULL);
-  gtk_widget_show (frame1);
-  gtk_box_pack_start (GTK_BOX (vbox1), frame1, TRUE, TRUE, 0);
+  buttonCancel = gtk_button_new_from_stock ("gtk-cancel");
+  gtk_widget_show (buttonCancel);
+  gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonCancel);
+  GTK_WIDGET_SET_FLAGS (buttonCancel, GTK_CAN_DEFAULT);
+
+  buttonApply = gtk_button_new_from_stock ("gtk-apply");
+  gtk_widget_show (buttonApply);
+  gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonApply);
+  GTK_WIDGET_SET_FLAGS (buttonApply, GTK_CAN_DEFAULT);
+
+  buttonOk = gtk_button_new_from_stock ("gtk-ok");
+  gtk_widget_show (buttonOk);
+  gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonOk);
+  GTK_WIDGET_SET_FLAGS (buttonOk, GTK_CAN_DEFAULT);
+
+  hbuttonbox2 = gtk_hbutton_box_new ();
+  gtk_widget_show (hbuttonbox2);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbuttonbox2, FALSE, TRUE, 0);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox2), GTK_BUTTONBOX_START);
+
+  buttonAutocrop = gtk_button_new_with_mnemonic (_("AutoCrop"));
+  gtk_widget_show (buttonAutocrop);
+  gtk_container_add (GTK_CONTAINER (hbuttonbox2), buttonAutocrop);
+  GTK_WIDGET_SET_FLAGS (buttonAutocrop, GTK_CAN_DEFAULT);
+
+  buttonReset = gtk_button_new ();
+  gtk_widget_show (buttonReset);
+  gtk_container_add (GTK_CONTAINER (hbuttonbox2), buttonReset);
+  GTK_WIDGET_SET_FLAGS (buttonReset, GTK_CAN_DEFAULT);
+
+  alignment1 = gtk_alignment_new (0.5, 0.5, 0, 0);
+  gtk_widget_show (alignment1);
+  gtk_container_add (GTK_CONTAINER (buttonReset), alignment1);
+
+  hbox1 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox1);
+  gtk_container_add (GTK_CONTAINER (alignment1), hbox1);
+
+  image1 = gtk_image_new_from_stock ("gtk-undo", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image1);
+  gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
+
+  label1 = gtk_label_new_with_mnemonic (_("Reset"));
+  gtk_widget_show (label1);
+  gtk_box_pack_start (GTK_BOX (hbox1), label1, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
 
   table1 = gtk_table_new (2, 4, FALSE);
   gtk_widget_show (table1);
-  gtk_container_add (GTK_CONTAINER (frame1), table1);
+  gtk_box_pack_start (GTK_BOX (vbox1), table1, FALSE, TRUE, 0);
 
   label2 = gtk_label_new (_("Crop Left :"));
   gtk_widget_show (label2);
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
+  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_FILL);
   gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
-  label3 = gtk_label_new (_("Crop Right :"));
+  label3 = gtk_label_new (_("Crop Top:"));
   gtk_widget_show (label3);
-  gtk_table_attach (GTK_TABLE (table1), label3, 2, 3, 0, 1,
+  gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
+  gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_FILL);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
-  label4 = gtk_label_new (_("Crop Top :"));
+  label4 = gtk_label_new (_("Crop Right:"));
   gtk_widget_show (label4);
-  gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 1, 2,
+  gtk_table_attach (GTK_TABLE (table1), label4, 2, 3, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
+  gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_FILL);
   gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
-  label5 = gtk_label_new (_("Crop Bottom :"));
+  label5 = gtk_label_new (_("Crop Bottom:"));
   gtk_widget_show (label5);
   gtk_table_attach (GTK_TABLE (table1), label5, 2, 3, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
+  gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_FILL);
   gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
 
-  entryLeft = gtk_entry_new ();
-  gtk_widget_show (entryLeft);
-  gtk_table_attach (GTK_TABLE (table1), entryLeft, 1, 2, 0, 1,
+  spinbuttonLeft_adj = gtk_adjustment_new (1, 0, 1000, 1, 10, 10);
+  spinbuttonLeft = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonLeft_adj), 1, 0);
+  gtk_widget_show (spinbuttonLeft);
+  gtk_table_attach (GTK_TABLE (table1), spinbuttonLeft, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonLeft), TRUE);
 
-  entryRight = gtk_entry_new ();
-  gtk_widget_show (entryRight);
-  gtk_table_attach (GTK_TABLE (table1), entryRight, 3, 4, 0, 1,
+  spinbuttonTop_adj = gtk_adjustment_new (1, 0, 1000, 1, 10, 10);
+  spinbuttonTop = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonTop_adj), 1, 0);
+  gtk_widget_show (spinbuttonTop);
+  gtk_table_attach (GTK_TABLE (table1), spinbuttonTop, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonTop), TRUE);
 
-  entryTop = gtk_entry_new ();
-  gtk_widget_show (entryTop);
-  gtk_table_attach (GTK_TABLE (table1), entryTop, 1, 2, 1, 2,
+  spinbuttonBottom_adj = gtk_adjustment_new (1, 0, 1000, 1, 10, 10);
+  spinbuttonBottom = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonBottom_adj), 1, 0);
+  gtk_widget_show (spinbuttonBottom);
+  gtk_table_attach (GTK_TABLE (table1), spinbuttonBottom, 3, 4, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonBottom), TRUE);
 
-  entryBottom = gtk_entry_new ();
-  gtk_widget_show (entryBottom);
-  gtk_table_attach (GTK_TABLE (table1), entryBottom, 3, 4, 1, 2,
+  spinbuttonRight_adj = gtk_adjustment_new (1, 0, 1000, 1, 10, 10);
+  spinbuttonRight = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonRight_adj), 1, 0);
+  gtk_widget_show (spinbuttonRight);
+  gtk_table_attach (GTK_TABLE (table1), spinbuttonRight, 3, 4, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonRight), TRUE);
 
-  label1 = gtk_label_new (_("Crop Values"));
-  gtk_widget_show (label1);
-  gtk_frame_set_label_widget (GTK_FRAME (frame1), label1);
-  gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
+  scale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 10, 10)));
+  gtk_widget_show (scale);
+  gtk_box_pack_start (GTK_BOX (vbox1), scale, FALSE, TRUE, 0);
 
-  frame2 = gtk_frame_new (NULL);
-  gtk_widget_show (frame2);
-  gtk_box_pack_start (GTK_BOX (vbox1), frame2, TRUE, TRUE, 0);
-
-  vbox2 = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox2);
-  gtk_container_add (GTK_CONTAINER (frame2), vbox2);
-
-  buttonAutoCrop = gtk_button_new_with_mnemonic (_("AutoCrop"));
-  gtk_widget_show (buttonAutoCrop);
-  gtk_box_pack_start (GTK_BOX (vbox2), buttonAutoCrop, FALSE, FALSE, 0);
-
-  buttonReset = gtk_button_new_with_mnemonic (_("Reset"));
-  gtk_widget_show (buttonReset);
-  gtk_box_pack_start (GTK_BOX (vbox2), buttonReset, FALSE, FALSE, 0);
-
-  hseparator2 = gtk_hseparator_new ();
-  gtk_widget_show (hseparator2);
-  gtk_box_pack_start (GTK_BOX (vbox2), hseparator2, TRUE, TRUE, 0);
-
-  label6 = gtk_label_new (_("Autocrop"));
-  gtk_widget_show (label6);
-  gtk_frame_set_label_widget (GTK_FRAME (frame2), label6);
-  gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
+  drawingarea1 = gtk_drawing_area_new ();
+  gtk_widget_show (drawingarea1);
+  gtk_box_pack_start (GTK_BOX (vbox1), drawingarea1, FALSE, TRUE, 0);
+  gtk_widget_set_size_request (drawingarea1, 100, 100);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
-  cancelbutton1 = gtk_button_new_from_stock ("gtk-cancel");
-  gtk_widget_show (cancelbutton1);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), cancelbutton1, GTK_RESPONSE_CANCEL);
-  GTK_WIDGET_SET_FLAGS (cancelbutton1, GTK_CAN_DEFAULT);
-
-  applybutton1 = gtk_button_new_from_stock ("gtk-apply");
-  gtk_widget_show (applybutton1);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), applybutton1, GTK_RESPONSE_APPLY);
-  GTK_WIDGET_SET_FLAGS (applybutton1, GTK_CAN_DEFAULT);
-
-  okbutton1 = gtk_button_new_from_stock ("gtk-ok");
-  gtk_widget_show (okbutton1);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), okbutton1, GTK_RESPONSE_OK);
-  GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
-
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
-  GLADE_HOOKUP_OBJECT (dialog1, frame1, "frame1");
+  GLADE_HOOKUP_OBJECT (dialog1, hbuttonbox1, "hbuttonbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonCancel, "buttonCancel");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonApply, "buttonApply");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonOk, "buttonOk");
+  GLADE_HOOKUP_OBJECT (dialog1, hbuttonbox2, "hbuttonbox2");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonAutocrop, "buttonAutocrop");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonReset, "buttonReset");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment1, "alignment1");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, image1, "image1");
+  GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
   GLADE_HOOKUP_OBJECT (dialog1, table1, "table1");
   GLADE_HOOKUP_OBJECT (dialog1, label2, "label2");
   GLADE_HOOKUP_OBJECT (dialog1, label3, "label3");
   GLADE_HOOKUP_OBJECT (dialog1, label4, "label4");
   GLADE_HOOKUP_OBJECT (dialog1, label5, "label5");
-  GLADE_HOOKUP_OBJECT (dialog1, entryLeft, "entryLeft");
-  GLADE_HOOKUP_OBJECT (dialog1, entryRight, "entryRight");
-  GLADE_HOOKUP_OBJECT (dialog1, entryTop, "entryTop");
-  GLADE_HOOKUP_OBJECT (dialog1, entryBottom, "entryBottom");
-  GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
-  GLADE_HOOKUP_OBJECT (dialog1, frame2, "frame2");
-  GLADE_HOOKUP_OBJECT (dialog1, vbox2, "vbox2");
-  GLADE_HOOKUP_OBJECT (dialog1, buttonAutoCrop, "buttonAutoCrop");
-  GLADE_HOOKUP_OBJECT (dialog1, buttonReset, "buttonReset");
-  GLADE_HOOKUP_OBJECT (dialog1, hseparator2, "hseparator2");
-  GLADE_HOOKUP_OBJECT (dialog1, label6, "label6");
+  GLADE_HOOKUP_OBJECT (dialog1, spinbuttonLeft, "spinbuttonLeft");
+  GLADE_HOOKUP_OBJECT (dialog1, spinbuttonTop, "spinbuttonTop");
+  GLADE_HOOKUP_OBJECT (dialog1, spinbuttonBottom, "spinbuttonBottom");
+  GLADE_HOOKUP_OBJECT (dialog1, spinbuttonRight, "spinbuttonRight");
+  GLADE_HOOKUP_OBJECT (dialog1, scale, "scale");
+  GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
-  GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
-  GLADE_HOOKUP_OBJECT (dialog1, applybutton1, "applybutton1");
-  GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
 
   return dialog1;
 }
