@@ -14,14 +14,30 @@ class AVDMProcessAudio_Film2Pal : public AVDMBufferedAudioStream
 {
 protected:
 			       
-				 double  _current;				
+				 			
 				 double  _target;
 				 uint8_t  _bufferin[PROCESS_BUFFER_SIZE];
-        	    		 uint32_t 	grab(uint8_t *obuffer);
+        	    	virtual uint32_t grab(uint8_t *obuffer);
 		
 public:
 		
 			~AVDMProcessAudio_Film2Pal();				
 		        AVDMProcessAudio_Film2Pal(AVDMGenericAudioStream *instream	);		
+     		
+};
+
+class AVDMProcessAudio_Pal2Film : public AVDMBufferedAudioStream
+{
+protected:
+			       
+				 			
+				 double  _target;
+				 uint8_t  _bufferin[PROCESS_BUFFER_SIZE];
+        	    	virtual uint32_t grab(uint8_t *obuffer);
+		
+public:			
+		        AVDMProcessAudio_Pal2Film(AVDMGenericAudioStream *instream	);
+			~AVDMProcessAudio_Pal2Film();
+
      		
 };

@@ -38,7 +38,7 @@ AVDMProcessAudio_Film2Pal::AVDMProcessAudio_Film2Pal(AVDMGenericAudioStream * in
     (instream)
 {
     // nothing special here...
-    _current=_target=0;
+    _target=0;
     _wavheader = new WAVHeader;
 
     memcpy(_wavheader, _instream->getInfo(), sizeof(WAVHeader));
@@ -98,9 +98,10 @@ uint32_t 	AVDMProcessAudio_Film2Pal::grab(uint8_t *obuffer)
 		rd--;
 		
 	}	
-	_target+=(25.-23.976)/23.976;
+#define ALIGN	23.976
+	_target+=(25.-23.976)/ALIGN;
 	
-#define ALIGN	25.
+
 	while(_target>1.)
 	{
 		for(uint32_t i=0;i<min;i++)
@@ -116,3 +117,88 @@ uint32_t 	AVDMProcessAudio_Film2Pal::grab(uint8_t *obuffer)
     return rendered;
 
 };
+//
+//      First we read the input buffer and apply the volume transformation
+//  in it.    No need for specific buffer
+//___________________________________________
+
+AVDMProcessAudio_Pal2Film::AVDMProcessAudio_Pal2Film(AVDMGenericAudioStream * instream ):AVDMBufferedAudioStream
+    (instream)
+{
+    // nothing special here...
+    _target=0;
+    _wavheader = new WAVHeader;
+
+    memcpy(_wavheader, _instream->getInfo(), sizeof(WAVHeader));
+    _wavheader->encoding = WAV_PCM;
+    _wavheader->byterate =
+	_wavheader->channels * _wavheader->frequency * 2;
+    _instream->goToTime(0);
+    strcpy(_name, "PROC:P2FL");
+    _length = instream->getLength();
+    
+    double d;
+    
+    d=(double)_length;
+    
+    d/=25.;
+    d*=23.976;
+    
+    _length=(uint32_t)floor(d);
+    printf("Pal2Film : %lu\n",(unsigned long int)_length);
+
+};
+ AVDMProcessAudio_Pal2Film::~AVDMProcessAudio_Pal2Film()
+  {
+     	delete _wavheader;
+	_wavheader=NULL;
+  }
+
+
+uint32_t 	AVDMProcessAudio_Pal2Film::grab(uint8_t *obuffer)
+{
+    uint32_t rd,rendered;
+    uint8_t *out=NULL,*copy=NULL;
+    uint32_t min;
+    
+    rd = _instream->readDecompress(8192*4, _bufferin);
+    if(!rd) return MINUS_ONE;        
+   
+    
+   
+    min=_wavheader->channels*2;
+    
+    rendered=0;
+    
+    // copy four by four
+    copy=_bufferin;
+    out=obuffer;
+    while(rd>min)
+    {
+    	for(uint32_t i=0;i<min;i++)
+	{
+		*out++=*copy++;
+		rendered++;
+		rd--;
+		
+	}	
+#define ALIGN	23.976
+	_target+=(25.-23.976)/ALIGN;
+	
+
+	while(_target>1.)
+	{
+		for(uint32_t i=0;i<min;i++)
+		{
+			*out++=*(copy-min+i);
+			rendered++;
+		
+		}			
+		_target=_target-1.0;
+	}
+    }
+    
+    return rendered;
+
+};
+

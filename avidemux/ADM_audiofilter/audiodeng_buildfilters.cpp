@@ -384,7 +384,18 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
       switch(audioFilmConv)
       {
       	default:
-      	case FILMCONV_NONE: break;
+		assert(0);
+      	case FILMCONV_NONE:
+		break;
+	case FILMCONV_PAL2FILM:		
+	 AVDMProcessAudio_Pal2Film *p2f;
+		printf("\n Pal2Film\n");
+		
+		p2f = new AVDMProcessAudio_Pal2Film(lastFilter);
+		lastFilter = p2f;
+		filters[filtercount++] = lastFilter;	
+		break;
+	 	
 	
 	case FILMCONV_FILM2PAL:
 		AVDMProcessAudio_Film2Pal *f2p;
