@@ -247,7 +247,7 @@ inline void dprintf(const char* fmt,...) {}
 #    else
 
 #        ifdef DEBUG
-#            define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, __VA_ARGS__)
+#            define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, ##args)
 #        else
 #            define dprintf(fmt,...)
 #        endif
