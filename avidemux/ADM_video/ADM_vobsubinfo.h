@@ -28,6 +28,12 @@ typedef struct vobSubLine
 
 }vobSubLine;
 
+typedef struct vobSubLanguage
+{
+        uint32_t        nbLanguage; 
+        char            *language[20];  
+}vobSubLanguage;
+
 typedef struct VobSubInfo
 {
         uint32_t        Palette[16];
@@ -38,10 +44,12 @@ typedef struct VobSubInfo
 }VobSubInfo;
 
 /// Read the sub and return a new filled out vobsub info struct
-uint8_t vobSubRead(char *filename,VobSubInfo **info);
+uint8_t vobSubRead(char *filename,int index,VobSubInfo **info);
 uint8_t destroySubInfo(VobSubInfo *sub);
 
-
+uint8_t         vobSubGetLanguage(char *filename,vobSubLanguage *lingua);
+vobSubLanguage  *vobSubAllocateLanguage(void);
+uint8_t         vobSubDestroyLanguage(vobSubLanguage *lingua);
 
 #endif
 // EOF

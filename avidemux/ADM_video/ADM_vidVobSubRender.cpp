@@ -201,6 +201,7 @@ uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start)
               //memset(ptr,color,run);
               memset(ptr,_colors[color],run);
               memset(alpha,_alpha[color],run);
+              if(run!=stride) _original->_dirty[y]=1;
               x+=run;
               ptr+=run;
               alpha+=run;
@@ -229,7 +230,7 @@ uint8_t  command;
 uint32_t pts;
         // Read data
 printf("**Cur:%llx next:%llx\n",_parser->getAbsPos(),_vobSubInfo->lines[idx+1].fileOffset);        
-while(_parser->getAbsPos()<_vobSubInfo->lines[idx+1].fileOffset)
+while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
 {        
         printf("**Cur:%llx next:%llx\n",_parser->getAbsPos(),_vobSubInfo->lines[idx+1].fileOffset);
         _subSize=_parser->read16i();
@@ -251,10 +252,11 @@ while(_parser->getAbsPos()<_vobSubInfo->lines[idx+1].fileOffset)
         
         while(2)
         {
-             
+                if(_curOffset>_subSize-5) break;
                 date=readword();
                 next=readword();
                 if(next==_curOffset-4) break;            // end of command
+                
                 while(_curOffset<next)
                 {
                         command=readbyte();
@@ -363,7 +365,7 @@ vobSubBitmap::vobSubBitmap(uint32_t w, uint32_t h)
 
   _bitmap=new uint8_t [page];
   _alphaMask=new uint8_t [page];
-                                                
+  _dirty=new uint8_t[h];                                                
   clear();
 }
 vobSubBitmap::~vobSubBitmap()
@@ -372,6 +374,7 @@ vobSubBitmap::~vobSubBitmap()
 
   CLN(_bitmap);
   CLN(_alphaMask);  
+  CLN(_dirty);
 }
 void vobSubBitmap::clear(void)
 {
@@ -379,6 +382,7 @@ void vobSubBitmap::clear(void)
 
   CLR(_bitmap);
   CLR(_alphaMask);
+  memset(_dirty,0,_height);
 }
 
 //***********************************************************

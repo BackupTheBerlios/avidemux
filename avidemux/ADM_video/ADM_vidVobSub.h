@@ -28,17 +28,19 @@ class vobSubBitmap
 {
   public:
         uint32_t                        _width,_height;
-        
+        uint32_t                        top, left;
       
-        uint8_t                         *_bitmap;               /// YUV image
+        uint8_t                         *_bitmap;                  /// YUV image
         uint8_t                         *_alphaMask;               /// alpha mask 
-
+        uint8_t                         *_dirty;                   /// Dirty lines (non transparent)
+ 
                                         vobSubBitmap(uint32_t w, uint32_t h); 
                                         ~vobSubBitmap();
         void                            clear(void);
         
                                         /// Convert palette bitmap to yuv&mask bitmap
         uint8_t                         buildYUV( int16_t *palette ); 
+                                        /// Generate the final bitmap (resized)
         uint8_t                         subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy);
 };
 //************************************

@@ -52,7 +52,7 @@
 
 #include "ADM_vidVobSub.h"
 
-
+extern uint8_t DIA_vobsub(char **name, uint32_t *idx);
 
 static FILTER_PARAM vobsubParam={1,{"subname"}};
 #define aprintf printf
@@ -65,13 +65,11 @@ BUILD_CREATE(vobsub_create,ADMVideoVobSub);
 //*************************************************************
 uint8_t ADMVideoVobSub::configure(AVDMGenericVideoStream *in)
 {
-char *name;
-       GUI_FileSelRead("Select .sub file to load, NOT .idx", &name);        
-       if(name)
+
+       
+  if(DIA_vobsub(&(_param->subname),&(_param->index)))
        {
                 cleanup();
-                if(_param->subname) ADM_dealloc(_param->subname);
-                _param->subname=name;
                 setup();
                 return 1;
        }
@@ -112,7 +110,7 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
 #else                
                 _param->subname =NULL;
 #endif                
-                _param->index = 0x20;                
+                _param->index = 0;                
         }
         
         setup();
@@ -120,22 +118,40 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
 //************************************
 uint8_t ADMVideoVobSub::setup(void)
 {
+  char *dup;
+  int l;
+  
    _vobSubInfo=NULL;
-   if(_param->subname)
+   if(_param->subname && strlen(_param->subname)>5)
         {
                 printf("Opening %s\n",_param->subname);
-                if(vobSubRead(_param->subname,&_vobSubInfo))
+                dup=ADM_strdup(_param->subname);
+                l=strlen(dup);
+                if(l>5)
+                  if(dup[l-4]=='.')
+                {
+                  dup[l-3]='s';
+                  dup[l-2]='u';
+                  dup[l-1]='b';
+                          
+                }
+                if(vobSubRead(_param->subname,_param->index,&_vobSubInfo))
                 {
                         printf("Opening index \n");
-                        _parser=new ADM_mpegDemuxerProgramStream(_param->index,0xe0);
-                        if(!_parser->open(_param->subname))
+                       
+                        
+                        _parser=new ADM_mpegDemuxerProgramStream(_param->index+0x20,0xe0);
+                        
+                        if(!_parser->open(dup))
                         {
                                 printf("Mpeg Parser : opening %s failed\n",_param->subname);
                                 delete _parser;
                                 _parser=NULL;
                 
                          }
+                         
                 }
+                ADM_dealloc(dup);
         }
         
         

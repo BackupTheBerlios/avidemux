@@ -26,7 +26,7 @@
 #include "ADM_vobsubinfo.h"
 
 static uint8_t fillLine(char *str,VobSubInfo *sub,uint32_t line);
-static uint32_t countLine(FILE *f);
+static uint32_t countLine(FILE *f,int index);
 uint8_t fillPalette(char *str,VobSubInfo *sub);
 
 uint8_t destroySubInfo(VobSubInfo *sub)
@@ -80,7 +80,7 @@ int p[16],o;
 }
 //******************
 //******************
-uint8_t vobSubRead(char *filename,VobSubInfo **info)
+uint8_t vobSubRead(char *filename,int index,VobSubInfo **info)
 {
 FILE            *file=NULL;
 uint32_t        nb_lines;
@@ -97,23 +97,13 @@ int             language=0;
                 return 0;
         }
         *info=NULL;
-        dup=ADM_strdup(filename);
-        l=strlen(dup);
-        if(l>5)
-                if(dup[l-4]=='.')
-                {
-                        dup[l-3]='i';
-                        dup[l-2]='d';
-                        dup[l-1]='x';
-                        file=fopen(dup,"rb");
-                }
-        ADM_dealloc(dup);
+        file=fopen(filename,"rt");
         if(!file) 
         {
                 printf("Could not open %s file\n",filename);
                 return 0;
         }
-        nb_lines=countLine(file);
+        nb_lines=countLine(file,index);
         if(!nb_lines)
         {
                 printf("Empty file\n");
@@ -134,7 +124,7 @@ int             language=0;
                 if(!strncmp(str,"palette:",7))                 fillPalette(str,sub);
                 else 
                 {
-                        if(!strncmp(str,"timestamp: ",10))        
+                        if(!strncmp(str,"timestamp: ",10) && language)        
                         {
                                 fillLine(str,sub,line);
                                 line++;
@@ -143,14 +133,17 @@ int             language=0;
                         {
                                 if(!strncmp(str,"id:",3))       // Catch language/index
                                 {
-                                      language++;
-                                      if(language>1) break;
-                                        
+                                  int  l;
+                                  char s[50];
+                                  sscanf(str,"id: %s index: %d",s,&l);
+                                  printf("Found lang : %s index %d while searching %d\n",s,l,index);
+                                  if(l==index) language=1;
+                                  else language=0;                                                                              
                                 
                                 }
                                 else
                                 {
-                                        if(!strncmp(str,"id:",3))       // Catch original screen dimension
+                                        if(!strncmp(str,"size:",5))       // Catch original screen dimension
                                         {
                                                 sscanf(str,"size:%lux%lu",&(sub->width),&(sub->height));
                                         }
@@ -178,18 +171,74 @@ subAbort:
 //******************
 // count #nb beginning by timestamp in file
 //******************
-uint32_t countLine(FILE *f)
+uint32_t countLine(FILE *f,int index)
 {
-char str[1024];
+char str[1024],s[1024];
 uint32_t nb=0;
+uint32_t match=0;
+int lang;
+
         fseek(f,0,SEEK_SET);
         while(!feof(f))
         {
                 fgets(str,1023,f);
-                if(!strncmp(str,"timestamp: ",10)) nb++;
+                if(!strncmp(str,"id:",3))
+                {
+                  sscanf(str,"id: %s index: %d",s,&lang);
+                  if(lang==index) match=1;
+                  else match=0;
+                }
+                else
+                  if(match)
+                        if(!strncmp(str,"timestamp: ",10)) nb++;
         
         }
         fseek(f,0,SEEK_SET);
         return nb;
 }
+//*****************************************
+vobSubLanguage *vobSubAllocateLanguage(void)
+{
+  vobSubLanguage *l;
+  l=new vobSubLanguage;
+  memset(l,0,sizeof(vobSubLanguage));
+  return l;  
+}
+//*****************************************
+uint8_t vobSubDestroyLanguage(vobSubLanguage *lingua)
+{
+  for(uint32_t i=0;i<lingua->nbLanguage;i++)
+    delete [] lingua->language[i];
+  delete lingua; 
+  return 1;
+}
+//*****************************************
+uint8_t vobSubGetLanguage(char *filename,vobSubLanguage *lingua)
+{
+  char str[1024];
+  uint32_t nb=0;
+  FILE *fd=NULL;
+  
+  fd=fopen(filename,"rb");
+  if(!fd) return 0;
+  
+  
+
+  
+  while(!feof(fd))
+  {
+    fgets(str,1023,fd);
+    if(!strncmp(str,"id: ",3))
+    {
+      lingua->language[nb]=new char[3];
+      lingua->language[nb][0]=str[4];
+      lingua->language[nb][1]=str[5];
+      lingua->language[nb][2]=0;
+      nb++;
+    }        
+  }
+  lingua->nbLanguage=nb;
+  return 1;
+}
+
 //EOF
