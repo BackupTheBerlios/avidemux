@@ -24,7 +24,8 @@ typedef enum
 	DEVICE_OSS=1,
 	DEVICE_DUMMY,
 	DEVICE_ARTS,
-	DEVICE_ALSA
+	DEVICE_ALSA,
+	DEVICE_COREAUDIO
 
 }AUDIO_DEVICE;
 void 		AVDM_audioSave( void );

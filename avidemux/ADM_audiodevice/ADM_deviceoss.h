@@ -37,6 +37,7 @@
 		      		virtual uint8_t stop( void ) { return 1;}
 		 
 		 }   ;
+
 #ifdef OSS_SUPPORT
 	        class ossAudioDevice : public audioDevice
 	 {
@@ -49,5 +50,17 @@
 		      		virtual uint8_t stop( void ) ;
 		 }     ;
 #endif
+#ifdef CONFIG_DARWIN
 
+	        class coreAudioDevice : public audioDevice
+	 {
+		 protected :
+					uint8_t				_inUse;
+		  public:
+		  			coreAudioDevice(void) ;
+		     		virtual uint8_t init( uint32_t channel,uint32_t fq ) ;
+	    			virtual uint8_t play( uint32_t len, uint8_t *data ) ;
+		      		virtual uint8_t stop( void ) ;
+		 }     ;
 
+#endif

@@ -5,7 +5,7 @@ noinst_LIBRARIES = libADM_audiodevice.a
 
 libADM_audiodevice_a_METASOURCES = AUTO
 
-libADM_audiodevice_a_SOURCES = ADM_deviceArts.cpp ADM_audiodevice.cpp ADM_deviceoss.cpp oss_out.cpp ADM_deviceALSA.cpp ADM_deviceALSA.h
+libADM_audiodevice_a_SOURCES = ADM_deviceArts.cpp ADM_audiodevice.cpp ADM_deviceoss.cpp oss_out.cpp ADM_deviceALSA.cpp ADM_deviceALSA.h ADM_deviceAudioCore.cpp
 
 
 EXTRA_DIST = oss_out.cpp audio_out.h ADM_deviceoss.h ADM_deviceoss.cpp ADM_audiodevice.cpp ADM_deviceArts.cpp ADM_deviceArts.h 

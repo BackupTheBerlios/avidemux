@@ -76,6 +76,12 @@ void AVDM_audioInit(void )
 {
 uint8_t init=0;
 char *name=NULL;
+
+#ifdef CONFIG_DARWIN
+// For darwin we only can/will use coreAudio borrowed from mplayer
+				AVDM_switch(DEVICE_COREAUDIO);
+				return;
+#endif
 		if(prefs->get(DEVICE_AUDIODEVICE, &name))
 		{
 		if(!strcmp(name,"Arts"))
@@ -107,8 +113,10 @@ char *name=NULL;
 		#endif
 		}
 
-}
 
+}
+// Switch the audio device class we are using
+//
 void AVDM_switch(AUDIO_DEVICE action)
 {
 	if(device)
@@ -119,6 +127,14 @@ void AVDM_switch(AUDIO_DEVICE action)
 	 currentDevice=DEVICE_DUMMY;
 	switch(action)
 	{
+#ifdef CONFIG_DARWIN
+		  case  DEVICE_COREAUDIO :
+								device=new 	 coreAudioDevice;
+								currentDevice=DEVICE_COREAUDIO;;
+								printf("Using Darwin coreaudio i/f\n");
+								break;
+
+#endif
 #ifdef OSS_SUPPORT
 		  case  DEVICE_OSS :
 								device=new 	 ossAudioDevice;
