@@ -135,7 +135,7 @@ uint8_t CONFcouple::getCouple(const char *myname,char **val)
 
 	ADM_assert(index!=-1);
 	ADM_assert(index<(int)nb);
-	*val=value[index];
+	*val=ADM_strdup(value[index]);
 	return 1;
 }
 uint8_t CONFcouple::getCouple(const char *myname,float *val)
