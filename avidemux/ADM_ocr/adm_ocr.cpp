@@ -55,6 +55,7 @@ static uint8_t glyphToText(admGlyph *glyph);
 static uint8_t saveGlyph(void);
 static uint8_t loadGlyph(char *name);
 static void displaySmall( admGlyph *glyph );
+static int cb_accept(GtkObject * object, gpointer user_data);
 static uint8_t setup(void);
 static  vobSubParam subparam={NULL,0,0};
 /*++++++++++++++++++++++++++++++++++++++++*/
@@ -87,6 +88,7 @@ typedef enum
     actionLoadGlyph,
     actionSaveGlyph,
     actionSkip,
+    actionSkipAll,
     actionAccept,
     actionIgnore
 }ocrAction;
@@ -117,7 +119,7 @@ uint8_t ADM_ocr_engine( void)
 #define ASSOCIATE(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
     ASSOCIATE(buttonStart,actionGo);
     ASSOCIATE(buttonOk,   actionAccept);
-    ASSOCIATE(buttonSkip,     actionSkip);
+    ASSOCIATE(buttonskip,     actionSkip);
     ASSOCIATE(buttonIgnore,   actionIgnore);
     
     ASSOCIATE(buttonGlyphLoad,   actionLoadGlyph);
@@ -134,6 +136,8 @@ uint8_t ADM_ocr_engine( void)
     
     CONNECT(drawingareaBitmap,expose_event,gui_draw);
     CONNECT(drawingareaSmall,expose_event,gui_draw_small);
+
+    CONNECT(entry,activate,cb_accept);
 _again:    
     if(!setup()) goto endIt;
     printf("Go go go\n");
@@ -284,13 +288,17 @@ uint32_t base=0,bottom,top;
         while(top<h && lineEmpty(workArea,w,w,top)) top++;
         // Nothing found
         if(top>=h-1) break;
+
+        // 
+       
+
         bottom=top+1;
         // Search empty line if any, bottom is the 1st line full of zero
         while(bottom<h && (!lineEmpty(workArea,w,w,bottom) || bottom-top<7))
         {
             bottom++;
         }
-        
+        if(line) strcat(decodedString,"\n"); 
         //printf("\n Top:%lu bottom:%lu\n",top,bottom);
        
         // Scan a full line
@@ -321,8 +329,7 @@ uint32_t base=0,bottom,top;
             if(!handleGlyph(colstart,colend,w,bottom,top)) return 0;
             colstart=colend;
       }
-      line++;
-      if(line<nbLine) strcat(decodedString,"\n");
+      line++;      
       top=bottom;
       
     }
@@ -481,6 +488,7 @@ uint8_t glyphToText(admGlyph *glyph)
                     else delete glyph;
                     break;
                 case actionSkip: //SKIP
+                case actionSkipAll:
                     break;
                 case GTK_RESPONSE_CLOSE:
                     if(GUI_Question("Sure ?")) return 0;
@@ -691,6 +699,16 @@ char text[1024];
     if(sel==actionGo) return 1;
     }
 }
+/**
+*/
+int cb_accept(GtkObject * object, gpointer user_data)
+{
+        //printf("Hopla\n");
+        gtk_signal_emit_by_name(GTK_OBJECT(WID(buttonOk)),"clicked",(gpointer)1);
+        return 0;
+
+}
+
 /**
  */
 #include "ADM_ocrLoadSave.h"
