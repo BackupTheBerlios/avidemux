@@ -120,6 +120,8 @@ top_distdir = ../
 
 DISTPPC= \
 	ppc/dsputil_altivec.c \
+	ppc/dsputil_altivec.h \
+	ppc/gcc_fixes.h \
 	ppc/dsputil_ppc.c \
 	ppc/dsputil_ppc.h \
 	ppc/fft_altivec.c \
