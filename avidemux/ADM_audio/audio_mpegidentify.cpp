@@ -33,7 +33,7 @@
 #include "fourcc.h"
 #include "aviaudio.hxx"
 
-#include "ADM_audio/ADM_mp3info.h"
+#include "ADM_audio/ADM_mp3info.h" 
 
    
 uint8_t mpegAudioIdentify(uint8_t *ptr, uint32_t maxLookUp, WAVHeader *header, uint8_t *tokens)
@@ -58,9 +58,12 @@ uint8_t mpegAudioIdentify(uint8_t *ptr, uint32_t maxLookUp, WAVHeader *header, u
         if(info.layer==3) header->encoding=WAV_MP3;
                 else header->encoding=WAV_MP2;
 
+        if(tokens)
+        {
                 tokens[0]=ptr[offset+1];
                 tokens[1]=ptr[offset+2]&0xfd;
                 tokens[2]=ptr[offset+3];
+        }
 #define DUMPX(x) printf(#x": %d\n",info.x);
                 DUMPX( level);                    
                 DUMPX( layer);
