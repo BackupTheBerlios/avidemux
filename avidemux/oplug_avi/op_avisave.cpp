@@ -42,6 +42,7 @@
 #include "oplug_avi/op_avisave.h"
 #include "ADM_gui/GUI_mux.h"
 
+uint32_t muxSize=4090;
 extern PARAM_MUX muxMode;
 extern int muxParam;
 
@@ -53,6 +54,19 @@ extern uint8_t audioShift;
 extern int32_t audioDelay;
 
 const char *getStrFromAudioCodec( uint32_t codec);
+//_________________________
+uint8_t ADM_aviUISetMuxer(  void )
+{
+	return DIA_setUserMuxParam ((int *) &muxMode, (int *) &muxParam, (int *) &muxSize);
+}
+
+
+//_______ set the autosplit size
+uint8_t ADM_aviSetSplitSize(uint32_t size)
+{
+	muxSize=size;
+	return 1;
+}
 
 GenericAviSave::GenericAviSave ()
 {

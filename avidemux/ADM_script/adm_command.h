@@ -32,12 +32,23 @@ static const admCommand myCommands[]=
 	{"normalize",		scriptAudioNormalize,1,APM_NUM},
 	{"downsample",		scriptAudioDownsample,1,APM_NUM},
 	{"resample",		scriptAudioResample,1,APM_NUM},
+	{"delay",		scriptAudioDelay,1,APM_NUM},
+	{"film2pal",		scriptFilm2Pal,1,APM_NUM},
 	
 	{"loadaudio",		scriptLoadAudio,2,APM_STRING,APM_STRING},
 	{"saveaudio",		scriptSaveAudio,1,APM_STRING},
+	{"audiocodec",		scriptAudioCodec,2,APM_STRING,APM_NUM},
+	
+	{"scanvbr",		scriptScanVbr,0},
 	
 	{"goto",		scriptGoto,1,APM_NUM},
 	
+	{"setfps",		scriptSetFps,1,APM_FLOAT},
+	
 	{"sleep",		scriptSleep,1,APM_NUM},
+	
+	{"setmarkera",		scriptSetMarkerA,1,APM_NUM},
+	{"setmarkerb",		scriptSetMarkerB,1,APM_NUM},
+	
 	{"exit", 		scriptExit,0}
 };

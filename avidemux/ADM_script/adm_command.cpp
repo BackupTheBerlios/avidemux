@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <math.h>
 #include <string.h>
 #include <assert.h>
 #include "ADM_library/default.h"
@@ -21,6 +22,8 @@
 #include "ADM_gui2/GUI_ui.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "adm_scanner.h" 
+#include "avi_vars.h"
+#include "gui_action.hxx"
 
 int scriptLoad(Arg *args);
 int scriptExit(Arg *args);
@@ -36,13 +39,103 @@ int scriptLoadAudio(Arg *args);
 int scriptSaveAudio(Arg *args);
 int scriptGoto(Arg *args);
 
-int scriptSleep(Arg *args);
+int scriptSetFps(Arg *args);
 
+int scriptSleep(Arg *args);
+int scriptSetMarkerA(Arg *args);
+int scriptSetMarkerB(Arg *args);
+int scriptScanVbr(Arg *args);
+int scriptAudioDelay(Arg *args);
+int scriptFilm2Pal(Arg *args);
+int scriptAudioCodec(Arg *args);
+
+extern void HandleAction(Action act);
 #include "adm_command.h" 
 void ADS_commandList( void );
 ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg);
+//_______________________
+int scriptAudioCodec(Arg *args)
+{
+char *name=args[0].arg.string;
+	LowerCase(name);
+	// First search the codec by its name
+	if(!audioCodecSetByName(name)) return 0;
+	// set set bitrate
+	audioFilter_SetBitrate( args[1].arg.integer);
+	return 1;
+}
+//_______________________
+int scriptFilm2Pal(Arg *args)
+{
+	return audioFilterFilm2Pal(args[0].arg.integer);
+}
+//_________Sleep in ms________________
+int scriptAudioDelay(Arg *args)
+{
+		return audioFilterDelay(args[0].arg.integer);				
+}
+//_________Sleep in ms________________
+int scriptScanVbr(Arg *args)
+{
+	HandleAction(ACT_AudioMap);
+	return 1;
+
+}
+//_________Sleep in ms________________
+int scriptSetMarkerA(Arg *args)
+{
+int	f=args[0].arg.integer;
+	
+
+	if (!avifileinfo)
+	{
+		
+		return 0;
+	} 
+	if(f==-1) f=avifileinfo->nb_frames-1;
+	if(f<0 || f>avifileinfo->nb_frames-1) return 0;
+	frameStart=f;  
+	return 1;
+
+}
+int scriptSetMarkerB(Arg *args)
+{
+int	f=args[0].arg.integer;
+	
+
+	if (!avifileinfo)
+	{
+		
+		return 0;
+	} 
+	if(f==-1) f=avifileinfo->nb_frames-1;
+	if(f<0 || f>avifileinfo->nb_frames-1) return 0;
+	frameEnd=f;  
+	return 1;
+
+}
 
 //_________Sleep in ms________________
+int scriptSetFps(Arg *args)
+{
+	float fps;
+	aviInfo info;
+
+	if (avifileinfo)
+	{
+		video_body->getVideoInfo(&info);				
+		info.fps1000 = (uint32_t)floor(args[0].arg.real*1000.f);
+		video_body->updateVideoInfo (&info);
+		video_body->getVideoInfo (avifileinfo);
+		return 1;
+	} else 
+	{
+		return 0;
+	}
+
+}
+
+//_________Sleep in s________________
 int scriptSleep(Arg *args)
 {
 	usleep(args[0].arg.integer*1000);

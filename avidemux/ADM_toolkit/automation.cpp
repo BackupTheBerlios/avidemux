@@ -101,12 +101,12 @@ static void call_requant(char *p, char *q, char *n);
 extern void show_info(char *p);
 extern const char *getStrFromAudioCodec( uint32_t codec);
 extern void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm, uint16_t * ss, uint16_t * ms);
-
+extern uint8_t ADM_aviSetSplitSize(uint32_t size);
 //_________________________________________________________________________
 
 extern uint8_t audioShift;
 extern int32_t audioDelay;
-extern uint32_t muxSize;
+
 extern int global_argc;
 extern char **global_argv;
 extern void	ADM_saveRaw(char *name );
@@ -342,9 +342,7 @@ void call_setAudio (char *p)
 	
 		int32_t i;
 		sscanf(p,"%ld",&i);
-		audioDelay=i;  
-		printf("\n CLI audio delay %ld\n",audioDelay);	
-		audioShift=1;	
+		audioFilterDelay(i);		
 }
 void call_audiocodec(char *p)
 {
@@ -409,10 +407,8 @@ void call_autosplit(char *p)
 
 		int32_t i;
 		sscanf(p,"%ld",&i);
-		muxSize=i;
-		printf("\n autosplit every %lu megabytes\n",muxSize);
-
-			}
+		ADM_aviSetSplitSize(i);
+}
 
 void setBegin(char *p) 
 {	

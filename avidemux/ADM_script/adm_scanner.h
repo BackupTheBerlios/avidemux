@@ -10,6 +10,7 @@ typedef enum
 	APM_STRING,
 	APM_QUOTED,
 	APM_FLOAT,
+	APM_BOOL,
 	APM_LAST
 
 }APM_TYPE;

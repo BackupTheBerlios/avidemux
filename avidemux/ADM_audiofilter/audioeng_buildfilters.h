@@ -80,4 +80,8 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm,uint8_t silent=0);
 void audioFilterNormalize(uint8_t onoff);
 void audioFilterDownsample(uint8_t onoff);
 void audioFilterResample(uint32_t onoff);
+uint8_t audioFilterDelay(int32_t delay);
+uint8_t audioFilterFilm2Pal(uint8_t onoff);
+
+void audioFilter_SetBitrate( int i);
 

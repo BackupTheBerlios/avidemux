@@ -138,9 +138,23 @@ char *alt;
 	myarg=&args[pushed];
 	switch(type)
 	{
+		case APM_BOOL:
+			LowerCase(value);
+			if(!strcmp(value,"true") || !strcmp(value,"on"))
+			{
+				myarg->type=APM_NUM;
+				myarg->arg.integer=1;				
+			}
+			else if(!strcmp(value,"false") || !strcmp(value,"off"))
+			{
+				myarg->type=APM_NUM;
+				myarg->arg.integer=0;
+			}
+			else return 0;
+			break;
 		case APM_NUM: 
 			myarg->type=APM_NUM;
-			myarg->arg.integer=atoi(value);
+			myarg->arg.integer=atoi(value);			
 			break;
 		case APM_STRING: 
 			alt=strdup(value);			

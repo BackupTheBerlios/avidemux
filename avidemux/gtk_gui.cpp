@@ -115,7 +115,7 @@ extern void saveMpegFile (char *name);
 //static void A_selectEncoder ( void );
 extern void A_SaveAudioDualAudio (void);
 static void secondTrackMP3 (char *name);
-
+extern uint8_t ADM_aviUISetMuxer(  void );
 static void secondTrackAC3 (char *name);
 
 static void updateSecondAudioTrack (void);
@@ -156,7 +156,7 @@ uint8_t use_fast_ffmpeg = 0;
 //__________
 
 
-uint32_t muxSize = 4090;
+
 
 extern int ignore_change;
 
@@ -239,7 +239,7 @@ HandleAction (Action action)
       break;
 
     case ACT_SetMuxParam:
-      DIA_setUserMuxParam ((int *) &muxMode, (int *) &muxParam, (int *) &muxSize);
+      ADM_aviUISetMuxer();
       return;
       break;
     case ACT_OuputToggle:
@@ -2184,11 +2184,11 @@ int A_audioSave(char *name)
 		  	}
 		// if we get here, either not compressed
 		// or decompressable
-		GUI_FileSelWrite ("Select WAV file to save ",A_saveAudioDecodedTest);
+		A_saveAudioDecodedTest(name);
 	    }
 	else			// copy mode...
 	    {
-	      GUI_FileSelWrite ("Select MP3 file to save ", A_saveAudio);
+	       A_saveAudio(name);
 	    }
 	return 1;
 }

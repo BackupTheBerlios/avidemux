@@ -72,6 +72,7 @@
            				virtual uint8_t saveAvi( char *name );
    };
 extern uint32_t muxSize;
-
+uint8_t ADM_aviSetSplitSize(uint32_t size);
+uint8_t ADM_aviUISetMuxer(  void );
   #endif
 

@@ -40,7 +40,8 @@
      OTHERCOMMENT = 266,
      END = 267,
      EQUAL = 268,
-     COMMA = 269
+     COMMA = 269,
+     BOOL = 270
    };
 #endif
 #define NUMBER 258
@@ -55,6 +56,7 @@
 #define END 267
 #define EQUAL 268
 #define COMMA 269
+#define BOOL 270
 
 
 

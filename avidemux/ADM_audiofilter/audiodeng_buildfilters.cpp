@@ -92,6 +92,27 @@ void audioFilterNormalize(uint8_t onoff)
 {
 	audioNormalizeMode=onoff;
 }
+
+uint8_t audioFilterDelay(int32_t delay)
+{	
+	if(delay)
+	{
+		audioShift=1;
+		audioDelay=delay;
+	}
+	else
+	{
+		audioShift=audioDelay=0;
+	}
+	return 1;
+
+}
+uint8_t audioFilterFilm2Pal(uint8_t onoff)
+{
+	if(onoff) audioFilmConv=FILMCONV_FILM2PAL;
+	else audioFilmConv=FILMCONV_NONE;
+	return 1;
+}
 void audioFilterDownsample(uint8_t onoff)
 {
 	if(onoff)
