@@ -70,12 +70,13 @@ typedef struct
 #define WAV_8BITS 	53 // dummy id
 #define WAV_MP4 	54 // dummy id
 #define WAV_8BITS_UNSIGNED 	55 // dummy id
+#define WAV_AMRNB 	56 // dummy id
 #include "ADM_audiocodec/ADM_audiocodec.h"
 
 class AVDMGenericAudioStream
 {
    	protected:
-    #define SIZE_INTERNAL 64*1024 //1024
+    #define SIZE_INTERNAL 64*1024 
 					uint8_t 	internalBuffer[2 * SIZE_INTERNAL];
             				WAVHeader	*_wavheader;
                 			ADM_Audiocodec 	*_codec;
