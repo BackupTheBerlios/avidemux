@@ -24,6 +24,7 @@ avidemux2_LDADD   =  \
 ./ADM_editor/libADM_editor.a \
 ./ADM_library/libADM_library.a \
 ./ADM_openDML/libADM_openDML.a \
+./oplug_ogm/liboplug_ogm.a \
 ./ADM_audiocodec/libADM_audiocodec.a ./ADM_audio/libADM_audio.a \
 ./oplug_avi/liboplug_avi.a \
 ./oplug_mpeg/liboplug_mpeg.a \
@@ -46,7 +47,6 @@ avidemux2_LDADD   =  \
 ./libMpeg2Dec/liblibMpeg2Dec.a   \
 ./ADM_toolkit/libADM_toolkit.a  \
 ./ADM_colorspace/libADM_colorspace.a \
-./oplug_ogm/liboplug_ogm.a \
 ../adm_lavcodec/libpostproc/libpostproc.a \
 ./ADM_library/libADM_library.a 
 
