@@ -1,5 +1,5 @@
 CC=g++
-OBJS= ffv1video.o ffv1rec.o ffv1audio.o ffv1color.o ffv1codec.o ffv1write.o
+OBJS= ffv1video.o ffv1rec.o ffv1audio.o ffv1color.o ffv1codec.o ffv1write.o frequencies.o
 
 
 IFLAGS= \

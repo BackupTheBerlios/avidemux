@@ -39,7 +39,8 @@
 //#include "avcodec.h"
 
 #include "ffv1.h"
-#define _VERSION_ "0.2"
+#include "frequencies.h"
+#define _VERSION_ "0.2.1"
 
 
 /* Globals */
@@ -86,6 +87,13 @@ static int initBuffers( void );
 void sighandler(int i)
 {
   if (!quiet) fprintf(stderr, "\n"); // preserve status line
+  closeVideoDev();
+  exit(0);
+}
+
+void sigexithandler (int i) 
+{
+  closeVideoDev();
   exit(0);
 }
 
@@ -113,6 +121,8 @@ void usage()
    fprintf(stderr, "         -V dev ........ Videodevice       [/dev/video0]\n");
    fprintf(stderr, "         -A dev ........ Audiodevice          [/dev/dsp]\n");
    fprintf(stderr, "         -T ............ use time for drop calculation\n");
+   fprintf(stderr, "         -P program..... switch tuner to program loaded from xawdecode \n");
+   fprintf(stderr, "         -L ............ list programs loaded from xawdecode \n");   
    fprintf(stderr, "         -p ............ PAL [default] \n");
    fprintf(stderr, "         -n ............ NTSC\n");
    fprintf(stderr, "         -s ............ SECAM\n");
@@ -171,7 +181,7 @@ int main(int argc, char** argv)
 
   parseRcFile();
 
-  while ((c=getopt(argc,argv,"d:b:M:q:l:c:C:S:W:H:t:NTV:A:a:srf:pnZb:x:y:zQ2")) != -1) {
+  while ((c=getopt(argc,argv,"d:b:M:q:l:c:C:S:W:H:t:NTV:A:a:srf:pnZb:x:y:zQ2P:L")) != -1) {
     switch(c) {
       case '2': do_split=1;break;
       case 'b': ainfo.frequency=atoi(optarg);break;
@@ -190,6 +200,17 @@ int main(int argc, char** argv)
 					exit(0);
 				};break;
       case 'y': audiomegs = atoi(optarg);  break;
+      case 'P':  
+        {
+          char buf[33];
+          info.frequency = get_chan_frequency(optarg, buf);
+          fprintf(stderr, "switching to program %s\n", buf);
+        }
+        break;
+      case 'L':
+        print_channels();
+        exit(0);
+        break;
       case 'p': info.ntsc = 0;  break;
       case 'n': info.ntsc = 1;  break;
       case 's': info.ntsc = 0; info.secam=1;  break;
@@ -318,6 +339,10 @@ if(info.height==0)
 		printf(" Cannot init video input\n");
 		exit(0);
 	}
+
+        signal(SIGINT, sigexithandler);
+        signal(SIGTERM, sigexithandler);
+        signal(SIGQUIT, sigexithandler);
 	captureVideoDev();
 
 	return 0;

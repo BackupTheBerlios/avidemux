@@ -18,6 +18,8 @@
 #define MEAN_DO_NO_WANT_V4L2
 #include <linux/videodev.h>
 
+
+
 #include "ffv1.h"
 // we need the BTTV_FIELDNR, so we really know how many frames we lose
 #define BTTV_FIELDNR            _IOR('v' , BASE_VIDIOCPRIVATE+2, unsigned int)
@@ -89,8 +91,10 @@ int volume=-1;
   	// choose the right input
   	if(ioctl(fd, VIDIOCSCHAN, &vchan)<0) perror("VIDIOCSCHAN");
 
-  	// if channel has a audio then activate it
-  	if ((vchan.flags & VIDEO_VC_AUDIO)==VIDEO_VC_AUDIO) {
+  	// if channel has a audio/tuner then activate it
+        // this was a check for VIDEO_VC_AUDIO, but somehow my saa7134 card only reports
+        // VIDEO_VC_TUNER, and it definitely has audio. Maybe one could omit this check completely?!?
+  	if ( (vchan.flags & VIDEO_VC_TUNER)==VIDEO_VC_TUNER) {
     	// we assume only a channel with audio can have a tuner therefore
     	// we only tune here if we are supposed to
     	if (info->frequency != 0.0)
@@ -149,6 +153,17 @@ int volume=-1;
   	printf("Video init successfull\n");
 	return 1;
   }
+
+
+void closeVideoDev (void)
+{
+  	// if channel has a audio then activate it
+  	if ((vchan.flags & VIDEO_VC_TUNER)==VIDEO_VC_TUNER) {
+      printf("resetting audio!\n");
+      if (ioctl(fd, VIDIOCSAUDIO, &origaudio)<0) perror("VIDIOCSAUDIO");
+
+    }
+}
 /*
 	Main loop for capturing video
 

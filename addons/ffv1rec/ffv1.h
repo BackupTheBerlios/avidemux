@@ -24,6 +24,8 @@ typedef struct
 }v4linfo;
 
 int 		initVideoDev(char *videodevice, v4linfo *info );
+void closeVideoDev(void);
+
 void 	captureVideoDev( void );
 
 unsigned long int getVideoFourCC( void );
