@@ -149,7 +149,7 @@ rm -f configure.in configure.in.new
 kde_use_qt_param=
 test -f configure.files || { echo "need configure.files for configure.in"; exit 1; }
 cat `egrep -v "configure.in.bot" < configure.files` > configure.in.new
-echo "KDE_CREATE_SUBDIRSLIST" >> configure.in.new
+#echo "KDE_CREATE_SUBDIRSLIST" >> configure.in.new
 if test -f Makefile.am.in; then
   subdirs=`cat subdirs`
   for dir in $subdirs; do
