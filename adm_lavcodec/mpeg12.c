@@ -190,7 +190,7 @@ static void init_uni_ac_vlc(RLTable *rl, uint32_t *uni_ac_vlc_bits, uint8_t *uni
 
 
 static int find_frame_rate_index(MpegEncContext *s){
-    int i;
+    int i=-1;
     int64_t dmin= INT64_MAX;
     int64_t d;
 
@@ -205,10 +205,11 @@ static int find_frame_rate_index(MpegEncContext *s){
             s->frame_rate_index= i;
         }
     }
-    if(dmin>4) //MEANX: dont be so nitpicking
-        return -1;
-    else
-        return 0;
+   if(d>4)
+   {
+   	av_log(0,AV_LOG_ERROR,"We did a roundup ! Expect async!\n");
+   }
+   return 0;
 }
 
 static int encode_init(AVCodecContext *avctx)
