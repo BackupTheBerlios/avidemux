@@ -37,6 +37,7 @@
 
 #include "ADM_gui2/GUI_accelRender.h"
 #include "ADM_gui2/GUI_xvDraw.h"
+#include "ADM_gui2/GUI_sdlDraw.h"
 
 #include "ADM_toolkit/toolkit_gtk.h"
 
@@ -150,7 +151,17 @@ uint8_t renderExpose(void)
 }
 uint8_t renderStartPlaying( void )
 {
+char *displ;
 	assert(!accel_mode);
+	// First check if local
+	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
+	// in that case we do not even try to use accel
+	displ=getenv("DISPLAY");
+	if(strcmp(displ,":0") && strcmp(displ,":0.0"))
+	{
+		printf("Looks like remote display, no Xv :%s\n",displ);
+		return 1;
+	}
 	#if defined(USE_XV)
 	
 		accel_mode=new XvAccelRender();
@@ -164,6 +175,23 @@ uint8_t renderStartPlaying( void )
 		{
 			printf("Xv init ok\n");
 		}
+	#endif
+	#if defined(USE_SDL)
+	if(!accel_mode)
+	{
+		printf("Trying SDL\n");
+		accel_mode=new sdlAccelRender();
+		if(!accel_mode->init(draw,renderW,renderH))
+		{
+			delete accel_mode;
+			accel_mode=NULL;
+			printf("sdl init failed\n");
+		}
+		else
+		{
+			printf("SDL init ok\n");
+		}
+	}
 	#endif
 	
 	return 1;
