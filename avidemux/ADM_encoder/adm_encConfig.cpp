@@ -65,6 +65,7 @@ extern void oplug_mpeg_dvd(char *name);
 extern void oplug_mpeg_svcdConf( void );
 extern void oplug_mpeg_dvdConf( void );
 
+
 extern void oplug_mpegff_conf(void);
 
 #ifdef USE_XVID_4 
@@ -99,7 +100,9 @@ extern int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 	#include "ADM_encoder/adm_encmjpeg.h"
 #endif
 
-
+extern  uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
+		   				   uint32_t * br,uint32_t *fsize,
+						   FFcodecSetting *conf);
 
 /*
   	Codec settings here
@@ -191,13 +194,13 @@ extern int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 	0.5,		// spatial masking
 	0,		// NAQ
 	0,		// Use xvid ratecontrol
-	0,		// buffersize
+	40,		// buffersize VCD like
 	0		// DUMMY
 	
 	
  	}
   };
- FFMPEGConfig mpeg2encSVCDConfig={
+  FFMPEGConfig ffmpegMpeg2Config={
   	{COMPRESS_CBR,4,1500000,700},
 	{
 	 ME_EPZS,//	ME
@@ -220,57 +223,15 @@ extern int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 	 1,
  	 0.5,// 	qcompress;  /* amount of qscale change between easy & hard scenes (0.0-1.0)*/
     	 0.5,// 	qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
-	(600*1000>>3),		// min bitrate in kB/S
-	(2200*1000)>>3,		// max bitrate
-	0,					// user_matrix 0->default, 1 tmpg, 2 animé , 3 kvcd
-	12,					// Safe gop size limit
-	NULL,				// inter & intra matrix, will be set depending on user_matrix
-	NULL,
-	0,				// interlaced
-	0,		        // WLA: bottom-field-first
-	0,				// widescreen
-	2,		// mb eval = distortion
-	8000,		// vratetol
-	0,
-	0.5,		// temporal masking
-	0,
-	0.5,		// spatial masking
-	0,		// NAQ
-	0		// DUMMY
- 	}
-  };
-  FFMPEGConfig mpeg2encDVDConfig={
-  	{COMPRESS_CBR,4,1500000,700},
-	{
-	 ME_EPZS,//	ME
-	 0, // 		GMC
-	 0,//		_4MV;
-	 0,//		_QPEL;
-	 0,//		_TREILLIS_QUANT
-	 2,//		qmin;
-	 31,//		qmax;
-	 3,//		max_qdiff;
-	 0,//		max_b_frames;
-	 1, //		mpeg_quant;
-	 1,//
-	 -2, // 		luma_elim_threshold;
-	 1,//
-	 -5, // 		chroma_elim_threshold;
-	 0.05,//		lumi_masking;
-	 1,
-	 0.01,//		dark_masking;
-	 1,
- 	 0.5,// 	qcompress;  /* amount of qscale change between easy & hard scenes (0.0-1.0)*/
-    	 0.5,// 	qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
-	(600*1000>>3),		// min bitrate in kB/S
+	0,		// min bitrate in kB/S
 	(8000*1000)>>3,		// max bitrate
 	0,					// user_matrix 0->default, 1 tmpg, 2 animé , 3 kvcd
 	12,					// Safe gop size limit
 	NULL,				// inter & intra matrix, will be set depending on user_matrix
 	NULL,
-	0,				// interlaced
-	0,		        // WLA: bottom-field-first
-	0,				// widescreen
+	0,		// interlaced
+	0,		// WLA: bottom-field-first
+	0,		// wide screen
 	2,		// mb eval = distortion
 	8000,		// vratetol
 	0,
@@ -278,8 +239,39 @@ extern int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 	0,
 	0.5,		// spatial masking
 	0,		// NAQ
+	0,		// Use xvid ratecontrol
+	240,		// buffersize 240 KB for Mpeg2 /
 	0		// DUMMY
+	
+	
  	}
+  };
+  // Mpeg2enc
+
+  #include "mpeg2enc/ADM_mpeg2enc.h"
+  
+ MPEG2ENCConfig mpeg2encSVCDConfig={
+  	{COMPRESS_CBR,4,1500000,700},
+	{
+	 	(2500*1000)>>3,		// Max BR
+		12,		// Gop size
+		0,		//int	wideScreen;
+		0,		//int	matrix;
+		0,		//int	interlacingType;
+		0		// bff
+	}
+  };
+  
+  MPEG2ENCConfig mpeg2encDVDConfig={
+  	{COMPRESS_CBR,4,1500000,700},
+	{
+	 	(9000*1000)>>3,		// Max BR
+		12,		// Gop size
+		0,		//int	wideScreen;
+		0,		//int	matrix;
+		0,		//int	interlacingType;
+		0		// bff
+	}
   };
 
 
@@ -505,8 +497,10 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 					case  CodecFFV1:
 											MAKECONF(ffmpegConfig);
 											break;
-					case CodecXVCD:
 					case CodecXSVCD:
+									MAKECONF(ffmpegMpeg2Config);
+									break;
+					case CodecXVCD:
 									MAKECONF(ffmpegMpeg1Config);
 									break;
 #endif
@@ -572,8 +566,11 @@ const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
 											*data=(uint8_t *)&ffmpegConfig;
 											*optSize=sizeof(ffmpegConfig);
 											break;
-					case CodecXVCD:
 					case CodecXSVCD:
+									*data=(uint8_t *)&ffmpegMpeg2Config;
+									*optSize=sizeof(ffmpegMpeg2Config);
+									break;
+					case CodecXVCD:
 
 									*data=(uint8_t *)&ffmpegMpeg1Config;
 									*optSize=sizeof(ffmpegMpeg1Config);
@@ -893,11 +890,18 @@ void videoCodecConfigureUI( void )
 						break;
 
 #endif
-		case CodecXVCD :
 		case CodecXSVCD :
-						oplug_mpegff_conf();
-
+			 			DIA_DVDffParam(&ffmpegMpeg2Config.generic.mode,
+								&ffmpegMpeg2Config.generic.qz,
+								&ffmpegMpeg2Config.generic.bitrate,
+								&ffmpegMpeg2Config.generic.finalsize,
+								&ffmpegMpeg2Config.specific);
 						break;
+		case CodecXVCD :
+						oplug_mpegff_conf();
+						break;
+		
+
 
 #ifdef USE_XX_XVID
       	 	case CodecXvid :
@@ -1017,12 +1021,15 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param, uint32_t ex
 					case  CodecHuff:
 					case  CodecFFV1:
 
-											generic=&ffmpegConfig.generic ;
-											specific=&ffmpegConfig.specific;
-											specSize=sizeof(ffmpegConfig.specific);
-											break;
+									generic=&ffmpegConfig.generic ;
+									specific=&ffmpegConfig.specific;
+									specSize=sizeof(ffmpegConfig.specific);
+									break;
+					case CodecXSVCD:		generic=&ffmpegMpeg2Config.generic;
+									specific=&ffmpegMpeg2Config.specific;
+									specSize=sizeof(ffmpegMpeg2Config.specific);
+									break;
 					case CodecXVCD:
-					case CodecXSVCD:
 									generic=&ffmpegMpeg1Config.generic;
 									specific=&ffmpegMpeg1Config.specific;
 									specSize=sizeof(ffmpegMpeg1Config.specific);

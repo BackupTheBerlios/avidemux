@@ -65,11 +65,11 @@
 #define CONTEXT_DVD    2
 
 extern uint8_t DIA_SVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
-		   				   uint32_t * br,uint32_t *fsize,FFcodecSetting *conf);
+		   				   uint32_t * br,uint32_t *fsize,Mpeg2encParam *conf);
 
 extern uint8_t  DIA_mpeg2opt(uint32_t *maxbitrate, uint32_t *qz, char *opt1,char **opts);
-extern FFMPEGConfig mpeg2encSVCDConfig;
-extern FFMPEGConfig mpeg2encDVDConfig;
+extern MPEG2ENCConfig mpeg2encSVCDConfig;
+extern MPEG2ENCConfig mpeg2encDVDConfig;
 
 static void oplug_mpeg_dvd_run(char *name);
 

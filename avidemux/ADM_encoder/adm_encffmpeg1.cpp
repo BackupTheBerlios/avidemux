@@ -224,7 +224,6 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
       				_state = enc_CQ;
 				setMatrix(); //_settings.user_matrix,_settings.gop_size);
      				_codec = new ffmpegEncoderCQ (_w, _h,_id);
-				_settings.bufferSize=800*1024;
      				_codec->setConfig(&_settings);
       				_codec->init (_param.qz,_fps,0);
       				break;
@@ -232,8 +231,7 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 				printf("ffmpeg mpeg1 cbr mode: %ld\n",_param.bitrate);
       				_state = enc_CBR;
 				setMatrix();
-     				_codec = new ffmpegEncoderCBR (_w, _h,_id);
-				_settings.bufferSize=800*1024;
+     				_codec = new ffmpegEncoderCBR (_w, _h,_id);				
 				_codec->setConfig(&_settings);			
 				flag1=1;
      				_codec->init (_param.bitrate,_fps,flag1);
@@ -398,14 +396,7 @@ uint32_t avg_bitrate;
   	
   
   	_codec=  new ffmpegEncoderVBR (_w, _h,0 ,_id); //0 -> external 1 -> internal
-	if(_id=FF_MPEG1)
-	{
-		_settings.bufferSize=220*1024;
-	}
-	else
-	{
-		_settings.bufferSize=800*1024;
-	}
+	
 	_codec->setConfig(&_settings);
 	  	
   	setMatrix();

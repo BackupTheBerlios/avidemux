@@ -61,3 +61,4 @@ INCLUDES = $(all_includes)
 %.o: %.s ; 	$(AS) $(ASFLAGS) -o $@ $<
 #
 EXTRA_DIST = mpeg2parm.h attributes.h mjpeg_types.h global.h transfrm_ref.h mpeg2enc.h  picture.hh simd.h fastintfns.h motionsearch.h mmxsse_motion.h quantize_ref.h format_codes.h ratectl.hh vlc.h syntaxparams.h tables.h predict_ref.h mpegconsts.h synchrolib.h mjpeg_logging.h mblock_sub44_sads_x86.h mblock_sub44_sads_x86_h.cc macroblock.hh cpu_accel.h yuv4mpeg.h  yuv4mpeg_intern.h mmx.h
+noinst_HEADERS = ADM_mpeg2Param.h

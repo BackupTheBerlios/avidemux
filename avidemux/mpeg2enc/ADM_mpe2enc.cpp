@@ -34,11 +34,13 @@
 
 
 #include "ADM_colorspace/colorspace.h"
+#include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_codecs/ADM_divxEncode.h"
 #include "mpeg2enc/ADM_mpeg2enc.h"
 #include "ADM_encoder/adm_encffmatrix.h"
 
 #include "ADM_library/default.h"
+
 
 static uint8_t mpeg2_running=0;
 #define MAX_BR_M 50000*1000

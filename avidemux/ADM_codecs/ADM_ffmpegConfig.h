@@ -67,7 +67,7 @@ typedef struct FFcodecSetting
 	
 	//
 	int		use_xvid_ratecontrol;
-	int		bufferSize;
+	int		bufferSize;			// in KBYTES !!!!
 	int		dummy;
 	
 }FFcodecSetting;

@@ -20,6 +20,12 @@
 #ifndef ADM_MPEGENC
 
 #include "mpeg2parm.h"
+#include "ADM_mpeg2Param.h"
+typedef struct MPEG2ENCConfig
+{
+		COMPRES_PARAMS generic;
+		Mpeg2encParam specific;
+}MPEG2ENCConfig;
 
 #define MPG_4_3 	2
 #define MPG_16_9 	3

@@ -147,24 +147,30 @@ uint8_t     ffmpegEncoder::gopMpeg1(void)
 	}
 	if(_settingsPresence)
 	{
-		_context->rc_max_rate=_settings.maxBitrate*8; //1800*1000;// 2400 max, 700 min
-		_context->rc_buffer_size=_settings.bufferSize;
-		//_context->rc_max_rate=1800*1000;
-		printf("FF Max rate : %lu kbps\n",(_context->rc_max_rate)/1000);
+		_context->rc_max_rate	=_settings.maxBitrate*8; //1800*1000;// 2400 max, 700 min
+		_context->rc_buffer_size=_settings.bufferSize*8*1024;	
+		_context->gop_size	=_settings.gop_size;
+		
 	}
-	//_context->rc_min_rate=700*1000;
-	//_context->rc_min_rate=500*1000;
-
-	_context->rc_buffer_size=_settings.bufferSize; // 40 for VCD  & 200 for SVCD
+	else
+	{
+		_context->rc_buffer_size=200*8*1024; // 40 for VCD  & 200 for SVCD
+		_context->gop_size=_settings.gop_size;
+		_context->gop_size=12;
+	}
 	_context->rc_buffer_aggressivity=1.0;
 	_context->rc_initial_cplx=3;
 	_context->qmin		= 2;
     	_context->qmax		= 31;
-	_context->gop_size=_settings.gop_size;
+	
 	_context->scenechange_threshold=0xfffffff; // Don't insert I frame out of order
 	//
 	//_context->dsp_mask= FF_MM_FORCE;
-
+	printf("Mpeg12 settings:\n____________\n");
+		printf("FF Max rate    : %lu kbps\n",(_context->rc_max_rate)/1000);
+		printf("FF Buffer Size : %lu bits / %lu kB\n",(_context->rc_buffer_size),
+				_context->rc_buffer_size/(8*1024));
+		printf("FF GOP Size    : %lu\n",_context->gop_size);
 	return 1;
 }
 uint8_t     ffmpegEncoder::initContext(  void )

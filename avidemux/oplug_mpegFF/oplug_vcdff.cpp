@@ -56,6 +56,7 @@ static uint8_t *_buffer=NULL,*_outbuffer=NULL;
 static void  end (void);
 
 extern FFMPEGConfig ffmpegMpeg1Config;
+extern FFMPEGConfig ffmpegMpeg2Config;
 //static FFMPEGConfig ffmpegConfigforXVCD;
 
 
@@ -78,6 +79,7 @@ void oplug_mpegff_conf( void )
 
 			);
 }
+
 void oplug_mpegff(char *name)
 {
 AVDMGenericVideoStream *_incoming;
@@ -129,7 +131,7 @@ uint32_t size;
 			printf("\n Using ffmpeg mpeg1 encoder\n");
 			break;
 		case CodecXSVCD:
-			encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpegMpeg1Config);
+			encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpegMpeg2Config);
 			printf("\n Using ffmpeg mpeg2 encoder\n");
 			break;
 		default:
