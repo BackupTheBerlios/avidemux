@@ -245,6 +245,7 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 #endif          
          if(fourCC::check(fcc,(uint8_t *)"MPEG")
 		|| fourCC::check(fcc,(uint8_t *)"mpg1")
+		|| fcc==0x10000002
 	 )
          {
 				printf("\n using Mpeg1/2 codec (libmpeg2)\n");
