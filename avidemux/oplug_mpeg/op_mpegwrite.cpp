@@ -1065,6 +1065,9 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm,uint8_t silent)
 	int err;
 	AVDMGenericAudioStream *_audio=NULL;
      
+	
+	if(!currentaudiostream) return NULL;
+	
       	// compute the number of bytes in the incoming stream
       	// to feed the filter chain
       	double	byt;
