@@ -79,9 +79,6 @@ char *Telecide::printConf( void )
         return buf;
 }
 
-#define YPLANE(x) (x->data)
-#define UPLANE(x) (x->data+_info.width*_info.height)
-#define VPLANE(x) (x->data+((_info.width*_info.height*5)>>2))
 
 #define PROGRESSIVE  0x00000001
 #define MAGIC_NUMBER (0xdeadbeef)

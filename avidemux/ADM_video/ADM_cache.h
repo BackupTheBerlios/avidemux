@@ -9,19 +9,29 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+typedef struct vidCacheEntry
+{
+		uint32_t 	frameNum;
+		ADMImage 	*frameBuffer;
+		uint8_t		frameLock;		
+		uint32_t	lastUse;
+
+}vidCacheEntry;
+
 class VideoCache
 {
 	private:
-		uint32_t 	nbEntry;
-		uint32_t 	*frameNum;
-		ADMImage 	**frameBuffer;
-		uint8_t		*frameLock;
-		AVDMGenericVideoStream *incoming;
+		vidCacheEntry	*entry;
 		ADV_Info 	info;
-		uint32_t	lastUsed;
+		uint32_t	counter;
+		uint32_t 	nbEntry;
+		
+		AVDMGenericVideoStream *incoming;
+		
 		
 		int32_t 	searchFrame( uint32_t frame);
 		int32_t 	searchPtr( ADMImage *ptr);
+		
 	public:
 		VideoCache(uint32_t nb,AVDMGenericVideoStream *in);
 		~VideoCache(void);

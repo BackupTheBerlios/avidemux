@@ -60,8 +60,8 @@ printf(  "*********************\n");
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
 //	REGISTERX("mpivtc","Mplayer ivtc",VF_MPDETC,1,mpdetc_create,mpdetc_script);	
-	REGISTERX("telecide","Decomb telecide",VF_DECOMB,1,decomb_create,decomb_script);
-	REGISTERX("decimate","Decomb decimate",VF_DECIMATE,1,decimate_create,decimate_script);
+//BG	REGISTERX("telecide","Decomb telecide",VF_DECOMB,1,decomb_create,decomb_script);
+//BG	REGISTERX("decimate","Decomb decimate",VF_DECIMATE,1,decimate_create,decimate_script);
 	
 //	REGISTER("palsmart","PAL-SMART",VF_TELECIDE,1,telecide_create);
 //	REGISTERX("deinterlace","Deinterlace",VF_DEINTERLACE,1,deinterlace_create,deinterlace_script);

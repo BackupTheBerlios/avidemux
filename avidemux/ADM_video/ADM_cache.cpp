@@ -37,28 +37,25 @@ uint32_t sz;
 	incoming=in;
 	memcpy(&info,in->getInfo(),sizeof(info));
 	// Ready buffers
-	frameNum=new uint32_t[nbEntry];
-	frameLock=new uint8_t[nbEntry];
-	frameBuffer=new ADMImage *[nbEntry]; //(uint8_t **)malloc( nbEntry*sizeof(uint8_t *));
+	entry=new vidCacheEntry[nbEntry];
 	sz=(info.width*info.height*3)>>1;
 	for(uint32_t i=0;i<nbEntry;i++)
 	{
-		frameNum[i]=0xffff0000;
-		frameLock[i]=0;
-		frameBuffer[i]=new ADMImage(info.width,info.height);	
-	}
-	lastUsed=0;
+		entry[i].frameBuffer	=new ADMImage(info.width,info.height);	
+		entry[i].frameNum	=0xffff0000;
+		entry[i].frameLock	=0;
+		entry[i].lastUse	=0xffff0000;
+	}	
+	counter=0;
 }
 //_____________________________________________
 VideoCache::~ VideoCache()
 {
 	for(uint32_t i=0;i<nbEntry;i++)
 	{
-		delete  frameBuffer[i];
+		delete  entry[i].frameBuffer;
 	}
-	delete [] frameBuffer;
-	delete [] frameLock;
-	delete [] frameNum;
+	delete [] entry;
 	
 }
 //_____________________________________________
@@ -66,7 +63,7 @@ int32_t VideoCache::searchFrame( uint32_t frame)
 {
 	for(uint32_t i=0;i<nbEntry;i++)
 	{
-		if(frameNum[i]==frame) return i;
+		if(entry[i].frameNum==frame) return i;
 	}
 	return -1;
 }
@@ -75,7 +72,7 @@ int32_t 	 VideoCache::searchPtr( ADMImage *ptr)
 {
 	for(uint32_t i=0;i<nbEntry;i++)
 	{
-		if(frameBuffer[i]==ptr) return i;
+		if(entry[i].frameBuffer==ptr) return i;
 	}
 	return -1;
 }
@@ -84,7 +81,7 @@ uint8_t  VideoCache::unlockAll(void)
 {
 	for(uint32_t i=0;i<nbEntry;i++)
 	{		
-		frameLock[i]=0;		
+		entry[i].frameLock=0;		
 	}
 	return 1;
 }
@@ -94,7 +91,7 @@ uint8_t  VideoCache::unlock(ADMImage *frame)
 int32_t k;
 	k=searchPtr(frame) ;
 	ADM_assert(k>=0);
-	frameLock[k]--;
+	entry[k].frameLock--;	
 	return 1;	
 }
 //_____________________________________________
@@ -102,8 +99,9 @@ uint8_t  VideoCache::purge(void)
 {
 	for(uint32_t i=0;i<nbEntry;i++)
 	{		
-		frameLock[i]=0;
-		frameNum[i]=0xffff0000;	
+		entry[i].frameLock=0;
+		entry[i].frameNum=0xffff0000;	
+		entry[i].lastUse=0xffff0000;	
 	}
 	return 1;
 
@@ -114,41 +112,49 @@ ADMImage *VideoCache::getImage(uint32_t frame)
 int32_t i;
 uint32_t tryz=nbEntry;
 uint32_t len,flags;
+ADMImage *ptr=NULL;
+
 	// Already there ?
 	if((i=searchFrame(frame))>=0)
 	{
 		aprintf("Cache : Cache hit %d buffer %d\n",frame,i);
-		frameLock[i]++;
-		return frameBuffer[i];	
+		entry[i].frameLock++;
+		entry[i].lastUse=counter;
+		counter++;
+		return entry[i].frameBuffer;	
 	}
 	// Else get it!
 	
 	// First elect a new buffer, we do it by 
-	// using a simple scheme
-	uint32_t count=0;
+	// using a RLU scheme
+	
+	uint32_t deltamax=0,delta;
+	uint32_t target=0xfff;
 	aprintf("Cache : Cache miss %d\n",frame);
 	//for(uint32_t i=0;i<nbEntry;i++) printf("%d(%d) ",frameNum[i],frameLock[i]);printf("\n");
-	while(tryz)
+	for(uint32_t i=0;i<nbEntry;i++)
 	{
-		if(!frameLock[(lastUsed+count)%nbEntry])
+		if(entry[i].frameLock) continue; 	// don"t consider locked frames
+		
+		
+		delta=abs((int)counter-(int)entry[i].lastUse);
+		if(delta>deltamax)
 		{
-			// for a candidate
-			ADMImage *ptr;
-			uint32_t target;
-			
-			target=(lastUsed+count)%nbEntry;
-			ptr=frameBuffer[target];
-			
-			if(!incoming->getFrameNumberNoAlloc(frame,&len,ptr,&flags)) return NULL;
-			lastUsed=(lastUsed+count+1)%nbEntry;
-			frameLock[target]++;
-			frameNum[target]=frame;			
-			return ptr;
+			deltamax=delta;
+			target=i;
 		}
-		tryz--;
-		count++;		
 	}
-	printf("Could not find empty slot in cache\n");
-	for(uint32_t i=0;i<nbEntry;i++) printf("%d(%d) ",frameNum[i],frameLock[i]);printf("\n");
-	ADM_assert(0);
+	ADM_assert(target!=0xfff);
+	// Target is the new cache we will use
+
+	ptr=entry[target].frameBuffer;
+	if(!incoming->getFrameNumberNoAlloc(frame,&len,ptr,&flags)) return NULL;
+	// Update LRU info
+	entry[target].frameLock++;
+	entry[target].frameNum=frame;
+	entry[target].lastUse=counter;
+	counter++;	
+	return ptr;
+	
 }
+

@@ -62,9 +62,6 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "ADM_toolkit/ADM_cpuCap.h"
-#define YPLANE(x) (x->data)
-#define UPLANE(x) (x->data+_info.width*_info.height)
-#define VPLANE(x) (x->data+((_info.width*_info.height*5)>>2))
 #define PROGRESSIVE  0x00000001
 #define MAGIC_NUMBER (0xdeadbeef)
 #define IN_PATTERN   0x00000002
@@ -289,6 +286,9 @@ Decimate::~Decimate(void)
 		if(vidCache) delete vidCache;
 		if(_param) delete _param;
 
+		vidCache=NULL;
+		_param=NULL;
+		sum=NULL;
 }
 //________________________________________________________
 void Decimate::DrawShow(uint8_t  *src, int useframe, bool forced, int dropframe,
