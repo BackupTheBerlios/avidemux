@@ -215,7 +215,6 @@ static int encode_init(AVCodecContext *avctx)
 {
     MpegEncContext *s = avctx->priv_data;
 
-    s->frameNumber=0; //MEANX
     
     if(MPV_encode_init(avctx) < 0)
         return -1;
@@ -336,7 +335,10 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
                 put_bits(&s->pb, 1, 0); //esc
                 put_bits(&s->pb, 3, 4); //profile
                 put_bits(&s->pb, 4, 8); //level
-                put_bits(&s->pb, 1, s->progressive_sequence);
+		if(s->flags2 & CODEC_FLAG2_32_PULLDOWN) //MEANX
+			put_bits(&s->pb, 1, 0);
+		else
+                	put_bits(&s->pb, 1, s->progressive_sequence);
                 put_bits(&s->pb, 2, 1); //chroma format 4:2:0
                 put_bits(&s->pb, 2, 0); //horizontal size ext
                 put_bits(&s->pb, 2, 0); //vertical size ext
@@ -449,7 +451,8 @@ void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
     	if(s->flags2 & CODEC_FLAG2_32_PULLDOWN)
 	{
 	
-		switch(s->frameNumber%4)
+		switch((s->picture_number - 
+                          s->gop_picture_number)&3)
 		{
 			case 0:
 			default:
@@ -458,18 +461,18 @@ void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
 				break;
 			case 1:
 				rff=0;
-				tff=1;
-				break;
-			case 2:
-				rff=0;
 				tff=0;
 				break;
-			case 3:
+			case 2:
 				rff=1;
 				tff=0;
 				break;
+			case 3:
+				rff=0;
+				tff=1;
+				break;
 		}		
-		s->frameNumber++;
+// 		
 	}
 	else
 	{
