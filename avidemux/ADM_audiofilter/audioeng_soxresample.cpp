@@ -27,8 +27,11 @@
 
 AVDMProcessAudio_SoxResample::~AVDMProcessAudio_SoxResample() 
 { 
-	sox_stop(&_resample);
-	sox_stop(&_resample2);
+	if(!_pass)
+	{
+		sox_stop(&_resample);
+		sox_stop(&_resample2);
+	}
   	delete _wavheader;
 };   
 
@@ -39,6 +42,7 @@ AVDMProcessAudio_SoxResample::AVDMProcessAudio_SoxResample(AVDMGenericAudioStrea
 	_frequency=frequency;
 	if(instream->getInfo()->frequency==frequency)
 	{
+		printf("Same in/out frequency, bypassing filter\n");
 		_pass=1;
 	}
     	_wavheader = new WAVHeader;
@@ -53,7 +57,9 @@ AVDMProcessAudio_SoxResample::AVDMProcessAudio_SoxResample(AVDMGenericAudioStrea
     	l=l/_instream->getInfo()->frequency;
     	_length = (uint32_t)floor(l);
 	_length=_length & 0xfffffffc;
-    	printf("resampling to %lu, %lu -> %lu bytes.\n",frequency,instream->getLength(),_length);
+    	printf("resampling to %lu, %lu -> %lu bytes.\n",(unsigned long int)frequency,
+			(unsigned long int)instream->getLength(),
+			(unsigned long int)_length);
 	if(!_pass)
 	{
     		assert( sox_init(_instream->getInfo()->frequency, frequency,&_resample)) ;
@@ -70,10 +76,13 @@ uint8_t AVDMProcessAudio_SoxResample::goToTime(uint32_t newoffset)
 	printf("Resample : Going back to beginning\n");
 	_instream->goToTime(0);
 	_headBuff=_tailBuff=0;
-	sox_stop(&_resample);
-	sox_stop(&_resample2);
-	assert( sox_init(_instream->getInfo()->frequency, _frequency,&_resample)) ;
-	assert( sox_init(_instream->getInfo()->frequency, _frequency,&_resample2)) ;
+	if(!_pass)
+	{
+		sox_stop(&_resample);
+		sox_stop(&_resample2);
+		assert( sox_init(_instream->getInfo()->frequency, _frequency,&_resample)) ;
+		assert( sox_init(_instream->getInfo()->frequency, _frequency,&_resample2)) ;
+	}
 	_head=_tail=0;
 	return 1;
 }
@@ -92,6 +101,13 @@ uint32_t 	AVDMProcessAudio_SoxResample::grab(uint8_t *obuffer)
     onechunk=(8192*2)*_wavheader->channels;
     myBuffer=(uint8_t *)_buffer;
         
+    // passthrought mode
+    if(_pass)
+    {
+    	rd= _instream->read(onechunk, (uint8_t  *)obuffer);
+	if(!rd) return MINUS_ONE;
+	return rd;
+     }
     // Read n samples
     // Go to the beginning of current block
     in = myBuffer+_head;
