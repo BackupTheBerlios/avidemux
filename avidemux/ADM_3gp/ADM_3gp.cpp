@@ -718,7 +718,7 @@ uint8_t	_3GPHeader::buildIndex(
 				uint32_t *Sn, 			uint32_t *outNbChunk)
 
 {
-uint32_t chunkCount[1000];
+uint32_t chunkCount[8000];
 uint32_t i,j,cur;
 
 	*outNbChunk=0;
