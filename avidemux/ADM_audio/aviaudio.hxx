@@ -82,7 +82,7 @@ class AVDMGenericAudioStream
 					uint8_t 	internalBuffer[2 * SIZE_INTERNAL];
 					uint8_t 	packetBuffer[2 * SIZE_INTERNAL];
 					uint32_t	packetHead,packetTail;
-					
+					uint8_t		isPaketizable( void);
             				WAVHeader	*_wavheader;
                 			ADM_Audiocodec 	*_codec;
 					uint32_t	_length;
@@ -188,7 +188,9 @@ public:
 										*l=_extraLen;
 										*d=_extraData;
 										return 1;
-									}		
+									}
+	virtual	uint8_t				getPacket(uint8_t *dest, uint32_t *len, 
+										uint32_t *samples);
 
 };
 

@@ -88,7 +88,25 @@ AVDMAviAudioStream::AVDMAviAudioStream(		odmlIndex *idx,
     printf("\n Total audio length : %lu",_length);
 }
 //#define VERBOSE_L3
-
+uint8_t	AVDMAviAudioStream::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
+{
+	if(isPaketizable())
+		return AVDMGenericAudioStream::getPacket(dest,len,samples);
+	// it is not packetizable, assume it is correctly muxed
+	// else welcome to segfault land
+	if(_current_index>=_nb_chunks)
+	{
+		*len=0;
+		*samples=0;
+		return 0;	
+	}
+	fseeko(_fd,_index[_current_index].offset,SEEK_SET);
+	fread(dest,1,_index[_current_index].size,_fd);
+	*len=_index[_current_index].size;
+	*samples=1024; // Common value
+	_current_index++;
+	return 1;
+}
 //___________________________________
 //
 //___________________________________

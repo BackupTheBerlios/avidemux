@@ -51,7 +51,36 @@ AVDMGenericAudioStream::~AVDMGenericAudioStream()
 	}
 
 }
+uint8_t AVDMGenericAudioStream::isPaketizable( void)
+{
 
+	// packetizable stuff
+	switch(_wavheader->encoding)
+	{
+	
+		case WAV_MP3:		// Yes
+		case WAV_MP2:
+		case WAV_WMA:
+		case WAV_PCM:
+		case WAV_MSADPCM:
+		case WAV_LPCM:
+		case WAV_AC3:
+		case WAV_8BITS:
+		case WAV_8BITS_UNSIGNED:
+		case WAV_ULAW:
+			return 1;
+			break;
+		case WAV_MP4:		// No
+		case WAV_AAC:
+		case WAV_OGG:
+			return 0;
+			break;
+		default:		// in doubt : no
+			return 0;
+			break;
+	}	
+
+}
 //________________________________________________________________
 //      Go to a beginning of an audio frame after the offset given
 //  Offset can be not frame bounded (MP3), correct that.
