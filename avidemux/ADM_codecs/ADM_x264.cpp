@@ -121,7 +121,7 @@ uint8_t         X264Encoder::encode( ADMImage        *in,
   x264_nal_t *nal;
   int nbNal=0;
   int sizemax=0;
-  
+ #if 0 
         if(flags) *flags=0;
         
         memset(_pic,0,sizeof(x264_picture_t));
@@ -155,6 +155,7 @@ uint8_t         X264Encoder::encode( ADMImage        *in,
         {
                 if(PICS->i_type==X264_TYPE_IDR) *flags=AVI_KEY_FRAME;
         }
+#endif	
         return 1;
       
         

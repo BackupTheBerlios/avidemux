@@ -161,6 +161,7 @@ ACT_RunScript,
 ACT_AudioCodecChanged,
 ACT_VideoCodecChanged,
 ACT_Bitrate,
+ACT_Ocr,
 ACT_DUMMY
 
 

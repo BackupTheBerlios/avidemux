@@ -195,6 +195,9 @@ HandleAction (Action action)
 
   switch (action)
     {
+      case ACT_Ocr:
+                ADM_ocr_engine( );
+                return;
       case ACT_AudioConfigure:
     		audioCodecSelect();
 		return;
@@ -259,11 +262,7 @@ HandleAction (Action action)
       return;
       break;
     case ACT_SetMuxParam:
-#ifdef TEST_OCR
-         ADM_ocr_engine( );
-#else    
       ADM_aviUISetMuxer();
-#endif
       return;
       break;
     case ACT_OuputToggle:
