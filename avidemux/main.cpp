@@ -50,6 +50,7 @@ typedef void *FCT_VOID(void *);
      extern "C" {
      extern void     avcodec_init(void );
      extern  void 	avcodec_register_all(void );
+     extern  int 	mpegps_init(void );
                        };
 #endif                       
 
@@ -156,6 +157,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
   
                 		avcodec_init();
 	                 	avcodec_register_all();
+				mpegps_init();
 	                  
 #endif
 // Load .avidemuxrc

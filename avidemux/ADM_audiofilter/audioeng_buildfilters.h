@@ -77,7 +77,7 @@ uint8_t audioFilterSetByName( const char *name);
 const char *audioCodecGetConf( void );
 uint8_t audioCodecSetConf(char *conf );
 
-AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm,uint8_t silent=0);
+AVDMGenericAudioStream *mpt_getAudioStream(void);
 
 void audioFilterNormalize(uint8_t onoff);
 void audioFilterDownsample(uint8_t onoff);
