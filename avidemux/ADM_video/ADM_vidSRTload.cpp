@@ -34,7 +34,7 @@
 #include "config.h"
 
 #ifdef USE_FREETYPE
-#define __STDC_ISO_10646__
+//#define __STDC_ISO_10646__
 #include "fourcc.h"
 #include "avio.hxx"
 
@@ -352,7 +352,7 @@ void utf16_end(void)
 void utf16_string( char *string)
 {
 	static char icc[MAXIC];
-	uint32_t len=0;
+	size_t len=0;
 	uint32_t sout=MAXIC>>1;
 	unsigned char c;
 	char *out;
