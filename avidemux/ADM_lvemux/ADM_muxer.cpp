@@ -211,7 +211,7 @@ uint8_t MpegMuxer::muxAC3(void)
 		 return 1;
 	}
 	
-	ADM_assert(pos>buffer);
+	ADM_assert(pos>=buffer);
 	uint32_t off=(uint32_t)(pos-&buffer[byteHead]);	
 	//printf("%lu\n",off);
 	mux_write_packet((PackStream *)packStream, 
