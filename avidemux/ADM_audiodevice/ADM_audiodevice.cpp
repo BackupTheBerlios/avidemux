@@ -18,6 +18,7 @@
 #ifdef USE_ARTS
 #include <artsc.h>
 #endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -41,6 +42,10 @@
 
 #ifdef ALSA_SUPPORT
 #include "ADM_audiodevice/ADM_deviceALSA.h"
+#endif
+
+#ifdef USE_SDL
+#include "ADM_audiodevice/ADM_deviceSDL.h"
 #endif
 
 #include "gui_action.hxx"
@@ -192,9 +197,13 @@ void AVDM_switch(AUDIO_DEVICE action)
 #endif
 #ifdef USE_SDL
 		case DEVICE_SDL:
-								
-
+								device=new sdlAudioDevice;
+								currentDevice=DEVICE_SDL;
+								break;
 #endif
+
+
+
 
 		 case  DEVICE_DUMMY:
 					default:
