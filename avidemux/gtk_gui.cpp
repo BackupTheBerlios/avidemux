@@ -83,6 +83,7 @@
 
 void A_handleSecondTrack (int tracktype);
 void A_saveImg (char *name);
+void A_saveBunchJpg( char *name);
 void A_requantize(void);
 void A_saveJpg (char *name);
 void A_loadWave (char *name);
@@ -529,7 +530,9 @@ case ACT_Pipe2Other:
       A_SaveAudioDualAudio();
       break;
 
-
+    case ACT_SaveBunchJPG:
+    	GUI_FileSelWrite ("Select Jpeg sequence to save ", A_saveBunchJpg);      
+    	break;
     case ACT_SaveImg:
       GUI_FileSelWrite ("Select BMP to save ", A_saveImg);
       //GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
@@ -1194,7 +1197,7 @@ void A_saveJpg (char *name)
 
 
 		codec=new  ffmpegEncoderFFMjpeg( avifileinfo->width,avifileinfo->height,FF_MJPEG)  ;
-		codec->init( 95,0);
+		codec->init( 95,25000);
 		if(!codec->encode(rdr_decomp_buffer,
 				 	buffer,
 					&sz,
@@ -1262,7 +1265,77 @@ Mpeg2encSVCD *codec=NULL;
   	GUI_Alert ("Done.");
 }
 #endif
+/**
+	Save the selection  as a bunch of jpeg 95% qual
+	Used mainly to make animated DVD menu 
 
+*/
+void A_saveBunchJpg(char *name)
+{
+  ffmpegEncoderFFMjpeg *codec=NULL;
+  uint32_t sz,fl;
+  FILE *fd;
+  uint8_t *buffer=NULL;
+  uint8_t *src=NULL;
+  uint32_t curImg;
+  char	 fullName[2048],*ext;
+
+
+  	if(frameStart>frameEnd)
+		{
+			GUI_Alert("Set markers correctly!");
+			return;
+		}
+	// Split name into base + extension
+	PathSplit(name,&name,&ext);
+	
+	
+	sz = avifileinfo->width* avifileinfo->height * 3;
+	buffer=new uint8_t [sz];
+	assert(buffer);
+	src=new uint8_t [sz];
+	assert(src);
+
+
+		codec=new  ffmpegEncoderFFMjpeg( avifileinfo->width,avifileinfo->height,FF_MJPEG)  ;
+		codec->init( 95,25000);
+		
+	for(curImg=frameStart;curImg<=frameEnd;curImg++)
+	{		
+		if (!video_body->getUncompressedFrame (curImg, src))
+		{
+			GUI_Alert("Cannot uncompress video!");
+			goto _bunch_abort;
+		}
+		if(!codec->encode(src,
+				 	buffer,
+					&sz,
+					&fl))
+			{
+				GUI_Alert("Problem encoding that frame!");
+				goto _bunch_abort;
+				
+			}
+		sprintf(fullName,"%s%04d.jpg",name,curImg-frameStart);
+		fd=fopen(fullName,"wb");
+		if(!fd)
+		{
+				GUI_Alert("Problem writing file!");
+				goto _bunch_abort;
+
+		}
+		fwrite (buffer, sz, 1, fd);
+    		fclose(fd);
+	}
+	GUI_Alert ("Done.");
+_bunch_abort:	
+    	delete [] buffer;
+	delete [] src;
+	delete codec;
+	return ;
+
+
+}
 /**________________________________________________________
  Save a BMP image from current display buffer
 ________________________________________________________*/

@@ -28,6 +28,7 @@ typedef enum
   ACT_StopAvi,
   ACT_SaveImg,
   ACT_SaveJPG,
+  ACT_SaveBunchJPG,
   ACT_SaveDVDPS,
   ACT_RecentFiles,
 
