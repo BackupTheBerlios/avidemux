@@ -50,6 +50,8 @@ extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *co
 
 //
 static   AVDMGenericVideoStream *preview=NULL;
+// Ugly should be dynamically allocated
+static uint8_t unpackd[MAXIMUM_SIZE*MAXIMUM_SIZE*3];
 // dummy constructor used to register the filter
 //____________________________________
 AVDMVideo_FilterDec::AVDMVideo_FilterDec(char *name,
@@ -251,7 +253,7 @@ void editorKillPreview( void )
       GUI_PreviewEnd();
 }
 
-static uint8_t unpackd[MAXIMUM_SIZE*MAXIMUM_SIZE*3];
+
 
 
 void editorUpdatePreview(uint32_t framenum)
