@@ -194,6 +194,10 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 				if(len<8)
 					{
 						printf("Probably pseudo black frame...\n");
+						out->_Qp=2;
+						out->flags=0; // assume P ?
+						if(flagz)
+							*flagz=out->flags;
 						return 1;
 					}
 				// allow null means we allow null frame in and so potentially

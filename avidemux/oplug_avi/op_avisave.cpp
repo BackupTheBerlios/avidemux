@@ -255,7 +255,8 @@ GenericAviSave::writeAudioChunk (uint32_t frame)
   	uint32_t sample,packetLen,packets=0;
 	
 
-	if(audio_filter->packetPerFrame())
+	if(audio_filter->packetPerFrame()
+		|| audio_filter->isVBR() )
 	{
 		while(_audioCurrent<_audioTarget)
 		{

@@ -109,7 +109,7 @@ uint64_t offset=_idx[framenum].offset; //+_mdatOffset;
  	fread(ptr, _idx[framenum].size, 1, _fd);
   	*framelen=_idx[framenum].size;
 	aprintf("Size: %lu\n",_idx[framenum].size);
-	if(offset & 1) printf("odd!\n");
+//	if(offset & 1) printf("odd!\n");
  	return 1;
 }
 OpenDMLHeader::~OpenDMLHeader()

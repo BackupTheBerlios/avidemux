@@ -149,6 +149,10 @@ uint32_t nfq,fqindex,brindex,index;
 					mpegInfo->size=(144*mpegInfo->bitrate*1000)/mpegInfo->samplerate;
 					mpegInfo->size+=mpegInfo->padding;			
 			}
+			if(*offset)
+				{
+					printf("MP3: Skipped %lu bytes\n",*offset);
+				}
 #if 0			
 			printf("Packet found : at :%d level:%d layer:%d fq:%d bitrate:%d mode:%d\n",
 					start-1,mpegInfo->level,mpegInfo->layer,mpegInfo->samplerate,
