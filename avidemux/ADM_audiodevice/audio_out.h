@@ -28,7 +28,7 @@ void 		AVDM_switch( AUDIO_DEVICE action );
 uint8_t 	AVDM_AudioPlay(uint8_t *ptr, uint32_t nb);
 uint32_t 	AVDM_AudioSetup(uint32_t fq, uint32_t channel);
 void 		AVDM_AudioClose(void);
-void 		AVDM_audioPref( void );
+AUDIO_DEVICE 	AVDM_getCurrentDevice( void);
 
 #endif
 #endif

@@ -100,16 +100,11 @@ const char *ADM_audioById(AUDIO_DEVICE id)
 
 }
 
-void AVDM_audioPref( void )
+AUDIO_DEVICE AVDM_getCurrentDevice( void)
 {
-AUDIO_DEVICE newDevice=currentDevice;
-
-	DIA_getAudioDevice(&newDevice);
-	if(newDevice!=currentDevice)
-	{
-		AVDM_switch(newDevice);
-	}
+	return currentDevice;
 }
+
 void AVDM_audioInit(void )
 {
 uint8_t init=0;
