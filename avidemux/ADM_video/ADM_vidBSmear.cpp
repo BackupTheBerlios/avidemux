@@ -132,35 +132,51 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
        		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
        		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       			
        		  // blacken top
-       		  uint8_t *srcY=data->data;
+       		  uint8_t *srcY=YPLANE(data);
+		  uint8_t *srcU=UPLANE(data);
+		  uint8_t *srcV=VPLANE(data);
        		  uint32_t bytes=_info.width*_param->top;
 		  uint32_t page=_info.width*_info.height;
        		
        		  memset(srcY,0x00,bytes);
-		  memset(srcY+page,0x80,bytes>>2);
-		  memset(srcY+((page*5)>>2),0x80,bytes>>2);
+		  memset(srcU,0x80,bytes>>2);
+		  memset(srcV,0x80,bytes>>2);
        		  // left & right
        		  uint32_t stride=_info.width;
+		  
        		  for(uint32_t y=_info.height;y>0;y--)
        		  {
        		        memset(srcY,0,_param->left);
        		        memset(srcY+stride-_param->right,0,_param->right);       		
        		        srcY+=stride;       		
+		 }
+		 for(uint32_t y=_info.height>>1;y>0;y--)
+       		  {
+       		        
+			memset(srcU,0x80,_param->left>>1);
+			memset(srcV,0x80,_param->left>>1);
+			memset(srcU+((stride-_param->right)>>1),0x80,_param->right>>1);
+			memset(srcV+((stride-_param->right)>>1),0x80,_param->right>>1);
+			srcU+=stride>>1;
+			srcV+=stride>>1;
        		  }
        		
        		  // backen bottom
-       		  srcY=data->data+_info.width*_info.height-1;
+       		  srcY=YPLANE(data)+_info.width*_info.height-1;
        		
        		 bytes=_info.width*_param->bottom;
        	 	 srcY-=bytes;
        		 memset(srcY,0x00,bytes);
 		// chroma
-		 srcY=data->data+page+(page>>2)-1;
-		 srcY-=bytes>>2;
-       		 memset(srcY,0x80,bytes>>2);
-		 memset(srcY+((page)>>2),0x80,bytes>>2);
-	
-       		
+		 srcU=UPLANE(data)+(page>>2)-1;
+		 srcU-=bytes>>2;
+       		 memset(srcU,0x80,bytes>>2);
+		 
+		 srcV=VPLANE(data)+(page>>2)-1;
+		 srcV-=bytes>>2;
+       		 memset(srcV,0x80,bytes>>2);
+		 
+       		data->_qStride=0;
        		  	
        		         		       		
       return 1;

@@ -52,8 +52,7 @@ ADMVideoRotate::ADMVideoRotate(AVDMGenericVideoStream *in, CONFcouple *couples)
 {
   _in=in;		
 
-  memcpy(&_info,_in->getInfo(),sizeof(_info));  									 	
-
+  memcpy(&_info,_in->getInfo(),sizeof(_info)); 
   _info.encoding=1;
 
  // _uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
@@ -79,7 +78,6 @@ ADMVideoRotate::ADMVideoRotate(AVDMGenericVideoStream *in, CONFcouple *couples)
   }
  _uncompressed=new ADMImage(_param->width,_param->height);
   printf("New Rotate %ld %ld %f\n", _info.width, _info.height, _param->angle);
-
   ADM_assert(_uncompressed);    	  	
 
 }
@@ -104,7 +102,8 @@ uint8_t	ADMVideoRotate::getCoupledConf( CONFcouple **couples)
 
 ADMVideoRotate::~ADMVideoRotate()
 {
- 	delete [] _uncompressed;
+ 	delete  _uncompressed;
+	_uncompressed=NULL;
 	DELETE(_param);
 }
 uint8_t ADMVideoRotate::getFrameNumberNoAlloc(uint32_t frame,
@@ -117,9 +116,7 @@ uint8_t ADMVideoRotate::getFrameNumberNoAlloc(uint32_t frame,
   // read uncompressed frame
   if(!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags)) return 0;
 
-  printf("rotate %ld %f\n", frame, _param->angle);
-  printf("%ld,%ld\n", _in->getInfo()->width, _in->getInfo()->height);
-
+  
   do_rotate(_uncompressed->data, 
   	_in->getInfo()->width, 
   	_in->getInfo()->height, 
@@ -128,11 +125,11 @@ uint8_t ADMVideoRotate::getFrameNumberNoAlloc(uint32_t frame,
 	&_info.width,
 	&_info.height);
 
-  printf("%ld,%ld\n", _info.width, _info.height);
+  //printf("%ld,%ld\n", _info.width, _info.height);
 
-  *flags=0;
+  *flags=_uncompressed->flags;
   *len= (_info.width * _info.height) + ((_info.width * _info.height) / 2);
-
+  data->_qStride=0;
   return 1;
 }
 

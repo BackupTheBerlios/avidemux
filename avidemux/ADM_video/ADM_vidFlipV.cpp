@@ -54,15 +54,15 @@ ADMVideoFlipV::ADMVideoFlipV(  AVDMGenericVideoStream *in,CONFcouple *setup)
 {
     UNUSED_ARG(setup);
  	_in=in;		
-   	memcpy(&_info,_in->getInfo(),sizeof(_info));  									 	
-  _info.encoding=1;
-	//_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+   	memcpy(&_info,_in->getInfo(),sizeof(_info)); 	
+  	_info.encoding=1;	
 	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
 	ADM_assert(_uncompressed);    	  	
 }
 ADMVideoFlipV::~ADMVideoFlipV()
 {
- 	delete [] _uncompressed;	
+ 	delete  _uncompressed;	
+	_uncompressed=NULL;
   
 }
 uint8_t ADMVideoFlipV::getFrameNumberNoAlloc(uint32_t frame,
@@ -71,54 +71,52 @@ uint8_t ADMVideoFlipV::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 
-			ADM_assert(frame<_info.nb_frames);
-						
-								
-			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
+	ADM_assert(frame<_info.nb_frames);
+	// read uncompressed frame
+	if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 
          uint8_t *in,*out;
          uint32_t stride=_info.width;
          uint32_t h=_info.height;
          uint32_t page,qpage;
-         
+        
+	 data->_qStride=0;
+	  
          page=stride*h;
          qpage=page>>2;
          
-         in=_uncompressed->data;
-         out=data->data+(h-1)*stride;
+         in=YPLANE(_uncompressed);
+         out=YPLANE(data)+(h-1)*stride;
          // flip y
          for(uint32_t y=h;y>0;y--)
          {
-					 memcpy(out,in,stride);
-					 in+=stride;
-					 out-=stride;					 					 
-			}
-			         
+		 memcpy(out,in,stride);
+		 in+=stride;
+		 out-=stride;
+	}
+	// Flip U & V			         
         stride>>=1;
-	in=_uncompressed->data+page;	
-        out=data->data+page+qpage-stride;
+	in=UPLANE(_uncompressed);	
+        out=UPLANE(data)+qpage-stride;
          // flip u
          for(uint32_t y=h>>1;y>0;y--)
          {
-					 memcpy(out,in,stride);
-					 in+=stride;
-					 out-=stride;					 					 
-			}
-	in=_uncompressed->data+page+qpage;	
-        out=data->data+page+qpage+qpage-stride;
+		 memcpy(out,in,stride);
+		 in+=stride;
+		 out-=stride;
+	}
+	in=VPLANE(_uncompressed);
+        out=VPLANE(data)+qpage-stride;
        
       
          // flip u
          for(uint32_t y=h>>1;y>0;y--)
          {
-					 memcpy(out,in,stride);
-					 in+=stride;
-					 out-=stride;					 					 
-			}
-         
-      
-      return 1;
+		 memcpy(out,in,stride);
+		 in+=stride;
+		 out-=stride;
+	}   
+	return 1;
 }
 
 

@@ -150,7 +150,7 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 			{
 				// For div3, no problem we take ffmpeg
 
-							return(decoders *)( new decoderFFDiv3(w,h));
+					return(decoders *)( new decoderFFDiv3(w,h));
 			}
 			
 #ifdef USE_FFMPEG	  
@@ -160,48 +160,48 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
        )
           {
 				
-			  				     	return(decoders *)( new decoderFFDV(w,h,extraLen,extraData));
+			  	     	return(decoders *)( new decoderFFDV(w,h,extraLen,extraData));
 			 }
 #endif	
 #ifdef USE_FFMPEG	  
     if(fourCC::check(fcc,(uint8_t *)"MP42"))
           {
 				
-			  				     	return(decoders *)( new decoderFFMP42(w,h));
+			  	     	return(decoders *)( new decoderFFMP42(w,h));
 			    }
 #endif	
 #ifdef USE_FFMPEG	  
     if(fourCC::check(fcc,(uint8_t *)"H263"))
           {
 				
-			  				     	return(decoders *)( new decoderFFH263(w,h));
+			  	     	return(decoders *)( new decoderFFH263(w,h));
 			    }
     if(fourCC::check(fcc,(uint8_t *)"HFYU"))
           {
 
-			  				     	return(decoders *)( new decoderFFhuff(w,h,extraLen,extraData));
+			  	     	return(decoders *)( new decoderFFhuff(w,h,extraLen,extraData));
 	   }
 
     if(fourCC::check(fcc,(uint8_t *)"SVQ3"))
           {
 
-			  				     	return(decoders *)( new decoderFFSVQ3(w,h,extraLen,extraData));
+			  	     	return(decoders *)( new decoderFFSVQ3(w,h,extraLen,extraData));
 	   }
 
     if(fourCC::check(fcc,(uint8_t *)"WMV2"))
           {
 
-			  				     	return(decoders *)( new decoderFFWMV2(w,h,extraLen,extraData));
+			  	     	return(decoders *)( new decoderFFWMV2(w,h,extraLen,extraData));
 	   }
  	if(fourCC::check(fcc,(uint8_t *)"FFV1"))
           {
 
-			  				     	return(decoders *)( new decoderFFV1(w,h));
+			  	     	return(decoders *)( new decoderFFV1(w,h));
 	   }
 	   if(fourCC::check(fcc,(uint8_t *)"SNOW"))
           {
 
-			  				     	return(decoders *)( new decoderSnow(w,h));
+			  	     	return(decoders *)( new decoderSnow(w,h));
 	   }
 #endif
 
@@ -213,9 +213,9 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 
  	if(isMpeg4Compatible(fcc)==1)
     	{
-					          	return(decoders *)( new decoderFFMpeg4(w,h));
-						  //	return(decoders *)( new decoderXvid(w,h));
-						  //	return(decoders *)( new decoderDIVX(w,h));
+				       	return(decoders *)( new decoderFFMpeg4(w,h));
+				  //	return(decoders *)( new decoderXvid(w,h));
+				  //	return(decoders *)( new decoderDIVX(w,h));
 	}
 
           if(fourCC::check(fcc,(uint8_t *)"MJPG") || fourCC::check(fcc,(uint8_t *)"mjpa"))
@@ -225,8 +225,8 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
                       			printf("\n using mjpeg codec\n");
 			  				     	return(decoders *)( new decoderMjpeg(w,h));
 #else
-                      			printf("\n using FF mjpeg codec\n");
-			  				     	return(decoders *)( new decoderFFMJPEG(w,h));
+                      		printf("\n using FF mjpeg codec\n");
+			  	     	return(decoders *)( new decoderFFMJPEG(w,h));
 #endif
 
            }

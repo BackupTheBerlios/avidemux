@@ -151,19 +151,6 @@ extern uint8_t DIA_RecentFiles( char **name );
 extern void mpeg_passthrough(  char *name );
 static void A_videoCheck( void);
 extern void parseScript(char *scriptname);
-#define USE_FFMPEG_AS_DEFAULT
-#ifdef USE_FFMPEG
-//uint8_t       use_fast_ffmpeg=1;
-#ifdef USE_FFMPEG_AS_DEFAULT
-uint8_t use_fast_ffmpeg = 1;
-#else
-uint8_t use_fast_ffmpeg = 0;
-
-#endif
-
-#else
-uint8_t use_fast_ffmpeg = 0;
-#endif
 int A_saveDVDPS(char *name);
 extern uint8_t ogmSave(char  *name);
 //__________
@@ -279,9 +266,7 @@ HandleAction (Action action)
 				   return;break;
 #endif                                  
     case ACT_Fast:
-      use_fast_ffmpeg = 1 - use_fast_ffmpeg;
-      printf (" Fast FFmpeg is now :%d\n", use_fast_ffmpeg);
-      return;
+      ADM_assert(0);
       break;
     case ACT_Exit:
       { uint8_t saveprefsonexit;

@@ -192,7 +192,9 @@ uint8_t AVDMVideoStreamMPResize::reset(uint32_t nw, uint32_t old,uint32_t algo)
 		ADD(3DNOW,3DNOW);
 		ADD(MMXEXT,MMX2);
 #endif	
-
+#if 0 //def USE_ALTIVEC
+		flags|=SWS_CPU_CAPS_ALTIVEC;
+#endif
 				    _context=sws_getContext(
 				    		_in->getInfo()->width,_in->getInfo()->height,
 						IMGFMT_YV12,
@@ -264,8 +266,6 @@ AVDMVideoStreamMPResize::AVDMVideoStreamMPResize(
 
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	//_uncompressed=(uint8_t *)malloc(3*_info.width*_info.height);
-	//_uncompressed=new uint8_t[3*_info.width*_info.height];
 	_uncompressed=new ADMImage(_info.width,_info.height);
 	_param=NEW( RESIZE_PARAMS);
 	_param->w=x;
@@ -331,31 +331,22 @@ uint8_t AVDMVideoStreamMPResize::getFrameNumberNoAlloc(uint32_t frame,
 			uint32_t page;
 
 			page=_in->getInfo()->width*_in->getInfo()->height;
-			src[0]=_uncompressed->data;
-			src[1]=_uncompressed->data+page;
-			src[2]=_uncompressed->data+page+(page>>2);;
+			src[0]=YPLANE(_uncompressed);
+			src[1]=UPLANE(_uncompressed);
+			src[2]=VPLANE(_uncompressed);
 
 			ssrc[0]=_in->getInfo()->width;
 			ssrc[1]=ssrc[2]=_in->getInfo()->width>>1;
 
 			page=_info.width*_info.height;
-			dst[0]=data->data;
-			dst[1]=data->data+page;
-			dst[2]=data->data+page+(page>>2);;
+			dst[0]=YPLANE(data);
+			dst[1]=UPLANE(data);
+			dst[2]=VPLANE(data);
 			ddst[0]=_info.width;
 			ddst[1]=ddst[2]=_info.width>>1;
-/*
-			_context->swScale(_context,
-							src,ssrc,
-							0,
-							_in->getInfo()->height,
-							dst,ddst);
-*/
+
 			sws_scale(_context,src,ssrc,0,_in->getInfo()->height,dst,ddst);
-
-//void (*swScale)(struct SwsContext *context, uint8_t* src[], int srcStride[], int srcSliceY,
-//             int srcSliceH, uint8_t* dst[], int dstStride[]);
-
-      return 1;
+			data->_qStride=0;
+	return 1;
 }
 

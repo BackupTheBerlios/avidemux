@@ -64,8 +64,6 @@ AVDMVideoStreamResize::AVDMVideoStreamResize(
 
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	//_uncompressed=(uint8_t *)malloc(3*_info.width*_info.height);
-	//_uncompressed=new uint8_t[3*_info.width*_info.height];
 	_uncompressed=new ADMImage(_info.width,_info.height);
 
 		if(couples)
@@ -83,9 +81,8 @@ AVDMVideoStreamResize::AVDMVideoStreamResize(
 				_param=NEW( RESIZE_PARAMS);
 				_param->w=_info.width;
 				_param->h = _info.height;
-			    _param->algo = 0;
-			}
-			//_intermediate_buffer=(uint8_t *)malloc(3*_info.width*_in->getInfo()->height);
+				_param->algo = 0;
+			}			
 			_intermediate_buffer=new uint8_t [3*_info.width*_in->getInfo()->height];	
 
   _info.encoding=1;
@@ -108,8 +105,6 @@ AVDMVideoStreamResize::AVDMVideoStreamResize(
 
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	//_uncompressed=(uint8_t *)malloc(3*_info.width*_info.height);
-	//_uncompressed=new uint8_t[3*_info.width*_info.height];
 	_uncompressed=new ADMImage(_info.width,_info.height);
 	_param=NEW( RESIZE_PARAMS);
 	_param->w=x;
@@ -117,15 +112,14 @@ AVDMVideoStreamResize::AVDMVideoStreamResize(
 	_info.width=_param->w;
 	_info.height=_param->h;
 	_param->algo = 0;
-			//_intermediate_buffer=(uint8_t *)malloc(3*_info.width*_in->getInfo()->height);
-			_intermediate_buffer=new uint8_t [3*_info.width*_in->getInfo()->height];
+	_intermediate_buffer=new uint8_t [3*_info.width*_in->getInfo()->height];
 
-  _info.encoding=1;
-  _init=0;
+	_info.encoding=1;
+	_init=0;
 	Vpattern_luma=NULL;
-    Vpattern_chroma=NULL;
+	Vpattern_chroma=NULL;
 	Hpattern_luma=NULL;
-    Hpattern_chroma=NULL;
+	Hpattern_chroma=NULL;
 }
 
 uint8_t	AVDMVideoStreamResize::getCoupledConf( CONFcouple **couples)
@@ -169,42 +163,32 @@ static Image in,out;
 		return 0;
 	}
 	
-			ADM_assert(_param);	
-	
-   			
+	ADM_assert(_param);	
+	if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
+       		
+	// do the resize in 3 passes, Y, U then V
+	in.width=_in->getInfo()->width;
+	in.height=_in->getInfo()->height;
+	in.data=_uncompressed->data;
 
-			// bypass filter
-			//return _in->getFrameNumberNoAlloc(frame, len,data,flags)	;
-			
-								
-			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
-       		
-       		// do the resize in 3 passes, Y, U then V
-       		in.width=_in->getInfo()->width;
-       		in.height=_in->getInfo()->height;
-       		in.data=_uncompressed->data;
-
-       		out.width=_info.width;
-       		out.height=_info.height;
-       		out.data=data->data;
-       		
-              if(!_init)
-              {
-               	_init=1;
-               	printf("\n Precomputing with algo :%lu\n",_param->algo);
-                	if(_param->algo>2)
-                 		{
-                      	printf("\n Wrong algorithm selection");
-                        ADM_assert(0);
-                     }
-               	 precompute(&out,&in, _param->algo );
-              }
-       		zoom(&out,&in)         ;
-       				       			
-       		
-       		  *flags=0;
-       		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       				
+	out.width=_info.width;
+	out.height=_info.height;
+	out.data=data->data;	
+	if(!_init)
+	{
+		_init=1;
+		printf("\n Precomputing with algo :%lu\n",_param->algo);
+		if(_param->algo>2)
+                {
+			printf("\n Wrong algorithm selection");
+			ADM_assert(0);
+		}
+		precompute(&out,&in, _param->algo );
+	}
+       	zoom(&out,&in)         ;       
+       data->flags=*flags=_uncompressed->flags;
+       data->_qStride=0;
+       *len= _info.width*_info.height+(_info.width*_info.height>>1);       				
       return 1;
 }
 

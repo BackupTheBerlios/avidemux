@@ -50,15 +50,15 @@ printf("\n Registering Filters\n");
 printf(  "*********************\n");
 
 	registerFilter("---- Image size/border alteration----",VF_INVALID,2,NULL,NULL);
-//	REGISTERX("crop","Crop",VF_CROP,1,crop_create,crop_script);
-//	REGISTERX("resize","Resize",VF_RESIZE,1,res_create,resize_script);
+	REGISTERX("crop","Crop",VF_CROP,1,crop_create,crop_script);
+	REGISTERX("resize","Resize",VF_RESIZE,1,res_create,resize_script);
 
 	REGISTERX("mpresize","Mplayer Resize",VF_MPLAYERRESIZE,1,mpresize_create,mpresize_script);
 
-//    	REGISTERX("blacken","Blacken Borders",VF_BLACKEN,1,bsmear_create,bsmear_script);
+	REGISTERX("blacken","Blacken Borders",VF_BLACKEN,1,bsmear_create,bsmear_script);
   	REGISTERX("addblack","Add black border",VF_ADDBORDER,1,addBorder_create,addBorder_script);
-//  	REGISTERX("vflip","Flip Vertical",VF_FLIP,1,flipv_create,flipv_script);
-//	REGISTERX("rotate","Rotate",VF_ROTATE,1,rotate_create,rotate_script);
+  	REGISTERX("vflip","Flip Vertical",VF_FLIP,1,flipv_create,flipv_script);
+	REGISTERX("rotate","Rotate",VF_ROTATE,1,rotate_create,rotate_script);
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
 //	REGISTERX("mpivtc","Mplayer ivtc",VF_MPDETC,1,mpdetc_create,mpdetc_script);	

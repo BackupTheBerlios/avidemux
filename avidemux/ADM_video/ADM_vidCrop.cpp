@@ -99,8 +99,8 @@ AVDMVideoStreamCrop::AVDMVideoStreamCrop(
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
  	//_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
 	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-  ADM_assert(_uncompressed);
-  _info.encoding=1;
+  	ADM_assert(_uncompressed);
+  	_info.encoding=1;
 
   	  	
 }
@@ -134,8 +134,8 @@ uint8_t AVDMVideoStreamCrop::getFrameNumberNoAlloc(uint32_t frame,
        		y=_in->getInfo()->height;
        		x=_in->getInfo()->width;
        		line=_info.width;
-       		src=_uncompressed->data+_param->top*x+_param->left;
-       		dest=data->data;
+       		src=YPLANE(_uncompressed)+_param->top*x+_param->left;
+       		dest=YPLANE(data);
        		
        		for(uint32_t k=_info.height;k>0;k--)
        			{
@@ -144,8 +144,9 @@ uint8_t AVDMVideoStreamCrop::getFrameNumberNoAlloc(uint32_t frame,
        			 	    dest+=line;
        			}
        		 // Crop U  & V
-       		 	src=_uncompressed->data+y*x+(x*_param->top>>2)+(_param->left>>1);
-       		 	src2=src+(x*y>>2);
+       		 	src=UPLANE(_uncompressed)+(x*_param->top>>2)+(_param->left>>1);
+       		 	src2=VPLANE(_uncompressed)+(x*_param->top>>2)+(_param->left>>1);
+			dest=UPLANE(data);
        		 	line>>=1;
        		 	x>>=1;       		       		 	
        		 		for(uint32_t k=((_info.height)>>1);k>0;k--)
@@ -154,6 +155,7 @@ uint8_t AVDMVideoStreamCrop::getFrameNumberNoAlloc(uint32_t frame,
        			 	    	src+=x;
        			 	    	dest+=line;
        		 		}
+			dest=VPLANE(data);	
        		 		for(uint32_t k=((_info.height)>>1);k>0;k--)
        		 		{
        		 	    	  	memcpy(dest,src2,line);
@@ -161,7 +163,8 @@ uint8_t AVDMVideoStreamCrop::getFrameNumberNoAlloc(uint32_t frame,
        			 	    	dest+=line;
        		 		}	
        		  *flags=0;
-       		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       			
+       		  *len= _info.width*_info.height+(_info.width*_info.height>>1);
+		  data->_qStride=0; // drop quant info
       return 1;
 }
 /**
