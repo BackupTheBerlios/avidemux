@@ -49,6 +49,7 @@ S
 #define MULGV -183
 
 #define vecbyte vector unsigned char
+#define vecshort vector unsigned short
 
 uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		    uint8_t * ptr_u,
@@ -103,7 +104,7 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 	vecbyte R,G,B;
 	
 	
-	uint8_t *ptr3=ptr2+w*3;
+	uint8_t *ptr3=ptr2+w*4;
 
 	#if 0	
 #define LOAD_ALIGN(dest,src) \
@@ -147,13 +148,13 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		aprintf("sy16e:%vld\n",sy16e);
 		aprintf("sy16o:%vld\n",sy16o);
 		//--------- get u, convert to long
-		LOAD_ALIGN(srcu,ptr_v);
+		LOAD_ALIGN(srcu,ptr_u);
 		aprintf("su8:%vd\n",srcu);
 		su16=(vector signed short )vec_perm(srcu,nullVect,permC);	
 		su16=vec_add(su16,conv2Signed);
 		aprintf("su16:%vd\n",su16);
 		//--------- get v, convert to long
-		LOAD_ALIGN(srcv,ptr_u);
+		LOAD_ALIGN(srcv,ptr_v);
 		sv16=(vector signed short )vec_perm(srcv,nullVect,permC);	
 		sv16=vec_add(sv16,conv2Signed);
 		aprintf("sv32:%vd\n",sv16);
@@ -226,95 +227,37 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		
 		vecbyte merge0,merge1;
 		vecshort merge2;
+#define MERGE_STORE_RGB(x) \
+		merge1=vec_mergeh(R,nullVect); \
+		merge0=vec_mergeh(B,G); \
+		merge2=vec_mergeh( (vecshort) merge0,(vecshort )merge1); \
+		vec_st((vecbyte)merge2,0,x); \
+		merge2=vec_mergel( (vecshort) merge0,(vecshort )merge1); \
+		vec_st((vecbyte)merge2,16,x);
 
-		merge0=vec_mergeh(nullVect,R);
-		merge1=vec_mergeh(G,B);
-		merge2=vec_mergeh( (vecshort) merge0,(vecshort )merge1);
-		printf("0:%vd\n",merge0);
-		printf("1:%vd\n",merge1);
-		printf("2:%vd\n",merge2);
-		
-		printf("R:%vd\n",merge2);
-				
-		vec_st((vecbyte)merge2,0,ptr2);
-		merge2=vec_mergel( (vecshort) merge0,(vecshort )merge1);
-		
-		printf("0:%vd\n",merge0);
-		printf("1:%vd\n",merge1);
-		printf("2:%vd\n",merge2);
-		vec_st((vecbyte)merge2,16,ptr2);
-		
+
+		MERGE_STORE_RGB(ptr2);	
 		// and do y2________________________________
 		
-		R0=vec_add(sv16e,Ra);
-		R1=vec_add(sv16o,Ra);
-		G0=vec_add(sv16e,Ga);
-		G1=vec_add(sv16o,Ga);
-		B0=vec_add(sv16e,Ba);
-		B1=vec_add(sv16o,Ba);
+		R0=vec_add(sz16e,Ra);
+		R1=vec_add(sz16o,Ra);
+		G0=vec_add(sz16e,Ga);
+		G1=vec_add(sz16o,Ga);
+		B0=vec_add(sz16e,Ba);
+		B1=vec_add(sz16o,Ba);
 
-		
-		
-		aprintf("R0:%vld\n",R0);
-		aprintf("R0b:%vd\n",(vecbyte)R0);
-		aprintf("R1:%vld\n",R1);
-		aprintf("R1b:%vd\n",(vecbyte)R1);
-		
-		aprintf("B0:%vld\n",B0);
-		aprintf("B1:%vld\n",B1);
-				
-		
-		// now time to pack the result		
-		// R0 G0 B0 R1 G1 B1 for each pack
-		// Merge 0/1 to get packed R G B
-		
-		
-
-		// Interleav R0 and G0
-		// We done do clipping (yet)
-		// Saturate
-		#define SAT(x) \
-			x=vec_max(x,(vector signed int)nullVect);
 		SAT(R0);
 		SAT(R1);
 		SAT(G0);
 		SAT(G1);
 		SAT(B0);
 		SAT(B1);
-		
-		
-		
+
 		R=vec_perm((vecbyte)R0,(vecbyte)R1,maskR);
 		G=vec_perm((vecbyte)G0,(vecbyte)G1,maskR);
 		B=vec_perm((vecbyte)B0,(vecbyte)B1,maskR);
 		
-		aprintf("R:%vd\n",R);
-		aprintf("G:%vd\n",G);
-		aprintf("B:%vd\n",B);
-				
-		// aligned write (?)
-		
-		vecbyte merge0,merge1;
-		vecshort merge2;
-
-		merge0=vec_mergeh(nullVect,R);
-		merge1=vec_mergeh(G,B);
-		merge2=vec_mergeh( (vecshort) merge0,(vecshort )merge1);
-		printf("0:%vd\n",merge0);
-		printf("1:%vd\n",merge1);
-		printf("2:%vd\n",merge2);
-		
-		printf("R:%vd\n",merge2);
-				
-		vec_st((vecbyte)merge2,0,ptr3);
-		merge2=vec_mergel( (vecshort) merge0,(vecshort )merge1);
-		
-		printf("0:%vd\n",merge0);
-		printf("1:%vd\n",merge1);
-		printf("2:%vd\n",merge2);
-		vec_st((vecbyte)merge2,16,ptr3);
-		
-		
+		MERGE_STORE_RGB(ptr3);	
 		//
 		count--;
 		ptr_y+=8;

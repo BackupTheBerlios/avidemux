@@ -210,7 +210,7 @@ uint8_t  COL_yv12rgb(uint32_t w, uint32_t h,uint8_t * ptr, uint8_t * ptr2 )
 
 #else
 	  slowYV12RGB(y, u, v, e, w);
-	  slowYV12RGB(y+w, u, v, e+3*w, w);
+	  slowYV12RGB(y+w, u, v, e+4*w, w);
 #endif
 
 		y += w<<1;
