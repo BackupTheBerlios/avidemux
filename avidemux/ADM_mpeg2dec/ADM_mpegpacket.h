@@ -61,9 +61,32 @@ class ADM_mpegDemuxer
 		virtual uint8_t 	forward(uint32_t f)=0;
 	         
             	virtual uint8_t		sync( uint8_t *stream);
-   	        virtual uint8_t		read8i(void);
-   	        virtual uint16_t	read16i(void);
-		virtual uint32_t	read32i(void);
+   	        virtual uint8_t		read8i(void)
+						{
+						uint8_t r;
+						read(1,&r);
+						//printf("\n %x ",r);
+						return r;					
+						};
+   	        virtual uint16_t	read16i(void)
+					{
+						uint16_t v;
+						uint8_t r[2];
+						read(2,r);
+						v=(r[0]<<8)+(r[1]);
+						return v;					
+					}
+
+		virtual uint32_t	read32i(void)
+					{
+					static uint8_t c[4];
+					uint32_t v;
+
+						read(4,c);
+						v= (c[0]<<24)+(c[1]<<16)+(c[2]<<8)+c[3];
+						return v;					
+					}
+
             
 		virtual	uint64_t	getAbsPos( void)=0;
             
@@ -80,16 +103,26 @@ class ADM_mpegDemuxerElementaryStream : public   ADM_mpegDemuxer
 			    FILE 			*_vob;
 	  public:
 	  					ADM_mpegDemuxerElementaryStream() ;
-	       	virtual    ~ADM_mpegDemuxerElementaryStream() ;	       
-	        virtual    uint32_t 		read(uint8_t *w,uint32_t len);
+	       	virtual    			~ADM_mpegDemuxerElementaryStream() ;	       
+	        virtual    uint32_t 		read(uint8_t *buf,uint32_t sz)
+						{
+						uint32_t rd;		
+							rd=fread(buf,1,sz,_vob)  ;
+							_pos+=sz;
+							if(_pos>=_size) _lastErr=1;
+							return rd;	
+						}
 	        virtual    uint8_t 		goTo(uint64_t offset);	            	 
 	        virtual    uint8_t   		open(char *name);
-	         virtual uint8_t getpos(uint64_t *p);
-	         virtual uint8_t forward(uint32_t f);
+	         virtual uint8_t 		getpos(uint64_t *p);
+	         virtual uint8_t 		forward(uint32_t f);
 	          
-            virtual	uint64_t		getAbsPos( void);
-            virtual uint8_t			_asyncJump(uint64_t relative,uint64_t absolute);
-             virtual uint32_t			getOtherSize(void) { return 0;};  
+            	virtual	uint64_t		getAbsPos( void);
+            	virtual uint8_t			_asyncJump(uint64_t relative,uint64_t absolute);
+             	virtual uint32_t		getOtherSize(void) { return 0;}; 
+	      	virtual uint8_t			read8i(void);
+	      	virtual uint16_t		read16i(void);
+		virtual uint32_t		read32i(void);
 
 	};
 	

@@ -261,7 +261,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 //	uint32_t first=0;
 	uint32_t total_frame=0;
 	uint32_t seq_found=0;
-	uint64_t lastI=0;
+	uint64_t lastPic=0;
 	uint32_t update=0;
 	uint8_t  gop_seen=0;
 	uint64_t lastGop=0;
@@ -291,18 +291,17 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 	switch(token)
 		{
 				case 0xb3: // video es
-									printf("Video Elementary stream");
-									demuxer=new ADM_mpegDemuxerElementaryStream;
-									break;
+						printf("Video Elementary stream");
+						demuxer=new ADM_mpegDemuxerElementaryStream;
+						break;
 				case 0xba : // program stream ?	(vob/mpeg/VCD)
-									printf("Program stream");
+						printf("Program stream");
 
-									demuxer=new ADM_mpegDemuxerProgramStream(0xe0,audiostreamid);
-									break;
+						demuxer=new  ADM_mpegDemuxerProgramStream(0xe0,audiostreamid);
+						break;
 				default:
-								printf("\n unrecognized stream\n");
-								return 0;
-												
+						printf("\n unrecognized stream\n");
+						return 0;	
 		}
 	// ok now we have it.
 	demuxer->open(mpeg);
@@ -320,8 +319,9 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 	fprintf(out,"1\n");
 	fprintf(out,"%s\n",mpeg);
 
-	DIA_working *work;
+	DIA_working 	*work;
 	uint32_t	gop_forward=0;
+	uint64_t	image_length,image_start,image_absStart;;
 
 	work=new DIA_working("Indexing mpeg");
 
@@ -357,6 +357,12 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
                                         		break;
 					*/
 					case 0xB3: // sequence start
+						gop_seen=1;
+						// Memorize gop position
+						// as it will be the real start of the
+						// next I Frame
+						lastGop=pos;
+						lastAbsGop=abspos;
 						if(seq_found)
 						{
 						 	demuxer->forward(8);
@@ -381,12 +387,16 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 						// x Gop broken x x x x x 
 						gop>>=6; // skip padding
 						gop&=1;
-						gop_seen=1;
-						// Memorize gop position
-						// as it will be the real start of the
-						// next I Frame
-						lastGop=pos;
-						lastAbsGop=abspos;
+						// take this as marker
+						if(!gop_seen)
+						{
+							gop_seen=1;
+							// Memorize gop position
+							// as it will be the real start of the
+							// next I Frame
+							lastGop=pos;
+							lastAbsGop=abspos;
+						}
 						// 25 bits = time code
 #if 0
 						if(gop)
@@ -414,46 +424,68 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 							printf("Fake closed gop!\n");
 							gop_forward=0;
 						}
-#endif
+
 						if(ftype==1 || ftype==2) // I or P
 							if(gop_forward) gop_forward--;
 						if(ftype==3 && gop_forward)
 							ftype=2; // change B frame to P frame
-
+#endif
 						switch(ftype)
 						{
 						case 2:// P 
 						case 3:// B
 						case 4:
+							// clear last memorized one
 							gop_seen=0;
 							if(total_frame==1)
 							{
+								// Skip until we met a I frame
 								total_frame=0;
 								continue;
 							}
-						case 1:// printf(" Pic : I\n");
-																				//	printf("\n%c",Type[ftype]);
-																					if(total_frame!=1)
+						case 1:// printf(" Pic : I\n");	
+							//	printf("\n%c",Type[ftype]);
+								
+							// We conclude the previous frame
+							// by indicating its length
+							// that is the current post - last pic
+							// Or the lastGop - last pic
+							if(total_frame!=1)
 							{
-								fprintf(out," %llu\n",pos-lastI-4);
+								if(gop_seen)
+									image_length=lastGop-4-lastPic;
+								else
+									image_length=pos-4-lastPic;
+								
+								fprintf(out," %llu\n",image_length);
 							}
+							
+							// Now set image type and start
 							if(!gop_seen)
-								fprintf(out,"%c %010llX",Type[ftype],pos-4);
-							else
-								fprintf(out,"%c %010llX",Type[ftype],lastGop-4);
-														          						if(ftype==1) // I frame
 							{
-								if(gop_seen) abspos=lastAbsGop;
+								image_start=pos-4;
+								image_absStart=abspos-4;
+							}
+							else
+							{
+								image_start=lastGop-4;
+								image_absStart=lastAbsGop-4;
+							}
+							
+							fprintf(out,"%c %010llX",Type[ftype],image_start);
+														          							if(ftype==1) // I frame
+							{
+								
 								fprintf(out," %010llX %10lx",
-								abspos-4,demuxer->getOtherSize()); 	
+								image_absStart,demuxer->getOtherSize()); 	
 							}
 							if(gop_seen)
 							{
-								lastI=lastGop-4;
+								lastPic=lastGop-4;
 								gop_seen=0;
 							}
 							else							
-								lastI=pos-4;
+								lastPic=pos-4;
 							nb_iframe++;
 							break;
 
@@ -464,7 +496,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 					}
 		}
 stop_found:
-//	 	fprintf(out," %d\n\n",demuxer->getSize()-lastI-4);
+//	 	fprintf(out," %d\n\n",demuxer->getSize()-lastPic-4);
 	 	fprintf(out," 0 \n\n");
        printf("\n end of stream...\n");
 	  // update # of frames

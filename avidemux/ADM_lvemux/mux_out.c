@@ -39,6 +39,7 @@
 #define LW_HB 1
 #define LW_LB 0
 static int mean_update_gop(PackStream *ps, uint8_t *ptr);
+static uint8_t *mean_lookup_gop(uint8_t *start, uint32_t len);
 static void put_bits(BitPack *bp, int n, uint32_t value)
 {
   uint8_t *pv   = (uint8_t *)&value;
@@ -759,15 +760,58 @@ uint32_t hh,mm,ss,ff;
 	
 
 }
+/*
+	Search for a GOP Header start code in the buffer
+		and returns the position of the data following
+		that startcode
+	If no startcode is found, returns NULL;
+
+
+*/
+uint8_t *mean_lookup_gop(uint8_t *start, uint32_t len)
+{
+uint32_t val,hnt;
+uint8_t *ptr=start,*end;
+
+				end=start+len;
+				val=0;
+				hnt=0;			
+			
+			// preload
+				hnt=((*ptr)<<16) + (*(ptr+1)<<8) +*(ptr+2);
+				ptr+=3;
+				while(ptr<end)
+				{
+					hnt<<=8;
+					hnt+=*ptr++;
+					if(hnt==0x000001b8)
+					{
+						return ptr;
+					}
+				
+				}
+				printf("Gop start not found after seq start (?)\n");
+				return NULL;
+
+
+}
 int mux_write_packet(PackStream *ps, 
                      uint8_t pkt_id, uint8_t *pkt_buf, int pkt_len) 
 {
 
     static uint8_t seq_start_code [] = {0x00, 0x00, 0x01, MX_SEQ_CODE};
     static uint8_t gop_start_code [] = {0x00, 0x00, 0x01, MX_GOP_CODE};
-    
+    static uint8_t seq_end_code   [] = {0x00, 0x00, 0x01, MX_SEQ_END};
+    uint8_t *ptr;
     int payload_size; 
      
+     if (pkt_id == VIDEO_ID)
+     	if(!memcmp(pkt_buf+pkt_len-4,seq_end_code,4))
+	{
+		printf("Removing seq_end code\n");
+		
+	} 
+    
     ps->pkt_id  = pkt_id;    // 0xC0=MP2-Audio, 0x80=AC3 Audio, 0xE0=Video 
     ps->pkt_buf = pkt_buf;
     ps->pkt_len = pkt_len; 
@@ -777,18 +821,40 @@ int mux_write_packet(PackStream *ps,
     //-------------------------------------------------
     if (pkt_id == VIDEO_ID) 
     {
+#if 0    
+      //
+      switch(pkt_buf[3])
+      {
+      	case MX_GOP_CODE: printf("Gop\n");break;
+	case MX_SEQ_CODE: printf("Seq\n");break;
+	case 0: printf("Img\n");break;
+	default: printf("--> %x\n",pkt_buf[3]);
+	}
+#endif      
       
+      
+      //
       if (pkt_len >= 4)
       {
       	
         if ( !memcmp(pkt_buf, seq_start_code, 4) || !memcmp(pkt_buf, gop_start_code, 4) )
         {
-		if(!memcmp(pkt_buf, gop_start_code, 4))
+		// MEANX
+		if(ps->forceRestamp)		
 		{
-			// MEANX
-			if(ps->forceRestamp)
-				mean_update_gop(ps,pkt_buf+4);
-			// /Meanx
+			ptr=NULL;
+			if(!memcmp(pkt_buf, gop_start_code, 4))
+					ptr=pkt_buf+4;
+				else
+					ptr=mean_lookup_gop(pkt_buf,pkt_len);
+			if(ptr)
+			{
+				mean_update_gop(ps,ptr);			
+			}
+			else
+			{
+				printf("Could not resync timestamp\n");
+			}	
 		}
         
 	  //-- every 2nd. sequence/GOP insert a VOBU packet --

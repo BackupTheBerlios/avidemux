@@ -54,6 +54,39 @@ ADM_mpegDemuxer::ADM_mpegDemuxer(void )
 ADM_mpegDemuxer::~ADM_mpegDemuxer( )
 {
 }
+
+
+uint8_t		ADM_mpegDemuxerElementaryStream::read8i(void)
+{
+	uint8_t r;
+		fread(&r,1,1,_vob)  ;
+		_pos+=1;
+		if(_pos>=_size) _lastErr=1;	
+		return r;					
+};
+uint16_t	ADM_mpegDemuxerElementaryStream::read16i(void)
+{
+	uint16_t v;
+	uint8_t r[2];
+			fread(r,1,2,_vob)  ;
+			_pos+=2;
+			if(_pos>=_size) _lastErr=1;	
+			return v=(r[0]<<8)+r[1];					
+}
+
+uint32_t	ADM_mpegDemuxerElementaryStream::read32i(void)
+{
+	static uint8_t c[4];
+	uint32_t v;
+
+		fread(c,1,4,_vob)  ;
+		_pos+=4;
+		if(_pos>=_size) _lastErr=1;	
+			
+		v= (c[0]<<24)+(c[1]<<16)+(c[2]<<8)+c[3];
+		return v;					
+}
+
 // a demuxer is also a king of hi-level parser
 uint8_t		ADM_mpegDemuxer::sync( uint8_t *stream)
 {
@@ -64,7 +97,7 @@ uint32_t val,hnt;
 				hnt=0;			
 			
 			// preload
-				hnt=(read8i()<<16) + (read8i()<<8) +read8i();								;		
+				hnt=(read8i()<<16) + (read8i()<<8) +read8i();
 				if(_lastErr)
 						{
 							_lastErr=0;
@@ -74,62 +107,33 @@ uint32_t val,hnt;
 				while((hnt!=0x00001))
 				{
 					
-						hnt<<=8;
-						val=read8i();					
-						hnt+=val;
-						hnt&=0xffffff;	
+					hnt<<=8;
+					val=read8i();					
+					hnt+=val;
+					hnt&=0xffffff;	
 					
-						if(_lastErr)
-						{
-							_lastErr=0;
-							// check if we are near the end, if so we abort							
-							// else we continue
-							uint64_t pos;
-										pos=getAbsPos();
-									//	if(_size-pos<1024)
-										{																	
-												printf("\n io error , aborting sync\n");
-												return 0;	
-										}
-										printf("\n  Bumped into something at %llu / %llu but going on\n",pos,_size);
-										if(!_size) assert(0);
-										// else we go on...
-										hnt=(read8i()<<16) + (read8i()<<8) +read8i();								;		
-						}
+					if(_lastErr)
+					{
+						_lastErr=0;
+						// check if we are near the end, if so we abort	
+						// else we continue
+						uint64_t pos;
+							pos=getAbsPos();
+							//	if(_size-pos<1024)
+							{
+								printf("\n io error , aborting sync\n");
+								return 0;	
+							}
+							printf("\n  Bumped into something at %llu / %llu but going on\n",pos,_size);
+							if(!_size) assert(0);
+							// else we go on...
+							hnt=(read8i()<<16) + (read8i()<<8) +read8i();
+					}
 									
 				}
 				
 	      *stream=read8i();
 	      return 1;
-}
-uint8_t		ADM_mpegDemuxer::read8i(void)
-{
-uint8_t r;
-					read(1,&r);
-					//printf("\n %x ",r);
-					return r;					
-	
-}
-uint16_t		ADM_mpegDemuxer::read16i(void)
-{
-	uint16_t v;
-	uint8_t r[2];
-					read(2,r);
-					v=(r[0]<<8)+(r[1]);
-					return v;					
-
-}
-
-
-uint32_t		ADM_mpegDemuxer::read32i(void)
-{
-		static uint8_t c[4];
-		uint32_t v;
-
-						read(4,c);
-						v= (c[0]<<24)+(c[1]<<16)+(c[2]<<8)+c[3];
-					return v;					
-	
 }
 
 //---------------------------------------------------------------------------------------------
@@ -193,15 +197,6 @@ uint8_t ADM_mpegDemuxerElementaryStream::getpos(uint64_t *p)
 
 	*p=ftello(_vob);
 	return 1;	
-}
-
-uint32_t ADM_mpegDemuxerElementaryStream::read(uint8_t *buf,uint32_t sz)
-{
-uint32_t rd;		
-		rd=fread(buf,1,sz,_vob)  ;
-		_pos+=sz;
-		if(_pos>=_size) _lastErr=1;
-		return rd;	
 }
 
 // 
