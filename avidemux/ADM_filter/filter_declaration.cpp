@@ -99,6 +99,7 @@ printf(  "*********************\n");
 	REGISTERX("chromashift","Chroma shift",VF_CHROMASHIFT,1,create_chromashift,chromashift_script);
 
 	REGISTERX("contrast","Contrast",VF_CONTRAST,1,contrast_create,contrast_script);
+	REGISTERX("equalizer","Luma equalizer",VF_EQUALIZER,1,equalizer_create,equalizer_script);
 
 	REGISTERX("lumaonly","Luma only",VF_LUMA,1,luma_create,luma_script);
 	REGISTERX("chromauonly","Chroma U only",VF_CHROMAU,1,chromaU_create,chromaU_script);
