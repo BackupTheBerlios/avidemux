@@ -798,6 +798,8 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 
 #endif //ARCH_X86
 
+
+#define memalign(a,b) ADM_alloc(b)
 // minor note: the HAVE_xyz is messed up after that line so don't use it
 
 static double getSplineCoeff(double a, double b, double c, double d, double dist)
