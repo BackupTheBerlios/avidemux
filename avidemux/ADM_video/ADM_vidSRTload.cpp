@@ -353,7 +353,7 @@ void utf16_string( char *string)
 {
 	static char icc[MAXIC];
 	size_t len=0;
-	uint32_t sout=MAXIC>>1;
+	size_t sout=MAXIC>>1;
 	unsigned char c;
 	char *out;
 	char *wrkstring;
