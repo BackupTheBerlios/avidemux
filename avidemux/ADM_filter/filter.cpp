@@ -267,8 +267,11 @@ void editorUpdatePreview(uint32_t framenum)
   if( GUI_StillAlive())
   {
   		aprintf("Preview: Ask for frame %lu\n",framenum);
-		preview->getFrameNumberNoAlloc(framenum,&len,unpackd,&fl);
-		GUI_PreviewUpdate(unpackd);
+		if(framenum<=preview->getInfo()->nb_frames-1)
+		{
+			preview->getFrameNumberNoAlloc(framenum,&len,unpackd,&fl);
+			GUI_PreviewUpdate(unpackd);
+		}
   }
 
 //   virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
