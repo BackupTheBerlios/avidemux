@@ -38,10 +38,11 @@
 #include "ADM_dialog/DIA_enter.h"
 #include "ADM_video/ADM_cache.h"
 
-static FILTER_PARAM ResampParam={1,{"newfps"}};
+static FILTER_PARAM ResampParam={2,{"newfps","use_linear"}};
 typedef struct FPS_Param
 {
   uint32_t  newfps; 
+  uint32_t  use_linear;
 }FPS_Param;
 class  ADMVideoResampleFPS:public AVDMGenericVideoStream
 {
@@ -67,7 +68,7 @@ BUILD_CREATE(resamplefps_create,ADMVideoResampleFPS);
  
 uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
 {
-  
+  uint8_t r=1;
   float f=_param->newfps;
   
   f/=1000;
@@ -77,16 +78,27 @@ uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
   {
     f*=1000;
     _param->newfps=(uint32_t)floor(f+0.4); 
-    _info.fps1000=_param->newfps;
-    return 1;
-  }      
-  return 0;        
+    _info.fps1000=_param->newfps;   
+    
+  }  
+  if(GUI_Question("Use linear blend ?"))
+  {
+        _param->use_linear=1;        
+  }
+  else
+  {
+        _param->use_linear=0;        
+  }
+
+    
+  return r;        
 }
 char *ADMVideoResampleFPS::printConf( void )
 {
   static char buf[50];
         
-  sprintf((char *)buf," Resample to %2.2f fps",(double)_param->newfps/1000.);
+  sprintf((char *)buf," Resample to %2.2f fps (blend:%d)",(double)_param->newfps/1000.,
+                _param->use_linear);
   return buf;
 }
 
@@ -100,11 +112,13 @@ ADMVideoResampleFPS::ADMVideoResampleFPS(  AVDMGenericVideoStream *in,CONFcouple
    
   if(couples)
   {                 
-    GET(newfps);                            
+    GET(newfps);    
+    GET(use_linear); 
   }
   else
   {
     _param->newfps =_info.fps1000;                
+    _param->use_linear=0;
   }      
  
   double newlength;
@@ -126,11 +140,12 @@ ADMVideoResampleFPS::~ADMVideoResampleFPS()
 uint8_t ADMVideoResampleFPS::getCoupledConf( CONFcouple **couples)
 {
   ADM_assert(_param);
-  *couples=new CONFcouple(1);
+  *couples=new CONFcouple(2);
 
 
-                        CSET(newfps);
-                        return 1;
+                CSET(newfps);
+                CSET(use_linear);
+                return 1;
 }
 
 
@@ -139,7 +154,8 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
                                              ADMImage *data,
                                              uint32_t *flags)
 {
-  ADMImage *mysrc=NULL;
+  ADMImage *mysrc1=NULL;
+  ADMImage *mysrc2=NULL;
 
   ADM_assert(frame<_info.nb_frames);
   // read uncompressed frame
@@ -152,22 +168,95 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
   f*=_in->getInfo()->fps1000;
   f/=_param->newfps;
   
+  if(!_param->use_linear)
+  {
   uint32_t nw;
   
   nw=(uint32_t)floor(f+0.4);
   if(nw>_in->getInfo()->nb_frames-1)
     nw=_in->getInfo()->nb_frames-1;
-  printf("Old:%lu new:%lu\n",frame,nw);
-  mysrc=vidCache->getImage(nw);
-  if(!mysrc) return 0;
+ 
+  mysrc1=vidCache->getImage(nw);
+  if(!mysrc1) return 0;
   
-  memcpy(YPLANE(data),YPLANE(mysrc),page);
-  memcpy(UPLANE(data),UPLANE(mysrc),page>>2);
-  memcpy(VPLANE(data),VPLANE(mysrc),page>>2);
+  memcpy(YPLANE(data),YPLANE(mysrc1),page);
+  memcpy(UPLANE(data),UPLANE(mysrc1),page>>2);
+  memcpy(VPLANE(data),VPLANE(mysrc1),page>>2);
  
   vidCache->unlockAll();
   
   
+  return 1;
+
+
+  }
+
+  uint32_t nw;
+  uint8_t lowweight;
+  uint8_t highweight;
+  
+  double diff;
+  
+  nw=(uint32_t)floor(f);
+  diff=f-floor(f);
+  highweight = (uint8_t)floor(diff*256);
+  lowweight = 256 - highweight;
+
+  if(nw>_in->getInfo()->nb_frames-1)
+    {
+      nw=_in->getInfo()->nb_frames-1;
+      diff=0.0;
+    }
+  //printf("New:%lu old:%lu\n",frame,nw);
+
+  if(highweight == 0)
+    {
+      mysrc1=vidCache->getImage(nw);  
+      if(!mysrc1) return 0;
+      
+      memcpy(YPLANE(data),YPLANE(mysrc1),page);
+      memcpy(UPLANE(data),UPLANE(mysrc1),page>>2);
+      memcpy(VPLANE(data),VPLANE(mysrc1),page>>2);
+      
+      vidCache->unlockAll();
+    }
+  else
+    {
+      mysrc1=vidCache->getImage(nw);
+      mysrc2=vidCache->getImage(nw+1);
+      if(!mysrc1 || !mysrc2) return 0;
+      
+      uint8_t *out, *in1, *in2;
+      uint32_t count;
+      uint32_t idx;
+      
+      out = YPLANE(data);
+      in1 = YPLANE(mysrc1);
+      in2 = YPLANE(mysrc2);
+      count = page;
+      for(idx = 0; idx < count; ++idx)
+	out[idx] = ((in1[idx]*lowweight) + (in2[idx]*highweight))>>8;
+      
+      out = UPLANE(data);
+      in1 = UPLANE(mysrc1);
+      in2 = UPLANE(mysrc2);
+      count = page>>2;
+
+      for(idx = 0; idx < count; ++idx)
+	out[idx] = ((in1[idx]*lowweight) + (in2[idx]*highweight))>>8;
+
+
+      out = VPLANE(data);
+      in1 = VPLANE(mysrc1);
+      in2 = VPLANE(mysrc2);
+      count = page>>2;
+
+      for(idx = 0; idx < count; ++idx)
+	out[idx] = ((in1[idx]*lowweight) + (in2[idx]*highweight))>>8;
+
+
+      vidCache->unlockAll();
+    }
   return 1;
  
 }
