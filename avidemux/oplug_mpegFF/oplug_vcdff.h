@@ -16,6 +16,6 @@
  ***************************************************************************/
 #ifdef USE_FFMPEG
 
-void oplug_mpegff(char *name);
+void oplug_mpegff(char *name,uint8_t psstream);
 
 #endif

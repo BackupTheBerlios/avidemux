@@ -52,12 +52,16 @@ extern "C" {
 #include "oplug_mpegFF/oplug_vcdff.h"
 
 #include "ADM_dialog/DIA_encoding.h"
+#include "ADM_audiofilter/audioprocess.hxx"
+#include "ADM_audiofilter/audioeng_buildfilters.h"
+#include "ADM_lavformat/ADM_lavformat.h"
 
 static uint8_t *_buffer=NULL,*_outbuffer=NULL;
 static void  end (void);
 
 extern FFMPEGConfig ffmpegMpeg1Config;
 extern FFMPEGConfig ffmpegMpeg2Config;
+extern FFMPEGConfig ffmpegMpeg2ConfigDVD;
 //static FFMPEGConfig ffmpegConfigforXVCD;
 
 
@@ -81,16 +85,20 @@ void oplug_mpegff_conf( void )
 			);
 }
 
-void oplug_mpegff(char *name)
+void oplug_mpegff(char *name, uint8_t ps_stream)
 {
 AVDMGenericVideoStream *_incoming;
 EncoderFFMPEGMpeg1  *encoder;
-FILE *file;
 
+lavMuxer	*muxer=NULL;
+FILE 		*file=NULL;
+uint8_t		audioBuffer[48000];
+uint32_t	audioLen=0;
 uint32_t _w,_h,_fps1000,_page,total;	
-
+AVDMGenericAudioStream	*audio;
 uint32_t len,flags;
 uint32_t size;
+ADM_MUXER_TYPE mux;
 	
 	twoPass=new char[strlen(name)+6];
 	twoFake=new char[strlen(name)+6];
@@ -116,14 +124,86 @@ uint32_t size;
 
 // override with mpeg1 specific stuff
 
-
-		
-//__________________________________					
-	file=fopen(name,"wb");
-	if(!file)
+	// Check if audio
+	if(ps_stream)
 	{
-		GUI_Alert("Cannot open output file !");
-	 return ;
+	
+		if(!currentaudiostream)
+		{
+			GUI_Alert("There is no audio track.");
+			return ;
+		}
+		audio=mpt_getAudioStream();
+	
+	// Have to check the type
+	// If it is mpeg2 we use DVD-PS
+	// If it is mpeg1 we use VCD-PS
+	// Later check if it is SVCD
+		if(!audio)
+		{
+			GUI_Alert("Audio track is  not suitable!\n");
+			return;
+		}
+		// Check
+		WAVHeader *hdr=audio->getInfo();
+	
+	
+	
+	
+		if(current_codec==CodecXVCD)
+		{
+			if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
+			{
+				GUI_Alert("This is not compatible with VCD mpeg.\n");
+				deleteAudioFilter();
+				return ;
+			}
+			mux=MUXER_VCD;
+			printf("X*CD: Using VCD PS\n");
+	
+		}else
+		{    
+			aviInfo info;
+			video_body->getVideoInfo(&info);
+			if(hdr->frequency==44100 && _w==480&&hdr->encoding == WAV_MP2 ) // SVCD ?
+			{
+				mux=MUXER_SVCD;
+				printf("X*VCD: Using SVCD PS\n");
+			}
+			else
+			{
+			 // mpeg2, we do only DVD right now
+			if(hdr->frequency!=48000 || 
+			(hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
+			{
+				deleteAudioFilter();
+				GUI_Alert("Audio track is not suitable!\n");
+				return ;
+			}
+			mux=MUXER_DVD;
+			printf("X*VCD: Using DVD PS\n");
+			}
+		}
+	
+		// Create muxer
+		muxer=new lavMuxer();
+		if(!muxer->open(name,0,mux,avifileinfo,audio->getInfo()))
+		{
+			delete muxer;
+			muxer=NULL;
+			deleteAudioFilter();
+			printf("Muxer init failed\n");
+			return ;
+		}
+	}
+	else
+	{	// Else open file (if possible)
+		file=fopen(name,"wb");
+		if(!file)
+		{
+			GUI_Alert("Cannot open output file !");
+	 		return ;
+		}
 	}
 	switch(current_codec)
 	{
@@ -135,6 +215,11 @@ uint32_t size;
 			encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpegMpeg2Config);
 			printf("\n Using ffmpeg mpeg2 encoder\n");
 			break;
+		case CodecXDVD:
+			encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpegMpeg2ConfigDVD);
+			printf("\n Using ffmpeg mpeg2 encoder (DVD)\n");
+			break;
+		
 		default:
 		ADM_assert(0);
 	}
@@ -160,7 +245,10 @@ uint32_t size;
   				encoding->setCodec("FFmpeg Mpeg1 VBR");
 				break;
 		case CodecXSVCD:
-  				encoding->setCodec("FFmpeg Mpeg2 VBR");
+  				encoding->setCodec("FFmpeg Mpeg2 SVCD VBR");
+				break;
+		case CodecXDVD:
+  				encoding->setCodec("FFmpeg Mpeg2 DVD VBR");
 				break;
 	}
 
@@ -198,13 +286,13 @@ uint32_t size;
 			}
 				encoder->startPass2();
 				encoding->reset();
-
 		}
 		if(encoder->isDualPass())
-     encoding->setPhasis ("Pass 2/2");
-    else
-     encoding->setPhasis ("Encoding");
+			encoding->setPhasis ("Pass 2/2");
+		else
+			encoding->setPhasis ("Encoding");
 
+		// 2nd or Uniq Pass
 		for(uint32_t i=0;i<total;i++)
 			{
        	// get frame
@@ -213,10 +301,36 @@ uint32_t size;
 					GUI_Alert("Error in pass 2");
 					goto finish;
 				}
+				if(file)
+				{
+					fwrite(_outbuffer,len,1,file);
+				}
+				else
+				{
+					uint32_t samples; 
+					uint32_t dts=encoder->getDTS();
+					
+					printf("%lu %lu\n",i,dts);
+					
+					muxer->writeVideoPacket(len,_outbuffer,
+							i,dts);
+					// _muxer->writeVideoPacket(len,_buffer_out,
+					//i-MPEG_PREFILL,_codec->getCodedPictureNumber());
+					while(muxer->needAudio()) 
+					{				
+						if(!audio->getPacket(audioBuffer, &audioLen, &samples))	
+						{ 
+							break; 
+						}
+						if(audioLen) 
+						{
+							muxer->writeAudioPacket(audioLen,audioBuffer); 
+							encoding->feedAudioFrame(audioLen); 
+						}
 
-				fwrite(_outbuffer,len,1,file);
-				size=ftell(file);
-				size=size/(1024*1024);				
+					}
+				
+				}
 				encoding->setFrame(i,total);
 				encoding->setQuant(encoder->getLastQz());
 				encoding->feedFrame(len);
@@ -231,7 +345,17 @@ finish:
 			delete encoding;
 			GUI_Alert("Encoding done");
 		 	end();
-			fclose(file);
+			if(file)
+			{
+				fclose(file);
+				file=NULL;
+			}
+			else
+			{
+				muxer->close();
+				delete muxer;
+				muxer=NULL;
+			}
 			delete encoder;
 			return ;
 }
