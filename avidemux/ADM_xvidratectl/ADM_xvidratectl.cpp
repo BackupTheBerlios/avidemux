@@ -28,7 +28,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: ADM_xvidratectl.cpp,v 1.2 2004/11/11 20:20:01 mean Exp $
+ * $Id: ADM_xvidratectl.cpp,v 1.3 2004/12/12 19:32:22 mean Exp $
  *
  *****************************************************************************/
 
@@ -57,7 +57,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 // Glueing to avidemux
-#define DPRINTF(a,b, ...) aprintf(b,## __VA_ARGS__)
+#define DPRINTF(a,b, args...) aprintf(b,## args);
 #undef malloc
 #undef free
 #undef realloc

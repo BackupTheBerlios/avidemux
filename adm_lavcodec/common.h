@@ -234,9 +234,9 @@ inline void dprintf(const char* fmt,...) {}
 #    else
 
 #        ifdef DEBUG
-#            define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, __VA_ARGS__)
+#            define dprintf(fmt,args...) av_log(NULL, AV_LOG_DEBUG, fmt, ##args)
 #        else
-#            define dprintf(fmt,...)
+#            define dprintf(fmt,args...)
 #        endif
 
 #    endif /* !CONFIG_WIN32 */
@@ -1077,7 +1077,7 @@ static inline int get_xbits_trace(GetBitContext *s, int n, char *file, char *fun
 #define tprintf(...) av_log(NULL, AV_LOG_DEBUG, __VA_ARGS__)
 
 #else //TRACE
-#define tprintf(...) {}
+#define tprintf(args...) {}
 #endif
 
 /* define it to include statistics code (useful only for optimizing
