@@ -3843,9 +3843,9 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 #ifdef HAVE_ALTIVEC
 				{ //MEANX
 					unsigned char __attribute__ ((aligned(16))) tempBlock[272];
-					transpose_16x8_char_toPackedAlign_altivec(tempBlock, dstBlock - (4 + 1), stride);
+					transpose_16x8_char_toPackedAlign_altivec(tempBlock, dstBlock - 4 , stride);
 					vertX1Filter_altivec(tempBlock, 16, &c); // 16 ?
-				 	transpose_8x16_char_fromPackedAlign_altivec(dstBlock - (4 + 1), tempBlock, stride);
+				 	transpose_8x16_char_fromPackedAlign_altivec(dstBlock - 4, tempBlock, stride);
 					//horizX1Filter_altivec(dstBlock-4, stride, QP);
 				}
 #else				
