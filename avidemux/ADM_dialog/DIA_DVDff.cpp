@@ -29,29 +29,14 @@
 #include "ADM_toolkit/toolkit.hxx"
 
 static GtkWidget	*create_dialog1 (void);
-#define SPIN_GETF(x,y) {conf->y= gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(x))) ;\
-				printf(#x":%d\n",conf->y);}
-#define SPIN_GET(x,y) {conf->y= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(WID(x))) ;\
-				printf(#x":%d\n",conf->y);}
 
-#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(x)),(gfloat)conf->y) ; \
-				printf(#x":%d\n",conf->y);}
-
-#define MENU_SET(x,y) { gtk_option_menu_set_history (GTK_OPTION_MENU(WID(x)),conf->y);}
-#define MENU_GET(x,y) { conf->y	= getRangeInMenu(WID(x));}
-#define TOGGLE_SET(x,y) {gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(WID(x)),conf->y);}
-#define TOGGLE_GET(x,y) {conf->y=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(WID(x)));\
-				printf(#y":%d\n",conf->y);}
 				
 #define ENTRY_SET(x,y) {gtk_write_entry(WID(x),(int)conf->y);}
-#define ENTRY_GET(x,y) {localSettings.y=gtk_read_entry(WID(x));\
-				printf(#y":%d\n",conf->y);}
+#define ENTRY_GET(x,y) {localSettings.y=gtk_read_entry(WID(x));}
 
-#define CHECK_GET(x,y) {conf->y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
-#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),conf->y);}	
 
-#define HIST_SET(x) gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenu_mode)), x)
-#define VAL_SET(x) gtk_write_entry(WID(entry_bitrate), x)
+#define HIST_SET(x) 	gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenu_mode)), x)
+#define VAL_SET(x) 	gtk_write_entry(WID(entry_bitrate), x)
 
 static GtkWidget 	*dialog=NULL;		      
 static uint32_t 	mQ,mB,mS;
