@@ -84,9 +84,11 @@ uint32_t end;
 		// if the last frame is the last frame (!)
 		// we add one to keep it, else we systematically skip
 		// the last frame
+#if 0					
 		if(frameEnd==end-1) end=frameEnd+1;
 		else
 			end=frameEnd;
+
 		if(!video_body->sanityCheckRef(frameStart,end,&pb))
 		{
 			if(pb)
@@ -97,7 +99,56 @@ uint32_t end;
 			if(!GUI_Question("Warning !\n Bframe has lost its reference frame\nContinue ?"))
 				return 0;
 		}
-	
+#endif
+		// Alter frameEnd so that it is not a B frame	
+		// as frameEnd -1 position	
+		uint32_t tgt=frameEnd;;
+		uint32_t flag=0,found=0;
+		
+		// need to do something ?
+		if(frameEnd>frameStart)
+		{
+			tgt=frameEnd;
+			if(tgt==end-1) tgt++;
+			video_body->getFlags(tgt-1,&flag);
+			if((frameEnd&AVI_B_FRAME))
+			{
+				printf("Last frame is a B frame, choosing better candidate\n");
+				 // The last real one is not a I/P Frame
+				 // Go forward or rewind
+				 if(tgt<end-1)
+				{	// Try next if possible
+					video_body->getFlags(tgt,&flag);
+					if(!(flag&AVI_B_FRAME))
+					{
+						printf("Taking next frame as last frame %lu\n",tgt+1);
+				 		frameEnd=tgt+1;
+				 		found=1;
+					}
+				}
+				if(!found) // next frame not possible, rewind
+				{
+					if(tgt>=end-2) tgt=end-2;
+					while(tgt>frameStart)
+					{
+						printf("Trying :%lu\n",tgt);
+						video_body->getFlags(tgt,&flag);
+						if(!(flag&AVI_B_FRAME))
+						{
+							printf("Taking previous frame as last frame %lu\n",tgt+1);
+				 			frameEnd=tgt+1;
+				 			found=1;
+							break;
+						}
+						else tgt--;
+					}
+				}
+				ADM_assert(found);
+			}
+		}
+		
+		
+		
 	}
 	switch(family)
 	{
