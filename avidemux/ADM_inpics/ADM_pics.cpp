@@ -45,7 +45,7 @@
 
 static	uint16_t s16;
 static	uint32_t s32;
-
+#define MAX_ACCEPTED_OPEN_FILE 99999
 uint8_t  picHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
 												uint32_t *flags)
             {
@@ -202,7 +202,7 @@ uint32_t			w=0,h=0;
 
        _nb_file=0;
 
-       for(uint32_t i=0;i<999;i++)
+       for(uint32_t i=0;i<MAX_ACCEPTED_OPEN_FILE;i++)
        	{
               sprintf(realname,realstring,name,i+_first);
               printf("\n %lu : %s",i,realname);
