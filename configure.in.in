@@ -551,12 +551,14 @@ AC_PATH_PROG(SDL_CONFIG, sdl-config, no)
       		have_sdl=no
 	else
 
- 		SDL_CFLAGS=$SDL_CONFIG  --cflags`
- 		SDL_LIBS=$SDL_CONFIG  --libs`    		
+ 		SDL_CFLAGS=`$SDL_CONFIG  --cflags`
+ 		SDL_LIBS=`$SDL_CONFIG  --libs`    		
     		CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
     		have_sdl=yes
  fi
-
+if test "x$have_sdl" = "xyes" ;  then
+	AC_DEFINE(USE_SDL,1,[Use SDL ])
+fi
 dnl __________________/SDL______________
 
 dnl ____________ free type 2________________
