@@ -409,8 +409,8 @@ TryAgain:
 				uint32_t 		len,flags,flag2;
 				uint8_t 		bframe=0, bconsistency=1;
 
-				buffer=new uint8_t [720*576*3];
-				bufferin=new uint8_t [720*576*3];
+				buffer=new uint8_t [info.width* info.height*2];
+				bufferin=new uint8_t [info.width* info.height*2];
 
 
 				// we decode 5 frames..should be enough to get an opinion
