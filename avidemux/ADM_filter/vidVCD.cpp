@@ -246,7 +246,7 @@ CONFcouple *couple;
 	newx,newy);
 
 
-	videofilters[nb_active_filter].tag = VF_RESIZE;
+	videofilters[nb_active_filter].tag = VF_MPLAYERRESIZE;
 	videofilters[nb_active_filter].filter->getCoupledConf(&couple);
 	videofilters[nb_active_filter].conf = couple;;
 	nb_active_filter++;

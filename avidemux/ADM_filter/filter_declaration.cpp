@@ -47,9 +47,8 @@ printf(  "*********************\n");
 	registerFilter("---- Image size/border alteration----",VF_INVALID,2,NULL);
 	REGISTER("Crop",VF_CROP,1,crop_create);
 	REGISTER("Resize",VF_RESIZE,1,res_create);
-#ifdef USE_MMX 
+
 	REGISTER("Mplayer Resize",VF_MPLAYERRESIZE,1,mpresize_create);
-#endif
 
     	REGISTER("Blacken Borders",VF_BLACKEN,1,bsmear_create);
   	REGISTER("Add black border",VF_ADDBORDER,1,addBorder_create);
