@@ -888,7 +888,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 
       if (rdr_decomp_buffer)
 	{
-	  free (rdr_decomp_buffer);
+	  delete  rdr_decomp_buffer;
 	  rdr_decomp_buffer = NULL;
 	}
 
