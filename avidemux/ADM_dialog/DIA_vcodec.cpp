@@ -32,7 +32,7 @@
  static void okCallback(GtkButton * button, gpointer user_data);
  static void callBackCalc( void );
 
- extern void DIA_Calculator(void);
+extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
  typedef struct myVideoCodec
  {
  		SelectCodecType codec;
@@ -83,7 +83,8 @@
 //___________________________________________________________
 void callBackCalc( void )
 {
-	DIA_Calculator();
+uint32_t sz,br;
+	DIA_Calculator(&sz,&br);
 }
 //___________________________________________________________
 uint8_t DIA_videoCodec( SelectCodecType *codec )

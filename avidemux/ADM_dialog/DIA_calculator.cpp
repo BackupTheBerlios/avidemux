@@ -45,7 +45,7 @@
 #include "ADM_audiofilter/audioeng_film2pal.h"
 
 
-void DIA_Calculator(void );
+void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
 static GtkWidget	*create_Calculator (void);  
 static GtkWidget *dialog;  
 static void prepare( void );
@@ -54,8 +54,10 @@ static void update( void );
 static uint32_t videoDuration;
 static uint32_t track1, track2;
 
+static uint32_t videoSize,videoBitrate;
+
 //************************************
-void DIA_Calculator(void )
+void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 {
 	if(!avifileinfo) return ;
 	
@@ -74,7 +76,9 @@ void DIA_Calculator(void )
 		}
 	}
 	gtk_widget_destroy(dialog);
-
+	*sizeInMeg=videoSize;
+	*avgBitrate=videoBitrate;
+	
 }
 //******************************************
 // Compute the value that will not change
@@ -199,13 +203,28 @@ char string[200];
 	else
 		{
 			videoSize=totalSize-audioSize;
+			// Compute average bps
+			float avg;
+			avg=videoSize;
+			avg*=1024.*1024.;
+			avg/=videoDuration;
+			// now we have byte /sec
+			// convert to kb per sec
+			avg=(avg*8)/1000;
+			videoBitrate=(uint32_t)avg;
+			sprintf(string,"%lu",(uint32_t)videoBitrate);
+			
+			gtk_label_set_text(GTK_LABEL(WID(labelBitrate)),string);
+			
+			//
 			sprintf(string,"%lu",videoSize);
+			
+			
 		}
 	gtk_label_set_text(GTK_LABEL(WID(labelVideo)),string);
 	
 	
 }
-//*************************************
 
 GtkWidget*
 create_Calculator (void)
@@ -249,6 +268,8 @@ create_Calculator (void)
   GtkWidget *labelAudio;
   GtkWidget *labelTotal;
   GtkWidget *labelVideo;
+  GtkWidget *label12;
+  GtkWidget *labelBitrate;
   GtkWidget *label8;
   GtkWidget *dialog_action_area1;
   GtkWidget *doit;
@@ -380,7 +401,7 @@ create_Calculator (void)
   gtk_widget_show (frame3);
   gtk_box_pack_start (GTK_BOX (vbox1), frame3, TRUE, TRUE, 0);
 
-  table1 = gtk_table_new (4, 2, FALSE);
+  table1 = gtk_table_new (5, 2, FALSE);
   gtk_widget_show (table1);
   gtk_container_add (GTK_CONTAINER (frame3), table1);
 
@@ -448,6 +469,22 @@ create_Calculator (void)
   gtk_label_set_justify (GTK_LABEL (labelVideo), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelVideo), 0, 0.5);
 
+  label12 = gtk_label_new (_("Average Bitrate (kbps)"));
+  gtk_widget_show (label12);
+  gtk_table_attach (GTK_TABLE (table1), label12, 0, 1, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label12), 0, 0.5);
+
+  labelBitrate = gtk_label_new (_("0"));
+  gtk_widget_show (labelBitrate);
+  gtk_table_attach (GTK_TABLE (table1), labelBitrate, 1, 2, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelBitrate), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelBitrate), 0, 0.5);
+
   label8 = gtk_label_new (_("<b>Result</b>"));
   gtk_widget_show (label8);
   gtk_frame_set_label_widget (GTK_FRAME (frame3), label8);
@@ -508,6 +545,8 @@ create_Calculator (void)
   GLADE_HOOKUP_OBJECT (Calculator, labelAudio, "labelAudio");
   GLADE_HOOKUP_OBJECT (Calculator, labelTotal, "labelTotal");
   GLADE_HOOKUP_OBJECT (Calculator, labelVideo, "labelVideo");
+  GLADE_HOOKUP_OBJECT (Calculator, label12, "label12");
+  GLADE_HOOKUP_OBJECT (Calculator, labelBitrate, "labelBitrate");
   GLADE_HOOKUP_OBJECT (Calculator, label8, "label8");
   GLADE_HOOKUP_OBJECT_NO_REF (Calculator, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (Calculator, doit, "doit");
