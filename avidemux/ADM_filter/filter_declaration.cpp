@@ -68,18 +68,19 @@ printf(  "*********************\n");
 //	REGISTERX("lavdeint","Lavcodec Deinterlacer",VF_LAVDEINT,1,lavdeint_create,lavdeint_script);
 //	REGISTERX("palfieldshift","Pal Field shift",VF_PALSHIFT,1,addPALShift_create,addPALShift_script);
 	
-//	REGISTERX("drop","Drop",VF_DROPOUT,1,dropout_create,dropout_script);
-//	REGISTERX("swapfields","SwapFields",VF_SWAPFIELDS,1,swapfield_create,swapfield_script);
-//	REGISTERX("smartswapfield","Smart SwapFields",VF_SMARTSWAPFIELDS,1,swapsmart_create,swapsmart_script);
+	REGISTERX("drop","Drop",VF_DROPOUT,1,dropout_create,dropout_script);
+	REGISTERX("swapfields","SwapFields",VF_SWAPFIELDS,1,swapfield_create,swapfield_script);
+	REGISTERX("smartswapfield","Smart SwapFields",VF_SMARTSWAPFIELDS,1,swapsmart_create,swapsmart_script);
 
-//	REGISTERX("keepevenfield","Keep even fields",VF_KEEPEVEN,1,keepeven_create,keepeven_script);
-//	REGISTERX("keepoddfield","Keep odd fields",VF_KEEPODD,1,keepodd_create,keepodd_script);
-//	REGISTERX("separatefields","Separate Fields",VF_SEPARATEFIELDS,1,
-//							separatefield_create,separatefield_script);
-//	REGISTERX("mergefield","Merge Fields",VF_MERGEFIELDS,1,mergefield_create,mergefield_script);
-//	REGISTERX("pulldown","PullDown",VF_PULLDOWN,1,pulldown_create,pulldown_script);
+	REGISTERX("keepevenfield","Keep even fields",VF_KEEPEVEN,1,keepeven_create,keepeven_script);
+	REGISTERX("keepoddfield","Keep odd fields",VF_KEEPODD,1,keepodd_create,keepodd_script);
+	REGISTERX("separatefields","Separate Fields",VF_SEPARATEFIELDS,1,
+							separatefield_create,separatefield_script);
+	REGISTERX("stackfield","Stack Fields",VF_STACKFIELD,1,stackfield_create,stackfield_script);
+	REGISTERX("mergefield","Merge Fields",VF_MERGEFIELDS,1,mergefield_create,mergefield_script);
+	REGISTERX("pulldown","PullDown",VF_PULLDOWN,1,pulldown_create,pulldown_script);
 	
-//	REGISTERX("kerneldeint","D. Graft Kernel deint",VF_KRNDEINT,1,kerneldeint_create,kerneldeint_script);
+	REGISTERX("kerneldeint","D. Graft Kernel deint",VF_KRNDEINT,1,kerneldeint_create,kerneldeint_script);
 	
 
 //	REGISTER("","Partial",VF_PARTIAL,0,partial_create);
@@ -117,7 +118,7 @@ printf(  "*********************\n");
 //BUG 	REGISTERX("mphqdenoise3d","Mplayer HQDenoise3D",VF_MPLHQD3D,1,MPD3D_create,MPD3D_script);
 	REGISTERX("msmooth","Msmooth by Donald Graft",VF_MSMOOTH,1,create_msmooth,msmooth_script);
 //	REGISTERX("forcedpp","Forced PostProcessing",VF_FORCEDPP,1,forcedpp_create,forcedpp_script);
-//	REGISTERX("soften","Soften",VF_SOFTEN,1,soften_create,soften_script);
+	REGISTERX("soften","Soften",VF_SOFTEN,1,soften_create,soften_script);
 #ifdef USE_FREETYPE   
 	registerFilter("----------------- Misc --------------",VF_INVALID,2,NULL,NULL);
 	REGISTERX("subtitle","Subtitler",VF_SUBTILE,1,subtitle_create,subtitle_script);

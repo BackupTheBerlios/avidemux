@@ -66,10 +66,14 @@ typedef struct DEINT_PARAM
  public:
 
 
-								ADMVideoFields(  AVDMGenericVideoStream *in,CONFcouple *setup);
-  					virtual 		~ADMVideoFields();
-		     			virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          										uint8_t *data,uint32_t *flags) { UNUSED_ARG(frame); UNUSED_ARG(len); UNUSED_ARG(data); UNUSED_ARG(flags); assert(0);return 0;}
+							ADMVideoFields(  AVDMGenericVideoStream *in,CONFcouple *setup);
+  				virtual 		~ADMVideoFields();
+		     		virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+          									uint8_t *data,uint32_t *flags) 
+								{
+								 UNUSED_ARG(frame); UNUSED_ARG(len); UNUSED_ARG(data);
+								 UNUSED_ARG(flags); assert(0);return 0;
+								 }
 					virtual uint8_t configure( AVDMGenericVideoStream *instream) ;
 
 					virtual uint8_t 	getCoupledConf( CONFcouple **couples);

@@ -141,8 +141,8 @@ ADMVideoKernelDeint::~ADMVideoKernelDeint()
 	    
 	   _uncompressed=NULL;
 
-  	    memcpy(&_info,_in->getInfo(),sizeof(_info));
-		vidCache=new VideoCache(4,_in);
+  	memcpy(&_info,_in->getInfo(),sizeof(_info));
+	vidCache=new VideoCache(4,_in);
 
 
 }
@@ -151,7 +151,7 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 							ADMImage *data,
 							uint32_t *flags)
 {
-		uint8_t *src,*prv,*dst;
+		
 		uint32_t frame_prev;
 		uint32_t page=_info.width*_info.height;
 		ADMImage *mysrc=NULL, *myprev=NULL;
@@ -163,7 +163,7 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 		frame_prev=frame;
 		if(frame_prev) frame_prev--;
 		
-		dst=data->data;
+		
 		
 			mysrc=vidCache->getImage(frame);
 			myprev=vidCache->getImage(frame_prev);
@@ -171,7 +171,7 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 			ADM_assert(myprev);
 		// Now go to kernel deint code
 			
-    const uint8_t *srcp, *prvp, *prvpp, *prvpn, *prvppp, *prvpnn, *prvp4p, *prvp4n;
+    const uint8_t *srcp, *prvp,*prvp_saved, *prvpp, *prvpn, *prvppp, *prvpnn, *prvp4p, *prvp4n;
 	const uint8_t *srcp_saved;
 	const uint8_t *srcpp, *srcppp, *srcpn, *srcpnn, *srcp3p, *srcp3n, *srcp4p, *srcp4n;
     uint8_t *dstp;
@@ -204,24 +204,30 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 	
 	for (z = 0; z < 3; z++)
 	{
-		src=mysrc->data;
-		prv=myprev->data;
 		
 		pitch=_info.width;
 		switch(z)
 		{
-			case 0:offset=0;
-			
+			case 0:		offset=0;
+					srcp=srcp_saved= YPLANE(mysrc);
+					dstp = dstp_saved=YPLANE(data);
+					prvp_saved=prvp=YPLANE(myprev);
 					break;
 			case 1:		offset=page;
 					pitch>>=1;
+					srcp=srcp_saved=UPLANE(mysrc);
+					dstp = dstp_saved=UPLANE(data);
+					prvp_saved=prvp=UPLANE(myprev);
 					break;
 			case 2:		offset=((page*5)>>2);
 					pitch>>=1;
+					srcp=srcp_saved=VPLANE(mysrc);
+					dstp = dstp_saved=VPLANE(data);
+					prvp_saved=prvp=VPLANE(myprev);
 					break;
 		
 		}
-		srcp = srcp_saved = src+offset;
+		
 		if (z==0 && (GetHintingData((uint8_t *) srcp, &hint) == false) && (hint & PROGRESSIVE))
 		{
 			if (debug ==true)
@@ -229,7 +235,9 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 				printf( "KernelDeint: frame %d: progressive\n", frame); 
 				
 			}
-			memcpy(dst,src,(page*3)>>1);
+			memcpy(YPLANE(data),YPLANE(mysrc),page);
+			memcpy(UPLANE(data),UPLANE(mysrc),page>>2);
+			memcpy(VPLANE(data),VPLANE(mysrc),page>>2);
 			vidCache->unlockAll();
 			return 1;
 		}
@@ -240,10 +248,8 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 				printf( "KernelDeint: frame %d: interkaced\n", frame); 
 			}
 		}
-		src_pitch = pitch;
 		
-		//dstp = dstp_saved = dst->GetWritePtr(plane); 
-		dstp = dstp_saved = dst+offset;
+		src_pitch = pitch;	
 		dst_pitch = pitch;
 		
 		w = pitch; //dst->GetRowSize(plane);
@@ -267,7 +273,7 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 		/* For the other field choose adaptively between using the previous field
 		   or the interpolant from the current field. */
 		//prvp = prv->GetReadPtr(plane) + 5*src_pitch - (1-order)*src_pitch;
-		prvp = prv+offset + 5*src_pitch - (1-order)*src_pitch;
+		prvp = prvp_saved + 5*src_pitch - (1-order)*src_pitch;
 		
 		
 		prvpp = prvp - src_pitch;

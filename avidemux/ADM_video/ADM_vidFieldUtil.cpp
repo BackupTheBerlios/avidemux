@@ -79,6 +79,53 @@ void vidFieldKeepEven(uint32_t w,uint32_t h,uint8_t *src,uint8_t *target)
 		target+=page>>2;
 		vidFieldDecimate(src,target,h,w>>1);
 }
+//
+//
+//
+static void stack(uint32_t w,uint32_t h,uint8_t *src,uint8_t *target)
+{
+uint8_t *dst1,*dst2;
+	dst1=target;
+	dst2=target+((w*h)>>1);	
+	
+	for(uint32_t y=h>>1;y>0;y--)
+	{
+		memcpy(dst1,src,w);
+		memcpy(dst2,src+w,w);
+		src+=2*w;
+		dst1+=w;
+		dst2+=w;
+	}
+	
+}
+
+//
+//	Put field 1 on top of field2
+//
+uint8_t vidFielStack(uint32_t w,uint32_t h,uint8_t *src,uint8_t *target)
+{
+uint8_t *d,*s;
+//uint32_t y;
+
+// interleave Y
+uint32_t page=w*h;
+	d=target;
+	s=src;
+	
+	stack(w,h,s,d);
+	
+	d=target+page;
+	s=src+page;
+	stack(w>>1,h>>1,s,d);
+	
+	d=target+((page*5)>>2);
+	s=src+((page*5)>>2);
+	stack(w>>1,h>>1,s,d);
+	
+	return 1;
+}
+	
+
 void vidFieldMerge(uint32_t w,uint32_t h,uint8_t *src,uint8_t *src2,uint8_t *target)
 {
 uint8_t *d,*s,*s2;

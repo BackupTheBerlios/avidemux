@@ -5,7 +5,7 @@
     copyright            : (C) 2002 by Ron Reithoffer 
     email                : <ron.reithoffer@chello.at>
  ***************************************************************************/
-#if 0
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -48,48 +48,54 @@ BUILD_CREATE(dropout_create,ADMVideoDropOut);
 //_______________________________________________________________
  
 
- char 								*ADMVideoDropOut::printConf(void)
- {
-	  	static char buf[50];
+char  *ADMVideoDropOut::printConf(void)
+{
+	static char buf[50];
 
- 				sprintf((char *)buf," DropOut :%ld",*_param);
+ 	sprintf((char *)buf," DropOut :%ld",*_param);
         return buf;
-	}
+}
 uint8_t  GUI_getIntegerValue(int *valye, int min, int max, char *title);	
 uint8_t ADMVideoDropOut::configure(AVDMGenericVideoStream *instream)
 {
 int i;
 
-			_in=instream;
-			i=(int)*_param;
-			if(GUI_getIntegerValue(&i,1,255,"DropOut Threshold"))
-			{
-					*_param=(uint32_t)i;
-					return 1;
-			}
-			return 0;
-		    
-	
+	_in=instream;
+	i=(int)*_param;
+	if(GUI_getIntegerValue(&i,1,255,"DropOut Threshold"))
+	{
+		*_param=(uint32_t)i;
+		return 1;
+	}
+	return 0;
 }
-//--------------------------------------------------------	
-ADMVideoDropOut::ADMVideoDropOut(
-									AVDMGenericVideoStream *in,CONFcouple *couples)
-                  :ADMVideoCached(in,couples)
+ADMVideoDropOut::~ADMVideoDropOut()
 {
-  //uint32_t frame;
-  _uncompressed=NULL;
+	DELETE(_param);
+	delete vidCache;
+	vidCache=NULL;
+}
 
-  _info.encoding=1;
-  if(couples)
-  {
-  			_param=NEW( uint32_t);
-			couples->getCouple((char *)"threshold",(uint32_t *)_param);
+//--------------------------------------------------------	
+ADMVideoDropOut::ADMVideoDropOut(AVDMGenericVideoStream *in,CONFcouple *couples)
+{
+
+  
+	_in=in;
+  	_info.encoding=1;
+	if(couples)
+	{
+  		_param=NEW( uint32_t);
+		couples->getCouple((char *)"threshold",(uint32_t *)_param);
 	}
 	else
 	{
-			_param=NEW( uint32_t);
-			*_param=30;
+		_param=NEW( uint32_t);
+		*_param=30;
 	}
+	vidCache=new VideoCache(4,_in);
+	memcpy(&_info,_in->getInfo(),sizeof(_info));
+	
  
 }
 
@@ -120,9 +126,10 @@ UNUSED_ARG(flags);
 uint32_t uvlen;
 uint32_t dlen,dflags;
 
-uint8_t										*_next;
-uint8_t										*_previous;
-uint8_t										*_current;
+ADMImage	*_next;
+ADMImage	*_previous;
+ADMImage	*_current;
+
 	//		printf("\n DropOut : %lu\n",frame);
 
 
@@ -133,36 +140,34 @@ uint8_t										*_current;
 			  if(frame> _info.nb_frames-1) return 0;
 			if(!frame || (frame==_info.nb_frames-1))
 			{
-				 if(!_in->getFrameNumberNoAlloc(frame, &dlen,_buffer[0],&dflags))
-				 {
-					 	return 0;
-					}
-				 _bufnum[0]=frame;
-					memcpy(data,_buffer[0],*len);
-					return 1;
+				_current=vidCache->getImage(frame);
+				if(!_current) return 0;
+				memcpy(YPLANE(data),YPLANE(_current),uvlen);
+				memcpy(UPLANE(data),UPLANE(_current),uvlen>>2);
+				memcpy(VPLANE(data),VPLANE(_current),uvlen>>2);
+				vidCache->unlockAll();
+				return 1;
 			}
-				ADM_assert(frame<_info.nb_frames);
-			// read uncompressed frame
-			switch(fillCache(frame))
-			{
-				  case 0: return 0;
-				  case 1: memcpy(data,_buffer[index_c],*len);return 1;break;
-				  case 2: break;
-				  default: ADM_assert(0); break;
-			}
-   		_previous=_buffer[index_p];
-   		_current=_buffer[index_c];
-   		_next=_buffer[index_n];
-           // for u & v , no action -> copy it as is
-           memcpy(data+uvlen,_current+uvlen,uvlen>>1);
+			
+		_current=vidCache->getImage(frame);
+		_previous=vidCache->getImage(frame-1);
+		_next=vidCache->getImage(frame+1);
+		if(!_current || !_previous || !_next)
+		{
+			vidCache->unlockAll();
+			 return 0;	
+		}
+           	// for u & v , no action -> copy it as is
+           	memcpy(UPLANE(data),UPLANE(_current),uvlen>>2);
+		memcpy(VPLANE(data),VPLANE(_current),uvlen>>2);
 
              uint8_t *inprev,*innext,*incur,*zout;
 
-              inprev=_previous+1+_info.width;
-              innext=_next+1+_info.width;
-              incur =_current+1+_info.width;
+              inprev=YPLANE(_previous)+1+_info.width;
+              innext=YPLANE(_next)+1+_info.width;
+              incur =YPLANE(_current)+1+_info.width;
 
-              zout=data+_info.width+1;
+              zout=YPLANE(data)+_info.width+1;
 
               int32_t c0,c1,c2,c3; //,_nextPix,_currPix,_prevPix,cc;
 
@@ -173,9 +178,9 @@ uint8_t										*_current;
 		  c2=0;
 		  c3=0;
 
-	  	inprev=_previous	+1+y*_info.width;
-              	innext=_next		+1+y*_info.width;;
-              	incur =_current	+1+y*_info.width;;
+	  	inprev=YPLANE(_previous)	+1+y*_info.width;
+              	innext=YPLANE(_next)		+1+y*_info.width;;
+              	incur =YPLANE(_current)	+1+y*_info.width;;
 
 			// look if the field is more different temporarily than spacially
 
@@ -198,10 +203,10 @@ uint8_t										*_current;
 				}
 
 		// If yes, replace the line by an average of next/previous image
-		inprev=_previous	+y*_info.width;
-              	innext=_next		+y*_info.width;;
-              	incur =_current	+y*_info.width;;
-		zout=data		+y*_info.width;
+		inprev=YPLANE(_previous)	+y*_info.width;
+              	innext=YPLANE(_next)		+y*_info.width;;
+              	incur =YPLANE(_current)		+y*_info.width;;
+		zout=YPLANE(data)		+y*_info.width;
 
 		if (c1<c0 &&c3<c2)
 		{
@@ -216,13 +221,9 @@ uint8_t										*_current;
 		else
 			memcpy(zout,incur,_info.width);
 	}
+	vidCache->unlockAll();
 return 1;
 }
-ADMVideoDropOut::~ADMVideoDropOut()
-{
-	DELETE(_param);
-}
 
 
-#endif
 #endif

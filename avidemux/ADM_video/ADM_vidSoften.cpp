@@ -158,28 +158,29 @@ uint8_t ADMVideoMaskedSoften::getFrameNumberNoAlloc(uint32_t frame,
 
 		// do luma only ATM
 		// copy chroma
-		memcpy(data->data+page,_uncompressed->data+page,page>>1);
+		memcpy(UPLANE(data),UPLANE(_uncompressed),page>>2);
+		memcpy(VPLANE(data),VPLANE(_uncompressed),page>>2);
 		
 		// for luma, the radius first lines /last lines are unchanged
-		memcpy(data->data,_uncompressed->data,radius*_info.width);
+		memcpy(YPLANE(data),YPLANE(_uncompressed),radius*_info.width);
 		
 		offset=page-_info.width*radius-1;
 		
-		memcpy(data->data+offset,
-			_uncompressed->data+offset,
+		memcpy(YPLANE(data)+offset,
+			YPLANE(_uncompressed)+offset,
 			radius*_info.width);
 
 		uint8_t *src,*dst;
 		uint32_t val,cur,coef;
 		
 		// optimized one
-		if(radius==2) return radius5(_uncompressed->data,data->data);
-		if(radius==1) return radius3(_uncompressed->data,data->data);
+		if(radius==2) return radius5(YPLANE(_uncompressed),YPLANE(data));
+		if(radius==1) return radius3(YPLANE(_uncompressed),YPLANE(data));
 		
 		for(uint32_t y=radius;y<_info.height-radius;y++)
 		{
-			src=_uncompressed->data+y*_info.width;
-			dst=data->data+y*_info.width;
+			src=YPLANE(_uncompressed)+y*_info.width;
+			dst=YPLANE(data)+y*_info.width;
 			
 			memcpy(dst,src,radius);
 			src+=radius;

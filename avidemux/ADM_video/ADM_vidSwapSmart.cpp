@@ -64,8 +64,7 @@ AVDMVideoSwapSmart::AVDMVideoSwapSmart(
 {
 UNUSED_ARG(setup);
   	_in=in;
-   	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	//_uncompressed=new uint8_t[3*_info.width*_info.height];
+   	memcpy(&_info,_in->getInfo(),sizeof(_info));	
 	_uncompressed=new ADMImage(_info.width,_info.height);
 
 
@@ -105,9 +104,9 @@ uint8_t AVDMVideoSwapSmart::getFrameNumberNoAlloc(uint32_t frame,
 
 		uint8_t *odd,*even,*target,*target2;
 
-		even=data->data;
+		even=YPLANE(data);
 		odd=even+w;
-		target=_uncompressed->data;
+		target=YPLANE(_uncompressed);
 		target2=_uncompressed->data+w;
 		stride=2*w;
 
@@ -124,8 +123,8 @@ uint8_t AVDMVideoSwapSmart::getFrameNumberNoAlloc(uint32_t frame,
 		// now we have straight and swapped
 		// which one is better ?
 		uint32_t s,m;
-		s=      ADMVideo_interlaceCount( data->data,_info.width, _info.height);
-		m=      ADMVideo_interlaceCount( _uncompressed->data,_info.width, _info.height);
+		s=      ADMVideo_interlaceCount( YPLANE(data),_info.width, _info.height);
+		m=      ADMVideo_interlaceCount( YPLANE(_uncompressed),_info.width, _info.height);
 
 		aprintf(" %lu straight vs %lu swapped => %s\n",s,m,(s*2>m*3?"swapped":"straight"));
 
@@ -133,7 +132,7 @@ uint8_t AVDMVideoSwapSmart::getFrameNumberNoAlloc(uint32_t frame,
 
 		if(s*2>m*3)  // swapped is better
 		{
-			memcpy(data->data,_uncompressed->data,page);
+			memcpy(YPLANE(data),YPLANE(_uncompressed),page);
 
 		}
 

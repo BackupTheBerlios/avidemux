@@ -79,7 +79,6 @@ AVDMVideoSwapField::AVDMVideoSwapField(
 UNUSED_ARG(setup);
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-//	_uncompressed=new uint8_t[3*_info.width*_info.height];
 	_uncompressed=new ADMImage(_info.width,_info.height);
 
 
@@ -90,8 +89,7 @@ AVDMVideoKeepOdd::AVDMVideoKeepOdd(
 {
 UNUSED_ARG(setup);
   	_in=in;
-   	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	//_uncompressed=new uint8_t[3*_info.width*_info.height];
+	memcpy(&_info,_in->getInfo(),sizeof(_info));
 	_uncompressed=new ADMImage(_info.width,_info.height);
 	_info.height>>=1;
 
@@ -99,13 +97,15 @@ UNUSED_ARG(setup);
 // ___ destructor_____________
 AVDMVideoSwapField::~AVDMVideoSwapField()
 {
- 	delete [] _uncompressed;
+ 	delete  _uncompressed;
+	_uncompressed=NULL;
 
 }
 // ___ destructor_____________
 AVDMVideoKeepOdd::~AVDMVideoKeepOdd()
 {
- 	delete [] _uncompressed;
+ 	delete _uncompressed;
+	_uncompressed=NULL;
 
 }
 
@@ -131,14 +131,16 @@ uint8_t AVDMVideoSwapField::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t page=w*h;
 		uint32_t stride;
 
-		memcpy(data->data+page,_uncompressed->data+page,page>>1); // copy u & v
-
+		// copy u & v
+		memcpy(UPLANE(data),UPLANE(_uncompressed),page>>2);
+		memcpy(VPLANE(data),VPLANE(_uncompressed),page>>2);
+		
 		uint8_t *odd,*even,*target,*target2;
 
-		even=_uncompressed->data;
+		even=YPLANE(_uncompressed);
 		odd=even+w;
-		target=data->data;
-		target2=data->data+w;
+		target=YPLANE(data);
+		target2=YPLANE(data)+w;
 		stride=2*w;
 
 		h>>=1;
@@ -167,7 +169,7 @@ uint8_t AVDMVideoKeepOdd::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t w=_info.width;
 		uint32_t h=_info.height;
 
-		vidFieldKeepOdd(  w,  h, _uncompressed->data,data->data);
+		vidFieldKeepOdd(  w,  h, YPLANE(_uncompressed),YPLANE(data));
 
 
       return 1;
@@ -190,7 +192,7 @@ uint8_t AVDMVideoKeepEven::getFrameNumberNoAlloc(uint32_t frame,
 
 
 
-		vidFieldKeepEven(  w,  h, _uncompressed->data,data->data);
+		vidFieldKeepEven(  w,  h, YPLANE(_uncompressed),YPLANE(data));
       return 1;
 }
 

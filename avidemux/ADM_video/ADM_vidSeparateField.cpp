@@ -44,9 +44,11 @@ static FILTER_PARAM swapParam={0,{""}};
 
 SCRIPT_CREATE(separatefield_script,AVDMVideoSeparateField,swapParam);
 SCRIPT_CREATE(mergefield_script,AVDMVideoMergeField,swapParam);
+SCRIPT_CREATE(stackfield_script,AVDMVideoStackField,swapParam);
 
 BUILD_CREATE(separatefield_create,AVDMVideoSeparateField);
 BUILD_CREATE(mergefield_create,AVDMVideoMergeField);
+BUILD_CREATE(stackfield_create,AVDMVideoStackField);
 
 char *AVDMVideoSeparateField::printConf( void )
 {
@@ -63,12 +65,12 @@ AVDMVideoSeparateField::AVDMVideoSeparateField(
 UNUSED_ARG(setup);
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-//	_uncompressed=new uint8_t[3*_info.width*_info.height];
-	_uncompressed=new ADMImage(_info.width,_info.height);
+	
 
 	_info.height>>=1;
 	_info.fps1000*=2;
 	_info.nb_frames*=2;
+	vidCache=new VideoCache(2,_in);
 
 }
 
@@ -76,7 +78,8 @@ UNUSED_ARG(setup);
 AVDMVideoSeparateField::~AVDMVideoSeparateField()
 {
  	
-
+	delete vidCache;
+	vidCache=NULL;
 }
 
 //
@@ -90,17 +93,20 @@ uint8_t AVDMVideoSeparateField::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 uint32_t ref;
-			if(frame>=_info.nb_frames) return 0;
-
+ADMImage *ptr;
+		if(frame>=_info.nb_frames) return 0;
 		ref=frame>>1;
+		
+		ptr=vidCache->getImage(ref);
+		if(!ptr) return 0;
 
-		  if(!_in->getFrameNumberNoAlloc(ref, len, _uncompressed, flags)) return 0;
-
+		ADM_assert(ptr->data);
+		ADM_assert(data->data);
 		if(frame&1) // odd image
-			 vidFieldKeepOdd(_info.width,_info.height*2,_uncompressed->data,data->data);
+			 vidFieldKeepOdd(_info.width,_info.height,ptr->data,data->data);
 		else
-			 vidFieldKeepEven(_info.width,_info.height*2,_uncompressed->data,data->data);
-
+			 vidFieldKeepEven(_info.width,_info.height,ptr->data,data->data);
+		vidCache->unlockAll();
       return 1;
 }
 //------------------ and merge them ------------------
@@ -120,27 +126,22 @@ AVDMVideoMergeField::AVDMVideoMergeField(
 {
 UNUSED_ARG(setup);
   	_in=in;
-   	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	//_uncompressed=new uint8_t[3*_info.width*_info.height];
-	_uncompressed=new ADMImage(_info.width,_info.height);
-	_uncompressed2=new ADMImage(_info.width,_info.height);
-	_cache=new ADMImage(_info.width,_info.height);
+   	memcpy(&_info,_in->getInfo(),sizeof(_info));	
+	vidCache=new VideoCache(4,_in);
 	
 
 	_info.height<<=1;
 	_info.fps1000>>=1;
 	_info.nb_frames>>=1;
-	_lastAsked=0xffffffff;
+
 
 }
 
 // ___ destructor_____________
 AVDMVideoMergeField::~AVDMVideoMergeField()
 {
- 		delete _uncompressed;
-		delete _uncompressed2;
-		delete _cache;
-		_cache=_uncompressed=_uncompressed2=NULL;
+ 		delete vidCache;
+		vidCache=NULL;
 }
 
 /**
@@ -152,24 +153,68 @@ uint8_t AVDMVideoMergeField::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 uint32_t ref,ref2;
+ADMImage *ptr1,*ptr2;
 		if(frame>=_info.nb_frames) return 0;
 
 		ref=frame<<1;
 		ref2=ref+1;
-
-		if(_lastAsked==ref)
+		ptr1=vidCache->getImage(ref);
+		ptr2=vidCache->getImage(ref+1);
+		
+		if(!ptr1 || !ptr2)
 		{
-				memcpy(_uncompressed->data,_cache->data, (_info.width*_info.height*3)>>2);
+			printf("Merge field : cannot read\n");
+			vidCache->unlockAll();
+		 	return 0;
 		}
-		else
-		{
-			if(!_in->getFrameNumberNoAlloc(ref, len, _uncompressed, flags)) return 0;
-		}
-		if(!_in->getFrameNumberNoAlloc(ref2, len, _uncompressed2, flags)) return 0;
-
-		 vidFieldMerge(_info.width,_info.height,_uncompressed->data,_uncompressed2->data,data->data);
-		 _lastAsked=ref2;
-		 memcpy(_cache->data,_uncompressed2->data, (_info.width*_info.height*3)>>2);
-
+		 vidFieldMerge(_info.width,_info.height,ptr1->data,ptr2->data,data->data);
+		 vidCache->unlockAll();
+		
       return 1;
 }
+//_______________________Stack Fields_______________________
+
+char *AVDMVideoStackField::printConf( void )
+{
+ 	static char buf[50];
+
+ 	sprintf((char *)buf," Stack fields");
+        return buf;
+}
+
+//_______________________________________________________________
+AVDMVideoStackField::AVDMVideoStackField(	AVDMGenericVideoStream *in,CONFcouple *setup)
+{
+UNUSED_ARG(setup);
+  	_in=in;
+   	memcpy(&_info,_in->getInfo(),sizeof(_info));	
+	_uncompressed=new ADMImage(_info.width,_info.height);	
+
+}
+
+// ___ destructor_____________
+AVDMVideoStackField::AVDMVideoStackField()
+{
+ 		delete _uncompressed;
+		_uncompressed=NULL;
+}
+
+/**
+	Interleave frame*2 and frame*2+1
+*/
+uint8_t AVDMVideoStackField::getFrameNumberNoAlloc(uint32_t frame,
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
+{
+uint32_t ref,ref2;
+ADMImage *ptr1,*ptr2;
+		if(frame>=_info.nb_frames) return 0;
+
+		 if(!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags)) return 0;
+		 
+		  vidFielStack(_info.width ,_info.height,YPLANE(_uncompressed),YPLANE(data));
+		
+      return 1;
+}
+

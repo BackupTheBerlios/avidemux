@@ -59,10 +59,11 @@ Swap each line  (shift up for odd, down for even)
        			 virtual char 					*printConf(void) ;
 
  public:
- 				AVDMVideoKeepEven(  AVDMGenericVideoStream *in,CONFcouple *setup) : AVDMVideoKeepOdd(  in,setup) {}
+ 			AVDMVideoKeepEven(  AVDMGenericVideoStream *in,CONFcouple *setup) : AVDMVideoKeepOdd(  in,setup) 
+			{}
 
 		      virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          									ADMImage *data,uint32_t *flags);
+          							ADMImage *data,uint32_t *flags);
 
 
  }     ;

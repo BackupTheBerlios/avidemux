@@ -45,17 +45,16 @@ ADMVideoFields::ADMVideoFields(
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
 	
 					
- 	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-	//uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  ADM_assert(_uncompressed);
-  _motionmask=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
-  ADM_assert(_motionmask);
-   _motionmask2=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
-  ADM_assert(_motionmask2);
+	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);	
+	ADM_assert(_uncompressed);
+	_motionmask=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
+	ADM_assert(_motionmask);
+	_motionmask2=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
+	ADM_assert(_motionmask2);
 
-  _info.encoding=1;
-  if(couples)
-  {
+	_info.encoding=1;
+	if(couples)
+	{
 			_param=NEW(DEINT_PARAM);
 			GET(motion_trigger);
 			GET(blend_trigger);
@@ -66,8 +65,6 @@ ADMVideoFields::ADMVideoFields(
 			_param->blend_trigger=9;
 			_param->motion_trigger=15;
 	}
-
-  	  	
 }
 
 uint8_t	ADMVideoFields::getCoupledConf( CONFcouple **couples)
@@ -85,10 +82,11 @@ uint8_t	ADMVideoFields::getCoupledConf( CONFcouple **couples)
 
 ADMVideoFields::~ADMVideoFields()
 {
- 	delete []_uncompressed;
+ 	delete _uncompressed;
 	delete []_motionmask ;
 	delete []_motionmask2;
  	DELETE(_param);
+	_uncompressed=NULL;
 }
 //
 //	Return 1 if seen as interleaved

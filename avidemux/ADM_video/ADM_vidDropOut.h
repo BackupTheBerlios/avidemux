@@ -16,25 +16,26 @@
  ***************************************************************************/
 #ifndef __DROPOUT__
 #define __DROPOUT__   
-#include "ADM_video/ADM_vidCached.h" 
- class  ADMVideoDropOut:public ADMVideoCached
+#include "ADM_video/ADM_cache.h"
+ 
+class  ADMVideoDropOut:public AVDMGenericVideoStream
  {
 
  protected:
-    		
-        uint32_t						*_param;
-        virtual char 					*printConf(void);
-	       
 
+        virtual char 				*printConf(void) ;
+						VideoCache	*vidCache;
+	 uint32_t				*_param;
  public:
- 		
-  					
-					ADMVideoDropOut(  AVDMGenericVideoStream *in,CONFcouple *setup);
+ 					
+  						ADMVideoDropOut(  AVDMGenericVideoStream *in,CONFcouple *setup);
+  						~ADMVideoDropOut();
+		      virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+          									ADMImage *data,uint32_t *flags);
 
-  					 ~ADMVideoDropOut();
-		          		virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,						ADMImage *data,uint32_t *flags);
+			virtual uint8_t configure( AVDMGenericVideoStream *instream) ;
+			virtual uint8_t getCoupledConf( CONFcouple **couples);
 
-					virtual uint8_t configure( AVDMGenericVideoStream *instream);
-					virtual uint8_t getCoupledConf( CONFcouple **couples);
  }     ;
+ 
 #endif
