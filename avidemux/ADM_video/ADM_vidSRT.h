@@ -24,11 +24,9 @@
 
 #define ADM_GLYPH_T uint16_t 
 // UTF16 -> Ascii
-#ifdef ADM_BIG_ENDIAN
-#define ADM_ASC(x) (x>>8)
-#else
+
 #define ADM_ASC(x) x
-#endif
+
 typedef struct subLine
 {
   

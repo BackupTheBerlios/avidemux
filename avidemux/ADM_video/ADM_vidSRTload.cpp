@@ -400,7 +400,7 @@ int ADM_SubAtoi(uint16_t *in)
 //
 uint8_t	ADM_utfInit( char *charset )
 {
-	myConv=iconv_open("UNICODE",charset); //"WINDOWS-1251");
+	myConv=iconv_open("UTF-16",charset); //"WINDOWS-1251");
 	if((int)myConv==-1)
 	{
 		printf("\n Error initializing iconv...\n");
@@ -435,8 +435,11 @@ uint32_t done=0;
 		*nbOut=0;
 		return 1;
 	}
-  
-  	sz=iconv(myConv,&cin,&sin,&cout,&sout);
+#ifdef  ICONV_NEED_CONST 
+  	sz=iconv(myConv,(const char **)&cin,&sin,&cout,&sout);
+#else
+	sz=iconv(myConv,&cin,&sin,&cout,&sout);
+#endif	
 	if(sz==-1)
 	{
   		printf("Iconv error:%s\n:%s:\n",strerror(errno),in);
@@ -454,6 +457,16 @@ uint32_t done=0;
 			
 		}
 	}
+// For win32 we swap le and be
+#ifdef CYG_MANGLING
+       ADM_GLYPH_T glyph;
+       for(uint32_t w=0;w<done;w++)
+       {
+               glyph=out[w];
+               out[w]=((glyph&0xff)<<8)+(glyph>>8);
+       }
+#endif
+
 	while(done &&( ADM_ASC(out[done-1])==0x0a || ADM_ASC(out[done-1]==0x0d))) done--;
 	*nbOut=done;
 	return 1;
