@@ -98,6 +98,7 @@ uint32_t AVDMAviAudioStream::read(uint32_t len, uint8_t * buffer)
     uint32_t avail, rd;
 //    uint32_t askedlen=len;
 
+	if (_current_index>=_nb_chunks) return 0;
     // just to be sure....  
     fseeko(_fd,_abs_position+_rel_position,SEEK_SET);
     togo = len;
@@ -109,7 +110,14 @@ uint32_t AVDMAviAudioStream::read(uint32_t len, uint8_t * buffer)
 
      do
      {
-	  avail = _index[_current_index].size - _rel_position;	// how much available ?
+     	  if(_rel_position>_index[_current_index].size )
+	  {
+	  	avail=0;
+	  }
+	  else
+	  {
+	  	avail = _index[_current_index].size - _rel_position;	// how much available ?
+	   }
 
 	  if (avail > togo)	// we can grab all in one move
 	    {
@@ -117,7 +125,7 @@ uint32_t AVDMAviAudioStream::read(uint32_t len, uint8_t * buffer)
 		if(!(togo == fread( buffer,1,togo,_fd)))
 		{
 			printf("\n Badly indexed file, trying to continue anyway...\n");
-			 return 1;
+			 return 0;
 		}
 #ifdef VERBOSE_L3
 
@@ -160,6 +168,7 @@ uint32_t AVDMAviAudioStream::read(uint32_t len, uint8_t * buffer)
 		printf("\n OVR: %lu rel:%lu len:%lu", _abs_position,
 		       _rel_position, togo);
 #endif
+#if 0
 		    _abs_position =_index[0].offset ;
             	     _rel_position = 0;
 		     _current_index=0;
@@ -167,6 +176,8 @@ uint32_t AVDMAviAudioStream::read(uint32_t len, uint8_t * buffer)
         	      _pos+=len;
                       _pos-=togo;
 		      return (len - togo);
+#endif
+			return 0;	      
 
 		  }
     	else

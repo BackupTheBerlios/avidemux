@@ -97,6 +97,7 @@ class AVDMGenericAudioStream
             				uint32_t	_nbMap;
                         		uint32_t	_current;
 					uint8_t		_mpegSync[3];
+					uint8_t 	shrink( void );
 					uint8_t		getPacketMP3(uint8_t *dest, uint32_t *len, 
 										uint32_t *samples);
 					uint8_t		getPacketAC3(uint8_t *dest, uint32_t *len, 

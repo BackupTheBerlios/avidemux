@@ -66,10 +66,10 @@ _VIDEOS *currentVideo;
 			return r;		
 		}
 		// could not get the cound, rewind and retry
-		printf("Editor:Read failed; retrying\n");
+		printf("EditorPacket:Read failed; retrying\n");
 		if(_audioseg == (_nb_segment - 1))
 		{		
-			printf("Editor : End of *last* stream\n");
+			printf("EditorPacket : End of *last* stream\n");
 			return 0;
 		}
 		currentVideo->_audiostream->goToTime(0);
@@ -88,7 +88,7 @@ _VIDEOS *currentVideo;
 	if(_audioseg == (_nb_segment - 1))
 	{
 		
-		printf("Editor : End of stream\n");
+		printf("EditorPacket : End of stream\n");
 		return 0;
 	}
 	// switch segment
@@ -106,7 +106,7 @@ _VIDEOS *currentVideo;
 	starttime= _videos[AUDIOSEG]._aviheader->getTime (_segments[_audioseg]._start_frame);
 	_videos[AUDIOSEG]._audiostream->goToTime(starttime);	
 	; // Fresh start samuel
-	aprintf("AudioEditor : switching to segment %lu\n",_audioseg);
+	printf("EditorPacket : switching to segment %lu\n",_audioseg);
 	return getAudioPacket(dest, len, samples);
 }
 //__________________________________________________
@@ -166,89 +166,12 @@ uint8_t ADM_Composer::audioGoTo (uint32_t offset)
 */
 uint32_t ADM_Composer::audioRead (uint32_t len, uint8_t * buffer)
 {
-  // first check if the len is within the seg ...
-  uint32_t    end_offset,    red;
-
-  // Offset of last byte in this seg...
-  end_offset =    _segments[_audioseg]._audio_start + _segments[_audioseg]._audio_size;
-//  printf("***AUDIO READ CALLED*************************************\n");
-  // we are beyond the end mark   or to the end mark
-  if (end_offset <= _audiooffset)
-    {
-      // we went out of bounds...
-      if (_audiooffset > end_offset)
-	{
-	  printf ("\n *** Ooops , audio spilled, overshot : %lu\n",
-		  _audiooffset - end_offset);
-	}
-      aprintf (" EDITOR audio next segments : %lu /  %lu start: %lu, size : %lu->  going to seg %ld\n",
-	      _audiooffset, end_offset,
-	      _segments[_audioseg]._audio_start,
-	      _segments[_audioseg]._audio_size, _audioseg + 1);
-      // we are at the end mark
-      // switch to next seg...
-      _audioseg++;
-      if (_audioseg == _nb_segment)
-	{
-	  _audioseg = 0;
-	  _audiooffset = 0;
-	  memset (buffer, 0, len);	// avoid sproutch
-	  return 0;
-	}
-      _audiooffset = _segments[_audioseg]._audio_start;
-      _videos[AUDIOSEG]._audiostream->goToSync (_audiooffset);
-      return audioRead (len, buffer);
-    }
-
-  // we still got data (theoritically in current seg...
-  // everything in the current seg ?
-  if ((_audiooffset + len) <= end_offset)
-    {
-      red =	_videos[_segments[_audioseg]._reference]._audiostream->read (len,
-								     buffer);
-      // fill with dummy....
-      if (!red)
-	{
-
-	  if (_audioseg == (_nb_segment - 1))
-	    {			// last segment no filling
-	      return 0;
-
-	    }
-	  printf (" Filling with dummy...\n");
-	  memset (buffer + red, 0, len);
-	  red = len;
-	}
-      _audiooffset += red;
-      return red;
-    }
-  // we have to switch from one seg to the next one
-  //
-  // leftover
-  aprintf ("\n switching segments\n");
-  uint32_t
-    left;
-  left = end_offset - _audiooffset;
-  red =
-    _videos[_segments[_audioseg]._reference]._audiostream->read (left,
-								 buffer);
-  if (!red)
-    {
-      printf (" error readinf audio from seg : %lu\n", _audioseg);
-      memset (buffer + red, 0, left);
-      red = left;		// dummy
-    }
-  _audiooffset += left;
-
-  if (red != len)
-    {
-      // there 's more coming to fetch go to next seg
-      return red + audioRead (len - red, buffer + red);
-    }
-  else
-    return red;
-  return 0;
-
+uint32_t size,sam;
+ if(!getAudioPacket(buffer,&size, &sam))
+ {
+ 	return 0; 
+ }
+ return size;
 }
 /*
 		Convert frame from a seg to an offset

@@ -53,7 +53,7 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 	uint32_t instock=0,rd=0;	
 
 	ADM_assert(_wavheader);
-	
+	shrink();
 	instock=packetTail-packetHead;
 	while(instock<MINSTOCK)
 	{
@@ -96,6 +96,19 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 	return 0;
 
 }
+uint8_t AVDMGenericAudioStream::shrink( void )
+{
+	ADM_assert(packetTail>=packetHead);
+	if(packetTail>SIZE_INTERNAL)
+	{
+		// Wrap
+		memmove(packetBuffer,&packetBuffer[packetHead],packetTail-packetHead);
+		packetTail-=packetHead;
+		packetHead=0;
+	}
+	
+	return 1;
+}
 uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len, 
 								uint32_t *samples)
 {
@@ -114,13 +127,6 @@ uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 			packetHead+=count;
 			*samples=sample;
 			*len=count;
-			if(packetTail>SIZE_INTERNAL)
-			{
-				// Wrap
-				memmove(packetBuffer,&packetBuffer[packetHead],packetTail-packetHead);
-				packetTail-=packetHead;
-				packetHead=0;
-			}
 			return 1;
 }
 	
@@ -130,11 +136,13 @@ uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 	uint32_t instock,rd;
 	uint32_t startOffset,endOffset;
 	uint8_t  lock=0;
+	uint8_t  headerfound=0;
 				
 			ADM_assert(_wavheader->encoding==WAV_AC3);
+			ADM_assert(packetTail>=packetHead);
 			if(packetTail<packetHead+6)
 			{
-				printf("PKTZ:Buffer empty\n");
+				printf("PKTZ:AC3 Buffer empty\n");
 				return 0;
 			}
 			// It is MP3, read packet
@@ -167,7 +175,8 @@ uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 						&sample_rate, &bit_rate);			
 				if(!size)
 				{
-					printf("OGM: Cannot sync\n");
+					printf("AC3: Cannot sync\n");
+					start++;
 					continue;
 				}
 				if(size+packetHead<=packetTail)
@@ -180,6 +189,7 @@ uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 				}
 				else
 				{	// not enought data left
+					headerfound=1;
 					printf("AC3Pkt: Need %lu have:%lu\n",size,packetTail-packetHead);
 					break;
 				}
@@ -188,18 +198,24 @@ uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 			if(!found)
 			{
 				printf("AC3pak: Cannot find packet (%lu)\n",packetTail-packetHead);
+
+				if(!headerfound)
+				{
+
+					// no header found, we can skip up to the 6 last bytes
+					uint32_t left;
+					left=packetTail-packetHead;
+					if(left>6) left=6;
+					packetHead=packetTail-left;
+
+					printf("AC3Pak: No ac3 header found, purging buffer (%lu - %lu)\n",packetHead,packetTail);
+				}
 				return 0;
 			}
 			*len=size;
 			*samples=1536;
 			
-			if(packetTail>SIZE_INTERNAL)
-			{
-				// Wrap
-				memmove(packetBuffer,&packetBuffer[packetHead],packetTail-packetHead);
-				packetTail-=packetHead;
-				packetHead=0;
-			}
+			
 			return 1;
 }
 /*
@@ -250,13 +266,6 @@ uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 			*len=mpegInfo.size;
 			*samples=mpegInfo.samples;
 			packetHead+=startOffset+mpegInfo.size;
-			if(packetTail>SIZE_INTERNAL)
-			{
-				// Wrap
-				memmove(packetBuffer,&packetBuffer[packetHead],packetTail-packetHead);
-				packetTail-=packetHead;
-				packetHead=0;
-			}
 			return 1;
 }		
 //---
@@ -292,13 +301,7 @@ uint8_t		AVDMGenericAudioStream::getPacketAAC(uint8_t *dest, uint32_t *len,
 			*len=mpegInfo.size;
 			*samples=mpegInfo.samples;
 			packetHead+=startOffset+mpegInfo.size;
-			if(packetTail>SIZE_INTERNAL)
-			{
-				// Wrap
-				memmove(packetBuffer,&packetBuffer[packetHead],packetTail-packetHead);
-				packetTail-=packetHead;
-				packetHead=0;
-			}
+
 			return 1;
 }
 //
