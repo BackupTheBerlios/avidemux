@@ -357,7 +357,7 @@ uint32_t rd;
 				_isaudiopresent=1;
 				fseeko(_fd,_Tracks[audioTrack].strh.offset,SEEK_SET);
 
-				if(_Tracks[audioTrack].strh.size!=sizeof(_audiostream));
+				if(_Tracks[audioTrack].strh.size != sizeof(_audiostream))
 				{
 				
 					printf("Mmm(2) we have a bogey here, size mismatch : %lu \n"
@@ -510,7 +510,7 @@ uint32_t count=0;
 				}
 			else
 			{
-					printf("Track %lu/%lu :\n",i);fourCC::print(tmp.fccType);printf("\n");
+					printf("Track %lu/%lu :\n",i,_nbTrack);fourCC::print(tmp.fccType);printf("\n");
 					
 			}			
 	}
@@ -527,7 +527,7 @@ uint32_t count=0;
 	for(uint32_t i=0;i<_nbTrack;i++)
 	{		
 			fseeko(_fd,_Tracks[i].strh.offset,SEEK_SET);
-			if(_Tracks[i].strh.size!=sizeof(_videostream));
+			if(_Tracks[i].strh.size!=sizeof(_videostream))
 			{
 				
 				printf("Mmm(4) we have a bogey here, size mismatch : %lu \n",_Tracks[i].strh.size);
@@ -665,7 +665,7 @@ void OpenDMLHeader::Dump( void )
 
       	}				
 }
-#define PAD	for(int j=0;j<nest;j++) aprintf("\t");
+#define PAD	for(uint j=0;j<nest;j++) aprintf("\t");
 /*
 	Recursively climb a riff tree and not where are
 	the interesting informations to be read later on
@@ -682,7 +682,7 @@ void OpenDMLHeader::walk(riffParser *p)
 	fcc=p->read32();
 	len=p->read32();
 #ifdef OPENDML_VERBOSE	
-	for(int j=0;j<nest;j++) aprintf("\t");
+	for(uint j=0;j<nest;j++) aprintf("\t");
 	PAD;
 	aprintf("Entry  :");fourCC::print(fcc);aprintf(" Size: %lu (%lx)\n",len,len);
 #endif	
