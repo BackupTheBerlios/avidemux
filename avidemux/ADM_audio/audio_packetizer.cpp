@@ -118,7 +118,7 @@ uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 //
 	uint32_t count,sample;
 			sample=_wavheader->frequency/100;			
-			count*=_wavheader->channels;
+			count=sample*_wavheader->channels;
 			if(_wavheader->encoding!=WAV_ULAW)
 			{
 				count*=2;			
