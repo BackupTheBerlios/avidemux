@@ -486,7 +486,10 @@ dnl __________________/ac3______________
 dnl __________________VORBIS______________
 AC_CHECK_LIB(vorbis,vorbis_info_init,,have_vorbis=no,-L/usr/X11R6/lib -lXext -lX11 -lm)
 if test "x$have_vorbis" = "xyes"; then
-	AC_DEFINE(USE_VORBIS,1,[Vorbis audio codec])
+	AC_CHECK_LIB(vorbisenc,vorbis_encode_init,,have_vorbis=no,-L/usr/X11R6/lib -lXext -lX11 -lm)
+	if test "x$have_vorbis" = "xyes"; then
+		AC_DEFINE(USE_VORBIS,1,[Vorbis audio codec])
+	fi
 fi
 dnl __________________/VORBIS______________
 
