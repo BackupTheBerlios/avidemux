@@ -303,8 +303,20 @@ int scriptAudioProcess(int n,Arg *args)
 extern int GUI_GoToFrame(uint32_t frame);
 int scriptGoto(int n,Arg *args)
 {	
-	if( args[0].arg.integer<0) return 0;
-	return GUI_GoToFrame( args[0].arg.integer );
+ int frameno;
+ 	if (!avifileinfo) return 0;
+	
+ 	frameno=args[0].arg.integer;
+	if( frameno<0)
+	{
+		aviInfo info;
+		video_body->getVideoInfo(&info);
+		frameno=-frameno;
+		if(frameno>info.nb_frames) return 0;
+		
+		frameno=info.nb_frames-frameno;
+	}
+	return GUI_GoToFrame( frameno );
 	
 }
 //________________________________________________
