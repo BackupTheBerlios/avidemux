@@ -29,7 +29,7 @@
 //== LOCAL Functions ==
 //=====================
 //#define VERBOSE
-#define VERBOSE_GOP
+//#define VERBOSE_GOP
 //== bit buffering stuff ==
 //=========================
 
