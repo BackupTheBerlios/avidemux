@@ -32,10 +32,14 @@
 #include "prefs.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_lavformat/ADM_lavformat.h"
+
 #include "ADM_lvemux/ADM_muxer.h"
 
 // To have access to low level infos 
 #include "ADM_codecs/ADM_mpeg.h"
+#include "ADM_lavcodec.h"
+#include "ADM_codecs/ADM_ffmp43.h"
+
 
 
 /**
@@ -108,11 +112,34 @@ void mpeg_passthrough(  char *name )
 	}
 	// Check
 	WAVHeader *hdr=audio->getInfo();
+	uint32_t isMpeg1;
+	uint32_t isLav;
+	if(!prefs->get(FEATURE_USE_LAVCODEC_MPEG, &isLav))
+		{
+		 isLav=0;
+		}
+
+	if(!isLav)
+	{
+		decoderMpeg *mpeghdr;
 	
-	decoderMpeg *mpeghdr;
+		mpeghdr=(decoderMpeg *)video_body->rawGetDecoder(0);
+		isMpeg1=mpeghdr->isMpeg1();
+	}
+	else
+	{
+		// How to know if it is mpeg 1?
+		// Assume it is not
+		/*
+		decoderFFMpeg12 *mpeghdr;
 	
-	mpeghdr=(decoderMpeg *)video_body->rawGetDecoder(0);
-	if(mpeghdr->isMpeg1())
+		mpeghdr=(decoderFFMpeg12 *)video_body->rawGetDecoder(0);
+		isMpeg1=mpeghdr->isMpeg1();
+		*/
+		isMpeg1=0;
+	
+	}
+	if(isMpeg1)
 	{
 		if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
 		{
