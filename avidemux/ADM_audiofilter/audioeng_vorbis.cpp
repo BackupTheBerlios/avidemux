@@ -38,28 +38,43 @@
 #include "vorbis/vorbisenc.h"
 #include "ADM_audiofilter/audioeng_vorbis.h"
 
-static uint16_t remap[4096];
-// Ctor: Duplicate
+#define VD (((vorbisStruct *)_handle)->vd)
+#define VI (((vorbisStruct *)_handle)->vi)
+#define VB (((vorbisStruct *)_handle)->vb)
+typedef struct vorbisStruct
+{ 
+	vorbis_info 	 vi ;
+	vorbis_dsp_state vd ;
+	vorbis_block     vb ;
+}vorbisStruct;
 //__________
 
 AVDMProcessAudio_Vorbis::AVDMProcessAudio_Vorbis(AVDMGenericAudioStream * instream)
 :AVDMBufferedAudioStream    (instream)
 {
+
     _wavheader = new WAVHeader;    
     memcpy(_wavheader, _instream->getInfo(), sizeof(WAVHeader));
    _wavheader->encoding=WAV_OGG;
     _instream->goToTime(0);	// rewind
-    _length = _instream->getLength();    
-    _handle=NULL;
+    _length = _instream->getLength();
+    _handle=(void *)new  vorbisStruct; 
+    
 };
 
 
 AVDMProcessAudio_Vorbis::~AVDMProcessAudio_Vorbis()
 {
     delete(_wavheader);
-    
+   
+
     if(_handle)
-    	;
+    {
+	vorbis_block_clear(&VB);
+	vorbis_dsp_clear(&VD);
+	vorbis_info_clear(&VI);
+	delete (vorbisStruct *)_handle;
+    }    	
     _handle=NULL;
     _wavheader=NULL;
 
@@ -76,19 +91,38 @@ AVDMProcessAudio_Vorbis::~AVDMProcessAudio_Vorbis()
 //_______________________________________________
 uint8_t AVDMProcessAudio_Vorbis::init( uint32_t bitrate)
 {
-unsigned long int samples_input, max_bytes_output;
 
 
 
+ 	vorbis_info_init(&VI) ;
+ 
+	if(0>vorbis_encode_init(&VI,
+			      _wavheader->channels,
+			       _wavheader->frequency,
+			      -1, // Max bitrate      
+			      bitrate*1000, //long nominal_bitrate,
+			      -1 //long min_bitrate))
+			      ))
+	{
+		printf("vorbis init error\n");
+		return 0;
+	
+	}
+	vorbis_analysis_init(&VD, &VI) ;
+	vorbis_block_init(&VD, &VB);
     
-    return 0;
+	printf("Vorbis encoder initialized\n");
+	printf("Bitrate :%lu\n",bitrate);
+	printf("Channels:%lu\n",_wavheader->channels);
+	printf("Frequenc:%lu\n",_wavheader->frequency);
+    return 1;
 }
 
 //_____________________________________________
 uint32_t AVDMProcessAudio_Vorbis::grab(uint8_t * obuffer)
 {
 uint32_t len,sam;
-	printf("Faac: Read\n");
+	printf("Vorbis: Read\n");
 	if(getPacket(obuffer,&len,&sam))
 		return len;
 	return MINUS_ONE;

@@ -210,8 +210,8 @@ rebranch2:
       }
     while (1);
   contact2:
-    printf("\n audio suboffset :%lu", suboffset - 2);
-     printf("\n total offset :%lu", offset +suboffset - 2);
+    aprintf("\n audio suboffset :%lu", suboffset - 2);
+     aprintf("\n total offset :%lu", offset +suboffset - 2);
     return goTo(offset + suboffset - 2);
     break;
 
