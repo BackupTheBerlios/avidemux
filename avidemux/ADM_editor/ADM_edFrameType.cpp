@@ -47,6 +47,8 @@ uint32_t frames=0,cur=0;
 uint8_t *compBuffer=NULL;
 //uint8_t *prepBuffer=NULL;
 ADMImage *prepBuffer=NULL;
+ADMImage *prepBufferNoCopy=NULL;
+ADMImage *tmpImage=NULL;
 uint32_t bframe;
 aviInfo    info;
 						
@@ -60,25 +62,24 @@ aviInfo    info;
 		GUI_Alert("Not indexable (divx5+packed?)");
 		return 0;
 	}
-	compBuffer=new uint8_t[(MAXIMUM_SIZE * MAXIMUM_SIZE * 3)>>1];
-	if(!compBuffer)
-		{
-			GUI_Alert("Cannot allocate memory");
-			return 0;
-		}
-	//prepBuffer=new uint8_t[(MAXIMUM_SIZE * MAXIMUM_SIZE * 3)>>1];
-	prepBuffer=new ADMImage(MAXIMUM_SIZE,MAXIMUM_SIZE);
-	if(!prepBuffer)
-		{
-			delete [] compBuffer;
-			GUI_Alert("Cannot allocate memory(2)");
-			return 0;
-		}
+                        vi=&(_videos[0]);
+                        vi->_aviheader->getVideoInfo (&info);
+                        
+	compBuffer=new uint8_t[(info.width * info.height * 3)>>1];
+	ADM_assert(compBuffer);
+
+	prepBuffer=new ADMImage(info.width ,info.height);            
+        prepBufferNoCopy=new ADMImage(info.width ,info.height);      
+
+	ADM_assert(prepBuffer);
+        ADM_assert(prepBufferNoCopy);
+
 	for(uint32_t i=0;i<_nb_video;i++)
 	{
 		frames+=_videos[i]._nb_video_frames;
 	}
 	DIA_working *work;
+        uint8_t nocopy;
 	work=new DIA_working("Rebuilding Frames");
 
 
@@ -87,7 +88,9 @@ aviInfo    info;
 		// set the decoder in fast mode
 			vi=&(_videos[vid]);
 			vi->_aviheader->getVideoInfo (&info);
-			
+			nocopy=vi->decoder->dontcopy();
+                        if(nocopy) tmpImage=prepBufferNoCopy;
+                                else tmpImage=prepBuffer;
 			bframe=0;
 			if(vi->_reorderReady)
 			{
@@ -102,7 +105,10 @@ aviInfo    info;
 							 compBuffer,
 							 &len, &flags);
 					if(len)
-		    				vi->decoder->uncompress (compBuffer, prepBuffer, len, &flags);
+                                        {
+                                                
+		    				vi->decoder->uncompress (compBuffer, tmpImage, len, &flags);
+                                        }
 					else
 						flags=0;
 	  				vi->_aviheader->setFlag(j,flags);
@@ -115,7 +121,8 @@ aviInfo    info;
 						vi->decoder->decodeFull();
             					GUI_Alert("Aborted!");
 						delete [] compBuffer;
-						delete [] prepBuffer;
+						delete  prepBuffer;
+                                                delete  prepBufferNoCopy;
              					return 0;
        					}
 					cur++;
@@ -131,6 +138,7 @@ aviInfo    info;
 	delete work;
 	delete [] compBuffer;
 	delete  prepBuffer;
+        delete  prepBufferNoCopy;
 	return 1;
 }
 
