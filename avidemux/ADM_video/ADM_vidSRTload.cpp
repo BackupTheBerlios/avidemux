@@ -447,6 +447,16 @@ uint32_t done=0;
   	}
 	// Get the amound of utf16...
 	done=(ADM_RAW-sout)>>1;
+// For win32 we swap le and be
+#ifdef CYG_MANGLING
+       ADM_GLYPH_T glyph;
+       for(uint32_t w=0;w<done;w++)
+       {
+               glyph=out[w];
+               out[w]=((glyph&0xff)<<8)+(glyph>>8);
+       }
+#endif
+	
 	if(done)
 	{
 		if(0xfeff==out[0])
@@ -457,15 +467,6 @@ uint32_t done=0;
 			
 		}
 	}
-// For win32 we swap le and be
-#ifdef CYG_MANGLING
-       ADM_GLYPH_T glyph;
-       for(uint32_t w=0;w<done;w++)
-       {
-               glyph=out[w];
-               out[w]=((glyph&0xff)<<8)+(glyph>>8);
-       }
-#endif
 
 	while(done &&( ADM_ASC(out[done-1])==0x0a || ADM_ASC(out[done-1]==0x0d))) done--;
 	*nbOut=done;

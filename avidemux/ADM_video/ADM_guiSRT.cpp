@@ -88,7 +88,6 @@ static void on_callback_color(GtkButton * button, gpointer user_data);
 static gboolean on_slider( void );
 
 static void indexSUB(char *name);
-static void fontCB(char *name);
 static void update(uint32_t value);
 static void read(void);
 
@@ -108,9 +107,9 @@ static int  GUI_subtitleParam(char *font,char *sub,int  *charset,int *size,uint3
 static gboolean gui_draw( void );
 static void draw( void);
 
-
-static char subString[300];
-static char fontString[300];
+#define MAX_STRING 300
+static char subString[MAX_STRING];
+static char fontString[MAX_STRING];
 
 static ADMImage  *sourceImage=NULL;
 static uint8_t *targetImage=NULL;
@@ -360,26 +359,23 @@ gboolean on_slider( void )
 }
 void on_callback_sub(GtkButton * button, gpointer user_data)
 {
-	     UNUSED_ARG(button);
-	     UNUSED_ARG(user_data);
-	     GUI_FileSelRead("Subtitle to load", indexSUB)  ;
+	      UNUSED_ARG(button);
+	UNUSED_ARG(user_data);
+        //GUI_FileSelRead("TTF font to use", fontCB);
+	FileSel_SelectRead("Subtitle to load", subString,
+		MAX_STRING,subString);
+	gtk_label_set_text(GTK_LABEL(WID(label_sub)),subString);
 }
-void indexSUB(char *name)
-{
-	 strcpy(subString,name);
-	 gtk_label_set_text(GTK_LABEL(WID(label_sub)),name);
-}
+
 void on_callback_font(GtkButton * button, gpointer user_data)
 {
         UNUSED_ARG(button);
 	UNUSED_ARG(user_data);
-        GUI_FileSelRead("TTF font to use", fontCB);
-
-}
-void fontCB(char *name)
-{
- 	strcpy(fontString,name);
-	gtk_label_set_text(GTK_LABEL(WID(label_font)),name);
+        //GUI_FileSelRead("TTF font to use", fontCB);
+	FileSel_SelectRead("TTF font to use", fontString,
+		MAX_STRING,fontString);
+	gtk_label_set_text(GTK_LABEL(WID(label_font)),fontString);
+	
 }
 /*--------------------------------------*/
 gboolean gui_draw( void )

@@ -44,6 +44,85 @@ char *PathCanonize(const char *tmpname);
 void		PathStripName(char *str);
 
 
+/**
+	Select a file
+		Target is the string allocated by caller that will receive the resule, maxlen byte
+		Source is a optionnal last file to replace the selector at the last dir used
+	@Title@ is the title of the dialog window
+	
+	Returns : 0 if error, 1 on success
+	
+
+*/
+uint8_t FileSel_SelectRead(const char *title,char *target,uint32_t max, const char *source)
+{
+	
+GtkWidget *dialog;
+uint8_t ret=0;
+gchar *selected_filename;
+gchar last;
+char *dupe=NULL,*tmpname=NULL;
+DIR *dir=NULL;
+	
+	dialog=create_fileselection1 ();
+	gtk_window_set_title (GTK_WINDOW (dialog),title);
+	gtk_transient(dialog);
+	if(source)
+	{
+		dupe=PathCanonize(source);
+		PathStripName(dupe);
+		if( (dir=opendir(dupe)) )
+			{
+				closedir(dir);
+				gtk_file_selection_set_filename(GTK_FILE_SELECTION(dialog),(gchar *)dupe);
+			}
+		delete [] dupe;
+	
+	}
+	else	//use pref
+	{
+		if( prefs->get(LASTDIR,&tmpname))
+		{
+			
+	
+			dupe=PathCanonize(tmpname);
+			PathStripName(dupe);
+
+			if( (dir=opendir(dupe)) )
+			{
+				closedir(dir);
+				gtk_file_selection_set_filename(GTK_FILE_SELECTION(dialog),(gchar *)dupe);
+			}
+			delete [] dupe;
+		}
+	}
+	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+	{
+			selected_filename= (gchar *) 	gtk_file_selection_get_filename(GTK_FILE_SELECTION(dialog));
+			last=selected_filename[strlen(selected_filename) - 1]; 
+			 if (last == '/' || last =='\\' )
+			 {
+      	  					GUI_Alert("Cannot open directory as file !");
+						return 0;
+			}
+			else
+			{
+				// Check we can read it ..
+				
+					FILE *fd;
+					fd=fopen(selected_filename,"rb");
+					if(fd)
+					{	
+						fclose(fd);
+						strncpy(target,(char *)selected_filename,max);
+						// Finally we accept it :)
+						ret=1;
+					}
+			}
+	}	
+	gtk_widget_destroy(dialog);
+	return ret;
+}
 
 void GUI_FileSelWrite(const char *label, SELFILE_CB * cb)
 {				/* Create the selector */
@@ -383,7 +462,11 @@ char *PathCanonize(const char *tmpname)
 	{
 		out=new char [strlen(path)+2];
 		strcpy(out,path);
+#ifndef CYG_MANGLING		
 		strcat(out,"/");
+#else
+		strcat(out,"\\");
+#endif	
 		printf("\n Canonizing null string ??? (%s)\n",out);
 	}else if(tmpname[0]=='/'
 #if defined(CYG_MANGLING)
@@ -396,9 +479,13 @@ char *PathCanonize(const char *tmpname)
 		strcpy(out,tmpname);
 		return out;
 	}else{
-		out=new char[strlen(path)+strlen(tmpname)+2];
+		out=new char[strlen(path)+strlen(tmpname)+6];
 		strcpy(out,path);
+#ifndef CYG_MANGLING		
 		strcat(out,"/");
+#else
+		strcat(out,"\\");
+#endif		
 		strcat(out,tmpname);
 	}
 	simplify_path(&out);
@@ -413,7 +500,11 @@ void		PathStripName(char *str)
 		int len=strlen(str);
 		if(len<=1) return;
 		len--;
+#ifndef CYG_MANGLING		
 		while( *(str+len)!='/' && len)
+#else
+	while( *(str+len)!='\\' && len)
+#endif		
 		{
 			 *(str+len)=0;
 			 len--;
