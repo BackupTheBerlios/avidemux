@@ -463,7 +463,7 @@ extern uint32_t videoProcessMode;
 
 uint8_t loadVideoCodecConf( char *name);
 uint8_t saveVideoCodecConf( char *name);
-static uint8_t mk_hex(uint8_t a,uint8_t b);
+uint8_t mk_hex(uint8_t a,uint8_t b);
 CodecFamilty videoCodecGetFamily( void )
 {
 	if(current_codec==CodecXVCD || current_codec==CodecXSVCD ||current_codec==CodecXDVD )
