@@ -348,17 +348,17 @@ int scriptAudioResample(int n,Arg *args)
 	
 //________________________________________________
 extern uint8_t addFile(char *name);
-extern int A_openAvi2 (char *name, uint8_t mode);
+extern int A_appendAvi (char *name);
 int scriptAppend(int n,Arg *args)
 {
-	return A_openAvi2 (args[0].arg.string,0);
+  return A_appendAvi (args[0].arg.string);
 	
 }
 //________________________________________________
-
+extern int A_openAvi (char *name);
 int scriptLoad(int n,Arg *args)
 {	
-	return A_openAvi2 (args[0].arg.string,0);
+	return A_openAvi (args[0].arg.string);
 }
 //________________________________________________
 int scriptExit(int n,Arg *args)

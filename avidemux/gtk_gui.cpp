@@ -104,7 +104,7 @@ int A_loadNone( void );
 void A_saveAudioDecodedTest (char *name);
 void A_openBrokenAvi (char *name);
 int A_openAvi2 (char *name, uint8_t mode);
-void A_appendAvi (char *name);
+int A_appendAvi (char *name);
 extern void A_SaveAudioNVideo (char *name);
 void HandleAction (Action action);
 void A_rebuildKeyFrame (void);
@@ -407,7 +407,7 @@ HandleAction (Action action)
 
 
 	case ACT_OpenAvi:
-	  GUI_FileSelRead ("Select AVI file...", A_openAvi);
+          GUI_FileSelRead ("Select AVI file...", (SELFILE_CB *)A_openAvi);
 	  break;
 
 	case ACT_BrokenAvi:
@@ -512,13 +512,13 @@ case ACT_Pipe2Other:
       break;
 
     case ACT_OpenAvi:
-      GUI_FileSelRead ("Select AVI file...", A_openAvi);
+      GUI_FileSelRead ("Select AVI file...",(SELFILE_CB *) A_openAvi);
       break;
     case ACT_BrokenAvi:
       GUI_FileSelRead ("Select AVI file...", A_openBrokenAvi);
       break;
     case ACT_AppendAvi:
-      GUI_FileSelRead ("Select AVI file to append...", A_appendAvi);
+      GUI_FileSelRead ("Select AVI file to append...",(SELFILE_CB *) A_appendAvi);
       break;
     case ACT_SaveWave:
       	{
@@ -872,10 +872,10 @@ A_openBrokenAvi (char *name)
   A_openAvi2 (name, 1);
 }
 
-void
+int
 A_openAvi (char *name)
 {
-  A_openAvi2 (name, 0);
+  return A_openAvi2 (name, 0);
 }
 extern void GUI_PreviewEnd (void);
 int A_openAvi2 (char *name, uint8_t mode)
@@ -1076,19 +1076,19 @@ void  updateLoaded ()
 //___________________________________________
 //  Append an AVI to the existing one
 //___________________________________________
-void
+int
 A_appendAvi (char *name)
 {
 
 
   if (playing)
-    return;
+    return 0;
   DIA_StartBusy ();
   if (!video_body->addFile (name))
     {
       DIA_StopBusy ();
       GUI_Alert ("Something failed ...");
-      return;
+      return 0;
     }
   DIA_StopBusy ();
 
@@ -1097,10 +1097,11 @@ A_appendAvi (char *name)
   if (!video_body->updateVideoInfo (avifileinfo))
     {
       GUI_Alert ("Something bad happened (II)...");
+      return 0;
     }
 
   ReSync ();
-
+  return 1;
 }
 
 //

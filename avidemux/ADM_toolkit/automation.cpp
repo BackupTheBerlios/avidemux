@@ -57,8 +57,8 @@ extern void ADS_commandList( void );
 extern uint8_t loadVideoCodecConf( char *name);
 extern int A_saveJpg (char *name);
 extern void filterLoadXml(char *n);
-extern void A_openAvi(char *name);
-extern void A_appendAvi (char *name);
+extern int A_openAvi(char *name);
+extern int A_appendAvi (char *name);
 extern void A_saveAudio(char *name);
 extern int A_loadNone( void );
 extern void A_saveAudioDecodedTest(char *name);
@@ -175,8 +175,8 @@ AUTOMATON reaction_table[]=
 		{"save-uncompressed-audio",1,"save uncompressed audio",A_saveAudioDecodedTest},
 		{"index-mpeg",		3,"create index of vob/mpeg : vob.vob index.index audio#",
 								((one_arg_type )call_indexMpeg)},
-		{"load",		1,"load video",		A_openAvi},
-		{"append",		1,"append video",	A_appendAvi},
+                {"load",		1,"load video",		(one_arg_type )A_openAvi},
+                {"append",		1,"append video",	(one_arg_type)A_appendAvi},
 		{"load-workbench",	1,"load workbench file",	load_workbench},
 		{"save",		1,"save avi",		save},		
 		

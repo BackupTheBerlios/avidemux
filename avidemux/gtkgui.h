@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
-void 			A_openAvi		(char *name);
+int 			A_openAvi		(char *name);
 void 			A_saveAudio	(char *name);
 void 			A_saveAudioDecoded	(char *name);
 void 			A_saveAVI		(char *name);
