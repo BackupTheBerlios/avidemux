@@ -11,3 +11,4 @@ libADM_mpegindexer_a_SOURCES = ADM_mpegparser.cpp ADM_mpegindexer.cpp ADM_mpegts
 EXTRA_DIST = ADM_mpegindexer.cpp ADM_mpegparser.cpp ADM_mpegparser.h 
 
 ####### kdevelop will overwrite this part!!! (end)############
+noinst_HEADERS =  ADM_mpegTs.h

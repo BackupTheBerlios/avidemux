@@ -67,17 +67,17 @@
 #define MODULE_NAME MODULE_MPEG
 #include "ADM_toolkit/ADM_debug.h"
 //___________________________
-uint8_t ADM_TsParse(char *file,uint32_t *nbTrack, uint32_t **token);
+#include "ADM_mpegindexer/ADM_mpegTs.h"
 static uint8_t tryAudioTrack(char *name,uint8_t id,int32_t *pts);
 static uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitrate);
-
+static uint8_t getAudioTrackInfoTS(char *name,uint8_t pidaud, uint32_t *chan, uint32_t *bitrate);
 //___________________________
 int sync( FILE *fd);
 int parse(FILE *fd);
 int usage(void );
-int push(int pid, int streamid);
+int push(int pid, int streamid,uint64_t pts);
 //___________________________
-static uint32_t stack[100];
+static ADM_TsTrackInfo stack[100];
 static uint32_t stacked=0;
 static uint8_t buffer[TS_PACKET*4];
 //___________________________
@@ -88,6 +88,7 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 	mParser *parser;
 	uint32_t nbAC3=0,nbMpeg=0,nbLPCM=0;
 	int32_t pts;
+	uint32_t vid=0;
 	uint8_t token;
 	// clear it before using it. Default = not present.
 	memset(audioTrack,0,sizeof(mpegAudioTrack)*24);
@@ -104,7 +105,9 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 		}
 	if(parser->read8i()==0x47) // Mpeg TS
 	{
-		uint32_t nb,*info;
+		uint32_t nb;
+		ADM_TsTrackInfo *info;
+		
 		if(! ADM_TsParse(name,&nb,&info)) return 0;
 		
 		uint32_t nbvid=0;
@@ -113,21 +116,24 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 		printf("Found %d tracks\n",nb);
 		for(uint32_t i=0;i<nb;i++)
 		{
-			id=info[i]&0xffff;
+			id=info[i].es;
 			printf("Id:%x\n",id);
-			if(id>=0xc0 && id<=0xcf)
+			if(id>=0xc0 && id<=0xcf) // Mpeg1/2 audio
 			{
 				audioTrack[nbMpeg].presence=1;
+				audioTrack[nbMpeg].shift=i;
 				nbMpeg++;				
 			}
 			else
 			if(id==0xbd) // private stream
 			{
 				audioTrack[nbAC3+8].presence=1;
+				audioTrack[nbAC3+8].shift=i;
 				nbAC3++;
 			}
 			else if(id>=0xE0 && id<=0xEF)
 			{
+				if(!nbvid) vid=i;
 				nbvid++;
 			}
 		}
@@ -136,11 +142,50 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 			GUI_Alert("No video track found!");
 			return 0;
 		}
+		printf("Video is pid :%x\n",vid);
 		if((nbAC3+nbMpeg)==0)
 		{
 			GUI_Alert("No audio track found\n");
 			return 0;	
 		}
+		// Now that we have the video stream
+		// we can compute the a/v sync value
+		nbAC3=nbMpeg=0;
+		int64_t vidPts=info[vid].pts;
+		
+		int64_t audPts=0;
+		
+		printf("Vid is tack %d, with pts %li\n",vid,info[vid].pts);
+		for(uint32_t i=0;i<8;i++)
+		{
+			//printf("%d<\n",i);			
+			if(audioTrack[i].presence)
+			{
+				audPts=info[audioTrack[i].shift].pts;
+				printf("MPEG aud %li %d\n",audPts,audioTrack[i].shift);
+				audPts=vidPts-audPts;
+				audPts/=90;
+				audioTrack[i].shift=audPts;
+				printf("%ld ms\n",audPts);
+				
+			}
+			if(audioTrack[i+8].presence)
+			{
+				uint32_t track;
+				track=audioTrack[i+8].shift;
+				audPts=info[track].pts;
+				printf("AC3 aud %li %d\n",audPts,audioTrack[i+8].shift);
+				audPts=vidPts-audPts;
+				audPts/=90;
+				audioTrack[i+8].shift=audPts;
+				printf("%ld ms\n",audPts);
+				getAudioTrackInfoTS(name,info[track].pid, &audioTrack[i+8].channels, 
+								&audioTrack[i+8].bitrate);
+				
+			}
+			
+		}
+		
 		return 1;
 		
 		
@@ -185,9 +230,18 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 	while(count>0)
 	{
 		if(!parser->peekPacket(&id)) break;
-		if(id>=0xC0 && id<=0xc7) audioTrack[id-0xC0].presence=1;
-		if(id>=0xA0 && id<=0xA7) audioTrack[id-0xA0+16].presence=1;
-		if(id<=0x7) audioTrack[id+8].presence=1;
+		if(id>=0xC0 && id<=0xc7) 
+		{
+			audioTrack[id-0xC0].presence=1;
+		}
+		if(id>=0xA0 && id<=0xA7) 
+		{
+			audioTrack[id-0xA0+16].presence=1;
+		}
+		if(id<=0x7)
+		{
+		 audioTrack[id+8].presence=1;
+		}
 		count--;
 	}
 	delete parser;
@@ -259,12 +313,13 @@ uint8_t tryAudioTrack(char *name,uint8_t id,int32_t *ptsShift)
 		}
 	return 0;
 }
+
 //
 //
 //_________________________________________________________
 uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitrate)
 {
-#define AMOUNT 4*1024
+#define AMOUNT 5*1024
 	uint32_t fq=0,syncoff;
 	uint8_t r=0;
 	uint8_t streamid;
@@ -291,11 +346,40 @@ uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitra
 	delete demuxer;
 	return r;
 }
+uint8_t getAudioTrackInfoTS(char *name,uint8_t pidaud, uint32_t *chan, uint32_t *bitrate)
+{
+
+	uint32_t fq=0,syncoff;
+	uint8_t r=0;
+	uint8_t streamid;
+	uint8_t buff[AMOUNT];
+	
+	ADM_mpegDemuxer *demuxer;
+	aprintf("Creating audio demuxer for pid %d\n",pidaud);
+	demuxer=new ADM_mpegDemuxerTransportStream(pidaud,0xff);
+	demuxer->open(name);
+
+	if(demuxer->read(buff,AMOUNT))	
+	{			
+		if( ADM_AC3GetInfo(buff, AMOUNT, &fq, bitrate,chan,&syncoff)) 
+		{
+			aprintf("**Track %d : Bitrate %lu\n",pidaud,*bitrate);			
+			r=1;
+		}
+	}
+	else
+	{
+		printf("*cannot read track : %d\n",pidaud);
+	}
+	aprintf("/Creating audio demuxer for stream %d\n",pidaud);
+	delete demuxer;
+	return r;
+}
 	
 //
-//
+// The 
 //__________________________________
-uint8_t ADM_TsParse(char *file,uint32_t *nbTrack, uint32_t **token)
+uint8_t ADM_TsParse(char *file,uint32_t *nbTrack, ADM_TsTrackInfo **token)
 {
 FILE *fd;
 	printf("Scanning mpeg Ts\n");
@@ -336,9 +420,11 @@ int parse(FILE *fd)
 {
 int loop=0;
 int pid,adapt,start,len;
-
+int esid;
+uint64_t pts=0;
 	while(loop<10000)
 	{
+		pts=0;
 		loop++;		
 		if(1!=fread(buffer,TS_PACKET,1,fd))
 		{
@@ -370,20 +456,52 @@ int pid,adapt,start,len;
 			printf("Weird...%x :%x %x %X\n",pid,buffer[start],buffer[start+1],buffer[start+2]);
 			continue;		
 		}
-		push(pid,buffer[start+3]);
+		// Next 
+		esid=buffer[start+3];
+		start+=4;
+		// look if pts is present...
+		
+		// 2: Size of PES
+		// 1: Flags scrambling align etc...
+		// 1: PTS DTS
+		// {1] addition header len
+		// [5] PTS[5] DTS ...
+		start+=3;
+		if((buffer[start]>>7) & 1)
+		{
+			start+=2;
+			pts=(((buffer[start]&6)>>1)<<30)+
+				(buffer[start+1]<<22)
+				+((buffer[start+2]>>1)<<15)
+				+(buffer[start+3]<<7)
+				+(buffer[start+4]>>1);
+		}
+		push(pid,esid,pts);
 	}	
 	return 1;
 }
-int push(int pid, int streamid)
+//
+//	Put in stack the triplet es id, packet id and pts 
+//
+int push(int pid, int streamid,uint64_t pts)
 {
 uint32_t key;
 	key=(pid<<16)+streamid;
 	for(int i=0;i<stacked;i++)
 	{
-		if(stack[i]==key) return 1;
+		if((stack[i].es==streamid) && (stack[i].pid==pid))
+		{
+			// already in there ...
+			// if old pts=0 update with current one
+			if(!stack[i].pts) stack[i].pts=pts;
+		 	return 1;
+		}
 	}
-	stack[stacked++]=key;
-	printf("Found pid: %x with stream : %x\n",pid,streamid);
+	stack[stacked].es=streamid;
+	stack[stacked].pid=pid;
+	stack[stacked].pts=pts;
+	stacked++;
+	printf("Found pid: %x with stream : %x pts:%llx\n",pid,streamid,pts);
 	return 1;
 
 }

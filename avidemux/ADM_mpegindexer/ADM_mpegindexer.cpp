@@ -51,12 +51,13 @@
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_MPEG
 #include "ADM_toolkit/ADM_debug.h"
+#include "ADM_mpegindexer/ADM_mpegTs.h"
 //#define aprintf printf
 
 void mpegToIndex2(char *name);
 void mpegToIndex(char *name)  ;
 //static void mpegPictureScan2(char *name);
-extern uint8_t ADM_TsParse(char *file,uint32_t *nbTrack, uint32_t **token);
+extern uint8_t ADM_TsParse(char *file,uint32_t *nbTrack, uint64_t **token);
 
 uint8_t indexMpeg(char *mpeg,char *file);
 
@@ -434,7 +435,8 @@ uint8_t ADM_matchPid(char *file, uint32_t audioin, uint32_t *Ovidpid, uint32_t *
 {
 		// in case of mpeg Ts we rescan it to get the proper stream id
 		// we assume the user has done a scan before (...)
-		uint32_t nb,*info;
+		uint32_t nb;
+		ADM_TsTrackInfo *info;
 		uint32_t vidpid=0,audpid=0;
 		if(!ADM_TsParse(file,&nb,&info))
 		{			
@@ -448,13 +450,13 @@ uint8_t ADM_matchPid(char *file, uint32_t audioin, uint32_t *Ovidpid, uint32_t *
 		printf("Found %d tracks\n",nb);
 		for(uint32_t i=0;i<nb;i++)
 		{
-			id=info[i]&0xffff;
+			id=info[i].es;
 			printf("Id:%x\n",id);
 			if(id>=0xc0 && id<=0xcf)
 			{
 				if((nbMpeg==(audioin-0xc0)) && !audpid)
 				{
-					audpid=info[i]>>16;
+					audpid=info[i].pid;
 				}				
 				nbMpeg++;
 			}
@@ -463,7 +465,7 @@ uint8_t ADM_matchPid(char *file, uint32_t audioin, uint32_t *Ovidpid, uint32_t *
 			{
 				if((nbAC3==audioin) && !audpid)
 				{
-					audpid=info[i]>>16;
+					audpid=info[i].pid;
 				}
 				nbAC3++;
 			}
@@ -471,7 +473,7 @@ uint8_t ADM_matchPid(char *file, uint32_t audioin, uint32_t *Ovidpid, uint32_t *
 			{
 				if(!vidpid)
 				{
-					vidpid=info[i]>>16;
+					vidpid=info[i].pid;
 					printf("Video is pid : %x\n",vidpid);
 				}
 				nbvid++;
