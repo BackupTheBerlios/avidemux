@@ -28,7 +28,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: ADM_xvidratectl.cpp,v 1.3 2004/12/12 19:32:22 mean Exp $
+ * $Id: ADM_xvidratectl.cpp,v 1.4 2004/12/17 18:25:11 mean Exp $
  *
  *****************************************************************************/
 
@@ -368,6 +368,19 @@ xvid_plg_data_t  data;
 
 		
 	return 1;
+}
+uint8_t ADM_newXvidRc::getInfo(uint32_t framenum, uint32_t *qz, uint32_t *size)
+{
+rc_2pass2_t * rc;
+	ADM_assert(framenum<_nbFrames);
+	ADM_assert(_state==RS_PASS2);
+	
+	rc=(rc_2pass2_t *)myHandle;
+	
+	*qz=rc->stats[framenum].quant;
+	*size=rc->stats[framenum].length;
+	return 1;
+
 }
 //
 uint8_t ADM_newXvidRc::startPass2( uint32_t final_size,uint32_t nbFrame )

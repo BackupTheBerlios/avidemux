@@ -45,19 +45,14 @@
 #define MODULE_NAME MODULE_ENCODER
 #include "ADM_toolkit/ADM_debug.h"
 
-extern "C" {
-#include "ADM_encoder/xvid_vbr.h"
-};
 #include "adm_encffmatrix.h"
 
 #define FIRST_PASS_QUANTIZER 2
 
 
-extern "C" {
-#include "ADM_encoder/xvid_vbr.h"
-};
+#include "ADM_xvidratectl/ADM_ratecontrol.h"
 
-static vbr_control_t vbrstate;
+static ADM_newXvidRcVBV *_xrc=NULL;
 
 /*_________________________________________________*/
 EncoderFFMPEGMpeg1::EncoderFFMPEGMpeg1 (FF_CODEC_ID id, FFMPEGConfig *config)
@@ -84,7 +79,8 @@ uint8_t EncoderFFMPEGMpeg1::encode (uint32_t frame, uint32_t * len, uint8_t * ou
 uint32_t l,f;
   ADM_assert (_codec);
   ADM_assert (_in);
-
+  ADM_rframe rf;
+  
   	if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
     	{
       		printf ("\n Error : Cannot read incoming frame !");
@@ -112,7 +108,15 @@ uint32_t l,f;
 						}
 						 myENC_RESULT enc;
                                 		_codec->getResult((void *)&enc);
-						updateStats(*len);
+						switch(*flags)
+						{
+							case AVI_KEY_FRAME: rf=RF_I;break;
+							case AVI_B_FRAME: rf=RF_B;break;
+							case 0: rf=RF_P;break;
+							default: ADM_assert(0);
+						
+						}
+						_xrc->logPass1(enc.out_quantizer,rf,*len);
 						
 					}
                                         _frametogo++;
@@ -127,55 +131,43 @@ uint32_t l,f;
 						return 1;
 					}
 
-					uint16_t nq;
-					uint8_t   nf;
+					uint32_t nq;
+					uint32_t   nf;
+					ADM_rframe f;
 
-          				nq=vbrGetQuant(&vbrstate);
-					nf=vbrGetIntra(&vbrstate);
-					// Encode it !
+					_xrc->getQz( &nq, &f );
+					
+					switch(f)
+					{
+						case RF_I: nf=AVI_KEY_FRAME;break;
+						default: nf=0;
+					}
+					
 					#define MPEG1_MIN_Q 2
-					#define MPEG1_MAX_Q 20
+					#define MPEG1_MAX_Q 28
+					if(nq<MPEG1_MIN_Q) nq=MPEG1_MIN_Q;
+					if(nq>MPEG1_MAX_Q) nq=MPEG1_MAX_Q;
 
-					if(nq<MPEG1_MIN_Q)
-					{
-							nq=MPEG1_MIN_Q;
-					}
-					if(nq>MPEG1_MAX_Q)
-					{
-							nq=MPEG1_MAX_Q;
-					}
 			     		//printf("asked :%d ",nq);
 					*flags=	(nq<<16)+nf; // ugly but help to keep interface
-                                	if(!_codec->encode(_vbuffer,		out,len,flags)) return 0;
-//#define ALLOW_PADDING
-
+                                	if(!_codec->encode(_vbuffer,out,len,flags)) return 0;
 					if(!*len)
 					{
 						printf("Skipping delay\n");
 						return 1;
 					}
-#ifdef ALLOW_PADDING					
-					if(vbrstate.underflow_warning)
 					{
-						uint32_t padding;
-							padding=(vbrstate.underflow_warning*1000)/_fps;
-
-						printf(" underflow detected ...adding : %lu bytes at frame %lu\n",
-									padding,frame);
-						memset(_vbuffer+*len,0,padding);
-						// we give the size before padding to Xvid 2 pass engine
-						// as else it will make it believe we got it all wrong
-						// since the bitrate is low and it happens seldom it is safe
-						// It may double up the effectice padding but
-						// with such low value it should be harmless
-						updateStats(*len);
-						*len+=padding;
-
-					}
-					else
-#endif
-					{
-                       				updateStats(*len);
+					 myENC_RESULT enc;
+                                		_codec->getResult((void *)&enc);
+						switch(*flags)
+						{
+							case AVI_KEY_FRAME: f=RF_I;break;
+							case AVI_B_FRAME: f=RF_B;break;
+							case 0: f=RF_P;break;
+							default: ADM_assert(0);
+						
+						}
+						_xrc->logPass2(enc.out_quantizer,f,*len);
 					}
                              		
 					return 1;
@@ -248,18 +240,6 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 				ffmpegEncoderCQ *cdec=NULL;
 						if(_use_xvid_ratecontrol)
 						{
-							if(0>  vbrSetDefaults(&vbrstate)) 
-								return 0;
-	       						vbrstate.fps=info->fps1000/1000.;
-							_state = enc_Pass1;
-							printf("\n ffmpeg dual size: %lu",_param.finalsize);
-							setMatrix();
-							cdec = new ffmpegEncoderCQ (_w, _h,_id); // Pass1
-							
-							FFcodecSetting tmp;
-							memcpy(&tmp,&_settings,sizeof(_settings));
-							tmp.maxBitrate=tmp.minBitrate=tmp.bufferSize=0;
-			    				cdec->setConfig(&tmp);
 							{
 							char dummy[strlen(_logname)+10];
 							strcpy(dummy,_logname);
@@ -267,9 +247,21 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 							
 							cdec->setLogFile(dummy);
 							}
+							_xrc=new ADM_newXvidRcVBV(_fps,_logname);
+							
+							_state = enc_Pass1;
+							printf("\n ffmpeg dual size: %lu MB, using xvid rc",
+								_param.finalsize>>10);
+							setMatrix();
+							cdec = new ffmpegEncoderCQ (_w, _h,_id); // Pass1
+							
+							FFcodecSetting tmp;
+							memcpy(&tmp,&_settings,sizeof(_settings));
+							tmp.maxBitrate=tmp.minBitrate=tmp.bufferSize=0;
+			    				cdec->setConfig(&tmp);
+							
 							cdec->init (FIRST_PASS_QUANTIZER,_fps,1);
 							_codec=cdec;
-									
 						}
 						else
 						{
@@ -310,13 +302,8 @@ uint8_t EncoderFFMPEGMpeg1::startPass1 (void)
   if(_use_xvid_ratecontrol)
   {
   	printf("Using Xvid 2 pass rate control (%s)\n",_logname);
-	vbrstate.mode=VBR_MODE_2PASS_1;
-	vbrstate.desired_size=_param.finalsize*1024*1024;
-	vbrstate.debug=0;
-	vbrstate.filename=_logname; //XvidInternal2pass_statfile;	
- 	if(0>   vbrInit(&vbrstate))             
-		return 0;
-	
+	_xrc->startPass1();
+
   }
   return 1;
 }
@@ -350,10 +337,12 @@ uint8_t EncoderFFMPEGMpeg1::stop (void)
   	{
 		if(  _state == enc_Pass1 || _state ==enc_Pass2)
 		{
-			if(_state== enc_Pass1 && _pass1Done)
-					vbrFinish(&vbrstate);
-			_state=enc_Invalid;
-			
+			if(_xrc)
+				{
+					delete _xrc;
+					_xrc=NULL;
+				}	
+							
 		}
 	}
 
@@ -370,6 +359,7 @@ uint32_t avg_bitrate;
 
    float db,ti;
 
+   	
    	db= _param.finalsize;
 	db=db*1024.*1024.*8.;
 	// now deb is in Bits
@@ -414,37 +404,9 @@ uint32_t avg_bitrate;
   	return 1;
   }
   // If we use Xvid...
-	if(vbrstate.mode==VBR_MODE_2PASS_1)
-		vbrFinish(&vbrstate);// ???
+  	_xrc->startPass2(_param.finalsize,_totalframe);
+	_xrc->setVBVInfo(_settings.maxBitrate,_settings.minBitrate,_settings.bufferSize);
 	
-  	memset(&vbrstate,0,sizeof(vbrstate));
-	if(0>  vbrSetDefaults(&vbrstate)) 
-			return 0;
-	vbrstate.fps=_fps/1000.;
-  	vbrstate.desired_bitrate= avg_bitrate;
-	vbrstate.vbv_buffer_size=_settings.bufferSize*8*1024;
-  	vbrstate.debug=0;
- 	vbrstate.filename=_logname;//XvidInternal2pass_statfile;
-	vbrstate.mode=VBR_MODE_2PASS_2;
-	vbrstate.maxAllowedBitrate=_settings.maxBitrate;
-	//
-	vbrstate.curve_compression_high=25, // curve_compression_high;
-	vbrstate.curve_compression_low=10, // curve_compression_low;
-	vbrstate.bitrate_payback_delay=240;
-	vbrstate.use_alt_curve=1; // use_alt_curve;
-	vbrstate.alt_curve_type=2; //VBR_ALT_CURVE_LINEAR, //int alt_curve_type;
-	vbrstate.alt_curve_low_dist=90; // alt_curve_low_dist;
-	vbrstate.alt_curve_high_dist=500; // alt_curve_high_dist;
-	vbrstate.alt_curve_min_rel_qual=50; // alt_curve_min_rel_qual;
-	
-	
-	//
-	
-  	if(vbrInit(&vbrstate)<0)
-	{
-		printf("*** Error in Xvid ratecontrol ****\n**************\n****************\n*********\n");
-	
-	}
  	_codec= new  ffmpegEncoderVBRExternal (_w, _h,_id); //0 -> external 1 -> internal (_w, _h);
 	
   	FFcodecSetting tmp;
@@ -465,18 +427,8 @@ uint32_t avg_bitrate;
 uint8_t  EncoderFFMPEGMpeg1::updateStats (uint32_t len)
 {
 
-	 myENC_RESULT enc;
-
-      	 _codec->getResult(&enc);
-	//printf("Resuld :%d\n",enc.is_key_frame);
-	vbrUpdate(&vbrstate,
-					enc.out_quantizer,
-					enc.is_key_frame,
-					0,
-					len,
-					0,0,0);
-
-			return 1;
+	ADM_assert(0);
+	return 1;
 }
 
 //

@@ -20,11 +20,7 @@
 #include "avi_vars.h"
 #include <ADM_assert.h>
 #include "ADM_xvidratectl/ADM_ratecontrol.h"
-extern "C" {
-#include "ADM_encoder/xvid_vbr.h"
-};
-
-static vbr_control_t mpegvbr;
+//static vbr_control_t mpegvbr;
 
 ADM_ratecontrol::ADM_ratecontrol(uint32_t fps1000, char *logname)
 {
@@ -33,6 +29,12 @@ ADM_ratecontrol::ADM_ratecontrol(uint32_t fps1000, char *logname)
 	_state=RS_IDLE;
 	_nbFrames++;
 }
+#if 0 // RMED
+extern "C" {
+#include "ADM_encoder/xvid_vbr.h"
+};
+
+
 ADM_oldXvidRc::~ADM_oldXvidRc()
 {
 	if(_state!=RS_IDLE)
@@ -162,4 +164,7 @@ int intra;
 
 
 }
+#endif
+
 //EOF
+

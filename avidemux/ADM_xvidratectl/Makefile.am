@@ -5,7 +5,8 @@ INCLUDES = $(all_includes)
 
 libADM_xvidratectl_a_METASOURCES = AUTO
 
-libADM_xvidratectl_a_SOURCES = ADM_xvidratectl.cpp ADM_oldxvid.cpp
+libADM_xvidratectl_a_SOURCES = ADM_xvidratectl.cpp ADM_oldxvid.cpp \
+	ADM_xvidratectlVBV.cpp
 
 
 EXTRA_DIST = 
