@@ -710,9 +710,13 @@ void MPV_common_init_mmx(MpegEncContext *s)
 	}
 
         if(dct_algo==FF_DCT_AUTO || dct_algo==FF_DCT_MMX){
+	/* MEANX*/
+#if 0	
             if(mm_flags & MM_SSE2){
                 s->dct_quantize= dct_quantize_SSE2;
-            } else if(mm_flags & MM_MMXEXT){
+            } else 
+#endif	    
+	    if(mm_flags & MM_MMXEXT){
                 s->dct_quantize= dct_quantize_MMX2;
             } else {
                 s->dct_quantize= dct_quantize_MMX;
