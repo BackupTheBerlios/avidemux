@@ -850,7 +850,7 @@ dnl __________ conditional ___________________
 AM_CONDITIONAL(HAVE_NASM, test "x$have_nasm" = "xyes")
 AM_CONDITIONAL(BUILD_MMX, test "x$use_mmx" = "x1")
 
-AM_CONDITIONAL(BUILD_MMX_COMPATIBLE, test "x$use_mmx" = "x1" || test "x$have_amd64"="xyes")
+AM_CONDITIONAL(BUILD_MMX_COMPATIBLE, test "x$use_mmx" = "x1" || test "x$have_amd64" = "xyes")
 
 AM_CONDITIONAL(BUILD_DARWIN, test "x$have_darwin" = "xyes")
 AM_CONDITIONAL(BUILD_PPC, test "x$have_ppc" = "xyes")
