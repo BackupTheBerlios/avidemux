@@ -65,11 +65,11 @@ int i;
 }
 //--------------------------------------------------------	
 ADMVideoStabilize::ADMVideoStabilize(AVDMGenericVideoStream *in,CONFcouple *couples)
-                  :ADMVideoCached(in,couples)
 {
   //uint32_t frame;
   _uncompressed=NULL;
-   
+  _in=in;
+  memcpy(&_info,in->getInfo(),sizeof(_info)); 
  
   _info.encoding=1;
   if(couples)
@@ -82,7 +82,14 @@ ADMVideoStabilize::ADMVideoStabilize(AVDMGenericVideoStream *in,CONFcouple *coup
 			_param=NEW( uint32_t);
 			*_param=30;
 	}
+	vidCache=new VideoCache(5,_in);
  
+}
+ADMVideoStabilize::~ADMVideoStabilize()
+{
+ 
+ 	DELETE(_param);
+	if(vidCache) delete vidCache;
 }
 
 
@@ -122,29 +129,17 @@ uint8_t										*_current;
 			
 			uvlen=    _info.width*_info.height;
 			*len=uvlen+(uvlen>>1);
-		  if(frame> _info.nb_frames-1) return 0;
+		    if(frame> _info.nb_frames-1) return 0;
+			_current=vidCache->getImage(frame);
+			assert(_current);
 			if(!frame || (frame==_info.nb_frames-1))
 			{
-				 if(!_in->getFrameNumberNoAlloc(frame, &dlen,_buffer[0],&dflags))
-				 {
-					 	return 0;
-					}
-				 _bufnum[0]=frame;
-					memcpy(data,_buffer[0],*len);
+					memcpy(data,_current,*len);
+					vidCache->unlockAll();
 					return 1;
 			}	 
-				assert(frame<_info.nb_frames);   
-			// read uncompressed frame
-			switch(fillCache(frame))
-			{
-					case 0: return 0;
-				  case 1: memcpy(data,_buffer[index_c],*len);return 1;break;
-				  case 2: break;
-				  default: assert(0); break;				
-			}
-   		_previous=_buffer[index_p];		
-   		_current=_buffer[index_c];
-   		_next=_buffer[index_n];          
+   		_previous=vidCache->getImage(frame-1);		
+   		_next=vidCache->getImage(frame+1);
            // for u & v , no action -> copy it as is
            memcpy(data+uvlen,_current+uvlen,uvlen>>1);
                							   				
@@ -195,12 +190,8 @@ uint8_t										*_current;
 			innext+=2;
 			inprev+=2;
 		}
+		vidCache->unlockAll();
 		return 1;	
-}
-ADMVideoStabilize::~ADMVideoStabilize()
-{
- 
- 	DELETE(_param);
 }
 
 

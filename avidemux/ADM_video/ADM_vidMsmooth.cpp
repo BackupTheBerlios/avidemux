@@ -52,6 +52,13 @@
 
 #include "ADM_toolkit/ADM_cpuCap.h"
 
+#ifdef HAVE_ALTIVEC_H
+#include "altivec.h"
+#endif
+#if 0
+#undef aprintf
+#define aprintf printf
+#endif
 #define GETFRAME(g, fp) \
 { \
 	int GETFRAMEf; \
@@ -74,7 +81,10 @@ extern void 	BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
 extern  void 	DrawString(uint8_t *dst, int x, int y, const char *s);
 extern  void 	DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
-
+static void Blur_C(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h) ;
+#ifdef HAVE_ALTIVEC
+void Blur_Altivec(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h);
+#endif
 
 class Msmooth : public AVDMGenericVideoStream
 {
@@ -367,6 +377,126 @@ done:
 	return 1;
 }
 
+
+#ifdef HAVE_ALTIVEC
+#define vecbyte vector unsigned char
+#define vect16 vector unsigned short
+
+#define LOAD_ALIGN(dest,src) \
+		dest = (vect16)vec_ld(0, src); 
+
+//______________________
+void Blur_Altivec(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h)
+{
+uint8_t *srcp,*srcpn,*srcpp;
+uint8_t *workp;
+uint32_t x,y;
+
+    vect16 pp,pc,pn,res,res2;
+	vect16 rp,rc,rn,resl;
+	vect16 zero,deux;
+	
+	uint32_t off;
+	vector unsigned char MSQ,mask;
+	zero=vec_splat_u16(0);
+	deux=vec_splat_u16(2);
+
+	srcpp = in;
+	srcp  = srcpp + w;
+	srcpn = srcp + w;
+	workp = out + w;
+	for (y = 1; y < h - 1; y++)
+	{
+		for (x = 0; x < (w>>4); x++)
+		{
+			off=x<<4;
+			LOAD_ALIGN(pp,srcpp+off);
+			LOAD_ALIGN(pc,srcp+off);
+			LOAD_ALIGN(pn,srcpn+off);
+			
+			aprintf("sn %vd\n",pn); 
+			aprintf("sp %vd\n",pp);
+			aprintf("sc %vd\n",pc);
+		
+			
+			rp=(vect16)vec_mergel( (vecbyte)zero,(vecbyte)pp);
+			rn=(vect16)vec_mergel( (vecbyte)zero,(vecbyte)pn);
+			rc=(vect16)vec_mergel( (vecbyte)zero,(vecbyte)pc);
+			
+			aprintf("rn %vd\n",rn); 
+			aprintf("rp %vd\n",rp);
+			aprintf("rc %vd\n",rc);
+		
+			res=vec_add(rp,rc);
+			res2=vec_add(rc,rn);
+			
+			aprintf("re %vd\n",res);
+			aprintf("r2 %vd\n",res2);
+			
+			res=vec_add(res,res2);
+			
+			resl=vec_sr(res,deux);
+			aprintf("rS %vd\n",res);
+			aprintf("r2 %vd\n",res2);
+			aprintf("rl %vd\n",resl);
+									
+			pp=(vect16)vec_mergeh( (vecbyte)zero,(vecbyte)pp);
+			pn=(vect16)vec_mergeh( (vecbyte)zero,(vecbyte)pn);
+			pc=(vect16)vec_mergeh( (vecbyte)zero,(vecbyte)pc);
+			
+			res=vec_add(pp,pc);
+			res2=vec_add(pc,pn);
+			res=vec_add(res,res2);
+			res=vec_sr(res,deux);
+			
+			aprintf("rH %vd\n",res);
+			
+			res=(vect16)vec_pack(res,resl);
+			aprintf("rF %vd\n",res);
+			
+			vec_st((vecbyte)res,0,(vector unsigned char *)(workp+off));
+			
+		}
+		srcpp += w;
+        srcp += w;
+        srcpn += w;
+        workp += w;
+    }
+	// Do it at the end as it may have been scratched
+	// due to 16 byte alignment
+	memcpy(out, in, w);
+	memcpy(out + (h-1)*w, in + (h-1)*w, w);
+	
+}
+#endif
+//______________________
+void Blur_C(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h)
+{
+uint8_t *srcp,*srcpn,*srcpp;
+uint8_t *workp;
+uint32_t x,y;
+	srcpp = in;
+	srcp  = srcpp + w;
+	srcpn = srcp + w;
+	workp = out + w;
+	memcpy(out, in, w);
+	memcpy(out + (h-1)*w, in + (h-1)*w, w);
+	for (y = 1; y < h - 1; y++)
+	{
+		workp[0] = srcp[0];
+		workp[w-1] = srcp[w-1];
+        for (x = 1; x < w - 1; x++)
+		{
+			workp[x] = (srcpp[x] + srcp[x]*2 + srcpn[x]) >>2;
+		}
+        srcpp += w;
+        srcp += w;
+        srcpn += w;
+        workp += w;
+    }
+
+}
+//_______________________________
 void  Msmooth::EdgeMaskYV12(const unsigned char *srcp, unsigned char *blurp, unsigned char *workp, unsigned char *maskp,
                         int row_size, int height, int src_pitch, int blur_pitch)
 {
@@ -382,53 +512,23 @@ void  Msmooth::EdgeMaskYV12(const unsigned char *srcp, unsigned char *blurp, uns
 	unsigned char *workpn;
 
 	unsigned char *maskp_saved = maskp;
-
 	int x, y;
 	int y1, y2, y3, y4;
 
 	/* Blur the source image prior to detail detection. */
-	srcpp = srcp_saved;
-	srcp  = srcpp + src_pitch;
-	srcpn = srcp + src_pitch;
-	workp = workp_saved + blur_pitch;
-	memcpy(workp_saved, srcp_saved, row_size);
-	memcpy(workp_saved + (height-1)*blur_pitch, srcp_saved + (height-1)*src_pitch, row_size);
-	for (y = 1; y < height - 1; y++)
-	{
-		workp[0] = srcp[0];
-		workp[row_size-1] = srcp[row_size-1];
-        for (x = 1; x < row_size - 1; x++)
+	#ifdef HAVE_ALTIVEC
+	#define ISALIGNED(x) (!( ((long long)x)&15 ))
+		if( ISALIGNED(srcp) && ISALIGNED(blurp) && ISALIGNED(workp) && ISALIGNED(maskp) && !(src_pitch&15))
 		{
-			workp[x] = (srcpp[x] + srcp[x] + srcpn[x]) / 3;
+			Blur_Altivec((uint8_t *)srcp,(uint8_t *)workp,row_size,height);
+			Blur_Altivec((uint8_t *)workp,(uint8_t *)blurp,row_size,height);
 		}
-        srcpp += src_pitch;
-        srcp += src_pitch;
-        srcpn += src_pitch;
-        workp += blur_pitch;
-    }
-
-	srcp  = srcp_saved + src_pitch;
-	workpp = workp_saved;
-	workp  = workpp + blur_pitch;
-	workpn = workp + blur_pitch;
-	blurp  = blurp_saved + blur_pitch;
-	memcpy(blurp_saved, srcp_saved, row_size);
-	memcpy(blurp_saved + (height-1)*blur_pitch, srcp_saved + (height-1)*src_pitch, row_size);
-	for (y = 1; y < height - 1; y++)
+		else
+	#endif
 	{
-		blurp[0] = srcp[0];
-		blurp[row_size-1] = srcp[row_size-1];
-        for (x = 1; x < row_size - 1; x++)
-		{
-			blurp[x] = (workp[x-1] + workp[x] + workp[x+1]) / 3;
-		}
-        srcp += src_pitch;
-        workpp += blur_pitch;
-        workp += blur_pitch;
-        workpn += blur_pitch;
-        blurp += blur_pitch;
-    }
-
+		Blur_C((uint8_t *)srcp,(uint8_t *)workp,row_size,height);
+		Blur_C((uint8_t *)workp,(uint8_t *)blurp,row_size,height);
+	}
 	/* Diagonal detail detection. */
 	blurp = (unsigned char *) workp_saved;
 	blurpn = blurp + blur_pitch;

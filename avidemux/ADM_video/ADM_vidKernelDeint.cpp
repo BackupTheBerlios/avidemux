@@ -103,9 +103,7 @@ char *ADMVideoKernelDeint::printConf( void )
 
 ADMVideoKernelDeint::~ADMVideoKernelDeint()
 {
- 	delete []_uncompressed;
-	delete []_uncompressed2;
-
+ if(vidCache) delete vidCache;
  	
 }
 
@@ -136,13 +134,10 @@ ADMVideoKernelDeint::~ADMVideoKernelDeint()
 	    _in=in;
 	    
 	   _uncompressed=NULL;
-	   _uncompressed2=NULL;
+
   	    memcpy(&_info,_in->getInfo(),sizeof(_info));
-	    _uncompressed=new uint8_t[3*_info.width*_info.height];	
-	    _uncompressed2=new uint8_t[3*_info.width*_info.height];	
-	    	    
-	   _cacheno1=0xffffffff;
-	   _cacheno2=0xffffffff;
+		vidCache=new VideoCache(4,_in);
+
 
 }
 uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
@@ -155,7 +150,7 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t page=_info.width*_info.height;
 		uint8_t *mysrc=NULL, *myprev=NULL;
 		
-		if(frame>=_info.nb_frames) return 0;
+		if(frame>_info.nb_frames-1) return 0;
 
 
 		
@@ -164,54 +159,10 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 		
 		dst=data;
 		
-		// read uncompressed frame
-		// sequential access
-		if(!frame)
-		{
-			aprintf("First frame\n");
-			if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed2,flags)) return 0;
-			memcpy(_uncompressed,_uncompressed2,(page*3)>>1);
-			_cacheno1=_cacheno2=0;
-			mysrc=_uncompressed;
-			myprev=_uncompressed2;
-		
-		}
-		else
-		{
-		if(_cacheno1==frame_prev)
-			{
-				aprintf("kdeint: Seq access, in cache1\n");
-				myprev=_uncompressed;				
-				if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed2,flags)) return 0;
-				_cacheno2=frame;
-				mysrc=_uncompressed2;
-				
-			}
-		else if(_cacheno2==frame_prev)
-			{	
-				aprintf("kdeint: Seq access, in cache2\n");
-				myprev=_uncompressed2;				
-				if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
-				_cacheno1=frame;
-				mysrc=_uncompressed;
-			}
-			else
-			{
-					
-       				aprintf("kdeint: random access\n");
-				if(!_in->getFrameNumberNoAlloc(frame_prev, len,_uncompressed2,flags)) 
-					return 0;
-				if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) 
-						return 0;					
-				_cacheno1=frame;
-				_cacheno2=frame_prev;
-				
-				mysrc=_uncompressed;
-				myprev=_uncompressed2;
-				
-			}
-				
-		}
+			mysrc=vidCache->getImage(frame);
+			myprev=vidCache->getImage(frame_prev);
+			assert(mysrc);
+			assert(myprev);
 		// Now go to kernel deint code
 			
     const uint8_t *srcp, *prvp, *prvpp, *prvpn, *prvppp, *prvpnn, *prvp4p, *prvp4n;
@@ -273,6 +224,7 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 				
 			}
 			memcpy(dst,src,(page*3)>>1);
+			vidCache->unlockAll();
 			return 1;
 		}
 		else
@@ -427,7 +379,7 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 			dstp  += 2*dst_pitch;
 		}
 	}
-
+	vidCache->unlockAll();
 	return 1;
 }
 

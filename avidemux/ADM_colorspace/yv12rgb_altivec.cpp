@@ -14,6 +14,8 @@ S
     begin                : Wed March 13 2004
     copyright            : (C) 2003 by mean
     email                : fixounet@free.fr
+	
+- correct Y by - 16
  ***************************************************************************/
 
 /***************************************************************************
@@ -58,24 +60,16 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 // A pack of constant vectors we will use later
 // we more or less rely on gcc to have good register allocation
 //________________________________________________________________
- 
-	 
-	
-const vector unsigned char permY= (vector unsigned char)
-		(  0x10,   0,0x10,  1, 0x10, 2, 0x10, 3, 0x10,   
-		4,  0x10,  5,  0x10,  6,  0x10,  7  );
-const vector unsigned char permC=(vector unsigned char)(
-					0x10,0,0x10,0x10,
-					0x10,1,0x10,0x10,
-					0x10,2,0x10,0x10,
-					0x10,3,0x10,0x10);
-const  vector signed short multy=(vector signed short)
+ const  vector signed short multy=(vector signed short)
 		(MULY,MULY,MULY,MULY, MULY,MULY,MULY,MULY);
 const  vector signed short multRu=(vector signed short)(MULRU,0,MULRU,0, MULRU,0,MULRU,0);
 const  vector signed short multBv=(vector signed short)(MULBV,0,MULBV,0, MULBV,0,MULBV,0);
 const  vector signed short multGu=(vector signed short)(MULGu,0,MULGu,0, MULGu,0,MULGu,0);
 const  vector signed short multGv=(vector signed short)(MULGV,0,MULGV,0, MULGV,0,MULGV,0);
-const  vector signed short conv2Signed=(vector signed short)(-128,-128,-128,-128,  									-128,-128,-128,-128);	
+const  vector signed short conv2Signed=(vector signed short)(-128,-128,-128,-128,-128,-128,-128,-128);	
+const  vector unsigned char conv16=(vector unsigned char)(16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16);	
+
+
 const vecbyte maskR=(vecbyte)(2,0x12,6,0x16,10,0x1a,14,0x1e,  0,0,0,0,0,0,0,0);
 #define MXF 0xff00
 const vector signed int maxFF=(vector signed int)(MXF,MXF,MXF,MXF);
@@ -135,9 +129,12 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		LOAD_ALIGN(srcy,ptr_y);
 		LOAD_ALIGN(srcy2,ptr_y+w);
 		
+		srcy=vec_subs(srcy,conv16);
+		srcy2=vec_subs(srcy2,conv16);
+		
 		nullVect=vec_splat_u8(0);
-		sy16=(vector signed short)vec_perm(srcy,nullVect,permY);	
-		sz16=(vector signed short)vec_perm(srcy2,nullVect,permY);	
+		sy16=(vector signed short)vec_mergeh(nullVect,srcy);	
+		sz16=(vector signed short)vec_mergeh(nullVect,srcy2);	
 		aprintf("sy16:%vd\n",sy16);
 		// multiply by scaling factor for y
 		sy16e=vec_mule(sy16,multy);
@@ -152,13 +149,25 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		//--------- get u, convert to long
 		LOAD_ALIGN(srcu,ptr_u);
 		aprintf("su8:%vd\n",srcu);
+		#if 0
 		su16=(vector signed short )vec_perm(srcu,nullVect,permC);	
 		su16=vec_add(su16,conv2Signed);
+		#else
+		srcu=(vecbyte)vec_mergeh(nullVect,srcu);
+		su16=(vector signed short)vec_mergeh( (vector signed short)srcu,(vector signed short)nullVect);
+		su16=vec_add(su16,conv2Signed);
+		#endif
 		aprintf("su16:%vd\n",su16);
 		//--------- get v, convert to long
 		LOAD_ALIGN(srcv,ptr_v);
+		#if 0
 		sv16=(vector signed short )vec_perm(srcv,nullVect,permC);	
 		sv16=vec_add(sv16,conv2Signed);
+		#else
+		srcv=(vecbyte)vec_mergeh(nullVect,srcv);
+		sv16=(vector signed short)vec_mergeh((vecshort)srcv,(vecshort)nullVect);
+		sv16=vec_add(sv16,conv2Signed);
+		#endif
 		aprintf("sv32:%vd\n",sv16);
 
 		// multiply to get Ru'

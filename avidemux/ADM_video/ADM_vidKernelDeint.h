@@ -2,6 +2,7 @@
 #ifndef ADM_KERNELDEINT
 #define ADM_KERNELDEINT
 
+#include "ADM_video/ADM_cache.h"
 typedef struct  KERNEL_CONF
 {
 	uint32_t		order, threshold;
@@ -16,9 +17,7 @@ class  ADMVideoKernelDeint:public AVDMGenericVideoStream
         virtual char 		*printConf(void) ;
 	KERNEL_CONF		*_param;
         int			 debug;
-	uint8_t			*_uncompressed2;
-	uint32_t		_cacheno1;
-	uint32_t		_cacheno2;
+	VideoCache		*vidCache;
 	   
 
  public:

@@ -218,7 +218,7 @@ UInt32			kFramesPerSlice=512;
 	streamFormat.mSampleRate = fq;		
 	streamFormat.mFormatID = kAudioFormatLinearPCM;	
 	streamFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger 
-								| kLinearPCMFormatFlagIsBigEndian
+	//							| kLinearPCMFormatFlagIsBigEndian
 								| kLinearPCMFormatFlagIsPacked;
 
 	streamFormat.mBytesPerPacket = channel * sizeof (UInt16);	

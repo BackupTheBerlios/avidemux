@@ -47,6 +47,8 @@ static uint8_t sdl_running=0;
 static SDL_Overlay *sdl_overlay=NULL;
 static SDL_Surface *sdl_display=NULL;
 static SDL_Rect disp;
+
+#define FORCEYV12
 //#define TEST_YU2 1
 
 extern void YV12_422( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h);
@@ -83,11 +85,11 @@ int flags;
 	
 	disp.w=w;
 	disp.h=h;
-	disp.x=1;
-	disp.y=1;
+	disp.x=0;
+	disp.y=0;
 
 	/* Hack to get SDL to use GTK window, ugly but works */
-#if 1
+#if !defined(CONFIG_DARWIN)
 	{ char SDL_windowhack[32];
 		sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",
 			GDK_WINDOW_XWINDOW(window->window));
@@ -100,7 +102,7 @@ int flags;
         	return 0;
     	  }
 	sdl_running=1;
-	flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_NOFRAME;
+	flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE ;//| SDL_NOFRAME;
   	bpp= SDL_VideoModeOK( w, h,  16, flags );
 	sdl_display= SDL_SetVideoMode( w, h,  bpp, flags );	
 	if(!sdl_display)
@@ -113,8 +115,8 @@ int flags;
 	
 	
 	//_______________________________________________________
-	sdl_overlay=SDL_CreateYUVOverlay(w,h,
-#if defined(CONFIG_DARWIN)|| defined(TEST_YU2)	
+	sdl_overlay=SDL_CreateYUVOverlay((w),(h),
+#if (defined(CONFIG_DARWIN)|| defined(TEST_YU2)	) && !defined(FORCEYV12)
 		SDL_YUY2_OVERLAY
 #else		
 		SDL_YV12_OVERLAY
@@ -126,33 +128,15 @@ int flags;
 		printf("Cannot create SDL overlay\n");
 		return 0;
 	}
-#if 0	// Does not work...
-	// Put the window on top of the previous one	
-	SDL_SysWMinfo info;
-	SDL_VERSION(&(info.version));
-    	if ( -1 == SDL_GetWMInfo(&info) ) 
-	{
-        	printf("Error getting WM info: %s\n", SDL_GetError());
-        	end();
-		return 0;
-    	}	
-	// 
-	 GdkWindow *gdkwin;
-	 Display *sdl_display;
-	 Window parent; 
-	 
-	  gdkwin = gtk_widget_get_parent_window(window);
-    	  sdl_display = GDK_WINDOW_XDISPLAY(gdkwin);
-	  
-    	  parent = GDK_WINDOW_XWINDOW(GTK_WIDGET(window)->window);
-	  //parent = GDK_WINDOW_XWINDOW(gdkwin);
-	                      
-          XReparentWindow(sdl_display,
-                        info.info.x11.wmwindow,
-                        parent,
-                        0,0);
-#endif		
+	
 	printf("SDL_init ok, type is : %d,planes :%d\n",sdl_overlay->hw_overlay,sdl_overlay->planes);
+	if(!sdl_overlay->hw_overlay)
+	{
+		printf("** HW Acceleration disabled **\n");
+	#ifdef CONFIG_DARWIN
+		printf("** Darwin**\n");
+	#endif
+	}
 	return 1;
 }
 uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h)
@@ -160,16 +144,18 @@ uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h)
 
 	assert(sdl_overlay);
 	SDL_LockYUVOverlay(sdl_overlay);	
-	/*sdl_overlay->pixels[0]=ptr;
-	sdl_overlay->pixels[1]=ptr+(w*h);
-	sdl_overlay->pixels[2]=ptr+((w*h*5)>>2);*/
-#if defined(CONFIG_DARWIN) || defined(TEST_YU2)	
+	
+#if (defined(CONFIG_DARWIN) || defined(TEST_YU2)	)&&!defined(FORCEYV12)
 	YV12_422( ptr, sdl_overlay->pixels[0],   w,  h);
 #else
 	memcpy(sdl_overlay->pixels[0],ptr,w*h);
 	memcpy(sdl_overlay->pixels[1],ptr+h*w,(w*h)>>2);
 	memcpy(sdl_overlay->pixels[2],ptr+((w*h*5)>>2),(w*h)>>2);
 #endif		
+	disp.w=w;
+	disp.h=h;
+	disp.x=0;
+	disp.y=0;
 	SDL_UnlockYUVOverlay(sdl_overlay);
 	SDL_DisplayYUVOverlay(sdl_overlay,&disp);
 	//printf("*\n");

@@ -24,12 +24,9 @@
 #include "config.h"
 
 #include "ADM_lavcodec.h"
-extern "C"
-{
-	#include "adm_lavcodec/dsputil.h"
-}
 #include "ADM_library/default.h"
 
+#include "ADM_toolkit/ADM_cpuCap.h"
 #include "ADM_pp.h"
 
 
@@ -64,9 +61,9 @@ char stringFQ[60];
 		uint32_t ppCaps=0;
 		
 #ifdef USE_MMX	
-		uint32_t  mm=mm_support();	
-	#define ADD(x,y) if( mm & MM_##x) ppCaps|=PP_CPU_CAPS_##y;
-		//if(mm& MM_MMX) ppCAPS|=PP_CPU_CAPS_MMX;
+		
+	#define ADD(x,y) if( CpuCaps::has##x()) ppCaps|=PP_CPU_CAPS_##y;
+		
 		ADD(MMX,MMX);		
 		ADD(3DNOW,3DNOW);
 		ADD(MMXEXT,MMX2);

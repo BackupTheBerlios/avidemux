@@ -167,28 +167,36 @@ void YV12_422_Altivec( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h)
 uint8_t *y,*y2,*u,*v,*out2;
 uint32_t dx,dy;
 vector unsigned char vecy,vecy2,vecu,vecv,MSQ,mask;
-vector unsigned char vecout,vecout2;
 vector unsigned char zero;
 
 #define VEC16 vector unsigned short
 #define VEC8 vector unsigned char
+#define VECS8 vector signed char
+	
 	out2=out+w*2;
 	y=in;
 	y2=in+w;
 	u=in+w*h;
 	v=in+((w*h*5)>>2);
 	zero=vec_splat_u8(0);
+	if( (long int)out & 15)
+	{
+		printf("Alignment issue in yv12 to 422 altivec!\n");
+	}
 	for(dy=h>>1;dy>0;dy--)
 	{
 		// We do 4 pix in a raw
 		for(dx=w>>3;dx>0;dx--)
 		{
 			LOAD_ALIGN(vecy,y); // expand
-			LOAD_ALIGN(vecy2,y); // expand
-			LOAD_ALIGN(vecu,u); // expand
+			LOAD_ALIGN(vecy2,y2); // expand
+			LOAD_ALIGN(vecu,v); // expand
 			LOAD_ALIGN(vecv,u); // expand
 			
 			vecu=(VEC8)vec_mergeh(vecu,vecv);
+			
+			
+			
 			vecy=(VEC8)vec_mergeh(vecy,vecu);
 			vecy2=(VEC8)vec_mergeh(vecy2,vecu);
 			// Store

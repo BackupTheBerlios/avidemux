@@ -19,7 +19,7 @@
 //----------------------
 //----------------------
 //----------------------
-#if (defined( HAVE_LIBESD) && defined(HAVE_ESD_H)) || defined(OSS_SUPPORT) || defined (USE_ARTS)
+#if (defined( HAVE_LIBESD) && defined(HAVE_ESD_H)) || defined(OSS_SUPPORT) || defined (USE_ARTS) || defined(USE_SDL) || defined(CONFIG_DARWIN)
 #define HAVE_AUDIO
 #endif
 //----------------------

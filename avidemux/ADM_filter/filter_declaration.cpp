@@ -111,6 +111,7 @@ printf(  "*********************\n");
 	REGISTER("Mplayer Denoise3D",VF_MPLLQD3D,1,MPD3Dlow_create);
 
 	REGISTER("Mplayer HQDenoise3D",VF_MPLHQD3D,1,MPD3D_create);
+	REGISTER("Msmooth by Donald Graft",VF_MSMOOTH,1,create_msmooth);
 	REGISTER("Forced PostProcessing",VF_FORCEDPP,1,forcedpp_create);
 	REGISTER("Soften",VF_SOFTEN,1,soften_create);
 #ifdef USE_FREETYPE   
