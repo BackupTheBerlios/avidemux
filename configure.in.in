@@ -168,6 +168,8 @@ have_amd64=no
 have_sdl=no;
 have_faad=yes
 have_faac=yes
+have_ppc=no
+
 dnl _________________ malloc.h ___________________
 
 AC_CHECK_HEADERS(malloc.h,have_malloc_h=yes)
@@ -725,7 +727,7 @@ case $adm_cpu in
 			else
 				ASFLAGS="-f win32 -DPREFIX"
 			fi
-			CCASFLAGS=$ASFLAGS
+			CCASFLAGS=$ASFLAGS			
 			echo "TARGET_MMX_NASM=yes" >> adm_lavcodec/config.cpu
 			AC_DEFINE(HAVE_ASM_NASM,1,"Use MMX acceleration")
 			echo "nasm found : $NASM_CONFIG"
@@ -760,12 +762,13 @@ case $adm_cpu in
 	ppc)
 		have_little_endian=no;
 		LMPG_OPT="";
+		have_ppc=yes
 		touch adm_lavcodec/config.cpu
 		echo "TARGET_PPC=yes" > adm_lavcodec/config.cpu
 		dnl we assume to be on linux-ish system here
 		AC_DEFINE(restrict,__restrict__,[roundup function])
 		AC_DEFINE(ADM_BIG_ENDIAN,1,[Big endian cpu  sparc or powerpc])
-		AC_DEFINE(ARCH_POWERPC,1,[Enable powerpc optim])
+		AC_DEFINE(ARCH_POWERPC,1,[Enable powerpc optim])		
 		AC_ARG_ENABLE(altivec,[  --enable-altivec           enable  altivec acceleration(ppc)],have_altivec=yes)
 		AC_DEFINE(WORDS_BIGENDIAN,1,[Big endian cpu  sparc or powerpc]);;
 
@@ -775,7 +778,7 @@ case $adm_cpu in
 			powerpc)
 			echo "Power Macintosh (darwin ??)"
 			have_darwin=yes
-			have_little_endian=no;
+			have_little_endian=no
   			AC_DEFINE(ADM_BSD_FAMILY,1,[BSD os specific ifdef])
 			LMPG_OPT="";
 			LDFLAGS="$LDFLAGS  \
@@ -789,7 +792,8 @@ case $adm_cpu in
 			AC_DEFINE(CONFIG_DARWIN,0,[Say to ffmpeg we are using darwin macOsX])
 			AC_DEFINE(WORDS_BIGENDIAN,1,[Big endian cpu  sparc or powerpc])
 			AC_ARG_ENABLE(altivec,[  --enable-altivec           enable  altivec acceleration(ppc)],have_altivec=yes)
-			AC_DEFINE(ARCH_POWERPC,1,[Enable powerpc optim]);;
+			AC_DEFINE(ARCH_POWERPC,1,[Enable powerpc optim])
+			have_ppc=yes;;
 			*)
 			have_little_endian=no;
 			LMPG_OPT="";
@@ -803,7 +807,7 @@ AC_MSG_CHECKING(for Altivec )
 AC_MSG_RESULT($have_altivec)
 if test "x$have_altivec" = "xyes"; then
 		echo "Altivec enabled";
-		echo "TARGET_ALTIVEC=yes" >> adm_lavcodec/config.cpu		
+		echo "TARGET_ALTIVEC=yes" >> adm_lavcodec/config.cpu
 		AC_DEFINE(HAVE_ALTIVEC,1,[Enable altivec by default])
 		if test "x$have_darwin" = "xno"; then
 			AC_DEFINE(HAVE_ALTIVEC_H,1,[Enable altivec by default])
@@ -835,7 +839,13 @@ dnl ________________NASM__________________
 AC_SUBST(AS)
 AC_SUBST(AS_FLAGS)
 AM_PROG_AS
+dnl __________ conditional ___________________
+
 AM_CONDITIONAL(HAVE_NASM, test "x$have_nasm" = "xyes")
+AM_CONDITIONAL(BUILD_MMX, test "x$use_mmx" = "x1")
+AM_CONDITIONAL(BUILD_DARWIN, test "x$have_darwin" = "xyes")
+AM_CONDITIONAL(BUILD_PPC, test "x$have_ppc" = "xyes")
+AM_CONDITIONAL(BUILD_ALTIVEC, test "x$have_altivec" = "xyes")
 
 dnl ____________________BSD famiy patch____________________________
 AC_TRY_COMPILE([
