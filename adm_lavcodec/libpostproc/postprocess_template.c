@@ -472,6 +472,169 @@ static inline void RENAME(vertRK1Filter)(uint8_t *src, int stride, int QP)
 }
 #endif
 
+#ifdef HAVE_ALTIVEC
+//MEANX
+static always_inline void vertX1Filter_altivec_template(int aligned,uint8_t *src, int stride, PPContext *co)
+{
+	//MEANX: Altivec version including clipping
+	//
+
+int16_t __attribute__ ((aligned(16))) v16[8];
+				
+
+#define VEC16 vector unsigned short
+#define VECS16 vector signed short
+#define VEC8 vector unsigned char
+#define VECS8 vector signed char
+#define VECS32 vector signed int
+
+
+#define LOAD_ALIGNED(dest,src) \
+		dest=(VEC8)vec_ld(0,(unsigned char* )src);
+
+#define LOAD_UNALIGNED(dest,src) \
+		MSQ=vec_ld(0, (unsigned char *)src);	\
+		LSQ= vec_ld(16, (unsigned char *)src);	\
+		dest=(VEC8)vec_perm(MSQ,LSQ, vec_lvsl(0, (unsigned char *)src));
+		
+#define STORE_ALIGNED(target,src)\
+	vec_st(src,0,target) ;
+			
+#define STORE_UNALIGNED(target,src) \
+	MSQ = vec_ld(0, target); \
+	LSQ = vec_ld(16, target);\
+	align = vec_lvsr(0, (unsigned char *)target); \
+	mask=vec_perm((VEC8 )vec_zero,(VEC8 )neg1,(VEC8)align); \
+	src=vec_perm((VEC8 )src,(VEC8)src,(VEC8)align ); \
+	MSQ = vec_sel( MSQ, (VEC8 )src, mask ); \
+	LSQ = vec_sel( (VEC8 )src, LSQ, mask ); \
+	vec_st( MSQ, 0, target ); \
+	vec_st( LSQ, 16, target ); 
+	
+
+
+	const VEC16 	vec_const=(VEC16)(4,0x11,0xFFFF,0,0,0,0,0);
+	const VEC8 	vec_zero=(VEC8)vec_splat(vec_const,3);		//0
+	const VEC16	neg1=vec_splat(vec_const,2); //FFFFF
+	const VEC16	vec_shift=vec_splat(vec_const,0); //4
+	
+	VEC8 	vec_src;
+	VEC8	MSQ,LSQ,mask,align,final;
+	VECS16 	vec_l0,vec_l1,vec_l2,vec_l3,vec_l4,vec_l5;	
+	VECS16 	vec_r0,vec_r1,vec_r2,vec_r3,vec_r4,vec_r5;	
+	VECS16 	vec_a,vec_b,vec_c,vec_b2,vec_sign,vec_invsign,vec_d,vec_d2;	
+	VECS16  v1,v2,vec_qp;
+	VEC8	sign,cmp;
+	
+	v16[0]=4*co->QP;
+	vec_qp=vec_ld(0,v16);
+	vec_qp=vec_splat(vec_qp,0);
+	src+=stride*5;
+	
+	#define LOAD_VECTORS(typ,x,y) \
+		LOAD_##typ(vec_src,y+stride*x); \
+		vec_l##x=(VECS16)vec_mergeh((VEC8)vec_zero,(VEC8)vec_src); \
+		vec_r##x=(VECS16)vec_mergel((VEC8)vec_zero,(VEC8)vec_src);  
+	
+	if(aligned)
+	{	
+		LOAD_VECTORS(ALIGNED,0,src);
+		LOAD_VECTORS(ALIGNED,1,src);
+		LOAD_VECTORS(ALIGNED,2,src);
+		LOAD_VECTORS(ALIGNED,3,src);
+		LOAD_VECTORS(ALIGNED,4,src);
+		LOAD_VECTORS(ALIGNED,5,src);
+	}
+	else
+	{
+		LOAD_VECTORS(UNALIGNED,0,src);
+		LOAD_VECTORS(UNALIGNED,1,src);
+		LOAD_VECTORS(UNALIGNED,2,src);
+		LOAD_VECTORS(UNALIGNED,3,src);
+		LOAD_VECTORS(UNALIGNED,4,src);
+		LOAD_VECTORS(UNALIGNED,5,src);
+	}
+	
+	//_____________________________________________________________________
+	
+	vec_a=vec_abs(vec_sub(vec_l1,vec_l2));  //a
+	vec_b2=vec_sub(vec_l2,vec_l3);		//b
+	vec_c=vec_abs(vec_sub(vec_l3,vec_l4));	//c
+	
+	vec_sign=(VECS16)vec_cmplt(vec_b2,(VECS16)vec_zero); //0xFF <0 , 0 >0 sign of b
+	vec_b=vec_abs(vec_b2);
+	
+	vec_d=vec_add(vec_b,vec_b);
+	vec_d2=vec_sub(vec_d,vec_a);
+	vec_d=vec_sub(vec_d2,vec_c);
+	vec_d2=vec_max(vec_d,(VECS16)vec_zero);  // 2*d everywhere
+	
+	cmp=(VEC8)vec_cmplt(vec_d2,vec_qp); 	// FF if 2d <vec qp
+	vec_d=vec_and(vec_d2,(VECS16)cmp);   // 0 if > , 2*d else, now v=0 is not little enough
+	
+	// time to add its sign to vec_d
+	//
+	vec_d2=vec_sub((VECS16)vec_zero,vec_d);  // vec_d2=-vec_d
+	vec_a=vec_and(vec_sign,vec_d);		// negative part
+	vec_b=vec_and( vec_nor(vec_sign,vec_sign)  ,vec_d2);
+	vec_d=vec_or(vec_a,vec_b);
+	
+	//_____________________________________________________________________
+	
+	
+#define PROCESS(x) \
+	v1=vec_sra(v2,vec_shift); \
+	vec_l##x=vec_max(vec_adds(vec_l##x,v1),(VECS16)vec_zero);	
+	
+#define PROCESSI(x) \
+	v1=vec_sra(v2,vec_shift); \
+	vec_l##x=vec_max(vec_subs(vec_l##x,v1),(VECS16)vec_zero);	
+		
+#define STORE_VECTORS(type,x,y) \
+		final=(VEC8)vec_pack(vec_l##x,vec_r##x); \
+		STORE_##type(y+stride*x,final); 		
+		
+	v2=vec_d;
+	PROCESS(0);				// *1
+	
+	v2=vec_add(vec_d,vec_d);
+	PROCESS(1);				// *2
+	
+	v2=vec_add(vec_add(vec_d,vec_d),vec_d);  // 3*
+	PROCESS(2);		
+	
+	v2=vec_add(vec_add(vec_d,vec_d),vec_d);  // -3*
+	PROCESSI(3);
+	
+	v2=vec_add(vec_d,vec_d);		//  *-2
+	PROCESSI(4);	
+	
+	v2=vec_d;				//  *-1
+	PROCESSI(5);
+		
+	if(aligned)
+	{	
+		STORE_VECTORS(ALIGNED,0,src);
+		STORE_VECTORS(ALIGNED,1,src);
+		STORE_VECTORS(ALIGNED,2,src);
+		STORE_VECTORS(ALIGNED,3,src);
+		STORE_VECTORS(ALIGNED,4,src);
+		STORE_VECTORS(ALIGNED,5,src);
+	}
+	else
+	{
+		STORE_VECTORS(UNALIGNED,0,src);
+		STORE_VECTORS(UNALIGNED,1,src);
+		STORE_VECTORS(UNALIGNED,2,src);
+		STORE_VECTORS(UNALIGNED,3,src);
+		STORE_VECTORS(UNALIGNED,4,src);
+		STORE_VECTORS(UNALIGNED,5,src);
+	
+	}
+
+// /MEANX
+}
+#endif
 /**
  * Experimental Filter 1
  * will not damage linear gradients
@@ -570,127 +733,8 @@ static inline void RENAME(vertX1Filter)(uint8_t *src, int stride, PPContext *co)
 #else
 
 #ifdef HAVE_ALTIVEC
-	//MEANX: Altivec version including clipping
-	//
-		int16_t __attribute__ ((aligned(16))) v16[8];
-				
-
-#define VEC16 vector unsigned short
-#define VECS16 vector signed short
-#define VEC8 vector unsigned char
-#define VECS8 vector signed char
-#define VECS32 vector signed int
-#define LOAD_ALIGN(dest,src) \
-		MSQ=vec_ld(0, (unsigned char *)src);	\
-		LSQ= vec_ld(16, (unsigned char *)src);	\
-		dest=(VEC8)vec_perm(MSQ,LSQ, vec_lvsl(0, (unsigned char *)src))
-		
-		
-#define STORE_ALIGN(target,src) \
-	MSQ = vec_ld(0, target); \
-	LSQ = vec_ld(16, target);\
-	align = vec_lvsr(0, (unsigned char *)target); \
-	mask=vec_perm((VEC8 )vec_zero,(VEC8 )neg1,(VEC8)align); \
-	src=vec_perm((VEC8 )src,(VEC8)src,(VEC8)align ); \
-	MSQ = vec_sel( MSQ, (VEC8 )src, mask ); \
-	LSQ = vec_sel( (VEC8 )src, LSQ, mask ); \
-	vec_st( MSQ, 0, target ); \
-	vec_st( LSQ, 16, target ); 
 	
-
-
-	const VEC16 	vec_const=(VEC16)(4,0x11,0xFFFF,0,0,0,0,0);
-	const VEC8 	vec_zero=(VEC8)vec_splat(vec_const,3);		//0
-	const VEC16	neg1=vec_splat(vec_const,2); //FFFFF
-	const VEC16	vec_shift=vec_splat(vec_const,0); //4
-	
-	VEC8 	vec_src;
-	VEC8	MSQ,LSQ,mask,align,final;
-	VECS16 	vec_l0,vec_l1,vec_l2,vec_l3,vec_l4,vec_l5;	
-	VECS16 	vec_r0,vec_r1,vec_r2,vec_r3,vec_r4,vec_r5;	
-	VECS16 	vec_a,vec_b,vec_c,vec_b2,vec_sign,vec_invsign,vec_d,vec_d2;	
-	VECS16  v1,v2,vec_qp;
-	VEC8	sign,cmp;
-	
-	v16[0]=4*co->QP;
-	vec_qp=vec_ld(0,v16);
-	vec_qp=vec_splat(vec_qp,0);
-	src+=stride*5;
-	
-	#define LOAD(x,y) \
-		LOAD_ALIGN(vec_src,y+stride*x); \
-		vec_l##x=(VECS16)vec_mergeh((VEC8)vec_zero,(VEC8)vec_src); \
-		vec_r##x=(VECS16)vec_mergel((VEC8)vec_zero,(VEC8)vec_src);  
-	LOAD(0,src);
-	LOAD(1,src);
-	LOAD(2,src);
-	LOAD(3,src);
-	LOAD(4,src);
-	LOAD(5,src);
-	//_____________________________________________________________________
-	
-	vec_a=vec_abs(vec_sub(vec_l1,vec_l2));  //a
-	vec_b2=vec_sub(vec_l2,vec_l3);		//b
-	vec_c=vec_abs(vec_sub(vec_l3,vec_l4));	//c
-	
-	vec_sign=(VECS16)vec_cmplt(vec_b2,(VECS16)vec_zero); //0xFF <0 , 0 >0 sign of b
-	vec_b=vec_abs(vec_b2);
-	
-	vec_d=vec_add(vec_b,vec_b);
-	vec_d2=vec_sub(vec_d,vec_a);
-	vec_d=vec_sub(vec_d2,vec_c);
-	vec_d2=vec_max(vec_d,(VECS16)vec_zero);  // 2*d everywhere
-	
-	cmp=(VEC8)vec_cmplt(vec_d2,vec_qp); 	// FF if 2d <vec qp
-	vec_d=vec_and(vec_d2,(VECS16)cmp);   // 0 if > , 2*d else, now v=0 is not little enough
-	
-	// time to add its sign to vec_d
-	//
-	vec_d2=vec_sub((VECS16)vec_zero,vec_d);  // vec_d2=-vec_d
-	vec_a=vec_and(vec_sign,vec_d);		// negative part
-	vec_b=vec_and( vec_nor(vec_sign,vec_sign)  ,vec_d2);
-	vec_d=vec_or(vec_a,vec_b);
-	
-	//_____________________________________________________________________
-	
-	
-#define PROCESS(x) \
-	v1=vec_sra(v2,vec_shift); \
-	vec_l##x=vec_max(vec_adds(vec_l##x,v1),(VECS16)vec_zero);	
-	
-#define PROCESSI(x) \
-	v1=vec_sra(v2,vec_shift); \
-	vec_l##x=vec_max(vec_subs(vec_l##x,v1),(VECS16)vec_zero);	
-		
-#define STORE(x,y) \
-		final=(VEC8)vec_pack(vec_l##x,vec_r##x); \
-		STORE_ALIGN(y+stride*x,final); 		
-		
-	v2=vec_d;
-	PROCESS(0);				//*1
-	
-	v2=vec_add(vec_d,vec_d);
-	PROCESS(1);				//*2
-	
-	v2=vec_add(vec_add(vec_d,vec_d),vec_d);  //3*
-	PROCESS(2);		
-	
-	v2=vec_add(vec_add(vec_d,vec_d),vec_d);  //-3*
-	PROCESSI(3);
-	
-	v2=vec_add(vec_d,vec_d);		//*-2
-	PROCESSI(4);	
-	
-	v2=vec_d;				//*-1
-	PROCESSI(5);
-		
-		
-	STORE(0,src);
-	STORE(1,src);
-	STORE(2,src);
-	STORE(3,src);
-	STORE(4,src);
-	STORE(5,src);
+		vertX1Filter_altivec_template(0,src,stride, co);
 #else
 
  	const int l1= stride;
@@ -3840,13 +3884,13 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 
 #else
 				if(mode & H_X1_FILTER)
-#if 0 //&& definded( HAVE_ALTIVEC)
+#if defined( HAVE_ALTIVEC)
 				{ //MEANX
 					unsigned char __attribute__ ((aligned(16))) tempBlock[272];
-					transpose_16x8_char_toPackedAlign_altivec(tempBlock, dstBlock - 4 , stride);
-					vertX1Filter_altivec(tempBlock, 16, &c); // 16 ?
-				 	transpose_8x16_char_fromPackedAlign_altivec(dstBlock - 4, tempBlock, stride);
-					//horizX1Filter_altivec(dstBlock-4, stride, QP);
+					transpose_16x8_char_toPackedAlign_altivec(tempBlock, dstBlock, dstStride);
+					vertX1Filter_altivec_template(1,tempBlock, 16, &c); // 16 !					
+				 	transpose_8x16_char_fromPackedAlign_altivec(dstBlock , tempBlock, dstStride);
+					//horizX1Filter_altivec(dstBlock-4, dstStride, QP);
 				}
 #else				
 					horizX1Filter(dstBlock-4, stride, QP); // Faster than altivec version
