@@ -95,11 +95,11 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #ifdef HAVE_ALTIVEC_H
 #include <altivec.h>
 #endif
-
+/*
 #ifndef HAVE_MEMALIGN
 #define memalign(a,b) malloc(b)
 #endif
-
+*/
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
 #define MAX(a,b) ((a) < (b) ? (b) : (a))
 #define ABS(a) ((a) > 0 ? (a) : (-(a)))
@@ -129,6 +129,11 @@ static uint64_t __attribute__((aligned(8))) attribute_used b02= 		0x020202020202
 static uint64_t __attribute__((aligned(8))) attribute_used b08= 		0x0808080808080808LL;
 static uint64_t __attribute__((aligned(8))) attribute_used b80= 		0x8080808080808080LL;
 #endif
+
+#include "../../avidemux/ADM_assert.h"
+#define free(x) ADM_dealloc(x)
+#define malloc(x) ADM_alloc(x)
+#define memalign(x,y) ADM_alloc(y)
 
 static uint8_t clip_table[3*256];
 static uint8_t * const clip_tab= clip_table + 256;
