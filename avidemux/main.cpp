@@ -52,6 +52,11 @@ typedef void *FCT_VOID(void *);
                        };
 #endif                       
 
+#ifdef USE_SDL
+	extern "C" {
+	#include "SDL/SDL.h"
+	}
+#endif
 void onexit( void );
 //extern void automation(int argc, char **argv);
 extern int automation(void );
