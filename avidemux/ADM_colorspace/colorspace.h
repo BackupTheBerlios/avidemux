@@ -33,4 +33,5 @@ uint8_t COL_411_YV12( uint8_t *in[3], uint32_t stride[3],  uint8_t *out,uint32_t
 uint8_t COL_RgbToYuv(uint8_t R,uint8_t G,uint8_t B, uint8_t *y,int8_t *u,int8_t  *v);
 uint8_t COL_YuvToRgb( uint8_t y,int8_t u,int8_t v,uint8_t *r,uint8_t *g,uint8_t *b);
 
-
+uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *oy2, 
+				uint8_t *u, uint8_t *v,uint32_t lineSize,uint32_t height,uint32_t stride);
