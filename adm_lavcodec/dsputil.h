@@ -389,10 +389,10 @@ extern int mm_flags;
 
 void add_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size);
 void put_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size);
-
+/* MEANX*/
 static inline void emms(void)
 {
-    __asm __volatile ("emms;":::"memory");
+    __asm __volatile ("emms");
 }
 
 
@@ -435,10 +435,10 @@ void vp3_idct_put_a64_mmx(int16_t *input_data, int16_t *dequant_matrix,
 void vp3_idct_add_a64_mmx(int16_t *input_data, int16_t *dequant_matrix,
     int coeff_count, uint8_t *dest, int stride);
 
-
+/* MEANX*/
 static inline void emms(void)
-{
-    __asm __volatile ("emms;":::"memory");
+
+    __asm __volatile ("emms");
 }
 
 
