@@ -13,4 +13,4 @@ libADM_audiocodec_a_SOURCES = ADM_codecwma.cpp ADM_ffwma.cpp mad.cpp \
 EXTRA_DIST = ADM_AC3.cpp ADM_AC3.h ADM_audiocodec.cpp ADM_audiocodec.h ADM_codecac3.cpp ADM_codecmp3.cpp ADM_codecwav.cpp adm_ogg.h audiocodec_ogg.cpp avdm_mad.h mad.cpp ADM_ffwma.cpp ADM_codecwma.cpp 
 
 ####### kdevelop will overwrite this part!!! (end)############
-noinst_HEADERS = ADM_vorbis.h ADM_codeculaw.h
+noinst_HEADERS = ADM_vorbis.h 
