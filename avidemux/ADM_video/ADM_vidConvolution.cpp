@@ -36,6 +36,15 @@
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include"ADM_video/ADM_vidConvolution.hxx"
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM convParam={2,{"luma","chroma"}};
+SCRIPT_CREATE(median_script,AVDMFastVideoMedian,convParam);
+SCRIPT_CREATE(mean_script,AVDMFastVideoMean,convParam);
+SCRIPT_CREATE(sharpen_script,AVDMVideoSharpen,convParam);
+SCRIPT_CREATE(gaussian_script,AVDMVideoGaussian,convParam);
+
 
 //AVDMGenericVideoStream *sharpen_create(AVDMGenericVideoStream *in, void *param);
 //AVDMGenericVideoStream *(AVDMGenericVideoStream *in, void *param);

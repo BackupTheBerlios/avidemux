@@ -33,7 +33,13 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidUVSwap.h"
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM nullParam={0,{""}};
+
+
+SCRIPT_CREATE(swapuv_script,ADMVideoUVSwap,nullParam);
 BUILD_CREATE(swapuv_create,ADMVideoUVSwap);
 
 char *ADMVideoUVSwap::printConf( void )

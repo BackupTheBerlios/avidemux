@@ -57,7 +57,14 @@
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_toolkit/ADM_debug.h"
+#include "ADM_filter/video_filters.h"
+#include "ADM_vidKernelDeint.h"
 
+static FILTER_PARAM kdintParam={5,{"order","threshold","sharp","twoway","map"}};
+
+
+SCRIPT_CREATE(kerneldeint_script,ADMVideoKernelDeint,kdintParam);
+BUILD_CREATE(kerneldeint_create,ADMVideoKernelDeint);
 
 static int PutHintingData(uint8_t *video, unsigned int hint);
 static int GetHintingData(uint8_t *video, unsigned int *hint);
@@ -67,9 +74,9 @@ extern uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *s
 
 #define PROGRESSIVE  0x00000001
 
-#include "ADM_vidKernelDeint.h"
 
-BUILD_CREATE(kerneldeint_create,ADMVideoKernelDeint);
+
+
 
 uint8_t ADMVideoKernelDeint::configure( AVDMGenericVideoStream *instream)
 {

@@ -32,7 +32,13 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidContrast.h"
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM contrastParam={5,{"offset","coef","doLuma","doChromaU","doChromaV"}};
+
+
+SCRIPT_CREATE(contrast_script,ADMVideoContrast,contrastParam);
 
 BUILD_CREATE(contrast_create,ADMVideoContrast);
 

@@ -41,7 +41,13 @@ Swap each line  (shift up for odd, down for even)
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_VIDSWAPSMART
 #include "ADM_toolkit/ADM_debug.h"
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM nullParam={0,{""}};
+
+
+SCRIPT_CREATE(swapsmart_script,AVDMVideoSwapSmart,nullParam);
 BUILD_CREATE(swapsmart_create,AVDMVideoSwapSmart);
 
 

@@ -35,7 +35,13 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidChromaShift.h"
 
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM cshiftParam={2,{"u","v"}};
+
+
+SCRIPT_CREATE(chromashift_script,ADMVideoChromaShift,cshiftParam);
 BUILD_CREATE(create_chromashift,ADMVideoChromaShift);
 
 char *ADMVideoChromaShift::printConf( void )

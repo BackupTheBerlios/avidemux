@@ -43,7 +43,11 @@
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_toolkit/ADM_debug.h"
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM swapParam={0,{""}};
+SCRIPT_CREATE(pulldown_script,ADMVideoPullDown,swapParam);
 BUILD_CREATE(pulldown_create,ADMVideoPullDown);
 
 char *ADMVideoPullDown::printConf( void )

@@ -33,11 +33,15 @@
 
 #include"ADM_video/ADM_vidDeinterlace.h"
 #include"ADM_video/ADM_vidTelecide.h"
+#include "ADM_filter/video_filters.h"
 
 #define MATCH_THRESH 100
 #define ASM_DEINT
 #define ASM_BLEND
+static FILTER_PARAM nullParam={0,{""}};
 
+
+SCRIPT_CREATE(telecide_script,ADMVideoTelecide,nullParam);
 extern  int32_t _l_w,_l_h;
 extern uint8_t *_l_p,*_l_c,*_l_n;
 extern uint8_t *_l_e,*_l_e2;

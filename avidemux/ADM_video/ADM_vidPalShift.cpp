@@ -32,6 +32,13 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidPalShift.h"
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM nullParam={0,{""}};
+
+
+SCRIPT_CREATE(addPALShift_script,ADMVideoPalShift,nullParam);
 BUILD_CREATE(addPALShift_create,ADMVideoPalShift);
 
 

@@ -32,7 +32,13 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidRotate.h"
+#include "ADM_filter/video_filters.h"
 
+
+static FILTER_PARAM rotpParam={3,{"width","height","angle"}};
+
+
+SCRIPT_CREATE(rotate_script,ADMVideoRotate,rotpParam);
 BUILD_CREATE(rotate_create,ADMVideoRotate);
 
 char *ADMVideoRotate::printConf( void )

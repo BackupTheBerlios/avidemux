@@ -38,6 +38,13 @@ Same idea as for avisynth separatefield
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidFieldUtil.h"
 #include "ADM_video/ADM_vidSeparateField.h"
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM swapParam={0,{""}};
+
+SCRIPT_CREATE(separatefield_script,AVDMVideoSeparateField,swapParam);
+SCRIPT_CREATE(mergefield_script,AVDMVideoMergeField,swapParam);
 
 BUILD_CREATE(separatefield_create,AVDMVideoSeparateField);
 BUILD_CREATE(mergefield_create,AVDMVideoMergeField);

@@ -33,6 +33,14 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidDropOut.h"
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM dropParam={1,{"threshold"}};
+
+
+SCRIPT_CREATE(dropout_script,ADMVideoDropOut,dropParam);
+
 
 //extern uint8_t distMatrix[256][256];
 extern uint32_t fixMul[16];

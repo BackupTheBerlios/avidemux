@@ -38,11 +38,20 @@ Swap each line  (shift up for odd, down for even)
 #include "ADM_video/ADM_vidFieldUtil.h"
 #include "ADM_video/ADM_vidSwapFields.h"
 //static void decimate(uint8_t *src,uint8_t *target, uint32_t linessrc, uint32_t width);
+#include "ADM_filter/video_filters.h"
+
+
+static FILTER_PARAM swapParam={0,{""}};
+
+
 
 BUILD_CREATE(swapfield_create,AVDMVideoSwapField);
 BUILD_CREATE(keepeven_create,AVDMVideoKeepEven);
 BUILD_CREATE(keepodd_create,AVDMVideoKeepOdd);
 
+SCRIPT_CREATE(swapfield_script,AVDMVideoSwapField,swapParam);
+SCRIPT_CREATE(keepeven_script,AVDMVideoKeepEven,swapParam);
+SCRIPT_CREATE(keepodd_script,AVDMVideoKeepOdd,swapParam);
 
 char *AVDMVideoSwapField::printConf( void )
 {
