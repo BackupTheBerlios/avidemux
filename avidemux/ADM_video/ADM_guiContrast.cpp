@@ -99,7 +99,7 @@ uint8_t ADMVideoContrast::configure (AVDMGenericVideoStream * instream)
   ADM_assert (instream->getFrameNumberNoAlloc (curframe, &l, aImage, &f));
 
   // From now we work in RGB !
-  memcpy (video2, aImage->data, w * h * 4);
+  memcpy (video2, aImage->data, (w * h * 3)>>1);
 
   COL_yv12rgb (w, h, video2, video3);
 
