@@ -45,75 +45,110 @@
 
 #include "gui_action.hxx"
 #include "audio_out.h"
+
 /**
 		in=0 -> arts1
 		in=1 -> alsa
 */
-extern void GUI_SetArts( uint8_t in );
+
 
 audioDevice *device=NULL;
 static AUDIO_DEVICE  currentDevice=DEVICE_DUMMY;
+static AUDIO_DEVICE ADM_audioByName(const char *name);
+static const char *ADM_audioById(AUDIO_DEVICE id);
+extern void DIA_getAudioDevice(AUDIO_DEVICE *id);
 
 void AVDM_audioSave( void )
 {
-	switch(currentDevice)
-	{
-		case DEVICE_ALSA:
-					prefs->set(DEVICE_AUDIODEVICE, "ALSA");
-					break;
-		case DEVICE_ARTS:
-					prefs->set(DEVICE_AUDIODEVICE, "Arts");
-					break;
-		default :
-					prefs->set(DEVICE_AUDIODEVICE, "Oss");
-					break;
+const char *string;
+		string=ADM_audioById(currentDevice);
+		prefs->set(DEVICE_AUDIODEVICE, string);
+	
 
+}
+AUDIO_DEVICE ADM_audioByName(const char *name)
+{
+	if(!name) return (AUDIO_DEVICE)0;
+	for(uint32_t i=0;i<sizeof(audioDeviceList)/sizeof(DEVICELIST);i++)
+	{
+		if(!strcmp(name,audioDeviceList[i].name))
+		{
+			return audioDeviceList[i].id;
+		}	
 	}
+	printf("Device not found :%s\n",name);
+	return (AUDIO_DEVICE)0;
+
+}
+const char *ADM_audioById(AUDIO_DEVICE id)
+{
+	
+	for(uint32_t i=0;i<sizeof(audioDeviceList)/sizeof(DEVICELIST);i++)
+	{
+		if(audioDeviceList[i].id==id)
+		{
+			return audioDeviceList[i].name;
+		}	
+	}
+	printf("Device not found :%d\n",id);
+	return (const char *)"Unknown!";
 
 }
 
+void AVDM_audioPref( void )
+{
+AUDIO_DEVICE newDevice=currentDevice;
+
+	DIA_getAudioDevice(&newDevice);
+	if(newDevice!=currentDevice)
+	{
+		AVDM_switch(newDevice);
+	}
+}
 void AVDM_audioInit(void )
 {
 uint8_t init=0;
 char *name=NULL;
+AUDIO_DEVICE id;
 
-#ifdef CONFIG_DARWIN
-// For darwin we only can/will use coreAudio borrowed from mplayer
-				AVDM_switch(DEVICE_COREAUDIO);
-				return;
-#endif
 		if(prefs->get(DEVICE_AUDIODEVICE, &name))
 		{
-		if(!strcmp(name,"Arts"))
-			{
-				printf("\n Using Arts Mmm ?\n");
-				AVDM_switch(DEVICE_ARTS);
-				GUI_SetArts(  0);
-				init=1;
-			}
-		else if(!strcmp(name,"ALSA"))
-			{
-				printf("\n Using ALSA, toying with kernel 2.5 are you :)\n");
-				AVDM_switch(DEVICE_ALSA);
-				GUI_SetArts(  1);
-				init=1;
-			}
-			free(name);
-			name=NULL;
+		id=ADM_audioByName(name);
+		free(name);
+		name=NULL;	
+		if(!id) id=DEVICE_DUMMY;
+		switch(id)
+		{
+
+			case DEVICE_ARTS:									
+			case DEVICE_ALSA:
+			case DEVICE_COREAUDIO:
+			case DEVICE_SDL:
+			
+						printf("Using real audio device\n");
+						AVDM_switch(id);
+						init=1;	
+						break;				
+			case DEVICE_DUMMY:
+			default:
+						printf("Using dummy audio device\n");
+						init=1;
+						AVDM_switch(id);
+						break;
+		
 		}
+		}
+		// Fallback
 		if(init==0)
 		{
 		#ifdef OSS_SUPPORT
-			AVDM_switch(DEVICE_OSS);
-			GUI_SetArts(  2);
+			AVDM_switch(DEVICE_OSS);			
 			printf("\n Using OSS\n");
 		#else
 			AVDM_switch(DEVICE_DUMMY);
 			printf("\n Using dummy\n");
 		#endif
 		}
-
-
 }
 // Switch the audio device class we are using
 //
@@ -153,6 +188,11 @@ void AVDM_switch(AUDIO_DEVICE action)
 								device=new 	 alsaAudioDevice;
 							 	currentDevice=DEVICE_ALSA;
 								break;
+
+#endif
+#ifdef USE_SDL
+		case DEVICE_SDL:
+								
 
 #endif
 

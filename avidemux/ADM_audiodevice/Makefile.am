@@ -13,3 +13,4 @@ EXTRA_DIST = oss_out.cpp audio_out.h ADM_deviceoss.h ADM_deviceoss.cpp ADM_audio
 ####### kdevelop will overwrite this part!!! (end)############
 
 INCLUDES = $(all_includes) $(ARTS_CFLAGS)
+noinst_HEADERS =  ADM_audiodevice.h
