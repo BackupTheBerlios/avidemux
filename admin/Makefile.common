@@ -5,8 +5,8 @@
 ### All the real work is done by the shellscript cvs.sh
 
 SHELL=/bin/sh
-
 cvs dist cvs-clean configure.in configure.files subdirs package-messages:
+	export PATH=/sw/bin:/opt/local/bin:$PATH
 	@admindir=$(admindir); \
 	if test "x$$admindir" = x; then \
 	  admindir=.; until test -f $$admindir/admin/cvs.sh; do \

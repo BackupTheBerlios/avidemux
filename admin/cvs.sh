@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 #
 # cvs.sh
 #
@@ -58,7 +58,7 @@ if test -r configure.in.in; then
 fi
 
 echo "*** Creating aclocal.m4"
-$ACLOCAL || exit 1
+$ACLOCAL >& aclocal.log || exit 1
 echo "*** Creating configure"
 call_and_fix_autoconf
 
@@ -71,7 +71,7 @@ echo "*** Creating Makefile templates"
 $AUTOMAKE || exit 1
 if test -z "$UNSERMAKE"; then
   echo "*** Postprocessing Makefile templates"
-  perl admin/am_edit || exit 1
+  #perl admin/am_edit || exit 1
 fi
 
 if egrep "^cvs-local:" $makefile_am >/dev/null; then \
@@ -107,7 +107,7 @@ fi
 $ACLOCAL
 $AUTOHEADER
 $AUTOMAKE --foreign --include-deps
-perl admin/am_edit
+#perl admin/am_edit
 call_and_fix_autoconf
 touch stamp-h.in
 if grep "^cvs-local:" $makefile_am >/dev/null; then
@@ -118,13 +118,16 @@ fi
 ###
 ### Then make messages
 ###
-if test -d po; then
- LIST=`find ./po -name "*.po"`
- for i in $LIST; do
-  file2=`echo $i | sed -e "s#\.po#\.gmo#"`
-  msgfmt -o $file2 $i || touch $file2
- done
-fi
+#if test -d po; then
+# #LIST=`find ./po -name "*.po"`
+# if test "x$LIST" = "x" ; then
+# else
+# for i in $LIST; do
+#  file2=`echo $i | sed -e "s#\.po#\.gmo#"`
+#  msgfmt -o $file2 $i || touch $file2
+# done
+# fi
+#fi
 if grep "^cvs-dist-local:" $makefile_am >/dev/null; then
   strip_makefile
   $MAKE -f $makefile_wo cvs-dist-local
@@ -136,7 +139,7 @@ subdir_dist()
 $ACLOCAL
 $AUTOHEADER
 $AUTOMAKE --foreign --include-deps
-perl ../admin/am_edit
+#perl ../admin/am_edit
 call_and_fix_autoconf
 }
 
