@@ -121,9 +121,9 @@ uint8_t DIA_SVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 				case 0:
 					*mode = COMPRESS_CBR;				      
 		      			value = (uint32_t) gtk_read_entry(WID(entryBitrate));
-		      			if (value < 3000)
+		      			if (value < 9900)
 			  			value *= 1000;
-		      			if (value > 16 && value < 6000000)
+		      			if (value > 16 && value < 9900000)
 					{
 			    			*br = value;
 			    			ret = 1;
