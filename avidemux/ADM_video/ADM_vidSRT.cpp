@@ -61,8 +61,7 @@ char 								*ADMVideoSubtitle::printConf(void)
 	}
 
 //--------------------------------------------------------	
-ADMVideoSubtitle::ADMVideoSubtitle(
-									AVDMGenericVideoStream *in,CONFcouple *couples)
+ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couples)
 {
 
   uint32_t frame;
@@ -100,6 +99,10 @@ ADMVideoSubtitle::ADMVideoSubtitle(
 			GET(_V_percent);
 			GET(_selfAdjustable);
 			GET(_delay);
+			GET(_useBackgroundColor);
+			GET(_bg_Y_percent);
+      GET(_bg_U_percent);
+      GET(_bg_V_percent);
 
 			if(_conf->_baseLine>_info.height-_conf->_fontsize*SRT_MAX_LINE)
 					_conf->_baseLine=_conf->_fontsize*SRT_MAX_LINE;
@@ -131,6 +134,11 @@ ADMVideoSubtitle::ADMVideoSubtitle(
 			_conf->_selfAdjustable=1;
 			_conf->_delay=0;
 			
+			_conf->_useBackgroundColor=0;
+			_conf->_bg_Y_percent=0;
+			_conf->_bg_U_percent=0;
+			_conf->_bg_V_percent=0;
+                        
 			strcpy(_conf->_fontname,FONTNAME);
 			strcpy(_conf->_subname,"");
 			strcpy(_conf->_charset,"UNICODE");
@@ -144,8 +152,12 @@ ADMVideoSubtitle::ADMVideoSubtitle(
 #define BITMAP_SIZE _info.width*_conf->_fontsize*SRT_MAX_LINE
 	_bitmapBuffer=new uint8_t[_info.width*_info.height];
 	_maskBuffer=new uint8_t[_info.width*_info.height];
+	_bgBitmapBuffer=new uint8_t[_info.width*_info.height];
+	_bgMaskBuffer=new uint8_t[_info.width*_info.height];
 	assert(_bitmapBuffer);
 	assert(_maskBuffer);
+	assert(_bgBitmapBuffer);
+	assert(_bgMaskBuffer);
 }
 uint8_t	ADMVideoSubtitle::loadSubtitle( void )
 {
@@ -198,12 +210,12 @@ char c;
   }
 
 
-			fclose(_fd);
-			_fd=NULL;
-			_bitmap=0xffffffff;
-			if(_line)	// that way we will have the first sub
-				_oldline=_line-1;
-			return 1;
+	fclose(_fd);
+	_fd=NULL;
+	_bitmap=0xffffffff;
+	if(_line)	// that way we will have the first sub
+		_oldline=_line-1;
+	return 1;
 }
 uint8_t	ADMVideoSubtitle::getCoupledConf( CONFcouple **couples)
 {
@@ -211,7 +223,7 @@ SUBCONF *_param;
 
 			_param=_conf; // keep macro happy
 			assert(_param);
-			*couples=new CONFcouple(10);
+			*couples=new CONFcouple(14);
 
 			CSET(_fontsize);
 			CSET(_subname);
@@ -223,6 +235,10 @@ SUBCONF *_param;
 			CSET(_V_percent);
 			CSET(_selfAdjustable);
 			CSET(_delay);
+			CSET(_useBackgroundColor);
+			CSET(_bg_Y_percent);
+			CSET(_bg_U_percent);
+			CSET(_bg_V_percent);
 
 		return 1;
 
@@ -241,6 +257,18 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 			{
 				delete [] _maskBuffer;
 				_maskBuffer=0;
+			}
+
+ 		if(_bgBitmapBuffer) 
+			{
+				delete [] _bgBitmapBuffer;
+				_bgBitmapBuffer=0;
+			}
+ 
+		if(_bgMaskBuffer) 
+			{
+				delete [] _bgMaskBuffer;
+				_bgMaskBuffer=0;
 			}
 
 		if(_fd)

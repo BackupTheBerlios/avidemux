@@ -20,6 +20,7 @@
 #ifdef USE_FREETYPE
 
 #define SRT_MAX_LINE 3
+#define SRT_MAX_LINE_LENGTH 512
 
  typedef struct subLine
  {
@@ -33,15 +34,27 @@
 	{
 		uint32_t _fontsize;
 		uint32_t _baseLine;
+
+  /** YUV font color components */
 		int32_t    _Y_percent;
 		int32_t    _U_percent;
 		int32_t    _V_percent;
-
 		char		*_fontname;
 		char		*_subname;
 		char 		*_charset;
 		uint32_t	_selfAdjustable;   /** Automatic line breaks */
-		int32_t		_delay;            /** Wait x miliseconds before show subtitles. If negative, it will to show subtitles x miliseconds before. */
+		int32_t		_delay;            
+		/** Wait x miliseconds before show subtitles. If negative, it will to show subtitles x */
+		/* miliseconds before. */
+
+
+		uint32_t	_useBackgroundColor;
+
+  /** YUV background color components */
+		int32_t   _bg_Y_percent;
+		int32_t   _bg_U_percent;
+		int32_t   _bg_V_percent;
+
 
 
 	}SUBCONF;
@@ -51,35 +64,34 @@
 
  protected:
 
-	    	SUBCONF								*_conf;
-
-        virtual char 					*printConf(void) ;
-       
-        FILE									*_fd;
-        uint8_t								loadSubTitle( void );
-				uint8_t  							loadSRT( void )        ;
-        uint32_t							_line;
-        subLine								*_subs;
-        uint32_t							_oldframe;
-        uint32_t							_oldline;
-        uint32_t							_bitmap;
-        uint32_t							search(uint32_t time);
-        void 									displayString(char *string);
-        void 									displayChar(uint32_t w,uint32_t h,char c);
-  uint32_t							displayLine(char *string,uint32_t line, uint32_t len);
-  uint32_t							displayLine(char *string,uint32_t line, uint32_t len, uint32_t *suggestedLen);
-	uint8_t 							lowPass(uint8_t *src, uint8_t *dst, uint32_t w, uint32_t h);
-	uint8_t 							decimate(uint8_t *src, uint8_t *dst, uint32_t w, uint32_t h);
+	    	SUBCONF					*_conf;
+       virtual char 					*printConf(void) ;
+        FILE						*_fd;
+        uint8_t						loadSubTitle( void );
+	uint8_t  					loadSRT( void )        ;
+        uint32_t					_line;
+        subLine						*_subs;
+        uint32_t					_oldframe;
+        uint32_t					_oldline;
+        uint32_t					_bitmap;
+        uint32_t					search(uint32_t time);
+        void 						displayString(char *string);
+        void 						displayChar(uint32_t w,uint32_t h,char c);
+  uint32_t						displayLine(char *string,uint32_t line, uint32_t len);
+  uint32_t						displayLine(char *string,uint32_t line, uint32_t len, uint32_t *suggestedLen);
+	uint8_t 					lowPass(uint8_t *src, uint8_t *dst, uint32_t w, uint32_t h);
+	uint8_t 					decimate(uint8_t *src, uint8_t *dst, uint32_t w, uint32_t h);
 
 
-        uint8_t								*_bitmapBuffer;
-	uint8_t								*_maskBuffer;
-	uint8_t								blend(uint8_t *target,uint32_t baseLine);
-	ADMfont								*_font;
-	uint8_t 								loadSubtitle(void);
-	uint8_t								loadFont(void);
-
-	uint8_t 								subParse( subLine *in, char *string );
+        uint8_t						*_bitmapBuffer;
+	uint8_t						*_maskBuffer;
+	uint8_t						*_bgBitmapBuffer;
+	uint8_t						*_bgMaskBuffer;
+	uint8_t						blend(uint8_t *target,uint32_t baseLine);
+	ADMfont						*_font;
+	uint8_t						loadSubtitle(void);
+	uint8_t						loadFont(void);
+	uint8_t 					subParse( subLine *in, char *string );
 
  public:
  		

@@ -47,6 +47,8 @@
 
 #define ALPHA
 
+#define LUMA_LEVEL 10
+
 #define SAFE_STRCPY(dest,destLen,src,srcLen) \
 memcpy(dest,src,srcLen<destLen?srcLen:destLen-1); \
 dest[srcLen<destLen?srcLen:destLen-1]='\0'; \
@@ -124,10 +126,11 @@ uint32_t	ADMVideoSubtitle::search(uint32_t time)
 //______________________________________
 void ADMVideoSubtitle::displayString(char *string)
 {
-  char *workStr=0;
+  char workStr[SRT_MAX_LINE_LENGTH];
   if (string) {
-    workStr=new char[strlen(string)+1];
-    strcpy(workStr,string);
+    SAFE_STRCPY(workStr,SRT_MAX_LINE_LENGTH,string,strlen(string));
+  } else {
+    workStr[0]='\0';
   }
 
 	uint32_t base,last=0,line=0;
@@ -144,13 +147,14 @@ void ADMVideoSubtitle::displayString(char *string)
 
 					memset(_bitmapBuffer,0,_info.height*_info.width);
 					memset(_maskBuffer,0,_info.height*_info.width);
-
+  memset(_bgBitmapBuffer,0,_info.height*_info.width);
+  memset(_bgMaskBuffer,0,_info.height*_info.width);
 
 							{
     const uint32_t workStrLen=strlen(workStr);
     uint32_t i=0;
     uint32_t suggestedLen=0;
-    while (last<workStrLen && line<3) {
+    while (last<workStrLen && line<SRT_MAX_LINE) {
       uint8_t lineBreakFound=0;
       while (!lineBreakFound) {
       // search for | char
@@ -200,8 +204,8 @@ void ADMVideoSubtitle::displayString(char *string)
 	aprintf("[debug] last=%d i=%d\n",last,i);
       } else {
 	if (! couldDisplay) {
-	  char lineStr [100];
-          SAFE_STRCPY(lineStr,100,workStr+last,i-last);
+          char lineStr [SRT_MAX_LINE_LENGTH];
+          SAFE_STRCPY(lineStr,SRT_MAX_LINE_LENGTH,workStr+last,i-last);
           printf("Line is too big: \"%s\".\n",lineStr);
 	}
 									last=i+1;
@@ -212,19 +216,17 @@ void ADMVideoSubtitle::displayString(char *string)
 									line++;
     }
 
-    if(line>3 || line==3 && last<workStrLen)
+    if(line>SRT_MAX_LINE || line==SRT_MAX_LINE && last<workStrLen)
 									{
-	char remainChars[500];
-        SAFE_STRCPY(remainChars,500,workStr+last,workStrLen);
+        char remainChars[SRT_MAX_LINE_LENGTH];
+        SAFE_STRCPY(remainChars,SRT_MAX_LINE_LENGTH,workStr+last,workStrLen);
 	//index range [0,1,2]
         printf("\nText is too big: \"%s\".\n",workStr);
 	printf("Remaining chars: \"%s\"\n",remainChars);
-        printf("Maximum 3 lines!\n");
+        printf("Maximum %d lines!\n",SRT_MAX_LINE);
 	//return;
 									}
 							}
-
-  if (workStr) {delete []workStr;}
 
 				// now blur bitmap into mask..
 				memset(_maskBuffer,0,SRT_MAX_LINE*_conf->_fontsize*_info.width);
@@ -247,7 +249,13 @@ uint8_t tmp[_info.width*_info.height];
 				lowPass(src,dst,_info.width,_info.height);
 				lowPass(tmp,src,_info.width>>1,_info.height>>1);
 
+  if (_conf->_useBackgroundColor) {
+    decimate(_bgMaskBuffer,tmp,_info.width,_info.height);
+    lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
+  }
 
+  //decimate(_bgBitmapBuffer,tmp,_info.width,_info.height);
+  //lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
 }
 // Display a full line centered on screen. It returns the
 // number of displayed chars.
@@ -348,6 +356,43 @@ uint32_t ADMVideoSubtitle::displayLine(char *string,uint32_t line, uint32_t len,
 	break;
       }
 	}
+
+  {
+    if (_conf->_useBackgroundColor) {
+      //Create background info
+      
+      int32_t delta=_info.width*line+((_info.width-w)>>1);
+      uint8_t *bitmapTarget=_bitmapBuffer+delta;
+      uint8_t *maskTarget=_maskBuffer+delta;
+      //uint8_t *bgBitmapTarget=_bgBitmapBuffer+delta;
+      uint8_t *bgMaskTarget=_bgMaskBuffer+delta;
+      
+      delta=3*_info.width;
+      bitmapTarget+=delta;
+      maskTarget+=delta;
+      //bgBitmapTarget+=delta;
+      bgMaskTarget+=delta;
+      
+      for (uint32_t i=0;i<_conf->_fontsize;i++) {
+	//memset(bgTarget,1,w);
+	for (uint32_t j=0;j<w;j++) {
+	  if (*(bitmapTarget+j)==0) {
+	    *(bgMaskTarget+j)=1;   //at this position, we will apply a different color
+	    //*(bgBitmapTarget+j)=1;
+	    *(maskTarget+j)=0;
+	    *(bitmapTarget+j)=0;
+	  }
+	}
+	bgMaskTarget+=_info.width;
+	//bgBitmapTarget+=_info.width;
+	maskTarget+=_info.width;
+	bitmapTarget+=_info.width;
+      }
+
+    }
+  }
+
+
 	// now w is the real width to displayString
 	// memcpy it to its real position
 	if(w>_info.width)
@@ -370,11 +415,13 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 {
 
 	uint8_t  *mask; //*oldtarget=target,*
+  uint8_t  *bgMask;
 	int8_t *chromatarget;
 	uint32_t hei,start;
 	uint32_t y;
 	uint32_t val;
 	int32_t ssigned;
+  int32_t bg_ssigned;
 
 
 	hei=SRT_MAX_LINE*_conf->_fontsize*_info.width;  // max height of our subtitle
@@ -386,13 +433,15 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 
 	// mask out left and right
 
+  uint32_t bg_val=128*_conf->_bg_Y_percent+128;
+  bg_val>>=8;
+
 	mask=_maskBuffer;
+  bgMask=_bgMaskBuffer;
  	target+=start;
-#define LUMA_LEVEL 10
   	for( y=hei;y>0;y--)
 	{
-		if(*mask)
-		{
+      if(*mask) {
 			if(*mask>LUMA_LEVEL)
 			{
 				val=*mask*_conf->_Y_percent+128;
@@ -401,8 +450,14 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 			}
 			else *target=0;
 		}
+
+      if(_conf->_useBackgroundColor && (*bgMask || *target==0)) {
+	*target=(uint8_t )bg_val;
+      }	  
+      
 		target++;
 		mask++;
+      bgMask++;
 	}
 
 // do u & v
@@ -413,11 +468,15 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	hei>>=2;
 
 	mask=_bitmapBuffer;
+  bgMask=_bgBitmapBuffer;
 	ctarget=chromatarget+start;
 	target=(uint8_t *)ctarget;
 
 	ssigned=_conf->_U_percent;
 	ssigned+=128;
+
+  bg_ssigned=_conf->_bg_U_percent;
+  bg_ssigned+=128;
 
 //#define MAXVAL(x) {val=*mask*(x)+127;val>>=8;*ctarget=(uint8_t)(val&0xff);}
 #define MAXVAL(x)  *target=(uint8_t )ssigned
@@ -427,7 +486,8 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 				*target=128; \
 			else \
 				MAXVAL(_conf->_U_percent); \
-		}
+                } \
+             else if (_conf->_useBackgroundColor && *bgMask) { if(*bgMask==1) {*target=128;} else {*target=(uint8_t)bg_ssigned;} }
 	//if(_conf->_U_percent!=128)
 	if(1)
   	for( y=hei;y>0;y--)
@@ -436,6 +496,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 		ctarget++;
 		target++;
 		mask++;
+	bgMask++;
 	}
 	else
 	{
@@ -444,11 +505,14 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 
 
 	mask=_bitmapBuffer;
+  bgMask=_bgBitmapBuffer;
 	ctarget=chromatarget+start+((_info.width*_info.height)>>2);;
 	target=(uint8_t *)ctarget;
 	ssigned=_conf->_V_percent;
 	ssigned+=128;
 
+  bg_ssigned=_conf->_bg_V_percent;
+  bg_ssigned+=128;
 
 	//if(_conf->_V_percent)
 	if(1)
@@ -459,6 +523,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 		ctarget++;
 		target++;
 		mask++;
+	bgMask++;
 	}
 	else
 	{
