@@ -44,6 +44,7 @@ extern "C"
 
 #ifdef USE_MMX
 extern "C" {
+#include "../../adm_lavcodec/avcodec.h"
 #include "../../adm_lavcodec/dsputil.h"
 }
 #endif
