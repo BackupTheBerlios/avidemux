@@ -95,7 +95,7 @@ uint32_t in,d=0,rd=0,ms10,offset=0,index=0; //,left=0,len=0;;
 				if(!getPacket(internalBuffer, &len,&sample))
 				{
 					printf("MapVBR:Get packet failed\n");
-					continue;
+					break;
 				}		  
 			        offset+=len;
 			      	rd += sample*Mul;
