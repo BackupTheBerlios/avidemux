@@ -125,13 +125,13 @@ void	YU_YV12_mmx(unsigned char *in,unsigned char *out, int w,int h)
 		for(xx=w>>3;xx>0;xx--)
 		{
 			__asm__( PACK_Y1 
-				:: "r" (in),"r" (y)
+				: : "r" (in),"r" (y)
 				);
 			__asm__( PACK_Y2 
-				:: "r" (in2),"r" (y2)
+				: : "r" (in2),"r" (y2)
 				);
 			__asm__( PREPARE_UV
-					:: "r"(yy)
+					: : "r"(yy)
 					); 
 			in+=8;
 			in2+=8;
@@ -140,20 +140,20 @@ void	YU_YV12_mmx(unsigned char *in,unsigned char *out, int w,int h)
 			
 			/*______________*/
 			__asm__( PACK_Y1 
-				:: "r" (in),"r" (y)
+				: : "r" (in),"r" (y)
 			);
 			__asm__( PACK_Y2 
-				:: "r" (in2),"r" (y2)
+				: : "r" (in2),"r" (y2)
 			);
 			__asm__( PREPARE_UV2
-			:: "r"(yy)
+			: : "r"(yy)
 					
 			); 
 			__asm__( PACK_U
-				:: "r" (u)
+				: : "r" (u)
 				); 
 			__asm__( PACK_V
-				:: "r" (v)
+				: : "r" (v)
 				); 
 			u+=4;
 			v+=4;
@@ -189,13 +189,13 @@ void	YU_YV12_mmx_swapped(unsigned char *in,unsigned char *out, int w,int h)
 		for(xx=w>>3;xx>0;xx--)
 		{
 			__asm__( PACK_Y1 
-				:: "r" (in),"r" (y)
+				: : "r" (in),"r" (y)
 				);
 			__asm__( PACK_Y2 
-				:: "r" (in2),"r" (y2)
+				: : "r" (in2),"r" (y2)
 				);
 			__asm__( PREPARE_UV
-					:: "r"(yy)
+					: : "r"(yy)
 					); 
 			in+=8;
 			in2+=8;
@@ -204,19 +204,19 @@ void	YU_YV12_mmx_swapped(unsigned char *in,unsigned char *out, int w,int h)
 			
 			/*______________*/
 			__asm__( PACK_Y1 
-				:: "r" (in),"r" (y)
+				: : "r" (in),"r" (y)
 			);
 			__asm__( PACK_Y2 
-				:: "r" (in2),"r" (y2)
+				: : "r" (in2),"r" (y2)
 			);
 			__asm__( PREPARE_UV2
-			:: "r"(yy)					
+			: : "r"(yy)					
 			); 
 			__asm__( PACK_U
-				:: "r" (u)
+				: : "r" (u)
 				); 
 			__asm__( PACK_V
-				:: "r" (v)
+				: : "r" (v)
 				); 
 			u+=4;
 			v+=4;
