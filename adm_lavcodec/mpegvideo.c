@@ -928,7 +928,7 @@ int MPV_encode_init(AVCodecContext *avctx)
         return -1;
     }
     
-    if(s->mpeg_quant && s->codec_id != CODEC_ID_MPEG4){ //FIXME mpeg2 uses that too
+    if(s->mpeg_quant && (s->codec_id != CODEC_ID_MPEG4) &&(s->codec_id != CODEC_ID_MPEG2VIDEO) ){ //FIXME mpeg2 uses that too
         av_log(avctx, AV_LOG_ERROR, "mpeg2 style quantization not supporetd by codec\n");
         return -1;
     }
@@ -966,8 +966,10 @@ int MPV_encode_init(AVCodecContext *avctx)
     i= ff_gcd(avctx->frame_rate, avctx->frame_rate_base);
     if(i > 1){
         av_log(avctx, AV_LOG_INFO, "removing common factors from framerate\n");
+	av_log(avctx, AV_LOG_INFO," was %d / %d\n",avctx->frame_rate, avctx->frame_rate_base);
         avctx->frame_rate /= i;
         avctx->frame_rate_base /= i;
+	av_log(avctx, AV_LOG_INFO," was %d / %d\n",avctx->frame_rate, avctx->frame_rate_base);
 //        return -1;
     }
     
