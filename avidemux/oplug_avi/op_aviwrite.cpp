@@ -304,12 +304,16 @@ uint32_t extraLen=0;
 		  	// use extended headers
 		  	//		
 		  	//
+#if 0			
 		  	double	    nb;
 		  	nb = stream->getLength ();
 		  	nb/= _videostream.dwLength;
 		  	// avg value of a block (i.e. a mpeg frame)
 		  	mp3vbr.nblocksize = (uint32_t) floor (nb);			
 		  	mp3vbr.nblocksize = R16(mp3vbr.nblocksize); 
+#else
+			mp3vbr.nblocksize=1152;
+#endif			
 		   }	
 		   else wav->blockalign=1;
 
