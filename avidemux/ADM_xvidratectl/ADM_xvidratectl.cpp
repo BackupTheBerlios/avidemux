@@ -28,7 +28,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: ADM_xvidratectl.cpp,v 1.5 2004/12/17 21:51:37 mean Exp $
+ * $Id: ADM_xvidratectl.cpp,v 1.6 2004/12/19 14:02:10 mean Exp $
  *
  *****************************************************************************/
 
@@ -369,7 +369,7 @@ xvid_plg_data_t  data;
 		
 	return 1;
 }
-uint8_t ADM_newXvidRc::getInfo(uint32_t framenum, uint32_t *qz, uint32_t *size)
+uint8_t ADM_newXvidRc::getInfo(uint32_t framenum, uint32_t *qz, uint32_t *size,ADM_rframe *type )
 {
 rc_2pass2_t * rc;
 	ADM_assert(framenum<_totalFrame);
@@ -379,6 +379,19 @@ rc_2pass2_t * rc;
 	
 	*qz=rc->stats[framenum].quant;
 	*size=rc->stats[framenum].length;
+	if(framenum>=_totalFrame-2)
+	{
+		*type=RF_I;
+	}
+	else
+	 switch(rc->stats[framenum].type)
+	 {
+	 	case XVID_TYPE_IVOP: *type=RF_I; ;break;
+		case XVID_TYPE_PVOP: *type=RF_P; ;break;
+		case XVID_TYPE_BVOP: *type=RF_B; ;break;
+		default:printf("f:%lu Type : %d\n",framenum,rc->stats[framenum].type);ADM_assert(0);
+	}
+	
 	return 1;
 
 }

@@ -30,6 +30,7 @@ typedef struct
 {
 	uint32_t quant;
 	uint32_t size;
+	ADM_rframe type;
 }ADM_pass_stat;
 #define FORBIDDEN {ADM_assert(0);return 0;}
 
@@ -85,7 +86,7 @@ public:
 	virtual		uint8_t getQz( uint32_t *qz, ADM_rframe *type );
 	virtual		uint8_t logPass2( uint32_t qz, ADM_rframe ftype,uint32_t size);
 			// Used for VBV
-			uint8_t getInfo(uint32_t framenum, uint32_t *qz, uint32_t *size);
+			uint8_t getInfo(uint32_t framenum, uint32_t *qz, uint32_t *size,ADM_rframe *type );
 
 };
 #define AVG_LOOKUP 5
@@ -100,7 +101,7 @@ protected:
 			uint32_t	_frame;
 			uint32_t	_vbv_fullness;
 			uint32_t	_byte_per_image;
-			double		_compr[AVG_LOOKUP];
+			double		_compr[3][AVG_LOOKUP];  
 			
 			uint8_t 	project(uint32_t framenum, uint32_t q, ADM_rframe frame);
 			uint8_t 	checkVBV(uint32_t framenum, uint32_t q, ADM_rframe frame);

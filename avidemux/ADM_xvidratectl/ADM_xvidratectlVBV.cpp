@@ -37,8 +37,7 @@ ADM_newXvidRcVBV::ADM_newXvidRcVBV(uint32_t fps1000, char *logname) : ADM_rateco
 	_stat=NULL;
 	_lastSize=NULL;
 	
-	for(uint32_t j=0;j<AVG_LOOKUP;j++)
-		_compr[j]=0;
+
 }
 ADM_newXvidRcVBV::~ADM_newXvidRcVBV()
 {
@@ -82,7 +81,7 @@ uint8_t ADM_newXvidRcVBV::startPass2( uint32_t size,uint32_t nbFrame )
 	
 	for(uint32_t i=0;i<nbFrame;i++)
 	{
-		rc->getInfo(i,&(cur->quant),&(cur->size));
+		rc->getInfo(i,&(cur->quant),&(cur->size),&(cur->type));
 		cur++;
 	}
 	// a roundup is close to fps
@@ -94,7 +93,11 @@ uint8_t ADM_newXvidRcVBV::startPass2( uint32_t size,uint32_t nbFrame )
 	memset(_lastSize,0,_roundup*sizeof(uint32_t));
 	_frame=0;
 	for(uint32_t i=0;i<AVG_LOOKUP;i++)
-		_compr[i]=1.0;
+	{
+		_compr[0][i]=1.0;
+		_compr[1][i]=1.0;
+		_compr[2][i]=1.0;
+	}
 	printf("Rc: Byte per image : %lu \n",_byte_per_image);
 	return 1;
 }
@@ -124,7 +127,7 @@ uint8_t ADM_newXvidRcVBV::logPass2(uint32_t qz, ADM_rframe ftype,uint32_t size)
 	// update compr
 	uint32_t rank;
 		rank=_frame%AVG_LOOKUP;
-		_compr[rank]=getComp(_stat[_frame].size,_stat[_frame].quant,size,qz);
+		_compr[ftype-1][rank]=getComp(_stat[_frame].size,_stat[_frame].quant,size,qz);
 	//
 	aprintf("Frame %08lu size %d type:%d vbv fullness %u, kbytes :%lu qz used :%d\n",_frame,size, ftype,(100*_vbv_fullness)/_vbvsize,_vbv_fullness/1024,qz);
 	// compute instantaneous br
@@ -161,7 +164,7 @@ uint8_t ADM_newXvidRcVBV::project(uint32_t framenum, uint32_t q, ADM_rframe fram
 }
 uint8_t ADM_newXvidRcVBV::checkVBV(uint32_t framenum, uint32_t q, ADM_rframe frame)
 {
-	float ratio;
+	
 	// Project the next frames with the same Q factor reduction as now
 	// and check
 	
@@ -174,30 +177,42 @@ uint8_t ADM_newXvidRcVBV::checkVBV(uint32_t framenum, uint32_t q, ADM_rframe fra
 		
 		// Q increase ratio
 		
-		float comp=0,size,qr;
-			
+		float compI=0,compP=0,compB=0,comp=0,size,qr;
+		float ratioI,ratioP,ratioB,ratio;
 	
 			for(uint32_t i=0;i<AVG_LOOKUP;i++)
 			{
-				comp+=_compr[i];
+				compI+=_compr[0][i];
+				compP+=_compr[1][i];
+				compB+=_compr[2][i];
 			}
 			
-			comp=comp/AVG_LOOKUP;	// Average compression ratio
-			ratio=getRatio(q,_stat[framenum].quant,comp);
+			compI=compI/AVG_LOOKUP;	// Average compression ratio
+			compP=compP/AVG_LOOKUP;	// Average compression ratio
+			compB=compB/AVG_LOOKUP;	// Average compression ratio
+			ratioI=getRatio(q,_stat[framenum].quant,compI);
+			ratioP=getRatio(q,_stat[framenum].quant,compP);
+			ratioB=getRatio(q,_stat[framenum].quant,compB);
 			
 		
 		for(uint32_t i=0;i<_roundup>>1;i++)
 		{
-		
+			switch(_stat[framenum+i].type)
+			{
+				case RF_I:ratio=ratioI;comp=compI;break;
+				case RF_P:ratio=ratioP;comp=compP;break;
+				case RF_B:ratio=ratioB;comp=compB;break;
+				default:ADM_assert(0);
+			}
 			size=ratio;
 			size*=_stat[framenum+i].size;
 			framesize=(uint32_t)floor(size);	// predicted size
 			
-			if(!i && frame==RF_I) // less compression ratio ~1.5 
-				framesize=(framesize*3)>>1;
+			if(frame==RF_I) // Keep a margin and anticipate BIG I frame
+				framesize=(framesize*12)/10;
 			
-			aprintf("\t Org: %lu projected :%d VBV:%d q:%d ratio:%f alpha:%f\n",_stat[framenum+i].size,framesize,
-					projected_vbv/1024,q,ratio,comp);
+			aprintf("\t Org: %lu projected :%d VBV:%d q:%d ratio:%f alpha:%f  type :%d\n",_stat[framenum+i].size,framesize,
+					projected_vbv/1024,q,ratio,comp,_stat[framenum+i].type);
 			if(projected_vbv<framesize)
 			{
 				aprintf("potential underflow at %d + %d , q:%d\n",framenum,i,q);
@@ -210,6 +225,10 @@ uint8_t ADM_newXvidRcVBV::checkVBV(uint32_t framenum, uint32_t q, ADM_rframe fra
 				projected_vbv=_vbvsize;
 			}
 		}
+	}
+	else
+	{
+		if(q<9) return 0;
 	}		
 	return 1;
 
@@ -270,7 +289,7 @@ float ADM_newXvidRcVBV::getRatio(uint32_t newq, uint32_t oldq, float alpha)
  	// Linear
 	// Ob*Oq*alpha=Nb*Nq
 	// Nb/Ob=Oq/Nq*alpha
-	alpha=1;
+	//alpha=1;
 	float comp;
 	
 	comp=oldq;	
