@@ -76,7 +76,9 @@ void ADM_dezalloc(void *ptr)
 	uint32_t *backdoor;
 	uint32_t size,offset;
 	char	 *c=(char *)ptr;
-	
+
+	if(!ptr) return;
+
 	backdoor=(uint32_t *)ptr;
 	backdoor-=2;
 	
