@@ -40,9 +40,10 @@ avidemux2_LDADD   =  \
 ./ADM_h263/libADM_h263.a   \
 ./ADM_nuv/libADM_nuv.a  ./ADM_ogm/libADM_ogm.a ./ADM_audiodevice/libADM_audiodevice.a \
 ./ADM_mpeg2dec/libADM_mpeg2dec.a \
+./ADM_dialog/libADM_dialog.a  \
 ./ADM_mpegindexer/libADM_mpegindexer.a   \
 ./ADM_mpeg2dec/libADM_mpeg2dec.a \
-./libMpeg2Dec/liblibMpeg2Dec.a   ./ADM_dialog/libADM_dialog.a \
+./libMpeg2Dec/liblibMpeg2Dec.a   \
 ./ADM_toolkit/libADM_toolkit.a  \
 ./ADM_colorspace/libADM_colorspace.a \
 ../adm_lavcodec/libpostproc/libpostproc.a \
