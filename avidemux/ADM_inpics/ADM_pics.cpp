@@ -22,11 +22,11 @@
  ***************************************************************************/
 
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include "config.h"
 #include "math.h"
 
 #include "ADM_library/default.h"
@@ -57,7 +57,7 @@ uint8_t  picHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 
  	fseek(_fd[framenum],_offset,SEEK_SET);
  	fread(ptr,_imgSize[framenum],	_imgSize[framenum]-_offset,_fd[framenum]);
-  	*framelen=_imgSize[framenum];;
+  	*framelen=_imgSize[framenum]-_offset;;
  	return 1;
 }
 
@@ -88,7 +88,8 @@ uint8_t    picHeader::close( void )
 typedef enum
 {
 	PIC_BMP=1,
-	PIC_JPEG
+	PIC_JPEG=2,
+	PIC_BMP2=3
 };
 
 uint32_t    picHeader::read32(FILE *fd)
@@ -122,36 +123,45 @@ uint8_t i;
 uint8_t    picHeader::open(char *inname)
 {
 
-uint32_t 			nnum,fcc;
+uint32_t		nnum;
+uint32_t		*fcc;
+uint8_t			fcc_tab[4];
 FILE 			*fd;
 char 			*end;
 uint32_t			w=0,h=0;
 
 	// 1- identity the file type
 	//
+	fcc=(uint32_t *)fcc_tab;
 	fd=fopen(inname,"rb");
 	if(!fd)
 		{
 			printf("\n Cannot open that file!\n");
 			return 0;
 		}
-	fread(&fcc,4,1,fd);
+	fread(fcc_tab,4,1,fd);
 	fclose(fd);
-	if(fourCC::check(fcc,(uint8_t *)"RIFF"))
+	if(fourCC::check(*fcc,(uint8_t *)"RIFF"))
 	{
 		_type=PIC_BMP;
-		printf("\n It looks like BMP...\n");
+		printf("\n It looks like BMP (RIFF)...\n");
 	}
 	else
 	{
-		if((fcc&0xffff)==R16(0xd8ff))
+		if(fcc_tab[0]=='B' && fcc_tab[1]=='M')
+		{
+			_type=PIC_BMP2;
+			printf("\n It looks like BMP (BM)...\n");
+		}
+		else	
+		if(fcc_tab[0]==0xff && fcc_tab[1]==0xd8)
 		{
 		 	_type=PIC_JPEG;
 			printf("\n It looks like Jpg...\n");
 		}
 		else
 		{
-			printf("\n Cannot identify file (%x %x)\n",fcc,fcc&0xffff);
+			printf("\n Cannot identify file (%x %x)\n",*fcc,*fcc&0xffff);
 			return 0;
 		}
 	}
@@ -226,9 +236,11 @@ uint32_t			w=0,h=0;
 	//
 	//	Image is bmp type
 	//________________________
-	  if(PIC_BMP==_type)
-	  {
-		BITMAPHEADER bmph;
+	switch(_type)
+	{
+		case PIC_BMP:
+			{
+			BITMAPHEADER bmph;
 
               		fread(&s16,2,1, _fd[0]);
               		if(s16!=0x4D42)
@@ -248,10 +260,14 @@ uint32_t			w=0,h=0;
               		_offset=bmph.size+14;
 			w=bmph.width ;
 			h=bmph.height ;
-	      }
-		else
-		{ // Jpeg : Grab the size
+			}
+			break;
+	
+
+		 // Jpeg : Grab the size
 		//____________________
+		case PIC_JPEG:
+			{
 			uint16_t tag=0,count=0,off;
 
 			_offset=0;
@@ -292,6 +308,38 @@ uint32_t			w=0,h=0;
 				return 0;
 			}
 			printf("\n %lu x %lu..\n",w,h);
+			}
+			break;
+
+		case PIC_BMP2:
+			{
+			BITMAPINFOHEADER bmph;
+
+			fseek(_fd[0],10,SEEK_SET);
+
+			#define MK32() (fcc_tab[0]+(fcc_tab[1]<<8)+(fcc_tab[2]<<16)+ \
+						(fcc_tab[3]<<24))
+
+              		fread(fcc_tab,4,1, _fd[0]);
+              		_offset=MK32();
+			// size, width height follow as int32 
+               		fread(&bmph, sizeof(bmph), 1, _fd[0]);
+#ifdef ADM_BIG_ENDIAN
+			Endian_BitMapInfo(&bmph);	
+#endif
+               		if(bmph.biCompression!=0)
+               		{
+                 		printf("\ncannot handle compressed bmp\n");
+	               		return 0;
+                	}
+			w=bmph.biWidth ;
+			h=bmph.biHeight ;
+			printf("W: %d H: %d offset : %d\n",w,h,_offset);
+			}
+	
+			break;
+		default:
+			assert(0);
 		}
 
 //_______________________________________

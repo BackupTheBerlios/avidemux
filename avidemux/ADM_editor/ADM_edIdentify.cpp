@@ -134,7 +134,11 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
       return 1;
     }
   if (magic[0] == R32(0x05364d42) ||
- 		(magic[0] &0xffff)== R32(0xd8ff) )
+ 		(magic[0] &0xffff)== R32(0xd8ff) 
+		||
+		magic[0]==R32(0x84364d42)
+		||
+		(id &0xffff)==R16(0x424d))
     {
 
       printf (" \n BMP file detected...\n");

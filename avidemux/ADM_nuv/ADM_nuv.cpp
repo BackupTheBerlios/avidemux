@@ -42,7 +42,7 @@
                                                  // 8192 ~ 45 ms
 														// 4410 ~  25 ms
 
-//#define DEBUG
+#define DEBUG
 //_____________________
 
 #include <stdio.h>
