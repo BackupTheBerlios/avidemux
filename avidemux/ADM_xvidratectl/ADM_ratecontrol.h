@@ -42,7 +42,7 @@ public:
 	virtual 	uint8_t setVBVInfo(uint32_t maxbr,uint32_t minbr, uint32_t vbvsize) FORBIDDEN ;
 	virtual		uint8_t startPass1( void )FORBIDDEN;
 	virtual		uint8_t logPass1(uint32_t qz, ADM_rframe ftype,uint32_t size)FORBIDDEN;
-	virtual		uint8_t startPass2( uint32_t size )FORBIDDEN;
+	virtual		uint8_t startPass2( uint32_t size ,uint32_t nbFrame)FORBIDDEN;
 	virtual		uint8_t getQz( uint32_t *qz, ADM_rframe *type )FORBIDDEN;
 	virtual		uint8_t logPass2( uint32_t qz, ADM_rframe ftype,uint32_t size)FORBIDDEN;
 
@@ -57,7 +57,7 @@ public:
 	virtual 	uint8_t setVBVInfo(uint32_t maxbr,uint32_t minbr, uint32_t vbvsize);
 	virtual		uint8_t startPass1( void );
 	virtual		uint8_t logPass1(uint32_t qz, ADM_rframe ftype,uint32_t size);
-	virtual		uint8_t startPass2( uint32_t size );
+	virtual		uint8_t startPass2( uint32_t size,uint32_t nbFrame );
 	virtual		uint8_t getQz( uint32_t *qz, ADM_rframe *type );
 	virtual		uint8_t logPass2( uint32_t qz, ADM_rframe ftype,uint32_t size);
 
@@ -72,7 +72,7 @@ public:
 	virtual 	uint8_t setVBVInfo(uint32_t maxbr,uint32_t minbr, uint32_t vbvsize);
 	virtual		uint8_t startPass1( void );
 	virtual		uint8_t logPass1(uint32_t qz, ADM_rframe ftype,uint32_t size);
-	virtual		uint8_t startPass2( uint32_t size );
+	virtual		uint8_t startPass2( uint32_t size,uint32_t nbFrame );
 	virtual		uint8_t getQz( uint32_t *qz, ADM_rframe *type );
 	virtual		uint8_t logPass2( uint32_t qz, ADM_rframe ftype,uint32_t size);
 

@@ -88,7 +88,7 @@ int intra=0;
 	return 1;
 }
 //
-uint8_t ADM_oldXvidRc::startPass2( uint32_t final_size )
+uint8_t ADM_oldXvidRc::startPass2( uint32_t final_size ,uint32_t nbFrame)
 {
 uint64_t total_size;
 
@@ -112,7 +112,7 @@ uint64_t total_size;
 
 	float br;
 	uint32_t avg;
-
+	_nbFrames=nbFrame;
 	ADM_assert(_nbFrames);
 	br=mpegvbr.desired_size*8;
 	br=br/_nbFrames;				// bit / frame
