@@ -37,7 +37,8 @@
 #include "multiplexor.hpp"
 
 #define MAX_UNDERRUN 10
-#define mjpeg_info mjpeg_warn
+//#define mjpeg_info mjpeg_warn
+//#define STREAM_LOGGING 1
 
 /****************
  *
@@ -49,6 +50,9 @@
 
 Multiplexor::Multiplexor(MultiplexJob &job, OutputStream &output)
 {
+
+        
+
     underrun_ignore = 0;
     underruns = 0;
 	start_of_new_pack = false;
@@ -1164,7 +1168,7 @@ void Multiplexor::Multiplex()
 		for( str = estreams.begin(); str < estreams.end(); ++str )
 		{
 #ifdef STREAM_LOGGING
-            mjpeg_debug("STREAM %02x: SCR=%lld mux=%d reqDTS=%lld", 
+            mjpeg_warn("STREAM %02x: SCR=%lld mux=%d reqDTS=%lld", 
                         (*str)->stream_id,
                         current_SCR /300,
                         (*str)->MuxPossible(current_SCR),
@@ -1190,10 +1194,12 @@ void Multiplexor::Multiplex()
 		{
 			despatch->BufferAndOutputSector();
 			video_first = false;
+#if 0                        
 				mjpeg_warn( "Stream %02x: data will arrive too late sent(SCR)=%lld required(DTS)=%lld", 
 							despatch->stream_id, 
 							current_SCR/300, 
 							earliest/300 );
+#endif                                                        
 				MuxStatus( LOG_WARN );
                         if( current_SCR >=  earliest && underrun_ignore == 0)
                         {
@@ -1298,11 +1304,11 @@ void Multiplexor::Multiplex()
 
     if( underruns> 0 )
 	{
-		mjpeg_error_exit1( "MUX STATUS: Frame data under-runs detected!" );
+		mjpeg_warn( "MUX STATUS: Frame data under-runs detected!" );
 	}
 	else
 	{
-		mjpeg_info( "MUX STATUS: no under-runs detected.");
+		mjpeg_warn( "MUX STATUS: no under-runs detected.");
 	}
 }
 

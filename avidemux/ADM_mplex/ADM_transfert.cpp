@@ -101,11 +101,11 @@ uint8_t admCond::abort( void )
 Transfert::Transfert(void)
 {
         buffer=new uint8_t[TRANSFERT_BUFFER];
-        fill=0;
+
         aborted=0;
         waitingData=0;
         ready=1;
-        fill=0;
+        head=tail=0;
 }
 Transfert::~Transfert()
 {
@@ -115,28 +115,28 @@ Transfert::~Transfert()
 uint32_t Transfert:: read(uint8_t *buf, uint32_t nb  )
 {
 uint32_t r=0;
+uint32_t fill;
         
   while(1)
   {
         mutex.lock();
+        fill=tail-head;
         if(fill>=nb)
         {
                 
-                memcpy(buf,buffer,nb);
-                memmove(buffer,buffer+nb,fill-nb);                
-                fill-=nb;
+                memcpy(buf,buffer+head,nb);                
+                head+=nb;
                 r+=nb;
                 mutex.unlock();
                 return r;
         }
         
         // Purge
-         memcpy(buf,buffer,fill);
+         memcpy(buf,buffer+head,fill);
          buf+=fill;
          nb-=fill;
-         r+=fill;
-         
-         fill=0;
+         r+=fill;         
+         head=tail=0;
          if(aborted) 
          {
                 mutex.unlock();
@@ -156,8 +156,14 @@ uint32_t r=0;
 }
 uint8_t Transfert::fillingUp( void)
 {
-        if(fill>(TRANSFERT_BUFFER*6)/10) return 1;
-        return 0;
+uint8_t r=0;
+
+        mutex.lock();
+        if(tail-head>(TRANSFERT_BUFFER/2)) r=1;
+        else r=0;
+        mutex.unlock();
+        return r;
+        
 
 }
 uint8_t Transfert:: write(uint8_t *buf, uint32_t nb  )
@@ -165,14 +171,22 @@ uint8_t Transfert:: write(uint8_t *buf, uint32_t nb  )
         if(aborted) return 0;
         
         mutex.lock(); 
-        if(nb+fill>=TRANSFERT_BUFFER)
+        // Need to pack ?
+        if(nb+tail>=TRANSFERT_BUFFER)
         {
-                printf("\n When writting %lu bytes, we overflow the existing %lu bytes\n",nb,fill);
+                memmove(buffer,buffer+head,tail-head);
+                tail-=head;
+                head=0;
+        }
+        // Overflow ?
+        if(nb+tail>=TRANSFERT_BUFFER)
+        {
+                printf("\n When writting %lu bytes, we overflow the existing %lu bytes\n",nb,tail-head);
                 ADM_assert(0);
         
         }
-        memcpy(buffer+fill,buf,nb);        
-        fill+=nb;
+        memcpy(buffer+tail,buf,nb);        
+        tail+=nb;
         mutex.unlock();
         if(waitingData)
                 cond.wakeup();

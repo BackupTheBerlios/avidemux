@@ -52,7 +52,7 @@ protected:
         uint8_t  waitingData;
         uint8_t  aborted;
         uint8_t  *buffer;   
-        uint32_t fill;     
+        uint32_t head,tail;     
 public:        
                 Transfert( void );
                 ~Transfert(  );

@@ -83,6 +83,7 @@ static IFileBitStream   *audioin=NULL;
 static IFileBitStream   *videoin=NULL;
 static uint32_t         fps1000;
 static int              mux_format;
+static int              slaveRunning=0;
 
 static  vector<IBitStream *> inputs;
 
@@ -130,7 +131,9 @@ uint8_t mplexMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type
         printf("creating slave thread\n");
         
         pthread_t slave;
+        slaveRunning=1;
         ADM_assert(!pthread_create(&slave,NULL,(THRINP)slaveThread,NULL));
+        sleep(1); // Allow slave thread to start
         printf("Init ok\n");
         return 1;
 }
@@ -161,6 +164,8 @@ int slaveThread( void )
                
         printf("Slave :Muxing\n");
         mux.Multiplex();
+        slaveRunning=0;
+        printf("Slace Thread exiting\n");
         pthread_exit(0);
 }        
 //___________________________________________________________________________
@@ -232,14 +237,14 @@ uint16_t a1,a2,a3,a4,ff;
                                 newtime=(newtime*1000);
                                 newtime/=fps1000; // in seconds
                                 
-                                hh=newtime/3600;
+                                hh=(uint32_t)newtime/3600;
                                 newtime-=hh*3600;
-                                mm=newtime/60;
+                                mm=(uint32_t)newtime/60;
                                 newtime-=mm*60;
-                                ss=newtime;
+                                ss=(uint32_t)newtime;
                                 newtime-=ss;
                                 newtime*=1000;
-                                ms=newtime;
+                                ms=(uint32_t)newtime;
                                 
                                 *(ptr+0)=(hh<<2)+(mm>>4);
                                 *(ptr+1)=((mm&0xf)<<4)+8+(ss>>3);
@@ -288,11 +293,22 @@ uint8_t mplexMuxer::close( void )
         if(_running)
         {
                 _running=0;
-                // Flush
-                // Cause deadlock :
                 channelvideo->abort();
                 channelaudio->abort();
-                
+                while(slaveRunning)
+                {
+                        printf("Waiting for slave thread to end\n");
+                        sleep(1);
+                }
+                        // Flush
+                        // Cause deadlock :
+                delete audioin;
+                delete videoin;
+                delete channelvideo;
+                delete channelaudio;
+                delete outputStream;
+                inputs.erase( inputs.begin(), inputs.end() );
+                printf("Mplex : All destroyed\n");
         }
         return 1;
 }
