@@ -25,133 +25,35 @@
 #include <setjmp.h>
 #include "cpu_accel.h"
 
+#include "ADM_library/default.h"
+#include "ADM_toolkit/ADM_cpuCap.h"
+
 #if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)
 extern int detect_altivec();
 #endif
 
-#ifdef HAVE_X86CPU 
-
-#include "mjpeg_types.h"
+//#include "mjpeg_types.h"
 
 /* Some miscelaneous stuff to allow checking whether SSE instructions cause
    illegal instruction errors.
 */
-#define RETSIGTYPE void //MEANX : FIXME
-#ifndef CYG_MANGLING
-static sigjmp_buf sigill_recover;
-#endif
-typedef RETSIGTYPE (*__sig_t)(int);
-
-static RETSIGTYPE sigillhandler(int sig )
-{
-#ifndef CYG_MANGLING
-	siglongjmp( sigill_recover, 1 );
-#endif	
-}
 
 
 
-static int testsseill()
-{
-	int illegal;
-#if defined(CYG_MANGLING)
-	/* SSE causes a crash on CYGWIN, apparently.
-	   Perhaps the wrong signal is being caught or something along
-	   those line ;-) or maybe SSE itself won't work...
-	*/
-	illegal = 1;
-#else
-	__sig_t old_handler = signal( SIGILL, sigillhandler);
-	if( sigsetjmp( sigill_recover, 1 ) == 0 )
-	{
-		asm ( "movups %xmm0, %xmm0" );
-		illegal = 0;
-	}
-	else
-		illegal = 1;
-	signal( SIGILL, old_handler );
-#endif
-	return illegal;
-}
 
 static int x86_accel (void)
 {
-    int32_t eax, ebx, ecx, edx;
-    int32_t AMD;
-    int32_t caps;
+   int32_t eax, ebx, ecx, edx;
+   int32_t AMD;
+   int32_t caps;
 
-#define cpuid(op,eax,ebx,ecx,edx)	\
-    asm ("cpuid"			\
-	 : "=a" (eax),			\
-	   "=b" (ebx),			\
-	   "=c" (ecx),			\
-	   "=d" (edx)			\
-	 : "a" (op)			\
-	 : "cc")
-
-    asm ("pushfl\n\t"
-	 "popl %0\n\t"
-	 "movl %0,%1\n\t"
-	 "xorl $0x200000,%0\n\t"
-	 "pushl %0\n\t"
-	 "popfl\n\t"
-	 "pushfl\n\t"
-	 "popl %0"
-         : "=a" (eax),
-	       "=b" (ebx)
-	 :
-	 : "cc");
-
-
-    if (eax == ebx)		// no cpuid
-	return 0;
-
-    cpuid (0x00000000, eax, ebx, ecx, edx);
-    if (!eax)			// vendor string only
-	return 0;
-
-    AMD = (ebx == 0x68747541) && (ecx == 0x444d4163) && (edx == 0x69746e65);
-
-    cpuid (0x00000001, eax, ebx, ecx, edx);
-    if (! (edx & 0x00800000))	// no MMX
-	return 0;
-
-    caps = ACCEL_X86_MMX;
-    /* If SSE capable CPU has same MMX extensions as AMD
-	   and then some. However, to use SSE O.S. must have signalled
-	   it use of FXSAVE/FXRSTOR through CR4.OSFXSR and hence FXSR (bit 24)
-	   here
-	*/
-    if ((edx & 0x02000000))	
-		caps = ACCEL_X86_MMX | ACCEL_X86_MMXEXT;
-	if( (edx & 0x03000000) == 0x03000000 )
-	{
-		/* Check whether O.S. has SSE support... has to be done with
-		   exception 'cos those Intel morons put the relevant bit
-		   in a reg that is only accesible in ring 0... doh! 
-		*/
-		if( !testsseill() )
-			caps |= ACCEL_X86_SSE;
-	}
-
-    cpuid (0x80000000, eax, ebx, ecx, edx);
-    if (eax < 0x80000001)	// no extended capabilities
-		return caps;
-
-    cpuid (0x80000001, eax, ebx, ecx, edx);
-
-    if (edx & 0x80000000)
-	caps |= ACCEL_X86_3DNOW;
-
-    if (AMD && (edx & 0x00400000))	// AMD MMX extensions
-	{
-		caps |= ACCEL_X86_MMXEXT;
-	}
-
-    return caps;
-}
-#endif
-
+   if(CpuCaps::hasMMX()) caps |=ACCEL_X86_MMX;
+   if(CpuCaps::hasMMXEXT()) caps |=ACCEL_X86_MMXEXT;
+   if(CpuCaps::has3DNOW()) caps |=ACCEL_X86_3DNOW;
+   if(CpuCaps::hasSSE()) caps |=ACCEL_X86_SSE;
+   return caps;
+} 
+   
 int cpu_accel (void)
 {
 #ifdef HAVE_X86CPU 
