@@ -307,7 +307,7 @@ static void * mmx_memcpy(void * to, const void * from, size_t len)
   /*
    *	Now do the tail of the block
    */
-  if(len) linux_kernel_memcpy_impl(to, from, len);
+  if(len) linux_kernel_memcpy_impl(uto, ufrom, len);
   return retval;
 }
 
