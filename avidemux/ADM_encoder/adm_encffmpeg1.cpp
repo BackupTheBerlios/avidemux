@@ -269,7 +269,7 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 							cdec = new ffmpegEncoderCQ (_w, _h,_id); // Pass1
 			    				FFcodecSetting tmp;
 							memcpy(&tmp,&_settings,sizeof(_settings));
-							tmp.maxBitrate=tmp.minBitrate=0;
+							tmp.maxBitrate=tmp.minBitrate=tmp.bufferSize=0;
 			    				cdec->setConfig(&tmp);
 							cdec->setLogFile(_logname);
 							cdec->init (FIRST_PASS_QUANTIZER,_fps,1);
