@@ -1209,7 +1209,7 @@ void Multiplexor::Multiplex()
 				++underruns;
 				if( underruns > MAX_UNDERRUN  )
 				{
-					mjpeg_error_exit1("Too many frame drops -exiting" );
+					//mjpeg_error_exit1("Too many frame drops -exiting" );
 				}
 			}
             if( despatch->nsec > 50 &&
