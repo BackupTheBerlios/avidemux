@@ -77,6 +77,8 @@ const  vector signed short multGu=(vector signed short)(MULGu,0,MULGu,0, MULGu,0
 const  vector signed short multGv=(vector signed short)(MULGV,0,MULGV,0, MULGV,0,MULGV,0);
 const  vector signed short conv2Signed=(vector signed short)(-128,-128,-128,-128,  									-128,-128,-128,-128);	
 const vecbyte maskR=(vecbyte)(2,0x12,6,0x16,10,0x1a,14,0x1e,  0,0,0,0,0,0,0,0);
+#define MXF 0xff00
+const vector signed int maxFF=(vector signed int)(MXF,MXF,MXF,MXF);
 
 //____________________________________
 //	We handle 8 pixels at a time
@@ -205,7 +207,8 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		// We done do clipping (yet)
 		// Saturate
 		#define SAT(x) \
-			x=vec_max(x,(vector signed int)nullVect);
+			x=vec_max(x,(vector signed int)nullVect); \
+			x=vec_min(x,(vector signed int)maxFF);
 		SAT(R0);
 		SAT(R1);
 		SAT(G0);
