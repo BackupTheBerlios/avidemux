@@ -307,6 +307,11 @@ if(info.height==0)
   // only root can do this
   if (getuid()==0) nice(-10);
 
+  if (reclength != -1)
+  {
+    signal(SIGALRM, sighandler);
+    alarm(reclength);
+  }
 
 	if( !initVideoDev(videodevice, &info ))
 	{
