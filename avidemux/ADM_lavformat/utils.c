@@ -308,7 +308,7 @@ void fifo_write(FifoBuffer *f, uint8_t *buf, int size, uint8_t **wptr_ptr)
     int len;
     uint8_t *wptr;
 
-     if(!wptr_ptr)
+    if(!wptr_ptr)
         wptr_ptr= &f->wptr;
     wptr = *wptr_ptr;
 
@@ -664,6 +664,7 @@ static int is_intra_only(AVCodecContext *enc){
         case CODEC_ID_RAWVIDEO:
         case CODEC_ID_DVVIDEO:
         case CODEC_ID_HUFFYUV:
+       //MEANX case CODEC_ID_FFVHUFF:
         case CODEC_ID_ASV1:
         case CODEC_ID_ASV2:
         case CODEC_ID_VCR1:
@@ -708,10 +709,8 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
     if (st->codec.codec_type == CODEC_TYPE_VIDEO) {
         /* XXX: need has_b_frame, but cannot get it if the codec is
            not initialized */
-        if ((st->codec.codec_id == CODEC_ID_MPEG1VIDEO ||
-             st->codec.codec_id == CODEC_ID_MPEG2VIDEO ||
-             st->codec.codec_id == CODEC_ID_MPEG4 ||
-             st->codec.codec_id == CODEC_ID_H264) && 
+        if ((   st->codec.codec_id == CODEC_ID_H264 
+             || st->codec.has_b_frames) && 
             pc && pc->pict_type != FF_B_TYPE)
             presentation_delayed = 1;
         /* this may be redundant, but it shouldnt hurt */
@@ -749,6 +748,15 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
         /* cannot compute PTS if not present (we can compute it only
            by knowing the futur */
     } else {
+        if(pkt->pts != AV_NOPTS_VALUE && pkt->duration){
+            int64_t old_diff= ABS(st->cur_dts - pkt->duration - pkt->pts);
+            int64_t new_diff= ABS(st->cur_dts - pkt->pts);
+            if(old_diff < new_diff && old_diff < (pkt->duration>>3)){
+                pkt->pts += pkt->duration;
+//                av_log(NULL, AV_LOG_DEBUG, "id:%d old:%Ld new:%Ld dur:%d cur:%Ld size:%d\n", pkt->stream_index, old_diff, new_diff, pkt->duration, st->cur_dts, pkt->size);
+            }
+        }
+    
         /* presentation is not delayed : PTS and DTS are the same */
         if (pkt->pts == AV_NOPTS_VALUE) {
             if (pkt->dts == AV_NOPTS_VALUE) {
@@ -1083,7 +1091,8 @@ static int is_raw_stream(AVFormatContext *s)
  *                 then it will be >=
  * @return < 0 if no such timestamp could be found
  */
-int av_index_search_timestamp(AVStream *st, int wanted_timestamp, int backward)
+int av_index_search_timestamp(AVStream *st, int64_t wanted_timestamp,
+                              int backward)
 {
     AVIndexEntry *entries= st->index_entries;
     int nb_entries= st->nb_index_entries;
@@ -1621,11 +1630,15 @@ static void av_estimate_timings(AVFormatContext *ic)
             file_size = 0;
     }
     ic->file_size = file_size;
-
-    if (ic->iformat == &mpegps_demux) {
+#if 0 //MEANX
+    if ((ic->iformat == &mpegps_demux || ic->iformat == &mpegts_demux) && file_size && !ic->pb.is_streamed) {
         /* get accurate estimate from the PTSes */
         av_estimate_timings_from_pts(ic);
-    } else if (av_has_timings(ic)) {
+    }
+#else
+	if(0) {}
+#endif //MEANX
+    else if (av_has_timings(ic)) {
         /* at least one components has timings - we use them for all
            the components */
         fill_all_stream_timings(ic);
@@ -1725,7 +1738,14 @@ int av_find_stream_info(AVFormatContext *ic)
     AVStream *st;
     AVPacket pkt1, *pkt;
     AVPacketList *pktl=NULL, **ppktl;
+    int64_t last_dts[MAX_STREAMS];
+    int64_t best_duration[MAX_STREAMS];
 
+    for(i=0;i<MAX_STREAMS;i++){
+        last_dts[i]= AV_NOPTS_VALUE;
+        best_duration[i]= INT64_MAX;
+    }
+    
     count = 0;
     read_size = 0;
     ppktl = &ic->packet_buffer;
@@ -1734,6 +1754,10 @@ int av_find_stream_info(AVFormatContext *ic)
         for(i=0;i<ic->nb_streams;i++) {
             st = ic->streams[i];
             if (!has_codec_parameters(&st->codec))
+                break;
+            /* variable fps and no guess at the real fps */
+            if(   st->codec.frame_rate >= 1000LL*st->codec.frame_rate_base
+               && best_duration[i]== INT64_MAX)
                 break;
         }
         if (i == ic->nb_streams) {
@@ -1791,6 +1815,15 @@ int av_find_stream_info(AVFormatContext *ic)
         if (pkt->duration != 0)
             st->codec_info_nb_frames++;
 
+        if(st->codec.codec_type == CODEC_TYPE_VIDEO){
+            int64_t last= last_dts[pkt->stream_index];
+            
+            if(pkt->dts != AV_NOPTS_VALUE && last != AV_NOPTS_VALUE && last < pkt->dts && 
+               best_duration[pkt->stream_index] > pkt->dts - last){
+                best_duration[pkt->stream_index] = pkt->dts - last;
+            }
+            last_dts[pkt->stream_index]= pkt->dts;
+        }
         /* if still no information, we try to open the codec and to
            decompress the frame. We try to avoid that in most cases as
            it takes longer and uses more memory. For MPEG4, we need to
@@ -1822,8 +1855,24 @@ int av_find_stream_info(AVFormatContext *ic)
     for(i=0;i<ic->nb_streams;i++) {
         st = ic->streams[i];
         if (st->codec.codec_type == CODEC_TYPE_VIDEO) {
-            if(st->codec.codec_id == CODEC_ID_RAWVIDEO && !st->codec.codec_tag)
+            if(st->codec.codec_id == CODEC_ID_RAWVIDEO && !st->codec.codec_tag && !st->codec.bits_per_sample)
                 st->codec.codec_tag= avcodec_pix_fmt_to_codec_tag(st->codec.pix_fmt);
+
+            if(best_duration[i] < INT64_MAX && st->codec.frame_rate_base*1000 <= st->codec.frame_rate){
+                int int_fps;
+
+                st->r_frame_rate= st->codec.frame_rate;
+                st->r_frame_rate_base= av_rescale(best_duration[i], st->codec.frame_rate, AV_TIME_BASE);
+                av_reduce(&st->r_frame_rate, &st->r_frame_rate_base, st->r_frame_rate, st->r_frame_rate_base, 1<<15);
+                
+                int_fps= av_rescale(st->r_frame_rate, 1, st->r_frame_rate_base);
+                
+                if(int_fps>0 && av_rescale(st->r_frame_rate, 1, int_fps) == st->r_frame_rate_base){
+                    st->r_frame_rate= int_fps;
+                    st->r_frame_rate_base= 1;
+                }               
+            }
+
             /* set real frame rate info */
             /* compute the real frame rate for telecine */
             if ((st->codec.codec_id == CODEC_ID_MPEG1VIDEO ||
@@ -2043,7 +2092,7 @@ int av_write_header(AVFormatContext *s)
 }
 
 //FIXME merge with compute_pkt_fields
-static void compute_pkt_fields2(AVStream *st, AVPacket *pkt){
+static int compute_pkt_fields2(AVStream *st, AVPacket *pkt){
     int b_frames = FFMAX(st->codec.has_b_frames, st->codec.max_b_frames);
     int num, den, frame_size;
 
@@ -2088,6 +2137,15 @@ static void compute_pkt_fields2(AVStream *st, AVPacket *pkt){
             pkt->dts= pkt->pts;
     }
     
+    if(st->cur_dts && st->cur_dts != AV_NOPTS_VALUE && st->cur_dts >= pkt->dts){
+        av_log(NULL, AV_LOG_ERROR, "error, non monotone timestamps %Ld >= %Ld\n", st->cur_dts, pkt->dts);
+        return -1;
+    }
+    if(pkt->dts != AV_NOPTS_VALUE && pkt->pts != AV_NOPTS_VALUE && pkt->pts < pkt->dts){
+        av_log(NULL, AV_LOG_ERROR, "error, pts < dts (%lu / %lu)\n",pkt->pts, pkt->dts);
+        return -1;
+    }
+
 //    av_log(NULL, AV_LOG_DEBUG, "av_write_frame: pts2:%lld dts2:%lld\n", pkt->pts, pkt->dts);
     st->cur_dts= pkt->dts;
     st->pts.val= pkt->dts;
@@ -2109,6 +2167,7 @@ static void compute_pkt_fields2(AVStream *st, AVPacket *pkt){
     default:
         break;
     }
+    return 0;
 }
 
 static void truncate_ts(AVStream *st, AVPacket *pkt){
@@ -2133,7 +2192,9 @@ int av_write_frame(AVFormatContext *s, AVPacket *pkt)
 {
     int ret;
 
-    compute_pkt_fields2(s->streams[pkt->stream_index], pkt);
+    ret=compute_pkt_fields2(s->streams[pkt->stream_index], pkt);
+    if(ret<0)
+        return ret;
     
     truncate_ts(s->streams[pkt->stream_index], pkt);
 
@@ -2228,7 +2289,8 @@ static int av_interleave_packet(AVFormatContext *s, AVPacket *out, AVPacket *in,
 int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt){
     AVStream *st= s->streams[ pkt->stream_index];
 
-    compute_pkt_fields2(st, pkt);
+    if(compute_pkt_fields2(st, pkt) < 0)
+        return -1;
     
     //FIXME/XXX/HACK drop zero sized packets
     if(st->codec.codec_type == CODEC_TYPE_AUDIO && pkt->size==0)

@@ -510,6 +510,9 @@ int sol_init(void);
 /* electronicarts.c */
 int ea_init(void);
 
+/* nsvdec.c */
+int nsvdec_init(void);
+
 #include "rtp.h"
 
 #include "rtsp.h"
@@ -543,6 +546,7 @@ int fifo_size(FifoBuffer *f, uint8_t *rptr);
 int fifo_read(FifoBuffer *f, uint8_t *buf, int buf_size, uint8_t **rptr_ptr);
 void fifo_write(FifoBuffer *f, uint8_t *buf, int size, uint8_t **wptr_ptr);
 int put_fifo(ByteIOContext *pb, FifoBuffer *f, int buf_size, uint8_t **rptr_ptr);
+void fifo_realloc(FifoBuffer *f, int size);
 
 /* media file input */
 AVInputFormat *av_find_input_format(const char *short_name);
@@ -580,7 +584,7 @@ void av_set_pts_info(AVStream *s, int pts_wrap_bits,
 #define AVSEEK_FLAG_BYTE     2 ///< seeking based on position in bytes
 
 int av_find_default_stream_index(AVFormatContext *s);
-int av_index_search_timestamp(AVStream *st, int timestamp, int flags);
+int av_index_search_timestamp(AVStream *st, int64_t timestamp, int flags);
 int av_add_index_entry(AVStream *st,
                        int64_t pos, int64_t timestamp, int distance, int flags);
 int av_seek_frame_binary(AVFormatContext *s, int stream_index, int64_t target_ts, int flags);

@@ -17,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "avformat.h"
+//MEANX #include "bitstream.h"
 
 #define MAX_PAYLOAD_SIZE 4096
 //#define DEBUG_SEEK
@@ -391,7 +392,7 @@ static int mpeg_mux_init(AVFormatContext *ctx)
         default:
             return -1;
         }
-	fifo_init(&stream->fifo, 16);
+        fifo_init(&stream->fifo, 16);
         stream->next_packet= &stream->premux_packet;
     }
     bitrate = 0;

@@ -19,7 +19,7 @@
 #include "avformat.h"
 #include "avio.h"
 #include <stdarg.h>
-#include <errno.h>
+
 #define IO_BUFFER_SIZE 32768
 
 int init_put_byte(ByteIOContext *s,

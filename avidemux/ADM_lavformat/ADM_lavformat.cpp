@@ -338,7 +338,7 @@ double p,d;
   	AVPacket pkt;
             av_init_packet(&pkt);
 	    
-	p=displayframe;      // Pts
+	p=displayframe+2;      // Pts
 	p=(p*1000*1000*1000);
 	p=p/_fps1000;
 	

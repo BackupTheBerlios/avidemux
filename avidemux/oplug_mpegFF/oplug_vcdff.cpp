@@ -100,6 +100,7 @@ uint32_t len,flags;
 uint32_t size;
 ADM_MUXER_TYPE mux;
 uint32_t  audio_encoding=0;
+uint32_t  real_framenum=0;
 	
 	twoPass=new char[strlen(name)+6];
 	twoFake=new char[strlen(name)+6];
@@ -305,6 +306,8 @@ uint32_t  audio_encoding=0;
 					GUI_Alert("Error in pass 2");
 					goto finish;
 				}
+				if(!len) continue;
+				
 				if(file)
 				{
 					fwrite(_outbuffer,len,1,file);
@@ -317,7 +320,8 @@ uint32_t  audio_encoding=0;
 					//printf("%lu %lu\n",i,dts);
 					
 					muxer->writeVideoPacket(len,_outbuffer,
-							i,dts);
+							real_framenum,dts);
+					real_framenum++;
 					// _muxer->writeVideoPacket(len,_buffer_out,
 					//i-MPEG_PREFILL,_codec->getCodedPictureNumber());
 					while(muxer->needAudio()) 
