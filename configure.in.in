@@ -166,7 +166,8 @@ have_malloc=no
 have_darwin=no
 have_amd64=no
 have_sdl=no;
-have_faad=yes;
+have_faad=yes
+have_faac=yes
 dnl _________________ malloc.h ___________________
 
 AC_CHECK_HEADERS(malloc.h,have_malloc_h=yes)
@@ -454,7 +455,23 @@ dnl ____________ faad ?________________
  AC_MSG_CHECKING(faad2 library) 
  AC_MSG_RESULT($have_faad)
   
-
+dnl _______________/faad_______________
+dnl ____________ faac ?________________
+ AC_CHECK_HEADERS(faac.h,,have_faad=no)
+ AC_CHECK_HEADERS(faacfg.h,,have_faad=no)
+ 
+ AC_ARG_ENABLE(faac,[  --disable-faac           Force no faac],have_faac=no)
+   
+    if test "x$have_faac" = "xyes"; then
+		AC_CHECK_LIB( faac,faacEncClose,,have_faac=no, -lm )
+		if test "x$have_faac" = "xyes"; then
+	  		AC_DEFINE(USE_FAAC,1,"[Use faac audio enccoder]")
+		fi  
+    fi     
+ AC_MSG_CHECKING(faac library) 
+ AC_MSG_RESULT($have_faac)
+  
+dnl _______________/faac_______________
 dnl _________________ /freetype 2 _________________
 dnl __________________ac3______________
 AC_CHECK_HEADERS(a52dec/a52.h,,have_ac3=no)
@@ -891,7 +908,8 @@ echo " SDL                 : $have_sdl"
 echo " Xvideo              : $have_xv"
 echo " Lame                : $have_lame"
 echo " Ogg Vorbis          : $have_vorbis"
-echo " Faad2               : $have_faad"
+echo " Faad2(decoder)      : $have_faad"
+echo " Faac (encoder)      : $have_faac"
 echo " A52/AC3             : $have_ac3"
 echo " FFMPEG              : $have_ff"
 echo " ARTS                : $have_arts"
