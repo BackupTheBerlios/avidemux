@@ -520,8 +520,8 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 
 const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
 {
-	static char conf[400];
-	static char tmp[200];
+	static char conf[4000];
+	static char tmp[2000];
 	uint32_t confSize=0;
 	conf[0]=0;
 
@@ -1262,14 +1262,29 @@ FILE *fd=NULL;
 }	
 uint8_t mk_hex(uint8_t a,uint8_t b)
 {
-	if(a>'a')
-		a=10+a-'a';
+int a1,b1;
+	a1=a;
+	b1=b;
+	if(a>='a')
+	{
+		a1=a1+10;
+		a1=a1-'a';
+	}
 	else
-		a=a-'0';
-	if(b>'a')
-		b=10+b-'a';
+	{
+		a1=a1-'0';
+	}
+	
+	if(b>='a')
+	{
+		b1=b1+10;
+		b1=b1-'a';
+	}
 	else
-		b=b-'0';
-	return (a<<4)+b;
+	{
+		b1=b1-'0';
+	}
+	
+	return (a1<<4)+b1;
 
 }
