@@ -28,8 +28,8 @@ class vobSubBitmap
 {
   public:
         uint32_t                        _width,_height;
-        uint8_t                        *_palettized;            /// bitmap
-      //  uint8_t                         *_data;                 /// Data for packet
+        
+      
         uint8_t                         *_bitmap;               /// YUV image
         uint8_t                         *_alphaMask;               /// alpha mask 
 
@@ -38,7 +38,7 @@ class vobSubBitmap
         void                            clear(void);
         
                                         /// Convert palette bitmap to yuv&mask bitmap
-        uint8_t                         buildYUV( int16_t *palette,uint8_t *alphaPalette ); 
+        uint8_t                         buildYUV( int16_t *palette ); 
         uint8_t                         subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy);
 };
 //************************************

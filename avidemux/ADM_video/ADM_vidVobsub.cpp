@@ -328,8 +328,10 @@ uint32_t sub;
 #define BCOEF alp
 #define ACOEF (15-alp)                               
 #endif
+
                                nw=old*(ACOEF)+(BCOEF)*nw;
                                out[x]=nw>>4;
+                               //out[x]=nw;
                         }
                         //memcpy(out,in,len);
                         out+=strideout;
@@ -348,7 +350,9 @@ uint8_t ADMVideoVobSub::Palettte2Display( void )
         // Then Process the RLE Datas
         // To get the _bitmap yuv data
         ADM_assert(_original);
-        _original->buildYUV(_YUVPalette,_alpha);
+        
+        // Set correct color
+        _original->buildYUV(_YUVPalette);
         
         // rebuild the scaled one
         // Compute the target size

@@ -147,7 +147,8 @@ uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start)
         uint32_t oldoffset=_curOffset;
         uint32_t stride=_subW;
         uint32_t x,y;
-        uint8_t *ptr=_original->_palettized;
+        uint8_t *ptr=_original->_bitmap;
+        uint8_t *alpha=_original->_alphaMask;
         uint32_t a,b;
         int     nibbleparity=0;
         int     nibble=0;
@@ -197,16 +198,20 @@ uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start)
               if((run>stride-x) || !run)
                 run=stride-x;
               
-              memset(ptr,color,run);
+              //memset(ptr,color,run);
+              memset(ptr,_colors[color],run);
+              memset(alpha,_alpha[color],run);
               x+=run;
               ptr+=run;
+              alpha+=run;
               //  aprintf("x:%d y:%d\n",x,y);
               if(x>=stride)
               {
                         
                      y++;
                      x=0;
-                     ptr=_original->_palettized+(y*2+start)*stride;
+                     ptr=_original->_bitmap+(y*2+start)*stride;
+                     alpha=_original->_alphaMask+(y*2+start)*stride;
                      SKIPNIBBLE;
               }
         }
@@ -355,7 +360,7 @@ vobSubBitmap::vobSubBitmap(uint32_t w, uint32_t h)
   
   page=w*h;
    
-  _palettized=new uint8_t [page];
+
   _bitmap=new uint8_t [page];
   _alphaMask=new uint8_t [page];
                                                 
@@ -364,14 +369,14 @@ vobSubBitmap::vobSubBitmap(uint32_t w, uint32_t h)
 vobSubBitmap::~vobSubBitmap()
 {
 #define CLN(x) if(x) delete [] x;
-  CLN(_palettized);
+
   CLN(_bitmap);
   CLN(_alphaMask);  
 }
 void vobSubBitmap::clear(void)
 {
 #define CLR(x) memset(x,0,_width*_height);
-  CLR(_palettized);
+
   CLR(_bitmap);
   CLR(_alphaMask);
 }
@@ -380,39 +385,17 @@ void vobSubBitmap::clear(void)
 // Convert the palette bitmap into yuv + alphamask bitmap
 //
 //***********************************************************
-uint8_t vobSubBitmap::buildYUV( int16_t *palette,uint8_t *alphaPalette )
+uint8_t vobSubBitmap::buildYUV( int16_t *palette )
 {
   
-  uint8_t *ptrin, *ptrout,*maskout;
+  uint8_t *ptr;
 
-  int     color;
-  int     alpha;
-  int     old,nw,cur;
-
-  ADM_assert(_bitmap);
-  ADM_assert(_palettized);
-
-  ptrin=_palettized;
-  ptrout=_bitmap;
-  maskout=_alphaMask;
+  ptr=_bitmap;      
         
-        
-  for(uint32_t y=0;y<_width;y++)
-    for(uint32_t x=0;x<_height;x++)
+  for(uint32_t y=0;y<_width*_height;y++)
   {
-                // Alpha blend it
-                
-    color=*ptrin;
-    alpha=alphaPalette[color];
-    nw=palette[color];
-                
-    *ptrout=nw;
-    *maskout=alpha;
-        
-                
-    ptrin++;
-    ptrout++;
-    maskout++;
+    *ptr=palette[*ptr];
+    ptr++;  
   }
   return 1;
 }
@@ -422,15 +405,17 @@ uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy)
 {
   int flags=0;
   SwsContext *ctx=NULL;
+  int er=0;
   
-#ifdef USE_MMX
+#if 0  
+//#ifdef USE_MMX
                 
 #define ADD(x,y) if( CpuCaps::has##x()) flags|=SWS_CPU_CAPS_##y;
                 ADD(MMX,MMX);           
                 ADD(3DNOW,3DNOW);
                 ADD(MMXEXT,MMX2);
 #endif  
-  
+  flags+=SWS_BILINEAR;
   // Need a new one ?
   // Or reuse the old one ?
   if(*tgt && (*tgt)->_width==newx && (*tgt)->_height==newy)
@@ -478,13 +463,14 @@ uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy)
   ddst[0]=newx;
   ddst[1]=ddst[2]=0;
 
-  sws_scale(ctx,src,ssrc,0,_height,dst,ddst);
+  er=sws_scale(ctx,src,ssrc,0,_height,dst,ddst);
+  printf("Er:%d\n",er);
   
   // And alpha
   src[0]=_alphaMask;  
   dst[0]=(*tgt)->_alphaMask;
-  sws_scale(ctx,src,ssrc,0,_height,dst,ddst);
-  
+  er=sws_scale(ctx,src,ssrc,0,_height,dst,ddst);
+  printf("Er:%d\n",er);
   // end
   sws_freeContext(ctx); 
   return 1;             
