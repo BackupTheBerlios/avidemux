@@ -73,6 +73,7 @@
 		VF_STACKFIELD,
 		VF_WHIRL,
 		VF_EQUALIZER,
+                VF_VOBSUB,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

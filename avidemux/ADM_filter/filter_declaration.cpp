@@ -125,6 +125,8 @@ printf(  "*********************\n");
 	registerFilter("----------------- Misc --------------",VF_INVALID,2,NULL,NULL);
 	REGISTERX("subtitle","Subtitler",VF_SUBTILE,1,subtitle_create,subtitle_script);
 #endif
+        REGISTERX("vobsub","VobSub",VF_VOBSUB,1,vobsub_create,vobsub_script);
+
 //	REGISTER("","Remove Salt",VF_SALT,0,salt_create);
  printf("\n");
 }		
