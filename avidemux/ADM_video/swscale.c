@@ -62,6 +62,7 @@ untested special converters
 #include "../mangle.h"
 */
 #include "config.h"
+#undef RUNTIME_CPUDETECT // MEANX : FIXME ASAP!
 #ifdef USE_MMX
 /* cpuCaps combined from cpudetect and whats actually compiled in
    (if there is no support for something compiled in it wont appear here) */

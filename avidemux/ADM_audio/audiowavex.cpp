@@ -27,6 +27,8 @@
 #include "config.h"
 #include "fourcc.h"
 #include "avifmt.h"
+#include "avifmt2.h"
+
 #include "aviaudio.hxx"
 #include "ADM_audio/audioex.h"
 /*---------------------------------------
@@ -80,6 +82,10 @@ uint8_t AVDMWavAudioStream::open(char *name)
 	  printf("\n Error reading FMT chunk...");
 	  goto drop;
       }
+      
+      // For our big endian friends
+      Endian_WavHeader(_wavheader);
+      //
     fseek(fd,t32-sizeof(WAVHeader),SEEK_CUR);  
     t32 = read32();
     if (!fourCC::check( t32, (uint8_t *) "data"))

@@ -125,7 +125,17 @@ uint8_t GUI_XvInit(GtkWidget * window, uint32_t w, uint32_t h)
     unsigned int port, adaptors;
     static XvAdaptorInfo *ai;
     static XvAdaptorInfo *curai;
+    char *displ;
 //      static XvImageFormatValues  *fo;
+
+	// First check if local
+	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
+	displ=getenv("DISPLAY");
+	if(strcmp(displ,":0.0"))
+	{
+		printf("Looks like remote display, no Xv\n");
+		return 0;
+	}
 
     win = gtk_widget_get_parent_window(window);
     xv_display = GDK_WINDOW_XDISPLAY(win);

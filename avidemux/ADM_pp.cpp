@@ -24,6 +24,10 @@
 #include "config.h"
 
 #include "ADM_lavcodec.h"
+extern "C"
+{
+	#include "adm_lavcodec/dsputil.h"
+}
 #include "ADM_library/default.h"
 
 #include "ADM_pp.h"
@@ -57,12 +61,18 @@ char stringFQ[60];
 			
 	if(strlen(stringMode))  // something to do ?
 		{
-			pp->ppContext=pp_get_context(pp->w, pp->h,
-#ifdef USE_MMX
-          			PP_CPU_CAPS_MMX
-#else
-         			0
-#endif
+		uint32_t ppCaps=0;
+		
+#ifdef USE_MMX	
+		uint32_t  mm=mm_support();	
+	#define ADD(x,y) if( mm & MM_##x) ppCaps|=PP_CPU_CAPS_##y;
+		//if(mm& MM_MMX) ppCAPS|=PP_CPU_CAPS_MMX;
+		ADD(MMX,MMX);		
+		ADD(3DNOW,3DNOW);
+		ADD(MMXEXT,MMX2);
+#endif		
+			pp->ppContext=pp_get_context(pp->w, pp->h,          			
+         			ppCaps
 			   );		
 			pp->ppMode=pp_get_mode_by_name_and_quality(
 			stringMode, pp->postProcStrength);;
