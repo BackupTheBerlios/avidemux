@@ -171,7 +171,7 @@ int main(int argc, char** argv)
 
   parseRcFile();
 
-  while ((c=getopt(argc,argv,"d:b:M:q:l:c:C:S:W:H:t:NTV:A:a:srf:pnbZ:x:y:zQ2")) != -1) {
+  while ((c=getopt(argc,argv,"d:b:M:q:l:c:C:S:W:H:t:NTV:A:a:srf:pnZb:x:y:zQ2")) != -1) {
     switch(c) {
       case '2': do_split=1;break;
       case 'b': ainfo.frequency=atoi(optarg);break;
@@ -399,6 +399,7 @@ void parseRcFile( void )
 					switch(string[0])
 					{
 							case '#': break;
+							case 'Z': info.quant=1;break;
 							case '2': do_split=1;break;
    							case 'p': info.ntsc = 0;  break;
       							case 'n': info.ntsc = 1;  break;

@@ -403,6 +403,7 @@ int res;
 	printf("Quality : %d \n",vinfo.quality);
 	printf("Keydist : %d \n",vinfo.keydist);
 	printf("ME      : %d \n",vinfo.me);
+	printf("Mpeg Qz : %d \n",vinfo.quant);
 	if(codec==FF_XVID)
 		return FFV1_XvidInit(info);
 
