@@ -899,7 +899,6 @@ POWERPC_PERF_STOP_COUNT(altivec_put_pixels8_xy2_num, 1);
    pixelssum1 = vec_add(pixelssum1, vctwo);
    
 POWERPC_PERF_START_COUNT(altivec_put_pixels8_xy2_num, 1); 
-   int bitCompare = (((((unsigned long)pixels) + line_size) & 0x0000000F) ==  0x0000000F);
    for (i = 0; i < h ; i++) {
      int rightside = ((unsigned long)block & 0x0000000F);
      blockv = vec_ld(0, block);
@@ -907,7 +906,7 @@ POWERPC_PERF_START_COUNT(altivec_put_pixels8_xy2_num, 1);
      temp1 = vec_ld(line_size, pixels);
      temp2 = vec_ld(line_size + 16, pixels);
      pixelsv1 = vec_perm(temp1, temp2, vec_lvsl(line_size, pixels));
-     if (bitCompare)
+     if (((((unsigned long)pixels) + line_size) & 0x0000000F) ==  0x0000000F)
      {
        pixelsv2 = temp2;
      }
@@ -1137,14 +1136,13 @@ POWERPC_PERF_START_COUNT(altivec_put_pixels16_xy2_num, 1);
                         (vector unsigned short)pixelsv2);
    pixelssum1 = vec_add(pixelssum1, vctwo);
    
-   int bitCompare = (((((unsigned long)pixels) + line_size) & 0x0000000F) ==  0x0000000F);
    for (i = 0; i < h ; i++) {
      blockv = vec_ld(0, block);
 
      temp1 = vec_ld(line_size, pixels);
      temp2 = vec_ld(line_size + 16, pixels);
      pixelsv1 = vec_perm(temp1, temp2, vec_lvsl(line_size, pixels));
-     if (bitCompare)
+     if (((((unsigned long)pixels) + line_size) & 0x0000000F) ==  0x0000000F)
      {
        pixelsv2 = temp2;
      }
