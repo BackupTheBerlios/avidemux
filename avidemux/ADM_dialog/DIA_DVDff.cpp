@@ -58,7 +58,7 @@ bufferSize myBuffer[3]=
 {
 	{0,40},
 	{1,112},
-	{2,240}
+	{2,224}
 };
 //____________________________________________
 
@@ -490,7 +490,7 @@ create_dialog1 (void)
   gtk_widget_show (svcd);
   gtk_container_add (GTK_CONTAINER (menu3), svcd);
 
-  dvd = gtk_menu_item_new_with_mnemonic (_("DVD: 240 kB"));
+  dvd = gtk_menu_item_new_with_mnemonic (_("DVD: 224 kB"));
   gtk_widget_show (dvd);
   gtk_container_add (GTK_CONTAINER (menu3), dvd);
 
