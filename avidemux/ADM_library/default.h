@@ -55,4 +55,11 @@
 #define ADM_ERR 0
 #define ADM_OK 	1
 #define ADM_IGN 2
+
+// For win32, useless else
+
+uint64_t ftello_adm(FILE *f);
+uint64_t fseeko_adm(FILE *f,fpos_t off,int whence);
+
+
 #endif

@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "default.h" 
+#include "ADM_assert.h" 
 
 #ifdef CYG_MANGLING
 #include "windows.h"
@@ -26,6 +28,35 @@ unsigned long int sec;
   
 	
 }
+uint64_t ftello_adm(FILE *f)
+{
+	fpos_t pos;
+	fgetpos(f,&pos);
+	return (uint64_t)pos;
+}
+uint64_t fseeko_adm(FILE *f,fpos_t off,int whence)
+{
+	switch(whence)
+	{
+		case SEEK_SET:
+			fsetpos(f,&off);
+			return 0;
+			break;
+		case SEEK_END:
+			fseek(f,0,SEEK_END);
+			return 0;
+			break;
+		case SEEK_CUR:
+			off+=ftello_adm(f);
+			fsetpos(f,&off);
+			return 0;
+
+	}
+	ADM_assert(0);
+	return 0;
+ }
+
+
 
 #endif
 

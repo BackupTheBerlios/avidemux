@@ -484,9 +484,9 @@ char *statname;
 
 
 	// check if stat file exists ?
-#ifndef CYG_MANGLING	
-	FILE *fd;
 	uint8_t reuse=0;
+#ifndef CYG_MANGLING	
+	FILE *fd;	
 	fd=fopen(statname,"rt");
 	if(fd)
 	{

@@ -21,13 +21,17 @@ It is an fopen/fwrite lookalike interface to chunks
  *                                                                         *
  ***************************************************************************/
 
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ADM_assert.h>
 #include <math.h>
-#include <config.h>
+#ifdef CYG_MANGLING
+#include <io.h>
+#endif
+
 #include "ADM_library/default.h"
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_library/fourcc.h"
