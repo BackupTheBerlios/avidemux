@@ -1206,6 +1206,11 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param, uint32_t ex
 									specific=&ffmpegMpeg1Config.specific;
 									specSize=sizeof(ffmpegMpeg1Config.specific);
 									break;
+                                        case CodecXDVD:
+                                                                        generic=&ffmpegMpeg2ConfigDVD.generic;
+                                                                        specific=&ffmpegMpeg2ConfigDVD.specific;
+                                                                        specSize=sizeof(ffmpegMpeg2ConfigDVD.specific);
+                                                                        break;
 #endif
 					default:
 								ADM_assert(0);
