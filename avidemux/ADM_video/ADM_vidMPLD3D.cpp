@@ -169,8 +169,7 @@ uint8_t  ADMVideoMPD3D::setup(void)
 	return 1;
 }
 //--------------------------------------------------------
-ADMVideoMPD3D::ADMVideoMPD3D(
-									AVDMGenericVideoStream *in,CONFcouple *couples)
+ADMVideoMPD3D::ADMVideoMPD3D(AVDMGenericVideoStream *in,CONFcouple *couples)
 
 {
   //uint32_t frame;
@@ -305,7 +304,7 @@ UNUSED_ARG(flags);
                 	(int *)Coefs[3]);
 
 
-		ant=_uncompressed+((W*H*3)>>1);
+		ant=_uncompressed+((W*H*5)>>2);
 		n=VPLANE(data);
 		c=VPLANE(_storage);
 
