@@ -94,7 +94,10 @@ ADM_Audiocodec *out;
 								extra,extraData);
 						break;
 #endif
-
+				case WAV_ULAW:
+						printf("\n ULAW codec\n");
+						out=(ADM_Audiocodec *) new ADM_AudiocodecUlaw(fourcc,info);
+						break;
               	case WAV_WMA:
         				printf("\n Audio codec:  ffWMA\n");
 				

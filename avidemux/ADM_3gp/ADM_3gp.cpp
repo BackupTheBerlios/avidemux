@@ -386,6 +386,17 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 
 					tom.skipAtom();
 					break;
+			case MKFCCR('u','l','a','w'): //'ulaw ':
+					tom.skipBytes(8);
+					_rdWav=new WAVHeader;
+					memset(_rdWav,0,sizeof(WAVHeader));					
+					_rdWav->channels=1;
+					_rdWav->bitspersample=16;
+					_rdWav->frequency=7980; // FIXME ?
+					_rdWav->encoding=WAV_ULAW;	
+					_rdWav->byterate=_rdWav->frequency;	
+					tom.skipAtom();
+					break;					
 			case MKFCCR('m','p','4','a'): //'mp4a':
 					tom.skipBytes(8);
 					_rdWav=new WAVHeader;

@@ -605,6 +605,7 @@ const char *getStrFromAudioCodec( uint32_t codec)
 		case (WAV_MP4): return (const char *)"MP4 audio";
 		case (WAV_AMRNB): return (const char *)"AMR narrow band";
 		case (WAV_MSADPCM): return (const char *)"MSADPCM";
+		case (WAV_ULAW): return (const char *)"ULAW";
 	}
 
 	return (const char *)"Unknown codec";

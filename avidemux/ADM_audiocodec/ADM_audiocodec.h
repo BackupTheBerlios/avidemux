@@ -205,7 +205,22 @@ class ADM_AudiocodecWavSwapped : public     ADM_Audiocodec
                  virtual			uint8_t isDecompressable(void ){ return 1;};
 
    };
+  class ADM_AudiocodecUlaw : public     ADM_Audiocodec
+ {
+    protected:
+    				uint32_t 		_inStock;                		
+    public:
+                				ADM_AudiocodecUlaw( uint32_t fourcc ,WAVHeader *info);
+                	virtual			~ADM_AudiocodecUlaw() ;
+         			virtual         void 	purge( void ) {};
+                 virtual 			uint8_t beginDecompress( void ) {return 1;};
+                 virtual 			uint8_t endDecompress( void ) {return 1;};
+                 virtual 			uint8_t run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
+		 					  uint32_t * nbOut);
+                 virtual			uint8_t isCompressed( void ){ return 1;};
+                 virtual			uint8_t isDecompressable(void ){ return 1;};
 
+   };
 
 
 
