@@ -482,7 +482,8 @@ void menuBuild(GtkWidget *table1,mpegAudioTrack *table)
 		if (table[i+00].presence)
 		{
 			yes=1;
-  			sprintf(str,"%d shift : %d ms",i,table[i].shift);
+  			sprintf(str,"%d: %lu channels, %lu kbps shift %d ms",
+			i,table[i].channels,(table[i].bitrate*8)/1000,table[i].shift);
 		}
 	}
 	_1 = gtk_image_menu_item_new_with_mnemonic (str);

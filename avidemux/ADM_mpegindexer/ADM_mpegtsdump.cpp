@@ -68,9 +68,9 @@
 #include "ADM_toolkit/ADM_debug.h"
 //___________________________
 #include "ADM_mpegindexer/ADM_mpegTs.h"
-static uint8_t tryAudioTrack(char *name,uint8_t id,int32_t *pts);
-static uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitrate);
-static uint8_t getAudioTrackInfoTS(char *name,uint8_t pidaud, uint32_t *chan, uint32_t *bitrate);
+static uint8_t tryAudioTrack(char *name,uint8_t id,mpegAudioTrack *track);
+static uint8_t getAC3AudioTrackInfo(char *name,uint32_t id, uint32_t *chan, uint32_t *bitrate,uint8_t tsstream);
+static uint8_t getMP2AudioTrackInfo(char *name,uint32_t id, uint32_t *chan, uint32_t *bitrate,uint8_t tsstream);
 //___________________________
 int sync( FILE *fd);
 int parse(FILE *fd);
@@ -154,33 +154,40 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 		int64_t vidPts=info[vid].pts;
 		
 		int64_t audPts=0;
+		uint32_t track;
+		double d;
 		
-		printf("Vid is tack %d, with pts %li\n",vid,info[vid].pts);
+		printf("Vid is tack %d, with pts %lu\n",vid,info[vid].pts);
 		for(uint32_t i=0;i<8;i++)
 		{
 			//printf("%d<\n",i);			
 			if(audioTrack[i].presence)
 			{
-				audPts=info[audioTrack[i].shift].pts;
-				printf("MPEG aud %li %d\n",audPts,audioTrack[i].shift);
-				audPts=vidPts-audPts;
-				audPts/=90;
-				audioTrack[i].shift=audPts;
-				printf("%ld ms\n",audPts);
+				track=audioTrack[i].shift;
+				audPts=info[track].pts;
+				printf("MPEG aud %lu %d\n",audPts,audioTrack[i].shift);
+				d=vidPts;
+				d-=audPts;
+				d/=90.;
+				audioTrack[i].shift=(int32_t)floor(d);
+				printf("%ld ms\n",(int32_t)floor(d));
+				getMP2AudioTrackInfo(name,info[track].pid, &audioTrack[i].channels, 
+								&audioTrack[i].bitrate,1);
 				
 			}
 			if(audioTrack[i+8].presence)
 			{
-				uint32_t track;
+				
 				track=audioTrack[i+8].shift;
 				audPts=info[track].pts;
 				printf("AC3 aud %li %d\n",audPts,audioTrack[i+8].shift);
-				audPts=vidPts-audPts;
-				audPts/=90;
-				audioTrack[i+8].shift=audPts;
-				printf("%ld ms\n",audPts);
-				getAudioTrackInfoTS(name,info[track].pid, &audioTrack[i+8].channels, 
-								&audioTrack[i+8].bitrate);
+				d=vidPts;
+				d-=audPts;
+				d/=90.;
+				audioTrack[i+8].shift=(int32_t)floor(d);
+				printf("%ld ms\n",(int32_t)floor(d));
+				getAC3AudioTrackInfo(name,info[track].pid, &audioTrack[i+8].channels, 
+								&audioTrack[i+8].bitrate,1);
 				
 			}
 			
@@ -249,31 +256,21 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 	for(uint32_t i=0;i<8;i++)
 		{		
 			if(audioTrack[i+8].presence)	
-			if(tryAudioTrack(name,i,&pts))
+			if(tryAudioTrack(name,i,&audioTrack[i+8]))
 			{
-				printf("AC3 %d is present\n",i);
-				audioTrack[i+8].presence=1;
-				audioTrack[i+8].shift=pts;
-				// Try to get info about it
-				getAudioTrackInfo(name,i, &audioTrack[i+8].channels, 
-								&audioTrack[i+8].bitrate);
+				printf("AC3 %d is present\n",i);				
 				nbAC3++;
 			}
 			if(audioTrack[i].presence)
-			if(tryAudioTrack(name,0xc0+i,&pts))
+			if(tryAudioTrack(name,0xc0+i,&audioTrack[i]))
 			{	
-				printf("Mpeg %d is present \n",i);
-				audioTrack[i].presence=1;
-				audioTrack[i].shift=pts;
+				printf("Mpeg %d is present \n",i,&audioTrack[i]);
 				nbMpeg++;
 			}
 			if(audioTrack[i+16].presence)
-			if(tryAudioTrack(name,0xA0+i,&pts))
+			if(tryAudioTrack(name,0xA0+i,&audioTrack[i+16]))
 			{
 				printf("LPCM %d is present \n",i);
-				audioTrack[i+16].presence= 1;
-				audioTrack[i+16].shift=pts;
-				nbLPCM++;
 			}
 		}
 		
@@ -292,8 +289,10 @@ uint8_t  MpegaudoDetectAudio(char *name, mpegAudioTrack *audioTrack)
 //
 //
 //______________________________________________________
-uint8_t tryAudioTrack(char *name,uint8_t id,int32_t *ptsShift)
+uint8_t tryAudioTrack(char *name,uint8_t id,mpegAudioTrack *track)
 {
+int32_t ptsShift=0;
+
 	uint32_t count=0,audio=0;
 	uint8_t streamid;
 	ADM_mpegDemuxer *demuxer;
@@ -304,11 +303,30 @@ uint8_t tryAudioTrack(char *name,uint8_t id,int32_t *ptsShift)
 	while(demuxer->sync(&streamid) && count<1000) count++;
 
 	audio=demuxer->getOtherSize();
-	*ptsShift=demuxer->getPTSDelta();
+	ptsShift=demuxer->getPTSDelta();
 	delete demuxer;
 	printf("When trying track : %x, found : %lu bytes\n",id,audio);
 	if(audio > 2000)
 		{
+				// now read it
+				track->shift=ptsShift;
+				if(id<8)
+				{
+					if(getAC3AudioTrackInfo(name,id, &(track->channels)
+						, &(track->bitrate),0))
+						{
+							return 1;
+						}
+				}
+				else if(id<0xcf)
+				{
+					if(getMP2AudioTrackInfo(name,id, &(track->channels)
+						, &(track->bitrate),0))
+						{
+							return 1;
+						}
+				
+				}
 				return 1; 
 		}
 	return 0;
@@ -317,7 +335,7 @@ uint8_t tryAudioTrack(char *name,uint8_t id,int32_t *ptsShift)
 //
 //
 //_________________________________________________________
-uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitrate)
+uint8_t getAC3AudioTrackInfo(char *name,uint32_t id, uint32_t *chan, uint32_t *bitrate,uint8_t tsstream)
 {
 #define AMOUNT 5*1024
 	uint32_t fq=0,syncoff;
@@ -327,7 +345,10 @@ uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitra
 	
 	ADM_mpegDemuxer *demuxer;
 	aprintf("Creating audio demuxer for stream %d\n",id);
-	demuxer=new ADM_mpegDemuxerProgramStream(id,0xe0);
+	if(tsstream)
+		demuxer=new ADM_mpegDemuxerTransportStream(id,0xff);
+	else
+		demuxer=new ADM_mpegDemuxerProgramStream(id,0xe0);
 	demuxer->open(name);
 
 	if(demuxer->read(buff,AMOUNT))	
@@ -346,36 +367,42 @@ uint8_t getAudioTrackInfo(char *name,uint8_t id, uint32_t *chan, uint32_t *bitra
 	delete demuxer;
 	return r;
 }
-uint8_t getAudioTrackInfoTS(char *name,uint8_t pidaud, uint32_t *chan, uint32_t *bitrate)
+uint8_t getMP2AudioTrackInfo(char *name,uint32_t id, uint32_t *chan, uint32_t *bitrate,uint8_t tsstream)
 {
-
+#define AMOUNT 5*1024
 	uint32_t fq=0,syncoff;
 	uint8_t r=0;
 	uint8_t streamid;
 	uint8_t buff[AMOUNT];
+	WAVHeader wav;
 	
 	ADM_mpegDemuxer *demuxer;
-	aprintf("Creating audio demuxer for pid %d\n",pidaud);
-	demuxer=new ADM_mpegDemuxerTransportStream(pidaud,0xff);
+	aprintf("Creating audio demuxer for stream %d\n",id);
+	if(tsstream)
+		demuxer=new ADM_mpegDemuxerTransportStream(id,0xff);
+	else
+		demuxer=new ADM_mpegDemuxerProgramStream(id,0xe0);
 	demuxer->open(name);
 
 	if(demuxer->read(buff,AMOUNT))	
-	{			
-		if( ADM_AC3GetInfo(buff, AMOUNT, &fq, bitrate,chan,&syncoff)) 
+	{		
+		if( mpegAudioIdentify(buff, AMOUNT, &wav,NULL))
+		
 		{
-			aprintf("**Track %d : Bitrate %lu\n",pidaud,*bitrate);			
+			*bitrate=wav.byterate;
+			*chan=wav.channels;
+			aprintf("**Track %d : Bitrate %lu\n",id,*bitrate);			
 			r=1;
 		}
 	}
 	else
 	{
-		printf("*cannot read track : %d\n",pidaud);
+		printf("*cannot read track : %d\n",id);
 	}
-	aprintf("/Creating audio demuxer for stream %d\n",pidaud);
+	aprintf("/Creating audio demuxer for stream %d\n",id);
 	delete demuxer;
 	return r;
 }
-	
 //
 // The 
 //__________________________________
