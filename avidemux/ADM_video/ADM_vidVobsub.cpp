@@ -8,7 +8,7 @@
 //
 // Copyright: See COPYING file that comes with this distribution
 //
-//
+// see http://sam.zoy.org/writings/dvd/subtitles/
 
 
 /***************************************************************************
@@ -42,41 +42,52 @@
 #include "ADM_mpeg2dec/ADM_mpegpacket.h"
 #include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
 
+#include "ADM_vobsubinfo.h"
 
 #define VOBSUB "/capture/sub/phone.sub"
 #define VS_MAXPACKET 128*1024
 
-static FILTER_PARAM vobsubParam={0,{""}};
+static FILTER_PARAM vobsubParam={1,{"subname"}};
 #define aprintf printf
 //*************************************************************
 //
+typedef struct vobSubParam
+{
+        char            *subname;
+        uint32_t        index;
+}vobSubParam;
+
+
 class  ADMVideoVobSub:public AVDMGenericVideoStream
  {
 
  protected:
         virtual char                    *printConf(void);
-        ADM_mpegDemuxerProgramStream    *_parser;
-        uint8_t                        *_palettized;              /// bitmap
-        uint8_t                         *_data;                 /// Data for packet
-        uint32_t                        _x1,_y1,_x2,_y2;        /// sub boxing
-        uint32_t                        _subW,_subH;
-        uint8_t                         _displaying;            ///  Is display active
-        uint32_t                        _curOffset;
         uint8_t                         readbyte(void);         /// Read a byte from buffer
         uint16_t                        readword(void);         /// Read a 16 bits word from buffer
         uint8_t                         forward(uint32_t v);    /// Read a 16 bits word from buffer
         uint8_t                         decodeRLE(uint32_t off,uint32_t evenline);
+   
+        ADM_mpegDemuxerProgramStream    *_parser;
+        uint8_t                        *_palettized;              /// bitmap
+        uint8_t                         *_data;                 /// Data for packet
+        VobSubInfo                      *_vobSubInfo;           /// Info of the index file
+        vobSubParam                     *_param;
+        
+        uint32_t                        _x1,_y1,_x2,_y2;        /// sub boxing
+        uint32_t                        _subW,_subH;
+        uint8_t                         _displaying;            ///  Is display active
+        uint32_t                        _curOffset;
         uint32_t                        _subSize;
         uint32_t                        _dataSize;              /// Size of the data chunk
-        uint32_t                        _palette[16];           /// The full palette, stored in .idx ?
+        
         uint8_t                         _colors[4];             /// Colors palette
         uint8_t                         _alpha[4];              /// Colors alpha
-        
         
  public:
                 
                         ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *setup);
-                        ADMVideoVobSub();
+                        ~ADMVideoVobSub();
         virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
                                                 ADMImage *data,uint32_t *flags);
         virtual uint8_t getCoupledConf( CONFcouple **couples)           ;
@@ -104,9 +115,9 @@ char *ADMVideoVobSub::printConf( void )
         return buf;
 }
 //*************************************************************
-ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *setup)
+ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
 {
-    UNUSED_ARG(setup);
+
         _in=in;         
         memcpy(&_info,_in->getInfo(),sizeof(_info));    
         _info.encoding=1;       
@@ -115,21 +126,55 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *setup)
         _parser=NULL;  
         _palettized=NULL;   
         
-        _parser=new ADM_mpegDemuxerProgramStream(0x20,0xe0);
-        if(!_parser->open(VOBSUB))
+        _param=NEW(vobSubParam);
+        
+        if(couples)
+        {                 
+                GET(subname);
+                GET(index);                               
+        }
+        else
         {
-                delete _parser;
-                _parser=NULL;
+#ifdef ADM_DEBUG
+                _param->subname=ADM_strdup(VOBSUB);
+#else                
+                _param->subname =NULL;
+#endif                
+                _param->index = 0x20;                
+        }
+        
+        if(_param->subname)
+        {
+                printf("Opening %s\n",_param->subname);
+                if(vobSubRead(_param->subname,&_vobSubInfo))
+                {
+                        printf("Opening index \n");
+                        _parser=new ADM_mpegDemuxerProgramStream(_param->index,0xe0);
+                        if(!_parser->open(_param->subname))
+                        {
+                                printf("Mpeg Parser : opening %s failed\n",_param->subname);
+                                delete _parser;
+                                _parser=NULL;
+                
+                         }
+                }
+        }
+        
+        
+        if(!_parser)
+        {
                 printf("opening of vobsub file failed\n");
         }
+      
         _x1=_y1=_x2=_y2=0;
         _data=new uint8_t [VS_MAXPACKET];
         _subSize=0;
         _subW=_subH=0;
+        _vobSubInfo=NULL;
                 
 }
 //*************************************************************
-ADMVideoVobSub::ADMVideoVobSub()
+ADMVideoVobSub::~ADMVideoVobSub()
 {
         delete  _uncompressed;  
         _uncompressed=NULL;
@@ -139,7 +184,14 @@ ADMVideoVobSub::ADMVideoVobSub()
         _palettized=NULL;
         if(_data) delete [] _data;
         _data=NULL;
-  
+        if(_vobSubInfo) destroySubInfo( _vobSubInfo);
+        _vobSubInfo=NULL;
+        if(_param)
+        {
+                if(_param->subname)  ADM_dealloc(_param->subname);
+                DELETE(_param);
+        }
+        _param=NULL;
 }
 //*************************************************************
 uint8_t ADMVideoVobSub::forward(uint32_t v)
@@ -170,7 +222,15 @@ uint16_t w;
 //*************************************************************
 uint8_t ADMVideoVobSub::getCoupledConf( CONFcouple **couples)
 {
-        return 0;
+                        ADM_assert(_param);
+                        *couples=new CONFcouple(2);
+
+#define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
+                        CSET(subname);
+                        CSET(index);
+                        
+
+                        return 1;
 }
 //*************************************************************
 uint8_t ADMVideoVobSub::getFrameNumberNoAlloc(uint32_t frame,
@@ -187,6 +247,15 @@ uint8_t  command;
         // read uncompressed frame
         if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 
+        if(!_parser)        
+        {
+                //
+                printf("No valid vobsub to process\n");
+                data->duplicate(_uncompressed);
+                return 1;
+        
+        }
+        
         // Read data
         _subSize=_parser->read16i();
         ADM_assert(_subSize);
