@@ -1584,7 +1584,8 @@ A_saveAudioDecodedTest (char *name)
   double duration;
   tstart=video_body->getTime(frameStart);
   tend=video_body->getTime(frameEnd+1);
-  duration=(tend-tstart)*saveFilter->getInfo()->frequency;
+  duration=(tend-tstart);
+  duration*=saveFilter->getInfo()->frequency;
   duration/=1000.;
   
   sampleTarget=(uint64_t)floor(duration);
