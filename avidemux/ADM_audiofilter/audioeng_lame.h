@@ -26,9 +26,10 @@ protected:
          uint32_t _bitrate;
          uint32_t _fq;
          uint32_t _size;
-	
+	ADM_LAME_PRESET _preset;
 				 uint8_t  _bufferin[PROCESS_BUFFER_SIZE];
           virtual uint32_t 	grab(uint8_t *obuffer);
+
 		
 public:
 						
@@ -38,7 +39,7 @@ public:
 						 uint32_t bitrate,
 						ADM_LAME_PRESET preset);
 		
-
+		virtual 	uint8_t	isVBR(void );
         AVDMProcessAudio_Lame(AVDMGenericAudioStream *instream	);		
      		
 };

@@ -146,6 +146,7 @@ uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
     _wavheader->byterate = (bitrate >> 3) * 1000;
    
     // configure CBR/ABR/...
+    _preset=preset;
     switch(preset)
     {
     	default:
@@ -168,7 +169,12 @@ uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
 
     return 1;
 }
+uint8_t	AVDMProcessAudio_Lame::isVBR(void )
+{
+	if(_preset==ADM_LAME_PRESET_CBR) return 0;
+	return 1;
 
+}
 //_____________________________________________
 uint32_t AVDMProcessAudio_Lame::grab(uint8_t * obuffer)
 {

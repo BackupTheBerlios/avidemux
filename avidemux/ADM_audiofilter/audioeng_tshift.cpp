@@ -45,12 +45,12 @@ AVDMProcessAudio_TimeShift::AVDMProcessAudio_TimeShift(AVDMGenericAudioStream * 
     if (msoff > 0)
     {
 	_byteoffset = _instream->convTime2Offset(msoff);
-	_byteoffset=_byteoffset & 0xfffffffe;      // jakub bug 2
+	_byteoffset=_byteoffset & 0xfffffffc;      // jakub bug 2
 	}
     else
     {
 	_byteoffset = _instream->convTime2Offset(-msoff);
-	_byteoffset=_byteoffset & 0xfffffffe;      // jakub bug 2
+	_byteoffset=_byteoffset & 0xfffffffc;      // jakub bug 2
 	_byteoffset=-_byteoffset;
 	}
 	
