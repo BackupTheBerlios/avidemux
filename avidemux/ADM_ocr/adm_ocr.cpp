@@ -1,6 +1,35 @@
-/*
-    Very simple OCR code to transform vobsub into srt file
-*/
+/***************************************************************************
+                         
+        Very simple OCR engine
+
+        We do it in 3 passes
+        
+                Ask the vobsub decoder for a bitmap
+                Try to split the bitmap in lines
+                For each lines try to split in glyph (i.e. horizontal line)
+                Detour the glyph
+                If the detoured glyph has a width much less inferiror to its width
+                it probably means we have a italic or kerning.
+                In that case use the detouring to isolate the glyphs
+
+
+         A bit of warning. 
+                        The UI code is ugly.
+                        Bottom is the last actual line so to get height you have to to last-first +1 !
+
+    begin                : Jan 2005
+    copyright            : (C) 2002 by mean
+    email                : fixounet@free.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -147,16 +176,14 @@ _again:
     redraw_x=redraw_y=0;
     GTK_PURGE;
 //  Time to go
-    // Inactivate frame1=gliph    frame2=in/out  buttonStart
+    // Inactivate frame1=glyph    frame2=in/out  buttonStart
     gtk_widget_set_sensitive(WID(buttonStart),0);
     gtk_widget_set_sensitive(WID(frameGlyph),0);
     gtk_widget_set_sensitive(WID(frameLoad),0);
     gtk_widget_set_sensitive(WID(frameBitmap),1);
 
     gtk_widget_set_sensitive(WID(buttonStart),0);
-    // Activate output
-   // gtk_widget_set_sensitive(WID(Current_Glyph),1);
-    //
+   
   
    char *fileout;
    fileout=(char *)gtk_label_get_text(GTK_LABEL(WID(labelSrt)));
@@ -184,14 +211,20 @@ _again:
      }
     seqNum=1;   // Sub number in srt file
     oldw=oldh=0;
-    
-    
+
+    //******************    
+    // Load all bitmaps
+    //******************
     for(uint32_t i=0;i<nbSub;i++)
     {
             first=last=0;
             bitmap=vobsub->getBitmap(i,&startTime, &endTime,&first,&last);
-            // Update display
-            if(!bitmap) break;
+            ADM_assert(last>=first);
+            
+            // something ?
+            if(!bitmap) continue;
+            if(first==last) continue;
+
             // If the bitmap size changed or does not exist yet...
             if(!workArea || oldbitmapw!=bitmap->_width || oldbitmaph!=bitmap->_height)
             {
@@ -200,7 +233,9 @@ _again:
                 delete [] workArea;
                 workArea=NULL; 
               }
+              // Workarea is actually bigger than what we use
               workArea=new uint8_t[bitmap->_width*(bitmap->_height)];
+              memset(workArea,0,bitmap->_width*(bitmap->_height));
             }
             oldbitmaph=bitmap->_height;
             oldbitmapw=bitmap->_width;
@@ -210,12 +245,13 @@ _again:
            redraw_x=w;
            redraw_y=h;
            //**
-           if(oldw!=w || oldh !=h)
-           {                
-                GTK_PURGE;
-           }
+           
            // Build
            mergeBitmap(bitmap->_bitmap+first*w, workArea, bitmap->_alphaMask+first*w,  w,   h);
+           if(oldw!=w || oldh !=h)
+           {                
+                GTK_PURGE;  // Force redaw
+           }
            // Merge
              GTK_PURGE;
              gui_draw();
@@ -532,13 +568,10 @@ uint8_t mergeBitmap(uint8_t *bitin, uint8_t *bitout, uint8_t *maskin,uint32_t w,
                     nw=in[x];
                     alp=mask[x];
 
-                    if(alp) 
-                    {
-                         if(alp>7&& nw >SUB_THRESH)  nw=0xff;
+                    if(alp>7&& nw >SUB_THRESH)  nw=0xff;
                          else       nw=0;
-                         out[x]=nw;                                         
-                    }
-                    else out[x]=0;
+                        
+                    out[x]=nw;
             }
             out+=w;
             in+=w;

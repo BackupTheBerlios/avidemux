@@ -17,9 +17,10 @@
 */
 static inline uint8_t lineEmpty(uint8_t *base, uint32_t stride, uint32_t width, uint32_t line)
 {
+    base+=line*stride;
     for(uint32_t x=0;x<width;x++)
     {
-        if(base[line*stride+x]) return 0;
+        if(base[x]) return 0;
     }
     return 1;
 }
