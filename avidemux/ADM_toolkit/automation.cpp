@@ -96,6 +96,8 @@ extern void updateLoaded(void );
 extern void A_requantize2( float percent, uint32_t quality, char *out_name );
 static void save(char*name);
 static void call_requant(char *p, char *q, char *n);
+extern void show_info(char *p);
+extern const char *getStrFromAudioCodec( uint32_t codec);
 
 //_________________________________________________________________________
 
@@ -166,6 +168,7 @@ AUTOMATON reaction_table[]=
 		{"autosplit",		1	,"split every N MBytes",call_autosplit},
 		{"requant",		3	,"requantize mpeg2 : percent quality[0..3] output_name",
 										(one_arg_type )call_requant},
+		{"info",		0	,"show information about loaded video and audio streams", show_info},
 		
 		{"help",		0,"print this",		call_help},
 		{"quit",		0,"exit avidemux",	call_quit}
@@ -474,5 +477,51 @@ void call_toolame(char *file)
 	A_Pipe(P_TOOLAME,file);
 }
 
+extern void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm, uint16_t * ss, uint16_t * ms);
+void show_info(char *p){
+   UNUSED_ARG(p);
+   
+   if (avifileinfo)
+    {
+		
+   printf("Video\n");
+   printf("   Video Size: %u x %u\n", avifileinfo->width, avifileinfo->height);
+   printf("   Frame Rate: %2.3f fps\n", (float)avifileinfo->fps1000/1000.F);
+   printf("   Number of frames: %d frames\n", avifileinfo->nb_frames);
+   printf("   Codec FourCC: %s\n", fourCC::tostring(avifileinfo->fcc));
+   if(avifileinfo->nb_frames){
+     uint16_t hh, mm, ss, ms;
+      frame2time(avifileinfo->nb_frames, avifileinfo->fps1000,&hh, &mm, &ss, &ms);
+      printf("   Duration: %02d:%02d:%02d.%03d\n", hh, mm, ss, ms);
+   }else{
+      printf("   Duration: 00:00:00.000\n");
+   }
+   printf("Audio\n");
+   if( wavinfo )
+    {
+      printf("   Codec: %s\n",getStrFromAudioCodec(wavinfo->encoding));     
+      
+      printf("   Mode: ");
+      switch( wavinfo->channels ){
+         case 1:  printf("MONO\n"); break;
+         case 2:  printf("STEREO\n"); break;
+         default: printf("????\n"); break;
+      }
+      printf("   BitRate: %u Bps / %u kbps\n", wavinfo->byterate, wavinfo->byterate*8/1000);
+      printf("   Frequency: %u Hz\n", wavinfo->frequency);
+      printf("   Duration: %u MBytes\n", video_body->getAudioLength()>>20);
+   }else{
+      printf("   Codec: NONE\n");
+      printf("   Mode: NONE\n");
+      printf("   BitRate: NONE\n");
+      printf("   Frequency: NONE\n");
+      printf("   Duration: NONE\n");
+    }
+   }
+   else
+   {
+   	printf("Nothing to get infos from\n");
+   }
+}
 
 //EOF
