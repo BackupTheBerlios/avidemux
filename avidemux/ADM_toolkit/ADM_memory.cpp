@@ -30,6 +30,13 @@
 
 #include "config.h"
 
+extern "C" {
+
+void *av_malloc(unsigned int size);
+void av_free(void *ptr);
+void *av_realloc(void *ptr, unsigned int size);
+}
+
 void *ADM_alloc(size_t size)
 {
 void *c;
@@ -58,4 +65,40 @@ void operator delete[] (void *c)
 {
 	ADM_dezalloc(c);
 }
+//********************************
+// lavcodec wrapper
+//********************************
+void *av_malloc(unsigned int size)
+{
+ 	return ADM_alloc(size);
+}
+
+/**
+ * av_realloc semantics (same as glibc): if ptr is NULL and size > 0,
+ * identical to malloc(size). If size is zero, it is identical to
+ * free(ptr) and NULL is returned.  
+ */
+void *av_realloc(void *ptr, unsigned int size)
+{
+  
+    
+    if(!ptr) return ADM_alloc(size);
+    if(!size) 
+    {
+    	
+    	ADM_dealloc(ptr);
+	return NULL;
+    }
+    
+    //  Alignment is kept ?
+    realloc(ptr,size);
+}
+
+/* NOTE: ptr = NULL is explicetly allowed */
+void av_free(void *ptr)
+{
+	ADM_dealloc(ptr);  
+}
+
+
 // EOF
