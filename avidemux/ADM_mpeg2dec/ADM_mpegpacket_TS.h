@@ -16,26 +16,26 @@ class ADM_mpegDemuxerTransportStream : public   ADM_mpegDemuxer
 	  private : 
 	  		
 	  		int32_t		_pesLen,_pesRead;
+			int32_t		_otherPesLen, _otherPesRead;
+			
+			uint32_t	_otherLen;
+			
 	  		uint64_t 	_firstPacketOffset;
 	            	uint64_t 	_packetOffset;
 	              	uint64_t 	_packetLen;
 	               	uint64_t 	_currentOffset;	
 	                              
-			uint8_t  	_otherStream;
-			uint8_t  	_otherStreamSubId;
-
-			uint32_t  	_otherLen;
-
-			uint8_t 	_streamId;
-			uint8_t 	_streamSubId;
+			uint8_t  	_otherPid;			
+			uint8_t 	_thisPid;			
 	                  	                
 			uint8_t		_buffer[TS_PACKET];
 			uint8_t		_TSbuffer[TS_PACKET];
 	                   
 	                 mParser 	*parser;           
 			uint8_t		_nextPacket(void);	
-			uint32_t  	_skipPacketHeader( uint8_t sid,uint8_t *subid,
-							uint32_t *pts,uint8_t start, uint8_t len,uint32_t *end );
+			uint32_t  	_skipPacketHeader( uint32_t *pts,uint8_t start, 
+							uint8_t totallen,uint32_t *end,uint32_t *peslen );
+
 			uint32_t  	_firstPTS;
 			uint32_t  	_otherPTS;
     
