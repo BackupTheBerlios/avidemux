@@ -1,28 +1,59 @@
-#ifndef TOOLAME_GLOBAL_H
-#define TOOLAME_GLOBAL_H
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
+
+#ifndef	_TOOLAME_GLOBAL_H_
+#define	_TOOLAME_GLOBAL_H_
+
+/***************************************************************************************
+psycho 0 mem struct
+****************************************************************************************/
+
+typedef struct psycho_0_mem_struct {
+	FLOAT ath_min[SBLIMIT];
+} psycho_0_mem;
+
 
 /***************************************************************************************
 psycho 1 mem struct
 ****************************************************************************************/
 
 typedef struct {
-  int line;
-  FLOAT bark, hear, x;
+	int line;
+	FLOAT bark, hear, x;
 } g_thres, *g_ptr;
 
 typedef struct {
-  FLOAT x;
-  int type, next, map;
+	FLOAT x;
+	int type, next, map;
 } mask, *mask_ptr;
 
 typedef struct psycho_1_mem_struct {
-  int off[2];
-  FLOAT fft_buf[2][1408];
-  int *cbound;
-  int crit_band;
-  int sub_size;
-  mask_ptr power;
-  g_ptr ltg;
+	int off[2];
+	FLOAT fft_buf[2][1408];
+	int *cbound;
+	int crit_band;
+	int sub_size;
+	mask_ptr power;
+	g_ptr ltg;
 } psycho_1_mem;
 
 /***************************************************************************************
@@ -32,14 +63,14 @@ Psycho3 memory structure
 
 #define SUBSIZE 136
 typedef struct psycho_3_mem_struct{
-  int off[2];
-  int freq_subset[SUBSIZE];
-  FLOAT bark[HBLKSIZE];
-  FLOAT ath[HBLKSIZE];
-  FLOAT fft_buf[2][1408];
+	int off[2];
+	int freq_subset[SUBSIZE];
+	FLOAT bark[HBLKSIZE];
+	FLOAT ath[HBLKSIZE];
+	FLOAT fft_buf[2][1408];
 #define CRITBANDMAX 32 /* this is much higher than it needs to be. really only about 24 */
-  int cbands; /* How many critical bands there really are */
-  int cbandindex[CRITBANDMAX]; /* The spectral line index of the start of
+	int cbands; /* How many critical bands there really are */
+	int cbandindex[CRITBANDMAX]; /* The spectral line index of the start of
 				each critical band */
 } psycho_3_mem;
 
@@ -66,29 +97,33 @@ typedef FLOAT F22HBLK[2][2][HBLKSIZE];
 typedef FLOAT DCB[CBANDS];
 
 typedef struct psycho_4_mem_struct {
-  int new;
-  int old;
-  int oldest;
-
-  FLOAT grouped_c[CBANDS];
-  FLOAT grouped_e[CBANDS];
-  FLOAT nb[CBANDS];
-  FLOAT cb[CBANDS];
-  FLOAT tb[CBANDS];
-  FLOAT ecb[CBANDS];
-  FLOAT bc[CBANDS];
-  FLOAT cbval[CBANDS];
-  FLOAT rnorm[CBANDS];
-  FLOAT wsamp_r[BLKSIZE], phi[BLKSIZE], energy[BLKSIZE], window[BLKSIZE];
-  FLOAT ath[HBLKSIZE], thr[HBLKSIZE], c[HBLKSIZE];
-  FLOAT fthr[HBLKSIZE], absthr[HBLKSIZE]; // psy2 only
-  int numlines[CBANDS];
-  int partition[HBLKSIZE];
-  FLOAT *tmn;
-  FCB *s;
-  FHBLK *lthr;
-  F2HBLK *r, *phi_sav;
-  FLOAT snrtmp[2][32];
+	int new;
+	int old;
+	int oldest;
+	
+	int flush;
+	int sync_flush;
+	int syncsize;
+	
+	FLOAT grouped_c[CBANDS];
+	FLOAT grouped_e[CBANDS];
+	FLOAT nb[CBANDS];
+	FLOAT cb[CBANDS];
+	FLOAT tb[CBANDS];
+	FLOAT ecb[CBANDS];
+	FLOAT bc[CBANDS];
+	FLOAT cbval[CBANDS];
+	FLOAT rnorm[CBANDS];
+	FLOAT wsamp_r[BLKSIZE], phi[BLKSIZE], energy[BLKSIZE], window[BLKSIZE];
+	FLOAT ath[HBLKSIZE], thr[HBLKSIZE], c[HBLKSIZE];
+	FLOAT fthr[HBLKSIZE], absthr[HBLKSIZE]; // psy2 only
+	int numlines[CBANDS];
+	int partition[HBLKSIZE];
+	FLOAT *tmn;
+	FCB *s;
+	FHBLK *lthr;
+	F2HBLK *r, *phi_sav;
+	FLOAT snrtmp[2][32];
 } psycho_4_mem, psycho_2_mem;
 
 
@@ -101,41 +136,44 @@ typedef struct psycho_4_mem_struct {
 
 /* Structure for Reading Layer II Allocation Tables from File */
 typedef struct {
-  unsigned int steps;
-  unsigned int bits;
-  unsigned int group;
-  unsigned int quant;
+	unsigned int steps;
+	unsigned int bits;
+	unsigned int group;
+	unsigned int quant;
 } sb_alloc, *alloc_ptr;
 
-typedef sb_alloc al_table[32][16];
+typedef sb_alloc alloc_table[32][16];
 
-/* Header Information Structure */
+/* Raw Header Information Structure */
 typedef struct {
-  int version;
-  int lay;
-  int error_protection;
-  int bitrate_index;
-  int sampling_frequency_idx;
-  int sampling_frequency;
-  int padding;
-  int private_bit;
-  int mode;
-  int mode_ext;
-  int copyright;
-  int original;
-  int emphasis;
+	int version;
+	int lay;
+	int error_protection;
+	int bitrate_index;
+	int samplerate_idx;
+	int padding;
+	int private_bit;
+	int mode;
+	int mode_ext;
+	int copyright;
+	int original;
+	int emphasis;
 } frame_header;
 
 /* Parent Structure Interpreting some Frame Parameters in Header */
 typedef struct {
-  frame_header *header;		/* raw header information */
-  int actual_mode;		/* when writing IS, may forget if 0 chs */
-  al_table *alloc;		/* bit allocation table read in */
-  int tab_num;			/* number of table as loaded */
-  int nch;			/* num channels: 1 for mono, 2 for stereo */
-  int jsbound;			/* first band of joint stereo coding */
-  int sblimit;			/* total number of sub bands */
+	int actual_mode;		/* when writing IS, may forget if 0 chs */
+	int nch;				/* num channels: 1 for mono, 2 for stereo */
+	int jsbound;			/* first band of joint stereo coding */
+	int sblimit;			/* total number of sub bands */
 } frame_info;
+
+
+typedef unsigned int subband_t[2][3][SCALE_BLOCK][SBLIMIT];
+typedef FLOAT jsb_sample_t[3][SCALE_BLOCK][SBLIMIT];
+typedef FLOAT sb_sample_t[2][3][SCALE_BLOCK][SBLIMIT];
+
+
 
 /***************************************************************************************
  toolame Global Options structure.
@@ -144,68 +182,99 @@ typedef struct {
 ****************************************************************************************/
 struct toolame_options_struct
 {
-  // Input PCM audio File Information
-  int sampling_frequency;   // mpeg1: 32000 [44100] 48000 
-			    // mpeg2: 16000  22050  24000  
-  int sampling_frequency_idx;// ++ [0] NB User sets samplerate, toolame converts it to index in initOptions
-
-  // Output MP2 File Information
-  int version;              //  0 mpeg2  [1] mpeg1                                 
-  int bitrate;              //  for mpeg1:32, 48, 56, 64, 80, 96,112,128,160,[192], 224, 256, 320, 384 
-		            //  for mpeg2: 8, 16, 24, 32, 40, 48, 56, 64, 80, [96], 112, 128, 144, 160 
-  int bitrate_index;        // ++ [10]. NB User sets bitrate, toolame converts it to index in initOptions
-  int mode;                /* [MPG_MD_STEREO]
-			      MPG_MD_DUAL_CHANNEL
-			      MPG_MD_JOINT_STEREO
-			      MPG_MD_MONO */
-  int padding;             // [FALSE] 
-  int doEnergyLevels;      // Write energy level information into the end of the frame [FALSE]
-  int numAncillaryBits;    // Number of reserved ancillary bits [0] (Currently only available for non-VBR modes)
-
-  // Psychoacoustic Model options
-  int psymodel;            // -1, 0, 1, 2, [3], 4   Psy model number
-  FLOAT athlevel;          // Adjust the Absolute Threshold of Hearing curve by [0] dB
-  int quickmode;           // Only calculate psy model ever X frames [FALSE] 
-  int quickcount;          // Only calculate psy model every [10] frames
-
-  // VBR Options
-  int vbr;                 // turn on VBR mode TRUE [FALSE] 
-  int upperbitrateindex;   // ++ [0] means no upper bitrate set for VBR mode. valid 1-15 depending on mode
-  FLOAT vbrlevel;          // Set VBR quality. [0.0] (sensible range -10.0 -> 10.0)
-
-  // Miscellaneous Options That Nobody Ever Uses
-  int emphasis;            // [n]one, 5(50/15 microseconds), c(ccitt j.17)  
-  int copyright;           // [FALSE] 
-  int original;            // [FALSE] 
-  int private_bit;         // [0] Your very own bit in the header.
-  int error_protection;    // [FALSE] 
-
-  // Digital Audio Broadcasting Extensions
-  int doDAB;               // Allocate space for the DigitalAudioBroadcasting info [FALSE] 
-  int dabCrcLength;        // Number of CRC bytes for DAB [2], 4 
-  int dabCrc[4];           // DAB CRC bytes are inserted here. User must insert them in frame
-  int dabXpadLength;       // Number of bytes in the XPAD
-
-  // Processing Options
-  int verbosity;           // Verbosity of output 0(never output a thing) [2] 100(output everything)
-
-
-  // Unless you're me, don't touch anything below here
-  // Init flags for contexts
-  int toolame_init;
-  int psycho1init;
-  psycho_1_mem *p1mem;
-  int psycho2init;
-  psycho_2_mem *p2mem;
-  int psycho3init;
-  psycho_3_mem *p3mem;
-  int psycho4init;
-  psycho_4_mem *p4mem;
-
-  // Frame info
-  frame_info frame;
-  frame_header header;
-
+	// Input PCM audio File Information
+	int samplerate_in;	// mpeg1: 32000 [44100] 48000 
+						// mpeg2: 16000  22050  24000 
+	int samplerate_out;
+	int num_channels;		// Number of channels on the input stream
+	
+	// Output MP2 File Information
+	MPEG_version version;     //  0 mpeg2  [1] mpeg1                                 
+	int bitrate;              //  for mpeg1:32, 48, 56, 64, 80, 96,112,128,160,[192], 224, 256, 320, 384 
+					//  for mpeg2: 8, 16, 24, 32, 40, 48, 56, 64, 80, [96], 112, 128, 144, 160 
+	MPEG_mode mode;                /* [MPG_MD_STEREO]
+				  MPG_MD_DUAL_CHANNEL
+				  MPG_MD_JOINT_STEREO
+				  MPG_MD_MONO */
+	Padding_type padding;             // [PAD_NO] 
+	int do_energy_levels;      // Write energy level information into the end of the frame [FALSE]
+	int num_ancillary_bits;    // Number of reserved ancillary bits [0] (Currently only available for non-VBR modes)
+	
+	// Psychoacoustic Model options
+	int psymodel;            // -1, 0, 1, 2, [3], 4   Psy model number
+	FLOAT athlevel;          // Adjust the Absolute Threshold of Hearing curve by [0] dB
+	int quickmode;           // Only calculate psy model ever X frames [FALSE] 
+	int quickcount;          // Only calculate psy model every [10] frames
+	
+	// VBR Options
+	int vbr;                 // turn on VBR mode TRUE [FALSE] 
+	int vbr_upper_index;   // ++ [0] means no upper bitrate set for VBR mode. valid 1-15 depending on mode
+	int vbr_max_bitrate;
+	FLOAT vbrlevel;          // Set VBR quality. [0.0] (sensible range -10.0 -> 10.0)
+	
+	// Miscellaneous Options That Nobody Ever Uses
+	Emphasis_type emphasis;  // [n]one, 5(50/15 microseconds), c(ccitt j.17)  
+	int copyright;           // [FALSE] 
+	int original;            // [FALSE] 
+	int private_bit;         // [0] Your very own bit in the header.
+	int error_protection;    // [FALSE] 
+	
+	// Digital Audio Broadcasting Extensions
+	int do_dab;              // Allocate space for the DigitalAudioBroadcasting info [FALSE] 
+	int dab_crc_len;         // Number of CRC bytes for DAB [2], 4 
+	int dab_crc[4];          // DAB CRC bytes are inserted here. User must insert them in frame
+	int dab_xpad_len;        // Number of bytes in the XPAD
+	
+	// Processing Options
+	int verbosity;           // Verbosity of output 0(never output a thing) [2] 100(output everything)
+	
+	
+	
+	
+	
+	// Bit allocation stuff
+	int lower_index;
+	int upper_index;
+	int bitrateindextobits[15];
+	int vbr_frame_count;			// Used for debugging VBR
+	int alloc_tab_num;			// number of table as loaded 
+	alloc_table *alloc_tab;			// bit allocation table 
+	
+	
+	// Used by toolame_encode_frame
+	int toolame_init;
+	short int buffer[2][1152];	// Sample buffer
+	int samples_left;				// Number of samples left in buffer
+	int psycount;
+	int crc;
+	
+	unsigned int bit_alloc[2][SBLIMIT];
+	unsigned int scfsi[2][SBLIMIT];
+	unsigned int scalar[2][3][SBLIMIT];
+	unsigned int j_scale[3][SBLIMIT];
+	FLOAT smrdef[2][32];
+	FLOAT smr[2][SBLIMIT];
+	FLOAT max_sc[2][SBLIMIT];
+	
+	subband_t *subband;
+	jsb_sample_t *j_sample;
+	sb_sample_t *sb_sample;
+	
+	
+	
+	// memory for psycho models
+	psycho_0_mem *p0mem;
+	psycho_1_mem *p1mem;
+	psycho_2_mem *p2mem;
+	psycho_3_mem *p3mem;
+	psycho_4_mem *p4mem;
+	
+	
+	
+	// Frame info
+	frame_info frame;
+	frame_header header;
+	
 };
 
 #endif

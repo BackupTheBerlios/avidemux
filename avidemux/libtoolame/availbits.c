@@ -1,27 +1,30 @@
 /*
- * toolame - an optimized mpeg 1/2 layer 2 audio encoder
- * Copyright (C) 2001 Michael Cheng
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *  Copyright (C) 2001-2004 Michael Cheng
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
  */
+
+
 #include <stdio.h>
+
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
-#include "encoder.h"
-#include "musicin.h"
 #include "availbits.h"
 
 
@@ -34,14 +37,16 @@ struct slotinfo {
 } slots;
 
 /* function returns the number of available bits */
-int available_bits (frame_header *header, toolame_options * glopts)
+int available_bits ( toolame_options * glopts )
 {
+  frame_header *header = &glopts->header;
   int adb;
 
   slots.extra = 0;		/* be default, no extra slots */
 
   slots.average =
-    (1152.0/ (header->sampling_frequency/1000.0) ) * ((FLOAT)toolame_getBitrate(glopts) / 8.0);
+    (1152.0/ ((FLOAT)glopts->samplerate_out/1000.0) )
+     * ((FLOAT)glopts->bitrate / 8.0);
 
   //fprintf(stdout,"availbits says: sampling freq is %i. version %i. bitrateindex %i slots %f\n",header->sampling_frequency, header->version, header->bitrate_index, slots.average);
 
@@ -66,3 +71,4 @@ int available_bits (frame_header *header, toolame_options * glopts)
 
   return adb;
 }
+

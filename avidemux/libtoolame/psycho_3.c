@@ -1,11 +1,31 @@
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
-#include "encoder.h"
 #include "mem.h"
 #include "fft.h"
 #include "ath.h"
@@ -362,7 +382,7 @@ void psycho_3_smr(FLOAT *LTmin, FLOAT *Lsb) {
   }
 }
 
-psycho_3_mem *psycho_3_init(toolame_options *glopts, frame_header *header) {
+psycho_3_mem *psycho_3_init( toolame_options *glopts ) {
   int i;
   int cbase = 0; /* current base index for the bark range calculation */
   FLOAT sfreq;
@@ -375,7 +395,7 @@ psycho_3_mem *psycho_3_init(toolame_options *glopts, frame_header *header) {
   int cbands=0;
   int *cbandindex;
 
-  mem = (psycho_3_mem *)calloc(1, sizeof(psycho_3_mem));
+  mem = (psycho_3_mem *)toolame_malloc(sizeof(psycho_3_mem), "psycho_3_mem");
   mem->off[0]=mem->off[1]=256;
   freq_subset = mem->freq_subset;
   bark = mem->bark;
@@ -386,11 +406,11 @@ psycho_3_mem *psycho_3_init(toolame_options *glopts, frame_header *header) {
   psycho_3_init_add_db();
   
   /* For each spectral line calculate the bark and the ATH (in dB) */
-  sfreq = (FLOAT)header->sampling_frequency;
+  sfreq = (FLOAT)glopts->samplerate_out;
   for (i=1;i<HBLKSIZE; i++) {
     FLOAT freq = i * sfreq/BLKSIZE;
-    bark[i] = MEANX_freq2bark(freq);
-    ath[i] = ATH_dB(freq,glopts->athlevel);
+    bark[i] = ath_freq2bark(freq);
+    ath[i] = ath_db(freq,glopts->athlevel);
   }
   
   { /* Work out the critical bands
@@ -483,9 +503,10 @@ void psycho_3_dump(int *tonelabel, FLOAT *Xtm, int *noiselabel, FLOAT *Xnm) {
   }
   fprintf(stdout,"\n");
 }
-void psycho_3 (short int buffer[2][1152], FLOAT scale[2][32], FLOAT ltmin[2][32], frame_info * frame, toolame_options *glopts)
+void psycho_3 (toolame_options *glopts, short int buffer[2][1152], FLOAT scale[2][32], FLOAT ltmin[2][32])
 {
   psycho_3_mem *mem;
+  frame_info *frame = &glopts->frame;
   int nch = frame->nch;
   int k, i;
   FLOAT sample[BLKSIZE];
@@ -497,11 +518,8 @@ void psycho_3 (short int buffer[2][1152], FLOAT scale[2][32], FLOAT ltmin[2][32]
   FLOAT LTg[HBLKSIZE];
   FLOAT Lsb[SBLIMIT];
 
-  frame_header *header = frame->header;
-
-  if (!glopts->psycho3init) {		
-    glopts->p3mem = psycho_3_init(glopts, header);
-    glopts->psycho3init++;    
+  if (!glopts->p3mem) {		
+    glopts->p3mem = psycho_3_init( glopts );
   }
   mem = glopts->p3mem;
 
@@ -530,13 +548,13 @@ void psycho_3 (short int buffer[2][1152], FLOAT scale[2][32], FLOAT ltmin[2][32]
     if (glopts->verbosity > 20)
       psycho_3_dump(tonelabel, Xtm, noiselabel, Xnm);
     psycho_3_decimation(mem->ath, tonelabel, Xtm, noiselabel, Xnm, mem->bark);
-    psycho_3_threshold(LTg, tonelabel, Xtm, noiselabel, Xnm, mem->bark, mem->ath, toolame_getBitrate(glopts) / nch, mem->freq_subset);
+    psycho_3_threshold(LTg, tonelabel, Xtm, noiselabel, Xnm, mem->bark, mem->ath, glopts->bitrate / nch, mem->freq_subset);
     psycho_3_minimummasking(LTg, &ltmin[k][0], mem->freq_subset);
     psycho_3_smr(&ltmin[k][0], Lsb);
   }
 }
 
 
-void psycho_3_deinit(psycho_3_mem *mem) {
-  toolame_free( (void **) &mem );
+void psycho_3_deinit(psycho_3_mem **mem) {
+  toolame_free( (void **) mem );
 }

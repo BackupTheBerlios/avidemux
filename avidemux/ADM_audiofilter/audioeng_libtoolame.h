@@ -24,6 +24,8 @@ protected:
 	uint8_t  _bufferin[PROCESS_BUFFER_SIZE];
 	uint32_t grab(uint8_t *obuffer);   
 	uint8_t  *_bfer;
+	
+	
 		    
 public:
 	uint8_t	init( uint32_t mode,

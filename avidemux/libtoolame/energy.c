@@ -1,9 +1,36 @@
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
+#include "bitbuffer.h"
+#include "energy.h"
 
-void doEnergyLevels(toolame_options *encodeOptions, unsigned char *mp2buffer, int frameEnd, short int *leftpcm, short int *rightpcm) {
+void do_energy_levels(toolame_options *glopts, bit_stream *bs)
+//void do_energy_levels(toolame_options *glopts, unsigned char *mp2buffer, int frameEnd, short int *leftpcm, short int *rightpcm)
+{
   /* Reference:
      Using the BWF Energy Levels in AudioScience Bitstreams
      http://www.audioscience.com/internet/technical/app0001.pdf
@@ -15,11 +42,18 @@ void doEnergyLevels(toolame_options *encodeOptions, unsigned char *mp2buffer, in
      you'll be overwriting mpeg audio data)
   */
      
+
+/*  *** FIXME removed due to code re-arrangement ***
+
+
+  short int *leftpcm = glopts->buffer[0];
+  short int *rightpcm = glopts->buffer[1];   
+     
   int i;
-  static int leftMax, rightMax;
+  int leftMax, rightMax;
   unsigned char rhibyte, rlobyte, lhibyte, llobyte;
 
-  /* find the maximum in the left and right channels */
+  // find the maximum in the left and right channels
   leftMax = rightMax = -1;
   for (i=0; i<1152;i++) { 
     if (abs(leftpcm[i])>leftMax)
@@ -28,13 +62,13 @@ void doEnergyLevels(toolame_options *encodeOptions, unsigned char *mp2buffer, in
       rightMax = abs(rightpcm[i]);
   }
 
-  /* convert max value to hi/lo bytes and write into buffer */
+  // convert max value to hi/lo bytes and write into buffer
   lhibyte = leftMax/256;
   llobyte = leftMax - 256*lhibyte;
   mp2buffer[frameEnd-1] = llobyte;
   mp2buffer[frameEnd-2] = lhibyte;
   
-  if (encodeOptions->mode!=MPG_MD_MONO) {
+  if (glopts->mode!=MONO) {
     // Only write the right channel energy info
     // if we're in stereo mode.
     mp2buffer[frameEnd-3] = 0;
@@ -44,4 +78,8 @@ void doEnergyLevels(toolame_options *encodeOptions, unsigned char *mp2buffer, in
     mp2buffer[frameEnd-4] = rlobyte;
     mp2buffer[frameEnd-5] = rhibyte;
   }
+  
+*/
 }
+
+

@@ -36,10 +36,15 @@
 #include "audioprocess.hxx"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_audiofilter/audioeng_libtoolame.h"
+
+extern "C"
+{
 #include "libtoolame/toolame.h"
+}
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO_FILTER
 #include "ADM_toolkit/ADM_debug.h"
+
 
 
 static toolame_options_struct *options=NULL;
@@ -66,7 +71,7 @@ AVDMProcessAudio_LibToolame::~AVDMProcessAudio_LibToolame()
     	delete(_wavheader);
 
     if(options)
-    	toolame_deinit( options);
+    	toolame_close( &options);
 
 	options=NULL;
 	_wavheader=NULL;
@@ -86,7 +91,7 @@ uint8_t AVDMProcessAudio_LibToolame::init( uint32_t mode, uint32_t bitrate)
 
     int ret;//, ratio;
     double comp;
-    int mmode;    	
+    MPEG_mode mmode;    	
     
 	_wavheader->byterate=(bitrate*1000)>>3;         
       
@@ -112,32 +117,32 @@ uint8_t AVDMProcessAudio_LibToolame::init( uint32_t mode, uint32_t bitrate)
 		return 0;
 	}
 	
-  	toolame_setSampleFreq (options, _wavheader->frequency);	
-	if(_wavheader->channels==1) mmode=MPG_MD_MONO;
+  	toolame_set_out_samplerate (options, _wavheader->frequency);	
+	if(_wavheader->channels==1) mmode=MONO;
 	else
 	switch (mode)
 	{
 	    case ADM_STEREO:
-		mmode = MPG_MD_STEREO;
+		mmode = STEREO;
 		break;
 	    case ADM_JSTEREO:
-		mmode = MPG_MD_JOINT_STEREO;
+		mmode = JOINT_STEREO;
 		break;
 	    case ADM_MONO:
-	    	mmode=MPG_MD_MONO;
+	    	mmode=MONO;
 		break;
 				
 	   default:
 		printf("\n **** unknown mode ***\n");
-		mmode = MPG_MD_STEREO;
+		mmode = STEREO;
 		break;
 
 	}
-	toolame_setMode(options,mmode);
-   	toolame_setErrorProtection(options,TRUE);	
+	toolame_set_mode(options,mmode);
+   	toolame_set_error_protection(options,TRUE);	
     	//toolame_setPadding (options,TRUE);
-	toolame_setBitrate (options,bitrate);
-	toolame_setVerbosity(options, 2);
+	toolame_set_bitrate (options,bitrate);
+	toolame_set_verbosity(options, 2);
 	toolame_init_params(options);	
 	
 
@@ -185,15 +190,13 @@ uint32_t AVDMProcessAudio_LibToolame::grab(uint8_t * obuffer)
 	if(_wavheader->channels==1)
 	{
 		nbout =toolame_encode_buffer(options, _buffer, _buffer,
-			  rdall>>1, obuffer,8192, 
-			  &nbout);
+			  rdall>>1, obuffer,8192  );
 		aprintf("in:%d out;%d\n",rdall,nbout);	
 	}		
 	else
 	{
-		nbframe= toolame_encode_buffer_interleaved(options, _buffer,
-			  rdall>>2, obuffer, ONE_CHUNK*2, 
-			  &nbout);
+		nbout= toolame_encode_buffer_interleaved(options, _buffer,
+			  rdall>>2, obuffer, ONE_CHUNK*2);
 		aprintf("2Lame: in:%d out:%d frame:%d\n",rdall,nbout,nbframe);	  
 		
 	}

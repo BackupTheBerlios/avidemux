@@ -1,17 +1,43 @@
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
+
 #include <stdio.h>
 #include <string.h>
+
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
 #include "dab.h"
 
+
 void
-CRC_calcDAB (frame_info * frame,
+dab_crc_calc (toolame_options *glopts,
 	     unsigned int bit_alloc[2][SBLIMIT],
 	     unsigned int scfsi[2][SBLIMIT],
-	     unsigned int scalar[2][3][SBLIMIT], unsigned int *crc,
+	     unsigned int scalar[2][3][SBLIMIT], 
+	     unsigned int *crc,
 	     int packed)
 {
+  frame_info * frame = &glopts->frame;
   int i, j, k;
   int nch = frame->nch;
   int nb_scalar;
@@ -32,22 +58,22 @@ CRC_calcDAB (frame_info * frame,
 	case 0:
 	  for (j = 0; j < 3; j++) {
 	    nb_scalar++;
-	    update_CRCDAB (scalar[k][j][i] >> 3, 3, crc);
+	    dab_crc_update (scalar[k][j][i] >> 3, 3, crc);
 	  }
 	  break;
 	case 1:
 	case 3:
 	  nb_scalar += 2;
-	  update_CRCDAB (scalar[k][0][i] >> 3, 3, crc);
-	  update_CRCDAB (scalar[k][2][i] >> 3, 3, crc);
+	  dab_crc_update (scalar[k][0][i] >> 3, 3, crc);
+	  dab_crc_update (scalar[k][2][i] >> 3, 3, crc);
 	  break;
 	case 2:
 	  nb_scalar++;
-	  update_CRCDAB (scalar[k][0][i] >> 3, 3, crc);
+	  dab_crc_update (scalar[k][0][i] >> 3, 3, crc);
 	}
 }
 
-void update_CRCDAB (unsigned int data, unsigned int length, unsigned int *crc)
+void dab_crc_update (unsigned int data, unsigned int length, unsigned int *crc)
 {
   unsigned int masking, carry;
 
@@ -65,6 +91,9 @@ void update_CRCDAB (unsigned int data, unsigned int length, unsigned int *crc)
 
 #ifdef OLD_BROKEN_DAB_STUFF
 // Leaving these here while DAB is reimplemented properly
+
+#define         MINIMUM         4   /* Minimum size of the buffer in bytes */
+#define         MAX_LENGTH      32  /* Maximum length of word written */
 
 
 /*
@@ -111,3 +140,5 @@ void update_CRCDAB (unsigned int data, unsigned int length, unsigned int *crc)
     }
 
 #endif
+
+

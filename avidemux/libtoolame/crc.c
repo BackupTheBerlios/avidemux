@@ -1,8 +1,31 @@
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
+
 #include <stdio.h>
 #include <string.h>
+
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
 #include "crc.h"
 
 /*****************************************************************************
@@ -11,38 +34,39 @@
 *
 *****************************************************************************/
 
-void CRC_calc (frame_info * frame, unsigned int bit_alloc[2][SBLIMIT],
+void crc_calc (toolame_options *glopts, unsigned int bit_alloc[2][SBLIMIT],
 	       unsigned int scfsi[2][SBLIMIT], unsigned int *crc)
 {
   int i, k;
-  frame_header *header = frame->header;
+  frame_info *frame = &glopts->frame;
+  frame_header *header = &glopts->header;
   int nch = frame->nch;
   int sblimit = frame->sblimit;
   int jsbound = frame->jsbound;
-  al_table *alloc = frame->alloc;
+  alloc_table *alloc = glopts->alloc_tab;
 
   *crc = 0xffff;		/* changed from '0' 92-08-11 shn */
-  update_CRC (header->bitrate_index, 4, crc);
-  update_CRC (header->sampling_frequency_idx, 2, crc);
-  update_CRC (header->padding, 1, crc);
-  update_CRC (header->private_bit, 1, crc);
-  update_CRC (header->mode, 2, crc);
-  update_CRC (header->mode_ext, 2, crc);
-  update_CRC (header->copyright, 1, crc);
-  update_CRC (header->original, 1, crc);
-  update_CRC (header->emphasis, 2, crc);
+  crc_update (header->bitrate_index, 4, crc);
+  crc_update (header->samplerate_idx, 2, crc);
+  crc_update (header->padding, 1, crc);
+  crc_update (header->private_bit, 1, crc);
+  crc_update (header->mode, 2, crc);
+  crc_update (header->mode_ext, 2, crc);
+  crc_update (header->copyright, 1, crc);
+  crc_update (header->original, 1, crc);
+  crc_update (header->emphasis, 2, crc);
 
   for (i = 0; i < sblimit; i++)
     for (k = 0; k < ((i < jsbound) ? nch : 1); k++)
-      update_CRC (bit_alloc[k][i], (*alloc)[i][0].bits, crc);
+      crc_update (bit_alloc[k][i], (*alloc)[i][0].bits, crc);
 
   for (i = 0; i < sblimit; i++)
     for (k = 0; k < nch; k++)
       if (bit_alloc[k][i])
-	update_CRC (scfsi[k][i], 2, crc);
+	crc_update (scfsi[k][i], 2, crc);
 }
 
-void update_CRC (unsigned int data, unsigned int length, unsigned int *crc)
+void crc_update (unsigned int data, unsigned int length, unsigned int *crc)
 {
   unsigned int masking, carry;
 

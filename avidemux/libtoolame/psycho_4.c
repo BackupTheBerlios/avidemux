@@ -1,11 +1,31 @@
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
-#include "encoder.h"
 #include "mem.h"
 #include "fft.h"
 #include "ath.h"
@@ -21,7 +41,7 @@ the notation in the ISO docs and in the sourcecode.
 I've nicked a bunch of stuff from LAME to make this a bit easier to grok
 - ATH values (this also overcomes the lack of mpeg-2 tables
   which meant that LSF never had proper values)
-- freq2bark() to convert frequencies directly to bark values.
+- ath_freq2bark() to convert frequencies directly to bark values.
 - spreading_function() isolated the calculation of the spreading function.
   Basically the same code as before, just isolated in its own function.
   LAME seem to does some extra tweaks to the ISO1117s model.
@@ -44,11 +64,11 @@ that much difference to the final SNR values, but it's something worth trying
 
 
 /* NMT is a constant 5.5dB. ISO11172 Sec D.2.4.h */
-static FLOAT NMT = 5.5;
+static const FLOAT NMT = 5.5;
 
 /* The index into this array is a bark value 
    This array gives the 'minval' values from ISO11172 Tables D.3.x */
-static FLOAT minval[27] = {
+static const FLOAT minval[27] = {
   0.0, /* bark = 0 */
   20.0, /* 1 */
   20.0, /* 2 */
@@ -142,7 +162,7 @@ FLOAT psycho_4_spreading_function(FLOAT bark) {
 /********************************
  * init psycho model 2
  ********************************/
-psycho_4_mem *psycho_4_init (int sfreq, toolame_options *glopts)
+psycho_4_mem *psycho_4_init (toolame_options *glopts, int sfreq)
 {
   psycho_4_mem *mem;
   FLOAT *cbval, *rnorm;
@@ -155,7 +175,7 @@ psycho_4_mem *psycho_4_init (int sfreq, toolame_options *glopts)
   int i, j;
 
   {
-    mem = (psycho_4_mem *)calloc(1, sizeof(psycho_4_mem));
+    mem = (psycho_4_mem *)toolame_malloc(sizeof(psycho_4_mem), "psycho_4_mem");
 
     mem->tmn = (FLOAT *) toolame_malloc (sizeof (DCB), "tmn");
     mem->s = (FCB *) toolame_malloc (sizeof (FCBCB), "s");
@@ -163,7 +183,6 @@ psycho_4_mem *psycho_4_init (int sfreq, toolame_options *glopts)
     mem->r = (F2HBLK *) toolame_malloc (sizeof (F22HBLK), "r");
     mem->phi_sav = (F2HBLK *) toolame_malloc (sizeof (F22HBLK), "phi_sav");
 
-    //static int new = 0, old = 1, oldest = 0;
     mem->new=0;
     mem->old=1;
     mem->oldest=0;
@@ -200,12 +219,12 @@ psycho_4_mem *psycho_4_init (int sfreq, toolame_options *glopts)
      Line 512 should be the nyquist freq  */
   for (i=0; i<HBLKSIZE; i++) {
     FLOAT freq = i * (FLOAT)sfreq/(FLOAT)BLKSIZE;
-    bark[i] = MEANX_freq2bark(freq);
+    bark[i] = ath_freq2bark(freq);
     /* The ath tables in the dist10 code seem to be a little out of kilter. 
        they seem to start with index 0 corresponding to (sampling freq)/1024.
        When in doubt, i'm going to assume that the dist10 code is wrong. MFC Feb2003  */
-    ath[i] = ATH_energy(freq,glopts->athlevel);
-    //fprintf(stdout,"%.2f ",ath[i]);
+    ath[i] = ath_energy(freq,glopts->athlevel);
+    //fprintf(stderr,"%.2f ",ath[i]);
   }  
  
 
@@ -280,8 +299,10 @@ psycho_4_mem *psycho_4_init (int sfreq, toolame_options *glopts)
 }
 
 
-void psycho_4 (short int buffer[2][1152], short int savebuf[2][1344], int nch,
-		FLOAT smr[2][32], int sfreq, toolame_options *glopts)
+void psycho_4 (toolame_options *glopts, 
+		short int buffer[2][1152],
+		short int savebuf[2][1152],
+		FLOAT smr[2][32])
 /* to match prototype : FLOAT args are always FLOAT */
 {
   psycho_4_mem *mem;
@@ -302,10 +323,12 @@ void psycho_4 (short int buffer[2][1152], short int savebuf[2][1344], int nch,
   FCB *s;
   FHBLK *lthr;
   F2HBLK *r, *phi_sav;
+  
+  int nch = glopts->frame.nch;
+  int sfreq = glopts->samplerate_out;
 
-  if (!glopts->psycho4init) {
-    glopts->p4mem = psycho_4_init (sfreq, glopts);
-    glopts->psycho4init++;
+  if (!glopts->p4mem) {
+    glopts->p4mem = psycho_4_init (glopts,sfreq);
   }
 
   mem = glopts->p4mem;
@@ -538,14 +561,14 @@ void psycho_4 (short int buffer[2][1152], short int savebuf[2][1344], int nch,
 }
 
 
-void psycho_4_deinit(psycho_4_mem *mem) {
-    toolame_free( (void **) &mem->tmn );
-    toolame_free( (void **) &mem->s );
-    toolame_free( (void **) &mem->lthr );
-    toolame_free( (void **) &mem->r );
-    toolame_free( (void **) &mem->phi_sav );
+void psycho_4_deinit(psycho_4_mem **mem) {
+    toolame_free( (void **) &(*mem)->tmn );
+    toolame_free( (void **) &(*mem)->s );
+    toolame_free( (void **) &(*mem)->lthr );
+    toolame_free( (void **) &(*mem)->r );
+    toolame_free( (void **) &(*mem)->phi_sav );
 
-    toolame_free( (void **) &mem);
+    toolame_free( (void **) mem);
 };
 
 

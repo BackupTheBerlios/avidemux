@@ -1,11 +1,32 @@
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
-#include "encoder.h"
 #include "mem.h"
 #include "fft.h"
 #include "psycho_2.h"
@@ -18,15 +39,15 @@
 
 /* The following static variables are constants.                           */
 
-static FLOAT nmt = 5.5;
+static const FLOAT nmt = 5.5;
 
-static FLOAT crit_band[27] = { 0, 100, 200, 300, 400, 510, 630, 770,
+static const FLOAT crit_band[27] = { 0, 100, 200, 300, 400, 510, 630, 770,
   920, 1080, 1270, 1480, 1720, 2000, 2320, 2700,
   3150, 3700, 4400, 5300, 6400, 7700, 9500, 12000,
   15500, 25000, 30000
 };
 
-static FLOAT bmax[27] = { 20.0, 20.0, 20.0, 20.0, 20.0, 17.0, 15.0,
+static const FLOAT bmax[27] = { 20.0, 20.0, 20.0, 20.0, 20.0, 17.0, 15.0,
   10.0, 7.0, 4.4, 4.5, 4.5, 4.5, 4.5,
   4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5,
   4.5, 4.5, 4.5, 3.5, 3.5, 3.5
@@ -37,7 +58,7 @@ void psycho_2_read_absthr (absthr, table)
      int table;
 {
   int j;
-#include "absthr.h"
+#include "psycho_2_absthr.h"
 
   if ((table < 0) || (table > 3)) {
     printf ("internal error: wrong table number");
@@ -53,7 +74,7 @@ void psycho_2_read_absthr (absthr, table)
 /********************************
  * init psycho model 2
  ********************************/
-psycho_2_mem *psycho_2_init (int sfreq, toolame_options *glopts)
+psycho_2_mem *psycho_2_init (toolame_options *glopts, int sfreq)
 {
   psycho_2_mem *mem;
   FLOAT *cbval, *rnorm;
@@ -72,7 +93,7 @@ psycho_2_mem *psycho_2_init (int sfreq, toolame_options *glopts)
   int sfreq_idx;
 
   {
-    mem = (psycho_2_mem *)calloc(1, sizeof(psycho_2_mem));
+    mem = (psycho_2_mem *)toolame_malloc(sizeof(psycho_2_mem), "psycho_2_mem");
 
     mem->tmn = (FLOAT *) toolame_malloc (sizeof (DCB), "tmn");
     mem->s = (FCB *) toolame_malloc (sizeof (FCBCB), "s");
@@ -84,6 +105,10 @@ psycho_2_mem *psycho_2_init (int sfreq, toolame_options *glopts)
     mem->new=0;
     mem->old=1;
     mem->oldest=0;
+    
+    mem->flush = (int) (384 * 3.0 / 2.0); 
+    mem->syncsize = 1056;
+    mem->sync_flush = mem->syncsize - mem->flush;
   }
 
   {
@@ -226,8 +251,9 @@ psycho_2_mem *psycho_2_init (int sfreq, toolame_options *glopts)
   return(mem);
 }
 
-void psycho_2 (short int buffer[2][1152], short int savebuf[2][1344], int nch,
-		FLOAT smr[2][32], int sfreq ,toolame_options *glopts)
+void psycho_2 (toolame_options *glopts, short int buffer[2][1152],
+	  short int savebuf[2][1152],
+		FLOAT smr[2][32])
 {
   psycho_2_mem *mem;
   unsigned int i, j, k, ch;
@@ -250,16 +276,13 @@ void psycho_2 (short int buffer[2][1152], short int savebuf[2][1344], int nch,
   FHBLK *lthr;
   F2HBLK *r, *phi_sav;
   FLOAT *absthr;
+  
+  int nch = glopts->frame.nch;
+  int sfreq = glopts->samplerate_out;
 
-  static int flush, sync_flush, syncsize;
 
-  if (!glopts->psycho2init) {
-    glopts->p2mem = psycho_2_init (sfreq, glopts);
-    glopts->psycho2init++;
-
-    flush = (int) (384 * 3.0 / 2.0); 
-    syncsize = 1056;
-    sync_flush = syncsize - flush;
+  if (!glopts->p2mem) {
+    glopts->p2mem = psycho_2_init (glopts, sfreq);
   }
   mem = glopts->p2mem;
   {
@@ -310,7 +333,7 @@ void psycho_2 (short int buffer[2][1152], short int savebuf[2][1344], int nch,
       {
 	short int *bufferp = buffer[ch];
 	for (j = 0; j < 480; j++) {
-	  savebuf[ch][j] = savebuf[ch][j + flush];
+	  savebuf[ch][j] = savebuf[ch][j + mem->flush];
 	  wsamp_r[j] = window[j] * ((FLOAT) savebuf[ch][j]);
 	}
 	for (; j < 1024; j++) {
@@ -496,12 +519,13 @@ void psycho_2 (short int buffer[2][1152], short int savebuf[2][1344], int nch,
 
 }
 
-void psycho_2_deinit(psycho_2_mem *mem) {
-  toolame_free( (void **) &mem->tmn );
-  toolame_free( (void **) &mem->s );
-  toolame_free( (void **) &mem->lthr );
-  toolame_free( (void **) &mem->r );
-  toolame_free( (void **) &mem->phi_sav );
+void psycho_2_deinit(psycho_2_mem **mem) {
+  toolame_free( (void **) &(*mem)->tmn );
+  toolame_free( (void **) &(*mem)->s );
+  toolame_free( (void **) &(*mem)->lthr );
+  toolame_free( (void **) &(*mem)->r );
+  toolame_free( (void **) &(*mem)->phi_sav );
 
-  toolame_free ( (void **) &mem );
+  toolame_free ( (void **) mem );
 }
+

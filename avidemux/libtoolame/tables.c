@@ -1,3 +1,25 @@
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
+
 /**********************************************************************
  * MPEG/Audio Tables I/O routines
  **********************************************************************/
@@ -5,50 +27,12 @@
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
 #include "mem.h"
 #include "tables.h"
 
-#define NUMTABLES 38
-char table_names[NUMTABLES][9];
-long table_offsets[NUMTABLES];
-int numtables = 0;
-char table_filename[250];
-
-int pick_table (toolame_options *glopts, frame_info * frame)
-/* choose table, load if necess, return # sb's */
-{
-  int table, lay, bsp, br_per_ch, sfrq;
-  int sblim = frame->sblimit;	/* return current value if no load */
-
-  lay = frame->header->lay - 1;
-  bsp = frame->header->bitrate_index;
-  br_per_ch = toolame_getBitrate(glopts) / frame->nch;
-  sfrq = (int)(frame->header->sampling_frequency/1000.0);
-  /* decision rules refer to per-channel bitrates (kbits/sec/chan) */
-  if (frame->header->version == MPEG_AUDIO_ID) {	/* MPEG-1 */
-    if ((sfrq == 48 && br_per_ch >= 56)
-	|| (br_per_ch >= 56 && br_per_ch <= 80))
-      table = 0;
-    else if (sfrq != 48 && br_per_ch >= 96)
-      table = 1;
-    else if (sfrq != 32 && br_per_ch <= 48)
-      table = 2;
-    else
-      table = 3;
-  } else {			/* MPEG-2 LSF */
-    table = 4;
-  }
-  if (frame->tab_num != table) {
-    if (frame->tab_num >= 0)
-      toolame_free ((void **) &(frame->alloc));
-    frame->alloc = (al_table *) toolame_malloc (sizeof (al_table), "alloc");
-    sblim = read_bit_alloc (frame->tab_num = table, frame->alloc);
-  }
-  return sblim;
-}
 
 
 /***********************************************************************
@@ -58,7 +42,7 @@ int pick_table (toolame_options *glopts, frame_info * frame)
  *
  **********************************************************************/
 
-int read_bit_alloc (int table, al_table *alloc)	/* read in table, return # subbands */
+static int read_bit_alloc (int table, alloc_table *alloc)	/* read in table, return # subbands */
 {
 
   static const int startindex_subband[5] = { 0, 290, 592, 674, 788 };
@@ -1083,3 +1067,41 @@ int read_bit_alloc (int table, al_table *alloc)	/* read in table, return # subba
   }
   return sblim;
 }
+
+
+
+int pick_table ( toolame_options *glopts )
+/* choose table, load if necess, return # sb's */
+{
+  frame_info *frame = &glopts->frame;
+  frame_header *header = &glopts->header;
+  int table, lay, bsp, br_per_ch, sfrq;
+  int sblim = frame->sblimit;	/* return current value if no load */
+
+  lay = header->lay - 1;
+  bsp = header->bitrate_index;
+  br_per_ch = glopts->bitrate / frame->nch;
+  sfrq = (int)(glopts->samplerate_out/1000.0);
+  /* decision rules refer to per-channel bitrates (kbits/sec/chan) */
+  if (header->version == MPEG1) {	/* MPEG-1 */
+    if ((sfrq == 48 && br_per_ch >= 56)
+	|| (br_per_ch >= 56 && br_per_ch <= 80))
+      table = 0;
+    else if (sfrq != 48 && br_per_ch >= 96)
+      table = 1;
+    else if (sfrq != 32 && br_per_ch <= 48)
+      table = 2;
+    else
+      table = 3;
+  } else {			/* MPEG-2 LSF */
+    table = 4;
+  }
+  if (glopts->alloc_tab_num != table) {
+    if (glopts->alloc_tab_num >= 0) toolame_free ((void **) &(glopts->alloc_tab));
+    glopts->alloc_tab = (alloc_table *) toolame_malloc (sizeof (alloc_table), "alloc_table");
+    glopts->alloc_tab_num = table;
+    sblim = read_bit_alloc (glopts->alloc_tab_num, glopts->alloc_tab);
+  }
+  return sblim;
+}
+

@@ -1,13 +1,28 @@
-#ifndef COMMON_DOT_H
-#define COMMON_DOT_H
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
 
-#ifndef EXIT_SUCCESS
-#define EXIT_SUCCESS 0
-#endif
 
-#ifndef EXIT_FAILURE
-#define EXIT_FAILURE 1
-#endif
+#ifndef _COMMON_H
+#define _COMMON_H
+
 
 #define         NULL_CHAR               '\0'
 
@@ -15,24 +30,26 @@
 #ifndef PI
 #define         PI                      3.14159265358979
 #endif
+#ifndef E
+#define         E                       2.71828182845
+#endif
 #define         PI2                     PI/2
 #define         PI4                     PI/4
 #define         PI64                    PI/64
 #define         LN_TO_LOG10             0.2302585093
 
 #define         VOL_REF_NUM             0
-#define         MPEG_AUDIO_ID           1
-#define		MPEG_PHASE2_LSF		0	/* 1995-07-11 SHN */
+//#define         MPEG_AUDIO_ID           1
+//#define         MPEG_PHASE2_LSF     0   /* 1995-07-11 SHN */
 #define         MAC_WINDOW_SIZE         24
 
-#define         MONO                    1
-#define         STEREO                  2
 #define         BITS_IN_A_BYTE          8
 #define         WORD                    16
 #define         MAX_NAME_SIZE           255
 #define         SBLIMIT                 32
 #define         SSLIMIT                 18
 #define         FFT_SIZE                1024
+#define			SPF						1152
 #define         HAN_SIZE                512
 #define         SCALE_BLOCK             12
 #define         SCALE_RANGE             64
@@ -40,44 +57,33 @@
 #define         CRC16_POLYNOMIAL        0x8005
 #define         CRC8_POLYNOMIAL         0x1D
 
-
-
-
-/* "bit_stream.h" Definitions */
-
-#define         MINIMUM         4	/* Minimum size of the buffer in bytes */
-#define         MAX_LENGTH      32	/* Maximum length of word written or
-					   read from bit stream */
-#define         READ_MODE       0
-#define         WRITE_MODE      1
-#define         ALIGNING        8
-#define         BINARY          0
-#define         ASCII           1
-
-#define         BUFFER_SIZE     4096
-
 #define         MIN(A, B)       ((A) < (B) ? (A) : (B))
 #define         MAX(A, B)       ((A) > (B) ? (A) : (B))
-/***********************************************************************
-*
-*  Global Type Definitions
-*
-***********************************************************************/
 
-typedef struct bit_stream_struc {
-  FILE *pt;			/* pointer to bit stream device */
-  unsigned char *buf;		/* bit stream buffer */
-  int buf_size;			/* size of buffer (in number of bytes) */
-  long totbit;			/* bit counter of bit stream */
-  int buf_byte_idx;		/* pointer to top byte in buffer */
-  int buf_bit_idx;		/* pointer to top bit of top byte in buffer */
-  int mode;			/* bit stream open in read or write mode */
-  int eob;			/* end of buffer index */
-  int eobs;			/* end of bit stream flag */
-  char format;
 
-  /* format of file in rd mode (BINARY/ASCII) */
-} Bit_stream_struc;
+/* This is the smallest MNR a subband can have before it is counted
+   as 'noisy' by the logic which chooses the number of JS subbands */
+
+#define NOISY_MIN_MNR   0.0
+
+
+/* Psychacoustic Model 1 Definitions */
+
+#define CB_FRACTION     0.33
+#define MAX_SNR         1000
+#define NOISE           10
+#define TONE            20
+#define DBMIN           -200.0
+#define LAST            -1
+#define STOP            -100
+#define POWERNORM       90.3090 /* = 20 * log10(32768) to normalize */
+/* max output power to 96 dB per spec */
+
+
+/* Psychoacoustic Model 2 Definitions */
+
+#define LXMIN           32.0
 
 
 #endif
+

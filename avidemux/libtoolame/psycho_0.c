@@ -1,10 +1,32 @@
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
+
 #include <stdio.h>
 #include <math.h>
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
 #include "ath.h"
-#include "encoder.h"
+#include "mem.h"
 #include "psycho_0.h"
 
 /* MFC Mar 03
@@ -26,28 +48,52 @@
    Feel free to make any sort of generic change you want. Add or subtract numbers, take
    logs, whatever. Fiddle with the numbers until we get a good SMR output */
 
-void psycho_0(FLOAT SMR[2][SBLIMIT], int nch, unsigned int scalar[2][3][SBLIMIT], int sfreq) {
-  int ch, sb, gr;
-  unsigned int minscaleindex[2][SBLIMIT]; /* Smaller scale indexes mean bigger scalefactors */
-  static FLOAT ath_min[SBLIMIT];
-  int i;
-  static int init=0;
 
-  if (!init) {
-    FLOAT freqperline = (FLOAT)sfreq/1024.0;
-    for (sb=0;sb<SBLIMIT;sb++) {
-      ath_min[sb] = 1000; /* set it huge */
-    }
-    
-    /* Find the minimum ATH in each subband */
-    for (i=0;i<512;i++) {
-      FLOAT thisfreq = i * freqperline;
-      FLOAT ath_val = ATH_dB(thisfreq, 0);
-      if (ath_val < ath_min[i>>4])
-	ath_min[i>>4] = ath_val;
-    }
-    init++;
-  }
+static psycho_0_mem *psycho_0_init (toolame_options *glopts, int sfreq)
+{
+	FLOAT freqperline = (FLOAT)sfreq/1024.0;
+	psycho_0_mem *mem = (psycho_0_mem *)toolame_malloc(sizeof(psycho_0_mem), "psycho_0_mem");
+	int sb, i;
+	
+	for (sb=0;sb<SBLIMIT;sb++) {
+		mem->ath_min[sb] = 1000; /* set it huge */
+	}
+
+	/* Find the minimum ATH in each subband */
+	for (i=0;i<512;i++) {
+		FLOAT thisfreq = i * freqperline;
+		FLOAT ath_val = ath_db(thisfreq, 0);
+		if (ath_val < mem->ath_min[i>>4])
+		mem->ath_min[i>>4] = ath_val;
+	}
+
+	return mem;
+}
+
+
+
+void psycho_0(toolame_options *glopts, FLOAT SMR[2][SBLIMIT], unsigned int scalar[2][3][SBLIMIT])
+{
+	psycho_0_mem *mem;
+	int nch = glopts->frame.nch;
+	int sfreq = glopts->samplerate_out;
+	int ch, sb, gr;
+	unsigned int minscaleindex[2][SBLIMIT]; /* Smaller scale indexes mean bigger scalefactors */
+
+	if (!glopts->p0mem) {
+		glopts->p0mem = psycho_0_init(glopts, sfreq);
+	}
+	mem = glopts->p0mem;
+
+
+	/* call functions for critical boundaries, freq. */
+	if (!glopts->p0mem) {			/* bands, bark values, and mapping */
+	} else {
+	
+		mem = glopts->p0mem;
+		
+	}
+
 
   /* Find the minimum scalefactor index for each ch/sb */
   for (ch=0;ch<nch;ch++) 
@@ -67,5 +113,12 @@ void psycho_0(FLOAT SMR[2][SBLIMIT], int nch, unsigned int scalar[2][3][SBLIMIT]
      MFC Mar 03 */
   for (ch=0;ch<nch;ch++)
     for (sb=0;sb<SBLIMIT;sb++)
-      SMR[ch][sb] = 2.0 * (30.0 - minscaleindex[ch][sb]) - ath_min[sb];
+      SMR[ch][sb] = 2.0 * (30.0 - minscaleindex[ch][sb]) - mem->ath_min[sb];
 }
+
+
+void psycho_0_deinit(psycho_0_mem **mem) {
+	toolame_free( (void **)mem);
+}
+
+

@@ -1,4 +1,27 @@
 /*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
+
+
+/*
 ** FFT and FHT routines
 **  Copyright 1988, 1993; Ron Mayer
 **  
@@ -30,14 +53,17 @@
 */
 #include <stdio.h>
 #include <math.h>
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
 #include "fft.h"
+
+
+
 #define         SQRT2                   1.4142135623730951454746218587388284504414
 
 
-static FLOAT costab[20] = {
+static const FLOAT costab[20] = {
   .00000000000000000000000000000000000000000000000000,
   .70710678118654752440084436210484903928483593768847,
   .92387953251128675612818318939678828682241662586364,
@@ -55,7 +81,7 @@ static FLOAT costab[20] = {
   .99999999540410731289097193313960614895889430318945,
   .99999999885102682756267330779455410840053741619428
 };
-static FLOAT sintab[20] = {
+static const FLOAT sintab[20] = {
   1.0000000000000000000000000000000000000000000000000,
   .70710678118654752440084436210484903928483593768846,
   .38268343236508977172845998403039886676134456248561,
@@ -1196,7 +1222,7 @@ static void fht (FLOAT * fz)
    MFC March 2003 */
 static FLOAT atan_t[ATANSIZE];
 
-INLINE FLOAT atan_table(FLOAT y, FLOAT x) {
+static INLINE FLOAT atan_table(FLOAT y, FLOAT x) {
   int index;
 
   index = (int)(ATANSCALE * fabs(y/x));
@@ -1216,7 +1242,7 @@ INLINE FLOAT atan_table(FLOAT y, FLOAT x) {
   return(atan_t[index]);
 }
 
-void atan_table_init(void) {
+static void atan_table_init(void) {
   int i;
   for (i=0;i<ATANSIZE;i++)
     atan_t[i] = atan((FLOAT)i/ATANSCALE);

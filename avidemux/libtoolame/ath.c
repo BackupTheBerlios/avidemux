@@ -1,12 +1,35 @@
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
+
 #include <stdio.h>
 #include <math.h>
+
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
 #include "ath.h"
 
   /* freq in hz */
-FLOAT ATH_dB(FLOAT f, FLOAT value)
+FLOAT ath_db(FLOAT f, FLOAT value)
 {
   /* from Painter & Spanias
     modified by Gabriel Bouvigne to better fit the reality
@@ -53,9 +76,9 @@ bitrate is more balanced according to the -V value.*/
 
 
 /* Convert ATH values from dB into energy values as required by the psycho model */
-FLOAT ATH_energy(FLOAT freq, FLOAT value) {
+FLOAT ath_energy(FLOAT freq, FLOAT value) {
   FLOAT db;
-  db = ATH_dB(freq, 0) + value; // Originally: ATH_dB(freq,value)
+  db = ath_db(freq, 0) + value; // Originally: ath_db(freq,value)
   /* The values in the standard, and from the ATH formula are in dB.
      In the psycho model we are working in the energy domain. Hence the values that 
      are in the absthr_X tables are not in dB. This function converts from dB into the energy domain.
@@ -73,7 +96,7 @@ FLOAT ATH_energy(FLOAT freq, FLOAT value) {
 /* Convert a frequency (in Hz) to a bark value
    Taken from LAME. MFC Feb 2003 
    see for example "Zwicker: Psychoakustik, 1982; ISBN 3-540-11401-7 */
-FLOAT MEANX_freq2bark(FLOAT freq)
+FLOAT ath_freq2bark(FLOAT freq)
 {
     if (freq<0) freq=0;
     freq = freq * 0.001;

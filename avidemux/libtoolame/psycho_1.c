@@ -1,10 +1,31 @@
+/*
+ *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *
+ *  Copyright (C) 2001-2004 Michael Cheng
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "common.h"
 #include "toolame.h"
 #include "toolame_global_flags.h"
-#include "common.h"
-#include "encoder.h"
 #include "mem.h"
 #include "fft.h"
 #include "psycho_1.h"
@@ -26,8 +47,7 @@ int *psycho_1_read_cbound (int lay, int freq, int *crit_band)
 /* this function reads in critical  band boundaries */
 {
 
-#include "critband.h"
-  //static const int FirstCriticalBand[7][27] = {...
+#include "psycho_1_critband.h"
   int *cbound;
   int i, k;
 
@@ -57,7 +77,7 @@ int *psycho_1_read_cbound (int lay, int freq, int *crit_band)
 /* reads in the frequency bands and bark values */
 void psycho_1_read_freq_band (g_ptr *ltg, int lay, int freq, int *sub_size)  {
 
-#include "freqtable.h"
+#include "psycho_1_freqtable.h"
 
   int i, k;
 
@@ -532,32 +552,30 @@ void psycho_1_dump(mask power[HAN_SIZE], int *tone, int *noise) {
 }
 
 void psycho_1 (toolame_options *glopts, short buffer[2][1152], FLOAT scale[2][SBLIMIT],
-	       FLOAT ltmin[2][SBLIMIT], frame_info * frame)
+	       FLOAT ltmin[2][SBLIMIT])
 {
   psycho_1_mem *mem;
-  frame_header *header = frame->header;
+  frame_info *frame = &glopts->frame;
+  frame_header *header = &glopts->header;
   int nch = frame->nch;
   int sblimit = frame->sblimit;
   int k, i, tone = 0, noise = 0;
-  //static int off[2] = { 256, 256 };
   FLOAT sample[FFT_SIZE];
   FLOAT spike[2][SBLIMIT];
   FLOAT *fft_buf[2];
-  //static mask_ptr power;
-  //static g_ptr ltg;
   FLOAT energy[FFT_SIZE];
 
   /* call functions for critical boundaries, freq. */
-  if (!glopts->psycho1init) {			/* bands, bark values, and mapping */
-    mem = (psycho_1_mem *)calloc(1, sizeof(psycho_1_mem));
+  if (!glopts->p1mem) {			/* bands, bark values, and mapping */
+    mem = (psycho_1_mem *)toolame_malloc(sizeof(psycho_1_mem), "psycho_1_mem");
 
     mem->power = (mask_ptr) toolame_malloc (sizeof (mask) * HAN_SIZE, "power");
-    if (header->version == MPEG_AUDIO_ID) {
-      mem->cbound = psycho_1_read_cbound (header->lay, header->sampling_frequency_idx, &mem->crit_band);
-      psycho_1_read_freq_band (&mem->ltg, header->lay, header->sampling_frequency_idx, &mem->sub_size);
+    if (header->version == MPEG1) {
+      mem->cbound = psycho_1_read_cbound (header->lay, header->samplerate_idx, &mem->crit_band);
+      psycho_1_read_freq_band (&mem->ltg, header->lay, header->samplerate_idx, &mem->sub_size);
     } else {
-      mem->cbound = psycho_1_read_cbound (header->lay, header->sampling_frequency_idx + 4, &mem->crit_band);
-      psycho_1_read_freq_band (&mem->ltg, header->lay, header->sampling_frequency_idx + 4, &mem->sub_size);
+      mem->cbound = psycho_1_read_cbound (header->lay, header->samplerate_idx + 4, &mem->crit_band);
+      psycho_1_read_freq_band (&mem->ltg, header->lay, header->samplerate_idx + 4, &mem->sub_size);
     }
     psycho_1_make_map (mem->sub_size, mem->power, mem->ltg);
     for (i = 0; i < 1408; i++)
@@ -569,14 +587,12 @@ void psycho_1 (toolame_options *glopts, short buffer[2][1152], FLOAT scale[2][SB
     mem->off[1]=256;
 
     glopts->p1mem = mem;
-    glopts->psycho1init++;
   }
   {
     mem = glopts->p1mem;
 
     fft_buf[0] = mem->fft_buf[0];
     fft_buf[1] = mem->fft_buf[1];
-
   }
 
 
@@ -604,17 +620,16 @@ void psycho_1 (toolame_options *glopts, short buffer[2][1152], FLOAT scale[2][SB
     psycho_1_noise_label (mem->crit_band, mem->cbound, mem->power, &noise, mem->ltg, energy);
     //psycho_1_dump(power, &tone, &noise) ;
     psycho_1_subsampling (mem->power, mem->ltg, &tone, &noise);
-    psycho_1_threshold (mem->sub_size, mem->power, mem->ltg, &tone, &noise,
-	       toolame_getBitrate(glopts) / nch);
+    psycho_1_threshold (mem->sub_size, mem->power, mem->ltg, &tone, &noise, glopts->bitrate / nch);
     psycho_1_minimum_mask (mem->sub_size, mem->ltg, &ltmin[k][0], sblimit);
     psycho_1_smr (&ltmin[k][0], &spike[k][0], &scale[k][0], sblimit);
   }
 
 }
 
-void psycho_1_deinit(psycho_1_mem *mem) {
-  toolame_free( (void **) &mem->cbound);
-  toolame_free( (void **) &mem->ltg);
-  toolame_free( (void **) &mem->power);
-  toolame_free( (void **) &mem);
+void psycho_1_deinit(psycho_1_mem **mem) {
+  toolame_free( (void **) &(*mem)->cbound);
+  toolame_free( (void **) &(*mem)->ltg);
+  toolame_free( (void **) &(*mem)->power);
+  toolame_free( (void **) mem);
 }

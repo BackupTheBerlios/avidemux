@@ -19,28 +19,16 @@
  *  
  */
 
-#ifndef	_BITBUFFER_H_
-#define	_BITBUFFER_H_
+#include <stdlib.h>
+#include <string.h>
+
+#include "toolame.h"
+//#include "../config.h" MEANX
 
 
-/* bit stream structure */
-typedef struct bit_stream_struc {
-    unsigned char *buf;       /* bit stream buffer */
-    int buf_size;         /* size of buffer (in number of bytes) */
-    long totbit;          /* bit counter of bit stream */
-    int buf_byte_idx;     /* pointer to top byte in buffer */
-    int buf_bit_idx;      /* pointer to top bit of top byte in buffer */
-    int eob;          /* end of buffer index */
-    int eobs;         /* end of bit stream flag */
-} bit_stream;
-
-
-bit_stream * buffer_init( unsigned char *buffer, int buffer_size );
-void buffer_deinit( bit_stream ** bs );
-
-void buffer_put1bit (bit_stream *, int);
-INLINE void buffer_putbits (bit_stream *, unsigned int, int);
-unsigned long buffer_sstell (bit_stream *);
-
-#endif
-
+const char* get_toolame_version( void )
+{
+	static const char* str = "2.0n by Nicholas Humfrey"; //MEANX
+	
+	return str;
+}
