@@ -74,7 +74,7 @@ uint32_t nfq,fqindex,brindex,index;
 					mpegInfo->level=4-(a[1]>>3)&3;
 					if(mpegInfo->level==3) continue;
 					if(mpegInfo->level==4) mpegInfo->level=3;
-					mpegInfo->protect=a[1]&1;
+					mpegInfo->protect=(a[1]&1)^1;
 					mpegInfo->padding=(a[2]>>1)&1;
 					mpegInfo->mode=(a[3])>>6;
 										
@@ -128,11 +128,23 @@ uint32_t nfq,fqindex,brindex,index;
 				}
 /*	*/
 			// Sample in the packet
-			if(1==mpegInfo->layer) 
-				mpegInfo->samples=384;
+			if(mpegInfo->level==1)
+			{
+				if(1==mpegInfo->layer) 
+					mpegInfo->samples=384;
+				else
+					mpegInfo->samples=1152;
+				*offset=start-1;
+			}
 			else
-				mpegInfo->samples=1152;
-			*offset=start-1;
+			{	// Mpeg2/2.5
+				if(1==mpegInfo->layer) 
+					mpegInfo->samples=384;
+				else
+					mpegInfo->samples=576;
+				*offset=start-1;
+			
+			}
 			
 			// Packet size
 			//L1:FrameLengthInBytes = (12 * BitRate / SampleRate + Padding) * 4
@@ -142,7 +154,7 @@ uint32_t nfq,fqindex,brindex,index;
 				case 1:
 					mpegInfo->size=((12*1000*mpegInfo->bitrate)/mpegInfo->samplerate)
 								+mpegInfo->padding;
-					mpegInfo->size=mpegInfo->size+4+2*mpegInfo->protect;
+					mpegInfo->size=mpegInfo->size*4;
 					break;
 				default:
 				//FrameLengthInBytes = 144 * BitRate / SampleRate + Padding
@@ -152,14 +164,17 @@ uint32_t nfq,fqindex,brindex,index;
 			if(*offset)
 				{
 					printf("MP3: Skipped %lu bytes\n",*offset);
+					
 				}
 #if 0			
+			printf("%02x %02x %02x %02x\n",a[0],a[1],a[2],a[3]);
 			printf("Packet found : at :%d level:%d layer:%d fq:%d bitrate:%d mode:%d\n",
 					start-1,mpegInfo->level,mpegInfo->layer,mpegInfo->samplerate,
 					mpegInfo->bitrate,mpegInfo->mode);
 			printf("Padd:%lu, crc on:%lu size:%lu\n",mpegInfo->padding,mpegInfo->protect,
 								mpegInfo->size);
-#endif					
+#endif				
+			
 			return 1;
 			
 
