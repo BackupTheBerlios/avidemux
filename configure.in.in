@@ -79,15 +79,15 @@ dnl ___ added to ease install in uncommon place __
 
 CPPFLAGS="  $USER_INCLUDES  $CPPFLAGS"
 dnl __________gettext_________________
-ALL_LINGUAS=""
 AM_GNU_GETTEXT( [external])
+GETTEXT_PACKAGE=avidemux
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], "$GETTEXT_PACKAGE",
+                   [gettext package name])
 
-ADM_LOCALEDIR=${datadir}/locale
-AC_SUBST(ADM_LOCALEDIR)
-kde_locale=$ADM_LOCALEDIR
-AC_SUBST(kde_locale)
-
-
+LOCALEDIR=${datadir}/locale
+AC_SUBST(LOCALEDIR)
+AC_DEFINE_UNQUOTED([LOCALEDIR], "$LOCALEDIR",
+                   [gettext locale dir])
 
 dnl __________GTK2 Stuff____________
 
@@ -630,9 +630,9 @@ AC_ARG_WITH(profile, [  profile flag],
   ]
 )
 if test "x$use_profile" = "x1"; then
-CXXFLAGS+=" -pg "
-CFLAGS+=" -pg "
-LDFLAGS+=" -pg "
+CXXFLAGS="$CXXFLAGS -pg "
+CFLAGS="$CFLAGS -pg "
+LDFLAGS="$LDFLAGS -pg "
 fi
 dnl ____________________ Cygwin / mingwin ? ___________
 use_cygwin=no
