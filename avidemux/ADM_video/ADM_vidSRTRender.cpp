@@ -369,7 +369,8 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	uint32_t val;
 	int32_t ssigned;
 	double alpha,alpha2;
-
+#define SHADOW_UP 	8
+#define SHADOW_DOWN 	16
 
 	hei=(SRT_MAX_LINE+1)*_conf->_fontsize;
 	if(hei>=_info.height-1) hei=_info.height-1;
@@ -390,7 +391,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 		uint8_t *shadow=target;
 		uint32_t shadow_pos;
 		
-		shadow_pos=_conf->_fontsize>>3;
+		shadow_pos=_conf->_fontsize/10;
 		start=_info.width*baseLine;  // base line in final image
 		// mask out left and right
 		mask=_maskBuffer; 
@@ -403,7 +404,7 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 				if(*mask>LUMA_LEVEL)
 				{
 					val=*shadow;
-					val>>=2;
+					val=(val*SHADOW_UP)/SHADOW_DOWN;
 					*shadow=(uint8_t )val;
 				}				
      		 } 	  
