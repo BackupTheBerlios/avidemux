@@ -486,9 +486,9 @@ AC_DEFINE(USE_AC3,1,[liba52dec])
 fi
 dnl __________________/ac3______________
 dnl __________________VORBIS______________
-AC_CHECK_LIB(vorbis,vorbis_info_init,,have_vorbis=no,-L/usr/X11R6/lib -lXext -lX11 -lm)
+AC_CHECK_LIB(vorbis,vorbis_info_init,,have_vorbis=no, -lm)
 if test "x$have_vorbis" = "xyes"; then
-	AC_CHECK_LIB(vorbisenc,vorbis_encode_init,,have_vorbis=no,-L/usr/X11R6/lib -lXext -lX11 -lm)
+	AC_CHECK_LIB(vorbisenc,vorbis_encode_init,,have_vorbis=no, -lm)
 	if test "x$have_vorbis" = "xyes"; then
 		AC_DEFINE(USE_VORBIS,1,[Vorbis audio codec])
 	fi
@@ -654,28 +654,6 @@ int z=0
 AC_MSG_RESULT($use_cygwin)
 
 
-dnl ______________ vectors ? for altivec mainly and a bit of 386 (fft) _______
-use_builtin=no
-AC_MSG_CHECKING(Built in vectors)
-
-
-AC_TRY_COMPILE([
-	
-#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 2)
-#else
-#error no vector builtins
-#endif
-],
-int z=0
-,[
-  use_builtin=yes
-])
-
-AC_MSG_RESULT(use_builtin)
-if test "x$use_builtin" = "xyes"; then
-	AC_DEFINE(HAVE_BUILTIN_VECTOR,1,[Enable altivec by default])
-fi
- 
 
 
 dnl ____________________ CPU____________________________
@@ -838,6 +816,33 @@ if test "x$use_cygwin" = "xyes"; then
 	CFLAGS=" $CFLAGS -mno-cygwin -mms-bitfields"
 	echo "CFLAGS= -mno-cygwin -mms-bitfields -I/usr/include/mingw -I/rot/include " >> adm_lavcodec/config.cpu
 fi
+dnl ______________ vectors ? for altivec mainly and a bit of 386 (fft) _______
+use_builtin=no
+AC_MSG_CHECKING(Built in vectors)
+
+
+AC_TRY_COMPILE([
+	
+#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 2)
+#else
+#error no vector builtins
+#endif
+],
+int z=0
+,[
+  use_builtin=yes
+])
+
+AC_MSG_RESULT(use_builtin)
+if test "x$use_builtin" = "xyes"; then
+	AC_DEFINE(HAVE_BUILTIN_VECTOR,1,[Enable altivec by default])
+	if(test "x$use_mmx" = "x1"); then
+	CFLAGS="$CFLAGS -msse"
+	CXXFLAGS="$CXXFLAGS -msse"
+	fi
+fi
+ 
+
 dnl ________________NASM__________________
 AC_SUBST(AS)
 AC_SUBST(AS_FLAGS)
