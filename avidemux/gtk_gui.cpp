@@ -626,7 +626,10 @@ case ACT_Pipe2Other:
     case ACT_PrevBlackFrame:
       GUI_NextPrevBlackFrame(-1);
       break;
-
+    case ACT_AllBlackFrames:    
+       GUI_FileSelWrite ("Select file to save", (SELFILE_CB *)A_ListAllBlackFrames);
+        break;                        
+    
     case ACT_PreviousFrame:
       if (curframe)
 	{

@@ -62,6 +62,7 @@ typedef enum
   ACT_PreviousFrame,
   ACT_PrevBlackFrame,
   ACT_NextBlackFrame,
+  ACT_AllBlackFrames,
    
   ACT_Scale,
   
