@@ -20,6 +20,10 @@
 
 #include <inttypes.h>
 #include "config.h"
+
+#ifdef HAVE_ALTIVEC_H
+#include "altivec.h"
+#endif
 #ifdef USE_MMX
 /*
 		0-> y1
@@ -135,5 +139,80 @@ uint32_t dx,dy;
 }
 void YV12_422( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h)
 {
+#ifdef USE_ALTIVEC && 0
+	if( !(w&7)
+		return YV12_422_Altivec(in,out,w,h);
+#endif	
 	YV12_422_C(in,out,w,h);
+
 }
+#ifdef USE_ALTIVEC && 0
+
+#define LOAD_ALIGN(dest,src) \
+		MSQ = vec_ld(0, src); \
+		mask = vec_lvsl(0, src); \
+		dest= vec_perm(MSQ, MSQ, mask); 
+
+
+void YV12_422_Altivec( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h)
+{
+uint8_t *y,*y2,*u,*v,*out2;
+uint32_t dx,dy;
+vector unsigned char vecy,vecy2,vecu,vecv;
+vector unsigned char vecout,vecout2;
+static const vector unsigned char zero;
+
+#define VEC16 vector unsigned short
+	out2=out+w*2;
+	y=in;
+	y2=in+w;
+	u=in+w*h;
+	v=in+((w*h*5)>>2);
+	zero=vec_splat_u8(0);
+	for(dy=h>>1;dy>0;dy--)
+	{
+		// We do 4 pix in a raw
+		for(dx=w>>4;dx>0;dx--)
+		{
+			LOAD_ALIGN(vecy,y); // expand
+			LOAD_ALIGN(vecy2,y); // expand
+			LOAD_ALIGN(vecu,u); // expand
+			LOAD_ALIGN(vecv,u); // expand
+			
+			// expand y's, keep 8 pixel
+			vecy=vec_mergeh(vecy,zero);
+			vecy2=vec_mergeh(vecy2,zero);
+			
+			// expand u and v, keep 4 pixels
+			vecu=vec_mergeh(zero,vecu);
+			vecu=vec_mergeh((VEC16)vecu,(VEC16)zero);
+			vecv=vec_mergeh(zero,vecu);
+			vecv=vec_mergeh((VEC16)vecu,(VEC16)zero);
+			
+			vecy=vec_or(vecy,vecu);
+			vecy=vec_or(vecy,vecv);
+			vecy2=vec_or(vecy2,vecu);
+			vecy2=vec_or(vecy2,vecv);
+			
+			// Store
+			vec_st((vecbyte)out,0,vecy); 
+			vec_st((vecbyte)out2,0,vecy2); 
+			// next
+			out2+=16;
+			out+=16;
+			y+=8;
+			y2+=8;
+			u+=4;
+			v+=4;
+		}
+		out+=w*2;
+		out2+=w*2;
+		y+=w;
+		y2+=w;
+		
+	
+	}
+}
+
+
+#endif
