@@ -50,6 +50,12 @@
 #include "oplug_ogm/op_ogsave.h"
 
 #define aprintf printf
+void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size);
+#ifdef ADM_BIG_ENDIAN	
+	 #define MEMCPY(a,b,c) memcpyswap((uint8_t *)a, (uint8_t *)b,c)
+#else
+	#define MEMCPY memcpy
+#endif	
 
 //________________________________________________
 uint8_t	ADM_ogmWriteProcess::initVideo(char *name)
@@ -145,11 +151,6 @@ uint32_t w,h,fps1000,fcc;
 // now we build the new stream !
     	aprintf("**main pass:\n");
 
-#ifdef ADM_BIG_ENDIAN
-	#define MEMCPY memcpyswap
-#else
-	#define MEMCPY memcpy
-#endif	
 
 		stream_header header;
 		int64_t dur64;
