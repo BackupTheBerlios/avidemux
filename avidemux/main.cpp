@@ -48,9 +48,10 @@ typedef void *FCT_VOID(void *);
 
 #ifdef USE_FFMPEG
      extern "C" {
-     extern void     avcodec_init(void );
+     extern void        avcodec_init(void );
      extern  void 	avcodec_register_all(void );
      extern  int 	mpegps_init(void );
+     extern uint8_t     ADM_InitMemcpy(void);
                        };
 #endif                       
 
@@ -80,6 +81,7 @@ extern void     VPInitLibrary();
 };
 
 void sig_segfault_handler(int signo);
+
 extern void ADMImage_stat( void );
 int global_argc;
 char **global_argv;
@@ -144,6 +146,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 	xvid4_init();
 #endif
 	CpuCaps::init();
+	ADM_InitMemcpy();
    if(!initGUI())
     	{
 		printf("\n Fatal : could not init GUI\n");
