@@ -90,7 +90,7 @@ faacEncConfigurationPtr cfg;
 	return 0;    
     }
     printf("FAAC!Sample input:%lu\nmax byte output\n",samples_input,max_bytes_output);
-    _incoming_frame=samples_input;
+    _incoming_frame=samples_input/_wavheader->channels;
     cfg= faacEncGetCurrentConfiguration(_handle);
     
     // Set default conf, same as ffmpeg
@@ -166,14 +166,7 @@ int wr;
 		      );
 		break;
 	case 2:
-		// remap
-		uint16_t *in;
-		in=(uint16_t *)buf;
-		for(int i=0;i<nbSample;i++)
-		{
-			remap[i]=in[2*i];
-			remap[i+nbSample]=in[2*i+1];
-		}
+		
 		wr = faacEncEncode(_handle,
                       (int32_t *)buf,
                       nbSample*2, // Nb sample for all channels
@@ -185,7 +178,7 @@ int wr;
 		     
 	*len=wr;
 	*samples=nbSample;
-	printf("Faac: asked :%lu got %lu out len:%d sample:%d\n",asked,rd,wr,nbSample);
+	//printf("Faac: asked :%lu got %lu out len:%d sample:%d\n",asked,rd,wr,nbSample);
 	return 1;
 }
 
