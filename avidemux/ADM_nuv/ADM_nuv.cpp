@@ -1053,18 +1053,29 @@ uint32_t rcount=0;
 #endif
 	       _old=new uint8_t [ DXFIELD(height)*DXFIELD(width)*3]; // too much
 	       delete work;
-// Jens patch here :)
 #if 1
-	       if(GUI_Question("Do you want to save an index ?"))
-	       {
-			char *mname=NULL;
-				GUI_FileSelWrite("Nuv index to save..",&mname);
-				if(mname)
-				{
-					saveIndex( mname,name);
+		{ unsigned int autoidx = 0;
+		  char *mname=NULL;
+			prefs->get(FEATURE_TRYAUTOIDX,&autoidx);
+			if( autoidx ){
+				mname = (char*)ADM_alloc(strlen(name)+strlen(".idx")+1);
+				ADM_assert(mname);
+				sprintf(mname,"%s.idx",name);
+				if( saveIndex( mname,name) == 1 ){
+					ADM_dealloc(mname);
+					return 1;
 				}
-	       }
-#endif // oops thanks Jens :)
+				ADM_dealloc(mname);
+			}
+			if(GUI_Question("Do you want to save an index ?")){
+				GUI_FileSelWrite("Nuv index to save..",&mname);
+				if(mname){
+					saveIndex( mname,name);
+					ADM_dealloc(mname);
+				}
+			}
+		}
+#endif
 	       return 1;
 
 }
