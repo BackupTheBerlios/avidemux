@@ -615,7 +615,19 @@ decoderFF_ffhuff::decoderFF_ffhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d) 
                                 }
         
 }
-
+decoderFFH264::decoderFFH264(uint32_t w,uint32_t h)  :decoderFF(w,h) 
+{
+  printf("Initializing lavcodec H264 decoder\n");
+  if (avcodec_open(_context,& h264_decoder) < 0)
+  {
+    printf(" Decoder init: FFMpeg H264 video decoder failed!\n");
+  }
+  else
+  {
+    printf(" Decoder init: FFMpeg H264 video decoder initialized!\n");
+  }
+  
+}
 decoderFFhuff::decoderFFhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)       :decoderFF(w,h) 
 {
       _context->extradata=(void *)d;

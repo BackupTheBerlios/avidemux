@@ -126,6 +126,15 @@ class decoderFFH263 : public decoderFF
      				          	decoderFFH263(uint32_t w,uint32_t h) ;
 	
 }   ;
+class decoderFFH264 : public decoderFF
+{
+  protected:
+                                
+                        
+  public:
+    decoderFFH264(uint32_t w,uint32_t h) ;
+        
+}   ;
 class decoderFFhuff : public decoderFF
 {
 	   protected:

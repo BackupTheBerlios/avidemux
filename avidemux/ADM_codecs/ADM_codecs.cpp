@@ -211,6 +211,11 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 
 			  	     	return(decoders *)( new decoderSnow(w,h));
 	   }
+           if(fourCC::check(fcc,(uint8_t *)"H264"))
+           {
+
+             return(decoders *)( new decoderFFH264(w,h));
+           }           
 #endif
 
 /*
