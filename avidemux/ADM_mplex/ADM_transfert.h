@@ -48,8 +48,7 @@ class Transfert
 protected:
         admMutex mutex;
         admCond  cond;
-        admCond  clientCond;
-        uint8_t  ready;        
+        admCond  clientCond;             
         
         uint8_t  aborted;
         uint8_t  *buffer;   

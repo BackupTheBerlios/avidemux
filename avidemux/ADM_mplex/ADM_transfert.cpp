@@ -27,8 +27,11 @@
 
 
 #include"ADM_transfert.h"
-#define HIGH_LVL ((TRANSFERT_BUFFER*2)/3)
-#define LOW_LVL (TRANSFERT_BUFFER/3)
+#define HIGH_LVL        ((TRANSFERT_BUFFER*2)/3)
+#define LOW_LVL         (TRANSFERT_BUFFER/3)
+// minimum amount of audio buffer we need
+#define MIN_REQUIRED    (32*1024)
+//#define MPLEX_D
 
 //**************** Mutex *******************
 admMutex::admMutex(void)
@@ -106,7 +109,7 @@ Transfert::Transfert(void)
 
         aborted=0;
         
-        ready=1;
+        
         head=tail=0;
         
 }
@@ -119,6 +122,9 @@ uint32_t Transfert:: read(uint8_t *buf, uint32_t nb  )
 {
 uint32_t r=0;
 uint32_t fill=0;
+#ifdef MPLEX_D                 
+         printf("Reading %lu\n",nb);
+#endif          
         
   while(1)
   {
@@ -130,7 +136,7 @@ uint32_t fill=0;
                 memcpy(buf,buffer+head,nb);                
                 head+=nb;
                 r+=nb;
-                mutex.unlock();
+                
                 goto endit;                                                    
         }
         
@@ -142,16 +148,21 @@ uint32_t fill=0;
          head=tail=0;
          if(aborted) 
          {
-                mutex.unlock();
+                
                 goto endit;
          }
          
          ADM_assert(!clientCond.iswaiting());
          mutex.unlock();  
-         //printf("Slave sleeping\n");
-         cond.wait();
+#ifdef MPLEX_D      
+         printf("Wanted : %lu , left :%lu\n",nb,fill);   
+         printf("Slave sleeping\n");
+#endif         
+         
+         cond.wait();         
          if(aborted) 
          {         
+                mutex.lock();
                 goto endit;
          }                          
          
@@ -166,6 +177,7 @@ endit:
                         clientCond.wakeup();        
                 }
         }
+        mutex.unlock();
         return r;               
 }
 //*********************************
@@ -186,6 +198,9 @@ uint8_t Transfert:: write(uint8_t *buf, uint32_t nb  )
 {
         if(aborted) return 0;
         
+#ifdef MPLEX_D                 
+         printf("Writing %lu\n",nb);
+#endif          
         mutex.lock(); 
         // Need to pack ?
         if(nb+tail>=TRANSFERT_BUFFER)
@@ -203,18 +218,30 @@ uint8_t Transfert:: write(uint8_t *buf, uint32_t nb  )
         }
         memcpy(buffer+tail,buf,nb);        
         tail+=nb;
-        mutex.unlock();
+        
         if(cond.iswaiting())
         {
-                //printf("Slave waking");
+#ifdef MPLEX_D      
+           
+         printf("Slave waking\n");
+#endif     
                 cond.wakeup();
         }                
+        mutex.unlock();
         return 1;
 }        
 uint8_t Transfert::needData( void )
 {
-        
-        return cond.iswaiting();
+  int32_t l;
+  uint8_t r=0;
+        mutex.lock(); 
+        l=tail-head;
+        ADM_assert(l>=0);
+        mutex.unlock();
+        if(l<MIN_REQUIRED) r=1;
+        if(cond.iswaiting()) r=1;
+//        return cond.iswaiting();
+        return r;
  
  }
 uint8_t Transfert::abort( void )
@@ -228,7 +255,10 @@ uint8_t Transfert::abort( void )
   
 uint8_t Transfert::clientLock( void )
 {
-        printf("sleeping\n");
+#ifdef MPLEX_D               
+         printf("Slave sleeping (%lu)\n",tail-=head);
+#endif         
+
         clientCond.wait();               
         return 1;
 
