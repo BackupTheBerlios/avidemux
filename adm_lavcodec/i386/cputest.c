@@ -68,14 +68,21 @@ int mm_support(void)
         cpuid(0x80000000, eax, ebx, ecx, edx);
         if ((unsigned)eax < 0x80000001)
             goto inteltest;
-        cpuid(0x80000001, eax, ebx, ecx, edx);
+	cpuid(0x80000001, eax, ebx, ecx, edx);
+	
         if ((edx & 0x00800000) == 0)
             return 0;
-        rval = MM_MMX;
-        if (edx & 0x80000000)
+        rval = MM_MMX;        
+	if (edx & 0x80000000)
             rval |= MM_3DNOW;
         if (edx & 0x00400000)
+	{
             rval |= MM_MMXEXT;
+	    /* SSE ? (athlon XP/Athlon64)*/
+	     cpuid(1, eax, ebx, ecx, edx);
+	     if(edx & 0x02000000)
+	     	rval |= MM_SSE;
+	}
         return rval;
     } else if (ebx == 0x746e6543 &&
                edx == 0x48727561 &&
