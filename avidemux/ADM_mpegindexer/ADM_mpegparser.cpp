@@ -54,81 +54,155 @@ mParser::~mParser()
 	}
 	
 }
-uint8_t mParser::open( char *name)
-{
-uint8_t check=1;
-uint8_t count=1;
-uint32_t l=strlen(name);
-char *tmp=new char[l+1];
-	  // first we check if we search for more file
-	  if(l<5) check=0;
-	  else
-	   if(name[l-4]!='.') check=0;
-	   else
-	   {
-			 uint8_t a= name[l-5];
-			 
-			 	if(a>'9') check=0;
-			  if(a<'0') check=0;
-			 
-			}
-	 
-	  if(check)
-	  {	// check how many files..
-	  	
-	  	
-	   	FILE *f;
-	    count=0;
-	   	strcpy(tmp,name);
-	    printf("\n Auto adding :\n");
-	    while(1)
-	    {
-					printf(" trying %s \n",tmp);
-					if(!(f=fopen(tmp,"rb"))) 
-					{
-						printf("Not found \n");
-						break;
-					}
-					fclose(f);
-					count++;
-					tmp[l-5]++;				
-			}
-		}
-	
-		if(!count)
-		{
-				delete [] tmp;
-			 return 0;
-		}                
 
-	   _nbFd=count;
-	 	 printf(" found %ld files\n",_nbFd);	   
-	   _curFd=0;
-		 _fd=new FILE*[_nbFd];
-		 _sizeFd=new uint64_t[_nbFd];		 
-	   strcpy(tmp,name);
-	  // open each one
-	  for(uint32_t i=0;i<_nbFd;i++)
-	  {
-	 		 _fd[i]=fopen(tmp,"rb");
-			if(!_fd[i])
+
+uint8_t mParser::open( char *filename )
+{
+	char *dot = NULL;                   // pointer to the last dot in filename
+	uint8_t decimals = 0;               // number of decimals
+	char *left = NULL, *number = NULL, *right = NULL; // parts of filename (after splitting)
+
+	char *followup = new char[ strlen(filename) + 1 ]; // possible follow-up filename
+	uint8_t first_followup = 1;         // indicates first follow-up
+	uint8_t last_followup = 0;          // indicates last follow-up (by number: 99)
+	uint8_t count = 0;                  // number of follow-ups
+
+	FILE **buffer_fd = NULL;            // _fd buffer
+	uint64_t *buffer_sizeFd = NULL;     // _sizeFd buffer
+
+	int i = 0;                          // index (general use)
+
+
+	// find the last dot
+	dot = strrchr( filename, '.' );
+
+	// count the decimals before the dot
+	decimals = 1;
+	while( (dot != NULL) && ((dot - decimals) != filename) &&
+	       (dot[0 - decimals] >= '0') && (dot[0 - decimals] <= '9') )
+		{ decimals++; }
+	decimals--;
+
+	// no number sequence
+	if( decimals == 0 )
+	{
+		printf( "\nSimple loading: \n" );
+		delete [] followup;
+		_nbFd = 1;
+		_curFd = 0;
+		_fd = new FILE * [_nbFd];
+		_sizeFd = new uint64_t [_nbFd];
+
+		// open file
+		if(! (_fd[0] = fopen(filename, "rb")) )
+		  { return 0; }
+
+		// calculate file-size
+		fseeko( _fd[0], 0, SEEK_END );
+		_sizeFd[0] = ftello( _fd[0] );
+		fseeko( _fd[0], 0, SEEK_SET );
+
+		printf( " file: %s, size: %u \n", filename, _sizeFd[0] );
+		printf( " found 1 files \n" );
+		printf( "Done \n" );
+		return 1;
+	}
+
+	// possible number sequence
+	else
+	{
+		// split the filename in <left>, <number> and <right>
+		// -----
+		
+		// <left> part
+		left = new char[(dot - filename - decimals) + 1];
+		strncpy( left, filename, (dot - filename - decimals) );
+		left[(dot - filename - decimals)] = '\0';
+
+		// <number> part
+		number = new char[decimals + 1];
+		strncpy( number, (dot - decimals), decimals );
+		number[decimals] = '\0';
+
+		// <right> part
+		right = new char[ strlen(dot) ];
+		strcpy( right, dot );
+
+		// add the file, and all existing follow-ups
+		// -----
+
+		buffer_fd = new FILE * [10 ^ decimals];
+		buffer_sizeFd = new uint64_t [10 ^ decimals];
+
+		printf( "\nAuto adding: \n" );
+		while( last_followup == 0 )
+		{
+			strcpy( followup, left );
+			strcat( followup, number );
+			strcat( followup, right );
+
+			// open file
+			buffer_fd[count] = fopen(followup, "rb");
+			if(! buffer_fd[count] )
 			{
-				delete [] tmp;
-				return 0;
+				// we need at least one file!
+				if( first_followup == 1 )
+				  { return 0; }
+				else
+				  { printf( " file: %s not found. \n", followup ); break; }
 			}
-			// Get size
-			fseeko( _fd[i],0,SEEK_END);
-			_sizeFd[i]=ftello(_fd[i]);  
-			fseeko(_fd[i],0,SEEK_SET);
-			printf(" file %ld :%s ",i,tmp);
-			printf(" size : %llu\n",_sizeFd[i]);
-			
-			tmp[l-5]++;					
-		}	
-		printf("Done\n");	
-		delete [] tmp;		
-		return 1;	
-}
+
+			// calculate file-size
+			fseeko( buffer_fd[count], 0, SEEK_END );
+			buffer_sizeFd[count] = ftello( buffer_fd[count] );
+			fseeko( buffer_fd[count], 0, SEEK_SET );
+
+			printf( " file %d: %s, size: %u \n", (count + 1), followup, buffer_sizeFd[count] );
+
+			// increase number
+			number[decimals - 1] = number[decimals - 1] + 1;
+			for( i = decimals - 1; i >= 0; i-- )
+			{
+				if( number[i] > '9' )
+				{
+					if( i == 0 )
+					  { last_followup = 1; break; }
+					number[i] = '0';
+					number[i - 1] = number[i - 1] + 1;
+				}
+			}
+
+			first_followup = 0;
+			count++;
+		} // while( last_followup == 0 )
+
+		// copy from buffer
+		_nbFd = count;
+		_curFd = 0;
+		_fd = new FILE * [_nbFd];
+		_sizeFd = new uint64_t [_nbFd];
+
+		for( i = 0; i < count; i++ )
+		{
+			_fd[i] = buffer_fd[i];
+			_sizeFd[i] = buffer_sizeFd[i];
+		}
+
+		// clean up
+		delete [] followup;
+		delete [] left;
+		delete [] number;
+		delete [] right;
+		delete [] buffer_fd;
+		delete [] buffer_sizeFd;
+
+		printf( " found %d files \n", count );
+		printf( "Done \n" );
+	} // if( decimals == 0 )
+
+} // mParser::open()
+
+
 /*----------------------------------------
 
 ------------------------------------------*/
