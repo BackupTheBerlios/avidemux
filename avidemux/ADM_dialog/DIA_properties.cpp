@@ -29,12 +29,11 @@
 #include "interface.h"
 #include "ADM_gui2/support.h"
 #include "avi_vars.h"
+#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 
 extern const char *getStrFromAudioCodec( uint32_t codec);
-void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
-		uint16_t * ss, uint16_t * ms);
 static GtkWidget	*create_dialog (void);
 
 void DIA_properties( void )
@@ -76,8 +75,11 @@ void DIA_properties( void )
 
 	  }
 	// Now audio
-	if (wavinfo)
+	WAVHeader *wavinfo=NULL;
+	if (currentaudiostream) wavinfo=currentaudiostream->getInfo();
+	  if(wavinfo)
 	  {
+	      
 	      switch (wavinfo->channels)
 		{
 		case 1:
@@ -98,7 +100,14 @@ void DIA_properties( void )
 		FILL_ENTRY(label_bitrate);
 		sprintf(text, "%s ", getStrFromAudioCodec(wavinfo->encoding));
 	     	FILL_ENTRY(label1_audiofourcc);
-		sprintf(text,"%lu MBytes",video_body->getAudioLength()>>20);
+		// Duration in seconds too
+		if(currentaudiostream)
+		{
+			ms2time((currentaudiostream->getLength()*1000)/wavinfo->byterate,
+				 &hh, &mm, &ss, &ms);
+	      		sprintf(text, "%02d:%02d:%02d.%03d (%lu MBytes)", hh, mm, ss, ms
+				,currentaudiostream->getLength()>>20);
+		}
 		FILL_ENTRY(label_audioduration);
 	} else
 	  {
