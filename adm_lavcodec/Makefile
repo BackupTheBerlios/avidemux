@@ -20,7 +20,7 @@ OBJS= common.o utils.o mem.o allcodecs.o \
       mpeg12.o h263dec.o svq1.o rv10.o mpegaudiodec.o pcm.o simple_idct.o \
       ratecontrol.o adpcm.o eval.o dv.o error_resilience.o \
       wmadec.o fft.o mdct.o mace.o huffyuv.o opts.o cyuv.o \
-      raw.o  vp3.o h264.o indeo3.o  golomb.o ffv1.o ra144.o  ra288.o \
+      raw.o  vp3.o vp3dsp.o h264.o indeo3.o  golomb.o ffv1.o ra144.o  ra288.o \
       4xm.o cabac.o asv1.o vcr1.o cljr.o faandct.o rational.o parser.o \
       roqvideo.o xan.o rpza.o  msrle.o  msvideo1.o \
       cinepak.o vqavideo.o idcinvideo.o smc.o flicvideo.o interplayvideo.o dpcm.o \
@@ -34,7 +34,8 @@ ifeq ($(TARGET_MMX),yes)
 OBJS += i386/fdct_mmx.o i386/cputest.o \
 	i386/dsputil_mmx.o i386/mpegvideo_mmx.o \
 	i386/idct_mmx.o i386/motion_est_mmx.o \
-	i386/simple_idct_mmx.o
+	i386/simple_idct_mmx.o \
+	i386/fft_sse.o
 endif
 ifeq ($(TARGET_PPC),yes)
 OBJS += \
@@ -236,6 +237,7 @@ DISTFILES= $(DIST386) $(DISTPPC) $(DIST_PP) \
 	indeo3data.h \
 	golomb.h \
 	vp3.c \
+	vp3dsp.c \
 	vp3data.h \
 	h264.c \
 	h264data.h \

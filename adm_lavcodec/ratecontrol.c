@@ -33,9 +33,7 @@
 #ifndef M_E
 #define M_E 2.718281828
 #endif
-#define MEANX
 
-static double bitrate_constraint(MpegEncContext *s, RateControlEntry *rce, double q, int frame_num);
 static int init_pass2(MpegEncContext *s);
 static double get_qscale(MpegEncContext *s, RateControlEntry *rce, double rate_factor, int frame_num);
 
@@ -438,6 +436,7 @@ double bitrate_constraint(MpegEncContext *s, RateControlEntry *rce, double q, in
 
 }
 // /MEANX
+
 static double modify_qscale(MpegEncContext *s, RateControlEntry *rce, double q, int frame_num){
     RateControlContext *rcc= &s->rc_context;
     int qmin, qmax;
@@ -457,15 +456,9 @@ static double modify_qscale(MpegEncContext *s, RateControlEntry *rce, double q, 
     bits= qp2bits(rce, q);
 //printf("q:%f\n", q);
     /* buffer overflow/underflow protection */
-    if(buffer_size
-#ifdef MEANX    
-    	&& !(s->flags&CODEC_FLAG_PASS1)
-#endif	
-	)
-     // MEANX : Dont do min/max in pass 1
-    {
+    if(buffer_size && !( s->flags&CODEC_FLAG_PASS1)){ //MEANX: Dont do min/max in pass1
       q=bitrate_constraint(s, rce, q, frame_num);
-  }
+    }
 //printf("q:%f max:%f min:%f size:%f index:%d bits:%f agr:%f\n", q,max_rate, min_rate, buffer_size, rcc->buffer_index, bits, s->avctx->rc_buffer_aggressivity);
     if(s->avctx->rc_qsquish==0.0 || qmin==qmax){
         if     (q<qmin) q=qmin;
@@ -656,14 +649,12 @@ float ff_rate_estimate_qscale(MpegEncContext *s)
             assert(pict_type == rce->new_pict_type);
 
         q= rce->new_qscale / br_compensation;
-
 //MEANX, take also constraint in pass 2
-#ifdef MEANX	
 	if(s->avctx->rc_buffer_size)
 	{
 	  q=bitrate_constraint(s, rce, q, picture_number);
 	}
-#endif	
+// /MEANX
 
 //printf("%f %f %f last:%d var:%d type:%d//\n", q, rce->new_qscale, br_compensation, s->frame_bits, var, pict_type);
     }else{

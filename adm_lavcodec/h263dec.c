@@ -42,8 +42,8 @@ int ff_h263_decode_init(AVCodecContext *avctx)
     s->workaround_bugs= avctx->workaround_bugs;
 
     // set defaults
+    MPV_decode_defaults(s);
     s->quant_precision=5;
-    s->progressive_sequence=1;
     s->decode_mb= ff_h263_decode_mb;
     s->low_delay= 1;
     avctx->pix_fmt= PIX_FMT_YUV420P;
@@ -124,7 +124,6 @@ int av_is_voppacked(AVCodecContext *avctx)
 
   }
   /* MeanX */
-
 
 
 
@@ -563,6 +562,8 @@ retry:
             s->workaround_bugs|= FF_BUG_EDGE;
         }
         
+        if(s->divx_version)
+            s->workaround_bugs|= FF_BUG_HPEL_CHROMA;
 #if 0
         if(s->divx_version==500)
             s->padding_bug_score= 256*256*256*64;
@@ -631,8 +632,6 @@ retry:
         s->gob_index = ff_h263_get_gob_height(s);
     
     // for hurry_up==5
-//    s->current_picture.pict_type= s->pict_type;
-    //s->current_picture.key_frame= s->pict_type == I_TYPE;
 /* MeanX
     s->current_picture.pict_type= s->pict_type;
     s->current_picture.key_frame= s->pict_type == I_TYPE;
@@ -640,7 +639,6 @@ retry:
 	pict->pict_type=s->current_picture.pict_type= s->pict_type;
    	pict->key_frame=s->current_picture.key_frame= s->pict_type == I_TYPE;
 /* MeanX : Get correct type */
-
 
     /* skip b frames if we dont have reference frames */
     if(s->last_picture_ptr==NULL && s->pict_type==B_TYPE) return get_consumed_bytes(s, buf_size);

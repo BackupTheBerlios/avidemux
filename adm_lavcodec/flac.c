@@ -133,7 +133,7 @@ static int64_t get_utf8(GetBitContext *gb)
     return val;
 }
 
-static int get_crc8(uint8_t *buf, int count){
+static int get_crc8(const uint8_t *buf, int count){
     int crc=0;
     int i;
     
@@ -753,7 +753,6 @@ static int flac_decode_close(AVCodecContext *avctx)
 }
 
 static void flac_flush(AVCodecContext *avctx){
-    int i;
     FLACContext *s = avctx->priv_data;
 
     s->bitstream_size=
