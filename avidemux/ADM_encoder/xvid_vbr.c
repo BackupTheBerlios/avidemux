@@ -778,7 +778,7 @@ static int vbr_init_2pass2(void *sstate)
 
 	/* Allocate memory space for the keyframe_location array */
 	if((state->keyframe_locations
-	    = (int*)malloc((state->nb_keyframes+1)*sizeof(int))) == NULL) {
+	    = (int*)ADM_alloc((state->nb_keyframes+1)*sizeof(int))) == NULL) {
 		fclose(state->pass1_file);
 		state->pass1_file = NULL;
 		return(-1);
@@ -813,9 +813,9 @@ _AGAIN_:
 	if(!precalced)
 	{
 		printf("nb_frames : %d\n",state->nb_frames);
-		state->size=(int *)malloc(sizeof(int)*state->nb_frames);
-		state->kf=(int *)malloc(sizeof(int)*state->nb_frames);
-		state->type=(int *)malloc(sizeof(int)*state->nb_frames);
+		state->size=(int *)ADM_alloc(sizeof(int)*state->nb_frames);
+		state->kf=(int *)ADM_alloc(sizeof(int)*state->nb_frames);
+		state->type=(int *)ADM_alloc(sizeof(int)*state->nb_frames);
 
 	// 1 read the whole file in memory
 	//-----------------------------------------------------
@@ -1997,8 +1997,8 @@ int  vbr_make_variance(vbr_control_t *state, float compression, int *variance, i
 		float compr_out;
 					
 		roundup=state->roundup;	
-		cur_mod=malloc(sizeof(float)*state->nb_frames);
-		final_mod=malloc(sizeof(float)*state->nb_frames);
+		cur_mod=ADM_alloc(sizeof(float)*state->nb_frames);
+		final_mod=ADM_alloc(sizeof(float)*state->nb_frames);
 		
 		
 		for(i=0;i<state->nb_frames;i++)
@@ -2109,8 +2109,8 @@ int  vbr_make_clipping(vbr_control_t *state, float compression)
 		int before,after;
 					
 		roundup=state->roundup;	
-		cur_mod=malloc(sizeof(float)*state->nb_frames);
-		final_mod=malloc(sizeof(float)*state->nb_frames);
+		cur_mod=ADM_alloc(sizeof(float)*state->nb_frames);
+		final_mod=ADM_alloc(sizeof(float)*state->nb_frames);
 		
 		
 		for(i=0;i<state->nb_frames;i++)

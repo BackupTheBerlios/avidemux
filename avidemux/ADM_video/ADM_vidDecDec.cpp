@@ -252,7 +252,7 @@ Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples)
 		}
 		last_request = -1;
 		firsttime = true;
-		sum = (unsigned int *) malloc(MAX_BLOCKS * MAX_BLOCKS * sizeof(unsigned int));
+		sum = (unsigned int *) ADM_alloc(MAX_BLOCKS * MAX_BLOCKS * sizeof(unsigned int));
 		ADM_assert(sum);		
 		all_video_cycle = true;
 

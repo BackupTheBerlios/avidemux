@@ -25,6 +25,7 @@
 #include <inttypes.h>
 
 #include "mpeg2.h"
+#include "../ADM_assert.h"
 
 static void * (* malloc_hook) (unsigned size, mpeg2_alloc_t reason) = NULL;
 static int (* free_hook) (void * buf) = NULL;
@@ -40,8 +41,8 @@ void * mpeg2_malloc (unsigned size, mpeg2_alloc_t reason)
 	    return buf;
     }
 
-    if (size) {
-	buf = (char *) malloc (size + 63 + sizeof (void **));
+    if (size) {    		
+	buf = (char *) ADM_alloc (size + 63 + sizeof (void **));
 	if (buf) {
 	    char * align_buf;
 
@@ -71,6 +72,6 @@ void mpeg2_free (void * buf)
 void mpeg2_malloc_hooks (void * malloc (unsigned, mpeg2_alloc_t),
 			 int free (void *))
 {
-    malloc_hook = malloc;
-    free_hook = free;
+    malloc_hook = ADM_alloc;
+    free_hook = ADM_dezalloc;
 }

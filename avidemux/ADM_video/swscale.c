@@ -68,7 +68,7 @@ untested special converters
 #include "../../adm_lavcodec/bswap.h" //MEANX
 //#include "../libvo/img_format.h"
 
-#define memalign(y,x) malloc(x)
+
 
 //#include "rgb2rgb.h"
 //#include "../libvo/fastmemcpy.h"
@@ -2219,7 +2219,7 @@ SwsFilter *sws_getDefaultFilter(float lumaGBlur, float chromaGBlur,
 				float chromaHShift, float chromaVShift,
 				int verbose)
 {
-	SwsFilter *filter= malloc(sizeof(SwsFilter));
+	SwsFilter *filter= ADM_alloc(sizeof(SwsFilter));
 
 	if(lumaGBlur!=0.0){
 		filter->lumH= sws_getGaussianVec(lumaGBlur, 3.0);
@@ -2285,7 +2285,7 @@ SwsVector *sws_getGaussianVec(double variance, double quality){
 	int i;
 	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	double middle= (length-1)*0.5;
-	SwsVector *vec= malloc(sizeof(SwsVector));
+	SwsVector *vec= ADM_alloc(sizeof(SwsVector));
 
 	vec->coeff= coeff;
 	vec->length= length;
@@ -2304,7 +2304,7 @@ SwsVector *sws_getGaussianVec(double variance, double quality){
 SwsVector *sws_getConstVec(double c, int length){
 	int i;
 	double *coeff= memalign(sizeof(double), length*sizeof(double));
-	SwsVector *vec= malloc(sizeof(SwsVector));
+	SwsVector *vec= ADM_alloc(sizeof(SwsVector));
 
 	vec->coeff= coeff;
 	vec->length= length;
@@ -2318,7 +2318,7 @@ SwsVector *sws_getConstVec(double c, int length){
 
 SwsVector *sws_getIdentityVec(void){
 	double *coeff= memalign(sizeof(double), sizeof(double));
-	SwsVector *vec= malloc(sizeof(SwsVector));
+	SwsVector *vec= ADM_alloc(sizeof(SwsVector));
 	coeff[0]= 1.0;
 
 	vec->coeff= coeff;
@@ -2352,7 +2352,7 @@ static SwsVector *sws_getConvVec(SwsVector *a, SwsVector *b){
 	int length= a->length + b->length - 1;
 	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	int i, j;
-	SwsVector *vec= malloc(sizeof(SwsVector));
+	SwsVector *vec= ADM_alloc(sizeof(SwsVector));
 
 	vec->coeff= coeff;
 	vec->length= length;
@@ -2374,7 +2374,7 @@ static SwsVector *sws_sumVec(SwsVector *a, SwsVector *b){
 	int length= MAX(a->length, b->length);
 	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	int i;
-	SwsVector *vec= malloc(sizeof(SwsVector));
+	SwsVector *vec= ADM_alloc(sizeof(SwsVector));
 
 	vec->coeff= coeff;
 	vec->length= length;
@@ -2391,7 +2391,7 @@ static SwsVector *sws_diffVec(SwsVector *a, SwsVector *b){
 	int length= MAX(a->length, b->length);
 	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	int i;
-	SwsVector *vec= malloc(sizeof(SwsVector));
+	SwsVector *vec= ADM_alloc(sizeof(SwsVector));
 
 	vec->coeff= coeff;
 	vec->length= length;
@@ -2409,7 +2409,7 @@ static SwsVector *sws_getShiftedVec(SwsVector *a, int shift){
 	int length= a->length + ABS(shift)*2;
 	double *coeff= memalign(sizeof(double), length*sizeof(double));
 	int i;
-	SwsVector *vec= malloc(sizeof(SwsVector));
+	SwsVector *vec= ADM_alloc(sizeof(SwsVector));
 
 	vec->coeff= coeff;
 	vec->length= length;
@@ -2459,7 +2459,7 @@ void sws_convVec(SwsVector *a, SwsVector *b){
 SwsVector *sws_cloneVec(SwsVector *a){
 	double *coeff= memalign(sizeof(double), a->length*sizeof(double));
 	int i;
-	SwsVector *vec= malloc(sizeof(SwsVector));
+	SwsVector *vec= ADM_alloc(sizeof(SwsVector));
 
 	vec->coeff= coeff;
 	vec->length= a->length;

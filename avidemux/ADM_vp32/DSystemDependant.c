@@ -242,7 +242,7 @@ void IssueWarning( char * WarningMessage __attribute__((unused)))
 
 char * SytemGlobalAlloc( unsigned int Size )  
 {
-    return malloc(Size);  
+    return ADM_alloc(Size);  
 }
 
 void SystemGlobalFree( char * MemPtr )

@@ -1383,7 +1383,7 @@ sz = avifileinfo->width* avifileinfo->height * 3;
 
   uint8_t *out;
 
-  	out=(uint8_t *)malloc(sz);
+  	out=(uint8_t *)ADM_alloc(sz);
 	if(!out)
 	{
 		GUI_Alert("Memory error!");
@@ -1549,7 +1549,7 @@ A_saveAudioDecodedTest (char *name)
       return;
     }
 
-  outbuffer = (uint8_t *) malloc (2 * OUTCHUNK);	// 1Meg cache;
+  outbuffer = (uint8_t *) ADM_alloc (2 * OUTCHUNK);	// 1Meg cache;
   if (!outbuffer)
     {
       GUI_Alert ("Memory Error!");

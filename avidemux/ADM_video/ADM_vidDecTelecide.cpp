@@ -169,7 +169,7 @@ Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples)
 		_param->back_saved = _param->back;
 
 		// Set up pattern guidance.
-		cache = (struct CACHE_ENTRY *) malloc(CACHE_SIZE * sizeof(struct CACHE_ENTRY));
+		cache = (struct CACHE_ENTRY *) ADM_alloc(CACHE_SIZE * sizeof(struct CACHE_ENTRY));
 		for (i = 0; i < CACHE_SIZE; i++)
 		{
 			cache[i].frame = 0xffffffff;
@@ -198,14 +198,14 @@ Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples)
 		xblocks = (_info.width+BLKSIZE-1) / BLKSIZE;
 		yblocks = (_info.height+BLKSIZE-1) / BLKSIZE;
 #ifdef WINDOWED_MATCH
-		matchp = (unsigned int *) malloc(xblocks * yblocks * sizeof(unsigned int));
+		matchp = (unsigned int *) ADM_alloc(xblocks * yblocks * sizeof(unsigned int));
 		
-		matchc = (unsigned int *) malloc(xblocks * yblocks * sizeof(unsigned int));
+		matchc = (unsigned int *) ADM_alloc(xblocks * yblocks * sizeof(unsigned int));
 		
 #endif
-		sump = (unsigned int *) malloc(xblocks * yblocks * sizeof(unsigned int));
+		sump = (unsigned int *) ADM_alloc(xblocks * yblocks * sizeof(unsigned int));
 		
-		sumc = (unsigned int *) malloc(xblocks * yblocks * sizeof(unsigned int));
+		sumc = (unsigned int *) ADM_alloc(xblocks * yblocks * sizeof(unsigned int));
 		
 
 		

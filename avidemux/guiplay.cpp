@@ -375,7 +375,7 @@ void ComputePreload(void)
     // 3 sec buffer..               
     wavbuf =
 	(uint8_t *)
-	malloc((4 * 3 *  channels * wavinfo->frequency));
+	ADM_alloc((4 * 3 *  channels * wavinfo->frequency));
     ADM_assert(wavbuf);
 
     double db;

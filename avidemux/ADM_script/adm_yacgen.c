@@ -149,8 +149,8 @@ typedef int YYSTYPE;
 #   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
 #   define YYSIZE_T size_t
 #  endif
-#  define YYSTACK_ALLOC malloc
-#  define YYSTACK_FREE free
+#  define YYSTACK_ALLOC ADM_alloc
+#  define YYSTACK_FREE ADM_dealloc
 # endif
 #endif /* ! defined (yyoverflow) || YYERROR_VERBOSE */
 

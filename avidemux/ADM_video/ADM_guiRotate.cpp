@@ -87,9 +87,9 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
 //  ADM_assert(video_yuv_orig);
 	video_yuv_orig=new ADMImage(w,h);
 	
-  video_rgb=(uint8_t *)malloc(w*h*4);
+  video_rgb=(uint8_t *)ADM_alloc(w*h*4);
   ADM_assert(video_rgb);
-  video_yuv=(uint8_t *)malloc(w*h*4);
+  video_yuv=(uint8_t *)ADM_alloc(w*h*4);
   ADM_assert(video_yuv);
 
   // ask current frame from previous filter

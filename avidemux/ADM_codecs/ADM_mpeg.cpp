@@ -147,7 +147,7 @@ yv12_instance_t *inst;
 			wmb=(_w+15)>>4;;
 			hmb=(_h+15)>>4;;
 			dec->quant_stride=wmb;
-			dec->quant=(int8_t*)malloc( (wmb*hmb)*sizeof(int8_t));
+			dec->quant=(int8_t*)ADM_alloc( (wmb*hmb)*sizeof(int8_t));
 			//
 			feedData(extraLen,_seqHeader);
 			feedData(extraLen,_seqHeader);
@@ -347,13 +347,6 @@ void yv12_close (vo_instance_t * _instance)
    UNUSED_ARG(_instance);
    printf(" yv12close called\n");
 }
-#ifdef HAVE_MEMALIGN
-/* some systems have memalign() but no declaration for it */
-void * memalign (size_t align, size_t size);
-#else
-/* assume malloc alignment is sufficient */
-#define memalign(align,size) malloc (size)
-#endif
 
 /**
 	yv12_setup_fbuf : Allocate some buffers

@@ -490,7 +490,7 @@ ffmpegEncoderVBR::init (uint32_t val, uint32_t fps1000)
   fseek (_statfile, 0, SEEK_END);
   statSize = ftello (_statfile);
   fseek (_statfile, 0, SEEK_SET);
-  _context->stats_in = (char *) malloc (statSize + 1);
+  _context->stats_in = (char *) ADM_alloc (statSize + 1);
   _context->stats_in[statSize] = 0;
   fread (_context->stats_in, statSize, 1, _statfile);
 

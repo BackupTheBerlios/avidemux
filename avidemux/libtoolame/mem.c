@@ -17,7 +17,7 @@ void *toolame_malloc (unsigned long block, char *item)
 
   void *ptr;
 
-  ptr = (void *) malloc (block);
+  ptr = (void *) ADM_alloc (block);
 
   if (ptr != NULL) {
     memset (ptr, 0, block);

@@ -133,7 +133,7 @@ GtkWidget	*create_dialog1 (void)
   
 
 */
-	GtkWidget **fq=(GtkWidget **)malloc(sizeof(GtkWidget *)*NB_BITRATE);
+	GtkWidget **fq=(GtkWidget **)ADM_alloc(sizeof(GtkWidget *)*NB_BITRATE);
 	char string[100];
 	for(unsigned int i=0;i<NB_BITRATE;i++)
 	{

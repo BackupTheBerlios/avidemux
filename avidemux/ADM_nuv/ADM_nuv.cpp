@@ -623,10 +623,10 @@ uint32_t rcount=0;
 
 						/* Store R tags in rqueue for indexing/ chop by external tools */
 						rcount++;
-						n=(ChaineD *)malloc(sizeof(ChaineD));
+						n=(ChaineD *)ADM_alloc(sizeof(ChaineD));
 						ADM_assert(n);
 						n->_next=NULL;
-						n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
+						n->_frame=(rtframeheader *)ADM_alloc(sizeof(rtframeheader));
 						n->_frame->comptype='R';
 						//memcpy(n->_frame,&frame,sizeof(frame));
 						n->_pos=ftello(_fd);
@@ -668,10 +668,10 @@ uint32_t rcount=0;
 						{
 						// we insert a dummy packet in audio chain to compensate
 												
-						n=(ChaineD *)malloc(sizeof(ChaineD));
+						n=(ChaineD *)ADM_alloc(sizeof(ChaineD));
 						ADM_assert(n);
 						n->_next=NULL;
-						n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
+						n->_frame=(rtframeheader *)ADM_alloc(sizeof(rtframeheader));
 						n->_frame->packetlength=THRESHOLD;
 #ifdef VERBOSE_SOUND
           					printf("\n Added %lu bytes",THRESHOLD);
@@ -797,10 +797,10 @@ uint32_t rcount=0;
 				// Video Chunk !!
 				case 'V':
 						if(!sync_met) break;
-						n=(ChaineD *)malloc(sizeof(ChaineD));
+						n=(ChaineD *)ADM_alloc(sizeof(ChaineD));
 						ADM_assert(n);
 						n->_next=NULL;
-						n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
+						n->_frame=(rtframeheader *)ADM_alloc(sizeof(rtframeheader));
 						memcpy(n->_frame,&frame,sizeof(frame));
 						n->_pos=ftello(_fd);
 						 n->_kf=0;
@@ -823,10 +823,10 @@ uint32_t rcount=0;
 						// if it !PCM we take it as is
 						if(!_isPCM)
 						{
-							n=(ChaineD *)malloc(sizeof(ChaineD));
+							n=(ChaineD *)ADM_alloc(sizeof(ChaineD));
 							ADM_assert(n);
 							n->_next=NULL;
-							n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
+							n->_frame=(rtframeheader *)ADM_alloc(sizeof(rtframeheader));
 							memcpy(n->_frame,&frame,sizeof(frame));
 							alen= n->_frame->packetlength;
 							n->_pos=ftello(_fd);
@@ -846,10 +846,10 @@ uint32_t rcount=0;
 									overshot-=frame.packetlength;
 									break;
 							}
-						n=(ChaineD *)malloc(sizeof(ChaineD));
+						n=(ChaineD *)ADM_alloc(sizeof(ChaineD));
 						ADM_assert(n);
 						n->_next=NULL;
-						n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
+						n->_frame=(rtframeheader *)ADM_alloc(sizeof(rtframeheader));
 
 
 						memcpy(n->_frame,&frame,sizeof(frame));
@@ -892,10 +892,10 @@ uint32_t rcount=0;
 							{
 							// we insert a dummy packet in audio chain to compensate
 
-						n=(ChaineD *)malloc(sizeof(ChaineD));
+						n=(ChaineD *)ADM_alloc(sizeof(ChaineD));
 						ADM_assert(n);
 						n->_next=NULL;
-						n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
+						n->_frame=(rtframeheader *)ADM_alloc(sizeof(rtframeheader));
 						n->_frame->packetlength=iestim-current_audio;
 						n->_frame->comptype='R';
 						//memcpy(n->_frame,&frame,sizeof(frame));

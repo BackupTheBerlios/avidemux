@@ -66,6 +66,7 @@
 
 #include "ADM_library/default.h"
 #include "ADM_libresample.h"
+#include "ADM_assert.h"
 
 #define SCALE (1.)
 
@@ -394,7 +395,7 @@ void *resample_open(int highQuality, double minFactor, double maxFactor)
       return 0;
    }
 
-   hp = (rsdata *)malloc(sizeof(rsdata));
+   hp = (rsdata *)ADM_alloc(sizeof(rsdata));
 
    hp->minFactor = minFactor;
    hp->maxFactor = maxFactor;
@@ -410,12 +411,12 @@ void *resample_open(int highQuality, double minFactor, double maxFactor)
    Rolloff = 0.90;
    Beta = 6;
 
-   Imp64 = (double *)malloc(hp->Nwing * sizeof(double));
+   Imp64 = (double *)ADM_alloc(hp->Nwing * sizeof(double));
 
    LpFilter(Imp64, hp->Nwing, 0.5*Rolloff, Beta, Npc);
 
-   hp->Imp = (float *)malloc(hp->Nwing * sizeof(float));
-   hp->ImpD = (float *)malloc(hp->Nwing * sizeof(float));
+   hp->Imp = (float *)ADM_alloc(hp->Nwing * sizeof(float));
+   hp->ImpD = (float *)ADM_alloc(hp->Nwing * sizeof(float));
    for(i=0; i<hp->Nwing; i++)
       hp->Imp[i] = Imp64[i];
 
@@ -440,7 +441,7 @@ void *resample_open(int highQuality, double minFactor, double maxFactor)
       we can zero-pad up to Xoff zeros at the end when we reach the
       end of the input samples. */
    hp->XSize = MAX(2*hp->Xoff+10, 4096);
-   hp->X = (float *)malloc((hp->XSize + hp->Xoff) * sizeof(float));
+   hp->X = (float *)ADM_alloc((hp->XSize + hp->Xoff) * sizeof(float));
    hp->Xp = hp->Xoff;
    hp->Xread = hp->Xoff;
    
@@ -451,7 +452,7 @@ void *resample_open(int highQuality, double minFactor, double maxFactor)
    /* Make the outBuffer long enough to hold the entire processed
       output of one inBuffer */
    hp->YSize = (int)(((double)hp->XSize)*maxFactor+2.0);
-   hp->Y = (float *)malloc(hp->YSize * sizeof(float));
+   hp->Y = (float *)ADM_alloc(hp->YSize * sizeof(float));
    hp->Yp = 0;
 
    hp->Time = (double)hp->Xoff; /* Current-time pointer for converter */

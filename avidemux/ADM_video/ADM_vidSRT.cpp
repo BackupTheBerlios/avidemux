@@ -116,12 +116,12 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 					_conf->_baseLine=_conf->_fontsize*SRT_MAX_LINE;
 
 			char *ft,*sub;
-			ft=(char *)malloc(500);
-			sub=(char *)malloc(500);
+			ft=(char *)ADM_alloc(500);
+			sub=(char *)ADM_alloc(500);
 			strcpy(ft,_conf->_subname); _conf->_subname=ft;
 			strcpy(sub,_conf->_fontname); _conf->_fontname=sub;
 
-			sub=(char *)malloc(500);
+			sub=(char *)ADM_alloc(500);
 			strcpy(sub,_conf->_charset); _conf->_charset=sub;
 			loadSubtitle();
 			loadFont();
@@ -131,9 +131,9 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 	{
 			_conf=NEW( SUBCONF);
 
-			_conf->_fontname=(char *)malloc(500);
-			_conf->_subname=(char *)malloc(500);
-			_conf->_charset=(char *)malloc(500);
+			_conf->_fontname=(char *)ADM_alloc(500);
+			_conf->_subname=(char *)ADM_alloc(500);
+			_conf->_charset=(char *)ADM_alloc(500);
 			_conf->_fontname[0]=0;
 			_conf->_subname[0]=0;
 			_conf->_charset[0]=0;

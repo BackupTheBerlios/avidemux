@@ -213,7 +213,7 @@ uint32_t			w=0,h=0;
 	printf("\n found %lu images\n",_nb_file);
 
 
-	_fd=(FILE **)malloc(_nb_file*sizeof(FILE*));
+	_fd=(FILE **)ADM_alloc(_nb_file*sizeof(FILE*));
 	_imgSize=new uint32_t[_nb_file];
 	  //_________________________________
           // now open them and assign fd && imgSize

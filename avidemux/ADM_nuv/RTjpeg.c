@@ -3136,7 +3136,7 @@ void RTjpeg_init_mcompress(void)
 
  if(!RTjpeg_old)
  {
-  RTjpeg_old=malloc((4*RTjpeg_width*RTjpeg_height)+32);
+  RTjpeg_old=ADM_alloc((4*RTjpeg_width*RTjpeg_height)+32);
   tmp=(unsigned long)RTjpeg_old;
   tmp+=32;
   tmp=tmp>>5;

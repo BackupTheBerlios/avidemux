@@ -177,8 +177,8 @@ class  AVDMVideoStreamRaw :public AVDMGenericVideoStream
 	These macros are used to build the create_ function automatically
 	That way external sw has no need to know the underlying class
 */
-#define NEW(x) (x *)malloc(sizeof(x))
-#define DELETE(x) {if(x){free(x);x=NULL;}}
+#define NEW(x) (x *)ADM_alloc(sizeof(x))
+#define DELETE(x) {if(x){ADM_dealloc(x);x=NULL;}}
 #define CREATOR(x,clss)  return new clss(in,x);
 #define BUILD_CREATE(name,clss) AVDMGenericVideoStream *name(AVDMGenericVideoStream *in, CONFcouple *conf) \
 {		CREATOR(conf,clss); }

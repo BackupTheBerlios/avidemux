@@ -163,7 +163,7 @@ int i;
 	/* Nwing: # of filter coeffs in right wing */
 	r->Nwing = r->Nq * (r->Nmult/2+1) + 1;
 
-	r->Imp = (Float *)malloc(sizeof(Float) * (r->Nwing+2)) + 1;
+	r->Imp = (Float *)ADM_alloc(sizeof(Float) * (r->Nwing+2)) + 1;
 	/* need Imp[-1] and Imp[Nwing] for quadratic interpolation */
 	/* returns error # <=0, or adjusted wing-len > 0 */
 	
@@ -210,7 +210,7 @@ int i;
 	r->Ysize = BUFFSIZE - r->Xsize;
 	/* st_report("Xsize %d, Ysize %d, Xoff %d",r->Xsize,r->Ysize,r->Xoff); */
 
-	r->X = (Float *) malloc(sizeof(Float) * (BUFFSIZE));
+	r->X = (Float *) ADM_alloc(sizeof(Float) * (BUFFSIZE));
 	r->Y = r->X + r->Xsize;
 
 	/* Need Xoff zeros at beginning of sample */
@@ -896,7 +896,7 @@ int makeFilter(Float Imp[], long Nwing, double Froll, double Beta,
    if (Mwing==0)
       return(-4);
 
-   ImpR = (double *) malloc(sizeof(double) * Mwing);
+   ImpR = (double *) ADM_alloc(sizeof(double) * Mwing);
 
    /* Design a Nuttall or Kaiser windowed Sinc low-pass filter */
    LpFilter(ImpR, Mwing, Froll, Beta, Num);

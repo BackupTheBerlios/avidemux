@@ -88,10 +88,10 @@ uint8_t ADMVideoContrast::configure (AVDMGenericVideoStream * instream)
 
   aImage = new ADMImage (w, h);
 
-  video2 = (uint8_t *) malloc (w * h * 4);
+  video2 = (uint8_t *) ADM_alloc (w * h * 4);
   ADM_assert (video2);
 
-  video3 = (uint8_t *) malloc (w * h * 4);
+  video3 = (uint8_t *) ADM_alloc (w * h * 4);
   ADM_assert (video3);
 
 

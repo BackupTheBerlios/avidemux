@@ -440,7 +440,7 @@ uint8_t aviWrite::saveBegin (char 	*name,
   curindex = 0;
   // the *2 is for audio and video
   // the *3 if for security sake
-  myindex = (IdxEntry *) malloc (sizeof (IdxEntry) * (nb_frame * 4));
+  myindex = (IdxEntry *) ADM_alloc (sizeof (IdxEntry) * (nb_frame * 4));
   asize = 0;
   vframe = 0;
   return 1;
@@ -580,7 +580,7 @@ uint8_t aviWrite::setStreamInfo (FILE * fo,
   alist->WriteChunk ((uint8_t *) "strf", infolen+extraLen, buf);
 
   junklen = maxxed - sizeof (AVIStreamHeader) - infolen-extraLen;
-  junk = (uint8_t *) malloc (junklen);
+  junk = (uint8_t *) ADM_alloc (junklen);
   ADM_assert (junk);
   memset (junk,0, junklen);
   //
@@ -591,7 +591,7 @@ uint8_t aviWrite::setStreamInfo (FILE * fo,
   	memcpy(junk,"Avidemux",len);	
   
   alist->WriteChunk ((uint8_t *) "JUNK", junklen, junk);
-  free (junk);
+  ADM_dealloc (junk);
 
   alist->End ();
   delete alist;

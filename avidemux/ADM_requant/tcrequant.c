@@ -2134,8 +2134,8 @@ int Mrequant_init (float quant_factor,int byteStuffing)
 	byte_stuff = byteStuffing;
 
 	
-	rbuf = cbuf = orbuf = malloc(BUF_SIZE);
-	wbuf = owbuf = malloc(BUF_SIZE);
+	rbuf = cbuf = orbuf = ADM_alloc(BUF_SIZE);
+	wbuf = owbuf = ADM_alloc(BUF_SIZE);
 	
 	inbytecnt = outbytecnt = 0;
 

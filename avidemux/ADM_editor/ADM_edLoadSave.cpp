@@ -106,7 +106,7 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 
   fclose (fd);
   // try to load filters
-  tmp = (char *) malloc (strlen (name) + 10);
+  tmp = (char *) ADM_alloc (strlen (name) + 10);
   ADM_assert (tmp);
   strcpy (tmp, name);
   strcat (tmp, ".flt");
@@ -262,7 +262,7 @@ uint8_t ADM_Composer::loadWorbench (char *name)
   printf ("\n Total frames : %lu \n", _total_frames);
 
 // try to load filters
-  tmp = (char *) malloc (strlen (name) + 10);
+  tmp = (char *) ADM_alloc (strlen (name) + 10);
   ADM_assert (tmp);
   strcpy (tmp, name);
   strcat (tmp, ".flt");

@@ -54,7 +54,7 @@ ____________________________________________
  {
 
 	uint8_t *tmp;
-	tmp=(uint8_t *)malloc(ww*hh*4);
+	tmp=(uint8_t *)ADM_alloc(ww*hh*4);
 
 	if( !tmp)
 		{
