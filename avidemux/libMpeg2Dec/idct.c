@@ -247,7 +247,7 @@ void mpeg2_idct_init (uint32_t accel)
     } else
 #endif
 #ifdef ARCH_PPC
-    if (accel & MPEG2_ACCEL_PPC_ALTIVEC) {
+    if (0 & accel & MPEG2_ACCEL_PPC_ALTIVEC) { //MEANX
 	mpeg2_idct_copy = mpeg2_idct_copy_altivec;
 	mpeg2_idct_add = mpeg2_idct_add_altivec;
 	mpeg2_idct_altivec_init ();

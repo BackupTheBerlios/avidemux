@@ -155,6 +155,7 @@ static inline uint32_t arch_accel (void)
     canjump = 0;
 
     signal (SIGILL, oldsig);
+    //return 0 ; // Meanx
     return MPEG2_ACCEL_PPC_ALTIVEC;
 }
 #endif /* ARCH_PPC */

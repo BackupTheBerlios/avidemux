@@ -43,7 +43,7 @@ void mpeg2_mc_init (uint32_t accel)
     else
 #endif
 #ifdef ARCH_PPC
-    if (accel & MPEG2_ACCEL_PPC_ALTIVEC)
+    if (accel & MPEG2_ACCEL_PPC_ALTIVEC ) //Meanx
 	mpeg2_mc = mpeg2_mc_altivec;
     else
 #endif

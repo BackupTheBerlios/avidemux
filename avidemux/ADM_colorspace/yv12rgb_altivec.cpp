@@ -54,10 +54,8 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 // A pack of constant vectors we will use later
 // we more or less rely on gcc to have good register allocation
 //________________________________________________________________
-const  vector unsigned char nullVect=
-	 (vector unsigned char)(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-const vector signed int  nullVectLong= (vector  signed int )(0,0,0,0);
-const vector signed int  VectMax= (vector signed int)(0xff,0xff,0xff,0xff);
+ 
+	 
 	
 const vector unsigned char permY= (vector unsigned char)
 		(  0x10,   0,0x10,  1, 0x10, 2, 0x10, 3, 0x10,   
@@ -73,7 +71,13 @@ const  vector signed short multRu=(vector signed short)(MULRU,0,MULRU,0, MULRU,0
 const  vector signed short multBv=(vector signed short)(MULBV,0,MULBV,0, MULBV,0,MULBV,0);
 const  vector signed short multGu=(vector signed short)(MULGu,0,MULGu,0, MULGu,0,MULGu,0);
 const  vector signed short multGv=(vector signed short)(MULGV,0,MULGV,0, MULGV,0,MULGV,0);
-	
+const  vector signed short conv2Signed=(vector signed short)(-128,-128,-128,-128,  									-128,-128,-128,-128);	
+const vecbyte maskR=(vecbyte)(2,0x12,6,0x16,10,0x1a,14,0x1e,  0,0,0,0,0,0,0,0);
+const vecbyte maskRG1=(vecbyte)(0,0x10,0,1, 0x11,0,2,0x12,  0,3,0x13,0 ,4,0x14,0,5);
+const vecbyte maskB1=(vecbyte)(0,1,0x10,3,  4,0x11,6,7,     0x12,9,10,0x13, 12,13,0x14,15);
+		
+const vecbyte maskRG2=(vecbyte)(0x15,5,0,0x16,  6,0,0x17,7,     0,0,0,0,0,0,0,0);
+const vecbyte maskB2=(vecbyte) (0,1,0x16,3,  4,0x17,6,7,  0,0,0,0,0,0,0,0);
 
 //____________________________________
 //	We handle 8 pixels at a time
@@ -85,8 +89,8 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 {
 
 	vector unsigned char y,y2,u,v;
-	vector signed short sy16,su16,sv16;
-	vector signed int sy16e,sy16o,su32,sv32;
+	vector signed short sy16,su16,sv16,sz16;
+	vector signed int sy16e,sy16o,su32,sv32,sz16e,sz16o;
 	vector unsigned char srcy,srcy2,srcu,srcv;
 	
 	
@@ -94,18 +98,28 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 	vector unsigned char OUT,OUT2;
 	vector signed int Ru,Gu,Gv,Bu;
 	vector signed int Ra,Ga,Ba;
-	vector signed short  conv2Signed=(vector signed short)(-128,-128,-128,-128,  -128,-128,-128,-128);
-	vector signed int R0,G0,B0;
-	vector signed int R1,G1,B1,maskH,maskL;
 	
+	vector signed int R0,G0,B0;
+	vector signed int R1,G1,B1;
+	vector unsigned char nullVect;
+	vecbyte R,G,B;
+	
+	
+	uint8_t *ptr3=ptr2+w*3;
 
-	int yshift,ushift,vshift;
+	#if 0	
 #define LOAD_ALIGN(dest,src) \
 		MSQ = vec_ld(0, src); \
 		LSQ = vec_ld(16, src); \
 		mask = vec_lvsl(0, src); \
 		dest= vec_perm(MSQ, LSQ, mask); 
+#endif
+#define LOAD_ALIGN(dest,src) \
+		MSQ = vec_ld(0, src); \
+		mask = vec_lvsl(0, src); \
+		dest= vec_perm(MSQ, MSQ, mask); 
 
+		
 #define STORE_ALIGN(register,adr) \
 		MSQ = vec_ld(0, adr); \
 		LSQ = vec_ld(16, adr);\
@@ -123,21 +137,30 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 
 		
 	// We do 8 pixels at a time
-	w>>=2;
-	while(w)
+	int count=w;
+	count>>=3;
+	
+	while(count)
 	{
 		aprintf("_________________________________\n");
 		//srcy2=(vector unsigned char )ptr_y2;
 		// expand y to signed int
 		// Realign if needed
 		LOAD_ALIGN(srcy,ptr_y);
-		aprintf("y shift : %d \ny8:%vd\n",yshift,srcy);
-
+		LOAD_ALIGN(srcy2,ptr_y+w);
+		
+		nullVect=vec_splat_u8(0);
 		sy16=(vector signed short)vec_perm(srcy,nullVect,permY);	
+		sz16=(vector signed short)vec_perm(srcy2,nullVect,permY);	
 		aprintf("sy16:%vd\n",sy16);
 		// multiply by scaling factor for y
 		sy16e=vec_mule(sy16,multy);
 		sy16o=vec_mulo(sy16,multy);
+		
+		sz16e=vec_mule(sz16,multy);
+		sz16o=vec_mulo(sz16,multy);
+		
+		
 		aprintf("sy16e:%vld\n",sy16e);
 		aprintf("sy16o:%vld\n",sy16o);
 		//--------- get u, convert to long
@@ -177,6 +200,8 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		B0=vec_add(sy16e,Ba);
 		B1=vec_add(sy16o,Ba);
 
+		
+		
 		aprintf("R0:%vld\n",R0);
 		aprintf("R0b:%vd\n",(vecbyte)R0);
 		aprintf("R1:%vld\n",R1);
@@ -194,8 +219,16 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 
 		// Interleav R0 and G0
 		// We done do clipping (yet)
-		vecbyte R,G,B;
-		vecbyte maskR=(vecbyte)(2,0x12,6,0x16,10,0x1a,14,0x1e,  0,0,0,0,0,0,0,0);
+		// Saturate
+		#define SAT(x) \
+			x=vec_max(x,(vector signed int)nullVect);
+		SAT(R0);
+		SAT(R1);
+		SAT(G0);
+		SAT(G1);
+		SAT(B0);
+		SAT(B1);
+		
 		
 		
 		R=vec_perm((vecbyte)R0,(vecbyte)R1,maskR);
@@ -207,13 +240,8 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		aprintf("B:%vd\n",B);
 				
 		// aligned write (?)
-		yshift=((int)ptr2) & 8;
 		
-		vecbyte maskRG1=(vecbyte)(0,0x10,0,1, 0x11,0,2,0x12,  0,3,0x13,0 ,4,0x14,0,5);
-		vecbyte maskB1=(vecbyte)(0,1,0x10,3,  4,0x11,6,7,     0x12,9,10,0x13, 12,13,0x14,15);
 		
-		vecbyte maskRG2=(vecbyte)(0x15,5,0,0x16,  6,0,0x17,7,     0,0,0,0,0,0,0,0);
-		vecbyte maskB2=(vecbyte) (0,1,0x16,3,  4,0x17,6,7,  0,0,0,0,0,0,0,0);
 		
 		
 		
@@ -234,15 +262,59 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 			aprintf("OUT22:%vd\n",OUT);
 			STORE_ALIGN(OUT,ptr2+16);
 		
+		// Now do y2_______________________
 		
 		
+		// so now we add Y to Ra to get R, Y+Ga=G, Y+Ba=B
+		R0=vec_add(sz16e,Ra);
+		R1=vec_add(sz16o,Ra);
+		G0=vec_add(sz16e,Ga);
+		G1=vec_add(sz16o,Ga);
+		B0=vec_add(sz16e,Ba);
+		B1=vec_add(sz16o,Ba);
 		
-		// and do y2
-		w--;
+		
+		// Pack both to single packed bytes
+		// Do saturation here too
+		
+		SAT(R0);
+		SAT(R1);
+		SAT(G0);
+		SAT(G1);
+		SAT(B0);
+		SAT(B1);
+		
+		R=vec_perm((vecbyte)R0,(vecbyte)R1,maskR);
+		G=vec_perm((vecbyte)G0,(vecbyte)G1,maskR);
+		B=vec_perm((vecbyte)B0,(vecbyte)B1,maskR);
+		
+				
+		// aligned write (?)
+		
+		
+			OUT=vec_perm(R,G,maskRG1);
+			aprintf("OUT0:%vd\n",OUT);
+			OUT=vec_perm(OUT,B,maskB1);
+			
+			aprintf("OUT1:%vd\n",OUT);
+		
+			STORE_ALIGN(OUT,ptr3);
+				
+			vec_splat(OUT,0);
+			OUT=vec_perm(B,G,maskRG2);
+			aprintf("OUT21:%vd\n",OUT);
+			OUT=vec_perm(OUT,R,maskB2);
+			
+			aprintf("OUT22:%vd\n",OUT);
+			STORE_ALIGN(OUT,ptr3+16);
+		
+		// and do y2________________________________
+		count--;
 		ptr_y+=8;
 		ptr_u+=4;
 		ptr_v+=4;
 		ptr2+=24;	
+		ptr3+=24;
 
 	}
 	
