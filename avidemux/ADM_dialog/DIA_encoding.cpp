@@ -59,6 +59,7 @@ DIA_encoding::DIA_encoding( uint32_t fps1000 )
 	gtk_signal_connect(GTK_OBJECT(dialog), "delete_event",
 		       GTK_SIGNAL_FUNC(on_destroy_abort), NULL);
 	gtk_widget_show(dialog);
+	gtk_window_set_modal(GTK_WINDOW(dialog), 1);
 	UI_iconify();
 	_lastTime=0;
 	_lastFrame=0;
