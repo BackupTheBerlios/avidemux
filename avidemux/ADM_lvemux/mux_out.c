@@ -845,7 +845,7 @@ int mux_write_packet(PackStream *ps,
       //-- at max 2 packs and ALL sync words will occur in  --
       //-- 1st. pack the 2nd. pack can be timestamped with  --
       //-- the same value prepared for next function call.  --
-      if (ps->pkt_id < VIDEO_ID)
+      if (ps->pkt_id == AUDIO_ID_MP2)
         ps->pts = ps->audio_pts + ps->a_pts_ofs + ps->audio_delay;
       else
         ps->pts = -1.0;  
