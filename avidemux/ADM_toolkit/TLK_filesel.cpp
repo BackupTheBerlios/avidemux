@@ -248,7 +248,14 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	gtk_widget_destroy(dialog);
 
 // CYB 2005.02.23
-    fileReadWrite(cb, rw, name);
+        if(cb)
+        {
+                fileReadWrite(cb, rw, name);
+        }
+        else
+        {
+                *rname=name;  
+        }
 }
 #else
 //
