@@ -185,6 +185,14 @@ typedef struct VBRext
 //   That one can be used several times so we pass stuff
 //   as parameter
 //_______________________________________________
+static 	uint32_t aacBitrate[16]=
+{
+	96000, 88200, 64000, 48000,
+	44100, 32000, 24000, 22050,
+	16000, 12000, 11025,  8000,
+	0,     0,     0,     0 
+};
+
 uint8_t aviWrite::writeAudioHeader (	AVDMGenericAudioStream * stream, AVIStreamHeader *header )
 {
 WAVHeader *wav=NULL;
@@ -222,28 +230,43 @@ uint32_t extraLen=0;
 	switch(wav->encoding)
 	{
 		case WAV_AAC:
+		{
+		// nb sample in stream  
+		
+			double len;
+			len=_videostream.dwLength;
+			len/=_videostream.dwRate;
+			len*=_videostream.dwScale;			
+			len*=wav->frequency;
+			len/=1024;
+			header->dwLength= floor(len);//_videostream.dwLength; 
 		 // AAC is mostly VBR
 		 header->dwFlags=1;
 		 header->dwInitialFrames=0;
 		 header->dwRate=wav->frequency;
-		 header->dwScale=1536; //1024;		 
+		 header->dwScale=1024; //sample/packet 1024 seems good for aac
 		 header->dwSampleSize = 0;
 		 header->dwSuggestedBufferSize=8192;
-		 header->dwInitialFrames = 0;	   
-		 header->dwLength= _videostream.dwLength;
+		 header->dwInitialFrames = 0;	 
+		
+		// header->dwLength= _videostream.dwLength; 
 		 wav->blockalign=4096;	  
 		 wav->bitspersample = 0; 
 		 
 		//*b++ = (BYTE)((profile +1) << 3 | (SRI >> 1));
 		//*b++ = (BYTE)(((SRI & 0x1) << 7) | (aacsource->GetChannelCount() << 3));
+		
+		int SRI=4;	// Default 44.1 khz
+		for(int i=0;i<16;i++) if(wav->frequency==aacBitrate[i]) SRI=i;
 		aacHeader[0]=0x2;
 		aacHeader[1]=0x0;
-		aacHeader[2]=0x11;
-		aacHeader[3]=0x90;
+		aacHeader[2]=(2<<3)+(SRI>>1); // Profile LOW
+		aacHeader[3]=((SRI&1)<<7)+((wav->channels)<<3);
 		
 
 		extra=&(aacHeader[0]);
 		extraLen=4;
+		}
 		break;
 	case WAV_MP3:							
 		  // then update VBR fields

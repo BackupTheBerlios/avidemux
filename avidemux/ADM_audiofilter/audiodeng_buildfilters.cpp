@@ -296,7 +296,9 @@ void audioCodecConfigure( void )
 								return;
 #ifdef USE_FAAC
 		case AUDIOENC_FAAC:
-						audioMP3bitrate=192;
+						
+							DIA_audioEncoder(&audioMP3mode, &audioMP3bitrate,"AAC parameter");
+							return;
 						return;
 #endif		
 #ifdef HAVE_LIBMP3LAME								

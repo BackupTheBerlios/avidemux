@@ -131,7 +131,7 @@ faacEncConfigurationPtr cfg;
 uint32_t AVDMProcessAudio_Faac::grab(uint8_t * obuffer)
 {
 uint32_t len,sam;
-	//printf("Faac: Read\n");
+	printf("Faac: Read\n");
 	if(getPacket(obuffer,&len,&sam))
 		return len;
 	return MINUS_ONE;
