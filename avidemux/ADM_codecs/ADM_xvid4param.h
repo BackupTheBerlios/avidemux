@@ -60,6 +60,10 @@
 	int bquant_offset;
 	int vhqmode;
 	int chroma_me;
+	int turbo;
+	int packed;
+	int closed_gop;
+	int bframe_threshold;
 	char logName[200];
 }   xvid4EncParam;
 

@@ -151,6 +151,9 @@ void xvid4otherUpload(GtkWidget *dialog)
 	CHECK_SET(checkbuttonGMC,		gmc);
 	CHECK_SET(checkbuttonQPel,		qpel);
 	CHECK_SET(checkbuttonHQAC,		hqac);
+	
+	CHECK_SET(checkbuttonTurbo,		turbo);
+	CHECK_SET(checkbuttonPacked,		packed);
 		
   	SPIN_SET(spinbuttonIMaxPeriod,  max_key_interval);
 	ENTRY_SET(entryIInterv,		min_key_interval);
@@ -199,6 +202,10 @@ void xvid4otherDownload(GtkWidget *dialog)
 	CHECK_GET(checkbuttonGMC,		gmc);
 	CHECK_GET(checkbuttonQPel,		qpel);
 	CHECK_GET(checkbuttonHQAC,		hqac);
+	CHECK_GET(checkbuttonTurbo,		turbo);
+	CHECK_GET(checkbuttonPacked,		packed);
+
+	
 	SPIN_GET(spinbuttonIMaxPeriod,  max_key_interval);	
   	ENTRY_GET(entryIInterv,			kfthreshold);
 	SPIN_GET(spinbuttonBFrame,		bframes);
@@ -273,6 +280,7 @@ int r;
 
 }
 //-------------------- Glade-2 here----------		
+//_____KK_______
 
 GtkWidget*
 create_dialog1 (void)
@@ -305,6 +313,9 @@ create_dialog1 (void)
   GtkWidget *vbox5;
   GtkWidget *checkbuttonCartoon;
   GtkWidget *checkbuttonChroma;
+  GtkWidget *vbox23;
+  GtkWidget *checkbuttonTurbo;
+  GtkWidget *checkbuttonPacked;
   GtkWidget *label8;
   GtkWidget *vbox6;
   GtkWidget *hbox8;
@@ -373,7 +384,7 @@ create_dialog1 (void)
   GtkWidget *vbox13;
   GtkWidget *label24;
   GtkWidget *label25;
-  //GtkWidget *label26;
+  GtkWidget *label26;
   GtkWidget *vbox14;
   GtkObject *spinbuttonIMax_adj;
   GtkWidget *spinbuttonIMax;
@@ -381,7 +392,7 @@ create_dialog1 (void)
   GtkWidget *spinbuttonPMax;
   GtkObject *spinbuttonBMax_adj;
   GtkWidget *spinbuttonBMax;
-  GtkWidget *label26;
+//  GtkWidget *label26;
   GtkWidget *label3;
   GtkWidget *vbox15;
   GtkWidget *frame4;
@@ -541,6 +552,20 @@ create_dialog1 (void)
   gtk_widget_show (checkbuttonChroma);
   gtk_box_pack_start (GTK_BOX (vbox5), checkbuttonChroma, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, checkbuttonChroma, _("Enables a chroma optimizer prefilter"), NULL);
+
+  vbox23 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox23);
+  gtk_box_pack_start (GTK_BOX (hbox7), vbox23, TRUE, TRUE, 0);
+
+  checkbuttonTurbo = gtk_check_button_new_with_mnemonic (_("Turbo Mode"));
+  gtk_widget_show (checkbuttonTurbo);
+  gtk_box_pack_start (GTK_BOX (vbox23), checkbuttonTurbo, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, checkbuttonTurbo, _("Enables fast 1st pass encoding"), NULL);
+
+  checkbuttonPacked = gtk_check_button_new_with_mnemonic (_("Packed bitstream"));
+  gtk_widget_show (checkbuttonPacked);
+  gtk_box_pack_start (GTK_BOX (vbox23), checkbuttonPacked, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, checkbuttonPacked, _("Enables Divx like packed vop, DO NOT SET, it is ugly"), NULL);
 
   label8 = gtk_label_new (_("Main"));
   gtk_widget_show (label8);
@@ -1011,7 +1036,7 @@ create_dialog1 (void)
   gtk_widget_show (okbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), okbutton1, GTK_RESPONSE_OK);
   GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
-/*
+#if 0
   g_signal_connect ((gpointer) one_pass_cbr1, "activate",
                     G_CALLBACK (on_one_pass_cbr1_activate),
                     NULL);
@@ -1057,7 +1082,7 @@ create_dialog1 (void)
   g_signal_connect ((gpointer) _4___wide_search1, "activate",
                     G_CALLBACK (on_4___wide_search1_activate),
                     NULL);
-*/
+#endif
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
@@ -1086,6 +1111,9 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, vbox5, "vbox5");
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonCartoon, "checkbuttonCartoon");
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonChroma, "checkbuttonChroma");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox23, "vbox23");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbuttonTurbo, "checkbuttonTurbo");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbuttonPacked, "checkbuttonPacked");
   GLADE_HOOKUP_OBJECT (dialog1, label8, "label8");
   GLADE_HOOKUP_OBJECT (dialog1, vbox6, "vbox6");
   GLADE_HOOKUP_OBJECT (dialog1, hbox8, "hbox8");
@@ -1190,6 +1218,7 @@ create_dialog1 (void)
 
   return dialog1;
 }
+
 
 
 #endif

@@ -341,29 +341,29 @@ extern int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
  static XVID4config xvid4Config={
  		{COMPRESS_CQ,4,1500000,700},
                     {
-		5, //int guiLevel;		
+		6, //int guiLevel;		
 	
 		1, //int min_key_interval;
 		250, // Max key interval
-		1, //int bframes;
+		2, //int bframes;
 	
 		0, //int mpegQuantizer;	
 		0, //int interlaced;
 		1, //int inter4mv;
-		1, //int trellis;	
+		0, //int trellis;	
 		0, //int cartoon;
 		0, //int greyscale;		
 		0, // qpel
 		0, // GMC
 		1, // hqac
-		1, // Chroma optim
+		0, // Chroma optim
 		{2,2,2},//qmin
 		{31,31,31},//qmax
 	
 	// This if for 2 pass 	
-		10, //int keyframe_boost;
-		25, //int curve_compression_high;
-		10, //int curve_compression_low;
+		0, //int keyframe_boost;
+		0, //int curve_compression_high;
+		0, //int curve_compression_low;
 		5,//int overflow_control_strength;
 		5,//int max_overflow_improvement;
 		5,//int max_overflow_degradation;
@@ -371,10 +371,14 @@ extern int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 		0, //int kfthreshold;
 	
 		24,//int container_frame_overhead;
-		100,//int bquant_ratio;
-		150,//int bquant_offset;    
-		0, //vhqmode		    
-		1 // chroma me
+		150,//int bquant_ratio;
+		100,//int bquant_offset;    
+		1, //vhqmode		    
+		1, // chroma me
+		0, // turbo
+		0, // Packed bitstream - Not Xvid Default
+		1, // closed_gop
+		0  // bframe_threshold
 		    }
 };;
 

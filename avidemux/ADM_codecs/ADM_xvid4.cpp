@@ -122,6 +122,13 @@ void     xvid4Encoder::createUpdate(void )
 		xvid_enc_create.max_key_interval=_param.max_key_interval;		
 		xvid_enc_create.bquant_ratio = 	_param.bquant_ratio;
 		xvid_enc_create.bquant_offset = 	_param.bquant_offset;
+		
+		if (_param.packed)
+			xvid_enc_create.global |= XVID_GLOBAL_PACKED;
+		
+		if (_param.closed_gop)
+			xvid_enc_create.global |= XVID_GLOBAL_CLOSED_GOP;
+		
 		for(uint32_t i=0;i<3;i++)
 		{
 			xvid_enc_create.min_quant[i]=_param.qmin[i];
@@ -158,6 +165,13 @@ void     xvid4Encoder::createUpdate(void )
 	
 	C_ME(HALFPELREFINE16);
 	C_ME(HALFPELREFINE8);
+	
+	// Turbo Mode
+	C_ME(FASTREFINE16);
+	C_ME(FASTREFINE8);
+	C_ME(SKIP_DELTASEARCH);
+	C_ME(FAST_MODEINTERPOLATE);
+	C_ME(BFRAME_EARLYSTOP);
 	
 	C_ME(GME_REFINE);
 	C_ME(QUARTERPELREFINE8);
@@ -276,17 +290,24 @@ uint8_t     xvid4Encoder::preAmble(uint8_t *in )
 			
 			xvid_enc_frame.motion    |= XVID_ME_QUARTERPELREFINE16;
 			xvid_enc_frame.motion    |= XVID_ME_QUARTERPELREFINE8;	
-			// Remove hpel stuff
-			///xvid_enc_frame.motion&=~(XVID_ME_HALFPELREFINE16+XVID_ME_HALFPELREFINE8);
-						
 		}
-	else		
-		{
 			
-			xvid_enc_frame.vop_flags|=XVID_VOP_HALFPEL;						
-			xvid_enc_frame.motion|=(XVID_ME_HALFPELREFINE16+XVID_ME_HALFPELREFINE8);
-									
+	if (_param.gmc)
+		{
+			xvid_enc_frame.vol_flags |= XVID_VOL_GMC;
+			xvid_enc_frame.motion    |= XVID_ME_GME_REFINE;
 		}
+									
+	if (_param.turbo)
+		{
+			xvid_enc_frame.motion    |= XVID_ME_FASTREFINE16;
+			xvid_enc_frame.motion    |= XVID_ME_FASTREFINE8;
+			xvid_enc_frame.motion    |= XVID_ME_SKIP_DELTASEARCH;
+			xvid_enc_frame.motion	 |= XVID_ME_FAST_MODEINTERPOLATE;
+			xvid_enc_frame.motion	 |= XVID_ME_BFRAME_EARLYSTOP;
+		}
+		
+	xvid_enc_frame.bframe_threshold = 	_param.bframe_threshold;
 		
 	xvid_enc_frame.input.csp = XVID_CSP_YV12;
 	xvid_enc_frame.input.stride[0] = _w;
@@ -561,7 +582,7 @@ int ret;
 	
 	preAmble(in);
 	
-	xvid_enc_frame.quant = 2;
+	//xvid_enc_frame.quant = 2;
 	xvid_enc_frame.bitstream = out;
 	xvid_enc_frame.input.plane[0] = in;
 	
