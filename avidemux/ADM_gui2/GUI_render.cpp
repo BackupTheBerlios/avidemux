@@ -157,6 +157,10 @@ char *displ;
 	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
 	// in that case we do not even try to use accel
 	displ=getenv("DISPLAY");
+	if(!displ)
+	{
+		return 0;
+	}
 	if(strcmp(displ,":0") && strcmp(displ,":0.0"))
 	{
 		printf("Looks like remote display, no Xv :%s\n",displ);
