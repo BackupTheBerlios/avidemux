@@ -266,6 +266,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
 			break;
 
 		case PIX_FMT_YUV422P:
+			//printf("422p\n");
 			stridex[0]=	_frame.linesize[0 ];
 			stridex[1]=	_frame.linesize[1 ];
 			stridex[2]=	_frame.linesize[2 ];
@@ -291,7 +292,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
 		// Default is YV12 or I420
 		// In that case depending on swap u/v
 		// we do it or not
-
+				//printf("420p\n");
 				src= (uint8_t **) _frame.data;
 #ifndef ADM_BIG_ENDIAN_ZZ
 			if(_postproc.postProcType && _postproc.postProcStrength)
@@ -376,14 +377,21 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 				  	tmp+=stride;
    				  	otmp+=_w;
 				}
-		stride=  _frame.linesize[1 ];
+		
 
 		if(!_swapUV)
+		{
 			tmp= src[1];
+			stride=  _frame.linesize[1];
+		}
 		else
-			tmp= src[2];
+		{
+			tmp= src[2];			
+			stride=  _frame.linesize[2];
+		}
+			
 
-		otmp= out+_w*_h+((_w*_h)>>2);
+		otmp= out+((5*_w*_h)>>2);
 
 		for(uint32_t y=_h>>1;y>0;y--)
 			{
@@ -392,9 +400,15 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
    				  	otmp+=_w>>1;
 				}
 		if(!_swapUV)
-			tmp= src[2];
+		{
+			tmp= src[2];			
+			stride=  _frame.linesize[2];
+		}
 		else
+		{
 			tmp= src[1];
+			stride=  _frame.linesize[1];
+		}
 		otmp= out+_w*_h;
 
 		for(uint32_t y=_h>>1;y>0;y--)
