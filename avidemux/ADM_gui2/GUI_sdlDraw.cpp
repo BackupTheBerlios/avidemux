@@ -47,7 +47,7 @@ static uint8_t sdl_running=0;
 static SDL_Overlay *sdl_overlay=NULL;
 static SDL_Surface *sdl_display=NULL;
 static SDL_Rect disp;
-#define TEST_YU2 1
+//#define TEST_YU2 1
 
 extern void YV12_422( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h);
 sdlAccelRender::sdlAccelRender( void)
@@ -113,7 +113,7 @@ int flags;
 	
 	//_______________________________________________________
 	sdl_overlay=SDL_CreateYUVOverlay(w,h,
-#if defined(CONFIG_DARWIN) || defined(TEST_YU2)	
+#if defined(CONFIG_DARWIN)|| defined(TEST_YU2)	
 		SDL_YUY2_OVERLAY
 #else		
 		SDL_YV12_OVERLAY

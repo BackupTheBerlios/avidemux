@@ -64,12 +64,6 @@ CALLBACK(none1                			,ACT_AudioSourceNone);
 CALLBACK(external_wav1                		,ACT_AudioSourceWAV);
 CALLBACK(build_vbr_time_map1      		,ACT_AudioMap);
 
-CALLBACK(oss				      		,ACT_SelectDevOSS);
-CALLBACK(arts1				      		,ACT_SelectDevArts);
-CALLBACK(alsa1				      	,ACT_SelectDevALSA);
-CALLBACK(none2				      	,ACT_SelectDevDummy);
-
-
 
  CALLBACK(index_mpeg1                		,ACT_MpegIndex);
  CALLBACK(cut_wizard1                		,ACT_CutWizard);

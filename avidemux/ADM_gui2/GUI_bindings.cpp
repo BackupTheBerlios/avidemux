@@ -560,32 +560,7 @@ int i;
 		in=2->oss
 
 */
-void GUI_SetArts( uint8_t in )
-{
-	switch(in)
-	{
-		case 0:
-			 	gtk_check_menu_item_set_active  (
-	 				GTK_CHECK_MENU_ITEM (lookup_widget(guiRootWindow,"arts1"))
-					, TRUE);
-				break;
-		case 1:
 
-				gtk_check_menu_item_set_active  (
-	 				GTK_CHECK_MENU_ITEM (lookup_widget(guiRootWindow,"alsa1"))
-					, TRUE);
-			break;
-		case 2:
-
-				gtk_check_menu_item_set_active  (
-	 				GTK_CHECK_MENU_ITEM (lookup_widget(guiRootWindow,"oss"))
-					, TRUE);
-			break;
-
-		default:
-			assert(0);
-		}
-}
 void UI_iconify( void )
 {
 	gtk_window_iconify(GTK_WINDOW(guiRootWindow));
