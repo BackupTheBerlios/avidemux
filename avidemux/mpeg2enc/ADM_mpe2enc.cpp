@@ -41,7 +41,7 @@
 #include "ADM_library/default.h"
 
 static uint8_t mpeg2_running=0;
-#define MAX_BR_M 10000*1000
+#define MAX_BR_M 50000*1000
 //#define TEST_NOB 1 // disable B frames
 Mpeg2enc::Mpeg2enc( uint32_t width,uint32_t height) :encoder(width,height)
              				{
@@ -205,6 +205,8 @@ uint8_t Mpeg2encSVCD::init( uint32_t qz, uint32_t maxbr ,uint32_t fps1000,
 		if(fast)
 		{
 			_settings._44_red=_settings._22_red=4;	// Turbo pass 1
+			_settings.format=3;	
+			_settings.video_buffer_size=1000;
 		}
 		
 #ifdef TEST_NOB		
@@ -256,6 +258,8 @@ uint8_t Mpeg2encDVD::init( uint32_t qz, uint32_t maxbr ,uint32_t fps1000
 		if(fast)
 		{
 			_settings._44_red=_settings._22_red=4;	// Turbo pass 1
+			_settings.format=3;	
+			_settings.video_buffer_size=1000;
 		}
 		mpeg2_running=1;
 		return (uint8_t ) mpegenc_init(&_settings,(int) _w, (int)_h, (int) fps1000);
