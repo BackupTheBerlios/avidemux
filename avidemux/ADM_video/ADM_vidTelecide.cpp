@@ -61,6 +61,7 @@ ADMVideoTelecide::ADMVideoTelecide(	AVDMGenericVideoStream *in,CONFcouple *setup
 										: ADMVideoFields(in,setup)
 {
 	vidCache=new VideoCache(4,in);
+	_uncompressed=new ADMImage(_info.width,_info.height);
   	
 }
 ADMVideoTelecide::~ADMVideoTelecide()
@@ -68,6 +69,7 @@ ADMVideoTelecide::~ADMVideoTelecide()
  	
 	delete vidCache;
 	vidCache=NULL;
+	delete _uncompressed;
 	
 }
 /*
@@ -141,7 +143,7 @@ ADMImage	*cur,*next;
 		// for u & v , no action -> copy it as is
 		memcpy(UPLANE(data),UPLANE(cur),uvlen>>2);
 		memcpy(VPLANE(data),VPLANE(cur),uvlen>>2);
-		data->_Qp=cur->_Qp;
+		data->copyInfo(cur);
 
         	// No interleaving detected
            	if(!(motion=hasMotion(data)) )
@@ -160,13 +162,13 @@ ADMImage	*cur,*next;
 */
 		// Interleav next in even field
 		
-		interleave(cur,data,1);
-		interleave(next,data,0);
-		nmatch=getMatch(data);
+		interleave(cur,_uncompressed,1);
+		interleave(next,_uncompressed,0);
+		nmatch=getMatch(_uncompressed);
 		
-		interleave(cur,data,0);
-		interleave(next,data,1);
-		n2match=getMatch(data);
+		interleave(cur,_uncompressed,0);
+		interleave(next,_uncompressed,1);
+		n2match=getMatch(_uncompressed);
 
 		printf(" Cur  : %lu \n",cmatch);
 		printf(" Next : %lu \n",nmatch);
@@ -175,32 +177,37 @@ ADMImage	*cur,*next;
 		if((cmatch<nmatch)&&(cmatch<n2match))
 		{
 			printf("\n __ pure interlaced __\n");
-			interleave(cur,data,0);
-			interleave(cur,data,1);
-			hasMotion(data);
-	  		doBlend(data);
+			interleave(cur,_uncompressed,0);
+			interleave(cur,_uncompressed,1);
+			hasMotion(_uncompressed);
+	  		doBlend(_uncompressed,data);			
 			vidCache->unlockAll();
 			return 1;
 		}
 		if( nmatch > n2match)
 		{
 			printf("\n -------Shifted-P is better \n");	
-			if(hasMotion(data))
+			if(hasMotion(_uncompressed))
 			{
-				 doBlend(data);
+				 doBlend(_uncompressed,data);
 				 printf(" but there is still motion \n");
 			}
+			else
+				data->duplicate(_uncompressed);
+
 		}
 		else
 		{
 			printf("\n -------Shifted-O is better \n");
-			interleave(cur,data,1);
-			interleave(next,data,0);
-			if(hasMotion(data))
+			interleave(cur,_uncompressed,1);
+			interleave(next,_uncompressed,0);
+			if(hasMotion(_uncompressed))
 			{
-				 doBlend(data);
+				 doBlend(_uncompressed,data);
 				 printf(" but there is still motion \n");
 			}
+			else
+				data->duplicate(_uncompressed);
 		}
 		// which chroma is better ? from current or from next ?
 		// search for a transition and see if there is also one ?

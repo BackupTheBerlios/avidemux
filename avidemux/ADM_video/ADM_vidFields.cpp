@@ -172,31 +172,33 @@ uint8_t ADMVideoFields::hasMotion(ADMImage *image)
 
 }
 
-uint8_t ADMVideoFields::doBlend(ADMImage *img)
+uint8_t ADMVideoFields::doBlend(ADMImage *src,ADMImage *dst)
 {
-   		uint32_t w,h,x; //,y;
+   	uint32_t w,h,x; //,y;
       	uint8_t *n,*p,*c,*e2;
-	uint8_t *f=YPLANE(img);
+	uint8_t *f;
 	uint8_t *yplane;
-//       int32_t val;
 
-	yplane=YPLANE(img);
+
+	
      	w=_info.width;
      	h=_info.height;
 
-	p=yplane;
-	c=p+w;
+	f=YPLANE(dst);
+	yplane=YPLANE(src);
+	p=yplane;	
+	c=yplane;
 	n=c+w;
-	e2=_motionmask2+w; 	
-           // First line
-           // always blend
-            for(x=w;x>0;x--)
-            {
-               	*f++=(*c+*n)>>1;
-                	  n++;
-                   c++;
-
-              }
+	e2=_motionmask2+w; 
+	
+	// First line
+	// always blend
+	for(x=w;x>0;x--)
+	{
+		*f++=(*c+*n)>>1;
+		n++;
+		c++;
+	}
              #if defined(USE_MMX) && defined(ASM_BLEND)
               blend_MMX(p,c,n,e2,f);
              #else

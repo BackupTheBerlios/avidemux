@@ -51,7 +51,8 @@ typedef struct DEINT_PARAM
 											uint8_t *e2
 												);
 
-           uint8_t 							doBlend(ADMImage *img);
+           uint8_t 							doBlend(ADMImage *src,
+	   									ADMImage *dst);
            void							blend_C(uint8_t *p,uint8_t *c,
 											uint8_t *n,
 											uint8_t *e,

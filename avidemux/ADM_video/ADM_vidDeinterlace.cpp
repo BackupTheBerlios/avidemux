@@ -53,12 +53,14 @@ BUILD_CREATE(deinterlace_create,ADMVideoDeinterlace);
 ADMVideoDeinterlace::~ADMVideoDeinterlace()
 {
  	
+	delete _uncompressed;
+	_uncompressed=NULL;
 }
 ADMVideoDeinterlace::ADMVideoDeinterlace(  AVDMGenericVideoStream *in,CONFcouple *couples)
 		:ADMVideoFields(in,couples)
 {
 
-
+	_uncompressed=new ADMImage(_info.width,_info.height);
 }
 
 //
@@ -78,21 +80,24 @@ uint32_t uvlen;
 		
 								
 		// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;         	
-
-		*len= _info.width*_info.height+(_info.width*_info.height>>1);       			
-
-		// for u & v , no action -> copy it as is
-		uvlen=    _info.width*_info.height;
+       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;         	
 		
+		uvlen=    _info.width*_info.height;
+		*len= (uvlen*3)>>1;       			
+
 		// No interleaving detected
-		if(!hasMotion(data))
+		if(!hasMotion(_uncompressed))
            	{
+			data->duplicate(_uncompressed);
 			
 		}
 		else
 		{
-			doBlend((data));
+			//printf("Blending\n");
+			doBlend(_uncompressed,data);
+			memcpy(UPLANE(data),UPLANE(_uncompressed),uvlen>>2);
+			memcpy(VPLANE(data),VPLANE(_uncompressed),uvlen>>2);
+			data->copyInfo(_uncompressed);
 		}
 		return 1;
 }
