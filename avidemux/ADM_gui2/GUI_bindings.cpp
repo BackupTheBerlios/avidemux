@@ -355,7 +355,8 @@ void UI_updateFrameCount(uint32_t curFrame)
 }
 void UI_setFrameCount(uint32_t curFrame,uint32_t total)
 {
-    char text[80];   
+    char text[80]; 
+    if(total) total--; // We display from 0 to X  
     // frames 
    // sprintf(text, "%lu ", curFrame);
    // gtk_label_set_text((GtkLabel *) guiCurFrame, text);

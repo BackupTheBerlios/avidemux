@@ -173,7 +173,7 @@ void GUI_PlayAvi(void)
 	  //printf("\n Rendering %lu frame\n",curframe);
 	  // read frame in chunk
 //	if (!video_body->getUncompressedFrame(curframe + 1, rdr_decomp_buffer))
-	if((played_frame)>=(max-2))
+	if((played_frame)>=(max-1))
 	{
 		printf("\n End met (%lu  / %lu )\n",played_frame,max);
 		goto abort_play;

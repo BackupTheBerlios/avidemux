@@ -58,6 +58,9 @@ uint32_t flags;
     if (playing)
 	return;
 
+    if( avifileinfo && curframe + 1 == avifileinfo->nb_frames )
+	return;
+
     if (avifileinfo)
       {
         if( !video_body->getUncompressedFrame(curframe + 1,rdr_decomp_buffer,&flags))
