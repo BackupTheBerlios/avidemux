@@ -1,6 +1,6 @@
 /*
  * cpu_accel.c
- * Copyright (C) 2000-2002 Michel Lespinasse <walken@zoy.org>
+ * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *
  * This file is part of mpeg2dec, a free MPEG-2 video stream decoder.
@@ -24,17 +24,10 @@
 #include "config.h"
 
 #include <inttypes.h>
-#include <signal.h>
 
 #include "mpeg2.h"
-
-
-/*
-
-
-*/
-
-#define ACCEL_DETECT
+#include "attributes.h"
+#include "mpeg2_internal.h"
 
 #ifdef ACCEL_DETECT
 #ifdef ARCH_X86
@@ -44,7 +37,7 @@ static inline uint32_t arch_accel (void)
     int AMD;
     uint32_t caps;
 
-#ifndef PIC
+#if !defined(PIC) && !defined(__PIC__)
 #define cpuid(op,eax,ebx,ecx,edx)	\
     __asm__ ("cpuid"			\
 	     : "=a" (eax),		\
@@ -115,17 +108,14 @@ static inline uint32_t arch_accel (void)
 }
 #endif /* ARCH_X86 */
 
-#ifdef ARCH_PPC
+#if defined(ARCH_PPC) || defined(ARCH_SPARC)
 #include <signal.h>
 #include <setjmp.h>
- typedef void (*sighandler_t)(int);
 
 static sigjmp_buf jmpbuf;
 static volatile sig_atomic_t canjump = 0;
-// MEANX : Workaround see how it was done before
-//static RETSIGTYPE sigill_handler (int sig)
 
-static sighandler_t sigill_handler (int sig)
+static RETSIGTYPE sigill_handler (int sig)
 {
     if (!canjump) {
 	signal (sig, SIG_DFL);
@@ -136,25 +126,71 @@ static sighandler_t sigill_handler (int sig)
     siglongjmp (jmpbuf, 1);
 }
 
+#ifdef ARCH_PPC
 static inline uint32_t arch_accel (void)
 {
-    signal (SIGILL, sigill_handler);
+    static RETSIGTYPE (* oldsig) (int);
+
+    oldsig = signal (SIGILL, sigill_handler);
     if (sigsetjmp (jmpbuf, 1)) {
-	signal (SIGILL, SIG_DFL);
+	signal (SIGILL, oldsig);
 	return 0;
     }
 
     canjump = 1;
 
+#ifdef HAVE_ALTIVEC_H	/* gnu */
+#define VAND(a,b,c) "vand " #a "," #b "," #c "\n\t"
+#else			/* apple */
+#define VAND(a,b,c) "vand v" #a ",v" #b ",v" #c "\n\t"
+#endif
     asm volatile ("mtspr 256, %0\n\t"
-		  "vand %%v0, %%v0, %%v0"
+		  VAND (0, 0, 0)
 		  :
 		  : "r" (-1));
 
-    signal (SIGILL, SIG_DFL);
+    canjump = 0;
+
+    signal (SIGILL, oldsig);
     return MPEG2_ACCEL_PPC_ALTIVEC;
 }
 #endif /* ARCH_PPC */
+
+#ifdef ARCH_SPARC
+static inline uint32_t arch_accel (void)
+{
+    static RETSIGTYPE (* oldsig) (int);
+
+    oldsig = signal (SIGILL, sigill_handler);
+    if (sigsetjmp (jmpbuf, 1)) {
+	signal (SIGILL, oldsig);
+	return 0;
+    }
+
+    canjump = 1;
+
+    /* pdist %f0, %f0, %f0 */
+    __asm__ __volatile__(".word\t0x81b007c0");
+
+    canjump = 0;
+
+    if (sigsetjmp (jmpbuf, 1)) {
+	signal (SIGILL, oldsig);
+	return MPEG2_ACCEL_SPARC_VIS;
+    }
+
+    canjump = 1;
+
+    /* edge8n %g0, %g0, %g0 */
+    __asm__ __volatile__(".word\t0x81b00020");
+
+    canjump = 0;
+
+    signal (SIGILL, oldsig);
+    return MPEG2_ACCEL_SPARC_VIS | MPEG2_ACCEL_SPARC_VIS2;
+}
+#endif /* ARCH_SPARC */
+#endif /* ARCH_PPC || ARCH_SPARC */
 
 #ifdef ARCH_ALPHA
 static inline uint32_t arch_accel (void)
@@ -168,7 +204,7 @@ static inline uint32_t arch_accel (void)
 					 MPEG2_ACCEL_ALPHA_MVI);
 }
 #endif /* ARCH_ALPHA */
-#endif
+#endif /* ACCEL_DETECT */
 
 uint32_t mpeg2_detect_accel (void)
 {
@@ -176,11 +212,21 @@ uint32_t mpeg2_detect_accel (void)
 
     accel = 0;
 #ifdef ACCEL_DETECT
-#ifdef LIBMPEG2_MLIB
-    accel = MPEG2_ACCEL_MLIB;
-#endif
-#if defined (ARCH_X86) || defined (ARCH_PPC) || defined (ARCH_ALPHA)
-    accel |= arch_accel ();
+#if defined (ARCH_X86) || defined (ARCH_PPC) || defined (ARCH_ALPHA) || defined (ARCH_SPARC)
+    accel = arch_accel ();
+#define PRT(x) if(accel & x) printf("Mpeg2dec accel :"#x"\n");
+#ifdef ARCH_X86
+	printf("Mpeg2dec: X86 CPU accel in use:\n");
+	PRT(MPEG2_ACCEL_X86_MMX);
+	PRT(MPEG2_ACCEL_X86_3DNOW);
+	PRT(MPEG2_ACCEL_X86_MMXEXT);
+#endif	
+#ifdef 	ARCH_PPC
+	printf("Mpeg2dec: PPC CPU accel in use:\n");
+	PRT(MPEG2_ACCEL_PPC_ALTIVEC);
+#endif	
+	
+    
 #endif
 #endif
     return accel;

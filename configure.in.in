@@ -39,7 +39,7 @@ dnl Perform program name transformation
 AC_ARG_PROGRAM
 
 dnl Automake doc recommends to do this only here. (Janos)
-AM_INIT_AUTOMAKE(avidemux,2.0.22)
+AM_INIT_AUTOMAKE(avidemux,2.0.23cvs)
 
 dnl almost the same like KDE_SET_PEFIX but the path is /usr/local
 dnl
@@ -302,6 +302,7 @@ AC_TRY_COMPILE([
   #include <math.h>
 ],[
   int arg = 0;
+	arg=lrintf(0.5);
 ],[
   have_lrintf=yes
 ])
@@ -346,7 +347,7 @@ iconv_t _conv;
 ],[
   have_consticonv=no
 ])
-if test have_consticonv = xno ; then
+if test x$have_consticonv = xyes ; then
   AC_DEFINE(ICONV_NEED_CONST,1,[Stricter prototyping])
 fi
 AC_MSG_RESULT($have_consticonv)
@@ -726,6 +727,8 @@ AC_DEFINE(CONFIG_ENCODERS,1,[FFMPEG])
 AC_DEFINE(CONFIG_DECODERS,1,[FFMPEG])
 AC_DEFINE(CONFIG_MPEGAUDIO_HP,1,[FFMPEG])
 
+dnl_________mpeg2dec_______________
+AC_DEFINE(ACCEL_DETECT,1,[MPEG2DEC])
 
 dnl ______________________________________________________
   AC_SUBST(LMPG_OPT)
