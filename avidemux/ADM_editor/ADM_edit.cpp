@@ -498,18 +498,20 @@ TryAgain:
 			return 1;
 		}
 		printf("\n checking for B-Frames...\n");
-		if( vid->_nb_video_frames >15) // 12
+		if( vid->_nb_video_frames >12) // 12
 		{
 				uint8_t 		*bufferin;
 				uint32_t 		len,flags,flag2;
 				uint8_t 		bframe=0, bconsistency=1;
-
+				uint32_t		scanned=12;
 				//buffer=new uint8_t [info.width* info.height*2];
+				if(vid->_nb_video_frames>50) scanned=50;
+				else				scanned=vid->_nb_video_frames;
 				
 				bufferin=new uint8_t [info.width* info.height*2];
 				ADMImage *buffer=new ADMImage(info.width,info.height);
 				// we decode 5 frames..should be enough to get an opinion
-				for(uint32_t i=0;i<13;i++)  //10
+				for(uint32_t i=0;i<scanned;i++)  //10
 				{
 					flags=flag2=0;
   					vid->_aviheader->getFrameNoAlloc (i,
