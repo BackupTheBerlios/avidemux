@@ -36,6 +36,7 @@
 # include <config.h>
 #include "ADM_gui2/support.h"
 #include "toolkit_gtk.h"
+#include "ADM_assert.h"
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
@@ -48,6 +49,36 @@ static GtkWidget	*create_dialogYN (void);
 static GtkWidget	*create_dialogOK (void);
 static int beQuiet=0;
 
+static GtkWidget *widgetStack[10];
+static int	  widgetCount=0;
+
+void gtk_register_dialog(GtkWidget *newdialog)
+{
+
+	widgetStack[widgetCount]=newdialog;
+	widgetCount++;
+}
+void gtk_unregister_dialog(GtkWidget *newdialog)
+{
+	ADM_assert(widgetCount);
+	ADM_assert(widgetStack[widgetCount-1]==newdialog);
+	widgetCount--;
+
+}
+void		gtk_transient(GtkWidget *widget)
+{
+GtkWidget *top;
+	assert(widgetCount);
+	top=widgetStack[widgetCount-1];
+	
+	gtk_window_set_modal(GTK_WINDOW(widget), 1);
+	gtk_window_set_transient_for (GTK_WINDOW(widget),GTK_WINDOW(top));
+	
+	
+	
+
+
+}
 
 /**
 	GUI_Quiet : Prevents gui from poping alert

@@ -1,7 +1,8 @@
 #include <config.h>
 #include "ADM_lavcodec.h"
 
-
+#include <stdio.h>
+#include <stdlib.h>
 #include "ADM_assert.h" 
 
 #include <gdk/gdkkeysyms.h>

@@ -54,6 +54,7 @@ DIA_encoding::DIA_encoding( uint32_t fps1000 )
 	_current=0;
 	setFps(fps1000);
 	dialog=create_dialog1();
+	gtk_register_dialog(dialog);
 	//gtk_transient(dialog);
 	gtk_signal_connect(GTK_OBJECT(WID(closebutton1)), "clicked",
                       GTK_SIGNAL_FUNC(DIA_stop),                   NULL);
@@ -94,6 +95,7 @@ void DIA_stop( void)
 DIA_encoding::~DIA_encoding( )
 {
 	ADM_assert(dialog);
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	dialog=NULL;
 	UI_deiconify();

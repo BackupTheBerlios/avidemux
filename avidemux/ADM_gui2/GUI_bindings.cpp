@@ -144,8 +144,9 @@ uint8_t initGUI( void )
 uint8_t ret=0;
 		// create top window
 		guiRootWindow=create_mainWindow();
-		if(!guiRootWindow) return 0;
 		
+		if(!guiRootWindow) return 0;
+		gtk_register_dialog(guiRootWindow);
 					
 		// and seek global sub entity
 		ret= bindGUI();		
@@ -161,17 +162,6 @@ uint8_t ret=0;
 	Set the parameter widget as transient 
 	for the main window
 */
-void		gtk_transient(GtkWidget *widget)
-{
-	if(!guiRootWindow) return;
-	gtk_window_set_modal(GTK_WINDOW(widget), 1);
-	gtk_window_set_transient_for (GTK_WINDOW(widget),GTK_WINDOW(guiRootWindow));
-	// set it modal also
-	
-	//gtk_window_set_transient_for (GTK_WINDOW(guiRootWindow),GTK_WINDOW(widget));
-
-
-}
 ///_____________________________________________________
 /// retrieve gtkwidget through their name
 /// the aim is to avoid having to modify the glade generated file

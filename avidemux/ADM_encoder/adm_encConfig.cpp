@@ -50,6 +50,7 @@
 #define MODULE_NAME MODULE_ENCODER
 #include "ADM_toolkit/ADM_debug.h"
 
+#include "ADM_dialog/DIA_enter.h"
 
 extern void UI_setVProcessToggleStatus( uint8_t status );
 extern void GUI_setVideoCodec(Action action );
@@ -939,8 +940,15 @@ void videoCodecConfigureUI( void )
 		case CodecFFV1:
 				break;
 		case CodecSnow:
-					ffmpegConfig.generic.mode=COMPRESS_CQ;
-					ffmpegConfig.generic.qz=4;
+				{
+					//ffmpegConfig.generic.mode=COMPRESS_CQ;
+					int val=ffmpegConfig.generic.qz;
+					
+					  if(DIA_GetIntegerValue(&val, 2, 31, "Snow Quantizer","Snow Quantizer"))
+					  {
+						ffmpegConfig.generic.qz=val;;
+					  }
+				}
 					break;
 
 		case  CodecH263P:
