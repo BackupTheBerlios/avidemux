@@ -165,13 +165,13 @@ uint8_t slowYV12RGB(uint8_t * ptr_y,
 		g = (y +g1)>>21;    \
 		b = (y +b1)>>21;    \
     CLIP(r);CLIP(g);CLIP(b); \
-	*ptr2++=r;	*ptr2++=g;	*ptr2++=b;
+	*ptr2++=r;	*ptr2++=g;	*ptr2++=b;ptr2++;
 #define MMM2(y) \
 	  r = (y +r1)>>21;    \
 		g = (y +g1)>>21;    \
 		b = (y +b1)>>21;    \
     CLIP(r);CLIP(g);CLIP(b); \
-	*ptr2++=r;	*ptr2++=g;	*ptr2++=b;
+	*ptr2++=r;	*ptr2++=g;	*ptr2++=b;ptr2++;
 
 	  y0 = (*ptr_y++) <<21;
 	  y1 = (*ptr_y++) <<21;
