@@ -202,7 +202,7 @@ UNUSED_ARG(_keep_right_luma);
 UNUSED_ARG(_keep_left_luma);
 		
 __asm__ __volatile__(
-"StartASM1: \n\t"
+"StartASM1%=: \n\t"
 "movl "Mangle(_l_source)",%%esi \n\t"
 "movl "Mangle(_l_dest)", %%edi \n\t"
 
@@ -215,7 +215,7 @@ __asm__ __volatile__(
 "movl "Mangle(w8)", %%ecx \n\t"                // -width/8
 "prefetchnta -128(%%esi) \n\t"        // preload cache
 "prefetchnta -128(%%eax) \n\t"
-"HLine:  \n\t"
+"HLine%=:  \n\t"
 "movq (%%esi,%%ecx,8),%%mm0 \n\t"     // mm0 <- lsource+(size/8)*8
 "movq (%%eax,%%ecx,8),%%mm1 \n\t"     // mm1 <- lprev+(size/8)*8
 "movq %%mm0,%%mm2 \n\t"               // mm2 <- mm0  source
@@ -245,7 +245,7 @@ __asm__ __volatile__(
 "movntq %%mm0,(%%edi,%%ecx,8) \n\t"   // store to des+ecx*8
 "movntq %%mm0,(%%ebx,%%ecx,8) \n\t"   // store to mask+ecx*8
 "sub $1,%%ecx \n\t"                  // add 1 to ecv
-"jnz HLine \n\t"                      // while !=0
+"jnz HLine%= \n\t"                      // while !=0
 #ifdef LOOP		
 /*		_l_source += _pitch_source;
 		_l_prev += _pitch_source;
