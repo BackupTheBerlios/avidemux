@@ -14,10 +14,8 @@
 #include <gtk/gtk.h>
 
 
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
 # include <config.h>
+
 #include "callbacks.h"
 #include "avi_vars.h"
 #include "ADM_gui2/support.h"
@@ -28,6 +26,7 @@
 # include "prefs.h"
 #include "ADM_audiodevice/audio_out.h"
 
+#include "ADM_assert.h"
 static GtkWidget	*create_dialog1 (void);
 
 static void on_callback_toolame(GtkButton * button, gpointer user_data);
@@ -63,7 +62,11 @@ uint32_t k;
 
 	
 	CONNECT(buttonToolame,on_callback_toolame);
-	
+	// Alsa
+        if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &str) != RC_OK )
+               str = ADM_strdup("plughw:0,0");
+        gtk_write_entry_string(WID(entryAlsa), str);
+        ADM_dealloc(str);
 	// prepare
 	
 	if(!prefs->get(TOOLAME_PATH, &str))
@@ -131,6 +134,11 @@ uint32_t k;
                 
 		autosplit=gtk_read_entry(WID(entry_mpeg2enc));
 		prefs->set(SETTINGS_MPEGSPLIT, autosplit);
+                
+                //alsa device
+                str=gtk_editable_get_chars(GTK_EDITABLE (WID(entryAlsa)), 0, -1);
+                if(str)
+                        prefs->set(DEVICE_AUDIO_ALSA_DEVICE, str);
 		
 	}
 
@@ -165,7 +173,8 @@ gint r;
 
 }
 
-GtkWidget       *create_dialog1 (void)
+GtkWidget*
+create_dialog1 (void)
 {
   GtkWidget *dialog;
   GtkWidget *dialog_vbox1;
@@ -189,10 +198,16 @@ GtkWidget       *create_dialog1 (void)
   GtkWidget *label17;
   GtkWidget *entry_mpeg2enc;
   GtkWidget *label1;
+  GtkWidget *frame2;
+  GtkWidget *vbox2;
   GtkWidget *hbox2;
   GtkWidget *label11;
   GtkWidget *optionmenu1;
   GtkWidget *menu1;
+  GtkWidget *hbox3;
+  GtkWidget *label19;
+  GtkWidget *entryAlsa;
+  GtkWidget *label18;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
@@ -336,28 +351,56 @@ GtkWidget       *create_dialog1 (void)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  label1 = gtk_label_new (_("Paths"));
+  label1 = gtk_label_new (_("<b>Paths</b>"));
   gtk_widget_show (label1);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label1);
   gtk_label_set_use_markup (GTK_LABEL (label1), TRUE);
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
 
+  frame2 = gtk_frame_new (NULL);
+  gtk_widget_show (frame2);
+  gtk_box_pack_start (GTK_BOX (vbox1), frame2, FALSE, FALSE, 0);
+
+  vbox2 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox2);
+  gtk_container_add (GTK_CONTAINER (frame2), vbox2);
+
   hbox2 = gtk_hbox_new (FALSE, 5);
   gtk_widget_show (hbox2);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbox2, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox2), hbox2, TRUE, TRUE, 0);
 
   label11 = gtk_label_new (_("Audio device:"));
   gtk_widget_show (label11);
-  gtk_box_pack_start (GTK_BOX (hbox2), label11, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox2), label11, FALSE, TRUE, 0);
   gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
 
   optionmenu1 = gtk_option_menu_new ();
   gtk_widget_show (optionmenu1);
-  gtk_box_pack_start (GTK_BOX (hbox2), optionmenu1, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox2), optionmenu1, FALSE, TRUE, 0);
 
   menu1 = gtk_menu_new ();
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu1), menu1);
+
+  hbox3 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox3);
+  gtk_box_pack_start (GTK_BOX (vbox2), hbox3, TRUE, TRUE, 0);
+
+  label19 = gtk_label_new (_("Device for Alsa :"));
+  gtk_widget_show (label19);
+  gtk_box_pack_start (GTK_BOX (hbox3), label19, FALSE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (label19), GTK_JUSTIFY_LEFT);
+
+  entryAlsa = gtk_entry_new ();
+  gtk_widget_show (entryAlsa);
+  gtk_box_pack_start (GTK_BOX (hbox3), entryAlsa, FALSE, TRUE, 0);
+  gtk_entry_set_max_length (GTK_ENTRY (entryAlsa), 10);
+
+  label18 = gtk_label_new (_("<b>Audio</b>"));
+  gtk_widget_show (label18);
+  gtk_frame_set_label_widget (GTK_FRAME (frame2), label18);
+  gtk_label_set_use_markup (GTK_LABEL (label18), TRUE);
+  gtk_label_set_justify (GTK_LABEL (label18), GTK_JUSTIFY_LEFT);
 
   dialog_action_area1 = GTK_DIALOG (dialog)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -396,10 +439,16 @@ GtkWidget       *create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog, label17, "label17");
   GLADE_HOOKUP_OBJECT (dialog, entry_mpeg2enc, "entry_mpeg2enc");
   GLADE_HOOKUP_OBJECT (dialog, label1, "label1");
+  GLADE_HOOKUP_OBJECT (dialog, frame2, "frame2");
+  GLADE_HOOKUP_OBJECT (dialog, vbox2, "vbox2");
   GLADE_HOOKUP_OBJECT (dialog, hbox2, "hbox2");
   GLADE_HOOKUP_OBJECT (dialog, label11, "label11");
   GLADE_HOOKUP_OBJECT (dialog, optionmenu1, "optionmenu1");
   GLADE_HOOKUP_OBJECT (dialog, menu1, "menu1");
+  GLADE_HOOKUP_OBJECT (dialog, hbox3, "hbox3");
+  GLADE_HOOKUP_OBJECT (dialog, label19, "label19");
+  GLADE_HOOKUP_OBJECT (dialog, entryAlsa, "entryAlsa");
+  GLADE_HOOKUP_OBJECT (dialog, label18, "label18");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog, okbutton1, "okbutton1");

@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
-
+#include "prefs.h"
  
 
 #ifdef ALSA_SUPPORT
@@ -69,7 +69,8 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
 
   static char *pcm_name;
 
-	pcm_name = ADM_strdup("plughw:0,0");
+        if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &pcm_name) != RC_OK )
+	       pcm_name = ADM_strdup("plughw:0,0");
  /* Allocate the snd_pcm_hw_params_t structure on the stack. */
     snd_pcm_hw_params_alloca(&hwparams);
     snd_pcm_sw_params_alloca(&swparams);
@@ -82,8 +83,10 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
     /* been completely processed by the soundcard.                */
     if (snd_pcm_open(&pcm_handle, pcm_name, stream, SND_PCM_NONBLOCK) < 0) {
       fprintf(stderr, "Error opening PCM device %s\n", pcm_name);
+      ADM_dealloc(pcm_name);
       return(0);
     }
+    ADM_dealloc(pcm_name);
     // past this point we got _init=1 -> partially initialized
     _init=1;
       /* Init hwparams with full configuration space */
@@ -296,8 +299,9 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
 
 
   static char *pcm_name;
-
-	pcm_name = ADM_strdup("plughw:0,0");
+  if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &pcm_name) != RC_OK )
+               pcm_name = ADM_strdup("plughw:0,0");
+	
  /* Allocate the snd_pcm_hw_params_t structure on the stack. */
     snd_pcm_hw_params_alloca(&hwparams);
     snd_pcm_sw_params_alloca(&swparams);
@@ -317,8 +321,10 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
       /* Init hwparams with full configuration space */
     if (snd_pcm_hw_params_any(pcm_handle, hwparams) < 0) {
       fprintf(stderr, "Can not configure this PCM device.\n");
+      ADM_dealloc(pcm_name);
       return(0);
     }
+    ADM_dealloc(pcm_name);
     /* Set access type. This can be either    */
     /* SND_PCM_ACCESS_RW_INTERLEAVED or       */
     /* SND_PCM_ACCESS_RW_NONINTERLEAVED.      */

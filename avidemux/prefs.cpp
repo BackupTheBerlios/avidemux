@@ -81,6 +81,7 @@ static opt_def opt_defs [] = {
 	{"settings.mpegsplit",	UINT,	"790",	NULL,	"400",	"900"	},
 	{"codecs.preferredcodec",		STRING,"FFmpeg4",NULL, NULL, NULL },
 	{"device.audiodevice",	STRING,"OSS",	NULL, NULL, NULL },
+	{"device.audio.alsa_device",		STRING,"plughw:0,0",NULL, NULL, NULL },
 	{"lastfiles.file1",		STRING,"",	NULL, NULL, NULL },
 	{"lastfiles.file2",		STRING,"",	NULL, NULL, NULL },
 	{"lastfiles.file3",		STRING,"",	NULL, NULL, NULL },
@@ -103,7 +104,7 @@ static opt_def opt_defs [] = {
 	{"feature.use_odml",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 61;
+int num_opts = 62;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

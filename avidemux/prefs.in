@@ -54,6 +54,7 @@ settings.mpegsplit, UINT,790,	400,	900
 # codec settings
 codecs.preferredcodec,			STRING,	FFmpeg4
 device.audiodevice,			STRING,	OSS
+device.audio.alsa_device,               STRING, "plughw:0,0"
 # lastfiles
 lastfiles.file1,			STRING,	""
 lastfiles.file2,			STRING,	""
