@@ -46,12 +46,6 @@
 #define MODULE_NAME 0
 #include "ADM_toolkit/ADM_debug.h"
 
-void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size);
-#ifdef ADM_BIG_ENDIAN	
-	 #define MEMCPY(a,b,c) memcpyswap((uint8_t *)a, (uint8_t *)b,c)
-#else
-	#define MEMCPY memcpy
-#endif	
 
 uint8_t	ADM_ogmWriteCopy::initVideo(char *name)
 {

@@ -113,38 +113,57 @@ WAVHeader	*info=NULL;
 		
 			memset(&header,0,sizeof(header));
 		
+			uint64_t d64;
+			uint32_t d32;
+			uint16_t d16;
+			
 			memcpy(&(header.streamtype),"audio\0\0\0",8);
 			memset(&(header.subtype),0,4);
 			sprintf(string,"%04X",info->encoding);
 			//memcpy(&(header.subtype),&(info->encoding),2);
 			memcpy(&(header.subtype),string,4);
 			printf("audio encoding:%x\n",info->encoding);
-			header.size=sizeof(header);
-			header.audio.channels=info->channels;
+			
+			
+#define DO(x,y,z) {d##z=y;MEMCPY(&header.x,&d##z,z>>3);}
+			DO(size,sizeof(header),32);
+			//header.size=sizeof(header);
+			//header.audio.channels=info->channels;
+			DO(audio.channels,info->channels,16);
 			// not reliable header.audio.blockalign=info->blockalign;
+			uint16_t bps;
+			uint16_t blkalign;
 			switch(info->encoding)
 			{
 				case WAV_MP3:
 				case WAV_MP2:
-					header.bits_per_sample=0;
-					header.audio.blockalign=1152;break;
+					bps=0;
+					blkalign=1152;break;
 				case WAV_AC3:	
-					header.bits_per_sample=2;
-					header.audio.blockalign=1536;break;
+					bps=2;
+					blkalign=1536;break;
 				default:
-					header.audio.blockalign=info->blockalign;
-					header.bits_per_sample=0;
+					blkalign=info->blockalign;
+					bps=0;
 					break;
 			}
 		
-			header.audio.avgbytespersec=info->byterate;
+			DO(audio.blockalign,blkalign,16);
+			DO(bits_per_sample,bps,16);
+			
+			//header.audio.avgbytespersec=info->byterate;
+			DO(audio.avgbytespersec,info->byterate,32);
 		
-			header.time_unit=(int64_t)10000000;
-			header.samples_per_unit=info->frequency;
+			//header.time_unit=(int64_t)10000000;
+			DO(time_unit,10000000LL,64);
+			//header.samples_per_unit=info->frequency;
+			DO(samples_per_unit,info->frequency,64);
 		
-			header.buffersize=info->frequency; // half a sec
-		
-			header.default_len=1;
+			//header.buffersize=info->frequency; // half a sec
+			DO(buffersize,info->frequency,32); // half a sec
+			
+			//header.default_len=1;
+			DO(default_len,1,32);
 			audioStream->writeHeaders(sizeof(header),(uint8_t *)&header); // +4 ?
 			_audioTarget=_audioCurrent=0;
 			return 1;	

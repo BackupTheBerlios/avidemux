@@ -15,6 +15,14 @@
 #include "ADM_dialog/DIA_encoding.h"
 #include "oplug_ogm/op_ogpage.h"
 #include "ADM_encoder/adm_encoder.h"
+// Some little / big endian stuff
+extern void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size);
+#ifdef ADM_BIG_ENDIAN	
+	 #define MEMCPY(a,b,c) memcpyswap((uint8_t *)a, (uint8_t *)b,c)
+#else
+	#define MEMCPY memcpy
+#endif	
+//
 class ADM_ogmWrite
 {
 	protected:
