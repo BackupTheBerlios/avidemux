@@ -123,16 +123,27 @@ void mpeg_passthrough(  char *name )
 		printf("PassThrought: Using VCD PS\n");
 	
 	}else
-	{     // mpeg2, we do only DVD right now
-		if(hdr->frequency!=48000 || 
-		(hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
+	{    
+		aviInfo info;
+		video_body->getVideoInfo(&info);
+		if(hdr->frequency==44100 && info.width==480&&hdr->encoding == WAV_MP2 ) // SVCD ?
 		{
-			deleteAudioFilter();
-			GUI_Alert("Audio track is not suitable!\n");
-			return ;
+			mux=MUXER_SVCD;
+			printf("PassThrought: Using SVCD PS\n");
 		}
+		else
+		{
+			 // mpeg2, we do only DVD right now
+			if(hdr->frequency!=48000 || 
+			(hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
+			{
+				deleteAudioFilter();
+				GUI_Alert("Audio track is not suitable!\n");
+				return ;
+			}
 		mux=MUXER_DVD;
 		printf("PassThrought: Using DVD PS\n");
+		}
 	}
 	
 	
