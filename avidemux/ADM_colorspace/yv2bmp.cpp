@@ -53,13 +53,29 @@ ____________________________________________
  {
 
 	uint8_t *tmp;
-	tmp=(uint8_t *)malloc(ww*hh*3);
+	tmp=(uint8_t *)malloc(ww*hh*4);
 
 	if( !tmp)
 		{
 			return 0;
 		}
 	COL_yv12rgb( ww,  hh, in, tmp);
+	
+	// First pack it so that we go from RGB32 to RGB24
+	uint8_t *rin,*rout;
+	
+	rin=rout=tmp;
+	
+	for(uint32_t jj=ww*hh;jj>0;jj--)
+	{
+		
+		*rout++=*rin++;
+		*rout++=*rin++;
+		*rout++=*rin++;
+		rin++;
+	
+	}
+	
 	// now revert RGB & up/down order
 	 // invert screen buffer + swap y
   uint8_t *e,*write;
