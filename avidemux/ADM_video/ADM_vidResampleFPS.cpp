@@ -143,8 +143,8 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
   double f;
   
   f=frame;
-  f/=_in->getInfo()->fps1000;
-  f*=_param->newfps;
+  f*=_in->getInfo()->fps1000;
+  f/=_param->newfps;
   
   uint32_t nw;
   
