@@ -211,7 +211,14 @@ uint8_t MpegMuxer::muxAC3(void)
 		 return 1;
 	}
 	
-	ADM_assert(pos>=buffer);
+	if(pos==&buffer[byteHead]) 
+	{
+		// it means we got only one frame
+		// write it ? no
+		printf("Lvemux : found only one AC3 frame\n");
+		return 1;
+	
+	}
 	uint32_t off=(uint32_t)(pos-&buffer[byteHead]);	
 	//printf("%lu\n",off);
 	mux_write_packet((PackStream *)packStream, 
