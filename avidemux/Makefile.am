@@ -6,7 +6,7 @@ bin_PROGRAMS = avidemux2
 avidemux2_SOURCES = gui_keyframes.cpp support.cpp guiplay.cpp gui_xv.cpp gui_savenew.cpp gui_rgb.cpp gui_navigate.cpp gtk_gui.cpp callbacks.cpp avilist.cpp main.cpp prefs.cpp ADM_guiBitrate.cpp ADM_requantize.cpp ADM_pp.cpp
 #avidemux_LDADD   = ./ADM_library/libADM_library.a ./ADM_audio/libADM_audio.a ./ADM_audiocodec/libADM_audiocodec.a ./ADM_audiofilter/libADM_audiofilter.a ./ADM_codecs/libADM_codecs.a ./ADM_colorspace/libADM_colorspace.a ./ADM_editor/libADM_editor.a ./ADM_encoder/libADM_encoder.a ./ADM_filter/libADM_filter.a ../ADM_gui2/libADM_gui2.a /ADM_gui/libADM_gui.a ./ADM_inpics/libADM_inpics.a ./ADM_nuv/libADM_nuv.a ./ADM_toolkit/libADM_toolkit.a ./oplug_mpeg/liboplug_mpeg.a ./ADM_video/libADM_video.a ./oplug_avi/liboplug_avi.a ./ADM_audiodevice/libADM_audiodevice.a ./ADM_vp32/libADM_vp32.a ./ADM_mpeg2dec/libADM_mpeg2dec.a ./ADM_mpegindexer/libADM_mpegindexer.a ./libMpeg2Dec/liblibMpeg2Dec.a ./oplug_mpegFF/liboplug_mpegFF.a  -L/usr/X11R6/lib -lm -lXext -lX11
 
-SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs ADM_colorspace ADM_editor ADM_encoder ADM_filter ADM_gui ADM_inpics ADM_nuv ADM_toolkit oplug_mpeg xpm ADM_video oplug_avi ADM_audiodevice ADM_vp32 ADM_mpeg2dec ADM_mpegindexer libMpeg2Dec oplug_mpegFF  ADM_h263 ADM_gui2 ADM_dialog ADM_ogm ADM_3gp mpeg2enc ADM_openDML libtoolame
+SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs ADM_colorspace ADM_editor ADM_encoder ADM_filter ADM_gui ADM_inpics ADM_nuv ADM_toolkit oplug_mpeg xpm ADM_video oplug_avi ADM_audiodevice ADM_vp32 ADM_mpeg2dec ADM_mpegindexer libMpeg2Dec oplug_mpegFF  ADM_h263 ADM_gui2 ADM_dialog ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame
 
 EXTRA_DIST = main.cpp avi_vars.h avilist.cpp avilist.h callbacks.cpp callbacks.h gtk_gui.cpp gtkgui.h gui_action.hxx gui_navigate.cpp  gui_rgb.cpp gui_savenew.cpp gui_xv.cpp guiplay.cpp interface.h support.cpp support.h gui_keyframes.cpp prototype.h ADM_lavcodec.h  prefs.h prefs.cpp prefs.in
 
@@ -27,6 +27,7 @@ avidemux2_LDADD   =  \
 ./oplug_avi/liboplug_avi.a \
 ./oplug_mpeg/liboplug_mpeg.a \
 ./oplug_mpegFF/liboplug_mpegFF.a  \
+./ADM_lvemux/libADM_lvemux.a \
 ./ADM_filter/libADM_filter.a \
 ./ADM_video/libADM_video.a   ./ADM_encoder/libADM_encoder.a  \
 ./ADM_codecs/libADM_codecs.a ./ADM_vp32/libADM_vp32.a   ./ADM_audiofilter/libADM_audiofilter.a \
