@@ -521,10 +521,12 @@ static int encode_init(AVCodecContext *avctx)
     }else s->context= 0;
     
     if(avctx->codec->id==CODEC_ID_HUFFYUV){
+#if 0 //MEANX    
         if(avctx->pix_fmt==PIX_FMT_YUV420P){
             av_log(avctx, AV_LOG_ERROR, "Error: YV12 is not supported by huffyuv; use vcodec=ffvhuff or format=422p\n");
             return -1;
         }
+#endif        
         if(avctx->context_model){
             av_log(avctx, AV_LOG_ERROR, "Error: per-frame huffman tables are not supported by huffyuv; use vcodec=ffvhuff\n");
             return -1;
