@@ -131,8 +131,13 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
    																	uint32_t *flags)
 {
 
-			assert(frame<_info.nb_frames);
-			assert(_param);									
+		if(frame>=_info.nb_frames) 
+		{
+			printf("Filter : out of bound!\n");
+			return 0;
+		}
+	
+		assert(_param);									
 								
 			// read uncompressed frame
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;

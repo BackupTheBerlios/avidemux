@@ -82,8 +82,8 @@ static uint32_t left,right,top,bottom,width,height;
 
 #define FILL_ENTRY(widget_name,value) gtk_write_entry(WID(widget_name),  value)
 
-int DIA_getBSMearParams(		uint32_t *w,uint32_t 	*w2, uint32_t *h,uint32_t *h2,uint32_t tw,uint32_t th,
-									uint8_t *video)
+int DIA_getBSMearParams(		uint32_t *w,uint32_t 	*w2, uint32_t *h,uint32_t *h2,
+					uint32_t tw,uint32_t th,uint8_t *video)
 {
 	// Allocate space for green-ised video
 	working=new uint8_t [tw*(th)*4];
@@ -123,7 +123,7 @@ int DIA_getBSMearParams(		uint32_t *w,uint32_t 	*w2, uint32_t *h,uint32_t *h2,ui
 	{
 
 		read(dialog);
-		memcpy(working,video,tw*th*3);
+		memcpy(working,video,tw*th*4);
 		update(working, tw,th);
 		draw(dialog,tw,th);
 	}
@@ -276,7 +276,7 @@ void autocrop( void )
 	// float aR,aG,aB;
 	uint8_t mR,mG,mB;
 
-	memcpy(working,original,width*height*3);
+	memcpy(working,original,width*height*4);
 	mR = mG = mB = 0;
 
 	in=working;
@@ -291,16 +291,18 @@ void autocrop( void )
 
 		if(*in<mB) *in=mB-*in; else *in=*in-mB;
 		in++;
+		
+		*in++=0;
 	}
 
 
 	in=working;
-
+	printf("top\n");
 	for(y=0;y<(height>>1) && stop==0;y++)
 	{
 		sum=blackLine(in,width);
 		top=y;
-		printf("%d : %lu / %lu\n",y,sum,width);
+		printf("top %d : %lu / %lu\n",y,sum,width);
 		// if black is more than 90 % it is ok
 		// 90%*width< sum
 
@@ -309,21 +311,23 @@ void autocrop( void )
 			stop=1;
 
 		}
-		in+=3*width;
+		in+=4*width;
 	}
 	// Bottom
-	in=working+width*3*(height-1);
+	in=working+width*4*(height-1);
 	stop=0;
+	printf("bottom\n");
 
 	for(y=0;y<(height>>1) && stop==0;y++)
 	{
 		sum=blackLine(in,width);
 		bottom=y;
+		printf("bot %d : %lu / %lu\n",y,sum,width);
 		if(PERCENT*width > 100*sum)
 		{
 			stop=1;
 		}
-		in-=3*width;
+		in-=4*width;
 	}
 
 	/*

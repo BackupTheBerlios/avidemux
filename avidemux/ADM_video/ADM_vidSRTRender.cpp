@@ -73,7 +73,11 @@ uint32_t absFrame=frame+_info.orgFrame;
 
 	//		printf("\n Stabilize : %lu\n",frame);
           _uncompressed=data;
-	assert(frame<_info.nb_frames);
+	if(frame>=_info.nb_frames) 
+	{
+		printf("Filter : out of bound!\n");
+		return 0;
+	}
 	if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
 
 	// if no subtitle return...
@@ -602,8 +606,8 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 
 //#define MAXVAL(x) {val=*mask*(x)+127;val>>=8;*ctarget=(uint8_t)(val&0xff);}
 
-#define BLEND_LEVEL 	30
-#define BLEND_PERCENT 	60
+#define BLEND_LEVEL 	3
+#define BLEND_PERCENT 	20
 
 #define MAXVAL(x)  *target=(uint8_t )ssigned
 #define DOIT if(*mask) \

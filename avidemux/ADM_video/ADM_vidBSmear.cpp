@@ -113,7 +113,12 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
    																	uint32_t *flags)
 {
 
-			assert(frame<_info.nb_frames);
+			if(frame>=_info.nb_frames) 
+			{
+				printf("Filter : out of bound!\n");
+				return 0;
+			}
+	
 			assert(_param);									
 								
 			// read uncompressed frame directly into follower

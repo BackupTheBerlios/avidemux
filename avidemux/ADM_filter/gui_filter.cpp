@@ -363,8 +363,9 @@ dummy=(int)user_data;
 		  w = in->getInfo ()->width;
 		  h = in->getInfo ()->height;
 		  data = (uint8_t *) malloc (w * h * 3);
-		  in->getFrameNumberNoAlloc (curframe, &l, data, &f);
 		  assert (data);
+		  in->getFrameNumberNoAlloc (curframe, &l, data, &f);
+		  
 		  GUI_PreviewInit (w, h);
 		  GUI_PreviewRun(data);
 		  GUI_PreviewEnd ();

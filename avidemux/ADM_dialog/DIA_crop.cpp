@@ -123,7 +123,7 @@ int DIA_getCropParams(		uint32_t *w,uint32_t 	*w2, uint32_t *h,uint32_t *h2,uint
 	{
 
 		read(dialog);
-		memcpy(working,video,tw*th*3);
+		memcpy(working,video,tw*th*4);
 		update(working, tw,th);
 		draw(dialog,tw,th);
 	}
@@ -274,7 +274,7 @@ void autocrop( void )
 	// float aR,aG,aB;
 	uint8_t mR,mG,mB;
 
-	memcpy(working,original,width*height*3);
+	memcpy(working,original,width*height*4);
 	mR = mG = mB = 0;
 
 	in=working;
@@ -289,6 +289,8 @@ void autocrop( void )
 
 		if(*in<mB) *in=mB-*in; else *in=*in-mB;
 		in++;
+		
+		*in++=0;
 	}
 
 
@@ -307,10 +309,10 @@ void autocrop( void )
 			stop=1;
 
 		}
-		in+=3*width;
+		in+=4*width;
 	}
 	// Bottom
-	in=working+width*3*(height-1);
+	in=working+width*4*(height-1);
 	stop=0;
 
 	for(y=0;y<(height>>1) && stop==0;y++)
@@ -321,7 +323,7 @@ void autocrop( void )
 		{
 			stop=1;
 		}
-		in-=3*width;
+		in-=4*width;
 	}
 
 	top=top & 0xfffe;

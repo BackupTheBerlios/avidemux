@@ -307,7 +307,12 @@ uint8_t AVDMVideoStreamMPResize::getFrameNumberNoAlloc(uint32_t frame,
    																	uint8_t *data,
    																	uint32_t *flags)
 {
-			assert(frame<_info.nb_frames);
+			if(frame>=_info.nb_frames) 
+			{
+				printf("Filter : out of bound!\n");
+				return 0;
+			}
+	
 			assert(_param);
 
        			if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;

@@ -157,7 +157,12 @@ uint8_t AVDMVideoStreamResize::getFrameNumberNoAlloc(uint32_t frame,
    																	uint32_t *flags)
 {
 static Image in,out;
-			assert(frame<_info.nb_frames);
+	if(frame>=_info.nb_frames) 
+	{
+		printf("Filter : out of bound!\n");
+		return 0;
+	}
+	
 			assert(_param);	
 	
    			
