@@ -168,6 +168,7 @@ DIST386= \
 	i386/fdct_mmx.c \
 	i386/fft_sse.c \
 	i386/idct_mmx.c \
+	i386/vp3dsp_mmx.c \
 	i386/mmx.h \
 	i386/motion_est_mmx.c \
 	i386/mpegvideo_mmx.c \
