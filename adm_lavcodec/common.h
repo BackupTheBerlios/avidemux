@@ -254,7 +254,7 @@ inline void dprintf(const char* fmt,...) {}
 
 extern const uint32_t inverse[256];
 
-#ifdef ARCH_X86
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 #    define FASTDIV(a,b) \
     ({\
         int ret,dmy;\
@@ -271,7 +271,7 @@ extern const uint32_t inverse[256];
 #    define FASTDIV(a,b)   ((a)/(b))
 #endif
  
-#ifdef ARCH_X86
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 // avoid +32 for shift optimization (gcc should do that ...)
 static inline  int32_t NEG_SSR32( int32_t a, int8_t s){
     asm ("sarl %1, %0\n\t"
@@ -390,8 +390,8 @@ typedef struct RL_VLC_ELEM {
 #endif
 
 /* used to avoid missaligned exceptions on some archs (alpha, ...) */
-#ifdef ARCH_X86
-#    define unaligned32(a) (*(uint32_t*)(a))
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#    define unaligned32(a) (*(const uint32_t*)(a))
 #else
 #    ifdef __GNUC__
 static inline uint32_t unaligned32(const void *v) {
@@ -460,7 +460,7 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 {
 #    ifdef ALIGNED_BITSTREAM_WRITER
-#        ifdef ARCH_X86
+#        if defined(ARCH_X86) || defined(ARCH_X86_64)
     asm volatile(
 	"movl %0, %%ecx			\n\t"
 	"xorl %%eax, %%eax		\n\t"
@@ -491,7 +491,7 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
     s->index= index;
 #        endif
 #    else //ALIGNED_BITSTREAM_WRITER
-#        ifdef ARCH_X86
+#        if defined(ARCH_X86) || defined(ARCH_X86_64)
     asm volatile(
 	"movl $7, %%ecx			\n\t"
 	"andl %0, %%ecx			\n\t"
@@ -620,7 +620,7 @@ static inline int unaligned32_be(const void *v)
         (gb)->index= name##_index;\
 
 #   define UPDATE_CACHE(name, gb)\
-        name##_cache= unaligned32_be( ((uint8_t *)(gb)->buffer)+(name##_index>>3) ) << (name##_index&0x07);\
+        name##_cache= unaligned32_be( ((const uint8_t *)(gb)->buffer)+(name##_index>>3) ) << (name##_index&0x07);\
 
 #   define SKIP_CACHE(name, gb, num)\
         name##_cache <<= (num);\
@@ -738,7 +738,7 @@ static inline int get_bits_count(GetBitContext *s){
         name##_bit_count-= 32;\
     }\
 
-#ifdef ARCH_X86
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 #   define SKIP_CACHE(name, gb, num)\
         asm(\
             "shldl %2, %1, %0		\n\t"\
@@ -1218,7 +1218,7 @@ static inline int ff_get_fourcc(const char *s){
 #define MKBETAG(a,b,c,d) (d | (c << 8) | (b << 16) | (a << 24))
 
 
-#ifdef ARCH_X86
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 #define MASK_ABS(mask, level)\
             asm volatile(\
 		"cdq			\n\t"\
@@ -1252,8 +1252,8 @@ if((y)<(x)){\
 }
 #endif
 
-#ifdef ARCH_X86
-static inline long long rdtsc()
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
+static inline long long rdtsc(void)
 {
 	long long l;
 	asm volatile(	"rdtsc\n\t"
@@ -1289,7 +1289,6 @@ tend= rdtsc();\
 #define CLAMP_TO_8BIT(d) ((d > 0xff) ? 0xff : (d < 0) ? 0 : d)
 
 /* avoid usage of various functions */
-#if 0 //MEANX
 #define malloc please_use_av_malloc
 #define free please_use_av_free
 #define realloc please_use_av_realloc
@@ -1300,7 +1299,7 @@ tend= rdtsc();\
 #define printf please_use_av_log
 #define fprintf please_use_av_log
 #endif
-#endif //MEANX
+
 #define CHECKED_ALLOCZ(p, size)\
 {\
     p= av_mallocz(size);\

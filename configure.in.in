@@ -661,11 +661,6 @@ echo "Checking cpu/system type"
 adm_cpu=`uname -m`;
 dnl reset config.cpu, avoid weird bugs
 echo "CPU type : $adm_cpu"
-if test "x$use_builtin" = "xyes"; then
-echo "TARGET_BUILTIN_VECTOR=yes" > adm_lavcodec/config.cpu
-else
-echo "" > adm_lavcodec/config.cpu
-fi
 use_mmx=0
 case $adm_cpu in
 	i386|i486|i586|i686)
@@ -720,6 +715,7 @@ case $adm_cpu in
 		have_little_endian=yes;
 		echo "TARGET_X86_64=yes" >> adm_lavcodec/config.cpu
 		AC_DEFINE(HAVE_X86_64,1,"X86_64 amd64 assembly")
+		AC_DEFINE(ARCH_X86_64,1,"X86_64 amd64 assembly")
 		have_amd64=yes
 		echo "ADM64";;
 	sparc|sparc64)
@@ -817,6 +813,8 @@ if test "x$use_cygwin" = "xyes"; then
 	echo "CFLAGS= -mno-cygwin -mms-bitfields -I/usr/include/mingw -I/rot/include " >> adm_lavcodec/config.cpu
 fi
 dnl ______________ vectors ? for altivec mainly and a bit of 386 (fft) _______
+dnl (except for amd64 ? bug in ubuntu ?)
+if test "x$have_amd64" = "xno"; then
 use_builtin=no
 AC_MSG_CHECKING(Built in vectors)
 
@@ -841,7 +839,7 @@ if test "x$use_builtin" = "xyes"; then
 	CXXFLAGS="$CXXFLAGS -msse"
 	fi
 fi
- 
+fi 
 
 dnl ________________NASM__________________
 AC_SUBST(AS)
@@ -851,6 +849,9 @@ dnl __________ conditional ___________________
 
 AM_CONDITIONAL(HAVE_NASM, test "x$have_nasm" = "xyes")
 AM_CONDITIONAL(BUILD_MMX, test "x$use_mmx" = "x1")
+
+AM_CONDITIONAL(BUILD_MMX_COMPATIBLE, test "x$use_mmx" = "x1" || test "x$have_amd64"="xyes")
+
 AM_CONDITIONAL(BUILD_DARWIN, test "x$have_darwin" = "xyes")
 AM_CONDITIONAL(BUILD_PPC, test "x$have_ppc" = "xyes")
 AM_CONDITIONAL(BUILD_ALTIVEC, test "x$have_altivec" = "xyes")

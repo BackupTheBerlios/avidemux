@@ -27,7 +27,7 @@
 
 #ifndef DSPUTIL_H
 #define DSPUTIL_H
-#include <math.h>
+#include "math.h" //MEANX
 #include "common.h"
 #include "avcodec.h"
 
@@ -42,10 +42,17 @@ void ff_jpeg_fdct_islow (DCTELEM *data);
 void ff_fdct248_islow (DCTELEM *data);
 
 void j_rev_dct (DCTELEM *data);
+void j_rev_dct4 (DCTELEM *data);
+void j_rev_dct2 (DCTELEM *data);
+void j_rev_dct1 (DCTELEM *data);
 
 void ff_fdct_mmx(DCTELEM *block);
 void ff_fdct_mmx2(DCTELEM *block);
 void ff_fdct_sse2(DCTELEM *block);
+
+void ff_h264_idct_add_c(uint8_t *dst, DCTELEM *block, int stride);
+void ff_h264_lowres_idct_add_c(uint8_t *dst, int stride, DCTELEM *block);
+void ff_h264_lowres_idct_put_c(uint8_t *dst, int stride, DCTELEM *block);
 
 /* encoding scans */
 extern const uint8_t ff_alternate_horizontal_scan[64];
@@ -327,7 +334,8 @@ typedef struct DSPContext {
      */
     void (*vp3_idct)(int16_t *input_data, int16_t *dequant_matrix,
         int coeff_count, DCTELEM *output_samples);
-
+ 
+    void (*h264_idct_add)(uint8_t *dst, DCTELEM *block, int stride);
 } DSPContext;
 
 void dsputil_static_init(void);
@@ -407,6 +415,7 @@ void put_signed_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int li
 
 static inline void emms(void)
 {
+    //MEANX __asm __volatile ("emms;":::"memory");
     __asm __volatile ("emms;");
 }
 
@@ -421,51 +430,6 @@ static inline void emms(void)
 
 void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx);
 void dsputil_init_pix_mmx(DSPContext* c, AVCodecContext *avctx);
-#elif defined(HAVE_X86_64) //____________________________________________________________________
-
-#undef emms_c
-
-#if 0
-#define MM_MMX    0x0001 /* standard MMX */
-#define MM_3DNOW  0x0004 /* AMD 3DNOW */
-#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
-#define MM_SSE    0x0008 /* SSE functions */
-#define MM_SSE2   0x0010 /* PIV SSE2 functions */
-
-extern int mm_flags;
-#endif
-void add_pixels_clamped_a64_mmx(const DCTELEM *block, uint8_t *pixels,   int line_size);
-void put_pixels_clamped_a64_mmx(const DCTELEM *block, uint8_t *pixels,   int line_size);
-void ff_simple_idct_put_a64_mmx(uint8_t *dest, int line_size, DCTELEM *block);
-void ff_simple_idct_add_a64_mmx(uint8_t *dest, int line_size, DCTELEM *block);
-void ff_simple_idct_a64_mmx(int16_t *block);
-void ff_fdct_a64_mmx(DCTELEM *block);
-void ff_fdct_a64_mmx2(DCTELEM *block);
-void ff_fdct_a64_sse2(DCTELEM *block);
-
-void vp3_dsp_init_a64_mmx(void);
-void vp3_idct_put_a64_mmx(int16_t *input_data, int16_t *dequant_matrix,
-    int coeff_count, uint8_t *dest, int stride);
-void vp3_idct_add_a64_mmx(int16_t *input_data, int16_t *dequant_matrix,
-    int coeff_count, uint8_t *dest, int stride);
-
-/* MEANX*/
-static inline void emms(void)
-{
-    __asm __volatile ("emms");
-}
-
-
-#define emms_c() \
-{\
-        emms();\
-}
-
-#define __align8 __attribute__ ((aligned (8)))
-
-void dsputil_init_a64(DSPContext* c, AVCodecContext *avctx);
-void dsputil_init_pix_a64(DSPContext* c, AVCodecContext *avctx);
-
 
 #elif defined(ARCH_ARMV4L)
 
