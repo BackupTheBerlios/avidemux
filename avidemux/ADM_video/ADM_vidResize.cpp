@@ -91,7 +91,7 @@ AVDMVideoStreamResize::AVDMVideoStreamResize(
 	Hpattern_luma=NULL;
     Hpattern_chroma=NULL;
 }
-#if !defined(MPLAYER_RESIZE_PREFFERED) || !defined(USE_MMX)
+#if !defined(MPLAYER_RESIZE_PREFFERED) 
 AVDMGenericVideoStream *createResizeFromParam(AVDMGenericVideoStream *in,uint32_t x,uint32_t y)
 {
 
