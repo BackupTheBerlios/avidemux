@@ -30,7 +30,11 @@
 
 uint64_t riffParser::getPos( void ) 
 { 
+#ifdef CYG_MANGLING
+        aprintf("pos : %I64u / %I64u \n",curPos,ftello(fd));
+#else
 	aprintf("pos : %llu / %llu \n",curPos,ftello(fd));
+#endif        
 	return curPos;
 //	return ftello(fd);
 };
@@ -55,7 +59,11 @@ uint8_t riffParser::skip(uint32_t s)
 }
 uint8_t riffParser::endReached(void)
 {
+#ifdef CYG_MANGLING
+        aprintf("Cur : %I64u end : %I64u left: %I64u\n",curPos,endPos,endPos-curPos);
+#else
 	aprintf("Cur : %llu end : %llu left: %llu\n",curPos,endPos,endPos-curPos);
+#endif        
 	if(curPos<endPos) 
 		return 0;
 	fseeko(fd,endPos,SEEK_SET);
