@@ -265,7 +265,9 @@ uint8_t			mpeg2decHeader::open(char *name)
 				_startSeqLen=count-4;
 				_startSeq=new uint8_t[_startSeqLen];
 				memcpy(_startSeq,tmp,_startSeqLen);
-				printf("seqLen : %u seq %x %x %x %x\n",
+				mixDump(tmp,50);
+				printf("Image :%d, seqLen : %u seq %x %x %x %x\n",
+					firstPic,
 					_startSeqLen, _startSeq[0],
 							_startSeq[1],
 							_startSeq[2],

@@ -68,7 +68,7 @@
 #define PRIVATE_STREAM_2 	0xbf
 #define SYSTEM_END_CODE		0xb9
 
-
+#define CLAMP 1
 static uint64_t _lastSync;
 extern void mixDump(uint8_t *i,uint32_t l);
 
@@ -98,8 +98,8 @@ ADM_mpegDemuxerTransportStream::ADM_mpegDemuxerTransportStream(uint8_t stream,ui
 		_otherPesLen=_otherPesRead=0;
 		
 		
-			_otherPid=stream2;
-			_thisPid=stream;
+		_otherPid=stream2;
+		_thisPid=stream;
 		
 		printf(" Internal  pid 1 = %x",_thisPid);		
 		printf(" Internal  pid 2 = %x",_otherPid);
@@ -336,34 +336,30 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 			}
 			if(pid==_otherPid)
 			{
-				_otherPesRead+=len;				
-				if(_otherPesRead>_otherPesLen)
+				if(_otherPesLen>0)
 				{
-					len=len-(_otherPesRead-_otherPesLen);
-					_otherPesRead=_otherPesLen;
-					//printf("Overshot : %d\n",_pesRead-_pesLen);
+					if(_otherPesRead+len>_otherPesLen)
+					{
+						len=_otherPesLen-_otherPesRead;					
+					}
+					_otherPesRead+=len;
 				}
-				_otherLen+=len;
+				_otherLen+=len;				
 			 	continue;
 			}
 			if(pid!=_thisPid)
 			{
 				assert(0);
-			}
-			_pesRead+=len;
-			
-			if(_pesLen>=0) // ignore 0 size Pes
+			}			
+			if(_pesLen>0) // ignore 0 size Pes
 			{
-				if(_pesRead>_pesLen)
+				if(_pesRead+len>_pesLen)
 				{
-					printf("Clamped :%d\n",_pesRead-_pesLen);
-					len=len-(_pesRead-_pesLen);
-					_pesRead=_pesLen;
-					
+					len=_pesLen-_pesRead;	
 				}
-				printf("Read : %d/%d\n",_pesRead,_pesLen);
+				_pesRead+=len;
 			}
-				
+			
 			_lastSync=sync;
 			_packetLen=len;
 			memcpy(_buffer,_TSbuffer+start,len);			
@@ -395,12 +391,13 @@ uint8_t align=0;
 uint16_t tag,ptsdts;
 uint32_t headerlen=0;
 uint32_t mid=0;
-		// We got fitst 00 00 01 ID	
-		;
+uint8_t  copy=0;
+uint32_t hdr=0;
+		// We got fitst 00 00 01 ID			
 		*pts=MINUS_ONE;
 		
 		uint64_t pos;
-		parser->getpos(&pos);		
+		parser->getpos(&pos);
 		if(_TSbuffer[start] || _TSbuffer[start+1] || _TSbuffer[start+2]!=01)
 		{
 			printf("TS: No 00 00 01 xx as PES header\n");		
@@ -411,48 +408,52 @@ uint32_t mid=0;
 		{
 			printf(">> %x\n",mid);
 		}
-		// 00 00 01 E0	
+		// 4: 00 00 01 E0	
+		// 2: Size of PES
+		// 1: Flags scrambling align etc...
+		// 1: PTS DTS
+		// {1] addition header len
+		// [5] PTS[5] DTS ...
 		totallen-=4;
 		start+=4;			
-		// size 2 bytes (ignored)
-		*peslen=(_TSbuffer[start]<<8)+_TSbuffer[start+1];	
-		//printf("This: PES :%d\n",*peslen);
+		// size 2 bytes
+		*peslen=(_TSbuffer[start]<<8)+_TSbuffer[start+1];			
 		totallen-=2;
 		start+=2;	
-		// scrambling 1 byte
+		//____ scrambling align etc..._________
+		// 10  X X (Scrambling)  |  Prio Align Copy Original
+		copy=_TSbuffer[start] & 0x02; // copyright
+		align=_TSbuffer[start]&4;
+		if((_TSbuffer[start]&0xC0)!=0x80)
+		{
+			printf("TS:!Mpeg1\n");
+		}
+		
+		if((_TSbuffer[start]&0x4))
+		{
+		//	printf("TS:!Align:%x\n",_TSbuffer[start]);
+		}
 		totallen-=1;
 		start+=1;	
-		//PTS/DST 1 byte
-		ptsdts=_TSbuffer[start];			
+		//_______PTS/DTS 1 byte___________________
+		ptsdts=_TSbuffer[start];
 		start++;
 		totallen--;
-		//flags 1 byte
+		headerlen=1+1+1; //1
+		/*-- header len 1 bytes---*/
+		hdr=_TSbuffer[start];	
 		start++;
-		totallen--;
-		headerlen=4+2+1+1+0; //1
-		if(ptsdts )
-		{
-			if(ptsdts&0x3F)
-			{
-				printf("More data : %x\n",ptsdts);
-			}
-			// Nb of bytes (ignored), we actually should use it
-			ptsdts>>6;
-			if(ptsdts&1)
-			{
-				start+=5;
-				totallen-=5;
-				headerlen+=5;
-			}
-			if(ptsdts&2)
-			{
-				start+=5;
-				totallen-=5;
-				headerlen+=5;
-			}
-		}
+		totallen--;	
+		// Extra header
+		//printf("Hdr:%d ptsdts:%d\n",hdr,ptsdts>>6);
+		start+=hdr;
+		totallen-=hdr;
+		
+		headerlen+=hdr;
+
 	*end=start;
 	*peslen-=headerlen;
+
     	return totallen;
 }
 
@@ -526,9 +527,9 @@ uint8_t	ADM_mpegDemuxerTransportStream::_asyncJump(uint64_t relative,uint64_t ab
 		// and read
 		parser->read32(2*TS_PACKET,backBuffer);
 		// Search from the middle to the beginning for a 0x47 (sync)
-		uint32_t search=TS_PACKET-1;
+		int32_t search=TS_PACKET-1;
 		int found=0;
-		while(search)
+		while(search>=0)
 		{
 			if(backBuffer[search]==0x47)
 			{	// Next one is also a sync ?
@@ -542,10 +543,10 @@ uint8_t	ADM_mpegDemuxerTransportStream::_asyncJump(uint64_t relative,uint64_t ab
 		}
 		if(!found)
 		{
-			printf("Packet not found :     \n");
-			printf(" abs %lld \n",absolute);
-			printf(" ref %lld \n",relative);
-			assert(0);
+			printf("TS:Packet not found :     \n");
+			printf("TS: abs %lld \n",absolute);
+			printf("TS: ref %lld \n",relative);
+			return 0;
 				
 		}
 		// found it, now resync just before
@@ -562,8 +563,8 @@ uint8_t	ADM_mpegDemuxerTransportStream::_asyncJump(uint64_t relative,uint64_t ab
 		// fill packet
 		if(!_nextPacket()) return 0;
 		// Offset in current packet is 
-		_currentOffset=_packetLen-delta-1;
-		_packetOffset=relative+delta-_packetLen;		
+		_currentOffset=_packetLen-delta;
+		_packetOffset=relative+delta-_packetLen;
 		return 1;
 		
 }
