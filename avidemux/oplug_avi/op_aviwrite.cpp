@@ -91,7 +91,7 @@ uint8_t aviWrite::updateHeader (MainAVIHeader * mainheader,
   	_file->write ((uint8_t *)mainheader, sizeof (MainAVIHeader));
 #endif
 // now update video stream header
-  fseek (_out, 0x6c, SEEK_SET);
+        _file->seek(0x6c);
 #ifdef ADM_BIG_ENDIAN
 
 	AVIStreamHeader as;
@@ -444,8 +444,6 @@ uint8_t aviWrite::saveBegin (char 	*name,
   //
 
   ADM_assert (!LMovie);
-  _file=new ADMFile();
-  _file->open(_out);
   
   LMovie = new AviList ("LIST", _file);
   LMovie->Begin ("movi");

@@ -158,7 +158,7 @@ uint32_t size;
       			//   printf("\n %lu / %lu",cf,frametogo);
       			writeVideoChunk (cf);
       			writeAudioChunk (cf);
-			writter->sync();
+			//writter->sync();
      
      
     };				// end for
