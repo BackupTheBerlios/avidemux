@@ -79,7 +79,8 @@ AVDMVideoAddBorder::AVDMVideoAddBorder(  AVDMGenericVideoStream *in,CONFcouple *
 		}				
 					
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
- 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+ 	//_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed);
   _info.encoding=1;
 
@@ -103,7 +104,8 @@ AVDMVideoAddBorder::AVDMVideoAddBorder(  AVDMGenericVideoStream *in,uint32_t x,u
 	_info.width+=_param->right+_param->left;
 	_info.height+=_param->bottom+_param->top;
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
- 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+ 	//_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed);
   _info.encoding=1;
 
@@ -131,9 +133,9 @@ AVDMVideoAddBorder::~AVDMVideoAddBorder()
  	
 }
 uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 
 		if(frame>=_info.nb_frames) 
@@ -148,8 +150,8 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
        		
 				// blacken screen
-				memset(data,0,_info.width*_info.height);
-				memset(data+_info.width*_info.height,128,_info.width*_info.height>>1);
+				memset(data->data,0,_info.width*_info.height);
+				memset(data->data+_info.width*_info.height,128,_info.width*_info.height>>1);
 
 
 				// do luma
@@ -160,8 +162,8 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
        		x=_in->getInfo()->width;
        		line=x;
 				lineout=_info.width;
-       		src=_uncompressed;
-       		dest=data+_param->left+_info.width*_param->top;
+       		src=_uncompressed->data;
+       		dest=data->data+_param->left+_info.width*_param->top;
        		
        		for(uint32_t k=y;k>0;k--)
        			{
@@ -173,11 +175,12 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
 					uint8_t *src_u,*src_v;
 					uint8_t *dst_u,*dst_v;
 
-       		 	src_u=_uncompressed+y*x;
+       		 	src_u=_uncompressed->data+y*x;
        		 	src_v=src_u+(x*y>>2);
        		 	line>>=1;
        		 	lineout>>=1;       		       		 	
-					dst_u= data+_info.width*_info.height+(_info.width*_param->top>>2)+(_param->left>>1);;
+					dst_u= data->data+_info.width*_info.height+(_info.width*_param->top>>2)+
+							(_param->left>>1);;
 					dst_v= dst_u+(_info.width*_info.height>>2);
 
        		 		for(uint32_t k=y>>1;k>0;k--)

@@ -56,7 +56,8 @@ ADMVideoFlipV::ADMVideoFlipV(  AVDMGenericVideoStream *in,CONFcouple *setup)
  	_in=in;		
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  									 	
   _info.encoding=1;
-	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+	//_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
 	ADM_assert(_uncompressed);    	  	
 }
 ADMVideoFlipV::~ADMVideoFlipV()
@@ -65,9 +66,9 @@ ADMVideoFlipV::~ADMVideoFlipV()
   
 }
 uint8_t ADMVideoFlipV::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 
 			ADM_assert(frame<_info.nb_frames);
@@ -84,8 +85,8 @@ uint8_t ADMVideoFlipV::getFrameNumberNoAlloc(uint32_t frame,
          page=stride*h;
          qpage=page>>2;
          
-         in=_uncompressed;
-         out=data+(h-1)*stride;
+         in=_uncompressed->data;
+         out=data->data+(h-1)*stride;
          // flip y
          for(uint32_t y=h;y>0;y--)
          {
@@ -94,9 +95,9 @@ uint8_t ADMVideoFlipV::getFrameNumberNoAlloc(uint32_t frame,
 					 out-=stride;					 					 
 			}
 			         
-         	stride>>=1;
-			in=_uncompressed+page;	
-         	out=data+page+qpage-stride;
+        stride>>=1;
+	in=_uncompressed->data+page;	
+        out=data->data+page+qpage-stride;
          // flip u
          for(uint32_t y=h>>1;y>0;y--)
          {
@@ -104,8 +105,8 @@ uint8_t ADMVideoFlipV::getFrameNumberNoAlloc(uint32_t frame,
 					 in+=stride;
 					 out-=stride;					 					 
 			}
-			in=_uncompressed+page+qpage;	
-         	out=data+page+qpage+qpage-stride;
+	in=_uncompressed->data+page+qpage;	
+        out=data->data+page+qpage+qpage-stride;
        
       
          // flip u

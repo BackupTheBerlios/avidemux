@@ -67,7 +67,7 @@ UNUSED_ARG(setup);
 	_info.nb_frames=(_info.nb_frames*5)/4;
 	for(uint32_t i=0;i<5;i++)
 	{
-		_uncompressed[i]=new uint8_t[3*_info.width*_info.height];
+		_uncompressed[i]=new ADMImage(_info.width,_info.height);
 	}
 	_cacheStart=0xfffffff;
 }
@@ -76,15 +76,15 @@ ADMVideoPullDown::~ADMVideoPullDown()
 {
 	for(uint32_t i=0;i<5;i++)
 	{
- 		delete [] _uncompressed[i];
+ 		delete  _uncompressed[i];
 	}
 }
 
 
 uint8_t ADMVideoPullDown::getFrameNumberNoAlloc(uint32_t frame,
-										uint32_t *len	,
-										uint8_t *data,
-										uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 //static Image in,out;
 			if(frame>=_info.nb_frames)
@@ -114,7 +114,7 @@ cont:
 			aprintf("Filter: It is in cache...(cachestart=%lu)\n",_cacheStart);
 			index=frame%5;
 			aprintf("getting %lu)\n",index);
-			memcpy(data,_uncompressed[index],*len);
+			memcpy(data->data,_uncompressed[index]->data,*len);
 			*flags=0;
 			return 1;
 		}
@@ -138,7 +138,7 @@ cont:
 		GET_FRAME(target+2,3);
 		GET_FRAME(target+3,4);
 		// copy chroma 1->2
-		memcpy(_uncompressed[2]+page,_uncompressed[1]+page,page>>1);
+		memcpy(_uncompressed[2]->data+page,_uncompressed[1]->data+page,page>>1);
 #define COPY_FIELD \
 		for(uint32_t y=0;y<_info.height>>1;y++) \
 		{ \
@@ -150,8 +150,8 @@ cont:
 		// now we merge 1 & 3 into 2
 
 		uint8_t *in,*out;
-		in=_uncompressed[1];
-		out=_uncompressed[2];
+		in=_uncompressed[1]->data;
+		out=_uncompressed[2]->data;
 		COPY_FIELD;
 
 
@@ -162,13 +162,13 @@ cont:
 		//
 		//  0 1 1 2 3
 		//  0 1 X 2 3
-		in=_uncompressed[3]+w;
-		out=_uncompressed[2]+w;
+		in=_uncompressed[3]->data+w;
+		out=_uncompressed[2]->data+w;
 		COPY_FIELD;
 		//  0 1 1 2 3
 		//  0 1 2 2 3
-		in=_uncompressed[4]+w;
-		out=_uncompressed[3]+w;
+		in=_uncompressed[4]->data+w;
+		out=_uncompressed[3]->data+w;
 		//  0 1 1 2 3
 		//  0 1 2 3 3
 		COPY_FIELD;

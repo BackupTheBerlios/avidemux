@@ -62,22 +62,25 @@ ADMVideoChromaU::ADMVideoChromaU(
   	_in=in;		
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  			 	
   _info.encoding=1;
-   	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+   //	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+   	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed);
   	  	
 }
 ADMVideoChromaU::~ADMVideoChromaU()
 {
  	
-	delete [] _uncompressed;
+	delete _uncompressed;
  	
 }
 
 //
 //	Remove y and v just keep U and expand it
 //
-   uint8_t ADMVideoChromaU::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags)
+   uint8_t ADMVideoChromaU::getFrameNumberNoAlloc(uint32_t frame,
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
    uint32_t x,w;
 			ADM_assert(frame<_info.nb_frames);
@@ -87,13 +90,13 @@ ADMVideoChromaU::~ADMVideoChromaU()
        		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       			
 
 				// remove y & v
-               memset(data+_info.width*_info.height,128,(_info.width*_info.height)>>2);
+               memset(data->data+_info.width*_info.height,128,(_info.width*_info.height)>>2);
 
 				// now expand  u
 				uint8_t *y,*v;
 
-				y=data;
-				v=_uncompressed+  _info.width*_info.height;
+				y=data->data;
+				v=_uncompressed->data+  _info.width*_info.height;
 
 				for(w= _info.height>>1;w>0;w--)
 				{
@@ -143,22 +146,25 @@ ADMVideoChromaV::ADMVideoChromaV(
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
   _info.encoding=1;
-   	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+   //	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+   	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed);
 
 }
 ADMVideoChromaV::~ADMVideoChromaV()
 {
 
-	delete [] _uncompressed;
+	delete  _uncompressed;
 
 }
 
 //
 //	Remove y and v just keep U and expand it
 //
-   uint8_t ADMVideoChromaV::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags)
+   uint8_t ADMVideoChromaV::getFrameNumberNoAlloc(uint32_t frame,
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
    uint32_t x,w;
 			ADM_assert(frame<_info.nb_frames);
@@ -168,13 +174,13 @@ ADMVideoChromaV::~ADMVideoChromaV()
        		  *len= _info.width*_info.height+(_info.width*_info.height>>1);
 
 				// remove y & v
-               memset(data+_info.width*_info.height,128,(_info.width*_info.height)>>2);
+               memset(data->data+_info.width*_info.height,128,(_info.width*_info.height)>>2);
 
 				// now expand  u
 				uint8_t *y,*v;
 
-				y=data;
-				v=_uncompressed+  _info.width*_info.height+(_info.width*_info.height>>2);
+				y=data->data;
+				v=_uncompressed->data+  _info.width*_info.height+(_info.width*_info.height>>2);
 
 				for(w= _info.height>>1;w>0;w--)
 				{

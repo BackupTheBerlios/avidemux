@@ -38,7 +38,7 @@
 
 // FIXME BADLY !!!
 static uint8_t compBuffer[MAXIMUM_SIZE * MAXIMUM_SIZE * 3];
-static uint8_t prepBuffer[MAXIMUM_SIZE * MAXIMUM_SIZE * 3];
+
 
 uint8_t
   ADM_Composer::getRaw (uint32_t framenum, uint8_t * ptr, uint32_t * framelen)
@@ -71,7 +71,7 @@ uint8_t
   return _videos[ref]._aviheader->getRawStart (ptr, len);
 
 }
-/*
+/**_____________________________________________________________________
 		Main function
 		Caller ask for a frame from the editor
 		We first split it to segment and frame from that segment
@@ -79,16 +79,18 @@ uint8_t
 		If not and if there is Bframe we look if it is the forward
 			reference frame we currently have
 
-*/
-uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, uint8_t * out,
+_______________________________________________________________________*/
+uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 				      uint32_t * flagz)
 {
   // first get segment
   uint32_t relframe, seg, flags, len;
   uint8_t ret = 0;
+  EditorCache   *cache;
+  ADMImage	*result;
 //    static uint32_t lastlen=0;
 
-		if(flagz)
+	if(flagz)
 			*flagz=0;
 
   // convert frame to block, relative frame
@@ -100,115 +102,51 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, uint8_t * out,
   uint32_t ref = _segments[seg]._reference;
   uint32_t llen = _videos[ref]._aviheader->getWidth ()
   				  * _videos[ref]._aviheader->getHeight ();
-llen = llen + (llen >> 1);
-_VIDEOS *vid=&_videos[ref];
-
-
-//*************************
-  // cached ?
-  //
-  //*************************
-
-  if (_cached == 1)
-  {
-   // case of forward ref frame
-    if (_videos[ref]._reorderReady) // if not reordered do not bother
-    {
-#if 0    
-    	if(_videos[ref]._forwardReference==relframe)
-    		{
-			// gotcha
-			aprintf("Cached as forward frame.\n");
-			memcpy(out,vid->_forwardFrame, llen);
-			if(flagz)
-				*flagz=vid->_forwardFlag;
-			_lastseg = seg;
-	  		_lastframe = relframe;				
-			return 1;
-		}
-#endif		
-    }
-    if((_lastseg == seg) && (_lastframe == relframe))
-    {
-      aprintf("Cached read (%lu) inst:%lx\n",_lastframe,this);
-      memcpy (out, prepBuffer, llen);
-      return 1;
-    }
-   
-    aprintf("Cache miss : wanted seg:%lu frame:%lu , in cache seg:%lu frame:%lu \n",
-					seg,relframe, _lastseg,_lastframe);
-  }  
-  else
-  {
-	aprintf("Cache not activated\n");
-  }
-
+	llen = llen + (llen >> 1);
+	_VIDEOS *vid=&_videos[ref];
+	cache=_videos[ref]._videoCache;
+	ADM_assert(cache);
+	
+	// First look in the cache
+	if((result=cache->getImage(relframe)))
+	{
+		aprintf("frame %lu is cached...\n",relframe);
+		out->duplicate(result);
+		if(flagz)
+			*flagz=result->flags;
+		return 1;
+	}
+	else
+	{
+		aprintf("frame %lu is not cached...\n",relframe);
+	}
+//
+	
+//	Prepare the destination...
+	result=cache->getFreeImage();
+  
   // now we got segment and frame
   //*************************
   // Is is a key frame ?
   //*************************
   _videos[ref]._aviheader->getFlags (relframe, &flags);
 
-  if (flags & AVI_KEY_FRAME)
+     if (flags & AVI_KEY_FRAME)
     {
-    aprintf("keyframe\n");
-      // yes
-
-   	if (vid->_reorderReady)
-    		if(vid->_forwardReference==relframe)
-    		{ 
-    		// if we got it allocated ...
-			aprintf("It is forward ref..\n");
-			if(vid->_forwardFrame)
-			{
-				memcpy(out,vid->_forwardFrame, llen);
-				if(_cached==1)
-					memcpy(prepBuffer,vid->_forwardFrame, llen);
-				if(flagz)
-					*flagz=vid->_forwardFlag;
-  				_lastseg = seg;
-	  			_lastframe = relframe;
-				aprintf(" using forward ref..\n");
-				return 1;
-			}
-    		}
-      if (_videos[ref]._aviheader->needDecompress ())
-	{
-	  if (!_videos[ref]._aviheader->getFrameNoAlloc (relframe,
-							 compBuffer,
-							 &len, &flags))
-	    return 0;
+    	aprintf("keyframe\n");
+     	if(!decodeCache(relframe,ref, result))	
+		{
+			printf("Editor: Cannot key frame %lu\n",relframe);
+			return 0;
+		}
 	  _lastseg = seg;
 	  _lastframe = relframe;
-
-	  // decode
-	  ret =  _videos[ref].decoder->uncompress (compBuffer, out, len, &flags);
 	  if(flagz)
-	  	*flagz=flags;
-	  if ((_cached == 1) && ret)
-	    {
-	      memcpy (prepBuffer, out, llen);
-	    }
-	  return (ret);
-	}
-      else
-	{			// does not need decompress (for example mpeg stream)
-	  if (!_videos[ref]._aviheader->getFrameNoAlloc (relframe,
-							 out, &len, &flags))
-	    return 0;
-	  _lastseg = seg;
-	  _lastframe = relframe;
-
-	  if ((_cached == 1))
-	    {
-	      memcpy (prepBuffer, out, llen);
-	    }
-	  return 1;
-
-	}
+	  	*flagz=result->flags;
+	  out->duplicate(result);
+	  return (1);
     }
-  else
-    {
+  
     //*************************
     // following frame ?
     // If it a  next b-frame we already have the forward reference set
@@ -218,209 +156,211 @@ _VIDEOS *vid=&_videos[ref];
       if ((seg == _lastseg) && ((_lastframe + 1) == relframe))
 	{
 	aprintf("following frame\n");
-	  _lastframe++;
-	//*************************
-    	// forward ref ?
-    	//*************************
-	    if (_videos[ref]._reorderReady)
-    		if(_videos[ref]._forwardReference==relframe)
-    		{
-    		// if we got it allocated ...
-			aprintf("Not kf, It is forward ref..\n");
-			if(_videos[ref]._forwardFrame)
+	// B Frame ?
+	if(_videos[ref]._aviheader->isReordered())
+	{
+		// The frame we seek is not in cache, so 
+		if(!_videos[ref]._aviheader->getFlags (relframe, &flags))
+		{
+			printf("Editor : Getflags failed\n");
+			return 0;
+		}
+		// if it is a b frame we decode all of them up to 
+		// the next ip included and put all this in cache
+		if(flags & AVI_B_FRAME)
+		{
+			// decode all of them up to the next I/P frame 
+			uint32_t nextIp=relframe;
+			
+			while((flags&AVI_B_FRAME))
 			{
-				memcpy(out,_videos[ref]._forwardFrame, llen);
-				if(flagz)
-					*flagz=vid->_forwardFlag;
-				aprintf(" using forward ref..\n");
-				if(_cached==1)
-					memcpy(prepBuffer,vid->_forwardFrame, llen);	
-				return 1;
+				nextIp++;
+				_videos[ref]._aviheader->getFlags (nextIp, &flags);
+				
 			}
-    		}
-
-	  if (_videos[ref]._aviheader->needDecompress ())
-	    {
-	      _videos[ref]._aviheader->getFlags(relframe,&flags);
-	         // and this video is B-frame friendly..
-      		if(_videos[ref]._reorderReady)
-	        if(flags & AVI_B_FRAME)
-    		  {
-			// we are at the right frame and it is a B-frame
-			// decompress the next P/I frame, store it in cache
-			// then decompress the current one
-			if(0==setForward(ref,relframe))
+			// Decode it
+			if(!decodeCache(nextIp,ref, result))	
 			{
-				printf("\n error setting fw frame \n");
+				printf("Editor: Cannot read ip frame %lu\n",nextIp);
+				return 0;
 			}
-    		  }
-	      if (!_videos[ref]._aviheader->getFrameNoAlloc (relframe,
-							     compBuffer,
-							     &len, &flags))
-		return 0;
-
-	      ret =	_videos[ref].decoder->uncompress (compBuffer, out, len,
-						  &flags);
-		if(flagz)
-				*flagz=flags;
-	    }
-	  else
-	    {
-	      ret = _videos[ref]._aviheader->getFrameNoAlloc (relframe,
-							      out,
-							      &len, &flags);
-		if(flagz)
-				*flagz=flags;
-	    }
-	  if ((_cached == 1))
-	    {
-	      memcpy (prepBuffer, out, llen);
-	    }
-	  return (ret);
-
+			
+			
+			// And now go forward...
+			uint32_t seeked=relframe;
+			while(seeked<nextIp)
+			{
+				result=cache->getFreeImage();
+				if(!decodeCache(seeked,ref, result))	
+				{
+					printf("Editor: Cannot read ip frame %lu\n",nextIp);
+					return 0;
+				}
+				if(seeked==relframe)
+				{
+					 out->duplicate(result);
+					 if(flagz) *flagz=result->flags;
+				}
+				seeked++;
+			}	
+			_lastframe=nextIp;
+			_lastseg = seg;
+			return 1;	
+		}
+		
 	}
+	// No b frame...
+      	 if(!decodeCache(relframe,ref, result))			
+			{
+				printf("Editor: Cannot read ip frame %lu\n",relframe);
+				return 0;
+			}
+	if(flagz)
+		*flagz=result->flags;	
+	out->duplicate(result);
+	_lastframe++;
+	_lastseg = seg;
+	return 1;	 
     }
-    //*************************
+  //*************************
   // completly async frame
   // rewind
   //*************************
   aprintf("async  frame\n");
   uint32_t rewind;
+  uint32_t seekFlag=0;
+  
+  _videos[ref]._aviheader->getFlags (relframe, &seekFlag);
+  
   flags = 0;
-  ref = _segments[seg]._reference;
-  // We clear the forward frame as it need to be stored properly later
-  _videos[ref]._forwardReference=0xffffffff;
   rewind = relframe;
   ADM_assert(rewind); // the first frame should be a keyframe !
-  	while (!(flags & AVI_KEY_FRAME))
-    	{
-      		rewind--;
-      		_videos[ref]._aviheader->getFlags (rewind, &flags);
-    	}
+  while (!(flags & AVI_KEY_FRAME))
+  {
+  	rewind--;
+  	_videos[ref]._aviheader->getFlags (rewind, &flags);	
+   }
   // now forward
-  for (uint32_t i = rewind; i <= relframe; i++)
+  // IP seen is the last P (or I) before the frame we seek
+  for (uint32_t i = rewind; i <relframe; i++)
     {
 
       _videos[ref]._aviheader->getFlags (i, &flags);
-      // do not bother decoding B frame
-      if((flags & AVI_B_FRAME) && (i!=relframe)) continue;
-
-      // if we want a B frame
-      // and this video is B-frame friendly..
-      if(_videos[ref]._reorderReady)
-      if(flags & AVI_B_FRAME &&(i==relframe))
-      {
-		// we are at the right frame and it is a B-frame
-		// decompress the next P/I frame, store it in cache
-		// then decompress the current one
-		if(0==setForward(ref,relframe))
-		{
-			printf("\n error setting fw frame \n");
-		}
+      // Skip B frames, there can be a lot of them
+      if((flags&AVI_B_FRAME)) continue;
+     
+       if(!decodeCache(i,ref, result))			
+	{
+		printf("Editor: Cannot read ip frame %lu\n",relframe);
+		return 0;
+	}
+	result=cache->getFreeImage();      
       }
+      
+      // Time to decode our frame
+      // if it is not a B, just decode it
+      // it it is a B, the usual stuff
+      if(!seekFlag)
+      {
+      		if(!decodeCache(relframe,ref, result))
+			{
+				printf("Editor: Cannot read ip frame %lu\n",relframe);
+				return 0;
+			}
+		if(flagz)
+			*flagz=result->flags;	
+		out->duplicate(result);	
+		return 1;	
+      
+      }
+      // it is a b frame      
+      // decode all of them up to the next I/P frame 
+	uint32_t nextIp=relframe;
+	flags=AVI_B_FRAME;	
+	while((flags&AVI_B_FRAME))
+	{
+		nextIp++;
+		_videos[ref]._aviheader->getFlags (nextIp, &flags);		
+	}
+	// Decode it
+	if(!decodeCache(nextIp,ref, result))	
+	{
+		printf("Editor: Cannot read ip frame %lu\n",nextIp);
+		return 0;
+	}
+			
+			
+	// And now go forward...
+	uint32_t seeked=relframe;
+	while(seeked<nextIp)
+	{
+		result=cache->getFreeImage();
+		if(!decodeCache(seeked,ref, result))	
+		{
+			printf("Editor: Cannot read ip frame %lu\n",nextIp);
+			return 0;
+		}
+		if(seeked==relframe)
+		{
+			 out->duplicate(result);
+			 if(flagz) *flagz=result->flags;
+		}
+		seeked++;
+	}  
+  	return 1;
+}
 
-	// then just
-      if (!_videos[ref]._aviheader->getFrameNoAlloc (i,
+
+//________________________________________________________________
+//	Read and decode the given frame into image cache entry
+//
+//
+//________________________________________________________________
+uint8_t		ADM_Composer::decodeCache(uint32_t frame,uint32_t seg, ADMImage *image)
+{
+uint32_t len;
+uint32_t flags;
+	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,
 						     compBuffer,
 						     &len, &flags))
 	{
-	  printf ("\n rewind failed.%ld -> %ld..(%ld)\n", rewind, relframe,
-		  i);
+	  printf ("\nEditor: last decoding failed.%ld)\n",   frame );
 	  return 0;
 	}
-      if (_videos[ref]._aviheader->needDecompress ())
-	{
-	  if (!_videos[ref].decoder->uncompress (compBuffer, out, len, &flags))
+	if (!_videos[seg].decoder->uncompress (compBuffer, image, len, &flags))
 	    {
+	      printf ("\nEditor: Last Decoding2 failed for frame %lu\n",frame);
 	      return 0;
 	    }
-	    if(flagz)
-	    	*flagz=flags;
-	}
-      else
-	{
-	  memcpy (out, compBuffer, len);
-	}
-    }
-  if (_cached == 1)
-    memcpy (prepBuffer, out, llen);
+	   
+	    image->flags=flags;	    	   
+	    _videos[seg]._videoCache->updateFrameNum(image,frame);	 
+	   return 1;
 
-  _lastseg = seg;
-  _lastframe = relframe;
-
-  return 1;
-}
-
-//
-//	Set the forward reference frame from the current frame
-//
-uint8_t ADM_Composer::setForward(uint32_t ref, uint32_t frame)
-{
-		uint32_t forw=frame;
-		uint32_t len;
-		uint32_t max=0,flags=0;;
-
-		_VIDEOS *vid;
-
-		vid=&_videos[ref];
-		max=vid->_nb_video_frames;
-
-		aprintf("\n Forwarding from frame :%lu \n",frame);
-
-		if(!vid->_reorderReady)
-		{
-			printf("\n Reorder not available\n");
-			return 0;
-		}
-		do
-		{	 forw++;
-   			vid->_aviheader->getFlags (forw, &flags);
-		}while((flags & AVI_B_FRAME) && (forw < max));
-		aprintf("\n Next i/p is  from frame :%lu \n",forw);
-		if(forw == max)
-		{
-			printf("\n could not find the forward ref for frame %lu \n",ref);
-			return 0;
-		}
-
-		if(!vid->_forwardFrame)
-		{
-			printf("\n Looking for forward frame for  %lu, but there is no allocated buffer ? \n",ref);
-			return 0;
-		}
-		// already got it ?
-		if(forw==vid->_forwardReference)
-		{
-			aprintf("\n re-using old one\n");
-			 return 1;
-		}
-		// get forward frame
-  		if (!vid->_aviheader->getFrameNoAlloc (
-				forw,
-				compBuffer,
-				 &len, &vid->_forwardFlag))
-				{
-				    		printf("\n Reading error\n");
-					     	return 0;
-				}
-		// and unpack it to the forward buffer
-				if(!vid->decoder->uncompress ((uint8_t *)compBuffer,
-						vid->_forwardFrame,
-						len,
-						&vid->_forwardFlag))
-					{
-						printf("\n Decompressing error\n");
-						return 0;
-					}
-			// remember if have it
-					vid->_forwardReference=forw;
-			return 1;
 }
 //
 //      Render previous kf
 //
+uint8_t	ADM_Composer::getPKFrame(uint32_t *frame)
+{
+	uint32_t fr, seg, relframe;	//,len; //flags,ret,nf;
+
+  fr = *frame;
+
+  if (*frame == 0)
+    {
+      return 0;
+    }
+  if (!searchPreviousKeyFrame (fr, &seg, &relframe))
+    {
+      printf (" NKF not found\n");
+      return 0;
+    }
+  ADM_assert (convSeg2Frame (frame, seg, relframe));
+  return 1;
+}
 uint8_t
-  ADM_Composer::getUncompressedFramePKF (uint32_t * frame, uint8_t * out)
+  ADM_Composer::getUncompressedFramePKF (uint32_t * frame, ADMImage * out)
 {
   uint32_t fr, seg, relframe;	//,len; //flags,ret,nf;
 
@@ -443,12 +383,25 @@ uint8_t
 
   return getUncompressedFrame (*frame, out);
 }
+uint8_t	ADM_Composer::getNKFrame(uint32_t *frame)
+{
+	uint32_t fr, seg, relframe;	//,len; //flags,ret,nf;
+
+  fr = *frame;  
+  if (!searchNextKeyFrame (fr, &seg, &relframe))
+    {
+      printf (" NKF not found\n");
+      return 0;
+    }
+  ADM_assert (convSeg2Frame (frame, seg, relframe));
+  return 1;
+}
 
 //
 //      Render Next kf
 //
 uint8_t
-  ADM_Composer::getUncompressedFrameNKF (uint32_t * frame, uint8_t * out)
+  ADM_Composer::getUncompressedFrameNKF (uint32_t * frame, ADMImage * out)
 {
   uint32_t fr, seg, relframe, nf;	//flags,ret,len;
 

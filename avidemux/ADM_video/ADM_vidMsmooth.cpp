@@ -66,9 +66,9 @@
 	if (GETFRAMEf > num_frames_hi - 1) GETFRAMEf = num_frames_hi - 1; \
 	(fp) = vidCache->getImage(GETFRAMEf); \
 }
-
-#define UPLANE(x) (x+_info.width*_info.height)
-#define VPLANE(x) (x+((_info.width*_info.height*5)>>2))
+#define YPLANE(x) (x->data)
+#define UPLANE(x) (x->data+_info.width*_info.height)
+#define VPLANE(x) (x->data+((_info.width*_info.height*5)>>2))
 
 #include "ADM_video/ADM_vidMSmooth_param.h"
 
@@ -93,7 +93,7 @@ private:
 	MSMOOTH_PARAM	*_param;
 	VideoCache	*vidCache;
 	uint8_t		show, debug;
-	uint8_t 	*blur,*work,*mask,*final,*final2;
+	ADMImage 	*blur,*work,*mask,*final,*final2;
 public:    
 
 			Msmooth(AVDMGenericVideoStream *in,CONFcouple *couples)   ;
@@ -108,7 +108,7 @@ public:
 	uint8_t 	configure(AVDMGenericVideoStream *in);
 	uint8_t		getCoupledConf( CONFcouple **couples);
 	uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-				uint8_t *data,uint32_t *flags);
+				ADMImage *data,uint32_t *flags);
 };
 
 BUILD_CREATE(create_msmooth,Msmooth);
@@ -146,7 +146,7 @@ Msmooth::Msmooth(AVDMGenericVideoStream *in,CONFcouple *couples)
 		}
 		
 	uint32_t sz=(_info.width*_info.height*3)>>1;
-	#define NW(x) x=new uint8_t[sz];ADM_assert(x);
+	#define NW(x) x=new ADMImage(_info.width,_info.height);ADM_assert(x);
 	NW(blur);
 	NW(work);
 	NW(mask);
@@ -205,13 +205,13 @@ char *Msmooth::printConf( void )
 	
 //________________________________________________________
 uint8_t Msmooth::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-				uint8_t *data,uint32_t *flags)
+				ADMImage *data,uint32_t *flags)
 {
-    uint8_t *src = vidCache->getImage(frame);
+    ADMImage *src = vidCache->getImage(frame);
    
-    uint8_t * deliver;
+    ADMImage * deliver;
 
-	const unsigned char *srcpY = src ;
+	const unsigned char *srcpY = YPLANE(src) ;
 	const unsigned char *srcp_savedY = srcpY;
     	int src_pitchY = _info.width;
 	
@@ -221,7 +221,7 @@ uint8_t Msmooth::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 	const unsigned char *srcpV =VPLANE(src);
 	const unsigned char *srcp_savedV = srcpV;
 
-    	unsigned char *blurpY = blur;//
+    	unsigned char *blurpY = YPLANE(blur);//
 	unsigned char *blurp_savedY = blurpY;
     	int blur_pitchY =  _info.width;
     	unsigned char *blurpU = UPLANE(blur);
@@ -230,28 +230,28 @@ uint8_t Msmooth::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     	unsigned char *blurpV = VPLANE(blur);
 	unsigned char *blurp_savedV = blurpV;
 
-    unsigned char *workpY = work; //->GetWritePtr(PLANAR_Y);
+    unsigned char *workpY = YPLANE(work); //->GetWritePtr(PLANAR_Y);
 	unsigned char *workp_savedY = workpY;
     unsigned char *workpU = UPLANE(work);
 	unsigned char *workp_savedU = workpU;
     unsigned char *workpV = VPLANE(work);
 	unsigned char *workp_savedV = workpV;
 
-    unsigned char *maskpY = mask; //->GetWritePtr(PLANAR_Y);
+    unsigned char *maskpY = YPLANE(mask); //->GetWritePtr(PLANAR_Y);
 	unsigned char *maskp_savedY = maskpY;
     unsigned char *maskpU = UPLANE(mask);
 	unsigned char *maskp_savedU = maskpU;
     unsigned char *maskpV = VPLANE(mask);
 	unsigned char *maskp_savedV = maskpV;
 
-    unsigned char *finalpY = final;//->GetWritePtr(PLANAR_Y);
+    unsigned char *finalpY = YPLANE(final);//->GetWritePtr(PLANAR_Y);
 	unsigned char *finalp_savedY = finalpY;
     unsigned char *finalpU = UPLANE(final);
 	unsigned char *finalp_savedU = finalpU;
     unsigned char *finalpV = VPLANE(final);
 	unsigned char *finalp_savedV = finalpV;
 
-    unsigned char *finalp2Y = final2; //->GetWritePtr(PLANAR_Y);
+    unsigned char *finalp2Y = YPLANE(final2); //->GetWritePtr(PLANAR_Y);
 	unsigned char *finalp2_savedY = finalp2Y;
     unsigned char *finalp2U = UPLANE(final2);
 	unsigned char *finalp2_savedU = finalp2U;
@@ -276,12 +276,12 @@ uint8_t Msmooth::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			char buf[80];
 			//env->MakeWritable(&mask);
 			sprintf(buf, "0.2 beta");
-			DrawString(mask, 0, 0, buf);
+			DrawString(mask->data, 0, 0, buf);
 			sprintf(buf, "From Donald Graft");
-			DrawString(mask, 0, 1, buf);
+			DrawString(mask->data, 0, 1, buf);
 		}
 		//return mask;
-		memcpy(data,mask,(_info.width*_info.height*3)>>1);
+		memcpy(data->data,mask->data,(_info.width*_info.height*3)>>1);
 		vidCache->unlockAll();
 		return 1;
 	}
@@ -371,11 +371,11 @@ done:
 		char buf[80];
 		//env->MakeWritable(&deliver);
 		sprintf(buf, "0.2beta");
-		DrawString(deliver, 0, 0, buf);
+		DrawString(deliver->data, 0, 0, buf);
 		sprintf(buf, "Donald Graft");
-		DrawString(deliver, 0, 1, buf);
+		DrawString(deliver->data, 0, 1, buf);
 	}
-	memcpy(data,deliver,(_info.width*_info.height*3)>>1);
+	memcpy(data->data,deliver->data,(_info.width*_info.height*3)>>1);
 	//return(deliver);
 	vidCache->unlockAll();
 	return 1;

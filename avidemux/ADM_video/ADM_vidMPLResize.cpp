@@ -74,16 +74,16 @@ class  AVDMVideoStreamMPResize:public AVDMGenericVideoStream
 
  protected:
 				RESIZE_PARAMS 	*_param;
-				SwsContext		*_context;
-				uint8_t 			reset(uint32_t nw, uint32_t old,uint32_t algo);
-				uint8_t			clean( void );
+				SwsContext	*_context;
+				uint8_t 	reset(uint32_t nw, uint32_t old,uint32_t algo);
+				uint8_t		clean( void );
  public:
 
   				AVDMVideoStreamMPResize(  AVDMGenericVideoStream *in,CONFcouple *setup);
 				AVDMVideoStreamMPResize(	AVDMGenericVideoStream *in,uint32_t x,uint32_t y);
   				virtual 		~AVDMVideoStreamMPResize();
           virtual 		uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags);
+          							ADMImage *data,uint32_t *flags);
 				uint8_t configure( AVDMGenericVideoStream *instream);
 	virtual 		char 	*printConf(void) ;
 
@@ -225,7 +225,8 @@ AVDMVideoStreamMPResize::AVDMVideoStreamMPResize(
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
 	//_uncompressed=(uint8_t *)malloc(3*_info.width*_info.height);
-	_uncompressed=new uint8_t[3*_info.width*_info.height];
+//	_uncompressed=new uint8_t[3*_info.width*_info.height];
+	_uncompressed=new ADMImage(_info.width,_info.height);
 
 		if(couples)
 		{
@@ -264,7 +265,8 @@ AVDMVideoStreamMPResize::AVDMVideoStreamMPResize(
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
 	//_uncompressed=(uint8_t *)malloc(3*_info.width*_info.height);
-	_uncompressed=new uint8_t[3*_info.width*_info.height];
+	//_uncompressed=new uint8_t[3*_info.width*_info.height];
+	_uncompressed=new ADMImage(_info.width,_info.height);
 	_param=NEW( RESIZE_PARAMS);
 	_param->w=x;
 	_param->h = y;
@@ -293,7 +295,8 @@ uint8_t	AVDMVideoStreamMPResize::getCoupledConf( CONFcouple **couples)
 // ___ destructor_____________
 AVDMVideoStreamMPResize::~AVDMVideoStreamMPResize()
 {
- 	delete [] _uncompressed;
+ 	delete  _uncompressed;
+	_uncompressed=NULL;
 
 	DELETE(_param);
 	clean();
@@ -306,9 +309,9 @@ AVDMVideoStreamMPResize::~AVDMVideoStreamMPResize()
 //
 
 uint8_t AVDMVideoStreamMPResize::getFrameNumberNoAlloc(uint32_t frame,
-																		uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 			if(frame>=_info.nb_frames) 
 			{
@@ -328,17 +331,17 @@ uint8_t AVDMVideoStreamMPResize::getFrameNumberNoAlloc(uint32_t frame,
 			uint32_t page;
 
 			page=_in->getInfo()->width*_in->getInfo()->height;
-			src[0]=_uncompressed;
-			src[1]=_uncompressed+page;
-			src[2]=_uncompressed+page+(page>>2);;
+			src[0]=_uncompressed->data;
+			src[1]=_uncompressed->data+page;
+			src[2]=_uncompressed->data+page+(page>>2);;
 
 			ssrc[0]=_in->getInfo()->width;
 			ssrc[1]=ssrc[2]=_in->getInfo()->width>>1;
 
 			page=_info.width*_info.height;
-			dst[0]=data;
-			dst[1]=data+page;
-			dst[2]=data+page+(page>>2);;
+			dst[0]=data->data;
+			dst[1]=data->data+page;
+			dst[2]=data->data+page+(page>>2);;
 			ddst[0]=_info.width;
 			ddst[1]=ddst[2]=_info.width>>1;
 /*

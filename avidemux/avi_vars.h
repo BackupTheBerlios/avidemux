@@ -65,7 +65,7 @@ EXTERN uint8_t 	mode_preview
 	It leads to the buffer where the last displayed frame has been uncompressed
 
 */
-EXTERN uint8_t *rdr_decomp_buffer
+EXTERN ADMImage *rdr_decomp_buffer
 #ifdef __DECLARE__
 =NULL
 #endif

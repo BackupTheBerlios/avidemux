@@ -84,7 +84,8 @@ uint8_t		EncoderXvid4::configure (AVDMGenericVideoStream * instream)
   info = instream->getInfo ();
   _w = info->width;
   _h = info->height;
-  _vbuffer = new uint8_t[_w * _h * 2];
+//  _vbuffer = new uint8_t[_w * _h * 2];
+	_vbuffer=new ADMImage(_w,_h);
   ADM_assert (_vbuffer);
   _in = instream;
   _fps1000=info->fps1000;

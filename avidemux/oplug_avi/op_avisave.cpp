@@ -75,7 +75,8 @@ GenericAviSave::GenericAviSave ()
   has_audio_track = has_audio_vbr = 0;
   one_audio_stock = 0;
 
-  vbuffer = new uint8_t[MAXIMUM_SIZE * MAXIMUM_SIZE * 3];
+ vbuffer = new uint8_t[MAXIMUM_SIZE * MAXIMUM_SIZE * 3];
+//  vbuffer=new ADMImage(MAXIMUM_SIZE,MAXIMUM_SIZE);
   abuffer = new uint8_t[96000];
 
   ADM_assert (vbuffer);
@@ -93,7 +94,7 @@ GenericAviSave::GenericAviSave ()
 
 GenericAviSave::~GenericAviSave ()
 {
-  delete[]vbuffer;
+  delete vbuffer;
   delete[]abuffer;
   _incoming=NULL;
 }

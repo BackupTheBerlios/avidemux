@@ -91,6 +91,7 @@ int value=4;;
   compEngaged = 0;
   encoderReady = 0;
   _encoder = NULL;
+  aImage=new ADMImage(_mainaviheader.dwWidth,_mainaviheader.dwHeight);
   _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
   encoding_gui->setFps(_incoming->getInfo()->fps1000);
   encoding_gui->setPhasis("Smart Copy");
@@ -110,7 +111,11 @@ GenericAviSaveSmart::~GenericAviSaveSmart ()
     }
   if (_encoder)
     delete      _encoder;
-
+ if(aImage)
+ {
+ 	delete aImage;
+	aImage=NULL;
+ }
 }
 
 // copy mode
@@ -138,11 +143,11 @@ GenericAviSaveSmart::writeVideoChunk (uint32_t frame)
       printf ("\n %lu encoding", frame);
       // Else encode it ....
       //1-Read it
-      ret1 = video_body->getUncompressedFrame (frameStart + frame, CPBuffer);
+      ret1 = video_body->getUncompressedFrame (frameStart + frame, aImage);
       if (!ret1)
 	return 0;
       // 2-encode it
-      if (!_encoder->encode (CPBuffer, vbuffer, &len, &_videoFlag))
+      if (!_encoder->encode (aImage, vbuffer, &len, &_videoFlag))
 	return 0;
       // 3-write it
       return writter->saveVideoFrame (len, _videoFlag, vbuffer);

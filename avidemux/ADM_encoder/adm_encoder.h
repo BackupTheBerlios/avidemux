@@ -24,6 +24,7 @@
  ***************************************************************************/
 #ifndef __ADM_encoder__
 #define __ADM_encoder__
+#include "ADM_library/ADM_image.h"
 typedef enum
 {
 
@@ -55,7 +56,7 @@ class Encoder
 	protected:
 				encoderState 		_state;
 				uint32_t		_w,_h;
-				uint8_t			*_vbuffer;
+				ADMImage		*_vbuffer;
              			 AVDMGenericVideoStream *_in;
 				char 			_logname[500];
 				COMPRES_PARAMS 		_param;

@@ -66,7 +66,7 @@ int value=0;
 /*
    	Uncompress frame, set flags if needed
 */
-uint8_t 	decoderVP3::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag) 		
+uint8_t 	decoderVP3::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag) 		
 {
     UNUSED_ARG(flag);
       	if (DecodeFrameToYUV(_handle, (char *)in, len, _w, _h)) 
@@ -82,7 +82,7 @@ uint8_t 	decoderVP3::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *
 		
 		uint32_t stride;
 		
-		to=out+(_w*_h)-_w;
+		to=out->data+(_w*_h)-_w;
 		
 		if(  _handle->PostProcessingLevel) 
 		{
@@ -103,7 +103,7 @@ uint8_t 	decoderVP3::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *
 			ti+=stride;							
 		}
 	
-		to2=out+_w*_h;
+		to2=out->data+_w*_h;
 		to=to2+((_w*_h)>>2);
        memset(to,128,_w>>1);
        memset(to2,128,_w>>1);

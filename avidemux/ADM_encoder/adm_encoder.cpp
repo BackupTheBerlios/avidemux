@@ -78,7 +78,9 @@ Encoder::~Encoder( void )
 {
 #define CLEAN(x) if(x) { delete [] x;x=NULL;}
 
-		CLEAN(_vbuffer);
+		//CLEAN(_vbuffer);
+		if(_vbuffer) delete _vbuffer;
+		_vbuffer=NULL;
 		CLEAN(entries);
 
 }

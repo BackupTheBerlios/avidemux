@@ -31,14 +31,14 @@
 
  protected:
 
-      					uint8_t					*_locked;
-        				uint8_t					*_lockcount;
-   			virtual 	char 						*printConf(void);
+      					ADMImage				*_locked;
+        				ADMImage				*_lockcount;
+   			virtual 	char 					*printConf(void);
         				NOISE_PARAM				*_param;
-        				uint32_t					_lastFrame;
-        				uint8_t 					doOnePix(uint8_t *in,uint8_t *out,
+        				uint32_t				_lastFrame;
+        				uint8_t 				doOnePix(uint8_t *in,uint8_t *out,
         												uint8_t *lock,uint8_t *nb);
-         				uint8_t 					doBlend(uint8_t *in,uint8_t *out,
+         				uint8_t 				doBlend(uint8_t *in,uint8_t *out,
         												uint8_t *lock,uint8_t *nb);
 
  public:
@@ -47,7 +47,7 @@
 							ADMVideoDenoise(  AVDMGenericVideoStream *in,CONFcouple *setup);
   			virtual 			~ADMVideoDenoise();
 		        virtual uint8_t 		getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          								uint8_t *data,uint32_t *flags);
+          								ADMImage *data,uint32_t *flags);
 			virtual uint8_t 		configure( AVDMGenericVideoStream *instream) ;
 
 			virtual uint8_t		getCoupledConf( CONFcouple **couples);

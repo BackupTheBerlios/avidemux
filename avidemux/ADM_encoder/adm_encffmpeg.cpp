@@ -96,7 +96,8 @@ uint8_t EncoderFFMPEGHuff::configure (AVDMGenericVideoStream * instream)
   _fps=info->fps1000;
   _w = info->width;
   _h = info->height;
-  _vbuffer = new uint8_t[_w * _h * 3];
+ // _vbuffer = new uint8_t[_w * _h * 3];
+ _vbuffer=new ADMImage(_w,_h);
   ADM_assert (_vbuffer);
   _in = instream;
 
@@ -149,7 +150,8 @@ uint8_t EncoderFFMPEGFFV1::configure (AVDMGenericVideoStream * instream)
   _fps=info->fps1000;
   _w = info->width;
   _h = info->height;
-  _vbuffer = new uint8_t[_w * _h * 3];
+//  _vbuffer = new uint8_t[_w * _h * 3];
+  _vbuffer=new ADMImage(_w,_h);
   ADM_assert (_vbuffer);
   _in = instream;
 
@@ -205,7 +207,8 @@ uint8_t EncodeFFMPEGSNow::configure (AVDMGenericVideoStream * instream)
   _fps=info->fps1000;
   _w = info->width;
   _h = info->height;
-  _vbuffer = new uint8_t[_w * _h * 3];
+//  _vbuffer = new uint8_t[_w * _h * 3];
+_vbuffer=new ADMImage(_w,_h);
   ADM_assert (_vbuffer);
   _in = instream;
 
@@ -263,7 +266,8 @@ EncoderFFMPEG::configure (AVDMGenericVideoStream * instream)
   _fps=info->fps1000;
   _w = info->width;
   _h = info->height;
-  _vbuffer = new uint8_t[_w * _h * 3];
+ // _vbuffer = new uint8_t[_w * _h * 3];
+ _vbuffer=new ADMImage(_w,_h);
   ADM_assert (_vbuffer);
   _in = instream;
 

@@ -120,7 +120,7 @@ uint8_t Mpeg2enc::init(  uint32_t qz, uint32_t maxbr, uint32_t fps1000,
 ---------------------------------------------------------
 */
 
-uint8_t Mpeg2enc::encode(		uint8_t 	*in,
+uint8_t Mpeg2enc::encode(		ADMImage 	*in,
 						   			uint8_t	*out,
 						   			uint32_t 	*len,
 			       						uint32_t 	*flags,
@@ -131,7 +131,7 @@ uint8_t r;
 	*flags=0;
 	f=(int)*flags;
 	l=(int)*len;
-	r=mpegenc_encode((char *)in,(char *)out,&l,&f,&q);
+	r=mpegenc_encode((char *)in->data,(char *)out,&l,&f,&q);
 	*quant=(uint32_t)q;
 	*flags=(uint32_t )f;
 	*len=(uint32_t)l;

@@ -21,8 +21,8 @@
       			                 uint8_t *planar;
 
      public:
-     										decoderRGB16(uint32_t w,uint32_t h);
-         		virtual					~decoderRGB16();
-    			virtual uint8_t 	uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag=NULL) 		;	
-		       uint8_t 				uncompressRGB24(uint8_t *in,uint8_t *out,uint32_t len);
+						decoderRGB16(uint32_t w,uint32_t h);
+			virtual			~decoderRGB16();
+			virtual uint8_t 	uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag=NULL);	
+		       uint8_t 			uncompressRGB24(uint8_t *in,ADMImage *out,uint32_t len);
 }   ;

@@ -17,6 +17,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ 
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,31 +35,9 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidFlux.h"
-#include "ADM_filter/video_filters.h"
 
-
-static FILTER_PARAM fluxParam={2,{"temporal_threshold","spatial_threshold"}};
-
-
-SCRIPT_CREATE(fluxsmooth_script,ADMVideoFlux,fluxParam);
-
-//#define ASM_FLUX
-BUILD_CREATE(fluxsmooth_create,ADMVideoFlux);
-
-static uint64_t  spat_thresh,temp_thresh;
-static uint64_t  _l_counter_init,_l_indexer,_l_prev_pels,_l_next_pels;
-static int _l_src_pitch;
-static int _l_dst_pitch;
-static int _l_xmax;
-
-static int ycnt;
 static int16_t scaletab[16];
 static uint64_t scaletab_MMX[65536];
-static	uint8_t * _l_currp; 
-static	 uint8_t * _l_prevp;								  								  
-static	 uint8_t * _l_nextp; 
-static	 uint8_t * _l_destp; 
 
 void initScaleTab( void )
 {
@@ -74,6 +54,31 @@ void initScaleTab( void )
 							  (((uint64_t)scaletab[(i >> 12) & 15]) << 48);
 		}
 }
+ #if 0
+#include "ADM_video/ADM_vidFlux.h"
+#include "ADM_filter/video_filters.h"
+
+static FILTER_PARAM fluxParam={2,{"temporal_threshold","spatial_threshold"}};
+
+
+SCRIPT_CREATE(fluxsmooth_script,ADMVideoFlux,fluxParam);
+
+//#define ASM_FLUX
+BUILD_CREATE(fluxsmooth_create,ADMVideoFlux);
+
+static uint64_t  spat_thresh,temp_thresh;
+static uint64_t  _l_counter_init,_l_indexer,_l_prev_pels,_l_next_pels;
+static int _l_src_pitch;
+static int _l_dst_pitch;
+static int _l_xmax;
+
+static int ycnt;
+static	uint8_t * _l_currp; 
+static	 uint8_t * _l_prevp;								  								  
+static	 uint8_t * _l_nextp; 
+static	 uint8_t * _l_destp; 
+
+
 static uint32_t size;
 
 ADMVideoFlux::ADMVideoFlux(AVDMGenericVideoStream *in,CONFcouple *couples)
@@ -625,3 +630,4 @@ CHECK_AND_ADD(temp_thresh)
 }
 #endif
 //
+#endif

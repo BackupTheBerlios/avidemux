@@ -72,8 +72,8 @@ ADMVideoMPD3Dlow::~ADMVideoMPD3Dlow()
 {
 
  	DELETE(_param);
-	delete [] _uncompressed;
-	delete [] _stored;
+	delete  _uncompressed;
+	delete  _stored;
 	delete [] Line;
 	Line=NULL;
 	_param=NULL;
@@ -165,8 +165,10 @@ uint32_t page;
 
 	page=_info.width*_info.height;
 
-  _stored=new uint8_t[(page*3)>>1];
-  _uncompressed=new uint8_t[ (page*3)>>1];
+ // _stored=new uint8_t[(page*3)>>1];
+ // _uncompressed=new uint8_t[ (page*3)>>1];
+ 	_stored=new ADMImage(_info.width,_info.height);
+	_uncompressed=new ADMImage(_info.width,_info.height);
 
   _info.encoding=1;
   _in=in;
@@ -210,9 +212,9 @@ uint8_t	ADMVideoMPD3Dlow::getCoupledConf( CONFcouple **couples)
 // else we blend
 
 uint8_t ADMVideoMPD3Dlow::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 UNUSED_ARG(flags);
 
@@ -233,7 +235,7 @@ UNUSED_ARG(flags);
 					 	return 0;
 				 }
 				// store for future use
-				memcpy(_stored,data,*len);
+				memcpy(_stored->data,data->data,*len);
 				_last=frame;
 				return 1;
 			}
@@ -247,9 +249,9 @@ UNUSED_ARG(flags);
 
 		uint8_t *c,*d,*p;
 
-		d=data;
-		c=_uncompressed;
-		p=_stored;
+		d=data->data;
+		c=_uncompressed->data;
+		p=_stored->data;
 //
 
    	deNoise(c,p, d,
@@ -285,7 +287,7 @@ UNUSED_ARG(flags);
 
 
 	_last=frame;
-	memcpy(_stored,data,(W*H*3)>>1);
+	memcpy(_stored->data,data->data,(W*H*3)>>1);
 	return 1;
 
 

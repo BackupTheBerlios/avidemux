@@ -78,6 +78,7 @@ extern void     VPInitLibrary();
 };
 
 void sig_segfault_handler(int signo);
+extern void ADMImage_stat( void );
 int global_argc;
 char **global_argv;
 
@@ -184,25 +185,17 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 void onexit( void )
 {
 	filterCleanUp();
+	ADMImage_stat();
 	printf("\n Goodbye...\n\n");
 }
 void sig_segfault_handler(int signo)
 {
+     ADMImage_stat();
      g_on_error_stack_trace ("avidemux");
+     printf("Memory stat:\n");
+
 //   g_on_error_query (programname);
-		printf("\n***************************************");
-		printf("\n***************************************");
-		printf("\n***************************************");
-		printf("\n If you started avidemux on a read only or ");
-		printf("\n win32 partition and tried to encode or use ");
-  		printf("\n Smart Copy, this crash is NORMAL");
-		printf("\n This a known DivX codec bug");
-		printf("\n");
-		printf("\n See the avidemux homepage or the documentation ");
-		printf("\n for more details on this bug");
-		printf("\n***************************************");
-		printf("\n***************************************");
-		printf("\n***************************************");
+
 
      signo=0; // will keep GCC happy
      exit(1); // _exit(1) ???

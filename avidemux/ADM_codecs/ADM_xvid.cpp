@@ -242,7 +242,7 @@ uint8_t 	xvidEncoderCBR::initExtented(uint32_t br,xvidEncParam *extend)
 //	Encode a single frame
 //
 uint8_t xvidEncoderCBR::encode(
-				uint8_t * in,
+				ADMImage * in,
 			    uint8_t * out,
 			    uint32_t * len,
        		uint32_t * flags)
@@ -260,7 +260,7 @@ uint8_t xvidEncoderCBR::encode(
 	xframe.bitstream = out;
 	xframe.length = -1; 	// this is written by the routine
 
-	xframe.image = in;
+	xframe.image = in->data;
     xframe.colorspace = XVID_CSP_YV12;	// defined in <xvid.h>
 
     xframe.intra = -1; // let the codec decide between I-frame (1) and P-frame (0)
@@ -364,7 +364,7 @@ uint8_t 	xvidEncoderCQ::initExtented(uint32_t q,xvidEncParam *extend)
 //
 
 uint8_t xvidEncoderCQ::encode(
-				uint8_t * in,
+				ADMImage * in,
 			    uint8_t * out,
 			    uint32_t * len,
        		uint32_t * flags)
@@ -382,7 +382,7 @@ uint8_t xvidEncoderCQ::encode(
 	xframe.bitstream = out;
 	xframe.length = -1; 	// this is written by the routine
 
-	xframe.image = in;
+	xframe.image = in->data;
     	xframe.colorspace = XVID_CSP_YV12;	// defined in <xvid.h>
 
     	xframe.intra = -1; // let the codec decide between I-frame (1) and P-frame (0)
@@ -427,7 +427,7 @@ uint8_t xvidEncoderCQ::encode(
 // *************************************************
 
  uint8_t xvidEncoderVBR::encode(
-				uint8_t * in,
+				ADMImage * in,
 			    uint8_t * out,
 			    uint32_t * len,
        		uint32_t * flags)
@@ -442,7 +442,7 @@ uint8_t xvidEncoderCQ::encode(
 
 }
  uint8_t xvidEncoderVBR::encodeVBR(
-				uint8_t * in,
+				ADMImage * in,
 			    uint8_t * out,
 			    uint32_t * len,
        		uint32_t * flags,
@@ -462,7 +462,7 @@ uint8_t xvidEncoderCQ::encode(
 	xframe.bitstream = out;
 	xframe.length = -1; 	// this is written by the routine
 
-	xframe.image = in;
+	xframe.image = in->data;
    	xframe.colorspace = XVID_CSP_YV12;	// defined in <xvid.h>
 
 	if(  forcekey)

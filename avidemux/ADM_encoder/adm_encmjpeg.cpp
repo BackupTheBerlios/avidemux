@@ -73,7 +73,8 @@ uint8_t EncoderMjpeg::configure( AVDMGenericVideoStream *instream)
 		_h=info->height;
 
 		
-		_vbuffer=new uint8_t[_w*_h*3];
+//		_vbuffer=new uint8_t[_w*_h*3];
+		_vbuffer=new ADMImage(_w,_h);
 		ADM_assert(_vbuffer);
 
    //	_codec=new mjpegEncoder(_w,_h);
@@ -101,10 +102,8 @@ uint32_t l,f;
 		{
 				printf("\n Error : Cannot read incoming frame !");
 				return 0;
-		}
-
- 	
-							return _codec->encode(   _vbuffer,out,len,flags);
+		}	
+		return _codec->encode(   _vbuffer,out,len,flags);
 	}
 
 //_______________________________

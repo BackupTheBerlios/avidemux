@@ -39,13 +39,13 @@ uint32_t sz;
 	// Ready buffers
 	frameNum=new uint32_t[nbEntry];
 	frameLock=new uint8_t[nbEntry];
-	frameBuffer=new uint8_t*[nbEntry]; //(uint8_t **)malloc( nbEntry*sizeof(uint8_t *));
+	frameBuffer=new ADMImage *[nbEntry]; //(uint8_t **)malloc( nbEntry*sizeof(uint8_t *));
 	sz=(info.width*info.height*3)>>1;
 	for(uint32_t i=0;i<nbEntry;i++)
 	{
 		frameNum[i]=0xffff0000;
 		frameLock[i]=0;
-		frameBuffer[i]=new uint8_t[sz];	
+		frameBuffer[i]=new ADMImage(info.width,info.height);	
 	}
 	lastUsed=0;
 }
@@ -54,7 +54,7 @@ VideoCache::~ VideoCache()
 {
 	for(uint32_t i=0;i<nbEntry;i++)
 	{
-		delete [] frameBuffer[i];
+		delete  frameBuffer[i];
 	}
 	delete [] frameBuffer;
 	delete [] frameLock;
@@ -71,7 +71,7 @@ int32_t VideoCache::searchFrame( uint32_t frame)
 	return -1;
 }
 //_____________________________________________
-int32_t 	 VideoCache::searchPtr( uint8_t *ptr)
+int32_t 	 VideoCache::searchPtr( ADMImage *ptr)
 {
 	for(uint32_t i=0;i<nbEntry;i++)
 	{
@@ -89,7 +89,7 @@ uint8_t  VideoCache::unlockAll(void)
 	return 1;
 }
 //_____________________________________________
-uint8_t  VideoCache::unlock(uint8_t *frame)
+uint8_t  VideoCache::unlock(ADMImage *frame)
 {
 int32_t k;
 	k=searchPtr(frame) ;
@@ -109,7 +109,7 @@ uint8_t  VideoCache::purge(void)
 
 }
 //_____________________________________________
-uint8_t *VideoCache::getImage(uint32_t frame)
+ADMImage *VideoCache::getImage(uint32_t frame)
 {
 int32_t i;
 uint32_t tryz=nbEntry;
@@ -133,7 +133,7 @@ uint32_t len,flags;
 		if(!frameLock[(lastUsed+count)%nbEntry])
 		{
 			// for a candidate
-			uint8_t *ptr;
+			ADMImage *ptr;
 			uint32_t target;
 			
 			target=(lastUsed+count)%nbEntry;

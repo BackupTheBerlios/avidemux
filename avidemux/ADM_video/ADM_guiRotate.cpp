@@ -59,7 +59,8 @@ static gboolean  			gui_draw(GtkWidget * widget,
 
 
 // Ugly !
-static uint8_t *video_yuv_orig, *video_rgb, *video_yuv;
+static uint8_t  *video_rgb, *video_yuv;
+static ADMImage *video_yuv_orig;
 static uint32_t orig_w, orig_h;
 static ROTATE_PARAM par;
 
@@ -82,8 +83,10 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
   h= _in->getInfo()->height;
 
 
-  video_yuv_orig=(uint8_t *)malloc(w*h*4);
-  ADM_assert(video_yuv_orig);
+//  video_yuv_orig=(uint8_t *)malloc(w*h*4);
+//  ADM_assert(video_yuv_orig);
+	video_yuv_orig=new ADMImage(w,h);
+	
   video_rgb=(uint8_t *)malloc(w*h*4);
   ADM_assert(video_rgb);
   video_yuv=(uint8_t *)malloc(w*h*4);
@@ -92,7 +95,7 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
   // ask current frame from previous filter
   ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l, video_yuv_orig, &f));
 
-  memcpy(video_yuv, video_yuv_orig, (w*h*3)>>1);
+  memcpy(video_yuv, video_yuv_orig->data, (w*h*3)>>1);
   COL_yv12rgb(w, h,video_yuv, video_rgb);
 
   ADM_assert(_param);
@@ -118,10 +121,11 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
   _info.height = _param->height;
 
   free(video_rgb);
-  free(video_yuv_orig);
+  delete video_yuv_orig;
   free(video_yuv);
 
-  video_rgb = video_yuv_orig = video_yuv = NULL;
+  video_rgb =  video_yuv = NULL;
+  video_yuv_orig =NULL;
 
   return ret;
 }
@@ -176,7 +180,7 @@ void gui_update(GtkButton * button, gpointer user_data)
   par.angle = GTK_ADJUSTMENT(adj_angle)->value;
   printf("\n Angle : %3.2f\n", par.angle);
 
-  do_rotate(video_yuv_orig, orig_w, orig_h, par.angle, video_yuv, &par.width, &par.height);
+  do_rotate(video_yuv_orig->data, orig_w, orig_h, par.angle, video_yuv, &par.width, &par.height);
 
   printf("w: %ld, h: %ld\n", par.width, par.height);
 

@@ -45,7 +45,8 @@ ADMVideoFields::ADMVideoFields(
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
 	
 					
- 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+ 	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
+	//uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
   ADM_assert(_uncompressed);
   _motionmask=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
   ADM_assert(_motionmask);
@@ -114,7 +115,7 @@ uint8_t ADMVideoFields::hasMotion(void)
        	memset(_motionmask,0xff,w);
           	memset(_motionmask2,0xff,w);
 
-        	p=_uncompressed;
+        	p=_uncompressed->data;
          	c=p+w;
           	n=c+w;
            e=_motionmask+w; 	
@@ -185,8 +186,8 @@ uint8_t ADMVideoFields::doBlend(uint8_t *f)
      	w=_info.width;
      	h=_info.height;
 
-       	p=_uncompressed;
-         	c=_uncompressed;
+       	p=_uncompressed->data;
+         	c=_uncompressed->data;
           	n=c+w;
            e2=_motionmask2+w; 	
            // First line

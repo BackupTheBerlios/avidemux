@@ -96,7 +96,7 @@ char *ADMVideoForcedPP::printConf( void )
 ADMVideoForcedPP::~ADMVideoForcedPP()
 {
 	if(_uncompressed)
- 		delete []_uncompressed;
+ 		delete _uncompressed;
 	if(_postproc.ppContext)
 		deletePostProc(&_postproc);
 
@@ -138,13 +138,14 @@ ADMVideoForcedPP::~ADMVideoForcedPP()
 		_postproc.forcedQuant=_param->forcedQuant;
 		updatePostProc(&_postproc);	    	
 	    	
-	    	_uncompressed=new uint8_t[3*_info.width*_info.height];	
+	    	//_uncompressed=new uint8_t[3*_info.width*_info.height];	
+		_uncompressed=new ADMImage(_info.width,_info.height);	
 		
 
 }
 uint8_t ADMVideoForcedPP::getFrameNumberNoAlloc(uint32_t frame,
 							uint32_t *len,
-							uint8_t *data,
+							ADMImage *data,
 							uint32_t *flags)
 {
 		uint32_t page=_info.width*_info.height;
@@ -162,12 +163,12 @@ uint8_t ADMVideoForcedPP::getFrameNumberNoAlloc(uint32_t frame,
 				if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags))
 				 		return 0;
 
-		 		oBuff[0]=data;
-		 		oBuff[1]=data+page;
+		 		oBuff[0]=data->data;
+		 		oBuff[1]=data->data+page;
  		 		oBuff[2]=oBuff[1]+(page>>2);
 				
-				iBuff[0]=_uncompressed;
-		 		iBuff[1]=_uncompressed+page;
+				iBuff[0]=_uncompressed->data;
+		 		iBuff[1]=_uncompressed->data+page;
  		 		iBuff[2]=iBuff[1]+(page>>2);
 				
 				

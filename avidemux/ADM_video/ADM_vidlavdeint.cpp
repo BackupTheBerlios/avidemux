@@ -55,7 +55,7 @@ AVDMVideoLavDeint::AVDMVideoLavDeint(
 UNUSED_ARG(setup);
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	_uncompressed=new uint8_t[3*_info.width*_info.height];
+	_uncompressed=new ADMImage(_info.width,_info.height);//uint8_t[3*_info.width*_info.height];
 
 
 }
@@ -63,7 +63,7 @@ UNUSED_ARG(setup);
 // ___ destructor_____________
 AVDMVideoLavDeint::~AVDMVideoLavDeint()
 {
- 	delete [] _uncompressed;
+ 	delete  _uncompressed;
 
 }
 
@@ -73,16 +73,16 @@ AVDMVideoLavDeint::~AVDMVideoLavDeint()
 //
 
 uint8_t AVDMVideoLavDeint::getFrameNumberNoAlloc(uint32_t frame,
-																		uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 //static Image in,out;
-			if(frame>=_info.nb_frames) return 0;
+		if(frame>=_info.nb_frames) return 0;
 
 
 			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
+       		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
 
 		// if not %4 -> skip
 		if((_info.width&03) || (_info.height & 3))
@@ -96,13 +96,13 @@ uint8_t AVDMVideoLavDeint::getFrameNumberNoAlloc(uint32_t frame,
   		AVPicture dest;
 		uint32_t page=_info.width*_info.height;
 		
-		src.data[0]=_uncompressed;
-		src.data[1]=_uncompressed+page;
-		src.data[2]=_uncompressed+((page*5)>>2);
+		src.data[0]=_uncompressed->data;
+		src.data[1]=_uncompressed->data+page;
+		src.data[2]=_uncompressed->data+((page*5)>>2);
   
-		dest.data[0]=data;
-		dest.data[1]=data+page;
-		dest.data[2]=data+((page*5)>>2);
+		dest.data[0]=data->data;
+		dest.data[1]=data->data+page;
+		dest.data[2]=data->data+((page*5)>>2);
 		
 		src.linesize[0]=dest.linesize[0]=_info.width;
 		src.linesize[1]=dest.linesize[1]=_info.width>>1;

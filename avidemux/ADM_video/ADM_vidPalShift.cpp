@@ -5,7 +5,7 @@
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
-
+#if 0
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -64,7 +64,7 @@ ADMVideoPalShift::ADMVideoPalShift(  AVDMGenericVideoStream *in,CONFcouple *setu
 						
 					
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
- 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+ 	//_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
   ADM_assert(_uncompressed);
 
  	_cache=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
@@ -83,9 +83,9 @@ ADMVideoPalShift::~ADMVideoPalShift()
  	
 }
 uint8_t ADMVideoPalShift::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 
       	uint32_t full,half;
@@ -173,4 +173,5 @@ uint8_t ADMVideoPalShift::getFrameNumberNoAlloc(uint32_t frame,
 
 
 
+#endif
 #endif

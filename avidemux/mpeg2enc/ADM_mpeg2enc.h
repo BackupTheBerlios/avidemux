@@ -46,11 +46,11 @@ class Mpeg2enc: public encoder
 
                   virtual    uint8_t  getResult( void *ress);
 		  virtual	uint8_t setQuantize( uint32_t quant) {return 0;};;
-		  virtual 	uint8_t encode(		uint8_t 	*in,
+		  virtual 	uint8_t encode(		ADMImage 	*in,
 						   			uint8_t	*out,
 						   			uint32_t 	*len,
 			       						uint32_t 	*flags	) {return 0;};
-                  virtual 	uint8_t encode(		uint8_t 	*in,
+                  virtual 	uint8_t encode(		ADMImage 	*in,
 						   			uint8_t	*out,
 						   			uint32_t 	*len,
 			       						uint32_t 	*flags,

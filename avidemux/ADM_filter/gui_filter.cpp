@@ -362,17 +362,17 @@ dummy=(int)user_data;
 		{
 		  AVDMGenericVideoStream *in;
 		  uint32_t w, h, l, f;
-		  uint8_t *data;
+		  ADMImage *data;
 		  extern uint32_t curframe;
 		  in = videofilters[action_parameter].filter;
 		  w = in->getInfo ()->width;
 		  h = in->getInfo ()->height;
-		  data = (uint8_t *) malloc (w * h * 3);
+		  data = new ADMImage(w,h); //(uint8_t *) malloc (w * h * 3);
 		  ADM_assert (data);
 		  in->getFrameNumberNoAlloc (curframe, &l, data, &f);
 		  
 		  GUI_PreviewInit (w, h);
-		  GUI_PreviewRun(data);
+		  GUI_PreviewRun(data->data);
 		  GUI_PreviewEnd ();
 		  free (data);
 		}

@@ -67,9 +67,9 @@ ADMVideoDeinterlace::ADMVideoDeinterlace(  AVDMGenericVideoStream *in,CONFcouple
 //
 
 uint8_t ADMVideoDeinterlace::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 //uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
 uint32_t uvlen;
@@ -83,15 +83,15 @@ uint32_t uvlen;
 
            // for u & v , no action -> copy it as is
            uvlen=    _info.width*_info.height;
-           memcpy(data+uvlen,_uncompressed+uvlen,uvlen>>1);
+           memcpy(data->data+uvlen,_uncompressed->data+uvlen,uvlen>>1);
            // No interleaving detected
            if(!hasMotion())
            	{
-               	memcpy(data,_uncompressed,*len);
+               	memcpy(data->data,_uncompressed->data,*len);
               }
               else
               {
-	              doBlend(data);
+	              doBlend(data->data);
              }
 
       return 1;

@@ -155,12 +155,10 @@ ADM_Composer::deleteAllVideos (void)
 	delete _videos[vid].decoder;
       // prevent from crashing
       _videos[vid]._aviheader->close ();
-      if(_videos[vid]._forwardFrame)
-      	{
-		delete [] _videos[vid]._forwardFrame;
-		_videos[vid]._forwardFrame=NULL;
-	}
       delete _videos[vid]._aviheader;
+      if(_videos[vid]._videoCache)
+      	delete  _videos[vid]._videoCache;
+      _videos[vid]._videoCache=NULL;
     }
 
   memset (_videos, 0, sizeof (_videos));
@@ -356,15 +354,13 @@ UNUSED_ARG(mode);
       info.fps1000 = 25 * 1000;
       updateVideoInfo (&info);
     }
-  uint32_t
-    l;
-  uint8_t *
-    d;
+  uint32_t    	l;
+  uint8_t 	*d;
   _videos[_nb_video]._aviheader->getExtraHeaderData (&l, &d);
   _videos[_nb_video].decoder = getDecoder (info.fcc,
 					   info.width, info.height, l, d);
 
-
+  _videos[_nb_video]._videoCache   =   new EditorCache(10,info.width,info.height) ;
   //
   //  And automatically create the segment
   //
@@ -373,6 +369,7 @@ UNUSED_ARG(mode);
   _segments[_nb_segment]._audio_start = 0;
   _segments[_nb_segment]._start_frame = 0;
   _segments[_nb_segment]._nb_frames   =   _videos[_nb_video]._nb_video_frames ;
+
   _videos[_nb_video]._isAudioVbr=0;
   // next one please
 	_nb_video++;
@@ -388,8 +385,6 @@ TryAgain:
 	uint32_t err=0;
 
 		vid= &(_videos[_nb_video-1]);
-		vid->_forwardReference=0xFFFFFFF;
-		vid->_forwardFrame= NULL;
 		vid->_reorderReady=0;
 		// we only try if we got everything needed...
 		if(!vid->decoder)
@@ -405,14 +400,14 @@ TryAgain:
 		printf("\n checking for B-Frames...\n");
 		if( vid->_nb_video_frames >15) // 12
 		{
-				uint8_t 		*buffer,*bufferin;
+				uint8_t 		*bufferin;
 				uint32_t 		len,flags,flag2;
 				uint8_t 		bframe=0, bconsistency=1;
 
-				buffer=new uint8_t [info.width* info.height*2];
+				//buffer=new uint8_t [info.width* info.height*2];
+				
 				bufferin=new uint8_t [info.width* info.height*2];
-
-
+				ADMImage *buffer=new ADMImage(info.width,info.height);
 				// we decode 5 frames..should be enough to get an opinion
 				for(uint32_t i=0;i<13;i++)  //10
 				{
@@ -420,7 +415,7 @@ TryAgain:
   					vid->_aviheader->getFrameNoAlloc (i,
 							 bufferin,
 							 &len, &flags);
-					if(!vid->decoder->uncompress( (uint8_t *)bufferin,(uint8_t *)buffer,len,&flag2 ))
+					if(!vid->decoder->uncompress( (uint8_t *)bufferin,buffer,len,&flag2 ))
 					{
 						err++;
 						printf("\n ***oops***\n");
@@ -443,7 +438,7 @@ TryAgain:
 					
 				}
 
-				delete [] buffer;
+				delete  buffer;
 				delete [] bufferin;
 				if(bframe)
 				{
@@ -451,7 +446,8 @@ TryAgain:
 					if(bconsistency)
 					{
 						printf("\n And the index is ok\n");
-						vid->_forwardFrame=new uint8_t [720*576*3];
+
+						//uint8_t [720*576*3];
 						vid->_reorderReady=vid->_aviheader->reorder();
 						if(vid->_reorderReady)
 						{
@@ -543,9 +539,9 @@ _VIDEOS *vid;
 				{
 						if((vid->_reorderReady=vid->_aviheader->reorder()))
 						{
+							aviInfo    info;
+							_videos[i]._aviheader->getVideoInfo (&info);
 							printf(" Video %lu has been reordered\n",i);
-							vid->_forwardFrame=new uint8_t [720*576*3];
-							vid->_forwardReference=0xFFFFFFF;
 						}
 
 				}

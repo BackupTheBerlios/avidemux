@@ -109,7 +109,7 @@ mpegWritter::mpegWritter( void )
 	_fps1000=0;
 	_page=0;
 	_codec=NULL;
-	_buffer=NULL;
+	aImage=NULL;
 	_buffer_out=NULL;
 	_audio=NULL;
 	_audioBuffer=NULL;
@@ -124,7 +124,7 @@ mpegWritter::mpegWritter( uint8_t ps )
 	_fps1000=0;
 	_page=0;
 	_codec=NULL;
-	_buffer=NULL;
+	aImage=NULL;
 	_buffer_out=NULL;
 	_audio=NULL;
 	_audioBuffer=NULL;
@@ -317,10 +317,11 @@ DIA_encoding		*encoding;
 	printf("\n mpeg2enc init done \n");
 
 
-	_buffer	=new uint8_t[_w*_h*2];
+	//_buffer	=new uint8_t[_w*_h*2];
+	aImage=new ADMImage(_w,_h);
 	_buffer_out=new uint8_t[_w*_h*2];
 
-	ADM_assert(  _buffer);
+	ADM_assert(  aImage);
 	ADM_assert(  _buffer_out);
 
 	encoding=new DIA_encoding(_fps1000);
@@ -378,7 +379,7 @@ DIA_encoding		*encoding;
 	for(uint32_t i=0;i<_total;i++)
 			{
             			if(!incoming->getFrameNumberNoAlloc(i, &size,
-					(uint8_t *) _buffer,&flags))
+					aImage,&flags))
 				{
 						delete encoding;
                					GUI_Alert("Encoding error !");
@@ -387,7 +388,7 @@ DIA_encoding		*encoding;
 						end();
 						return 0 ;
 				}
-				_codec->encode(	_buffer,_buffer_out , &len,&flags,&outquant);
+				_codec->encode(	aImage,_buffer_out , &len,&flags,&outquant);
 				total_size+=len;
 				encoding->feedFrame(len);
 				encoding->setQuant(outquant);
@@ -420,7 +421,7 @@ DIA_encoding		*encoding;
 			encoding->setPhasis("Finishing");
 			for(uint32_t i=0;i<MPEG_PREFILL;i++)
 			{
-				_codec->encode(_buffer,_buffer_out , &len,&flags);
+				_codec->encode(aImage,_buffer_out , &len,&flags);
 				total_size+=len;
 				encoding->feedFrame(len);
 				if(!_muxer)
@@ -471,7 +472,8 @@ char *statname;
 	_fps1000=incoming->getInfo()->fps1000;
 		_total=incoming->getInfo()->nb_frames;
 	if(!_total) return 0;
-	_buffer	=new uint8_t[_w*_h*2];
+	//_buffer	=new uint8_t[_w*_h*2];
+	aImage=new ADMImage(_w,_h);
 	_buffer_out=new uint8_t[_w*_h*2];
 
 
@@ -545,7 +547,7 @@ int intra,q;
 	if(!init(name,mpegtype,interlaced,bff,widescreen)) return 0; // WLA
 	printf("\n mpeg2enc init done \n");
 
-	ADM_assert(  _buffer);
+	ADM_assert(  aImage);
 	ADM_assert(  _buffer_out);
 
 	q=2; // q=2
@@ -621,7 +623,7 @@ int intra,q;
 	for(uint32_t i=0;i<_total;i++)
 	{
 		_codec->setQuantize(q);
-        	if(!	incoming->getFrameNumberNoAlloc(i, &size,(uint8_t *) _buffer,&flags))
+        	if(!	incoming->getFrameNumberNoAlloc(i, &size,aImage,&flags))
 		{
         		GUI_Alert("Encoding error !");
 			end();
@@ -630,10 +632,10 @@ int intra,q;
 		if(i<MPEG_PREFILL)
 				{
 
-					_codec->encode(_buffer,_buffer_out , &len,&flags,&outquant);
+					_codec->encode(aImage,_buffer_out , &len,&flags,&outquant);
 					continue;
 				}
-		_codec->encode(		_buffer,_buffer_out , &len,&flags,&outquant);
+		_codec->encode(		aImage,_buffer_out , &len,&flags,&outquant);
 		total_size+=len;
 
 		if(flags & AVI_KEY_FRAME) intra=1;
@@ -671,7 +673,7 @@ int intra,q;
 	// flush queue
 	for(uint32_t i=0;i<MPEG_PREFILL;i++)
 	{
-		_codec->encode(		_buffer,_buffer_out , &len,&flags,&outquant);
+		_codec->encode(		aImage,_buffer_out , &len,&flags,&outquant);
 		total_size+=len;
 
 		if(flags & AVI_KEY_FRAME) intra=1;
@@ -742,7 +744,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 	}
 			printf("\n mpeg2enc init done \n");
 
-	ADM_assert(  _buffer);
+	ADM_assert(  aImage);
 	ADM_assert(  _buffer_out);
 	encoding->reset();
 	encoding->setFrame (0, _total);
@@ -829,7 +831,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 	}
 	for(uint32_t i=0;i<_total;i++)
 	{
-        	if(!incoming->getFrameNumberNoAlloc(i, &size,(uint8_t *) _buffer,&flags))
+        	if(!incoming->getFrameNumberNoAlloc(i, &size,aImage,&flags))
 		{
                		GUI_Alert("Encoding error !");
 			if(!_audio)
@@ -842,7 +844,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 		if(i<MPEG_PREFILL)
 		{
 
-			_codec->encode(_buffer,_buffer_out , &len,&flags,&outquant);	
+			_codec->encode(aImage,_buffer_out , &len,&flags,&outquant);	
 			continue;
 		}
 		encoding->feedFrame(len); // Set
@@ -852,7 +854,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 			q=vbrGetQuant(&mpegvbr);
 			_codec->setQuantize(q);
 		}
-		_codec->encode(_buffer,_buffer_out , &len,&flags,&outquant);
+		_codec->encode(aImage,_buffer_out , &len,&flags,&outquant);
 		encoding->setQuant(outquant);
 		if(flags & AVI_KEY_FRAME) intra=1;
 		else			intra=0;
@@ -911,7 +913,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 		
 		q=vbrGetQuant(&mpegvbr);
 		_codec->setQuantize(q);
-		_codec->encode(		_buffer,_buffer_out , &len,&flags,&outquant);
+		_codec->encode(		aImage,_buffer_out , &len,&flags,&outquant);
 		encoding->setQuant(outquant);
 		if(flags & AVI_KEY_FRAME) intra=1;
 			else		intra=0;
@@ -998,9 +1000,10 @@ uint8_t mpegWritter::end( void )
 	_codec=NULL;
 	// grab last bytes
 
-	if(_buffer) delete [] _buffer;
+	if(aImage) delete  aImage;
 	if(_buffer_out) delete [] _buffer_out;
-	_buffer=_buffer_out=NULL;
+	aImage=NULL;
+	_buffer_out=NULL;
 	
 	if(_audioBuffer)
 	{

@@ -79,7 +79,8 @@ AVDMVideoSwapField::AVDMVideoSwapField(
 UNUSED_ARG(setup);
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	_uncompressed=new uint8_t[3*_info.width*_info.height];
+//	_uncompressed=new uint8_t[3*_info.width*_info.height];
+	_uncompressed=new ADMImage(_info.width,_info.height);
 
 
 }
@@ -90,7 +91,8 @@ AVDMVideoKeepOdd::AVDMVideoKeepOdd(
 UNUSED_ARG(setup);
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	_uncompressed=new uint8_t[3*_info.width*_info.height];
+	//_uncompressed=new uint8_t[3*_info.width*_info.height];
+	_uncompressed=new ADMImage(_info.width,_info.height);
 	_info.height>>=1;
 
 }
@@ -113,9 +115,9 @@ AVDMVideoKeepOdd::~AVDMVideoKeepOdd()
 //
 
 uint8_t AVDMVideoSwapField::getFrameNumberNoAlloc(uint32_t frame,
-																		uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 //static Image in,out;
 			if(frame>=_info.nb_frames) return 0;
@@ -129,14 +131,14 @@ uint8_t AVDMVideoSwapField::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t page=w*h;
 		uint32_t stride;
 
-		memcpy(data+page,_uncompressed+page,page>>1); // copy u & v
+		memcpy(data->data+page,_uncompressed->data+page,page>>1); // copy u & v
 
 		uint8_t *odd,*even,*target,*target2;
 
-		even=_uncompressed;
+		even=_uncompressed->data;
 		odd=even+w;
-		target=data;
-		target2=data+w;
+		target=data->data;
+		target2=data->data+w;
 		stride=2*w;
 
 		h>>=1;
@@ -154,9 +156,9 @@ uint8_t AVDMVideoSwapField::getFrameNumberNoAlloc(uint32_t frame,
 }
 
 uint8_t AVDMVideoKeepOdd::getFrameNumberNoAlloc(uint32_t frame,
-																		uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 //static Image in,out;
 			if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
@@ -165,16 +167,16 @@ uint8_t AVDMVideoKeepOdd::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t w=_info.width;
 		uint32_t h=_info.height;
 
-		vidFieldKeepOdd(  w,  h, _uncompressed,data);
+		vidFieldKeepOdd(  w,  h, _uncompressed->data,data->data);
 
 
       return 1;
 }
 
 uint8_t AVDMVideoKeepEven::getFrameNumberNoAlloc(uint32_t frame,
-																		uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 //static Image in,out;
 			if(frame>=_info.nb_frames) return 0;
@@ -188,7 +190,7 @@ uint8_t AVDMVideoKeepEven::getFrameNumberNoAlloc(uint32_t frame,
 
 
 
-		vidFieldKeepEven(  w,  h, _uncompressed,data);
+		vidFieldKeepEven(  w,  h, _uncompressed->data,data->data);
       return 1;
 }
 

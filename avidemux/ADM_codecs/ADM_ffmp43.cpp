@@ -42,19 +42,7 @@
 #define MODULE_NAME  MODULE_CODEC
 #include "ADM_toolkit/ADM_debug.h"
 
-extern int DIA_getMPParams( int *pplevel, int *ppstrength,int *swap);
-//#include "../adm_lavcodec/mpegvideo.h"
 
-uint32_t PP_DefaultValue=3;
-uint32_t PP_DefaultStrength=5;
-
-void setPostProc(int v,int s)
-{
-	PP_DefaultValue=v;
-	PP_DefaultStrength=s;
-	printf("\n New default PP value  : %ld %ld",PP_DefaultValue,PP_DefaultStrength);
-
-}
 extern "C"
 {
 int av_is_voppacked(AVCodecContext *avctx);
@@ -68,18 +56,10 @@ uint8_t  decoderFF::isDivxPacked( void )
 //________________________________________________
 void decoderFF::setParam( void )
 {
-	int postproc, strength,uv;
-		postproc=_postproc.postProcType;
-		strength=_postproc.postProcStrength;
-		uv=_swapUV;
-		if( DIA_getMPParams( &postproc,&strength,(int *)&_swapUV))
-		{
-				_postproc.postProcType=postproc;
-				_postproc.postProcStrength=strength;				
-				printf("\n new PP : %ld %ld \n",postproc,strength);
-				updatePostProc(&_postproc );				
-
-		}
+		if(GUI_Question("Invert u & v ?"))
+			_swapUV=1;
+		else
+			_swapUV=0;
 
         return; // no param for ffmpeg
 }
@@ -111,10 +91,6 @@ decoderFF::decoderFF(uint32_t w,uint32_t h) :decoders(w,h)
 			   
 			    _swapUV=0;
 				//_context->strict_std_compliance=-1;
-	   		    initPostProc(&_postproc,w,h);			    
-			    _postproc.postProcType=PP_DefaultValue;
-			    _postproc.postProcStrength=PP_DefaultStrength;
-			    updatePostProc(&_postproc);
 			    printf("FFMpeg build : %d\n", LIBAVCODEC_BUILD);
 }
 
@@ -124,11 +100,7 @@ decoderFF::~decoderFF()
 {
 		avcodec_close(_context);
 		free(_context);
-		delete [] _internalBuffer;
-		deletePostProc(&_postproc);
-		// if(_ppMode) {pp_free_mode(_ppMode);_ppMode=NULL;}
-		// if(_ppContext) {pp_free_context(_ppContext);_ppContext=NULL;}
-
+		delete [] _internalBuffer;	
 		printf("FF base destroyed\n");
 }
 
@@ -176,7 +148,7 @@ uint8_t decoderFF::decodeFull(void )
 	return 1;
 }
 
-uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flagz)
+uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flagz)
 
 {
  int got_picture=0;
@@ -184,7 +156,6 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
  int strideTab[3];
  int strideTab2[3];
  int ret=0;
-
 
 		if(len==0 && !_allowNull) // Null frame, silently skipped
 				{
@@ -216,8 +187,8 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
 				if(_allowNull)
 				{
 					if(flagz) *flagz=AVI_KEY_FRAME;
-					memset(out,0,_w*_h);
-					memset(out+_w*_h,128,(_w*_h)>>1);
+					memset(out->data,0,_w*_h);
+					memset(out->data+_w*_h,128,(_w*_h)>>1);
 					printf("\n ignoring got pict ==0\n");
 					return 1;
 
@@ -262,7 +233,8 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
 			_frame.linesize[0 ]=_w;
 			_frame.linesize[1 ]=_w>>1;
 			_frame.linesize[2 ]=_w>>1;
-
+			// No pp
+			out->_qStride=0;
 			break;
 
 		case PIX_FMT_YUV422P:
@@ -285,6 +257,9 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
 			_frame.linesize[0 ]=_w;
 			_frame.linesize[1 ]=_w>>1;
 			_frame.linesize[2 ]=_w>>1;
+			// No pp
+			out->_qStride=0;
+			
 			break;
 		
 		case PIX_FMT_YUV420P:
@@ -292,9 +267,35 @@ uint8_t     decoderFF::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t
 		// Default is YV12 or I420
 		// In that case depending on swap u/v
 		// we do it or not
+	
 				//printf("420p\n");
 				src= (uint8_t **) _frame.data;
-#ifndef ADM_BIG_ENDIAN_ZZ
+#if 1				
+				if(out->quant)
+				{
+					if(_frame.qstride<out->_qStride || ! out->_qStride)
+					{
+						printf("FF43: Stride differs %d %d\n",
+								_frame.qstride,out->_qStride);
+						out->_qStride=0;
+					}
+					else
+					{
+						uint8_t *src,*dst;
+						src=(uint8_t *)_frame.qscale_table;
+						dst=out->quant;
+						// Pack them
+						for(uint32_t y=0;y<((_h+15)>>4);y++)
+						{				
+							memcpy(dst,src,out->_qStride);
+							src+=_frame.qstride;
+							dst+=out->_qStride;
+							
+						}
+					}
+				}
+#endif				
+#if 0
 			if(_postproc.postProcType && _postproc.postProcStrength)
 			{ 	// we do postproc !
 				// keep
@@ -336,18 +337,18 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 						stride=	_frame.linesize[0 ];
 						data1=(uint8_t *)_frame.data[0];
 						data2=(uint8_t *)_frame.data[0]+stride;
-						oy=out;
-						oy2=out+_w;
+						oy=out->data;
+						oy2=out->data+_w;
 						if(!_swapUV)
 						{
-							u=out+(_w*_h);
-							v=out+((_w*_h*5)>>2);
+							u=out->data+(_w*_h);
+							v=out->data+((_w*_h*5)>>2);
 						
 						}
 						else
 						{
-							v=out+(_w*_h);
-							u=out+((_w*_h*5)>>2);	
+							v=out->data+(_w*_h);
+							u=out->data+((_w*_h*5)>>2);	
 						}
 						
 						 COL_RawRGB32toYV12(data1,data2, oy,oy2, 
@@ -357,6 +358,7 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 						{
 							*flagz=frameType();
 						}
+						out->_qStride=0;
  						return 1;
 				}
 		default:
@@ -364,9 +366,11 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 				return 0;
 				
 		}
+		// Pack the output so that stride=width
+		
 		uint8_t *tmp;
 		tmp=src[0];
-		uint8_t *otmp= out;
+		uint8_t *otmp= out->data;
 		uint32_t stride;
 
 		stride=  _frame.linesize[0 ];
@@ -391,7 +395,7 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 		}
 			
 
-		otmp= out+((5*_w*_h)>>2);
+		otmp= out->data+((5*_w*_h)>>2);
 
 		for(uint32_t y=_h>>1;y>0;y--)
 			{
@@ -409,7 +413,7 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 			tmp= src[1];
 			stride=  _frame.linesize[1];
 		}
-		otmp= out+_w*_h;
+		otmp= out->data+_w*_h;
 
 		for(uint32_t y=_h>>1;y>0;y--)
 			{
@@ -420,13 +424,15 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 
 		_lastQ=0; //_context->quality;
 	//	printf("FF %d :: \n",_frame.pict_type);
+		out->_Qp=(_frame.quality*32)/FF_LAMBDA_MAX;
+		//printf("%d %d\n",_frame.quality,FF_LAMBDA_MAX);
+		out->flags=frameType();
 		if(flagz)
 		{
 
-			*flagz=frameType();
-
+			*flagz=out->flags;
 		}
-
+		
  		return 1;
 }
 

@@ -5,7 +5,7 @@
     copyright            : (C) 2002 by Ron Reithoffer 
     email                : <ron.reithoffer@chello.at>
  ***************************************************************************/
-
+#if 0
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -111,9 +111,9 @@ uint8_t	ADMVideoDropOut::getCoupledConf( CONFcouple **couples)
 // else we blend
 
 uint8_t ADMVideoDropOut::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 UNUSED_ARG(flags);
 
@@ -224,4 +224,5 @@ ADMVideoDropOut::~ADMVideoDropOut()
 }
 
 
+#endif
 #endif

@@ -30,9 +30,9 @@ class  ADMVideoMPD3Dlow:public AVDMGenericVideoStream
 
         			MPD3D_PARAM			*_param;
 
-				int	  					Coefs[4][512];
-        			uint8_t					*Line;
-				uint8_t					*_stored;
+				int				Coefs[4][512];
+        			uint8_t				*Line;
+				ADMImage			*_stored;
 				
 
 
@@ -55,10 +55,10 @@ class  ADMVideoMPD3Dlow:public AVDMGenericVideoStream
 						ADMVideoMPD3Dlow(  AVDMGenericVideoStream *in,CONFcouple *setup);
   						 ~ADMVideoMPD3Dlow();
 		        virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags);
+ 									ADMImage *data,uint32_t *flags);
 
 			virtual uint8_t 	configure( AVDMGenericVideoStream *instream);
-     			virtual char 	*printConf(void);
+     			virtual char 		*printConf(void);
 			virtual uint8_t 	getCoupledConf( CONFcouple **couples);
 
  }     ;

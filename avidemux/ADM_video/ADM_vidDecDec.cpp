@@ -62,9 +62,9 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "ADM_toolkit/ADM_cpuCap.h"
-
-#define UPLANE(x) (x+_info.width*_info.height)
-#define VPLANE(x) (x+((_info.width*_info.height*5)>>2))
+#define YPLANE(x) (x->data)
+#define UPLANE(x) (x->data+_info.width*_info.height)
+#define VPLANE(x) (x->data+((_info.width*_info.height*5)>>2))
 #define PROGRESSIVE  0x00000001
 #define MAGIC_NUMBER (0xdeadbeef)
 #define IN_PATTERN   0x00000002
@@ -152,7 +152,7 @@ public:
 			Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples);    
 			Decimate::~Decimate(void);
 	uint8_t  	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-				uint8_t *data,uint32_t *flags);
+				ADMImage *data,uint32_t *flags);
 
     	uint8_t   	*GetFrame(int n);
 	void   		DrawShow(uint8_t  *src, int useframe, bool forced, int dropframe,
@@ -367,10 +367,10 @@ void Decimate::DrawShow(uint8_t  *src, int useframe, bool forced, int dropframe,
 }
 //______________________________________________________________________
 uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-				uint8_t *data,uint32_t *flags)
+				ADMImage *data,uint32_t *flags)
 {
 	int dropframe, useframe, nextfrm, wY, wUV, hY, hUV, x, y, pitchY, pitchUV, dpitchY, dpitchUV;
-	uint8_t  *src, *next, *dst;
+	ADMImage  *src, *next, *dst;
 	unsigned char *srcrpY, *nextrpY, *dstwpY;
 	unsigned char *srcrpU, *nextrpU, *dstwpU;
 	unsigned char *srcrpV, *nextrpV, *dstwpV;
@@ -395,23 +395,23 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		if (show == true)
 		{
 			sprintf(buf, "Decimate %s", VERSION);
-			DrawString(src, 0, 0, buf);
+			DrawString(src->data, 0, 0, buf);
 			sprintf(buf, "Copyright 2003 Donald Graft");
-			DrawString(src, 0, 1, buf);
+			DrawString(src->data, 0, 1, buf);
 			sprintf(buf,"%d: %3.2f", start, showmetrics[0]);
-			DrawString(src, 0, 3, buf);
+			DrawString(src->data, 0, 3, buf);
 			sprintf(buf,"%d: %3.2f", start + 1, showmetrics[1]);
-			DrawString(src, 0, 4, buf);
+			DrawString(src->data, 0, 4, buf);
 			sprintf(buf,"%d: %3.2f", start + 2, showmetrics[2]);
-			DrawString(src, 0, 5, buf);
+			DrawString(src->data, 0, 5, buf);
 			sprintf(buf,"%d: %3.2f", start + 3, showmetrics[3]);
-			DrawString(src, 0, 6, buf);
+			DrawString(src->data, 0, 6, buf);
 			sprintf(buf,"%d: %3.2f", start + 4, showmetrics[4]);
-			DrawString(src, 0, 7, buf);
+			DrawString(src->data, 0, 7, buf);
 			sprintf(buf,"in frm %d, use frm %d", inframe, useframe);
-			DrawString(src, 0, 8, buf);
+			DrawString(src->data, 0, 8, buf);
 			sprintf(buf,"dropping frm %d%s", dropframe, last_forced == true ? ", forced!" : "");
-			DrawString(src, 0, 9, buf);
+			DrawString(src->data, 0, 9, buf);
 		}
 		if (debug)
 		{	
@@ -445,7 +445,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		unsigned int hint, film = 1;
 
 		GETFRAME(inframe, src);
-	    	srcrpY = src; //(unsigned char *) src->GetReadPtr(PLANAR_Y);
+	    	srcrpY = YPLANE(src); //(unsigned char *) src->GetReadPtr(PLANAR_Y);
 		if (GetHintingData(srcrpY, &hint) == false)
 		{
 			film = hint & PROGRESSIVE;
@@ -463,26 +463,26 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			{
 
 				sprintf(buf, "Decimate %s", VERSION);
-				DrawString(src, 0, 0, buf);
+				DrawString(src->data, 0, 0, buf);
 				sprintf(buf, "Copyright 2003 Donald Graft");
-				DrawString(src, 0, 1, buf);
+				DrawString(src->data, 0, 1, buf);
 				sprintf(buf,"%d: %3.2f", start, showmetrics[0]);
-				DrawString(src, 0, 3, buf);
+				DrawString(src->data, 0, 3, buf);
 				sprintf(buf,"%d: %3.2f", start + 1, showmetrics[1]);
-				DrawString(src, 0, 4, buf);
+				DrawString(src->data, 0, 4, buf);
 				sprintf(buf,"%d: %3.2f", start + 2, showmetrics[2]);
-				DrawString(src, 0, 5, buf);
+				DrawString(src->data, 0, 5, buf);
 				sprintf(buf,"%d: %3.2f", start + 3, showmetrics[3]);
-				DrawString(src, 0, 6, buf);
+				DrawString(src->data, 0, 6, buf);
 				sprintf(buf,"%d: %3.2f", start + 4, showmetrics[4]);
-				DrawString(src, 0, 7, buf);
+				DrawString(src->data, 0, 7, buf);
 				sprintf(buf,"infrm %d", inframe);
-				DrawString(src, 0, 8, buf);
+				DrawString(src->data, 0, 8, buf);
 				if (last_forced == false)
 					sprintf(buf,"chose %d, passing through", dropframe);
 				else
 					sprintf(buf,"chose %d, passing through, forced!", dropframe);
-				DrawString(src, 0, 9, buf);
+				DrawString(src->data, 0, 9, buf);
 			}
 			if (debug)
 			{
@@ -619,26 +619,26 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		{
 
 			sprintf(buf, "Decimate %s", VERSION);
-			DrawString(dst, 0, 0, buf);
+			DrawString(dst->data, 0, 0, buf);
 			sprintf(buf, "Copyright 2003 Donald Graft");
-			DrawString(dst, 0, 1, buf);
+			DrawString(dst->data, 0, 1, buf);
 			sprintf(buf,"%d: %3.2f", start, showmetrics[0]);
-			DrawString(dst, 0, 3, buf);
+			DrawString(dst->data, 0, 3, buf);
 			sprintf(buf,"%d: %3.2f", start + 1, showmetrics[1]);
-			DrawString(dst, 0, 4, buf);
+			DrawString(dst->data, 0, 4, buf);
 			sprintf(buf,"%d: %3.2f", start + 2, showmetrics[2]);
-			DrawString(dst, 0, 5, buf);
+			DrawString(dst->data, 0, 5, buf);
 			sprintf(buf,"%d: %3.2f", start + 3, showmetrics[3]);
-			DrawString(dst, 0, 6, buf);
+			DrawString(dst->data, 0, 6, buf);
 			sprintf(buf,"%d: %3.2f", start + 4, showmetrics[4]);
-			DrawString(dst, 0, 7, buf);
+			DrawString(dst->data, 0, 7, buf);
 			sprintf(buf,"infrm %d", inframe);
-			DrawString(dst, 0, 8, buf);
+			DrawString(dst->data, 0, 8, buf);
 			if (last_forced == false)
 				sprintf(buf,"chose %d, blending %d and %d",dropframe, inframe, nextfrm);
 			else
 				sprintf(buf,"chose %d, blending %d and %d, forced!", dropframe, inframe, nextfrm);
-			DrawString(dst, 0, 9, buf);
+			DrawString(dst->data, 0, 9, buf);
 		}
 		//return dst;
 		memcpy(data,dst,*len);
@@ -660,28 +660,28 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 
 
 			sprintf(buf, "Decimate %s", VERSION);
-			DrawString(src, 0, 0, buf);
+			DrawString(src->data, 0, 0, buf);
 			sprintf(buf, "Copyright 2003 Donald Graft");
-			DrawString(src, 0, 1, buf);
+			DrawString(src->data, 0, 1, buf);
 			sprintf(buf,"in frm %d, use frm %d", inframe, useframe);
-			DrawString(src, 0, 3, buf);
+			DrawString(src->data, 0, 3, buf);
 			sprintf(buf,"%d: %3.2f (%s)", start, showmetrics[0],
 					Dshow[0] ? "new" : "dup");
-			DrawString(src, 0, 4, buf);
+			DrawString(src->data, 0, 4, buf);
 			sprintf(buf,"%d: %3.2f (%s)", start + 1, showmetrics[1],
 					Dshow[1] ? "new" : "dup");
-			DrawString(src, 0, 5, buf);
+			DrawString(src->data, 0, 5, buf);
 			sprintf(buf,"%d: %3.2f (%s)", start + 2, showmetrics[2],
 					Dshow[2] ? "new" : "dup");
-			DrawString(src, 0, 6, buf);
+			DrawString(src->data, 0, 6, buf);
 			sprintf(buf,"%d: %3.2f (%s)", start + 3, showmetrics[3],
 					Dshow[3] ? "new" : "dup");
-			DrawString(src, 0, 7, buf);
+			DrawString(src->data, 0, 7, buf);
 			sprintf(buf,"%d: %3.2f (%s)", start + 4, showmetrics[4],
 					Dshow[4] ? "new" : "dup");
-			DrawString(src, 0, 8, buf);
+			DrawString(src->data, 0, 8, buf);
 			sprintf(buf,"Dropping frm %d%s", dropframe, last_forced == true ? " forced!" : "");
-			DrawString(src, 0, 9, buf);
+			DrawString(src->data, 0, 9, buf);
 		}
 		if (debug)
 		{	
@@ -731,7 +731,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			/* It's film, so decimate in the normal way. */
 			if (useframe >= dropframe) useframe++;
 			GETFRAME(useframe, src);
-			DrawShow(src, useframe, forced, dropframe, metric, inframe);			
+			DrawShow(src->data, useframe, forced, dropframe, metric, inframe);			
 			memcpy(data,src,*len);
 			vidCache->unlockAll();		
 			return 1; // return src;
@@ -740,7 +740,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		{
 			/* It's a video cycle. Output the first frame of the cycle. */
 			GETFRAME(useframe, src);
-			DrawShow(src, 0, forced, dropframe, metric, inframe);
+			DrawShow(src->data, 0, forced, dropframe, metric, inframe);
 			//return src;
 			memcpy(data,src,*len);
 			vidCache->unlockAll();		
@@ -750,7 +750,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		{
 			/* It's a video cycle. Output the last frame of the cycle. */
 			GETFRAME(useframe+1, src);
-			DrawShow(src, 0, forced, dropframe, metric, inframe);
+			DrawShow(src->data, 0, forced, dropframe, metric, inframe);
 			//return src;
 			memcpy(data,src,*len);
 			vidCache->unlockAll();		
@@ -847,7 +847,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 #ifdef DECIMATE_MMX_BUILD_PLANE
 			}
 #endif
-			DrawShow(dst, 0, forced, dropframe, metric, inframe);
+			DrawShow(dst->data, 0, forced, dropframe, metric, inframe);
 			vidCache->unlockAll();
 			//return dst;
 			memcpy(data,dst,*len);
@@ -868,7 +868,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *forced)
 {
 	int f;
-	uint8_t  * store[MAX_CYCLE_SIZE+1];
+	ADMImage  * store[MAX_CYCLE_SIZE+1];
 	const unsigned char *storepY[MAX_CYCLE_SIZE+1];
 	const unsigned char *storepU[MAX_CYCLE_SIZE+1];
 	const unsigned char *storepV[MAX_CYCLE_SIZE+1];
@@ -891,7 +891,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 	for (f = 0; f <= _param->cycle; f++)
 	{
 		GETFRAME(frame + f - 1, store[f]);
-		storepY[f] = store[f];//->GetReadPtr(PLANAR_Y);
+		storepY[f] = YPLANE(store[f]);//->GetReadPtr(PLANAR_Y);
 		hints_invalid = GetHintingData((unsigned char *) storepY[f], &hints[f]);
 		if (_param->quality == 1 || _param->quality == 3)
 		{
@@ -1036,7 +1036,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 {
 	int f, g, fsum, bsum, highest, highest_index;
-	uint8_t * store[MAX_CYCLE_SIZE+1];
+	ADMImage * store[MAX_CYCLE_SIZE+1];
 	const unsigned char *storepY[MAX_CYCLE_SIZE+1];
 	const unsigned char *storepU[MAX_CYCLE_SIZE+1];
 	const unsigned char *storepV[MAX_CYCLE_SIZE+1];
@@ -1063,7 +1063,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 		firsttime = false;
 		for (f = 0; f < MAX_CYCLE_SIZE; f++) Dprev[f] = -1;
 		GETFRAME(frame, store[0]);
-		storepY[0] = store[0];//->GetReadPtr(PLANAR_Y);
+		storepY[0] = YPLANE(store[0]);//->GetReadPtr(PLANAR_Y);
 		if (_param->quality == 1 || _param->quality == 3)
 		{
 			storepU[0] = UPLANE(store[0]);//->GetReadPtr(PLANAR_U);
@@ -1073,7 +1073,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 		for (f = 1; f <= _param->cycle; f++)
 		{
 			GETFRAME(frame + f - 1, store[f]);
-			storepY[f] = store[f];//->GetReadPtr(PLANAR_Y);
+			storepY[f] =YPLANE( store[f]);//->GetReadPtr(PLANAR_Y);
 			if (_param->quality == 1 || _param->quality == 3)
 			{
 				storepU[f] = UPLANE(store[f]);//->GetReadPtr(PLANAR_U);
@@ -1191,7 +1191,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
  	else if (frame >= num_frames_hi - 1)
 	{
 		GETFRAME(num_frames_hi - 1, store[0]);
-		storepY[0] = store[0];//->GetReadPtr(PLANAR_Y);
+		storepY[0] = YPLANE(store[0]);//->GetReadPtr(PLANAR_Y);
 		if (_param->quality == 1 || _param->quality == 3)
 		{
 			storepU[0] = UPLANE(store[0]);//->GetReadPtr(PLANAR_U);
@@ -1203,7 +1203,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 	else
 	{
 		GETFRAME(frame + _param->cycle - 1, store[0]);
-		storepY[0] = store[0];//->GetReadPtr(PLANAR_Y);
+		storepY[0] = YPLANE(store[0]);//->GetReadPtr(PLANAR_Y);
 		if (_param->quality == 1 || _param->quality == 3)
 		{
 			storepU[0] = UPLANE(store[0]);//->GetReadPtr(PLANAR_U);
@@ -1218,7 +1218,7 @@ void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
 	for (f = 1; f <= _param->cycle; f++)
 	{
 		GETFRAME(frame + f + _param->cycle - 1, store[f]);
-		storepY[f] = store[f];//->GetReadPtr(PLANAR_Y);
+		storepY[f] =YPLANE( store[f]);//->GetReadPtr(PLANAR_Y);
 		if (_param->quality == 1 || _param->quality == 3)
 		{
 			storepU[f] = UPLANE(store[f]);//->GetReadPtr(PLANAR_U);

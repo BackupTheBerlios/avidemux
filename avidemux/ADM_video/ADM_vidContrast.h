@@ -38,18 +38,17 @@ typedef struct CONTRAST_PARAM
  {
 
  protected:
-				virtual char 									*printConf(void);
-
+				virtual char 					*printConf(void);
 				CONTRAST_PARAM					*_param;
-				uint8_t									_tableFlat[256];
-				uint8_t									_tableNZ[256];
+				uint8_t						_tableFlat[256];
+				uint8_t						_tableNZ[256];
 
  public:
 
 					ADMVideoContrast(  AVDMGenericVideoStream *in,CONFcouple *setup);
   					virtual ~ADMVideoContrast();
 		          virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags);
+          																	ADMImage *data,uint32_t *flags);
 					virtual uint8_t 	configure( AVDMGenericVideoStream *instream) ;
 
  					virtual uint8_t	getCoupledConf( CONFcouple **couples);

@@ -70,7 +70,8 @@ ADMVideoChromaShift::ADMVideoChromaShift(  AVDMGenericVideoStream *in,CONFcouple
 		}
 
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
- 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+ 	//_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   	ADM_assert(_uncompressed);
   	_info.encoding=1;
 }
@@ -115,9 +116,9 @@ ADMVideoChromaShift::~ADMVideoChromaShift()
 
 }
 uint8_t ADMVideoChromaShift::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 
 			ADM_assert(frame<_info.nb_frames);
@@ -133,28 +134,28 @@ uint8_t ADMVideoChromaShift::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t page;
 
 		page=(w*h);
-		memcpy(data,_uncompressed,page);
+		memcpy(data->data,_uncompressed->data,page);
 
 		if(!_param->u)
 			{
-				memcpy(data+page,_uncompressed+page,page>>2);
+				memcpy(data->data+page,_uncompressed->data+page,page>>2);
 			}
 		else
 		{
-			shift(data+page,_uncompressed+page,w>>1,h>>1,_param->u);
+			shift(data->data+page,_uncompressed->data+page,w>>1,h>>1,_param->u);
 		}
 		if(!_param->v)
 			{
-				memcpy(data+page+(page>>2),_uncompressed+page+(page>>2),page>>2);
+				memcpy(data->data+page+(page>>2),_uncompressed->data+page+(page>>2),page>>2);
 			}
 		else
 		{
-			shift(data+page+(page>>2),_uncompressed+page+(page>>2),w>>1,h>>1,_param->v);
+			shift(data->data+page+(page>>2),_uncompressed->data+page+(page>>2),w>>1,h>>1,_param->v);
 		}
 		if(_param->u)
-			fixup(data,w,h,_param->u*2);
+			fixup(data->data,w,h,_param->u*2);
 		if(_param->v)
-			fixup(data,w,h,_param->v*2);
+			fixup(data->data,w,h,_param->v*2);
 
       return 1;
 }

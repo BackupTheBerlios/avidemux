@@ -24,7 +24,7 @@
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
-
+#if 0
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -121,9 +121,9 @@ DELETE(_param);
 }
 
 uint8_t AVDMVideoTempSmooth::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 							uint32_t one_screen;
 							uint8_t *p;
@@ -148,7 +148,7 @@ uint8_t AVDMVideoTempSmooth::getFrameNumberNoAlloc(uint32_t frame,
 									_ptr_to_screen[i]=p;
 									p+=one_screen;
 							}
-	            			if(!_in->getFrameNumberNoAlloc(frame, len,_screen,flags)) return 0;
+	            					if(!_in->getFrameNumberNoAlloc(frame, len,_screen,flags)) return 0;
 							// copy it to next ones
 							for(uint32_t i=1;i<_param->radius;i++)
 							{
@@ -286,3 +286,4 @@ uint8_t AVDMVideoTempSmooth::getFrameNumberNoAlloc(uint32_t frame,
         return 1;
 }
 
+#endif

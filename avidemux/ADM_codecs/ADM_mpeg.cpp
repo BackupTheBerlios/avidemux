@@ -101,27 +101,14 @@ uint8_t decoderMpeg::kill_codec (void)
   }
   mpeg2_close (MPEG2DEC);
   _decoder=NULL;
-  yv12_close (output);  
-  
-  deletePostProc(&_postproc);
+  yv12_close (output);     
 
   return 1;
 }
 //________________________________________________
 void decoderMpeg::setParam( void )
 {
-int postproc, strength,uv;
-		postproc=_postproc.postProcType;
-		strength=_postproc.postProcStrength;
-		uv=_swapUV;
-		if( DIA_getMPParams( &postproc,&strength,(int *)&_swapUV))
-		{
-				_postproc.postProcType=postproc;
-				_postproc.postProcStrength=strength;				
-				printf("\n new PP : %ld %ld \n",postproc,strength);
-				updatePostProc(&_postproc );				
 
-		}
 
         return; 
 }	
@@ -170,14 +157,12 @@ yv12_instance_t *inst;
 			
 			_swapUV=0;
 			// Post Proc is disabled by default
-			initPostProc(&_postproc,w,h);	    
 			
-			updatePostProc(&_postproc);	
   			printf ("\n done\n");
 
 }
 /*------------------------------------------------------------------*/
-uint8_t 	decoderMpeg::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag)
+uint8_t 	decoderMpeg::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag)
 {
 		if(flag) *flag=0;
 #if defined( REMOVE_PADDING)
@@ -191,73 +176,34 @@ uint8_t 	decoderMpeg::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t 
 
 		t=(uint8_t *) MPEG2DEC->fbuf[0]->buf[0];
 		mpeg2_cleanup(MPEG2DEC);
-		info= mpeg2_info (MPEG2DEC);				
-#ifndef ADM_BIG_ENDIAN_ZZ
-		if(_postproc.postProcType && _postproc.postProcStrength)
-			{ 	// we do postproc !
-				// keep
-
-		 		oBuff[0]=out; 
-		 		oBuff[1]=out+_w*_h;
- 		 		oBuff[2]=out+((_w*_h*5)>>2);
-				
-				iBuff[0]=t;
-		 		iBuff[1]=t+_w*_h;
- 		 		iBuff[2]=t+((_w*_h*5)>>2);
-        			
-			        strideTab[0]=strideTab2[0]=_w;
-				strideTab[1]=strideTab2[1]=_w>>1;
-				strideTab[2]=strideTab2[2]=_w>>1;
-/*
-void  pp_postprocess(uint8_t * src[3], int srcStride[3],
-                 uint8_t * dst[3], int dstStride[3],
-                 int horizontalSize, int verticalSize,
-                 QP_STORE_T *QP_store,  int QP_stride,
-		 pp_mode_t *mode, 
-		 pp_context_t *ppContext, 
-		 int pict_type);
-
-*/            			
-		 		   pp_postprocess(
-		      			iBuff,
-		        		strideTab,
-		          		oBuff,
-		         		strideTab2,
-		      			_w,
-		        		_h,
-		          		MPEG2DEC->decoder.quant,
-		          		MPEG2DEC->decoder.quant_stride,
-		         		_postproc.ppMode,
-		          		_postproc.ppContext,
-		          		MPEG2DEC->decoder.coding_type);	
-					printf("Postprocessed\n");		  	
-			}
-		else			
-#endif		
-			memcpy(out,t,(_w*_h*3)>>1);
-		// Or we get postprocessing info
-		// get it in t, post process it to out
-		if(flag)
+		info= mpeg2_info (MPEG2DEC);
+		
+		if(out->quant && MPEG2DEC->decoder.quant_stride>=out->_qStride)
 		{
-			*flag=0;
-			//switch(_seen)
-			switch(MPEG2DEC->decoder.coding_type)
+			memcpy(out->quant,MPEG2DEC->decoder.quant,out->_qSize);
+		
+		}
+		memcpy(out->data,t,(_w*_h*3)>>1);
+		
+		switch(MPEG2DEC->decoder.coding_type)
 			{
-				case I_TYPE:*flag=AVI_KEY_FRAME;break;
-				case B_TYPE:*flag=AVI_B_FRAME;break;
-				case P_TYPE:*flag=0;break;
+				case I_TYPE:out->flags=AVI_KEY_FRAME;break;
+				case B_TYPE:out->flags=AVI_B_FRAME;break;
+				case P_TYPE:out->flags=0;break;
 				default:
 					printf("\n unknown frame type ! %d\n",MPEG2DEC->decoder.coding_type);
 					//ADM_assert(0);
 					//return 0;
-					*flag=0;
+					out->flags=0;
 			}
-			if(MPEG2DEC->ext_state & PIC_FLAG_PROGRESSIVE_FRAME)
+		if(flag)
+		{
+			*flag=out->flags;
+		}
+		if(MPEG2DEC->ext_state & PIC_FLAG_PROGRESSIVE_FRAME)
 			{
 				aprintf("Progressive\n");
 			}
-		}
-
 		return 1;
 }
 void decoderMpeg::feedData(uint32_t len, uint8_t *data)

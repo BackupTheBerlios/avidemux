@@ -54,7 +54,7 @@
 				
 					uint8_t		init(uint32_t a, uint32_t b) {return 0;} // not used
               			  	uint8_t 	getResult( void *ress);                
-              			virtual uint8_t 	encode(	uint8_t 	*in,
+              			virtual uint8_t 	encode(	ADMImage 	*in,
 					   	 		uint8_t 	*out,
 					   			uint32_t 	*len,
 			       					uint32_t 	*flags)=0;
@@ -74,9 +74,9 @@
 
                    			} ;
 			
-            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );			
+            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );	
             		virtual 	uint8_t encode(
-        	  				uint8_t 	*in,
+        	  				ADMImage 	*in,
 					 	uint8_t 	*out,
 						uint32_t 	*len,
 						uint32_t 	*flags);
@@ -93,9 +93,9 @@
 
                    			} ;
 			
-            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );			
+            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );	
             		virtual 	uint8_t encode(
-        	  				uint8_t 	*in,
+        	  				ADMImage 	*in,
 					 	uint8_t 	*out,
 						uint32_t 	*len,
 						uint32_t 	*flags);
@@ -112,9 +112,9 @@
 
                    			} ;
 			
-            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );			
+            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );	
             		virtual 	uint8_t encode(
-        	  				uint8_t 	*in,
+        	  				ADMImage 	*in,
 					 	uint8_t 	*out,
 						uint32_t 	*len,
 						uint32_t 	*flags);
@@ -131,9 +131,9 @@
 
                    			} ;
 			
-            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );			
+            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );	
             		virtual 	uint8_t encode(
-        	  				uint8_t 	*in,
+        	  				ADMImage 	*in,
 					 	uint8_t 	*out,
 						uint32_t 	*len,
 						uint32_t 	*flags);

@@ -112,7 +112,7 @@ static void draw( void);
 static char subString[300];
 static char fontString[300];
 
-static uint8_t  *sourceImage=NULL;
+static ADMImage  *sourceImage=NULL;
 static uint8_t *targetImage=NULL;
 static uint8_t *targetImageRGB=NULL;
 
@@ -138,9 +138,9 @@ uint32_t l,f;
 		_w=_info.width;
 		_h=_info.height;
 
-		sourceImage		=new uint8_t[_w*_h*2];
+		sourceImage		=new ADMImage(_w,_h);//uint8_t[_w*_h*2];
 		targetImage		=new uint8_t[_w*_h*2];
-		targetImageRGB	=new uint8_t[_w*_h*4];
+		targetImageRGB		=new uint8_t[_w*_h*4];
 
 		ADM_assert(instream->getFrameNumberNoAlloc(curframe,
 						&l,
@@ -187,11 +187,12 @@ uint32_t l,f;
 				
 				ret=1;
 		}
-		delete [] sourceImage;
+		delete  sourceImage;
 		delete [] targetImage;
 		delete [] targetImageRGB;
 
-		sourceImage=targetImage=targetImageRGB=NULL;
+		sourceImage=NULL;
+		targetImage=targetImageRGB=NULL;
 		return 1;
 
 }

@@ -76,7 +76,7 @@ ADMVideoMPD3D::~ADMVideoMPD3D()
  	DELETE(_param);
 	delete [] _uncompressed;
 	delete [] Line;
-	delete [] _storage;
+	delete  _storage;
 
 	_storage=NULL;
 	Line=NULL;
@@ -195,7 +195,7 @@ ADMVideoMPD3D::ADMVideoMPD3D(
 			_param->param3=PARAM3_DEFAULT;
 	}
 	_uncompressed=new unsigned short[(_info.width*_info.height*3)>>1];
-	_storage=new uint8_t [(_info.width*_info.height*3)>>1];
+	_storage=new ADMImage(_info.width,_info.height);
 	setup();
 
 	_last=0xFFFFFFF;
@@ -223,9 +223,9 @@ uint8_t	ADMVideoMPD3D::getCoupledConf( CONFcouple **couples)
 // else we blend
 
 uint8_t ADMVideoMPD3D::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 UNUSED_ARG(flags);
 
@@ -245,7 +245,7 @@ UNUSED_ARG(flags);
 					 	return 0;
 					}
 				 	unsigned short* dst=_uncompressed;
-	    				unsigned char* src=data;
+	    				unsigned char* src=data->data;
 					for (int Y = 0; Y < (W*H*3)>>1; Y++)
 						{
 	    						 	*(dst++)=*(src++)<<8;
@@ -266,8 +266,8 @@ UNUSED_ARG(flags);
 		unsigned short *ant;
 
 		ant=_uncompressed;
-		n=data;
-		c=_storage;
+		n=data->data;
+		c=_storage->data;
 //
    		deNoise(c, n,
 			Line,ant, W, H,

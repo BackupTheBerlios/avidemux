@@ -101,15 +101,19 @@ ADMVideoDenoise::ADMVideoDenoise(
   
   page= 3*_in->getInfo()->width*_in->getInfo()->height;
   
-  _uncompressed=new uint8_t [page];
+//  _uncompressed=new uint8_t [page];
+  _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed);
   
-  _locked=new uint8_t [page];
+ // _locked=new uint8_t [page];
+  _locked=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_locked);
  
-	_lockcount=new uint8_t [page];
+//	_lockcount=new uint8_t [page];
+
   ADM_assert(_lockcount);  
   
+   _lockcount=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   memset(_lockcount,0,page);  
         
   _param=NULL;
@@ -167,8 +171,10 @@ ADMVideoDenoise::~ADMVideoDenoise()
 //
 //	Remove y and v just keep U and expand it
 //
-uint8_t ADMVideoDenoise::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags)
+uint8_t ADMVideoDenoise::getFrameNumberNoAlloc(uint32_t frame,
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
    //uint32_t x,w;
   	uint32_t page; 
@@ -207,15 +213,15 @@ uint8_t ADMVideoDenoise::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
           // init all
           
           // luma
-          nb=_lockcount;
-          lock=_locked;
-          in=_uncompressed;
-          out=data;
+          nb=_lockcount->data;
+          lock=_locked->data;
+          in=_uncompressed->data;
+          out=data->data;
           // u
           unb=nb+page*4;
           ulock=lock+page*4;
           uin=in+page*4;
-          uout=data+page*4;
+          uout=data->data+page*4;
           // v
           vnb=unb+page;
           vlock=ulock+page;

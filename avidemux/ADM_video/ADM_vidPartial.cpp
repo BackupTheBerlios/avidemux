@@ -132,8 +132,10 @@ ADMVideoPartial::~ADMVideoPartial()
 
 }
 //
-uint8_t ADMVideoPartial::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags)
+uint8_t ADMVideoPartial::getFrameNumberNoAlloc(uint32_t frame,
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 		ADM_assert(_son);
 		

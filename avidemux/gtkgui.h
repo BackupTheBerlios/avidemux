@@ -20,7 +20,7 @@ void 			A_saveAudio	(char *name);
 void 			A_saveAudioDecoded	(char *name);
 void 			A_saveAVI		(char *name);
 void 			A_playAvi		(void);
-void 			update_status_bar(uint32_t frametype=0xff );
+void 			update_status_bar(ADMImage *image );
 void 			rebuild_status_bar(void );
 
 

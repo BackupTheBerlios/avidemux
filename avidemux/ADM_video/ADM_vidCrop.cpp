@@ -97,7 +97,8 @@ AVDMVideoStreamCrop::AVDMVideoStreamCrop(
 		}				
 					
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
- 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+ 	//_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed);
   _info.encoding=1;
 
@@ -105,7 +106,7 @@ AVDMVideoStreamCrop::AVDMVideoStreamCrop(
 }
 AVDMVideoStreamCrop::~AVDMVideoStreamCrop()
 {
- 	delete []_uncompressed;
+ 	delete _uncompressed;
  	DELETE(_param);
 }
 
@@ -115,9 +116,9 @@ AVDMVideoStreamCrop::~AVDMVideoStreamCrop()
 //
 
 uint8_t AVDMVideoStreamCrop::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 
 			ADM_assert(frame<_info.nb_frames);
@@ -133,8 +134,8 @@ uint8_t AVDMVideoStreamCrop::getFrameNumberNoAlloc(uint32_t frame,
        		y=_in->getInfo()->height;
        		x=_in->getInfo()->width;
        		line=_info.width;
-       		src=_uncompressed+_param->top*x+_param->left;
-       		dest=data;
+       		src=_uncompressed->data+_param->top*x+_param->left;
+       		dest=data->data;
        		
        		for(uint32_t k=_info.height;k>0;k--)
        			{
@@ -143,7 +144,7 @@ uint8_t AVDMVideoStreamCrop::getFrameNumberNoAlloc(uint32_t frame,
        			 	    dest+=line;
        			}
        		 // Crop U  & V
-       		 	src=_uncompressed+y*x+(x*_param->top>>2)+(_param->left>>1);
+       		 	src=_uncompressed->data+y*x+(x*_param->top>>2)+(_param->left>>1);
        		 	src2=src+(x*y>>2);
        		 	line>>=1;
        		 	x>>=1;       		       		 	

@@ -212,7 +212,8 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
   	_fps=info->fps1000;
   	_w = info->width;
   	_h = info->height;
-  	_vbuffer = new uint8_t[_w * _h * 3];
+  	//_vbuffer = new uint8_t[_w * _h * 3];
+	_vbuffer=new ADMImage(_w,_h);
   	ADM_assert (_vbuffer);
   	_in = instream;
 	_use_xvid_ratecontrol=_settings.use_xvid_ratecontrol;

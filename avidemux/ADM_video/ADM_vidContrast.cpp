@@ -60,7 +60,8 @@ ADMVideoContrast::ADMVideoContrast(
   	_in=in;		
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  			 	
   _info.encoding=1;
-   	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+   //	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+   _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed);
   _param=NULL;
   if(couples)
@@ -113,8 +114,10 @@ ADMVideoContrast::~ADMVideoContrast()
 //
 //	Remove y and v just keep U and expand it
 //
-   uint8_t ADMVideoContrast::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags)
+   uint8_t ADMVideoContrast::getFrameNumberNoAlloc(uint32_t frame,
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
    //uint32_t x,w;
    
@@ -129,38 +132,38 @@ ADMVideoContrast::~ADMVideoContrast()
            // luma 
            if(	_param->doLuma)
            {
-		           if(!doContrast(_uncompressed,data,_tableFlat,
+		           if(!doContrast(_uncompressed->data,data->data,_tableFlat,
 		           				_info.width,_info.height))
   						  	return 0;
 						}
 						else
 						{
-							   memcpy(data,_uncompressed,sz);
+							   memcpy(data->data,_uncompressed->data,sz);
 							}
 					// ______u_____________		
 							
           if(	_param->doChromaU)
            {
-						 if(!doContrast(_uncompressed+sz,data+sz,_tableNZ,
+						 if(!doContrast(_uncompressed->data+sz,data->data+sz,_tableNZ,
            				_info.width>>1,_info.height>>1))
 							  	return 0;
 						}						
 						else
 						{
-							   memcpy(data+sz,_uncompressed+sz,sz>>2);
+							   memcpy(data->data+sz,_uncompressed->data+sz,sz>>2);
 							}
 							
 					// ______v_____________		
           if(	_param->doChromaV)
            {
 
-						 if(!doContrast(_uncompressed+sz+(sz>>2),data+sz+(sz>>2),
+						 if(!doContrast(_uncompressed->data+sz+(sz>>2),data->data+sz+(sz>>2),
 						 			_tableNZ,_info.width>>1,_info.height>>1))
 							  	return 0;
 						}
 						else
 						{
-							   memcpy(data+sz+(sz>>2),_uncompressed+sz+(sz>>2),sz>>2);
+							   memcpy(data->data+sz+(sz>>2),_uncompressed->data+sz+(sz>>2),sz>>2);
 							}
                       
            

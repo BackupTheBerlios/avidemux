@@ -36,6 +36,8 @@
 
 #define INT int32_t
 #include "ADM_video/ADM_confCouple.h"
+#include "ADM_library/ADM_image.h"
+#include "ADM_pp.h"
 
 void GUI_PreviewInit(uint32_t w , uint32_t h);
 uint8_t 	GUI_PreviewUpdate(uint8_t *data);
@@ -93,7 +95,7 @@ typedef struct
  {
    protected:
       	ADV_Info 					_info;
-   	  uint8_t   					*_uncompressed;
+   	  ADMImage   					*_uncompressed;
 	  AVDMGenericVideoStream 	*_in;
 /* not really used */
           uint8_t		getPixel(int32_t x,int32_t y,uint8_t *data);
@@ -109,7 +111,7 @@ typedef struct
         virtual char 	*printConf(void) { static char *str=(char *)"."; return str;};
 
         virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          							uint8_t *data,uint32_t *flags)=0;
+          							ADMImage *data,uint32_t *flags)=0;
           	ADV_Info 	*getInfo( void ) { return &_info;};
          virtual uint8_t	getCoupledConf( CONFcouple **couples)
 	  				{*couples=NULL;return 0;};
@@ -131,8 +133,11 @@ class  AVDMVideoStreamNull :public AVDMGenericVideoStream
  {
 
  protected:
-				ADM_Composer *_in;
+				ADM_Composer 			*_in;
 				uint32_t			_start;
+				ADM_PP				_pp;
+				
+				
 
  public:
 
@@ -141,7 +146,7 @@ class  AVDMVideoStreamNull :public AVDMGenericVideoStream
 
 
           virtual 	uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-								uint8_t *data,uint32_t *flags);
+								ADMImage *data,uint32_t *flags);
            	 	uint8_t configure( AVDMGenericVideoStream *instream);
 
 
@@ -161,7 +166,7 @@ class  AVDMVideoStreamRaw :public AVDMGenericVideoStream
 
 
           virtual 	uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-								uint8_t *data,uint32_t *flags);
+								ADMImage *data,uint32_t *flags);
            	 	uint8_t configure( AVDMGenericVideoStream *instream);
 
 

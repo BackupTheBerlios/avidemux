@@ -63,7 +63,7 @@ void block_diffs_MMX(struct metrics *m, unsigned char *old, unsigned char *ew, i
 static void 	diff_planes(struct metrics *m, unsigned char *old, unsigned char *nw, int w, int h, int os, int ns);
 static void 	diff_fields(struct frameinfo *fi, uint8_t  *old, uint8_t  *nw);
 static void 	status(struct frameinfo *f);
-static void 	copy_image(uint8_t  *dest, uint8_t  *src, int field);
+static void 	copy_image(ADMImage  *sdest, ADMImage  *ssrc, int field);
 
 static uint32_t 	myw,myh;
 static struct vf_priv_s *myparam; // UGLY FIXME BURK
@@ -93,8 +93,10 @@ UNUSED_ARG(setup);
 	_info.nb_frames=_info.nb_frames/5;
 	_info.nb_frames=_info.nb_frames*4;
 	aprintf("Frame out : %lu fpout: %lu\n",_info.nb_frames,_info.fps1000);
-	_uncompressed=new uint8_t[(3*_info.width*_info.height)>>1];
-	_lastFrame=new uint8_t[(3*_info.width*_info.height)>>1];
+//	_uncompressed=new uint8_t[(3*_info.width*_info.height)>>1];
+//	_lastFrame=new uint8_t[(3*_info.width*_info.height)>>1];
+	_uncompressed=new ADMImage(_info.width,_info.height);
+	_lastFrame=new ADMImage(_info.width,_info.height);
 	
 	_param=new vf_priv_s;
 	_param->drop = 0;
@@ -107,8 +109,8 @@ UNUSED_ARG(setup);
 // ___ destructor_____________
 AVDMVideoMPDetc::~AVDMVideoMPDetc()
 {
- 	delete [] _uncompressed;
-	delete [] _lastFrame;
+ 	delete  _uncompressed;
+	delete  _lastFrame;
 	if(myparam)
 	{
 		delete _param;
@@ -173,7 +175,7 @@ int foo(struct vf_priv_s *p, uint8_t  *nw, uint8_t *cur)
 
 uint8_t AVDMVideoMPDetc::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *len,
-				uint8_t *data,
+   				ADMImage *data,
 				uint32_t *flags)
 {
 uint32_t page=_info.width*_info.height;
@@ -254,7 +256,7 @@ uint32_t page=_info.width*_info.height;
 			
 */			
 			
-			switch (foo(_param, _uncompressed, _lastFrame)) 
+			switch (foo(_param, _uncompressed->data, _lastFrame->data)) 
 			{
 			case F_DROP:
 				copy_image(_lastFrame, _uncompressed, 2);
@@ -265,7 +267,7 @@ uint32_t page=_info.width*_info.height;
 				if(off>6)
 				{
 					aprintf("Cancelled dropout!, deinterlacing in place----------\n");
-					memcpy(data,_lastFrame,(page*3)>>1);
+					memcpy(data->data,_lastFrame,(page*3)>>1);
 					frame_ready=1;
 					_param->outframes++;
 					_param->dropnext=0;
@@ -273,9 +275,9 @@ uint32_t page=_info.width*_info.height;
 					AVPicture src;
 					uint32_t page=_info.width*_info.height;
 		
-					src.data[0]=data;
-					src.data[1]=data+page;
-					src.data[2]=data+((page*5)>>2);
+					src.data[0]=data->data;
+					src.data[1]=data->data+page;
+					src.data[2]=data->data+((page*5)>>2);
   					
 		
 					src.linesize[0]=_info.width;
@@ -294,7 +296,7 @@ uint32_t page=_info.width*_info.height;
 			case F_MERGE:
 				copy_image(_lastFrame, _uncompressed, 0);
 				frame_ready = do_put_image(_lastFrame);
-				if(frame_ready) memcpy(data,_lastFrame,(page*3)>>1);
+				if(frame_ready) memcpy(data->data,_lastFrame->data,(page*3)>>1);
 				copy_image(_lastFrame, _uncompressed, 1);
 				aprintf("MPivtc MERGE\n");
 				//clear(_lastFrame);
@@ -302,13 +304,13 @@ uint32_t page=_info.width*_info.height;
 			case F_NEXT:
 				copy_image(_lastFrame, _uncompressed, 2);
 				frame_ready = do_put_image(_lastFrame);
-				if(frame_ready) memcpy(data,_lastFrame,(page*3)>>1);
+				if(frame_ready) memcpy(data->data,_lastFrame->data,(page*3)>>1);
 				aprintf("MPivtc NEXT\n");
 				//clear(_lastFrame);
 				break;
 			case F_SHOW:
 				frame_ready = do_put_image(_lastFrame);
-				if(frame_ready) memcpy(data,_lastFrame,(page*3)>>1);
+				if(frame_ready) memcpy(data->data,_lastFrame->data,(page*3)>>1);
 				copy_image(_lastFrame, _uncompressed, 2);
 				aprintf("MPivtc OK\n");
 				//clear(_lastFrame);
@@ -323,7 +325,7 @@ uint32_t page=_info.width*_info.height;
 /*
 	Return 1 if ok, 0 if dropped
 */
-uint8_t AVDMVideoMPDetc::do_put_image(uint8_t *data)
+uint8_t AVDMVideoMPDetc::do_put_image(ADMImage *data)
 {
 	int dropflag;
 	int off=0;
@@ -440,7 +442,7 @@ static void diff_planes(struct frameinfo *fi,
 	memset(mean, 0, sizeof(struct metrics));
 	for (y = 0; y < h-7; y += 8) {
 		for (x = 8; x < w-8-7; x += 8) {
-#ifdef USE_MMX	
+#if 00 //FIXME def USE_MMX	
 	#define block_diffs block_diffs_MMX
 #else
 	#define block_diffs block_diffs_C
@@ -492,11 +494,13 @@ void diff_fields(struct frameinfo *fi, uint8_t  *old, uint8_t  *nw)
 
 
 //void copy_image(mp_image_t *dmpi, mp_image_t *mpi, int field)
-void copy_image(uint8_t  *dest, uint8_t  *src, int field)
+void copy_image(ADMImage  *sdest, ADMImage  *ssrc, int field)
 {
 	uint32_t page;
 	page=myw*myh;
-	
+	uint8_t *src,*dest;
+	src=ssrc->data;
+	dest=sdest->data;
 	switch (field) {
 	case 0:
 		my_memcpy_pic(dest, src, myw, myh>>1,
@@ -567,13 +571,13 @@ void copy_image(uint8_t  *dest, uint8_t  *src, int field)
 		break;
 	}
 }
-#ifdef USE_MMX
+#if 0 // FIXME USE_MMX
  void block_diffs_MMX(struct metrics *m, unsigned char *old, unsigned char *nw, int os, int ns)
 {
 	int i;
 	short out[24]; // output buffer for the partial metrics from the mmx code
 	
-	asm (
+	__asm__ (
 		"movl $4, %%ecx \n\t"
 		"pxor %%mm4, %%mm4 \n\t" // 4 even difference sums
 		"pxor %%mm5, %%mm5 \n\t" // 4 odd difference sums

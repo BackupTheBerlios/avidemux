@@ -31,6 +31,9 @@
  #define __ADM_composer__
  #include "ADM_editor/ADM_Video.h"
  #include "ADM_codecs/ADM_codec.h"
+ #include "ADM_library/ADM_image.h"
+ #include "ADM_editor/ADM_edCache.h"
+ 
 #define MAX_SEG  	100 // Should be enougth
 #define MAX_VIDEO   100
 typedef enum
@@ -61,17 +64,15 @@ typedef struct
   	vidHeader 							*_aviheader;
   	decoders							*decoder;
 
-	uint32_t  								_audio_size;
-	uint32_t								_audio_duration;
-	AVDMGenericAudioStream 			*_audiostream;
+	uint32_t  							_audio_size;
+	uint32_t							_audio_duration;
+	AVDMGenericAudioStream 						*_audiostream;
 	uint8_t								_isAudioVbr;
 	WAVHeader							*_wavheader;
 
-	uint32_t								_nb_video_frames;
-	uint32_t								_forwardReference;
-	uint8_t								*_forwardFrame;
-	uint32_t								_forwardFlag;
+	uint32_t							_nb_video_frames;	
 	uint8_t								_reorderReady;
+	EditorCache							*_videoCache;
 }_VIDEOS;
 
 
@@ -89,7 +90,7 @@ typedef struct
 class ADM_Composer
 {
   private:
-  					uint8_t 	setForward(uint32_t ref, uint32_t frame);
+  					uint8_t		decodeCache(uint32_t frame,uint32_t seg, ADMImage *image);
   					uint32_t 	_nb_segment;
 					uint32_t 	_nb_video;
 					uint32_t  _nb_clipboard;
@@ -163,8 +164,9 @@ class ADM_Composer
 						uint8_t   	getRawStart(uint32_t frame,uint8_t *ptr,uint32_t *len);
 
 
-   						uint8_t 	getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
-												uint32_t *flags=0,  uint8_t *seq=0);
+   						uint8_t 	getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,
+										uint32_t* framelen,
+										uint32_t *flags=0,  uint8_t *seq=0);
 	          				uint32_t 	getTime(uint32_t fn);
 						uint32_t 	getFlags(uint32_t frame,uint32_t *flags);
 						uint32_t 	getFlagsAndSeg (uint32_t frame, 
@@ -195,9 +197,15 @@ class ADM_Composer
                   //
                   //	Coder/decoder
                   //
-                  			uint8_t			getUncompressedFrame(uint32_t frame,uint8_t *out,uint32_t *flagz=NULL)    ;
-	     	  			uint8_t			getUncompressedFramePKF(uint32_t *frame,uint8_t *out)    ;
-	     	  			uint8_t			getUncompressedFrameNKF(uint32_t *frame,uint8_t *out)    ;
+		  			// Search previous/ next key frame
+		  			uint8_t			getPKFrame(uint32_t *frame);
+					uint8_t			getNKFrame(uint32_t *frame);
+					//
+                  			uint8_t			getUncompressedFrame(uint32_t frame,ADMImage *out,
+									uint32_t *flagz=NULL)    ;
+					// Obsolete									
+	     	  			uint8_t			getUncompressedFramePKF(uint32_t *frame,ADMImage *out)    ;
+	     	  			uint8_t			getUncompressedFrameNKF(uint32_t *frame,ADMImage *out)    ;
 
               				uint8_t			searchNextKeyFrame(uint32_t in,uint32_t *oseg, uint32_t * orel);
                  			uint8_t			searchPreviousKeyFrame(uint32_t in,uint32_t *oseg, uint32_t * orel);

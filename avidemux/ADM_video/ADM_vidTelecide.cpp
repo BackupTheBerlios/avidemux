@@ -1,3 +1,4 @@
+#if 0
 /***************************************************************************
                           ADM_vidTelecide.cpp  -  description
                              -------------------
@@ -238,3 +239,4 @@ uint32_t      ADMVideoTelecide::getMatch( void )
 
 
 
+#endif

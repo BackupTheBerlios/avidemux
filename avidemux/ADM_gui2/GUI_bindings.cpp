@@ -40,6 +40,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 
+#include "ADM_codecs/ADM_codec.h"
 
 void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
 	   uint16_t * ss, uint16_t * ms);
@@ -310,26 +311,21 @@ void UI_setTitle(char *name)
  	gtk_window_set_title (GTK_WINDOW (guiRootWindow), title);
 
 }
-void UI_setFrameType( uint32_t frametype)
+void UI_setFrameType( uint32_t frametype,uint32_t qp)
 {
 GtkLabel *wid=(GtkLabel *)lookup_widget(guiRootWindow,"labelFrameType");
-
-	if(frametype==0xff)
-  			gtk_label_set_text( wid,"Frame: ?");
-	else
-		{
-			
-			if(frametype & 0x10)
-					gtk_label_set_text( wid,"Frame: I");
-			else
-				if(frametype & 0x4000)
-						gtk_label_set_text( wid,"Frame: B");
-					else
-						gtk_label_set_text( wid,"Frame: P");
-
-
-		}
-
+static char string[100];
+char	c='?';
+	switch(frametype)
+	{
+		case AVI_KEY_FRAME: c='I';break;
+		case AVI_B_FRAME: c='B';break;
+		case 0: c='P';break;
+		default:c='?';break;
+	
+	}
+	sprintf(string,"Frame:%c(%02d)",c,qp);
+	gtk_label_set_text( wid,string);	
 
 }
 ///

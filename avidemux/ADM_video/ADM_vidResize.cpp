@@ -65,7 +65,8 @@ AVDMVideoStreamResize::AVDMVideoStreamResize(
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
 	//_uncompressed=(uint8_t *)malloc(3*_info.width*_info.height);
-	_uncompressed=new uint8_t[3*_info.width*_info.height];
+	//_uncompressed=new uint8_t[3*_info.width*_info.height];
+	_uncompressed=new ADMImage(_info.width,_info.height);
 
 		if(couples)
 		{
@@ -108,7 +109,8 @@ AVDMVideoStreamResize::AVDMVideoStreamResize(
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
 	//_uncompressed=(uint8_t *)malloc(3*_info.width*_info.height);
-	_uncompressed=new uint8_t[3*_info.width*_info.height];
+	//_uncompressed=new uint8_t[3*_info.width*_info.height];
+	_uncompressed=new ADMImage(_info.width,_info.height);
 	_param=NEW( RESIZE_PARAMS);
 	_param->w=x;
 	_param->h = y;
@@ -142,10 +144,11 @@ uint8_t	AVDMVideoStreamResize::getCoupledConf( CONFcouple **couples)
 // ___ destructor_____________
 AVDMVideoStreamResize::~AVDMVideoStreamResize()
 {
- 	delete [] _uncompressed;
+ 	delete  _uncompressed;
 	delete [] _intermediate_buffer;
 	DELETE(_param);
-	_uncompressed=_intermediate_buffer=NULL;
+	_uncompressed=NULL;
+	_intermediate_buffer=NULL;
  	endcompute();
 }
 
@@ -155,9 +158,9 @@ AVDMVideoStreamResize::~AVDMVideoStreamResize()
 //
 
 uint8_t AVDMVideoStreamResize::getFrameNumberNoAlloc(uint32_t frame,
-																		uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 static Image in,out;
 	if(frame>=_info.nb_frames) 
@@ -180,11 +183,11 @@ static Image in,out;
        		// do the resize in 3 passes, Y, U then V
        		in.width=_in->getInfo()->width;
        		in.height=_in->getInfo()->height;
-       		in.data=_uncompressed;
+       		in.data=_uncompressed->data;
 
        		out.width=_info.width;
        		out.height=_info.height;
-       		out.data=data;
+       		out.data=data->data;
        		
               if(!_init)
               {

@@ -128,7 +128,7 @@ uint8_t isMSMpeg4Compatible( uint32_t fourcc)
       #undef CHECK
 }
 
-uint8_t decoders::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag) {
+uint8_t decoders::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag) {
     UNUSED_ARG(in);
     UNUSED_ARG(out);
     UNUSED_ARG(len);
@@ -286,7 +286,7 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
     	
    }
 
-uint8_t coders::compress(uint8_t *in,uint8_t *out,uint32_t *len){
+uint8_t coders::compress(ADMImage *in,uint8_t *out,uint32_t *len){
     UNUSED_ARG(in);
     UNUSED_ARG(out);
     UNUSED_ARG(len);

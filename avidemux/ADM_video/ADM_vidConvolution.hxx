@@ -29,9 +29,9 @@ class  AVDMVideoConvolution:public AVDMGenericVideoStream
 
  protected:
 
-      		uint8_t								*_U,*_V;
+      		uint8_t							*_U,*_V;
       		virtual	 uint8_t       					convolutionKernel(int32_t x,int32_t y,uint8_t *out)=0;
-           	virtual char 							*printConf(void);
+           	virtual char 						*printConf(void);
 
  public:
 
@@ -40,7 +40,7 @@ class  AVDMVideoConvolution:public AVDMGenericVideoStream
 
   					virtual 		~AVDMVideoConvolution();
 		          		virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          											uint8_t *data,uint32_t *flags);
+          											ADMImage *data,uint32_t *flags);
 					virtual uint8_t	configure( AVDMGenericVideoStream *instream) { UNUSED_ARG(instream); return 0;};
 
  }     ;
@@ -102,10 +102,10 @@ class  AVDMVideoConvolution:public AVDMGenericVideoStream
 #warning FIXME: string constants cannot be used as char
  		        virtual char 							*printConf(void) { return const_cast<char*>("ERROR");};
 
-								AVDMFastVideoConvolution(  AVDMGenericVideoStream *in,CONFcouple *setup);
-  					virtual 		~AVDMFastVideoConvolution();
+							AVDMFastVideoConvolution(  AVDMGenericVideoStream *in,CONFcouple *setup);
+  					virtual 	~AVDMFastVideoConvolution();
 		          		virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags);
+									ADMImage *data,uint32_t *flags);
 					virtual uint8_t	configure( AVDMGenericVideoStream *instream) ;
 
 					virtual uint8_t	getCoupledConf( CONFcouple **couples)		;
@@ -114,17 +114,17 @@ class  AVDMVideoConvolution:public AVDMGenericVideoStream
  class    AVDMFastVideoMean: public AVDMFastVideoConvolution
  {
 	 	protected:
-			  virtual uint8_t 					doLine(uint8_t  *pred,
-																					uint8_t *cur,
-   																				uint8_t *next,
-   																				uint8_t *out,
-                       										uint32_t w)   ;
+			  virtual uint8_t 		doLine(uint8_t  *pred,
+			  					uint8_t *cur,
+   								uint8_t *next,
+								uint8_t *out,
+                       						uint32_t w)   ;
 
 		public:
 
-					AVDMFastVideoMean(  AVDMGenericVideoStream *in,CONFcouple *setup) :
-				  		AVDMFastVideoConvolution(  in,setup) {};
-					virtual char 							*printConf(void);
+							AVDMFastVideoMean(  AVDMGenericVideoStream *in,CONFcouple *setup) :
+				  			AVDMFastVideoConvolution(  in,setup) {};
+					virtual char 	*printConf(void);
 
 	}      ;
 
@@ -132,50 +132,50 @@ class  AVDMVideoConvolution:public AVDMGenericVideoStream
    class    AVDMFastVideoGauss: public AVDMFastVideoConvolution
  {
 	 	protected:
-			  virtual uint8_t 					doLine(uint8_t  *pred,
-																					uint8_t *cur,
-   																				uint8_t *next,
-   																				uint8_t *out,
-                       										uint32_t w)   ;
+			  virtual uint8_t 		doLine(uint8_t  *pred,
+								uint8_t *cur,
+								uint8_t *next,
+								uint8_t *out,
+								uint32_t w)   ;
         
 		public:
 
-									AVDMFastVideoGauss(  AVDMGenericVideoStream *in,CONFcouple *setup) :
-				  						AVDMFastVideoConvolution(  in,setup) {};
-					virtual char 							*printConf(void);
+							AVDMFastVideoGauss(  AVDMGenericVideoStream *in,CONFcouple *setup) :
+				  			AVDMFastVideoConvolution(  in,setup) {};
+					virtual char	*printConf(void);
 
 	}      ;
      class    AVDMFastVideoSharpen: public AVDMFastVideoConvolution
  {
 	 	protected:
-			  virtual uint8_t 					doLine(uint8_t  *pred,
-																					uint8_t *cur,
-   																				uint8_t *next,
-   																				uint8_t *out,
-                       										uint32_t w)   ;
+			  virtual uint8_t 		doLine(uint8_t  *pred,
+			  					uint8_t *cur,
+								uint8_t *next,
+								uint8_t *out,
+								uint32_t w)   ;
         
 		public:
 
-					AVDMFastVideoSharpen(  AVDMGenericVideoStream *in,CONFcouple *setup) :
+						AVDMFastVideoSharpen(  AVDMGenericVideoStream *in,CONFcouple *setup) :
 				  		AVDMFastVideoConvolution(  in,setup) {};
-					virtual char 							*printConf(void);				    	          							
+					virtual char 		*printConf(void);	
   				
 	}      ;
 
 	    class    AVDMFastVideoMedian: public AVDMFastVideoConvolution
  {
 	 	protected:
-			  virtual uint8_t 					doLine(uint8_t  *pred,
-																					uint8_t *cur,
-   																				uint8_t *next,
-   																				uint8_t *out,
-                       										uint32_t w)   ;
+			  virtual uint8_t 	doLine(uint8_t  *pred,
+			  				uint8_t *cur,
+							uint8_t *next,
+							uint8_t *out,
+							uint32_t w)   ;
         
 		public:
 
-					AVDMFastVideoMedian(  AVDMGenericVideoStream *in,CONFcouple *setup) :
-				  		AVDMFastVideoConvolution(  in,setup) {};
-					virtual char 							*printConf(void);				    	          							
+							AVDMFastVideoMedian(  AVDMGenericVideoStream *in,CONFcouple *setup) :
+				  			AVDMFastVideoConvolution(  in,setup) {};
+					virtual char 	*printConf(void);
   				
 	}      ;
 

@@ -16,7 +16,7 @@
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
-
+#if 0
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -292,3 +292,4 @@ fnd:
 
 
 
+#endif

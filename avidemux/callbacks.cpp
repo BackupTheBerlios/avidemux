@@ -73,7 +73,7 @@ uint8_t stop_req = 0;
 /// Update all  informations : current frame # and current time, total frame ...
 ///_____________________________________________________________
 
-void  update_status_bar(uint32_t frametype)
+void  update_status_bar(ADMImage *frame)
 {
     char text[80];
     double len;
@@ -84,7 +84,7 @@ void  update_status_bar(uint32_t frametype)
  
 	UI_updateFrameCount( curframe);
 	UI_updateTimeCount( curframe,avifileinfo->fps1000);
-	UI_setFrameType(  frametype);
+	UI_setFrameType(  frame->flags,frame->_Qp);
     // progress bar
     len = 100;
     len=len / (double) avifileinfo->nb_frames;

@@ -51,7 +51,7 @@ decoderRGB16::~decoderRGB16()
 //
 //
 
-uint8_t 	decoderRGB16::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag) 	
+uint8_t 	decoderRGB16::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag) 	
 {
 uint32_t xx,yy,i;
 uint8_t *ry,*ru,*rv;
@@ -68,7 +68,7 @@ uint32_t  y,u,v;
          		return uncompressRGB24(  in,out, len);
            }
 
-         	ry=out;
+         	ry=out->data;
           ru=planar;
           rv=planar+_w*_h;
           in16=(uint16_t *)in;
@@ -99,7 +99,7 @@ uint32_t  y,u,v;
           ru=planar;
           rv=planar+_w*_h;
 
-            rv2=out+_w*_h;
+            rv2=out->data+_w*_h;
             ru2=rv2+(_w*_h>>2);
             for( yy=_h>>1;yy>0;yy--)
             {
@@ -130,7 +130,7 @@ uint32_t  y,u,v;
 
          return 1;
 }
-uint8_t 	decoderRGB16::uncompressRGB24(uint8_t *in,uint8_t *out,uint32_t len) 	
+uint8_t 	decoderRGB16::uncompressRGB24(uint8_t *in,ADMImage *out,uint32_t len) 	
 {
 UNUSED_ARG(len);
 uint32_t xx,yy; //i;
@@ -140,7 +140,7 @@ uint32_t  r,g,b;
 uint32_t  y,u,v;
 
 
-         	ry=out;
+         	ry=out->data;
           ru=planar;
           rv=planar+_w*_h;
 
@@ -169,7 +169,7 @@ uint32_t  y,u,v;
           ru=planar;
           rv=planar+_w*_h;
 
-            rv2=out+_w*_h;
+            rv2=out->data+_w*_h;
             ru2=rv2+(_w*_h>>2);
             for( yy=_h>>1;yy>0;yy--)
             {

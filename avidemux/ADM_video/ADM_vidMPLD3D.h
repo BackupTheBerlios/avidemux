@@ -38,9 +38,9 @@ class  ADMVideoMPD3D:public AVDMGenericVideoStream
 				int	  					Coefs[4][512*16];
         			uint32_t					*Line;
 
-				uint16_t					*_uncompressed;
-				uint8_t					*_storage;
-				uint32_t					_last;
+				uint16_t				*_uncompressed;
+				ADMImage				*_storage;
+				uint32_t				_last;
 
 				void 	PrecalcCoefs(int *Ct, double Dist25);
 				uint8_t  	setup(void);
@@ -59,7 +59,7 @@ class  ADMVideoMPD3D:public AVDMGenericVideoStream
 						ADMVideoMPD3D(  AVDMGenericVideoStream *in,CONFcouple *setup);
   						 ~ADMVideoMPD3D();
 		        virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags);
+   								ADMImage *data,uint32_t *flags);
 
 			virtual uint8_t 	configure( AVDMGenericVideoStream *instream);
      			virtual char 	*printConf(void);

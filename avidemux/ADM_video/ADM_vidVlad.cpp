@@ -130,8 +130,11 @@ AVDMVideoVlad::AVDMVideoVlad(  AVDMGenericVideoStream *in,CONFcouple *couples)
  	  _param->cthresholdMask=0;
    }
     _mask=new uint8_t[_info.width*_info.height*3];
-	  _uncompressed=new uint8_t[_info.width*_info.height*3];
-    _prev=new uint8_t[_info.width*_info.height*3];    
+//	  _uncompressed=new uint8_t[_info.width*_info.height*3];
+//    _prev=new uint8_t[_info.width*_info.height*3];   
+	 _uncompressed=new ADMImage(_info.width,_info.height); 
+	  _prev=new ADMImage(_info.width,_info.height);
+	  
 	  ADM_assert(_mask);ADM_assert(_uncompressed);ADM_assert(_prev);
 	  memset(_mask,0,	_info.width*_info.height*3);
 	  
@@ -381,12 +384,12 @@ __asm__ __volatile__ (
 //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-uint8_t AVDMVideoVlad::getFrameNumberNoAlloc(uint32_t n,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+uint8_t AVDMVideoVlad::getFrameNumberNoAlloc(uint32_t frame,
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
-	
+	uint32_t n;
 	uint32_t page=_info.width*_info.height;
 	
 		if(n>(_info.nb_frames-1)) return 0;
@@ -411,47 +414,48 @@ uint8_t AVDMVideoVlad::getFrameNumberNoAlloc(uint32_t n,
 		
 			  
 			_threshold= ythresholdMask;
-			ProcessYPlane (_uncompressed,
-										 _info.width,
-						   		   _prev, 						        	
-   						   		 _prev, 
-						   				data, 
-						   				_mask, 
-						   				_info.width, 
+			ProcessYPlane (_uncompressed->data,
+								_info.width,
+						   		_prev->data,     	
+   						   		 _prev->data, 
+				   				data->data, 
+				   				_mask, 
+				   				_info.width, 
 						       		_info.height,
-						   				ythresholdMask);
+				   				ythresholdMask);
 /*     
 			printf("n y_threshold : %lx\n",ythresholdMask);
 			printf("n c_threshold : %lx\n",cthresholdMask);
 */			
 			if (0==_param->cthresholdMask)
 			{
-				memcpy(data+page,_uncompressed+page,page>>1);
+				memcpy(data->data+page,_uncompressed->data+page,page>>1);
 			}
 			else
 			{
 				uint32_t of=page;
 				_threshold= cthresholdMask;
-				ProcessCPlane (_uncompressed+of,
-										 _info.width>>1,
-						   		   _prev+of, 
-   						   		 _prev+of, 
-						   				data+of, 
-						   				_mask, 
-						   				_info.width>>1, 
-						       		_info.height>>1,
-						   				cthresholdMask);
-						       
-					of=of+(of>>2);						       
-          ProcessCPlane (_uncompressed+of,
-										 _info.width>>1,
-						   		   _prev+of, 
-   						   		 _prev+of, 
-						   				data+of, 
-						   				_mask, 
-						   				_info.width>>1, 
-						       		_info.height>>1,
-						   				cthresholdMask);
+				ProcessCPlane (_uncompressed->data+of,
+							_info.width>>1,
+							_prev->data+of, 
+   							_prev->data+of, 
+							data->data+of, 
+							_mask, 
+							_info.width>>1, 
+							_info.height>>1,
+							cthresholdMask);       
+				
+				of=of+(of>>2);	       
+				
+				ProcessCPlane (_uncompressed->data+of,
+							_info.width>>1,
+							_prev->data+of, 
+							_prev->data+of, 
+							data->data+of, 
+							_mask, 
+							_info.width>>1, 
+							_info.height>>1,
+							cthresholdMask);
 			
 			}
 		

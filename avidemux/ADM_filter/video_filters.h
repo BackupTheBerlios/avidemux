@@ -101,6 +101,10 @@
     AVDMGenericVideoStream *getLastVideoFilter( void );
  AVDMGenericVideoStream *getFirstVideoFilter( uint32_t frameStart, uint32_t nbFrame);
   AVDMGenericVideoStream *getFirstVideoFilter( void);
+  AVDMGenericVideoStream *getFirstCurrentVideoFilter( void);
+  
+  void	filterSetPostProc( void );
+  
 #ifdef USE_LIBXML2
 void filterSaveXml(char *name);
 void filterSaveXml(char *name,uint8_t silent);

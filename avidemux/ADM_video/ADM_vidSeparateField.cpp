@@ -63,7 +63,8 @@ AVDMVideoSeparateField::AVDMVideoSeparateField(
 UNUSED_ARG(setup);
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	_uncompressed=new uint8_t[3*_info.width*_info.height];
+//	_uncompressed=new uint8_t[3*_info.width*_info.height];
+	_uncompressed=new ADMImage(_info.width,_info.height);
 
 	_info.height>>=1;
 	_info.fps1000*=2;
@@ -74,7 +75,7 @@ UNUSED_ARG(setup);
 // ___ destructor_____________
 AVDMVideoSeparateField::~AVDMVideoSeparateField()
 {
- 	delete [] _uncompressed;
+ 	
 
 }
 
@@ -84,9 +85,9 @@ AVDMVideoSeparateField::~AVDMVideoSeparateField()
 //
 
 uint8_t AVDMVideoSeparateField::getFrameNumberNoAlloc(uint32_t frame,
-																		uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 uint32_t ref;
 			if(frame>=_info.nb_frames) return 0;
@@ -96,9 +97,9 @@ uint32_t ref;
 		  if(!_in->getFrameNumberNoAlloc(ref, len, _uncompressed, flags)) return 0;
 
 		if(frame&1) // odd image
-			 vidFieldKeepOdd(_info.width,_info.height*2,_uncompressed,data);
+			 vidFieldKeepOdd(_info.width,_info.height*2,_uncompressed->data,data->data);
 		else
-			 vidFieldKeepEven(_info.width,_info.height*2,_uncompressed,data);
+			 vidFieldKeepEven(_info.width,_info.height*2,_uncompressed->data,data->data);
 
       return 1;
 }
@@ -120,10 +121,11 @@ AVDMVideoMergeField::AVDMVideoMergeField(
 UNUSED_ARG(setup);
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	_uncompressed=new uint8_t[3*_info.width*_info.height];
-	_uncompressed2=new uint8_t[3*_info.width*_info.height];
-	_cache=new uint8_t[3*_info.width*_info.height];
-
+	//_uncompressed=new uint8_t[3*_info.width*_info.height];
+	_uncompressed=new ADMImage(_info.width,_info.height);
+	_uncompressed2=new ADMImage(_info.width,_info.height);
+	_cache=new ADMImage(_info.width,_info.height);
+	
 
 	_info.height<<=1;
 	_info.fps1000>>=1;
@@ -135,19 +137,19 @@ UNUSED_ARG(setup);
 // ___ destructor_____________
 AVDMVideoMergeField::~AVDMVideoMergeField()
 {
- 	delete [] _uncompressed;
-	delete [] _uncompressed2;
-	delete [] _cache;
-
+ 		delete _uncompressed;
+		delete _uncompressed2;
+		delete _cache;
+		_cache=_uncompressed=_uncompressed2=NULL;
 }
 
 /**
 	Interleave frame*2 and frame*2+1
 */
 uint8_t AVDMVideoMergeField::getFrameNumberNoAlloc(uint32_t frame,
-																		uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 uint32_t ref,ref2;
 		if(frame>=_info.nb_frames) return 0;
@@ -157,7 +159,7 @@ uint32_t ref,ref2;
 
 		if(_lastAsked==ref)
 		{
-				memcpy(_uncompressed,_cache, (_info.width*_info.height*3)>>2);
+				memcpy(_uncompressed->data,_cache->data, (_info.width*_info.height*3)>>2);
 		}
 		else
 		{
@@ -165,9 +167,9 @@ uint32_t ref,ref2;
 		}
 		if(!_in->getFrameNumberNoAlloc(ref2, len, _uncompressed2, flags)) return 0;
 
-		 vidFieldMerge(_info.width,_info.height,_uncompressed,_uncompressed2,data);
+		 vidFieldMerge(_info.width,_info.height,_uncompressed->data,_uncompressed2->data,data->data);
 		 _lastAsked=ref2;
-		 memcpy(_cache,_uncompressed2, (_info.width*_info.height*3)>>2);
+		 memcpy(_cache->data,_uncompressed2->data, (_info.width*_info.height*3)>>2);
 
       return 1;
 }

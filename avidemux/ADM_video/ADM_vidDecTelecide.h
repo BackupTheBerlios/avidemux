@@ -136,7 +136,7 @@ public:
 
 	void Telecide::WriteHints(unsigned char *dst, bool film, bool inpattern);
 	virtual uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-				uint8_t *data,uint32_t *flags);
+				ADMImage *data,uint32_t *flags);
 	char *Telecide::printConf( void );
 	uint8_t Telecide::configure(AVDMGenericVideoStream *in);
 	uint8_t	Telecide::getCoupledConf( CONFcouple **couples);

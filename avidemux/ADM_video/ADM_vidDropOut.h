@@ -32,8 +32,7 @@
 					ADMVideoDropOut(  AVDMGenericVideoStream *in,CONFcouple *setup);
 
   					 ~ADMVideoDropOut();
-		          		virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags);
+		          		virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,						ADMImage *data,uint32_t *flags);
 
 					virtual uint8_t configure( AVDMGenericVideoStream *instream);
 					virtual uint8_t getCoupledConf( CONFcouple **couples);

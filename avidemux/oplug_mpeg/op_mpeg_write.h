@@ -35,7 +35,7 @@ class	mpegWritter
 				uint32_t		_fps1000;
 				uint32_t		_total;
 				uint8_t			_outputAsPs;
-				uint8_t			*_buffer;
+				ADMImage		*aImage;
 				uint8_t			*_buffer_out;
 				uint8_t			init(char *name,ADM_MPEGTYPE type,
 				uint8_t 		interlaced,

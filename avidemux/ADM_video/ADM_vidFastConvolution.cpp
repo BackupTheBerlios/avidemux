@@ -65,7 +65,8 @@ AVDMFastVideoConvolution::AVDMFastVideoConvolution(
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
 
 					
- 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+// 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed); 
   _info.encoding=1;
   if(couples==NULL)
@@ -96,9 +97,9 @@ AVDMFastVideoConvolution::~AVDMFastVideoConvolution()
 //
 
 uint8_t AVDMFastVideoConvolution::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 //uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
 uint8_t *x1,*x2,*x3,*o1;
@@ -118,14 +119,14 @@ uint32_t stride,page;
 					}
 					else
 					{
-	         	o1=data+stride;
-  	        x1=_uncompressed;
+	         	o1=data->data+stride;
+  	        x1=_uncompressed->data;
     	      x2=x1+stride;
       	    x3=x2+stride;
 
 	          // first and last line
-	          memcpy(data,_uncompressed,stride);
-	          memcpy(data+page*4-stride,_uncompressed+page*4-stride,stride);          
+	          memcpy(data->data,_uncompressed->data,stride);
+	          memcpy(data->data+page*4-stride,_uncompressed->data+page*4-stride,stride);          
 	          // Luma
 	          for(int32_t y=1;y<(int32_t)_info.height-1;y++)
 	  				{
@@ -139,21 +140,21 @@ uint32_t stride,page;
       	// chroma u & v
          if(!_param->chroma)
           {
-	        	memcpy(data+page*4,_uncompressed+page*4,page*2);
+	        	memcpy(data->data+page*4,_uncompressed->data+page*4,page*2);
 					}
 					else
 					{
 						stride>>=1;
 						// chroma u
 						
-	         	o1=data+page*4+stride;
-  	        x1=_uncompressed+page*4;
+	         	o1=data->data+page*4+stride;
+  	        x1=_uncompressed->data+page*4;
     	      x2=x1+stride;
       	    x3=x2+stride;
 
 	          // first and last line
-	          memcpy(data+page*4,_uncompressed+page*4,stride);
-	          memcpy(data+page*5-stride,_uncompressed+page*5-stride,stride);          
+	          memcpy(data->data+page*4,_uncompressed->data+page*4,stride);
+	          memcpy(data->data+page*5-stride,_uncompressed->data+page*5-stride,stride);          
 	          // Luma
 	          for(int32_t y=1;y<(int32_t)(_info.height>>1)-1;y++)
 	  				{
@@ -165,14 +166,14 @@ uint32_t stride,page;
 	      		}
 						// chroma V
 						
-	         	o1=data+page*5+stride;
-  	        x1=_uncompressed+page*5;
+	         	o1=data->data+page*5+stride;
+  	        x1=_uncompressed->data+page*5;
     	      x2=x1+stride;
       	    x3=x2+stride;
 
 	          // first and last line
-	          memcpy(data+page*5,_uncompressed+page*5,stride);
-	          memcpy(data+page*6-stride,_uncompressed+page*6-stride,stride);          
+	          memcpy(data->data+page*5,_uncompressed->data+page*5,stride);
+	          memcpy(data->data+page*6-stride,_uncompressed->data+page*6-stride,stride);          
 	          // Luma
 	          for(int32_t y=1;y<(int32_t)(_info.height>>1)-1;y++)
 	  				{

@@ -25,10 +25,10 @@
    
 							    
      public:
-     										decoderVP3(uint32_t w,uint32_t h);
-         		virtual					~decoderVP3();
-    			virtual uint8_t 	uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag=NULL) 		;	
-   		       	virtual 			void setParam( void );
+     						decoderVP3(uint32_t w,uint32_t h);
+         		virtual			~decoderVP3();
+    			virtual uint8_t 	uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag=NULL);
+   		       	virtual void 		setParam( void );
 	
 
 }   ;

@@ -51,14 +51,16 @@ UNUSED_ARG(instream);
 CROP_PARAMS *par;
 uint32_t w,h,l,f;
 uint8_t ret=0;
-uint8_t *video1;
+ADMImage *video1;
 
 	// Get info from previous filter
 	w=_in->getInfo()->width;
 	h= _in->getInfo()->height;
 	printf("\n AddBlackBorder in : %u  x %u\n",w,h);
 
-	video1=(uint8_t *)malloc(w*h*4);
+	//video1=(uint8_t *)malloc(w*h*4);
+	video1=new ADMImage(w,h);
+	
 	ADM_assert(video1);	
 	// ask current frame from previous filter
 	ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l, video1,&f));
@@ -67,7 +69,7 @@ uint8_t *video1;
      	par=_param;
 
 	switch(DIA_getCropParams("Border Smear",&par->left,&par->right,&par->top,&par->bottom,
-			w,h,(uint8_t *)video1 )){
+			w,h,video1->data )){
 		case 0:  printf("cancelled\n");
 		         break;
 		case 1:  _info.width=_in->getInfo()->width-_param->left-_param->right;
@@ -77,7 +79,7 @@ uint8_t *video1;
 		default: ADM_assert(0);
 	}
 
-	free(video1);	
+	delete video1;	
 	return ret;
 
 }

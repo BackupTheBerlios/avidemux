@@ -27,7 +27,7 @@ class  ADMVideoLargeMedian:public AVDMGenericVideoStream
 
  protected:
     		AVDMGenericVideoStream 	*_in;
-    		uint8_t					*_uncompressed;
+    		//uint8_t					*_uncompressed;
 	virtual uint8_t 					doLine(uint8_t  *pred2,
 										uint8_t *pred1,
    										uint8_t *cur,
@@ -43,7 +43,7 @@ class  ADMVideoLargeMedian:public AVDMGenericVideoStream
 
   			virtual 		~ADMVideoLargeMedian();
 		        virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags);
+									ADMImage *data,uint32_t *flags);
 			virtual uint8_t 	configure( AVDMGenericVideoStream *instream) ;
 			virtual uint8_t 	getCoupledConf( CONFcouple **couples);
 

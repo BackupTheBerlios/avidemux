@@ -113,9 +113,9 @@ AVDMVideoStreamBSMear::~AVDMVideoStreamBSMear()
 //
 
 uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 
 			if(frame>=_info.nb_frames) 
@@ -132,7 +132,7 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
        		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
        		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       			
        		  // blacken top
-       		  uint8_t *srcY=data;
+       		  uint8_t *srcY=data->data;
        		  uint32_t bytes=_info.width*_param->top;
 		  uint32_t page=_info.width*_info.height;
        		
@@ -149,13 +149,13 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
        		  }
        		
        		  // backen bottom
-       		  srcY=data+_info.width*_info.height-1;
+       		  srcY=data->data+_info.width*_info.height-1;
        		
        		 bytes=_info.width*_param->bottom;
        	 	 srcY-=bytes;
        		 memset(srcY,0x00,bytes);
 		// chroma
-		 srcY=data+page+(page>>2)-1;
+		 srcY=data->data+page+(page>>2)-1;
 		 srcY-=bytes>>2;
        		 memset(srcY,0x80,bytes>>2);
 		 memset(srcY+((page)>>2),0x80,bytes>>2);

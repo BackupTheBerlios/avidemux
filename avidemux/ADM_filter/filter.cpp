@@ -51,7 +51,8 @@ extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *co
 //
 static   AVDMGenericVideoStream *preview=NULL;
 // Ugly should be dynamically allocated
-static uint8_t unpackd[MAXIMUM_SIZE*MAXIMUM_SIZE*3];
+#warning HARDCODEC IMAGE SIZE
+static ADMImage *unpackd;
 // dummy constructor used to register the filter
 //____________________________________
 AVDMVideo_FilterDec::AVDMVideo_FilterDec(char *name,
@@ -205,6 +206,11 @@ extern ADM_Composer *video_body;
 	updateVideoFilters();
        return videofilters[  0].filter;
 }
+AVDMGenericVideoStream *getFirstCurrentVideoFilter( void)
+{
+	ADM_assert(nb_active_filter);
+ 	return videofilters[  0].filter;
+}
 AVDMGenericVideoStream *getFirstVideoFilter( void)
 {
 extern ADM_Composer *video_body;
@@ -299,14 +305,22 @@ void 	editorReignitPreview( void )
 	   
 	    preview=videofilters[  nb_active_filter-1].filter;
 	    aprintf("--spawning\n");
-            GUI_PreviewInit(preview->getInfo()->width,
-									preview->getInfo()->height);
+	    if(unpackd)
+	    {
+	    	delete unpackd;
+		unpackd=NULL;		
+	    }
+	    unpackd=new ADMImage(preview->getInfo()->width,preview->getInfo()->height);
+            GUI_PreviewInit(preview->getInfo()->width,preview->getInfo()->height);
 }
 
 
 void editorKillPreview( void )
 {
       GUI_PreviewEnd();
+      if(unpackd)
+      	delete unpackd;
+      unpackd=NULL;
 }
 
 
@@ -319,6 +333,7 @@ void editorUpdatePreview(uint32_t framenum)
 //
 	uint32_t fl,len;	
  	ADM_assert(preview);
+	ADM_assert(unpackd);
 
   if( GUI_StillAlive())
   {
@@ -326,7 +341,7 @@ void editorUpdatePreview(uint32_t framenum)
 		if(framenum<=preview->getInfo()->nb_frames-1)
 		{
 			preview->getFrameNumberNoAlloc(framenum,&len,unpackd,&fl);
-			GUI_PreviewUpdate(unpackd);
+			GUI_PreviewUpdate(unpackd->data);
 		}
   }
 

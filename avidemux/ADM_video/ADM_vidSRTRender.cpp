@@ -62,7 +62,7 @@ dest[srcLen<destLen?srcLen:destLen-1]='\0'; \
 //__________________________________________________________________
 uint8_t ADMVideoSubtitle::getFrameNumberNoAlloc(uint32_t frame,
 						uint32_t *len,
-   						uint8_t *data,
+   						ADMImage *data,
    						uint32_t *flags)
 {
 
@@ -90,7 +90,7 @@ uint32_t absFrame=frame+_info.orgFrame;
 	      if(time<=_subs[_oldline].endTime && time >=_subs[_oldline].startTime)
 	      {
 	      		aprintf("Sub: cached %lu %lu %lu\n",time,_subs[_oldline].startTime,_subs[_oldline].endTime);
-			blend(data,_conf->_baseLine); // re-use it
+			blend(data->data,_conf->_baseLine); // re-use it
 			return 1;	
 
 	      }
@@ -103,7 +103,7 @@ uint32_t absFrame=frame+_info.orgFrame;
 					aprintf("Sub: Using line %d\n",srch);
 					//printf("\n %s \n",_subs[_oldline].string);
 					displayString(&(_subs[_oldline]));
-					blend(data,_conf->_baseLine);
+					blend(data->data,_conf->_baseLine);
 			}
 
 		return 1;

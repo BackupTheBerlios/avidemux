@@ -79,9 +79,9 @@ char *Telecide::printConf( void )
         return buf;
 }
 
-
-#define UPLANE(x) (x+_info.width*_info.height)
-#define VPLANE(x) (x+((_info.width*_info.height*5)>>2))
+#define YPLANE(x) (x->data)
+#define UPLANE(x) (x->data+_info.width*_info.height)
+#define VPLANE(x) (x->data+((_info.width*_info.height*5)>>2))
 
 #define PROGRESSIVE  0x00000001
 #define MAGIC_NUMBER (0xdeadbeef)
@@ -292,12 +292,14 @@ void Telecide::Debug(int frame)
 }
 
 //______________________________________________________________
-uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-				uint8_t *data,uint32_t *flags)
+uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame,
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 uint32_t framep,framen;
-uint8_t * fp,* fc, *fn, *dst, *final;
-uint8_t * lc,* lp;
+ADMImage * fp,* fc, *fn, *dst, *final;
+ADMImage * lc,* lp;
 
 unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 	unsigned char *fprpU, *fcrpU, *fnrpU;//, *fcrp_savedU
@@ -314,7 +316,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 	
 	
 //	dst = env->NewVideoFrame(vi);
-	dst=data;
+	dst=data;//->data;
 	// Get the current frame.
 	
 	if (frame > _info.nb_frames - 1) frame = _info.nb_frames - 1;
@@ -327,7 +329,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 	//GETFRAME(pframe, fp);
 	fp=vidCache->getImage(framep);
 	ADM_assert(fp);
-	fprp = (unsigned char *) fp;
+	fprp = YPLANE( fp);
 	
 	{
 		fprpU = (unsigned char *)  UPLANE(fp);
@@ -336,7 +338,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 	
 	fc=vidCache->getImage(frame);
 	ADM_assert(fc);
-	fcrp = (unsigned char *) fc;
+	fcrp =YPLANE( fc);
 	
 	{
 		fcrpU = (unsigned char *) UPLANE(fc);
@@ -347,7 +349,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 	//GETFRAME(nframe, fn);
 	fn=vidCache->getImage(framen);
 	ADM_assert(fn);
-	fnrp = (unsigned char *) fn;
+	YPLANE( fn);
 	
 	{
 		fnrpU = (unsigned char *)  UPLANE(fn);
@@ -559,7 +561,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 	else strcpy(status, "[out-of-pattern]");
 
 	// Assemble and output the reconstructed frame according to the final match.
-	dstp = dst;
+	dstp = YPLANE(dst);
     
 	{
 		dstpU =  UPLANE(dst);
@@ -657,25 +659,25 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 			// Blend mode.
 			final = data; //env->NewVideoFrame(vi);
 			// Do first and last lines.
-			finalp = final;
-			dstp = dst;
-			dstpn = dstp + dpitch;
+			finalp = YPLANE(final);
+			dstp = YPLANE(dst);
+			dstpn =  (dstp) + dpitch;
 			for (x = 0; x < w; x++)
 			{
 				finalp[x] = (((int)dstp[x] + (int)dstpn[x]) >> 1);
 			}
-			finalp = final + (h-1)*dpitch;
-			dstp = dst + (h-1)*dpitch;
-			dstpp = dstp - dpitch;
+			finalp = YPLANE(final) + (h-1)*dpitch;
+			dstp = YPLANE(dst) + (h-1)*dpitch;
+			dstpp =  (dstp) - dpitch;
 			for (x = 0; x < w; x++)
 			{
 				finalp[x] = (((int)dstp[x] + (int)dstpp[x]) >> 1);
 			}
 			// Now do the rest.
-			dstp = dst + dpitch;
-			dstpp = dstp - dpitch;
-			dstpn = dstp + dpitch;
-			finalp = final + dpitch;
+			dstp = YPLANE(dst) + dpitch;
+			dstpp =  (dstp) - dpitch;
+			dstpn =  (dstp) + dpitch;
+			finalp = YPLANE(final) + dpitch;
 			for (y = 1; y < h - 1; y++)
 			{
 				for (x = 0; x < w; x++)
@@ -779,9 +781,9 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 					}
 				}
 			}
-			if (_param->show == true) Show(final, frame);
+			if (_param->show == true) Show(final->data, frame);
 			if (_param->debug == true) Debug(frame);
-			if (_param->hints == true) WriteHints(final, film, inpattern);
+			if (_param->hints == true) WriteHints(final->data, film, inpattern);
 			
 			vidCache->unlockAll();
 			return 1;
@@ -789,7 +791,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 
 		// Interpolate mode.
 		// Luma plane.
-		dstp = dst + dpitch;
+		dstp = YPLANE(dst) + dpitch;
 		dstpp = dstp - dpitch;
 		dstpn = dstp + dpitch;
 		for (y = 1; y < h - 1; y+=2)
@@ -853,9 +855,9 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 		}
 	}
 
-	if (_param->show == true) Show(dst, frame);
+	if (_param->show == true) Show(dst->data, frame);
 	if (_param->debug == true) Debug(frame);
-	if (_param->hints == true) WriteHints(dst, film, inpattern);
+	if (_param->hints == true) WriteHints(dst->data, film, inpattern);
 	vidCache->unlockAll();
 	return 1;
 }

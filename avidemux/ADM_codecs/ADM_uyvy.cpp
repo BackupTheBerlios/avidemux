@@ -29,7 +29,7 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_uyvy.h"
  
- uint8_t decoderUYVY::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag)
+ uint8_t decoderUYVY::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag)
 {
 
 	if(len<_w*_h*2)
@@ -40,8 +40,8 @@
 	uint8_t *ptrY,*ptrU,*ptrV,*ptr;
 	
 	ptr=in;
-	ptrY=out;
-	ptrU=out+_w*_h;
+	ptrY=out->data;
+	ptrU=out->data+_w*_h;
 	ptrV=ptrU+((_w*_h)>>2);
 	
 	for(uint32_t y=0;y<_h;y++)
@@ -68,7 +68,7 @@
 	return 1;
 
 }
-uint8_t decoderYUY2::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag)
+uint8_t decoderYUY2::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag)
 {
 
 	if(len<_w*_h*2)
@@ -79,9 +79,9 @@ uint8_t decoderYUY2::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *
 	uint8_t *ptrY,*ptrU,*ptrV,*ptr;
 	
 	ptr=in;
-	ptrY=out;
-	ptrV=out+_w*_h;
-	ptrU=out+((_w*_h*5)>>2);
+	ptrY=out->data;
+	ptrV=out->data+_w*_h;
+	ptrU=out->data+((_w*_h*5)>>2);
 	
 	
 	for(uint32_t y=0;y<_h;y++)

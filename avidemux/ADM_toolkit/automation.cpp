@@ -340,11 +340,7 @@ void call_buildtimemap(char *p) { UNUSED_ARG(p); aprintf("timemap\n");HandleActi
 
 void call_setPP(char *v,char *s)
 {
-int iv=3,is=5;
-	sscanf(v,"%d",&iv);
-	sscanf(s,"%d",&is);
-	aprintf("post proc %d %d\n",iv,is);
-	setPostProc(iv,is);
+// TODO
 	
 
 }

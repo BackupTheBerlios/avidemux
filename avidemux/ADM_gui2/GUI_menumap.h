@@ -37,7 +37,7 @@ CALLBACK(to_other1 				,ACT_Pipe2Other);
 
  CALLBACK( play_video1         			,ACT_PlayAvi);
  CALLBACK( decoder_options1         		,ACT_DecoderOption);
- 
+ CALLBACK( set_postprocessing1			,ACT_SetPostProcessing);
  CALLBACK( next_frame1            		,ACT_NextFrame);
  CALLBACK( previous_frame1            		,ACT_PreviousFrame);
  CALLBACK( next_intra_frame1            	,ACT_NextKFrame);

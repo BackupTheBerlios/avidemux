@@ -57,7 +57,8 @@ ADMVideoLargeMedian::ADMVideoLargeMedian(
   memcpy(&_info,_in->getInfo(),sizeof(_info));  		
 	
 					
- 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+ 	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
+	// uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
   ADM_assert(_uncompressed);
   
   _info.encoding=1;
@@ -105,9 +106,9 @@ char *ADMVideoLargeMedian::printConf(void)
 //
 
 uint8_t ADMVideoLargeMedian::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 //uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
 uint8_t *x1,*x2,*x3,*x4,*x5,*o1;
@@ -128,10 +129,10 @@ uint32_t stride,page;
 					 else
 					 {
 						memcpy(data,_uncompressed,stride*2);
-	          memcpy(data+page*4-stride*2,_uncompressed+page*4-2*stride,2*stride);          
+	          memcpy(data->data+page*4-stride*2,_uncompressed+page*4-2*stride,2*stride);          
 	         
-						o1=data+stride*2;;
-  	        x1=_uncompressed;
+		o1=data->data+stride*2;;
+  	        x1=_uncompressed->data;
     	      x2=x1+stride;
       	    x3=x2+stride;
             x4=x3+stride;
@@ -153,16 +154,16 @@ uint32_t stride,page;
 						stride>>=1;
 					if(!_param->chroma)
 					{
-						 	memcpy(data+page*4,_uncompressed+page*4,page*2);			
+						 	memcpy(data->data+page*4,_uncompressed->data+page*4,page*2);			
 					}	
 					else
 					{
 	          // first and last line
-	          memcpy(data+page*4,_uncompressed+page*4,stride*2);
-	          memcpy(data+page*5-stride*2,_uncompressed+page*5-2*stride,2*stride);          						
+	          memcpy(data->data+page*4,_uncompressed->data+page*4,stride*2);
+	          memcpy(data->data+page*5-stride*2,_uncompressed->data+page*5-2*stride,2*stride);          						
 						// chroma u						
-	         	o1=data+page*4+stride*2;
-  	        x1=_uncompressed+page*4;
+	         	o1=data->data+page*4+stride*2;
+  	        x1=_uncompressed->data+page*4;
     	      x2=x1+stride;
       	    x3=x2+stride;
             x4=x3+stride;
@@ -180,11 +181,11 @@ uint32_t stride,page;
 	      		}
 						// chroma V
 						 // first and last line
-	          memcpy(data+page*5,_uncompressed+page*5,stride*2);
-	          memcpy(data+page*6-2*stride,_uncompressed+page*6-2*stride,2*stride);          
+	          memcpy(data->data+page*5,_uncompressed->data+page*5,stride*2);
+	          memcpy(data->data+page*6-2*stride,_uncompressed->data+page*6-2*stride,2*stride);          
 	          
-	         	o1=data+page*5+stride*2;
-  	        x1=_uncompressed+page*5;
+	         	o1=data->data+page*5+stride*2;
+  	        x1=_uncompressed->data+page*5;
     	      x2=x1+stride;
       	    x3=x2+stride;
             x4=x3+stride;

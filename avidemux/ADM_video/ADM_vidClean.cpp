@@ -69,7 +69,8 @@ AVDMVideoSmooth::AVDMVideoSmooth(
         }
 
 					
-  _uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+  //_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+  _uncompressed=new ADMImage (_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed);
   _info.encoding=1;
 
@@ -89,14 +90,14 @@ uint8_t	AVDMVideoSmooth::getCoupledConf( CONFcouple **couples)
 }
 AVDMVideoSmooth::~AVDMVideoSmooth()
 {
- 	delete []_uncompressed;
+ 	delete _uncompressed;
  	DELETE(_param);
 }
 
 uint8_t AVDMVideoSmooth::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 uint8_t *dst,*dstu,*dstv,*src,*srcu,*srcv;
 
@@ -112,12 +113,12 @@ uint8_t *dst,*dstu,*dstv,*src,*srcu,*srcv;
 			// read uncompressed frame
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 
-         		src=_uncompressed;
-           	srcu=_uncompressed+_info.width*_info.height;
+         		src=_uncompressed->data;
+           	srcu=_uncompressed->data+_info.width*_info.height;
            	srcv=srcu+((_info.width*_info.height)>>2);
 
-              dst=data;
-              dstu=data+_info.width*_info.height;;
+              dst=data->data;
+              dstu=data->data+_info.width*_info.height;;
               dstv=dstu+((_info.width*_info.height)>>2);;
 
               int16_t radius=_param->radius;
@@ -128,7 +129,7 @@ uint8_t *dst,*dstu,*dstv,*src,*srcu,*srcv;
              			{
                       	// for each pixel we take the surrounding one
                        	// if threshold is not met
-                        		l=getPixel(x,y,_uncompressed);
+                        		l=getPixel(x,y,_uncompressed->data);
                           	if(!(x&1))
                            	{
                           		u=getPixelU(x,y,srcu);
@@ -146,7 +147,7 @@ uint8_t *dst,*dstu,*dstv,*src,*srcu,*srcv;
                               		{
                                   		if( (xx*xx+yy*yy)<radius*radius)
                                     	{
-                                   		ldelta =getPixel(x+xx,y+yy,_uncompressed)-l;
+                                   		ldelta =getPixel(x+xx,y+yy,_uncompressed->data)-l;
   		                            		udelta=getPixelU(x+xx,y+yy,srcu)-u;
                                      		vdelta=getPixelU(x+xx,y+yy,srcv)-v;                                       	
 
@@ -179,9 +180,9 @@ uint8_t *dst,*dstu,*dstv,*src,*srcu,*srcv;
                                   if(y&1)       	
                                   if(x&1)				
                                   	{
-                        				setPixelU(  (su+fu)>>1,x,y,dstu);
-                           			setPixelU(  (sv+fv)>>1,x,y,dstv);                                               				
-                              		}
+                        			setPixelU(  (su+fu)>>1,x,y,dstu);
+                           			setPixelU(  (sv+fv)>>1,x,y,dstv);  
+					}
                                 	else
                                  	{
                                      	su=fu;

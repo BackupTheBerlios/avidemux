@@ -45,9 +45,11 @@ _VIDEOS *vi;
 uint32_t len,flags;
 uint32_t frames=0,cur=0;
 uint8_t *compBuffer=NULL;
-uint8_t *prepBuffer=NULL;
+//uint8_t *prepBuffer=NULL;
+ADMImage *prepBuffer=NULL;
 uint32_t bframe;
-
+aviInfo    info;
+						
 	if(!_nb_video)
 	{
 		GUI_Alert("No video loaded");
@@ -64,7 +66,8 @@ uint32_t bframe;
 			GUI_Alert("Cannot allocate memory");
 			return 0;
 		}
-	prepBuffer=new uint8_t[(MAXIMUM_SIZE * MAXIMUM_SIZE * 3)>>1];
+	//prepBuffer=new uint8_t[(MAXIMUM_SIZE * MAXIMUM_SIZE * 3)>>1];
+	prepBuffer=new ADMImage(MAXIMUM_SIZE,MAXIMUM_SIZE);
 	if(!prepBuffer)
 		{
 			delete [] compBuffer;
@@ -83,6 +86,8 @@ uint32_t bframe;
 	{
 		// set the decoder in fast mode
 			vi=&(_videos[vid]);
+			vi->_aviheader->getVideoInfo (&info);
+			
 			bframe=0;
 			if(vi->_reorderReady)
 			{
@@ -116,14 +121,13 @@ uint32_t bframe;
 				// and there is b-frame
 				if(bframe)
 				{
-					vi->_forwardFrame=new uint8_t [720*576*3];
 					vi->_reorderReady=vi->_aviheader->reorder();
 				}
 			}
 	}
 	delete work;
 	delete [] compBuffer;
-	delete [] prepBuffer;
+	delete  prepBuffer;
 	return 1;
 }
 

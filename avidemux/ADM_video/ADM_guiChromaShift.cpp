@@ -70,7 +70,8 @@
 				printf(#x":%d\n", y);}
 
 
-static uint8_t *video_working,*video_src,*video_rgb;
+static uint8_t *video_working,*video_rgb;
+static	ADMImage *video_src;
 static int32_t shift_u, shift_v;
 static uint32_t ww,hh;
 
@@ -92,7 +93,8 @@ uint8_t ADMVideoChromaShift::configure( AVDMGenericVideoStream *instream)
 uint8_t ret=0;
 uint32_t l,f;
 
-							video_working=video_src=NULL;
+							video_working=NULL;
+							video_src=NULL;
 
 		                 // Get info from previous filter
 							ww=_in->getInfo()->width;
@@ -100,7 +102,7 @@ uint32_t l,f;
 
 							printf("\n Chromashift in : %lu  x %lu\n",ww,hh);
 
-							video_src=new uint8_t [ww*hh*2];
+							video_src=new ADMImage(ww,hh);// uint8_t [ww*hh*2];
 							ADM_assert(video_src);
 							video_working=new uint8_t [ww*hh*2];
 							ADM_assert(video_working);
@@ -111,7 +113,7 @@ uint32_t l,f;
 
 							// ask current frame from previous filter
 							ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l,
-          														video_src,&f));
+          									video_src,&f));
 
 							shift_u=_param->u;
 							shift_v=_param->v;
@@ -125,9 +127,10 @@ uint32_t l,f;
 							}
 
 							delete [] video_working;
-							delete [] video_src;
+							delete  video_src;
 							delete [] video_rgb;
-							video_working=video_src=NULL;
+							video_working=NULL;
+							video_src=NULL;
 
 					return ret;
 }
@@ -186,13 +189,13 @@ void update( void)
 {
 
 		// First copy Y
-		memcpy(video_working,video_src,(ww*hh));
+		memcpy(video_working,video_src->data,(ww*hh));
 		// then shift u
 
 		 ADMVideoChromaShift::shift(video_working+ww*hh,
-		 						video_src+ww*hh, ww>>1,hh>>1,shift_u);
+		 						video_src->data+ww*hh, ww>>1,hh>>1,shift_u);
 		ADMVideoChromaShift::shift(video_working+((5*ww*hh)>>2),
-		 						video_src+((5*ww*hh)>>2), ww>>1,hh>>1,shift_v);
+		 						video_src->data+((5*ww*hh)>>2), ww>>1,hh>>1,shift_v);
 		if(shift_u)
 			ADMVideoChromaShift::fixup(video_working,ww,hh,shift_u*2);
 		if(shift_v)

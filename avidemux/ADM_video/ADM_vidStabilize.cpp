@@ -5,7 +5,7 @@
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
-
+#if 0
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -116,9 +116,9 @@ uint8_t	ADMVideoStabilize::getCoupledConf( CONFcouple **couples)
 // else we blend
 
 uint8_t ADMVideoStabilize::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 UNUSED_ARG(flags);
 uint32_t uvlen;
@@ -154,7 +154,7 @@ uint8_t										*_current;
               innext=_next+1+_info.width;
               incur =_current+1+_info.width;
               
-              zout=data+_info.width+1;
+              zout=data->data+_info.width+1;
               
              
               uint8_t *nl,*pl,*nc,*pc;
@@ -200,4 +200,5 @@ uint8_t										*_current;
 }
 
 
+#endif
 #endif

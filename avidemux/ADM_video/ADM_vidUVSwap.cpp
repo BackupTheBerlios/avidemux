@@ -71,9 +71,9 @@ ADMVideoUVSwap::~ADMVideoUVSwap()
 			}
 }
 uint8_t ADMVideoUVSwap::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 
 			ADM_assert(frame<_info.nb_frames);
@@ -85,7 +85,7 @@ uint8_t ADMVideoUVSwap::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t sz;
 		uint8_t *start;
 					sz=_info.width*_info.height;
-					start=data+sz;
+					start=data->data+sz;
 					sz>>=2;
 
 					memcpy(_buf,start,sz);

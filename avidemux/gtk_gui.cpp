@@ -88,7 +88,7 @@
 
 #include "mpeg2enc/ADM_mpeg2enc.h"
 
-
+#include "ADM_filter/video_filters.h"
 
 void A_handleSecondTrack (int tracktype);
 int A_delete(uint32_t start, uint32_t end);
@@ -168,7 +168,7 @@ int A_saveDVDPS(char *name);
 extern uint8_t ogmSave(char  *name);
 //__________
 extern uint8_t ogmSave(char *fd);
-
+extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
 
 
 extern int ignore_change;
@@ -589,7 +589,7 @@ case ACT_Pipe2Other:
 	GUI_PlayAvi ();
       break;
     case ACT_SetPostProcessing:
-      GUI_Alert ("Obsolete");
+      filterSetPostProc();
       break;
 
     case ACT_NextFrame:
@@ -969,10 +969,9 @@ void  updateLoaded ()
     }
 
   curframe = 0;
-
+  getFirstVideoFilter(); // reinit first filter
   video_body->flushCache();
-  ADM_assert (rdr_decomp_buffer =
-	  (uint8_t *) malloc (3 * avifileinfo->width * avifileinfo->height));
+  ADM_assert (rdr_decomp_buffer =new ADMImage(avifileinfo->width,avifileinfo->height));
 
   //frameStart = 0;
   //frameEnd = avifileinfo->nb_frames - 1;
@@ -1033,9 +1032,10 @@ void  updateLoaded ()
     }
   else
     {
-      renderUpdateImage (rdr_decomp_buffer);
+      renderUpdateImage (rdr_decomp_buffer->data);
       renderRefresh ();
     }
+    
    printf("\n** conf updated **\n");
 }
 
@@ -1237,7 +1237,7 @@ void A_saveBunchJpg(char *name)
   uint32_t sz,fl;
   FILE *fd;
   uint8_t *buffer=NULL;
-  uint8_t *src=NULL;
+  ADMImage *src=NULL;
   uint32_t curImg;
   char	 fullName[2048],*ext;
 
@@ -1254,7 +1254,8 @@ void A_saveBunchJpg(char *name)
 	sz = avifileinfo->width* avifileinfo->height * 3;
 	buffer=new uint8_t [sz];
 	ADM_assert(buffer);
-	src=new uint8_t [sz];
+	//src=new uint8_t [sz];
+	src=new ADMImage(avifileinfo->width,avifileinfo->height);
 	ADM_assert(src);
 
 
@@ -1263,7 +1264,7 @@ void A_saveBunchJpg(char *name)
 		
 	for(curImg=frameStart;curImg<=frameEnd;curImg++)
 	{		
-		if (!video_body->getUncompressedFrame (curImg, src))
+		if (!GUI_getFrame (curImg, src,NULL))
 		{
 			GUI_Alert("Cannot uncompress video!");
 			goto _bunch_abort;
@@ -1349,7 +1350,7 @@ sz = avifileinfo->width* avifileinfo->height * 3;
 		return;
 	}
 
-	 if(!COL_yv12rgbBMP(bmph.biWidth, bmph.biHeight,rdr_decomp_buffer, out))
+	 if(!COL_yv12rgbBMP(bmph.biWidth, bmph.biHeight,rdr_decomp_buffer->data, out))
 	 {
 		GUI_Alert("Error converting to BMP !");
 		return;
@@ -2107,18 +2108,19 @@ uint32_t max=0;
 void A_videoCheck( void)
 {
 uint32_t nb=0;
-uint32_t buf[720*576*2];
+//uint32_t buf[720*576*2];
 uint32_t error=0;
+ADMImage *aImage;
 DIA_working *work;
 
 	nb = avifileinfo->nb_frames;
 	work=new DIA_working("Checking video");
-
+	aImage=new ADMImage(avifileinfo->width,avifileinfo->height);
   for(uint32_t i=0;i<nb;i++)
   {
 	work->update(i, nb);
       	if(!work->isAlive()) break;
-	if(!video_body->getUncompressedFrame (i, (uint8_t *)buf))
+	if(!GUI_getFrame (i, aImage,NULL))
 	{
 		error ++;
 		printf("Frame %u has error\n",i);
@@ -2126,6 +2128,7 @@ DIA_working *work;
 
     };
   delete work;
+  delete aImage;
   if(error==0)
   	GUI_Alert("No error found !");
 else
@@ -2235,5 +2238,7 @@ uint32_t count;
 
 
 }
+
+
 // EOF
 

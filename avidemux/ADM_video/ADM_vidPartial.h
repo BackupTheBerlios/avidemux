@@ -35,12 +35,12 @@ typedef struct  PARTIAL_CONFIG
       			AVDMGenericVideoStream 	*_son;
 			PARTIAL_CONFIG			*_param;
  public:
- 	virtual 	char 						*printConf(void);
-  									ADMVideoPartial(  AVDMGenericVideoStream *in,CONFcouple *setup);
-									ADMVideoPartial(  AVDMGenericVideoStream *in,VF_FILTERS tag,CONFcouple *setup);
+ 	virtual 	char 		*printConf(void);
+  					ADMVideoPartial(  AVDMGenericVideoStream *in,CONFcouple *setup);
+					ADMVideoPartial(  AVDMGenericVideoStream *in,VF_FILTERS tag,CONFcouple *setup);
   			virtual ~ADMVideoPartial();
 		    	virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags);
+          																	ADMImage *data,uint32_t *flags);
 			virtual uint8_t configure( AVDMGenericVideoStream *instream) ;
 			virtual uint8_t	getCoupledConf( CONFcouple **couples);
  }     ;

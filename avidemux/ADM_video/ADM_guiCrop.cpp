@@ -45,7 +45,7 @@ uint8_t AVDMVideoStreamCrop::configure( AVDMGenericVideoStream *instream)
 CROP_PARAMS *par;
 uint32_t w,h,l,f;
 uint8_t ret=0;
-uint8_t *video1;
+ADMImage *video1;
 
 		video1=NULL;
 
@@ -54,7 +54,8 @@ uint8_t *video1;
 		h= _in->getInfo()->height;
 
 		printf("\n Crop in : %lu  x %lu\n",w,h);
-		video1=(uint8_t *)malloc(w*h*4);
+		//video1=(uint8_t *)malloc(w*h*4);
+		video1=new ADMImage(w,h);
 		ADM_assert(video1);
 
 		// ask current frame from previous filter
@@ -63,7 +64,7 @@ uint8_t *video1;
 		par=_param;
 		
     	 	switch(DIA_getCropParams("Crop Settings",&par->left,&par->right,&par->top,&par->bottom,
-     							w,h,(uint8_t *)video1 ))
+     							w,h,video1->data ))
 		{
 			case 0:
 		      		printf("cancelled\n");
@@ -77,7 +78,7 @@ uint8_t *video1;
 				ADM_assert(0);
 		}
 
-		free(video1);		
+		delete video1;
 		video1=NULL;
 		return ret;
 }

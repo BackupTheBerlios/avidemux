@@ -34,23 +34,23 @@
 					void checkFlags( xvidEncParam *extend=NULL );    
 
           public :
-             	void			*getXvidStat( void );
-          			xvidEncoder(uint32_t width,uint32_t height)  // : divxEncoder(width,height)
+             				void		*getXvidStat( void );
+          						xvidEncoder(uint32_t width,uint32_t height)
+							  // : divxEncoder(width,height)
              				{
-                                _w=width;
-                                _h=height;
-                                _init=0;
-                                
+						_w=width;
+						_h=height;
+						_init=0;                                
                    			} ;
-                  		uint8_t 	stopEncoder(void );
+                  			uint8_t 	stopEncoder(void );
               			virtual uint8_t 	init( uint32_t val,uint32_t fps1000)=0;
-							virtual	uint8_t 	init( uint32_t val,uint32_t fps1000,uint32_t extra) =0;
-							virtual uint8_t 	initExtented(uint32_t val,xvidEncParam *extend=NULL)=0 ;
-              			  uint8_t 	getResult( void *ress);                
-              virtual 	uint8_t encode(
-        							uint8_t 	*in,
-								   	 	uint8_t 	*out,
-								   		uint32_t 	*len,
+				virtual	uint8_t 	init( uint32_t val,uint32_t fps1000,uint32_t extra) =0;
+				virtual uint8_t 	initExtented(uint32_t val,xvidEncParam *extend=NULL)=0 ;
+              				uint8_t 	getResult( void *ress);                
+              			virtual 	uint8_t encode(
+        							ADMImage 	*in,
+								uint8_t 	*out,
+								uint32_t 	*len,
 			       					uint32_t 	*flags)=0;
 				
 
@@ -67,7 +67,7 @@
           virtual 	uint8_t 	init( uint32_t val,uint32_t fps1000);
 					virtual		uint8_t 	init(uint32_t val,uint32_t fps1000,uint32_t extra) ;
           virtual 	uint8_t encode(
-        					uint8_t 	*in,
+        					ADMImage 	*in,
 					 	uint8_t 	*out,
 						uint32_t 	*len,
 						uint32_t 	*flags);
@@ -84,14 +84,14 @@
              				{
 
                    			} ;
-						virtual 	uint8_t 	initExtented(uint32_t val,xvidEncParam *extend=NULL)                      ;
-            virtual 	uint8_t init( uint32_t val,uint32_t fps1000);
-						virtual		uint8_t 	init(uint32_t val,uint32_t fps1000,uint32_t extra) ;
-            virtual 	uint8_t encode(
-        	  				uint8_t 	*in,
-									 	uint8_t 	*out,
-										uint32_t 	*len,
-				       			uint32_t 	*flags);
+				virtual 	uint8_t initExtented(uint32_t val,xvidEncParam *extend=NULL) ;
+				virtual 	uint8_t init( uint32_t val,uint32_t fps1000);
+				virtual		uint8_t init(uint32_t val,uint32_t fps1000,uint32_t extra) ;
+            			virtual 	uint8_t encode(
+        	  					ADMImage 	*in,
+							uint8_t 	*out,
+							uint32_t 	*len,
+							uint32_t 	*flags);
    };
    class xvidEncoderVBR : public    xvidEncoderCQ
   	{
@@ -105,17 +105,17 @@
                    			} ;
                   	
                   		virtual 	uint8_t encode(
-    			    	  				uint8_t 	*in,
-									 	uint8_t 	*out,
-										uint32_t 	*len,
-			    			   			uint32_t 	*flags);
+    			    	  				ADMImage 	*in,
+							 	uint8_t 	*out,
+								uint32_t 	*len,
+								uint32_t 	*flags);
 	                     uint8_t encodeVBR(
-												uint8_t * in,
-											    uint8_t * out,
-											    uint32_t * len,
-								       		uint32_t * flags,
-								         		uint16_t	 nq,
-								           	uint8_t forcekey);
+								ADMImage * in,
+								uint8_t * out,
+								uint32_t * len,
+								uint32_t * flags,
+								uint16_t	 nq,
+								uint8_t forcekey);
 
    };
 

@@ -20,6 +20,7 @@
  #include "ADM_library/default.h"
  #include "ADM_dialog/DIA_working.h"
  #include "ADM_dialog/DIA_encoding.h"
+ #include "ADM_library/ADM_image.h"
  
 
  class GenericAviSave
@@ -45,8 +46,8 @@
 
                 uint8_t 		computeAudioCBR (void)   ;
                 aviWrite		*writter;
-                uint8_t		*vbuffer;
-                uint8_t		*abuffer;
+                uint8_t			*vbuffer;
+                uint8_t			*abuffer;
                 uint32_t		_videoFlag;
 		uint32_t  	 	_lastIPFrameSent;
 

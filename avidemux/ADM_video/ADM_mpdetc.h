@@ -46,11 +46,11 @@ class  AVDMVideoMPDetc:public AVDMGenericVideoStream
  protected:
 
 	struct vf_priv_s	*_param;
-	uint8_t			*_lastFrame;
+	ADMImage		*_lastFrame;
         virtual char 		*printConf(void) ;
 	
 	
-		uint8_t 	do_put_image(uint8_t *data);
+		uint8_t 	do_put_image(ADMImage *data);
 		uint32_t	_inFrame;
 		uint32_t	_lastAsked;
 		uint32_t 	_copy;
@@ -60,7 +60,7 @@ class  AVDMVideoMPDetc:public AVDMGenericVideoStream
   				AVDMVideoMPDetc(  AVDMGenericVideoStream *in,CONFcouple *setup);
   				~AVDMVideoMPDetc();
 	virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          									uint8_t *data,uint32_t *flags);
+          									ADMImage *data,uint32_t *flags);
 
 			virtual uint8_t 	configure( AVDMGenericVideoStream *instream) 
 								{return 0;};

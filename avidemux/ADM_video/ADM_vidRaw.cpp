@@ -61,11 +61,14 @@ AVDMVideoStreamRaw::~AVDMVideoStreamRaw()
 //		GUI to decompress it .
 //
 
-uint8_t AVDMVideoStreamRaw::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-   																	uint8_t *data,uint32_t *flags)
+uint8_t AVDMVideoStreamRaw::getFrameNumberNoAlloc(uint32_t frame,
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
         UNUSED_ARG(len);
     	UNUSED_ARG(flags);
+		*len=(_info.width*_info.height*3)>>1;
 		if(!(frame<_info.nb_frames))
 		{
 				printf("\n goiing out of bounds! :%ld / %ld \n",frame,_info.nb_frames);
@@ -73,8 +76,9 @@ uint8_t AVDMVideoStreamRaw::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		}
 
 			// read uncompressed frame
-		if(!_in->getFrameNoAlloc(_start+frame,data,len,flags)     )
+		if(!_in->getUncompressedFrame(_start+frame,data,flags)     )
      			return 0;
+		
         return 1;
 
 

@@ -66,7 +66,8 @@ AVDMVideoConvolution::AVDMVideoConvolution(
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
 	
 					
- 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+// 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+ 	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
   ADM_assert(_uncompressed);
   _U=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
   ADM_assert(_U);
@@ -81,11 +82,12 @@ AVDMVideoConvolution::AVDMVideoConvolution(
 
 AVDMVideoConvolution::~AVDMVideoConvolution()
 {
- 	delete []_uncompressed;
+ 	delete _uncompressed;
  	delete [] _U;
-  delete [] _V;
+  	delete [] _V;
 
-  _uncompressed=_U=_V=NULL;
+  _uncompressed=NULL;
+  _U=_V=NULL;
 }
 
 //
@@ -94,9 +96,9 @@ AVDMVideoConvolution::~AVDMVideoConvolution()
 //
 
 uint8_t AVDMVideoConvolution::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
 			ADM_assert(frame<_info.nb_frames);
@@ -106,12 +108,12 @@ uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 
          	
-                srcu=_uncompressed+( _info.height * _info.width);
+                srcu=_uncompressed->data+( _info.height * _info.width);
                 srcv=srcu+(( _info.height * _info.width)>>2);
                 // expand u & v in buffers
                  dstu=_U;
                  dstv=_V;
-              	dst=data;
+              	dst=data->data;
                 for(int32_t y=(int32_t)_info.height>>1;y>0;y--)
                 {
  	               for(int32_t x=(int32_t)_info.width>>1;x>0;x--)
@@ -134,25 +136,25 @@ uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
   				{
                	for(int32_t x=0;x<(int32_t)_info.width;x++)
                 	{
-          				*dst++=convolutionKernel(x,y,_uncompressed);
+          				*dst++=convolutionKernel(x,y,_uncompressed->data);
           				
 
               	}
                }
 
                 // Chroma u & v
-                	dstu=data+( _info.height * _info.width);
+                dstu=data->data+( _info.height * _info.width);
                	dstv=dstu+(( _info.height * _info.width)>>2)  ;
 
                for(int32_t y=0;y<(int32_t)_info.height>>1;y++)
   				{
                	for(int32_t x=0;x<(int32_t)_info.width>>1;x++)
                 	{
-          				*dstu++=		(convolutionKernel(2*x,2*y,_U)+convolutionKernel(2*x+1,2*y,_U)+
-              								convolutionKernel(2*x,2*y+1,_U)+convolutionKernel(2*x,2*y+1,_U))>>2;
+          			*dstu++=(convolutionKernel(2*x,2*y,_U)+convolutionKernel(2*x+1,2*y,_U)+
+              					convolutionKernel(2*x,2*y+1,_U)+convolutionKernel(2*x,2*y+1,_U))>>2;
           				
-          				*dstv++=		(convolutionKernel(2*x,2*y,_V)+convolutionKernel(2*x+1,2*y,_V)+
-              								convolutionKernel(2*x,2*y+1,_V)+convolutionKernel(2*x,2*y+1,_V))>>2;
+          			*dstv++=(convolutionKernel(2*x,2*y,_V)+convolutionKernel(2*x+1,2*y,_V)+
+              				convolutionKernel(2*x,2*y+1,_V)+convolutionKernel(2*x,2*y+1,_V))>>2;
 
               	}
                }

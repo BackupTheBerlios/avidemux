@@ -36,15 +36,14 @@
 					void		feedData(uint32_t len, uint8_t *data);
 					uint32_t	_swapUV;
 					uint8_t     	*unpackBuffer;
-					ADM_PP		_postproc;
-				 
+					
 
 				
      public:
      							decoderMpeg(uint32_t w,uint32_t h,
 								uint32_t extraLen, uint8_t *extraData);
          		virtual				~decoderMpeg();
-    			virtual 	uint8_t 	uncompress(uint8_t *in,uint8_t *out,
+    			virtual 	uint8_t 	uncompress(uint8_t *in,ADMImage *out,
 								uint32_t len,uint32_t *flag=NULL);
 			virtual 	uint8_t	 	bFramePossible(void) { return 1;}
 			virtual 	void 		setParam( void );

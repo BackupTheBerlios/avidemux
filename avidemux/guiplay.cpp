@@ -65,7 +65,7 @@ static void FillAudio(void);
 
 
  extern void  UI_setPreviewToggleStatus( uint8_t status );
-
+ extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
 //___________________________________
 extern uint8_t stop_req;
 static int called = 0;
@@ -90,7 +90,7 @@ void GUI_PlayAvi(void)
 
     uint32_t framelen,flags;
     AVDMGenericVideoStream *filter;
-    uint8_t *buffer;
+    ADMImage *buffer=NULL;
 
     vids = 0, auds = 0, dauds = 0;
     // check we got everything...
@@ -133,7 +133,7 @@ void GUI_PlayAvi(void)
     one_frame = (uint32_t) floor(10000000 / filter->getInfo()->fps1000);
     err = one_frame % 10;
     one_frame /= 10;
-    buffer=new uint8_t [filter->getInfo()->height*filter->getInfo()->width*3];
+    buffer=new ADMImage(filter->getInfo()->width,filter->getInfo()->height);
     // go to RealTime...    
     printf(" One frame : %lu, err=%lu ms\n", one_frame, err);
     // read frame in chunk
@@ -160,13 +160,13 @@ void GUI_PlayAvi(void)
     do
       {
 	  	vids++;		
-	  	renderUpdateImage(buffer);
+	  	renderUpdateImage(buffer->data);
      	if(mode_preview&&!guiOutputDisplay)
      	{
         	
       		editorUpdatePreview(played_frame);
       	}
-	  update_status_bar(flags);
+	  update_status_bar(buffer);
 	  if (time_a == 0)
 	      time_a = getTime(0);
 	  // mark !
@@ -234,15 +234,16 @@ abort_play:
     // go back to normal display mode
     //____________________________________
     playing = 0;
-	  delete [] buffer;
+	  delete  buffer;
 
 	   renderStopPlaying();
 	   renderResize(avifileinfo->width ,  avifileinfo->height);
 	   getFirstVideoFilter( );
-	   video_body->getUncompressedFrame(curframe, rdr_decomp_buffer,&flags);
-	   renderUpdateImage(rdr_decomp_buffer);
+	   //video_body->getUncompressedFrame(curframe, rdr_decomp_buffer,&flags);
+	   GUI_getFrame(curframe, rdr_decomp_buffer, &flags);
+	   renderUpdateImage(rdr_decomp_buffer->data);
 	   renderRefresh();
-     	   update_status_bar(flags);
+     	   update_status_bar(rdr_decomp_buffer);
 	   if(mode_preview)
 	   {
 		editorUpdatePreview(curframe);

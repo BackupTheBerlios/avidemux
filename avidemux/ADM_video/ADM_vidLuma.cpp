@@ -75,9 +75,9 @@ ADMVideoLuma::~ADMVideoLuma()
  	
 }
 uint8_t ADMVideoLuma::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+				uint32_t *len,
+   				ADMImage *data,
+				uint32_t *flags)
 {
 
 			ADM_assert(frame<_info.nb_frames);
@@ -89,7 +89,7 @@ uint8_t ADMVideoLuma::getFrameNumberNoAlloc(uint32_t frame,
 		uint32_t sz;
 			
 					sz=_info.width*_info.height;
-					memset(data+sz,128,sz>>1);
+					memset(data->data+sz,128,sz>>1);
 
 
       return 1;

@@ -148,13 +148,13 @@ ADMVideoKernelDeint::~ADMVideoKernelDeint()
 }
 uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 							uint32_t *len,
-							uint8_t *data,
+							ADMImage *data,
 							uint32_t *flags)
 {
 		uint8_t *src,*prv,*dst;
 		uint32_t frame_prev;
 		uint32_t page=_info.width*_info.height;
-		uint8_t *mysrc=NULL, *myprev=NULL;
+		ADMImage *mysrc=NULL, *myprev=NULL;
 		
 		if(frame>_info.nb_frames-1) return 0;
 
@@ -163,7 +163,7 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 		frame_prev=frame;
 		if(frame_prev) frame_prev--;
 		
-		dst=data;
+		dst=data->data;
 		
 			mysrc=vidCache->getImage(frame);
 			myprev=vidCache->getImage(frame_prev);
@@ -204,8 +204,8 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 	
 	for (z = 0; z < 3; z++)
 	{
-		src=mysrc;
-		prv=myprev;
+		src=mysrc->data;
+		prv=myprev->data;
 		
 		pitch=_info.width;
 		switch(z)

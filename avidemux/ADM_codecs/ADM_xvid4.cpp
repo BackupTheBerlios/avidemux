@@ -393,7 +393,7 @@ uint8_t xvid4EncoderCQ::init(uint32_t q,uint32_t fps1000, xvid4EncParam *param)
 
 
 uint8_t xvid4EncoderCQ::encode(
-			uint8_t * in,
+			ADMImage * in,
 			uint8_t * out,
 			uint32_t * len,
        			uint32_t * flags)
@@ -402,7 +402,7 @@ int ret;
 
 	
 	
-	preAmble(in);
+	preAmble(in->data);
 	
 	xvid_enc_frame.quant = _q;
 	xvid_enc_frame.bitstream = out;	
@@ -477,7 +477,7 @@ uint8_t xvid4EncoderCBR::init(uint32_t br,uint32_t fps1000, xvid4EncParam *param
 
 
 uint8_t xvid4EncoderCBR::encode(
-			uint8_t * in,
+			ADMImage * in,
 			uint8_t * out,
 			uint32_t * len,
        			uint32_t * flags)
@@ -486,7 +486,7 @@ int ret;
 
 	
 	
-	preAmble(in);
+	preAmble(in->data);
 	
 	xvid_enc_frame.quant = 0;
 	xvid_enc_frame.bitstream = out;
@@ -570,7 +570,7 @@ uint8_t xvid4EncoderPass1::init(uint32_t br,uint32_t fps1000, xvid4EncParam *par
 
 
 uint8_t xvid4EncoderPass1::encode(
-			uint8_t * in,
+			ADMImage * in,
 			uint8_t * out,
 			uint32_t * len,
        			uint32_t * flags)
@@ -579,7 +579,7 @@ int ret;
 
 	
 	
-	preAmble(in);
+	preAmble(in->data);
 	
 	//xvid_enc_frame.quant = 2;
 	xvid_enc_frame.bitstream = out;
@@ -674,7 +674,7 @@ uint8_t xvid4EncoderPass2::init(uint32_t br,uint32_t fps1000, xvid4EncParam *par
 
 
 uint8_t xvid4EncoderPass2::encode(
-			uint8_t * in,
+			ADMImage * in,
 			uint8_t * out,
 			uint32_t * len,
        			uint32_t * flags)
@@ -683,7 +683,7 @@ int ret;
 
 	
 	
-	preAmble(in);
+	preAmble(in->data);
 		
 	xvid_enc_frame.bitstream = out;
 	xvid_enc_frame.input.plane[0] = in;
