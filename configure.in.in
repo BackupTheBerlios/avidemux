@@ -629,7 +629,7 @@ int z=0
 ])
 
 AC_MSG_RESULT(use_builtin)
-if test "use_builtin" = "xyes"; then
+if test "x$use_builtin" = "xyes"; then
 	AC_DEFINE(HAVE_BUILTIN_VECTOR,1,[Enable altivec by default])
 fi
  
