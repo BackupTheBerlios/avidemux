@@ -210,6 +210,7 @@ uint8_t AVDM_MadRun(uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,
 }
 static inline signed int scale(mad_fixed_t sample)
 {
+signed int r;
     /* round */
     sample += (1L << (MAD_F_FRACBITS - 16));
 
@@ -220,7 +221,11 @@ static inline signed int scale(mad_fixed_t sample)
 	sample = -MAD_F_ONE;
 
     /* quantize */
-    return sample >> (MAD_F_FRACBITS + 1 - 16);
+    r= sample >> (MAD_F_FRACBITS + 1 - 16);
+#ifdef ADM_BIG_ENDIAN
+	r= (r>>8)+((r&0xff)<<8);
+#endif
+  return r;
 }
 
 
