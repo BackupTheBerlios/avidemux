@@ -233,8 +233,9 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
     }
   //*************************
   // completly async frame
-  // rewind
+  // rewind ?
   //*************************
+    
   aprintf("async  frame, wanted : %lu last %lu (%lu - %lu seg)\n",relframe,_lastframe,seg,_lastseg);
   uint32_t rewind;
   uint32_t seekFlag=0;
@@ -242,6 +243,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
   _videos[ref]._aviheader->getFlags (relframe, &seekFlag);
   
   flags = 0;
+  uint32_t need_rewind=1;
   rewind = relframe;
   ADM_assert(rewind); // the first frame should be a keyframe !
   while (!(flags & AVI_KEY_FRAME))
@@ -249,23 +251,51 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
   	rewind--;
   	_videos[ref]._aviheader->getFlags (rewind, &flags);	
    }
+   // Optimize for resample FPS*************************
+   // If we are in the same segment, look if it is better to decode
+    // From where we are or to seek the previous intra
+   if ((seg == _lastseg))
+   {
+     if(rewind<_lastframe && relframe>_lastframe) // we have a better position to go from
+     { 
+       for (uint32_t i = _lastframe+1; i <relframe; i++)
+       {
+
+         _videos[ref]._aviheader->getFlags (i, &flags);
+      // Skip B frames, there can be a lot of them
+         if((flags&AVI_B_FRAME)) continue;
+     
+         if(!decodeCache(i,ref, result))                  
+         {
+           printf("Editor: Cannot read ip frame %lu\n",relframe);
+           return 0;
+         }
+         result=cache->getFreeImage();      
+       }
+       need_rewind=0;
+     }
+   }
+   // Optimize for resample FPS*************************
+   // 
   // now forward
   // IP seen is the last P (or I) before the frame we seek
-  for (uint32_t i = rewind; i <relframe; i++)
-    {
+   if(need_rewind)
+   {
+        for (uint32_t i = rewind; i <relframe; i++)
+        {
 
-      _videos[ref]._aviheader->getFlags (i, &flags);
-      // Skip B frames, there can be a lot of them
-      if((flags&AVI_B_FRAME)) continue;
+                _videos[ref]._aviheader->getFlags (i, &flags);
+                // Skip B frames, there can be a lot of them
+                if((flags&AVI_B_FRAME)) continue;
      
-       if(!decodeCache(i,ref, result))			
-	{
-		printf("Editor: Cannot read ip frame %lu\n",relframe);
-		return 0;
-	}
-	result=cache->getFreeImage();      
-      }
-      
+                if(!decodeCache(i,ref, result))			
+	        {
+		      printf("Editor: Cannot read ip frame %lu\n",relframe);
+		      return 0;
+	        }
+	        result=cache->getFreeImage();      
+        }
+   }
       // Time to decode our frame
       // if it is not a B, just decode it
       // it it is a B, the usual stuff
