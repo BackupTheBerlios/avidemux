@@ -1,0 +1,1396 @@
+/***************************************************************************
+                          ADM_vidDecTelecide  -  description
+                             -------------------
+    
+    email                : fixounet@free.fr
+
+    Port of Donal Graft Decimate which is (c) Donald Graft
+    http://www.neuron2.net
+    http://puschpull.org/avisynth/decomb_reference_manual.html
+
+ ***************************************************************************/
+
+/*
+	Decimate plugin for Avisynth -- performs 1-in-N
+	decimation on a stream of progressive frames, which are usually
+	obtained from the output of my Telecide plugin for Avisynth.
+	For each group of N successive frames, this filter deletes the
+	frame that is most similar to its predecessor. Thus, duplicate
+	frames coming out of Telecide can be removed using Decimate. This
+	filter adjusts the frame rate of the clip as
+	appropriate. Selection of the cycle size is selected by specifying
+	a parameter to Decimate() in the Avisynth scipt.
+
+	Copyright (C) 2003 Donald A. Graft
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+	The author can be contacted at:
+	Donald Graft
+	neuron2@attbi.com.
+*/
+#include "config.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <assert.h>
+
+#include "config.h"
+#include "fourcc.h"
+#include "avio.hxx"
+#include "avi_vars.h"
+
+#include "ADM_toolkit/toolkit.hxx"
+#include "ADM_editor/ADM_edit.hxx"
+#include "ADM_video/ADM_genvideo.hxx"
+#include"ADM_video/ADM_vidField.h"
+#include"ADM_video/ADM_cache.h"
+
+
+#if 1 || TEST_DECOMB
+
+#define UPLANE(x) (x+_info.width*_info.height)
+#define VPLANE(x) (x+((_info.width*_info.height*5)>>2))
+#define PROGRESSIVE  0x00000001
+#define MAGIC_NUMBER (0xdeadbeef)
+#define IN_PATTERN   0x00000002
+
+extern uint8_t PutHintingData(unsigned char *video, unsigned int hint);
+extern uint8_t GetHintingData(unsigned char *video, unsigned int *hint);
+extern void BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
+            int src_pitch, int row_size, int height);
+extern  void DrawString(uint8_t *dst, int x, int y, const char *s);
+extern  void DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
+#define OutputDebugString(x) printf("%s\n",x)
+
+
+
+
+#define MAX_CYCLE_SIZE 25
+#define MAX_BLOCKS 50
+
+#define GETFRAME(g, fp) \
+{ \
+	int GETFRAMEf; \
+	GETFRAMEf = (g); \
+	if (GETFRAMEf < 0) GETFRAMEf = 0; \
+	if (GETFRAMEf > num_frames_hi - 1) GETFRAMEf = num_frames_hi - 1; \
+	(fp) = vidCache->getImage(GETFRAMEf); \
+}
+
+/* Decimate 1-in-N implementation. */
+class Decimate : public AVDMGenericVideoStream
+{
+	int num_frames_hi, cycle, mode, quality;
+	double threshold, threshold2;
+	const char *ovr;
+	int last_request, last_result;
+	bool last_forced;
+	double last_metric;
+	double metrics[MAX_CYCLE_SIZE];
+	double showmetrics[MAX_CYCLE_SIZE];
+	int Dprev[MAX_CYCLE_SIZE];
+	int Dcurr[MAX_CYCLE_SIZE];
+	int Dnext[MAX_CYCLE_SIZE];
+	int Dshow[MAX_CYCLE_SIZE];
+	unsigned int hints[MAX_CYCLE_SIZE];
+	bool hints_invalid;
+	bool all_video_cycle;
+	bool firsttime;
+	int heightY, row_sizeY, pitchY;
+	int heightUV, row_sizeUV, pitchUV;
+	int pitch, row_size, height;
+	int xblocks, yblocks;
+	unsigned int *sum, div;
+	bool debug, show;
+	
+	VideoCache	*vidCache;
+	
+public:
+				
+			Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples);    
+			Decimate::~Decimate(void);
+	uint8_t  	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+				uint8_t *data,uint32_t *flags);
+
+    	uint8_t   	*GetFrame(int n);
+	void   		DrawShow(uint8_t  *src, int useframe, bool forced, int dropframe,
+		                              double metric, int inframe );
+	void   		DrawShowYUY2(uint8_t  *src, int useframe, bool forced, int dropframe,
+		                              double metric, int inframe );
+    	void   		FindDuplicate(int frame, int *chosen, double *metric, bool *forced   );
+    	void   		FindDuplicate2(int frame, int *chosen, bool *forced );
+    	void   		FindDuplicateYUY2(int frame, int *chosen, double *metric, bool *force);
+    	void   		FindDuplicate2YUY2(int frame, int *chosen, bool *forced );
+	
+	char 		*printConf( void );
+	uint8_t 	configure(AVDMGenericVideoStream *in);
+	uint8_t		getCoupledConf( CONFcouple **couples);
+};
+
+
+
+BUILD_CREATE(decimate_create,Decimate);
+extern void DrawString(uint8_t *dst, int x, int y, const char *s);
+/*
+PClip _child, int _cycle, int _mode, double _threshold, double _threshold2,
+				int _quality, const char * _ovr, bool _show, bool _debug, IScriptEnvironment* env) 
+GenericVideoFilter(_child), cycle(_cycle), mode(_mode), threshold(_threshold),
+threshold2(_threshold2), quality(_quality), ovr(_ovr), show(_show), debug(_debug)
+*/	
+uint8_t Decimate::configure(AVDMGenericVideoStream *in)
+{
+	_in=in;
+	return 1;
+	
+}
+
+char *Decimate::printConf( void )
+{
+ 	static char buf[50];
+
+
+ 	sprintf((char *)buf," Decomb Decimate");
+        return buf;
+}
+
+
+Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples)		
+{
+{
+		
+		int count = 0;
+		char buf[80];
+		unsigned int *p;
+
+		_in=in;		
+   		memcpy(&_info,_in->getInfo(),sizeof(_info));    
+  		_info.encoding=1;
+		_uncompressed=NULL;		
+  		_info.encoding=1;
+		
+		// Init here
+		
+		cycle=5;
+		mode=1;
+		
+		//
+		
+		
+		assert(cycle);
+		vidCache=new VideoCache(cycle+2,in);
+		
+		if (mode == 0 || mode == 2 || mode == 3)
+		{
+			num_frames_hi = _info.nb_frames;
+			_info.nb_frames = _info.nb_frames * (cycle - 1) / cycle;
+			_info.fps1000=_info.fps1000*(cycle-1);
+			_info.fps1000=(uint32_t)(_info.fps1000/cycle);
+			
+		}
+		last_request = -1;
+		firsttime = true;
+		sum = (unsigned int *) malloc(MAX_BLOCKS * MAX_BLOCKS * sizeof(unsigned int));
+		assert(sum);		
+		all_video_cycle = true;
+
+		if (debug)
+		{
+			char b[80];
+			sprintf(b, "Decimate %s by Donald Graft, Copyright 2003\n", VERSION);
+			OutputDebugString(b);
+		}
+	}
+}
+//________________________________________________________
+uint8_t	Decimate::getCoupledConf( CONFcouple **couples)
+{
+	*couples=NULL;
+	return 1;
+}
+//________________________________________________________
+Decimate::~Decimate(void)
+{
+		if (sum != NULL) free(sum);
+		if(vidCache) delete vidCache;
+
+}
+//________________________________________________________
+void Decimate::DrawShow(uint8_t  *src, int useframe, bool forced, int dropframe,
+						double metric, int inframe)
+{
+	char buf[80];
+	int start = (useframe / cycle) * cycle;
+
+	if (show == true)
+	{
+		sprintf(buf, "Decimate %s", VERSION);
+		DrawString(src, 0, 0, buf);
+		sprintf(buf, "Copyright 2003 Donald Graft");
+		DrawString(src, 0, 1, buf);
+		sprintf(buf,"%d: %3.2f", start, showmetrics[0]);
+		DrawString(src, 0, 3, buf);
+		sprintf(buf,"%d: %3.2f", start + 1, showmetrics[1]);
+		DrawString(src, 0, 4, buf);
+		sprintf(buf,"%d: %3.2f", start + 2, showmetrics[2]);
+		DrawString(src, 0, 5, buf);
+		sprintf(buf,"%d: %3.2f", start + 3, showmetrics[3]);
+		DrawString(src, 0, 6, buf);
+		sprintf(buf,"%d: %3.2f", start + 4, showmetrics[4]);
+		DrawString(src, 0, 7, buf);
+		if (all_video_cycle == false)
+		{
+			sprintf(buf,"in frm %d, use frm %d", inframe, useframe);
+			DrawString(src, 0, 8, buf);
+			if (forced == false)
+				sprintf(buf,"chose %d, dropping", dropframe);
+			else
+				sprintf(buf,"chose %d, dropping, forced!", dropframe);
+			DrawString(src, 0, 9, buf);
+		}
+		else
+		{
+			sprintf(buf,"in frm %d", inframe);
+			DrawString(src, 0, 8, buf);
+			sprintf(buf,"chose %d, decimating all-video cycle", dropframe);
+			DrawString(src, 0, 9, buf);
+		}
+	}
+	if (debug)
+	{
+		if (!(inframe%cycle))
+		{
+			sprintf(buf,"Decimate: %d: %3.2f\n", start, showmetrics[0]);
+			OutputDebugString(buf);
+			sprintf(buf,"Decimate: %d: %3.2f\n", start + 1, showmetrics[1]);
+			OutputDebugString(buf);
+			sprintf(buf,"Decimate: %d: %3.2f\n", start + 2, showmetrics[2]);
+			OutputDebugString(buf);
+			sprintf(buf,"Decimate: %d: %3.2f\n", start + 3, showmetrics[3]);
+			OutputDebugString(buf);
+			sprintf(buf,"Decimate: %d: %3.2f\n", start + 4, showmetrics[4]);
+			OutputDebugString(buf);
+		}
+		if (all_video_cycle == false)
+		{
+			sprintf(buf,"Decimate: in frm %d useframe %d\n", inframe, useframe);
+			OutputDebugString(buf);
+			if (forced == false)
+				sprintf(buf,"Decimate: chose %d, dropping\n", dropframe);
+			else
+				sprintf(buf,"Decimate: chose %d, dropping, forced!\n", dropframe);
+			OutputDebugString(buf);
+		}
+		else
+		{
+			sprintf(buf,"Decimate: in frm %d\n", inframe);
+			OutputDebugString(buf);
+			sprintf(buf,"Decimate: chose %d, decimating all-video cycle\n", dropframe);
+			OutputDebugString(buf);
+		}
+	}
+}
+//______________________________________________________________________
+uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+				uint8_t *data,uint32_t *flags)
+{
+	int dropframe, useframe, nextfrm, wY, wUV, hY, hUV, x, y, pitchY, pitchUV, dpitchY, dpitchUV;
+	uint8_t  *src, *next, *dst;
+	unsigned char *srcrpY, *nextrpY, *dstwpY;
+	unsigned char *srcrpU, *nextrpU, *dstwpU;
+	unsigned char *srcrpV, *nextrpV, *dstwpV;
+	uint32_t inframe=frame;
+	double metric;
+	char buf[255];
+
+	*len=(_info.width*_info.height*3)>>1;
+	
+	if (mode == 0)
+	{
+		bool forced = false;
+		int start;
+
+		/* Normal decimation. Remove the frame most similar to its preceding frame. */
+		/* Determine the correct frame to use and get it. */
+		useframe = inframe + inframe / (cycle - 1);
+		start = (useframe / cycle) * cycle;
+		FindDuplicate((useframe / cycle) * cycle, &dropframe, &metric, &forced);
+		if (useframe >= dropframe) useframe++;
+		GETFRAME(useframe, src);
+		if (show == true)
+		{
+			sprintf(buf, "Decimate %s", VERSION);
+			DrawString(src, 0, 0, buf);
+			sprintf(buf, "Copyright 2003 Donald Graft");
+			DrawString(src, 0, 1, buf);
+			sprintf(buf,"%d: %3.2f", start, showmetrics[0]);
+			DrawString(src, 0, 3, buf);
+			sprintf(buf,"%d: %3.2f", start + 1, showmetrics[1]);
+			DrawString(src, 0, 4, buf);
+			sprintf(buf,"%d: %3.2f", start + 2, showmetrics[2]);
+			DrawString(src, 0, 5, buf);
+			sprintf(buf,"%d: %3.2f", start + 3, showmetrics[3]);
+			DrawString(src, 0, 6, buf);
+			sprintf(buf,"%d: %3.2f", start + 4, showmetrics[4]);
+			DrawString(src, 0, 7, buf);
+			sprintf(buf,"in frm %d, use frm %d", inframe, useframe);
+			DrawString(src, 0, 8, buf);
+			sprintf(buf,"dropping frm %d%s", dropframe, last_forced == true ? ", forced!" : "");
+			DrawString(src, 0, 9, buf);
+		}
+		if (debug)
+		{	
+			if (!(inframe % cycle))
+			{
+				sprintf(buf,"Decimate: %d: %3.2f\n", start, showmetrics[0]);
+				OutputDebugString(buf);
+				sprintf(buf,"Decimate: %d: %3.2f\n", start + 1, showmetrics[1]);
+				OutputDebugString(buf);
+				sprintf(buf,"Decimate: %d: %3.2f\n", start + 2, showmetrics[2]);
+				OutputDebugString(buf);
+				sprintf(buf,"Decimate: %d: %3.2f\n", start + 3, showmetrics[3]);
+				OutputDebugString(buf);
+				sprintf(buf,"Decimate: %d: %3.2f\n", start + 4, showmetrics[4]);
+				OutputDebugString(buf);
+			}
+			sprintf(buf,"Decimate: in frm %d, use frm %d\n", inframe, useframe);
+			OutputDebugString(buf);
+			sprintf(buf,"Decimate: dropping frm %d%s\n", dropframe, last_forced == true ? ", forced!" : "");
+			OutputDebugString(buf);
+		}
+	    //return src;
+	        memcpy(data,src,*len);
+		vidCache->unlockAll();
+		return 1;
+	}
+	else if (mode == 1)
+	{
+		bool forced = false;
+		int start = (inframe / cycle) * cycle;
+		unsigned int hint, film = 1;
+
+		GETFRAME(inframe, src);
+	    	srcrpY = src; //(unsigned char *) src->GetReadPtr(PLANAR_Y);
+		if (GetHintingData(srcrpY, &hint) == false)
+		{
+			film = hint & PROGRESSIVE;
+//			if (film) OutputDebugString("film\n");
+//			else OutputDebugString("video\n");
+		}
+
+		/* Find the most similar frame as above but replace it with a blend of
+		   the preceding and following frames. */
+		num_frames_hi = _in->getInfo()->nb_frames; /* FIXME MEANX */
+		FindDuplicate((inframe / cycle) * cycle, &dropframe, &metric, &forced);
+		if (!film || inframe != dropframe || (threshold && metric > threshold))
+		{
+			if (show == true)
+			{
+
+				sprintf(buf, "Decimate %s", VERSION);
+				DrawString(src, 0, 0, buf);
+				sprintf(buf, "Copyright 2003 Donald Graft");
+				DrawString(src, 0, 1, buf);
+				sprintf(buf,"%d: %3.2f", start, showmetrics[0]);
+				DrawString(src, 0, 3, buf);
+				sprintf(buf,"%d: %3.2f", start + 1, showmetrics[1]);
+				DrawString(src, 0, 4, buf);
+				sprintf(buf,"%d: %3.2f", start + 2, showmetrics[2]);
+				DrawString(src, 0, 5, buf);
+				sprintf(buf,"%d: %3.2f", start + 3, showmetrics[3]);
+				DrawString(src, 0, 6, buf);
+				sprintf(buf,"%d: %3.2f", start + 4, showmetrics[4]);
+				DrawString(src, 0, 7, buf);
+				sprintf(buf,"infrm %d", inframe);
+				DrawString(src, 0, 8, buf);
+				if (last_forced == false)
+					sprintf(buf,"chose %d, passing through", dropframe);
+				else
+					sprintf(buf,"chose %d, passing through, forced!", dropframe);
+				DrawString(src, 0, 9, buf);
+			}
+			if (debug)
+			{
+				if (!(inframe % cycle))
+				{
+					sprintf(buf,"Decimate: %d: %3.2f\n", start, showmetrics[0]);
+					OutputDebugString(buf);
+					sprintf(buf,"Decimate: %d: %3.2f\n", start + 1, showmetrics[1]);
+					OutputDebugString(buf);
+					sprintf(buf,"Decimate: %d: %3.2f\n", start + 2, showmetrics[2]);
+					OutputDebugString(buf);
+					sprintf(buf,"Decimate: %d: %3.2f\n", start + 3, showmetrics[3]);
+					OutputDebugString(buf);
+					sprintf(buf,"Decimate: %d: %3.2f\n", start + 4, showmetrics[4]);
+					OutputDebugString(buf);
+				}
+				sprintf(buf,"Decimate: in frm %d\n", inframe);
+				OutputDebugString(buf);
+				if (last_forced == false)
+					sprintf(buf,"Decimate: chose %d, passing through\n", dropframe);
+				else
+					sprintf(buf,"Decimate: chose %d, passing through, forced!\n", dropframe);
+				OutputDebugString(buf);
+			}
+			//return src;
+			memcpy(data,src,*len);
+			vidCache->unlockAll();
+			return 1;
+		}
+		if (inframe < _in->getInfo()->nb_frames - 1) /* FIXME MEANX*/
+			nextfrm = inframe + 1;
+		else
+			nextfrm = _in->getInfo()->nb_frames - 1;
+		if (debug)
+		{
+			if (!(inframe % cycle))
+			{
+				sprintf(buf,"Decimate: %d: %3.2f\n", start, showmetrics[0]);
+				OutputDebugString(buf);
+				sprintf(buf,"Decimate: %d: %3.2f\n", start + 1, showmetrics[1]);
+				OutputDebugString(buf);
+				sprintf(buf,"Decimate: %d: %3.2f\n", start + 2, showmetrics[2]);
+				OutputDebugString(buf);
+				sprintf(buf,"Decimate: %d: %3.2f\n", start + 3, showmetrics[3]);
+				OutputDebugString(buf);
+				sprintf(buf,"Decimate: %d: %3.2f\n", start + 4, showmetrics[4]);
+				OutputDebugString(buf);
+			}
+			sprintf(buf,"Decimate: in frm %d\n", inframe);
+			OutputDebugString(buf);
+			if (last_forced == false)
+				sprintf(buf,"Decimate: chose %d, blending %d and %d\n", dropframe, inframe, nextfrm);
+			else
+				sprintf(buf,"Decimate: chose %d, blending %d and %d, forced!\n", dropframe, inframe, nextfrm);
+			OutputDebugString(buf);
+		}
+		GETFRAME(nextfrm, next);
+		dst = data; //env->NewVideoFrame(vi);
+		pitchY = _info.width; //src->GetPitch(PLANAR_Y);
+		dpitchY = _info.width; //dst->GetPitch(PLANAR_Y);
+		wY = _info.width; //src->GetRowSize(PLANAR_Y);
+		hY = _info.height; //src->GetHeight(PLANAR_Y);
+		pitchUV = _info.width>>1;// src->GetPitch(PLANAR_V);
+		dpitchUV =_info.width>>1;// dst->GetPitch(PLANAR_V);
+		wUV = _info.width>>1;//src->GetRowSize(PLANAR_V);
+		hUV = _info.height>>1;//src->GetHeight(PLANAR_V);
+		
+		nextrpY = (unsigned char *) next; //next->GetReadPtr(PLANAR_Y);
+		dstwpY = (unsigned char *) dst; //dst->GetWritePtr(PLANAR_Y);
+#ifdef DECIMATE_MMX_BUILD
+		if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) 
+		{
+			isse_blend_decimate_plane(dstwpY, srcrpY, nextrpY, wY, hY, dpitchY, pitchY, pitchY);
+		} else {
+#endif
+			for (y = 0; y < hY; y++)
+			{
+				for (x = 0; x < wY; x++)
+				{
+					dstwpY[x] = ((int)srcrpY[x] + (int)nextrpY[x] ) >> 1;  
+				}
+				srcrpY += pitchY;
+				nextrpY += pitchY;
+				dstwpY += dpitchY;
+			}
+#ifdef DECIMATE_MMX_BUILD
+		}
+#endif
+		srcrpU = (unsigned char *) UPLANE(src);//->GetReadPtr(PLANAR_U);
+	    nextrpU = (unsigned char *) UPLANE(next);//->GetReadPtr(PLANAR_U);
+	    dstwpU = (unsigned char *) UPLANE(dst);//->GetWritePtr(PLANAR_U);
+#ifdef DECIMATE_MMX_BUILD
+		if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
+			isse_blend_decimate_plane(dstwpU, srcrpU, nextrpU, wUV, hUV, dpitchUV, pitchUV, pitchUV);
+		} else {
+#endif
+			for (y = 0; y < hUV; y++)
+			{
+				for (x = 0; x < wUV; x++)
+				{
+					dstwpU[x] = ((int)srcrpU[x] + (int)nextrpU[x]) >> 1;
+				}
+				srcrpU += pitchUV;
+				nextrpU += pitchUV;
+				dstwpU += dpitchUV;
+			}
+#ifdef DECIMATE_MMX_BUILD
+		}
+#endif
+	    srcrpV = (unsigned char *) VPLANE(src);//->GetReadPtr(PLANAR_V);
+	    nextrpV = (unsigned char *) VPLANE(next);//->GetReadPtr(PLANAR_V);
+	    dstwpV = (unsigned char *) VPLANE(dst);//->GetWritePtr(PLANAR_V);
+
+#ifdef DECIMATE_MMX_BUILD
+		if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
+			isse_blend_decimate_plane(dstwpV, srcrpV, nextrpV, wUV, hUV, dpitchUV, pitchUV, pitchUV);
+		} else {
+#endif
+			for (y = 0; y < hUV; y++)
+			{
+				for (x = 0; x < wUV; x++)
+				{
+					dstwpV[x] = ((int)srcrpV[x] + + (int)nextrpV[x]) >> 1;
+				}
+				srcrpV += pitchUV;
+				nextrpV += pitchUV;
+				dstwpV += dpitchUV;
+			}
+#ifdef DECIMATE_MMX_BUILD
+		}
+#endif
+		if (show == true)
+		{
+
+			sprintf(buf, "Decimate %s", VERSION);
+			DrawString(dst, 0, 0, buf);
+			sprintf(buf, "Copyright 2003 Donald Graft");
+			DrawString(dst, 0, 1, buf);
+			sprintf(buf,"%d: %3.2f", start, showmetrics[0]);
+			DrawString(dst, 0, 3, buf);
+			sprintf(buf,"%d: %3.2f", start + 1, showmetrics[1]);
+			DrawString(dst, 0, 4, buf);
+			sprintf(buf,"%d: %3.2f", start + 2, showmetrics[2]);
+			DrawString(dst, 0, 5, buf);
+			sprintf(buf,"%d: %3.2f", start + 3, showmetrics[3]);
+			DrawString(dst, 0, 6, buf);
+			sprintf(buf,"%d: %3.2f", start + 4, showmetrics[4]);
+			DrawString(dst, 0, 7, buf);
+			sprintf(buf,"infrm %d", inframe);
+			DrawString(dst, 0, 8, buf);
+			if (last_forced == false)
+				sprintf(buf,"chose %d, blending %d and %d",dropframe, inframe, nextfrm);
+			else
+				sprintf(buf,"chose %d, blending %d and %d, forced!", dropframe, inframe, nextfrm);
+			DrawString(dst, 0, 9, buf);
+		}
+		//return dst;
+		memcpy(data,dst,*len);
+		vidCache->unlockAll();		
+		return 1;
+	}
+	else if (mode == 2)
+	{
+		bool forced = false;
+
+		/* Delete the duplicate in the longest string of duplicates. */
+		useframe = inframe + inframe / (cycle - 1);
+		FindDuplicate2((useframe / cycle) * cycle, &dropframe, &forced);
+		if (useframe >= dropframe) useframe++;
+		GETFRAME(useframe, src);
+		if (show == true)
+		{
+			int start = (useframe / cycle) * cycle;
+
+
+			sprintf(buf, "Decimate %s", VERSION);
+			DrawString(src, 0, 0, buf);
+			sprintf(buf, "Copyright 2003 Donald Graft");
+			DrawString(src, 0, 1, buf);
+			sprintf(buf,"in frm %d, use frm %d", inframe, useframe);
+			DrawString(src, 0, 3, buf);
+			sprintf(buf,"%d: %3.2f (%s)", start, showmetrics[0],
+					Dshow[0] ? "new" : "dup");
+			DrawString(src, 0, 4, buf);
+			sprintf(buf,"%d: %3.2f (%s)", start + 1, showmetrics[1],
+					Dshow[1] ? "new" : "dup");
+			DrawString(src, 0, 5, buf);
+			sprintf(buf,"%d: %3.2f (%s)", start + 2, showmetrics[2],
+					Dshow[2] ? "new" : "dup");
+			DrawString(src, 0, 6, buf);
+			sprintf(buf,"%d: %3.2f (%s)", start + 3, showmetrics[3],
+					Dshow[3] ? "new" : "dup");
+			DrawString(src, 0, 7, buf);
+			sprintf(buf,"%d: %3.2f (%s)", start + 4, showmetrics[4],
+					Dshow[4] ? "new" : "dup");
+			DrawString(src, 0, 8, buf);
+			sprintf(buf,"Dropping frm %d%s", dropframe, last_forced == true ? " forced!" : "");
+			DrawString(src, 0, 9, buf);
+		}
+		if (debug)
+		{	
+			sprintf(buf,"Decimate: inframe %d useframe %d\n", inframe, useframe);
+			OutputDebugString(buf);
+		}
+	    //return src;
+	    	memcpy(data,src,*len);
+		vidCache->unlockAll();
+		return 1;
+	}
+	else if (mode == 3)
+	{
+		bool forced = false;
+
+		/* Decimate by removing a duplicate from film cycles and doing a
+		   blend rate conversion on the video cycles. */
+		if (cycle != 5)//	env->ThrowError("Decimate: mode=3 requires cycle=5");
+		{
+			printf("Decimate: mode=3 requires cycle=5\n");
+			return 0;
+		}
+		useframe = inframe + inframe / (cycle - 1);
+		FindDuplicate((useframe / cycle) * cycle, &dropframe, &metric, &forced);
+		/* Use hints from Telecide about film versus video. Also use the difference
+		   metric of the most similar frame in the cycle; if it exceeds threshold,
+		   assume it's a video cycle. */
+		if (!(inframe % 4))
+		{
+			all_video_cycle = false;
+			if (threshold && metric > threshold)
+			{
+				all_video_cycle = true;
+			}
+			if ((hints_invalid == false) &&
+				(!(hints[0] & PROGRESSIVE) ||
+				 !(hints[1] & PROGRESSIVE) ||
+				 !(hints[2] & PROGRESSIVE) ||
+				 !(hints[3] & PROGRESSIVE) ||
+				 !(hints[4] & PROGRESSIVE)))
+			{
+				all_video_cycle = true;
+			}
+		}
+		if (all_video_cycle == false)
+		{
+			/* It's film, so decimate in the normal way. */
+			if (useframe >= dropframe) useframe++;
+			GETFRAME(useframe, src);
+			DrawShow(src, useframe, forced, dropframe, metric, inframe);			
+			memcpy(data,src,*len);
+			vidCache->unlockAll();		
+			return 1; // return src;
+		}
+		else if ((inframe % 4) == 0)
+		{
+			/* It's a video cycle. Output the first frame of the cycle. */
+			GETFRAME(useframe, src);
+			DrawShow(src, 0, forced, dropframe, metric, inframe);
+			//return src;
+			memcpy(data,src,*len);
+			vidCache->unlockAll();		
+			return 1; // return src;
+		}
+		else if ((inframe % 4) == 3)
+		{
+			/* It's a video cycle. Output the last frame of the cycle. */
+			GETFRAME(useframe+1, src);
+			DrawShow(src, 0, forced, dropframe, metric, inframe);
+			//return src;
+			memcpy(data,src,*len);
+			vidCache->unlockAll();		
+			return 1; // return src;
+		}
+		else if ((inframe % 4) == 1 || (inframe % 4) == 2)
+		{
+			/* It's a video cycle. Make blends for the remaining frames. */
+			if ((inframe % 4) == 1)
+			{
+				GETFRAME(useframe, src);
+				if (useframe < num_frames_hi - 1)
+					nextfrm = useframe + 1;
+				else
+					nextfrm = _in->getInfo()->nb_frames - 1;
+				GETFRAME(nextfrm, next);
+			}
+			else
+			{
+				GETFRAME(useframe + 1, src);
+				nextfrm = useframe;
+				GETFRAME(nextfrm, next);
+			}
+			dst = data; //env->NewVideoFrame(vi);
+			pitchY = _info.width; //src->GetPitch(PLANAR_Y);
+			dpitchY = _info.width; //dst->GetPitch(PLANAR_Y);
+			wY = _info.width; //src->GetRowSize(PLANAR_Y);
+			hY = _info.height; //src->GetHeight(PLANAR_Y);
+			pitchUV = _info.width>>1; //src->GetPitch(PLANAR_V);
+			dpitchUV =_info.width>>1; // dst->GetPitch(PLANAR_V);
+			wUV = _info.width>>1; //src->GetRowSize(PLANAR_V);
+			hUV = _info.height>>1; //src->GetHeight(PLANAR_V);
+			
+		    srcrpY = (unsigned char *) src; //src->GetReadPtr(PLANAR_Y);
+			nextrpY = (unsigned char *) next; //next->GetReadPtr(PLANAR_Y);
+			dstwpY = (unsigned char *) dst; //dst->GetWritePtr(PLANAR_Y);
+#ifdef DECIMATE_MMX_BUILD
+			if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
+				isse_blend_decimate_plane(dstwpY, srcrpY, nextrpY, wY, hY, dpitchY, pitchY, pitchY);
+			} else {
+#endif
+				for (y = 0; y < hY; y++)
+				{
+					for (x = 0; x < wY; x++)
+					{
+						dstwpY[x] = ((int)srcrpY[x] + (int)nextrpY[x]) >> 1;
+					}
+					srcrpY += pitchY;
+					nextrpY += pitchY;
+					dstwpY += dpitchY;
+				}
+#ifdef DECIMATE_MMX_BUILD
+			}
+#endif
+			srcrpU = (unsigned char *) UPLANE(src);//->GetReadPtr(PLANAR_U);
+			nextrpU = (unsigned char *)UPLANE( next);//->GetReadPtr(PLANAR_U);
+			dstwpU = (unsigned char *) UPLANE(dst);//->GetWritePtr(PLANAR_U);
+#ifdef DECIMATE_MMX_BUILD
+			if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
+				isse_blend_decimate_plane(dstwpU, srcrpU, nextrpU, wUV, hUV, dpitchUV, pitchUV, pitchUV);
+			} else {
+#endif
+				for (y = 0; y < hUV; y++)
+				{
+					for (x = 0; x < wUV; x++)
+					{
+						dstwpU[x] = ((int)srcrpU[x] + (int)nextrpU[x]) >> 1;
+					}
+					srcrpU += pitchUV;
+					nextrpU += pitchUV;
+					dstwpU += dpitchUV;
+				}
+#ifdef DECIMATE_MMX_BUILD
+			}
+#endif
+			srcrpV = (unsigned char *) VPLANE(src);//->GetReadPtr(PLANAR_V);
+			nextrpV = (unsigned char *)VPLANE( next);//->GetReadPtr(PLANAR_V);
+			dstwpV = (unsigned char *) VPLANE(dst);//->GetWritePtr(PLANAR_V);
+#ifdef DECIMATE_MMX_BUILD
+			if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
+				isse_blend_decimate_plane(dstwpV, srcrpV, nextrpV, wUV, hUV, dpitchUV, pitchUV, pitchUV);
+			} else {
+#endif
+				for (y = 0; y < hUV; y++)
+				{
+					for (x = 0; x < wUV; x++)
+					{
+						dstwpV[x] = ((int)srcrpV[x] + (int)nextrpV[x]) >> 1;
+					}
+					srcrpV += pitchUV;
+					nextrpV += pitchUV;
+					dstwpV += dpitchUV;
+				}
+#ifdef DECIMATE_MMX_BUILD
+			}
+#endif
+			DrawShow(dst, 0, forced, dropframe, metric, inframe);
+			vidCache->unlockAll();
+			//return dst;
+			memcpy(data,dst,*len);
+			vidCache->unlockAll();		
+			return 1; // return src;			
+		}
+		//return src;
+		memcpy(data,src,*len);
+		vidCache->unlockAll();		
+		return 1; // return src;			
+	}
+	//env->ThrowError("Decimate: invalid mode option (0-3)");
+	printf("Decimate: invalid mode option (0-3)\n");
+	/* Avoid compiler warning. */
+	return 0;
+}
+
+void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *forced)
+{
+	int f;
+	uint8_t  * store[MAX_CYCLE_SIZE+1];
+	const unsigned char *storepY[MAX_CYCLE_SIZE+1];
+	const unsigned char *storepU[MAX_CYCLE_SIZE+1];
+	const unsigned char *storepV[MAX_CYCLE_SIZE+1];
+	const unsigned char *prevY, *prevU, *prevV, *currY, *currU, *currV;
+	int x, y, lowest_index, div;
+	unsigned int count[MAX_CYCLE_SIZE], lowest;
+	bool found;
+
+	/* Only recalculate differences when a new set is needed. */
+	if (frame == last_request)
+	{
+		*chosen = last_result;
+		*metric = last_metric;
+		return;
+	}
+	last_request = frame;
+
+	/* Get cycle+1 frames starting at the one before the asked-for one. */
+	for (f = 0; f <= cycle; f++)
+	{
+		GETFRAME(frame + f - 1, store[f]);
+		storepY[f] = store[f];//->GetReadPtr(PLANAR_Y);
+		hints_invalid = GetHintingData((unsigned char *) storepY[f], &hints[f]);
+		if (quality == 1 || quality == 3)
+		{
+			storepU[f] = UPLANE(store[f]);//->GetReadPtr(PLANAR_U);
+			storepV[f] = VPLANE(store[f]);//->GetReadPtr(PLANAR_V);
+		}
+	}
+
+    pitchY = _info.width; //store[0]->GetPitch(PLANAR_Y);
+    row_sizeY = _info.width; //store[0]->GetRowSize(PLANAR_Y);
+    heightY = _info.height; //store[0]->GetHeight(PLANAR_Y);
+	if (quality == 1 || quality == 3)
+	{
+		pitchUV = _info.width>>1; //store[0]->GetPitch(PLANAR_V);
+		row_sizeUV = _info.width>>1;//store[0]->GetRowSize(PLANAR_V);
+		heightUV = _info.height>>1;//store[0]->GetHeight(PLANAR_V);
+	}
+
+#ifdef DECIMATE_MMX_BUILD
+	int old_quality=0;
+	if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
+		old_quality = quality;
+		if (quality < 2)
+			quality += 2;
+	}
+#endif
+
+	switch (quality)
+	{
+	case 0: // subsample, luma only
+		div = (heightY * row_sizeY / 4) * 219;
+		break;
+	case 1: // subsample, luma and chroma
+		div = (heightY * row_sizeY / 4) * 219 + (2 * (heightUV * row_sizeUV / 4)) * 224;
+		break;
+	case 2: // fully sample, luma only
+		div = (heightY * row_sizeY) * 219;
+		break;
+	case 3: // fully sample, luma and chroma
+		div = (heightY * row_sizeY) * 219 + (2 * heightUV * row_sizeUV) * 224;
+		break;
+	}
+
+#ifdef DECIMATE_MMX_BUILD
+	if ((env->GetCPUFlags() & CPUF_INTEGER_SSE)) {
+		/* Compare each frame to its predecessor. */
+		for (f = 1; f <= cycle; f++)
+		{
+			prevY = storepY[f-1];
+			currY = storepY[f];
+			count[f-1] = 0;
+			if ((!(row_sizeY&31)) || (old_quality<=1)) {
+				count[f-1] = isse_scenechange_32(currY, prevY, heightY, row_sizeY, pitchY, pitchY);
+			} else if (!(row_sizeY&15)) {
+				count[f-1] = isse_scenechange_16(currY, prevY, heightY, row_sizeY, pitchY, pitchY);
+			} else {
+				count[f-1] = isse_scenechange_8(currY, prevY, heightY, row_sizeY, pitchY, pitchY);
+			}
+			if (quality == 3) {
+				prevU = storepU[f-1];
+				prevV = storepV[f-1];
+				currU = storepU[f];
+				currV = storepV[f];
+				if (!(row_sizeUV&31)) {
+					count[f-1] += isse_scenechange_32(currU, prevU, heightUV, row_sizeUV, pitchUV, pitchUV);
+					count[f-1] += isse_scenechange_32(currV, prevV, heightUV, row_sizeUV, pitchUV, pitchUV);
+				} else if (!(row_sizeY&15)) {
+					count[f-1] += isse_scenechange_16(currU, prevU, heightUV, row_sizeUV, pitchUV, pitchUV);
+					count[f-1] += isse_scenechange_16(currV, prevV, heightUV, row_sizeUV, pitchUV, pitchUV);
+				} else {
+					count[f-1] += isse_scenechange_8(currU, prevU, heightUV, row_sizeUV, pitchUV, pitchUV);
+					count[f-1] += isse_scenechange_8(currV, prevV, heightUV, row_sizeUV, pitchUV, pitchUV);
+				}			
+			}
+			showmetrics[f-1] = (count[f-1] * 100.0) / div;
+		}
+	} else {
+#endif
+		/* Compare each frame to its predecessor. */
+		for (f = 1; f <= cycle; f++)
+		{
+			prevY = storepY[f-1];
+			currY = storepY[f];
+			count[f-1] = 0;
+			for (y = 0; y < heightY; y++)
+			{
+				for (x = 0; x < row_sizeY;)
+				{
+					count[f-1] += abs((int)currY[x] - (int)prevY[x]);
+					x++;
+					if (quality == 0 || quality == 1)
+					{
+						if (!(x%4)) x += 12;
+					}
+				}
+				prevY += pitchY;
+				currY += pitchY;
+			}
+			if (quality == 1 || quality == 3)
+			{
+				prevU = storepU[f-1];
+				prevV = storepV[f-1];
+				currU = storepU[f];
+				currV = storepV[f];
+				for (y = 0; y < heightUV; y++)
+				{
+					for (x = 0; x < row_sizeUV;)
+					{
+						count[f-1] += abs((int)currU[x] - (int)prevU[x]);
+						count[f-1] += abs((int)currV[x] - (int)prevV[x]);
+						x++;
+						if (quality == 1)
+						{
+							if (!(x%4)) x += 12;
+						}
+					}
+					prevU += pitchUV;
+					currU += pitchUV;
+					prevV += pitchUV;
+					currV += pitchUV;
+				}
+			}
+			showmetrics[f-1] = (count[f-1] * 100.0) / div;
+		}
+#ifdef DECIMATE_MMX_BUILD
+	}
+#endif
+	/* Find the frame with the lowest difference count but
+	   don't use the artificial duplicate at frame 0. */
+	if (frame == 0)
+	{
+		lowest = count[1];
+		lowest_index = 1;
+	}
+	else
+	{
+		lowest = count[0];
+		lowest_index = 0;
+	}
+	for (x = 1; x < cycle; x++)
+	{
+		if (count[x] < lowest)
+		{
+			lowest = count[x];
+			lowest_index = x;
+		}
+	}
+	last_result = frame + lowest_index;
+	if (quality == 1 || quality == 3)
+		last_metric = (lowest * 100.0) / div;
+	else
+		last_metric = (lowest * 100.0) / div;
+	*chosen = last_result;
+	*metric = last_metric;
+
+
+	found = false;
+	last_forced = false;
+	
+	if (found == true)
+	{
+		*chosen = last_result ;
+		*forced = last_forced = true;
+	}
+}
+
+void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
+{
+	int f, g, fsum, bsum, highest, highest_index;
+	uint8_t * store[MAX_CYCLE_SIZE+1];
+	const unsigned char *storepY[MAX_CYCLE_SIZE+1];
+	const unsigned char *storepU[MAX_CYCLE_SIZE+1];
+	const unsigned char *storepV[MAX_CYCLE_SIZE+1];
+	const unsigned char *prevY, *prevU, *prevV, *currY, *currU, *currV;
+	int x, y;
+	double lowest;
+	unsigned int lowest_index;
+	char buf[255];
+	unsigned int highest_sum;
+	bool found;
+#define BLKSIZE 32
+
+	/* Only recalculate differences when a new cycle is started. */
+	if (frame == last_request)
+	{
+		*chosen = last_result;
+		*forced = last_forced;
+		return;
+	}
+	last_request = frame;
+
+	if (firsttime == true || frame == 0)
+	{
+		firsttime = false;
+		for (f = 0; f < MAX_CYCLE_SIZE; f++) Dprev[f] = -1;
+		GETFRAME(frame, store[0]);
+		storepY[0] = store[0];//->GetReadPtr(PLANAR_Y);
+		if (quality == 1 || quality == 3)
+		{
+			storepU[0] = UPLANE(store[0]);//->GetReadPtr(PLANAR_U);
+			storepV[0] = VPLANE(store[0]);//->GetReadPtr(PLANAR_V);
+		}
+
+		for (f = 1; f <= cycle; f++)
+		{
+			GETFRAME(frame + f - 1, store[f]);
+			storepY[f] = store[f];//->GetReadPtr(PLANAR_Y);
+			if (quality == 1 || quality == 3)
+			{
+				storepU[f] = UPLANE(store[f]);//->GetReadPtr(PLANAR_U);
+				storepV[f] = VPLANE(store[f]);//->GetReadPtr(PLANAR_V);
+			}
+		}
+
+		pitchY = _info.width; //store[0]->GetPitch(PLANAR_Y);
+		row_sizeY = _info.width; //store[0]->GetRowSize(PLANAR_Y);
+		heightY = _info.height; //store[0]->GetHeight(PLANAR_Y);
+		if (quality == 1 || quality == 3)
+		{
+			pitchUV = _info.width>>1; //store[0]->GetPitch(PLANAR_V);
+			row_sizeUV = _info.width>>1; //store[0]->GetRowSize(PLANAR_V);
+			heightUV = _info.height>>1; //store[0]->GetHeight(PLANAR_V);
+		}
+		switch (quality)
+		{
+		case 0: // subsample, luma only
+			div = (BLKSIZE * BLKSIZE / 4) * 219;
+			break;
+		case 1: // subsample, luma and chroma
+			div = (BLKSIZE * BLKSIZE / 4) * 219 + (BLKSIZE * BLKSIZE / 8) * 224;
+			break;
+		case 2: // fully sample, luma only
+			div = (BLKSIZE * BLKSIZE) * 219;
+			break;
+		case 3: // fully sample, luma and chroma
+			div = (BLKSIZE * BLKSIZE) * 219 + (BLKSIZE * BLKSIZE / 2) * 224;
+			break;
+		}
+		xblocks = row_sizeY / BLKSIZE;
+		if (row_sizeY % BLKSIZE) xblocks++;
+		yblocks = heightY / BLKSIZE;
+		if (heightY % BLKSIZE) yblocks++;
+
+		/* Compare each frame to its predecessor. */
+		for (f = 1; f <= cycle; f++)
+		{
+			for (y = 0; y < yblocks; y++)
+			{
+				for (x = 0; x < xblocks; x++)
+				{
+					sum[y*xblocks+x] = 0;
+				}
+			}
+			prevY = storepY[f-1];
+			currY = storepY[f];
+			for (y = 0; y < heightY; y++)
+			{
+				for (x = 0; x < row_sizeY;)
+				{
+					sum[(y/BLKSIZE)*xblocks+x/BLKSIZE] += abs((int)currY[x] - (int)prevY[x]);
+					x++;
+					if (quality == 0 || quality == 1)
+					{
+						if (!(x%4)) x += 12;
+					}
+				}
+				prevY += pitchY;
+				currY += pitchY;
+			}
+			if (quality == 1 || quality == 3)
+			{
+				prevU = storepU[f-1];
+				currU = storepU[f];
+				prevV = storepV[f-1];
+				currV = storepV[f];
+				for (y = 0; y < heightUV; y++)
+				{
+					for (x = 0; x < row_sizeUV;)
+					{
+						sum[((2*y)/BLKSIZE)*xblocks+(2*x)/BLKSIZE] += abs((int)currU[x] - (int)prevU[x]);
+						sum[((2*y)/BLKSIZE)*xblocks+(2*x)/BLKSIZE] += abs((int)currV[x] - (int)prevV[x]);
+						x++;
+						if (quality == 0 || quality == 1)
+						{
+							if (!(x%4)) x += 12;
+						}
+					}
+					prevU += pitchUV;
+					currU += pitchUV;
+					prevV += pitchUV;
+					currV += pitchUV;
+				}
+			}
+			highest_sum = 0;
+			for (y = 0; y < yblocks; y++)
+			{
+				for (x = 0; x < xblocks; x++)
+				{
+					if (sum[y*xblocks+x] > highest_sum)
+					{
+						highest_sum = sum[y*xblocks+x];
+					}
+				}
+			}
+			metrics[f-1] = (highest_sum * 100.0) / div;
+		}
+
+		Dcurr[0] = 1;
+		for (f = 1; f < cycle; f++)
+		{
+			if (metrics[f] < threshold2) Dcurr[f] = 0;
+			else Dcurr[f] = 1;
+		}
+
+		if (debug)
+		{
+			sprintf(buf,"Decimate: %d: %3.2f %3.2f %3.2f %3.2f %3.2f\n",
+					0, metrics[0], metrics[1], metrics[2], metrics[3], metrics[4]);
+			OutputDebugString(buf);
+		}
+	}
+ 	else if (frame >= num_frames_hi - 1)
+	{
+		GETFRAME(num_frames_hi - 1, store[0]);
+		storepY[0] = store[0];//->GetReadPtr(PLANAR_Y);
+		if (quality == 1 || quality == 3)
+		{
+			storepU[0] = UPLANE(store[0]);//->GetReadPtr(PLANAR_U);
+			storepV[0] = VPLANE(store[0]);//->GetReadPtr(PLANAR_V);
+		}
+		for (f = 0; f < MAX_CYCLE_SIZE; f++) Dprev[f] = Dcurr[f];
+		for (f = 0; f < MAX_CYCLE_SIZE; f++) Dcurr[f] = Dnext[f];
+	}
+	else
+	{
+		GETFRAME(frame + cycle - 1, store[0]);
+		storepY[0] = store[0];//->GetReadPtr(PLANAR_Y);
+		if (quality == 1 || quality == 3)
+		{
+			storepU[0] = UPLANE(store[0]);//->GetReadPtr(PLANAR_U);
+			storepV[0] = VPLANE(store[0]);//->GetReadPtr(PLANAR_V);
+		}
+		for (f = 0; f < MAX_CYCLE_SIZE; f++) Dprev[f] = Dcurr[f];
+		for (f = 0; f < MAX_CYCLE_SIZE; f++) Dcurr[f] = Dnext[f];
+	}
+	for (f = 0; f < MAX_CYCLE_SIZE; f++) Dshow[f] = Dcurr[f];
+	for (f = 0; f < MAX_CYCLE_SIZE; f++) showmetrics[f] = metrics[f];
+
+	for (f = 1; f <= cycle; f++)
+	{
+		GETFRAME(frame + f + cycle - 1, store[f]);
+		storepY[f] = store[f];//->GetReadPtr(PLANAR_Y);
+		if (quality == 1 || quality == 3)
+		{
+			storepU[f] = UPLANE(store[f]);//->GetReadPtr(PLANAR_U);
+			storepV[f] = VPLANE(store[f]);//->GetReadPtr(PLANAR_V);
+		}
+	}
+
+	/* Compare each frame to its predecessor. */
+	for (f = 1; f <= cycle; f++)
+	{
+		prevY = storepY[f-1];
+		currY = storepY[f];
+		for (y = 0; y < yblocks; y++)
+		{
+			for (x = 0; x < xblocks; x++)
+			{
+				sum[y*xblocks+x] = 0;
+			}
+		}
+		for (y = 0; y < heightY; y++)
+		{
+			for (x = 0; x < row_sizeY;)
+			{
+				sum[(y/BLKSIZE)*xblocks+x/BLKSIZE] += abs((int)currY[x] - (int)prevY[x]);
+				x++;
+				if (quality == 0 || quality == 1)
+				{
+					if (!(x%4)) x += 12;
+				}
+			}
+			prevY += pitchY;
+			currY += pitchY;
+		}
+		if (quality == 1 || quality == 3)
+		{
+			prevU = storepU[f-1];
+			currU = storepU[f];
+			prevV = storepV[f-1];
+			currV = storepV[f];
+			for (y = 0; y < heightUV; y++)
+			{
+				for (x = 0; x < row_sizeUV;)
+				{
+					sum[((2*y)/BLKSIZE)*xblocks+(2*x)/BLKSIZE] += abs((int)currU[x] - (int)prevU[x]);
+					sum[((2*y)/BLKSIZE)*xblocks+(2*x)/BLKSIZE] += abs((int)currV[x] - (int)prevV[x]);
+					x++;
+					if (quality == 0 || quality == 1)
+					{
+						if (!(x%4)) x += 12;
+					}
+				}
+				prevU += pitchUV;
+				currU += pitchUV;
+				prevV += pitchUV;
+				currV += pitchUV;
+			}
+		}
+		highest_sum = 0;
+		for (y = 0; y < yblocks; y++)
+		{
+			for (x = 0; x < xblocks; x++)
+			{
+				if (sum[y*xblocks+x] > highest_sum)
+				{
+					highest_sum = sum[y*xblocks+x];
+				}
+			}
+		}
+		metrics[f-1] = (highest_sum * 100.0) / div;
+	}
+
+	/* Find the frame with the lowest difference count but
+	   don't use the artificial duplicate at frame 0. */
+	if (frame == 0)
+	{
+		lowest = metrics[1];
+		lowest_index = 1;
+	}
+	else
+	{
+		lowest = metrics[0];
+		lowest_index = 0;
+	}
+	for (f = 1; f < cycle; f++)
+	{
+		if (metrics[f] < lowest)
+		{
+			lowest = metrics[f];
+			lowest_index = f;
+		}
+	}
+
+	for (f = 0; f < cycle; f++)
+	{
+		if (metrics[f] < threshold2) Dnext[f] = 0;
+		else Dnext[f] = 1;
+	}
+
+	if (debug)
+	{
+		sprintf(buf,"Decimate: %d: %3.2f %3.2f %3.2f %3.2f %3.2f\n",
+		        frame + 5, metrics[0], metrics[1], metrics[2], metrics[3], metrics[4]);
+		OutputDebugString(buf);
+	}
+
+	if (debug)
+	{
+		sprintf(buf,"Decimate: %d: %d %d %d %d %d\n",
+		        frame, Dcurr[0], Dcurr[1], Dcurr[2], Dcurr[3], Dcurr[4]);
+//		sprintf(buf,"Decimate: %d: %d %d %d %d %d - %d %d %d %d %d - %d %d %d %d %d\n",
+//		        frame, Dprev[0], Dprev[1], Dprev[2], Dprev[3], Dprev[4],
+//					   Dcurr[0], Dcurr[1], Dcurr[2], Dcurr[3], Dcurr[4],
+//					   Dnext[0], Dnext[1], Dnext[2], Dnext[3], Dnext[4]);
+		OutputDebugString(buf);
+	}
+
+	/* Find the longest strings of duplicates and decimate a frame from it. */
+	highest = -1;
+	for (f = 0; f < cycle; f++)
+	{
+		if (Dcurr[f] == 1)
+		{
+			bsum = 0;
+			fsum = 0;
+		}
+		else
+		{
+			bsum = 1;
+			g = f;
+			while (--g >= 0)
+			{
+				if (Dcurr[g] == 0)
+				{
+					bsum++;
+				}
+				else break;
+			}
+			if (g < 0)
+			{
+				g = cycle;
+				while (--g >= 0)
+				{
+					if (Dprev[g] == 0)
+					{
+						bsum++;
+					}
+					else break;
+				}
+			}
+			fsum = 1;
+			g = f;
+			while (++g < cycle)
+			{
+				if (Dcurr[g] == 0)
+				{
+					fsum++;
+				}
+				else break;
+			}
+			if (g >= cycle)
+			{
+				g = -1;
+				while (++g < cycle)
+				{
+					if (Dnext[g] == 0)
+					{
+						fsum++;
+					}
+					else break;
+				}
+			}
+		}
+		if (bsum + fsum > highest)
+		{
+			highest = bsum + fsum;
+			highest_index = f;
+		}
+//		sprintf(buf,"Decimate: bsum %d, fsum %d\n", bsum, fsum);
+//		OutputDebugString(buf);
+	}
+
+	f = highest_index;
+	if (Dcurr[f] == 1)
+	{
+		/* No duplicates were found! Act as if mode=0. */
+		*chosen = last_result = frame + lowest_index;
+	}
+	else
+	{
+		/* Prevent this decimated frame from being considered again. */ 
+		Dcurr[f] = 1;
+		*chosen = last_result = frame + highest_index;
+	}
+	last_forced = false;
+	if (debug)
+	{
+		sprintf(buf,"Decimate: dropping frame %d\n", last_result);
+		OutputDebugString(buf);
+	}
+
+	
+	found = false;
+	
+	if (found == true)
+	{
+		*chosen = last_result ;
+		*forced = last_forced = true;
+		if (debug)
+		{
+			sprintf(buf,"Decimate: overridden drop frame -- drop %d\n", last_result);
+			OutputDebugString(buf);
+		}
+	}
+}
+#endif

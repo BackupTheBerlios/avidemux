@@ -46,7 +46,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include"ADM_video/ADM_vidField.h"
-#include"ADM_video/ADM_vidCached.h"
+
 
 
 #if 1 || TEST_DECOMB
@@ -81,12 +81,12 @@ char *Telecide::printConf( void )
 #define IN_PATTERN   0x00000002
 
 
-static uint8_t PutHintingData(unsigned char *video, unsigned int hint);
-static uint8_t GetHintingData(unsigned char *video, unsigned int *hint);
-static void BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
+  uint8_t PutHintingData(unsigned char *video, unsigned int hint);
+  uint8_t GetHintingData(unsigned char *video, unsigned int *hint);
+  void BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
             int src_pitch, int row_size, int height);
-static void DrawString(uint8_t *dst, int x, int y, const char *s);
-static void DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
+  void DrawString(uint8_t *dst, int x, int y, const char *s);
+  void DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
 Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples) 
 {

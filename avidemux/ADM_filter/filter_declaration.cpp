@@ -58,6 +58,8 @@ printf(  "*********************\n");
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
 	REGISTER("Mplayer ivtc",VF_MPDETC,1,mpdetc_create);	
 	REGISTER("Decomb telecide",VF_DECOMB,1,decomb_create);
+	REGISTER("Decomb decimate",VF_DECIMATE,1,decimate_create);
+	
 	REGISTER("PAL-SMART",VF_TELECIDE,1,telecide_create);
 	REGISTER("Deinterlace",VF_DEINTERLACE,1,deinterlace_create);
 	REGISTER("Lavcodec Deinterlacer",VF_LAVDEINT,1,lavdeint_create);
