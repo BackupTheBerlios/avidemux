@@ -122,6 +122,23 @@ uint8_t _3gpAudio::goTo(uint32_t newoffset)
     	_pos=newoffset;
     return 1;
 }
+//______________________________________
+uint8_t _3gpAudio::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
+{
+
+uint32_t r=0;
+	if(_current_index>=_nb_chunks)  return 0;
+	
+	  fseeko(_fd,_index[_current_index].offset,SEEK_SET);
+	  r=fread(dest,1,_index[_current_index].size,_fd);
+	  _current_index++;
+	  *len=r;
+	  *samples=1024;
+	  return 1;
+
+
+
+}
 //_______________________________________________________
 //
 //
