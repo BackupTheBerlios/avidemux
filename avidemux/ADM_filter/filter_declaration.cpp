@@ -63,10 +63,10 @@ printf(  "*********************\n");
 //BG	REGISTERX("telecide","Decomb telecide",VF_DECOMB,1,decomb_create,decomb_script);
 //BG	REGISTERX("decimate","Decomb decimate",VF_DECIMATE,1,decimate_create,decimate_script);
 	
-//	REGISTER("palsmart","PAL-SMART",VF_TELECIDE,1,telecide_create);
-//	REGISTERX("deinterlace","Deinterlace",VF_DEINTERLACE,1,deinterlace_create,deinterlace_script);
-//	REGISTERX("lavdeint","Lavcodec Deinterlacer",VF_LAVDEINT,1,lavdeint_create,lavdeint_script);
-//	REGISTERX("palfieldshift","Pal Field shift",VF_PALSHIFT,1,addPALShift_create,addPALShift_script);
+	REGISTER("palsmart","PAL-SMART",VF_TELECIDE,1,telecide_create);
+	REGISTERX("deinterlace","Deinterlace",VF_DEINTERLACE,1,deinterlace_create,deinterlace_script);
+	REGISTERX("lavdeint","Lavcodec Deinterlacer",VF_LAVDEINT,1,lavdeint_create,lavdeint_script);
+	REGISTERX("palfieldshift","Pal Field shift",VF_PALSHIFT,1,addPALShift_create,addPALShift_script);
 	
 	REGISTERX("drop","Drop",VF_DROPOUT,1,dropout_create,dropout_script);
 	REGISTERX("swapfields","SwapFields",VF_SWAPFIELDS,1,swapfield_create,swapfield_script);

@@ -15,24 +15,22 @@
  *                                                                         *
  ***************************************************************************/
 #include "ADM_video/ADM_vidField.h"
- 
+#include "ADM_video/ADM_cache.h"
 class  ADMVideoTelecide:public ADMVideoFields
  {
 
  protected:
-    		uint32_t 									getMatch(void);
-             	uint8_t 									interleave(	uint8_t *in,uint8_t odd)  ;
-              	uint8_t									*_next;
-              	uint32_t									_instock;
+    		uint32_t 		getMatch(ADMImage *image);
+             	uint8_t 		interleave(ADMImage *src1, ADMImage *dst,uint8_t odd);
+              	VideoCache		*vidCache;
  public:
  		
   					
 					ADMVideoTelecide(  AVDMGenericVideoStream *in,CONFcouple *setup);
-  					virtual ~ADMVideoTelecide();
-		        		virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	uint8_t *data,uint32_t *flags);
-				   																	
-					 virtual char 									*printConf(void);		
+  			virtual 	~ADMVideoTelecide();
+			virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+          					ADMImage *data,uint32_t *flags);
+			 virtual char 	*printConf(void);		
  }     ;
 
 

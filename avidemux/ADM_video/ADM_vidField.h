@@ -39,7 +39,7 @@ typedef struct DEINT_PARAM
       		uint8_t						*_motionmask;
         	uint8_t						*_motionmask2;
            	virtual char 					*printConf(void) { assert(0);return NULL;}
-           	uint8_t 						hasMotion(void);
+           	uint8_t 						hasMotion(ADMImage *image);
 		void  							hasMotion_C(uint8_t *p,uint8_t *c,
 											uint8_t *n,
 											uint8_t *e,
@@ -51,7 +51,7 @@ typedef struct DEINT_PARAM
 											uint8_t *e2
 												);
 
-           uint8_t 							doBlend(uint8_t *f);
+           uint8_t 							doBlend(ADMImage *img);
            void							blend_C(uint8_t *p,uint8_t *c,
 											uint8_t *n,
 											uint8_t *e,
@@ -69,7 +69,7 @@ typedef struct DEINT_PARAM
 							ADMVideoFields(  AVDMGenericVideoStream *in,CONFcouple *setup);
   				virtual 		~ADMVideoFields();
 		     		virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          									uint8_t *data,uint32_t *flags) 
+          									ADMImage *data,uint32_t *flags) 
 								{
 								 UNUSED_ARG(frame); UNUSED_ARG(len); UNUSED_ARG(data);
 								 UNUSED_ARG(flags); assert(0);return 0;

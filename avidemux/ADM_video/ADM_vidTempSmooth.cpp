@@ -71,7 +71,7 @@ AVDMVideoTempSmooth::AVDMVideoTempSmooth(
 									AVDMGenericVideoStream *in,CONFcouple *couples)
 {
 
-    _ptr_to_screen=NULL;
+   	 _ptr_to_screen=NULL;
 	_screen=NULL;
   	_in=in;		
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
@@ -115,7 +115,7 @@ uint8_t	AVDMVideoTempSmooth::getCoupledConf( CONFcouple **couples)
 AVDMVideoTempSmooth::~AVDMVideoTempSmooth()
 {
 DELETE(_param);
-   if(  _ptr_to_screen) free( _ptr_to_screen);
+	if(  _ptr_to_screen) free( _ptr_to_screen);
 	if(_screen) delete [] _screen;
  	
 }
@@ -125,49 +125,49 @@ uint8_t AVDMVideoTempSmooth::getFrameNumberNoAlloc(uint32_t frame,
    				ADMImage *data,
 				uint32_t *flags)
 {
-							uint32_t one_screen;
-							uint8_t *p;
+	uint32_t one_screen;
+	uint8_t *p;
 
 
-							one_screen=  _info.width*_info.height;
-							one_screen+=one_screen>>1;
+		one_screen=  _info.width*_info.height;
+		one_screen+=one_screen>>1;
 
-	if(!_screen) // first time -> allocate and fill the whole stuff
+		if(!_screen) // first time -> allocate and fill the whole stuff
 			{
 
-         					// allocate ptr
-							//_ptr_to_screen=new *uint8_t[_param->_radius];
-							_ptr_to_screen=(uint8_t **)malloc(_param->radius*sizeof(uint8_t *));
-							_screen=new uint8_t[_param->radius*_info.width*_info.height*2];
+         			// allocate ptr
+				//_ptr_to_screen=new *uint8_t[_param->_radius];
+				_ptr_to_screen=(uint8_t **)malloc(_param->radius*sizeof(uint8_t *));
+				_screen=new uint8_t[_param->radius*_info.width*_info.height*2];
 
-							p=_screen;
+				p=_screen;
 
-							for(uint32_t i=0;i<_param->radius;i++)
-							{
+				for(uint32_t i=0;i<_param->radius;i++)
+				{
                           	
-									_ptr_to_screen[i]=p;
-									p+=one_screen;
-							}
-	            					if(!_in->getFrameNumberNoAlloc(frame, len,_screen,flags)) return 0;
-							// copy it to next ones
-							for(uint32_t i=1;i<_param->radius;i++)
-							{
-								memcpy( _ptr_to_screen[i],_screen,one_screen);
-							}
+					_ptr_to_screen[i]=p;
+					p+=one_screen;
+				}
+	        		if(!_in->getFrameNumberNoAlloc(frame, len,_screen,flags)) return 0;
+				// copy it to next ones
+				for(uint32_t i=1;i<_param->radius;i++)
+				{
+					memcpy( _ptr_to_screen[i],_screen,one_screen);
+				}
 
-							// ready !
-							memcpy(data,_screen,one_screen);
-							*len=one_screen;
-							return 1;							
+				// ready !
+				memcpy(data,_screen,one_screen);
+				*len=one_screen;
+				return 1;							
 			}
        	// now is the generic case
-			// first round rubbing the screens (0 being the most recent...)
+	// first round rubbing the screens (0 being the most recent...)
 			uint8_t *o;
 			o=_ptr_to_screen[_param->radius-1];
-    		for(uint32_t i=1;i<_param->radius;i++)	
+    			for(uint32_t i=1;i<_param->radius;i++)	
 			{
 			   	_ptr_to_screen[i]=_ptr_to_screen[i-1];
-            }
+            		}
 			_ptr_to_screen[0]=o;
   			if(!_in->getFrameNumberNoAlloc(frame, len,o,flags)) return 0;
 	
@@ -285,5 +285,4 @@ uint8_t AVDMVideoTempSmooth::getFrameNumberNoAlloc(uint32_t frame,
 	free(ptrv);
         return 1;
 }
-
 #endif

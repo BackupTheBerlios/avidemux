@@ -1,4 +1,4 @@
-#if 0
+
 /***************************************************************************
                           ADM_vidTelecide.cpp  -  description
                              -------------------
@@ -60,17 +60,14 @@ char *ADMVideoTelecide::printConf(void)
 ADMVideoTelecide::ADMVideoTelecide(	AVDMGenericVideoStream *in,CONFcouple *setup)
 										: ADMVideoFields(in,setup)
 {
-
-
-	_next=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  ADM_assert(_next);
-  _instock=0xFFFF0000;
-  	  	
+	vidCache=new VideoCache(4,in);
+  	
 }
 ADMVideoTelecide::~ADMVideoTelecide()
 {
  	
-	delete []_next;	
+	delete vidCache;
+	vidCache=NULL;
 	
 }
 /*
@@ -78,21 +75,23 @@ ADMVideoTelecide::~ADMVideoTelecide()
    		even line from in2 odd=0
       odd  line          odd=1
 */
-uint8_t ADMVideoTelecide::interleave(	uint8_t *in2,uint8_t odd)
+uint8_t ADMVideoTelecide::interleave(	ADMImage *imgsrc, ADMImage *imgdst,uint8_t odd)
 {
  	uint32_t w=_info.width;
-	uint8_t  	*out=_uncompressed;
-
-if(odd)
-{
-	in2+=w;
-	out+=w;
-}
+	uint8_t  *src1,*dst;
+	
+	src1=YPLANE(imgsrc);
+	dst=YPLANE(imgdst);
+	if(odd)
+	{
+		src1+=w;
+		dst+=w;
+	}
 	for(uint32_t y=(_info.height>>1);y>0;y--)
 		{
-        		memcpy(out,in2,w);						
-				in2+=w<<1;
-				out+=w<<1;
+        		memcpy(dst,src1,w);
+			src1+=w<<1;
+			dst+=w<<1;
 		}
 	return 1;
 }
@@ -103,98 +102,110 @@ if(odd)
 //
 
 uint8_t ADMVideoTelecide::getFrameNumberNoAlloc(uint32_t frame,
-																	uint32_t *len,
-   																	uint8_t *data,
-   																	uint32_t *flags)
+			uint32_t *len,
+			ADMImage *data,
+			uint32_t *flags)
 {
 uint32_t uvlen;
 uint32_t dummylen;
 uint8_t motion;
 
 uint32_t 	cmatch,nmatch,n2match;
+ADMImage	*cur,*next;
 
 			
+		if(frame>=_info.nb_frames) return 0;			
+		uvlen=    _info.width*_info.height;
+		*len=uvlen+(uvlen>>1);
+		
+		cur=vidCache->getImage(frame);
+		if(!cur) return 0;
+		
+		if(!frame || frame==_info.nb_frames-1)
+		{
+			cur->_qStride=0;
+			data->duplicate(cur);
+			vidCache->unlockAll();
+			return 1;
+		
+		}
+		
+		next=vidCache->getImage(frame-1);
+		if(!next) 
+		{
+			vidCache->unlockAll();
+			return 0;
+		}		
+		
 
-			ADM_assert(frame<_info.nb_frames);
-			ADM_assert(_uncompressed);					
-			
-			uvlen=    _info.width*_info.height;
-			*len=uvlen+(uvlen>>1);
-			
-			if(_instock!=frame)
-			{																	
-			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, &dummylen,_uncompressed,flags)) return 0;         	
-   		}
-     	else
-      {
-					memcpy(_uncompressed,_next,*len);
+		// for u & v , no action -> copy it as is
+		memcpy(UPLANE(data),UPLANE(cur),uvlen>>2);
+		memcpy(VPLANE(data),VPLANE(cur),uvlen>>2);
+		data->_Qp=cur->_Qp;
+
+        	// No interleaving detected
+           	if(!(motion=hasMotion(data)) )
+		{
+			printf("\n Not interlaced !\n");
+			memcpy(YPLANE(data),YPLANE(cur),uvlen);
+			vidCache->unlockAll();
+      			return 1; // over !
+		}
+		// else cmatch is the current match
+		cmatch=getMatch(cur);
+
+/*	------------------------------------------------------------------------------------
+			Try to complete with next frame  fields
+-----------------------------------------------------------------------------------
+*/
+		// Interleav next in even field
+		
+		interleave(cur,data,1);
+		interleave(next,data,0);
+		nmatch=getMatch(data);
+		
+		interleave(cur,data,0);
+		interleave(next,data,1);
+		n2match=getMatch(data);
+
+		printf(" Cur  : %lu \n",cmatch);
+		printf(" Next : %lu \n",nmatch);
+		printf(" NextP: %lu \n",n2match);
+
+		if((cmatch<nmatch)&&(cmatch<n2match))
+		{
+			printf("\n __ pure interlaced __\n");
+			interleave(cur,data,0);
+			interleave(cur,data,1);
+			hasMotion(data);
+	  		doBlend(data);
+			vidCache->unlockAll();
+			return 1;
+		}
+		if( nmatch > n2match)
+		{
+			printf("\n -------Shifted-P is better \n");	
+			if(hasMotion(data))
+			{
+				 doBlend(data);
+				 printf(" but there is still motion \n");
 			}
-
-           // for u & v , no action -> copy it as is
-           memcpy(data,_uncompressed,(uvlen*3)>>1);
-	
-    	     if(frame==_info.nb_frames-1) return 1;
-
-           // No interleaving detected
-           if(!(motion=hasMotion()) )
-           	{
-									printf("\n Not interlaced !\n");
-      						return 1; // over !					
-             }
-            cmatch=getMatch();
-
-    /*	------------------------------------------------------------------------------------
-								Try to complete with next frame  fields
-	------------------------------------------------------------------------------------
-					*/
-            if(!_in->getFrameNumberNoAlloc(frame+1, &dummylen,_next,flags)) return 0;
-            _instock=frame+1;
-						interleave(_next,0);
-
-						nmatch=getMatch();
-						
-					  memcpy(_uncompressed,data,_info.width*_info.height);
-	          interleave(_next,1);
-	          
- 						n2match=getMatch();
-
-						printf(" Cur  : %lu \n",cmatch);
-						printf(" Next : %lu \n",nmatch);
-						printf(" NextP: %lu \n",n2match);
-
-						if((cmatch<nmatch)&&(cmatch<n2match))
-						{
-			   				printf("\n __ pure interlaced __\n");
-			          memcpy(_uncompressed,data,_info.width*_info.height);
-								hasMotion();
-	  		        doBlend(data);					
-								return 1;
-						}
-						if( nmatch > n2match)
-						{
-							printf("\n -------Shifted-P is better \n");
-							if(hasMotion())
-							{
-								 doBlend(data);
-								 printf(" but there is still motion \n");
-							}
-						}
-						else
-						{
-							printf("\n -------Shifted-O is better \n");
-							memcpy(_uncompressed,data,_info.width*_info.height);
-	          	interleave(_next,0);
-							if(hasMotion())
-							{
-								 doBlend(data);
-								 printf(" but there is still motion \n");
-							}
-						}							  		    			
-						// which chroma is better ? from current or from next ?
-						// search for a transition and see if there is also one ?
-						
-						return 1;						
+		}
+		else
+		{
+			printf("\n -------Shifted-O is better \n");
+			interleave(cur,data,1);
+			interleave(next,data,0);
+			if(hasMotion(data))
+			{
+				 doBlend(data);
+				 printf(" but there is still motion \n");
+			}
+		}
+		// which chroma is better ? from current or from next ?
+		// search for a transition and see if there is also one ?
+		vidCache->unlockAll();				
+		return 1;						
 }
 
 /*
@@ -202,30 +213,30 @@ uint32_t 	cmatch,nmatch,n2match;
 
 
 */
-uint32_t      ADMVideoTelecide::getMatch( void )
+uint32_t      ADMVideoTelecide::getMatch( ADMImage *image )
 {
 
 			uint32_t m=0,x,y;
 
 			uint8_t *p,*n,*c;
 
-			c=_uncompressed + _info.width;
-			n=_uncompressed + _info.width+_info.width;
-			p=_uncompressed ;
-
-
+			p=YPLANE(image) ;
+			c=p+ _info.width;
+			n=c+ _info.width;
+			
 			for(y=_info.height>>2;  y >2 ; y--)
-					{
-           for(x=_info.width;x>0;x--)
-								{
-                             		if(  (*c-*p)*(*c-*n) >MATCH_THRESH) m++;
-										p++;c++;n++;
-								}
-								p+=3*_info.width;
-								c+=3*_info.width;
-								n+=3*_info.width;
+			{
+           			for(x=_info.width;x>0;x--)
+				{
+					if(  (*c-*p)*(*c-*n) >MATCH_THRESH) 
+						m++;
+					p++;c++;n++;
+				}
+				p+=3*_info.width;
+				c+=3*_info.width;
+				n+=3*_info.width;
 
-					}
+			}
 
                  return m;
 }
@@ -239,4 +250,3 @@ uint32_t      ADMVideoTelecide::getMatch( void )
 
 
 
-#endif

@@ -5,7 +5,7 @@
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
-#if 0
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -56,31 +56,36 @@ ADMVideoPalShift::ADMVideoPalShift(  AVDMGenericVideoStream *in,CONFcouple *setu
 
 	_reverse=NULL;
  	_in=in;		
-   	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
+	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
 	
 
-				_reverse=new uint8_t;;
-				*_reverse=1;
-						
-					
- 	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
- 	//_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  ADM_assert(_uncompressed);
+	_reverse=new uint8_t;;
+	*_reverse=1;
+	
+  	_info.encoding=1;
 
- 	_cache=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  ADM_assert(_cache);
-
-  _info.encoding=1;
-	_cacheno=0xffffffff;
+	vidCache=new VideoCache(5,in);
 
 
   	  	
 }
+ uint8_t ADMVideoPalShift::configure( AVDMGenericVideoStream *instream) 
+{
+	if(GUI_Question("Try reverse ?"))
+	{
+		*_reverse=1;
+	}
+	else
+	{
+		*_reverse=0;
+	}
+	return 1;
+
+} 
 ADMVideoPalShift::~ADMVideoPalShift()
 {
- 	delete []_uncompressed;
-
- 	
+	delete vidCache;
+	delete _reverse;
 }
 uint8_t ADMVideoPalShift::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *len,
@@ -88,90 +93,67 @@ uint8_t ADMVideoPalShift::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 
-      	uint32_t full,half;
+uint32_t full,half;
+ADMImage *cur,*next;
 
-				full=_info.width*_info.height;
-				half=full>>4;
+		full=_info.width*_info.height;
+		half=full>>2;
 
-			ADM_assert(frame<_info.nb_frames);
-						
-								
-			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
-				if(frame==0)
-						{
-                      		memcpy(data,_uncompressed,full+(full>>1));
-								memcpy(_cache,_uncompressed,full+(full>>1));
-								_cacheno=0;
-								return 1;
-						}
-
-				// Is the frame in cache the good one ?
-				if(_cacheno!=(frame-1))
-					{  // get it !
-					       		if(!_in->getFrameNumberNoAlloc(frame-1, len,_cache,flags)) return 0;
-									_cacheno=frame-1;
-					}					
-       		
-				// copy u & v as they are
+		if(frame>=_info.nb_frames) return 0;
+		
+		cur=vidCache->getImage(frame);
+		if(!cur) return 0;
 			
+		// for first or last frame do nothing
+		if(!frame || frame==_info.nb_frames-1)
+		{
+			cur->_qStride=0; // Remove quant
+			data->duplicate(cur);
+			vidCache->unlockAll();
+			return 1;	
+		}				
+								
+		// copy u & v as they are			
 
-				memcpy(data+full,_uncompressed+full,full>>1);
+		memcpy(UPLANE(data),UPLANE(cur),half);
+		memcpy(VPLANE(data),VPLANE(cur),half);
 
-				// now copy odd field from framei and even frame from frame i-1
-				uint8_t *out;
-				uint8_t *cur;
-				uint8_t *prev;
-				uint32_t dline=_info.width;
+		// now copy odd field from framei and even frame from frame i-1		
+		// OR the other way around
+		uint32_t dline=_info.width;
+		
+		next=vidCache->getImage(frame+1);
+		if(!next) return 0;
 
-			if(!*_reverse)
-			{
-				prev=_cache+_info.width;
-				cur=_uncompressed;
-				out=data;
-	
-				for(uint32_t y=(_info.height>>1);y>0;y--)
-					{
-                   	memcpy(out,cur, dline);
-						out+=dline;
-                   	memcpy(out,prev, dline);
-						out+=dline;
-						cur+=dline;
-						cur+=dline;
-						prev+=dline;
-						prev+=dline;
-					}
-				}
-				else
-				{
-				prev=_cache;
-				cur=_uncompressed+_info.width;
-				out=data;
-	
-				for(uint32_t y=(_info.height>>1);y>0;y--)
-					{
-						memcpy(out,prev, dline);
-						out+=dline;
-                   	memcpy(out,cur, dline);
-						out+=dline;
-                   	
-						cur+=dline;
-						cur+=dline;
-						prev+=dline;
-						prev+=dline;
-					}
-				}
-                   // fill cache
-						_cacheno=frame;
-						memcpy(  _cache,_uncompressed, full);
-
-
-
-
+		//
+		uint8_t *src,*dst,*src2;
+		if(!*_reverse)
+		{
+			src2=YPLANE(cur)+dline;
+			src=YPLANE(next);
+			dst=YPLANE(data);
+		}
+		else
+		{
+			src2=YPLANE(next)+dline;
+			src=YPLANE(cur);
+			dst=YPLANE(data);
+		
+		}
+		for(uint32_t y=(_info.height>>1);y>0;y--)
+		{
+                	memcpy(dst,src, dline);
+			dst+=dline;
+                	memcpy(dst,src2, dline);
+			dst+=dline;
+			src+=dline*2;
+			src2+=dline*2;
+		}
+		
+	vidCache->unlockAll();
       return 1;
 }
 
 
 
-#endif
 #endif

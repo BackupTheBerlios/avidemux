@@ -73,28 +73,28 @@ uint8_t ADMVideoDeinterlace::getFrameNumberNoAlloc(uint32_t frame,
 {
 //uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
 uint32_t uvlen;
-			if(frame>=_info.nb_frames) return 0;
-			ADM_assert(_uncompressed);					
+		
+		if(frame>=_info.nb_frames) return 0;
+		
 								
-			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;         	
+		// read uncompressed frame
+       		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;         	
 
-       		  *len= _info.width*_info.height+(_info.width*_info.height>>1);       			
+		*len= _info.width*_info.height+(_info.width*_info.height>>1);       			
 
-           // for u & v , no action -> copy it as is
-           uvlen=    _info.width*_info.height;
-           memcpy(data->data+uvlen,_uncompressed->data+uvlen,uvlen>>1);
-           // No interleaving detected
-           if(!hasMotion())
+		// for u & v , no action -> copy it as is
+		uvlen=    _info.width*_info.height;
+		
+		// No interleaving detected
+		if(!hasMotion(data))
            	{
-               	memcpy(data->data,_uncompressed->data,*len);
-              }
-              else
-              {
-	              doBlend(data->data);
-             }
-
-      return 1;
+			
+		}
+		else
+		{
+			doBlend((data));
+		}
+		return 1;
 }
 
 

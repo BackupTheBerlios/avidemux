@@ -55,7 +55,7 @@ AVDMVideoLavDeint::AVDMVideoLavDeint(
 UNUSED_ARG(setup);
   	_in=in;
    	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	_uncompressed=new ADMImage(_info.width,_info.height);//uint8_t[3*_info.width*_info.height];
+	_uncompressed=new ADMImage(_info.width,_info.height);
 
 
 }
@@ -64,6 +64,7 @@ UNUSED_ARG(setup);
 AVDMVideoLavDeint::~AVDMVideoLavDeint()
 {
  	delete  _uncompressed;
+	_uncompressed=NULL;
 
 }
 
@@ -81,14 +82,15 @@ uint8_t AVDMVideoLavDeint::getFrameNumberNoAlloc(uint32_t frame,
 		if(frame>=_info.nb_frames) return 0;
 
 
-			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
+		// read uncompressed frame
+       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 
 		// if not %4 -> skip
 		if((_info.width&03) || (_info.height & 3))
 		{
 			printf("\n WIDTH & HEIGHT must be multiple of 4!!\n");
-			memcpy(data,_uncompressed,(_info.width*_info.height*3)>>1);
+			_uncompressed->_qStride=0;
+			data->duplicate(_uncompressed);
 			return 1;
 		}
 		// and deinterlace it
@@ -96,13 +98,13 @@ uint8_t AVDMVideoLavDeint::getFrameNumberNoAlloc(uint32_t frame,
   		AVPicture dest;
 		uint32_t page=_info.width*_info.height;
 		
-		src.data[0]=_uncompressed->data;
-		src.data[1]=_uncompressed->data+page;
-		src.data[2]=_uncompressed->data+((page*5)>>2);
+		src.data[0]=YPLANE(_uncompressed);
+		src.data[1]=UPLANE(_uncompressed);
+		src.data[2]=VPLANE(_uncompressed);
   
-		dest.data[0]=data->data;
-		dest.data[1]=data->data+page;
-		dest.data[2]=data->data+((page*5)>>2);
+		dest.data[0]=YPLANE(data);
+		dest.data[1]=UPLANE(data);
+		dest.data[2]=VPLANE(data);
 		
 		src.linesize[0]=dest.linesize[0]=_info.width;
 		src.linesize[1]=dest.linesize[1]=_info.width>>1;
@@ -112,7 +114,8 @@ uint8_t AVDMVideoLavDeint::getFrameNumberNoAlloc(uint32_t frame,
 		{
 			printf("Error in avpicture deinterlace!\n");
 			return 0;
-		} 		
+		} 	
+		data->_qStride=0;	
 
       return 1;
 }

@@ -16,17 +16,16 @@
  ***************************************************************************/
 #ifndef PALSHIFT__
 #define PALSHIFT__
-
+#include "ADM_video/ADM_cache.h" 
  class  ADMVideoPalShift:public AVDMGenericVideoStream
  {
 
  protected:
     		
-		uint8_t					*_cache;
-		uint32_t				_cacheno;
-     virtual 	char 					*printConf(void);
+		VideoCache			*vidCache;
+     virtual 	char 				*printConf(void);
 
-		uint8_t					*_reverse;
+		uint8_t				*_reverse;
 
 
  public:
@@ -37,7 +36,7 @@
   	virtual 		~ADMVideoPalShift();
 	virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
           								ADMImage *data,uint32_t *flags);
-	virtual uint8_t configure( AVDMGenericVideoStream *instream) {return 1;};
+	virtual uint8_t configure( AVDMGenericVideoStream *instream) ;
 
  }     ;
 #endif

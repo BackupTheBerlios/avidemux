@@ -45,8 +45,6 @@ ADMVideoFields::ADMVideoFields(
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
 	
 					
-	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);	
-	ADM_assert(_uncompressed);
 	_motionmask=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
 	ADM_assert(_motionmask);
 	_motionmask2=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
@@ -82,11 +80,11 @@ uint8_t	ADMVideoFields::getCoupledConf( CONFcouple **couples)
 
 ADMVideoFields::~ADMVideoFields()
 {
- 	delete _uncompressed;
+ 	
 	delete []_motionmask ;
 	delete []_motionmask2;
  	DELETE(_param);
-	_uncompressed=NULL;
+	
 }
 //
 //	Return 1 if seen as interleaved
@@ -94,12 +92,12 @@ ADMVideoFields::~ADMVideoFields()
 //
 //		Check if in a 8x8 square n, n+1 , n+2 lines differ too much
 //
-uint8_t ADMVideoFields::hasMotion(void)
+uint8_t ADMVideoFields::hasMotion(ADMImage *image)
 {
     	uint32_t w,h,x,y;
       	uint8_t *n,*p,*c,*e,*e2;
-
-       //int32_t val;
+	uint8_t *yplane=YPLANE(image);
+       
 
      	w=_info.width;
      	h=_info.height;
@@ -113,7 +111,7 @@ uint8_t ADMVideoFields::hasMotion(void)
        	memset(_motionmask,0xff,w);
           	memset(_motionmask2,0xff,w);
 
-        	p=_uncompressed->data;
+        	p=yplane;
          	c=p+w;
           	n=c+w;
            e=_motionmask+w; 	
@@ -174,20 +172,22 @@ uint8_t ADMVideoFields::hasMotion(void)
 
 }
 
-uint8_t ADMVideoFields::doBlend(uint8_t *f)
+uint8_t ADMVideoFields::doBlend(ADMImage *img)
 {
    		uint32_t w,h,x; //,y;
       	uint8_t *n,*p,*c,*e2;
-
+	uint8_t *f=YPLANE(img);
+	uint8_t *yplane;
 //       int32_t val;
 
+	yplane=YPLANE(img);
      	w=_info.width;
      	h=_info.height;
 
-       	p=_uncompressed->data;
-         	c=_uncompressed->data;
-          	n=c+w;
-           e2=_motionmask2+w; 	
+	p=yplane;
+	c=p+w;
+	n=c+w;
+	e2=_motionmask2+w; 	
            // First line
            // always blend
             for(x=w;x>0;x--)
