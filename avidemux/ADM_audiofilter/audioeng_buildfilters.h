@@ -76,3 +76,8 @@ const char *audioCodecGetConf( void );
 uint8_t audioCodecSetConf(char *conf );
 
 AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm,uint8_t silent=0);
+
+void audioFilterNormalize(uint8_t onoff);
+void audioFilterDownsample(uint8_t onoff);
+void audioFilterResample(uint32_t onoff);
+

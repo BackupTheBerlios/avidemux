@@ -90,7 +90,7 @@ void A_loadWave (char *name);
 void A_loadAC3 (char *name);
 void A_saveAudioDecodedTest (char *name);
 void A_openBrokenAvi (char *name);
-void A_openAvi2 (char *name, uint8_t mode);
+int A_openAvi2 (char *name, uint8_t mode);
 void A_appendAvi (char *name);
 extern void A_SaveAudioNVideo (char *name);
 void HandleAction (Action action);
@@ -897,17 +897,17 @@ A_openAvi (char *name)
   A_openAvi2 (name, 0);
 }
 extern void GUI_PreviewEnd (void);
-void A_openAvi2 (char *name, uint8_t mode)
+int A_openAvi2 (char *name, uint8_t mode)
 {
   uint8_t res;
 
   if (playing)
-    return;
+    return 0;
   /// check if name exists
   FILE *fd;
   fd = fopen (name, "rb");
   if (!fd)
-    return;
+    return 0;
   fclose (fd);
 
 
@@ -944,14 +944,14 @@ void A_openAvi2 (char *name, uint8_t mode)
     {
     	if(ADM_IGN==res) 
 	{
-		return ;
+		return 0;
 	}
 	
       currentaudiostream = NULL;
       avifileinfo = NULL;
 
       GUI_Alert ("Problem opening that file!");
-      return;
+      return 0;
     }
 	{ char *longname = PathCanonize(name);
 	  int i;
@@ -966,6 +966,7 @@ void A_openAvi2 (char *name, uint8_t mode)
 		UI_setTitle(longname+i);
 		free(longname);
 	}
+	return 1;
 }
 
 void  updateLoaded ()

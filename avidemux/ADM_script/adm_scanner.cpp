@@ -34,7 +34,9 @@ static void CleanParam(void);
 static uint32_t pushed;
 static Arg args[MAXPARAM];
 void dumpStack( char *cmd, int nb, Arg *arg);
-extern int ADS_execCommand(char *cmd, int nb, Arg *arg);
+extern ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg);
+
+static char scriptError[1024];
 //_____________________________________
 void parseScript(char *scriptname);
 //_____________________________________
@@ -57,7 +59,7 @@ int i;
 			return ;
 		}
 	
-	printf("Error \n");
+	printf("Error %s at line %d\n",scriptError,yylineno);
 	return ;
 }
 //______________________________
@@ -78,19 +80,38 @@ int yywrap(void)
 int Call( char *value)
 {
 char *command=strdup(value);
-int status;
+ASC_ERROR status;
+int	  ret=1;
 	
 	
 	status=ADS_execCommand(value,pushed,args);
-	if(!status)
+	if(status!=ASC_OK)
 	{
-		printf("Error on:\n");
+		ret=0;
+		switch(status)
+		{
+			case(ASC_UNKNOWN_FUNC):
+					sprintf(scriptError,"Unknown function");
+					break;
+			case(ASC_BAD_NUM_PARAM):
+					sprintf(scriptError,"Bad number of parameter");
+					break;
+			case(ASC_BAD_PARAM):
+					sprintf(scriptError,"Wrong parameter type");
+					break;
+			case(ASC_EXEC_FAILED):
+					sprintf(scriptError,"Execution failed");
+					break;
+			default:
+					sprintf(scriptError,"Unknown error");
+					break;
+		}
 		dumpStack(value,pushed,args);	
 	}
 	
 	CleanParam();
 	free(command);
-	return status;
+	return ret;
 }
 //______________________________
 void CleanParam(void)
@@ -136,7 +157,7 @@ char *alt;
 		case APM_QUOTED:
 		// Get rid of "" 
 			alt=strdup(value+1);			
-			alt[strlen(alt)-2]=0;			
+			alt[strlen(alt)-1]=0;			
 			myarg->type=APM_STRING;
 			myarg->arg.string=alt;			
 			break;

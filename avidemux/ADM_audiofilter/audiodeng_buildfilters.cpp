@@ -88,6 +88,29 @@ FILMCONV audioFilmConv=FILMCONV_NONE;
 //
 static AUDIOENCODER  activeAudioEncoder=  AUDIOENC_NONE;
 
+void audioFilterNormalize(uint8_t onoff)
+{
+	audioNormalizeMode=onoff;
+}
+void audioFilterDownsample(uint8_t onoff)
+{
+	if(onoff)
+		audioResampleMode=RESAMPLING_DOWNSAMPLING;
+	else
+		audioResampleMode=RESAMPLING_NONE;
+}
+void audioFilterResample(uint32_t onoff)
+{
+	if(onoff)
+	{
+		audioResampleMode=RESAMPLING_CUSTOM;
+		audioFreq=onoff;
+	}
+	else
+		audioResampleMode=RESAMPLING_NONE;
+
+} 
+//______________________________
 void audioFilter_SetBitrate( int i)
 {
 	audioMP3bitrate=i;

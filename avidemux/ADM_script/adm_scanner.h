@@ -13,6 +13,16 @@ typedef enum
 	APM_LAST
 
 }APM_TYPE;
+
+typedef enum
+{
+	ASC_OK,
+	ASC_UNKNOWN_FUNC,
+	ASC_BAD_NUM_PARAM,
+	ASC_BAD_PARAM,
+	ASC_EXEC_FAILED
+}ASC_ERROR;
+
 int PushParam(APM_TYPE, char *value);
 int Call(char *string);
 typedef union

@@ -20,6 +20,7 @@ EXTRA_DIST = main.cpp avi_vars.h avilist.cpp avilist.h callbacks.cpp callbacks.h
 avidemux2_LDADD   =  \
   ../adm_lavcodec/libavcodec.a \
   ../adm_lavcodec/libpostproc/libpostproc.a \
+  ./ADM_script/libADM_script.a \
 ./ADM_editor/libADM_editor.a \
 ./ADM_library/libADM_library.a \
 ./ADM_openDML/libADM_openDML.a \
@@ -43,8 +44,7 @@ avidemux2_LDADD   =  \
 ./ADM_toolkit/libADM_toolkit.a  \
 ./ADM_colorspace/libADM_colorspace.a \
 ../adm_lavcodec/libpostproc/libpostproc.a \
-./ADM_library/libADM_library.a \
-./ADM_script/libADM_script.a
+./ADM_library/libADM_library.a 
 
 
 INCLUDES= $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) -DADMLOCALE='"'$(ADM_LOCALEDIR)'"'

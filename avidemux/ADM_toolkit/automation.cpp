@@ -43,6 +43,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "ADM_filter/vidVCD.h"
+extern void ADS_commandList( void );
 extern uint8_t loadVideoCodecConf( char *name);
 extern void A_saveJpg (char *name);
 extern void filterLoadXml(char *n);
@@ -56,6 +57,7 @@ extern void GUI_loadMP3(char *name);
 extern void A_loadAC3(char *name);
 extern void A_loadWave(char *name);
 extern void GUI_Quiet( void);
+extern void parseScript(char *name);
 extern void GUI_Verbose( void);
 extern void audioFilter_SetBitrate( int i);
 extern void A_Save(char *name);
@@ -125,7 +127,9 @@ typedef struct AUTOMATON
 //_________________________________________________________________________
 
 AUTOMATON reaction_table[]=
-{
+{	
+		{"list",		0,"list functions available for scripting",(one_arg_type)ADS_commandList}, 
+		{"run",			1,"load and run a script",		parseScript},
 		{"audio-process",	0,"activate audio processing",		call_audioproc},
 		{"audio-normalize",	0,"activate normalization",		call_normalize},
 		{"audio-downsample",	0,"activate 48->44 downsampling",	call_downsample},
