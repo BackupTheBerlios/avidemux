@@ -163,7 +163,7 @@ have_altivec=no
 have_malloc=no
 have_darwin=no
 have_amd64=no
-have_sdl=yes;
+have_sdl=no;
 dnl _________________ malloc.h ___________________
 
 AC_CHECK_HEADERS(malloc.h,have_malloc_h=yes)
@@ -544,8 +544,8 @@ fi
 dnl __________________SDL______________
 
 AC_MSG_CHECKING(libSDL support)
-AC_PATH_PROG(SDL_CONFIG, sdl-config, no)
- if test "SDL_CONFIG" = "no" ; then
+AC_PATH_PROG(SDL_CONFIG, sdl-config, "no")
+ if test "$SDL_CONFIG" = "no" ; then
 	   	SDL_LIBS=""
     		SDL_CFLAGS=""
       		have_sdl=no
