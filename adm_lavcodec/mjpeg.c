@@ -659,11 +659,11 @@ static int encode_picture_lossless(AVCodecContext *avctx, unsigned char *buf, in
     mjpeg_picture_header(s);
 
     s->header_bits= put_bits_count(&s->pb);
-
+    
     if(avctx->pix_fmt == PIX_FMT_RGBA32){
         int x, y, i;
         const int linesize= p->linesize[0];
-        uint16_t buffer[2048][4];
+        uint16_t (*buffer)[4]= s->rd_scratchpad;
         int left[3], top[3], topleft[3];
 
         for(i=0; i<3; i++){
@@ -674,6 +674,11 @@ static int encode_picture_lossless(AVCodecContext *avctx, unsigned char *buf, in
             const int modified_predictor= y ? predictor : 1;
             uint8_t *ptr = p->data[0] + (linesize * y);
 
+            if(s->pb.buf_end - s->pb.buf - (put_bits_count(&s->pb)>>3) < width*3*4){
+                av_log(s->avctx, AV_LOG_ERROR, "encoded frame too large\n");
+                return -1;
+            }
+            
             for(i=0; i<3; i++){
                 top[i]= left[i]= topleft[i]= buffer[0][i];
             }
@@ -707,6 +712,10 @@ static int encode_picture_lossless(AVCodecContext *avctx, unsigned char *buf, in
         const int mb_height = (height + s->mjpeg_vsample[0] - 1) / s->mjpeg_vsample[0];
         
         for(mb_y = 0; mb_y < mb_height; mb_y++) {
+            if(s->pb.buf_end - s->pb.buf - (put_bits_count(&s->pb)>>3) < mb_width * 4 * 3 * s->mjpeg_hsample[0] * s->mjpeg_vsample[0]){
+                av_log(s->avctx, AV_LOG_ERROR, "encoded frame too large\n");
+                return -1;
+            }
             for(mb_x = 0; mb_x < mb_width; mb_x++) {
                 if(mb_x==0 || mb_y==0){
                     for(i=0;i<3;i++) {
@@ -827,7 +836,7 @@ typedef struct MJpegDecodeContext {
     int last_dc[MAX_COMPONENTS]; /* last DEQUANTIZED dc (XXX: am I right to do that ?) */
     AVFrame picture; /* picture structure */
     int linesize[MAX_COMPONENTS];                   ///< linesize << interlaced
-    uint8_t *qscale_table;
+    int8_t *qscale_table;
     DCTELEM block[64] __align8;
     ScanTable scantable;
     void (*idct_put)(uint8_t *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
@@ -837,12 +846,14 @@ typedef struct MJpegDecodeContext {
 
     int buggy_avid;
     int interlace_polarity;
+
+    int mjpb_skiptosod;
 } MJpegDecodeContext;
 
 static int mjpeg_decode_dht(MJpegDecodeContext *s);
 
 static int build_vlc(VLC *vlc, const uint8_t *bits_table, const uint8_t *val_table, 
-                      int nb_codes)
+                      int nb_codes, int use_static)
 {
     uint8_t huff_size[256];
     uint16_t huff_code[256];
@@ -850,7 +861,7 @@ static int build_vlc(VLC *vlc, const uint8_t *bits_table, const uint8_t *val_tab
     memset(huff_size, 0, sizeof(huff_size));
     build_huffman_codes(huff_size, huff_code, bits_table, val_table);
     
-    return init_vlc(vlc, 9, nb_codes, huff_size, 1, 1, huff_code, 2, 2);
+    return init_vlc(vlc, 9, nb_codes, huff_size, 1, 1, huff_code, 2, 2, use_static);
 }
 
 static int mjpeg_decode_init(AVCodecContext *avctx)
@@ -878,12 +889,12 @@ static int mjpeg_decode_init(AVCodecContext *avctx)
 	return -1;
     s->start_code = -1;
     s->first_picture = 1;
-    s->org_height = avctx->height;
+    s->org_height = avctx->coded_height;
     
-    build_vlc(&s->vlcs[0][0], bits_dc_luminance, val_dc_luminance, 12);
-    build_vlc(&s->vlcs[0][1], bits_dc_chrominance, val_dc_chrominance, 12);
-    build_vlc(&s->vlcs[1][0], bits_ac_luminance, val_ac_luminance, 251);
-    build_vlc(&s->vlcs[1][1], bits_ac_chrominance, val_ac_chrominance, 251);
+    build_vlc(&s->vlcs[0][0], bits_dc_luminance, val_dc_luminance, 12, 0);
+    build_vlc(&s->vlcs[0][1], bits_dc_chrominance, val_dc_chrominance, 12, 0);
+    build_vlc(&s->vlcs[1][0], bits_ac_luminance, val_ac_luminance, 251, 0);
+    build_vlc(&s->vlcs[1][1], bits_ac_chrominance, val_ac_chrominance, 251, 0);
 
     if (avctx->flags & CODEC_FLAG_EXTERN_HUFF)
     {
@@ -894,6 +905,69 @@ static int mjpeg_decode_init(AVCodecContext *avctx)
     }
 
     return 0;
+}
+
+
+/**
+ * finds the end of the current frame in the bitstream.
+ * @return the position of the first byte of the next frame, or -1
+ */
+static int find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_size){
+    int vop_found, i;
+    uint16_t state;
+    
+    vop_found= pc->frame_start_found;
+    state= pc->state;
+    
+    i=0;
+    if(!vop_found){
+        for(i=0; i<buf_size; i++){
+            state= (state<<8) | buf[i];
+            if(state == 0xFFD8){
+                i++;
+                vop_found=1;
+                break;
+            }
+        }
+    }
+
+    if(vop_found){
+        /* EOF considered as end of frame */
+        if (buf_size == 0)
+            return 0;
+        for(; i<buf_size; i++){
+            state= (state<<8) | buf[i];
+            if(state == 0xFFD8){
+                pc->frame_start_found=0;
+                pc->state=0; 
+                return i-1;
+            }
+        }
+    }
+    pc->frame_start_found= vop_found;
+    pc->state= state;
+    return END_NOT_FOUND;
+}
+
+static int jpeg_parse(AVCodecParserContext *s,
+                           AVCodecContext *avctx,
+                           uint8_t **poutbuf, int *poutbuf_size, 
+                           const uint8_t *buf, int buf_size)
+{
+    ParseContext *pc = s->priv_data;
+    int next;
+    
+    next= find_frame_end(pc, buf, buf_size);
+
+    if (ff_combine_frame(pc, next, (uint8_t **)&buf, &buf_size) < 0) {
+        *poutbuf = NULL;
+        *poutbuf_size = 0;
+        return buf_size;
+    }
+
+    *poutbuf = (uint8_t *)buf;
+    *poutbuf_size = buf_size;
+    return next;
 }
 
 /* quantize tables */
@@ -971,7 +1045,7 @@ static int mjpeg_decode_dht(MJpegDecodeContext *s)
         free_vlc(&s->vlcs[class][index]);
         dprintf("class=%d index=%d nb_codes=%d\n",
                class, index, code_max + 1);
-        if(build_vlc(&s->vlcs[class][index], bits_table, val_table, code_max + 1) < 0){
+        if(build_vlc(&s->vlcs[class][index], bits_table, val_table, code_max + 1, 0) < 0){
             return -1;
         }
     }
@@ -995,7 +1069,10 @@ static int mjpeg_decode_sof(MJpegDecodeContext *s)
     }
     height = get_bits(&s->gb, 16);
     width = get_bits(&s->gb, 16);
+    
     dprintf("sof0: picture: %dx%d\n", width, height);
+    if(avcodec_check_dimensions(s->avctx, width, height))
+        return -1;
 
     nb_components = get_bits(&s->gb, 8);
     if (nb_components <= 0 ||
@@ -1030,8 +1107,7 @@ static int mjpeg_decode_sof(MJpegDecodeContext *s)
             
         s->width = width;
         s->height = height;
-        s->avctx->width = s->width;
-        s->avctx->height = s->height;
+        avcodec_set_dimensions(s->avctx, width, height);
 
         /* test interlaced mode */
         if (s->first_picture &&
@@ -1164,10 +1240,13 @@ static int decode_block(MJpegDecodeContext *s, DCTELEM *block,
 
 static int ljpeg_decode_rgb_scan(MJpegDecodeContext *s, int predictor, int point_transform){
     int i, mb_x, mb_y;
-    uint16_t buffer[2048][4];
+    uint16_t buffer[32768][4];
     int left[3], top[3], topleft[3];
     const int linesize= s->linesize[0];
     const int mask= (1<<s->bits)-1;
+    
+    if((unsigned)s->mb_width > 32768) //dynamic alloc
+        return -1;
     
     for(i=0; i<3; i++){
         buffer[0][i]= 1 << (s->bits + point_transform - 1);
@@ -1338,8 +1417,8 @@ static int mjpeg_decode_scan(MJpegDecodeContext *s){
                     }
 //		    dprintf("mb: %d %d processed\n", mb_y, mb_x);
                     ptr = s->picture.data[c] + 
-                        (s->linesize[c] * (v * mb_y + y) * 8) + 
-                        (h * mb_x + x) * 8;
+                        (((s->linesize[c] * (v * mb_y + y) * 8) + 
+                        (h * mb_x + x) * 8) >> s->avctx->lowres);
                     if (s->interlaced && s->bottom_field)
                         ptr += s->linesize[c] >> 1;
 //av_log(NULL, AV_LOG_DEBUG, "%d %d %d %d %d %d %d %d \n", mb_x, mb_y, x, y, c, s->bottom_field, (v * mb_y + y) * 8, (h * mb_x + x) * 8);
@@ -1455,6 +1534,10 @@ static int mjpeg_decode_sos(MJpegDecodeContext *s)
     if(s->avctx->debug & FF_DEBUG_PICT_INFO)
         av_log(s->avctx, AV_LOG_DEBUG, "%s %s p:%d >>:%d\n", s->lossless ? "lossless" : "sequencial DCT", s->rgb ? "RGB" : "", predictor, point_transform);
     
+    /* mjpeg-b can have padding bytes between sos and image data, skip them */
+    for (i = s->mjpb_skiptosod; i > 0; i--)
+        skip_bits(&s->gb, 8);
+
     if(s->lossless){
             if(s->rgb){
                 if(ljpeg_decode_rgb_scan(s, predictor, point_transform) < 0)
@@ -1764,9 +1847,9 @@ static int mjpeg_decode_frame(AVCodecContext *avctx,
 			*(dst++) = x;
 			if (x == 0xff)
 			{
-			    while(*src == 0xff) src++;
+                            while(src<buf_end && x == 0xff)
+                                x = *(src++);
 
-			    x = *(src++);
 			    if (x >= 0xd0 && x <= 0xd7)
 				*(dst++) = x;
 			    else if (x)
@@ -1900,7 +1983,7 @@ static int mjpegb_decode_frame(AVCodecContext *avctx,
     AVFrame *picture = data;
     GetBitContext hgb; /* for the header */
     uint32_t dqt_offs, dht_offs, sof_offs, sos_offs, second_field_offs;
-    uint32_t field_size;
+    uint32_t field_size, sod_offs;
 
     /* no supplementary picture */
     if (buf_size == 0)
@@ -1912,6 +1995,7 @@ static int mjpegb_decode_frame(AVCodecContext *avctx,
 read_header:
     /* reset on every SOI */
     s->restart_interval = 0;
+    s->mjpb_skiptosod = 0;
 
     init_get_bits(&hgb, buf_ptr, /*buf_size*/(buf_end - buf_ptr)*8);
 
@@ -1961,15 +2045,16 @@ read_header:
 
     sos_offs = get_bits_long(&hgb, 32);
     dprintf("sos offs: 0x%x\n", sos_offs);
+    sod_offs = get_bits_long(&hgb, 32);
+    dprintf("sod offs: 0x%x\n", sod_offs);
     if (sos_offs)
     {
 //	init_get_bits(&s->gb, buf+sos_offs, (buf_end - (buf+sos_offs))*8);
 	init_get_bits(&s->gb, buf+sos_offs, field_size*8);
+	s->mjpb_skiptosod = (sod_offs - sos_offs - show_bits(&s->gb, 16));
 	s->start_code = SOS;
 	mjpeg_decode_sos(s);
     }
-
-    skip_bits(&hgb, 32); /* start of data offset */
 
     if (s->interlaced) {
         s->bottom_field ^= 1;
@@ -2041,10 +2126,10 @@ static int sp5x_decode_frame(AVCodecContext *avctx,
     j += sizeof(sp5x_data_dht);
 
     memcpy(recoded+j, &sp5x_data_sof[0], sizeof(sp5x_data_sof));
-    recoded[j+5] = (avctx->height >> 8) & 0xFF;
-    recoded[j+6] = avctx->height & 0xFF;
-    recoded[j+7] = (avctx->width >> 8) & 0xFF;
-    recoded[j+8] = avctx->width & 0xFF;
+    recoded[j+5] = (avctx->coded_height >> 8) & 0xFF;
+    recoded[j+6] = avctx->coded_height & 0xFF;
+    recoded[j+7] = (avctx->coded_width >> 8) & 0xFF;
+    recoded[j+8] = avctx->coded_width & 0xFF;
     j += sizeof(sp5x_data_sof);
 
     memcpy(recoded+j, &sp5x_data_sos[0], sizeof(sp5x_data_sos));
@@ -2068,8 +2153,8 @@ static int sp5x_decode_frame(AVCodecContext *avctx,
 #else
     /* SOF */
     s->bits = 8;
-    s->width = avctx->width;
-    s->height = avctx->height;
+    s->width  = avctx->coded_width;
+    s->height = avctx->coded_height;
     s->nb_components = 3;
     s->component_id[0] = 0;
     s->h_count[0] = 2;
@@ -2225,3 +2310,12 @@ AVCodec ljpeg_encoder = { //FIXME avoid MPV_* lossless jpeg shouldnt need them
     MPV_encode_end,
 };
 #endif
+
+AVCodecParser mjpeg_parser = {
+    { CODEC_ID_MJPEG },
+    sizeof(ParseContext),
+    NULL,
+    jpeg_parse,
+    ff_parse_close,
+};
+

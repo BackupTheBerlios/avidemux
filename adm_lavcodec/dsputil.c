@@ -446,6 +446,40 @@ static void put_pixels_clamped_c(const DCTELEM *block, uint8_t *restrict pixels,
     }
 }
 
+static void put_pixels_clamped4_c(const DCTELEM *block, uint8_t *restrict pixels,
+				 int line_size)
+{
+    int i;
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    
+    /* read the pixels */
+    for(i=0;i<4;i++) {
+        pixels[0] = cm[block[0]];
+        pixels[1] = cm[block[1]];
+        pixels[2] = cm[block[2]];
+        pixels[3] = cm[block[3]];
+
+        pixels += line_size;
+        block += 8;
+    }
+}
+
+static void put_pixels_clamped2_c(const DCTELEM *block, uint8_t *restrict pixels,
+				 int line_size)
+{
+    int i;
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    
+    /* read the pixels */
+    for(i=0;i<2;i++) {
+        pixels[0] = cm[block[0]];
+        pixels[1] = cm[block[1]];
+
+        pixels += line_size;
+        block += 8;
+    }
+}
+
 static void put_signed_pixels_clamped_c(const DCTELEM *block, 
                                         uint8_t *restrict pixels,
                                         int line_size)
@@ -483,6 +517,38 @@ static void add_pixels_clamped_c(const DCTELEM *block, uint8_t *restrict pixels,
         pixels[5] = cm[pixels[5] + block[5]];
         pixels[6] = cm[pixels[6] + block[6]];
         pixels[7] = cm[pixels[7] + block[7]];
+        pixels += line_size;
+        block += 8;
+    }
+}
+
+static void add_pixels_clamped4_c(const DCTELEM *block, uint8_t *restrict pixels,
+                          int line_size)
+{
+    int i;
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    
+    /* read the pixels */
+    for(i=0;i<4;i++) {
+        pixels[0] = cm[pixels[0] + block[0]];
+        pixels[1] = cm[pixels[1] + block[1]];
+        pixels[2] = cm[pixels[2] + block[2]];
+        pixels[3] = cm[pixels[3] + block[3]];
+        pixels += line_size;
+        block += 8;
+    }
+}
+
+static void add_pixels_clamped2_c(const DCTELEM *block, uint8_t *restrict pixels,
+                          int line_size)
+{
+    int i;
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+    
+    /* read the pixels */
+    for(i=0;i<2;i++) {
+        pixels[0] = cm[pixels[0] + block[0]];
+        pixels[1] = cm[pixels[1] + block[1]];
         pixels += line_size;
         block += 8;
     }
@@ -2145,7 +2211,6 @@ static void OPNAME ## h264_qpel16_hv_lowpass(uint8_t *dst, int16_t *tmp, uint8_t
     OPNAME ## h264_qpel8_hv_lowpass(dst  , tmp  , src  , dstStride, tmpStride, srcStride);\
     OPNAME ## h264_qpel8_hv_lowpass(dst+8, tmp+8, src+8, dstStride, tmpStride, srcStride);\
     src += 8*srcStride;\
-    tmp += 8*tmpStride;\
     dst += 8*dstStride;\
     OPNAME ## h264_qpel8_hv_lowpass(dst  , tmp  , src  , dstStride, tmpStride, srcStride);\
     OPNAME ## h264_qpel8_hv_lowpass(dst+8, tmp+8, src+8, dstStride, tmpStride, srcStride);\
@@ -2308,6 +2373,82 @@ H264_MC(avg_, 16)
 #undef op2_avg
 #undef op2_put
 #endif
+
+static inline uint8_t clip1(int x){
+    if(x > 255) return 255;
+    if(x < 0)   return 0;
+    return x;
+}
+#define op_scale1(x)  block[x] = clip1( (block[x]*weight + offset) >> log2_denom )
+#define op_scale2(x)  dst[x] = clip( (src[x]*weights + dst[x]*weightd + offset) >> (log2_denom+1), 0, 255 )
+#define H264_WEIGHT(W,H) \
+static void weight_h264_pixels ## W ## x ## H ## _c(uint8_t *block, int stride, int log2_denom, int weight, int offset){ \
+    int x, y; \
+    offset <<= log2_denom; \
+    if(log2_denom) offset += 1<<(log2_denom-1); \
+    for(y=0; y<H; y++, block += stride){ \
+        op_scale1(0); \
+        op_scale1(1); \
+        if(W==2) continue; \
+        op_scale1(2); \
+        op_scale1(3); \
+        if(W==4) continue; \
+        op_scale1(4); \
+        op_scale1(5); \
+        op_scale1(6); \
+        op_scale1(7); \
+        if(W==8) continue; \
+        op_scale1(8); \
+        op_scale1(9); \
+        op_scale1(10); \
+        op_scale1(11); \
+        op_scale1(12); \
+        op_scale1(13); \
+        op_scale1(14); \
+        op_scale1(15); \
+    } \
+} \
+static void biweight_h264_pixels ## W ## x ## H ## _c(uint8_t *dst, uint8_t *src, int stride, int log2_denom, int weightd, int weights, int offsetd, int offsets){ \
+    int x, y; \
+    int offset = (offsets + offsetd + 1) >> 1; \
+    offset = ((offset << 1) + 1) << log2_denom; \
+    for(y=0; y<H; y++, dst += stride, src += stride){ \
+        op_scale2(0); \
+        op_scale2(1); \
+        if(W==2) continue; \
+        op_scale2(2); \
+        op_scale2(3); \
+        if(W==4) continue; \
+        op_scale2(4); \
+        op_scale2(5); \
+        op_scale2(6); \
+        op_scale2(7); \
+        if(W==8) continue; \
+        op_scale2(8); \
+        op_scale2(9); \
+        op_scale2(10); \
+        op_scale2(11); \
+        op_scale2(12); \
+        op_scale2(13); \
+        op_scale2(14); \
+        op_scale2(15); \
+    } \
+}
+
+H264_WEIGHT(16,16)
+H264_WEIGHT(16,8)
+H264_WEIGHT(8,16)
+H264_WEIGHT(8,8)
+H264_WEIGHT(8,4)
+H264_WEIGHT(4,8)
+H264_WEIGHT(4,4)
+H264_WEIGHT(4,2)
+H264_WEIGHT(2,4)
+H264_WEIGHT(2,2)
+
+#undef op_scale1
+#undef op_scale2
+#undef H264_WEIGHT
 
 static void wmv2_mspel8_h_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h){
     uint8_t *cm = cropTbl + MAX_NEG_CROP;
@@ -2826,6 +2967,9 @@ void ff_set_cmp(DSPContext* c, me_cmp_func *cmp, int type){
         case FF_CMP_DCT:
             cmp[i]= c->dct_sad[i];
             break;
+        case FF_CMP_DCTMAX:
+            cmp[i]= c->dct_max[i];
+            break;
         case FF_CMP_PSNR:
             cmp[i]= c->quant_psnr[i];
             break;
@@ -3045,6 +3189,23 @@ static int dct_sad8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2
 
     for(i=0; i<64; i++)
         sum+= ABS(temp[i]);
+        
+    return sum;
+}
+
+static int dct_max8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
+    MpegEncContext * const s= (MpegEncContext *)c;
+    uint64_t __align8 aligned_temp[sizeof(DCTELEM)*64/8];
+    DCTELEM * const temp= (DCTELEM*)aligned_temp;
+    int sum=0, i;
+    
+    assert(h==8);
+
+    s->dsp.diff_pixels(temp, src1, src2, stride);
+    s->dsp.fdct(temp);
+
+    for(i=0; i<64; i++)
+        sum= FFMAX(sum, ABS(temp[i]));
         
     return sum;
 }
@@ -3278,6 +3439,7 @@ static int vsse16_c(/*MpegEncContext*/ void *c, uint8_t *s1, uint8_t *s2, int st
 WARPER8_16_SQ(hadamard8_diff8x8_c, hadamard8_diff16_c)
 WARPER8_16_SQ(hadamard8_intra8x8_c, hadamard8_intra16_c)
 WARPER8_16_SQ(dct_sad8x8_c, dct_sad16_c)
+WARPER8_16_SQ(dct_max8x8_c, dct_max16_c)
 WARPER8_16_SQ(quant_psnr8x8_c, quant_psnr16_c)
 WARPER8_16_SQ(rd8x8_c, rd16_c)
 WARPER8_16_SQ(bit8x8_c, bit16_c)
@@ -3293,6 +3455,41 @@ static void ff_jref_idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 {
     j_rev_dct (block);
     add_pixels_clamped_c(block, dest, line_size);
+}
+
+static void ff_jref_idct4_put(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    j_rev_dct4 (block);
+    put_pixels_clamped4_c(block, dest, line_size);
+}
+static void ff_jref_idct4_add(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    j_rev_dct4 (block);
+    add_pixels_clamped4_c(block, dest, line_size);
+}
+
+static void ff_jref_idct2_put(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    j_rev_dct2 (block);
+    put_pixels_clamped2_c(block, dest, line_size);
+}
+static void ff_jref_idct2_add(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    j_rev_dct2 (block);
+    add_pixels_clamped2_c(block, dest, line_size);
+}
+
+static void ff_jref_idct1_put(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+
+    dest[0] = cm[(block[0] + 4)>>3];
+}
+static void ff_jref_idct1_add(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;
+
+    dest[0] = cm[dest[0] + ((block[0] + 4)>>3)];
 }
 
 /* init static data */
@@ -3333,17 +3530,41 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     }
 #endif //CONFIG_ENCODERS
 
-    if(avctx->idct_algo==FF_IDCT_INT){
-        c->idct_put= ff_jref_idct_put;
-        c->idct_add= ff_jref_idct_add;
-        c->idct    = j_rev_dct;
-        c->idct_permutation_type= FF_LIBMPEG2_IDCT_PERM;
-    }else{ //accurate/default
-        c->idct_put= simple_idct_put;
-        c->idct_add= simple_idct_add;
-        c->idct    = simple_idct;
+    if(avctx->lowres==1){
+        if(avctx->idct_algo==FF_IDCT_INT || avctx->idct_algo==FF_IDCT_AUTO){
+            c->idct_put= ff_jref_idct4_put;
+            c->idct_add= ff_jref_idct4_add;
+        }else{
+            c->idct_put= ff_h264_lowres_idct_put_c;
+            c->idct_add= ff_h264_lowres_idct_add_c;
+        }
+        c->idct    = j_rev_dct4;
         c->idct_permutation_type= FF_NO_IDCT_PERM;
+    }else if(avctx->lowres==2){
+        c->idct_put= ff_jref_idct2_put;
+        c->idct_add= ff_jref_idct2_add;
+        c->idct    = j_rev_dct2;
+        c->idct_permutation_type= FF_NO_IDCT_PERM;
+    }else if(avctx->lowres==3){
+        c->idct_put= ff_jref_idct1_put;
+        c->idct_add= ff_jref_idct1_add;
+        c->idct    = j_rev_dct1;
+        c->idct_permutation_type= FF_NO_IDCT_PERM;
+    }else{
+        if(avctx->idct_algo==FF_IDCT_INT){
+            c->idct_put= ff_jref_idct_put;
+            c->idct_add= ff_jref_idct_add;
+            c->idct    = j_rev_dct;
+            c->idct_permutation_type= FF_LIBMPEG2_IDCT_PERM;
+        }else{ //accurate/default
+            c->idct_put= simple_idct_put;
+            c->idct_add= simple_idct_add;
+            c->idct    = simple_idct;
+            c->idct_permutation_type= FF_NO_IDCT_PERM;
+        }
     }
+
+    c->h264_idct_add= ff_h264_idct_add_c;
 
     /* VP3 DSP support */
     c->vp3_dsp_init = vp3_dsp_init_c;
@@ -3459,6 +3680,27 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->avg_h264_chroma_pixels_tab[1]= avg_h264_chroma_mc4_c;
     c->avg_h264_chroma_pixels_tab[2]= avg_h264_chroma_mc2_c;
 
+    c->weight_h264_pixels_tab[0]= weight_h264_pixels16x16_c;
+    c->weight_h264_pixels_tab[1]= weight_h264_pixels16x8_c;
+    c->weight_h264_pixels_tab[2]= weight_h264_pixels8x16_c;
+    c->weight_h264_pixels_tab[3]= weight_h264_pixels8x8_c;
+    c->weight_h264_pixels_tab[4]= weight_h264_pixels8x4_c;
+    c->weight_h264_pixels_tab[5]= weight_h264_pixels4x8_c;
+    c->weight_h264_pixels_tab[6]= weight_h264_pixels4x4_c;
+    c->weight_h264_pixels_tab[7]= weight_h264_pixels4x2_c;
+    c->weight_h264_pixels_tab[8]= weight_h264_pixels2x4_c;
+    c->weight_h264_pixels_tab[9]= weight_h264_pixels2x2_c;
+    c->biweight_h264_pixels_tab[0]= biweight_h264_pixels16x16_c;
+    c->biweight_h264_pixels_tab[1]= biweight_h264_pixels16x8_c;
+    c->biweight_h264_pixels_tab[2]= biweight_h264_pixels8x16_c;
+    c->biweight_h264_pixels_tab[3]= biweight_h264_pixels8x8_c;
+    c->biweight_h264_pixels_tab[4]= biweight_h264_pixels8x4_c;
+    c->biweight_h264_pixels_tab[5]= biweight_h264_pixels4x8_c;
+    c->biweight_h264_pixels_tab[6]= biweight_h264_pixels4x4_c;
+    c->biweight_h264_pixels_tab[7]= biweight_h264_pixels4x2_c;
+    c->biweight_h264_pixels_tab[8]= biweight_h264_pixels2x4_c;
+    c->biweight_h264_pixels_tab[9]= biweight_h264_pixels2x2_c;
+
     c->put_mspel_pixels_tab[0]= put_mspel8_mc00_c;
     c->put_mspel_pixels_tab[1]= put_mspel8_mc10_c;
     c->put_mspel_pixels_tab[2]= put_mspel8_mc20_c;
@@ -3475,6 +3717,7 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     SET_CMP_FUNC(hadamard8_diff)
     c->hadamard8_diff[4]= hadamard8_intra16_c;
     SET_CMP_FUNC(dct_sad)
+    SET_CMP_FUNC(dct_max)
     c->sad[0]= pix_abs16_c;
     c->sad[1]= pix_abs8_c;
     c->sse[0]= sse16_c;

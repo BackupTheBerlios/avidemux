@@ -2984,8 +2984,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             }
         }
 #endif //CONFIG_ENCODERS
-        //MEANX:if(avctx->lowres==0){
-        if(1){
+        if(avctx->lowres==0){
             if(idct_algo==FF_IDCT_AUTO || idct_algo==FF_IDCT_SIMPLEMMX){
                 c->idct_put= ff_simple_idct_put_mmx;
                 c->idct_add= ff_simple_idct_add_mmx;

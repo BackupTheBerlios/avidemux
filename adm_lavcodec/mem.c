@@ -16,13 +16,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
+#if 0 //MEANX 
 /**
  * @file mem.c
  * default memory allocator for libavcodec.
  */
  
-#if 0 //MEANX 
 #include "avcodec.h"
 
 /* here we can use OS dependant allocation functions */
@@ -46,9 +45,13 @@
 void *av_malloc(unsigned int size)
 {
     void *ptr;
+    int diff;
+
+    /* lets disallow possible ambiguous cases */
+    if(size > INT_MAX)
+        return NULL;
     
 #ifdef MEMALIGN_HACK
-    int diff;
     ptr = malloc(size+16+1);
     diff= ((-(int)ptr - 1)&15) + 1;
     ptr += diff;
@@ -94,9 +97,13 @@ void *av_malloc(unsigned int size)
  */
 void *av_realloc(void *ptr, unsigned int size)
 {
+    int diff;
+    /* lets disallow possible ambiguous cases */
+    if(size > INT_MAX)
+        return NULL;
+
 #ifdef MEMALIGN_HACK
     //FIXME this isnt aligned correctly though it probably isnt needed
-    int diff;
     if(!ptr) return av_malloc(size);
     diff= ((char*)ptr)[-1];
     return realloc(ptr - diff, size + diff) + diff;
@@ -116,5 +123,4 @@ void av_free(void *ptr)
         free(ptr);
 #endif
 }
-
-#endif //MEANX
+#endif // /MEANX

@@ -2093,6 +2093,9 @@ static void render_fragments(Vp3DecodeContext *s,
         upper_motion_limit = 7 * s->current_frame.linesize[2];
         lower_motion_limit = height * s->current_frame.linesize[2] + width - 8;
     }
+    
+    if((unsigned)stride > 2048)
+        return; //various tables are fixed size
 
     /* for each fragment row... */
     for (y = 0; y < height; y += 8) {
@@ -2420,27 +2423,27 @@ static int vp3_decode_init(AVCodecContext *avctx)
         /* DC histograms */
         init_vlc(&s->dc_vlc[i], 5, 32,
             &dc_bias[i][0][1], 4, 2,
-            &dc_bias[i][0][0], 4, 2);
+            &dc_bias[i][0][0], 4, 2, 0);
 
         /* group 1 AC histograms */
         init_vlc(&s->ac_vlc_1[i], 5, 32,
             &ac_bias_0[i][0][1], 4, 2,
-            &ac_bias_0[i][0][0], 4, 2);
+            &ac_bias_0[i][0][0], 4, 2, 0);
 
         /* group 2 AC histograms */
         init_vlc(&s->ac_vlc_2[i], 5, 32,
             &ac_bias_1[i][0][1], 4, 2,
-            &ac_bias_1[i][0][0], 4, 2);
+            &ac_bias_1[i][0][0], 4, 2, 0);
 
         /* group 3 AC histograms */
         init_vlc(&s->ac_vlc_3[i], 5, 32,
             &ac_bias_2[i][0][1], 4, 2,
-            &ac_bias_2[i][0][0], 4, 2);
+            &ac_bias_2[i][0][0], 4, 2, 0);
 
         /* group 4 AC histograms */
         init_vlc(&s->ac_vlc_4[i], 5, 32,
             &ac_bias_3[i][0][1], 4, 2,
-            &ac_bias_3[i][0][0], 4, 2);
+            &ac_bias_3[i][0][0], 4, 2, 0);
     }
 
     /* build quantization zigzag table */
@@ -2680,6 +2683,11 @@ static int theora_decode_header(AVCodecContext *avctx, GetBitContext gb)
 
     s->width = get_bits(&gb, 16) << 4;
     s->height = get_bits(&gb, 16) << 4;
+    
+    if(avcodec_check_dimensions(avctx, s->width, s->height)){
+        s->width= s->height= 0;
+        return -1;
+    }
     
     skip_bits(&gb, 24); /* frame width */
     skip_bits(&gb, 24); /* frame height */

@@ -41,7 +41,7 @@ vp3dsp_sse2.o:i386/vp3dsp_sse2.c
 	$(CC) -o $@ $< -c  $(CFLAGS) $(all_includes)   -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -msse
 
 libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) $(EXTEND_A64) ac3enc.c \
-		adpcm.c 	allcodecs.c 	avcodec.c 	common.c 	cyuv.c 	dsputil.c 	dv.c \
+		adpcm.c 	allcodecs.c 	cyuv.c 	dsputil.c 	dv.c \
 		error_resilience.c 	eval.c 	fdctref.c 	fft.c 	h263.c 	h263dec.c 	huffyuv.c 	imgconvert.c \
 		imgresample.c 	jfdctfst.c 	jfdctint.c 	jrevdct.c 	mace.c 	mdct.c 	mem.c 	mjpeg.c \
 		motion_est.c 	mpeg12.c 	mpegaudio.c 	mpegaudiodec.c 	mpegvideo.c 	msmpeg4.c 	opts.c \
@@ -50,7 +50,8 @@ libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) $(EXTEND_A64) ac3enc.c \
 		golomb.c 	4xm.c 	cabac.c 	asv1.c vcr1.c cljr.c 	faandct.c 	rational.c 	parser.c \
 		roqvideo.c 	xan.c 	rpza.c 	msrle.c 	msvideo1.c 	cinepak.c 	vqavideo.c \
 		idcinvideo.c 	smc.c 	flicvideo.c 	interplayvideo.c 	dpcm.c 	8bps.c vmdav.c \
-	truemotion1.c flac.c g726.c 	qtrle.c lcl.c 	snow.c integer.c 
+	truemotion1.c flac.c g726.c 	qtrle.c lcl.c 	snow.c integer.c \
+		rangecoder.c bitstream.c h264idct.c h261.c
 	
 
 EXTRA_DIST = 

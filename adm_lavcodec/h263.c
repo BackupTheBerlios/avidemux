@@ -91,6 +91,8 @@ static uint32_t uni_mpeg4_intra_rl_bits[64*64*2*2];
 static uint8_t  uni_mpeg4_intra_rl_len [64*64*2*2];
 static uint32_t uni_mpeg4_inter_rl_bits[64*64*2*2];
 static uint8_t  uni_mpeg4_inter_rl_len [64*64*2*2];
+static uint8_t  uni_h263_intra_aic_rl_len [64*64*2*2];
+static uint8_t  uni_h263_inter_rl_len [64*64*2*2];
 //#define UNI_MPEG4_ENC_INDEX(last,run,level) ((last)*128 + (run)*256 + (level))
 //#define UNI_MPEG4_ENC_INDEX(last,run,level) ((last)*128*64 + (run) + (level)*64)
 #define UNI_MPEG4_ENC_INDEX(last,run,level) ((last)*128*64 + (run)*128 + (level))
@@ -1876,6 +1878,50 @@ static void init_uni_mpeg4_rl_tab(RLTable *rl, uint32_t *bits_tab, uint8_t *len_
     }
 }
 
+static void init_uni_h263_rl_tab(RLTable *rl, uint32_t *bits_tab, uint8_t *len_tab){
+    int slevel, run, last;
+    
+    assert(MAX_LEVEL >= 64);
+    assert(MAX_RUN   >= 63);
+
+    for(slevel=-64; slevel<64; slevel++){
+        if(slevel==0) continue;
+        for(run=0; run<64; run++){
+            for(last=0; last<=1; last++){
+                const int index= UNI_MPEG4_ENC_INDEX(last, run, slevel+64);
+                int level= slevel < 0 ? -slevel : slevel;
+                int sign= slevel < 0 ? 1 : 0;
+                int bits, len, code;
+                int level1, run1;
+                
+                len_tab[index]= 100;
+                     
+                /* ESC0 */
+                code= get_rl_index(rl, last, run, level);
+                bits= rl->table_vlc[code][0];
+                len=  rl->table_vlc[code][1];
+                bits=bits*2+sign; len++;
+                
+                if(code!=rl->n && len < len_tab[index]){
+                    if(bits_tab) bits_tab[index]= bits;
+                    len_tab [index]= len;
+                }
+                /* ESC */
+                bits= rl->table_vlc[rl->n][0];
+                len = rl->table_vlc[rl->n][1];
+                bits=bits*2+last; len++;
+                bits=bits*64+run; len+=6;
+                bits=bits*256+(level&0xff); len+=8;
+                
+                if(len < len_tab[index]){
+                    if(bits_tab) bits_tab[index]= bits;
+                    len_tab [index]= len;
+                }
+            }
+        }
+    }
+}
+
 void h263_encode_init(MpegEncContext *s)
 {
     static int done = 0;
@@ -1885,17 +1931,28 @@ void h263_encode_init(MpegEncContext *s)
 
         init_uni_dc_tab();
 
-        init_rl(&rl_inter);
-        init_rl(&rl_intra);
-        init_rl(&rl_intra_aic);
+        init_rl(&rl_inter, 1);
+        init_rl(&rl_intra, 1);
+        init_rl(&rl_intra_aic, 1);
         
         init_uni_mpeg4_rl_tab(&rl_intra, uni_mpeg4_intra_rl_bits, uni_mpeg4_intra_rl_len);
         init_uni_mpeg4_rl_tab(&rl_inter, uni_mpeg4_inter_rl_bits, uni_mpeg4_inter_rl_len);
+
+        init_uni_h263_rl_tab(&rl_intra_aic, NULL, uni_h263_intra_aic_rl_len);
+        init_uni_h263_rl_tab(&rl_inter    , NULL, uni_h263_inter_rl_len);
 
         init_mv_penalty_and_fcode(s);
     }
     s->me.mv_penalty= mv_penalty; //FIXME exact table for msmpeg4 & h263p
     
+    s->intra_ac_vlc_length     =s->inter_ac_vlc_length     = uni_h263_inter_rl_len;
+    s->intra_ac_vlc_last_length=s->inter_ac_vlc_last_length= uni_h263_inter_rl_len + 128*64;
+    if(s->h263_aic){
+        s->intra_ac_vlc_length     = uni_h263_intra_aic_rl_len;
+        s->intra_ac_vlc_last_length= uni_h263_intra_aic_rl_len + 128*64;
+    }
+    s->ac_esc_length= 7+1+6+8;
+
     // use fcodes >1 only for mpeg4 & h263 & h263p FIXME
     switch(s->codec_id){
     case CODEC_ID_MPEG4:
@@ -2112,11 +2169,13 @@ void ff_set_mpeg4_time(MpegEncContext * s, int picture_number){
 
     if(s->pict_type==B_TYPE){
         s->pb_time= s->pp_time - (s->last_non_b_time - s->time);
+        assert(s->pb_time > 0 && s->pb_time < s->pp_time);
     }else{
         s->last_time_base= s->time_base;
         s->time_base= time_div;
         s->pp_time= s->time - s->last_non_b_time;
         s->last_non_b_time= s->time;
+        assert(s->pp_time > 0);
     }
 }
 
@@ -2226,14 +2285,10 @@ static void mpeg4_encode_vol_header(MpegEncContext * s, int vo_number, int vol_n
         put_bits(&s->pb, 8, s->avctx->sample_aspect_ratio.den);
     }
 
-    if(s->low_delay){
-        put_bits(&s->pb, 1, 1);		/* vol control parameters= yes */
-        put_bits(&s->pb, 2, 1);		/* chroma format YUV 420/YV12 */
-        put_bits(&s->pb, 1, s->low_delay);
-        put_bits(&s->pb, 1, 0);		/* vbv parameters= no */
-    }else{
-        put_bits(&s->pb, 1, 0);		/* vol control parameters= no */
-    }
+    put_bits(&s->pb, 1, 1);		/* vol control parameters= yes */
+    put_bits(&s->pb, 2, 1);		/* chroma format YUV 420/YV12 */
+    put_bits(&s->pb, 1, s->low_delay);
+    put_bits(&s->pb, 1, 0);		/* vbv parameters= no */
 
     put_bits(&s->pb, 2, RECT_SHAPE);	/* vol shape= rectangle */
     put_bits(&s->pb, 1, 1);		/* marker bit */
@@ -2742,13 +2797,17 @@ static VLC mb_type_b_vlc;
 static VLC h263_mbtype_b_vlc;
 static VLC cbpc_b_vlc;
 
-void init_vlc_rl(RLTable *rl)
+void init_vlc_rl(RLTable *rl, int use_static)
 {
     int i, q;
-    
+ 
+    /* Return if static table is already initialized */
+    if(use_static && rl->rl_vlc[0])
+        return;    
+
     init_vlc(&rl->vlc, 9, rl->n + 1, 
              &rl->table_vlc[0][1], 4, 2,
-             &rl->table_vlc[0][0], 4, 2);
+             &rl->table_vlc[0][0], 4, 2, use_static);
 
     
     for(q=0; q<32; q++){
@@ -2759,8 +2818,10 @@ void init_vlc_rl(RLTable *rl)
             qmul=1;
             qadd=0;
         }
-        
-        rl->rl_vlc[q]= av_malloc(rl->vlc.table_size*sizeof(RL_VLC_ELEM));
+        if(use_static)        
+            rl->rl_vlc[q]= av_mallocz_static(rl->vlc.table_size*sizeof(RL_VLC_ELEM));
+        else
+            rl->rl_vlc[q]= av_malloc(rl->vlc.table_size*sizeof(RL_VLC_ELEM));
         for(i=0; i<rl->vlc.table_size; i++){
             int code= rl->vlc.table[i][0];
             int len = rl->vlc.table[i][1];
@@ -2801,44 +2862,44 @@ void h263_decode_init_vlc(MpegEncContext *s)
 
         init_vlc(&intra_MCBPC_vlc, INTRA_MCBPC_VLC_BITS, 9, 
                  intra_MCBPC_bits, 1, 1,
-                 intra_MCBPC_code, 1, 1);
+                 intra_MCBPC_code, 1, 1, 1);
         init_vlc(&inter_MCBPC_vlc, INTER_MCBPC_VLC_BITS, 28, 
                  inter_MCBPC_bits, 1, 1,
-                 inter_MCBPC_code, 1, 1);
+                 inter_MCBPC_code, 1, 1, 1);
         init_vlc(&cbpy_vlc, CBPY_VLC_BITS, 16,
                  &cbpy_tab[0][1], 2, 1,
-                 &cbpy_tab[0][0], 2, 1);
+                 &cbpy_tab[0][0], 2, 1, 1);
         init_vlc(&mv_vlc, MV_VLC_BITS, 33,
                  &mvtab[0][1], 2, 1,
-                 &mvtab[0][0], 2, 1);
-        init_rl(&rl_inter);
-        init_rl(&rl_intra);
-        init_rl(&rvlc_rl_inter);
-        init_rl(&rvlc_rl_intra);
-        init_rl(&rl_intra_aic);
-        init_vlc_rl(&rl_inter);
-        init_vlc_rl(&rl_intra);
-        init_vlc_rl(&rvlc_rl_inter);
-        init_vlc_rl(&rvlc_rl_intra);
-        init_vlc_rl(&rl_intra_aic);
+                 &mvtab[0][0], 2, 1, 1);
+        init_rl(&rl_inter, 1);
+        init_rl(&rl_intra, 1);
+        init_rl(&rvlc_rl_inter, 1);
+        init_rl(&rvlc_rl_intra, 1);
+        init_rl(&rl_intra_aic, 1);
+        init_vlc_rl(&rl_inter, 1);
+        init_vlc_rl(&rl_intra, 1);
+        init_vlc_rl(&rvlc_rl_inter, 1);
+        init_vlc_rl(&rvlc_rl_intra, 1);
+        init_vlc_rl(&rl_intra_aic, 1);
         init_vlc(&dc_lum, DC_VLC_BITS, 10 /* 13 */,
                  &DCtab_lum[0][1], 2, 1,
-                 &DCtab_lum[0][0], 2, 1);
+                 &DCtab_lum[0][0], 2, 1, 1);
         init_vlc(&dc_chrom, DC_VLC_BITS, 10 /* 13 */,
                  &DCtab_chrom[0][1], 2, 1,
-                 &DCtab_chrom[0][0], 2, 1);
+                 &DCtab_chrom[0][0], 2, 1, 1);
         init_vlc(&sprite_trajectory, SPRITE_TRAJ_VLC_BITS, 15,
                  &sprite_trajectory_tab[0][1], 4, 2,
-                 &sprite_trajectory_tab[0][0], 4, 2);
+                 &sprite_trajectory_tab[0][0], 4, 2, 1);
         init_vlc(&mb_type_b_vlc, MB_TYPE_B_VLC_BITS, 4,
                  &mb_type_b_tab[0][1], 2, 1,
-                 &mb_type_b_tab[0][0], 2, 1);
+                 &mb_type_b_tab[0][0], 2, 1, 1);
         init_vlc(&h263_mbtype_b_vlc, H263_MBTYPE_B_VLC_BITS, 15,
                  &h263_mbtype_b_tab[0][1], 2, 1,
-                 &h263_mbtype_b_tab[0][0], 2, 1);
+                 &h263_mbtype_b_tab[0][0], 2, 1, 1);
         init_vlc(&cbpc_b_vlc, CBPC_B_VLC_BITS, 4,
                  &cbpc_b_tab[0][1], 2, 1,
-                 &cbpc_b_tab[0][0], 2, 1);
+                 &cbpc_b_tab[0][0], 2, 1, 1);
     }
 }
 
@@ -4519,7 +4580,7 @@ retry:
                 memset(block, 0, sizeof(DCTELEM)*64);
                 goto retry;
             }
-            av_log(s->avctx, AV_LOG_ERROR, "run overflow at %dx%d\n", s->mb_x, s->mb_y);
+            av_log(s->avctx, AV_LOG_ERROR, "run overflow at %dx%d i:%d\n", s->mb_x, s->mb_y, s->mb_intra);
             return -1;
         }
         j = scan_table[i];
@@ -5725,7 +5786,8 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
     
     /* vop coded */
     if (get_bits1(gb) != 1){
-        av_log(s->avctx, AV_LOG_ERROR, "vop not coded\n");
+        if(s->avctx->debug&FF_DEBUG_PICT_INFO)
+            av_log(s->avctx, AV_LOG_ERROR, "vop not coded\n");
         return FRAME_SKIPED;
     }
 //printf("time %d %d %d || %Ld %Ld %Ld\n", s->time_increment_bits, s->time_increment_resolution, s->time_base,
@@ -5861,6 +5923,13 @@ int ff_mpeg4_decode_picture_header(MpegEncContext * s, GetBitContext *gb)
 
     /* search next start code */
     align_get_bits(gb);
+
+    if(s->avctx->codec_tag == ff_get_fourcc("WV1F") && show_bits(gb, 24) == 0x575630){
+        skip_bits(gb, 24);
+        if(get_bits(gb, 8) == 0xF0)
+            return decode_vop_header(s, gb);
+    }
+
     startcode = 0xff;
     for(;;) {
         v = get_bits(gb, 8);
@@ -6046,7 +6115,7 @@ int flv_h263_decode_picture_header(MpegEncContext *s)
         width = height = 0;
         break;
     }
-    if ((width == 0) || (height == 0))
+    if(avcodec_check_dimensions(s->avctx, width, height))
         return -1;
     s->width = width;
     s->height = height;
@@ -6072,7 +6141,7 @@ int flv_h263_decode_picture_header(MpegEncContext *s)
 
     if(s->avctx->debug & FF_DEBUG_PICT_INFO){
         av_log(s->avctx, AV_LOG_DEBUG, "%c esc_type:%d, qp:%d num:%d\n",
-               av_get_pict_type_char(s->pict_type), s->h263_flv-1, s->qscale, s->picture_number);
+               s->dropable ? 'D' : av_get_pict_type_char(s->pict_type), s->h263_flv-1, s->qscale, s->picture_number);
     }
     
     s->y_dc_scale_table=

@@ -28,6 +28,7 @@
 #ifndef DSPUTIL_H
 #define DSPUTIL_H
 #include "math.h" //MEANX
+
 #include "common.h"
 #include "avcodec.h"
 
@@ -105,6 +106,8 @@ typedef void (*op_pixels_func)(uint8_t *block/*align width (8 or 16)*/, const ui
 typedef void (*tpel_mc_func)(uint8_t *block/*align width (8 or 16)*/, const uint8_t *pixels/*align 1*/, int line_size, int w, int h);
 typedef void (*qpel_mc_func)(uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);
 typedef void (*h264_chroma_mc_func)(uint8_t *dst/*align 8*/, uint8_t *src/*align 1*/, int srcStride, int h, int x, int y);
+typedef void (*h264_weight_func)(uint8_t *block, int stride, int log2_denom, int weight, int offset);
+typedef void (*h264_biweight_func)(uint8_t *dst, uint8_t *src, int stride, int log2_denom, int weightd, int weights, int offsetd, int offsets);
 
 #define DEF_OLD_QPEL(name)\
 void ff_put_        ## name (uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);\
@@ -172,12 +175,14 @@ typedef struct DSPContext {
     me_cmp_func nsse[5];
     me_cmp_func w53[5];
     me_cmp_func w97[5];
+    me_cmp_func dct_max[5];
 
     me_cmp_func me_pre_cmp[5];
     me_cmp_func me_cmp[5];
     me_cmp_func me_sub_cmp[5];
     me_cmp_func mb_cmp[5];
     me_cmp_func ildct_cmp[5]; //only width 16 used
+    me_cmp_func frame_skip_cmp[5]; //only width 8 used
 
     /**
      * Halfpel motion compensation with rounding (a+b+1)>>1.
@@ -255,6 +260,9 @@ typedef struct DSPContext {
 
     qpel_mc_func put_h264_qpel_pixels_tab[3][16];
     qpel_mc_func avg_h264_qpel_pixels_tab[3][16];
+    
+    h264_weight_func weight_h264_pixels_tab[10];
+    h264_biweight_func biweight_h264_pixels_tab[10];
     
     me_cmp_func pix_abs[2][4];
     
@@ -406,6 +414,7 @@ int mm_support(void);
 #define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
 #define MM_SSE    0x0008 /* SSE functions */
 #define MM_SSE2   0x0010 /* PIV SSE2 functions */
+#define MM_3DNOWEXT  0x0020 /* AMD 3DNowExt */
 
 extern int mm_flags;
 
@@ -415,8 +424,9 @@ void put_signed_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int li
 
 static inline void emms(void)
 {
-    //MEANX __asm __volatile ("emms;":::"memory");
-    __asm __volatile ("emms;");
+   //MEANX  __asm __volatile ("emms;":::"memory");
+      __asm __volatile ("emms;");
+
 }
 
 
@@ -427,6 +437,7 @@ static inline void emms(void)
 }
 
 #define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 
 void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx);
 void dsputil_init_pix_mmx(DSPContext* c, AVCodecContext *avctx);
@@ -436,6 +447,7 @@ void dsputil_init_pix_mmx(DSPContext* c, AVCodecContext *avctx);
 /* This is to use 4 bytes read to the IDCT pointers for some 'zero'
    line optimizations */
 #define __align8 __attribute__ ((aligned (4)))
+#define STRIDE_ALIGN 4
 
 void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx);
 
@@ -443,6 +455,7 @@ void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx);
 
 /* SPARC/VIS IDCT needs 8-byte aligned DCT blocks */
 #define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 
 void dsputil_init_mlib(DSPContext* c, AVCodecContext *avctx);
 
@@ -450,11 +463,13 @@ void dsputil_init_mlib(DSPContext* c, AVCodecContext *avctx);
 
 /* SPARC/VIS IDCT needs 8-byte aligned DCT blocks */
 #define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 void dsputil_init_vis(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(ARCH_ALPHA)
 
 #define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 
 void dsputil_init_alpha(DSPContext* c, AVCodecContext *avctx);
 
@@ -471,24 +486,28 @@ extern int mm_flags;
 #endif
 
 #define __align8 __attribute__ ((aligned (16)))
+#define STRIDE_ALIGN 16
 
 void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(HAVE_MMI)
 
 #define __align8 __attribute__ ((aligned (16)))
+#define STRIDE_ALIGN 16
 
 void dsputil_init_mmi(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(ARCH_SH4)
 
 #define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 
 void dsputil_init_sh4(DSPContext* c, AVCodecContext *avctx);
 
 #else
 
-#define __align8
+#define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 
 #endif
 

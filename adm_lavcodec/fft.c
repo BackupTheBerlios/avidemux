@@ -62,7 +62,7 @@ int ff_fft_init(FFTContext *s, int nbits, int inverse)
         int has_vectors = 0;
 
 #if defined(HAVE_MMX)
-        has_vectors = mm_support() & MM_SSE & 0 ; //MEANX : DISABLE
+        has_vectors = mm_support() & MM_SSE & 0; //MEANX: Crash on win32
 #endif
 #if defined(HAVE_ALTIVEC) && !defined(ALTIVEC_USE_REFERENCE_C_CODE)
         has_vectors = mm_support() & MM_ALTIVEC;

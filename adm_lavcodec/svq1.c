@@ -844,28 +844,28 @@ static int svq1_decode_init(AVCodecContext *avctx)
 
     init_vlc(&svq1_block_type, 2, 4,
         &svq1_block_type_vlc[0][1], 2, 1,
-        &svq1_block_type_vlc[0][0], 2, 1);
+        &svq1_block_type_vlc[0][0], 2, 1, 1);
 
     init_vlc(&svq1_motion_component, 7, 33,
         &mvtab[0][1], 2, 1,
-        &mvtab[0][0], 2, 1);
+        &mvtab[0][0], 2, 1, 1);
 
     for (i = 0; i < 6; i++) {
         init_vlc(&svq1_intra_multistage[i], 3, 8,
             &svq1_intra_multistage_vlc[i][0][1], 2, 1,
-            &svq1_intra_multistage_vlc[i][0][0], 2, 1);
+            &svq1_intra_multistage_vlc[i][0][0], 2, 1, 1);
         init_vlc(&svq1_inter_multistage[i], 3, 8,
             &svq1_inter_multistage_vlc[i][0][1], 2, 1,
-            &svq1_inter_multistage_vlc[i][0][0], 2, 1);
+            &svq1_inter_multistage_vlc[i][0][0], 2, 1, 1);
     }
 
     init_vlc(&svq1_intra_mean, 8, 256,
         &svq1_intra_mean_vlc[0][1], 4, 2,
-        &svq1_intra_mean_vlc[0][0], 4, 2);
+        &svq1_intra_mean_vlc[0][0], 4, 2, 1);
 
     init_vlc(&svq1_inter_mean, 9, 512,
         &svq1_inter_mean_vlc[0][1], 4, 2,
-        &svq1_inter_mean_vlc[0][0], 4, 2);
+        &svq1_inter_mean_vlc[0][0], 4, 2, 1);
 
     return 0;
 }
@@ -880,6 +880,8 @@ static int svq1_decode_end(AVCodecContext *avctx)
 
 static void svq1_write_header(SVQ1Context *s, int frame_type)
 {
+    int i;
+
     /* frame code */
     put_bits(&s->pb, 22, 0x20);
 
@@ -898,12 +900,22 @@ static void svq1_write_header(SVQ1Context *s, int frame_type)
         /* output 5 unknown bits (2 + 2 + 1) */
         put_bits(&s->pb, 5, 0);
 
-        /* forget about matching up resolutions, just use the free-form
-         * resolution code (7) for now */
-        put_bits(&s->pb, 3, 7);
-        put_bits(&s->pb, 12, s->frame_width);
-        put_bits(&s->pb, 12, s->frame_height);
-
+	for (i = 0; i < 7; i++)
+	{
+	    if ((svq1_frame_size_table[i].width == s->frame_width) &&
+		(svq1_frame_size_table[i].height == s->frame_height))
+	    {
+		put_bits(&s->pb, 3, i);
+		break;
+	    }
+	}
+	
+	if (i == 7)
+	{
+	    put_bits(&s->pb, 3, 7);
+    	    put_bits(&s->pb, 12, s->frame_width);
+    	    put_bits(&s->pb, 12, s->frame_height);
+	}
     }
 
     /* no checksum or extra data (next 2 bits get 0) */
@@ -1069,7 +1081,7 @@ static int encode_block(SVQ1Context *s, uint8_t *src, uint8_t *ref, uint8_t *dec
 
 #ifdef CONFIG_ENCODERS
 
-static void svq1_encode_plane(SVQ1Context *s, int plane, unsigned char *src_plane, unsigned char *ref_plane, unsigned char *decoded_plane,
+static int svq1_encode_plane(SVQ1Context *s, int plane, unsigned char *src_plane, unsigned char *ref_plane, unsigned char *decoded_plane,
     int width, int height, int src_stride, int stride)
 {
     int x, y;
@@ -1176,6 +1188,11 @@ static void svq1_encode_plane(SVQ1Context *s, int plane, unsigned char *src_plan
             uint8_t *ref= ref_plane + offset;
             int score[4]={0,0,0,0}, best;
             uint8_t temp[16*stride];
+            
+            if(s->pb.buf_end - s->pb.buf - (put_bits_count(&s->pb)>>3) < 3000){ //FIXME check size
+                av_log(s->avctx, AV_LOG_ERROR, "encoded frame too large\n");
+                return -1;
+            }
 
             s->m.mb_x= x;
             ff_init_block_index(&s->m);
@@ -1268,6 +1285,7 @@ static void svq1_encode_plane(SVQ1Context *s, int plane, unsigned char *src_plan
         }
         s->m.first_slice_line=0;
     }
+    return 0;
 }
 
 static int svq1_encode_init(AVCodecContext *avctx)
@@ -1287,6 +1305,7 @@ static int svq1_encode_init(AVCodecContext *avctx)
     s->c_block_height = (s->frame_height / 4 + 15) / 16;
 
     s->avctx= avctx;
+    s->m.avctx= avctx;
     s->m.me.scratchpad= av_mallocz((avctx->width+64)*2*16*2*sizeof(uint8_t)); 
     s->m.me.map       = av_mallocz(ME_MAP_SIZE*sizeof(uint32_t));
     s->m.me.score_map = av_mallocz(ME_MAP_SIZE*sizeof(uint32_t));
@@ -1328,10 +1347,11 @@ static int svq1_encode_frame(AVCodecContext *avctx, unsigned char *buf,
 
     svq1_write_header(s, p->pict_type);
     for(i=0; i<3; i++){
-        svq1_encode_plane(s, i,
+        if(svq1_encode_plane(s, i,
             s->picture.data[i], s->last_picture.data[i], s->current_picture.data[i],
             s->frame_width / (i?4:1), s->frame_height / (i?4:1), 
-            s->picture.linesize[i], s->current_picture.linesize[i]);
+            s->picture.linesize[i], s->current_picture.linesize[i]) < 0)
+                return -1;
     }
 
 //    align_put_bits(&s->pb);

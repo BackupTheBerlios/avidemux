@@ -95,7 +95,7 @@ static void destroy_handle(private_handle_t* handle)
     }
 }
 
-int avcodec(void* handle, avc_cmd_t cmd, void* pin, void* pout)
+int avcodec(void *handle, avc_cmd_t cmd, void* pin, void* pout)
 {
     AVCodecContext* ctx = handle;
     switch (cmd)
