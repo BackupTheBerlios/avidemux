@@ -104,7 +104,7 @@ rebranch:
 	    }
       }
     while (l++<maxLookUp-1);
-    printf("\n cannot detect MPEG frame...\n");
+    printf("\n cannot detect MPEG frame...(%d)\n",maxLookUp);
     return 0;
   contact:
   

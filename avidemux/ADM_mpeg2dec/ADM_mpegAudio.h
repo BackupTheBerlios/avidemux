@@ -28,17 +28,17 @@
    	protected:
  
        protected:
-					    ADM_mpegDemuxer		*demuxer;	
-					    uint32_t								_syncPoints;
-					    SYNC_								*_sync;
-					    uint8_t 								getAudioSpec(void);
-				     	uint8_t 								getAC3AudioSpec(void);
+		ADM_mpegDemuxer		*demuxer;	
+		uint32_t		_syncPoints;
+		SYNC_			*_sync;
+		uint8_t 		getAudioSpec(void);
+		uint8_t 		getAC3AudioSpec(void);
 				
 		public:
-					AVDMMpeg2decAudioStream( char *name,uint32_t nbsync );
-					virtual 						~AVDMMpeg2decAudioStream() ;          		
-					virtual uint8_t 			goTo(uint32_t offset);
-					virtual uint32_t 			read(uint32_t size,uint8_t *ptr);
+				AVDMMpeg2decAudioStream( char *name,uint32_t nbsync );
+	virtual 		~AVDMMpeg2decAudioStream() ;          		
+	virtual uint8_t 	goTo(uint32_t offset);
+	virtual uint32_t 	read(uint32_t size,uint8_t *ptr);
 
 }
 ;

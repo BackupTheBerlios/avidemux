@@ -37,6 +37,7 @@
 #include "ADM_library/fourcc.h"
 #include "ADM_mpeg2dec/ADM_mpegscan.h"
 #include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
+#include "ADM_mpeg2dec/ADM_mpegpacket_TS.h"
 #include "ADM_mpeg2dec/ADM_mpegAudio.h"
 #include "ADM_toolkit/toolkit.hxx"
 
@@ -60,14 +61,12 @@ AVDMMpeg2decAudioStream::~AVDMMpeg2decAudioStream()
 }					
 AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 {
-	 	FILE *file;
-	  		
-		int type,id;
+	 	FILE *file;	
+		int type=0,id;
+		uint8_t ctype=0;
 		uint64_t abs;
 		uint32_t dummy;//,audio=0;
-		//uint32_t nbIframe=0;
-	  	
-	  char string[1025]; //,str[1024];;
+		char string[1025]; //,str[1024];;
 	
 		_sync= NULL;
 		_wavheader=NULL;
@@ -80,24 +79,27 @@ AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 				assert(0);
 			}
 		
-		 fgets(string,1023,file);   	// File header
-	   sscanf(string,"IDXM %c %x",(char*)&type,&id);
-//	   printf("%s --> type %c %x\n",string,type,id);
-	   // makes gdb crash ???
-	   // not an elementary stream nor program stream -> WTF
-	   /*
-	   if((type!=(int)'P' ) )
-	   	{
-			printf(" OOppps Type is %c should be %c !!!!!!\n",type,'P');
-			fclose(file);
-				assert(0);
-		}  */
-		
-	  fgets(string,1023,file);   	// # of  frames	 		
+		fgets(string,1023,file);   	// File header
+		sscanf(string,"IDXM %c %x",(char*)&ctype,&id);
+		type=ctype;
+		fgets(string,1023,file);   	// # of  frames	 		
 		fgets(string,1023,file);   	// nb file
 		fgets(string,1023,file);   	// File header
 		string[strlen(string)-1]=0; // remove CR
-		demuxer=new ADM_mpegDemuxerProgramStream(id,0xe0); // we take the 0xc0 streamid->audio		
+		switch(type)
+		{
+		case 'P':	demuxer=new ADM_mpegDemuxerProgramStream(id,0xe0); 
+				// we take the 0xc0 streamid->audio
+				break;
+		case 'T':
+				demuxer=new ADM_mpegDemuxerTransportStream(0xbd,0xe0); 
+				// we take the 0xc0 streamid->audio
+				break;
+		default:
+				assert(0);
+		}
+		
+						
 		if(!demuxer->open(string))
 		{
 				printf("\n cannot open mpeg >%s<\n",string);
@@ -123,20 +125,21 @@ AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 			     fgets(string,1023,file);     
 			     if(string[0]=='I')
 		        {
-						  if(5!=sscanf(string,"%c %llX %llX %lX %lu",
-														  &t,	 	&of, &abs,&dummy,   	&sz))
-														  {
-																	printf("\n not enought infos : %s", string);
-															}
+				if(5!=sscanf(string,"%c %llX %llX %lX %lu",
+					&t,&of, &abs,&dummy,&sz))
+				  {
+					printf("\n not enought infos : %s", string);
+				}
 
-							_sync[y].absolute=abs;
-							_sync[y].relative=dummy;
-							//printf(" %llX %llX\n", _sync[y].absolute,_sync[y].relative);
-							y++;																	
-					 }
+				_sync[y].absolute=abs;
+				_sync[y].relative=dummy;
+				//printf(" %llX %llX\n", _sync[y].absolute,_sync[y].relative);
+				y++;	
+			 }
 
-			}    
-			fclose(file);  
+		}    
+		
+		fclose(file);  
 			
 			// now fill in the header
 			_length=_sync[nb_sync-1].relative;

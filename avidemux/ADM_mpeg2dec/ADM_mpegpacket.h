@@ -91,6 +91,7 @@ class ADM_mpegDemuxer
 		virtual	uint64_t	getAbsPos( void)=0;
             
 		virtual uint8_t		_asyncJump(uint64_t relative,uint64_t absolute)=0;
+		virtual uint8_t		_asyncJump2(uint64_t relative,uint64_t absolute)=0;
 		virtual uint32_t	getOtherSize(void)=0;  
 		virtual	uint64_t	getSize( void);
 		virtual void 		dump( void ) {};
@@ -119,6 +120,8 @@ class ADM_mpegDemuxerElementaryStream : public   ADM_mpegDemuxer
 	          
             	virtual	uint64_t		getAbsPos( void);
             	virtual uint8_t			_asyncJump(uint64_t relative,uint64_t absolute);
+		virtual uint8_t			_asyncJump2(uint64_t relative,uint64_t absolute)
+							 { assert(0);return 0;};
              	virtual uint32_t		getOtherSize(void) { return 0;}; 
 	      	virtual uint8_t			read8i(void);
 	      	virtual uint16_t		read16i(void);

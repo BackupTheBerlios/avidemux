@@ -14,6 +14,8 @@
 class ADM_mpegDemuxerTransportStream : public   ADM_mpegDemuxer
 {
 	  private : 
+	  		
+	  		int32_t		_pesLen,_pesRead;
 	  		uint64_t 	_firstPacketOffset;
 	            	uint64_t 	_packetOffset;
 	              	uint64_t 	_packetLen;
@@ -33,7 +35,7 @@ class ADM_mpegDemuxerTransportStream : public   ADM_mpegDemuxer
 	                 mParser 	*parser;           
 			uint8_t		_nextPacket(void);	
 			uint32_t  	_skipPacketHeader( uint8_t sid,uint8_t *subid,
-							uint32_t *pts,uint8_t start, uint8_t len );
+							uint32_t *pts,uint8_t start, uint8_t len,uint32_t *end );
 			uint32_t  	_firstPTS;
 			uint32_t  	_otherPTS;
     
@@ -49,8 +51,8 @@ class ADM_mpegDemuxerTransportStream : public   ADM_mpegDemuxer
            
 		virtual	uint64_t	getAbsPos( void);
 		virtual uint8_t		_asyncJump(uint64_t relative,uint64_t absolute);;		
-             
-		virtual uint32_t	getOtherSize(void) {return 0;};  
+		virtual uint8_t		_asyncJump2(uint64_t relative,uint64_t absolute);
+		virtual uint32_t	getOtherSize(void) {return _otherLen;};  
 		virtual void 		dump( void ) ;
 		virtual int32_t 	getPTSDelta( void ) ;
 };

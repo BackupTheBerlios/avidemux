@@ -180,6 +180,10 @@ yv12_instance_t *inst;
 uint8_t 	decoderMpeg::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag)
 {
 		if(flag) *flag=0;
+#if defined( REMOVE_PADDING)
+		while(*(in+len-1)==0) len--;
+#endif		
+		
 		feedData(len,in);
 
 	const mpeg2_info_t  *info ;
