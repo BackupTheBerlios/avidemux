@@ -407,6 +407,46 @@ static inline void emms(void)
 void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx);
 void dsputil_init_pix_mmx(DSPContext* c, AVCodecContext *avctx);
 
+#elif defined(HAVE_X86_64) //____________________________________________________________________
+
+#undef emms_c
+
+#if 0
+#define MM_MMX    0x0001 /* standard MMX */
+#define MM_3DNOW  0x0004 /* AMD 3DNOW */
+#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
+#define MM_SSE    0x0008 /* SSE functions */
+#define MM_SSE2   0x0010 /* PIV SSE2 functions */
+
+extern int mm_flags;
+#endif
+void add_pixels_clamped_a64_mmx(const DCTELEM *block, uint8_t *pixels,   int line_size);
+void put_pixels_clamped_a64_mmx(const DCTELEM *block, uint8_t *pixels,   int line_size);
+void ff_simple_idct_put_a64_mmx(uint8_t *dest, int line_size, DCTELEM *block);
+void ff_simple_idct_add_a64_mmx(uint8_t *dest, int line_size, DCTELEM *block);
+void ff_simple_idct_a64_mmx(int16_t *block);
+void ff_fdct_a64_mmx(DCTELEM *block);
+void ff_fdct_a64_mmx2(DCTELEM *block);
+void ff_fdct_a64_sse2(DCTELEM *block);
+
+
+static inline void emms(void)
+{
+    __asm __volatile ("emms;":::"memory");
+}
+
+
+#define emms_c() \
+{\
+        emms();\
+}
+
+#define __align8 __attribute__ ((aligned (8)))
+
+void dsputil_init_a64(DSPContext* c, AVCodecContext *avctx);
+void dsputil_init_pix_a64(DSPContext* c, AVCodecContext *avctx);
+
+
 #elif defined(ARCH_ARMV4L)
 
 /* This is to use 4 bytes read to the IDCT pointers for some 'zero'

@@ -3280,6 +3280,9 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 #ifdef HAVE_MMX
     dsputil_init_mmx(c, avctx);
 #endif
+#ifdef HAVE_X86_64
+    dsputil_init_a64(c, avctx);
+#endif
 #ifdef ARCH_ARMV4L
     dsputil_init_armv4l(c, avctx);
 #endif

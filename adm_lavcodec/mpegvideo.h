@@ -718,6 +718,9 @@ int MPV_encode_picture(AVCodecContext *avctx, unsigned char *buf, int buf_size, 
 #ifdef HAVE_MMX
 void MPV_common_init_mmx(MpegEncContext *s);
 #endif
+#ifdef HAVE_X86_64
+void MPV_common_init_a64(MpegEncContext *s);
+#endif
 #ifdef ARCH_ALPHA
 void MPV_common_init_axp(MpegEncContext *s);
 #endif

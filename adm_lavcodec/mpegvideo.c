@@ -229,6 +229,9 @@ int DCT_common_init(MpegEncContext *s)
 #ifdef HAVE_MMX
     MPV_common_init_mmx(s);
 #endif
+#ifdef HAVE_X86_64
+    MPV_common_init_a64(s);
+#endif
 #ifdef ARCH_ALPHA
     MPV_common_init_axp(s);
 #endif

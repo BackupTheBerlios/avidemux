@@ -34,8 +34,12 @@ ifeq ($(TARGET_MMX),yes)
 OBJS += i386/fdct_mmx.o i386/cputest.o \
 	i386/dsputil_mmx.o i386/mpegvideo_mmx.o \
 	i386/idct_mmx.o i386/motion_est_mmx.o \
-	i386/simple_idct_mmx.o \
-	i386/fft_sse.o
+	i386/simple_idct_mmx.o 
+ifeq ($(TARGET_BUILTIN_VECTOR),yes)	
+	OBJS+=i386/fft_sse.o
+	CFLAGS+=-msse
+endif
+
 endif
 ifeq ($(TARGET_PPC),yes)
 OBJS += \
@@ -55,6 +59,15 @@ CFLAGS+=-maltivec -mabi=altivec	 -faltivec
 endif
 ifeq ($(TARGET_DARWIN),yes)
        CFLAGS+=-force_cpusubtype_ALL
+endif
+ifeq ($(TARGET_X86_64),yes)
+       OBJS += \
+	x86_64/idct_a64.o \
+	x86_64/dsputil_a64.o \
+	x86_64/simple_idct_a64.o \
+	x86_64/fdct_a64.o \
+	x86_64/motion_est_a64.o 	 \
+	x86_64/mpegvideo_a64.o 	
 endif
 
 
