@@ -78,6 +78,27 @@ uint32_t zero4=0;
 	_pageNumber++;		
 	return 1;
 }
+//___________ Write comment___________
+uint8_t ogm_page::writeDirect(uint32_t size, uint8_t *data)
+{
+uint32_t chunk;
+	
+	#define COM_OFFSET 0	
+	memcpy(_page+COM_OFFSET,data,size);
+	size+COM_OFFSET;
+	_current_lacing=0;
+	_current_off=size;
+	while(size>0)
+	{
+		chunk=min(size,255);
+		size-=chunk;
+		push(chunk,size);
+	}	
+	_first=1;
+	flush();
+	return 1;
+}
+//________________________________________________________
 //_________________________________________________________
 uint8_t ogm_page::write(uint32_t size, uint8_t *data,uint32_t flags,uint64_t timestamp)
 {
@@ -128,6 +149,25 @@ uint32_t chunk;
 	}
 	// Last one was a 0xff ?
 	
+	return 1;
+}
+// Write raw packet provided by vorbis encoder
+// Don"t try to double guess , just rebuild our own packet and write it
+uint8_t ogm_page::writeRawData(uint32_t size, uint8_t *data,uint64_t samples)
+{
+uint32_t chunk;
+	_sequence++;	
+	 _fresh=1;
+	 _timestamp=samples;	
+	while(size)
+	{
+		chunk=min(255,size);
+		memcpy(_page+_current_off,data,chunk);
+		_current_off+=chunk;
+		data+=chunk;
+		size-=chunk;
+		push(chunk,size);		
+	}
 	return 1;
 }
 // We assume that the headers fit in one page (64 k)
@@ -246,6 +286,7 @@ uint8_t *data;
 	
 	if(!_fresh) _header.header_type=1;
 	if(_first)  _header.header_type=OG_FIRST_PAGE;
+	
 	
 	//	
 	memcpy(_header.abs_pos,&_timestamp,8);

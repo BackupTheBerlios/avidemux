@@ -141,6 +141,39 @@ WAVHeader	*info=NULL;
 		
 		header.default_len=1;
 		
+		if(audioFilter->getInfo()->encoding==WAV_OGG)
+		{
+			uint32_t exlen;
+			uint8_t  *exdata;
+			audioFilter->extraData(&exlen,&exdata);
+			uint32_t *p;
+			p=(uint32_t *)exdata;
+			
+			if(!exlen || !exdata)
+			{
+				delete audioFilter;
+				audioFilter=NULL;
+				delete audioStream;
+				audioStream=NULL;
+				printf("Vorbis audio setup failed\n");
+				return 0;
+			}
+			
+			exdata+=3*sizeof(uint32_t);
+			
+			audioStream->writeDirect(p[0],exdata); // Header
+			
+			exdata+=p[0];
+			audioStream->writeDirect(p[1],exdata); // Comment
+			
+			exdata+=p[1];
+			audioStream->writeDirect(p[2],exdata); // Codebook
+			_audioTarget=_audioCurrent=0;
+			return 1;	
+		
+		}
+		
+		
 		audioStream->writeHeaders(sizeof(header),(uint8_t *)&header); // +4 ?
 		_audioTarget=_audioCurrent=0;
 		
@@ -157,6 +190,9 @@ double tgt;
 uint32_t len,packetLen,packets=0;
 uint32_t totalsample=0;
 uint32_t lastPacket;
+uint32_t header_offset;
+
+
 	if(!audioStream) return 1; // nothing to do
 	if(!audioFilter) return 1;
 		
@@ -168,27 +204,37 @@ uint32_t lastPacket;
 	
 	len=0;
 	sample=0;
+	
+	if(_audioTarget<_audioCurrent)
+	{
+		aprintf("OgWr: Enough audio in the tank..\n");
+		return 1;
+	}	
 	// _audioTarget is the # of sample we want
+	// Here we are handling MP3 or AC3
+	if(audioFilter->getInfo()->encoding==WAV_OGG) header_offset=0;
+		else	header_offset=1;
+		
 	while(_audioCurrent<_audioTarget)
 	{
-		if(!audioFilter->getPacket(_audioBuffer+len,&packetLen,&sample))
+		_audioBuffer[0]=0;
+		if(!audioFilter->getPacket(_audioBuffer+header_offset,&packetLen,&sample))
 		{
 			printf("OGMWR:Could not read packet\n");
 			break;
 		}
-		len+=packetLen;
+		
 		_audioCurrent+=sample;
-		totalsample+=sample;
+		totalsample+=sample;		
+		audioStream->writeRawData(packetLen+header_offset,_audioBuffer,_audioCurrent);
 		packets++;
+		len+=packetLen;
 	}
-	lastPacket=_audioCurrent-sample;
-	if(len)
+	if(totalsample)
 	{
+		audioStream->flush();
 		aprintf("OGMW: Found %lu packet sample :%lu len=%lu, curoffset:%lu targetoffset=%lu\n",
 			packets,totalsample,len,_audioCurrent,_audioTarget);
-			
-		audioStream->write(len,_audioBuffer,AVI_KEY_FRAME,(uint64_t)(_audioCurrent));
-	
 	}	
 	return 1;
 }

@@ -28,11 +28,16 @@ protected:
          uint32_t 	grab(uint8_t *obuffer);
 	 void  		*_handle;
 	 uint8_t	dropBuffer[SIZE_INTERNAL];
+	 uint64_t	_oldpos;
+	 uint32_t	_extraLen;
+	 uint8_t	*_extraData;
+	 
 public:
 			uint8_t	init( uint32_t bitrate);		
 		virtual ~AVDMProcessAudio_Vorbis();				
 			AVDMProcessAudio_Vorbis(AVDMGenericAudioStream *instream);	
      		virtual uint8_t	getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);		
+		virtual uint8_t	extraData(uint32_t *l,uint8_t **d);
 };
 
 #endif

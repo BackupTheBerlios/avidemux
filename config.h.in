@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+/* MPEG2DEC */
+#undef ACCEL_DETECT
+
 /* Big endian cpu sparc or powerpc */
 #undef ADM_BIG_ENDIAN
 
@@ -12,6 +15,9 @@
 /* Sparc workstations */
 #undef ADM_SPARC
 
+/* "Alsa is 1.0" */
+#undef ALSA_1_0_SUPPORT
+
 /* "Use alsa as possible audio device" */
 #undef ALSA_SUPPORT
 
@@ -23,6 +29,9 @@
 
 /* post proc */
 #undef ARCH_X86
+
+/* Say to ffmpeg we are using darwin macOsX */
+#undef CONFIG_DARWIN
 
 /* FFMPEG */
 #undef CONFIG_DECODERS
@@ -39,7 +48,10 @@
 /* FFMPEG */
 #undef CONFIG_X86
 
-/* BSD needs that */
+/* "Name mangling" */
+#undef CYG_MANGLING
+
+/* roundup function */
 #undef EMULATE_FAST_INT
 
 /* Define to 1 if translation of program messages to the user's native
@@ -77,6 +89,15 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* Define to 1 if you have the <faacfg.h> header file. */
+#undef HAVE_FAACFG_H
+
+/* Define to 1 if you have the <faac.h> header file. */
+#undef HAVE_FAAC_H
+
+/* Define to 1 if you have the <faad.h> header file. */
+#undef HAVE_FAAD_H
+
 /* Define to 1 if you have the <ft2build.h> header file. */
 #undef HAVE_FT2BUILD_H
 
@@ -98,17 +119,23 @@
 /* Define to 1 if you have the `asound' library (-lasound). */
 #undef HAVE_LIBASOUND
 
+/* Define to 1 if you have the `faac' library (-lfaac). */
+#undef HAVE_LIBFAAC
+
+/* Define to 1 if you have the `faad' library (-lfaad). */
+#undef HAVE_LIBFAAD
+
 /* Define to 1 if you have the `mad' library (-lmad). */
 #undef HAVE_LIBMAD
 
 /* Define to 1 if you have the `mp3lame' library (-lmp3lame). */
 #undef HAVE_LIBMP3LAME
 
-/* Define to 1 if you have the `pthread' library (-lpthread). */
-#undef HAVE_LIBPTHREAD
-
 /* Define to 1 if you have the `vorbis' library (-lvorbis). */
 #undef HAVE_LIBVORBIS
+
+/* Define to 1 if you have the `vorbisenc' library (-lvorbisenc). */
+#undef HAVE_LIBVORBISENC
 
 /* "Use libxml2 to load/save .avidemuxrc" */
 #undef HAVE_LIBXML2
@@ -128,8 +155,11 @@
 /* Define to 1 if you have the <mad.h> header file. */
 #undef HAVE_MAD_H
 
-/* all but BSD have this */
-#undef HAVE_MEMALIGN
+/* have malloc.h */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if you have the <malloc/malloc.h> header file. */
+#undef HAVE_MALLOC_MALLOC_H
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -158,9 +188,6 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
-/* C++ compiler supports template repository */
-#undef HAVE_TEMPLATE_REPOSITORY
-
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
@@ -173,8 +200,14 @@
 /* "Use X86 CPU for mpeg2enc" */
 #undef HAVE_X86CPU
 
-/* Prototyping and stuff */
+/* "X86_64 amd64 assembly" */
+#undef HAVE_X86_64
+
+/* Stricter prototyping */
 #undef ICONV_NEED_CONST
+
+/* "sse on cywin" */
+#undef MEMALIGN_HACK
 
 /* OSS detected */
 #undef OSS_SUPPORT
@@ -197,6 +230,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* "Let ffmpeg decide which is faster" */
+#undef RUNTIME_CPUDETECT
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
@@ -205,6 +241,12 @@
 
 /* "Arts" */
 #undef USE_ARTS
+
+/* "Use faac audio enccoder" */
+#undef USE_FAAC
+
+/* "Use faad audio decoder" */
+#undef USE_FAAD
 
 /* FFMPEG */
 #undef USE_FFMPEG
@@ -224,8 +266,14 @@
 /* libmad */
 #undef USE_MP3
 
+/* Use SDL */
+#undef USE_SDL
+
 /* Vorbis audio codec */
 #undef USE_VORBIS
+
+/* Try to use Xv extension */
+#undef USE_XV
 
 /* use xvid api 1.0 beta */
 #undef USE_XVID_4
@@ -239,8 +287,17 @@
 /* Big endian cpu sparc or powerpc */
 #undef WORDS_BIGENDIAN
 
-/* BSD have rintf */
-#undef lrintf
+/* "" */
+#undef fseeko
+
+/* "" */
+#undef ftello
+
+/* "rindex does not exist on cygwin" */
+#undef index
 
 /* roundup function */
 #undef restrict
+
+/* "rindex does not exist on cygwin" */
+#undef rindex

@@ -365,6 +365,11 @@ void call_audiocodec(char *p)
 		audioCodecSetcodec( AUDIOENC_NONE );
 	else if(!strcmp(p,"TOOLAME"))
 		audioCodecSetcodec( AUDIOENC_2LAME );		
+#ifdef USE_VORBIS		
+	else if(!strcmp(p,"VORBIS"))
+		audioCodecSetcodec( AUDIOENC_VORBIS );		
+#endif		
+		
 	else{
 		audioCodecSetcodec( AUDIOENC_NONE );
 		fprintf(stderr,"audio codec \"%s\" unknown.\n",p);

@@ -42,11 +42,13 @@
 #define VD (((vorbisStruct *)_handle)->vd)
 #define VI (((vorbisStruct *)_handle)->vi)
 #define VB (((vorbisStruct *)_handle)->vb)
+#define VC (((vorbisStruct *)_handle)->vc)
 typedef struct vorbisStruct
 { 
 	vorbis_info 	 vi ;
 	vorbis_dsp_state vd ;
 	vorbis_block     vb ;
+	vorbis_comment   vc ;
 }vorbisStruct;
 //__________
 
@@ -60,7 +62,9 @@ AVDMProcessAudio_Vorbis::AVDMProcessAudio_Vorbis(AVDMGenericAudioStream * instre
     _instream->goToTime(0);	// rewind
     _length = _instream->getLength();
     _handle=(void *)new  vorbisStruct; 
-    
+    _oldpos=0;
+    _extraData=NULL;
+    _extraLen=0;
 };
 
 
@@ -78,6 +82,10 @@ AVDMProcessAudio_Vorbis::~AVDMProcessAudio_Vorbis()
     }    	
     _handle=NULL;
     _wavheader=NULL;
+    if(_extraData)
+    {
+    	free(_extraData);
+    }
 
 };
 
@@ -94,6 +102,7 @@ uint8_t AVDMProcessAudio_Vorbis::init( uint32_t bitrate)
 {
 
 
+ogg_packet header1,header2,header3;
 
  	vorbis_info_init(&VI) ;
  
@@ -111,7 +120,33 @@ uint8_t AVDMProcessAudio_Vorbis::init( uint32_t bitrate)
 	}
 	vorbis_analysis_init(&VD, &VI) ;
 	vorbis_block_init(&VD, &VB);
-    
+      	vorbis_comment_init(&VC);
+	vorbis_comment_add_tag(&VC, "encoder", "AVIDEMUX2") ;
+	
+	vorbis_analysis_headerout(&VD, &VC, &header1,
+                                &header2, &header3);
+
+				
+	// Store all headers as extra data
+	// see ogg vorbis decode for details
+	// we need 3 packets
+	
+	_extraLen=header1.bytes+header2.bytes+header3.bytes+3*sizeof(uint32_t);
+	_extraData=new uint8_t[_extraLen];
+	
+	uint32_t *ex=(uint32_t *)_extraData;
+	uint8_t *d;
+	d=_extraData+sizeof(uint32_t)*3;
+	ex[0]=header1.bytes;
+	ex[1]=header2.bytes;
+	ex[2]=header3.bytes;
+	memcpy(d,header1.packet,ex[0]);
+	d+=ex[0];
+	memcpy(d,header2.packet,ex[1]);
+	d+=ex[1];
+	memcpy(d,header3.packet,ex[2]);
+	vorbis_comment_clear(&VC);
+			
 	printf("\nVorbis encoder initialized\n");
 	printf("Bitrate :%lu\n",bitrate);
 	printf("Channels:%lu\n",_wavheader->channels);
@@ -132,8 +167,96 @@ uint32_t len,sam;
 uint8_t	AVDMProcessAudio_Vorbis::getPacket(uint8_t *dest, uint32_t *len, 
 					uint32_t *samples)
 {
-	return 0;
-}
+int16_t  *buf=(int16_t *)dropBuffer;
+uint32_t nbSample=0;
+uint32_t rdall=0,asked,rd;
+int wr;
+float s;
+ogg_packet op ;
+uint64_t total=0;
+#define FRAME 1024
+#define ROUNDMAX 3000
 
+int count=ROUNDMAX;
+// Check that we have packet from previous pass
+while(count--)
+{
+	//printf("Round %d\n",ROUNDMAX-count);
+  	if(vorbis_analysis_blockout(&VD, &VB) == 1) 
+	{
+	vorbis_analysis(&VB, NULL);
+	vorbis_bitrate_addblock(&VB) ;
+	//printf("Blockout\n");
+	
+	if(vorbis_bitrate_flushpacket(&VD, &op)) 
+	{
+		if(op.bytes<2) continue; // avoid the 1byte sized packet
+		
+            
+	    memcpy(dest, op.packet,op.bytes);
+	    *len=op.bytes;
+	    *samples=op.granulepos-_oldpos;
+	    _oldpos=op.granulepos;
+	  //  aprintf("1st packet :sampl:%lu len :%lu sample:%lu abs:%llu\n",*samples,op.bytes,total,op.granulepos);
+	    return 1;
+	}
+        }
+
+	asked=FRAME*2*_wavheader->channels;
+	rd=_instream->read(asked,(uint8_t *)buf);
+	nbSample=rd/(2*_wavheader->channels);
+	total+=nbSample;
+	//aprintf("Nb Sample:%lu\n",nbSample);
+	// Now we got out samples, encode them
+	float **float_samples;
+	
+	float_samples=vorbis_analysis_buffer(&VD, nbSample) ;
+	
+	// Put our samples in incoming buffer
+	switch(_wavheader->channels)
+	{
+		case 1:
+			{
+			for(int i=0;i<nbSample;i++)
+			{
+				s=buf[i];
+				s/=32768.;
+			 	float_samples[0][i]=s;
+			}
+			}
+			break;
+		case 2:
+			{
+			for(int i=0;i<nbSample;i++)
+			{
+				s=buf[i*2];
+				s/=32768.;
+			 	float_samples[0][i]=s;
+				s=buf[i*2+1];
+				s/=32768.;
+			 	float_samples[1][i]=s;
+
+			}
+			}
+			break;
+		default:
+			ADM_assert(0);
+
+	
+	}
+	// Buffer full, go go go
+	 vorbis_analysis_wrote(&VD, nbSample) ; 
+	 
+	}
+       
+	return 0;
+	
+}
+uint8_t		AVDMProcessAudio_Vorbis::extraData(uint32_t *l,uint8_t **d)
+{
+			*l=_extraLen;
+			*d=_extraData;
+		return 1;
+}
 #endif		
 // EOF
