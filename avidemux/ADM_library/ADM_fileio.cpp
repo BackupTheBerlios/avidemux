@@ -20,7 +20,7 @@
 #include "ADM_fileio.h"
 
 #define ADM_FILE_BUFFER 4*256*1024 // 256 kB
-
+//#define ADMF_DEBUG
 ADMFile::ADMFile( void)
 {
         _out=NULL;
@@ -48,23 +48,42 @@ uint8_t ADMFile::open(FILE *in)
 }
 uint8_t ADMFile::flush(void)
 {
+ ADM_assert(_fill<=ADM_FILE_BUFFER);
         if(_fill)
         {
+                
                 fwrite(_buffer,_fill,1,_out);
+                
                 _curPos+=_fill;
+#ifdef ADMF_DEBUG                
+                printf("Flushing %lu bytes, now at :%lu\n",_fill,_curPos);
+#endif                
                 _fill=0;
         }
         return 1;
 }
 uint64_t ADMFile::tell(void)
 {
+ ADM_assert(_fill<ADM_FILE_BUFFER);
+        uint32_t c;
+     
+        flush();
+#ifdef ADMF_DEBUG           
+        c=ftello(_out);
+        ADM_assert(c==_curPos);
+        printf("[%lu] Ftell :%lu \n",this,c);
+#endif        
         return _curPos+_fill;  
 }
 uint8_t ADMFile::seek(uint64_t where)
 {
+ ADM_assert(_fill<ADM_FILE_BUFFER);
         flush();
         fseeko(_out,where,SEEK_SET);
         _curPos=where;
+#ifdef ADMF_DEBUG        
+        printf("[%lu] Fseek :%lu \n",this,where);
+#endif        
         return 1;
 }
 //
@@ -73,7 +92,12 @@ uint8_t ADMFile::seek(uint64_t where)
 uint8_t ADMFile::write(uint8_t *data,uint32_t how)
 {
         uint32_t oneshot;
-        
+#ifdef ADMF_DEBUG        
+        printf("[%lu]Fwrite : %lu\n",this,how);
+        printf("Curpos:%lu ",_curPos);
+        printf("Tell  :%lu ",ftello(_out));
+        printf("Fill :%lu\n",_fill);
+#endif        
         while(1)
         {
                 ADM_assert(_fill<ADM_FILE_BUFFER);
