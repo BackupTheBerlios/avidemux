@@ -469,7 +469,7 @@ static int mux_put_av_pack(PackStream *ps)
      	available_size = ps->pkt_len;
 	padding_size   = payload_size - available_size; 
 	// If there is a bit of padding, keep it
-	if(1) //ps->pkt_id >= AUDIO_ID_MP2)
+	if(0) //ps->pkt_id >= AUDIO_ID_MP2)
 	{
 				padding_size = 0;	
 	}
