@@ -33,40 +33,14 @@ static int (* free_hook) (void * buf) = NULL;
 void * mpeg2_malloc (unsigned size, mpeg2_alloc_t reason)
 {
 
-    char * buf;
-
-    if (malloc_hook) {
-	buf = (char *) malloc_hook (size, reason);
-	if (buf)
-	    return buf;
-    }
-
-    if (size) {    		
-	buf = (char *) ADM_alloc (size + 63 + sizeof (void **));
-	if (buf) {
-	    char * align_buf;
-
-	    align_buf = buf + 63 + sizeof (void **);
-	    align_buf -= (long)align_buf & 63;
-	    *(((void **)align_buf) - 1) = buf;
-	    return align_buf;
-	}
-    }
-    return NULL;
-    
-    //return memalign(64,size+64);
+	return ADM_alloc(size);
+   
 }
 
 void mpeg2_free (void * buf)
 {
 
-    if (free_hook && free_hook (buf))
-	return;
-
-    if (buf)
-	ADM_dealloc (*(((void **)buf) - 1));
-	
-	//free(buf);
+   	return ADM_dealloc(buf);
 }
 
 void mpeg2_malloc_hooks (void * mallocs (unsigned, mpeg2_alloc_t),
