@@ -282,7 +282,13 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
 #endif            
      //       put_bits(&s->pb, 4, s->aspect_ratio_info);
        //MEANX: 4:3
-            put_bits(&s->pb, 4, 2);
+	    if(s->avctx->sample_aspect_ratio.num==16 && s->avctx->sample_aspect_ratio.den==9)
+	    {
+	    	//printf("FFmpeg : Wide\n");
+	    	put_bits(&s->pb,4,3); //16:9
+	    }
+	    else	//4:3
+            	put_bits(&s->pb, 4, 2);
 		if((s->flags2 & CODEC_FLAG2_32_PULLDOWN) && (s->codec_id == CODEC_ID_MPEG2VIDEO))
 	    {	    	
 	    	put_bits(&s->pb, 4,4);

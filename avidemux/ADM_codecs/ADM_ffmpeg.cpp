@@ -157,6 +157,17 @@ ffmpegEncoder::gopMpeg1 (void)
     }
   if (_settingsPresence)
     {
+    	if(_settings.widescreen) 
+	{
+		_context->sample_aspect_ratio.num=16;
+		_context->sample_aspect_ratio.den=9;
+	}
+	else
+	{
+		_context->sample_aspect_ratio.num=4;
+		_context->sample_aspect_ratio.den=3;
+	}
+
       _context->rc_max_rate = _settings.maxBitrate * 8;	//1800*1000;// 2400 max, 700 min
       _context->rc_buffer_size_header=_settings.bufferSize * 8 * 1024;
       // If we don't have a maxrate, don't set buffer_size
