@@ -95,6 +95,7 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
         _info.encoding=1;       
         _parser=NULL;  
         _resampled=NULL;
+        _chromaResampled=NULL;
         _original=NULL;        
         
         _param=NEW(vobSubParam);
@@ -214,6 +215,11 @@ uint8_t ADMVideoVobSub::cleanup(void)
         if(_resampled)
           delete _resampled;
         _resampled=NULL;
+        
+        if(_chromaResampled)
+          delete _chromaResampled;
+        _chromaResampled=NULL;
+        
         
         if(_data) delete [] _data;
         _data=NULL;
@@ -359,10 +365,59 @@ uint32_t sub;
                         in+=stridein;
                         mask+=stridein;
                 }
+                
+                // Now do chroma u & chroma V
+                uint32_t crosspage=(_info.width*_info.height)>>2;
+                
+                strideout=_info.width>>1;
+                stridein=_chromaResampled->_width;
+                
+                out=data->data+_info.width*_info.height;
+                out+=(src->placeTop>>1)*(_info.width>>1);
+                mask=_chromaResampled->_alphaMask;
+                
+                
+                if(strideout>stridein) xx=stridein;
+                else            xx=strideout;
+                
+                int16_t left=(_info.height>>1)-(_chromaResampled->_height+(_original->placeTop>>1));
+                
+                if(left<_chromaResampled->_height) yy=left;
+                else yy=_chromaResampled->_height;
+                
+                for(uint32_t y=0;y<yy;y++)
+                {
+                   for(uint32_t x=0;x<xx;x++)
+                   {
+                        if(mask[x]>10)         
+                        {
+                          int16_t val;
+                          val=out[x];
+                          val-=128;
+                         
+                          
+                          
+                          nw=val*(16-alp);
+                          
+                          val/=4;
+                          val=val+128;
+                                
+                          out[x]=val; 
+                          out[crosspage+x]=val;
+                        }                                                 
+                   }
+                   out+=strideout;
+                   mask+=stridein;
+                }
         }
         return 1;
 }
-//***********************************************************
+//*************************************************************************
+//
+//      Convert the original bitmap to a rescaled & repositionned one
+//      that will be blended into the current picutr
+//
+//*************************************************************************
 uint8_t ADMVideoVobSub::Palettte2Display( void )
 {
         ADM_assert(_parser);
@@ -406,38 +461,47 @@ uint8_t ADMVideoVobSub::Palettte2Display( void )
         bottom=_original->_height-1;
         while(bottom && !_original->_dirty[bottom]) bottom--;
         
+        // If true it means we have 2 subs, one on top, one on bottom
+        //
+        if(bottom>(oy>>1) && top<(oy>>1) && (bottom-top>(oy>>1)))
+        {
+          // in that case, take only the lower one
+          top=oy>>1;
+          while(top<oy && !_original->_dirty[top]) top++;                    
+        }
         //
         //  The useful part is between top & bottom lines
         //
         
         // Shrink factor
+        // The shrink factor is the one used to shrink from the original video
+        // to the resize video
+        
         double scale,l;
         scale=fx;
         scale/=ox;
         printf("top %lu : bottom :%lu Scale :%f ox:%lu oy:%lu fx:%lu \n",top,bottom,scale,ox,oy,fx);
-        // Compute the new width/height of the sub
-        // as if it was not cropped, that is the width match, not the height
         
+        // We rescale the sub by the same factor
+        // Only the visible / useful part
         l=scale;
         l=l*sx;
         sx=(uint32_t )floor(l);
         
-        // We only rescale the used part, not the full image
-        //
+       
         l=scale;
         l=l*(bottom-top);
         sy=(uint32_t )floor(l);
         
 
-        /*
-                Simple formula, assume sx ~ ox
-                and just rescale sx,sy to fx,fy
-        
-        */
-        
+        // And we resize that useful part of sub
+        // to our final bitmap (resampled)
+                
         _original->subResize(&_resampled,sx,sy,top, bottom-top);
                 
         uint32_t tail;
+        
+        // Set the position of the sub so that it is ok
         
         tail=16+sy;
         
@@ -449,7 +513,7 @@ uint8_t ADMVideoVobSub::Palettte2Display( void )
         
         _resampled->placeTop=tail;
         
-        
+        _resampled->subResize(&_chromaResampled,sx>>1,sy>>1,0,sy);
         return 1;
 }
 

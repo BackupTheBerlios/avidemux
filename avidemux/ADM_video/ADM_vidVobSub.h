@@ -67,6 +67,7 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
         vobSubParam                     *_param;
         vobSubBitmap                    *_original;              /// True size (..) depacked vobsub
         vobSubBitmap                    *_resampled;            /// Final one; to be blended in picture
+        vobSubBitmap                    *_chromaResampled;      /// Same as above but shinked by 2
         uint32_t                        _x1,_y1,_x2,_y2;        /// sub boxing
         uint32_t                        _subW,_subH;
         uint8_t                         _displaying;            ///  Is display active
