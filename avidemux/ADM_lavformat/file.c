@@ -18,6 +18,9 @@
  */
 #include "avformat.h"
 #include <fcntl.h>
+#ifdef CYG_MANGLING
+#define CONFIG_WIN32
+#endif
 #ifndef CONFIG_WIN32
 #include <unistd.h>
 #include <sys/ioctl.h>

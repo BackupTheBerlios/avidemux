@@ -20,6 +20,8 @@
  ***************************************************************************/
 #ifndef __AVIFMT2__
 #define __AVIFMT2__
+
+#ifndef WIN32_CLASH
 typedef struct
 {
     uint32_t 		biSize;
@@ -38,7 +40,7 @@ typedef struct {
 	BITMAPINFOHEADER bmiHeader;
 	int	bmiColors[1];
 } BITMAPINFO, *LPBITMAPINFO;
-
+#endif //win32clash
 /* Borrowed from vdub
 	Thanks to avery lee */
 #define AVI_INDEX_OF_CHUNKS 0X01

@@ -49,6 +49,8 @@ void 		ADM_usleep(unsigned long us);
 
 
 #ifdef CYG_MANGLING
+#ifndef HAVE_STRUCT_TIMESPEC
+#define HAVE_STRUCT_TIMESPEC
 	typedef struct timespec
 	{
 		time_t tv_sec;
@@ -59,6 +61,7 @@ void 		ADM_usleep(unsigned long us);
 	#define timezone int
 	#define usleep ADM_usleep
 	#define TIMZ int
+#endif
 #else
 	#define TIMZ struct timezone
 #endif

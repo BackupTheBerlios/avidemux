@@ -15,13 +15,6 @@
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-#include "ADM_audiofilter/audioprocess.hxx"
-#include "ADM_audio/ADM_a52info.h"
-
-#include "ADM_codecs/ADM_codec.h"
-#include "ADM_editor/ADM_Video.h"
-
-#include "ADM_lavformat/ADM_lavformat.h"
 
 
 #include "ADM_toolkit/ADM_debugID.h"

@@ -23,12 +23,19 @@
 
 #include "config.h"
 
+#ifdef CYG_MANGLING
+#define WIN32_CLASH
+#define WAIT1() ADM_usleep(1000) // Allow slave thread to start
+#else
+#define WAIT1() sleep(1)
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
-
+#include <pthread.h>
 
 #undef malloc
 #undef realloc
@@ -41,7 +48,9 @@
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/ADM_a52info.h"
 
-#include "ADM_codecs/ADM_codec.h"
+//#include "ADM_codecs/ADM_codec.h"
+#include "ADM_library/avifmt.h"
+#include "ADM_library/avifmt2.h"
 #include "ADM_editor/ADM_Video.h"
 
 #include "ADM_lavformat/ADM_lavformat.h"
@@ -133,7 +142,9 @@ uint8_t mplexMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type
         pthread_t slave;
         slaveRunning=1;
         ADM_assert(!pthread_create(&slave,NULL,(THRINP)slaveThread,NULL));
-        sleep(1); // Allow slave thread to start
+
+        WAIT1();        
+        
         printf("Init ok\n");
         return 1;
 }
@@ -276,7 +287,7 @@ uint16_t a1,a2,a3,a4,ff;
         while(channelvideo->fillingUp())
         {
                 printf("Output buffer filling up, sleeping a bit\n");
-                sleep(1);
+                WAIT1();
         }                
         
         return 1;
@@ -298,7 +309,7 @@ uint8_t mplexMuxer::close( void )
                 while(slaveRunning)
                 {
                         printf("Waiting for slave thread to end\n");
-                        sleep(1);
+                        WAIT1();
                 }
                         // Flush
                         // Cause deadlock :

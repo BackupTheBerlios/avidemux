@@ -13,7 +13,7 @@
 #ifndef NOAVIFMT
 
 #ifndef __WINE_WINDEF_H
-
+#ifndef WIN32_CLASH
 #define LOBYTE(w)              ((uint8_t)(uint16_t)(w))
 #define HIBYTE(w)              ((uint8_t)((uint16_t)(w) >> 8))
 
@@ -22,6 +22,8 @@
 
 #define MAKELONG(low,high)     ((int32_t)(((uint16_t)(low)) | (((uint32_t)((uint16_t)(high))) << 16)))
 
+
+
 typedef struct __attribute__((__packed__))
 {
     int16_t	left;
@@ -29,6 +31,9 @@ typedef struct __attribute__((__packed__))
     int16_t	right;
     int16_t	bottom;
 } RECT, *PRECT, *LPRECT;
+
+#endif
+
 #endif // __WINE_WINDEF_H
 
 #ifdef _MSC_VER

@@ -25,11 +25,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#if 0
 #ifdef _WIN32
 #include <win32defs.h>
 #else
 #include <sys/param.h>
+#endif
 #endif
 #include "systems.hpp"
 #include "mplexconsts.hpp"
