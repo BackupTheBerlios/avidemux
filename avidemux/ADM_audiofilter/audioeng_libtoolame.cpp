@@ -135,9 +135,11 @@ uint8_t AVDMProcessAudio_LibToolame::init( uint32_t mode, uint32_t bitrate)
 	}
 	toolame_setMode(options,mmode);
    	toolame_setErrorProtection(options,TRUE);	
-    	toolame_setPadding (options,TRUE);
+    	//toolame_setPadding (options,TRUE);
 	toolame_setBitrate (options,bitrate);
-	toolame_init_params(options);
+	toolame_setVerbosity(options, 2);
+	toolame_init_params(options);	
+	
 
 	printf("Libtoolame successfully initialized\n");
     return 1;       
