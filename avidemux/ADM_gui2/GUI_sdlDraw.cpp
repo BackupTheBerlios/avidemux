@@ -66,7 +66,7 @@ uint8_t sdlAccelRender::end( void)
 	}
 	if(sdl_running)
 	{
-		SDL_Quit();
+		SDL_QuitSubSystem(SDL_INIT_VIDEO);
 	}
 	sdl_running=0;
 	sdl_overlay=NULL;
@@ -87,13 +87,14 @@ int flags;
 	disp.y=1;
 
 	/* Hack to get SDL to use GTK window, ugly but works */
+#if 1
 	{ char SDL_windowhack[32];
 		sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",
 			GDK_WINDOW_XWINDOW(window->window));
 		putenv(SDL_windowhack);
 	}
-
-	 if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) 
+#endif
+	if (  SDL_InitSubSystem(SDL_INIT_VIDEO) < 0 ) 
 	 {
         	fprintf(stderr, "Unable to init SDL: %s\n", SDL_GetError());
         	return 0;
