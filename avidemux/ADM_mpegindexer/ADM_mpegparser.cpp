@@ -130,9 +130,11 @@ uint8_t mParser::open( char *filename )
 
 		// add the file, and all existing follow-ups
 		// -----
-
-		buffer_fd = new FILE * [10 ^ decimals];
-		buffer_sizeFd = new uint64_t [10 ^ decimals];
+                uint32_t tabSize;
+                
+                tabSize=(uint32_t)pow(10,decimals);
+                buffer_fd = new FILE * [tabSize];
+                buffer_sizeFd = new uint64_t [tabSize];
 
 		printf( "\nAuto adding: \n" );
 		while( last_followup == 0 )
