@@ -592,6 +592,24 @@ else
 CXXFLAGS="  -I.. -IADM_library -I../ADM_library  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -O $CXXFLAGS -O2"
 
 fi
+
+dnl ___________________profiling _______________________
+
+use_profile=0
+
+dnl debug
+
+AC_ARG_WITH(profile, [  profile flag],
+  [
+	   use_profile=1
+
+  ]
+)
+if test "x$use_profile" = "x1"; then
+CXXFLAGS+=" -pg "
+CFLAGS+=" -pg "
+LDFLAGS+=" -pg "
+fi
 dnl ____________________ Cygwin / mingwin ? ___________
 use_cygwin=no
 AC_MSG_CHECKING(win32 host)
@@ -663,6 +681,7 @@ d
 		AC_DEFINE(HAVE_ASM_MMX,1,"Use MMX acceleration")
 		AC_DEFINE(HAVE_MMX,1,"Use MMX acceleration")
 		AC_DEFINE(HAVE_X86CPU,1,"Use X86 CPU for mpeg2enc")
+		AC_DEFINE(RUNTIME_CPUDETECT,1,"Let ffmpeg decide which is faster")
 		dnl FIXME
 		dnl
 
