@@ -42,7 +42,7 @@ uint8_t AVDMMP3AudioStream::open(char *name)
      _wavheader = new WAVHeader();
     
 
-    if(! mpegAudioIdentify(ptr, 2048,_wavheader) )
+    if(! mpegAudioIdentify(ptr, 2048,_wavheader,_mpegSync) )
     {
 		delete _wavheader;
 		_wavheader=NULL;

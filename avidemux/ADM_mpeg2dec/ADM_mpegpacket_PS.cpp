@@ -565,7 +565,9 @@ uint8_t align=0;
 									*pts=(pts1>>1)<<15;
 									*pts+=pts2>>1;
 									*pts+=(((pts0&6)>>1)<<30);
-									//printf("PTS: %lx\n",*pts);
+#ifdef PRINT_PTS									
+									printf("PTS: %lx\n",*pts,sid);
+#endif									
 								}
 								break;
 							case 3: // PTS=1 DTS=1
@@ -582,8 +584,9 @@ uint8_t align=0;
 			            					*pts=(pts1>>1)<<15;
 									*pts+=pts2>>1;
 									*pts+=(((pts0&6)>>1)<<30);
-									//printf("PTS: %lx\n",*pts);
-									
+#ifdef PRINT_PTS																		
+									printf("PTS: %lx %x\n",*pts,sid);
+#endif
 									pts0=parser->read8i();	
 									pts1=parser->read16i();	
 			     						pts2=parser->read16i();			

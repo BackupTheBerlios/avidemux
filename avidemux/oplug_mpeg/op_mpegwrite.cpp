@@ -1029,7 +1029,7 @@ uint32_t fps1000;
 	printf("----- Audio Track for mpeg Ready.------\n");
 	
 	_muxer=new MpegMuxer();
-	if(!_muxer->open(name,8000,fps1000,_audio->getInfo()))
+	if(!_muxer->open(name,MUX_MPEG_VRATE,fps1000,_audio->getInfo()))
 	{
 		delete _muxer;
 		_muxer=NULL;
@@ -1107,7 +1107,7 @@ AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *mypcm)
   	one_frame_double *= 1000000.;
   	// in ms now;
   	one_frame = (uint32_t) floor (one_frame_double);
-  	printf (" One audio frame : %lu ms\n", one_frame);
+  	printf (" One audio frame : %lu (%f) ms\n", one_frame,one_frame_double);
 
 
   	double    pcm;
@@ -1115,8 +1115,8 @@ AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *mypcm)
   	// fix hitokiri bug part 1.
   	pcm = one_frame_double * 2 * wav->frequency * wav->channels;
   	pcm /= 1000;
-  	one_pcm_audio_frame = (uint32_t) floor (pcm);
-  	printf (" one PCM audio frame is %lu bytes \n", one_pcm_audio_frame);
+  	one_pcm_audio_frame = (uint32_t) floor (pcm+0.5);
+  	printf (" one PCM audio frame is %lu bytes (%f) \n", one_pcm_audio_frame,pcm);
 
   	// get the equivalent in bytes
   	assert (wav);
@@ -1124,10 +1124,10 @@ AVDMGenericAudioStream *mpt_getAudioStream(uint32_t *mypcm)
   	one_frame_double *= wav->byterate;
 
 
-	  one_frame = (uint32_t) floor (one_frame_double);
-
+	  one_frame = (uint32_t) floor (one_frame_double+0.5);
+	printf (" one coded audio frame is %lu bytes (%f) \n", one_frame,one_frame_double);
   	if (one_frame & 1)
-    		one_frame--;
+    		one_frame++;
   	one_delta_frame = one_frame_double - one_frame;
   	// Real ? correction of hitokiri bug
   	one_delta_frame *= 1000;

@@ -81,7 +81,7 @@ void mpeg_passthrough(  char *name )
 	}
 	
   	muxer=new MpegMuxer();
-	if(!muxer->open(name,8000,avifileinfo->fps1000,audio->getInfo()))
+	if(!muxer->open(name,MUX_MPEG_VRATE,avifileinfo->fps1000,audio->getInfo()))
 	{
 		delete muxer;
 		muxer=NULL;

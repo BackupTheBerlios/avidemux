@@ -21,6 +21,8 @@
  *
  */
 #define  _MUX_OUT 1
+#include <stdio.h>
+#include <math.h>
 #include "mux_out.h"
 
 //=====================
@@ -566,6 +568,7 @@ static int mux_flush_packs(PackStream *ps)
   uint8_t *end     = ps->stream_buf + ps->buf_level;
   double  scr_step = ps->pack_size * ps->pict_duration / ps->buf_level;
   int64_t timestamp;
+  int n;
   
   while (start < end)
   {
@@ -590,7 +593,7 @@ static int mux_flush_packs(PackStream *ps)
     start   += ps->pack_size;
   }
   
-  int n = fwrite(ps->stream_buf, 1, ps->buf_level, ps->fp);
+  n = fwrite(ps->stream_buf, 1, ps->buf_level, ps->fp);
 
   //-- start in front of buffer again --  
   ps->pack_start = ps->stream_buf;
@@ -651,12 +654,18 @@ PackStream *mux_open(char *fn,
     ps->audio_max_buf_size = 4 * 1024;
     ps->audio_pts   = 0;
     // MEANX
-    if(audio_id==AUDIO_ID_MP2)
-    	ps->audio_encoded_fs=(int)ceil(( MP2_FRAME_SIZE*a_bit_rate)/(8*sample_rate));
-    else // AC3
+    // We set clean default value...
+    if(audio_id==AUDIO_ID_AC3)
     	ps->audio_encoded_fs=(int)ceil((AC3_FRAME_SIZE *a_bit_rate)/(8*sample_rate));
-      
+    else
+    	ps->audio_encoded_fs=(int)ceil(( MP2_FRAME_SIZE*a_bit_rate)/(8*sample_rate));
+	
+     ps->a_pts_ofs = A_PTS_MIN;
+     ps->v_pts_ofs = A_PTS_MIN;
+	
+  
 #if 0    
+    
       ap.size_pf = (int)( (ap.samples_pf * ap.br) / (8.0 * ap.sr) + 0.5);
     fprintf(stderr, "\naudio stream type (%s) detected \n", (ap.id==AUDIO_ID_MP2)? "MP2":"AC3");
     fprintf(stderr, "- sample rate (%d Hz)\n- bitrate (%d bps)\n- frame size (%d bytes)\n",
@@ -752,6 +761,8 @@ int mux_write_packet(PackStream *ps,
 
     //-- after audio data -> update all pack SCRs and write unit -- 
     if (ps->pkt_id < VIDEO_ID) return mux_flush_packs(ps);
+    
+    //printf("A-V :%d\n",ps->audio_pts-ps->pts);
 
     return 0;
 }

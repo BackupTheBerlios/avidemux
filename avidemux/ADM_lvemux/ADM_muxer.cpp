@@ -42,6 +42,7 @@ extern "C" {
 MpegMuxer::MpegMuxer( void )
 {
 	packStream=NULL;
+	byteHead=byteTail=0;
 }
 MpegMuxer::~MpegMuxer(  )
 {
@@ -54,6 +55,9 @@ uint8_t MpegMuxer::open(char *filename, uint32_t vbitrate, uint32_t fps1000, WAV
 double fps;
 uint32_t abitrate,frequency;
 PackStream *pack=NULL;
+
+int bytes_needed,samples_needed;
+float bn,sn;
 
 	fps=fps1000;
 	fps/=1000.;
@@ -79,6 +83,19 @@ PackStream *pack=NULL;
 	packStream=(void *)pack;
 	printf("Lvemux successfully initialized with :\n fq=%lu audio bitrate"
 	" %lu video bitrate %lu framerate :%f id:%lu",frequency,abitrate,vbitrate,fps,audioType);
+	
+	sn=audioheader->frequency*1000.0;
+	sn/=fps1000;
+	samples_needed = (int)floor(sn+0.5); // pcm sample per frame
+	  
+	bn=1000./fps1000;
+	bn*=audioheader->byterate;
+	
+	bytes_needed=(int)floor(bn+0.5);
+	
+	printf("Sample per frame : %d %f, bytes per frame :%d %f\n",samples_needed,sn,bytes_needed,bn);
+	_packSize=bytes_needed;	  
+  
 	return 1;
 
 }
@@ -87,8 +104,31 @@ uint8_t MpegMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 {
 int r;
 	assert(packStream);
-	r=mux_write_packet((PackStream *)packStream, 
-                               audioType, buf, (int) len); 
+	memcpy(buffer+byteTail,buf,len);
+	byteTail+=len;
+	while(byteTail-byteHead>=_packSize)
+	{
+		r=mux_write_packet((PackStream *)packStream, 
+                               audioType, buffer+byteHead, _packSize); 
+		byteHead+=_packSize;
+	}
+			       
+	if(byteTail>=MUX_BUFFER_SIZE)
+	{
+		memmove(buffer+byteHead,buffer,byteTail-byteHead);
+		byteTail-=byteHead;
+		byteHead=0;
+	
+	}
+	if(byteTail>MUX_BUFFER_SIZE)
+	{
+		printf("Tail : %lu\n",byteTail);
+		printf("Head : %lu\n",byteHead);
+		printf("Delta: %lu\n",byteTail-byteHead);
+		printf("Pack : %lu\n",_packSize);
+		assert(0);
+	
+	}
 	return 1;
 
 }

@@ -263,6 +263,10 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 	uint32_t seq_found=0;
 	uint64_t lastI=0;
 	uint32_t update=0;
+	uint8_t  gop_seen=0;
+	uint64_t lastGop=0;
+	uint64_t lastAbsGop=0;
+	
     uint8_t streamid,audiostreamid=0x00;
 	mParser *parser;
 	ADM_mpegDemuxer *demuxer;
@@ -377,6 +381,9 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 						// x Gop broken x x x x x 
 						gop>>=6; // skip padding
 						gop&=1;
+						gop_seen=1;
+						lastGop=pos;
+						lastAbsGop=abspos;
 						// 25 bits = time code
 #if 0
 						if(gop)
@@ -415,6 +422,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 						case 2:// P 
 						case 3:// B
 						case 4:
+							gop_seen=0;
 							if(total_frame==1)
 							{
 								total_frame=0;
@@ -426,13 +434,23 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 							{
 								fprintf(out," %llu\n",pos-lastI-4);
 							}
-							fprintf(out,"%c %010llX",Type[ftype],pos-4);
+							if(!gop_seen)
+								fprintf(out,"%c %010llX",Type[ftype],pos-4);
+							else
+								fprintf(out,"%c %010llX",Type[ftype],lastGop-4);
 														          						if(ftype==1) // I frame
 							{
+								if(gop_seen) abspos=lastAbsGop;
 								fprintf(out," %010llX %10lx",
 								abspos-4,demuxer->getOtherSize()); 	
 							}
-							lastI=pos-4;
+							if(gop_seen)
+							{
+								lastI=lastGop-4;
+								gop_seen=0;
+							}
+							else							
+								lastI=pos-4;
 							nb_iframe++;
 							break;
 
