@@ -410,13 +410,13 @@ EncoderFFMPEG::encode (uint32_t frame, uint32_t * len, uint8_t * out,
       case enc_Same:
       		{
 			uint32_t inq;
-      			if(*flags& AVI_KEY_FRAME) *flags=AVI_KEY_FRAME;
+      			if(*flags& AVI_KEY_FRAME) *flags=1;
 				else		  *flags=0;
 			inq=_vbuffer->_Qp;
 			
 			inq>>=1; 	// ?
 			
-      			*flags+=(inq<<8);
+      			*flags+=(inq<<16);
 			
 			if(!_codec->encode(   _vbuffer,out,len,flags))
 			{
