@@ -266,13 +266,15 @@ void DIA_encoding::feedAudioFrame(uint32_t size)
 }
 uint8_t DIA_encoding::isAlive( void )
 {
+#ifndef CYG_MANGLING
 	if(stopReq)
 	{
 		if(GUI_Question("Continue encoding, no will stop it ?"))
 		{
 			stopReq=0;
-		}
+		}		
 	}
+#endif	
 	if(!stopReq) return 1;
 	return 0;
 }

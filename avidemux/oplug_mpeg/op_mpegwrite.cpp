@@ -484,6 +484,7 @@ char *statname;
 
 
 	// check if stat file exists ?
+#ifndef CYG_MANGLING	
 	FILE *fd;
 	uint8_t reuse=0;
 	fd=fopen(statname,"rt");
@@ -492,6 +493,7 @@ char *statname;
 		fclose(fd);
 		if(GUI_Question("Reuse log file ?")) reuse=1;
 	}
+#endif	
 #if 1
 if(!reuse)
 //	if(!dopass1(name,statname,final_size,bitrate,mpegtype,matrix,interlaced,widescreen))
