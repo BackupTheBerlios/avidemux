@@ -41,7 +41,7 @@ Some functions to manipulate fields
 void vidFieldDecimate(uint8_t *src,uint8_t *target, uint32_t linessrc, uint32_t width)
 {
 	linessrc>>=1;
-	for(;linessrc--;linessrc>0)
+	for(;linessrc>0;linessrc--)
 		{
 			memcpy(target,src,width);
 			target+=width;
