@@ -27,6 +27,8 @@
 
 
 #include"ADM_transfert.h"
+#define HIGH_LVL ((TRANSFERT_BUFFER*2)/3)
+#define LOW_LVL (TRANSFERT_BUFFER/3)
 
 //**************** Mutex *******************
 admMutex::admMutex(void)
@@ -103,9 +105,10 @@ Transfert::Transfert(void)
         buffer=new uint8_t[TRANSFERT_BUFFER];
 
         aborted=0;
-        waitingData=0;
+        
         ready=1;
         head=tail=0;
+        
 }
 Transfert::~Transfert()
 {
@@ -115,12 +118,12 @@ Transfert::~Transfert()
 uint32_t Transfert:: read(uint8_t *buf, uint32_t nb  )
 {
 uint32_t r=0;
-uint32_t fill;
+uint32_t fill=0;
         
   while(1)
   {
         mutex.lock();
-        fill=tail-head;
+        fill=tail-head;        
         if(fill>=nb)
         {
                 
@@ -128,7 +131,7 @@ uint32_t fill;
                 head+=nb;
                 r+=nb;
                 mutex.unlock();
-                return r;
+                goto endit;                                                    
         }
         
         // Purge
@@ -140,26 +143,39 @@ uint32_t fill;
          if(aborted) 
          {
                 mutex.unlock();
-                return r;
+                goto endit;
          }
-         waitingData=1;       
+         
+         ADM_assert(!clientCond.iswaiting());
          mutex.unlock();  
+         //printf("Slave sleeping\n");
          cond.wait();
          if(aborted) 
          {         
-                return r;
-         }                 
-         waitingData=0;
+                goto endit;
+         }                          
          
   }
-  return 0;               
+endit: 
+        if(clientCond.iswaiting()) // No need to protect as the client is locked
+        {
+                fill=tail-head;       
+                if(fill<LOW_LVL)
+                {
+                        printf("Waking..\n");
+                        clientCond.wakeup();        
+                }
+        }
+        return r;               
 }
+//*********************************
 uint8_t Transfert::fillingUp( void)
 {
 uint8_t r=0;
 
         mutex.lock();
-        if(tail-head>(TRANSFERT_BUFFER/2)) r=1;
+        if((tail-head)>HIGH_LVL)
+                r=1;
         else r=0;
         mutex.unlock();
         return r;
@@ -188,22 +204,32 @@ uint8_t Transfert:: write(uint8_t *buf, uint32_t nb  )
         memcpy(buffer+tail,buf,nb);        
         tail+=nb;
         mutex.unlock();
-        if(waitingData)
+        if(cond.iswaiting())
+        {
+                //printf("Slave waking");
                 cond.wakeup();
+        }                
         return 1;
 }        
 uint8_t Transfert::needData( void )
 {
-        return waitingData;
+        
+        return cond.iswaiting();
  
  }
 uint8_t Transfert::abort( void )
 {
         aborted=1;
-        if(waitingData)
+        if(cond.iswaiting())
                 cond.abort();
         return 1;
  
  }
   
+uint8_t Transfert::clientLock( void )
+{
+        printf("sleeping\n");
+        clientCond.wait();               
+        return 1;
 
+}

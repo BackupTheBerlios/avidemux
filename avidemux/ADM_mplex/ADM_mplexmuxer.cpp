@@ -284,10 +284,10 @@ uint16_t a1,a2,a3,a4,ff;
                 }
         }
         r= channelvideo->write(buf,len);
-        while(channelvideo->fillingUp())
+        if(channelvideo->fillingUp())
         {
-                printf("Output buffer filling up, sleeping a bit\n");
-                WAIT1();
+                //printf("Output buffer filling up, sleeping a bit\n");
+                channelvideo->clientLock();
         }                
         
         return 1;

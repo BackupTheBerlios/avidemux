@@ -26,7 +26,7 @@
 //#include "aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include <ADM_assert.h>
-#include "ADM_dialog/DIA_working.h"
+#include "ADM_dialog/DIA_encoding.h"
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
@@ -58,8 +58,10 @@
 			printf("passthrough:Could not get audio\n"); \
 			break; \
 		}\
-		if(audiolen) \
+		if(audiolen) {\
 			muxer->writeAudioPacket(audiolen,buffer); \
+                        work->feedAudioFrame(audiolen);\
+                        }\
 		total_got+=audiolen; \
 	} \
 }
@@ -73,7 +75,7 @@ void mpeg_passthrough(  char *name )
   uint32_t audiolen;
   uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3];
   
-  DIA_working *work;
+  DIA_encoding *work;
   ADM_MUXER_TYPE mux;
   
   double total_wanted=0;
@@ -187,8 +189,10 @@ void mpeg_passthrough(  char *name )
 	// In copy mode it is better to recompute the gop timestamp
 	muxer->forceRestamp();
   ///____________________________
-  work=new DIA_working("Saving MpegPS stream");
-
+  work=new DIA_encoding(avifileinfo->fps1000);
+  work->setCodec("Copy");
+  work->setAudioCodec("---");
+  work->setPhasis("Saving");
   // preamble
   /*
   video_body->getRawStart (frameStart, buffer, &len);
@@ -202,8 +206,8 @@ void mpeg_passthrough(  char *name )
   for (uint32_t i = frameStart; i < frameEnd; i++)
     {
       
+      work->setFrame(i - frameStart, frameEnd - frameStart);
       
-      work->update (i - frameStart, frameEnd - frameStart);
       if(!work->isAlive()) goto _abt;
       ADM_assert (video_body->getFlags (i, &flags));
       if (flags & AVI_B_FRAME)	// oops
@@ -226,6 +230,7 @@ void mpeg_passthrough(  char *name )
 	video_body->getRaw (found, buffer, &len);
 	
 	muxer->writeVideoPacket (len,buffer,cur++,found-frameStart);	
+        work->feedFrame(len);
 	PACK_AUDIO(0)
 	
 	  
@@ -235,6 +240,7 @@ void mpeg_passthrough(  char *name )
 		video_body->getRaw (j, buffer, &len);
 		
 		muxer->writeVideoPacket (len,buffer,cur++,j-frameStart);
+                work->feedFrame(len);
 		PACK_AUDIO(0)
 		
     	    }
@@ -249,6 +255,7 @@ void mpeg_passthrough(  char *name )
 			if(buffer[0]==0 && buffer[1]==0 && buffer[2]==1 && buffer[3]==0xb3) // Seq start
 			{
 				muxer->writeVideoPacket (len,buffer,cur++,i-frameStart);
+                                work->feedFrame(len);
 				PACK_AUDIO(0)
 				
 				
@@ -260,6 +267,7 @@ void mpeg_passthrough(  char *name )
 	  			video_body->getRaw (i, buffer+seq, &len);
 				
 				muxer->writeVideoPacket (len+seq,buffer,cur++,i-frameStart);
+                                work->feedFrame(len);
 				PACK_AUDIO(0)
 				
 			}
@@ -269,6 +277,7 @@ void mpeg_passthrough(  char *name )
 			video_body->getRaw (i, buffer, &len);
 			
 			muxer->writeVideoPacket (len,buffer,cur++,i-frameStart);
+                        work->feedFrame(len);
 			PACK_AUDIO(0)
 			
 		}

@@ -48,8 +48,9 @@ class Transfert
 protected:
         admMutex mutex;
         admCond  cond;
-        uint8_t  ready;
-        uint8_t  waitingData;
+        admCond  clientCond;
+        uint8_t  ready;        
+        
         uint8_t  aborted;
         uint8_t  *buffer;   
         uint32_t head,tail;     
@@ -62,6 +63,7 @@ public:
         uint8_t abort( void ); 
         uint8_t eof( void ) {return aborted;}; 
         uint8_t fillingUp( void);
+        uint8_t clientLock( void);
         
 };
 
