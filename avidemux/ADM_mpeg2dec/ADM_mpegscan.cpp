@@ -188,11 +188,13 @@ uint8_t			mpeg2decHeader::open(char *name)
 
 		for(uint32_t y=0;y<_nbFrames;y++)
 		{
-		     fgets(string,1023,file);     
-
-				  sscanf(string,"%c %llX %u",
+		     		fgets(string,1023,file);     
+				of=0;
+				sz=0;
+				abs=0;
+				sscanf(string,"%c %llX %u",
 				  &t,	 	&of,    	&sz);
-				   if(t!=(uint8_t)'I')
+				if(t!=(uint8_t)'I')
 				   { 
 				    _indexMpegPTS[y].type=t;
 				    _indexMpegPTS[y].offset=of;
