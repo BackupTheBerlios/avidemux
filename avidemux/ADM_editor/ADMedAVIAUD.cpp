@@ -88,9 +88,8 @@ _VIDEOS *currentVideo;
 	}
 	// switch segment
 	// We adjust the audiosample to avoid adding cumulative shift
-#if 0	
-	_audioSample=-_audioSample;
-	_audioSample+=_segments[_audioseg]._audio_duration;	
+#if 1	
+	_audioSample-=_segments[_audioseg]._audio_duration;	
 #else	
 	_audioSample=0;
 #endif	
