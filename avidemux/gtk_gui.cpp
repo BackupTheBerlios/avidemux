@@ -942,7 +942,11 @@ int A_openAvi2 (char *name, uint8_t mode)
 
 	updateLoaded ();
 	for(i=strlen(longname);i>=0;i--)
+#ifdef CYG_MANGLING
+		if( longname[i] == '\\' ){
+#else
 		if( longname[i] == '/' ){
+#endif
 			i++;
 			break;
 		}
