@@ -101,6 +101,14 @@ uint8_t         EncoderX264::configure (AVDMGenericVideoStream * instream)
                           return 0;
                   }
                   break;
+     case COMPRESS_2PASS:
+               // printf("\n X264 dual size: %lu (%s)\n",_param.finalsize,_logname);
+                _state = enc_Pass1;
+                _codec = new X264EncoderPass2 (_w, _h);
+                  //strcpy(encparam.logName,_logname);
+                  //printf("Using %s as stat file\n",encparam.logName);
+                        
+                  break;                  
         default:
                   ADM_assert(0);
       }
@@ -115,7 +123,15 @@ uint8_t         EncoderX264::configure (AVDMGenericVideoStream * instream)
 
 uint8_t    EncoderX264::startPass1 (void)
 {
-  ADM_assert(0);
+  ADV_Info *info;
+  ADM_assert (_state == enc_Pass1);
+  info= _in->getInfo ();
+  if(!_codec->init(_param.bitrate,info->fps1000,&(_codecParam)))
+  {
+    printf("Error initi Xvid4 pass1 mode\n");
+    return 0;
+  }
+  return 1;
 }
 
 
@@ -123,14 +139,20 @@ uint8_t    EncoderX264::startPass1 (void)
 uint8_t    EncoderX264::isDualPass (void)
 {
  
+  if ((_state == enc_Pass1) || (_state == enc_Pass2))
+  {
+    return 1;
+  }
   return 0;
 
 }
 
 uint8_t    EncoderX264::setLogFile (const char *lofile, uint32_t nbframe)
 {
+ // strcpy (_logname, lofile);
+  _frametogo = nbframe;
+  _totalframe= nbframe;
   return 1;
-  //ADM_assert(0);
 
 }
 
@@ -151,7 +173,23 @@ uint8_t
     return 0;
   }
 
+   //   return _codec->encode (_vbuffer, out, len, flags);
+  switch (_state)
+  {
+   
+                        
+    case enc_CBR:
+    case enc_CQ:
+    case enc_Pass1:
+    case enc_Pass2:
       return _codec->encode (_vbuffer, out, len, flags);
+      break;
+  
+    default:
+      ADM_assert (0);
+  }
+  return 1;   
+ 
  
 }
 
@@ -169,7 +207,44 @@ uint8_t
 uint8_t
     EncoderX264::startPass2 (void)
 {
-  ADM_assert(0);
+  float br;
+  uint32_t finalSize;
+  
+  ADM_assert (_state == enc_Pass1);
+  printf ("\n Starting pass 2 (%dx%d)\n",_w,_h);
+  
+  
+  finalSize=_param.finalsize;
+   
+
+   
+  br=finalSize*8;
+  br*=1024*1024;
+  br=br/ _totalframe;                             // bit / frame
+  br=br*_fps1000;
+  br=br/1000;
+   
+  finalSize= (int)floor(br);
+            
+  _state = enc_Pass2;
+        // Delete codec and start new one
+  if (_codec)
+  {
+    delete  _codec;
+    _codec = NULL;
+  }
+  printf("\n X264 dual size: %lu MB\n",_param.finalsize);
+        
+  _codec = new X264EncoderPass2 (_w, _h);
+ // strcpy(encparam.logName,_logname);
+  //printf("Using %s as stat file, average bitrate %d kbps\n",_logname,finalSize/1000);
+  if(!_codec->init((uint32_t )br,_fps1000,&_codecParam))
+  {
+    printf("Error initializing x264 pass1 mode\n");
+    return 0;
+  }
+  _frametogo=0;
+  return 1;
 }
 
 #endif

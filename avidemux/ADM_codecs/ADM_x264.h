@@ -74,4 +74,36 @@
     virtual         uint8_t init( uint32_t br,uint32_t fps1000,ADM_x264Param *param );     
  
 };
+//***************** Pass1 **************** 
+   class X264EncoderPass1 : public    X264Encoder
+{
+  protected :
+                                
+    uint32_t _q;              
+        
+  public :
+    X264EncoderPass1(uint32_t width,uint32_t height) : X264Encoder(width,height)
+    {
+
+    } ;
+    ~X264EncoderPass1();                    
+    virtual         uint8_t init( uint32_t val,uint32_t fps1000,ADM_x264Param *param );     
+ 
+};
+//***************** Pass 2 **************** 
+   class X264EncoderPass2 : public    X264Encoder
+{
+  protected :
+                                
+    uint32_t _q;              
+        
+  public :
+    X264EncoderPass2(uint32_t width,uint32_t height) : X264Encoder(width,height)
+    {
+
+    } ;
+    ~X264EncoderPass2();                    
+    virtual         uint8_t init( uint32_t val,uint32_t fps1000,ADM_x264Param *param );     
+ 
+};
 #endif

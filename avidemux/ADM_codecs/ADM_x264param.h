@@ -18,7 +18,8 @@ typedef struct ADM_x264Param
   uint32_t cabac;
   uint32_t maxKf;
   uint32_t minKf;
-  uint32_t nbBframe;    
+  uint32_t nbBframe;  
+    
 }ADM_x264Param;
 
 #endif

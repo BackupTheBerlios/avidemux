@@ -37,7 +37,7 @@ extern "C"
 
 // Yes, ugly FIXME
 static  x264_param_t          param;
-
+static  myENC_RESULT          x_res;
 //********************************************* 
 // Set the common stuff prior to codec opening
 // ratecontrol stuff is left to the caller
@@ -107,11 +107,6 @@ X264Encoder::~X264Encoder()
   stopEncoder(); 
 }
 //*******************************
-uint8_t         X264Encoder::getResult( void *ress)
-{
-  return 1;         
-}
-
 //************************************
 uint8_t         X264Encoder::encode( ADMImage        *in,
                                     uint8_t         *out,
@@ -121,7 +116,8 @@ uint8_t         X264Encoder::encode( ADMImage        *in,
   x264_nal_t *nal;
   int nbNal=0;
   int sizemax=0;
- #if 0 
+  x264_picture_t pic_out;
+  
         if(flags) *flags=0;
         
         memset(_pic,0,sizeof(x264_picture_t));
@@ -137,7 +133,7 @@ uint8_t         X264Encoder::encode( ADMImage        *in,
         
         PICS->i_type=X264_TYPE_AUTO;
         
-        if(x264_encoder_encode(HANDLE, &nal, &nbNal, PICS,NULL) < 0) 
+        if(x264_encoder_encode(HANDLE, &nal, &nbNal, PICS,&pic_out) < 0) 
         {
           printf("Error encoding with x264\n");
           return 0; 
@@ -151,25 +147,36 @@ uint8_t         X264Encoder::encode( ADMImage        *in,
           size+= x264_nal_encode(out + size, &sizemax, 1, &nal[i]);          
         }
         *len=size;
+        
+        if(pic_out.i_type==X264_TYPE_IDR)  x_res.is_key_frame=1;
+              else x_res.is_key_frame=0;
+        x_res.out_quantizer=pic_out.i_qpplus1;
         if(flags)
         {
-                if(PICS->i_type==X264_TYPE_IDR) *flags=AVI_KEY_FRAME;
+                *flags=x_res.is_key_frame;
         }
-#endif	
-        return 1;
-      
-        
-        
-  
-}
 
+        return 1;  
+}
+//**************************************
+uint8_t         X264Encoder::getResult( void *ress)
+{
+  myENC_RESULT *res;
+
+  res=(myENC_RESULT *)ress;
+  memcpy(res,&x_res,sizeof(myENC_RESULT));
+  return 1;
+
+}
 //*******************CQ*****************
 uint8_t         X264EncoderCQ::init( uint32_t val,uint32_t fps1000,ADM_x264Param *zparam )
 {
   memset(&param,0,sizeof(param));
   x264_param_default( &param );
 
-  param.rc.i_qp_constant=val;           // should be ~ the same as CQ mode (?)
+  param.rc.i_rc_buffer_size=-1;
+  param.rc.i_qp_constant=val;  
+           // should be ~ the same as CQ mode (?)
   return preamble(fps1000,zparam); 
 }
 X264EncoderCQ::~X264EncoderCQ()
@@ -183,11 +190,54 @@ uint8_t         X264EncoderCBR::init( uint32_t val,uint32_t fps1000,ADM_x264Para
   x264_param_default( &param );
   param.rc.b_cbr=1;
   param.rc.i_bitrate=val;  
+  param.rc.i_rc_buffer_size=val;
+  param.rc.i_rc_init_buffer=val>>1;
   return preamble(fps1000,zparam); 
 }
 X264EncoderCBR::~X264EncoderCBR()
 {
   stopEncoder(); 
 }
+//*********************Pass1***************
+uint8_t         X264EncoderPass1::init( uint32_t val,uint32_t fps1000,ADM_x264Param *zparam )
+{
+  memset(&param,0,sizeof(param));
+  x264_param_default( &param );
+  
+  param.rc.i_rc_buffer_size=-1;
+  param.rc.i_qp_constant=2;  
+  
+  param.rc.b_stat_write = 1;
+  param.rc.b_stat_read = 0;
+  param.rc.psz_stat_out = "/tmp/x264_log.tmp"; //FIXME
+  return preamble(fps1000,zparam); 
+}
+X264EncoderPass1::~X264EncoderPass1()
+{
+  stopEncoder(); 
+}
+//*********************Pass1***************
+uint8_t         X264EncoderPass2::init( uint32_t val,uint32_t fps1000,ADM_x264Param *zparam )
+{
+  memset(&param,0,sizeof(param));
+  x264_param_default( &param );
+  
+  param.rc.b_cbr=1;
+  param.rc.i_bitrate=val;  
+  param.rc.i_rc_buffer_size=val;
+  param.rc.i_rc_init_buffer=val>>1;
+  
+  param.rc.b_stat_write = 0;
+  param.rc.b_stat_read = 1;
+  
+  
+  param.rc.psz_stat_in = "/tmp/x264_log.tmp"; // FIXME
+  return preamble(fps1000,zparam); 
+}
+X264EncoderPass2::~X264EncoderPass2()
+{
+  stopEncoder(); 
+}
+
 //********
 #endif

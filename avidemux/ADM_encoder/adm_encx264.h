@@ -40,6 +40,7 @@ class EncoderX264: public Encoder
     uint32_t                _fps1000;
     COMPRES_PARAMS          _param;
     ADM_x264Param           _codecParam;
+    uint32_t                _totalframe;
   public:
     EncoderX264    ( X264Config  *conf)  ;
     ~EncoderX264    ()  ;
