@@ -631,7 +631,7 @@ CXXFLAGS="   -I.. -IADM_library -I../ADM_library  -D_LARGEFILE_SOURCE -D_FILE_OF
 CFLAGS="  $CFLAGS -g3"
 AC_DEFINE(ADM_DEBUG,1,[be verbose])
 else
-CXXFLAGS="  -I.. -IADM_library -I../ADM_library  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -g $CXXFLAGS -O2"
+CXXFLAGS="  -I.. -IADM_library -I../ADM_library  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  $CXXFLAGS -O3"
 
 fi
 
