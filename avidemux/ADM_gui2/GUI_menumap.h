@@ -15,8 +15,11 @@ CALLBACK(avi_muxer_options1 			,ACT_SetMuxParam);
 CALLBACK(save_raw_video_stream1			,ACT_SaveRaw);
 CALLBACK(save_as_dvd_ps1			,ACT_SaveDVDPS);
 
-
-
+CALLBACK(load_project         			,ACT_OpenAvi); 
+CALLBACK(save_project_as1              		,ACT_SaveWork);
+CALLBACK(save_current_project                	,ACT_SaveCurrentWork);
+ 
+ 
 CALLBACK(to_toolame1 				,ACT_Pipe2Lame);
 CALLBACK(to_lame1 				,ACT_PipeLame);
 CALLBACK(to_other1 				,ACT_Pipe2Other);
@@ -53,8 +56,7 @@ CALLBACK(to_other1 				,ACT_Pipe2Other);
  CALLBACK( search_previous_black_frame1  			,ACT_PrevBlackFrame);
  CALLBACK( search_next_black_frame1 			,ACT_NextBlackFrame);
 
- CALLBACK(load_edit_list1               		,ACT_LoadWork);
- CALLBACK(save_edit_list1                	,ACT_SaveWork);
+ 
 CALLBACK(reset_edits1                		,ACT_ResetSegments);
 
 
