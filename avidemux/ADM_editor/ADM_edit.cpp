@@ -523,6 +523,7 @@ TryAgain:
   					vid->_aviheader->getFrameNoAlloc (i,
 							 bufferin,
 							 &len, &flags);
+                                        if(!len) continue;
 					if(!vid->decoder->uncompress( (uint8_t *)bufferin,buffer,len,&flag2 ))
 					{
 						err++;
@@ -539,7 +540,9 @@ TryAgain:
 					 	bframe=1;
 						vid->_aviheader->getFlags(i,&flags);
 						if(!(flags & AVI_B_FRAME))
+                                                {
 							bconsistency=0;
+                                                }
 						else
 							printf("\n and flags is ok\n");
 					}
