@@ -158,6 +158,33 @@ class ADM_AudiocodecWavSwapped : public     ADM_Audiocodec
 
 
 #endif
+#ifdef USE_FAAD
+#define FAAD_BUFFER 2048
+  class ADM_faad : public     ADM_Audiocodec
+ {
+    protected:
+    						uint8_t _inited;
+						void	*_instance;
+						uint8_t _buffer[FAAD_BUFFER];
+						uint32_t _inbuffer;	
+    public:
+                					ADM_faad( uint32_t fourcc ,WAVHeader *info,
+								uint32_t l,uint8_t *d);
+                		virtual			~ADM_faad() ;
+         			virtual         void 	purge( void );
+                 virtual 			uint8_t run( uint8_t * ptr, uint32_t nbIn, 
+		 						uint8_t * outptr,   uint32_t * nbOut);
+                 virtual			uint8_t isCompressed( void ){ return 1;};
+                 virtual			uint8_t isDecompressable(void ){ return 1;};
+		 virtual 			uint8_t beginDecompress( void ) ;
+                 virtual 			uint8_t endDecompress( void ) ;
+          
+
+   };
+
+
+
+#endif
 
 #define ADMWA_BUF 4096
    class ADM_AudiocodecWMA : public     ADM_Audiocodec

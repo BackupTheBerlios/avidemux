@@ -87,6 +87,13 @@ ADM_Audiocodec *out;
 								extra,extraData);
 						break;
 #endif		
+#ifdef USE_FAAD
+				case WAV_MP4:
+						printf("\n MP4 audio \n");
+						out= (ADM_Audiocodec *) new ADM_faad(fourcc,info,
+								extra,extraData);
+						break;
+#endif
 
               	case WAV_WMA:
         				printf("\n Audio codec:  ffWMA\n");
