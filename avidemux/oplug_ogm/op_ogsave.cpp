@@ -45,56 +45,84 @@
 #include "ADM_audiofilter/audioprocess.hxx"
 
 #include "ADM_library/default.h"
-#include "oplug_ogm/op_ogpage.h"
+#include "oplug_ogm/op_ogsave.h"
 
-
+//_______________________________________________
 uint8_t ogmSave(char  *name)
 {
-FILE *fd=NULL;
+uint8_t ret;
+	ADM_ogmWrite *writter;
+	if(videoProcessMode)
+		writter=new ADM_ogmWriteProcess;
+	else
+		writter=new ADM_ogmWriteCopy;
+	writter->save(name);
+	
+	delete writter;
+	return ret;
+}
+
+//_______________________________________________
+ADM_ogmWrite::ADM_ogmWrite(void)
+{
+_audioBuffer=_videoBuffer=NULL;
+videoStream=videoStream=NULL;
+encoding_gui=NULL;
+_fd=NULL;
+_togo=0;
+}
+
+//_______________________________________________
+ADM_ogmWrite::~ADM_ogmWrite()
+{
+#define FREE_IF(x) if(x) {delete x;x=NULL;}
+#define FREE_IFX(x) if(x) {delete [] x;x=NULL;}
+
+	FREE_IFX(_audioBuffer);
+	FREE_IFX(_videoBuffer);
+	FREE_IF(videoStream);
+	FREE_IF(videoStream);
+	FREE_IF(encoding_gui);
+	if(_fd) fclose(_fd);
+	_fd=NULL;
+
+
+}
+//_______________________________________________
+uint8_t ADM_ogmWrite::save(char *name)
+{
+
 uint8_t *bufr;
 uint32_t len,flags;
 uint8_t error=0;
 double audioTarget,audioCurrent,audioInc;
 WAVHeader	*info=NULL;
-		bufr=new uint8_t[avifileinfo->width*avifileinfo->height*3];
-		fd=fopen(name,"wb");
-		if(!fd)
+
+		_fd=fopen(name,"wb");
+		if(!_fd)
 		{
 			GUI_Alert("Problem writing to that file\n");
 			return 0;
 		}
-		ogm_page *videoStream,*audioStream=NULL;
-		videoStream=new ogm_page(fd,0);
-	
+
+		videoStream=new ogm_page(_fd,0);
+	/*
 		if(currentaudiostream)
 		{
 			audioStream=new ogm_page(fd,1);
 		}
+	*/
+		encoding_gui=new DIA_encoding(25000);
 		//______________ Write headers..._____________________
-		stream_header header;
 		
-		memset(&header,0,sizeof(header));
+		if(!initVideo())
+		{
+			fclose(_fd);
+			GUI_Alert("Troubles initializing video\n");
+			return 0;
 		
-		memcpy(&(header.streamtype),"video\0\0\0",8);
-		memcpy(&(header.subtype),&(avifileinfo->fcc),4);
-		header.size=sizeof(header);
-		header.video.width=avifileinfo->width;
-		header.video.height=avifileinfo->height;
-		// Timing ..
-		double duration; // duration in 10us
-		duration=avifileinfo->fps1000;
-		duration=1000./duration;
-		duration*=1000*1000;
-		duration*=10;
-		
-		header.time_unit=(int64_t)duration;
-		header.samples_per_unit=1;
-		
-		header.buffersize=0x10000;
-		header.bits_per_sample=24;
-		
-		
-		videoStream->writeHeaders(sizeof(header),(uint8_t *)&header); // +4 ?
+		}
+#if 0		
 		//______________ Write headers/ Audio..._____________________
 		if(audioStream)
 		{
@@ -137,17 +165,20 @@ WAVHeader	*info=NULL;
 		}
 		uint32_t chunk,red;
 		double audioPcm;
+#endif		
+		encoding_gui->setFps(_fps1000);
+		encoding_gui->reset();
 		// ___________________Then body_______________________
-		for(uint32_t j=frameStart;j<=frameEnd && !error;j++)
+		for(uint32_t j=0;j<=_togo && !error;j++)
 		{
-			error=!  video_body->getFrameNoAlloc (j, bufr, &len,
-				      &flags);	
-			if(error)
+			encoding_gui->setFrame(j,_togo);
+			if(!encoding_gui->isAlive())
 			{
-				 continue;
+				error=1;
+				continue;
 			}
-			videoStream->write(len,bufr,flags,j-frameStart);
-			
+			if(!writeVideo(j)) error=1;
+#if 0			
 			//
 			if(audioStream)
 			{
@@ -163,25 +194,36 @@ WAVHeader	*info=NULL;
 				}
 				
 				audioPcm=audioCurrent;
-				audioCurrent+=red;
-				audioPcm*=info->frequency; // back to sample
-				audioPcm/=info->byterate; // durtion in second				
+				audioCurrent+=red;				
+				audioPcm/=1152; // Hardcoded to MP3 as of now
 				
 				audioStream->write(red,bufr,0,(uint64_t)floor(audioPcm));
 				
 			}
+#endif			
 		}
+		delete encoding_gui;
+		encoding_gui=NULL;
 		//________________ Flush______________________
 		videoStream->flush();
-		if(audioStream) audioStream->flush();
+		//if(audioStream) audioStream->flush();
 		// ____________Close____________________
-		delete videoStream;
-		if(audioStream) 
-		{
-			delete audioStream;
-		}
-		delete [] bufr;
-		fclose(fd);
+		fclose(_fd);
 
 	return !error;
 }
+// Dummy ones
+uint8_t	ADM_ogmWrite::initVideo(void)
+{
+		assert(0);
+		return 0;
+
+}
+//___________________________________________________
+uint8_t	ADM_ogmWrite::writeVideo(uint32_t frame)
+{
+		assert(0);
+		return 0;
+
+}
+// EOF
