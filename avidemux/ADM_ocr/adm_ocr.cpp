@@ -566,10 +566,30 @@ void displaySmall( admGlyph *glyph)
         sdata=NULL;
         sw=glyph->width;
         sh=glyph->height;
-        sdata=new uint8_t[(sw)*(sh)];
-        gtk_widget_set_usize(smallDisplay, sw+2, sh+2);
+        sdata=new uint8_t[(sw*2+2)*(sh*2+2)];
+        gtk_widget_set_usize(smallDisplay, sw*2+2, sh*2+2);
     }
-    memcpy(sdata,glyph->data,sw*sh);
+    uint32_t stride=sw*2+2;
+    uint8_t *in=glyph->data;
+    uint8_t *out=sdata;
+    
+    memset(out,0,stride);
+    out+=stride;
+    for(uint32_t y=0;y<sh;y++)
+    {
+      *(out++)=0;
+      for(uint32_t x=0;x<sw;x++)
+      {
+        out[1]=out[0]=out[stride]=out[stride+1]=*in;
+        out+=2; 
+        in++;
+        
+      } 
+      *(out++)=0;
+      out+=stride;      
+    }
+    memset(out,0,stride);
+    //memcpy(sdata,glyph->data,sw*sh);
     gui_draw_small();
 } 
 
@@ -577,13 +597,13 @@ gboolean gui_draw_small(void)
 { 
  if(sw && sh && sdata)
     gdk_draw_gray_image(smallDisplay->window, smallDisplay->style->fg_gc[GTK_STATE_NORMAL],
-                        1,                          // X
-                        1,                          // y
-                        sw,                          //width
-                        sh,                          //h*2, // heigth
+                        0,                          // X
+                        0,                          // y
+                        sw*2+2,                          //width
+                        sh*2+2,                          //h*2, // heigth
                         GDK_RGB_DITHER_NONE,
                         sdata, // buffer
-                        sw );
+                        sw*2+2 );
     return true;
 }
 
@@ -670,91 +690,6 @@ char text[1024];
     }
 }
 /**
-*/
-uint8_t saveGlyph(void)
-{
-    FILE *out;
-    char *name=NULL;
-    uint32_t slen;
-    
-    admGlyph *glyph=head.next;
-    
-    GUI_FileSelWrite("Select Glyphfile to save to", &name);
-    if(!name)
-        return 0;
-    
-    out=fopen(name,"wb");
-    ADM_dealloc(name);
-    if(!out)
-    {
-        GUI_Alert("Problem writing");
-        return 0;
-    }
-    #define WRITE(x) fwrite(&(x),sizeof(x),1,out);
-    WRITE(nbGlyphs);
-    
-    while(glyph)
-    {
-        WRITE(glyph->width);
-        WRITE(glyph->height);
-        fwrite(glyph->data,glyph->width*glyph->height,1,out);
-        if(glyph->code) slen=strlen(glyph->code);
-             else slen=0;
-        WRITE(slen);
-        fwrite(glyph->code,slen,1,out);
-        glyph=glyph->next;
-    }
-    
-    fclose(out);
-    return 1;
-
-}
-/**
-*/
-uint8_t loadGlyph(char *name)
-{
-    FILE *out;
-    admGlyph *glyph,*nw;
-    uint32_t N,w,h,slen;
-    
-    if(head.next)
-    {
-        if(!GUI_Question("Erase current glyphs ?"))
-            return 0;
-        destroyGlyphTree(&head);
-        nbGlyphs=0;
-    }
-    glyph=&head;
-    out=fopen(name,"rb");
-    if(!out)
-    {
-        GUI_Alert("Problem reading");
-        return 0;
-    }
-    #define READ(x) fread(&(x),sizeof(x),1,out);
-    nbGlyphs=0;
-    READ(N);
-    while(N--)
-    {
-        
-        READ(w);
-        READ(h);
-        nw=new admGlyph(w,h);
-        fread(nw->data,w*h,1,out);
-        READ(slen);
-        if(slen)
-        {
-            nw->code=new char[slen+1];
-            fread(nw->code,slen,1,out);
-            nw->code[slen]=0;
-        }
-        glyph->next=nw;
-        glyph=nw;
-        nbGlyphs++;
-    }
-    
-    fclose(out);
-    return 1;
-
-}
+ */
+#include "ADM_ocrLoadSave.h"
 //;

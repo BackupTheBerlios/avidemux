@@ -9,3 +9,4 @@ libADM_ocr_a_SOURCES =  adm_ocr.cpp adm_glyph.cpp adm_leftturn.cpp
 
 EXTRA_DIST = 
 
+noinst_HEADERS = ADM_ocrLoadSave.h
