@@ -70,6 +70,7 @@ int scriptVideoCodec2(int n,Arg *args);
 int scriptSave(int n,Arg *args);
 int scriptLoadFilter(int n,Arg *args);
 int scriptAddVideoFilter(int n,Arg *args);
+int scriptRemoveFrame(int n,Arg *args);
 extern void HandleAction(Action act);
 //_________________________
 #include "adm_command.h" 
@@ -85,6 +86,15 @@ VF_FILTERS filter;
 		printf("Filter tag :%d\n",filter);
 		return (filterAddScript(filter,n,args));
 		
+}
+//___________________________
+extern int A_delete(uint32_t start, uint32_t end);
+int scriptRemoveFrame(int n,Arg *args)
+{
+uint32_t a,b;
+		a=args[0].arg.integer;
+		b=args[1].arg.integer;
+		return A_delete(a,b);
 }
 //_______________________
 extern int filterLoadXml(char *docname,uint8_t silent);

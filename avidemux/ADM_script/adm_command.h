@@ -66,6 +66,7 @@ static const admCommand myCommands[]=
 	{"setmarkerb",		scriptSetMarkerB,1,APM_NUM},
 	
 	{"addvideofilter",	scriptAddVideoFilter,0x101,APM_STRING},
+	{"removeframes",	scriptRemoveFrame,2,APM_NUM,APM_NUM},
 	
 	{"exit", 		scriptExit,0}
 };
