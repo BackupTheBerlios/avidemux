@@ -68,7 +68,7 @@ extern "C" {
 #include "ADM_toolkit/toolkit.hxx"
 extern uint8_t GUI_Question(char *);
 extern  uint8_t use_fast_ffmpeg;
-
+uint8_t isMpeg12Compatible(uint32_t fourcc);
 uint8_t isMpeg4Compatible( uint32_t fourcc)
 {
      #define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
@@ -87,6 +87,26 @@ uint8_t isMpeg4Compatible( uint32_t fourcc)
 
       #undef CHECK
 }
+#ifdef ADM_BIG_ENDIAN
+	#define SWAP32(x) x=R32(x)
+#else
+	#define SWAP32(x) ;
+#endif
+
+uint8_t isMpeg12Compatible(uint32_t fourcc)
+{
+ #define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+						{mpeg=1; }
+
+    uint8_t mpeg=0;	
+    	CHECK("MPEG");
+	CHECK("mpg1");
+	SWAP32(fourcc);
+        if(fourcc==0x10000002) mpeg=1;
+         return mpeg;
+#undef CHECK
+}
+	
 uint8_t isMSMpeg4Compatible( uint32_t fourcc)
 {
      #define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
@@ -242,16 +262,13 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 							printf("\n using VP3 codec\n");
 			       	return(decoders *)( new decoderVP3(w,h));
 			    }
-#endif          
-         if(fourCC::check(fcc,(uint8_t *)"MPEG")
-		|| fourCC::check(fcc,(uint8_t *)"mpg1")
-		|| fcc==0x10000002
-	 )
-         {
-				printf("\n using Mpeg1/2 codec (libmpeg2)\n");
-			    	return(decoders *)( new decoderMpeg(w,h,extraLen,extraData));
-			     // 	return(decoders *)( new decoderFFMpeg12(w,h,extraLen,extraData));
-			    }
+#endif         
+	if(isMpeg12Compatible(fcc))
+	{         
+		printf("\n using Mpeg1/2 codec (libmpeg2)\n");
+	    	return(decoders *)( new decoderMpeg(w,h,extraLen,extraData));
+	     // 	return(decoders *)( new decoderFFMpeg12(w,h,extraLen,extraData));
+	}
 
         // default : null decoder
   			printf("\n using invalid codec for \n");

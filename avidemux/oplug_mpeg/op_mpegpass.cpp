@@ -54,7 +54,7 @@
 			muxer->writeAudioPacket(audiolen,buffer); }
 			
     
- 
+ uint8_t isMpeg12Compatible(uint32_t fourcc);
  
 void mpeg_passthrough(  char *name )
 {
@@ -74,7 +74,7 @@ void mpeg_passthrough(  char *name )
   	printf("Saving as mpg PS to file %s\n",name);
   
   	// First we check it is mpeg
-  	if(!fourCC::check(avifileinfo->fcc,(uint8_t *)"MPEG"))
+	if(!isMpeg12Compatible(avifileinfo->fcc))
   	{
   		GUI_Alert("This is not a mpeg.\nSwitch to process mode.");
 		return ;
