@@ -71,7 +71,8 @@ extern "C"
 {
 	#include "ADM_requant/tcrequant.h"
 }
-#include "ADM_lvemux/ADM_muxer.h"
+//#include "ADM_lvemux/ADM_muxer.h"
+#include "ADM_lavformat/ADM_lavformat.h"
 
 
 uint8_t DIA_Requant(float *perce,uint32_t *quality,uint64_t init,uint32_t audioSize);
@@ -109,13 +110,15 @@ void A_requantize( void )
 		size+=fsize;
 	}
 	//
-	audio=mpt_getAudioStream(&audioInc,1);
+	audio=mpt_getAudioStream();
 	if(audio)
 	{
 		audioSize=audio->getLength();
 	}
 	else
+	{
 		audioSize=0;
+	}
 	//
 	deleteAudioFilter();
 	printf("Found audio :%lu\n",audioSize);
@@ -129,39 +132,25 @@ void A_requantize( void )
 	
 	A_requantize2(percent,quality,out_name);
 }
-#if 1
+
 #define PACK_AUDIO \
 { \
 	uint32_t samples; \
 	uint32_t fill=0; \
 	uint32_t audiolen; \
-	audioWanted+=audioInc; \
-	while(audioGot <audioWanted) \
+	while(muxer->needAudio()) \
 	{				\
-		if(!audio->getPacket(audioBuffer+fill, &audiolen, &samples))	\
+		if(!audio->getPacket(audioBuffer, &audiolen, &samples))	\
 		{ \
 			break; \
 		}\
-		fill+=audiolen; \
+		if(audiolen)	{muxer->writeAudioPacket(audiolen,audioBuffer);} \
 		audioGot+=audiolen; \
 	} \
-	if(fill) muxer->writeAudioPacket(fill,audioBuffer); \
-	else	printf("requant: frame %lu : no more audio\n",i);\
 }
-#else
-#define PACK_AUDIO 	{ uint32_t audiolen=0, audioread=0;	\
-				audioWanted+=audioInc; \
-				if(muxer->audioEmpty()) \
-	 				audiolen=(uint32_t)floor(8+audioWanted-audioGot);\
-				else \
- 					audiolen=(uint32_t)floor(audioWanted-audioGot);\
-				audioread = audio->read (audiolen,audioBuffer); \
-				if(audioread!=audiolen) printf("Mmm not enough audio..\n"); \
-				muxer->writeAudioPacket(audioread,audioBuffer);\
-				audioGot+=audioread;}
-#endif				
-#define PACK_FRAME(i) \
-			video_body->getRaw (i, buffer, &len); \
+			
+#define PACK_FRAME(d,p) \
+			video_body->getRaw (p, buffer, &len); \
 			Mrequant_frame(buffer,  len,outbuffer, &lenout); \
 			encoding->feedFrame(lenout);	\
 			aprintf("%lu in:%03lu out:%03lu\n",i,len>>10,lenout>>10); \
@@ -169,7 +158,7 @@ void A_requantize( void )
 	  			fwrite (outbuffer, lenout, 1, file); \
 			else\
 			{\
-				muxer->writeVideoPacket(lenout,outbuffer); \
+				muxer->writeVideoPacket(lenout,outbuffer,d-frameStart,p-frameStart); \
 				aprintf("Requant in %x %x %x %x\n",buffer[0],buffer[1],buffer[2],buffer[3]); \
 				aprintf("Requant out %x %x %x %x %x %x\n",outbuffer[0],\
 					outbuffer[1],outbuffer[2],outbuffer[3],outbuffer[4],outbuffer[5]); \
@@ -188,7 +177,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	double 		audioInc=0;
 	double		audioWanted=0,audioGot=0;
 	uint32_t	audioLen;
-	MpegMuxer	*muxer=NULL;
+	lavMuxer	*muxer=NULL;
 	uint32_t	fps1000=0;
 	
 	
@@ -203,12 +192,15 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	
  	
 	// get audio if any
-	audio=mpt_getAudioStream(&audioInc);
+	audio=mpt_getAudioStream();
 	if(audio)
 	{
 		fps1000=avifileinfo->fps1000;
-		muxer=new MpegMuxer;
-		if(!muxer->open(out_name,MUX_MPEG_VRATE,fps1000,audio->getInfo(),(float)audioInc))
+		muxer=new lavMuxer;
+		aviInfo info;
+		video_body->getVideoInfo(&info);
+		if(!muxer->open(out_name,(uint32_t )0,&info,audio->getInfo()))
+		//if(!muxer->open(out_name,0,fps1000,audio->getInfo(),(float)audioInc))
 		{
 			GUI_Alert("Muxer init failed\n");
 			goto _abt;
@@ -260,11 +252,11 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	  		if (!found)
 	    			goto _abt;
 	  		// Write the found frame
-	  		PACK_FRAME(found);
+	  		PACK_FRAME(i,found);
 	  		// and the B frames
 	  		for (uint32_t j = i; j < found; j++)
 	    		{
-	      			PACK_FRAME(j);
+	      			PACK_FRAME(j+1,j);
 			}
 	  		i = found;		// Will be plussed by for
 		}
@@ -285,8 +277,8 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	  					fwrite (outbuffer, lenout, 1, file); 
 					else
 					{
-						muxer->writeVideoPacket(lenout,outbuffer); 
-						aprintf("in:%03lu out:%03lu\n",len>>10,lenout>>10); \
+						muxer->writeVideoPacket(lenout,outbuffer,0,0); 
+						aprintf("in:%03lu out:%03lu\n",len>>10,lenout>>10); 
 						PACK_AUDIO; 
 					}
 				}
@@ -305,14 +297,14 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	  					fwrite (outbuffer, lenout, 1, file); 
 					else
 					{
-						muxer->writeVideoPacket(lenout,outbuffer); 
+						muxer->writeVideoPacket(lenout,outbuffer,0,0); 
 						PACK_AUDIO; 
-						aprintf("in:%03lu out:%03lu\n",len>>10,lenout>>10); \
+						aprintf("in:%03lu out:%03lu\n",len>>10,lenout>>10);
 					}
 				}
 			}
 			else
-	  			PACK_FRAME(i);	
+	  			PACK_FRAME(i,i);	
 		}
 	}
 _abt:
