@@ -230,6 +230,19 @@ void UI_purge( void )
 			      }
 
 }
+uint64_t swap64(uint64_t in)
+{
+uint32_t low,high;
+uint64_t out;
+	high=in>>32;
+	low=in&0xffffffff;
+	high=swap32(high);
+	low=swap32(low);
+	out=low;
+	out=(out<<32)+high;
+	return out;
+
+}
 // swap BE/LE : Ugly
 uint32_t swap32( uint32_t in)
 {
