@@ -277,25 +277,30 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 	static uint32_t nbSz,nbCo,nbSc,nbSync;
 	static uint32_t duration;
 	static uint32_t _lastW, _lastH;
+	static uint32_t nest=0;
 
 	uint32_t type;
 	uint32_t n=0,j,wh,i,l=0;
 	uint32_t tag=0xff;
 
+	
 	while(!atom->isDone())
 	{
 		adm_atom tom(	atom);
 #ifdef _3GP_VERBOSE
+					for(uint32_t o=0;o<nest;o++) printf("\t");
 					printf("parsing atom ");
-					fourCC::print(tom.getFCC());
+					fourCC::printBE(tom.getFCC());
 					printf("\n");	
 #endif
+		nest++;
 		switch((tom.getFCC()))
 		{
 			default:
 #ifdef _3GP_VERBOSE
+					for(uint32_t o=0;o<nest;o++) printf("\t");
 					printf("skipping atom ");
-					fourCC::print(tom.getFCC());
+					fourCC::printBE(tom.getFCC());
 					printf("\n");	
 #endif
 					tom.skipAtom();
@@ -316,8 +321,12 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 			case MKFCCR('M','O','V','I') : //'MOVI':
 				parseAtomTree(&tom);
 				break;
+			case MKFCCR('s','m','h','d'): // Track audio header
+					fourCC::printBE(tom.read32());
+					tom.skipAtom();
+					break;
 			case MKFCCR('d','c','o','m') : //dcom':
-					fourCC::print(tom.read32());
+					fourCC::printBE(tom.read32());
 					tom.skipAtom();
 					break;
 			case MKFCCR('m','v','h','d') : //'mvhd':
@@ -381,36 +390,34 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					tom.skipBytes(8);
 					_rdWav=new WAVHeader;
 					memset(_rdWav,0,sizeof(WAVHeader));
-					printf("Raw audio detected\n");
-					printf("Version : %u\n",tom.read16());
-					printf("Revision :%u\n",tom.read16());
-					printf("Vendor :%lu\n",tom.read32());
-					_rdWav->channels=tom.read16();
-					_rdWav->bitspersample=tom.read16();
-					_rdWav->encoding=tom.read16();
-
-					printf("Channels :%lu\n",_rdWav->channels);
-					printf("S size :%lu\n",_rdWav->bitspersample);
-					printf("Compression :%u\n",_rdWav->encoding);
-					printf("Packet Size :%u\n",tom.read16());
-					i=tom.read32();
-					if(i&0xffff)
-					{
-						GUI_Alert("Expect troubles...\n");
-					}
-					if(!_rdWav->channels) _rdWav->channels=1;
-					if(_rdWav->bitspersample<8) _rdWav->bitspersample=8;
-					_rdWav->encoding=WAV_MP4; // dummy codec, mpeg4 audio
-#warning hardcoded
-					_rdWav->byterate=16000;
-					_rdWav->frequency=(i>>16);
-					printf("Bitrate :%lu (%x)\n",i,i);
-					printf("Byterate :%lu\n",_rdWav->byterate);
-					printf("Frequency :%lu\n",_rdWav->frequency);
-// hardcoded for now
-
+					_rdWav->encoding=WAV_MP4;
+					
+					#warning !!!!!!!!!!!!!!!
+					#warning decode MP4 audio header!
+					#warning !!!!!!!!!!!!!!!
+					_rdWav->frequency=44100;
+					_rdWav->channels=2;
+					_rdWav->bitspersample=16;
+					_rdWav->byterate=128000/8;
+					
 					tom.skipAtom();
 					break;
+			case MKFCCR('s','a','m','r'): //'mp4a':
+					tom.skipBytes(8);
+					_rdWav=new WAVHeader;
+					memset(_rdWav,0,sizeof(WAVHeader));
+					_rdWav->encoding=WAV_AMRNB;
+					
+					#warning !!!!!!!!!!!!!!!
+					#warning decode WAV_AMRNB audio header!
+					#warning !!!!!!!!!!!!!!!
+					_rdWav->frequency=8000;
+					_rdWav->channels=1;
+					_rdWav->bitspersample=16;
+					_rdWav->byterate=12000/8;
+					
+					tom.skipAtom();
+					break;					
 			case MKFCCR('s','t','s','s'): //'stss':
 				printf("Sync atom found\n");
 				tom.read32();
@@ -675,8 +682,9 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				break;
 				
 		}
-
+		nest--;
 	}
+	
 	return 1;
 }
 /*

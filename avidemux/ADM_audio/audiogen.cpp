@@ -63,6 +63,8 @@ uint8_t AVDMGenericAudioStream::goToSync(uint32_t offset)
     #define SYNCAC3 8192
     uint8_t	syncbuff[SYNCAC3];
     uint32_t suboffset = 0,byterate;
+    uint32_t tryz;
+    
     assert(_wavheader);
     // can't deal with something not mp3...
   //  printf("syncing asked : %lu",offset);
@@ -97,6 +99,39 @@ uint8_t AVDMGenericAudioStream::goToSync(uint32_t offset)
 		      			printf("... wma offset : %lu",wmaoffset);
 				    	if(!goTo(wmaoffset)) return 0;
 					return 1;
+		case WAV_MP4:
+		#warning FIXME NEED DOC
+				suboffset=0;
+				tryz=0;
+				if(!goTo(offset)) return 0;
+				while(tryz<1200)
+				{
+					if (!read(1, &a))
+					{
+						printf("MP4sync :Read failed\n");
+	      					return 0;
+					}
+					if(a==0x21)
+						{
+							if (!read(1, &a))
+	      							return 0;
+							if(a==0x0a)
+							{
+								if(!goTo(offset+suboffset))
+								{
+									printf("MP4sync :Seek failed\n");
+									return 0;
+								}
+								printf("MP4sync : sync %ld\n",suboffset);
+								return 1;
+							}
+							suboffset++;
+						}
+					suboffset++;
+					tryz++;
+				}
+				printf("MP4sync : cound not find sync\n");
+				return 0;
 						
       		case WAV_PCM:
       			uint32_t mask;
