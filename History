@@ -1,20 +1,104 @@
-     ************************ TODO****************************
+************************ TODO****************************
 	Todo :
-						
-			
-			+ Fix smart copy with B-frame support	
-			+ Fix memory leak induced by raw shift<<<===			
-			
-			
-		ALTIVEC
-			
-	
-	
-		Audio API : 	Grab returns MINUS_ONE when cannot read anymore
+
+	Audio API : 	Grab returns MINUS_ONE when cannot read anymore
 				Read returns 0
 				getPacket returns 0
-       *********************** /TODO ***************************
-       03/11/03
+*********************** /TODO **************************
+ Xmas break, win32 based, Laptop rules
+       
+              Basic support for field encoded mpeg2
+              Fix postproc for field encoded mpeg2
+              Fix displayed qz (not ok for mpeg2)
+              Fix displayed audio in copy mode
+              Win32: Display quant workaround
+              Added setFormat script command
+              Display audio codec/mode when using lavc codec
+              
+
+	21.12.04
+		- display if qpel was used (gross hack)
+		- 
+	19.12.04
+		- fix crah when unpacking Bvop / resulting # of image > initial (blah2.5.Avi)
+		- save container used in project file
+		- better projection model
+	18.12.04
+		- simplistic projecton model + VBV for DVD (lavc)
+		- Jens : save xvid conf in prefs
+		
+	17.12.04
+		- fixed xvidrc + dvd (lavc)
+		- began adding VBV to xvidrc
+	13/12/04
+		- added muxer capabilities to lavcodec mpeg1/2 codec (X*VCD)
+	12/12/04
+		- S s.deleeuw : add more file in mpeg (several digit)
+		- Jens : gcc 2.95 fix
+---------------test2-----------------------
+	08/12/04
+		- Use fake normalize to avoid being stuck for long in calculator DVD/ps
+	06/12/04
+		- PTS/DTS is in fact needed (absolutely)
+	05/12/04
+		- Try to guess svcd in copy mode
+	04/12/04
+		- non altivec ppc fix by darwin@otierney.net 
+	03/12/04
+		- stereo2mono / -1 final
+		- cleanup for removed menu entries
+		- handle mp3 vbr/cbr writing correctly, gain some space !
+	02/12/04
+		- save as VCD PS/DVD PS depending if it is mpeg1 or 2
+		- win32 compile fix for lavformat
+		- mono2stereo and stereo 2 mono, need to add override mode
+	01/12/04
+		- did half smart copy
+	28/11/04
+		- SVCD + UI
+	27/11/04
+		- fixed audio too short when pulldown + mpeg2 in a mpeg stream (wrong computation of duration)
+		- fixed deadlock on lavFormat end of stream
+		- vcd template
+	25/11/04
+		- lavformat ok
+	21/11/04
+		- muxer ~ ok, need to do PTS
+       18/11/04
+       		- Began to merge lavformat mpeg2 muxer
+       17/11/04
+       		- dual audio 
+       14/11/04
+       		- be silent in script mode
+		- try to workaround empty space between atoms
+		- read mp4a atom correctly
+		- read better some atoms (should work in all case : stts)
+		- partial support of aac in avi
+       13/11/04
+       		- better handling of audio in mp4/mov
+		- added follow mode to cli (follow=3)
+		- svq3 needs extradata
+       12/11/04
+       		- fix size_t/unsigned in for realloc
+       11/11/04
+       		- fix gop size changing from pass1 to pass2 for SVCD
+		- merged Xvid 1.1
+		- fixed bframe offset/ratio
+		- fix audio stall for save dvd ps
+       10/11/04
+       		- Redesigned xvid ratecontrol to offer a simpler common interface for all rc code
+		- merged old ratecontrol into new interface
+		- began to do new ratecontrol in new interface
+       08/11/04
+       		- ffv1rec : Improved ffv1rec (Michael Teske)
+       07/11/04
+       		- faac encoding access through menu
+		- 16/9 for DVD lavc
+		- display different name
+       ------------06 Nov 04  : 2.0.34-test1---------------
+       04/11/04
+   		- display current a/v codec
+       03/11/04
        		- Correct header when encoding mp3 VBR
 		- fix round up for timeshift on wave
        02/11/04
