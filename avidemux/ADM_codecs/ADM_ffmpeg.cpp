@@ -38,7 +38,7 @@
 #include "ADM_codecs/ADM_ffmpeg.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-//#define TEST_NOB 1
+#define TEST_NOB 1
 
 static char LogName[500];
 
@@ -136,7 +136,12 @@ uint8_t     ffmpegEncoder::gopMpeg1(void)
 #endif	
 	printf("\n Using 2 b frames \n");
 	_context->mpeg_quant=0; //1; // Should be mpeg quant §
-	_context->rc_max_rate=1800*1000;// 2400 max, 700 min
+	if(_settingsPresence)
+	{
+		_context->rc_max_rate=_settings.maxBitrate*8; //1800*1000;// 2400 max, 700 min
+		//_context->rc_max_rate=1800*1000;
+		printf("Max rate : %lu kbps\n",(_context->rc_max_rate)/1000);
+	}
 	//_context->rc_min_rate=700*1000;
 	//_context->rc_min_rate=500*1000;
 

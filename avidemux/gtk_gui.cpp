@@ -836,7 +836,7 @@ case ACT_Pipe2Other:
       break;
       // set decoder option (post processing ...)
     case ACT_DecoderOption:
-      video_body->setDecodeParam ();
+      video_body->setDecodeParam ( curframe);
 
       break;
     case ACT_VideoParameter:

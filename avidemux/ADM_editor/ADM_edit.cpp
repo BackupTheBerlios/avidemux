@@ -519,13 +519,23 @@ _VIDEOS *vid;
 }
 /**
 	Set decoder settings (post process/swap u&v...)
-	Only one file or all of the same kind
+	for the segment referred by frame
 
 */
-uint8_t ADM_Composer::setDecodeParam (void)
+uint8_t ADM_Composer::setDecodeParam (uint32_t frame)
 {
+uint32_t seg,relframe,ref;
   if (_nb_video)
-    _videos[0].decoder->setParam ();
+  {
+   if (!convFrame2Seg (frame, &seg, &relframe))
+    {
+      printf ("\n Conversion failed !\n");
+      return 0;
+    }
+    // Search source
+     ref = _segments[seg]._reference;
+    _videos[ref].decoder->setParam ();        
+  }
   return 1;
 
 }

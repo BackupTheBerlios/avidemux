@@ -175,7 +175,7 @@ class ADM_Composer
 					//    Info etc... to be removed later
 					//______________________________
 
-			     		uint8_t 			setDecodeParam( void );
+			     		uint8_t 			setDecodeParam( uint32_t frame );
 	 				AVIStreamHeader 	*getVideoStreamHeader(void ) ;
 	 				MainAVIHeader 		*getMainHeader(void );
 	 				BITMAPINFOHEADER 	*getBIH(void ) ;
