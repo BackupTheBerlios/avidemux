@@ -242,6 +242,22 @@ uint8_t 			AVDMMpeg2decAudioStream::goTo(uint32_t offset)
 	ADM_mpegDemuxerProgramStream *dem;
 	dem=(ADM_mpegDemuxerProgramStream*)demuxer;
 	
+	// Border line case
+	if(offset<_sync[0].relative)
+	{
+		aprintf("Audio: too low value, going back to 0\n");
+		_pos=0;
+		return demuxer->goTo(0);
+	}
+#if 0	
+	if(_offset>_sync[_syncPoints-1].relative)
+	{
+		aprintf("Audio: too hi value, going to the end\n");
+		_pos=0;
+		return demuxer->goTo(0);
+	}
+#endif
+	
 	for(uint32_t y=0;y<_syncPoints-1;y++)
 	{
 			if((offset>=_sync[y].relative) && (offset<_sync[y+1].relative))
@@ -260,6 +276,8 @@ uint8_t 			AVDMMpeg2decAudioStream::goTo(uint32_t offset)
 			}		
 	}
 	printf("\n Audio : Duh!\n");
+	printf("We tried to sync : Offset :%d, first :%d last :%d\n",
+				offset,_sync[0].relative,_sync[_syncPoints-1]);
 	return 0;
 }
 
