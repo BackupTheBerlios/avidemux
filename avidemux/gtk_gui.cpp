@@ -139,6 +139,7 @@ void ADM_cutWizard (void);
 void computeIT (int size, int nb, int brate, uint32_t * frame,
 		uint32_t * rsize);
 int ADM_saveRaw (char *name);
+static char * actual_workbench_file;
 static void A_saveWorkbench (char *name);
 void A_loadWorkbench (char *name);
 void updateLoaded (void);
@@ -459,10 +460,15 @@ case ACT_Pipe2Other:
     case ACT_SaveWork:
       GUI_FileSelWrite ("Select workbench to save ", A_saveWorkbench);
       break;
-   case ACT_SaveCurrentWork:
-   		GUI_Alert("Jens told he would code that part\n");
-		break;
-   	break;
+    case ACT_SaveCurrentWork:
+      if( actual_workbench_file ){
+        char *tmp = strdup(actual_workbench_file);
+         A_saveWorkbench( tmp ); // will write "actual_workbench_file" itself
+         free(tmp);
+      }else{
+         GUI_FileSelWrite ("Select workbench to save ", A_saveWorkbench);
+      }
+      break;
 	case ACT_JumpToFrame: 
 		// read value	
 			printf("Jump!\n");	 
@@ -862,6 +868,10 @@ void
 A_openAvi (char *name)
 {
   A_openAvi2 (name, 0);
+  if( actual_workbench_file ){
+     free(actual_workbench_file);
+     actual_workbench_file = NULL;
+  }
 }
 extern void GUI_PreviewEnd (void);
 int A_openAvi2 (char *name, uint8_t mode)
@@ -1946,6 +1956,9 @@ void
 A_saveWorkbench (char *name)
 {
   video_body->saveWorbench (name);
+  if( actual_workbench_file )
+     free(actual_workbench_file);
+  actual_workbench_file = strdup(name);
 }
 
 void A_loadWorkbench (char *name)
@@ -1957,12 +1970,13 @@ void A_loadWorkbench (char *name)
     return;
   fclose (fd);
 
- if( video_body->loadWorbench (name))
-   {
+ if( video_body->loadWorbench (name)){
     updateLoaded ();
-      // remember this file
-     prefs->set_lastfile(name);
-    }
+    prefs->set_lastfile(name); // remember this file
+    if( actual_workbench_file )
+       free(actual_workbench_file);
+    actual_workbench_file = strdup(name);
+ }
 }
 //---------------------
 extern int DIA_audioEncoder(int *pmode, int *pbitrate,const char *title);
