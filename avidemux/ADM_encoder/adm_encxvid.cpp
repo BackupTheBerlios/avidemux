@@ -36,6 +36,7 @@
 #include "ADM_codecs/ADM_xvid.h"
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encxvid.h"
+#include "ADM_assert.h"
 extern "C" {
 #include "ADM_encoder/xvid_vbr.h"
 };
