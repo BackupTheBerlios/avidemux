@@ -67,12 +67,12 @@ oggHeader::oggHeader(void)
 	_audioTrack2=0xff;
 	_demux=NULL;
 	_index=NULL;
+	_audioIndex[0]=_audioIndex[1]=NULL;
 	_lastImage=0xffff;
-	_lastFrag=0x0;
-	_nbAudioPacket=0;
+	_lastFrag=0x0;	
 	_audio=NULL;
-
-
+	_nbAudioPacket[0]=_nbAudioPacket[1]=0;
+	_audioTrackSize[0]=_audioTrackSize[1]=0;
 }
 oggHeader::~oggHeader()
 {
@@ -87,6 +87,17 @@ oggHeader::~oggHeader()
 			delete [] _index;
 			_index=NULL;
 		}
+	if(_audioIndex[0])
+	{
+			delete [] _audioIndex[0];
+			_audioIndex[0]=NULL;	
+	}
+	if(_audioIndex[1])
+	{
+			delete [] _audioIndex[1];
+			_audioIndex[1]=NULL;	
+	}
+	
 }
 
 void oggHeader::Dump(void)
@@ -278,21 +289,25 @@ double fps;
 
 
 		uint32_t nbFrames;
-		if(!buildIndex(&nbFrames,&nbAudioFrame))
+		if(!buildIndex(&nbFrames))
 			{
 				printf("\n could not build index..\n");
 				return 0;
 			}
 		// Take audio 1 atm
-		if(_audioTrack!=0xff && _index[nbFrames-1].audioData[0])
+		if(_audioTrack!=0xff && _nbAudioPacket[0])
 		{
 			_isaudiopresent=1;
-			if(_audioTrack2!=0xff && GUI_Question("Take second track ?"))
+			if(_audioTrack2!=0xff &&_nbAudioPacket[1] && GUI_Question("Take second track ?"))
 			{
-				_audio=new oggAudio( name,  nbFrames,_index,_audioTrack2,1 );
+				_audio=new oggAudio( name,  _nbAudioPacket,_audioIndex,
+						_audioTrackSize,_audioTrack2,1 );
 			}
 			else
-				_audio=new oggAudio( name,  nbFrames,_index,_audioTrack,0 );
+			{
+				_audio=new oggAudio( name,  _nbAudioPacket,_audioIndex,
+						_audioTrackSize,_audioTrack,0 );
+			}
 		
 		
 		}
@@ -314,7 +329,7 @@ double fps;
 
 
 */
-uint8_t oggHeader::buildIndex(uint32_t  *nb,uint32_t *nbOther)
+uint8_t oggHeader::buildIndex(uint32_t  *nb)
 {
 uint32_t size,flags;
 uint8_t  id;
@@ -329,8 +344,10 @@ uint32_t dataSeen[2];
 
 uint8_t frag, *frags;
 
-DIA_working *work=new DIA_working("Scanning OGM");
+uint32_t async=0,atotal=0;
 
+DIA_working *work=new DIA_working("Scanning OGM");
+OgAudioIndex *tmpaudio[2];
 #define MAXINDEX (30*3600*3)
 
 	_index=new OgIndex[MAXINDEX];
@@ -338,8 +355,17 @@ DIA_working *work=new DIA_working("Scanning OGM");
 	dataSeen[0]=dataSeen[1]=0;
 	memset(_index,0,sizeof(OgIndex)*MAXINDEX);
 	printf("Temporary index created of %lu megaBytes\n",(sizeof(OgIndex)*MAXINDEX)>>20);
+	
+	tmpaudio[0]=new OgAudioIndex[MAXINDEX];
+	tmpaudio[1]=new OgAudioIndex[MAXINDEX];
+	
+	printf("Audio, Temporary index created of 2*%lu megaBytes\n",(sizeof(OgAudioIndex)*MAXINDEX)>>20);
+	
+	_nbAudioPacket[0]=_nbAudioPacket[1]=0;
+	
 	frameFlag=0;
 	curpos=0;
+	
 	while(_demux->readHeader(&size,&flags,&frame2,&id))
 	{
 		//printf("Id:%d\n",id);
@@ -348,21 +374,21 @@ DIA_working *work=new DIA_working("Scanning OGM");
 			uint32_t psize=size;
 			if(id==_audioTrack ) 
 				{
-					/*_demux->getLace(&frag,&frags);
-					size+=sizeof(OG_Header);
-					size+=frag;*/
-					lastSeen[0]=frame2;
-					dataSeen[0]+=size;
-					//printf("%llu frames\n",frame2);
+					OgAudioIndex *idx=&tmpaudio[0][_nbAudioPacket[0]++];	
+					idx->pos=_demux->getPos();
+					idx->sampleCount=frame2;
+					idx->dataSum=_audioTrackSize[0];
+					_audioTrackSize[0]+=size;
+					
 				}
 			if(id==_audioTrack2)
 				{
-					/*
-					_demux->getLace(&frag,&frags);
-					size+=sizeof(OG_Header);
-					size+=frag;*/
-					 lastSeen[1]=frame2;
-					 dataSeen[1]+=size;
+					OgAudioIndex *idx=&tmpaudio[1][_nbAudioPacket[1]++];	
+					idx->pos=_demux->getPos();
+					idx->sampleCount=frame2;
+					
+					idx->dataSum=_audioTrackSize[1];
+					_audioTrackSize[1]+=size;
 				}
 			_demux->skipBytes(psize);
 			continue;
@@ -384,13 +410,8 @@ DIA_working *work=new DIA_working("Scanning OGM");
 			curpos=_demux->getPos();
    			// we can easily retrieve that one
    			_index[frame].pos=curpos;
-			_index[frame].audioSeen[0]=lastSeen[0];
-			_index[frame].audioSeen[1]=lastSeen[1];
-			_index[frame].audioData[1]=dataSeen[1];
-			_index[frame].audioData[0]=dataSeen[0];
 			
-			aprintf("frame : %lu,audio1: %lu  audio2 : %lu bytes1:%lu bytes2:%lu\n",
-				frame,lastSeen[0],lastSeen[1],dataSeen[0],dataSeen[1]);
+			aprintf("frame : %lu,",frame);
 			aprintf("Pos:%llu\n",curpos);
 
 		}
@@ -421,15 +442,10 @@ DIA_working *work=new DIA_working("Scanning OGM");
 		//if(frame>6000) break;
 	}
 	// Collect last bits of audio
-	_index[frame-1].audioSeen[0]=lastSeen[0];
-	_index[frame-1].audioSeen[1]=lastSeen[1];
-	_index[frame-1].audioData[1]=dataSeen[1];
-	_index[frame-1].audioData[0]=dataSeen[0];
-
 	
 	delete work;
 	*nb=frame;
-	printf("\n FOUND %lu FRAMES\n",frame);
+	printf("\n Found %lu Frame\n",frame);
 	if(!frame) return 0;
 
 	// shrink index
@@ -437,8 +453,22 @@ DIA_working *work=new DIA_working("Scanning OGM");
 	tmp=new OgIndex[frame];
 	memcpy(tmp,_index,sizeof(OgIndex)*frame);
 	printf("Final index created of %lu megaBytes\n",(sizeof(OgIndex)*frame)>>20);
+	
+	// shrink audio indexes
+	_audioIndex[0]=new OgAudioIndex[ _nbAudioPacket[0] ];
+	_audioIndex[1]=new OgAudioIndex[ _nbAudioPacket[1] ];
+	memcpy(_audioIndex[0],tmpaudio[0],sizeof(OgAudioIndex)*_nbAudioPacket[0]);
+	memcpy(_audioIndex[1],tmpaudio[1],sizeof(OgAudioIndex)*_nbAudioPacket[1]);
+	
+	delete [] tmpaudio[0];
+	delete [] tmpaudio[1];
+	
+	printf("Final index for audio track1 of %lu megaBytes\n",(sizeof(_audioIndex)*_nbAudioPacket[0])>>20);
+	printf("Final index for audio track2 of %lu megaBytes\n",(sizeof(_audioIndex)*_nbAudioPacket[1])>>20);
+	
+	
 	printf("Audio track1: %lu bytes seen, Audio Track2 : %lu bytes seen\n",
-		dataSeen[0],dataSeen[1]);
+		_audioTrackSize[0],_audioTrackSize[1]);	
 	delete [] _index;
 	_index=tmp;
 

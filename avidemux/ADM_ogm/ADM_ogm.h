@@ -12,23 +12,30 @@ typedef struct OgIndex
 	uint32_t flags;
 	uint64_t pos;
 	uint32_t size;
-	uint64_t audioSeen[2];	// Nb of sample seen for track 1/2 
+}OgIndex;
+
+typedef struct OgAudioIndex
+{
+	uint64_t pos;
+	uint64_t sampleCount;	// Nb of sample seen for track 1/2 
 				// the sample are of the equivalent of PCM 16 bytes, so the number gets high
 				// -very- quickly. The good news is that once we get the frequency, it is
 				// very accurate seeking.
-	uint32_t audioData[2];	// accumulative data seen for track1/2 in usefull payload
+	uint32_t dataSum;	// accumulative data seen for track1/2 in usefull payload
 				// handy for seeking
-}OgIndex;
+}OgAudioIndex;
 #define NO_FRAG 0xFFFF
 class oggAudio :  public AVDMGenericAudioStream
 {
 
 		protected:
-			    OGMDemuxer			*_demuxer;
-			    OgIndex			*_index;
+			    OGMDemuxer			*_demuxer;			    
+			    OgAudioIndex		*_audioIndex[2];
+			    uint32_t			_audioCount[2];
 			    uint8_t			_track;
 			    uint8_t			_trackIndex;
-			    uint32_t			_nbIndex;  
+			    
+			    uint32_t			_nbIndex[2];  
 			    uint8_t			_buffer[64*1025];
 			    uint32_t			_inBuffer; 
 			    uint64_t			_pos;
@@ -40,8 +47,10 @@ class oggAudio :  public AVDMGenericAudioStream
  
 				
 		public:
-					oggAudio( char *name,uint32_t nbsync,
-						OgIndex *idx,uint8_t trk,uint8_t trkidx );
+					oggAudio( char *name,uint32_t nbsync[2],
+						OgAudioIndex *idx[2],
+						uint32_t     sizeCount[2],
+						uint8_t trk,uint8_t trkidx );
 			virtual 	~oggAudio() ;
 			virtual uint8_t goTo(uint32_t offset);
 			virtual uint32_t read(uint32_t size,uint8_t *ptr);
@@ -69,11 +78,13 @@ protected:
 				uint32_t			_audioTrack;
 				void				_dump(void);
 				OGMDemuxer 			*_demux;				
-				uint8_t 			buildIndex(uint32_t  *nb,uint32_t *nbaudio);
+				uint8_t 			buildIndex(uint32_t  *nb);
 				OgIndex				*_index;				
 				uint32_t			_lastImage;
 				uint32_t			_lastFrag;
-				uint32_t			_nbAudioPacket;
+				uint32_t			_nbAudioPacket[2];	// nb of packet
+				uint32_t			_audioTrackSize[2];	// size in bytes 
+				OgAudioIndex			*_audioIndex[2];	// indexes
 				oggAudio			*_audio;
 
 public:

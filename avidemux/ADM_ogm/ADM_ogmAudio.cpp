@@ -8,6 +8,10 @@
 // It uses a slightly different api than other audio due to the
 //  specificity of ogg (packet oriented, strongly)
 //
+//  The destructor may appear as incomplete, it is because a lot of arrays
+//  are from the global demuxer, so they will be freed by it later on
+//
+//
 // Author: mean <fixounet@free.fr>, (C) 2004
 //
 // Copyright: See COPYING file that comes with this distribution
@@ -42,15 +46,23 @@ oggAudio::~ oggAudio()
 	
 
 }
-oggAudio::oggAudio( char *name,uint32_t nbsync,OgIndex *idx,uint8_t trk,uint8_t trkIndex )
+
+oggAudio::oggAudio( char *name,uint32_t nbsync[2],OgAudioIndex *idx[2],uint32_t trackLength[2],
+				uint8_t trk,uint8_t trkidx )
 {
 	_track=trk;
-	_trackIndex=trkIndex;
+	_trackIndex=trkidx;
 	
-	_index=idx;
+	_audioIndex[0]=idx[0];
+	_audioIndex[1]=idx[1];
 	_demuxer=new OGMDemuxer();
+	
 	assert(_demuxer->open(name));
-	_nbIndex=nbsync;
+	_nbIndex[0]=nbsync[0];
+	_nbIndex[1]=nbsync[1];
+	
+	_audioCount[0]=trackLength[0];
+	_audioCount[1]=trackLength[1];
 	
 	_wavheader=new   WAVHeader;
 	memset(  _wavheader,0,sizeof( WAVHeader));
@@ -62,7 +74,11 @@ oggAudio::oggAudio( char *name,uint32_t nbsync,OgIndex *idx,uint8_t trk,uint8_t 
 	_wavheader->channels=2;
 	_wavheader->frequency=44100;
 	_wavheader->encoding=WAV_OGG;
-	_length=_index[_nbIndex-1].audioData[_trackIndex];
+	
+	
+	
+	_length=_audioCount[_trackIndex];
+	
 	_destroyable=1;
 	_inBuffer=0;
 	_lastFrag=NO_FRAG;
@@ -129,13 +145,13 @@ uint8_t oggAudio::goTo(uint32_t offset)
 		_inBuffer=0;
 		return 1;
 	}
-	for(uint32_t i=0;i<_nbIndex-1;i++)
+	for(uint32_t i=0;i<_nbIndex[_trackIndex]-1;i++)
 	{
-		if(_index[i].audioData[_trackIndex]>offset)
+		if(_audioIndex[_trackIndex][i].dataSum>offset)
 		{
 			aprintf("matching frame %lu \n",i);
 			// is i
-			_demuxer->setPos(_index[i].pos);
+			_demuxer->setPos(_audioIndex[_trackIndex][i].pos);
 			// search next packet			
 			_inBuffer=0;
 			return fillBuffer();
@@ -308,22 +324,23 @@ uint32_t flags,nbout=0;
 uint8_t	 oggAudio::goToTime(uint32_t mstime)
 {
 uint64_t val,cur,f;
-uint32_t last=0;
 uint32_t flags,cursize;
+OgAudioIndex *idx;
 
 	val=mstime;
 	val*=_wavheader->frequency;
 	val/=1000; // in seconds
 	aprintf("OGM:Looking for %lu ms\n",mstime);
 	aprintf("Looking for %llu sample\n",val);
-	for(uint32_t i=0;i<_nbIndex-1;i++)
+	idx=_audioIndex[_trackIndex];
+	for(uint32_t i=0;i<_nbIndex[_trackIndex];i++)
 	{
-		if(!_index[i+1].pos) continue;
-		cur=_index[i+1].audioSeen[_trackIndex];
+		
+		cur=idx[i].sampleCount;
 		if(cur>val)
 		{
 			aprintf("Gotcha at frame %lu\n",i);
-			_demuxer->setPos(_index[last].pos);
+			_demuxer->setPos(idx[i].pos);
 			_inBuffer=0;
 			_lastFrag=NO_FRAG;
 			// Now we forward till the next header is > value
@@ -345,8 +362,7 @@ uint32_t flags,cursize;
 			aprintf("Could no sync to a header close enough\n");
 			return 0;
 		}
-		aprintf("%lu: Current %llu target %llu\n",i,_index[i+1].audioSeen[0],val);
-		if(_index[i+1].pos) last=i;
+		aprintf("%lu: Current %llu target %llu\n",i,idx[i].sampleCount,val);		
 	}
 	printf("**Failed to seek to %lu ms!**\n",mstime);
 	return 0;
