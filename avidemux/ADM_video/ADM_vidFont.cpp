@@ -122,7 +122,7 @@ int error;
 }
 //____________________________________________________
 
-int ADMfont::fontDraw(char *target, int  c, int stride, int size,int *ww)
+int ADMfont::fontDraw(char *target, int  c, int prevchar,int stride, int size,int *ww)
 {
 
 
@@ -132,13 +132,18 @@ int ADMfont::fontDraw(char *target, int  c, int stride, int size,int *ww)
 				return 0;
 			}
 FT_GlyphSlot  slot = _face->glyph;  // a small shortcut
-int  glyph_index,error;
-
+int  glyph_index,glyph_prev;
+int error;
+FT_Vector delta;
+int kern;
 	
 	//printf("FONT: rendering %d %c\n",c,c);
 	*ww=0;	
 	
 	glyph_index = FT_Get_Char_Index( _face, c );
+	if(prevchar)
+		glyph_prev=FT_Get_Char_Index( _face, prevchar );
+		
    	error = FT_Load_Glyph(
         		   _face,          /* handle to face object */
         		     glyph_index,   /* glyph index           */
@@ -167,23 +172,47 @@ int  glyph_index,error;
 	int srow=0;
 
 		
-			heigh=bitmap->rows;
-			target+=stride*(size-slot->bitmap_top);
-			
+	heigh=bitmap->rows;
+	target+=stride*(size-slot->bitmap_top);
+	
+	int correction;
+	if(prevchar && FT_HAS_KERNING( _face ))
+	{		
+		FT_Get_Kerning( _face,glyph_prev, glyph_index,  FT_KERNING_DEFAULT, &delta );	
+		correction=delta.x/64;
+	}
+	else
+		correction=0;
+	target+=correction;
+	
+	target+=slot->bitmap_left;
+	//target+=(slot->bitmap_top)*stride;
 	for (int h = heigh; h>0 ; h-- )
-	{
-							
+	{						
 	    for (int w =0;w< bitmap->width;  w++ )
 	    {
-				if(bitmap->buffer[srow+w])
+		if(bitmap->buffer[srow+w])
 			    *(target+w) = bitmap->buffer[srow+w];
 		    
-		 }  
+	     }  
 		 target+=stride;
 		 srow+=bitmap->pitch ;		
 	}
-
-			*ww=bitmap->width;
-			return 1;
+	
+	// Now advance cursor
+	int advance=0;//correction;
+	*ww=bitmap->width;	
+	advance+=slot->advance.x/64;
+	
+	
+// 	printf("FONT: Width %d, adance:%d\n",bitmap->width,advance);
+//  	printf("FONT:cur :%c next :%c\n",c,prevchar);
+//  	printf("FONT:cur :%d next :%d\n",glyph_index,glyph_prev);
+//  	printf("FONT:Raw: %d kerning:%d kerning :%d \n",*ww,delta.x,delta.y);
+		
+	
+//	FT_Done_Glyph(glyph_index); Mem leak ?
+	*ww=advance;
+	return 1;
 }
 #endif

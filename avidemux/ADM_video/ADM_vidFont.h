@@ -33,7 +33,7 @@
 		~ADMfont();
 
 	int initFreeType( char *fontname );
-	int fontDraw(char *target, int c, int stride, int size,int *ww);
+	int fontDraw(char *target, int c,int prevchar, int stride, int size,int *ww);
 	int fontSetSize ( int size);
 	int fontSetCharSet (char *code);
 

@@ -246,7 +246,7 @@ uint32_t ADMVideoSubtitle::displayLine(ADM_GLYPH_T *string,uint32_t line, uint32
 
 
   
-	uint32_t w=0;
+	uint32_t w=0,next;
 	int ww;
 
 	// we dummy do it one time to get the actual width of the string
@@ -262,10 +262,12 @@ uint32_t ADMVideoSubtitle::displayLine(ADM_GLYPH_T *string,uint32_t line, uint32
 			{
 				ww=0;
 				car=string[i];
+				if(i) next=string[i-1];
+					else next=0;
 				// Change ' to "
 				//if(ADM_ASC(car)==0x27)
 				//	car=0x22;
-	        		if(!_font->fontDraw((char *)(target+1+w),car , _info.width,_conf->_fontsize,&ww))
+	        		if(!_font->fontDraw((char *)(target+1+w),car,next , _info.width,_conf->_fontsize,&ww))
 				{
 					printf("Font error\n");
               return 0;
@@ -275,13 +277,27 @@ uint32_t ADMVideoSubtitle::displayLine(ADM_GLYPH_T *string,uint32_t line, uint32
 					printf("Warning w out of bound (%d)\n",ww);
 					ww=0;
 				}
-				w=w+ww+2;
+				if(w+ww>_info.width)
+				{
+					printf("Line too long!\n");
+					len=i;
+					goto _abt;
+					break;
+				}
+				w=w+ww;
 			}
       
 	}
-
+_abt:
 	//Now we can render it at its final position
-	target=_bitmapBuffer+_info.width*line+((_info.width-w)>>1);
+	if(w<_info.width)
+	{
+		target=_bitmapBuffer+_info.width*line+((_info.width-w)>>1);
+	}
+	else
+	{
+		target=_bitmapBuffer+_info.width*line+1;
+	}
 
   //printf("[debug] line %s\n",string);
 
@@ -298,8 +314,9 @@ uint32_t ADMVideoSubtitle::displayLine(ADM_GLYPH_T *string,uint32_t line, uint32
 			{
 				ww=0;
 				car=string[i];
-
-	        		if(!_font->fontDraw((char *)(target+1+w),car , _info.width,_conf->_fontsize,&ww))
+				if(i) next=string[i-1];
+					else next=0;
+	        		if(!_font->fontDraw((char *)(target+1+w),car,next , _info.width,_conf->_fontsize,&ww))
 				{
 					printf("Font error\n");
               return 0;
@@ -309,7 +326,7 @@ uint32_t ADMVideoSubtitle::displayLine(ADM_GLYPH_T *string,uint32_t line, uint32
 					printf("Warning w out of bound (%d)\n",ww);
 					ww=0;
 				}
-				w=w+ww+2;
+				w=w+ww;
 			}
       
 	}
