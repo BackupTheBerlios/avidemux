@@ -251,6 +251,7 @@ static char tmp[720*576*3];
 	_frame.linesize[0]=_w;
        	_frame.linesize[1]=_w>>1;
        	_frame.linesize[2]=_w>>1;
+        _frame.pts = AV_NOPTS_VALUE;
 	_frame.quality=vinfo.quality;
 
 //	printf("\n in Qual : %f \n",_frame.quality);
