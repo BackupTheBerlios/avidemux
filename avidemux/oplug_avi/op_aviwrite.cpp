@@ -235,22 +235,27 @@ uint32_t extraLen=0;
 		
 			double len;
 			len=_videostream.dwLength;
+#if 0			
 			len/=_videostream.dwRate;
 			len*=_videostream.dwScale;			
 			len*=wav->frequency;
 			len/=1024;
+#endif			
 			header->dwLength= floor(len);//_videostream.dwLength; 
 		 // AAC is mostly VBR
 		 header->dwFlags=1;
 		 header->dwInitialFrames=0;
 		 header->dwRate=wav->frequency;
+		 
+		 	
+		 
 		 header->dwScale=1024; //sample/packet 1024 seems good for aac
 		 header->dwSampleSize = 0;
 		 header->dwSuggestedBufferSize=8192;
 		 header->dwInitialFrames = 0;	 
 		
 		// header->dwLength= _videostream.dwLength; 
-		 wav->blockalign=4096;	  
+		 wav->blockalign=1024;	  
 		 wav->bitspersample = 0; 
 		 
 		//*b++ = (BYTE)((profile +1) << 3 | (SRI >> 1));

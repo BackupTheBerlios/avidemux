@@ -33,6 +33,7 @@ public:
 		virtual ~AVDMProcessAudio_Faac();				
 			AVDMProcessAudio_Faac(AVDMGenericAudioStream *instream);	
      		virtual uint8_t	getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
+		virtual uint8_t packetPerFrame( void) {return 1;}
 };
 
 #endif

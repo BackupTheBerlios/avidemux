@@ -252,7 +252,23 @@ GenericAviSave::writeAudioChunk (uint32_t frame)
   
   	uint32_t sample,packetLen,packets=0;
 	
-  	
+
+	if(audio_filter->packetPerFrame())
+	{
+		while(_audioCurrent<_audioTarget)
+		{
+			if(!audio_filter->getPacket(abuffer,&packetLen,&sample))
+			{
+				printf("AVIWR:Could not read packet\n");
+				return 0;
+			}
+			_audioCurrent+=sample;
+	 		writter->saveAudioFrame (packetLen,abuffer);
+			encoding_gui->feedAudioFrame(packetLen);
+		}
+	 	return 1;
+	}
+
 	sample=0;
 	// _audioTarget is the # of sample we want
 	while(_audioCurrent<_audioTarget)
