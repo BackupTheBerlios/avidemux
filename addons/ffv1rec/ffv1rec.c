@@ -5,6 +5,10 @@
     begin                : Tue Jul  2003
     copyright            : (C) 2003 by mean
     email                : fixounet@free.fr
+
+    Improvements also by
+    	E Strickland 
+	Michael Teske
  ***************************************************************************/
 
 /***************************************************************************
