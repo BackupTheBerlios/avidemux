@@ -471,18 +471,15 @@ OgAudioIndex *tmpaudio[2];
 		// get laces to see if there is stuff in it
 
 		for(uint32_t i=0;i<frag;i++)
-		{
-			if(!i && (!(flags & OG_CONTINUE_PACKET)))
-			{
-				// remove 2 header bytes
-				cursize+=frags[i]-1;
-			}
-			else
+		{			
 			cursize+=frags[i];
 			// it means end of a frame
 			if(frags[i]!=0xff)
 			{
-				_index[frame].size=cursize;
+				if(!cursize)
+					_index[frame].size=0;
+				else
+					_index[frame].size=cursize-1;
 				_index[frame].flags=frameFlag;
 				aprintf("Detected frame : %lu,size %lu  page count : %lu\n",
 					frame,cursize,frame2);
@@ -543,6 +540,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 
 	uint32_t size,len,flags,seek,cursize=0;
 	uint8_t bte,frag,*frags;
+	uint32_t red=0;
 
 
 	aprintf("****************** frame %lu requested **************\n",framenum);
@@ -561,15 +559,25 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 			return 0;
 		};
 		//
-
+		// Finish the current page, maybe there is several images
+		// ending here
 		for(uint32_t i=_lastFrag+1;i<frag;i++)
 		{
 			aprintf("\t cont :%lu -> %02d ( %lu to go)\n",i,frags[i],len-frags[i]);
 			cursize=frags[i];
+			// first byte
+			// skip it			
+			if(!red && frags[i])
+			{
+				cursize--;
+				_demux->readBytes(1,ptr);
+			}
+			
 			// get the frame ?
 			_demux->readBytes(cursize,ptr);
 			len-=cursize;
 			ptr+=cursize;
+			red+=cursize;
 			_lastFrag=i;
 
 			aprintf(" Last frag : %lu\n",_lastFrag);
@@ -608,7 +616,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 		assert(_demux->setPos(_index[seek].pos));
 		// and now read forward
 	}
-
+	// Read a complete one
 	while(_demux->readHeaderOfType(_videoTrack,&size,&flags,&f))
 	{
 		aprintf("\n page : %lu\n",f);
@@ -624,6 +632,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 			if(bte&1) continue;
 			// skip one more bite
 			//_demux->readBytes(1,&bte);
+			red+=1;
 		}
 		// get laces to see if there is stuff in it
 		aprintf("__ frags__ : %u \n",frag);
@@ -661,7 +670,8 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 			// it means end of a frame
 			if(frags[i]!=0xff )
 			{
-
+				// reset
+				red=0;
 				aprintf("--seeking (%ld) got : %lu \n",i,seek);
 				if(seek==framenum && len==0)
 				{
