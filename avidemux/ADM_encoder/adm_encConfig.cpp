@@ -448,7 +448,23 @@ static MJPEGConfig mjpegConfig={90,0};
 extern uint8_t DIA_mjpegCodecSetting( int *qual, int *swap );
 #endif
 
+///////////////////////////////////////////:
+#ifdef USE_X264
 
+#include "ADM_encoder/adm_encx264.h"
+static X264Config  x264Config
+={
+  {COMPRESS_CQ,4,1500000,700},
+  {
+  2,    //uint32_t qmin;
+  51,   //uint32_t qmax;
+  1,    //uint32_t cabac;
+  250,  //uint32_t maxKf;
+  5,    //uint32_t minKf;
+  2,    //uint32_t nbBframe;  
+  } 
+};
+#endif
 
 ///////////////////////////////////////////
 #ifdef USE_DIVX
@@ -519,6 +535,10 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 				MAKECONF(xvid4Config);
 		      		break;
 				
+#endif
+#ifdef USE_X264
+                case CodecX264:
+                                break;
 #endif
 #ifdef USE_XX_XVID
       	 	case CodecXvid :
@@ -600,6 +620,12 @@ const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
 
 	switch( current_codec)
 	{
+#ifdef USE_X264
+                                case CodecX264:
+                                        *data=NULL;
+                                        *optSize=0;
+                                         break;
+#endif          
 #ifdef USE_XX_XVID
       	 			case CodecXvid :
 						*data=(uint8_t *)&xvidConfig;
@@ -889,6 +915,9 @@ static const codecEnumByName mycodec[]=
 	{CodecH263P	,"H263+","H263+"},
 	{CodecHuff	,"Huffyuv","Huffyuv"},
 	{CodecFFV1	,"FFV1","FFV1"},
+#ifdef USE_X264
+        {CodecX264,     "X264","X264"},
+#endif                
 	{CodecSnow	,"Snow","Snow"}
 };
 uint32_t encoderGetNbEncoder(void)
@@ -1105,8 +1134,11 @@ void videoCodecConfigureUI( void )
 					  }
 				}
 					break;
-
-		case  CodecH263P:
+#ifdef USE_X264
+                case CodecX264:
+                            break;
+#endif
+		case  CodecH263P:                  
 					printf("\n H263P\n");					
 		case  CodecH263:  
 					printf("\n H263\n");					
@@ -1170,6 +1202,10 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param, uint32_t ex
 						specific=&xvid4Config.specific;
 						specSize=sizeof(xvid4Config.specific);
 		      		break;
+#endif
+#ifdef USE_X264
+                                case CodecX264:
+                                        break;
 #endif
 #ifdef  USE_FFMPEG
 					case CodecMjpeg :
@@ -1271,7 +1307,11 @@ Encoder *e=NULL;
 				  		e=new   EncoderFFMPEG(FF_MPEG4,&ffmpegConfig);
 				    	break;			
 #endif		
-
+#ifdef USE_X264
+                case CodecX264:
+                                        e=new EncoderX264(NULL);
+                                        break;
+#endif
 #ifdef USE_FFMPEG
                 case   CodecFFhuff:             
                                         e=new   EncoderFFMPEGFFHuff(&ffmpegConfig);

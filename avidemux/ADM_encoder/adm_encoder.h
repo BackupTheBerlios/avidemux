@@ -119,6 +119,9 @@ typedef enum
 	CodecXDVD,
 	CodecXvid4,
         CodecFFhuff,
+#ifdef USE_X264
+        CodecX264,
+#endif        
 	CodecDummy	
 }SelectCodecType;
 
