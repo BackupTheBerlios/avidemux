@@ -127,6 +127,7 @@ class ADM_Composer
 
 						uint8_t 	getMagic(char *name,uint32_t *magic);
 						uint8_t 	identify(char *name, fileType *type);
+						uint32_t 	searchForwardSeg(uint32_t startframe);
 
   public:
   						uint8_t	activateCache( void ){ _cached=1;_lastseg=0xffffff;return 1;}
@@ -166,11 +167,14 @@ class ADM_Composer
 												uint32_t *flags=0,  uint8_t *seq=0);
 	          				uint32_t 	getTime(uint32_t fn);
 						uint32_t 	getFlags(uint32_t frame,uint32_t *flags);
+						uint32_t 	getFlagsAndSeg (uint32_t frame, 
+									uint32_t * flags,uint32_t *segs);
 						uint8_t  	setFlag(uint32_t frame,uint32_t flags);
 						uint8_t	updateVideoInfo(aviInfo *info);
 
 						uint8_t  	getFrameSize(uint32_t frame,uint32_t *size) ;
-
+						uint8_t		sanityCheckRef(uint32_t start, uint32_t end,
+									uint32_t *fatal);
 					//______________________________
 					//    Info etc... to be removed later
 					//______________________________

@@ -53,6 +53,7 @@ static void  A_SaveAudioNVideo(char *name);
 
 int A_Save( char *name)
 {
+uint32_t end;
 	// depending on the type we save a avi, a mpeg or a XVCD
 	CodecFamilty family;
 	family= videoCodecGetFamily();
@@ -60,6 +61,29 @@ int A_Save( char *name)
 	if(!videoProcessMode)
 		family=CodecFamilyAVI;
 	printf("**saving:**\n");
+	// Check if we need to do a sanity B frame check
+	if(!videoProcessMode)
+	{	
+		uint32_t pb;
+		end=avifileinfo->nb_frames;
+		// if the last frame is the last frame (!)
+		// we add one to keep it, else we systematically skip
+		// the last frame
+		if(frameEnd==end-1) end=frameEnd+1;
+		else
+			end=frameEnd;
+		if(!video_body->sanityCheckRef(frameStart,end,&pb))
+		{
+			if(pb)
+			{
+				GUI_Alert("The video starts/ends by lonely B frame\nPlease remove them");
+				return 0;
+			}
+			if(!GUI_Question("Warning !\n Bframe has lost its reference frame\nContinue ?"))
+				return 0;
+		}
+	
+	}
 	switch(family)
 	{
 		case CodecFamilyAVI:

@@ -147,6 +147,19 @@ uint32_t ADM_Composer::getFlags (uint32_t frame, uint32_t * flags)
     _reference;
   return _videos[ref]._aviheader->getFlags (relframe, flags);
 }
+uint32_t ADM_Composer::getFlagsAndSeg (uint32_t frame, uint32_t * flags,uint32_t *segs)
+{
+  uint32_t
+    relframe;
+  uint32_t
+    seg;
+  if (!convFrame2Seg (frame, &seg, &relframe))
+    return 0;
+  uint32_t    ref =   _segments[seg]._reference;
+  
+    *segs=seg;
+    return _videos[ref]._aviheader->getFlags (relframe, flags);  
+}
 
 uint8_t ADM_Composer::getFrameSize (uint32_t frame, uint32_t * size)
 {
@@ -246,3 +259,111 @@ ADM_Composer::getBIH (void)
 {
   return STUBB->getBIH ();
 };
+//
+//	Do a sanity check for copy mode
+//	Check that B frames did not loose there backward/forward ref frame
+// 	It is brute force as we only need to check begin/end of each segment
+//	But it should be fast anyway
+uint8_t		ADM_Composer::sanityCheckRef(uint32_t start, uint32_t end,uint32_t *fatal)
+{
+uint32_t flags,seg;
+uint32_t lastnonb=0,segnonB=0xffff;
+uint32_t forward=0,forwardseg=0xffff;
+
+uint8_t ok=0;
+uint32_t i=0;
+	*fatal=0;
+	// If it is not in PTS, no need to bother
+	if(!isReordered(start))
+	{
+		printf("Not reordered or no B frame, nothing to check\n");
+		return 1;
+	}
+	// If the last frames are B frames it is fatal
+	if(!getFlagsAndSeg (end-1, &flags,&seg))
+	{
+				printf("Cannot get flags for frame %lu\n",end-1);
+				goto _abt;
+	}
+	if(flags & AVI_B_FRAME)
+	{
+		printf("Ending B frame -> abort (%lu)\n",end-1);
+		*fatal=1;
+		return 0;
+	}
+	if(!getFlagsAndSeg (start, &flags,&seg))
+	{
+				printf("Cannot get flags for frame %lu\n",start);
+				goto _abt;
+	}
+	if(flags & AVI_B_FRAME)
+	{
+		printf("Starting B frame -> abort\n");
+		*fatal=1;
+		return 0;
+	}
+	for( i=start;i<end;i++)
+	{
+			//printf("%08lu/%08lu\r",i,end-start);
+			if(!getFlagsAndSeg (i, &flags,&seg))
+			{
+				printf("Cannot get flags for frame %lu\n",i);
+				goto _abt;
+			}
+			if(flags & AVI_B_FRAME)
+			{ 	// search if we have to send a I/P frame in adance
+				if(segnonB!=seg) 
+				{
+					printf("bw failed! (%lu/%lu)\n",seg,segnonB);
+					 goto _abt;
+				}
+;
+				
+				forwardseg=searchForwardSeg(i);
+				if(seg!=forwardseg)
+				{
+					printf("Fw failed! (%lu/%lu)\n",seg,forwardseg);
+					 goto _abt;
+				}								
+			}
+			else // it is not a B frame and we have nothing on hold, sent it..
+			{
+				lastnonb=i;
+				segnonB=seg;				
+			}
+	}
+	ok=1;
+_abt:
+	if(!ok)
+	{
+		printf("Frame %d has lost its fw/bw reference frame (%lu/%lu)\n",i,start,end);
+	}
+	return ok;
+}
+// return the segment holding the next reference frame
+//
+uint32_t ADM_Composer::searchForwardSeg(uint32_t startframe)
+{
+	uint32_t fw=startframe;
+	uint32_t flags,seg;
+	uint8_t r;
+
+			while(1)
+			{
+				fw++;
+				r=getFlagsAndSeg (fw, &flags,&seg);
+				if(!(flags & AVI_B_FRAME))
+				{
+					return seg;
+
+				}
+				
+				if(!r)
+				{
+					seg=0xffff;
+					return seg;
+				}
+
+			}
+	return 1;
+}
