@@ -28,6 +28,13 @@ Convert yv12 to bmp firendly RGB
 #include "colorspace.h"
 
 
+
+#ifdef HAVE_ALTIVEC
+extern uint8_t altivecYV12RGB(uint8_t * ptr_y,
+		    uint8_t * ptr_u,
+		    uint8_t * ptr_v, uint8_t * ptr2, uint32_t w);
+#endif		    
+
 static void swapRnB (uint8_t * ptr, uint32_t w);
 static uint8_t slowYV12RGB(uint8_t * ptr_y,
 		    uint8_t * ptr_u,
@@ -198,6 +205,15 @@ uint8_t  COL_yv12rgb(uint32_t w, uint32_t h,uint8_t * ptr, uint8_t * ptr2 )
 #ifdef USE_MMX
 	  fastYV12RGB_mmx(y, u, v, e, w);
 	  //fastYV12RGB_mmx(y+w, u, v, e+3*w, w);
+#elif HAVE_ALTIVEC
+
+	 altivecYV12RGB(y,
+		    	u,
+		    	v, e, w);
+	altivecYV12RGB(y+w,
+		    	u,
+		    	v, e+3*w, w);			
+
 #else
 	  slowYV12RGB(y, u, v, e, w);
 	  slowYV12RGB(y+w, u, v, e+3*w, w);
