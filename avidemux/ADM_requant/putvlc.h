@@ -21,7 +21,7 @@ typedef struct
  * indexed by [macroblock_type]
  */
 
-const static VLCtable mbtypetab[3][32]=
+static const VLCtable mbtypetab[3][32]=
 {
  /* I */
  {
@@ -58,7 +58,7 @@ const static VLCtable mbtypetab[3][32]=
  * indexed by [coded_block_pattern]
  */
 
-const static VLCtable cbptable[64]=
+static const VLCtable cbptable[64]=
 {
   {0x01,9}, {0x0b,5}, {0x09,5}, {0x0d,6}, 
   {0x0d,4}, {0x17,7}, {0x13,7}, {0x1f,8}, 
@@ -88,7 +88,7 @@ const static VLCtable cbptable[64]=
  * codes do not include s (sign bit)
  */
 
-const static VLCtable dct_code_tab1[2][40]=
+static const VLCtable dct_code_tab1[2][40]=
 {
  /* run = 0, level = 1...40 */
  {
@@ -118,7 +118,7 @@ const static VLCtable dct_code_tab1[2][40]=
  }
 };
 
-const static VLCtable dct_code_tab2[30][5]=
+static const VLCtable dct_code_tab2[30][5]=
 {
   /* run = 2...31, level = 1...5 */
   {{0x05, 4}, {0x04, 7}, {0x0b,10}, {0x14,12}, {0x14,13}},
@@ -162,7 +162,7 @@ const static VLCtable dct_code_tab2[30][5]=
  * codes do not include s (sign bit)
  */
 
-const static VLCtable dct_code_tab1a[2][40]=
+static const VLCtable dct_code_tab1a[2][40]=
 {
  /* run = 0, level = 1...40 */
  {
@@ -192,7 +192,7 @@ const static VLCtable dct_code_tab1a[2][40]=
  }
 };
 
-const static VLCtable dct_code_tab2a[30][5]=
+static const VLCtable dct_code_tab2a[30][5]=
 {
   /* run = 2...31, level = 1...5 */
   {{0x05, 5}, {0x07, 7}, {0xfc, 8}, {0x0c,10}, {0x14,13}},
