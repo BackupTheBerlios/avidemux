@@ -22,32 +22,34 @@
   class decoderMpeg: public decoders
 {
      protected:
-     					uint8_t		_seen;
-				      uint8_t 		*_seqHeader;
-				      uint32_t		_seqLen;
-				      uint8_t		_seqFound;
-				      uint8_t		*postprocessed;
+                                      uint8_t		_seen;
+                                      uint8_t 		*_seqHeader;
+                                      uint32_t		_seqLen;
+                                      uint8_t		_seqFound;
+                                      uint8_t		*postprocessed;
 
-				      uint8_t		init_codec( void );
-				      uint8_t		kill_codec( void );
-				      void		*_decoder;
-				      void 		setFather( decoderMpeg *f);
-					void  		decode_mpeg2 (uint8_t * current, uint8_t * end);
-					void		feedData(uint32_t len, uint8_t *data);
-					uint32_t	_swapUV;
-					uint8_t     	*unpackBuffer;
+                                      uint8_t		init_codec( void );
+                                      uint8_t		kill_codec( void );
+                                      void		*_decoder;
+                                      void 		setFather( decoderMpeg *f);
+                                      void  		decode_mpeg2 (uint8_t * current, uint8_t * end);
+                                      void		feedData(uint32_t len, uint8_t *data);
+                                      uint32_t	_swapUV;
+                                      uint8_t     	*unpackBuffer;
+                                        
 					
 
 				
      public:
-     							decoderMpeg(uint32_t w,uint32_t h,
-								uint32_t extraLen, uint8_t *extraData);
-         		virtual				~decoderMpeg();
-    			virtual 	uint8_t 	uncompress(uint8_t *in,ADMImage *out,
+                                                        decoderMpeg(uint32_t w,uint32_t h,
+                                                                uint32_t extraLen, uint8_t *extraData);
+                        virtual				~decoderMpeg();
+                        virtual 	uint8_t 	uncompress(uint8_t *in,ADMImage *out,
 								uint32_t len,uint32_t *flag=NULL);
-			virtual 	uint8_t	 	bFramePossible(void) { return 1;}
-			virtual 	void 		setParam( void );
-					uint8_t 	isMpeg1(void);
+                        virtual 	uint8_t	 	bFramePossible(void) { return 1;}
+                        virtual 	void 		setParam( void );
+                                        uint8_t 	isMpeg1(void);
+                                        uint8_t         dontcopy(void) { return 1;}
 
 }   ;
 

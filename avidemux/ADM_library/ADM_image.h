@@ -32,6 +32,7 @@ typedef enum ADM_ASPECT
 class ADMImage
 {
 public:
+        
 	uint8_t		*data;		/// Pointer to actual image data
 	uint32_t	_width;		/// Width of image
 	uint32_t	_height;	/// Height of image
@@ -41,14 +42,24 @@ public:
 	uint32_t	_qSize;		/// Size of the *quant bitfield
 	ADM_ASPECT	_aspect;	/// Aspect ratio
 	uint32_t	flags;		/// Flags for this image (AVI_KEY_FRAME/AVI_B_FRAME)
-	
+
+	uint8_t         _isRef;         /// If True means the datas are just a link to data we don't own!
 public:
+
+        uint8_t         *_planes[3];     /// In case of linked data store y/u/v pointers
+        uint32_t        _planeStride[3]; /// Same story
+
 		ADMImage(uint32_t width, uint32_t height);
+                ADMImage(uint32_t width, uint32_t height,uint32_t dummy); /// To create linked datas image        
 		~ADMImage();
 	uint8_t duplicate(ADMImage *src);	/// copy an image to ourself, including info
 	uint8_t duplicateFull(ADMImage *src);	/// copy an image to ourself, including info
 	uint8_t copyInfo(ADMImage *src);	/// copy all the flags, not the data themselves
 	uint8_t copyQuantInfo(ADMImage *src);	/// copy quant table if any
+        uint8_t isRef(void) { return _isRef;};
+        uint8_t setLinkInfos(uint8_t *y,        /// To fill in infos for linked image
+                        uint8_t *u,uint8_t *v,uint32_t stridey,
+                        uint32_t strideu, uint32_t stridev);
 
 };
 #define YPLANE(x) (x->data)

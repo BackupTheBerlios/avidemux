@@ -51,6 +51,8 @@
      			virtual uint8_t 	getLastQ( uint8_t *q) { *q=_lastQ;return 1;}
 
 			// does this codec *possibly* can have b-frame ?
+                        virtual uint8_t dontcopy(void) { return 0;}     // if 1 means the decoder will return reference
+                                                                        // no need to copy the datas to ADMimage
 			virtual uint8_t bFramePossible(void) { return 0;}
 			virtual uint8_t decodeHeaderOnly(void ) { return 0;};
 			virtual uint8_t decodeFull(void ) { return 0;}

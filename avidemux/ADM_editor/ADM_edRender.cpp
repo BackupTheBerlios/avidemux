@@ -366,6 +366,9 @@ uint32_t len;
 uint32_t flags,sumit;
 float	 sum;
 EditorCache *cache=_videos[seg]._videoCache;	
+ADMImage *tmpImage;
+uint8_t refOnly=0;
+
 	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,
 						     compBuffer,
 						     &len, &flags))
@@ -373,19 +376,30 @@ EditorCache *cache=_videos[seg]._videoCache;
 	  printf ("\nEditor: last decoding failed.%ld)\n",   frame );
 	  return 0;
 	}
-	ADM_assert(_imageBuffer);
+        ADM_assert(_imageBuffer);
+        refOnly=_videos[seg].decoder->dontcopy(); // can we skip one memcpy ?
+        if(refOnly)
+        {       // This is only an empty Shell
+                tmpImage=new ADMImage(_imageBuffer->_width,_imageBuffer->_height,1);
+        }
+        else
+        {
+                tmpImage=_imageBuffer;
+        }
+	
 	// Do pp, and use imageBuffer as intermediate buffer
-	if (!_videos[seg].decoder->uncompress (compBuffer, _imageBuffer, len, &flags))
+	if (!_videos[seg].decoder->uncompress (compBuffer, tmpImage, len, &flags))
 	    {
 	      printf ("\nEditor: Last Decoding2 failed for frame %lu\n",frame);
 	      return 0;
 	    }
 	// Quant ?
-	if(!_imageBuffer->quant || !_imageBuffer->_qStride)
-	{
-		_imageBuffer->_Qp=2;
-		image->duplicate(_imageBuffer);
+	if(!tmpImage->quant || !tmpImage->_qStride)
+	{      
+		image->_Qp=2;
+		image->duplicate(tmpImage);
 		cache->updateFrameNum(image,frame);
+                if(refOnly) delete tmpImage;
 		aprintf("EdCache: No quant avail\n");
 		return 1;
 	}
@@ -393,33 +407,41 @@ EditorCache *cache=_videos[seg]._videoCache;
 	// 1 compute average quant
 	int qz;
 	sumit=0;
-	for(uint32_t z=0;z<_imageBuffer->_qSize;z++)
+        // Dupe infos
+        image->copyInfo(tmpImage);
+        //image->copyQuantInfo(tmpImage);
+
+        // Do postprocessing if any
+	for(uint32_t z=0;z<tmpImage->_qSize;z++)
 	{
-            qz=(int)_imageBuffer->quant[z];
+            qz=(int)tmpImage->quant[z];
 			sumit+=qz;
 	}
-	sumit+=(_imageBuffer->_qSize-1);
+	sumit+=(tmpImage->_qSize-1);
 //	sumit*=2;
 	sum=(float)sumit;
-	sum/=_imageBuffer->_qSize;
+	sum/=tmpImage->_qSize;
 	if(sum>31) sum=31;
 	if(sum<1) sum=1;
-		
-	_imageBuffer->_Qp=(uint32_t)floor(sum);
+	
+        // update average Q	
+	tmpImage->_Qp=image->_Qp=(uint32_t)floor(sum);
 	
 	// Pp deactivated ?
 	if(!_pp.postProcType || !_pp.postProcStrength)
 	{
-		image->duplicate(_imageBuffer);
+                // nothing to do
+		image->duplicate(tmpImage);
 		cache->updateFrameNum(image,frame);
+                if(refOnly) delete tmpImage;
 		aprintf("EdCache: Postproc disabled\n");
 		return 1;	
 	}
 	
 	int type;	
 	#warning FIXME should be FF_I_TYPE/B/P
-	if(_imageBuffer->flags & AVI_KEY_FRAME) type=1;
-		else if(_imageBuffer->flags & AVI_B_FRAME) type=3;
+	if(tmpImage->flags & AVI_KEY_FRAME) type=1;
+		else if(tmpImage->flags & AVI_B_FRAME) type=3;
 			else type=2;
 	
 	// we do postproc !
@@ -430,25 +452,36 @@ EditorCache *cache=_videos[seg]._videoCache;
 	aviInfo _info;
 		
 		getVideoInfo(&_info);
-		iBuff[0]= YPLANE((_imageBuffer));
-		if(1)
-		{
-			iBuff[1]= UPLANE((_imageBuffer));
- 			iBuff[2]= VPLANE((_imageBuffer));
-		}
-		else
-		{
-			iBuff[2]= UPLANE((_imageBuffer));
- 			iBuff[1]= VPLANE((_imageBuffer));
-		}
-			oBuff[0]= YPLANE(image);
+                if(refOnly)
+                {
+                        iBuff[0]= tmpImage->_planes[0];
+                        iBuff[1]= tmpImage->_planes[1];
+                        iBuff[2]= tmpImage->_planes[2];
+        
+                        strideTab2[0]=_info.width;
+                        strideTab2[1]=_info.width>>1;
+                        strideTab2[2]=_info.width>>1;
+
+                        strideTab[0]=tmpImage->_planeStride[0];
+                        strideTab[1]=tmpImage->_planeStride[1];
+                        strideTab[2]=tmpImage->_planeStride[2];
+                        
+                }
+                else
+                {
+		        iBuff[0]= YPLANE((tmpImage));
+			iBuff[1]= UPLANE((tmpImage));
+ 			iBuff[2]= VPLANE((tmpImage));
+		
+                	oBuff[0]= YPLANE(image);
 			oBuff[1]= UPLANE(image);
  			oBuff[2]= VPLANE(image);
+                                                                
+                        strideTab[0]=strideTab2[0]=_info.width;
+                        strideTab[1]=strideTab2[1]=_info.width>>1;
+                        strideTab[2]=strideTab2[2]=_info.width>>1;
+                }
         			
-			strideTab[0]=strideTab2[0]=_info.width;
-			strideTab[1]=strideTab2[1]=_info.width>>1;
-			strideTab[2]=strideTab2[2]=_info.width>>1;
-            			
 		 pp_postprocess(
 		 		iBuff,
 		 		strideTab,
@@ -461,8 +494,8 @@ EditorCache *cache=_videos[seg]._videoCache;
 		         	_pp.ppMode,
 		          	_pp.ppContext,
 		          	type);			// img type
-				// update some infos
-		image->copyInfo(_imageBuffer);
+                // update some infos
+                if(refOnly) delete tmpImage;
 		cache->updateFrameNum(image,frame);
 		aprintf("EdCache: Postproc done\n");
 		return 1;	

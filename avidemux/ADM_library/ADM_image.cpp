@@ -40,6 +40,7 @@ void ADMImage_stat( void )
 ADMImage::ADMImage(uint32_t width, uint32_t height)
 {
 	_width=width;
+        _isRef=0;
 	_height=height;
 	data=new uint8_t [ ((width+15)&0xffffff0)*((height+15)&0xfffffff0)*2];
 	ADM_assert(data);
@@ -55,18 +56,37 @@ ADMImage::ADMImage(uint32_t width, uint32_t height)
 	if(imgCurMem>imgMaxMem) imgMaxMem=imgCurMem;
 	if(imgCurNb>imgMaxNb) imgMaxNb=imgCurNb;
 };
+// Create a fake image with external datas
+ADMImage::ADMImage(uint32_t width, uint32_t height,uint32_t dummy)
+{
+        _width=width;
+        _isRef=1;
+        _height=height;
+        data=NULL;        
+        quant=NULL;
+        _qStride=0;
+        _Qp=2;
+        flags=0;
+        _qSize=0;
+        _aspect=ADM_ASPECT_1_1;        
+        imgCurNb++;
+                
+};
 //
 //	Deallocate
 //
 ADMImage::~ADMImage()
 {
-	if(quant) delete [] quant;
-	quant=NULL;
-	if(data) delete [] data;
-	data=NULL;
-	
+        if(!_isRef)
+        {
+	       if(quant) delete [] quant;
+	       quant=NULL;
+	       if(data) delete [] data;
+	       data=NULL;
+               imgCurMem-=(_width*_height*3)>>1;
+	}
 	imgCurNb--;
-	imgCurMem-=(_width*_height*3)>>1;
+	
 }
 
 //
@@ -84,9 +104,48 @@ uint8_t ADMImage::duplicate(ADMImage *src)
 	_qSize=0;
 	
 	copyInfo(src);
-	memcpy(YPLANE(this),YPLANE(src),_width*_height);
-	memcpy(UPLANE(this),UPLANE(src),(_width*_height)>>2);
-	memcpy(VPLANE(this),VPLANE(src),(_width*_height)>>2);
+        if(!src->_isRef)
+        {
+	       memcpy(YPLANE(this),YPLANE(src),_width*_height);
+	       memcpy(UPLANE(this),UPLANE(src),(_width*_height)>>2);
+	       memcpy(VPLANE(this),VPLANE(src),(_width*_height)>>2);
+        }
+        else
+        {       // The source is a reference
+                // We have to use the alternate informations
+                // to copy & compact at the same time
+                //
+                uint8_t *in,*out;
+                uint32_t w,h,stride;
+
+                w=src->_width;
+                h=src->_height;
+                stride=src->_planeStride[0];
+                out=YPLANE(this);
+                in=src->_planes[0];
+#define PLANE_CPY(h) \
+                for(uint32_t y=0;y<h;y++)  \
+                { \
+                        memcpy(out,in,w); \
+                        in+=stride;       \
+                        out+=w;           \
+                } 
+                PLANE_CPY(h);
+
+                w>>=1;
+                h>>=1;
+                in=src->_planes[1];
+                out=UPLANE(this);
+                stride=src->_planeStride[1];
+                PLANE_CPY(h);
+        
+                in=src->_planes[2];
+                out=VPLANE(this);
+                stride=src->_planeStride[2];
+                PLANE_CPY(h);
+
+
+        }
 	return 1;
 }
 uint8_t ADMImage::duplicateFull(ADMImage *src)

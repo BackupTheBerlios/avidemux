@@ -187,10 +187,29 @@ uint8_t 	decoderMpeg::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t
 		
 		if(out->quant && MPEG2DEC->decoder.quant_stride>=out->_qStride)
 		{
-			memcpy(out->quant,MPEG2DEC->decoder.quant,out->_qSize);
+                        if(dontcopy())
+                        {
+                             out->quant=(uint8_t *)MPEG2DEC->decoder.quant;
+                        }
+                        else
+			     memcpy(out->quant,MPEG2DEC->decoder.quant,out->_qSize);
 		
 		}
-		memcpy(out->data,t,(_w*_h*3)>>1);
+                if(dontcopy())
+                {
+                        uint32_t plane=_w*_h;
+
+                        out->_planes[0]=t;
+                        out->_planes[1]=t+plane;
+                        out->_planes[2]=t+((plane*5)>>2);
+                        out->_planeStride[0]=_w;
+                        out->_planeStride[1]=_w>>1;
+                        out->_planeStride[2]=_w>>1;
+                }
+                else
+                {
+		      memcpy(out->data,t,(_w*_h*3)>>1);
+                }
 		
 		switch(MPEG2DEC->decoder.coding_type)
 			{
