@@ -76,7 +76,17 @@ static int const divx4_general_presets[7] = {
 	0 | XVID_INTER4V | XVID_HALFPEL,
 	0 | XVID_INTER4V | XVID_HALFPEL
 };
-
+#else
+static const int X4motion_presets[] = {	
+			0,
+			0,
+			0,
+			0,
+			XVID_ME_HALFPELREFINE16,
+			XVID_ME_HALFPELREFINE16 | XVID_ME_ADVANCEDDIAMOND16,
+			XVID_ME_HALFPELREFINE16 | XVID_ME_EXTSEARCH16 |
+			XVID_ME_HALFPELREFINE8  | XVID_ME_USESQUARES16
+};
 #endif
 
 /*----------------------*/
@@ -139,7 +149,8 @@ int ret;
 	xvid_enc_stats.version = XVID_VERSION;
 	xvid_enc_frame.length = 0;
 	xvid_enc_frame.vop_flags|=XVID_VOP_HALFPEL;	
-	
+	if(vinfo.quant)
+		xvid_enc_frame.vol_flags|=XVID_VOL_MPEGQUANT;
 	
 	xvid_enc_frame.input.csp = XVID_CSP_YV12;
 	xvid_enc_frame.input.stride[0] = _w;
@@ -152,12 +163,11 @@ int ret;
 	xvid_enc_frame.input.plane[0] = in;
 	xvid_enc_frame.input.plane[2] = in+(_w*_h);
 	xvid_enc_frame.input.plane[1] = in+((_w*_h*5)>>2);
-	
-	xvid_enc_frame.quant = vinfo.quality;
+		
 	xvid_enc_frame.bitstream = out;	
 	
 	xvid_enc_frame.quant = vinfo.quality;
-
+	xvid_enc_frame.motion = X4motion_presets[vinfo.me];
 	if(nextIsKF)
 	{
     		xvid_enc_frame.type = XVID_TYPE_IVOP; // let the codec decide between I-frame (1) and P-frame (0)
@@ -329,6 +339,10 @@ int err;
    		xvid_enc_create.fbase =25000;
 	//Framerate
 	xvid_enc_create.fincr = 1000;
+	
+	//
+	
+	//
 	err = xvid_encore(NULL, XVID_ENC_CREATE, &xvid_enc_create, NULL);
 	if(err<0)
 	{

@@ -20,6 +20,7 @@ typedef struct
 	int		keydist;
 	int		me;
 	int		quality;
+	int		quant; // 00 H263/ 1 MPEG
 }v4linfo;
 
 int 		initVideoDev(char *videodevice, v4linfo *info );

@@ -54,7 +54,7 @@ typedef  void *PTHR(void *);
 
 struct video_audio origaudio;
 
-		v4linfo info={352,288,0,0,1,0,200,1,3};
+		v4linfo info={352,288,0,0,1,0,200,1,3,0};
 		audioInfo ainfo;
 
 #define ERROR(PARAM) { fprintf(stderr, "\n%s\n", PARAM); exit(1); }
@@ -98,6 +98,7 @@ void usage()
    fprintf(stderr, "\nA nuvrec derivative, compressing with lavcodec ffv1 codec\n");
    fprintf(stderr, "Usage: nuvrec [options] filename \n\n");
    fprintf(stderr, "options: -q n .......... Quality 2..31                 ]\n");
+   fprintf(stderr, "options: -Z   .......... Use mpeg quant                ]\n");
    fprintf(stderr, "         -M n .......... Motion estimation (1-6) [1]   ]\n");
    fprintf(stderr, "         -d n .......... K frame distance(1.500)[200]  ]\n");
    fprintf(stderr, "         -l n .......... Luminance Threshold   0..20 [1]\n");
@@ -170,13 +171,14 @@ int main(int argc, char** argv)
 
   parseRcFile();
 
-  while ((c=getopt(argc,argv,"d:b:M:q:l:c:C:S:W:H:t:NTV:A:a:srf:pnb:x:y:zQ2")) != -1) {
+  while ((c=getopt(argc,argv,"d:b:M:q:l:c:C:S:W:H:t:NTV:A:a:srf:pnbZ:x:y:zQ2")) != -1) {
     switch(c) {
       case '2': do_split=1;break;
       case 'b': ainfo.frequency=atoi(optarg);break;
       case 'q': info.quality = atoi(optarg); break;
       case 'd': if(!(info.keydist = atoi(optarg))) info.keydist=1; break;
       case 'M': info.me = atoi(optarg); break;
+      case 'Z': info.quant=1;break;
       case 'S': info.channel = atoi(optarg); break;
       case 'W': info.width = atoi(optarg);  break;
       case 'H': info.height = atoi(optarg);  break;
