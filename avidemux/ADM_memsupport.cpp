@@ -149,7 +149,7 @@ void *av_realloc(void *ptr, unsigned int newsize)
 	nalloc=ADM_alloc(newsize);
 	
 	memcpy(nalloc,ptr,size);
-	free(c-offset);
+	ADM_dealloc(ptr);
 	return nalloc;
 }
 
