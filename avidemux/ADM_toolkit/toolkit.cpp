@@ -251,6 +251,14 @@ int value;
 		value = (int) atoi(str);
 		return value;
 }
+float gtk_read_entry_float(GtkWidget *entry)
+{
+char *str;
+float value;
+     		str =		  gtk_editable_get_chars(GTK_EDITABLE ((entry)), 0, -1);
+		value = (int) atof(str);
+		return value;
+}
 
 void gtk_write_entry(GtkWidget *entry, int value)
 {
@@ -260,6 +268,16 @@ gint r;
 		gtk_editable_delete_text(GTK_EDITABLE(entry), 0,-1);
 		gtk_editable_insert_text(GTK_EDITABLE(entry), string, strlen(string), &r);
 }
+void gtk_write_entry_float(GtkWidget *entry, float value)
+{
+
+gint r;
+char string[400];
+		sprintf(string,"%f",value);		
+		gtk_editable_delete_text(GTK_EDITABLE(entry), 0,-1);
+		gtk_editable_insert_text(GTK_EDITABLE(entry), string, strlen(string), &r);
+}
+
 void gtk_write_entry_string(GtkWidget *entry, char *value)
 {
 
