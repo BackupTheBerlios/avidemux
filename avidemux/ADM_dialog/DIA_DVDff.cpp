@@ -125,7 +125,7 @@ uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 		     			*mode = COMPRESS_2PASS;	
 					value = (uint32_t)
 						gtk_read_entry(WID(entry_bitrate));
-        				if((value>0)&&(value<4000))
+        				if((value>0)&&(value<8200)) // enough for DL DVDs
           				{
        						*fsize=value;	
            				}
@@ -147,6 +147,14 @@ void upload(GtkWidget *dialog, FFcodecSetting *conf)
 // 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton1)),(float)conf->gop_size) ;
 	ENTRY_SET(entry_gopsize,gop_size);
 	
+	if(conf->interlaced)
+	{
+		if(conf->bff)
+			RADIO_SET(radiobutton_bff,1);
+		else
+			RADIO_SET(radiobutton_tff,1);			
+			
+	}
 	if(conf->widescreen)
 		RADIO_SET(radiobutton_ar169,1);			
 	gtk_write_entry(WID(entry_maxbitrate),(conf->maxBitrate*8)/1000);
@@ -172,6 +180,22 @@ void download(GtkWidget *dialog, FFcodecSetting *conf)
 	
 	
 	
+	if(RADIO_GET(radiobutton_progr))
+	{
+		conf->interlaced=0;
+		conf->bff=0;
+	}
+	else if(RADIO_GET(radiobutton_tff))
+	{
+		conf->interlaced=1;
+		conf->bff=0;
+	}
+	else if(RADIO_GET(radiobutton_bff))
+	{
+		conf->interlaced=1;
+		conf->bff=1;
+	}
+
 	if(RADIO_GET(radiobutton_ar169))
 	{
 		conf->widescreen=1;
@@ -273,6 +297,13 @@ create_dialog1 (void)
   GtkWidget *svcd;
   GtkWidget *dvd;
   GtkWidget *label5;
+  GtkWidget *frame6;
+  GtkWidget *hbox5;
+  GtkWidget *radiobutton_progr;
+  GSList *radiobutton_progr_group = NULL;
+  GtkWidget *radiobutton_tff;
+  GtkWidget *radiobutton_bff;
+  GtkWidget *label15;
   GtkWidget *hbox1;
   GtkWidget *frame3;
   GtkWidget *hbox2;
@@ -287,6 +318,7 @@ create_dialog1 (void)
   GtkWidget *tmpgenc1;
   GtkWidget *anime1;
   GtkWidget *kvcd1;
+  GtkWidget *hrtmpgenc1;
   GtkWidget *label10;
   GtkWidget *hbox3;
   GtkWidget *label11;
@@ -470,6 +502,38 @@ create_dialog1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label5), TRUE);
   gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
 
+  frame6 = gtk_frame_new (NULL);
+  gtk_widget_show (frame6);
+  gtk_box_pack_start (GTK_BOX (vbox1), frame6, TRUE, TRUE, 0);
+
+  hbox5 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox5);
+  gtk_container_add (GTK_CONTAINER (frame6), hbox5);
+
+  radiobutton_progr = gtk_radio_button_new_with_mnemonic (NULL, _("Progressive"));
+  gtk_widget_show (radiobutton_progr);
+  gtk_box_pack_start (GTK_BOX (hbox5), radiobutton_progr, FALSE, FALSE, 0);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton_progr), radiobutton_progr_group);
+  radiobutton_progr_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton_progr));
+
+  radiobutton_tff = gtk_radio_button_new_with_mnemonic (NULL, _("Interlaced TFF"));
+  gtk_widget_show (radiobutton_tff);
+  gtk_box_pack_start (GTK_BOX (hbox5), radiobutton_tff, FALSE, FALSE, 0);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton_tff), radiobutton_progr_group);
+  radiobutton_progr_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton_tff));
+
+  radiobutton_bff = gtk_radio_button_new_with_mnemonic (NULL, _("Interlaced BFF"));
+  gtk_widget_show (radiobutton_bff);
+  gtk_box_pack_start (GTK_BOX (hbox5), radiobutton_bff, FALSE, FALSE, 0);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobutton_bff), radiobutton_progr_group);
+  radiobutton_progr_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobutton_bff));
+
+  label15 = gtk_label_new (_("<b>Interlacing</b>"));
+  gtk_widget_show (label15);
+  gtk_frame_set_label_widget (GTK_FRAME (frame6), label15);
+  gtk_label_set_use_markup (GTK_LABEL (label15), TRUE);
+  gtk_label_set_justify (GTK_LABEL (label15), GTK_JUSTIFY_LEFT);
+
   hbox1 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox1);
   gtk_box_pack_start (GTK_BOX (vbox1), hbox1, TRUE, TRUE, 0);
@@ -526,6 +590,10 @@ create_dialog1 (void)
   gtk_widget_show (kvcd1);
   gtk_container_add (GTK_CONTAINER (menu2), kvcd1);
 
+  hrtmpgenc1 = gtk_menu_item_new_with_mnemonic (_("HR-Tmpgenc"));
+  gtk_widget_show (hrtmpgenc1);
+  gtk_container_add (GTK_CONTAINER (menu2), hrtmpgenc1);
+  
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu_matrix), menu2);
 
   label10 = gtk_label_new (_("<b>Matrices</b>"));
@@ -617,6 +685,12 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, svcd, "svcd");
   GLADE_HOOKUP_OBJECT (dialog1, dvd, "dvd");
   GLADE_HOOKUP_OBJECT (dialog1, label5, "label5");
+  GLADE_HOOKUP_OBJECT (dialog1, frame6, "frame6");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox5, "hbox5");
+  GLADE_HOOKUP_OBJECT (dialog1, radiobutton_progr, "radiobutton_progr");
+  GLADE_HOOKUP_OBJECT (dialog1, radiobutton_tff, "radiobutton_tff");
+  GLADE_HOOKUP_OBJECT (dialog1, radiobutton_bff, "radiobutton_bff");
+  GLADE_HOOKUP_OBJECT (dialog1, label15, "label15");
   GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
   GLADE_HOOKUP_OBJECT (dialog1, frame3, "frame3");
   GLADE_HOOKUP_OBJECT (dialog1, hbox2, "hbox2");
@@ -630,6 +704,7 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, tmpgenc1, "tmpgenc1");
   GLADE_HOOKUP_OBJECT (dialog1, anime1, "anime1");
   GLADE_HOOKUP_OBJECT (dialog1, kvcd1, "kvcd1");
+  GLADE_HOOKUP_OBJECT (dialog1, hrtmpgenc1, "hrtmpgenc1");
   GLADE_HOOKUP_OBJECT (dialog1, label10, "label10");
   GLADE_HOOKUP_OBJECT (dialog1, hbox3, "hbox3");
   GLADE_HOOKUP_OBJECT (dialog1, label11, "label11");

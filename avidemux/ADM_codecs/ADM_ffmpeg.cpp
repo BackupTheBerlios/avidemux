@@ -174,6 +174,18 @@ ffmpegEncoder::gopMpeg1 (void)
   _context->qmax = 31;
 
   _context->scenechange_threshold = 0xfffffff;	// Don't insert I frame out of order
+
+  _frame.interlaced_frame=_settings.interlaced;
+  if (_settings.interlaced) 
+  	_frame.top_field_first=!_settings.bff;
+  
+#if defined(CODEC_FLAG_INTERLACED_DCT)
+  _context->flags |= _settings.interlaced ? CODEC_FLAG_INTERLACED_DCT : 0;
+#endif
+#if defined(CODEC_FLAG_INTERLACED_ME)
+  _context->flags |= _settings.interlaced ? CODEC_FLAG_INTERLACED_ME : 0;
+#endif
+  
   //
   //_context->dsp_mask= FF_MM_FORCE;
   printf ("Mpeg12 settings:\n____________\n");

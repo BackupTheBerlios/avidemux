@@ -504,6 +504,11 @@ uint8_t  EncoderFFMPEGMpeg1::setMatrix( void)
 								_settings.intra_matrix=		kvcd_intra;
 								_settings.inter_matrix=		kvcd_inter;
 								break;
+						case ADM_MATRIX_HRTMP:
+								printf("\n using custom matrix : HR-Tmpgenc\n");
+								_settings.intra_matrix=		hrtmpgenc_intra;
+								_settings.inter_matrix=		hrtmpgenc_inter;
+								break;
 					}
 		return 1;
 }

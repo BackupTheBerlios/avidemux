@@ -46,7 +46,7 @@ typedef struct FFcodecSetting
     	float 		qblur;      		// 0.0--1.0
 	int		minBitrate;
 	int		maxBitrate;
-	int		user_matrix;  // 0 normal / 1 tmpgenc / 2 anime / 3 kvcd
+	int		user_matrix;  // 0 normal / 1 tmpgenc / 2 anime / 3 kvcd / 4 hr-tmpgenc
 	int		gop_size;	// For mpeg1/2 , 12 is good
 	uint16_t  	*intra_matrix;
 	uint16_t 	*inter_matrix;
