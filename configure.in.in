@@ -248,7 +248,7 @@ AC_CHECK_HEADER(xvid.h,,have_xvid4=no)
 dnl -- check API version 4.0
 AC_TRY_COMPILE([
   	#include "xvid.h"
-	#if  XVID_API == ((4<<16)+0)
+	#if ( XVID_API == ((4<<16)+0)) || ( XVID_API == ((4<<16)+1))
 	#error Xvid Api is 4.0 :)
 	#endif
 
