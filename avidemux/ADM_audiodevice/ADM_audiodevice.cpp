@@ -170,7 +170,7 @@ void AVDM_switch(AUDIO_DEVICE action)
 								break;
 
 #endif
-#ifdef OSS_SUPPORT
+#if defined(OSS_SUPPORT) && !defined(CYG_MANGLING)
 		  case  DEVICE_OSS :
 								device=new 	 ossAudioDevice;
 								currentDevice=DEVICE_OSS;;

@@ -93,12 +93,15 @@ void GUI_Sleep(uint32_t ms)
 {
     if (ms < 10)
 	return;
-
+#ifdef CYG_MANGLING
+	usleep(ms*1000);
+#else
     ms -= 10;
     timespec ts, tr;
     ts.tv_sec = 0;
     ts.tv_nsec = ms * 1000 * 1000;
     nanosleep(&ts, &tr);
+#endif
     
 }
 
@@ -360,4 +363,22 @@ char 		*ADM_index(const char *s, int c)
 	}
 	return NULL;
 }
+void ADM_usleep(unsigned long us)
+{
+	// Put you usleep here
+}
+#ifdef CYG_MANGLING
+void gettimeofday(struct timeval *p, void *tz)
+{
+	UNTIME tme;
+	//GetSystemTimeAsFileTime(&(tme.ft));
+	tme.ns100=0;
+	p->tv_usec=(long int)((tme.ns100/10LL)% 1000000LL);
+	p->tv_sec=(long int)((tme.ns100-(116444736000000000LL))/10000000LL);
+	return;
+  
+	
+}
+#endif
+
 //EOF

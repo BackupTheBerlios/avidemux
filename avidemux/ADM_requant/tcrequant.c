@@ -51,9 +51,8 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include <unistd.h>
 #include <math.h>
-#include <fcntl.h>
+
 
 // MEANX
 #include "../ADM_library/default.h"

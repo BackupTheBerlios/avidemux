@@ -40,6 +40,7 @@
 #include "ADM_debug.h"
 
 #include "avi_vars.h"
+#include "toolkit.hxx"
 #include "TLK_clock.h"
 static uint8_t inited=0;
 static struct timeval _itimev;
@@ -72,7 +73,7 @@ uint32_t Clock::getElapsedMS(void )
 **/
 uint32_t getAbsTime( void )
 {
-     struct timeval timev;
+     struct timeval timev;     
      struct timezone timez;
 
     int32_t tt;

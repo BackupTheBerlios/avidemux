@@ -44,7 +44,21 @@ uint16_t 		swap16(uint16_t in);
 inline uint32_t 		dontswap(uint32_t in) {return in;};
 char 		*ADM_rindex(const char *s, int c);
 char 		*ADM_index(const char *s, int c);
+void 		ADM_usleep(unsigned long us);
 
+
+#ifdef CYG_MANGLING
+typedef struct timespec
+{
+	time_t tv_sec;
+	long int tv_nsec;
+};
+
+void gettimeofday(struct timeval *p, void *tz);
+#define timezone int
+#define usleep ADM_usleep
+
+#endif
 
 #define FRAME_PAL 1
 #define FRAME_FILM 2

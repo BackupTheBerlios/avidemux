@@ -12,11 +12,13 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <ctype.h>
 #include <math.h>
 #include <string.h>
 #include <assert.h>
+#ifndef CYG_MANGLING
+ #include "unistd.h"
+#endif
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_gui2/GUI_ui.h"
@@ -29,7 +31,6 @@
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_filter/video_filters.h"
-
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_SCRIPT
 #include "ADM_toolkit/ADM_debug.h"

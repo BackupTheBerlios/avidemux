@@ -848,8 +848,7 @@ if test "x$use_cygwin" = "xyes"; then
 	#AC_DEFINE(link(x,y),-1,"")	
 	CXXFLAGS=" $CXXFLAGS -mno-cygwin -mms-bitfields"
 	CFLAGS=" $CFLAGS -mno-cygwin -mms-bitfields"
-
-	
+	echo "CFLAGS=\" -mno-cygwin -mms-bitfields \" " >> adm_libavcodec/config.cpu
 fi
 dnl ________________NASM__________________
 AC_SUBST(AS)
