@@ -25,3 +25,9 @@ void UI_deiconify( void );
 uint32_t UI_readCurFrame( void );
 void UI_JumpDone(void);
 
+int 	UI_getCurrentACodec(void);
+int 	UI_getCurrentVCodec(void);
+void UI_setAudioCodec( int i);
+void UI_setVideoCodec( int i);
+
+ 

@@ -159,7 +159,10 @@ extern uint8_t ogmSave(char  *name);
 extern uint8_t ogmSave(char *fd);
 extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
 extern int A_SaveUnpackedVop( char *name);
-
+extern void      videoCodecConfigureUI(void);
+extern void audioCodecChanged(int newcodec);
+extern void videoCodecChanged(int newcodec);
+extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
 extern int ignore_change;
 
 PARAM_MUX muxMode = MUX_REGULAR;
@@ -189,6 +192,21 @@ HandleAction (Action action)
 
   switch (action)
     {
+      case ACT_AudioConfigure:
+    		audioCodecSelect();
+		return;
+	case ACT_VideoConfigure:
+    		videoCodecSelect();
+		return;
+    case ACT_VideoCodecChanged:
+    		
+    		videoCodecChanged(UI_getCurrentVCodec());
+		return;
+   case ACT_AudioCodecChanged:
+   		audioCodecChanged(UI_getCurrentACodec());
+    		
+		return;
+    
     case ACT_RunScript:
     			 GUI_FileSelRead ("Select script to load ", parseScript);
     		return;
@@ -204,10 +222,12 @@ HandleAction (Action action)
     		 DIA_about( );
 		 return;
     case ACT_VideoCodec:
-      videoCodecSelect ();
+      //videoCodecSelect ();
+      videoCodecConfigureUI();
       return;
     case ACT_AudioCodec:
-      audioCodecSelect ();
+      //audioCodecSelect ();
+      audioCodecConfigure();
       return;
 
     case ACT_AudioFilters:
@@ -406,6 +426,12 @@ HandleAction (Action action)
   // we have an AVI loaded
   switch (action)
     {
+    case ACT_Bitrate:
+    			{
+				uint32_t a,b;
+				DIA_Calculator(&a,&b );
+			}
+    			break;
     case ACT_SaveUnpackedMpeg4:
     			if(GUI_Question("This is to be used to undo packed vop on mpeg4.\nContinue ?"))
 			{ 

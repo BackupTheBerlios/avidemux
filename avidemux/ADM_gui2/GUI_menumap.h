@@ -69,9 +69,12 @@ CALLBACK(external_wav1                		,ACT_AudioSourceWAV);
 CALLBACK(build_vbr_time_map1      		,ACT_AudioMap);
 
 
- CALLBACK(index_mpeg1                		,ACT_MpegIndex);
- CALLBACK(cut_wizard1                		,ACT_CutWizard);
- CALLBACK(select_log_file1           		,ACT_SetLogFile);
+ //CALLBACK(index_mpeg1                		,ACT_MpegIndex);
+ //CALLBACK(cut_wizard1                		,ACT_CutWizard);
+// CALLBACK(select_log_file1           		,ACT_SetLogFile);
+
+CALLBACK(videoencoder				,ACT_VideoConfigure);
+CALLBACK(audio_encoder1           		,ACT_AudioConfigure);
 
 CALLBACK(bitrate_histogram1		      	,ACT_BitRate);
 

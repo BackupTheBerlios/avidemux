@@ -70,6 +70,10 @@ extern void oplug_mpeg_dvdConf( void );
 extern void UI_PrintCurrentVCodec(const char *str);
 extern void oplug_mpegff_conf(void);
 
+uint32_t encoderGetNbEncoder(void);
+const char* encoderGetIndexedName(uint32_t i);
+extern void UI_setVideoCodec(int i);
+
 #ifdef USE_XVID_4 
 	#include "ADM_codecs/ADM_xvid4.h"
 	#include "ADM_codecs/ADM_xvid4param.h"
@@ -781,29 +785,56 @@ static const codecEnumByName mycodec[]=
 	{CodecDivx	,"Divx"},
 #endif
 #ifdef USE_XX_XVID
-	{CodecXvid	,	"Xvid"},
+	{CodecXvid	,"Xvid"},
 #endif
 
 #ifdef USE_XVID_4
-	{CodecXvid4	,	"Xvid4"},
+	{CodecXvid4	,"Xvid4"},
 #endif
 
 
-	{CodecMjpeg	,	"Mjpeg"},
+	{CodecMjpeg	,"Mjpeg"},
 #ifdef USE_MJPEG
-	{CodecVCD	,	"VCD"},
-	{CodecSVCD,	"SVCD"},
-	{CodecDVD,		"DVD"},
+	{CodecVCD	,"VCD"},
+	{CodecSVCD	,"SVCD"},
+	{CodecDVD	,"DVD"},
 #endif
-	{CodecXVCD,	"XVCD"},
-	{CodecXSVCD,	"XSVCD"},
-	{CodecFF		,"FFmpeg4"},
-	{CodecH263	,	"H263"},
+	{CodecXVCD	,"XVCD"},
+	{CodecXSVCD	,"XSVCD"},
+	{CodecFF	,"FFmpeg4"},
+	{CodecH263	,"H263"},
 	{CodecH263P	,"H263+"},
-	{CodecHuff		,"Huffyuv"},
-	{CodecFFV1		,"FFV1"},
-	{CodecSnow		,"Snow"}
+	{CodecHuff	,"Huffyuv"},
+	{CodecFFV1	,"FFV1"},
+	{CodecSnow	,"Snow"}
 };
+uint32_t encoderGetNbEncoder(void)
+{
+	return sizeof(mycodec)/sizeof(codecEnumByName);
+}
+const char* encoderGetIndexedName(uint32_t i)
+{
+	ADM_assert(i<sizeof(mycodec)/sizeof(codecEnumByName));
+	return mycodec[i].name;
+}
+void videoCodecChanged(int newcodec)
+{
+	ADM_assert(newcodec<sizeof(mycodec)/sizeof(codecEnumByName));
+	current_codec=mycodec[newcodec].type;
+}
+void encoderPrint(void)
+{
+	for(uint32_t i=0;i<sizeof(mycodec)/sizeof(codecEnumByName);i++)
+	{
+		if(current_codec==mycodec[i].type)
+		{
+			UI_setVideoCodec(i);
+			return;
+		}
+	
+	}
+	ADM_assert(0);
+}
 //___________________________________________________
 void saveEncoderConfig( void )
 {
@@ -1304,9 +1335,5 @@ int a1,b1;
 
 }
 
-void encoderPrint(void)
-{
-	UI_PrintCurrentVCodec(encoderGetName());
-}
 
 // EOF

@@ -17,7 +17,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #  include <config.h>
-
+/*******************THIS IS NOT USED ANYMORE********************/
+/*******************THIS IS NOT USED ANYMORE********************/
+/*******************THIS IS NOT USED ANYMORE********************/
+/*******************THIS IS NOT USED ANYMORE********************/
+/*******************THIS IS NOT USED ANYMORE********************/
+/*******************THIS IS NOT USED ANYMORE********************/
+/*******************THIS IS NOT USED ANYMORE********************/
+/*******************THIS IS NOT USED ANYMORE********************/
+/*******************THIS IS NOT USED ANYMORE********************/
 
 #include <string.h>
 

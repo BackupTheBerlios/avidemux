@@ -158,6 +158,9 @@ ACT_Pref,
 ACT_Requant,
 ACT_JumpToFrame,
 ACT_RunScript,
+ACT_AudioCodecChanged,
+ACT_VideoCodecChanged,
+ACT_Bitrate,
 ACT_DUMMY
 
 

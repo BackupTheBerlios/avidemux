@@ -55,28 +55,32 @@
 extern void UI_setAProcessToggleStatus( uint8_t status );
 extern uint8_t DIA_audioCodec( AUDIOENCODER *codec );
 extern int DIA_audioEncoder(int *pmode, int *pbitrate,const char *title);
+extern void UI_setAudioCodec( int i);
+uint32_t audioFilterGetNbEncoder(void);
+const char* audioFilterGetIndexedName(uint32_t i);
 
 typedef struct {
 	const char *name;
+	const char *menuName;
 	AUDIOENCODER codec;
 }CODECLIST;
 
 static CODECLIST myCodecList[]=
 {
 #ifdef HAVE_LIBMP3LAME
-		{"lame", AUDIOENC_MP3},
+		{"lame","Lame", AUDIOENC_MP3},
 #endif
 #ifdef USE_AAC
-		{"aac", AUDIOENC_AAC},
+		{"aac","FAAC", AUDIOENC_AAC},
 #endif
 #ifdef USE_VORBIS
-		{"vorbis", AUDIOENC_VORBIS},
+		{"vorbis","Vorbis", AUDIOENC_VORBIS},
 #endif
 
-		{"mp2", AUDIOENC_MP2},
-		{"ac3", AUDIOENC_AC3},
-		{"toolame", AUDIOENC_2LAME},
-		{"none", AUDIOENC_NONE}
+		{"mp2", "FFm MP2", AUDIOENC_MP2},
+		{"ac3", "FFm AC3",AUDIOENC_AC3},
+		{"toolame","Toolame", AUDIOENC_2LAME},
+		{"none", "Wav PCM",AUDIOENC_NONE}
 };
 extern int DIA_getLameSettings(int *pmode, int *pbitrate,ADM_LAME_PRESET *preset);
 extern void UI_PrintCurrentACodec( const char *s);
@@ -84,7 +88,7 @@ extern void UI_PrintCurrentACodec( const char *s);
 #define MAX_AUDIO_FILTER 10
 static AVDMProcessAudioStream *filters[MAX_AUDIO_FILTER];
 static uint32_t filtercount = 0;
-static void audioDisplayCodec( void );
+
  int  audioNormalizeMode = 0;
  int  audioFreq=48000;
  RESAMPLING  audioResampleMode = RESAMPLING_NONE;
@@ -103,6 +107,23 @@ FILMCONV audioFilmConv=FILMCONV_NONE;
  ADM_LAME_PRESET audioMP3preset=ADM_LAME_PRESET_CBR;
 //
 static AUDIOENCODER  activeAudioEncoder=  AUDIOENC_NONE;
+
+void audioCodecChanged(int newcodec)
+{
+	ADM_assert(newcodec<sizeof(myCodecList) /sizeof(CODECLIST));
+	activeAudioEncoder=myCodecList[newcodec].codec;
+
+}
+
+uint32_t audioFilterGetNbEncoder(void)
+{
+	return sizeof(myCodecList) /sizeof(CODECLIST);
+}
+const char* audioFilterGetIndexedName(uint32_t i)
+{
+ 	ADM_assert(i<sizeof(myCodecList) /sizeof(CODECLIST));
+	return myCodecList[i].menuName;
+}
 
 void audioFilterNormalize(uint8_t onoff)
 {
@@ -269,21 +290,33 @@ const char *audioFilterGetName( void )
 	return conf;
 
 }
-void audioDisplayCodec( void )
+void audioPrintCurrentCodec(void)
 {
-	UI_PrintCurrentACodec(audioCodecGetName()  );
+
+	for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
+	{
+		if(activeAudioEncoder==myCodecList[i].codec)
+		{
+			UI_setAudioCodec(i);
+			return;
+		}
+	
+	}
+	ADM_assert(0);
 }
  void audioCodecSetcodec(AUDIOENCODER codec)
 {
 
 	activeAudioEncoder=codec;
-	audioDisplayCodec();
+	audioPrintCurrentCodec();
+
 }
 
 void audioCodecSelect( void )
 {
 	DIA_audioCodec( &activeAudioEncoder );
-	audioDisplayCodec();
+	audioPrintCurrentCodec();
+
 
 }
 /*

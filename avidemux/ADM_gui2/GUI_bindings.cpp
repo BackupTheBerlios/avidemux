@@ -73,7 +73,13 @@ extern GtkWidget	*create_mainWindow (void);
 extern void guiCallback(GtkMenuItem * menuitem, gpointer user_data);
 extern void HandleAction(Action act);
 extern void UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_data);
-
+// To build vcodec
+extern uint32_t encoderGetNbEncoder(void);
+extern const char* encoderGetIndexedName(uint32_t i);
+// To build a codec
+uint32_t audioFilterGetNbEncoder(void);
+const char* audioFilterGetIndexedName(uint32_t i);
+//
 static uint8_t  bindGUI( void );
 static gboolean destroyCallback(GtkWidget * widget,	  GdkEvent * event, gpointer user_data);
 static gboolean  on_drawingarea1_expose_event(GtkWidget * widget,  GdkEventExpose * event, gpointer user_data);
@@ -116,13 +122,14 @@ buttonCallBack_S buttonCallback[]=
 	{"buttonSaveAvi"		,"clicked"		,ACT_SaveAvi},
 	{"buttonFilters"		,"clicked"		,ACT_VideoParameter},
 	{"buttonAudioFilter"		,"clicked"		,ACT_AudioFilters},
-	{"buttonVCodec"			,"clicked"		,ACT_VideoCodec},
-	{"buttonACodec"			,"clicked"		,ACT_AudioCodec},
+	{"buttonConfV"			,"clicked"		,ACT_VideoCodec},
+	{"buttonConfA"			,"clicked"		,ACT_AudioCodec},
 	{"buttonRecent"			,"clicked"		,ACT_RecentFiles},
 	{"buttonPrevBlack"		,"clicked"		,ACT_PrevBlackFrame},
 	{"buttonNextBlack"		,"clicked"		,ACT_NextBlackFrame},
 	{"buttonGotoA"			,"clicked"		,ACT_GotoMarkA},
 	{"buttonGotoB"			,"clicked"		,ACT_GotoMarkB},	
+	{"buttonBitrate"		,"clicked"		,ACT_Bitrate},	
 
 	{"togglebuttonPreview"		,"toggled"		,ACT_PreviewToggle},
 	{"toggleOutput"			,"toggled"		,ACT_OuputToggle},
@@ -133,7 +140,10 @@ buttonCallBack_S buttonCallback[]=
 	{"boxCurFrame"			,"editing_done"		,ACT_JumpToFrame},
 	{"boxCurFrame"			,"activate"		,ACT_JumpToFrame},
 	{"boxCurTime"			,"editing_done"		,ACT_TimeChanged},
-	{"togglebuttonAudio"		,"toggled"		,ACT_AudioModeToggle}
+	{"togglebuttonAudio"		,"toggled"		,ACT_AudioModeToggle},
+	{"optionVCodec"			,"changed"		,ACT_VideoCodecChanged},
+	{"optionACodec"			,"changed"		,ACT_AudioCodecChanged}
+	
 
 };
 
@@ -265,6 +275,42 @@ uint8_t  bindGUI( void )
  	gtk_signal_connect(GTK_OBJECT(guiDrawingArea), "expose_event",
 		       GTK_SIGNAL_FUNC(on_drawingarea1_expose_event),
 		       NULL);
+		       
+		       
+	// Finally add video codec...
+	uint32_t nbVid;
+	const char *name;
+	GtkWidget *menuv;
+		 menuv = gtk_menu_new ();
+		nbVid=encoderGetNbEncoder();
+		GtkWidget *vidWidget[nbVid];
+		printf("Found %d video encoder\n",nbVid);		       
+		for(uint32_t i=0;i<nbVid;i++)
+		{
+			name=encoderGetIndexedName(i);
+			vidWidget[i]=gtk_menu_item_new_with_mnemonic(name);
+  			gtk_widget_show (vidWidget[i]);
+  			gtk_container_add (GTK_CONTAINER (menuv), vidWidget[i]);
+		}
+	 gtk_option_menu_set_menu (GTK_OPTION_MENU (lookup_widget(guiRootWindow,"optionVCodec")), menuv);
+	// And A codec
+	// Finally add video codec...
+	uint32_t nbAud;
+	
+	GtkWidget *menua;
+		 menua = gtk_menu_new ();
+		nbAud=audioFilterGetNbEncoder();
+		GtkWidget *audWidget[nbAud];
+		printf("Found %d audio encoder\n",nbAud);		       
+		for(uint32_t i=0;i<nbAud;i++)
+		{
+			name=audioFilterGetIndexedName(i);
+			audWidget[i]=gtk_menu_item_new_with_mnemonic(name);
+  			gtk_widget_show (audWidget[i]);
+  			gtk_container_add (GTK_CONTAINER (menua), audWidget[i]);
+		}
+	 gtk_option_menu_set_menu (GTK_OPTION_MENU (lookup_widget(guiRootWindow,"optionACodec")), menua);
+
     return 1;
 
 }
@@ -573,6 +619,28 @@ void UI_BusyCursor( void )
 
 	
 }
+ int 	UI_getCurrentACodec(void)
+ {
+ 	return getRangeInMenu(lookup_widget(guiRootWindow,"optionACodec"));
+ 
+ }
+ int 	UI_getCurrentVCodec(void)
+ {
+ 
+ 	return getRangeInMenu(lookup_widget(guiRootWindow,"optionVCodec"));
+ 
+ }
+void UI_setAudioCodec( int i)
+{
+	gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,"optionACodec")), i);
+
+}
+void UI_setVideoCodec( int i)
+{
+	gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,"optionVCodec")), i);
+
+}
+
 void UI_NormalCursor( void )
 {
 //	gtk_widget_set_events(guiRootWindow,guiCursorEvtMask);
@@ -583,12 +651,7 @@ void UI_NormalCursor( void )
 }
 void UI_PrintCurrentVCodec(const char *str)
 {
- 	gtk_label_set_text((GtkLabel *) lookup_widget(guiRootWindow,"labelVcodec"), str);
-
-}
-void UI_PrintCurrentACodec(const char *str)
-{
- 	gtk_label_set_text((GtkLabel *) lookup_widget(guiRootWindow,"labelAcodec"), str);
+ 	
 
 }
 // EOF
