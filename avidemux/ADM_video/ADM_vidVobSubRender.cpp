@@ -189,7 +189,7 @@ uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start,uint32_t end)
                                 a<<=4;
                                 NEXTNIBBLE(b);
                                 a|=b;
-                                if(a<4)
+                                if(a<0x100)
                                 {
                                         a|=(stride-x)<<2;
                                 }
@@ -335,8 +335,8 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
                                                   _x2=nx2;
                                                   _y1=ny1;
                                                   _y2=ny2;
-                                                  _subW=_x2-_x1;
-                                                  _subH=_y2-_y1;                                                
+                                                  _subW=_x2-_x1+1;
+                                                  _subH=_y2-_y1+1;                                                
                                                   _original=new vobSubBitmap(_subW,_subH);
                                                 }
                                                                         
