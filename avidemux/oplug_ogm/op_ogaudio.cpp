@@ -201,7 +201,7 @@ uint32_t header_offset;
 	tgt*=1000*audioFilter->getInfo()->frequency;
 	
 	_audioTarget=(uint32_t )floor(tgt);
-	
+	//printf("Frame :%lu audio current : %lu target:%lu \n",vframe,_audioCurrent,_audioTarget);
 	len=0;
 	sample=0;
 	
@@ -227,9 +227,11 @@ uint32_t header_offset;
 		_audioCurrent+=sample;
 		totalsample+=sample;		
 		audioStream->writeRawData(packetLen+header_offset,_audioBuffer,_audioCurrent);
+		
 		packets++;
 		len+=packetLen;
 	}
+	encoding_gui->feedAudioFrame(len);
 	if(totalsample)
 	{
 		audioStream->flush();

@@ -205,6 +205,8 @@ while(count--)
 	asked=FRAME*2*_wavheader->channels;
 	rd=_instream->read(asked,(uint8_t *)buf);
 	nbSample=rd/(2*_wavheader->channels);
+	
+	if(!nbSample) return 0;
 	total+=nbSample;
 	//aprintf("Nb Sample:%lu\n",nbSample);
 	// Now we got out samples, encode them
