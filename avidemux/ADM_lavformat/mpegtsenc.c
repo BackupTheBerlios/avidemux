@@ -173,8 +173,9 @@ int mpegts_write_section1(MpegTSSection *s, int tid, int id,
 /*********************************************/
 /* mpegts writer */
 
-#define DEFAULT_PMT_START_PID   0x1000
-#define DEFAULT_START_PID       0x0100
+#define DEFAULT_PMT_START_PID   0x0040  //0x1000 MEANX
+#define DEFAULT_START_PID       0x0031 // 0x100 MEANX
+#define DEFAULT_AUDIO_START_PID 0x0034 // 0x100 MEANX
 #define DEFAULT_PROVIDER_NAME   "FFmpeg"
 #define DEFAULT_SERVICE_NAME    "Service01"
 
@@ -386,6 +387,8 @@ static int mpegts_write_header(AVFormatContext *s)
     AVStream *st;
     int i, total_bit_rate;
 
+    int vidPid=0,audPid=0;      //MEANX
+
     ts->tsid = DEFAULT_TSID;
     ts->onid = DEFAULT_ONID;
     /* allocate a single DVB service */
@@ -412,7 +415,11 @@ static int mpegts_write_header(AVFormatContext *s)
         if (!ts_st)
             goto fail;
         st->priv_data = ts_st;
-        ts_st->pid = DEFAULT_START_PID + i;
+        // MEANX
+        //ts_st->pid = DEFAULT_START_PID + i;
+        if(st->codec.codec_type==CODEC_TYPE_AUDIO) ts_st->pid=DEFAULT_AUDIO_START_PID+audPid++;
+                                else ts_st->pid=DEFAULT_START_PID+vidPid++;
+        // /MEANX
         ts_st->payload_pts = AV_NOPTS_VALUE;
         /* update PCR pid if needed */
         if (st->codec.codec_type == CODEC_TYPE_VIDEO && 
