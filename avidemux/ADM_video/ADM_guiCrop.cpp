@@ -18,12 +18,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
-#include <assert.h>
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
@@ -56,10 +55,10 @@ uint8_t *video1;
 
 		printf("\n Crop in : %lu  x %lu\n",w,h);
 		video1=(uint8_t *)malloc(w*h*4);
-		assert(video1);
+		ADM_assert(video1);
 
 		// ask current frame from previous filter
-		assert(instream->getFrameNumberNoAlloc(curframe, &l,video1,&f));
+		ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l,video1,&f));
 						
 		par=_param;
 		
@@ -75,7 +74,7 @@ uint8_t *video1;
 				ret=1;
 				break;
 			default:
-				assert(0);
+				ADM_assert(0);
 		}
 
 		free(video1);		

@@ -26,8 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include <math.h>
 #include <iconv.h>
@@ -124,7 +123,7 @@ ADMVideoSubtitle::subParse (subLine * in, char *string)
 
   j = 1;
   totallen = strlen (string);
-  assert (totallen);
+  ADM_assert (totallen);
   while (string[j] != '}' && j < totallen)
     j++;
   string[j] = 0;
@@ -297,7 +296,7 @@ ADMVideoSubtitle::loadSRT (void)
 	      		strcat (text, string);
 	      		if (strlen (text) > 300)
 			{
-		  		assert (0);
+		  		ADM_assert (0);
 			}
 	    	}
 	  }

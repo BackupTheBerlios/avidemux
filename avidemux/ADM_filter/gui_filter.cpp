@@ -17,12 +17,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
@@ -366,7 +366,7 @@ dummy=(int)user_data;
 		  w = in->getInfo ()->width;
 		  h = in->getInfo ()->height;
 		  data = (uint8_t *) malloc (w * h * 3);
-		  assert (data);
+		  ADM_assert (data);
 		  in->getFrameNumberNoAlloc (curframe, &l, data, &f);
 		  
 		  GUI_PreviewInit (w, h);
@@ -400,7 +400,7 @@ dummy=(int)user_data;
 #if 0
 	    default:
 	    	printf("Unknown action :%d, action param %d\n",action,action_parameter);
-	      assert (0);
+	      ADM_assert (0);
 #endif	      
 	    }
 	//updateFilterList();

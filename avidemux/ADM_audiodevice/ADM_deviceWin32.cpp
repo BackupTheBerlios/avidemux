@@ -32,7 +32,7 @@
 #include <errno.h>
 
 
-#include <assert.h>
+#include <ADM_assert.h>
   
 #include "fourcc.h" 
  
@@ -184,7 +184,7 @@ uint8_t win32AudioDevice::play(uint32_t nb,uint8_t * ptr)
  uint32_t av=0;
 	WAVEHDR *hdr;
 
-   assert(nb<BUCKET_SIZE);
+   ADM_assert(nb<BUCKET_SIZE);
    // First do clean up
 #if 0   
       for(uint32_t i=0;i<NB_BUCKET;i++)

@@ -40,7 +40,7 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -196,7 +196,7 @@ uint8_t oggHeader::open(char *name)
 	*/
 
 	demux=new OGMDemuxer();
-	assert(demux->open(name));
+	ADM_assert(demux->open(name));
 	for(uint32_t track=0;track<10;track++)
 	{
 		if(!demux->readHeader(&size,&flag,&framenum,&id)) break;
@@ -286,7 +286,7 @@ uint8_t oggHeader::open(char *name)
 	// time to gather some informations
 
 	_demux=new OGMDemuxer();
-	assert(_demux->open(name));
+	ADM_assert(_demux->open(name));
 	_demux->readHeaderOfType(_videoTrack,&size,&flag,&framenum);
 	_demux->readBytes(1,&firstByte);
 	_demux->readPayload(buffer);
@@ -598,7 +598,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 										framenum,len,_lastFrag,frag);
 										
 					printf("For information the frame len is %lu\n",*framelen);
-					assert(0);
+					ADM_assert(0);
 				}
 
 			}
@@ -613,7 +613,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 		aprintf("last seekable : %lu\n",seek);
 
 		// Jump to seek
-		assert(_demux->setPos(_index[seek].pos));
+		ADM_assert(_demux->setPos(_index[seek].pos));
 		// and now read forward
 	}
 	// Read a complete one
@@ -664,7 +664,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 			{
 				printf("\n When requesting frame %lu we got len to go %lu and reached a new frame, lastFrag=%lu/%u\n",
 										framenum,len,_lastFrag,frag);
-				assert(0);
+				ADM_assert(0);
 			}
 
 			// it means end of a frame
@@ -683,7 +683,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 					printf("\n Inconsistency : When requesting frame %lu we got len to go %lu and reached a new frame, lastFrag=%lu/%u\n",
 										framenum,len,_lastFrag,frag);
 					printf("For information the frame len is %lu\n",*framelen);
-					assert(0);
+					ADM_assert(0);
 				}
 				seek++;
 			}

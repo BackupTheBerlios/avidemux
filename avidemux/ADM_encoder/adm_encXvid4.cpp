@@ -24,6 +24,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <config.h>
+#include <ADM_assert.h>
 #ifdef USE_XVID_4
 #include "xvid.h"
 
@@ -75,7 +76,7 @@ EncoderXvid4::~EncoderXvid4 ()
 //--------------------------------
 uint8_t		EncoderXvid4::configure (AVDMGenericVideoStream * instream)
 {
-  assert (instream);
+  ADM_assert (instream);
   ADV_Info *info;
 
 	//uint32_t flag1,flag2,flag3;
@@ -84,7 +85,7 @@ uint8_t		EncoderXvid4::configure (AVDMGenericVideoStream * instream)
   _w = info->width;
   _h = info->height;
   _vbuffer = new uint8_t[_w * _h * 2];
-  assert (_vbuffer);
+  ADM_assert (_vbuffer);
   _in = instream;
   _fps1000=info->fps1000;
   switch (_param.mode)
@@ -120,7 +121,7 @@ uint8_t		EncoderXvid4::configure (AVDMGenericVideoStream * instream)
       			
       			break;
     default:
-      			assert (0);
+      			ADM_assert (0);
     } 	
   	printf ("\n Xvid4 Encoder ready , w: %lu h:%lu mode:%d", _w, _h, _state);
   	return 1;
@@ -133,7 +134,7 @@ uint8_t
 EncoderXvid4::startPass1 (void)
 {
  ADV_Info *info;
-  assert (_state == enc_Pass1);
+  ADM_assert (_state == enc_Pass1);
   info= _in->getInfo ();
   if(!_codec->init(_param.bitrate,info->fps1000,&encparam))
 			{
@@ -174,8 +175,8 @@ EncoderXvid4::encode (uint32_t frame, uint32_t * len, uint8_t * out,
   uint32_t l, f;
   //ENC_RESULT enc;
 
-  assert (_codec);
-  assert (_in);
+  ADM_assert (_codec);
+  ADM_assert (_in);
 
   if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
     {
@@ -193,7 +194,7 @@ EncoderXvid4::encode (uint32_t frame, uint32_t * len, uint8_t * out,
       		break;
   
     default:
-      		assert (0);
+      		ADM_assert (0);
     }
     return 1;   
  
@@ -216,7 +217,7 @@ EncoderXvid4::startPass2 (void)
 uint32_t 	finalSize;
 float 		br;
 
-  assert (_state == enc_Pass1);
+  ADM_assert (_state == enc_Pass1);
   printf ("\n Starting pass 2 (%dx%d)\n",_w,_h);
   
   

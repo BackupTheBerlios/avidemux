@@ -28,7 +28,7 @@
 #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 //#include <math.h>
 #include "ADM_library/default.h"
@@ -248,7 +248,7 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 				case P_TYPE:*flag=0;break;
 				default:
 					printf("\n unknown frame type ! %d\n",MPEG2DEC->decoder.coding_type);
-					//assert(0);
+					//ADM_assert(0);
 					//return 0;
 					*flag=0;
 			}

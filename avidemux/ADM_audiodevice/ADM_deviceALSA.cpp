@@ -23,7 +23,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
  #include "config.h"
 

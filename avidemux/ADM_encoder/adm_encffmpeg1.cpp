@@ -22,6 +22,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <config.h>
+#include <ADM_assert.h>
 
 #ifdef USE_FFMPEG
 #include "ADM_lavcodec.h"
@@ -76,8 +77,8 @@ uint8_t EncoderFFMPEGMpeg1::encode (uint32_t frame, uint32_t * len, uint8_t * ou
 			  uint32_t * flags)
 {
 uint32_t l,f;
-  assert (_codec);
-  assert (_in);
+  ADM_assert (_codec);
+  ADM_assert (_in);
 
   	if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
     	{
@@ -176,10 +177,10 @@ uint32_t l,f;
 
 					break;
 		default:
-				assert(0);
+				ADM_assert(0);
 				break;
 		}
-		assert(0);
+		ADM_assert(0);
 		return 0;
 
 }
@@ -200,7 +201,7 @@ uint8_t EncoderFFMPEGMpeg1::getLastQz( void)
 uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 {
 
-  assert (instream);
+  ADM_assert (instream);
   ADV_Info *info;
   fd=NULL;
 
@@ -212,7 +213,7 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
   	_w = info->width;
   	_h = info->height;
   	_vbuffer = new uint8_t[_w * _h * 3];
-  	assert (_vbuffer);
+  	ADM_assert (_vbuffer);
   	_in = instream;
 	_use_xvid_ratecontrol=_settings.use_xvid_ratecontrol;
 
@@ -278,7 +279,7 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 				}
    				 break;
     default:
-      				assert (0);
+      				ADM_assert (0);
 				break;
 
     }
@@ -292,7 +293,7 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 
 uint8_t EncoderFFMPEGMpeg1::startPass1 (void)
 {
- assert (_state == enc_Pass1);
+ ADM_assert (_state == enc_Pass1);
   _frametogo = 0;
   printf ("\n Starting pass 1\n");
   printf (" Creating logfile :%s\n", _logname);
@@ -354,7 +355,7 @@ uint8_t EncoderFFMPEGMpeg1::startPass2 (void)
 {
 uint32_t vbr;
 uint32_t avg_bitrate;
- assert (_state == enc_Pass1);
+ ADM_assert (_state == enc_Pass1);
   printf ("\n-------* Starting pass 2*-------------\n");
 
 

@@ -22,6 +22,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include "config.h"
+#include <ADM_assert.h>
 
 
 #include "ADM_lavcodec.h"
@@ -77,7 +78,7 @@ void oplug_mpeg_vcd(char *inname)
 	char *name;
 
 	mpegWritter *mpg = new mpegWritter();
-	assert(mpg);
+	ADM_assert(mpg);
 
 	if(!inname)
 	{
@@ -114,7 +115,7 @@ void oplug_mpeg_svcd(char *inname)
 
 
    	mpegWritter *mpg = new mpegWritter();
-	assert(mpg);
+	ADM_assert(mpg);
 
 	if( mpg->save_svcd(name))
 		GUI_Alert("Success !");
@@ -139,7 +140,7 @@ char *name=NULL;
 
 
    mpegWritter *mpg = new mpegWritter();
-	assert(mpg);
+	ADM_assert(mpg);
 
 	if( mpg->save_dvd(name))
 		GUI_Alert("Success !");
@@ -212,7 +213,7 @@ WAVHeader *info=NULL,tmpinfo;
 void oplug_mpeg_dvd_run(char *name)
 {
    	mpegWritter *mpg = new mpegWritter(1);
-	assert(mpg);
+	ADM_assert(mpg);
 
 	if( mpg->save_dvd(name))
 		GUI_Alert("Success !");

@@ -25,7 +25,7 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include <math.h>

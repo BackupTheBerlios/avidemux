@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <glib.h>
 #include <signal.h>
+#include <ADM_assert.h>
 #ifndef CYG_MANGLING
 #include <unistd.h>
 #endif
@@ -264,7 +265,7 @@ static int index;
 																  reaction_table[index].callback(NULL);
 																  break;
 												default:
-																	assert(0);
+																	ADM_assert(0);
 																	break;																  
 												} 
 												cur+=1+reaction_table[index].have_arg;
@@ -471,7 +472,7 @@ void call_requant(char *p, char *q, char *n)
 	A_requantize2( f,i, n )	;
 }
 void load_workbench(char*name){
-   assert(name);
+   ADM_assert(name);
    A_loadWorkbench(name);
  //  updateLoaded();
 }

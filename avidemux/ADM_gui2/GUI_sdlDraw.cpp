@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include "ADM_library/default.h"
 #ifndef CYG_MANGLING
 #include <X11/Xlib.h>
@@ -146,7 +146,7 @@ int flags;
 uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h)
 {
 
-	assert(sdl_overlay);
+	ADM_assert(sdl_overlay);
 	SDL_LockYUVOverlay(sdl_overlay);	
 	
 #if (defined(CONFIG_DARWIN) || defined(TEST_YU2)	)&&!defined(FORCEYV12)

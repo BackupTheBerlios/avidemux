@@ -37,8 +37,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -102,7 +101,7 @@ AVDMVideoTempSmooth::AVDMVideoTempSmooth(
 uint8_t	AVDMVideoTempSmooth::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(3);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
@@ -192,9 +191,9 @@ uint8_t AVDMVideoTempSmooth::getFrameNumberNoAlloc(uint32_t frame,
 			uint8_t **ptr  = (uint8_t **)malloc(_param->radius * sizeof(uint8_t *));
 			uint8_t **ptru = (uint8_t **)malloc(_param->radius * sizeof(uint8_t *));
 			uint8_t **ptrv = (uint8_t **)malloc(_param->radius * sizeof(uint8_t *));
-						assert(ptr);
-						assert(ptru);
-						assert(ptrv);
+						ADM_assert(ptr);
+						ADM_assert(ptru);
+						ADM_assert(ptrv);
 
 						for(uint8_t j=1;j<_param->radius;j++)
 						{

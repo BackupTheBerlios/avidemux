@@ -18,7 +18,7 @@
 #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 //#include <math.h>
 #include "ADM_library/default.h"

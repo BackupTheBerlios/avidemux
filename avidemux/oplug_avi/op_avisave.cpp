@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
+#include "ADM_assert.h" 
 
 
 #include <time.h>
@@ -77,8 +78,8 @@ GenericAviSave::GenericAviSave ()
   vbuffer = new uint8_t[MAXIMUM_SIZE * MAXIMUM_SIZE * 3];
   abuffer = new uint8_t[96000];
 
-  assert (vbuffer);
-  assert (abuffer);
+  ADM_assert (vbuffer);
+  ADM_assert (abuffer);
 
   audio_filter=NULL;
   audio_filter2=NULL;
@@ -299,7 +300,7 @@ GenericAviSave::computeAudioCBR (void)
   WAVHeader *
     wav = NULL;
 
-  assert (audio_filter);
+  ADM_assert (audio_filter);
 
   wav = audio_filter->getInfo ();
   //
@@ -321,7 +322,7 @@ GenericAviSave::computeAudioCBR (void)
   }
   // compute duration of a audio frame
   // in ms
-  assert (fps1000);
+  ADM_assert (fps1000);
   printf ("\n fps : %lu\n", fps1000);
   one_frame_double = (double) fps1000;
   one_frame_double = 1. / one_frame_double;
@@ -342,7 +343,7 @@ GenericAviSave::computeAudioCBR (void)
   printf ("\n one PCM audio frame is %lu bytes \n", one_pcm_audio_frame);
 
   // get the equivalent in bytes
-  assert (wav);
+  ADM_assert (wav);
   one_frame_double /= 1000.;	// go back to seconds
   one_frame_double *= wav->byterate;
 
@@ -408,7 +409,7 @@ GenericAviSave::writeAudioChunk (void)
 	    }
 	  break;
 	default:
-	  assert (0);
+	  ADM_assert (0);
 	}
 
       if (len & 1)
@@ -489,21 +490,21 @@ GenericAviSave::guiStart (void)
 void
 GenericAviSave::guiStop (void)
 {
- 	assert(encoding_gui);
+ 	ADM_assert(encoding_gui);
   	delete encoding_gui;
   	encoding_gui=NULL;
 
 }
 void GenericAviSave::guiSetPhasis(char *str)
 {
-	assert(encoding_gui);
+	ADM_assert(encoding_gui);
 	encoding_gui->setPhasis(str);
 	
 }
 uint8_t
 GenericAviSave::guiUpdate (uint32_t nb, uint32_t total)
 {
-  assert(encoding_gui);
+  ADM_assert(encoding_gui);
   encoding_gui->setFrame (nb, total);
   if ( encoding_gui->isAlive () == 1)
     return 0;
@@ -580,7 +581,7 @@ uint32_t GenericAviSave::searchForward(uint32_t startframe)
 					return fw;
 
 				}
-				assert(r);
+				ADM_assert(r);
 				if(!r)
 				{
 					printf("\n Could not locate last non B frame \n");

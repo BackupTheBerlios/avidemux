@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 
 #include <math.h>
@@ -50,7 +50,7 @@ ogm_page::ogm_page(FILE *fd,uint32_t streamId)
 {
 	_fd=fd;
 	_stream=streamId;
-	assert(fd);
+	ADM_assert(fd);
 	reset();
 }
 //_________________________________________________________
@@ -159,7 +159,7 @@ uint32_t chunk;
 //_________________________________________________________
 uint8_t ogm_page::push(uint32_t size,uint32_t remain)
 {
-	assert(size<0x100);
+	ADM_assert(size<0x100);
 	_lacing[_current_lacing++]=size;
 	if((size==0xff) && !remain)
 		_lacing[_current_lacing++]=0;

@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -212,7 +212,7 @@ uint32_t OpenDMLHeader::read32( void )
 {
 uint8_t i[4]={0,0,0,0};
 
-	assert(_fd);
+	ADM_assert(_fd);
 	if(1!=fread(i,4,1,_fd))
 	{
 		printf("Problem using odml read32\n");

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -119,7 +119,7 @@ uint8_t AVDMProcessAudio_FFmpeg::init( uint32_t bitrate)
          		return 0;
          }
 		_bfer=new uint8_t [ CONTEXT->frame_size*2*_wavheader->channels];
-		assert(_bfer);         
+		ADM_assert(_bfer);         
     return 1;       
 }
 

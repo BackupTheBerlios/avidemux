@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -66,7 +66,7 @@ uint8_t adm_atom::skipBytes( uint32_t nb )
 uint32_t pos;
 	fseek(_fd,nb,SEEK_CUR);
 	pos=ftell(_fd);
-	if(pos>_atomStart+_atomSize+1) assert(0);	
+	if(pos>_atomStart+_atomSize+1) ADM_assert(0);	
 	return 1;
 }
 

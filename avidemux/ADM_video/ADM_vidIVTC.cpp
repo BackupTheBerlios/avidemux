@@ -29,8 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -135,7 +134,7 @@ cont:
 		{
 			aprintf("Not in cache...\n");
 		}
-		assert(!loop);
+		ADM_assert(!loop);
 		loop++;
 		// Else ask the 5 corresponding frame
 		_cacheStart=target;

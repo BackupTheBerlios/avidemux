@@ -129,7 +129,7 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
            					}
             					break;
 		  		default:
-		      				assert(0);
+		      				ADM_assert(0);
 				}
 	}
 	gtk_widget_destroy(dialog);

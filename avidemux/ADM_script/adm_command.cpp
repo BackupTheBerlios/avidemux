@@ -15,7 +15,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #ifndef CYG_MANGLING
  #include "unistd.h"
 #endif
@@ -366,7 +366,7 @@ ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg,uint8_t fake)
 {
 int found=-1;
 int candidate=-1;
-	assert(nb<MAXPARAM);
+	ADM_assert(nb<MAXPARAM);
 	// First go to lowercase
 	LowerCase(cmd);
 	// 1- lookup the command

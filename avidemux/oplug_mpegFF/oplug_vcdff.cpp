@@ -20,7 +20,7 @@
  ***************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 #include "config.h"
@@ -124,7 +124,7 @@ uint32_t size;
 			printf("\n Using ffmpeg mpeg2 encoder\n");
 			break;
 		default:
-		assert(0);
+		ADM_assert(0);
 	}
   	encoder->setLogFile("/tmp/mpegVBR.txt",total);
   	if(!encoder->configure(_incoming))
@@ -137,8 +137,8 @@ uint32_t size;
 	_buffer=new uint8_t[_page];
 	_outbuffer=new uint8_t[_page];
 
-	assert(  _buffer);
-	assert(  _outbuffer);
+	ADM_assert(  _buffer);
+	ADM_assert(  _outbuffer);
  
   DIA_encoding				*encoding;
   encoding =new DIA_encoding(_fps1000);

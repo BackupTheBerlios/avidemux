@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -319,7 +319,7 @@ void audioCodecConfigure( void )
 								}
 								return;
 		default:
-					assert(0);																				
+					ADM_assert(0);																				
 		
 	}
 	
@@ -443,7 +443,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
       switch(audioFilmConv)
       {
       	default:
-		assert(0);
+		ADM_assert(0);
       	case FILMCONV_NONE:
 		break;
 	case FILMCONV_PAL2FILM:		
@@ -642,7 +642,7 @@ uint8_t init;
     	  break;
 
       default:
-      assert(0);
+      ADM_assert(0);
   }
 //_______________________________________________________
 

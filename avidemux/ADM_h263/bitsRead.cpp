@@ -14,7 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -149,7 +149,7 @@ uint8_t c;
 uint8_t bitsReader::forward(uint32_t nbBits)
 {
         UNUSED_ARG(nbBits);
-		assert(0);
+		ADM_assert(0);
 }
 uint8_t	bitsReader::read1bit( void )
 {
@@ -166,7 +166,7 @@ uint8_t bitsReader::read(uint32_t nbBits,uint32_t *val)
 	uint32_t r=0;
 	uint8_t left=0;
 	uint8_t w=0; 
-	assert(nbBits<32);
+	ADM_assert(nbBits<32);
 	while(1)
 	{
 		left=8-_rdBits;

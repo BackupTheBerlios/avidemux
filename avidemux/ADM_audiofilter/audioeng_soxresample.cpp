@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -62,8 +62,8 @@ AVDMProcessAudio_SoxResample::AVDMProcessAudio_SoxResample(AVDMGenericAudioStrea
 			(unsigned long int)_length);
 	if(!_pass)
 	{
-    		assert( sox_init(_instream->getInfo()->frequency, frequency,&_resample)) ;
-		assert( sox_init(_instream->getInfo()->frequency, frequency,&_resample2)) ;
+    		ADM_assert( sox_init(_instream->getInfo()->frequency, frequency,&_resample)) ;
+		ADM_assert( sox_init(_instream->getInfo()->frequency, frequency,&_resample2)) ;
 	}
     	_head=_tail=0;
 }
@@ -72,7 +72,7 @@ AVDMProcessAudio_SoxResample::AVDMProcessAudio_SoxResample(AVDMGenericAudioStrea
 
 uint8_t AVDMProcessAudio_SoxResample::goToTime(uint32_t newoffset) 
 {
-	assert(!newoffset);
+	ADM_assert(!newoffset);
 	printf("Resample : Going back to beginning\n");
 	_instream->goToTime(0);
 	_headBuff=_tailBuff=0;
@@ -80,8 +80,8 @@ uint8_t AVDMProcessAudio_SoxResample::goToTime(uint32_t newoffset)
 	{
 		sox_stop(&_resample);
 		sox_stop(&_resample2);
-		assert( sox_init(_instream->getInfo()->frequency, _frequency,&_resample)) ;
-		assert( sox_init(_instream->getInfo()->frequency, _frequency,&_resample2)) ;
+		ADM_assert( sox_init(_instream->getInfo()->frequency, _frequency,&_resample)) ;
+		ADM_assert( sox_init(_instream->getInfo()->frequency, _frequency,&_resample2)) ;
 	}
 	_head=_tail=0;
 	return 1;
@@ -184,8 +184,8 @@ uint32_t 	AVDMProcessAudio_SoxResample::grab(uint8_t *obuffer)
     			printf("Sox run error!!\n");
 			return 0;
     		}   
-		assert(nb_in==nb_in2);
-		assert(nbout==nbout2);
+		ADM_assert(nb_in==nb_in2);
+		ADM_assert(nbout==nbout2);
 		_head=_head+(nb_in*4);
 		snbout+=nbout*4;
 		obuffer+=nbout*4;
@@ -193,8 +193,8 @@ uint32_t 	AVDMProcessAudio_SoxResample::grab(uint8_t *obuffer)
 		//printf("This round : %lu , total %lu\n",nbout*2,snbout);
 	}
       }
-      	assert(_tail>=_head);
-	assert(snbout<PROCESS_BUFFER_SIZE);
+      	ADM_assert(_tail>=_head);
+	ADM_assert(snbout<PROCESS_BUFFER_SIZE);
 	if(PROCESS_BUFFER_SIZE-_tail < MINIMUM_BUFFER)
 	{
 		// copy to beginning
@@ -209,8 +209,8 @@ uint32_t 	AVDMProcessAudio_SoxResample::grab(uint8_t *obuffer)
 		//printf("Reset : %ld, %lu\n",total,_tail);
 		total=0;		
 	}
-	assert( 0==(_head&1));
-	assert( 0==(_tail&1));
+	ADM_assert( 0==(_head&1));
+	ADM_assert( 0==(_tail&1));
 	
     	return snbout;    	
 

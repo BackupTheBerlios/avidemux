@@ -34,8 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -75,7 +74,7 @@ char *Telecide::printConf( void )
 {
  	static char buf[50];
 
-  	assert(_param); 	
+  	ADM_assert(_param); 	
  	sprintf((char *)buf," Decomb Telecide");
         return buf;
 }
@@ -327,7 +326,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 	
 	//GETFRAME(pframe, fp);
 	fp=vidCache->getImage(framep);
-	assert(fp);
+	ADM_assert(fp);
 	fprp = (unsigned char *) fp;
 	
 	{
@@ -336,7 +335,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 	}
 	
 	fc=vidCache->getImage(frame);
-	assert(fc);
+	ADM_assert(fc);
 	fcrp = (unsigned char *) fc;
 	
 	{
@@ -347,7 +346,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 		
 	//GETFRAME(nframe, fn);
 	fn=vidCache->getImage(framen);
-	assert(fn);
+	ADM_assert(fn);
 	fnrp = (unsigned char *) fn;
 	
 	{
@@ -371,7 +370,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 				
 				//GETFRAME(y == 0 ? 1 : y - 1, lp);
 				lp=vidCache->getImage(y == 0 ? 1 : y - 1);
-				assert(lp);
+				ADM_assert(lp);
 				prp = (unsigned char *) lp;
 				{
 					prpU = (unsigned char *)  UPLANE(lp);
@@ -379,7 +378,7 @@ unsigned char *fprp, *fcrp, *fcrp_saved, *fnrp;
 				}
 				//GETFRAME(y, lc);
 				lc=vidCache->getImage(y);
-				assert(lc);
+				ADM_assert(lc);
 				crp = (unsigned char *) lc;
 				{
 					crpU = (unsigned char *) UPLANE(lc);
@@ -1385,7 +1384,7 @@ void Telecide::PutChosen(int frame, unsigned int chosen)
 
 		f = frame % CACHE_SIZE;
 		if (frame < 0 || frame > _info.nb_frames - 1)
-			assert(0);
+			ADM_assert(0);
 		cache[f].frame = frame;
 		cache[f].metrics[P] = p;
 		if (f) cache[f-1].metrics[N] = p;
@@ -1404,7 +1403,7 @@ void Telecide::PutChosen(int frame, unsigned int chosen)
 		if (frame < 0 || frame > _info.nb_frames - 1)
 		{
 			printf("Frame %d is out! (%d)\n",frame,_info.nb_frames-1);
-			assert(0);
+			ADM_assert(0);
 		}
 		if (cache[f].frame != frame)
 		{
@@ -1481,7 +1480,7 @@ void DrawString(uint8_t *dst, int x, int y, const char *s)
 uint8_t	Telecide::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(16);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))

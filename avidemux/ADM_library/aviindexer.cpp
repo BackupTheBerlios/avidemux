@@ -22,7 +22,7 @@
 
 #include <string.h>
 //#include <sstream>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include "avio.hxx"
 #include "fourcc.h"
@@ -37,7 +37,7 @@ uint8_t ret=1;
 
 	// already done..
 	if( _reordered) return 1;
-	assert(_videoindex);
+	ADM_assert(_videoindex);
 	index=new ShortIndex[_nb_vchunk];
 	// clear B frame flag for last frames
 	_videoindex[_nb_vchunk-1].Flags &=~AVI_B_FRAME;
@@ -106,14 +106,14 @@ uint8_t aviHeader::mergeIndex(uint32_t nbframe, SubChunk * First,
 
     //*idx = (ShortIndex *) malloc(sizeof(ShortIndex) * nbframe);
     *idx=new ShortIndex[nbframe];
-    assert(*idx);
+    ADM_assert(*idx);
     curidx = *idx;
     for (uint32_t i = 0; i < nbframe; i++)
       {
 	  if(!First)
 	  {
 		printf("Error : %lu / %lu end of chain \n",i,nbframe);
-		assert(0);
+		ADM_assert(0);
 
 	  }
 	  curidx->Offset = First->_offset;

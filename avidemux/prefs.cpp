@@ -4,7 +4,7 @@
 #include <strings.h>
 #include <unistd.h>	/* access(), R_OK */
 #include <errno.h>	/* errno, ENOENT */
-#include <assert.h>
+#include <ADM_assert.h>
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
@@ -107,7 +107,7 @@ void erase_blank_nodes(xmlNodePtr cur){
 
 xmlNodePtr goto_node(xmlNodePtr cur, const char *str){
   xmlNodePtr ret;
-   assert(cur);
+   ADM_assert(cur);
    ret = cur->children;
    while( ret ){
       if( !strcmp((char *)ret->name,str) )
@@ -404,7 +404,7 @@ int preferences::get(options option, unsigned int *val){
 	if( opt_defs[option].type != UINT ){
 		fprintf(stderr,"preferences::get(%s,uint) called for type %d\n",
 			opt_defs[option].name,opt_defs[option].type);
-		assert(0);
+		ADM_assert(0);
 	}
 	if( sscanf(p,"%u",val) == 1 )
 		return RC_OK;
@@ -418,7 +418,7 @@ int preferences::get(options option,          int *val){
 	if( opt_defs[option].type != INT ){
 		fprintf(stderr,"preferences::get(%s,int) called for type %d\n",
 			opt_defs[option].name,opt_defs[option].type);
-		assert(0);
+		ADM_assert(0);
 	}
 	if( sscanf(p,"%d",val) == 1 )
 		return RC_OK;
@@ -432,7 +432,7 @@ int preferences::get(options option, unsigned long *val){
 	if( opt_defs[option].type != ULONG ){
 		fprintf(stderr,"preferences::get(%s,ulong) called for type %d\n",
 			opt_defs[option].name,opt_defs[option].type);
-		assert(0);
+		ADM_assert(0);
 	}
 	if( sscanf(p,"%lu",val) == 1 )
 		return RC_OK;
@@ -446,7 +446,7 @@ int preferences::get(options option, long *val){
 	if( opt_defs[option].type != LONG ){
 		fprintf(stderr,"preferences::get(%s,long) called for type %d\n",
 			opt_defs[option].name,opt_defs[option].type);
-		assert(0);
+		ADM_assert(0);
 	}
 	if( sscanf(p,"%ld",val) == 1 )
 		return RC_OK;
@@ -460,7 +460,7 @@ int preferences::get(options option, float *val){
 	if( opt_defs[option].type != FLOAT ){
 		fprintf(stderr,"preferences::get(%s,float) called for type %d\n",
 			opt_defs[option].name,opt_defs[option].type);
-		assert(0);
+		ADM_assert(0);
 	}
 	if( sscanf(p,"%f",val) == 1 )
 		return RC_OK;
@@ -485,7 +485,7 @@ int preferences::set(options option, const unsigned int val){
 	if( opt_defs[option].type != UINT ){
 		fprintf(stderr,"preferences::set(%s,uint) called for type %d\n",
 			opt_defs[option].name,opt_defs[option].type);
-		assert(0);
+		ADM_assert(0);
 	}
 	// check range
 	if( sscanf(opt_defs[option].minimum,"%u",&l) != 1){
@@ -558,7 +558,7 @@ int preferences::set(options option, const unsigned long val){
 	if( opt_defs[option].type != ULONG ){
 		fprintf(stderr,"preferences::set(%s,ulong) called for type %d\n",
 			opt_defs[option].name,opt_defs[option].type);
-		assert(0);
+		ADM_assert(0);
 	}
 	// check range
 	if( sscanf(opt_defs[option].minimum,"%lu",&l) != 1){
@@ -595,7 +595,7 @@ int preferences::set(options option, const long val){
 	if( opt_defs[option].type != LONG ){
 		fprintf(stderr,"preferences::set(%s,long) called for type %d\n",
 			opt_defs[option].name,opt_defs[option].type);
-		assert(0);
+		ADM_assert(0);
 	}
 	// check range
 	if( sscanf(opt_defs[option].minimum,"%ld",&l) != 1){
@@ -632,7 +632,7 @@ int preferences::set(options option, const float val){
 	if( opt_defs[option].type != FLOAT ){
 		fprintf(stderr,"preferences::set(%s,float) called for type %d\n",
 			opt_defs[option].name,opt_defs[option].type);
-		assert(0);
+		ADM_assert(0);
 	}
 	// check range
 	if( sscanf(opt_defs[option].minimum,"%f",&l) != 1){
@@ -667,7 +667,7 @@ int preferences::set(options option, const char * val){
 	if( opt_defs[option].type != STRING ){
 		fprintf(stderr,"preferences::set(%s,string) called for type %d\n",
 			opt_defs[option].name,opt_defs[option].type);
-		assert(0);
+		ADM_assert(0);
 	}
 	// check val
 	if( ! val )
@@ -765,7 +765,7 @@ int preferences::set_lastfile(const char* file){
 	  xmlNodePtr p;
 	  xmlNodePtr q;
 		// we assume a valid xml document, but maybe an older version
-		assert( xdoc->children );
+		ADM_assert( xdoc->children );
 		p = xdoc->children;				// ->avidemux (should be there)
 		p = goto_node_with_create(p, "lastfiles");	// ->avidemux->lastfile
 		q = goto_node_with_create(p, "file1");		// ->avidemux->lastfile->1

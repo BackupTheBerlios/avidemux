@@ -19,8 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include <math.h>
 #include <iconv.h>
@@ -111,7 +110,7 @@ ADMVideoMaskedSoften::~ADMVideoMaskedSoften()
 		
 		_uncompressed=NULL;
 		_in=in;
-		assert(in);
+		ADM_assert(in);
 		if(!couples)
 		{
 			
@@ -130,7 +129,7 @@ ADMVideoMaskedSoften::~ADMVideoMaskedSoften()
 			
 						
 		}
-		assert(in);
+		ADM_assert(in);
 		
 		memcpy(&_info,_in->getInfo(),sizeof(_info));	
 			    	
@@ -205,7 +204,7 @@ uint8_t ADMVideoMaskedSoften::getFrameNumberNoAlloc(uint32_t frame,
 					
 					}
 				}
-				assert(coef);
+				ADM_assert(coef);
 				if(coef!=1)
 					val=(val+(coef>>1)-1)/coef;
 				*dst++=val;
@@ -259,7 +258,7 @@ uint8_t *c0,*c1,*c2,*c3,*c4,ref;
 					CHECK(c3);
 					CHECK(c4);
 				}
-				assert(coef);
+				ADM_assert(coef);
 				if(coef!=1)
 					val=(val+(coef>>1)-1)/coef;
 
@@ -315,7 +314,7 @@ uint8_t *dist;
 					CHECK(c2);
 				
 					
-				assert(coef);
+				ADM_assert(coef);
 				if(coef!=1)
 					val=(val+(coef>>1)-1)/coef;
 				*dst++=val;

@@ -30,6 +30,7 @@
 #include <math.h>
 #include <unistd.h>
 
+#include "ADM_assert.h"
 
 #include <time.h>
 #include <sys/time.h>
@@ -817,7 +818,7 @@ case ACT_Pipe2Other:
 
     default:
       printf ("\n unhandled action %d\n", action);
-      assert (0);
+      ADM_assert (0);
       return;
 
     }
@@ -955,7 +956,7 @@ void  updateLoaded ()
   curframe = 0;
 
   video_body->flushCache();
-  assert (rdr_decomp_buffer =
+  ADM_assert (rdr_decomp_buffer =
 	  (uint8_t *) malloc (3 * avifileinfo->width * avifileinfo->height));
 
   //frameStart = 0;
@@ -1114,7 +1115,7 @@ A_saveAudio (char *name)
 
   work=new DIA_working("Saving audio");
   out = fopen (name, "wb");
-  assert (out);
+  ADM_assert (out);
 
 // compute start position
   currentaudiostream->goToTime (video_body->getTime (frameStart));
@@ -1170,7 +1171,7 @@ int A_saveJpg (char *name)
 
 	sz = avifileinfo->width* avifileinfo->height * 3;
 	buffer=new uint8_t [sz];
-	assert(buffer);
+	ADM_assert(buffer);
 
 
 		codec=new  ffmpegEncoderFFMjpeg( avifileinfo->width,avifileinfo->height,FF_MJPEG)  ;
@@ -1237,9 +1238,9 @@ void A_saveBunchJpg(char *name)
 	
 	sz = avifileinfo->width* avifileinfo->height * 3;
 	buffer=new uint8_t [sz];
-	assert(buffer);
+	ADM_assert(buffer);
 	src=new uint8_t [sz];
-	assert(src);
+	ADM_assert(src);
 
 
 		codec=new  ffmpegEncoderFFMjpeg( avifileinfo->width,avifileinfo->height,FF_MJPEG)  ;
@@ -1892,7 +1893,7 @@ int ADM_saveRaw (char *name)
     {
       work->update (i - frameStart, frameEnd - frameStart);
       if(!work->isAlive()) goto _abt;
-      assert (video_body->getFlags (i, &flags));
+      ADM_assert (video_body->getFlags (i, &flags));
       if (flags & AVI_B_FRAME)	// oops
 	{
 	  // se search for the next i /p
@@ -1900,7 +1901,7 @@ int ADM_saveRaw (char *name)
 
 	  for (uint32_t j = i + 1; j < frameEnd; j++)
 	    {
-	      assert (video_body->getFlags (j, &flags));
+	      ADM_assert (video_body->getFlags (j, &flags));
 	      if (!(flags & AVI_B_FRAME))
 		{
 		  found = j;
@@ -2174,7 +2175,7 @@ int A_delete(uint32_t start, uint32_t end)
 uint32_t count;
 
       aviInfo info;
-      assert (video_body->getVideoInfo (&info));
+      ADM_assert (video_body->getVideoInfo (&info));
       count = end - start;
      
       if( end < start ){

@@ -25,7 +25,7 @@ It is an fopen/fwrite lookalike interface to chunks
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include <config.h>
 #include "ADM_library/default.h"
@@ -65,7 +65,7 @@ AVDMAviAudioStream::AVDMAviAudioStream(		odmlIndex *idx,
     strcpy(_name, "FILE:AVI");
 
      _codec=getAudioCodec(wav->encoding,wav,_extraLen,_extraData);
-     assert(_codec);
+     ADM_assert(_codec);
 
     _current_index = 0;
 
@@ -142,7 +142,7 @@ uint32_t AVDMAviAudioStream::read(uint32_t len, uint8_t * buffer)
 		if (rd != avail)
 		  {
 		      printf("\n Error : Expected :%lu bytes read :%lu \n",     rd, avail);
-		      assert(0);
+		      ADM_assert(0);
 
 		  }
 		buffer += avail;
@@ -159,7 +159,7 @@ uint32_t AVDMAviAudioStream::read(uint32_t len, uint8_t * buffer)
 		    _abs_position =_index[0].offset ;
             	     _rel_position = 0;
 		     _current_index=0;
-		      assert(len >= togo);
+		      ADM_assert(len >= togo);
         	      _pos+=len;
                       _pos-=togo;
 		      return (len - togo);
@@ -209,7 +209,7 @@ uint8_t AVDMAviAudioStream::goTo(uint32_t newoffset)
     			{
                   printf("\n idx : %lu max: %lu len:%lu\n",  _current_index,_nb_chunks,len);
 		  _current_index=0;
-                  //assert(0);
+                  //ADM_assert(0);
                   //pos=0;
                   return 0;
        		};
@@ -225,7 +225,7 @@ uint8_t AVDMAviAudioStream::goTo(uint32_t newoffset)
       }
     while (len);
     _abs_position = _index[_current_index].offset;
-  assert(_current_index<_nb_chunks);
+  ADM_assert(_current_index<_nb_chunks);
     _pos=newoffset;
     return 1;
 }

@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 
@@ -55,7 +55,7 @@ uint8_t     divxEncoder::stopEncoder(void )
 {
     int ret;
 
-    assert(_init);
+    ADM_assert(_init);
     ret = encore(_handle, ENC_OPT_RELEASE, 0, 0);
     _init = 0;
     if (ret == ENC_OK)
@@ -74,7 +74,7 @@ uint8_t divxEncoder::getResult( void *ress)
 uint8_t divxEncoder::init( uint32_t val,uint32_t fps1000) {
     UNUSED_ARG(val);
     UNUSED_ARG(fps1000);
-	assert(0);
+	ADM_assert(0);
 }
 
 uint8_t divxEncoder::encode(
@@ -87,7 +87,7 @@ uint8_t divxEncoder::encode(
     int ret;
 ENC_FRAME frame;
 
-    assert(_init);
+    ADM_assert(_init);
 	memset(&frame,0,sizeof(frame));
 	frame.image=in;
 	frame.bitstream=out;
@@ -165,7 +165,7 @@ uint8_t divxEncoderCQ::init(uint32_t q,uint32_t fps1000)
 
 	setting.vbr_mode=RCMODE_1PASS_CONSTANT_Q;
 	setting.quantizer=_q;
-    	assert(0 == _init);
+    	ADM_assert(0 == _init);
 
 	if(ENC_OK!=encore((void *)&_handle, ENC_OPT_INIT, &tag, &setting))
 	{
@@ -196,7 +196,7 @@ uint8_t divxEncoderCBR::init(uint32_t q,uint32_t fps1000)
 
 	setting.vbr_mode=RCMODE_502_1PASS; //RCMODE_VBV_1PASS;
 	setting.bitrate=_br;
-    	assert(0 == _init);
+    	ADM_assert(0 == _init);
 
 	if(ENC_OK!=encore((void*)&_handle, ENC_OPT_INIT, &tag, &setting))
 	{

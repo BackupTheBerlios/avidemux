@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -116,7 +116,7 @@ uint32_t AVDMProcessAudio_TimeShift::readDecompress(uint32_t len,
 	  _instream->read(ask, buf);
 	  _outpos -= ask;
       }
-    assert(_outpos == 0);
+    ADM_assert(_outpos == 0);
     return _instream->read(len, buffer);
 
 

@@ -17,8 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -97,7 +96,7 @@ ADMVideoDropOut::ADMVideoDropOut(
 uint8_t	ADMVideoDropOut::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(1);
 			(*couples)->setCouple((char *)"threshold",(*_param));
 			return 1;
@@ -142,14 +141,14 @@ uint8_t										*_current;
 					memcpy(data,_buffer[0],*len);
 					return 1;
 			}
-				assert(frame<_info.nb_frames);
+				ADM_assert(frame<_info.nb_frames);
 			// read uncompressed frame
 			switch(fillCache(frame))
 			{
 				  case 0: return 0;
 				  case 1: memcpy(data,_buffer[index_c],*len);return 1;break;
 				  case 2: break;
-				  default: assert(0); break;
+				  default: ADM_assert(0); break;
 			}
    		_previous=_buffer[index_p];
    		_current=_buffer[index_c];

@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include "config.h"
 #include "ADM_editor/ADM_Video.h"
 vidHeader::~vidHeader ()
@@ -100,7 +100,7 @@ uint8_t vidHeader::getVideoInfo (aviInfo * info)
 uint8_t vidHeader::setMyName (char *name)
 {
   _name = new char[strlen (name) + 1];
-  assert (_name);
+  ADM_assert (_name);
   strcpy (_name, name);
   return 1;
 

@@ -18,8 +18,7 @@
  #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -80,7 +79,7 @@ ADMVideoRotate::ADMVideoRotate(AVDMGenericVideoStream *in, CONFcouple *couples)
 
   printf("New Rotate %ld %ld %f\n", _info.width, _info.height, _param->angle);
 
-  assert(_uncompressed);    	  	
+  ADM_assert(_uncompressed);    	  	
 
 }
 
@@ -89,7 +88,7 @@ ADMVideoRotate::ADMVideoRotate(AVDMGenericVideoStream *in, CONFcouple *couples)
 uint8_t	ADMVideoRotate::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(3);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
@@ -112,7 +111,7 @@ uint8_t ADMVideoRotate::getFrameNumberNoAlloc(uint32_t frame,
                                               uint8_t *data,
                                               uint32_t *flags)
 {
-  assert(frame<_info.nb_frames);
+  ADM_assert(frame<_info.nb_frames);
 								
   // read uncompressed frame
   if(!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags)) return 0;

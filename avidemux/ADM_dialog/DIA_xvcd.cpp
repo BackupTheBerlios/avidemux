@@ -2,6 +2,7 @@
 #include "ADM_lavcodec.h"
 
 
+#include "ADM_assert.h" 
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -134,7 +135,7 @@ uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
              						ret=-1;
          					break;
 		  		default:
-		      				assert(0);
+		      				ADM_assert(0);
 				}
 	}
 	else

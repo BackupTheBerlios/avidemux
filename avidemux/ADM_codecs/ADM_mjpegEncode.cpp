@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 #include "avi_vars.h"
@@ -123,7 +123,7 @@ int l;
 }
 
 uint8_t mjpegEncoder::getResult( void *ress) {  // for dual pass only
-	assert(0);
+	ADM_assert(0);
 	UNUSED_ARG(ress);
 
 }

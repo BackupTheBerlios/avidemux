@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>

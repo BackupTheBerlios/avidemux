@@ -17,8 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include <math.h>
 #include <iconv.h>
@@ -164,10 +163,10 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 	_maskBuffer=new uint8_t[_info.width*_info.height];
   _bgBitmapBuffer=new uint8_t[(_info.width*_info.height)>>1];
 	_bgMaskBuffer=new uint8_t[_info.width*_info.height];
-	assert(_bitmapBuffer);
-	assert(_maskBuffer);
-	assert(_bgBitmapBuffer);
-	assert(_bgMaskBuffer);
+	ADM_assert(_bitmapBuffer);
+	ADM_assert(_maskBuffer);
+	ADM_assert(_bgBitmapBuffer);
+	ADM_assert(_bgMaskBuffer);
 }
 uint8_t	ADMVideoSubtitle::loadSubtitle( void )
 {
@@ -244,7 +243,7 @@ uint8_t	ADMVideoSubtitle::getCoupledConf( CONFcouple **couples)
 SUBCONF *_param;
 
 			_param=_conf; // keep macro happy
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(14);
 
 			CSET(_fontsize);

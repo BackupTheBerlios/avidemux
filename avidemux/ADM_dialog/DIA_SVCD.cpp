@@ -21,6 +21,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "ADM_assert.h" 
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -147,7 +148,7 @@ uint8_t DIA_SVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
            				}
             				break;
 		  		default:
-		      			assert(0);
+		      			ADM_assert(0);
 				}
 		
 	}

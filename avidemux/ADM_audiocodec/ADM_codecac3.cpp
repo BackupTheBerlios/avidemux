@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -31,7 +31,7 @@
 
 ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc) :   ADM_Audiocodec(fourcc)
 {
- 	assert(fourcc==WAV_AC3);
+ 	ADM_assert(fourcc==WAV_AC3);
 
 }
 ADM_AudiocodecAC3::~ADM_AudiocodecAC3( )

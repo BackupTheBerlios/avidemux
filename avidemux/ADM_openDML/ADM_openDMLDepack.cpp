@@ -11,7 +11,7 @@
 //
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -55,7 +55,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	nbFrame=getMainHeader()->dwTotalFrames;
 	
 	odmlIndex *newIndex=new odmlIndex[nbFrame];
-	assert(newIndex);
+	ADM_assert(newIndex);
 	uint32_t newTotal=0;
 	printf("Trying to unpack the stream\n");
 	DIA_working *working=new DIA_working("Unpacking packed bitstream");

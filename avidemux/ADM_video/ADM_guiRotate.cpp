@@ -19,12 +19,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
-#include <assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -84,19 +83,19 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
 
 
   video_yuv_orig=(uint8_t *)malloc(w*h*4);
-  assert(video_yuv_orig);
+  ADM_assert(video_yuv_orig);
   video_rgb=(uint8_t *)malloc(w*h*4);
-  assert(video_rgb);
+  ADM_assert(video_rgb);
   video_yuv=(uint8_t *)malloc(w*h*4);
-  assert(video_yuv);
+  ADM_assert(video_yuv);
 
   // ask current frame from previous filter
-  assert(instream->getFrameNumberNoAlloc(curframe, &l, video_yuv_orig, &f));
+  ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l, video_yuv_orig, &f));
 
   memcpy(video_yuv, video_yuv_orig, (w*h*3)>>1);
   COL_yv12rgb(w, h,video_yuv, video_rgb);
 
-  assert(_param);
+  ADM_assert(_param);
   memcpy(&par,_param,sizeof(par));
 
 
@@ -112,7 +111,7 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
     memcpy(_param,&par,sizeof(par));
     break;
     default:
-    assert(0);
+    ADM_assert(0);
   }
 
   _info.width = _param->width;

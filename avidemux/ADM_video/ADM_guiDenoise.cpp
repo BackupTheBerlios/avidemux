@@ -27,7 +27,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include <assert.h>
+#include <ADM_assert.h>
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"

@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -36,7 +36,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_encoder/adm_encConfig.h"
-#include "assert.h"
+#include "ADM_assert.h"
 
 // Ugly but sooo usefull
 extern uint32_t frameStart,frameEnd;
@@ -106,7 +106,7 @@ for (uint32_t i = 0; i < _nb_segment; i++)
   fclose (fd);
   // try to load filters
   tmp = (char *) malloc (strlen (name) + 10);
-  assert (tmp);
+  ADM_assert (tmp);
   strcpy (tmp, name);
   strcat (tmp, ".flt");
 
@@ -255,7 +255,7 @@ uint8_t ADM_Composer::loadWorbench (char *name)
 
 // try to load filters
   tmp = (char *) malloc (strlen (name) + 10);
-  assert (tmp);
+  ADM_assert (tmp);
   strcpy (tmp, name);
   strcat (tmp, ".flt");
 

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
@@ -84,7 +84,7 @@ uint8_t renderResize(uint32_t w, uint32_t h)
 			delete [] screenBuffer;
 			screenBuffer=NULL;
 		}
-	assert(screenBuffer=new uint8_t [(w*h*4)]);		// RGB -> *3
+	ADM_assert(screenBuffer=new uint8_t [(w*h*4)]);		// RGB -> *3
 	updateWindowSize( draw,w,h);
 	UI_purge();
 	return 1;
@@ -117,7 +117,7 @@ uint8_t renderRefresh(void)
 {
 	if(!screenBuffer)
 	{
-		if(accel_mode) assert(0);
+		if(accel_mode) ADM_assert(0);
 		return 0;
 	}
 
@@ -135,7 +135,7 @@ uint8_t renderExpose(void)
 {
 	if(!screenBuffer)
 	{
-		if(accel_mode) assert(0);
+		if(accel_mode) ADM_assert(0);
 		return 0;
 	}
 
@@ -152,7 +152,7 @@ uint8_t renderExpose(void)
 uint8_t renderStartPlaying( void )
 {
 char *displ;
-	assert(!accel_mode);
+	ADM_assert(!accel_mode);
 	// First check if local
 	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
 	// in that case we do not even try to use accel
@@ -223,7 +223,7 @@ uint8_t renderStopPlaying( void )
 //
 uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h)
 {
-    assert(screenBuffer);
+    ADM_assert(screenBuffer);
     renderW = w;
     renderH = h;
 

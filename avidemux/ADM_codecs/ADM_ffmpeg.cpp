@@ -21,7 +21,7 @@
  ***************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 #include "config.h"
@@ -55,7 +55,7 @@ static myENC_RESULT res;
 			
    		_context=avcodec_alloc_context();
 								
-		assert(_context);
+		ADM_assert(_context);
 		memset(   &_frame,0,sizeof(_frame));
 		_frame.pts=AV_NOPTS_VALUE;
 		_context->width=_w;
@@ -181,7 +181,7 @@ uint8_t     ffmpegEncoder::initContext(  void )
 			case FF_HUFF:		res=  avcodec_open(_context, &huffyuv_encoder);break;
 			case FF_FFV1:		res=  avcodec_open(_context, &ffv1_encoder);break;
 			case FF_MJPEG:	res=  avcodec_open(_context, &mjpeg_encoder);break;
-			default: assert(0);
+			default: ADM_assert(0);
 		}
 
 		if(res<0)
@@ -615,7 +615,7 @@ else
 		case 0: _context->mb_decision=FF_MB_DECISION_SIMPLE;break;
 		case 1: _context->mb_decision=FF_MB_DECISION_BITS;break;
 		case 2: _context->mb_decision=FF_MB_DECISION_RD;break;
-		default:assert(0);
+		default:ADM_assert(0);
 		
 		
 	}
@@ -681,7 +681,7 @@ uint8_t ffmpegEncoder::encode( uint8_t *in, uint8_t *out, uint32_t *len, uint32_
     UNUSED_ARG(out);
     UNUSED_ARG(len);
     UNUSED_ARG(flags);
-	assert(0);
+	ADM_assert(0);
     return 0;
 }
 //------------------------------

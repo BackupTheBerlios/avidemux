@@ -18,8 +18,7 @@
  #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -77,7 +76,7 @@ uint8_t ADMVideoUVSwap::getFrameNumberNoAlloc(uint32_t frame,
    																	uint32_t *flags)
 {
 
-			assert(frame<_info.nb_frames);
+			ADM_assert(frame<_info.nb_frames);
 
 
 			// read uncompressed frame

@@ -22,7 +22,8 @@
 
 #include <time.h>
 #include <sys/time.h>
-#include "config.h"
+#include <config.h>
+#include "ADM_assert.h"
 #include "avi_vars.h"
 
 
@@ -99,7 +100,7 @@ uint32_t end;
 					oplug_mpegff(name);
 					break;
 		default:
-					assert(0);
+					ADM_assert(0);
 					return 0;
 	}
 	return 1;

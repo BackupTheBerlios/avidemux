@@ -20,6 +20,7 @@
 #include <strings.h>
 #include <math.h>
 #include <unistd.h>
+#include <ADM_assert.h>
 
 #include <time.h>
 #include <sys/time.h>
@@ -460,7 +461,7 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 
 	switch( current_codec)
 	{
-#define MAKECONF(x)  if(extraLen) {assert(extraLen==sizeof(x));memcpy(&(x),extraData,extraLen);}
+#define MAKECONF(x)  if(extraLen) {ADM_assert(extraLen==sizeof(x));memcpy(&(x),extraData,extraLen);}
 #ifdef USE_XVID_4
       	 	case CodecXvid4 :
 
@@ -510,7 +511,7 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 									break;
 #endif
 					default:
-								assert(0);
+								ADM_assert(0);
 
 	}
 
@@ -591,7 +592,7 @@ const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
 									break;
 #endif
 					default:
-								assert(0);
+								ADM_assert(0);
 
 	}
 
@@ -620,7 +621,7 @@ void EncoderSaveMpeg(char *name)
 		case CodecDVD:
 				oplug_mpeg_dvd(name);
 				break;
-		default:assert(0);
+		default:ADM_assert(0);
 	}
 #else
 	GUI_Alert("** NO MPEG ENCODING SUPPORT**");
@@ -996,7 +997,7 @@ void videoCodecConfigureUI( void )
 					break;
 #endif
 					default:
-								assert(0);
+								ADM_assert(0);
 					}								  			
 	
 	
@@ -1073,7 +1074,7 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param, uint32_t ex
 									break;
 #endif
 					default:
-								assert(0);
+								ADM_assert(0);
 
 	}
 	  generic->mode=mode;
@@ -1092,7 +1093,7 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param, uint32_t ex
 								generic->finalsize=param;
 								break;
 				default:
-								assert(0);												
+								ADM_assert(0);												
 															
 		}
 

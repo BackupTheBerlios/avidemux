@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -35,7 +35,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_dialog/DIA_working.h"
 #include "ADM_ogm/ADM_ogm.h"
-#include "assert.h"
+#include "ADM_assert.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_EDITOR
@@ -195,8 +195,8 @@ uint8_t ADM_Composer::addFile (char *name, uint8_t mode)
 
 UNUSED_ARG(mode);
 	_haveMarkers=0; // by default no markers are present
-  assert (_nb_segment < MAX_SEG);
-  assert (_nb_video < MAX_VIDEO);
+  ADM_assert (_nb_segment < MAX_SEG);
+  ADM_assert (_nb_video < MAX_VIDEO);
 
   if (!identify (name, &type))
     return 0;
@@ -229,7 +229,7 @@ UNUSED_ARG(mode);
     case Mpeg_FileType:
     	// look if the idx exists
 	char tmpname[256];
-	assert(strlen(name)+5<256);;
+	ADM_assert(strlen(name)+5<256);;
 	strcpy(tmpname,name);
 	strcat(tmpname,".idx");
 	if(addFile(tmpname)) return 1;
@@ -622,7 +622,7 @@ uint8_t ADM_Composer::removeFrames (uint32_t start, uint32_t end)
   if (!convFrame2Seg (start, &seg1, &rel1) ||
       !convFrame2Seg (end, &seg2, &rel2))
     {
-      assert (0);
+      ADM_assert (0);
     }
   // if seg1 != seg2 we can just modify seg1 and seg2
   if (seg1 != seg2)
@@ -694,7 +694,7 @@ uint32_t seg=0xfff;
   if (!convFrame2Seg (start, &seg1, &rel1) ||
       !convFrame2Seg (end, &seg2, &rel2))
     {
-      assert (0);
+      ADM_assert (0);
     }
     _nb_clipboard=0;
   // if seg1 != seg2 we can just modify seg1 and seg2
@@ -747,7 +747,7 @@ uint32_t rel,seg;
 
 	if (!convFrame2Seg (whereto, &seg, &rel) )
     	{
-      		assert (0);
+      		ADM_assert (0);
     	}
 	dumpSeg();
 
@@ -913,7 +913,7 @@ uint8_t ADM_Composer::removeTo (uint32_t to, uint32_t seg, uint8_t included)
   uint32_t
     ref;
 
-  assert (checkInSeg (seg, to));
+  ADM_assert (checkInSeg (seg, to));
   ref = _segments[seg]._start_frame;
   _segments[seg]._start_frame = to;
   if (included)
@@ -937,7 +937,7 @@ uint8_t ADM_Composer::removeTo (uint32_t to, uint32_t seg, uint8_t included)
 uint8_t
   ADM_Composer::removeFrom (uint32_t from, uint32_t seg, uint8_t included)
 {
-  assert (checkInSeg (seg, from));
+  ADM_assert (checkInSeg (seg, from));
   _segments[seg]._nb_frames = (from - _segments[seg]._start_frame);
 
   if (!included)
@@ -1019,7 +1019,7 @@ uint8_t ADM_Composer::checkInSeg (uint32_t seg, uint32_t frame)
 }
 uint8_t	ADM_Composer::isIndexable( void)
 {
-	if(!_nb_video) assert(0);
+	if(!_nb_video) ADM_assert(0);
 	return _videos[0].decoder->isIndexable();
 
 }

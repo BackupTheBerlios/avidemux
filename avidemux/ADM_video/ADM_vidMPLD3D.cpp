@@ -19,8 +19,7 @@ Daniel Moreno <comac@comac.darktech.org>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -206,7 +205,7 @@ ADMVideoMPD3D::ADMVideoMPD3D(
 uint8_t	ADMVideoMPD3D::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(3);
  			//(*couples)->setCouple((char *)"param",*_param);
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
@@ -255,7 +254,7 @@ UNUSED_ARG(flags);
 					return 1;
 
 			}
-			assert(frame<_info.nb_frames);
+			ADM_assert(frame<_info.nb_frames);
 			// read uncompressed frame
 			// else we fill previous/current/next
 			if(!_in->getFrameNumberNoAlloc(frame, &dlen,_storage,&dflags))

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "ADM_assert.h" 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -129,7 +130,7 @@ int ret=0;
            					}						
             					break;
 		  		default:
-		      				assert(0);
+		      				ADM_assert(0);
 				}
 		
 	}

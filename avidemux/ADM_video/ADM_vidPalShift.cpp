@@ -17,8 +17,7 @@
  #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -66,10 +65,10 @@ ADMVideoPalShift::ADMVideoPalShift(  AVDMGenericVideoStream *in,CONFcouple *setu
 					
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
  	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  assert(_uncompressed);
+  ADM_assert(_uncompressed);
 
  	_cache=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  assert(_cache);
+  ADM_assert(_cache);
 
   _info.encoding=1;
 	_cacheno=0xffffffff;
@@ -94,7 +93,7 @@ uint8_t ADMVideoPalShift::getFrameNumberNoAlloc(uint32_t frame,
 				full=_info.width*_info.height;
 				half=full>>4;
 
-			assert(frame<_info.nb_frames);
+			ADM_assert(frame<_info.nb_frames);
 						
 								
 			// read uncompressed frame

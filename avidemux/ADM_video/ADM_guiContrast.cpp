@@ -19,12 +19,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
-#include <assert.h>
 #include <math.h>
 #include "config.h"
 
@@ -84,15 +83,15 @@ uint8_t r;
 						
 
 							video2=(uint8_t *)malloc(w*h*4);							
-							assert(video2);
+							ADM_assert(video2);
 							video1=(uint8_t *)malloc(w*h*4);							
-							assert(video1);
+							ADM_assert(video1);
     					video3=(uint8_t *)malloc(w*h*4);							
-							assert(video1);
+							ADM_assert(video1);
 
 							
 							// ask current frame from previous filter
-							assert(instream->getFrameNumberNoAlloc(curframe, &l,
+							ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l,
           																				video1,&f));
 						
 							// From now we work in RGB !
@@ -100,7 +99,7 @@ uint8_t r;
 							
               COL_yv12rgb(w,h,video2,video3);
 				
-						assert(_param);			
+						ADM_assert(_param);			
 						memcpy(&par,_param,sizeof(par));
 						sw=w;
 						sh=h;
@@ -114,7 +113,7 @@ uint8_t r;
 							memcpy(_param,&par,sizeof(par));
 					break;
 				default:
-					assert(0);
+					ADM_assert(0);
 				}
 		
 					free(video1);

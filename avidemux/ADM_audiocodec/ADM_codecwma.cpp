@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -44,9 +44,9 @@
  ADM_AudiocodecWMA::ADM_AudiocodecWMA(uint32_t fourcc,WAVHeader *info,uint32_t l,uint8_t *d)
        :  ADM_Audiocodec(fourcc)
  {
-		assert(fourcc==WAV_WMA);	
+		ADM_assert(fourcc==WAV_WMA);	
 		_contextVoid=(void *)avcodec_alloc_context();
-		assert(_contextVoid);
+		ADM_assert(_contextVoid);
 	// Fills in some values...	
     _context->channels 		= info->channels;
     _context->sample_rate = info->frequency;
@@ -61,7 +61,7 @@
 		 if (avcodec_open(_context, &wmav2_decoder) < 0) 
 		      {
 					printf("\n WMA decoder init failed !\n");								
-					assert(0);
+					ADM_assert(0);
 				}
 }
  ADM_AudiocodecWMA::~ADM_AudiocodecWMA()
@@ -83,7 +83,7 @@ int max=0,pout=0,toread;
 	while(1)
 	{
 		#define PREFILL _blockalign
-    	assert(_inStock<PREFILL);
+    	ADM_assert(_inStock<PREFILL);
      	max=_inStock+nbIn;
  //     printf("\n Align :%d max : %d stock :%d in : %d",PREFILL,max,_inStock,nbIn);
        if(max>=(int)PREFILL)

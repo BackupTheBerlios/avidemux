@@ -25,7 +25,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "math.h"
 
@@ -53,7 +53,7 @@ uint8_t  picHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
               }
 uint8_t  picHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
 {
-	assert(framenum<=_nb_file);
+	ADM_assert(framenum<=_nb_file);
 
  	fseek(_fd[framenum],_offset,SEEK_SET);
  	fread(ptr,_imgSize[framenum]-_offset,1,_fd[framenum]);
@@ -111,7 +111,7 @@ uint16_t i;
 uint8_t    picHeader::read8(FILE *fd)
 {
 uint8_t i;
-	assert(fd);
+	ADM_assert(fd);
 	i=0;
 	if(!	fread(&i,1,1,fd))
 	{
@@ -226,7 +226,7 @@ uint32_t			w=0,h=0;
 	      fseek(_fd[i],0,SEEK_END);
 	      _imgSize[i]=ftell( _fd[i] );
 		fseek(_fd[i],0,SEEK_SET);
-              assert(_fd[i]!=NULL);
+              ADM_assert(_fd[i]!=NULL);
             }
 
 	delete [] name;
@@ -339,7 +339,7 @@ uint32_t			w=0,h=0;
 	
 			break;
 		default:
-			assert(0);
+			ADM_assert(0);
 		}
 
 //_______________________________________

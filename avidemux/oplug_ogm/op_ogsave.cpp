@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 
 #include <math.h>
@@ -161,14 +161,14 @@ uint8_t error=0;
 // Dummy ones
 uint8_t	ADM_ogmWrite::initVideo(void)
 {
-		assert(0);
+		ADM_assert(0);
 		return 0;
 
 }
 //___________________________________________________
 uint8_t	ADM_ogmWrite::writeVideo(uint32_t frame)
 {
-		assert(0);
+		ADM_assert(0);
 		return 0;
 
 }

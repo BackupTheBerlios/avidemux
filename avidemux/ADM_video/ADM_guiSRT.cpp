@@ -18,12 +18,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include <iconv.h>
 
@@ -142,7 +141,7 @@ uint32_t l,f;
 		targetImage		=new uint8_t[_w*_h*2];
 		targetImageRGB	=new uint8_t[_w*_h*4];
 
-		assert(instream->getFrameNumberNoAlloc(curframe,
+		ADM_assert(instream->getFrameNumberNoAlloc(curframe,
 						&l,
 						sourceImage,
 						&f));
@@ -411,7 +410,7 @@ uint32_t h;
 		}
 	}
 	// convert to rgb
-	assert(COL_yv12rgb(_w,_h,targetImage,targetImageRGB));
+	ADM_assert(COL_yv12rgb(_w,_h,targetImage,targetImageRGB));
 
 }
 

@@ -29,7 +29,7 @@ S
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "default.h"
 #include "ADM_toolkit/ADM_debugID.h"

@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -65,7 +65,7 @@ uint8_t AVDMGenericAudioStream::goToSync(uint32_t offset)
     uint32_t suboffset = 0,byterate;
     uint32_t tryz;
     
-    assert(_wavheader);
+    ADM_assert(_wavheader);
     // can't deal with something not mp3...
   //  printf("syncing asked : %lu",offset);
     switch(  _wavheader->encoding )
@@ -219,7 +219,7 @@ rebranch2:
     		return goTo(offset);
       		break;
       }
-      assert(0);
+      ADM_assert(0);
       return 0;
 }
 
@@ -230,7 +230,7 @@ rebranch2:
 uint8_t AVDMGenericAudioStream::endDecompress(void)
 {
 
-	assert(_codec);
+	ADM_assert(_codec);
  	return _codec->endDecompress();
 }
 
@@ -241,7 +241,7 @@ uint8_t AVDMGenericAudioStream::endDecompress(void)
 //________________________________________________________________
 uint8_t AVDMGenericAudioStream::beginDecompress(void)
 {
-	assert(_codec);
+	ADM_assert(_codec);
  	return _codec->beginDecompress();
 }
 
@@ -253,9 +253,9 @@ uint32_t AVDMGenericAudioStream::readDecompress(uint32_t size,
 {
     uint32_t rd = 0, d = 0, in = 0;
     // Paranoia check
-    assert(_wavheader);
-    assert(_codec);
-    assert(isDecompressable());
+    ADM_assert(_wavheader);
+    ADM_assert(_codec);
+    ADM_assert(isDecompressable());
 
 
   if(!_codec->isCompressed())
@@ -293,7 +293,7 @@ uint8_t AVDMGenericAudioStream::isCompressed(void)
 {
     if (_wavheader)
       {
-			assert(_codec);
+			ADM_assert(_codec);
  			return _codec->isCompressed();
       }
     return 1;
@@ -306,7 +306,7 @@ uint8_t AVDMGenericAudioStream::isDecompressable(void)
 {
     if (_wavheader)
       {
-			assert(_codec);
+			ADM_assert(_codec);
  			return _codec->isDecompressable();
       }
     return 0;
@@ -382,7 +382,7 @@ uint32_t AVDMGenericAudioStream::convTime2Offset(uint32_t time)
     uint32_t offset;
     // convert time information into
     // byte offset
-    assert(_wavheader);    
+    ADM_assert(_wavheader);    
     one_frame_double = time;
     one_frame_double *= _wavheader->byterate;
     one_frame_double /= 1000.;
@@ -444,7 +444,7 @@ uint32_t	AVDMGenericAudioStream::readPCMeq(uint32_t lenasked,
 uint32_t index=0,max,min,pivot;
 
 static uint32_t lastindex=0;
-				assert(_audioMap);	
+				ADM_assert(_audioMap);	
     			// _current is our position
        		// search throught index where _current is....
 
@@ -497,7 +497,7 @@ static uint32_t lastindex=0;
              	else
 		             if( _audioMap[max].foffset==_current) index=max;
                			else
-                  			assert(0);
+                  			ADM_assert(0);
 
 gotit:
              // ok, so now we have the index corresponding to the beginning

@@ -13,7 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include "config.h"
 #include "default.h"
 #include "ADM_riff.h"
@@ -70,7 +70,7 @@ riffParser::~riffParser()
 }
 riffParser::riffParser(char *name)
 {
-	assert(fd=fopen(name,"rb"));
+	ADM_assert(fd=fopen(name,"rb"));
 	startPos=0;
 	fseeko(fd,0,SEEK_END);
 	endPos=ftello(fd);

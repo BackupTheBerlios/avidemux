@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
+#include <ADM_assert.h>
 
 #include <time.h>
 #include <sys/time.h>
@@ -64,7 +65,7 @@ uint8_t EncoderMjpeg::configure( AVDMGenericVideoStream *instream)
         ADV_Info 			*info;	
 //         int q,s;
 
-   		assert(instream);
+   		ADM_assert(instream);
 		_in=instream;
 
 		info=instream->getInfo(  );
@@ -73,7 +74,7 @@ uint8_t EncoderMjpeg::configure( AVDMGenericVideoStream *instream)
 
 		
 		_vbuffer=new uint8_t[_w*_h*3];
-		assert(_vbuffer);
+		ADM_assert(_vbuffer);
 
    //	_codec=new mjpegEncoder(_w,_h);
   	_codec=new  ffmpegEncoderFFMjpeg( _w,_h,FF_MJPEG)  ;
@@ -93,8 +94,8 @@ uint8_t EncoderMjpeg::encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t
 uint32_t l,f;
 
 
-		assert(_codec);
-		assert(_in);
+		ADM_assert(_codec);
+		ADM_assert(_in);
 
 		if(!_in->getFrameNumberNoAlloc(frame,&l,_vbuffer,&f))
 		{

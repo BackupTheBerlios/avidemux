@@ -15,8 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include <math.h>
 #include <iconv.h>
@@ -110,7 +109,7 @@ ADMVideoForcedPP::~ADMVideoForcedPP()
 		printf("Adding forced PP filter\n");
 		_uncompressed=NULL;
 		_in=in;
-		assert(in);
+		ADM_assert(in);
 		if(!couples)
 		{
 			
@@ -129,7 +128,7 @@ ADMVideoForcedPP::~ADMVideoForcedPP()
 			
 						
 		}
-		assert(in);
+		ADM_assert(in);
 		
 		memcpy(&_info,_in->getInfo(),sizeof(_info));	
 		

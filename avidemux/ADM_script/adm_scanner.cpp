@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #define YYSTYPE char * 
@@ -203,7 +203,7 @@ char *alt;
 			return 0;
 	}	
 	pushed++;
-	assert(pushed<MAXPARAM);
+	ADM_assert(pushed<MAXPARAM);
 	return 1;
 
 }

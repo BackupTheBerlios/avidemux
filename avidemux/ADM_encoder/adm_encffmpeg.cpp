@@ -22,6 +22,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <config.h>
+#include <ADM_assert.h>
 
 #ifdef USE_FFMPEG
 #include "ADM_lavcodec.h"
@@ -65,8 +66,8 @@ uint8_t EncoderFFMPEGHuff::encode (uint32_t frame, uint32_t * len, uint8_t * out
 			  uint32_t * flags)
 {
 uint32_t l,f;
-  assert (_codec);
-  assert (_in);
+  ADM_assert (_codec);
+  ADM_assert (_in);
 
   if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
     {
@@ -86,7 +87,7 @@ uint8_t r=0;
 }	
 uint8_t EncoderFFMPEGHuff::configure (AVDMGenericVideoStream * instream)
 {
- assert (instream);
+ ADM_assert (instream);
   ADV_Info *info;
 
 
@@ -96,7 +97,7 @@ uint8_t EncoderFFMPEGHuff::configure (AVDMGenericVideoStream * instream)
   _w = info->width;
   _h = info->height;
   _vbuffer = new uint8_t[_w * _h * 3];
-  assert (_vbuffer);
+  ADM_assert (_vbuffer);
   _in = instream;
 
   _codec = new ffmpegEncoderCQ (_w, _h,_id);
@@ -119,8 +120,8 @@ uint8_t EncoderFFMPEGFFV1::encode (uint32_t frame, uint32_t * len, uint8_t * out
 			  uint32_t * flags)
 {
 uint32_t l,f;
-  assert (_codec);
-  assert (_in);
+  ADM_assert (_codec);
+  ADM_assert (_in);
 
   if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
     {
@@ -139,7 +140,7 @@ uint32_t l,f;
 }	
 uint8_t EncoderFFMPEGFFV1::configure (AVDMGenericVideoStream * instream)
 {
- assert (instream);
+ ADM_assert (instream);
   ADV_Info *info;
 
 
@@ -149,7 +150,7 @@ uint8_t EncoderFFMPEGFFV1::configure (AVDMGenericVideoStream * instream)
   _w = info->width;
   _h = info->height;
   _vbuffer = new uint8_t[_w * _h * 3];
-  assert (_vbuffer);
+  ADM_assert (_vbuffer);
   _in = instream;
 
   _codec = new ffmpegEncoderCQ (_w, _h,_id);
@@ -182,7 +183,7 @@ const char *EncoderFFMPEG::getCodecName(void )
 					return "FFV1";
 					break;
 		default:
-				assert(0);
+				ADM_assert(0);
 
 	}
 	return NULL;
@@ -192,7 +193,7 @@ uint8_t
 EncoderFFMPEG::configure (AVDMGenericVideoStream * instream)
 {
 
-  assert (instream);
+  ADM_assert (instream);
   ADV_Info *info;
 
 	uint32_t flag1,flag2,flag3;
@@ -203,7 +204,7 @@ EncoderFFMPEG::configure (AVDMGenericVideoStream * instream)
   _w = info->width;
   _h = info->height;
   _vbuffer = new uint8_t[_w * _h * 3];
-  assert (_vbuffer);
+  ADM_assert (_vbuffer);
   _in = instream;
 
 
@@ -256,7 +257,7 @@ EncoderFFMPEG::configure (AVDMGenericVideoStream * instream)
 
       break;
     default:
-      assert (0);
+      ADM_assert (0);
 
     }
   _in = instream;
@@ -270,7 +271,7 @@ EncoderFFMPEG::configure (AVDMGenericVideoStream * instream)
 uint8_t
 EncoderFFMPEG::startPass1 (void)
 {
-		 assert (_state == enc_Pass1);
+		 ADM_assert (_state == enc_Pass1);
   _frametogo = 0;
   printf ("\n Starting pass 1\n");
   printf (" Creating logfile :%s\n", _logname);
@@ -319,8 +320,8 @@ EncoderFFMPEG::encode (uint32_t frame, uint32_t * len, uint8_t * out,
   uint32_t l, f;
   //ENC_RESULT enc;
 
-  assert (_codec);
-  assert (_in);
+  ADM_assert (_codec);
+  ADM_assert (_in);
 
   if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
     {
@@ -336,7 +337,7 @@ EncoderFFMPEG::encode (uint32_t frame, uint32_t * len, uint8_t * out,
       break;
   case enc_Pass1:
 
-					//		assert(fd);
+					//		ADM_assert(fd);
 			if(!_codec->encode(   _vbuffer,out,len,flags))
 			{
 				printf("\n codec error on 1st pass !");
@@ -359,7 +360,7 @@ EncoderFFMPEG::encode (uint32_t frame, uint32_t * len, uint8_t * out,
                               break;
 
           default:
-      assert (0);
+      ADM_assert (0);
     }
   return 0;
 }
@@ -378,7 +379,7 @@ uint8_t
 EncoderFFMPEG::startPass2 (void)
 {
 
-	 assert (_state = enc_Pass1);
+	 ADM_assert (_state = enc_Pass1);
   printf ("\n Starting pass 2\n");
 
 

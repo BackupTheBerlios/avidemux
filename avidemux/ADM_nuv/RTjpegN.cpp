@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <inttypes.h>
 #include "config.h"
 
@@ -3385,7 +3385,7 @@ int8_t *data;
  data=(int8_t *)sp;
  data+=12;
  //mean
- assert(sizeof(RTjpeg_frameheader)==12);
+ ADM_assert(sizeof(RTjpeg_frameheader)==12);
  
  if((RTJPEG_SWAP_HALFWORD(fh->width) != width)||
     (RTJPEG_SWAP_HALFWORD(fh->height) != height))

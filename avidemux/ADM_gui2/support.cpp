@@ -8,7 +8,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <gtk/gtk.h>
 
 #include "support.h"
@@ -67,7 +67,7 @@ GdkPixbuf	*create_pixbuf                  (const gchar     *filename)
 	if(found==-1)
 	{
 		printf("\n Mmmm problem with pixmap button. Did you change the code ?\n");
-		assert(0);
+		ADM_assert(0);
 	
 	}
 

@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -104,7 +104,7 @@ AUDIOENCODER findCodec( void )
 uint8_t j;
 			j=getRangeInMenu(lookup_widget(dialog,"optionmenu_CodecList"));
 		
-			if(j>=sizeof(myTab)/sizeof(AUDIOENCODER)) assert(0);
+			if(j>=sizeof(myTab)/sizeof(AUDIOENCODER)) ADM_assert(0);
 			return myTab[j];
 			
 

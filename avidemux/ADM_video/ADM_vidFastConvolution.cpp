@@ -17,8 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include "config.h"
 
 #include "fourcc.h"
@@ -45,7 +44,7 @@ BUILD_CREATE(Gaussian_create,AVDMFastVideoGauss);
 uint8_t	AVDMFastVideoConvolution::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(2);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
@@ -67,7 +66,7 @@ AVDMFastVideoConvolution::AVDMFastVideoConvolution(
 
 					
  	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  assert(_uncompressed); 
+  ADM_assert(_uncompressed); 
   _info.encoding=1;
   if(couples==NULL)
   {
@@ -105,8 +104,8 @@ uint8_t AVDMFastVideoConvolution::getFrameNumberNoAlloc(uint32_t frame,
 uint8_t *x1,*x2,*x3,*o1;
 uint32_t stride,page;
 
-			assert(frame<_info.nb_frames);
-			assert(_uncompressed);					
+			ADM_assert(frame<_info.nb_frames);
+			ADM_assert(_uncompressed);					
 			stride=_info.width;
 			page=(stride*_info.height)>>2;
 																

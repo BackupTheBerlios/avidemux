@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -291,7 +291,7 @@ _VIDEOS *vid=&_videos[ref];
   // We clear the forward frame as it need to be stored properly later
   _videos[ref]._forwardReference=0xffffffff;
   rewind = relframe;
-  assert(rewind); // the first frame should be a keyframe !
+  ADM_assert(rewind); // the first frame should be a keyframe !
   	while (!(flags & AVI_KEY_FRAME))
     	{
       		rewind--;
@@ -439,7 +439,7 @@ uint8_t
       printf (" NKF not found\n");
       return 0;
     }
-  assert (convSeg2Frame (frame, seg, relframe));
+  ADM_assert (convSeg2Frame (frame, seg, relframe));
 
   return getUncompressedFrame (*frame, out);
 }
@@ -461,7 +461,7 @@ uint8_t
     }
 
 
-  assert (nf = convSeg2Frame (frame, seg, relframe));
+  ADM_assert (nf = convSeg2Frame (frame, seg, relframe));
 
   return getUncompressedFrame (*frame, out);
 

@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include "config.h"
 
@@ -37,7 +37,7 @@ uint8_t AVDMMP3AudioStream::open(char *name)
 	
     printf("\n opening stream %s (MP3)",name);
     fd = fopen(name, "rb");
-    assert(fd);
+    ADM_assert(fd);
     fread(buffer,2048,1,fd);
      _wavheader = new WAVHeader();
     
@@ -54,7 +54,7 @@ uint8_t AVDMMP3AudioStream::open(char *name)
     //
     //
       _codec=getAudioCodec(_wavheader->encoding);
-     assert(_codec);
+     ADM_assert(_codec);
      _wavheader->blockalign=1;
     return 1;
 }

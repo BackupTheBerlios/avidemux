@@ -27,6 +27,7 @@
 
 
 #include <config.h>
+#include "ADM_assert.h" 
 
 #include <gtk/gtk.h>
 
@@ -374,7 +375,7 @@ void ComputePreload(void)
     wavbuf =
 	(uint8_t *)
 	malloc((4 * 3 *  channels * wavinfo->frequency));
-    assert(wavbuf);
+    ADM_assert(wavbuf);
 
     double db;
     // go to the beginning...

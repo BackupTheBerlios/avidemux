@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 #include <errno.h>
-#include <assert.h>
+#include <ADM_assert.h>
   
 #include "fourcc.h" 
  

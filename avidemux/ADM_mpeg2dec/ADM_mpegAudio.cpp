@@ -22,7 +22,7 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include <math.h>
@@ -76,7 +76,7 @@ AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 		if(!file) 
 			{
 				printf("\n Error !!");
-				assert(0);
+				ADM_assert(0);
 			}
 		
 		fgets(string,1023,file);   	// File header
@@ -101,7 +101,7 @@ AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 				break;
 			}
 		default:
-				assert(0);
+				ADM_assert(0);
 		}
 		
 						
@@ -110,13 +110,13 @@ AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 				printf("\n cannot open mpeg >%s<\n",string);
 				delete demuxer;
 				fclose(file);
-				assert(0);
+				ADM_assert(0);
 
 		}
 		
 		_syncPoints=nb_sync;
 		_sync=new  SYNC_[_syncPoints+1]	; 	
-		assert(_sync);		
+		ADM_assert(_sync);		
 
 		fgets(string,1023,file);   	// Size x*y
 
@@ -213,7 +213,7 @@ AVDMMpeg2decAudioStream::AVDMMpeg2decAudioStream(char *name,uint32_t nb_sync)
 						}
 						break;
 				default:
-						assert(0);
+						ADM_assert(0);
 
 			}
 			demuxer->goTo(0);

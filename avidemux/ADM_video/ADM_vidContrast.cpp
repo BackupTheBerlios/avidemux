@@ -17,8 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -46,7 +45,7 @@ char *ADMVideoContrast::printConf( void )
 {
  	static char buf[50];
 
-  assert(_param); 	
+  ADM_assert(_param); 	
  	sprintf((char *)buf," contrast : %1.2f %lu",_param->coef,_param->offset);
         return buf;
 }
@@ -62,7 +61,7 @@ ADMVideoContrast::ADMVideoContrast(
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  			 	
   _info.encoding=1;
    	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  assert(_uncompressed);
+  ADM_assert(_uncompressed);
   _param=NULL;
   if(couples)
   	{
@@ -92,7 +91,7 @@ ADMVideoContrast::ADMVideoContrast(
 uint8_t	ADMVideoContrast::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(5);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
@@ -119,8 +118,8 @@ ADMVideoContrast::~ADMVideoContrast()
 {
    //uint32_t x,w;
    
-   		assert(_param);
-			assert(frame<_info.nb_frames);
+   		ADM_assert(_param);
+			ADM_assert(frame<_info.nb_frames);
 								
 			
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;

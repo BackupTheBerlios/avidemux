@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -60,7 +60,7 @@ uint8_t AVDMProcessAudio_Piper::init(char *outfile,
 	UNUSED_ARG(outfile);
 	UNUSED_ARG(mode);
 	UNUSED_ARG(bitrate);
-	assert(0);
+	ADM_assert(0);
 	return 0;
 
 }
@@ -177,7 +177,7 @@ uint8_t  AVDMProcessAudio_Piper::push( uint32_t *eaten )
 // Read n samples
     // Go to the beginning of current block
     in = _bufferin;
-    assert(_pipe);
+    ADM_assert(_pipe);
     while (rdall < ONE_CHUNK)
       {
 	  // don't ask too much front.

@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -35,7 +35,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-#include "assert.h"
+#include "ADM_assert.h"
 
 /**
 	Read the magic of a file i.e. its 16 first bytes

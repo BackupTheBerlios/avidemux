@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "ADM_assert.h" 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -105,7 +106,7 @@ int ret=0;
 						gtk_label_set_text(GTK_LABEL(WID(label11)),"Size (MBytes):");
             					break;
 		  		default:
-		      				assert(0);
+		      				ADM_assert(0);
 				}
 	}
 	gtk_widget_destroy(dialog);

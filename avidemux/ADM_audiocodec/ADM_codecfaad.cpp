@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "fourcc.h"
@@ -94,7 +94,7 @@ unsigned char chan=0;
 uint8_t first=0;
 
 
-		assert(_instance);
+		ADM_assert(_instance);
 		*nbOut=0;
 		if(!_inited) // we still have'nt initialized the codec
 		{

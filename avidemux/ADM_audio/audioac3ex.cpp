@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <sstream>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -49,7 +49,7 @@ uint32_t syncoff;
 
     // read wavheader
     _wavheader = new WAVHeader;
-    assert(_wavheader);
+    ADM_assert(_wavheader);
     if(! 		ADM_AC3GetInfo(syncbuff, 10*1024,&fq, &br,&chan,&syncoff)   )
     		{
             	abort();
@@ -71,7 +71,7 @@ uint32_t syncoff;
     //
 
        _codec=getAudioCodec(WAV_AC3);
-     assert(_codec);
+     ADM_assert(_codec);
     return 1;
 
 }

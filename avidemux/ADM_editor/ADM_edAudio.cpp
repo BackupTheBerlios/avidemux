@@ -25,7 +25,7 @@ to generic audio stream
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include "config.h"
 #include "avifmt.h"
@@ -68,7 +68,7 @@ AVDMEditAudioStream::AVDMEditAudioStream (ADM_Composer * father)
     }
   else
     _codec = getAudioCodec (0);
-  assert (_codec);
+  ADM_assert (_codec);
   _vbr = 0;
 }
 
@@ -109,7 +109,7 @@ uint32_t
   // we will have to ask each part to the father 
   // and keep sync
   uint32_t got;
-  assert (_vbr);
+  ADM_assert (_vbr);
 
   got = video_body->readPCMeq (lenasked, out, lenout);
   _pos += got;

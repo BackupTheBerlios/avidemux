@@ -25,7 +25,7 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -75,7 +75,7 @@ uint8_t OGMDemuxer::setPos( uint64_t pos )
 {
 	_payload=0;
 	fseeko(_fd,pos,SEEK_SET);
-	assert(pos<_filesize);
+	ADM_assert(pos<_filesize);
 	_payload=0;
 	return 1;
 }
@@ -124,7 +124,7 @@ uint64_t seq;
 		if(!fourCC::check(_page.sig,(uint8_t *)"OggS"))
 		{
 			printf("Bad at offset :%lu 0x %x\n",_hdrpos,_hdrpos);
-			assert(0);
+			ADM_assert(0);
 		}
 		*id=fourCC::get(_page.serial);
 		//
@@ -185,7 +185,7 @@ uint64_t seq;
 uint8_t		OGMDemuxer::readPayload( uint8_t *data)
 {
 
-		assert(_payload);
+		ADM_assert(_payload);
 		fread(data,1,_payload,_fd);
 		_payload=0;
 		return 1;
@@ -209,7 +209,7 @@ uint8_t		OGMDemuxer::readBytes(uint32_t size, uint8_t *data)
 uint8_t		OGMDemuxer::skipBytes(uint32_t size)
 {
 
-		assert(size<=_payload);
+		ADM_assert(size<=_payload);
 		fseeko(_fd,size,SEEK_CUR);
 		_payload-=size;
 		return 1;

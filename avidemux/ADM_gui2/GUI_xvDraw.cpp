@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "config.h"
+#include "ADM_assert.h"
 
 #ifdef USE_XV
 //#define VERBOSE_XV
@@ -90,8 +91,8 @@ static uint8_t GUI_XvExpose( void );
 
 void GUI_XvEnd( void )
 {
-	assert(xv_port);
- 	assert(xv_display);
+	ADM_assert(xv_port);
+ 	ADM_assert(xv_display);
 
 
   	printf("\n Releasing Xv Port\n");
@@ -271,7 +272,7 @@ unsigned long num_adaptors;
 
 	xv_gc = XCreateGC(xv_display, xv_win, 0L, &xv_xgc);
 	
-	//assert(BadWindow!=XSelectInput(xv_display, xv_win, ExposureMask | VisibilityChangeMask));
+	//ADM_assert(BadWindow!=XSelectInput(xv_display, xv_win, ExposureMask | VisibilityChangeMask));
 
     }
     printf("\n Xv init succeedeed\n");

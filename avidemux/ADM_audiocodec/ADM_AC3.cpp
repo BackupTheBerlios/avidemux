@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <ADM_assert.h>
 #include "config.h"
 #ifdef USE_AC3
 
@@ -120,12 +121,12 @@ ADM_AC3Run(uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,
     int flags = 0, samprate = 0, bitrate = 0, chan = 2;
     int16_t *ptrOut = (int16_t *) outptr;
 
-    assert(init_done);
+    ADM_assert(init_done);
     *nbOut = 0;
     // First copy in -> Buffer
     memcpy(buffer + inbuffer, ptr, nbIn);
     inbuffer += nbIn;
-    assert(inbuffer < AC3_BUF_SIZE);
+    ADM_assert(inbuffer < AC3_BUF_SIZE);
     // Not enough data to work
     if ((nbIn == 0) && (inbuffer < (3840 + 7)))
 	return 0;

@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 
 #include <math.h>
@@ -153,7 +153,7 @@ uint32_t chunk,red;
 		
 	// Do some sanity check / cleanup on the buffer
 	
-	assert(_audioTail>=_audioHead);
+	ADM_assert(_audioTail>=_audioHead);
 	
 	//
 	if(_audioTail>OGM_AUDIO_BUFFER)
@@ -162,7 +162,7 @@ uint32_t chunk,red;
 		_audioTail-=_audioHead;
 		_audioHead=0;
 	}
-	assert((_audioTail-_audioHead)<(OGM_AUDIO_BUFFER>>1));
+	ADM_assert((_audioTail-_audioHead)<(OGM_AUDIO_BUFFER>>1));
 	
 	
 	// Fill buffer (CBR)

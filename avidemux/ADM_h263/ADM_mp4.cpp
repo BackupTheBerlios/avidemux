@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include "config.h"
 
@@ -352,7 +352,7 @@ uint8_t    mp4Header::open(char *name)
 				return 0;
 			}
 	_idx=new h263Entry[nbImg+1];
-	assert(_idx);
+	ADM_assert(_idx);
 	//
 	// Second pass, collect as much information as possible
 	//

@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -170,7 +170,7 @@ uint8_t	OpenDMLHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {  	
 	if(_isaudiopresent)
 	{
-		assert(_audioTrack);
+		ADM_assert(_audioTrack);
 		*audio=_audioTrack;
 		return 1;
 	}
@@ -549,7 +549,7 @@ uint32_t count=0;
 					which--;					
 				}			
 	}
-	assert(0);
+	ADM_assert(0);
 	return 0;
 }
 /*

@@ -17,12 +17,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
-#include <assert.h>
 
 #include "config.h"
 
@@ -61,7 +60,7 @@ CONFcouple::~CONFcouple()
 
 uint8_t CONFcouple::setCouple(char *myname,uint32_t val)
 {
-	assert(cur<nb);
+	ADM_assert(cur<nb);
 
 	name[cur]=strdup(myname);
 	sprintf(tmpstring,"%lu",val);
@@ -71,7 +70,7 @@ uint8_t CONFcouple::setCouple(char *myname,uint32_t val)
 }
 uint8_t CONFcouple::setCouple(char *myname,float val)
 {
-	assert(cur<nb);
+	ADM_assert(cur<nb);
 
 	name[cur]=strdup(myname);
 	sprintf(tmpstring,"%f",val);
@@ -81,7 +80,7 @@ uint8_t CONFcouple::setCouple(char *myname,float val)
 }
 uint8_t CONFcouple::setCouple(char *myname,double val)
 {
-	assert(cur<nb);
+	ADM_assert(cur<nb);
 
 	name[cur]=strdup(myname);
 	sprintf(tmpstring,"%f",val);
@@ -91,7 +90,7 @@ uint8_t CONFcouple::setCouple(char *myname,double val)
 }
 uint8_t CONFcouple::setCouple(char *myname,int32_t val)
 {
-	assert(cur<nb);
+	ADM_assert(cur<nb);
 
 	name[cur]=strdup(myname);
 	sprintf(tmpstring,"%ld",val);
@@ -101,7 +100,7 @@ uint8_t CONFcouple::setCouple(char *myname,int32_t val)
 }
 uint8_t CONFcouple::setCouple(char *myname,char *val)
 {
-	assert(cur<nb);
+	ADM_assert(cur<nb);
 
 	name[cur]=strdup(myname);
 	value[cur]=strdup(val);
@@ -114,8 +113,8 @@ uint8_t CONFcouple::getCouple(char *myname,uint32_t *val)
 {
 	int32_t index=lookupName(myname);
 
-	assert(index!=-1);
-	assert(index<(int)nb);
+	ADM_assert(index!=-1);
+	ADM_assert(index<(int)nb);
 	*val=(int)atoi(value[index]);
 	return 1;
 }
@@ -123,8 +122,8 @@ uint8_t CONFcouple::getCouple(char *myname,int32_t *val)
 {
 	int32_t index=lookupName(myname);
 
-	assert(index!=-1);
-	assert(index<(int)nb);
+	ADM_assert(index!=-1);
+	ADM_assert(index<(int)nb);
 	*val=(int)atoi(value[index]);
 	return 1;
 }
@@ -132,8 +131,8 @@ uint8_t CONFcouple::getCouple(char *myname,char **val)
 {
 	int32_t index=lookupName(myname);
 
-	assert(index!=-1);
-	assert(index<(int)nb);
+	ADM_assert(index!=-1);
+	ADM_assert(index<(int)nb);
 	*val=value[index];
 	return 1;
 }
@@ -141,8 +140,8 @@ uint8_t CONFcouple::getCouple(char *myname,float *val)
 {
 int32_t index=lookupName(myname);
 
-	assert(index!=-1);
-	assert(index<(int)nb);
+	ADM_assert(index!=-1);
+	ADM_assert(index<(int)nb);
 	sscanf(value[index],"%f",val);;
 	return 1;
 }
@@ -150,8 +149,8 @@ uint8_t CONFcouple::getCouple(char *myname,double *val)
 {
 	int32_t index=lookupName(myname);
 
-	assert(index!=-1);
-	assert(index<(int)nb);
+	ADM_assert(index!=-1);
+	ADM_assert(index<(int)nb);
 	sscanf(value[index],"%lf",val);;
 	return 1;
 }

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -70,8 +70,8 @@ uint8_t *ptr;
       printf("\n 10 ms is %lu\n",ms10);
       ptr=(uint8_t *)malloc(2*64*1024); // should be enough
 		_audioMap=new ST_point[100*3600*4]; // 4 hours / 6 Megs
-      assert(ptr);
-      assert(_audioMap);
+      ADM_assert(ptr);
+      ADM_assert(_audioMap);
 
       // Initialize MAD decoding engine
       AVDM_MadInit();

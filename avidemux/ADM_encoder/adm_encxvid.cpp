@@ -76,7 +76,7 @@ EncoderXvid::EncoderXvid (XVIDconfig *codecconfig)
 uint8_t
 EncoderXvid::configure (AVDMGenericVideoStream * instream)
 {
-  assert (instream);
+  ADM_assert (instream);
   ADV_Info *info;
 
 	//uint32_t flag1,flag2,flag3;
@@ -86,7 +86,7 @@ EncoderXvid::configure (AVDMGenericVideoStream * instream)
   _h = info->height;
   printf("Configuting xvif encoder (%dx%d)\n",_w,_h);
   _vbuffer = new uint8_t[_w * _h * 3];
-  assert (_vbuffer);
+  ADM_assert (_vbuffer);
   _in = instream;
 
 
@@ -123,7 +123,7 @@ EncoderXvid::configure (AVDMGenericVideoStream * instream)
       
       break;
     default:
-      assert (0);
+      ADM_assert (0);
 
     }
   _in = instream;
@@ -137,7 +137,7 @@ EncoderXvid::configure (AVDMGenericVideoStream * instream)
 uint8_t
 EncoderXvid::startPass1 (void)
 {
-  assert (_state == enc_Pass1);
+  ADM_assert (_state == enc_Pass1);
   _frametogo = 0;
   printf ("\n Starting pass 1\n");
   printf (" Creating logfile :%s\n", _logname);  
@@ -192,8 +192,8 @@ EncoderXvid::encode (uint32_t frame, uint32_t * len, uint8_t * out,
   uint32_t l, f;
   //ENC_RESULT enc;
 
-  assert (_codec);
-  assert (_in);
+  ADM_assert (_codec);
+  ADM_assert (_in);
 
   if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
     {
@@ -210,7 +210,7 @@ EncoderXvid::encode (uint32_t frame, uint32_t * len, uint8_t * out,
     case enc_Pass1:
 	
 			
-							assert(fd);
+							ADM_assert(fd);
 							if(!_codec->encode(   _vbuffer,out,len,flags))
 							{
 								printf("\n codec error on 1st pass !");
@@ -255,7 +255,7 @@ EncoderXvid::encode (uint32_t frame, uint32_t * len, uint8_t * out,
                               break;
 	break;
           default:
-      assert (0);
+      ADM_assert (0);
     }
   return 0;
 }
@@ -281,7 +281,7 @@ uint8_t
 EncoderXvid::startPass2 (void)
 {
 
-  assert (_state == enc_Pass1);
+  ADM_assert (_state == enc_Pass1);
   printf ("\n Starting pass 2\n");
   
   // update xvid internal 2 pass engine

@@ -24,8 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -130,7 +129,7 @@ AVDMVideoStreamResize::AVDMVideoStreamResize(
 uint8_t	AVDMVideoStreamResize::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(3);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
@@ -167,7 +166,7 @@ static Image in,out;
 		return 0;
 	}
 	
-			assert(_param);	
+			ADM_assert(_param);	
 	
    			
 
@@ -194,7 +193,7 @@ static Image in,out;
                 	if(_param->algo>2)
                  		{
                       	printf("\n Wrong algorithm selection");
-                        assert(0);
+                        ADM_assert(0);
                      }
                	 precompute(&out,&in, _param->algo );
               }

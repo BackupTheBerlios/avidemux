@@ -16,7 +16,7 @@
  ***************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 
@@ -85,7 +85,7 @@ decoderXvid::decoderXvid(uint32_t w,uint32_t h) :decoders(w,h)
         xerr = xx_xvid_decore(NULL, XVID_DEC_CREATE, &xparam, NULL);
         _handle = xparam.handle;
 
-        assert(xerr==XVID_ERR_OK);
+        ADM_assert(xerr==XVID_ERR_OK);
 
 
 }

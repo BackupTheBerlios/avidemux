@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include <gdk/gdkkeysyms.h>

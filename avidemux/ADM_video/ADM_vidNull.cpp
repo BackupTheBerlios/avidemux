@@ -20,14 +20,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
 #include "config.h"
 #include "ADM_editor/ADM_edit.hxx"
-#include "assert.h"
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include "ADM_toolkit/ADM_debugID.h"
@@ -45,7 +44,7 @@ aviInfo aviinf;
   	
   	// now build infos
   	
-  	assert(_in->getVideoInfo(&aviinf));
+  	ADM_assert(_in->getVideoInfo(&aviinf));
   	_info.width=aviinf.width;
   	_info.height=aviinf.height;
 	if(start+nb==aviinf.nb_frames-1)  nb++; // take last frame
@@ -55,8 +54,8 @@ aviInfo aviinf;
 	_info.fps1000=aviinf.fps1000;
 	_info.orgFrame=start;
   	_uncompressed=(uint8_t *)malloc(3*aviinf.width*aviinf.height);
-  	assert(_uncompressed);
-	assert(start+nb<=aviinf.nb_frames);
+  	ADM_assert(_uncompressed);
+	ADM_assert(start+nb<=aviinf.nb_frames);
 
   	aprintf("\n Null stream initialized with start frame = %lu, nbframe=%lu \n",_start,nb);
   	

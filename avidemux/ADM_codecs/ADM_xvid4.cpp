@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 #include "config.h"
@@ -281,7 +281,7 @@ uint8_t     xvid4Encoder::preAmble(uint8_t *in )
 		case 0:
 			break;
 		default:
-			assert(0);
+			ADM_assert(0);
 	}	
 	if(_param.qpel)
 		{

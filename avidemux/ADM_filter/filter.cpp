@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
+#include <ADM_assert.h>
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
@@ -116,7 +116,7 @@ void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable
 		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
 		,char *filtername)
 {
-        assert(nb_video_filter<(MAX_FILTER-1));
+        ADM_assert(nb_video_filter<(MAX_FILTER-1));
         allfilters[ nb_video_filter].name=name;
         allfilters[ nb_video_filter].create=create;
         allfilters[ nb_video_filter].tag=tag;
@@ -133,7 +133,7 @@ void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
 		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
 		,char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args))
 {
-        assert(nb_video_filter<(MAX_FILTER-1));
+        ADM_assert(nb_video_filter<(MAX_FILTER-1));
         allfilters[ nb_video_filter].name=name;
         allfilters[ nb_video_filter].create=create;
         allfilters[ nb_video_filter].tag=tag;
@@ -265,7 +265,7 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
 {
 	 AVDMGenericVideoStream *filter;
 
-			assert(tag!=VF_INVALID);
+			ADM_assert(tag!=VF_INVALID);
 			for(unsigned int i=0;i<nb_video_filter;i++)
 				{
 					if(tag==allfilters[i].tag)
@@ -274,7 +274,7 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
 							return filter;
 						}
 				}
-			assert(0);
+			ADM_assert(0);
 			return NULL;                      
 }
 /*____________________________________
@@ -318,7 +318,7 @@ void editorUpdatePreview(uint32_t framenum)
 //
 //
 	uint32_t fl,len;	
- 	assert(preview);
+ 	ADM_assert(preview);
 
   if( GUI_StillAlive())
   {
@@ -353,7 +353,7 @@ int trans[MAXPARAM];
 	for(int i=0;i<nb;i++)
 	{
 		l=strlen(param->param[i]);
-		assert(l);
+		ADM_assert(l);
 		found=-1;
 		for(int j=0;j<nb;j++)
 		{
@@ -451,7 +451,7 @@ FILE *f;
 			// get args
 			CONFcouple *couple;
 			char *arg,*value;
-			assert(videofilters[i].filter->getCoupledConf( &couple));
+			ADM_assert(videofilters[i].filter->getCoupledConf( &couple));
 			for(int j=0;j<couple->getNumber();j++)
 			{
 				 couple->getEntry(j, &arg,&value);

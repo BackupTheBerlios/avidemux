@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 #include "config.h"
@@ -97,7 +97,7 @@ decoderFF::decoderFF(uint32_t w,uint32_t h) :decoders(w,h)
 		_context=new AVCodecContext;
     memset(_context, 0, sizeof(AVCodecContext));
 #endif
-				assert(_context);
+				ADM_assert(_context);
 				memset(&_frame,0,sizeof(_frame));
 
 				_context->max_b_frames=0;

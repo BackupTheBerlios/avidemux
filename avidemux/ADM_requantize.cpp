@@ -31,6 +31,7 @@
 #include <sys/time.h>
 
 #include "config.h"
+#include "ADM_assert.h"
 
 #include "callbacks.h"
 #include "interface.h"
@@ -241,7 +242,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 		encoding->setFrame(i-frameStart,frameEnd-frameStart);
 		
       		if(!encoding->isAlive()) goto _abt;
-      		assert (video_body->getFlags (i, &flags));
+      		ADM_assert (video_body->getFlags (i, &flags));
       		if (flags & AVI_B_FRAME)	// oops
 		{
 	  		// se search for the next i /p
@@ -249,7 +250,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 
 	  		for (uint32_t j = i + 1; j < frameEnd; j++)
 	    		{
-	      			assert (video_body->getFlags (j, &flags));
+	      			ADM_assert (video_body->getFlags (j, &flags));
 	      			if (!(flags & AVI_B_FRAME))
 				{
 		  			found = j;

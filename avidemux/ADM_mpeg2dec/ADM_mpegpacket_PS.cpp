@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 
 #include <math.h>
@@ -127,7 +127,7 @@ uint8_t ADM_mpegDemuxerProgramStream::open(char *name)
 		printf("\n Size of PES stream : %llu",_size);
 		// search the first video packet....
 		if(!_nextPacket())
-				assert(0);
+				ADM_assert(0);
 				
 			_firstPacketOffset=_lastSync-4;	
 	
@@ -336,7 +336,7 @@ uint8_t  ADM_mpegDemuxerProgramStream::	_nextPacket(void)
 				{
 					_packetLen=len;
 
-					assert(_packetLen<PES_BUFFER_SIZE);
+					ADM_assert(_packetLen<PES_BUFFER_SIZE);
 			  		parser->read32(_packetLen,_buffer);
 			      		_currentOffset=0;
 			      		aprintf("Found packet id :%x subid :%x\n",stream,subid);
@@ -617,7 +617,7 @@ uint8_t align=0;
 								}
 								break;
 							case 1:
-								assert(0); // forbidden !
+								ADM_assert(0); // forbidden !
 								break;
 							case 0: 
 								// printf("\n PTS00\n");
@@ -740,7 +740,7 @@ uint8_t align=0;
 				case 1:
 							// 0001 xxx		
 									{     // PTSDTS=01 not allowed											
-										assert(0);
+										ADM_assert(0);
 									}
 									break;
 												

@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -120,7 +120,7 @@ int max;
 					// and write each attribute
 					for(uint32_t i=0;i<setup->getNumber();i++)
 					{
-						assert(setup->getEntry(i,&nm,&val));
+						ADM_assert(setup->getEntry(i,&nm,&val));
 						xmlNewChild(nodeConf,NULL,(xmlChar *)nm,(xmlChar *)val );
 					}
 				delete setup;
@@ -223,8 +223,8 @@ CONFcouple *couple;
 			//			printf("\n ** needs %d param :\n",args);
 
 						conf=conf->children;
-						assert(conf);
-						assert(args);
+						ADM_assert(conf);
+						ADM_assert(args);
 						couple=buildCouple(args,conf);
 
 					}
@@ -261,14 +261,14 @@ char *val,*nm;
 			 }
 		val=(char *)xmlNodeGetContent(node);
 
-		assert(val);
-		assert(couple->setCouple(nm,val));
+		ADM_assert(val);
+		ADM_assert(couple->setCouple(nm,val));
 	//	printf("\n --> :%s: %s \n",nm,val);
 		nb--;
 		node=node->next;
 
 	};
-	assert(nb==0);
+	ADM_assert(nb==0);
 	return couple;
 
 }

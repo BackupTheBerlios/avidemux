@@ -35,6 +35,7 @@ Mean.
 #include <gdk/gdktypes.h>
 #include <time.h>
 #include <sys/time.h>
+#include "ADM_assert.h"
 
 #include "callbacks.h"
 #include "interface.h"
@@ -194,7 +195,7 @@ void GUI_UpdateAudioToggle(AudioSource nwsource)
 	  break;
 
       default:
-	  assert(0);
+	  ADM_assert(0);
       }
 #warning fixme
 //    gtk_entry_set_text((GtkEntry *) entry_faudioname, text);

@@ -18,8 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -48,7 +47,7 @@ uint32_t frame;
   for(uint32_t u=0;u<3;u++)
   {
   		_buffer[u]=new uint8_t [frame];
-    	assert(_buffer[u]);
+    	ADM_assert(_buffer[u]);
   }
  	_bufnum[0]=0xefffffff;
  	_bufnum[1]=0xefffffff;
@@ -71,7 +70,7 @@ ADMVideoCached::~ADMVideoCached()
 
 char	*ADMVideoCached::printConf( void) 
 {
-	assert(0);
+	ADM_assert(0);
 	return NULL;
 }
 uint8_t ADMVideoCached::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
@@ -81,7 +80,7 @@ uint8_t ADMVideoCached::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     UNUSED_ARG(len);
     UNUSED_ARG(data);
     UNUSED_ARG(flags);
-	assert(0);
+	ADM_assert(0);
 	return 0;
 }
 int32_t ADMVideoCached::searchIndex(uint32_t frame)
@@ -117,7 +116,7 @@ uint32_t dflags,dlen;
 							case 4: index_n=1;break;
 							case 8: index_n=2;break;
 							default:
-											assert(0);														
+											ADM_assert(0);														
 						}
 						_bufnum[index_n]=frame+1;
 						if(!_in->getFrameNumberNoAlloc(frame+1, &dlen,_buffer[index_n],

@@ -18,7 +18,7 @@
  
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 #include "config.h"
@@ -73,7 +73,7 @@ char stringFQ[60];
 			   );		
 			pp->ppMode=pp_get_mode_by_name_and_quality(
 			stringMode, pp->postProcStrength);;
-			assert(pp->ppMode);
+			ADM_assert(pp->ppMode);
 			aprintf("Enabled type:%d strength:%d\n",
 				pp->postProcType,pp->postProcStrength);
 		}	   

@@ -13,8 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -94,7 +93,7 @@ uint8_t  VideoCache::unlock(uint8_t *frame)
 {
 int32_t k;
 	k=searchPtr(frame) ;
-	assert(k>=0);
+	ADM_assert(k>=0);
 	frameLock[k]--;
 	return 1;	
 }
@@ -151,5 +150,5 @@ uint32_t len,flags;
 	}
 	printf("Could not find empty slot in cache\n");
 	for(uint32_t i=0;i<nbEntry;i++) printf("%d(%d) ",frameNum[i],frameLock[i]);printf("\n");
-	assert(0);
+	ADM_assert(0);
 }

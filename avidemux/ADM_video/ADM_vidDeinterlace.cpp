@@ -23,8 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -75,7 +74,7 @@ uint8_t ADMVideoDeinterlace::getFrameNumberNoAlloc(uint32_t frame,
 //uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
 uint32_t uvlen;
 			if(frame>=_info.nb_frames) return 0;
-			assert(_uncompressed);					
+			ADM_assert(_uncompressed);					
 								
 			// read uncompressed frame
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;         	

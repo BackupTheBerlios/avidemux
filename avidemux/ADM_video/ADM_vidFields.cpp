@@ -17,8 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -47,11 +46,11 @@ ADMVideoFields::ADMVideoFields(
 	
 					
  	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  assert(_uncompressed);
+  ADM_assert(_uncompressed);
   _motionmask=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
-  assert(_motionmask);
+  ADM_assert(_motionmask);
    _motionmask2=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
-  assert(_motionmask2);
+  ADM_assert(_motionmask2);
 
   _info.encoding=1;
   if(couples)
@@ -73,7 +72,7 @@ ADMVideoFields::ADMVideoFields(
 uint8_t	ADMVideoFields::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(2);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))

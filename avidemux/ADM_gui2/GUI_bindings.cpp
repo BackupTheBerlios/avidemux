@@ -26,7 +26,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "interface.h"
 #include "support.h"
@@ -242,7 +242,7 @@ uint8_t  bindGUI( void )
 			if(!bt)
 			{
 				printf("Binding failed for %s\n",buttonCallback[i].name);
-				assert(0);
+				ADM_assert(0);
 			}
 			ADD_SIGNAL(bt,buttonCallback[i].signal,buttonCallback[i].action);
 			GTK_WIDGET_UNSET_FLAGS (bt, GTK_CAN_FOCUS);			

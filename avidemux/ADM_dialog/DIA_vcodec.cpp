@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include "ADM_assert.h" 
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -111,7 +112,7 @@ SelectCodecType findCodec( void )
 uint8_t j;
 			j=getRangeInMenu(lookup_widget(dialog,"optionmenu_CodecList"));
 
-			if(j>=sizeof(myTab)/sizeof(SelectCodecType)) assert(0);
+			if(j>=sizeof(myTab)/sizeof(SelectCodecType)) ADM_assert(0);
 			return myTab[j];
 			
 

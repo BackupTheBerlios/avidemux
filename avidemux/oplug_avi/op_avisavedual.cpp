@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
+#include <ADM_assert.h>
 
 #include <time.h>
 #include <sys/time.h>
@@ -145,7 +146,7 @@ GenericAviSaveCopyDualAudio::writeAudioChunk (void)
   uint32_t    len;
   // if there is no audio, we do nothing
   if (!audio_filter)
-    assert(0);
+    ADM_assert(0);
   //******************************
   // Audio CBR
   //******************************

@@ -29,7 +29,7 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "callbacks.h"
 #include "interface.h"
@@ -190,7 +190,7 @@ void gui_ok(GtkButton * button, gpointer user_data)
     		 	lock=-2;
       	break;
        default:
-       		assert(0);
+       		ADM_assert(0);
       }
     return;
 

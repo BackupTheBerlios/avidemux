@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 
@@ -76,7 +76,7 @@ uint8_t AVDMWavAudioStream::open(char *name)
       }
     // read wavheader
     _wavheader = new WAVHeader;
-    assert(_wavheader);
+    ADM_assert(_wavheader);
     if (fread(_wavheader, sizeof(WAVHeader), 1, fd) != 1)
       {
 	  printf("\n Error reading FMT chunk...");
@@ -100,7 +100,7 @@ uint8_t AVDMWavAudioStream::open(char *name)
     printf("\n %lu offset \n", _offset);
     _wavheader->blockalign=1;
      _codec=getAudioCodec(WAV_PCM);
-     assert(_codec);
+     ADM_assert(_codec);
     return 1;
   drop:
     abort();

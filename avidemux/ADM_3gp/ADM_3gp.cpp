@@ -49,7 +49,7 @@ http://developer.apple.com/documentation/QuickTime/QTFF/QTFFChap2/chapter_3_sect
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -734,10 +734,10 @@ uint32_t i,j,cur;
 	aprintf("co : %lu sz: %lu sc: %lu co[0]%lu \n",nbCo,nbSz,nbSc,Co[0]);
 	aprintf("+_+_+_+_+_+\n");
 
-	assert(Sc);
-	assert(Sn);
-	assert(Co);
-	assert(Sz);
+	ADM_assert(Sc);
+	ADM_assert(Sn);
+	ADM_assert(Co);
+	ADM_assert(Sz);
 
 	// first set size
 	if(!nbSz)// in that case they are all the same size, i.e.audio
@@ -861,7 +861,7 @@ uint32_t _3GPHeader::readPackedLen(adm_atom *tom )
 //
 uint8_t 	_3GPHeader::sync(_3gpIndex *idx,uint32_t index_size, uint32_t sync_size,uint32_t *sync)
 {
-	assert(index_size>=sync_size);
+	ADM_assert(index_size>=sync_size);
 	for(uint32_t i=0;i<sync_size;i++)
 	{
 		idx[sync[i]-1].intra=1;

@@ -27,7 +27,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <assert.h>  
+#include <ADM_assert.h>  
 #include "ADM_library/default.h"
 #include "audio_out.h"
 #include  "ADM_audiodevice/ADM_deviceoss.h"

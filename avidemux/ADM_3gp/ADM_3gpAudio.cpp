@@ -31,7 +31,7 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -124,7 +124,7 @@ uint8_t _3gpAudio::goTo(uint32_t newoffset)
       }
     while (len);
     	_abs_position = _index[_current_index].offset;
-	assert(_current_index<_nb_chunks);
+	ADM_assert(_current_index<_nb_chunks);
     	_pos=newoffset;
     return 1;
 }
@@ -185,7 +185,7 @@ uint32_t _3gpAudio::read(uint32_t len,uint8_t *buffer)
 		if (rd != avail)
 		  {
 		      printf("\n Error : Expected :%lu bytes read :%lu \n",     rd, avail);
-		      //assert(0);
+		      //ADM_assert(0);
 		      return rd;
 
 		  }
@@ -202,7 +202,7 @@ uint32_t _3gpAudio::read(uint32_t len,uint8_t *buffer)
 #endif
 		      _abs_position =_index[0].offset ;
             		_rel_position = 0;
-		      assert(len >= togo);
+		      ADM_assert(len >= togo);
         	  	_pos+=len;
             		_pos-=togo;
 		      return (len - togo);

@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 #include "config.h"
@@ -82,7 +82,7 @@ uint8_t     xvidEncoder::stopEncoder(void )
 {
     int ret;
 
-    assert(_init);
+    ADM_assert(_init);
     
     ret = xvid_encore(_handle, XVID_ENC_DESTROY, 0, 0);
     _init = 0;
@@ -207,7 +207,7 @@ uint8_t 	xvidEncoderCBR::initExtented(uint32_t br,xvidEncParam *extend)
     //---
 			_br=br;
     	printf(" Xvid : Compressing %lu x %lu video in CBR %lu\n", _w, _h, _br);
-    	assert(0 == _init);
+    	ADM_assert(0 == _init);
 
    	xinit.cpu_flags = XVID_CPU_MMX;
 		xvid_init(NULL, 0, &xinit, NULL);
@@ -330,7 +330,7 @@ uint8_t 	xvidEncoderCQ::initExtented(uint32_t q,xvidEncParam *extend)
     //---
 	_q=q;
     	printf(" Xvid : Compressing %lu x %lu video in CQ %lu\n", _w, _h, _q);
-    	assert(0 == _init);
+    	ADM_assert(0 == _init);
 
    	
 	xvid_init(NULL, 0, &xinit, NULL);

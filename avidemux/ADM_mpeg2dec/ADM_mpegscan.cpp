@@ -26,7 +26,7 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include <math.h>
@@ -156,7 +156,7 @@ uint8_t			mpeg2decHeader::open(char *name)
 							demuxer=new ADM_mpegDemuxerTransportStream(ovid,0xff);
 						}
 							break;
-			default: assert(0);
+			default: ADM_assert(0);
 		}
 		
 		if(!demuxer->open(string))
@@ -175,7 +175,7 @@ uint8_t			mpeg2decHeader::open(char *name)
 		if(!_indexMpegPTS)
 			{
 					GUI_Alert("out of memory!!");
-					assert(0);
+					ADM_assert(0);
 			}
 
 		
@@ -379,7 +379,7 @@ uint8_t  mpeg2decHeader::renumber(uint32_t nob)
 								printf("Frame : %u / %u , type %d\n",
 										c,_nbFrames,_indexMpegPTS[c].type);
 				
-								assert(0);
+								ADM_assert(0);
 						}
 			}
 			// put back last frame we had in store

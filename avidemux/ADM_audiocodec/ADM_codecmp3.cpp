@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <sstream>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -32,7 +32,7 @@
 ADM_AudiocodecMP3::ADM_AudiocodecMP3( uint32_t fourcc) :   ADM_Audiocodec(fourcc)
 {
  	if((fourcc!=WAV_MP3) && (fourcc!=WAV_MP2))
-  		assert(0);
+  		ADM_assert(0);
 	if(fourcc==WAV_MP2) printf("Mpeg1/2 audio codec created\n");
 
 }

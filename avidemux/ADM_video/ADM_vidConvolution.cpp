@@ -20,8 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -53,7 +52,7 @@ BUILD_CREATE(median_create,AVDMFastVideoMedian);
 
  char *AVDMVideoConvolution::printConf(void)
 {
- 		assert(0); // this one is pure
+ 		ADM_assert(0); // this one is pure
 }
 
 //_______________________________________________________________
@@ -68,11 +67,11 @@ AVDMVideoConvolution::AVDMVideoConvolution(
 	
 					
  	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  assert(_uncompressed);
+  ADM_assert(_uncompressed);
   _U=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
-  assert(_U);
+  ADM_assert(_U);
    _V=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
-  assert(_V);
+  ADM_assert(_V);
   _info.encoding=1;
 
   	  	
@@ -100,8 +99,8 @@ uint8_t AVDMVideoConvolution::getFrameNumberNoAlloc(uint32_t frame,
    																	uint32_t *flags)
 {
 uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
-			assert(frame<_info.nb_frames);
-			assert(_uncompressed);					
+			ADM_assert(frame<_info.nb_frames);
+			ADM_assert(_uncompressed);					
 								
 			// read uncompressed frame
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;

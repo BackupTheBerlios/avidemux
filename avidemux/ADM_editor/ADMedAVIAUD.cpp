@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -225,8 +225,8 @@ uint32_t ADM_Composer::audioRead (uint32_t len, uint8_t * buffer)
 uint8_t  ADM_Composer::audioFnToOff (uint32_t seg, uint32_t fn, uint32_t * noff)
 {
  aprintf("Editor: audioFnToOff go to : seg %lu fn %lu \n",seg,fn);
-  assert (seg < _nb_segment);
-  assert (_videos[AUDIOSEG]._audiostream);
+  ADM_assert (seg < _nb_segment);
+  ADM_assert (_videos[AUDIOSEG]._audiostream);
 
 #define AS _videos[AUDIOSEG]._audiostream
 
@@ -305,8 +305,8 @@ uint8_t ADM_Composer::audioGoToFn (uint32_t seg, uint32_t fn, uint32_t * noff)
 // since we got the frame we can find the segment
 
 
-  assert (seg < _nb_segment);
-  assert (_videos[SEG]._audiostream);
+  ADM_assert (seg < _nb_segment);
+  ADM_assert (_videos[SEG]._audiostream);
   _audioseg=seg;
 #undef AS
 #define AS _videos[SEG]._audiostream

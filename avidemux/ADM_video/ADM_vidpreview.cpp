@@ -21,12 +21,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
-#include <assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -66,7 +65,7 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
 			printf("\n Warning rgb render not null...\n");
 			free(rgb_render);
 		}
-      assert(rgb_render=new uint8_t [w*h*4]);
+      ADM_assert(rgb_render=new uint8_t [w*h*4]);
        uw=w;
        uh=h;
 

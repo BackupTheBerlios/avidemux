@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -111,7 +111,7 @@ uint8_t
 
   if (relframe == 0)		//switch to last frame of prev seg
     {
-      assert (seg);
+      ADM_assert (seg);
       seg--;
       relframe = _segments[seg]._nb_frames - 1;
 

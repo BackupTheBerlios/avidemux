@@ -19,6 +19,7 @@
 #include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <ADM_assert.h>
 #include <gtk/gtk.h>
 
 #include <dirent.h>
@@ -431,7 +432,7 @@ void PathSplit(char *str, char **root, char **ext)
 		// Search the last .
 		l=strlen(full);
 		l--;
-		assert(l>0);
+		ADM_assert(l>0);
 		while( *(full+l)!='.' && l) l--;
 		if(!l || l==(strlen(full)-1))
 		{

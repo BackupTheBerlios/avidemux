@@ -37,8 +37,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include <math.h>
 #include <iconv.h>
@@ -168,8 +167,8 @@ uint8_t ADMVideoKernelDeint::getFrameNumberNoAlloc(uint32_t frame,
 		
 			mysrc=vidCache->getImage(frame);
 			myprev=vidCache->getImage(frame_prev);
-			assert(mysrc);
-			assert(myprev);
+			ADM_assert(mysrc);
+			ADM_assert(myprev);
 		// Now go to kernel deint code
 			
     const uint8_t *srcp, *prvp, *prvpp, *prvpn, *prvppp, *prvpnn, *prvp4p, *prvp4n;

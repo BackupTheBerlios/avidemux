@@ -25,8 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -92,7 +91,7 @@ AVDMVideoStreamBSMear::AVDMVideoStreamBSMear(  	AVDMGenericVideoStream *in,CONFc
 uint8_t	AVDMVideoStreamBSMear::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(4);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
@@ -125,7 +124,7 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
 				return 0;
 			}
 	
-			assert(_param);									
+			ADM_assert(_param);									
 								
 			// read uncompressed frame directly into follower
 			// and blacken there

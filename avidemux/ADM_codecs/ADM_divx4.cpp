@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 #include "config.h"
@@ -58,7 +58,7 @@ DEC_INIT decinit;
 
 		decinit.codec_version=500;
 
-		assert(DEC_OK==decore(&_handle,DEC_OPT_INIT,&decinit,NULL));
+		ADM_assert(DEC_OK==decore(&_handle,DEC_OPT_INIT,&decinit,NULL));
 
 DivXBitmapInfoHeader header;
 
@@ -70,7 +70,7 @@ DivXBitmapInfoHeader header;
 		header.biWidth=_w;
 		header.biHeight=_h;
 		header.biCompression=fourCC::get((uint8_t *)"YV12");
-		assert(DEC_OK==decore(_handle,DEC_OPT_SETOUT,&header,NULL));
+		ADM_assert(DEC_OK==decore(_handle,DEC_OPT_SETOUT,&header,NULL));
 
 		printf("\n Divx 5.0.5 decoder initialized\n");
 
@@ -81,7 +81,7 @@ DivXBitmapInfoHeader header;
 
 decoderDIVX::~decoderDIVX()
 {
-		assert(DEC_OK==decore(_handle,DEC_OPT_RELEASE,NULL,NULL));
+		ADM_assert(DEC_OK==decore(_handle,DEC_OPT_RELEASE,NULL,NULL));
 		_handle=NULL;
 		printf("Divx 5.0.5 destroyed\n");
 }

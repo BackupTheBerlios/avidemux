@@ -43,7 +43,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -101,8 +101,8 @@ AVDMProcessAudio_Resample::AVDMProcessAudio_Resample(AVDMGenericAudioStream * in
     strcpy(_name, "PROC:RESMP");
     Sound_Max = 0;
     _quality = quality;
-    assert(quality > 0);
-    assert(quality < 5);
+    ADM_assert(quality > 0);
+    ADM_assert(quality < 5);
     InitialSRC();
 
     _length = _instream->getLength() / 12;

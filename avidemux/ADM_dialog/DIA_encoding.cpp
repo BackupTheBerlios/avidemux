@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "ADM_assert.h" 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -44,7 +45,7 @@ static void DIA_stop( void);
 static uint8_t stopReq=0;
 DIA_encoding::DIA_encoding( uint32_t fps1000 )
 {
-	assert(dialog==NULL);
+	ADM_assert(dialog==NULL);
 	stopReq=0;
 	
 	_totalSize=0;
@@ -92,7 +93,7 @@ void DIA_stop( void)
 }
 DIA_encoding::~DIA_encoding( )
 {
-	assert(dialog);
+	ADM_assert(dialog);
 	gtk_widget_destroy(dialog);
 	dialog=NULL;
 	UI_deiconify();
@@ -100,39 +101,39 @@ DIA_encoding::~DIA_encoding( )
 }
 void DIA_encoding::setPhasis(const char *n)
 {
-	   assert(dialog);
+	   ADM_assert(dialog);
   	   gtk_label_set_text(GTK_LABEL(WID(label_phasis)),n);
 
 }
 void DIA_encoding::setAudioCodec(const char *n)
 {
-	   assert(dialog);
+	   ADM_assert(dialog);
   	   gtk_label_set_text(GTK_LABEL(WID(label_acodec)),n);
 
 }
 
 void DIA_encoding::setCodec(const char *n)
 {
-	   assert(dialog);
+	   ADM_assert(dialog);
   	   gtk_label_set_text(GTK_LABEL(WID(label_vcodec)),n);
 
 }
 void DIA_encoding::setBitrate(uint32_t br)
 {
-	   assert(dialog);
+	   ADM_assert(dialog);
 	   sprintf(string,"%lu kbps",br);
   	   gtk_label_set_text(GTK_LABEL(WID(label_bitrate)),string);
 
 }
 void DIA_encoding::setQuant(uint32_t quant)
 {
-	   assert(dialog);
+	   ADM_assert(dialog);
 	   sprintf(string,"%lu",quant);
   	   gtk_label_set_text(GTK_LABEL(WID(label_quant)),string);
 }
 void DIA_encoding::reset(void)
 {
-	   assert(dialog);
+	   ADM_assert(dialog);
 	   _totalSize=0;
 	   _videoSize=0;
 	   _current=0;
@@ -141,7 +142,7 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 {
 	uint32_t tim;
 
-	   assert(dialog);
+	   ADM_assert(dialog);
 	   sprintf(string,"%lu/%lu",nb,total);
   	   gtk_label_set_text(GTK_LABEL(WID(label_frame)),string);
      	   //
@@ -215,21 +216,21 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 
 void DIA_encoding::setSize(int size)
 {
-	assert(dialog);
+	ADM_assert(dialog);
 	   sprintf(string,"%lu",size);
   	   gtk_label_set_text(GTK_LABEL(WID(label_size)),string);
 
 }
 void DIA_encoding::setAudioSize(int size)
 {
-	assert(dialog);
+	ADM_assert(dialog);
 	   sprintf(string,"%lu",size);
   	   gtk_label_set_text(GTK_LABEL(WID(label_asize)),string);
 
 }
 void DIA_encoding::setVideoSize(int size)
 {
-	assert(dialog);
+	ADM_assert(dialog);
 	   sprintf(string,"%lu",size);
   	   gtk_label_set_text(GTK_LABEL(WID(label_vsize)),string);
 
@@ -237,7 +238,7 @@ void DIA_encoding::setVideoSize(int size)
 void DIA_encoding::feedFrame(uint32_t size)
 {
 	uint32_t br;
-	assert(dialog);
+	ADM_assert(dialog);
 	_totalSize+=size;
 	_videoSize+=size;
 	_bitrate[_current++]=size;
@@ -255,7 +256,7 @@ void DIA_encoding::feedFrame(uint32_t size)
 void DIA_encoding::feedAudioFrame(uint32_t size)
 {
 	uint32_t br;
-	assert(dialog);
+	ADM_assert(dialog);
 	_totalSize+=size;
 	_audioSize+=size;
 	setSize(_totalSize>>20);

@@ -25,7 +25,7 @@
 #include <math.h>
 #include <time.h>
 #include <sys/time.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -51,11 +51,11 @@ MpegMuxer::MpegMuxer( void )
 }
 MpegMuxer::~MpegMuxer(  )
 {
-	assert(!packStream);
+	ADM_assert(!packStream);
 }
 uint8_t MpegMuxer::forceRestamp(void)
 {
-	assert(packStream);
+	ADM_assert(packStream);
 	((PackStream *)packStream)->forceRestamp=1;
 	return 1;
 }
@@ -118,7 +118,7 @@ float bn,sn;
 uint8_t MpegMuxer::writeVideoPacket(uint32_t len, uint8_t *buf)
 {
 int r;
-	assert(packStream);
+	ADM_assert(packStream);
 	if(!len)
 		{
 			 keepGoing=0;
@@ -132,7 +132,7 @@ int r;
 }
 uint8_t MpegMuxer::close ( void )
 {
-	assert(packStream);
+	ADM_assert(packStream);
 	 mux_close((PackStream *)packStream);
 	 packStream=NULL;
 	 return 1;
@@ -144,7 +144,7 @@ uint8_t MpegMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 int r;
 uint32_t t=0;
 uint32_t n;
-	assert(packStream);
+	ADM_assert(packStream);
 	if(!len)
 	{
 		printf("Stopping packet\n"); 
@@ -159,7 +159,7 @@ uint32_t n;
 	{
 		case AUDIO_ID_AC3: muxAC3();break;
 		case AUDIO_ID_MP2: muxMP2();break;
-		default:assert(0);
+		default:ADM_assert(0);
 	}
 	//aprintf("This round : %lu\n",t);  
 	if(byteTail>=MUX_BUFFER_SIZE)
@@ -175,7 +175,7 @@ uint32_t n;
 		printf("Head : %lu\n",byteHead);
 		printf("Delta: %lu\n",byteTail-byteHead);
 		printf("Pack : %lu\n",_packSize);
-		assert(0);
+		ADM_assert(0);
 	
 	}
 	return 1;
@@ -211,7 +211,7 @@ uint8_t MpegMuxer::muxAC3(void)
 		 return 1;
 	}
 	
-	assert(pos>buffer);
+	ADM_assert(pos>buffer);
 	uint32_t off=(uint32_t)(pos-&buffer[byteHead]);	
 	//printf("%lu\n",off);
 	mux_write_packet((PackStream *)packStream, 
@@ -261,7 +261,7 @@ uint8_t MpegMuxer::muxMP2(void)
 		 return 1;
 	}
 	
-	assert(pos>buffer);
+	ADM_assert(pos>buffer);
 	uint32_t off=(uint32_t)(pos-&buffer[byteHead]);	
 	//printf("%lu\n",off);
 	mux_write_packet((PackStream *)packStream, 

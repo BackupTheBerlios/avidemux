@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 #include <stdio.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "avifmt.h"

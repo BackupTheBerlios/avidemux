@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <sstream>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -36,7 +36,7 @@
 
 ADM_Audiocodec8Bits::ADM_Audiocodec8Bits( uint32_t fourcc) :   ADM_Audiocodec(fourcc)
 {
- 	assert(fourcc==WAV_8BITS||fourcc==WAV_8BITS_UNSIGNED);
+ 	ADM_assert(fourcc==WAV_8BITS||fourcc==WAV_8BITS_UNSIGNED);
 	if(fourcc==WAV_8BITS_UNSIGNED)
 			_unsign=1;
 	else

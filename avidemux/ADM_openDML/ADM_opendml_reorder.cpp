@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -48,7 +48,7 @@ uint8_t ret=1;
 uint32_t nbFrame= _videostream.dwLength;
 	// already done..
 	if( _reordered) return 1;
-	assert(_idx);
+	ADM_assert(_idx);
 	
 	index=new odmlIndex[nbFrame];
 	// clear B frame flag for last frames

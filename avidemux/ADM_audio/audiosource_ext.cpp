@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -63,7 +63,7 @@ uint32_t AVDMFileStream::read32(void)
     uint32_t val;
     uint8_t buf[5];
 
-    assert(fd);
+    ADM_assert(fd);
     if(fread(buf, 4, 1, fd) != 1) return 0; // hopefully it will fail somehere
 
 	val=buf[0]+(buf[1]<<8)+(buf[2]<<16)+(buf[3]<<24);
@@ -77,7 +77,7 @@ _________________________________________*/
 uint32_t AVDMFileStream::read(uint32_t len, uint8_t * buffer)
 {
     uint32_t rd;
-    assert(fd);
+    ADM_assert(fd);
 
     rd = fread(buffer, 1, len, fd);
     _pos+=rd;
@@ -89,7 +89,7 @@ uint32_t AVDMFileStream::read(uint32_t len, uint8_t * buffer)
 _________________________________________*/
 uint8_t AVDMFileStream::goTo(uint32_t newoffset)
 {
-    assert(fd);
+    ADM_assert(fd);
     if(0==fseek(fd, newoffset + _offset, SEEK_SET))
     {
 	   _pos=newoffset;

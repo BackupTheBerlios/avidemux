@@ -31,8 +31,7 @@ Skip factor=2
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 #include "config.h"
 #include "fourcc.h"

@@ -37,7 +37,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 
@@ -329,7 +329,7 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 					_otherPesRead=0;			
 					if(_otherPTS==MINUS_ONE) _otherPTS=pts;		
 				}
-				else assert(0);
+				else ADM_assert(0);
 			}
 			if(!len)
 			{
@@ -351,7 +351,7 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 			}
 			if(pid!=_thisPid)
 			{
-				assert(0);
+				ADM_assert(0);
 			}			
 			if(_pesLen>0) // ignore 0 size Pes
 			{

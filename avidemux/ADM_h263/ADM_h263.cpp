@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -161,7 +161,7 @@ uint8_t    h263Header::open(char *name)
 				return 0;
 			}
 	_idx=new h263Entry[nbImg+1];
-	assert(_idx);
+	ADM_assert(_idx);
 
 	last_pts=0;
 	nbImg=0;

@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <ADM_assert.h>
 
 
 #include "config.h"
@@ -176,7 +177,7 @@ uint8_t  mpegWritter::save_svcd(char *name)
 								);
 		break;
 	}
-	assert(0);
+	ADM_assert(0);
 	return 0;
 }
 
@@ -247,7 +248,7 @@ WAVHeader		*info=NULL,tmpinfo;
 						);
 		break;
 	}
-	assert(0);
+	ADM_assert(0);
 	return 0;
 }
 // ______________________________________________
@@ -298,7 +299,7 @@ DIA_encoding		*encoding;
 	}
 	else
 	{
-		assert(_muxer);
+		ADM_assert(_muxer);
 		
 
 	}
@@ -319,8 +320,8 @@ DIA_encoding		*encoding;
 	_buffer	=new uint8_t[_w*_h*2];
 	_buffer_out=new uint8_t[_w*_h*2];
 
-	assert(  _buffer);
-	assert(  _buffer_out);
+	ADM_assert(  _buffer);
+	ADM_assert(  _buffer_out);
 
 	encoding=new DIA_encoding(_fps1000);
 
@@ -366,7 +367,7 @@ DIA_encoding		*encoding;
 
 				}
 					break;
-		default: assert(0);
+		default: ADM_assert(0);
 	}
 
 	printf("\n--encoding started--\n");
@@ -542,8 +543,8 @@ int intra,q;
 	if(!init(name,mpegtype,interlaced,bff,widescreen)) return 0; // WLA
 	printf("\n mpeg2enc init done \n");
 
-	assert(  _buffer);
-	assert(  _buffer_out);
+	ADM_assert(  _buffer);
+	ADM_assert(  _buffer_out);
 
 	q=2; // q=2
 	encoding->setPhasis("1st Pass");
@@ -609,7 +610,7 @@ int intra,q;
 				}
 				break;
 		default:
-				assert(0);
+				ADM_assert(0);
 				break;
 	}
 
@@ -739,8 +740,8 @@ uint32_t		len,flags,type,outquant,audiolen;
 	}
 			printf("\n mpeg2enc init done \n");
 
-	assert(  _buffer);
-	assert(  _buffer_out);
+	ADM_assert(  _buffer);
+	ADM_assert(  _buffer_out);
 	encoding->reset();
 	encoding->setFrame (0, _total);
 
@@ -816,7 +817,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 			}
 			break;
 		default:
-				assert(0);
+				ADM_assert(0);
 				break;
 	}
 	encoding->setPhasis("2nd Pass");
@@ -1117,7 +1118,7 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm,uint8_t silent)
 	double    one_frame_double, one_delta_frame;
   	WAVHeader *wav = NULL;
 
-  	assert (_audio);
+  	ADM_assert (_audio);
 
   	wav = _audio->getInfo ();
   
@@ -1131,7 +1132,7 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm,uint8_t silent)
   	
   	// compute duration of a audio frame
   	// in ms
-  	assert (fps1000);
+  	ADM_assert (fps1000);
   	printf (" fps : %lu\n", fps1000);
   	one_frame_double = (double) fps1000;
   	one_frame_double = 1. / one_frame_double;
@@ -1153,7 +1154,7 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm,uint8_t silent)
   	printf (" one PCM audio frame is %lu bytes (%f) \n", one_pcm_audio_frame,pcm);
 
   	// get the equivalent in bytes
-  	assert (wav);
+  	ADM_assert (wav);
   	one_frame_double /= 1000.;	// go back to seconds
   	one_frame_double *= wav->byterate;
 

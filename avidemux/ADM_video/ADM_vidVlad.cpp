@@ -23,8 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -126,14 +125,14 @@ AVDMVideoVlad::AVDMVideoVlad(  AVDMGenericVideoStream *in,CONFcouple *couples)
 	else
 	{
 		_param=NEW(VLAD_PARAM);
-		assert(_param);
+		ADM_assert(_param);
 	  _param->ythresholdMask=5;
  	  _param->cthresholdMask=0;
    }
     _mask=new uint8_t[_info.width*_info.height*3];
 	  _uncompressed=new uint8_t[_info.width*_info.height*3];
     _prev=new uint8_t[_info.width*_info.height*3];    
-	  assert(_mask);assert(_uncompressed);assert(_prev);
+	  ADM_assert(_mask);ADM_assert(_uncompressed);ADM_assert(_prev);
 	  memset(_mask,0,	_info.width*_info.height*3);
 	  
 	   ythresholdMask=0;
@@ -148,7 +147,7 @@ AVDMVideoVlad::AVDMVideoVlad(  AVDMGenericVideoStream *in,CONFcouple *couples)
 uint8_t	AVDMVideoVlad::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(2);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))

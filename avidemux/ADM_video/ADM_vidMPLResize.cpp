@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "fourcc.h"
 #include "avio.hxx"
@@ -182,7 +182,7 @@ uint8_t AVDMVideoStreamMPResize::reset(uint32_t nw, uint32_t old,uint32_t algo)
 								flags=SWS_BICUBIC;break;
 						case 2: //Lanczos
 								flags=SWS_LANCZOS;break;
-						default:assert(0);
+						default:ADM_assert(0);
 
 					}
 #ifdef USE_MMX
@@ -280,7 +280,7 @@ AVDMVideoStreamMPResize::AVDMVideoStreamMPResize(
 uint8_t	AVDMVideoStreamMPResize::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(3);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
@@ -316,7 +316,7 @@ uint8_t AVDMVideoStreamMPResize::getFrameNumberNoAlloc(uint32_t frame,
 				return 0;
 			}
 	
-			assert(_param);
+			ADM_assert(_param);
 
        			if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 

@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -161,7 +161,7 @@ uint8_t AVDMProcessAudio_Normalize::preprocess(void)
 		// Clipping ?
 		if (db > 32767.)
 		  {
-		      //assert(0);
+		      //ADM_assert(0);
 		      db = 32767.;
 		  }
 		j = (int16_t) floor(db);
@@ -189,7 +189,7 @@ uint32_t AVDMProcessAudio_Normalize::read(uint32_t len, uint8_t * buffer)
 {
     uint32_t rd, i;
     int16_t *s;
-    assert(_scanned);
+    ADM_assert(_scanned);
     rd = _instream->readDecompress(len, buffer);
     s = (int16_t *) buffer;
     for (i = 0; i < (rd >> 1); i++)

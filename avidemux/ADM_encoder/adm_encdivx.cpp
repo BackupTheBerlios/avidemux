@@ -58,14 +58,14 @@ uint8_t EncoderDivx::configure( AVDMGenericVideoStream *instream)
 {
      //  COMPRES_PARAMS par;
 
-		assert(instream);
+		ADM_assert(instream);
         ADV_Info 			*info;
 
 		info=instream->getInfo(  );
 		_w=info->width;
 		_h=info->height;
 		_vbuffer=new uint8_t[_w*_h*3];
-		assert(_vbuffer);
+		ADM_assert(_vbuffer);
 
 
 		switch(_param.mode)
@@ -83,7 +83,7 @@ uint8_t EncoderDivx::configure( AVDMGenericVideoStream *instream)
                      								_codec->init( 2,info->fps1000);
 										break;
 		default:
-					assert(0);
+					ADM_assert(0);
 
         }
        		_in=instream;
@@ -96,7 +96,7 @@ uint8_t EncoderDivx::configure( AVDMGenericVideoStream *instream)
 
 uint8_t EncoderDivx::startPass1( void )
 {
-		   	assert(_state==  enc_Pass1);
+		   	ADM_assert(_state==  enc_Pass1);
 			_frametogo=0;
 			printf("\n Starting pass 1\n");
 			printf(" Creating logfile :%s\n",_logname);
@@ -133,8 +133,8 @@ uint8_t EncoderDivx::encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t 
 uint32_t l,f;
 myENC_RESULT enc;
 
-		assert(_codec);
-		assert(_in);
+		ADM_assert(_codec);
+		ADM_assert(_in);
 
 		if(!_in->getFrameNumberNoAlloc(frame,&l,_vbuffer,&f))
 		{
@@ -153,7 +153,7 @@ myENC_RESULT enc;
                               break;
 
 				default:
-							assert(0);
+							ADM_assert(0);
         }
 		return 0;
 }

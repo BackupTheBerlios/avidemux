@@ -17,8 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -81,7 +80,7 @@ ADMVideoStabilize::ADMVideoStabilize(AVDMGenericVideoStream *in,CONFcouple *coup
   if(couples)
   {
 			_param=NEW(uint32_t);
-			assert(couples->getCouple((char *)"param",_param));
+			ADM_assert(couples->getCouple((char *)"param",_param));
 	}
 	else
 	{
@@ -102,7 +101,7 @@ ADMVideoStabilize::~ADMVideoStabilize()
 uint8_t	ADMVideoStabilize::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(1);
  			(*couples)->setCouple((char *)"param",*_param);
 
@@ -137,7 +136,7 @@ uint8_t										*_current;
 			*len=uvlen+(uvlen>>1);
 		    if(frame> _info.nb_frames-1) return 0;
 			_current=vidCache->getImage(frame);
-			assert(_current);
+			ADM_assert(_current);
 			if(!frame || (frame==_info.nb_frames-1))
 			{
 					memcpy(data,_current,*len);
@@ -182,8 +181,8 @@ uint8_t										*_current;
 				PONDERATE(*(nl),1);
 				PONDERATE(*(pl),1);
 													//*zout=(uint8_t)floor(0.49+(c/coeff));
-																assert(coeff);
-				assert(coeff<16);
+																ADM_assert(coeff);
+				ADM_assert(coeff<16);
 				*zout=(c*fixMul[coeff])>>16;
 				zout++;
 				incur++;

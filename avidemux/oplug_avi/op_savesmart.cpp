@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
+#include "ADM_assert.h" 
 
 #include <time.h>
 #include <sys/time.h>
@@ -194,7 +195,7 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
   aviInfo
     info;
   video_body->getVideoInfo (&info);
-  assert (0 == encoderReady);
+  ADM_assert (0 == encoderReady);
   encoderReady = 1;
   uint8_t ret=0;
   FFcodecSetting myConfig={
@@ -257,11 +258,11 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
 				}
 				else
 					{
-				       assert(0);
+				       ADM_assert(0);
 					}			
 			}
 #else
-			assert(0);
+			ADM_assert(0);
 			}			
 #endif
 
@@ -271,7 +272,7 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
 uint8_t
 GenericAviSaveSmart::stopEncoder (void)
 {
-  assert (1 == encoderReady);
+  ADM_assert (1 == encoderReady);
   encoderReady = 0;
   return (_encoder->stopEncoder ());
 }

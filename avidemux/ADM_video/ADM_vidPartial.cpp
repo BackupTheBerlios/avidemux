@@ -23,8 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -87,7 +86,7 @@ uint8_t	ADMVideoPartial::getCoupledConf( CONFcouple **couples)
 {
 			uint32_t nbParam=0;
 
-			assert(_param);
+			ADM_assert(_param);
 
 			// first we ask the child its config
 			CONFcouple *child;
@@ -136,7 +135,7 @@ ADMVideoPartial::~ADMVideoPartial()
 uint8_t ADMVideoPartial::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
           																	uint8_t *data,uint32_t *flags)
 {
-		assert(_son);
+		ADM_assert(_son);
 		if(frame>=_param->_start && frame<=_param->_end) // 
 		{
 				return _son->getFrameNumberNoAlloc(frame,len,data,flags);

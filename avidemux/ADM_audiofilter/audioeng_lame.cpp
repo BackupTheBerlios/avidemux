@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 //#include <stream.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -210,7 +210,7 @@ uint32_t AVDMProcessAudio_Lame::grab(uint8_t * obuffer)
       {
 	  printf("n Error !!! : %ld\n", nbout);
 
-	  assert(nbout > 0);
+	  ADM_assert(nbout > 0);
 	  return MINUS_ONE;
       }
     done = (uint32_t) nbout;

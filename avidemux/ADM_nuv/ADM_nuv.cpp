@@ -53,7 +53,7 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include "math.h"
@@ -325,10 +325,10 @@ uint8_t *planes[3];
 			default:
 					printf("\n unknown compression :%c\n",
 							_videoIndex[framenum]._compression);
-					assert(0);
+					ADM_assert(0);
 
 		}
-	assert(0);
+	ADM_assert(0);
 	return (0);
 }
 
@@ -485,10 +485,10 @@ uint32_t rcount=0;
 		// now parse header
 		rtfileheader *head;
 		head=new rtfileheader;
-		assert(head);
+		ADM_assert(head);
 		_nuv_header=(void *)head;
 
-		assert(fread(head,sizeof(rtfileheader),1,_fd));
+		ADM_assert(fread(head,sizeof(rtfileheader),1,_fd));
 		if(fourCC::check((uint8_t *)head->finfo,(uint8_t *)"Myth"))
 		{
 			_isMyth=1;
@@ -522,7 +522,7 @@ uint32_t rcount=0;
 
 		// compute audio duration
 		double_per_frame=DXFIELD(fps);
-		assert(double_per_frame);
+		ADM_assert(double_per_frame);
 
 		// fps -> 1/x = duration of a frame in ms.
 		double_per_frame=1.0f/double_per_frame;
@@ -596,7 +596,7 @@ uint32_t rcount=0;
 			if(frame.packetlength) fseeko(_fd,frame.packetlength,SEEK_CUR);
 
 //			printf("\n Position : %x\n",ftell(_fd));
-			assert(fread(&frame,sizeof(rtframeheader),1,_fd));
+			ADM_assert(fread(&frame,sizeof(rtframeheader),1,_fd));
 
 #ifdef DEBUG
 			printf("\n Type  : %c",frame.frametype);
@@ -624,7 +624,7 @@ uint32_t rcount=0;
 						/* Store R tags in rqueue for indexing/ chop by external tools */
 						rcount++;
 						n=(ChaineD *)malloc(sizeof(ChaineD));
-						assert(n);
+						ADM_assert(n);
 						n->_next=NULL;
 						n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
 						n->_frame->comptype='R';
@@ -669,7 +669,7 @@ uint32_t rcount=0;
 						// we insert a dummy packet in audio chain to compensate
 												
 						n=(ChaineD *)malloc(sizeof(ChaineD));
-						assert(n);
+						ADM_assert(n);
 						n->_next=NULL;
 						n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
 						n->_frame->packetlength=THRESHOLD;
@@ -700,7 +700,7 @@ uint32_t rcount=0;
 
 										old=ftello(_fd);
 										buffer=new uint8_t[frame.packetlength];
-										assert(buffer);
+										ADM_assert(buffer);
 
 										_lzo_pos=old;
 										_lzo_size=frame.packetlength;
@@ -750,14 +750,14 @@ uint32_t rcount=0;
 						{
 							printf("extra ;  %lu , packet %lu\n",_ffv1_extraLen,
 											frame.packetlength);
-							assert(0);
+							ADM_assert(0);
 
 						}
 						// some codecs need extra data to be initialized properly
 						if(_ffv1_extraLen)
 						{
 							_ffv1_extraData=new uint8_t[_ffv1_extraLen];
-							assert(_ffv1_extraData);
+							ADM_assert(_ffv1_extraData);
 							fread(_ffv1_extraData,_ffv1_extraLen,1,_fd);
 
 						}
@@ -798,7 +798,7 @@ uint32_t rcount=0;
 				case 'V':
 						if(!sync_met) break;
 						n=(ChaineD *)malloc(sizeof(ChaineD));
-						assert(n);
+						ADM_assert(n);
 						n->_next=NULL;
 						n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
 						memcpy(n->_frame,&frame,sizeof(frame));
@@ -824,7 +824,7 @@ uint32_t rcount=0;
 						if(!_isPCM)
 						{
 							n=(ChaineD *)malloc(sizeof(ChaineD));
-							assert(n);
+							ADM_assert(n);
 							n->_next=NULL;
 							n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
 							memcpy(n->_frame,&frame,sizeof(frame));
@@ -847,7 +847,7 @@ uint32_t rcount=0;
 									break;
 							}
 						n=(ChaineD *)malloc(sizeof(ChaineD));
-						assert(n);
+						ADM_assert(n);
 						n->_next=NULL;
 						n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
 
@@ -864,7 +864,7 @@ uint32_t rcount=0;
 						current_audio+=alen; //frame.packetlength;
 						break;
 				default:
-//					assert(0);
+//					ADM_assert(0);
 					printf("\n Type unknown : %c %d\n",frame.frametype,frame.frametype);
 					cont=0;
 					break;
@@ -893,7 +893,7 @@ uint32_t rcount=0;
 							// we insert a dummy packet in audio chain to compensate
 
 						n=(ChaineD *)malloc(sizeof(ChaineD));
-						assert(n);
+						ADM_assert(n);
 						n->_next=NULL;
 						n->_frame=(rtframeheader *)malloc(sizeof(rtframeheader));
 						n->_frame->packetlength=iestim-current_audio;
@@ -921,9 +921,9 @@ uint32_t rcount=0;
 		_rIndex=new nuvIndex[rcount];
 		_rcount=rcount;
 
-		assert(_videoIndex);
-		assert(_audioIndex);
-		assert(_tableIndex);
+		ADM_assert(_videoIndex);
+		ADM_assert(_audioIndex);
+		ADM_assert(_tableIndex);
 		
 		ChaineD *p;
 		uint32_t kf=0;
@@ -932,7 +932,7 @@ uint32_t rcount=0;
       		n=vhead._next;
 		for(uint32_t i=0;i<v-t;i++)
 		{
-			assert(n);
+			ADM_assert(n);
 			_videoIndex[i]._pos=n->_pos;	
 			_videoIndex[i]._len=n->_frame->packetlength;
 			if( _videoIndex[i]._len>max) max=_videoIndex[i]._len;
@@ -961,7 +961,7 @@ uint32_t rcount=0;
 		uint32_t i;
 		for(  i=0;i<rcount;i++)
 		{
-			assert(n);
+			ADM_assert(n);
 			_rIndex[i]._pos=n->_pos;
 			_rIndex[i]._len=n->_frame->packetlength;
 			_rIndex[i]._compression=n->_frame->comptype;
@@ -976,7 +976,7 @@ uint32_t rcount=0;
        		n=ahead._next;
 		for(  i=0;i<a;i++)
 		{
-			assert(n);
+			ADM_assert(n);
 			_audioIndex[i]._pos=n->_pos;
 			_audioIndex[i]._len=n->_frame->packetlength;
 			_audioIndex[i]._compression=n->_frame->comptype;
@@ -1363,7 +1363,7 @@ FILE *fd;
 		if(!_isXvid && !_isMyth)
 		{
 			aprintf("Rtjpeg old type..\n");
-			assert(_lzo_size);
+			ADM_assert(_lzo_size);
 			//uint64_t pos;
 
 			fseeko(_fd,_lzo_pos,SEEK_SET);

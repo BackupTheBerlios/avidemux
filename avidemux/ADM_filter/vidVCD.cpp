@@ -23,9 +23,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>

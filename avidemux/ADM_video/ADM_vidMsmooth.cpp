@@ -32,8 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -147,7 +146,7 @@ Msmooth::Msmooth(AVDMGenericVideoStream *in,CONFcouple *couples)
 		}
 		
 	uint32_t sz=(_info.width*_info.height*3)>>1;
-	#define NW(x) x=new uint8_t[sz];assert(x);
+	#define NW(x) x=new uint8_t[sz];ADM_assert(x);
 	NW(blur);
 	NW(work);
 	NW(mask);
@@ -187,7 +186,7 @@ Msmooth::~Msmooth(void)
 uint8_t Msmooth::configure(AVDMGenericVideoStream *in)
 {
 	_in=in;
-	assert(_param);
+	ADM_assert(_param);
 	//return  DIA_getDecombDecimate(_param);
 	//return 1;
 	return DIA_getMSmooth(_param);
@@ -199,7 +198,7 @@ char *Msmooth::printConf( void )
 {
  	static char buf[50];
 
-	assert(_param);
+	ADM_assert(_param);
  	sprintf((char *)buf," Donald Graft MSmooth");
         return buf;
 }

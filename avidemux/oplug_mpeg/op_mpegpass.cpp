@@ -19,6 +19,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <errno.h>
+#include <ADM_assert.h>
 
 #include "ADM_library/default.h"
 #include "avi_vars.h"
@@ -120,7 +121,7 @@ void mpeg_passthrough(  char *name )
       
       work->update (i - frameStart, frameEnd - frameStart);
       if(!work->isAlive()) goto _abt;
-      assert (video_body->getFlags (i, &flags));
+      ADM_assert (video_body->getFlags (i, &flags));
       if (flags & AVI_B_FRAME)	// oops
 	{
 	  // se search for the next i /p
@@ -128,7 +129,7 @@ void mpeg_passthrough(  char *name )
 
 	for (uint32_t j = i + 1; j < frameEnd; j++)
 	{
-		assert (video_body->getFlags (j, &flags));
+		ADM_assert (video_body->getFlags (j, &flags));
 		if (!(flags & AVI_B_FRAME))
 		{
 			found = j;

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "ADM_assert.h" 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -53,7 +54,7 @@ uint8_t  DIA_setUserMuxParam( int *mode, int *param, int *muxsize)
 					RADIO_SET(radioBytes,1);
          				break  ;
                		default:
-                 				assert(0);
+                 				ADM_assert(0);
                      }
 		ADJ_SET(spinbutton3,*muxsize);
 
@@ -77,7 +78,7 @@ uint8_t  DIA_setUserMuxParam( int *mode, int *param, int *muxsize)
 							*param=ADJ_GET(spinSize);
 							break;
 					default:
-							assert(0);
+							ADM_assert(0);
 							break;
 				}
 

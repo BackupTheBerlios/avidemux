@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -68,7 +68,7 @@ uint8_t
 			       uint32_t seg, uint32_t relframe)
 {
   uint32_t curseg = 0;
-  assert (seg < _nb_segment);
+  ADM_assert (seg < _nb_segment);
   *framenum = 0;
   while (curseg < seg)
     {

@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #define MINUS_ONE 0xffffffff
 
@@ -57,7 +57,7 @@ oggAudio::oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx )
 	
 	_demuxer=new OGMDemuxer();
 	
-	assert(_demuxer->open(name));
+	ADM_assert(_demuxer->open(name));
 	
 	_wavheader=new   WAVHeader;
 	memset(  _wavheader,0,sizeof( WAVHeader));
@@ -173,7 +173,7 @@ uint64_t f;
 		_inBuffer+=sizehdr;
 		_demuxer->readBytes(size,_buffer+_inBuffer);
 		_inBuffer+=size;	
-		assert(_inBuffer<64*1024);		
+		ADM_assert(_inBuffer<64*1024);		
 		aprintf("\n audio in buffer : %lu\n",_inBuffer);			
 		return 1;
 	}

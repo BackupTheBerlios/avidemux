@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>

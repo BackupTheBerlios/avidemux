@@ -44,8 +44,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -184,7 +183,7 @@ SCRIPT_CREATE(decimate_script,Decimate,decdecParam);
 uint8_t Decimate::configure(AVDMGenericVideoStream *in)
 {
 	_in=in;
-	assert(_param);
+	ADM_assert(_param);
 	return  DIA_getDecombDecimate(_param);
 	
 }
@@ -193,7 +192,7 @@ char *Decimate::printConf( void )
 {
  	static char buf[50];
 
-	assert(_param);
+	ADM_assert(_param);
  	sprintf((char *)buf," Decomb Decimate cycle:%d",_param->cycle);
         return buf;
 }
@@ -243,7 +242,7 @@ Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples)
 			_param->threshold2=3.0;
 		}
 		
-		assert(_param->cycle);
+		ADM_assert(_param->cycle);
 		vidCache=new VideoCache(_param->cycle*2+1,in);
 		
 		if (_param->mode == 0 || _param->mode == 2 || _param->mode == 3)
@@ -257,7 +256,7 @@ Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples)
 		last_request = -1;
 		firsttime = true;
 		sum = (unsigned int *) malloc(MAX_BLOCKS * MAX_BLOCKS * sizeof(unsigned int));
-		assert(sum);		
+		ADM_assert(sum);		
 		all_video_cycle = true;
 
 		if (debug)

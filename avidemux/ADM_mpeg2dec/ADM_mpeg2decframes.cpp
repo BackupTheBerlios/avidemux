@@ -22,7 +22,7 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include <math.h>
@@ -86,7 +86,7 @@ uint8_t  	mpeg2decHeader::getRaw(uint32_t framenum,uint8_t *ptr,uint32_t* framel
 }
 uint8_t	mpeg2decHeader::asyncJump(uint32_t frame)
 {
-		assert(_indexMpegPTS[frame].type=='I');
+		ADM_assert(_indexMpegPTS[frame].type=='I');
 		 if(!demuxer->_asyncJump(_indexMpegPTS[frame].offset,
                                                                 _indexMpegPTS[frame].absoffset))
 			{
@@ -120,7 +120,7 @@ uint32_t mpeg2decHeader::getFlags(uint32_t frame,uint32_t *flags)
 			case 'P': *flags=0; break;
 			case 'B': *flags=AVI_B_FRAME; break;
 			default:
-					assert(0);
+					ADM_assert(0);
 					return 0;
 	}
 	return 1;

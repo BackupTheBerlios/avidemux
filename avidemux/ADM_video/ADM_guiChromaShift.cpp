@@ -18,12 +18,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
-#include <assert.h>
 #include "config.h"
 
 #include "fourcc.h"
@@ -102,16 +101,16 @@ uint32_t l,f;
 							printf("\n Chromashift in : %lu  x %lu\n",ww,hh);
 
 							video_src=new uint8_t [ww*hh*2];
-							assert(video_src);
+							ADM_assert(video_src);
 							video_working=new uint8_t [ww*hh*2];
-							assert(video_working);
+							ADM_assert(video_working);
 
 							video_rgb=new uint8_t [ww*hh*4];
-							assert(video_rgb);
+							ADM_assert(video_rgb);
 
 
 							// ask current frame from previous filter
-							assert(instream->getFrameNumberNoAlloc(curframe, &l,
+							ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l,
           														video_src,&f));
 
 							shift_u=_param->u;

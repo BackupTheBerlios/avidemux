@@ -20,14 +20,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
 #include "config.h"
 #include "ADM_editor/ADM_edit.hxx"
-#include "assert.h"
 #include "ADM_video/ADM_genvideo.hxx"
 
 
@@ -42,14 +41,14 @@ aviInfo aviinf;
 
   	// now build infos
 
-  	assert(_in->getVideoInfo(&aviinf));
+  	ADM_assert(_in->getVideoInfo(&aviinf));
   	_info.width=aviinf.width;
   	_info.height=aviinf.height;
   	_info.nb_frames=nb;
 	_start=start;
   	_info.encoding=0;
 	_info.fps1000=aviinf.fps1000;
-	assert(start+nb<=aviinf.nb_frames);
+	ADM_assert(start+nb<=aviinf.nb_frames);
 	printf("\n Raw stream initizlized with start frame = %lu\n",_start);
 }
 AVDMVideoStreamRaw::~AVDMVideoStreamRaw()

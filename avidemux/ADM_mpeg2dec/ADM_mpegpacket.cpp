@@ -22,7 +22,7 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <string.h>
 #include "config.h"
 #include <math.h>
@@ -127,7 +127,7 @@ uint32_t val,hnt;
 								return 0;	
 							}
 							printf("\n  Bumped into something at %llu / %llu but going on\n",pos,_size);
-							if(!_size) assert(0);
+							if(!_size) ADM_assert(0);
 							// else we go on...
 							hnt=(read8i()<<16) + (read8i()<<8) +read8i();
 					}

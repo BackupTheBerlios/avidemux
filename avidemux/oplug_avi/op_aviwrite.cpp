@@ -25,7 +25,7 @@
 
 #include <string.h>
 #include <strings.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -61,7 +61,7 @@ aviWrite::aviWrite( void )
 }
 uint8_t aviWrite::sync( void )
 {
-	assert(_out);
+	ADM_assert(_out);
 	fflush(_out);
 	return 1;
 
@@ -111,8 +111,8 @@ uint8_t aviWrite::updateHeader (MainAVIHeader * mainheader,
 uint8_t aviWrite::writeMainHeader( void )
 {
 
-  assert (_out);
-  assert (LAll == NULL);
+  ADM_assert (_out);
+  ADM_assert (LAll == NULL);
 
   fseek (_out, 0, SEEK_SET);	// rewind
 
@@ -141,7 +141,7 @@ uint8_t aviWrite::writeMainHeader( void )
 uint8_t aviWrite::writeVideoHeader( uint8_t *extra, uint32_t extraLen )
 {
 
-  assert (_out);
+  ADM_assert (_out);
 
       _videostream.fccType = fourCC::get ((uint8_t *) "vids");
       _bih.biSize=sizeof(_bih)+extraLen;
@@ -207,7 +207,7 @@ uint32_t extraLen=0;
 	wmaheader[25-16]=01;
 
         wav = stream->getInfo ();
-      assert (wav);
+      ADM_assert (wav);
 
       memset (header, 0, sizeof (AVIStreamHeader));
       header->fccType = fourCC::get ((uint8_t *) "auds");
@@ -237,7 +237,7 @@ uint32_t extraLen=0;
     
 		  if (wav->blockalign ==1152)	// VBR audio
 			{			// We do like nandub do
-		  	//assert (audiostream->asTimeTrack ());
+		  	//ADM_assert (audiostream->asTimeTrack ());
 		  	wav->blockalign = 1152;	// just a try
 		     	wav->bitspersample = 16;
 		  
@@ -325,7 +325,7 @@ uint8_t aviWrite::saveBegin (char 	*name,
 	asize=asize2=0;
 
 //  Sanity Check
-  	assert (_out == NULL);
+  	ADM_assert (_out == NULL);
   	if (!(_out = fopen (name, "wb")))
   {
 		printf("Problem writing : %s\n",name);
@@ -381,7 +381,7 @@ uint8_t aviWrite::saveBegin (char 	*name,
 	LMain=NULL;
   //
 
-  assert (!LMovie);
+  ADM_assert (!LMovie);
   	LMovie = new AviList ("LIST", _out);
   LMovie->Begin ("movi");
   curindex = 0;
@@ -528,7 +528,7 @@ uint8_t aviWrite::setStreamInfo (FILE * fo,
 
   junklen = maxxed - sizeof (AVIStreamHeader) - infolen-extraLen;
   junk = (uint8_t *) malloc (junklen);
-  assert (junk);
+  ADM_assert (junk);
   memset (junk,0, junklen);
   //
   // Fill junk with out info string  
@@ -554,7 +554,7 @@ uint32_t pos;
 	 // we take size of file + index
 	 // with 32 bytes per index entry
 	 // 
-	 assert(_out);
+	 ADM_assert(_out);
 	 pos=ftello(_out);
 	 return pos+curindex*4*4;	 	
 }

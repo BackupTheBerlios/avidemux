@@ -20,8 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 #include <math.h>
 
 #include "config.h"
@@ -100,7 +99,7 @@ ADMVideoFlux::ADMVideoFlux(AVDMGenericVideoStream *in,CONFcouple *couples)
 uint8_t	ADMVideoFlux::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(2);
 
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
@@ -172,7 +171,7 @@ uint32_t plane=_info.width*_info.height;
 				 case 0: return 0; break;
 				 case 1: memcpy(data,_buffer[index_c],size); return 1; break;
 				 case 2: break;
-				 default:assert(0);
+				 default:ADM_assert(0);
 			}				 
 				
 //	printf("\n Action\n");		
@@ -348,17 +347,17 @@ void ADMVideoFlux::DoFilter_C(
 					++cnt;
 				}
 
-				assert(sum >= 0);
-				assert(sum < 2806);
-				assert(cnt > 0);
-				assert(cnt < 12);
+				ADM_assert(sum >= 0);
+				ADM_assert(sum < 2806);
+				ADM_assert(cnt > 0);
+				ADM_assert(cnt < 12);
 
 				*destp++ = (uint8_t )(((sum * 2 + cnt) * scaletab[cnt]) >> 16);
 				++currp;
 			} else
 				*destp++ = *currp++;
 		} while(--xcnt);
-		assert(xcnt == 0);
+		ADM_assert(xcnt == 0);
 
 		*destp = *currp; // Copy right edge
 
@@ -367,7 +366,7 @@ void ADMVideoFlux::DoFilter_C(
 		nextp += skip;
 		destp += dskip;
 	} while(--ycnt);
-	assert(ycnt == 0);
+	ADM_assert(ycnt == 0);
 
 }
 #ifdef USE_MMX

@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
+#include "ADM_assert.h"
 
 
 #include <time.h>
@@ -168,7 +169,7 @@ uint32_t ADM_ogmWriteCopy::searchForward(uint32_t startframe)
 					return fw;
 
 				}
-				assert(r);
+				ADM_assert(r);
 				if(!r)
 				{
 					printf("\n Could not locate last non B frame \n");

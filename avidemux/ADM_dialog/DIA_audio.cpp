@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
+#include "ADM_assert.h" 
 
 
 #include <gdk/gdkkeysyms.h>
@@ -60,14 +61,14 @@
 		case RESAMPLING_NONE:			RADIO_SET(radiobuttonNone,1);break;
 		case RESAMPLING_DOWNSAMPLING:		RADIO_SET(radiobutton2,1);break;
 		case RESAMPLING_CUSTOM:			RADIO_SET(radiobuttonSox,1);break;
-		default:assert(0);
+		default:ADM_assert(0);
 	}
 	switch(*filmconv)
 	{	
 		case FILMCONV_NONE:		RADIO_SET(radiobutton_fpsnone,1);break;
 		case FILMCONV_FILM2PAL:		RADIO_SET(radiobutton_fpsfilm,1);break;
 		case FILMCONV_PAL2FILM:		RADIO_SET(radiobutton_fpsPAL,1);break;
-		default:assert(0);
+		default:ADM_assert(0);
 	}
 	result=gtk_dialog_run(GTK_DIALOG(dialog));
 			
@@ -91,14 +92,14 @@
 						else if(RADIO_GET(radiobuttonSox))
 							*downsamplingmethod=RESAMPLING_CUSTOM; 
 							else
-								assert(0);
+								ADM_assert(0);
 					if(RADIO_GET(radiobutton_fpsnone)) *filmconv=FILMCONV_NONE;
 					else if(RADIO_GET(radiobutton_fpsfilm)) 
 						*filmconv=FILMCONV_FILM2PAL;
 						else if(RADIO_GET(radiobutton_fpsPAL))
 							*filmconv=FILMCONV_PAL2FILM; 
 							else
-								assert(0);
+								ADM_assert(0);
 					
 					break;
 		default:

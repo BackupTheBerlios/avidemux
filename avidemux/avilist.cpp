@@ -25,7 +25,7 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 
 
@@ -48,9 +48,9 @@
 AviList::AviList(const char *name, FILE * f)
 {
     _fcc = fourCC::get((uint8_t *) name);
-    assert(_fcc);
+    ADM_assert(_fcc);
     _ff = f;
-    assert(_ff);
+    ADM_assert(_ff);
     //_begin=_end=(fpos_t )0;
 }
 
@@ -75,7 +75,7 @@ uint8_t AviList::End(void)
     uint32_t len, b, e;
 
 
-//      assert(_begin);
+//      ADM_assert(_begin);
     fgetpos(_ff, &_end);
 #ifdef NO_LARGE_FILE
     e = (uint32_t) ftell(_ff);
@@ -152,7 +152,7 @@ uint8_t AviList::Write32(uint8_t * c)
 {
     uint32_t fcc;
     fcc = fourCC::get(c);
-    assert(fcc);
+    ADM_assert(fcc);
     Write32(fcc);
     return 1;
 }
@@ -164,7 +164,7 @@ uint8_t AviList::WriteChunk(uint8_t * chunkid, uint32_t len, uint8_t * p)
     fcc = fourCC::get(chunkid);
 //
 //              len=(len+1) & 0xfffffffe;
-    assert(fcc);
+    ADM_assert(fcc);
     Write32(fcc);
     Write32(len);
     Write(p, len);

@@ -19,8 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -72,7 +71,7 @@ ADMVideoChromaShift::ADMVideoChromaShift(  AVDMGenericVideoStream *in,CONFcouple
 
  	//_uncompressed=(uint8_t *)malloc(3*_in->getInfo()->width*_in->getInfo()->height);
  	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  	assert(_uncompressed);
+  	ADM_assert(_uncompressed);
   	_info.encoding=1;
 }
 
@@ -80,7 +79,7 @@ ADMVideoChromaShift::ADMVideoChromaShift(  AVDMGenericVideoStream *in,CONFcouple
 uint8_t	ADMVideoChromaShift::getCoupledConf( CONFcouple **couples)
 {
 
-			assert(_param);
+			ADM_assert(_param);
 			*couples=new CONFcouple(2);
 
 
@@ -121,8 +120,8 @@ uint8_t ADMVideoChromaShift::getFrameNumberNoAlloc(uint32_t frame,
    																	uint32_t *flags)
 {
 
-			assert(frame<_info.nb_frames);
-			assert(_param);									
+			ADM_assert(frame<_info.nb_frames);
+			ADM_assert(_param);									
 								
 			// read uncompressed frame
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;

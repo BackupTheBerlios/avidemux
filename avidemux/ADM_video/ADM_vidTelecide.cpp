@@ -16,8 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <assert.h>
+#include <ADM_assert.h>
 
 #include "config.h"
 #include "fourcc.h"
@@ -63,7 +62,7 @@ ADMVideoTelecide::ADMVideoTelecide(	AVDMGenericVideoStream *in,CONFcouple *setup
 
 
 	_next=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
-  assert(_next);
+  ADM_assert(_next);
   _instock=0xFFFF0000;
   	  	
 }
@@ -115,8 +114,8 @@ uint32_t 	cmatch,nmatch,n2match;
 
 			
 
-			assert(frame<_info.nb_frames);
-			assert(_uncompressed);					
+			ADM_assert(frame<_info.nb_frames);
+			ADM_assert(_uncompressed);					
 			
 			uvlen=    _info.width*_info.height;
 			*len=uvlen+(uvlen>>1);
