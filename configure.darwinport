@@ -1,0 +1,9 @@
+#!/bin/bash
+export PATH=/opt/local/bin:$PATH
+export LD_LIBRARY_PATH=/opt/local/lib:$LD_LIBRARY_PATH
+export CPPFLAGS="-I/opt/local/include"
+export CFLAGS=$CPPFLAGS
+export CXXFLAGS=$CPPFLAGS
+export LDFLAGS="-L/opt/local/lib"
+./configure --prefix=/opt/local --with-extra-includes=/opt/local/include --with-extra-libs=/opt/local/lib --enable-altivec
+
