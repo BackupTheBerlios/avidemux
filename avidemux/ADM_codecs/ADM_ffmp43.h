@@ -29,6 +29,8 @@
 					uint8_t			_allowNull; 	
 					uint32_t		_swapUV;	
 					uint32_t  		frameType( void );
+					
+					uint32_t		_showMv;
      public:
      					decoderFF(uint32_t w,uint32_t h);
          		virtual		~decoderFF();

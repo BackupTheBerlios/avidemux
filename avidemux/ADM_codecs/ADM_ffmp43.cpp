@@ -42,7 +42,7 @@
 #define MODULE_NAME  MODULE_CODEC
 #include "ADM_toolkit/ADM_debug.h"
 
-
+extern uint8_t DIA_lavDecoder(uint32_t *swapUv, uint32_t *showU);
 extern "C"
 {
 int av_is_voppacked(AVCodecContext *avctx);
@@ -56,11 +56,7 @@ uint8_t  decoderFF::isDivxPacked( void )
 //________________________________________________
 void decoderFF::setParam( void )
 {
-		if(GUI_Question("Invert u & v ?"))
-			_swapUV=1;
-		else
-			_swapUV=0;
-
+	DIA_lavDecoder(&_swapUV,&_showMv);
         return; // no param for ffmpeg
 }
 
@@ -91,7 +87,13 @@ decoderFF::decoderFF(uint32_t w,uint32_t h) :decoders(w,h)
 			   
 			    _swapUV=0;
 				//_context->strict_std_compliance=-1;
+				
+				_showMv=0;
+#define FF_SHOW		(FF_DEBUG_VIS_MV_P_FOR+	FF_DEBUG_VIS_MV_B_FOR+FF_DEBUG_VIS_MV_B_BACK)
+//#define FF_SHOW		(FF_DEBUG_VIS_MV_P_FOR)
 			    printf("FFMpeg build : %d\n", LIBAVCODEC_BUILD);
+			_context->debug_mv 	|=FF_SHOW;
+			_context->debug		|=FF_DEBUG_VIS_MB_TYPE+FF_DEBUG_VIS_QP;
 }
 
 //_____________________________________________________
@@ -157,6 +159,18 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
  int strideTab2[3];
  int ret=0;
 
+ 		if(_showMv) 
+		{
+			_context->debug_mv 	|= FF_SHOW;
+			_context->debug		|=0;//FF_DEBUG_VIS_MB_TYPE;
+			//_context->debug	|=FF_DEBUG_VIS_MB_TYPE+FF_DEBUG_VIS_QP;
+		}
+		else 
+		{
+			_context->debug_mv 	&=~FF_SHOW;
+			_context->debug		&=~(FF_DEBUG_VIS_MB_TYPE+FF_DEBUG_VIS_QP);
+		}
+			
 		if(len==0 && !_allowNull) // Null frame, silently skipped
 				{
             				if(flagz) *flagz=AVI_KEY_FRAME;
