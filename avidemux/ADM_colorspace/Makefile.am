@@ -5,7 +5,7 @@ INCLUDES = $(all_includes)
 
 libADM_colorspace_a_METASOURCES = AUTO
 
-libADM_colorspace_a_SOURCES = yv12_rgb.cpp yv12_422p.cpp yv2bmp.cpp yuv.cpp rgb2yuv.cpp
+libADM_colorspace_a_SOURCES = yv12_rgb.cpp yv12_422p.cpp yv2bmp.cpp yuv.cpp rgb2yuv.cpp yv12rgb_altivec.cpp
 
 
 EXTRA_DIST = colorspace.h yv12_422p.cpp yv12_rgb.cpp yv2bmp.cpp
