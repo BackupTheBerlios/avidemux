@@ -59,7 +59,7 @@ void GUI_FileSelWrite(const char *label, char * * name)
     GUI_FileSel(label, NULL, 1,name);
 }
 
-#if (GTK_MINOR_VERSION*10+GTK_MICRO_VERSION)<34
+#if 1 or (GTK_MINOR_VERSION*10+GTK_MICRO_VERSION)<34
 
 void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 {				/* Create the selector */

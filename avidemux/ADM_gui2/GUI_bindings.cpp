@@ -144,7 +144,8 @@ uint8_t ret=0;
 		// and seek global sub entity
 		ret= bindGUI();		
 		if(ret) gtk_widget_show(guiRootWindow);
-		
+		// Set it as always low level
+		//gtk_window_set_keep_below(GTK_WINDOW(guiRootWindow), 1);
 		renderInit();
 		
 	return ret;

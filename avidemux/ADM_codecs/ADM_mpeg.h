@@ -22,6 +22,7 @@
   class decoderMpeg: public decoders
 {
      protected:
+     					uint8_t		_seen;
 				      uint8_t 		*_seqHeader;
 				      uint32_t		_seqLen;
 				      uint8_t		_seqFound;

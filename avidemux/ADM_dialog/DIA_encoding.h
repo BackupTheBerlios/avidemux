@@ -9,12 +9,17 @@ private:
 		uint32_t  _lastTime;
 		uint32_t  _lastFrame;
 		uint32_t _fps_average;
-		uint32_t _totalSize;
+		uint64_t _totalSize;
+		uint64_t _audioSize;
+		uint64_t _videoSize;
 		uint32_t _bitrate[60];
 		uint32_t _roundup;
 		uint32_t _current;
+	
 		void setBitrate(uint32_t br);
 		void setSize(int size);
+		void setAudioSize(int size);
+		void setVideoSize(int size);
 public:
 		DIA_encoding( uint32_t fps1000 );
 		~DIA_encoding( );
@@ -23,6 +28,7 @@ public:
 		void setPhasis(const char *n);
 		void setCodec(const char *n);
 		void feedFrame(uint32_t br);		
+		void feedAudioFrame(uint32_t br);		
 		void setQuant(uint32_t quant);
 		void setFrame(uint32_t nb,uint32_t total);
 		

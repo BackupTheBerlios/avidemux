@@ -190,6 +190,7 @@ uint8_t  mpegWritter::save_svcd(char *name)
 				audioread = _audio->read (audiolen,_audioBuffer); \
 				if(audioread!=audiolen) printf("Mmm not enough audio..\n"); \
 				_muxer->writeAudioPacket(audioread,_audioBuffer);\
+				encoding->feedAudioFrame(audioread); \
 				audioGot+=audioread;}
 				
 /*---------------------------------------------------------------------------------------*/

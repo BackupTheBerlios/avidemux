@@ -239,6 +239,7 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 		// get it in t, post process it to out
 		if(flag)
 		{
+			//switch(_seen)
 			switch(MPEG2DEC->decoder.coding_type)
 			{
 				case I_TYPE:*flag=AVI_KEY_FRAME;break;
@@ -329,10 +330,13 @@ void  decoderMpeg::decode_mpeg2 (uint8_t * current, uint8_t * end)
 	case STATE_PICTURE:
 	    /* might skip */
 	    /* might set fbuf */
-
+		
+		_seen=MPEG2DEC->decoder.coding_type;
+		printf("1st %d\n",_seen);
 	    break;
 	case STATE_PICTURE_2ND:
-	    /* should not do anything */
+	    	/* should not do anything */
+	    	printf("2nd\n");
 	    break;
 	case STATE_SLICE:
 	case STATE_END:

@@ -417,6 +417,7 @@ GenericAviSave::writeAudioChunk (void)
       if (len)
 	{
 	  writter->saveAudioFrame (len, abuffer);
+	  encoding_gui->feedAudioFrame(len);
 	}
       return 1;
 
