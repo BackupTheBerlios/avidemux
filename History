@@ -9,6 +9,16 @@
 			+ Fix memory leak induced by raw shift<<<===			
 			
        *********************** /TODO ***************************
+       29.02.2004	
+       		- Max bitrate for DVD upped
+		- alsa 1.x support
+		- vlad patch
+		- fix the little bugs from 2.0.22 
+		- Some warnings removed
+		- added lrintf autodetect in ./configure
+		- added EMULATE_FAST in ./configure
+		- added iconv /const ** to ./configure
+-----------2.0.22---------------------------       
        24.02.2004
        		- Fixed a/v sync correction that was disabled due to silent parameters
        22.02.2004
