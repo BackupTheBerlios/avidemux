@@ -177,18 +177,20 @@ protected:
 
 
 			
-        		 uint32_t  _timeoffset;
-				 int32_t  _byteoffset;	
-     			 uint32_t  _startoffset;			
-				 uint32_t  _outpos;
+        		 uint32_t  _starttime;		// actual start time
+			 int32_t   _msoff;		// copy of parameter
+			 uint8_t   _filterOn;		// filter active ?
+     			 uint32_t  _startoffset;
+			 uint32_t  _sampleOffset;
+
 
 		
 public:
 						
-			~AVDMProcessAudio_RawShift();
-        		AVDMProcessAudio_RawShift(AVDMGenericAudioStream *instream,
-				int32_t msoffset,
-               			uint32_t starttime	);		 // offset in ms
+				~AVDMProcessAudio_RawShift();
+        			AVDMProcessAudio_RawShift(AVDMGenericAudioStream *instream,
+					int32_t msoffset,
+					uint32_t starttime	);		 // offset in ms
         	virtual uint32_t read(uint32_t len,uint8_t *buffer);
 		virtual uint8_t  goTo(uint32_t newoffset);
 		virtual uint8_t  goToTime(uint32_t newoffset);
@@ -199,6 +201,8 @@ public:
 					{
 						 return _instream->extraData(l,d);
 					}
+		virtual	uint8_t		getPacket(uint8_t *dest, uint32_t *len, 
+							uint32_t *samples);
 		   		
 };
  //_____________________________________________
