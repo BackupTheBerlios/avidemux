@@ -118,6 +118,11 @@ uint8_t ADMImage::duplicate(ADMImage *src)
                 // We have to use the alternate informations
                 // to copy & compact at the same time
                 //
+
+                ADM_assert(src->_planeStride[0]);
+                ADM_assert(src->_planeStride[1]);
+                ADM_assert(src->_planeStride[2]);
+
                 uint8_t *in,*out;
                 uint32_t w,h,stride;
 

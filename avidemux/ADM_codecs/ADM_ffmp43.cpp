@@ -423,6 +423,8 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 		uint8_t *otmp= out->data;
 		uint32_t stride;
 
+                ADM_assert(!dontcopy());
+
 		stride=  _frame.linesize[0 ];
 
 		for(uint32_t y=_h;y>0;y--)
