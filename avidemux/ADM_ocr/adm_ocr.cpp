@@ -116,24 +116,24 @@ uint8_t ADM_ocr_engine( void)
     gtk_register_dialog(dialog);
 #define ASSOCIATE(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
     ASSOCIATE(buttonStart,actionGo);
-    ASSOCIATE(buttonAccept,   actionAccept);
+    ASSOCIATE(buttonOk,   actionAccept);
     ASSOCIATE(buttonSkip,     actionSkip);
     ASSOCIATE(buttonIgnore,   actionIgnore);
     
-    ASSOCIATE(buttonLoad,   actionLoadGlyph);
-    ASSOCIATE(buttonSave,   actionSaveGlyph);
+    ASSOCIATE(buttonGlyphLoad,   actionLoadGlyph);
+    ASSOCIATE(buttonGlyphSave,   actionSaveGlyph);
     
-    ASSOCIATE(buttonSelectVob,   actionLoadVob);
-    ASSOCIATE(buttonSRT,   actionSaveSub);
+    ASSOCIATE(buttonVobsub,   actionLoadVob);
+    ASSOCIATE(buttonSrt,   actionSaveSub);
    
     gtk_widget_show(dialog);
 //  disable
     
-    mainDisplay=WID(drawingareaVobSub);
-    smallDisplay=WID(drawingareaMini);
+    mainDisplay=WID(drawingareaBitmap);
+    smallDisplay=WID(drawingareaSmall);
     
-    CONNECT(drawingareaVobSub,expose_event,gui_draw);
-    CONNECT(drawingareaMini,expose_event,gui_draw_small);
+    CONNECT(drawingareaBitmap,expose_event,gui_draw);
+    CONNECT(drawingareaSmall,expose_event,gui_draw_small);
 _again:    
     if(!setup()) goto endIt;
     printf("Go go go\n");
@@ -145,15 +145,17 @@ _again:
 //  Time to go
     // Inactivate frame1=gliph    frame2=in/out  buttonStart
     gtk_widget_set_sensitive(WID(buttonStart),0);
-    gtk_widget_set_sensitive(WID(frame1),0);
-    gtk_widget_set_sensitive(WID(frame2),0);
+    gtk_widget_set_sensitive(WID(frameGlyph),0);
+    gtk_widget_set_sensitive(WID(frameLoad),0);
+    gtk_widget_set_sensitive(WID(frameBitmap),1);
+
     gtk_widget_set_sensitive(WID(buttonStart),0);
     // Activate output
-    gtk_widget_set_sensitive(WID(Current_Glyph),1);
+   // gtk_widget_set_sensitive(WID(Current_Glyph),1);
     //
   
    char *fileout;
-   fileout=(char *)gtk_label_get_text(GTK_LABEL(WID(labelSRT)));
+   fileout=(char *)gtk_label_get_text(GTK_LABEL(WID(labelSrt)));
    if(!fileout)
     {
         GUI_Alert("Ouptut file incorrect!");
@@ -232,16 +234,16 @@ _again:
              sprintf(text,"%03d/%03d",i+1,nbSub);
              gtk_label_set_text(GTK_LABEL(WID(labelNbLines)),text);
              sprintf(text,"%03d",nbGlyphs);
-             gtk_label_set_text(GTK_LABEL(WID(labelNbGLyph)),text);
+             gtk_label_set_text(GTK_LABEL(WID(labelNbGlyphs)),text);
     }
 
 endIt:
     // Final round
-    gtk_widget_set_sensitive(WID(frame1),1);
-    gtk_widget_set_sensitive(WID(frame2),0);
+    gtk_widget_set_sensitive(WID(frameGlyph),1);
+    gtk_widget_set_sensitive(WID(frameLoad),0);
     gtk_widget_set_sensitive(WID(buttonStart),0);  
-    gtk_widget_set_sensitive(WID(frame5),0);
-    gtk_widget_set_sensitive(WID(Current_Glyph),0); 
+    gtk_widget_set_sensitive(WID(frameBitmap),0);
+   // gtk_widget_set_sensitive(WID(Current_Glyph),0); 
     
     if(nbGlyphs && actionSaveGlyph==gtk_dialog_run(GTK_DIALOG(dialog)))
         saveGlyph();
@@ -448,14 +450,14 @@ uint8_t glyphToText(admGlyph *glyph)
                 // Draw it
                 displaySmall(glyph); 
                 gtk_label_set_text(GTK_LABEL(WID(labelText)),decodedString);
-                gtk_editable_delete_text(GTK_EDITABLE(WID(entryEntry)), 0,-1);
+                gtk_editable_delete_text(GTK_EDITABLE(WID(entry)), 0,-1);
                 
                 //gtk_widget_set_sensitive(WID(buttonAccept),1);
                 //gtk_widget_set_sensitive(WID(buttonSkip),1);
                 //gtk_widget_set_sensitive(WID(entryEntry),1);
                 
-                gtk_widget_grab_focus (WID(entryEntry));
-                gtk_widget_grab_default (WID(buttonAccept));
+                gtk_widget_grab_focus (WID(entry));
+                gtk_widget_grab_default (WID(buttonOk));
                 
                 //printf("i\n");
                 switch(gtk_dialog_run(GTK_DIALOG(dialog)))
@@ -466,7 +468,7 @@ uint8_t glyphToText(admGlyph *glyph)
                         nbGlyphs++;
                         break;
                 case actionAccept:
-                    string =gtk_editable_get_chars(GTK_EDITABLE (WID(entryEntry)), 0, -1);
+                    string =gtk_editable_get_chars(GTK_EDITABLE (WID(entry)), 0, -1);
                     if(string&& strlen(string))
                     {
                         glyph->code=ADM_strdup(string);
@@ -485,7 +487,7 @@ uint8_t glyphToText(admGlyph *glyph)
                     break; // Abort
                     
                 }
-                gtk_editable_delete_text(GTK_EDITABLE(WID(entryEntry)), 0,-1);
+                gtk_editable_delete_text(GTK_EDITABLE(WID(entry)), 0,-1);
                 //gtk_widget_set_sensitive(WID(buttonAccept),0);
                 //gtk_widget_set_sensitive(WID(buttonSkip),0);
                 //gtk_widget_set_sensitive(WID(entryEntry),0);
@@ -622,12 +624,12 @@ char text[1024];
     GTK_PURGE;   
     // Main loop : Only accept glyph load/save
     // Sub & srt select & start ocr
-    gtk_widget_set_sensitive(WID(frame1),1);
-    gtk_widget_set_sensitive(WID(frame2),1);
+    gtk_widget_set_sensitive(WID(frameGlyph),1);
+    gtk_widget_set_sensitive(WID(frameLoad),1);
     gtk_widget_set_sensitive(WID(buttonStart),1);
     
-    gtk_widget_set_sensitive(WID(frame5),0);
-    gtk_widget_set_sensitive(WID(Current_Glyph),0); 
+    gtk_widget_set_sensitive(WID(frameBitmap),0);
+    //gtk_widget_set_sensitive(WID(Current_Glyph),0); 
      switch(sel=gtk_dialog_run(GTK_DIALOG(dialog)))
      {
         case actionLoadVob:
@@ -638,7 +640,7 @@ char text[1024];
                         if(DIA_vobsub(&subparam))
                         {
                             lang_index=subparam.index;
-                            gtk_label_set_text(GTK_LABEL(WID(labelVobSub)),subparam.subname);
+                            gtk_label_set_text(GTK_LABEL(WID(labelVobsub)),subparam.subname);
                         }
                         
                     
@@ -650,7 +652,7 @@ char text[1024];
                     GUI_FileSelWrite("Select SRT to save", &srt);
                     if(srt)
                     {
-                        gtk_label_set_text(GTK_LABEL(WID(labelSRT)),srt);
+                        gtk_label_set_text(GTK_LABEL(WID(labelSrt)),srt);
                     }
                 }
                 break;
@@ -664,7 +666,7 @@ char text[1024];
                     {
                             loadGlyph(gly);
                             sprintf(text,"%03d",nbGlyphs);
-                            gtk_label_set_text(GTK_LABEL(WID(labelNbGLyph)),text);
+                            gtk_label_set_text(GTK_LABEL(WID(labelNbGlyphs)),text);
                     }
             }
                 break;
