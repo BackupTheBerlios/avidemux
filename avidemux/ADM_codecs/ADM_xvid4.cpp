@@ -583,7 +583,7 @@ int ret;
 	
 	//xvid_enc_frame.quant = 2;
 	xvid_enc_frame.bitstream = out;
-	xvid_enc_frame.input.plane[0] = in;
+	xvid_enc_frame.input.plane[0] = YPLANE(in);
 	
 
 	
@@ -686,7 +686,7 @@ int ret;
 	preAmble(in->data);
 		
 	xvid_enc_frame.bitstream = out;
-	xvid_enc_frame.input.plane[0] = in;
+	xvid_enc_frame.input.plane[0] = YPLANE(in);
 	
 
 	
