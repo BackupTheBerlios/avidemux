@@ -609,6 +609,32 @@ int z=0
 ])
 
 AC_MSG_RESULT($use_cygwin)
+
+
+dnl ______________ vectors ? for altivec mainly and a bit of 386 (fft) _______
+use_builtin=no
+AC_MSG_CHECKING(Built in vectors)
+
+
+AC_TRY_COMPILE([
+	
+#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 2)
+#else
+#error no vector builtins
+#endif
+],
+int z=0
+,[
+  use_builtin=yes
+])
+
+AC_MSG_RESULT(use_builtin)
+if test "use_builtin" = "xyes"; then
+	AC_DEFINE(HAVE_BUILTIN_VECTOR,1,[Enable altivec by default])
+fi
+ 
+
+
 dnl ____________________ CPU____________________________
 
 adm_cpu=`uname -m`;
@@ -720,8 +746,7 @@ d
 esac
 ALTIVEC_SWITCH=''
 if test "x$have_altivec" = "xyes"; then
-		echo "TARGET_ALTIVEC=yes" >> adm_lavcodec/config.cpu
-		AC_DEFINE(HAVE_BUILTIN_VECTOR,1,[Enable altivec by default])
+		echo "TARGET_ALTIVEC=yes" >> adm_lavcodec/config.cpu		
 		AC_DEFINE(HAVE_ALTIVEC,1,[Enable altivec by default])
 		if test "x$have_darwin" = "xno"; then
 			AC_DEFINE(HAVE_ALTIVEC_H,1,[Enable altivec by default])
@@ -816,6 +841,7 @@ echo " Altivec             : $have_altivec"
 echo " MacOsX(Darwin)      : $have_darwin"
 echo " nasm                : $have_nasm ( $AS )"
 echo " Cygwin              : $use_cygwin"
+echo " Gcc supports vectors: $use_builtin"
  if test "x$have_xml2" = "xno"; then
  	echo "************ LIBXML2 IS MANDATORY ***************"
  	echo "************ get it from http://www.xmlsoft.org*********"
