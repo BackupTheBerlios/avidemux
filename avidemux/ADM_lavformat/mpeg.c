@@ -1030,11 +1030,13 @@ static int output_packet(AVFormatContext *ctx, int flush){
     int best_i= -1;
     int best_score= INT_MIN;
     int ignore_constraints=0;
+    int data_present;
     int64_t scr= s->last_scr;
     PacketDesc *timestamp_packet;
     const int64_t max_delay= av_rescale(ctx->max_delay, 90000, AV_TIME_BASE);
 
 retry:
+    data_present=0;
     for(i=0; i<ctx->nb_streams; i++){
         AVStream *st = ctx->streams[i];
         StreamInfo *stream = st->priv_data;
@@ -1048,7 +1050,7 @@ retry:
         if(avail_data==0)
             continue;
         assert(avail_data>0);
-
+	data_present++;
         if(space < s->packet_size && !ignore_constraints)
             continue;
             
@@ -1072,6 +1074,7 @@ retry:
             if(pkt_desc && pkt_desc->dts < best_dts)
                 best_dts= pkt_desc->dts;
         }
+	if(!data_present && flush) return 0; // Meanx : avoid being stuck in there
 
 #if 0
         av_log(ctx, AV_LOG_DEBUG, "bumping scr, scr:%f, dts:%f\n", 

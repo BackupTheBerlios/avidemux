@@ -130,17 +130,26 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHea
 	c->width = info->width;  
 	c->height = info->height; 
 	
-    
-	if(_fps1000==23976 || _fps1000==29970)
+    	switch(_fps1000)
 	{
-		c->frame_rate = 30000;  
-		c->frame_rate_base = 1001;
+		case 25000:
+			c->frame_rate = 25000;  
+			c->frame_rate_base = 1000;	
+			break;
+		case 23976:
+			c->frame_rate = 24000;  
+			c->frame_rate_base = 1001;	
+			break;
+		case  29970:
+			c->frame_rate = 30000;  
+			c->frame_rate_base = 1001;	
+			break;
+		default:
+			GUI_Alert("FPS is not suitable!");
+			return 0;
 	}
-	else
-	{
-		c->frame_rate = 25000;  
-		c->frame_rate_base = 1000;	
-	}		
+
+			
 	c->gop_size=15;
 	c->max_b_frames=2;
 	c->has_b_frames=1;
@@ -218,7 +227,7 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 	    f/=_audioByterate;
             _total+=len;
 	    
-            pkt.dts=pkt.pts=f+2000;
+            pkt.dts=pkt.pts=(int64_t)floor(f+2000);
 	   
             pkt.stream_index=1;
            
@@ -246,11 +255,12 @@ uint8_t lavMuxer::needAudio( void )
 	    	f/=_audioByterate;
 		f+=2000;
 		dts=(uint64_t)floor(f);
-		aprintf("Need audio  ?: %llu / %llu\n",dts,_curDTS);
+		aprintf("Need audio  ?: %llu / %llu : %llu\n ",dts,_curDTS,_curDTS+one);
 		if((dts>=_curDTS) && (dts<=_curDTS+one)) return 1;
 		if(dts<=_curDTS)
 		{
 			printf("LavMuxer:Audio DTS is too low %llu / %llu!\n",dts,_curDTS);
+			return 1;
 		}
 		return 0;
 }
@@ -271,13 +281,12 @@ double p,d;
 	d=(d*1000*1000*1000);
 	d=d/_fps1000;
 	
-	_curDTS=pkt.dts= ( (int)floor(d));
-	pkt.pts= ( (int)floor(p));
 	
 	_curDTS=(int64_t)floor(d);
 	
 	pkt.dts=(int64_t)floor(d);
 	pkt.pts=(int64_t)floor(p);
+	
 	aprintf("Lavformat : Pts :%llu dts:%llu",pkt.pts,pkt.dts);
 	pkt.stream_index=0;
            
@@ -314,7 +323,7 @@ uint8_t lavMuxer::close( void )
 		_running=0;
 		// Flush
 		// Cause deadlock :
-		//av_write_trailer(oc);
+		av_write_trailer(oc);
 		url_fclose(&oc->pb);
 
 	}
