@@ -664,7 +664,7 @@ PackStream *mux_open(char *fn,
 	
 	printf("Audio encoded fs: %d\n",ps->audio_encoded_fs);	
      ps->a_pts_ofs = A_PTS_MIN;
-     ps->v_pts_ofs = A_PTS_MIN;
+     ps->v_pts_ofs = V_PTS_MIN;
 	
   
 #if 0    
@@ -728,11 +728,17 @@ uint32_t hh,mm,ss,ff;
 	mm=floor( rel/60.);
 	rel=rel-mm*60.;
 	ss=floor( rel);
+	
+	rel-=ss; // we got the leftover in seconds
+	rel/=ps->pict_duration;
+	ff=(int)floor(ff);
 	//printf("new : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
 	
 	*(ptr+0)=(hh<<2)+(mm>>4);
 	*(ptr+1)=((mm&0xf)<<4)+8+(ss>>3);
 	*(ptr+2)= ((ss&7)<<5)+(ff>>1);
+	*(ptr+3)&=0x7f;
+	*(ptr+3)+=(ff&1) <<7;
 	
 	// lowest bits of ff is left untouched
 	a1=*ptr;

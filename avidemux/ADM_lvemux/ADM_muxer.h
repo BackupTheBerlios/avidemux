@@ -11,7 +11,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#define MUX_MPEG_VRATE 8000000
+#define MUX_MPEG_VRATE 0
 #define MUX_BUFFER_SIZE 200*1024
 class MpegMuxer
 {
@@ -21,6 +21,11 @@ class MpegMuxer
 	uint32_t byteTail;
 	uint32_t _packSize;
 	uint8_t  buffer[MUX_BUFFER_SIZE*2];
+	
+	uint8_t muxAC3(void);
+	uint8_t muxMP2(void);
+	uint32_t frequency;
+	uint32_t audioBitrate;
 public:
 		MpegMuxer(void );
 		~MpegMuxer(  );

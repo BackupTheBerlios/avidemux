@@ -37,6 +37,17 @@
 extern "C" {
 	#include "ADM_lvemux/mux_out.h"
 };
+
+#ifdef USE_AC3
+
+#include "avi_vars.h"
+extern "C"
+{
+#include "a52dec/a52.h"
+}
+#endif
+
+
 MpegMuxer::MpegMuxer( void )
 {
 	packStream=NULL;
@@ -67,7 +78,17 @@ float bn,sn;
 	
 	// lookup audio info from wavheader
 	abitrate=audioheader->byterate*8;
-	frequency=audioheader->frequency;
+	
+#ifndef USE_AC3
+	if(audioheader->encoding==WAV_AC3)
+	{
+		GUI_Alert("I need liba52 to write mpeg/ac3 !");
+		return 0;
+		
+	}
+#endif	
+	this->frequency=frequency=audioheader->frequency;
+	audioBitrate=(audioheader->byterate*8)/1000;
 	switch(audioheader->encoding)
 	{
 		case WAV_MP2: audioType=AUDIO_ID_MP2;break;
@@ -104,6 +125,23 @@ float bn,sn;
 	return 1;
 
 }
+uint8_t MpegMuxer::writeVideoPacket(uint32_t len, uint8_t *buf)
+{
+int r;
+	assert(packStream);
+	r=mux_write_packet((PackStream *)packStream, 
+                               VIDEO_ID, buf, (int) len); 
+	return 1;
+
+}
+uint8_t MpegMuxer::close ( void )
+{
+	assert(packStream);
+	 mux_close((PackStream *)packStream);
+	 packStream=NULL;
+	 return 1;
+	
+}
 
 uint8_t MpegMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 {
@@ -115,17 +153,12 @@ uint32_t n;
 	byteTail+=len;
 	
 	
-	n=(byteTail-byteHead)/_packSize;
-	if(n)
-	
+	switch(audioType)
 	{
-		//printf("Writing :%d bytes\n",n*_packSize);
-		r=mux_write_packet((PackStream *)packStream, 
-                               audioType, buffer+byteHead, n*_packSize); 
-		byteHead+=n*_packSize;
-		t+=n*_packSize;
+		case AUDIO_ID_AC3: muxAC3();break;
+		case AUDIO_ID_MP2: muxMP2();break;
+		default:assert(0);
 	}
-			     
 	//aprintf("This round : %lu\n",t);  
 	if(byteTail>=MUX_BUFFER_SIZE)
 	{
@@ -144,23 +177,96 @@ uint32_t n;
 	
 	}
 	return 1;
-
 }
-uint8_t MpegMuxer::writeVideoPacket(uint32_t len, uint8_t *buf)
+// Give as much complete AC3 frames as possible
+//
+uint8_t MpegMuxer::muxAC3(void)
 {
-int r;
-	assert(packStream);
-	r=mux_write_packet((PackStream *)packStream, 
-                               VIDEO_ID, buf, (int) len); 
+#ifndef USE_AC3
+	assert(0);
+#endif
+	uint8_t *end=&buffer[byteTail];	
+	uint8_t *ptr=&buffer[byteHead];	
+	uint8_t *pos=NULL;
+	int len=0;
+	
+	
+	int flags,samprate,bitrate;
+	
+	
+	while(ptr+8<end)
+	{
+		// look for a new AC3 sync word
+		 if( (len=a52_syncinfo (ptr,&flags, &samprate, &bitrate))>0)
+		 {
+		 	pos=ptr;
+			ptr+=len;
+		 }
+		 else
+		 	ptr++;
+	}
+	// Write out the result
+	if(!pos)
+	{
+		printf("Could not sync :%lu \n",byteTail-byteHead);
+		 return 1;
+	}
+	
+	assert(pos>buffer);
+	uint32_t off=(uint32_t)(pos-&buffer[byteHead]);	
+	//printf("%lu\n",off);
+	mux_write_packet((PackStream *)packStream, 
+                              AUDIO_ID_AC3, &buffer[byteHead], off); 
+	byteHead+=off;
+	return 1;
+}
+//
+//	Borrowed from lvemux
+//
+uint8_t MpegMuxer::muxMP2(void)
+{
+ static const int sr[] = {44100, 48000, 32000, 0};
+ static const int br[] = {0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0 };
+  	
+	uint8_t *end=&buffer[byteTail];	
+	uint8_t *ptr=&buffer[byteHead];	
+	uint8_t *pos=NULL;
+	
+	
+	uint16_t startcode=0;
+	static uint16_t longword;
+	
+	while(ptr+4<end)
+	{
+		startcode=(startcode<<8)+*ptr;
+		if(startcode==0xfff || ((startcode&0xfff0)==0xfff0))
+		{
+			// grab bitrate & frequency
+			longword=(startcode<<8)+*(ptr+1);
+			if(startcode==0xfff)  longword<<=4;
+			if(sr[((longword & 0xC) >> 2)&3]==frequency)
+				if(br[((longword & 0xF0) >> 4)&0xF]==audioBitrate)
+				{
+					pos=ptr-1;				
+					ptr+=3;
+				}	
+		}
+		ptr++;
+	}
+	// Write out the result
+	if(!pos || pos<=&buffer[byteHead])
+	{
+		 printf("Could not sync :%lu \n",byteTail-byteHead);
+		 return 1;
+	}
+	
+	assert(pos>buffer);
+	uint32_t off=(uint32_t)(pos-&buffer[byteHead]);	
+	//printf("%lu\n",off);
+	mux_write_packet((PackStream *)packStream, 
+                              AUDIO_ID_MP2, &buffer[byteHead], off); 
+	byteHead+=off;
 	return 1;
 
-}
-uint8_t MpegMuxer::close ( void )
-{
-	assert(packStream);
-	 mux_close((PackStream *)packStream);
-	 packStream=NULL;
-	 return 1;
-	
 }
 
