@@ -94,7 +94,8 @@ typedef struct
 
   //-- diverse --
   int       is_stdout; 
-  
+  int	    framecount; //MEANX : need to get correct gop
+  uint8_t   forceRestamp; // Meanx : If set force gop timestamp recomputation
   //--   pack'ed output stream buffer --
   uint8_t   stream_buf[256*1024];
   int       buf_level;

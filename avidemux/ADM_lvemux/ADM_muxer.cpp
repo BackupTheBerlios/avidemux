@@ -46,7 +46,12 @@ MpegMuxer::~MpegMuxer(  )
 {
 	assert(!packStream);
 }
-
+uint8_t MpegMuxer::forceRestamp(void)
+{
+	assert(packStream);
+	((PackStream *)packStream)->forceRestamp=1;
+	return 1;
+}
 uint8_t MpegMuxer::open(char *filename, uint32_t vbitrate, uint32_t fps1000, WAVHeader *audioheader)
 {
 
@@ -114,6 +119,7 @@ uint32_t n;
 	if(n)
 	
 	{
+		printf("Writing :%d bytes\n",n*_packSize);
 		r=mux_write_packet((PackStream *)packStream, 
                                audioType, buffer+byteHead, n*_packSize); 
 		byteHead+=n*_packSize;

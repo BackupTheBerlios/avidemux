@@ -38,7 +38,7 @@
 #define HW_LB 2
 #define LW_HB 1
 #define LW_LB 0
-
+static int mean_update_gop(PackStream *ps, uint8_t *ptr);
 static void put_bits(BitPack *bp, int n, uint32_t value)
 {
   uint8_t *pv   = (uint8_t *)&value;
@@ -651,10 +651,12 @@ PackStream *mux_open(char *fn,
     ps->audio_id    = audio_id;
     ps->audio_bound = 1;
     ps->audio_delay = 0; //(audio_id == 0x80)? 200:0;
-    ps->audio_max_buf_size = 4 * 1024;
-    ps->audio_pts   = 0;
+    ps->audio_max_buf_size = 4 * 1024;    
+    ps->framecount  = 0;
     // MEANX
     // We set clean default value...
+    ps->audio_pts   = 0;
+    ps->forceRestamp= 0;
     if(audio_id==AUDIO_ID_AC3)
     	ps->audio_encoded_fs=(int)ceil((AC3_FRAME_SIZE *a_bit_rate)/(8*sample_rate));
     else
@@ -688,8 +690,66 @@ void mux_close(PackStream *ps)
     if (!ps->is_stdout) fclose(ps->fp);
   }
 }
+//
+//	Meanx: In case we copy/paste stuff, we may need to recompute the
+//	gop timestamp
+//
+//
+int mean_update_gop(PackStream *ps, uint8_t *ptr)
+{
+double oldms;
+double newms;
+double news,rel;
+uint8_t a1,a2,a3,a4;
+uint32_t hh,mm,ss,ff;
+	// compute time
+	newms=ps->framecount;
+	newms*=ps->pict_duration; // newms is in ms
+	
+	
+	
+	// get old timestamp
+	a1=*ptr;
+	a2=*(ptr+1);
+	a3=*(ptr+2);
+	a4=*(ptr+3);
+	hh=(a1>>2)&0x1f;
+	mm=((a1&3)<<4)+(a2>>4);
+	ss=((a2&7)<<3)+(a3>>5);
+	ff=((a3&0x1f)<<1)+(a4>>7);
+	
+	printf("Old : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
+	
+	
+	// Rebuild gop timestamp
+	news=newms/1000.;
+	hh=floor(news/(3600.));
+	rel=news-hh*3600.;
+	mm=floor( rel/60.);
+	rel=rel-mm*60.;
+	ss=floor( rel);
+	printf("new : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
+	
+	*(ptr+0)=(hh<<2)+(mm>>4);
+	*(ptr+1)=((mm&0xf)<<4)+8+(ss>>3);
+	*(ptr+2)= ((ss&7)<<5)+(ff>>1);
+	
+	// lowest bits of ff is left untouched
+	a1=*ptr;
+	a2=*(ptr+1);
+	a3=*(ptr+2);
+	a4=*(ptr+3);
+	hh=(a1>>2)&0x1f;
+	mm=((a1&3)<<4)+(a2>>4);
+	ss=((a2&7)<<3)+(a3>>5);
+	ff=((a3&0x1f)<<1)+(a4>>7);
+	
+	printf("Fixed : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
+	
+	
+	
 
-
+}
 int mux_write_packet(PackStream *ps, 
                      uint8_t pkt_id, uint8_t *pkt_buf, int pkt_len) 
 {
@@ -707,11 +767,21 @@ int mux_write_packet(PackStream *ps,
     //-------------------------------------------------
     if (pkt_id == VIDEO_ID) 
     {
+      
       if (pkt_len >= 4)
       {
+      	
         if ( !memcmp(pkt_buf, seq_start_code, 4) || !memcmp(pkt_buf, gop_start_code, 4) )
         {
-          //-- every 2nd. sequence/GOP insert a VOBU packet --
+		if(!memcmp(pkt_buf, gop_start_code, 4))
+		{
+			// MEANX
+			if(ps->forceRestamp)
+				mean_update_gop(ps,pkt_buf+4);
+			// /Meanx
+		}
+        
+	  //-- every 2nd. sequence/GOP insert a VOBU packet --
           if (ps->gop_cnt==0)
           {
             mux_put_vobu_pack(ps);
@@ -725,6 +795,7 @@ int mux_write_packet(PackStream *ps,
           //ps->audio_pts = ps->pts;
         }
       }
+      ps->framecount++; //MEANX
     }
     else if (pkt_len)
     {

@@ -101,7 +101,8 @@ void mpeg_passthrough(  char *name )
 		return ;
 		
 	}
-  
+	// In copy mode it is better to recompute the gop timestamp
+	muxer->forceRestamp();
   ///____________________________
   work=new DIA_working("Saving MpegPS stream");
 
