@@ -190,7 +190,7 @@ WAVHeader *info=NULL,tmpinfo;
 	}
 	
 	// Second, check video
-	if(strcmp(videoCodecGetName(),"DVD"))
+	if(strcmp(videoCodecGetName(),"DVD"))// && strcmp(videoCodecGetName(),"XSVCD"))
 	{
 		GUI_Alert("You need to select DVD as video codec!");
 		return;

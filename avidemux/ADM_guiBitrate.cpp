@@ -228,7 +228,7 @@ GtkWidget	*create_dialog1 (uint32_t max, float *value)
                     (GtkAttachOptions) (0), 0, 0);
 
 			p=value[j];
-			p=p/100.;
+			p=p/100.;	
        			gtk_progress_set_percentage(GTK_PROGRESS(progressbar1),(gfloat)p);
 
 	}

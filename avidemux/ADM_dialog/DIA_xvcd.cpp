@@ -48,6 +48,9 @@ uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 
 
 #define WID(x) lookup_widget(dialog,#x)
+#define CHECK_GET(x,y) {y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
+#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),y);}		
+
 	dialog=create_dialog1();
 	gtk_transient(dialog);	
   	gtk_window_set_title (GTK_WINDOW (dialog), title);
@@ -75,8 +78,9 @@ uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 	gtk_write_entry(WID(entry_min),(int) (conf->minBitrate *8)/1000);
 	gtk_write_entry(WID(entry_max),(int) (conf->maxBitrate *8)/1000);
  	gtk_option_menu_set_history (GTK_OPTION_MENU (WID(optionmenu1)),conf->user_matrix);
+	gtk_option_menu_set_history (GTK_OPTION_MENU (WID(optionmenu1)),conf->user_matrix);
  	gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton1)),(float)conf->gop_size) ;
-
+	CHECK_SET(checkbuttonxvid,conf->use_xvid_ratecontrol);
 	ret=-1;
 	while(ret==-1)
 	{
@@ -88,7 +92,7 @@ uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 				conf->maxBitrate=(gtk_read_entry(WID(entry_max))*1000)>>3;
 				conf->user_matrix= getRangeInMenu(WID(optionmenu1));
 				conf->gop_size= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(WID(spinbutton1)));
-
+				CHECK_GET(checkbuttonxvid,conf->use_xvid_ratecontrol);
 				r=RADIO_GET(radioCQ)+(2*RADIO_GET(radioCBR))+(4*RADIO_GET(radio2Pass));
 				printf("\n r: %d \n",r);
 				switch(r)
@@ -176,6 +180,8 @@ create_dialog1 (void)
   GtkWidget *label4;
   GtkObject *spinbutton1_adj;
   GtkWidget *spinbutton1;
+  GtkWidget *label5;
+  GtkWidget *checkbuttonxvid;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
@@ -186,7 +192,7 @@ create_dialog1 (void)
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
 
-  table1 = gtk_table_new (7, 2, FALSE);
+  table1 = gtk_table_new (8, 2, FALSE);
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), table1, TRUE, TRUE, 0);
 
@@ -284,7 +290,7 @@ create_dialog1 (void)
   gtk_widget_show (tmpeng_1);
   gtk_container_add (GTK_CONTAINER (menu1), tmpeng_1);
 
-  anim__1 = gtk_menu_item_new_with_mnemonic (_("Anime"));
+  anim__1 = gtk_menu_item_new_with_mnemonic (_("Anim\303\251"));
   gtk_widget_show (anim__1);
   gtk_container_add (GTK_CONTAINER (menu1), anim__1);
 
@@ -309,6 +315,20 @@ create_dialog1 (void)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton1), TRUE);
+
+  label5 = gtk_label_new (_("Use Xvid ratecontrol"));
+  gtk_widget_show (label5);
+  gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 7, 8,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
+
+  checkbuttonxvid = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkbuttonxvid);
+  gtk_table_attach (GTK_TABLE (table1), checkbuttonxvid, 1, 2, 7, 8,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -347,11 +367,12 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, k_vcd1, "k_vcd1");
   GLADE_HOOKUP_OBJECT (dialog1, label4, "label4");
   GLADE_HOOKUP_OBJECT (dialog1, spinbutton1, "spinbutton1");
+  GLADE_HOOKUP_OBJECT (dialog1, label5, "label5");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbuttonxvid, "checkbuttonxvid");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
 
   return dialog1;
 }
-
 

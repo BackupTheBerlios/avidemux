@@ -22,6 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+#define MINUS_ONE 0xffffffff
+
 #include "ADM_ogm/ADM_ogm.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_OGM_AUDIO
@@ -219,7 +222,12 @@ uint32_t i;
 	lenbyte=data[0];
 	lenbyte=(lenbyte>>6)+((lenbyte&2)<<1);
 	lenbyte=1+lenbyte;
-	assert(ssize>=lenbyte);
+	if(ssize<lenbyte)
+	{
+		printf("Oops:ssize %lu, lenbyte %d\n",ssize,lenbyte);
+		return MINUS_ONE;
+		
+	}
 	ssize-=lenbyte;
 	memmove(data,data+lenbyte,ssize);
 	return ssize;
