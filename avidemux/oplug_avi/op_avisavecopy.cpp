@@ -62,6 +62,14 @@ uint8_t GenericAviSaveCopy::setupVideo (char *name)
   //
   memcpy(&_videostreamheader,video_body->getVideoStreamHeader (),sizeof( _videostreamheader));
   memcpy(&_mainaviheader,video_body->getMainHeader (),sizeof(_mainaviheader));
+  
+  // Change both to divx/DX50
+  if(_needUserDataUpdate)
+  {
+  	_videostreamheader.fccHandler=fourCC::get((uint8_t *)"divx");
+	_bih.biCompression=fourCC::get((uint8_t *)"DX50");
+  
+  }
   /* update to fix earlier bug */
    _mainaviheader.dwWidth=_bih.biWidth;
    _mainaviheader.dwHeight=_bih.biHeight;
@@ -228,6 +236,8 @@ void updateUserData(uint8_t *start, uint32_t len)
 			// looks ok ?
 			if(strncmp((char *)start,"DivX",len))
 			{
+				memset(start,0,4); // should work better
+#if 0			
 				// looks for a p while not null
 				// if there isnt we will reach a new startcode
 				// and it will stop
@@ -250,6 +260,7 @@ void updateUserData(uint8_t *start, uint32_t len)
 				else	*start=0; // remove 'p'
 				*start=0;
 				return;
+#endif				
 			
 			}
 			
