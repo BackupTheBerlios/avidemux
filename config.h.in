@@ -1,0 +1,246 @@
+/* config.h.in.  Generated from configure.in by autoheader.  */
+
+/* Big endian cpu sparc or powerpc */
+#undef ADM_BIG_ENDIAN
+
+/* BSD os specific ifdef */
+#undef ADM_BSD_FAMILY
+
+/* be verbose */
+#undef ADM_DEBUG
+
+/* Sparc workstations */
+#undef ADM_SPARC
+
+/* "Use alsa as possible audio device" */
+#undef ALSA_SUPPORT
+
+/* Enable powerpc optim */
+#undef ARCH_POWERPC
+
+/* Altivec for libmpeg2 */
+#undef ARCH_PPC
+
+/* post proc */
+#undef ARCH_X86
+
+/* FFMPEG */
+#undef CONFIG_DECODERS
+
+/* FFMPEG */
+#undef CONFIG_ENCODERS
+
+/* FFMPEG */
+#undef CONFIG_MPEGAUDIO_HP
+
+/* FFMPEG */
+#undef CONFIG_RISKY
+
+/* FFMPEG */
+#undef CONFIG_X86
+
+/* BSD needs that */
+#undef EMULATE_FAST_INT
+
+/* Define to 1 if translation of program messages to the user's native
+   language is requested. */
+#undef ENABLE_NLS
+
+/* Define to 1 if you have the <a52dec/a52.h> header file. */
+#undef HAVE_A52DEC_A52_H
+
+/* Define to 1 if you have the <alsa/asoundlib.h> header file. */
+#undef HAVE_ALSA_ASOUNDLIB_H
+
+/* Enable altivec by default */
+#undef HAVE_ALTIVEC
+
+/* Enable altivec by default */
+#undef HAVE_ALTIVEC_H
+
+/* Define to 1 if you have the <artsc.h> header file. */
+#undef HAVE_ARTSC_H
+
+/* "Use MMX acceleration" */
+#undef HAVE_ASM_MMX
+
+/* "Use MMX acceleration" */
+#undef HAVE_ASM_NASM
+
+/* Enable altivec by default */
+#undef HAVE_BUILTIN_VECTOR
+
+/* Define if the GNU dcgettext() function is already present or preinstalled.
+   */
+#undef HAVE_DCGETTEXT
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <ft2build.h> header file. */
+#undef HAVE_FT2BUILD_H
+
+/* Define if the GNU gettext() function is already present or preinstalled. */
+#undef HAVE_GETTEXT
+
+/* Define if you have the iconv() function. */
+#undef HAVE_ICONV
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <lame/lame.h> header file. */
+#undef HAVE_LAME_LAME_H
+
+/* Define to 1 if you have the `a52' library (-la52). */
+#undef HAVE_LIBA52
+
+/* Define to 1 if you have the `asound' library (-lasound). */
+#undef HAVE_LIBASOUND
+
+/* Define to 1 if you have the `mad' library (-lmad). */
+#undef HAVE_LIBMAD
+
+/* Define to 1 if you have the `mp3lame' library (-lmp3lame). */
+#undef HAVE_LIBMP3LAME
+
+/* Define to 1 if you have the `pthread' library (-lpthread). */
+#undef HAVE_LIBPTHREAD
+
+/* Define to 1 if you have the `vorbis' library (-lvorbis). */
+#undef HAVE_LIBVORBIS
+
+/* "Use libxml2 to load/save .avidemuxrc" */
+#undef HAVE_LIBXML2
+
+/* Define to 1 if you have the <libxml/parser.h> header file. */
+#undef HAVE_LIBXML_PARSER_H
+
+/* Define to 1 if you have the `Xv' library (-lXv). */
+#undef HAVE_LIBXV
+
+/* Define to 1 if you have the `xvidcore' library (-lxvidcore). */
+#undef HAVE_LIBXVIDCORE
+
+/* roundup function */
+#undef HAVE_LRINTF
+
+/* Define to 1 if you have the <mad.h> header file. */
+#undef HAVE_MAD_H
+
+/* all but BSD have this */
+#undef HAVE_MEMALIGN
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* "Use MMX acceleration" */
+#undef HAVE_MMX
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/shm.h> header file. */
+#undef HAVE_SYS_SHM_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* C++ compiler supports template repository */
+#undef HAVE_TEMPLATE_REPOSITORY
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <X11/extensions/XShm.h> header file. */
+#undef HAVE_X11_EXTENSIONS_XSHM_H
+
+/* Define to 1 if you have the <X11/extensions/Xvlib.h> header file. */
+#undef HAVE_X11_EXTENSIONS_XVLIB_H
+
+/* "Use X86 CPU for mpeg2enc" */
+#undef HAVE_X86CPU
+
+/* Prototyping and stuff */
+#undef ICONV_NEED_CONST
+
+/* OSS detected */
+#undef OSS_SUPPORT
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* liba52dec */
+#undef USE_AC3
+
+/* "Arts" */
+#undef USE_ARTS
+
+/* FFMPEG */
+#undef USE_FFMPEG
+
+/* "Use FreeType2 font rendering" */
+#undef USE_FREETYPE
+
+/* LibXML2 is available */
+#undef USE_LIBXML2
+
+/* MJPEG */
+#undef USE_MJPEG
+
+/* "Use MMX acceleration" */
+#undef USE_MMX
+
+/* libmad */
+#undef USE_MP3
+
+/* Vorbis audio codec */
+#undef USE_VORBIS
+
+/* use xvid api 1.0 beta */
+#undef USE_XVID_4
+
+/* use xvid api */
+#undef USE_XX_XVID
+
+/* Version number of package */
+#undef VERSION
+
+/* Big endian cpu sparc or powerpc */
+#undef WORDS_BIGENDIAN
+
+/* BSD have rintf */
+#undef lrintf
+
+/* roundup function */
+#undef restrict

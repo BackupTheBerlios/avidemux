@@ -1,0 +1,11 @@
+#!/bin/csh
+./configure --with-debug --prefix=/sw --with-extra-includes=/sw/include --with-extra-libs=/sw/lib
+foreach i  ( `more ./list` )
+echo "Cleaning $i"
+cd $i
+more Makefile | sed 's/all\-nls//g' > Makefile.1
+cp Makefile Makefile.old
+cp Makefile.1 Makefile
+cd -
+end
+

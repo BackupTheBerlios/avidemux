@@ -1,0 +1,14 @@
+2003-09-17  <>
+	New ui, same as for SVCD/DVD 
+
+2003-03-23  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* configure.in (AC_CONFIG_FILES): Add po/Makefile.in.
+
+2003-03-23  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* Makefile.am (SUBDIRS): Add m4.
+	(ACLOCAL_AMFLAGS): New variable.
+	(EXTRA_DIST): Add admin/config.rpath.
+	* configure.in (AC_CONFIG_FILES): Add po/Makefile.in,
+

@@ -1,0 +1,1097 @@
+# translation of klingon.po to 
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER, 2003
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: klingon\n"
+"POT-Creation-Date: 2003-03-23 21:06+0000\n"
+"PO-Revision-Date: 2003-03-23 21:15+0000\n"
+"Last-Translator: \n"
+"Language-Team: fr_FR <en@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.0.1\n"
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:178
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:962
+msgid "mainWindow"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:179
+msgid "Avidemux2"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:181
+msgid "about.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:189
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:963
+msgid "vbox1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:194
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:964
+msgid "menuBar"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:198
+msgid "_File"
+msgstr "_Fouslkjcoi"
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:199
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:965
+msgid "menuitem1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:204
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:966
+msgid "menuitem1_menu"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:207
+msgid "Open video"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:208
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:967
+msgid "open_video1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:211
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:224
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:254
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:318
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:362
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:381
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:394
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:407
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:420
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:433
+msgid "activate"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:215
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:646
+msgid "gtk-open"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:216
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:968
+msgid "image274"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:220
+msgid "Append video"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:221
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:969
+msgid "append_video1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:228
+msgid "gtk-add"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:229
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:970
+msgid "image275"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:234
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:971
+msgid "separator1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:239
+msgid "Save Audio"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:240
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:972
+msgid "save_audio1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:245
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:973
+msgid "separator2"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:250
+msgid "Save as avi"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:251
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:974
+msgid "save_as_avi1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:258
+msgid "Save as dual audio avi"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:259
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:975
+msgid "save_as_dual_audio_avi1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:263
+msgid "Avi Muxer options"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:264
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:976
+msgid "avi_muxer_options1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:269
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:977
+msgid "separator6"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:274
+msgid "Save raw video stream"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:275
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:978
+msgid "save_raw_video_stream1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:279
+msgid "Export as mpeg video"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:280
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:979
+msgid "export_as_mpeg_video1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:285
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:980
+msgid "export_as_mpeg_video1_menu"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:288
+msgid "Video CD"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:289
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:981
+msgid "video_cd1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:293
+msgid "SVCD"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:294
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:982
+msgid "svcd1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:298
+msgid "DVD"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:299
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:983
+msgid "dvd1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:303
+msgid "XVCD (ffmpeg Mpeg1)"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:304
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:984
+msgid "xvcd"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:309
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:985
+msgid "separator11"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:314
+msgid "Video Informations"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:315
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:986
+msgid "video_informations1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:322
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:658
+msgid "gtk-dialog-question"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:323
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:987
+msgid "image276"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:328
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:988
+msgid "separator7"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:333
+msgid "Save image"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:334
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:989
+msgid "save_image1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:339
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:990
+msgid "separatormenuitem1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:344
+msgid "gtk-quit"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:345
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:991
+msgid "quit1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:349
+msgid "Play "
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:350
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:992
+msgid "play_1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:355
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:993
+msgid "play_1_menu"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:358
+msgid "Play video"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:359
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:994
+msgid "play_video1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:366
+msgid "Decoder options"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:367
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:995
+msgid "decoder_options1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:372
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:996
+msgid "separator9"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:377
+msgid "Next frame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:378
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:997
+msgid "next_frame1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:385
+msgid "gtk-go-forward"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:386
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:998
+msgid "image277"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:390
+msgid "Previous frame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:391
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:999
+msgid "previous_frame1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:398
+msgid "gtk-go-back"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:399
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1000
+msgid "image278"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:403
+msgid "Next Intra frame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:404
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1001
+msgid "next_intra_frame1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:411
+msgid "gtk-goto-last"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:412
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1002
+msgid "image279"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:416
+msgid "Previous Intra frame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:417
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1003
+msgid "previous_intra_frame1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:424
+msgid "gtk-goto-first"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:425
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1004
+msgid "image280"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:429
+msgid "Jump to frame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:430
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1005
+msgid "jum_to_frame1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:437
+msgid "gtk-jump-to"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:438
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1006
+msgid "image281"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:442
+msgid "_Edit"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:443
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1007
+msgid "menuitem2"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:448
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1008
+msgid "menuitem2_menu"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:451
+msgid "gtk-cut"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:452
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1009
+msgid "cut1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:456
+msgid "gtk-copy"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:457
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1010
+msgid "copy1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:461
+msgid "gtk-paste"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:462
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1011
+msgid "paste1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:466
+msgid "gtk-delete"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:467
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1012
+msgid "delete1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:472
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1013
+msgid "separator5"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:477
+msgid "Set marker A"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:478
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1014
+msgid "set_marker_a1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:482
+msgid "Set marker B"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:483
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1015
+msgid "set_marker_b1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:488
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1016
+msgid "separator4"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:493
+msgid "Go to marker A"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:494
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1017
+msgid "go_to_marker_a1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:498
+msgid "Go to marker B"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:499
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1018
+msgid "go_to_marker_b1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:504
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1019
+msgid "separator10"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:509
+msgid "Load edit list"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:510
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1020
+msgid "load_edit_list1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:514
+msgid "Save edit list"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:515
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1021
+msgid "save_edit_list1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:519
+msgid "Audio source"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:520
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1022
+msgid "audio_source1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:525
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1023
+msgid "audio_source1_menu"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:528
+msgid "Current Video"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:529
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1024
+msgid "current_video1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:533
+msgid "External mpeg (mp2/mp3)"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:534
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1025
+msgid "external_mpeg"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:538
+msgid "External Wav"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:539
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1026
+msgid "external_wav1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:543
+msgid "External AC3"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:544
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1027
+msgid "external_ac1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:548
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:622
+msgid "None"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:549
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1028
+msgid "none1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:554
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1029
+msgid "separator12"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:559
+msgid "Build VBR time map"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:560
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1030
+msgid "build_vbr_time_map1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:564
+msgid "Misc"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:565
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1031
+msgid "misc1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:570
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1032
+msgid "misc1_menu"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:573
+msgid "Index mpeg"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:574
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1033
+msgid "index_mpeg1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:578
+msgid "Cut Wizard"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:579
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1034
+msgid "cut_wizard1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:583
+msgid "Select Log file"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:584
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1035
+msgid "select_log_file1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:588
+msgid "Rebuild frames (I&B)"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:589
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1036
+msgid "rebuild_frames"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:593
+msgid "Change fps"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:594
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1037
+msgid "change_fps"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:598
+msgid "Save preference"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:599
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1038
+msgid "save_preference1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:603
+msgid "Audio Device"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:604
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1039
+msgid "audio_device1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:609
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1040
+msgid "audio_device1_menu"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:612
+msgid "OSS"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:613
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1041
+msgid "oss"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:617
+msgid "Arts"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:618
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1042
+msgid "arts1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:623
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1043
+msgid "none2"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:627
+msgid "_About"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:628
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1044
+msgid "about1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:633
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1045
+msgid "hbuttonbox1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:640
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1046
+msgid "buttonOpen"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:647
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1047
+msgid "image164"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:652
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1048
+msgid "buttonInfo"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:659
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1049
+msgid "image165"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:664
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1050
+msgid "buttonSaveAvi"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:670
+msgid "gtk-save-as"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:671
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1051
+msgid "image166"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:676
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1052
+msgid "buttonFilters"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:683
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1053
+msgid "alignment6"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:688
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1054
+msgid "hbox8"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:692
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:720
+msgid "gtk-dialog-info"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:693
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1055
+msgid "image167"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:697
+msgid "v filter"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:698
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1056
+msgid "label10"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:704
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1057
+msgid "buttonAudioFilter"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:711
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1058
+msgid "alignment7"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:716
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1059
+msgid "hbox9"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:721
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1060
+msgid "image168"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:725
+msgid "a filter"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:726
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1061
+msgid "label11"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:731
+msgid "VCodec"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:732
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1062
+msgid "buttonVCodec"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:738
+msgid "ACodec"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:739
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1063
+msgid "buttonACodec"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:745
+msgid "Recent files"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:746
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1064
+msgid "buttonRecent"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:752
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1065
+msgid "guiDrawing"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:759
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:761
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1066
+msgid "sliderNavigate"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:769
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1067
+msgid "hbox2"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:773
+msgid "Frames : "
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:774
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1068
+msgid "label1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:779
+msgid "000000"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:780
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1069
+msgid "labelCurFrame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:785
+msgid " / 000000"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:786
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1070
+msgid "labelTotalFrame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:791
+msgid " Time :"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:792
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1071
+msgid "label4"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:797
+msgid "00:00:00,000"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:798
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1072
+msgid "labelCurTime"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:803
+msgid " / 00:00:00,000"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:804
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1073
+msgid "labelTotalTime"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:809
+msgid " A:0"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:810
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1074
+msgid "labelMarkA"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:815
+msgid " B:-1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:816
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1075
+msgid "labelMarkB"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:822
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1076
+msgid "hbox1"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:828
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1077
+msgid "buttonPlay"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:833
+msgid "play.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:834
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1078
+msgid "image126"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:839
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1079
+msgid "buttonStop"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:844
+msgid "stop.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:845
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1080
+msgid "image134"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:850
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1081
+msgid "buttonPrevFrame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:855
+msgid "backward.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:856
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1082
+msgid "image127"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:861
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1083
+msgid "buttonNextFrame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:866
+msgid "forward.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:867
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1084
+msgid "image125"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:872
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1085
+msgid "buttonPrevKFrame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:877
+msgid "Kbackward.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:878
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1086
+msgid "image128"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:883
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1087
+msgid "buttonNextKFrame"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:888
+msgid "Kforward.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:889
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1088
+msgid "image129"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:894
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1089
+msgid "buttonMarkA"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:899
+msgid "markA.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:900
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1090
+msgid "image130"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:905
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1091
+msgid "buttonMarkB"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:910
+msgid "markB.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:911
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1092
+msgid "image131"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:916
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1093
+msgid "buttonBegin"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:921
+msgid "begin.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:922
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1094
+msgid "image132"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:927
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1095
+msgid "buttonEnd"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:932
+msgid "end.xpm"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:933
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1096
+msgid "image133"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:937
+msgid "Preview"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:938
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1097
+msgid "togglebuttonPreview"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:943
+msgid "Output"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:944
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1098
+msgid "toggleOutput"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:949
+msgid "V Process"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:950
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1099
+msgid "togglebuttonVideo"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:955
+msgid "A Process"
+msgstr ""
+
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:956
+#: ../avidemux/ADM_gui2/GUI_main2.cpp:1100
+msgid "togglebuttonAudio"
+msgstr ""
+

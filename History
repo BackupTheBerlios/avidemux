@@ -1,0 +1,784 @@
+     ************************ TODO****************************
+	Todo :
+			
+			+ Add complete flag support for Ogg <<--
+			+ Rebuild all audio @ editor level
+			+ Fix smart copy with B-frame support
+			+ Should add ColorSpace and Aspect ratio to video filter chain
+
+			+ Fix memory leak induced by raw shift<<<===
+			
+	+ Complete OGM audio suport (ogg)
+		
+       *********************** /TODO ***************************
+       29/01/2004
+       		- Seeking ok, a tad slow. plop at playback.
+       28/01/2004
+       		- Ogg playback ok, seeking is a problem.
+       27/01/2004
+       		- First libvorbis init successfull
+		- complete init with header/comment/codebook packet read ( :P )
+       26/01/2004
+       		- more ogg
+       25/01/2004
+       		- ogg audio
+		- fix for weird avi header made by streamer
+       21/01/2004	
+       		- lavcodec patch for siemens
+		- fred patch for 3gp -> avi
+		- Merged & modified Entropy patch for better audio sync
+		- Fixed the bug of qscale x=1--W instead of x=0--W-1
+       20/01/2004
+       		- speedup for soften
+       18/01/2004
+       		- Fixed external wav crash
+		- Added ForcePP filter
+		- Valgrind -> some little fix
+		- Added soften (uncomplete)
+       17/01/2004
+       		- New ui for SVCD/DVD
+		- Split save mpeg2 es/mpeg2 ps -> new menu entry
+       16/01/2004
+       		- Fixed wrong bitrate for libtoolame 
+		- Fixed audio detection when audio process is on
+		- More stuff into lvemux
+		- More fix for SVCD/DVD mixing
+       15/01/2004
+       		- began adding lvemux
+       14/01/2004
+       		- Merge WLA & Jens patches
+		- Better handle MP2 bs MP3
+		- Began integrating lvemux
+		- Fixed xvid4 reuse of log file
+       13/01/2004
+       		- dont pop out null frame when B frames are on
+		- fix (?) for too many dropped B frame  + incorrect reordering
+		 
+       12/01/2004
+       		- better direct input for frame#
+		- Fixed interlaced/widescreen settings (scroll lock)
+       11/01/2004
+       		- preliminary support for libtoolame encoding
+		- added encode_interleaved to libtoolame
+		- try to keep the B frames at the beginning by replacing them by dupe of I frame
+       10/01/2004
+       		- better support for 8 bits pcm audio
+		- endian fix for save audio /PCM
+		- added libtoolame beta (with a always beta software it is ok)
+       09/01/2004
+       		- Try to better detect type2 avi
+       08/01/2004
+       		- reverted closed gop stuff
+		- fixed buffered audio filter using same buffer for in and out (duh!)
+		- disabled post proc for mpeg1/2 for the moment
+       07/01/2004
+       		- dropped sox, trying to use libresample instead (early job)
+       06/01/2004
+       		- Better max bitrate for ffmpeg
+       04/01/2004
+       		- Update to ffmpeg CVS
+		- Look at destructor for mpeg codec <<<<
+		- Use ffmpeg 2 pass engine for XSVCD
+       03/01/2004
+       		- Begin adding postprocessing to mpeg1/2
+		- Unified PP, dropped mplayer one, taken the one from libavcodec instead
+		- Merged Jens patch
+		
+       02/01/2004
+       		- Added ui for kernel deint
+		- Display time shift between audio and video
+		- Fixed closed gop 
+		
+       01/01/2004
+       		- Fixed cache issue when the cached frame was the forward ref frame
+			(still some ugly stuff here)
+		- Added D Graft kernel deint
+       31/12/2003
+       		- Put back ffv1 patch for frame type
+		- more lavc ui stuff  
+       30/12/2003
+       		- UI -> both save bmp & save jpg are there
+		- save bmp fixed on big endian cpus
+       29/12/2003
+       		- Updated po file  + vcodec by type detection
+       27/12/2003
+       		- Fix for missing 1st sub (workaround), thanks ron
+       26/12/2003
+       		- Added half D1 res + command 
+		- split codec configuration from edl file
+		 
+		
+------------------------2.0.20---------------------		
+       20/12/2003
+       		- Fixed overflow in xvid 2 pass mode
+		- emulate_fast_int fix for solaris & bsd
+       16/12/2003
+       		- inttypes BIG cleanup (solaris/amd64 stuff)
+		- xvid4 finish and init " a la " mplayer
+       13/12/2003
+       		- Fix for hpel xvid4
+		- Default bitrate is 1500 (was 1.5)
+		- Try to be 64 bits clean
+       12/12/2003
+       		- Fixed mpeg indexer ui
+		- Xvid4 a la jakub
+       10/12/2003
+       		- indexer now also shows # of channels and bitrate
+       09/12/2003
+       		- Added some more Xvid options. Not working properly now
+		- Continued mpeg audio scan. More user friendly now. (2/3).
+       08/12/2003
+       		- Finished 2pass xvid + some i/f cleanup. 
+		- Added m2vrequant to the addond dir
+		- Markers taken into account for requant
+		- First part of better autodecting audio tracks from mpeg file
+       06/12/2003
+       		- Basic Xvid4 working
+       04/12/2003
+       		- Begun Xvid 4 support
+		- Fixed Requant
+		- Fixed --audio-toolame (thx bruce1271)
+       01/12/2003
+       		- Disabled buggy altivec code in libavcodec
+		- Mpeg2dec is 0.3.1 -> partial update to take gcc bug for altivec (gcc < 3.3). *altivec.c from 23 April 2003
+				(should be macOsX safe too)
+       30/11/2003
+       		- M2V Requantizer
+		- Most dialog are now transient to main
+       29/11/2003
+       		- Fixed lagrange multiplier for newer ffmpeg version
+		- Show quantizer for both xvid and lavcodec
+		- Added requantizer menu + requantize mpeg menu
+		- Fixed bitrate histogram for avi/openDML
+       28/11/2003
+       		- Sox resample almost ok
+		- Misc fix for audio buffering
+		- Added resample and append to cli commands
+       26/11/2003
+       		- PPC cleanup (ffmpeg) no altivec yet
+		- Huge speed increase in audio processing, resample to X is ok for mono
+	23/11/2003
+		- Forgot to re-enable MMX optim for Xvid in CQ mode (oops)       
+       18/11/2003
+       		- Slowly incorporating lvemux mux engine
+		- Partially fixed Xv redrawing bug
+       17/11/2003
+       		- Fix for ffmpeg4 ui being stuck
+       14/11/2003
+       		- UI continued (keyboard shortcut)
+		- Fixed modal mode for ffmpeg tuning
+		-
+       13/11/2003
+       		- New UI
+		- Fix VCD
+       09/11/2003
+       		  Fix for slightly broken avi header (non standard at least) -> Cagnulein
+		  Fixing MacOSX build (fun stuff :) )
+       03/11/2003 Deinterlace non ivtc-ed frames
+       01/11/2003----------2.0.18-------------
+       28/10/2003
+       		- Fixed displayed Qz/Size/Bitrate for Pass1 (mpeg)
+		- Fixed trainling frames for mpeg1/2
+		- Change from CQ=6 to CBR=avg for pass 1 + gross patch disable padding
+       18/10/2003
+       		- Fixed FFV1 keyframe
+		- Fixed MP ivtc (?)
+		- Began to put back 3:2 pulldown in ffmpeg
+       16/10/2003
+       		- Solaris/Big endian fix for openDML
+       15/10/2003
+       		- Fixed rebuild Keyframe for gcc 2.95 (strained the stack too much)
+		- Do flush to avoid delaying the io too much
+		- Added new ui : DIA_SVCD, added 16/9 and interlaced to ffconfig  & ui
+       14/10/2003
+       		- Fixed potential round up error in detc
+		- Fixed ctrl+[]
+       13/10/2003
+       		
+       		- Some keyboard shortcuts added
+		- Save ffmpeg mpeg2 audio with valid encoding (we take mp3 closest)
+       12/10/2003
+       		- Fixed some openDML offset 
+		- Arts : reverted to default settings
+		- Cache : Always on, side effects ?
+		- Switched from detc to ivtc
+		- Fixed audioIdx not initialized
+       11/10/2003
+       		- 32/64 fix for openDML
+		- fix for extraData audio & video
+		- audio track added for openDML super index
+		- fix for dual audio openDML
+		- fix for flags not updated for P frames
+		- tag junk field with avidemux 
+		- smarter choice between openDML/regular avi
+       10/10/2003
+       		- Regular index workish commiting
+       09/10/2003
+       		- Continued openDML + regular + reindexer
+		- Reverted to save bmp
+       07/10/2003
+       		- Fixed vprocess for good
+		- Fixed frame start/end in edl
+       05/10/2003
+       		- Fixed extraData len in header (Joseph)
+		- Layout skeleton for openDML (empty now)
+       04/10/2003
+       		- Began to remove multi char const (gcc 3.3)
+		- Fixed length computation for save audio (hope i did not break it)
+		- Be more responsive / update more often when saving audio (little loss of perf prolly)
+       03/10/2003
+       		- Fixed mplayer detc port. Removed ivtc.
+       02/10/2003
+       		- Fixed xvid 2 pass
+		- Save MarkA / MarkB in edl too
+		- Merged Laurent Culioli patch for configure --disable-mmx
+       01/10/2003
+       		- Merged Anish FreeBSD compatibiliy stuff
+		- Began to port detc - not working as of now
+       30-09-2003
+       		- Half fixed black border (still left & right chroma to do)
+		- First step to big avi support
+       28-09-2003
+       		- Merged Set display fix for mpeg encoding
+		- Merged Dopez sync fix for ffv1rec
+		- Added lavdeinterlace as video filter
+		- Added Vincent Strubel ppc configure stuff
+----------2.0.16----------       
+       26-09-2003
+       		- Merged h263/lavcodec stuffing from Michael Niedermayer
+       25-09-2003
+       		- set name for SVCD/DVD/X*CD
+       22-09-2003
+       		- Fixed multiple toggling
+		- Fixed bad ifdef xvid_cvs
+		- Fix unneccessary crop/resize for SVCD res
+		- Fix SVCD/... res so that we do 1:1 -> 4:3 instead of 1:1 -> 1:1
+       21-09-2003
+       		- Now everybody use the new encoding ui
+		- Fixed nasm clash between mpeg2enc and xvid (dct_mmx stuff)
+       20-09-2003
+       		- Fixed byte/bit in *VCD when called from cli (ugly need to rewrite the whole stuff)
+       19-09-2003
+       		- Updated doc a bit
+		- Fixed DVD output a bit too
+		- Fixed mmx for mpeg2enc + build on non mmx system
+       18*09*2003
+       		- Fix reset seg not complete
+       17/09/2003
+       		- mpeg2enc 1st pass with Q=4 -> better
+		- same for xsvcd
+		- Fixed vbv & bitrate for xsvcd should not be rejected anymore
+       16/09/2003
+       		- Migrated CVS to tuxfamily.org . Thanks to them :)
+       09/09/2003
+       		- CODEC: Mpeg2enc, began to nasm-ism it., still slow
+       07/09/2003
+       		- CODEC: Mpeg3enc ok for VCD, still not really good for SVCD
+		- DEMUX: Fixed a bug in aviaudio ->read spotted by efence
+       05/09/2003
+       		- CODEC: Initial import of mpeg2enc 1.6.90
+				Making mpeg3enc out of avidemux
+15-5       
+      04/09/2003
+      		- UI: Set loaded file title
+		- EDITOR : Fix last frame being dropped
+		- config : Try to be clean with freeBSD directly through config.in.in
+		- UI: Make a nicer display of bitrate histogram
+       02/09/2003
+       		- EDITOR : Restore video process mode correctly in EDL
+		- CODEC: Fixed gop size & custom matrix
+       01/09/2003
+
+       		- CODEC: Added custom matrix/gop size
+		- UI: Display mpeg1/ mpeg2 in codec
+		- Codec: Set user tunable gop size & qz matrix (->buggy)
+       31/08/2003
+       		- UI: Preview killed if output is set
+		- XVCD: Added min & max bitrate (works only in 2 pass mode)
+		- UI : Added histogram
+		- TOOLKIT: Added gtk_entry read/write
+		- DEMUXER : Expanded avi to 64 bits internally.
+		- configure : Check for pkg-config && gtk flags a bit harder
+       30/08/2003
+       		- New resize with PAL and 4/3 16/9 taken into account
+		- XVCD / XSVCD
+       26/08/2003
+       		- FILTER : Fixed D3D for good this times
+		- EDITOR : Load edl when SVCD type
+		- FFMPEG: Updated to 0.4.7 + mpeg2 encoder from CVS
+       25/08/2003
+       		-FILTER: Fixed HQD3D not allocating enough memory
+       		-FILTER: Fixed(?) D3D/ HQD3D floor/ceil errors
+		- FILTER : Finished chroma shift
+
+       24/08/2003
+       		- EDITOR 	: Codec fine tuning is saved in edl file (.specific part)
+		- FILTER 	: Began going visual for chroma shift
+---2.0.15-1---
+       23/08/2003
+       		- FFV1 : ~/.ffv1recrc + 2 Gb limit
+		- FILTER: Fixed slow / bad redraw for crop
+		- lavcodec: Merged AC3 patch
+	22/08/2003
+       		- FILTER: Fixed subtitles (multi line case ->build id)
+		- EDITOR : Fixed cache not being activated
+		- DEMUX: Scan jpeg header to find width & height (crappy)
+       21/08/2003
+       		- NUV : Correct recomputation of normal bitrate when fq!=44.1 khz
+		- DEMUX : Added partial support for jpeg files (still need to set w & h)
+       20/08/2003
+       		- AVIW: Patched aviwrite so that microsecperframe is never null -> bad fix, compute
+				it from fps
+		- NUV: Added support for 'N' tag -> audio frequency. Sync broken if !=44,11 khz
+       19/08/2003
+       		- FILTER:Fixed HD D3D -> ??
+		- CODEC:Fixed max I frame interval for Xvid
+       18/08/2003
+       		- FFV1: ffv1rec cleanup, Mjpeg & mpeg still buggy Grrr
+       17/08/2003
+       		- CODEC: Mjpeg encoder from lavcodec
+		- CODEC: Save as jpeg instead of bmp
+		- DEMX: Began modifying in pict to load jpeg too
+******2.0.14***********
+
+2.0.13-3
+       15-08-2003
+       			- FILTER : Clean up of Drop filter
+			- GUI 	: Keep selected filter after up/down
+       11/12/13-08-2003
+			- Added gui color sel
+			- Added support for mythTv "T" frame
+       11-08-2003
+			- Tried to add color selection to subtitles
+2.0.13-2
+       10-08-2003
+       			- CONF: Merged (some) netbsd patches
+			- CODEC: Added swap uv option for ffmpeg
+			- EDITOR: Fixed audio bug which was working only if there was 1 reference
+       09-08-2003
+       			- NUV: Fixed extraLen in nuvheader being unitialized
+			- GUI: Changed the keymapping [] for A/B, home/end to goto(0) / goto(end)
+			- FILTER: New gui for SRT, lookup
+			- FILTER : Cleanup sub parser
+			- FILTER : Changed the aliasing method for subs
+       08-08-2003
+       			- GUI: Do not even try to index divx5 vop packed
+			- Began to work on new subtitle config
+2.0.13-1-----
+       07-08-2003
+       			- GUI: When deleting frames, reset a & b to 0, max
+			- WKB: Load file with space in the name
+       06-08-2003
+       			- 3GP : Added big size support (up to 4gB)
+			- 3GP : Added stss atom support (keyframe)
+			- 3GP : Added support for SVQ3 atom
+			- Codecs : Added support for SVQ3 lavcodec
+	05-08-2003
+			-3GP: Fixed the bih field (codec stayed at XXX when saving as copy)
+			- 3GP: Fixed the const sample/ chunk case
+			- 3GP : Added 8bits unsigned pseudo codec
+       04-08-2003
+       			- 3gp:Fixed fps computation for 3gp/olympus
+			- 3gp: Fixed reindex for 3gp/olympus
+			- 3gp :Fixed esds header for mp4 video (3gp)
+			- Merged jens patches
+			- 3gp :Added support for olympus raw audio (8 bits -> problem)
+			- ** Fix when all sample the same size !!**
+       03-08-2003
+       			- Rewrote the track handling for avi , now accept track id beginning by 0/1/2
+			- fixed save dual which was not working
+***03-08-2003 ***2.0.12
+
+	3-08-2003
+			- Try to accept avi where audio is first (at least grab video)
+			 need to rethink it...
+
+       02-08-2003
+       			- Added decoding for olympus like .mov
+			- Fixed DVB buggy stream (laclasse)
+			- Ignore errors for tivo files (indierocksteve)
+			- Modified stuff to include ffv1rec in package
+       29-08-2003
+       			- Merged Anish Freebsd patches
+			- Fixed Asher problem with crop
+       28-08-2003
+       			- Added support for any ffv1rec codec
+			- Modded ffv1rec to add fourcc/extradata  (huffyuv / ffv1 available from now)
+       27-07-2003
+       			- Added ffv1rec to source tree (will come back on it later)
+			- Fixed key shortcuts
+       26-07-2003
+       			- Added autodetect for mpeg audio
+			- Use ffmpeg mjpeg decode if no mjpegtools
+       24-07-2003
+       			- Fixed DVD params being used instead of SVCD (indie)
+			- New stuff in autoconf to deal with freeBSD/power pc etc...
+			- Jens patch for end/start check
+       23-07-2003
+       			- 3gp video & audio support (no AMR codec for audio)
+			- Fixed false message for divx5
+			- Fixed # frame count for copy/paste
+
+       21-07-2003
+       			- Added check video
+			- Added copy/paste
+			- Began 3GP read support
+	18-07-2003
+			- Added mpeg1 inside avi support (rcooley)
+			- Added support for FFV1 codec (nice and fast)
+	17-07-2003
+			- update ffmpeg to cvs
+	16-07-2003
+			- configure.in.in fix for powerpc
+			- dont go to frame 0 after cut
+			- fix the case when we load a edl file which as less frame than the current edl filesel
+			- File type autodetect for solaris/powerpc
+			- Sound playback for solaris/powerpc
+			- Fixed smart copy (oops)
+2.0.8-10-----------------
+       09-07-2003
+       			- Solaris mostly ok except OBJ_MMX to manually remove
+			- Fixed the audio/video conf swap
+			- DVD/SVCD/VCD is now using the encoder gui
+			- Applied Jens autoswap disabler patch
+			- Added are you sure in encoding stop button
+       08-07-2003
+       			- More solaris
+			- New avi writter Copy mode :
+				+ Ok for MP3 VBR x1
+				+ OK for MP3 CBR x1
+				+ OK for wma x1
+	07-07-2003
+			- Fix for process mode vids
+			- More solaris stuff
+			- libmpeg2 should compile on non intel cpu
+---------2.0.9-1--------------
+       06-07-2003
+       			- Autocrop
+       05-07-2003
+       			- Gtk2 isation of xvid
+			- Xvid params simplified, now closer to the windows version
+			- Crop Gtk2 ised (except autocrop)
+
+       04-07-2003
+       			- Dual audio save back online
+			- Fixed memory leak in save copy
+			- Fixed copy mode if mpeg type is selected
+			- Merged first part of solaris compatibility stuff
+       02-07-2003
+       			- Try to detect MP3 VBR (crude)
+			- Save prefs without updating codec stuff at exit (last working dir saved)
+			- Canonized name to avoid current directory problem at filesel level
+					** Fixme : Should be canonized also for idx/workbench etc...**
+       30-07-2003
+       			- Gtk2isation of muxer options
+			- Fixed SVCD (buildid)
+	29-06-2003
+			- Gtk2 isation of Mplayer postproc  + display correct strength
+			- Gtk2isation of enterInt & enterFloat
+			- Auto iconification of main window when encoding
+			- Gtk2-isation of XVCD gui
+			- Google found the solution for the adjust crap : gtk_range_get_adjustment
+				Could be simpler in Gtk doc GrumbleMumble
+------------2.0.8---------
+       24-06-2003
+       			- Added audio conf & process mode
+			- Added video process mode
+			- Need video codec conf and we are done :)
+       23-06-2003
+       			- Added audio & video codec to the saved infos in workbench
+			- Added save audio filter in workbench
+			- Fixed inapropriate delete _incoming in avisave. (?).
+       22-06-2003
+       			- More update stuff (should be clean now)
+			- Began remerging the whole save stuff
+2.0.7-4
+	18-06-2003
+			- Fixed update in a cleaner way
+	17-06-2003
+			- Fixed update of preview window by  2 patch
+			- Added reference frame # for subtitle
+       16-06-2003
+       			- Fixed call to xvid when divx is not present (bad ifdef)
+			- added non reg test to cvs
+       15-06-2003
+       			- Fixed abort for nuv loading properly (jens Arm). Probably a memory leak or two there...
+			- Changed behaviour, now save [A,B[ like for cutting
+			- Made GUI for mplayer (HQ)D3D filter
+			- Tested a bit the new engine on VCD/XVCD & Xvid : seems okay
+       12-06-2003
+       			- Continued splitting the getLastFilter / getFirst filter in two parts
+				(one for the whole stream, one for a piece of it like audio)
+       11-06-2003
+       			- Began the new null & raw filters
+       09-06-2003
+       			- Patched (again) libavcodec to use its vop packed detection stuff
+			- Rmed divx dependancy
+			- New mod for new mythtv comptype=4 stuff ( Scott Doty)
+
+	08-06-2003
+			- Merged Jens patch + Divx 5.0.5 decoder (ugly patch)
+			- Try to detect vop packed stream (even uglier)
+--2.0.7-1
+	03-06-2003
+			- Added non-HQ mplayer denoise3D
+	02-06-2003
+			- Fixed rotate (Martin Schipany)
+       01-06-2003
+       			- Fixed the assembly strangeness in 2.0.6
+			- Began to add Mplayer Denoise3D
+			- Fixed the warning due to multiple destroy call for preview
+--2.0.6--
+       31-05-2003
+       			- Fixed fps saving when altered by filter
+			- Fixed cancel in pass 1
+       30-05-2003
+       			- Fixed the strdup bug in export VCD
+			- Mostly debugged the mmx version & C version of ilace count (could be faster)
+			- Works except the 0-4 case where pulldowned frame are across two 5images blocks
+			- Added a pulldown filter.
+
+       	29-05-2003
+			- Played with mmx.h, very handy to debug mmx code
+	28-05-2003
+			- Began merging and asming the interlace count code
+
+---2.0.4---
+26-05-2003
+			- Fixed clock
+			- Added nuv indexing / saving/loading
+			- Played with rivatv and found the source of the noisy video . Nice picture now :)
+ 25/05/2003
+ 			- Fixed clock (Jens)
+ 24/05/2003
+ 			- Fixed (again) mpeg demuxer. Workaround a gcc bug ?. Weird.
+  23/05/2003
+  			- Began adding support for divx 5.0.5 encoder. At least it does compile
+			- Began IVTC
+			- Fixed local problem with toolame 44.1 -> 44,1  (look at lame too ***)
+-------2.0.3-3
+  22/05/2003
+  			- Fixed bug spotted by papaf about mpegQuant for XVCD
+  21/05/2003
+			- Hopefully fixed the mpeg indexing bug
+			- Removed the system_end_of_stream check
+			- Upped autocut to 3gb for snowdog
+--------2.0.3-2
+ 19/05/2003
+			- Fixed the variadic macro mess for Gcc 3, have to look for gcc 2.95
+			- Fixed gcc 3.3 rejecting string as char, almost no more warnings :)
+			- Made a slightly better printf system for debug
+			- Dropped last lonely B frame in case of AVI (probably a better way)
+			- Ditto for mpeg, we try to keep more frames toward the end
+			- Removed the end-of-stream check for mpeg (0xb9)
+18/05/2003
+			- Began separating Mpeg2 file i/o and codec & played ET : Best covert ops 2 times    :)
+			- It is mostly working, but there is a speed penalty, probably out of order access
+			- Need to completly rewrite the audio handling part...
+17/05/2003
+			- Began to deal with CBR/VBR audio in editor
+			- Updated ffmpeg, that fixes the problem with pict_type
+			- Patched so that hurry_up returns the correct value
+			- B frame strategy does not work with PB frame ala DIVX, should find a way to split it back to P/B frames
+			- Re-silenced ffmpeg & forced aspect ratio 2
+16/05/2003
+			- More B frame stuff, ok when encoding from ADM, not when re-ordered from external avi file
+			- Added a frame type indicator
+			- Fixed interpretation of libavcodec frame type -> do not use frame.pict_type anymore
+			  -> now globally working, time to do mpeg1/2
+15/05/2003
+			- B-frame reordering for avi
+			- Min Q for SVCD-mpeg1 back to 2, max 20
+14/05/2003
+			- B frame handling logic added to editor
+13/05/2003
+			- Began to add framework support for B-frame...
+12/05/2003
+			- Big warning clean-up
+			- Added underflow flags to 2 pass, and temptative padding
+			- Fixed preview by gtk2 -ised it a bit
+11/05/2003
+			- Fixed display of add borders
+			- Fixed the make dist engine
+			- Removed the buildFfmpeg script -> not used anymore
+			- Time to set a release avidemux 2.0.2
+10/05/2003
+			- Set lower quantizer incs  for XVCD
+			- Set aspect ration according to region
+----------------- preview12 -------------------
+09/05/2003
+			- 2passXvid with ffmpeg mpeg1 encode is workish       
+08/05/2003
+			- Began an hybrid of FFmpeg mpeg1 encoder
+					with xvid 2 pass algorythm. It will enable max rate control later.
+
+----------- preview 11--------------------------
+07/05/2003
+
+			- Added some i18n to subtitles, now handles russian / czech and german.
+			- a lot of patches to This
+05/05/2003
+			- Fixed contrast gui
+			- Merged Jens 3/4 patches
+			- Alsa is working now, borrowed some bits from Mplayer (sw param)
+					some pops & cracks , dunno where it is coming from
+			- LPCM pseudo codec
+			- Added PCM mpeg program audio track support Jva
+04/05/2003
+			- Fixed OGM (255/0)
+			- Began to add alsa audio support
+-------------       preview10-----------------
+02/05/2003
+			- OGM demuxer for video is work-ish albeit slowly
+01/05/2003
+			- More OGM stuff
+			- Apparently mpeg2 from CLI  is broken       <<< Fixed
+30/04/2003
+			- Redone masking for subtitle
+			- Merged Jens patches
+			- CTRL+G is back
+29/04/2003
+			- Merged patch from Thomas schank (filename protection for mpeg2enc)
+			- Gtkisation of mpeg2opt, Jens will not be happy ...
+			- Inlined read8/16/32 for mpeg2 parser should be significantly faster
+28/04/2003
+			- Partial is back.
+			- Skeleton for OGM reader & include files
+27/04/2003
+			- Fixed save wkb with no filter
+			- Fixed load workbench from cli with wrong name
+			- Merged jens patch
+			- Lame piping (does not work)
+			- Pipe to anything (not completed)
+			- Fixed encoder (cli -> jens)
+			- Re-enabled normalize & downsample for command line (ugly)
+			- Added cli mode for toolame
+---------- preview9--------------------
+25/04/2003
+			- Cleanup of audio filter chain builder
+			- Fixed LOCALEDIR
+			- toolame is autodetected at buid time
+			- Remerged Jens save mpeg patch
+			
+24/04/2003
+			- First toolame piping stuff.
+23/04/2003
+			- Fixed multiple working when saving avi in process mode
+			- Fixed inversion on audio type for mpeg (AC3/mpeg)
+			- Fixed a couple of warnings (some of them interesting)
+			- Added entry for pipe audio
+-------- preview 8--------
+21/04/2003
+			- Working -> DIA_working (gtk2), no more global stuff.
+			- Created DIA_busy for simple waiting stuff
+			- Removed GUI_workin stuff
+			- Opening mpeg ->index, and open it (a bit ugly), no more failed
+			- Began adding slow unoptimized 411/422 converter for FFmpeg
+20/04/2003
+			- Upgraded libmpeg2 to 0.3.1, simpler...
+			- Added Clock API
+
+18/04/2003
+			- Save image is back
+			- cleaned up yv12rgb
+			- Gtk2isation of DNR
+--- preview 7---
+17/04/2003
+			- Finished incorporating Mplayer resize
+16/04/2003
+			- Fixed lanczos3 (and bicubic) filter
+			- Began to add mplayer resize func
+15/04/2003
+			- New filter : Smart swap that tries to identify the frame that need
+				field swapping.
+14/04/2003
+			- New filter : chroma shift
+			- Fixed click beside the slidebar to jump ahead a bit
+			- Added Anish
+			- Tried a patch for RTJpegN (blind patch) for marcooo and the Suse 8.2
+13/04/2003
+			- New xml stuff ~ 90 % ok, some bugs left  / partial still broken
+			- Everything should be mostly functionnal now
+			- Check that we have really write access (Simon's request)
+12/04/2003
+			- Save filter as XML -> now mandory ? 50 % done
+			- Switching from binary save to xml save -> everything is broken...   
+11/04/2003
+			- Separate & merge fields (cheap)
+			- Began working on new filter load/save in XML
+				(time to learn how libxml works)
+10/04/2003
+			- Added filters swap fields, keep odd & keep even
+08/04&07/04
+			- New GUI for resize engine (16/9 eme and slider)
+--preview5--
+04/04/2003	Birthday :)
+			- Gtk2 isation of filters
+			- Gtk2isation of convolution filters
+			- Set nicer window size (jakub)
+			- Added reset segments
+			- New filesel, gtk2 way.
+
+03/04/2003
+			- Merged Jacek Pliszka <pliszka@phyun0.ucr.edu goto black frame patch
+02/04/2003
+			- Auto-open index in case of mpeg
+			- Only remember successfully opened files
+			- Resize recent file dialog
+01/04/2003
+			- Re-coded save/load workbench
+			- Load workbench as file (ugly)
+			- Fixed xv leaking colors (workaround)
+			- Fixed CTRL+X
+31/03/2003
+			- Time map menu fix
+			- Audio device clean up + saved in pref
+
+30/03/2003
+			- Update ffmpeg to yesterday CVS
+27/03/2003
+			- Fixed Xv  Made preview 3.
+23&24/03/2003
+			- i18n
+22/03/2003
+			- 0.9RC3 is out
+			- editor :continued splitting editor into segments and videos
+			- played mame a bit, galaga still my favorite game.
+21/03/2003
+			- Began trashing editor
+19/03/2003
+			- About & mjpeg GUI
+			- mjpeg config consistent with others
+18/03/2003
+			- Finished audio codec settings
+			- Fixed change FPS
+			- rewrote properties dialog in gtk2
+17/03/2003
+			- More clean- up 
+			- Menus mostly complete
+			- Most functions present       
+
+16/03/2003
+			- Fixed a process & v process toggle buttons
+			- Decorellated menu binding from glade :)   
+			- Finished audio filters    
+			- Video codec + configure
+			- Audio codec + configure
+			- Workish solution for myth TV
+			
+15/03/2003
+			- Removed old GUI for good
+			- Fixed Xv release
+			- Audio filter setup 50 % done
+			- Merged new version of RTjpeg
+			- Have a nuv / mythTv nuv compatible stuff -> reread carefully.       
+14/03/2003
+			- Fixed configure about Xv stuff
+			- Make patch-o-matic for gui_main       
+			- Huge cleanup on callback.[ch] and interface.[ch]
+			- Began switching from old GUI to new GUI 
+			- new layers  UI_ and render_
+13/03/2003
+			- First clean up of renderer (no more shared stuff)       
+12/03/2003
+			- Began splitting new GUI in ADM_gui2       
