@@ -173,7 +173,20 @@ DIST386= \
 	i386/mpegvideo_mmx.c \
 	i386/mpegvideo_mmx_template.c \
 	i386/simple_idct_mmx.c
-DISTFILES= $(DIST386) $(DISTPPC) $(DIST_PP) \
+DISTX86_64= \
+	x86_64/dsputil_a64.c  \
+	x86_64/idct_a64.c        \
+	x86_64/mpegvideo_a64.c           \
+	x86_64/simple_idct_a64.c \
+	x86_64/fdct_a64.c     \
+	x86_64/motion_est_a64.c  \
+	x86_64/mpegvideo_a64_template.c  \
+	x86_64/vp3dsp_a64.c \
+	x86_64/dsputil_a64_avg.h  \
+	x86_64/dsputil_a64_rnd.h  \
+	x86_64/mmx.h
+	
+DISTFILES= $(DIST386) $(DISTPPC) $(DIST_PP) $(DISTX86_64) \
 	Makefile \
 	a52dec.c \
 	ac3.h \
@@ -297,6 +310,7 @@ DISTFILES= $(DIST386) $(DISTPPC) $(DIST_PP) \
 srcdir= .
 distdir: $(DISTFILES)
 	mkdir $(distdir)/i386
+	mkdir $(distdir)/x86_64
 	mkdir $(distdir)/ppc
 	mkdir $(distdir)/libpostproc
 	@for file in $(DISTFILES); do \
