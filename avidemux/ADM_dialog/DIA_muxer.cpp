@@ -186,7 +186,7 @@ GtkWidget	*create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (vbox2), label2, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
 
-  spinbutton3_adj = gtk_adjustment_new (10, 10, 5000, 1, 10, 10);
+  spinbutton3_adj = gtk_adjustment_new (10, 10, 4095, 1, 10, 10);
   spinbutton3 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton3_adj), 1, 0);
   gtk_widget_show (spinbutton3);
   gtk_box_pack_start (GTK_BOX (vbox2), spinbutton3, FALSE, FALSE, 0);
