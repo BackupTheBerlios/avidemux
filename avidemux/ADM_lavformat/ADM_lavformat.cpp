@@ -33,7 +33,9 @@ extern "C"
 	#include "avformat.h"
 };
 
-
+#undef malloc
+#undef realloc
+#undef free
 #include <ADM_assert.h>
 
 #include "ADM_library/default.h"
@@ -42,6 +44,7 @@ extern "C"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/ADM_a52info.h"
 #include "ADM_lavformat.h"
+#include "ADM_codecs/ADM_codec.h"
 
 
 
@@ -50,6 +53,7 @@ static    AVOutputFormat *fmt;
 static    AVFormatContext *oc;
 static    AVStream *audio_st, *video_st;
 static    double audio_pts, video_pts;
+
 //___________________________________________________________________________
 lavMuxer::lavMuxer( void )
 {
@@ -57,6 +61,10 @@ lavMuxer::lavMuxer( void )
 	oc=NULL;
 	audio_st=NULL;
 	video_st=NULL;
+	_fps1000=0;
+	_audioByterate=0;
+	_total=0;
+	_frameNo=0;
 }
 //___________________________________________________________________________
 lavMuxer::~lavMuxer()
@@ -67,7 +75,7 @@ lavMuxer::~lavMuxer()
 uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, uint32_t fps1000, WAVHeader *audioheader,float need)
 {
  AVCodecContext *c;
-
+	_fps1000=fps1000;
 	fmt = guess_format("dvd", NULL, NULL);
 	if (!fmt) 
 	{
@@ -82,6 +90,8 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, uint32_t fps1000, WAV
 	}
 	oc->oformat = fmt;
 	sprintf(oc->filename,"file://%s",filename);
+	// Video
+	//________
 	
 	video_st = av_new_stream(oc, 0);
 	if (!video_st) 
@@ -93,33 +103,32 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, uint32_t fps1000, WAV
 	c = &video_st->codec;
 	c->codec_id = CODEC_ID_MPEG2VIDEO;
 	c->codec_type = CODEC_TYPE_VIDEO;
-	c->bit_rate = 9800000;
-   
-	c->width = 720;  
-	c->height = 576;
+	c->flags=CODEC_FLAG_QSCALE;   
+	c->width = 720;  //FIXME
+	c->height = 576; //FIXME
+	c->bit_rate=0;
     
-	if(fps1000==23976 || fps1000==29960)
+	if(fps1000==23976 || fps1000==29970)
 	{
-		c->frame_rate = 3000;  
+		c->frame_rate = 30000;  
 		c->frame_rate_base = 1001;
 	}
 	else
 	{
 		c->frame_rate = 25025;  
-		c->frame_rate_base = 1001;
-	
-	}
-	c->gop_size = 12; 	// Should not be needed
-	c->max_b_frames = 2;	// id
-	
-	
+		c->frame_rate_base = 1001;	
+	}		
+	c->gop_size=15;
+	c->max_b_frames=2;
+
+	// Audio
+	//________
 	audio_st = av_new_stream(oc, 1);
 	if (!audio_st) 
 	{
 		printf("Lav: new stream failed\n");
 		return 0;
 	}
-	
 
 		
 	c = &audio_st->codec;
@@ -129,10 +138,10 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, uint32_t fps1000, WAV
 	c->bit_rate = audioheader->byterate*8;
 	c->sample_rate = audioheader->frequency;
 	c->channels = audioheader->channels;
-
+	
 //----------------------
 	oc->packet_size=2048;
-	oc->mux_rate=10080000;
+	oc->mux_rate=10080*1000;
 	
 	if (av_set_parameters(oc, NULL) < 0) 
 	{
@@ -150,7 +159,7 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, uint32_t fps1000, WAV
 
 
 	printf("lavformat mpeg muxer initialized\n");
-	
+	_audioByterate=audioheader->byterate;
 	return 1;
 }
 //___________________________________________________________________________
@@ -159,49 +168,64 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 
 	int ret;
   	AVPacket pkt;
+	double f;
+	
             av_init_packet(&pkt);
-            
-            pkt.pts= AV_NOPTS_VALUE;
-            pkt.stream_index=1;
+	    
             pkt.flags |= PKT_FLAG_KEY;
+	    
+	    f=_total;
+	    f*=1000.*1000.;
+	    f/=_audioByterate;
+	    _total+=len;
+            pkt.pts= (int)floor(f);
+	    
+            pkt.stream_index=1;
+           
 
             pkt.data= buf;
             pkt.size= len;
             
-            /* write the compressed frame in the media file */
             ret = av_write_frame(oc, &pkt);
 	    if(ret) 
 			{
 				printf("Error writing audio packet\n");
 				return 0;
 			}
-
+	printf("A: frame %lu pts%d\n",_frameNo,pkt.pts);
 	return 1;
 }
 //___________________________________________________________________________
 uint8_t lavMuxer::writeVideoPacket(uint32_t len, uint8_t *buf)
 {
 int ret;
-static int i=0;
+
+double f;
   	AVPacket pkt;
             av_init_packet(&pkt);
-             pkt.flags |= PKT_FLAG_KEY;
-
-            pkt.pts= 0;
-            pkt.stream_index=0;
+	    
+	f=_frameNo++;
+	f=(f*1000*1000*1000);
+	f=f/_fps1000;
+	pkt.pts= (int)floor(f);
+	pkt.stream_index=0;
            
-            pkt.data= buf;
-            pkt.size= len;
-            
-            /* write the compressed frame in the media file */
-            ret = av_write_frame(oc, &pkt);
-		if(ret) 
-			{
-				printf("Error writing video packet\n");
-				return 0;
-			}
-	printf("Lavf :%d frame done\n",i);
-	i++;
+	pkt.data= buf;
+	pkt.size= len;
+	// Look if it is a gop start or seq start
+	if(!buf[0] &&  !buf[1] && buf[2]==1)
+	{
+		if(buf[3]==0xb3 || buf[3]==0xb8 ) // Seq start or gop start
+		pkt.flags |= PKT_FLAG_KEY; 
+	}
+           
+	ret = av_write_frame(oc, &pkt);
+	if(ret) 
+	{
+		printf("Error writing video packet\n");
+		return 0;
+	}
+	printf("V: frame %lu pts%d\n",_frameNo,pkt.pts);
 	return 1;
 }
 //___________________________________________________________________________
@@ -213,9 +237,9 @@ uint8_t lavMuxer::forceRestamp(void)
 uint8_t lavMuxer::close( void )
 {
 	if(audio_st)
-		 av_freep(audio_st);
+		 av_free(audio_st);
 	if(video_st)
-		 av_freep(video_st);
+		 av_free(video_st);
 	video_st=NULL;
 	audio_st=NULL;
 	if(oc)

@@ -13,6 +13,12 @@
 //
 class lavMuxer
 {
+protected:
+		uint32_t _frameNo;
+		uint32_t _fps1000;
+		uint32_t _audioByterate;
+		uint32_t _total;
+
 public:
 		lavMuxer(void );
 		~lavMuxer(  );
