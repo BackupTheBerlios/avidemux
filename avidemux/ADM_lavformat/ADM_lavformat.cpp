@@ -50,11 +50,31 @@ extern "C"
 #include "ADM_lavformat.h"
 
 
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_LAVFORMAT
+#include "ADM_toolkit/ADM_debug.h"
+
+
 static    AVOutputFormat *fmt;
 static    AVFormatContext *oc;
 static    AVStream *audio_st, *video_st;
 static    double audio_pts, video_pts;
 
+static uint32_t one;
+uint64_t  _curDTS;
+
+// convert in in us to out in 90Khz tick
+int64_t adm_90k( double in)
+{
+int64_t out;
+	// in=in/1000*1000 us->s
+	// in/=(1/90000) nb 90 khz tick
+	// in*=90*000/000*000
+	// in =  in*=90/000
+	//in=in*90./1000.;
+	out= (int64_t)in;
+	return out;
+}
 //___________________________________________________________________________
 lavMuxer::lavMuxer( void )
 {
@@ -67,6 +87,7 @@ lavMuxer::lavMuxer( void )
 	_total=0;
 	_frameNo=0;
 	_running=0;
+	_curDTS=0;
 }
 //___________________________________________________________________________
 lavMuxer::~lavMuxer()
@@ -117,16 +138,17 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHea
 	}
 	else
 	{
-		c->frame_rate = 25025;  
-		c->frame_rate_base = 1001;	
+		c->frame_rate = 25000;  
+		c->frame_rate_base = 1000;	
 	}		
 	c->gop_size=15;
 	c->max_b_frames=2;
+	c->has_b_frames=1;
 
 	c->rc_buffer_size=8*1024*224;
 	c->rc_max_rate=9000*1000;
 	c->rc_min_rate=0;
-	c->bit_rate=6000*1000;
+	c->bit_rate=9000*1000;
 	
 	// Audio
 	//________
@@ -155,6 +177,7 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHea
 	oc->packet_size=2048;
 	oc->mux_rate=10080*1000;
 	oc->preload=AV_TIME_BASE/10; // 100 ms preloading
+	oc->max_delay=500*1000; // 500 ms
 	
 	if (av_set_parameters(oc, NULL) < 0) 
 	{
@@ -171,9 +194,12 @@ uint8_t lavMuxer::open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHea
 	dump_format(oc, 0, filename, 1);
 
 
-	printf("lavformat mpeg muxer initialized\n");
+	aprintf("lavformat mpeg muxer initialized\n");
 	_running=1;
 	_audioByterate=audioheader->byterate;
+	one=(1000*1000*1000)/_fps1000;
+	_curDTS=one;
+
 	return 1;
 }
 //___________________________________________________________________________
@@ -186,17 +212,16 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 	
             av_init_packet(&pkt);
 	    
-           // pkt.flags |= PKT_FLAG_KEY;
-	    
 	    f=_total;
 	    f*=1000.*1000.;
 	    f/=_audioByterate;
-	    _total+=len;
-            pkt.pts= (int)floor(f);
+            _total+=len;
 	    
+            pkt.dts=pkt.pts=f+2000;
+	   
             pkt.stream_index=1;
            
-
+	  //  pkt.flags |= PKT_FLAG_KEY; 
             pkt.data= buf;
             pkt.size= len;
             
@@ -206,22 +231,50 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 				printf("Error writing audio packet\n");
 				return 0;
 			}
-	printf("A: frame %lu pts%d\n",_frameNo,pkt.pts);
+	aprintf("A: frame %lu pts%d\n",_frameNo,pkt.pts);
 	return 1;
 }
 //___________________________________________________________________________
-uint8_t lavMuxer::writeVideoPacket(uint32_t len, uint8_t *buf)
+uint8_t lavMuxer::needAudio( void )
+{
+	
+	double f;
+	uint64_t dts;
+	 	f=_total;
+	    	f*=1000.*1000.;
+	    	f/=_audioByterate;
+		f+=2000;
+		dts=(uint64_t)floor(f);
+		
+		if((dts>=_curDTS) && (dts<=_curDTS+one)) return 1;
+		ADM_assert(dts>_curDTS);
+		return 0;
+}
+//___________________________________________________________________________
+uint8_t lavMuxer::writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe)
 {
 int ret;
 
-double f;
+double p,d;
   	AVPacket pkt;
             av_init_packet(&pkt);
 	    
-	f=_frameNo++;
-	f=(f*1000*1000*1000);
-	f=f/_fps1000;
-	pkt.pts= (int)floor(f);
+	p=displayframe;      // Pts
+	p=(p*1000*1000*1000);
+	p=p/_fps1000;
+	
+	d=frameno;		// dts
+	d=(d*1000*1000*1000);
+	d=d/_fps1000;
+	
+	_curDTS=pkt.dts= ( (int)floor(d));
+	pkt.pts= ( (int)floor(p));
+	
+	_curDTS=(int64_t)floor(d);
+	
+	pkt.dts=(int64_t)floor(d);
+	pkt.pts=(int64_t)floor(p);
+	
 	pkt.stream_index=0;
            
 	pkt.data= buf;
@@ -230,16 +283,18 @@ double f;
 	if(!buf[0] &&  !buf[1] && buf[2]==1)
 	{
 		if(buf[3]==0xb3 || buf[3]==0xb8 ) // Seq start or gop start
-		pkt.flags |= PKT_FLAG_KEY; 
+		pkt.flags |= PKT_FLAG_KEY;
+		//printf("Intra\n"); 
 	}
            
-	ret = av_write_frame(oc, &pkt);
+	ret =av_write_frame(oc, &pkt);
 	if(ret) 
 	{
 		printf("Error writing video packet\n");
 		return 0;
 	}
-	printf("V: frame %lu pts%d\n",_frameNo,pkt.pts);
+	aprintf("V: frame %lu pts%d\n",_frameNo,pkt.pts);
+	
 	return 1;
 }
 //___________________________________________________________________________
@@ -254,6 +309,7 @@ uint8_t lavMuxer::close( void )
 	{
 		_running=0;
 		// Flush
+		// Cause deadlock :
 		av_write_trailer(oc);
 		url_fclose(&oc->pb);
 

@@ -301,7 +301,6 @@ static int get_system_header_size(AVFormatContext *ctx)
         }
         buf_index += 3;
     }
-
     return buf_index;
 }
 
@@ -822,6 +821,17 @@ static int flush_packet(AVFormatContext *ctx, int stream_index,
                 stuffing_size += payload_size - trailer_size;
         }
 
+        if (pad_packet_bytes > 0 && pad_packet_bytes <= 7) { // can't use padding, so use stuffing
+            packet_size += pad_packet_bytes;
+            payload_size += pad_packet_bytes; // undo the previous adjustment
+            if (stuffing_size < 0) {
+                stuffing_size = pad_packet_bytes;
+            } else {
+                stuffing_size += pad_packet_bytes;
+            }
+            pad_packet_bytes = 0;
+        }
+
         if (stuffing_size < 0)
             stuffing_size = 0;
         if (stuffing_size > 16) {    /*<=16 for MPEG-1, <=32 for MPEG-2*/
@@ -830,13 +840,10 @@ static int flush_packet(AVFormatContext *ctx, int stream_index,
             payload_size -= stuffing_size;
             stuffing_size = 0;
         }
-
+        
         nb_frames= get_nb_frames(ctx, stream, payload_size - stuffing_size);
 
         put_be32(&ctx->pb, startcode);
-
-        if (pad_packet_bytes <= 7)               // if we need to stuff the pad bytes, increase the pkt size
-            packet_size += pad_packet_bytes;
 
         put_be16(&ctx->pb, packet_size);
         
@@ -926,13 +933,8 @@ static int flush_packet(AVFormatContext *ctx, int stream_index,
         stuffing_size= 0;
     }
 
-    if (pad_packet_bytes > 0) {
-        if (pad_packet_bytes > 7)   // if the bytes to pad are less than the padding pack header, use stuffing.
-            put_padding_packet(ctx,&ctx->pb, pad_packet_bytes);
-        else
-            for(i=0;i<pad_packet_bytes;i++)
-                put_byte(&ctx->pb, 0xff);
-    }
+    if (pad_packet_bytes > 0)
+        put_padding_packet(ctx,&ctx->pb, pad_packet_bytes);    
 
     for(i=0;i<zero_trail_bytes;i++)
         put_byte(&ctx->pb, 0x00);
@@ -1158,6 +1160,7 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, AVPacket *pkt)
 
     if(pts != AV_NOPTS_VALUE) pts += preload;
     if(dts != AV_NOPTS_VALUE) dts += preload;
+	//printf("st:%d Pts:%lld Dts:%lld \n",pkt->stream_index, pkt->pts,pkt->dts);
 
 //av_log(ctx, AV_LOG_DEBUG, "dts:%f pts:%f flags:%d stream:%d nopts:%d\n", dts/90000.0, pts/90000.0, pkt->flags, pkt->stream_index, pts != AV_NOPTS_VALUE);
     *stream->next_packet=
@@ -1683,9 +1686,8 @@ AVInputFormat mpegps_demux = {
 
 int mpegps_init(void)
 {
-       //meanx
+ //meanx
        register_protocol(&file_protocol);
-
 #ifdef CONFIG_ENCODERS
     av_register_output_format(&mpeg1system_mux);
     av_register_output_format(&mpeg1vcd_mux);
