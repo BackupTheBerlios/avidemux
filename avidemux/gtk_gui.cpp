@@ -14,8 +14,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ // This is used to test new features
+ // should be commented out for regulat build
 //#define TEST_MP2
-
+#ifdef TEST_MP2
+	#warning TEST_MP2 is ON
+	#warning TEST_MP2 is ON
+	#warning TEST_MP2 is ON
+	#warning TEST_MP2 is ON
+	#warning TEST_MP2 is ON
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -154,8 +162,9 @@ uint8_t use_fast_ffmpeg = 0;
 uint8_t use_fast_ffmpeg = 0;
 #endif
 int A_saveDVDPS(char *name);
+extern uint8_t ogmSave(char  *name);
 //__________
-
+extern uint8_t ogmSave(char *fd);
 
 
 
@@ -424,7 +433,11 @@ HandleAction (Action action)
 			
     case ACT_SaveDVDPS:
     			A_saveDVDPS(NULL);
-    			break;			
+    			break;
+    case ACT_SaveOGM:
+    			 GUI_FileSelWrite ("Select OGM file to write", (SELFILE_CB *)ogmSave);
+    			break;
+				
     case ACT_FrameChanged:
     			printf("FrameChanged\n");
 			break;
@@ -1191,42 +1204,9 @@ int A_saveJpg (char *name)
 }
 #else
 
-void A_saveJpg (char *name)
+int A_saveJpg (char *name)
 {
-Mpeg2encSVCD *codec=NULL;
-  uint32_t sz,fl,size;
-  FILE *fd;
-  uint8_t *buffer=NULL;
-  uint8_t *buffer_out=NULL;
-
-	fd=fopen(name,"wb");
-	if(!fd)
-	{
-				GUI_Alert("Problem opening file!");
-				return ;
-
-	}
-	sz = avifileinfo->width* avifileinfo->height * 3;
-	buffer=new uint8_t [sz];
-	buffer_out=new uint8_t [sz];
-	assert(buffer);
-
-		// mpeg1 hardcoded
-		codec=new  Mpeg2encSVCD( avifileinfo->width,avifileinfo->height)  ;
-		codec->init( 5,2100,avifileinfo->fps1000);
-
-		for(uint32_t w=0;w<avifileinfo->nb_frames;w++)
-		{
-			video_body->getUncompressedFrame(w,buffer,&fl);
-			codec->encode(buffer,buffer_out,&size,&fl);
-			fwrite (buffer_out, size, 1, fd);
-		}
-
-
-	fclose(fd);
-    	delete [] buffer;
-	delete [] buffer_out;
-	delete codec;
+ 	ogmSave(name);
   	GUI_Alert ("Done.");
 }
 #endif

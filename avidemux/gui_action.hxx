@@ -27,6 +27,7 @@ typedef enum
   ACT_PlayAvi,
   ACT_StopAvi,
   ACT_SaveImg,
+  ACT_SaveOGM,
   ACT_SaveJPG,
   ACT_SaveBunchJPG,
   ACT_SaveDVDPS,
