@@ -79,10 +79,12 @@ static CODECLIST myCodecList[]=
 		{"none", AUDIOENC_NONE}
 };
 extern int DIA_getLameSettings(int *pmode, int *pbitrate,ADM_LAME_PRESET *preset);
+extern void UI_PrintCurrentACodec( const char *s);
+
 #define MAX_AUDIO_FILTER 10
 static AVDMProcessAudioStream *filters[MAX_AUDIO_FILTER];
 static uint32_t filtercount = 0;
-
+static void audioDisplayCodec( void );
  int  audioNormalizeMode = 0;
  int  audioFreq=48000;
  RESAMPLING  audioResampleMode = RESAMPLING_NONE;
@@ -267,17 +269,21 @@ const char *audioFilterGetName( void )
 	return conf;
 
 }
-
-
+void audioDisplayCodec( void )
+{
+	UI_PrintCurrentACodec(audioCodecGetName()  );
+}
  void audioCodecSetcodec(AUDIOENCODER codec)
 {
 
 	activeAudioEncoder=codec;
+	audioDisplayCodec();
 }
 
 void audioCodecSelect( void )
 {
 	DIA_audioCodec( &activeAudioEncoder );
+	audioDisplayCodec();
 
 }
 /*

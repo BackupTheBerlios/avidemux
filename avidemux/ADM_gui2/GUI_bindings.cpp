@@ -581,3 +581,14 @@ void UI_NormalCursor( void )
 
 	
 }
+void UI_PrintCurrentVCodec(const char *str)
+{
+ 	gtk_label_set_text((GtkLabel *) lookup_widget(guiRootWindow,"labelVcodec"), str);
+
+}
+void UI_PrintCurrentACodec(const char *str)
+{
+ 	gtk_label_set_text((GtkLabel *) lookup_widget(guiRootWindow,"labelAcodec"), str);
+
+}
+// EOF

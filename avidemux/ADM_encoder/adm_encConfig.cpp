@@ -67,7 +67,7 @@ extern void oplug_mpeg_dvd(char *name);
 extern void oplug_mpeg_svcdConf( void );
 extern void oplug_mpeg_dvdConf( void );
 
-
+extern void UI_PrintCurrentVCodec(const char *str);
 extern void oplug_mpegff_conf(void);
 
 #ifdef USE_XVID_4 
@@ -403,8 +403,10 @@ SelectCodecType current_codec=CodecDivx;
 #else
 SelectCodecType current_codec=CodecFF;
 #endif
-
-EXTERN uint32_t videoProcessMode;
+extern void UI_PrintCurrentVCodec(const char *str);
+static void encoderPrint(void);
+static const char *encoderGetName(void);
+extern uint32_t videoProcessMode;
 
 uint8_t loadVideoCodecConf( char *name);
 uint8_t saveVideoCodecConf( char *name);
@@ -815,6 +817,18 @@ void saveEncoderConfig( void )
 	}
 	
 }
+const char *encoderGetName(void)
+{
+	for(uint32_t i=0;i< sizeof(mycodec)/sizeof(codecEnumByName);i++)
+	{
+		if(current_codec==mycodec[i].type)
+			return mycodec[i].name;
+	
+	}
+	return "???";
+
+}
+
 void loadEncoderConfig ( void )
 {
  char *name;
@@ -875,11 +889,14 @@ uint8_t DIA_videoCodec( SelectCodecType *codec );
 void videoCodecSelect( void )
 {
 	DIA_videoCodec( &current_codec );
+	encoderPrint();
+	// HERE UI_PrintCurrentVCodec( (current_codec))
 
 }
 void videoCodecSetcodec(SelectCodecType codec)
 {
 	current_codec=codec;
+	encoderPrint();
 
 }
 void videoCodecConfigureUI( void )
@@ -1286,3 +1303,10 @@ int a1,b1;
 	return (a1<<4)+b1;
 
 }
+
+void encoderPrint(void)
+{
+	UI_PrintCurrentVCodec(encoderGetName());
+}
+
+// EOF

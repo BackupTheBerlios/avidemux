@@ -154,6 +154,7 @@ create_mainWindow (void)
   GtkWidget *label14;
   GtkWidget *hbox14;
   GtkWidget *handlebox1;
+  GtkWidget *vbox5;
   GtkWidget *vbox2;
   GtkWidget *buttonFilters;
   GtkWidget *buttonAudioFilter;
@@ -163,6 +164,9 @@ create_mainWindow (void)
   GtkWidget *togglebuttonAudio;
   GtkWidget *togglebuttonPreview;
   GtkWidget *toggleOutput;
+  GtkWidget *vbox6;
+  GtkWidget *labelVcodec;
+  GtkWidget *labelAcodec;
   GtkWidget *guiDrawing;
   GtkWidget *sliderNavigate;
   GtkWidget *hbox17;
@@ -951,10 +955,15 @@ create_mainWindow (void)
   gtk_handle_box_set_shadow_type (GTK_HANDLE_BOX (handlebox1), GTK_SHADOW_NONE);
   gtk_handle_box_set_handle_position (GTK_HANDLE_BOX (handlebox1), GTK_POS_TOP);
 
+  vbox5 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_set_name (vbox5, "vbox5");
+  gtk_widget_show (vbox5);
+  gtk_container_add (GTK_CONTAINER (handlebox1), vbox5);
+
   vbox2 = gtk_vbox_new (FALSE, 0);
   gtk_widget_set_name (vbox2, "vbox2");
   gtk_widget_show (vbox2);
-  gtk_container_add (GTK_CONTAINER (handlebox1), vbox2);
+  gtk_box_pack_start (GTK_BOX (vbox5), vbox2, TRUE, TRUE, 0);
 
   buttonFilters = gtk_button_new_with_mnemonic (_("V Filter  [F1]"));
   gtk_widget_set_name (buttonFilters, "buttonFilters");
@@ -1033,6 +1042,23 @@ create_mainWindow (void)
   gtk_widget_add_accelerator (toggleOutput, "clicked", accel_group,
                               GDK_F8, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
+
+  vbox6 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_set_name (vbox6, "vbox6");
+  gtk_widget_show (vbox6);
+  gtk_box_pack_start (GTK_BOX (vbox5), vbox6, TRUE, TRUE, 0);
+
+  labelVcodec = gtk_label_new (_("---"));
+  gtk_widget_set_name (labelVcodec, "labelVcodec");
+  gtk_widget_show (labelVcodec);
+  gtk_box_pack_start (GTK_BOX (vbox6), labelVcodec, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (labelVcodec), GTK_JUSTIFY_LEFT);
+
+  labelAcodec = gtk_label_new (_("---"));
+  gtk_widget_set_name (labelAcodec, "labelAcodec");
+  gtk_widget_show (labelAcodec);
+  gtk_box_pack_start (GTK_BOX (vbox6), labelAcodec, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (labelAcodec), GTK_JUSTIFY_LEFT);
 
   guiDrawing = gtk_drawing_area_new ();
   gtk_widget_set_name (guiDrawing, "guiDrawing");
@@ -1478,6 +1504,7 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, label14, "label14");
   GLADE_HOOKUP_OBJECT (mainWindow, hbox14, "hbox14");
   GLADE_HOOKUP_OBJECT (mainWindow, handlebox1, "handlebox1");
+  GLADE_HOOKUP_OBJECT (mainWindow, vbox5, "vbox5");
   GLADE_HOOKUP_OBJECT (mainWindow, vbox2, "vbox2");
   GLADE_HOOKUP_OBJECT (mainWindow, buttonFilters, "buttonFilters");
   GLADE_HOOKUP_OBJECT (mainWindow, buttonAudioFilter, "buttonAudioFilter");
@@ -1487,6 +1514,9 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, togglebuttonAudio, "togglebuttonAudio");
   GLADE_HOOKUP_OBJECT (mainWindow, togglebuttonPreview, "togglebuttonPreview");
   GLADE_HOOKUP_OBJECT (mainWindow, toggleOutput, "toggleOutput");
+  GLADE_HOOKUP_OBJECT (mainWindow, vbox6, "vbox6");
+  GLADE_HOOKUP_OBJECT (mainWindow, labelVcodec, "labelVcodec");
+  GLADE_HOOKUP_OBJECT (mainWindow, labelAcodec, "labelAcodec");
   GLADE_HOOKUP_OBJECT (mainWindow, guiDrawing, "guiDrawing");
   GLADE_HOOKUP_OBJECT (mainWindow, sliderNavigate, "sliderNavigate");
   GLADE_HOOKUP_OBJECT (mainWindow, hbox17, "hbox17");

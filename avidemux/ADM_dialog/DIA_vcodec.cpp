@@ -31,7 +31,6 @@
  static GtkWidget *dialog;
  static void okCallback(GtkButton * button, gpointer user_data);
  static void callBackCalc( void );
-
 extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
  typedef struct myVideoCodec
  {
@@ -66,7 +65,6 @@ extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
 	{CodecXSVCD,"DVD (lavcodec)"}
 	
  };
-
  void okCallback(GtkButton * button, gpointer user_data)
 {
 	SelectCodecType cur;
