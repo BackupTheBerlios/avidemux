@@ -17,7 +17,7 @@
 #ifndef __MPEG_WRITE_H
 #define __MPEG_WRITE_H
 #include "ADM_lvemux/ADM_muxer.h"
-
+#include "ADM_xvidratectl/ADM_ratecontrol.h"
 typedef enum
 {
 	ADM_VCD=1,
@@ -29,7 +29,7 @@ typedef enum
 class	mpegWritter
 {
   private :
-  				
+  				ADM_ratecontrol		*_ratecontrol;
 				Mpeg2enc		*_codec;
 				uint32_t 		_w,_h,_page;
 				uint32_t		_fps1000;

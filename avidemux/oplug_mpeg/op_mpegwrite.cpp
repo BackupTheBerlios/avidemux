@@ -71,12 +71,10 @@
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
 
-extern "C" {
-#include "ADM_encoder/xvid_vbr.h"
-};
+
 #include "ADM_dialog/DIA_enter.h"
 
-static vbr_control_t mpegvbr;
+
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_MPEG2ENC
@@ -119,6 +117,7 @@ mpegWritter::mpegWritter( void )
 	_muxer=NULL;
 	_outputAsPs=0;
 	audioWanted=audioGot=0;
+	_ratecontrol=NULL;
 
 }
 mpegWritter::mpegWritter( uint8_t ps )
@@ -134,6 +133,7 @@ mpegWritter::mpegWritter( uint8_t ps )
 	_muxer=NULL;
 	_outputAsPs=1;
 	audioWanted=audioGot=0;
+	_ratecontrol=NULL;
 
 }
 //_______________________________________
@@ -500,6 +500,9 @@ char *statname;
 		if(GUI_Question("Reuse log file ?")) reuse=1;
 	}
 #endif	
+	//_ratecontrol=new ADM_oldXvidRc(_fps1000,statname);
+	_ratecontrol=new ADM_newXvidRc(_fps1000,statname);
+	
 #if 1
 if(!reuse)
 //	if(!dopass1(name,statname,final_size,bitrate,mpegtype,matrix,interlaced,widescreen))
@@ -558,25 +561,9 @@ int intra,q;
 	encoding->setPhasis("1st Pass");
 	bitrate=0; // we dont care in pass 1 ...
 
- 	memset(&mpegvbr,0,sizeof(mpegvbr));
-       	if(0>  vbrSetDefaults(&mpegvbr)) 				return 0;
-	mpegvbr.fps=_fps1000/1000.;
+ 	
 
- 	mpegvbr.mode=VBR_MODE_2PASS_1;
-	mpegvbr.desired_size=(uint64_t)final_size*(uint64_t)(1024*1024);
-	mpegvbr.debug=0;
-	mpegvbr.filename=statname; //XvidInternal2pass_statfile;
-
-					
-	br=mpegvbr.desired_size*8;
-	br=br/_total;				// bit / frame
-	br=br*mpegvbr.fps;
-	br/=1000;
-	avg=(uint32_t)floor(br);
-
-	printf("Average bitrate : %lu\n",avg);
-
-	if(0>   vbrInit(&mpegvbr))             				return 0;
+	ADM_assert(_ratecontrol->startPass1());
 
 	switch(mpegtype)
 	{
@@ -627,7 +614,7 @@ int intra,q;
 	for(uint32_t i=0;i<_total;i++)
 	{
 		_codec->setQuantize(q);
-        	if(!	incoming->getFrameNumberNoAlloc(i, &size,aImage,&flags))
+        	if(!incoming->getFrameNumberNoAlloc(i, &size,aImage,&flags))
 		{
         		GUI_Alert("Encoding error !");
 			end();
@@ -642,29 +629,19 @@ int intra,q;
 		_codec->encode(		aImage,_buffer_out , &len,&flags,&outquant);
 		total_size+=len;
 
-		if(flags & AVI_KEY_FRAME) intra=1;
-			else					intra=0;
+		
 		aprintf("inquant  : %02d outquant :%02d Intra %d, len %lu\n",q,outquant,intra,len);
 
+		ADM_rframe ftype;
 		switch(flags)
 		{
-			case AVI_KEY_FRAME: 	type=1;
-						break;
-			case AVI_B_FRAME: 	type=3;
-						break;
-			default:
-						type=2;
-						break;
+			case AVI_KEY_FRAME: 	ftype=RF_I;break;
+			case AVI_B_FRAME: 	ftype=RF_B;break;
+			default:		ftype=RF_P;break;
 		}
 
-		vbrUpdate(&mpegvbr,
-				outquant,
-				intra,
-				0,
-				len,
-				0,
-				0,
-				type);
+		ADM_assert(_ratecontrol->logPass1(outquant,ftype,len));
+		
 		encoding->setFrame(i,_total);
 		encoding->setQuant(outquant);
 		encoding->feedFrame(len);
@@ -680,28 +657,18 @@ int intra,q;
 		_codec->encode(		aImage,_buffer_out , &len,&flags,&outquant);
 		total_size+=len;
 
-		if(flags & AVI_KEY_FRAME) intra=1;
-			else					intra=0;
+		
 		aprintf("inquant  : %02d outquant :%02d Intra %d\n",q,outquant,intra);
 
+		ADM_rframe ftype;
 		switch(flags)
 		{
-			case AVI_KEY_FRAME: 	type=1;
-									break;
-			case AVI_B_FRAME: 	type=3;
-									break;
-			default:
-								type=2;
-								break;
+			case AVI_KEY_FRAME: 	ftype=RF_I;break;
+			case AVI_B_FRAME: 	ftype=RF_B;break;
+			default:		ftype=RF_P;break;
 		}
-		vbrUpdate(&mpegvbr,
-				outquant,
-				intra,
-				0,
-				len,
-				0,
-				0,
-				type);
+		ADM_assert(_ratecontrol->logPass1(outquant,ftype,len));
+
 		encoding->setFrame(i,MPEG_PREFILL);
 		encoding->setQuant(outquant);
 		encoding->feedFrame(len);
@@ -710,7 +677,7 @@ int intra,q;
 	// flush queue
 	delete _codec;
 	_codec=NULL;
-	vbrFinish(&mpegvbr);
+	
 	return 1;
 }
 /*--------------------------------------------------------------------*/
@@ -757,42 +724,9 @@ uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 	encoding->setFrame (0, _total);
 
 /*-------------------- Pass 1 over, go to pass 2 --------------------------------*/
-	total_size=0;
-	 memset(&mpegvbr,0,sizeof(mpegvbr));
-	if(0>  vbrSetDefaults(&mpegvbr))
-	{
-		printf("set default failed\n");
-		return 0;
-	}
-	mpegvbr.fps=_fps1000/1000.;
-
-	mpegvbr.mode=VBR_MODE_2PASS_2;
-	mpegvbr.desired_size=(uint64_t)final_size*(uint64_t)1024*(uint64_t)1024;
-	mpegvbr.debug=0;
-	mpegvbr.filename=statname; //XvidInternal2pass_statfile;
-
-	float br;
-	uint32_t avg;
-
-	br=mpegvbr.desired_size*8;
-	br=br/_total;				// bit / frame
-	br=br*mpegvbr.fps;
-
-	mpegvbr.desired_bitrate= (int)floor(br);
-	avg=(uint32_t)floor(br/1000.);
-	printf("average bitrate : %lu\n",avg);
-	//mpegvbr.maxAllowedBitrate=(2500*1000)>>3; 
-	// enable stuff in xvid
-	//mpegvbr.twopass_max_bitrate=2500*1000;
-	//mpegvbr.alt_curve_high_dist=10;
-	//mpegvbr.alt_curve_low_dist=30;
-	//mpegvbr.alt_curve_type=VBR_ALT_CURVE_AGGRESIVE;
-
-	if(0>vbrInit(&mpegvbr))
-	{
-		GUI_Alert("Error initializing 2 pass!");
-		return 0;
-	}
+	
+	ADM_assert(_ratecontrol->startPass2(final_size,_total));
+	
 	encoding->setPhasis("2nd Pass");
 	q=2;
 
@@ -856,38 +790,30 @@ uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 			continue;
 		}
 		encoding->feedFrame(len); // Set
-		/* prepare quantization for next gop */
-		//if(vbr_next_intra( &mpegvbr))
-		{
-			q=vbrGetQuant(&mpegvbr);
-			_codec->setQuantize(q);
-		}
+		//
+		ADM_rframe ftype,ztype;
+		uint32_t qz;
+		ADM_assert(_ratecontrol->getQz(&qz,&ztype));
+		q=qz;
+		_codec->setQuantize(q);
 		_codec->encode(aImage,_buffer_out , &len,&flags,&outquant);
 		quantstat[outquant]++;
 		encoding->setQuant(outquant);
-		if(flags & AVI_KEY_FRAME) intra=1;
-		else			intra=0;
+		
 		switch(flags)
 		{
-			case AVI_KEY_FRAME: 	type=1;
-																		break;
-			case AVI_B_FRAME: 	type=3;
-																		break;
-			default:
-						type=2;
-						break;
+			case AVI_KEY_FRAME: 	ftype=RF_I;break;
+			case AVI_B_FRAME: 	ftype=RF_B;break;
+			default:		ftype=RF_P;break;
+		}
+		if(ftype!=ztype)
+		{
+			printf("**Frame type does not match %d %d\n",ztype,ftype);
 		}
 		aprintf("inquant  : %02d outquant %02d Intra %d size :%d flags %x\n",
 				q,outquant,intra,len,flags);
-		vbrUpdate(&mpegvbr,
-				outquant,
-				//q,
-				intra,
-				0,
-				len,
-				0,
-				0,
-				type);
+		ADM_assert(_ratecontrol->logPass2(outquant,ftype,len));
+		
 
 		total_size+=len;
 	
@@ -921,35 +847,23 @@ uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 	for(uint32_t i=0;i<MPEG_PREFILL;i++)
 	{
 		
-		q=vbrGetQuant(&mpegvbr);
+		ADM_rframe ftype;
+		uint32_t qz;
+		ADM_assert(_ratecontrol->getQz(&qz,&ftype));
+		q=qz;
 		_codec->setQuantize(q);
 		_codec->encode(		aImage,_buffer_out , &len,&flags,&outquant);
 		quantstat[outquant]++;
 		encoding->setQuant(outquant);
-		if(flags & AVI_KEY_FRAME) intra=1;
-			else		intra=0;
 		switch(flags)
 		{
-			case AVI_KEY_FRAME: 	type=1;
-						break;
-			case AVI_B_FRAME: 	type=3;
-						break;
-			default:
-						type=2;
-						break;
-		}		
-
-		printf("inquant  : %02d outquant %02d Intra %d size :%d flags %x\n",q,outquant,
-					intra,len,flags);
-		vbrUpdate(&mpegvbr,
-				outquant,
-				//q,
-				intra,
-				0,
-				len,
-				0,
-				0,
-				type);
+			case AVI_KEY_FRAME: 	ftype=RF_I;break;
+			case AVI_B_FRAME: 	ftype=RF_B;break;
+			default:		ftype=RF_P;break;
+		}
+		aprintf("inquant  : %02d outquant %02d Intra %d size :%d flags %x\n",
+				q,outquant,intra,len,flags);
+		ADM_assert(_ratecontrol->logPass2(outquant,ftype,len));
 
 		total_size+=len;
 		if(!_muxer)
@@ -1027,6 +941,11 @@ uint8_t mpegWritter::end( void )
 		_muxer->close();
 		delete _muxer;
 		_muxer=NULL;
+	}
+	if(_ratecontrol)
+	{
+		delete _ratecontrol;
+		_ratecontrol=NULL;
 	}
       return 1;
 }
