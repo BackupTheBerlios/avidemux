@@ -464,8 +464,9 @@ GenericAviSave::writeAudioChunk (void)
 void
 GenericAviSave::guiStart (void)
 {
-	dialog_work=new DIA_working("Saving AVI");
-	dialog_work->update(0,100);
+	encoding_gui=new DIA_encoding(_incoming->getInfo ()->fps1000);
+	encoding_gui->setCodec("Copy");
+	encoding_gui->setFrame (0, 100);
 
 }
 void
@@ -477,16 +478,20 @@ GenericAviSave::guiSetSize (uint32_t size)
 void
 GenericAviSave::guiStop (void)
 {
- 	delete dialog_work;
-	dialog_work=NULL;
+ 	assert(encoding_gui);
+  	delete encoding_gui;
+  	encoding_gui=NULL;
 
 }
 
 uint8_t
 GenericAviSave::guiUpdate (uint32_t nb, uint32_t total)
 {
-	assert(dialog_work);
-  return dialog_work->update (nb, total);
+  assert(encoding_gui);
+  encoding_gui->setFrame (nb, total);
+  if ( encoding_gui->isAlive () == 1)
+    return 0;
+  return 1;
 
 
 }
