@@ -44,7 +44,8 @@
           public :
 	  				xvid4Encoder(uint32_t width,uint32_t height)   : encoder(width,height)
              				{
-                                		_init=0;                                
+                                		_init=0;   
+						_handle=NULL;                             
                    			} ;
 					~xvid4Encoder();
              				void		*getXvidStat( void );          			
