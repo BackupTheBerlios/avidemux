@@ -17,6 +17,7 @@
  // This is used to test new features
  // should be commented out for regulat build
 //#define TEST_MP2
+#define TEST_OCR
 #ifdef TEST_MP2
 	#warning TEST_MP2 is ON
 	#warning TEST_MP2 is ON
@@ -165,6 +166,8 @@ extern void videoCodecChanged(int newcodec);
 extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
 extern int ignore_change;
 
+extern uint8_t ADM_ocr_engine( void);
+
 PARAM_MUX muxMode = MUX_REGULAR;
 int muxParam = 0;
 
@@ -256,7 +259,11 @@ HandleAction (Action action)
       return;
       break;
     case ACT_SetMuxParam:
+#ifdef TEST_OCR
+         ADM_ocr_engine( );
+#else    
       ADM_aviUISetMuxer();
+#endif
       return;
       break;
     case ACT_OuputToggle:

@@ -119,18 +119,26 @@ class ADM_AudiocodecWavSwapped : public     ADM_Audiocodec
    };
 
 #ifdef USE_MP3
+
+#define ADM_MP3_BUFFER (48*1024)
     class ADM_AudiocodecMP3 : public     ADM_Audiocodec
  {
     protected:
+                                uint32_t        _head;
+                                uint32_t        _tail;
+                                uint8_t         _buffer[ADM_MP3_BUFFER];
+                                void            *_stream;
+                                void            *_frame;
+                                void            *_synth;
     public:
-                						ADM_AudiocodecMP3( uint32_t fourcc );
-                	virtual			~ADM_AudiocodecMP3() ;
-         			virtual         void 	purge( void ) {};
-                 virtual 			uint8_t beginDecompress( void ) ;
-                 virtual 			uint8_t endDecompress( void );
-                 virtual 			uint8_t run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut);
-                 virtual			uint8_t isCompressed( void ){ return 1;};
-                 virtual			uint8_t isDecompressable(void ){ return 1;};
+                                                ADM_AudiocodecMP3( uint32_t fourcc );
+                virtual                         ~ADM_AudiocodecMP3() ;
+                virtual         void            purge( void ) {};
+                 virtual        uint8_t         beginDecompress( void ) ;
+                 virtual        uint8_t         endDecompress( void );
+                 virtual        uint8_t         run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut);
+                 virtual        uint8_t         isCompressed( void ){ return 1;};
+                 virtual        uint8_t         isDecompressable(void ){ return 1;};
 
    };
 #endif
@@ -186,25 +194,45 @@ class ADM_AudiocodecWavSwapped : public     ADM_Audiocodec
 
 #endif
 
-#define ADMWA_BUF 4096
+#define ADMWA_BUF (4*1024*16) // 64 kB internal
    class ADM_AudiocodecWMA : public     ADM_Audiocodec
  {
     protected:
-    					void 			*_contextVoid;
-         				uint8_t       _buffer[ ADMWA_BUF];
-             			uint32_t 		_inStock;
-                		uint32_t		_blockalign;
+                            void                    *_contextVoid;
+                            uint8_t                 _buffer[ ADMWA_BUF];
+                            uint32_t                _tail,_head;
+                            uint32_t                _blockalign;
     public:
-                						ADM_AudiocodecWMA( uint32_t fourcc ,WAVHeader *info,uint32_t l,uint8_t *d);
-                	virtual			~ADM_AudiocodecWMA() ;
-         			virtual         void 	purge( void ) {};
-                 virtual 			uint8_t beginDecompress( void ) ;
-                 virtual 			uint8_t endDecompress( void );
-                 virtual 			uint8_t run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut);
-                 virtual			uint8_t isCompressed( void ){ return 1;};
-                 virtual			uint8_t isDecompressable(void ){ return 1;};
+                                                ADM_AudiocodecWMA( uint32_t fourcc ,WAVHeader *info,uint32_t l,uint8_t *d);
+                virtual                         ~ADM_AudiocodecWMA() ;
+                virtual                         void 	purge( void ) {};
+                virtual     uint8_t             beginDecompress( void ) ;
+                virtual     uint8_t             endDecompress( void );
+                virtual     uint8_t             run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut);
+                virtual     uint8_t             isCompressed( void ){ return 1;};
+                virtual     uint8_t             isDecompressable(void ){ return 1;};
 
    };
+   //****************************************************
+   #define ADM_AMR_BUFFER (16*1024) // 16 kB internal
+    class ADM_AudiocodecAMR : public     ADM_Audiocodec
+ {
+    protected:
+                                void            *_contextVoid;
+                                uint8_t         _buffer[ ADM_AMR_BUFFER];
+                                uint32_t        _head,_tail;
+    public:
+                                                ADM_AudiocodecAMR( uint32_t fourcc ,WAVHeader *info);
+                 virtual	               ~ADM_AudiocodecAMR() ;
+                 virtual                        void 	purge( void ) {};
+                 virtual                        uint8_t beginDecompress( void ) ;
+                 virtual                        uint8_t endDecompress( void );
+                 virtual                        uint8_t run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut);
+                 virtual                        uint8_t isCompressed( void ){ return 1;};
+                 virtual                        uint8_t isDecompressable(void ){ return 1;};
+
+   };
+   //****************************************************
   class ADM_AudiocodecUlaw : public     ADM_Audiocodec
  {
     protected:

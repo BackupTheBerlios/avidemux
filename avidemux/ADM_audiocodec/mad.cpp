@@ -20,7 +20,7 @@ Strongly derived from madlld 0.1 by Bertrand Petit
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#if 0
 # include <stdio.h>
 # include <unistd.h>
 # include <math.h>
@@ -229,4 +229,5 @@ signed int r;
 }
 
 
+#endif
 #endif

@@ -83,7 +83,7 @@ uint8_t artsAudioDevice::init(uint32_t channel, uint32_t fq)
 		return 0;
 	}
 	arts_stream_set(_stream, ARTS_P_BLOCKING, 1);
-	//arts_stream_set(_stream, ARTS_P_BUFFER_TIME, 500); // Ask for 1 sec buffer
+	arts_stream_set(_stream, ARTS_P_BUFFER_TIME, 50); // Ask for 1 sec buffer
 	//arts_stream_set(_stream,  ARTS_P_PACKET_SETTINGS, (11<<16)+10);
 	
 	

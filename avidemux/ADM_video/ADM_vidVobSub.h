@@ -82,7 +82,12 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
         uint32_t                        _currentSub;            ///
         uint32_t                        _initialPts;
  public:
-                
+    /* This 3 functions are used by OCR */
+                        ADMVideoVobSub(  char *fileidx,uint32_t idx);
+              vobSubBitmap *getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last);
+              uint32_t     getNbImage( void);
+    /* /ocr */ 
+    
                         ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *setup);
                         ~ADMVideoVobSub();
         virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,

@@ -84,7 +84,10 @@ extern "C" {
 #include "ADM_video/swscale.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
 
-#define aprintf printf
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_FILTER
+#include "ADM_toolkit/ADM_debug.h"
+
 //*************************************************************
 uint8_t ADMVideoVobSub::forward(uint32_t v)
 {
@@ -233,16 +236,24 @@ uint8_t  command;
         _subSize=0;
 uint32_t pts;
         // Read data
-printf("**Cur:%llx next:%llx\n",_parser->getAbsPos(),_vobSubInfo->lines[idx+1].fileOffset);        
+aprintf("**Cur:%llx next:%llx\n",_parser->getAbsPos(),_vobSubInfo->lines[idx+1].fileOffset);        
 while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
 {        
-        printf("**Cur:%llx next:%llx\n",_parser->getAbsPos(),_vobSubInfo->lines[idx+1].fileOffset);
+        aprintf("**Cur:%llx next:%llx\n",_parser->getAbsPos(),_vobSubInfo->lines[idx+1].fileOffset);
         _subSize=_parser->read16i();
-        ADM_assert(_subSize);
+        if(!_subSize)
+        {
+            printf("Vobsub: error reading\n");
+            return 0;
+        }
         
         aprintf("Vobsub: data len =%d\n",_subSize);
         
-        ADM_assert(_subSize<VS_MAXPACKET);
+        if(_subSize>VS_MAXPACKET-1)
+         {
+            printf("Vobsub: error reading (packet too big)\n");
+            return 0;
+        }
         _parser->read(_data+2,_subSize-2);
        
         // We got the full packet
@@ -250,7 +261,12 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
         _curOffset=2;
         _dataSize=readword();
         aprintf("data block=%lu\n",_dataSize);
-        ADM_assert(_dataSize>4);
+        if(_dataSize<=4)
+        {
+            printf("Vobsub: data block too small\n");
+            return 0;       
+        }
+        
         forward(_dataSize-4);    // go to the command block
         
         
@@ -281,7 +297,7 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
                                                 comp=comp/90;     // 90khz
                                                 comp+=date*10;    // 1/100th of a second
                                                  _vobSubInfo->lines[idx].stopTime=(uint32_t)comp;
-                                                printf("****Sub: idx : %lu starts at :%lu end at :%lu\n",
+                                                aprintf("****Sub: idx : %lu starts at :%lu end at :%lu\n",
                                                         idx,
                                                         _vobSubInfo->lines[idx].startTime, 
                                                         _vobSubInfo->lines[idx].stopTime);
@@ -419,7 +435,7 @@ uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy,u
   SwsContext *ctx=NULL;
   int er=0;
   
-  printf("Sub Resize : top %lu height %lu -> %lu %lu\n",oldtop, oldheight,newx, newy);
+  aprintf("Sub Resize : top %lu height %lu -> %lu %lu\n",oldtop, oldheight,newx, newy);
   
 #if 0  
 //#ifdef USE_MMX
@@ -447,7 +463,7 @@ uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy,u
   if(oldheight==newy && _width==newx)
   {
     uint8_t *src,*dst;
-    printf("No need to resize\n");
+    aprintf("No need to resize\n");
     src=_bitmap+oldtop*_width;
     dst=(*tgt)->_bitmap;
     memcpy(dst,src,newx*newy); 
@@ -494,13 +510,13 @@ uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy,u
   ddst[1]=ddst[2]=0;
 
   er=sws_scale(ctx,src,ssrc,0,oldheight,dst,ddst);
-  printf("Er:%d\n",er);
+  aprintf("Er:%d\n",er);
   
   // And alpha
   src[0]=_alphaMask+oldtop*_width;  
   dst[0]=(*tgt)->_alphaMask;
   er=sws_scale(ctx,src,ssrc,0,_height,dst,ddst);
-  printf("Er:%d\n",er);
+  aprintf("Er:%d\n",er);
   // end
   sws_freeContext(ctx); 
   return 1;             

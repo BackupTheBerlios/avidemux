@@ -137,7 +137,7 @@ uint8_t         X264Encoder::encode( ADMImage        *in,
         
         PICS->i_type=X264_TYPE_AUTO;
         
-        if(x264_encoder_encode(HANDLE, &nal, &nbNal, PICS) < 0) 
+        if(x264_encoder_encode(HANDLE, &nal, &nbNal, PICS,NULL) < 0) 
         {
           printf("Error encoding with x264\n");
           return 0; 

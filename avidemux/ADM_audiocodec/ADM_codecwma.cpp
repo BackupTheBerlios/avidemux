@@ -1,6 +1,8 @@
 /***************************************************************************
                           ADM_codecwma.cpp  -  description
                              -------------------
+        We do also AMR here                      
+                             
     begin                : Tue Nov 12 2002
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
@@ -58,6 +60,8 @@
     _context->extradata=(void *)d;
     _context->extradata_size=(int)l;	
     printf(" Using %ld bytes of extra header data\n",l);
+    mixDump(d,l);
+    printf("\n");
 		 if (avcodec_open(_context, &wmav2_decoder) < 0) 
 		      {
 				printf("\n WMA decoder init failed !\n");

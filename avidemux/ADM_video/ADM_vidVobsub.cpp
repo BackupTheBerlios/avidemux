@@ -123,6 +123,82 @@ ADMVideoVobSub::ADMVideoVobSub(  AVDMGenericVideoStream *in,CONFcouple *couples)
         
         setup();
 }
+/*
+    Alternate constructor for use by OCR
+*/
+ADMVideoVobSub::ADMVideoVobSub(  char *fileidx,uint32_t idx)
+{
+
+        _in=NULL;         
+        memset(&_info,0,sizeof(_info));    
+        _info.encoding=1;       
+        _parser=NULL;  
+        _resampled=NULL;
+        _chromaResampled=NULL;
+        _original=NULL;        
+        
+        _param=NEW(vobSubParam);
+        
+        
+        _param->subname=ADM_strdup(fileidx);
+        _param->index = idx;   
+        _param->subShift=0;                    
+        
+        setup();
+}
+/*
+    Returns bitmap & info for the Nth subs
+*/
+
+vobSubBitmap *ADMVideoVobSub::getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last)
+{
+    ADM_assert(_vobSubInfo);
+    ADM_assert(nb<_vobSubInfo->nbLines);
+    
+    // Seek & decode
+    _parser->_asyncJump2(0,_vobSubInfo->lines[nb].fileOffset);
+    handleSub(nb);
+    *first=*last=0;
+    if(_original)
+    {
+    uint32_t ox,oy;
+        _original->buildYUV(_YUVPalette);
+        ox=_vobSubInfo->width;
+        oy=_vobSubInfo->height;
+        
+        // Search the 1st/last non null line
+        uint32_t top=0,bottom=0;
+        while(top<oy && !_original->_dirty[top]) top++;
+        
+        bottom=_original->_height-1;
+        while(bottom && !_original->_dirty[bottom]) bottom--;
+        
+        // If true it means we have 2 subs, one on top, one on bottom
+        //
+        if(bottom>(oy>>1) && top<(oy>>1) && (bottom-top>(oy>>1)))
+        {
+          // in that case, take only the lower one
+          top=oy>>1;
+          while(top<oy && !_original->_dirty[top]) top++;                    
+        }
+        *first=top;
+        *last=bottom;
+    }
+    *start=_vobSubInfo->lines[nb].startTime;
+    *end=_vobSubInfo->lines[nb].stopTime;
+    return _original;
+}
+/*
+    Returns the nb of lines found in the sub
+*/
+uint32_t     ADMVideoVobSub::getNbImage( void)
+{
+    if(!_parser) return 0;
+    if(!_param) return 0;
+    if(!_vobSubInfo) return 0;
+    return _vobSubInfo->nbLines;
+
+}
 //************************************
 uint8_t ADMVideoVobSub::setup(void)
 {

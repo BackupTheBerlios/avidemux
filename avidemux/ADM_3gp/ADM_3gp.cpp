@@ -122,16 +122,16 @@ uint32_t offset=_idx[framenum].offset; //+_mdatOffset;
 	if(_volHeaderLen && !framenum)
 	{
 
- 		fseek(_fd,_volHeader,SEEK_SET);
+ 		fseeko(_fd,_volHeader,SEEK_SET);
  		fread(ptr, _volHeaderLen, 1, _fd);
 
- 		fseek(_fd,offset,SEEK_SET);
+ 		fseeko(_fd,offset,SEEK_SET);
  		fread(ptr+_volHeaderLen, _idx[framenum].size, 1, _fd);
   		*framelen=_idx[framenum].size+_volHeaderLen;
  		return 1;
 	}
 
- 	fseek(_fd,offset,SEEK_SET);
+ 	fseeko(_fd,offset,SEEK_SET);
  	fread(ptr, _idx[framenum].size, 1, _fd);
   	*framelen=_idx[framenum].size;
  	return 1;
@@ -270,8 +270,54 @@ uint8_t    _3GPHeader::open(char *name)
 	parseAtomTree(atom);
 	delete atom;
 	printf("Found video codec type :");fourCC::print(_videostream.fccHandler);printf("\n");
-
-	if(!_idx) return 0;
+        if(!_idx) return 0;
+        // If it is mpeg4 and we have extra data
+        // Decode vol header to get the real width/height
+        // The mpeg4/3GP/Mov header is often misleading
+        if(fourCC::check(_videostream.fccHandler,(uint8_t *)"DIVX"))
+        {
+            if(_volHeaderLen)
+            {
+                uint32_t w=0,h=0;
+                uint8_t *data=new uint8_t[_volHeaderLen+16]; // padding issue
+                fseek(_fd,_volHeader,SEEK_SET);
+                fread(data,_volHeaderLen,1,_fd);
+                if(extractMpeg4Info(data,_volHeaderLen,&w,&h))
+                {
+                    printf("MP4 Corrected size : %lu x %lu\n",w,h);
+                    _video_bih.biWidth=_mainaviheader.dwWidth=w ;
+                    _video_bih.biHeight=_mainaviheader.dwHeight=h;                               
+                }
+                delete [] data;            
+            }
+        
+        }
+        else
+        {
+        /*
+            Same story for H263 : Analyze 1st frame to get the real width/height
+        */
+            if(fourCC::check(_videostream.fccHandler,(uint8_t *)"H263"))
+            {
+                uint32_t len;
+                uint8_t *data;
+                uint32_t w=0,h=0;
+                        len=_idx[0].size;
+                        data=new uint8_t[len+16];
+                        fseek(_fd,_idx[0].offset,SEEK_SET);
+                        fread(data, len, 1, _fd);
+                        if(extractH263Info(data,len,&w,&h))
+                        {
+                            printf("H263 Corrected size : %lu x %lu\n",w,h);
+                            _video_bih.biWidth=_mainaviheader.dwWidth=w ;
+                            _video_bih.biHeight=_mainaviheader.dwHeight=h;                               
+                        }
+                        delete [] data;
+            }
+        
+        }
+        fseek(_fd,0,SEEK_SET);
+	
 	if(_nbAudioChunk)
 	{
 	      _isaudiopresent=1;
@@ -716,19 +762,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				tom.skipBytes(24);				
 				wh=tom.read32();
 				printf("MP4 : %ld x %ld \n",_video_bih.biWidth,_video_bih.biHeight);
-				if(wh!= (128<<16)+96 && wh!=(176<<16)+144)
-				{
-					if(GUI_Question("Not QCIF/SQCif, force size ?"))
-					{
-						if(GUI_Question("Is it QCIF ?"))
-						{
-							wh=(176<<16)+144;
-						}
-						else	wh=(128<<16)+96;
-
-					}
-
-				}
+				
               			_video_bih.biWidth=_mainaviheader.dwWidth=wh>>16 ;
               			_video_bih.biHeight=_mainaviheader.dwHeight=wh & 0xffff;
               			_videostream.fccHandler=fourCC::get((uint8_t *)"DIVX");
