@@ -32,6 +32,7 @@ typedef enum
 	enc_CBR,
 	enc_Pass1,
 	enc_Pass2,
+	enc_Same,
 	enc_Invalid
 
 }encoderState;

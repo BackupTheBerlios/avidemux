@@ -129,6 +129,10 @@ int ret=0;
 				      			
            					}						
             					break;
+				case 3:
+						*mode=COMPRESS_SAME;
+						ret=1;
+						break;
 		  		default:
 		      				ADM_assert(0);
 				}
@@ -170,6 +174,11 @@ uint32_t b;
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),1);
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbuttonQuant)),(gfloat)mQ);
 			break;
+		case COMPRESS_SAME:
+			HIST_SET(3);
+			gtk_widget_set_sensitive(WID(entryEntry),0);
+			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
+			break;
 		}
 }
 /**
@@ -184,6 +193,7 @@ int r;
 		case 0: mMode=COMPRESS_CBR ;break;
 		case 1: mMode=COMPRESS_CQ ;break;
 		case 2: mMode=COMPRESS_2PASS ;break;
+		case 3: mMode=COMPRESS_SAME ;break;
 	
 	}
 	updateMode();
@@ -324,6 +334,7 @@ create_dialog1 (void)
   GtkWidget *one_pass_cbr1;
   GtkWidget *one_pass_quantizer1;
   GtkWidget *two_pass1;
+  GtkWidget *same_qz_as_input1;
   GtkObject *spinbuttonQuant_adj;
   GtkWidget *spinbuttonQuant;
   GtkWidget *entryEntry;
@@ -542,6 +553,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table3), label10, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
 
   label11 = gtk_label_new (_("Bitrate (kb/s):"));
@@ -549,6 +561,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table3), label11, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
 
   label12 = gtk_label_new (_("Quantizer:"));
@@ -556,6 +569,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table3), label12, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label12), 0, 0.5);
 
   optionmenuType = gtk_option_menu_new ();
@@ -579,6 +593,10 @@ create_dialog1 (void)
   gtk_widget_show (two_pass1);
   gtk_container_add (GTK_CONTAINER (menu1), two_pass1);
 
+  same_qz_as_input1 = gtk_menu_item_new_with_mnemonic (_("Same Qz as input"));
+  gtk_widget_show (same_qz_as_input1);
+  gtk_container_add (GTK_CONTAINER (menu1), same_qz_as_input1);
+
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenuType), menu1);
 
   spinbuttonQuant_adj = gtk_adjustment_new (4, 1, 31, 1, 10, 10);
@@ -600,6 +618,7 @@ create_dialog1 (void)
   label51 = gtk_label_new (_("Variable bitrate mode"));
   gtk_widget_show (label51);
   gtk_frame_set_label_widget (GTK_FRAME (frame10), label51);
+  gtk_label_set_justify (GTK_LABEL (label51), GTK_JUSTIFY_LEFT);
 
   hbox7 = gtk_hbox_new (FALSE, 10);
   gtk_widget_show (hbox7);
@@ -636,6 +655,7 @@ create_dialog1 (void)
   label40 = gtk_label_new (_(":"));
   gtk_widget_show (label40);
   gtk_box_pack_start (GTK_BOX (hbox20), label40, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label40), GTK_JUSTIFY_LEFT);
 
   entryAspectY = gtk_entry_new ();
   gtk_widget_show (entryAspectY);
@@ -645,6 +665,7 @@ create_dialog1 (void)
   label8 = gtk_label_new (_("Main"));
   gtk_widget_show (label8);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), label8);
+  gtk_label_set_justify (GTK_LABEL (label8), GTK_JUSTIFY_LEFT);
 
   vbox6 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox6);
@@ -664,6 +685,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table7), label41, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label41), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label41), 0, 0.5);
 
   label15 = gtk_label_new (_("Max I-frame interval:"));
@@ -671,6 +693,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table7), label15, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label15), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label15), 0, 0.5);
 
   hbox30 = gtk_hbox_new (FALSE, 10);
@@ -746,6 +769,7 @@ create_dialog1 (void)
   label18 = gtk_label_new (_("Number of B-frames:"));
   gtk_widget_show (label18);
   gtk_box_pack_start (GTK_BOX (hbox11), label18, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label18), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label18), 0, 0.5);
 
   spinbuttonBFrame_adj = gtk_adjustment_new (1, 0, 4, 1, 1, 1);
@@ -767,6 +791,7 @@ create_dialog1 (void)
   label17 = gtk_label_new (_("Advanced Simple Profile"));
   gtk_widget_show (label17);
   gtk_frame_set_label_widget (GTK_FRAME (frame2), label17);
+  gtk_label_set_justify (GTK_LABEL (label17), GTK_JUSTIFY_LEFT);
 
   hbox24 = gtk_hbox_new (FALSE, 10);
   gtk_widget_show (hbox24);
@@ -788,6 +813,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label43, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label43), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label43), 0, 0.5);
 
   optionmenuPrecmp = gtk_option_menu_new ();
@@ -838,6 +864,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label44, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label44), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label44), 0, 0.5);
 
   optionmenuCmp = gtk_option_menu_new ();
@@ -888,6 +915,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label45, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label45), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label45), 0, 0.5);
 
   optionmenuSubcmp = gtk_option_menu_new ();
@@ -938,6 +966,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label68, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label68), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label68), 0, 0.5);
 
   optionmenuMBcmp = gtk_option_menu_new ();
@@ -1014,6 +1043,7 @@ create_dialog1 (void)
   label49 = gtk_label_new (_("ME comparison function"));
   gtk_widget_show (label49);
   gtk_frame_set_label_widget (GTK_FRAME (frame8), label49);
+  gtk_label_set_justify (GTK_LABEL (label49), GTK_JUSTIFY_LEFT);
 
   frame9 = gtk_frame_new (NULL);
   gtk_widget_show (frame9);
@@ -1031,6 +1061,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table2), label47, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label47), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label47), 0, 0.5);
 
   label48 = gtk_label_new (_("ME:"));
@@ -1038,6 +1069,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table2), label48, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label48), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label48), 0, 0.5);
 
   optionmenuPreDia = gtk_option_menu_new ();
@@ -1105,10 +1137,12 @@ create_dialog1 (void)
   label50 = gtk_label_new (_("Diamond type and size"));
   gtk_widget_show (label50);
   gtk_frame_set_label_widget (GTK_FRAME (frame9), label50);
+  gtk_label_set_justify (GTK_LABEL (label50), GTK_JUSTIFY_LEFT);
 
   label2 = gtk_label_new (_("Motion Estimation"));
   gtk_widget_show (label2);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), label2);
+  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
 
   vbox10 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox10);
@@ -1128,6 +1162,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table6), label19, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label19), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label19), 0, 0.5);
 
   label52 = gtk_label_new (_("Macroblock decision:"));
@@ -1135,6 +1170,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table6), label52, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label52), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label52), 0, 0.5);
 
   label62 = gtk_label_new (_("Quantizer range - Min:"));
@@ -1142,6 +1178,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table6), label62, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label62), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label62), 0, 0.5);
 
   optionmenuMbd = gtk_option_menu_new ();
@@ -1202,6 +1239,7 @@ create_dialog1 (void)
   label24 = gtk_label_new (_("Max:"));
   gtk_widget_show (label24);
   gtk_box_pack_start (GTK_BOX (hbox29), label24, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label24), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label24), 0, 0.5);
 
   spinbuttonIMax_adj = gtk_adjustment_new (31, 1, 31, 1, 10, 10);
@@ -1225,6 +1263,7 @@ create_dialog1 (void)
   label3 = gtk_label_new (_("Quantization"));
   gtk_widget_show (label3);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), label3);
+  gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
 
   vbox11 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox11);
@@ -1373,10 +1412,12 @@ create_dialog1 (void)
   label59 = gtk_label_new (_("Single coefficient elimination threshold"));
   gtk_widget_show (label59);
   gtk_frame_set_label_widget (GTK_FRAME (frame11), label59);
+  gtk_label_set_justify (GTK_LABEL (label59), GTK_JUSTIFY_LEFT);
 
   label53 = gtk_label_new (_("Masking"));
   gtk_widget_show (label53);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 3), label53);
+  gtk_label_set_justify (GTK_LABEL (label53), GTK_JUSTIFY_LEFT);
 
   table8 = gtk_table_new (4, 2, FALSE);
   gtk_widget_show (table8);
@@ -1392,6 +1433,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table8), label64, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label64), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label64), 0, 0.5);
 
   label65 = gtk_label_new (_("Quantizer compression:"));
@@ -1399,6 +1441,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table8), label65, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label65), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label65), 0, 0.5);
 
   label66 = gtk_label_new (_("Quantizer blur:"));
@@ -1406,6 +1449,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table8), label66, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label66), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label66), 0, 0.5);
 
   label67 = gtk_label_new (_("Max quantizer difference:"));
@@ -1413,6 +1457,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table8), label67, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label67), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label67), 0, 0.5);
 
   spinbuttonMaxQDiff_adj = gtk_adjustment_new (3, 1, 31, 1, 10, 10);
@@ -1449,6 +1494,7 @@ create_dialog1 (void)
   labelRateTol = gtk_label_new (_("Ratecontrol"));
   gtk_widget_show (labelRateTol);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 4), labelRateTol);
+  gtk_label_set_justify (GTK_LABEL (labelRateTol), GTK_JUSTIFY_LEFT);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -1463,170 +1509,8 @@ create_dialog1 (void)
   gtk_widget_show (okbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), okbutton1, GTK_RESPONSE_OK);
   GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
-/*
-  g_signal_connect ((gpointer) one_pass_cbr1, "activate",
-                    G_CALLBACK (on_one_pass_cbr1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) one_pass_quantizer1, "activate",
-                    G_CALLBACK (on_one_pass_quantizer1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) two_pass1, "activate",
-                    G_CALLBACK (on_two_pass1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _0___none1, "activate",
-                    G_CALLBACK (on_0___none1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _1___full1, "activate",
-                    G_CALLBACK (on_1___full1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _2___log2, "activate",
-                    G_CALLBACK (on_2___log2_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _3___phods1, "activate",
-                    G_CALLBACK (on_3___phods1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _4___epzs1, "activate",
-                    G_CALLBACK (on_4___epzs1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _5___x1, "activate",
-                    G_CALLBACK (on_5___x1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _0__sad1, "activate",
-                    G_CALLBACK (on_0__sad1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _1__sse1, "activate",
-                    G_CALLBACK (on_1__sse1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _2__satd1, "activate",
-                    G_CALLBACK (on_2__satd1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _3__dct1, "activate",
-                    G_CALLBACK (on_3__dct1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _4__psnr1, "activate",
-                    G_CALLBACK (on_4__psnr1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _5__bit1, "activate",
-                    G_CALLBACK (on_5__bit1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _6__rd1, "activate",
-                    G_CALLBACK (on_6__rd1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _7__zero1, "activate",
-                    G_CALLBACK (on_7__zero1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem1, "activate",
-                    G_CALLBACK (on_0__sad1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem2, "activate",
-                    G_CALLBACK (on_1__sse1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem3, "activate",
-                    G_CALLBACK (on_2__satd1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem4, "activate",
-                    G_CALLBACK (on_3__dct1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem5, "activate",
-                    G_CALLBACK (on_4__psnr1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem6, "activate",
-                    G_CALLBACK (on_5__bit1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem7, "activate",
-                    G_CALLBACK (on_6__rd1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem8, "activate",
-                    G_CALLBACK (on_7__zero1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem9, "activate",
-                    G_CALLBACK (on_0__sad1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem10, "activate",
-                    G_CALLBACK (on_1__sse1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem11, "activate",
-                    G_CALLBACK (on_2__satd1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem12, "activate",
-                    G_CALLBACK (on_3__dct1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem13, "activate",
-                    G_CALLBACK (on_4__psnr1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem14, "activate",
-                    G_CALLBACK (on_5__bit1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem15, "activate",
-                    G_CALLBACK (on_6__rd1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem16, "activate",
-                    G_CALLBACK (on_7__zero1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem28, "activate",
-                    G_CALLBACK (on_0__sad1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem29, "activate",
-                    G_CALLBACK (on_1__sse1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem30, "activate",
-                    G_CALLBACK (on_2__satd1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem31, "activate",
-                    G_CALLBACK (on_3__dct1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem32, "activate",
-                    G_CALLBACK (on_4__psnr1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem33, "activate",
-                    G_CALLBACK (on_5__bit1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem34, "activate",
-                    G_CALLBACK (on_6__rd1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem35, "activate",
-                    G_CALLBACK (on_7__zero1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _3__adaptive_with_size_1, "activate",
-                    G_CALLBACK (on__3__adaptive_with_size_1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _2__adaptive_with_size_1, "activate",
-                    G_CALLBACK (on__2__adaptive_with_size_1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) experimental1, "activate",
-                    G_CALLBACK (on_experimental1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _1__normal_with_size_1__epzs_1, "activate",
-                    G_CALLBACK (on_1__normal_with_size_1__epzs_1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _2__normal_with_size_1, "activate",
-                    G_CALLBACK (on_2__normal_with_size_1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem23, "activate",
-                    G_CALLBACK (on__3__adaptive_with_size_1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem24, "activate",
-                    G_CALLBACK (on__2__adaptive_with_size_1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem25, "activate",
-                    G_CALLBACK (on_experimental1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem26, "activate",
-                    G_CALLBACK (on_1__normal_with_size_1__epzs_1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) menuitem27, "activate",
-                    G_CALLBACK (on_2__normal_with_size_1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _0__mbcmp1, "activate",
-                    G_CALLBACK (on_0__mbcmp1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _1__fewest_bits1, "activate",
-                    G_CALLBACK (on_1__fewest_bits1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) _2__rate_distortion1, "activate",
-                    G_CALLBACK (on_2__rate_distortion1_activate),
-                    NULL);
-*/
+
+
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
@@ -1642,6 +1526,7 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, one_pass_cbr1, "one_pass_cbr1");
   GLADE_HOOKUP_OBJECT (dialog1, one_pass_quantizer1, "one_pass_quantizer1");
   GLADE_HOOKUP_OBJECT (dialog1, two_pass1, "two_pass1");
+  GLADE_HOOKUP_OBJECT (dialog1, same_qz_as_input1, "same_qz_as_input1");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonQuant, "spinbuttonQuant");
   GLADE_HOOKUP_OBJECT (dialog1, entryEntry, "entryEntry");
   GLADE_HOOKUP_OBJECT (dialog1, label51, "label51");

@@ -285,6 +285,14 @@ EncoderFFMPEG::configure (AVDMGenericVideoStream * instream)
 */    
   switch (_param.mode)
     {
+    case COMPRESS_SAME:
+    				printf("FFmpeg in follow quant mode\n");
+				_state=enc_Same;
+				_codec=  new ffmpegEncoderVBRExternal (_w, _h,_id); 
+				_codec->setConfig(&_settings);
+      				_codec->init (2,_fps,0);
+      				break;
+				
     case COMPRESS_CQ:
 				printf("ffmpeg cq mode: %ld\n",_param.qz);
       				_state = enc_CQ;
@@ -399,6 +407,31 @@ EncoderFFMPEG::encode (uint32_t frame, uint32_t * len, uint8_t * out,
     case enc_CQ:
       return _codec->encode (_vbuffer, out, len, flags);
       break;
+      case enc_Same:
+      		{
+			uint32_t inq;
+      			if(*flags& AVI_KEY_FRAME) *flags=AVI_KEY_FRAME;
+				else		  *flags=0;
+			inq=_vbuffer->_Qp;
+			
+			inq>>=1; 	// ?
+			
+      			*flags+=(inq<<8);
+			
+			if(!_codec->encode(   _vbuffer,out,len,flags))
+			{
+				printf("\n codec error on 1st pass !");
+				return 0;
+			}
+                        myENC_RESULT enc;
+			// Grab result
+        		_codec->getResult((void *)&enc);       
+			
+			//printf("Inq:%lu outq:%lu\n",inq,enc.out_quantizer);                       
+			_frametogo++;
+			return 1;
+			break;
+		}
   case enc_Pass1:
 
 					//		ADM_assert(fd);
