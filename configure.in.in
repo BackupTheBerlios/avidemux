@@ -38,7 +38,7 @@ AC_CANONICAL_HOST
 dnl Perform program name transformation
 AC_ARG_PROGRAM
 dnl Automake doc recommends to do this only here. (Janos)
-AM_INIT_AUTOMAKE(avidemux,2.0.29cvs)
+AM_INIT_AUTOMAKE(avidemux,2.0.33cv)
 
 dnl almost the same like KDE_SET_PEFIX but the path is /usr/local
 dnl
