@@ -2166,9 +2166,11 @@ void dsputil_init_a64(DSPContext* c, AVCodecContext *avctx)
             c->idct_permutation_type= FF_LIBMPEG2_IDCT_PERM;
         }
         /* VP3 optimized DSP functions */
+#if 0	
         c->vp3_dsp_init = vp3_dsp_init_a64_mmx;
         c->vp3_idct_put = vp3_idct_put_a64_mmx;
         c->vp3_idct_add = vp3_idct_add_a64_mmx;
+#endif	
  
 #ifdef CONFIG_ENCODERS
         c->get_pixels = get_pixels_a64_mmx;
