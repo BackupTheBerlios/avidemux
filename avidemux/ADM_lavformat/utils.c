@@ -16,13 +16,17 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+ #include "config.h" //MEANX
 #include "avformat.h"
 
 #undef NDEBUG
 #include <assert.h>
+
+#if 0
 #include <errno.h>
 #include <err.h>
 #include <error.h>
+#endif //MEANX
 
 AVInputFormat *first_iformat = NULL;
 AVOutputFormat *first_oformat = NULL;

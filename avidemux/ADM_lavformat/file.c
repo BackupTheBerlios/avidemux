@@ -16,6 +16,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+ //MEANX
+ #include "config.h"
+ #ifdef CYG_MANGLING
+ 	#define CONFIG_WIN32
+ #endif
 #include "avformat.h"
 #include <fcntl.h>
 #ifndef CONFIG_WIN32
