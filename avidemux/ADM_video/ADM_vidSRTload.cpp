@@ -228,10 +228,12 @@ uint32_t line;
 			           text[0]=0;
 			           break;
 			 case 2:// looking for text
+	  //printf("[debug] State 2 line %d : %s\n",_line,string);
 			 	       if(strlen(string)<3)
 			         	{
 										 _subs[_line].string=new char[strlen(text)+1];
 										 memcpy(_subs[_line].string,text,strlen(text)+1);
+              //printf("[debug] State 2 line %d added\n",_line);
 										_line++;
 										state=0;
 										break;
@@ -259,6 +261,23 @@ uint32_t line;
 			}
 		
 	}	
+
+   if (line > 0 && text) {
+    // Add last line
+    //printf("[debug] Last line : %s\n",text);
+    _subs[_line].string=new char[strlen(text)+1];
+    memcpy(_subs[_line].string,text,strlen(text)+1);
+    _line++;
+  }
+
+
+   // checks contents
+  //  for(uint32_t i=0;i<line;i++) {
+//      printf("[debug] (%d) At %d %d : %s\n",i, _subs[i].startTime,
+// 	    _subs[i].endTime, _subs[i].string);
+//    }
+
+
 
 	return 1;
 }
