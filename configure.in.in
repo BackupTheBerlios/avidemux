@@ -161,7 +161,7 @@ have_nasm=no
 have_altivec=no
 have_malloc=no
 have_darwin=no
-
+have_amd64=no
 dnl _________________ malloc.h ___________________
 
 AC_CHECK_HEADERS(malloc.h,have_malloc_h=yes)
@@ -639,8 +639,12 @@ dnl ____________________ CPU____________________________
 
 adm_cpu=`uname -m`;
 dnl reset config.cpu, avoid weird bugs
-echo "" > adm_lavcodec/config.cpu
 echo "CPU type : $adm_cpu"
+if test "x$use_builtin" = "xyes"; then
+echo "TARGET_BUILTIN_VECTOR=yes" > adm_lavcodec/config.cpu
+else
+echo "" > adm_lavcodec/config.cpu
+fi
 use_mmx=0
 case $adm_cpu in
 	i386|i486|i586|i686)
@@ -691,6 +695,9 @@ d
 		fi;;
 	x86_64)
 		have_little_endian=yes;
+		echo "TARGET_X86_64=yes" >> adm_lavcodec/config.cpu
+		AC_DEFINE(HAVE_X86_64,1,"X86_64 amd64 assembly")
+		have_amd64=yes
 		echo "ADM64";;
 	sparc|sparc64)
 		have_little_endian=no;
@@ -837,6 +844,7 @@ echo " MMX                 : yes"
 else
 echo " MMX                 : no"
 fi
+echo " AMD64               : $have_amd64"
 echo " Altivec             : $have_altivec"
 echo " MacOsX(Darwin)      : $have_darwin"
 echo " nasm                : $have_nasm ( $AS )"
