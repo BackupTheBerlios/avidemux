@@ -64,7 +64,7 @@ void UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_data)
 		switch(event->keyval)
 		{
 			case GDK_l:
-			case GDK_L: action=ACT_LoadWork;break;
+			case GDK_L: action=ACT_OpenAvi;break;
 			case GDK_s:
 			case GDK_S: action=ACT_SaveWork;break;
 				

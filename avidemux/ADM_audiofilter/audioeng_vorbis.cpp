@@ -6,7 +6,8 @@
     copyright            : (C) 2002-4 by mean
     email                : fixounet@free.fr
     
-    Interface to FAAC
+    Interface to Vorbis lib
+    Strongly derived from ffmpeg code
     
  ***************************************************************************/
 
@@ -111,7 +112,7 @@ uint8_t AVDMProcessAudio_Vorbis::init( uint32_t bitrate)
 	vorbis_analysis_init(&VD, &VI) ;
 	vorbis_block_init(&VD, &VB);
     
-	printf("Vorbis encoder initialized\n");
+	printf("\nVorbis encoder initialized\n");
 	printf("Bitrate :%lu\n",bitrate);
 	printf("Channels:%lu\n",_wavheader->channels);
 	printf("Frequenc:%lu\n",_wavheader->frequency);

@@ -34,6 +34,7 @@
 
 #include <time.h>
 #include <sys/time.h>
+#include <fcntl.h>	/* O_RDONLY */
 
 #include "config.h"
 
@@ -142,7 +143,6 @@ void computeIT (int size, int nb, int brate, uint32_t * frame,
 int ADM_saveRaw (char *name);
 static char * actual_workbench_file;
 static void A_saveWorkbench (char *name);
-void A_loadWorkbench (char *name);
 void updateLoaded (void);
 extern void encoderSetLogFile (char *name);
 extern void videoCodecSelect (void);
@@ -234,12 +234,6 @@ HandleAction (Action action)
 	GUI_Alert("Obsolete!");
       return;
       break;
-    case ACT_LoadWork:
-      GUI_FileSelRead ("Select workbench to load ", A_loadWorkbench);
-
-      return;
-      break;
-
     case ACT_SetMuxParam:
       ADM_aviUISetMuxer();
       return;
@@ -741,6 +735,11 @@ case ACT_Pipe2Other:
       		UI_setMarkers (frameStart, frameEnd);
       		ReSync ();
 
+		// forget last project file
+		if( actual_workbench_file ){
+			free(actual_workbench_file);
+			actual_workbench_file = NULL;
+		}
 	}
 	break;
 
@@ -855,10 +854,6 @@ void
 A_openAvi (char *name)
 {
   A_openAvi2 (name, 0);
-  if( actual_workbench_file ){
-     free(actual_workbench_file);
-     actual_workbench_file = NULL;
-  }
 }
 extern void GUI_PreviewEnd (void);
 int A_openAvi2 (char *name, uint8_t mode)
@@ -904,6 +899,13 @@ int A_openAvi2 (char *name, uint8_t mode)
   else
     res = video_body->addFile (name);
   DIA_StopBusy ();
+
+  // forget last project file
+  if( actual_workbench_file ){
+     free(actual_workbench_file);
+     actual_workbench_file = NULL;
+  }
+
   if (res!=ADM_OK)			// an error occured
     {
     	if(ADM_IGN==res) 
@@ -917,19 +919,36 @@ int A_openAvi2 (char *name, uint8_t mode)
       GUI_Alert ("Problem opening that file!");
       return 0;
     }
-	{ char *longname = PathCanonize(name);
-	  int i;
-		// remember this file
-		prefs->set_lastfile(longname);
-		updateLoaded ();
-		for(i=strlen(longname);i>=0;i--)
-			if( longname[i] == '/' ){
-				i++;
-				break;
+
+    { int fd,i;
+      char magic[4];
+      char *longname = PathCanonize(name);
+
+	/* check myself it is a project file (transparent detected and read
+        ** by video_body->addFile (name);
+	*/
+	if( (fd = open(longname,O_RDONLY)) != -1 ){
+		if( read(fd,magic,4) == 4 ){
+			/* remember a workbench file */
+			if( !strncmp(magic,"ADMW",4) ){
+				actual_workbench_file = strdup(longname);
 			}
-		UI_setTitle(longname+i);
-		free(longname);
+		}
+		close(fd);
 	}
+
+	/* remember any video or workbench file to "recent" */
+	prefs->set_lastfile(longname);
+
+	updateLoaded ();
+	for(i=strlen(longname);i>=0;i--)
+		if( longname[i] == '/' ){
+			i++;
+			break;
+		}
+	UI_setTitle(longname+i);
+	free(longname);
+    }
 	return 1;
 }
 
@@ -1978,23 +1997,6 @@ A_saveWorkbench (char *name)
   actual_workbench_file = strdup(name);
 }
 
-void A_loadWorkbench (char *name)
-{
-  /// check if name exists
-  FILE *fd;
-  fd = fopen (name, "rb");
-  if (!fd)
-    return;
-  fclose (fd);
-
- if( video_body->loadWorbench (name)){
-    updateLoaded ();
-    prefs->set_lastfile(name); // remember this file
-    if( actual_workbench_file )
-       free(actual_workbench_file);
-    actual_workbench_file = strdup(name);
- }
-}
 //---------------------
 extern int DIA_audioEncoder(int *pmode, int *pbitrate,const char *title);
 /**---------------------------------------------------

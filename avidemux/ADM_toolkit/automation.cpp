@@ -471,7 +471,7 @@ void call_requant(char *p, char *q, char *n)
 }
 void load_workbench(char*name){
    ADM_assert(name);
-   A_loadWorkbench(name);
+   A_openAvi(name);
  //  updateLoaded();
 }
 
