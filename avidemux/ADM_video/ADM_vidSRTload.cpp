@@ -189,6 +189,7 @@ uint32_t line;
 	uint32_t j;
 	int state=0;
 
+  const char *strLineBreak = _conf->_selfAdjustable ? " " : "|";
 	for(uint32_t i=0;i<line;i++)
 	{
 //			printf(" %d - %d\n",i,line);
@@ -247,8 +248,9 @@ uint32_t line;
 											 			string[l]=0;
 											    	l--;
 												};
-									if(text[0])
-												strcat(text,"|");
+              if(text[0]) {
+                strcat(text,strLineBreak);
+	      }
 										strcat(text,string);
 										if(strlen(text)>300)
 										{

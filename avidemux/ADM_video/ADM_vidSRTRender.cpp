@@ -46,6 +46,12 @@
 #define SUB_OUT 0xf0000000
 
 #define ALPHA
+
+#define SAFE_STRCPY(dest,destLen,src,srcLen) \
+memcpy(dest,src,srcLen<destLen?srcLen:destLen-1); \
+dest[srcLen<destLen?srcLen:destLen-1]='\0'; \
+
+
 //                     1
 //		Get in range in 121 + coeff matrix
 //                     1
@@ -180,7 +186,9 @@ void ADMVideoSubtitle::displayString(char *string)
 	aprintf("[debug] last=%d i=%d\n",last,i);
       } else {
 	if (! couldDisplay) {
-	  printf("line is too big.\n");
+	  char lineStr [100];
+	  SAFE_STRCPY(lineStr,100,string+last,i-last);
+          printf("Line is too big: \"%s\".\n",lineStr);
 	}
 									last=i+1;
 	i++;
@@ -190,10 +198,14 @@ void ADMVideoSubtitle::displayString(char *string)
 									line++;
     }
 
-    if(line>=3)
+    if(line>3 || line==3 && last<stringLen)
 									{
+	char remainChars[500];
+	SAFE_STRCPY(remainChars,500,string+last,stringLen);
 	//index range [0,1,2]
-											printf("\n Maximum 3 lines!\n");
+	printf("\nText is too big: \"%s\".\n",string);
+	printf("Remaining chars: \"%s\"\n",remainChars);
+        printf("Maximum 3 lines!\n");
 	//return;
 									}
 							}
