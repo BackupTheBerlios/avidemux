@@ -82,6 +82,7 @@
 
 
 void A_handleSecondTrack (int tracktype);
+int A_delete(uint32_t start, uint32_t end);
 void A_saveImg (char *name);
 void A_saveBunchJpg( char *name);
 void A_requantize(void);
@@ -734,47 +735,20 @@ case ACT_Pipe2Other:
 
     case ACT_Delete:
     case ACT_Cut:
-      uint32_t count;
-
-      aviInfo info;
-      assert (video_body->getVideoInfo (&info));
-      count = frameEnd - frameStart;
+    
+     
       old=frameStart;
-      if( frameEnd < frameStart ){
-         GUI_Alert("Marker A < B: can't delete");
-         return;
-      }
-      if (count >= info.nb_frames - 1)
-	{
-	  GUI_Alert ("You don't want to \n remove all frames !");
-	  return;
-	}
-
-      video_body->dumpSeg ();
-      if (!video_body->removeFrames (frameStart, frameEnd))
-	{
-	  GUI_Alert ("Something bad happened...");
-	}
-      video_body->dumpSeg ();
-      //resync GUI and video
-      if (!video_body->updateVideoInfo (avifileinfo))
-	{
-	  GUI_Alert ("Something bad happened (II)...");
-	}
-      if (old >= avifileinfo->nb_frames)
+      if( A_delete(frameStart,frameEnd))
+      {
+      	if (old >= avifileinfo->nb_frames)
 	{			// we removed too much
 	  old = avifileinfo->nb_frames - 1;
 	}
-
-
-      frameEnd=avifileinfo->nb_frames-1;
-      frameStart=0;
-      rebuild_status_bar ();
-      UI_setMarkers (frameStart, frameEnd);
-      ReSync ();
-      curframe=old;
-      printf(" goiing back to %u\n",old);
-      GUI_GoToFrame (old);
+      	curframe=old;	 
+      	GUI_GoToFrame (old);      
+      }
+      
+      
       break;
 
     case ACT_AudioMap:
@@ -2214,6 +2188,49 @@ int A_saveDVDPS(char *name)
 			}
 
 	return 1;
+}
+int A_delete(uint32_t start, uint32_t end)
+{
+uint32_t count;
+
+      aviInfo info;
+      assert (video_body->getVideoInfo (&info));
+      count = end - start;
+     
+      if( end < start ){
+         GUI_Alert("Marker A < B: can't delete");
+         return 0;
+      }
+      if (count >= info.nb_frames - 1)
+	{
+	  GUI_Alert ("You don't want to \n remove all frames !");
+	  return 0;
+	}
+
+      video_body->dumpSeg ();
+      if (!video_body->removeFrames (start, end))
+	{
+	  GUI_Alert ("Something bad happened...");
+	  return 0;
+	}
+      video_body->dumpSeg ();
+      //resync GUI and video
+      if (!video_body->updateVideoInfo (avifileinfo))
+	{
+	  GUI_Alert ("Something bad happened (II)...");
+	}
+      
+
+
+      frameEnd=avifileinfo->nb_frames-1;
+      frameStart=0;
+      rebuild_status_bar ();
+      UI_setMarkers (frameStart, frameEnd);
+      ReSync ();
+     return 1;
+      
+
+
 }
 // EOF
 
