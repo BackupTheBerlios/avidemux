@@ -1635,7 +1635,7 @@ static int has_codec_parameters(AVCodecContext *enc)
     }
     return (val != 0);
 }
-
+#if 0 //MEANX
 static int try_decode_frame(AVStream *st, const uint8_t *data, int size)
 {
     int16_t *samples;
@@ -1874,7 +1874,7 @@ int av_read_pause(AVFormatContext *s)
         return AVERROR_NOTSUPP;
     return s->iformat->read_pause(s);
 }
-
+#endif // MEANX
 /**
  * Close a media file (but not its codecs)
  *
