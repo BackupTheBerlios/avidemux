@@ -717,6 +717,7 @@ void OpenDMLHeader::walk(riffParser *p)
 							walk(n);
 							delete n;
 				}
+				p->curPos=ftello(p->fd);
 				break;
 		case MKFCC('s','t','r','f'):
 					_Tracks[_nbTrack].strf.offset=p->getPos();				
