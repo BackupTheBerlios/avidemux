@@ -106,8 +106,9 @@ uint8_t	ADMVideoContrast::getCoupledConf( CONFcouple **couples)
 }
 ADMVideoContrast::~ADMVideoContrast()
 {
- 	
-	delete [] _uncompressed;
+ 	if(_uncompressed)
+		delete  _uncompressed;
+	_uncompressed=0;
  	DELETE(_param);
 }
 

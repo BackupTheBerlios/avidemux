@@ -98,7 +98,7 @@ printf(  "*********************\n");
  	REGISTERX("swapuv","Swap u & v",VF_SWAPUV,1,swapuv_create,swapuv_script);
 	REGISTERX("chromashift","Chroma shift",VF_CHROMASHIFT,1,create_chromashift,chromashift_script);
 
-//	REGISTERX("contrast","Contrast",VF_CONTRAST,1,contrast_create,contrast_script);
+	REGISTERX("contrast","Contrast",VF_CONTRAST,1,contrast_create,contrast_script);
 
 	REGISTERX("lumaonly","Luma only",VF_LUMA,1,luma_create,luma_script);
 	REGISTERX("chromauonly","Chroma U only",VF_CHROMAU,1,chromaU_create,chromaU_script);
