@@ -67,6 +67,11 @@ _VIDEOS *currentVideo;
 		}
 		// could not get the cound, rewind and retry
 		printf("Editor:Read failed; retrying\n");
+		if(_audioseg == (_nb_segment - 1))
+		{		
+			printf("Editor : End of *last* stream\n");
+			return 0;
+		}
 		currentVideo->_audiostream->goToTime(0);
 		r=currentVideo->_audiostream->getPacket(dest,len,samples);
 		if(r)
