@@ -56,6 +56,14 @@ void gtk_register_dialog(GtkWidget *newdialog)
 {
 
 	widgetStack[widgetCount]=newdialog;
+	// old one is no longer modal
+	if(widgetCount)
+	{
+		gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount-1]), 0);
+		gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount]), 1);
+		// The new one is
+		
+	}
 	widgetCount++;
 }
 void gtk_unregister_dialog(GtkWidget *newdialog)
@@ -63,6 +71,11 @@ void gtk_unregister_dialog(GtkWidget *newdialog)
 	ADM_assert(widgetCount);
 	ADM_assert(widgetStack[widgetCount-1]==newdialog);
 	widgetCount--;
+	if(widgetCount>1)
+	{
+		// Reset the old one modal
+		gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount-1]), 1);
+	}
 
 }
 void		gtk_transient(GtkWidget *widget)

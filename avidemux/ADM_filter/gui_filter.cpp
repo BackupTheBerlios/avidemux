@@ -430,7 +430,7 @@ uint8_t ret=0;
 
 
   dialog2 = create_dialogList ();
-
+	gtk_register_dialog(dialog2);
   tree=lookup_widget(dialog2,"treeview2");
   gtk_widget_set_size_request (tree, 400, 400);
   for (uint32_t i = 0; i < nb_video_filter; i++)
@@ -465,6 +465,7 @@ uint8_t ret=0;
 					}
 			}
 	}
+	gtk_unregister_dialog(dialog2);
 	gtk_widget_destroy(dialog2);
 
 	return tag;
