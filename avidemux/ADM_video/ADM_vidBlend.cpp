@@ -38,12 +38,7 @@
 
 #include"ADM_video/ADM_vidField.h"
 
-#ifdef __CYGWIN__ // CYGWIN
-	#define Mangle(x) "_" #x
-#else
-	#define Mangle(x) #x
-#endif
-
+#include "admmangle.h"
 
 
  static int32_t _l_w,_l_h;

@@ -23,7 +23,6 @@
 #include <assert.h>
 #include <string.h>
 #include <math.h>
-#include <dlfcn.h>
 #include "config.h"
 #include "ADM_library/default.h"
 #include "ADM_codecs/ADM_codec.h"

@@ -51,11 +51,7 @@ Skip factor=2
 
 #include "mmx_macros.h"
 
-#ifdef __CYGWIN__ // CYGWIN
-	#define Mangle(x) "_" #x
-#else
-	#define Mangle(x) #x
-#endif
+#include "admmangle.h"
 
 
 #define SKIP_FACTOR 2   // 2^SKIPFACTOR=SKIP_LINEAR+1

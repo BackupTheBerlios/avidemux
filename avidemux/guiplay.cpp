@@ -30,7 +30,6 @@
 
 #include <gtk/gtk.h>
 
-#include <sched.h>
 #include "config.h"
 #include "callbacks.h"
 #include "interface.h"

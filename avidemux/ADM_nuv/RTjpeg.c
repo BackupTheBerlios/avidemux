@@ -34,6 +34,18 @@
 #include "mmx.h"
 #endif
 
+void RTjpeg_color_init(void);
+void RTjpeg_quant(__s16 *block, __s32 *qtbl);
+void RTjpeg_init_data(void);
+void RTjpeg_idct_init(void);
+int RTjpeg_bcomp(__s16 *old, __u16 *mask);
+void RTjpeg_dct_init(void);
+void RTjpeg_idct(__u8 *odata, __s16 *data, int rskip);
+int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8);
+int RTjpeg_s2b(__s16 *data, __s8 *strm, __u8 bt8, __u32 *qtbl);
+void RTjpeg_quant_init(void);
+void RTjpeg_dctY(__u8 *idata, __s16 *odata, int rskip);
+
 //#define SHOWBLOCK 1
 #define BETTERCOMPRESSION 1
 
@@ -3792,6 +3804,7 @@ void RTjpeg_yuvrgb16(__u8 *buf, __u8 *rgb, int stride)
 
 void RTjpeg_yuvrgb8(__u8 *buf, __u8 *rgb, int stride)
 {
- bcopy(buf, rgb, RTjpeg_width*RTjpeg_height);
+ 	//bcopy(buf, rgb, RTjpeg_width*RTjpeg_height);
+	memcpy(rgb,buf, RTjpeg_width*RTjpeg_height);
 }
 

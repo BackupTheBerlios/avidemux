@@ -24,7 +24,7 @@
 #include <config.h>
 
 #include <gtk/gtk.h>
-#include <pthread.h>
+
 #ifdef HAVE_DCGETTEXT
 #include <libintl.h>
 #include <locale.h>

@@ -5,7 +5,8 @@
 #include <unistd.h>	/* access(), R_OK */
 #include <errno.h>	/* errno, ENOENT */
 #include <assert.h>
-
+#include "ADM_library/default.h"
+#include "ADM_toolkit/toolkit.hxx"
 
 #include "config.h"
 

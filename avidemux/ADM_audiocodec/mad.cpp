@@ -23,8 +23,6 @@ Strongly derived from madlld 0.1 by Bertrand Petit
 
 # include <stdio.h>
 # include <unistd.h>
-# include <sys/stat.h>
-# include <sys/mman.h>
 # include <math.h>
 
 # include <config.h>
@@ -222,7 +220,8 @@ signed int r;
 
     /* quantize */
     r= sample >> (MAD_F_FRACBITS + 1 - 16);
-#ifdef ADM_BIG_ENDIAN && 0 // this was wrong
+// this was wrong    
+#ifdef ADM_BIG_ENDIAN && 0 
 	r= (r>>8)+((r&0xff)<<8);
 #endif
   return r;

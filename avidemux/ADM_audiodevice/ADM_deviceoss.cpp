@@ -14,19 +14,22 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
+#ifdef OSS_SUPPORT 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <assert.h>
   
- #include "config.h"
  
-#ifdef OSS_SUPPORT
+ 
+
 #include "ADM_library/default.h"
 #include "audio_out.h"
 

@@ -840,6 +840,12 @@ dnl ____________________ /CPU____________________________
 
 if test "x$use_cygwin" = "xyes"; then
 	AC_DEFINE(MEMALIGN_HACK,1,"sse on cywin")
+	AC_DEFINE(CYG_MANGLING,1,"Name mangling")
+	AC_DEFINE(rindex,ADM_rindex,"rindex does not exist on cygwin")
+	CXXFLAGS=" $CXXFLAGS -mno-cygwin -mms-bitfields"
+	CFLAGS=" CFLAGS -mno-cygwin -mms-bitfields"
+
+	
 fi
 dnl ________________NASM__________________
 AC_SUBST(AS)

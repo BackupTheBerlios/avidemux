@@ -443,7 +443,7 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 {
  const char *tmp;
  int  mode = 0;
- uint videoProcess;
+ uint32_t videoProcess;
 	//printf("-Video filter by name : %s\n",name);
 
 	Read(videoProcess);

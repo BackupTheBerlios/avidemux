@@ -650,7 +650,7 @@ static void init_pict_data( Picture *picture )
 	/* The (non-existent) previous encoding using an as-yet un-used
 	   picture encoding data buffers is "completed"
 	*/
-	sync_guard_init( &picture->completion, 1 );
+	//sync_guard_init( &picture->completion, 1 );
 }
 
 
@@ -721,10 +721,10 @@ static void reconstruct( Picture *picture)
 #endif
 }
 
-static mp_semaphore_t worker_available =  SEMAPHORE_INITIALIZER;
+/*static mp_semaphore_t worker_available =  SEMAPHORE_INITIALIZER;
 static mp_semaphore_t picture_available = SEMAPHORE_INITIALIZER;
 static mp_semaphore_t picture_started = SEMAPHORE_INITIALIZER;
-
+*/
 #ifdef DEBUG_BLOCK_STRIPED
 static unsigned int checksum( uint8_t *buf, unsigned int len )
 {
@@ -841,12 +841,12 @@ static void *parencodeworker(void *start_arg)
 
 	for(;;)
 	{
-		mp_semaphore_signal( &worker_available, 1);
-		mp_semaphore_wait( &picture_available );
+//		mp_semaphore_signal( &worker_available, 1);
+//		mp_semaphore_wait( &picture_available );
 		/* Precisely *one* worker is started after update of
 		   picture_for_started_worker, so no need for handshake.  */
 		picture = (Picture *)picture_to_encode;
-		mp_semaphore_signal( &picture_started, 1);
+//		mp_semaphore_signal( &picture_started, 1);
 
 		/* ALWAYS do-able */
 		mjpeg_info("Frame %d %c %d %d",  
@@ -877,24 +877,24 @@ static void *parencodeworker(void *start_arg)
 #ifdef ORIGINAL_PHASE_BASED_PROC
 		if( ctl->refine_from_rec )
 		{
-			sync_guard_test( picture->ref_frame_completion );
+			//sync_guard_test( picture->ref_frame_completion );
 			motion_estimation(picture);
 		}
 		else
 		{
 			motion_estimation(picture);
-			sync_guard_test( picture->ref_frame_completion );
+			//sync_guard_test( picture->ref_frame_completion );
 		}
 		predict(picture);
 
 		/* No dependency */
 		transform(picture);
 #else
-        sync_guard_test( picture->ref_frame_completion );
+        //sync_guard_test( picture->ref_frame_completion );
         encodembs(picture);
 #endif
 		/* Depends on previous frame completion for IB and P */
-		sync_guard_test( picture->prev_frame_completion );
+		//sync_guard_test( picture->prev_frame_completion );
 		picture->PutHeadersAndEncoding(*bitrate_controller);
 
 		reconstruct(picture);
@@ -925,7 +925,7 @@ static void *parencodeworker(void *start_arg)
 
 		/* We're finished - let anyone depending on us know...
 		 */
-		sync_guard_update( &picture->completion, 1 );
+		//sync_guard_update( &picture->completion, 1 );
 			
 	}
 
@@ -936,10 +936,10 @@ static void *parencodeworker(void *start_arg)
 static void parencodepict( Picture *picture )
 {
 
-	mp_semaphore_wait( &worker_available );
+//	mp_semaphore_wait( &worker_available );
 	picture_to_encode = picture;
-	mp_semaphore_signal( &picture_available, 1 );
-	mp_semaphore_wait( &picture_started );
+//	mp_semaphore_signal( &picture_available, 1 );
+//	mp_semaphore_wait( &picture_started );
 }
 
 
@@ -1175,8 +1175,8 @@ void putseq_next( int *type,int *quant )
 			cur_ref_idx = (cur_ref_idx + 1) % R_PICS;
 			old_ref_picture = new_ref_picture;
 			new_ref_picture = &ref_pictures[cur_ref_idx];
-			new_ref_picture->ref_frame_completion = &old_ref_picture->completion;
-			new_ref_picture->prev_frame_completion = &cur_picture->completion;
+//			new_ref_picture->ref_frame_completion = &old_ref_picture->completion;
+//			new_ref_picture->prev_frame_completion = &cur_picture->completion;
 			I_or_P_frame_struct(&ss, new_ref_picture);
 			cur_picture = new_ref_picture;
 		}
@@ -1193,13 +1193,13 @@ void putseq_next( int *type,int *quant )
 			new_b_picture->oldref = new_ref_picture->oldref;
 			new_b_picture->neworg = new_ref_picture->neworg;
 			new_b_picture->newref = new_ref_picture->newref;
-			new_b_picture->ref_frame_completion = &new_ref_picture->completion;
-			new_b_picture->prev_frame_completion = &cur_picture->completion;
+//			new_b_picture->ref_frame_completion = &new_ref_picture->completion;
+//			new_b_picture->prev_frame_completion = &cur_picture->completion;
 			B_frame_struct( &ss, new_b_picture );
 			cur_picture = new_b_picture;
 		}
 
-		sync_guard_update( &cur_picture->completion, 0 );
+//		sync_guard_update( &cur_picture->completion, 0 );
 #ifdef PUSH
 		assert(0==pushframe(cur_picture->temp_ref+ss.gop_start_frame,
 					cur_picture->curorg));
@@ -1232,8 +1232,8 @@ void putseq_next( int *type,int *quant )
 void putseq_end( void )
 {
 	/* Wait for final frame's encoding to complete */
-	if( ctl->max_encoding_frames > 1 )
-		sync_guard_test( &cur_picture->completion );
+//	if( ctl->max_encoding_frames > 1 )
+//		sync_guard_test( &cur_picture->completion );
 	putseqend();
 
 	if( opt->pulldown_32 )

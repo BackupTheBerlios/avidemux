@@ -65,10 +65,10 @@ public:
 	/* multiple-reader/single-writer channels Synchronisation  
 	   sync only: no data is "read"/"written"
 	 */
-	sync_guard_t *ref_frame_completion;
+/*	sync_guard_t *ref_frame_completion;
 	sync_guard_t *prev_frame_completion;
 	sync_guard_t completion;
-
+*/
 	/* picture encoding source data  */
 	uint8_t **oldorg, **neworg;	/* Images for Old and new reference picts */
 	uint8_t **oldref, **newref;	/* original and reconstructed */

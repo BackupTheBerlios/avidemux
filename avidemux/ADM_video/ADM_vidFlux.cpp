@@ -371,11 +371,7 @@ void ADMVideoFlux::DoFilter_C(
 
 }
 #ifdef USE_MMX
-#ifdef __CYGWIN__ // CYGWIN
-	#define Mangle(x) "_" #x
-#else
-	#define Mangle(x) #x
-#endif
+#include "admmangle.h"
 /*
 	__asm movq mm2, mm0 \
 	__asm movq mm3, mm1 \

@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <gtk/gtk.h>
-#include <pthread.h>
+
 #include <unistd.h>
 #include <dirent.h>
 #include <errno.h>

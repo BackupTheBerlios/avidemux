@@ -331,4 +331,19 @@ void		LowerCase(char *string)
 	}
 
 }
+// Does not exist in cygwin
+char 		*ADM_rindex(const char *s, int c)
+{
+	if(!s) return NULL;
+	if(!*s) return NULL;
+	uint32_t l=strlen(s)-1;
+	while(l)
+	{
+		if(s[l]==c) return (char *)(s+l);
+		l--;
+	}
+	return NULL;
+
+
+}
 //EOF

@@ -529,7 +529,7 @@ uint8_t aviWrite::setStreamInfo (FILE * fo,
   junklen = maxxed - sizeof (AVIStreamHeader) - infolen-extraLen;
   junk = (uint8_t *) malloc (junklen);
   assert (junk);
-  bzero (junk, junklen);
+  memset (junk,0, junklen);
   //
   // Fill junk with out info string  
   uint32_t len=strlen("Avidemux");

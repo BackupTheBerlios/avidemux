@@ -86,6 +86,9 @@ static int verbose = 2;
 
 // user defined types
 //typedef unsigned int		uint;
+#ifdef CYG_MANGLING
+	#define uint unsigned int
+#endif
 typedef unsigned char		uint8;
 typedef unsigned short		uint16;
 typedef unsigned int		uint32;

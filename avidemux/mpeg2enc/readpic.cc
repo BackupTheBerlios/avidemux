@@ -84,11 +84,6 @@
 	  once the chunk-reading worker thread has been started.
    */
 
-static pthread_mutex_t frame_buffer_lock;
-
-static pthread_cond_t new_chunk_req = PTHREAD_COND_INITIALIZER;
-static pthread_cond_t new_chunk_ack = PTHREAD_COND_INITIALIZER;
-static pthread_t      worker_thread;
 
 static volatile int frames_read = 0;
 static int last_frame = -1;
@@ -296,7 +291,7 @@ static void read_chunk(void)
 
 
 */
-
+#if 0
 static void *read_chunks_worker(void *_dummy)
 {
 	//mjpeg_info("PRO: requesting frame buf lock" );
@@ -346,7 +341,7 @@ static void start_worker(void)
 	}
 
 }
-
+#endif
  /*****************************************************
  *
  *  Read another chunk of frames into the frame buffer if the
@@ -380,7 +375,7 @@ static void read_chunk_seq( int num_frame )
  * will thoroughly deadlocked.
  *
  *****************************************************/
-   
+#if 0   
 
 
 static void read_chunk_par( int num_frame)
@@ -412,6 +407,7 @@ static void read_chunk_par( int num_frame)
 	}
 	
 }
+#endif
 static void load_frame( int num_frame )
 {
 	printf("Push %d\n",num_frame);	
@@ -423,6 +419,7 @@ static void load_frame( int num_frame )
 	
 	if( frames_read == 0)
 	{
+#if 0	
 #ifdef __linux__
 		pthread_mutexattr_t mu_attr;
 		pthread_mutexattr_t *p_attr = &mu_attr;
@@ -432,18 +429,19 @@ static void load_frame( int num_frame )
 		pthread_mutexattr_t *p_attr = NULL;		
 #endif		
 		pthread_mutex_init( &frame_buffer_lock, p_attr );
+#endif		
 
         lum_mean = new int[frame_buffer_size];
 
 		/*
           Pre-fill the buffer with one chunk of frames...
         */
-		if( ctl->parallel_read )
+	/*	if( ctl->parallel_read )
         {
 			start_worker();
             read_chunk_par( num_frame);
         }
-        else
+        else*/
         {
             read_chunk_seq( num_frame);
         }
@@ -453,9 +451,9 @@ static void load_frame( int num_frame )
    /* Read a chunk of frames if we've got less than one chunk buffered
 	*/
 
-   if( ctl->parallel_read )
+/*   if( ctl->parallel_read )
 	   read_chunk_par( num_frame );
-   else
+   else*/
 	   read_chunk_seq( num_frame );
 
    /* We aren't allowed to go too far behind the last read

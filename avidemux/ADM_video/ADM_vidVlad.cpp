@@ -33,11 +33,7 @@
 #include "avi_vars.h"
 #ifdef USE_MMX
 //#define LOOP
-#ifdef __CYGWIN__ // CYGWIN
-	#define Mangle(x) "_" #x
-#else
-	#define Mangle(x) #x
-#endif
+#include "admmangle.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"

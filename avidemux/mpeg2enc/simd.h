@@ -29,11 +29,7 @@
 #define __SIMD_H__
 #include <config.h>
 #include "mjpeg_types.h"
-#ifdef __CYGWIN__ // CYGWIN
-	#define Mangle(x) "_" #x
-#else
-	#define Mangle(x) #x
-#endif
+#include "admmangle.h"
 
 #ifdef __cplusplus
 extern "C"

@@ -63,11 +63,14 @@ B = Y + 1.772U              3716153
 
 
 #ifdef USE_MMX
-#ifdef __CYGWIN__ // CYGWIN
+#if 0
+#ifdef CYG_MANGLING // CYGWIN
 	#define Mangle(x) "_" #x
 #else
 	#define Mangle(x) #x
 #endif
+#endif
+#include "admmangle.h"
 
 /* hope these constant values are cache line aligned */
 static volatile uint64_t mmx_80w = 0x0080008000800080LL;

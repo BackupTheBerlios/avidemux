@@ -42,11 +42,7 @@
 //	#define DEBUG_DEINT 1
 //	#define MMX_TRACE 1
 	#include "mmx_macros.h"
-#ifdef __CYGWIN__ // CYGWIN
-	#define Mangle(x) "_" #x
-#else
-	#define Mangle(x) #x
-#endif
+#include "admmangle.h"
 
  void myDeintASM(void);
 

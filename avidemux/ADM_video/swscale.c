@@ -73,11 +73,7 @@ untested special converters
 //#include "rgb2rgb.h"
 //#include "../libvo/fastmemcpy.h"
 //MEANX
-#ifdef __CYGWIN__ // CYGWIN
-	#define MANGLE(x) "_" #x
-#else
-	#define MANGLE(x) #x
-#endif
+#include "../admmangle.h"
 //MEANX
 
 #undef MOVNTQ
