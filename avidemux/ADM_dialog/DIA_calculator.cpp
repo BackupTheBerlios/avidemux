@@ -54,6 +54,8 @@ static void update( void );
 static uint32_t videoDuration;
 static uint32_t track1, track2;
 
+uint32_t numberOfVideoFrames;
+
 static uint32_t videoSize,videoBitrate;
 
 //************************************
@@ -92,15 +94,14 @@ void prepare( void )
 	aviInfo info;
 	char string[200];
 	 uint16_t mm,hh,ss,ms;
-	 uint32_t frame;
 	 AVDMProcessAudioStream *stream;
 	 
-	 if(frameStart<frameEnd) frame=frameEnd-frameStart;
-	 else			 frame=frameStart-frameEnd;
+	 if(frameStart<frameEnd) numberOfVideoFrames=frameEnd-frameStart;
+	 else			 numberOfVideoFrames=frameStart-frameEnd;
  
  	
 	
-	duration=(float)video_body->getTime (frame);
+	duration=(float)video_body->getTime (numberOfVideoFrames);
 	duration=duration/1000.;
 	
 	if(duration<0) duration=-duration;
@@ -108,7 +109,7 @@ void prepare( void )
 	video_body->getVideoInfo(&info);
 	
 	videoDuration=(uint32_t)ceil(duration);
-	frame2time(frame,info.fps1000, &hh, &mm, &ss, &ms);
+	frame2time(numberOfVideoFrames,info.fps1000, &hh, &mm, &ss, &ms);
 	// now we can set it
 	sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
 	gtk_label_set_text(GTK_LABEL(WID(labelDuration)),string);
@@ -167,7 +168,8 @@ char string[200];
 	uint32_t s74,s80,dvd;
 	
 	// For avi/ogm 
-	if(getRangeInMenu(WID(optionmenu2))==2)
+	int f = getRangeInMenu(WID(optionmenu2));
+	if(f==2)
 	{ // Mpeg
 		s74=730;
 		s80=790;
@@ -195,6 +197,46 @@ char string[200];
 	sprintf(string,"%lu",totalSize);
 	gtk_label_set_text(GTK_LABEL(WID(labelTotal)),string);
 	
+	// Compute muxing overhead size
+	uint32_t muxingOverheadSize;
+	int numberOfAudioTracks = 0;
+	int numberOfChunks;
+	switch (f)
+	{ 
+		case 0:
+			// AVI
+			/*
+				Muxing overhead is 8 + 32 = 40 bytes per chunk.
+				More or less: numberOfChunks = (x + 1) * numberOfVideoFrames,
+				where x - the number of audio tracks
+			*/
+			if (track1 != 0)
+			{
+				numberOfAudioTracks++;
+			}
+			if (track2 != 0)
+			{
+				numberOfAudioTracks++;
+			}
+			numberOfChunks = (numberOfAudioTracks + 1) * numberOfVideoFrames;
+			muxingOverheadSize = (uint32_t) ceil((numberOfChunks * 40) / 1048576.0);;
+			break;
+		case 1:
+			// OGM
+			// Muxing overhead is 1.1% to 1.2% of (videoSize + audioSize)
+			muxingOverheadSize = (uint32_t) ceil(totalSize - totalSize / 1.012);
+			break;
+		case 2:
+			// MPEG
+			// Muxing overhead is 1%  to 2% of (videoSize + audioSize)
+			muxingOverheadSize = (uint32_t) ceil(totalSize - totalSize / 1.02);
+			break;
+		default:
+			ADM_assert(0);
+	}
+	sprintf(string,"%lu",muxingOverheadSize);
+	gtk_label_set_text(GTK_LABEL(WID(labelMux)),string);
+	
 	// and compute
 	//
 	uint32_t videoSize;
@@ -202,7 +244,7 @@ char string[200];
 	if(audioSize>=totalSize) sprintf(string,"** NO ROOM LEFT**");
 	else
 		{
-			videoSize=totalSize-audioSize;
+			videoSize=totalSize-audioSize - muxingOverheadSize;
 			// Compute average bps
 			float avg;
 			avg=videoSize;
@@ -218,7 +260,6 @@ char string[200];
 			
 			//
 			sprintf(string,"%lu",videoSize);
-			
 			
 		}
 	gtk_label_set_text(GTK_LABEL(WID(labelVideo)),string);
@@ -260,16 +301,18 @@ create_Calculator (void)
   GtkWidget *label4;
   GtkWidget *frame3;
   GtkWidget *table1;
-  GtkWidget *label11;
-  GtkWidget *label10;
-  GtkWidget *label9;
   GtkWidget *labelDOO;
   GtkWidget *labelDuration;
-  GtkWidget *labelAudio;
-  GtkWidget *labelTotal;
-  GtkWidget *labelVideo;
   GtkWidget *label12;
   GtkWidget *labelBitrate;
+  GtkWidget *labelVideo;
+  GtkWidget *label11;
+  GtkWidget *label9;
+  GtkWidget *labelAudio;
+  GtkWidget *labelTotal;
+  GtkWidget *label10;
+  GtkWidget *label13;
+  GtkWidget *labelMux;
   GtkWidget *label8;
   GtkWidget *dialog_action_area1;
   GtkWidget *doit;
@@ -401,33 +444,9 @@ create_Calculator (void)
   gtk_widget_show (frame3);
   gtk_box_pack_start (GTK_BOX (vbox1), frame3, TRUE, TRUE, 0);
 
-  table1 = gtk_table_new (5, 2, FALSE);
+  table1 = gtk_table_new (6, 2, FALSE);
   gtk_widget_show (table1);
   gtk_container_add (GTK_CONTAINER (frame3), table1);
-
-  label11 = gtk_label_new (_("Video Size (MBytes)"));
-  gtk_widget_show (label11);
-  gtk_table_attach (GTK_TABLE (table1), label11, 0, 1, 3, 4,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
-
-  label10 = gtk_label_new (_("Total Size (MBytes)"));
-  gtk_widget_show (label10);
-  gtk_table_attach (GTK_TABLE (table1), label10, 0, 1, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
-
-  label9 = gtk_label_new (_("Audio size (MBytes)"));
-  gtk_widget_show (label9);
-  gtk_table_attach (GTK_TABLE (table1), label9, 0, 1, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
 
   labelDOO = gtk_label_new (_("Duration "));
   gtk_widget_show (labelDOO);
@@ -445,33 +464,9 @@ create_Calculator (void)
   gtk_label_set_justify (GTK_LABEL (labelDuration), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelDuration), 0, 0.5);
 
-  labelAudio = gtk_label_new (_("0"));
-  gtk_widget_show (labelAudio);
-  gtk_table_attach (GTK_TABLE (table1), labelAudio, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelAudio), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelAudio), 0, 0.5);
-
-  labelTotal = gtk_label_new (_("0"));
-  gtk_widget_show (labelTotal);
-  gtk_table_attach (GTK_TABLE (table1), labelTotal, 1, 2, 2, 3,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelTotal), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelTotal), 0, 0.5);
-
-  labelVideo = gtk_label_new (_("0"));
-  gtk_widget_show (labelVideo);
-  gtk_table_attach (GTK_TABLE (table1), labelVideo, 1, 2, 3, 4,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelVideo), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelVideo), 0, 0.5);
-
-  label12 = gtk_label_new (_("Average Bitrate (kbps)"));
+  label12 = gtk_label_new (_("Average Video Bitrate (kbps)"));
   gtk_widget_show (label12);
-  gtk_table_attach (GTK_TABLE (table1), label12, 0, 1, 4, 5,
+  gtk_table_attach (GTK_TABLE (table1), label12, 0, 1, 5, 6,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
@@ -479,11 +474,75 @@ create_Calculator (void)
 
   labelBitrate = gtk_label_new (_("0"));
   gtk_widget_show (labelBitrate);
-  gtk_table_attach (GTK_TABLE (table1), labelBitrate, 1, 2, 4, 5,
+  gtk_table_attach (GTK_TABLE (table1), labelBitrate, 1, 2, 5, 6,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (labelBitrate), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelBitrate), 0, 0.5);
+
+  labelVideo = gtk_label_new (_("0"));
+  gtk_widget_show (labelVideo);
+  gtk_table_attach (GTK_TABLE (table1), labelVideo, 1, 2, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelVideo), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelVideo), 0, 0.5);
+
+  label11 = gtk_label_new (_("Video Size (MBytes)"));
+  gtk_widget_show (label11);
+  gtk_table_attach (GTK_TABLE (table1), label11, 0, 1, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
+
+  label9 = gtk_label_new (_("Audio size (MBytes)"));
+  gtk_widget_show (label9);
+  gtk_table_attach (GTK_TABLE (table1), label9, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
+
+  labelAudio = gtk_label_new (_("0"));
+  gtk_widget_show (labelAudio);
+  gtk_table_attach (GTK_TABLE (table1), labelAudio, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelAudio), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelAudio), 0, 0.5);
+
+  labelTotal = gtk_label_new (_("0"));
+  gtk_widget_show (labelTotal);
+  gtk_table_attach (GTK_TABLE (table1), labelTotal, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelTotal), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelTotal), 0, 0.5);
+
+  label10 = gtk_label_new (_("Total Size (MBytes)"));
+  gtk_widget_show (label10);
+  gtk_table_attach (GTK_TABLE (table1), label10, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
+
+  label13 = gtk_label_new (_("Muxing overhead size (MBytes)"));
+  gtk_widget_show (label13);
+  gtk_table_attach (GTK_TABLE (table1), label13, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label13), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label13), 0, 0.5);
+
+  labelMux = gtk_label_new (_("0"));
+  gtk_widget_show (labelMux);
+  gtk_table_attach (GTK_TABLE (table1), labelMux, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelMux), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelMux), 0, 0.5);
 
   label8 = gtk_label_new (_("<b>Result</b>"));
   gtk_widget_show (label8);
@@ -537,16 +596,18 @@ create_Calculator (void)
   GLADE_HOOKUP_OBJECT (Calculator, label4, "label4");
   GLADE_HOOKUP_OBJECT (Calculator, frame3, "frame3");
   GLADE_HOOKUP_OBJECT (Calculator, table1, "table1");
-  GLADE_HOOKUP_OBJECT (Calculator, label11, "label11");
-  GLADE_HOOKUP_OBJECT (Calculator, label10, "label10");
-  GLADE_HOOKUP_OBJECT (Calculator, label9, "label9");
   GLADE_HOOKUP_OBJECT (Calculator, labelDOO, "labelDOO");
   GLADE_HOOKUP_OBJECT (Calculator, labelDuration, "labelDuration");
-  GLADE_HOOKUP_OBJECT (Calculator, labelAudio, "labelAudio");
-  GLADE_HOOKUP_OBJECT (Calculator, labelTotal, "labelTotal");
-  GLADE_HOOKUP_OBJECT (Calculator, labelVideo, "labelVideo");
   GLADE_HOOKUP_OBJECT (Calculator, label12, "label12");
   GLADE_HOOKUP_OBJECT (Calculator, labelBitrate, "labelBitrate");
+  GLADE_HOOKUP_OBJECT (Calculator, labelVideo, "labelVideo");
+  GLADE_HOOKUP_OBJECT (Calculator, label11, "label11");
+  GLADE_HOOKUP_OBJECT (Calculator, label9, "label9");
+  GLADE_HOOKUP_OBJECT (Calculator, labelAudio, "labelAudio");
+  GLADE_HOOKUP_OBJECT (Calculator, labelTotal, "labelTotal");
+  GLADE_HOOKUP_OBJECT (Calculator, label10, "label10");
+  GLADE_HOOKUP_OBJECT (Calculator, label13, "label13");
+  GLADE_HOOKUP_OBJECT (Calculator, labelMux, "labelMux");
   GLADE_HOOKUP_OBJECT (Calculator, label8, "label8");
   GLADE_HOOKUP_OBJECT_NO_REF (Calculator, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (Calculator, doit, "doit");
