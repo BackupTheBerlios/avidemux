@@ -937,6 +937,7 @@ echo " MMX                 : no"
 fi
 echo " AMD64               : $have_amd64"
 echo " Altivec             : $have_altivec"
+echo " PPC                 : $have_ppc"
 echo " MacOsX(Darwin)      : $have_darwin"
 echo " nasm                : $have_nasm ( $AS )"
 echo " Cygwin              : $use_cygwin"
