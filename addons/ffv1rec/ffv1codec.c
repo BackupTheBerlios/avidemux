@@ -425,6 +425,12 @@ int res;
 	_context->pix_fmt		=  PIX_FMT_YUV420P; //PIX_FMT_YV12;
 	_context->flags		= CODEC_FLAG_QSCALE;
 
+        /*S.Ellis: For FFVHUFF context_model=1 gives much better compression */
+        if(codec==FF_FFHUFF) {
+                _context->context_model=1;
+                _context->prediction_method=2;
+        }
+                   
 	switch(codec)
 	{
 		case FF_HUFF: 	res=avcodec_open(_context,&huffyuv_encoder);break;
