@@ -29,6 +29,7 @@
 //== LOCAL Functions ==
 //=====================
 //#define VERBOSE
+#define VERBOSE_GOP
 //== bit buffering stuff ==
 //=========================
 
@@ -721,7 +722,7 @@ uint32_t hh,mm,ss,ff;
 	mm=((a1&3)<<4)+(a2>>4);
 	ss=((a2&7)<<3)+(a3>>5);
 	ff=((a3&0x1f)<<1)+(a4>>7);
-#ifdef VERBOSE	
+#ifdef VERBOSE_GOP	
 	printf("Old : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
 #endif	
 	
@@ -753,7 +754,7 @@ uint32_t hh,mm,ss,ff;
 	mm=((a1&3)<<4)+(a2>>4);
 	ss=((a2&7)<<3)+(a3>>5);
 	ff=((a3&0x1f)<<1)+(a4>>7);
-#ifdef VERBOSE		
+#ifdef VERBOSE_GOP		
 	printf("Fixed : h:%02d m:%02d s:%02d f:%02d\n",hh,mm,ss,ff);
 #endif	
 	

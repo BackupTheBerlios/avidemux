@@ -95,7 +95,7 @@ extern int32_t audioDelay;
 // else do 1st pass with constant Q=6
 #define ADM_1PASS_CBR 1
 #define MAXAUDIO 56000
-extern AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm);
+
 // ______________________________________________
 // 								Initialise all variables
 // ______________________________________________
@@ -1044,7 +1044,7 @@ uint32_t fps1000;
 }
 
 
-AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm)
+AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm,uint8_t silent)
 {
 
 // Second check the audio track
@@ -1072,10 +1072,15 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm)
         	uint32_t    tstart,tend;
 		int32_t shift=0;
 		
-		if(!  DIA_GetIntegerValue((int*)&shift, -1000, +1000, "Audio/video shift", 
+		if(!silent)
+			if(!  DIA_GetIntegerValue((int*)&shift, -1000, +1000, "Audio/video shift", 
 				"Audio Video Shift (ms):"))
+			{
+				return 0;		
+			}
+		else
 		{
-			return 0;		
+			shift=0;
 		}
 		
 	  	tstart = video_body->getTime (frameStart);		

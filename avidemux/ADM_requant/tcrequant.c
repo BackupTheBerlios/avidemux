@@ -58,6 +58,12 @@
 // MEANX
 #include "../ADM_library/default.h"
 #include "tcrequant.h"
+
+#include "../ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_TCREQUANT
+#include "../ADM_toolkit/ADM_debug.h"
+
+
 // / MEANX
 
 
@@ -205,6 +211,16 @@ static uint64 cnt_b_i, cnt_b_ni;
 		mloka1 = rbuf - cbuf; if (mloka1) memmove(orbuf, cbuf, mloka1);\
 		cbuf = rbuf = orbuf; rbuf += mloka1;
 	
+	#define AUTOPAD 0
+	// Meanx: We add a fake sync sequence at the end to allow full decoding of the picture
+	// else it will wait for the next frame to complete that one
+	// Due to the mpegPs muxer, it is vital we have one full frame in, one full frame out
+	// The selected syncword is a seq start as it will bard with illegal value  if we
+	// do it wrong.
+	// We remove this extra datas at the end, along with extra craps (padding) that may be
+	// there also. It is very empirical.
+	//  //Meanx
+	
 	#define LOCK(x) \
 		while (unlikely(x > (rbuf-cbuf))) \
 		{ \
@@ -212,11 +228,26 @@ static uint64 cnt_b_i, cnt_b_ni;
 			if(MIN_READ<mean_read_available) mloka1=MIN_READ;\
 				else mloka1=mean_read_available; \
 			memcpy(rbuf, mean_read, mloka1); \
-			mean_read_available-=mloka1;\
-			mean_read+=mloka1; \
-			if (mloka1 <= 0) { RETURN } \
+			if(mean_read_available && mean_read_available==mloka1) \
+			{\
+				 rbuf[mloka1]=0; \
+				 rbuf[mloka1+1]=0; \
+				 rbuf[mloka1+2]=1; \
+				 rbuf[mloka1+3]=0xB3; \
+				 mean_read+=mloka1; \
+				 mloka1+=4; \
+				 mean_read_available=0; \
+			} \
+			else \
+			{ \
+				mean_read_available-=mloka1;\
+				mean_read+=mloka1; \
+			} \
+			if (mloka1 < 0) { aprintf("mloka1 neg\n");RETURN } \
 			inbytecnt += mloka1; \
 			rbuf += mloka1; \
+			if((rbuf-cbuf)<x)  \
+				{aprintf("Not enough : %lu %lu\n",x,rbuf-cbuf);RETURN}\
 		} 
 		
 	#define FORCE_LOCK() \
@@ -276,7 +307,13 @@ static uint64 cnt_b_i, cnt_b_ni;
 		printf("Return invoked\n"); \
 		return 0;
 #endif
-	#define RETURN goto _req_exit;		
+#if 1
+	#define RETURN  \
+		{mean_track();\
+		goto _req_exit;}	
+#else
+	#define RETURN {mean_track();}
+#endif
 	
 #endif
 	
@@ -307,6 +344,7 @@ static void putnonintrablk(RunLevel *blk);
 static void putmbtype(int mb_type);
 static void putmbdata(int macroblock_modes);
 static void mpeg2_slice ( const int code );
+static void mean_track(void );
 //
 // / MEANX
 		
@@ -2121,8 +2159,9 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 	mean_read=in;
 	mean_read_available=len;
 
-	while(mean_read_available+(rbuf-cbuf)>10)
+	while(mean_read_available+(rbuf-cbuf)>14)
 	{
+		aprintf("Available :%lu\n",mean_read_available+(rbuf-cbuf));
 		// get next start code prefix
 		found = 0;
 		while (!found)
@@ -2332,10 +2371,18 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 
 	// Flush incoming & outgoing buffers
 _req_exit:	
+	aprintf("Left1: %lu\n",rbuf-cbuf);	
+	// Some leftovers, 4 we added to force a startsync and hopefully some crap
+	if(rbuf-cbuf<9) rbuf=cbuf;
+	else
+		{
+			printf("There is too much left...:%lu\n",rbuf-cbuf);
+		}
 	WRITE;
+	
 	FORCE_LOCK();
 	assert(!mean_available);
-	
+	aprintf("Left: %lu\n",rbuf-cbuf);	
 	*lenout=mean_wrotten;
 	return 1;
 }
@@ -2349,6 +2396,10 @@ int Mrequant_end (void)
 	return 1;
 	
 }
+void mean_track(void )
+{
+	aprintf("**return invoked : mean_available 0x%x left 0x%x\n",mean_read_available,rbuf-cbuf);
 
+}
 // -- EOF --
 

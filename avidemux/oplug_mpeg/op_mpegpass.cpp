@@ -41,7 +41,7 @@
 	Usefull for editing PVR captured files for example
 
 */
- extern AVDMGenericAudioStream *mpt_getAudioStream(double *pcm);
+
 
  #define PACK_AUDIO(x) {\
  			total_wanted+=pcm; \

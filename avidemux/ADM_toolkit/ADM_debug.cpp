@@ -31,11 +31,13 @@
 
 // put here the module you want to be verbose (MODULE_xxx + MODULE_yyyy+  ....)
 #ifndef masked
-#define masked  (MODULE_REQUANT) //(MODULE_AUDIO_EDITOR) MODULE_OGM_AUDIO
+#define masked  (0) //(MODULE_AUDIO_EDITOR) MODULE_OGM_AUDIO MODULE_REQUANT
 #endif
 
 // If the entitty is in masked we actually print the string
 // else we silently drop it
+extern "C"
+{
  void indirect_printf(int entity, const char *prf, ...)
   {
   static char print_buffer[1024];
@@ -55,3 +57,4 @@
 	}
   }
 
+}

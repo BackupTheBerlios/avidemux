@@ -14,15 +14,24 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- #if !defined(MODULE_NAME)
+#if !defined(MODULE_NAME)
          #error define MODULE_NAME when using aprintf !
 #endif
+
+
 
 #if !defined(ADM_DEBUG)
          #define aprintf(prt, args...) ;
 #else
         #if (MODULE_NAME !=0x8000)
+	#ifdef __cplusplus
+	extern "C" {
+	#endif
 	 	void indirect_printf(int entity, const char *fmt, ...);
+	#ifdef __cplusplus
+	}
+	#endif
+			
                 #define aprintf(prt, ...) indirect_printf(MODULE_NAME,prt, ## __VA_ARGS__)
         #else
                 #define aprintf(prt, ...) ;

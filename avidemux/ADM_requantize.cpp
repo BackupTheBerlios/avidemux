@@ -82,19 +82,20 @@
 #include "ADM_codecs/ADM_ffmpeg.h"
 
 #include "mpeg2enc/ADM_mpeg2enc.h"
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_REQUANT
+#include "ADM_toolkit/ADM_debug.h"
+
 extern "C"
 {
 	#include "ADM_requant/tcrequant.h"
 }
 #include "ADM_lvemux/ADM_muxer.h"
-#include "ADM_toolkit/ADM_debugID.h"
-#define MODULE_NAME MODULE_REQUANT
-#include "ADM_toolkit/ADM_debug.h"
 
 
-uint8_t DIA_Requant(float *perce,uint32_t *quality,uint64_t init);
+uint8_t DIA_Requant(float *perce,uint32_t *quality,uint64_t init,uint32_t audioSize);
 void A_requantize2( float percent, uint32_t quality, char *out_name )	;
-extern AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm);
+
 /*
 	We pipe the raw mpeg stream to mpeg2requantizer
 
@@ -110,6 +111,9 @@ void A_requantize( void )
 	
 	float 		percent;
 	uint32_t 	quality;
+	AVDMGenericAudioStream *audio=NULL;
+	uint32_t	audioSize;
+	double 		audioInc;
 	
 	
 	//
@@ -124,7 +128,17 @@ void A_requantize( void )
 		size+=fsize;
 	}
 	//
-	if(! DIA_Requant(&percent,&quality,size)) return;
+	audio=mpt_getAudioStream(&audioInc,1);
+	if(audio)
+	{
+		audioSize=audio->getLength();
+	}
+	else
+		audioSize=0;
+	//
+	deleteAudioFilter();
+	printf("Found audio :%lu\n",audioSize);
+	if(! DIA_Requant(&percent,&quality,size,audioSize)) return;
 	
 	printf("Using shrink factor %f, with qual=%lu\n",percent,quality);
 	
@@ -155,6 +169,9 @@ void A_requantize( void )
 			else\
 			{\
 				muxer->writeVideoPacket(lenout,outbuffer); \
+				aprintf("Requant in %x %x %x %x\n",buffer[0],buffer[1],buffer[2],buffer[3]); \
+				aprintf("Requant out %x %x %x %x %x %x\n",outbuffer[0],\
+					outbuffer[1],outbuffer[2],outbuffer[3],outbuffer[4],outbuffer[5]); \
 				PACK_AUDIO; \
 			}
 			
@@ -195,6 +212,9 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 			GUI_Alert("Muxer init failed\n");
 			goto _abt;
 		}
+		// The requantizer will not alter the gop timestamp
+		// they (may) need to be resynced
+		muxer->forceRestamp();
 		
 	}
 	else
