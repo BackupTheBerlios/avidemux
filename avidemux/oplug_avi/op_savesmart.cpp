@@ -200,7 +200,7 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
   FFcodecSetting myConfig={
 	 ME_EPZS,//	ME
 	 0, // 		GMC	
-	 1,//		_4MV;
+	 0,//		_4MV;
 	 0,//		_QPEL;	 
 	 0,//		_TREILLIS_QUANT
 	 2,//		qmin;
@@ -251,9 +251,9 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
 			 {
 				 ffmpegEncoderCQ *tmp;
 				  tmp = new ffmpegEncoderCQ (info.width, info.height,FF_MSMP4V3);
-			    ret= tmp->init (qz,0);
-			    _encoder=tmp;
-			 
+				  tmp->setConfig(&myConfig);
+			    	  ret= tmp->init (qz,25000);
+			    	  _encoder=tmp;
 				}
 				else
 					{
