@@ -103,19 +103,7 @@ extern void mixDump(uint8_t *ptr,uint32_t len);
 		printf(" Internal  stream 2 = %x",_otherStream);
 		printf("stream 2s= %x\n",_otherStreamSubId);
 }
-int32_t 	ADM_mpegDemuxerProgramStream::getPTSDelta( void ) 
-{
-	if(_firstPTS==MINUS_ONE) return 0;
-	if(_otherPTS==MINUS_ONE) return 0;
-	
-	double delta;
-	
-	delta=_firstPTS;
-	delta-=_otherPTS;
-	delta/=90.;
-	printf("\n>>Delta PTS = %f ms<<\n",delta);
-	return (int32_t)floor(delta);
-}
+
  ADM_mpegDemuxerProgramStream::~ADM_mpegDemuxerProgramStream() 
  {
 		if(parser) delete parser;			

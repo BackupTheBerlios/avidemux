@@ -269,7 +269,7 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 {
 	uint8_t stream,subid;
 	uint32_t len;
-	uint32_t pts=0;
+	uint32_t pts=MINUS_ONE;
 	uint32_t pid,adapt,start;
 	uint32_t peslen;
 	uint64_t sync;
@@ -321,11 +321,13 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 				{
 					_pesLen=peslen;
 					_pesRead=0;
+					if(_firstPTS==MINUS_ONE) _firstPTS=pts;
 				}	
 				else if(pid==_otherPid)
 				{
 					_otherPesLen=peslen;
-					_otherPesRead=0;					
+					_otherPesRead=0;			
+					if(_otherPTS==MINUS_ONE) _otherPTS=pts;		
 				}
 				else assert(0);
 			}
@@ -444,6 +446,20 @@ uint32_t hdr=0;
 		hdr=_TSbuffer[start];	
 		start++;
 		totallen--;	
+		// Read PTS if it is there
+		if((ptsdts>>7)&1)
+		{
+			
+			*pts=(((_TSbuffer[start]&6)>>1)<<30)+
+				(_TSbuffer[start+1]<<22)
+				+((_TSbuffer[start+2]>>1)<<15)
+				+(_TSbuffer[start+3]<<7)
+				+(_TSbuffer[start+4]>>1);
+		}
+		else
+		{
+			*pts=MINUS_ONE;
+		}
 		// Extra header
 		//printf("Hdr:%d ptsdts:%d\n",hdr,ptsdts>>6);
 		start+=hdr;

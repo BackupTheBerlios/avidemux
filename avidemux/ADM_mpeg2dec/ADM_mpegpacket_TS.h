@@ -57,5 +57,5 @@ class ADM_mpegDemuxerTransportStream : public   ADM_mpegDemuxer
 		virtual int32_t 	getPTSDelta( void ) ;
 };
 #define PRIVATE_STREAM_1 	0xbd
-#define MINUS_ONE 0xffffffff
+
 

@@ -49,6 +49,8 @@
 ADM_mpegDemuxer::ADM_mpegDemuxer(void )
 {
 		_lastErr=0;
+		_firstPTS=MINUS_ONE;
+		_otherPTS=MINUS_ONE;	
 	
 }
 ADM_mpegDemuxer::~ADM_mpegDemuxer( )
@@ -208,4 +210,16 @@ uint8_t			ADM_mpegDemuxerElementaryStream::_asyncJump(uint64_t relative,uint64_t
 		return 1;
 	
 }
-
+ int32_t ADM_mpegDemuxer::getPTSDelta( void ) 
+{
+	if(_firstPTS==MINUS_ONE) return 0;
+	if(_otherPTS==MINUS_ONE) return 0;
+	
+	double delta;
+	
+	delta=_firstPTS;
+	delta-=_otherPTS;
+	delta/=90.;
+	printf("\n>>Delta PTS = %f ms<<\n",delta);
+	return (int32_t)floor(delta);
+}

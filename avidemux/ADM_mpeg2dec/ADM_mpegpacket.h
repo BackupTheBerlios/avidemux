@@ -25,7 +25,7 @@
  #ifndef ADM_mpgpack
  #define ADM_mpgpack
  #include "ADM_mpegindexer/ADM_mpegparser.h"
- 
+ #define MINUS_ONE 0xffffffff
  class ADM_mpegpacket
  {
 	  private : 
@@ -45,10 +45,11 @@ class ADM_mpegDemuxer
  {
 	  protected : 
 	          
-	            uint64_t  _size;
-	            uint64_t _pos;
-	            uint8_t   _lastErr;
-	            		  
+		uint64_t  _size;
+		uint64_t _pos;
+		uint8_t   _lastErr;
+		uint32_t  _firstPTS;
+		uint32_t  _otherPTS;		  
 	  public:
 	  					ADM_mpegDemuxer();
 		virtual    ~ADM_mpegDemuxer();	       
@@ -95,9 +96,8 @@ class ADM_mpegDemuxer
 		virtual uint32_t	getOtherSize(void)=0;  
 		virtual	uint64_t	getSize( void);
 		virtual void 		dump( void ) {};
-		virtual int32_t 	getPTSDelta( void ) { return 0;};
-	};
-	
+		virtual int32_t 	getPTSDelta( void );
+};	
 class ADM_mpegDemuxerElementaryStream : public   ADM_mpegDemuxer
  {
 	  private : 
