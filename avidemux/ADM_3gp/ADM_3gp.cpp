@@ -166,6 +166,7 @@ uint8_t    _3GPHeader::close( void )
 	DEL(Sync);
 	DEL(SttsN);
 	DEL(SttsC);
+	DEL(_audioExtraData);
  	return 1;
 }
 //
@@ -189,7 +190,10 @@ _3GPHeader::_3GPHeader(void)
 	 Sync=NULL;
 	 SttsN=NULL;
 	 SttsC=NULL;
-
+	_otherExtraStart=0;
+	_otherExtraSize=0;
+	_audioExtraData=0;
+	
 
 }
 uint8_t	_3GPHeader::getAudioStream(AVDMGenericAudioStream **audio)
@@ -271,7 +275,7 @@ uint8_t    _3GPHeader::open(char *name)
 	if(_nbAudioChunk)
 	{
 	      _isaudiopresent=1;
-	      _audioTrack=new _3gpAudio( _audioIdx, _nbAudioChunk,_fd,_rdWav);
+	      _audioTrack=new _3gpAudio( _audioIdx, _nbAudioChunk,_fd,_rdWav,_audioExtraLen,_audioExtraData);
 	}
 	printf("3gp/mov file successfully read..\n");
 	return 1;
@@ -289,6 +293,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 	uint32_t n=0,j,wh,i,l=0;
 	uint32_t tag=0xff;
 
+	// Skippable : Edit edts dinf
+	//		udta : user data
 	
 	while(!atom->isDone())
 	{
@@ -297,7 +303,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					for(uint32_t o=0;o<nest;o++) printf("\t");
 					printf("parsing atom ");
 					fourCC::printBE(tom.getFCC());
-					printf("\n");	
+					printf(" (size %lu)\n",tom.getSize());	
 #endif
 		nest++;
 		switch((tom.getFCC()))
@@ -405,19 +411,36 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					tom.skipAtom();
 					break;					
 			case MKFCCR('m','p','4','a'): //'mp4a':
-					tom.skipBytes(8);
 					_rdWav=new WAVHeader;
+					// Put safe default here, in case there 
+					// is no decodable information later on
 					memset(_rdWav,0,sizeof(WAVHeader));
-					_rdWav->encoding=WAV_AAC;
-					
-					#warning !!!!!!!!!!!!!!!
-					#warning decode MP4 audio header!
-					#warning !!!!!!!!!!!!!!!
+					_rdWav->encoding=WAV_AAC;					
 					_rdWav->frequency=44100;
 					_rdWav->channels=2;
 					_rdWav->bitspersample=16;
 					_rdWav->byterate=128000/8;
-					
+					// According to 3gp doc we should have 28 bytes
+					// at least
+
+					if(tom.getSize()<28) break;
+					// 6 *0
+					tom.skipBytes(6);
+					tom.skipBytes(2); // data ref index
+					tom.skipBytes(4); // Version/revision
+					tom.skipBytes(4); // Vendor
+					_rdWav->channels=tom.read16();
+					printf("Channel :%d\n",_rdWav->channels);
+					printf("Sample  :%d\n",tom.read16());
+					tom.skipBytes(4);
+					_rdWav->frequency=tom.read16();
+					printf("Fq      :%d\n",_rdWav->frequency);
+					tom.skipBytes(2);
+					// There might be an esds atom here
+					// but
+					//   (1) i don't have the doc
+					//   (2) it does not seem vital
+
 					tom.skipAtom();
 					break;
 			case MKFCCR('s','a','m','r'): //'mp4a':
@@ -450,7 +473,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					
 					SttsN[i]=tom.read32();
 					SttsC[i]=tom.read32();
-					printf("stts: count:%u size:%u (unscaled)\n",SttsN[i],SttsC[i]);	
+					aprintf("stts: count:%u size:%u (unscaled)\n",SttsN[i],SttsC[i]);	
 					//dur*=1000.*1000.;; // us
 					//dur/=myScale;
 				}
@@ -485,26 +508,57 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				{
 				uint32_t nbo;
 				case 1:
-           				_videostream.dwLength= _mainaviheader.dwTotalFrames=nbSz;
-					if(duration)
-              				_videostream.dwRate=(1000*1000*_videostream.dwLength)/duration;;
+					{
+           				
+					
 					buildIndex(&_idx,myScale,
 							nbSz,Sz,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
 							Sn,&nbo);
+					// Take the last entry in the video index as global time
+					// time in us
+					_videostream.dwLength= _mainaviheader.dwTotalFrames=nbo;
+					double last=_idx[nbo-1].time;
+					// avoid rounding error
+					
+					last+=_idx[1].time; // ~ 1 Frame duration
+					ADM_assert(last>0.1);
+					last=1000.*1000.*1000./last;
+					last*=nbo;
+					printf("3GP:Tk %lu Nb sz:%lu nbFrame:%lu duration:%f us\n",
+							current,nbSz,nbo,last);
+              				_videostream.dwRate=(uint32_t)floor(last);
+					if(_otherExtraSize)
+					{
+						printf("We have some (%lu) extra data for video",_otherExtraSize);
+						_volHeader=_otherExtraStart;
+						_volHeaderLen=_otherExtraSize;
+					}
 					if(nbSync)
 						sync(_idx,nbSz,nbSync,Sync);
+					}
 					break;
 				case 2:
-
+					// audio
 					buildIndex(&_audioIdx,myScale,
 							nbSz,Sz,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
 							Sn,&nbo);
+					// Check for extra
+					if(_otherExtraSize)
+					{	// Get extra data here
+						printf("We have some (%lu) extra data for audio\n",_otherExtraSize);
+						_audioExtraData=new uint8_t[_otherExtraStart];
+						_audioExtraLen=_otherExtraSize;
+						fseek(_fd,_otherExtraStart,SEEK_SET);
+						fread(_audioExtraData,1,_otherExtraSize,_fd);
+					
+					}
 					if(nbo)
 						_nbAudioChunk=nbo;
 					else
 						_nbAudioChunk=nbSz;
 					break;
 				}
+				_otherExtraStart=_otherExtraSize=0;
 				DEL(Sz);
 				DEL(Co);
 				DEL(Sc);
@@ -588,7 +642,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
               			_video_bih.biHeight=_mainaviheader.dwHeight=wh & 0xffff;
 				printf("H263 : %ld x %ld \n",_video_bih.biWidth,_video_bih.biHeight);
               			_videostream.fccHandler=fourCC::get((uint8_t *)"H263");
-                        _video_bih.biCompression=_videostream.fccHandler;
+                        	_video_bih.biCompression=_videostream.fccHandler;
 				// d263 atom here	 -> ignored
 				tom.skipAtom();
 				break;
@@ -631,39 +685,31 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 			case MKFCCR('e','s','d','s'): //'esds':
 					// in case of mpeg4 we only take
 					// the mpeg4 vol header
-					if(fourCC::check(_videostream.fccHandler,(uint8_t *)"DIVX"))
+					
+
+					tom.skipBytes(4);
+					tag=0xff;
+					while(tag!=Tag_DecSpecificInfo && !tom.isDone())
 					{
-
-						tom.skipBytes(4);
-						tag=0xff;
-						while(tag!=Tag_DecSpecificInfo && !tom.isDone())
+						tag=tom.read();
+						l=readPackedLen(&tom);
+						printf("\t Tag : %lu Len : %lu\n",tag,l);
+						switch(tag)
 						{
-							tag=tom.read();
-							l=readPackedLen(&tom);
-							printf("\t Tag : %lu Len : %lu\n",tag,l);
-							switch(tag)
-							{
-								case Tag_ES_Desc:
-									tom.skipBytes(3);
-									break;
-								case Tag_DecConfigDesc:
-									tom.skipBytes(1+1+3+4+4);	
-									break;
-								case Tag_DecSpecificInfo:
+							case Tag_ES_Desc:
+								tom.skipBytes(3);
+								break;
+							case Tag_DecConfigDesc:
+								tom.skipBytes(1+1+3+4+4);	
+								break;
+							case Tag_DecSpecificInfo:
 
-									_volHeader=ftell(_fd);
-									_volHeaderLen=l;
-									break;
+								_otherExtraStart=ftell(_fd);
+								_otherExtraSize=l;
+								break;
 							}
-						}
 					}
-					else
-					{	
-						_volHeader=ftell(_fd);
-						_volHeaderLen=tom.getSize();
-					}
-
-
+					
 				tom.skipAtom();
 				break;
 			case MKFCCR('m','p','4','v'): //'mp4v':
@@ -823,7 +869,7 @@ uint32_t i,j,cur;
 		printf("Using packet size of %lu, %lu packets ..\n",packet_size,*outNbChunk);
 		// we try to avoid too big packet_size
 		// so we split them in packet size number
-#if 1
+
 		*idx=new _3gpIndex[nbCo];
 		memset(*idx,0,nbCo*sizeof(_3gpIndex));
 		*outNbChunk=nbCo;
@@ -836,100 +882,91 @@ uint32_t i,j,cur;
 		}
 		// Time to update audio (as we are probably in audio)
 		// they should be all the same duration
+		// since they are all the same size...
 		ADM_assert(nbStts==1);
-		ADM_assert(SttsC[0]==1); // 
-		printf("created %u blocks\n",nbCo);
+		uint32_t count,val;
+				
+		if(SttsC[0]==1)
+		{		
+			count=nbCo;
+			val=SttsN[0];
+		}
+		else
+		{
+			count=SttsN[0];
+			val=SttsC[0];
+		
+		}
+		printf("created %u blocks\n",count);
 		// update timestamps on block
-		double dur=SttsN[0];
+		double dur=val;
 		double total=0;
 		
-			dur=dur/myScale;
-			dur/=nbCo;		// we got the duration of one block
-			dur*=1000*1000.;	// in us now
-		for(uint32_t i=0;i<nbCo;i++)
+		dur=dur/myScale;
+		dur/=count;		// we got the duration of one block
+		dur*=1000*1000.;	// in us now
+		for(uint32_t i=0;i<count;i++)
 		{
 			(*idx)[i].time=(uint64_t)floor(total);
-			total+=dur;
+			total+=dur;		
+		}
 		
-		}
+		
 		return 1;
-#else
-		*idx=new _3gpIndex[nbPacket];
-		_3gpIndex *ix=*idx;
 
-		for(i=0;i<nbCo;i++)
-		{
-			cur_size=0;
-			while((cur_size+chunk_size)<chunk_size)
-			{
-				ix[cur_entry].size=packet_size;
-				ix[cur_entry].offset=cur_size;
-				cur_size+=packet_size;
-				aprintf("Size : %lu offset : %lu\n",ix[cur_entry].size,ix[cur_entry].offset);
-				cur_entry++;
-			}
-			if(cur_size<chunk_size)
-			{
-				ix[cur_entry].size=chunk_size-cur_size;
-				ix[cur_entry].offset=Co[i]+cur_size;
-				cur_entry++;
-			}
-		}
-		return 1;
-#endif
 		
 		
 	}
-	else
+		
+	// We have different packet size
+	// Probably video
+	*idx=new _3gpIndex[nbSz];
+	memset(*idx,0,nbSz*sizeof(_3gpIndex));
+
+	for(i=0;i<nbSz;i++)
 	{
-		*idx=new _3gpIndex[nbSz];
-		memset(*idx,0,nbSz*sizeof(_3gpIndex));
-
-		for(i=0;i<nbSz;i++)
+		(*idx)[i].size=Sz[i];
+		aprintf("\t size : %d : %lu\n",i,Sz[i]);
+	}
+	// if no sample to chunk we map directly
+	// first build the # of sample per chunk table
+	for(i=0;i<nbSc;i++)
+	{
+		for(j=Sc[i]-1;j<nbCo;j++)
 		{
-			(*idx)[i].size=Sz[i];
-			aprintf("\t size : %d : %lu\n",i,Sz[i]);
+			chunkCount[j]=Sn[i];
 		}
-		// if no sample to chunk we map directly
-	{	// first build the # of sample per chunk table
-		for(i=0;i<nbSc;i++)
-		{
-			for(j=Sc[i]-1;j<nbCo;j++)
-			{
-				chunkCount[j]=Sn[i];
-			}
-			aprintf("(%d) sc: %lu sn:%lu\n",i,Sc[i],Sn[i]);
-
-		}
-			for(j=0;j<nbCo;j++)
+		aprintf("(%d) sc: %lu sn:%lu\n",i,Sc[i],Sn[i]);
+	}
+/*			for(j=0;j<nbSc;j++)
 			{
 				aprintf("\n count number : %d - %lu\n",j,Sn[j]);
-			}
-		// now we have for each chunk the number of sample in it
-		cur=0;
-		for(j=0;j<nbCo;j++)
+			}*/
+	// now we have for each chunk the number of sample in it
+	cur=0;
+	for(j=0;j<nbCo;j++)
+	{
+		int tail=0;
+		aprintf("--starting at %lu , %lu to go\n",Co[j],chunkCount[j]);
+		for(uint32_t k=0;k<chunkCount[j];k++)
 		{
-			int tail=0;
-			aprintf("--starting at %lu , %lu to go\n",Co[j],chunkCount[j]);
-			for(uint32_t k=0;k<chunkCount[j];k++)
-			{
-				(*idx)[cur].offset=Co[j]+tail;
-				tail+=(*idx)[cur].size;
-				aprintf(" sample : %d offset : %lu\n",cur,(*idx)[cur].offset);
-				aprintf("Tail : %lu\n",tail);
-				cur++;
-			}
-
-
+			(*idx)[cur].offset=Co[j]+tail;
+			tail+=(*idx)[cur].size;
+			aprintf(" sample : %d offset : %lu\n",cur,(*idx)[cur].offset);
+			aprintf("Tail : %lu\n",tail);
+			cur++;
 		}
-		*outNbChunk=cur;;
+
+
 	}
-	}
+	*outNbChunk=cur;;
+	
+	
 	// Now deal with duration
 	// the unit is us FIXME, probably said in header
 	// we put each sample duration in the time entry
 	// then sum them up to get the absolute time position
-_3gp_time:	
+
 	uint32_t nbChunk=*outNbChunk;
 	if(nbStts)		//uint32_t nbStts,	uint32_t *SttsN,uint32_t SttsC,
 	{
@@ -957,13 +994,14 @@ _3gp_time:
 		uint64_t total=0;
 		float    ftot;
 		uint32_t thisone;
+		
 		for(uint32_t i=0;i<nbChunk;i++)
 		{
 			thisone=(*idx)[i].time;
 			ftot=total;
 			ftot*=1000.*1000.;
 			ftot/=myScale;
-			(*idx)[i].time=(uint32_t)floor(ftot);
+			(*idx)[i].time=(uint64_t)floor(ftot);
 			total+=thisone;
 			aprintf("Audio chunk : %lu time :%lu\n",i,(*idx)[i].time);
 		}

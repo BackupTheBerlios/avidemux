@@ -41,6 +41,16 @@ adm_atom::adm_atom(adm_atom *atom)
 	_atomStart=ftell(_fd);
 	_atomSize=read32();
 	_atomFCC=read32();
+	// Gross hack for some (buggy ?) movie
+	if(!_atomSize)
+	{
+		printf("3GP:Workaround: detected wrong sized atom!\nTrying to continue\n");
+		_atomStart+=4;
+		_atomSize-=4;
+		fseek(_fd,_atomStart,SEEK_SET);
+		_atomSize=read32();
+		_atomFCC=read32();
+	}
 #ifdef ATOM_DEBUG
 	dumpAtom();
 #endif

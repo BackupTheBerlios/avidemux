@@ -39,7 +39,7 @@
 //
 //_______________________________________________________
 
-_3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *incoming)
+_3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *incoming,uint32_t extraLen,uint8_t *extraData)
 {
 	_nb_chunks=nbchunk;
 	_fd=fd;
@@ -49,6 +49,9 @@ _3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *inco
 	_pos=0;
 	_index=idx;
 
+	_extraLen=extraLen;
+	_extraData=extraData;
+	
 	_wavheader=new WAVHeader;
 	memset(_wavheader,0,sizeof(WAVHeader));
 	// AMR like...
@@ -79,9 +82,8 @@ _3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *inco
 	printf("Frequency :%d\n",_wavheader->frequency);
 	printf("Encoding   :%d\n",_wavheader->encoding);
 	printf("Channels   :%d\n",_wavheader->channels);
+	printf("Extra data :%lu\n",_extraLen);
     	goToTime(0);
-
-
 }
  uint8_t	_3gpAudio::goToTime(uint32_t mstime)
 {
@@ -146,10 +148,26 @@ uint32_t r=0;
 	  
 	  
 	  return 1;
-
-
-
 }
+//_______________________________________________________
+//
+//
+//_______________________________________________________
+
+uint8_t	_3gpAudio::extraData(uint32_t *l,uint8_t **d)
+{
+	if(_extraLen && _extraData)
+	{
+		*l=_extraLen;
+		*d=_extraData;
+		return 1;
+	
+	}
+	*l=0;
+	*d=NULL;
+	return 0;
+}
+
 //_______________________________________________________
 //
 //

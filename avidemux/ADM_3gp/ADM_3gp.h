@@ -48,19 +48,22 @@ protected:
               	uint32_t 					_current_index;
 	    	_3gpIndex 					*_index;
 		FILE						*_fd;
-
+		uint32_t					_extraLen;
+		uint8_t						*_extraData;
 		
 		
 		
 public:
 					_3gpAudio(_3gpIndex *idx,
-						uint32_t nbchunk, FILE * fd,WAVHeader *incoming);
+						uint32_t nbchunk, FILE * fd,WAVHeader *incoming,
+						uint32_t extraLen,uint8_t *extraData);
 	virtual				~_3gpAudio();
         virtual uint32_t 		read(uint32_t len,uint8_t *buffer);
         virtual uint8_t  		goTo(uint32_t newoffset);
 		   uint8_t			getNbChunk(uint32_t *ch);
 	virtual uint8_t 		getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
 	virtual uint8_t 		goToTime(uint32_t mstime);
+	virtual uint8_t			extraData(uint32_t *l,uint8_t **d);
 
 };
 
@@ -73,9 +76,15 @@ protected:
 	  FILE 				*_fd;
 	  _3gpIndex 			*_idx;
 	  _3gpIndex 			*_audioIdx;
-	  uint32_t				_nbAudioChunk;
-	  uint32_t				_volHeader;
-	  uint32_t				_volHeaderLen;
+	  uint32_t			_nbAudioChunk;
+	  uint32_t			_volHeader;
+	  uint32_t			_volHeaderLen;
+	  
+	  uint32_t			_otherExtraStart;
+	  uint32_t			_otherExtraSize;
+	  
+	  uint8_t			*_audioExtraData;
+	  uint32_t			_audioExtraLen;
 	uint8_t 				parseAtomTree(adm_atom *atom);
 	  _3gpAudio			*_audioTrack;
 	uint8_t 				sync(_3gpIndex *idx,uint32_t index_size, uint32_t sync_size,uint32_t *sync);
