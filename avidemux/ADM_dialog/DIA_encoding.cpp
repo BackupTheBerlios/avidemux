@@ -133,6 +133,7 @@ void DIA_encoding::reset(void)
 {
 	   assert(dialog);
 	   _totalSize=0;
+	   _videoSize=0;
 	   _current=0;
 }
 void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
