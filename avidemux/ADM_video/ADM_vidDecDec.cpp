@@ -213,7 +213,7 @@ Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples)
 		}
 		
 		assert(_param->cycle);
-		vidCache=new VideoCache(_param->cycle+2,in);
+		vidCache=new VideoCache(_param->cycle*2+1,in);
 		
 		if (_param->mode == 0 || _param->mode == 2 || _param->mode == 3)
 		{
