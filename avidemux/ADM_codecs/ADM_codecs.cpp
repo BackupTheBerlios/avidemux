@@ -66,6 +66,9 @@ extern "C" {
 #include "ADM_codecs/ADM_mpeg.h"
 #include "ADM_codecs/ADM_vp3.h"
 #include "ADM_toolkit/toolkit.hxx"
+
+#include "prefs.h"
+
 extern uint8_t GUI_Question(char *);
 extern  uint8_t use_fast_ffmpeg;
 uint8_t isMpeg12Compatible(uint32_t fourcc);
@@ -270,10 +273,22 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 			    }
 #endif         
 	if(isMpeg12Compatible(fcc))
-	{         
+	{        	
+		uint32_t  lavcodec_mpeg=0;
 		printf("\n using Mpeg1/2 codec (libmpeg2)\n");
-	    	return(decoders *)( new decoderMpeg(w,h,extraLen,extraData));
-	    //  	return(decoders *)( new decoderFFMpeg12(w,h,extraLen,extraData));
+		if(!prefs->get(FEATURE_USE_LAVCODEC_MPEG, &lavcodec_mpeg))
+		{
+		 lavcodec_mpeg=0;
+		}
+		if(lavcodec_mpeg)
+		{
+			return(decoders *)( new decoderFFMpeg12(w,h,extraLen,extraData));
+		}
+		else
+		{
+	    		return(decoders *)( new decoderMpeg(w,h,extraLen,extraData));
+		}
+	    //  
 	}
 
         // default : null decoder

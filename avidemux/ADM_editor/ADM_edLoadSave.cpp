@@ -37,6 +37,7 @@
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_assert.h"
+#include "prefs.h"
 
 // Ugly but sooo usefull
 extern uint32_t frameStart,frameEnd;
@@ -234,8 +235,15 @@ uint8_t ADM_Composer::loadWorbench (char *name)
 
 	if(2==fscanf(fd,"Video start-end : %lu %lu\n",&edFrameStart,&edFrameEnd))
 	{
-		printf("Got start end!\n");
-		_haveMarkers=1;
+		uint8_t val = 0;
+		prefs->get(FEATURE_IGNORESAVEDMARKERS,&val);
+		if( val ){
+			printf("Ignored start end!\n");
+			_haveMarkers=0;
+		}else{
+			printf("Got start end!\n");
+			_haveMarkers=1;
+		}
 	}
 	else
 	{

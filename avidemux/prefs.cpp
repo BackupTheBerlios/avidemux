@@ -73,10 +73,12 @@ static opt_def opt_defs [] = {
 	{"requant_path",		STRING,"",	NULL, NULL, NULL },
 	{"feature.swap_if_A_greater_than_B",		UINT,	"1",	NULL,	"0",	"1"	},
 	{"feature.svcdres.preferedsourceratio",		STRING,"1:1",	NULL, NULL, NULL },
-	{"feature.saveprefsonexit",		UINT,	"1",	NULL,	"0",	"1"	}
+	{"feature.saveprefsonexit",		UINT,	"1",	NULL,	"0",	"1"	},
+	{"feature.ignoresavedmarkers",		UINT,	"0",	NULL,	"0",	"1"	},
+	{"feature.use_lavcodec_mpeg",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 37;
+int num_opts = 39;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2
