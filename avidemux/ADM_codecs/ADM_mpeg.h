@@ -35,7 +35,7 @@
 					void  		decode_mpeg2 (uint8_t * current, uint8_t * end);
 					void		feedData(uint32_t len, uint8_t *data);
 					uint32_t	_swapUV;
-					
+					uint8_t     	*unpackBuffer;
 					ADM_PP		_postproc;
 				 
 

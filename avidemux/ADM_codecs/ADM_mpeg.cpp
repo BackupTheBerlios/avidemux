@@ -54,7 +54,7 @@ extern "C"
 
 extern void 			mpeg2_pop(mpeg2dec_t *m);
 extern void 			mpeg2_popI(mpeg2dec_t *m);
-static vo_instance_t 	*yv12_open (void);
+static vo_instance_t 		*yv12_open (void);
 static void 			yv12_close (vo_instance_t * _instance);
 static int 			yv12_setup (vo_instance_t * _instance, unsigned int width, 	
 					unsigned int height,unsigned  int chroma_w, 
@@ -73,6 +73,7 @@ typedef struct yv12_instance_s
     vo_instance_t 			vo;
    decoderMpeg	 		*father;
     uint32_t				w,h;
+    uint8_t			*buffer;
 } yv12_instance_t;
 
 static uint8_t *iBuff[3];
@@ -83,19 +84,9 @@ decoderMpeg::~decoderMpeg ()
 {
 #warning clean up libmpeg2 here
 	kill_codec();
+	delete [] unpackBuffer;
 }
-//____________________init ____________________
 
-uint8_t decoderMpeg::init_codec (void)
-{
-
-  printf ("\n initializing mpeg2 decoder");
-  output =yv12_open ();
-  _decoder=mpeg2_init();
-  printf ("\n done\n");
-
-  return 1;
-}
 
 //____________________-un init ____________________
 uint8_t decoderMpeg::kill_codec (void)
@@ -144,6 +135,7 @@ decoderMpeg::decoderMpeg(uint32_t w,uint32_t h,uint32_t extraLen, uint8_t *extra
 {
 mpeg2_decoder_t *dec;
 uint32_t wmb,hmb;
+yv12_instance_t *inst;
 			_seqLen=extraLen;
 			if(extraLen)
 			{
@@ -160,6 +152,9 @@ uint32_t wmb,hmb;
 			// now init libmpeg2
  			printf ("\n initializing mpeg2 decoder %lu x %lu\n",_w,_h);
   			output =yv12_open ();
+			inst=(yv12_instance_t *)output;
+			unpackBuffer=new uint8_t [(w*h*9)>>1];
+			inst->buffer=unpackBuffer;
   			_decoder=mpeg2_init();
 			dec=&((MPEG2DEC)->decoder);
 			wmb=(_w+15)>>4;;
@@ -176,6 +171,7 @@ uint32_t wmb,hmb;
 			_swapUV=0;
 			// Post Proc is disabled by default
 			initPostProc(&_postproc,w,h);	    
+			
 			updatePostProc(&_postproc);	
   			printf ("\n done\n");
 
@@ -197,7 +193,7 @@ uint8_t 	decoderMpeg::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t 
 			{ 	// we do postproc !
 				// keep
 
-		 		oBuff[0]=out;
+		 		oBuff[0]=out; 
 		 		oBuff[1]=out+_w*_h;
  		 		oBuff[2]=out+((_w*_h*5)>>2);
 				
@@ -293,6 +289,7 @@ void  decoderMpeg::decode_mpeg2 (uint8_t * current, uint8_t * end)
 				}
 			break;
 	case -1:
+	       printf("Not ready \n");
 	    return;
 	case STATE_SEQUENCE:
 	    /* might set nb fbuf, convert format, stride */
@@ -300,7 +297,7 @@ void  decoderMpeg::decode_mpeg2 (uint8_t * current, uint8_t * end)
 	    printf("\n Seq found\n");
 	    
 	    vo_setup_result_t res;
-	    if(!_seqFound)
+	 if(!_seqFound)
 	    {
 	    	if (output->setup (output,
 	    			info->sequence->width,
@@ -314,14 +311,14 @@ void  decoderMpeg::decode_mpeg2 (uint8_t * current, uint8_t * end)
 	    		}
 	 		uint8_t * buf[3];
 			void * id;
-
-			output->setup_fbuf (output, buf, &id);  // 3 buffer ...
-			mpeg2_set_buf (MPEG2DEC, buf, id);
-			output->setup_fbuf (output, buf, &id);
-			mpeg2_set_buf (MPEG2DEC, buf, id);
-			output->setup_fbuf (output, buf, &id);
-			mpeg2_set_buf (MPEG2DEC, buf, id);
-			_seqFound=1;
+			//mpeg2_custom_fbuf(MPEG2DEC,1);
+			output->setup_fbuf (output, buf, (void **)0);  // 3 buffer ...
+			mpeg2_set_buf (MPEG2DEC, buf, (void *)0);
+			output->setup_fbuf (output, buf, (void **)1);
+			mpeg2_set_buf (MPEG2DEC, buf, (void *)1);
+			output->setup_fbuf (output, buf, (void **)2);
+			mpeg2_set_buf (MPEG2DEC, buf, (void *)2);
+			_seqFound=0;
 		}
 		else
 			printf("..already initialized...\n");
@@ -332,17 +329,17 @@ void  decoderMpeg::decode_mpeg2 (uint8_t * current, uint8_t * end)
 	    /* might set fbuf */
 		
 		_seen=MPEG2DEC->decoder.coding_type;
-		printf("1st %d\n",_seen);
+		//printf("1st %d\n",_seen);
 	    break;
 	case STATE_PICTURE_2ND:
 	    	/* should not do anything */
-	    	printf("2nd\n");
+	    	//printf("2nd\n");
 	    break;
 	case STATE_SLICE:
 	case STATE_END:
 	    /* draw current picture */
 	    /* might free frame buffer */
-
+           
 	    break;
 	}
     }
@@ -409,16 +406,21 @@ void * memalign (size_t align, size_t size);
 static void yv12_setup_fbuf (vo_instance_t * _instance,			    uint8_t ** buf, void ** id)
 {
 	uint8_t *all;
-	uint32_t page;
-    yv12_instance_t * instance = (yv12_instance_t *) _instance;
- printf(" **********YV12 setup fbuf called : %lu x %lu\n",instance->w,instance->h);
+	uint32_t page,i,img;
+    
+	yv12_instance_t * instance = (yv12_instance_t *) _instance;
+	i=(uint32_t)id;
+ 	printf(" **********YV12 setup fbuf called : %lu x %lu (%lu)\n",instance->w,instance->h,i);
 
  	page=instance->w*instance->h;
-	all=(uint8_t *)malloc((page*3)>>1);
-	memset(all,0,(page*3)>>1);
+	img=(page*3)>>1;
+
+	all=instance->buffer;
+	all+=img*i;
+	memset(all,0,img);
     buf[0] =all;
     buf[2] =all+page;;
     buf[1] =all+page+(page>>2);;
-    *id=NULL;
+    //@*id=NULL;
 
 }
