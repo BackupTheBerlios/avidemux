@@ -260,7 +260,7 @@ void updateUserData(uint8_t *start, uint32_t len)
 						printf("Unpacketizer:packed marker not found!\n");
 					}
 				else	*start='n'; // remove 'p'
-				*start=0;
+				
 				return;
 #endif				
 			
