@@ -99,6 +99,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(
 			GET(_U_percent);
 			GET(_V_percent);
 			GET(_selfAdjustable);
+			GET(_delay);
 
 			if(_conf->_baseLine>_info.height-_conf->_fontsize*SRT_MAX_LINE)
 					_conf->_baseLine=_conf->_fontsize*SRT_MAX_LINE;
@@ -128,13 +129,14 @@ ADMVideoSubtitle::ADMVideoSubtitle(
 			_conf->_charset=(char *)malloc(500);
 			_conf->_baseLine=_info.height-24*SRT_MAX_LINE;
 			_conf->_selfAdjustable=1;
+			_conf->_delay=0;
+			
 			strcpy(_conf->_fontname,FONTNAME);
 			strcpy(_conf->_subname,"");
 			strcpy(_conf->_charset,"UNICODE");
 	}
 
   
-
   	_info.encoding=1;
 
 
@@ -168,6 +170,34 @@ char c;
 			default:
 					GUI_Alert("\n cannot identify \nsubtitle format ");
 			}
+
+  // Apply delay to subtitles
+  
+  aprintf("[debug] DELAY %d\n", _conf->_delay);
+  if(_conf->_delay)
+  {
+  	int32_t newStartTime;
+	int32_t newEndTime;
+	for(uint32_t i=0;i<_line;i++) 
+	{
+		aprintf("[debug] BEFORE DELAY (%d) %d %d\n",i, _subs[i].startTime,_subs[i].endTime);
+		newStartTime=_subs[i].startTime;
+		newStartTime+=_conf->_delay;
+		_subs[i].startTime=(newStartTime);
+		newEndTime=_subs[i].endTime;
+		newEndTime+=_conf->_delay;
+		_subs[i].endTime=(newEndTime);
+		// put them at infinit display time
+		// should get rid of them
+		if(newEndTime<0 || newStartTime<0)
+		{
+			_subs[i].startTime=_subs[i].endTime=0;
+		}
+		aprintf("[debug] AFTER DELAY (%d) %d %d\n",i, _subs[i].startTime,_subs[i].endTime);
+  	}
+  }
+
+
 			fclose(_fd);
 			_fd=NULL;
 			_bitmap=0xffffffff;
@@ -181,7 +211,7 @@ SUBCONF *_param;
 
 			_param=_conf; // keep macro happy
 			assert(_param);
-			*couples=new CONFcouple(9);
+			*couples=new CONFcouple(10);
 
 			CSET(_fontsize);
 			CSET(_subname);
@@ -192,6 +222,7 @@ SUBCONF *_param;
 			CSET(_U_percent);
 			CSET(_V_percent);
 			CSET(_selfAdjustable);
+			CSET(_delay);
 
 		return 1;
 

@@ -140,25 +140,8 @@ void ADMVideoSubtitle::displayString(char *string)
 					memset(_maskBuffer,0,_info.height*_info.width);
 
 
-//   // search for | char
-//   for(uint32_t i=0;i<strlen(string);i++)
-//     {
-//       if( *(string+i)=='|')
-// 	{
-// 	  displayLine(string+last,base,i-last);
-// 	  last=i+1;
-// 	  base+=_conf->_fontsize;
-// 	  line++;
-// 	  if(line>3)
-// 	    {
-// 	      printf("\n Maximum 3 lines!\n");
-// 	      return;
-// 	    }
-// 	}
-//     }
-//   //printf("\len :%d\n",strlen(string)-last);
-//   displayLine(string+last,base,strlen(string)-last);
-
+  // When selfAdjustable is on, break lines must be ignored
+  const char chBreakLine = _conf->_selfAdjustable ? ' ' : '|';
 
 							{
     const uint32_t stringLen=strlen(string);
@@ -168,6 +151,11 @@ void ADMVideoSubtitle::displayString(char *string)
       // search for | char
       while (*(string+i)!='|' && i<stringLen) {
 	i++;
+      }
+      
+      if (i<stringLen) {
+	// found | char
+	string[i]=chBreakLine;
       }
       
       uint32_t couldDisplay=displayLine(string+last,base,i-last,&suggestedLen);

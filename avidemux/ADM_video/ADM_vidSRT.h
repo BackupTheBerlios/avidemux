@@ -4,6 +4,9 @@
     begin                : Thu Dec 12 2002
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
+    
+    Lots of bugfixes / enhancement by Daniel Lima
+    
  ***************************************************************************/
 
 /***************************************************************************
@@ -37,7 +40,8 @@
 		char		*_fontname;
 		char		*_subname;
 		char 		*_charset;
-  		uint32_t	_selfAdjustable;
+		uint32_t	_selfAdjustable;   /** Automatic line breaks */
+		int32_t		_delay;            /** Wait x miliseconds before show subtitles. If negative, it will to show subtitles x miliseconds before. */
 
 
 	}SUBCONF;

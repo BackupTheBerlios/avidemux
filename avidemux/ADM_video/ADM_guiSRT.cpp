@@ -97,7 +97,7 @@ static uint32_t glob_base=0;
 
 
 static int  GUI_subtitleParam(char *font,char *sub,int  *charset,int *size,uint32_t *baseline,
-				int32_t *coly,int32_t *colu,int32_t *colv,uint32_t *autocut);
+                              int32_t *coly,int32_t *colu,int32_t *colv,uint32_t *autocut,int32_t *delay);
 
 static gboolean gui_draw( void );
 static void draw( void);
@@ -149,7 +149,8 @@ uint32_t l,f;
 							&(_conf->_Y_percent),
 							&(_conf->_U_percent),
 							&(_conf->_V_percent),
-							&(_conf->_selfAdjustable)
+							&(_conf->_selfAdjustable),
+							&(_conf->_delay)
 							))
 		 {
 			 	printf("\n Font : %s", _conf->_fontname);
@@ -179,8 +180,10 @@ uint32_t l,f;
 }
 
 int  GUI_subtitleParam(char *font,char *sub,int  *charset,int *size,uint32_t *baseline,
-				int32_t *coly,int32_t *colu,int32_t *colv,uint32_t *autocut)
+                       int32_t *coly,int32_t *colu,int32_t *colv,uint32_t *autocut,int32_t *delay)
 {
+
+  
 
 int ret=0;
 gint answer;
@@ -202,6 +205,8 @@ gint answer;
         gtk_label_set_text(GTK_LABEL(WID(label_font)),font);
         gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton_fontsize)),(gfloat)*size) ;
 	CHECK_SET(checkbutton_autosplit,*autocut);
+	
+	gtk_write_entry(WID(entry_delay), *delay);
 	
 	int nb=sizeof(names)/sizeof(unicd);
 
@@ -277,7 +282,7 @@ gint answer;
 				*colu=myU;
 				*colv=myV;
 				CHECK_GET(checkbutton_autosplit,*autocut);
-
+				*delay= (int32_t)gtk_read_entry(WID(entry_delay));
 				ret=1;
 	}
 
@@ -406,6 +411,7 @@ uint32_t h;
 
 */
 
+//-------------------------------
 
 GtkWidget*
 create_dialog1 (void)
@@ -429,17 +435,20 @@ create_dialog1 (void)
   GtkWidget *optionmenu1;
   GtkWidget *menu1;
   GtkWidget *enc_ascii;
-  /*
+/*  
   GtkWidget *enc_8859;
   GtkWidget *ebc_cyrillic;
   GtkWidget *enc_german;
-  */
+*/  
   GtkObject *spinbutton_fontsize_adj;
   GtkWidget *spinbutton_fontsize;
   GtkWidget *label5;
   GtkWidget *hbox4;
   GtkWidget *button_color;
   GtkWidget *checkbutton_autosplit;
+  GtkWidget *hseparator1;
+  GtkWidget *label6;
+  GtkWidget *entry_delay;
   GtkWidget *hbox3;
   GtkWidget *drawingarea1;
   GtkWidget *vscale1;
@@ -458,7 +467,7 @@ create_dialog1 (void)
   gtk_widget_show (vbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
 
-  table1 = gtk_table_new (5, 2, FALSE);
+  table1 = gtk_table_new (7, 2, FALSE);
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (vbox1), table1, TRUE, TRUE, 0);
 
@@ -538,7 +547,6 @@ create_dialog1 (void)
   gtk_widget_show (enc_ascii);
   gtk_container_add (GTK_CONTAINER (menu1), enc_ascii);
 /*
-
   enc_8859 = gtk_menu_item_new_with_mnemonic (_("Iso 8859-1 (Czech...)"));
   gtk_widget_show (enc_8859);
   gtk_container_add (GTK_CONTAINER (menu1), enc_8859);
@@ -580,7 +588,30 @@ create_dialog1 (void)
 
   checkbutton_autosplit = gtk_check_button_new_with_mnemonic (_("Auto split"));
   gtk_widget_show (checkbutton_autosplit);
-  gtk_box_pack_start (GTK_BOX (hbox4), checkbutton_autosplit, FALSE, FALSE, 0);
+  gtk_table_attach (GTK_TABLE (table1), checkbutton_autosplit, 0, 1, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  hseparator1 = gtk_hseparator_new ();
+  gtk_widget_show (hseparator1);
+  gtk_table_attach (GTK_TABLE (table1), hseparator1, 1, 2, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+  label6 = gtk_label_new (_("Delay in ms"));
+  gtk_widget_show (label6);
+  gtk_table_attach (GTK_TABLE (table1), label6, 0, 1, 6, 7,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
+
+  entry_delay = gtk_entry_new ();
+  gtk_widget_show (entry_delay);
+  gtk_table_attach (GTK_TABLE (table1), entry_delay, 1, 2, 6, 7,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_size_request (entry_delay, 90, -1);
+  gtk_entry_set_text (GTK_ENTRY (entry_delay), _("0"));
 
   hbox3 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox3);
@@ -644,6 +675,9 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, hbox4, "hbox4");
   GLADE_HOOKUP_OBJECT (dialog1, button_color, "button_color");
   GLADE_HOOKUP_OBJECT (dialog1, checkbutton_autosplit, "checkbutton_autosplit");
+  GLADE_HOOKUP_OBJECT (dialog1, hseparator1, "hseparator1");
+  GLADE_HOOKUP_OBJECT (dialog1, label6, "label6");
+  GLADE_HOOKUP_OBJECT (dialog1, entry_delay, "entry_delay");
   GLADE_HOOKUP_OBJECT (dialog1, hbox3, "hbox3");
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
   GLADE_HOOKUP_OBJECT (dialog1, vscale1, "vscale1");
@@ -654,6 +688,7 @@ create_dialog1 (void)
 
   return dialog1;
 }
+
 
 
 
