@@ -437,7 +437,7 @@ void vp3_idct_add_a64_mmx(int16_t *input_data, int16_t *dequant_matrix,
 
 /* MEANX*/
 static inline void emms(void)
-
+{
     __asm __volatile ("emms");
 }
 
