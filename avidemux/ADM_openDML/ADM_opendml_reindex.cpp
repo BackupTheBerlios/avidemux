@@ -41,7 +41,11 @@ uint32_t fcc,len,shortFCC,track;
 uint64_t pos;
 uint32_t achunk=0,vchunk=0;
 uint8_t end=0;
-uint32_t shortTotal,shortCur;
+uint32_t shortTotal,shortCur,highFCC;
+
+	UNUSED_ARG(audioTrackNumber);
+	UNUSED_ARG(vidTrack);
+
 
 	printf("Re-indexing the file, it can take a while....\n");
 	// jump to the movi chunk
@@ -78,9 +82,18 @@ uint32_t shortTotal,shortCur;
 		len=read32();
 		aprintf("%s size:%lu (%llx/%llx)\n",fourCC::tostring(fcc),len,pos,ftello(_fd));
 		shortFCC=fcc>>16;
-		track=((fcc>>8)&0xff)-'0';
+		track=((fcc>>8)&0xff)-'0'; 
 		pos+=8;
+		highFCC=fcc&0xffff;
+		if(highFCC==MKFCC('i','x',0,0))
+		{
+					printf("OpenDML index found, skipping it\n");
+					fseeko(_fd,len,SEEK_CUR);
+					pos+=len;
+					continue;
+		}
 				
+		
 		switch(shortFCC)
 		{
 			case MKFCC('d','c',0,0):	// video tracks
@@ -94,24 +107,30 @@ uint32_t shortTotal,shortCur;
 					fseeko(_fd,len,SEEK_CUR);
 					pos+=len;
 					break;
-			case MKFCC('w','b',0,0):					
+			case MKFCC('w','b',0,0):
+					if(track==audioTrack)
+					{
 					aprintf("\tAud.\n");
 					_audioIdx[achunk].offset=pos;
 					_audioIdx[achunk].size=len;					
 					achunk++;
+					}
 					if(len&1) len++;
 					fseeko(_fd,len,SEEK_CUR);					
 					pos+=len;
+					
 					break;
 			default:
 					printf("\n unknown fcc: ");fourCC::print(fcc);printf("\n");
+					printf("\n ShortFcc: ");fourCC::print(shortFCC);printf("\n");
+					printf("\n HighFCC: ");fourCC::print(highFCC);printf("\n");
 					end=1;
 					break;
 		
 		}
 			
 	}
-	printf("%lu audio and %lu video chunks found\n",vchunk,achunk);
+	printf("%lu audio and %lu video chunks found\n",(unsigned long int)vchunk,(unsigned long int)achunk);
 	// update stuff
 	_videostream.dwLength= _mainaviheader.dwTotalFrames=vchunk;
 	_nbAudioChunk=achunk;
