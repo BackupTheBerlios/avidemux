@@ -891,7 +891,8 @@ else
 		CFLAGS="$CFLAGS -O2"
 	fi
 fi
-
+CFLAGS="$CFLAGS -falign-loops=16"
+CXXFLAGS="$CXXFLAGS -falign-loops=16"
 dnl ___________________lavcodec _________________________
 
 AC_DEFINE(CONFIG_RISKY,1,[FFMPEG])
