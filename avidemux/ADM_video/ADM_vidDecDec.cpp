@@ -108,6 +108,8 @@ int isse_scenechange_8(const uint8_t *c_plane,const  uint8_t *tplane, int height
 //________________________________
 #include "ADM_vidDecDec_param.h"
 extern uint8_t DIA_getDecombDecimate(DECIMATE_PARAM *param);
+
+#define BLKSIZE 32
 //________________________________
 /* Decimate 1-in-N implementation. */
 class Decimate : public AVDMGenericVideoStream
@@ -866,6 +868,7 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 	int x, y, lowest_index, div;
 	unsigned int count[MAX_CYCLE_SIZE], lowest;
 	bool found;
+	unsigned int highest_sum=0;
 
 	/* Only recalculate differences when a new set is needed. */
 	if (frame == last_request)
@@ -900,113 +903,94 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 	}
 
 	int use_quality=_param->quality;
-#ifdef DECIMATE_MMX_BUILD
-	
-		if (use_quality < 2)
-			use_quality += 2;
-	
-#endif
+
 
 	switch (use_quality)
 	{
 	case 0: // subsample, luma only
-		div = (heightY * row_sizeY / 4) * 219;
+		div = (BLKSIZE * BLKSIZE / 4) * 219;
 		break;
 	case 1: // subsample, luma and chroma
-		div = (heightY * row_sizeY / 4) * 219 + (2 * (heightUV * row_sizeUV / 4)) * 224;
+		div = (BLKSIZE * BLKSIZE / 4) * 219 + ( (BLKSIZE * BLKSIZE / 8)) * 224;
 		break;
 	case 2: // fully sample, luma only
-		div = (heightY * row_sizeY) * 219;
+		div = (BLKSIZE * BLKSIZE) * 219;
 		break;
 	case 3: // fully sample, luma and chroma
-		div = (heightY * row_sizeY) * 219 + (2 * heightUV * row_sizeUV) * 224;
+		div = (BLKSIZE * BLKSIZE) * 219 + ( BLKSIZE * BLKSIZE/2) * 224;
 		break;
 	}
 
-#ifdef DECIMATE_MMX_BUILD
-	if (CpuCaps::hasSSE()) { 
-		/* Compare each frame to its predecessor. */
-		for (f = 1; f <= _param->cycle; f++)
+	xblocks = row_sizeY / BLKSIZE;
+	if (row_sizeY % BLKSIZE) xblocks++;
+	yblocks = heightY / BLKSIZE;
+	if (heightY % BLKSIZE) yblocks++;
+
+	/* Compare each frame to its predecessor. */
+	for (f = 1; f <= _param->cycle; f++)
+	{
+		prevY = storepY[f-1];
+		currY = storepY[f];
+		for (y = 0; y < yblocks; y++)
 		{
-			prevY = storepY[f-1];
-			currY = storepY[f];
-			count[f-1] = 0;
-			if ((!(row_sizeY&31)) || (_param->quality<=1)) {
-				count[f-1] = isse_scenechange_32(currY, prevY, heightY, row_sizeY);
-			} else if (!(row_sizeY&15)) {
-				count[f-1] = isse_scenechange_16(currY, prevY, heightY, row_sizeY);
-			} else {
-				count[f-1] = isse_scenechange_8(currY, prevY, heightY, row_sizeY);
-			}
-			if (_param->quality == 3) {
-				prevU = storepU[f-1];
-				prevV = storepV[f-1];
-				currU = storepU[f];
-				currV = storepV[f];
-				if (!(row_sizeUV&31)) {
-					count[f-1] += isse_scenechange_32(currU, prevU, heightUV, row_sizeUV);
-					count[f-1] += isse_scenechange_32(currV, prevV, heightUV, row_sizeUV);
-				} else if (!(row_sizeY&15)) {
-					count[f-1] += isse_scenechange_16(currU, prevU, heightUV, row_sizeUV);
-					count[f-1] += isse_scenechange_16(currV, prevV, heightUV, row_sizeUV);
-				} else {
-					count[f-1] += isse_scenechange_8(currU, prevU, heightUV, row_sizeUV);
-					count[f-1] += isse_scenechange_8(currV, prevV, heightUV, row_sizeUV);
-				}			
-			}
-			showmetrics[f-1] = (count[f-1] * 100.0) / div;
-		}
-	} else {
-#endif
-		/* Compare each frame to its predecessor. */
-		for (f = 1; f <= _param->cycle; f++)
-		{
-			prevY = storepY[f-1];
-			currY = storepY[f];
-			count[f-1] = 0;
-			for (y = 0; y < heightY; y++)
+			for (x = 0; x < xblocks; x++)
 			{
-				for (x = 0; x < row_sizeY;)
+				sum[y*xblocks+x] = 0;
+			}
+		}
+		for (y = 0; y < heightY; y++)
+		{
+			for (x = 0; x < row_sizeY;)
+			{
+				sum[(y/BLKSIZE)*xblocks+x/BLKSIZE] += abs((int)currY[x] - (int)prevY[x]);
+				x++;
+				if (_param->quality == 0 || _param->quality == 1)
 				{
-					count[f-1] += abs((int)currY[x] - (int)prevY[x]);
+					if (!(x%4)) x += 12;
+				}
+			}
+			prevY += pitchY;
+			currY += pitchY;
+		}
+		if (_param->quality == 1 || _param->quality == 3)
+		{
+			prevU = storepU[f-1];
+			prevV = storepV[f-1];
+			currU = storepU[f];
+			currV = storepV[f];
+			for (y = 0; y < heightUV; y++)
+			{
+				for (x = 0; x < row_sizeUV;)
+				{
+					sum[((2*y)/BLKSIZE)*xblocks+(2*x)/BLKSIZE] += abs((int)currU[x] - (int)prevU[x]);
+					sum[((2*y)/BLKSIZE)*xblocks+(2*x)/BLKSIZE] += abs((int)currV[x] - (int)prevV[x]);
 					x++;
-					if (_param->quality == 0 || _param->quality == 1)
+					if (_param->quality == 1)
 					{
 						if (!(x%4)) x += 12;
 					}
 				}
-				prevY += pitchY;
-				currY += pitchY;
+				prevU += pitchUV;
+				currU += pitchUV;
+				prevV += pitchUV;
+				currV += pitchUV;
 			}
-			if (_param->quality == 1 || _param->quality == 3)
+		}
+		highest_sum = 0;
+		for (y = 0; y < yblocks; y++)
+		{
+			for (x = 0; x < xblocks; x++)
 			{
-				prevU = storepU[f-1];
-				prevV = storepV[f-1];
-				currU = storepU[f];
-				currV = storepV[f];
-				for (y = 0; y < heightUV; y++)
+				if (sum[y*xblocks+x] > highest_sum)
 				{
-					for (x = 0; x < row_sizeUV;)
-					{
-						count[f-1] += abs((int)currU[x] - (int)prevU[x]);
-						count[f-1] += abs((int)currV[x] - (int)prevV[x]);
-						x++;
-						if (_param->quality == 1)
-						{
-							if (!(x%4)) x += 12;
-						}
-					}
-					prevU += pitchUV;
-					currU += pitchUV;
-					prevV += pitchUV;
-					currV += pitchUV;
+					highest_sum = sum[y*xblocks+x];
 				}
 			}
-			showmetrics[f-1] = (count[f-1] * 100.0) / div;
 		}
-#ifdef DECIMATE_MMX_BUILD
+		count[f-1] = highest_sum;
+		showmetrics[f-1] = (count[f-1] * 100.0) / div;
 	}
-#endif
+
 	/* Find the frame with the lowest difference count but
 	   don't use the artificial duplicate at frame 0. */
 	if (frame == 0)
@@ -1035,15 +1019,10 @@ void Decimate::FindDuplicate(int frame, int *chosen, double *metric, bool *force
 	*chosen = last_result;
 	*metric = last_metric;
 
-
-	found = false;
-	last_forced = false;
 	
-	if (found == true)
-	{
-		*chosen = last_result ;
-		*forced = last_forced = true;
-	}
+	found = false;
+	last_forced = false;	
+
 }
 //____________________________________________________
 void Decimate::FindDuplicate2(int frame, int *chosen, bool *forced)
