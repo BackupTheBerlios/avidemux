@@ -31,7 +31,7 @@
 #include "avio.hxx"
 #include "config.h"
 #include "avi_vars.h"
-#ifdef USE_MMX
+
 //#define LOOP
 #include "admmangle.h"
 
@@ -202,4 +202,3 @@ int 	iang;
 	}
 	}
 }
-#endif
