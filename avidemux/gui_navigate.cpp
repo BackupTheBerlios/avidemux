@@ -165,6 +165,44 @@ uint8_t  countLightPixels(int darkness)
 
 void GUI_NextPrevBlackFrame(int dir)
 {
+   uint32_t f;
+    uint32_t flags;
+
+    if (playing)
+		return;
+    if (! avifileinfo)
+       return;
+
+   const int darkness=40;
+
+   DIA_working *work=new DIA_working("Seeking");
+   while(1)
+   {
+
+   	f=curframe+dir;
+   	if(work->update(1)) break;
+
+	if((f==0 && dir==-1)|| (f==avifileinfo->nb_frames-1&&dir==1)) break;
+
+     if( !video_body->getUncompressedFrame(f ,rdr_decomp_buffer,&flags))
+       {
+       		curframe=0;
+		video_body->getUncompressedFrame(0 ,rdr_decomp_buffer);
+		break;
+       }
+
+     curframe=f;
+
+     if(!countLightPixels(darkness)) break;
+
+       update_status_bar(rdr_decomp_buffer);
+
+   }
+   	delete work;
+       renderUpdateImage(rdr_decomp_buffer->data);
+       if(mode_preview)
+	 editorUpdatePreview( curframe)     ;
+       update_status_bar(rdr_decomp_buffer);
 
    return ;
 }
