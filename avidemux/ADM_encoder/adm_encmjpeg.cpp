@@ -78,7 +78,7 @@ uint8_t EncoderMjpeg::configure( AVDMGenericVideoStream *instream)
    //	_codec=new mjpegEncoder(_w,_h);
   	_codec=new  ffmpegEncoderFFMjpeg( _w,_h,FF_MJPEG)  ;
 
-		_codec->init( _q,_swapped);
+		_codec->init( _q,info->fps1000,0);
 
 	return 1;
 }
