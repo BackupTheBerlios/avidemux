@@ -145,16 +145,27 @@ uint32_t w,h,fps1000,fcc;
 // now we build the new stream !
     	aprintf("**main pass:\n");
 
-		
+#ifdef ADM_BIG_ENDIAN
+	#define MEMCPY memcpyswap
+#else
+	#define MEMCPY memcpy
+#endif	
+
 		stream_header header;
+		int64_t dur64;
+		uint32_t dur32;
+		uint16_t dur16;
 		
 		memset(&header,0,sizeof(header));
 		
 		memcpy(&(header.streamtype),"video\0\0\0",8);
 		memcpy(&(header.subtype),&fcc,4);
-		header.size=sizeof(header);
-		header.video.width=w;
-		header.video.height=h;
+		
+		//header.size=sizeof(header);
+		dur32=sizeof(header);
+		MEMCPY(&header.size,&dur32,4);
+		MEMCPY(&(header.video.width),&w,4);
+		MEMCPY(&(header.video.height),&h,4);
 		// Timing ..
 		double duration; // duration in 10us
 		duration=fps1000;
@@ -162,14 +173,23 @@ uint32_t w,h,fps1000,fcc;
 		duration*=1000*1000;
 		duration*=10;
 		
-		header.time_unit=(int64_t)duration;
-		header.samples_per_unit=1;
+		dur64=(int64_t)duration;
 		
-		header.buffersize=0x10000;
-		header.bits_per_sample=24;
+		MEMCPY(&header.time_unit,&dur64,8);
+		dur64=1;
+		MEMCPY(&header.samples_per_unit,&dur64,8);
 		
-		header.default_len=1;
-				
+		dur32=0x10000;
+		MEMCPY(&header.buffersize,&dur32,4);
+		
+		dur16=24;
+		MEMCPY(&header.bits_per_sample,&dur16,2);
+		
+		
+		//header.default_len=1;
+		dur32=1;
+		MEMCPY(&header.default_len,&dur32,4);
+		
 		return videoStream->writeHeaders(sizeof(header),(uint8_t *)&header); // +4 ?
 
 }

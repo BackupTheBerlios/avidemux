@@ -33,6 +33,7 @@
 #include "oplug_ogm/op_ogpage.h"
 
 #define min(a,b) (a>b)?b:a
+extern void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size);
 //_________________________________________________________
 uint8_t ogm_page::reset(void)
 {
@@ -66,8 +67,10 @@ uint32_t zero4=0;
 
 	if(!_current_lacing) return 1; // Empty
 	
+	
 	buildHeader();
 	fwrite(&_header,sizeof(_header),1,_fd);
+	
 	fwrite(_lacing,_current_lacing,1,_fd);
 	fwrite(_page,_current_off,1,_fd);	
 	_current_lacing=0;
@@ -289,9 +292,14 @@ uint8_t *data;
 	
 	
 	//	
-	memcpy(_header.abs_pos,&_timestamp,8);
-	memcpy(_header.serial,&_stream,4);	
-	memcpy(&_header.page_sequence,&_pageNumber,4);
+#ifdef ADM_BIG_ENDIAN
+	#define MEMcpy memcpyswap
+#else
+	#define MEMcpy memcpy
+#endif		
+	MEMcpy((uint8_t *)_header.abs_pos,(uint8_t *)&_timestamp,8);
+	MEMcpy((uint8_t *)_header.serial,(uint8_t *)&_stream,4);	
+	MEMcpy((uint8_t *)&_header.page_sequence,(uint8_t *)&_pageNumber,4);
 	
 	_header.nb_segment=_current_lacing;
 	

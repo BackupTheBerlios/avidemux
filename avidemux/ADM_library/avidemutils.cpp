@@ -31,7 +31,7 @@
 #include "subchunk.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"
-
+void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size);
 //_________________________________________________
 //      Convert a frame number into equivalent in ms
 //_________________________________________________
@@ -173,5 +173,19 @@ void Endian_WavHeader(WAVHeader *w)
 
 #endif
 
+
+}
+// Here we copy in reverse order
+// Useful to do LE/BE conv on nomber
+// 
+void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size)
+{
+	dest+=size-1;
+	while(size--)
+	{
+		*dest=*src;
+		dest--;
+		src++;
+	}
 
 }

@@ -46,9 +46,19 @@
 #define MODULE_NAME 0
 #include "ADM_toolkit/ADM_debug.h"
 
+void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size);
+#ifdef ADM_BIG_ENDIAN
+	#define MEMCPY memcpyswap
+#else
+	#define MEMCPY memcpy
+#endif	
+
 uint8_t	ADM_ogmWriteCopy::initVideo(char *name)
 {
-		
+uint32_t w,h;	
+int64_t dur64;
+uint32_t dur32;
+uint16_t dur16;
 		_togo=frameEnd-frameStart;
 		stream_header header;
 		
@@ -65,9 +75,15 @@ uint8_t	ADM_ogmWriteCopy::initVideo(char *name)
 		encoding_gui->setCodec((char *)"Copy");
 		encoding_gui->setPhasis((char *)"Saving...");
 		
-		header.size=sizeof(header);
-		header.video.width=avifileinfo->width;
-		header.video.height=avifileinfo->height;
+		//header.size=sizeof(header);
+		dur32=sizeof(header);
+		MEMCPY(&header.size,&dur32,4);
+		
+		w=avifileinfo->width;
+		h=avifileinfo->height;
+		MEMCPY(&(header.video.width),&w,4);
+		MEMCPY(&(header.video.height),&h,4);
+				
 		// Timing ..
 		double duration; // duration in 10us
 		_fps1000=avifileinfo->fps1000;
@@ -76,14 +92,26 @@ uint8_t	ADM_ogmWriteCopy::initVideo(char *name)
 		duration*=1000*1000;
 		duration*=10;
 		
-		header.time_unit=(int64_t)duration;
-		header.samples_per_unit=1;
 		
-		header.buffersize=0x10000;
-		header.bits_per_sample=24;
+		dur64=(int64_t)duration;
 		
-		header.default_len=1;
+		MEMCPY(&header.time_unit,&dur64,8);
 		
+		dur64=1;
+		MEMCPY(&header.samples_per_unit,&dur64,8);
+		
+		dur32=0x10000;
+		MEMCPY(&header.buffersize,&dur32,4);
+		//header.buffersize=0x10000;
+		
+		//header.bits_per_sample=24;
+		dur16=24;
+		MEMCPY(&header.bits_per_sample,&dur16,2);
+		
+		dur16=1;
+		//header.default_len=1;
+		dur32=1;
+		MEMCPY(&header.default_len,&dur32,4);
 		return videoStream->writeHeaders(sizeof(header),(uint8_t *)&header); // +4 ?
 
 }

@@ -156,7 +156,8 @@ uint8_t error=0;
 		encoding_gui=NULL;
 		//________________ Flush______________________
 		videoStream->flush();
-		endAudio();		
+		endAudio();
+		//deleteAudioFilters();
 		// ____________Close____________________
 		fclose(_fd);
 		_fd=NULL;
