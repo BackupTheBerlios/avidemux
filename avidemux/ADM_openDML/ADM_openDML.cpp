@@ -665,7 +665,7 @@ void OpenDMLHeader::Dump( void )
 
       	}				
 }
-#define PAD	for(uint j=0;j<nest;j++) aprintf("\t");
+#define PAD	for(uint32_t j=0;j<nest;j++) aprintf("\t");
 /*
 	Recursively climb a riff tree and not where are
 	the interesting informations to be read later on
