@@ -79,7 +79,7 @@ static CODECLIST myCodecList[]=
 
 		{"mp2", "FFm MP2", AUDIOENC_MP2},
 		{"ac3", "FFm AC3",AUDIOENC_AC3},
-//		{"toolame","Toolame", AUDIOENC_2LAME},
+		{"toolame","Toolame", AUDIOENC_2LAME},
 		{"none", "Wav PCM",AUDIOENC_NONE}
 };
 extern int DIA_getLameSettings(int *pmode, int *pbitrate,ADM_LAME_PRESET *preset);
