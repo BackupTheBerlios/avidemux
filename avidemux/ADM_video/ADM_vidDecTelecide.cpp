@@ -54,10 +54,13 @@
 
 BUILD_CREATE(decomb_create,Telecide);
 
+extern uint8_t DIA_getDecombTelecide(TelecideParam *param);
+
 uint8_t Telecide::configure(AVDMGenericVideoStream *in)
 {
 	_in=in;
-	return 1;
+	return DIA_getDecombTelecide(_param);
+	
 }
 
 char *Telecide::printConf( void )
