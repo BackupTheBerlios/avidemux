@@ -745,20 +745,7 @@ AVDMProcessAudioStream *lastFilter = NULL;
 	// Start from a clean state
 	printf("Building raw audio filter with start:%lu duration:%lu shift:%d\n",startTime,duration,shift);
 	deleteAudioFilter();	
-	
-	// No shift
-	if(shift<=0)
-	{	
-	
-		lastFilter=new AVDMProcessAudio_RawShift(currentaudiostream,0,startTime-shift);
-		filters[filtercount++] = lastFilter;
-		return lastFilter;	
-	}
-	// had to add a loop filter
-	if(startTime>shift)
-		lastFilter=new AVDMProcessAudio_RawShift(currentaudiostream,0,startTime-shift);
-	else
-		lastFilter=new AVDMProcessAudio_RawShift(currentaudiostream,shift,startTime);
+	lastFilter=new AVDMProcessAudio_RawShift(currentaudiostream,shift,startTime);
 	filters[filtercount++] = lastFilter;
 	return lastFilter;
 	

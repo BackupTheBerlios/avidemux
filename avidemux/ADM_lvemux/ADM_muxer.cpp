@@ -207,7 +207,7 @@ uint8_t MpegMuxer::muxAC3(void)
 	// Write out the result
 	if(!pos)
 	{
-		printf("Could not sync :%lu \n",byteTail-byteHead);
+		printf("LVEMux AC3:Could not sync :%lu \n",byteTail-byteHead);
 		 return 1;
 	}
 	
@@ -257,7 +257,7 @@ uint8_t MpegMuxer::muxMP2(void)
 	// Write out the result
 	if(!pos || pos<=&buffer[byteHead])
 	{
-		 printf("Could not sync :%lu \n",byteTail-byteHead);
+		 printf("LVEMux MP2: Could not sync :%lu \n",byteTail-byteHead);
 		 return 1;
 	}
 	

@@ -114,31 +114,24 @@ aprintf("Editor audio : Gototime  %lu\n",mstime);
 
 uint32_t AVDMEditAudioStream::read (uint32_t len, uint8_t * buffer)
 {
-
-
-  int32_t
-    done =
-    len,
-    ck;
-  do
-    {
-      ck = video_body->audioRead (done, buffer);
-      aprintf("**** Audio Editor : read\n");
-      // printf("\n\t read : asked : %lu %lu",done,ck);
-      if (!ck)
-	return len - done;
-
-	// case of vorbis
-	#warning GROSS HACK
-		if(_wavheader->encoding==WAV_OGG) return ck;
+  	uint32_t    done = 0;
+	uint32_t    ck,toread;
+  
+	#warning hack!
+  	if(_wavheader->encoding==WAV_OGG) return video_body->audioRead (done, buffer);
+  
+  	while(done<len)
+	{
+		toread=len-done;
+		ck = video_body->audioRead (toread, buffer);
+		if(!ck) return done;
+		done+=ck;
+		buffer+=ck;
+		_pos+=ck;
 	
-	#warning /GROSS HACK	
-      done -= ck;
-      buffer += ck;
-      _pos += ck;
-    }
-  while (done > 0);
-  return len - done;
+	
+	}
+	return done;
 
 }
 //-----------------------------------------

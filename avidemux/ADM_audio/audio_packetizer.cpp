@@ -160,11 +160,17 @@ uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 				count=packetTail-packetHead;
 				count&=0xffffffC;
 			}
-			memcpy(dest,&packetBuffer[packetHead],count);
+			memcpy(dest,&packetBuffer[packetHead],count);			
 			packetHead+=count;
 			
 			// now revert to sample
 			sample=count/_wavheader->channels;
+			if(!sample)
+			{
+				packetHead=packetTail=0;
+				printf("Wav Packetizer: running empty, last packet sent\n");
+				return 0;
+			}
 			if(_wavheader->encoding!=WAV_ULAW)
 			{
 				*samples=sample/2;
@@ -285,7 +291,7 @@ uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 			ADM_assert(_wavheader->encoding==WAV_MP2||_wavheader->encoding==WAV_MP3);
 			if(packetTail<packetHead+4)
 			{
-				printf("PKTZ:Buffer empty:%lu / %lu\n",packetHead,packetTail);
+				printf("PKTZ: MP3Buffer empty:%lu / %lu\n",packetHead,packetTail);
 				return 0;
 			}
 			// Build template, only fq ATM
@@ -300,12 +306,14 @@ uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 			{
 				// Error decoding mpeg
 				printf("MPInfo:** CANNOT FIND MPEG START CODE**\n");
-				packetHead+=4;
+				packetHead+=1;
 				return 0;
 			}
 			if(packetHead+startOffset+mpegInfo.size>packetTail)
 			{
-				printf("MP3 packetizer: not enough data\n");
+				printf("MP3 packetizer: not enough data (start %lu size %lu, needs %lu)\n"
+						,startOffset,mpegInfo.size,packetTail-packetHead);
+				packetHead+=1;
 				return 0;
 			}
 			memcpy(dest,&packetBuffer[packetHead+startOffset],

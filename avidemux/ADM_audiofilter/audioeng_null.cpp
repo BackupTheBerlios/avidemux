@@ -81,7 +81,7 @@ uint8_t  AVDMProcessAudio_Null::goToTime(uint32_t newoffset)
 	 {
 	 	printf("AFNull: MMm Null not going to 0 ?\n");
 	 }
-
+	return 1;
 }
 
 // EOF

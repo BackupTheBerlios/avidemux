@@ -80,7 +80,7 @@ AVDMProcessAudioStream    (instream)
 
     strcpy(_name, "PROC:RAWS");
     _length = instream->getLength();
-    printf("\n Raw shit : Start:%lu ms, Sample offset = %lu\n",_starttime,_sampleOffset);
+    printf("\n Raw shift : Start:%lu ms, Sample offset = %lu\n",_starttime,_sampleOffset);
 
 
 };
