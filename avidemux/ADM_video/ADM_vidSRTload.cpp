@@ -52,12 +52,21 @@
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_toolkit/ADM_debug.h"
 
+#define ADM_RAW 1024
 
 static iconv_t myConv=(iconv_t)-1;;
 static int ADM_SubAtoi(uint16_t *in);
 
+static uint8_t	ADM_utfInit( char *charset );
+static uint8_t ADM_utfConv(ADM_GLYPH_T *out, char *in,uint32_t nbIn, uint32_t *nbOut);
+static uint8_t ADM_utfEnd( void);
+
+
+
+
 uint8_t	ADMVideoSubtitle::loadFont (void)
 {
+ 
   if (!_font->initFreeType (_conf->_fontname))
     {
       printf ("\n Free type init failed for font %s!", _conf->_fontname);
@@ -66,6 +75,7 @@ uint8_t	ADMVideoSubtitle::loadFont (void)
     {
       _font->fontSetSize (_conf->_fontsize);
     }
+   
   return 1;
 }
 
@@ -81,6 +91,13 @@ uint8_t  ADMVideoSubtitle::loadSubTitle (void)
   uint32_t current_line = 0;
   // first cound how many line
   _line = 0;
+   // init iconv...  
+  if(! ADM_utfInit(_conf->_charset))
+  {
+  	printf("Problem initializing iconv, aborting\n");
+	return 0;
+  
+  }
   while (fgets (string, 200, _fd))
     {
       _line++;
@@ -94,34 +111,24 @@ uint8_t  ADMVideoSubtitle::loadSubTitle (void)
     return 0;
   memset (_subs, 0, sizeof (subLine) * _line);
 
-  // init iconv...  
-  myConv=iconv_open("UNICODE",_conf->_charset); //"WINDOWS-1251");
-   if((int)myConv==-1)
-	{
-		printf("\n Error initializing iconv...\n");
-		return  0;
-	}
+
+ 
 //	
   for (uint32_t i = 0; i < _line; i++)
     {
-      fgets (string, 200, _fd);
+      fgets (string, ADM_RAW, _fd);
       //printf("\n in : %s ",string);
       if (string[0] != '{')
 	continue;
       subParse ((subLine *) & (_subs[current_line]), string);
       current_line++;
     }
-  // Purge iconv
-  if((int)myConv!=-1)
-	{
-		iconv_close(myConv);
-		myConv=(iconv_t)-1;
-	}
+	
   // the effective number of line we have
   _line = current_line;
   return 1;
   
-
+ ADM_utfEnd( );
 }
 
 //___________________________________________________________________
@@ -131,46 +138,21 @@ uint8_t  ADMVideoSubtitle::loadSubTitle (void)
 //___________________________________________________________________
 uint8_t	ADMVideoSubtitle::subParse (subLine * in, char *string)
 {
-#define ADM_RAW 1024
 
-  static ADM_GLYPH_T 	final[ADM_RAW/sizeof(ADM_GLYPH_T)];	// convert to unicode
+
+  static ADM_GLYPH_T 	final[ADM_RAW];	// convert to unicode
   uint32_t   	startindex, endindex,textindex;
   uint32_t 	j;
   float 	f;
  
   uint32_t 	finallen=0;
-  
-  size_t	sin,sout,sz;
-  char		*cin,*cout;
-  
+  uint32_t	alpha;
+ 
   j = 1;
   
   
-  //
-  // final is the same but in unicode (utf16)
-  // Finallen is the size in GLYPH, not in byte
-  // Normally in  utf16 it is the double
-  sin=strlen(string);
-  sout=1024;
-  cin=string;
-  cout=(char *)&(final[0]);
-  if((uint8_t)string[0]==0xff && (uint8_t)string[1]==0xfe) 
-  {
-		 cin+=2;
-		 sin-=2;
-  }
-  ADM_assert (sin);
+  ADM_utfConv(final,string,strlen(string),&finallen);
   
-  sz=iconv(myConv,&cin,&sin,&cout,&sout);
-  if(sz==-1)
-  {
-  	printf("Iconv error:%s\n:%s:\n",strerror(errno),string);
-	return 0;
-	
-  }
-  // Get the amound of utf16...
-  finallen=(ADM_RAW-sout)>>1;
-  while(finallen &&( ADM_ASC(final[finallen-1])==0x0a || ADM_ASC(final[finallen-1]==0x0d))) finallen--;
   // ignore { }
   while (ADM_ASC(final[j]) != '}' && j < finallen)
     j++;
@@ -192,14 +174,17 @@ uint8_t	ADMVideoSubtitle::subParse (subLine * in, char *string)
 
   // convert frame -> time in ms
   // skip utf marker if present
-  if(final[startindex]=='{') startindex++;
-  
-  f = ADM_SubAtoi (&final[startindex]);
+  alpha= ADM_SubAtoi (&final[1]);
+  f=(float)alpha;
+  aprintf("%s start:%d",string,alpha);
   f = f * 1000000. / _info.fps1000;
   in->startTime = (uint32_t) floor (f);
 
-  f = ADM_SubAtoi (&final[endindex]);
+  alpha = ADM_SubAtoi (&final[endindex]);
+  f=(float)alpha;
+  aprintf(" end:%d\n",alpha);
   f = f * 1000000. / _info.fps1000;
+  
   in->endTime = (uint32_t) floor (f);
 
   uint32_t lllines=0;
@@ -216,7 +201,7 @@ uint8_t	ADMVideoSubtitle::subParse (subLine * in, char *string)
   	if(ADM_ASC(final[j+textindex])=='|') lllines++;
   }
 
-  
+  printf("%lu -->%lu\n",in->startTime,in->endTime);
   in->nbLine=lllines+1;
   in->string=new ADM_GLYPH_T *[in->nbLine];
   in->lineSize=new uint32_t[in->nbLine];
@@ -255,8 +240,8 @@ ADMVideoSubtitle::loadSRT (void)
 {
 
 
-  static ADM_GLYPH_T 	final[ADM_RAW/sizeof(ADM_GLYPH_T)];	// convert to unicode
-  ADM_GLYPH_T  		temp[SRT_MAX_LINE][ADM_RAW/sizeof(ADM_GLYPH_T)];
+  static ADM_GLYPH_T 	final[ADM_RAW];	// convert to unicode
+  ADM_GLYPH_T  		temp[SRT_MAX_LINE][ADM_RAW];
   uint32_t		tempSize[SRT_MAX_LINE];
   char			string[ADM_RAW];
   
@@ -266,17 +251,14 @@ ADMVideoSubtitle::loadSRT (void)
   // Init iconv
    uint32_t 	finallen=0;
   subLine	*current;
-  size_t	sin,sout,sz;
-  char		*cin,*cout;
-  uint8_t	c;
   
-   
-  myConv=iconv_open("UNICODE",_conf->_charset); //"WINDOWS-1251");
-  if((int)myConv==-1)
-	{
-		printf("\n Error initializing iconv...\n");
-		return  0;
-	}
+  if(! ADM_utfInit(_conf->_charset))
+  {
+  	printf("Problem initializing iconv, aborting\n");
+	return 0;
+  
+  } 
+  
   // first cound how many line
   line = 0;
   _line = 0;
@@ -303,30 +285,8 @@ ADMVideoSubtitle::loadSRT (void)
     {
 	current=&_subs[_line];
 	fgets (string, ADM_RAW, _fd);
-	sin=strlen(string);
-	sout=1024;
-	cin=string;
-	cout=(char *)&(final[0]);
-	
-	if((uint8_t)string[0]==0xff && (uint8_t)string[1]==0xfe)
-	{
-		 cin+=2;
-		 sin-=2;
-	}
-	if(!sin) continue;
-  
-  	sz=iconv(myConv,&cin,&sin,&cout,&sout);
-	if(sz==-1)
-	{
-  		printf("Iconv error:%s\n:%s:\n",strerror(errno),string);
-		continue;
-		//return 0;	
-  	}
-	// Get the amound of utf16...
-	finallen=(ADM_RAW-sout)>>1;
-	// Purge cr/lf
-	while(finallen &&( ADM_ASC(final[finallen-1])==0x0a || ADM_ASC(final[finallen-1]==0x0d))) finallen--;
-	
+	ADM_utfConv(final,string,strlen(string),&finallen);
+	// Purge cr/lf	
 	switch (state)
 	{
 	case 0:		// waiting for number	 
@@ -410,13 +370,8 @@ ADMVideoSubtitle::loadSRT (void)
 	}
 
     }
-    	printf(">> Sub: %d subs stored and loaded\n",_line);
- 	// close iconv
-	if((int)myConv!=-1)
-	{
-		iconv_close(myConv);
-		myConv=(iconv_t)-1;
-	}
+  ADM_utfEnd( );
+  printf(">> Sub: %d subs stored and loaded\n",_line); 	
   return 1;
   
 }
@@ -428,12 +383,7 @@ int ADM_SubAtoi(uint16_t *in)
 	int d;
 	do
 	{
-		d=ADM_ASC(*in);
-		if(*in==0xfeff)
-		{
-			*in++;
-			continue;
-		}
+		d=ADM_ASC(*in);		
 		in++;
 		if(d>='0' && d<='9')
 		{
@@ -446,4 +396,81 @@ int ADM_SubAtoi(uint16_t *in)
 	
 
 }
+//	Init iconv, so that we can go utf16
+//
+uint8_t	ADM_utfInit( char *charset )
+{
+	myConv=iconv_open("UNICODE",charset); //"WINDOWS-1251");
+	if((int)myConv==-1)
+	{
+		printf("\n Error initializing iconv...\n");
+		return  0;
+	}
+	return 1;
+}
+//
+//	Convert the incoming string to utf16
+//	While doing it, remove the utf16 makers from input/output
+//	(fffe)
+//
+uint8_t ADM_utfConv(ADM_GLYPH_T *out, char *in,uint32_t nbIn, uint32_t *nbOut)
+{
+size_t sin,sout,sz;
+char *cout,*cin;
+uint32_t done=0;
+
+	memset(out,0,ADM_RAW*sizeof(ADM_GLYPH_T));
+	sin=strlen(in);
+	sout=ADM_RAW;
+	cin=in;
+	cout=(char *)(out);
+	
+	if((uint8_t)in[0]==0xff && (uint8_t)in[1]==0xfe)
+	{
+		 cin+=2;
+		 sin-=2;
+	}
+	if(!sin) 
+	{
+		*nbOut=0;
+		return 1;
+	}
+  
+  	sz=iconv(myConv,&cin,&sin,&cout,&sout);
+	if(sz==-1)
+	{
+  		printf("Iconv error:%s\n:%s:\n",strerror(errno),in);
+		//out[0]=' ';
+  	}
+	// Get the amound of utf16...
+	done=(ADM_RAW-sout)>>1;
+	if(done)
+	{
+		if(0xfeff==out[0])
+		{
+			//aprintf("Removing utf tag\n");
+			done--;
+			memmove(&out[0],&out[1],done*sizeof(ADM_GLYPH_T));
+			
+		}
+	}
+	while(done &&( ADM_ASC(out[done-1])==0x0a || ADM_ASC(out[done-1]==0x0d))) done--;
+	*nbOut=done;
+	return 1;
+	
+}
+// Close iconv
+//
+
+uint8_t ADM_utfEnd( void)
+{
+  // Purge iconv
+  if((int)myConv!=-1)
+	{
+		iconv_close(myConv);
+		myConv=(iconv_t)-1;
+	}
+}
+
+
 #endif

@@ -89,7 +89,7 @@ uint32_t absFrame=frame+_info.orgFrame;
 
 	      if(time<=_subs[_oldline].endTime && time >=_subs[_oldline].startTime)
 	      {
-	      		aprintf("Sub: cached\n");
+	      		aprintf("Sub: cached %lu %lu %lu\n",time,_subs[_oldline].startTime,_subs[_oldline].endTime);
 			blend(data,_conf->_baseLine); // re-use it
 			return 1;	
 
