@@ -52,6 +52,9 @@ static GtkWidget	*create_dialogAudioCodec (void);
 #ifdef USE_FAAC
 	,AUDIOENC_FAAC
 #endif
+#ifdef USE_VORBIS
+	,AUDIOENC_VORBIS
+#endif
 
  };
   
@@ -127,6 +130,10 @@ GtkWidget	*create_dialogAudioCodec (void)
   #ifdef HAVE_LIBMP3LAME
   GtkWidget *lame_mp1;
   #endif
+    #ifdef USE_VORBIS
+  GtkWidget *vorbis;
+  #endif
+
   #ifdef HAVE_LIBMP3LAME
   GtkWidget *faac;
 #endif
@@ -181,6 +188,11 @@ GtkWidget	*create_dialogAudioCodec (void)
   gtk_widget_show (faac);
   gtk_container_add (GTK_CONTAINER (menu1), faac);
 #endif
+#ifdef USE_VORBIS
+  vorbis = gtk_menu_item_new_with_mnemonic (_("Vorbis"));
+  gtk_widget_show (vorbis);
+  gtk_container_add (GTK_CONTAINER (menu1), vorbis);
+#endif
 #ifdef PIPE_TOOLAME
  toolame = gtk_menu_item_new_with_mnemonic (_("Toolame(pipe)"));
   gtk_widget_show (toolame);
@@ -221,6 +233,9 @@ GtkWidget	*create_dialogAudioCodec (void)
 #endif
 #ifdef USE_FAAC
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, faac, "faac");
+#endif
+#ifdef USE_VORBIS
+  GLADE_HOOKUP_OBJECT (dialogAudioCodec, vorbis, "vorbis");
 #endif
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, buttonConfigure, "buttonConfigure");
   GLADE_HOOKUP_OBJECT_NO_REF (dialogAudioCodec, dialog_action_area1, "dialog_action_area1");

@@ -559,7 +559,7 @@ int intra,q;
 	mpegvbr.fps=_fps1000/1000.;
 
  	mpegvbr.mode=VBR_MODE_2PASS_1;
-	mpegvbr.desired_size=final_size*1024*1024;
+	mpegvbr.desired_size=(uint64_t)final_size*(uint64_t)(1024*1024);
 	mpegvbr.debug=0;
 	mpegvbr.filename=statname; //XvidInternal2pass_statfile;
 

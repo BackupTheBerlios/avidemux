@@ -1498,10 +1498,13 @@ A_saveAudioDecodedTest (char *name)
 {
 
 // debug audio seek
-  uint32_t len2, gauge = 0;
-  uint32_t written = 0, max;
+  uint32_t len, gauge = 0;
+  uint32_t written = 0;
   FILE *out;
   AVDMGenericAudioStream *saveFilter;
+  
+  uint64_t sampleTarget,sampleCurrent;
+  
 #undef BITT
 #define BITT 4*1152
 #define OUTCHUNK 1024*1024
@@ -1529,10 +1532,7 @@ A_saveAudioDecodedTest (char *name)
       GUI_Alert ("Memory Error!");
       return;
     }
-// compute max bytes to read (with little margin)
-  max = getAudioByteCount( frameStart, frameEnd);
 
-  printf ("\n input : %u bytes\n", max);
 
 
 // re-ignite first filter...
@@ -1550,68 +1550,63 @@ A_saveAudioDecodedTest (char *name)
   /*          from begin and end of the audio stream. That was not good :) Now it runs correctly also if you use */
   /*          audio stream with same length then video, therefore is premature ending :) */
 
-  uint32_t delay = 0;
-  if (audioDelay > 0)
-    {
-      saveFilter =
-	buildAudioFilter (currentaudiostream,
-			  video_body->getTime (frameStart), max);
-    }
-  else
-    {
-      delay = currentaudiostream->convTime2Offset (-audioDelay);
-      saveFilter =
-	buildAudioFilter (currentaudiostream,
-			  video_body->getTime (frameStart), max + delay);
-    }
-
-    DIA_working *work=new DIA_working("Saving audio");
+ 
+	saveFilter =	buildAudioFilter (currentaudiostream,
+			  video_body->getTime (frameStart), 0xffffffff);
+   
+    	DIA_working *work=new DIA_working("Saving audio");
 
 
 //
 //  Create First filter that is null filter
 //
   saveFilter->writeHeader (out);
-  printf (".. Starting ..\n");
-  if (audioDelay > 0)
+  uint32_t tstart,tend,samples;
+  double duration;
+  tstart=video_body->getTime(frameStart);
+  tend=video_body->getTime(frameEnd+1);
+  duration=(tend-tstart)*saveFilter->getInfo()->frequency;
+  duration/=1000.;
+  
+  sampleTarget=(uint64_t)floor(duration);
+  sampleCurrent=0;
+  gauge=0;
+  
+  while ((sampleCurrent<sampleTarget))
     {
-      max = saveFilter->getLength ();
-    }
-  else
-    {
-      max = saveFilter->getLength () - delay;
-    }
-  printf ("\n Computed length : %u\n", max);
-  while (1)
-    {
-      len2 = saveFilter->readDecompress (BITT, outbuffer + gauge);
+      if(!saveFilter->getPacket(outbuffer + gauge,&len,&samples))
+      {
+        printf("Audio save:Read error\n");
+      	break;
+      }
       //      printf("Got : %lu\n",len2);
-      gauge += len2;
+      gauge += len;
+      sampleCurrent+=samples;
       // update GUI                   
-	if (work->update (written, max))	// abort request ?
-	    goto abortSaveAudio;
-      if ((len2 == 0) || (gauge > OUTCHUNK))	// either out buffer is full
-	// or we read nothing -> end of file
+	if (work->update (sampleCurrent>>10, sampleTarget>>10))	// abort request ?
+	    break;;
+      if (gauge > OUTCHUNK)	// either out buffer is full	
 	{
-	  fwrite (outbuffer, 1, gauge, out);
-	  //      fflush(out);    
+	  fwrite (outbuffer, 1, gauge, out);	  
 	  written += gauge;
 	  gauge = 0;
-	  if (len2 == 0)
-	    break;		// premature ending
-	 
-	  //printf("\n written %lu/%lu max\n",written,max);
-	}
-      //      if(written>max) break; // we wrote everything !
+	}   	
     };
-abortSaveAudio:
+// Clean up
+	if(gauge)
+	{
+		fwrite (outbuffer,  gauge,1, out);	  
+		written += gauge;
+		gauge = 0;	
+	}
   saveFilter->endWrite (out, written);
   fclose (out);
   free (outbuffer);
   delete work;
   deleteAudioFilter ();
   currentaudiostream->endDecompress ();
-  printf (" actually written %u\n", written);
+  printf ("AudioSave: actually written %u\n", written);
+  printf ("Audiosave: target sample:%llu, got :%llu\n",sampleTarget,sampleCurrent);
 
 
 }

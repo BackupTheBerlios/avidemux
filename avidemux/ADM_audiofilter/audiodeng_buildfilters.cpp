@@ -39,6 +39,10 @@
 #ifdef HAVE_LIBMP3LAME
 	#include "lame/lame.h"
 #endif
+#ifdef USE_VORBIS
+	#include "audioeng_vorbis.h"
+#endif
+
 #include "gui_action.hxx"
 /*
   	Ugly should get ride of it. Temporary fix.
@@ -62,6 +66,13 @@ static CODECLIST myCodecList[]=
 #ifdef HAVE_LIBMP3LAME
 		{"lame", AUDIOENC_MP3},
 #endif
+#ifdef USE_AAC
+		{"aac", AUDIOENC_AAC},
+#endif
+#ifdef USE_VORBIS
+		{"vorbis", AUDIOENC_VORBIS},
+#endif
+
 		{"mp2", AUDIOENC_MP2},
 		{"ac3", AUDIOENC_AC3},
 		{"toolame", AUDIOENC_2LAME},
@@ -298,6 +309,13 @@ void audioCodecConfigure( void )
 		case AUDIOENC_FAAC:
 						
 							DIA_audioEncoder(&audioMP3mode, &audioMP3bitrate,"AAC parameter");
+							return;
+						return;
+#endif	
+#ifdef USE_VORBIS
+		case AUDIOENC_VORBIS:
+						
+							DIA_audioEncoder(&audioMP3mode, &audioMP3bitrate,"VORBIS parameter");
 							return;
 						return;
 #endif		
@@ -561,6 +579,25 @@ uint8_t init;
  				filters[filtercount++] = lastFilter;
 			#endif
 			break;
+#ifdef USE_VORBIS
+		case AUDIOENC_VORBIS:
+		{
+				AVDMProcessAudio_Vorbis *vorbis;
+				vorbis = new AVDMProcessAudio_Vorbis(lastFilter);
+				if(vorbis->init(audioMP3bitrate))
+				{
+					lastFilter = vorbis;
+					filters[filtercount++] = lastFilter;
+				}
+ 				else
+				{
+					delete vorbis;
+					GUI_Alert("VORBIS initialization failed\n"
+							" NOT ACTIVATED");
+				}
+		}
+		break;
+#endif			
 #ifdef USE_FAAC
 		case AUDIOENC_FAAC:
 		{
