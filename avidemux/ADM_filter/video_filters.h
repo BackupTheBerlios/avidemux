@@ -76,6 +76,7 @@
                 VF_VOBSUB,
                 VF_CHFPS,
                 VF_RESAMPLE_FPS,
+                VF_LAVPP_DEINT,
 		VF_DUMMY
  	 }VF_FILTERS;
  	
