@@ -44,7 +44,7 @@
 
 #include "ffv1.h"
 #include "frequencies.h"
-#define _VERSION_ "0.2.2"
+#define _VERSION_ "0.2.3"
 
 
 /* Globals */
