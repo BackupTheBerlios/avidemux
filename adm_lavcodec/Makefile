@@ -90,7 +90,7 @@ tags:
 tests: apiexample cpuid_test $(TESTS)
 
 libpostproc/libpostproc.a:
-		cd libpostproc && make && cd ..
+		cd libpostproc && $(MAKE) && cd ..
 
 $(LIB): $(OBJS)
 	rm -f $@
