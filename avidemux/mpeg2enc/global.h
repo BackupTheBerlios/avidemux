@@ -150,7 +150,7 @@ EXTERN t_control *ctl;
 
 EXTERN void feedframe_buffer(int num_frame);
 #warning duplicate define -> bad!
-#define PREFILL 30
+#define PREFILL 6
 
 // to be easily free-ed
 EXTERN int *lum_mean

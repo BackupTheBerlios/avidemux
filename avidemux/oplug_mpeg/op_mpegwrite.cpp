@@ -86,7 +86,7 @@ static vbr_control_t mpegvbr;
 
 
 #warning FIXME: Duplicate define with mpeg2enc -> bad
-#define MPEG_PREFILL 29
+#define MPEG_PREFILL 5
 
 extern FFMPEGConfig mpeg2encSVCDConfig;
 extern FFMPEGConfig mpeg2encDVDConfig;

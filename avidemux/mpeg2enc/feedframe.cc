@@ -60,6 +60,8 @@ int pushframe( int num_frame, unsigned char *frame[])
    frame[0] = frame_buffers[n][0];
    frame[1] = frame_buffers[n][1];
    frame[2] = frame_buffers[n][2];
+   
+   
 
    return 0;
 }
@@ -101,10 +103,10 @@ while(frames_read - num_frame < READ_CHUNK_SIZE )
 #else
 void feedframe_buffer(int num_frame)
 {
-	if(num_frame>frames_read+PREFILL)
+	//if(num_frame>frames_read+PREFILL)
 	{
-		printf("!!!!! FRAME UNDERFLOW!!!\n");
-		exit( -1);
+		printf("!!!!! FRAME UNDERFLOW frame asked : %d read:%d prefill:%d !!!\n",num_frame,frames_read,PREFILL);
+	//	exit( -1);
 	}
 }
 
@@ -131,35 +133,6 @@ void feedOneFrame(char *y, char *u,char *vv)
 	memcpy(frame_buffers[n][1],u,(v*h)>>2);
 	memcpy(frame_buffers[n][2],vv,(v*h)>>2);
 
-
-	  ++frames_read;
-   //printf("Fed : %d \n",frames_read);
+	++frames_read;	  
 
 }
-/* use the interface  mike */
-/*
-void y4grabFrame(char *yy,char *uu,char *vv)
-{
-   int n, v, h, i,j, y;
-   y4m_frame_info_t fi;
-
-y4m_init_frame_info (&fi);
-
-      y = y4m_read_frame_header (istrm_fd, &fi);
-
-      v = opt->vertical_size;
-      h = opt->horizontal_size;
-      for(i=0;i<v;i++)
-         piperead(istrm_fd,(uint8_t *)yy+i*opt->phy_width,h);
-
-      v = opt->chroma_format==CHROMA420 ?
-		  opt->vertical_size/2 : opt->vertical_size;
-      h = opt->chroma_format!=CHROMA444 ?
-		  opt->horizontal_size/2 : opt->horizontal_size;
-      for(i=0;i<v;i++)
-         piperead(istrm_fd,(uint8_t *)uu+i*opt->phy_chrom_width,h);
-      for(i=0;i<v;i++)
-         piperead(istrm_fd,(uint8_t *)vv+i*opt->phy_chrom_width,h);
-
-}
-*/
