@@ -49,7 +49,9 @@
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/audioex.h"
-
+#include "ADM_audiofilter/audioeng_buildfilters.h"
+extern uint8_t audioShift;
+extern int32_t audioDelay;
 
 GenericAviSaveCopyDualAudio::GenericAviSaveCopyDualAudio (AVDMGenericAudioStream	*track)
 			: GenericAviSaveCopy()
@@ -57,30 +59,129 @@ GenericAviSaveCopyDualAudio::GenericAviSaveCopyDualAudio (AVDMGenericAudioStream
    printf("**********************************\n");
    printf("second audio track set\n");
     audio_filter2= track;
-    if(!track)
-    {
-		printf("BUT NULL!\n");
-    }
+    _audioCurrent2=0;
 }
 
 //
 //      Just to keep gcc happy....
 //
-GenericAviSaveCopyDualAudio::~GenericAviSaveCopyDualAudio ()
-{
-
-}
 
 uint8_t GenericAviSaveCopyDualAudio::setupAudio (void)
 {
-
+  int32_t shift=0;
+  if(!audio_filter2) return 0;
+  if(!currentaudiostream) return 0;
+  if(audioDelay && audioShift) shift=audioDelay;
+  
+  audio_filter=buildRawAudioFilter( video_body->getTime (frameStart), 
+      		0xffffffff, shift);
+  audio_filter2->goToTime(0);
   return 1;
 }
 //---------------------------------------------------------------------------
 uint8_t
 GenericAviSaveCopyDualAudio::writeAudioChunk (uint32_t frame)
 {
- 
-      return 1;
+  uint32_t    len;
+  // if there is no audio, we do nothing
+  if (!audio_filter)
+    return 0;
+    
+  double t;
+  
+  t=frame+1;
+  t=t/fps1000;
+  t=t*1000*audio_filter->getInfo()->frequency;
+  _audioTarget=(uint32_t )floor(t);
+  
+  	uint32_t sample,packetLen,packets=0;
+	
+	_audioInBuffer=0;
+	if(audio_filter->packetPerFrame()
+		|| audio_filter->isVBR() )
+	{
+		while(_audioCurrent<_audioTarget)
+		{
+			if(!audio_filter->getPacket(abuffer,&packetLen,&sample))
+			{
+				printf("AVIWR:Could not read packet\n");
+				return 0;
+			}
+			_audioCurrent+=sample;
+	 		writter->saveAudioFrame (packetLen,abuffer);
+			encoding_gui->feedAudioFrame(packetLen);
+		}
+	 	
+	}
+	else
+	{
+		sample=0;
+		// _audioTarget is the # of sample we want
+		while(_audioCurrent<_audioTarget)
+		{
+			if(!audio_filter->getPacket(abuffer+_audioInBuffer,&packetLen,&sample))
+			{
+				printf("AVIWR:Could not read packet\n");
+				break;
+			}
+			_audioInBuffer+=packetLen;
+			_audioTotal+=packetLen;
+			_audioCurrent+=sample;		
+			packets++;
+		}
+	}
 
+      if (_audioInBuffer)
+	{
+	  writter->saveAudioFrame (_audioInBuffer, abuffer);
+	  encoding_gui->feedAudioFrame(_audioInBuffer);	  
+	}
+	//_____________________________________________________
+	// now do track2
+	//_____________________________________________________
+      
+	_audioInBuffer=0;
+	if(audio_filter2->packetPerFrame()
+		|| audio_filter2->isVBR() )
+	{
+		while(_audioCurrent2<_audioTarget)
+		{
+			if(!audio_filter2->getPacket(abuffer,&packetLen,&sample))
+			{
+				printf("AVIWR:Could not read packet\n");
+				return 0;
+			}
+			_audioCurrent2+=sample;
+			_audioTotal+=packetLen;
+	 		writter->saveAudioFrameDual (packetLen,abuffer);
+			encoding_gui->feedAudioFrame(packetLen);
+		}
+	 	
+	}
+	else
+	{
+		sample=0;
+		// _audioTarget is the # of sample we want
+		while(_audioCurrent2<_audioTarget)
+		{
+			if(!audio_filter2->getPacket(abuffer+_audioInBuffer,&packetLen,&sample))
+			{
+				printf("AVIWR:Could not read packet\n");
+				break;
+			}
+			_audioInBuffer+=packetLen;
+			_audioTotal+=packetLen;
+			_audioCurrent2+=sample;	
+			packets++;
+		}
+	}
+
+      if (_audioInBuffer)
+	{
+	  writter->saveAudioFrameDual (_audioInBuffer, abuffer);
+	  encoding_gui->feedAudioFrame(_audioInBuffer);
+	  _audioInBuffer=0;
+	}
+      return 1;
 }
+//____________

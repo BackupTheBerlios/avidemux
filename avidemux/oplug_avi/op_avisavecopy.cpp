@@ -109,10 +109,10 @@ uint8_t GenericAviSaveCopy::setupVideo (char *name)
 //
 //      Just to keep gcc happy....
 //
-GenericAviSaveCopy::~GenericAviSaveCopy ()
-{
-
-}
+// GenericAviSaveCopy::~GenericAviSaveCopy ()
+// {
+// 
+// }
 
 // copy mode
 // Basically ask a video frame and send it to writter

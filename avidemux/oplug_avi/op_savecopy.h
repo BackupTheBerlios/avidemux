@@ -34,7 +34,7 @@
 										{
 											_needUserDataUpdate=pack;
 										};	
-                          virtual ~GenericAviSaveCopy();
+               //           virtual ~GenericAviSaveCopy();
    };
 
  class GenericAviSaveCopyDualAudio : public   GenericAviSaveCopy
@@ -43,7 +43,7 @@
 
 			
                         char				*_trackname;
-
+			uint32_t			_audioCurrent2;
 
 
 		                   virtual uint8_t setupAudio( void);
@@ -51,7 +51,7 @@
 				 //virtual uint8_t setupVideo (char *name);
      public:
                                      GenericAviSaveCopyDualAudio(AVDMGenericAudioStream	*track);
-                          virtual ~GenericAviSaveCopyDualAudio();
+                          //virtual ~GenericAviSaveCopyDualAudio();
    };
 
 
