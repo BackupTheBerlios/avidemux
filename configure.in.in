@@ -107,6 +107,8 @@ dnl    AC_PATH_PROG(PKG_CONFIG,pkg-config, AC_MSG_ERROR([*** pkg-config not foun
 
 
    GTK_LIBS=`$PKG_CONFIG  gtk+-2.0 --libs`
+   GLIB_LIBS=`$PKG_CONFIG  glib-2.0 --libs`
+   GTK_LIBS="$GTK_LIBS $GLIB_LIBS"
    GTK_CFLAGS=`$PKG_CONFIG  gtk+-2.0 --cflags` 
 
    AC_SUBST(GTK_CFLAGS)
@@ -169,6 +171,7 @@ have_sdl=no;
 have_faad=yes
 have_faac=yes
 have_ppc=no
+have_x264=yes
 
 dnl _________________ malloc.h ___________________
 
@@ -203,6 +206,15 @@ fi
 
 
 dnl __________________divx______________
+dnl __________________x264 ______________
+AC_MSG_CHECKING(for x264 codec )
+AC_CHECK_HEADER(x264.h,,have_x264=no)
+if test "x$have_x264" = "xyes"; then
+   AC_CHECK_LIB(x264,x264_encoder_open,,have_x264=no,-lm)
+fi
+if test "x$have_x264" = "xyes"; then
+	AC_DEFINE(USE_X264,1,[use x264 encoder])
+fi
 
 
 dnl __________________xvid 0.9 ______________
@@ -911,6 +923,7 @@ echo " Divx5.0.5 ?         : $have_divx"
 echo " *** DISABLED ***"
 echo " Xvid 0.9 Codec      : $have_xx_xvid"
 echo " Xvid 1.0 Codec      : $have_xvid4"
+echo " x264 encoder c      : $have_x264"
 echo " Mad decoder         : $have_mad"
 echo " OSS                 : $have_oss"
 echo " ALSA                : $have_alsa"
