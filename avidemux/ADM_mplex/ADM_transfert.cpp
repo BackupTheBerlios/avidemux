@@ -30,7 +30,7 @@
 #define HIGH_LVL        ((TRANSFERT_BUFFER*2)/3)
 #define LOW_LVL         (TRANSFERT_BUFFER/3)
 // minimum amount of audio buffer we need
-#define MIN_REQUIRED    (32*1024)
+#define MIN_REQUIRED    (1024*1024)
 //#define MPLEX_D
 
 //**************** Mutex *******************
