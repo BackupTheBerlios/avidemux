@@ -23,6 +23,7 @@
 #include "ADM_library/fourcc.h"
 #include "ADM_openDML/ADM_openDML.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_dialog/DIA_working.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_UNPACKER
@@ -57,10 +58,11 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	assert(newIndex);
 	uint32_t newTotal=0;
 	printf("Trying to unpack the stream\n");
+	DIA_working *working=new DIA_working("Unpacking packed bitstream");
 	
 	for(uint32_t img=0;img<nbFrame;img++)
 	{
-		
+		working->update(img,nbFrame);
 		if(!getFrameNoAlloc(img,buffer,&len))
 			{
 				printf("Error could not get frame %lu\n",img);
@@ -124,6 +126,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	ret=1;
 _abortUnpack:
 	delete [] buffer;
+	delete working;
 	if(ret=1)
 	{
 		printf("Sucessfully unpacked the bitstream\n");

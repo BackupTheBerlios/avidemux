@@ -98,6 +98,7 @@ static void save(char*name);
 static void call_requant(char *p, char *q, char *n);
 extern void show_info(char *p);
 extern const char *getStrFromAudioCodec( uint32_t codec);
+extern void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm, uint16_t * ss, uint16_t * ms);
 
 //_________________________________________________________________________
 
@@ -477,7 +478,6 @@ void call_toolame(char *file)
 	A_Pipe(P_TOOLAME,file);
 }
 
-extern void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm, uint16_t * ss, uint16_t * ms);
 void show_info(char *p){
    UNUSED_ARG(p);
    

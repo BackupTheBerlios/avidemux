@@ -32,6 +32,7 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 
+extern const char *getStrFromAudioCodec( uint32_t codec);
 void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
 		uint16_t * ss, uint16_t * ms);
 static GtkWidget	*create_dialog (void);
@@ -93,38 +94,9 @@ void DIA_properties( void )
 	     
 	      	sprintf(text, "%lu Hz", wavinfo->frequency);
 	     	FILL_ENTRY(label_fq);
-	     
-	      
-	      sprintf(text, "%lu Bps / %lu kbps", wavinfo->byterate,      wavinfo->byterate * 8 / 1000);
-	      FILL_ENTRY(label_bitrate);
-	      
-	      switch (wavinfo->encoding)
-		{
-		case (WAV_MP2):
-		    sprintf(text, "MP2 ");
-		    break;
-		case (WAV_MP3):
-		    sprintf(text, "MP3 ");
-		    break;
-		case (WAV_WMA):
-		    sprintf(text, "WMA ");
-		    break;
-		 case (WAV_LPCM):
-		    sprintf(text, "LPCM ");
-		    break;
-		case (WAV_PCM):
-		    sprintf(text, "PCM ");
-		    break;
-		case (WAV_AC3):
-		    sprintf(text, "AC3 ");
-		    break;
-       		case (WAV_OGG):
-       		    sprintf(text,"OGG/VORBIS");
-        	    break;
-		default:
-		    sprintf(text, "?? (0x%2x) ", wavinfo->encoding);
-		    break;
-		}
+		sprintf(text, "%lu Bps / %lu kbps", wavinfo->byterate,      wavinfo->byterate * 8 / 1000);
+		FILL_ENTRY(label_bitrate);
+		sprintf(text, "%s ", getStrFromAudioCodec(wavinfo->encoding));
 	     	FILL_ENTRY(label1_audiofourcc);
 		sprintf(text,"%lu MBytes",video_body->getAudioLength()>>20);
 		FILL_ENTRY(label_audioduration);
