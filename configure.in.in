@@ -842,8 +842,12 @@ if test "x$use_cygwin" = "xyes"; then
 	AC_DEFINE(MEMALIGN_HACK,1,"sse on cywin")
 	AC_DEFINE(CYG_MANGLING,1,"Name mangling")
 	AC_DEFINE(rindex,ADM_rindex,"rindex does not exist on cygwin")
+	AC_DEFINE(index,ADM_index,"rindex does not exist on cygwin")
+	AC_DEFINE(fseeko,fseek,"")
+	AC_DEFINE(ftello,ftell,"")
+	#AC_DEFINE(link(x,y),-1,"")	
 	CXXFLAGS=" $CXXFLAGS -mno-cygwin -mms-bitfields"
-	CFLAGS=" CFLAGS -mno-cygwin -mms-bitfields"
+	CFLAGS=" $CFLAGS -mno-cygwin -mms-bitfields"
 
 	
 fi
