@@ -38,7 +38,7 @@
 
 #include "ADM_colorspace/colorspace.h"
 
-extern  int 				DIA_getCropParams(	uint32_t *w,uint32_t 	*w2, uint32_t *h,uint32_t *h2,uint32_t tw,
+extern  int DIA_getCropParams(char *display,	uint32_t *w,uint32_t 	*w2, uint32_t *h,uint32_t *h2,uint32_t tw,
 											uint32_t th,uint8_t *in);
 uint8_t AVDMVideoStreamCrop::configure( AVDMGenericVideoStream *instream)
 
@@ -46,52 +46,40 @@ uint8_t AVDMVideoStreamCrop::configure( AVDMGenericVideoStream *instream)
 CROP_PARAMS *par;
 uint32_t w,h,l,f;
 uint8_t ret=0;
-uint8_t *video1,*video2;
+uint8_t *video1;
 
-							video1=video2=NULL;
+		video1=NULL;
 
-		                 // Get info from previous filter
-							w=_in->getInfo()->width;
-							h= _in->getInfo()->height;
+		// Get info from previous filter
+		w=_in->getInfo()->width;
+		h= _in->getInfo()->height;
 
-							printf("\n Crop in : %lu  x %lu\n",w,h);
+		printf("\n Crop in : %lu  x %lu\n",w,h);
+		video1=(uint8_t *)malloc(w*h*4);
+		assert(video1);
 
-							video2=(uint8_t *)malloc(w*h*4);							
-							assert(video2);
-							video1=(uint8_t *)malloc(w*h*4);							
-							assert(video1);
-
-							// ask current frame from previous filter
-							assert(instream->getFrameNumberNoAlloc(curframe, &l,
-          																				video2,&f));
+		// ask current frame from previous filter
+		assert(instream->getFrameNumberNoAlloc(curframe, &l,video1,&f));
 						
-							// From now we work in RGB !
-                         COL_yv12rgb(w,h,video2,video1);
-
-							
-							
-			par=_param;
+		par=_param;
 		
-    	 	switch(DIA_getCropParams(&par->cropx,&par->cropx2,&par->cropy,&par->cropy2,
+    	 	switch(DIA_getCropParams("Crop Settings",&par->cropx,&par->cropx2,&par->cropy,&par->cropy2,
      							w,h,(uint8_t *)video1 ))
-				{
-				case 0:
+		{
+			case 0:
 		      		printf("cancelled\n");
-					break;
-				case 1:
-					_info.width=_in->getInfo()->width-_param->cropx-_param->cropx2;
-					_info.height=_in->getInfo()->height-_param->cropy-_param->cropy2;
-					ret=1;
-					break;
-				default:
-					assert(0);
-				}
+				break;
+			case 1:
+				_info.width=_in->getInfo()->width-_param->cropx-_param->cropx2;
+				_info.height=_in->getInfo()->height-_param->cropy-_param->cropy2;
+				ret=1;
+				break;
+			default:
+				assert(0);
+		}
 
-					free(video1);
-					free(video2);
-					video1=video2=NULL;
-
-					return ret;
+		free(video1);		
+		video1=NULL;
+		return ret;
 }
-
 #endif
