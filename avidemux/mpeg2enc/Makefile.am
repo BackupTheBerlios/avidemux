@@ -26,7 +26,6 @@ libmpeg2enc_a_SOURCES = ADM_mpe2enc.cpp ADM_mpeg2enc.h ad_layer.cc conform.cc \
 
 endif
 
-EXTRA_DIST =
 
 ####### kdevelop will overwrite this part!!! (end)############
 
