@@ -186,7 +186,7 @@ uint8_t MpegMuxer::muxAC3(void)
 {
 #ifndef USE_AC3
 	assert(0);
-#endif
+#else
 	uint8_t *end=&buffer[byteTail];	
 	uint8_t *ptr=&buffer[byteHead];	
 	uint8_t *pos=NULL;
@@ -220,6 +220,7 @@ uint8_t MpegMuxer::muxAC3(void)
 	mux_write_packet((PackStream *)packStream, 
                               AUDIO_ID_AC3, &buffer[byteHead], off); 
 	byteHead+=off;
+#endif	
 	return 1;
 }
 //
