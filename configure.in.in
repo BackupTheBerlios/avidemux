@@ -759,9 +759,9 @@ case $adm_cpu in
   			AC_DEFINE(ADM_BSD_FAMILY,1,[BSD os specific ifdef])
 			LMPG_OPT="";
 			LDFLAGS="$LDFLAGS  \
-				/System/Library/Frameworks/CoreServices.framework/CoreServices \
-				/System/Library/Frameworks/CoreAudio.framework/CoreAudio  \
-				/System/Library/Frameworks/AudioUnit.framework/AudioUnit"  
+				-framework CoreServices \
+				-framework CoreAudio  \
+				-framework AudioUnit"  
 			touch adm_lavcodec/config.cpu
 			echo "TARGET_DARWIN=yes" >> adm_lavcodec/config.cpu
 			echo "TARGET_PPC=yes" >> adm_lavcodec/config.cpu
