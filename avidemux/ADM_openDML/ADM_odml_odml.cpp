@@ -115,6 +115,12 @@ uint32_t 	i,j;
 
 	// Jump to index of vidTrack
 	printf("Trying ODML super index..\n");
+#define szeof(x) printf("Sizeof "#x":%d\n",sizeof(x));        
+        szeof(OPENDML_INDEX);
+        szeof(OPENDML_ENTRY);
+        szeof(OPENML_SECONDARY_INDEX);
+        
+        
 	if(!_Tracks[track].indx.offset)
 	{
 		printf("No indx field.\n");
