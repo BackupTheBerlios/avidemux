@@ -459,8 +459,8 @@ dnl ____________ faad ?________________
   
 dnl _______________/faad_______________
 dnl ____________ faac ?________________
- AC_CHECK_HEADERS(faac.h,,have_faad=no)
- AC_CHECK_HEADERS(faacfg.h,,have_faad=no)
+ AC_CHECK_HEADERS(faac.h,,have_faac=no)
+ AC_CHECK_HEADERS(faaccfg.h,,have_faac=no)
  
  AC_ARG_ENABLE(faac,[  --disable-faac           Force no faac],have_faac=no)
    
