@@ -33,7 +33,10 @@ static void on_callback_lame(GtkButton * button, gpointer user_data);
 static void on_callback_toolame(GtkButton * button, gpointer user_data);
 static void on_callback_lvemux(GtkButton * button, gpointer user_data);
 static void on_callback_requant(GtkButton * button, gpointer user_data);
+static void on_callback_audio(GtkButton * button, gpointer user_data);
 static GtkWidget *dialog=NULL;
+
+extern void 		AVDM_audioPref( void );
 
 uint8_t DIA_Preferences(void);
 uint8_t DIA_Preferences(void)
@@ -55,6 +58,7 @@ const char *nullstring="";
 	CONNECT(buttonToolame,on_callback_toolame);
 	CONNECT(buttonLvemux,on_callback_lvemux);
 	CONNECT(buttonRequant,on_callback_requant);	
+	CONNECT(button_audioDevice,on_callback_audio);	
 
 	// prepare
 	
@@ -103,6 +107,11 @@ const char *nullstring="";
 	gtk_widget_destroy(dialog);
 	dialog=NULL;
 	return ret;
+}
+void on_callback_audio(GtkButton * button, gpointer user_data)
+{
+	printf("Audio device\n");
+	AVDM_audioPref();
 }
 void on_callback_lame(GtkButton * button, gpointer user_data)
 {
@@ -154,6 +163,7 @@ char *lame=NULL;
 	 }
 
 }
+
 GtkWidget*
 create_dialog1 (void)
 {
@@ -175,6 +185,9 @@ create_dialog1 (void)
   GtkWidget *label7;
   GtkWidget *entryRequant;
   GtkWidget *buttonRequant;
+  GtkWidget *label8;
+  GtkWidget *button_audioDevice;
+  GtkWidget *hseparator1;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
@@ -185,7 +198,7 @@ create_dialog1 (void)
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
 
-  table1 = gtk_table_new (5, 3, FALSE);
+  table1 = gtk_table_new (6, 3, FALSE);
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), table1, TRUE, TRUE, 0);
 
@@ -194,6 +207,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
   label2 = gtk_label_new (_("Path"));
@@ -201,6 +215,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label2, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
   label3 = gtk_label_new (_("Select"));
@@ -208,6 +223,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label3, 2, 3, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
   label4 = gtk_label_new (_("Toolame"));
@@ -215,6 +231,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
   entryToolame = gtk_entry_new ();
@@ -234,6 +251,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
 
   entryLame = gtk_entry_new ();
@@ -253,6 +271,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label6, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
 
   entryLvemux = gtk_entry_new ();
@@ -272,6 +291,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label7, 0, 1, 4, 5,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
 
   entryRequant = gtk_entry_new ();
@@ -285,6 +305,26 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), buttonRequant, 2, 3, 4, 5,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+
+  label8 = gtk_label_new (_("AudioDevice"));
+  gtk_widget_show (label8);
+  gtk_table_attach (GTK_TABLE (table1), label8, 0, 1, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label8), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label8), 0, 0.5);
+
+  button_audioDevice = gtk_button_new_with_mnemonic (_("Select Device"));
+  gtk_widget_show (button_audioDevice);
+  gtk_table_attach (GTK_TABLE (table1), button_audioDevice, 1, 2, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  hseparator1 = gtk_hseparator_new ();
+  gtk_widget_show (hseparator1);
+  gtk_table_attach (GTK_TABLE (table1), hseparator1, 2, 3, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -319,6 +359,9 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, label7, "label7");
   GLADE_HOOKUP_OBJECT (dialog1, entryRequant, "entryRequant");
   GLADE_HOOKUP_OBJECT (dialog1, buttonRequant, "buttonRequant");
+  GLADE_HOOKUP_OBJECT (dialog1, label8, "label8");
+  GLADE_HOOKUP_OBJECT (dialog1, button_audioDevice, "button_audioDevice");
+  GLADE_HOOKUP_OBJECT (dialog1, hseparator1, "hseparator1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
