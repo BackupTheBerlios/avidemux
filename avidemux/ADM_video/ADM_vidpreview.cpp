@@ -66,7 +66,7 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
 			printf("\n Warning rgb render not null...\n");
 			free(rgb_render);
 		}
-      assert(rgb_render=(uint8_t *)malloc(w*h*4));
+      assert(rgb_render=new uint8_t [w*h*4]);
        uw=w;
        uh=h;
 
@@ -140,7 +140,7 @@ void GUI_PreviewEnd(void)
  		}
  	if(rgb_render)
  		{
- 		 	free(rgb_render);
+ 		 	delete [] rgb_render;
  		 	rgb_render=NULL;
  		}
 	dialog=NULL;

@@ -1168,7 +1168,7 @@ uint8_t nuvHeader::saveIndex( const char *name,const char *org)
 	fprintf(fd,"PCM:%d\n",_isPCM);
 	fprintf(fd,"Fq:%d\n",_audio_frequency);
 	fprintf(fd,"%lu video frames\n",_mainaviheader.dwTotalFrames);
-	for(  j=0;j<_mainaviheader.dwTotalFrames;j++)
+	for( int32_t j=0;j<_mainaviheader.dwTotalFrames;j++)
 	{
 		fprintf(fd,"Comp:%c  Pos :%llu Size:%lu Kf:%lu\n",
 				_videoIndex[j]._compression,
@@ -1215,6 +1215,7 @@ uint8_t nuvHeader::loadIndex( const char *name)
 {
 char str[1024];
 char filename[1024];
+char filename2[1024];
 uint32_t nb=0,w,h;
 FILE *fd;
 
@@ -1243,9 +1244,35 @@ FILE *fd;
 	_fd=fopen(filename,"rb");
 	if(!_fd)
 	{
+		char *p;
 		printf("\n could not open %s file..\n",filename);
-		fclose(fd);
-	 	return 0;
+		/* check for index file in dirname(name) */
+		strncpy(filename2,name,sizeof(filename2));
+		filename2[sizeof(filename2)-1] = '\0';
+		if( (p = rindex(filename2,'/')) ){
+			*(++p) = '\0';
+		}else{
+			filename2[0] = '\0';
+		}
+		if( (p = rindex(filename,'/')) ){
+			p++;
+		}else{
+			p = filename;
+		}
+		strncat(filename2,p,sizeof(filename2)-strlen(filename2));
+		filename2[sizeof(filename2)-1] = '\0';
+		if( !strncmp(filename,filename2,sizeof(filename2)) ){
+			/* we don't have a second filename */
+			fclose(fd);
+			return 0;
+		}
+		_fd=fopen(filename2,"rb");
+		if(!_fd){
+			printf(" could not open %s file..\n", filename2);
+			fclose(fd);
+	 		return 0;
+		}
+		printf(" using %s instead..\n", filename2);
 	 }
 
 	uint32_t fps;

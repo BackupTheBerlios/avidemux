@@ -58,7 +58,6 @@ uint8_t ADM_Composer::getMarkers(uint32_t *start, uint32_t *end)
 			*start=0;
 			*end=_total_frames-1;
 		}
-	_haveMarkers;				
 	return 1;		
 }
 //______________________________________________
@@ -136,6 +135,7 @@ uint8_t ADM_Composer::loadWorbench (char *name)
   char    str[4000];
   char    str_extra[4000];
   char    str_tmp[4000];
+  char    filename2[1024];
   uint32_t    nb;
   FILE *    fd;
   char *    tmp;
@@ -171,11 +171,38 @@ uint8_t ADM_Composer::loadWorbench (char *name)
 	    printf("adding %s\n",s);
 	    if(ADM_OK!=addFile (s))
 	    {
-	    	GUI_Alert("Problem reading file,\nexpect crash");
-		fclose(fd);
-		_nb_video=i;
-		if(_nb_video>1) _nb_video--;
-		return 0;
+		char *p;
+		strncpy(filename2,name,sizeof(filename2));
+		filename2[sizeof(filename2)-1] = '\0';
+		if( (p = rindex(filename2,'/')) ){
+			*(++p) = '\0';
+		}else{
+			filename2[0] = '\0';
+		}
+		if( (p = rindex(s,'/')) ){
+			p++;
+		}else{
+			p = s;
+		}
+		strncat(filename2,p,sizeof(filename2)-strlen(filename2));
+		filename2[sizeof(filename2)-1] = '\0';
+		if( !strncmp(s,filename2,sizeof(filename2)) ){
+			/* we don't have a second filename */
+			GUI_Alert("Problem reading file,\nexpect crash");
+			fclose(fd);
+			_nb_video=i;
+			if(_nb_video>1) _nb_video--;
+			return 0;
+		}
+		printf(" could not open %s file..\n", s);
+		printf(" adding %s instead\n", filename2);
+		if(ADM_OK!=addFile (filename2)){
+	    		GUI_Alert("Problem reading file,\nexpect crash");
+			fclose(fd);
+			_nb_video=i;
+			if(_nb_video>1) _nb_video--;
+			return 0;
+		}
 	   }
 
     }
