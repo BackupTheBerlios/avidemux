@@ -64,7 +64,7 @@ oggAudio::oggAudio( char *name,OgAudioTrack *tracks,uint8_t trkidx )
 	_wavheader->blockalign = 4;
 	_wavheader->byterate=_currentTrack->byterate;
 	_wavheader->channels=_currentTrack->channels;
-	_wavheader->frequency=44100;
+	_wavheader->frequency=_currentTrack->frequency;
 	_wavheader->encoding=_currentTrack->encoding;
 	
 	_length=_tracks[_trackIndex].trackSize;
@@ -182,43 +182,70 @@ uint32_t oggAudio::read(uint32_t size, uint8_t *data)
 {
 uint32_t i;
 
-	if(!_inBuffer)
-		readPacket(&_inBuffer,_buffer,&i);
-	if(!_inBuffer) return 0;
-	if(size<_inBuffer)
+	if(_wavheader->encoding==WAV_OGG)
 	{
-		memcpy(data,_buffer,size);
-		memmove(_buffer,_buffer+size,_inBuffer-size);
-		_inBuffer-=size;
-		aprintf("Ogg:This round read %lu bytes from buffer (asked) \n",size);
-		return size;
+
+		if(!_inBuffer)
+			readPacket(&_inBuffer,_buffer,&i);
+		if(!_inBuffer) return 0;
+		if(size<_inBuffer)
+		{
+			memcpy(data,_buffer,size);
+			memmove(_buffer,_buffer+size,_inBuffer-size);
+			_inBuffer-=size;
+			aprintf("Ogg:This round read %lu bytes from buffer (asked) \n",size);
+			return size;
+		}
+		memcpy(data,_buffer,_inBuffer);
+		i=_inBuffer;
+		_inBuffer=0;
+		aprintf("This round read %lu bytes asked %lu \n",i,size);
+		return i;
 	}
-	memcpy(data,_buffer,_inBuffer);
-	i=_inBuffer;
-	_inBuffer=0;
-	aprintf("This round read %lu bytes asked %lu \n",i,size);
-	return i;
+	// It is not vorbis audio
+	// We have to skip 1 byte header in case of fresh packet
+	// Ask the full page
+	uint32_t cursize=0;
+	uint32_t flags=0;
+	uint64_t stamp=0;
+	uint8_t *frags,frag;
+	uint32_t ssize=0;
+	while(_demuxer->readHeaderOfType(_currentTrack->audioTrack,&cursize,&flags,&stamp))
+		{
+			_demuxer->getLace(&frag,&frags);
+			for(uint32_t i=0;i<frag;i++)
+			{
+				cursize=frags[i];
+				if(!i && !(flags&1)) // fresh packet -> skip one byte
+				{
+					_demuxer->readBytes(1,data);
+					assert(cursize);
+					cursize--;
+					_demuxer->readBytes(cursize,data);
+				}
+				else
+				{
+					_demuxer->readBytes(cursize,data);
+				}
+				data+=cursize;
+				_lastFrag=i;
+				ssize+=cursize;	
+				if(frags[i]!=0xff )
+				{
+					if(i==frag-1) _lastFrag=NO_FRAG;
+					return ssize;
+				}
+			}
+			// Else skip it, should not happen
+			printf("OGM : Failed reading non vorbis\n");
+			return 0;
 			
-#if 0	
-	if(!_inBuffer)
-	{
-		fillBuffer();
-	}	
-	if(!_inBuffer) return 0;
-	if(size<_inBuffer)
-	{
-		memcpy(data,_buffer,size);
-		memmove(_buffer,_buffer+size,_inBuffer-size);
-		_inBuffer-=size;
-		aprintf("This round read %lu bytes from buffer (asked) \n",size);
-		return size;
-	}
-	memcpy(data,_buffer,_inBuffer);
-	i=_inBuffer;
-	_inBuffer=0;
-	aprintf("This round read %lu bytes asked %lu \n",i,size);
-	return i;
-#endif	
+		
+		}
+	printf("OGM : Failed reading non vorbis\n");
+	return 0;
+	
+
 
 }
 //
@@ -328,6 +355,9 @@ OgAudioIndex *idx;
 	val/=1000; // in seconds
 	aprintf("OGM:Looking for %lu ms\n",mstime);
 	aprintf("Looking for %llu sample\n",val);
+	
+	
+	//
 	idx=_currentTrack->index;
 	for(uint32_t i=0;i<_currentTrack->nbAudioPacket;i++)
 	{		

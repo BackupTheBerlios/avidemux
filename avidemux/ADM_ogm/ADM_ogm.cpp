@@ -233,6 +233,7 @@ uint8_t oggHeader::open(char *name)
 					_audioTracks[0].encoding=WAV_OGG;
 					_audioTracks[0].channels=header->audio.channels;
 					_audioTracks[0].byterate=header->audio.avgbytespersec;
+					_audioTracks[0].frequency=header->samples_per_unit;
 					printf("Taking that track as audio track 1\n");
 				}
 				else
@@ -242,6 +243,7 @@ uint8_t oggHeader::open(char *name)
 					_audioTracks[1].encoding=WAV_OGG;
 					_audioTracks[1].channels=header->audio.channels;
 					_audioTracks[1].byterate=header->audio.avgbytespersec;
+					_audioTracks[1].frequency=header->samples_per_unit;
 					printf("Taking that track as audio track 2\n");
 				}
 				dumpHeader(header,1);
@@ -258,6 +260,7 @@ uint8_t oggHeader::open(char *name)
 					_audioTracks[0].encoding=codec;
 					_audioTracks[0].channels=header->audio.channels;
 					_audioTracks[0].byterate=header->audio.avgbytespersec;
+					_audioTracks[0].frequency=header->samples_per_unit;
 					printf("Taking that track as audio track 1\n");
 				}
 				else
@@ -267,6 +270,7 @@ uint8_t oggHeader::open(char *name)
 					_audioTracks[1].encoding=codec;
 					_audioTracks[1].channels=header->audio.channels;
 					_audioTracks[1].byterate=header->audio.avgbytespersec;
+					_audioTracks[1].frequency=header->samples_per_unit;
 					printf("Taking that track as audio track 2\n");
 				}
 				dumpHeader(header,1);

@@ -33,6 +33,7 @@ typedef struct OgAudioTrack
 	uint32_t			byterate;
 	uint32_t			nbAudioPacket;	// nb of packet
 	uint32_t			trackSize;	// size in bytes 
+	uint32_t			frequency;
 	OgAudioIndex			*index;	// indexes
 }OgAudioTrack;
 
