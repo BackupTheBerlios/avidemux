@@ -666,7 +666,7 @@ d
 		dnl FIXME
 		dnl
 
-		echo "TARGET_MMX=yes" > adm_lavcodec/config.cpu
+		echo "TARGET_MMX=yes" >> adm_lavcodec/config.cpu
 
 		AC_PATH_PROG(NASM_CONFIG, nasm, no)
  		if test "$NASM_CONFIG" = "no" ; then
