@@ -53,8 +53,8 @@ AVDMProcessAudio_Film2Pal::AVDMProcessAudio_Film2Pal(AVDMGenericAudioStream * in
     
     d=(double)_length;
     
-    d*=25.;
-    d/=23.976;
+    d/=25.;
+    d*=23.976;
     
     _length=(uint32_t)floor(d);
     printf("Film 2 pal : %lu\n",(unsigned long int)_length);
@@ -73,11 +73,11 @@ AVDMProcessAudio_Film2Pal::AVDMProcessAudio_Film2Pal(AVDMGenericAudioStream * in
 //___________________________________________
 uint32_t 	AVDMProcessAudio_Film2Pal::grab(uint8_t *obuffer)
 {
-    uint32_t rd,rendered;
+    uint32_t rd,rendered,org;
     uint8_t *out=NULL,*copy=NULL;
     uint32_t min;
     
-    rd = _instream->readDecompress(8192*4, _bufferin);
+    org=rd = _instream->readDecompress(8192*4, _bufferin);
     if(!rd) return MINUS_ONE;        
    
     
@@ -89,31 +89,39 @@ uint32_t 	AVDMProcessAudio_Film2Pal::grab(uint8_t *obuffer)
     // copy four by four
     copy=_bufferin;
     out=obuffer;
-    while(rd>min)
+    
+    while(rd>=min)
     {
     	for(uint32_t i=0;i<min;i++)
 	{
 		*out++=*copy++;
-		rendered++;
-		rd--;
 		
-	}	
-#define ALIGN	23.976
-	_target+=(25.-23.976)/ALIGN;
-	
-
-	while(_target>1.)
-	{
-		for(uint32_t i=0;i<min;i++)
-		{
-			*out++=*(copy-min+i);
-			rendered++;
-		
-		}			
-		_target=_target-1.0;
 	}
+	
+	rendered+=min;
+	rd-=min;
+	
+#define ALIGN	23.976
+	_target+=(25000-23976);
+	
+	while(_target>25000)
+	{
+					
+		rendered-=min;	
+		out-=min;
+		_target=_target-25000;
+	}
+	
     }
+#if 0    
+    float f;
     
+    f=rendered;
+    f/=org;
+    f*=23.976,
+    printf("ratio:%f\n",f);
+#endif   
+    if(rd) printf("****%d***\n",rd); 
     return rendered;
 
 };
@@ -141,8 +149,8 @@ AVDMProcessAudio_Pal2Film::AVDMProcessAudio_Pal2Film(AVDMGenericAudioStream * in
     
     d=(double)_length;
     
-    d/=25.;
-    d*=23.976;
+    d*=25.;
+    d/=23.976;
     
     _length=(uint32_t)floor(d);
     printf("Pal2Film : %lu\n",(unsigned long int)_length);
@@ -183,10 +191,10 @@ uint32_t 	AVDMProcessAudio_Pal2Film::grab(uint8_t *obuffer)
 		
 	}	
 #define ALIGN	23.976
-	_target+=(25.-23.976)/ALIGN;
+	_target+=(25000-23976);
 	
 
-	while(_target>1.)
+	while(_target>23976)
 	{
 		for(uint32_t i=0;i<min;i++)
 		{
@@ -194,7 +202,7 @@ uint32_t 	AVDMProcessAudio_Pal2Film::grab(uint8_t *obuffer)
 			rendered++;
 		
 		}			
-		_target=_target-1.0;
+		_target=_target-23976;
 	}
     }
     
