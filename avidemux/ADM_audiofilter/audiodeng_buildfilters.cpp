@@ -70,8 +70,8 @@ static CODECLIST myCodecList[]=
 #ifdef HAVE_LIBMP3LAME
 		{"lame","Lame", AUDIOENC_MP3},
 #endif
-#ifdef USE_AAC
-		{"aac","FAAC", AUDIOENC_AAC},
+#ifdef USE_FAAC
+		{"aac","FAAC", AUDIOENC_FAAC},
 #endif
 #ifdef USE_VORBIS
 		{"vorbis","Vorbis", AUDIOENC_VORBIS},
