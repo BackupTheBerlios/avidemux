@@ -258,12 +258,22 @@ uint32_t rd;
 		// now read up each parts...
 		//____________________________
 		
+#ifdef CYG_MANGLING
+                
+#define DUMP_TRACK(i) aprintf(" at %I64u (%I64x) size : %I64u (%I64x)\n", \
+                                _Tracks[i].strh.offset,\
+                                _Tracks[i].strh.offset,\
+                                _Tracks[i].strh.size,\
+                                _Tracks[i].strh.size);
+
+#else
+                
 #define DUMP_TRACK(i) aprintf(" at %llu (%llx) size : %llu (%llx)\n", \
 				_Tracks[i].strh.offset,\
 				_Tracks[i].strh.offset,\
 				_Tracks[i].strh.size,\
 				_Tracks[i].strh.size);
-								
+#endif								
 		for(uint32_t i=0;i<_nbTrack;i++)
 		{
 			DUMP_TRACK(i);		

@@ -37,7 +37,7 @@
 #define MODULE_NAME MODULE_ODML
 #include "ADM_toolkit/ADM_debug.h"
 
-#define OPENDML_VERBOSE
+//#define OPENDML_VERBOSE
 
 
 typedef struct OPENDML_INDEX
@@ -171,14 +171,18 @@ uint32_t 	i,j;
 		fseeko(_fd,superEntries[i].offset,SEEK_SET);
 		fcc=read32();
 		len=read32();
-		aprintf("subindex : %lu size %lu (%lx)",i,len,len);
+                aprintf("subindex : %lu size %lu (%lx)",i,len,len);              
 		fourCC::print(fcc);aprintf("\n");
 		if(1!=fread(&second,sizeof(second),1,_fd))
 		{
 			printf("Problem reading secondary index \n");
 			return 0;
 		}	
+#ifdef CYG_MANGLING                
+                aprintf("Base : %I64x\n",second.base);
+#else                                
 		aprintf("Base : %llx\n",second.base);
+#endif                
 		uint32_t sizeflag;
 		for( j=0;j<second.nbEntryInUse;j++)
 		{
@@ -197,7 +201,12 @@ uint32_t 	i,j;
 					(*index)[count].intra=0;
 				else 
 					(*index)[count].intra=AVI_KEY_FRAME;
-				aprintf("Frame.off : %llx, size %llx\n",_idx[count].offset,
+#ifdef CYG_MANGLING
+                                aprintf("Frame.off : %I64x, size %I64x\n",
+#else                                        
+				aprintf("Frame.off : %llx, size %llx\n",
+#endif                                
+                                                                        _idx[count].offset,
 									_idx[count].size);
 				count++;									
 			
