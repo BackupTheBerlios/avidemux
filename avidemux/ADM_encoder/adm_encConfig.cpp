@@ -942,6 +942,13 @@ void loadEncoderConfig ( void )
 			return;
 		}
 		videoCodecSelectByName(name);
+		/* change some hardcoded defaults ... */
+#ifdef USE_XX_XVID
+		prefs->get(CODECS_XVID_ENCTYPE,   (uint*)&(xvidConfig.generic.mode));
+		prefs->get(CODECS_XVID_QUANTIZER, &(xvidConfig.generic.qz));
+		prefs->get(CODECS_XVID_BITRATE,   &(xvidConfig.generic.bitrate));
+		prefs->get(CODECS_XVID_FINALSIZE, &(xvidConfig.generic.finalsize));
+#endif
 }
 int videoCodecSelectByName(const char *name)
 {

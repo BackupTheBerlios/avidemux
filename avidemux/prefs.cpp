@@ -60,6 +60,10 @@ static opt_def opt_defs [] = {
 	{"codecs.dvd.matrix",		UINT,	"0",	NULL,	"0",	"99999"},
 	{"codecs.dvd.gopsize",		UINT,	"12",	NULL,	"0",	"99999"},
 	{"codecs.dvd.maxbitrate",		UINT,	"9000",	NULL,	"0",	"9900"	},
+	{"codecs.xvid.enctype",		UINT,	"0",	NULL,	"0",	"99999"},
+	{"codecs.xvid.quantizer",		UINT,	"4",	NULL,	"2",	"32"	},
+	{"codecs.xvid.bitrate",		UINT,	"1500000",NULL,	"17",	"5900000"},
+	{"codecs.xvid.finalsize",	UINT,	"700",	NULL,	"0",	"3999"	},
 	{"filters.subtitle.fontname",		STRING,"/usr/X11R6/lib/X11/fonts/truetype/arial.ttf",NULL, NULL, NULL },
 	{"filters.subtitle.charset",		STRING,"ISO-8859-1",NULL, NULL, NULL },
 	{"filters.subtitle.fontsize",		UINT,	"24",	NULL,	"1",	"576"	},
@@ -97,7 +101,7 @@ static opt_def opt_defs [] = {
 	{"feature.tryautoidx",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 55;
+int num_opts = 59;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

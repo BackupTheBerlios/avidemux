@@ -26,7 +26,7 @@
 #include "ADM_assert.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_gui/GUI_xvidparam.h"
-
+#include "prefs.h"
 
 #ifdef USE_XX_XVID 
 #include "xvid.h"
@@ -63,27 +63,29 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 
 	dialog=create_dialog1();
 	gtk_transient(dialog);
+
 	// set the right select button
  	switch (*mode)
 	    {
 	    	case COMPRESS_CBR:
 
 			RADIO_SET(radioCBR,1);
-			b=*br/1000;
-			FILL_ENTRY(entryCBR,(uint32_t)b);
 			break;
 
 		case COMPRESS_2PASS:
 			RADIO_SET(radio2Pass,1);
-			FILL_ENTRY(entry2Pass, *fsize);
 			break;
 
 	    	case COMPRESS_CQ:
 			RADIO_SET(radioCQ,1);
-			FILL_ENTRY(entryCQ, *qz);
-
 			break;
 		}
+	/* set all values, to give the user neccessary defaults if he change the */
+	/* compress radio button */
+	b=*br/1000;
+	FILL_ENTRY(entryCBR,(uint32_t)b);
+	FILL_ENTRY(entry2Pass, *fsize);
+	FILL_ENTRY(entryCQ, *qz);
 
 		xvidFill(dialog,param);
 
@@ -91,7 +93,8 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 	{
 
 		xvidRead(dialog,param);
-		int r,value=0;
+		int r;
+		uint value=0;
 		ret=1;
 		r=RADIO_GET(radioCQ)+(2*RADIO_GET(radioCBR))+(4*RADIO_GET(radio2Pass));
 
@@ -99,36 +102,33 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 			{
 				case 2:
 					*mode = COMPRESS_CBR;
+                                        prefs->set(CODECS_XVID_ENCTYPE,(uint)COMPRESS_CBR);
 				      str =		  gtk_editable_get_chars(GTK_EDITABLE (WID(entryCBR)), 0, -1);
 		      			value = (uint32_t) atoi(str);
 		      			if (value < 3000)
 			  			value *= 1000;
-		      			if (value > 16 && value < 6000000)
-					{
-			    			*br = value;
-			    			ret = 1;
-		      			}
+					prefs->set(CODECS_XVID_BITRATE,value);
+					prefs->get(CODECS_XVID_BITRATE,br);
+			    		ret = 1;
 					break;
 				case 1:
 					*mode = COMPRESS_CQ;
+                                        prefs->set(CODECS_XVID_ENCTYPE,(uint)COMPRESS_CQ);
 		      			str =	  gtk_editable_get_chars(GTK_EDITABLE(WID(entryCQ)), 0,						 -1);
 		      			value = (uint32_t) atoi(str);
-		      			if (value >= 2 && value <= 32)
-						{
-			    			*qz = value;
-		      				}
+					prefs->set(CODECS_XVID_QUANTIZER,value);
+					prefs->get(CODECS_XVID_QUANTIZER,qz);
+					ret = 1;
 		      			break;
-
 				case 4:
-		     				*mode = COMPRESS_2PASS;
-		       				str=gtk_editable_get_chars(GTK_EDITABLE(WID(entry2Pass)), 0,	 -1);
-		      				value = (uint32_t) atoi(str);
-        					if((value>0)&&(value<4000))
-          					{
-       							*fsize=value;
-				      			ret=1;
-           					}
-            					break;
+		     			*mode = COMPRESS_2PASS;
+                                        prefs->set(CODECS_XVID_ENCTYPE,(uint)COMPRESS_2PASS);
+		       			str=gtk_editable_get_chars(GTK_EDITABLE(WID(entry2Pass)), 0,	 -1);
+		      			value = (uint32_t) atoi(str);
+					prefs->set(CODECS_XVID_FINALSIZE,value);
+					prefs->get(CODECS_XVID_FINALSIZE,fsize);
+				      	ret=1;
+            				break;
 		  		default:
 		      				ADM_assert(0);
 				}
