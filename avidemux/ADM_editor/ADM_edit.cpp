@@ -238,7 +238,23 @@ UNUSED_ARG(mode);
 			 ret = _videos[_nb_video]._aviheader->open(name); 			
 			break;
       
-      OPEN_AS (Nuppel_FileType, nuvHeader);
+    case Nuppel_FileType:
+	{ // look if the idx exists
+	  char *tmpname = (char*)ADM_alloc(strlen(name)+strlen(".idx")+1);
+		ADM_assert(tmpname);
+		sprintf(tmpname,"%s.idx",name);
+		if(addFile(tmpname))
+		{
+			return 1; // Memleak ?
+		}
+		ADM_dealloc(tmpname);
+		// open .nuv file
+		_videos[_nb_video]._aviheader=new nuvHeader;
+		ret = _videos[_nb_video]._aviheader->open(name);
+		// we store the native .nuv file in the edl
+		// the next load of the edl will open .idx instead
+		break;
+	}
       OPEN_AS (BMP_FileType, picHeader);
       OPEN_AS (MpegIdx_FileType, mpeg2decHeader);
       OPEN_AS (_3GPP_FileType, _3GPHeader);
@@ -286,7 +302,7 @@ UNUSED_ARG(mode);
 			}else{ // no audio stream
 				if(indexMpeg (name,tmpname,0)){
 					printf("\n re-opening %s\n",tmpname);
-					return addFile (tmpname, 0);
+					return addFile (tmpname, 0); // memleak ?
 				} // else goto GUI_Question
 			}
 		}
