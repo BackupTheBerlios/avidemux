@@ -41,6 +41,7 @@
 			virtual 	uint8_t decodeHeaderOnly(void ) ;
 			virtual 	uint8_t decodeFull(void );
 			virtual 	uint8_t isDivxPacked( void );
+			virtual		uint32_t getSpecificMpeg4Info( void );
 }   ;
 
 class decoderFFDiv3 : public  decoderFF

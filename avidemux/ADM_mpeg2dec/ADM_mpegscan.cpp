@@ -307,8 +307,8 @@ uint8_t			mpeg2decHeader::open(char *name)
       _mainaviheader.dwMicroSecPerFrame=(uint32_t)floor(0);;     
       _videostream.fccType=fourCC::get((uint8_t *)"vids");
       _video_bih.biBitCount=24;
-      _videostream.fccHandler=fourCC::get((uint8_t *)"MPEG");
-      _video_bih.biCompression=fourCC::get((uint8_t *)"MPEG");;
+      
+      _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"MPEG");;
       
       _videostream.dwInitialFrames= 0;
       _videostream.dwStart= 0;

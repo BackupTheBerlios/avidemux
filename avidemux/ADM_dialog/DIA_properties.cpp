@@ -34,6 +34,8 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 
+#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),y);}	
+
 extern const char *getStrFromAudioCodec( uint32_t codec);
 static GtkWidget	*create_dialog (void);
 
@@ -43,7 +45,9 @@ void DIA_properties( void )
  char text[80];
  uint16_t hh, mm, ss, ms;
  GtkWidget *dialog;
-
+ uint8_t gmc, qpel,vop;
+ uint32_t info;
+ 
     if (playing)
 	return;
 
@@ -51,6 +55,12 @@ void DIA_properties( void )
     if (!avifileinfo)
 	return;
 
+	// Fetch info
+	info=video_body->getSpecificMpeg4Info();
+	vop=info & ADM_VOP_ON;
+	qpel=info & ADM_QPEL_ON;
+	gmc=info & ADM_GMC_ON;
+	
 	dialog = create_dialog();
 	gtk_transient(dialog);
 #define FILL_ENTRY(x) gtk_label_set_text((GtkLabel *) lookup_widget(dialog,#x),text);
@@ -75,6 +85,10 @@ void DIA_properties( void )
 	   	FILL_ENTRY(label_duration);	
 
 	  }
+	// Fill in vop, gmc & qpel
+	if(vop) CHECK_SET(checkbutton_vop,1);
+	if(gmc) CHECK_SET(checkbutton_gmc,1);
+	if(qpel) CHECK_SET(checkbutton_qpel,1);
 	// Now audio
 	WAVHeader *wavinfo=NULL;
 	if (currentaudiostream) wavinfo=currentaudiostream->getInfo();
@@ -146,6 +160,14 @@ create_dialog (void)
   GtkWidget *label_number;
   GtkWidget *label_videofourcc;
   GtkWidget *label_duration;
+  GtkWidget *hseparator1;
+  GtkWidget *hseparator2;
+  GtkWidget *label18;
+  GtkWidget *label19;
+  GtkWidget *label20;
+  GtkWidget *checkbutton_vop;
+  GtkWidget *checkbutton_qpel;
+  GtkWidget *checkbutton_gmc;
   GtkWidget *label1;
   GtkWidget *frame2;
   GtkWidget *table2;
@@ -177,7 +199,7 @@ create_dialog (void)
   gtk_widget_show (frame1);
   gtk_box_pack_start (GTK_BOX (vbox1), frame1, TRUE, TRUE, 0);
 
-  table1 = gtk_table_new (5, 2, FALSE);
+  table1 = gtk_table_new (9, 2, FALSE);
   gtk_widget_show (table1);
   gtk_container_add (GTK_CONTAINER (frame1), table1);
 
@@ -260,6 +282,60 @@ create_dialog (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (label_duration), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label_duration), 0, 0.5);
+
+  hseparator1 = gtk_hseparator_new ();
+  gtk_widget_show (hseparator1);
+  gtk_table_attach (GTK_TABLE (table1), hseparator1, 0, 1, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+
+  hseparator2 = gtk_hseparator_new ();
+  gtk_widget_show (hseparator2);
+  gtk_table_attach (GTK_TABLE (table1), hseparator2, 1, 2, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+  label18 = gtk_label_new (_("Vop packed"));
+  gtk_widget_show (label18);
+  gtk_table_attach (GTK_TABLE (table1), label18, 0, 1, 6, 7,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label18), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label18), 0, 0.5);
+
+  label19 = gtk_label_new (_("Quarter Pixel"));
+  gtk_widget_show (label19);
+  gtk_table_attach (GTK_TABLE (table1), label19, 0, 1, 7, 8,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label19), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label19), 0, 0.5);
+
+  label20 = gtk_label_new (_("GMC"));
+  gtk_widget_show (label20);
+  gtk_table_attach (GTK_TABLE (table1), label20, 0, 1, 8, 9,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label20), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label20), 0, 0.5);
+
+  checkbutton_vop = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkbutton_vop);
+  gtk_table_attach (GTK_TABLE (table1), checkbutton_vop, 1, 2, 6, 7,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  checkbutton_qpel = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkbutton_qpel);
+  gtk_table_attach (GTK_TABLE (table1), checkbutton_qpel, 1, 2, 7, 8,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  checkbutton_gmc = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkbutton_gmc);
+  gtk_table_attach (GTK_TABLE (table1), checkbutton_gmc, 1, 2, 8, 9,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
 
   label1 = gtk_label_new (_("<b>Video</b>"));
   gtk_widget_show (label1);
@@ -386,6 +462,14 @@ create_dialog (void)
   GLADE_HOOKUP_OBJECT (dialog1, label_number, "label_number");
   GLADE_HOOKUP_OBJECT (dialog1, label_videofourcc, "label_videofourcc");
   GLADE_HOOKUP_OBJECT (dialog1, label_duration, "label_duration");
+  GLADE_HOOKUP_OBJECT (dialog1, hseparator1, "hseparator1");
+  GLADE_HOOKUP_OBJECT (dialog1, hseparator2, "hseparator2");
+  GLADE_HOOKUP_OBJECT (dialog1, label18, "label18");
+  GLADE_HOOKUP_OBJECT (dialog1, label19, "label19");
+  GLADE_HOOKUP_OBJECT (dialog1, label20, "label20");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbutton_vop, "checkbutton_vop");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbutton_qpel, "checkbutton_qpel");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbutton_gmc, "checkbutton_gmc");
   GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
   GLADE_HOOKUP_OBJECT (dialog1, frame2, "frame2");
   GLADE_HOOKUP_OBJECT (dialog1, table2, "table2");

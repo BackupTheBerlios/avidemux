@@ -27,7 +27,17 @@
 
 #define STUBB _videos[0]._aviheader
 
+/*
+	Propagate this hack to the underlying decoder
+*/
+uint32_t ADM_Composer::getSpecificMpeg4Info( void )
+{
+	if(_nb_segment) 
+		if(_videos[0].decoder)
+	 		return _videos[0].decoder->getSpecificMpeg4Info();
+	return 0;
 
+}
 /**
   Convert a frame as seen by the gui to a segment and offset
   in the segment

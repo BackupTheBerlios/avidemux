@@ -46,13 +46,29 @@
 extern uint8_t DIA_lavDecoder(uint32_t *swapUv, uint32_t *showU);
 extern "C"
 {
-int av_is_voppacked(AVCodecContext *avctx);
+int av_is_voppacked(AVCodecContext *avctx, int *vop_packed, int *gmc, int *qpel);
 };
 uint8_t  decoderFF::isDivxPacked( void )
 {
-	return av_is_voppacked(_context);
+	int vop, gmc,qpel;
+	av_is_voppacked(_context,&vop,&gmc,&qpel);
+	return vop;
 }
-
+// Fill the bitfields for some mpeg4 specific info
+// It is a bit of a hack as we make it a general
+// stuff (i.e. shared with all codecs) whereas it is mpeg4 specific
+// and should stay within mpeg4 scope FIXME
+uint32_t decoderFF::getSpecificMpeg4Info( void )
+{
+	int vop, gmc,qpel;
+	uint32_t out=0;
+	av_is_voppacked(_context,&vop,&gmc,&qpel);
+	
+	if(qpel) out+=ADM_QPEL_ON;
+	if(gmc)  out+=ADM_GMC_ON;
+	
+	return out;
+}
 
 //________________________________________________
 void decoderFF::setParam( void )

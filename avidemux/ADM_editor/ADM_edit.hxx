@@ -192,6 +192,8 @@ class ADM_Composer
 						uint8_t  	getFrameSize(uint32_t frame,uint32_t *size) ;
 						uint8_t		sanityCheckRef(uint32_t start, uint32_t end,
 									uint32_t *fatal);
+					//*******************************************	
+						uint32_t 	getSpecificMpeg4Info( void );
 					//______________________________
 					//    Info etc... to be removed later
 					//______________________________

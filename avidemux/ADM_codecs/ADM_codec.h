@@ -22,6 +22,10 @@
 #define AVI_B_FRAME	0x4000	 // hopefully it is not used..
 #define AVI_P_FRAME   	0x0
 
+#define ADM_QPEL_ON	1
+#define ADM_GMC_ON	2
+#define ADM_VOP_ON	4
+
   typedef struct _my_ENC_RESULT_
     {
 		int is_key_frame;	// the current frame is encoded as a key frame
@@ -51,6 +55,7 @@
 			virtual uint8_t decodeHeaderOnly(void ) { return 0;};
 			virtual uint8_t decodeFull(void ) { return 0;}
 			virtual uint8_t isDivxPacked( void ){ return 0;};
+			virtual uint32_t getSpecificMpeg4Info( void ){ return 0;};
 			virtual uint8_t isIndexable( void ){ return 1;};
    }  ;
 

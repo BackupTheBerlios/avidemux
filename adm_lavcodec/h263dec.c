@@ -116,11 +116,14 @@ int ff_h263_decode_end(AVCodecContext *avctx)
     return 0;
 }
 /* MeanX : Ugly patch to detect vo ppacked stuff ... */
-int av_is_voppacked(AVCodecContext *avctx)
+int av_is_voppacked(AVCodecContext *avctx, int *vop_packed, int *gmc, int *qpel)
 {
     MpegEncContext *s = avctx->priv_data;
-  	if(s->divx_packed) return 1;
-	return 0;
+    	*qpel=*gmc=*vop_packed=0;
+  	*vop_packed=(s->divx_packed);
+	*qpel=s->quarter_sample;
+	*gmc=0;	// FIXME
+	return 1;
 
   }
   /* MeanX */

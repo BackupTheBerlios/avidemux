@@ -329,7 +329,7 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 //
 //
 //________________________________________________________________
- //*****
+
 uint8_t		ADM_Composer::decodeCache(uint32_t frame,uint32_t seg, ADMImage *image)
 {
 uint32_t len;
@@ -362,7 +362,9 @@ EditorCache *cache=_videos[seg]._videoCache;
 	// We got everything, let's go
 	// 1 compute average quant
 	for(uint32_t z=0;z<_imageBuffer->_qSize;z++)
+	{
 			sum+=_imageBuffer->quant[z];
+	}
 	sum+=(_imageBuffer->_qSize-1);
 	sum*=2;
 	sum/=_imageBuffer->_qSize;
