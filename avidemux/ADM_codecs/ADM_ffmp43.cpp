@@ -283,7 +283,9 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 	
 				//printf("420p\n");
 				src= (uint8_t **) _frame.data;
-#if 1				
+				
+				if(_frame.qstride && _frame.qscale_table)	
+				{
 				if(out->quant)
 				{
 					{
@@ -303,7 +305,9 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 						}
 					}
 				}
-#endif				
+				}
+				else out->_qStride=0;
+
 #if 0
 			if(_postproc.postProcType && _postproc.postProcStrength)
 			{ 	// we do postproc !
