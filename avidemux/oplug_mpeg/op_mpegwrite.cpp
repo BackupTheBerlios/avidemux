@@ -1073,11 +1073,13 @@ AVDMGenericAudioStream *mpt_getAudioStream(double *mypcm,uint8_t silent)
 		int32_t shift=0;
 		
 		if(!silent)
+		{
 			if(!  DIA_GetIntegerValue((int*)&shift, -1000, +1000, "Audio/video shift", 
 				"Audio Video Shift (ms):"))
 			{
 				return 0;		
 			}
+		}
 		else
 		{
 			shift=0;
