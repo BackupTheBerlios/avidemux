@@ -57,7 +57,7 @@ class  ADMVideoResampleFPS:public AVDMGenericVideoStream
     virtual uint8_t     getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
                                           ADMImage *data,uint32_t *flags);
 
-
+             uint8_t     getCoupledConf( CONFcouple **couples);
 }     ;
 
 SCRIPT_CREATE(resamplefps_script,ADMVideoResampleFPS,ResampParam);
@@ -75,6 +75,7 @@ uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
   {
     f*=1000;
     _param->newfps=(uint32_t)floor(f+0.4); 
+    _info.fps1000=_param->newfps;
     return 1;
   }      
   return 0;        
@@ -110,6 +111,7 @@ ADMVideoResampleFPS::ADMVideoResampleFPS(  AVDMGenericVideoStream *in,CONFcouple
   newlength/=_info.fps1000;
   newlength*=_param->newfps;
   _info.nb_frames=(uint32_t)floor(newlength);
+  _info.fps1000=_param->newfps;
   
 }
 ADMVideoResampleFPS::~ADMVideoResampleFPS()
@@ -117,6 +119,17 @@ ADMVideoResampleFPS::~ADMVideoResampleFPS()
   delete _param;
   
 }
+uint8_t ADMVideoResampleFPS::getCoupledConf( CONFcouple **couples)
+{
+  ADM_assert(_param);
+  *couples=new CONFcouple(1);
+
+
+                        CSET(newfps);
+                        return 1;
+}
+
+
 uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
                                              uint32_t *len,
                                              ADMImage *data,
