@@ -214,7 +214,14 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
             			printf("\n using uyvy codec\n");
 			       	return(decoders *)( new decoderUYVY(w,h));
            }
+	if(fourCC::check(fcc,(uint8_t *)"YUY2"))
+          {
+            			printf("\n using YUY2 codec\n");
+			       	return(decoders *)( new decoderYUY2(w,h));
+           }
 
+	   
+	   
 	if((fcc==0)   ||   fourCC::check(fcc,(uint8_t *)"RGB "))
   			{
             // RGB 16 Codecs
