@@ -14,17 +14,18 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include <config.h>
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <math.h>
 #include <unistd.h>
-#include <ADM_assert.h>
+
 
 #include <time.h>
 #include <sys/time.h>
-#include <config.h>
+
 
 #include "gui_action.hxx"
 #ifdef USE_FFMPEG
@@ -34,7 +35,7 @@
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
-
+#include <ADM_assert.h>
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 #include "ADM_video/ADM_genvideo.hxx"
@@ -260,7 +261,8 @@ extern  uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 		0,		//int	matrix;
 		0,		//int	interlacingType;
 		0		// bff
-	}
+	},
+	0		// unconfigured
   };
   
   MPEG2ENCConfig mpeg2encDVDConfig={
@@ -272,7 +274,8 @@ extern  uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 		0,		//int	matrix;
 		0,		//int	interlacingType;
 		0		// bff
-	}
+	},
+	0		// unconfigured
   };
 
 
@@ -483,10 +486,16 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
 					case CodecVCD:
 						break;
 					case CodecSVCD:
-						MAKECONF(mpeg2encSVCDConfig);
+						if(extraLen && (extraLen == sizeof(mpeg2encSVCDConfig)) ){
+							memcpy(&mpeg2encSVCDConfig,extraData,extraLen);
+							mpeg2encSVCDConfig.configured = 1;
+						}
 						break;
 					case CodecDVD:
-						MAKECONF(mpeg2encDVDConfig);
+						if(extraLen && (extraLen == sizeof(mpeg2encDVDConfig)) ){
+							memcpy(&mpeg2encDVDConfig,extraData,extraLen);
+							mpeg2encDVDConfig.configured = 1;
+						}
 						break;
 
 

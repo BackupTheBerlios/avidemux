@@ -4,7 +4,7 @@
 #include <strings.h>
 #include <unistd.h>	/* access(), R_OK */
 #include <errno.h>	/* errno, ENOENT */
-#include <ADM_assert.h>
+
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
@@ -14,6 +14,11 @@
 #include <libxml/tree.h>
 #include <libxml/parser.h>
 #endif
+#include <ADM_assert.h>
+
+#define free(x) ADM_dealloc(x)
+#define malloc(x) ADM_alloc(x)
+#define strdup(x) ADM_strdup(x)
 
 extern char *PathCanonize(const char *tmpname);
 
@@ -37,12 +42,26 @@ typedef struct {
 } opt_def;
 
 static opt_def opt_defs [] = {
-	{"codecs.mpeg2enc.svcd.maxbitrate",		UINT,	"2600",	NULL,	"0",	"2500"	},
-	{"codecs.mpeg2enc.svcd.quantisation",		UINT,	"10",	NULL,	"2",	"31"	},
-	{"codecs.mpeg2enc.svcd.ExtraParams",		STRING,"",	NULL, NULL, NULL },
-	{"codecs.mpeg2enc.dvd.maxbitrate",		UINT,	"9500",	NULL,	"0",	"9800"	},
-	{"codecs.mpeg2enc.dvd.quantisation",		UINT,	"7",	NULL,	"2",	"31"	},
-	{"codecs.mpeg2enc.dvd.ExtraParams",		STRING,"",	NULL, NULL, NULL },
+	{"codecs.svcd.enctype",		UINT,	"0",	NULL,	"0",	"99999"},
+	{"codecs.svcd.bitrate",		UINT,	"1500000",NULL,	"16000","2748000"},
+	{"codecs.svcd.quantizer",		UINT,	"4",	NULL,	"2",	"31"	},
+	{"codecs.svcd.finalsize",	UINT,	"700",	NULL,	"0",	"99999"},
+	{"codecs.svcd.interlaced",		UINT,	"0",	NULL,	"0",	"1"	},
+	{"codecs.svcd.bff",		UINT,	"0",	NULL,	"0",	"1"	},
+	{"codecs.svcd.widescreen",		UINT,	"0",	NULL,	"0",	"1"	},
+	{"codecs.svcd.matrix",		UINT,	"0",	NULL,	"0",	"99999"},
+	{"codecs.svcd.gopsize",		UINT,	"12",	NULL,	"0",	"99999"},
+	{"codecs.svcd.maxbitrate",		UINT,	"2500",	NULL,	"0",	"2748"	},
+	{"codecs.dvd.enctype",		UINT,	"0",	NULL,	"0",	"99999"},
+	{"codecs.dvd.bitrate",		UINT,	"1500000",NULL,	"16000","9900000"},
+	{"codecs.dvd.quantizer",		UINT,	"4",	NULL,	"2",	"31"	},
+	{"codecs.dvd.finalsize",	UINT,	"700",	NULL,	"0",	"99999"},
+	{"codecs.dvd.interlaced",		UINT,	"0",	NULL,	"0",	"1"	},
+	{"codecs.dvd.bff",		UINT,	"0",	NULL,	"0",	"1"	},
+	{"codecs.dvd.widescreen",		UINT,	"0",	NULL,	"0",	"1"	},
+	{"codecs.dvd.matrix",		UINT,	"0",	NULL,	"0",	"99999"},
+	{"codecs.dvd.gopsize",		UINT,	"12",	NULL,	"0",	"99999"},
+	{"codecs.dvd.maxbitrate",		UINT,	"9000",	NULL,	"0",	"9900"	},
 	{"filters.subtitle.fontname",		STRING,"/usr/X11R6/lib/X11/fonts/truetype/arial.ttf",NULL, NULL, NULL },
 	{"filters.subtitle.charset",		STRING,"ISO-8859-1",NULL, NULL, NULL },
 	{"filters.subtitle.fontsize",		UINT,	"24",	NULL,	"1",	"576"	},
@@ -79,7 +98,7 @@ static opt_def opt_defs [] = {
 	{"feature.disable_nuv_resync",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 40;
+int num_opts = 54;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2
@@ -492,6 +511,7 @@ int preferences::get(options option, char **val){
 int preferences::set(options option, const unsigned int val){
    unsigned int l,r;
    char buf[1024];
+   unsigned int v = val;
 	// check type of option
 	if( opt_defs[option].type != UINT ){
 		fprintf(stderr,"preferences::set(%s,uint) called for type %d\n",
@@ -507,18 +527,20 @@ int preferences::set(options option, const unsigned int val){
 		fprintf(stderr,"error reading opt_defs[option].maximum\n");
 		return RC_FAILED;
 	}
-	if( val < l ){
-		fprintf(stderr,"%s : value < min : %u < %u\n", opt_defs[option].name, val, l);
-		return RC_FAILED;
+	if( v < l ){
+		fprintf(stderr,"%s : value < min : %u < %u\n", opt_defs[option].name, v, l);
+		v = l;
+		fprintf(stderr,"   using %u as value instead.\n", v);
 	}
-	if( val > r ){
-		fprintf(stderr,"%s : value > max : %u > %u\n", opt_defs[option].name, val, r);
-		return RC_FAILED;
+	if( v > r ){
+		fprintf(stderr,"%s : value > max : %u > %u\n", opt_defs[option].name, v, r);
+		v = r;
+		fprintf(stderr,"   using %u as value instead.\n", v);
 	}
 	// set value
 	if( opt_defs[option].current_val )
 		free(opt_defs[option].current_val);
-	snprintf(buf,1024,"%u",val);
+	snprintf(buf,1024,"%u",v);
 	buf[1023] = '\0';
 	opt_defs[option].current_val = strdup(buf);
 	if( ! opt_defs[option].current_val )
@@ -529,6 +551,7 @@ int preferences::set(options option, const unsigned int val){
 int preferences::set(options option, const int val){
    int l,r;
    char buf[1024];
+   int v = val;
 	// check type of option
 	if( opt_defs[option].type != INT ){
 		fprintf(stderr,"preferences::set(%s,int) called for type %d\n",
@@ -543,18 +566,20 @@ int preferences::set(options option, const int val){
 		fprintf(stderr,"error reading opt_defs[option].maximum\n");
 		return RC_FAILED;
 	}
-	if( val < l ){
-		fprintf(stderr,"%s : value < min : %d < %d\n", opt_defs[option].name, val, l);
-		return RC_FAILED;
+	if( v < l ){
+		fprintf(stderr,"%s : value < min : %d < %d\n", opt_defs[option].name, v, l);
+		v = l;
+		fprintf(stderr,"   using %d as value instead.\n", v);
 	}
-	if( val > r ){
-		fprintf(stderr,"%s : value > max : %d > %d\n", opt_defs[option].name, val, r);
-		return RC_FAILED;
+	if( v > r ){
+		fprintf(stderr,"%s : value > max : %d > %d\n", opt_defs[option].name, v, r);
+		v = r;
+		fprintf(stderr,"   using %d as value instead.\n", v);
 	}
 	// set value
 	if( opt_defs[option].current_val )
 		free(opt_defs[option].current_val);
-	snprintf(buf,1024,"%d",val);
+	snprintf(buf,1024,"%d",v);
 	buf[1023] = '\0';
 	opt_defs[option].current_val = strdup(buf);
 	if( ! opt_defs[option].current_val )
@@ -565,6 +590,7 @@ int preferences::set(options option, const int val){
 int preferences::set(options option, const unsigned long val){
    unsigned long l,r;
    char buf[1024];
+   unsigned long v = val;
 	// check type of option
 	if( opt_defs[option].type != ULONG ){
 		fprintf(stderr,"preferences::set(%s,ulong) called for type %d\n",
@@ -580,18 +606,20 @@ int preferences::set(options option, const unsigned long val){
 		fprintf(stderr,"error reading opt_defs[option].maximum\n");
 		return RC_FAILED;
 	}
-	if( val < l ){
-		fprintf(stderr,"%s : value < min : %lu < %lu\n", opt_defs[option].name, val, l);
-		return RC_FAILED;
+	if( v < l ){
+		fprintf(stderr,"%s : value < min : %lu < %lu\n", opt_defs[option].name, v, l);
+		v = l;
+		fprintf(stderr,"   using %lu as value instead.\n", v);
 	}
-	if( val > r ){
-		fprintf(stderr,"%s : value > max : %lu > %lu\n", opt_defs[option].name, val, r);
-		return RC_FAILED;
+	if( v > r ){
+		fprintf(stderr,"%s : value > max : %lu > %lu\n", opt_defs[option].name, v, r);
+		v = r;
+		fprintf(stderr,"   using %lu as value instead.\n", v);
 	}
 	// set value
 	if( opt_defs[option].current_val )
 		free(opt_defs[option].current_val);
-	snprintf(buf,1024,"%lu",val);
+	snprintf(buf,1024,"%lu",v);
 	buf[1023] = '\0';
 	opt_defs[option].current_val = strdup(buf);
 	if( ! opt_defs[option].current_val )
@@ -602,6 +630,7 @@ int preferences::set(options option, const unsigned long val){
 int preferences::set(options option, const long val){
    long l,r;
    char buf[1024];
+   long v = val;
 	// check type of option
 	if( opt_defs[option].type != LONG ){
 		fprintf(stderr,"preferences::set(%s,long) called for type %d\n",
@@ -617,18 +646,20 @@ int preferences::set(options option, const long val){
 		fprintf(stderr,"error reading opt_defs[option].maximum\n");
 		return RC_FAILED;
 	}
-	if( val < l ){
-		fprintf(stderr,"%s : value < min : %ld < %ld\n", opt_defs[option].name, val, l);
-		return RC_FAILED;
+	if( v < l ){
+		fprintf(stderr,"%s : value < min : %ld < %ld\n", opt_defs[option].name, v, l);
+		v = l;
+		fprintf(stderr,"   using %ld as value instead.\n", v);
 	}
-	if( val > r ){
-		fprintf(stderr,"%s : value > max : %ld > %ld\n", opt_defs[option].name, val, r);
-		return RC_FAILED;
+	if( v > r ){
+		fprintf(stderr,"%s : value > max : %ld > %ld\n", opt_defs[option].name, v, r);
+		v = r;
+		fprintf(stderr,"   using %ld as value instead.\n", v);
 	}
 	// set value
 	if( opt_defs[option].current_val )
 		free(opt_defs[option].current_val);
-	snprintf(buf,1024,"%ld",val);
+	snprintf(buf,1024,"%ld",v);
 	buf[1023] = '\0';
 	opt_defs[option].current_val = strdup(buf);
 	if( ! opt_defs[option].current_val )
@@ -639,6 +670,7 @@ int preferences::set(options option, const long val){
 int preferences::set(options option, const float val){
    float l,r;
    char buf[1024];
+   float v = val;
 	// check type of option
 	if( opt_defs[option].type != FLOAT ){
 		fprintf(stderr,"preferences::set(%s,float) called for type %d\n",
@@ -654,18 +686,20 @@ int preferences::set(options option, const float val){
 		fprintf(stderr,"error reading opt_defs[option].maximum\n");
 		return RC_FAILED;
 	}
-	if( val < l ){
-		fprintf(stderr,"%s : value < min : %f < %f\n", opt_defs[option].name, val, l);
-		return RC_FAILED;
+	if( v < l ){
+		fprintf(stderr,"%s : value < min : %f < %f\n", opt_defs[option].name, v, l);
+		v = l;
+		fprintf(stderr,"   using %f as value instead.\n", v);
 	}
-	if( val > r ){
-		fprintf(stderr,"%s : value > max : %f > %f\n", opt_defs[option].name, val, r);
-		return RC_FAILED;
+	if( v > r ){
+		fprintf(stderr,"%s : value > max : %f > %f\n", opt_defs[option].name, v, r);
+		v = r;
+		fprintf(stderr,"   using %f as value instead.\n", v);
 	}
 	// set value
 	if( opt_defs[option].current_val )
 		free(opt_defs[option].current_val);
-	snprintf(buf,1024,"%f",val);
+	snprintf(buf,1024,"%f",v);
 	buf[1023] = '\0';
 	opt_defs[option].current_val = strdup(buf);
 	if( ! opt_defs[option].current_val )

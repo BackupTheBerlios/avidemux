@@ -11,12 +11,26 @@
 # maximum     :: the largest  value this option can have (ignored for STRING)
 
 # option name				type	value	minimum	maximum (incl.)
-codecs.mpeg2enc.svcd.maxbitrate,	UINT,	2600,	0,	2500
-codecs.mpeg2enc.svcd.quantisation,	UINT,	10,	2,	31
-codecs.mpeg2enc.svcd.ExtraParams,	STRING,	""
-codecs.mpeg2enc.dvd.maxbitrate,		UINT,	9500,	0,	9800
-codecs.mpeg2enc.dvd.quantisation,	UINT,	7,	2,	31
-codecs.mpeg2enc.dvd.ExtraParams,	STRING,	""
+codecs.svcd.enctype,			UINT,	0,	0,	99999
+codecs.svcd.bitrate,			UINT,	1500000,16000,	2748000
+codecs.svcd.quantizer,			UINT,	4,	2,	31
+codecs.svcd.finalsize,			UINT,	700,	0,	99999
+codecs.svcd.interlaced,			UINT,	0,	0,	1
+codecs.svcd.bff,			UINT,	0,	0,	1
+codecs.svcd.widescreen,			UINT,	0,	0,	1
+codecs.svcd.matrix,			UINT,	0,	0,	99999
+codecs.svcd.gopsize,			UINT,	12,	0,	99999
+codecs.svcd.maxbitrate,			UINT,	2500,	0,	2748
+codecs.dvd.enctype,			UINT,	0,	0,	99999
+codecs.dvd.bitrate,			UINT,	1500000,16000,	9900000
+codecs.dvd.quantizer,			UINT,	4,	2,	31
+codecs.dvd.finalsize,			UINT,	700,	0,	99999
+codecs.dvd.interlaced,			UINT,	0,	0,	1
+codecs.dvd.bff,				UINT,	0,	0,	1
+codecs.dvd.widescreen,			UINT,	0,	0,	1
+codecs.dvd.matrix,			UINT,	0,	0,	99999
+codecs.dvd.gopsize,			UINT,	12,	0,	99999
+codecs.dvd.maxbitrate,			UINT,	9000,	0,	9900
 filters.subtitle.fontname,		STRING, "/usr/X11R6/lib/X11/fonts/truetype/arial.ttf"
 filters.subtitle.charset,		STRING, "ISO-8859-1"
 filters.subtitle.fontsize,		UINT,	24,	1,	576

@@ -30,7 +30,7 @@
 #include <math.h>
 #include <unistd.h>
 
-#include "ADM_assert.h"
+
 
 #include <time.h>
 #include <sys/time.h>
@@ -46,6 +46,7 @@
 
 #include "fourcc.h"
 #include "avi_vars.h"
+#include "ADM_assert.h"
 #include "ADM_toolkit/filesel.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "prototype.h"
@@ -90,7 +91,7 @@
 #include "mpeg2enc/ADM_mpeg2enc.h"
 
 #include "ADM_filter/video_filters.h"
-
+#include "ADM_assert.h"
 void A_handleSecondTrack (int tracktype);
 int A_delete(uint32_t start, uint32_t end);
 void A_saveImg (char *name);
@@ -443,9 +444,9 @@ case ACT_Pipe2Other:
       break;
     case ACT_SaveCurrentWork:
       if( actual_workbench_file ){
-        char *tmp = strdup(actual_workbench_file);
+        char *tmp = ADM_strdup(actual_workbench_file);
          A_saveWorkbench( tmp ); // will write "actual_workbench_file" itself
-         free(tmp);
+         ADM_dealloc(tmp);
       }else{
          GUI_FileSelWrite ("Select workbench to save ", A_saveWorkbench);
       }
@@ -737,7 +738,7 @@ case ACT_Pipe2Other:
 
 		// forget last project file
 		if( actual_workbench_file ){
-			free(actual_workbench_file);
+			ADM_dealloc(actual_workbench_file);
 			actual_workbench_file = NULL;
 		}
 	}
@@ -902,7 +903,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 
   // forget last project file
   if( actual_workbench_file ){
-     free(actual_workbench_file);
+     ADM_dealloc(actual_workbench_file);
      actual_workbench_file = NULL;
   }
 
@@ -931,7 +932,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 		if( read(fd,magic,4) == 4 ){
 			/* remember a workbench file */
 			if( !strncmp(magic,"ADMW",4) ){
-				actual_workbench_file = strdup(longname);
+				actual_workbench_file = ADM_strdup(longname);
 			}
 		}
 		close(fd);
@@ -951,7 +952,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 			break;
 		}
 	UI_setTitle(longname+i);
-	free(longname);
+	ADM_dealloc(longname);
     }
 	return 1;
 }
@@ -1399,7 +1400,7 @@ sz = avifileinfo->width* avifileinfo->height * 3;
   	if (!fd)
     	{
       	GUI_Alert ("Something bad happened.");
-	free(out);
+	ADM_dealloc(out);
       	return;
     	}
 
@@ -1431,7 +1432,7 @@ sz = avifileinfo->width* avifileinfo->height * 3;
       	fwrite (out, sz, 1, fd);
 
     	fclose(fd);
-    	free(out);
+    	ADM_dealloc(out);
 
   GUI_Alert ("Done.");
 
@@ -1625,7 +1626,7 @@ A_saveAudioDecodedTest (char *name)
 	}
   saveFilter->endWrite (out, written);
   fclose (out);
-  free (outbuffer);
+  ADM_dealloc (outbuffer);
   delete work;
   deleteAudioFilter ();
   currentaudiostream->endDecompress ();
@@ -1998,8 +1999,8 @@ A_saveWorkbench (char *name)
 {
   video_body->saveWorbench (name);
   if( actual_workbench_file )
-     free(actual_workbench_file);
-  actual_workbench_file = strdup(name);
+     ADM_dealloc(actual_workbench_file);
+  actual_workbench_file = ADM_strdup(name);
 }
 
 //---------------------
@@ -2060,7 +2061,7 @@ void A_Pipe(pipID who,char *outfile)
 		}
 		else
 		{
-			file=strdup(outfile);
+			file=ADM_strdup(outfile);
 		}
 
 	if(!file) return;
@@ -2089,9 +2090,9 @@ void A_Pipe(pipID who,char *outfile)
 				break;
 	}
     deleteAudioFilter();
-    if(param) free(param);
-    if(cmd) free(cmd);
-    if(file) free(file);
+    if(param) ADM_dealloc(param);
+    if(cmd) ADM_dealloc(cmd);
+    if(file) ADM_dealloc(file);
     GUI_Alert("Done!");
 
 }

@@ -14,14 +14,15 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 #include <math.h>
 #include <math.h>
 #include <iconv.h>
-#include "config.h"
+
 
 #ifdef USE_FREETYPE
 
@@ -31,11 +32,15 @@
 #include "avi_vars.h"
 
 #include "ADM_toolkit/toolkit.hxx"
+
+
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include "ADM_video/ADM_vidFont.h"
 #include "ADM_video/ADM_vidSRT.h"
+
+#include <ADM_assert.h>
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
@@ -165,11 +170,11 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 			{ char *tmp;
 			   prefs->get(FILTERS_SUBTITLE_FONTNAME,&tmp);
 			   strcpy(_conf->_fontname,tmp);
-			   free(tmp);
+			   ADM_dealloc(tmp);
 			   
 			   prefs->get(FILTERS_SUBTITLE_CHARSET,&tmp);
 			   strcpy(_conf->_charset,tmp); 
-                           free(tmp);
+                           ADM_dealloc(tmp);
 			}
 			
 	}
@@ -340,9 +345,9 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 		}
 	if(_conf)
 	{
-			free(_conf->_subname);
-			free(_conf->_fontname);
-			free(_conf->_charset);
+			ADM_dealloc(_conf->_subname);
+			ADM_dealloc(_conf->_fontname);
+			ADM_dealloc(_conf->_charset);
 
 		 	DELETE(_conf);
 	}

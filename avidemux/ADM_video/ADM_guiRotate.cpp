@@ -15,18 +15,18 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
 #include <math.h>
 
-#include "config.h"
+
 #include "fourcc.h"
 #include "avio.hxx"
 #include "config.h"
@@ -42,6 +42,8 @@
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
+#include <ADM_assert.h>
+
 
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 
@@ -120,9 +122,9 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
   _info.width = _param->width;
   _info.height = _param->height;
 
-  free(video_rgb);
+  ADM_dealloc(video_rgb);
   delete video_yuv_orig;
-  free(video_yuv);
+  ADM_dealloc(video_yuv);
 
   video_rgb =  video_yuv = NULL;
   video_yuv_orig =NULL;

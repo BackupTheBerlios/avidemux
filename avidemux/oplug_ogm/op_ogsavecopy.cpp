@@ -9,20 +9,23 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-#include "ADM_assert.h"
+
 
 
 #include <time.h>
 #include <sys/time.h>
 
-#include "config.h"
+
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_assert.h"
 #include "subchunk.h"
 #include "avilist.h"
 

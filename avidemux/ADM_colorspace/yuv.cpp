@@ -20,15 +20,15 @@ Not optimised for speed at all, should take the one from ffmpeg
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
-#include "config.h"
+
 #include "ADM_library/default.h"
 
-
+#include <ADM_assert.h>
 #include "colorspace.h"
 
 

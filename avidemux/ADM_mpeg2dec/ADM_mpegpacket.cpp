@@ -15,14 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 #include <stdio.h>
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-#ifdef __FreeBSD__
-          #include <sys/types.h>
-#endif
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
 #include "config.h"
 #include <math.h>
@@ -35,6 +29,7 @@
 #include "ADM_audio/aviaudio.hxx"
 
 #include "ADM_library/fourcc.h"
+#include <ADM_assert.h>
 #include "ADM_mpeg2dec/ADM_mpegpacket.h"
 #include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
 

@@ -18,6 +18,7 @@
 #include "ADM_toolkit/toolkit_gtk_include.h"
 
 #include "prefs.h"
+#include "../ADM_assert.h"
 static GtkWidget	*create_dialog1 (void);
 
 uint8_t DIA_pipe(char **cmd,char **param)
@@ -60,13 +61,13 @@ gtk_editable_insert_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), str, 
 			str=READ_ENTRY(entryName);
 			if(strlen(str))
 			{
-				*cmd=strdup(str);;
+				*cmd=ADM_strdup(str);;
 				prefs->set(PIPE_CMD,str);
 			}
 			str=READ_ENTRY(entryName);
 			if(strlen(str))
 			{
-				*param=strdup(str);;
+				*param=ADM_strdup(str);;
 				prefs->set(PIPE_PARAM,str);
 			}
 			ret=1;

@@ -184,7 +184,7 @@ uint32_t targety;
 			}
 		}
 		if( inputratio ){
-			free(inputratio);
+			ADM_dealloc(inputratio);
 			inputratio = NULL;
 		}
 			original_x=(uint32_t)floor(rx+0.49);

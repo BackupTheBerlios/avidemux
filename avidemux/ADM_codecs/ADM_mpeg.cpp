@@ -19,8 +19,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
 #include "config.h"
+
+#include <stdio.h>
+
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
@@ -28,7 +30,7 @@
 #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
 //#include <math.h>
 #include "ADM_library/default.h"
@@ -46,7 +48,7 @@ extern "C"
 #include "libMpeg2Dec/video_out.h"
 #include "libMpeg2Dec/mpeg2.h"
 #include "libMpeg2Dec/mpeg2_internal.h"
-
+#include <ADM_assert.h>
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_CODEC
 #include "ADM_toolkit/ADM_debug.h"
@@ -96,7 +98,7 @@ uint8_t decoderMpeg::kill_codec (void)
   
   if(dec->quant)
   {
-  	free(dec->quant);
+  	ADM_dealloc(dec->quant);
 	dec->quant=NULL;
   }
   mpeg2_close (MPEG2DEC);

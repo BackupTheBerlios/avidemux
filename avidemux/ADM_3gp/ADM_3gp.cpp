@@ -45,15 +45,16 @@ http://developer.apple.com/documentation/QuickTime/QTFF/QTFFChap2/chapter_3_sect
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
-#include "config.h"
+
 #include "math.h"
 
+#include <ADM_assert.h>
 #include "ADM_library/default.h"
 #include "ADM_editor/ADM_Video.h"
 

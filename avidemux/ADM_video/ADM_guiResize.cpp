@@ -17,10 +17,11 @@ GUI part of resize.
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
@@ -28,7 +29,7 @@ GUI part of resize.
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
-#include "config.h"
+
 #include "avi_vars.h"
 #ifdef HAVE_ENCODER
 
@@ -38,6 +39,9 @@ GUI part of resize.
 #include "ADM_video/ADM_resizebis.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include <ADM_assert.h>
+
+
 static int getResizeParams(uint32_t * w, uint32_t * h, uint32_t * algo,uint32_t w,uint32_t h,uint32_t fps);
 
 

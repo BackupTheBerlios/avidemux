@@ -18,14 +18,7 @@
  *                                                                         *
  ***************************************************************************/
 #include <stdio.h>
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-#ifdef __FreeBSD__
-          #include <sys/types.h>
-#endif
 #include <stdlib.h>
-#include <ADM_assert.h>
 
 
 
@@ -37,6 +30,8 @@
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "avio.hxx"
+#include <ADM_assert.h>
+
 #include "fourcc.h"
 #include "riffparser.h"
 #include "subchunk.h"

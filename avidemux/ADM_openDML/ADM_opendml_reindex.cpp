@@ -12,13 +12,15 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
-#include "config.h"
+
 #include "math.h"
+#include <ADM_assert.h>
 #ifdef ADM_DEBUG
 //	#define ODML_INDEX_VERBOSE
 #endif

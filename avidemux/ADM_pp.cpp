@@ -15,15 +15,17 @@
 //             2 Verti deblock
 //             4 Dering
 // strength between 0 and 5
+#include "config.h"
  
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
-#include "config.h"
+
 
 #include "ADM_lavcodec.h"
+#include <ADM_assert.h>
+
 #include "ADM_library/default.h"
 
 #include "ADM_toolkit/ADM_cpuCap.h"

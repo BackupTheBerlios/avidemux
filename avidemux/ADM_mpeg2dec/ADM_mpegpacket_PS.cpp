@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
 
 #include <math.h>
@@ -33,7 +33,7 @@
 #include "ADM_library/default.h"
 
 #include "ADM_mpegindexer/ADM_mpegparser.h"
-
+#include <ADM_assert.h>
 #include "ADM_mpeg2dec/ADM_mpegpacket.h"
 #include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
 

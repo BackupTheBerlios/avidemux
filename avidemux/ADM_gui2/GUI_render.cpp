@@ -17,19 +17,21 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 
 #include <stdio.h>         
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
 
-#include "config.h"
+
 #include "avi_vars.h"
+#include <ADM_assert.h>
+
 #include "prototype.h"
 #include "ADM_colorspace/colorspace.h"
 //#include "ADM_gui/GUI_vars.h"

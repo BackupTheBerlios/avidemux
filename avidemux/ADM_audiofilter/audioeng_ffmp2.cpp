@@ -60,7 +60,7 @@ AVDMProcessAudio_FFmpeg::~AVDMProcessAudio_FFmpeg()
 {
     delete(_wavheader);
     avcodec_close(CONTEXT);
-    free(_context);
+    ADM_dealloc(_context);
     if(_bfer)
     	{
 			 	delete [] _bfer;

@@ -14,14 +14,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <stdio.h>
-#include <ADM_assert.h>
-#include <string.h>
 #include "config.h"
+
+#include <stdio.h>
+#include <string.h>
+
 #include "avifmt.h"
 #include "avifmt2.h"
 #include "fourcc.h"
 
+#include <ADM_assert.h>
 void fourCC::print(uint32_t fourcc)
 {
     char s[5];

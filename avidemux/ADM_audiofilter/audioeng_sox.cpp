@@ -395,8 +395,8 @@ int sox_stop(ResampleStruct *r)
 {
 	
 	
-	free(r->Imp - 1);
-	free(r->X);
+	ADM_dealloc((r->Imp - 1));
+	ADM_dealloc(r->X);
 	/* free(r->Y); Y is in same block starting at X */ 
 	return (1);
 }
@@ -919,7 +919,7 @@ int makeFilter(Float Imp[], long Nwing, double Froll, double Beta,
       for (i=0; i<Mwing; i++)
          Imp[i] = ImpR[i];
    }
-   free(ImpR);
+   ADM_dealloc(ImpR);
    for (i=Mwing; i<=Nwing; i++) Imp[i] = 0;
    /* Imp[Mwing] and Imp[-1] needed for quadratic interpolation */
    Imp[-1] = Imp[1];

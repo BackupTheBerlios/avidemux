@@ -44,7 +44,7 @@ int push_cleanup( void )
 {
 	if(lum_mean)
 	{
-		free(lum_mean);
+		delete [] lum_mean;
 	}
 	lum_mean=NULL;
 

@@ -102,7 +102,7 @@ int yywrap(void)
 //	args[i] is the nth parameter
 int Call( char *value)
 {
-char *command=strdup(value);
+char *command=ADM_strdup(value);
 ASC_ERROR status;
 int	  ret=1;
 	
@@ -134,7 +134,7 @@ int	  ret=1;
 	}
 	
 	CleanParam();
-	free(command);
+	ADM_dealloc(command);
 	return ret;
 }
 //______________________________
@@ -145,7 +145,7 @@ void CleanParam(void)
 	{
 		if(args[i].type==APM_STRING)
 		{
-			free(args[i].arg.string);
+			ADM_dealloc(args[i].arg.string);
 			args[i].arg.string=NULL;
 		}	
 	}
@@ -180,7 +180,7 @@ char *alt;
 			myarg->arg.integer=atoi(value);			
 			break;
 		case APM_STRING: 
-			alt=strdup(value);			
+			alt=ADM_strdup(value);			
 			myarg->type=APM_STRING;
 			myarg->arg.string=alt;
 			break;
@@ -194,7 +194,7 @@ char *alt;
 			break;
 		case APM_QUOTED:
 		// Get rid of "" 
-			alt=strdup(value+1);			
+			alt=ADM_strdup(value+1);			
 			alt[strlen(alt)-1]=0;			
 			myarg->type=APM_STRING;
 			myarg->arg.string=alt;			

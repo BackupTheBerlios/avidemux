@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <ADM_assert.h>
+
 #include "ADM_library/default.h"
 #ifndef CYG_MANGLING
 #include <X11/Xlib.h>
@@ -33,7 +33,7 @@
 
 #include <time.h>
 #include <sys/time.h>
-
+#include <ADM_assert.h>
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_gui2/GUI_render.h"
 

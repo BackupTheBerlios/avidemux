@@ -18,7 +18,7 @@
  *                                                                         *
  ***************************************************************************/
 
-
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,7 +29,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "config.h"
+
 
 #include "callbacks.h"
 #include "interface.h"
@@ -43,6 +43,7 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "prototype.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_assert.h"
 #include "ADM_toolkit/bitmap.h"
 #include "subchunk.h"
 #include "avilist.h"

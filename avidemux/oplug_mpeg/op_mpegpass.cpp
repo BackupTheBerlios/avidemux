@@ -19,13 +19,13 @@
 #include <time.h>
 #include <sys/time.h>
 #include <errno.h>
-#include <ADM_assert.h>
+
 
 #include "ADM_library/default.h"
 #include "avi_vars.h"
 //#include "aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
-
+#include <ADM_assert.h>
 #include "ADM_dialog/DIA_working.h"
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"

@@ -25,6 +25,7 @@ typedef struct MPEG2ENCConfig
 {
 		COMPRES_PARAMS generic;
 		Mpeg2encParam specific;
+		unsigned int configured; // 0 == defaults, 1 == configured by user or prefs or saved_file
 }MPEG2ENCConfig;
 
 #define MPG_4_3 	2

@@ -14,15 +14,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-#include "ADM_assert.h" 
 
 #include <time.h>
 #include <sys/time.h>
-#include "config.h"
+
 #ifdef USE_FFMPEG
 extern "C" {
 	#include "ADM_lavcodec.h"
@@ -42,6 +43,9 @@ extern "C" {
 #include "ADM_filter/video_filters.h"
 #include "ADM_codecs/ADM_divxEncode.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
+
+#include "ADM_assert.h" 
+
 
 #include "oplug_avi/op_aviwrite.hxx"
 #include "oplug_avi/op_avisave.h"

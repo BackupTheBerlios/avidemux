@@ -17,20 +17,25 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 
-#include "config.h"
+
+
 #include "fourcc.h"
 #include "avio.hxx"
+#include <ADM_assert.h>
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_inpics/ADM_pics.h"
+
 #include "ADM_nuv/ADM_nuv.h"
 #include "ADM_h263/ADM_h263.h"
+
 #include "ADM_mpeg2dec/ADM_mpegscan.h"
 #include "ADM_toolkit/toolkit.hxx"
+
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
@@ -119,7 +124,7 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 
   saveVideoCodecConf(tmp);
   
-  free (tmp);
+  ADM_dealloc (tmp);
   return 1;
 
 
@@ -278,7 +283,7 @@ uint8_t ADM_Composer::loadWorbench (char *name)
   loadVideoCodecConf(tmp);
   
     
-  free (tmp);
+  ADM_dealloc (tmp);
   return 1;
 
 }

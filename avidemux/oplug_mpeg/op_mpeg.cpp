@@ -14,21 +14,23 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include "config.h"
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
-#include "config.h"
-#include <ADM_assert.h>
+
+
 
 
 #include "ADM_lavcodec.h"
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include <ADM_assert.h>
 #include "subchunk.h"
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
@@ -225,7 +227,20 @@ void oplug_mpeg_dvd_run(char *name)
 }
 void oplug_mpeg_svcdConf( void )
 {
-
+	if( mpeg2encSVCDConfig.configured == 0 ){
+		prefs->get( CODECS_SVCD_ENCTYPE,    (unsigned int*)&mpeg2encSVCDConfig.generic.mode);
+		prefs->get( CODECS_SVCD_BITRATE,    &mpeg2encSVCDConfig.generic.bitrate);
+		prefs->get( CODECS_SVCD_QUANTIZER,  &mpeg2encSVCDConfig.generic.qz);
+		prefs->get( CODECS_SVCD_FINALSIZE,  &mpeg2encSVCDConfig.generic.finalsize);
+		prefs->get( CODECS_SVCD_INTERLACED, &mpeg2encSVCDConfig.specific.interlaced);
+		prefs->get( CODECS_SVCD_BFF,        &mpeg2encSVCDConfig.specific.bff);
+		prefs->get( CODECS_SVCD_WIDESCREEN, &mpeg2encSVCDConfig.specific.widescreen);
+		prefs->get( CODECS_SVCD_MATRIX,     &mpeg2encSVCDConfig.specific.user_matrix);
+		prefs->get( CODECS_SVCD_GOPSIZE,    &mpeg2encSVCDConfig.specific.gop_size);
+		prefs->get( CODECS_SVCD_MAXBITRATE, &mpeg2encSVCDConfig.specific.maxBitrate);
+		mpeg2encSVCDConfig.specific.maxBitrate = (mpeg2encSVCDConfig.specific.maxBitrate*1000) >> 3;
+		mpeg2encSVCDConfig.configured = 1;
+	}
 	DIA_SVCDParam( (char *)"SVCD", &mpeg2encSVCDConfig.generic.mode,
 			&mpeg2encSVCDConfig.generic.qz,
 			&mpeg2encSVCDConfig.generic.bitrate,
@@ -233,10 +248,47 @@ void oplug_mpeg_svcdConf( void )
 			&mpeg2encSVCDConfig.specific
 
 			);
+	/* set configured values to prefs */
+	prefs->set( CODECS_SVCD_ENCTYPE,    (unsigned int)mpeg2encSVCDConfig.generic.mode);
+	prefs->set( CODECS_SVCD_BITRATE,    mpeg2encSVCDConfig.generic.bitrate);
+	prefs->set( CODECS_SVCD_QUANTIZER,  mpeg2encSVCDConfig.generic.qz);
+	prefs->set( CODECS_SVCD_FINALSIZE,  mpeg2encSVCDConfig.generic.finalsize);
+	prefs->set( CODECS_SVCD_INTERLACED, mpeg2encSVCDConfig.specific.interlaced);
+	prefs->set( CODECS_SVCD_BFF,        mpeg2encSVCDConfig.specific.bff);
+	prefs->set( CODECS_SVCD_WIDESCREEN, mpeg2encSVCDConfig.specific.widescreen);
+	prefs->set( CODECS_SVCD_MATRIX,     mpeg2encSVCDConfig.specific.user_matrix);
+	prefs->set( CODECS_SVCD_GOPSIZE,    mpeg2encSVCDConfig.specific.gop_size);
+	mpeg2encSVCDConfig.specific.maxBitrate = (mpeg2encSVCDConfig.specific.maxBitrate << 3) / 1000;
+	prefs->set( CODECS_SVCD_MAXBITRATE, mpeg2encSVCDConfig.specific.maxBitrate);
+	/* read "fixed"-"in range" values for further processing */
+	prefs->get( CODECS_SVCD_ENCTYPE,    (unsigned int*)&mpeg2encSVCDConfig.generic.mode);
+	prefs->get( CODECS_SVCD_BITRATE,    &mpeg2encSVCDConfig.generic.bitrate);
+	prefs->get( CODECS_SVCD_QUANTIZER,  &mpeg2encSVCDConfig.generic.qz);
+	prefs->get( CODECS_SVCD_FINALSIZE,  &mpeg2encSVCDConfig.generic.finalsize);
+	prefs->get( CODECS_SVCD_INTERLACED, &mpeg2encSVCDConfig.specific.interlaced);
+	prefs->get( CODECS_SVCD_BFF,        &mpeg2encSVCDConfig.specific.bff);
+	prefs->get( CODECS_SVCD_WIDESCREEN, &mpeg2encSVCDConfig.specific.widescreen);
+	prefs->get( CODECS_SVCD_MATRIX,     &mpeg2encSVCDConfig.specific.user_matrix);
+	prefs->get( CODECS_SVCD_GOPSIZE,    &mpeg2encSVCDConfig.specific.gop_size);
+	prefs->get( CODECS_SVCD_MAXBITRATE, &mpeg2encSVCDConfig.specific.maxBitrate);
+	mpeg2encSVCDConfig.specific.maxBitrate = (mpeg2encSVCDConfig.specific.maxBitrate*1000) >> 3;
 }
 void oplug_mpeg_dvdConf( void )
 {
-
+	if( mpeg2encDVDConfig.configured == 0 ){
+		prefs->get( CODECS_DVD_ENCTYPE,    (unsigned int*)&mpeg2encDVDConfig.generic.mode);
+		prefs->get( CODECS_DVD_BITRATE,    &mpeg2encDVDConfig.generic.bitrate);
+		prefs->get( CODECS_DVD_QUANTIZER,  &mpeg2encDVDConfig.generic.qz);
+		prefs->get( CODECS_DVD_FINALSIZE,  &mpeg2encDVDConfig.generic.finalsize);
+		prefs->get( CODECS_DVD_INTERLACED, &mpeg2encDVDConfig.specific.interlaced);
+		prefs->get( CODECS_DVD_BFF,        &mpeg2encDVDConfig.specific.bff);
+		prefs->get( CODECS_DVD_WIDESCREEN, &mpeg2encDVDConfig.specific.widescreen);
+		prefs->get( CODECS_DVD_MATRIX,     &mpeg2encDVDConfig.specific.user_matrix);
+		prefs->get( CODECS_DVD_GOPSIZE,    &mpeg2encDVDConfig.specific.gop_size);
+		prefs->get( CODECS_DVD_MAXBITRATE, &mpeg2encDVDConfig.specific.maxBitrate);
+		mpeg2encDVDConfig.specific.maxBitrate = (mpeg2encDVDConfig.specific.maxBitrate*1000) >> 3;
+		mpeg2encDVDConfig.configured = 1;
+	}
 	DIA_SVCDParam( (char *)"DVD", &mpeg2encDVDConfig.generic.mode,
 			&mpeg2encDVDConfig.generic.qz,
 			&mpeg2encDVDConfig.generic.bitrate,
@@ -244,5 +296,29 @@ void oplug_mpeg_dvdConf( void )
 			&mpeg2encDVDConfig.specific
 
 			);
+	/* set configured values to prefs */
+	prefs->set( CODECS_DVD_ENCTYPE,    (unsigned int)mpeg2encDVDConfig.generic.mode);
+	prefs->set( CODECS_DVD_BITRATE,    mpeg2encDVDConfig.generic.bitrate);
+	prefs->set( CODECS_DVD_QUANTIZER,  mpeg2encDVDConfig.generic.qz);
+	prefs->set( CODECS_DVD_FINALSIZE,  mpeg2encDVDConfig.generic.finalsize);
+	prefs->set( CODECS_DVD_INTERLACED, mpeg2encDVDConfig.specific.interlaced);
+	prefs->set( CODECS_DVD_BFF,        mpeg2encDVDConfig.specific.bff);
+	prefs->set( CODECS_DVD_WIDESCREEN, mpeg2encDVDConfig.specific.widescreen);
+	prefs->set( CODECS_DVD_MATRIX,     mpeg2encDVDConfig.specific.user_matrix);
+	prefs->set( CODECS_DVD_GOPSIZE,    mpeg2encDVDConfig.specific.gop_size);
+	mpeg2encDVDConfig.specific.maxBitrate = (mpeg2encDVDConfig.specific.maxBitrate << 3) / 1000;
+	prefs->set( CODECS_DVD_MAXBITRATE, mpeg2encDVDConfig.specific.maxBitrate);
+	/* read "fixed"-"in range" values for further processing */
+	prefs->get( CODECS_DVD_ENCTYPE,    (unsigned int*)&mpeg2encDVDConfig.generic.mode);
+	prefs->get( CODECS_DVD_BITRATE,    &mpeg2encDVDConfig.generic.bitrate);
+	prefs->get( CODECS_DVD_QUANTIZER,  &mpeg2encDVDConfig.generic.qz);
+	prefs->get( CODECS_DVD_FINALSIZE,  &mpeg2encDVDConfig.generic.finalsize);
+	prefs->get( CODECS_DVD_INTERLACED, &mpeg2encDVDConfig.specific.interlaced);
+	prefs->get( CODECS_DVD_BFF,        &mpeg2encDVDConfig.specific.bff);
+	prefs->get( CODECS_DVD_WIDESCREEN, &mpeg2encDVDConfig.specific.widescreen);
+	prefs->get( CODECS_DVD_MATRIX,     &mpeg2encDVDConfig.specific.user_matrix);
+	prefs->get( CODECS_DVD_GOPSIZE,    &mpeg2encDVDConfig.specific.gop_size);
+	prefs->get( CODECS_DVD_MAXBITRATE, &mpeg2encDVDConfig.specific.maxBitrate);
+	mpeg2encDVDConfig.specific.maxBitrate = (mpeg2encDVDConfig.specific.maxBitrate*1000) >> 3;
 }
 

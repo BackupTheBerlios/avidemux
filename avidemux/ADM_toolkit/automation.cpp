@@ -17,17 +17,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
 #include "config.h"
+
 #include <stdlib.h>
 #include <glib.h>
 #include <signal.h>
-#include <ADM_assert.h>
 #ifndef CYG_MANGLING
 #include <unistd.h>
 #endif
 #include <math.h>
-#include "config.h"
+
 
 #include <gtk/gtk.h>
 
@@ -36,6 +35,8 @@
 #include "support.h"
 #include "avi_vars.h"
 //#include "ADM_gui/GUI_vars.h"
+#include <ADM_assert.h>
+
 #include "gui_action.hxx"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"

@@ -17,13 +17,14 @@ Convert yv12 to bmp firendly RGB
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
-#include <string.h>
-#include "config.h"
-#include "ADM_library/default.h"
 
+#include <string.h>
+
+#include "ADM_library/default.h"
+#include <ADM_assert.h>
 
 #include "colorspace.h"
 #ifdef HAVE_ALTIVEC
@@ -100,7 +101,7 @@ ____________________________________________
       write+=w;
     }
 
-	free(tmp);
+	ADM_dealloc(tmp);
 	return 1;
 }
 /**

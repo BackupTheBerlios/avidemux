@@ -215,13 +215,13 @@ Telecide::~Telecide()
 {
 		unsigned int *p;
 
-		if (cache != NULL) free(cache);
+		if (cache != NULL) ADM_dealloc(cache);
 #ifdef WINDOWED_MATCH
-		if (matchp != NULL) free(matchp);
-		if (matchc != NULL) free(matchc);
+		if (matchp != NULL) ADM_dealloc(matchp);
+		if (matchc != NULL) ADM_dealloc(matchc);
 #endif
-		if (sump != NULL) free(sump);
-		if (sumc != NULL) free(sumc);
+		if (sump != NULL) ADM_dealloc(sump);
+		if (sumc != NULL) ADM_dealloc(sumc);
 
 		delete vidCache;
 		vidCache=NULL;

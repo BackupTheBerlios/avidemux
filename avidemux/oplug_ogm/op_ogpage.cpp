@@ -22,11 +22,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
 
 #include <math.h>
-
+#include <ADM_assert.h>
 #include "ADM_library/default.h"
 #include "ADM_library/avifmt.h"
 #include "ADM_library/avifmt2.h"

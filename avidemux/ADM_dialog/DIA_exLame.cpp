@@ -19,7 +19,7 @@
 
 #include "prefs.h"
 static GtkWidget	*create_dialog1 (void);
-
+#include "ADM_assert.h"
 uint8_t DIA_lame(char **lame)
 {
 	GtkWidget *dialog;
@@ -51,7 +51,7 @@ gtk_editable_insert_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), str, 
 			str=READ_ENTRY(entry1);
 			if(strlen(str))
 			{
-				*lame=strdup(str);;
+				*lame=ADM_strdup(str);;
 				prefs->set(LAME_CLI,str);
 			}
 			ret=1;

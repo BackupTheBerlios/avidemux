@@ -44,8 +44,9 @@
 
 //#define DEBUG
 //_____________________
-
+#include "config.h"
 #include <stdio.h>
+
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
@@ -53,14 +54,14 @@
           #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <ADM_assert.h>
 #include <string.h>
-#include "config.h"
+
 #include "math.h"
 
 #include "ADM_library/default.h"
 #include "ADM_editor/ADM_Video.h"
 
+#include <ADM_assert.h>
 
 #include "ADM_library/fourcc.h"
 #include "ADM_nuv/ADM_nuv.h"
@@ -572,7 +573,7 @@ uint32_t rcount=0;
 								{\
 									vqueue=aqueue; \
 									aqueue=aqueue->_next; \
-									free(vqueue); \
+									ADM_dealloc(vqueue); \
 								}
 								aqueue=ahead._next;
 								PURGE;
@@ -951,8 +952,8 @@ uint32_t rcount=0;
 
 			p=n;
 			n=n->_next;
-			free(p->_frame);
-			free(p);
+			ADM_dealloc(p->_frame);
+			ADM_dealloc(p);
 		}
 
 		// Scan rframe chain
@@ -967,8 +968,8 @@ uint32_t rcount=0;
 			_rIndex[i]._compression=n->_frame->comptype;
 			p=n;
 			n=n->_next;
-			free(p->_frame);
-			free(p);
+			ADM_dealloc(p->_frame);
+			ADM_dealloc(p);
 		}
 
 			// Scan audio chain
@@ -982,8 +983,8 @@ uint32_t rcount=0;
 			_audioIndex[i]._compression=n->_frame->comptype;
 			p=n;
 			n=n->_next;
-			free(p->_frame);
-			free(p);
+			ADM_dealloc(p->_frame);
+			ADM_dealloc(p);
 		}
 		printf("\n Index collapsed, found %lu keyframes\n",kf);
 		//

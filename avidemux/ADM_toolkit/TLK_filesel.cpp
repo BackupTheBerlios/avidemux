@@ -17,9 +17,9 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
-#include <ADM_assert.h>
 #include <gtk/gtk.h>
 
 #include <dirent.h>
@@ -30,6 +30,8 @@
 
 #include "avi_vars.h"
 #include "toolkit.hxx"
+#include <ADM_assert.h>
+
 #include "filesel.h"
 #include "prefs.h"
 #define TH_READ 1
@@ -184,7 +186,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 			}
 			else
 			{
-						name=strdup(selected_filename);
+						name=ADM_strdup(selected_filename);
 
 						char *str=PathCanonize(name);
 						PathStripName(str);
@@ -213,7 +215,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 				}
 				fclose(fd);
 				cb(name);
-				free(name);
+				ADM_dealloc(name);
 
 			}
 			else // write
@@ -237,7 +239,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 
 
 				cb(name);
-				free(name);
+				ADM_dealloc(name);
 			}
 		} // no callback -> return value
 		else
@@ -301,7 +303,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
       	  					GUI_Alert("Cannot open directory as file !");
 			else
 			{
-						name=strdup(selected_filename);
+						name=ADM_strdup(selected_filename);
 
 						char *str=PathCanonize(name);
 						PathStripName(str);
@@ -329,7 +331,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 				}
 				fclose(fd);
 				cb(name);
-				free(name);
+				ADM_dealloc(name);
 
 			}
 			else // write
@@ -353,7 +355,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 
 
 				cb(name);
-				free(name);
+				ADM_dealloc(name);
 			}
 		} // no callback -> return value
 		else

@@ -25,16 +25,7 @@
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <ADM_assert.h>
-  
- 
- 
 
-#include "ADM_library/default.h"
-#include "audio_out.h"
-
-#include  "ADM_audiodevice/ADM_deviceoss.h"
-#include "ADM_toolkit/toolkit.hxx"
 #if defined(ADM_BSD_FAMILY) && !defined(__FreeBSD__)
 	#include <soundcard.h>
 	const char *dsp = DEVOSSAUDIO;;
@@ -44,6 +35,16 @@
 	const char *dsp = "/dev/dsp";
 
 #endif
+ 
+ 
+
+#include "ADM_library/default.h"
+#include "audio_out.h"
+#include <ADM_assert.h>
+#include  "ADM_audiodevice/ADM_deviceoss.h"
+#include "ADM_toolkit/toolkit.hxx"
+
+
 
 
 

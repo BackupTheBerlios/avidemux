@@ -14,14 +14,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
-#include "config.h"
+
 #include "ADM_library/default.h"
 
+#include <ADM_assert.h>
 
 #ifdef USE_THEORA
 #include "ADM_colorspace/colorspace.h"

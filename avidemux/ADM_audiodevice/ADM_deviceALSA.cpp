@@ -18,23 +18,27 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
-#include <ADM_assert.h>
 
- #include "config.h"
+ 
 
 #ifdef ALSA_SUPPORT
+#include <alsa/asoundlib.h>
+#include <ADM_assert.h>
+
 #include "ADM_library/default.h"
 
 
 #include  "ADM_audiodevice/ADM_deviceoss.h"
 #include  "ADM_audiodevice/ADM_deviceALSA.h"
-#include <alsa/asoundlib.h>
 
+#include "ADM_assert.h"
 //
 //	_____________ ALSA 0.9________________
 //
@@ -65,7 +69,7 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
 
   static char *pcm_name;
 
-	pcm_name = strdup("plughw:0,0");
+	pcm_name = ADM_strdup("plughw:0,0");
  /* Allocate the snd_pcm_hw_params_t structure on the stack. */
     snd_pcm_hw_params_alloca(&hwparams);
     snd_pcm_sw_params_alloca(&swparams);
@@ -288,7 +292,7 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
 
   static char *pcm_name;
 
-	pcm_name = strdup("plughw:0,0");
+	pcm_name = ADM_strdup("plughw:0,0");
  /* Allocate the snd_pcm_hw_params_t structure on the stack. */
     snd_pcm_hw_params_alloca(&hwparams);
     snd_pcm_sw_params_alloca(&swparams);

@@ -282,7 +282,7 @@ uint8_t	Decimate::getCoupledConf( CONFcouple **couples)
 //________________________________________________________
 Decimate::~Decimate(void)
 {
-		if (sum != NULL) free(sum);
+		if (sum != NULL) ADM_dealloc(sum);
 		if(vidCache) delete vidCache;
 		if(_param) delete _param;
 

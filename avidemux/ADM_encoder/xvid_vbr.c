@@ -29,7 +29,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <math.h>
-#include <assert.h>
+#include "../ADM_assert.h"
 
 #include "config.h"
 /* Local headers */
@@ -1795,22 +1795,22 @@ static int vbr_finish_2pass2(void *sstate)
 
 	/* Free the memory */
 	if(state->keyframe_locations)
-		free(state->keyframe_locations);
+		ADM_dealloc(state->keyframe_locations);
 
 	{ // meanX
 		if(state->size)
 			{
-				free(state->size);
+				ADM_dealloc(state->size);
 				state->size=NULL;
 			}
 		if(state->kf)
 			{
-				free(state->kf);
+				ADM_dealloc(state->kf);
 				state->kf=NULL;
 			}
 		if(state->type)
 			{
-				free(state->type);
+				ADM_dealloc(state->type);
 				state->type=NULL;
 			}
 
@@ -2086,8 +2086,8 @@ int  vbr_make_variance(vbr_control_t *state, float compression, int *variance, i
 		
 		//printf("Compression in /out : %f /  %f\n",compression, compr_out);
 		//printf("Variance : %f\n",d_variance);
-		free(cur_mod);		
-		free(final_mod);		
+		ADM_dealloc(cur_mod);		
+		ADM_dealloc(final_mod);		
 		return 0;
 }	
 /*
@@ -2166,8 +2166,8 @@ int  vbr_make_clipping(vbr_control_t *state, float compression)
 			after=state->size[i];
 			//printf("%d --> %d (%f)\n",before,after,final_mod[i]*50);
 		}
-		free(cur_mod);		
-		free(final_mod);	
+		ADM_dealloc(cur_mod);		
+		ADM_dealloc(final_mod);	
 		//exit(0);	
 		return 0;		
 }		

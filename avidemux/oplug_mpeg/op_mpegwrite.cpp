@@ -19,6 +19,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -28,15 +30,16 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <ADM_assert.h>
 
 
-#include "config.h"
+
 
 #include "ADM_lavcodec.h"
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include <ADM_assert.h>
+
 #include "subchunk.h"
 
 #include "ADM_encoder/ADM_vidEncode.hxx"

@@ -29,13 +29,13 @@ S
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
 #include "default.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME 0
 #include "ADM_toolkit/ADM_debug.h"
-
+#include <ADM_assert.h>
 
 #if defined(HAVE_ALTIVEC) && defined(CONFIG_DARWIN)
 #ifdef HAVE_ALTIVEC_H

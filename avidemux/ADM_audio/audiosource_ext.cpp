@@ -54,7 +54,7 @@ void AVDMFileStream::abort( void )
   	}
     if (_wavheader)
       {
-	  free(_wavheader);
+	  ADM_dealloc(_wavheader);
 	  _wavheader = NULL;
       }
 }

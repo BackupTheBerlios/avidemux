@@ -61,7 +61,7 @@
 #include "../ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_TCREQUANT
 #include "../ADM_toolkit/ADM_debug.h"
-
+#include "../ADM_assert.h"
 
 // / MEANX
 
@@ -272,9 +272,9 @@ static uint64 cnt_b_i, cnt_b_ni;
 		mloka1 = rbuf - cbuf;\
 		if (mloka1) { COPY(mloka1); }\
 		WRITE \
-		free(orbuf); \
+		ADM_dealloc(orbuf); \
 		orbuf=NULL; \
-		free(owbuf); \
+		ADM_dealloc(owbuf); \
 		owbuf=NULL; \
 		\
 		LOG("Stats:\n");\
@@ -2395,7 +2395,7 @@ _req_exit:
 int Mrequant_end (void)
 {
 
-#define free_if(x) if(x){free(x);x=NULL;}
+#define free_if(x) if(x){ADM_dealloc(x);x=NULL;}
 	free_if(orbuf);
 	free_if(owbuf);
 	return 1;

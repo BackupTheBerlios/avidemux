@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 //#define TEST_MP2
-
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,26 +29,18 @@
 
 #include <time.h>
 #include <sys/time.h>
-
-#include "config.h"
-#include "ADM_assert.h"
-
-#include "callbacks.h"
-#include "interface.h"
-#include "support.h"
+#include <gtk/gtk.h>
 
 #include "ADM_lavcodec.h"
 
 #include "fourcc.h"
-#include "avi_vars.h"
-#include "ADM_toolkit/filesel.h"
-#include "ADM_toolkit/toolkit_gtk.h"
-#include "prototype.h"
-#include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/bitmap.h"
-#include "subchunk.h"
-#include "avilist.h"
 
+#include "ADM_toolkit/filesel.h"
+
+#include "avi_vars.h"
+#include "ADM_assert.h"
+#include "ADM_toolkit/toolkit.hxx"
+#include "prefs.h"
 
 
 
@@ -56,19 +48,10 @@
 #include "ADM_audio/audioex.h"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "gui_action.hxx"
-#include "gtkgui.h"
-//#include "ADM_gui/GUI_vars.h"
-#include "ADM_gui/GUI_mux.h"
-#include "oplug_mpeg/op_mpeg.h"
-#include "oplug_mpegFF/oplug_vcdff.h"
+
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_audiofilter/audioeng_piper.h"
-#include "prefs.h"
+
 #include "ADM_encoder/adm_encConfig.h"
-#include "ADM_gui2/GUI_render.h"
-#include "ADM_gui2/GUI_ui.h"
-#include "ADM_colorspace/colorspace.h"
-#include "ADM_audiodevice/audio_out.h"
 
 #include "ADM_dialog/DIA_busy.h"
 #include "ADM_dialog/DIA_encoding.h"
@@ -80,9 +63,6 @@
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 
-#include "ADM_codecs/ADM_ffmpeg.h"
-
-#include "mpeg2enc/ADM_mpeg2enc.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_REQUANT
 #include "ADM_toolkit/ADM_debug.h"

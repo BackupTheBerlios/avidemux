@@ -14,22 +14,21 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
 #include <math.h>
-#include "config.h"
+
 
 #include "fourcc.h"
 #include "avio.hxx"
-#include "config.h"
+
 #include "avi_vars.h"
 #ifdef HAVE_ENCODER
 
@@ -42,6 +41,7 @@
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
+#include <ADM_assert.h>
 
 
 #include "prototype.h"
@@ -122,8 +122,8 @@ uint8_t ADMVideoContrast::configure (AVDMGenericVideoStream * instream)
 
   delete
     aImage;
-  free (video2);
-  free (video3);
+  ADM_dealloc (video2);
+  ADM_dealloc (video3);
 
   video2 = video3 = NULL;
   aImage = NULL;

@@ -22,13 +22,15 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 
 #include "ADM_library/default.h"
+#include <ADM_assert.h>
+
 #include "avifmt.h"
 #include "avifmt2.h"
 

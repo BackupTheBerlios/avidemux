@@ -17,13 +17,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
-#include "config.h"
+
 #include "ADM_library/default.h"
 #include "ADM_codecs/ADM_codec.h"
 #ifdef USE_XVID_4
@@ -31,6 +31,7 @@
 #include "ADM_codecs/ADM_xvid4param.h"
 #include "ADM_codecs/ADM_xvid4.h"
 #include "xvid.h"
+#include <ADM_assert.h>
 
 
 static const int motion_presets[] = {	
@@ -84,14 +85,17 @@ void xvid4_init(void)
 	printf("\txvid thread:%d\n",xvid_gbl_info.num_threads);
 	printf("\txvid SIMD supported:(%x)\n",xvid_gbl_info.cpu_flags);
 	#define CPUF(x) if(xvid_gbl_info.cpu_flags  & XVID_CPU_##x) printf("\t\t"#x"\n");	
-
+#ifdef USE_MMX
 	CPUF(MMX);
 	CPUF(MMXEXT);
 	CPUF(SSE);
 	CPUF(SSE2);
 	CPUF(3DNOW);
 	CPUF(3DNOWEXT);
+#endif	
+#ifdef USE_ALTIVEC	
 	CPUF(ALTIVEC);
+#endif	
 	
 }
 xvid4Encoder::~xvid4Encoder()

@@ -25,7 +25,7 @@
 #include <math.h>
 #include <time.h>
 #include <sys/time.h>
-#include <ADM_assert.h>
+
 
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -38,9 +38,9 @@
 extern "C" {
 	#include "ADM_lvemux/mux_out.h"
 };
+#include <ADM_assert.h>
 
 
-#include "avi_vars.h"
 
 
 MpegMuxer::MpegMuxer( void )

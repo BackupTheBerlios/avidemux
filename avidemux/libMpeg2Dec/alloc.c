@@ -64,13 +64,13 @@ void mpeg2_free (void * buf)
 	return;
 
     if (buf)
-	free (*(((void **)buf) - 1));
+	ADM_dealloc (*(((void **)buf) - 1));
 	
 	//free(buf);
 }
 
-void mpeg2_malloc_hooks (void * malloc (unsigned, mpeg2_alloc_t),
-			 int free (void *))
+void mpeg2_malloc_hooks (void * mallocs (unsigned, mpeg2_alloc_t),
+			 int frees (void *))
 {
     malloc_hook = ADM_alloc;
     free_hook = ADM_dezalloc;

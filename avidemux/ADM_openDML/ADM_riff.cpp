@@ -10,12 +10,14 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
-#include "config.h"
+
 #include "default.h"
+#include <ADM_assert.h>
+
 #include "ADM_riff.h"
 
 #include "ADM_toolkit/ADM_debugID.h"

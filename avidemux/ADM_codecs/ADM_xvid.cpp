@@ -18,17 +18,20 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include "config.h"
+ 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
 #include <math.h>
-#include "config.h"
+
 #include "ADM_library/default.h"
+
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_gui/GUI_xvidparam.h"
 
+#include "ADM_assert.h"
 
 static myENC_RESULT xvid_res;
 

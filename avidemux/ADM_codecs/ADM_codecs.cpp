@@ -17,12 +17,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
 #include <math.h>
-#include "config.h"
+
 
  #include "ADM_vp32/ADM_vp3.h"
  
@@ -66,7 +67,7 @@ extern "C" {
 #include "ADM_codecs/ADM_mpeg.h"
 #include "ADM_codecs/ADM_vp3.h"
 #include "ADM_toolkit/toolkit.hxx"
-
+#include <ADM_assert.h>
 #include "prefs.h"
 
 extern uint8_t GUI_Question(char *);

@@ -72,6 +72,7 @@ extern void  buildDistMatrix( void );
 extern void initScaleTab( void );
 extern void initEncoders( void );
 extern uint8_t initGUI( void );
+extern void ADM_memStat( void );
 extern "C"
 {
 extern void     VPInitLibrary();
@@ -186,6 +187,7 @@ void onexit( void )
 {
 	filterCleanUp();
 	ADMImage_stat();
+	ADM_memStat();
 	printf("\n Goodbye...\n\n");
 }
 void sig_segfault_handler(int signo)

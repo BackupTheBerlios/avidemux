@@ -19,12 +19,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
 #include <math.h>
-#include "config.h"
+
 
 #ifdef USE_FFMPEG
 #include "ADM_lavcodec.h"
@@ -35,9 +36,10 @@
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_codecs/ADM_divxEncode.h"
-#include "ADM_codecs/ADM_ffmpeg.h"
-#include "ADM_toolkit/toolkit.hxx"
 
+#include "ADM_toolkit/toolkit.hxx"
+#include <ADM_assert.h>
+#include "ADM_codecs/ADM_ffmpeg.h"
 //#define TEST_NOB 1
 
 static char LogName[500];
@@ -504,7 +506,7 @@ ffmpegEncoderVBR::~ffmpegEncoderVBR ()
 {
 
 
-  free (_context->stats_in);
+  ADM_dealloc (_context->stats_in);
 
 }
 

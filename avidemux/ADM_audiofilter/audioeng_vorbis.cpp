@@ -84,7 +84,7 @@ AVDMProcessAudio_Vorbis::~AVDMProcessAudio_Vorbis()
     _wavheader=NULL;
     if(_extraData)
     {
-    	free(_extraData);
+    	ADM_dealloc(_extraData);
     }
 
 };

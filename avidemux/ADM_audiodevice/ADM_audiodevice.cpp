@@ -27,7 +27,7 @@
 #include "avi_vars.h"
 #include "prefs.h"
 #ifdef HAVE_AUDIO
-
+#include "ADM_assert.h"
 
 #include "ADM_audiodevice/ADM_deviceoss.h"
 
@@ -114,7 +114,7 @@ AUDIO_DEVICE id;
 		if(prefs->get(DEVICE_AUDIODEVICE, &name))
 		{
 		id=ADM_audioByName(name);
-		free(name);
+		ADM_dealloc(name);
 		name=NULL;	
 		if(!id) id=DEVICE_DUMMY;
 		switch(id)

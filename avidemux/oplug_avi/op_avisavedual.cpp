@@ -17,20 +17,23 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-#include <ADM_assert.h>
 
 #include <time.h>
 #include <sys/time.h>
-#include "config.h"
+
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "subchunk.h"
 #include "avilist.h"
+
+#include <ADM_assert.h>
 
 
 #include "ADM_video/ADM_genvideo.hxx"

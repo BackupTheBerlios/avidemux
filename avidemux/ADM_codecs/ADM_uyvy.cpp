@@ -9,8 +9,9 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include <stdio.h>
 #include "config.h"
+#include <stdio.h>
+
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
@@ -18,7 +19,7 @@
 #include <sys/types.h>
 #endif
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
 //#include <math.h>
 #include "ADM_library/default.h"
@@ -28,7 +29,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_uyvy.h"
- 
+#include <ADM_assert.h> 
  uint8_t decoderUYVY::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag)
 {
 

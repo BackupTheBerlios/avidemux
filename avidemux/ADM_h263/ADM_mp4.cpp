@@ -12,16 +12,17 @@
  *
  *
  */
+ #include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
-#include <ADM_assert.h>
 #include <math.h>
-#include "config.h"
 
 #include "ADM_library/default.h"
 #include "ADM_editor/ADM_Video.h"
+#include <ADM_assert.h>
 
 
 #include "ADM_library/fourcc.h"

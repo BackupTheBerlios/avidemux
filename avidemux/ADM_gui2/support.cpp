@@ -8,13 +8,13 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <ADM_assert.h>
+
 #include <gtk/gtk.h>
 
 #include "support.h"
 
 #include "ADM_library/default.h"
-
+#include <ADM_assert.h>
 #include "xpm/play.xpm"
 #include "xpm/stop.xpm"
 #include "xpm/forward.xpm"

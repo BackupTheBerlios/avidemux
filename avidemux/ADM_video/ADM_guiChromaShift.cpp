@@ -14,21 +14,22 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
-#include "config.h"
+
 
 #include "fourcc.h"
 #include "avio.hxx"
 #include "config.h"
 #include "avi_vars.h"
+#include <ADM_assert.h>
 
 
 #include "ADM_editor/ADM_edit.hxx"

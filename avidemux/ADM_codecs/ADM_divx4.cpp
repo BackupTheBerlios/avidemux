@@ -17,13 +17,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
-#include "config.h"
+
 #ifdef USE_DIVX
 
 #include "ADM_lavcodec.h"
@@ -38,6 +38,7 @@
 #include "ADM_gui/GUI_MPP.h"
 
 #include "ADM_toolkit/toolkit.hxx"
+#include <ADM_assert.h>
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME  MODULE_CODEC

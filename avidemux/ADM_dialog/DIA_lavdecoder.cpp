@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "ADM_assert.h" 
+
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
@@ -29,7 +29,7 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
-
+#include "ADM_assert.h" 
 #define CHECK_GET(x,y) {*y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
 #define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),*y);}	
 

@@ -6,6 +6,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
+# include <config.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -13,7 +16,6 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "ADM_assert.h" 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -21,15 +23,18 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-# include <config.h>
+
 
 #include "callbacks.h"
-#include "avi_vars.h"
+//#include "avi_vars.h"
+#include "default.h"
+
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 
+#include "ADM_assert.h" 
 
 #include "DIA_encoding.h"
 

@@ -16,28 +16,29 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
-#include <ADM_assert.h>
 
-#include "config.h"
+
 #include "fourcc.h"
 #include "avio.hxx"
+#ifdef USE_LIBXML2
+	#include <libxml/tree.h>
+	#include <libxml/parser.h>
+#endif
 
 #include "ADM_toolkit/toolkit.hxx"
+#include <ADM_assert.h>
+
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
 #include "ADM_video/ADM_confCouple.h"
 #include "avi_vars.h"
-#ifdef USE_LIBXML2
-	#include <libxml/tree.h>
-	#include <libxml/parser.h>
-#endif
 // exported vars
 extern uint32_t nb_video_filter;
 extern uint32_t nb_active_filter;

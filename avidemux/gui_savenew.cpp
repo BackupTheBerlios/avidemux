@@ -14,6 +14,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include <config.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -22,14 +24,14 @@
 
 #include <time.h>
 #include <sys/time.h>
-#include <config.h>
-#include "ADM_assert.h"
+
 #include "avi_vars.h"
 
 
 #include "avi_vars.h"
 #include "prototype.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_assert.h"
 
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"

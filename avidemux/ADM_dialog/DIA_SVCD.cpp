@@ -21,23 +21,23 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "ADM_assert.h" 
+
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 # include <math.h>
 
 #include "callbacks.h"
-#include "avi_vars.h"
+#include "ADM_library/default.h"//#include "avi_vars.h"
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 
 
-#include "ADM_library/default.h"
+
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-
+#include "ADM_assert.h" 
 
 #include "mpeg2enc/ADM_mpeg2enc.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -119,33 +119,20 @@ uint8_t DIA_SVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 				case 0:
 					*mode = COMPRESS_CBR;				      
 		      			value = (uint32_t) gtk_read_entry(WID(entryBitrate));
-		      			if (value < 9900)
-			  			value *= 1000;
-		      			if (value > 16 && value < 9900000)
-					{
-			    			*br = value;
-			    			ret = 1;
-		      			}
-					
+			    		*br = value * 1000;
 					break;
 				case 1:
 					*mode = COMPRESS_CQ;		      			
 					value = (uint32_t) gtk_spin_button_get_value_as_int(
 								GTK_SPIN_BUTTON(WID(spinbuttonQz)));
-		      			if (value >= 2 && value <= 32)
-					{
-			    			*qz = value;
-		      			}
+			    		*qz = value;
 		      			break;
 
 				case 2:
 		     			*mode = COMPRESS_2PASS;	
 					value = (uint32_t)
 						gtk_read_entry(WID(entryBitrate));
-        				if((value>0)&&(value<4000))
-          				{
-       						*fsize=value;	
-           				}
+       					*fsize=value;	
             				break;
 		  		default:
 		      			ADM_assert(0);

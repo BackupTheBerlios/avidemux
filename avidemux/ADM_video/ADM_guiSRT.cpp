@@ -14,6 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,14 +23,12 @@
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
-#include <ADM_assert.h>
 #include <math.h>
 #include <iconv.h>
 
-#include "config.h"
+
 #include "fourcc.h"
 #include "avio.hxx"
-#include "config.h"
 
 #ifdef USE_FREETYPE
 
@@ -57,6 +56,7 @@
 
 #include "prototype.h"
 #include "prefs.h"
+#include <ADM_assert.h>
 
 typedef struct unicd
 {

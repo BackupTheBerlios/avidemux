@@ -18,7 +18,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include <config.h>
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -26,8 +27,8 @@
 #include <errno.h>
 
 
-#include <config.h>
-#include "ADM_assert.h" 
+
+
 
 #include <gtk/gtk.h>
 
@@ -38,6 +39,8 @@
 
 #include "fourcc.h"
 #include "avi_vars.h"
+#include "ADM_assert.h" 
+
 #include "ADM_toolkit/filesel.h"
 #include "prototype.h"
 #include "ADM_audiodevice/audio_out.h"
@@ -252,7 +255,7 @@ abort_play:
     if (currentaudiostream)
       {
 	  if (wavbuf)
-	      free(wavbuf);
+	      ADM_dealloc(wavbuf);
 	  deleteAudioFilter();
 	  currentaudiostream->endDecompress();
 	  AVDM_AudioClose();

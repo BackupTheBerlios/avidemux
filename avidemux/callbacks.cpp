@@ -20,7 +20,7 @@ Mean.
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#  include <config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,14 +28,14 @@ Mean.
 #include <unistd.h>
 
 
-#  include <config.h>
+
 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdktypes.h>
 #include <time.h>
 #include <sys/time.h>
-#include "ADM_assert.h"
+
 
 #include "callbacks.h"
 #include "interface.h"
@@ -43,6 +43,7 @@ Mean.
 
 #include "fourcc.h"
 #include "avi_vars.h"
+#include "ADM_assert.h"
 #include "ADM_toolkit/filesel.h"
 #include "prototype.h"
 #include "ADM_audiodevice/audio_out.h"

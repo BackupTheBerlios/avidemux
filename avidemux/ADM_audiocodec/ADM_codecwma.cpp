@@ -67,7 +67,7 @@
  ADM_AudiocodecWMA::~ADM_AudiocodecWMA()
  {
 		avcodec_close(_context);
-		free(_context);
+		ADM_dealloc(_context);
 		_contextVoid=NULL;
 }    
 /*-------------------------------------------------------------------------------------------------------------------------

@@ -17,11 +17,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "config.h"
-#include "ADM_assert.h"
 
 #ifdef USE_XV
 //#define VERBOSE_XV
@@ -37,8 +38,10 @@
 #include <gdk/gdkx.h>
 #include <errno.h>
 
-#include "config.h"
+
 #include "avi_vars.h"
+#include "ADM_assert.h"
+
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_gui2/GUI_render.h"
 

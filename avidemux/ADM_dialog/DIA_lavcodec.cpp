@@ -1,21 +1,24 @@
+# include <config.h>
+
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
 
-#include "ADM_assert.h" 
+
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-# include <config.h>
+
 #include "callbacks.h"
 #include "avi_vars.h"
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_assert.h" 
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 

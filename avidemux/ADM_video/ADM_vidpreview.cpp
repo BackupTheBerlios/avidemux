@@ -18,10 +18,12 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
+#include "config.h"
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
@@ -30,13 +32,15 @@
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
-#include "config.h"
+
 #include "avi_vars.h"
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_colorspace/colorspace.h"
 #include "prototype.h"
+#include <ADM_assert.h>
+
 static GtkWidget	*create_dialog1 (void);
 
 static void 			previewRender(void);
@@ -63,7 +67,7 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
 		if(rgb_render)
 		{
 			printf("\n Warning rgb render not null...\n");
-			free(rgb_render);
+			delete [] rgb_render;
 		}
       ADM_assert(rgb_render=new uint8_t [w*h*4]);
        uw=w;

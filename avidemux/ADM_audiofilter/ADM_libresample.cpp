@@ -428,7 +428,7 @@ void *resample_open(int highQuality, double minFactor, double maxFactor)
    /* Last coeff. not interpolated */
    hp->ImpD[hp->Nwing-1] = - hp->Imp[hp->Nwing-1];
 
-   free(Imp64);
+   ADM_dealloc(Imp64);
 
    /* Calc reach of LP filter wing (plus some creeping room) */
    Xoff_min =(uint32_t) (((hp->Nmult+1)/2.0) * MAX(1.0, 1.0/(double)minFactor) + 10);
@@ -638,10 +638,10 @@ int resample_process(void   *handle,
 void resample_close(void *handle)
 {
    rsdata *hp = (rsdata *)handle;
-   free(hp->X);
-   free(hp->Y);
-   free(hp->Imp);
-   free(hp->ImpD);
-   free(hp);
+   ADM_dealloc(hp->X);
+   ADM_dealloc(hp->Y);
+   ADM_dealloc(hp->Imp);
+   ADM_dealloc(hp->ImpD);
+   ADM_dealloc(hp);
 }
 

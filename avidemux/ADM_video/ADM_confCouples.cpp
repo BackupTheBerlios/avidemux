@@ -14,19 +14,21 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 
 #include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
 
-#include "config.h"
+
 
 #include "fourcc.h"
 #include "avio.hxx"
+#include <ADM_assert.h>
 
 #include "ADM_video/ADM_confCouple.h"
 static char tmpstring[1024]; // should be enougth
@@ -62,9 +64,9 @@ uint8_t CONFcouple::setCouple(const char *myname,uint32_t val)
 {
 	ADM_assert(cur<nb);
 
-	name[cur]=strdup(myname);
+	name[cur]=ADM_strdup(myname);
 	sprintf(tmpstring,"%lu",val);
-	value[cur]=strdup(tmpstring);
+	value[cur]=ADM_strdup(tmpstring);
 	cur++;
 	return 1;
 }
@@ -72,9 +74,9 @@ uint8_t CONFcouple::setCouple(const char *myname,float val)
 {
 	ADM_assert(cur<nb);
 
-	name[cur]=strdup(myname);
+	name[cur]=ADM_strdup(myname);
 	sprintf(tmpstring,"%f",val);
-	value[cur]=strdup(tmpstring);
+	value[cur]=ADM_strdup(tmpstring);
 	cur++;
 	return 1;
 }
@@ -82,9 +84,9 @@ uint8_t CONFcouple::setCouple(const char *myname,double val)
 {
 	ADM_assert(cur<nb);
 
-	name[cur]=strdup(myname);
+	name[cur]=ADM_strdup(myname);
 	sprintf(tmpstring,"%f",val);
-	value[cur]=strdup(tmpstring);
+	value[cur]=ADM_strdup(tmpstring);
 	cur++;
 	return 1;
 }
@@ -92,9 +94,9 @@ uint8_t CONFcouple::setCouple(const char *myname,int32_t val)
 {
 	ADM_assert(cur<nb);
 
-	name[cur]=strdup(myname);
+	name[cur]=ADM_strdup(myname);
 	sprintf(tmpstring,"%ld",val);
-	value[cur]=strdup(tmpstring);
+	value[cur]=ADM_strdup(tmpstring);
 	cur++;
 	return 1;
 }
@@ -102,8 +104,8 @@ uint8_t CONFcouple::setCouple(const char *myname,const char *val)
 {
 	ADM_assert(cur<nb);
 
-	name[cur]=strdup(myname);
-	value[cur]=strdup(val);
+	name[cur]=ADM_strdup(myname);
+	value[cur]=ADM_strdup(val);
 	cur++;
 	return 1;
 }

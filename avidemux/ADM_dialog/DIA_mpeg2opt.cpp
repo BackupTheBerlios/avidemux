@@ -16,7 +16,7 @@
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
-
+#include "ADM_assert.h"
 
 static GtkWidget	*create_dialog1 (void);
 
@@ -73,7 +73,7 @@ gtk_editable_insert_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), str, 
 					*qz=val1;
 			s=READ_ENTRY(entryArgs);
 			if(ret)
-					*opts=strdup(s);
+					*opts=ADM_strdup(s);
 				else
 					*opts=NULL;
 

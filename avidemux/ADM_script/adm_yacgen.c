@@ -93,6 +93,7 @@
 #define YYSTYPE char * 
 #include "adm_yacgen.h"
 #include "adm_scanner.h" 
+#include "../ADM_assert.h" 
 
 
 /* Enabling traces.  */
@@ -1046,11 +1047,11 @@ yyreduce:
     {
 			if(!Call(yyvsp[-3]))
 			{
-				free(yyvsp[-3]); // don't need it anymore
+				ADM_dealloc(yyvsp[-3]); // don't need it anymore
 				YYABORT;
 			}
 			else
-				free(yyvsp[-3]); // don't need it anymore
+				ADM_dealloc(yyvsp[-3]); // don't need it anymore
 		;}
     break;
 

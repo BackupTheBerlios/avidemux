@@ -72,7 +72,7 @@ class ffmpegEncoder:public encoder
       {
 	_init = 0;
 	avcodec_close (_context);
-	free (_context);
+	ADM_dealloc (_context);
 	_context = NULL;
       }
     return 1;

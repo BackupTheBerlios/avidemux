@@ -25,7 +25,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
+
 #include <string.h>
 #include "math.h"
 
@@ -37,6 +37,7 @@
 #include "ADM_inpics/ADM_pics.h"
 #include "ADM_inpics/bitmap.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include <ADM_assert.h>
 #include "ADM_toolkit/filesel.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_INPIC
@@ -69,7 +70,7 @@ uint8_t    picHeader::close( void )
          		{
               		 	fclose(_fd[i]);
           	   	}
-              free(_fd);
+              ADM_dealloc(_fd);
               _fd=NULL;
 
      	}

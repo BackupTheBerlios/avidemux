@@ -18,14 +18,14 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
 
-#include "config.h"
+
 #include "avi_vars.h"
 #include "prototype.h"
 #ifdef BIG_ENDIAN
@@ -39,6 +39,7 @@
 #include "ADM_codecs/ADM_divxEncode.h"
 
 #include "ADM_toolkit/toolkit.hxx"
+#include <ADM_assert.h>
 
 static 	ENC_RESULT 			result;
 static   	tagDivXBitmapInfoHeader 	tag;

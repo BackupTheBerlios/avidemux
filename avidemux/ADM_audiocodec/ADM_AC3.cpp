@@ -20,11 +20,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <ADM_assert.h>
-#include "config.h"
+
+
+
 #ifdef USE_AC3
 
 #include "avi_vars.h"
@@ -34,6 +37,7 @@ extern "C" {
 };
 
 #include "ADM_audiocodec/ADM_AC3.h"
+#include <ADM_assert.h>
  //#include "ADM_audio/ADM_a52info.h"
 
 

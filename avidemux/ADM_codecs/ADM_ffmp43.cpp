@@ -17,14 +17,15 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ADM_assert.h>
 #include <string.h>
 #include <math.h>
-#include "config.h"
+
 #ifdef USE_FFMPEG
+#include <ADM_assert.h>
 
 #include "ADM_lavcodec.h"
 #include "ADM_library/default.h"
@@ -101,7 +102,7 @@ decoderFF::decoderFF(uint32_t w,uint32_t h) :decoders(w,h)
 decoderFF::~decoderFF()
 {
 		avcodec_close(_context);
-		free(_context);
+		ADM_dealloc(_context);
 		delete [] _internalBuffer;	
 		printf("FF base destroyed\n");
 }
