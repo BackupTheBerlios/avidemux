@@ -103,7 +103,12 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
     }
 
     /* Set sample format */
-    if (snd_pcm_hw_params_set_format(pcm_handle, hwparams, SND_PCM_FORMAT_S16_LE) < 0) {
+#ifdef ADM_BIG_ENDIAN
+    if (snd_pcm_hw_params_set_format(pcm_handle, hwparams, SND_PCM_FORMAT_S16_BE) < 0) 
+#else	    
+    if (snd_pcm_hw_params_set_format(pcm_handle, hwparams, SND_PCM_FORMAT_S16_LE) < 0) 
+#endif
+    {
       fprintf(stderr, "Error setting format.\n");
       return(0);
     }
@@ -326,7 +331,12 @@ uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
     }
 
     /* Set sample format */
-    if (snd_pcm_hw_params_set_format(pcm_handle, hwparams, SND_PCM_FORMAT_S16_LE) < 0) {
+#ifdef ADM_BIG_ENDIAN
+    if (snd_pcm_hw_params_set_format(pcm_handle, hwparams, SND_PCM_FORMAT_S16_BE) < 0) 
+#else	    
+    if (snd_pcm_hw_params_set_format(pcm_handle, hwparams, SND_PCM_FORMAT_S16_LE) < 0) 
+#endif	    
+    {
       fprintf(stderr, "Error setting format.\n");
       return(0);
     }

@@ -97,7 +97,11 @@ uint8_t ossAudioDevice::init(uint32_t channel, uint32_t fq)
 	    return 0;
         }
     }
+#ifdef ADM_BIG_ENDIAN    
+    int fmt = AFMT_S16_BE;
+#else
     int fmt = AFMT_S16_LE;
+#endif    
     if (ioctl (oss_fd, SNDCTL_DSP_SETFMT, &fmt) < 0) {
         printf("\n Error setting up OSS(FORMAT): Error : %d", errno);
         return 0;
