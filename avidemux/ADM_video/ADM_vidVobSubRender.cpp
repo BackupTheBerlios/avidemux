@@ -147,6 +147,9 @@ uint32_t value;
 // RLE code inspired from mplayer
 uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start,uint32_t end)
 {
+
+        if(!_original) return 0;
+
         uint32_t oldoffset=_curOffset;
         uint32_t stride=_subW;
         uint32_t x,y;
@@ -208,7 +211,7 @@ uint8_t ADMVideoVobSub::decodeRLE(uint32_t off,uint32_t start,uint32_t end)
               //memset(ptr,color,run);
               memset(ptr,_colors[color],run);
               memset(alpha,_alpha[color],run);
-              if(run!=stride) _original->_dirty[y*2+start]=1;
+              if(run!=stride) _original->setDirty(y*2+start);
               x+=run;
               ptr+=run;
               alpha+=run;
@@ -254,7 +257,11 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
             printf("Vobsub: error reading (packet too big)\n");
             return 0;
         }
-        _parser->read(_data+2,_subSize-2);
+        if(!_parser->read(_data+2,_subSize-2)) 
+        {
+                printf("VS: read failed\n");
+                return 0;
+        }
        
         // We got the full packet
         // now scan it
@@ -362,10 +369,14 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
                                         // 2*16 bits : odd offset, even offset
                                         {
                                         uint32_t odd,even;
-                                        odd=readword();
+                                        odd=readword();                                        
                                         even=readword();
-                                        decodeRLE(odd,0,even);
-                                        decodeRLE(even,1,0);
+                                        if(_original) 
+                                                {
+                                                _original->clear();
+                                                decodeRLE(odd,0,even);
+                                                decodeRLE(even,1,0);
+                                                }
                                         }
                                         break;   
                                 default:                                                     
@@ -391,6 +402,19 @@ vobSubBitmap::vobSubBitmap(uint32_t w, uint32_t h)
   _alphaMask=new uint8_t [page];
   _dirty=new uint8_t[h];                                                
   clear();
+}
+uint8_t vobSubBitmap::isDirty(uint32_t line)
+{
+        ADM_assert(line<_height);
+        if(_dirty[line]) return 1;
+        return 0;
+
+}
+uint8_t vobSubBitmap::setDirty(uint32_t line)
+{
+        ADM_assert(line<_height);
+        _dirty[line]=1;
+        return 1;
 }
 vobSubBitmap::~vobSubBitmap()
 {

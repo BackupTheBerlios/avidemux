@@ -27,13 +27,18 @@ typedef struct vobSubParam
 //************************************
 class vobSubBitmap
 {
+  protected:
+        uint8_t                         *_dirty;                   /// Dirty lines (non transparent)
   public:
+        uint8_t                         isDirty(uint32_t line);
+        uint8_t                         setDirty(uint32_t line);
+
         uint32_t                        _width,_height;
         uint32_t                        placeTop, placeHeight;     /// Position of the sub
       
         uint8_t                         *_bitmap;                  /// YUV image
         uint8_t                         *_alphaMask;               /// alpha mask 
-        uint8_t                         *_dirty;                   /// Dirty lines (non transparent)
+        
  
                                         vobSubBitmap(uint32_t w, uint32_t h); 
                                         ~vobSubBitmap();

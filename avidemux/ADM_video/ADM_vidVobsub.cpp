@@ -152,37 +152,60 @@ ADMVideoVobSub::ADMVideoVobSub(  char *fileidx,uint32_t idx)
 
 vobSubBitmap *ADMVideoVobSub::getBitmap(uint32_t nb,uint32_t *start, uint32_t *end,uint32_t *first,uint32_t *last)
 {
+uint32_t top=0,bottom=0;
     ADM_assert(_vobSubInfo);
     ADM_assert(nb<_vobSubInfo->nbLines);
     
     // Seek & decode
     _parser->_asyncJump2(0,_vobSubInfo->lines[nb].fileOffset);
-    handleSub(nb);
+    if(!handleSub(nb))
+        {
+                printf("Error reading getBimap\n");
+                *first=*last=0;
+                return _original; // might be null (?)
+        }
     *first=*last=0;
     if(_original)
     {
     uint32_t ox,oy;
         _original->buildYUV(_YUVPalette);
-        ox=_vobSubInfo->width;
-        oy=_vobSubInfo->height;
+        ox=_original->_width;        
+        oy=_original->_height;
+        printf("Original :%lu x %lu\n",ox,oy);
+        ADM_assert(oy<=_vobSubInfo->height);
         
         // Search the 1st/last non null line
-        uint32_t top=0,bottom=0;
-        while(top<oy && !_original->_dirty[top]) top++;
+//#define DONTCLIP
+#ifdef DONTCLIP     
+         *first=0;
+         *last=oy-1;   
+#else
+        while(top<oy && !_original->isDirty(top)) top++;
         
-        bottom=_original->_height-1;
-        while(bottom && !_original->_dirty[bottom]) bottom--;
+        if(top==oy)
+        {
+                top=bottom=0;   // Empty bitmap ?
+                *first=top;
+                *last=bottom;
+                return NULL; 
+        }
+        bottom=oy-1;
+        while(bottom>top && !_original->isDirty(bottom)) bottom--;
         
         // If true it means we have 2 subs, one on top, one on bottom
         //
+#if 0
         if(bottom>(oy>>1) && top<(oy>>1) && (bottom-top>(oy>>1)))
         {
           // in that case, take only the lower one
           top=oy>>1;
-          while(top<oy && !_original->_dirty[top]) top++;                    
+          while(top<oy && !_original->isDirty(top)) top++;                    
         }
+        printf("> clipped: %lu / %lu=%lu\n",top,bottom,bottom-top+1);
+#endif
         *first=top;
         *last=bottom;
+#endif
     }
     *start=_vobSubInfo->lines[nb].startTime;
     *end=_vobSubInfo->lines[nb].stopTime;
@@ -542,10 +565,10 @@ uint8_t ADMVideoVobSub::Palettte2Display( void )
         
         // Search the 1st/last non null line
         uint32_t top=0,bottom=0;
-        while(top<oy && !_original->_dirty[top]) top++;
+        while(top<oy && !_original->isDirty(top)) top++;
         
         bottom=_original->_height-1;
-        while(bottom && !_original->_dirty[bottom]) bottom--;
+        while(bottom && !_original->isDirty(bottom)) bottom--;
         
         // If true it means we have 2 subs, one on top, one on bottom
         //
@@ -553,7 +576,7 @@ uint8_t ADMVideoVobSub::Palettte2Display( void )
         {
           // in that case, take only the lower one
           top=oy>>1;
-          while(top<oy && !_original->_dirty[top]) top++;                    
+          while(top<oy && !_original->isDirty(top)) top++;                    
         }
         //
         //  The useful part is between top & bottom lines
