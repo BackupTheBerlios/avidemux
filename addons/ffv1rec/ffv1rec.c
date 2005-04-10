@@ -48,7 +48,10 @@
 
 
 /* Globals */
-
+extern "C"
+{
+extern uint8_t ADM_InitMemcpy(void);
+}
 static void parseRcFile( void );
 
 int recordaudio=1;
@@ -161,6 +164,7 @@ int main(int argc, char** argv)
   int reclength= -1; // reclength in secs
  char c;
 
+	ADM_InitMemcpy();
 
   /////////////////////////////////////////////////////
   //  CHECKING AND INTERPRETING COMMAND LINE SWITCHES
