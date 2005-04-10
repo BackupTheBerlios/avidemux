@@ -84,6 +84,60 @@ public:
         virtual uint8_t needAudio(void);
 
 };
+#define TS_PACKET_SIZE 188
 
+typedef struct
+{
+    uint64_t pts;
+    uint8_t  packet[TS_PACKET_SIZE];
+}entryPacket;
+
+typedef struct
+{
+    uint32_t pid;
+    uint32_t counter;
+    uint32_t tableId;
+    uint32_t sectionId;
+}channel;
+
+class tsMuxer : public ADMMpegMuxer
+{
+protected:
+        entryPacket *packetPipe;
+        uint32_t    packetHead,packetTail;
+        FILE        *outFile;     
+        uint32_t    audioPid,videoPid;
+        uint32_t    _curPTS;
+        uint32_t    nbPacket;
+        uint32_t    packetSincePAT;
+        uint64_t    lastPCR;
+        
+        entryPacket *getPacket( void);   
+        uint8_t     writeSection( uint32_t pid,channel *chan, 
+                                uint8_t *data, uint32_t len) ;
+        uint8_t     writePmt( void); 
+        uint8_t     writePat( void);                       
+        uint8_t     writePacket(uint8_t *data, uint32_t len, uint64_t pcr,channel *chan,uint8_t start);
+        uint8_t     writePacketPad(uint8_t *data, uint32_t len, uint64_t pcr,channel *chan,uint8_t start);
+        uint64_t    audioTime( void)   ;            // Time is us
+        uint64_t    videoTime( uint32_t frameno);   // Time in us                    
+        uint8_t     flushPackets(uint8_t r);
+        
+        channel     audioChannel,videoChannel,pmt,pat;
+        aviInfo     _info;
+        WAVHeader   _wavHeader;
+             
+public:
+                tsMuxer(void );
+                ~tsMuxer(  );
+        virtual uint8_t open( char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
+        virtual uint8_t writeAudioPacket(uint32_t len, uint8_t *buf);
+        virtual uint8_t writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe );
+        virtual uint8_t forceRestamp(void);
+        virtual uint8_t close( void );
+        virtual uint8_t audioEmpty( void);
+        virtual uint8_t needAudio(void);
+
+};
 //EOF
 
