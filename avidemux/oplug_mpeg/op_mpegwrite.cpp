@@ -423,8 +423,24 @@ DIA_encoding		*encoding;
 	printf("\n--encoding started--\n");
 	if(_muxer)
 	{
-		 encoding->setAudioCodec(getStrFromAudioCodec(_audio->getInfo()->encoding));	
+            if(audioProcessMode)
+                encoding->setAudioCodec(getStrFromAudioCodec(_audio->getInfo()->encoding));
+            else
+                encoding->setAudioCodec("Copy");
+            switch(_outputAs)
+            {
+                
+                case MUXER_TS:  encoding->setContainer("Mpeg TS");break;
+                case MUXER_VCD: encoding->setContainer("Mpeg VCD");break;
+                case MUXER_SVCD:encoding->setContainer("Mpeg SVCD");break;
+                case MUXER_DVD: encoding->setContainer("Mpeg DVD");break;
+                default:
+                    ADM_assert(0);           
+            }
+            
 	}
+        else
+            encoding->setContainer("Mpeg ES");
 	for(uint32_t i=0;i<_total;i++)
 			{
             			if(!incoming->getFrameNumberNoAlloc(i, &size,
@@ -1044,7 +1060,7 @@ uint32_t fps1000;
         if(type!=MUXER_TS)
 	       _muxer=new mplexMuxer();	
         else
-               _muxer=new lavMuxer();
+               _muxer=new tsMuxer(); //lavMuxer();
         
 	// open( char *filename, uint32_t vbitrate, aviInfo *info, WAVHeader *audioheader,float need);
 	aviInfo info;

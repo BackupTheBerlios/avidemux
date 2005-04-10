@@ -207,24 +207,23 @@ uint32_t end;
 					}
 					break;
 		case CodecFamilyXVCD:
-					switch(UI_GetCurrentFormat())
-						{
-							case ADM_PS:
-								oplug_mpegff(name,1);;
-								break;
-							case ADM_ES:
-								oplug_mpegff(name,0);;
-								break;
-							default:
-								GUI_Alert("Output format is not compatible!");
-						}
-					break;
-		default:
-					ADM_assert(0);
-					return 0;
-	}
-	getFirstVideoFilter(0,avifileinfo->nb_frames);
-	return 1;
+                    switch(UI_GetCurrentFormat())
+                    {
+                        case ADM_TS:
+                        case ADM_PS:
+                        case ADM_ES:
+                                oplug_mpegff(name,UI_GetCurrentFormat());;
+                                break;
+                        default:
+                            GUI_Alert("Output format is not compatible!");
+                    }
+                    break;
+                default:
+                            ADM_assert(0);
+                            return 0;
+        }
+        getFirstVideoFilter(0,avifileinfo->nb_frames);
+        return 1;
 }
 void  A_SaveAudioDualAudio(char *inname)
 {

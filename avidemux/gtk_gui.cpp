@@ -184,8 +184,7 @@ extern int audioDelay;
 // QT or other port should be easy
 //___________________________________________
 
-void
-HandleAction (Action action)
+void HandleAction (Action action)
 {
   static int recursive = 0;
 
@@ -401,7 +400,7 @@ HandleAction (Action action)
   // allow all actions
 
   // restict disabled uncoded actions
-  if ((int) action > 100)
+  if ((int) action > 160)
     {
       GUI_Alert ("Not coded on this version");
       return;

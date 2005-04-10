@@ -85,12 +85,12 @@ void oplug_mpegff_conf( void )
 			);
 }
 
-void oplug_mpegff(char *name, uint8_t ps_stream)
+void oplug_mpegff(char *name, ADM_OUT_FORMAT type)
 {
 AVDMGenericVideoStream *_incoming;
 EncoderFFMPEGMpeg1  *encoder;
 
-mplexMuxer	*muxer=NULL;
+ADMMpegMuxer	*muxer=NULL;
 FILE 		*file=NULL;
 uint8_t		audioBuffer[48000];
 uint32_t	audioLen=0;
@@ -127,86 +127,115 @@ uint32_t  real_framenum=0;
 // override with mpeg1 specific stuff
 
 	// Check if audio
-	if(ps_stream)
-	{
-	
-		if(!currentaudiostream)
-		{
-			GUI_Alert("There is no audio track.");
-			return ;
-		}
-		audio=mpt_getAudioStream();
-	
-	// Have to check the type
-	// If it is mpeg2 we use DVD-PS
-	// If it is mpeg1 we use VCD-PS
-	// Later check if it is SVCD
-		if(!audio)
-		{
-			GUI_Alert("Audio track is  not suitable!\n");
-			return;
-		}
-		// Check
-		WAVHeader *hdr=audio->getInfo();
-	
-			audio_encoding=hdr->encoding;
-	
-	
-		if(current_codec==CodecXVCD)
-		{
-			if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
-			{
-				GUI_Alert("This is not compatible with VCD mpeg.\n");
-				deleteAudioFilter();
-				return ;
-			}
-			mux=MUXER_VCD;
-			printf("X*CD: Using VCD PS\n");
-	
-		}else
-		{    
-			aviInfo info;
-			video_body->getVideoInfo(&info);
-			if(hdr->frequency==44100 && _w==480&&hdr->encoding == WAV_MP2 ) // SVCD ?
-			{
-				mux=MUXER_SVCD;
-				printf("X*VCD: Using SVCD PS\n");
-			}
-			else
-			{
-			 // mpeg2, we do only DVD right now
-			if(hdr->frequency!=48000 || 
-			(hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
-			{
-				deleteAudioFilter();
-				GUI_Alert("Audio track is not suitable!\n");
-				return ;
-			}
-			mux=MUXER_DVD;
-			printf("X*VCD: Using DVD PS\n");
-			}
-		}
-	
-		// Create muxer
-		muxer=new mplexMuxer();
-		if(!muxer->open(name,0,mux,avifileinfo,audio->getInfo()))
-		{
-			delete muxer;
-			muxer=NULL;
-			deleteAudioFilter();
-			printf("Muxer init failed\n");
-			return ;
-		}
-	}
-	else
-	{	// Else open file (if possible)
-		file=fopen(name,"wb");
-		if(!file)
-		{
-			GUI_Alert("Cannot open output file !");
-	 		return ;
-		}
-	}
+        switch(type)
+        {
+            default:
+                    ADM_assert(0);
+            case ADM_ES:
+                        // Else open file (if possible)                       
+                        mux=MUXER_NONE;
+                        break;
+            case ADM_TS:
+                    if(!currentaudiostream)
+                    {
+                        GUI_Alert("There is no audio track.");
+                        return ;
+                    }
+                    audio=mpt_getAudioStream();
+                    mux=MUXER_TS;
+                    break;
+            case ADM_PS:
+            
+            {
+                if(!currentaudiostream)
+                {
+                        GUI_Alert("There is no audio track.");
+                        return ;
+                }
+                audio=mpt_getAudioStream();
+                // Have to check the type
+                // If it is mpeg2 we use DVD-PS
+                // If it is mpeg1 we use VCD-PS
+                // Later check if it is SVCD
+                if(!audio)
+                {
+                        GUI_Alert("Audio track is  not suitable!\n");
+                        return;
+                }
+                // Check
+                WAVHeader *hdr=audio->getInfo();	
+                audio_encoding=hdr->encoding;
+                if(current_codec==CodecXVCD)
+                {
+                        if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
+                        {
+                            GUI_Alert("This is not compatible with VCD mpeg.\n");
+                            deleteAudioFilter();
+                            return ;
+                        }
+                        mux=MUXER_VCD;
+                        printf("X*CD: Using VCD PS\n");
+                }else
+                {    
+                        aviInfo info;
+                        video_body->getVideoInfo(&info);
+                        if(hdr->frequency==44100 && _w==480&&hdr->encoding == WAV_MP2 ) // SVCD ?
+                        {
+                            mux=MUXER_SVCD;
+                            printf("X*VCD: Using SVCD PS\n");
+                        }
+                        else
+                        {
+                            // mpeg2, we do only DVD right now
+                            if(hdr->frequency!=48000 || 
+                                (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
+                            {
+                                deleteAudioFilter();
+                                GUI_Alert("Audio track is not suitable!\n");
+                                return ;
+                            }
+                            mux=MUXER_DVD;
+                            printf("X*VCD: Using DVD PS\n");
+                        }
+                }
+            }
+         }        
+        // Create muxer
+        switch(type)
+        {
+            case ADM_PS:
+                    muxer=new mplexMuxer;
+                    break;
+            case ADM_TS:
+                    muxer=new tsMuxer;
+                    break;
+            case ADM_ES:
+                    break;
+            default:
+                    ADM_assert(0);
+        
+        
+        }
+        if(muxer)
+        {
+            if(!muxer->open(name,0,mux,avifileinfo,audio->getInfo()))
+            {
+                delete muxer;
+                muxer=NULL;
+                deleteAudioFilter();
+                printf("Muxer init failed\n");
+                return ;
+            }
+        }
+        else
+        {
+            file=fopen(name,"wb");
+            if(!file)
+            {
+                    GUI_Alert("Cannot open output file !");
+                    return ;
+            }
+        }
 	switch(current_codec)
 	{
 		case CodecXVCD:
@@ -225,6 +254,7 @@ uint32_t  real_framenum=0;
 		default:
 		ADM_assert(0);
 	}
+        
   	encoder->setLogFile(twoPass,total);
   	if(!encoder->configure(_incoming))
   	{
@@ -253,7 +283,16 @@ uint32_t  real_framenum=0;
   				encoding->setCodec("FFmpeg Mpeg2 DVD VBR");
 				break;
 	}
-
+switch(mux)
+  {
+    case MUXER_NONE:encoding->setContainer("Mpeg ES");break;
+    case MUXER_TS:  encoding->setContainer("Mpeg TS");break;
+    case MUXER_VCD: encoding->setContainer("Mpeg VCD");break;
+    case MUXER_SVCD:encoding->setContainer("Mpeg SVCD");break;
+    case MUXER_DVD: encoding->setContainer("Mpeg DVD");break;
+    default:
+        ADM_assert(0);
+  }
 
 
 
@@ -296,7 +335,12 @@ uint32_t  real_framenum=0;
 
          // Set info for audio if any
          if(muxer)
-                  encoding->setAudioCodec(getStrFromAudioCodec(audio_encoding));
+         {
+            if(!audioProcessMode)
+                  encoding->setAudioCodec("Copy");
+            else
+                  encoding->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
+         }
 		// 2nd or Uniq Pass
 		for(uint32_t i=0;i<total;i++)
 			{

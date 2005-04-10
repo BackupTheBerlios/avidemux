@@ -68,7 +68,7 @@
 }
 
 uint8_t isMpeg12Compatible(uint32_t fourcc);
- 
+extern const char *getStrFromAudioCodec( uint32_t codec); 
 void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
 {
   uint32_t len, flags;
@@ -181,17 +181,28 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
                                 printf("PassThrought: Using DVD PS\n");
                         }
                 }
+
   	        muxer=new mplexMuxer();
+#if 0
+#warning TEST
+#warning TEST
+#warning TEST
+#warning TEST
+#warning TEST
+#warning TEST
+                muxer=new lavMuxer();
+#endif
                 break;
         case ADM_TS:     
              printf("Using TS output format\n");   
-             muxer=new lavMuxer();
+             muxer=new tsMuxer(); //lavMuxer();
              mux=MUXER_TS;
              break;
         default:
                 ADM_assert(0);
                 break;
         }
+        
         if(!muxer)
          {
                  printf("No muxer ?\n");
@@ -205,6 +216,7 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
 		return ;
 		
 	}
+        
 	// In copy mode it is better to recompute the gop timestamp
 	muxer->forceRestamp();
   ///____________________________
@@ -212,6 +224,19 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
   work->setCodec("Copy");
   work->setAudioCodec("---");
   work->setPhasis("Saving");
+  if(!audioProcessMode)
+     work->setAudioCodec("Copy");
+  else
+     work->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
+  switch(mux)
+  {
+    case MUXER_TS: work->setContainer("Mpeg TS");break;
+    case MUXER_VCD: work->setContainer("Mpeg VCD");break;
+    case MUXER_SVCD: work->setContainer("Mpeg SVCD");break;
+    case MUXER_DVD: work->setContainer("Mpeg DVD");break;
+    default:
+        ADM_assert(0);
+  }
   // preamble
   /*
   video_body->getRawStart (frameStart, buffer, &len);
