@@ -1,0 +1,432 @@
+/***************************************************************************
+                          Hue/Saturation filter ported from mplayer 
+ (c)  * Software equalizer (brightness, contrast, gamma, saturation)
+ *
+ * Hampa Hug <hampa@hampa.ch> (original LUT gamma/contrast/brightness filter)
+ * Daniel Moreno <comac@comac.darktech.org> (saturation, R/G/B gamma support)
+ * Richard Felker (original MMX contrast/brightness code (vf_eq.c))
+ * Michael Niedermayer <michalni@gmx.at> (LUT16)
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#include <stdio.h>
+#include <math.h>
+
+#include <stdlib.h>
+#include <string.h>
+#include <ADM_assert.h>
+
+#include "config.h"
+#include "fourcc.h"
+#include "avio.hxx"
+#include "config.h"
+#include "avi_vars.h"
+#ifdef HAVE_ENCODER
+
+
+#include "ADM_toolkit/toolkit.hxx"
+#include "ADM_editor/ADM_edit.hxx"
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_video/ADM_vidFlipV.h"
+#include "ADM_filter/video_filters.h"
+#include "ADM_dialog/DIA_enter.h"
+#include "ADM_video/ADM_cache.h"
+
+#include "admmangle.h"
+
+static FILTER_PARAM Eq2Param={8,{"contrast","brightness","saturation",
+                                "gamma","gamma_weight","rgamma","ggamma","bgamma"}};
+#define LUT16
+typedef struct Eq2_Param
+{
+  float     contrast ;      /* 1.0 means do nothing..*/    
+  float     brightness;     /* 0 means */
+  float     saturation;
+  
+  float     gamma;
+  float     gamma_weight;
+  float     rgamma;
+  float     ggamma;
+  float     bgamma;
+}Eq2_Param;
+typedef struct oneSetting {
+  unsigned char lut[256];
+#ifdef LUT16
+  uint16_t lut16[256*256];
+#endif
+  int           lut_clean;
+
+  double        c;
+  double        b;
+  double        g;
+  double        w;
+} oneSetting;
+typedef struct Eq2Settings {
+  oneSetting param[3];
+
+  double        contrast;
+  double        brightness;
+  double        saturation;
+
+  double        gamma;
+  double        gamma_weight;
+  double        rgamma;
+  double        ggamma;
+  double        bgamma;
+
+ 
+} Eq2Settings;
+/*=====================================*/
+typedef void (*apply_func) (oneSetting *par, unsigned char *dst, unsigned char *src,
+  unsigned w, unsigned h, unsigned dstride, unsigned sstride);
+static void apply_lut (oneSetting *par, unsigned char *dst, unsigned char *src,
+  unsigned w, unsigned h, unsigned dstride, unsigned sstride);
+#ifdef USE_MMX
+static void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
+  unsigned w, unsigned h, unsigned dstride, unsigned sstride);
+#endif
+static void create_lut (oneSetting *par);
+/*=====================================*/
+class  ADMVideoEq2:public AVDMGenericVideoStream
+{
+
+  protected:
+    AVDMGenericVideoStream  *_in;           
+    virtual char            *printConf(void);
+            void            update(void);
+            Eq2_Param       *_param;    
+            VideoCache      *vidCache; 
+            float           _hue;
+            float           _saturation;
+            Eq2Settings     settings;
+            apply_func      func;
+  public:
+                
+                        ADMVideoEq2(  AVDMGenericVideoStream *in,CONFcouple *setup);
+    virtual             ~ADMVideoEq2();
+    virtual uint8_t     configure(AVDMGenericVideoStream *in);
+    virtual uint8_t     getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+                                          ADMImage *data,uint32_t *flags);
+
+             uint8_t     getCoupledConf( CONFcouple **couples);
+}     ;
+
+SCRIPT_CREATE(Eq2_script,ADMVideoEq2,Eq2Param);
+BUILD_CREATE(Eq2_create,ADMVideoEq2);
+
+
+uint8_t ADMVideoEq2::configure(AVDMGenericVideoStream *in)
+{
+  uint8_t r=1;
+  float h,s;
+  _in=in;   
+ 
+  DIA_GetFloatValue(&_param->contrast, 0, 2, "Enter Contrast","Contrast:");
+  DIA_GetFloatValue(&_param->brightness, 0, 2, "Enter Brightness","Brightness:");
+  DIA_GetFloatValue(&_param->saturation, 0, 2, "Enter Saturation","Saturation:");
+  DIA_GetFloatValue(&_param->gamma, 0, 2, "Enter gamma","gamma:");
+  DIA_GetFloatValue(&_param->gamma_weight, 0, 2, "Enter gamma_weight","gamma_weight:");
+  DIA_GetFloatValue(&_param->rgamma, 0, 2, "Enter rgamma","rgamma:");
+  DIA_GetFloatValue(&_param->ggamma, 0, 2, "Enter ggamma","ggamma:");
+  DIA_GetFloatValue(&_param->bgamma, 0, 2, "Enter bgamma","bgamma:");
+  update();
+  return r;        
+}
+char *ADMVideoEq2::printConf( void )
+{
+  static char buf[50];
+        
+  sprintf((char *)buf," Eq2 :Cont:%1.2f Brigh:%1.2f Sat:%1.2f",
+                _param->contrast,_param->brightness,_param->saturation);
+  return buf;
+}
+
+ADMVideoEq2::ADMVideoEq2(  AVDMGenericVideoStream *in,CONFcouple *couples)
+{
+  
+  _in=in;         
+  memcpy(&_info,_in->getInfo(),sizeof(_info));    
+  _info.encoding=1; 
+  _param=new  Eq2_Param;
+  if(couples)
+  {                 
+    GET(contrast); 
+    GET(brightness);    
+    GET(saturation); 
+    GET(gamma); 
+    GET(gamma_weight); 
+    GET(rgamma); 
+    GET(ggamma); 
+    GET(bgamma); 
+  }
+  else
+  {
+    _param->contrast =1.0;                
+    _param->brightness=0.0;
+    _param->saturation =1.0;  
+    _param->gamma =1.0; 
+    _param->gamma_weight=1.0; 
+    _param->rgamma =1.0; 
+    _param->ggamma =1.0; 
+    _param->bgamma =1.0;    
+  }      
+  vidCache=new VideoCache(1,_in);
+  update();
+#ifdef USE_MMX
+    if(1)
+        func=affine_1d_MMX;
+    else
+#endif
+        func=apply_lut;
+    
+   
+}
+void ADMVideoEq2::update(void)
+{
+    settings.param[0].lut_clean=0;
+    settings.param[1].lut_clean=0;
+    settings.param[2].lut_clean=0;
+    settings.contrast=_param->contrast;
+    settings.param[0].c=_param->contrast;  
+    settings.brightness=_param->brightness;
+    settings.param[0].b=_param->brightness;;
+    settings.saturation=_param->saturation;
+    settings.param[1].c=_param->saturation;
+    settings.param[2].c=_param->saturation;
+    
+    
+    settings.ggamma=_param->ggamma;
+    settings.bgamma=_param->bgamma;
+    settings.rgamma=_param->rgamma;
+    settings.gamma=_param->gamma;
+    settings.param[0].g=settings.gamma*settings.ggamma;
+    settings.param[1].g=sqrt(settings.bgamma/settings.ggamma);
+    settings.param[2].g=sqrt(settings.rgamma/settings.ggamma);
+    settings.param[0].w=settings.param[1].w=settings.param[2].w=
+    settings.gamma_weight=_param->gamma_weight;   
+           
+}
+ADMVideoEq2::~ADMVideoEq2()
+{
+  delete _param;
+  delete vidCache;
+  
+}
+uint8_t ADMVideoEq2::getCoupledConf( CONFcouple **couples)
+{
+  ADM_assert(_param);
+  *couples=new CONFcouple(8);
+
+
+                CSET(contrast);
+                CSET(brightness);
+                CSET(saturation);
+                CSET(gamma); 
+                CSET(gamma_weight); 
+                CSET(rgamma); 
+                CSET(ggamma); 
+                CSET(bgamma); 
+                return 1;
+}
+
+
+uint8_t ADMVideoEq2::getFrameNumberNoAlloc(uint32_t frame,
+                                             uint32_t *len,
+                                             ADMImage *data,
+                                             uint32_t *flags)
+{
+  ADMImage *mysrc=NULL;
+  
+
+  if(frame>=_info.nb_frames) return 0;
+  
+  mysrc=vidCache->getImage(frame);
+  if(!mysrc) return 0;
+  
+  uint32_t w,h;
+  w=_info.width;
+  h=_info.height;
+  func(&(settings.param[0]),YPLANE(data),YPLANE(mysrc),w,h,w,w);
+  w>>=1;
+  h>>=1;
+  func(&(settings.param[2]),UPLANE(data),UPLANE(mysrc),w,h,w,w);
+  func(&(settings.param[1]),VPLANE(data),VPLANE(mysrc),w,h,w,w);
+ 
+  vidCache->unlockAll();
+  
+  
+  return 1;
+}
+
+static
+void create_lut (oneSetting *par)
+{
+  unsigned i;
+  double   g, v;
+  double   lw, gw;
+
+  g = par->g;
+  gw = par->w;
+  lw = 1.0 - gw;
+
+  if ((g < 0.001) || (g > 1000.0)) {
+    g = 1.0;
+  }
+
+  g = 1.0 / g;
+
+  for (i = 0; i < 256; i++) {
+    v = (double) i / 255.0;
+    v = par->c * (v - 0.5) + 0.5 + par->b;
+
+    if (v <= 0.0) {
+      par->lut[i] = 0;
+    }
+    else {
+      v = v*lw + pow(v, g)*gw;
+
+      if (v >= 1.0) {
+        par->lut[i] = 255;
+      }
+      else {
+        par->lut[i] = (unsigned char) (256.0 * v);
+      }
+    }
+  }
+
+#ifdef LUT16
+  for(i=0; i<256*256; i++){
+    par->lut16[i]= par->lut[i&0xFF] + (par->lut[i>>8]<<8);
+  }
+#endif
+
+  par->lut_clean = 1;
+}
+
+#ifdef USE_MMX
+static
+void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
+  unsigned w, unsigned h, unsigned dstride, unsigned sstride)
+{
+  unsigned i;
+  int      contrast, brightness;
+  unsigned dstep, sstep;
+  int      pel;
+  short    int brvec[4];
+  short    int contvec[4];
+  
+//  printf("\nmmx: src=%p dst=%p w=%d h=%d ds=%d ss=%d\n",src,dst,w,h,dstride,sstride);
+
+  contrast = (int) (par->c * 256 * 16);
+  brightness = ((int) (100.0 * par->b + 100.0) * 511) / 200 - 128 - contrast / 32;
+
+  brvec[0] = brvec[1] = brvec[2] = brvec[3] = brightness;
+  contvec[0] = contvec[1] = contvec[2] = contvec[3] = contrast;
+
+  sstep = sstride - w;
+  dstep = dstride - w;
+
+  while (h-- > 0) {
+    asm volatile (
+      "movq (%5), %%mm3 \n\t"
+      "movq (%6), %%mm4 \n\t"
+      "pxor %%mm0, %%mm0 \n\t"
+      "movl %4, %%eax\n\t"
+      ".balign 16 \n\t"
+      "1: \n\t"
+      "movq (%0), %%mm1 \n\t"
+      "movq (%0), %%mm2 \n\t"
+      "punpcklbw %%mm0, %%mm1 \n\t"
+      "punpckhbw %%mm0, %%mm2 \n\t"
+      "psllw $4, %%mm1 \n\t"
+      "psllw $4, %%mm2 \n\t"
+      "pmulhw %%mm4, %%mm1 \n\t"
+      "pmulhw %%mm4, %%mm2 \n\t"
+      "paddw %%mm3, %%mm1 \n\t"
+      "paddw %%mm3, %%mm2 \n\t"
+      "packuswb %%mm2, %%mm1 \n\t"
+      "add $8, %0 \n\t"
+      "movq %%mm1, (%1) \n\t"
+      "add $8, %1 \n\t"
+      "decl %%eax \n\t"
+      "jnz 1b \n\t"
+      : "=r" (src), "=r" (dst)
+      : "0" (src), "1" (dst), "r" (w >> 3), "r" (brvec), "r" (contvec)
+      : "%eax"
+    );
+
+    for (i = w & 7; i > 0; i--) {
+      pel = ((*src++ * contrast) >> 12) + brightness;
+      if (pel & 768) {
+        pel = (-pel) >> 31;
+      }
+      *dst++ = pel;
+    }
+
+    src += sstep;
+    dst += dstep;
+  }
+
+  asm volatile ( "emms \n\t" ::: "memory" );
+}
+#endif
+
+void apply_lut (oneSetting *par, unsigned char *dst, unsigned char *src,
+  unsigned w, unsigned h, unsigned dstride, unsigned sstride)
+{           
+            
+    
+  
+  unsigned      i, j, w2;
+  unsigned char *lut;
+  uint16_t *lut16;
+
+  if (!par->lut_clean) {
+    create_lut (par);
+  }
+
+  lut = par->lut;
+#ifdef LUT16
+  lut16 = par->lut16;
+  w2= (w>>3)<<2;
+  for (j = 0; j < h; j++) {
+    uint16_t *src16= (uint16_t*)src;
+    uint16_t *dst16= (uint16_t*)dst;
+    for (i = 0; i < w2; i+=4) {
+      dst16[i+0] = lut16[src16[i+0]];
+      dst16[i+1] = lut16[src16[i+1]];
+      dst16[i+2] = lut16[src16[i+2]];
+      dst16[i+3] = lut16[src16[i+3]];
+    }
+    i <<= 1;
+#else
+  w2= (w>>3)<<3;
+  for (j = 0; j < h; j++) {
+    for (i = 0; i < w2; i+=8) {
+      dst[i+0] = lut[src[i+0]];
+      dst[i+1] = lut[src[i+1]];
+      dst[i+2] = lut[src[i+2]];
+      dst[i+3] = lut[src[i+3]];
+      dst[i+4] = lut[src[i+4]];
+      dst[i+5] = lut[src[i+5]];
+      dst[i+6] = lut[src[i+6]];
+      dst[i+7] = lut[src[i+7]];
+    }
+#endif
+    for (; i < w; i++) {
+      dst[i] = lut[src[i]];
+    }
+
+    src += sstride;
+    dst += dstride;
+  }
+}  
+#endif

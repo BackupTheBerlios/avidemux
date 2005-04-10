@@ -78,6 +78,8 @@
                 VF_RESAMPLE_FPS,
                 VF_LAVPP_DEINT,
                 VF_UNSTACK_FIELD,
+                VF_HUE,
+                VF_EQ2,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

@@ -113,6 +113,8 @@ printf(  "*********************\n");
 	REGISTERX("lumaonly","Luma only",VF_LUMA,1,luma_create,luma_script);
 	REGISTERX("chromauonly","Chroma U only",VF_CHROMAU,1,chromaU_create,chromaU_script);
 	REGISTERX("chromavonly","Chroma V only",VF_CHROMAV,1,chromaV_create,chromaV_script);
+        REGISTERX("hue","Mplayer Hue",VF_HUE,1,hue_create,hue_script);
+        REGISTERX("eq2","Mplayer Eq2",VF_EQ2,1,Eq2_create,Eq2_script);
 		
 	registerFilter("-------------- Smoother -------------",VF_INVALID,2,NULL,NULL);
 	//   registerFilter("Temporal smoother",tempsmooth_create);	
