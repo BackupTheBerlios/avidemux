@@ -383,7 +383,7 @@ uint8_t refOnly=0;
 
         refOnly=_videos[seg].decoder->dontcopy(); // can we skip one memcpy ?
 
-        if(!len & refOnly)      // Size is null = no image and we only got a pointer
+        if(!len & refOnly & !frame)      // Size is null = no image and we only got a pointer
                                 // copy the previous one
         {                
                 // First image
