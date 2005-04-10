@@ -2,7 +2,11 @@
 
 #include <config.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
 #include "mjpeg_types.h"
+#include "mjpeg_logging.h"
 #include "transfrm_ref.h"
 
 /* Copyright (C) 1996, MPEG Software Simulation Group. All Rights Reserved. */
@@ -46,6 +50,9 @@
 /* this code assumes >> to be a two's-complement arithmetic */
 /* right shift: (-2)>>1 == -1 , (-3)>>1 == -2               */
 
+
+// define if you want to include idct testing code
+#define IDCTTEST
 
 
 #define W1 2841 /* 2048*sqrt(2)*cos(1*pi/16) */
@@ -201,6 +208,135 @@ void idct(int16_t *block)
     idctcol(block+i);
 }
 
+#ifdef IDCTTEST
+
+extern void idct_mmx(int16_t *blk);
+extern void idct_sse(int16_t *blk);
+
+static double coslu[8][8];
+
+/* reference idct taken from "ieeetest.c"
+ * Written by Tom Lane (tgl@cs.cmu.edu).
+ * Released to public domain 11/22/93.
+ */   
+void idct_ref(int16_t *block)
+{
+    int x,y,u,v;
+    double tmp, tmp2;
+    double res[8][8];
+
+    for (y=0; y<8; y++) {
+        for (x=0; x<8; x++) {
+            tmp = 0.0;
+            for (v=0; v<8; v++) {
+                tmp2 = 0.0;
+                for (u=0; u<8; u++) {
+                    tmp2 += (double) block[v*8+u] * coslu[x][u];
+                }
+                tmp += coslu[y][v] * tmp2;
+            }
+            res[y][x] = tmp;
+        }
+    }
+
+    for (v=0; v<8; v++) {
+        for (u=0; u<8; u++) {
+            tmp = res[v][u];
+            if (tmp < 0.0) {
+                x = - ((int) (0.5 - tmp));
+            } else {
+                x = (int) (tmp + 0.5);
+            }
+            block[v*8+u] = x;
+        }
+    }
+}
+
+void init_idct_ref(void)
+{
+  int a,b;
+  double tmp;
+
+  for(a=0;a<8;a++)
+    for(b=0;b<8;b++) {
+      tmp = cos((double)((a+a+1)*b) * (3.14159265358979323846 / 16.0));
+      if(b==0)
+	tmp /= sqrt(2.0);
+      coslu[a][b] = tmp * 0.5;
+    }
+}
+
+struct dct_test {
+    int bounds,maxerr,iter;
+    int me[64],mse[64];
+};
+
+void dct_test_and_print(struct dct_test *dt,int range,int16_t *origblock,int16_t *block)
+{
+    int b,m,i;
+
+    b=0;
+    m=0;
+    for( i=0; i<64; i++ ) {
+        int x=block[i]-origblock[i];
+        int ax=abs(x);
+        dt->me[i]+=x;
+        dt->mse[i]+=x*x;
+        if( ax>m )
+            m=ax;
+        if( block[i]<-range || block[i]>=range )
+            b++;
+        if( origblock[i]<-range || origblock[i]>=range ) {
+            // mjpeg_info("*********** REFERENCE VERSION OUT OF BOUNDS\n");
+        }
+    }
+    dt->bounds+=b;
+    if (m > dt->maxerr )
+        dt->maxerr = m;
+    dt->iter++;
+    if( !(dt->iter&65535) ) {
+        int sme=0,srms=0;
+
+        for( i=0; i<64; i++ ) {
+            sme+=dt->me[i];
+            srms+=dt->mse[i];
+        }
+        mjpeg_info("dct_test[%d]: max error=%d, mean error=%.8f, rms error=%.8f; bounds err=%d\n",
+                   dt->iter,dt->maxerr,
+                   sme/(dt->iter*64.),
+                   srms/(dt->iter*64.),
+                   dt->bounds);
+        for( i=0; i<8; i++ ) {
+            int j;
+
+            for( j=0; j<8; j++ )
+                fprintf(stderr,"%9.6f%c",((double)dt->me[i*8+j])/dt->iter,j==7?'\n':' ');
+            for( j=0; j<8; j++ )
+                fprintf(stderr,"%9.6f%c",((double)dt->mse[i*8+j])/dt->iter,j==7?'\n':' ');
+            fprintf(stderr,"\n");
+        }
+    }
+}
+
+static struct dct_test idct_res;
+
+void idct_test(int16_t *block)
+{
+    int16_t origblock[64];
+
+    memcpy(origblock,block,64*sizeof(int16_t));
+
+    idct_ref(origblock);
+    // idct(origblock);
+
+    idct(block);
+    // idct_mmx(block);
+    // idct_sse(block);
+
+    dct_test_and_print(&idct_res,256,origblock,block);
+}
+#endif
+
 void init_idct(void)
 {
   int i;
@@ -208,4 +344,9 @@ void init_idct(void)
   iclp = iclip+512;
   for (i= -512; i<512; i++)
     iclp[i] = (i<-256) ? -256 : ((i>255) ? 255 : i);
+
+#ifdef IDCTTEST
+  memset(&idct_res,0,sizeof(idct_res));
+  init_idct_ref();
+#endif
 }

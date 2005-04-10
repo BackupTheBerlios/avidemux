@@ -24,8 +24,8 @@
 #include "config.h"
 #include "mjpeg_types.h"
 #include "simd.h"
-
-#if defined(HAVE_ASM_MMX) && defined(HAVE_ASM_NASM) 
+#include "predict_ref.h"
+#if defined(USE_MMX) 
 void pred_comp_mmxe(
 	uint8_t *src,
 	uint8_t *dst,
@@ -51,16 +51,16 @@ void pred_comp_mmxe(
 	if( xh )
 	{
 		if( yh ) 
-			predcomp_11_mmxe(s,d,lx,w,h,addflag);
+			predcomp_11_mmxe((char *)s,(char *)d,lx,w,h,addflag);
 		else /* !yh */
-			predcomp_10_mmxe(s,d,lx,w,h,addflag);
+			predcomp_10_mmxe((char *)s,(char *)d,lx,w,h,addflag);
 	}
 	else /* !xh */
 	{
 		if( yh ) 
-			predcomp_01_mmxe(s,d,lx,w,h,addflag);
+			predcomp_01_mmxe((char *)s,(char *)d,lx,w,h,addflag);
 		else /* !yh */
-			predcomp_00_mmxe(s,d,lx,w,h,addflag);
+			predcomp_00_mmxe((char *)s,(char *)d,lx,w,h,addflag);
 	}
 		
 }
@@ -90,16 +90,16 @@ void pred_comp_mmx(
 	if( xh )
 	{
 		if( yh ) 
-			predcomp_11_mmx(s,d,lx,w,h,(int)addflag);
+			predcomp_11_mmx((char *)s,(char *)d,lx,w,h,(int)addflag);
 		else /* !yh */
-			predcomp_10_mmx(s,d,lx,w,h,(int)addflag);
+			predcomp_10_mmx((char *)s,(char *)d,lx,w,h,(int)addflag);
 	}
 	else /* !xh */
 	{
 		if( yh ) 
-			predcomp_01_mmx(s,d,lx,w,h,(int)addflag);
+			predcomp_01_mmx((char *)s,(char *)d,lx,w,h,(int)addflag);
 		else /* !yh */
-			predcomp_00_mmx(s,d,lx,w,h,(int)addflag);
+			predcomp_00_mmx((char *)s,(char *)d,lx,w,h,(int)addflag);
 	}
 		
 }

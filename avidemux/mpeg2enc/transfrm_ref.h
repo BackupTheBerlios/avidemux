@@ -84,7 +84,11 @@ void idct( int16_t *blk );
 void init_fdct (void);
 void init_idct (void);
 */
-
+#ifdef USE_MMX
+void init_mp2_fdct_sse();
+void mp2_fdct_sse( int16_t *blk );
+void mp2_idct_sse( int16_t *blk );
+#endif
 //MEANX
 /*
 #ifdef  __cplusplus

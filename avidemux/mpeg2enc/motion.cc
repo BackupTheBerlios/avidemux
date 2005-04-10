@@ -1,15 +1,13 @@
-#include <stdio.h>
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
-#include "cpu_accel.h"
+#include <stdio.h>
 
 #include "mmxsse_motion.h"
 #include "mjpeg_logging.h"
-
+#include "ADM_toolkit/ADM_cpuCap.h"
 void enable_mmxsse_motion(int cpucap)
 {
-	if(cpucap & ACCEL_X86_MMXEXT ) /* AMD MMX or SSE... */
+#ifdef USE_MMX
+	if(CpuCaps::hasMMXEXT())  /* AMD MMX or SSE... */
 	{
 		printf( "SETTING EXTENDED MMX for MOTION!\n");
 		psad_sub22 = sad_sub22_mmxe;
@@ -30,7 +28,7 @@ void enable_mmxsse_motion(int cpucap)
 		pmblocks_sub44_mests = mblocks_sub44_mests_mmxe;
 
 	}
-	else if(cpucap & ACCEL_X86_MMX) /* Ordinary MMX CPU */
+	else if(CpuCaps::hasMMX()) /* Ordinary MMX CPU */
 	{
 		printf( "SETTING MMX for MOTION!\n");
 		psad_sub22 = sad_sub22_mmx;
@@ -55,5 +53,5 @@ void enable_mmxsse_motion(int cpucap)
 		printf( "SETTING regular ME (non accelerated)!\n");
 	}
 
-
+#endif
 }

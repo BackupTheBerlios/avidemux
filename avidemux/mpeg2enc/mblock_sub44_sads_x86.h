@@ -22,8 +22,6 @@
 
 #include <config.h>
 #include "mjpeg_types.h"
-extern "C"
-{
 int mblocks_sub44_mests_mmxe( uint8_t *blk,  uint8_t *ref,
 							 int ilow, int jlow,
 							 int ihigh, int jhigh, 
@@ -36,5 +34,4 @@ int mblocks_sub44_mests_mmx( uint8_t *blk,  uint8_t *ref,
 							int threshold,
 							int h, int rowstride, 
 							me_result_s *resvec);
-}
 #endif

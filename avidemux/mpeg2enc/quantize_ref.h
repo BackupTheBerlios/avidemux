@@ -54,8 +54,26 @@ void iquant_non_intra (int16_t *src, int16_t *dst, int mquant);
 
 int quant_weight_coeff_sum(int16_t *blk, uint16_t * i_quant_mat);
 void iquant_non_intra_m1(int16_t *src, int16_t *dst, uint16_t *quant_mat);
-
-
+/*-------*/
+int quant_non_intra_sse( int16_t *src, int16_t *dst,
+                                     int q_scale_type,
+                                     int *nonsat_mquant);
+int quant_non_intra_mmx( int16_t *src, int16_t *dst,
+                                     int q_scale_type,
+                                     int *nonsat_mquant);
+int quant_non_intra_3dnow( int16_t *src, int16_t *dst,
+                                     int q_scale_type,
+                                     int *nonsat_mquant);    
+int quant_weight_coeff_sum_mmx(int16_t *blk, uint16_t*i_quant_mat );
+void iquant_non_intra_mmx(int16_t *src, int16_t *dst, int mquant );
+				     				      
+void iquant_non_intra_m1_extmmx(int16_t *src, int16_t *dst, uint16_t *qmat);
+void iquant_non_intra_m2_extmmx(int16_t *src, int16_t *dst, uint16_t *qmat);
+void iquant_non_intra_m1_mmx(int16_t *src, int16_t *dst, uint16_t *qmat);
+void iquant_non_intra_m2_mmx(int16_t *src, int16_t *dst, uint16_t *qmat);
+int quantize_ni_mmx(short *dst, short *src,
+                             short *quant_mat, short *i_quant_mat,
+                     int imquant, int mquant, int sat_limit);
 
 #ifdef  __cplusplus
 }

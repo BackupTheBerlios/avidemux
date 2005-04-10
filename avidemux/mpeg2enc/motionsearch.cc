@@ -49,11 +49,8 @@
 
 
 
-#if defined(HAVE_ASM_MMX) && defined(HAVE_ASM_NASM)
-extern "C"
-{
+#if defined(USE_MMX)
 #include "mmxsse_motion.h"
-}
 #endif
 
 /*
@@ -979,8 +976,6 @@ void variance(uint8_t *p, int size,	int rowstride,
 
 void init_motion_search(void)
 {
-	int cpucap = cpu_accel();
-
 	/* Initialize function pointers. This allows partial acceleration
 	 * implementations to update only the function pointers they support.
 	 */
@@ -1001,13 +996,9 @@ void init_motion_search(void)
 	pbuild_sub44_mests = build_sub44_mests;
 	psubsample_image = subsample_image;
 
-#if defined(HAVE_ASM_MMX) && defined(HAVE_ASM_NASM)
+#if defined(USE_MMX)
 	printf("Enabling mmx motion search\n");
-	enable_mmxsse_motion(cpucap);
+	enable_mmxsse_motion(0);
 #endif
-#if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)
-	if (cpucap > 0) {
-		enable_altivec_motion();
-	}
-#endif
+
 }

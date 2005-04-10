@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include "config.h"
+#include <stdlib.h>
 #include <limits.h>
 #include <math.h>
 #include "mmxsse_motion.h"
@@ -23,21 +23,24 @@ void find_best_one_pel_mmxe( me_result_set *sub22set,
 	uint8_t *orgblk;
 	int penalty;
 	me_result_s matchrec;
-	int resvec[4];
+	int32_t resvec[4];
 
 	for( k = 0; k < sub22set->len; ++k )
-	{	
+	{
+                int x;
 		matchrec = sub22set->mests[k];
 		orgblk = org + (i0+matchrec.x)+rowstride*(j0+matchrec.y);
-		penalty = intmax(abs(matchrec.x),abs(matchrec.y))<<5;
+		penalty = (abs(matchrec.x) + abs(matchrec.y))<<3;
 		
 		/* Get SAD for macroblocks: 	orgblk,orgblk(+1,0),
 		   orgblk(0,+1), and orgblk(+1,+1)
 		   Done all in one go to reduce memory bandwidth demand
 		*/
-		mblock_nearest4_sads_mmxe(orgblk,blk,rowstride,h,
-		resvec);
-
+                if( penalty>=dmin )
+                    continue;
+		x=mblock_nearest4_sads_mmxe(orgblk,blk,rowstride,h,resvec,dmin-penalty);
+                if( x+penalty>=dmin )
+                    continue;
 		for( i = 0; i < 4; ++i )
 		{
 			if( matchrec.x <= ilim && matchrec.y <= jlim )

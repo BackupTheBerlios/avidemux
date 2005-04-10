@@ -61,6 +61,7 @@
 
 #include "cpu_accel.h"
 #include "simd.h"
+#include "ADM_toolkit/ADM_cpuCap.h"
 
 #if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
 void enable_altivec_quantization(int opt->mpeg1);
@@ -470,53 +471,42 @@ void iquant_non_intra(int16_t *src, int16_t *dst, int mquant )
 
 void init_quantizer(void)
 {
-#if defined(HAVE_ASM_MMX) && defined(HAVE_ASM_NASM)
-	int flags = cpu_accel();
-	const char *opt_type1, *opt_type2;
-	if( (flags & ACCEL_X86_MMX) != 0 ) /* MMX CPU */
-	{
-		if( (flags & ACCEL_X86_3DNOW) != 0 )
-		{
-			opt_type1 = "3DNOW and";
-			pquant_non_intra = quant_non_intra_3dnow;
-		}
-		else if ( (flags & ACCEL_X86_SSE) != 0 )
-		{
-			opt_type1 = "SSE and";
-			pquant_non_intra = quant_non_intra_sse;
-		}
-		else 
-		{
-			opt_type1 = "MMX and";
-			pquant_non_intra = quant_non_intra_mmx;
-		}
-
-		if ( (flags & ACCEL_X86_MMXEXT) != 0 )
-		{
-			opt_type2 = "EXTENDED MMX";
-			pquant_weight_coeff_sum = quant_weight_coeff_sum_mmx;
-			piquant_non_intra = iquant_non_intra_mmx;
-		}
-		else
-		{
-			opt_type2 = "MMX";
-			pquant_weight_coeff_sum = quant_weight_coeff_sum_mmx;
-			piquant_non_intra = iquant_non_intra_mmx;
-		}
-		printf( "SETTING %s %s for QUANTIZER!", opt_type1, opt_type2);
-	}
-	else
+#warning Quantizer MMX code disabled for now!
+#if 0 && defined(USE_MMX)
+        if(CpuCaps::has3DNOW())
+        {
+                printf("Using 3dnow quantizer\n");
+                pquant_non_intra = quant_non_intra_3dnow;
+        }
+        else
+        if(CpuCaps::hasSSE())
+        {
+                printf("Using SSE quantizer\n");
+                pquant_non_intra = quant_non_intra_sse;
+        }else
+        if(CpuCaps::hasMMX())
+        {
+                printf("Using MMX quantizer\n");
+                pquant_non_intra = quant_non_intra_mmx;
+        }       
+        else
+#endif         
+        {       printf("Using MMX quantizer\n");
+                pquant_non_intra = quant_non_intra;	
+        }
+#warning MMX code disabled
+#if 0 && defined(USE_MMX)
+        if(CpuCaps::hasMMX())
+        {
+                pquant_weight_coeff_sum = quant_weight_coeff_sum_mmx;
+                piquant_non_intra = iquant_non_intra_mmx;
+        }else
 #endif
-	{
-		pquant_non_intra = quant_non_intra;	  
-		pquant_weight_coeff_sum = quant_weight_coeff_sum;
-		piquant_non_intra = iquant_non_intra;
-		printf( "SETTING no accel\n");
-	}
-#if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
-	if (cpu_accel())
-	    enable_altivec_quantization(opt->mpeg1);
-#endif
+        {
+                pquant_weight_coeff_sum = quant_weight_coeff_sum;
+                piquant_non_intra = iquant_non_intra;
+        
+        }        
 }
 
 

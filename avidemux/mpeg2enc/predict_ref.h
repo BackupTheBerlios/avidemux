@@ -44,10 +44,36 @@ void clearblock ( int picture_struct, uint8_t *cur[], int i0, int j0);
 
 void init_predict(void);
 
-
+void pred_comp_mmxe(
+	uint8_t *src,
+	uint8_t *dst,
+	int lx,
+	int w, int h,
+	int x, int y,
+	int dx, int dy,
+	int addflag);
+void pred_comp_mmx(
+	uint8_t *src,
+	uint8_t *dst,
+	int lx,
+	int w, int h,
+	int x, int y,
+	int dx, int dy,
+	int addflag);
 #ifdef  __cplusplus
 }
-#endif
+#endif	
+void predcomp_00_mmx(char *src,char *dst,int lx, int w, int h, int addflag);
+void predcomp_10_mmx(char *src,char *dst,int lx, int w, int h, int addflag);
+void predcomp_01_mmx(char *src,char *dst,int lx, int w, int h, int addflag);
+void predcomp_11_mmx(char *src,char *dst,int lx, int w, int h, int addflag);
+
+void predcomp_00_mmxe(char *src,char *dst,int lx, int w, int h, int addflag);
+void predcomp_10_mmxe(char *src,char *dst,int lx, int w, int h, int addflag);
+void predcomp_01_mmxe(char *src,char *dst,int lx, int w, int h, int addflag);
+void predcomp_11_mmxe(char *src,char *dst,int lx, int w, int h, int addflag);
+	
+
 
 #endif /* _PREDICT_H */
 

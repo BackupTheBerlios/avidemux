@@ -50,7 +50,22 @@
 #include "mjpeg_logging.h"
 #include "global.h"
 #include "predict_ref.h"
-
+void pred_comp_mmxe(
+	uint8_t *src,
+	uint8_t *dst,
+	int lx,
+	int w, int h,
+	int x, int y,
+	int dx, int dy,
+	int addflag);
+void pred_comp_mmx(
+	uint8_t *src,
+	uint8_t *dst,
+	int lx,
+	int w, int h,
+	int x, int y,
+	int dx, int dy,
+	int addflag);
 /* form prediction for a complete picture (frontend for predict_mb)
  *
  * mbi:  macroblock info

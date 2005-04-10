@@ -57,25 +57,21 @@
 #include "transfrm_ref.h"
 #include "cpu_accel.h"
 #include "simd.h"
-
+#include "ADM_toolkit/ADM_cpuCap.h"
 #if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)
 #include "../utils/altivec/altivec_transform.h"
 #endif
 
 #ifdef USE_MMX
-extern "C"
-{
- 	void mp2_fdct_mmx(short int *block);;
+
 	void add_pred_mmx (uint8_t *pred, uint8_t *cur,
 						  int lx, int16_t *blk) ;
 	void sub_pred_mmx (uint8_t *pred, uint8_t *cur,
 						  int lx, int16_t *blk) ;
+ 	void mp2_fdct_mmx(short int *block);;
 
 	int field_dct_best_mmx( uint8_t *cur_lum_mb, uint8_t *pred_lum_mb);
 	void mp2_idct_mmx( int16_t * blk ) ;
-
-
- }
  #endif
 void fdct( int16_t *blk );
 void init_fdct (void);
@@ -194,36 +190,48 @@ void sub_pred(uint8_t *pred, uint8_t *cur, int lx, 	int16_t *blk)
 
 void init_transform(void)
 {
-	int flags;
-	flags = cpu_accel();
 
 	// By default use C implementation
-#if defined( USE_MMX) && defined(HAVE_ASM_NASM)
-		pfdct = mp2_fdct_mmx;
-		pidct = mp2_idct_mmx;
-		padd_pred = add_pred_mmx;
-		psub_pred = sub_pred_mmx;
-		pfield_dct_best = field_dct_best_mmx;
-		printf("\n SETTINGS  i/f DCT MMX code\n");
-		printf("\n SETTINGS MMX i/f DCT activated\n");
-#else
+#if defined( USE_MMX) 
+                if(CpuCaps::hasSSE())
+                {
+		  pfdct = mp2_fdct_sse;
+		  pidct = mp2_idct_sse;
+		  padd_pred = add_pred_mmx;
+		  psub_pred = sub_pred_mmx;
+		  pfield_dct_best = field_dct_best_mmx;
+                  init_mp2_fdct_sse();
+		  printf("\n SETTINGS  idct/fdct : SSE \n");
+		  
+                } else
+                if(CpuCaps::hasMMX())
+                {
+		  pfdct = mp2_fdct_mmx;
+		  pidct = mp2_idct_mmx;
+		  padd_pred = add_pred_mmx;
+		  psub_pred = sub_pred_mmx;
+		  pfield_dct_best = field_dct_best_mmx;
+		  printf("\n SETTINGS  idct/fdct : MMX \n");
+		  
+                }
+                else
+                
+#endif
+                {
 		pfdct = fdct;
 		pidct = idct;
 		padd_pred = add_pred;
 		psub_pred = sub_pred;
 		pfield_dct_best = field_dct_best;
-		init_fdct();
-		init_idct();
-		#if !defined(HAVE_ASM_NASM)
-		printf("Because nasm was not found\n");
-		#endif
+                printf("\n SETTINGS  idct/fdct : C \n");
 		#if !defined(USE_MMX)
 		printf("Because MMX was disabled\n");
 		#endif
-
+                }
 		init_fdct();
 		init_idct();
-#endif
+                
+}                
 	// MEANX
 #if 0
 #if defined(HAVE_ASM_MMX) && defined(HAVE_ASM_NASM) 
@@ -287,4 +295,4 @@ void init_transform(void)
 	init_fdct();
 	init_idct();
 #endif
-}
+
