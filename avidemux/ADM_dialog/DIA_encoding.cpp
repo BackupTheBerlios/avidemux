@@ -145,6 +145,11 @@ void DIA_encoding::reset(void)
 	   _videoSize=0;
 	   _current=0;
 }
+void DIA_encoding::setContainer(const char *container)
+{
+        ADM_assert(dialog);
+        gtk_label_set_text(GTK_LABEL(WID(label_container)),container);
+}
 void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 {
 	uint32_t tim;
@@ -328,10 +333,12 @@ create_dialog1 (void)
   GtkWidget *hbox1;
   GtkWidget *image1;
   GtkWidget *label33;
+  
+   GtkWidget *label_c1,*label_container,*label90;
 
   dialog1 = gtk_dialog_new ();
   gtk_widget_set_size_request (dialog1, 500, -1);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog1), 12);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog1), 13);
   gtk_window_set_title (GTK_WINDOW (dialog1), _("Encoding in Progress"));
   gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);
 
@@ -554,6 +561,29 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (label_eta), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label_eta), 0, 0.5);
+/*
+
+*/
+  label90 = gtk_label_new (_("<b>Container:</b>"));
+  gtk_widget_show (label90);
+  gtk_table_attach (GTK_TABLE (table4), label90, 0, 1, 11, 12,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label90), TRUE);
+  gtk_label_set_justify (GTK_LABEL (label90), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label90), 0, 0.5);
+  gtk_misc_set_padding (GTK_MISC (label90), 12, 0);
+
+  label_container = gtk_label_new (_("None"));
+  gtk_widget_show (label_container);
+  gtk_table_attach (GTK_TABLE (table4), label_container, 1, 2, 11, 12,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label_container), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label_container), 0, 0.5);
+/*
+
+*/  
 
   progressbar1 = gtk_progress_bar_new ();
   gtk_widget_show (progressbar1);
@@ -621,6 +651,7 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
   GLADE_HOOKUP_OBJECT (dialog1, image1, "image1");
   GLADE_HOOKUP_OBJECT (dialog1, label33, "label33");
+  GLADE_HOOKUP_OBJECT (dialog1, label_container, "label_container");
 
   return dialog1;
 }

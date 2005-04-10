@@ -33,6 +33,7 @@ public:
 		void feedAudioFrame(uint32_t br);		
 		void setQuant(uint32_t quant);
 		void setFrame(uint32_t nb,uint32_t total);
+                void setContainer(const char *container);
 		
  		uint8_t isAlive(void);
 };
