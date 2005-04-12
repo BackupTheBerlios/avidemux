@@ -97,28 +97,28 @@ void myBlendASM(void)
 {
 	__asm__ (
 //"StartASM4: \n\t"
-"push 				%%edi\n\t"
-"push 				%%esi\n\t"
-"push 				%%eax\n\t"
+"push 				"REG_di"\n\t"
+"push 				"REG_si"\n\t"
+"push 				"REG_ax"\n\t"
 
-"movl (%0), %%eax \n\t"
-"movl "Mangle(_l_p)", %%eax \n\t"
-"movl "Mangle(_l_c)", %%ebx \n\t"
-"movl "Mangle(_l_n)", %%ecx \n\t"
-"movl "Mangle(_l_e)", %%esi \n\t"
-"movl "Mangle(_l_e2)", %%edi \n\t"
+"mov (%0), "REG_ax" \n\t"
+"mov "Mangle(_l_p)", "REG_ax" \n\t"
+"mov "Mangle(_l_c)", "REG_bx" \n\t"
+"mov "Mangle(_l_n)", "REG_cx" \n\t"
+"mov "Mangle(_l_e)", "REG_si" \n\t"
+"mov "Mangle(_l_e2)", "REG_di" \n\t"
 "movq "Mangle(full_ones)",%%mm7 \n\t"
 "pxor	   %%mm6,%%mm6 \n\t"
 
 "DHCOLB%=: \n\t" // loop
-"movl "Mangle(_l_w)", %%edx \n\t"                // loop one line
+"mov "Mangle(_l_w)", "REG_dx" \n\t"                // loop one line
 
 "DHLineB%=:  \n\t"
 
-"movd (%%ebx),%%mm0 \n\t"     // mm0 <- c
-"movd (%%eax),%%mm1 \n\t"     // mm1 <- p
-"movd (%%ecx),%%mm2 \n\t"     // mm2 <- n
-"movd (%%esi),%%mm3 \n\t"     // mm2 <- e
+"movd ("REG_bx"),%%mm0 \n\t"     // mm0 <- c
+"movd ("REG_ax"),%%mm1 \n\t"     // mm1 <- p
+"movd ("REG_cx"),%%mm2 \n\t"     // mm2 <- n
+"movd ("REG_si"),%%mm3 \n\t"     // mm2 <- e
 
 
 "punpcklbw %%mm6, %%mm0 \n\t"
@@ -162,23 +162,23 @@ void myBlendASM(void)
 "packuswb  %%mm6, %%mm0 \n\t"          // pack
 //"movq %%mm0,S10 \n\t"
 
-"movd	   %%mm0, (%%edi) \n\t" // store
+"movd	   %%mm0, ("REG_di") \n\t" // store
 
 //
 //
 // next
-"addl       $4,%%eax \n\t"
-"addl       $4,%%ebx \n\t"
-"addl       $4,%%ecx \n\t"
-"addl       $4,%%esi \n\t"
-"addl       $4,%%edi \n\t"
-"subl       $1,%%edx			\n\t"
+"add       $4,"REG_ax" \n\t"
+"add       $4,"REG_bx" \n\t"
+"add       $4,"REG_cx" \n\t"
+"add       $4,"REG_si" \n\t"
+"add       $4,"REG_di" \n\t"
+"sub       $1,"REG_dx"	\n\t"
 "jne        DHLineB%= \n\t"   // next
-"subl       $1,"Mangle(_l_h)"  \n\t" // next line
+"sub       $1,"Mangle(_l_h)"  \n\t" // next line
 "jne        DHCOLB%= \n\t"
-"pop 				%%eax\n\t"
-"pop 				%%esi\n\t"
-"pop 				%%edi\n\t"
+"pop 				"REG_ax"\n\t"
+"pop 				"REG_si"\n\t"
+"pop 				"REG_di"\n\t"
 " emms       \n\t"
  : /* no output */
  :  "r"(&_mmTHRESH1)

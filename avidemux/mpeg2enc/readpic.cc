@@ -112,8 +112,15 @@ int luminance_mean(uint8_t *frame, int w, int h )
 // code borrowed from ffmpeg by means
 static int pix_sum16_mmx(uint8_t * pix, int line_size){
     const int h=16;
+#ifdef ARCH_X86_64
+    long int rline_size=line_size;
+    long int sum;
+    long int index= -line_size*h;
+#else    
+    int rline_size=line_size;
     int sum;
     int index= -line_size*h;
+#endif
 
     __asm __volatile(
                 "pxor %%mm7, %%mm7		\n\t"
@@ -131,7 +138,7 @@ static int pix_sum16_mmx(uint8_t * pix, int line_size){
                 "paddw %%mm2, %%mm3		\n\t"
                 "paddw %%mm1, %%mm3		\n\t"
                 "paddw %%mm3, %%mm6		\n\t"
-                "addl %3, %1			\n\t"
+                "add %3, %1			\n\t"
                 " js 1b				\n\t"
                 "movq %%mm6, %%mm5		\n\t"
                 "psrlq $32, %%mm6		\n\t"
@@ -140,9 +147,9 @@ static int pix_sum16_mmx(uint8_t * pix, int line_size){
                 "psrlq $16, %%mm6		\n\t"
                 "paddw %%mm5, %%mm6		\n\t"
                 "movd %%mm6, %0			\n\t"
-                "andl $0xFFFF, %0		\n\t"
+                "and $0xFFFF, %0		\n\t"
                 : "=&r" (sum), "+r" (index)
-                : "r" (pix - index), "r" (line_size)
+                : "r" (pix - index), "r" (rline_size)
         );
 
         return sum;

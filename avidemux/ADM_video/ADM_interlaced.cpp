@@ -132,14 +132,14 @@ pxor_r2r(mm7,mm7);
 	for(y=h>>SKIP_FACTOR;  y >2 ; y--)
 		{
 			__asm__ __volatile__(
-				"mov "Mangle(_l_c)",	%%eax\n\t"
-				"mov "Mangle(_l_p)",	%%ebx\n\t"
-				"mov "Mangle(_l_n)",	%%ecx\n\t"
-				"mov "Mangle(_l_h)",	%%edx\n\t"
+				"mov "Mangle(_l_c)",	"REG_ax"\n\t"
+				"mov "Mangle(_l_p)",	"REG_bx"\n\t"
+				"mov "Mangle(_l_n)",	"REG_cx"\n\t"
+				"mov "Mangle(_l_h)",	"REG_dx"\n\t"
 				"8: \n\t"
-				"movd (%%eax),	%%mm0\n\t"
-				"movd (%%ebx),	%%mm1\n\t"
-				"movd (%%ecx),	%%mm2\n\t"
+				"movd ("REG_ax"),	%%mm0\n\t"
+				"movd ("REG_bx"),	%%mm1\n\t"
+				"movd ("REG_cx"),	%%mm2\n\t"
 				:
 				:
 				: "eax", "ebx", "ecx", "edx"
@@ -147,10 +147,10 @@ pxor_r2r(mm7,mm7);
 				COMPUTE
 
 			__asm__ __volatile__(
-				"addl $4,		%%eax\n\t"
-				"addl $4	,	%%ebx\n\t"
-				"addl $4,		%%ecx\n\t"
-				"subl $1,		%%edx\n\t"
+				"add $4,		"REG_ax"\n\t"
+				"add $4	,	"REG_bx"\n\t"
+				"add $4,		"REG_cx"\n\t"
+				"sub $1,		"REG_dx"\n\t"
 				"jnz 		8b\n\t"
 				:
 				:
@@ -167,8 +167,8 @@ pxor_r2r(mm7,mm7);
 		// retrieve mm7 containg the total
 
 		__asm__ __volatile__(
-		"mov 	$"Mangle(_total)",		%%eax\n\t"
-		"movd 	%%mm7,	(%%eax)\n\t"
+		"mov 	$"Mangle(_total)",		"REG_ax"\n\t"
+		"movd 	%%mm7,	("REG_ax")\n\t"
 		"emms\n\t"
 		:
 		:
@@ -205,13 +205,13 @@ pxor_r2r(mm7,mm7);
 			for(x=w>>2;x>0;x--)
 			{
 			__asm__ __volatile__(
-				"mov "Mangle(_l_c)",	%%eax\n\t"
-				"mov "Mangle(_l_p)",	%%ebx\n\t"
-				"mov "Mangle(_l_n)",	%%ecx\n\t"
-				"mov "Mangle(_l_h)",	%%edx\n\t"
-				"movd (%%eax),	%%mm0\n\t"
-				"movd (%%ebx),	%%mm1\n\t"
-				"movd (%%ecx),	%%mm2\n\t"
+				"mov "Mangle(_l_c)",	"REG_ax"\n\t"
+				"mov "Mangle(_l_p)",	"REG_bx"\n\t"
+				"mov "Mangle(_l_n)",	"REG_cx"\n\t"
+				"mov "Mangle(_l_h)",	"REG_dx"\n\t"
+				"movd ("REG_ax"),	%%mm0\n\t"
+				"movd ("REG_bx"),	%%mm1\n\t"
+				"movd ("REG_cx"),	%%mm2\n\t"
 				:
 				:
 				: "eax", "ebx", "ecx", "edx"
@@ -232,8 +232,8 @@ pxor_r2r(mm7,mm7);
 		// retrieve mm7 containg the total
 
 		__asm__ __volatile__(
-		"mov 	$"Mangle(_total)",		%%eax\n\t"
-		"movd 	%%mm7,	(%%eax)\n\t"
+		"mov 	$"Mangle(_total)",		"REG_ax"\n\t"
+		"movd 	%%mm7,	("REG_ax")\n\t"
 		"emms\n\t"
 		:
 		:

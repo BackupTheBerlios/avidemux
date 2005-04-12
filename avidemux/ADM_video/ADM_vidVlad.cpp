@@ -199,21 +199,21 @@ UNUSED_ARG(_keep_left_luma);
 		
 __asm__ __volatile__(
 "StartASM1%=: \n\t"
-"movl "Mangle(_l_source)",%%esi \n\t"
-"movl "Mangle(_l_dest)", %%edi \n\t"
+"mov "Mangle(_l_source)","REG_si" \n\t"
+"mov "Mangle(_l_dest)", "REG_di" \n\t"
 
-"movl "Mangle(_l_prev)", %%eax \n\t"
-"movl "Mangle(_l_sprev)", %%ebx \n\t"
-"movl "Mangle(_l_mask)", %%edx \n\t"
+"mov "Mangle(_l_prev)", "REG_ax" \n\t"
+"mov "Mangle(_l_sprev)", "REG_bx" \n\t"
+"mov "Mangle(_l_mask)", "REG_dx" \n\t"
 "movq "Mangle(_threshold)",%%mm6 \n\t"
 "pxor %%mm7,%%mm7 \n\t"
 " \n\t"
-"movl "Mangle(w8)", %%ecx \n\t"                // -width/8
-"prefetchnta -128(%%esi) \n\t"        // preload cache
-"prefetchnta -128(%%eax) \n\t"
+"mov "Mangle(w8)", "REG_cx" \n\t"                // -width/8
+"prefetchnta -128("REG_si") \n\t"        // preload cache
+"prefetchnta -128("REG_ax") \n\t"
 "HLine%=:  \n\t"
-"movq (%%esi,%%ecx,8),%%mm0 \n\t"     // mm0 <- lsource+(size/8)*8
-"movq (%%eax,%%ecx,8),%%mm1 \n\t"     // mm1 <- lprev+(size/8)*8
+"movq ("REG_si","REG_cx",8),%%mm0 \n\t"     // mm0 <- lsource+(size/8)*8
+"movq ("REG_ax","REG_cx",8),%%mm1 \n\t"     // mm1 <- lprev+(size/8)*8
 "movq %%mm0,%%mm2 \n\t"               // mm2 <- mm0  source
 "movq %%mm1,%%mm3 \n\t"               // mm3 <-mm1   oold
 "psubusb %%mm1,%%mm0 \n\t"            // mm0=mm0-mm1
@@ -232,15 +232,15 @@ __asm__ __volatile__(
 "pand %%mm1,%%mm4 \n\t"               // if right & left triggered
 "packuswb %%mm4,%%mm4 \n\t"           // packed to 4 bytes
 "movq %%mm0,%%mm1 \n\t"               // mm0 -> mm1 (invert diff to thresh)
-"movd %%mm4,(%%edx,%%ecx,4) \n\t"     // store mask m4->mask+ecx*4
+"movd %%mm4,("REG_dx","REG_cx",4) \n\t"     // store mask m4->mask+ecx*4
 " \n\t"
 "pxor "Mangle(_full_f)",%%mm1 \n\t"             // iinvert m1 
 "pand %%mm3,%%mm0 \n\t"               // mm0=old and mask diff
 "pand %%mm2,%%mm1 \n\t"               // mm1= source and invert diff
 "por %%mm1,%%mm0 \n\t"                // m0 = mix
-"movntq %%mm0,(%%edi,%%ecx,8) \n\t"   // store to des+ecx*8
-"movntq %%mm0,(%%ebx,%%ecx,8) \n\t"   // store to mask+ecx*8
-"sub $1,%%ecx \n\t"                  // add 1 to ecv
+"movntq %%mm0,("REG_di","REG_cx",8) \n\t"   // store to des+ecx*8
+"movntq %%mm0,("REG_bx","REG_cx",8) \n\t"   // store to mask+ecx*8
+"sub $1,"REG_cx" \n\t"                  // add 1 to ecv
 "jnz HLine%= \n\t"                      // while !=0
 #ifdef LOOP		
 /*		_l_source += _pitch_source;
@@ -249,23 +249,23 @@ __asm__ __volatile__(
 		_l_dest += _pitch_source;
 		_l_mask +=_pitch_source>>1;
 		*/
-"movl "Mangle(_l_source)",%%esi \n\t"
-"movl "Mangle(_l_prev)",  %%eax \n\t"
-"movl "Mangle(_l_sprev)", %%ebx \n\t"
-"movl "Mangle(_l_dest)",  %%edi \n\t"
-"movl "Mangle(_l_mask)",  %%edx \n\t"
-"movl "Mangle(_pitch_source)",%%ecx \n\t"
-"addl  %%ecx,%%esi \n\t"
-"addl  %%ecx,%%eax \n\t"
-"addl  %%ecx,%%ebx \n\t"
-"addl  %%ecx,%%edi \n\t"
-"movl  %%esi, "Mangle(_l_source)" \n\t"
-"movl  %%eax, "Mangle(_l_prev)" \n\t"
-"movl  %%ebx, "Mangle(_l_sprev)" \n\t"
-"movl  %%edi, "Mangle(_l_dest)" \n\t"
-"sar   $1,%%ecx \n\t"
-"addl  %%ecx,%%edx \n\t"
-"movl  %%edx,"Mangle(_l_mask)"   \n\t"
+"mov "Mangle(_l_source)","REG_si" \n\t"
+"mov "Mangle(_l_prev)",  "REG_ax" \n\t"
+"mov "Mangle(_l_sprev)", "REG_bx" \n\t"
+"mov "Mangle(_l_dest)",  "REG_di" \n\t"
+"mov "Mangle(_l_mask)",  "REG_dx" \n\t"
+"mov "Mangle(_pitch_source)","REG_cx" \n\t"
+"add  "REG_cx","REG_si" \n\t"
+"add  "REG_cx","REG_ax" \n\t"
+"add  "REG_cx","REG_bx" \n\t"
+"add  "REG_cx","REG_di" \n\t"
+"mov  "REG_si", "Mangle(_l_source)" \n\t"
+"mov  "REG_ax", "Mangle(_l_prev)" \n\t"
+"mov  "REG_bx", "Mangle(_l_sprev)" \n\t"
+"mov  "REG_di", "Mangle(_l_dest)" \n\t"
+"sar   $1,"REG_cx" \n\t"
+"add  "REG_cx","REG_dx" \n\t"
+"mov  "REG_dx","Mangle(_l_mask)"   \n\t"
 
 #endif	
  : /* no output */
@@ -306,18 +306,18 @@ void ProcessCPlane(unsigned char *source, int pitch_source,
 
 
 __asm__ __volatile__ (
-"movl "Mangle(_l_source)", %%esi \n\t"
-"movl "Mangle(_l_dest)", %%edi \n\t"
-"movl "Mangle(_l_prev)", %%eax \n\t"
-"movl "Mangle(_l_sprev)", %%ebx \n\t"
-"movl "Mangle(_l_mask)", %%edx \n\t"
+"mov "Mangle(_l_source)", "REG_si" \n\t"
+"mov "Mangle(_l_dest)", "REG_di" \n\t"
+"mov "Mangle(_l_prev)", "REG_ax" \n\t"
+"mov "Mangle(_l_sprev)", "REG_bx" \n\t"
+"mov "Mangle(_l_mask)", "REG_dx" \n\t"
 "movq "Mangle(_threshold)",%%mm6 \n\t"
 "pxor %%mm7,%%mm7 \n\t"
 " \n\t"
-"movl "Mangle(w8)", %%ecx \n\t"
+"mov "Mangle(w8)", "REG_cx" \n\t"
 "Lfoo%=:  \n\t"
-"movq (%%esi,%%ecx,8),%%mm0 \n\t"
-"movq (%%eax,%%ecx,8),%%mm1 \n\t"
+"movq ("REG_si","REG_cx",8),%%mm0 \n\t"
+"movq ("REG_ax","REG_cx",8),%%mm1 \n\t"
 "movq %%mm0,%%mm2 \n\t"
 "movq %%mm1,%%mm3 \n\t"
 "psubusb %%mm1,%%mm0 \n\t"
@@ -328,7 +328,7 @@ __asm__ __volatile__ (
 "psubusb %%mm6,%%mm0 \n\t"
 "pcmpeqb %%mm7,%%mm0 \n\t"
 " \n\t"
-"movq (%%edx,%%ecx,8),%%mm4 \n\t"
+"movq ("REG_dx","REG_cx",8),%%mm4 \n\t"
 "pand %%mm4,%%mm0 \n\t"
 "movq %%mm0,%%mm1 \n\t"
 " \n\t"
@@ -336,9 +336,9 @@ __asm__ __volatile__ (
 "pand %%mm3,%%mm0 \n\t"
 "pand %%mm2,%%mm1 \n\t"
 "por %%mm1,%%mm0 \n\t"
-"movntq %%mm0,(%%edi,%%ecx,8) \n\t"
-"movntq %%mm0,(%%ebx,%%ecx,8) \n\t"
-"subl $1,%%ecx \n\t"
+"movntq %%mm0,("REG_di","REG_cx",8) \n\t"
+"movntq %%mm0,("REG_bx","REG_cx",8) \n\t"
+"sub $1,"REG_cx" \n\t"
 "jnz Lfoo%= \n\t"
 
 #ifdef LOOP		
@@ -348,22 +348,22 @@ __asm__ __volatile__ (
 		_l_dest += _pitch_source;
 		_l_mask +=_pitch_source>>1;
 		*/
-"movl "Mangle(_l_source)",%%esi \n\t"
-"movl "Mangle(_l_prev)",  %%eax \n\t"
-"movl "Mangle(_l_sprev)", %%ebx \n\t"
-"movl "Mangle(_l_dest)",  %%edi \n\t"
-"movl "Mangle(_l_mask)",  %%edx \n\t"
-"movl "Mangle(_pitch_source)",%%ecx \n\t"
-"addl  %%ecx,%%esi \n\t"
-"addl  %%ecx,%%eax \n\t"
-"addl  %%ecx,%%ebx \n\t"
-"addl  %%ecx,%%edi \n\t"
-"addl  %%ecx,%%edx \n\t"
-"movl  %%esi,"Mangle( _l_source)" \n\t"
-"movl  %%eax,"Mangle( _l_prev)" \n\t"
-"movl  %%ebx,"Mangle( _l_sprev)" \n\t"
-"movl  %%edi,"Mangle( _l_dest)" \n\t"
-"movl  %%edx,"Mangle(_l_mask)"   \n\t"
+"mov "Mangle(_l_source)","REG_si" \n\t"
+"mov "Mangle(_l_prev)",  "REG_ax" \n\t"
+"mov "Mangle(_l_sprev)", "REG_bx" \n\t"
+"mov "Mangle(_l_dest)",  "REG_di" \n\t"
+"mov "Mangle(_l_mask)",  "REG_dx" \n\t"
+"mov "Mangle(_pitch_source)","REG_cx" \n\t"
+"add  "REG_cx","REG_si" \n\t"
+"add  "REG_cx","REG_ax" \n\t"
+"add  "REG_cx","REG_bx" \n\t"
+"add  "REG_cx","REG_di" \n\t"
+"add  "REG_cx","REG_dx" \n\t"
+"mov  "REG_si","Mangle( _l_source)" \n\t"
+"mov  "REG_ax","Mangle( _l_prev)" \n\t"
+"mov  "REG_bx","Mangle( _l_sprev)" \n\t"
+"mov  "REG_di","Mangle( _l_dest)" \n\t"
+"mov  "REG_dx","Mangle(_l_mask)"   \n\t"
 
 #endif	
  : /* no output */

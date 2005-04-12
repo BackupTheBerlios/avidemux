@@ -721,6 +721,10 @@ case $adm_cpu in
 	x86_64|amd64)
 		have_little_endian=yes;
 		echo "TARGET_X86_64=yes" >> adm_lavcodec/config.cpu
+		AC_DEFINE(USE_MMX,1,"Use MMX acceleration")
+		AC_DEFINE(HAVE_MMX,1,"Use MMX acceleration")
+		AC_DEFINE(RUNTIME_CPUDETECT,1,"Let ffmpeg decide which is faster")
+
 		AC_DEFINE(HAVE_X86_64,1,"X86_64 amd64 assembly")
 		AC_DEFINE(ARCH_X86_64,1,"X86_64 amd64 assembly")
 		have_amd64=yes

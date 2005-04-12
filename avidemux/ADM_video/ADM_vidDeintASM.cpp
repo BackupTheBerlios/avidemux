@@ -128,21 +128,20 @@ void myDeintASM(void)
 	//printf("\n using  MMX \n");
 
 
-
         	{
 
 			__asm__ __volatile__ (
-				"mov "Mangle(_l_c)",	%%eax\n\t"
-				"mov "Mangle(_l_p)",	%%ebx\n\t"
-				"mov "Mangle(_l_n)",	%%ecx\n\t"
-				"mov "Mangle(_l_all)",	%%esi\n\t"
+				"mov "Mangle(_l_c)",	"REG_ax"\n\t"
+				"mov "Mangle(_l_p)",	"REG_bx"\n\t"
+				"mov "Mangle(_l_n)",	"REG_cx"\n\t"
+				"mov "Mangle(_l_all)",	"REG_si"\n\t"
 				"7:"
-				"movd (%%eax),	%%mm0\n\t"
-				"movd (%%ebx),	%%mm1\n\t"
-				"movd (%%ecx),	%%mm2\n\t"
+				"movd ("REG_ax"),	%%mm0\n\t"
+				"movd ("REG_bx"),	%%mm1\n\t"
+				"movd ("REG_cx"),	%%mm2\n\t"
 				:
 				:
-				: "eax", "ebx", "ecx", "edx","esi"
+				: "eax","ebx","ecx","edx","esi" 
 				);
 
 				COMPUTE_MMX;
@@ -150,18 +149,18 @@ void myDeintASM(void)
 				/* store result in e, e2 */
 
 			__asm__ __volatile__(
-				"mov 	"Mangle(_l_e)",	%%edx\n\t"
-				"movd	%%mm3,(%%edx)\n\t"
+				"mov 	"Mangle(_l_e)",	"REG_dx"\n\t"
+				"movd	%%mm3,("REG_dx")\n\t"
 
-				"mov 	"Mangle(_l_e2)",	%%edx\n\t"
-				"movd	%%mm0,(%%edx)\n\t"
+				"mov 	"Mangle(_l_e2)",	"REG_dx"\n\t"
+				"movd	%%mm0,("REG_dx")\n\t"
 
-				"addl 	$4,	%%eax\n\t"
-				"addl 	$4,	%%ebx\n\t"
-				"addl 	$4,	%%ecx\n\t"
-				"addl 	$4,	"Mangle(_l_e)"\n\t"
-				"addl 	$4,	"Mangle(_l_e2)"\n\t"
-				"subl 	$1,	%%esi\n\t"
+				"add 	$4,	"REG_ax"\n\t"
+				"add 	$4,	"REG_bx"\n\t"
+				"add 	$4,	"REG_cx"\n\t"
+				"add 	$4,	"Mangle(_l_e)"\n\t"
+				"add 	$4,	"Mangle(_l_e2)"\n\t"
+				"sub 	$1,	"REG_si"\n\t"
 				"jnz 7b\n\t"
 
 				:
@@ -191,13 +190,13 @@ int32_t x,y;
                		{
 
 			__asm__ __volatile__ (
-				"mov _l_c,	%%eax\n\t"
-				"mov _l_p,	%%ebx\n\t"
-				"mov _l_n,	%%ecx\n\t"
-				"mov _l_w,	%%esi\n\t"
-				"movd (%%eax),	%%mm0\n\t"
-				"movd (%%ebx),	%%mm1\n\t"
-				"movd (%%ecx),	%%mm2\n\t"
+				"mov _l_c,	"REG_ax"\n\t"
+				"mov _l_p,	"REG_bx"\n\t"
+				"mov _l_n,	"REG_cx"\n\t"
+				"mov _l_w,	"REG_si"\n\t"
+				"movd ("REG_ax"),	%%mm0\n\t"
+				"movd ("REG_bx"),	%%mm1\n\t"
+				"movd ("REG_cx"),	%%mm2\n\t"
 				:
 				:
 				: "eax", "ebx", "ecx", "edx","esi"
@@ -208,12 +207,12 @@ int32_t x,y;
 				/* store result in e, e2 */
 
 			__asm__ __volatile__(
-				"mov 	_l_e,	%%edx\n\t"
-				"movd	%%mm3,(%%edx)\n\t"
+				"mov 	_l_e,	"REG_dx"\n\t"
+				"movd	%%mm3,("REG_dx")\n\t"
 				//"movd	%%mm3,(%%eax)\n\t"
 
-				"mov 	_l_e2,	%%edx\n\t"
-				"movd	%%mm0,(%%edx)\n\t"
+				"mov 	_l_e2,	"REG_dx"\n\t"
+				"movd	%%mm0,("REG_dx")\n\t"
 
 				:
 				:
