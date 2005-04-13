@@ -348,9 +348,20 @@ static int read_old_huffman_tables(HYuvContext *s){
 #endif
 }
 
+static void alloc_temp(HYuvContext *s){
+    int i;
+    
+    if(s->bitstream_bpp<24){
+        for(i=0; i<3; i++){
+            s->temp[i]= av_malloc(s->width + 16);
+        }
+    }else{
+        s->temp[0]= av_malloc(4*s->width + 16);
+    }
+}
+
 static int common_init(AVCodecContext *avctx){
     HYuvContext *s = avctx->priv_data;
-    int i;
 
     s->avctx= avctx;
     s->flags= avctx->flags;
@@ -360,10 +371,7 @@ static int common_init(AVCodecContext *avctx){
     s->width= avctx->width;
     s->height= avctx->height;
     assert(s->width>0 && s->height>0);
-    
-    for(i=0; i<3; i++){
-        s->temp[i]= av_malloc(avctx->width + 16);
-    }
+        
     return 0;
 }
 
@@ -456,6 +464,8 @@ s->bgr32=1;
         assert(0);
     }
     
+    alloc_temp(s);
+    
 //    av_log(NULL, AV_LOG_DEBUG, "pred:%d bpp:%d hbpp:%d il:%d\n", s->predictor, s->bitstream_bpp, avctx->bits_per_sample, s->interlaced);
 
     return 0;
@@ -521,25 +531,21 @@ static int encode_init(AVCodecContext *avctx)
     }else s->context= 0;
     
     if(avctx->codec->id==CODEC_ID_HUFFYUV){
-#if 0 //MEANX    
         if(avctx->pix_fmt==PIX_FMT_YUV420P){
             av_log(avctx, AV_LOG_ERROR, "Error: YV12 is not supported by huffyuv; use vcodec=ffvhuff or format=422p\n");
             return -1;
         }
-#endif        
         if(avctx->context_model){
             av_log(avctx, AV_LOG_ERROR, "Error: per-frame huffman tables are not supported by huffyuv; use vcodec=ffvhuff\n");
             return -1;
         }
         if(s->interlaced != ( s->height > 288 ))
             av_log(avctx, AV_LOG_INFO, "using huffyuv 2.2.0 or newer interlacing flag\n");
-    }
-#if 0  //MEANX   
-    else if(avctx->strict_std_compliance>=0){
-        av_log(avctx, AV_LOG_ERROR, "This codec is under development; files encoded with it may not be decodeable with future versions!!! Set vstrict=-1 to use it anyway.\n");
+    }else if(avctx->strict_std_compliance>=0){
+        av_log(avctx, AV_LOG_ERROR, "This codec is under development; files encoded with it may not be decodeable with future versions!!! Set vstrict=-1 / -strict -1 to use it anyway.\n");
         return -1;
     }
-#endif    
+    
     ((uint8_t*)avctx->extradata)[0]= s->predictor;
     ((uint8_t*)avctx->extradata)[1]= s->bitstream_bpp;
     ((uint8_t*)avctx->extradata)[2]= s->interlaced ? 0x10 : 0x20;
@@ -603,6 +609,8 @@ static int encode_init(AVCodecContext *avctx)
     
 //    printf("pred:%d bpp:%d hbpp:%d il:%d\n", s->predictor, s->bitstream_bpp, avctx->bits_per_sample, s->interlaced);
 
+    alloc_temp(s);
+
     s->picture_number=0;
 
     return 0;
@@ -648,7 +656,10 @@ static int encode_422_bitstream(HYuvContext *s, int count){
             s->stats[0][ s->temp[0][2*i+1] ]++;
             s->stats[2][ s->temp[2][  i  ] ]++;
         }
-    }else if(s->context){
+    }
+    if(s->avctx->flags2&CODEC_FLAG2_NO_OUTPUT)
+        return 0;
+    if(s->context){
         for(i=0; i<count; i++){
             s->stats[0][ s->temp[0][2*i  ] ]++;
             put_bits(&s->pb, s->len[0][ s->temp[0][2*i  ] ], s->bits[0][ s->temp[0][2*i  ] ]);
@@ -684,7 +695,11 @@ static int encode_gray_bitstream(HYuvContext *s, int count){
             s->stats[0][ s->temp[0][2*i  ] ]++;
             s->stats[0][ s->temp[0][2*i+1] ]++;
         }
-    }else if(s->context){
+    }
+    if(s->avctx->flags2&CODEC_FLAG2_NO_OUTPUT)
+        return 0;
+    
+    if(s->context){
         for(i=0; i<count; i++){
             s->stats[0][ s->temp[0][2*i  ] ]++;
             put_bits(&s->pb, s->len[0][ s->temp[0][2*i  ] ], s->bits[0][ s->temp[0][2*i  ] ]);
@@ -774,10 +789,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
 
     AVFrame *picture = data;
 
-    /* no supplementary picture */
-    if (buf_size == 0)
-        return 0;
-        
     s->bitstream_buffer= av_fast_realloc(s->bitstream_buffer, &s->bitstream_buffer_size, buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
 
     s->dsp.bswap_buf((uint32_t*)s->bitstream_buffer, (uint32_t*)buf, buf_size/4);
@@ -1149,11 +1160,11 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
                 if(s->predictor == PLANE && s->interlaced < cy){
                     s->dsp.diff_bytes(s->temp[1], ydst, ydst - fake_ystride, width);
                     s->dsp.diff_bytes(s->temp[2], udst, udst - fake_ustride, width2);
-                    s->dsp.diff_bytes(s->temp[2] + 1250, vdst, vdst - fake_vstride, width2);
+                    s->dsp.diff_bytes(s->temp[2] + width2, vdst, vdst - fake_vstride, width2);
 
                     lefty= sub_left_prediction(s, s->temp[0], s->temp[1], width , lefty);
                     leftu= sub_left_prediction(s, s->temp[1], s->temp[2], width2, leftu);
-                    leftv= sub_left_prediction(s, s->temp[2], s->temp[2] + 1250, width2, leftv);
+                    leftv= sub_left_prediction(s, s->temp[2], s->temp[2] + width2, width2, leftv);
                 }else{
                     lefty= sub_left_prediction(s, s->temp[0], ydst, width , lefty);
                     leftu= sub_left_prediction(s, s->temp[1], udst, width2, leftu);
@@ -1184,7 +1195,8 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
             snprintf(p, end-p, "\n");
             p++;
         }
-    }else{
+    }
+    if(!(s->avctx->flags2 & CODEC_FLAG2_NO_OUTPUT)){
         flush_put_bits(&s->pb);
         s->dsp.bswap_buf((uint32_t*)buf, (uint32_t*)buf, size);
         avctx->stats_out[0] = '\0';
@@ -1206,20 +1218,6 @@ static int encode_end(AVCodecContext *avctx)
     
     return 0;
 }
-
-static const AVOption huffyuv_options[] =
-{
-    AVOPTION_CODEC_INT("prediction_method", "prediction_method", prediction_method, 0, 2, 0),
-    AVOPTION_END()
-};
-
-static const AVOption ffvhuff_options[] =
-{
-    AVOPTION_CODEC_INT("prediction_method", "prediction_method", prediction_method, 0, 2, 0),
-    AVOPTION_CODEC_INT("context_model", "context_model", context_model, 0, 2, 0),
-    AVOPTION_END()
-};
-
 
 AVCodec huffyuv_decoder = {
     "huffyuv",
@@ -1257,7 +1255,6 @@ AVCodec huffyuv_encoder = {
     encode_init,
     encode_frame,
     encode_end,
-    .options = huffyuv_options,
 };
 
 AVCodec ffvhuff_encoder = {
@@ -1268,7 +1265,6 @@ AVCodec ffvhuff_encoder = {
     encode_init,
     encode_frame,
     encode_end,
-    .options = ffvhuff_options,
 };
 
 #endif //CONFIG_ENCODERS
