@@ -368,6 +368,7 @@ float	 sum;
 EditorCache *cache=_videos[seg]._videoCache;	
 ADMImage *tmpImage=NULL;
 uint8_t refOnly=0;
+uint32_t left,ww;
 
 	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,
 						     compBuffer,
@@ -404,11 +405,16 @@ uint8_t refOnly=0;
         if(refOnly)
         {       // This is only an empty Shell
                 tmpImage=new ADMImage(_imageBuffer->_width,_imageBuffer->_height,1);
+                ww=_imageBuffer->_width & 0xfffff0;
+                left=_imageBuffer->_width & 0xf;
+
         }
         else
         {
                 tmpImage=_imageBuffer;
-        }
+                ww=_imageBuffer->_width;
+                left=0;
+       }
 	
 	// Do pp, and use imageBuffer as intermediate buffer
 	if (!_videos[seg].decoder->uncompress (compBuffer, tmpImage, len, &flags))
@@ -511,13 +517,64 @@ uint8_t refOnly=0;
 		 		strideTab,
 		 		oBuff,
 		 		strideTab2,
-		 		_info.width,
+		 		ww,
 		        	_info.height,
 		          	(int8_t *)(tmpImage->quant),
 		          	tmpImage->_qStride,
 		         	_pp.ppMode,
 		          	_pp.ppContext,
 		          	type);			// img type
+                /* 
+                        If there is a chroma block that needs padding
+                        (width not multiple of 16) while postprocessing,
+                        we process up to the nearest 16 multiple and
+                        just copy luma & chroma info that was left over
+                */
+                if(refOnly && left)
+                {
+                        uint8_t *src,*dst;
+                        uint32_t stridein,strideout,right;
+                        right=_info.width-left;
+                        // Luma
+                        dst=YPLANE(image)+right;
+                        src=tmpImage->_planes[0]+right;
+                        stridein=tmpImage->_planeStride[0];
+                        strideout=_info.width;
+                        for(uint32_t y=_info.height;y>0;y--)
+                        {
+                                memcpy(dst,src,left);
+                                dst+=strideout;
+                                src+=stridein;
+                        }
+                        // Chroma
+                        left>>=1;
+                        right>>=1;
+                        //
+                        dst=UPLANE(image)+right;
+                        src=tmpImage->_planes[1]+right;
+                        stridein=tmpImage->_planeStride[1];
+                        strideout=_info.width>>1;
+                        for(uint32_t y=_info.height>>1;y>0;y--)
+                        {
+                                memcpy(dst,src,left);
+                                dst+=strideout;
+                                src+=stridein;
+                        }
+                        //
+                        dst=VPLANE(image)+right;
+                        src=tmpImage->_planes[2]+right;
+                        stridein=tmpImage->_planeStride[2];
+                        strideout=_info.width>>1;
+                        for(uint32_t y=_info.height>>1;y>0;y--)
+                        {
+                                memcpy(dst,src,left);
+                                dst+=strideout;
+                                src+=stridein;
+                        }
+                        
+
+                }
+
                 // update some infos
                 if(refOnly) delete tmpImage;
 		cache->updateFrameNum(image,frame);
