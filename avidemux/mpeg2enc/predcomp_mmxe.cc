@@ -24,6 +24,7 @@
  */
  
 #include <config.h>
+#ifdef USE_MMX
 #include "mjpeg_types.h"
 #include "mmx.h"
 
@@ -290,3 +291,4 @@ void predcomp_01_mmxe(char *src,char *dst,int lx, int w, int h, int mask)
 	
 	emms();
 }
+#endif

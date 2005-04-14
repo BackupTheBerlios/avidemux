@@ -22,6 +22,7 @@
  */
 
 #include <config.h>
+#ifdef USE_MMX
 #include "mjpeg_types.h"
 #include "mmx.h"
 
@@ -236,3 +237,4 @@ int32_t quant_weight_coeff_sum_mmx(int16_t *src, int16_t *i_quant_mat)
 	return sum;
 }
 
+#endif

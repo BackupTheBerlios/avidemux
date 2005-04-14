@@ -22,6 +22,7 @@
 
 
 #include <config.h>
+#ifdef USE_MMX
 #include <math.h>
 #include "mjpeg_types.h"
 #include "syntaxparams.h"
@@ -242,3 +243,4 @@ int field_dct_best_mmx( uint8_t *cur_lum_mb, uint8_t *pred_lum_mb)
 
 	return dct_type;
 }
+#endif

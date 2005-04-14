@@ -35,6 +35,7 @@
  */
 
 #include <config.h>
+#ifdef USE_MMX
 #include "mjpeg_types.h"
 #include "attributes.h"
 #include "mmx.h"
@@ -243,3 +244,4 @@ static __inline__ int qblock_sad_mmx(uint8_t *refblk,
 
 
 
+#endif

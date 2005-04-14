@@ -1,4 +1,5 @@
 #include <config.h>
+#ifdef USE_MMX
 #include <math.h>
 #include <unistd.h>
 #include "mjpeg_types.h"
@@ -469,3 +470,4 @@ void mp2_fdct_sse(int16_t *block)
     }
     emms();
 }
+#endif

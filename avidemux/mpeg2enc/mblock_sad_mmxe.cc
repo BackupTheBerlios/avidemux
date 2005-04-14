@@ -31,6 +31,7 @@
 */
 
 #include <config.h>
+#ifdef USE_MMX
 #include "mjpeg_types.h"
 #include "mmx.h"
 #include "mmxsse_motion.h"
@@ -438,3 +439,4 @@ void mblock_sub22_nearest4_sads_mmxe(uint8_t *blk1, uint8_t *blk2,
     movq_r2m(mm1,resvec[2]);
     emms();
 }
+#endif
