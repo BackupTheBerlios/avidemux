@@ -111,6 +111,9 @@ protected:
         uint32_t    nbPacket;
         uint32_t    packetSincePAT;
         uint64_t    lastPCR;
+        uint8_t     *audioBuffer;
+        uint32_t    audioFill;
+        uint8_t     *pesBuffer;
         
         entryPacket *getPacket( void);   
         uint8_t     writeSection( uint32_t pid,channel *chan, 
@@ -119,10 +122,12 @@ protected:
         uint8_t     writePat( void);                       
         uint8_t     writePacket(uint8_t *data, uint32_t len, uint64_t pcr,channel *chan,uint8_t start);
         uint8_t     writePacketPad(uint8_t *data, uint32_t len, uint64_t pcr,channel *chan,uint8_t start);
-        uint64_t    audioTime( void)   ;            // Time is us
+        uint64_t    audioTime( uint32_t time)   ;            // Time is us
         uint64_t    videoTime( uint32_t frameno);   // Time in us                    
         uint8_t     flushPackets(uint8_t r);
-        
+        uint8_t     writeAudioPacket2(void);
+        uint8_t     pes2ts(channel *chan,uint64_t pcr,uint8_t tim );
+
         channel     audioChannel,videoChannel,pmt,pat;
         aviInfo     _info;
         WAVHeader   _wavHeader;

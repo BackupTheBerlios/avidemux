@@ -64,6 +64,9 @@
 #define TS_PAT_EVERY_PACKET     256
 #define TS_MUX_RATE             10000000        // 10 Mbs
 
+#define AUDIO_BUFFER            1024*1024
+#define PES_BUFFER              1024
+#define STUFFING_PATTERN        0
 static uint8_t writePts(uint8_t *data,uint64_t ipts);
 // /* ------------------------------------------------------------------------*/write
 tsMuxer::tsMuxer( void)
@@ -94,13 +97,21 @@ tsMuxer::tsMuxer( void)
     packetSincePAT=0;
     nbPacket=0;
     lastPCR=0;
-    
+    audioFill=0;
+    audioBuffer=new uint8_t[AUDIO_BUFFER];
+    pesBuffer=new uint8_t [PES_BUFFER];
 }
 tsMuxer::~tsMuxer( )
 {
    if(packetPipe)
     delete [] packetPipe;
    packetPipe=NULL;
+   if(audioBuffer)
+        delete [] audioBuffer;
+   audioBuffer=NULL;
+   if(pesBuffer)
+        delete [] pesBuffer;
+   pesBuffer=NULL;
 
 }
 //
@@ -113,7 +124,7 @@ double dpcr;    // delta PCR
 uint64_t pcr,packetpcr;
 entryPacket *entry;
         
-        dpcr=TS_PACKET_SIZE;
+        dpcr=TS_PACKET_SIZE*8;
         dpcr/=TS_MUX_RATE;      
         dpcr=dpcr*1000*1000;        // duration of a packet in us
         pcr=(uint64_t )dpcr;
@@ -147,7 +158,7 @@ entryPacket *entry;
                 }
             }
 #endif            
-            _curPTS+=pcr;
+           // _curPTS+=pcr;
             fwrite(entry->packet,TS_PACKET_SIZE,1,outFile);
             packetHead++;
             packetHead%=TS_NB_PACKET;
@@ -198,6 +209,9 @@ uint8_t *pkt;
     paket=getPacket();
     paket->pts=pcr;
     pkt=paket->packet;
+
+    // Here we go
+
     pkt[i++]=0x47;
     if(start) val=TS_UNIT_START; // Start ?
             else val=0;
@@ -303,7 +317,7 @@ uint8_t tsMuxer::needAudio(void)
     // all computation is in us
     uint32_t one=(1000*1000*1000)/_info.fps1000;
     
-            pts=audioTime();
+            pts=audioTime(audioFill);
             aprintf("Need audio  ?: %llu / %llu : %llu\n ",pts,_curPTS,_curPTS+one);
             if((pts>=_curPTS) && (pts<=_curPTS+one)) return 1;
             if(pts<=_curPTS)
@@ -384,8 +398,8 @@ uint8_t tsMuxer::writePmt( void)
 uint8_t data[1024];
 uint32_t i=0,sid=1;
 
-        data[i++]=0xE0+(audioChannel.pid>>8);  // PCR pid locked on audio             
-        data[i++]=audioChannel.pid&0xff;       //                 
+        data[i++]=0xE0+(videoChannel.pid>>8);  // PCR pid locked on audio             
+        data[i++]=videoChannel.pid&0xff;       //                 
         data[i++]=0xf0;  // info length              
         data[i++]=0;  // info length   
         //-- Video --
@@ -398,81 +412,104 @@ uint32_t i=0,sid=1;
         if(_wavHeader.encoding==WAV_AC3)
             data[i++]=0x81; // ac3
         else
-            data[i++]=0x03; // Mpeg2 audio
+            data[i++]=0x04; // Mpeg2 audio
         data[i++]=0xE0+(audioChannel.pid>>8); // pid
         data[i++]=(audioChannel.pid&0xff); 
         data[i++]=0xF0; // no descriptor
         data[i++]=0;    // no descriptor
+        
+        
         
 /*        data[2]=0xF0+((i-4)>>8);
         data[3]=((i-4)&0xff);
 */        
         return writeSection(pmt.pid,&pmt,data,i);                          
                                 
-}                                   
+} 
+uint8_t tsMuxer::pes2ts(channel *chan,uint64_t pcr,uint8_t tim )
+{
+        uint32_t part=0,l;
+        uint32_t out=PES_BUFFER;
+        uint8_t *data=pesBuffer;
+        while(out)
+        {
+                if(!part && tim)
+                {
+                        l=writePacket(data,out,pcr,chan,1);
+                }
+                else
+                        l=writePacket(data,out,TS_NO_PCR,chan,0);
+                out-=l;
+                data+=l;
+                part++;
+        }
+        return 1;
+}
+                                  
 uint8_t tsMuxer::writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe )
 {
-    uint32_t part=0;
-    uint8_t  data[TS_PACKET_SIZE*2];
+    
+    uint8_t  *data;
     uint32_t pes_len;
     uint64_t its;
     double d;
-   
-    _curPTS=videoTime(frameno);
-   
+    uint32_t left,part=1;
     
+    writeAudioPacket2();
+
+    _curPTS=videoTime(frameno);
+
+    // First packet    
     while(len)
     {
-        if(!part)
-        {
+            
             // we build header & pts separately
             //
-            uint32_t i=0;
-            //data[i++]=0x00;
-            data[i++]=0x00;
-            data[i++]=0x01;
-            data[i++]=0xe0;   // video id
-            pes_len=len+3+5+5;  // len + flags + pts  +pf 
-            data[i++]=pes_len>>8;
-            data[i++]=pes_len & 0xff;
-            data[i++]=0x80; // mpeg2
-            data[i++]=0x80+0x40; // PTS only + dts
-            data[i++]=5;    // PTS LEN
-            
-            // pts
-            its=videoTime(displayframe);
-            writePts(data+i,its);
-            i+=5;
-            // dts
-            its=videoTime(frameno);
-            writePts(data+i,its);
-            i+=5;
-            
-            uint32_t left;
-            left=TS_PACKET_SIZE-i-TS_HEADER_LEN-1;  // No PCR for now
-            if(left>len)
+            uint32_t i=0,left;
+            data=pesBuffer;
+            if(part)
             {
-                left=len;
-            }
-            memcpy(data+i,buf,left);
-            its=videoTime(frameno);
-            left=writePacket(data, i+left, its,&videoChannel,1);
-            left-=i;
-            // Write packet
-            len-=left;
-            buf+=left;
-        }
-        else
-        {
-            uint32_t left;
             
+                //data[i++]=0x00;
+                data[i++]=0x00;
+                data[i++]=0x01;
+                data[i++]=0xe0;   // video id
+                pes_len=len+3+10;  // PES header
+                data[i++]=pes_len>>8;
+                data[i++]=pes_len & 0xff;
+                data[i++]=0x80; // mpeg2
+            
+                data[i++]=0x80+0x40; // PTS + dts
+                data[i++]=10;    // PTS LEN
+            
+                // pts
+                its=videoTime(displayframe);
+                writePts(data+i,its);
+                i+=5;
+                // dts
+                its=videoTime(frameno);
+                writePts(data+i,its);
+                i+=5;                
+            
+                left=TS_PACKET_SIZE-i;
+                if(left>len)
+                {
+                      left=len;
+
+                }
+                memcpy(data+i,buf,left);                      
+                left=writePacket(data, i+len, its,&videoChannel,1);
+                left=left-i;
+            }
+            else
+            {
                 left=writePacket(buf, len, TS_NO_PCR,&videoChannel,0);
-                ADM_assert(left<=len);
-                len-=left;
-                buf+=left;
-        }
-        part++;
-    }
+            }
+
+            buf+=left;
+            len-=left;                   
+            part=0;
+     }    
     return 1;
 }
 /* Return time elapsed for video in us */
@@ -489,11 +526,11 @@ uint64_t p;
     return p;
 }    
 /* Return time elapsed for audio in us */
-uint64_t tsMuxer::audioTime( void)
+uint64_t tsMuxer::audioTime( uint32_t fill)
 {
 double f;
 uint64_t d;
-    f=_total;
+    f=_total+fill;
      f*=1000.*1000.;  // in us
      f/=(_wavHeader.byterate);   
      d= (uint64_t)floor(f);
@@ -502,71 +539,33 @@ uint64_t d;
 }
 uint8_t tsMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 {
-    uint32_t part=0;
-    uint8_t  data[TS_PACKET_SIZE*2];
-    uint32_t pes_len;
-    double f;
-    uint64_t ipts;
+#if 0
+        if(audioFill+len>PES_BUFFER)    // Enough for a PES BUFFER
+                writeAudioPacket2();
+#endif
+        memcpy(audioBuffer+audioFill,buf,len);
+        audioFill+=len;
+        ADM_assert(audioFill<AUDIO_BUFFER);
+        return 1;        
+}
+uint8_t tsMuxer::writeAudioPacket2(void)
+{
+    uint32_t part=1;
+    uint8_t  *data; // should be enough for one frame...    
+    uint64_t ipts;   
+    uint32_t left,pes_len;
+    uint8_t  *buf=audioBuffer;
+    uint32_t len=audioFill,org=audioFill;    
+    uint64_t its;
 
-  
-     ipts=audioTime(); // Time in us     
-     _total+=len;
-     
-    while(len)
-    {
-        if(!part)
-        {
-            // we build header & pts separately
-            //
-            uint32_t i=0;
-            //data[i++]=0x00;
-            data[i++]=0x00;
-            data[i++]=0x01;
-            if(_wavHeader.encoding==WAV_AC3)
-            {
-                data[i++]=0xbd;   // audio id
-            }
-            else
-                data[i++]=0xc0;   // audio id
-            pes_len=len+3+5;  // len + flags + pts  +pf 
-            data[i++]=pes_len>>8;
-            data[i++]=pes_len & 0xff;
-            data[i++]=0x80; // mpeg2
-            data[i++]=0x80; // PTS only + dts
-            data[i++]=5;    // PTS LEN
-            
-            // pts
-            writePts(data+i,ipts);
-            i+=5;
-            
-            
-            uint32_t left;
-            left=TS_PACKET_SIZE-i-TS_HEADER_LEN-1;  // No PCR for now
-            if(left>len)
-            {
-                left=len;
-            }
-            memcpy(data+i,buf,left);
-            left=writePacket(data, i+left, ipts,&audioChannel,1);
-            left-=i;
-            // Write packet
-            len-=left;
-            buf+=left;
-            
-            
-        }
-        else
-        {
-            uint32_t left;
-            
-                left=writePacket(buf, len, TS_NO_PCR,&audioChannel,0);
-                ADM_assert(left<=len);
-                len-=left;
-                buf+=left;
-        }
-        part++;
-    }
-    return 1;
+    if(!audioFill) return 1; // nothing to do
+
+
+   
+   
+     audioFill=0;
+     _total+=org;
+     return 1;
 }
 /*
     ipts is is us
