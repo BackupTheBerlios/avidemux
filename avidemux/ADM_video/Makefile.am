@@ -37,6 +37,6 @@ EXTRA_DIST = ADM_genvideo.cpp ADM_genvideo.hxx ADM_guiAddBorder.cpp ADM_guiBSMea
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES= $(all_includes) $(GTK_CFLAGS) $(FREETYPE_CFLAGS) $(ALTIVEC_SWITCH)
 noinst_HEADERS = ADM_vidlavdeint.h ADM_mpdetc.h ADM_vidKernelDeint.h \
-				ADM_vidForcedPP.h ADM_vidSoften.h ADM_cache.h ADM_vidDecTel_param.h ADM_vidDecDec_param.h \
-				ADM_vidMSmooth_param.h ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \
-	ADM_lavpp_deintparam.h
+					ADM_vidForcedPP.h ADM_vidSoften.h ADM_cache.h ADM_vidDecTel_param.h ADM_vidDecDec_param.h \
+					ADM_vidMSmooth_param.h ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \
+		ADM_lavpp_deintparam.h ADM_vidEq2.h
