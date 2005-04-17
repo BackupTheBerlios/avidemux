@@ -424,7 +424,7 @@ extern  uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 		0, //int kfreduction;
 		0, //int kfthreshold;
 	
-		24,//int container_frame_overhead;
+		0, //24,//int container_frame_overhead;
 		150,//int bquant_ratio;
 		100,//int bquant_offset;    
 		1, //vhqmode		    
