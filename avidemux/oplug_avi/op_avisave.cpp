@@ -338,6 +338,7 @@ GenericAviSave::guiStart (void)
 	encoding_gui=new DIA_encoding(25000);
 	encoding_gui->setCodec("Copy");
 	encoding_gui->setFrame (0, 100);
+        encoding_gui->setContainer("Avi");
 
 }
 
