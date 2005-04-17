@@ -67,7 +67,7 @@
 #define AUDIO_BUFFER            1024*1024
 #define PES_BUFFER              1024
 #define STUFFING_PATTERN        0
-static uint8_t writePts(uint8_t *data,uint64_t ipts);
+static uint8_t writePts(uint8_t *data,uint64_t ipts,uint32_t flags);
 // /* ------------------------------------------------------------------------*/write
 tsMuxer::tsMuxer( void)
 {
@@ -499,19 +499,21 @@ uint8_t tsMuxer::writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,ui
                 data[i++]=pes_len>>8;
                 data[i++]=pes_len & 0xff;
                 data[i++]=0x80; // mpeg2
-            
+           
                 data[i++]=0x80+0x40; // PTS + dts
                 data[i++]=10;    // PTS LEN
             
                 // pts
+                
                 its=videoTime(displayframe);
-                writePts(data+i,its);
+                writePts(data+i,its,3);
+                data[i]|=0x10;
                 i+=5;
                 // dts
                 its=videoTime(frameno);
-                writePts(data+i,its);
+                writePts(data+i,its,1);
                 i+=5;                
-            
+
                 left=TS_PACKET_SIZE-i;
                 if(left>len)
                 {
@@ -591,7 +593,14 @@ uint8_t tsMuxer::writeAudioPacket2(void)
                 //data[i++]=0x00;
                 data[i++]=0x00;
                 data[i++]=0x01;
-                data[i++]=0xc0;   // video id
+               // data[i++]=0xc0;   // video id
+                if(_wavHeader.encoding==WAV_AC3)
+                {
+                        data[i++]=0xbd;   // audio id
+                }
+                else
+                        data[i++]=0xc0;   // audio id
+
                 pes_len=len+3+5;  // PES header
                 data[i++]=pes_len>>8;
                 data[i++]=pes_len & 0xff;
@@ -601,7 +610,7 @@ uint8_t tsMuxer::writeAudioPacket2(void)
             
                 // pts
                 its=audioTime(0);
-                writePts(data+i,its);
+                writePts(data+i,its,2);
                 i+=5;                             
             
                 left=TS_PACKET_SIZE-i;
@@ -631,14 +640,18 @@ uint8_t tsMuxer::writeAudioPacket2(void)
 /*
     ipts is is us
 */
-uint8_t writePts(uint8_t *data,uint64_t ipts)
+/*
+        flags : PTS only = 2 PTS+DTS=3 DTS=1
+
+*/
+uint8_t writePts(uint8_t *data,uint64_t ipts,uint32_t flags)
 {
 uint32_t i=0;
 uint64_t p;
             ipts=ipts&0xfffffffffLL; // clip to 36 bits 33 bits *8 before clipping
             ipts=(ipts*90)/1000;
             
-            data[i++]=(0x02 << 4) | (((ipts >> 30) & 0x07) << 1) | 1;
+            data[i++]=(flags << 4) | (((ipts >> 30) & 0x07) << 1) | 1;
             p=(((ipts >> 15) & 0x7fff) << 1) | 1;
             data[i++]=p>>8;
             data[i++]=p&0xff;
