@@ -184,7 +184,7 @@ pcr is pts in us
 uint8_t     tsMuxer::writePacket(uint8_t *data, uint32_t len, uint64_t pcr,channel *chan,uint8_t start)
 {
 
-uint32_t i=0,val=0;
+uint32_t i=0,val=0,fill=0,fre;
 entryPacket *paket;
 uint8_t *pkt;
 
@@ -212,51 +212,72 @@ uint8_t *pkt;
 
     // Here we go
 
+        // Will we fill the packet
+        fre=TS_PACKET_SIZE-TS_HEADER_LEN;
+        if(start)       fre--;  // offset
+        if(pcr!=TS_NO_PCR) fre-=8;
+        if(len<fre) // We won't fill the packet
+        {
+                fill=fre-len;
+        }
+
     pkt[i++]=0x47;
     if(start) val=TS_UNIT_START; // Start ?
             else val=0;
     pkt[i++]=val+((chan->pid)>>8);
     pkt[i++]=(chan->pid)&0xff;
    
-    if(pcr!=TS_NO_PCR)
+    if(pcr!=TS_NO_PCR || fill)
         val=TS_UNIT_PAYLOAD_AF;     // if me put a pcr, we need to say there is
                                     // an adaption field
     else
         val=TS_UNIT_PAYLOAD_ONLY;
     pkt[i++]=val+(chan->counter&0xf);  // Payload only
     chan->counter++;
-    if(pcr!=TS_NO_PCR)
+    if(pcr!=TS_NO_PCR || fill)
     {
+        if(pcr!=TS_NO_PCR)
+        {
         
-        pcr=(pcr*90)/1000;
-        pcr=pcr&0x1FFFFFFFFLL; //mask to avoid overflow
-        pkt[i++]=7;
-        pkt[i++]=0x10; // AF flags
+                pcr=(pcr*90)/1000;
+                pcr=pcr&0x1FFFFFFFFLL; //mask to avoid overflow
+                pkt[i++]=7+fill;
+                pkt[i++]=0x10; // AF flags
         
-        pkt[i++]=(pcr>>25)&0xff; // FF
-        pkt[i++]=(pcr>>17)&0xff; // FF
-        pkt[i++]=(pcr>>9)&0xff; // FF
-        pkt[i++]=(pcr>>1)&0xff; // FF
-        pkt[i++]=(pcr<<7)&0x80; // &0x80
-        pkt[i++]=0x00;
-    }
+                pkt[i++]=(pcr>>25)&0xff; // FF
+                pkt[i++]=(pcr>>17)&0xff; // FF
+                pkt[i++]=(pcr>>9)&0xff; // FF
+                pkt[i++]=(pcr>>1)&0xff; // FF
+                pkt[i++]=(pcr<<7)&0x80; // &0x80
+                pkt[i++]=0x00;
+                if(fill)
+                {
+                        memset(pkt+i,0xff,fill);        
+                        i+=fill;
+                }
+        }
+        else
+        {
+                pkt[i++]=fill-1;
+                switch(fill)
+                {
+                        case 1: break;
+                        case 2: pkt[i++]=0;
+                                break;
+                        default:
+                                pkt[i++]=0;
+                                memset(pkt+i,0xff,fill-2);   
+                                i+=fill-2;
+                                break;
+                }
+        }
+     }
 
     
     if(start) pkt[i++]=0; // pointer field
     uint32_t left=TS_PACKET_SIZE-i;
-    if(len<left)
-    {
-        memcpy(pkt+i,data,len);
-        memset(pkt+i+len,0xff,left-len);
-        left=len;  
-        //fwrite(pkt,TS_PACKET_SIZE,1,outFile);  
-    }
-    else
-    {
-        memcpy(pkt+i,data,left); 
-        //fwrite(pkt,TS_PACKET_SIZE,1,outFile);       
-    }
-    
+    ADM_assert(len>=left);
+    memcpy(pkt+i,data,left);
     return left;
 }
 
@@ -539,10 +560,6 @@ uint64_t d;
 }
 uint8_t tsMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 {
-#if 0
-        if(audioFill+len>PES_BUFFER)    // Enough for a PES BUFFER
-                writeAudioPacket2();
-#endif
         memcpy(audioBuffer+audioFill,buf,len);
         audioFill+=len;
         ADM_assert(audioFill<AUDIO_BUFFER);
@@ -561,7 +578,51 @@ uint8_t tsMuxer::writeAudioPacket2(void)
     if(!audioFill) return 1; // nothing to do
 
 
-   
+     while(len)
+    {
+            
+            // we build header & pts separately
+            //
+            uint32_t i=0,left;
+            data=pesBuffer;
+            if(part)
+            {
+            
+                //data[i++]=0x00;
+                data[i++]=0x00;
+                data[i++]=0x01;
+                data[i++]=0xc0;   // video id
+                pes_len=len+3+5;  // PES header
+                data[i++]=pes_len>>8;
+                data[i++]=pes_len & 0xff;
+                data[i++]=0x80; // mpeg2            
+                data[i++]=0x80; // PTS 
+                data[i++]=5;    // PTS LEN
+            
+                // pts
+                its=audioTime(0);
+                writePts(data+i,its);
+                i+=5;                             
+            
+                left=TS_PACKET_SIZE-i;
+                if(left>len)
+                {
+                      left=len;
+
+                }
+                memcpy(data+i,buf,left);                      
+                left=writePacket(data, i+len, its,&audioChannel,1);
+                left=left-i;
+            }
+            else
+            {
+                left=writePacket(buf, len, TS_NO_PCR,&audioChannel,0);
+            }
+
+            buf+=left;
+            len-=left;                   
+            part=0;
+     }    
    
      audioFill=0;
      _total+=org;
