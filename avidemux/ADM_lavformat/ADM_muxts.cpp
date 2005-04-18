@@ -64,8 +64,8 @@
 #define TS_PAT_EVERY_PACKET     256
 #define TS_MUX_RATE             10000000        // 10 Mbs
 
-#define AUDIO_BUFFER            1024*1024
-#define PES_BUFFER              1024
+#define AUDIO_BUFFER            1024*10
+#define PES_BUFFER              1024            // Just to build packet into
 #define STUFFING_PATTERN        0
 static uint8_t writePts(uint8_t *data,uint64_t ipts,uint32_t flags);
 // /* ------------------------------------------------------------------------*/write
@@ -466,8 +466,30 @@ uint8_t tsMuxer::pes2ts(channel *chan,uint64_t pcr,uint8_t tim )
         }
         return 1;
 }
-                                  
 uint8_t tsMuxer::writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe )
+{
+#define MAX_PES 64000
+uint32_t l;
+
+       writeAudioPacket2();
+       _curPTS=videoTime(frameno); 
+       while(len)
+       {
+                if(len>MAX_PES)
+                        l=MAX_PES;
+                else
+                        l=len;
+                if(!writeVideoPacket2(l,buf, frameno, displayframe ))
+                {
+                    return 0;    
+                }
+                len-=l;
+                buf+=l;
+        }
+        return 1;
+
+}                                  
+uint8_t tsMuxer::writeVideoPacket2(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe )
 {
     
     uint8_t  *data;
@@ -476,9 +498,7 @@ uint8_t tsMuxer::writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,ui
     double d;
     uint32_t left,part=1;
     
-    writeAudioPacket2();
-
-    _curPTS=videoTime(frameno);
+    
 
     // First packet    
     while(len)

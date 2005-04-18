@@ -127,7 +127,7 @@ protected:
         uint8_t     flushPackets(uint8_t r);
         uint8_t     writeAudioPacket2(void);
         uint8_t     pes2ts(channel *chan,uint64_t pcr,uint8_t tim );
-
+        uint8_t     writeVideoPacket2(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe );
         channel     audioChannel,videoChannel,pmt,pat;
         aviInfo     _info;
         WAVHeader   _wavHeader;
