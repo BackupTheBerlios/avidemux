@@ -45,18 +45,7 @@
 static FILTER_PARAM Eq2Param={8,{"contrast","brightness","saturation",
                                 "gamma","gamma_weight","rgamma","ggamma","bgamma"}};
 #define LUT16
-typedef struct Eq2_Param
-{
-  float     contrast ;      /* 1.0 means do nothing..*/    
-  float     brightness;     /* 0 means */
-  float     saturation;
-  
-  float     gamma;
-  float     gamma_weight;
-  float     rgamma;
-  float     ggamma;
-  float     bgamma;
-}Eq2_Param;
+#include "ADM_vidEq2.h"
 typedef struct oneSetting {
   unsigned char lut[256];
 #ifdef LUT16
@@ -128,16 +117,8 @@ uint8_t ADMVideoEq2::configure(AVDMGenericVideoStream *in)
   uint8_t r=1;
   float h,s;
   _in=in;   
- 
-  DIA_GetFloatValue(&_param->contrast, 0, 2, "Enter Contrast","Contrast:");
-  DIA_GetFloatValue(&_param->brightness, 0, 2, "Enter Brightness","Brightness:");
-  DIA_GetFloatValue(&_param->saturation, 0, 2, "Enter Saturation","Saturation:");
-  DIA_GetFloatValue(&_param->gamma, 0, 2, "Enter gamma","gamma:");
-  DIA_GetFloatValue(&_param->gamma_weight, 0, 2, "Enter gamma_weight","gamma_weight:");
-  DIA_GetFloatValue(&_param->rgamma, 0, 2, "Enter rgamma","rgamma:");
-  DIA_GetFloatValue(&_param->ggamma, 0, 2, "Enter ggamma","ggamma:");
-  DIA_GetFloatValue(&_param->bgamma, 0, 2, "Enter bgamma","bgamma:");
-  update();
+  r=DIA_getEQ2Param(_param);
+  if(r) update();
   return r;        
 }
 char *ADMVideoEq2::printConf( void )
