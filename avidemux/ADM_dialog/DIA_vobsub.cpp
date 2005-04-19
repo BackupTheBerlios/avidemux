@@ -48,10 +48,12 @@
 #include "ADM_video/ADM_vobsubinfo.h"
 #include "ADM_video/ADM_vidVobSub.h"
 
+#define MAX_INDECES 16
+
 static GtkWidget        *create_dialog1 (void);
 static GtkWidget        **fq;
 static GtkWidget        *dialog;
-
+static int              indeces[MAX_INDECES];
 static void update(char *name,int i);
 
 uint8_t DIA_vobsub(vobSubParam *param);
@@ -117,7 +119,7 @@ uint8_t DIA_vobsub(vobSubParam *param)
                 param->subname=name;                                        
                 //
                 
-                param->index=getRangeInMenu(WID(optionmenu1));
+                param->index=indeces[getRangeInMenu(WID(optionmenu1))];
                 param->subShift=shift;
                 break;
               case GTK_RESPONSE_CANCEL:
@@ -152,9 +154,11 @@ void update(char *name,int idx)
       // add them
     for(int i=0;i<lang->nbLanguage;i++)
     {
-      fq[i]=gtk_menu_item_new_with_mnemonic (lang->language[i]);
+      fq[i]=gtk_menu_item_new_with_mnemonic (lang->language[i].name);
       gtk_widget_show (fq[i]);
       gtk_container_add (GTK_CONTAINER (menu1), fq[i]);
+      indeces[i]=lang->language[i].index;
+      ADM_assert(i<MAX_INDECES);
     }
     gtk_option_menu_set_menu (GTK_OPTION_MENU (WID(optionmenu1)), menu1);
     gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenu1)), idx);

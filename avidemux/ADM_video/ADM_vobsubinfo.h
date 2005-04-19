@@ -27,11 +27,15 @@ typedef struct vobSubLine
         uint64_t        fileOffset;     /// Offset in the file where this sub starts
 
 }vobSubLine;
-
+typedef struct vobSubOneLang
+{
+        char     *name;
+        uint32_t index;
+}vobSubOneLang;
 typedef struct vobSubLanguage
 {
         uint32_t        nbLanguage; 
-        char            *language[20];  
+        vobSubOneLang   language[20];  
 }vobSubLanguage;
 
 typedef struct VobSubInfo

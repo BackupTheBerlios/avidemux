@@ -207,8 +207,8 @@ vobSubLanguage *vobSubAllocateLanguage(void)
 //*****************************************
 uint8_t vobSubDestroyLanguage(vobSubLanguage *lingua)
 {
-  for(uint32_t i=0;i<lingua->nbLanguage;i++)
-    delete [] lingua->language[i];
+  for(uint32_t i=0;i<lingua->nbLanguage;i++)  
+    delete [] lingua->language[i].name;
   delete lingua; 
   return 1;
 }
@@ -216,7 +216,8 @@ uint8_t vobSubDestroyLanguage(vobSubLanguage *lingua)
 uint8_t vobSubGetLanguage(char *filename,vobSubLanguage *lingua)
 {
   char str[1024];
-  uint32_t nb=0;
+  char s[16];
+  uint32_t nb=0,index;
   FILE *fd=NULL;
   
   fd=fopen(filename,"rb");
@@ -230,10 +231,13 @@ uint8_t vobSubGetLanguage(char *filename,vobSubLanguage *lingua)
     fgets(str,1023,fd);
     if(!strncmp(str,"id: ",3))
     {
-      lingua->language[nb]=new char[3];
-      lingua->language[nb][0]=str[4];
-      lingua->language[nb][1]=str[5];
-      lingua->language[nb][2]=0;
+      sscanf(str,"id: %s index: %d",s,&index);
+      lingua->language[nb].name=new char[3];
+      lingua->language[nb].name[0]=str[4];
+      lingua->language[nb].name[1]=str[5];
+      lingua->language[nb].name[2]=0;
+      //
+      lingua->language[nb].index=index;
       nb++;
     }        
   }
