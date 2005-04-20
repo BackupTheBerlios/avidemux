@@ -428,17 +428,28 @@ uint32_t i=0,sid=1;
         data[i++]=0xE0+(videoChannel.pid>>8); // pid
         data[i++]=(videoChannel.pid&0xff); 
         data[i++]=0xF0; // no descriptor
-        data[i++]=0;    // no descriptor
+        data[i++]=3;    // Stream descriptor
+        data[i++]=0x52;    
+        data[i++]=1;    
+        data[i++]=1;    
         //-- Audio --
         if(_wavHeader.encoding==WAV_AC3)
             data[i++]=0x81; // ac3
         else
-            data[i++]=0x04; // Mpeg2 audio
+            data[i++]=0x03; // Mpeg2 audio
         data[i++]=0xE0+(audioChannel.pid>>8); // pid
         data[i++]=(audioChannel.pid&0xff); 
         data[i++]=0xF0; // no descriptor
-        data[i++]=0;    // no descriptor
-        
+        data[i++]=3+6;    // Stream descriptor
+        data[i++]=0x52;    
+        data[i++]=1;    
+        data[i++]=2;    
+        data[i++]=0x0a; // Language    
+        data[i++]=4;    
+        data[i++]='e';    
+        data[i++]='n';    
+        data[i++]='g';    
+        data[i++]=0x02;     // Hearing impaired ?
         
         
 /*        data[2]=0xF0+((i-4)>>8);
