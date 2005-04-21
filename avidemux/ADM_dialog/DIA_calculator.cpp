@@ -44,6 +44,7 @@
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_audiofilter/audioeng_film2pal.h"
 
+#include "ADM_filter/video_filters.h"
 
 void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
 static GtkWidget	*create_Calculator (void);  
@@ -51,6 +52,7 @@ static GtkWidget *dialog;
 static void prepare( void );
 static void update( void );
 static int cb_mod(GtkObject * object, gpointer user_data);
+static int cb_mod2(GtkObject * object, gpointer user_data);
 
 static uint32_t videoDuration;
 static uint32_t track1, track2;
@@ -59,6 +61,7 @@ uint32_t numberOfVideoFrames;
 
 static uint32_t videoSize,videoBitrate;
 
+static uint32_t getPicSize(void);
 //************************************
 void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 {
@@ -67,6 +70,8 @@ void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 	dialog=create_Calculator();
         gtk_signal_connect(GTK_OBJECT(WID(optionmenu1)), "changed",
                       GTK_SIGNAL_FUNC(cb_mod),   (void *) 0);
+        gtk_signal_connect(GTK_OBJECT(WID(optionmenu2)), "changed",
+                      GTK_SIGNAL_FUNC(cb_mod2),   (void *) 0);
 	prepare();
 	update();
         gtk_widget_set_sensitive(WID(entryCustom),0);
@@ -147,7 +152,16 @@ void prepare( void )
 	
 	
 }
-
+/************************************/
+uint32_t getPicSize(void)
+{
+uint32_t size;
+         AVDMGenericVideoStream *last;
+                last=getLastVideoFilter();
+                size=last->getInfo()->width*last->getInfo()->width;
+        
+                return size;
+}
 //*************************************
 void update( void )
 {
@@ -203,8 +217,8 @@ aviInfo info;
 		default:
 			ADM_assert(0);
 	}
-	sprintf(string,"%lu",totalSize);
-	gtk_label_set_text(GTK_LABEL(WID(labelTotal)),string);
+	//sprintf(string,"%lu",totalSize);
+	//gtk_label_set_text(GTK_LABEL(WID(labelTotal)),string);
 	
 	// Compute muxing overhead size
 	uint32_t muxingOverheadSize;
@@ -243,8 +257,8 @@ aviInfo info;
 		default:
 			ADM_assert(0);
 	}
-	sprintf(string,"%lu",muxingOverheadSize);
-	gtk_label_set_text(GTK_LABEL(WID(labelMux)),string);
+	//sprintf(string,"%lu",muxingOverheadSize);
+	//gtk_label_set_text(GTK_LABEL(WID(labelMux)),string);
 	
 	// and compute
 	//
@@ -252,7 +266,8 @@ aviInfo info;
 	
 	if(audioSize>=totalSize) sprintf(string,"** NO ROOM LEFT**");
 	else
-		{
+		{     
+                        uint32_t picSize;
 			videoSize=totalSize-audioSize - muxingOverheadSize;
 			// Compute average bps
 			float avg;
@@ -274,7 +289,14 @@ aviInfo info;
                         // Bpp
                         bpp=videoBitrate;
                         bpp=bpp*1000000.;  // kbit->bit + compensate for fps1000
-                        bpp/=(info.width*info.height);
+                        // Fetch info from filter
+                
+                        
+                        if(videoProcessMode)
+                                picSize=getPicSize();
+                        else
+                                picSize=info.width*info.height;
+                        bpp/=picSize;
                         //printf("w:%d h:%d\n",info.width,info.height);
                         bpp/=info.fps1000;
                         sprintf(string,"%1.3f",bpp);
@@ -296,8 +318,15 @@ int sens=0;
                 sens=1;    
         }
         gtk_widget_set_sensitive(WID(entryCustom),sens);
+        update();
         return 0;
 }
+int cb_mod2(GtkObject * object, gpointer user_data)
+{
+        update();
+        return 0;
+}
+//*****************
 GtkWidget*
 create_Calculator (void)
 {
@@ -305,91 +334,167 @@ create_Calculator (void)
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox1;
   GtkWidget *frame1;
-  GtkWidget *vbox3;
-  GtkWidget *hbox3;
-  GtkWidget *label3;
+  GtkWidget *table2;
+  GtkWidget *hbox5;
+  GtkWidget *labelDOO;
+  GtkWidget *labelDuration;
+  GtkWidget *hbox14;
+  GtkWidget *label2;
+  GtkWidget *hbox16;
+  GtkWidget *label16;
+  GtkWidget *entryCustom;
+  GtkWidget *hbox21;
+  GtkWidget *label14;
+  GtkWidget *hbox18;
   GtkWidget *optionmenu2;
   GtkWidget *menu2;
   GtkWidget *avi1;
   GtkWidget *ogm1;
   GtkWidget *mpeg1;
-  GtkWidget *hbox6;
-  GtkWidget *hbox2;
-  GtkWidget *label2;
+  GtkWidget *hbox17;
   GtkWidget *optionmenu1;
   GtkWidget *menu1;
-  GtkWidget *_1x74_cd1;
-  GtkWidget *_2x74_cd1;
   GtkWidget *_1x80_cd1;
   GtkWidget *_2x80_cd1;
+  GtkWidget *_1x74_cd1;
+  GtkWidget *_2x74_cd1;
   GtkWidget *dvd1;
   GtkWidget *custom1;
-  GtkWidget *hbox5;
-  GtkWidget *label14;
-  GtkWidget *entryCustom;
+  GtkWidget *fixed1;
+  GtkWidget *fixed2;
+  GtkWidget *fixed3;
+  GtkWidget *fixed4;
   GtkWidget *label1;
   GtkWidget *frame2;
-  GtkWidget *hbox4;
+  GtkWidget *hbox11;
+  GtkWidget *hbox12;
   GtkWidget *label6;
   GtkWidget *entry3;
+  GtkWidget *hbox13;
   GtkWidget *label7;
   GtkWidget *entry4;
   GtkWidget *label4;
   GtkWidget *frame3;
-  GtkWidget *table1;
-  GtkWidget *labelDOO;
-  GtkWidget *labelDuration;
-  GtkWidget *labelVideo;
+  GtkWidget *hbox20;
+  GtkWidget *table3;
   GtkWidget *label11;
   GtkWidget *label9;
+  GtkWidget *labelVideo;
   GtkWidget *labelAudio;
-  GtkWidget *labelTotal;
-  GtkWidget *label10;
-  GtkWidget *label13;
-  GtkWidget *labelMux;
+  GtkWidget *table4;
   GtkWidget *label12;
-  GtkWidget *labelBitrate;
   GtkWidget *label15;
+  GtkWidget *labelBitrate;
   GtkWidget *labelBPP;
   GtkWidget *label8;
   GtkWidget *dialog_action_area1;
   GtkWidget *doit;
   GtkWidget *button1;
+  GtkTooltips *tooltips;
+
+  tooltips = gtk_tooltips_new ();
 
   Calculator = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (Calculator), _("Calculator"));
+  gtk_container_set_border_width (GTK_CONTAINER (Calculator), 6);
+  gtk_window_set_title (GTK_WINDOW (Calculator), _("Bitrate Calculator"));
+  gtk_window_set_resizable (GTK_WINDOW (Calculator), FALSE);
 
   dialog_vbox1 = GTK_DIALOG (Calculator)->vbox;
   gtk_widget_show (dialog_vbox1);
 
-  vbox1 = gtk_vbox_new (FALSE, 0);
+  vbox1 = gtk_vbox_new (FALSE, 6);
   gtk_widget_show (vbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
 
   frame1 = gtk_frame_new (NULL);
   gtk_widget_show (frame1);
-  gtk_box_pack_start (GTK_BOX (vbox1), frame1, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox1), frame1, FALSE, FALSE, 0);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_NONE);
 
-  vbox3 = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox3);
-  gtk_container_add (GTK_CONTAINER (frame1), vbox3);
+  table2 = gtk_table_new (3, 4, FALSE);
+  gtk_widget_show (table2);
+  gtk_container_add (GTK_CONTAINER (frame1), table2);
+  gtk_container_set_border_width (GTK_CONTAINER (table2), 12);
+  gtk_table_set_row_spacings (GTK_TABLE (table2), 6);
+  gtk_table_set_col_spacings (GTK_TABLE (table2), 12);
 
-  hbox3 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox3);
-  gtk_box_pack_start (GTK_BOX (vbox3), hbox3, TRUE, TRUE, 0);
+  hbox5 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox5);
+  gtk_table_attach (GTK_TABLE (table2), hbox5, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
 
-  label3 = gtk_label_new (_("Target Format :"));
-  gtk_widget_show (label3);
-  gtk_box_pack_start (GTK_BOX (hbox3), label3, FALSE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
+  labelDOO = gtk_label_new (_("Duration:"));
+  gtk_widget_show (labelDOO);
+  gtk_box_pack_start (GTK_BOX (hbox5), labelDOO, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (labelDOO), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelDOO), 0, 0.5);
+
+  labelDuration = gtk_label_new (_("00:00:00"));
+  gtk_widget_show (labelDuration);
+  gtk_table_attach (GTK_TABLE (table2), labelDuration, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelDuration), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelDuration), 0, 0.5);
+
+  hbox14 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox14);
+  gtk_table_attach (GTK_TABLE (table2), hbox14, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+
+  label2 = gtk_label_new_with_mnemonic (_("_Medium:"));
+  gtk_widget_show (label2);
+  gtk_box_pack_start (GTK_BOX (hbox14), label2, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
+
+  hbox16 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox16);
+  gtk_table_attach (GTK_TABLE (table2), hbox16, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+
+  label16 = gtk_label_new_with_mnemonic (_("_Format:"));
+  gtk_widget_show (label16);
+  gtk_box_pack_start (GTK_BOX (hbox16), label16, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label16), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label16), 0, 0.5);
+
+  entryCustom = gtk_entry_new ();
+  gtk_widget_show (entryCustom);
+  gtk_table_attach (GTK_TABLE (table2), entryCustom, 3, 4, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_tooltips_set_tip (tooltips, entryCustom, _("Total size (custom)"), NULL);
+  gtk_entry_set_max_length (GTK_ENTRY (entryCustom), 10);
+  gtk_entry_set_width_chars (GTK_ENTRY (entryCustom), 6);
+
+  hbox21 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox21);
+  gtk_table_attach (GTK_TABLE (table2), hbox21, 2, 3, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+  label14 = gtk_label_new_with_mnemonic (_("_Custom size (MB):"));
+  gtk_widget_show (label14);
+  gtk_box_pack_start (GTK_BOX (hbox21), label14, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label14), GTK_JUSTIFY_LEFT);
+
+  hbox18 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox18);
+  gtk_table_attach (GTK_TABLE (table2), hbox18, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
 
   optionmenu2 = gtk_option_menu_new ();
   gtk_widget_show (optionmenu2);
-  gtk_box_pack_start (GTK_BOX (hbox3), optionmenu2, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox18), optionmenu2, TRUE, TRUE, 0);
+  gtk_tooltips_set_tip (tooltips, optionmenu2, _("Output container format"), NULL);
 
   menu2 = gtk_menu_new ();
 
-  avi1 = gtk_menu_item_new_with_mnemonic (_("Avi"));
+  avi1 = gtk_menu_item_new_with_mnemonic (_("AVI"));
   gtk_widget_show (avi1);
   gtk_container_add (GTK_CONTAINER (menu2), avi1);
 
@@ -397,49 +502,43 @@ create_Calculator (void)
   gtk_widget_show (ogm1);
   gtk_container_add (GTK_CONTAINER (menu2), ogm1);
 
-  mpeg1 = gtk_menu_item_new_with_mnemonic (_("Mpeg"));
+  mpeg1 = gtk_menu_item_new_with_mnemonic (_("MPEG"));
   gtk_widget_show (mpeg1);
   gtk_container_add (GTK_CONTAINER (menu2), mpeg1);
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu2), menu2);
 
-  hbox6 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox6);
-  gtk_box_pack_start (GTK_BOX (vbox3), hbox6, TRUE, TRUE, 0);
-
-  hbox2 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox2);
-  gtk_box_pack_start (GTK_BOX (hbox6), hbox2, TRUE, TRUE, 0);
-
-  label2 = gtk_label_new (_("Target Medium :"));
-  gtk_widget_show (label2);
-  gtk_box_pack_start (GTK_BOX (hbox2), label2, FALSE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
+  hbox17 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox17);
+  gtk_table_attach (GTK_TABLE (table2), hbox17, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
 
   optionmenu1 = gtk_option_menu_new ();
   gtk_widget_show (optionmenu1);
-  gtk_box_pack_start (GTK_BOX (hbox2), optionmenu1, FALSE, FALSE, 0);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (optionmenu1), 1);
+  gtk_box_pack_start (GTK_BOX (hbox17), optionmenu1, TRUE, TRUE, 0);
+  gtk_tooltips_set_tip (tooltips, optionmenu1, _("Total size"), NULL);
 
   menu1 = gtk_menu_new ();
 
-  _1x74_cd1 = gtk_menu_item_new_with_mnemonic (_("1x74 Cd"));
-  gtk_widget_show (_1x74_cd1);
-  gtk_container_add (GTK_CONTAINER (menu1), _1x74_cd1);
-
-  _2x74_cd1 = gtk_menu_item_new_with_mnemonic (_("2x74 Cd"));
-  gtk_widget_show (_2x74_cd1);
-  gtk_container_add (GTK_CONTAINER (menu1), _2x74_cd1);
-
-  _1x80_cd1 = gtk_menu_item_new_with_mnemonic (_("1x80 Cd"));
+  _1x80_cd1 = gtk_menu_item_new_with_mnemonic (_("1x 80 min. CD (700 MB)"));
   gtk_widget_show (_1x80_cd1);
   gtk_container_add (GTK_CONTAINER (menu1), _1x80_cd1);
+  gtk_tooltips_set_tip (tooltips, _1x80_cd1, _("Total size (custom)"), NULL);
 
-  _2x80_cd1 = gtk_menu_item_new_with_mnemonic (_("2x80 Cd"));
+  _2x80_cd1 = gtk_menu_item_new_with_mnemonic (_("2x 80 min. CD (1400 MB)"));
   gtk_widget_show (_2x80_cd1);
   gtk_container_add (GTK_CONTAINER (menu1), _2x80_cd1);
 
-  dvd1 = gtk_menu_item_new_with_mnemonic (_("DVD5"));
+  _1x74_cd1 = gtk_menu_item_new_with_mnemonic (_("1x 74 min. CD (650 MB)"));
+  gtk_widget_show (_1x74_cd1);
+  gtk_container_add (GTK_CONTAINER (menu1), _1x74_cd1);
+
+  _2x74_cd1 = gtk_menu_item_new_with_mnemonic (_("2x 74 min. CD (1300 MB)"));
+  gtk_widget_show (_2x74_cd1);
+  gtk_container_add (GTK_CONTAINER (menu1), _2x74_cd1);
+
+  dvd1 = gtk_menu_item_new_with_mnemonic (_("DVD5 (4300 MB)"));
   gtk_widget_show (dvd1);
   gtk_container_add (GTK_CONTAINER (menu1), dvd1);
 
@@ -449,20 +548,29 @@ create_Calculator (void)
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu1), menu1);
 
-  hbox5 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox5);
-  gtk_box_pack_start (GTK_BOX (hbox6), hbox5, TRUE, TRUE, 0);
+  fixed1 = gtk_fixed_new ();
+  gtk_widget_show (fixed1);
+  gtk_table_attach (GTK_TABLE (table2), fixed1, 2, 3, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
 
-  label14 = gtk_label_new (_("Custom Size (MB):"));
-  gtk_widget_show (label14);
-  gtk_box_pack_start (GTK_BOX (hbox5), label14, FALSE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label14), GTK_JUSTIFY_LEFT);
+  fixed2 = gtk_fixed_new ();
+  gtk_widget_show (fixed2);
+  gtk_table_attach (GTK_TABLE (table2), fixed2, 2, 3, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
 
-  entryCustom = gtk_entry_new ();
-  gtk_widget_show (entryCustom);
-  gtk_box_pack_start (GTK_BOX (hbox5), entryCustom, FALSE, TRUE, 0);
-  gtk_entry_set_max_length (GTK_ENTRY (entryCustom), 10);
-  gtk_entry_set_width_chars (GTK_ENTRY (entryCustom), 10);
+  fixed3 = gtk_fixed_new ();
+  gtk_widget_show (fixed3);
+  gtk_table_attach (GTK_TABLE (table2), fixed3, 3, 4, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+  fixed4 = gtk_fixed_new ();
+  gtk_widget_show (fixed4);
+  gtk_table_attach (GTK_TABLE (table2), fixed4, 3, 4, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
 
   label1 = gtk_label_new (_("<b>Target</b>"));
   gtk_widget_show (label1);
@@ -472,31 +580,47 @@ create_Calculator (void)
 
   frame2 = gtk_frame_new (NULL);
   gtk_widget_show (frame2);
-  gtk_box_pack_start (GTK_BOX (vbox1), frame2, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox1), frame2, FALSE, FALSE, 0);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame2), GTK_SHADOW_NONE);
 
-  hbox4 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox4);
-  gtk_container_add (GTK_CONTAINER (frame2), hbox4);
+  hbox11 = gtk_hbox_new (TRUE, 12);
+  gtk_widget_show (hbox11);
+  gtk_container_add (GTK_CONTAINER (frame2), hbox11);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox11), 12);
 
-  label6 = gtk_label_new (_("Track 1 :"));
+  hbox12 = gtk_hbox_new (FALSE, 6);
+  gtk_widget_show (hbox12);
+  gtk_box_pack_start (GTK_BOX (hbox11), hbox12, TRUE, TRUE, 0);
+
+  label6 = gtk_label_new_with_mnemonic (_("Track _1:"));
   gtk_widget_show (label6);
-  gtk_box_pack_start (GTK_BOX (hbox4), label6, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox12), label6, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
 
   entry3 = gtk_entry_new ();
   gtk_widget_show (entry3);
-  gtk_box_pack_start (GTK_BOX (hbox4), entry3, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox12), entry3, TRUE, TRUE, 0);
+  gtk_tooltips_set_tip (tooltips, entry3, _("Audio bitrate in kb/s for track 1 (0 for no audio)"), NULL);
+  gtk_entry_set_max_length (GTK_ENTRY (entry3), 10);
+  gtk_entry_set_width_chars (GTK_ENTRY (entry3), 6);
 
-  label7 = gtk_label_new (_("Track 2 : "));
+  hbox13 = gtk_hbox_new (FALSE, 6);
+  gtk_widget_show (hbox13);
+  gtk_box_pack_start (GTK_BOX (hbox11), hbox13, TRUE, TRUE, 0);
+
+  label7 = gtk_label_new_with_mnemonic (_("Track _2: "));
   gtk_widget_show (label7);
-  gtk_box_pack_start (GTK_BOX (hbox4), label7, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox13), label7, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
 
   entry4 = gtk_entry_new ();
   gtk_widget_show (entry4);
-  gtk_box_pack_start (GTK_BOX (hbox4), entry4, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox13), entry4, TRUE, TRUE, 0);
+  gtk_tooltips_set_tip (tooltips, entry4, _("Audio bitrate in kb/s for track 2 (optional)"), NULL);
+  gtk_entry_set_max_length (GTK_ENTRY (entry4), 10);
+  gtk_entry_set_width_chars (GTK_ENTRY (entry4), 6);
 
-  label4 = gtk_label_new (_("<b>Audio</b>"));
+  label4 = gtk_label_new (_("<b>Audio Bitrate</b>"));
   gtk_widget_show (label4);
   gtk_frame_set_label_widget (GTK_FRAME (frame2), label4);
   gtk_label_set_use_markup (GTK_LABEL (label4), TRUE);
@@ -504,119 +628,85 @@ create_Calculator (void)
 
   frame3 = gtk_frame_new (NULL);
   gtk_widget_show (frame3);
-  gtk_box_pack_start (GTK_BOX (vbox1), frame3, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox1), frame3, FALSE, FALSE, 0);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame3), GTK_SHADOW_NONE);
 
-  table1 = gtk_table_new (7, 2, FALSE);
-  gtk_widget_show (table1);
-  gtk_container_add (GTK_CONTAINER (frame3), table1);
+  hbox20 = gtk_hbox_new (TRUE, 12);
+  gtk_widget_show (hbox20);
+  gtk_container_add (GTK_CONTAINER (frame3), hbox20);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox20), 12);
 
-  labelDOO = gtk_label_new (_("Duration "));
-  gtk_widget_show (labelDOO);
-  gtk_table_attach (GTK_TABLE (table1), labelDOO, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelDOO), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelDOO), 0, 0.5);
+  table3 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_show (table3);
+  gtk_box_pack_start (GTK_BOX (hbox20), table3, TRUE, TRUE, 0);
+  gtk_table_set_row_spacings (GTK_TABLE (table3), 6);
+  gtk_table_set_col_spacings (GTK_TABLE (table3), 6);
 
-  labelDuration = gtk_label_new (_("00:00:00"));
-  gtk_widget_show (labelDuration);
-  gtk_table_attach (GTK_TABLE (table1), labelDuration, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelDuration), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelDuration), 0, 0.5);
-
-  labelVideo = gtk_label_new (_("0"));
-  gtk_widget_show (labelVideo);
-  gtk_table_attach (GTK_TABLE (table1), labelVideo, 1, 2, 4, 5,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelVideo), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelVideo), 0, 0.5);
-
-  label11 = gtk_label_new (_("Video Size (MBytes)"));
+  label11 = gtk_label_new (_("Video size (MB):"));
   gtk_widget_show (label11);
-  gtk_table_attach (GTK_TABLE (table1), label11, 0, 1, 4, 5,
+  gtk_table_attach (GTK_TABLE (table3), label11, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
 
-  label9 = gtk_label_new (_("Audio size (MBytes)"));
+  label9 = gtk_label_new (_("Audio size (MB):"));
   gtk_widget_show (label9);
-  gtk_table_attach (GTK_TABLE (table1), label9, 0, 1, 3, 4,
+  gtk_table_attach (GTK_TABLE (table3), label9, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
 
+  labelVideo = gtk_label_new (_("0"));
+  gtk_widget_show (labelVideo);
+  gtk_table_attach (GTK_TABLE (table3), labelVideo, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelVideo), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelVideo), 0, 0.5);
+
   labelAudio = gtk_label_new (_("0"));
   gtk_widget_show (labelAudio);
-  gtk_table_attach (GTK_TABLE (table1), labelAudio, 1, 2, 3, 4,
+  gtk_table_attach (GTK_TABLE (table3), labelAudio, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (labelAudio), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelAudio), 0, 0.5);
 
-  labelTotal = gtk_label_new (_("0"));
-  gtk_widget_show (labelTotal);
-  gtk_table_attach (GTK_TABLE (table1), labelTotal, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelTotal), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelTotal), 0, 0.5);
+  table4 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_show (table4);
+  gtk_box_pack_start (GTK_BOX (hbox20), table4, TRUE, TRUE, 0);
+  gtk_table_set_row_spacings (GTK_TABLE (table4), 6);
+  gtk_table_set_col_spacings (GTK_TABLE (table4), 6);
 
-  label10 = gtk_label_new (_("Total Size (MBytes)"));
-  gtk_widget_show (label10);
-  gtk_table_attach (GTK_TABLE (table1), label10, 0, 1, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
-
-  label13 = gtk_label_new (_("Muxing overhead size (MBytes)"));
-  gtk_widget_show (label13);
-  gtk_table_attach (GTK_TABLE (table1), label13, 0, 1, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label13), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label13), 0, 0.5);
-
-  labelMux = gtk_label_new (_("0"));
-  gtk_widget_show (labelMux);
-  gtk_table_attach (GTK_TABLE (table1), labelMux, 1, 2, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelMux), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelMux), 0, 0.5);
-
-  label12 = gtk_label_new (_("Average Video Bitrate (kbps)"));
+  label12 = gtk_label_new (_("Video bitrate:"));
   gtk_widget_show (label12);
-  gtk_table_attach (GTK_TABLE (table1), label12, 0, 1, 6, 7,
+  gtk_table_attach (GTK_TABLE (table4), label12, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label12), 0, 0.5);
 
-  labelBitrate = gtk_label_new (_("0"));
-  gtk_widget_show (labelBitrate);
-  gtk_table_attach (GTK_TABLE (table1), labelBitrate, 1, 2, 6, 7,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelBitrate), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelBitrate), 0, 0.5);
-
-  label15 = gtk_label_new (_("Average bpp"));
+  label15 = gtk_label_new (_("Bits per pixel:"));
   gtk_widget_show (label15);
-  gtk_table_attach (GTK_TABLE (table1), label15, 0, 1, 5, 6,
+  gtk_table_attach (GTK_TABLE (table4), label15, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (label15), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label15), 0, 0.5);
 
+  labelBitrate = gtk_label_new (_("0"));
+  gtk_widget_show (labelBitrate);
+  gtk_table_attach (GTK_TABLE (table4), labelBitrate, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelBitrate), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelBitrate), 0, 0.5);
+
   labelBPP = gtk_label_new (_("0.0"));
   gtk_widget_show (labelBPP);
-  gtk_table_attach (GTK_TABLE (table1), labelBPP, 1, 2, 5, 6,
+  gtk_table_attach (GTK_TABLE (table4), labelBPP, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (labelBPP), GTK_JUSTIFY_LEFT);
@@ -642,62 +732,76 @@ create_Calculator (void)
   gtk_dialog_add_action_widget (GTK_DIALOG (Calculator), button1, GTK_RESPONSE_CLOSE);
   GTK_WIDGET_SET_FLAGS (button1, GTK_CAN_DEFAULT);
 
+  gtk_label_set_mnemonic_widget (GTK_LABEL (label2), optionmenu1);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (label16), optionmenu2);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (label14), entryCustom);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (label6), entry3);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (label7), entry4);
+
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (Calculator, Calculator, "Calculator");
   GLADE_HOOKUP_OBJECT_NO_REF (Calculator, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (Calculator, vbox1, "vbox1");
   GLADE_HOOKUP_OBJECT (Calculator, frame1, "frame1");
-  GLADE_HOOKUP_OBJECT (Calculator, vbox3, "vbox3");
-  GLADE_HOOKUP_OBJECT (Calculator, hbox3, "hbox3");
-  GLADE_HOOKUP_OBJECT (Calculator, label3, "label3");
+  GLADE_HOOKUP_OBJECT (Calculator, table2, "table2");
+  GLADE_HOOKUP_OBJECT (Calculator, hbox5, "hbox5");
+  GLADE_HOOKUP_OBJECT (Calculator, labelDOO, "labelDOO");
+  GLADE_HOOKUP_OBJECT (Calculator, labelDuration, "labelDuration");
+  GLADE_HOOKUP_OBJECT (Calculator, hbox14, "hbox14");
+  GLADE_HOOKUP_OBJECT (Calculator, label2, "label2");
+  GLADE_HOOKUP_OBJECT (Calculator, hbox16, "hbox16");
+  GLADE_HOOKUP_OBJECT (Calculator, label16, "label16");
+  GLADE_HOOKUP_OBJECT (Calculator, entryCustom, "entryCustom");
+  GLADE_HOOKUP_OBJECT (Calculator, hbox21, "hbox21");
+  GLADE_HOOKUP_OBJECT (Calculator, label14, "label14");
+  GLADE_HOOKUP_OBJECT (Calculator, hbox18, "hbox18");
   GLADE_HOOKUP_OBJECT (Calculator, optionmenu2, "optionmenu2");
   GLADE_HOOKUP_OBJECT (Calculator, menu2, "menu2");
   GLADE_HOOKUP_OBJECT (Calculator, avi1, "avi1");
   GLADE_HOOKUP_OBJECT (Calculator, ogm1, "ogm1");
   GLADE_HOOKUP_OBJECT (Calculator, mpeg1, "mpeg1");
-  GLADE_HOOKUP_OBJECT (Calculator, hbox6, "hbox6");
-  GLADE_HOOKUP_OBJECT (Calculator, hbox2, "hbox2");
-  GLADE_HOOKUP_OBJECT (Calculator, label2, "label2");
+  GLADE_HOOKUP_OBJECT (Calculator, hbox17, "hbox17");
   GLADE_HOOKUP_OBJECT (Calculator, optionmenu1, "optionmenu1");
   GLADE_HOOKUP_OBJECT (Calculator, menu1, "menu1");
-  GLADE_HOOKUP_OBJECT (Calculator, _1x74_cd1, "_1x74_cd1");
-  GLADE_HOOKUP_OBJECT (Calculator, _2x74_cd1, "_2x74_cd1");
   GLADE_HOOKUP_OBJECT (Calculator, _1x80_cd1, "_1x80_cd1");
   GLADE_HOOKUP_OBJECT (Calculator, _2x80_cd1, "_2x80_cd1");
+  GLADE_HOOKUP_OBJECT (Calculator, _1x74_cd1, "_1x74_cd1");
+  GLADE_HOOKUP_OBJECT (Calculator, _2x74_cd1, "_2x74_cd1");
   GLADE_HOOKUP_OBJECT (Calculator, dvd1, "dvd1");
   GLADE_HOOKUP_OBJECT (Calculator, custom1, "custom1");
-  GLADE_HOOKUP_OBJECT (Calculator, hbox5, "hbox5");
-  GLADE_HOOKUP_OBJECT (Calculator, label14, "label14");
-  GLADE_HOOKUP_OBJECT (Calculator, entryCustom, "entryCustom");
+  GLADE_HOOKUP_OBJECT (Calculator, fixed1, "fixed1");
+  GLADE_HOOKUP_OBJECT (Calculator, fixed2, "fixed2");
+  GLADE_HOOKUP_OBJECT (Calculator, fixed3, "fixed3");
+  GLADE_HOOKUP_OBJECT (Calculator, fixed4, "fixed4");
   GLADE_HOOKUP_OBJECT (Calculator, label1, "label1");
   GLADE_HOOKUP_OBJECT (Calculator, frame2, "frame2");
-  GLADE_HOOKUP_OBJECT (Calculator, hbox4, "hbox4");
+  GLADE_HOOKUP_OBJECT (Calculator, hbox11, "hbox11");
+  GLADE_HOOKUP_OBJECT (Calculator, hbox12, "hbox12");
   GLADE_HOOKUP_OBJECT (Calculator, label6, "label6");
   GLADE_HOOKUP_OBJECT (Calculator, entry3, "entry3");
+  GLADE_HOOKUP_OBJECT (Calculator, hbox13, "hbox13");
   GLADE_HOOKUP_OBJECT (Calculator, label7, "label7");
   GLADE_HOOKUP_OBJECT (Calculator, entry4, "entry4");
   GLADE_HOOKUP_OBJECT (Calculator, label4, "label4");
   GLADE_HOOKUP_OBJECT (Calculator, frame3, "frame3");
-  GLADE_HOOKUP_OBJECT (Calculator, table1, "table1");
-  GLADE_HOOKUP_OBJECT (Calculator, labelDOO, "labelDOO");
-  GLADE_HOOKUP_OBJECT (Calculator, labelDuration, "labelDuration");
-  GLADE_HOOKUP_OBJECT (Calculator, labelVideo, "labelVideo");
+  GLADE_HOOKUP_OBJECT (Calculator, hbox20, "hbox20");
+  GLADE_HOOKUP_OBJECT (Calculator, table3, "table3");
   GLADE_HOOKUP_OBJECT (Calculator, label11, "label11");
   GLADE_HOOKUP_OBJECT (Calculator, label9, "label9");
+  GLADE_HOOKUP_OBJECT (Calculator, labelVideo, "labelVideo");
   GLADE_HOOKUP_OBJECT (Calculator, labelAudio, "labelAudio");
-  GLADE_HOOKUP_OBJECT (Calculator, labelTotal, "labelTotal");
-  GLADE_HOOKUP_OBJECT (Calculator, label10, "label10");
-  GLADE_HOOKUP_OBJECT (Calculator, label13, "label13");
-  GLADE_HOOKUP_OBJECT (Calculator, labelMux, "labelMux");
+  GLADE_HOOKUP_OBJECT (Calculator, table4, "table4");
   GLADE_HOOKUP_OBJECT (Calculator, label12, "label12");
-  GLADE_HOOKUP_OBJECT (Calculator, labelBitrate, "labelBitrate");
   GLADE_HOOKUP_OBJECT (Calculator, label15, "label15");
+  GLADE_HOOKUP_OBJECT (Calculator, labelBitrate, "labelBitrate");
   GLADE_HOOKUP_OBJECT (Calculator, labelBPP, "labelBPP");
   GLADE_HOOKUP_OBJECT (Calculator, label8, "label8");
   GLADE_HOOKUP_OBJECT_NO_REF (Calculator, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (Calculator, doit, "doit");
   GLADE_HOOKUP_OBJECT (Calculator, button1, "button1");
+  GLADE_HOOKUP_OBJECT_NO_REF (Calculator, tooltips, "tooltips");
 
+  gtk_widget_grab_focus (entry3);
   return Calculator;
 }
 
