@@ -208,10 +208,10 @@ aviInfo info;
 	int j=getRangeInMenu(WID(optionmenu1));
 	switch(j)
 	{
-		case 0: totalSize=1*s74;break;
-		case 1: totalSize=2*s74;break;
-		case 2: totalSize=1*s80;break;
-		case 3: totalSize=2*s80;break;
+		case 2: totalSize=1*s74;break;
+		case 3: totalSize=2*s74;break;
+		case 0: totalSize=1*s80;break;
+		case 1: totalSize=2*s80;break;
 		case 4: totalSize=dvd;break;
                 case 5: totalSize=gtk_read_entry(WID(entryCustom)); if(totalSize<1) totalSize=1;break;
 		default:
