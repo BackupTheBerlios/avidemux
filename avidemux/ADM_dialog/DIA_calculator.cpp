@@ -217,8 +217,8 @@ aviInfo info;
 		default:
 			ADM_assert(0);
 	}
-	//sprintf(string,"%lu",totalSize);
-	//gtk_label_set_text(GTK_LABEL(WID(labelTotal)),string);
+	sprintf(string,"%lu",totalSize);
+	gtk_label_set_text(GTK_LABEL(WID(labelTotal)),string);
 	
 	// Compute muxing overhead size
 	uint32_t muxingOverheadSize;
@@ -327,6 +327,7 @@ int cb_mod2(GtkObject * object, gpointer user_data)
         return 0;
 }
 //*****************
+
 GtkWidget*
 create_Calculator (void)
 {
@@ -360,10 +361,6 @@ create_Calculator (void)
   GtkWidget *_2x74_cd1;
   GtkWidget *dvd1;
   GtkWidget *custom1;
-  GtkWidget *fixed1;
-  GtkWidget *fixed2;
-  GtkWidget *fixed3;
-  GtkWidget *fixed4;
   GtkWidget *label1;
   GtkWidget *frame2;
   GtkWidget *hbox11;
@@ -377,10 +374,12 @@ create_Calculator (void)
   GtkWidget *frame3;
   GtkWidget *hbox20;
   GtkWidget *table3;
-  GtkWidget *label11;
   GtkWidget *label9;
-  GtkWidget *labelVideo;
   GtkWidget *labelAudio;
+  GtkWidget *label11;
+  GtkWidget *labelVideo;
+  GtkWidget *label17;
+  GtkWidget *labelTotal;
   GtkWidget *table4;
   GtkWidget *label12;
   GtkWidget *label15;
@@ -521,24 +520,24 @@ create_Calculator (void)
 
   menu1 = gtk_menu_new ();
 
-  _1x80_cd1 = gtk_menu_item_new_with_mnemonic (_("1x 80 min. CD (700 MB)"));
+  _1x80_cd1 = gtk_menu_item_new_with_mnemonic (_("1x 80 min. CD"));
   gtk_widget_show (_1x80_cd1);
   gtk_container_add (GTK_CONTAINER (menu1), _1x80_cd1);
   gtk_tooltips_set_tip (tooltips, _1x80_cd1, _("Total size (custom)"), NULL);
 
-  _2x80_cd1 = gtk_menu_item_new_with_mnemonic (_("2x 80 min. CD (1400 MB)"));
+  _2x80_cd1 = gtk_menu_item_new_with_mnemonic (_("2x 80 min. CD"));
   gtk_widget_show (_2x80_cd1);
   gtk_container_add (GTK_CONTAINER (menu1), _2x80_cd1);
 
-  _1x74_cd1 = gtk_menu_item_new_with_mnemonic (_("1x 74 min. CD (650 MB)"));
+  _1x74_cd1 = gtk_menu_item_new_with_mnemonic (_("1x 74 min. CD"));
   gtk_widget_show (_1x74_cd1);
   gtk_container_add (GTK_CONTAINER (menu1), _1x74_cd1);
 
-  _2x74_cd1 = gtk_menu_item_new_with_mnemonic (_("2x 74 min. CD (1300 MB)"));
+  _2x74_cd1 = gtk_menu_item_new_with_mnemonic (_("2x 74 min. CD"));
   gtk_widget_show (_2x74_cd1);
   gtk_container_add (GTK_CONTAINER (menu1), _2x74_cd1);
 
-  dvd1 = gtk_menu_item_new_with_mnemonic (_("DVD5 (4300 MB)"));
+  dvd1 = gtk_menu_item_new_with_mnemonic (_("DVD5"));
   gtk_widget_show (dvd1);
   gtk_container_add (GTK_CONTAINER (menu1), dvd1);
 
@@ -547,30 +546,6 @@ create_Calculator (void)
   gtk_container_add (GTK_CONTAINER (menu1), custom1);
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu1), menu1);
-
-  fixed1 = gtk_fixed_new ();
-  gtk_widget_show (fixed1);
-  gtk_table_attach (GTK_TABLE (table2), fixed1, 2, 3, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-
-  fixed2 = gtk_fixed_new ();
-  gtk_widget_show (fixed2);
-  gtk_table_attach (GTK_TABLE (table2), fixed2, 2, 3, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-
-  fixed3 = gtk_fixed_new ();
-  gtk_widget_show (fixed3);
-  gtk_table_attach (GTK_TABLE (table2), fixed3, 3, 4, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-
-  fixed4 = gtk_fixed_new ();
-  gtk_widget_show (fixed4);
-  gtk_table_attach (GTK_TABLE (table2), fixed4, 3, 4, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
 
   label1 = gtk_label_new (_("<b>Target</b>"));
   gtk_widget_show (label1);
@@ -636,43 +611,59 @@ create_Calculator (void)
   gtk_container_add (GTK_CONTAINER (frame3), hbox20);
   gtk_container_set_border_width (GTK_CONTAINER (hbox20), 12);
 
-  table3 = gtk_table_new (2, 2, FALSE);
+  table3 = gtk_table_new (3, 2, FALSE);
   gtk_widget_show (table3);
   gtk_box_pack_start (GTK_BOX (hbox20), table3, TRUE, TRUE, 0);
   gtk_table_set_row_spacings (GTK_TABLE (table3), 6);
   gtk_table_set_col_spacings (GTK_TABLE (table3), 6);
 
-  label11 = gtk_label_new (_("Video size (MB):"));
-  gtk_widget_show (label11);
-  gtk_table_attach (GTK_TABLE (table3), label11, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
-
   label9 = gtk_label_new (_("Audio size (MB):"));
   gtk_widget_show (label9);
-  gtk_table_attach (GTK_TABLE (table3), label9, 0, 1, 1, 2,
+  gtk_table_attach (GTK_TABLE (table3), label9, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
 
+  labelAudio = gtk_label_new (_("0"));
+  gtk_widget_show (labelAudio);
+  gtk_table_attach (GTK_TABLE (table3), labelAudio, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelAudio), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelAudio), 0, 0.5);
+
+  label11 = gtk_label_new (_("Video size (MB):"));
+  gtk_widget_show (label11);
+  gtk_table_attach (GTK_TABLE (table3), label11, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
+
   labelVideo = gtk_label_new (_("0"));
   gtk_widget_show (labelVideo);
-  gtk_table_attach (GTK_TABLE (table3), labelVideo, 1, 2, 0, 1,
+  gtk_table_attach (GTK_TABLE (table3), labelVideo, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_label_set_justify (GTK_LABEL (labelVideo), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelVideo), 0, 0.5);
 
-  labelAudio = gtk_label_new (_("0"));
-  gtk_widget_show (labelAudio);
-  gtk_table_attach (GTK_TABLE (table3), labelAudio, 1, 2, 1, 2,
+  label17 = gtk_label_new (_("Total size (MB):"));
+  gtk_widget_show (label17);
+  gtk_table_attach (GTK_TABLE (table3), label17, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (labelAudio), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (labelAudio), 0, 0.5);
+  gtk_label_set_justify (GTK_LABEL (label17), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label17), 0, 0.5);
+
+  labelTotal = gtk_label_new (_("0"));
+  gtk_widget_show (labelTotal);
+  gtk_table_attach (GTK_TABLE (table3), labelTotal, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelTotal), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelTotal), 0, 0.5);
 
   table4 = gtk_table_new (2, 2, FALSE);
   gtk_widget_show (table4);
@@ -769,10 +760,6 @@ create_Calculator (void)
   GLADE_HOOKUP_OBJECT (Calculator, _2x74_cd1, "_2x74_cd1");
   GLADE_HOOKUP_OBJECT (Calculator, dvd1, "dvd1");
   GLADE_HOOKUP_OBJECT (Calculator, custom1, "custom1");
-  GLADE_HOOKUP_OBJECT (Calculator, fixed1, "fixed1");
-  GLADE_HOOKUP_OBJECT (Calculator, fixed2, "fixed2");
-  GLADE_HOOKUP_OBJECT (Calculator, fixed3, "fixed3");
-  GLADE_HOOKUP_OBJECT (Calculator, fixed4, "fixed4");
   GLADE_HOOKUP_OBJECT (Calculator, label1, "label1");
   GLADE_HOOKUP_OBJECT (Calculator, frame2, "frame2");
   GLADE_HOOKUP_OBJECT (Calculator, hbox11, "hbox11");
@@ -786,10 +773,12 @@ create_Calculator (void)
   GLADE_HOOKUP_OBJECT (Calculator, frame3, "frame3");
   GLADE_HOOKUP_OBJECT (Calculator, hbox20, "hbox20");
   GLADE_HOOKUP_OBJECT (Calculator, table3, "table3");
-  GLADE_HOOKUP_OBJECT (Calculator, label11, "label11");
   GLADE_HOOKUP_OBJECT (Calculator, label9, "label9");
-  GLADE_HOOKUP_OBJECT (Calculator, labelVideo, "labelVideo");
   GLADE_HOOKUP_OBJECT (Calculator, labelAudio, "labelAudio");
+  GLADE_HOOKUP_OBJECT (Calculator, label11, "label11");
+  GLADE_HOOKUP_OBJECT (Calculator, labelVideo, "labelVideo");
+  GLADE_HOOKUP_OBJECT (Calculator, label17, "label17");
+  GLADE_HOOKUP_OBJECT (Calculator, labelTotal, "labelTotal");
   GLADE_HOOKUP_OBJECT (Calculator, table4, "table4");
   GLADE_HOOKUP_OBJECT (Calculator, label12, "label12");
   GLADE_HOOKUP_OBJECT (Calculator, label15, "label15");
