@@ -127,9 +127,14 @@ extern int A_delete(uint32_t start, uint32_t end);
 int scriptRemoveFrame(int n,Arg *args)
 {
 uint32_t a,b;
-		a=args[0].arg.integer;
-		b=args[1].arg.integer;
-		return A_delete(a,b);
+	a=args[0].arg.integer;
+	b=args[1].arg.integer;
+             if(avifileinfo && a >= avifileinfo->nb_frames)
+                       a = avifileinfo->nb_frames-1;
+             if(avifileinfo && b >= avifileinfo->nb_frames)
+                       b = avifileinfo->nb_frames-1;
+		
+	return A_delete(a,b);
 }
 //_______________________
 extern int filterLoadXml(char *docname,uint8_t silent);
