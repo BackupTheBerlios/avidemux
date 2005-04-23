@@ -43,9 +43,9 @@
 
 
 
-static  uint64_t _full_f = 0xFFFFFFFFFFFFFFFFLL;
-static  uint64_t _keep_right_luma = 0x00FF00FF00FF00FFLL;
-static  uint64_t _keep_left_luma = 0xFF00FF00FF00FF00LL;
+static  uint64_t _full_f ASM_CONST = 0xFFFFFFFFFFFFFFFFLL;
+static  uint64_t _keep_right_luma ASM_CONST = 0x00FF00FF00FF00FFLL;
+static  uint64_t _keep_left_luma ASM_CONST = 0xFF00FF00FF00FF00LL;
 
 static volatile uint8_t *_l_source ;
 static volatile uint8_t *_l_prev ;

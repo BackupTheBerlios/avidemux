@@ -35,6 +35,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
+#include "admmangle.h"
 
 static int16_t scaletab[16];
 static uint64_t scaletab_MMX[65536];
@@ -66,11 +67,12 @@ SCRIPT_CREATE(fluxsmooth_script,ADMVideoFlux,fluxParam);
 //#define ASM_FLUX
 BUILD_CREATE(fluxsmooth_create,ADMVideoFlux);
 
-static uint64_t  spat_thresh,temp_thresh;
-static uint64_t  _l_counter_init,_l_indexer,_l_prev_pels,_l_next_pels;
-static long int _l_src_pitch;
-static long int _l_dst_pitch;
-static int _l_xmax;
+static uint64_t spat_thresh ASM_CONST =0LL;
+static uint64_t temp_thresh ASM_CONST =0LL;
+static uint64_t ASM_CONST _l_counter_init,_l_indexer,_l_prev_pels,_l_next_pels;
+static long int _l_src_pitch ASM_CONST =0;
+static long int _l_dst_pitch ASM_CONST =0;
+static int _l_xmax ASM_CONST=0;
 
 static int ycnt;
 static	uint8_t * _l_currp; 
@@ -387,7 +389,6 @@ void ADMVideoFlux::DoFilter_C(
 
 }
 #ifdef USE_MMX
-#include "admmangle.h"
 /*
 	__asm movq mm2, mm0 \
 	__asm movq mm3, mm1 \

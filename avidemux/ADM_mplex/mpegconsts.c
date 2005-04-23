@@ -41,7 +41,7 @@ mpeg_framerates[] = {
 
 
 #define MPEG_NUM_RATES (sizeof(mpeg_framerates)/sizeof(mpeg_framerates[0]))
-static const mpeg_framerate_code_t mpeg_num_framerates = MPEG_NUM_RATES;
+static const mpeg_framerate_code_t MX_mpeg_num_framerates = MPEG_NUM_RATES;
 
 static const char *
 framerate_definitions[MPEG_NUM_RATES] =
@@ -127,7 +127,7 @@ static const y4m_ratio_t *mpeg_aspect_ratios[2] =
 	mpeg2_aspect_ratios
 };
 
-static const mpeg_aspect_code_t mpeg_num_aspect_ratios[2] = 
+static const mpeg_aspect_code_t MX_mpeg_num_aspect_ratios[2] = 
 {
   sizeof(mpeg1_aspect_ratios)/sizeof(mpeg1_aspect_ratios[0]),
   sizeof(mpeg2_aspect_ratios)/sizeof(mpeg2_aspect_ratios[0])
@@ -141,7 +141,7 @@ static const mpeg_aspect_code_t mpeg_num_aspect_ratios[2] =
 int
 mpeg_valid_framerate_code( mpeg_framerate_code_t code )
 {
-    return ((code > 0) && (code < mpeg_num_framerates)) ? 1 : 0;
+    return ((code > 0) && (code < MX_mpeg_num_framerates)) ? 1 : 0;
 }
 
 
@@ -193,7 +193,7 @@ int
 mpeg_valid_aspect_code( int version, mpeg_framerate_code_t c )
 {
 	if ((version == 1) || (version == 2))
-        return ((c > 0) && (c < mpeg_num_aspect_ratios[version-1])) ? 1 : 0;
+        return ((c > 0) && (c < MX_mpeg_num_aspect_ratios[version-1])) ? 1 : 0;
     else
         return 0;
 }

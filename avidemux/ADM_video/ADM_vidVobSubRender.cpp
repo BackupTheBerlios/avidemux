@@ -509,7 +509,7 @@ uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy,u
   newx,newy,
   IMGFMT_Y8,
   flags,
-  NULL, NULL);
+  NULL, NULL,NULL);
 
   ADM_assert(ctx);
     

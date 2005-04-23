@@ -19,6 +19,9 @@
  * 02111-1307, USA.
  *
  */
+#define K_AVG_WINDOW_I   4.0
+#define K_AVG_WINDOW_P   10.0
+#define	K_AVG_WINDOW_B   20.0
 
 #include <config.h>
 class MacroBlock;
@@ -137,9 +140,6 @@ private:
 	double avg_KI;
 	double avg_KB;
 	double avg_KP;
-	static const double K_AVG_WINDOW_I = 4.0;
-	static const double K_AVG_WINDOW_P = 10.0;
-	static const double  K_AVG_WINDOW_B = 20.0;
 
 	double bits_per_mb;
 	bool fast_tune;

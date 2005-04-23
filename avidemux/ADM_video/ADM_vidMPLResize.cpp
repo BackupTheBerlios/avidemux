@@ -200,7 +200,7 @@ uint8_t AVDMVideoStreamMPResize::reset(uint32_t nw, uint32_t old,uint32_t algo)
 						IMGFMT_YV12,
 		 				nw,old,
 	   					IMGFMT_YV12,
-	    					flags, srcFilter, dstFilter);
+	    					flags, srcFilter, dstFilter,NULL);
 
 				if(!_context) return 0;
 				return 1;

@@ -19,15 +19,31 @@
 #ifndef SWSCALE_INTERNAL_H
 #define SWSCALE_INTERNAL_H
 
-//MEANX #include "../mp_msg.h"
+#ifdef HAVE_ALTIVEC_H
+#include <altivec.h>
+#endif
 
-#define MSG_WARN(args...) {} 
-#define MSG_FATAL(args...)  {}
-#define MSG_ERR(args...) {}
-#define MSG_V(args...) ; 
-#define MSG_DBG2(args...)  {}
-#define MSG_INFO(args...)  {}
+#ifdef CONFIG_DARWIN
+#define AVV(x...) (x)
+#else
+#define AVV(x...) {x}
+#endif
 
+//#include "../mp_msg.h"
+/* MEANX
+#define MSG_WARN(args...) mp_msg(MSGT_SWS,MSGL_WARN, ##args )
+#define MSG_FATAL(args...) mp_msg(MSGT_SWS,MSGL_FATAL, ##args )
+#define MSG_ERR(args...) mp_msg(MSGT_SWS,MSGL_ERR, ##args )
+#define MSG_V(args...) mp_msg(MSGT_SWS,MSGL_V, ##args )
+#define MSG_DBG2(args...) mp_msg(MSGT_SWS,MSGL_DBG2, ##args )
+#define MSG_INFO(args...) mp_msg(MSGT_SWS,MSGL_INFO, ##args )
+*/
+#define MSG_WARN(args...) 
+#define MSG_FATAL(args...) exit(0)
+#define MSG_ERR(args...) 
+#define MSG_V(args...)
+#define MSG_DBG2(args...) 
+#define MSG_INFO(args...) 
 #define MAX_FILTER_SIZE 256
 
 typedef int (*SwsFunc)(struct SwsContext *context, uint8_t* src[], int srcStride[], int srcSliceY,
@@ -50,6 +66,7 @@ typedef struct SwsContext{
 	int chrIntHSubSample, chrIntVSubSample;
 	int chrDstHSubSample, chrDstVSubSample;
 	int vChrDrop;
+	double param[2];
 
 	int16_t **lumPixBuf;
 	int16_t **chrPixBuf;
@@ -71,8 +88,8 @@ typedef struct SwsContext{
 	int vLumBufSize;
 	int vChrBufSize;
 
-	uint8_t __attribute__((aligned(32))) funnyYCode[10000];
-	uint8_t __attribute__((aligned(32))) funnyUVCode[10000];
+	uint8_t *funnyYCode;
+	uint8_t *funnyUVCode;
 	int32_t *lumMmx2FilterPos;
 	int32_t *chrMmx2FilterPos;
 	int16_t *lumMmx2Filter;
@@ -132,6 +149,19 @@ typedef struct SwsContext{
 	int dstW;
 	int esp;
 	uint64_t vRounder     __attribute__((aligned(8)));
+
+#ifdef HAVE_ALTIVEC
+
+  vector signed short   CY;
+  vector signed short   CRV;
+  vector signed short   CBU;
+  vector signed short   CGU;
+  vector signed short   CGV;
+  vector signed short   OY;
+  vector unsigned short CSHIFT;
+
+#endif
+
 } SwsContext;
 //FIXME check init (where 0)
 

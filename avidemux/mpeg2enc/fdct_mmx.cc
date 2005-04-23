@@ -66,8 +66,8 @@ static const int16_t fdct_tg_all_16[] ATTR_ALIGN(8) = {
 static const int16_t ocos_4_16[4] ATTR_ALIGN(8) = {
     23170, 23170, 23170, 23170, //cos * (2<<15) + 0.5
 };
-
-static const int64_t fdct_one_corr ATTR_ALIGN(8) = 0x0001000100010001LL;
+//MEANX
+static volatile const int64_t fdct_one_corr ATTR_ALIGN(8) = 0x0001000100010001LL;
 static const int32_t fdct_r_row[2] ATTR_ALIGN(8) = {RND_FRW_ROW, RND_FRW_ROW };
 
 static const int16_t tab_frw_01234567[] ATTR_ALIGN(8) = {  // forward_dct coeff table
@@ -184,7 +184,6 @@ static const int16_t tab_frw_01234567[] ATTR_ALIGN(8) = {  // forward_dct coeff 
      //      forward_dct_row1(j); // dct_row transform on row #j
      // }
      //
-
 
 void mp2_fdct_mmx(int16_t *blk)
 {
