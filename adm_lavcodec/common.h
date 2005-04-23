@@ -54,14 +54,6 @@
 #define AVOPTION_SUB(ptr) { .name = NULL, .help = (const char*)ptr }
 #define AVOPTION_END() AVOPTION_SUB(NULL)
 
-struct AVOption;
-#ifdef HAVE_MMX
-extern const struct AVOption avoptions_common[3 + 5];
-#else
-extern const struct AVOption avoptions_common[3];
-#endif
-extern const struct AVOption avoptions_workaround_bug[11];
-
 #endif /* HAVE_AV_CONFIG_H */
 
 /* Suppress restrict if it was not defined in config.h.  */
@@ -82,6 +74,14 @@ extern const struct AVOption avoptions_workaround_bug[11];
 #    define attribute_used __attribute__((used))
 #else
 #    define attribute_used
+#endif
+#endif
+
+#ifndef attribute_unused
+#if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
+#    define attribute_unused __attribute__((unused))
+#else
+#    define attribute_unused
 #endif
 #endif
 
@@ -247,7 +247,7 @@ inline void dprintf(const char* fmt,...) {}
 #    else
 
 #        ifdef DEBUG
-#            define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, ##args)
+#            define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, __VA_ARGS__)
 #        else
 #            define dprintf(fmt,...)
 #        endif
@@ -457,6 +457,16 @@ if((y)<(x)){\
 #endif
 
 #if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86_64)
+static inline uint64_t rdtsc(void)
+{
+	uint64_t a, d;
+	asm volatile(	"rdtsc\n\t"
+		: "=a" (a), "=d" (d)
+	);
+	return (d << 32) | (a & 0xffffffff);
+}
+#else
 static inline long long rdtsc(void)
 {
 	long long l;
@@ -465,6 +475,7 @@ static inline long long rdtsc(void)
 	);
 	return l;
 }
+#endif
 
 #define START_TIMER \
 uint64_t tend;\
@@ -489,8 +500,6 @@ tend= rdtsc();\
 #define START_TIMER 
 #define STOP_TIMER(id) {}
 #endif
-
-#define CLAMP_TO_8BIT(d) ((d > 0xff) ? 0xff : (d < 0) ? 0 : d)
 
 /* avoid usage of various functions */
 #define malloc please_use_av_malloc

@@ -1741,6 +1741,34 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int frame_skip_cmp;
+     /**
+     * border processing masking. raises the quantizer for mbs on the borders
+     * of the picture.
+     * - encoding: set by user
+     * - decoding: unused
+     */
+    float border_masking;
+
+    /**
+     * minimum MB lagrange multipler.
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int mb_lmin;
+
+    /**
+     * maximum MB lagrange multipler.
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int mb_lmax;
+
+    /**
+     * 
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int me_penalty_compensation;
 } AVCodecContext;
 
 

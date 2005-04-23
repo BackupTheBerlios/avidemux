@@ -2923,8 +2923,8 @@ asm volatile(
 		: "r" (src), "r" ((long)step), "m" (c->pQPb), "m"(c->ppMode.flatnessThreshold)
 		: "%"REG_a
 		);
-
-	if(dc_mask & eq_mask){
+	dc_mask&=eq_mask; //MEANX
+	if(dc_mask){
 		long offset= -8*step;
 		int64_t *temp_sums= sums;
 
@@ -3099,7 +3099,8 @@ asm volatile(
 		" js 1b						\n\t"
 
 		: "+r"(offset), "+r"(temp_sums)
-		: "r" ((long)step), "r"(src - offset), "m"(dc_mask & eq_mask)
+		//: "r" ((long)step), "r"(src - offset), "m"(dc_mask & eq_mask)
+		: "r" ((long)step), "r"(src - offset), "m"(dc_mask )
 		);
 	}else
 		src+= step; // src points to begin of the 8x8 Block
