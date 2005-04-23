@@ -11,18 +11,49 @@
 #endif
 /* Regiter renaming */
 #ifdef HAVE_X86_64
-#define REG_ax  "%%rax" 
-#define REG_bx  "%%rbx" 
-#define REG_cx  "%%rcx" 
-#define REG_dx  "%%rdx" 
-#define REG_si  "%%rsi" 
-#define REG_di  "%%rdi" 
+#define REG_a  "rax" 
+#define REGa    rax 
+#define REGb    rbx 
+#define REG_b  "rbx"
+#define REG_c  "rcx" 
+#define REG_d  "rdx" 
+#define REG_S  "rsi" 
+#define REG_D  "rdi" 
+#define REGSP   rsp  
+#define REG_SP "rsp" 
+#define REG_BP "rbp" 
 #else
-#define REG_ax  "%%eax" 
-#define REG_bx  "%%ebx" 
-#define REG_cx  "%%ecx" 
-#define REG_dx  "%%edx" 
-#define REG_si  "%%esi" 
-#define REG_di  "%%edi" 
-#endif	
+#define REGa    eax  
+#define REGb    ebx 
+#define REG_a  "eax"  
+#define REG_b  "ebx" 
+#define REG_c  "ecx" 
+#define REG_d  "edx" 
+#define REG_S  "esi" 
+#define REG_D  "edi" 
+#define REG_SP "esp" 
+#define REGSP   esp  
+#define REG_BP "ebp" 
+#endif
+
+#define REG_ax "%%"REG_a
+#define REG_bx "%%"REG_b
+#define REG_cx "%%"REG_c
+#define REG_dx "%%"REG_d
+
+#define REG_si "%%"REG_S
+#define REG_di "%%"REG_D
+
+#define REG_sp "%%"REG_SP
+#define REG_bp "%%"REG_BP
+
+#ifndef attribute_used
+#if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
+#    define attribute_used __attribute__((used))
+#else
+#    define attribute_used
+#endif
+#endif
+
+#define ASM_CONST attribute_used __attribute__ ((aligned(8)))
 

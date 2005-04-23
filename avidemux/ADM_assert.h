@@ -15,6 +15,8 @@ extern char *ADM_strdup( const char *in);
 typedef void *(* adm_fast_memcpy)(void *to, const void *from, size_t len);
 extern adm_fast_memcpy myMemcpy;
 
+#define ADM_memalign(x,y) ADM_alloc(y)
+
 #define ADM_dealloc(x) ADM_dezalloc( (void *)x)
 #define memcpy myMemcpy
 

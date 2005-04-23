@@ -168,7 +168,7 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
 // return 2;
 
  // first byte allways written
- (__u8)strm[0]=
+ strm[0]=
       (__u8)(data[RTjpeg_ZZ[0]]>254) ? 254:((data[RTjpeg_ZZ[0]]<0)?0:data[RTjpeg_ZZ[0]]);
 
 
@@ -178,7 +178,7 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
  bitten = ((unsigned char)ci) << 2;
 
  if (ci==0) {
-   (__u8)strm[1]= bitten; 
+   strm[1]= bitten; 
    co = 2;
    return (int)co;
  }
@@ -207,7 +207,7 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
    }
 
    if( bitoff == 0 ) {
-      (__u8)strm[co]= bitten; 
+      strm[co]= bitten; 
       bitten = 0;
       bitoff = 8; 
       co++;
@@ -219,7 +219,7 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
  /* ci must be 0 */
  if(bitoff != 6) {
 
-      (__u8)strm[co]= bitten; 
+      strm[co]= bitten; 
       co++;
      
  }
@@ -236,7 +236,7 @@ HERZWEH:
    break;
  case 2:
  case 0:
-   (__u8)strm[co]= bitten; 
+   strm[co]= bitten; 
    bitoff = 4;
    co++;
    bitten = 0; // clear half nibble values in bitten
@@ -257,7 +257,7 @@ HERZWEH:
    bitten |= (ZZvalue&0xf)<<bitoff;
 
    if( bitoff == 0 ) {
-      (__u8)strm[co]= bitten; 
+      strm[co]= bitten; 
       bitten = 0;
       bitoff = 8;
       co++;
@@ -267,14 +267,14 @@ HERZWEH:
  
  /* ci must be 0 */
  if( bitoff == 0 ) {
-    (__u8)strm[co]= bitten; 
+    strm[co]= bitten; 
     co++;
  }  
  goto BAUCHWEH;
 
 HIRNWEH:
 
- (__u8)strm[co]= bitten; 
+ strm[co]= bitten; 
  co++;
   
 
