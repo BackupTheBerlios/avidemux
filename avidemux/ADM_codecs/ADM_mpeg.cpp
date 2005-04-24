@@ -175,8 +175,13 @@ uint8_t 	decoderMpeg::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t
 #if defined( REMOVE_PADDING)
 		while(*(in+len-1)==0) len--;
 #endif		
-		if(!len) return 1;
-		feedData(len,in);
+		if(!len)
+                {
+                        if(!dontcopy())
+                                return 1;
+                }
+                if(len)
+		      feedData(len,in);
 
 	const mpeg2_info_t  *info ;
 	uint8_t *t;
