@@ -44,41 +44,35 @@
 #include "ADM_toolkit/ADM_debug.h"
 #include "ADM_filter/video_filters.h"
 
+typedef struct DGBobparam
+{
+        uint32_t  thresh;// low=more flickering, less jaggie
+        uint32_t  order; //0 : Bottom field first, 1 top field first        
+        uint32_t  mode;  // 0 keep # of frames, 1 *2 fps & *2 frame, 2  #*2, fps*150% slow motion
+        uint32_t  ap;    // Extra artifact check, better not to use
+}DGBobparam;
+
 class DGbob : public AVDMGenericVideoStream
 {
        
-        int32_t order, thresh, mode;
-        int32_t ap;
-        
-  
-        bool debug, show;
+        DGBobparam      *_param;        
         
         VideoCache      *vidCache;
-        
+       
+        void            update(void); 
 public:
                                 
                         DGbob::DGbob(AVDMGenericVideoStream *in,CONFcouple *couples);    
                         DGbob::~DGbob(void);
         uint8_t         getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
                                 ADMImage *data,uint32_t *flags);
-
-        uint8_t         *GetFrame(int n);
-        void            DrawShow(uint8_t  *src, int useframe, bool forced, int dropframe,
-                                              double metric, int inframe );
-        void            DrawShowYUY2(uint8_t  *src, int useframe, bool forced, int dropframe,
-                                              double metric, int inframe );
-        void            FindDuplicate(int frame, int *chosen, double *metric, bool *forced   );
-        void            FindDuplicate2(int frame, int *chosen, bool *forced );
-        void            FindDuplicateYUY2(int frame, int *chosen, double *metric, bool *force);
-        void            FindDuplicate2YUY2(int frame, int *chosen, bool *forced );
         
         char            *printConf( void );
         uint8_t         configure(AVDMGenericVideoStream *in);
         uint8_t         getCoupledConf( CONFcouple **couples);
 };
 
-static FILTER_PARAM dgbobParam={0,{"cycle","mode","quality","threshold","threshold2"}};
-
+static FILTER_PARAM dgbobParam={4,{"order","mode","thresh","ap"}};
 
 BUILD_CREATE(dgbob_create,DGbob);
 SCRIPT_CREATE(dgbob_script,DGbob,dgbobParam);
@@ -88,6 +82,7 @@ uint8_t DGbob::configure(AVDMGenericVideoStream *in)
 {
         _in=in;
 //        ADM_assert(_param);
+        update();
         return 1;
         
 }
@@ -97,7 +92,7 @@ char *DGbob::printConf( void )
         static char buf[50];
 
         //ADM_assert(_param);
-        sprintf((char *)buf," DGBobd\n");
+        sprintf((char *)buf," DGBob\n");
         return buf;
 }
 
@@ -120,26 +115,54 @@ DGbob::DGbob(AVDMGenericVideoStream *in,CONFcouple *couples)
                 
                                 
                 vidCache=new VideoCache(5,in);
-                
-                order=0;
-                thresh=0;
-                mode=1;
-                thresh=12;
-                ap=0;
+                _param= new DGBobparam;
+                if(couples)
+                {
+                        GET(order);
+                        GET(mode);
+                        GET(thresh);
+                        GET(ap);
+                }
+                else
+                {
+                        _param->order=2;
+                        _param->mode=0;
+                        _param->thresh=12;
+                        _param->ap=0;
+                }
+                update();
+}
+void DGbob::update(void)
+{
+                memcpy(&_info,_in->getInfo(),sizeof(_info));    
+                _info.encoding=1;
+                switch(_param->mode)
+                {
+                        case 0:
+                                break;
+                        case 1:
+                                _info.fps1000*=2;
+                                _info.nb_frames*=2;
+                                break;
+                        case 2:
+                                _info.nb_frames*=2;
+                                break;
+                        default: ADM_assert(0);
+
+                }
+             
 }
 //________________________________________________________
 uint8_t DGbob::getCoupledConf( CONFcouple **couples)
 {
         *couples=NULL;
-        *couples=new CONFcouple(0);
+        *couples=new CONFcouple(4);
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
-/*        
-        CSET(cycle);
+        
+        CSET(order);
         CSET(mode);
-        CSET(quality);
-        CSET(threshold);
-        CSET(threshold2);
-*/
+        CSET(thresh);
+        CSET(ap);
 
         return 1;
 }
@@ -148,7 +171,9 @@ DGbob::~DGbob(void)
 {
                 
                 if(vidCache) delete vidCache;                
-                vidCache=NULL;                                
+                vidCache=NULL;   
+                if(_param) delete _param;
+                _param=NULL;                             
 }
 uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
                                 ADMImage *data,uint32_t *flags)
@@ -156,9 +181,9 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
         ADMImage *src,*prv,*prvprv,*nxt,*nxtnxt,*dst;
 	uint32_t n,num_frames;
 
-        num_frames=_info.nb_frames>>1;   // ??
+        num_frames=_in->getInfo()->nb_frames;   // ??
 
-	if (mode == 0) n = frame;
+	if (_param->mode == 0) n = frame;
 	else n = frame/2;
 
         src=vidCache->getImage(n);
@@ -182,7 +207,7 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     unsigned char *dstp, *dstp_saved;
  
     int src_pitch, dst_pitch, w, h;
-	int x, y, z, v1, v2, D = thresh, T = 6, AP = 30;
+	int x, y, z, v1, v2, D = _param->thresh, T = 6, AP = 30;
 	int plane;
 
         uint32_t ww,hh;
@@ -241,12 +266,12 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		w = dst->GetRowSize(plane);
 		h = dst->GetHeight(plane);
 */
-		if ((mode > 0) && (frame & 1))
+		if ((_param->mode > 0) && (frame & 1))
 		{
 			// Process odd-numbered frames.
 			// Copy field from current frame.
-			srcp = srcp_saved + order * src_pitch;
-			dstp = dstp_saved + order * dst_pitch;
+			srcp = srcp_saved +_param->order * src_pitch;
+			dstp = dstp_saved +_param->order * dst_pitch;
 			for (y = 0; y < h; y+=2)
 			{
 				memcpy(dstp, srcp, w);
@@ -254,25 +279,25 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 				dstp += 2*dst_pitch;
 			}
 			// Copy through the line that will be missed below.
-			memcpy(dstp_saved + (1-order)*(h-1)*dst_pitch, srcp_saved + (1-order)*(h-1)*src_pitch, w);
+			memcpy(dstp_saved + (1-_param->order)*(h-1)*dst_pitch, srcp_saved + (1-_param->order)*(h-1)*src_pitch, w);
 			/* For the other field choose adaptively between using the previous field
 			   or the interpolant from the current field. */
                         
 			//prvp = prv->GetReadPtr(plane) + src_pitch + order*src_pitch;
                         switch(z)
                         {
-                                case 0:prvp = YPLANE(prv) + src_pitch + order*src_pitch;break;
-                                case 1:prvp = UPLANE(prv) + src_pitch + order*src_pitch;break;
-                                case 2:prvp = VPLANE(prv) + src_pitch + order*src_pitch;break;
+                                case 0:prvp = YPLANE(prv) + src_pitch + _param->order*src_pitch;break;
+                                case 1:prvp = UPLANE(prv) + src_pitch + _param->order*src_pitch;break;
+                                case 2:prvp = VPLANE(prv) + src_pitch + _param->order*src_pitch;break;
                         }
 			prvpp = prvp - src_pitch;
 			prvpn = prvp + src_pitch;
 			//prvprvp = prvprv->GetReadPtr(plane) + src_pitch + order*src_pitch;
                          switch(z)
                         {
-                                case 0:prvprvp = YPLANE(prvprv) + src_pitch + order*src_pitch;break;
-                                case 1:prvprvp = UPLANE(prvprv) + src_pitch + order*src_pitch;break;
-                                case 2:prvprvp = VPLANE(prvprv) + src_pitch + order*src_pitch;break;
+                                case 0:prvprvp = YPLANE(prvprv) + src_pitch + _param->order*src_pitch;break;
+                                case 1:prvprvp = UPLANE(prvprv) + src_pitch + _param->order*src_pitch;break;
+                                case 2:prvprvp = VPLANE(prvprv) + src_pitch + _param->order*src_pitch;break;
                         }
 
 			prvprvpp = prvprvp - src_pitch;
@@ -281,9 +306,9 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			//nxtp = nxt->GetReadPtr(plane) + src_pitch + order*src_pitch;
                         switch(z)
                         {
-                                case 0:nxtp = YPLANE(nxt) + src_pitch + order*src_pitch;break;
-                                case 1:nxtp = UPLANE(nxt) + src_pitch + order*src_pitch;break;
-                                case 2:nxtp = VPLANE(nxt) + src_pitch + order*src_pitch;break;
+                                case 0:nxtp = YPLANE(nxt) + src_pitch + _param->order*src_pitch;break;
+                                case 1:nxtp = UPLANE(nxt) + src_pitch + _param->order*src_pitch;break;
+                                case 2:nxtp = VPLANE(nxt) + src_pitch + _param->order*src_pitch;break;
                         }
 
 			nxtpp = nxtp - src_pitch;
@@ -291,16 +316,16 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			//nxtnxtp = nxtnxt->GetReadPtr(plane) + src_pitch + order*src_pitch;
                         switch(z)
                         {
-                                case 0:nxtnxtp = YPLANE(nxtnxt) + src_pitch + order*src_pitch;break;
-                                case 1:nxtnxtp = UPLANE(nxtnxt) + src_pitch + order*src_pitch;break;
-                                case 2:nxtnxtp = VPLANE(nxtnxt) + src_pitch + order*src_pitch;break;
+                                case 0:nxtnxtp = YPLANE(nxtnxt) + src_pitch + _param->order*src_pitch;break;
+                                case 1:nxtnxtp = UPLANE(nxtnxt) + src_pitch + _param->order*src_pitch;break;
+                                case 2:nxtnxtp = VPLANE(nxtnxt) + src_pitch + _param->order*src_pitch;break;
                         }
 			nxtnxtpp = nxtnxtp - src_pitch;
 			nxtnxtpn = nxtnxtp + src_pitch;
-			srcp =  srcp_saved + src_pitch + order*src_pitch;
+			srcp =  srcp_saved + src_pitch + _param->order*src_pitch;
 			srcpp = srcp - src_pitch;
 			srcpn = srcp + src_pitch;
-			dstp =  dstp_saved + dst_pitch + order*dst_pitch;
+			dstp =  dstp_saved + dst_pitch + _param->order*dst_pitch;
 			for (y = 0; y < h - 2; y+=2)
 			{
 				for (x = 0; x < w; x++)
@@ -319,7 +344,7 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 						&& abs(srcpp[x] - nxtpp[x]) < D
 					   )
 					{
-						if (ap == true)
+						if (_param->ap == true)
 						{
 							v1 = (int) srcp[x] - AP;
 							if (v1 < 0) v1 = 0; 
@@ -379,8 +404,8 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		{
 			// Process even-numbered frames.
 			// Copy field from current frame.
-			srcp = srcp_saved + (1-order) * src_pitch;
-			dstp = dstp_saved + (1-order) * dst_pitch;
+			srcp = srcp_saved + (1-_param->order) * src_pitch;
+			dstp = dstp_saved + (1-_param->order) * dst_pitch;
 			for (y = 0; y < h; y+=2)
 			{
 				memcpy(dstp, srcp, w);
@@ -388,24 +413,24 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 				dstp += 2*dst_pitch;
 			}
 			// Copy through the line that will be missed below.
-			memcpy(dstp_saved + order*(h-1)*dst_pitch, srcp_saved + order*(h-1)*src_pitch, w);
+			memcpy(dstp_saved + _param->order*(h-1)*dst_pitch, srcp_saved + _param->order*(h-1)*src_pitch, w);
 			/* For the other field choose adaptively between using the previous field
 			   or the interpolant from the current field. */
 			//prvp = prv->GetReadPtr(plane) + src_pitch + (1-order)*src_pitch;
                         switch(z)
                         {
-                                case 0:prvp = YPLANE(prv) + src_pitch + (1-order)*src_pitch;break;
-                                case 1:prvp = UPLANE(prv) + src_pitch + (1-order)*src_pitch;break;
-                                case 2:prvp = VPLANE(prv) + src_pitch + (1-order)*src_pitch;break;
+                                case 0:prvp = YPLANE(prv) + src_pitch + (1-_param->order)*src_pitch;break;
+                                case 1:prvp = UPLANE(prv) + src_pitch + (1-_param->order)*src_pitch;break;
+                                case 2:prvp = VPLANE(prv) + src_pitch + (1-_param->order)*src_pitch;break;
                         }
 			prvpp = prvp - src_pitch;
 			prvpn = prvp + src_pitch;
 			// prvprvp = prvprv->GetReadPtr(plane) + src_pitch + (1-order)*src_pitch;
                         switch(z)
                         {
-                                case 0:prvprvp = YPLANE(prvprv) + src_pitch + (1-order)*src_pitch;break;
-                                case 1:prvprvp = UPLANE(prvprv) + src_pitch + (1-order)*src_pitch;break;
-                                case 2:prvprvp = VPLANE(prvprv) + src_pitch + (1-order)*src_pitch;break;
+                                case 0:prvprvp = YPLANE(prvprv) + src_pitch + (1-_param->order)*src_pitch;break;
+                                case 1:prvprvp = UPLANE(prvprv) + src_pitch + (1-_param->order)*src_pitch;break;
+                                case 2:prvprvp = VPLANE(prvprv) + src_pitch + (1-_param->order)*src_pitch;break;
                         }
                         
 			prvprvpp = prvprvp - src_pitch;
@@ -413,25 +438,25 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			//nxtp = nxt->GetReadPtr(plane) + src_pitch + (1-order)*src_pitch;
                         switch(z)
                         {
-                                case 0:nxtp = YPLANE(nxt) + src_pitch + (1-order)*src_pitch;break;
-                                case 1:nxtp = UPLANE(nxt) + src_pitch + (1-order)*src_pitch;break;
-                                case 2:nxtp = VPLANE(nxt) + src_pitch + (1-order)*src_pitch;break;
+                                case 0:nxtp = YPLANE(nxt) + src_pitch + (1-_param->order)*src_pitch;break;
+                                case 1:nxtp = UPLANE(nxt) + src_pitch + (1-_param->order)*src_pitch;break;
+                                case 2:nxtp = VPLANE(nxt) + src_pitch + (1-_param->order)*src_pitch;break;
                         }
 			nxtpp = nxtp - src_pitch;
 			nxtpn = nxtp + src_pitch;
 			//nxtnxtp = nxtnxt->GetReadPtr(plane) + src_pitch + (1-order)*src_pitch;
                          switch(z)
                         {
-                                case 0:nxtnxtp = YPLANE(nxtnxt) + src_pitch + (1-order)*src_pitch;break;
-                                case 1:nxtnxtp = UPLANE(nxtnxt) + src_pitch + (1-order)*src_pitch;break;
-                                case 2:nxtnxtp = VPLANE(nxtnxt) + src_pitch + (1-order)*src_pitch;break;
+                                case 0:nxtnxtp = YPLANE(nxtnxt) + src_pitch + (1-_param->order)*src_pitch;break;
+                                case 1:nxtnxtp = UPLANE(nxtnxt) + src_pitch + (1-_param->order)*src_pitch;break;
+                                case 2:nxtnxtp = VPLANE(nxtnxt) + src_pitch + (1-_param->order)*src_pitch;break;
                         }
 			nxtnxtpp = nxtnxtp - src_pitch;
 			nxtnxtpn = nxtnxtp + src_pitch;
-			srcp =  srcp_saved + src_pitch + (1-order)*src_pitch;
+			srcp =  srcp_saved + src_pitch + (1-_param->order)*src_pitch;
 			srcpp = srcp - src_pitch;
 			srcpn = srcp + src_pitch;
-			dstp =  dstp_saved + dst_pitch + (1-order)*dst_pitch;
+			dstp =  dstp_saved + dst_pitch + (1-_param->order)*dst_pitch;
 			for (y = 0; y < h - 2; y+=2)
 			{
 				for (x = 0; x < w; x++)
@@ -450,7 +475,7 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 						&& abs(srcpp[x] - nxtpp[x]) < D
 					   )
 					{
-						if (ap == true)
+						if (_param->ap == true)
 						{
 							v1 = (int) prvp[x] - AP;
 							if (v1 < 0) v1 = 0; 
@@ -510,6 +535,7 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
         vidCache->unlockAll();
 	return 1;
 }
+//EOF
 
 
 
