@@ -44,14 +44,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 #include "ADM_filter/video_filters.h"
 
-typedef struct DGBobparam
-{
-        uint32_t  thresh;// low=more flickering, less jaggie
-        uint32_t  order; //0 : Bottom field first, 1 top field first        
-        uint32_t  mode;  // 0 keep # of frames, 1 *2 fps & *2 frame, 2  #*2, fps*150% slow motion
-        uint32_t  ap;    // Extra artifact check, better not to use
-}DGBobparam;
-
+#include "ADM_vidDGbob_param.h"
 class DGbob : public AVDMGenericVideoStream
 {
        
@@ -78,12 +71,16 @@ BUILD_CREATE(dgbob_create,DGbob);
 SCRIPT_CREATE(dgbob_script,DGbob,dgbobParam);
 
 /*************************************/
+extern uint8_t DIA_getDGbob(DGBobparam *param);
 uint8_t DGbob::configure(AVDMGenericVideoStream *in)
 {
         _in=in;
-//        ADM_assert(_param);
-        update();
-        return 1;
+        if(DIA_getDGbob(_param))
+        {        
+                update();
+                return 1;
+        }
+        return 0;
         
 }
 
@@ -92,7 +89,7 @@ char *DGbob::printConf( void )
         static char buf[50];
 
         //ADM_assert(_param);
-        sprintf((char *)buf," DGBob\n");
+        sprintf((char *)buf," DGBob mode:%d order:%d thresh:%d\n",_param->mode,_param->order,_param->thresh);
         return buf;
 }
 
@@ -114,7 +111,7 @@ DGbob::DGbob(AVDMGenericVideoStream *in,CONFcouple *couples)
                 _info.nb_frames*=2;
                 
                                 
-                vidCache=new VideoCache(5,in);
+                vidCache=new VideoCache(7,in);
                 _param= new DGBobparam;
                 if(couples)
                 {
@@ -125,7 +122,7 @@ DGbob::DGbob(AVDMGenericVideoStream *in,CONFcouple *couples)
                 }
                 else
                 {
-                        _param->order=2;
+                        _param->order=1;
                         _param->mode=0;
                         _param->thresh=12;
                         _param->ap=0;

@@ -80,6 +80,7 @@
                 VF_UNSTACK_FIELD,
                 VF_HUE,
                 VF_EQ2,
+                VF_DGBOB,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

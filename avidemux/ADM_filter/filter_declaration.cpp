@@ -91,7 +91,7 @@ printf(  "*********************\n");
 	REGISTERX("pulldown","PullDown",VF_PULLDOWN,1,pulldown_create,pulldown_script);
 	
 	REGISTERX("kerneldeint","D. Graft Kernel deint",VF_KRNDEINT,1,kerneldeint_create,kerneldeint_script);
-	
+	REGISTERX("dgbob","DGBob",VF_DGBOB,1,dgbob_create,dgbob_script);
 
 	REGISTER("","Partial",VF_PARTIAL,0,partial_create);
 	registerFilter("-------- Convolution Kernel ---------",VF_INVALID,2,NULL,NULL);
