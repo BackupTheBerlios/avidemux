@@ -105,7 +105,7 @@ uint32_t decoderFF::getSpecificMpeg4Info( void )
 	
 	if(qpel) out+=ADM_QPEL_ON;
         if(_gmc) out+=ADM_GMC_ON;
-	
+	if(vop) out+=ADM_VOP_ON;	
 	
 	return out;
 }
