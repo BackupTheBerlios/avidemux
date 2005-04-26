@@ -60,7 +60,7 @@ printf(  "*********************\n");
 	REGISTERX("rotate","Rotate",VF_ROTATE,1,rotate_create,rotate_script);
         REGISTERX("chfps","Change FPS",VF_CHFPS,1,chfps_create,chfps_script);
         REGISTERX("resamplefps","Resample FPS",VF_RESAMPLE_FPS,1,resamplefps_create,resamplefps_script);                
-        
+        REGISTERX("msharpen","MSharpen by Donald Graft",VF_MSHARPEN,1,msharpen_create,msharpen_script);
 	REGISTERX("whirl","Whirl",VF_WHIRL,1,whirl_create,whirl_script);
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);

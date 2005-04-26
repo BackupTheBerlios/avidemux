@@ -81,6 +81,7 @@
                 VF_HUE,
                 VF_EQ2,
                 VF_DGBOB,
+                VF_MSHARPEN,
 		VF_DUMMY
  	 }VF_FILTERS;
  	
