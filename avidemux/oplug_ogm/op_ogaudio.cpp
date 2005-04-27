@@ -89,6 +89,7 @@ WAVHeader	*info=NULL;
 			audioFilter=  buildAudioFilter (currentaudiostream,
 					video_body->getTime (frameStart),
 					0xffffffff);
+                        if(!audioFilter) return 0;
 			fcc=audioFilter->getInfo()->encoding;
 			encoding_gui->setAudioCodec(getStrFromAudioCodec(fcc));
 		}
