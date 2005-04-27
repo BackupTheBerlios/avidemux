@@ -75,10 +75,12 @@ WAVHeader	*info=NULL;
 		{
 			audioStream=new ogm_page(_fd,2);
 		}
+/*
 		else 
 		{			
 			return 0;
 		}
+*/
 		//
 		if(audioProcessMode)
 		{
