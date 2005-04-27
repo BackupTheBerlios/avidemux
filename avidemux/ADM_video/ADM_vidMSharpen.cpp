@@ -8,6 +8,11 @@
     http://www.neuron2.net
     http://puschpull.org/avisynth/decomb_reference_manual.html
 
+        It is a bit less efficient as we do hz & vz blur separately
+        The formula has been changed a bit from 1 1 1 to 1 2 1
+        for speed aspect & MMX  
+        Mean
+
  ***************************************************************************/
 /*
 	Msharpen plugin for Avisynth -- performs detail-preserving smoothing.
@@ -60,8 +65,7 @@ private:
 	MSHARPEN_PARAM	*_param;
 	VideoCache	*vidCache;
         ADMImage        *blurrImg,*work;
-	ADMImage 	*blur,*mask,*final,*final2;
-	uint32_t	debug;
+
         uint32_t        invstrength;
 
         void detect_edges(ADMImage *src, ADMImage *dst, unsigned char *dstp, int plane);
@@ -114,7 +118,7 @@ Msharpen::Msharpen(AVDMGenericVideoStream *in,CONFcouple *couples)
 			_param->strength=100;	
 			_param->threshold=15;	
 		}
-                debug=0;
+                
 		invstrength=255-_param->strength;	
 		blurrImg=new ADMImage(_info.width,_info.height);
                 work=new ADMImage(_info.width,_info.height);
@@ -145,16 +149,16 @@ Msharpen::~Msharpen(void)
 	blurrImg=NULL;
         work=NULL;
 }
+extern uint8_t DIA_getMSharpen(MSHARPEN_PARAM *param);
 //________________________________________________________
 uint8_t Msharpen::configure(AVDMGenericVideoStream *in)
 {
+uint8_t r=0;
 	_in=in;
 	ADM_assert(_param);
-	//return  DIA_getDecombDecimate(_param);
+	r= DIA_getMSharpen(_param);
         invstrength=255-_param->strength;       
-	return 1;
-	//return DIA_getMsharpen(_param);
-	
+	return r;
 }
 
 //________________________________________________________
@@ -208,7 +212,7 @@ unsigned char *dstp;
 			if (_param->highq == true)
 				detect_edges_HiQ(blur, dst, dstp, i);
 
-			if (!mask) apply_filter(src, blur, dst, dstp, i);
+			if (!_param->mask) apply_filter(src, blur, dst, dstp, i);
 		}
 	}
 
@@ -281,28 +285,85 @@ int wh ,ww,hh;
   srcp+=src_pitch,
   srcpn=srcp+src_pitch;
   int val;
+
   // Vertical only for now      
+#ifdef USE_MMX
+  int off;
+        __asm__(
+                        ".align 16\n"
+                        "pxor  %%mm7,%%mm7\n"
+                : : );
+                        
   for (int y=1; y<h-1 ;y++) 
-  {         
+  {               
+        for (int x =  (w>>3);x>0; x--)
+                {
+                        off=x<<3;                        
+                        __asm__(
+                        ".align 16\n"                      
+                        "movq  (%0),%%mm0\n"
+                        "movq  %%mm0,%%mm6\n"
+                        "punpckhbw %%mm7,%%mm0\n" // High part extended to 16 bits
+                        "punpcklbw %%mm7,%%mm6\n" // low part ditto
+                        
+                        "movq  (%1),%%mm1\n"
+                        "movq  %%mm1,%%mm5\n"
+                        "punpckhbw %%mm7,%%mm1\n"
+                        "punpcklbw %%mm7,%%mm5\n"
+                        
+                        "movq  (%2),%%mm2\n"
+                        "movq  %%mm2,%%mm4\n"
+                        "punpckhbw %%mm7,%%mm2\n"
+                        "punpcklbw %%mm7,%%mm4\n"
+                        
+                        "paddw %%mm1,%%mm0\n"
+                        "paddw %%mm5,%%mm6\n"
+                        
+                        "paddw %%mm1,%%mm2\n"
+                        "paddw %%mm5,%%mm4\n"
+                        
+                        "paddw %%mm0,%%mm2\n"
+                        "paddw %%mm6,%%mm4\n"
+                        "psrlw $2, %%mm4\n"
+                        "psrlw $2, %%mm2\n"
+                        "packuswb %%mm2,%%mm4\n"
+                        "movq %%mm4,(%3)\n" //
+                        
+                        : : "r" (srcpn+off),
+                           "r" (srcp+off), "r" (srcpp+off), "r" (wk+off)
+                        );
+                }                        
+        srcp+=src_pitch;
+        srcpp+=src_pitch;
+        srcpn+=src_pitch;
+        wk+=src_pitch;     
+  }
+  __asm__("emms\n");
+#else      
+
+  for (int y=1; y<h-1 ;y++) 
+  {       
+
         for(int x=0;x<w;x++)
         {
-                val=srcp[x]+srcpn[x]+srcpp[x];
-                wk[x]=(val+1)/3;
+                val=srcp[x]+srcpn[x]+srcpp[x]+srcp[x];
+                wk[x]=(val)>>2;
         } 
         srcp+=src_pitch;
         srcpp+=src_pitch;
         srcpn+=src_pitch;
         wk+=src_pitch;     
   }
-  // Horizontal
+#endif
+  //************ Horizontal****************
   blurp=blurp_saved;
   srcp=wk_saved;
   for (int y=1; y<h-1 ;y++) 
   {         
         for(int x=1;x<w-1;x++)
         {
-                val=srcp[x-1]+srcp[x]+srcp[x+1];
-                blurp[x]=(val+1)/3;
+                val=srcp[x-1]+srcp[x]+srcp[x+1]+srcp[x];
+                blurp[x]=val>>2;
         } 
         srcp+=src_pitch;
         srcpp+=src_pitch;
@@ -445,7 +506,7 @@ void Msharpen::detect_edges(ADMImage *src, ADMImage *dst, unsigned char *dstp, i
    srcpn+=src_pitch;
    dstp+=dst_pitch;
   }
-  if (mask) {
+  if (_param->mask) {
     dstp=dstp_saved;
     memset(dstp_saved+(h-1)*dst_pitch,0,w);  // Not used, if not returning mask
     for (int y=0;y<h;dstp+=dst_pitch,y++) {
