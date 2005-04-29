@@ -1,5 +1,8 @@
 /***************************************************************************
-                          audioeng_normalize.cpp  -  description
+                          Audio codec that tries to keep the sync
+				when doing PAL<->FILM fps change.
+			  Simply enough we drop or duplicate sample
+			  to compensate. 
                              -------------------
     begin                : Sun Jan 13 2002
     copyright            : (C) 2002 by mean
@@ -17,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <stream.h>
 #include <ADM_assert.h>
 #include <math.h>
 
@@ -26,13 +28,14 @@
 #include "avifmt2.h"
 #include "avio.hxx"
 #include "fourcc.h"
-//#include "aviaudio.hxx"
 #include "audioprocess.hxx"
 #include "audioeng_film2pal.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_dialog/DIA_working.h"
-// Ctor
-//__________
+
+// Integer only
+#define PAL_SAM  25025
+#define FILM_SAM 24000
 
 AVDMProcessAudio_Film2Pal::AVDMProcessAudio_Film2Pal(AVDMGenericAudioStream * instream):AVDMBufferedAudioStream
     (instream)
@@ -53,8 +56,8 @@ AVDMProcessAudio_Film2Pal::AVDMProcessAudio_Film2Pal(AVDMGenericAudioStream * in
     
     d=(double)_length;
     
-    d/=25.;
-    d*=23.976;
+    d*=FILM_SAM;
+    d/=PAL_SAM;
     d*=1.05; // Add 5 % margin
     
     _length=(uint32_t)floor(d);
@@ -102,27 +105,22 @@ uint32_t 	AVDMProcessAudio_Film2Pal::grab(uint8_t *obuffer)
 	rendered+=min;
 	rd-=min;
 	
-#define ALIGN	23.976
-	_target+=(25000-23976);
-	
-	while(_target>25000)
+	_target+=(PAL_SAM-FILM_SAM);
+	//_______________________________________
+	// Remove sample
+	// To compensate
+	//_______________________________________
+	// Fps higher=we have to accelerate sound = remove samples
+	// The compression factor is 1-((25-24)/25)	
+	while(_target>PAL_SAM)
 	{
 					
 		rendered-=min;	
 		out-=min;
-		_target=_target-25000;
+		_target=_target-PAL_SAM;
 	}
 	
     }
-#if 0    
-    float f;
-    
-    f=rendered;
-    f/=org;
-    f*=23.976,
-    printf("ratio:%f\n",f);
-#endif   
-    if(rd) printf("****%d***\n",rd); 
     return rendered;
 
 };
@@ -150,8 +148,8 @@ AVDMProcessAudio_Pal2Film::AVDMProcessAudio_Pal2Film(AVDMGenericAudioStream * in
     
     d=(double)_length;
     
-    d*=25.;
-    d/=23.976;
+    d*=PAL_SAM;
+    d/=FILM_SAM;
     
     _length=(uint32_t)floor(d);
     printf("Pal2Film : %lu\n",(unsigned long int)_length);
@@ -173,13 +171,13 @@ uint32_t 	AVDMProcessAudio_Pal2Film::grab(uint8_t *obuffer)
     rd = _instream->readDecompress(8192*4, _bufferin);
     if(!rd) return MINUS_ONE;        
    
-    
-   
     min=_wavheader->channels*2;
     
     rendered=0;
     
-    // copy four by four
+    // 
+    // copy sample per sample, 16 bits mono to stereo
+    // 
     copy=_bufferin;
     out=obuffer;
     while(rd>min)
@@ -191,11 +189,15 @@ uint32_t 	AVDMProcessAudio_Pal2Film::grab(uint8_t *obuffer)
 		rd--;
 		
 	}	
-#define ALIGN	23.976
-	_target+=(25000-23976);
-	
+	_target+=(PAL_SAM-FILM_SAM);
+	//_______________________________________
+	// Duplicate sample
+	// To compensate
+	//_______________________________________
+	// In : One second is worth FILM_SAM samples
+	// Out:FILM_SAM+(PAL_SAM-FILM_SAM)*FILM_SAM/FILM_SAM=PAL_SAM = 25 fps
 
-	while(_target>23976)
+	while(_target>FILM_SAM)
 	{
 		for(uint32_t i=0;i<min;i++)
 		{
@@ -203,7 +205,7 @@ uint32_t 	AVDMProcessAudio_Pal2Film::grab(uint8_t *obuffer)
 			rendered++;
 		
 		}			
-		_target=_target-23976;
+		_target=_target-FILM_SAM;
 	}
     }
     
