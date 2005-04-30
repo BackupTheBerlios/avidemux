@@ -102,7 +102,11 @@ void initPostProc(ADM_PP *pp,uint32_t w, uint32_t h)
 	memset(pp,0,sizeof(ADM_PP));
 	pp->w=w;
 	pp->h=h;
+#ifdef HAVE_ALTIVEC	
+	pp->fastMode=0;
+#else	
 	pp->fastMode=1;
+#endif	
 	aprintf("Initializing postproc\n");
 	
 
