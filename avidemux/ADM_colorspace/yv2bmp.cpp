@@ -82,7 +82,7 @@ ____________________________________________
 	 // invert screen buffer + swap y
   uint8_t *e,*write;
   uint32_t w, y;
-  uint8_t buff[800 * 3];
+  uint8_t buff[ww * 3];
 
   w = ww*3;
 
