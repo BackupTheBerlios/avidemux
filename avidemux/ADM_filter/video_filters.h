@@ -82,6 +82,7 @@
                 VF_EQ2,
                 VF_DGBOB,
                 VF_MSHARPEN,
+                VF_ASHARP,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

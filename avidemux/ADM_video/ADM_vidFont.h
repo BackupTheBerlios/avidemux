@@ -15,7 +15,9 @@
  *                                                                         *
  ***************************************************************************/
  #ifdef USE_FREETYPE
-
+#undef free
+#undef alloc
+#undef realloc
  #include <ft2build.h>
  #include FT_FREETYPE_H
 
