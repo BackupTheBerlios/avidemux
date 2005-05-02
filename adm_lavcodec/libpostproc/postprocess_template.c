@@ -3517,7 +3517,13 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 	QP_STORE_T QPs[], int QPStride, int isColor, PPContext *c2)
 {
 	PPContext __attribute__((aligned(8))) c= *c2; //copy to stack for faster access
-	int x,y;
+#ifdef 	ARCH_X86_64
+	int64_t  x,y;
+	int64_t copyAhead;
+#else	
+	int32_t x,y;
+	int32_t copyAhead;
+#endif	
 #ifdef COMPILE_TIME_MODE
 	const int mode= COMPILE_TIME_MODE;
 #else
@@ -3526,7 +3532,6 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 	int black=0, white=255; // blackest black and whitest white in the picture
 	int QPCorrecture= 256*256;
 
-	int copyAhead;
 #ifdef HAVE_MMX
 	int i;
 #endif
