@@ -46,6 +46,10 @@
 extern "C"
 {
 #include "libMpeg2Dec/video_out.h"
+#undef free
+#undef alloc
+#undef realloc
+	
 #include "libMpeg2Dec/mpeg2.h"
 #include "libMpeg2Dec/mpeg2_internal.h"
 #include <ADM_assert.h>
@@ -389,10 +393,17 @@ void yv12_close (vo_instance_t * _instance)
 static void yv12_setup_fbuf (vo_instance_t * _instance,			    uint8_t ** buf, void ** id)
 {
 	uint8_t *all;
-	uint32_t page,i,img;
+	uint32_t page,img;
+#ifdef ARCH_X86_64 
+	uint64_t i;
+	i=(uint64_t)id;
+
+#else
+	uint32_t i;
+	i=(uint32_t)id;
+#endif	
     
 	yv12_instance_t * instance = (yv12_instance_t *) _instance;
-	i=(uint32_t)id;
  	printf(" **********YV12 setup fbuf called : %lu x %lu (%lu)\n",instance->w,instance->h,i);
 
  	page=instance->w*instance->h;
