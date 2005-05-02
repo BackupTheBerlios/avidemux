@@ -190,7 +190,7 @@ typedef enum {
 
 void * mpeg2_malloc (unsigned size, mpeg2_alloc_t reason);
 void mpeg2_free (void * buf);
-void mpeg2_malloc_hooks (void * malloc (unsigned, mpeg2_alloc_t),
-			 int free (void *));
+void mpeg2_malloc_hooks (void * zmalloc (unsigned, mpeg2_alloc_t),
+			 int zfree (void *));
 
 #endif /* MPEG2_H */
