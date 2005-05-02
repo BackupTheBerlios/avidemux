@@ -22,12 +22,20 @@
 //
 #ifndef ADM_IMAGE
 #define ADM_IMAGE
-
+#include "ADM_assert.h"
 typedef enum ADM_ASPECT
 {
 	ADM_ASPECT_4_3=1,
 	ADM_ASPECT_16_9,
 	ADM_ASPECT_1_1
+};
+// Avisynth compatibility layer
+typedef enum ADM_PLANE
+{
+        PLANAR_Y=1,
+        PLANAR_U=2,
+        PLANAR_V=3
+        
 };
 class ADMImage
 {
@@ -46,6 +54,27 @@ public:
 	uint8_t         _isRef;         /// If True means the datas are just a link to data we don't own!
         uint8_t         _noPicture;     /// No picture to display
         void            commonInit(uint32_t w,uint32_t h); /// sub constructor
+        uint32_t        GetPitch(ADM_PLANE plane)
+                                {
+                                        switch(plane)
+                                        {
+                                                case PLANAR_Y:return _width;break;
+                                                case PLANAR_U:
+                                                case PLANAR_V:return _width>>1;break;
+                                                default: ADM_assert(0);
+                                        }
+                                }
+        uint8_t         *GetWritePtr(ADM_PLANE plane)
+                        {       
+                                uint32_t plan=_width*_height;
+                                switch(plane)
+                                        {
+                                                case PLANAR_Y:return data;break;
+                                                case PLANAR_U:return data+plan;break;
+                                                case PLANAR_V:return data+((plan*5)>>2);break;
+                                                default: ADM_assert(0);
+                                        }
+                        }
 public:
 
         uint8_t         *_planes[3];     /// In case of linked data store y/u/v pointers

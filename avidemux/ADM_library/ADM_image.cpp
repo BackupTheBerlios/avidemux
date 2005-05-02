@@ -10,13 +10,15 @@
 //
 //
 #include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "ADM_assert.h"
 #include "ADM_library/default.h"
 
 #include "ADM_library/ADM_image.h"
-#include "ADM_assert.h"
+//#include "ADM_assert.h"
 void ADMImage_stat( void );
 
 static uint32_t imgMaxMem=0;
@@ -118,7 +120,7 @@ uint8_t ADMImage::duplicate(ADMImage *src)
         {
                 if(src->_noPicture)
                 {
-                        // no pic available, blacken it
+                        // no pic available, blacken it                        
                         memset(YPLANE(this),0,_width*_height);
                         memset(UPLANE(this),128,(_width*_height)>>2);
                         memset(VPLANE(this),128,(_width*_height)>>2);
