@@ -14,7 +14,6 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
 #include "config.h"
 
  /*
@@ -40,13 +39,12 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidClean.h"
-//#include "ADM_video/ADM_vidCommonFilter.h"
 
-static void gui_ok(GtkButton * button, gpointer user_data);
+
+
 static int getSmoothParams(	uint32_t *w,uint32_t 	*w2);
 static GtkWidget  *create_dialog1 (void);
 
-static int croplock;
 static GtkObject *blend_adj;
 static GtkObject *radius_adj;
 
@@ -57,95 +55,49 @@ UNUSED_ARG(instream);
 
 SMOOTH_PARAMS *par;
 	
-     	par=_param;
-     	return((uint8_t)getSmoothParams(&par->radius,&par->blend));
-
+//     	par=_param;
+     	//return((uint8_t)getSmoothParams(&par->radius,&par->blend));
+	return 1;
+#warning FIXME , CODE REMOVED AMD64/GCC4
 }
 
+#if 0
 //
 //      Get crop parameters from GUI
 //                         left, right, top, down , initial size
 //
 int getSmoothParams(	uint32_t *radius,uint32_t 	*stre)
 {
-//char 	string[50];
-//gchar   *str;
 static 	GtkWidget *resi;
-//int 	ret;
 uint32_t 	ir,is;
+int             r=0;
 
-		ir=*radius;
-		is=*stre;
+                ir=*radius;
+                is=*stre;
 
-		do
-		{
-			croplock=0;
-			resi=create_dialog1();				
-	  		gtk_widget_show(resi);
+                resi=create_dialog1();
+                gtk_widget_show(resi);
+                gtk_adjustment_set_value( GTK_ADJUSTMENT(blend_adj),(  gdouble  ) is );
+                gtk_adjustment_set_value( GTK_ADJUSTMENT(radius_adj),(  gdouble  ) ir*2 );
 
-     		  	gtk_adjustment_set_value( GTK_ADJUSTMENT(blend_adj),(  gdouble  ) is );
-    			gtk_signal_emit_by_name (GTK_OBJECT (blend_adj), "changed");
-            		  	gtk_adjustment_set_value( GTK_ADJUSTMENT(radius_adj),(  gdouble  ) ir*2 );
-    			gtk_signal_emit_by_name (GTK_OBJECT (radius_adj), "changed");
+                int response;
+                response=gtk_dialog_run(GTK_DIALOG(dialog));
 
-		while(!croplock)
-		{
-			gtk_main_iteration();
-		}
-		// now check parameters
-		//
-		if(1==croplock) //         ok button
-		{
-    			*radius= (uint32_t)floor(GTK_ADJUSTMENT(radius_adj)->value);
-       		*radius=*radius/2;
-       		*stre=is;
-		}
-		// cancel button
-		if(croplock!=-1)
-		{
-		 	gtk_widget_destroy(resi);
-		}
-	}while(!croplock);
-	// exit ok
-	if(croplock==1)
-	{
-		return 1;
-	}
-  return 0;
+                if(response==GTK_REPLY_OK)
+                {
+                        *radius= (uint32_t)floor(GTK_ADJUSTMENT(radius_adj)->value);
+                        *radius=*radius/2;
+                        *stre=is;
+                        r=1;
+                }
+                gtk_widget_destroy(resi);
+                return r;
 }
 //
 //
 //
 //
-/*void gui_ko(GtkButton * button, gpointer user_data)
-{
-	if(croplock==0)
-		croplock=-1;
-}  */
 
-
-void gui_ok(GtkButton * button, gpointer user_data)
-{
-    UNUSED_ARG(button);
-
-    int res;
-
-    res = (int) user_data;
-    if (croplock)
-			return;			// second call back->ignore.
-			
-    switch (res)
-      {
-      case 1:
-	  croplock = 1;
-	  break;
-      case 0:
-	  croplock = -2;
-	  break;
-      }
-    return;
-
-};
 
 GtkWidget*
 create_dialog1 (void)
@@ -261,3 +213,5 @@ create_dialog1 (void)
 }
 
 #endif
+#endif 
+

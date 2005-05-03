@@ -607,7 +607,7 @@ void guiCallback(GtkMenuItem * menuitem, gpointer user_data)
     Action act;
     uint32_t aint;
 
-    aint = (uint32_t) user_data;
+    aint = (long int) user_data;
     act = (Action) aint;
     if(act==ACT_Scale)
     {

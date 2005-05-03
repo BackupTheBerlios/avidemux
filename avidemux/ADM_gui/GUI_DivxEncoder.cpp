@@ -14,6 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#if 0
 #include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -399,3 +400,4 @@ gtk_window_set_modal(GTK_WINDOW(compression), 1);
 
   return compression;
 }
+#endif

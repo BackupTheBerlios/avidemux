@@ -403,7 +403,7 @@ int ADM_SubAtoi(uint16_t *in)
 uint8_t	ADM_utfInit( char *charset )
 {
 	myConv=iconv_open("UTF-16",charset); //"WINDOWS-1251");
-	if((int)myConv==-1)
+	if((long int)myConv==-1)
 	{
 		printf("\n Error initializing iconv...\n");
 		return  0;
@@ -481,7 +481,7 @@ uint32_t done=0;
 uint8_t ADM_utfEnd( void)
 {
   // Purge iconv
-  if((int)myConv!=-1)
+  if((long int)myConv!=-1)
 	{
 		iconv_close(myConv);
 		myConv=(iconv_t)-1;

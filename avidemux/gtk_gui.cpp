@@ -1782,7 +1782,7 @@ extern void getCutPoints (int br);
 void
 ADM_cutWizard (void)
 {
-
+#if 0
   int br;
   if (currentaudiostream)
     {
@@ -1792,7 +1792,7 @@ ADM_cutWizard (void)
     br = 128;
 
   getCutPoints (br);
-
+#endif
 }
 
 void

@@ -754,25 +754,26 @@
 			" jb 1b				\n\t"
 #define WRITEYUY2(dst, dstw, index)  REAL_WRITEYUY2(dst, dstw, index)
 
-
 static inline void RENAME(yuv2yuvX)(SwsContext *c, int16_t *lumFilter, int16_t **lumSrc, int lumFilterSize,
 				    int16_t *chrFilter, int16_t **chrSrc, int chrFilterSize,
 				    uint8_t *dest, uint8_t *uDest, uint8_t *vDest, int dstW, int chrDstW)
 {
 #ifdef HAVE_MMX
+	long int xchrDstW=chrDstW;
+	long int xdstW=dstW;
 	if(uDest != NULL)
 	{
 		asm volatile(
 				YSCALEYUV2YV12X(0, CHR_MMX_FILTER_OFFSET)
 				:: "r" (&c->redDither),
-				"r" (uDest), "m" ((long)chrDstW)
+				"r" (uDest), "m" (xchrDstW)
 				: "%"REG_a, "%"REG_d, "%"REG_S
 			);
 
 		asm volatile(
 				YSCALEYUV2YV12X(4096, CHR_MMX_FILTER_OFFSET)
 				:: "r" (&c->redDither),
-				"r" (vDest), "m" ((long)chrDstW)
+				"r" (vDest), "m" (xchrDstW)
 				: "%"REG_a, "%"REG_d, "%"REG_S
 			);
 	}
@@ -780,7 +781,7 @@ static inline void RENAME(yuv2yuvX)(SwsContext *c, int16_t *lumFilter, int16_t *
 	asm volatile(
 			YSCALEYUV2YV12X(0, LUM_MMX_FILTER_OFFSET)
 			:: "r" (&c->redDither),
-			   "r" (dest), "m" ((long)dstW)
+			   "r" (dest), "m" (xdstW)
 			: "%"REG_a, "%"REG_d, "%"REG_S
 		);
 #else
@@ -869,6 +870,7 @@ static inline void RENAME(yuv2yuv1)(int16_t *lumSrc, int16_t *chrSrc,
 /**
  * vertical scale YV12 to RGB
  */
+#if 0 //MEANX
 static inline void RENAME(yuv2packedX)(SwsContext *c, int16_t *lumFilter, int16_t **lumSrc, int lumFilterSize,
 				    int16_t *chrFilter, int16_t **chrSrc, int chrFilterSize,
 			    uint8_t *dest, int dstW, int dstY)
@@ -978,6 +980,7 @@ static inline void RENAME(yuv2packedX)(SwsContext *c, int16_t *lumFilter, int16_
 		break;
 	}
 }
+#endif
 #if 0
 /**
  * vertical bilinear scale YV12 to RGB
@@ -2218,7 +2221,7 @@ static inline void RENAME(hyscale)(uint16_t *dst, int dstWidth, uint8_t *src, in
 				   int srcFormat, uint8_t *formatConvBuffer, int16_t *mmx2Filter,
 				   int32_t *mmx2FilterPos)
 {
-	int xIncLow,xIncHigh;
+	long int xIncLow,xIncHigh;
 
 	xIncLow=xInc&0xffff;
 	xIncHigh=xInc>>16;
@@ -2393,7 +2396,8 @@ inline static void RENAME(hcscale)(uint16_t *dst, int dstWidth, uint8_t *src1, u
 				   int srcFormat, uint8_t *formatConvBuffer, int16_t *mmx2Filter,
 				   int32_t *mmx2FilterPos)
 {
-	int xIncLow,xIncHigh;
+	long int xIncLow,xIncHigh;
+	long int xdstWidth=dstWidth;
 	xIncLow=xInc&0xffff;
 	xIncHigh=xInc>>16;
     if(srcFormat==IMGFMT_YUY2)
@@ -2563,7 +2567,7 @@ FUNNY_UV_CODE
 		" jb 1b				\n\t"
 
 	//:: "m" (src1), "m" (dst), "m" ((long)dstWidth), "m" ((long)(xInc>>16)), "m" ((xInc&0xFFFF)),
-	:: "m" (src1), "m" (dst), "m" ((long)dstWidth), "m" ((long)(xIncHigh)), "m" ((xIncLow)),
+	:: "m" (src1), "m" (dst), "m" (xdstWidth), "m" (xIncHigh), "m" (xIncLow),
 		"r" (src2)
 		: "%"REG_a, "%"REG_b, "%ecx", "%"REG_D, "%esi"
 		);
