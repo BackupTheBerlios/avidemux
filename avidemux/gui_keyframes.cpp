@@ -41,7 +41,7 @@ Rebuild keyframe in index
 		(keyframe & B-frames)
 
 */
-void A_rebuildKeyFrame(void)
+uint8_t A_rebuildKeyFrame(void)
 {
 
 	video_body->rebuildFrameType();
@@ -90,4 +90,5 @@ uint32_t nbBframe=0;
     GUI_Alert("Done!");
     return;
 #endif
+return 1;
 };

@@ -108,7 +108,7 @@ int A_openAvi2 (char *name, uint8_t mode);
 int A_appendAvi (char *name);
 extern void A_SaveAudioNVideo (char *name);
 void HandleAction (Action action);
-void A_rebuildKeyFrame (void);
+uint8_t A_rebuildKeyFrame (void);
 extern int GUI_handleFilter (void);
 extern void filterCleanUp (void);
 int A_audioSave(char *name);

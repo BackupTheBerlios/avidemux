@@ -117,11 +117,14 @@ static void set_autoindex(char *p);
 extern int A_SaveUnpackedVop( char *name);
 extern int A_saveDVDPS(char *name);
 extern void A_saveWorkbench (char *name);
+extern uint8_t A_rebuildKeyFrame (void);
 //
 static int call_bframe(void);
 static int call_packedvop(void);
 static int call_saveDVD(char *a);
 static int set_output_format(const char *str);
+//
+
 //_________________________________________________________________________
 
 extern uint8_t audioShift;
@@ -210,6 +213,7 @@ AUTOMATON reaction_table[]=
 		{"autoindex",		0	,"try to generate required index files", set_autoindex},
 		{"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
 		
+                {"rebuild-index",       0       ,"rebuild index with correct frame type", (one_arg_type)A_rebuildKeyFrame},
 		{"help",		0,"print this",		call_help},
 		{"quit",		0,"exit avidemux",	call_quit}
 
