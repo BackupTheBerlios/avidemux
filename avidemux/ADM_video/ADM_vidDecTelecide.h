@@ -68,7 +68,7 @@ struct PREDICTION
 	unsigned int predicted_metric;
 };
 
-#define GETFRAME(g, fp) { int GETFRAMEf; uint32_t len,flags;GETFRAMEf = (g); if (GETFRAMEf < 0) GETFRAMEf = 0; 	else if (GETFRAMEf >= _info.nb_frames) GETFRAMEf = _info.nb_frames - 1; _in->getFrameNumberNoAlloc(GETFRAMEf, &len, fp,&flags); }
+#define GETFRAME(g, fp) { int GETFRAMEf; uint32_t len,flags;GETFRAMEf = (g); fp=NULL;if (GETFRAMEf < 0) GETFRAMEf = 0; 	else if (GETFRAMEf >= _info.nb_frames) GETFRAMEf = _info.nb_frames - 1; fp=vidCache->getImage(GETFRAMEf); }
 #include "ADM_video/ADM_vidDecTel_param.h"
 class Telecide : public AVDMGenericVideoStream
 {
@@ -114,7 +114,7 @@ public:
 	
 	void Telecide::CalculateMetrics(int n, unsigned char *crp, unsigned char *crpU, unsigned char *crpV, 
 				unsigned char *prp, unsigned char *prpU, unsigned char *prpV);
-	void Telecide::Show(PVideoFrame &dst, int frame);
+	void Telecide::Show(ADMImage *dst, int frame);
 	void Telecide::Debug(int frame);
 
 	Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples);		

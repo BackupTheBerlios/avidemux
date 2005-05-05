@@ -74,7 +74,10 @@ extern uint8_t 	PutHintingData(unsigned char *video, unsigned int hint);
 extern uint8_t 	GetHintingData(unsigned char *video, unsigned int *hint);
 extern void 	BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
             		int src_pitch, int row_size, int height);
-extern  void 	DrawString(uint8_t *dst, int x, int y, const char *s);
+//extern  void 	DrawString(uint8_t *dst, int x, int y, const char *s);
+extern  void    DrawString(ADMImage *dst, int x, int y, const char *s);
+#define DrawString(a,b,c,d) DrawString(NULL,b,c,d)
+
 extern  void 	DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
 static void Blur_C(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h) ;
