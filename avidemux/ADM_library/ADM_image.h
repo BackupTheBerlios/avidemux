@@ -23,6 +23,8 @@
 #ifndef ADM_IMAGE
 #define ADM_IMAGE
 #include "ADM_assert.h"
+
+
 typedef enum ADM_ASPECT
 {
 	ADM_ASPECT_4_3=1,
@@ -30,6 +32,12 @@ typedef enum ADM_ASPECT
 	ADM_ASPECT_1_1
 };
 // Avisynth compatibility layer
+
+//#define vi.num_frames _info.nb_frames
+//#define vi.IsYV12()   1
+#define GetReadPtr GetWritePtr
+#define GetRowSize GetPitch
+
 typedef enum ADM_PLANE
 {
         PLANAR_Y=1,
@@ -63,7 +71,7 @@ public:
                                                 case PLANAR_V:return _width>>1;break;
                                                 default: ADM_assert(0);
                                         }
-                                }
+                                };
         uint8_t         *GetWritePtr(ADM_PLANE plane)
                         {       
                                 uint32_t plan=_width*_height;
@@ -74,7 +82,18 @@ public:
                                                 case PLANAR_V:return data+((plan*5)>>2);break;
                                                 default: ADM_assert(0);
                                         }
-                        }
+                        };
+   
+        uint32_t GetHeight(ADM_PLANE plane)
+                                {
+                                        switch(plane)
+                                        {
+                                                case PLANAR_Y:return _height;break;
+                                                case PLANAR_U:
+                                                case PLANAR_V:return _height>>1;break;
+                                                default: ADM_assert(0);
+                                        }
+                                };
 public:
 
         uint8_t         *_planes[3];     /// In case of linked data store y/u/v pointers
