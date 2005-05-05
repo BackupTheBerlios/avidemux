@@ -5,6 +5,184 @@
 				Read returns 0
 				getPacket returns 0
 *********************** /TODO **************************
+        05/05
+                - Redone decomb telecide using avisynth compatibility lib
+        04/05
+                - --rebuild-index command line
+        01/05
+                - Asharp
+------------------------2.0.38rc3-------------
+        30/04
+                Fixed save bmp on large file (hdtv)
+                Maybe fixed altivec pp
+        26/4
+                - msharpen 1/2
+        25/4
+                - dgbob 2/2
+        24/4
+                - doc update
+                - dgbob 1/2
+        20/04
+                - added language to ts
+                - jakub new bitrate calc ui
+                - some fix in bitrate calc
+        19/04
+                - fix # of parameter for mplayerhqd3D
+                - fixed vobsub index non sequential (when some languages were omitted from the sub)
+        18/04
+                - tiny gui for eq2 , gamma working ?
+                - fixed Ts output for picture > 64 k, vlc happy now
+        17/04
+                - added container info for ogm & avi
+
+        15/04
+        
+                - fixed (?) mpeg2enc build on non 386
+                - fixed green flags/huffyuv
+---------------------------------------------
+April Break
+                Ts muxer
+                Mplayer hue & eq2
+                Fixed bitrate calc not showing
+                Fixed black frame handling
+-----------------------2.0.38rc2b----------------------------------------
+        28/03/05
+                - assume 24 fps is pulldowned (lavformat)
+                - set bitrate for ts
+                - Fix b frames detection when dontcopy is on
+        27/03/05
+                - Dont try to copymode a mpeg dont starting by intra 
+                - fixed some bugs in miniOcr
+                - enter key validate the glyph in miniOCR
+        26/03/05
+                - mpegTs
+                - upped mpeg split
+                - Jens : Partial display correct frame # / avoid partializing partialized filter
+                - Jens : crash avoided writing error on prj
+                - dont crash when using appended file with no audio
+                - A Robinson : Scan all black frames
+                - Try to speed up a bit black frame detection
+        25/03/05
+                - better bitrate calc
+                - begin work on muxer for mpegTs
+                
+        24/03/05
+                - try to detect GMC
+                - FIXME: dropped frame handling
+        23/03/05
+                - more dontcopy stuff
+                - fixed memcpy_mmx
+        22/03/05
+                - added refcopy to gain one extra memcpy
+        21/03/05
+                - fast xine/mplayer memcpy
+        20/03/05
+                - Merged entropy linear for fps resample +conf+mmx
+                - added ability to select Alsa device
+        16/03/05
+                - X264 fine tuning for encoding CBR (it was just 1000 too high :))
+                - Dialog for x264 does its job
+                - fix myth autoloading bug
+        15/03/05
+                - Better handling of 8 bits PCM
+
+        13/03/05
+                - X264 ui
+                - Redone ocr ui
+                - jens : mono2stero/append from cli + save stat as a file
+        10/03/05
+                - jens : Gcc 2.95
+                - lavc pp deint over
+        09/03/05
+                - Begin adding lavc pp deint
+        08/03/05
+                - Merged Cyrille DnD patch
+        07/03/05
+                - fixed one bit offset, thanks yan
+
+   March break
+        - save/load glyphs
+        - avoid memcpying when using mad decoder
+        - less memcpy for WMA/AMR decoding
+        - clean up WMA decoding too
+        - Added AMR NB decoder from ffmpeg
+        - Peek inside mp4/h263 to get correct width/height
+        - use common free/alloc for pp
+
+
+
+        25/01/05
+                - ffmpeg patch fourcc Jindrich Makovicka 
+        22/01/05
+                - skeleton UI for x264
+                - more x264 : param/cbr/cq
+        21/01/05
+                - x264
+-------------------------2.0.38rc1----------------------
+        20/01/05
+                - vobsub ui + shift capability
+        19/01/05
+                - cleanup for mpeg identify + ignore diff at padding level
+                - accept 0xF4 mpeg audio
+        18/01/05
+                - fix auto load for mpeg when N>10 (centove)
+        16/01/05
+                - ODML write support by GMV
+        15/01/05
+                - added indexMpeg to script
+        12/01/05
+                - 1Meg prefill for audio to prevent mplex from empty-ing audio while filing video
+                - append cleanup (script/cli/...)
+                - avoid one more mplex mjpeg_exit
+        11/01/05
+                - made some tweak with mplex muxer
+        10/01/05
+                - fixed vobsub display
+                - fixed loadcodec config for XDVD
+        06/01/05
+                - Optimized async editor get frame
+        05/01/05
+                - display ok + select lang ok. Time to resize properly
+                Maybe need some chroma too
+                - resize ok chroma ok
+        04/01/05
+                - vs:simple ui
+                - vs:can select the language
+        03/01/05
+                - more cleanup & basic resampling
+                - resampling ok, colors ok, speed up
+        02/01/05
+                - cleanup of vobsub/restructuring
+        30/01/05
+                - better vobsub timing
+                - fixed win32_huff loading : padding bug in openmlindex_secondary
+        29/01/05
+                - fixed bad jump in seq header (broken mpeg indexing)
+                - fixed (?) lock handling on mplex muxing
+                - jens : added avidemux2 to vcdimager in addons
+                - moonz : added change fps filter
+                - changed ui for mpeg2 passthrough
+
+        24/01/05
+                - Simple seeking for vobsub :)
+        23/01/05
+                - silence mplex SCR warning . Dont understand where they come from
+                - exit cleanly from mplex (?)
+                - Jens : Export setformat to cli
+        21/01/05
+                - more vobsub: color conv + merge + blend ok
+        20/01/05
+                - more vobsub
+                - mixup fixed for confcoupl -> read
+                
+        17/01/05-18/01
+                Timid vobsub support
+                Read psu packet ok, now fix up the rle decoder
+        16/01/05
+                Cosmetic job on equalizer
+        15/01/05
+                 update to ffmpeg cvs
+                 added ffhuff read/write
  Xmas break, win32 based, Laptop rules
        
               Basic support for field encoded mpeg2
