@@ -27,12 +27,33 @@
 #include "ADM_audiodevice/audio_out.h"
 
 #include "ADM_assert.h"
+#include "ADM_gui2/GUI_render.h"
+
 static GtkWidget	*create_dialog1 (void);
 
 
 static GtkWidget *dialog=NULL;
 
 extern void 		AVDM_audioPref( void );
+
+typedef struct stVideoDevice
+{
+        ADM_RENDER_TYPE type;
+        char            *name;
+
+}stVideoDevice;
+
+static stVideoDevice myVideoDevice[]
+={
+        {RENDER_GTK,"Gtk (no accel)"},
+#ifdef USE_XV
+        {RENDER_XV,"Xvideo accel (best)"},
+#endif
+#ifdef USE_SDL
+        {RENDER_SDL,"SDL accel"},
+#endif
+
+};
 
 uint8_t DIA_Preferences(void);
 
@@ -48,7 +69,10 @@ uint32_t	lavcodec_mpeg=0;
 uint32_t        use_odml=0;
 uint32_t	autosplit=0;
 GtkWidget *wids[10];
+GtkWidget *videowids[10];
 uint32_t k;
+unsigned int renderI;
+ADM_RENDER_TYPE render;
 	
 	dialog=create_dialog1();
 	gtk_transient(dialog);
@@ -90,8 +114,30 @@ uint32_t k;
         }               
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonOpenDML)),
                                       use_odml);
+        // Video accel device ______________________________________________
+        int vd=0;
+        if(prefs->get(DEVICE_VIDEODEVICE,&renderI)!=RC_OK)
+        {       
+                render=RENDER_GTK;
+        }else
+        {
+                render=(ADM_RENDER_TYPE)renderI;
+        }
+        for(uint32_t i=0;i<sizeof(myVideoDevice)/sizeof(stVideoDevice);i++)
+        {
+                if(myVideoDevice[i].type==render)
+                        {
+                                vd=i;
+                        }
+                videowids[i] = gtk_menu_item_new_with_mnemonic ( myVideoDevice[i].name);
+                gtk_widget_show (videowids[i]);
+                gtk_container_add (GTK_CONTAINER (WID(menu3)), videowids[i]);
+        }               
+         gtk_option_menu_set_menu (GTK_OPTION_MENU (WID(optionmenuVideo)), WID(menu3));
+         gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenuVideo)), vd);
+                        
 
-	// Audio device
+	// Audio accel device ______________________________________________
 	for(uint32_t i=0;i<sizeof(audioDeviceList)/sizeof(DEVICELIST);i++)
 	{
 		if(audioDeviceList[i].id==olddevice)
@@ -116,6 +162,14 @@ uint32_t k;
 		{
 			AVDM_switch(newdevice);
 		}
+                // video device
+
+                k=getRangeInMenu(WID(optionmenuVideo));
+                render=myVideoDevice[k].type;
+                renderI=(int)render;
+                prefs->set(DEVICE_VIDEODEVICE,renderI);
+                
+                ///*********
 		lavcodec_mpeg=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbutton_lavcodec)));
 		prefs->set(FEATURE_USE_LAVCODEC_MPEG, lavcodec_mpeg);
                 

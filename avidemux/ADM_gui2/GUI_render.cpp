@@ -43,7 +43,7 @@
 
 #include "ADM_toolkit/toolkit_gtk.h"
 
- 
+#include "prefs.h"
 static uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h);
 
 
@@ -154,6 +154,8 @@ uint8_t renderExpose(void)
 uint8_t renderStartPlaying( void )
 {
 char *displ;
+unsigned int renderI;
+ADM_RENDER_TYPE render;
 	ADM_assert(!accel_mode);
 	// First check if local
 	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
@@ -172,8 +174,19 @@ char *displ;
 		return 1;
 	}
 #endif	
-	#if defined(USE_XV)
-	
+ 
+        if(prefs->get(DEVICE_VIDEODEVICE,&renderI)!=RC_OK)
+        {       
+                render=RENDER_GTK;
+        }else
+        {
+                render=(ADM_RENDER_TYPE)renderI;
+        }
+        switch(render)
+        {
+        
+#if defined(USE_XV)
+	       case RENDER_XV:
 		accel_mode=new XvAccelRender();
 		if(!accel_mode->init(draw,renderW,renderH))
 		{
@@ -185,10 +198,10 @@ char *displ;
 		{
 			printf("Xv init ok\n");
 		}
-	#endif
-	#if defined(USE_SDL)
-	if(!accel_mode)
-	{
+                break;
+#endif
+#if defined(USE_SDL)
+              case RENDER_SDL:
 		printf("Trying SDL\n");
 		accel_mode=new sdlAccelRender();
 		if(!accel_mode->init(draw,renderW,renderH))
@@ -201,8 +214,14 @@ char *displ;
 		{
 			printf("SDL init ok\n");
 		}
-	}
-	#endif
+                break;
+#endif
+                default:break;
+        }
+        if(!accel_mode)
+        {
+                printf("No accel used for rendering\n");
+        }
 	
 	return 1;
 }
