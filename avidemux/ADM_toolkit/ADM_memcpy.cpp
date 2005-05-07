@@ -401,9 +401,11 @@ static struct {
   { "libc memcpy()", memcpy, 0, 0 },
 #if defined(ARCH_X86) //&& !defined(_MSC_VER)
   { "linux kernel memcpy()", linux_kernel_memcpy, 0, 0 },
+#ifdef USE_MMX
   { "MMX optimized memcpy()", mmx_memcpy, 0, MM_MMX },
   { "MMXEXT optimized memcpy()", mmx2_memcpy, 0, MM_MMXEXT },
   { "SSE optimized memcpy()", sse_memcpy, 0, MM_MMXEXT|MM_SSE },
+#endif
 #endif /* ARCH_X86 */
 #if 0 && defined (ARCH_PPC) && !defined (HOST_OS_DARWIN)
   { "ppcasm_memcpy()", ppcasm_memcpy, 0, 0 },
