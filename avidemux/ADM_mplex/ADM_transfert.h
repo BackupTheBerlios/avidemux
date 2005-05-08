@@ -23,17 +23,18 @@ public:
                         ~admMutex();        
                 uint8_t lock(void);
                 uint8_t unlock(void);
+                uint8_t isLocked(void);
 };
 
 class admCond
 {
 private:
         pthread_cond_t  _cond;
-        admMutex        _condtex;
+        admMutex        *_condtex;
         uint8_t         waiting;
         uint8_t         aborted;
 public:        
-                        admCond( void);
+                        admCond( admMutex *tex);
                         ~admCond();        
                 uint8_t wait(void);
                 uint8_t wakeup(void);
@@ -47,8 +48,8 @@ class Transfert
 {
 protected:
         admMutex mutex;
-        admCond  cond;
-        admCond  clientCond;             
+        admCond  *cond;
+        admCond  *clientCond;             
         
         uint8_t  aborted;
         uint8_t  *buffer;   

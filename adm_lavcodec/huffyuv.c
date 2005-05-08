@@ -529,25 +529,26 @@ static int encode_init(AVCodecContext *avctx)
             return -1;
         }
     }else s->context= 0;
-    
+#if 0 //MEANX    
     if(avctx->codec->id==CODEC_ID_HUFFYUV){
         if(avctx->pix_fmt==PIX_FMT_YUV420P){
             av_log(avctx, AV_LOG_ERROR, "Error: YV12 is not supported by huffyuv; use vcodec=ffvhuff or format=422p\n");
             return -1;
         }
+#endif
         if(avctx->context_model){
             av_log(avctx, AV_LOG_ERROR, "Error: per-frame huffman tables are not supported by huffyuv; use vcodec=ffvhuff\n");
             return -1;
         }
         if(s->interlaced != ( s->height > 288 ))
             av_log(avctx, AV_LOG_INFO, "using huffyuv 2.2.0 or newer interlacing flag\n");
-    }
-#if 0
-else if(avctx->strict_std_compliance>=0){
+    
+
+  if(avctx->strict_std_compliance>=0){
         av_log(avctx, AV_LOG_ERROR, "This codec is under development; files encoded with it may not be decodeable with future versions!!! Set vstrict=-1 / -strict -1 to use it anyway.\n");
         return -1;
     }
-#endif
+
     
     ((uint8_t*)avctx->extradata)[0]= s->predictor;
     ((uint8_t*)avctx->extradata)[1]= s->bitstream_bpp;

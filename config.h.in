@@ -21,6 +21,9 @@
 /* "Use alsa as possible audio device" */
 #undef ALSA_SUPPORT
 
+/* AMR_NB */
+#undef AMR_NB
+
 /* Enable powerpc optim */
 #undef ARCH_POWERPC
 
@@ -29,6 +32,9 @@
 
 /* post proc */
 #undef ARCH_X86
+
+/* "X86_64 amd64 assembly" */
+#undef ARCH_X86_64
 
 /* Say to ffmpeg we are using darwin macOsX */
 #undef CONFIG_DARWIN
@@ -45,9 +51,6 @@
 /* FFMPEG */
 #undef CONFIG_RISKY
 
-/* FFMPEG */
-#undef CONFIG_X86
-
 /* "Name mangling" */
 #undef CYG_MANGLING
 
@@ -57,6 +60,9 @@
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #undef ENABLE_NLS
+
+/* gettext package name */
+#undef GETTEXT_PACKAGE
 
 /* Define to 1 if you have the <a52dec/a52.h> header file. */
 #undef HAVE_A52DEC_A52_H
@@ -73,12 +79,6 @@
 /* Define to 1 if you have the <artsc.h> header file. */
 #undef HAVE_ARTSC_H
 
-/* "Use MMX acceleration" */
-#undef HAVE_ASM_MMX
-
-/* "Use MMX acceleration" */
-#undef HAVE_ASM_NASM
-
 /* Enable altivec by default */
 #undef HAVE_BUILTIN_VECTOR
 
@@ -88,9 +88,6 @@
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
-
-/* Define to 1 if you have the <faacfg.h> header file. */
-#undef HAVE_FAACFG_H
 
 /* Define to 1 if you have the <faac.h> header file. */
 #undef HAVE_FAAC_H
@@ -137,8 +134,8 @@
 /* Define to 1 if you have the `vorbisenc' library (-lvorbisenc). */
 #undef HAVE_LIBVORBISENC
 
-/* "Use libxml2 to load/save .avidemuxrc" */
-#undef HAVE_LIBXML2
+/* Define to 1 if you have the `x264' library (-lx264). */
+#undef HAVE_LIBX264
 
 /* Define to 1 if you have the <libxml/parser.h> header file. */
 #undef HAVE_LIBXML_PARSER_H
@@ -164,7 +161,7 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* "Use MMX acceleration" */
+/* post proc */
 #undef HAVE_MMX
 
 /* Define to 1 if you have the <stdint.h> header file. */
@@ -197,14 +194,11 @@
 /* Define to 1 if you have the <X11/extensions/Xvlib.h> header file. */
 #undef HAVE_X11_EXTENSIONS_XVLIB_H
 
-/* "Use X86 CPU for mpeg2enc" */
-#undef HAVE_X86CPU
-
-/* "X86_64 amd64 assembly" */
-#undef HAVE_X86_64
-
 /* Stricter prototyping */
 #undef ICONV_NEED_CONST
+
+/* gettext locale dir */
+#undef LOCALEDIR
 
 /* "sse on cywin" */
 #undef MEMALIGN_HACK
@@ -260,9 +254,6 @@
 /* MJPEG */
 #undef USE_MJPEG
 
-/* "Use MMX acceleration" */
-#undef USE_MMX
-
 /* libmad */
 #undef USE_MP3
 
@@ -271,6 +262,9 @@
 
 /* Vorbis audio codec */
 #undef USE_VORBIS
+
+/* use x264 encoder */
+#undef USE_X264
 
 /* Try to use Xv extension */
 #undef USE_XV

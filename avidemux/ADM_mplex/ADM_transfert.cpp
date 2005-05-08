@@ -58,12 +58,17 @@ uint8_t admMutex::unlock(void)
         ADM_assert(!pthread_mutex_unlock(&_tex));
         return 1;
 }
+uint8_t admMutex::isLocked(void)
+{
+        return _locked;
+}
 
 //**************** Cond *******************
 
-admCond::admCond( void )
+admCond::admCond( admMutex *tex )
 {
         ADM_assert(!pthread_cond_init(&_cond,NULL));
+        _condtex=tex;
         waiting=0;
         aborted=0;
 }
@@ -76,11 +81,11 @@ uint8_t admCond::wait(void)
 {
         if(aborted) return 0;
         // take sem
-        _condtex.lock();
+        ADM_assert(_condtex->isLocked());
         waiting=1;
-        ADM_assert(!pthread_cond_wait(&_cond, &(_condtex._tex)));
+        ADM_assert(!pthread_cond_wait(&_cond, &(_condtex->_tex)));
         waiting=0;
-        _condtex.unlock();
+        _condtex->unlock();
         return 1;
 }
 uint8_t admCond::wakeup(void)
@@ -105,6 +110,8 @@ uint8_t admCond::abort( void )
 
 Transfert::Transfert(void)
 {
+        cond=new admCond(&mutex);
+        clientCond=new admCond(&mutex);
         buffer=new uint8_t[TRANSFERT_BUFFER];
 
         aborted=0;
@@ -115,6 +122,8 @@ Transfert::Transfert(void)
 }
 Transfert::~Transfert()
 {
+        delete cond;
+        delete clientCond;
         delete [] buffer;
         
 }
@@ -152,29 +161,29 @@ uint32_t fill=0;
                 goto endit;
          }
          
-         ADM_assert(!clientCond.iswaiting());
-         mutex.unlock();  
+         ADM_assert(!clientCond->iswaiting());
+         
 #ifdef MPLEX_D      
          printf("Wanted : %lu , left :%lu\n",nb,fill);   
          printf("Slave sleeping\n");
 #endif         
          
-         cond.wait();         
+         cond->wait();         
+         
          if(aborted) 
          {         
-                mutex.lock();
+                mutex.lock();       
                 goto endit;
-         }                          
-         
+         }                                   
   }
 endit: 
-        if(clientCond.iswaiting()) // No need to protect as the client is locked
+        if(clientCond->iswaiting()) // No need to protect as the client is locked
         {
                 fill=tail-head;       
                 if(fill<LOW_LVL)
                 {
                         printf("Waking..\n");
-                        clientCond.wakeup();        
+                        clientCond->wakeup();        
                 }
         }
         mutex.unlock();
@@ -219,13 +228,13 @@ uint8_t Transfert:: write(uint8_t *buf, uint32_t nb  )
         memcpy(buffer+tail,buf,nb);        
         tail+=nb;
         
-        if(cond.iswaiting())
+        if(cond->iswaiting())
         {
 #ifdef MPLEX_D      
            
          printf("Slave waking\n");
 #endif     
-                cond.wakeup();
+                cond->wakeup();
         }                
         mutex.unlock();
         return 1;
@@ -239,16 +248,16 @@ uint8_t Transfert::needData( void )
         ADM_assert(l>=0);
         mutex.unlock();
         if(l<MIN_REQUIRED) r=1;
-        if(cond.iswaiting()) r=1;
-//        return cond.iswaiting();
+        if(cond->iswaiting()) r=1;
+//        return cond->iswaiting();
         return r;
  
  }
 uint8_t Transfert::abort( void )
 {
         aborted=1;
-        if(cond.iswaiting())
-                cond.abort();
+        if(cond->iswaiting())
+                cond->abort();
         return 1;
  
  }
@@ -259,7 +268,8 @@ uint8_t Transfert::clientLock( void )
          printf("Slave sleeping (%lu)\n",tail-=head);
 #endif         
 
-        clientCond.wait();               
+        mutex.lock();
+        clientCond->wait();               
         return 1;
 
 }

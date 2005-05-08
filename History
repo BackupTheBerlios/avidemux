@@ -5,6 +5,20 @@
 				Read returns 0
 				getPacket returns 0
 *********************** /TODO **************************
+        08/05
+                - fixed jpeg encoding
+                - clean up of MMX etc..
+                - fixed filter display (jakub)
+                - changed audio mux rate  for mpeg ts (vk)
+                - race in mpeg PS (T rupp)
+                - support mov file starting by skip
+                - dont reset marker when loading filters
+
+        07/05   - fix build when mmx is disabled
+                - cleanup prefs menu to add video accel
+                - added video accel in prefs
+
+        06/05  - Hdd failure
         05/05
                 - Redone decomb telecide using avisynth compatibility lib
         04/05
