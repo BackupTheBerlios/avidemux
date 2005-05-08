@@ -133,8 +133,6 @@ GUI_handleFilter (void)
 
 
   dialog = create_filterMain ();
-  gtk_register_dialog (dialog);
-  gtk_widget_show (dialog);
   gtk_widget_set_size_request (lookup_widget (dialog, "treeview1"), 400, 400);
 
 
@@ -166,6 +164,9 @@ GUI_handleFilter (void)
   //      gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(treeview1),A_DOUBLECLICK);
 
   updateFilterList ();
+  gtk_register_dialog (dialog);
+  gtk_widget_show (dialog);
+  
   gui_act ac;
   int run = 1, reply;
   while (run)
