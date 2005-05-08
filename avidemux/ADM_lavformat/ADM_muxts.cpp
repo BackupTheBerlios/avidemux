@@ -67,6 +67,7 @@
 #define AUDIO_BUFFER            1024*10
 #define PES_BUFFER              1024            // Just to build packet into
 #define STUFFING_PATTERN        0
+#define MUX_EVERY_N_AUDIO_FRAMES 5
 static uint8_t writePts(uint8_t *data,uint64_t ipts,uint32_t flags);
 // /* ------------------------------------------------------------------------*/write
 tsMuxer::tsMuxer( void)
@@ -100,6 +101,7 @@ tsMuxer::tsMuxer( void)
     audioFill=0;
     audioBuffer=new uint8_t[AUDIO_BUFFER];
     pesBuffer=new uint8_t [PES_BUFFER];
+    audioPacket=0;
 }
 tsMuxer::~tsMuxer( )
 {
@@ -482,7 +484,7 @@ uint8_t tsMuxer::writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,ui
 #define MAX_PES 64000
 uint32_t l;
 
-       writeAudioPacket2();
+       //writeAudioPacket2();
        _curPTS=videoTime(frameno); 
        while(len)
        {
@@ -595,7 +597,13 @@ uint8_t tsMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 {
         memcpy(audioBuffer+audioFill,buf,len);
         audioFill+=len;
+        audioPacket++;
         ADM_assert(audioFill<AUDIO_BUFFER);
+        if(audioPacket>MUX_EVERY_N_AUDIO_FRAMES)
+        {
+                writeAudioPacket2();
+                audioPacket%=MUX_EVERY_N_AUDIO_FRAMES;
+        }
         return 1;        
 }
 uint8_t tsMuxer::writeAudioPacket2(void)
