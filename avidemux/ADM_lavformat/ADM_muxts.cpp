@@ -599,7 +599,7 @@ uint8_t tsMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
         audioFill+=len;
         audioPacket++;
         ADM_assert(audioFill<AUDIO_BUFFER);
-        if(audioPacket>MUX_EVERY_N_AUDIO_FRAMES)
+        if(audioPacket>=MUX_EVERY_N_AUDIO_FRAMES)
         {
                 writeAudioPacket2();
                 audioPacket%=MUX_EVERY_N_AUDIO_FRAMES;
