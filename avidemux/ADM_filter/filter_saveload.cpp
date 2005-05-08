@@ -176,13 +176,15 @@ CONFcouple *couple;
 
 			if(!nb_active_filter)
 			{
+                                uint32_t fStart,fEnd;
+
 				// avoid going down
 				aviInfo aviinf;
   				// now build infos
   				video_body->getVideoInfo(&aviinf);
-				frameStart=0;
-				frameEnd=aviinf.nb_frames-1;
-  		 		videofilters[0].filter=  new AVDMVideoStreamNull(video_body,0,frameEnd);
+				fStart=0;
+				fEnd=aviinf.nb_frames-1;
+  		 		videofilters[0].filter=  new AVDMVideoStreamNull(video_body,0,fEnd);
 
     			}
 			nb_active_filter=1;
