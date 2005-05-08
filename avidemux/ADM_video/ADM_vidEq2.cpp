@@ -329,9 +329,8 @@ void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
   asm volatile (
         "movq (%0), %%mm3 \n\t"
         "movq (%1), %%mm4 \n\t"
-        :
-        :  "r" (brvec),"r" (contvec)
-        :
+        ::  "r" (brvec),"r" (contvec)
+        
         );
   while (h-- > 0) {
     asm volatile (
