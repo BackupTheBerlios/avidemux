@@ -41,7 +41,8 @@
 
 #include "nuppelvideo.h"
 //#include "avcodec.h"
-
+#include "../../avidemux/ADM_library/default.h"
+#include "../../avidemux/ADM_toolkit/ADM_cpuCap.h"
 #include "ffv1.h"
 #include "frequencies.h"
 #define _VERSION_ "0.2.3"
@@ -164,6 +165,7 @@ int main(int argc, char** argv)
   int reclength= -1; // reclength in secs
  char c;
 
+	 CpuCaps::init	();
 	ADM_InitMemcpy();
 
   /////////////////////////////////////////////////////

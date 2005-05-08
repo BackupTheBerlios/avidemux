@@ -1,6 +1,6 @@
 CC=g++
 OBJS= ffv1video.o ffv1rec.o ffv1audio.o ffv1color.o ffv1codec.o ffv1write.o frequencies.o
-MEMCPY=../../avidemux/ADM_toolkit/ADM_memcpy.o
+MEMCPY=../../avidemux/ADM_toolkit/ADM_memcpy.o ../../avidemux/ADM_toolkit/ADM_cpuCap.o 
 
 IFLAGS= \
 -I../../avidemux \
