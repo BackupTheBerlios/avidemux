@@ -232,7 +232,7 @@ ffmpegEncoder::initContext (void)
   // player compatiblity               
   if (_id == FF_MPEG1 || _id == FF_MPEG2)
     gopMpeg1 ();
-  if (_id == FF_HUFF || _id == FF_FFV1)
+ // if (_id == FF_HUFF || _id == FF_FFV1)
     _context->strict_std_compliance = -1;
   switch (_id)
     {
