@@ -49,7 +49,7 @@
 
 
 
-#if defined(USE_MMX)
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 #include "mmxsse_motion.h"
 #endif
 
@@ -996,7 +996,7 @@ void init_motion_search(void)
 	pbuild_sub44_mests = build_sub44_mests;
 	psubsample_image = subsample_image;
 
-#if defined(USE_MMX)
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 	printf("Enabling mmx motion search\n");
 	enable_mmxsse_motion(0);
 #endif

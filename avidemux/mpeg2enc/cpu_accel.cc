@@ -40,6 +40,7 @@ extern int detect_altivec();
 
 
 
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
 
 static int x86_accel (void)
 {
@@ -53,10 +54,10 @@ static int x86_accel (void)
    if(CpuCaps::hasSSE()) caps |=ACCEL_X86_SSE;
    return caps;
 } 
-   
+#endif   
 int cpu_accel (void)
 {
-#ifdef HAVE_X86CPU 
+#if defined(ARCH_X86) || defined(ARCH_X86_64)
     static int got_accel = 0;
     static int accel;
 

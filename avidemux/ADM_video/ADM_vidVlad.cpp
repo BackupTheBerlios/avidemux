@@ -30,7 +30,7 @@
 #include "avio.hxx"
 #include "config.h"
 #include "avi_vars.h"
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 //#define LOOP
 #include "admmangle.h"
 

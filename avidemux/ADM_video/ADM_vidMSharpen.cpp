@@ -287,7 +287,9 @@ int wh ,ww,hh;
   int val;
 
   // Vertical only for now      
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+  if(CpuCaps::hasMMX())
+  {
   int off;
         __asm__(
                         ".align 16\n"
@@ -339,8 +341,10 @@ int wh ,ww,hh;
         wk+=src_pitch;     
   }
   __asm__("emms\n");
-#else      
-
+ }
+ else
+#endif      
+  {
   for (int y=1; y<h-1 ;y++) 
   {       
 
@@ -354,7 +358,7 @@ int wh ,ww,hh;
         srcpn+=src_pitch;
         wk+=src_pitch;     
   }
-#endif
+  }
   //************ Horizontal****************
   blurp=blurp_saved;
   srcp=wk_saved;

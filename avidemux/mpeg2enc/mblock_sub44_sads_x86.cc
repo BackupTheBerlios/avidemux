@@ -35,7 +35,7 @@
  */
 
 #include <config.h>
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 #include "mjpeg_types.h"
 #include "attributes.h"
 #include "mmx.h"

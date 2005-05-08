@@ -20,7 +20,7 @@
 
 #include <config.h>
 #include "mjpeg_types.h"
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 #include "mmx.h"
   
 void sub_pred_mmx(unsigned char *pred, unsigned char *cur, int lx, int16_t *blk)

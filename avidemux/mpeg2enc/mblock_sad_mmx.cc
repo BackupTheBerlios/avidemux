@@ -26,7 +26,7 @@
 
 #include <config.h>
 #include "mjpeg_types.h"
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 #include "mmx.h"
 
 

@@ -22,7 +22,7 @@
 
 
 #include <config.h>
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 #include <math.h>
 #include "mjpeg_types.h"
 #include "syntaxparams.h"

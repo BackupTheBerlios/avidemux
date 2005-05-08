@@ -75,7 +75,7 @@
 
 #include "ADM_vidVobSub.h"
 
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 extern "C" {
 #include "../../adm_lavcodec/avcodec.h"
 }

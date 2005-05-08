@@ -84,7 +84,7 @@ static void Blur_C(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h) ;
 #ifdef HAVE_ALTIVEC
 void Blur_Altivec(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h);
 #endif
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 void Blur_MMX(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h);
 #endif
 class Msmooth : public AVDMGenericVideoStream
@@ -477,7 +477,7 @@ int16_t  v16[8];
 }
 #endif
 
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 //______________________
 void Blur_MMX(uint8_t *in, uint8_t *out, uint32_t w, uint32_t h)
 {
@@ -595,9 +595,9 @@ void  Msmooth::EdgeMaskYV12(const unsigned char *srcp, unsigned char *blurp, uns
 	int y1, y2, y3, y4;
 
 	/* Blur the source image prior to detail detection. */
-	#if defined(USE_MMX)
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 		//printf("MMX\n");
-	if(1)
+	if(CpuCaps::hasMMX())
 	{
 		Blur_MMX((uint8_t *)srcp,(uint8_t *)workp,row_size,height);
 		Blur_MMX((uint8_t *)workp,(uint8_t *)blurp,row_size,height);

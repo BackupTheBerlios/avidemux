@@ -32,6 +32,7 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_xvideco.h"
 #include <ADM_assert.h>
+#include "ADM_toolkit/ADM_CpuCap.h"
 
 //#include "ADM_gui/GUI_decodersettings.h"
 
@@ -73,13 +74,12 @@ decoderXvid::decoderXvid(uint32_t w,uint32_t h) :decoders(w,h)
              int xerr;
 
 		_handle=NULL;
-
-#ifdef USE_MMX
-         xinit.cpu_flags=    XVID_CPU_MMX;
-#else
-		xinit.cpu_flags = 0;
+                xinit.cpu_flags = 0;
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+        if(cpuCaps::hasMMX())
+                xinit.cpu_flags=    XVID_CPU_MMX;
 #endif
-
+	
         xx_xvid_init(NULL, 0, &xinit, NULL);
 
         xparam.width = w;

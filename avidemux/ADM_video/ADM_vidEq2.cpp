@@ -77,7 +77,7 @@ typedef struct Eq2Settings {
 /*=====================================*/
 static void apply_lut (oneSetting *par, unsigned char *dst, unsigned char *src,
   unsigned int w, unsigned int h);
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 static void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
   unsigned int w, unsigned int h);
 #endif
@@ -236,7 +236,7 @@ uint8_t ADMVideoEq2::getFrameNumberNoAlloc(uint32_t frame,
   w=_info.width;
   h=_info.height;
 
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
   if(CpuCaps::hasMMX())
   {
         affine_1d_MMX(&(settings.param[0]),YPLANE(data),YPLANE(mysrc),w,h);
@@ -305,7 +305,7 @@ void create_lut (oneSetting *par)
   par->lut_clean = 1;
 }
 
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 static
 void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
   unsigned int w, unsigned int h)

@@ -124,8 +124,8 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 	printf(" FreeBsd   : Anish Mistry, amistry@am-productions.biz\n");
 
 
-#ifdef USE_MMX
-	printf("MMX activated.\n"); 	
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+	printf("Arcc X86 X86_64 activated.\n"); 	
 #endif
    
 

@@ -49,9 +49,8 @@ extern "C"
 
 #include "ADM_assert.h"
 #include "ADM_library/default.h"
-#ifdef USE_MMX
 #include "ADM_cpuCap.h"
-#endif
+
 adm_fast_memcpy myMemcpy=NULL;
 /* Original comments from mplayer (file: aclib.c)
  This part of code was taken by me from Linux-2.4.3 and slightly modified
@@ -399,9 +398,9 @@ static struct {
 {
   { NULL, NULL, 0, 0 },
   { "libc memcpy()", memcpy, 0, 0 },
-#if defined(ARCH_X86) //&& !defined(_MSC_VER)
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
   { "linux kernel memcpy()", linux_kernel_memcpy, 0, 0 },
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
   { "MMX optimized memcpy()", mmx_memcpy, 0, MM_MMX },
   { "MMXEXT optimized memcpy()", mmx2_memcpy, 0, MM_MMXEXT },
   { "SSE optimized memcpy()", sse_memcpy, 0, MM_MMXEXT|MM_SSE },
@@ -414,7 +413,7 @@ static struct {
   { NULL, NULL, 0, 0 }
 };
 
-#ifdef HAVE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 static unsigned long long int rdtsc(void)
 {
   unsigned long long int x;
@@ -466,13 +465,14 @@ uint8_t ADM_InitMemcpy(void)
   int               config_flags = 0;
 #undef memcpy
         myMemcpy=memcpy;
-#ifdef HAVE_MMX
-        myMemcpy=mmx_memcpy;
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+        if(CpuCaps::hasMMX())
+                myMemcpy=mmx_memcpy;
 #endif
 #if 0
 	probe(memcpy,"libc");
 	probe(linux_kernel_memcpy,"kernel");
-#ifdef HAVE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 	if(CpuCaps::hasMMX()) probe(mmx_memcpy,"mmx");
 	if(CpuCaps::hasMMXEXT()) probe(mmx_memcpy,"mmxext");
 	if(CpuCaps::hasSSE()) probe(sse_memcpy,"sse");

@@ -33,7 +33,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include"ADM_video/ADM_vidField.h"
-
+#include "ADM_toolkit/ADM_cpuCap.h"
 //_______________________________________________________________
 
 ADMVideoFields::ADMVideoFields(
@@ -118,12 +118,13 @@ uint8_t ADMVideoFields::hasMotion(ADMImage *image)
            e2=_motionmask2+w; 	
   //___________________ C version of motion detection ________________________
        // other line
-       #if defined(USE_MMX) && defined(ASM_DEINT)
-       
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_DEINT)
+       if(CpuCaps::hasMMX())  
       	hasMotion_MMX(p,c,n,e,e2);
-       #else
+       else
+#endif 
       	 hasMotion_C(p,c,n,e,e2);
-       #endif 
+       
       
       
 //_______________________________
@@ -199,12 +200,12 @@ uint8_t ADMVideoFields::doBlend(ADMImage *src,ADMImage *dst)
 		n++;
 		c++;
 	}
-             #if defined(USE_MMX) && defined(ASM_BLEND)
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_BLEND)
+       if(CpuCaps::hasMMX())               
               blend_MMX(p,c,n,e2,f);
-             #else
+        else
+#endif
               blend_C(p,c,n,e2,f);
-             #endif
-              
               // Last line
             for(x=w;x>0;x--)
             {

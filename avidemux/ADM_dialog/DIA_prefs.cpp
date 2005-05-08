@@ -28,7 +28,7 @@
 
 #include "ADM_assert.h"
 #include "ADM_gui2/GUI_render.h"
-
+#include "ADM_toolkit/ADM_cpuCap.h"
 static GtkWidget	*create_dialog1 (void);
 
 
@@ -76,7 +76,17 @@ ADM_RENDER_TYPE render;
 	
 	dialog=create_dialog1();
 	gtk_transient(dialog);
-	
+//****************************	
+#define SET_CPU(x,y) gtk_widget_set_sensitive(WID(check##x),0); \
+        if(CpuCaps::has##y()) gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(check##x)),1);
+
+        SET_CPU(MMX,MMX);
+        SET_CPU(MMXEXT,MMXEXT);
+        SET_CPU(3DNOW,3DNOW);
+        SET_CPU(SSE,SSE);
+        SET_CPU(SSE2,SSE);
+        gtk_widget_set_sensitive( (WID(checkAltivec)),0);
+//****************************
 	olddevice=newdevice=AVDM_getCurrentDevice();
 	
 	#define CONNECT(A,B)  gtk_signal_connect (GTK_OBJECT(lookup_widget(dialog,#A)), "clicked", \
@@ -217,7 +227,8 @@ gint r;
 
 }
 
-GtkWidget *create_dialog1(void)
+GtkWidget*
+create_dialog1 (void)
 {
   GtkWidget *dialog;
   GtkWidget *dialog_vbox1;
@@ -246,6 +257,21 @@ GtkWidget *create_dialog1(void)
   GtkWidget *optionmenuAudio;
   GtkWidget *menu2;
   GtkWidget *label28;
+  GtkWidget *frame7;
+  GtkWidget *table5;
+  GtkWidget *label32;
+  GtkWidget *label33;
+  GtkWidget *label34;
+  GtkWidget *label35;
+  GtkWidget *label36;
+  GtkWidget *label37;
+  GtkWidget *checkMMX;
+  GtkWidget *checkMMXEXT;
+  GtkWidget *check3DNOW;
+  GtkWidget *checkSSE;
+  GtkWidget *checkSSE2;
+  GtkWidget *checkAltivec;
+  GtkWidget *label31;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
@@ -399,6 +425,104 @@ GtkWidget *create_dialog1(void)
   gtk_label_set_use_markup (GTK_LABEL (label28), TRUE);
   gtk_label_set_justify (GTK_LABEL (label28), GTK_JUSTIFY_LEFT);
 
+  frame7 = gtk_frame_new (NULL);
+  gtk_widget_show (frame7);
+  gtk_box_pack_start (GTK_BOX (vbox1), frame7, TRUE, TRUE, 0);
+
+  table5 = gtk_table_new (6, 2, FALSE);
+  gtk_widget_show (table5);
+  gtk_container_add (GTK_CONTAINER (frame7), table5);
+
+  label32 = gtk_label_new (_("MMX"));
+  gtk_widget_show (label32);
+  gtk_table_attach (GTK_TABLE (table5), label32, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label32), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label32), 0, 0.5);
+
+  label33 = gtk_label_new (_("MMXEXT"));
+  gtk_widget_show (label33);
+  gtk_table_attach (GTK_TABLE (table5), label33, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label33), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label33), 0, 0.5);
+
+  label34 = gtk_label_new (_("3DNOW"));
+  gtk_widget_show (label34);
+  gtk_table_attach (GTK_TABLE (table5), label34, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label34), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label34), 0, 0.5);
+
+  label35 = gtk_label_new (_("SSE"));
+  gtk_widget_show (label35);
+  gtk_table_attach (GTK_TABLE (table5), label35, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label35), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label35), 0, 0.5);
+
+  label36 = gtk_label_new (_("SSE2"));
+  gtk_widget_show (label36);
+  gtk_table_attach (GTK_TABLE (table5), label36, 0, 1, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label36), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label36), 0, 0.5);
+
+  label37 = gtk_label_new (_("Altivec"));
+  gtk_widget_show (label37);
+  gtk_table_attach (GTK_TABLE (table5), label37, 0, 1, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (label37), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label37), 0, 0.5);
+
+  checkMMX = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkMMX);
+  gtk_table_attach (GTK_TABLE (table5), checkMMX, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  checkMMXEXT = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkMMXEXT);
+  gtk_table_attach (GTK_TABLE (table5), checkMMXEXT, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  check3DNOW = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (check3DNOW);
+  gtk_table_attach (GTK_TABLE (table5), check3DNOW, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  checkSSE = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkSSE);
+  gtk_table_attach (GTK_TABLE (table5), checkSSE, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  checkSSE2 = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkSSE2);
+  gtk_table_attach (GTK_TABLE (table5), checkSSE2, 1, 2, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  checkAltivec = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkAltivec);
+  gtk_table_attach (GTK_TABLE (table5), checkAltivec, 1, 2, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  label31 = gtk_label_new (_("<b>Cpu</b>"));
+  gtk_widget_show (label31);
+  gtk_frame_set_label_widget (GTK_FRAME (frame7), label31);
+  gtk_label_set_use_markup (GTK_LABEL (label31), TRUE);
+  gtk_label_set_justify (GTK_LABEL (label31), GTK_JUSTIFY_LEFT);
+
   dialog_action_area1 = GTK_DIALOG (dialog)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
@@ -440,6 +564,21 @@ GtkWidget *create_dialog1(void)
   GLADE_HOOKUP_OBJECT (dialog, optionmenuAudio, "optionmenuAudio");
   GLADE_HOOKUP_OBJECT (dialog, menu2, "menu2");
   GLADE_HOOKUP_OBJECT (dialog, label28, "label28");
+  GLADE_HOOKUP_OBJECT (dialog, frame7, "frame7");
+  GLADE_HOOKUP_OBJECT (dialog, table5, "table5");
+  GLADE_HOOKUP_OBJECT (dialog, label32, "label32");
+  GLADE_HOOKUP_OBJECT (dialog, label33, "label33");
+  GLADE_HOOKUP_OBJECT (dialog, label34, "label34");
+  GLADE_HOOKUP_OBJECT (dialog, label35, "label35");
+  GLADE_HOOKUP_OBJECT (dialog, label36, "label36");
+  GLADE_HOOKUP_OBJECT (dialog, label37, "label37");
+  GLADE_HOOKUP_OBJECT (dialog, checkMMX, "checkMMX");
+  GLADE_HOOKUP_OBJECT (dialog, checkMMXEXT, "checkMMXEXT");
+  GLADE_HOOKUP_OBJECT (dialog, check3DNOW, "check3DNOW");
+  GLADE_HOOKUP_OBJECT (dialog, checkSSE, "checkSSE");
+  GLADE_HOOKUP_OBJECT (dialog, checkSSE2, "checkSSE2");
+  GLADE_HOOKUP_OBJECT (dialog, checkAltivec, "checkAltivec");
+  GLADE_HOOKUP_OBJECT (dialog, label31, "label31");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog, okbutton1, "okbutton1");

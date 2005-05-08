@@ -43,7 +43,7 @@ Skip factor=2
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
-
+#include "ADM_toolkit/ADM_cpuCap.h"
 //#define MMX_TRACE
 #define ASM_ILACING
 
@@ -70,9 +70,9 @@ Skip factor=2
 		mm2 contains 4 bytes of n
 */
 
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_ILACING)
 
-#if defined( USE_MMX) &&  defined(ASM_ILACING)
-
+static uint32_t      ADMVideo_interlaceCount_MMX( uint8_t *src ,uint32_t w, uint32_t h);
 static uint8_t *_l_p=NULL;
 static uint8_t *_l_c=NULL;
 static uint8_t *_l_n=NULL;
@@ -104,11 +104,24 @@ paddd_r2r(mm0,mm7);
 
 
 #endif
+static uint32_t      ADMVideo_interlaceCount_C( uint8_t *src ,uint32_t w, uint32_t h);
 /*
 	Returns the # of interlacing effects on 1/4 of the image
 */
-#if defined( USE_MMX) &&  defined(ASM_ILACING)  && !defined(MMX_TRACE)
+
 uint32_t      ADMVideo_interlaceCount( uint8_t *src ,uint32_t w, uint32_t h)
+{
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_ILACING)  
+        if(CpuCaps::hasMMX())
+                return ADMVideo_interlaceCount_MMX(src,w,h);
+        else
+#endif
+        return ADMVideo_interlaceCount_C(src,w,h);
+
+}
+
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_ILACING)  
+uint32_t      ADMVideo_interlaceCount_MMX( uint8_t *src ,uint32_t w, uint32_t h)
 {
 uint32_t m=0,y,x;
 
@@ -179,75 +192,8 @@ pxor_r2r(mm7,mm7);
                  return m;
 }
 #endif
-#if defined( USE_MMX) &&  defined(ASM_ILACING)  && defined(MMX_TRACE)
-uint32_t      ADMVideo_interlaceCount( uint8_t *src ,uint32_t w, uint32_t h)
-{
-uint32_t m=0,y,x;
-	printf("\n***TRACE***\n");
-_total.uq=0LL;
-//_l255.uq=0xffffffffffffffffLL;
-//_l0.uq=0LL;
-_lwrd.uq=0xffffLL;
-uint32_t stride=w*SKIP_LINEAR;
-	_l_p=src;
-	_l_c=src+w;
-	_l_n=src+w+w;
-	_l_h=w;
-	_lthresh.uq=QMATCH_THRESH+(QMATCH_THRESH<<16)+
-				(QMATCH_THRESH<<32)+(QMATCH_THRESH<<48);
-
-movq_m2r(_lwrd,mm6);
-pxor_r2r(mm5,mm5);
-pxor_r2r(mm7,mm7);
-
-	for(y=h>>SKIP_FACTOR;  y >2 ; y--)
-		{
-			for(x=w>>2;x>0;x--)
-			{
-			__asm__ __volatile__(
-				"mov "Mangle(_l_c)",	"REG_ax"\n\t"
-				"mov "Mangle(_l_p)",	"REG_bx"\n\t"
-				"mov "Mangle(_l_n)",	"REG_cx"\n\t"
-				"mov "Mangle(_l_h)",	"REG_dx"\n\t"
-				"movd ("REG_ax"),	%%mm0\n\t"
-				"movd ("REG_bx"),	%%mm1\n\t"
-				"movd ("REG_cx"),	%%mm2\n\t"
-				:
-				:
-				: "eax", "ebx", "ecx", "edx"
-				);
-				COMPUTE
-				_l_c+=4;
-				_l_p+=4;
-				_l_n+=4;
-
-			}
-
-				_l_p+=(1+SKIP_LINEAR)*w;
-				_l_c+=(1+SKIP_LINEAR)*w;
-				_l_n+=(1+SKIP_LINEAR)*w;
-
-
-		}
-		// retrieve mm7 containg the total
-
-		__asm__ __volatile__(
-		"mov 	$"Mangle(_total)",		"REG_ax"\n\t"
-		"movd 	%%mm7,	("REG_ax")\n\t"
-		"emms\n\t"
-		:
-		:
-		: "eax"
-		);
-		m=(uint32_t)_total.uw[0];
-		printf("m: %lu\n",m);
-                 return m;
-}
-
-#endif
-#if !defined(USE_MMX) || !defined(ASM_ILACING)
 // C version
-uint32_t      ADMVideo_interlaceCount( uint8_t *src ,uint32_t w, uint32_t h)
+uint32_t      ADMVideo_interlaceCount_C( uint8_t *src ,uint32_t w, uint32_t h)
 {
 uint32_t m=0,y,x;
 
@@ -281,5 +227,5 @@ uint32_t m=0,y,x;
 
                  return m;
 }
-#endif
+
 

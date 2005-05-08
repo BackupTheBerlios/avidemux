@@ -27,6 +27,7 @@ Convert yv12 to bmp firendly RGB
 #include <ADM_assert.h>
 
 #include "colorspace.h"
+#include "ADM_toolkit/ADM_cpuCap.h"
 #ifdef HAVE_ALTIVEC
 extern uint8_t altivecYV12RGB(uint8_t * ptr_y,
 		    uint8_t * ptr_u,
@@ -203,11 +204,13 @@ uint8_t slowYV12RGB(uint8_t * ptr_y,
 //____________________________________________________________
 // YUYV Version
 //____________________________________________________________
+typedef void (proto_yuv) ( uint8_t * py, uint8_t * pu, uint8_t * pv,  uint8_t * image, int h_size);
 
 uint8_t  COL_yv12rgb(uint32_t w, uint32_t h,uint8_t * ptr, uint8_t * ptr2 )
 {
     uint32_t i, l;
     uint8_t *y, *u, *v, *e;
+    proto_yuv *accel=NULL;
 
     l = w;			// line width in byte
     y = ptr;
@@ -215,22 +218,25 @@ uint8_t  COL_yv12rgb(uint32_t w, uint32_t h,uint8_t * ptr, uint8_t * ptr2 )
     u = v + ((w * h) >> 2);
     e = ptr2;
 
-    for (i = (h>>1); i > 0; i--)
-      {
-#ifdef USE_MMX
-	  fastYV12RGB_mmx(y, u, v, e, w);
-	  //fastYV12RGB_mmx(y+w, u, v, e+3*w, w);
-#elif defined(HAVE_ALTIVEC) && defined(CONFIG_DARWIN)
-
-	 altivecYV12RGB(y,
-		    	u,
-		    	v, e, w);		
-
-#else
-	  slowYV12RGB(y, u, v, e, w);
-	  slowYV12RGB(y+w, u, v, e+4*w, w);
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+    if(CpuCaps::hasMMX())
+        accel=fastYV12RGB_mmx;
+#endif
+#if defined(HAVE_ALTIVEC) && defined(CONFIG_DARWIN)
+        accel=altivecYV12RGB;
 #endif
 
+    for (i = (h>>1); i > 0; i--)
+      {
+        if(accel)
+        {
+                accel(y,u,v,e,w);
+        }
+        else
+        {
+	  slowYV12RGB(y, u, v, e, w);
+	  slowYV12RGB(y+w, u, v, e+4*w, w);
+        }
 		y += w<<1;
 		u += w >> 1;
 		v += w >> 1;

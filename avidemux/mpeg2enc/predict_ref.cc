@@ -301,7 +301,7 @@ void init_predict(void)
 		printf("SETTING : NO ACCEL\n");
 	}
 
-#if defined(USE_MMX)
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 	else if(cpucap & ACCEL_X86_MMXEXT ) /* AMD MMX or SSE... */
 	{
 		printf( "SETTING EXTENDED MMX for PREDICTION!\n");

@@ -76,7 +76,7 @@ uint32_t x,y;
                  }
               }
 }
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 void ADMVideoFields::blend_MMX(uint8_t *p,uint8_t *c,
 																							uint8_t *n,
 																							uint8_t *e,

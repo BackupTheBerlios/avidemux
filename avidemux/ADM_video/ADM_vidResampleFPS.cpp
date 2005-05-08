@@ -37,7 +37,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_dialog/DIA_enter.h"
 #include "ADM_video/ADM_cache.h"
-
+#include "ADM_toolkit/ADM_cpuCap.h"
 #include "admmangle.h"
 
 static FILTER_PARAM ResampParam={2,{"newfps","use_linear"}};
@@ -149,7 +149,7 @@ uint8_t ADMVideoResampleFPS::getCoupledConf( CONFcouple **couples)
                 CSET(use_linear);
                 return 1;
 }
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 static uint64_t low,high;
 static void blendMMX(uint8_t *src, uint8_t *src2, uint8_t *dst, uint8_t alpha, uint8_t beta,uint32_t count)
 {
@@ -291,10 +291,12 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
         
       count = page;
 
-#ifdef USE_MMX
-      blendMMX(in1,in2,out,lowweight,highweight,(count*3)>>1);
-#else
-      
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+        if(CpuCaps::hasMMX())
+                blendMMX(in1,in2,out,lowweight,highweight,(count*3)>>1);
+        else
+#endif
+      {
       for(idx = 0; idx < count; ++idx)
 	out[idx] = ((in1[idx]*lowweight) + (in2[idx]*highweight))>>8;
 
@@ -314,7 +316,7 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
 
       for(idx = 0; idx < count; ++idx)
 	out[idx] = ((in1[idx]*lowweight) + (in2[idx]*highweight))>>8;
-#endif
+      }
 
       vidCache->unlockAll();
     }

@@ -14,12 +14,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <inttypes.h>
 #include "config.h"
+
+#include "ADM_toolkit/ADM_cpuCap.h"
 
 #ifdef HAVE_ALTIVEC_H
 #include "altivec.h"
@@ -28,7 +30,7 @@
 static void YV12_422_Altivec( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h);
 #endif
 
-#ifdef USE_MMX
+#if  defined( ARCH_X86)  || defined(ARCH_X86_64)
 #include "../mpeg2enc/mmx.h"
 static void YV12_422_mmx( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h);
 #endif
@@ -42,8 +44,8 @@ void YV12_422( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h)
 	if( !(w&7))
 		return YV12_422_Altivec(in,out,w,h);
 #endif	
-#if defined( USE_MMX) 
-	if(!(w&3))
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+	if(!(w&3) && CpuCaps::hasMMX())
 		return  YV12_422_mmx( in, out,  w, h);
 #endif
 	YV12_422_C(in,out,w,h);
@@ -102,7 +104,7 @@ uint32_t dx,dy;
 	Process 16 bytes = 4 pix from y1 and 4 pix from y2
 */
 
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 #define LOAD_M "                                                       \n\
 # load y,u,v                                                 \n\
 movd 		(%2), %%mm0    	 		 # load 4u       00000 u3 U2 U1 U0   \n\

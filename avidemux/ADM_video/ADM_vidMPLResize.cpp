@@ -39,7 +39,7 @@
 
 
 
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 extern "C" {
 #include "../../adm_lavcodec/avcodec.h"
 }
@@ -185,7 +185,7 @@ uint8_t AVDMVideoStreamMPResize::reset(uint32_t nw, uint32_t old,uint32_t algo)
 						default:ADM_assert(0);
 
 					}
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 		
 		#define ADD(x,y) if( CpuCaps::has##x()) flags|=SWS_CPU_CAPS_##y;
 		ADD(MMX,MMX);		

@@ -264,14 +264,18 @@ ADMImage	*image,*next,*prev;
 	nextp += src_pitch;
 	destp += dst_pitch;
 
-	#if defined(USE_MMX) && defined(ASM_FLUX)
+	#if (defined( ARCH_X86)  || defined(ARCH_X86_64)) && defined(ASM_FLUX)
+        if(CpuCaps::hasMMX())
+        {
 		DoFilter_MMX(currp, prevp, nextp, src_pitch,
 			destp, dst_pitch, row_size, height - 2);
-	
-	#else
+	}else
+	#endif
+        {
 		DoFilter_C(currp, prevp, nextp, src_pitch,
 			destp, dst_pitch, row_size, height - 2);
-	#endif
+        }
+	
 	data->copyInfo(image);
 	vidCache->unlockAll();
 	return 1;
@@ -388,7 +392,7 @@ void ADMVideoFlux::DoFilter_C(
 	ADM_assert(ycnt == 0);
 
 }
-#ifdef USE_MMX
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 /*
 	__asm movq mm2, mm0 \
 	__asm movq mm3, mm1 \

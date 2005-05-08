@@ -62,7 +62,7 @@
 #include "../utils/altivec/altivec_transform.h"
 #endif
 
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 
 	void add_pred_mmx (uint8_t *pred, uint8_t *cur,
 						  int lx, int16_t *blk) ;
@@ -192,7 +192,7 @@ void init_transform(void)
 {
 
 	// By default use C implementation
-#if defined( USE_MMX) 
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
                 if(CpuCaps::hasSSE())
                 {
 		  pfdct = mp2_fdct_sse;
@@ -224,9 +224,9 @@ void init_transform(void)
 		psub_pred = sub_pred;
 		pfield_dct_best = field_dct_best;
                 printf("\n SETTINGS  idct/fdct : C \n");
-		#if !defined(USE_MMX)
-		printf("Because MMX was disabled\n");
-		#endif
+#if !defined( ARCH_X86)  && !defined(ARCH_X86_64)
+		printf("Because not X86 Arch\n");
+#endif
                 }
 		init_fdct();
 		init_idct();

@@ -167,7 +167,7 @@ void ADMVideoLavPPDeint::setup(void)
   string[0]=0;
   
         cleanup();
-#ifdef USE_MMX              
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 #define ADD(x,y) if( CpuCaps::has##x()) ppCaps|=PP_CPU_CAPS_##y;                
                 ADD(MMX,MMX);           
                 ADD(3DNOW,3DNOW);

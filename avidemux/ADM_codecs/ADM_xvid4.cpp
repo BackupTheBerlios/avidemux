@@ -85,7 +85,7 @@ void xvid4_init(void)
 	printf("\txvid thread:%d\n",xvid_gbl_info.num_threads);
 	printf("\txvid SIMD supported:(%x)\n",xvid_gbl_info.cpu_flags);
 	#define CPUF(x) if(xvid_gbl_info.cpu_flags  & XVID_CPU_##x) printf("\t\t"#x"\n");	
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 	CPUF(MMX);
 	CPUF(MMXEXT);
 	CPUF(SSE);

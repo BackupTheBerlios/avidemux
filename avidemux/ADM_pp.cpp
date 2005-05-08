@@ -70,7 +70,7 @@ char stringFQ[60];
 		{
 		uint32_t ppCaps=0;
 		
-#ifdef USE_MMX	
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 		
 	#define ADD(x,y) if( CpuCaps::has##x()) ppCaps|=PP_CPU_CAPS_##y;
 		

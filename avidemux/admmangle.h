@@ -10,7 +10,7 @@
 	#define MANGLE(x) #x
 #endif
 /* Regiter renaming */
-#ifdef HAVE_X86_64
+#ifdef ARCH_X86_64
 #define REG_a  "rax" 
 #define REGa    rax 
 #define REGb    rbx 

@@ -59,17 +59,8 @@ B = Y + 1.772U              3716153
 #include <inttypes.h>
 #include "config.h"
 
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 
-
-
-#ifdef USE_MMX
-#if 0
-#ifdef CYG_MANGLING // CYGWIN
-	#define Mangle(x) "_" #x
-#else
-	#define Mangle(x) #x
-#endif
-#endif
 #include "admmangle.h"
 
 /* hope these constant values are cache line aligned */

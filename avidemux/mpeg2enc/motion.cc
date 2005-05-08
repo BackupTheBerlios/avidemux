@@ -6,7 +6,7 @@
 #include "ADM_toolkit/ADM_cpuCap.h"
 void enable_mmxsse_motion(int cpucap)
 {
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 	if(CpuCaps::hasMMXEXT())  /* AMD MMX or SSE... */
 	{
 		printf( "SETTING EXTENDED MMX for MOTION!\n");

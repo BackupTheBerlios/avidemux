@@ -80,6 +80,8 @@
 #include "mpegconsts.h"
 #include "yuv4mpeg.h"
  
+#include "ADM_toolkit/ADM_cpuCap.h"
+
    /* NOTE: access toframes_read *must* be read-only in other threads
 	  once the chunk-reading worker thread has been started.
    */
@@ -90,11 +92,23 @@ static int last_frame = -1;
 
 
 /* Buffers for frame luminance means */
+int luminance_mean_C(uint8_t *frame, int w, int h );
+int luminance_mean_MMX(uint8_t *frame, int w, int h );
 
 
-
-#ifndef USE_MMX
 int luminance_mean(uint8_t *frame, int w, int h )
+{
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
+        if(CpuCaps::hasMMX()) return luminance_mean_MMX(frame,w,h);
+#endif
+        luminance_mean_C(frame,w,h);
+}
+
+
+
+
+
+int luminance_mean_C(uint8_t *frame, int w, int h )
 {
 	uint8_t *p = frame;
 	uint8_t *lim = frame + w*h;
@@ -107,10 +121,12 @@ int luminance_mean(uint8_t *frame, int w, int h )
 	sum=sum/(w*h);
 	return sum;
 }
-#else
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
 // MEANX
 // code borrowed from ffmpeg by means
-static int pix_sum16_mmx(uint8_t * pix, int line_size){
+
+static int pix_sum16_mmx(uint8_t * pix, int line_size)
+{
     const int h=16;
 #ifdef ARCH_X86_64
     long int rline_size=line_size;
@@ -154,28 +170,26 @@ static int pix_sum16_mmx(uint8_t * pix, int line_size){
 
         return sum;
 }
-int luminance_mean(uint8_t *frame, int w, int h )
+int luminance_mean_MMX(uint8_t *frame, int w, int h )
 {
-	uint8_t *p = frame;
-	int mean=0;
-	int x,y;
+        uint8_t *p = frame;
+        int mean=0;
+        int x,y;
 
-	for(y=0; y<h; y+=16)
-	{
-		p=frame+w*y;
-        	for(x=0; x<w; x+=16)
-		{
+        for(y=0; y<h; y+=16)
+        {
+                p=frame+w*y;
+                for(x=0; x<w; x+=16)
+                {
 
-			mean+=pix_sum16_mmx(p, w);
-			p+=16;
-        	}
-    	}
-	__asm__ ("emms");
-	mean=mean/(w*h);
-	return mean;
+                        mean+=pix_sum16_mmx(p, w);
+                        p+=16;
+                }
+        }
+        __asm__ ("emms");
+        mean=mean/(w*h);
+        return mean;
 }
-
-
 
 #endif
 // MEANX

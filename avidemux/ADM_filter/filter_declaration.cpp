@@ -123,7 +123,7 @@ printf(  "*********************\n");
 	REGISTERX("denoise","Denoise",VF_DENOISE,1,denoise_create,denoise_script);
 	REGISTERX("fluxsmooth","FluxSmooth",VF_FLUXSMOOTH,1,fluxsmooth_create,fluxsmooth_script);
 	
-#ifdef USE_MMX
+#if defined( ARCH_X86)  || defined(ARCH_X86_64)
     	REGISTERX("temporalcleaner","Temporal Cleaner",VF_VLADSMOOTH,1,vladsmooth_create,vladsmooth_script);
 #endif
 
