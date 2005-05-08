@@ -41,7 +41,8 @@
 #include "ADM_video/ADM_cache.h"
 
 #include "admmangle.h"
-
+//#undef USE_MMX
+#include "ADM_toolkit/ADM_cpuCap.h"
 static FILTER_PARAM Eq2Param={8,{"contrast","brightness","saturation",
                                 "gamma","gamma_weight","rgamma","ggamma","bgamma"}};
 #define LUT16
@@ -74,13 +75,11 @@ typedef struct Eq2Settings {
  
 } Eq2Settings;
 /*=====================================*/
-typedef void (*apply_func) (oneSetting *par, unsigned char *dst, unsigned char *src,
-  unsigned w, unsigned h, unsigned dstride, unsigned sstride);
 static void apply_lut (oneSetting *par, unsigned char *dst, unsigned char *src,
-  unsigned w, unsigned h, unsigned dstride, unsigned sstride);
+  unsigned int w, unsigned int h);
 #ifdef USE_MMX
 static void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
-  unsigned w, unsigned h, unsigned dstride, unsigned sstride);
+  unsigned int w, unsigned int h);
 #endif
 static void create_lut (oneSetting *par);
 /*=====================================*/
@@ -95,8 +94,7 @@ class  ADMVideoEq2:public AVDMGenericVideoStream
             VideoCache      *vidCache; 
             float           _hue;
             float           _saturation;
-            Eq2Settings     settings;
-            apply_func      func;
+            Eq2Settings     settings;            
   public:
                 
                         ADMVideoEq2(  AVDMGenericVideoStream *in,CONFcouple *setup);
@@ -118,7 +116,7 @@ uint8_t ADMVideoEq2::configure(AVDMGenericVideoStream *in)
   float h,s;
   _in=in;   
   r=DIA_getEQ2Param(_param);
-  if(r) update();
+  update();
   return r;        
 }
 char *ADMVideoEq2::printConf( void )
@@ -161,17 +159,13 @@ ADMVideoEq2::ADMVideoEq2(  AVDMGenericVideoStream *in,CONFcouple *couples)
   }      
   vidCache=new VideoCache(1,_in);
   update();
-#ifdef USE_MMX
-    if(1)
-        func=affine_1d_MMX;
-    else
-#endif
-        func=apply_lut;
     
    
 }
 void ADMVideoEq2::update(void)
 {
+    memset(&settings,0,sizeof(settings));
+
     settings.param[0].lut_clean=0;
     settings.param[1].lut_clean=0;
     settings.param[2].lut_clean=0;
@@ -193,6 +187,12 @@ void ADMVideoEq2::update(void)
     settings.param[2].g=sqrt(settings.rgamma/settings.ggamma);
     settings.param[0].w=settings.param[1].w=settings.param[2].w=
     settings.gamma_weight=_param->gamma_weight;   
+
+
+ create_lut(&(settings.param[0]));
+ create_lut(&(settings.param[1]));
+ create_lut(&(settings.param[2]));
+  
            
 }
 ADMVideoEq2::~ADMVideoEq2()
@@ -235,12 +235,25 @@ uint8_t ADMVideoEq2::getFrameNumberNoAlloc(uint32_t frame,
   uint32_t w,h;
   w=_info.width;
   h=_info.height;
-  func(&(settings.param[0]),YPLANE(data),YPLANE(mysrc),w,h,w,w);
-  w>>=1;
-  h>>=1;
-  func(&(settings.param[2]),UPLANE(data),UPLANE(mysrc),w,h,w,w);
-  func(&(settings.param[1]),VPLANE(data),VPLANE(mysrc),w,h,w,w);
- 
+
+#ifdef USE_MMX
+  if(CpuCaps::hasMMX())
+  {
+        affine_1d_MMX(&(settings.param[0]),YPLANE(data),YPLANE(mysrc),w,h);
+        w>>=1;
+        h>>=1;
+        affine_1d_MMX(&(settings.param[2]),UPLANE(data),UPLANE(mysrc),w,h);
+        affine_1d_MMX(&(settings.param[1]),VPLANE(data),VPLANE(mysrc),w,h);       
+   }
+   else
+#endif
+   {
+        apply_lut(&(settings.param[0]),YPLANE(data),YPLANE(mysrc),w,h);
+        w>>=1;
+        h>>=1;
+        apply_lut(&(settings.param[2]),UPLANE(data),UPLANE(mysrc),w,h);
+        affine_1d_MMX(&(settings.param[1]),VPLANE(data),VPLANE(mysrc),w,h);       
+    }
   vidCache->unlockAll();
   
   
@@ -295,15 +308,15 @@ void create_lut (oneSetting *par)
 #ifdef USE_MMX
 static
 void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
-  unsigned w, unsigned h, unsigned dstride, unsigned sstride)
+  unsigned int w, unsigned int h)
 {
   unsigned i;
   int      contrast, brightness;
-  unsigned dstep, sstep;
+  unsigned dstep, sstep,w3;
   int      pel;
   short    int brvec[4];
   short    int contvec[4];
-  
+  w3=w>>3;
 //  printf("\nmmx: src=%p dst=%p w=%d h=%d ds=%d ss=%d\n",src,dst,w,h,dstride,sstride);
 
   contrast = (int) (par->c * 256 * 16);
@@ -312,17 +325,20 @@ void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
   brvec[0] = brvec[1] = brvec[2] = brvec[3] = brightness;
   contvec[0] = contvec[1] = contvec[2] = contvec[3] = contrast;
 
-  sstep = sstride - w;
-  dstep = dstride - w;
-
+  
+  asm volatile (
+        "movq (%0), %%mm3 \n\t"
+        "movq (%1), %%mm4 \n\t"
+        :
+        :  "r" (brvec),"r" (contvec)
+        :
+        );
   while (h-- > 0) {
     asm volatile (
-      "movq (%5), %%mm3 \n\t"
-      "movq (%6), %%mm4 \n\t"
       "pxor %%mm0, %%mm0 \n\t"
       "movl %4, %%eax\n\t"
       ".balign 16 \n\t"
-      "1: \n\t"
+      "lop%=: \n\t"
       "movq (%0), %%mm1 \n\t"
       "movq (%0), %%mm2 \n\t"
       "punpcklbw %%mm0, %%mm1 \n\t"
@@ -338,9 +354,9 @@ void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
       "movq %%mm1, (%1) \n\t"
       "add $8, %1 \n\t"
       "decl %%eax \n\t"
-      "jnz 1b \n\t"
+      "jnz lop%= \n\t"
       : "=r" (src), "=r" (dst)
-      : "0" (src), "1" (dst), "r" (w >> 3), "r" (brvec), "r" (contvec)
+      : "0" (src), "1" (dst), "r" (w3)
       : "%eax"
     );
 
@@ -352,8 +368,6 @@ void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
       *dst++ = pel;
     }
 
-    src += sstep;
-    dst += dstep;
   }
 
   asm volatile ( "emms \n\t" ::: "memory" );
@@ -361,18 +375,16 @@ void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
 #endif
 
 void apply_lut (oneSetting *par, unsigned char *dst, unsigned char *src,
-  unsigned w, unsigned h, unsigned dstride, unsigned sstride)
+  unsigned int w, unsigned int h)
 {           
             
     
-  
-  unsigned      i, j, w2;
+  unsigned int dstride,  sstride;
+  unsigned int i, j, w2;
   unsigned char *lut;
   uint16_t *lut16;
 
-  if (!par->lut_clean) {
-    create_lut (par);
-  }
+   dstride=sstride=w;
 
   lut = par->lut;
 #ifdef LUT16
