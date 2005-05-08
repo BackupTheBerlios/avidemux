@@ -181,7 +181,8 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
     if(fourCC::check(id,(uint8_t *)"ftyp") ||
     	fourCC::check(id,(uint8_t *)"pnot") ||
 	fourCC::check(id,(uint8_t *)"mdat") ||
-	fourCC::check(id,(uint8_t *)"moov")
+	fourCC::check(id,(uint8_t *)"moov") ||
+        fourCC::check(id,(uint8_t *)"skip") 
 	)
     {
  		printf (" \n 3GPP /MP4/Quicktime file detected..\n");
