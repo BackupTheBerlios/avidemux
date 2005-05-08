@@ -103,6 +103,7 @@ typedef struct
 class tsMuxer : public ADMMpegMuxer
 {
 protected:
+        uint32_t    audioPacket;
         entryPacket *packetPipe;
         uint32_t    packetHead,packetTail;
         FILE        *outFile;     
