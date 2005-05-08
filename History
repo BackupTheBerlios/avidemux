@@ -13,7 +13,7 @@
                 - race in mpeg PS (T rupp)
                 - support mov file starting by skip
                 - dont reset marker when loading filters
-
+		- began to build non reg
         07/05   - fix build when mmx is disabled
                 - cleanup prefs menu to add video accel
                 - added video accel in prefs
