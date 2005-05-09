@@ -239,7 +239,7 @@ rebranch2:
 				suboffset++;
 				if(b==0xff) goto rebranch2;
                                 a&=0xfd; // ignore padding bit
-				if(c==_mpegSync[0]&& a==_mpegSync[1] && b==_mpegSync[2])
+				if(c==_mpegSync[0]&& a==_mpegSync[1] && ((b&0xc0)==(_mpegSync[2]&0xC0)))
 				{
 					suboffset-=2;
 					goto contact2;
