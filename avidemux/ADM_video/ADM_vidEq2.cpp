@@ -41,47 +41,16 @@
 #include "ADM_video/ADM_cache.h"
 
 #include "admmangle.h"
-//#undef USE_MMX
 #include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_vidEq2.h"
 static FILTER_PARAM Eq2Param={8,{"contrast","brightness","saturation",
                                 "gamma","gamma_weight","rgamma","ggamma","bgamma"}};
-#define LUT16
-#include "ADM_vidEq2.h"
-typedef struct oneSetting {
-  unsigned char lut[256];
-#ifdef LUT16
-  uint16_t lut16[256*256];
-#endif
-  int           lut_clean;
 
-  double        c;
-  double        b;
-  double        g;
-  double        w;
-} oneSetting;
-typedef struct Eq2Settings {
-  oneSetting param[3];
-
-  double        contrast;
-  double        brightness;
-  double        saturation;
-
-  double        gamma;
-  double        gamma_weight;
-  double        rgamma;
-  double        ggamma;
-  double        bgamma;
-
- 
-} Eq2Settings;
 /*=====================================*/
-static void apply_lut (oneSetting *par, unsigned char *dst, unsigned char *src,
-  unsigned int w, unsigned int h);
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 static void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
   unsigned int w, unsigned int h);
 #endif
-static void create_lut (oneSetting *par);
 /*=====================================*/
 class  ADMVideoEq2:public AVDMGenericVideoStream
 {
@@ -115,7 +84,7 @@ uint8_t ADMVideoEq2::configure(AVDMGenericVideoStream *in)
   uint8_t r=1;
   float h,s;
   _in=in;   
-  r=DIA_getEQ2Param(_param);
+  r=DIA_getEQ2Param(_param,in);
   update();
   return r;        
 }
@@ -164,37 +133,39 @@ ADMVideoEq2::ADMVideoEq2(  AVDMGenericVideoStream *in,CONFcouple *couples)
 }
 void ADMVideoEq2::update(void)
 {
-    memset(&settings,0,sizeof(settings));
-
-    settings.param[0].lut_clean=0;
-    settings.param[1].lut_clean=0;
-    settings.param[2].lut_clean=0;
-    settings.contrast=_param->contrast;
-    settings.param[0].c=_param->contrast;  
-    settings.brightness=_param->brightness;
-    settings.param[0].b=_param->brightness;;
-    settings.saturation=_param->saturation;
-    settings.param[1].c=_param->saturation;
-    settings.param[2].c=_param->saturation;
-    
-    
-    settings.ggamma=_param->ggamma;
-    settings.bgamma=_param->bgamma;
-    settings.rgamma=_param->rgamma;
-    settings.gamma=_param->gamma;
-    settings.param[0].g=settings.gamma*settings.ggamma;
-    settings.param[1].g=sqrt(settings.bgamma/settings.ggamma);
-    settings.param[2].g=sqrt(settings.rgamma/settings.ggamma);
-    settings.param[0].w=settings.param[1].w=settings.param[2].w=
-    settings.gamma_weight=_param->gamma_weight;   
-
-
- create_lut(&(settings.param[0]));
- create_lut(&(settings.param[1]));
- create_lut(&(settings.param[2]));
-  
-           
+   update_lut(&settings,_param);      
 }
+void update_lut(Eq2Settings *settings,Eq2_Param *_param)
+{
+     memset(settings,0,sizeof(settings));
+
+    settings->param[0].lut_clean=0;
+    settings->param[1].lut_clean=0;
+    settings->param[2].lut_clean=0;
+    settings->contrast=_param->contrast;
+    settings->param[0].c=_param->contrast;  
+    settings->brightness=_param->brightness;
+    settings->param[0].b=_param->brightness;;
+    settings->saturation=_param->saturation;
+    settings->param[1].c=_param->saturation;
+    settings->param[2].c=_param->saturation;
+    
+    
+    settings->ggamma=_param->ggamma;
+    settings->bgamma=_param->bgamma;
+    settings->rgamma=_param->rgamma;
+    settings->gamma=_param->gamma;
+    settings->param[0].g=settings->gamma*settings->ggamma;
+    settings->param[1].g=sqrt(settings->bgamma/settings->ggamma);
+    settings->param[2].g=sqrt(settings->rgamma/settings->ggamma);
+    settings->param[0].w=settings->param[1].w=settings->param[2].w=
+    settings->gamma_weight=_param->gamma_weight;   
+
+
+    create_lut(&(settings->param[0]));
+    create_lut(&(settings->param[1]));
+    create_lut(&(settings->param[2])); 
+}          
 ADMVideoEq2::~ADMVideoEq2()
 {
   delete _param;
@@ -252,7 +223,7 @@ uint8_t ADMVideoEq2::getFrameNumberNoAlloc(uint32_t frame,
         w>>=1;
         h>>=1;
         apply_lut(&(settings.param[2]),UPLANE(data),UPLANE(mysrc),w,h);
-        affine_1d_MMX(&(settings.param[1]),VPLANE(data),VPLANE(mysrc),w,h);       
+        apply_lut(&(settings.param[1]),VPLANE(data),VPLANE(mysrc),w,h);       
     }
   vidCache->unlockAll();
   
@@ -260,7 +231,7 @@ uint8_t ADMVideoEq2::getFrameNumberNoAlloc(uint32_t frame,
   return 1;
 }
 
-static
+
 void create_lut (oneSetting *par)
 {
   unsigned i;
