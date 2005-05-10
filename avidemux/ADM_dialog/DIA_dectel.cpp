@@ -55,7 +55,7 @@ int ret=0;
 	MENU_SET(optionmenuPost,post);
 	MENU_SET(optionmenuBlend,blend);
 	MENU_SET(optionmenuChroma,chroma);
-	
+	gtk_register_dialog(dialog);
 	
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
 	{
@@ -72,6 +72,7 @@ int ret=0;
 		RD_ENTRY(entryNT,nt);
 		ret=1;
 	}
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;
 }

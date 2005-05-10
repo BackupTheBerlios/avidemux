@@ -75,7 +75,7 @@ int ret=0;
         gtk_range_set_value (GTK_RANGE(WID(hscaleThresh)),(gdouble)param->threshold);
         gtk_range_set_value (GTK_RANGE(WID(hscaleStrength)),(gdouble)param->strength);
         
-        
+        gtk_register_dialog(dialog);
         if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
         {
           GtkAdjustment *adj;   
@@ -93,6 +93,7 @@ int ret=0;
                 ret=1;
         
         }
+        gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
         return ret;
 

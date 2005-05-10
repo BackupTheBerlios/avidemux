@@ -70,6 +70,7 @@ int ret=0;
                 else     RADIO_SET(radiobutton1,1);
          gtk_range_set_value (GTK_RANGE(WID(hscale1)),(gdouble)param->thresh);
         // run
+        gtk_register_dialog(dialog);
         if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
         {
                 MENU_GET(optionmenu1,mode);
@@ -79,6 +80,7 @@ int ret=0;
                 param->thresh=GTK_ADJUSTMENT(adj)->value;
                 ret=1;
         }
+        gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
         return ret;
 }

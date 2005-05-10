@@ -31,6 +31,7 @@
 
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
+#include "ADM_toolkit/toolkit_gtk.h"
 #ifdef HAVE_ENCODER
 
 
@@ -56,6 +57,7 @@ uint8_t ADMVideoLargeMedian::configure(AVDMGenericVideoStream * instream)
 	if(_param->luma) STOGGLE(luma);
 	if(_param->chroma) STOGGLE(chroma);
 
+        gtk_register_dialog(dialog);
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
 	{
 
@@ -64,6 +66,7 @@ uint8_t ADMVideoLargeMedian::configure(AVDMGenericVideoStream * instream)
 		ret=1;
 
 	}
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;
 

@@ -67,7 +67,7 @@ int ret=0;
 	MENU_SET(optionmenu2,quality);
 	SPIN_SET(spinbuttonCycle,cycle);
 	
-	
+	gtk_register_dialog(dialog);
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
 	{
 		MENU_GET(optionmenu1,mode);
@@ -79,6 +79,7 @@ int ret=0;
 		ret=1;
 	
 	}
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;
 }
