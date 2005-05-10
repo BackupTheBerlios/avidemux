@@ -58,7 +58,7 @@ printf(  "*********************\n");
   	REGISTERX("addblack","Add black border",VF_ADDBORDER,1,addBorder_create,addBorder_script);
   	REGISTERX("vflip","Flip Vertical",VF_FLIP,1,flipv_create,flipv_script);
 	REGISTERX("rotate","Rotate",VF_ROTATE,1,rotate_create,rotate_script);
-        REGISTERX("chfps","Change FPS",VF_CHFPS,1,chfps_create,chfps_script);
+        //REGISTERX("chfps","Change FPS",VF_CHFPS,1,chfps_create,chfps_script);
         REGISTERX("resamplefps","Resample FPS",VF_RESAMPLE_FPS,1,resamplefps_create,resamplefps_script);                
         REGISTERX("msharpen","MSharpen by Donald Graft",VF_MSHARPEN,1,msharpen_create,msharpen_script);
         REGISTERX("asharp","ASharp by MarcFD",VF_ASHARP,1,asharp_create,asharp_script);
