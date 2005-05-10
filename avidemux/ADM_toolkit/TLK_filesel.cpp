@@ -83,7 +83,7 @@ DIR *dir=NULL;
 	}
 	else	//use pref
 	{
-		if( prefs->get(LASTDIR,&tmpname))
+		if( prefs->get(LASTDIR_READ,&tmpname))
 		{
 			
 	
@@ -199,6 +199,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	char *name=NULL;
 	char *tmpname;
 	gchar *selected_filename;
+        uint8_t res;
 
 	if(rname)
 		*rname=NULL;
@@ -206,7 +207,11 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	dialog=create_fileselection1();
 	gtk_window_set_title (GTK_WINDOW (dialog),label);
 	gtk_transient(dialog);
-	if( prefs->get(LASTDIR,&tmpname))
+        if(rw)
+	       res=prefs->get(LASTDIR_WRITE,&tmpname); 
+        else
+               res=prefs->get(LASTDIR_READ,&tmpname); 
+        if(res)
 	{
 		DIR *dir;
 	//	printf("tmpname : %s\n",tmpname);
@@ -240,7 +245,10 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 
 						char *str=PathCanonize(name);
 						PathStripName(str);
-						prefs->set(LASTDIR,str);			
+                                                if(rw)
+						  prefs->set(LASTDIR_WRITE,str);			
+                                                else
+                                                  prefs->set(LASTDIR_READ,str);                        
 						delete [] str;
 
 			}
@@ -268,6 +276,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	char *name=NULL;
 	char *tmpname;
 	gchar *selected_filename;
+        uint8_t res;
 	GtkFileChooserAction action;
 	
 	if(rname)
@@ -282,8 +291,11 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 				      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
 				      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 				      NULL);
-				      
-	if( prefs->get(LASTDIR,&tmpname))
+        if(rw)
+                res=prefs->get(LASTDIR_WRITE,&tmpname)
+        else
+                res=prefs->get(LASTDIR_READ,&tmpname)
+	if(res)
 	{
 		char *str=PathCanonize(tmpname);
 		PathStripName(str);
@@ -313,7 +325,10 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 
 						char *str=PathCanonize(name);
 						PathStripName(str);
-						prefs->set(LASTDIR,str);			
+                                                if(rw)
+						  prefs->set(LASTDIR_WRITE,str);
+                                                else
+                                                  prefs->set(LASTDIR_READ,str);                     
 						delete [] str;
 
 	}		}

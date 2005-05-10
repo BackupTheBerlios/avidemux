@@ -87,7 +87,8 @@ static opt_def opt_defs [] = {
 	{"lastfiles.file2",		STRING,"",	NULL, NULL, NULL },
 	{"lastfiles.file3",		STRING,"",	NULL, NULL, NULL },
 	{"lastfiles.file4",		STRING,"",	NULL, NULL, NULL },
-	{"lastdir",		STRING,"",	NULL, NULL, NULL },
+	{"lastdir_read",		STRING,"",	NULL, NULL, NULL },
+	{"lastdir_write",		STRING,"",	NULL, NULL, NULL },
 	{"lame_cli",		STRING,"",	NULL, NULL, NULL },
 	{"pipe_cmd",		STRING,"",	NULL, NULL, NULL },
 	{"pipe_param",		STRING,"",	NULL, NULL, NULL },
@@ -105,7 +106,7 @@ static opt_def opt_defs [] = {
 	{"feature.use_odml",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 63;
+int num_opts = 64;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2
