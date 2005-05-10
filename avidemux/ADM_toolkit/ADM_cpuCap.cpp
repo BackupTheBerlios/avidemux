@@ -19,7 +19,7 @@ extern "C"
 #include "../adm_lavcodec/dsputil.h"
 }
 #endif
-int CpuCaps::myCpuCaps=0;
+
 
   void 	CpuCaps::init( void)
 {

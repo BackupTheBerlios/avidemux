@@ -85,7 +85,7 @@ void sig_segfault_handler(int signo);
 extern void ADMImage_stat( void );
 int global_argc;
 char **global_argv;
-
+int CpuCaps::myCpuCaps=0;
 int main(int argc, char *argv[])
 {
 // Check for big files
