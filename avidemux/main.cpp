@@ -137,8 +137,9 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
    register_Encoders( );
     atexit(onexit);
 
-    
+#ifndef CYG_MANGLING    
     g_thread_init(NULL);
+#endif
     gtk_set_locale();
     gtk_init(&argc, &argv);
     gdk_rgb_init();
