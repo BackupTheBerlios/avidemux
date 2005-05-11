@@ -347,7 +347,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
-  label5 = gtk_label_new_with_mnemonic (_("_Saturation :"));
+  label5 = gtk_label_new_with_mnemonic (_("_Saturation:"));
   gtk_widget_show (label5);
   gtk_table_attach (GTK_TABLE (table2), label5, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -355,31 +355,34 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
 
-  hscaleBrightness = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, -1, 1, 0.1, 0.1, 0)));
+  hscaleBrightness = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, -1, 1, 0.05, 1, 0)));
   gtk_widget_show (hscaleBrightness);
   gtk_table_attach (GTK_TABLE (table2), hscaleBrightness, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_widget_set_size_request (hscaleBrightness, 140, -2);
+  gtk_widget_set_size_request (hscaleBrightness, 144, 0);
   gtk_scale_set_value_pos (GTK_SCALE (hscaleBrightness), GTK_POS_RIGHT);
+  gtk_scale_set_digits (GTK_SCALE (hscaleBrightness), 2);
 
-  hscaleSaturation = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0, 3, 0.1, 0.1, 0)));
+  hscaleSaturation = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0, 3, 0.05, 1, 0)));
   gtk_widget_show (hscaleSaturation);
   gtk_table_attach (GTK_TABLE (table2), hscaleSaturation, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_widget_set_size_request (hscaleSaturation, 140, -2);
+  gtk_widget_set_size_request (hscaleSaturation, 144, 0);
   gtk_scale_set_value_pos (GTK_SCALE (hscaleSaturation), GTK_POS_RIGHT);
+  gtk_scale_set_digits (GTK_SCALE (hscaleSaturation), 2);
 
-  hscaleContrast = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, -2, 2, 0.1, 0.1, 0)));
+  hscaleContrast = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, -2, 2, 0.05, 1, 0)));
   gtk_widget_show (hscaleContrast);
   gtk_table_attach (GTK_TABLE (table2), hscaleContrast, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_widget_set_size_request (hscaleContrast, 140, -2);
+  gtk_widget_set_size_request (hscaleContrast, 144, 0);
   gtk_scale_set_value_pos (GTK_SCALE (hscaleContrast), GTK_POS_RIGHT);
+  gtk_scale_set_digits (GTK_SCALE (hscaleContrast), 2);
 
-  label3 = gtk_label_new_with_mnemonic (_("_Contrast :"));
+  label3 = gtk_label_new_with_mnemonic (_("_Contrast:"));
   gtk_widget_show (label3);
   gtk_table_attach (GTK_TABLE (table2), label3, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
@@ -413,23 +416,25 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
 
-  hscaleGamma = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.1, 0.1, 0)));
+  hscaleGamma = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.05, 1, 0)));
   gtk_widget_show (hscaleGamma);
   gtk_table_attach (GTK_TABLE (table3), hscaleGamma, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_widget_set_size_request (hscaleGamma, 140, -2);
+  gtk_widget_set_size_request (hscaleGamma, 144, 0);
   gtk_scale_set_value_pos (GTK_SCALE (hscaleGamma), GTK_POS_RIGHT);
+  gtk_scale_set_digits (GTK_SCALE (hscaleGamma), 2);
 
-  hscaleGammaR = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.1, 0.1, 0)));
+  hscaleGammaR = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.05, 1, 0)));
   gtk_widget_show (hscaleGammaR);
   gtk_table_attach (GTK_TABLE (table3), hscaleGammaR, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_widget_set_size_request (hscaleGammaR, 140, -2);
+  gtk_widget_set_size_request (hscaleGammaR, 144, 0);
   gtk_scale_set_value_pos (GTK_SCALE (hscaleGammaR), GTK_POS_RIGHT);
+  gtk_scale_set_digits (GTK_SCALE (hscaleGammaR), 2);
 
-  label8 = gtk_label_new_with_mnemonic (_("_R:"));
+  label8 = gtk_label_new_with_mnemonic (_("_Red:"));
   gtk_widget_show (label8);
   gtk_table_attach (GTK_TABLE (table3), label8, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -437,15 +442,16 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label8), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label8), 0, 0.5);
 
-  hscaleGammaG = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.1, 0.1, 0)));
+  hscaleGammaG = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.05, 1, 0)));
   gtk_widget_show (hscaleGammaG);
   gtk_table_attach (GTK_TABLE (table3), hscaleGammaG, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_widget_set_size_request (hscaleGammaG, 140, -2);
+  gtk_widget_set_size_request (hscaleGammaG, 144, 0);
   gtk_scale_set_value_pos (GTK_SCALE (hscaleGammaG), GTK_POS_RIGHT);
+  gtk_scale_set_digits (GTK_SCALE (hscaleGammaG), 2);
 
-  label9 = gtk_label_new_with_mnemonic (_("_G:"));
+  label9 = gtk_label_new_with_mnemonic (_("_Green:"));
   gtk_widget_show (label9);
   gtk_table_attach (GTK_TABLE (table3), label9, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -453,7 +459,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
 
-  label10 = gtk_label_new_with_mnemonic (_("_B:"));
+  label10 = gtk_label_new_with_mnemonic (_("_Blue:"));
   gtk_widget_show (label10);
   gtk_table_attach (GTK_TABLE (table3), label10, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
@@ -469,21 +475,23 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
 
-  hscaleGammaB = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.1, 0.1, 0)));
+  hscaleGammaB = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.05, 1, 0)));
   gtk_widget_show (hscaleGammaB);
   gtk_table_attach (GTK_TABLE (table3), hscaleGammaB, 1, 2, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_widget_set_size_request (hscaleGammaB, 140, -2);
+  gtk_widget_set_size_request (hscaleGammaB, 144, 0);
   gtk_scale_set_value_pos (GTK_SCALE (hscaleGammaB), GTK_POS_RIGHT);
+  gtk_scale_set_digits (GTK_SCALE (hscaleGammaB), 2);
 
-  hscaleGammaWeight = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0, 1, 0.1, 0.1, 0)));
+  hscaleGammaWeight = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0, 1, 0.05, 1, 0)));
   gtk_widget_show (hscaleGammaWeight);
   gtk_table_attach (GTK_TABLE (table3), hscaleGammaWeight, 1, 2, 4, 5,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_widget_set_size_request (hscaleGammaWeight, 140, -2);
+  gtk_widget_set_size_request (hscaleGammaWeight, 144, 0);
   gtk_scale_set_value_pos (GTK_SCALE (hscaleGammaWeight), GTK_POS_RIGHT);
+  gtk_scale_set_digits (GTK_SCALE (hscaleGammaWeight), 2);
 
   label2 = gtk_label_new (_("<b>Gamma</b>"));
   gtk_widget_show (label2);
