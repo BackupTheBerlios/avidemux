@@ -14,10 +14,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <ADM_assert.h>
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #define YYSTYPE char * 
+
+
+
 extern "C" 
 {
 #include "adm_yacgen.h"
@@ -25,6 +29,7 @@ extern "C"
 void 	yyerror(const char *str);
 int 	yywrap(void);
 int	yyparse(void);
+char *script_getVar(char *in, enum yytokentype *r);
 };
 extern FILE *yyin;
 extern int yylineno;
@@ -39,6 +44,18 @@ extern void GUI_Quiet( void );
 extern void GUI_Verbose( void );
 static char scriptError[1024];
 static uint8_t thisIsADrill;
+
+
+typedef struct scriptVar
+{
+        char *name;
+        char *string;
+        enum yytokentype type;
+}scriptVar;
+
+
+static scriptVar myVars[ADM_MAX_VAR];
+uint32_t nbVar=0;
 //_____________________________________
 void parseScript(char *scriptname);
 //_____________________________________
@@ -153,6 +170,63 @@ void CleanParam(void)
 		}	
 	}
 	pushed=0;
+
+}
+/*
+        Push a var into the stack var
+
+*/
+uint8_t scriptAddVar(char *var,char *value)
+{
+        if(!var || !strlen(var)) 
+        {
+                printf("Script : Var name invalid\n");
+                return 0;
+        }
+        if(!value || !strlen(value)) 
+        {
+                printf("Script : value invalid\n");
+                return 0;
+        }
+        myVars[nbVar].name=ADM_strdup(var);
+        myVars[nbVar].string=ADM_strdup(value);
+        // check it is a number
+        uint8_t digit=1;
+        for(int i=0;i<strlen(value);i++)
+        {
+                 if(!isdigit(value[i]))
+                        {digit=0;break;}
+        }
+        if(digit)
+             myVars[nbVar].type=(enum yytokentype)NUMBER;
+        else
+             myVars[nbVar].type=(enum yytokentype)STRING;
+        nbVar++;
+        return 1;
+
+}
+/*
+       Retrieve a var in the stack
+
+*/
+char *script_getVar(char *in, enum yytokentype *r)
+{
+
+        printf("Get var called with in=[%s]\n",in);
+        for(uint32_t i=0;i<nbVar;i++)
+        {
+                if(myVars[i].name)
+                {
+                        if(!strcmp(myVars[i].name,in+1)) // skip the  $ 
+                        {
+                                *r=(enum yytokentype)myVars[i].type;
+                                return ADM_strdup(myVars[i].string);
+                        }
+
+                }
+        }
+        printf("Warning: var [%s] is unknown !\n");
+        return NULL;
 
 }
 //______________________________

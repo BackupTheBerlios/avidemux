@@ -118,11 +118,13 @@ extern int A_SaveUnpackedVop( char *name);
 extern int A_saveDVDPS(char *name);
 extern void A_saveWorkbench (char *name);
 extern uint8_t A_rebuildKeyFrame (void);
+extern uint8_t scriptAddVar(char *var,char *value);
 //
 static int call_bframe(void);
 static int call_packedvop(void);
 static int call_saveDVD(char *a);
 static int set_output_format(const char *str);
+static void setVar(char *in);
 //
 
 //_________________________________________________________________________
@@ -214,6 +216,8 @@ AUTOMATON reaction_table[]=
 		{"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
 		
                 {"rebuild-index",       0       ,"rebuild index with correct frame type", (one_arg_type)A_rebuildKeyFrame},
+
+                {"var",                 1       ,"set var (--var myvar=3)", (one_arg_type)setVar},
 		{"help",		0,"print this",		call_help},
 		{"quit",		0,"exit avidemux",	call_quit}
 
@@ -350,6 +354,28 @@ void call_downsample    (char *p)
 	audioForceDownSample();
 	printf("downsample\n");
 	 UNUSED_ARG(p); 
+
+}
+// The form is name=value
+// split it in two
+void setVar(char *in)
+{
+char *equal;
+        equal=strstr(in,"=");
+        if(!equal)
+        {
+                printf("Malformed set var  %s (name=value)\n",in);
+                return ;
+        }
+        if(in+strlen(in)==equal)
+        {
+                printf("No value after =  %s (name=value)\n",in);
+                return ;
+        }
+        *equal=0; // Remove =
+        
+        if(!scriptAddVar(in,equal+1))
+                printf("Warning setvar failed\n");        
 
 }
 void call_resample    (char *p)

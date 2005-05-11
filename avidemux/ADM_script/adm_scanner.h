@@ -4,6 +4,9 @@
 */
 #ifndef ADMSCANNER
 #define ADMSCANNER
+
+#define ADM_MAX_VAR 50
+
 typedef enum 
 {
 	APM_NUM,

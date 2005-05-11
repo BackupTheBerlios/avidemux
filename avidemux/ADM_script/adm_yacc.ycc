@@ -1,0 +1,56 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#define YYSTYPE char * 
+#include "adm_yacgen.h"
+#include "adm_scanner.h" 
+%}
+
+%token NUMBER HEXNUMBER FLOAT QUOTEDNAME STRING OPEN CLOSE COMMENT OTHERCOMMENT END EQUAL COMMA BOOL
+
+
+%%
+input : 
+		| input line
+		; 
+line : 
+		 END 
+		| command END 
+		| comment 
+		;
+comment :
+		COMMENT
+		{
+		}
+		| OTHERCOMMENT
+		{
+		}
+		;
+arg :
+		NUMBER		{ if(!PushParam(APM_NUM,$1)) YYABORT;} 
+		| HEXNUMBER   	{ if(!PushParam(APM_HEXNUM,$1)) YYABORT;} 
+		| STRING	{ if(!PushParam(APM_STRING,$1)) YYABORT;} 
+		| QUOTEDNAME	{ if(!PushParam(APM_QUOTED,$1)) YYABORT;} 
+		| FLOAT		{ if(!PushParam(APM_FLOAT,$1)) YYABORT;} 
+		| BOOL		{ if(!PushParam(APM_BOOL,$1)) YYABORT;} 
+		;
+
+arglist :
+			/* can be empty */
+		| arg 
+		| arglist COMMA arg 
+		;
+command : 
+		STRING OPEN arglist CLOSE 
+		{
+			if(!Call($1))
+			{
+				free($1); // don't need it anymore
+				YYABORT;
+			}
+			else
+				free($1); // don't need it anymore
+		}
+		;
+%%
+
