@@ -5,6 +5,16 @@
 				Read returns 0
 				getPacket returns 0
 *********************** /TODO **************************
+        12/05
+                - fixed (?) mpeg 2 layer 3 packet size computing
+        11/05
+                - added ugly/simplistic var stuff
+        10/05
+                - fix (?) the cpucap integer declaration
+                - fix some win32 transient issue
+        09/05
+                - Eq2 part2
+                - be less strict on mpeg audio match code
         08/05
                 - fixed jpeg encoding
                 - clean up of MMX etc..
