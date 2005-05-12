@@ -168,7 +168,7 @@ uint32_t nfq,fqindex,brindex,index;
 				default:
 				//FrameLengthInBytes = 144 * BitRate / SampleRate + Padding
                                   uint32_t slot_per_frame;
-                                        if(mpegInfo->layer==3 && mpegInfo->lsf)  slot_per_frame=72; 
+                                        if(mpegInfo->layer==3 && mpegInfo->level==2)  slot_per_frame=72; 
                                                 else slot_per_frame=144;
                                         mpegInfo->size=(slot_per_frame*mpegInfo->bitrate*1000)/mpegInfo->samplerate;
 					mpegInfo->size+=mpegInfo->padding;			
