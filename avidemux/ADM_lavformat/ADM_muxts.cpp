@@ -511,7 +511,11 @@ uint8_t tsMuxer::writeVideoPacket2(uint32_t len, uint8_t *buf,uint32_t frameno,u
     double d;
     uint32_t left,part=1;
     
-    
+//#define IGNORE_PTS
+        
+#ifdef IGNORE_PTS
+        displayframe=frameno+1;
+#endif    
 
     // First packet    
     while(len)
