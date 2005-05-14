@@ -43,7 +43,7 @@
 #include "config.h"
 #include "avi_vars.h"
 
-#include "unistd.h"
+//#include "unistd.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/toolkit_gtk.h"
