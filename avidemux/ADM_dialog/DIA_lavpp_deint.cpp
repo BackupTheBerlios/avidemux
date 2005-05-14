@@ -51,7 +51,7 @@ uint8_t DIA_lavpp_deint(lavc_pp_param *param)
   
   
   dialog=create_dialog1();
-  
+  gtk_register_dialog(dialog);
   CHECK_SET(checkbuttonAutoLevel,autolevel);
  
   
@@ -63,6 +63,7 @@ uint8_t DIA_lavpp_deint(lavc_pp_param *param)
     param->deintType=getRangeInMenu(WID(optionmenu1));
     r=1; 
   }
+  gtk_unregister_dialog(dialog);
   gtk_widget_destroy(dialog);
   return r;
 }
