@@ -50,10 +50,6 @@ static uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h);
 uint8_t  GUI_InitRender (GtkWidget *g, uint32_t w,uint32_t h);
 
 
-extern void GUI_XvEnd( void );
-extern void yuv420_argb32_mmx (uint8_t * image, uint8_t * py,
-			       uint8_t * pu, uint8_t * pv,
-			       int h_size, int v_size);
 
 extern GtkWidget *getDrawWidget( void );
 static AccelRender *accel_mode=NULL;
