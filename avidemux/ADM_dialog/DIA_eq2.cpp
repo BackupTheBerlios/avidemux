@@ -416,7 +416,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
 
-  hscaleGamma = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.05, 1, 0)));
+  hscaleGamma = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 3, 0.05, 1, 0)));
   gtk_widget_show (hscaleGamma);
   gtk_table_attach (GTK_TABLE (table3), hscaleGamma, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -425,7 +425,7 @@ create_dialog1 (void)
   gtk_scale_set_value_pos (GTK_SCALE (hscaleGamma), GTK_POS_RIGHT);
   gtk_scale_set_digits (GTK_SCALE (hscaleGamma), 2);
 
-  hscaleGammaR = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.05, 1, 0)));
+  hscaleGammaR = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 3, 0.05, 1, 0)));
   gtk_widget_show (hscaleGammaR);
   gtk_table_attach (GTK_TABLE (table3), hscaleGammaR, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
@@ -442,7 +442,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label8), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label8), 0, 0.5);
 
-  hscaleGammaG = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.05, 1, 0)));
+  hscaleGammaG = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 3, 0.05, 1, 0)));
   gtk_widget_show (hscaleGammaG);
   gtk_table_attach (GTK_TABLE (table3), hscaleGammaG, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
@@ -475,7 +475,7 @@ create_dialog1 (void)
   gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
 
-  hscaleGammaB = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 10, 0.05, 1, 0)));
+  hscaleGammaB = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (1, 0.1, 3, 0.05, 1, 0)));
   gtk_widget_show (hscaleGammaB);
   gtk_table_attach (GTK_TABLE (table3), hscaleGammaB, 1, 2, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
