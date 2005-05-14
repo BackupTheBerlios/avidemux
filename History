@@ -5,6 +5,9 @@
 				Read returns 0
 				getPacket returns 0
 *********************** /TODO **************************
+--------------------2.0.38 final : 1030-----
+        14/05   
+                - changed max for eq2 to 3 (from 10)
         12/05
                 - fixed (?) mpeg 2 layer 3 packet size computing
         11/05
