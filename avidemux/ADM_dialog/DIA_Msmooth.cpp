@@ -75,7 +75,7 @@ int ret=0;
 	
 	SPIN_SET(spinbuttonThresh,threshold);
 	SPIN_SET(spinbuttonStrength,strength);
-	
+	gtk_register_dialog(dialog);
 	
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
 	{
@@ -86,6 +86,7 @@ int ret=0;
 		ret=1;
 	
 	}
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;
 
