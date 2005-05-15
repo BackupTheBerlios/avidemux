@@ -47,10 +47,6 @@ static FILTER_PARAM Eq2Param={8,{"contrast","brightness","saturation",
                                 "gamma","gamma_weight","rgamma","ggamma","bgamma"}};
 
 /*=====================================*/
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
-static void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
-  unsigned int w, unsigned int h);
-#endif
 /*=====================================*/
 class  ADMVideoEq2:public AVDMGenericVideoStream
 {
@@ -277,7 +273,7 @@ void create_lut (oneSetting *par)
 }
 
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
-static
+
 void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
   unsigned int w, unsigned int h)
 {
@@ -289,7 +285,8 @@ void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
   short    int contvec[4];
   w3=w>>3;
 //  printf("\nmmx: src=%p dst=%p w=%d h=%d ds=%d ss=%d\n",src,dst,w,h,dstride,sstride);
-
+  if(par->g!=1.0) return apply_lut(par,dst,src,w,h);
+  //printf("MMX\n");
   contrast = (int) (par->c * 256 * 16);
   brightness = ((int) (100.0 * par->b + 100.0) * 511) / 200 - 128 - contrast / 32;
 

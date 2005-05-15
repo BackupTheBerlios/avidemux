@@ -52,4 +52,10 @@ void apply_lut (oneSetting *par, unsigned char *dst, unsigned char *src,
   unsigned int w, unsigned int h);
 void create_lut (oneSetting *par);
 
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+void affine_1d_MMX (oneSetting *par, unsigned char *dst, unsigned char *src,
+                unsigned int w, unsigned int h);
+#endif
+
+
 #endif

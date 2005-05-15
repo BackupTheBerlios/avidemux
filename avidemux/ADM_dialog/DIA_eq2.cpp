@@ -53,7 +53,7 @@
 #include "prototype.h"
 #include "ADM_assert.h"
 
-
+#include "ADM_toolkit/ADM_cpuCap.h"
 
 
 
@@ -224,9 +224,20 @@ uint8_t *src,*dst;
 uint32_t stride;
 
         update_lut(&mySettings,&myEq2);
-        apply_lut(&(mySettings.param[0]),YPLANE(imgdisplay),YPLANE(imgsrc),w,h);
-        apply_lut(&(mySettings.param[2]),UPLANE(imgdisplay),UPLANE(imgsrc),w>>1,h>>1);
-        apply_lut(&(mySettings.param[1]),VPLANE(imgdisplay),VPLANE(imgsrc),w>>1,h>>1);       
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+        if(CpuCaps::hasMMX())
+        {
+                affine_1d_MMX(&(mySettings.param[0]),YPLANE(imgdisplay),YPLANE(imgsrc),w,h);
+                affine_1d_MMX(&(mySettings.param[2]),UPLANE(imgdisplay),UPLANE(imgsrc),w>>1,h>>1);
+                affine_1d_MMX(&(mySettings.param[1]),VPLANE(imgdisplay),VPLANE(imgsrc),w>>1,h>>1);       
+        }
+        else
+#endif
+        {
+                apply_lut(&(mySettings.param[0]),YPLANE(imgdisplay),YPLANE(imgsrc),w,h);
+                apply_lut(&(mySettings.param[2]),UPLANE(imgdisplay),UPLANE(imgsrc),w>>1,h>>1);
+                apply_lut(&(mySettings.param[1]),VPLANE(imgdisplay),VPLANE(imgsrc),w>>1,h>>1);       
+        }
 
         // copy Y half
     dst=YPLANE(imgdisplay);
