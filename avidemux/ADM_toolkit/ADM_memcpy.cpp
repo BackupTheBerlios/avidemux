@@ -41,6 +41,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ADM_library/default.h"
+#include "ADM_cpuCap.h"
 extern "C"
 {
         #include "adm_lavcodec/dsputil.h"
@@ -48,8 +50,6 @@ extern "C"
 
 
 #include "ADM_assert.h"
-#include "ADM_library/default.h"
-#include "ADM_cpuCap.h"
 
 adm_fast_memcpy myMemcpy=NULL;
 /* Original comments from mplayer (file: aclib.c)
