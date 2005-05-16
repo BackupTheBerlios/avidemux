@@ -30,6 +30,8 @@ else
 
 if BUILD_PPC
 EXTEND_PPC=ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c 
+else
+EXTEND_PPC=
 endif
 
 endif
@@ -41,7 +43,7 @@ fft_sse.o:i386/fft_sse.c
 vp3dsp_sse2.o:i386/vp3dsp_sse2.c
 	$(CC) -o $@ $< -c  $(CFLAGS) $(all_includes)   -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -msse
 
-libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) $(EXTEND_A64) ac3enc.c $(EXTEND_AMR) \
+libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c $(EXTEND_AMR) \
 		adpcm.c 	allcodecs.c 	cyuv.c 	dsputil.c 	dv.c \
 		error_resilience.c 	eval.c 	fdctref.c 	fft.c 	h263.c 	h263dec.c 	huffyuv.c 	imgconvert.c \
 		imgresample.c 	jfdctfst.c 	jfdctint.c 	jrevdct.c 	mace.c 	mdct.c 	mem.c 	mjpeg.c \
