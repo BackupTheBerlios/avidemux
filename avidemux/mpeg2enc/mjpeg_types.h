@@ -1,5 +1,5 @@
 /*
-    $Id: mjpeg_types.h,v 1.1 2004/01/30 19:39:36 mean Exp $
+    $Id$
 
     Copyright (C) 2000 Herbert Valerio Riedel <hvr@gnu.org>
 

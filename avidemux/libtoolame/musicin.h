@@ -2,7 +2,7 @@
  * ISO MPEG Audio Subgroup Software Simulation Group (1996)
  * ISO 13818-3 MPEG-2 Audio Encoder - Lower Sampling Frequency Extension
  *
- * $Id: musicin.h,v 1.1 2004/01/30 19:39:45 mean Exp $
+ * $Id$
  *
  * $Log: musicin.h,v $
  * Revision 1.1  2004/01/30 19:39:45  mean

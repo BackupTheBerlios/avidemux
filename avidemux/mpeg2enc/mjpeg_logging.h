@@ -1,5 +1,5 @@
 /*
-    $Id: mjpeg_logging.h,v 1.1 2004/01/30 19:39:37 mean Exp $
+    $Id$
 
     Copyright (C) 2000 Herbert Valerio Riedel <hvr@gnu.org>
 

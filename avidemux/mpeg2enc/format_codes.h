@@ -1,5 +1,5 @@
 /*
-    $Id: format_codes.h,v 1.1 2004/01/30 19:39:36 mean Exp $
+    $Id$
 
     Copyright (C) 2001 Andrew Stevens <andrew.stevens@planet-interkom.de>
 
