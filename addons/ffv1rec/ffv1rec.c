@@ -58,6 +58,7 @@ static void parseRcFile( void );
 int recordaudio=1;
 int quiet;
 pthread_t pid_audio, pid_video, pid_buffer, pid_write;
+int CpuCaps::myCpuCaps=0;
 
 typedef  void *PTHR(void *);
 
