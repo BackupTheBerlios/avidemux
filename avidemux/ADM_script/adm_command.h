@@ -63,7 +63,9 @@ int scriptClearSegments(int n, Arg *srgs);
 int scriptAddSegment(int n, Arg *srgs);
 int scriptOutputFormat(int n, Arg *srgs);
 
-// All comment must be in lower case!
+// All comment must be in lower case!!!!!!!!!!!
+// All comment must be in lower case!!!!!!!!!!!
+// All comment must be in lower case!!!!!!!!!!!
 // A number of param > 0x100 means variable, at least yy with value = yy+0x100
 // For video, we need at least one : The video filter name
 static const admCommand myCommands[]=
@@ -72,8 +74,8 @@ static const admCommand myCommands[]=
 	{"load", 		scriptLoad,1,APM_STRING},
 	{"append",		scriptAppend,1,APM_STRING},
 	
-        {"clearSegments",       scriptClearSegments,0},
-        {"addSegment",          scriptAddSegment,3,APM_NUM,APM_NUM,APM_NUM},
+        {"clearsegments",       scriptClearSegments,0},
+        {"addsegment",          scriptAddSegment,3,APM_NUM,APM_NUM,APM_NUM},
 
 	{"videoprocess",	scriptVideoProcess,1,APM_NUM},
 	{"audioprocess",	scriptAudioProcess,1,APM_NUM},

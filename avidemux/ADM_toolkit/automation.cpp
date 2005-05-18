@@ -68,7 +68,7 @@ extern int GUI_loadMP3(char *name);
 extern int A_loadAC3(char *name);
 extern int A_loadWave(char *name);
 extern void GUI_Quiet( void);
-extern void parseScript(char *name);
+extern uint8_t parseScript(char *name);
 extern void GUI_Verbose( void);
 extern void audioFilter_SetBitrate( int i);
 extern void A_Save(char *name);
@@ -155,7 +155,7 @@ AUTOMATON reaction_table[]=
 {	
 		{"list",		0,"list functions available for scripting",(one_arg_type)ADS_commandList},
 		{"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
-		{"run",			1,"load and run a script",		parseScript},
+		{"run",			1,"load and run a script",		(one_arg_type)parseScript},
 		{"audio-process",	0,"activate audio processing",		call_audioproc},
 		{"audio-normalize",	0,"activate normalization",		call_normalize},
 		{"audio-downsample",	0,"activate 48->44 downsampling",	call_downsample},

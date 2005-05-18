@@ -142,7 +142,58 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 
 
 }
+/*______________________________________________
+        Save the project as a script
+______________________________________________*/
+uint8_t ADM_Composer::saveAsScript (char *name)
+{
+printf("\n **Saving script project **\n");
+  char *    tmp;
 
+  if (!_nb_segment)
+    return 1;
+
+  FILE *    fd;
+
+  if( !(fd = fopen (name, "wt")) ){
+    fprintf(stderr,"\ncan't open script file \"%s\" for writing: %u (%s)\n",
+                   name, errno, strerror(errno));
+    return 0;
+  }
+
+// Save source and segment
+//______________________________________________
+  fprintf (fd, "#!ADM000\n");
+  fprintf (fd, "#--automatically built--\n");
+  fprintf (fd,"# %02ld videos source \n", _nb_video);
+  for (uint32_t i = 0; i < _nb_video; i++)
+    {
+        if(!i)
+                fprintf (fd, "load(\"%s\");\n", _videos[i]._aviheader->getMyName ());
+        else
+        fprintf (fd, "append(\"%s\");\n", _videos[i]._aviheader->getMyName ());
+    }
+  
+  fprintf (fd,"#%02ld segments\n", _nb_segment);
+  fprintf (fd,"clearSegments();\n");
+
+ 
+
+for (uint32_t i = 0; i < _nb_segment; i++)
+    {
+        uint32_t src,start,nb;
+                src=_segments[i]._reference;
+                start=_segments[i]._start_frame;
+                nb=_segments[i]._nb_frames;
+          fprintf (fd, "addSegment(%lu,%lu,%lu);\n",src,start,nb);
+    }
+  // All done
+  fclose (fd);
+  
+  return 1;
+
+
+}
 
 //______________________________________________
 // Save the config, including name, segment etc...

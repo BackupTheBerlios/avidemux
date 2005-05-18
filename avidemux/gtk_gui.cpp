@@ -152,7 +152,7 @@ extern uint8_t DIA_about( void );
 extern uint8_t DIA_RecentFiles( char **name );
 extern void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format );
 static void A_videoCheck( void);
-extern void parseScript(char *scriptname);
+extern uint8_t parseScript(char *scriptname);
 int A_saveDVDPS(char *name);
 static void	A_setPostproc( void );
 extern uint8_t ogmSave(char  *name);
@@ -215,7 +215,7 @@ void HandleAction (Action action)
 		return;
     
     case ACT_RunScript:
-    			 GUI_FileSelRead ("Select script to load ", parseScript);
+    			 GUI_FileSelRead ("Select script to load ",(SELFILE_CB *) parseScript);
     		return;
 		
     case ACT_RecentFiles:
@@ -1960,7 +1960,11 @@ _abt:
 void
 A_saveWorkbench (char *name)
 {
+#if 0
   video_body->saveWorbench (name);
+#else
+  video_body->saveAsScript(name);
+#endif
   if( actual_workbench_file )
      ADM_dealloc(actual_workbench_file);
   actual_workbench_file = ADM_strdup(name);

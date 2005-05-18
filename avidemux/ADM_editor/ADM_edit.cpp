@@ -51,6 +51,7 @@ int DIA_mpegIndexer (char **mpegFile, char **indexFile, int *aid,
 void DIA_indexerPrefill(char *name);
 extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
 extern uint8_t loadVideoCodecConf( char *name);
+extern uint8_t parseScript(char *name);
 //
 //
 int filterDefaultPPType=3;
@@ -339,6 +340,9 @@ UNUSED_ARG(mode);
 	case WorkBench_FileType:
 
   		return loadWorbench(name);
+        case Script_FileType:
+                return parseScript(name);
+                
     default:
       if (type == Unknown_FileType)
 	{
@@ -735,7 +739,7 @@ uint8_t ADM_Composer::addSegment(uint32_t source,uint32_t start, uint32_t nb)
                 printf("[editor]:start out of bound %d/%d\n",start,_videos[source]._nb_video_frames);
                  return 0;
         }
-        if(_videos[source]._nb_video_frames<=start+nb)
+        if(_videos[source]._nb_video_frames<start+nb)
         {
                 printf("[editor]:end out of bound %d/%d\n",start+nb,_videos[source]._nb_video_frames);
                  return 0;
@@ -745,8 +749,9 @@ uint8_t ADM_Composer::addSegment(uint32_t source,uint32_t start, uint32_t nb)
         seg->_reference=source;
         seg->_start_frame=start;
         seg->_nb_frames=nb;
-        updateAudioTrack (_nb_segment);
         _nb_segment++;
+        updateAudioTrack (_nb_segment-1);
+        
 
         return 1;
 }

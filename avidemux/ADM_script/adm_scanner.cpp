@@ -57,9 +57,9 @@ typedef struct scriptVar
 static scriptVar myVars[ADM_MAX_VAR];
 uint32_t nbVar=0;
 //_____________________________________
-void parseScript(char *scriptname);
+uint8_t parseScript(char *scriptname);
 //_____________________________________
-void parseScript(char *scriptname)
+uint8_t parseScript(char *scriptname)
 {
 int i;
 	//yydebug=1;
@@ -71,7 +71,7 @@ int i;
 	if(!yyin) 
 	{
 		GUI_Alert("Cannot open that file");
-		exit(0) ;	
+		return 0;	
 	}
 	pushed=0;
 	i=yyparse();
@@ -79,7 +79,7 @@ int i;
 	if(i)
 	{
 		printf("Error %s at line %d\n",scriptError,yylineno);
-		exit(0);
+		return 0;
 	}
 	// Now do it for real
 	//_______________________________________
@@ -89,7 +89,7 @@ int i;
 	if(!yyin) 
 	{
 		GUI_Alert("Cannot open that file");
-		exit(0) ;	
+		return 0;	
 	}
 	pushed=0;
 	GUI_Quiet();
@@ -100,9 +100,10 @@ int i;
 		{
 			printf("Parsing successfull\n");
 	//		exit(0); ;
+                        return 1;
 		}
 	
-	
+	return 0;
 	//exit(-1) ;
 }
 //______________________________

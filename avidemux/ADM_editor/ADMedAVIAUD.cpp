@@ -289,7 +289,11 @@ uint8_t ADM_Composer::audioGoToFn (uint32_t seg, uint32_t fn, uint32_t * noff)
 // since we got the frame we can find the segment
 
 
-  ADM_assert (seg < _nb_segment);
+  if (seg >= _nb_segment)
+        {
+                printf("[audioGotoFn] asked : %d max :%d\n",seg,_nb_segment);
+                ADM_assert(seg<_nb_segment);
+        }
   ADM_assert (_videos[SEG]._audiostream);
   _audioseg=seg;
 #undef AS

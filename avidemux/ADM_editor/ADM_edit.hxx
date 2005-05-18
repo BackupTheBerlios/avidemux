@@ -51,6 +51,7 @@ typedef enum
 		Ogg_FileType=9,
 		_3GPP_FileType=10,
 		VCodec_FileType=11,
+                Script_FileType=12,
 		DUMMY_FILETYPE=99
 }fileType;
 
@@ -152,6 +153,7 @@ class ADM_Composer
   				virtual 			~ADM_Composer();
   						void		clean( void );
   						void		dumpSeg(void);
+                                                uint8_t         saveAsScript (char *name);
 						uint8_t 	saveWorbench(char *name)      ;
 						uint8_t 	loadWorbench(char *name)      ;
 						uint8_t     resetSeg( void );

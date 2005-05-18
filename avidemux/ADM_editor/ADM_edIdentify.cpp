@@ -177,6 +177,15 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
       		return 1;
 
     }
+    if(fourCC::check(id,(uint8_t *)"#!AD"))
+        {
+                printf (" \n ADM script file detected..\n");
+                *type=Script_FileType;
+                return 1;
+        }
+      //
+      //        Warning, from here we change endianness
+      //
 	id=R32(magic[1]);
     if(fourCC::check(id,(uint8_t *)"ftyp") ||
     	fourCC::check(id,(uint8_t *)"pnot") ||
@@ -190,7 +199,7 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
       		return 1;
 
     }
-
+      
   printf ("\n unrecognized file detected...\n");
   fourCC::print(magic[0]); printf("\n");
   fourCC::print(magic[1]);
