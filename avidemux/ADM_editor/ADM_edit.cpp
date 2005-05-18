@@ -137,13 +137,13 @@ uint8_t ADM_Composer::getAudioExtra (uint32_t * l, uint8_t ** d)
 /**
 	Purge all segments
 */
-void
-ADM_Composer::deleteAllSegments (void)
+uint8_t ADM_Composer::deleteAllSegments (void)
 {
 
 
   memset (_segments, 0, sizeof (_segments));
   _nb_segment = 0;
+  return 1;
 
 }
 
@@ -711,7 +711,45 @@ uint8_t ADM_Composer::cleanup (void)
   _total_frames = 0;
   return 1;
 }
+/*
+        param:
+                source : source #
+                start : start frame in source #
+                nb    : nb frame to copy into segment
+*/
+uint8_t ADM_Composer::addSegment(uint32_t source,uint32_t start, uint32_t nb)
+{
+        // do some sanity check
+        if(_nb_segment==MAX_SEG-1)
+        {
+                printf("[editor] Too many segments %d\n",_nb_segment);
+                return 0;
+        }
+        if(_nb_video<=source)
+        {
+                printf("[editor]: No such source %d/%d\n",source,_nb_video);
+                 return 0;
+        }
+        if(_videos[source]._nb_video_frames<=start)
+        {
+                printf("[editor]:start out of bound %d/%d\n",start,_videos[source]._nb_video_frames);
+                 return 0;
+        }
+        if(_videos[source]._nb_video_frames<=start+nb)
+        {
+                printf("[editor]:end out of bound %d/%d\n",start+nb,_videos[source]._nb_video_frames);
+                 return 0;
+        }
+        // ok, let's go
+        _SEGMENT *seg=&(_segments[_nb_segment]);
+        seg->_reference=source;
+        seg->_start_frame=start;
+        seg->_nb_frames=nb;
+        updateAudioTrack (_nb_segment);
+        _nb_segment++;
 
+        return 1;
+}
 /**
 ______________________________________________________
 //  Remove frames , the frame are given as seen by GUI

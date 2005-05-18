@@ -134,8 +134,7 @@ class ADM_Composer
 						uint8_t 	removeFrom( uint32_t from, uint32_t seg,uint8_t included);
 						uint8_t 	checkInSeg( uint32_t seg, uint32_t frame);
 						uint8_t 	sanityCheck( void);
-				       		uint8_t  	updateAudioTrack(uint32_t seg);
-					   	void 		deleteAllSegments(void);
+				       		uint8_t  	updateAudioTrack(uint32_t seg);			   	
 						void 		deleteAllVideos(void );
 
 						uint8_t 	getMagic(char *name,uint32_t *magic);
@@ -143,6 +142,8 @@ class ADM_Composer
 						uint32_t 	searchForwardSeg(uint32_t startframe);
 
   public:
+                                                uint8_t addSegment(uint32_t source,uint32_t start, uint32_t nb);
+                                                uint8_t deleteAllSegments(void);
   						uint8_t	activateCache( void ){ _cached=1;_lastseg=0xffffff;return 1;}
 						uint8_t	flushCache( void ){ _lastseg=0xffffff;return 1;}
 						uint8_t	desactivateCache( void ){ _cached=0;return 1;}

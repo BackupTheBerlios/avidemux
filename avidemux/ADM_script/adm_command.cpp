@@ -64,8 +64,30 @@ const ADM_CONTAINER container[]=
   MK_CONT(FMT_DUMMY)  
 };    
 #define NB_CONT sizeof(container)/sizeof(ADM_CONTAINER)
+//*************************************
+int scriptClearSegments(int n, Arg *srgs)
+{
+        if(n!=0)
+                {
+                        return 0;
+                }
+        return video_body->deleteAllSegments();
+}
+/*
+        Param #1, source nb
+        Param #2, start frame
+        Param #3  Nb Frame
+*/
+int scriptAddSegment(int n, Arg *args)
+{
+        if(n!=3) return 0;
+        return video_body->addSegment(args[0].arg.integer,
+                                        args[1].arg.integer,
+                                        args[2].arg.integer);
 
+}
 
+//*************************************
 extern uint8_t indexMpeg(char *mpeg,char *file,uint8_t aid);
 int scriptIndexMpeg(int n,Arg *args)
 {

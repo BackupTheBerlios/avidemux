@@ -59,6 +59,8 @@ int scriptSaveOgm(int n, Arg *args);
 int scriptIndexMpeg(int n, Arg *args);
 int scriptScanBlackFrames(int n, Arg *args);
 
+int scriptClearSegments(int n, Arg *srgs);
+int scriptAddSegment(int n, Arg *srgs);
 int scriptOutputFormat(int n, Arg *srgs);
 
 // All comment must be in lower case!
@@ -70,6 +72,9 @@ static const admCommand myCommands[]=
 	{"load", 		scriptLoad,1,APM_STRING},
 	{"append",		scriptAppend,1,APM_STRING},
 	
+        {"clearSegments",       scriptClearSegments,0},
+        {"addSegment",          scriptAddSegment,3,APM_NUM,APM_NUM,APM_NUM},
+
 	{"videoprocess",	scriptVideoProcess,1,APM_NUM},
 	{"audioprocess",	scriptAudioProcess,1,APM_NUM},
 	
