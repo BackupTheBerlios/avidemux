@@ -63,6 +63,17 @@ const ADM_CONTAINER container[]=
   MK_CONT(AVI_UNP),
   MK_CONT(FMT_DUMMY)  
 };    
+
+int scriptMono2Stereo(int n, Arg *args)
+{
+        return audioFilterMono2Stereo(args[0].arg.integer);
+}
+int scriptStereo2mono(int n, Arg *args)
+{
+        return audioFilterStereo2Mono(args[0].arg.integer);
+}
+
+
 #define NB_CONT sizeof(container)/sizeof(ADM_CONTAINER)
 //*************************************
 int scriptClearSegments(int n, Arg *srgs)
@@ -235,6 +246,12 @@ int scriptLoadCodec(int n,Arg *args)
 	return loadVideoCodecConf(args[0].arg.string);
 }
 //_______________________
+
+int scriptPal2Film(int n,Arg *args)
+{
+        return audioFilterPal2Film(args[0].arg.integer);
+}
+
 int scriptFilm2Pal(int n,Arg *args)
 {
 	return audioFilterFilm2Pal(args[0].arg.integer);
@@ -380,7 +397,8 @@ int scriptVideoProcess(int n,Arg *args)
 //________________________________________________
 int scriptAudioNormalize(int n,Arg *args)
 {	
-	audioFilterNormalize(1);
+        
+	audioFilterNormalize( args[0].arg.integer);
 	return 1;
 }
 //________________________________________________

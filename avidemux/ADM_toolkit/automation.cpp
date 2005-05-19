@@ -29,6 +29,7 @@
 
 
 #include <gtk/gtk.h>
+#include <ctype.h>
 
 
 #include "interface.h"
@@ -103,7 +104,7 @@ static void call_videocodec(char *p) ;
 static void call_videoconf(char *p) ;
 static int searchReactionTable(char *string);
 static void call_setPP(char *v,char *s);
-static void call_toolame(char *p);
+
 extern void updateLoaded(void );
 extern void A_requantize2( float percent, uint32_t quality, char *out_name );
 static void save(char*name);
@@ -126,7 +127,7 @@ static int call_saveDVD(char *a);
 static int set_output_format(const char *str);
 static void setVar(char *in);
 //
-
+uint8_t trueFalse(char *p);
 //_________________________________________________________________________
 
 extern uint8_t audioShift;
@@ -157,8 +158,8 @@ AUTOMATON reaction_table[]=
 		{"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
 		{"run",			1,"load and run a script",		(one_arg_type)parseScript},
 		{"audio-process",	0,"activate audio processing",		call_audioproc},
-		{"audio-normalize",	0,"activate normalization",		call_normalize},
-		{"audio-downsample",	0,"activate 48->44 downsampling",	call_downsample},
+		{"audio-normalize",	1,"activate normalization",		call_normalize},
+		{"audio-downsample",	1,"activate 48->44 downsampling",	call_downsample},
 		{"audio-resample",	1,"resample to x hz",			call_resample},
 		{"audio-mono2stereo",	0,"channel: convert mono to stereo",	call_mono2stereo},
 		{"audio-stereo2mono",	0,"channel: convert stereo tp mono",	call_stereo2mono},
@@ -202,7 +203,7 @@ AUTOMATON reaction_table[]=
 		{"audio-bitrate",	1,"set audio encoding bitrate",	call_audiobitrate},
 		{"fps",	1	,"set frames per second",	call_fps},
 		{"audio-codec",		1,"set audio codec (MP2/MP3/AC3/NONE/TOOLAME)",call_audiocodec},
-		{"audio-toolame",	1,"pipe audio to toolame and save to file",call_toolame},
+		
 		{"video-codec",		1,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD)",				call_videocodec},
 		{"video-conf",		1	,"set video codec conf (cq=q|cbr=br|2pass=size)[,mbr=br][,matrix=(0|1|2|3)]",				call_videoconf},
 //		{"2pass-log",		1	,"select the log file for 2 passes mode",				encoderSetLogFile},
@@ -334,8 +335,7 @@ void call_audioproc   (char *p) { UNUSED_ARG(p); HandleAction(ACT_AudioModeProce
 void call_videoproc   (char *p) { UNUSED_ARG(p); HandleAction(ACT_VideoModeProcess); }
 
 
-extern  int  audioNormalizeMode;
-extern void audioForceDownSample( void );
+
 extern void audioSetResample(uint32_t fq);
 int call_saveDVD(char *a)
 {
@@ -345,15 +345,25 @@ int call_saveDVD(char *a)
 
 void call_normalize   (char *p)
 {
-	audioNormalizeMode=1; // Ugly
-	aprintf("normalize\n");
-	 UNUSED_ARG(p);
+        audioFilterNormalize(trueFalse(p));	
 }
 void call_downsample    (char *p)
 {
-	audioForceDownSample();
-	printf("downsample\n");
-	 UNUSED_ARG(p); 
+	audioFilterDownsample(trueFalse(p));	
+}
+void call_resample    (char *p)
+{
+int fq;
+        fq=atoi(p);
+        if(fq>1000)
+        {
+                audioSetResample(fq);
+                printf("resample to %d\n",fq);
+        }
+        else
+        {
+                printf("*** INVALID FREQUENCY***\n");
+        }        
 
 }
 // The form is name=value
@@ -378,21 +388,7 @@ char *equal;
                 printf("Warning setvar failed\n");        
 
 }
-void call_resample    (char *p)
-{
-int fq;
-	fq=atoi(p);
-	if(fq>1000)
-	{
-		audioSetResample(fq);
-		printf("resample to %d\n",fq);
-	}
-	else
-	{
-		printf("*** INVALID FREQUENCY***\n");
-	}	 
 
-}
 
 
 
@@ -540,10 +536,6 @@ void save(char*name)
 	A_Save(name);
 }
 
-void call_toolame(char *file)
-{
-	A_Pipe(P_TOOLAME,file);
-}
 
 void set_autoindex(char *p){
 	UNUSED_ARG(p);
@@ -618,7 +610,7 @@ int set_output_format(const char *str){
 	*/
 	map.type = APM_STRING;
 	map.arg.string  = (char *)ADM_alloc(strlen(str)+1);
-	assert( map.arg.string );
+	ADM_assert( map.arg.string );
 	strcpy( map.arg.string, str );
 	rc = scriptOutputFormat(-1,&map);
 	ADM_dealloc( map.arg.string );
@@ -632,5 +624,33 @@ void call_mono2stereo(char *p){
 void call_stereo2mono(char *p){
    audioFilterStereo2Mono(1);
 }
+/*
+        return 0 if p is 0 or false or off
+        else 1
 
+*/
+uint8_t trueFalse(char *p)
+{
+int notdigit=0;
+        if(!p) return 0; // should not happen...
+
+        int l=strlen(p);
+        for(int i=0;i<l;i++) if(!isdigit(p[i])) notdigit=1;
+        if(!notdigit) // looks like a digit
+        {
+                l=atoi(p);
+                if(l) return 1;
+                return 0;
+        }
+        // It is a string
+        
+        uint8_t ret=1;
+
+        if(!strcasecmp(p,"off")) ret=0;
+        if(!strcasecmp(p,"false")) ret=0;
+
+        
+        return ret;
+
+}
 //EOF

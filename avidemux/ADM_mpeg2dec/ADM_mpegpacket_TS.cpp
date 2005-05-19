@@ -282,7 +282,7 @@ uint8_t  ADM_mpegDemuxerTransportStream::_nextPacket(void)
 		{
 			if(!parser->read32(TS_PACKET,_TSbuffer))
 			{
-					printf("\nTS: could not read!\n");
+					printf("\nTS: could not read! (%x)\n",_thisPid);
 					return 0;			
 			}
 			if(_TSbuffer[0]!=0x47)

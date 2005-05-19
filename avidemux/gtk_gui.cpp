@@ -469,6 +469,7 @@ void HandleAction (Action action)
   	case ACT_TimeChanged:
 			printf("TimeChanged\n");
       			break;			
+#if 0
     case ACT_Pipe2Lame:
 		 A_Pipe(P_TOOLAME);
     	break;
@@ -478,7 +479,7 @@ void HandleAction (Action action)
 case ACT_Pipe2Other:
 		 A_Pipe(P_OTHER);
     	break;
-
+#endif
     case ACT_SaveWork:
       GUI_FileSelWrite ("Select workbench to save ", A_saveWorkbench);
       break;
@@ -1982,7 +1983,7 @@ extern uint8_t DIA_pipe(char **cmd, char **param);
 extern uint8_t audioPiperLame(char *file, AVDMProcessAudioStream *in,char *extra);
 extern uint8_t audioPipeTo(char *file, AVDMProcessAudioStream *in,char *cmd, char *param);
 
-
+#if 0
 void A_Pipe(pipID who,char *outfile)
 {
   AVDMProcessAudioStream *in;
@@ -2063,7 +2064,7 @@ void A_Pipe(pipID who,char *outfile)
     GUI_Alert("Done!");
 
 }
-
+#endif
 /**
 	Return the # of byte to go from start frame to end frame
 

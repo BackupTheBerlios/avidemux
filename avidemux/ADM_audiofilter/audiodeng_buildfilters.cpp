@@ -88,25 +88,68 @@ extern void UI_PrintCurrentACodec( const char *s);
 #define MAX_AUDIO_FILTER 10
 static AVDMProcessAudioStream *filters[MAX_AUDIO_FILTER];
 static uint32_t filtercount = 0;
-
- int  audioNormalizeMode = 0;
- int  audioFreq=48000;
- RESAMPLING  audioResampleMode = RESAMPLING_NONE;
+static AUDIOENCODER  activeAudioEncoder=  AUDIOENC_NONE;
+/*----------------------------------*/
+static int  audioNormalizeMode = 0;
+static int  audioFreq=48000;
+static RESAMPLING  audioResampleMode = RESAMPLING_NONE;
 static int  audioDRC = 0;
-
-
+static FILMCONV audioFilmConv=FILMCONV_NONE;
+static CHANNELCONV audioChannelConv=CHANNELCONV_NONE;
+static int audioMP3mode = 0;
+static int audioMP3bitrate = 128;
+static ADM_LAME_PRESET audioMP3preset=ADM_LAME_PRESET_CBR;
 // These are globals for the moment
 int 	   audioShift = 0;
 int	   audioDelay=0;
+//************
+uint8_t audioGetNormalize(void)
+{
+        return audioNormalizeMode;
 
-FILMCONV audioFilmConv=FILMCONV_NONE;
-CHANNELCONV audioChannelConv=CHANNELCONV_NONE;
+}
+uint8_t audioGetDownsample(void)
+{
+        switch(audioResampleMode)
+        {
+        case RESAMPLING_CUSTOM:
+        case RESAMPLING_NONE: return 0;
+        case RESAMPLING_DOWNSAMPLING: return 1;
+        default: ADM_assert(0);
+        }
+        return 0;
+        
+}
+uint32_t audioGetResample(void)
+{
+      return audioFreq;
+        
+}
+uint32_t audioGetDelay(void)
+{
+        if(audioShift && audioDelay)
+        {
+                return audioDelay;
+                
+        }
+        return 0;
+}
+FILMCONV audioGetFpsConv(void)
+{
+        return audioFilmConv;
+}
+CHANNELCONV audioGetChannelConv(void)
+{
+        return audioChannelConv;
+}
 
-// MP3 parameters
- int audioMP3mode = 0, audioMP3bitrate = 128;
- ADM_LAME_PRESET audioMP3preset=ADM_LAME_PRESET_CBR;
+uint32_t audioGetBitrate(void)
+{
+        return audioMP3bitrate;
+} 
+/*----------------------------------*/
 //
-static AUDIOENCODER  activeAudioEncoder=  AUDIOENC_NONE;
+
 
 void audioCodecChanged(int newcodec)
 {
@@ -160,13 +203,23 @@ uint8_t audioFilterStereo2Mono(uint8_t onoff)
 		audioChannelConv=CHANNELCONV_NONE;
 	return 1;
 }
-
+RESAMPLING  audioGetResampling(void)
+{
+        return audioResampleMode;
+}
 uint8_t audioFilterFilm2Pal(uint8_t onoff)
 {
 	if(onoff) audioFilmConv=FILMCONV_FILM2PAL;
 	else audioFilmConv=FILMCONV_NONE;
 	return 1;
 }
+uint8_t audioFilterPal2Film(uint8_t onoff)
+{
+        if(onoff) audioFilmConv=FILMCONV_PAL2FILM;
+        else audioFilmConv=FILMCONV_NONE;
+        return 1;
+}
+
 void audioFilterDownsample(uint8_t onoff)
 {
 	if(onoff)

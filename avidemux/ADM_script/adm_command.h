@@ -43,6 +43,7 @@ int scriptSetMarkerB(int n,Arg *args);
 int scriptScanVbr(int n,Arg *args);
 int scriptAudioDelay(int n,Arg *args);
 int scriptFilm2Pal(int n,Arg *args);
+int scriptPal2Film(int n,Arg *args);
 int scriptAudioCodec(int n,Arg *args);
 int scriptLoadCodec(int n,Arg *args);
 int scriptSavejpeg(int n,Arg *args);
@@ -62,6 +63,9 @@ int scriptScanBlackFrames(int n, Arg *args);
 int scriptClearSegments(int n, Arg *srgs);
 int scriptAddSegment(int n, Arg *srgs);
 int scriptOutputFormat(int n, Arg *srgs);
+
+int scriptMono2Stereo(int n, Arg *srgs);
+int scriptStereo2mono(int n, Arg *srgs);
 
 // All comment must be in lower case!!!!!!!!!!!
 // All comment must be in lower case!!!!!!!!!!!
@@ -87,12 +91,17 @@ static const admCommand myCommands[]=
 	{"save",		scriptSave,1,APM_STRING},
 	{"saveogm",		scriptSaveOgm,1,APM_STRING},
 	
-	{"setformat",   scriptOutputFormat,1,APM_STRING},
-	{"normalize",		scriptAudioNormalize,1,APM_NUM},
-	{"downsample",		scriptAudioDownsample,1,APM_NUM},
-	{"resample",		scriptAudioResample,1,APM_NUM},
-	{"delay",		scriptAudioDelay,1,APM_NUM},
+	{"setformat",          scriptOutputFormat,1,APM_STRING},
+
+	{"audionormalize",	scriptAudioNormalize,1,APM_NUM},
+	{"audiodownsample",	scriptAudioDownsample,1,APM_NUM},
+	{"audioresample",	scriptAudioResample,1,APM_NUM},
+	{"audiodelay",		scriptAudioDelay,1,APM_NUM},
+        {"audiomono2stereo",    scriptMono2Stereo,1,APM_NUM},
+        {"audiostereo2mono",    scriptStereo2mono,1,APM_NUM},
+
 	{"film2pal",		scriptFilm2Pal,1,APM_NUM},
+        {"pal2film",            scriptPal2Film,1,APM_NUM},
 	
 	{"loadaudio",		scriptLoadAudio,2,APM_STRING,APM_STRING},
 	
