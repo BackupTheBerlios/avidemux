@@ -1034,7 +1034,11 @@ const char *videoCodecGetName( void )
 	printf("\n Mmmm get video  codec  name failed..\n");
 	return NULL;
 }
+char *videoCodecGetConf(void)
+{
+        
 
+}
 void initEncoders( void)
 {
 //		strcpy( TwoPassLogFile,"/tmp/Xvid2passLog");

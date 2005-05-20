@@ -164,8 +164,10 @@ printf("\n **Saving script project **\n");
 // Save source and segment
 //______________________________________________
   fprintf (fd, "#!ADM000\n");
-  fprintf (fd, "#--automatically built--\n\n");
-  fprintf (fd,"#** Video **\n");
+  fprintf (fd, "#--automatically built--\n");
+  fprintf (fd, "#--Project: %s\n\n",name);
+
+  fprintf (fd,"\n#** Video **\n");
   fprintf (fd,"# %02ld videos source \n", _nb_video);
   for (uint32_t i = 0; i < _nb_video; i++)
     {
@@ -190,11 +192,24 @@ for (uint32_t i = 0; i < _nb_segment; i++)
     }
 // Filter
 //___________________________
+        fprintf(fd,"\n#** Filters **\n");
+        filterSaveScriptFD(fd);
+// Video codec
+//___________________________
+uint8_t  *extraData ;
+uint32_t extraDataSize;
 
+        fprintf(fd,"\n#** Video Codec conf **\n");
+        videoCodecGetConf(&extraDataSize,&extraData);
+        //if(extraDataSize())
+        // Fixme
+        fprintf(fd,"videoCodec(%s,%s);\n",videoCodecGetName(),"CQ=4");
 // Audio
 //______________________________________________
    uint32_t delay;
-   fprintf(fd,"#** Audio **\n");
+   fprintf(fd,"\n#** Audio **\n");
+   fprintf(fd,"audioreset(1);\n",audioReset());
+
    fprintf(fd,"audiocodec(%s,%d);\n", audioCodecGetName(),audioGetBitrate()); 
    fprintf(fd,"audioprocess(%d);\n",audioProcessMode);
    fprintf(fd,"audionormalize(%d);\n",audioGetNormalize());         
@@ -204,27 +219,27 @@ for (uint32_t i = 0; i < _nb_segment; i++)
         {
                 case CHANNELCONV_2to1:  fprintf(fd,"audiostereo2mono(1);\n");break;
                 case CHANNELCONV_1to2:  fprintf(fd,"audiomono2stereo(1);\n");break;
-                case CHANNELCONV_NONE:  fprintf(fd,"audiomono2stereo(0);\n");break;
+                case CHANNELCONV_NONE: ;break;
                 default:ADM_assert(0);
         }     
    // Change fps ?
         switch(audioGetFpsConv())
         {
-                case FILMCONV_NONE:      fprintf(fd,"audiostereo2mono(1);\n");break;
-                case FILMCONV_PAL2FILM:  fprintf(fd,"audiomono2stereo(1);\n");break;
-                case FILMCONV_FILM2PAL:  fprintf(fd,"audiomono2stereo(0);\n");break;
+                case FILMCONV_NONE:      ;break;
+                case FILMCONV_PAL2FILM:  fprintf(fd,"pal2film(1);\n");break;
+                case FILMCONV_FILM2PAL:  fprintf(fd,"film2pal(1);\n");break;
                 default:ADM_assert(0);
         }
    // Resampling
         switch(audioGetResampling())
         {
-                case RESAMPLING_NONE:          fprintf(fd,"audiodownsample(0);\n");break;
+                case RESAMPLING_NONE:         ;break;
                 case RESAMPLING_DOWNSAMPLING:  fprintf(fd,"audiodownsample(1);\n");break;
                 case RESAMPLING_CUSTOM:        fprintf(fd,"audioresample(%lu);\n",audioGetResample());break;
                 default:ADM_assert(0);
         }
         
-
+  fprintf(fd,"\n#End of script\n");
   // All done
   fclose (fd);
   

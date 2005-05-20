@@ -102,6 +102,15 @@ static ADM_LAME_PRESET audioMP3preset=ADM_LAME_PRESET_CBR;
 // These are globals for the moment
 int 	   audioShift = 0;
 int	   audioDelay=0;
+//**********
+uint8_t audioReset(void )
+{
+        audioNormalizeMode=0;
+        audioResampleMode = RESAMPLING_NONE;
+        audioFilmConv=FILMCONV_NONE;
+        audioChannelConv=CHANNELCONV_NONE;
+        return 1;
+}
 //************
 uint8_t audioGetNormalize(void)
 {

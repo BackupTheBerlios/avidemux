@@ -451,6 +451,11 @@ FILE *f;
 		{ 	GUI_Alert("Cannot write file!");
 			return;
 		}
+                filterSaveScriptFD(f);
+                fclose(f);
+}
+void filterSaveScriptFD(FILE *f)
+{
 		for(int i=1;i<nb_active_filter;i++)
 		{
 			VF_FILTERS tag=videofilters[i].tag;
@@ -478,6 +483,6 @@ FILE *f;
 			fprintf(f,");\n");			
 		
 		}
-		fclose(f);
+		
 }		
 // EOF
