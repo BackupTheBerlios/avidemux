@@ -81,7 +81,8 @@ extern "C" {
 }
 #endif
 
-#include "ADM_video/swscale.h"
+#include "MPlayer_pp/img_format.h"
+#include "MPlayer_pp/swscale.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
@@ -387,6 +388,7 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
                 }// end while
         }
   }     
+  return 1;
 }
 vobSubBitmap::vobSubBitmap(uint32_t w, uint32_t h)
 {

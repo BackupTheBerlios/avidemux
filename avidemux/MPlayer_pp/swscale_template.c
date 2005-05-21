@@ -754,26 +754,35 @@
 			" jb 1b				\n\t"
 #define WRITEYUY2(dst, dstw, index)  REAL_WRITEYUY2(dst, dstw, index)
 
+
 static inline void RENAME(yuv2yuvX)(SwsContext *c, int16_t *lumFilter, int16_t **lumSrc, int lumFilterSize,
 				    int16_t *chrFilter, int16_t **chrSrc, int chrFilterSize,
 				    uint8_t *dest, uint8_t *uDest, uint8_t *vDest, int dstW, int chrDstW)
 {
 #ifdef HAVE_MMX
-	long int xchrDstW=chrDstW;
-	long int xdstW=dstW;
 	if(uDest != NULL)
 	{
 		asm volatile(
 				YSCALEYUV2YV12X(0, CHR_MMX_FILTER_OFFSET)
 				:: "r" (&c->redDither),
-				"r" (uDest), "m" (xchrDstW)
+				"r" (uDest),
+#ifdef ARCH_X86_64				
+			       	"m" (chrDstW)
+#else
+			       	"m" ((long)chrDstW)
+#endif				
 				: "%"REG_a, "%"REG_d, "%"REG_S
 			);
 
 		asm volatile(
 				YSCALEYUV2YV12X(4096, CHR_MMX_FILTER_OFFSET)
 				:: "r" (&c->redDither),
-				"r" (vDest), "m" (xchrDstW)
+				"r" (vDest),
+#ifdef ARCH_X86_64				
+			       	"m" (chrDstW)
+#else
+			       	"m" ((long)chrDstW)
+#endif				
 				: "%"REG_a, "%"REG_d, "%"REG_S
 			);
 	}
@@ -781,7 +790,12 @@ static inline void RENAME(yuv2yuvX)(SwsContext *c, int16_t *lumFilter, int16_t *
 	asm volatile(
 			YSCALEYUV2YV12X(0, LUM_MMX_FILTER_OFFSET)
 			:: "r" (&c->redDither),
-			   "r" (dest), "m" (xdstW)
+			   "r" (dest),
+#ifdef ARCH_X86_64				
+			       	"m" (dstW)
+#else
+			       	"m" ((long)dstW)
+#endif				
 			: "%"REG_a, "%"REG_d, "%"REG_S
 		);
 #else
@@ -796,7 +810,7 @@ yuv2yuvXinC(lumFilter, lumSrc, lumFilterSize,
 #endif //!HAVE_ALTIVEC
 #endif
 }
-#if 0
+
 static inline void RENAME(yuv2nv12X)(SwsContext *c, int16_t *lumFilter, int16_t **lumSrc, int lumFilterSize,
 				     int16_t *chrFilter, int16_t **chrSrc, int chrFilterSize,
 				     uint8_t *dest, uint8_t *uDest, int dstW, int chrDstW, int dstFormat)
@@ -805,7 +819,7 @@ yuv2nv12XinC(lumFilter, lumSrc, lumFilterSize,
 	     chrFilter, chrSrc, chrFilterSize,
 	     dest, uDest, dstW, chrDstW, dstFormat);
 }
-#endif
+
 static inline void RENAME(yuv2yuv1)(int16_t *lumSrc, int16_t *chrSrc,
 				    uint8_t *dest, uint8_t *uDest, uint8_t *vDest, int dstW, int chrDstW)
 {
@@ -870,7 +884,6 @@ static inline void RENAME(yuv2yuv1)(int16_t *lumSrc, int16_t *chrSrc,
 /**
  * vertical scale YV12 to RGB
  */
-#if 0 //MEANX
 static inline void RENAME(yuv2packedX)(SwsContext *c, int16_t *lumFilter, int16_t **lumSrc, int lumFilterSize,
 				    int16_t *chrFilter, int16_t **chrSrc, int chrFilterSize,
 			    uint8_t *dest, int dstW, int dstY)
@@ -980,8 +993,7 @@ static inline void RENAME(yuv2packedX)(SwsContext *c, int16_t *lumFilter, int16_
 		break;
 	}
 }
-#endif
-#if 0
+
 /**
  * vertical bilinear scale YV12 to RGB
  */
@@ -1293,11 +1305,10 @@ FULL_YSCALEYUV2RGB
 #endif //HAVE_MMX
 YSCALE_YUV_2_ANYRGB_C(YSCALE_YUV_2_RGB2_C, YSCALE_YUV_2_PACKED2_C)
 }
-#endif
+
 /**
  * YV12 to RGB without scaling or interpolating
  */
-#if 0
 static inline void RENAME(yuv2packed1)(SwsContext *c, uint16_t *buf0, uint16_t *uvbuf0, uint16_t *uvbuf1,
 			    uint8_t *dest, int dstW, int uvalpha, int dstFormat, int flags, int y)
 {
@@ -1490,7 +1501,7 @@ static inline void RENAME(yuv2packed1)(SwsContext *c, uint16_t *buf0, uint16_t *
 		YSCALE_YUV_2_ANYRGB_C(YSCALE_YUV_2_RGB1B_C, YSCALE_YUV_2_PACKED1B_C)
 	}
 }
-#endif
+
 //FIXME yuy2* can read upto 7 samples to much
 
 static inline void RENAME(yuy2ToY)(uint8_t *dst, uint8_t *src, int width)
@@ -1621,8 +1632,6 @@ static inline void RENAME(uyvyToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1,
 
 static inline void RENAME(bgr32ToY)(uint8_t *dst, uint8_t *src, int width)
 {
-#ifdef HAVE_MMXFIXME
-#else
 	int i;
 	for(i=0; i<width; i++)
 	{
@@ -1632,13 +1641,10 @@ static inline void RENAME(bgr32ToY)(uint8_t *dst, uint8_t *src, int width)
 
 		dst[i]= ((RY*r + GY*g + BY*b + (33<<(RGB2YUV_SHIFT-1)) )>>RGB2YUV_SHIFT);
 	}
-#endif
 }
 
 static inline void RENAME(bgr32ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, int width)
 {
-#ifdef HAVE_MMXFIXME
-#else
 	int i;
 	for(i=0; i<width; i++)
 	{
@@ -1655,7 +1661,6 @@ static inline void RENAME(bgr32ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1
 		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+2)) + 128;
 		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+2)) + 128;
 	}
-#endif
 }
 
 static inline void RENAME(bgr24ToY)(uint8_t *dst, uint8_t *src, int width)
@@ -2047,9 +2052,7 @@ static inline void RENAME(rgb24ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1
 static inline void RENAME(hScale)(int16_t *dst, int dstW, uint8_t *src, int srcW, int xInc,
 				  int16_t *filter, int16_t *filterPos, int filterSize)
 {
-
 #ifdef HAVE_MMX
-	long int filterSizeDouble=filterSize*2;
 	assert(filterSize % 4 == 0 && filterSize>0);
 	if(filterSize==4) // allways true for upscaling, sometimes for down too
 	{
@@ -2142,10 +2145,10 @@ static inline void RENAME(hScale)(int16_t *dst, int dstW, uint8_t *src, int srcW
 	else
 	{
 		long counter= -2*dstW;
+		uint8_t * src_fsize=src+filterSize;
 //		filter-= counter*filterSize/2;
 		filterPos-= counter/2;
 		dst-= counter/2;
-		src+=filterSize;//MEANX
 		asm volatile(
 			"pxor %%mm7, %%mm7		\n\t"
 			"movq "MANGLE(w02)", %%mm6	\n\t"
@@ -2184,10 +2187,8 @@ static inline void RENAME(hScale)(int16_t *dst, int dstW, uint8_t *src, int srcW
 			" jnc 1b			\n\t"
 
 			: "+r" (counter), "+r" (filter)
-			//: "m" (filterPos), "m" (dst), "m"(src+filterSize),
-			: "m" (filterPos), "m" (dst), "m"(src),
-			  //"m" (src), "r" ((long)filterSize*2)
-			  "m" (src), "r" (filterSizeDouble)
+			: "m" (filterPos), "m" (dst), "m"(src_fsize),
+			  "m" (src), "r" ((long)filterSize*2)
 			: "%"REG_b, "%"REG_a, "%"REG_c
 		);
 	}
@@ -2221,10 +2222,7 @@ static inline void RENAME(hyscale)(uint16_t *dst, int dstWidth, uint8_t *src, in
 				   int srcFormat, uint8_t *formatConvBuffer, int16_t *mmx2Filter,
 				   int32_t *mmx2FilterPos)
 {
-	long int xIncLow,xIncHigh;
-
-	xIncLow=xInc&0xffff;
-	xIncHigh=xInc>>16;
+	int xIncLow=xInc&0xffff,xIncHigh=xInc>>16;
     if(srcFormat==IMGFMT_YUY2)
     {
 	RENAME(yuy2ToY)(formatConvBuffer, src, srcW);
@@ -2273,7 +2271,7 @@ static inline void RENAME(hyscale)(uint16_t *dst, int dstWidth, uint8_t *src, in
     if(!(flags&SWS_FAST_BILINEAR))
 #endif
     {
-    	RENAME(hScale)((int16_t *)dst, dstWidth, src, srcW, xInc, hLumFilter, hLumFilterPos, hLumFilterSize);
+    	RENAME(hScale)(dst, dstWidth, src, srcW, xInc, hLumFilter, hLumFilterPos, hLumFilterSize);
     }
     else // Fast Bilinear upscale / crap downscale
     {
@@ -2370,7 +2368,6 @@ FUNNY_Y_CODE
 
 
 		:: "r" (src), "m" (dst), "m" (dstWidth), "m" (xIncHigh), "m" (xIncLow)
-		//:: "r" (src), "m" (dst), "m" (dstWidth), "m" (xInc>>16), "m" (xInc&0xFFFF)
 		: "%"REG_a, "%"REG_b, "%ecx", "%"REG_D, "%esi"
 		);
 #ifdef HAVE_MMX2
@@ -2396,10 +2393,7 @@ inline static void RENAME(hcscale)(uint16_t *dst, int dstWidth, uint8_t *src1, u
 				   int srcFormat, uint8_t *formatConvBuffer, int16_t *mmx2Filter,
 				   int32_t *mmx2FilterPos)
 {
-	long int xIncLow,xIncHigh;
-	long int xdstWidth=dstWidth;
-	xIncLow=xInc&0xffff;
-	xIncHigh=xInc>>16;
+	int xIncLow=xInc&0xffff,xIncHigh=xInc>>16;
     if(srcFormat==IMGFMT_YUY2)
     {
 	RENAME(yuy2ToUV)(formatConvBuffer, formatConvBuffer+2048, src1, src2, srcW);
@@ -2460,8 +2454,8 @@ inline static void RENAME(hcscale)(uint16_t *dst, int dstWidth, uint8_t *src1, u
     if(!(flags&SWS_FAST_BILINEAR))
 #endif
     {
-    	RENAME(hScale)((int16_t *)dst     , dstWidth, src1, srcW, xInc, hChrFilter, hChrFilterPos, hChrFilterSize);
-    	RENAME(hScale)((int16_t *)(dst+2048), dstWidth, src2, srcW, xInc, hChrFilter, hChrFilterPos, hChrFilterSize);
+    	RENAME(hScale)(dst     , dstWidth, src1, srcW, xInc, hChrFilter, hChrFilterPos, hChrFilterSize);
+    	RENAME(hScale)(dst+2048, dstWidth, src2, srcW, xInc, hChrFilter, hChrFilterPos, hChrFilterSize);
     }
     else // Fast Bilinear upscale / crap downscale
     {
@@ -2566,8 +2560,13 @@ FUNNY_UV_CODE
 		"cmp %2, %%"REG_a"		\n\t"
 		" jb 1b				\n\t"
 
-	//:: "m" (src1), "m" (dst), "m" ((long)dstWidth), "m" ((long)(xInc>>16)), "m" ((xInc&0xFFFF)),
-	:: "m" (src1), "m" (dst), "m" (xdstWidth), "m" (xIncHigh), "m" (xIncLow),
+		:: "m" (src1), "m" (dst), 
+#ifdef ARCH_X86_64
+		"m" (dstWidth), "m" (xIncHigh),
+#else
+		"m" ((long)dstWidth), "m" ((long)(xIncHigh)),
+#endif
+		 "m" ((xIncLow)),
 		"r" (src2)
 		: "%"REG_a, "%"REG_b, "%ecx", "%"REG_D, "%esi"
 		);
@@ -2723,7 +2722,7 @@ i--;
 				ASSERT(lastInLumBuf + 1 - srcSliceY < srcSliceH)
 				ASSERT(lastInLumBuf + 1 - srcSliceY >= 0)
 //				printf("%d %d\n", lumBufIndex, vLumBufSize);
-				RENAME(hyscale)((uint16_t *)lumPixBuf[ lumBufIndex ], dstW, s, srcW, lumXInc,
+				RENAME(hyscale)(lumPixBuf[ lumBufIndex ], dstW, s, srcW, lumXInc,
 						flags, canMMX2BeUsed, hLumFilter, hLumFilterPos, hLumFilterSize,
 						funnyYCode, c->srcFormat, formatConvBuffer, 
 						c->lumMmx2Filter, c->lumMmx2FilterPos);
@@ -2740,7 +2739,7 @@ i--;
 				//FIXME replace parameters through context struct (some at least)
 
 				if(!(isGray(srcFormat) || isGray(dstFormat)))
-					RENAME(hcscale)((uint16_t*)chrPixBuf[ chrBufIndex ], chrDstW, src1, src2, chrSrcW, chrXInc,
+					RENAME(hcscale)(chrPixBuf[ chrBufIndex ], chrDstW, src1, src2, chrSrcW, chrXInc,
 						flags, canMMX2BeUsed, hChrFilter, hChrFilterPos, hChrFilterSize,
 						funnyUVCode, c->srcFormat, formatConvBuffer, 
 						c->chrMmx2Filter, c->chrMmx2FilterPos);
@@ -2765,7 +2764,7 @@ i--;
 				ASSERT(lumBufIndex < 2*vLumBufSize)
 				ASSERT(lastInLumBuf + 1 - srcSliceY < srcSliceH)
 				ASSERT(lastInLumBuf + 1 - srcSliceY >= 0)
-				RENAME(hyscale)((uint16_t*)lumPixBuf[ lumBufIndex ], dstW, s, srcW, lumXInc,
+				RENAME(hyscale)(lumPixBuf[ lumBufIndex ], dstW, s, srcW, lumXInc,
 						flags, canMMX2BeUsed, hLumFilter, hLumFilterPos, hLumFilterSize,
 						funnyYCode, c->srcFormat, formatConvBuffer, 
 						c->lumMmx2Filter, c->lumMmx2FilterPos);
@@ -2781,7 +2780,7 @@ i--;
 				ASSERT(lastInChrBuf + 1 - chrSrcSliceY >= 0)
 
 				if(!(isGray(srcFormat) || isGray(dstFormat)))
-					RENAME(hcscale)((uint16_t*)chrPixBuf[ chrBufIndex ], chrDstW, src1, src2, chrSrcW, chrXInc,
+					RENAME(hcscale)(chrPixBuf[ chrBufIndex ], chrDstW, src1, src2, chrSrcW, chrXInc,
 						flags, canMMX2BeUsed, hChrFilter, hChrFilterPos, hChrFilterSize,
 						funnyUVCode, c->srcFormat, formatConvBuffer, 
 						c->chrMmx2Filter, c->chrMmx2FilterPos);
@@ -2821,14 +2820,12 @@ i--;
 		}
 #endif
 		if(dstFormat == IMGFMT_NV12 || dstFormat == IMGFMT_NV21){
-#if 0			
 			const int chrSkipMask= (1<<c->chrDstVSubSample)-1;
 			if(dstY&chrSkipMask) uDest= NULL; //FIXME split functions in lumi / chromi
 			RENAME(yuv2nv12X)(c,
 				vLumFilter+dstY*vLumFilterSize   , lumSrcPtr, vLumFilterSize,
 				vChrFilter+chrDstY*vChrFilterSize, chrSrcPtr, vChrFilterSize,
 				dest, uDest, dstW, chrDstW, dstFormat);
-#endif			
 		}
 		else if(isPlanarYUV(dstFormat) || isGray(dstFormat)) //YV12 like
 		{
@@ -2850,23 +2847,19 @@ i--;
 		}
 		else
 		{
-#if 0
 			ASSERT(lumSrcPtr + vLumFilterSize - 1 < lumPixBuf + vLumBufSize*2);
 			ASSERT(chrSrcPtr + vChrFilterSize - 1 < chrPixBuf + vChrBufSize*2);
 			if(vLumFilterSize == 1 && vChrFilterSize == 2) //Unscaled RGB
 			{
 				int chrAlpha= vChrFilter[2*dstY+1];
-				RENAME(yuv2packed1)(c, (uint16_t *)*lumSrcPtr,
-				(uint16_t *)*chrSrcPtr, (uint16_t *)*(chrSrcPtr+1),
+				RENAME(yuv2packed1)(c, *lumSrcPtr, *chrSrcPtr, *(chrSrcPtr+1),
 						 dest, dstW, chrAlpha, dstFormat, flags, dstY);
 			}
 			else if(vLumFilterSize == 2 && vChrFilterSize == 2) //BiLinear Upscale RGB
 			{
 				int lumAlpha= vLumFilter[2*dstY+1];
 				int chrAlpha= vChrFilter[2*dstY+1];
-				RENAME(yuv2packed2)(c, (uint16_t *)*lumSrcPtr,
-				(uint16_t *)*(lumSrcPtr+1), (uint16_t
-				*)*chrSrcPtr, (uint16_t *)*(chrSrcPtr+1),
+				RENAME(yuv2packed2)(c, *lumSrcPtr, *(lumSrcPtr+1), *chrSrcPtr, *(chrSrcPtr+1),
 						 dest, dstW, lumAlpha, chrAlpha, dstY);
 			}
 			else //General RGB
@@ -2876,7 +2869,6 @@ i--;
 					vChrFilter+dstY*vChrFilterSize, chrSrcPtr, vChrFilterSize,
 					dest, dstW, dstY);
 			}
-#endif
 		}
             }
 	    else // hmm looks like we can't use MMX here without overwriting this array's tail
@@ -2884,14 +2876,12 @@ i--;
 		int16_t **lumSrcPtr= lumPixBuf + lumBufIndex + firstLumSrcY - lastInLumBuf + vLumBufSize;
 		int16_t **chrSrcPtr= chrPixBuf + chrBufIndex + firstChrSrcY - lastInChrBuf + vChrBufSize;
 		if(dstFormat == IMGFMT_NV12 || dstFormat == IMGFMT_NV21){
-#if 0
 			const int chrSkipMask= (1<<c->chrDstVSubSample)-1;
 			if(dstY&chrSkipMask) uDest= NULL; //FIXME split functions in lumi / chromi
 			yuv2nv12XinC(
 				vLumFilter+dstY*vLumFilterSize   , lumSrcPtr, vLumFilterSize,
 				vChrFilter+chrDstY*vChrFilterSize, chrSrcPtr, vChrFilterSize,
 				dest, uDest, dstW, chrDstW, dstFormat);
-#endif
 		}
 		else if(isPlanarYUV(dstFormat) || isGray(dstFormat)) //YV12
 		{
@@ -2904,14 +2894,12 @@ i--;
 		}
 		else
 		{
-#if 0
 			ASSERT(lumSrcPtr + vLumFilterSize - 1 < lumPixBuf + vLumBufSize*2);
 			ASSERT(chrSrcPtr + vChrFilterSize - 1 < chrPixBuf + vChrBufSize*2);
 			yuv2packedXinC(c, 
 				vLumFilter+dstY*vLumFilterSize, lumSrcPtr, vLumFilterSize,
 				vChrFilter+dstY*vChrFilterSize, chrSrcPtr, vChrFilterSize,
 				dest, dstW, dstY);
-#endif			
 		}
 	    }
 	}

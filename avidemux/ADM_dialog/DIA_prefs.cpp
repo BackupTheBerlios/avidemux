@@ -84,7 +84,7 @@ ADM_RENDER_TYPE render;
         SET_CPU(MMXEXT,MMXEXT);
         SET_CPU(3DNOW,3DNOW);
         SET_CPU(SSE,SSE);
-        SET_CPU(SSE2,SSE);
+        SET_CPU(SSE2,SSE2);
         gtk_widget_set_sensitive( (WID(checkAltivec)),0);
 //****************************
 	olddevice=newdevice=AVDM_getCurrentDevice();
