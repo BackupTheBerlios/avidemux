@@ -49,6 +49,8 @@ while(<$fd>){
 		if( $b eq "STRING" ){
 			$c =~ s/^"//;
 			$c =~ s/"$//;
+                        $c =~ s/@/,/; # Replace % by , needed by alsa stuff
+
 		}else{
 			$cpp_str .= "\t";
 		}
@@ -60,7 +62,7 @@ while(<$fd>){
 			$cpp_str .= " NULL, NULL },\n";
 		}else{
 			$d =~ s/^\s*,\s*//;
-			($d,$e) = split(",",$d);
+			($d,$e) = split(",",$d);                        
 			$d =~ s/\s*$//;
 			$e =~ s/^\s*//;
 			$e =~ s/\s*$//;
