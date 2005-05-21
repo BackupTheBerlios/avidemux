@@ -66,6 +66,7 @@ int scriptOutputFormat(int n, Arg *srgs);
 
 int scriptMono2Stereo(int n, Arg *srgs);
 int scriptStereo2mono(int n, Arg *srgs);
+int scriptAudioReset(int n, Arg *srgs);
 
 // All comment must be in lower case!!!!!!!!!!!
 // All comment must be in lower case!!!!!!!!!!!
@@ -93,6 +94,7 @@ static const admCommand myCommands[]=
 	
 	{"setformat",          scriptOutputFormat,1,APM_STRING},
 
+        {"audioreset",          scriptAudioReset,1,APM_NUM},
 	{"audionormalize",	scriptAudioNormalize,1,APM_NUM},
 	{"audiodownsample",	scriptAudioDownsample,1,APM_NUM},
 	{"audioresample",	scriptAudioResample,1,APM_NUM},

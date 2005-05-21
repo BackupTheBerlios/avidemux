@@ -200,12 +200,24 @@ uint8_t  *extraData ;
 uint32_t extraDataSize;
 
         fprintf(fd,"\n#** Video Codec conf **\n");
-        videoCodecGetConf(&extraDataSize,&extraData);
+        //videoCodecGetConf(&extraDataSize,&extraData);
         //if(extraDataSize())
         // Fixme
-        fprintf(fd,"videoCodec(%s,%s);\n",videoCodecGetName(),"CQ=4");
+        char *namevcodec;
+        namevcodec=new char[strlen(name)+10];
+        strcpy(namevcodec,name);
+        strcat(namevcodec,".vcodec");
+        saveVideoCodecConf(namevcodec);
+        delete [] namevcodec;
+        fprintf(fd,"videoCodec(%s,\"%s\",%s.vcodec);\n",videoCodecGetName(),videoCodecGetMode(),name);
+// Audio Source
+//______________________________________________
+
+        
+
 // Audio
 //______________________________________________
+
    uint32_t delay;
    fprintf(fd,"\n#** Audio **\n");
    fprintf(fd,"audioreset(1);\n",audioReset());

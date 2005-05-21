@@ -1020,7 +1020,31 @@ int videoCodecSelectByName(const char *name)
 		}
 		return 0;
 }
+const char *videoCodecGetMode( void)
+{
+        uint8_t *data;
+        uint32_t nbData=0;
+        COMPRES_PARAMS *mode;
+        static char string[90];
 
+
+        videoCodecGetConf( &nbData, &data);
+        if(!nbData) return "CQ=4"; // dummy
+
+        ADM_assert(nbData>=sizeof(COMPRES_PARAMS));        
+        mode=(COMPRES_PARAMS *)data;
+        switch(mode->mode)
+        {
+                case COMPRESS_CQ: sprintf(string,"CQ=%d",mode->qz);break;
+                case COMPRESS_CBR: sprintf(string,"CBR=%d",mode->bitrate);break;
+                case COMPRESS_2PASS: sprintf(string,"2PASS=%d",mode->finalsize);break;
+                case COMPRESS_SAME: sprintf(string,"FOLLOW=0");break;
+                default:
+                        ADM_assert(0);
+        }
+        return string;
+
+}
 const char *videoCodecGetName( void )
 {
 	for(uint32_t i=0;i<sizeof(mycodec)/sizeof(codecEnumByName);i++)

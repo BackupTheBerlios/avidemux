@@ -11,5 +11,7 @@ int 		videoCodecSelectByName( const char *name);
 void 		videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData);
 const char  	*videoCodecGetConf( uint32_t *nbData , uint8_t **data);
 
+// Returns the mode (CQ/CBR...) as a string, suitable for a script
+const char      *videoCodecGetMode( void);
 
 #endif

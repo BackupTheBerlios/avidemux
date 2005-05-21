@@ -64,6 +64,11 @@ const ADM_CONTAINER container[]=
   MK_CONT(FMT_DUMMY)  
 };    
 
+int scriptAudioReset(int n, Arg *args)
+{
+         audioReset();
+         return 1;
+}
 int scriptMono2Stereo(int n, Arg *args)
 {
         return audioFilterMono2Stereo(args[0].arg.integer);
