@@ -68,6 +68,8 @@ int scriptMono2Stereo(int n, Arg *srgs);
 int scriptStereo2mono(int n, Arg *srgs);
 int scriptAudioReset(int n, Arg *srgs);
 
+int scriptSetPostProc(int n, Arg *srgs);
+
 // All comment must be in lower case!!!!!!!!!!!
 // All comment must be in lower case!!!!!!!!!!!
 // All comment must be in lower case!!!!!!!!!!!
@@ -84,6 +86,8 @@ static const admCommand myCommands[]=
 
 	{"videoprocess",	scriptVideoProcess,1,APM_NUM},
 	{"audioprocess",	scriptAudioProcess,1,APM_NUM},
+
+        {"setpostproc",         scriptSetPostProc,3,APM_NUM},
 	
 	{"savejpg",		scriptSavejpeg,1,APM_STRING},
 	{"saverawvideo",	scriptRaw,1,APM_STRING},

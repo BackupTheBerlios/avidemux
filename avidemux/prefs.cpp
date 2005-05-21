@@ -83,6 +83,8 @@ static opt_def opt_defs [] = {
 	{"device.audiodevice",	STRING,"OSS",	NULL, NULL, NULL },
 	{"device.audio.alsa_device",		STRING,"plughw:0,0",NULL, NULL, NULL },
 	{"device.videodevice",		UINT,	"0",	NULL,	"0",	"10"	},
+	{"default.postproc_type",		UINT,	"3",	NULL,	"0",	"7"	},
+	{"default.postproc_value",		UINT,	"3",	NULL,	"0",	"5"	},
 	{"lastfiles.file1",		STRING,"",	NULL, NULL, NULL },
 	{"lastfiles.file2",		STRING,"",	NULL, NULL, NULL },
 	{"lastfiles.file3",		STRING,"",	NULL, NULL, NULL },
@@ -106,7 +108,7 @@ static opt_def opt_defs [] = {
 	{"feature.use_odml",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 64;
+int num_opts = 66;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

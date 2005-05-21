@@ -56,6 +56,9 @@ codecs.preferredcodec,			STRING,	FFmpeg4
 device.audiodevice,			STRING,	OSS
 device.audio.alsa_device,               STRING, "plughw:0@0"
 device.videodevice,			UINT,	0,	0,	10
+# Posproc
+default.postproc_type,			UINT,	3,	0,	7
+default.postproc_value,			UINT,	3,	0,	5
 # lastfiles
 lastfiles.file1,			STRING,	""
 lastfiles.file2,			STRING,	""

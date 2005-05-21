@@ -54,13 +54,13 @@ extern uint8_t loadVideoCodecConf( char *name);
 extern uint8_t parseScript(char *name);
 //
 //
-int filterDefaultPPType=3;
-int filterDefaultPPStrength=3;
 
 #define TEST_MPEG2DEC
 
 ADM_Composer::ADM_Composer (void)
 {
+uint32_t type,value;
+
   _nb_segment = 0;
   _nb_video = 0;
   _total_frames = 0;
@@ -74,8 +74,11 @@ ADM_Composer::ADM_Composer (void)
   _haveMarkers=0; // only edl have markers
   // Initialize a default postprocessing (dummy)
   initPostProc(&_pp,16,16);
-  _pp.postProcType=filterDefaultPPType;
-  _pp.postProcStrength=filterDefaultPPStrength;
+  if(!prefs->get(DEFAULT_POSTPROC_TYPE,&type)) type=3;
+  if(!prefs->get(DEFAULT_POSTPROC_VALUE,&value)) value=3;
+
+  _pp.postProcType=type;
+  _pp.postProcStrength=value;
   _pp.forcedQuant=0;
   updatePostProc(&_pp);
   _imageBuffer=NULL;    
@@ -369,11 +372,15 @@ UNUSED_ARG(mode);
   // 1st if it is our first video we update postproc
  if(!_nb_video)
  {
- 	
+        uint32_t type,value;
+
+        if(!prefs->get(DEFAULT_POSTPROC_TYPE,&type)) type=3;
+        if(!prefs->get(DEFAULT_POSTPROC_VALUE,&value)) value=3; 	
+
 	deletePostProc(&_pp );
  	initPostProc(&_pp,info.width,info.height);
-	_pp.postProcType=filterDefaultPPType;
-	_pp.postProcStrength=filterDefaultPPStrength;
+	_pp.postProcType=type;
+	_pp.postProcStrength=value;
 	_pp.forcedQuant=0;
 	updatePostProc(&_pp);
 

@@ -63,7 +63,15 @@ const ADM_CONTAINER container[]=
   MK_CONT(AVI_UNP),
   MK_CONT(FMT_DUMMY)  
 };    
+int scriptSetPostProc(int n, Arg *args)
+{
+        uint32_t type,strength,swapuv;
 
+        type=args[0].arg.integer;
+        strength=args[1].arg.integer;
+        swapuv=args[2].arg.integer;
+        return video_body->setPostProc(type,strength,swapuv);
+}
 int scriptAudioReset(int n, Arg *args)
 {
          audioReset();

@@ -190,6 +190,15 @@ for (uint32_t i = 0; i < _nb_segment; i++)
                 nb=_segments[i]._nb_frames;
           fprintf (fd, "addSegment(%lu,%lu,%lu);\n",src,start,nb);
     }
+// postproc
+//___________________________
+
+        int pptype, ppstrength,ppswap;
+                video_body->getPostProc( &pptype, &ppstrength, &ppswap);
+                fprintf(fd,"\n#** Postproc **\n");
+                fprintf(fd,"setpostproc(%d,%d,%d);\n",pptype,ppstrength,ppswap);
+
+
 // Filter
 //___________________________
         fprintf(fd,"\n#** Filters **\n");
