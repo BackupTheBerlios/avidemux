@@ -48,13 +48,13 @@ static FILTER_PARAM ppParam={3,{"postProcType","postProcStrength","forcedQuant"}
 SCRIPT_CREATE(forcedpp_script,ADMVideoForcedPP,ppParam);
 BUILD_CREATE(forcedpp_create,ADMVideoForcedPP);
 
-extern int DIA_getMPParams( int *pplevel, int *ppstrength,int *swap);
+extern int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap);
 
 uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
 {
 	_in=instream;
-	int postproc, strength,uv;
-	
+	uint32_t postproc, strength,uv;
+	int forced;
 		postproc=_param->postProcType;
 		strength=_param->postProcStrength;
 		uv=0;
@@ -62,8 +62,8 @@ uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
 		{
 				_param->postProcType=postproc;
 				_param->postProcStrength=strength;				
-				uv=_param->forcedQuant;
-				if( DIA_GetIntegerValue(&uv,2,31, "Quant Value","Enter forced Q:"))
+				forced=_param->forcedQuant;
+				if( DIA_GetIntegerValue(&forced,2,31, "Quant Value","Enter forced Q:"))
 				{
 					_param->forcedQuant=uv;
 				}

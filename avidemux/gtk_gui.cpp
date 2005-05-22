@@ -2231,13 +2231,13 @@ uint32_t count;
 
 
 }
-extern int DIA_getMPParams( int *pplevel, int *ppstrength,int *swap);
+extern int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap);
 
 
 //
 void	A_setPostproc( void )
 {
-int type,strength,swap;
+uint32_t type,strength,swap;
 	if(!avifileinfo) return;
 	
 	video_body->getPostProc(&type,&strength,&swap);

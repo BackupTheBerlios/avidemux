@@ -238,10 +238,10 @@ class ADM_Composer
 			virtual 	uint8_t			audioGoToTime(uint32_t mstime,uint32_t *off);
 					uint8_t 		getMarkers(uint32_t *start, uint32_t *end);
 								 // get markers from file
-					uint8_t 		setPostProc( int type, int strength, 
-										int swapuv);
-					uint8_t 		getPostProc( int *type, int *strength, 
-										int *swapuv);
+					uint8_t 		setPostProc( uint32_t type, uint32_t strength, 
+										uint32_t swapuv);
+					uint8_t 		getPostProc( uint32_t *type, uint32_t *strength, 
+										uint32_t *swapuv);
 										
 					uint8_t 		getAudioPacket(uint8_t *dest, uint32_t *len, uint32_t
 									*samples);

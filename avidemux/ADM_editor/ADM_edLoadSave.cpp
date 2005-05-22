@@ -193,7 +193,7 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 // postproc
 //___________________________
 
-        int pptype, ppstrength,ppswap;
+        uint32_t pptype, ppstrength,ppswap;
                 video_body->getPostProc( &pptype, &ppstrength, &ppswap);
                 fprintf(fd,"\n#** Postproc **\n");
                 fprintf(fd,"setpostproc(%d,%d,%d);\n",pptype,ppstrength,ppswap);

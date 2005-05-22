@@ -22,7 +22,7 @@
 static GtkWidget	*create_dialog1 (void);
 
 
-int DIA_getMPParams( int *pplevel, int *ppstrength,int *swap)
+int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap)
 {
 	GtkWidget *dialog;
 	GtkAdjustment *pp_adj;

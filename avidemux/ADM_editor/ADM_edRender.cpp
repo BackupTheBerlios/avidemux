@@ -582,7 +582,7 @@ uint32_t left,ww;
 		return 1;	
 
 }
-uint8_t ADM_Composer::setPostProc( int type, int strength, int swapuv)
+uint8_t ADM_Composer::setPostProc( uint32_t type, uint32_t strength, uint32_t swapuv)
 {
 	if(!_nb_video) return 0;
 	_pp.postProcType=type;
@@ -590,7 +590,7 @@ uint8_t ADM_Composer::setPostProc( int type, int strength, int swapuv)
 	updatePostProc(&_pp); // DeletePostproc/ini missing ?
 	return 1;
 }
-uint8_t ADM_Composer::getPostProc( int *type, int *strength, int *swapuv)
+uint8_t ADM_Composer::getPostProc( uint32_t *type, uint32_t *strength, uint32_t *swapuv)
 {
 	if(!_nb_video) return 0;
 	*type=_pp.postProcType;
