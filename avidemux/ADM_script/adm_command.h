@@ -31,7 +31,7 @@ int scriptAudioDownsample(int n,Arg *args);
 int scriptAudioResample(int n,Arg *args);
 int scriptAudioNormalize(int n,Arg *args);
 
-int scriptLoadAudio(int n,Arg *args);
+
 int scriptSaveAudio(int n,Arg *args);
 int scriptGoto(int n,Arg *args);
 
@@ -69,6 +69,7 @@ int scriptStereo2mono(int n, Arg *srgs);
 int scriptAudioReset(int n, Arg *srgs);
 
 int scriptSetPostProc(int n, Arg *srgs);
+int scriptAudioSource(int n, Arg *srgs);
 
 // All comment must be in lower case!!!!!!!!!!!
 // All comment must be in lower case!!!!!!!!!!!
@@ -98,6 +99,7 @@ static const admCommand myCommands[]=
 	
 	{"setformat",          scriptOutputFormat,1,APM_STRING},
 
+        {"audiosource",         scriptAudioSource,2,APM_STRING,APM_STRING},
         {"audioreset",          scriptAudioReset,1,APM_NUM},
 	{"audionormalize",	scriptAudioNormalize,1,APM_NUM},
 	{"audiodownsample",	scriptAudioDownsample,1,APM_NUM},
@@ -109,7 +111,7 @@ static const admCommand myCommands[]=
 	{"film2pal",		scriptFilm2Pal,1,APM_NUM},
         {"pal2film",            scriptPal2Film,1,APM_NUM},
 	
-	{"loadaudio",		scriptLoadAudio,2,APM_STRING,APM_STRING},
+	
 	
 	{"saveaudio",		scriptSaveAudio,1,APM_STRING},
 	{"audiocodec",		scriptAudioCodec,2,APM_STRING,APM_NUM},

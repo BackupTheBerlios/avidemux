@@ -132,15 +132,6 @@ EXTERN uint32_t videoProcessMode
 
 EXTERN uint32_t frameStart,frameEnd;
 
-typedef enum
-{
-  	AudioAvi=1,
-	AudioMP3,
-	AudioWav,
- 	AudioAC3,
-	AudioNone
-
-}AudioSource;
 
 
 

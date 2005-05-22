@@ -65,7 +65,7 @@ typedef struct {
 	AUDIOENCODER codec;
 }CODECLIST;
 
-static CODECLIST myCodecList[]=
+static const CODECLIST myCodecList[]=
 {
 #ifdef HAVE_LIBMP3LAME
 		{"lame","Lame", AUDIOENC_MP3},
@@ -82,6 +82,22 @@ static CODECLIST myCodecList[]=
 		{"toolame","Toolame", AUDIOENC_2LAME},
 		{"none", "Wav PCM",AUDIOENC_NONE}
 };
+typedef struct externalSource
+{
+ AudioSource type;
+ char *name;       
+}externalSource;
+
+static const externalSource Sources[]=
+{
+        {AudioAvi,"VIDEO"},
+        {AudioMP3,"MP3"},
+        {AudioWav,"WAV"},
+        {AudioAC3,"AC3"},
+        {AudioNone,"NONE"}
+};
+
+
 extern int DIA_getLameSettings(int *pmode, int *pbitrate,ADM_LAME_PRESET *preset);
 extern void UI_PrintCurrentACodec( const char *s);
 
@@ -102,6 +118,24 @@ static ADM_LAME_PRESET audioMP3preset=ADM_LAME_PRESET_CBR;
 // These are globals for the moment
 int 	   audioShift = 0;
 int	   audioDelay=0;
+//**********
+const char              *audioSourceFromEnum(AudioSource src)
+{
+        uint32_t nb=sizeof(Sources)/sizeof(externalSource);
+        for(uint32_t i=0;i<nb;i++)
+                if(src==Sources[i].type) return Sources[i].name;
+        ADM_assert(0);
+
+}
+AudioSource             audioSourceFromString(const char *name)
+{
+        uint32_t nb=sizeof(Sources)/sizeof(externalSource);
+        for(uint32_t i=0;i<nb;i++)
+                if(!strcasecmp(name,Sources[i].name)) return Sources[i].type;
+        return (AudioSource)0;
+
+}
+
 //**********
 uint8_t audioReset(void )
 {

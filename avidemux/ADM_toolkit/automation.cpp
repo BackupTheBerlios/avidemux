@@ -65,7 +65,7 @@ extern int A_loadNone( void );
 extern void A_saveAudioDecodedTest(char *name);
 extern uint8_t indexMpeg(char *mpeg,char *file,uint8_t aid);
 extern void A_SaveAudioNVideo(char *name);
-extern int GUI_loadMP3(char *name);
+extern int A_loadMP3(char *name);
 extern int A_loadAC3(char *name);
 extern int A_loadWave(char *name);
 extern void GUI_Quiet( void);
@@ -194,7 +194,7 @@ AUTOMATON reaction_table[]=
 								,(one_arg_type)call_packedvop},
 		
 		
-		{"external-mp3",	1,"load external mpeg audio as audio track",(one_arg_type)GUI_loadMP3},
+		{"external-mp3",	1,"load external mpeg audio as audio track",(one_arg_type)A_loadMP3},
 		{"external-ac3",	1,"load external ac3 audio as audio track",(one_arg_type)A_loadAC3},
 		{"external-wav",	1,"load external wav audio as audio track",(one_arg_type)A_loadWave},
 		{"no-audio",		0,"load external wav audio as audio track",(one_arg_type)A_loadNone},

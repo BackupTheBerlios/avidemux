@@ -50,7 +50,8 @@ extern uint32_t frameStart,frameEnd;
 static uint32_t edFrameStart,edFrameEnd;
 uint8_t loadVideoCodecConf( char *name);
 uint8_t saveVideoCodecConf( char *name);
-extern int audioMP3bitrate ;
+//extern int audioMP3bitrate ;
+extern const char              *audioSourceFromEnum(AudioSource src);
 // Ugly, will have to clean it later
 
 uint8_t ADM_Composer::getMarkers(uint32_t *start, uint32_t *end)
@@ -230,6 +231,15 @@ uint32_t extraDataSize;
    uint32_t delay;
    fprintf(fd,"\n#** Audio **\n");
    fprintf(fd,"audioreset(1);\n",audioReset());
+
+   // External audio ?
+        char *audioName;
+        AudioSource  source;
+
+        source=getCurrentAudioSource(&audioName);
+        if(!audioName) audioName="";
+        if(source!=AudioAvi)
+                fprintf(fd,"audiosource(%s,\"%s\");\n", audioSourceFromEnum(source),audioName); 
 
    fprintf(fd,"audiocodec(%s,%d);\n", audioCodecGetName(),audioGetBitrate()); 
    fprintf(fd,"audioprocess(%d);\n",audioProcessMode);

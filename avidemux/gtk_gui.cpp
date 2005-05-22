@@ -101,6 +101,7 @@ void A_requantize(void);
 int A_saveJpg (char *name);
 int A_loadWave (char *name);
 int A_loadAC3 (char *name);
+int A_loadMP3 (char *name);
 int A_loadNone( void );
 void A_saveAudioDecodedTest (char *name);
 void A_openBrokenAvi (char *name);
@@ -674,12 +675,12 @@ case ACT_Pipe2Other:
       break;
     case ACT_AudioSourceAvi:
       //currentaudiostream=aviaudiostream;
-      changeAudioStream (aviaudiostream, AudioAvi);
+      changeAudioStream (aviaudiostream, AudioAvi,NULL);
       //wavinfo= currentaudiostream->getInfo();
       break;
 
     case ACT_AudioSourceMP3:
-      GUI_FileSelRead ("Select MP3 to load ", (SELFILE_CB *)GUI_loadMP3);
+      GUI_FileSelRead ("Select MP3 to load ", (SELFILE_CB *)A_loadMP3);
       break;
     case ACT_AudioSourceAC3:
       GUI_FileSelRead ("Select AC3 to load ", (SELFILE_CB *)A_loadAC3);
@@ -689,7 +690,7 @@ case ACT_Pipe2Other:
       break;
     case ACT_AudioSourceNone:
       //currentaudiostream=(AVDMGenericAudioStream *)NULL;
-      changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone);
+       ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
       break;
 
   
@@ -915,7 +916,7 @@ int A_openAvi2 (char *name, uint8_t mode)
       video_body->cleanup ();
       curframe = 0;
       currentaudiostream = NULL;
-      changeAudioStream (NULL, AudioNone);
+      changeAudioStream (NULL, AudioNone,NULL);
       filterCleanUp ();
 
 
@@ -1052,7 +1053,7 @@ void  updateLoaded ()
       }
       /* </JSC> */
       video_body->getAudioStream (&aviaudiostream);
-      changeAudioStream (aviaudiostream, AudioAvi);
+      changeAudioStream (aviaudiostream, AudioAvi,NULL);
       if (aviaudiostream)
 	if (!aviaudiostream->isDecompressable ())
 	  {
@@ -1130,7 +1131,7 @@ void ReSync (void)
   if (currentaudiostream == aviaudiostream)
     {
       isaviaud = 1;
-      changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone);
+      changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
 
     }
   else
@@ -1141,7 +1142,7 @@ void ReSync (void)
   video_body->getAudioStream (&aviaudiostream);
   if (isaviaud)
     {
-      changeAudioStream (aviaudiostream, AudioAvi);
+      changeAudioStream (aviaudiostream, AudioAvi,NULL);
     }
   	//updateVideoFilters ();
 	getFirstVideoFilter();
@@ -1494,13 +1495,13 @@ A_loadAC3 (char *name)
       return 0;
     }
   //currentaudiostream=wav;
-  changeAudioStream (ac3, AudioAC3);
+  changeAudioStream (ac3, AudioAC3,name);
   wavinfo = currentaudiostream->getInfo ();
   return 1;
 }
 int A_loadNone( void )
 {
- 	changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone);
+ 	changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
 }
 //_____________________________________________________________
 //
@@ -1508,11 +1509,46 @@ int A_loadNone( void )
 //              
 //
 //_____________________________________________________________
+AudioSource currentAudioSource=AudioAvi;
+char *currentAudioName=NULL;
+//_____________________________________________________________
+//
+//              Load MP3 and identify wavfmt infos to fill avi header
+//              -> use mad ?
+//
+//_____________________________________________________________
+int A_loadMP3(char *name)
+{
+    if (!avifileinfo)
+        return 0;
+    AVDMMP3AudioStream *mp3 = new AVDMMP3AudioStream();
+
+    if (mp3->open(name) == 0)
+      {
+          printf("MP3 open file failed...");
+          delete mp3;
+          return 0;
+      }
+    //currentaudiostream=mp3;
+    changeAudioStream(mp3, AudioMP3,name);
+    wavinfo = currentaudiostream->getInfo();
+    return 1;
+}
+//_____________________________________________________________
+//
+//              Load wave
+//              
+//
+//_____________________________________________________________
+
 int
 A_loadWave (char *name)
 {
   if (!avifileinfo)
-    return 0;
+  {
+        printf("No video loaded\n");
+        return 0;
+   }
   AVDMWavAudioStream *wav = new AVDMWavAudioStream ();
 
   if (wav->open (name) == 0)
@@ -1523,27 +1559,38 @@ A_loadWave (char *name)
       return 0;
     }
   //currentaudiostream=wav;
-  changeAudioStream (wav, AudioWav);
+  changeAudioStream (wav, AudioWav,name);
   wavinfo = currentaudiostream->getInfo ();
   return 1;
 }
-
+AudioSource getCurrentAudioSource(char **name)
+{
+        *name=currentAudioName;
+        return currentAudioSource;
+}
 //________________________________________________________
 // Change audio stream and delete the old one if needed
 //________________________________________________________
-void
-changeAudioStream (AVDMGenericAudioStream * newaudio, AudioSource nwsource)
+uint8_t 
+changeAudioStream (AVDMGenericAudioStream * newaudio, AudioSource nwsource,char *myname)
 {
   if (currentaudiostream)
     {
       if (currentaudiostream->isDestroyable ())
 	delete currentaudiostream;
+      currentAudioSource=AudioNone;
+      if(currentAudioName) ADM_dealloc(currentAudioName);
+      currentAudioName=NULL;
     }
   currentaudiostream = newaudio;
-  GUI_UpdateAudioToggle (nwsource);
+//  GUI_UpdateAudioToggle (nwsource);
   if (currentaudiostream)
+  {
     wavinfo = currentaudiostream->getInfo ();
-
+    currentAudioSource=nwsource;
+    currentAudioName=ADM_strdup(myname);
+  }
+  return 1;
 }
 
 //_____________________________________________________________

@@ -58,6 +58,7 @@ Mean.
 #include "ADM_gui2/GUI_render.h"
 #include "ADM_gui2/GUI_ui.h"
 
+
 extern void HandleAction(Action act);
 
 //static GtkWidget *wabout = NULL;
@@ -127,29 +128,6 @@ void rebuild_status_bar(void)
 //
 //____________________________________________
 
-//_____________________________________________________________
-//
-//              Load MP3 and identify wavfmt infos to fill avi header
-//              -> use mad ?
-//
-//_____________________________________________________________
-int GUI_loadMP3(char *name)
-{
-    if (!avifileinfo)
-	return 0;
-    AVDMMP3AudioStream *mp3 = new AVDMMP3AudioStream();
-
-    if (mp3->open(name) == 0)
-      {
-	  printf("MP3 open file failed...");
-	  delete mp3;
-	  return 0;
-      }
-    //currentaudiostream=mp3;
-    changeAudioStream(mp3, AudioMP3);
-    wavinfo = currentaudiostream->getInfo();
-    return 1;
-}
 
 
 ///
@@ -172,7 +150,7 @@ uint32_t GUI_GetScale(void)
 
 
 
-
+#if 0
 
 void GUI_UpdateAudioToggle(AudioSource nwsource)
 {
@@ -201,5 +179,5 @@ void GUI_UpdateAudioToggle(AudioSource nwsource)
 #warning fixme
 //    gtk_entry_set_text((GtkEntry *) entry_faudioname, text);
 }
-
+#endif
 // EOF

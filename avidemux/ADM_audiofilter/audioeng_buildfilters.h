@@ -74,6 +74,15 @@ typedef enum CHANNELCONV
 	CHANNELCONV_1to2=2,
 	CHANNELCONV_last
 }CHANNELCONV;
+typedef enum
+{
+        AudioAvi=1,
+        AudioMP3,
+        AudioWav,
+        AudioAC3,
+        AudioNone
+
+}AudioSource;
 
 void audioCodecSetcodec(AUDIOENCODER codec);
 uint8_t audioReset(void);
@@ -111,5 +120,10 @@ FILMCONV audioGetFpsConv(void);
 CHANNELCONV audioGetChannelConv(void);
 RESAMPLING  audioGetResampling(void);
 /*-----*/
+uint8_t                 changeAudioStream(AVDMGenericAudioStream *newaudio,AudioSource so,char *name);
+AudioSource             getCurrentAudioSource(char **name);
+const char              *audioSourceFromEnum(AudioSource *src);
+AudioSource             audioSourceFromString(const char *name);
+//
 
 

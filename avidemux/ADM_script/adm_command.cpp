@@ -63,6 +63,49 @@ const ADM_CONTAINER container[]=
   MK_CONT(AVI_UNP),
   MK_CONT(FMT_DUMMY)  
 };    
+extern int A_loadAC3 (char *name);
+extern int A_loadMP3 (char *name);
+extern int A_loadWave (char *name);
+
+int scriptAudioSource(int n, Arg *args)
+{
+        // 1st arg is type
+        AudioSource src;
+        int result=0;
+
+        src=audioSourceFromString(args[0].arg.string);
+        if(!src) {printf("[Script]Invalid audiosource type\n");return 0;}
+        switch(src)
+        {
+                case AudioAvi:
+                        result= changeAudioStream (aviaudiostream, AudioAvi,NULL);
+                        break;
+                case AudioMP3:
+                        result= A_loadMP3(args[1].arg.string);
+                        break;
+                case AudioWav:
+                        result= A_loadWave(args[1].arg.string);
+                        break;
+                case AudioAC3:
+                        result= A_loadAC3(args[1].arg.string);
+                        break;
+                case AudioNone:
+                         result= changeAudioStream(NULL,AudioNone,NULL);
+                          break;
+                default:        
+                        ADM_assert(0);
+
+        }
+        printf("[script] ");
+        
+        if(!result)  printf("failed :");
+        else    printf("succeed :");
+        printf(" external source %d (%s) \n",
+                                                        src,args[1].arg.string);
+        return result;
+
+}
+
 int scriptSetPostProc(int n, Arg *args)
 {
         uint32_t type,strength,swapuv;
@@ -350,31 +393,6 @@ int scriptSaveAudio(int n,Arg *args)
 	return A_audioSave(args[0].arg.string);
 }
 //________________________________________________
-extern int GUI_loadMP3(char *name);
-extern int A_loadAC3(char *name);
-extern int A_loadWave(char *name);
-int scriptLoadAudio(int n,Arg *args)
-{	
-	char *type=args[0].arg.string;
-	
-	LowerCase(type);
-	if(!strcmp(type,"mp3") )
-	{
-		return GUI_loadMP3(args[1].arg.string);
-		
-	}
-	if(!strcmp(type,"wav") )
-	{
-		return A_loadWave(args[1].arg.string);
-		
-	}
-	if(!strcmp(type,"ac3") )
-	{
-		return A_loadAC3(args[1].arg.string);
-		
-	}	
-	return 0;
-}
 //________________________________________________
 int scriptAudioProcess(int n,Arg *args)
 {	
