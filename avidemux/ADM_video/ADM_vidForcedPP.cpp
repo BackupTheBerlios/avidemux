@@ -61,11 +61,12 @@ uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
 		if( DIA_getMPParams( &postproc,&strength,&uv))
 		{
 				_param->postProcType=postproc;
-				_param->postProcStrength=strength;				
+				_param->postProcStrength=strength;
+                                
 				forced=_param->forcedQuant;
 				if( DIA_GetIntegerValue(&forced,2,31, "Quant Value","Enter forced Q:"))
 				{
-					_param->forcedQuant=uv;
+					_param->forcedQuant=forced;
 				}
 
 				updatePostProc(&_postproc );				
@@ -171,8 +172,10 @@ uint8_t ADMVideoForcedPP::getFrameNumberNoAlloc(uint32_t frame,
 			 		return 0;
 
 			oBuff[0]=YPLANE(data);
-			oBuff[1]=UPLANE(data);
- 			oBuff[2]=VPLANE(data);
+                        {
+                             oBuff[1]=VPLANE(data);
+                             oBuff[2]=UPLANE(data);
+                        }
 				
 			iBuff[0]=YPLANE(_uncompressed);
 		 	iBuff[1]=UPLANE(_uncompressed);

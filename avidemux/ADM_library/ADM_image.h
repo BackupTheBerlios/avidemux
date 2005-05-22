@@ -94,6 +94,7 @@ public:
                                                 default: ADM_assert(0);
                                         }
                                 };
+        uint8_t duplicateMacro(ADMImage *src,uint32_t swap);       /// copy an image to ourself, including info
 public:
 
         uint8_t         *_planes[3];     /// In case of linked data store y/u/v pointers
@@ -105,6 +106,7 @@ public:
                 
 		~ADMImage();
 	uint8_t duplicate(ADMImage *src);	/// copy an image to ourself, including info
+        uint8_t duplicateSwapUV(ADMImage *src); /// copy an image to ourself, including info
 	uint8_t duplicateFull(ADMImage *src);	/// copy an image to ourself, including info
 	uint8_t copyInfo(ADMImage *src);	/// copy all the flags, not the data themselves
 	uint8_t copyQuantInfo(ADMImage *src);	/// copy quant table if any

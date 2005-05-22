@@ -79,6 +79,7 @@ uint32_t type,value;
 
   _pp.postProcType=type;
   _pp.postProcStrength=value;
+  _pp.swapuv=0;
   _pp.forcedQuant=0;
   updatePostProc(&_pp);
   _imageBuffer=NULL;    

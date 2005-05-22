@@ -18,6 +18,7 @@ typedef struct ADM_PP
 	pp_mode_t			*ppMode;
  	uint32_t			postProcType;
 	uint32_t			postProcStrength;
+        uint32_t                        swapuv;
 	uint32_t			forcedQuant;
 	uint32_t			fastMode;
 	uint32_t			w,h;

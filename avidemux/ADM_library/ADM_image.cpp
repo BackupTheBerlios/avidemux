@@ -94,27 +94,35 @@ ADMImage::~ADMImage()
 //
 //	Duplicate
 //
-uint8_t ADMImage::duplicate(ADMImage *src)
+uint8_t ADMImage::duplicateMacro(ADMImage *src,uint32_t swap)
 {
-	// Sanity check
-	ADM_assert(src->_width==_width);
-	ADM_assert(src->_height==_height);
+        // Sanity check
+        ADM_assert(src->_width==_width);
+        ADM_assert(src->_height==_height);
 
         ADM_assert(!_isRef); // could not duplicate to a linked data image
 
-	// cleanup if needed
-	if(quant) delete [] quant;
-	quant=NULL;
+        // cleanup if needed
+        if(quant) delete [] quant;
+        quant=NULL;
  
-       _qStride=0;	
-	_qSize=0;
-	
-	copyInfo(src);
+       _qStride=0;      
+        _qSize=0;
+        
+        copyInfo(src);
         if(!src->_isRef)
         {
-	       memcpy(YPLANE(this),YPLANE(src),_width*_height);
-	       memcpy(UPLANE(this),UPLANE(src),(_width*_height)>>2);
-	       memcpy(VPLANE(this),VPLANE(src),(_width*_height)>>2);
+               memcpy(YPLANE(this),YPLANE(src),_width*_height);
+                if(swap)
+                {
+                        memcpy(UPLANE(this),VPLANE(src),(_width*_height)>>2);
+                        memcpy(VPLANE(this),UPLANE(src),(_width*_height)>>2);
+                }
+                else
+                {
+                        memcpy(UPLANE(this),UPLANE(src),(_width*_height)>>2);
+                        memcpy(VPLANE(this),VPLANE(src),(_width*_height)>>2);
+                }
         }
         else
         {
@@ -160,19 +168,34 @@ uint8_t ADMImage::duplicate(ADMImage *src)
                 w>>=1;
                 h>>=1;
                 in=src->_planes[1];
-                out=UPLANE(this);
+                if(swap)
+                        out=VPLANE(this);
+                else
+                        out=UPLANE(this);
                 stride=src->_planeStride[1];
                 PLANE_CPY(h);
         
                 in=src->_planes[2];
-                out=VPLANE(this);
+                if(swap)
+                        out=UPLANE(this);
+                else
+                        out=VPLANE(this);
                 stride=src->_planeStride[2];
                 PLANE_CPY(h);
 
 
         }
-	return 1;
+        return 1;
 }
+uint8_t ADMImage::duplicate(ADMImage *src)
+{
+	return duplicateMacro(src,0);
+}
+uint8_t ADMImage::duplicateSwapUV(ADMImage *src)
+{
+        return duplicateMacro(src,0);
+}
+
 uint8_t ADMImage::duplicateFull(ADMImage *src)
 {
 	// Sanity check

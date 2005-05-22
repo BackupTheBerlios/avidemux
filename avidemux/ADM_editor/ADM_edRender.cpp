@@ -460,7 +460,10 @@ uint32_t left,ww;
 	if(!_pp.postProcType || !_pp.postProcStrength)
 	{
                 // nothing to do
-		image->duplicate(tmpImage);
+                if(_pp.swapuv)
+		      image->duplicateSwapUV(tmpImage);
+                else
+                        image->duplicate(tmpImage);
 		cache->updateFrameNum(image,frame);
                 if(refOnly) delete tmpImage;
 		aprintf("EdCache: Postproc disabled\n");
@@ -508,10 +511,18 @@ uint32_t left,ww;
                         strideTab[1]=strideTab2[1]=_info.width>>1;
                         strideTab[2]=strideTab2[2]=_info.width>>1;
                 }
+                if(_pp.swapuv)
+                {
         	        oBuff[0]= YPLANE(image);
-                        oBuff[1]= UPLANE(image);
-                        oBuff[2]= VPLANE(image);		
+                        oBuff[1]= VPLANE(image);
+                        oBuff[2]= UPLANE(image);		
+                }else
+                {
 
+                        oBuff[0]= YPLANE(image);
+                        oBuff[1]= UPLANE(image);
+                        oBuff[2]= VPLANE(image);                
+                }
 		 pp_postprocess(
 		 		iBuff,
 		 		strideTab,
@@ -587,6 +598,7 @@ uint8_t ADM_Composer::setPostProc( uint32_t type, uint32_t strength, uint32_t sw
 	if(!_nb_video) return 0;
 	_pp.postProcType=type;
 	_pp.postProcStrength=strength;
+        _pp.swapuv=swapuv;
 	updatePostProc(&_pp); // DeletePostproc/ini missing ?
 	return 1;
 }
@@ -595,7 +607,7 @@ uint8_t ADM_Composer::getPostProc( uint32_t *type, uint32_t *strength, uint32_t 
 	if(!_nb_video) return 0;
 	*type=_pp.postProcType;
 	*strength=_pp.postProcStrength;
-	*swapuv=0;
+	*swapuv=_pp.swapuv;
 	return 1;
 }
 //______________________________________________
