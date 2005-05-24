@@ -265,7 +265,8 @@ uint8_t fileParser::forward(uint64_t jmp)
 uint8_t fileParser::setpos(uint64_t o)
 {
 
-                        for(uint32_t i=0;i<_nbFd;i++)
+                if(o>=_head && o<_tail) return 1;
+                for(uint32_t i=0;i<_nbFd;i++)
                         {
                                 if( (o>=_sizeFdCumul[i]) && o<(_sizeFdCumul[i]+_sizeFd[i]))
                                         {

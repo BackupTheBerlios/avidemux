@@ -25,6 +25,7 @@
 class dmx_demuxerES: public dmx_demuxer
  {
           protected : 
+                  uint64_t stampAbs;
                   uint32_t consumed;
                   fileParser *parser;
                 
@@ -37,6 +38,7 @@ class dmx_demuxerES: public dmx_demuxer
                 
                 virtual uint8_t         forward(uint32_t f);
                 virtual uint8_t         stamp(void); 
+                virtual uint8_t         getStamp(uint64_t *abs,uint64_t *rel);
                 virtual uint64_t        elapsed(void);
                 
                 virtual uint8_t         getPos( uint64_t *abs,uint64_t *rel);

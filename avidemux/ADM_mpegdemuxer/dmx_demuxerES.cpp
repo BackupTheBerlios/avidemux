@@ -33,6 +33,7 @@ dmx_demuxerES::dmx_demuxerES(void)
 {
         consumed=0;
         parser=new fileParser();
+        stampAbs=0;
 }
 dmx_demuxerES::~dmx_demuxerES()
 {
@@ -53,6 +54,14 @@ uint8_t dmx_demuxerES::forward(uint32_t f)
 uint8_t  dmx_demuxerES::stamp(void)
 {
         consumed=0;
+        parser->getpos(&stampAbs);
+        stampAbs-=4;
+}
+uint8_t dmx_demuxerES::getStamp( uint64_t *a,uint64_t *r)
+{
+        *r=0;
+        *a=stampAbs;
+        return 1;
 }
 uint64_t dmx_demuxerES::elapsed(void)
 {
@@ -62,6 +71,7 @@ uint8_t  dmx_demuxerES::getPos( uint64_t *abs,uint64_t *rel)
 {
         *rel=0;
         parser->getpos(abs);
+        abs-=4; //
         return 1;
 }
 uint8_t dmx_demuxerES::setPos( uint64_t abs,uint64_t  rel)

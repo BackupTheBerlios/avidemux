@@ -38,6 +38,7 @@ class dmx_demuxer
 		
 		virtual uint8_t 	forward(uint32_t f)=0;
 	        virtual uint8_t         stamp(void)=0; 
+                virtual uint8_t         getStamp(uint64_t *abs,uint64_t *rel)=0;
                 virtual uint64_t        elapsed(void)=0;
                 
                 virtual uint8_t         getPos( uint64_t *abs,uint64_t *rel)=0;

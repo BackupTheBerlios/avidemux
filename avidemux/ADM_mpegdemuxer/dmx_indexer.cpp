@@ -63,11 +63,12 @@ static const uint32_t FPS[16]={
 
 static const char Type[5]={'X','I','P','B','D'};
 
-#define MAX_PUSHED 50
+#define MAX_PUSHED 100
 
 static uint32_t nbPushed,nbGop,nbImage;
 
 static uint32_t frameType[MAX_PUSHED],frameSize[MAX_PUSHED];
+static uint64_t frameAbs[MAX_PUSHED],frameRel[MAX_PUSHED];
 
 static uint64_t gopStartAbs,gopStartRel;
 /*
@@ -100,13 +101,13 @@ uint8_t dmx_indexer(char *mpeg,char *file)
         fprintf(out,"Type     : %c\n",'E'); // ES for now
         fprintf(out,"File     : %s\n",realname);
         fprintf(out,"Image    : %c\n",'P'); // Progressive
-        fprintf(out,"Picture  : %lu x %lu %lu fps\n",0,0,0); // width...
-        fprintf(out,"Nb Gop   : %lu \n",0); // width...
-        fprintf(out,"Nb Images: %lu \n",0); // width...
-        fprintf(out,"Nb Audio : %lu\n",0); 
+        fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",0,0,0); // width...
+        fprintf(out,"Nb Gop   : %05lu \n",0); // width...
+        fprintf(out,"Nb Images: %05lu \n",0); // width...
+        fprintf(out,"Nb Audio : %02lu\n",0); 
         fprintf(out,"Streams  : V0000:0000\n"); 
         
-        fprintf(out,"# NGop NImg nbImg Pos rel type:size type:size\n"); 
+        fprintf(out,"# NGop NImg nbImg type:abs:rel:size ...\n"); 
 
         uint8_t  firstGop=1;
         uint8_t  grabbing=0,seq_found=0;
@@ -146,17 +147,13 @@ uint8_t dmx_indexer(char *mpeg,char *file)
                                                         break;
                                         */
                                         case 0xB3: // sequence start
-                                                demuxer->stamp();
+                                                
                                                 grabbing=1;    
-                                                if(!firstGop)    
-                                                {                                        
-                                                        gopDump(out,demuxer);                        
-                                                }
-                                                else
-                                                {
-                                                        demuxer->getPos(&gopStartAbs,&gopStartRel);
+                                                if(firstGop)    
+                                                {                                                   
                                                         firstGop=0;
                                                 }
+                                                gopDump(out,demuxer);                        
                                                 if(seq_found)
                                                 {
                                                         demuxer->forward(8);
@@ -179,10 +176,8 @@ uint8_t dmx_indexer(char *mpeg,char *file)
                                                         grabbing=0;        
                                                         continue;
                                                 }
-                                                if(!firstGop)
-                                                        gopDump(out,demuxer);
+                                                gopDump(out,demuxer);
                                                 firstGop=0;
-                                                demuxer->stamp();
                                                 demuxer->forward(3);    
                                                 gop=demuxer->read8i();
                                                 
@@ -200,7 +195,6 @@ uint8_t dmx_indexer(char *mpeg,char *file)
                                                 ftype=7 & (val>>3);
                                              
                                                 Push(ftype,demuxer);
-                                                demuxer->stamp();
                                              
                                                 break;
                                         default:
@@ -217,10 +211,10 @@ stop_found:
         fprintf(out,"Type     : %c\n",'E'); // ES for now
         fprintf(out,"File     : %s\n",realname);
         fprintf(out,"Image    : %c\n",'P'); // Progressive
-        fprintf(out,"Picture  : %lu x %lu %lu fps\n",imageW,imageH,imageFps); // width...
-        fprintf(out,"Nb Gop   : %lu \n",nbGop); // width...
-        fprintf(out,"Nb Images: %lu \n",nbImage); // width...
-        fprintf(out,"Nb Audio : %lu\n",0); 
+        fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",imageW,imageH,imageFps); // width...
+        fprintf(out,"Nb Gop   : %05lu \n",nbGop); // width...
+        fprintf(out,"Nb Images: %05lu \n",nbImage); // width...
+        fprintf(out,"Nb Audio : %02lu\n",0); 
         fprintf(out,"Streams  : V0000:0000\n"); 
 
           fclose(out);
@@ -232,10 +226,25 @@ stop_found:
 /**** Push a frame**/
 uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer)
 {
+uint64_t abs,rel;
+        
+        
         frameType[nbPushed]=ftype;
+
+        
+        
         if(nbPushed)
+        {
+                
                 frameSize[nbPushed-1]=demuxer->elapsed();
+                demuxer->stamp();                
+                demuxer->getStamp(&abs,&rel);
+                frameAbs[nbPushed]=abs;
+                frameRel[nbPushed]=rel;        
+        
+        }
         nbPushed++;
+        
         ADM_assert(nbPushed<MAX_PUSHED);
         return 1;
 
@@ -243,19 +252,32 @@ uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer)
 /*** Pop the whold gop ***/
 uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer)
 {
+uint64_t abs,rel;
         if(!nbPushed) return 1;
 
-        frameSize[nbPushed]=demuxer->elapsed();
-        fprintf(fd,"%03lu %06lu %02lu %llu %llu ",nbGop,nbImage,nbPushed,gopStartAbs,gopStartRel);
+        frameSize[nbPushed-1]=demuxer->elapsed();
+        fprintf(fd,"V %03lu %06lu %02lu ",nbGop,nbImage,nbPushed);
 
-        for(uint32_t i=0;i<nbPushed;i++) fprintf(fd,"%c:%06lu ",Type[frameType[i]],frameSize[i]);
+        // For each picture Type : abs position : relat position : size
+        for(uint32_t i=0;i<nbPushed;i++) 
+        {
+                fprintf(fd,"%c:%08llx,%05lx",
+                        Type[frameType[i]],
+                        frameAbs[i],
+                        frameRel[i]);
+                fprintf(fd,",%05lx ",
+                        frameSize[i]);
+        }
         
         fprintf(fd,"\n");
 
         nbGop++;
         nbImage+=nbPushed;
         nbPushed=0;
-        demuxer->getPos(&gopStartAbs,&gopStartRel);
+        demuxer->stamp();
+        demuxer->getStamp(&abs,&rel);  
+        frameAbs[nbPushed]=abs;
+        frameRel[nbPushed]=rel;
         return 1;
         
 }
