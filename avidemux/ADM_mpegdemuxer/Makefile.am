@@ -5,7 +5,7 @@ INCLUDES = $(all_includes)
 
 libADM_mpegdemuxer_a_METASOURCES = AUTO
 
-libADM_mpegdemuxer_a_SOURCES = dmx_io.cpp
+libADM_mpegdemuxer_a_SOURCES = dmx_io.cpp dmx_demuxer.cpp dmx_indexer.cpp dmx_demuxerES.cpp
 
 
 EXTRA_DIST = 
