@@ -38,19 +38,19 @@ class dmx_demuxer
 		
 		virtual uint8_t 	forward(uint32_t f)=0;
 	        virtual uint8_t         stamp(void)=0; 
-                virtual uint8_t         getStamp(uint64_t *abs,uint64_t *rel)=0;
                 virtual uint64_t        elapsed(void)=0;
                 
                 virtual uint8_t         getPos( uint64_t *abs,uint64_t *rel)=0;
                 virtual uint8_t         setPos( uint64_t abs,uint64_t  rel)=0;
                 
                 virtual uint64_t        getSize( void) { return _size;}          
-                virtual uint8_t         sync( uint8_t *stream);
+                
             	
                 virtual uint8_t         read(uint8_t *w,uint32_t len)=0;
    	        virtual uint8_t		read8i(void)=0;
    	        virtual uint16_t	read16i(void)=0;
 		virtual uint32_t	read32i(void)=0;
+                virtual uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r)=0;
 		
 };	
 	

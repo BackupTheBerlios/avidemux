@@ -38,7 +38,7 @@ class dmx_demuxerES: public dmx_demuxer
                 
                 virtual uint8_t         forward(uint32_t f);
                 virtual uint8_t         stamp(void); 
-                virtual uint8_t         getStamp(uint64_t *abs,uint64_t *rel);
+
                 virtual uint64_t        elapsed(void);
                 
                 virtual uint8_t         getPos( uint64_t *abs,uint64_t *rel);
@@ -52,6 +52,7 @@ class dmx_demuxerES: public dmx_demuxer
                 virtual uint16_t        read16i(void)                 {ENDCHECK;consumed+=2;return parser->read16i();}
                 virtual uint32_t        read32i(void)                 {ENDCHECK;consumed+=4;return parser->read32i();}
                 
+                virtual uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r);
 };      
         
 

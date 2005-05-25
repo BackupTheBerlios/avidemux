@@ -57,12 +57,6 @@ uint8_t  dmx_demuxerES::stamp(void)
         parser->getpos(&stampAbs);
         stampAbs-=4;
 }
-uint8_t dmx_demuxerES::getStamp( uint64_t *a,uint64_t *r)
-{
-        *r=0;
-        *a=stampAbs;
-        return 1;
-}
 uint64_t dmx_demuxerES::elapsed(void)
 {
         return consumed;        
@@ -70,13 +64,54 @@ uint64_t dmx_demuxerES::elapsed(void)
 uint8_t  dmx_demuxerES::getPos( uint64_t *abs,uint64_t *rel)
 {
         *rel=0;
-        parser->getpos(abs);
-        abs-=4; //
+        parser->getpos(abs);       
         return 1;
 }
 uint8_t dmx_demuxerES::setPos( uint64_t abs,uint64_t  rel)
 {
                return parser->setpos(abs);
+}
+/*
+        Sync on mpeg sync word, returns the sync point in abs/r
+*/
+uint8_t         dmx_demuxerES::sync( uint8_t *stream,uint64_t *abs,uint64_t *r)
+{
+uint32_t val,hnt;
+         *r=0;
+
+                val=0;
+                hnt=0;                  
+                        
+                // preload
+                hnt=(read8i()<<16) + (read8i()<<8) +read8i();
+                if(_lastErr)
+                {
+                        _lastErr=0;
+                        printf("\n io error , aborting sync\n");
+                        return 0;       
+                }
+                
+                while((hnt!=0x00001))
+                {
+                                        
+                        hnt<<=8;
+                        val=read8i();                                   
+                        hnt+=val;
+                        hnt&=0xffffff;  
+                                        
+                        if(_lastErr)
+                        {
+                             _lastErr=0;
+                            printf("\n io error , aborting sync\n");
+                            return 0;
+                         }
+                                                                        
+                }
+                                
+                *stream=read8i();
+                parser->getpos(abs);
+                *abs-=4;
+                return 1;
 }
 
           

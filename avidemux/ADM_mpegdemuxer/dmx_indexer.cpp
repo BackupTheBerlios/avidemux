@@ -37,8 +37,8 @@
 #include "dmx_demuxerEs.h"
 
 
-static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer);
-static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer);
+static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
+static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
 
 uint8_t dmx_indexer(char *mpeg,char *file);
 
@@ -70,7 +70,7 @@ static uint32_t nbPushed,nbGop,nbImage;
 static uint32_t frameType[MAX_PUSHED],frameSize[MAX_PUSHED];
 static uint64_t frameAbs[MAX_PUSHED],frameRel[MAX_PUSHED];
 
-static uint64_t gopStartAbs,gopStartRel;
+
 /*
         Index the incoming mpeg file
 
@@ -79,7 +79,8 @@ uint8_t dmx_indexer(char *mpeg,char *file)
 {
         DIA_working *work;
         dmx_demuxer *demuxer;
-
+        uint64_t syncAbs,syncRel;
+        uint64_t lastAbs,lastRel;
         uint8_t streamid;                
         char *realname=PathCanonize(mpeg);
         FILE *out;        
@@ -113,28 +114,25 @@ uint8_t dmx_indexer(char *mpeg,char *file)
         uint8_t  grabbing=0,seq_found=0;
         uint32_t imageW, imageH, imageFps;
         uint32_t total_frame=0,val;
+
+        uint32_t temporal_ref,ftype;
+
         work=new DIA_working("Indexing mpeg");
 
         nbPushed=0;
         nbGop=0;
         nbImage=0;
-
-        gopStartAbs=0;
-        gopStartRel=0;
-
+        
         while(1)
         {
-                                if(!demuxer->sync(&streamid)) break;                                
+                                if(!demuxer->sync(&streamid,&syncAbs,&syncRel)) break;                                
                                 update++;
                                 if(update>100)
                                         {
-                                                uint64_t pos,rel;
-                                                demuxer->getPos(&pos,&rel);
-                                                if(work->update(pos>>16,demuxer->getSize()>>16))
+                                                if(work->update(syncAbs>>16,demuxer->getSize()>>16))
                                                 {
                                                         // abort;
                                                         goto stop_found;
-
                                                 }
                                                 update=0;
                                         }
@@ -153,7 +151,7 @@ uint8_t dmx_indexer(char *mpeg,char *file)
                                                 {                                                   
                                                         firstGop=0;
                                                 }
-                                                gopDump(out,demuxer);                        
+                                                gopDump(out,demuxer,syncAbs,syncRel);                        
                                                 if(seq_found)
                                                 {
                                                         demuxer->forward(8);
@@ -176,25 +174,21 @@ uint8_t dmx_indexer(char *mpeg,char *file)
                                                         grabbing=0;        
                                                         continue;
                                                 }
-                                                gopDump(out,demuxer);
+                                                gopDump(out,demuxer,syncAbs,syncRel);                        
                                                 firstGop=0;
                                                 demuxer->forward(3);    
                                                 gop=demuxer->read8i();
                                                 
                                                 break;
                                         case 0x00 : // picture
-                                                //  printf("PIC\n");
-                                                uint8_t ftype;
-                                                uint8_t temporal_ref;
-                                                
+                                               
                                                 if(!seq_found) continue;
                                                 grabbing=0;
                                                 total_frame++;
                                                 val=demuxer->read16i();
                                                 temporal_ref=val>>6;
                                                 ftype=7 & (val>>3);
-                                             
-                                                Push(ftype,demuxer);
+                                                Push(ftype,demuxer,syncAbs,syncRel);
                                              
                                                 break;
                                         default:
@@ -202,7 +196,8 @@ uint8_t dmx_indexer(char *mpeg,char *file)
                                         }
                 }
 stop_found:
-          if(nbPushed)  gopDump(out,demuxer);
+          demuxer->getPos(&lastAbs,&lastRel);
+          if(nbPushed)  gopDump(out,demuxer,lastAbs,lastRel);
 
           fseeko(out,0,SEEK_SET);
 
@@ -224,23 +219,18 @@ stop_found:
           return 1;
 }
 /**** Push a frame**/
-uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer)
+uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
 {
-uint64_t abs,rel;
-        
-        
+                                            
         frameType[nbPushed]=ftype;
-
-        
         
         if(nbPushed)
         {
                 
                 frameSize[nbPushed-1]=demuxer->elapsed();
-                demuxer->stamp();                
-                demuxer->getStamp(&abs,&rel);
                 frameAbs[nbPushed]=abs;
                 frameRel[nbPushed]=rel;        
+                demuxer->stamp();
         
         }
         nbPushed++;
@@ -250,9 +240,9 @@ uint64_t abs,rel;
 
 }
 /*** Pop the whold gop ***/
-uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer)
+uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
 {
-uint64_t abs,rel;
+
         if(!nbPushed) return 1;
 
         frameSize[nbPushed-1]=demuxer->elapsed();
@@ -274,10 +264,10 @@ uint64_t abs,rel;
         nbGop++;
         nbImage+=nbPushed;
         nbPushed=0;
+                
+        frameAbs[0]=abs;
+        frameRel[0]=rel;
         demuxer->stamp();
-        demuxer->getStamp(&abs,&rel);  
-        frameAbs[nbPushed]=abs;
-        frameRel[nbPushed]=rel;
         return 1;
         
 }

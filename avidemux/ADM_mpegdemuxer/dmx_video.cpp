@@ -264,7 +264,7 @@ uint8_t                 dmxHeader::open(char *name)
                         if(string[0]!='V') continue;
         
                         // # NGop NImg nbImg Pos rel type:size type:size
-                        sscanf(string,"V %03lu %06lu %02lu ",&gop,&imageStart,&imageNb);
+                        sscanf(string,"V %lu %lu %lu ",&gop,&imageStart,&imageNb);
                                 ADM_assert(read==gop);
                                 ADM_assert(currentImage==imageStart);
                         
@@ -280,9 +280,11 @@ uint8_t                 dmxHeader::open(char *name)
                                         ADM_assert(str);
                                         str--;
                                       
-                                        sscanf(str,"%c:%08llx,%05lx,%05lx",&imgtype,&imgabs,&imgrel,&imgsize);
+                                        sscanf(str,"%c:%llx,%lx,%lx",&imgtype,&imgabs,&imgrel,&imgsize);
                                         _index[i].type=imgtype;
                                         _index[i].size=imgsize;
+                                       
+                                       
                                         _index[i].absolute=imgabs;
                                         _index[i].relative=imgrel;
                                         
@@ -398,7 +400,7 @@ uint8_t                 dmxHeader::open(char *name)
 void          dmxHeader:: Dump (void )
 {
          
-        for(uint32_t i=0;i<30;i++)
+        for(uint32_t i=0;i<50;i++)
         {
                 printf("%d : %c S:%x A:%x R:%x\n",i,_index[i].type,_index[i].size,_index[i].absolute,_index[i].relative);
 
@@ -468,7 +470,11 @@ uint8_t  dmxHeader::renumber(void)
 }
 
 //-------------------------
-
+// We do no try to optimize
+// sequential access,
+// it is up to the underlying layer to do so (demuxer)
+// Here we look for simplicity
+//__________________________
 uint8_t   dmxHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t *framelen,  uint32_t *flags)
 {
 uint32_t f;
