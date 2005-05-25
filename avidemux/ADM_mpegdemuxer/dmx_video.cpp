@@ -40,7 +40,7 @@
 #define H _mainaviheader.dwHeight
 
 #include "dmx_demuxerEs.h"
-
+#include "dmx_demuxerPS.h"
 
 #include "dmx_video.h"
 
@@ -228,7 +228,7 @@ uint8_t                 dmxHeader::open(char *name)
                 
                 ADM_assert(type=='E');
                 
-                demuxer=new dmx_demuxerES();
+                demuxer=new dmx_demuxerPS(0xE0);
                 if(!demuxer->open(realname))
                 {
                                 printf("\n cannot open mpeg >%s<\n",realname);

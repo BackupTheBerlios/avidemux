@@ -33,26 +33,26 @@ class dmx_demuxerES: public dmx_demuxer
                            dmx_demuxerES() ;
                 virtual    ~dmx_demuxerES();             
                 
-                virtual    uint8_t      open(char *name);
+                     uint8_t      open(char *name);
                  
                 
-                virtual uint8_t         forward(uint32_t f);
-                virtual uint8_t         stamp(void); 
+                  uint8_t         forward(uint32_t f);
+                  uint8_t         stamp(void); 
 
-                virtual uint64_t        elapsed(void);
+                  uint64_t        elapsed(void);
                 
-                virtual uint8_t         getPos( uint64_t *abs,uint64_t *rel);
-                virtual uint8_t         setPos( uint64_t abs,uint64_t  rel);
+                  uint8_t         getPos( uint64_t *abs,uint64_t *rel);
+                  uint8_t         setPos( uint64_t abs,uint64_t  rel);
                 
-                virtual uint64_t        getSize( void) { return _size;}          
+                  uint64_t        getSize( void) { return _size;}          
                 
                 
-                virtual uint8_t         read(uint8_t *w,uint32_t len) {ENDCHECK;consumed+=len;return parser->read32(len,w);}
-                virtual uint8_t         read8i(void)                  {ENDCHECK;consumed++;return parser->read8i();}
-                virtual uint16_t        read16i(void)                 {ENDCHECK;consumed+=2;return parser->read16i();}
-                virtual uint32_t        read32i(void)                 {ENDCHECK;consumed+=4;return parser->read32i();}
+                  uint8_t         read(uint8_t *w,uint32_t len) {ENDCHECK;consumed+=len;return parser->read32(len,w);}
+                  uint8_t         read8i(void)                  {ENDCHECK;consumed++;return parser->read8i();}
+                  uint16_t        read16i(void)                 {ENDCHECK;consumed+=2;return parser->read16i();}
+                  uint32_t        read32i(void)                 {ENDCHECK;consumed+=4;return parser->read32i();}
                 
-                virtual uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r);
+                  uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r);
 };      
         
 

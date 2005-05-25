@@ -35,6 +35,7 @@
 #define MODULE_NAME MODULE_MPEG
 #include "ADM_toolkit/ADM_debug.h"
 #include "dmx_demuxerEs.h"
+#include "dmx_demuxerPS.h"
 
 
 static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
@@ -87,9 +88,14 @@ uint8_t dmx_indexer(char *mpeg,char *file)
         
         uint32_t update=0;
 
-       
+#if 0       
         demuxer=new dmx_demuxerES;
         demuxer->open(realname);
+#else
+        demuxer=new dmx_demuxerPS(0xE0);
+        demuxer->open(realname);
+
+#endif
         out=fopen(file,"wt");
         if(!out)
         {
