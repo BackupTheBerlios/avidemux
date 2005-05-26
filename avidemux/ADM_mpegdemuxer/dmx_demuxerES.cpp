@@ -74,10 +74,12 @@ uint8_t dmx_demuxerES::setPos( uint64_t abs,uint64_t  rel)
 /*
         Sync on mpeg sync word, returns the sync point in abs/r
 */
-uint8_t         dmx_demuxerES::sync( uint8_t *stream,uint64_t *abs,uint64_t *r)
+uint8_t         dmx_demuxerES::sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts,uint64_t *dts)
 {
 uint32_t val,hnt;
          *r=0;
+                *pts=ADM_NO_PTS;
+                *dts=ADM_NO_PTS;
 
                 val=0;
                 hnt=0;                  

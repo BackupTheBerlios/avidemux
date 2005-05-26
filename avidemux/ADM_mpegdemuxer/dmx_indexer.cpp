@@ -38,6 +38,8 @@
 #include "dmx_demuxerPS.h"
 #include "dmx_identify.h"
 
+#define MIN_DELTA_PTS 150 // autofix in ms
+
 static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
 static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
 
@@ -76,13 +78,18 @@ static uint64_t frameAbs[MAX_PUSHED],frameRel[MAX_PUSHED];
         Index the incoming mpeg file
 
 */
-uint8_t dmx_indexer(char *mpeg,char *file)
+uint8_t dmx_indexer(char *mpeg,char *file,uint16_t videoPid,uint16_t videoPesPid,
+                                        uint16_t audioPid, uint16_t audioPesId)
+
 {
         DIA_working *work;
         dmx_demuxer *demuxer;
         uint64_t syncAbs,syncRel;
         uint64_t lastAbs,lastRel;
-        uint8_t streamid;                
+        uint64_t pts,dts;
+        uint64_t olddts=ADM_NO_PTS;
+        uint8_t streamid;   
+        uint32_t lastRefPic=0;             
         char *realname=PathCanonize(mpeg);
         FILE *out;        
         DMX_TYPE mpegType;
@@ -102,7 +109,7 @@ uint8_t dmx_indexer(char *mpeg,char *file)
                                 mpegTypeChar='E';
                                 break;
                 case DMX_MPG_PS:
-                                demuxer=new dmx_demuxerPS(0xE0);
+                                demuxer=new dmx_demuxerPS(videoPesPid,audioPesId);
                                 mpegTypeChar='P';
                                 break;
                 default : ADM_assert(0);
@@ -127,13 +134,13 @@ uint8_t dmx_indexer(char *mpeg,char *file)
         fprintf(out,"Nb Gop   : %05lu \n",0); // width...
         fprintf(out,"Nb Images: %05lu \n",0); // width...
         fprintf(out,"Nb Audio : %02lu\n",0); 
-        fprintf(out,"Streams  : V0000:0000\n"); 
+        fprintf(out,"Streams  : V%04x:%04x A%04X:%04X\n",videoPid,videoPesPid,audioPid,audioPesId); 
         
         fprintf(out,"# NGop NImg nbImg type:abs:rel:size ...\n"); 
 
         uint8_t  firstGop=1;
         uint8_t  grabbing=0,seq_found=0;
-        uint32_t imageW, imageH, imageFps;
+        uint32_t imageW=0, imageH=0, imageFps=0;
         uint32_t total_frame=0,val;
 
         uint32_t temporal_ref,ftype;
@@ -143,10 +150,10 @@ uint8_t dmx_indexer(char *mpeg,char *file)
         nbPushed=0;
         nbGop=0;
         nbImage=0;
-        
+        printf("*********Indexing started***********\n");
         while(1)
         {
-                                if(!demuxer->sync(&streamid,&syncAbs,&syncRel)) break;                                
+                                if(!demuxer->sync(&streamid,&syncAbs,&syncRel,&pts,&dts)) break;   
                                 update++;
                                 if(update>100)
                                         {
@@ -209,6 +216,33 @@ uint8_t dmx_indexer(char *mpeg,char *file)
                                                 val=demuxer->read16i();
                                                 temporal_ref=val>>6;
                                                 ftype=7 & (val>>3);
+#define USING dts
+                                                if(USING!=ADM_NO_PTS)
+                                                {
+                                                        if(olddts!=ADM_NO_PTS )
+                                                        {                
+                                                                if(USING>=olddts)
+                                                                {
+                                                                uint64_t delta,deltaRef;
+                                                                        delta=USING-olddts;
+                                                                        
+                                                                        delta/=90;
+                                                                      //  printf("Delta :%llu ms\n",delta);
+                                                                        // compute what we should be using
+                                                                        deltaRef=nbPushed+nbImage-lastRefPic;
+                                                                        // in ms
+                                                                        deltaRef=(deltaRef*1000*1000)/imageFps;
+                                                                        if(abs(delta-deltaRef)>MIN_DELTA_PTS)
+                                                                        {
+                                                                                printf("Discontinuity %llu %llu!\n",delta,deltaRef);
+                                                                        }
+                                                                } 
+                                                        }
+                                                        olddts=USING;
+                                                        lastRefPic=nbPushed+nbImage;
+                                                }
+                                                
+                                                
                                                 Push(ftype,demuxer,syncAbs,syncRel);
                                              
                                                 break;
@@ -231,10 +265,16 @@ stop_found:
         fprintf(out,"Nb Gop   : %05lu \n",nbGop); // width...
         fprintf(out,"Nb Images: %05lu \n",nbImage); // width...
         fprintf(out,"Nb Audio : %02lu\n",0); 
-        fprintf(out,"Streams  : V0000:0000\n"); 
+         fprintf(out,"Streams  : V%04x:%04x A%04X:%04X\n",videoPid,videoPesPid,audioPid,audioPesId); 
 
-          fclose(out);
-          delete work;
+        fclose(out);
+        delete work;  
+
+        printf("*********Indexing stopped***********\n");
+        printf("Found :%lu gop\n",nbGop);
+        printf("Found :%lu image\n",nbImage);
+        printf("Found :%lu audio byte\n",demuxer->audioCounted());
+        
           delete demuxer;
           delete [] realname;
           return 1;
@@ -281,6 +321,16 @@ uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
         }
         
         fprintf(fd,"\n");
+
+        // audio if any
+        //*******************************************
+        // Nb image abs_pos audio seen
+        // The Nb image is used to compute a drift
+        //*******************************************
+        if(demuxer->hasAudio())
+        {
+                fprintf(fd,"A %lu %llx %llu\n",nbImage,frameAbs[0],demuxer->audioCounted());
+        }
 
         nbGop++;
         nbImage+=nbPushed;

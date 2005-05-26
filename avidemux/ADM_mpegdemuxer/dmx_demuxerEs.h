@@ -52,7 +52,7 @@ class dmx_demuxerES: public dmx_demuxer
                   uint16_t        read16i(void)                 {ENDCHECK;consumed+=2;return parser->read16i();}
                   uint32_t        read32i(void)                 {ENDCHECK;consumed+=4;return parser->read32i();}
                 
-                  uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r);
+                  uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts,uint64_t *dts);
 };      
         
 

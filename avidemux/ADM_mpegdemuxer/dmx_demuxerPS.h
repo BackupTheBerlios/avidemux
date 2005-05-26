@@ -43,6 +43,9 @@ class dmx_demuxerPS: public dmx_demuxer
                   fileParser    *parser;
                   uint32_t       myPid;           // pid: high part =0xff if private stream, 00 if not
 
+                  uint32_t       otherPid;
+                  uint32_t       otherCount;
+
                   uint8_t       *_pesBuffer;
 
                   uint32_t      _pesBufferIndex; // current position in pesBuffer
@@ -66,9 +69,8 @@ class dmx_demuxerPS: public dmx_demuxer
                   uint8_t       refill(void);
                   uint8_t getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *len,uint64_t *pts,uint64_t *dts);
                   
-                
           public:
-                           dmx_demuxerPS(uint32_t myPid) ;
+                           dmx_demuxerPS(uint32_t myPid,uint32_t otherPid) ;
                 virtual    ~dmx_demuxerPS();             
                 
                      uint8_t      open(char *name);
@@ -86,6 +88,11 @@ class dmx_demuxerPS: public dmx_demuxer
                 
                 
                   uint8_t         read(uint8_t *w,uint32_t len);
+                  uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts, uint64_t *dts);
+
+                  uint8_t         hasAudio(void) { return 1;}
+                  uint32_t        audioCounted(void) {return otherCount;};
+
 // Inlined
 uint8_t         read8i(void)
 {
@@ -138,7 +145,7 @@ uint8_t b[4];
         return r;
 }
                 
-                  uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r);
+                  
 };      
         
 

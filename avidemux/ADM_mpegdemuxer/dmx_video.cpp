@@ -173,7 +173,7 @@ uint8_t                 dmxHeader::open(char *name)
                 uint8_t  type,progressif;
                 char     realname[1024];
                 uint32_t dummy;
-
+                uint32_t aPid,vPid,aPesPid;
                 
                 char string[1024]; //,str[1024];;
                 uint8_t interlac=0;
@@ -218,7 +218,7 @@ uint8_t                 dmxHeader::open(char *name)
                 //fscanf(string,"Nb Audio : %02lu\n",0); 
 
                 fgets(string,1023,file);
-                //fscanf(string,"Streams  : V0000:0000\n"); 
+                sscanf(string,"Streams  : V%X:%X A%X:%X\n",&vPid,&dummy,&aPid,&aPesPid); 
 
                 printf("For file :%s\n",realname);                
                 printf("Pic      :%dx%d, %d fps\n",w,h,fps);
@@ -229,7 +229,7 @@ uint8_t                 dmxHeader::open(char *name)
                 switch(type)
                 {
                         case 'P':
-                                demuxer=new dmx_demuxerPS(0xE0);
+                                demuxer=new dmx_demuxerPS(0xE0,aPesPid);
                                 break;
                         case 'E':
                                 demuxer=new dmx_demuxerES();
@@ -392,16 +392,22 @@ uint8_t                 dmxHeader::open(char *name)
      
                         _lastFrame=0xffffffff;
 
-                       _videostream.dwLength= _mainaviheader.dwTotalFrames=_nbFrames;
-     // audio ?
-                        Dump();                      
+                       _videostream.dwLength= _mainaviheader.dwTotalFrames=_nbFrames;     
+                       // Dump();                      
                         // switch DTS->PTS
                         if(!renumber())
                         {
                                 GUI_Alert("Mpeg renumbering error !");
                                 return 0;
                         }
-                        Dump();
+                        //Dump();
+                        if(type=='P')
+                        {
+                                // We have potentially some audio
+                                // Try to get it
+
+
+                        }
 
      printf("Mpeg index file successfully read\n");         
      return 1; 

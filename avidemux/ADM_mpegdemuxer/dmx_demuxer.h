@@ -34,7 +34,8 @@ class dmx_demuxer
 		virtual    ~dmx_demuxer();	       
 		
 		virtual    uint8_t   	open(char *name)=0;
-	         
+	        virtual    uint8_t      hasAudio(void) { return 0;}
+                virtual    uint32_t     audioCounted(void) { return 0;}
 		
 		virtual uint8_t 	forward(uint32_t f)=0;
 	        virtual uint8_t         stamp(void)=0; 
@@ -49,9 +50,8 @@ class dmx_demuxer
                 virtual uint8_t         read(uint8_t *w,uint32_t len)=0;
    	        virtual uint8_t		read8i(void)=0;
    	        virtual uint16_t	read16i(void)=0;
-		virtual uint32_t	read32i(void)=0;
-                virtual uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r)=0;
-		
+		virtual uint32_t	read32i(void)=0;                
+		virtual uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts, uint64_t *dts)=0;
 };	
 	
 

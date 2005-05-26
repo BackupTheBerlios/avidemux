@@ -29,7 +29,7 @@
 
 #include "dmx_demuxerPS.h"
  
-dmx_demuxerPS::dmx_demuxerPS(uint32_t pid)
+dmx_demuxerPS::dmx_demuxerPS(uint32_t pid,uint32_t opid)
 {
         consumed=0;
         parser=new fileParser();
@@ -43,6 +43,12 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t pid)
         _pesBufferIndex=0;
         
         myPid=pid;
+        otherPid=opid;
+
+        if(myPid<9 || myPid>0xA0) myPid|=0xff00;
+        if(otherPid<9 || otherPid>0xA0) otherPid|=0xff00;
+
+        otherCount=0;
 }
 dmx_demuxerPS::~dmx_demuxerPS()
 {
@@ -147,7 +153,7 @@ uint32_t mx;
                 return read(w,len);
                 
 }
-uint8_t         dmx_demuxerPS::sync( uint8_t *stream,uint64_t *abs,uint64_t *r)
+uint8_t         dmx_demuxerPS::sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts,uint64_t *dts)
 {
 uint32_t val,hnt;
          *r=0;
@@ -187,6 +193,8 @@ uint32_t val,hnt;
                 {
                         *abs=_pesBufferStart;
                         *r=_pesBufferIndex-4;
+                        *pts=_pesPTS;
+                        *dts=_pesDTS;
                 }
                 else
                 {       // pick what is needed from oldPesStart etc...
@@ -200,6 +208,8 @@ uint32_t val,hnt;
                                 }
                                 *abs=_oldPesStart;
                                 *r=left;
+                                *pts=_oldPTS;
+                                *dts=_oldDTS;
                 }
                 return 1;
 }
@@ -219,6 +229,9 @@ uint64_t abs,pts,dts;
 _again:
         if(!parser->sync(&stream)) 
         {
+                uint64_t pos;
+                parser->getpos(&pos);
+                printf("DmxPS: cannot sync  at %llu/%llu\n",pos,_size);
                 _lastErr=1;
                 return 0;
         }
@@ -253,7 +266,13 @@ _again:
                 if(!parser->read32(len,_pesBuffer)) return 0;
                 return 1;
         }
+        if(otherPid==globstream)
+        {
+                otherCount+=len;
+                parser->forward(len);
+        }
         // Here keep track of other tracks
+        parser->forward(len);
         goto _again;
         return 0;
 }
