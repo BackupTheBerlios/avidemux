@@ -226,9 +226,19 @@ uint8_t                 dmxHeader::open(char *name)
                 printf("#Img     :%lu\n",_nbFrames);
 
                 
-                ADM_assert(type=='E');
-                
-                demuxer=new dmx_demuxerPS(0xE0);
+                switch(type)
+                {
+                        case 'P':
+                                demuxer=new dmx_demuxerPS(0xE0);
+                                break;
+                        case 'E':
+                                demuxer=new dmx_demuxerES();
+                                break;
+                        default:
+                                ADM_assert(0);
+                }
+
+
                 if(!demuxer->open(realname))
                 {
                                 printf("\n cannot open mpeg >%s<\n",realname);

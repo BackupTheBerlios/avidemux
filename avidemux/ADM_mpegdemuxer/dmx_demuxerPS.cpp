@@ -101,7 +101,13 @@ uint8_t dmx_demuxerPS::setPos( uint64_t abs,uint64_t  rel)
                         printf("DMX_PS: refill failed\n");
                         return 0;
                 }
-                ADM_assert(rel<_pesBufferLen);
+                if(rel>=_pesBufferLen)
+                {
+                        printf("Set pos failed : asked rel:%lu max: %lu, absPos:%llu absPosafterRefill:%llu\n",
+                                        rel,_pesBufferLen,abs,_pesBufferStart);
+                        ADM_assert(rel<_pesBufferLen);                        
+                }
+
                 _pesBufferIndex=rel;
                 return 1;
                
@@ -187,6 +193,11 @@ uint32_t val,hnt;
                         // since the beginning in the previous packet
                         uint32_t left=4-_pesBufferIndex;
                                  left=_oldPesLen-left;
+                                 if(left>_oldPesLen)
+                                {
+                                        printf("Need %lu bytes from previous packet, which len is %lu\n",left,_oldPesLen);
+                                        ADM_assert(0);
+                                }
                                 *abs=_oldPesStart;
                                 *r=left;
                 }

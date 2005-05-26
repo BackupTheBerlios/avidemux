@@ -36,7 +36,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 #include "dmx_demuxerEs.h"
 #include "dmx_demuxerPS.h"
-
+#include "dmx_identify.h"
 
 static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
 static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
@@ -85,17 +85,32 @@ uint8_t dmx_indexer(char *mpeg,char *file)
         uint8_t streamid;                
         char *realname=PathCanonize(mpeg);
         FILE *out;        
-        
+        DMX_TYPE mpegType;
+        uint8_t  mpegTypeChar;
         uint32_t update=0;
 
-#if 0       
-        demuxer=new dmx_demuxerES;
-        demuxer->open(realname);
-#else
-        demuxer=new dmx_demuxerPS(0xE0);
+        mpegType=dmxIdentify(realname);
+        if(mpegType==DMX_MPG_UNKNOWN)
+        {
+                delete [] realname;
+                return 0;
+        }
+        switch(mpegType)
+        {
+                case DMX_MPG_ES:
+                                demuxer=new dmx_demuxerES;
+                                mpegTypeChar='E';
+                                break;
+                case DMX_MPG_PS:
+                                demuxer=new dmx_demuxerPS(0xE0);
+                                mpegTypeChar='P';
+                                break;
+                default : ADM_assert(0);
+
+        }
+        
         demuxer->open(realname);
 
-#endif
         out=fopen(file,"wt");
         if(!out)
         {
@@ -105,7 +120,7 @@ uint8_t dmx_indexer(char *mpeg,char *file)
                         return 0;
         }
         fprintf(out,"ADMX0003\n");
-        fprintf(out,"Type     : %c\n",'E'); // ES for now
+        fprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
         fprintf(out,"File     : %s\n",realname);
         fprintf(out,"Image    : %c\n",'P'); // Progressive
         fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",0,0,0); // width...
@@ -209,7 +224,7 @@ stop_found:
 
         // Update header
         fprintf(out,"ADMX0003\n");
-        fprintf(out,"Type     : %c\n",'E'); // ES for now
+        fprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
         fprintf(out,"File     : %s\n",realname);
         fprintf(out,"Image    : %c\n",'P'); // Progressive
         fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",imageW,imageH,imageFps); // width...

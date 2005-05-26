@@ -22,7 +22,19 @@
 #define PRIVATE_STREAM_1        0xbd
 #define PRIVATE_STREAM_2        0xbf
 #define SYSTEM_END_CODE         0xb9
+/*
+        A bit of explanation here.
+        The demuxer will take each packet and lookup what it is
+        If it is the seeked pes,it will copy its content into _pesBuffer
+        If not it will keep statical info and continue
 
+        The pid is like that :
+                For simple pes-pid it is the pes_pid (0xC0, 0xE0,...)
+                For data stored in private stream 1 (LPCM, AC3,...), the value is 0xFF00 + sub stream id
+                        with sub stream id : 0-8 for AC3, A0-A8 for LPCM, 
+
+
+*/
 class dmx_demuxerPS: public dmx_demuxer
  {
           protected : 
