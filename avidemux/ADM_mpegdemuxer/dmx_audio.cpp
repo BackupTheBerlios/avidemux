@@ -127,7 +127,13 @@ dmxAudioStream::open (char *name)
     default:
       ADM_assert (0);
     }
-
+  if(!demuxer->open(realname))
+        {
+                printf("DMX audio : cannot open %s\n");
+                
+                fclose(file);                
+                return 0;
+        }
   // Now build the index
   nbIndex = nbGop;
   index = new dmxAudioIndex[nbGop + 2];
@@ -152,9 +158,10 @@ dmxAudioStream::open (char *name)
   nbIndex = read;
   if (!read)
     {
-      printf ("No audio at all!\n");
+      printf ("No audio at all!\n");              
       return 0;
     }
+
   // now fill in the header
   _length = index[nbIndex - 1].count;
   _wavheader = new WAVHeader;
@@ -179,7 +186,8 @@ dmxAudioStream::open (char *name)
 
   demuxer->setPos (index[0].start, 0);
   _pos = 0;
-  printf ("\n Mpeg audio initialized (%lu bytes)\n", _length);
+  printf ("\n DMX audio initialized (%lu bytes)\n", _length);
+  printf ("With %lu sync point\n", nbIndex);
   return 1;
 }
 // __________________________________________________________
@@ -190,14 +198,37 @@ dmxAudioStream::goTo (uint32_t offset)
 {
 uint8_t dummy[1024];
 uint32_t left,right;
+int fnd=0;
+        
         // Search into the index to take the neareast one
         if(offset>=_length) return 0;
-        for(uint32_t i=0;i<nbIndex-1;i++)
+
+        if(offset<index[0].count)
         {
-                if(index[i].count>=offset && index[i+1].count<offset)
+                demuxer->setPos(0,0);
+                _pos=0;
+                fnd=1;
+        }
+        else
+        {
+                for(uint32_t i=0;i<nbIndex-1;i++)
                 {
-                        demuxer->setPos(index[i].start,0);
-                        _pos=index[i].count;
+                        if(index[i].count<=offset && index[i+1].count>offset)
+                        {
+                                demuxer->setPos(index[i].start,0);
+                                _pos=index[i].count;
+                                fnd=1;
+                                break;
+                
+                        }
+
+                }
+        }
+        if(!fnd)
+        {
+         printf("DMX audio : failed!\n");
+         return 0;
+        }
                         left=offset-_pos;
                         while(left)
                         {
@@ -209,13 +240,7 @@ uint32_t left,right;
                              left-=right;
                              _pos+=right;
                         }
-                        
-                        return 1;
-                
-                }
-
-        }
-  return 0;
+  return 1;
 }
 
 // __________________________________________________________
@@ -231,7 +256,7 @@ uint32_t read;
                                 printf("DMX_audio Going out of bound\n");
                                 return 0;
                         }
-                        if(!demuxer->read(ptr,size))
+                        if(!(size=demuxer->read(ptr,size)))
                         {
                                 printf("DMX_audio Read failed\n");
                                  return 0;
