@@ -47,7 +47,7 @@ class dmx_demuxerES: public dmx_demuxer
                   uint64_t        getSize( void) { return _size;}          
                 
                 
-                  uint8_t         read(uint8_t *w,uint32_t len) {ENDCHECK;consumed+=len;return parser->read32(len,w);}
+                  uint32_t        read(uint8_t *w,uint32_t len) {ENDCHECK;consumed+=len;return parser->read32(len,w);}
                   uint8_t         read8i(void)                  {ENDCHECK;consumed++;return parser->read8i();}
                   uint16_t        read16i(void)                 {ENDCHECK;consumed+=2;return parser->read16i();}
                   uint32_t        read32i(void)                 {ENDCHECK;consumed+=4;return parser->read32i();}

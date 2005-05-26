@@ -45,10 +45,11 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t pid,uint32_t opid)
         myPid=pid;
         otherPid=opid;
 
-        if(myPid<9 || myPid>0xA0) myPid|=0xff00;
-        if(otherPid<9 || otherPid>0xA0) otherPid|=0xff00;
+        if(myPid<9 || (myPid>0xA0&&myPid<0xA9)) myPid|=0xff00;
+        if(otherPid<9 || (otherPid>0xA0&&otherPid<0xA9)) otherPid|=0xff00;
 
         otherCount=0;
+        printf("Creating mpeg PS demuxer  main Pid: %X and 2nd pid: %X\n",myPid,otherPid);
 }
 dmx_demuxerPS::~dmx_demuxerPS()
 {
@@ -124,7 +125,7 @@ uint8_t dmx_demuxerPS::setPos( uint64_t abs,uint64_t  rel)
 
 
 
-uint8_t         dmx_demuxerPS::read(uint8_t *w,uint32_t len)
+uint32_t         dmx_demuxerPS::read(uint8_t *w,uint32_t len)
 {
 uint32_t mx;
                 // enough in buffer ?
@@ -133,7 +134,7 @@ uint32_t mx;
                         memcpy(w,_pesBuffer+_pesBufferIndex,len);
                         _pesBufferIndex+=len;
                         consumed+=len;
-                        return 1;
+                        return len;
                 }
                 // flush
                 mx=_pesBufferLen-_pesBufferIndex;
@@ -150,7 +151,7 @@ uint32_t mx;
                         _lastErr=1;
                          return 0;
                 }
-                return read(w,len);
+                return mx+read(w,len);
                 
 }
 uint8_t         dmx_demuxerPS::sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts,uint64_t *dts)
@@ -272,13 +273,13 @@ _again:
                 parser->forward(len);
         }
         // Here keep track of other tracks
-        parser->forward(len);
+        
         goto _again;
         return 0;
 }
 /*
         Retrieve info about the packet we just met
-        It is assumed that parser is just aftern the packet startcode
+        It is assumed that parser is just after the packet startcode
 
 */
 uint8_t dmx_demuxerPS::getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *olen,uint64_t *opts,uint64_t *odts)
@@ -437,50 +438,50 @@ uint8_t align=0;
 //----------------------------------------------------------------------------------------------                                        
            if(0) //_muxTypeMpeg2)
                 {
-                                        printf("*** packet type 1 inside type 2 ?????*****\n");
-                                        return 0; // mmmm                       
-                                }
-                        // now look at  STD buffer size if present
-                        // 01xxxxxxxxx
-                        if ((c>>6) == 1) 
-                        {       // 01
-                                                size-=2;
-                                                parser->read8i();                       // skip one byte
-                                                c=parser->read8i();   // then another
-                        }                       
-                        // PTS/DTS
-                        switch(c>>4)
-                                {
-                                case 2:
-                                        {
-                                                // 0010 xxxx PTS only
-                                                uint64_t pts1,pts2,pts0;
-                                                                size -= 4;
-                                                                pts0=(c>>1) &7;
-                                                                pts1=parser->read16i()>>1;
-                                                                pts2=parser->read16i()>>1;
-                                                                *opts=pts2+(pts1<<15)+(pts0<<30);
-                                                                break;
-                                        }
-                                case 3:
-                                        {               // 0011 xxxx
-                                                uint64_t pts1,pts2,pts0;
-                                                                size -= 9;
+                        printf("*** packet type 1 inside type 2 ?????*****\n");
+                        return 0; // mmmm                       
+                }
+          // now look at  STD buffer size if present
+          // 01xxxxxxxxx
+          if ((c>>6) == 1) 
+          {       // 01
+                        size-=2;
+                        parser->read8i();                       // skip one byte
+                        c=parser->read8i();   // then another
+           }                       
+           // PTS/DTS
+           switch(c>>4)
+           {
+                case 2:
+                {
+                        // 0010 xxxx PTS only
+                        uint64_t pts1,pts2,pts0;
+                                        size -= 4;
+                                        pts0=(c>>1) &7;
+                                        pts1=parser->read16i()>>1;
+                                        pts2=parser->read16i()>>1;
+                                        *opts=pts2+(pts1<<15)+(pts0<<30);
+                                        break;
+                  }
+                  case 3:
+                  {               // 0011 xxxx
+                        uint64_t pts1,pts2,pts0;
+                                        size -= 9;
                                                                         
-                                                                pts0=(c>>1) &7;
-                                                                pts1=parser->read16i()>>1;
-                                                                pts2=parser->read16i()>>1;
-                                                                *opts=pts2+(pts1<<15)+(pts0<<30);
-                                                                parser->forward(5);
-                                        }                                                               
-                                                                break;
-                                case 1:
-                                       // 0001 xxx             
-                                            // PTSDTS=01 not allowed                        
-                                                return 0;
-                                                break;
-                                                                                                
-                                }
+                                        pts0=(c>>1) &7;
+                                        pts1=parser->read16i()>>1;
+                                        pts2=parser->read16i()>>1;
+                                        *opts=pts2+(pts1<<15)+(pts0<<30);
+                                        parser->forward(5);
+                   }                                                               
+                   break;
+                   
+                case 1:
+                        // 0001 xxx             
+                        // PTSDTS=01 not allowed                        
+                                return 0;
+                                break; 
+                }
                                                                 
 
                 if(!align)      

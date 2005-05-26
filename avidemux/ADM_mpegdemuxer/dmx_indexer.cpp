@@ -327,9 +327,9 @@ uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
         // Nb image abs_pos audio seen
         // The Nb image is used to compute a drift
         //*******************************************
-        if(demuxer->hasAudio())
+        if(demuxer->hasAudio() && demuxer->audioCounted())
         {
-                fprintf(fd,"A %lu %llx %llu\n",nbImage,frameAbs[0],demuxer->audioCounted());
+                fprintf(fd,"A %lu %llx %llu\n",nbImage,abs,demuxer->audioCounted());
         }
 
         nbGop++;

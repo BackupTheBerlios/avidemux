@@ -36,13 +36,16 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_dialog/DIA_working.h"
 
-#define W _mainaviheader.dwWidth
-#define H _mainaviheader.dwHeight
 
 #include "dmx_demuxerEs.h"
 #include "dmx_demuxerPS.h"
 
 #include "dmx_video.h"
+#include "dmx_audio.h"
+
+#define W _mainaviheader.dwWidth
+#define H _mainaviheader.dwHeight
+
 
 dmxHeader::dmxHeader  (void)
 {                
@@ -57,6 +60,7 @@ dmxHeader::dmxHeader  (void)
         _nbGop=0;
 
         _index=NULL;
+        _audioStream=NULL;
 
 }
 //
@@ -66,6 +70,7 @@ dmxHeader::~dmxHeader  ()
 {
        
         close();
+        _audioStream=NULL; // Will be destroyed by audio!
 }
 uint8_t            dmxHeader::getRaw(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
 {
@@ -129,6 +134,7 @@ uint8_t                 dmxHeader::close(void)
 
 WAVHeader *dmxHeader::getAudioInfo(void )
 {
+        if(_audioStream) return _audioStream->getInfo();
                  return NULL;
 
 }
@@ -137,6 +143,12 @@ WAVHeader *dmxHeader::getAudioInfo(void )
 
 uint8_t                 dmxHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {
+        if(_audioStream)
+        {
+                *audio=_audioStream;
+                return 1;
+        }
+                *audio=NULL;
                 return 0;
 
 
@@ -165,6 +177,7 @@ uint8_t dmxHeader::getFrameSize(uint32_t frame,uint32_t *size) {
 
 
 */
+#define MAX_LINE 4096
 uint8_t                 dmxHeader::open(char *name)
 {
                 FILE *file;
@@ -175,7 +188,7 @@ uint8_t                 dmxHeader::open(char *name)
                 uint32_t dummy;
                 uint32_t aPid,vPid,aPesPid;
                 
-                char string[1024]; //,str[1024];;
+                char string[MAX_LINE+1]; //,str[1024];;
                 uint8_t interlac=0;
                         
                 printf("\n  opening d2v file : %s\n",name);
@@ -186,7 +199,7 @@ uint8_t                 dmxHeader::open(char *name)
                                 return 0;
                         }
                 
-                fgets(string,1023,file);        // File header
+                fgets(string,MAX_LINE,file);        // File header
                 if(strncmp(string,"ADMX",4))
                 {
                         fclose(file);
@@ -195,29 +208,29 @@ uint8_t                 dmxHeader::open(char *name)
                 }
         
                 
-                fgets(string,1023,file);
+                fgets(string,MAX_LINE,file);
                 sscanf(string,"Type     : %c\n",&type); // ES for now
                 
 
-                fgets(string,1023,file);
+                fgets(string,MAX_LINE,file);
                 sscanf(string,"File     : %s\n",realname);
 
-                fgets(string,1023,file);
+                fgets(string,MAX_LINE,file);
                 sscanf(string,"Image    : %c\n",&progressif); // Progressive
 
-                fgets(string,1023,file);
+                fgets(string,MAX_LINE,file);
                 sscanf(string,"Picture  : %04lu x %04lu %05lu fps\n",&w,&h,&fps); // width...
 
-                fgets(string,1023,file);
+                fgets(string,MAX_LINE,file);
                 sscanf(string,"Nb Gop   : %05lu \n",&_nbGop); // width...
 
-                fgets(string,1023,file);
+                fgets(string,MAX_LINE,file);
                 sscanf(string,"Nb Images: %05lu \n",&_nbFrames); // width...
 
-                fgets(string,1023,file);
+                fgets(string,MAX_LINE,file);
                 //fscanf(string,"Nb Audio : %02lu\n",0); 
 
-                fgets(string,1023,file);
+                fgets(string,MAX_LINE,file);
                 sscanf(string,"Streams  : V%X:%X A%X:%X\n",&vPid,&dummy,&aPid,&aPesPid); 
 
                 printf("For file :%s\n",realname);                
@@ -270,7 +283,7 @@ uint8_t                 dmxHeader::open(char *name)
                 DIA_working *work=new DIA_working("Opening mpeg..");
                 while(read<_nbGop)
                 {
-                        if(!fgets(string,1023,file)) break;
+                        if(!fgets(string,MAX_LINE,file)) break;
                         if(string[0]!='V') continue;
         
                         // # NGop NImg nbImg Pos rel type:size type:size
@@ -287,7 +300,13 @@ uint8_t                 dmxHeader::open(char *name)
                                 for(uint32_t i=currentImage;i<currentImage+imageNb;i++)
                                 {
                                         str=strstr(needle,":"); 
-                                        ADM_assert(str);
+                                        if(!str)
+                                        {
+                                                printf("Gop: %d/%d\n",read,_nbGop);
+                                                printf("Img: %d/%d\n",i,i-currentImage);
+                                                printf("Str:%s\n",string);
+                                                ADM_assert(0);
+                                        }
                                         str--;
                                       
                                         sscanf(str,"%c:%llx,%lx,%lx",&imgtype,&imgabs,&imgrel,&imgsize);
@@ -405,10 +424,16 @@ uint8_t                 dmxHeader::open(char *name)
                         {
                                 // We have potentially some audio
                                 // Try to get it
-
+                                dmxAudioStream *tmp;
+                                tmp=new dmxAudioStream;
+                                if(!tmp->open(name)) delete tmp;
+                                else
+                                {
+                                        _audioStream=tmp;
+                                }
 
                         }
-
+                        
      printf("Mpeg index file successfully read\n");         
      return 1; 
 }

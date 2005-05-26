@@ -49,7 +49,7 @@
                         uint8_t  getpos(uint64_t *o);
                         uint8_t  setpos(uint64_t o);                
                         uint64_t getSize( void ) ;
-                        uint8_t  read32(uint32_t l, uint8_t *buffer);
+                        uint32_t read32(uint32_t l, uint8_t *buffer);
                         uint8_t  end(void) { return _off==_size-1;};
 #ifdef NO_INLINE_FP
                         uint32_t read32i(void );

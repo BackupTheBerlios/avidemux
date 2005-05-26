@@ -87,7 +87,7 @@ class dmx_demuxerPS: public dmx_demuxer
                   uint64_t        getSize( void) { return _size;}          
                 
                 
-                  uint8_t         read(uint8_t *w,uint32_t len);
+                  uint32_t        read(uint8_t *w,uint32_t len);
                   uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts, uint64_t *dts);
 
                   uint8_t         hasAudio(void) { return 1;}

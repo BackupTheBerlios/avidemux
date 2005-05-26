@@ -330,7 +330,7 @@ uint8_t fileParser::getpos(uint64_t *o)
 /*--------------------------------------------------
                 Read l bytes from file
 ----------------------------------------------------*/
-uint8_t fileParser::read32(uint32_t len, uint8_t *buffer)
+uint32_t fileParser::read32(uint32_t len, uint8_t *buffer)
 {
 uint32_t r;
 
@@ -338,22 +338,28 @@ uint64_t remain,begin,mx,last;
 
         ADM_assert(_off>=_head);
         ADM_assert(_off<=_tail);
-      
+              
+        if(_head>=_size-1) return 0;
+ 
+// Check we do not go out of bound
         if(_off+len>=_size)
         {
-                _off=_size-1;
-                _tail=_head=_off;
-                return 0;
+                len=_size-_off;
         }
+
         remain=_tail-_off;
         begin=_off-_head;
-        if(len<remain)
-        {
-                
+
+
+
+        // everything in cache ?
+        if(len<=remain)
+        {                
                 memcpy(buffer,_buffer+begin,len);
                 _off+=len;
-                return 1;
+                return len;
         }
+        
         // No enough data, purge cache
         if(remain)
         {
@@ -361,8 +367,11 @@ uint64_t remain,begin,mx,last;
                 _off+=remain;
                 len-=remain;
                 buffer+=remain;
+                return remain+read32(len,buffer);
         }
-        // Reload
+        
+        // Reload ?
+        // What is left in that file ?
         mx=_sizeFd[_curFd]+_sizeFdCumul[_curFd]-_off;
         // Do we need more, if so jump over it
         if(len>mx)
@@ -375,7 +384,7 @@ uint64_t remain,begin,mx,last;
                 _curFd++;                
                 if(_curFd>=_nbFd) return 0;
                 fseeko(_fd[_curFd],0,SEEK_SET);
-                return read32(len,buffer);
+                return mx+read32(len,buffer);
         }
         // Read what is available in file, store leftover in the buffer
         fread(buffer,len,1,_fd[_curFd]);
@@ -387,7 +396,7 @@ uint64_t remain,begin,mx,last;
         _head=_off;
         _tail=_head+mx;
         
-         return 1;
+         return len;
         
 }       
 #ifdef NO_INLINE_FP
