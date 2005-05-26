@@ -38,6 +38,11 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "dmx_audio.h"
+#include "ADM_audio/ADM_mp3info.h"
+#include "ADM_audio/ADM_a52info.h"
+#define MAX_LINE 4096
+#define PROBE_SIZE (4096*2)
+
 //___________________________________________________                                                                                                                           
 //___________________________________________________                                                                                                                           
 
@@ -57,7 +62,6 @@ dmxAudioStream::~dmxAudioStream ()
   demuxer = NULL;
 
 }
-#define MAX_LINE 4096
 dmxAudioStream::dmxAudioStream (void)
 {
   _wavheader = NULL;
@@ -105,10 +109,10 @@ dmxAudioStream::open (char *name)
   sscanf (string, "Picture  : %04lu x %04lu %05lu fps\n", &w, &h, &fps);	// width...
 
   fgets (string, MAX_LINE, file);
-  sscanf (string, "Nb Gop   : %05lu \n", &nbGop);	// width...
+  sscanf (string, "Nb Gop   : %lu \n", &nbGop);	// width...
 
   fgets (string, MAX_LINE, file);
-  sscanf (string, "Nb Images: %05lu \n", &nbFrame);	// width...
+  sscanf (string, "Nb Images: %lu \n", &nbFrame);	// width...
 
   fgets (string, MAX_LINE, file);
   //fscanf(string,"Nb Audio : %02lu\n",0); 
@@ -170,21 +174,17 @@ dmxAudioStream::open (char *name)
   // put some default value
   _wavheader->bitspersample = 16;
   _wavheader->blockalign = 4;
-  _wavheader->byterate = 224000 / 8;
-  _wavheader->channels = 2;
-
+  
   _destroyable = 1;
   strcpy (_name, "dmx audio");
-  demuxer->setPos (index[0].start, 0);
-        //********************************
-        // Should auto probe stream here
-        //********************************
-  _wavheader->encoding = WAV_MP2;
+  demuxer->setPos (0, 0);
 
-  _wavheader->frequency = 44100;
-  _wavheader->byterate = 192000 / 8;
-
-  demuxer->setPos (index[0].start, 0);
+  if(!probeAudio()) return 0;
+        printf("Probed audio\n");
+        printf("Br:%lu\n",(_wavheader->byterate*8)/1000);
+        printf("Fq:%lu\n",_wavheader->frequency);
+        printf("Ch:%lu\n",_wavheader->channels);
+  demuxer->setPos (0, 0);
   _pos = 0;
   printf ("\n DMX audio initialized (%lu bytes)\n", _length);
   printf ("With %lu sync point\n", nbIndex);
@@ -264,5 +264,66 @@ uint32_t read;
                         _pos+=size;     
                         return size;
 }
+// __________________________________________________________
+// __________________________________________________________
 
+uint8_t dmxAudioStream::probeAudio (void)
+{
+uint32_t read,offset,offset2,fq,br,chan;          
+uint8_t buffer[PROBE_SIZE];
+MpegAudioInfo mpegInfo;
+                
+        if(PROBE_SIZE!=demuxer->read(buffer,PROBE_SIZE)) return 0;
+
+        // Try mp2/3
+        if(getMpegFrameInfo(buffer,PROBE_SIZE,&mpegInfo,NULL,&offset))
+        {
+                if(getMpegFrameInfo(buffer+offset,PROBE_SIZE-offset,&mpegInfo,NULL,&offset2))
+                        if(!offset2)
+                        {
+                                _wavheader->byterate=(1000*mpegInfo.bitrate)>>3;
+                                _wavheader->frequency=mpegInfo.samplerate;
+
+                                if(mpegInfo.mode!=3) _wavheader->channels=2;
+                                        else _wavheader->channels=1;
+
+                                if(mpegInfo.layer==3) _wavheader->encoding=WAV_MP3;
+                                else _wavheader->encoding=WAV_MP2;
+                                return 1;
+                        }
+        }
+        // Try AC3
+
+        if(ADM_AC3GetInfo(buffer,PROBE_SIZE,&fq,&br,&chan,&offset))
+        {
+                if(ADM_AC3GetInfo(buffer+offset,PROBE_SIZE-offset,&fq,&br,&chan,&offset2))
+                {
+                                _wavheader->byterate=(1000*br)>>3;
+                                _wavheader->frequency=fq;                                
+                                _wavheader->encoding=WAV_AC3;
+                                _wavheader->channels=chan;
+                                return 1;
+                }
+        }
+        // Default 48khz stereo lpcm
+                _wavheader->byterate=(48000*4);
+                _wavheader->frequency=48000;                                
+                _wavheader->encoding=WAV_LPCM;
+                _wavheader->channels=2;
+        return 1;
+}
+#if 0
+void dmxAudioStream::checkAudio(void)
+{
+        lastImg=index[0].image;
+        lastCount=index[0].count;
+        for(uint32_t i=1;i<nbIndex-1;i++)
+        {
+                deltaImage=index[i].image-lastImg;
+                deltaSound=index[i].count-lastImg;
+
+        }
+
+}
+#endif
  //

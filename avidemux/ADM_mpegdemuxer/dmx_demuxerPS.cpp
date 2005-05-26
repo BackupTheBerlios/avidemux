@@ -249,6 +249,8 @@ _again:
         {
                 goto _again;
         }
+        if(len>MAX_PES_BUFFER) goto _again;
+
         if(stream==PRIVATE_STREAM_1) globstream=0xFF00+substream;
                 else                 globstream=stream;
         if(myPid==globstream)
@@ -263,17 +265,17 @@ _again:
                 _pesBufferStart=abs;
                 _pesBufferLen=len;
                 _pesBufferIndex=0;
-                ADM_assert(len<MAX_PES_BUFFER);
+
                 if(!parser->read32(len,_pesBuffer)) return 0;
                 return 1;
         }
         if(otherPid==globstream)
         {
                 otherCount+=len;
-                parser->forward(len);
+               
         }
         // Here keep track of other tracks
-        
+         parser->forward(len);
         goto _again;
         return 0;
 }

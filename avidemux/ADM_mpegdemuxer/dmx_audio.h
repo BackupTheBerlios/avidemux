@@ -30,7 +30,7 @@
 class dmxAudioStream : public AVDMGenericAudioStream
 {
         protected:
- 
+                uint8_t         probeAudio (void);
        protected:
                 dmx_demuxer            *demuxer;       
                 uint32_t                nbIndex;

@@ -222,10 +222,10 @@ uint8_t                 dmxHeader::open(char *name)
                 sscanf(string,"Picture  : %04lu x %04lu %05lu fps\n",&w,&h,&fps); // width...
 
                 fgets(string,MAX_LINE,file);
-                sscanf(string,"Nb Gop   : %05lu \n",&_nbGop); // width...
+                sscanf(string,"Nb Gop   : %lu \n",&_nbGop); // width...
 
                 fgets(string,MAX_LINE,file);
-                sscanf(string,"Nb Images: %05lu \n",&_nbFrames); // width...
+                sscanf(string,"Nb Images: %lu \n",&_nbFrames); // width...
 
                 fgets(string,MAX_LINE,file);
                 //fscanf(string,"Nb Audio : %02lu\n",0); 
@@ -285,7 +285,7 @@ uint8_t                 dmxHeader::open(char *name)
                 {
                         if(!fgets(string,MAX_LINE,file)) break;
                         if(string[0]!='V') continue;
-        
+                        //printf("%s\n",string);
                         // # NGop NImg nbImg Pos rel type:size type:size
                         sscanf(string,"V %lu %lu %lu ",&gop,&imageStart,&imageNb);
                                 ADM_assert(read==gop);
@@ -297,19 +297,28 @@ uint8_t                 dmxHeader::open(char *name)
                                 ADM_assert(needle);
                                 needle--;
                                 // 
+                                
                                 for(uint32_t i=currentImage;i<currentImage+imageNb;i++)
                                 {
                                         str=strstr(needle,":"); 
                                         if(!str)
                                         {
+                                                printf("****** Error reading index, index damaged ?****\n");
                                                 printf("Gop: %d/%d\n",read,_nbGop);
-                                                printf("Img: %d/%d\n",i,i-currentImage);
+                                                printf("Img: %d/%d/%d\n",i,i-currentImage,imageNb);
                                                 printf("Str:%s\n",string);
+                                                printf("****** Error reading index, index damaged ?****\n");
                                                 ADM_assert(0);
                                         }
                                         str--;
                                       
                                         sscanf(str,"%c:%llx,%lx,%lx",&imgtype,&imgabs,&imgrel,&imgsize);
+                                        if(i>=_nbFrames)         
+                                        {
+                                                printf("Max frame exceeded :%d/%d\n",i,_nbFrames);
+                                                ADM_assert(i<_nbFrames);
+                                        }
+                                        
                                         _index[i].type=imgtype;
                                         _index[i].size=imgsize;
                                        

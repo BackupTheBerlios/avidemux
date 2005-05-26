@@ -64,7 +64,7 @@ static const uint32_t FPS[16]={
                 0                       // 15
         };
 
-static const char Type[5]={'X','I','P','B','D'};
+static const char Type[5]={'X','I','P','B','P'};
 
 #define MAX_PUSHED 100
 
@@ -216,6 +216,12 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint16_t videoPid,uint16_t videoPesPid
                                                 val=demuxer->read16i();
                                                 temporal_ref=val>>6;
                                                 ftype=7 & (val>>3);
+                                                // skip illegal values
+                                                if(ftype<1 || ftype>3)
+                                                {
+                                                         printf("[Indexer]Met illegal pic at %llu + %llu\n",syncAbs,syncRel);
+                                                         continue;
+                                                }
 #define USING dts
                                                 if(USING!=ADM_NO_PTS)
                                                 {
