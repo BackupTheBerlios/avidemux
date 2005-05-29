@@ -294,7 +294,7 @@ uint32_t val,hnt;
         val=0;
         hnt=0;                  
         // preload
-        if((4+_off)>=_sizeFd[_curFd]) return 0;
+        if((4+_off)>=_sizeFd[_nbFd-1]) return 0;
         hnt=(read8i()<<16) + (read8i()<<8) +read8i();
         
 

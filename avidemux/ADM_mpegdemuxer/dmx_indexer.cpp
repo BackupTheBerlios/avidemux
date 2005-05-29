@@ -63,15 +63,22 @@ static const uint32_t FPS[16]={
                 0,                      // 14
                 0                       // 15
         };
-
+typedef struct IndFrame
+{
+	uint32_t type;
+	uint32_t size;
+	uint64_t abs;
+	uint64_t rel;
+	
+}IndFrame;
 static const char Type[5]={'X','I','P','B','P'};
 
 #define MAX_PUSHED 100
 
 static uint32_t nbPushed,nbGop,nbImage;
 
-static uint32_t frameType[MAX_PUSHED],frameSize[MAX_PUSHED];
-static uint64_t frameAbs[MAX_PUSHED],frameRel[MAX_PUSHED];
+
+static IndFrame frames[MAX_PUSHED];
 
 
 /*
@@ -109,8 +116,13 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint16_t videoPid,uint16_t videoPesPid
                                 mpegTypeChar='E';
                                 break;
                 case DMX_MPG_PS:
-                                demuxer=new dmx_demuxerPS(videoPesPid,audioPesId);
+                						{
+                								dmx_demuxerPS *dmx;
+                                dmx=new dmx_demuxerPS(videoPesPid,audioPesId);
+                               // dmx->setProbeSize(4*1024*1024LL);
+                                demuxer=dmx;
                                 mpegTypeChar='P';
+                            }
                                 break;
                 default : ADM_assert(0);
 
@@ -150,6 +162,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint16_t videoPid,uint16_t videoPesPid
         nbPushed=0;
         nbGop=0;
         nbImage=0;
+        grabbing=0;
         printf("*********Indexing started***********\n");
         while(1)
         {
@@ -173,12 +186,9 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint16_t videoPid,uint16_t videoPesPid
                                                         break;
                                         */
                                         case 0xB3: // sequence start
-                                                
+                                                if(grabbing) continue;
                                                 grabbing=1;    
-                                                if(firstGop)    
-                                                {                                                   
-                                                        firstGop=0;
-                                                }
+                                                
                                                 gopDump(out,demuxer,syncAbs,syncRel);                        
                                                 if(seq_found)
                                                 {
@@ -198,8 +208,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint16_t videoPid,uint16_t videoPesPid
                                                 uint32_t gop;   
                                                 if(!seq_found) continue;
                                                 if(grabbing) 
-                                                {
-                                                        grabbing=0;        
+                                                {                                                            
                                                         continue;
                                                 }
                                                 gopDump(out,demuxer,syncAbs,syncRel);                        
@@ -285,18 +294,23 @@ stop_found:
           delete [] realname;
           return 1;
 }
-/**** Push a frame**/
+/**** Push a frame
+There is a +- 2 correction when we switch gop
+as in the frame header we read 2 bytes
+Between frames, the error is self cancelling.
+
+**/
 uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
 {
                                             
-        frameType[nbPushed]=ftype;
+        frames[nbPushed].type=ftype;
         
         if(nbPushed)
-        {
-                
-                frameSize[nbPushed-1]=demuxer->elapsed();
-                frameAbs[nbPushed]=abs;
-                frameRel[nbPushed]=rel;        
+        {                
+                frames[nbPushed-1].size=demuxer->elapsed();
+                if(nbPushed==1) frames[nbPushed-1].size-=2;
+                frames[nbPushed].abs=abs;
+                frames[nbPushed].rel=rel;        
                 demuxer->stamp();
         
         }
@@ -309,21 +323,25 @@ uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
 /*** Pop the whold gop ***/
 uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
 {
-
+				if(!nbPushed && !nbImage) demuxer->stamp();
         if(!nbPushed) return 1;
 
-        frameSize[nbPushed-1]=demuxer->elapsed();
+        frames[nbPushed-1].size=demuxer->elapsed()+2;
         fprintf(fd,"V %03lu %06lu %02lu ",nbGop,nbImage,nbPushed);
 
         // For each picture Type : abs position : relat position : size
         for(uint32_t i=0;i<nbPushed;i++) 
         {
+#ifndef CYG_MANGLING        	
                 fprintf(fd,"%c:%08llx,%05lx",
-                        Type[frameType[i]],
-                        frameAbs[i],
-                        frameRel[i]);
+#else
+								fprintf(fd,"%c:%08I64x,%05lx",
+#endif                
+                        Type[frames[i].type],
+                        frames[i].abs,
+                        frames[i].rel);
                 fprintf(fd,",%05lx ",
-                        frameSize[i]);
+                        frames[i].size);
         }
         
         fprintf(fd,"\n");
@@ -335,15 +353,19 @@ uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
         //*******************************************
         if(demuxer->hasAudio() && demuxer->audioCounted())
         {
-                fprintf(fd,"A %lu %llx %llu\n",nbImage,abs,demuxer->audioCounted());
+#ifndef CYG_MANGLING        	
+                 fprintf(fd,"A %lu %llx %llu\n",nbImage,abs,demuxer->audioCounted());
+#else
+                fprintf(fd,"A %lu %I64x %I64u\n",nbImage,abs,demuxer->audioCounted());
+#endif                
         }
 
         nbGop++;
         nbImage+=nbPushed;
         nbPushed=0;
                 
-        frameAbs[0]=abs;
-        frameRel[0]=rel;
+        frames[0].abs=abs;
+        frames[0].rel=rel;
         demuxer->stamp();
         return 1;
         

@@ -311,8 +311,11 @@ uint8_t                 dmxHeader::open(char *name)
                                                 ADM_assert(0);
                                         }
                                         str--;
-                                      
+#ifdef CYG_MANGLING                                        
+                                        sscanf(str,"%c:%I64x,%lx,%lx",&imgtype,&imgabs,&imgrel,&imgsize);
+#else                                      
                                         sscanf(str,"%c:%llx,%lx,%lx",&imgtype,&imgabs,&imgrel,&imgsize);
+#endif                                          
                                         if(i>=_nbFrames)         
                                         {
                                                 printf("Max frame exceeded :%d/%d\n",i,_nbFrames);
@@ -555,5 +558,7 @@ uint8_t    dmxHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t *f
         return getFrameNoAlloc(framenum, ptr , framelen,NULL);
 
 }
+   
+
 
 // EOF

@@ -65,7 +65,7 @@ uint32_t fileParser::read32i(void )
        uint8_t *p;
         // case one, it fits in the buffer
         //
-        if(_off+4<_tail)
+        if(_off+3<_tail)
         {
                 p=&(_buffer[_off-_head]);
                 _off+=4;
@@ -85,7 +85,7 @@ uint16_t fileParser::read16i(void )
        uint8_t *p;
         // case one, it fits in the buffer
         //
-        if(_off+2<_tail)
+        if(_off+1<_tail)
         {
                 p=&(_buffer[_off-_head]);
                 _off+=2;
@@ -101,7 +101,7 @@ uint16_t fileParser::read16i(void )
 uint8_t fileParser::read8i(void )
 {
 uint8_t r;
-        if(_off+1<_tail)
+        if(_off<_tail)
         {
                 r= _buffer[_off-_head];
                 _off++;     

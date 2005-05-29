@@ -35,10 +35,10 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t pid,uint32_t opid)
         parser=new fileParser();
         stampAbs=0;
         _pesBuffer=new uint8_t [MAX_PES_BUFFER];
-        memset(allPid,0,sizeof(allPid));
+
         memset(seen,0,sizeof(seen));
 
-        _pesBufferStart=0;
+        _pesBufferStart=0;  // Big value so that we read
         _pesBufferLen=0;
         _pesBufferIndex=0;
         
@@ -49,6 +49,8 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t pid,uint32_t opid)
         if(otherPid<9 || (otherPid>0xA0&&otherPid<0xA9)) otherPid|=0xff00;
 
         otherCount=0;
+       	_probeSize=0; 
+       	memset(seen,0,255*sizeof(uint64_t));     
         printf("Creating mpeg PS demuxer  main Pid: %X and 2nd pid: %X\n",myPid,otherPid);
 }
 dmx_demuxerPS::~dmx_demuxerPS()
@@ -57,6 +59,11 @@ dmx_demuxerPS::~dmx_demuxerPS()
         parser=NULL;
         if(_pesBuffer) delete [] _pesBuffer;
         _pesBuffer=NULL;
+}
+uint8_t dmx_demuxerPS::setProbeSize(uint32_t sz)
+{
+		_probeSize=sz;
+		return 1;
 }
 uint8_t dmx_demuxerPS::open(char *name)
 {
@@ -68,7 +75,7 @@ uint8_t dmx_demuxerPS::open(char *name)
 uint8_t dmx_demuxerPS::forward(uint32_t f)
 {
 uint32_t left;        
-        if(_pesBufferIndex+f<_pesBufferLen) 
+        if(_pesBufferIndex+f<=_pesBufferLen) 
         {
                 _pesBufferIndex+=f;
                 consumed+=f;
@@ -97,6 +104,20 @@ uint8_t  dmx_demuxerPS::getPos( uint64_t *abs,uint64_t *rel)
 }
 uint8_t dmx_demuxerPS::setPos( uint64_t abs,uint64_t  rel)
 {
+				// Need to move ?
+				if(abs==_pesBufferStart && _pesBufferLen)
+				{
+						if(_pesBufferLen<=rel)
+							{
+								printf("Asked setpos to go %lu whereas %lu is max\n",
+											rel,_pesBufferLen);
+								ADM_assert(rel<_pesBufferLen);
+							}
+						
+					  _pesBufferIndex=rel;
+					  return 1;
+					
+				}
                if(!parser->setpos(abs))
                 {
                         printf("DMX_PS: setPos failed\n");
@@ -108,6 +129,7 @@ uint8_t dmx_demuxerPS::setPos( uint64_t abs,uint64_t  rel)
                         printf("DMX_PS: refill failed\n");
                         return 0;
                 }
+                
                 if(rel>=_pesBufferLen)
                 {
                         printf("Set pos failed : asked rel:%lu max: %lu, absPos:%llu absPosafterRefill:%llu\n",
@@ -129,7 +151,7 @@ uint32_t         dmx_demuxerPS::read(uint8_t *w,uint32_t len)
 {
 uint32_t mx;
                 // enough in buffer ?
-                if(_pesBufferIndex+len<_pesBufferLen)
+                if(_pesBufferIndex+len<=_pesBufferLen)
                 {
                         memcpy(w,_pesBuffer+_pesBufferIndex,len);
                         _pesBufferIndex+=len;
@@ -138,14 +160,15 @@ uint32_t mx;
                 }
                 // flush
                 mx=_pesBufferLen-_pesBufferIndex;
+								if(mx)
+								{
+                	memcpy(w,_pesBuffer+_pesBufferIndex,mx);
 
-                memcpy(w,_pesBuffer+_pesBufferIndex,mx);
-
-                _pesBufferIndex+=mx;
-                consumed+=mx;
-                w+=mx;
-                len-=mx;
-        
+                	_pesBufferIndex+=mx;
+                	consumed+=mx;
+                	w+=mx;
+                	len-=mx;
+        				}	
                 if(!refill())
                 {
                         _lastErr=1;
@@ -202,6 +225,8 @@ uint32_t val,hnt;
                         // since the beginning in the previous packet
                         uint32_t left=4-_pesBufferIndex;
                                  left=_oldPesLen-left;
+                                 printf("Next packet : %I64X Len :%lu, using previous packet %I64X len:%u as pos=%lu\n",
+                                 		_pesBufferStart,_pesBufferLen,_oldPesStart,_oldPesLen,_pesBufferIndex);
                                  if(left>_oldPesLen)
                                 {
                                         printf("Need %lu bytes from previous packet, which len is %lu\n",left,_oldPesLen);
@@ -236,12 +261,34 @@ _again:
                 _lastErr=1;
                 return 0;
         }
+        if(_probeSize)
+        {
+        	uint64_t pos;
+                parser->getpos(&pos);
+                if(pos>_probeSize)
+                {
+                		printf("Probe exceeded\n");
+                		return 0;
+                }
+        }
+// Handle out of band stuff        
+        if(stream==PACK_START_CODE) 
+        {
+        		parser->forward(8);
+        		goto _again;
+        }
+        if(stream==PADDING_CODE || stream==SYSTEM_START_CODE) 
+        {
+        		parser->forward(parser->read16i());
+        		goto _again;
+        }
         // Only keep relevant parts
         // i.e. a/v : C0 C9 E0 E9
         // subs 20-29
         // private data 1/2
 #define INSIDE(min,max) (stream>=min && stream<max)
-        if(!(  INSIDE(0xC0,0xC9) || INSIDE(0xE0,0xE9) || INSIDE(0x20,0x29) || stream==PRIVATE_STREAM_1)) goto _again;
+        if(!(  INSIDE(0xC0,0xC9) || INSIDE(0xE0,0xE9) || INSIDE(0x20,0x29) || stream==PRIVATE_STREAM_1
+        			)) goto _again;
         // Ok we got a candidate
         parser->getpos(&abs);
         abs-=4;
@@ -253,6 +300,7 @@ _again:
 
         if(stream==PRIVATE_STREAM_1) globstream=0xFF00+substream;
                 else                 globstream=stream;
+        seen[globstream & 0xFF]+=len;
         if(myPid==globstream)
         {
                 _oldPesStart=_pesBufferStart;
@@ -298,7 +346,8 @@ uint8_t align=0;
                 
                                         
                 size=parser->read16i();
-                if((stream==0xbe) || (stream==PRIVATE_STREAM_2)
+                if((stream==PADDING_CODE) || 
+                	 (stream==PRIVATE_STREAM_2)
                         ||(size==SYSTEM_START_CODE) //?
                         ) // special case, no header
                         {

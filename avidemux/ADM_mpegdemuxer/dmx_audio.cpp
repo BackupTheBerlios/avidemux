@@ -152,7 +152,11 @@ dmxAudioStream::open (char *name)
 	break;
       if (string[0] != 'A')
 	continue;
+#ifdef CYG_MANGLING
+      sscanf (string, "A %lu %llx %I64u\n", &img, &abs, &count);
+#else      
       sscanf (string, "A %lu %llx %llu\n", &img, &abs, &count);
+#endif        
       index[read].img = img;
       index[read].start = abs;
       index[read].count = count;
