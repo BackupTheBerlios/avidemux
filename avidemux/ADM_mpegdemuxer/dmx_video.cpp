@@ -186,7 +186,7 @@ uint8_t                 dmxHeader::open(char *name)
                 uint8_t  type,progressif;
                 char     realname[1024];
                 uint32_t dummy;
-                uint32_t aPid,vPid,aPesPid;
+                uint32_t vPid;
                 
                 char string[MAX_LINE+1]; //,str[1024];;
                 uint8_t interlac=0;
@@ -231,7 +231,10 @@ uint8_t                 dmxHeader::open(char *name)
                 //fscanf(string,"Nb Audio : %02lu\n",0); 
 
                 fgets(string,MAX_LINE,file);
-                sscanf(string,"Streams  : V%X:%X A%X:%X\n",&vPid,&dummy,&aPid,&aPesPid); 
+                //fprintf(out,"Main aud : %02lu\n",preferedAudio); 
+
+                fgets(string,MAX_LINE,file);
+                sscanf(string,"Streams  : V%X:%X \n",&dummy,&vPid); 
 
                 printf("For file :%s\n",realname);                
                 printf("Pic      :%dx%d, %d fps\n",w,h,fps);
@@ -242,8 +245,13 @@ uint8_t                 dmxHeader::open(char *name)
                 switch(type)
                 {
                         case 'P':
-                                demuxer=new dmx_demuxerPS(0xE0,aPesPid);
-                                break;
+                                {
+                                        MPEG_TRACK track;
+                                        track.pid=0;
+                                        track.pes=vPid;
+                                        demuxer=new dmx_demuxerPS(1,&track);
+                                        break;
+                                }
                         case 'E':
                                 demuxer=new dmx_demuxerES();
                                 break;

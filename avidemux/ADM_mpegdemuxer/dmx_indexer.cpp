@@ -85,9 +85,7 @@ static IndFrame frames[MAX_PUSHED];
         Index the incoming mpeg file
 
 */
-uint8_t dmx_indexer(char *mpeg,char *file,uint16_t videoPid,uint16_t videoPesPid,
-                                        uint16_t audioPid, uint16_t audioPesId)
-
+uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosync,uint32_t nbTracks,MPEG_TRACK *tracks)
 {
         DIA_working *work;
         dmx_demuxer *demuxer;
@@ -116,12 +114,11 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint16_t videoPid,uint16_t videoPesPid
                                 mpegTypeChar='E';
                                 break;
                 case DMX_MPG_PS:
-                						{
-                								dmx_demuxerPS *dmx;
-                                dmx=new dmx_demuxerPS(videoPesPid,audioPesId);
-                               // dmx->setProbeSize(4*1024*1024LL);
-                                demuxer=dmx;
-                                mpegTypeChar='P';
+                		{
+                		dmx_demuxerPS *dmx;
+                                        dmx=new dmx_demuxerPS(nbTracks,tracks);
+                                        demuxer=dmx;
+                                        mpegTypeChar='P';
                             }
                                 break;
                 default : ADM_assert(0);
@@ -144,10 +141,16 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint16_t videoPid,uint16_t videoPesPid
         fprintf(out,"Image    : %c\n",'P'); // Progressive
         fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",0,0,0); // width...
         fprintf(out,"Nb Gop   : %05lu \n",0); // width...
-        fprintf(out,"Nb Images: %05lu \n",0); // width...
-        fprintf(out,"Nb Audio : %02lu\n",0); 
-        fprintf(out,"Streams  : V%04x:%04x A%04X:%04X\n",videoPid,videoPesPid,audioPid,audioPesId); 
-        
+        fprintf(out,"Nb Images: %08lu \n",0); // width...
+        fprintf(out,"Nb Audio : %02lu\n",nbTracks-1); 
+        fprintf(out,"Main aud : %02lu\n",preferedAudio); 
+        fprintf(out,"Streams  : ");
+        for(int s=0;s<nbTracks;s++)
+        {
+                if(!s) fprintf(out,"V%04x:%04x ",tracks[0].pid,tracks[0].pes);
+                        else fprintf(out,"A%04x:%04x ",tracks[s].pid,tracks[s].pes);                
+        }
+        fprintf(out,"\n");
         fprintf(out,"# NGop NImg nbImg type:abs:rel:size ...\n"); 
 
         uint8_t  firstGop=1;
@@ -278,9 +281,7 @@ stop_found:
         fprintf(out,"Image    : %c\n",'P'); // Progressive
         fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",imageW,imageH,imageFps); // width...
         fprintf(out,"Nb Gop   : %05lu \n",nbGop); // width...
-        fprintf(out,"Nb Images: %05lu \n",nbImage); // width...
-        fprintf(out,"Nb Audio : %02lu\n",0); 
-         fprintf(out,"Streams  : V%04x:%04x A%04X:%04X\n",videoPid,videoPesPid,audioPid,audioPesId); 
+        fprintf(out,"Nb Images: %08lu \n",nbImage); // width...
 
         fclose(out);
         delete work;  
@@ -288,7 +289,7 @@ stop_found:
         printf("*********Indexing stopped***********\n");
         printf("Found :%lu gop\n",nbGop);
         printf("Found :%lu image\n",nbImage);
-        printf("Found :%lu audio byte\n",demuxer->audioCounted());
+
         
           delete demuxer;
           delete [] realname;
@@ -351,13 +352,15 @@ uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
         // Nb image abs_pos audio seen
         // The Nb image is used to compute a drift
         //*******************************************
-        if(demuxer->hasAudio() && demuxer->audioCounted())
+        if(demuxer->hasAudio() )
         {
+#if 0
 #ifndef CYG_MANGLING        	
                  fprintf(fd,"A %lu %llx %llu\n",nbImage,abs,demuxer->audioCounted());
 #else
                 fprintf(fd,"A %lu %I64x %I64u\n",nbImage,abs,demuxer->audioCounted());
 #endif                
+#endif
         }
 
         nbGop++;

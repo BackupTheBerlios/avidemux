@@ -81,6 +81,7 @@ dmxAudioStream::open (char *name)
   uint32_t aPid, vPid, aPesPid;
   uint32_t nbGop, nbFrame;
 
+return 0; // To complete
 
  file=fopen(name,"rt");
  if(!file) return 0;

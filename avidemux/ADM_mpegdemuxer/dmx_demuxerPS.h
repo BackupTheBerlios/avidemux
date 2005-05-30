@@ -1,8 +1,9 @@
 #ifndef DMX_DMX_PS
 #define DMX_DMX_PS
+
  
 #include "dmx_demuxer.h"
- 
+
 #define MAX_PES_BUFFER (65*1024) // should be safe enough
 #define MAX_PES_STREAM 50       // should be enough too :)
 
@@ -42,10 +43,7 @@ class dmx_demuxerPS: public dmx_demuxer
                   uint32_t      consumed;
                   fileParser    *parser;
                   uint32_t       myPid;           // pid: high part =0xff if private stream, 00 if not
-
-                  uint32_t       otherPid;
-                  uint32_t       otherCount;
-
+                  
                   uint8_t       *_pesBuffer;
 
                   uint32_t      _pesBufferIndex; // current position in pesBuffer
@@ -60,17 +58,18 @@ class dmx_demuxerPS: public dmx_demuxer
                   uint32_t      _oldPesLen;      // useful when need to go back (after video startcode)
                   uint64_t      _oldPTS;
                   uint64_t      _oldDTS;
-									uint32_t			_probeSize;			// If not nul, we will only seek to this
+                  uint32_t      _probeSize;      // If not nul, we will only seek to this
                   uint32_t      maxPid;
 
-                  uint64_t      seen[255];                                  
-
+                  uint64_t      seen[256];                                  
+                  uint8_t       mask[256];       
+                
                   uint8_t       refill(void);
-                  uint8_t 			getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *len,uint64_t *pts,uint64_t *dts);
+                  uint8_t       getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *len,uint64_t *pts,uint64_t *dts);
 
-                  uint8_t				getStat(uint64_t *oseen) {oseen=seen;return 1;}
+                  uint8_t	getStat(uint64_t *oseen) {oseen=seen;return 1;}
           public:
-                           dmx_demuxerPS(uint32_t myPid,uint32_t otherPid) ;
+                           dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks) ;
                 virtual    ~dmx_demuxerPS();             
                 
                      uint8_t      open(char *name);
@@ -85,13 +84,13 @@ class dmx_demuxerPS: public dmx_demuxer
                   uint8_t         setPos( uint64_t abs,uint64_t  rel);
                 
                   uint64_t        getSize( void) { return _size;}          
-                  uint8_t				  setProbeSize(uint32_t probe);                
+                  uint8_t         setProbeSize(uint32_t probe);                
                 
                   uint32_t        read(uint8_t *w,uint32_t len);
                   uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts, uint64_t *dts);
 
-                  uint8_t         hasAudio(void) { return 1;}
-                  uint32_t        audioCounted(void) {return otherCount;};
+                  uint8_t         hasAudio(void) { return 0;}
+
 
 // Inlined
 uint8_t         read8i(void)

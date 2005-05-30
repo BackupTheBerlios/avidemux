@@ -29,7 +29,7 @@
 
 #include "dmx_demuxerPS.h"
  
-dmx_demuxerPS::dmx_demuxerPS(uint32_t pid,uint32_t opid)
+dmx_demuxerPS::dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks)
 {
         consumed=0;
         parser=new fileParser();
@@ -41,17 +41,31 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t pid,uint32_t opid)
         _pesBufferStart=0;  // Big value so that we read
         _pesBufferLen=0;
         _pesBufferIndex=0;
+        ADM_assert(nb>0);
+
         
-        myPid=pid;
-        otherPid=opid;
+
+        
+        if(nb!=256)     // Only pick one track as main, and a few as informative
+        {
+                myPid=tracks[0].pes;
+                memset(mask,0,256);
+                for(int i=1;i<nb;i++)
+                {
+                        mask[i]=1;
+                }
+        }else
+        {
+                memset(mask,1,256); // take all tracks
+        }
 
         if(myPid<9 || (myPid>0xA0&&myPid<0xA9)) myPid|=0xff00;
-        if(otherPid<9 || (otherPid>0xA0&&otherPid<0xA9)) otherPid|=0xff00;
 
-        otherCount=0;
+
+
        	_probeSize=0; 
        	memset(seen,0,255*sizeof(uint64_t));     
-        printf("Creating mpeg PS demuxer  main Pid: %X and 2nd pid: %X\n",myPid,otherPid);
+        printf("Creating mpeg PS demuxer  main Pid: %X \n",myPid);
 }
 dmx_demuxerPS::~dmx_demuxerPS()
 {
@@ -225,8 +239,10 @@ uint32_t val,hnt;
                         // since the beginning in the previous packet
                         uint32_t left=4-_pesBufferIndex;
                                  left=_oldPesLen-left;
+#if 0
                                  printf("Next packet : %I64X Len :%lu, using previous packet %I64X len:%u as pos=%lu\n",
                                  		_pesBufferStart,_pesBufferLen,_oldPesStart,_oldPesLen,_pesBufferIndex);
+#endif
                                  if(left>_oldPesLen)
                                 {
                                         printf("Need %lu bytes from previous packet, which len is %lu\n",left,_oldPesLen);
@@ -317,9 +333,9 @@ _again:
                 if(!parser->read32(len,_pesBuffer)) return 0;
                 return 1;
         }
-        if(otherPid==globstream)
+        if(mask[globstream &0xff])
         {
-                otherCount+=len;
+                seen[globstream& 0xff]+=len;
                
         }
         // Here keep track of other tracks

@@ -21,7 +21,7 @@
 #include "dmx_io.h"
  
 #define ADM_NO_PTS 0xFFFFFFFFFFFFFFFFLL
-
+#include "dmx_indexer.h"
 class dmx_demuxer
  {
 	  protected : 
@@ -34,8 +34,7 @@ class dmx_demuxer
 		virtual    ~dmx_demuxer();	       
 		
 		virtual    uint8_t   	open(char *name)=0;
-	        virtual    uint8_t      hasAudio(void) { return 0;}
-                virtual    uint32_t     audioCounted(void) { return 0;}
+	        virtual    uint8_t      hasAudio(void) { return 0;}                
 		
 		virtual uint8_t 	forward(uint32_t f)=0;
 	        virtual uint8_t         stamp(void)=0; 

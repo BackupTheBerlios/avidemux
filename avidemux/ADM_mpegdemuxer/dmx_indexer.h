@@ -18,8 +18,14 @@
  #ifndef DMX_INDX
  #define DMX_INDX
  
-uint8_t dmx_indexer(char *mpeg,char *file,uint16_t videoPid,uint16_t videoPesPid,
-                                        uint16_t audioPid, uint16_t audioPesId);
+typedef struct MPEG_TRACK
+{
+        uint16_t pid;
+        uint16_t pes;
+        
+}MPEG_TRACK;
+
+uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosync,uint32_t nbTracks,MPEG_TRACK *tracks);
         
 
 #endif
