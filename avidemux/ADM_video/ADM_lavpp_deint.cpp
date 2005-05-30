@@ -175,7 +175,7 @@ void ADMVideoLavPPDeint::setup(void)
 #endif             
         cleanup();
 #undef ADD       
-#define ADD(z)  { if(string[0]) strcat(string,#z); else strcpy(string,#z);}        
+#define ADD(z)  { if(string[0]) strcat(string,","#z); else strcpy(string,#z);}        
                
         if(_param->autolevel) ADD(al);
         switch(_param->deintType)
