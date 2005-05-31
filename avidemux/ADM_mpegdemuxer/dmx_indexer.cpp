@@ -41,7 +41,7 @@
 #define MIN_DELTA_PTS 150 // autofix in ms
 
 static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
-static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
+static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel,uint32_t nbTracks);
 
 uint8_t dmx_indexer(char *mpeg,char *file);
 
@@ -192,7 +192,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 if(grabbing) continue;
                                                 grabbing=1;    
                                                 
-                                                gopDump(out,demuxer,syncAbs,syncRel);                        
+                                                gopDump(out,demuxer,syncAbs,syncRel,nbTracks);                        
                                                 if(seq_found)
                                                 {
                                                         demuxer->forward(8);
@@ -214,7 +214,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 {                                                            
                                                         continue;
                                                 }
-                                                gopDump(out,demuxer,syncAbs,syncRel);                        
+                                                gopDump(out,demuxer,syncAbs,syncRel,nbTracks);                        
                                                 firstGop=0;
                                                 demuxer->forward(3);    
                                                 gop=demuxer->read8i();
@@ -270,7 +270,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                 }
 stop_found:
           demuxer->getPos(&lastAbs,&lastRel);
-          if(nbPushed)  gopDump(out,demuxer,lastAbs,lastRel);
+          if(nbPushed)  gopDump(out,demuxer,lastAbs,lastRel,nbTracks);
 
           fseeko(out,0,SEEK_SET);
 
@@ -322,10 +322,12 @@ uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
 
 }
 /*** Pop the whold gop ***/
-uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
+uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel,uint32_t nbTracks)
 {
-				if(!nbPushed && !nbImage) demuxer->stamp();
+        if(!nbPushed && !nbImage) demuxer->stamp();
         if(!nbPushed) return 1;
+
+uint64_t stats[nbTracks];
 
         frames[nbPushed-1].size=demuxer->elapsed()+2;
         fprintf(fd,"V %03lu %06lu %02lu ",nbGop,nbImage,nbPushed);
@@ -333,11 +335,8 @@ uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
         // For each picture Type : abs position : relat position : size
         for(uint32_t i=0;i<nbPushed;i++) 
         {
-#ifndef CYG_MANGLING        	
-                fprintf(fd,"%c:%08llx,%05lx",
-#else
-								fprintf(fd,"%c:%08I64x,%05lx",
-#endif                
+
+                fprintf(fd,"%c:%08"LLX",%05lx",
                         Type[frames[i].type],
                         frames[i].abs,
                         frames[i].rel);
@@ -352,15 +351,17 @@ uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
         // Nb image abs_pos audio seen
         // The Nb image is used to compute a drift
         //*******************************************
-        if(demuxer->hasAudio() )
+        if(demuxer->hasAudio() & nbTracks>1)
         {
-#if 0
-#ifndef CYG_MANGLING        	
-                 fprintf(fd,"A %lu %llx %llu\n",nbImage,abs,demuxer->audioCounted());
-#else
-                fprintf(fd,"A %lu %I64x %I64u\n",nbImage,abs,demuxer->audioCounted());
-#endif                
-#endif
+                demuxer->getStats(stats);
+                
+                fprintf(fd,"A %lu %"LLX" ",nbImage,abs);
+                for(uint32_t i=1;i<nbTracks;i++)
+                {
+                        fprintf(fd,":%"LLX" ",stats[i]);
+                }
+                fprintf(fd,"\n");
+                
         }
 
         nbGop++;

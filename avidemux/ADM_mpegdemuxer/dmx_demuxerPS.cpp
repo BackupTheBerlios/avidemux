@@ -42,7 +42,9 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks)
         _pesBufferLen=0;
         _pesBufferIndex=0;
         ADM_assert(nb>0);
+        tracked=NULL;
 
+        nbTracked=nb;
         
 
         
@@ -50,10 +52,13 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks)
         {
                 myPid=tracks[0].pes;
                 memset(mask,0,256);
+                tracked=new uint8_t[nbTracked];
                 for(int i=1;i<nb;i++)
                 {
                         mask[i]=1;
-                }
+                        tracked[i]=tracks[i].pes&0xff;
+                }                
+                
         }else
         {
                 memset(mask,1,256); // take all tracks
@@ -73,6 +78,32 @@ dmx_demuxerPS::~dmx_demuxerPS()
         parser=NULL;
         if(_pesBuffer) delete [] _pesBuffer;
         _pesBuffer=NULL;
+        if(tracked) delete [] tracked;
+        tracked=NULL;
+}
+/*
+        Get stats about the PES ids tracked in tracked order
+        if nbTracked=256 it means tracks all possible PES id
+        The 0 rank is video
+*/
+uint8_t       dmx_demuxerPS::getStats(uint64_t *oseen)
+{
+        if(nbTracked!=256)
+        {
+                oseen[0]=0;
+                for(int i=1;i<nbTracked;i++)
+                {
+                        oseen[i]=seen[tracked[i]];
+                }
+        }
+        else
+        {
+                 for(int i=0;i<nbTracked;i++)
+                {
+                        oseen[i]=seen[i];
+                }
+        }
+        return 1;
 }
 uint8_t dmx_demuxerPS::setProbeSize(uint32_t sz)
 {

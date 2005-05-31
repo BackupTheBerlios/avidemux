@@ -78,10 +78,8 @@ dmxAudioStream::open (char *name)
   uint32_t w = 720, h = 576, fps = 0;
   uint8_t type, progressif;
   char realname[1024];
-  uint32_t aPid, vPid, aPesPid;
-  uint32_t nbGop, nbFrame;
-
-return 0; // To complete
+  uint32_t aPid, vPid, aPes,mainAudio;
+  uint32_t nbGop, nbFrame,nbAudioStream;
 
  file=fopen(name,"rt");
  if(!file) return 0;
@@ -116,19 +114,44 @@ return 0; // To complete
   sscanf (string, "Nb Images: %lu \n", &nbFrame);	// width...
 
   fgets (string, MAX_LINE, file);
-  //fscanf(string,"Nb Audio : %02lu\n",0); 
+  sscanf(string,"Nb Audio : %lu\n",&nbAudioStream); 
 
+  fgets(string,MAX_LINE,file);
+  sscanf(string,"Main aud : %lu\n",&mainAudio); 
+
+  if(!nbAudioStream)
+  {
+_abrt:
+         fclose (file);
+        return 0;
+  }
   fgets (string, MAX_LINE, file);
-  sscanf (string, "Streams  : V%X:%X A%X:%X\n", &vPid, &dummy, &aPid,
-	  &aPesPid);
 
+  char *needle,*hay;
+  uint32_t i=0;
 
+  hay=string;
+  while(i!=mainAudio+1)
+  {
+        needle=strstr(hay," A");
+        if(!needle) goto _abrt;
+        sscanf(needle," A%x:%x",&aPid,&aPes);
+        needle[0]='.';
+        needle[1]='.';
+        hay=needle;
+        i++;
+  }
+  printf("Using Track :%x Pid:%x Es:%x for audio\n",mainAudio,aPid,aPes);
+  // Build the streams
 
   switch (type)
     {
     case 'P':
-      demuxer = new dmx_demuxerPS (aPesPid, 0);
-      break;
+                MPEG_TRACK track;
+                track.pes=aPes;
+                track.pid=aPid;
+                demuxer = new dmx_demuxerPS (1,&track);
+                break;
     default:
       ADM_assert (0);
     }
@@ -147,17 +170,30 @@ return 0; // To complete
   uint32_t read = 0, img, count;
   uint64_t abs;
 
+  
   while (read < nbGop)
     {
       if (!fgets (string, MAX_LINE, file))
 	break;
       if (string[0] != 'A')
 	continue;
-#ifdef CYG_MANGLING
-      sscanf (string, "A %lu %llx %I64u\n", &img, &abs, &count);
-#else      
-      sscanf (string, "A %lu %llx %llu\n", &img, &abs, &count);
-#endif        
+
+      sscanf (string, "A %lu %"LLX, &img, &abs); //FIXME read all audio tracks and pick the one we want
+        hay=strstr(string,":");
+        ADM_assert(hay)
+        i=0;
+       while(i!=mainAudio+1)
+        {
+                needle=strstr(hay,":");
+                if(!needle) ADM_assert(0);
+                sscanf(needle,":%lx",&count);
+                needle[0]='.';                
+                hay=needle;
+                i++;
+        }
+
+
+
       index[read].img = img;
       index[read].start = abs;
       index[read].count = count;

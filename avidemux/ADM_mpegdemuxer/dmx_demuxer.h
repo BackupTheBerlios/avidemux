@@ -44,7 +44,7 @@ class dmx_demuxer
                 virtual uint8_t         setPos( uint64_t abs,uint64_t  rel)=0;
                 
                 virtual uint64_t        getSize( void) { return _size;}          
-                
+                virtual uint8_t         getStats(uint64_t *stat)=0;
             	
                 virtual uint32_t        read(uint8_t *w,uint32_t len)=0;
    	        virtual uint8_t		read8i(void)=0;

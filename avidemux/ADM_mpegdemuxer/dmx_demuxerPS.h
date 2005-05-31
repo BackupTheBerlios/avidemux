@@ -62,12 +62,14 @@ class dmx_demuxerPS: public dmx_demuxer
                   uint32_t      maxPid;
 
                   uint64_t      seen[256];                                  
-                  uint8_t       mask[256];       
+                  uint8_t       mask[256];    
+                  uint8_t       *tracked   ;
+                  uint32_t      nbTracked;
                 
                   uint8_t       refill(void);
                   uint8_t       getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *len,uint64_t *pts,uint64_t *dts);
 
-                  uint8_t	getStat(uint64_t *oseen) {oseen=seen;return 1;}
+                  
           public:
                            dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks) ;
                 virtual    ~dmx_demuxerPS();             
@@ -89,8 +91,8 @@ class dmx_demuxerPS: public dmx_demuxer
                   uint32_t        read(uint8_t *w,uint32_t len);
                   uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts, uint64_t *dts);
 
-                  uint8_t         hasAudio(void) { return 0;}
-
+                  uint8_t         hasAudio(void) { return 1;} // MAYBE has audio
+                  uint8_t         getStats(uint64_t *stat);
 
 // Inlined
 uint8_t         read8i(void)
