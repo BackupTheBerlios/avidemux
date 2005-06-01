@@ -15,7 +15,7 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 										DIA_audiodevice.cpp DIA_dectel.cpp DIA_decimate.cpp DIA_Msmooth.cpp DIA_pause.cpp \
 									DIA_DVDff.cpp DIA_lavdecoder.cpp DIA_lame.cpp DIA_calculator.cpp DIA_equalizer.cpp \
 				DIA_vobsub.cpp DIA_x264.cpp DIA_ocr.cpp DIA_lavpp_deint.cpp DIA_hue.cpp DIA_eq2.cpp \
-				DIA_dgbob.cpp DIA_msharpen.cpp DIA_asharp.cpp
+				DIA_dgbob.cpp DIA_msharpen.cpp DIA_asharp.cpp DIA_dmx.cpp
 
 
 EXTRA_DIST = DIA_encoding.h 
