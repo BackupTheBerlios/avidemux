@@ -29,4 +29,11 @@ extern adm_fast_memcpy myMemcpy;
 #ifdef __cplusplus
 }
 #endif
-
+// Compatibility with fprintf etc.. with long long & win32
+#ifdef CYG_MANGLING
+        #define LLX "I64x"
+        #define LLU "I64u"
+#else
+        #define LLX "llx"
+        #define LLU "llu"
+#endif
