@@ -52,6 +52,7 @@ typedef enum
 		_3GPP_FileType=10,
 		VCodec_FileType=11,
                 Script_FileType=12,
+                NewMpeg_FileType=13,
 		DUMMY_FILETYPE=99
 }fileType;
 
@@ -141,6 +142,7 @@ class ADM_Composer
 						uint8_t 	getMagic(char *name,uint32_t *magic);
 						uint8_t 	identify(char *name, fileType *type);
 						uint32_t 	searchForwardSeg(uint32_t startframe);
+                                                uint8_t         tryIndexing(char *name);
 
   public:
                                                 uint8_t addSegment(uint32_t source,uint32_t start, uint32_t nb);

@@ -36,6 +36,9 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_dialog/DIA_working.h"
 #include "ADM_ogm/ADM_ogm.h"
+#include "ADM_mpegdemuxer/dmx_video.h"
+#include "ADM_mpegdemuxer/dmx_identify.h"
+#include "ADM_mpegdemuxer/dmx_probe.h"
 #include "ADM_assert.h"
 #include "prefs.h"
 
@@ -46,10 +49,12 @@
 #ifdef USE_DIVX
 	#include "ADM_codecs/ADM_divx4.h"
 #endif
+#include "ADM_mpegdemuxer/dmx_indexer.h"
 int DIA_mpegIndexer (char **mpegFile, char **indexFile, int *aid,
 		     int already = 0);
 void DIA_indexerPrefill(char *name);
 extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
+
 extern uint8_t loadVideoCodecConf( char *name);
 extern uint8_t parseScript(char *name);
 //
@@ -238,6 +243,7 @@ UNUSED_ARG(mode);
       		break;
       OPEN_AS (Mp4_FileType, mp4Header);
       OPEN_AS (H263_FileType, h263Header);
+      OPEN_AS (NewMpeg_FileType,dmxHeader);
       // For AVI we first try top open it as openDML
       case AVI_FileType:
       			_videos[_nb_video]._aviheader=new OpenDMLHeader; 
@@ -273,73 +279,14 @@ UNUSED_ARG(mode);
 	strcpy(tmpname,name);
 	strcat(tmpname,".idx");
 	if(addFile(tmpname)) return 1;
-      // then propose to index it
-	{ unsigned int autoidx = 0;
-		prefs->get(FEATURE_TRYAUTOIDX,&autoidx);
-		if( autoidx ){
-		   mpegAudioTrack track[24];
-		   int tracknum = -1;
-		   int trackcount = 0;
-			if(MpegaudoDetectAudio(name,track)){
-				for(int i=0;i<8;i++){
-					if(track[i+8].presence){
-						tracknum = i;
-						trackcount++;
-					}
-					if(track[i].presence){
-						tracknum = 0xC0 | i;
-						trackcount++;
-					}
-					if(track[i+16].presence){
-						tracknum = 0xA0 | i;
-						trackcount++;
-					}
-				}
-				if( trackcount == 0 ){
-					printf("\nNo audio tracks found. Autoindex aborted ...\n");
-				}else if( trackcount > 1 ){
-					printf("\nMore than one audio track found. Autoindex aborted ...\n");
-				}else{
-					if(indexMpeg (name,tmpname,(uint8_t)tracknum)){
-						printf("\n re-opening %s\n",tmpname);
-						return addFile (tmpname, 0);
-					} // else goto GUI_Question
-				} // else goto GUI_Question
-			}else{ // no audio stream
-				if(indexMpeg (name,tmpname,0)){
-					printf("\n re-opening %s\n",tmpname);
-					return addFile (tmpname, 0); // memleak ?
-				} // else goto GUI_Question
-			}
-		}
-	}
-      if (GUI_Question ("This looks like mpeg\n Do you want to index it?"))
-	{
-	  char *	  idx, *	    mname;
-	  int	    track;
-
-	  DIA_indexerPrefill(name);
-	  if (DIA_mpegIndexer (&mname, &idx, &track, 1))
-	    {
-	      if ((mname == NULL) || (idx == NULL))
-		{
-		  GUI_Alert ("Select files!");
-
-		  return 0;
-		}
-	      printf ("\n indexing :%s to \n%s\n", mname, idx);
-
-
-	      if (indexMpeg (mname, idx, (uint8_t) track))
-	      {
-	      		printf("\n re-opening %s\n", idx);
-			return addFile (idx, 0);
-	      }
-	      return 0;
-
-	    }
-	}
-      return 0;
+        if(tryIndexing(name))
+        {
+                return addFile (name);
+        }
+        return 0;
+        //break;
+     
+      //return 0;
       break;
 	case WorkBench_FileType:
 
@@ -548,19 +495,20 @@ TryAgain:
 					//printf(" %lu : %lu \n",i,flag2);
 					if(flag2 & AVI_B_FRAME)
 					{
-						printf(" %lu is a b frame\n",i);
+						printf(" * ");
 					 	bframe=1;
 						vid->_aviheader->getFlags(i,&flags);
 						if(!(flags & AVI_B_FRAME))
                                                 {
+                                                        printf("Frame %lu is A B frame, flag not ok\n",i);
 							bconsistency=0;
                                                 }
 						else
-							printf("\n and flags is ok\n");
+							printf("# ");
 					}
-					
+					if((i%16)==15) printf("\n");
 				}
-
+                                printf("\n");
 				delete  buffer;
 				delete [] bufferin;
 				if(getEnv(ENV_EDITOR_BFRAME))
@@ -1269,6 +1217,52 @@ uint8_t r=0;
 		if(r) { printf("Env override %d used\n",newflag);}
 		return r;
 
+}
+//_________________________________________
+//    Try indexing the file, return 1 if file successfully indexed 
+//              0 else
+//_________________________________________
+extern uint8_t DIA_dmx(char *file,DMX_TYPE format,uint32_t nbTracks, MPEG_TRACK *tracks, uint32_t *selectedTracks);
+//
+uint8_t         ADM_Composer::tryIndexing(char *name)
+{
+ unsigned int autoidx = 0;
+      if (!GUI_Question ("This looks like mpeg\n Do you want to index it?"))
+        {
+                return 0;
+        }
+          char      *idx;
+          DMX_TYPE  type;
+          uint32_t  nbTrack=0,audioTrack=0;
+          MPEG_TRACK *tracks=NULL;
+          uint8_t r=1;
+
+                if(!dmx_probe(name,&type,&nbTrack,&tracks))
+                {
+                        printf("This is not mpeg\n");
+                        return 0;
+                }
+
+          
+                if(type==DMX_MPG_PS)
+                {
+                       if(!DIA_dmx(name,type,nbTrack,tracks,&audioTrack))
+                        {
+                                delete [] tracks;
+                                return 0;
+                        }
+                }
+                idx=new char[strlen(name)+5];
+                strcpy(idx,name);
+                strcat(idx,".idx");
+
+                r=dmx_indexer(name,idx,audioTrack,0,nbTrack,tracks);
+
+                delete [] tracks;
+                delete [] idx;
+
+                if(!r) GUI_Alert("Indexing failed."); 
+                return r;
 }
 //
 //

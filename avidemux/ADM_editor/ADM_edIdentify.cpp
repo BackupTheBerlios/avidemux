@@ -183,6 +183,12 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
                 *type=Script_FileType;
                 return 1;
         }
+        if(fourCC::check(id,(uint8_t *)"ADMX"))
+        {
+                printf (" \n New mpeg index file detected..\n");
+                *type=NewMpeg_FileType;
+                return 1;
+        }
       //
       //        Warning, from here we change endianness
       //
