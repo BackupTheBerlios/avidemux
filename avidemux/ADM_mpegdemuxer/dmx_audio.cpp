@@ -143,7 +143,7 @@ _abrt:
   }
   printf("Using Track :%x Pid:%x Es:%x for audio\n",mainAudio,aPid,aPes);
   // Build the streams
-
+  myPes=aPes;
   switch (type)
     {
     case 'P':
@@ -317,41 +317,50 @@ MpegAudioInfo mpegInfo;
         if(PROBE_SIZE!=demuxer->read(buffer,PROBE_SIZE)) return 0;
 
         // Try mp2/3
-        if(getMpegFrameInfo(buffer,PROBE_SIZE,&mpegInfo,NULL,&offset))
+        if(myPes>=0xC0 && myPes<0xC9)
         {
-                if(getMpegFrameInfo(buffer+offset,PROBE_SIZE-offset,&mpegInfo,NULL,&offset2))
-                        if(!offset2)
-                        {
-                                _wavheader->byterate=(1000*mpegInfo.bitrate)>>3;
-                                _wavheader->frequency=mpegInfo.samplerate;
+                if(getMpegFrameInfo(buffer,PROBE_SIZE,&mpegInfo,NULL,&offset))
+                {
+                        if(getMpegFrameInfo(buffer+offset,PROBE_SIZE-offset,&mpegInfo,NULL,&offset2))
+                                if(!offset2)
+                                {
+                                        _wavheader->byterate=(1000*mpegInfo.bitrate)>>3;
+                                        _wavheader->frequency=mpegInfo.samplerate;
 
-                                if(mpegInfo.mode!=3) _wavheader->channels=2;
+                                        if(mpegInfo.mode!=3) _wavheader->channels=2;
                                         else _wavheader->channels=1;
 
-                                if(mpegInfo.layer==3) _wavheader->encoding=WAV_MP3;
-                                else _wavheader->encoding=WAV_MP2;
-                                return 1;
-                        }
+                                        if(mpegInfo.layer==3) _wavheader->encoding=WAV_MP3;
+                                        else _wavheader->encoding=WAV_MP2;
+                                        return 1;
+                                }
+                }
         }
         // Try AC3
-
-        if(ADM_AC3GetInfo(buffer,PROBE_SIZE,&fq,&br,&chan,&offset))
+        if(myPes<9)
         {
-                if(ADM_AC3GetInfo(buffer+offset,PROBE_SIZE-offset,&fq,&br,&chan,&offset2))
+                if(ADM_AC3GetInfo(buffer,PROBE_SIZE,&fq,&br,&chan,&offset))
                 {
+                        if(ADM_AC3GetInfo(buffer+offset,PROBE_SIZE-offset,&fq,&br,&chan,&offset2))
+                        {
                                 _wavheader->byterate=(1000*br)>>3;
                                 _wavheader->frequency=fq;                                
                                 _wavheader->encoding=WAV_AC3;
                                 _wavheader->channels=chan;
                                 return 1;
+                        }
                 }
         }
         // Default 48khz stereo lpcm
+        if(myPes>=0xA0 && myPes<0xA9)
+        {
                 _wavheader->byterate=(48000*4);
                 _wavheader->frequency=48000;                                
                 _wavheader->encoding=WAV_LPCM;
                 _wavheader->channels=2;
-        return 1;
+                return 1;
+        }
+        return 0;
 }
 #if 0
 void dmxAudioStream::checkAudio(void)

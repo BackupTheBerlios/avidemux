@@ -38,15 +38,17 @@
 #include "dmx_demuxerPS.h"
 #include "dmx_identify.h"
 #include "dmx_probe.h"
+#include "ADM_dialog/DIA_busy.h"
 
-#define MAX_PROBE (4*1024*1024) // Scans the 4 first meg
+#define MAX_PROBE (10*1024*1024LL) // Scans the 4 first meg
 #define MIN_DETECT (10*1024) // Need this to say the stream is present
 
 uint8_t dmx_probe(char *file, DMX_TYPE  *type, uint32_t *nbTracks,MPEG_TRACK **tracks)
 {
 uint8_t dummy[10];
-uint64_t seen[256];
+uint64_t seen[256],abs,rel;
 int     audio,video;
+
         printf("Probing %s for streams...\n",file);
         *type=dmxIdentify(file);
         if(*type==DMX_MPG_ES)
@@ -74,11 +76,16 @@ int     audio,video;
                         printf("Cannot open file file demuxer (%s)\n",file);
                         return 0;
                 }
+                DIA_StartBusy();
                 demuxer->setProbeSize(MAX_PROBE);
                 demuxer->read(dummy,1);
                 demuxer->getStats(seen);
+                demuxer->getPos( &abs,&rel);
+                abs>>=20;
+                printf("Stopped at %"LLU" MB\n",abs);
 
                 delete demuxer;
+                DIA_StopBusy();
         // Now analyze...
         video=0;
         // Take the first video track suitable
@@ -100,7 +107,7 @@ int     audio,video;
 #if 1
         for(int i=0;i<256;i++)
         {
-                if(seen[i]) printf("%x: there is something\n",i);
+                if(seen[i]) printf("%x: there is something %lu kb\n",i,seen[i]>>10);
         }
 #endif
         // 1 count how much audio we have

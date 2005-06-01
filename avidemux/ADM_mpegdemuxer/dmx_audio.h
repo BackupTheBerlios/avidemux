@@ -35,6 +35,7 @@ class dmxAudioStream : public AVDMGenericAudioStream
                 dmx_demuxer            *demuxer;       
                 uint32_t                nbIndex;
                 dmxAudioIndex           *index;
+                uint16_t                myPes;
                                 
                 public:
                                 dmxAudioStream( void);
