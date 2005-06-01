@@ -343,7 +343,7 @@ MpegAudioInfo mpegInfo;
                 {
                         if(ADM_AC3GetInfo(buffer+offset,PROBE_SIZE-offset,&fq,&br,&chan,&offset2))
                         {
-                                _wavheader->byterate=(1000*br)>>3;
+                                _wavheader->byterate=br; //(1000*br)>>3;
                                 _wavheader->frequency=fq;                                
                                 _wavheader->encoding=WAV_AC3;
                                 _wavheader->channels=chan;
