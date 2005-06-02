@@ -42,6 +42,7 @@
 
 static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
 static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel,uint32_t nbTracks);
+static uint8_t gopUpdate(dmx_demuxer *demuxer);
 
 uint8_t dmx_indexer(char *mpeg,char *file);
 
@@ -71,15 +72,20 @@ typedef struct IndFrame
 	uint64_t rel;
 	
 }IndFrame;
+
+typedef struct TimeStamp
+{
+        uint16_t hh,mm,ss,ff;
+}TimeStamp;
 static const char Type[5]={'X','I','P','B','P'};
 
 #define MAX_PUSHED 100
 
 static uint32_t nbPushed,nbGop,nbImage;
-
+static TimeStamp firstStamp,lastStamp;
 
 static IndFrame frames[MAX_PUSHED];
-
+static uint32_t computeTimeDifference(TimeStamp *f,TimeStamp *l);
 
 /*
         Index the incoming mpeg file
@@ -100,6 +106,9 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         DMX_TYPE mpegType;
         uint8_t  mpegTypeChar;
         uint32_t update=0;
+        
+        
+
 
         mpegType=dmxIdentify(realname);
         if(mpegType==DMX_MPG_UNKNOWN)
@@ -211,14 +220,13 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 uint32_t gop;   
                                                 if(!seq_found) continue;
                                                 if(grabbing) 
-                                                {                                                            
+                                                {         
+                                                        gopUpdate(demuxer);                                                 
                                                         continue;
                                                 }
                                                 gopDump(out,demuxer,syncAbs,syncRel,nbTracks);                        
-                                                firstGop=0;
-                                                demuxer->forward(3);    
-                                                gop=demuxer->read8i();
-                                                
+                                                gopUpdate(demuxer);
+                                                firstGop=0;                                                
                                                 break;
                                         case 0x00 : // picture
                                                
@@ -273,6 +281,25 @@ stop_found:
           if(nbPushed)  gopDump(out,demuxer,lastAbs,lastRel,nbTracks);
 
           fseeko(out,0,SEEK_SET);
+        // Update if needed
+        uint32_t compfps,delta=computeTimeDifference(&firstStamp,&lastStamp);
+       
+        delta=delta/1000; // in second
+        if(delta)
+        {
+                 compfps= (1000*nbImage)/delta;    // 3 Million images should be enough, no overflow                
+        }
+        else
+        {
+                compfps=imageFps;
+        }
+        // Detect interlaced vs progressive
+
+        // Detect film (i.e. NTSC with computed fps close to 24)
+        if(imageFps==29970 || imageFps==30000)
+        {
+                if(compfps>23800 && compfps < 24200) imageFps=23976;
+        }
 
         // Update header
         fprintf(out,"ADMX0003\n");
@@ -287,10 +314,10 @@ stop_found:
         delete work;  
 
         printf("*********Indexing stopped***********\n");
-        printf("Found :%lu gop\n",nbGop);
-        printf("Found :%lu image\n",nbImage);
+        printf("Found       :%lu gop\n",nbGop);
+        printf("Found       :%lu image\n",nbImage);                
+        printf("Average fps :%lu /1000 fps\n",compfps);
 
-        
           delete demuxer;
           delete [] realname;
           return 1;
@@ -363,7 +390,8 @@ uint64_t stats[nbTracks];
                 fprintf(fd,"\n");
                 
         }
-
+        // Print some gop stamp infos, does not hurt
+        fprintf(fd,"# Timestamp %02d:%02d:%02d,%03d\n",lastStamp.hh,lastStamp.mm,lastStamp.ss,lastStamp.ff);
         nbGop++;
         nbImage+=nbPushed;
         nbPushed=0;
@@ -374,3 +402,50 @@ uint64_t stats[nbTracks];
         return 1;
         
 }
+uint8_t gopUpdate(dmx_demuxer *demuxer)
+{
+uint32_t a1,a2,a3,a4;
+uint32_t hh,mm,ss,ff;
+TimeStamp *ts;
+
+        a1=demuxer->read8i();
+        a2=demuxer->read8i();
+        a3=demuxer->read8i();
+        a4=demuxer->read8i();
+        hh=(a1>>2)&0x1f;
+        mm=((a1&3)<<4)+(a2>>4);
+        ss=((a2&7)<<3)+(a3>>5);
+        ff=((a3&0x1f)<<1)+(a4>>7);
+        if(!nbGop)  ts=&firstStamp;
+                else ts=&lastStamp;
+        
+        ts->hh=hh;
+        ts->mm=mm;
+        ts->ss=ss;
+        ts->ff=ff;
+        if(!nbGop) memcpy(&lastStamp,&firstStamp,sizeof(firstStamp));
+        return 1;
+}
+uint32_t computeTimeDifference(TimeStamp *f,TimeStamp *l)
+{
+        uint32_t h,m,s,ms,r=0,result=0;
+#define DOIT(x,next) if(l->x < f->x) \
+                        { \
+                                r=(next-(f->x-l->x));\
+                                result-=1; \
+                        }\
+                         else r=(l->x-f->x);\
+                        result=result*next+r;printf("%lu\n",r);
+
+#define PRINT(x) printf("%02d:%02d:%02d\n",x->hh,x->mm,x->ss,x->ff);
+        DOIT(hh,0);                        
+        DOIT(mm,60);        
+        DOIT(ss,60);        
+        DOIT(ff,1000);
+        PRINT(l);
+        PRINT(f);         
+        printf("%lu ms\n",result/1000);
+        return result;
+
+}
+//
