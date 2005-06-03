@@ -73,8 +73,9 @@ char str[512];
         {
                 sprintf(str,"???");
                 pes=tracks[i].pes;
-                if(pes<9) sprintf(str,"%d: AC3 :%x",i,pes);
-                if(pes>=0xC0 && pes<0xC9) sprintf(str,"%d: MP2  :%x",i,pes);
+                if(pes<9) sprintf(str,"%d: AC3 :%x channels:%d bitrate:%d kbps",i,pes,tracks[i].channels,tracks[i].bitrate);
+                if(pes>=0xC0 && pes<0xC9) sprintf(str,"%d: MP2  :%x channels:%d bitrate:%d kbps",
+                                                i,pes,tracks[i].channels,tracks[i].bitrate);
                 if(pes>=0xA0 && pes<0xA9) sprintf(str,"%d: LPCM :%x",i,pes);
                 
                 _1 = gtk_image_menu_item_new_with_mnemonic (str);
