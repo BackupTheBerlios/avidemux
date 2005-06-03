@@ -93,6 +93,7 @@ class dmx_demuxerPS: public dmx_demuxer
 
                   uint8_t         hasAudio(void) { return 1;} // MAYBE has audio
                   uint8_t         getStats(uint64_t *stat);
+                  uint8_t         changePid(uint8_t newpid);
 
 // Inlined
 uint8_t         read8i(void)

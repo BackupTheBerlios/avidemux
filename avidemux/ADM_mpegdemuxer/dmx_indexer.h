@@ -22,7 +22,9 @@ typedef struct MPEG_TRACK
 {
         uint16_t pid;
         uint16_t pes;
-        
+        // Only for audio...
+        uint32_t channels;
+        uint32_t bitrate;
 }MPEG_TRACK;
 
 uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosync,uint32_t nbTracks,MPEG_TRACK *tracks);

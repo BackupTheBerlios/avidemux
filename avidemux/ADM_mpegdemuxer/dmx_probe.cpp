@@ -39,6 +39,8 @@
 #include "dmx_identify.h"
 #include "dmx_probe.h"
 #include "ADM_dialog/DIA_busy.h"
+#include "ADM_audio/ADM_mp3info.h"
+#include "ADM_audio/ADM_a52info.h"
 
 #define MAX_PROBE (10*1024*1024LL) // Scans the 4 first meg
 #define MIN_DETECT (10*1024) // Need this to say the stream is present
@@ -84,7 +86,6 @@ int     audio,video;
                 //abs>>=20;
                 printf("Stopped at %"LLU", %"LLU" MB\n",abs,abs>>20);
 
-                delete demuxer;
                 DIA_StopBusy();
         // Now analyze...
         video=0;
@@ -100,6 +101,7 @@ int     audio,video;
         if(!video)
         {
                 printf("Cannot find any video stream\n");
+                delete demuxer;
                 return 0;
         }
         
@@ -125,6 +127,51 @@ int     audio,video;
         for(int i=0;i<9;i++) if(seen[i]>MIN_DETECT) DOME;
         for(int i=0xc0;i<0xc9;i++) if(seen[i]>MIN_DETECT) DOME;
         for(int i=0xA0;i<0xA9;i++) if(seen[i]>MIN_DETECT) DOME;
+
+        // Now go a bit deeper and try to extract infos
+        #define BUFFER_SIZE (10*1024)
+
+        uint8_t buffer[BUFFER_SIZE];
+        uint32_t read;
+        uint32_t br,fq,offset,pes,chan;
+        MpegAudioInfo mpegInfo;        
+
+        for(int i=1;i<audio;i++)
+        {
+
+                pes=(*tracks)[i].pes;
+                if((pes<0xC9 && pes>=0xc0) || ((pes<9)))
+                {
+                        demuxer->changePid(pes);
+                        demuxer->setPos(0,0);
+                        read=demuxer->read(buffer,BUFFER_SIZE);
+                        // We need about 5 Ko...
+                        if(read>BUFFER_SIZE>>1)
+                        {
+                                if(pes<9)
+                                {
+                                        if(ADM_AC3GetInfo(buffer,read,&fq,&br,&chan,&offset))
+                                        {
+                                                (*tracks)[i].channels=chan;
+                                                (*tracks)[i].bitrate=(8*br)/1000;
+                                        }
+                                }else
+                                {
+                                        if(getMpegFrameInfo(buffer,read,&mpegInfo,NULL,&offset))
+                                        {
+                                                if(mpegInfo.mode!=3)  (*tracks)[i].channels=2;
+                                                         else  (*tracks)[i].channels=1;
+                                                
+                                                (*tracks)[i].bitrate=mpegInfo.bitrate;
+                                        }
+                                }                
+
+                        }
+                }
+
+        }
+
+        delete demuxer;
 
         printf("Found video as %x, and %d audio tracks\n",video,audio-1);
         return 1;
