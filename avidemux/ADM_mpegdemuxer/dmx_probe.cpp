@@ -67,7 +67,7 @@ int     audio,video;
         dmx_demuxerPS *demuxer;
         MPEG_TRACK    pseudo;
 
-               pseudo.pes=0xfe;
+               pseudo.pes=0xea; // Hopefully not used
                pseudo.pid=0;
                demuxer=new dmx_demuxerPS(256,&pseudo);
                if(!demuxer->open(file))
@@ -81,8 +81,8 @@ int     audio,video;
                 demuxer->read(dummy,1);
                 demuxer->getStats(seen);
                 demuxer->getPos( &abs,&rel);
-                abs>>=20;
-                printf("Stopped at %"LLU" MB\n",abs);
+                //abs>>=20;
+                printf("Stopped at %"LLU", %"LLU" MB\n",abs,abs>>20);
 
                 delete demuxer;
                 DIA_StopBusy();

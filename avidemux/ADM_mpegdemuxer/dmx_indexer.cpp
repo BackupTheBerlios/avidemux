@@ -435,15 +435,17 @@ uint32_t computeTimeDifference(TimeStamp *f,TimeStamp *l)
                                 result-=1; \
                         }\
                          else r=(l->x-f->x);\
-                        result=result*next+r;printf("%lu\n",r);
+                        result=result*next+r;
 
 #define PRINT(x) printf("%02d:%02d:%02d\n",x->hh,x->mm,x->ss,x->ff);
         DOIT(hh,0);                        
         DOIT(mm,60);        
         DOIT(ss,60);        
         DOIT(ff,1000);
+#if 0
         PRINT(l);
         PRINT(f);         
+#endif
         printf("%lu ms\n",result/1000);
         return result;
 

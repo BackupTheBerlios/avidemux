@@ -46,11 +46,11 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks)
 
         nbTracked=nb;
         
-
+        myPid=tracks[0].pes;
         
         if(nb!=256)     // Only pick one track as main, and a few as informative
         {
-                myPid=tracks[0].pes;
+                
                 memset(mask,0,256);
                 tracked=new uint8_t[nbTracked];
                 for(int i=1;i<nb;i++)
