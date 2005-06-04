@@ -54,6 +54,7 @@ avidemux2_LDADD   =  \
 ./ADM_mpeg2dec/libADM_mpeg2dec.a \
 ./ADM_mpegdemuxer/libADM_mpegdemuxer.a   \
 ./ADM_mpegindexer/libADM_mpegindexer.a   \
+./ADM_dialog/libADM_dialog.a  \
 ./libMpeg2Dec/liblibMpeg2Dec.a   \
 ./ADM_toolkit/libADM_toolkit.a  \
 ./ADM_colorspace/libADM_colorspace.a \
