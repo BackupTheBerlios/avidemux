@@ -27,7 +27,7 @@
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
-#include "ADM_dialog/DIA_working.h"
+#include "ADM_dialog/DIA_idx_pg.h"
 
 
 
@@ -93,7 +93,7 @@ static uint32_t computeTimeDifference(TimeStamp *f,TimeStamp *l);
 */
 uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosync,uint32_t nbTracks,MPEG_TRACK *tracks)
 {
-        DIA_working *work;
+        DIA_progressIndexing *work;
         dmx_demuxer *demuxer;
         uint64_t syncAbs,syncRel;
         uint64_t lastAbs,lastRel;
@@ -169,7 +169,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
 
         uint32_t temporal_ref,ftype;
 
-        work=new DIA_working("Indexing mpeg");
+        work=new DIA_progressIndexing(mpeg);
 
         nbPushed=0;
         nbGop=0;
@@ -182,11 +182,14 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                 update++;
                                 if(update>100)
                                         {
-                                                if(work->update(syncAbs>>16,demuxer->getSize()>>16))
+                                               /* if(work->update(syncAbs>>16,demuxer->getSize()>>16))
                                                 {
                                                         // abort;
                                                         goto stop_found;
-                                                }
+                                                }*/
+                                                work->update(syncAbs>>16,demuxer->getSize()>>16,nbImage,
+                                                        lastStamp.hh,lastStamp.mm,lastStamp.ss);
+//uint32_t done,uint32_t total, uint32_t nbImage, uint32_t hh, uint32_t mm, uint32_t ss);
                                                 update=0;
                                         }
                                 switch(streamid)
@@ -437,16 +440,17 @@ uint32_t computeTimeDifference(TimeStamp *f,TimeStamp *l)
                          else r=(l->x-f->x);\
                         result=result*next+r;
 
-#define PRINT(x) printf("%02d:%02d:%02d\n",x->hh,x->mm,x->ss,x->ff);
+#define PRINT(z,x) printf(#z"%02d:%02d:%02d\n",x->hh,x->mm,x->ss,x->ff);
         DOIT(hh,0);                        
         DOIT(mm,60);        
         DOIT(ss,60);        
         DOIT(ff,1000);
 #if 0
-        PRINT(l);
-        PRINT(f);         
+        PRINT(first,f);         
+        PRINT(last,l);
+        
 #endif
-        printf("%lu ms\n",result/1000);
+        printf("Time difference:%lu s\n",result/1000);
         return result;
 
 }
