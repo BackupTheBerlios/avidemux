@@ -33,7 +33,11 @@ static uint32_t xin,xout;
 ADM_faad::ADM_faad( uint32_t fourcc ,WAVHeader *info,uint32_t l,uint8_t *d) :   ADM_Audiocodec(fourcc)
 {
 faacDecConfigurationPtr conf;
+#ifdef OLD_FAAD_PROTO
 unsigned long int srate;
+#else
+uint32_t srate;
+#endif
 unsigned char chan;
 		_inited=0;
 		_instance=NULL;
@@ -89,7 +93,11 @@ long int res;
 void *outbuf;
 faacDecFrameInfo info;
 int max=0;
-unsigned long int srate=0;
+#ifdef OLD_FAAD_PROTO
+unsigned long int srate;
+#else
+uint32_t srate;
+#endif
 unsigned char chan=0;
 uint8_t first=0;
 
