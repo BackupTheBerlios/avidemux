@@ -361,42 +361,7 @@ float duration;
       _videos[_nb_video]._audio_size =_videos[_nb_video]._audiostream->getLength ();
      
       
-	// For mpeg2, try to guess if it is pulldowned material
-	double duration_a, duration_v;
-	double rdirect, rpulldown;
 	
-	duration_a=_videos[_nb_video]._audio_size;
-	duration_a/=_wavinfo->byterate;   // now we got duration in seconds
-	
-	// ditto for video
-	duration_v= _videos[_nb_video]._nb_video_frames;
-	duration_v/=info.fps1000;
-	duration_v*=1000;
-	
-	printf("Audio : %f video : %f\n",duration_a,duration_v);
-	if(MpegIdx_FileType==type && info.fps1000>29000 && info.fps1000<30000
-		 && duration_a>1 && duration_v>1)
-	{
-		rdirect=(duration_a-duration_v)/duration_v;
-		if(rdirect<0) rdirect=-rdirect;
-		
-		rpulldown=((duration_a*0.8)-duration_v)/duration_v;
-		if(rpulldown<0) rpulldown=-rpulldown;
-		
-		
-		printf("Direct : %f pd : %f\n",rdirect,rpulldown);
-		if( rdirect*2> rpulldown)
-		{
-			printf("Probably pulldowned, switching to 23.976 \n");
-			 AVIStreamHeader *ily =	_videos[_nb_video]._aviheader->	getVideoStreamHeader ();
-      				ily->dwRate = 23976;
-      				ily->dwScale = 1000;
-				info.fps1000=23976;	
-		
-		}
-		
-	
-	}
 	duration=_videos[_nb_video]._nb_video_frames;
 	duration/=info.fps1000;
 	duration*=1000;			// duration in seconds
@@ -1246,7 +1211,8 @@ uint8_t         ADM_Composer::tryIndexing(char *name)
           
                 if(type==DMX_MPG_PS)
                 {
-                       if(!DIA_dmx(name,type,nbTrack,tracks,&audioTrack))
+                       if(nbTrack>2)
+                        if(!DIA_dmx(name,type,nbTrack,tracks,&audioTrack))
                         {
                                 delete [] tracks;
                                 return 0;
