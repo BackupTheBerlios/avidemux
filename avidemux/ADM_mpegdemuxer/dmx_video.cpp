@@ -61,6 +61,7 @@ dmxHeader::dmxHeader  (void)
 
         _index=NULL;
         _audioStream=NULL;
+        _fieldEncoded=0;
 
 }
 //
@@ -217,7 +218,7 @@ uint8_t                 dmxHeader::open(char *name)
 
                 fgets(string,MAX_LINE,file);
                 sscanf(string,"Image    : %c\n",&progressif); // Progressive
-
+                if(progressif) _fieldEncoded=1;
                 fgets(string,MAX_LINE,file);
                 sscanf(string,"Picture  : %04lu x %04lu %05lu fps\n",&w,&h,&fps); // width...
 

@@ -286,7 +286,7 @@ stop_found:
           fseeko(out,0,SEEK_SET);
         // Update if needed
         uint32_t compfps,delta=computeTimeDifference(&firstStamp,&lastStamp);
-       
+
         delta=delta/1000; // in second
         if(delta)
         {
@@ -296,19 +296,38 @@ stop_found:
         {
                 compfps=imageFps;
         }
-        // Detect interlaced vs progressive
 
         // Detect film (i.e. NTSC with computed fps close to 24)
         if(imageFps==29970 || imageFps==30000)
         {
                 if(compfps>23800 && compfps < 24200) imageFps=23976;
         }
+        // Detect interlaced vs progressive
+        // If field encoded, the average fps is about twice as theoritical fps
+        char type='P';
+        float err;
 
-        // Update header
+        err=imageFps*2;
+        err-=compfps;
+        err*=100;
+        err/=imageFps*2;
+        if(err<0) err=-err;
+        printf("%lu :%lu / %lu , %f\n",imageFps,imageFps*2,compfps,err);
+
+        if(err<10) 
+        {
+                type='I';
+                printf("Seems to be field encoded\n");
+        }
+        else
+        {
+                printf("Seems to be frame encoded\n");
+        }
+        // *****************Update header*************
         fprintf(out,"ADMX0003\n");
         fprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
         fprintf(out,"File     : %s\n",realname);
-        fprintf(out,"Image    : %c\n",'P'); // Progressive
+        fprintf(out,"Image    : %c\n",type); // Progressive
         fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",imageW,imageH,imageFps); // width...
         fprintf(out,"Nb Gop   : %05lu \n",nbGop); // width...
         fprintf(out,"Nb Images: %08lu \n",nbImage); // width...

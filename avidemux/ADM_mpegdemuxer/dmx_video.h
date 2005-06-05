@@ -30,6 +30,7 @@ protected:
         uint32_t                _lastFrame;
         uint8_t                 renumber(void);
         dmxAudioStream          *_audioStream;
+        uint8_t                 _fieldEncoded;
 public:
 
                                 dmxHeader(void);
