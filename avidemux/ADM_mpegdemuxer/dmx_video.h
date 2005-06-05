@@ -29,6 +29,7 @@ protected:
 
         uint32_t                _lastFrame;
         uint8_t                 renumber(void);
+        uint8_t                 mergeFields(void);
         dmxAudioStream          *_audioStream;
         uint8_t                 _fieldEncoded;
 public:

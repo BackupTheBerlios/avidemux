@@ -218,7 +218,7 @@ uint8_t                 dmxHeader::open(char *name)
 
                 fgets(string,MAX_LINE,file);
                 sscanf(string,"Image    : %c\n",&progressif); // Progressive
-                if(progressif) _fieldEncoded=1;
+                if(progressif=='I') _fieldEncoded=1;
                 fgets(string,MAX_LINE,file);
                 sscanf(string,"Picture  : %04lu x %04lu %05lu fps\n",&w,&h,&fps); // width...
 
@@ -414,6 +414,11 @@ uint8_t                 dmxHeader::open(char *name)
                                         _index[0].relative);
 
                                                  
+                        if(_fieldEncoded) 
+                        {
+                                printf("This is field encoded...\n");
+                                mergeFields();
+                        }
                         _isaudiopresent=0; 
                         _isvideopresent=1; 
                         _videostream.dwScale=1000;
@@ -434,6 +439,7 @@ uint8_t                 dmxHeader::open(char *name)
 
                        _videostream.dwLength= _mainaviheader.dwTotalFrames=_nbFrames;     
                        // Dump();                      
+                        
                         // switch DTS->PTS
                         if(!renumber())
                         {
@@ -470,15 +476,33 @@ void          dmxHeader:: Dump (void )
 
 }
 //
+//      Merge the 2 fields to create frames
+//
+uint8_t  dmxHeader::mergeFields(void)
+{
+dmxIndex       *tmp=new  dmxIndex[_nbFrames/2+1];;
+uint32_t        newNb=_nbFrames>>1;
+        for(uint32_t c=0;c<newNb;c++)
+        {
+                // copy 1st field
+                memcpy(&tmp[c],&_index[c*2],sizeof(dmxIndex));
+                tmp[c].size+=_index[c*2+1].size;
+        }
+        delete [] _index;
+        _index=tmp;
+        _nbFrames=newNb;
+        return 1;
+
+}
+
+//
 //      Create GOP renumbering and PTS index entry
 //
 uint8_t  dmxHeader::renumber(void)
 {
-            
+
 
         dmxIndex       *tmp=new  dmxIndex[_nbFrames+2];;
-        
-        
         //__________________________________________
         // the direct index is in DTS time (i.e. decoder time)
         // we will now do the PTS index, so that frame numbering is done
