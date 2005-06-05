@@ -759,30 +759,22 @@ static inline void RENAME(yuv2yuvX)(SwsContext *c, int16_t *lumFilter, int16_t *
 				    int16_t *chrFilter, int16_t **chrSrc, int chrFilterSize,
 				    uint8_t *dest, uint8_t *uDest, uint8_t *vDest, int dstW, int chrDstW)
 {
+	long int longChrDstW=(long int)chrDstW;
+	long int longDstW=(long int)dstW;
 #ifdef HAVE_MMX
 	if(uDest != NULL)
 	{
 		asm volatile(
 				YSCALEYUV2YV12X(0, CHR_MMX_FILTER_OFFSET)
 				:: "r" (&c->redDither),
-				"r" (uDest),
-#ifdef ARCH_X86_64				
-			       	"m" (chrDstW)
-#else
-			       	"m" ((long)chrDstW)
-#endif				
+				"r" (uDest), "m" (longChrDstW)
 				: "%"REG_a, "%"REG_d, "%"REG_S
 			);
 
 		asm volatile(
 				YSCALEYUV2YV12X(4096, CHR_MMX_FILTER_OFFSET)
 				:: "r" (&c->redDither),
-				"r" (vDest),
-#ifdef ARCH_X86_64				
-			       	"m" (chrDstW)
-#else
-			       	"m" ((long)chrDstW)
-#endif				
+				"r" (vDest), "m" (longChrDstW)
 				: "%"REG_a, "%"REG_d, "%"REG_S
 			);
 	}
@@ -790,12 +782,7 @@ static inline void RENAME(yuv2yuvX)(SwsContext *c, int16_t *lumFilter, int16_t *
 	asm volatile(
 			YSCALEYUV2YV12X(0, LUM_MMX_FILTER_OFFSET)
 			:: "r" (&c->redDither),
-			   "r" (dest),
-#ifdef ARCH_X86_64				
-			       	"m" (dstW)
-#else
-			       	"m" ((long)dstW)
-#endif				
+			   "r" (dest), "m" (longDstW)
 			: "%"REG_a, "%"REG_d, "%"REG_S
 		);
 #else
@@ -2144,8 +2131,8 @@ static inline void RENAME(hScale)(int16_t *dst, int dstW, uint8_t *src, int srcW
 	}
 	else
 	{
+		uint8_t *offset = src+filterSize;
 		long counter= -2*dstW;
-		uint8_t * src_fsize=src+filterSize;
 //		filter-= counter*filterSize/2;
 		filterPos-= counter/2;
 		dst-= counter/2;
@@ -2187,7 +2174,7 @@ static inline void RENAME(hScale)(int16_t *dst, int dstW, uint8_t *src, int srcW
 			" jnc 1b			\n\t"
 
 			: "+r" (counter), "+r" (filter)
-			: "m" (filterPos), "m" (dst), "m"(src_fsize),
+			: "m" (filterPos), "m" (dst), "m"(offset),
 			  "m" (src), "r" ((long)filterSize*2)
 			: "%"REG_b, "%"REG_a, "%"REG_c
 		);
@@ -2222,7 +2209,6 @@ static inline void RENAME(hyscale)(uint16_t *dst, int dstWidth, uint8_t *src, in
 				   int srcFormat, uint8_t *formatConvBuffer, int16_t *mmx2Filter,
 				   int32_t *mmx2FilterPos)
 {
-	int xIncLow=xInc&0xffff,xIncHigh=xInc>>16;
     if(srcFormat==IMGFMT_YUY2)
     {
 	RENAME(yuy2ToY)(formatConvBuffer, src, srcW);
@@ -2330,6 +2316,8 @@ FUNNY_Y_CODE
 	else
 	{
 #endif
+	int xInc_shr16 = xInc >> 16;
+	int xInc_mask = xInc & 0xffff;
 	//NO MMX just normal asm ...
 	asm volatile(
 		"xor %%"REG_a", %%"REG_a"	\n\t" // i
@@ -2367,7 +2355,7 @@ FUNNY_Y_CODE
 		" jb 1b				\n\t"
 
 
-		:: "r" (src), "m" (dst), "m" (dstWidth), "m" (xIncHigh), "m" (xIncLow)
+		:: "r" (src), "m" (dst), "m" (dstWidth), "m" (xInc_shr16), "m" (xInc_mask)
 		: "%"REG_a, "%"REG_b, "%ecx", "%"REG_D, "%esi"
 		);
 #ifdef HAVE_MMX2
@@ -2393,7 +2381,6 @@ inline static void RENAME(hcscale)(uint16_t *dst, int dstWidth, uint8_t *src1, u
 				   int srcFormat, uint8_t *formatConvBuffer, int16_t *mmx2Filter,
 				   int32_t *mmx2FilterPos)
 {
-	int xIncLow=xInc&0xffff,xIncHigh=xInc>>16;
     if(srcFormat==IMGFMT_YUY2)
     {
 	RENAME(yuy2ToUV)(formatConvBuffer, formatConvBuffer+2048, src1, src2, srcW);
@@ -2527,6 +2514,9 @@ FUNNY_UV_CODE
 	else
 	{
 #endif
+	long xInc_shr16 = (long) (xInc >> 16);
+	int xInc_mask = xInc & 0xffff;
+        int longDstWidth=(long int)dstWidth;	
 	asm volatile(
 		"xor %%"REG_a", %%"REG_a"	\n\t" // i
 		"xor %%"REG_b", %%"REG_b"		\n\t" // xx
@@ -2560,13 +2550,7 @@ FUNNY_UV_CODE
 		"cmp %2, %%"REG_a"		\n\t"
 		" jb 1b				\n\t"
 
-		:: "m" (src1), "m" (dst), 
-#ifdef ARCH_X86_64
-		"m" (dstWidth), "m" (xIncHigh),
-#else
-		"m" ((long)dstWidth), "m" ((long)(xIncHigh)),
-#endif
-		 "m" ((xIncLow)),
+		:: "m" (src1), "m" (dst), "m" (longDstWidth), "m" (xInc_shr16), "m" (xInc_mask),
 		"r" (src2)
 		: "%"REG_a, "%"REG_b, "%ecx", "%"REG_D, "%esi"
 		);
