@@ -54,7 +54,7 @@ static void 	GUI_XvEnd( void );
 static uint8_t 	GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h);
 static uint8_t 	GUI_XvSync(void);
 
-
+static uint8_t getAtom(char *string);
 //________________Wrapper around Xv_______________
 XvAccelRender::XvAccelRender( void ) 
 {
@@ -122,9 +122,10 @@ uint8_t GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h)
 
 	  // for YV12, 4 bits for Y 4 bits for u, 4 bits for v
 	  // total 1.5*
+         XLockDisplay (xv_display);
 	  memcpy(xvimage->data, src, (w*h*3)>>1);
-	  XLockDisplay (xv_display);
-	  // And display it !
+	
+        // And display it !
 #if 1
 	  XvShmPutImage(xv_display, xv_port, xv_win, xv_gc, xvimage, 0, 0, w, h,	// src
 			0, 0, w, h,	// dst
@@ -200,7 +201,7 @@ unsigned long num_adaptors;
 */
 #ifdef VERBOSE_XV
 	  printf("\n_______________________________\n");
-	  printf("\n Adaptator	: %d", i);
+	  printf("\n Adaptor 		: %d", i);
 	  printf("\n Base ID		: %ld", curai->base_id);
 	  printf("\n Nb Port	 	: %lu", curai->num_ports);
 	  printf("\n Type			 	: %d,",
@@ -258,17 +259,46 @@ unsigned long num_adaptors;
    XShmSegmentInfo *shminfo
 
 */
+        
+        XSetWindowAttributes xswa;
+        XWindowAttributes attribs;
+        static Atom xv_atom;
+        unsigned long xswamask;
+        int erCode;
+
+        /* check if colorkeying is needed */
+        xv_atom = getAtom( "XV_AUTOPAINT_COLORKEY" );
+        if(xv_atom!=None)
+        {
+                XvSetPortAttribute( xv_display, xv_port, xv_atom, 1 );
+        }
+        else printf("No autopaint \n");
+
+        /* if we have to deal with colorkeying ... */
+        
 	xvimage = XvShmCreateImage(WDN, xv_port,
 				   xv_format, 0, w, h, &Shminfo);
 
 	Shminfo.shmid = shmget(IPC_PRIVATE, xvimage->data_size,
 			       IPC_CREAT | 0777);
+        if(Shminfo.shmid<=0)
+        {
+                printf("shmget failed\n");
+        }
 	Shminfo.shmaddr = (char *) shmat(Shminfo.shmid, 0, 0);
 	Shminfo.readOnly = False;
+        if(Shminfo.shmaddr==(char *)-1)
+        {
+                printf("Shmat failed\n");
+        }
 	xvimage->data = Shminfo.shmaddr;
 	XShmAttach(WDN, &Shminfo);
 	XSync(WDN, False);
-	shmctl(Shminfo.shmid, IPC_RMID, 0);
+	erCode=shmctl(Shminfo.shmid, IPC_RMID, 0);
+        if(erCode)
+        {
+                printf("Shmctl failed :%d\n",erCode);
+        }
 	memset(xvimage->data, 0, xvimage->data_size);
 
 	xv_xgc.graphics_exposures = False;
@@ -296,10 +326,14 @@ uint8_t GUI_XvList(Display * dis, uint32_t port, uint32_t * fmt)
     int k, f = 0;
 
     formatValues = XvListImageFormats(dis, port, &imgfmt);
-    if (formatValues)
-	for (k = 0; !f || (k < imgfmt); k++)
+// when "formatValues" is NULL, imgfmt should be zero, too 
+//    if (formatValues)
+
+// this will run endless or segfault if the colorspace searched for isn't found
+//	for (k = 0; !f || (k < imgfmt); k++)
+	for (k = 0; !f && (k < imgfmt); k++)
 	  {
-#ifdef VERVOSE_XV
+#ifdef VERBOSE_XV
 	      printf("\n %lx %d --> %s", port, formatValues[k].id,
 		     formatValues[k].guid);
 #endif
@@ -312,10 +346,34 @@ uint8_t GUI_XvList(Display * dis, uint32_t port, uint32_t * fmt)
 		    f = 1;
 		    *fmt = formatValues[k].id;
 		}
-    } else
-	f = 0;
-    XFree(formatValues);
+    }// else   
+     //	f = 0; // f has already been initialized zero
+	if (formatValues) //checking if it's no NULL-pointer won't hurt
+	    XFree(formatValues); 
     return f;
+}
+uint8_t getAtom(char *string)
+{
+  XvAttribute * attributes;
+  int attrib_count,i;
+  Atom xv_atom = None;
+
+  attributes = XvQueryPortAttributes( xv_display, xv_port, &attrib_count );
+  if( attributes!=NULL )
+  {
+    for ( i = 0; i < attrib_count; ++i )
+    {
+      if ( strcmp(attributes[i].name, string ) == 0 )
+      {
+        xv_atom = XInternAtom( xv_display, string, False );
+        break; // found what we want, break out
+      }
+    }
+    XFree( attributes );
+  }
+
+  return xv_atom;
+
 }
 void GUI_XvBuildAtom(Display * dis, Atom * atom, char *string)
 {
