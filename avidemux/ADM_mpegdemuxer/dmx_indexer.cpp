@@ -39,6 +39,9 @@
 #include "dmx_identify.h"
 
 #define MIN_DELTA_PTS 150 // autofix in ms
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_MPEG
+#include "ADM_toolkit/ADM_debug.h"
 
 static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
 static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel,uint32_t nbTracks);
@@ -180,6 +183,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         {
                                 if(!demuxer->sync(&streamid,&syncAbs,&syncRel,&pts,&dts)) break;   
                                 update++;
+                                //aprintf("\t\tSync : %x at %"LLX"\n",streamid,syncAbs);
                                 if(update>100)
                                         {
                                                /* if(work->update(syncAbs>>16,demuxer->getSize()>>16))
@@ -219,7 +223,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 demuxer->forward(4);
                                                 break;
                                         case 0xb8: // GOP
-                                                //      printf("GOP\n");
+                                                //aprintf("GOP %d\n",nbGop);
                                                 uint32_t gop;   
                                                 if(!seq_found) continue;
                                                 if(grabbing) 
@@ -233,12 +237,18 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 break;
                                         case 0x00 : // picture
                                                
-                                                if(!seq_found) continue;
+                                                
+                                                if(!seq_found)
+                                                { 
+                                                        continue;
+                                                        printf("No sequence start yet, skipping..\n");
+                                                }
                                                 grabbing=0;
                                                 total_frame++;
                                                 val=demuxer->read16i();
                                                 temporal_ref=val>>6;
                                                 ftype=7 & (val>>3);
+                                                //aprintf("Temporal ref:%lu\n",temporal_ref);
                                                 // skip illegal values
                                                 if(ftype<1 || ftype>3)
                                                 {
@@ -364,6 +374,7 @@ uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
                 demuxer->stamp();
         
         }
+        //aprintf("\tpushed %d %"LLX"\n",nbPushed,abs);
         nbPushed++;
         
         ADM_assert(nbPushed<MAX_PUSHED);

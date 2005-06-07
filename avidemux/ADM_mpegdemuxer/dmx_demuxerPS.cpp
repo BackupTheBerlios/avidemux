@@ -159,7 +159,7 @@ uint8_t dmx_demuxerPS::setPos( uint64_t abs,uint64_t  rel)
 				// Need to move ?
 				if(abs==_pesBufferStart && _pesBufferLen)
 				{
-						if(_pesBufferLen<=rel)
+						if(_pesBufferLen<rel)
 							{
 								printf("Asked setpos to go %lu whereas %lu is max\n",
 											rel,_pesBufferLen);
@@ -182,7 +182,7 @@ uint8_t dmx_demuxerPS::setPos( uint64_t abs,uint64_t  rel)
                         return 0;
                 }
                 
-                if(rel>=_pesBufferLen)
+                if(rel>_pesBufferLen)
                 {
                         printf("Set pos failed : asked rel:%lu max: %lu, absPos:%llu absPosafterRefill:%llu\n",
                                         rel,_pesBufferLen,abs,_pesBufferStart);
@@ -212,22 +212,20 @@ uint32_t mx;
                 }
                 // flush
                 mx=_pesBufferLen-_pesBufferIndex;
-								if(mx)
-								{
-                	memcpy(w,_pesBuffer+_pesBufferIndex,mx);
-
-                	_pesBufferIndex+=mx;
-                	consumed+=mx;
-                	w+=mx;
-                	len-=mx;
-        				}	
+                if(mx)
+                {
+                        memcpy(w,_pesBuffer+_pesBufferIndex,mx);
+                        _pesBufferIndex+=mx;
+                        consumed+=mx;
+                        w+=mx;
+                        len-=mx;
+                }
                 if(!refill())
                 {
                         _lastErr=1;
                          return 0;
                 }
                 return mx+read(w,len);
-                
 }
 uint8_t         dmx_demuxerPS::sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts,uint64_t *dts)
 {
@@ -235,8 +233,8 @@ uint32_t val,hnt;
          *r=0;
 
                 val=0;
-                hnt=0;                  
-                        
+                hnt=0;
+
                 // preload
                 hnt=(read8i()<<16) + (read8i()<<8) +read8i();
                 if(_lastErr)
@@ -245,24 +243,24 @@ uint32_t val,hnt;
                         printf("\n io error , aborting sync\n");
                         return 0;       
                 }
-                
+
                 while((hnt!=0x00001))
                 {
-                                        
+
                         hnt<<=8;
-                        val=read8i();                                   
+                        val=read8i();
                         hnt+=val;
-                        hnt&=0xffffff;  
-                                        
+                        hnt&=0xffffff;
+ 
                         if(_lastErr)
                         {
                              _lastErr=0;
                             printf("\n io error , aborting sync\n");
                             return 0;
                          }
-                                                                        
+
                 }
-                                
+
                 *stream=read8i();
                 // Case 1 : assume we are still in the same packet
                 if(_pesBufferIndex>=4)
@@ -315,6 +313,7 @@ _again:
                 _lastErr=1;
                 return 0;
         }
+        parser->getpos(&abs);
         if(_probeSize)
         {
         	uint64_t pos;
@@ -333,7 +332,9 @@ _again:
         }
         if(stream==PADDING_CODE || stream==SYSTEM_START_CODE) 
         {
-        		parser->forward(parser->read16i());
+                        len=parser->read16i();
+                        //printf("\tForwarding %lu bytes\n",len);
+        		parser->forward(len);
         		goto _again;
         }
         // Only keep relevant parts
@@ -341,7 +342,7 @@ _again:
         // subs 20-29
         // private data 1/2
 #define INSIDE(min,max) (stream>=min && stream<max)
-        if(!(  INSIDE(0xC0,0xC9) || INSIDE(0xE0,0xE9) || INSIDE(0x20,0x29) || stream==PRIVATE_STREAM_1
+        if(!(  INSIDE(0xC0,0xC9) || INSIDE(0xE0,0xE9) || INSIDE(0x20,0x29) || stream==PRIVATE_STREAM_1 || stream==PRIVATE_STREAM_2
         			)) goto _again;
         // Ok we got a candidate
         parser->getpos(&abs);
@@ -402,7 +403,7 @@ uint8_t align=0;
                 size=parser->read16i();
                 if((stream==PADDING_CODE) || 
                 	 (stream==PRIVATE_STREAM_2)
-                        ||(size==SYSTEM_START_CODE) //?
+                        ||(stream==SYSTEM_START_CODE) //?
                         ) // special case, no header
                         {
                                 *olen=size;      

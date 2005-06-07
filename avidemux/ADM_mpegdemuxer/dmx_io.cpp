@@ -294,7 +294,11 @@ uint32_t val,hnt;
         val=0;
         hnt=0;                  
         // preload
-        if((4+_off)>=_sizeFd[_nbFd-1]) return 0;
+        if((4+_off)>=_size) 
+        {
+                printf("Dmx IO: End of file met (%"LLU" / %"LLU" seg%lu)\n",_off,_size,_nbFd);
+                return 0;
+        }
         hnt=(read8i()<<16) + (read8i()<<8) +read8i();
         
 
@@ -306,7 +310,7 @@ uint32_t val,hnt;
                 hnt&=0xffffff;
                 if(_curFd==_nbFd-1)
                 {       
-                                if((4+_off)>=_sizeFd[_curFd]) return 0;
+                                if((4+_off)>=_size) return 0;
                 }
         }
                                 

@@ -100,7 +100,7 @@ uint8_t         read8i(void)
 {
         uint8_t r;
         
-        if(_pesBufferIndex+1<=_pesBufferLen)
+        if(_pesBufferIndex<_pesBufferLen)
         {
                 consumed++;
                 r=_pesBuffer[_pesBufferIndex++];
