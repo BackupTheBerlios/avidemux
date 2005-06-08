@@ -774,6 +774,13 @@ if test "x$use_cygwin" = "xyes"; then
 	CFLAGS=" $CFLAGS -mno-cygwin -mms-bitfields"
 	
 fi
+dnl __________ test for gentoo faad2.h ___________
+AC_ARG_WITH(newfaad, 
+            AC_HELP_STRING([--with-newfaad],[Use gentoo like faad2.h]),
+            [    ],
+            [    AC_DEFINE(OLD_FAAD_PROTO,1,"Use gentoo way for faad2.h")],
+                )
+
 dnl ______________ vectors ? for altivec mainly and a bit of 386 (fft) _______
 dnl (except for amd64 ? bug in ubuntu ?)
 if test "x$have_amd64" = "xno"; then
