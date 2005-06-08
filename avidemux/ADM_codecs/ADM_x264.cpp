@@ -48,7 +48,7 @@ uint8_t   X264Encoder::preamble(uint32_t fps1000,ADM_x264Param *zparam)
   
   x264_t                *xhandle=NULL;
  
-        printf("Opening X264\n");
+        printf("Opening X264 for %lu x %lu\n",_w,_h);
   
         param.cpu=0; // Will be slow ...
         param.i_width=_w;
@@ -60,7 +60,7 @@ uint8_t   X264Encoder::preamble(uint32_t fps1000,ADM_x264Param *zparam)
         
         param.i_fps_num=fps1000;
         param.i_fps_den=1000;
-        param.i_maxframes=0;
+//        param.i_maxframes=0;
         if(zparam)
         {
                 param.i_frame_reference=1;              //  ref frame like mpeg1/2/4
@@ -186,7 +186,7 @@ uint8_t         X264EncoderCQ::init( uint32_t val,uint32_t fps1000,ADM_x264Param
   memset(&param,0,sizeof(param));
   x264_param_default( &param );
 
-  param.rc.i_rc_buffer_size=-1;
+//  param.rc.i_rc_buffer_size=-1;
   param.rc.i_qp_constant=val;  
            // should be ~ the same as CQ mode (?)
   return preamble(fps1000,zparam); 
@@ -202,8 +202,8 @@ uint8_t         X264EncoderCBR::init( uint32_t val,uint32_t fps1000,ADM_x264Para
   x264_param_default( &param );
   param.rc.b_cbr=1;
   param.rc.i_bitrate=val/1000;  
-  param.rc.i_rc_buffer_size=val/1000;
-  param.rc.i_rc_init_buffer=(val/1000)>>1;
+//  param.rc.i_rc_buffer_size=val/1000;
+//  param.rc.i_rc_init_buffer=(val/1000)>>1;
   return preamble(fps1000,zparam); 
 }
 X264EncoderCBR::~X264EncoderCBR()
@@ -216,7 +216,7 @@ uint8_t         X264EncoderPass1::init( uint32_t val,uint32_t fps1000,ADM_x264Pa
   memset(&param,0,sizeof(param));
   x264_param_default( &param );
   
-  param.rc.i_rc_buffer_size=-1;
+//  param.rc.i_rc_buffer_size=-1;
   param.rc.i_qp_constant=2;  
   
   param.rc.b_stat_write = 1;
@@ -236,8 +236,8 @@ uint8_t         X264EncoderPass2::init( uint32_t val,uint32_t fps1000,ADM_x264Pa
   
   param.rc.b_cbr=1;
   param.rc.i_bitrate=val;  
-  param.rc.i_rc_buffer_size=val;
-  param.rc.i_rc_init_buffer=val>>1;
+  //param.rc.i_rc_buffer_size=val;
+  //param.rc.i_rc_init_buffer=val>>1;
   
   param.rc.b_stat_write = 0;
   param.rc.b_stat_read = 1;
