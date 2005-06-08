@@ -28,8 +28,8 @@
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_assert.h" 
  GtkWidget	*DIA_ocr(void);
- 
-GtkWidget   *DIA_ocr (void)
+
+GtkWidget *DIA_ocr (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
@@ -72,8 +72,9 @@ GtkWidget   *DIA_ocr (void)
   GtkWidget *labelText;
   GtkWidget *entry;
   GtkWidget *hbuttonbox1;
+  GtkWidget *buttonCalibrate;
   GtkWidget *buttonSkipAll;
-  GtkWidget *buttonskip;
+  GtkWidget *buttonSkip;
   GtkWidget *buttonIgnore;
   GtkWidget *buttonOk;
   GtkWidget *hseparator1;
@@ -82,7 +83,7 @@ GtkWidget   *DIA_ocr (void)
   GtkWidget *closebutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("dialog1"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), _("Mini OCR"));
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -169,7 +170,7 @@ GtkWidget   *DIA_ocr (void)
 
   frameLoad = gtk_frame_new (NULL);
   gtk_widget_show (frameLoad);
-  gtk_box_pack_start (GTK_BOX (hbox1), frameLoad, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox1), frameLoad, TRUE, TRUE, 0);
 
   vbox2 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox2);
@@ -284,17 +285,22 @@ GtkWidget   *DIA_ocr (void)
   gtk_widget_show (hbuttonbox1);
   gtk_box_pack_start (GTK_BOX (vbox7), hbuttonbox1, TRUE, TRUE, 0);
 
-  buttonSkipAll = gtk_button_new_with_mnemonic (_("Skip Whole"));
+  buttonCalibrate = gtk_button_new_with_mnemonic (_("Calibrate"));
+  gtk_widget_show (buttonCalibrate);
+  gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonCalibrate);
+  GTK_WIDGET_SET_FLAGS (buttonCalibrate, GTK_CAN_DEFAULT);
+
+  buttonSkipAll = gtk_button_new_with_mnemonic (_("Skip all"));
   gtk_widget_show (buttonSkipAll);
   gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonSkipAll);
   GTK_WIDGET_SET_FLAGS (buttonSkipAll, GTK_CAN_DEFAULT);
 
-  buttonskip = gtk_button_new_with_mnemonic (_("Skip"));
-  gtk_widget_show (buttonskip);
-  gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonskip);
-  GTK_WIDGET_SET_FLAGS (buttonskip, GTK_CAN_DEFAULT);
+  buttonSkip = gtk_button_new_with_mnemonic (_("Skip Glyph"));
+  gtk_widget_show (buttonSkip);
+  gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonSkip);
+  GTK_WIDGET_SET_FLAGS (buttonSkip, GTK_CAN_DEFAULT);
 
-  buttonIgnore = gtk_button_new_with_mnemonic (_("Ignore"));
+  buttonIgnore = gtk_button_new_with_mnemonic (_("Ignore glyph"));
   gtk_widget_show (buttonIgnore);
   gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonIgnore);
   GTK_WIDGET_SET_FLAGS (buttonIgnore, GTK_CAN_DEFAULT);
@@ -365,8 +371,9 @@ GtkWidget   *DIA_ocr (void)
   GLADE_HOOKUP_OBJECT (dialog1, labelText, "labelText");
   GLADE_HOOKUP_OBJECT (dialog1, entry, "entry");
   GLADE_HOOKUP_OBJECT (dialog1, hbuttonbox1, "hbuttonbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonCalibrate, "buttonCalibrate");
   GLADE_HOOKUP_OBJECT (dialog1, buttonSkipAll, "buttonSkipAll");
-  GLADE_HOOKUP_OBJECT (dialog1, buttonskip, "buttonskip");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonSkip, "buttonSkip");
   GLADE_HOOKUP_OBJECT (dialog1, buttonIgnore, "buttonIgnore");
   GLADE_HOOKUP_OBJECT (dialog1, buttonOk, "buttonOk");
   GLADE_HOOKUP_OBJECT (dialog1, hseparator1, "hseparator1");
@@ -376,3 +383,4 @@ GtkWidget   *DIA_ocr (void)
 
   return dialog1;
 }
+
