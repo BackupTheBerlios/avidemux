@@ -16,7 +16,7 @@ false				yylval=yytext;return BOOL;
 \-[0-9]+			yylval=yytext;return NUMBER;
 \-*([0-9])+"."([0-9])*		yylval=yytext;return FLOAT;
 0x[0-9a-fA-F]+  		yylval=yytext;return HEXNUMBER;
-[a-zA-Z0-9_/\.=]+	  		yylval=ADM_strdup(yytext);return STRING;
+[a-zA-Z0-9_/\.=\-]+	  		yylval=ADM_strdup(yytext);return STRING;
 \(				return OPEN;
 \)				return CLOSE;
 \/\/.*				return COMMENT;

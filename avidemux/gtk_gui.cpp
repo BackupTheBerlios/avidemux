@@ -1953,9 +1953,10 @@ int ADM_saveRaw (char *name)
   work=new DIA_working("Saving raw video stream");
 
   // preamble
+#if 0
   video_body->getRawStart (frameStart, buffer, &len);
   fwrite (buffer, len, 1, fd);
-
+#endif
   for (uint32_t i = frameStart; i < frameEnd; i++)
     {
       work->update (i - frameStart, frameEnd - frameStart);
