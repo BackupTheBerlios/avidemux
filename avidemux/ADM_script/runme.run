@@ -1,0 +1,9 @@
+echo "updating lexer.."
+flex -oadm_lexgen.1 -l adm_lex.lex
+cat adm_lexgen.1 | sed 's/free( ptr );/ADM_dezalloc(ptr);/g'  |\
+sed 's/ realloc( /ADM_realloc(/g' | sed 's/ malloc( /ADM_alloc(/g' > adm_lexgen.c
+echo "done"
+
+
+
+
