@@ -220,7 +220,24 @@ void ms2time(uint32_t len2,uint16_t * hh, uint16_t * mm,
     *ms = (uint32_t) floor(len2);
 
 }
+void            time2frame(uint32_t *frame, uint32_t fps, uint32_t hh, uint32_t mm,
+                                uint32_t ss, uint32_t ms)
+{
+// convert everything to ms : uint32_t = 1000 hours, should be plenty enough
+uint32_t count=0;
+                count+=ms;
+                count+=ss*1000;
+                count+=mm*60*1000;
+                count+=hh*3600*1000;
+double d;
+                d=count;                
+                // ms
+                d=d*fps;
+                d/=1000;
+                d/=1000;
+                *frame= (uint32_t)(floor(d+0.5));
 
+}
 void UI_purge( void )
 {
 	

@@ -44,6 +44,7 @@ CALLBACK(to_other1 				,ACT_Pipe2Other);
  CALLBACK( next_intra_frame1            	,ACT_NextKFrame);
  CALLBACK( previous_intra_frame1         	,ACT_PreviousKFrame);
  CALLBACK( jum_to_frame1               		,ACT_Goto);
+ CALLBACK( jump_to_time1                        ,ACT_GotoTime);
 
  CALLBACK( copy1      				,ACT_Copy);
  CALLBACK( paste1      				,ACT_Paste);

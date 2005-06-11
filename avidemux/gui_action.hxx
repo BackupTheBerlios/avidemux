@@ -67,6 +67,7 @@ typedef enum
   ACT_Scale,
   
   ACT_Goto,
+  ACT_GotoTime,
   
 
   ACT_Begin,

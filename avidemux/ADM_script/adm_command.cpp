@@ -42,6 +42,7 @@ extern void HandleAction(Action act);
 //_________________________
 #include "adm_command.h" 
 void ADS_commandList( void );
+extern uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss);
 ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg,uint8_t fake);
 //_______________________
 #include "ADM_editor/ADM_outputfmt.h"
@@ -106,6 +107,14 @@ int scriptAudioSource(int n, Arg *args)
 
 }
 
+int scriptGoToTime(int n, Arg *args)
+{
+uint16_t hh,mm,ss,ms;
+        hh=args[0].arg.integer;
+        mm=args[0].arg.integer;
+        ss=args[0].arg.integer;
+        return  A_jumpToTime(  hh,  mm,  ss);
+}
 int scriptSetPostProc(int n, Arg *args)
 {
         uint32_t type,strength,swapuv;
@@ -544,21 +553,12 @@ int candidate=-1;
 }
 void ADS_commandList( void )
 {
-	printf("List of functions available in script mode\n");
-	for(int i=sizeof(myCommands)/sizeof(admCommand)-1;i>=0;i--)
-	{
-		printf("\n%s ( ",myCommands[i].command);
-		for(int j=0;j<myCommands[i].nbArgs;j++)
-		{
-			switch(myCommands[i].args[j])
-			{
-				case APM_NUM: printf( " number ");break;
-				case APM_STRING: printf( " string/file ");break;
-				case APM_FLOAT: printf( " float ");break;
-				default: printf(" ??? ");break;
-			}		
-		}
-		printf(")");
-	}
-	printf("\n");
+        printf("List of functions available in script mode\n");
+        for(int i=sizeof(myCommands)/sizeof(admCommand)-1;i>=0;i--)
+        {
+                printf("%s \t: ",myCommands[i].command);
+                printf("%s \n",myCommands[i].man);
+
+        }
+        printf("\n");
 }

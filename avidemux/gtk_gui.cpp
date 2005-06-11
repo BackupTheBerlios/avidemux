@@ -159,7 +159,9 @@ static void	A_setPostproc( void );
 extern uint8_t ogmSave(char  *name);
 //
 static uint8_t A_pass(char *name);
+uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss);
 //__________
+extern uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss);
 extern uint8_t ogmSave(char *fd);
 extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
 extern int A_SaveUnpackedVop( char *name);
@@ -493,17 +495,26 @@ case ACT_Pipe2Other:
          GUI_FileSelWrite ("Select workbench to save ", A_saveWorkbench);
       }
       break;
-	case ACT_JumpToFrame: 
-		// read value	
-			printf("Jump!\n");	 
-			nf=UI_readCurFrame();
-			if(nf>0 && nf< avifileinfo->nb_frames)
-			{
-				GUI_GoToFrame(nf);
-			}
-			UI_JumpDone();
-		break;
-	
+        case ACT_JumpToFrame: 
+                // read value	
+                printf("Jump!\n");	 
+                nf=UI_readCurFrame();
+                if(nf>0 && nf< avifileinfo->nb_frames)
+                {
+                        GUI_GoToFrame(nf);
+                }
+                UI_JumpDone();
+                break;
+    case ACT_GotoTime:
+                {
+                        uint16_t mm,hh,ss,ms;
+                             frame2time(curframe,avifileinfo->fps1000,&hh,&mm,&ss,&ms);
+                             if(DIA_gotoTime(&hh,&mm,&ss))
+                                {
+                                        A_jumpToTime(hh,mm,ss);
+                                }
+                }
+                break;
     case ACT_SaveRaw:
       GUI_FileSelWrite ("Select raw file to save ", (SELFILE_CB *)ADM_saveRaw);
       break;
@@ -2280,7 +2291,19 @@ uint32_t count;
 
 }
 extern int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap);
-
+//
+uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss)
+{
+uint32_t frame;
+        time2frame(&frame,avifileinfo->fps1000,hh,mm,ss,0);
+        if(frame>=avifileinfo->nb_frames)
+        {
+                printf("Frame is out of bound\n");
+                return 0;
+        }
+        return GUI_GoToFrame(frame);
+        
+}
 
 //
 void	A_setPostproc( void )
