@@ -690,7 +690,7 @@ case ACT_Pipe2Other:
       break;
     case ACT_AudioSourceNone:
       //currentaudiostream=(AVDMGenericAudioStream *)NULL;
-       ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+       changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
       break;
 
   
