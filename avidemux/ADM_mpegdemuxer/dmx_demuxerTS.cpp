@@ -4,6 +4,18 @@
                 
     copyright            : (C) 2005 by mean
     email                : fixounet@free.fr
+
+        Here we try to read a whole PES packet at a time...
+        So we concatenate all TS packet to get it
+        Else it is a pain to handle potentiel padding bytes
+
+        A special case, if the PES size is 0, it means it is an unbound
+        PES packet, and so the demuxer must guess the size when encountering
+        the next TS packet having the payload unit flag
+        It is a way to overcome the 64k size limit of the PES packetization
+        In that case the padding must be in the adaptation layer bytes.
+        
+
  ***************************************************************************/
 
 /***************************************************************************
@@ -25,8 +37,9 @@
 #include "ADM_library/default.h"
 #include <ADM_assert.h>
 
+#define TS_VERBOSE 1
 
-
+#include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
 #include "dmx_demuxerTS.h"
 uint8_t         dmx_demuxerTS::changePid(uint8_t newpid)
 {
@@ -44,40 +57,26 @@ dmx_demuxerTS::dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks)
         _pesBuffer=new uint8_t [MAX_TS_BUFFER];
 
         memset(seen,0,sizeof(seen));
-
+        memset(allPid,0,sizeof(allPid));
         _pesBufferStart=0;  // Big value so that we read
         _pesBufferLen=0;
         _pesBufferIndex=0;
         ADM_assert(nb>0);
         tracked=NULL;
-
         nbTracked=nb;
-        
         myPid=tracks[0].pid; // For mpeg TS we use the PID field as the PES field is irrelevant
+        printf("Ts: Using %x as pid for track 0\n",myPid);
         
-        if(nb!=256)     // Only pick one track as main, and a few as informative
+        // Build reverse lookup
+        for(int i=0;i<nb;i++)
         {
-#if 0                
-                memset(mask,0,256);
-                tracked=new uint8_t[nbTracked];
-                for(int i=1;i<nb;i++)
-                {
-                        mask[i]=1;
-                        tracked[i]=tracks[i].pes&0xff;
-                }                
-#endif
-                
-        }else
-        {
-#if 0
-                memset(mask,1,256); // take all tracks
-#endif
+                allPid[ tracks[i].pid ]=1+i;
         }
 
-
-       	_probeSize=0; 
-       	memset(seen,0,255*sizeof(uint64_t));     
-        printf("Creating mpeg PS demuxer  main Pid: %X \n",myPid);
+        _probeSize=0; 
+        packMode=0;
+        packLen=0;
+        printf("Creating mpeg TS demuxer  main Pid: %X , pes id :%x\n",myPid,tracks[0].pes);
 }
 dmx_demuxerTS::~dmx_demuxerTS()
 {
@@ -95,20 +94,9 @@ dmx_demuxerTS::~dmx_demuxerTS()
 */
 uint8_t       dmx_demuxerTS::getStats(uint64_t *oseen)
 {
-        if(nbTracked!=256)
+        for(int i=0;i<nbTracked;i++)
         {
-                oseen[0]=0;
-                for(int i=1;i<nbTracked;i++)
-                {
-                        oseen[i]=seen[tracked[i]];
-                }
-        }
-        else
-        {
-                 for(int i=0;i<nbTracked;i++)
-                {
-                        oseen[i]=seen[i];
-                }
+                oseen[i]=seen[i];
         }
         return 1;
 }
@@ -121,7 +109,6 @@ uint8_t dmx_demuxerTS::open(char *name)
 {
         if(! parser->open(name)) return 0;
         _size=parser->getSize();
-        
         return 1;
 }
 uint8_t dmx_demuxerTS::forward(uint32_t f)
@@ -156,42 +143,42 @@ uint8_t  dmx_demuxerTS::getPos( uint64_t *abs,uint64_t *rel)
 }
 uint8_t dmx_demuxerTS::setPos( uint64_t abs,uint64_t  rel)
 {
-				// Need to move ?
-				if(abs==_pesBufferStart && _pesBufferLen)
-				{
-						if(_pesBufferLen<rel)
-							{
-								printf("Asked setpos to go %lu whereas %lu is max\n",
-											rel,_pesBufferLen);
-								ADM_assert(rel<_pesBufferLen);
-							}
-						
-					  _pesBufferIndex=rel;
-					  return 1;
-					
-				}
-               if(!parser->setpos(abs))
+        // Still in same packet ?
+        if(abs==_pesBufferStart && _pesBufferLen)
+        {
+                if(_pesBufferLen<rel)
                 {
-                        printf("DMX_PS: setPos failed\n");
-                         return 0;
-                }
-                _pesBufferStart=abs;
-                if(!refill())
-                {
-                        printf("DMX_PS: refill failed\n");
-                        return 0;
-                }
-                
-                if(rel>_pesBufferLen)
-                {
-                        printf("Set pos failed : asked rel:%lu max: %lu, absPos:%llu absPosafterRefill:%llu\n",
-                                        rel,_pesBufferLen,abs,_pesBufferStart);
-                        ADM_assert(rel<_pesBufferLen);                        
+                        printf("Asked setpos to go %lu whereas %lu is max\n",
+                                rel,_pesBufferLen);
+                        ADM_assert(rel<_pesBufferLen);
                 }
 
                 _pesBufferIndex=rel;
                 return 1;
-               
+        }
+        // There is a risk we don't get the PES start for that
+        //
+        if(!parser->setpos(abs))
+        {
+                printf("DMX_TS: setPos failed\n");
+                return 0;
+        }
+        _pesBufferStart=abs;
+        if(!refill())
+        {
+                printf("DMX_TS: refill failed\n");
+                return 0;
+        }
+
+        if(rel>_pesBufferLen)
+        {
+                printf("Set pos failed : asked rel:%lu max: %lu, absPos:%llu absPosafterRefill:%llu\n",
+                                        rel,_pesBufferLen,abs,_pesBufferStart);
+                ADM_assert(rel<_pesBufferLen);                        
+        }
+
+        _pesBufferIndex=rel;
+        return 1;
 }
 /*
         Sync on mpeg sync word, returns the sync point in abs/r
@@ -294,45 +281,150 @@ uint32_t val,hnt;
 
 //
 //      Refill the pesBuffer
-//              Only with the pid that is of interest for us
-//              Update PTS/DTS
-//              Keep track of other pes len
+//              Read packet of correct PID, locate a PES start and read the whole PES packet
+//              It cannot be bigger than 64 k in bound mode, in that case packMode=1, packLen is the leftover to read
+//              
 //
 uint8_t dmx_demuxerTS::refill(void)
 {
-uint32_t globstream,len,pid,payloadunit=0;
+uint32_t consumed,len,pid,payload=0;
 uint8_t  stream,substream;
 uint64_t count,abs,pts,dts;
-uint8_t  head1,head2;
-uint8_t  tmp[TS_PACKET_SIZE];
-        // Resync on our stream
-_again:
+uint32_t left,cc,lenPes;
+
+        _pesBufferIndex=0;
+
+
+_againBranch:
+        while(1)
+        {
+                 if(!readPacket(&pid,&left, &payload,&abs,&cc))
+                        {
+                                printf("dmxTs: Cannot read packet (1) at %"LLX"\n",abs);
+                                return 0;
+                        }
+                        if(allPid[pid]) 
+                        break;
+                        parser->forward(left); // Else skip packet
+        }
+
         
+       
+        
+        if(!payload) // Take as is...
+        {
+                if(pid==myPid)
+                {
+                        // No payloadStart, read it raw
+                        _oldPesStart=_pesBufferStart;
+                        _oldPesLen=_pesBufferLen;
+                        _pesBufferStart=abs;
+                        _pesBufferLen=left;
+                        parser->read32(left,_pesBuffer);
+                        if(packMode)
+                        {
+                                if(packLen<left) _pesBufferLen=packLen;
+                        }
+                        packLen-=left;
+                        return 1;
+                }
+                // Udate info on that track
+                updateTracker(pid,left);
+                parser->forward(left);
+                goto _againBranch;
+        }
+        // Payload present, read header
+        if(!getInfoPES(&consumed,&dts,&pts,&stream,&substream,&lenPes))
+        {
+                        printf("dmxTs: get info failed at %"LLX"\n",abs);
+                        goto _againBranch;
+        }
+#ifdef TS_VERBOSE
+                printf("Stream :%x found at %"LLX" size :%lu\n",stream,abs,lenPes);
+#endif
+       
+        if(consumed>left)
+        {
+                printf("Wrong PES header at %"LLX" %lu / %lu\n",abs,consumed,left);
+                goto _againBranch;
+        }
+        if(lenPes) 
+                {
+                        packMode=1;
+                        packLen=lenPes;
+                }
+        else
+                {
+                        packMode=0;
+                }
+        left-=consumed;
+        if(myPid==pid)
+        {
+                _oldPesStart=_pesBufferStart;
+                _oldPesLen=_pesBufferLen;
+                _pesBufferStart=abs;
+                _pesBufferLen=left;
+                _pesPTS=pts;
+                _pesDTS=dts;
+                parser->read32(left,_pesBuffer);
+                if(packMode)
+                {
+                        if(packLen<left) _pesBufferLen=packLen;
+                        packLen-=_pesBufferLen;
+                }
+                return 1;
+        }
+        // update info
+        updateTracker(pid,left);
+        parser->forward(left);
+        goto _againBranch;
+}
+//***********************************
+// Read a Ts packet and extract
+// interesting infos
+//***********************************
+uint8_t dmx_demuxerTS::readPacket(uint32_t *opid,uint32_t *oleft, uint32_t *isPayloadStart,uint64_t *ostart,uint32_t *occ)
+{
+uint32_t consumed,len,pid,payloadunit=0,discarded;
+uint64_t count,abs;
+uint32_t left;
+uint8_t  byte1,byte2;
+_again:
+        payloadunit=0;
         parser->getpos(&count);
         count=_size-count;
-        while(parser->read8i()!=0x47 && abs>TS_PACKET_SIZE) abs--;
+        discarded=0;
+        while(parser->read8i()!=0x47 && count>TS_PACKET_SIZE)
+                {
+                        discarded++;
+                        count--;
+                }
         if(count<TS_PACKET_SIZE)
         {
-                printf("DmxTS: cannot sync  \n");
+                printf("DmxTS: cannot sync (EOF reached) \n");
                 _lastErr=1;
                 return 0;
         }
+        // Check that there is a 0x47 later on...
+        parser->getpos(&abs);
+        if(discarded) // We did not have a continuous sync, check 2 more packet boundaries..
+        {
+                printf("Ts: Discontinuity of %lu at %"LLX"\n",discarded,abs);
+                parser->forward(TS_PACKET_SIZE-1);
+                byte1=parser->read8i();
+                parser->forward(TS_PACKET_SIZE-1);
+                byte2=parser->read8i();
+                parser->setpos(abs);  // The setpos/getpos is mostly free due to the parser large buffer
+                if(byte1!=0x47 || byte2!=0x47) goto _again;
+        }
+        // Memorize where it starts
+        *ostart=abs-1;
         // Read Pid etc...
         pid=parser->read16i();
-        if(pid & TS_UNIT_START) payloadunit=1;
+        if((pid>>8) & TS_UNIT_START) payloadunit=1;
         pid&=0x1fff; // remove flags
-        // Read leftover
-        parser->read32(TS_PACKET_SIZE-3,tmp);
-        parser->getpos(&abs);
-        abs-=3;
-#if 0
-        if(parser->peek8i()!=0x47)
-        {
-                
-                printf("DmxTs: broken packet at %"LLX"\n",abs);
-                goto _again;
-        }
-#endif        
+        // Start of packet..
+        left=TS_PACKET_SIZE-3;
         if(_probeSize)
         {
                 if(abs>_probeSize)
@@ -343,86 +435,117 @@ _again:
         }
         // Ok now get some informations....
         // only interested in my Pid & user data Pid
-        if(pid!=myPid && pid<0x20)
-        {
+        if(pid!=myPid && pid<0x10)
+        {       
+                parser->forward(left);
                 goto _again;
         }
         // One of the stream we are looking for ?
-        if(!allPid[pid]) goto _again; // No
+        if(!allPid[pid]) 
+        {
+                parser->forward(left);
+                goto _again; // No
+        }
         // Remove header if any
-        int index=0;
+        
         int cc,val,adaptation;
-        val=tmp[index++];
+        // Flags : adaptation layer + continuity counter etc...
+        val=parser->read8i();
+        left--;
         cc=val & 0xf;
         adaptation=(val >>4)&0x3;
+        if(!(adaptation & 1)) // no payload
+        {
+                parser->forward(left);
+                goto _again;
+        }
         if(adaptation & 2) // There is an adaptation field
         {
-                val=tmp[index++];
-                index+=val; // skip adaptation field
+                val=parser->read8i();
+                left--;
+                if(val>=left)
+                {
+                 printf("Wrong adaptation layer size at %"LLX" size=%lu, bytes left = %lu pid=%lx\n",abs,val,left,pid);
+                 goto _again; // need to search..
+                }
+                parser->forward(val); // skip adaptation field
+                left-=val;
         }
         // Ok now we got the raw data packet
+        
+        *oleft=left;
+        *opid=pid;
+        *occ=cc;
+        
         if(payloadunit) // A PSI or PES packet starts here
         {
-                // There is a PES / PSI header
-                // PES...
-                int left=TS_PACKET_SIZE-3-index;
-                
-
-        }
-        else
-        {
-                if(pid==myPid)
-                {
-                        _pesDTS=dts;
-                        _pesPTS=pts;
-                        _pesBufferStart=abs;
-                        _pesBufferLen=TS_PACKET_SIZE-3-index;;
-                        _pesBufferIndex=0;
-                        memcpy(_pesBuffer,&tmp[index],_pesBufferLen);
-                        return 1;
-                }
-        }
-        goto _again;
+                *isPayloadStart=1;
+        }else
+                *isPayloadStart=0;
+        return 1;
 }
 /*
         Retrieve info about the packet we just met
         It is assumed that parser is just after the packet startcode
 
 */
-uint8_t dmx_demuxerTS::getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *olen,uint64_t *opts,uint64_t *odts)
+uint8_t       dmx_demuxerTS::updateTracker(uint32_t trackerPid,uint32_t nbData)
+{
+        seen[(allPid[trackerPid])-1]+=nbData;
+        return 1;
+}
+
+uint8_t       dmx_demuxerTS::getInfoPES(uint32_t *oconsumed,uint64_t *odts,uint64_t *opts,
+                                        uint8_t *ostream,uint8_t *substream,
+                                        uint32_t *olen)
 {
 
-//uint32_t un ,deux;
-uint64_t size=0;
+uint32_t consumed=0;
+int size=0,nulsize=0;
 uint8_t c,d;
 uint8_t align=0;
-                        
+
+                if(parser->read8i()) return 0;
+                if(parser->read8i()) return 0;
+                if(parser->read8i()!=1) return 0;
+                *ostream=parser->read8i(); // Stream
+                consumed=4;
+
                 *substream=0xff;
                 *opts=ADM_NO_PTS;
                 *odts=ADM_NO_PTS;
                 
-#if 0
+
                 size=parser->read16i();
-                if((stream==PADDING_CODE) || 
-                	 (stream==PRIVATE_STREAM_2)
-                        ||(stream==SYSTEM_START_CODE) //?
+                consumed+=2;
+                if(!size) nulsize=1;
+                if((*ostream==PADDING_CODE) || 
+                	 (*ostream==PRIVATE_STREAM_2)
+                        ||(*ostream==SYSTEM_START_CODE) //?
                         ) // special case, no header
                         {
+                                if(nulsize) size=0;
                                 *olen=size;      
                                 return 1;
                         }
-#endif
+
                         //      remove padding if any                                           
         
                 while((c=parser->read8i()) == 0xff) 
                 {
+                        consumed++;
                         size--;
                 }
+                consumed++;
 //----------------------------------------------------------------------------
 //-------------------------------MPEG-2 PES packet style----------------------
 //----------------------------------------------------------------------------
-                if(((c&0xC0)==0x80))
+                if(((c&0xC0)!=0x80))
                 {
+                        printf("DmxTs: Not mpeg2 PES!\n");
+                        return 0;
+                }
+                
                         uint32_t ptsdts,len;
                         //printf("\n mpeg2 type \n");
                         //_muxTypeMpeg2=1;
@@ -435,6 +558,7 @@ uint8_t align=0;
                         // header len
                         len=parser->read8i();
                         size-=3;  
+                        consumed+=2;
 
                         switch(ptsdts)
                         {
@@ -448,6 +572,7 @@ uint8_t align=0;
                                                         pts2=parser->read16i();                 
                                                         len-=5;
                                                         size-=5;
+                                                        consumed+=5;
                                                         *opts=(pts1>>1)<<15;
                                                         *opts+=pts2>>1;
                                                         *opts+=(((pts0&6)>>1)<<30);
@@ -476,6 +601,7 @@ uint8_t align=0;
                                                                 len-=skip;
                                                                 size-=skip;
                                                                 *odts=dts;
+                                                                consumed+=10;
                                                                         //printf("DTS: %lx\n",dts);                
                                                    }
                                                    break;               
@@ -496,16 +622,18 @@ uint8_t align=0;
                         {
                                 parser->forward(len);
                                 size=size-len;
+                                consumed+=len;
                         }
 
-#if 0
-                if(stream==PRIVATE_STREAM_1)
-#endif
+
+                if(*ostream==PRIVATE_STREAM_1)
+
                 {
                         if(size>5)
                         {
                         // read sub id
                                *substream=parser->read8i();
+                                consumed++;
   //                    printf("\n Subid : %x",*subid);
                                 switch(*substream)
                                 {
@@ -521,6 +649,7 @@ uint8_t align=0;
                                                 // of 3 bytes
                                                 parser->forward(3);
                                                 size-=3;
+                                                consumed+3;
                                                 break;
                                 // Subs
                                 case 0x20:case 0x21:case 0x22:case 0x23:
@@ -534,68 +663,15 @@ uint8_t align=0;
                                 if(*substream>0x26 || *substream<0x20)
                                 {
                                         parser->forward(3);
+                                        consumed+3;
                                         size-=3;
                                 }
                                 size--;
                         }
                 }
                //    printf(" pid %x size : %x len %x\n",sid,size,len);
+                if(nulsize) size=0;
                 *olen=size;
+                *oconsumed=consumed;
                 return 1;
-        }
-//----------------------------------------------------------------------------------------------                
-//-------------------------------MPEG-1 PES packet style----------------------                                  
-//----------------------------------------------------------------------------------------------                                        
-           if(0) //_muxTypeMpeg2)
-                {
-                        printf("*** packet type 1 inside type 2 ?????*****\n");
-                        return 0; // mmmm                       
-                }
-          // now look at  STD buffer size if present
-          // 01xxxxxxxxx
-          if ((c>>6) == 1) 
-          {       // 01
-                        size-=2;
-                        parser->read8i();                       // skip one byte
-                        c=parser->read8i();   // then another
-           }                       
-           // PTS/DTS
-           switch(c>>4)
-           {
-                case 2:
-                {
-                        // 0010 xxxx PTS only
-                        uint64_t pts1,pts2,pts0;
-                                        size -= 4;
-                                        pts0=(c>>1) &7;
-                                        pts1=parser->read16i()>>1;
-                                        pts2=parser->read16i()>>1;
-                                        *opts=pts2+(pts1<<15)+(pts0<<30);
-                                        break;
-                  }
-                  case 3:
-                  {               // 0011 xxxx
-                        uint64_t pts1,pts2,pts0;
-                                        size -= 9;
-                                                                        
-                                        pts0=(c>>1) &7;
-                                        pts1=parser->read16i()>>1;
-                                        pts2=parser->read16i()>>1;
-                                        *opts=pts2+(pts1<<15)+(pts0<<30);
-                                        parser->forward(5);
-                   }                                                               
-                   break;
-                   
-                case 1:
-                        // 0001 xxx             
-                        // PTSDTS=01 not allowed                        
-                                return 0;
-                                break; 
-                }
-                                                                
-
-                if(!align)      
-                        size--;         
-        *olen=size;
-        return 1;
 }

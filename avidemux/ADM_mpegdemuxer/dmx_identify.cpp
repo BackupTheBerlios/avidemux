@@ -26,12 +26,16 @@
 #include <ADM_assert.h>
 
 #include "dmx_io.h"
+#include "dmx_demuxerTS.h"
 #include "dmx_demuxerPS.h"
 #include "dmx_demuxerEs.h"
 #include "dmx_identify.h"
 
 #define MAX_PROBE (5*1024*1024)
 #define MIN_DETECT 100
+
+static uint8_t probeTs(fileParser *parser);
+
 DMX_TYPE dmxIdentify(char *name)
 {
 DMX_TYPE ret=DMX_MPG_UNKNOWN;
@@ -48,6 +52,13 @@ uint8_t stream;
         {
                 goto _fnd;
         }
+        // Try to see if it is a TS:
+        if(probeTs(parser))
+                {
+                        delete parser;
+                        return DMX_MPG_TS;
+                }
+        parser->setpos(0);
         while(1)
         {
                 parser->getpos(&pos);
@@ -91,3 +102,43 @@ _fnd:
                 delete parser;
                 return ret;
 }
+uint8_t probeTs(fileParser *parser)
+{
+uint64_t size,pos,left;
+uint32_t count,discarded;
+        // Try to sync on a 0x47 and verify we have several of them in a raw
+        size=parser->getSize();
+        while(1)
+        {
+                parser->getpos(&pos);
+                if(size-pos<TS_PACKET_SIZE || pos> 100*1024)
+                {
+                        return 0;
+                }
+                left=size-pos;
+                count=0;
+                discarded=0;
+                while(parser->read8i()!=0x47 && left > TS_PACKET_SIZE)
+                        {
+                                left--;
+                                discarded++;
+                                if(discarded>TS_PACKET_SIZE*3) return 0;
+                        }
+                if(left<=TS_PACKET_SIZE) return 0;
+                parser->getpos(&pos);
+
+                parser->forward(TS_PACKET_SIZE-1);
+                if(parser->read8i()!=0x47) goto loop;
+                parser->forward(TS_PACKET_SIZE-1);
+                if(parser->read8i()!=0x47) goto loop;
+                parser->forward(TS_PACKET_SIZE-1);
+                if(parser->read8i()!=0x47) goto loop;
+                // It is a TS file:
+                return 1;
+loop:
+                parser->setpos(pos);
+        }
+
+        return 1;
+}
+// EOF

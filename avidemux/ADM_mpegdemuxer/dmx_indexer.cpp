@@ -36,6 +36,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 #include "dmx_demuxerEs.h"
 #include "dmx_demuxerPS.h"
+#include "dmx_demuxerTS.h"
 #include "dmx_identify.h"
 
 #define MIN_DELTA_PTS 150 // autofix in ms
@@ -121,6 +122,14 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         }
         switch(mpegType)
         {
+                case DMX_MPG_TS:
+                                {
+                                dmx_demuxerTS *dmx;
+                                dmx=new dmx_demuxerTS(nbTracks,tracks);
+                                demuxer=dmx;
+                                mpegTypeChar='T';
+                                break;
+                                }
                 case DMX_MPG_ES:
                                 demuxer=new dmx_demuxerES;
                                 mpegTypeChar='E';
@@ -214,6 +223,11 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                         demuxer->forward(8);
                                                         break;
                                                 }
+                                                // Our firt frame is here
+                                                // Important to initialize the mpeg decoder !
+                                                frames[0].abs=syncAbs;
+                                                frames[0].rel=syncRel;
+                                                //
                                                 seq_found=1;
                                                 val=demuxer->read32i();
                                                 imageW=val>>20;
@@ -252,7 +266,8 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 // skip illegal values
                                                 if(ftype<1 || ftype>3)
                                                 {
-                                                         printf("[Indexer]Met illegal pic at %llu + %llu\n",syncAbs,syncRel);
+                                                         printf("[Indexer]Met illegal pic at %"LLX" + %"LLX"\n",
+                                                                        syncAbs,syncRel);
                                                          continue;
                                                 }
 #define USING dts

@@ -19,6 +19,7 @@
 #include "ADM_mpegdemuxer/dmx_demuxer.h"
 #include "ADM_mpegdemuxer/dmx_demuxerEs.h"
 #include "ADM_mpegdemuxer/dmx_demuxerPS.h"
+#include "ADM_mpegdemuxer/dmx_demuxerTS.h"
  #include "ADM_audio/aviaudio.hxx"
  typedef struct dmxAudioIndex
  {

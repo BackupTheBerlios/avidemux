@@ -62,7 +62,15 @@ int     audio,video;
                 printf("It is ES, no need to look for audio\n");
                 return 1;
         }
-        if(*type!=DMX_MPG_PS) return 0;
+        if(*type==DMX_MPG_TS)
+        {
+                printf("Looks like a mpeg TS\n");
+                return 1;
+        }
+        if(*type!=DMX_MPG_PS) 
+        {
+                return 0;
+        }
 
         // It is mpeg PS
         // Create a fake demuxer, set a probe limite and collect info for all streams found

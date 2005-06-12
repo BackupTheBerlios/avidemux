@@ -144,13 +144,19 @@ _abrt:
   printf("Using Track :%x Pid:%x Es:%x for audio\n",mainAudio,aPid,aPes);
   // Build the streams
   myPes=aPes;
+MPEG_TRACK track;
   switch (type)
     {
     case 'P':
-                MPEG_TRACK track;
+                
                 track.pes=aPes;
                 track.pid=aPid;
                 demuxer = new dmx_demuxerPS (1,&track);
+                break;
+    case 'T':
+                track.pes=aPes;
+                track.pid=aPid;
+                demuxer = new dmx_demuxerTS (1,&track);
                 break;
     default:
       ADM_assert (0);

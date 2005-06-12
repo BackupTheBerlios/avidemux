@@ -39,6 +39,7 @@
 
 #include "dmx_demuxerEs.h"
 #include "dmx_demuxerPS.h"
+#include "dmx_demuxerTS.h"
 
 #include "dmx_video.h"
 #include "dmx_audio.h"
@@ -187,7 +188,7 @@ uint8_t                 dmxHeader::open(char *name)
                 uint8_t  type,progressif;
                 char     realname[1024];
                 uint32_t dummy;
-                uint32_t vPid;
+                uint32_t vPid,vTsId;
                 
                 char string[MAX_LINE+1]; //,str[1024];;
                 uint8_t interlac=0;
@@ -235,7 +236,7 @@ uint8_t                 dmxHeader::open(char *name)
                 //fprintf(out,"Main aud : %02lu\n",preferedAudio); 
 
                 fgets(string,MAX_LINE,file);
-                sscanf(string,"Streams  : V%X:%X \n",&dummy,&vPid); 
+                sscanf(string,"Streams  : V%X:%X \n",&vTsId,&vPid); 
 
                 printf("For file :%s\n",realname);                
                 printf("Pic      :%dx%d, %d fps\n",w,h,fps);
@@ -245,6 +246,15 @@ uint8_t                 dmxHeader::open(char *name)
                 
                 switch(type)
                 {
+                        case 'T' :
+                                {
+                                        MPEG_TRACK track;
+                                        track.pid=vTsId;
+                                        track.pes=vPid;
+                                        demuxer=new dmx_demuxerTS(1,&track);
+                                        break;
+
+                                }
                         case 'P':
                                 {
                                         MPEG_TRACK track;
@@ -447,7 +457,7 @@ uint8_t                 dmxHeader::open(char *name)
                                 return 0;
                         }
                         //Dump();
-                        if(type=='P')
+                        if(type=='P' || type=='T')
                         {
                                 // We have potentially some audio
                                 // Try to get it

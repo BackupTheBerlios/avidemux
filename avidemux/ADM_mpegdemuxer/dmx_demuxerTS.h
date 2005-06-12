@@ -1,10 +1,10 @@
-#ifndef DMX_DMX_PS
-#define DMX_DMX_PS
+#ifndef DMX_DMX_TS
+#define DMX_DMX_TS
 
  
 #include "dmx_demuxer.h"
 
-#define MAX_TS_BUFFER (1024) // should be safe enough
+#define MAX_TS_BUFFER (2*1024*1024) // should be safe enough, 2 MB for a full compressed frame,even for HDTV
 #define MAX_TS_STREAM 50       // should be enough too :)
 
 
@@ -13,6 +13,7 @@
 #define TS_UNIT_START        0x40
 #define TS_UNIT_PAYLOAD_ONLY 0x10
 #define TS_UNIT_PAYLOAD_AF   0x30
+#define TS_UNBOUND_SIZE      0x10000000
 /*
         A bit of explanation here.
         The demuxer will take each packet and lookup what it is
@@ -37,12 +38,14 @@ class dmx_demuxerTS: public dmx_demuxer
                   uint8_t       *_pesBuffer;
 
                   uint32_t      _pesBufferIndex; // current position in pesBuffer
-
                   uint64_t      _pesBufferStart;
                   uint32_t      _pesBufferLen;
                   uint64_t      _pesPTS;
                   uint64_t      _pesDTS;
-                
+
+                  uint32_t      packMode;
+                  uint32_t      packLen;
+
 
                   uint64_t      _oldPesStart;    // Contains info for previous packet of same pid
                   uint32_t      _oldPesLen;      // useful when need to go back (after video startcode)
@@ -57,8 +60,11 @@ class dmx_demuxerTS: public dmx_demuxer
                   uint32_t      nbTracked;
                 
                   uint8_t       refill(void);
-                  uint8_t       getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *len,uint64_t *pts,uint64_t *dts);
-
+                  uint8_t       readPacket(uint32_t *opid,uint32_t *oleft, uint32_t *isPayloadStart,
+                                        uint64_t *ostart,uint32_t *occ);
+                  uint8_t       getInfoPES(uint32_t *consumed,uint64_t *dts,uint64_t *pts,uint8_t *stream,
+                                        uint8_t *substream, uint32_t *lenPes);
+                  uint8_t       updateTracker(uint32_t trackerPid,uint32_t nbData);
                   
           public:
                            dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks) ;
