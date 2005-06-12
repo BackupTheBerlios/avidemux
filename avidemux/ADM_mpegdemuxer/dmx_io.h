@@ -16,7 +16,7 @@
  ***************************************************************************/
 #ifndef FPARSER_
 #define FPARSER_
-#define DMX_BUFFER 1024*1024
+#define DMX_BUFFER 1024*100
 
 /*
         _off is the logical offset in the file
