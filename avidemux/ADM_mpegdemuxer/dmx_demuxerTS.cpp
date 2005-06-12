@@ -330,7 +330,7 @@ _againBranch:
 #endif
                                          _pesBufferLen=packLen;
                                 }
-                                packLen-=left;
+                                packLen-=_pesBufferLen;
                                 if(!packLen) packMode=0;
                         }
                         return 1;
@@ -658,7 +658,7 @@ uint8_t align=0;
                                 headconsumd+=len;
                         }
 
-
+#if 0
                 if(*ostream==PRIVATE_STREAM_1)
 
                 {
@@ -702,6 +702,7 @@ uint8_t align=0;
                                 size--;
                         }
                 }
+#endif
                //    printf(" pid %x size : %x len %x\n",sid,size,len);
                 if(nulsize) size=0;
                 *olen=size;
