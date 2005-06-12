@@ -37,7 +37,7 @@
 #include "ADM_library/default.h"
 #include <ADM_assert.h>
 
-#define TS_VERBOSE 1
+//#define TS_VERBOSE 1
 
 #include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
 #include "dmx_demuxerTS.h"
@@ -289,7 +289,7 @@ uint8_t dmx_demuxerTS::refill(void)
 {
 uint32_t consumed,len,pid,payload=0;
 uint8_t  stream,substream;
-uint64_t count,abs,pts,dts;
+uint64_t count,abs,pts,dts,first;
 uint32_t left,cc,lenPes;
 
         _pesBufferIndex=0;
@@ -298,19 +298,16 @@ uint32_t left,cc,lenPes;
 _againBranch:
         while(1)
         {
-                 if(!readPacket(&pid,&left, &payload,&abs,&cc))
-                        {
-                                printf("dmxTs: Cannot read packet (1) at %"LLX"\n",abs);
-                                return 0;
-                        }
-                        if(allPid[pid]) 
+                if(!readPacket(&pid,&left, &payload,&abs,&cc))
+                {
+                        printf("dmxTs: Cannot read packet (1) at %"LLX"\n",abs);
+                        return 0;
+                }
+                if(allPid[pid]) 
                         break;
-                        parser->forward(left); // Else skip packet
+                parser->forward(left); // Else skip packet
         }
 
-        
-       
-        
         if(!payload) // Take as is...
         {
                 if(pid==myPid)
@@ -321,11 +318,21 @@ _againBranch:
                         _pesBufferStart=abs;
                         _pesBufferLen=left;
                         parser->read32(left,_pesBuffer);
+                        _pesPTS=ADM_NO_PTS;
+                        _pesDTS=ADM_NO_PTS;
+                        // If we are in pack mode, cut padding bits
                         if(packMode)
                         {
-                                if(packLen<left) _pesBufferLen=packLen;
+                                if(packLen<left)
+                                {
+#if 1 //def 1  TS_VERBOSE
+                                        printf("Dropping some bytes : %lu / %lu\n",_pesBufferLen,packLen);
+#endif
+                                         _pesBufferLen=packLen;
+                                }
+                                packLen-=left;
+                                if(!packLen) packMode=0;
                         }
-                        packLen-=left;
                         return 1;
                 }
                 // Udate info on that track
@@ -334,43 +341,56 @@ _againBranch:
                 goto _againBranch;
         }
         // Payload present, read header
+#ifdef TS_VERBOSE
+        parser->getpos(&first);
+        printf("BF: left:%lu delta :%"LLU"\n",left,first-abs);
+#endif
         if(!getInfoPES(&consumed,&dts,&pts,&stream,&substream,&lenPes))
         {
                         printf("dmxTs: get info failed at %"LLX"\n",abs);
                         goto _againBranch;
         }
 #ifdef TS_VERBOSE
-                printf("Stream :%x found at %"LLX" size :%lu\n",stream,abs,lenPes);
+        printf("Stream :%x found at %"LLX" size :%lu\n",stream,abs,lenPes);
+        parser->getpos(&count);
+        printf("consumed :%lu left:%lu delta :%"LLU"\n",consumed,left,count-first);
+        if(count-first!=consumed) printf("*** PES header length is wrong***\n");
+
 #endif
-       
         if(consumed>left)
         {
                 printf("Wrong PES header at %"LLX" %lu / %lu\n",abs,consumed,left);
                 goto _againBranch;
         }
-        if(lenPes) 
+        
+        left-=consumed;
+        if(myPid==pid)
+        {
+                if(lenPes) 
                 {
                         packMode=1;
                         packLen=lenPes;
                 }
-        else
+                else
                 {
                         packMode=0;
                 }
-        left-=consumed;
-        if(myPid==pid)
-        {
+
                 _oldPesStart=_pesBufferStart;
                 _oldPesLen=_pesBufferLen;
+
                 _pesBufferStart=abs;
                 _pesBufferLen=left;
+
                 _pesPTS=pts;
                 _pesDTS=dts;
+
                 parser->read32(left,_pesBuffer);
                 if(packMode)
                 {
                         if(packLen<left) _pesBufferLen=packLen;
                         packLen-=_pesBufferLen;
+                        if(!packLen) packMode=0;
                 }
                 return 1;
         }
@@ -389,6 +409,10 @@ uint32_t consumed,len,pid,payloadunit=0,discarded;
 uint64_t count,abs;
 uint32_t left;
 uint8_t  byte1,byte2;
+        parser->getpos(&count);
+#ifdef TS_VERBOSE
+        printf("Starting sync at %"LLX"\n",count);
+#endif
 _again:
         payloadunit=0;
         parser->getpos(&count);
@@ -409,7 +433,7 @@ _again:
         parser->getpos(&abs);
         if(discarded) // We did not have a continuous sync, check 2 more packet boundaries..
         {
-                printf("Ts: Discontinuity of %lu at %"LLX"\n",discarded,abs);
+                
                 parser->forward(TS_PACKET_SIZE-1);
                 byte1=parser->read8i();
                 parser->forward(TS_PACKET_SIZE-1);
@@ -417,12 +441,17 @@ _again:
                 parser->setpos(abs);  // The setpos/getpos is mostly free due to the parser large buffer
                 if(byte1!=0x47 || byte2!=0x47) goto _again;
         }
+#ifdef TS_VERBOSE
+        printf("Sync at %"LLX"\n",abs-1);
+#endif
         // Memorize where it starts
         *ostart=abs-1;
         // Read Pid etc...
         pid=parser->read16i();
         if((pid>>8) & TS_UNIT_START) payloadunit=1;
         pid&=0x1fff; // remove flags
+        if(discarded)
+                printf("Ts: Discontinuity of %lu at %"LLX" pid:%lx\n",discarded,abs,pid);
         // Start of packet..
         left=TS_PACKET_SIZE-3;
         if(_probeSize)
@@ -500,16 +529,20 @@ uint8_t       dmx_demuxerTS::getInfoPES(uint32_t *oconsumed,uint64_t *odts,uint6
                                         uint32_t *olen)
 {
 
-uint32_t consumed=0;
+uint32_t headconsumd=0;
 int size=0,nulsize=0;
 uint8_t c,d;
 uint8_t align=0;
+                *oconsumed=0;
 
+                // Check it looks like a PES header
+                // It could be a PSI header ...
                 if(parser->read8i()) return 0;
                 if(parser->read8i()) return 0;
                 if(parser->read8i()!=1) return 0;
                 *ostream=parser->read8i(); // Stream
-                consumed=4;
+                headconsumd=4;
+// 
 
                 *substream=0xff;
                 *opts=ADM_NO_PTS;
@@ -517,7 +550,7 @@ uint8_t align=0;
                 
 
                 size=parser->read16i();
-                consumed+=2;
+                headconsumd+=2;
                 if(!size) nulsize=1;
                 if((*ostream==PADDING_CODE) || 
                 	 (*ostream==PRIVATE_STREAM_2)
@@ -526,6 +559,7 @@ uint8_t align=0;
                         {
                                 if(nulsize) size=0;
                                 *olen=size;      
+                                *oconsumed=headconsumd;
                                 return 1;
                         }
 
@@ -533,10 +567,9 @@ uint8_t align=0;
         
                 while((c=parser->read8i()) == 0xff) 
                 {
-                        consumed++;
+                        headconsumd++;
                         size--;
                 }
-                consumed++;
 //----------------------------------------------------------------------------
 //-------------------------------MPEG-2 PES packet style----------------------
 //----------------------------------------------------------------------------
@@ -558,7 +591,7 @@ uint8_t align=0;
                         // header len
                         len=parser->read8i();
                         size-=3;  
-                        consumed+=2;
+                        headconsumd+=3;
 
                         switch(ptsdts)
                         {
@@ -572,7 +605,7 @@ uint8_t align=0;
                                                         pts2=parser->read16i();                 
                                                         len-=5;
                                                         size-=5;
-                                                        consumed+=5;
+                                                        headconsumd+=5;
                                                         *opts=(pts1>>1)<<15;
                                                         *opts+=pts2>>1;
                                                         *opts+=(((pts0&6)>>1)<<30);
@@ -601,7 +634,7 @@ uint8_t align=0;
                                                                 len-=skip;
                                                                 size-=skip;
                                                                 *odts=dts;
-                                                                consumed+=10;
+                                                                headconsumd+=10;
                                                                         //printf("DTS: %lx\n",dts);                
                                                    }
                                                    break;               
@@ -622,7 +655,7 @@ uint8_t align=0;
                         {
                                 parser->forward(len);
                                 size=size-len;
-                                consumed+=len;
+                                headconsumd+=len;
                         }
 
 
@@ -633,7 +666,7 @@ uint8_t align=0;
                         {
                         // read sub id
                                *substream=parser->read8i();
-                                consumed++;
+                                headconsumd++;
   //                    printf("\n Subid : %x",*subid);
                                 switch(*substream)
                                 {
@@ -649,7 +682,7 @@ uint8_t align=0;
                                                 // of 3 bytes
                                                 parser->forward(3);
                                                 size-=3;
-                                                consumed+3;
+                                                headconsumd+=3;
                                                 break;
                                 // Subs
                                 case 0x20:case 0x21:case 0x22:case 0x23:
@@ -663,7 +696,7 @@ uint8_t align=0;
                                 if(*substream>0x26 || *substream<0x20)
                                 {
                                         parser->forward(3);
-                                        consumed+3;
+                                        headconsumd+=3;
                                         size-=3;
                                 }
                                 size--;
@@ -672,6 +705,6 @@ uint8_t align=0;
                //    printf(" pid %x size : %x len %x\n",sid,size,len);
                 if(nulsize) size=0;
                 *olen=size;
-                *oconsumed=consumed;
+                *oconsumed=headconsumd;
                 return 1;
 }
