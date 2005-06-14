@@ -61,6 +61,10 @@ char str[512];
                 case DMX_MPG_PS:
                         gtk_label_set_text(GTK_LABEL(WID(labelType)),"Program Stream");
                         break;
+                case DMX_MPG_TS:
+                        gtk_label_set_text(GTK_LABEL(WID(labelType)),"Transport Stream");
+                        break;
+
                 default: ADM_assert(0);
         }
         sprintf(str,"%x (%x)",tracks[0].pes,tracks[0].pid);
