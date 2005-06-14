@@ -221,19 +221,19 @@ uint8_t                 dmxHeader::open(char *name)
                 sscanf(string,"Image    : %c\n",&progressif); // Progressive
                 if(progressif=='I') _fieldEncoded=1;
                 fgets(string,MAX_LINE,file);
-                sscanf(string,"Picture  : %04lu x %04lu %05lu fps\n",&w,&h,&fps); // width...
+                sscanf(string,"Picture  : %u x %u %u fps\n",&w,&h,&fps); // width...
 
                 fgets(string,MAX_LINE,file);
-                sscanf(string,"Nb Gop   : %lu \n",&_nbGop); // width...
+                sscanf(string,"Nb Gop   : %u \n",&_nbGop); // width...
 
                 fgets(string,MAX_LINE,file);
-                sscanf(string,"Nb Images: %lu \n",&_nbFrames); // width...
+                sscanf(string,"Nb Images: %u \n",&_nbFrames); // width...
 
                 fgets(string,MAX_LINE,file);
-                //fscanf(string,"Nb Audio : %02lu\n",0); 
+                //fscanf(string,"Nb Audio : %u\n",0); 
 
                 fgets(string,MAX_LINE,file);
-                //fprintf(out,"Main aud : %02lu\n",preferedAudio); 
+                //fprintf(out,"Main aud : %u\n",preferedAudio); 
 
                 fgets(string,MAX_LINE,file);
                 sscanf(string,"Streams  : V%X:%X \n",&vTsId,&vPid); 
@@ -306,7 +306,7 @@ uint8_t                 dmxHeader::open(char *name)
                         if(string[0]!='V') continue;
                         //printf("%s\n",string);
                         // # NGop NImg nbImg Pos rel type:size type:size
-                        sscanf(string,"V %lu %lu %lu ",&gop,&imageStart,&imageNb);
+                        sscanf(string,"V %u %u %u ",&gop,&imageStart,&imageNb);
                                 ADM_assert(read==gop);
                                 ADM_assert(currentImage==imageStart);
                         

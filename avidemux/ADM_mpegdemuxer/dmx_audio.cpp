@@ -105,19 +105,19 @@ dmxAudioStream::open (char *name)
   sscanf (string, "Image    : %c\n", &progressif);	// Progressive
 
   fgets (string, MAX_LINE, file);
-  sscanf (string, "Picture  : %04lu x %04lu %05lu fps\n", &w, &h, &fps);	// width...
+  sscanf (string, "Picture  : %u x %u %u fps\n", &w, &h, &fps);	// width...
 
   fgets (string, MAX_LINE, file);
-  sscanf (string, "Nb Gop   : %lu \n", &nbGop);	// width...
+  sscanf (string, "Nb Gop   : %u \n", &nbGop);	// width...
 
   fgets (string, MAX_LINE, file);
-  sscanf (string, "Nb Images: %lu \n", &nbFrame);	// width...
+  sscanf (string, "Nb Images: %u \n", &nbFrame);	// width...
 
   fgets (string, MAX_LINE, file);
-  sscanf(string,"Nb Audio : %lu\n",&nbAudioStream); 
+  sscanf(string,"Nb Audio : %u\n",&nbAudioStream); 
 
   fgets(string,MAX_LINE,file);
-  sscanf(string,"Main aud : %lu\n",&mainAudio); 
+  sscanf(string,"Main aud : %u\n",&mainAudio); 
 
   if(!nbAudioStream)
   {
@@ -171,7 +171,7 @@ MPEG_TRACK track;
   // Now build the index
   nbIndex = nbGop;
   index = new dmxAudioIndex[nbGop + 2];
-  printf ("Building index with %lu sync points\n", nbGop);
+  printf ("Building index with %u sync points\n", nbGop);
 
   uint32_t read = 0, img, count;
   uint64_t abs;
@@ -184,7 +184,7 @@ MPEG_TRACK track;
       if (string[0] != 'A')
 	continue;
 
-      sscanf (string, "A %lu %"LLX, &img, &abs); //FIXME read all audio tracks and pick the one we want
+      sscanf (string, "A %u %"LLX, &img, &abs); //FIXME read all audio tracks and pick the one we want
         hay=strstr(string,":");
         ADM_assert(hay)
         i=0;
