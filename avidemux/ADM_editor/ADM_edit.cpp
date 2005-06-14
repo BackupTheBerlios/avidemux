@@ -1209,7 +1209,7 @@ uint8_t         ADM_Composer::tryIndexing(char *name)
                 }
 
           
-                if(type==DMX_MPG_PS)
+                if(type==DMX_MPG_PS || type==DMX_MPG_TS)
                 {
                        if(nbTrack>2)
                         if(!DIA_dmx(name,type,nbTrack,tracks,&audioTrack))
@@ -1224,7 +1224,8 @@ uint8_t         ADM_Composer::tryIndexing(char *name)
 
                 r=dmx_indexer(name,idx,audioTrack,0,nbTrack,tracks);
 
-                delete [] tracks;
+                if(tracks)
+                        delete [] tracks;
                 delete [] idx;
 
                 if(!r) GUI_Alert("Indexing failed."); 
