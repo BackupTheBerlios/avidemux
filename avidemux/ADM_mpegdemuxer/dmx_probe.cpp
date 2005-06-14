@@ -36,6 +36,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "dmx_demuxerPS.h"
+#include "dmx_demuxerTS.h"
 #include "dmx_identify.h"
 #include "dmx_probe.h"
 #include "ADM_dialog/DIA_busy.h"
@@ -45,32 +46,39 @@
 #define MAX_PROBE (10*1024*1024LL) // Scans the 4 first meg
 #define MIN_DETECT (10*1024) // Need this to say the stream is present
 
+static uint8_t dmx_probePS(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
+static uint8_t dmx_probeTS(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
+static uint8_t dmx_probeTSBruteForce(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
+
 uint8_t dmx_probe(char *file, DMX_TYPE  *type, uint32_t *nbTracks,MPEG_TRACK **tracks)
 {
-uint8_t dummy[10];
-uint64_t seen[256],abs,rel;
-int     audio,video;
 
         printf("Probing %s for streams...\n",file);
         *type=dmxIdentify(file);
-        if(*type==DMX_MPG_ES)
+        switch(*type)
         {
+        case DMX_MPG_ES:
+                {
                 *nbTracks=1;
                 *tracks=new MPEG_TRACK;
                 (*tracks)->pes=0xE0;
                 (*tracks)->pid=0;
                 printf("It is ES, no need to look for audio\n");
                 return 1;
+                }
+        case DMX_MPG_TS:
+                return dmx_probeTS(file,nbTracks,tracks);
+
+        case DMX_MPG_PS:
+                return dmx_probePS(file,nbTracks,tracks);
         }
-        if(*type==DMX_MPG_TS)
-        {
-                printf("Looks like a mpeg TS\n");
-                return 1;
-        }
-        if(*type!=DMX_MPG_PS) 
-        {
-                return 0;
-        }
+        return 0;
+}
+uint8_t dmx_probePS(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks)
+{
+uint8_t dummy[10];
+uint64_t seen[256],abs,rel;
+int     audio,video;
 
         // It is mpeg PS
         // Create a fake demuxer, set a probe limite and collect info for all streams found
@@ -184,3 +192,157 @@ int     audio,video;
         printf("Found video as %x, and %d audio tracks\n",video,audio-1);
         return 1;
 }
+uint8_t dmx_probeTS(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks)
+{
+        return dmx_probeTSBruteForce(file,nbTracks,tracks);
+}
+/**************************************
+****************************************************************
+    Brute force pid scanning in mpeg TS file
+    We seek all PES packets and store their PID and PES id
+*****************************************************************/
+#define MAX_FOUND_PID 100
+#define CHECK(x) val=parser->read8i(); left--;if(val!=x) goto _next;
+typedef struct myPid
+{
+  uint32_t pid;
+  uint32_t pes;
+
+}myPid;
+uint8_t dmx_probeTSBruteForce(char *file, uint32_t *nbTracks,MPEG_TRACK **tracks)
+{
+
+  // Brute force indexing
+  //
+  // Build a dummy track
+MPEG_TRACK dummy[TS_ALL_PID];
+fileParser *parser;
+uint32_t   foundPid=0;
+myPid      allPid[MAX_FOUND_PID];
+uint8_t    buffer[BUFFER_SIZE];
+MpegAudioInfo mpegInfo; 
+
+    dummy[0].pid=0x1; // should no be in use
+    dummy[0].pes=0xE0;
+
+        dmx_demuxerTS demuxer(TS_ALL_PID,dummy,0);
+        if(!demuxer.open(file))
+        {
+          return 0;
+        }
+    // Set probe to 10 Meg
+      demuxer.setProbeSize(10*1024*1024L);
+      parser=demuxer.getParser();
+      // And run
+
+      uint32_t pid,left,isPayloadStart,cc,val;
+      uint64_t abs;
+      while(demuxer.readPacket(&pid,&left, &isPayloadStart,&abs,&cc))
+      {
+        if(isPayloadStart)
+        {
+            // Is it a PES type packet
+            // it should then start by 0x0 0x0 0x1 PID
+
+            CHECK(0);
+            CHECK(0);
+            CHECK(1);
+            val=parser->read8i();
+            left--;
+            // Check it does not exist already
+            int present=0;
+            for(int i=0;i<foundPid;i++) if(pid==allPid[i].pid) {present=1;break;}
+            if(!present)
+            {
+              allPid[foundPid].pes=val;
+              allPid[foundPid].pid=pid;
+              foundPid++;
+            }
+            ADM_assert(foundPid<MAX_FOUND_PID);
+        } 
+_next:
+        parser->forward(left);
+      }
+      if(!foundPid)
+      {
+         printf("ProbeTS: No PES packet header found\n");
+         return 0;
+      }
+      //****************************************
+      // Build information from the found Pid
+      //****************************************
+      for(int i=0;i<foundPid;i++) printf("Pid : %04x Pes :%02x \n",allPid[i].pid,allPid[i].pes);
+
+      // Search for a pid for video track
+      //
+      *tracks=new MPEG_TRACK[foundPid];
+      MPEG_TRACK *trk=*tracks;
+      uint32_t vPid=0,vIdx;
+      uint32_t offset,fq,br,chan;
+
+      for(int i=0;i<foundPid;i++)
+      {
+        if(allPid[i].pes>=0xE0 && allPid[i].pes<0xE9)
+        {
+            vPid=trk[0].pes=allPid[i].pes;
+            trk[0].pid=allPid[i].pid;
+            vIdx=i;
+            break;
+        }
+      }
+      if(!vPid)
+      {
+        delete [] trk;
+        *tracks=0;
+        printf("probeTs: No video track\n");
+        return 0;
+      }
+      // Now build the other audio (?) tracks
+      allPid[vIdx].pid=0;
+      uint32_t start=1,code,id,read;
+      for(int i=0;i<foundPid;i++)
+      {
+        code=allPid[i].pes;
+        id=allPid[i].pid;
+
+        if(!id) continue;
+
+        if((code>=0xC0 && code < 0xC9) || code==0xbd)
+        {
+            demuxer.changePid(id);
+            demuxer.setPos(0,0);
+            read=demuxer.read(buffer,BUFFER_SIZE);
+            if(read!=BUFFER_SIZE) continue;
+            if(code>=0xC0 && code < 0xC9) // Mpeg audio
+            {
+              if(getMpegFrameInfo(buffer,read,&mpegInfo,NULL,&offset))
+                   {
+                      if(mpegInfo.mode!=3)  trk[start].channels=2;
+                          else  trk[start].channels=1;
+ 
+                      trk[start].bitrate=mpegInfo.bitrate;
+                      trk[start].pid=id;
+                      trk[start].pes=code;
+                      start++;
+
+                    }
+            }
+            else // AC3
+            {
+                  if(ADM_AC3GetInfo(buffer,read,&fq,&br,&chan,&offset))
+                  {
+                          trk[start].channels=chan;
+                          trk[start].bitrate=(8*br)/1000;
+                          trk[start].pid=id;
+                          trk[start].pes=0;
+                          start++;
+                  }
+
+            }
+
+        }
+      }
+      *nbTracks=start;
+      return 1;
+}
+

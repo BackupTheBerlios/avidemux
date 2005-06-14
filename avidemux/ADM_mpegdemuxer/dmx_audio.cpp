@@ -156,7 +156,7 @@ MPEG_TRACK track;
     case 'T':
                 track.pes=aPes;
                 track.pid=aPid;
-                demuxer = new dmx_demuxerTS (1,&track);
+                demuxer = new dmx_demuxerTS (1,&track,0);
                 break;
     default:
       ADM_assert (0);

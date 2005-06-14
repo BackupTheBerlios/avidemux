@@ -251,7 +251,7 @@ uint8_t                 dmxHeader::open(char *name)
                                         MPEG_TRACK track;
                                         track.pid=vTsId;
                                         track.pes=vPid;
-                                        demuxer=new dmx_demuxerTS(1,&track);
+                                        demuxer=new dmx_demuxerTS(1,&track,0);
                                         break;
 
                                 }

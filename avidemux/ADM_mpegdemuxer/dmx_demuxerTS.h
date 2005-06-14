@@ -14,6 +14,7 @@
 #define TS_UNIT_PAYLOAD_ONLY 0x10
 #define TS_UNIT_PAYLOAD_AF   0x30
 #define TS_UNBOUND_SIZE      0x10000000
+#define TS_ALL_PID           0x2000
 /*
         A bit of explanation here.
         The demuxer will take each packet and lookup what it is
@@ -34,7 +35,7 @@ class dmx_demuxerTS: public dmx_demuxer
                   uint32_t      consumed;
                   fileParser    *parser;
                   uint32_t       myPid;           // pid: high part =0xff if private stream, 00 if not
-                  
+                  uint32_t      isPsi;
                   uint8_t       *_pesBuffer;
 
                   uint32_t      _pesBufferIndex; // current position in pesBuffer
@@ -60,21 +61,22 @@ class dmx_demuxerTS: public dmx_demuxer
                   uint32_t      nbTracked;
                 
                   uint8_t       refill(void);
-                  uint8_t       readPacket(uint32_t *opid,uint32_t *oleft, uint32_t *isPayloadStart,
-                                        uint64_t *ostart,uint32_t *occ);
                   uint8_t       getInfoPES(uint32_t *consumed,uint64_t *dts,uint64_t *pts,uint8_t *stream,
                                         uint8_t *substream, uint32_t *lenPes);
+                  uint8_t       getInfoPSI(uint32_t *oconsumed,uint32_t *olen);
                   uint8_t       updateTracker(uint32_t trackerPid,uint32_t nbData);
                   
           public:
-                           dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks) ;
+                           dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks,uint32_t psi) ;
                 virtual    ~dmx_demuxerTS();             
                 
                      uint8_t      open(char *name);
                  
-                
+                  fileParser      *getParser(void) {return parser;}
                   uint8_t         forward(uint32_t f);
                   uint8_t         stamp(void); 
+                  uint8_t         readPacket(uint32_t *opid,uint32_t *oleft, uint32_t *isPayloadStart,
+                                        uint64_t *ostart,uint32_t *occ);
 
                   uint64_t        elapsed(void);
                 
@@ -89,7 +91,7 @@ class dmx_demuxerTS: public dmx_demuxer
 
                   uint8_t         hasAudio(void) { return 1;} // MAYBE has audio
                   uint8_t         getStats(uint64_t *stat);
-                  uint8_t         changePid(uint8_t newpid);
+                  uint8_t         changePid(uint32_t newpid);
 
 // Inlined
 uint8_t         read8i(void)

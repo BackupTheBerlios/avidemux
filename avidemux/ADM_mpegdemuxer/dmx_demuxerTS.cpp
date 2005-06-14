@@ -41,7 +41,7 @@
 
 #include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
 #include "dmx_demuxerTS.h"
-uint8_t         dmx_demuxerTS::changePid(uint8_t newpid)
+uint8_t         dmx_demuxerTS::changePid(uint32_t newpid)
 {
           myPid=newpid;
           
@@ -49,7 +49,7 @@ uint8_t         dmx_demuxerTS::changePid(uint8_t newpid)
         _pesBufferLen=0;
         _pesBufferIndex=0;
 }
-dmx_demuxerTS::dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks)
+dmx_demuxerTS::dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks,uint32_t psi)
 {
         consumed=0;
         parser=new fileParser();
@@ -68,14 +68,19 @@ dmx_demuxerTS::dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks)
         printf("Ts: Using %x as pid for track 0\n",myPid);
         
         // Build reverse lookup
-        for(int i=0;i<nb;i++)
-        {
-                allPid[ tracks[i].pid ]=1+i;
-        }
+        if(nb==TS_ALL_PID)
+                for(int i=0;i<nb;i++)
+                    allPid[ i ]=1+i;
+        else
+                for(int i=0;i<nb;i++)
+                {
+                        allPid[ tracks[i].pid ]=1+i;
+                }
 
         _probeSize=0; 
         packMode=0;
         packLen=0;
+        isPsi=psi;
         printf("Creating mpeg TS demuxer  main Pid: %X , pes id :%x\n",myPid,tracks[0].pes);
 }
 dmx_demuxerTS::~dmx_demuxerTS()
@@ -345,6 +350,24 @@ _againBranch:
         parser->getpos(&first);
         printf("BF: left:%lu delta :%"LLU"\n",left,first-abs);
 #endif
+        if(pid==myPid && isPsi)
+        {
+                if(!getInfoPSI(&consumed,&lenPes))
+                        goto _againBranch;
+                if(left<consumed) 
+                        goto _againBranch;
+                left-=consumed;
+                _pesBufferStart=abs;
+                _pesBufferLen=left;
+
+                _pesPTS=ADM_NO_PTS;
+                _pesDTS=ADM_NO_PTS;
+
+                parser->read32(left,_pesBuffer);
+                return 1;
+        }
+
+
         if(!getInfoPES(&consumed,&dts,&pts,&stream,&substream,&lenPes))
         {
                         printf("dmxTs: get info failed at %"LLX"\n",abs);
@@ -658,54 +681,16 @@ uint8_t align=0;
                                 headconsumd+=len;
                         }
 
-#if 0
-                if(*ostream==PRIVATE_STREAM_1)
 
-                {
-                        if(size>5)
-                        {
-                        // read sub id
-                               *substream=parser->read8i();
-                                headconsumd++;
-  //                    printf("\n Subid : %x",*subid);
-                                switch(*substream)
-                                {
-                                //AC3
-                                        case 0x80:case 0x81:case 0x82:case 0x83:
-                                        case 0x84:case 0x85:case 0x86:case 0x87:
-                                                *substream=*substream-0x80;
-                                                break;
-                                // PCM
-                                        case 0xA0:case 0xA1:case 0xa2:case 0xa3:
-                                        case 0xA4:case 0xA5:case 0xa6:case 0xa7:
-                                                // we have an additionnal header
-                                                // of 3 bytes
-                                                parser->forward(3);
-                                                size-=3;
-                                                headconsumd+=3;
-                                                break;
-                                // Subs
-                                case 0x20:case 0x21:case 0x22:case 0x23:
-                                case 0x24:case 0x25:case 0x26:case 0x27:
-                                                break;
-                             
-                                default:
-                                                *substream=0xff;
-                                }
-                                // skip audio header (if not sub)
-                                if(*substream>0x26 || *substream<0x20)
-                                {
-                                        parser->forward(3);
-                                        headconsumd+=3;
-                                        size-=3;
-                                }
-                                size--;
-                        }
-                }
-#endif
                //    printf(" pid %x size : %x len %x\n",sid,size,len);
                 if(nulsize) size=0;
                 *olen=size;
                 *oconsumed=headconsumd;
                 return 1;
+}
+uint8_t dmx_demuxerTS::getInfoPSI(uint32_t *oconsumed,uint32_t *olen)
+{
+        *oconsumed=*olen=0;
+        return 1;
+
 }

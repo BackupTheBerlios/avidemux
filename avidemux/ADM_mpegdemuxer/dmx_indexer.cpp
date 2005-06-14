@@ -125,7 +125,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                 case DMX_MPG_TS:
                                 {
                                 dmx_demuxerTS *dmx;
-                                dmx=new dmx_demuxerTS(nbTracks,tracks);
+                                dmx=new dmx_demuxerTS(nbTracks,tracks,0);
                                 demuxer=dmx;
                                 mpegTypeChar='T';
                                 break;
