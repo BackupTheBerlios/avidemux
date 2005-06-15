@@ -857,7 +857,7 @@ void aviWrite::odml_write_dummy_chunk(AviList* alist, uint64_t* fpos, uint32_t s
 }
 bool aviWrite::odml_index_frame(int stream_nbr, uint32_t data_size, bool keyFrame){
 	if(doODML!=NO){
-		ADM_assert(!stream_nbr<odml_nbrof_streams);
+//		ADM_assert(!stream_nbr<odml_nbrof_streams);
 		odml_super_index_t* sidx=odml_indexes+stream_nbr;	// access to super index
 		if(sidx->odml_index[sidx->index_count].nEntriesInUse==odml_index_size){	// new index needed?
 			if(sidx->index_count<odml_nbrof_index-1)	// can index counter be increased?
