@@ -75,8 +75,10 @@ virtual	uint8_t			isReordered( void ) { return 0;} // by default we don"t do fra
   //				 Audio
   //__________________________
 
-virtual 	WAVHeader *getAudioInfo(void ) =0 ;
+virtual 	WAVHeader              *getAudioInfo(void ) =0 ;
 virtual 	uint8_t			getAudioStream(AVDMGenericAudioStream **audio)=0;
+virtual         uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
+virtual         uint8_t                 changeAudioStream(uint32_t newstream);
 
 // Frames
   //__________________________

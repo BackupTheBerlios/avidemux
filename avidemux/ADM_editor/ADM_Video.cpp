@@ -125,3 +125,23 @@ uint8_t vidHeader::getRawStart (uint8_t * ptr, uint32_t * len)
   *len = 0;
   return 1;
 }
+uint8_t                 vidHeader::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+{
+WAVHeader *wav;
+
+        *infos=NULL;
+        *nbStreams=0;
+        wav=getAudioInfo( );
+        if(!wav) return 0;
+        *nbStreams=1;
+        *infos=new uint32_t[1];
+        *infos[0]=wav->encoding;
+        return 1;
+
+}
+// By default we don't do that dave.
+uint8_t                 vidHeader::changeAudioStream(uint32_t newstream)
+{
+        return 0;
+}
+//
