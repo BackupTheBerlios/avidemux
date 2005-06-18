@@ -37,6 +37,7 @@
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_ODML
 #include "ADM_toolkit/ADM_debug.h"
+#if 0
 uint8_t 	OpenDMLHeader::indexReindex(uint32_t vidTrack,uint32_t audioTrack,uint32_t audioTrackNumber)
 {
 uint32_t fcc,len,shortFCC,track;
@@ -140,3 +141,4 @@ uint32_t shortTotal,shortCur,highFCC;
 	return 1;
 	
 }
+#endif

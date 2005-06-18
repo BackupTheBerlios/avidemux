@@ -39,7 +39,6 @@
 
 //#define OPENDML_VERBOSE
 
-
 typedef struct OPENDML_INDEX
 {
 	//uint32_t	fcc;
@@ -85,26 +84,28 @@ __attribute__ ((packed))
 	In case of avi file, audioTrackNumber is used.				
 	
 */
-uint8_t		OpenDMLHeader::indexODML(uint32_t vidTrack,uint32_t audTrack,uint32_t audioTrackNumber)
+uint8_t		OpenDMLHeader::indexODML(uint32_t vidTrack)
 {
 uint32_t total;
 	
 	printf("Building odml video track\n");
 	if(!scanIndex(vidTrack,&_idx,&total))
+        {
+                printf("Odml video index failed\n");
 		return 0;
+        }
  	_videostream.dwLength= _mainaviheader.dwTotalFrames=total;
-	if(audTrack!=0xff)
-	{
-		printf("Building odml audio track\n");
-		if(!scanIndex(audTrack,&_audioIdx,&total))
-		{
-			_isaudiopresent=0;
-			printf("Problem indexing audio!\n");
-			return 1;		
-		}
- 		_nbAudioChunk=total;
-	
-	}
+	for(int i=0;i<_nbAudioTracks;i++)
+        {
+                if(!scanIndex(     _audioTracks[i].trackNum,
+                                &(_audioTracks[i].index),
+                                &(_audioTracks[i].nbChunks)))
+                {
+                        printf("Odml audio %d tracknum %d, index failed\n",i,_audioTracks[i].trackNum);
+                        return 0;
+                }
+        }
+        printf("Odml indexing succeeded\n");
 	return 1;
 }
 /*
@@ -234,18 +235,5 @@ uint32_t 	i,j;
 	}
 	
 	return 1;
-}
-
-uint32_t OpenDMLHeader::read32( void )
-{
-uint8_t i[4]={0,0,0,0};
-
-	ADM_assert(_fd);
-	if(1!=fread(i,4,1,_fd))
-	{
-		printf("Problem using odml read32\n");
-		return 0;
-	}
-	return (i[3]<<24)+(i[2]<<16)+(i[1]<<8)+i[0];
 }
 

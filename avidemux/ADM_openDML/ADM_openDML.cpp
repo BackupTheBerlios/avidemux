@@ -129,26 +129,17 @@ uint8_t    OpenDMLHeader::close( void )
 		delete [] _idx;
 		_idx=NULL;
 	}
-	if(_audioIdx)
-	{
-		delete [] _audioIdx;
-		_audioIdx=NULL;
-	}	
 	if(_videoExtraData)
 	{
 		delete [] _videoExtraData;
 		_videoExtraData=NULL;
 	}
-	if(_audioExtraData)
+	if(_audioTracks)
 	{
-		delete [] _audioExtraData;
-		_audioExtraData=NULL;
+		delete [] _audioTracks;
+		_audioTracks=NULL;
 	}
-	if(_audioTrack)
-	{
-		delete _audioTrack;
-		_audioTrack=NULL;
-	}
+
  	return 1;
 }
 //
@@ -157,49 +148,45 @@ uint8_t    OpenDMLHeader::close( void )
 
 OpenDMLHeader::OpenDMLHeader(void)
 {
-	_fd=NULL;
+        _fd=NULL;
 	_idx=NULL;	
-	_audioIdx=NULL;
-	_nbAudioChunk=0;
 	_nbTrack=0;
 	memset(&(_Tracks[0]),0,sizeof(_Tracks));
 	memset(&_regularIndex,0,sizeof(_regularIndex));
-	_videoExtraData=_audioExtraData=NULL;
-	_videoExtraLen=_audioExtraLen=0;
-	_nbAudioChunk=0;
-	_audioTrack=NULL;
+	_videoExtraData=NULL;
+	_videoExtraLen=0;
 	_reordered=0;
 	_recHack=0;
-
-	
+        // Audio
+        _audioTracks=NULL;
+        _nbAudioTracks=0;
+        _currentAudioTrack=0;
 
 }
 uint8_t	OpenDMLHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {  	
-	if(_isaudiopresent)
-	{
-		ADM_assert(_audioTrack);
-		*audio=_audioTrack;
-		return 1;
-	}
-	*audio=NULL;
-	return 0;	
+        if(_nbAudioTracks)
+        {
+
+                *audio=_audioTracks[_currentAudioTrack].track;
+                ADM_assert(*audio);
+                return 1;
+        }
+        *audio=NULL;
+        return 0;	
 };
 WAVHeader 	*OpenDMLHeader::getAudioInfo(void )
 { 	
 	
-	if(_isaudiopresent)
-		return &_wavHeader; 
+	if(_nbAudioTracks)
+		return _audioTracks[_currentAudioTrack].wavHeader; 
 	else
 		return NULL;
 	
 } ;
 uint32_t OpenDMLHeader::getNbStream(void)
 { 
-		if(_isaudiopresent)
-			return 2;
-		else
-			return 1;
+                return 1+_nbAudioTracks;
 };
 //______________________________________
 //
@@ -354,73 +341,71 @@ uint32_t rd;
 		if(_mainaviheader.dwStreams>=2)
 		{
 			// which one is the audio track, is there several ?
-			switch(countAudioTrack())
-			{
-				case 0: printf("No audio track found.\n");
-					break;
-				case 1: printf("One audio track found\n");
-					audioTrack=searchAudioTrack(0);
-					audioTrackNumber=0;
-					break;
-				default: printf("Several audio tracks found\n");
-					uint32_t t;
-					t=GUI_Question("Take second audio track ?");
-					audioTrackNumber=t;
-					audioTrack=searchAudioTrack(t);
-			}
-			if(audioTrack!=0xff) // one is marked
-			{
-				// Read information
-				printf("Taking audio track : %lu %lu\n",audioTrackNumber,audioTrack);
-				_isaudiopresent=1;
-				fseeko(_fd,_Tracks[audioTrack].strh.offset,SEEK_SET);
+			if(!(_nbAudioTracks=countAudioTrack()))
+                        {
+                                printf("Weird, there is no audio track, but more than one stream...\n");
+                        }			
+                        else
+                        {
+                          uint32_t run=0,audio=0;
+                          odmlAudioTrack *track;
 
-				if(_Tracks[audioTrack].strh.size != sizeof(_audiostream))
-				{
-				
-					printf("Mmm(2) we have a bogey here, size mismatch : %lu \n"
-						,_Tracks[audioTrack].strh.size);
-					printf("expected %d\n",sizeof(_audiostream));
-					if(_Tracks[audioTrack].strh.size<sizeof(_audiostream)-8)
-					{
-						GUI_Alert("Maformed header!");
-						return 0;
-					}		
-					printf("Trying to continue anyway\n");			
-				}
-				fread(&_audiostream,sizeof(_audiostream),1,_fd);
+                          _audioTracks=new odmlAudioTrack[_nbAudioTracks]; 
+                          while(audio<_nbAudioTracks)
+                          {
+                                        ADM_assert(run<_nbTrack);
+
+                                        track=&(_audioTracks[audio]);
+                                        fseeko(_fd,_Tracks[run].strh.offset,SEEK_SET);
+                                        if(_Tracks[run].strh.size != sizeof(_audiostream))
+                                        {
+                                                printf("Mmm(2) we have a bogey here, size mismatch : %u \n"
+                                                        ,_Tracks[audioTrack].strh.size);
+                                                printf("expected %d\n",sizeof(_audiostream));
+                                                if(_Tracks[run].strh.size<sizeof(_audiostream)-8)
+                                                {
+                                                        GUI_Alert("Maformed header!");
+                                                        return 0;
+                                                }
+                                                printf("Trying to continue anyway\n");			
+                                        }
+                                        fread(track->avistream,sizeof(_audiostream),1,_fd);
 #ifdef ADM_BIG_ENDIAN
-				Endian_AviStreamHeader(&_audiostream);
+                                        Endian_AviStreamHeader(track->avistream);
 #endif
-				if(_audiostream.fccType!=MKFCC('a','u','d','s'))
-				{	
-					printf("Not an audio track!\n");
-					return 0;
-				}
-				// now read extra stuff
-				fseeko(_fd,_Tracks[audioTrack].strf.offset,SEEK_SET);		
-				extra=_Tracks[audioTrack].strf.size-sizeof(_wavHeader);
-				if(extra<0)
-				{	
-					printf("WavHeader is not big enough (%lu/%lu)!\n",
-					_Tracks[audioTrack].strf.size,sizeof(WAVHeader));
-					return 0;
-				}
-				fread(&_wavHeader,sizeof(WAVHeader),1,_fd);				
+                                        if(track->avistream->fccType!=MKFCC('a','u','d','s'))
+                                        {	
+                                                printf("Not an audio track!\n");
+                                                run++;
+                                                continue;
+                                        }
+                                        // now read extra stuff
+                                        fseeko(_fd,_Tracks[run].strf.offset,SEEK_SET);		
+                                        extra=_Tracks[run].strf.size-sizeof(_wavHeader);
+                                        if(extra<0)
+                                        {	
+                                                printf("WavHeader is not big enough (%lu/%lu)!\n",
+                                                _Tracks[audioTrack].strf.size,sizeof(WAVHeader));
+                                                return 0;
+                                        }
+                                        fread(track->wavHeader,sizeof(WAVHeader),1,_fd);				
 #ifdef ADM_BIG_ENDIAN
-				Endian_WavHeader(&_wavHeader);
+                                        Endian_WavHeader(track->wavHeader);
 #endif
-				if(extra>2)
-				{				
-					fgetc(_fd);fgetc(_fd);
-					extra-=2;
-					_audioExtraLen=extra;		
-					_audioExtraData=new uint8_t [extra];
-					fread(_audioExtraData,extra,1,_fd);
-				}					
-			
-			}		
-		}
+                                        if(extra>2)
+                                        {
+                                                fgetc(_fd);fgetc(_fd);
+                                                extra-=2;
+                                                track->extraDataLen=extra;		
+                                                track->extraData=new uint8_t [extra];
+                                                fread(track->extraData,extra,1,_fd);
+                                        }
+                                        track->trackNum=run;
+                                        audio++;
+                                        run++;
+                           }	
+                        }
+                }
 		
 		// now look at the index stuff
 		// there could be 3 cases:
@@ -445,52 +430,48 @@ uint32_t rd;
 				
 		
 		// 1st case, we have an avi < 4 Gb
-		// potentially avi type 1		
+		// potentially avi type 1	
+#if 0	
 		if((_fileSize<4*1024*1024*1024LL)&&
-			// if riff size is ~ fileSize try regular index
+                	// if riff size is ~ fileSize try regular index
 			 (abs(riffSize-_fileSize)<1024*1024))
-			{
-				printf("Size looks good, maybe type 1 avi\n");
-				if(!ret && !_Tracks[vidTrack].indx.offset) // try regular avi
-					ret=indexRegular(vidTrack,audioTrack,audioTrackNumber);		
-				if (!ret && _Tracks[vidTrack].indx.offset)	
-					ret=indexODML(vidTrack,audioTrack,audioTrackNumber);
-				if(!ret) // re-index!
-					ret=indexReindex(vidTrack,audioTrack,audioTrackNumber);		
-			} // else try openDML/reindexing
-		else
-			{
-				printf("Size mismatch, not type 1 avi\n");
-				if (!ret && _Tracks[vidTrack].indx.offset)	
-					ret=indexODML(vidTrack,audioTrack,audioTrackNumber);
-				if(!ret) // re-index!
-					ret=indexReindex(vidTrack,audioTrack,audioTrackNumber);			
-			
-			}
-				
-		if(!ret) 
-		{
-			printf("Cound not index it properly...\n");
-			return 0;
-		
-		}				
-		if(!_audioIdx) _isaudiopresent=0;
-		else
-		{
-			// build audio stream
-		 	_audioTrack = new AVDMAviAudioStream(_audioIdx,
-   						_nbAudioChunk,
-						_fd,
-						&_wavHeader,						
-						0,
-						_audioExtraLen,_audioExtraData);
-		
-		}
-		_videostream.fccHandler=_video_bih.biCompression;
-		printf("\nOpenDML file successfully read..\n");
-		
-		return ret;
-	
+#endif
+
+                printf("Size looks good, maybe type 1 avi\n");
+                // If there is no openDML index
+                if(!ret && _regularIndex.offset ) // try regular avi if a idx1 field is there (avi index)
+                        ret=indexRegular(vidTrack);
+
+                if (!ret && _Tracks[vidTrack].indx.offset)	// Try openDML if a index field is there (openDML)
+                        ret=indexODML(vidTrack);
+                if(!ret) 
+                {
+                        printf("Could not index it properly...\n");
+                        return 0;
+
+                }
+                if(!_nbAudioTracks)
+                {
+                         _isaudiopresent=0;
+                }
+                else
+                {
+                        // build audio stream
+                        odmlAudioTrack *track;
+                        for(int i=0;i<_nbAudioTracks;i++)
+                        {
+                                track=&(_audioTracks[i]);
+                                _audioTracks[i].track= new AVDMAviAudioStream(track->index,
+                                                track->nbChunks,
+                                                _fd,
+                                                track->wavHeader,
+                                                0,
+                                                track->extraDataLen,track->extraData);
+                        }
+                }
+                _videostream.fccHandler=_video_bih.biCompression;
+                printf("\nOpenDML file successfully read..\n");
+                return ret;
 }
 /*
 	Count how many audio track is found
@@ -528,48 +509,24 @@ uint32_t count=0;
 				}
 			else
 			{
-					printf("Track %lu/%lu :\n",i,_nbTrack);fourCC::print(tmp.fccType);printf("\n");
+                                if(tmp.fccType==MKFCC('v','i','d','s') && tmp.fccHandler==MKFCC('D','X','S','B'))
+                                {
+
+                                        printf("Track %lu/%lu is subs\n",i,_nbTrack);  
+                                }
+                                else
+                                {
+                                        printf("Track %lu/%lu :\n",i,_nbTrack);
+                                        fourCC::print(tmp.fccType);
+                                        fourCC::print(tmp.fccHandler);
+                                        printf("\n");
+                                }
 					
 			}			
 	}
 	return count;
 }
-/*
-	return index of the which-th track
 
-*/
-uint32_t  OpenDMLHeader::searchAudioTrack(uint32_t which)
-{
-AVIStreamHeader tmp;
-uint32_t count=0;
-	for(uint32_t i=0;i<_nbTrack;i++)
-	{		
-			fseeko(_fd,_Tracks[i].strh.offset,SEEK_SET);
-			if(_Tracks[i].strh.size!=sizeof(_videostream))
-			{
-				
-				printf("Mmm(4) we have a bogey here, size mismatch : %lu \n",_Tracks[i].strh.size);
-				printf("expected %d\n",sizeof(_videostream));
-				if(_Tracks[i].strh.size<sizeof(_videostream)-8)
-				{
-					GUI_Alert("Maformed header!");
-					return 0;
-				}		
-				printf("Trying to continue anyway\n");			
-			}
-			fread(&tmp,sizeof(tmp),1,_fd);
-#ifdef ADM_BIG_ENDIAN
-			Endian_AviStreamHeader(&tmp);
-#endif
-			if(tmp.fccType==MKFCC('a','u','d','s'))
-				{
-					if(!which) return i;
-					which--;					
-				}			
-	}
-	ADM_assert(0);
-	return 0;
-}
 /*
 	Dump in human readable form the content of all headers
 		
@@ -627,11 +584,15 @@ void OpenDMLHeader::Dump( void )
        	X_DUMP( biXPelsPerMeter);
        	X_DUMP( biYPelsPerMeter);
        	X_DUMP( biClrUsed);
-    
-	if(_isaudiopresent)
+
+        /*****************************************************************
+                Dump infos about all audio tracks found
+
+        ******************************************************************/
+        for(int i=0;i<_nbAudioTracks;i++)
      	{
 #undef X_DUMP
-#define X_DUMP(x) printf("\n "#x":\t\t:%ld",_audiostream.x);
+#define X_DUMP(x) printf("\n "#x":\t\t:%ld",_audioTracks[i].avistream->x);
 
 
 
@@ -640,10 +601,10 @@ void OpenDMLHeader::Dump( void )
 
 
 	  printf("\n fccType     :");
-	  fourCC::print(_audiostream.fccType);
+	  fourCC::print(_audioTracks[i].avistream->fccType);
 	  printf("\n fccHandler :");
-	  fourCC::print(_audiostream.fccHandler);
-	  printf("\n fccHandler :0x%lx", _audiostream.fccHandler);
+	  fourCC::print(_audioTracks[i].avistream->fccHandler);
+	  printf("\n fccHandler :0x%lx", _audioTracks[i].avistream->fccHandler);
 
 
 	  X_DUMP(dwFlags);
@@ -659,7 +620,7 @@ void OpenDMLHeader::Dump( void )
 	      	
 	  
 #undef X_DUMP
-#define X_DUMP(x) printf("\n "#x":\t\t:%lu",_wavHeader.x);
+#define X_DUMP(x) printf("\n "#x":\t\t:%lu",_audioTracks[i].wavHeader->x);
 
 	  X_DUMP(encoding);
 	  X_DUMP(channels);	/* 1 = mono, 2 = stereo */
@@ -668,20 +629,14 @@ void OpenDMLHeader::Dump( void )
 	  X_DUMP(blockalign);	/* Bytes per sample block */
 	  X_DUMP(bitspersample);	/* One of 8, 12, 16, or 4 for ADPCM */
 	  
-	  printf(" Extra Data  : %ld\n",_audioExtraLen);
-	if(_audioExtraLen)
+	  printf(" Extra Data  : %ld\n",_audioTracks[i].extraDataLen);
+	if(_audioTracks[i].extraDataLen)
 	{
-		mixDump( _audioExtraData, _audioExtraLen);
+		mixDump( _audioTracks[i].extraData, _audioTracks[i].extraDataLen);
 	}
 	printf("\n");
 
-	  
-	 if(_wavHeader.encoding==WAV_MP3 && _audiostream.dwScale==1152)
-      		{
-			GUI_Alert("This looks like MP3 vbr.\n Use audio->build time map");
-      		}
-
-      	}				
+      }
 }
 #define PAD	for(uint32_t j=0;j<nest;j++) aprintf("\t");
 /*
@@ -720,9 +675,9 @@ void OpenDMLHeader::walk(riffParser *p)
 				printf("\n Main avi header :\n");				
 				break;
 		case MKFCC('i','d','x','1'):
-				printf("Idx1 found\n");
-				_regularIndex.offset=p->getPos();
-				_regularIndex.size=len;
+                                _regularIndex.offset=p->getPos();
+                                printf("Idx1 found at offset %"LLX"\n",_regularIndex.offset);
+                                _regularIndex.size=len;
 				return;
 				break;				
 		case MKFCC('R','I','F','F'):
@@ -750,7 +705,7 @@ void OpenDMLHeader::walk(riffParser *p)
 					DUMP_TRACK(_nbTrack);
 					break;
 		case MKFCC('i','n','d','x'):
-					printf("Indx found\n");
+					printf("Indx found for track %d\n",_nbTrack);
 					_Tracks[_nbTrack].indx.offset=p->getPos();
 					_Tracks[_nbTrack].indx.size=len;
 					p->skip(len);
@@ -797,3 +752,26 @@ void OpenDMLHeader::walk(riffParser *p)
 	nest--;
 }
 
+//****************************************
+odmlAudioTrack::odmlAudioTrack(void)
+{
+        index=NULL;
+        track=NULL;
+        extraData=NULL;
+
+        wavHeader=new WAVHeader;
+        nbChunks=0;
+        extraDataLen=0;
+        trackNum=0;
+        totalLen=0;
+        nbChunks=0;
+        avistream=new AVIStreamHeader;
+}
+odmlAudioTrack::~odmlAudioTrack()
+{
+        if(index) delete [] index;
+        if(track) delete  track;
+        if(wavHeader) delete wavHeader;
+        if(extraData) delete [] extraData;
+        if(avistream) delete avistream;
+}

@@ -37,6 +37,23 @@ typedef struct odmlTrack
 	odmlIndex indx;
 }odmlTrack;
 
+class odmlAudioTrack
+{
+public:
+                 odmlAudioTrack(void);
+                 ~odmlAudioTrack();
+//********************************
+                 odmlIndex               *index;
+                 AVDMGenericAudioStream  *track;
+                 WAVHeader               *wavHeader;
+                 uint32_t                nbChunks;
+                 uint32_t                extraDataLen;
+                 uint8_t                 *extraData;
+                 uint32_t                trackNum;
+                 uint32_t                totalLen;
+                AVIStreamHeader          *avistream;
+};
+
 class OpenDMLHeader         :public vidHeader
 {
 protected:
@@ -44,9 +61,16 @@ protected:
 	  uint64_t			_fileSize;
 	  FILE 				*_fd;
 	  odmlIndex 			*_idx;
-	  odmlIndex 			*_audioIdx;
-	  AVDMGenericAudioStream	*_audioTrack;
-	  WAVHeader			_wavHeader;
+
+	  odmlAudioTrack               *_audioTracks;
+
+         uint32_t                       _nbAudioTracks;
+         uint32_t                       _currentAudioTrack;
+
+          odmlIndex                     *_audioIdx;
+          AVDMGenericAudioStream        *_audioTrack;
+          WAVHeader                     *_wavHeader;
+
 	  
 	  void 				walk(riffParser *p) ;
 	  uint32_t			_nbTrack;
@@ -61,9 +85,6 @@ protected:
 	  // Extra data for audio & video track
 	  //_________________________________________	  
 	  
-	  uint32_t			_nbAudioChunk;
-	  uint32_t			_audioExtraLen;
-	  uint8_t			*_audioExtraData;
 	  uint8_t			_reordered;	/// set to DTS ?
 	  
 	  
@@ -73,13 +94,25 @@ protected:
 	  // _____________________________________________
 	  //		indexer, vanilla, odml and others
 	  // _____________________________________________
-	  uint8_t			indexODML(uint32_t vidTrack,uint32_t audTrack,uint32_t audioTrackNumber);
-	  uint8_t 			indexRegular(uint32_t vidTrack,uint32_t audTrack,uint32_t audioTrackNumber);
+	  uint8_t			indexODML(uint32_t vidTrack);
+	  uint8_t 			indexRegular(uint32_t vidTrack);
+
 	  uint8_t 			indexReindex(uint32_t vidTrack,uint32_t audTrack,
 	  					uint32_t audioTrackNumber);	
 					// scan one track for openDML						
 	  uint8_t			scanIndex(uint32_t track,odmlIndex **index,uint32_t *nbElem);
-	  uint32_t			read32( void );	
+	  uint32_t			read32( void )
+                                        {
+                                                uint8_t i[4]={0,0,0,0};
+                                                ADM_assert(_fd);
+                                                if(1!=fread(i,4,1,_fd))
+                                                {
+                                                        printf("Problem using odml read32\n");
+                                                        return 0;
+                                                }
+                                                return (i[3]<<24)+(i[2]<<16)+(i[1]<<8)+i[0];
+                                        };
+
 	  uint8_t			reorder( void );
 	  uint8_t			isReordered( void );
 	  	  	
