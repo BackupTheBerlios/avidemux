@@ -1,2 +1,2 @@
-cp ~/avidemux2/glade/src/interface.c ./GUI_main2.cpp
+cp ~/oldi/avidemux2/trunk/glade/src/interface.c ./GUI_main2.cpp
 bash patch.bash
