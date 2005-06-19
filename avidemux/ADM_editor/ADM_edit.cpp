@@ -751,6 +751,63 @@ uint8_t ADM_Composer::removeFrames (uint32_t start, uint32_t end)
   return 1;
 
 }
+//******************************
+// Select audio track
+//
+//******************************
+uint8_t ADM_Composer::getAudioStreamsInfo(uint32_t frame,uint32_t *nbStreams, uint32_t **infos)
+{
+uint32_t seg,rel,reference;
+
+        if (!convFrame2Seg (frame, &seg, &rel))
+        {
+                printf("Editor : frame2seg failed (%u)\n",frame);
+                return 0;
+        }
+        reference=_segments[seg]._reference;
+        return _videos[reference]._aviheader->getAudioStreamsInfo(nbStreams,infos);
+}
+/*
+        Change the audio track for the source video attached to the "frame" frame
+
+*/
+uint8_t ADM_Composer::changeAudioStream(uint32_t frame,uint32_t newstream)
+{
+uint32_t   seg,rel,reference;
+double     duration;
+WAVHeader *wav;
+aviInfo    info;
+
+        if (!convFrame2Seg (frame, &seg, &rel))
+        {
+                printf("Editor : frame2seg failed (%u)\n",frame);
+                return 0;
+        }
+        reference=_segments[seg]._reference;
+        if(!_videos[reference]._aviheader->changeAudioStream(newstream))
+        {
+                printf("Editor : stream change failed for frame %u seg %u stream %u\n",frame,seg,newstream);
+                return 0;
+        }
+        // Now update audio tracks infos
+        wav = _videos[reference]._aviheader->getAudioInfo ();
+        if(!wav)
+        {
+                ADM_assert(0); // Cannot change to a non existing track!
+        }
+        _videos[reference]._aviheader->getVideoInfo (&info);
+        _videos[reference]._aviheader->getAudioStream (&_videos[reference]._audiostream);
+        _videos[reference]._audio_size =_videos[reference]._audiostream->getLength ();
+        duration=_videos[reference]._nb_video_frames;
+        duration/=info.fps1000;
+        duration*=1000;                 // duration in seconds
+        duration*=wav->frequency;          // In sample
+        _videos[reference]._audio_duration=(uint64_t)floor(duration);
+        for(uint32_t i=0;i<_nb_segment;i++)
+                updateAudioTrack(i);
+        return 1;
+}
+
 /**
 ______________________________________________________
 //
