@@ -137,6 +137,8 @@ virtual 	uint8_t			close(void) ;
 
 virtual 	WAVHeader 	*getAudioInfo(void ); 
 virtual 	uint8_t		getAudioStream(AVDMGenericAudioStream **audio);
+virtual         uint8_t         getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
+virtual         uint8_t         changeAudioStream(uint32_t newstream);
 
 // Frames
   //__________________________

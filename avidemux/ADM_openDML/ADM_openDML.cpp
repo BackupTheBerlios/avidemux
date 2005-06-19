@@ -775,3 +775,26 @@ odmlAudioTrack::~odmlAudioTrack()
         if(extraData) delete [] extraData;
         if(avistream) delete avistream;
 }
+
+uint8_t         OpenDMLHeader::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+{
+        *nbStreams=_nbAudioTracks;
+        if(!_nbAudioTracks)
+                {
+                        *infos=NULL;
+                        return 1;
+                }
+        *infos=new uint32_t[_nbAudioTracks];
+        for(int i=0;i<_nbAudioTracks;i++)
+        {
+                (*infos)[i]=_audioTracks[i].wavHeader->encoding;
+        }
+        return 1;
+
+}
+uint8_t         OpenDMLHeader::changeAudioStream(uint32_t newstream)
+{
+                ADM_assert(newstream < _nbAudioTracks);
+                _currentAudioTrack=newstream;
+                return 1;
+}
