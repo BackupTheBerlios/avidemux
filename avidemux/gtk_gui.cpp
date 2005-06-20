@@ -17,7 +17,7 @@
  // This is used to test new features
  // should be commented out for regulat build
 //#define TEST_MP2
-#define TEST_OCR
+
 #ifdef TEST_MP2
 	#warning TEST_MP2 is ON
 	#warning TEST_MP2 is ON
@@ -134,7 +134,7 @@ extern uint8_t ADM_aviUISetMuxer(  void );
 
 
 static void updateSecondAudioTrack (void);
-
+void A_audioTrack(void);
 extern int A_Save( char *name);
 static uint32_t getAudioByteCount( uint32_t start, uint32_t end);
 extern void mpegToIndex (char *name);
@@ -415,7 +415,6 @@ void HandleAction (Action action)
       switch (action)
 	{
 
-
 	case ACT_OpenAvi:
           GUI_FileSelRead ("Select AVI file...", (SELFILE_CB *)A_openAvi);
 	  break;
@@ -436,6 +435,10 @@ void HandleAction (Action action)
   // we have an AVI loaded
   switch (action)
     {
+   case ACT_SelectTrack1:
+                A_audioTrack();
+                break;
+
     case ACT_Bitrate:
     			{
 				uint32_t a,b;
@@ -1308,8 +1311,11 @@ int A_saveJpg (char *name)
 
 int A_saveJpg (char *name)
 {
- 	ogmSave(name);
-  	GUI_Alert ("Done.");
+static int b=1;
+         video_body->changeAudioStream(0,b);
+        b^=1;
+        return 1;
+ 	
 }
 #endif
 /**
@@ -2319,6 +2325,52 @@ uint32_t type,strength,swap;
  	}
 
 }
+extern uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, uint32_t *infos);
+void A_audioTrack( void )
+{
+        uint32_t nb,*infos;
+        AudioSource old,nw;        
+        uint8_t r=0;
+        uint32_t oldtrack,newtrack;
 
+
+        if(!video_body->getAudioStreamsInfo(0,&nb, &infos))
+        {
+                GUI_Alert("Get tracks info failed");
+                return ;
+        }
+        newtrack=oldtrack=video_body->getCurrentAudioStreamNumber(0);
+        nw=old=currentAudioSource;
+        r=DIA_audioTrack(&nw, &newtrack,nb, infos);
+        delete [] infos;
+        // Change track here
+        if(old==nw && (nw!=AudioAvi)) return;
+
+        switch( nw)
+        {
+                case AudioMP3:
+                        GUI_FileSelRead ("Select MP3 to load ", (SELFILE_CB *)A_loadMP3);
+                        break;
+                case AudioAC3:
+                        GUI_FileSelRead ("Select AC3 to load ", (SELFILE_CB *)A_loadAC3);
+                        break;
+                case AudioWav:
+                        GUI_FileSelRead ("Select WAV to load ",(SELFILE_CB *) A_loadWave);
+                        break;
+                case AudioNone:
+                          changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+                        break;
+                case AudioAvi:
+                        //printf("New :%d old:%d\n",newtrack,oldtrack);
+                        if(oldtrack!=newtrack)
+                        {
+                                video_body->changeAudioStream(0,newtrack);
+                                changeAudioStream (aviaudiostream, AudioAvi,NULL);
+                        }
+                        break;
+                default:
+                        ADM_assert(0);
+        }
+}
 // EOF
 

@@ -252,6 +252,7 @@ class ADM_Composer
 					decoders 		*rawGetDecoder(uint32_t frame);
                                         uint8_t                 getAudioStreamsInfo(uint32_t frame,uint32_t *nbStreams, uint32_t **infos);
                                         uint8_t                 changeAudioStream(uint32_t frame,uint32_t newstream);
+                                        uint32_t                getCurrentAudioStreamNumber(uint32_t frame);
 
 };
 #endif

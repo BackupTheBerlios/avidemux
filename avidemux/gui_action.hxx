@@ -164,6 +164,7 @@ ACT_AudioCodecChanged,
 ACT_VideoCodecChanged,
 ACT_Bitrate,
 ACT_Ocr,
+ACT_SelectTrack1,
 ACT_DUMMY
 
 

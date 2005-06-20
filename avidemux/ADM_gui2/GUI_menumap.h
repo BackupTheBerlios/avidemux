@@ -62,12 +62,14 @@ CALLBACK(to_other1 				,ACT_Pipe2Other);
  
 CALLBACK(reset_edits1                		,ACT_ResetSegments);
 
-
+CALLBACK(source1                                 ,ACT_SelectTrack1);
+/*
 CALLBACK(current_video1             	   	,ACT_AudioSourceAvi);
 CALLBACK(external_mpeg                		,ACT_AudioSourceMP3);
 CALLBACK(external_ac1                		,ACT_AudioSourceAC3);
 CALLBACK(none1                			,ACT_AudioSourceNone);
 CALLBACK(external_wav1                		,ACT_AudioSourceWAV);
+*/
 CALLBACK(build_vbr_time_map1      		,ACT_AudioMap);
 
 

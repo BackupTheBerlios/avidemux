@@ -139,7 +139,7 @@ virtual 	WAVHeader 	*getAudioInfo(void );
 virtual 	uint8_t		getAudioStream(AVDMGenericAudioStream **audio);
 virtual         uint8_t         getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
 virtual         uint8_t         changeAudioStream(uint32_t newstream);
-
+                uint32_t        getCurrentAudioStreamNumber(void) { return _currentAudioTrack;}
 // Frames
   //__________________________
   //				 video
@@ -152,7 +152,7 @@ virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* frame
 virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)	;
 virtual 	uint8_t  getFrameSize(uint32_t frame,uint32_t *size) ;
 	     	 		
-virtual	  uint8_t			getExtraHeaderData(uint32_t *len, uint8_t **data);
+virtual	        uint8_t	 getExtraHeaderData(uint32_t *len, uint8_t **data);
 };
 
 #endif

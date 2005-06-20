@@ -771,6 +771,18 @@ uint32_t seg,rel,reference;
         Change the audio track for the source video attached to the "frame" frame
 
 */
+uint32_t ADM_Composer::getCurrentAudioStreamNumber(uint32_t frame)
+{
+uint32_t   seg,rel,reference;
+
+        if (!convFrame2Seg (frame, &seg, &rel))
+        {
+                printf("Editor : frame2seg failed (%u)\n",frame);
+                return 0;
+        }
+        reference=_segments[seg]._reference;
+        return _videos[reference]._aviheader->getCurrentAudioStreamNumber();
+}
 uint8_t ADM_Composer::changeAudioStream(uint32_t frame,uint32_t newstream)
 {
 uint32_t   seg,rel,reference;
