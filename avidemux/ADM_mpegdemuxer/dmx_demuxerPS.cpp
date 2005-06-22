@@ -28,9 +28,9 @@
 
 
 #include "dmx_demuxerPS.h"
-uint8_t         dmx_demuxerPS::changePid(uint8_t newpid)
+uint8_t         dmx_demuxerPS::changePid(uint32_t newpid,uint32_t newpes)
 {
-          myPid=newpid;
+          myPid=newpes & 0xff;
           if(myPid<9 || (myPid>0xA0&&myPid<0xA9)) myPid|=0xff00;
         _pesBufferStart=0;  // Big value so that we read
         _pesBufferLen=0;

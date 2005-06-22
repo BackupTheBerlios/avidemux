@@ -86,6 +86,9 @@ private:
 public:
                         uint8_t                                 reorder( void ) {return 1;}
                         uint8_t                                 isReordered( void ) { return 1;}
+                        uint8_t                 changeAudioStream(uint32_t newstream);
+                        uint32_t                getCurrentAudioStreamNumber(void) ;
+                        uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
 
 };
 #endif

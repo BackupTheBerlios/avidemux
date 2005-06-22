@@ -41,7 +41,7 @@
 
 #include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
 #include "dmx_demuxerTS.h"
-uint8_t         dmx_demuxerTS::changePid(uint32_t newpid)
+uint8_t         dmx_demuxerTS::changePid(uint32_t newpid,uint32_t newpes)
 {
           myPid=newpid;
           

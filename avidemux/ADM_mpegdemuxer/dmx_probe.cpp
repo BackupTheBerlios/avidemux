@@ -158,7 +158,7 @@ int     audio,video;
                 pes=(*tracks)[i].pes;
                 if((pes<0xC9 && pes>=0xc0) || ((pes<9)))
                 {
-                        demuxer->changePid(pes);
+                        demuxer->changePid(0,pes);
                         demuxer->setPos(0,0);
                         read=demuxer->read(buffer,BUFFER_SIZE);
                         // We need about 5 Ko...
@@ -309,7 +309,7 @@ _next:
 
         if((code>=0xC0 && code < 0xC9) || code==0xbd)
         {
-            demuxer.changePid(id);
+            demuxer.changePid(id,code);
             demuxer.setPos(0,0);
             read=demuxer.read(buffer,BUFFER_SIZE);
             if(read!=BUFFER_SIZE) continue;

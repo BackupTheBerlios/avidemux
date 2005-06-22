@@ -43,21 +43,22 @@
 #define MAX_LINE 4096
 #define PROBE_SIZE (4096*2)
 
-//___________________________________________________                                                                                                                           
-//___________________________________________________                                                                                                                           
-
-//___________________________________________________                                                                                                                           
-//___________________________________________________                                                                                                                           
+//___________________________________________________
+//___________________________________________________
+//___________________________________________________
+//___________________________________________________
 dmxAudioStream::~dmxAudioStream ()
 {
-  if (index)
-    delete[]index;
-  if (_wavheader)
-    delete _wavheader;
+  if (_index)
+    delete[] _index;
+
   if (demuxer)
     delete demuxer;
 
-  index = NULL;
+  if(_tracks)
+      delete [] _tracks;
+
+  _index = NULL;
   _wavheader = NULL;
   demuxer = NULL;
 
@@ -65,9 +66,11 @@ dmxAudioStream::~dmxAudioStream ()
 dmxAudioStream::dmxAudioStream (void)
 {
   _wavheader = NULL;
-  index = NULL;
   demuxer = NULL;
-  nbIndex = 0;
+  nbTrack = 0;
+  _tracks=NULL;
+  currentTrack=0;
+  _index=NULL;
 }
 uint8_t
 dmxAudioStream::open (char *name)
@@ -125,37 +128,46 @@ _abrt:
          fclose (file);
         return 0;
   }
+  _tracks=new dmxAudioTrack[nbAudioStream];
+  nbTrack=nbAudioStream;
+  _index=new dmxAudioIndex[nbGop+1];
   fgets (string, MAX_LINE, file);
 
   char *needle,*hay;
   uint32_t i=0;
-
+/*
+    Extrcat the PES/PID for each audio track from the line
+        A(PES):(PID) A(PES):(PID) ....
+*/
   hay=string;
-  while(i!=mainAudio+1)
+  while(1)
   {
         needle=strstr(hay," A");
-        if(!needle) goto _abrt;
+        if(!needle) goto _nnx;
         sscanf(needle," A%x:%x",&aPid,&aPes);
+        ADM_assert(i<nbAudioStream);
+        _tracks[i].myPid=aPid;
+        _tracks[i].myPes=aPes;
         needle[0]='.';
         needle[1]='.';
         hay=needle;
         i++;
   }
-  printf("Using Track :%x Pid:%x Es:%x for audio\n",mainAudio,aPid,aPes);
-  // Build the streams
-  myPes=aPes;
+_nnx:
+  ADM_assert(i==nbAudioStream);
+  currentTrack=mainAudio;
+  // Now build the demuxers
+  // We build only one demuxer, then we will use changePid
+  // To go from one track to another
 MPEG_TRACK track;
+                track.pes=_tracks[mainAudio].myPes;
+                track.pid=_tracks[mainAudio].myPid;
   switch (type)
     {
     case 'P':
-                
-                track.pes=aPes;
-                track.pid=aPid;
                 demuxer = new dmx_demuxerPS (1,&track);
                 break;
     case 'T':
-                track.pes=aPes;
-                track.pid=aPid;
                 demuxer = new dmx_demuxerTS (1,&track,0);
                 break;
     default:
@@ -170,7 +182,7 @@ MPEG_TRACK track;
         }
   // Now build the index
   nbIndex = nbGop;
-  index = new dmxAudioIndex[nbGop + 2];
+ 
   printf ("Building index with %u sync points\n", nbGop);
 
   uint32_t read = 0, img, count;
@@ -188,21 +200,22 @@ MPEG_TRACK track;
         hay=strstr(string,":");
         ADM_assert(hay)
         i=0;
-       while(i!=mainAudio+1)
+       while(1)
         {
                 needle=strstr(hay,":");
-                if(!needle) ADM_assert(0);
+                if(!needle) goto _nxt;;
                 sscanf(needle,":%lx",&count);
                 needle[0]='.';                
                 hay=needle;
+                _index[read].count[i] = count;
                 i++;
         }
+_nxt:
 
 
-
-      index[read].img = img;
-      index[read].start = abs;
-      index[read].count = count;
+      _index[read].img = img;
+      _index[read].start = abs;
+      
       read++;
     }
   fclose (file);
@@ -214,27 +227,29 @@ MPEG_TRACK track;
     }
 
   // now fill in the header
-  _length = index[nbIndex - 1].count;
-  _wavheader = new WAVHeader;
-  memset (_wavheader, 0, sizeof (WAVHeader));
+  _length = _index[nbIndex - 1].count[mainAudio];
+  for(int i=0;i<nbTrack;i++)
+  {
+    WAVHeader *hdr;
+    hdr=&(_tracks[i].wavHeader);
+    memset (hdr, 0, sizeof (WAVHeader));
 
-  // put some default value
-  _wavheader->bitspersample = 16;
-  _wavheader->blockalign = 4;
+    // put some default value
+    hdr->bitspersample = 16;
+    hdr->blockalign = 4;
   
-  _destroyable = 1;
-  strcpy (_name, "dmx audio");
-  demuxer->setPos (0, 0);
-
+    _destroyable = 1;
+    strcpy (_name, "dmx audio");
+    demuxer->setPos (0, 0);
+  }
   if(!probeAudio()) return 0;
-        printf("Probed audio\n");
-        printf("Br:%lu\n",(_wavheader->byterate*8)/1000);
-        printf("Fq:%lu\n",_wavheader->frequency);
-        printf("Ch:%lu\n",_wavheader->channels);
+        
+  demuxer->changePid(_tracks[currentTrack].myPid,_tracks[currentTrack].myPes);
   demuxer->setPos (0, 0);
   _pos = 0;
   printf ("\n DMX audio initialized (%lu bytes)\n", _length);
   printf ("With %lu sync point\n", nbIndex);
+  changeAudioTrack(mainAudio);
   return 1;
 }
 // __________________________________________________________
@@ -250,7 +265,7 @@ int fnd=0;
         // Search into the index to take the neareast one
         if(offset>=_length) return 0;
 
-        if(offset<index[0].count)
+        if(offset<_index[0].count[currentTrack])
         {
                 demuxer->setPos(0,0);
                 _pos=0;
@@ -260,10 +275,10 @@ int fnd=0;
         {
                 for(uint32_t i=0;i<nbIndex-1;i++)
                 {
-                        if(index[i].count<=offset && index[i+1].count>offset)
+                        if(_index[i].count[currentTrack]<=offset && _index[i+1].count[currentTrack]>offset)
                         {
-                                demuxer->setPos(index[i].start,0);
-                                _pos=index[i].count;
+                                demuxer->setPos(_index[i].start,0);
+                                _pos=_index[i].count[currentTrack];
                                 fnd=1;
                                 break;
                 
@@ -316,12 +331,25 @@ uint32_t read;
 
 uint8_t dmxAudioStream::probeAudio (void)
 {
-uint32_t read,offset,offset2,fq,br,chan;          
+uint32_t read,offset,offset2,fq,br,chan,myPes;          
 uint8_t buffer[PROBE_SIZE];
 MpegAudioInfo mpegInfo;
-                
-        if(PROBE_SIZE!=demuxer->read(buffer,PROBE_SIZE)) return 0;
+WAVHeader *hdr;
 
+      for(int i=0;i<nbTrack;i++)
+      {
+        hdr=&(_tracks[i].wavHeader);
+        // Change demuxer...
+
+        demuxer->changePid(_tracks[i].myPid,_tracks[i].myPes);
+        demuxer->setPos(0,0);
+        //
+        if(PROBE_SIZE!=demuxer->read(buffer,PROBE_SIZE))
+        {
+           printf("DmxAudio: Reading for track %d failed\n",i);
+           return 0;
+        }
+        myPes=_tracks[i].myPes;
         // Try mp2/3
         if(myPes>=0xC0 && myPes<0xC9)
         {
@@ -330,15 +358,15 @@ MpegAudioInfo mpegInfo;
                         if(getMpegFrameInfo(buffer+offset,PROBE_SIZE-offset,&mpegInfo,NULL,&offset2))
                                 if(!offset2)
                                 {
-                                        _wavheader->byterate=(1000*mpegInfo.bitrate)>>3;
-                                        _wavheader->frequency=mpegInfo.samplerate;
+                                        hdr->byterate=(1000*mpegInfo.bitrate)>>3;
+                                        hdr->frequency=mpegInfo.samplerate;
 
-                                        if(mpegInfo.mode!=3) _wavheader->channels=2;
-                                        else _wavheader->channels=1;
+                                        if(mpegInfo.mode!=3) hdr->channels=2;
+                                        else hdr->channels=1;
 
-                                        if(mpegInfo.layer==3) _wavheader->encoding=WAV_MP3;
-                                        else _wavheader->encoding=WAV_MP2;
-                                        return 1;
+                                        if(mpegInfo.layer==3) hdr->encoding=WAV_MP3;
+                                        else hdr->encoding=WAV_MP2;
+                                        continue;
                                 }
                 }
         }
@@ -349,37 +377,50 @@ MpegAudioInfo mpegInfo;
                 {
                         if(ADM_AC3GetInfo(buffer+offset,PROBE_SIZE-offset,&fq,&br,&chan,&offset2))
                         {
-                                _wavheader->byterate=br; //(1000*br)>>3;
-                                _wavheader->frequency=fq;                                
-                                _wavheader->encoding=WAV_AC3;
-                                _wavheader->channels=chan;
-                                return 1;
+                                hdr->byterate=br; //(1000*br)>>3;
+                                hdr->frequency=fq;                                
+                                hdr->encoding=WAV_AC3;
+                                hdr->channels=chan;
+                                continue;
                         }
                 }
         }
         // Default 48khz stereo lpcm
         if(myPes>=0xA0 && myPes<0xA9)
         {
-                _wavheader->byterate=(48000*4);
-                _wavheader->frequency=48000;                                
-                _wavheader->encoding=WAV_LPCM;
-                _wavheader->channels=2;
-                return 1;
+                hdr->byterate=(48000*4);
+                hdr->frequency=48000;                                
+                hdr->encoding=WAV_LPCM;
+                hdr->channels=2;
+                continue;
         }
-        return 0;
+  }
+  return 1;
 }
-#if 0
-void dmxAudioStream::checkAudio(void)
+
+uint8_t dmxAudioStream::changeAudioTrack(uint32_t newtrack)
 {
-        lastImg=index[0].image;
-        lastCount=index[0].count;
-        for(uint32_t i=1;i<nbIndex-1;i++)
-        {
-                deltaImage=index[i].image-lastImg;
-                deltaSound=index[i].count-lastImg;
+      ADM_assert(newtrack<nbTrack);
+      currentTrack=newtrack;
 
-        }
-
+      _length=_index[nbIndex-1].count[currentTrack];
+      _wavheader=&(_tracks[currentTrack].wavHeader);
+      // Set demuxer...
+      demuxer->changePid(_tracks[currentTrack].myPid,_tracks[currentTrack].myPes);
+      //
+      return 1;
 }
-#endif
+uint8_t                 dmxAudioStream::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+{
+    *nbStreams=0;
+    *infos=NULL;
+    if(!nbTrack) return 1;
+    *nbStreams=nbTrack;
+    *infos=new uint32_t [nbTrack];
+    for(int i=0;i<nbTrack;i++)
+        (*infos)[i]=_tracks[i].wavHeader.encoding;
+    return 1;
+}
+
+
  //

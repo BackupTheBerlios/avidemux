@@ -601,7 +601,26 @@ uint8_t    dmxHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t *f
         return getFrameNoAlloc(framenum, ptr , framelen,NULL);
 
 }
-   
-
+/*********************************/
+ uint8_t  dmxHeader::changeAudioStream(uint32_t newstream)
+{
+  ADM_assert(_audioStream);
+  return _audioStream->changeAudioTrack(newstream);
+}
+uint32_t  dmxHeader::getCurrentAudioStreamNumber(void)
+{
+  if(!_audioStream) return 0;
+  return _audioStream->currentTrack;
+}
+uint8_t  dmxHeader::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+{
+    if(!_audioStream)
+    {
+        *nbStreams=0;
+        *infos=NULL;
+        return 1;
+    }
+    return _audioStream->getAudioStreamsInfo(nbStreams,infos);
+}
 
 // EOF

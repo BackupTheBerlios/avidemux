@@ -21,30 +21,45 @@
 #include "ADM_mpegdemuxer/dmx_demuxerPS.h"
 #include "ADM_mpegdemuxer/dmx_demuxerTS.h"
  #include "ADM_audio/aviaudio.hxx"
+
+#define DMX_MAX_TRACK 16
+
  typedef struct dmxAudioIndex
  {
-                uint32_t img;
-                uint64_t start;       
-                uint64_t count;               
+                uint32_t img;                      // Corresponding image
+                uint64_t start;                    // Start of packet
+                uint64_t count[DMX_MAX_TRACK];         // Size of audio seen
 };
- 
+class dmxAudioTrack
+{
+public:
+                      dmxAudioTrack(void) {};
+                      ~dmxAudioTrack() {};
+      uint32_t        myPes,myPid;
+      WAVHeader       wavHeader;
+};
 class dmxAudioStream : public AVDMGenericAudioStream
 {
         protected:
                 uint8_t         probeAudio (void);
        protected:
-                dmx_demuxer            *demuxer;       
+                dmx_demuxer            *demuxer;
+                dmxAudioIndex           *_index;
                 uint32_t                nbIndex;
-                dmxAudioIndex           *index;
-                uint16_t                myPes;
+                uint32_t                nbTrack;
+                dmxAudioTrack           *_tracks;
+                
+                
                                 
                 public:
+                uint32_t        currentTrack;
                                 dmxAudioStream( void);
                 uint8_t         open(char *name);
         virtual                 ~dmxAudioStream() ;                    
         virtual uint8_t         goTo(uint32_t offset);
         virtual uint32_t        read(uint32_t size,uint8_t *ptr);
-
+                  uint8_t        getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
+                  uint8_t        changeAudioTrack(uint32_t newtrack);
 }
 ;
 #endif
