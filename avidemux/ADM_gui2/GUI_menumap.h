@@ -20,11 +20,11 @@ CALLBACK(load_project         			,ACT_OpenAvi);
 CALLBACK(save_project_as1              		,ACT_SaveWork);
 CALLBACK(save_current_project                	,ACT_SaveCurrentWork);
  
+#if 0
  
 CALLBACK(to_toolame1 				,ACT_Pipe2Lame);
 CALLBACK(to_lame1 				,ACT_PipeLame);
 CALLBACK(to_other1 				,ACT_Pipe2Other);
-#if 0
  CALLBACK(video_cd1                		,ACT_SaveMpeg1vcd);
  CALLBACK(svcd1                          		,ACT_SaveMpeg2svcd);
  CALLBACK(dvd1                                       ,ACT_SaveMpeg2dvd);
@@ -85,10 +85,10 @@ CALLBACK(bitrate_histogram1		      	,ACT_BitRate);
  CALLBACK(rebuild_frames           		,ACT_RebuildKF);
  CALLBACK(change_fps           			,ACT_ChangeFPS);
  CALLBACK(about1	           			,ACT_About);
-
+#if 0
 CALLBACK(mp3_file1				,ACT_SecondAudioMP3);
 CALLBACK(ac3_file1					,ACT_SecondAudioAC3);
-
+#endif
  //CALLBACK(save_preference1   		,ACT_SavePref);
  CALLBACK(preferences1   			,ACT_Pref);
 CALLBACK(	check_frames			,ACT_VideoCheck);
