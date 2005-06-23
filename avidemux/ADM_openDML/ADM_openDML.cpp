@@ -437,9 +437,12 @@ uint32_t rd;
 			 (abs(riffSize-_fileSize)<1024*1024))
 #endif
 
-                printf("Size looks good, maybe type 1 avi\n");
+#define HAS(x) if(x) printf(#x" : yes\n"); else printf(#x" : no\n");
                 // If there is no openDML index
-                if(!ret && _regularIndex.offset ) // try regular avi if a idx1 field is there (avi index)
+                HAS( _regularIndex.offset);
+                HAS( _Tracks[vidTrack].indx.offset);
+                if(!ret && _regularIndex.offset &&!_Tracks[vidTrack].indx.offset) 
+        // try regular avi if a idx1 field is there (avi index)
                         ret=indexRegular(vidTrack);
 
                 if (!ret && _Tracks[vidTrack].indx.offset)	// Try openDML if a index field is there (openDML)
