@@ -2365,6 +2365,10 @@ void A_audioTrack( void )
                         if(oldtrack!=newtrack)
                         {
                                 video_body->changeAudioStream(0,newtrack);
+                                //
+                                delete aviaudiostream;
+                                aviaudiostream=NULL;
+                                video_body->getAudioStream(&aviaudiostream);
                                 changeAudioStream (aviaudiostream, AudioAvi,NULL);
                         }
                         break;
