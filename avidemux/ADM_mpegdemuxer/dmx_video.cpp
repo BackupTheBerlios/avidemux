@@ -308,7 +308,12 @@ uint8_t                 dmxHeader::open(char *name)
                         // # NGop NImg nbImg Pos rel type:size type:size
                         sscanf(string,"V %u %u %u ",&gop,&imageStart,&imageNb);
                                 ADM_assert(read==gop);
-                                ADM_assert(currentImage==imageStart);
+                                if(currentImage!=imageStart)
+				{
+					printf("At gop :%u read:%u, expected image %u, got %u,imagenb:%u\n",gop,read,currentImage,imageStart,imageNb);
+					printf("String :%s\n",string);
+					ADM_assert(0);
+				}
                         
                                 
                                 // now split the image
@@ -331,9 +336,9 @@ uint8_t                 dmxHeader::open(char *name)
                                         }
                                         str--;
 #ifdef CYG_MANGLING                                        
-                                        sscanf(str,"%c:%I64x,%lx,%lx",&imgtype,&imgabs,&imgrel,&imgsize);
+                                        sscanf(str,"%c:%I64x,%I64x,%x",&imgtype,&imgabs,&imgrel,&imgsize);
 #else                                      
-                                        sscanf(str,"%c:%llx,%lx,%lx",&imgtype,&imgabs,&imgrel,&imgsize);
+                                        sscanf(str,"%c:%llx,%llx,%x",&imgtype,&imgabs,&imgrel,&imgsize);
 #endif                                          
                                         if(i>=_nbFrames)         
                                         {
