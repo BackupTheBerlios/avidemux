@@ -278,7 +278,10 @@ UNUSED_ARG(mode);
 	ADM_assert(strlen(name)+5<256);;
 	strcpy(tmpname,name);
 	strcat(tmpname,".idx");
-	if(addFile(tmpname)) return 1;
+        if(ADM_fileExist(tmpname))
+        {
+	       return addFile(tmpname);
+        }
         if(tryIndexing(name))
         {
                 return addFile (name);
