@@ -405,17 +405,17 @@ uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel,uint32_t
 uint64_t stats[nbTracks];
 
         frames[nbPushed-1].size=demuxer->elapsed()+2;
-        fprintf(fd,"V %03lu %06lu %02lu ",nbGop,nbImage,nbPushed);
+        fprintf(fd,"V %03u %06u %02u ",nbGop,nbImage,nbPushed);
 
         // For each picture Type : abs position : relat position : size
         for(uint32_t i=0;i<nbPushed;i++) 
         {
 
-                fprintf(fd,"%c:%08"LLX",%05lx",
+                fprintf(fd,"%c:%08"LLX",%05x",
                         Type[frames[i].type],
                         frames[i].abs,
                         frames[i].rel);
-                fprintf(fd,",%05lx ",
+                fprintf(fd,",%05x ",
                         frames[i].size);
         }
         
@@ -430,7 +430,7 @@ uint64_t stats[nbTracks];
         {
                 demuxer->getStats(stats);
                 
-                fprintf(fd,"A %lu %"LLX" ",nbImage,abs);
+                fprintf(fd,"A %u %"LLX" ",nbImage,abs);
                 for(uint32_t i=1;i<nbTracks;i++)
                 {
                         fprintf(fd,":%"LLX" ",stats[i]);

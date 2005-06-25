@@ -62,7 +62,7 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks)
                 tracked=new uint8_t[nbTracked];
                 for(int i=1;i<nb;i++)
                 {
-                        mask[i]=1;
+                        mask[tracks[i].pes&0xff]=1;
                         tracked[i]=tracks[i].pes&0xff;
                 }                
                 
@@ -355,7 +355,7 @@ _again:
 
         if(stream==PRIVATE_STREAM_1) globstream=0xFF00+substream;
                 else                 globstream=stream;
-        seen[globstream & 0xFF]+=len;
+      //  seen[globstream & 0xFF]+=len;
         if(myPid==globstream)
         {
                 _oldPesStart=_pesBufferStart;
