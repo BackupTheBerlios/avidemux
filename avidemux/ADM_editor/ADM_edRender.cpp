@@ -420,7 +420,8 @@ uint32_t left,ww;
 	if (!_videos[seg].decoder->uncompress (compBuffer, tmpImage, len, &flags))
 	    {
 	      printf ("\nEditor: Last Decoding2 failed for frame %lu\n",frame);
-	      return 0;
+	 //     return 0;
+                goto _next;
 	    }
 
         // 
@@ -600,7 +601,7 @@ uint32_t left,ww;
                         
 
                 }
-
+_next:
                 // update some infos
                 if(refOnly) delete tmpImage;
 		cache->updateFrameNum(image,frame);
