@@ -48,7 +48,7 @@ inline uint32_t 		dontswap(uint32_t in) {return in;};
 char 		*ADM_rindex(const char *s, int c);
 char 		*ADM_index(const char *s, int c);
 void 		ADM_usleep(unsigned long us);
-
+uint8_t         ADM_fileExist(char *name);
 
 #ifdef CYG_MANGLING
 #ifndef HAVE_STRUCT_TIMESPEC

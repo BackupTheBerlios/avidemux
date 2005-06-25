@@ -397,5 +397,13 @@ char 		*ADM_index(const char *s, int c)
 	}
 	return NULL;
 }
+uint8_t         ADM_fileExist(char *name)
+{
+FILE *file;
+                file=fopen(name,"rb");
+                if(!file) return 0;
+                fclose(file);
+                return 1;
 
+}
 //EOF
