@@ -166,11 +166,12 @@ uint32_t 	i,j;
 		fread(&len,4,1,_fd);				
 		if(1!=fread(&second,sizeof(second),1,_fd))
 		{
-			printf("Problem reading secondary index \n");
-			return 0;
+			printf("Problem reading secondary index (%u/%u) trying to continue \n",i,masterIndex.nbEntryInUse);
+			goto _cntue;
 		}
 		total+=second.nbEntryInUse;	
 	}
+_cntue:
 	printf("Found a grand total of %lu frames\n",total);
 	*nbElem=total;
 	
@@ -191,8 +192,8 @@ uint32_t 	i,j;
 		fourCC::print(fcc);aprintf("\n");
 		if(1!=fread(&second,sizeof(second),1,_fd))
 		{
-			printf("Problem reading secondary index \n");
-			return 0;
+			printf("Problem reading secondary index (%u/%u) trying to continue \n",i,masterIndex.nbEntryInUse);
+			return 1;
 		}	
 #ifdef CYG_MANGLING                
                 aprintf("Base : %I64x\n",second.base);
