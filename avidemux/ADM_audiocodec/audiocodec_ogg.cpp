@@ -109,8 +109,10 @@
 	}
 	// update some info in header this is the only place to get them
 	// especially frequency.
+/*
 	info->channels=STRUCT->vinfo.channels;
 	info->frequency=STRUCT->vinfo.rate;
+*/
 	info->byterate=STRUCT->vinfo.bitrate_nominal>>3;
 	
 	if(!info->byterate) 
@@ -159,6 +161,7 @@ int	nb_synth;
 	packet.e_o_s=0;
 	packet.bytes=nbIn;
 	packet.packet=ptr;
+        packet.granulepos=-1;
 	if(!vorbis_synthesis(&STRUCT->vblock,&packet))
 	{
 	      vorbis_synthesis_blockin(&STRUCT->vdsp,&STRUCT->vblock);
@@ -197,7 +200,7 @@ int	nb_synth;
 	  }
 	// Puge them
 	 vorbis_synthesis_read(&STRUCT->vdsp,nb_synth); 
-	 aprintf("This round : in %d bytes, out %d bytes\n",nbIn,*nbOut);
+	 aprintf("This round : in %d bytes, out %d bytes synthetized:%d\n",nbIn,*nbOut,nb_synth);
 	return 1;
 	
 }	
@@ -210,6 +213,7 @@ int	nb_synth;
   
   	//vorbis_synthesis_blockin(&STRUCT->vdsp,&STRUCT->vblock);
   	vorbis_synthesis_pcmout(&STRUCT->vdsp,&sample_pcm);
+        vorbis_synthesis_restart(&STRUCT->vdsp);
   	return 1;
   }
 #endif

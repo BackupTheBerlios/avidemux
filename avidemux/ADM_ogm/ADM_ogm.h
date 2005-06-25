@@ -81,7 +81,7 @@ protected:
              			FILE 			*_fd;
 				uint64_t 			_filesize;
 				uint32_t			_videoTrack;
-				
+				uint32_t                        _currentAudioTrack;
 				OgAudioTrack			_audioTracks[2];	
 				
 				void				_dump(void);
@@ -92,6 +92,7 @@ protected:
 				uint32_t			_lastFrag;
 				oggAudio			*_audio;
 				uint8_t				_reordered;
+                                char                            *_name;
 				uint8_t  			dumpHeader(stream_header *header,uint8_t isaudio);
 public:
 
@@ -114,6 +115,9 @@ virtual 	uint8_t			close(void) ;
 
 virtual 	WAVHeader 		*getAudioInfo(void )  ;
 virtual 	uint8_t			getAudioStream(AVDMGenericAudioStream **audio);
+virtual         uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
+virtual         uint8_t                 changeAudioStream(uint32_t newstream);
+virtual         uint32_t                getCurrentAudioStreamNumber(void) { return _currentAudioTrack;}
 
 // Frames
   //__________________________

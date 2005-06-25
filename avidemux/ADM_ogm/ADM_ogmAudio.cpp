@@ -366,7 +366,10 @@ uint8_t	 oggAudio::goToTime(uint32_t mstime)
 uint64_t val,cur,f;
 uint32_t flags,cursize;
 OgAudioIndex *idx;
-
+#if 0
+static WAVHeader hdr;
+        memcpy(&hdr,_wavheader,sizeof(hdr));
+#endif
 	val=mstime;
 	packetHead=packetHead=0;
 	val*=_wavheader->frequency;
@@ -385,7 +388,7 @@ OgAudioIndex *idx;
 			return 1;
 	}
 	//
-	
+	printf("Goto :%lu, max :%lu\n",val,idx[_currentTrack->nbAudioPacket].sampleCount);
 	for(uint32_t i=0;i<_currentTrack->nbAudioPacket;i++)
 	{		
 		cur=idx[i].sampleCount;
@@ -416,7 +419,7 @@ OgAudioIndex *idx;
 				}
 			
 			}
-			aprintf("Could no sync to a header close enough\n");
+			printf("Could no sync to a header close enough\n");
 			return 0;
 		}
 		aprintf("%lu: Current %llu target %llu\n",i,idx[i].sampleCount,val);		
