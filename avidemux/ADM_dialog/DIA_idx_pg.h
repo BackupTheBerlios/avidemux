@@ -1,9 +1,11 @@
 #ifndef DIA_IDX_PG
 #define DIA_IDX_PG
+#include "ADM_toolkit/TLK_clock.h"
 
 class DIA_progressIndexing
 {
 protected:
+                Clock   clock;
         
 public:
                         DIA_progressIndexing(char *name);
