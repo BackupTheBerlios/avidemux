@@ -79,7 +79,7 @@ int scriptAudioSource(int n, Arg *args)
         switch(src)
         {
                 case AudioAvi:
-                        result= changeAudioStream (aviaudiostream, AudioAvi,NULL);
+                        result= A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
                         break;
                 case AudioMP3:
                         result= A_loadMP3(args[1].arg.string);
@@ -91,7 +91,7 @@ int scriptAudioSource(int n, Arg *args)
                         result= A_loadAC3(args[1].arg.string);
                         break;
                 case AudioNone:
-                         result= changeAudioStream(NULL,AudioNone,NULL);
+                         result= A_changeAudioStream(NULL,AudioNone,NULL);
                           break;
                 default:        
                         ADM_assert(0);
