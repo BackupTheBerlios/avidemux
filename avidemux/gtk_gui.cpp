@@ -1605,7 +1605,8 @@ changeAudioStream (AVDMGenericAudioStream * newaudio, AudioSource nwsource,char 
   {
     wavinfo = currentaudiostream->getInfo ();
     currentAudioSource=nwsource;
-    currentAudioName=ADM_strdup(myname);
+    if(myname)
+        currentAudioName=ADM_strdup(myname);
   }
   return 1;
 }
@@ -2366,6 +2367,8 @@ void A_audioTrack( void )
                         {
                                 video_body->changeAudioStream(0,newtrack);
                                 //
+                                if(aviaudiostream==currentaudiostream)
+                                        currentaudiostream=NULL;
                                 delete aviaudiostream;
                                 aviaudiostream=NULL;
                                 video_body->getAudioStream(&aviaudiostream);

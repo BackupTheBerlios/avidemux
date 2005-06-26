@@ -68,7 +68,7 @@ oggHeader::oggHeader(void)
 	memset(&_audioTracks[1],0,sizeof(OgAudioTrack));
 	
 	_audioTracks[0].audioTrack=_audioTracks[1].audioTrack=0xff;
-	
+	_currentAudioTrack=0;
 }
 oggHeader::~oggHeader()
 {
@@ -91,8 +91,8 @@ oggHeader::~oggHeader()
 			_audioTracks[i].index=NULL;	
 		}
 	}
-	
-	
+        if(_name) ADM_dealloc(_name);
+        _name=NULL;
 }
 
 void oggHeader::Dump(void)
@@ -185,7 +185,7 @@ uint8_t oggHeader::open(char *name)
 
 	OGMDemuxer 	*demux;
 	uint8_t  	buffer[64*1024];
-	stream_header	*header;
+	stream_header	header;
 	uint32_t 	fourcc=0;
 	uint32_t 	size,flag;
 	uint8_t		firstByte;
@@ -194,14 +194,19 @@ uint8_t oggHeader::open(char *name)
 	uint32_t	nbAudioFrame;
 
 
-	header=(stream_header *)buffer;
-
+//	header=(stream_header *)buffer;
+        _name=ADM_strdup(name);
 	/**
 		We open up to 10 tracks an see what's inside
 	*/
 
 	demux=new OGMDemuxer();
 	ADM_assert(demux->open(name));
+        memset(_audioTracks,0,sizeof(OgAudioTrack)*2);
+
+        _audioTracks[0].audioTrack=0xff;
+        _audioTracks[1].audioTrack=0xff;
+
 	for(uint32_t track=0;track<10;track++)
 	{
 		if(!demux->readHeader(&size,&flag,&framenum,&id)) break;
@@ -217,28 +222,31 @@ uint8_t oggHeader::open(char *name)
 		// we got a first page with track id track
 		// What is it ?
 		char str[20];
-#define OINFO(x,y) memcpy(str,header->x,y); str[y]=0;printf(#x"\t:%s \n",str);
+#define OINFO(x,y) memcpy(str,header.x,y); str[y]=0;printf(#x"\t:%s \n",str);
 
-			OINFO(streamtype,8);
+			memcpy(str,buffer,8);
 			str[5]=0;
 			
 			// if it is a video track we keep it handy
 			if(!strcmp(str,"video"))
 			{
+                                memcpy(&header,buffer,sizeof(header));
 				_videoTrack=id;
-				fourcc=fourCC::get((uint8_t *)&(header->subtype[0]))   ;
-				dumpHeader(header,0);
+				fourcc=fourCC::get((uint8_t *)&(header.subtype[0]))   ;
+				dumpHeader(&header,0);
 				
 			}
+#define MK32(x) (buffer[x]+(buffer[x+1]<<8)+(buffer[x+2]<<16)+(buffer[x+3]<<24))
 			if(!strcmp(str,"vorbi"))
 			{
+                                memcpy(&header,buffer,sizeof(header));
 				if( _audioTracks[0].audioTrack==0xff)
 				{
 					_audioTracks[0].audioTrack=id;
 					_audioTracks[0].encoding=WAV_OGG;
-					_audioTracks[0].channels=R16(header->audio.channels);
-					_audioTracks[0].byterate=R32(header->audio.avgbytespersec);
-					_audioTracks[0].frequency=R64(header->samples_per_unit);
+					_audioTracks[0].channels=buffer[10];//R16(header.audio.channels);
+					_audioTracks[0].byterate=1600;//R32(header.audio.avgbytespersec);
+					_audioTracks[0].frequency=MK32(11);//R64(header.samples_per_unit);
 					printf("Taking that track as audio track 1\n");
 				}
 				else
@@ -246,15 +254,16 @@ uint8_t oggHeader::open(char *name)
 				{
 					_audioTracks[1].audioTrack=id;
 					_audioTracks[1].encoding=WAV_OGG;
-					_audioTracks[1].channels=R16(header->audio.channels);
-					_audioTracks[1].byterate=R32(header->audio.avgbytespersec);
-					_audioTracks[1].frequency=R64(header->samples_per_unit);
+					_audioTracks[1].channels=buffer[10];//R16(header.audio.channels);
+					_audioTracks[1].byterate=1600; //MK32(11); //R32(header.audio.avgbytespersec);
+					_audioTracks[1].frequency=MK32(11);//R64(header.samples_per_unit);
 					printf("Taking that track as audio track 2\n");
 				}
-				dumpHeader(header,1);
+				dumpHeader(&header,1);
 			}
 			if(!strcmp(str,"audio"))
 			{
+                                memcpy(&header,buffer,sizeof(header));
 				uint32_t codec;
 				OINFO(subtype,4);
 				sscanf(str,"%x",&codec);
@@ -263,9 +272,9 @@ uint8_t oggHeader::open(char *name)
 				{
 					_audioTracks[0].audioTrack=id;
 					_audioTracks[0].encoding=codec;
-					_audioTracks[0].channels=R16(header->audio.channels);
-					_audioTracks[0].byterate=R32(header->audio.avgbytespersec);
-					_audioTracks[0].frequency=R64(header->samples_per_unit);
+					_audioTracks[0].channels=R16(header.audio.channels);
+					_audioTracks[0].byterate=R32(header.audio.avgbytespersec);
+					_audioTracks[0].frequency=R64(header.samples_per_unit);
 					printf("Taking that track as audio track 1\n");
 				}
 				else
@@ -273,12 +282,12 @@ uint8_t oggHeader::open(char *name)
 				{
 					_audioTracks[1].audioTrack=id;
 					_audioTracks[1].encoding=codec;
-					_audioTracks[1].channels=R16(header->audio.channels);
-					_audioTracks[1].byterate=R32(header->audio.avgbytespersec);
-					_audioTracks[1].frequency=R64(header->samples_per_unit);
+					_audioTracks[1].channels=R16(header.audio.channels);
+					_audioTracks[1].byterate=R32(header.audio.avgbytespersec);
+					_audioTracks[1].frequency=R64(header.samples_per_unit);
 					printf("Taking that track as audio track 2\n");
 				}
-				dumpHeader(header,1);
+				dumpHeader(&header,1);
 			}
 			OINFO(subtype,4); // fourcc
 	}
@@ -295,7 +304,7 @@ uint8_t oggHeader::open(char *name)
 	_demux->readHeaderOfType(_videoTrack,&size,&flag,&framenum);
 	_demux->readBytes(1,&firstByte);
 	_demux->readPayload(buffer);
-
+         memcpy(&header,buffer,sizeof(header));
 
 #define CLR(x)              memset(& x,0,sizeof(  x));
 
@@ -310,11 +319,11 @@ uint8_t oggHeader::open(char *name)
 		SWAP32(header->video.height);
 		SWAP64(header->time_unit);
 
-              _mainaviheader.dwMicroSecPerFrame=header->time_unit;;     // assuming per sample=1
+              _mainaviheader.dwMicroSecPerFrame=header.time_unit;;     // assuming per sample=1
 
-	      if(!header->time_unit) header->time_unit=40000;
+	      if(!header.time_unit) header.time_unit=40000;
 double fps;
-		fps= header->time_unit;
+		fps= header.time_unit;
 		fps=1/fps;
 		fps=fps*10000000*1000;
 		  _videostream.dwRate=(uint32_t )floor(fps);;
@@ -330,8 +339,8 @@ double fps;
               _videostream.dwLength= _mainaviheader.dwTotalFrames=1; // ??
                _videostream.dwInitialFrames= 0;
                _videostream.dwStart= 0;
-               _video_bih.biWidth=_mainaviheader.dwWidth=header->video.width ;
-               _video_bih.biHeight=_mainaviheader.dwHeight=header->video.height;
+               _video_bih.biWidth=_mainaviheader.dwWidth=header.video.width ;
+               _video_bih.biHeight=_mainaviheader.dwHeight=header.video.height;
                _video_bih.biPlanes= 24;
 
 		_isaudiopresent=0;
@@ -352,6 +361,7 @@ double fps;
 				&&_audioTracks[1].nbAudioPacket 
 				&& GUI_Question("Take second track ?"))
 			{
+                                _currentAudioTrack=1;
 				_audio=new oggAudio( name, &_audioTracks[0],1 );
 			}
 			else
@@ -368,6 +378,31 @@ double fps;
  		_videostream.dwLength= _mainaviheader.dwTotalFrames=nbFrames;
 		return 1;
 
+}
+uint8_t   oggHeader::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+{
+uint32_t nb=0;
+        if(_audioTracks[0].audioTrack!=0xff) nb++;
+        if(_audioTracks[1].audioTrack!=0xff) nb++;
+        *nbStreams=nb;
+        *infos=NULL;
+        if(nb)
+        {
+                *infos=new uint32_t[nb];
+                for(int i=0;i<nb;i++) (*infos)[i]=_audioTracks[i].encoding;
+        }
+        return 1;
+}
+uint8_t   oggHeader::changeAudioStream(uint32_t newstream)
+{
+uint32_t nb=0;
+        if(_audioTracks[0].audioTrack!=0xff) nb++;
+        if(_audioTracks[1].audioTrack!=0xff) nb++;
+        ADM_assert(newstream<nb);
+        delete _audio;
+        _audio=new oggAudio( _name, &_audioTracks[0],newstream );
+        _currentAudioTrack=newstream;
+        return 1;
 }
 
 /**
@@ -399,6 +434,7 @@ DIA_working *work=new DIA_working("Scanning OGM");
 	track1=&_audioTracks[0];
 	track2=&_audioTracks[1];
 
+        
 
 OgAudioIndex *tmpaudio[2];
 #define MAXINDEX (30*3600*3)
