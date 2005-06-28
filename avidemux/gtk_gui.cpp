@@ -689,7 +689,7 @@ case ACT_Pipe2Other:
       break;
     case ACT_AudioSourceAvi:
       //currentaudiostream=aviaudiostream;
-      changeAudioStream (aviaudiostream, AudioAvi,NULL);
+      A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
       //wavinfo= currentaudiostream->getInfo();
       break;
 
@@ -704,7 +704,7 @@ case ACT_Pipe2Other:
       break;
     case ACT_AudioSourceNone:
       //currentaudiostream=(AVDMGenericAudioStream *)NULL;
-       changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+       A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
       break;
 
   
@@ -930,7 +930,7 @@ int A_openAvi2 (char *name, uint8_t mode)
       video_body->cleanup ();
       curframe = 0;
       currentaudiostream = NULL;
-      changeAudioStream (NULL, AudioNone,NULL);
+      A_changeAudioStream (NULL, AudioNone,NULL);
       filterCleanUp ();
 
 
@@ -1067,7 +1067,7 @@ void  updateLoaded ()
       }
       /* </JSC> */
       video_body->getAudioStream (&aviaudiostream);
-      changeAudioStream (aviaudiostream, AudioAvi,NULL);
+      A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
       if (aviaudiostream)
 	if (!aviaudiostream->isDecompressable ())
 	  {
@@ -1145,7 +1145,7 @@ void ReSync (void)
   if (currentaudiostream == aviaudiostream)
     {
       isaviaud = 1;
-      changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+      A_changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
 
     }
   else
@@ -1156,7 +1156,7 @@ void ReSync (void)
   video_body->getAudioStream (&aviaudiostream);
   if (isaviaud)
     {
-      changeAudioStream (aviaudiostream, AudioAvi,NULL);
+      A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
     }
   	//updateVideoFilters ();
 	getFirstVideoFilter();
@@ -1512,13 +1512,13 @@ A_loadAC3 (char *name)
       return 0;
     }
   //currentaudiostream=wav;
-  changeAudioStream (ac3, AudioAC3,name);
+  A_changeAudioStream (ac3, AudioAC3,name);
   wavinfo = currentaudiostream->getInfo ();
   return 1;
 }
 int A_loadNone( void )
 {
- 	changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+ 	A_changeAudioStream ((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
 }
 //_____________________________________________________________
 //
@@ -1547,7 +1547,7 @@ int A_loadMP3(char *name)
           return 0;
       }
     //currentaudiostream=mp3;
-    changeAudioStream(mp3, AudioMP3,name);
+    A_changeAudioStream(mp3, AudioMP3,name);
     wavinfo = currentaudiostream->getInfo();
     return 1;
 }
@@ -1576,7 +1576,7 @@ A_loadWave (char *name)
       return 0;
     }
   //currentaudiostream=wav;
-  changeAudioStream (wav, AudioWav,name);
+  A_changeAudioStream (wav, AudioWav,name);
   wavinfo = currentaudiostream->getInfo ();
   return 1;
 }
@@ -1588,8 +1588,7 @@ AudioSource getCurrentAudioSource(char **name)
 //________________________________________________________
 // Change audio stream and delete the old one if needed
 //________________________________________________________
-uint8_t 
-changeAudioStream (AVDMGenericAudioStream * newaudio, AudioSource nwsource,char *myname)
+uint8_t A_changeAudioStream (AVDMGenericAudioStream * newaudio, AudioSource nwsource,char *myname)
 {
   if (currentaudiostream)
     {
@@ -2359,7 +2358,7 @@ void A_audioTrack( void )
                         GUI_FileSelRead ("Select WAV to load ",(SELFILE_CB *) A_loadWave);
                         break;
                 case AudioNone:
-                          changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+                          A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
                         break;
                 case AudioAvi:
                         //printf("New :%d old:%d\n",newtrack,oldtrack);
@@ -2372,7 +2371,7 @@ void A_audioTrack( void )
                                 delete aviaudiostream;
                                 aviaudiostream=NULL;
                                 video_body->getAudioStream(&aviaudiostream);
-                                changeAudioStream (aviaudiostream, AudioAvi,NULL);
+                                A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
                         }
                         break;
                 default:
