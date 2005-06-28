@@ -120,7 +120,7 @@ FILMCONV audioGetFpsConv(void);
 CHANNELCONV audioGetChannelConv(void);
 RESAMPLING  audioGetResampling(void);
 /*-----*/
-uint8_t                 changeAudioStream(AVDMGenericAudioStream *newaudio,AudioSource so,char *name);
+uint8_t                 A_changeAudioStream(AVDMGenericAudioStream *newaudio,AudioSource so,char *name);
 AudioSource             getCurrentAudioSource(char **name);
 const char              *audioSourceFromEnum(AudioSource *src);
 AudioSource             audioSourceFromString(const char *name);
