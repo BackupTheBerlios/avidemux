@@ -39,6 +39,7 @@
 #include "ADM_encoder/adm_encConfig.h"
 #include "prefs.h"
 #include "ADM_audiodevice/audio_out.h"
+#include "ADM_script/ADM_JSGlobal.h"
 
 #ifdef USE_XVID_4
 extern void xvid4_init(void);
@@ -79,6 +80,7 @@ extern "C"
 {
 extern void     VPInitLibrary();
 };
+
 
 void sig_segfault_handler(int signo);
 
@@ -121,7 +123,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 	printf(" Code      : Mean & JSC \n");
 	printf(" GFX       : Nestor Di , nestordi@augcyl.org\n");
 	printf(" Testing   : Jakub Misak\n");
-	printf(" FreeBsd   : Anish Mistry, amistry@am-productions.biz\n");
+	printf(" FreeBSD   : Anish Mistry, amistry@am-productions.biz\n");
 
 
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
@@ -188,7 +190,14 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
    	printf("Global SDL init...\n");
    	SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
    #endif
+
+	if(SpidermonkeyInit() == true)
+		printf("Spidermonkey initialized.\n");
+
     gtk_main();
+
+	SpidermonkeyDestroy();
+
     return 0;
 }
 void onexit( void )

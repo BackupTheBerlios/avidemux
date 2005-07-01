@@ -14,5 +14,5 @@ libADM_toolkit_a_SOURCES = automation.cpp choice.cpp toolkit.cpp filesel.cpp \
 EXTRA_DIST = filesel.cpp filesel.h toolkit.cpp toolkit.hxx bitmap.h choice.cpp automation.cpp  win32.cpp
 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES= $(all_includes) $(GTK_CFLAGS)
+INCLUDES= $(all_includes) $(GTK_CFLAGS) $(SMONKEY_CFLAGS)
 noinst_HEADERS =  ADM_cpuCap.h

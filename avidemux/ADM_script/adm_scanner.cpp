@@ -18,9 +18,9 @@
 #include <ADM_assert.h>
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_JSGlobal.h"
+
 #define YYSTYPE char * 
-
-
 
 extern "C" 
 {
@@ -56,6 +56,7 @@ typedef struct scriptVar
 
 static scriptVar myVars[ADM_MAX_VAR];
 uint32_t nbVar=0;
+
 //_____________________________________
 uint8_t parseScript(char *scriptname);
 //_____________________________________

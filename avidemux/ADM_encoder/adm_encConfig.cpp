@@ -784,7 +784,7 @@ int videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
 			}
 			if(equal==0xfff)
 			{
-				printf("\n i did not understood the args for video conf\n");
+				printf("\n I did not understand the args for video conf.\n");
 				return 0;
 			}
 			go = cs+equal+1;

@@ -24,6 +24,7 @@
 #include "fourcc.h"
 #include "avio.hxx"
 #include "ADM_editor/ADM_edit.hxx"
+#include "ADM_script/ADM_JSGlobal.h"
 #include "ADM_inpics/ADM_pics.h"
 #include "ADM_nuv/ADM_nuv.h"
 #include "ADM_h263/ADM_h263.h"
@@ -296,6 +297,12 @@ UNUSED_ARG(mode);
   		return loadWorbench(name);
         case Script_FileType:
                 return parseScript(name);
+	case ECMAScript_FileType:
+                printf("****** This is an ecmascript, run it with avidemux2 --run yourscript *******\n");
+                printf("****** This is an ecmascript, run it with avidemux2 --run yourscript *******\n");
+                printf("****** This is an ecmascript, run it with avidemux2 --run yourscript *******\n");
+                return 0;
+		
                 
     default:
       if (type == Unknown_FileType)

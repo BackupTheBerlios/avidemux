@@ -181,8 +181,14 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
     }
     if(fourCC::check(id,(uint8_t *)"#!AD"))
         {
-                printf (" \n ADM script file detected..\n");
+                printf (" \n ADM script file detected...\n");
                 *type=Script_FileType;
+                return 1;
+        }
+    if(fourCC::check(id,(uint8_t *)"//AD"))
+        {
+                printf (" \n ADM ECMAScript/Javascript file detected..\n");
+                *type=ECMAScript_FileType;
                 return 1;
         }
         if(fourCC::check(id,(uint8_t *)"ADMX"))

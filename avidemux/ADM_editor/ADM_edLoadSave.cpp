@@ -148,6 +148,7 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 ______________________________________________*/
 uint8_t ADM_Composer::saveAsScript (char *name)
 {
+const char *truefalse[]={"false","true"};
 printf("\n **Saving script project **\n");
   char *    tmp;
 
@@ -164,23 +165,25 @@ printf("\n **Saving script project **\n");
 
 // Save source and segment
 //______________________________________________
-  fprintf (fd, "#!ADM000\n");
-  fprintf (fd, "#--automatically built--\n");
-  fprintf (fd, "#--Project: %s\n\n",name);
+  fprintf( fd,"//AD  <- These first 4 characters need to be the first 4 characters to identify the ECMAScript file to Avidemux");
+  fprintf (fd, "//\n");
+  fprintf (fd, "//--automatically built--\n");
+  fprintf (fd, "//--Project: %s\n\n",name);
 
-  fprintf (fd,"\n#** Video **\n");
-  fprintf (fd,"# %02ld videos source \n", _nb_video);
+  fprintf (fd, "var app = new Avidemux();\n");
+  fprintf (fd,"\n//** Video **\n");
+  fprintf (fd,"// %02ld videos source \n", _nb_video);
   for (uint32_t i = 0; i < _nb_video; i++)
     {
         if(!i)
-                fprintf (fd, "load(\"%s\");\n", _videos[i]._aviheader->getMyName ());
+                fprintf (fd, "app.load(\"%s\");\n", _videos[i]._aviheader->getMyName ());
         else
-        fprintf (fd, "append(\"%s\");\n", _videos[i]._aviheader->getMyName ());
+        fprintf (fd, "app.append(\"%s\");\n", _videos[i]._aviheader->getMyName ());
     }
   
-  fprintf (fd,"#%02ld segments\n", _nb_segment);
-  fprintf (fd,"clearSegments();\n");
-
+  fprintf (fd,"//%02ld segments\n", _nb_segment);
+  fprintf (fd,"app.clearSegments();\n");
+  
  
 
 for (uint32_t i = 0; i < _nb_segment; i++)
@@ -189,27 +192,27 @@ for (uint32_t i = 0; i < _nb_segment; i++)
                 src=_segments[i]._reference;
                 start=_segments[i]._start_frame;
                 nb=_segments[i]._nb_frames;
-          fprintf (fd, "addSegment(%lu,%lu,%lu);\n",src,start,nb);
+          fprintf (fd, "app.addSegment(%lu,%lu,%lu);\n",src,start,nb);
     }
 // postproc
 //___________________________
 
         uint32_t pptype, ppstrength,ppswap;
                 video_body->getPostProc( &pptype, &ppstrength, &ppswap);
-                fprintf(fd,"\n#** Postproc **\n");
-                fprintf(fd,"setpostproc(%d,%d,%d);\n",pptype,ppstrength,ppswap);
+                fprintf(fd,"\n//** Postproc **\n");
+                fprintf(fd,"app.video.setPostProc(%d,%d,%d);\n",pptype,ppstrength,ppswap);
 
 
 // Filter
 //___________________________
-        fprintf(fd,"\n#** Filters **\n");
-        filterSaveScriptFD(fd);
+        fprintf(fd,"\n//** Filters **\n");
+        filterSaveScriptJS(fd);
 // Video codec
 //___________________________
 uint8_t  *extraData ;
 uint32_t extraDataSize;
 
-        fprintf(fd,"\n#** Video Codec conf **\n");
+        fprintf(fd,"\n//** Video Codec conf **\n");
         //videoCodecGetConf(&extraDataSize,&extraData);
         //if(extraDataSize())
         // Fixme
@@ -219,18 +222,18 @@ uint32_t extraDataSize;
         strcat(namevcodec,".vcodec");
         saveVideoCodecConf(namevcodec);
         delete [] namevcodec;
-        fprintf(fd,"videoCodec(%s,\"%s\",%s.vcodec);\n",videoCodecGetName(),videoCodecGetMode(),name);
+        fprintf(fd,"app.video.process=%s;\n",truefalse[videoProcessMode]);
+        fprintf(fd,"app.video.codec(\"%s\",\"%s\",\"%s.vcodec\");\n",videoCodecGetName(),videoCodecGetMode(),name);
 // Audio Source
 //______________________________________________
-
-        
 
 // Audio
 //______________________________________________
 
    uint32_t delay;
-   fprintf(fd,"\n#** Audio **\n");
-   fprintf(fd,"audioreset(1);\n",audioReset());
+   
+   fprintf(fd,"\n//** Audio **\n");
+   fprintf(fd,"app.audio.reset();\n");
 
    // External audio ?
         char *audioName;
@@ -238,18 +241,19 @@ uint32_t extraDataSize;
 
         source=getCurrentAudioSource(&audioName);
         if(!audioName) audioName="";
-        if(source!=AudioAvi)
-                fprintf(fd,"audiosource(%s,\"%s\");\n", audioSourceFromEnum(source),audioName); 
 
-   fprintf(fd,"audiocodec(%s,%d);\n", audioCodecGetName(),audioGetBitrate()); 
-   fprintf(fd,"audioprocess(%d);\n",audioProcessMode);
-   fprintf(fd,"audionormalize(%d);\n",audioGetNormalize());         
-   fprintf(fd,"audiodelay(%d);\n",audioGetDelay());
+        if(source!=AudioAvi)
+                fprintf(fd,"app.audio.load(%s,\"%s\");\n", audioSourceFromEnum(source),audioName); 
+
+   fprintf(fd,"app.audio.codec(\"%s\",%d);\n", audioCodecGetName(),audioGetBitrate()); 
+   fprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode]);
+   fprintf(fd,"app.audio.normalize=%s;\n",truefalse[audioGetNormalize()]);
+   fprintf(fd,"app.audio.delay=%d;\n",audioGetDelay());
    // Change mono2stereo ?
    switch(audioGetChannelConv())
         {
-                case CHANNELCONV_2to1:  fprintf(fd,"audiostereo2mono(1);\n");break;
-                case CHANNELCONV_1to2:  fprintf(fd,"audiomono2stereo(1);\n");break;
+                case CHANNELCONV_2to1:  fprintf(fd,"app.audio.mono2stereo=true;\n");break;
+                case CHANNELCONV_1to2:  fprintf(fd,"app.audio.stereo2mono=true;\n");break;
                 case CHANNELCONV_NONE: ;break;
                 default:ADM_assert(0);
         }     
@@ -257,20 +261,21 @@ uint32_t extraDataSize;
         switch(audioGetFpsConv())
         {
                 case FILMCONV_NONE:      ;break;
-                case FILMCONV_PAL2FILM:  fprintf(fd,"pal2film(1);\n");break;
-                case FILMCONV_FILM2PAL:  fprintf(fd,"film2pal(1);\n");break;
+                case FILMCONV_PAL2FILM:  fprintf(fd,"app.audio.pal2film=true;\n");break;
+                case FILMCONV_FILM2PAL:  fprintf(fd,"app.audio.film2pal=true;\n");break;
                 default:ADM_assert(0);
         }
    // Resampling
         switch(audioGetResampling())
         {
                 case RESAMPLING_NONE:         ;break;
-                case RESAMPLING_DOWNSAMPLING:  fprintf(fd,"audiodownsample(1);\n");break;
-                case RESAMPLING_CUSTOM:        fprintf(fd,"audioresample(%lu);\n",audioGetResample());break;
+                case RESAMPLING_DOWNSAMPLING:  fprintf(fd,"app.audio.downsample=true;\n");break;
+                case RESAMPLING_CUSTOM:        fprintf(fd,"app.audio.resample=%u;\n",audioGetResample());break;
                 default:ADM_assert(0);
         }
         
-  fprintf(fd,"\n#End of script\n");
+  fprintf(fd,"//app.Exit();\n");
+  fprintf(fd,"\n//End of script\n");
   // All done
   fclose (fd);
   

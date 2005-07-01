@@ -484,5 +484,36 @@ void filterSaveScriptFD(FILE *f)
 		
 		}
 		
-}		
+}	
+void filterSaveScriptJS(FILE *f)
+{
+                for(int i=1;i<nb_active_filter;i++)
+                {
+                        VF_FILTERS tag=videofilters[i].tag;
+                        fprintf(f,"app.video.addFilter(");
+                        for(unsigned int j=0;j<nb_video_filter;j++)
+                                {
+                                        if(tag==allfilters[j].tag)
+                                        {       
+                                                fprintf(f,"\"%s\"",allfilters[j].filtername);
+                                                break;  
+                                        }
+                                }
+                        // get args
+                        CONFcouple *couple;
+                        char *arg,*value;
+                        if(videofilters[i].filter->getCoupledConf( &couple))
+                        {
+                                for(int j=0;j<couple->getNumber();j++)
+                                {
+                                         couple->getEntry(j, &arg,&value);
+                                         fprintf(f,",\"%s=%s\"",arg,value);
+                                }
+                                delete couple;
+                        }
+                        fprintf(f,");\n");                      
+                
+                }
+                
+}               	
 // EOF

@@ -41,8 +41,8 @@ typedef enum
 {
 		Unknown_FileType=0,
 		AVI_FileType=1,
-    		Mpeg_FileType=2,
-		Nuppel_FileType=3    ,
+		Mpeg_FileType=2,
+		Nuppel_FileType=3,
 		BMP_FileType=4  ,
 		MpegIdx_FileType=5,
 		H263_FileType=6,
@@ -51,8 +51,9 @@ typedef enum
 		Ogg_FileType=9,
 		_3GPP_FileType=10,
 		VCodec_FileType=11,
-                Script_FileType=12,
-                NewMpeg_FileType=13,
+		Script_FileType=12,
+		NewMpeg_FileType=13,
+		ECMAScript_FileType=14,
 		DUMMY_FILETYPE=99
 }fileType;
 

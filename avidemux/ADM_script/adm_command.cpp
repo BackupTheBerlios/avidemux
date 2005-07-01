@@ -47,23 +47,8 @@ ASC_ERROR ADS_execCommand(char *cmd, int nb, Arg *arg,uint8_t fake);
 //_______________________
 #include "ADM_editor/ADM_outputfmt.h"
 #include "ADM_gui2/GUI_ui.h"
-typedef struct ADM_CONTAINER
-{
-    ADM_OUT_FORMAT type;
-    const char     *name;
-}ADM_CONTAINER;
-#define MK_CONT(x) {ADM_##x,#x}
+#include "ADM_script/ADM_container.h"
 
-const ADM_CONTAINER container[]=
-{
-  MK_CONT(AVI),
-  MK_CONT(OGM),
-  MK_CONT(ES),
-  MK_CONT(PS),
-  MK_CONT(AVI_DUAL),
-  MK_CONT(AVI_UNP),
-  MK_CONT(FMT_DUMMY)  
-};    
 extern int A_loadAC3 (char *name);
 extern int A_loadMP3 (char *name);
 extern int A_loadWave (char *name);
