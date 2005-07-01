@@ -218,7 +218,6 @@ if test "x$have_x264" = "xyes"; then
 	AC_DEFINE(USE_X264,1,[use x264 encoder])
 fi
 
-
 dnl __________________xvid 0.9 ______________
 AC_MSG_CHECKING(for xvid codec 0.9)
 AC_CHECK_HEADER(xvid.h,,have_xx_xvid=no)
@@ -659,6 +658,35 @@ int z=0
 
 AC_MSG_RESULT($use_cygwin)
 
+dnl __________________SPIDERMONKEY ______________
+have_sm=yes
+SMONKEY_CFLAGS=""
+AC_MSG_CHECKING(spidermonkey engine )
+ AC_ARG_WITH(jsapi-include,
+    [    --with-jsapi-include=PATH       path to jsapi.h],[],[])
+  if test "${with_jsapi_include}" != "no" -a -n "${with_jsapi_include}"
+  then
+    SMONKEY_CFLAGS="-I${with_jsapi_include}"
+    if test "x$use_cygwin" = "xyes"; then
+	SMONKEY_CFLAGS="$SMONKEY_CFLAGS -DXP_WIN"
+    else
+	SMONKEY_CFLAGS="$SMONKEY_CFLAGS -DXP_UNIX"
+    fi
+  fi
+ echo "using : $SMONKEY_CFLAGS : as extra flags"
+
+ old_flags=$CPPFLAGS
+
+CPPFLAGS="$CPPFLAGS $SMONKEY_CFLAGS"
+AC_CHECK_HEADER(jsapi.h,,have_sm=no)
+if test "x$have_sm" = "xyes"; then
+   AC_CHECK_LIB(js,JS_Init,,have_sm=no,-lm)
+fi
+if test "x$have_sm" = "xno"; then
+	AC_MSG_ERROR([*** SPIDERMONKEY javascript engine not found !***])
+fi
+CPPFLAGS=$old_flags
+dnl ________/SPIDERMONKEY__________
 
 
 
@@ -875,6 +903,7 @@ dnl ______________________________________________________
 
   AC_SUBST(FREETYPE_CFLAGS)
   AC_SUBST(FREETYPE_LIBS)
+  AC_SUBST(SMONKEY_CFLAGS)
 
 dnl **   mean   ***
 echo " GTK+ version        : $GTK_VERSION"
