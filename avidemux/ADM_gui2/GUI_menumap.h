@@ -71,3 +71,5 @@ CALLBACK(item1                                 ,ACT_AllBlackFrames);
 CALLBACK(first_frame1                          ,ACT_Begin);
 CALLBACK(last_frame1                           ,ACT_End);
 CALLBACK(filters1                              ,ACT_VideoParameter);
+CALLBACK(toolbar1                              ,ACT_ViewMain);
+CALLBACK(sidebar1                              ,ACT_ViewSide);

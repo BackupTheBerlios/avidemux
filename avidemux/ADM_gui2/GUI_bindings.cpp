@@ -810,5 +810,23 @@ void DNDDataReceived( GtkWidget *widget, GdkDragContext *dc,
     }
     gtk_drag_finish(dc,TRUE,FALSE,t);
 }
+void UI_toogleSide(void)
+{
+static int show=1;
+        show=show^1;
+        if(!show)
+                gtk_widget_hide(GTK_WIDGET(lookup_widget(guiRootWindow,"toolbar2")) );
+        else
+                gtk_widget_show(GTK_WIDGET(lookup_widget(guiRootWindow,"toolbar2")) );
+}
+void UI_toogleMain(void)
+{
+static int show=1;
+        show=show^1;
+        if(!show)
+                gtk_widget_hide(GTK_WIDGET(lookup_widget(guiRootWindow,"vbox9")));
+        else
+                gtk_widget_show(GTK_WIDGET(lookup_widget(guiRootWindow,"vbox9")));
+}
 
 // EOF

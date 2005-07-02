@@ -35,5 +35,8 @@ void UI_setVideoCodec( int i);
 
 ADM_OUT_FORMAT 	UI_GetCurrentFormat( void );
 uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt );
+
+void UI_toogleSide(void);
+void UI_toogleMain(void);
 #endif
 // EOF

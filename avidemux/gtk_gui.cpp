@@ -199,6 +199,8 @@ void HandleAction (Action action)
 int nw;
   switch (action)
     {
+        case ACT_ViewMain: UI_toogleMain();return;
+        case ACT_ViewSide: UI_toogleSide();return;
       case ACT_Ocr:
                 ADM_ocr_engine( );
                 return;
