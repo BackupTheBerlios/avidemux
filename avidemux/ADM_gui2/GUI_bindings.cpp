@@ -76,6 +76,10 @@ extern void A_openAvi (char *name);
 extern void A_appendAvi (char *name);
 
 
+static void on_audio_change(void);
+static void on_video_change(void);
+static int update_ui=0;
+
 #define AUDIO_WIDGET "comboboxAudio"
 #define VIDEO_WIDGET "comboboxVideo"
 #define FORMAT_WIDGET "comboboxFormat"
@@ -172,19 +176,15 @@ buttonCallBack_S buttonCallback[]=
 
 	{"toggletoolbuttonPreview"	,"toggled"		,ACT_PreviewToggle},
 	{"toggletoolbuttonOutput"      ,"toggled"		,ACT_OuputToggle},
-	
-	
-		
-//	{"togglebuttonVideo"		,"toggled"		,ACT_VideoModeToggle},
-//      {"togglebuttonAudio"            ,"toggled"              ,ACT_AudioModeToggle},
+
 //      {"buttonRecent"                 ,"clicked"              ,ACT_RecentFiles},
 	{"boxCurFrame"			,"editing_done"		,ACT_JumpToFrame},
 	{"boxCurFrame"			,"activate"		,ACT_JumpToFrame},
 	{"boxCurTime"			,"editing_done"		,ACT_TimeChanged},
-
+#if 0
 	{VIDEO_WIDGET		,"changed"		,ACT_VideoCodecChanged},
 	{AUDIO_WIDGET			,"changed"		,ACT_AudioCodecChanged}
-
+#endif
 
 };
 
@@ -327,7 +327,7 @@ uint8_t  bindGUI( void )
 
                 nbVid=encoderGetNbEncoder();
                 combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,VIDEO_WIDGET));
-                gtk_combo_box_remove_text(combo_box,-1);
+                gtk_combo_box_remove_text(combo_box,0);
                 printf("Found %d video encoder\n",nbVid);
                 for(uint32_t i=0;i<nbVid;i++)
                 {
@@ -341,7 +341,7 @@ uint8_t  bindGUI( void )
 
                 nbAud=audioFilterGetNbEncoder();
                 combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,AUDIO_WIDGET));
-
+                gtk_combo_box_remove_text(combo_box,0);
                 printf("Found %d audio encoder\n",nbAud);		       
                 for(uint32_t i=0;i<nbAud;i++)
                 {
@@ -353,6 +353,13 @@ uint8_t  bindGUI( void )
         gtk_combo_box_set_active(combo_box,0);
 
     //
+        gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,VIDEO_WIDGET)), "changed",
+                       GTK_SIGNAL_FUNC(on_video_change),
+                       NULL);
+        gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,AUDIO_WIDGET)), "changed",
+                       GTK_SIGNAL_FUNC(on_audio_change),
+                       NULL);
+        
     //
     //CYB 2005.02.22: DND (START)
     // Set up avidemux as an available drag'n'drop target.
@@ -671,6 +678,34 @@ void UI_BusyCursor( void )
 
 	
 }
+void on_video_change(void)
+{
+int enable;
+        if(update_ui) return;
+
+        if(!UI_getCurrentVCodec()) // copy ?
+        {
+                enable=0;
+        }
+        else enable=1;
+        gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonConfV"),enable);        
+        gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonFilters"),enable);        
+        HandleAction(ACT_VideoCodecChanged);
+}
+void on_audio_change(void)
+{
+int enable;
+       if(update_ui) return;
+        if(!UI_getCurrentACodec()) // copy ?
+        {
+                enable=0;
+        }
+        else enable=1;
+        gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonConfA"),enable);        
+        //gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonAudioFilter"),enable);        
+        HandleAction(ACT_AudioCodecChanged);
+
+}
  int 	UI_getCurrentACodec(void)
  {
         //return getRangeInMenu(lookup_widget(guiRootWindow,AUDIO_WIDGET));
@@ -684,15 +719,20 @@ void UI_BusyCursor( void )
         return gtk_combo_box_get_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,VIDEO_WIDGET)));
  
  }
+
 void UI_setAudioCodec( int i)
 {
         //gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,AUDIO_WIDGET)), i);
+        update_ui=1;
         gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,AUDIO_WIDGET)),i);
+        update_ui=0;
 }
 void UI_setVideoCodec( int i)
 {
         //gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,VIDEO_WIDGET)), i);
+        update_ui=1;
         gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,VIDEO_WIDGET)),i);
+        update_ui=0;
 
 }
 
