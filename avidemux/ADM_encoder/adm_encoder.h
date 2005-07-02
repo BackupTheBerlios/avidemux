@@ -102,6 +102,7 @@ Encoder *getVideoEncoder( uint32_t w,uint32_t h );
 
 typedef enum
 {
+        CodecCopy,
 	CodecDivx	,
 	CodecXvid	,
 	CodecFF,

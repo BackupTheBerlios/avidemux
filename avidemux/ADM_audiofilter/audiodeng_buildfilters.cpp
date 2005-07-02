@@ -67,6 +67,7 @@ typedef struct {
 
 static const CODECLIST myCodecList[]=
 {
+                {"copy","Copy", AUDIOENC_COPY},
 #ifdef HAVE_LIBMP3LAME
 		{"lame","Lame", AUDIOENC_MP3},
 #endif

@@ -57,8 +57,9 @@ CALLBACK(to_other1 				,ACT_Pipe2Other);
 
  CALLBACK( search_previous_black_frame1  	,ACT_PrevBlackFrame);
  CALLBACK( search_next_black_frame1		,ACT_NextBlackFrame);
+#if 0
  CALLBACK( scan_for_black_frames1               ,ACT_AllBlackFrames);
-
+#endif
  
 CALLBACK(reset_edits1                		,ACT_ResetSegments);
 

@@ -542,9 +542,9 @@ if test "x$have_xv" = "xyes"; then
 ])
 fi
 
-
+LDFLAGS="$LDFLAGS -L/usr/X11R6/lib";
 if test "x$have_xv" = "xyes"; then
-AC_CHECK_LIB(Xv,XvShmPutImage,,have_xv=no,-L/usr/X11R6/lib -lXext -lX11 -lm)
+AC_CHECK_LIB(Xv,XvShmPutImage,,have_xv=no, -lXext -lX11 -lm)
 fi
 if test "x$have_xv" = "xyes"; then
 	AC_DEFINE(USE_XV,1,[Try to use Xv extension])
@@ -681,6 +681,9 @@ CPPFLAGS="$CPPFLAGS $SMONKEY_CFLAGS"
 AC_CHECK_HEADER(jsapi.h,,have_sm=no)
 if test "x$have_sm" = "xyes"; then
    AC_CHECK_LIB(js,JS_Init,,have_sm=no,-lm)
+   if test "x$have_sm" = "xno"; then
+     AC_CHECK_LIB(smjs,JS_Init,,have_sm=no,-lm)
+   fi
 fi
 if test "x$have_sm" = "xno"; then
 	AC_MSG_ERROR([*** SPIDERMONKEY javascript engine not found !***])

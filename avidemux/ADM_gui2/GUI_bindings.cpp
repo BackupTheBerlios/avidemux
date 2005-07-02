@@ -76,7 +76,9 @@ extern void A_openAvi (char *name);
 extern void A_appendAvi (char *name);
 
 
-
+#define AUDIO_WIDGET "comboboxAudio"
+#define VIDEO_WIDGET "comboboxVideo"
+#define FORMAT_WIDGET "comboboxFormat"
 //
 enum 
 {
@@ -153,33 +155,36 @@ buttonCallBack_S buttonCallback[]=
 	{"buttonMarkB"			,"clicked"		,ACT_MarkB},
 	{"buttonBegin"			,"clicked"		,ACT_Begin},
 	{"buttonEnd"			,"clicked"		,ACT_End},
-	{"buttonOpen"			,"clicked"		,ACT_OpenAvi},
-	{"buttonInfo"			,"clicked"		,ACT_AviInfo},
-	{"buttonSaveAvi"		,"clicked"		,ACT_SaveAvi},
+	{"menutoolbuttonOpen"		,"clicked"		,ACT_OpenAvi},
+	{"toolbuttonInfo"			,"clicked"		,ACT_AviInfo},
+	{"toolbuttonSave"		,"clicked"		,ACT_SaveAvi},
+
 	{"buttonFilters"		,"clicked"		,ACT_VideoParameter},
 	{"buttonAudioFilter"		,"clicked"		,ACT_AudioFilters},
 	{"buttonConfV"			,"clicked"		,ACT_VideoCodec},
 	{"buttonConfA"			,"clicked"		,ACT_AudioCodec},
-	{"buttonRecent"			,"clicked"		,ACT_RecentFiles},
+
 	{"buttonPrevBlack"		,"clicked"		,ACT_PrevBlackFrame},
 	{"buttonNextBlack"		,"clicked"		,ACT_NextBlackFrame},
 	{"buttonGotoA"			,"clicked"		,ACT_GotoMarkA},
 	{"buttonGotoB"			,"clicked"		,ACT_GotoMarkB},	
-	{"buttonBitrate"		,"clicked"		,ACT_Bitrate},	
+	{"toolbuttonCalc"		,"clicked"		,ACT_Bitrate},	
 
-	{"togglebuttonPreview"		,"toggled"		,ACT_PreviewToggle},
-	{"toggleOutput"			,"toggled"		,ACT_OuputToggle},
+	{"toggletoolbuttonPreview"	,"toggled"		,ACT_PreviewToggle},
+	{"toggletoolbuttonOutput"      ,"toggled"		,ACT_OuputToggle},
 	
 	
 		
-	{"togglebuttonVideo"		,"toggled"		,ACT_VideoModeToggle},
+//	{"togglebuttonVideo"		,"toggled"		,ACT_VideoModeToggle},
+//      {"togglebuttonAudio"            ,"toggled"              ,ACT_AudioModeToggle},
+//      {"buttonRecent"                 ,"clicked"              ,ACT_RecentFiles},
 	{"boxCurFrame"			,"editing_done"		,ACT_JumpToFrame},
 	{"boxCurFrame"			,"activate"		,ACT_JumpToFrame},
 	{"boxCurTime"			,"editing_done"		,ACT_TimeChanged},
-	{"togglebuttonAudio"		,"toggled"		,ACT_AudioModeToggle},
-	{"optionVCodec"			,"changed"		,ACT_VideoCodecChanged},
-	{"optionACodec"			,"changed"		,ACT_AudioCodecChanged}
-	
+
+	{VIDEO_WIDGET		,"changed"		,ACT_VideoCodecChanged},
+	{AUDIO_WIDGET			,"changed"		,ACT_AudioCodecChanged}
+
 
 };
 
@@ -231,11 +236,13 @@ uint8_t  bindGUI( void )
 	
 	ADM_LOOKUP(guiCurTime,boxCurTime);
 	ADM_LOOKUP(guiTotalTime,labelTotalTime);
-	
+#if 0	
 	ADM_LOOKUP(guiPreviewToggle,togglebuttonPreview);
 	ADM_LOOKUP(guiOutputToggle,toggleOutput);
+
 	ADM_LOOKUP(guiAudioToggle,togglebuttonAudio);
 	ADM_LOOKUP(guiVideoToggle,togglebuttonVideo);
+#endif
 #undef ADM_LOOKUP
   // bind menu
  #define CALLBACK(x,y) gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,#x)), "activate", \
@@ -316,36 +323,35 @@ uint8_t  bindGUI( void )
 	// Finally add video codec...
 	uint32_t nbVid;
 	const char *name;
-	GtkWidget *menuv;
-		 menuv = gtk_menu_new ();
-		nbVid=encoderGetNbEncoder();
-		GtkWidget *vidWidget[nbVid];
-		printf("Found %d video encoder\n",nbVid);		       
-		for(uint32_t i=0;i<nbVid;i++)
-		{
-			name=encoderGetIndexedName(i);
-			vidWidget[i]=gtk_menu_item_new_with_mnemonic(name);
-  			gtk_widget_show (vidWidget[i]);
-  			gtk_container_add (GTK_CONTAINER (menuv), vidWidget[i]);
-		}
-	 gtk_option_menu_set_menu (GTK_OPTION_MENU (lookup_widget(guiRootWindow,"optionVCodec")), menuv);
-	// And A codec
-	// Finally add video codec...
-	uint32_t nbAud;
-	
-	GtkWidget *menua;
-		 menua = gtk_menu_new ();
-		nbAud=audioFilterGetNbEncoder();
-		GtkWidget *audWidget[nbAud];
-		printf("Found %d audio encoder\n",nbAud);		       
-		for(uint32_t i=0;i<nbAud;i++)
-		{
-			name=audioFilterGetIndexedName(i);
-			audWidget[i]=gtk_menu_item_new_with_mnemonic(name);
-  			gtk_widget_show (audWidget[i]);
-  			gtk_container_add (GTK_CONTAINER (menua), audWidget[i]);
-		}
-	 gtk_option_menu_set_menu (GTK_OPTION_MENU (lookup_widget(guiRootWindow,"optionACodec")), menua);
+        GtkComboBox     *combo_box;
+
+                nbVid=encoderGetNbEncoder();
+                combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,VIDEO_WIDGET));
+                gtk_combo_box_remove_text(combo_box,-1);
+                printf("Found %d video encoder\n",nbVid);
+                for(uint32_t i=0;i<nbVid;i++)
+                {
+                        name=encoderGetIndexedName(i);
+                        gtk_combo_box_append_text      (combo_box,name);
+                }
+
+        // And A codec
+        // Finally add video codec...
+        uint32_t nbAud;
+
+                nbAud=audioFilterGetNbEncoder();
+                combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,AUDIO_WIDGET));
+
+                printf("Found %d audio encoder\n",nbAud);		       
+                for(uint32_t i=0;i<nbAud;i++)
+                {
+                        name=audioFilterGetIndexedName(i);
+                        gtk_combo_box_append_text      (combo_box,name);	
+                }
+                 gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET)),0);
+        // Format
+        gtk_combo_box_set_active(combo_box,0);
+
     //
     //
     //CYB 2005.02.22: DND (START)
@@ -667,23 +673,26 @@ void UI_BusyCursor( void )
 }
  int 	UI_getCurrentACodec(void)
  {
- 	return getRangeInMenu(lookup_widget(guiRootWindow,"optionACodec"));
+        //return getRangeInMenu(lookup_widget(guiRootWindow,AUDIO_WIDGET));
+        return gtk_combo_box_get_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,AUDIO_WIDGET)));
  
  }
  int 	UI_getCurrentVCodec(void)
  {
  
- 	return getRangeInMenu(lookup_widget(guiRootWindow,"optionVCodec"));
+ 	//return getRangeInMenu(lookup_widget(guiRootWindow,VIDEO_WIDGET));
+        return gtk_combo_box_get_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,VIDEO_WIDGET)));
  
  }
 void UI_setAudioCodec( int i)
 {
-	gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,"optionACodec")), i);
-
+        //gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,AUDIO_WIDGET)), i);
+        gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,AUDIO_WIDGET)),i);
 }
 void UI_setVideoCodec( int i)
 {
-	gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,"optionVCodec")), i);
+        //gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,VIDEO_WIDGET)), i);
+        gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,VIDEO_WIDGET)),i);
 
 }
 
@@ -703,12 +712,12 @@ void UI_PrintCurrentVCodec(const char *str)
 ADM_OUT_FORMAT UI_GetCurrentFormat( void )
 {
 
-	return (ADM_OUT_FORMAT) getRangeInMenu(lookup_widget(guiRootWindow,"optionmenu1"));
+	return (ADM_OUT_FORMAT)gtk_combo_box_get_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET)));
 }
 uint8_t UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
 {
 
-	gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,"optionmenu1")), fmt);
+	 gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET)),fmt);
 	return 1;
 }
 // DND CYB

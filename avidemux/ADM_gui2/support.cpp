@@ -66,8 +66,9 @@ GdkPixbuf	*create_pixbuf                  (const gchar     *filename)
 	}
 	if(found==-1)
 	{
-		printf("\n Mmmm problem with pixmap button. Did you change the code ?\n");
-		ADM_assert(0);
+		printf("\n Mmmm problem with pixmap button. Did you change the code ?(%s)\n",filename);
+		//ADM_assert(0);
+                return NULL;
 	
 	}
 

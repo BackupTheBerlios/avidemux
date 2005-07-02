@@ -5,6 +5,43 @@
 				Read returns 0
 				getPacket returns 0
 *********************** /TODO **************************
+        25 June
+                Multiple audio track for OGM + cleanup of the mess
+        20 June
+                Added audio track selection
+        19 June
+                Low level/mid level ok for audio switching
+        18 June
+                Began adding support for on the fly audio track switch
+        12 June  Fixed some got_pict=0 issue 
+                 TS: Fixed AC3 demuxing, mostly ok
+        09 June  Fixed "-" in script, began mpeg TS
+        08 June  Fixed faad2/x264. Added threshold to miniocr + enabled skipall button.
+        07 June  Fixed demuxer for private stream2 / multiple file input
+        06 June  Fixed Xv redraw issue
+
+                dedicated ui for indexing progress
+        01      Prober + new ui + commit the whole thing
+        31      ES Ok, PS ok, demuxer + stats, audio + multiple audio tracks (only one picked)
+        26      Basic audio ok
+        25      finished ES, began PS, simplisitc PS done
+--------------2.0.40--------------------------
+        24      ES demuxer & indexer
+        23/05
+                - began working on new mpeg demuxer
+        22/05
+                - save pp in project
+                - global pp default
+                - re-enabled swap uv in pp
+                - external source for audio scriptable
+        20/05
+                - fixed the "," issue in prefs_gen.pl
+                - fixed some ocr issue
+                - moved to pristine mplayer swscale
+        19/05
+                - fixed resize_mmx2 by disabling it
+        18/05
+                - moving project save/load to script
 --------------------2.0.38 final : 1030-----
         14/05   
                 - changed max for eq2 to 3 (from 10)

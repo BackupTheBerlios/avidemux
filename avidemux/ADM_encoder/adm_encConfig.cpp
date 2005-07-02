@@ -901,6 +901,7 @@ typedef struct codecEnumByName
 
 static const codecEnumByName mycodec[]=
 {
+        {CodecCopy      ,"Copy","Copy"},
 #ifdef USE_DIVX
 	{CodecDivx	,"Divx","Divx"},
 #endif

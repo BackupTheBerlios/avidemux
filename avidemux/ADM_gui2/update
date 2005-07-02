@@ -1,2 +1,2 @@
-cp ~/oldi/avidemux2/trunk/glade/src/interface.c ./GUI_main2.cpp
+cp /home/fx/Projects/nicer/main-nicer/src/interface.c ./GUI_main2.cpp
 bash patch.bash

@@ -122,11 +122,17 @@
 /* Define to 1 if you have the `faad' library (-lfaad). */
 #undef HAVE_LIBFAAD
 
+/* Define to 1 if you have the `js' library (-ljs). */
+#undef HAVE_LIBJS
+
 /* Define to 1 if you have the `mad' library (-lmad). */
 #undef HAVE_LIBMAD
 
 /* Define to 1 if you have the `mp3lame' library (-lmp3lame). */
 #undef HAVE_LIBMP3LAME
+
+/* Define to 1 if you have the `smjs' library (-lsmjs). */
+#undef HAVE_LIBSMJS
 
 /* Define to 1 if you have the `vorbis' library (-lvorbis). */
 #undef HAVE_LIBVORBIS
@@ -202,6 +208,9 @@
 
 /* "sse on cywin" */
 #undef MEMALIGN_HACK
+
+/* "Use gentoo way for faad2.h" */
+#undef OLD_FAAD_PROTO
 
 /* OSS detected */
 #undef OSS_SUPPORT
