@@ -196,7 +196,7 @@ void HandleAction (Action action)
   // handle out of band actions
   // independant load not loaded
 //------------------------------------------------
-
+int nw;
   switch (action)
     {
       case ACT_Ocr:
@@ -209,11 +209,16 @@ void HandleAction (Action action)
     		videoCodecSelect();
 		return;
     case ACT_VideoCodecChanged:
-    		
-    		videoCodecChanged(UI_getCurrentVCodec());
+    		nw=UI_getCurrentVCodec();
+                if(!nw) videoProcessMode=0;
+                        else videoProcessMode=1;
+    		videoCodecChanged(nw);
 		return;
    case ACT_AudioCodecChanged:
-   		audioCodecChanged(UI_getCurrentACodec());
+                nw=UI_getCurrentACodec();
+                if(!nw) audioProcessMode=0;
+                        else audioProcessMode=1;
+   		audioCodecChanged(nw);
     		
 		return;
     
