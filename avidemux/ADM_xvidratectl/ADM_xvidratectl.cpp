@@ -50,6 +50,7 @@
 #include <math.h>
 #include <limits.h>
 #include "ADM_library/default.h"
+#include "ADM_toolkit/ADM_quota.h"
 #include "ADM_assert.h"
 #include "ADM_xvidr_internal.h"
 #include "ADM_toolkit/ADM_debugID.h"
@@ -2148,7 +2149,7 @@ iscomment(char *string)
     rc->stat_file = NULL;
 
 	/* Open the 1st pass file */
-	if((rc->stat_file = fopen(param->filename, "w+b")) == NULL)
+	if((rc->stat_file = qfopen(param->filename, "w+b")) == NULL)
 		return(XVID_ERR_FAIL);
 
 	/* I swear xvidcore isn't buggy, but when using mencoder+xvid4 i observe
@@ -2181,11 +2182,11 @@ iscomment(char *string)
 	/*
 	 * The File Header
 	 */
-	fprintf(rc->stat_file, "# XviD 2pass stat file (core version %d.%d.%d)\n",
+	qfprintf(rc->stat_file, "# XviD 2pass stat file (core version %d.%d.%d)\n",
 			XVID_VERSION_MAJOR(XVID_VERSION),
 			XVID_VERSION_MINOR(XVID_VERSION),
 			XVID_VERSION_PATCH(XVID_VERSION));
-	fprintf(rc->stat_file, "# Please do not modify this file\n\n");
+	qfprintf(rc->stat_file, "# Please do not modify this file\n\n");
 
     rc->fq_error = 0;
 
@@ -2197,7 +2198,7 @@ iscomment(char *string)
  int rc_2pass1_destroy(rc_2pass1_t * rc, xvid_plg_destroy_t * destroy)
 {
 	if (rc->stat_file) {
-		if (fclose(rc->stat_file) == EOF) {
+		if (qfclose(rc->stat_file) == EOF) {
 			DPRINTF(XVID_DEBUG_RC, "Error closing stats file (%s)", strerror(errno));
 		}
 	}
@@ -2288,7 +2289,7 @@ iscomment(char *string)
 
 	/* write the resulting statistics */
 
-	fprintf(rc->stat_file, "%c %d %d %d %d %d %d\n",
+	qfprintf(rc->stat_file, "%c %d %d %d %d %d %d\n",
 			type,
 			stats->quant,
 			stats->kblks,

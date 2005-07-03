@@ -29,6 +29,7 @@
 #include <math.h>
 
 #include "ADM_library/default.h"
+#include "ADM_toolkit/ADM_quota.h"
 #include <ADM_assert.h>
 
 #include "avifmt.h"
@@ -196,7 +197,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 	
 	// ok now we have it.
 	demuxer->open(realname);
-	out=fopen(file,"wt");
+	out=qfopen(file,"wt");
 	if(!out)
 	{
 			printf("\n Error : cannot open index !");
@@ -204,21 +205,21 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 			delete [] realname;
 			return 0;
 	}
-	fprintf(out,"IDXM ");
+	qfprintf(out,"IDXM ");
 	switch(token)
 	{
-		case 0xb3: fprintf(out,"E XX\n");break;
-		case 0x47: fprintf(out,"T XX\n");break;
-		case 0xba: fprintf(out,"P XX\n");break;
+		case 0xb3: qfprintf(out,"E XX\n");break;
+		case 0x47: qfprintf(out,"T XX\n");break;
+		case 0xba: qfprintf(out,"P XX\n");break;
 		default:
 			printf("Unknown token / mpeg type\n");
 			return 0;
 	}
 	
 	
-	fprintf(out,"000000000000\n");
-	fprintf(out,"1\n");
-	fprintf(out,"%s\n",realname);
+	qfprintf(out,"000000000000\n");
+	qfprintf(out,"1\n");
+	qfprintf(out,"%s\n",realname);
 
 	DIA_working 	*work;
 	uint32_t	gop_forward=0;
@@ -293,7 +294,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 					      	fps= FPS[val & 0xf];
 						demuxer->forward(4);
 						printf("\n %ld x %ld at %ld fps\n",w,h,fps);
-						fprintf(out,"%ld %ld %ld\n",w,h,fps);
+						qfprintf(out,"%ld %ld %ld\n",w,h,fps);
 
 						break;
 					case 0xb8: // GOP
@@ -376,7 +377,7 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 								else
 									image_length=pos-4-lastPic;
 								
-								fprintf(out," %llu\n",image_length);
+								qfprintf(out," %llu\n",image_length);
 							}
 							
 							// Now set image type and start
@@ -391,17 +392,17 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 								image_absStart=lastAbsGop-4;
 							}
 #ifndef CYG_MANGLING							
-							fprintf(out,"%c %010llX",
+							qfprintf(out,"%c %010llX",
 #else
-							fprintf(out,"%c %010I64X",
+							qfprintf(out,"%c %010I64X",
 #endif							
 								Type[ftype],image_start);
 							if(ftype==1) // I frame
 							{
 #ifndef CYG_MANGLING								
-								fprintf(out," %010llX %10lx",
+								qfprintf(out," %010llX %10lx",
 #else
-								fprintf(out," %I64X %10lx",
+								qfprintf(out," %I64X %10lx",
 #endif								
 								image_absStart,demuxer->getOtherSize()); 	
 							}
@@ -423,26 +424,26 @@ uint8_t indexMpeg(char *mpeg,char *file,uint8_t audioid)
 		}
 stop_found:
 //	 	fprintf(out," %d\n\n",demuxer->getSize()-lastPic-4);
-	 	fprintf(out," 0 \n\n");
+	 	qfprintf(out," 0 \n\n");
 		printf("\n end of stream...\n");
 		// update # of frames
 		fseek(out,0,SEEK_SET);
 		printf("Progressive :%lu, interlaced :%lu unknown :%lu\n",
 		    pic_progressive,pic_interlaced,pic_unknown);
-		fprintf(out,"IDXM ");
+		qfprintf(out,"IDXM ");
 		
 		switch(token)
 		{
-			case 0xb3: fprintf(out,"E %02x\n",audiostreamid);;break;
-			case 0x47: fprintf(out,"T %02x\n",audiostreamid);break;
-			case 0xba: fprintf(out,"P %02x\n",audiostreamid);;break;
+			case 0xb3: qfprintf(out,"E %02x\n",audiostreamid);;break;
+			case 0x47: qfprintf(out,"T %02x\n",audiostreamid);break;
+			case 0xba: qfprintf(out,"P %02x\n",audiostreamid);;break;
 			default:
 				printf("Unknown token / mpeg type\n");
 				return 0;
 		}
-		fprintf(out,"%012lX\n",nb_iframe);
+		qfprintf(out,"%012lX\n",nb_iframe);
 
-		fclose(out);
+		qfclose(out);
 		delete work;
 	  printf("\n Total : %lu frames\n",total_frame);
 	  if(demuxer->getPTSDelta()!=0)

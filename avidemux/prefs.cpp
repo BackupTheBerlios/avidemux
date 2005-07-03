@@ -7,6 +7,7 @@
 
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_toolkit/ADM_quota.h"
 
 #include "config.h"
 
@@ -398,8 +399,7 @@ int preferences::save_xml_to_file(){
            return RC_FAILED;
         }
 	xmlSetDocCompressMode(xdoc,9);
-	if( xmlSaveFormatFile(rcfilenew,xdoc,1) == -1 ){
-           fprintf(stderr,"\ncan't save xml tree to file. Filesystem full?\n\n");
+	if( qxmlSaveFormatFile(rcfilenew,xdoc,1) == -1 ){
 	   return RC_FAILED;
 	}
 	snprintf(rcfile,1024,"%s/.avidemuxrc",home);

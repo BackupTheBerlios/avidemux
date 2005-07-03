@@ -31,6 +31,7 @@
 #endif
 
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_toolkit/ADM_quota.h"
 #include <ADM_assert.h>
 
 #include "ADM_editor/ADM_edit.hxx"
@@ -130,11 +131,7 @@ int max;
 		}
 
 		xmlSetDocCompressMode(xdoc,0);  // we want pure text
-		if( xmlSaveFormatFile(docname,xdoc,1) == -1 )
-		{
-			GUI_Alert("Error writing XML file");
-			return ;
-		}
+		qxmlSaveFormatFile(docname,xdoc,1);
 		xmlFreeDoc(xdoc);
 	return ;
 }

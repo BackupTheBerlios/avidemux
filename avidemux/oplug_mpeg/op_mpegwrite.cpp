@@ -36,6 +36,7 @@
 
 #include "ADM_lavcodec.h"
 #include "fourcc.h"
+#include "ADM_toolkit/ADM_quota.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
@@ -339,12 +340,8 @@ DIA_encoding		*encoding;
 	printf("Br:%d, qz:%d\n",bitrate,qz);
 	if(!_audio)
 	{
-		fd=fopen(name,"wb");
-		if(!fd)
-		{
-			GUI_Alert("Problem opening file!");
+		if(!(fd=qfopen(name,"wb")))
 			return 0;			
-		}
 	}
 	else
 	{
@@ -449,7 +446,7 @@ DIA_encoding		*encoding;
 						delete encoding;
                					GUI_Alert("Encoding error !");
 						if(fd)
-							fclose(fd);
+							qfclose(fd);
 						end();
 						return 0 ;
 				}
@@ -469,7 +466,7 @@ DIA_encoding		*encoding;
 						
 				}else
 				{
-					fwrite(_buffer_out,len,1,fd);
+					qfwrite(_buffer_out,len,1,fd);
 					fflush(fd);
 				}
 									
@@ -480,7 +477,7 @@ DIA_encoding		*encoding;
 						delete encoding;
 						end();
 						if(fd)
-						  fclose(fd);
+						  qfclose(fd);
 						 return 0;
 					}
 			}
@@ -491,7 +488,7 @@ DIA_encoding		*encoding;
 				total_size+=len;
 				encoding->feedFrame(len);
 				if(!_muxer)
-					fwrite(_buffer_out,len,1,fd);
+					qfwrite(_buffer_out,len,1,fd);
 				else
 				{
 					_muxer->writeVideoPacket(len,_buffer_out,
@@ -506,7 +503,7 @@ DIA_encoding		*encoding;
 			delete encoding;
 			
 			if(!_muxer)
-				fclose(fd);
+				qfclose(fd);
 			else
 			{
 				_muxer->close();
@@ -744,7 +741,7 @@ int intra,q;
 	return 1;
 }
 /*--------------------------------------------------------------------*/
-uint32_t		quantstat[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint32_t quantstat[32]; /* 0-31 ; 0 and 1 are unused */
 void print_quant_stat(const char *n){
   char *str = (char*)ADM_alloc( strlen(n) + 4 );
   unsigned int i=2,sum=0,total=0;
@@ -752,14 +749,14 @@ void print_quant_stat(const char *n){
    ADM_assert( str );
    strcpy(str,n);
    strcat(str,".qs");
-   if( (fd=fopen(str,"wb")) ){
+   if( (fd=qfopen(str,"wb")) ){
       for(;i<32;i++){
-         fprintf(fd,"Quant % 2u: % 7u times\n",i,quantstat[i]);
+         qfprintf(fd,"Quant % 2u: % 7u times\n",i,quantstat[i]);
          sum+=i*quantstat[i];
          total+=quantstat[i];
       }
-      fprintf(fd,"\nQuant over all: %2.2f\n",(float)sum/(float)total);
-      fclose(fd);
+      qfprintf(fd,"\nQuant over all: %2.2f\n",(float)sum/(float)total);
+      qfclose(fd);
    }
    ADM_dealloc( str );
 }
@@ -776,16 +773,13 @@ FILE			*fd=NULL;
 uint64_t		total_size=0;
 uint32_t		len,flags,type,outquant,audiolen;
 
+	memset(quantstat,0,32);
+
    	incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
 	if(!_audio)
 	{
-		fd=fopen(name,"wb");
-		if(!fd)
-		{
-			GUI_Alert("Problem opening file!");
+		if( !(fd=qfopen(name,"wb")) )
 			return 0;
-
-		}
 	}
 
 //	if(!init(name,mpegtype,interlaced,widescreen))
@@ -854,7 +848,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 		{
                		GUI_Alert("Encoding error !");
 			if(!_audio)
-				fclose(fd);
+				qfclose(fd);
 			end();
 			return 0 ;
 		}
@@ -897,7 +891,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 	
 		if(!_muxer)
 			{			
-				fwrite(_buffer_out,len,1,fd);
+				qfwrite(_buffer_out,len,1,fd);
 				fflush(fd);
 			}
 		else
@@ -915,7 +909,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 		{
 			 print_quant_stat(name);
 			 end();
-			 fclose(fd);
+			 qfclose(fd);
 			 return 0;
 		}
 	}
@@ -946,7 +940,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 		total_size+=len;
 		if(!_muxer)
 		{		
-			fwrite(_buffer_out,len,1,fd);
+			qfwrite(_buffer_out,len,1,fd);
 			fflush(fd);
 		}
 		else
@@ -964,7 +958,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 	}
 //--			
 	if(!_muxer)	
-		fclose(fd);
+		qfclose(fd);
 	else
 	{
 		_muxer->close();

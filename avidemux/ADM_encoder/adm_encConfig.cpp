@@ -33,6 +33,7 @@
 #endif
 
 #include "fourcc.h"
+#include "ADM_toolkit/ADM_quota.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
@@ -1471,33 +1472,29 @@ uint8_t *extra=NULL;
 uint8_t saveVideoCodecConf( char *name)
 {
 FILE *fd=NULL;
-	fd=fopen(name,"wt");
+	fd=qfopen(name,"wt");
 	if(!fd)
-	{
-		printf("Trouble writing codec conf\n");
 		return 0;
-	
-	}
-	fprintf(fd,"ADVC\n");
+	qfprintf(fd,"ADVC\n");
 // and video codec
-	fprintf(fd,"Video codec : %s\n",videoCodecGetName() );
+	qfprintf(fd,"Video codec : %s\n",videoCodecGetName() );
 // video config
 	uint32_t 	extraSize;
 	uint8_t 	*extra;
-	fprintf(fd,"Video conf : %s\n",videoCodecGetConf(&extraSize,&extra)  );
+	qfprintf(fd,"Video conf : %s\n",videoCodecGetConf(&extraSize,&extra)  );
 
 	// Raw hexDump the opt string
 	// which contains
-	fprintf(fd,"Video extraConf size : %lu\n",extraSize);
+	qfprintf(fd,"Video extraConf size : %lu\n",extraSize);
 	if(extraSize)
 	{
 		for(uint32_t l=extraSize;l>0;l--)
 		{
-			fprintf(fd,"%02x ",*extra++);
+			qfprintf(fd,"%02x ",*extra++);
 		}
-		fprintf(fd,"\n");
+		qfprintf(fd,"\n");
 	}
-	fclose(fd);
+	qfclose(fd);
 	return 1;
 }	
 uint8_t mk_hex(uint8_t a,uint8_t b)

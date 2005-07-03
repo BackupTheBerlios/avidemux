@@ -26,6 +26,7 @@
 
 #include "fourcc.h"
 #include "avio.hxx"
+#include "ADM_toolkit/ADM_quota.h"
 #include <ADM_assert.h>
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_inpics/ADM_pics.h"
@@ -82,41 +83,38 @@ printf("\n **Saving workbench **\n");
 
   FILE *    fd;
 
-  if( !(fd = fopen (name, "wt")) ){
-    fprintf(stderr,"\ncan't open workbench file \"%s\" for writing: %u (%s)\n",
-                   name, errno, strerror(errno));
+  if( !(fd = qfopen (name, "wt")) )
     return 1;
-  }
 
-  fprintf (fd, "ADMW0002\n");
-  fprintf (fd,"%02ld videos\n", _nb_video);
+  qfprintf (fd, "ADMW0002\n");
+  qfprintf (fd,"%02ld videos\n", _nb_video);
 
   for (uint32_t i = 0; i < _nb_video; i++)
     {
-      fprintf (fd, "Name : %s\n", _videos[i]._aviheader->getMyName ());
+      qfprintf (fd, "Name : %s\n", _videos[i]._aviheader->getMyName ());
     }
-fprintf (fd,"%02ld segments\n", _nb_segment);
+  qfprintf (fd,"%02ld segments\n", _nb_segment);
 
-for (uint32_t i = 0; i < _nb_segment; i++)
+  for (uint32_t i = 0; i < _nb_segment; i++)
     {
-      fprintf (fd, "Start : %lu\n", _segments[i]._start_frame);
-      fprintf (fd, "Size : %lu\n", _segments[i]._nb_frames);
-      fprintf (fd, "Ref :   %lu\n", _segments[i]._reference);
+      qfprintf (fd, "Start : %lu\n", _segments[i]._start_frame);
+      qfprintf (fd, "Size : %lu\n", _segments[i]._nb_frames);
+      qfprintf (fd, "Ref :   %lu\n", _segments[i]._reference);
     }
 // Dump video codec
-	fprintf(fd,"Audio codec : %s\n",audioCodecGetName() );
+	qfprintf(fd,"Audio codec : %s\n",audioCodecGetName() );
 // audio filter
-	fprintf(fd,"Audio filter : %s\n",audioFilterGetName());
+	qfprintf(fd,"Audio filter : %s\n",audioFilterGetName());
 // audio conf
-	fprintf(fd,"Audio conf : %s\n",audioCodecGetConf());
+	qfprintf(fd,"Audio conf : %s\n",audioCodecGetConf());
 
 
-	fprintf(fd,"Video start-end : %lu %lu\n",frameStart,frameEnd);
+	qfprintf(fd,"Video start-end : %lu %lu\n",frameStart,frameEnd);
 	
 
-  fprintf(fd,"container :%d\n", UI_GetCurrentFormat());
+  qfprintf(fd,"container :%d\n", UI_GetCurrentFormat());
   // All done
-  fclose (fd);
+  qfclose (fd);
   // try to load filters
   tmp = (char *) ADM_alloc (strlen (name) + 10);
   ADM_assert (tmp);

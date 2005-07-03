@@ -1,5 +1,5 @@
 
-noinst_LIBRARIES = libADM_dialog.a
+noinst_LIBRARIES = libADM_dialog.a libADM_dialog2.a
 
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)
 
@@ -18,6 +18,7 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 				DIA_dgbob.cpp DIA_msharpen.cpp DIA_asharp.cpp DIA_dmx.cpp DIA_idx_pg.cpp DIA_gototime.cpp \
 				DIA_audioTrack.cpp
 
+libADM_dialog2_a_SOURCES = DIA_quota.cpp
 
 EXTRA_DIST = DIA_encoding.h 
 
