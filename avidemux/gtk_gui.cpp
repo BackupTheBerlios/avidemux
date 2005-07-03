@@ -179,7 +179,7 @@ int muxParam = 0;
 extern int audioShift;
 extern int audioDelay;
 
-
+extern bool parseECMAScript(const char *name);
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -225,7 +225,7 @@ int nw;
 		return;
     
     case ACT_RunScript:
-    			 GUI_FileSelRead ("Select script to load ",(SELFILE_CB *) parseScript);
+    			 GUI_FileSelRead ("Select ecmascript to run ",(SELFILE_CB *) parseECMAScript);
     		return;
 		
     case ACT_RecentFiles:
