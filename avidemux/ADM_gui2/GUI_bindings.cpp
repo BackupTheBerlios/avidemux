@@ -236,10 +236,10 @@ uint8_t  bindGUI( void )
 	
 	ADM_LOOKUP(guiCurTime,boxCurTime);
 	ADM_LOOKUP(guiTotalTime,labelTotalTime);
-#if 0	
-	ADM_LOOKUP(guiPreviewToggle,togglebuttonPreview);
-	ADM_LOOKUP(guiOutputToggle,toggleOutput);
 
+	ADM_LOOKUP(guiPreviewToggle,toggletoolbuttonPreview);
+	ADM_LOOKUP(guiOutputToggle,toggletoolbuttonOutput);
+#if 0
 	ADM_LOOKUP(guiAudioToggle,togglebuttonAudio);
 	ADM_LOOKUP(guiVideoToggle,togglebuttonVideo);
 #endif
@@ -563,7 +563,7 @@ char string[500];
 uint8_t UI_getPreviewToggleStatus( void )
 {                         //gtk_toggle_button_get_active
 
-	if(TRUE==gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(guiPreviewToggle))  )
+	if(TRUE==gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(guiPreviewToggle))  )
  		return 1;
    	else
     	return 0;
@@ -576,7 +576,7 @@ uint8_t UI_setPreviewToggleStatus( uint8_t status )
 gint b;
 	 if(status) b=TRUE;
   	else			b=FALSE;
-     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(guiPreviewToggle),b);
+     gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON(guiPreviewToggle),b);
 
 
 }
@@ -589,8 +589,8 @@ gint b;
 	 if(status) b=TRUE;
   	else			b=FALSE;
 
-	if(b!=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(guiAudioToggle)))
-     		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(guiAudioToggle),b);
+	if(b!=gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(guiAudioToggle)))
+     		gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON(guiAudioToggle),b);
 	aprintf("++ audio toggle : %d(%d)\n",b,status);
 
 }
@@ -602,9 +602,9 @@ void UI_setVProcessToggleStatus( uint8_t status )
 gint b;
 	 if(status) 		b=TRUE;
   	else			b=FALSE;
-	if(b!=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(guiVideoToggle)))
+	if(b!=gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(guiVideoToggle)))
 	{
-     		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(guiVideoToggle),b);
+     		gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON(guiVideoToggle),b);
 		aprintf("Changing it to %d\n",b);
 	}
 	aprintf("++ video toggle : %d\n",b);
