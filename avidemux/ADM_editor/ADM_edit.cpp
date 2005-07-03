@@ -295,8 +295,10 @@ UNUSED_ARG(mode);
 	case WorkBench_FileType:
 
   		return loadWorbench(name);
+#if 0
         case Script_FileType:
                 return parseScript(name);
+#endif
 	case ECMAScript_FileType:
                 printf("****** This is an ecmascript, run it with avidemux2 --run yourscript *******\n");
                 printf("****** This is an ecmascript, run it with avidemux2 --run yourscript *******\n");
