@@ -51,10 +51,10 @@
 
 #include "ADM_filter/vidVCD.h"
 
-#include "ADM_script/adm_command.h"
+//#include "ADM_script/adm_command.h"
 
 extern void filterListAll(void );
-extern void ADS_commandList( void );
+
 extern uint8_t loadVideoCodecConf( char *name);
 extern int A_saveJpg (char *name);
 extern void filterLoadXml(char *n);
@@ -119,12 +119,12 @@ extern int A_SaveUnpackedVop( char *name);
 extern int A_saveDVDPS(char *name);
 extern void A_saveWorkbench (char *name);
 extern uint8_t A_rebuildKeyFrame (void);
-extern uint8_t scriptAddVar(char *var,char *value);
+uint8_t scriptAddVar(char *var,char *value);
 //
 static int call_bframe(void);
 static int call_packedvop(void);
 static int call_saveDVD(char *a);
-static int set_output_format(const char *str);
+//static int set_output_format(const char *str);
 static void setVar(char *in);
 //
 uint8_t trueFalse(char *p);
@@ -154,7 +154,7 @@ typedef struct AUTOMATON
 
 AUTOMATON reaction_table[]=
 {	
-		{"list",		0,"list functions available for scripting",(one_arg_type)ADS_commandList},
+		
 		{"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
 		{"run",			1,"load and run a script",		(one_arg_type)parseECMAScript},
 		{"audio-process",	0,"activate audio processing",		call_audioproc},
@@ -214,7 +214,7 @@ AUTOMATON reaction_table[]=
 										(one_arg_type )call_requant},
 		{"info",		0	,"show information about loaded video and audio streams", show_info},
 		{"autoindex",		0	,"try to generate required index files", set_autoindex},
-		{"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
+//		{"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
 		
                 {"rebuild-index",       0       ,"rebuild index with correct frame type", (one_arg_type)A_rebuildKeyFrame},
 
@@ -384,7 +384,7 @@ char *equal;
         }
         *equal=0; // Remove =
         
-        if(!scriptAddVar(in,equal+1))
+        if(!(in,equal+1))
                 printf("Warning setvar failed\n");        
 
 }
@@ -598,7 +598,7 @@ int call_packedvop(void)
 	video_body->setEnv(ENV_EDITOR_PVOP);
 	return 1;
 }
-
+#if 0
 int set_output_format(const char *str){
   Arg map;
   int rc;
@@ -616,7 +616,7 @@ int set_output_format(const char *str){
 	ADM_dealloc( map.arg.string );
 	return(rc);
 }
-
+#endif
 void call_mono2stereo(char *p){
    audioFilterMono2Stereo(1);
 }
@@ -653,4 +653,76 @@ int notdigit=0;
         return ret;
 
 }
+#define ADM_MAX_VAR 50
+typedef struct scriptVar
+{
+        char *name;
+        char *string;
+        int  isString;
+}scriptVar;
+
+
+static scriptVar myVars[ADM_MAX_VAR];
+uint32_t nbVar=0;
+
+/*
+        Push a var into the stack var
+
+*/
+uint8_t scriptAddVar(char *var,char *value)
+{
+        if(!var || !strlen(var)) 
+        {
+                printf("Script : Var name invalid\n");
+                return 0;
+        }
+        if(!value || !strlen(value)) 
+        {
+                printf("Script : value invalid\n");
+                return 0;
+        }
+        myVars[nbVar].name=ADM_strdup(var);
+        myVars[nbVar].string=ADM_strdup(value);
+        // check it is a number
+        uint8_t digit=1;
+        for(int i=0;i<strlen(value);i++)
+        {
+                 if(!isdigit(value[i]))
+                        {digit=0;break;}
+        }
+        if(digit)
+             myVars[nbVar].isString=0;
+        else
+             myVars[nbVar].isString=1;
+        nbVar++;
+        return 1;
+
+}
+/*
+       Retrieve a var in the stack
+
+*/
+
+
+char *script_getVar(char *in, int *r)
+{
+
+        printf("Get var called with in=[%s]\n",in);
+        for(uint32_t i=0;i<nbVar;i++)
+        {
+                if(myVars[i].name)
+                {
+                        if(!strcmp(myVars[i].name,in+1)) // skip the  $ 
+                        {
+                                *r=myVars[i].isString;
+                                return ADM_strdup(myVars[i].string);
+                        }
+
+                }
+        }
+        printf("Warning: var [%s] is unknown !\n");
+        return NULL;
+
+}
+
 //EOF
