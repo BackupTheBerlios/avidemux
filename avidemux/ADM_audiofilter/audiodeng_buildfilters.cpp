@@ -547,26 +547,48 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 		size=(uint32_t)floor(d);
 		size=(size+1)&0xfffffffe;
 	}
-    firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
-					    starttime, size);
-    filtercount = 0;
-    lastFilter = firstFilter;
-    filters[filtercount++] = firstFilter;
-
 //_______________________________________________________
-    if (audioDelay)
+    if (audioDelay && audioShift)
       {
-	  if (audioShift)
-	    {
-		AVDMProcessAudio_TimeShift *ts;
-		ts = new AVDMProcessAudio_TimeShift(lastFilter,
-						    audioDelay);
-		tshift = (AVDMProcessAudioStream *) ts;
-		lastFilter = tshift;
-		printf("\n Time shift activated with %d %d ms", audioShift,audioDelay);
-		filters[filtercount++] = lastFilter;
-	    }
+                printf("\n Time shift activated with %d %d ms", audioShift,audioDelay);
+                // Depending on starttime & delay
+                // we may have or not to add silence
+                int32_t sstart=(int32_t)starttime;
+                
+                if (sstart>=audioDelay) // just seek in the file
+                {
+                        firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
+                                            sstart-audioDelay, size);
+                        filtercount = 0;
+                        lastFilter = firstFilter;
+                        filters[filtercount++] = firstFilter;
+                }
+                else    // We have to add a silence of -sstart seconds
+                {
+                
+                        // First the raw one 
+                        firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
+                                            0, size);
+                        filtercount = 0;
+                        lastFilter = firstFilter;
+                        filters[filtercount++] = firstFilter;
+                        // Then the silence
+                        AVDMProcessAudio_TimeShift *ts;
+                        ts = new AVDMProcessAudio_TimeShift(lastFilter, sstart);
+                        tshift = (AVDMProcessAudioStream *) ts;
+                        lastFilter = tshift;
+                        
+                        filters[filtercount++] = lastFilter;
+                }
       }
+      else // no delay
+    {
+        firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
+                                            starttime, size);
+        filtercount = 0;
+        lastFilter = firstFilter;
+        filters[filtercount++] = firstFilter;
+    }
 
 
 //_______________________________________________________
@@ -684,24 +706,36 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 AVDMProcessAudioStream *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t size)
 {
-AVDMProcessAudioStream *lastFilter;
+AVDMProcessAudioStream *lastFilter=NULL;
+int32_t sstart;
 
- 	lastFilter = new AVDMProcessAudio_Null(currentaudiostream,starttime, size);
- 	filtercount = 0;
- 	filters[filtercount++] = lastFilter;
-	if (audioDelay)
-      			{
-				  if (audioShift)
-				    {
-						AVDMProcessAudio_TimeShift *ts;
-						ts = new AVDMProcessAudio_TimeShift(lastFilter,    audioDelay);
+        // Do we need to go back
+        sstart=(int32_t)starttime;
 
-						lastFilter = ts;
-						printf("\n Time shift activated with %d %d ms", audioShift,audioDelay);
-						filters[filtercount++] = lastFilter;
+        if(audioShift && audioDelay)
+        {
+                if(sstart>audioDelay) sstart-=audioDelay;
+                else
+                {
+                        sstart=audioDelay-sstart;
+                        lastFilter = new AVDMProcessAudio_Null(currentaudiostream,0, size);
+                        filtercount = 0;
+                        filters[filtercount++] = lastFilter;
 
-	    				}
-			}
+                        AVDMProcessAudio_TimeShift *ts;
+                                ts = new AVDMProcessAudio_TimeShift(lastFilter,    sstart);
+
+                                lastFilter = ts;
+                                printf("\n Time shift activated with %d %d ms", audioShift,audioDelay);
+                                filters[filtercount++] = lastFilter;
+                                return lastFilter;
+                }
+        }
+
+        lastFilter = new AVDMProcessAudio_Null(currentaudiostream,sstart, size);
+        filtercount = 0;
+        filters[filtercount++] = lastFilter;
+       
 	return lastFilter;
 }
 void audioForceDownSample( void)
