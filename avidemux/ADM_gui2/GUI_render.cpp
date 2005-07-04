@@ -259,3 +259,21 @@ AccelRender::AccelRender( void)
 {
 }
 
+void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg)
+{
+    GtkWidget *widget;
+    widget = (GtkWidget *)widg; 
+    //return;
+
+
+    gdk_draw_rgb_32_image(widget->window, widget->style->fg_gc[GTK_STATE_NORMAL], 0,    // X
+                       0,       // y
+                       w,       //width
+                       h,       //h*2, // heigth
+                       GDK_RGB_DITHER_NONE,
+                       //GDK_RGB_DITHER_MAX,  // dithering
+                       (guchar *) dis,  // buffer
+                       w * 4);
+
+
+}
