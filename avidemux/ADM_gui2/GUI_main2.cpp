@@ -193,6 +193,10 @@ create_mainWindow (void)
   GtkWidget *alignment16;
   GtkWidget *hbox18;
   GtkWidget *label22;
+  GtkWidget *hbox19;
+  GtkWidget *CheckButtonTimeshift;
+  GtkObject *spinbuttonTimeShift_adj;
+  GtkWidget *spinbuttonTimeShift;
   GtkWidget *label19;
   GtkWidget *frame7;
   GtkWidget *alignment14;
@@ -1055,6 +1059,20 @@ create_mainWindow (void)
   gtk_widget_show (label22);
   gtk_box_pack_start (GTK_BOX (hbox18), label22, FALSE, FALSE, 0);
 
+  hbox19 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox19);
+  gtk_box_pack_start (GTK_BOX (vbox8), hbox19, TRUE, TRUE, 0);
+
+  CheckButtonTimeshift = gtk_check_button_new_with_mnemonic (_("Shift"));
+  gtk_widget_show (CheckButtonTimeshift);
+  gtk_box_pack_start (GTK_BOX (hbox19), CheckButtonTimeshift, FALSE, FALSE, 0);
+
+  spinbuttonTimeShift_adj = gtk_adjustment_new (1, -9999, 9999, 1, 10, 10);
+  spinbuttonTimeShift = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonTimeShift_adj), 1, 0);
+  gtk_widget_show (spinbuttonTimeShift);
+  gtk_box_pack_start (GTK_BOX (hbox19), spinbuttonTimeShift, TRUE, TRUE, 0);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonTimeShift), TRUE);
+
   label19 = gtk_label_new (_("<b>Audio</b>"));
   gtk_widget_show (label19);
   gtk_frame_set_label_widget (GTK_FRAME (frame6), label19);
@@ -1526,6 +1544,9 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, alignment16, "alignment16");
   GLADE_HOOKUP_OBJECT (mainWindow, hbox18, "hbox18");
   GLADE_HOOKUP_OBJECT (mainWindow, label22, "label22");
+  GLADE_HOOKUP_OBJECT (mainWindow, hbox19, "hbox19");
+  GLADE_HOOKUP_OBJECT (mainWindow, CheckButtonTimeshift, "CheckButtonTimeshift");
+  GLADE_HOOKUP_OBJECT (mainWindow, spinbuttonTimeShift, "spinbuttonTimeShift");
   GLADE_HOOKUP_OBJECT (mainWindow, label19, "label19");
   GLADE_HOOKUP_OBJECT (mainWindow, frame7, "frame7");
   GLADE_HOOKUP_OBJECT (mainWindow, alignment14, "alignment14");

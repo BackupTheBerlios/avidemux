@@ -172,12 +172,10 @@ extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
 extern int ignore_change;
 
 extern uint8_t ADM_ocr_engine( void);
-
+uint8_t A_TimeShift(void);
 PARAM_MUX muxMode = MUX_REGULAR;
 int muxParam = 0;
 
-extern int audioShift;
-extern int audioDelay;
 
 extern bool parseECMAScript(const char *name);
 //___________________________________________
@@ -199,6 +197,7 @@ void HandleAction (Action action)
 int nw;
   switch (action)
     {
+        
         case ACT_ViewMain: UI_toogleMain();return;
         case ACT_ViewSide: UI_toogleSide();return;
       case ACT_Ocr:
@@ -421,7 +420,9 @@ int nw;
     {
       switch (action)
 	{
-
+        case ACT_TimeShift:
+                A_TimeShift();
+                break;
 	case ACT_OpenAvi:
           GUI_FileSelRead ("Select AVI file...", (SELFILE_CB *)A_openAvi);
 	  break;
@@ -442,6 +443,10 @@ int nw;
   // we have an AVI loaded
   switch (action)
     {
+     case ACT_TimeShift:
+                A_TimeShift();
+                break;
+
    case ACT_SelectTrack1:
                 A_audioTrack();
                 break;
@@ -2384,6 +2389,27 @@ void A_audioTrack( void )
                 default:
                         ADM_assert(0);
         }
+}
+//****************
+uint8_t A_TimeShift(void)
+{
+static int update=0;
+// extern int audioShift;
+// extern int audioDelay;
+int onoff;
+int value;
+        if(update) return 1;
+        update=1;
+
+        // Read and update
+        update=0;
+        UI_getTimeShift(&onoff,&value);
+        if(onoff && value) audioFilterDelay(value);
+                else audioFilterDelay(0);
+        //****
+
+        update=0;
+
 }
 // EOF
 

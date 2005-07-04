@@ -177,15 +177,13 @@ buttonCallBack_S buttonCallback[]=
 	{"toggletoolbuttonPreview"	,"toggled"		,ACT_PreviewToggle},
 	{"toggletoolbuttonOutput"      ,"toggled"		,ACT_OuputToggle},
 
-//      {"buttonRecent"                 ,"clicked"              ,ACT_RecentFiles},
 	{"boxCurFrame"			,"editing_done"		,ACT_JumpToFrame},
 	{"boxCurFrame"			,"activate"		,ACT_JumpToFrame},
 	{"boxCurTime"			,"editing_done"		,ACT_TimeChanged},
-#if 0
-	{VIDEO_WIDGET		,"changed"		,ACT_VideoCodecChanged},
-	{AUDIO_WIDGET			,"changed"		,ACT_AudioCodecChanged}
-#endif
 
+        {"CheckButtonTimeshift"         ,"toggled"             ,ACT_TimeShift},
+        {"spinbuttonTimeShift"          ,"value_changed"       ,ACT_TimeShift}
+  
 };
 
 ///
@@ -705,7 +703,7 @@ int enable;
         }
         else enable=1;
         gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonConfA"),enable);        
-        //gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonAudioFilter"),enable);        
+        gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonAudioFilter"),enable);        
         HandleAction(ACT_AudioCodecChanged);
 
 }
@@ -830,6 +828,20 @@ static int show=1;
                 gtk_widget_hide(GTK_WIDGET(lookup_widget(guiRootWindow,"vbox9")));
         else
                 gtk_widget_show(GTK_WIDGET(lookup_widget(guiRootWindow,"vbox9")));
+}
+uint8_t UI_getTimeShift(int *onoff,int *value)
+{
+
+        *onoff=gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(guiRootWindow,"CheckButtonTimeshift")));
+        *value=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(guiRootWindow,"spinbuttonTimeShift"))) ;
+        return 1;
+}
+uint8_t UI_setTimeShift(int onoff,int value)
+{
+
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (lookup_widget(guiRootWindow,"CheckButtonTimeshift")),onoff);
+        gtk_spin_button_set_value(GTK_SPIN_BUTTON(lookup_widget(guiRootWindow,"spinbuttonTimeShift")),value) ;
+        return 1;
 }
 
 // EOF

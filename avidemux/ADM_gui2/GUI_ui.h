@@ -38,5 +38,8 @@ uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt );
 
 void UI_toogleSide(void);
 void UI_toogleMain(void);
+
+uint8_t UI_getTimeShift(int *onoff,int *value);
+uint8_t UI_setTimeShift(int onoff,int value);
 #endif
 // EOF

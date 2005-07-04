@@ -167,6 +167,7 @@ ACT_Ocr,
 ACT_SelectTrack1,
 ACT_ViewMain,
 ACT_ViewSide,
+ACT_TimeShift,
 ACT_DUMMY
 
 
