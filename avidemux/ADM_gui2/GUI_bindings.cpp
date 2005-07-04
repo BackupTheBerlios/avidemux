@@ -335,6 +335,8 @@ uint8_t  bindGUI( void )
                         gtk_combo_box_append_text      (combo_box,name);
                 }
 
+        gtk_combo_box_set_active(combo_box,0);
+        on_video_change();
         // And A codec
         // Finally add video codec...
         uint32_t nbAud;
@@ -348,9 +350,10 @@ uint8_t  bindGUI( void )
                         name=audioFilterGetIndexedName(i);
                         gtk_combo_box_append_text      (combo_box,name);	
                 }
-                 gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET)),0);
-        // Format
         gtk_combo_box_set_active(combo_box,0);
+	on_audio_change();
+        // Format
+                 gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET)),0);
 
     //
         gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,VIDEO_WIDGET)), "changed",
@@ -810,7 +813,7 @@ void DNDDataReceived( GtkWidget *widget, GdkDragContext *dc,
     }
     gtk_drag_finish(dc,TRUE,FALSE,t);
 }
-void UI_toogleSide(void)
+void UI_toogleMain(void)
 {
 static int show=1;
         show=show^1;
@@ -819,7 +822,7 @@ static int show=1;
         else
                 gtk_widget_show(GTK_WIDGET(lookup_widget(guiRootWindow,"toolbar2")) );
 }
-void UI_toogleMain(void)
+void UI_toogleSide(void)
 {
 static int show=1;
         show=show^1;
