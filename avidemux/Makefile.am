@@ -75,7 +75,7 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 
 # the library search path.
 avidemux2_LDFLAGS = $(all_libraries) -L/usr/X11R6/lib $(SDL_LIBS) $(GTK_LIBS) \
-	$(FREETYPE_LIBS) $(ARTS_LIBS) $(XML_LIBS) ../adm_lavcodec/libavcodec.a -lX11 -lXext -ljs
+	$(FREETYPE_LIBS) $(ARTS_LIBS) $(XML_LIBS) ../adm_lavcodec/libavcodec.a -lX11 -lXext 
 
 noinst_HEADERS = ADM_pp.h admmangle.h
 AM_CFLAGS = -g

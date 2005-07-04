@@ -522,57 +522,6 @@ dnl __________________/MJEG______________
 
 
 
-dnl __________________XV______________
-
-
-AC_CHECK_HEADERS(sys/shm.h,,have_xv=no)
-
-if test "x$have_xv" = "xyes"; then
- AC_CHECK_HEADERS(X11/extensions/XShm.h,,have_xv=no,
-[
-#include<stdio.h>
-#include<X11/Intrinsic.h>
-])
-fi
-if test "x$have_xv" = "xyes"; then
- AC_CHECK_HEADERS(X11/extensions/Xvlib.h,,have_xv=no,
-[
-#include<stdio.h>
-#include<X11/Intrinsic.h>
-])
-fi
-
-LDFLAGS="$LDFLAGS -L/usr/X11R6/lib";
-if test "x$have_xv" = "xyes"; then
-AC_CHECK_LIB(Xv,XvShmPutImage,,have_xv=no, -lXext -lX11 -lm)
-fi
-if test "x$have_xv" = "xyes"; then
-	AC_DEFINE(USE_XV,1,[Try to use Xv extension])
-fi
-dnl __________________SDL______________
-
-AC_MSG_CHECKING(libSDL support)
-AC_PATH_PROG(SDL_CONFIG, sdl-config, "no")
- if test "$SDL_CONFIG" = "no" ; then
-	   	SDL_LIBS=""
-    		SDL_CFLAGS=""
-      		have_sdl=no
-	else
-
- 		SDL_CFLAGS=`$SDL_CONFIG  --cflags`
- 		SDL_LIBS=`$SDL_CONFIG  --libs`    		
-    		CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
-    		have_sdl=yes
- fi
-if test "x$have_sdl" = "xyes" ;  then
-	AC_DEFINE(USE_SDL,1,[Use SDL ])
-fi
-dnl __________________/SDL______________
-
-
-
-
-
 dnl ____________ free type 2________________
  AC_MSG_CHECKING(Freetype2 support)
  AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
@@ -682,7 +631,8 @@ AC_CHECK_HEADER(jsapi.h,,have_sm=no)
 if test "x$have_sm" = "xyes"; then
    AC_CHECK_LIB(js,JS_Init,,have_sm=no,-lm)
    if test "x$have_sm" = "xno"; then
-     AC_CHECK_LIB(smjs,JS_Init,,have_sm=no,-lm)
+	have_sm="yes"
+     	AC_CHECK_LIB(smjs,JS_Init,,have_sm=no,-lm)
    fi
 fi
 if test "x$have_sm" = "xno"; then
@@ -690,6 +640,57 @@ if test "x$have_sm" = "xno"; then
 fi
 CPPFLAGS=$old_flags
 dnl ________/SPIDERMONKEY__________
+
+
+dnl __________________XV______________
+
+
+AC_CHECK_HEADERS(sys/shm.h,,have_xv=no)
+
+if test "x$have_xv" = "xyes"; then
+ AC_CHECK_HEADERS(X11/extensions/XShm.h,,have_xv=no,
+[
+#include<stdio.h>
+#include<X11/Intrinsic.h>
+])
+fi
+if test "x$have_xv" = "xyes"; then
+ AC_CHECK_HEADERS(X11/extensions/Xvlib.h,,have_xv=no,
+[
+#include<stdio.h>
+#include<X11/Intrinsic.h>
+])
+fi
+
+LDFLAGS="$LDFLAGS -L/usr/X11R6/lib -lXext -lX11 -lm";
+if test "x$have_xv" = "xyes"; then
+AC_CHECK_LIB(Xv,XvShmPutImage,,have_xv=no, )
+fi
+if test "x$have_xv" = "xyes"; then
+	AC_DEFINE(USE_XV,1,[Try to use Xv extension])
+fi
+dnl __________________SDL______________
+
+AC_MSG_CHECKING(libSDL support)
+AC_PATH_PROG(SDL_CONFIG, sdl-config, "no")
+ if test "$SDL_CONFIG" = "no" ; then
+	   	SDL_LIBS=""
+    		SDL_CFLAGS=""
+      		have_sdl=no
+	else
+
+ 		SDL_CFLAGS=`$SDL_CONFIG  --cflags`
+ 		SDL_LIBS=`$SDL_CONFIG  --libs`    		
+    		CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
+    		have_sdl=yes
+ fi
+if test "x$have_sdl" = "xyes" ;  then
+	AC_DEFINE(USE_SDL,1,[Use SDL ])
+fi
+dnl __________________/SDL______________
+
+
+
 
 
 
