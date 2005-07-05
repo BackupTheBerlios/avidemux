@@ -71,7 +71,6 @@ protected:
   unsigned char vt[513];
   int nfrms, keepTrack;
   unsigned int diffmax;
-  char buf[256];
 
   virtual char *printConf (void);
   VideoCache *vidCache;
@@ -97,8 +96,8 @@ BUILD_CREATE (cnr2_create, vidCNR2);
 SCRIPT_CREATE (cnr2_script, vidCNR2, cnr2_template);
 
 extern uint8_t DIA_cnr2(CNR2Param *param);
-uint8_t
-vidCNR2::configure (AVDMGenericVideoStream * in)
+/*************************************/
+uint8_t vidCNR2::configure (AVDMGenericVideoStream * in)
 {
         if( DIA_cnr2(_param))
         {
@@ -107,36 +106,27 @@ vidCNR2::configure (AVDMGenericVideoStream * in)
         }
         return 0;
 }
-
-char *
-vidCNR2::printConf (void)
+/*************************************/
+char *vidCNR2::printConf (void)
 {
   static char buf[50];
   sprintf ((char *) buf, " CNR2 by MarcFD/Tritical");
   return buf;
 }
-
+/*************************************/
 vidCNR2::vidCNR2 (AVDMGenericVideoStream * in, CONFcouple * couples)
 {
-
-
-
 
   _in = in;
   memcpy (&_info, _in->getInfo (), sizeof (_info));
   _info.encoding = 1;
-  
-
-  _info.encoding = 1;
-
-  
   _param = NEW (CNR2Param);
   vidCache = new VideoCache (4, in);
   _uncompressed=new ADMImage(_info.width,_info.height);
   if (couples)
     {
 #undef GET
-#define GET(x) couples->getCouple((char *)"p"#x,&(_param->x))
+#define GET(x) couples->getCouple(#x,&(_param->x))
       GET (scdthr);
       GET (ln);
       GET (lm);
@@ -168,18 +158,22 @@ vidCNR2::vidCNR2 (AVDMGenericVideoStream * in, CONFcouple * couples)
   nfrms = _info.nb_frames - 1;
   setup ();
 }
-uint8_t
-vidCNR2::setup (void)
+/*************************************/
+uint8_t vidCNR2::setup (void)
 {
+double root;
+
+  root= _info.height * _info.width;
+  root*=_param->scdthr;
   if (_param->sceneChroma)
-    diffmax =
-      (int) ((_param->scdthr * _info.height * _info.width * 331.0f) / 100.0f);
+    diffmax =      (int) ((root * 331.0f) / 100.0f);
   else
-    diffmax =
-      (int) ((_param->scdthr * _info.height * _info.width * 219.0f) / 100.0f);
+    diffmax =      (int) ((root* 219.0f) / 100.0f);
+
   memset (lt, 0, 513);		// for safety
   memset (ut, 0, 513);
   memset (vt, 0, 513);
+
   keepTrack = -39482;
 
   const double pi = M_PI;
@@ -193,6 +187,7 @@ vidCNR2::setup (void)
   int i, j;
   for (i = -256; i < 256; ++i)
     lt[i + 256] = 0;
+
   for (j = -_param->ln; j <= _param->ln; ++j)
     {
       if (Y)
@@ -235,7 +230,7 @@ vidCNR2::~vidCNR2 ()
 
   delete _param;
   _param = NULL;
-  delete _param;
+  DELETE( _param);
   delete vidCache;
   _param = NULL;
   vidCache = NULL;
@@ -251,8 +246,7 @@ vidCNR2::~vidCNR2 ()
 }
 
 //______________________________________________________________
-uint8_t
-vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
+uint8_t vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
 				uint32_t * len,
 				ADMImage * data, uint32_t * flags)
 {
@@ -278,7 +272,7 @@ vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
   int src_pitchUV = _info.width >> 1;	//src->GetPitch(PLANAR_V);
   int heightY = _info.height;	//src->GetHeight(PLANAR_Y);
   int heightUV = _info.height >> 1;	//src->GetHeight(PLANAR_V);
-  int widthY = _info.width >> 1;	//src->GetRowSize(PLANAR_Y);
+  int widthY = _info.width ;	//src->GetRowSize(PLANAR_Y);
   int widthYd2 = widthY >> 1;
   int widthUV = _info.width >> 1;	//src->GetRowSize(PLANAR_V);
 
@@ -422,9 +416,8 @@ exit:
   return 1;
 }
 
-
-void
-vidCNR2::downSampleYV12 (unsigned char *dst, ADMImage * src)
+/*************************************/
+void vidCNR2::downSampleYV12 (unsigned char *dst, ADMImage * src)
 {
   unsigned char *temp = dst;
   const unsigned char *srcpY = YPLANE (src);
@@ -447,15 +440,14 @@ vidCNR2::downSampleYV12 (unsigned char *dst, ADMImage * src)
       temp += widthY;
     }
 }
-
-uint8_t
-vidCNR2::getCoupledConf (CONFcouple ** couples)
+/*************************************/
+uint8_t vidCNR2::getCoupledConf (CONFcouple ** couples)
 {
 
   ADM_assert (_param);
   *couples = new CONFcouple (9);
 #undef CSET
-#define CSET(x)  (*couples)->setCouple((char *)"p"#x,(_param->x))
+#define CSET(x)  (*couples)->setCouple(#x,(_param->x))
 
   CSET (scdthr);
   CSET (ln);
