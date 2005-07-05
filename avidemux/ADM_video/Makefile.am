@@ -30,14 +30,14 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp ADM_vidDeintASM.cpp ADM_vidVlad.cpp \
 								ADM_vidWirl.cpp ADM_vidEqualizer.cpp ADM_vidVobsub.cpp ADM_vobsubinfo.cpp \
 				ADM_vidChangeFPS.cpp ADM_vidVobSubRender.cpp ADM_vidResampleFPS.cpp ADM_lavpp_deint.cpp \
 				ADM_vidHue.cpp ADM_vidEq2.cpp ADM_vidDGbob.cpp \
-				ADM_vidMSharpen.cpp ADM_vidAsharp.cpp
+				ADM_vidMSharpen.cpp ADM_vidAsharp.cpp ADM_vidCNR2.cpp
 
 
-EXTRA_DIST = ADM_genvideo.cpp ADM_genvideo.hxx ADM_guiAddBorder.cpp ADM_guiBSMear.cpp ADM_guiClean.cpp ADM_guiCrop.cpp ADM_guiResize.cpp ADM_resizebis.cpp ADM_resizebis.hxx ADM_vidAddBorder.cpp ADM_vidAddBorder.h ADM_vidBSmear.cpp ADM_vidChroma.cpp ADM_vidChroma.h ADM_vidClean.cpp ADM_vidClean.h ADM_vidUVSwap.h ADM_vidUVSwap.cpp ADM_vidTempSmooth.h ADM_vidTempSmooth.cpp ADM_vidTelecide.h ADM_vidTelecide.cpp ADM_vidResize.cpp ADM_vidpreview.cpp ADM_vidPalShift.h ADM_vidPalShift.cpp ADM_vidNull.cpp ADM_vidLuma.h ADM_vidLuma.cpp ADM_vidDeinterlace.h ADM_vidDeinterlace.cpp ADM_vidCrop.cpp ADM_vidConvolution.hxx ADM_vidConvolution.cpp ADM_resizeter.cpp ADM_vidContrast.cpp ADM_vidContrast.h ADM_guiContrast.cpp ADM_vidStabilize.cpp ADM_vidStabilize.h ADM_vidFlipV.h ADM_vidFlipV.cpp ADM_vidFastConvolution.cpp ADM_guiConv.cpp ADM_vidDenoise.h ADM_vidDenoise.cpp ADM_guiDenoise.cpp ADM_vidSRT.cpp ADM_vidSRT.h ADM_vidFont.cpp ADM_vidFont.h ADM_guiSRT.cpp ADM_vidPartial.h ADM_vidPartial.cpp ADM_vidFlux.cpp ADM_vidFlux.h ADM_vidCached.cpp ADM_vidCached.h ADM_vidSalt.cpp ADM_vidSalt.h ADM_vidLargeMedian.cpp ADM_vidLargeMedian.h ADM_guiMedianBig.cpp ADM_vidVlad.cpp ADM_vidVlad.h ADM_vidDeintASM.cpp ADM_vidFields.cpp ADM_vidField.h  ADM_vidHue.cpp ADM_vidEq2.cpp
+EXTRA_DIST = ADM_genvideo.cpp ADM_genvideo.hxx ADM_guiAddBorder.cpp ADM_guiBSMear.cpp ADM_guiClean.cpp ADM_guiCrop.cpp ADM_guiResize.cpp ADM_resizebis.cpp ADM_resizebis.hxx ADM_vidAddBorder.cpp ADM_vidAddBorder.h ADM_vidBSmear.cpp ADM_vidChroma.cpp ADM_vidChroma.h ADM_vidClean.cpp ADM_vidClean.h ADM_vidUVSwap.h ADM_vidUVSwap.cpp ADM_vidTempSmooth.h ADM_vidTempSmooth.cpp ADM_vidTelecide.h ADM_vidTelecide.cpp ADM_vidResize.cpp ADM_vidpreview.cpp ADM_vidPalShift.h ADM_vidPalShift.cpp ADM_vidNull.cpp ADM_vidLuma.h ADM_vidLuma.cpp ADM_vidDeinterlace.h ADM_vidDeinterlace.cpp ADM_vidCrop.cpp ADM_vidConvolution.hxx ADM_vidConvolution.cpp ADM_resizeter.cpp ADM_vidContrast.cpp ADM_vidContrast.h ADM_guiContrast.cpp ADM_vidStabilize.cpp ADM_vidStabilize.h ADM_vidFlipV.h ADM_vidFlipV.cpp ADM_vidFastConvolution.cpp ADM_guiConv.cpp ADM_vidDenoise.h ADM_vidDenoise.cpp ADM_guiDenoise.cpp ADM_vidSRT.cpp ADM_vidSRT.h ADM_vidFont.cpp ADM_vidFont.h ADM_guiSRT.cpp ADM_vidPartial.h ADM_vidPartial.cpp ADM_vidFlux.cpp ADM_vidFlux.h ADM_vidCached.cpp ADM_vidCached.h ADM_vidSalt.cpp ADM_vidSalt.h ADM_vidLargeMedian.cpp ADM_vidLargeMedian.h ADM_guiMedianBig.cpp ADM_vidVlad.cpp ADM_vidVlad.h ADM_vidDeintASM.cpp ADM_vidFields.cpp ADM_vidField.h  ADM_vidHue.cpp ADM_vidEq2.cpp ADM_vidCNR2.cpp
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES= $(all_includes) $(GTK_CFLAGS) $(FREETYPE_CFLAGS) $(ALTIVEC_SWITCH)
 noinst_HEADERS = ADM_vidlavdeint.h ADM_mpdetc.h ADM_vidKernelDeint.h \
 					ADM_vidForcedPP.h ADM_vidSoften.h ADM_cache.h ADM_vidDecTel_param.h ADM_vidDecDec_param.h \
 					ADM_vidMSmooth_param.h ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \
-		ADM_lavpp_deintparam.h ADM_vidEq2.h
+		ADM_lavpp_deintparam.h ADM_vidEq2.h 
