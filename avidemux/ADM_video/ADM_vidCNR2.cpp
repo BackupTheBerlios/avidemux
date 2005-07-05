@@ -125,14 +125,14 @@ vidCNR2::vidCNR2 (AVDMGenericVideoStream * in, CONFcouple * couples)
   _in = in;
   memcpy (&_info, _in->getInfo (), sizeof (_info));
   _info.encoding = 1;
-  _uncompressed = NULL;
+  
 
   _info.encoding = 1;
 
-  _uncompressed = new ADMImage (_info.width, _info.height);
+  
   _param = NEW (CNR2Param);
   vidCache = new VideoCache (4, in);
-
+  _uncompressed=new ADMImage(_info.width,_info.height);
   if (couples)
     {
 #undef GET
@@ -157,7 +157,7 @@ vidCNR2::vidCNR2 (AVDMGenericVideoStream * in, CONFcouple * couples)
       _param->vn = 47;
       _param->vm = 255;
       _param->sceneChroma = 0;
-      _param->mode = 0;
+      _param->mode = 0x00FFFF; // u&v in narrow mode
     }
   //
   py_saved = py = cy_saved = cy = NULL;
@@ -184,11 +184,11 @@ vidCNR2::setup (void)
 
   const double pi = M_PI;
   bool Y = true, U = true, V = true;
-  if (_param->mode & 0xFF0000 == 'x')
+  if (_param->mode & 0xFF0000 )
     Y = false;
-  if (_param->mode & 0x00FF00 == 'x')
+  if (_param->mode & 0x00FF00 )
     U = false;
-  if (_param->mode & 0x0000FF == 'x')
+  if (_param->mode & 0x0000FF )
     V = false;
   int i, j;
   for (i = -256; i < 256; ++i)
@@ -227,6 +227,7 @@ vidCNR2::setup (void)
 	vt[j + 256] =
 	  (int) ((_param->vm / 2) * (1 + cos ((j * pi) / _param->vn)));
     }
+    return 1;
 }
 //____________________________________________________________________
 vidCNR2::~vidCNR2 ()
@@ -240,11 +241,12 @@ vidCNR2::~vidCNR2 ()
   vidCache = NULL;
   delete[]py_saved;
   delete[]cy_saved;
-  delete _uncompressed;
+  
   py_saved = NULL;
   cy_saved = NULL;
-  _uncompressed = NULL;
-
+  
+  delete _uncompressed;
+  _uncompressed=NULL;
 
 }
 
@@ -281,13 +283,12 @@ vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
   int widthUV = _info.width >> 1;	//src->GetRowSize(PLANAR_V);
 
   downSampleYV12 (cy, src);
-
+  mprev = vidCache->getImage (frame - 1);
+  _uncompressed->duplicate(mprev); // not optimal
   if (keepTrack != frame)
     {
       keepTrack = frame;
-      mprev = vidCache->getImage (frame - 1);
-      _uncompressed->duplicate (mprev);
-      downSampleYV12 (py, _uncompressed);
+      downSampleYV12 (py, mprev);
     }
   unsigned char *dstpY = YPLANE (data);	//dst->GetWritePtr(PLANAR_Y);
   unsigned char *dstpU = UPLANE (data);	//dst->GetWritePtr(PLANAR_U);
