@@ -60,6 +60,8 @@
 
 #include "ADM_vidCNR2_param.h"
 
+//#define SUBST 1
+
 class vidCNR2:public AVDMGenericVideoStream
 {
 
@@ -162,6 +164,7 @@ vidCNR2::vidCNR2 (AVDMGenericVideoStream * in, CONFcouple * couples)
 uint8_t vidCNR2::setup (void)
 {
 double root;
+double num,denum,mul;
 
   root= _info.height * _info.width;
   root*=_param->scdthr;
@@ -184,45 +187,64 @@ double root;
     U = false;
   if (_param->mode & 0x0000FF )
     V = false;
+
+// Reset
   int i, j;
   for (i = -256; i < 256; ++i)
+  {
     lt[i + 256] = 0;
-
-  for (j = -_param->ln; j <= _param->ln; ++j)
-    {
-      if (Y)
-	lt[j + 256] =
-	  (int) ((_param->lm / 2) *
-		 (1 + cos ((j * j * pi) / (_param->ln * _param->ln))));
-      else
-	lt[j + 256] =
-	  (int) ((_param->lm / 2) * (1 + cos ((j * pi) / _param->ln)));
-    }
-  for (i = -256; i < 256; ++i)
     ut[i + 256] = 0;
-  for (j = -_param->un; j <= _param->un; ++j)
-    {
-      if (U)
-	ut[j + 256] =
-	  (int) ((_param->um / 2) *
-		 (1 + cos ((j * j * pi) / (_param->un * _param->un))));
-      else
-	ut[j + 256] =
-	  (int) ((_param->um / 2) * (1 + cos ((j * pi) / _param->un)));
-    }
-  for (i = -256; i < 256; ++i)
     vt[i + 256] = 0;
-  for (j = -_param->vn; j <= _param->vn; ++j)
-    {
-      if (V)
-	vt[j + 256] =
-	  (int) ((_param->vm / 2) *
-		 (1 + cos ((j * j * pi) / (_param->vn * _param->vn))));
-      else
-	vt[j + 256] =
-	  (int) ((_param->vm / 2) * (1 + cos ((j * pi) / _param->vn)));
-    }
-    return 1;
+  }
+ 
+ num=M_PI;
+        /************************ Y********************/
+ mul=_param->lm / 2.;
+ if(Y)
+ { 
+  denum=_param->ln*_param->ln;
+  for (j = -_param->ln; j <= _param->ln; ++j)
+        lt[j + 256] =  (int) (mul * (1 + cos ((j * j * num) / denum)));
+ }
+ else
+ {
+  denum=_param->ln;
+  for (j = -_param->ln; j <= _param->ln; ++j)
+        lt[j + 256] =  (int) (mul * (1 + cos ((j * num) / denum)));
+ 
+ }
+
+  
+    /************************ U ********************/
+ mul=_param->um / 2.;
+ if(U)
+ {
+        denum=_param->un*_param->un;
+        for (j = -_param->un; j <= _param->un; ++j)
+                ut[j + 256] =  (int) (mul * (1 + cos ((j * j * pi) / (denum))));
+ }
+ else
+ {
+        denum=_param->un;
+        for (j = -_param->un; j <= _param->un; ++j)
+                ut[j + 256] =  (int) (mul * (1 + cos ((j  * pi) / (denum))));
+
+ }
+      /************************ V ********************/  
+  mul=_param->vm / 2.;
+  if(V)
+   {
+        denum=_param->vn*_param->vn;
+        for (j = -_param->vn; j <= _param->vn; ++j)
+                vt[j + 256] =  (int) (mul * (1 + cos ((j * j * pi) / (denum))));
+ }
+ else
+ {
+        denum=_param->vn;
+        for (j = -_param->vn; j <= _param->vn; ++j)
+                vt[j + 256] =  (int) (mul * (1 + cos ((j  * pi) / (denum))));
+ } 
+  return 1;
 }
 //____________________________________________________________________
 vidCNR2::~vidCNR2 ()
@@ -277,10 +299,10 @@ uint8_t vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
   int widthUV = _info.width >> 1;	//src->GetRowSize(PLANAR_V);
 
   downSampleYV12 (cy, src);
-  mprev = vidCache->getImage (frame - 1);
-  _uncompressed->duplicate(mprev); // not optimal
   if (keepTrack != frame)
     {
+      mprev = vidCache->getImage (frame - 1);
+      _uncompressed->duplicate(mprev); // not optimal  
       keepTrack = frame;
       downSampleYV12 (py, mprev);
     }
@@ -293,8 +315,7 @@ uint8_t vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
   int y, x, ydiff, uvdiff, cr;
   unsigned int difft = 0;
   const int off = 256;
-  // Dupe luma
-  memcpy (dstpY, srcpY, _info.height * _info.width);
+  int res;
   // U plane (we add the luma plane diff to difft here not on v)
   prevy = py;
   curry = cy;
@@ -313,8 +334,13 @@ uint8_t vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
 	      uvdiff = srcp[x] - prevp[x];
 	      difft += abs (uvdiff) + abs (ydiff << 2);
 	      cr = (lt[ydiff + off] * t[uvdiff + off]);
-	      dstp[x] = prevp[x] =
-		(cr * prevp[x] + (65536 - cr) * srcp[x] + 32768) >> 16;
+	       res=(cr * prevp[x] + (65536 - cr) * srcp[x] + 32768) >> 16;
+#ifdef SUBST
+                if(res!=srcp[x]) dstp[x]=120;
+                        else dstp[x]=0;
+#else
+                 dstp[x] = prevp[x]=res;
+#endif
 	    }
 	  if (difft > diffmax)
 	    {
@@ -337,8 +363,14 @@ uint8_t vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
 	      uvdiff = srcp[x] - prevp[x];
 	      difft += abs (ydiff << 2);
 	      cr = (lt[ydiff + off] * t[uvdiff + off]);
-	      dstp[x] = prevp[x] =
-		(cr * prevp[x] + (65536 - cr) * srcp[x] + 32768) >> 16;
+	      res =		(cr * prevp[x] + (65536 - cr) * srcp[x] + 32768) >> 16;
+#ifdef SUBST
+                if(res!=srcp[x]) dstp[x]=120;
+                        else dstp[x]=0;
+#else
+                 dstp[x] = prevp[x]=res;
+#endif
+
 	    }
 	  if (difft > diffmax)
 	    {
@@ -368,8 +400,14 @@ uint8_t vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
 	      uvdiff = srcp[x] - prevp[x];
 	      difft += abs (uvdiff);
 	      cr = (lt[ydiff + off] * t[uvdiff + off]);
-	      dstp[x] = prevp[x] =
-		(cr * prevp[x] + (65536 - cr) * srcp[x] + 32768) >> 16;
+	      res =(cr * prevp[x] + (65536 - cr) * srcp[x] + 32768) >> 16;
+#ifdef SUBST
+                if(res!=srcp[x]) dstp[x]=120;
+                        else dstp[x]=0;
+#else
+                 dstp[x] = prevp[x]=res;
+#endif
+
 	    }
 	  if (difft > diffmax)
 	    {
@@ -391,8 +429,14 @@ uint8_t vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
 	      ydiff = curry[x] - prevy[x];
 	      uvdiff = srcp[x] - prevp[x];
 	      cr = (lt[ydiff + off] * t[uvdiff + off]);
-	      dstp[x] = prevp[x] =
-		(cr * prevp[x] + (65536 - cr) * srcp[x] + 32768) >> 16;
+	      res =(cr * prevp[x] + (65536 - cr) * srcp[x] + 32768) >> 16;
+#ifdef SUBST
+                if(res!=srcp[x]) dstp[x]=120;
+                        else dstp[x]=0;
+#else
+                 dstp[x] = prevp[x]=res;
+#endif
+
 	    }
 	  srcp += src_pitchUV;
 	  dstp += dst_pitchUV;
@@ -402,6 +446,11 @@ uint8_t vidCNR2::getFrameNumberNoAlloc (uint32_t frame,
 	}
     }
 exit:
+//#define CNR_VERBOSE
+#if defined( CNR_VERBOSE) && defined(ADM_DEBUG)
+        printf("cur:%u max:%u\n",difft,diffmax);
+#endif
+        // Scene change ?
   if (difft > diffmax)
     {
       data->duplicate (cur);
@@ -409,6 +458,9 @@ exit:
       return 1;
     }
   ++keepTrack;
+  // Dupe luma
+  memcpy (dstpY, srcpY, _info.height * _info.width);
+
   swap = py;
   py = cy;
   cy = swap;
