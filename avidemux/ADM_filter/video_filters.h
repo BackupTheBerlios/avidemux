@@ -83,6 +83,7 @@
                 VF_DGBOB,
                 VF_MSHARPEN,
                 VF_ASHARP,
+		VF_CNR2,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

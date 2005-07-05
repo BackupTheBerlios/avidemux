@@ -116,6 +116,7 @@ printf(  "*********************\n");
 	REGISTERX("chromavonly","Chroma V only",VF_CHROMAV,1,chromaV_create,chromaV_script);
         REGISTERX("hue","Mplayer Hue",VF_HUE,1,hue_create,hue_script);
         REGISTERX("eq2","Mplayer Eq2",VF_EQ2,1,Eq2_create,Eq2_script);
+        REGISTERX("cnr2","CNR2 (MarcFD/Tritical)",VF_CNR2,1,cnr2_create,cnr2_script);
 		
 	registerFilter("-------------- Smoother -------------",VF_INVALID,2,NULL,NULL);
 	//   registerFilter("Temporal smoother",tempsmooth_create);	
