@@ -150,6 +150,9 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #endif
 	CpuCaps::init();
 	ADM_InitMemcpy();
+// Load .avidemuxrc
+    prefs->load();
+
    if(!initGUI())
     	{
 		printf("\n Fatal : could not init GUI\n");
@@ -168,8 +171,6 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 				mpegps_init();
 	                  
 #endif
-// Load .avidemuxrc
-    prefs->load();
 #ifdef HAVE_AUDIO
     AVDM_audioInit();
 #endif    

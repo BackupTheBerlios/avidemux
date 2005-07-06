@@ -41,5 +41,7 @@ void UI_toogleMain(void);
 
 uint8_t UI_getTimeShift(int *onoff,int *value);
 uint8_t UI_setTimeShift(int onoff,int value);
+
+uint8_t UI_updateRecentMenu( void );
 #endif
 // EOF

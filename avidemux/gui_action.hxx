@@ -168,6 +168,10 @@ ACT_SelectTrack1,
 ACT_ViewMain,
 ACT_ViewSide,
 ACT_TimeShift,
+ACT_RECENT0,
+ACT_RECENT1,
+ACT_RECENT2,
+ACT_RECENT3,
 ACT_DUMMY
 
 

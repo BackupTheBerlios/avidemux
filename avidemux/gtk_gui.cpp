@@ -197,7 +197,19 @@ void HandleAction (Action action)
 int nw;
   switch (action)
     {
-        
+        case ACT_RECENT0:
+        case ACT_RECENT1:        
+        case ACT_RECENT2:
+        case ACT_RECENT3:
+                        const char **name;
+                        int rank;
+                                name=prefs->get_lastfiles();
+                                rank=(int)action-ACT_RECENT0;
+                                ADM_assert(name[rank]);
+                                A_openAvi2 ((char *)name[rank], 0);
+                                
+                                
+                return;
         case ACT_ViewMain: UI_toogleMain();return;
         case ACT_ViewSide: UI_toogleSide();return;
       case ACT_Ocr:
@@ -409,7 +421,7 @@ int nw;
   // allow all actions
 
   // restict disabled uncoded actions
-  if ((int) action > 160)
+  if ((int) action >= ACT_DUMMY)
     {
       GUI_Alert ("Not coded on this version");
       return;
@@ -999,7 +1011,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 
 	/* remember any video or workbench file to "recent" */
 	prefs->set_lastfile(longname);
-
+        UI_updateRecentMenu();
 	updateLoaded ();
 	for(i=strlen(longname);i>=0;i--)
 #ifdef CYG_MANGLING

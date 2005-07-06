@@ -45,7 +45,7 @@
 
 #include "ADM_toolkit/filesel.h"
 #include "ADM_editor/ADM_Video.h"
-
+#include "prefs.h"
 void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
 	   uint16_t * ss, uint16_t * ms);
 
@@ -361,6 +361,8 @@ uint8_t  bindGUI( void )
                        GTK_SIGNAL_FUNC(on_audio_change),
                        NULL);
         
+        // Add initial recent files
+        UI_updateRecentMenu(  );
     //
     //CYB 2005.02.22: DND (START)
     // Set up avidemux as an available drag'n'drop target.
@@ -843,5 +845,35 @@ uint8_t UI_setTimeShift(int onoff,int value)
         gtk_spin_button_set_value(GTK_SPIN_BUTTON(lookup_widget(guiRootWindow,"spinbuttonTimeShift")),value) ;
         return 1;
 }
+uint8_t UI_updateRecentMenu( void )
+{
+const char **names;
+uint32_t nb_item=0;
+GtkWidget *button,*menu,*item[4];
+static Action recent[4]={ACT_RECENT0,ACT_RECENT1,ACT_RECENT2,ACT_RECENT3};
 
+        names=prefs->get_lastfiles();
+// count
+        for( nb_item=0;nb_item<4;nb_item++)
+        {
+                if(!names[nb_item]) break;
+        }
+        button=lookup_widget(guiRootWindow,"menutoolbuttonOpen");
+        if(!nb_item)
+        {
+                gtk_menu_tool_button_set_menu   (GTK_MENU_TOOL_BUTTON(button),NULL);
+                return 1;
+        }
+        menu=gtk_menu_new();
+        for(int i=0;i<nb_item;i++)
+        {
+                item[i]=gtk_menu_item_new_with_label(names[i]);
+                gtk_menu_attach(GTK_MENU(menu),item[i],0,1,i,i+1);
+                 gtk_signal_connect (GTK_OBJECT (item[i]), "activate", GTK_SIGNAL_FUNC (guiCallback), 
+                                (gpointer) recent[i]);
+                gtk_widget_show (item[i]);
+        }
+        gtk_menu_tool_button_set_menu   (GTK_MENU_TOOL_BUTTON(button),menu);
+        return 1;
+}
 // EOF
