@@ -56,7 +56,7 @@
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "gui_action.hxx"
 #include "gtkgui.h"
-#include "ADM_gui/GUI_mux.h"
+//#include "ADM_gui/GUI_mux.h"
 #include "oplug_mpeg/op_mpeg.h"
 #include "oplug_mpegFF/oplug_vcdff.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
