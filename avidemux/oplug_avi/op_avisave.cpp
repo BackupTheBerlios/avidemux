@@ -48,7 +48,7 @@
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "oplug_avi/op_aviwrite.hxx"
 #include "oplug_avi/op_avisave.h"
-#include "ADM_gui/GUI_mux.h"
+#include "GUI_mux.h"
 
 uint32_t muxSize=4090;
 extern PARAM_MUX muxMode;
