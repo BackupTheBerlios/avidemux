@@ -14,12 +14,12 @@
 typedef enum 
 {
 	ADM_AVI=0,
+        ADM_AVI_UNP,
+        ADM_AVI_DUAL,
 	ADM_OGM,
 	ADM_ES,
 	ADM_PS,
         ADM_TS,
-	ADM_AVI_DUAL,
-	ADM_AVI_UNP,
 	ADM_FMT_DUMMY
 }ADM_OUT_FORMAT;
 
