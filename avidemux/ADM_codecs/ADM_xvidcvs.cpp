@@ -28,7 +28,7 @@
 
 #include "ADM_library/default.h"
 #include "ADM_codecs/ADM_codec.h"
-#include "ADM_gui/GUI_xvidparam.h"
+//#include "ADM_gui/GUI_xvidparam.h"
 
 uint8_t xvid_cvs_loaded=0;
 static myENC_RESULT xvid_res;

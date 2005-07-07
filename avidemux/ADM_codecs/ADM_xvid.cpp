@@ -29,7 +29,7 @@
 #include "ADM_library/default.h"
 
 #include "ADM_codecs/ADM_codec.h"
-#include "ADM_gui/GUI_xvidparam.h"
+//#include "ADM_gui/GUI_xvidparam.h"
 
 #include "ADM_assert.h"
 
