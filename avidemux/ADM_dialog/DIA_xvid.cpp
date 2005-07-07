@@ -25,7 +25,7 @@
 #include "ADM_library/default.h"
 #include "ADM_assert.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_gui/GUI_xvidparam.h"
+//#include "ADM_gui/GUI_xvidparam.h"
 #include "prefs.h"
 
 #ifdef USE_XX_XVID 

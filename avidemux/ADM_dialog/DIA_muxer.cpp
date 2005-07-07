@@ -31,7 +31,7 @@
 
 
 
-#include "ADM_gui/GUI_mux.h"
+#include "oplug_avi/GUI_mux.h"
 
 static GtkWidget	*create_dialog1 (void);
 
