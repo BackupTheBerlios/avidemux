@@ -10,7 +10,7 @@ avidemux2_SOURCES =   guiplay.cpp  \
 #avidemux_LDADD   = ./ADM_library/libADM_library.a ./ADM_audio/libADM_audio.a ./ADM_audiocodec/libADM_audiocodec.a ./ADM_audiofilter/libADM_audiofilter.a ./ADM_codecs/libADM_codecs.a ./ADM_colorspace/libADM_colorspace.a ./ADM_editor/libADM_editor.a ./ADM_encoder/libADM_encoder.a ./ADM_filter/libADM_filter.a ../ADM_gui2/libADM_gui2.a /ADM_gui/libADM_gui.a ./ADM_inpics/libADM_inpics.a ./ADM_nuv/libADM_nuv.a ./ADM_toolkit/libADM_toolkit.a ./oplug_mpeg/liboplug_mpeg.a ./ADM_video/libADM_video.a ./oplug_avi/liboplug_avi.a ./ADM_audiodevice/libADM_audiodevice.a ./ADM_vp32/libADM_vp32.a ./ADM_mpeg2dec/libADM_mpeg2dec.a ./ADM_mpegindexer/libADM_mpegindexer.a ./libMpeg2Dec/liblibMpeg2Dec.a ./oplug_mpegFF/liboplug_mpegFF.a  -L/usr/X11R6/lib -lm -lXext -lX11
 
 SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
-	ADM_colorspace ADM_editor ADM_encoder ADM_filter ADM_gui ADM_inpics ADM_nuv \
+	ADM_colorspace ADM_editor ADM_encoder ADM_filter  ADM_inpics ADM_nuv \
 	ADM_toolkit oplug_mpeg xpm ADM_video oplug_avi ADM_audiodevice ADM_vp32 \
 	ADM_mpeg2dec ADM_mpegindexer libMpeg2Dec oplug_mpegFF ADM_h263 ADM_gui2 ADM_dialog \
 	ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame ADM_requant \
@@ -49,7 +49,7 @@ avidemux2_LDADD   =  \
 ./libtoolame/liblibtoolame.a \
 ./ADM_gui2/libADM_gui2.a  \
 ./mpeg2enc/libmpeg2enc.a \
-./ADM_gui/libADM_gui.a ./ADM_inpics/libADM_inpics.a  ./ADM_3gp/libADM_3gp.a \
+./ADM_inpics/libADM_inpics.a  ./ADM_3gp/libADM_3gp.a \
 ./ADM_h263/libADM_h263.a   \
 ./ADM_nuv/libADM_nuv.a  ./ADM_ogm/libADM_ogm.a ./ADM_audiodevice/libADM_audiodevice.a \
 ./ADM_mpeg2dec/libADM_mpeg2dec.a \

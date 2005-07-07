@@ -150,6 +150,7 @@ uint32_t end;
 		
 		
 	}
+        printf("Output format:%d\n",UI_GetCurrentFormat());
 	switch(family)
 	{
 		case CodecFamilyAVI:
