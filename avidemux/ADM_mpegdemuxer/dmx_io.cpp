@@ -99,13 +99,6 @@ uint8_t fileParser::open( char *filename,FP_TYPE *multi )
         // Nuv files can have 20 decimals
         // Keep it down to 10000
         if(decimals>4) decimals=4;
-        if(*multi==FP_PROBE)
-        {
-                if(decimals)
-                        *multi=FP_APPEND;       //
-                else
-                        *multi=FP_DONT_APPEND;
-        }
         if(*multi==FP_DONT_APPEND)
         {
                 if(decimals) printf("There was several files, but dont append was forced\n");
@@ -230,7 +223,14 @@ uint8_t fileParser::open( char *filename,FP_TYPE *multi )
                 delete [] right;
                 delete [] buffer_fd;
                 delete [] buffer_sizeFd;
-
+                if(*multi==FP_PROBE)
+                {
+                        if(count>1)
+                                *multi=FP_APPEND;       //
+                        else
+                                *multi=FP_DONT_APPEND;
+                }
+        
                 printf( " found %d files \n", count );
                 printf( "Done \n" );
         } // if( decimals == 0 )
