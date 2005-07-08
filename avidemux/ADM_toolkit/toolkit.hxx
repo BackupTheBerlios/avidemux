@@ -23,6 +23,7 @@ void			PathStripName(char *str);
 char 		*PathCanonize(const char *tmpname);
 void		LowerCase(char *string);
 void 		GUI_Alert(const char *alertstring);
+void            GUI_Info(const char *alertstring);
 int 			GUI_Question(const char *alertstring);
 void			GUI_Sleep(uint32_t ms);
 int 			GUI_Alternate(char *title,char *choice1,char *choice2);
