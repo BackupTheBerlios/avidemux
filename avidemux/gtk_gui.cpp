@@ -1328,7 +1328,7 @@ int A_saveJpg (char *name)
     	fclose(fd);
     	delete [] buffer;
 	delete codec;
-  	GUI_Alert ("Done.");
+  	GUI_Info ("Done.");
 	return 1;
 }
 #else
@@ -1405,7 +1405,7 @@ void A_saveBunchJpg(char *name)
 		fwrite (buffer, sz, 1, fd);
     		fclose(fd);
 	}
-	GUI_Alert ("Done.");
+	GUI_Info ("Done.");
 _bunch_abort:	
     	delete [] buffer;
 	delete [] src;
@@ -1509,7 +1509,7 @@ sz = avifileinfo->width* avifileinfo->height * 3;
     	fclose(fd);
     	ADM_dealloc(out);
 
-  GUI_Alert ("Done.");
+  GUI_Info ("Done.");
 
 }
 
@@ -1837,7 +1837,7 @@ char *trackName=NULL;
     			{
       				secondaudiostream = tmp;      
       				printf ("\n MP3 loaded\n");
-				GUI_Alert("Second track loaded.");
+				GUI_Info("Second track loaded.");
     			}
 		}
 			break;
@@ -1855,7 +1855,7 @@ char *trackName=NULL;
     			{
       				secondaudiostream = tmp;
       				printf ("\n AC3 loaded\n");
-				GUI_Alert("Second track loaded.");
+				GUI_Info("Second track loaded.");
     			}
 			}
 			break;
@@ -1963,7 +1963,7 @@ A_mpegIndexer (void)
 	}
       printf ("\n indexing :%s to \n%s\n (audio %x)", mpeg, file,id);
       if (indexMpeg (mpeg, file, (uint8_t) id))
-	GUI_Alert ("Index done");
+	GUI_Info ("Index done");
 
     }
   else
@@ -2150,7 +2150,7 @@ void A_Pipe(pipID who,char *outfile)
     if(param) ADM_dealloc(param);
     if(cmd) ADM_dealloc(cmd);
     if(file) ADM_dealloc(file);
-    GUI_Alert("Done!");
+    GUI_Info("Done!");
 
 }
 #endif

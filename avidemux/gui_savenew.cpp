@@ -249,7 +249,7 @@ char *name;
         		GUI_Alert(" AVI NOT saved");
        		}
        		else
-        		GUI_Alert(" Saved successfully");
+        		GUI_Info(" Saved successfully");
        		delete nw;
 
 }
@@ -272,7 +272,7 @@ GenericAviSave	*nw;
         	GUI_Alert(" AVI NOT saved");
 	}
 	else
-        	GUI_Alert(" Saved successfully");
+        	GUI_Info(" Saved successfully");
 
 	delete nw;
 	return 1;
@@ -345,7 +345,7 @@ void  A_SaveAudioNVideo(char *name)
         	GUI_Alert(" AVI NOT saved");
        }
        else
-        	GUI_Alert(" Saved successfully");
+        	GUI_Info(" Saved successfully");
 
        delete nw;
 

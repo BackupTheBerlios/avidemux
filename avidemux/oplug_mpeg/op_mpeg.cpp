@@ -96,7 +96,7 @@ void oplug_mpeg_vcd(char *inname)
 
 
 	if( mpg->save_vcd(name))
-		GUI_Alert("Success !");
+		GUI_Info("Success !");
 	else
 		GUI_Alert("Failed !");
 
@@ -191,7 +191,7 @@ void oplug_mpeg_svcd(char *inname)
 	ADM_assert(mpg);
 
 	if( mpg->save_svcd(name))
-		GUI_Alert("Success !");
+		GUI_Info("Success !");
 	else
 		GUI_Alert("Failed !");
 
@@ -252,7 +252,7 @@ AVDMGenericAudioStream *stream;
 	ADM_assert(mpg);
 
 	if( mpg->save_svcd(name))
-		GUI_Alert("Success !");
+		GUI_Info("Success !");
 	else
 		GUI_Alert("Failed !");
 
@@ -281,7 +281,7 @@ char *name=NULL;
 	ADM_assert(mpg);
 
 	if( mpg->save_dvd(name))
-		GUI_Alert("Success !");
+		GUI_Info("Success !");
 	else
 		GUI_Alert("Failed !");
 
@@ -356,7 +356,7 @@ void oplug_mpeg_dvd_run(char *name)
 	ADM_assert(mpg);
 
 	if( mpg->save_dvd(name))
-		GUI_Alert("Success !");
+		GUI_Info("Success !");
 	else
 		GUI_Alert("Failed !");
 
@@ -433,7 +433,7 @@ void oplug_mpeg_ts_run(char *name)
         ADM_assert(mpg);
 
         if( mpg->save_dvd(name))
-                GUI_Alert("Success !");
+                GUI_Info("Success !");
         else
                 GUI_Alert("Failed !");
 
@@ -447,7 +447,7 @@ void oplug_mpeg_vcd_run(char *name)
 	ADM_assert(mpg);
 
 	if( mpg->save_vcd(name))
-		GUI_Alert("Success !");
+		GUI_Info("Success !");
 	else
 		GUI_Alert("Failed !");
 

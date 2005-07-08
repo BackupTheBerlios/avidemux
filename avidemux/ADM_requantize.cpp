@@ -319,6 +319,6 @@ _abt:
 		   }
 	Mrequant_end();
 	deleteAudioFilter();
-	GUI_Alert("Done!");
+	GUI_Info("Done!");
 
 }
