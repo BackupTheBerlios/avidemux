@@ -41,14 +41,14 @@ DMX_TYPE dmxIdentify(char *name)
 DMX_TYPE ret=DMX_MPG_UNKNOWN;
 uint64_t pos;
 uint8_t stream;
-
+FP_TYPE fp=FP_DONT_APPEND;
         uint64_t size;
         uint32_t typeES=0,typePS=0;
         fileParser *parser;
         parser=new fileParser();
 
         printf("Probing : %s\n",name);
-        if(!parser->open(name))
+        if(!parser->open(name,&fp))
         {
                 goto _fnd;
         }

@@ -110,6 +110,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         DMX_TYPE mpegType;
         uint8_t  mpegTypeChar;
         uint32_t update=0;
+        uint32_t multi=0;
         
         
 
@@ -137,7 +138,17 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                 case DMX_MPG_PS:
                 		{
                 		dmx_demuxerPS *dmx;
-                                        dmx=new dmx_demuxerPS(nbTracks,tracks);
+                                fileParser    *fp;
+                                FP_TYPE       type=FP_PROBE; 
+                                        fp=new fileParser;
+                                        fp->open(realname,&type);
+                                        delete fp;
+                                        if(type==FP_APPEND)
+                                        {
+                                                if(GUI_Question("There is several mpeg file, append them ?"))
+                                                        multi=1;
+                                        }
+                                        dmx=new dmx_demuxerPS(nbTracks,tracks,multi);
                                         demuxer=dmx;
                                         mpegTypeChar='P';
                             }
@@ -159,6 +170,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         fprintf(out,"ADMX0003\n");
         fprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
         fprintf(out,"File     : %s\n",realname);
+        fprintf(out,"Append   : %d\n",multi);
         fprintf(out,"Image    : %c\n",'P'); // Progressive
         fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",0,0,0); // width...
         fprintf(out,"Nb Gop   : %05lu \n",0); // width...
@@ -352,6 +364,7 @@ stop_found:
         fprintf(out,"ADMX0003\n");
         fprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
         fprintf(out,"File     : %s\n",realname);
+        fprintf(out,"Append   : %d\n",multi);
         fprintf(out,"Image    : %c\n",type); // Progressive
         fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",imageW,imageH,imageFps); // width...
         fprintf(out,"Nb Gop   : %05lu \n",nbGop); // width...

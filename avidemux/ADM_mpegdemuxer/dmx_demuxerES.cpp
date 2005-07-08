@@ -42,7 +42,8 @@ dmx_demuxerES::~dmx_demuxerES()
 }
 uint8_t dmx_demuxerES::open(char *name)
 {
-        if(! parser->open(name)) return 0;
+FP_TYPE fp=FP_DONT_APPEND;
+        if(! parser->open(name,&fp)) return 0;
         _size=parser->getSize();
         return 1;
 }

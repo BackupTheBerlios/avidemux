@@ -83,6 +83,7 @@ dmxAudioStream::open (char *name)
   char realname[1024];
   uint32_t aPid, vPid, aPes,mainAudio;
   uint32_t nbGop, nbFrame,nbAudioStream;
+  int multi;
 
  file=fopen(name,"rt");
  if(!file) return 0;
@@ -103,6 +104,9 @@ dmxAudioStream::open (char *name)
 
   fgets (string, MAX_LINE, file);
   sscanf (string, "File     : %s\n", realname);
+
+  fgets (string, MAX_LINE, file);
+  sscanf(string,"Append   : %d\n",&multi);
 
   fgets (string, MAX_LINE, file);
   sscanf (string, "Image    : %c\n", &progressif);	// Progressive
@@ -165,7 +169,7 @@ MPEG_TRACK track;
   switch (type)
     {
     case 'P':
-                demuxer = new dmx_demuxerPS (1,&track);
+                demuxer = new dmx_demuxerPS (1,&track,multi);
                 break;
     case 'T':
                 demuxer = new dmx_demuxerTS (1,&track,0);

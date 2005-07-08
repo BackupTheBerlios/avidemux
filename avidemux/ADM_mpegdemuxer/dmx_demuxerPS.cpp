@@ -36,7 +36,7 @@ uint8_t         dmx_demuxerPS::changePid(uint32_t newpid,uint32_t newpes)
         _pesBufferLen=0;
         _pesBufferIndex=0;
 }
-dmx_demuxerPS::dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks)
+dmx_demuxerPS::dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks,uint32_t multi)
 {
         consumed=0;
         parser=new fileParser();
@@ -78,6 +78,7 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks)
        	_probeSize=0; 
        	memset(seen,0,255*sizeof(uint64_t));     
         printf("Creating mpeg PS demuxer  main Pid: %X \n",myPid);
+        _multi=multi;
 }
 dmx_demuxerPS::~dmx_demuxerPS()
 {
@@ -119,7 +120,9 @@ uint8_t dmx_demuxerPS::setProbeSize(uint32_t sz)
 }
 uint8_t dmx_demuxerPS::open(char *name)
 {
-        if(! parser->open(name)) return 0;
+FP_TYPE fp=FP_DONT_APPEND;
+        if(_multi) fp=FP_APPEND;
+        if(! parser->open(name,&fp)) return 0;
         _size=parser->getSize();
         
         return 1;

@@ -87,7 +87,7 @@ int     audio,video;
 
                pseudo.pes=0xea; // Hopefully not used
                pseudo.pid=0;
-               demuxer=new dmx_demuxerPS(256,&pseudo);
+               demuxer=new dmx_demuxerPS(256,&pseudo,0);
                if(!demuxer->open(file))
                 {
                         delete demuxer;

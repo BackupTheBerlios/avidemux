@@ -192,6 +192,7 @@ uint8_t                 dmxHeader::open(char *name)
                 
                 char string[MAX_LINE+1]; //,str[1024];;
                 uint8_t interlac=0;
+                int multi;
                         
                 printf("\n  opening d2v file : %s\n",name);
                 file=fopen(name,"rt");
@@ -216,6 +217,9 @@ uint8_t                 dmxHeader::open(char *name)
 
                 fgets(string,MAX_LINE,file);
                 sscanf(string,"File     : %s\n",realname);
+                
+                fgets (string, MAX_LINE, file);
+                sscanf(string,"Append   : %d\n",&multi);
 
                 fgets(string,MAX_LINE,file);
                 sscanf(string,"Image    : %c\n",&progressif); // Progressive
@@ -260,7 +264,7 @@ uint8_t                 dmxHeader::open(char *name)
                                         MPEG_TRACK track;
                                         track.pid=0;
                                         track.pes=vPid;
-                                        demuxer=new dmx_demuxerPS(1,&track);
+                                        demuxer=new dmx_demuxerPS(1,&track,multi);
                                         break;
                                 }
                         case 'E':

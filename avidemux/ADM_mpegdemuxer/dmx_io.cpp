@@ -65,8 +65,11 @@ fileParser::~fileParser()
 /*
         Open one file, probe to see if there is several file with contiguous name
         and handle them as one big file if that's the case
+
+        If multi is set to probe, return value will be APPEND if there is several files, dont_append if one
+        if multi is set to dont_append, file won't be auto appended even if they exist
 */
-uint8_t fileParser::open( char *filename )
+uint8_t fileParser::open( char *filename,FP_TYPE *multi )
 {
         char *dot = NULL;                   // pointer to the last dot in filename
         uint8_t decimals = 0;               // number of decimals
@@ -82,7 +85,7 @@ uint8_t fileParser::open( char *filename )
 
         int i = 0;                          // index (general use)
 
-
+        
         // find the last dot
         dot = strrchr( filename, '.' );
 
@@ -96,7 +99,18 @@ uint8_t fileParser::open( char *filename )
         // Nuv files can have 20 decimals
         // Keep it down to 10000
         if(decimals>4) decimals=4;
-        
+        if(*multi==FP_PROBE)
+        {
+                if(decimals)
+                        *multi=FP_APPEND;       //
+                else
+                        *multi=FP_DONT_APPEND;
+        }
+        if(*multi==FP_DONT_APPEND)
+        {
+                if(decimals) printf("There was several files, but dont append was forced\n");
+                decimals=0;
+        }
         // no number sequence
         if( decimals == 0 )
         {

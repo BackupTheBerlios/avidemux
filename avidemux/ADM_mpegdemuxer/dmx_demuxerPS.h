@@ -53,10 +53,10 @@ class dmx_demuxerPS: public dmx_demuxer
                 
                   uint8_t       refill(void);
                   uint8_t       getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *len,uint64_t *pts,uint64_t *dts);
-
+                  uint32_t      _multi;
                   
           public:
-                           dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks) ;
+                           dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks,uint32_t multi) ;
                 virtual    ~dmx_demuxerPS();             
                 
                      uint8_t      open(char *name);
