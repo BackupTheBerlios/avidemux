@@ -53,9 +53,9 @@ S
 #define vecbyte vector unsigned char
 #define vecshort vector unsigned short
 
-uint8_t altivecYV12RGB(uint8_t * ptr_y,
+void altivecYV12RGB(uint8_t * ptr_y,
 		    uint8_t * ptr_u,
-		    uint8_t * ptr_v, uint8_t * ptr2, uint32_t w);
+		    uint8_t * ptr_v, uint8_t * ptr2, int w);
 
 // A pack of constant vectors we will use later
 // we more or less rely on gcc to have good register allocation
@@ -78,9 +78,9 @@ const vector signed int maxFF=(vector signed int)(MXF,MXF,MXF,MXF);
 //	We handle 8 pixels at a time
 //	My first altivec code :)
 //____________________________________
-uint8_t altivecYV12RGB(uint8_t * ptr_y,
+void altivecYV12RGB(uint8_t * ptr_y,
 		    uint8_t * ptr_u,
-		    uint8_t * ptr_v, uint8_t * ptr2, uint32_t w)
+		    uint8_t * ptr_v, uint8_t * ptr2, int w)
 {
 
 	vector unsigned char y,y2,u,v;
@@ -280,7 +280,7 @@ uint8_t altivecYV12RGB(uint8_t * ptr_y,
 
 	}
 	
-	return 1;
+	return;
 }
 //
 

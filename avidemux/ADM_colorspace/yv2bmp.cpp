@@ -29,9 +29,9 @@ Convert yv12 to bmp firendly RGB
 #include "colorspace.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
 #ifdef HAVE_ALTIVEC
-extern uint8_t altivecYV12RGB(uint8_t * ptr_y,
+extern void altivecYV12RGB(uint8_t * ptr_y,
 		    uint8_t * ptr_u,
-		    uint8_t * ptr_v, uint8_t * ptr2, uint32_t w);
+		    uint8_t * ptr_v, uint8_t * ptr2, int w);
 #endif		    
 
 static void swapRnB (uint8_t * ptr, uint32_t w);
