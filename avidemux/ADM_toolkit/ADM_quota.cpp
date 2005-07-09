@@ -6,7 +6,7 @@
 #include "ADM_quota.h"
 
 #include "default.h"
-extern uint8_t DIA_quota(const char *);
+extern uint8_t DIA_quota(char *);
 extern void GUI_Alert(const char *);
 
 #ifdef USE_LIBXML2
@@ -58,7 +58,11 @@ FILE *qfopen(const char *path, const char *mode){
   int fd;
 	while( !FD ){
 		FD = fopen (path,mode);
-		if( !FD && (errno == ENOSPC || errno == EDQUOT) ){
+		if( !FD && (errno == ENOSPC 
+#ifndef CYG_MANGLING
+|| errno == EDQUOT
+#endif
+) ){
 		  char msg[msg_len];
 		  	fprintf(stderr,"qfopen(): can't open \"%s\": %s\n", path,
 				       (errno==ENOSPC?"filesystem full":"quota exceeded"));
@@ -137,7 +141,11 @@ ssize_t qwrite(int fd, const void *buf, size_t numbytes){
 			ret+=rc;
 			continue;
 		}
-		if( rc == -1 && (errno == ENOSPC || errno == EDQUOT) ){
+		if( rc == -1 && (errno == ENOSPC 
+#ifndef CYG_MANGLING
+|| errno == EDQUOT
+#endif
+) ){
 		  uint8_t rc;
 			if( qfile[fd].ignore )
 				return -1;

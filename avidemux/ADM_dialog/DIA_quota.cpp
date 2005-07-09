@@ -38,7 +38,7 @@
 static GtkWidget	*create_dialog1 (const char *);
 //	Return 1 if resume, 0 if ignore
 //
-uint8_t DIA_quota( const char * msg )
+uint8_t DIA_quota( char * msg )
 {
 	uint8_t ret=2;
 	GtkWidget *dialog;
