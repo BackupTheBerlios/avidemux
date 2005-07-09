@@ -119,12 +119,13 @@ extern int A_SaveUnpackedVop( char *name);
 extern int A_saveDVDPS(char *name);
 extern void A_saveWorkbench (char *name);
 extern uint8_t A_rebuildKeyFrame (void);
+extern uint8_t A_setContainer(const char *cont);
 uint8_t scriptAddVar(char *var,char *value);
 //
 static int call_bframe(void);
 static int call_packedvop(void);
 static int call_saveDVD(char *a);
-//static int set_output_format(const char *str);
+static int set_output_format(const char *str);
 static void setVar(char *in);
 //
 uint8_t trueFalse(char *p);
@@ -214,7 +215,7 @@ AUTOMATON reaction_table[]=
 										(one_arg_type )call_requant},
 		{"info",		0	,"show information about loaded video and audio streams", show_info},
 		{"autoindex",		0	,"try to generate required index files", set_autoindex},
-//		{"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
+		{"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
 		
                 {"rebuild-index",       0       ,"rebuild index with correct frame type", (one_arg_type)A_rebuildKeyFrame},
 
@@ -598,25 +599,11 @@ int call_packedvop(void)
 	video_body->setEnv(ENV_EDITOR_PVOP);
 	return 1;
 }
-#if 0
+
 int set_output_format(const char *str){
-  Arg map;
-  int rc;
-	/* map to adm_script function and args */
-	/*
-	** JSC: have to change (const char*) to (char *) with max compatibility
-	** there are many dependencies if map.arg.string is changed to (char *) native
-	**    won't check them all :-)
-	*/
-	map.type = APM_STRING;
-	map.arg.string  = (char *)ADM_alloc(strlen(str)+1);
-	ADM_assert( map.arg.string );
-	strcpy( map.arg.string, str );
-	rc = scriptOutputFormat(-1,&map);
-	ADM_dealloc( map.arg.string );
-	return(rc);
+  	return A_setContainer(str);
 }
-#endif
+
 void call_mono2stereo(char *p){
    audioFilterMono2Stereo(1);
 }

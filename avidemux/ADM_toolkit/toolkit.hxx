@@ -50,6 +50,8 @@ char 		*ADM_rindex(const char *s, int c);
 char 		*ADM_index(const char *s, int c);
 void 		ADM_usleep(unsigned long us);
 uint8_t         ADM_fileExist(char *name);
+void            GUI_Verbose(void);
+void            GUI_Quiet(void);
 
 #ifdef CYG_MANGLING
 #ifndef HAVE_STRUCT_TIMESPEC
