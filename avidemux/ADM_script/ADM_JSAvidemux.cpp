@@ -48,6 +48,7 @@ extern uint8_t A_ListAllBlackFrames( char *file );
 extern uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss);
 extern uint8_t addFile(char *name);
 
+uint8_t A_setContainer(const char *cont);
 
 JSPropertySpec ADM_JSAvidemux::avidemux_properties[] = 
 { 
@@ -75,6 +76,8 @@ JSFunctionSpec ADM_JSAvidemux::avidemux_methods[] =
         { "clearSegments", ClearSegments ,0,0,0}, // Clear all segments
         { "addSegment", AddSegment ,3,0,0}, // Clear all segments
 	{ "goToTime", GoToTime, 3, 0, 0 },	// more current frame to time index
+        { "displayError", displayError, 1, 0, 0 },      // Display an error an halt
+        { "displayInfo", displayInfo, 1, 0, 0 },      // Display an error an halt
 	{ 0 }
 };
 
@@ -230,16 +233,9 @@ JSBool ADM_JSAvidemux::JSSetProperty(JSContext *cx, JSObject *obj, jsval id, jsv
 					priv->getObject()->m_pContainer = JSVAL_TO_STRING(*vp);
 					char *pContainer = JS_GetStringBytes(priv->getObject()->m_pContainer);
 					aprintf("Setting container format \"%s\"\n",pContainer);
-					for(int i=0;i<NB_CONT;i++)
-					{
-						printf("%s\n",container[i].name);
-						if(!strcasecmp(pContainer,container[i].name))
-						{
-							UI_SetCurrentFormat(container[i].type);
-							return JS_TRUE;
-						}
-					}
-					printf("Cannot set output format \"%s\"\n",pContainer);
+                                        if(A_setContainer(pContainer))
+                                                return JS_TRUE;
+                                        return JS_FALSE;
 					return JS_FALSE;
 				}
 				break;
@@ -417,6 +413,34 @@ JSBool ADM_JSAvidemux::AddSegment(JSContext *cx, JSObject *obj, uintN argc,
         *rval = BOOLEAN_TO_JSVAL( video_body->addSegment(a,b,c));
         return JS_TRUE;
 }// end AddSegment
+JSBool ADM_JSAvidemux::displayError(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin AddSegment
+        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+        // default return value
+        if(argc != 1)
+                return JS_FALSE;
+        char  *stringa = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+        GUI_Verbose();
+        GUI_Alert(stringa);
+        GUI_Quiet();
+        
+        return JS_TRUE;
+}// end AddSegment
+JSBool ADM_JSAvidemux::displayInfo(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin AddSegment
+        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+        // default return value
+        if(argc != 1)
+                return JS_FALSE;
+        char  *stringa = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+        GUI_Verbose();
+        GUI_Info(stringa);
+        GUI_Quiet();
+        return JS_TRUE;
+}// end AddSegment
+
 
 JSBool ADM_JSAvidemux::Exit(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
@@ -443,3 +467,17 @@ JSBool ADM_JSAvidemux::GoToTime(JSContext *cx, JSObject *obj, uintN argc,
 	return JS_TRUE;
 }// end GoToTime
 
+uint8_t A_setContainer(const char *cont)
+{
+       for(int i=0;i<NB_CONT;i++)
+       {
+                printf("%s\n",container[i].name);
+                if(!strcasecmp(cont,container[i].name))
+                {
+                        UI_SetCurrentFormat(container[i].type);
+                        return 1;
+                }
+       }
+       printf("Cannot set output format \"%s\"\n",cont);
+       return 0;
+}

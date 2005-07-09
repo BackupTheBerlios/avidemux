@@ -31,6 +31,16 @@ public:
 	static JSBool ListBlackFrames(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool PostProcess(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
+static JSBool SetFps1000(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+static JSBool GetFps1000(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+static JSBool GetWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+static JSBool GetHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+static JSBool GetFCC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+
+static JSBool isVopPacked(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+static JSBool hasGmc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+static JSBool hasQpel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+
 	static JSPropertySpec avidemuxvideo_properties[];
 	static JSFunctionSpec avidemuxvideo_methods[];
 	enum

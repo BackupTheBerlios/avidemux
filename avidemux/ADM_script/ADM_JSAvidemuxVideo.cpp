@@ -56,6 +56,14 @@ JSFunctionSpec ADM_JSAvidemuxVideo::avidemuxvideo_methods[] =
 	{ "saveJpeg", SaveJPEG, 1, 0, 0 },	// save the current frame as a JPEG
 	{ "listBlackFrames", ListBlackFrames, 1, 0, 0 },	// output a list of the black frame to a file
 	{ "setPostProc", PostProcess, 3, 0, 0 },	// Postprocess
+        { "setFps1000", SetFps1000, 1, 0, 0 },        // Postprocess
+        { "getFps1000", GetFps1000, 0, 0, 0 },        // Postprocess
+        { "getWidth", GetWidth, 0, 0, 0 },        // Postprocess
+        { "getHeight", GetHeight, 0, 0, 0 },        // Postprocess
+        { "getFCC", GetFCC, 0, 0, 0 },        // Postprocess
+        { "isVopPacked", isVopPacked, 0, 0, 0 },        // Postprocess
+        { "hasQpel", hasQpel, 0, 0, 0 },        // Postprocess
+        { "hasGmc", hasGmc, 0, 0, 0 },        // Postprocess
 	{ 0 }
 };
 
@@ -313,4 +321,130 @@ JSBool ADM_JSAvidemuxVideo::PostProcess(JSContext *cx, JSObject *obj, uintN argc
 	int rtn = video_body->setPostProc(JSVAL_TO_INT(argv[0]),JSVAL_TO_INT(argv[1]),JSVAL_TO_INT(argv[2]));
 	*rval = BOOLEAN_TO_JSVAL(rtn);
 	return JS_TRUE;
+}// end PostProcess
+
+JSBool ADM_JSAvidemuxVideo::GetFps1000(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+aviInfo info;
+
+        video_body->getVideoInfo(&info);
+        
+        ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
+        // default return value
+        *rval = INT_TO_JSVAL(25000);
+        if(argc != 0)
+                return JS_FALSE;
+        
+        *rval = INT_TO_JSVAL(info.fps1000);
+        return JS_TRUE;
+}// end PostProcess
+
+JSBool ADM_JSAvidemuxVideo::SetFps1000(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+int fps;
+aviInfo info;
+
+        video_body->getVideoInfo(&info);
+        
+        ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
+        // default return value
+        fps=JSVAL_TO_INT(argv[0]);
+        if(fps>100000 || fps<2000)
+        {      
+                printf("Fps too low\n");
+                return JS_FALSE;
+        }       
+        info.fps1000=fps;
+        video_body->updateVideoInfo(&info);
+        video_body->getVideoInfo (avifileinfo);
+        return JS_TRUE;
+}// end PostProcess
+
+
+JSBool ADM_JSAvidemuxVideo::GetWidth(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+aviInfo info;
+
+        video_body->getVideoInfo(&info);
+        
+        ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
+        // default return value
+        *rval = INT_TO_JSVAL(100);
+        if(argc != 0)
+                return JS_FALSE;
+        
+        *rval = INT_TO_JSVAL(info.width);
+        return JS_TRUE;
+}// end PostProcess
+JSBool ADM_JSAvidemuxVideo::GetHeight(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+aviInfo info;
+
+        video_body->getVideoInfo(&info);
+        
+        ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
+        // default return value
+        *rval = INT_TO_JSVAL(100);
+        if(argc != 0)
+                return JS_FALSE;
+        
+        *rval = INT_TO_JSVAL(info.height);
+        return JS_TRUE;
+}// end PostProcess
+JSBool ADM_JSAvidemuxVideo::GetFCC(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+aviInfo info;
+
+        video_body->getVideoInfo(&info);
+        
+        ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
+        // default return value
+        *rval = STRING_TO_JSVAL("NONE");
+        if(argc != 0)
+                return JS_FALSE;
+        
+        *rval = STRING_TO_JSVAL(JS_NewStringCopyZ(cx, fourCC::tostring(info.fcc)));
+        return JS_TRUE;
+}// end PostProcess
+
+JSBool ADM_JSAvidemuxVideo::isVopPacked(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+int32_t info;
+       info=video_body->getSpecificMpeg4Info();
+        
+        ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
+        // default return value
+        *rval=JS_FALSE;
+        if(info & ADM_VOP_ON) *rval=JS_TRUE;
+        return JS_TRUE;
+}// end PostProcess
+JSBool ADM_JSAvidemuxVideo::hasGmc(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+uint32_t info;
+       info=video_body->getSpecificMpeg4Info();
+        
+        ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
+        // default return value
+        *rval=JS_FALSE;
+        if(info & ADM_GMC_ON) *rval=JS_TRUE;
+        return JS_TRUE;
+}// end PostProcess
+JSBool ADM_JSAvidemuxVideo::hasQpel(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+uint32_t info;
+       info=video_body->getSpecificMpeg4Info();
+        
+        ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
+        // default return value
+        *rval=JS_FALSE;
+        if(info & ADM_QPEL_ON) *rval=JS_TRUE;
+        return JS_TRUE;
 }// end PostProcess
