@@ -16,5 +16,5 @@ libADM_mplex_a_SOURCES = ac3strm_in.cpp audiostrm.hpp audiostrm_out.cpp \
 
 EXTRA_DIST = 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES= $(all_includes) -I../mpeg2enc/ -Impeg2enc
+INCLUDES= $(all_includes) -I../mpeg2enc 
 noinst_HEADERS = ADM_inout.h ADM_transfert.h
