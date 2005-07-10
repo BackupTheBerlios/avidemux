@@ -1,5 +1,11 @@
+#include "config.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "ADM_library/default.h"
 #include "ADM_JSGlobal.h"
 #include "ADM_JSAvidemux.h"
+
+extern uint8_t JS_AvidemuxFunction(JSContext *cx,JSObject *global);
 
 // expose our main javascript context to the entire program
 JSObject *g_pObject;
@@ -57,6 +63,7 @@ bool SpidermonkeyInit()
 //			JSObject *objVideo = ADM_JSAvidemuxVideo::JSInit(cx, global);
 			// register error handler
 			JS_SetErrorReporter(cx, printJSError);
+                        JS_AvidemuxFunction(cx,global);
 			return true;
 		}// end context created
 	}// end runtime created

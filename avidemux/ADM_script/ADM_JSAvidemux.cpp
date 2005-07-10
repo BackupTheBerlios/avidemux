@@ -76,8 +76,6 @@ JSFunctionSpec ADM_JSAvidemux::avidemux_methods[] =
         { "clearSegments", ClearSegments ,0,0,0}, // Clear all segments
         { "addSegment", AddSegment ,3,0,0}, // Clear all segments
 	{ "goToTime", GoToTime, 3, 0, 0 },	// more current frame to time index
-        { "displayError", displayError, 1, 0, 0 },      // Display an error an halt
-        { "displayInfo", displayInfo, 1, 0, 0 },      // Display an error an halt
 	{ 0 }
 };
 
@@ -411,33 +409,6 @@ JSBool ADM_JSAvidemux::AddSegment(JSContext *cx, JSObject *obj, uintN argc,
         int c = JSVAL_TO_INT(argv[2]);
         aprintf("adding segment :%d %d %d\n",a,b,c);
         *rval = BOOLEAN_TO_JSVAL( video_body->addSegment(a,b,c));
-        return JS_TRUE;
-}// end AddSegment
-JSBool ADM_JSAvidemux::displayError(JSContext *cx, JSObject *obj, uintN argc, 
-                                       jsval *argv, jsval *rval)
-{// begin AddSegment
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
-        // default return value
-        if(argc != 1)
-                return JS_FALSE;
-        char  *stringa = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-        GUI_Verbose();
-        GUI_Alert(stringa);
-        GUI_Quiet();
-        
-        return JS_TRUE;
-}// end AddSegment
-JSBool ADM_JSAvidemux::displayInfo(JSContext *cx, JSObject *obj, uintN argc, 
-                                       jsval *argv, jsval *rval)
-{// begin AddSegment
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
-        // default return value
-        if(argc != 1)
-                return JS_FALSE;
-        char  *stringa = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-        GUI_Verbose();
-        GUI_Info(stringa);
-        GUI_Quiet();
         return JS_TRUE;
 }// end AddSegment
 
