@@ -39,11 +39,10 @@
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 
-static GtkWidget	*create_fileselection1 (void);
-static void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw, char **name=NULL);
 
-char *PathCanonize(const char *tmpname);
-void		PathStripName(char *str);
+static void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw, char **name=NULL);
+char            *PathCanonize(const char *tmpname);
+void            PathStripName(char *str);
 
 
 /**
@@ -66,7 +65,12 @@ gchar last;
 char *dupe=NULL,*tmpname=NULL;
 DIR *dir=NULL;
 	
-	dialog=create_fileselection1 ();
+	dialog = gtk_file_chooser_dialog_new ("Open File",
+                                      NULL,
+                                      GTK_FILE_CHOOSER_ACTION_OPEN,
+                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                      NULL);
 	gtk_window_set_title (GTK_WINDOW (dialog),title);
 	gtk_transient(dialog);
 	if(source)
@@ -76,7 +80,7 @@ DIR *dir=NULL;
 		if( (dir=opendir(dupe)) )
 			{
 				closedir(dir);
-				gtk_file_selection_set_filename(GTK_FILE_SELECTION(dialog),(gchar *)dupe);
+				gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)source);
 			}
 		delete [] dupe;
 	
@@ -93,14 +97,14 @@ DIR *dir=NULL;
 			if( (dir=opendir(dupe)) )
 			{
 				closedir(dir);
-				gtk_file_selection_set_filename(GTK_FILE_SELECTION(dialog),(gchar *)dupe);
+				gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)dupe);
 			}
 			delete [] dupe;
 		}
 	}
-	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_ACCEPT)
 	{
-			selected_filename= (gchar *) 	gtk_file_selection_get_filename(GTK_FILE_SELECTION(dialog));
+			selected_filename= (gchar *) 	gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 			if(strlen(selected_filename))
 			{
 			last=selected_filename[strlen(selected_filename) - 1]; 
@@ -190,7 +194,6 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 }
 // CYB 2005.02.23: DND
 
-#if 1 || (GTK_MINOR_VERSION*10+GTK_MICRO_VERSION)<34
 
 void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 {				/* Create the selector */
@@ -204,56 +207,60 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	if(rname)
 		*rname=NULL;
 
-	dialog=create_fileselection1();
-	gtk_window_set_title (GTK_WINDOW (dialog),label);
-	gtk_transient(dialog);
+        dialog=dialog = gtk_file_chooser_dialog_new ("Open File",
+                                      NULL,
+                                      GTK_FILE_CHOOSER_ACTION_OPEN,
+                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                      NULL);
+    
+        gtk_window_set_title (GTK_WINDOW (dialog),label);
+        gtk_register_dialog(dialog);
         if(rw)
-	       res=prefs->get(LASTDIR_WRITE,&tmpname); 
+                res=prefs->get(LASTDIR_WRITE,&tmpname); 
         else
                res=prefs->get(LASTDIR_READ,&tmpname); 
         if(res)
 	{
-		DIR *dir;
-	//	printf("tmpname : %s\n",tmpname);
-		char *str=PathCanonize(tmpname);
+                DIR *dir;
+                char *str=PathCanonize(tmpname);
+                PathStripName(str);
 
-	//	printf("tmpname : %s\n",str);
-		PathStripName(str);
-
-	//	printf("tmpname : *%s*\n",str);
-		/* LASTDIR may have gone; then do nothing and use current dir instead (implied) */
-		if( (dir=opendir(str)) ){
-			closedir(dir);
-			gtk_file_selection_set_filename(GTK_FILE_SELECTION(dialog),(gchar *)str);
-		}
-		delete [] str;
-	}
-	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+                /* LASTDIR may have gone; then do nothing and use current dir instead (implied) */
+                if( (dir=opendir(str)) )
+                {
+                        closedir(dir);
+                        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)str);
+                }
+                delete [] str;
+        }
+        if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_ACCEPT)
 	{
 
-			selected_filename= (gchar *) 	gtk_file_selection_get_filename(GTK_FILE_SELECTION(dialog));
+                        selected_filename= (gchar *) 	gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 #ifdef CYG_MANGLING
-			if (*(selected_filename + strlen(selected_filename) - 1) == '\\'){
+                        if (*(selected_filename + strlen(selected_filename) - 1) == '\\'){
 #else			
-			 if (*(selected_filename + strlen(selected_filename) - 1) == '/'){
-#endif			 
-      	  					GUI_Alert("Cannot open directory as file !");
-			}
-			else
-			{
-						name=ADM_strdup(selected_filename);
+                        if (*(selected_filename + strlen(selected_filename) - 1) == '/'){
+#endif	 
+                        GUI_Alert("Cannot open directory as file !");
+                }
+                else
+                {
+                        name=ADM_strdup(selected_filename);
 
-						char *str=PathCanonize(name);
-						PathStripName(str);
-                                                if(rw)
-						  prefs->set(LASTDIR_WRITE,str);			
-                                                else
-                                                  prefs->set(LASTDIR_READ,str);                        
-						delete [] str;
+                        char *str=PathCanonize(name);
+                        PathStripName(str);
+                        if(rw)
+                                prefs->set(LASTDIR_WRITE,str);			
+                        else
+                                prefs->set(LASTDIR_READ,str);                        
+                        delete [] str;
 
-			}
-	}
-	gtk_widget_destroy(dialog);
+                }
+        }
+        gtk_unregister_dialog(dialog);
+        gtk_widget_destroy(dialog);
 
 // CYB 2005.02.23
         if(cb)
@@ -265,133 +272,12 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
                 *rname=name;  
         }
 }
-#else
-//
-//	Gtk 2.4 Using fileChooser instead of fileselect
-//
-void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
-{				/* Create the selector */
-
-    	GtkWidget *dialog;
-	char *name=NULL;
-	char *tmpname;
-	gchar *selected_filename;
-        uint8_t res;
-	GtkFileChooserAction action;
-	
-	if(rname)
-		*rname=NULL;
-
-	if(!rw) 	action=GTK_FILE_CHOOSER_ACTION_OPEN;
-		else 	action=GTK_FILE_CHOOSER_ACTION_SAVE;
-
-	dialog = gtk_file_chooser_dialog_new (label,
-				      NULL,
-				      action,
-				      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-				      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-				      NULL);
-        if(rw)
-                res=prefs->get(LASTDIR_WRITE,&tmpname)
-        else
-                res=prefs->get(LASTDIR_READ,&tmpname)
-	if(res)
-	{
-		char *str=PathCanonize(tmpname);
-		PathStripName(str);
-		
-		printf("Current folder : *%s*\n",str);
-		if(str)
-		{	// remove last /
-			str[strlen(str)-1]=0;
-	 		gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER(dialog), str);
-		}
-		delete [] str;
-	}				      
-	
-			      
-	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-  	{
-    		selected_filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));    
-#ifdef CYG_MANGLING
-	if (*(selected_filename + strlen(selected_filename) - 1) == '\\')
-#else  	
-	 if (*(selected_filename + strlen(selected_filename) - 1) == '/')
-#endif	 
-      	  					GUI_Alert("Cannot open directory as file !");
-			else
-			{
-						name=ADM_strdup(selected_filename);
-
-						char *str=PathCanonize(name);
-						PathStripName(str);
-                                                if(rw)
-						  prefs->set(LASTDIR_WRITE,str);
-                                                else
-                                                  prefs->set(LASTDIR_READ,str);                     
-						delete [] str;
-
-	}		}
-	gtk_widget_destroy (dialog);
-	
-// CYB 2005.02.23
-    fileReadWrite(cb, rw, name);
-}
-
-#endif
-
 
 
 //------------------------------------------------------------------
 
-static gint response_accept_cb(GtkWidget *widget,  gpointer  *data);
-static gint response_cancel_cb(GtkWidget *widget,  gpointer  *data);
-
-GtkWidget	*create_fileselection1 (void)
-{
-  GtkWidget *fileselection1;
-  GtkWidget *ok_button1;
-  GtkWidget *cancel_button1;
-
-  fileselection1 = gtk_file_selection_new (_("Select File"));
-    gtk_widget_show (fileselection1);
-  gtk_container_set_border_width (GTK_CONTAINER (fileselection1), 10);
-
-  ok_button1 = GTK_FILE_SELECTION (fileselection1)->ok_button;
-  gtk_widget_show (ok_button1);
-  GTK_WIDGET_SET_FLAGS (ok_button1, GTK_CAN_DEFAULT);
-
-  cancel_button1 = GTK_FILE_SELECTION (fileselection1)->cancel_button;
-  gtk_widget_show (cancel_button1);
-  GTK_WIDGET_SET_FLAGS (cancel_button1, GTK_CAN_DEFAULT);
-// Patch
-g_signal_connect (    	GTK_OBJECT (ok_button1), "clicked", 	G_CALLBACK (response_accept_cb), fileselection1);
-g_signal_connect (    	GTK_OBJECT (cancel_button1), "clicked", 	G_CALLBACK (response_cancel_cb), fileselection1);
-
-// /Patch
-  /* Store pointers to all widgets, for use by lookup_widget(). */
-  GLADE_HOOKUP_OBJECT_NO_REF (fileselection1, fileselection1, "fileselection1");
-  GLADE_HOOKUP_OBJECT_NO_REF (fileselection1, ok_button1, "ok_button1");
-  GLADE_HOOKUP_OBJECT_NO_REF (fileselection1, cancel_button1, "cancel_button1");
-
-  return fileselection1;
-}
-gint response_accept_cb(GtkWidget *widget,  gpointer  *data)
-{
-UNUSED_ARG(widget);
-    GtkWidget  *dialog = (GtkWidget *) data;
-    gtk_dialog_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-    return TRUE;
-}
-gint response_cancel_cb(GtkWidget *widget,  gpointer  *data)
-{
-UNUSED_ARG(widget);
-    GtkWidget  *dialog = (GtkWidget *) data;
-    gtk_dialog_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
-    return TRUE;
-}
-
 /*
+
 ** note: it modifies it's first argument
 */
 void simplify_path(char **buf){
@@ -516,3 +402,4 @@ void PathSplit(char *str, char **root, char **ext)
 		*root=full;
 		return ;
 }
+
