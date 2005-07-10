@@ -51,6 +51,8 @@
 	#include "ADM_codecs/ADM_divx4.h"
 #endif
 #include "ADM_mpegdemuxer/dmx_indexer.h"
+#include "ADM_outputfmt.h"
+#include "ADM_gui2/GUI_ui.h"
 int DIA_mpegIndexer (char **mpegFile, char **indexFile, int *aid,
 		     int already = 0);
 void DIA_indexerPrefill(char *name);
@@ -553,6 +555,8 @@ TryAgain:
 									// Can we repack it ?
 									if(dml->unpackPacked())
 									{
+                                                                                // Set ouput to avi vop
+                                                                                UI_SetCurrentFormat(ADM_AVI_UNP);
 										goto TryAgain;
 									}
 									GUI_Alert("Could not unpack it\n"
@@ -563,9 +567,7 @@ TryAgain:
 
 								printf("\n Switching codec...\n");
 								delete vid->decoder;
-								vid->decoder=getDecoderVopPacked(info.fcc,
-																   info.width,
-																   info.height,0,NULL);
+								vid->decoder=getDecoderVopPacked(info.fcc, info.width,info.height,0,NULL);
 								ispacked=1;
 #else
 								GUI_Alert("Troubles ahead : This a vop packed avi..");
