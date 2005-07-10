@@ -56,16 +56,16 @@ static int	  widgetCount=0;
 void gtk_register_dialog(GtkWidget *newdialog)
 {
 
-	widgetStack[widgetCount]=newdialog;
-	// old one is no longer modal
-	if(widgetCount)
-	{
-		gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount-1]), 0);
-		gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount]), 1);
-		// The new one is
-		
-	}
-	widgetCount++;
+        widgetStack[widgetCount]=newdialog;
+        // old one is no longer modal
+        if(widgetCount)
+        {
+                gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount-1]), 0);
+                gtk_window_set_transient_for (GTK_WINDOW(newdialog),GTK_WINDOW(widgetStack[widgetCount-1]));
+        }
+        gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount]), 1);
+        
+        widgetCount++;
 }
 void gtk_unregister_dialog(GtkWidget *newdialog)
 {
@@ -146,6 +146,7 @@ int ret=0;
 
         dialog=create_dialogYN();
         gtk_label_set_text(GTK_LABEL(WID(label1)),alertstring);
+        gtk_label_set_use_markup(GTK_LABEL(WID(label1)), TRUE);
         gtk_register_dialog(dialog);
         if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_YES)
         {
@@ -169,6 +170,7 @@ void             GUI_Info(const char *alertstring)
         }
         dialog=create_dialogInfo();
         gtk_label_set_text(GTK_LABEL(WID(label1)),alertstring);
+        gtk_label_set_use_markup(GTK_LABEL(WID(label1)), TRUE);
         gtk_register_dialog(dialog);
         gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_unregister_dialog(dialog);
@@ -193,6 +195,7 @@ void 		GUI_Alert(const char *alertstring)
         }
         dialog=create_dialogWarning();
         gtk_label_set_text(GTK_LABEL(WID(label1)),alertstring);
+        gtk_label_set_use_markup(GTK_LABEL(WID(label1)), TRUE);
         gtk_register_dialog(dialog);
         gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_unregister_dialog(dialog);
@@ -288,21 +291,32 @@ create_dialogYN (void)
   GtkWidget *buttonNo;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Question"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), _(""));
+  
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
+  gtk_window_set_resizable (GTK_WINDOW (dialog1), FALSE);
+  gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);  
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
+  gtk_box_set_spacing (GTK_BOX (dialog_vbox1), 12);
   gtk_widget_show (dialog_vbox1);
 
   hbox1 = gtk_hbox_new (FALSE, 0);
+  gtk_box_set_spacing (GTK_BOX (hbox1), 12);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox1), 6);
   gtk_widget_show (hbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), hbox1, TRUE, TRUE, 0);
 
-  image1 = gtk_image_new_from_stock ("gtk-dialog-question", GTK_ICON_SIZE_DIALOG);
+  image1 = gtk_image_new_from_stock ("gtk-dialog-warning", GTK_ICON_SIZE_DIALOG);
+  gtk_misc_set_alignment (GTK_MISC (image1), 0.5, 0.0);
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
 
   label1 = gtk_label_new (_("label1"));
+  gtk_label_set_line_wrap (GTK_LABEL(label1), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label1), 0.5, 0.0);
+  gtk_label_set_selectable (GTK_LABEL(label1), TRUE);
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (hbox1), label1, TRUE, TRUE, 0);
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_CENTER);
@@ -311,14 +325,14 @@ create_dialogYN (void)
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
-  buttonYes = gtk_button_new_from_stock ("gtk-yes");
+  buttonYes = gtk_button_new_from_stock ("gtk-cancel");
   gtk_widget_show (buttonYes);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonYes, GTK_RESPONSE_YES);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonYes, GTK_RESPONSE_NO);
   GTK_WIDGET_SET_FLAGS (buttonYes, GTK_CAN_DEFAULT);
 
-  buttonNo = gtk_button_new_from_stock ("gtk-no");
+  buttonNo = gtk_button_new_from_stock ("gtk-ok");
   gtk_widget_show (buttonNo);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonNo, GTK_RESPONSE_NO);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonNo, GTK_RESPONSE_YES);
   GTK_WIDGET_SET_FLAGS (buttonNo, GTK_CAN_DEFAULT);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
@@ -402,21 +416,32 @@ GtkWidget       *create_dialogInfo (void)
   GtkWidget *closebutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Information"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), _(""));
+  
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
+  gtk_window_set_resizable (GTK_WINDOW (dialog1), FALSE);
+  gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
+  gtk_box_set_spacing (GTK_BOX (dialog_vbox1), 12);
   gtk_widget_show (dialog_vbox1);
 
   hbox1 = gtk_hbox_new (FALSE, 0);
+  gtk_box_set_spacing (GTK_BOX (hbox1), 12);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox1), 6);
   gtk_widget_show (hbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), hbox1, TRUE, TRUE, 0);
 
   image1 = gtk_image_new_from_stock ("gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
+  gtk_misc_set_alignment (GTK_MISC (image1), 0.5, 0.0);
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
 
   label1 = gtk_label_new (_("label1"));
+  gtk_label_set_line_wrap (GTK_LABEL(label1), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label1), 0.5, 0.0);
+  gtk_label_set_selectable (GTK_LABEL(label1), TRUE);
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (hbox1), label1, TRUE, TRUE, 0);
 
@@ -424,7 +449,7 @@ GtkWidget       *create_dialogInfo (void)
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
-  closebutton1 = gtk_button_new_from_stock ("gtk-close");
+  closebutton1 = gtk_button_new_from_stock ("gtk-ok");
   gtk_widget_show (closebutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), closebutton1, GTK_RESPONSE_CLOSE);
   GTK_WIDGET_SET_FLAGS (closebutton1, GTK_CAN_DEFAULT);
@@ -454,21 +479,32 @@ create_dialogWarning (void)
   GtkWidget *closebutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Warning"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), _(""));
+  
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
+  gtk_window_set_resizable (GTK_WINDOW (dialog1), FALSE);
+  gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
+  gtk_box_set_spacing (GTK_BOX (dialog_vbox1), 12);
   gtk_widget_show (dialog_vbox1);
 
   hbox1 = gtk_hbox_new (FALSE, 0);
+  gtk_box_set_spacing (GTK_BOX (hbox1), 12);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox1), 6);
   gtk_widget_show (hbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), hbox1, TRUE, TRUE, 0);
 
-  image1 = gtk_image_new_from_stock ("gtk-dialog-warning", GTK_ICON_SIZE_DIALOG);
+  image1 = gtk_image_new_from_stock ("gtk-dialog-error", GTK_ICON_SIZE_DIALOG);
+  gtk_misc_set_alignment (GTK_MISC (image1), 0.5, 0.0);
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
 
   label1 = gtk_label_new (_("label1"));
+  gtk_label_set_line_wrap (GTK_LABEL(label1), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label1), 0.5, 0.0);
+  gtk_label_set_selectable (GTK_LABEL(label1), TRUE);
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (hbox1), label1, TRUE, TRUE, 0);
 
@@ -476,7 +512,7 @@ create_dialogWarning (void)
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
-  closebutton1 = gtk_button_new_from_stock ("gtk-close");
+  closebutton1 = gtk_button_new_from_stock ("gtk-ok");
   gtk_widget_show (closebutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), closebutton1, GTK_RESPONSE_CLOSE);
   GTK_WIDGET_SET_FLAGS (closebutton1, GTK_CAN_DEFAULT);
