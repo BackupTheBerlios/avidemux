@@ -49,6 +49,8 @@
 */
 #include "avi_vars.h"
 #include "audioeng_toolame.h"
+#include "ADM_audiocodec/ADM_audiocodeclist.h"
+
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO_FILTER
 #include "ADM_toolkit/ADM_debug.h"
@@ -59,30 +61,7 @@ extern void UI_setAudioCodec( int i);
 uint32_t audioFilterGetNbEncoder(void);
 const char* audioFilterGetIndexedName(uint32_t i);
 
-typedef struct {
-	const char *name;
-	const char *menuName;
-	AUDIOENCODER codec;
-}CODECLIST;
 
-static const CODECLIST myCodecList[]=
-{
-                {"copy","Copy", AUDIOENC_COPY},
-#ifdef HAVE_LIBMP3LAME
-		{"lame","Lame", AUDIOENC_MP3},
-#endif
-#ifdef USE_FAAC
-		{"aac","FAAC", AUDIOENC_FAAC},
-#endif
-#ifdef USE_VORBIS
-		{"vorbis","Vorbis", AUDIOENC_VORBIS},
-#endif
-
-		{"mp2", "FFm MP2", AUDIOENC_MP2},
-		{"ac3", "FFm AC3",AUDIOENC_AC3},
-		{"toolame","Toolame", AUDIOENC_2LAME},
-		{"none", "Wav PCM",AUDIOENC_NONE}
-};
 typedef struct externalSource
 {
  AudioSource type;

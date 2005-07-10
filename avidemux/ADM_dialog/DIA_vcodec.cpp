@@ -22,7 +22,7 @@
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_encoder/adm_encoder.h"
-
+#include "ADM_encoder/ADM_videocodeclist.h"
 
 //___________________________________
 
@@ -32,42 +32,8 @@
  static void okCallback(GtkButton * button, gpointer user_data);
  static void callBackCalc( void );
 extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
- typedef struct myVideoCodec
- {
- 		SelectCodecType codec;
-		char		*name;
- }myVideoCodec;
- static myVideoCodec myTab[]=
- {
- 	{CodecFF,"Lavcodec Mpeg4"},
-	{CodecH263,"Lavcodec H263"},
-	{CodecH263P,"Lavcodec H263+"},
-	{CodecHuff,"Huffyuv"},
-        {CodecFFhuff,"FF Huffyuv"},
-	{CodecFFV1,"FFV1"},
-	{CodecSnow,"Snow"},
-#ifdef USE_XVID_4	
- 	{CodecXvid4,"Xvid4"},
-#endif	
-#ifdef USE_XX_XVID	
- 	{CodecXvid,"Xvid"},
-#endif
-#ifdef USE_DIVX
-	{CodecDivx,"Divx"},
-#endif
-
-	{CodecMjpeg,"Mjpeg"},
-#ifdef USE_MJPEG
-	{CodecVCD,"VCD"},
-	{CodecSVCD,"SVCD"},
-	{CodecDVD,"DVD"},
-#endif
-	{CodecXVCD,"XVCD (lav)"},
-	{CodecXSVCD,"XSVCD (lav)"},
-	{CodecXDVD,"DVD (lavcodec)"}
-	
- };
- void okCallback(GtkButton * button, gpointer user_data)
+ 
+void okCallback(GtkButton * button, gpointer user_data)
 {
 	SelectCodecType cur;
 
@@ -92,19 +58,19 @@ uint8_t DIA_videoCodec( SelectCodecType *codec )
 
 	uint8_t ret=0;
 	SelectCodecType old=*codec;
-	GtkWidget *widget[sizeof(myTab)/sizeof(myVideoCodec)]; 
+	GtkWidget *widget[sizeof(mycodec)/sizeof(codecEnumByName)]; 
 	dialog=create_dialogVideoCodec();
 	//gtk_transient(dialog);	
 	gtk_register_dialog(dialog);
 
 	
 	// now set the input one
-	for(uint32_t i=0;i<sizeof(myTab)/sizeof(myVideoCodec);i++)
+	for(uint32_t i=0;i<sizeof(mycodec)/sizeof(codecEnumByName);i++)
 	{
-		widget[i]=gtk_menu_item_new_with_mnemonic (myTab[i].name);
+		widget[i]=gtk_menu_item_new_with_mnemonic (mycodec[i].displayName);
   		gtk_widget_show (widget[i]);
   		gtk_container_add (GTK_CONTAINER (WID(menu1)), widget[i]);
-		if(*codec==myTab[i].codec)
+		if(*codec==mycodec[i].type)
 			{
 				// set
 				gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenu_CodecList)), i);
@@ -136,8 +102,8 @@ SelectCodecType findCodec( void )
 uint8_t j;
 			j=getRangeInMenu(WID(optionmenu_CodecList));
 
-			if(j>=sizeof(myTab)/sizeof(myVideoCodec)) ADM_assert(0);
-			return myTab[j].codec;
+			if(j>=sizeof(mycodec)/sizeof(codecEnumByName)) ADM_assert(0);
+			return mycodec[j].type;
 			
 
 }

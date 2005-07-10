@@ -26,6 +26,7 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 
+#include "ADM_audiocodec/ADM_audiocodeclist.h"
 
 #include "ADM_gui2/support.h"
 
@@ -43,23 +44,6 @@ static GtkWidget	*create_dialogAudioCodec (void);
  static GtkWidget *dialog;
  static void okCallback(GtkButton * button, gpointer user_data);
  
- static AUDIOENCODER myTab[]=
- {
- 	AUDIOENC_NONE
-	,AUDIOENC_MP2
-	,AUDIOENC_AC3
-	,AUDIOENC_2LAME
-#ifdef 	HAVE_LIBMP3LAME
-	,AUDIOENC_MP3
-#endif
-#ifdef USE_FAAC
-	,AUDIOENC_FAAC
-#endif
-#ifdef USE_VORBIS
-	,AUDIOENC_VORBIS
-#endif
-
- };
   
  void okCallback(GtkButton * button, gpointer user_data)
 {
@@ -86,8 +70,8 @@ uint8_t DIA_audioCodec( AUDIOENCODER *codec )
 
 	
 	// now set the input one
-	for(uint32_t i=0;i<sizeof(myTab)/sizeof(AUDIOENCODER);i++)
-		if(*codec==myTab[i])
+	for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
+		if(*codec==myCodecList[i].codec)
 			{
 				// set 
 				gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(dialog,"optionmenu_CodecList")), i);
@@ -113,8 +97,8 @@ AUDIOENCODER findCodec( void )
 uint8_t j;
 			j=getRangeInMenu(lookup_widget(dialog,"optionmenu_CodecList"));
 		
-			if(j>=sizeof(myTab)/sizeof(AUDIOENCODER)) ADM_assert(0);
-			return myTab[j];
+			if(j>=sizeof(myCodecList)/sizeof(CODECLIST)) ADM_assert(0);
+			return myCodecList[j].codec;
 			
 
 }
@@ -145,6 +129,8 @@ GtkWidget	*create_dialogAudioCodec (void)
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
+  GtkWidget *acodec[10];
+  int acodecNb=0;
 
   dialogAudioCodec = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (dialogAudioCodec), _("AudioCodec"));
@@ -162,46 +148,14 @@ GtkWidget	*create_dialogAudioCodec (void)
 
   menu1 = gtk_menu_new ();
 
-  uncompressed = gtk_menu_item_new_with_mnemonic (_("Uncompressed"));
-  gtk_widget_show (uncompressed);
-  gtk_container_add (GTK_CONTAINER (menu1), uncompressed);
-
-  ffmpeg_mpeg_audio = gtk_menu_item_new_with_mnemonic (_("FFmpeg mpeg audio"));
-  gtk_widget_show (ffmpeg_mpeg_audio);
-  gtk_container_add (GTK_CONTAINER (menu1), ffmpeg_mpeg_audio);
-
-  ffmpeg_ac3_2_channels1 = gtk_menu_item_new_with_mnemonic (_("FFmpeg AC3 2 channels"));
-  gtk_widget_show (ffmpeg_ac3_2_channels1);
-  gtk_container_add (GTK_CONTAINER (menu1), ffmpeg_ac3_2_channels1);
-  
-  
-   libtoolame = gtk_menu_item_new_with_mnemonic (_("Toolame (internal)"));
-  gtk_widget_show (libtoolame);
-  gtk_container_add (GTK_CONTAINER (menu1), libtoolame);
- 
-  
-  
- #ifdef HAVE_LIBMP3LAME
-  lame_mp1 = gtk_menu_item_new_with_mnemonic (_("Lame MP3"));
-  gtk_widget_show (lame_mp1);
-  gtk_container_add (GTK_CONTAINER (menu1), lame_mp1);
-#endif
-#ifdef USE_FAAC
-  faac = gtk_menu_item_new_with_mnemonic (_("FAAC"));
-  gtk_widget_show (faac);
-  gtk_container_add (GTK_CONTAINER (menu1), faac);
-#endif
-#ifdef USE_VORBIS
-  vorbis = gtk_menu_item_new_with_mnemonic (_("Vorbis"));
-  gtk_widget_show (vorbis);
-  gtk_container_add (GTK_CONTAINER (menu1), vorbis);
-#endif
-#ifdef PIPE_TOOLAME
- toolame = gtk_menu_item_new_with_mnemonic (_("Toolame(pipe)"));
-  gtk_widget_show (toolame);
-  gtk_container_add (GTK_CONTAINER (menu1), toolame);
-
-#endif
+ /***************/
+        for(int i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
+        {
+                acodec[i]=gtk_menu_item_new_with_mnemonic(myCodecList[i].menuName);
+                gtk_widget_show(acodec[i]);
+                gtk_container_add(GTK_CONTAINER(menu1),acodec[i]);
+        }  
+ /***************/ 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu_CodecList), menu1);
 
   buttonConfigure = gtk_button_new_with_mnemonic (_("Configure codec"));
@@ -228,18 +182,13 @@ GtkWidget	*create_dialogAudioCodec (void)
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, vbox1, "vbox1");
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, optionmenu_CodecList, "optionmenu_CodecList");
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, menu1, "menu1");
-  GLADE_HOOKUP_OBJECT (dialogAudioCodec, uncompressed, "uncompressed");
-  GLADE_HOOKUP_OBJECT (dialogAudioCodec, ffmpeg_mpeg_audio, "ffmpeg_mpeg_audio");
-  GLADE_HOOKUP_OBJECT (dialogAudioCodec, ffmpeg_ac3_2_channels1, "ffmpeg_ac3_2_channels1");
- #ifdef HAVE_LIBMP3LAME
-  GLADE_HOOKUP_OBJECT (dialogAudioCodec, lame_mp1, "lame_mp1");
-#endif
-#ifdef USE_FAAC
-  GLADE_HOOKUP_OBJECT (dialogAudioCodec, faac, "faac");
-#endif
-#ifdef USE_VORBIS
-  GLADE_HOOKUP_OBJECT (dialogAudioCodec, vorbis, "vorbis");
-#endif
+/****/
+   for(int i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
+        {
+                GLADE_HOOKUP_OBJECT (dialogAudioCodec, acodec[i],myCodecList[i].name );
+        }
+
+/****/
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, buttonConfigure, "buttonConfigure");
   GLADE_HOOKUP_OBJECT_NO_REF (dialogAudioCodec, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialogAudioCodec, cancelbutton1, "cancelbutton1");

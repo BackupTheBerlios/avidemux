@@ -735,6 +735,8 @@ void UI_setAudioCodec( int i)
         //gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,AUDIO_WIDGET)), i);
         update_ui=1;
         gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,AUDIO_WIDGET)),i);
+        gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonConfA"),i);        
+        gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonAudioFilter"),i);        
         update_ui=0;
 }
 void UI_setVideoCodec( int i)
