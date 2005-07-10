@@ -46,6 +46,9 @@
 #include "ADM_toolkit/filesel.h"
 #include "ADM_editor/ADM_Video.h"
 #include "prefs.h"
+
+#define WOD(x) lookup_widget (guiRootWindow,#x)
+
 void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
 	   uint16_t * ss, uint16_t * ms);
 
@@ -580,12 +583,44 @@ uint8_t UI_getPreviewToggleStatus( void )
 uint8_t UI_setPreviewToggleStatus( uint8_t status )
 {
 gint b;
+        update_ui=1;
 	 if(status) b=TRUE;
   	else			b=FALSE;
      gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON(guiPreviewToggle),b);
-
+        // Update checkbox
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(WOD(preview1)),status);
+        update_ui=0;
 
 }
+///
+///     Return status of preview button toggle
+///     1-> Activated
+///     0-> deActivated
+
+uint8_t UI_getOutputToggleStatus( void )
+{                         //gtk_toggle_button_get_active
+
+        if(TRUE==gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(guiOutputToggle))  )
+                return 1;
+        else
+        return 0;
+}
+///
+///     Update the preview button toggle
+///
+uint8_t UI_setOutputToggleStatus( uint8_t status )
+{
+gint b;
+        update_ui=1;
+         if(status) b=TRUE;
+        else                    b=FALSE;
+     gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON(guiOutputToggle),b);
+        // Update checkbox
+     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(WOD(display_output1)),status);
+        update_ui=0;
+
+}
+
 /**
 	Set/unset the toggle button audio process
 */
@@ -625,6 +660,7 @@ void guiCallback(GtkMenuItem * menuitem, gpointer user_data)
     UNUSED_ARG(menuitem);
     Action act;
     uint32_t aint;
+    if(update_ui) return; // no event sent
 
     aint = (long int) user_data;
     act = (Action) aint;

@@ -947,14 +947,20 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (toolbar2), separatortoolitem2);
 
   toggletoolbuttonPreview = (GtkWidget*) gtk_toggle_tool_button_new ();
-  gtk_tool_button_set_label (GTK_TOOL_BUTTON (toggletoolbuttonPreview), _("P_review"));
+  gtk_tool_button_set_label (GTK_TOOL_BUTTON (toggletoolbuttonPreview), _("Preview"));
+  tmp_image = gtk_image_new_from_stock ("gtk-copy", tmp_toolbar_icon_size);
+  gtk_widget_show (tmp_image);
+  gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON (toggletoolbuttonPreview), tmp_image);
   gtk_widget_show (toggletoolbuttonPreview);
   gtk_container_add (GTK_CONTAINER (toolbar2), toggletoolbuttonPreview);
   gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toggletoolbuttonPreview), tooltips, _("Preview filtered video in a new window"), NULL);
   gtk_tool_item_set_is_important (GTK_TOOL_ITEM (toggletoolbuttonPreview), TRUE);
 
   toggletoolbuttonOutput = (GtkWidget*) gtk_toggle_tool_button_new ();
-  gtk_tool_button_set_label (GTK_TOOL_BUTTON (toggletoolbuttonOutput), _("O_utput"));
+  gtk_tool_button_set_label (GTK_TOOL_BUTTON (toggletoolbuttonOutput), _("Output"));
+  tmp_image = gtk_image_new_from_stock ("gtk-zoom-fit", tmp_toolbar_icon_size);
+  gtk_widget_show (tmp_image);
+  gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON (toggletoolbuttonOutput), tmp_image);
   gtk_widget_show (toggletoolbuttonOutput);
   gtk_container_add (GTK_CONTAINER (toolbar2), toggletoolbuttonOutput);
   gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toggletoolbuttonOutput), tooltips, _("Display filtered output in the main window"), NULL);

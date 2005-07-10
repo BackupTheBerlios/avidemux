@@ -73,3 +73,7 @@ CALLBACK(last_frame1                           ,ACT_End);
 CALLBACK(filters1                              ,ACT_VideoParameter);
 CALLBACK(toolbar1                              ,ACT_ViewMain);
 CALLBACK(sidebar1                              ,ACT_ViewSide);
+CALLBACK(preview1                              ,ACT_PreviewToggle);
+CALLBACK(display_output1                       ,ACT_OuputToggle);
+
+

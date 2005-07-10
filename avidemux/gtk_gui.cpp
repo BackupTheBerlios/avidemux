@@ -288,7 +288,9 @@ int nw;
       return;
       break;
     case ACT_OuputToggle:
-      guiOutputDisplay ^= 1;
+        guiOutputDisplay ^= 1;
+        UI_setOutputToggleStatus (guiOutputDisplay);
+        printf ("\n Ouput is now : %d", guiOutputDisplay);
       return;
 
     case ACT_MpegIndex:
@@ -626,8 +628,8 @@ case ACT_Pipe2Other:
 //        printf("\n new frame : %lu",nf);
       break;
     case ACT_PreviewToggle:
-
-      mode_preview = UI_getPreviewToggleStatus ();
+      mode_preview^=1;
+      UI_setPreviewToggleStatus (mode_preview);
 
       printf ("\n Preview is now : %d", mode_preview);
       if (mode_preview)
@@ -882,10 +884,16 @@ case ACT_Pipe2Other:
     case ACT_VideoParameter:
       // first remove current viewer
       if (mode_preview)
-	editorKillPreview ();
+        {
+                
+	        editorKillPreview ();
+        }
       GUI_handleFilter ();
       if (mode_preview)
+      {
+        editorReignitPreview();
 	editorUpdatePreview (curframe);
+      }
       break;
 
     case ACT_RebuildKF:
