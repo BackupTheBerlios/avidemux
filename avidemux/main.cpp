@@ -73,7 +73,6 @@ extern uint8_t dloadXvidCVS( void );
 
 extern void  buildDistMatrix( void );
 extern void initScaleTab( void );
-extern void initEncoders( void );
 extern uint8_t initGUI( void );
 extern void ADM_memStat( void );
 extern "C"
@@ -176,7 +175,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #endif    
     buildDistMatrix();
     initScaleTab();
-    initEncoders();
+
     loadEncoderConfig();
     
    

@@ -201,6 +201,7 @@ uint8_t ret=0;
 		// and seek global sub entity
 		ret= bindGUI();		
 		if(ret) gtk_widget_show(guiRootWindow);
+                UI_purge();
 		// Set it as always low level
 		//gtk_window_set_keep_below(GTK_WINDOW(guiRootWindow), 1);
 		renderInit();
@@ -373,6 +374,8 @@ uint8_t  bindGUI( void )
     g_signal_connect(GTK_OBJECT(guiRootWindow), "drag_data_received",
         GTK_SIGNAL_FUNC(DNDDataReceived),NULL);
     //CYB 2005.02.22: DND (END)
+
+        
     return 1;
 
 }
@@ -684,7 +687,11 @@ void UI_BusyCursor( void )
 void on_video_change(void)
 {
 int enable;
-        if(update_ui) return;
+        if(update_ui)
+        {
+                printf("Updating\n");
+                 return;
+        }
 
         if(!UI_getCurrentVCodec()) // copy ?
         {
@@ -735,6 +742,8 @@ void UI_setVideoCodec( int i)
         //gtk_option_menu_set_history(GTK_OPTION_MENU(lookup_widget(guiRootWindow,VIDEO_WIDGET)), i);
         update_ui=1;
         gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,VIDEO_WIDGET)),i);
+        gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonConfV"),i);        
+        gtk_widget_set_sensitive(lookup_widget(guiRootWindow,"buttonFilters"),i);        
         update_ui=0;
 
 }

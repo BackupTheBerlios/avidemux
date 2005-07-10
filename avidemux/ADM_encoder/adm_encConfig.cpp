@@ -1065,11 +1065,6 @@ char *videoCodecGetConf(void)
         
 
 }
-void initEncoders( void)
-{
-//		strcpy( TwoPassLogFile,"/tmp/Xvid2passLog");
-		printf("**********OBSOLETE*********\n");
-}
 ///
 ///  Prompt for a codec and allow configuration
 ///
