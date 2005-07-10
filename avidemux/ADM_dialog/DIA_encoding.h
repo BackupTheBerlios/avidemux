@@ -2,6 +2,7 @@
 
 */
 #include "ADM_toolkit/TLK_clock.h"
+#define MAX_BR_SLOT 200
 class DIA_encoding
 {
 private:
@@ -12,7 +13,7 @@ private:
 		uint64_t _totalSize;
 		uint64_t _audioSize;
 		uint64_t _videoSize;
-		uint32_t _bitrate[60];
+		uint32_t _bitrate[MAX_BR_SLOT];
 		uint32_t _roundup;
 		uint32_t _current;
 	

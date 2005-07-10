@@ -76,6 +76,7 @@ DIA_encoding::DIA_encoding( uint32_t fps1000 )
 void DIA_encoding::setFps(uint32_t fps)
 {
 	_roundup=(uint32_t )floor( (fps+999)/1000);
+        ADM_assert(_roundup<MAX_BR_SLOT);
 	for(uint32_t i=0;i<_roundup;i++)
 		_bitrate[i]=0;
 	
