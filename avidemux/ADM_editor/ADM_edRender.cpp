@@ -420,14 +420,28 @@ uint32_t left,ww;
 	if (!_videos[seg].decoder->uncompress (compBuffer, tmpImage, len, &flags))
 	    {
 	      printf ("\nEditor: Last Decoding2 failed for frame %lu\n",frame);
-	 //     return 0;
-                goto _next;
-	    }
+	       // Try to dupe previous frame
+                if(frame)
+                {             
+                        ADMImage *prev; 
+                        prev=cache->getImage(frame-1);
+                        if(prev)
+                        {
+                                image->duplicate(prev);
+                                cache->updateFrameNum(image,frame);
+                                if(refOnly)
+                                        delete tmpImage;
+                                return 1;
+                        }
+                }
+                goto _next; 
+           }
 
         // 
         if(tmpImage->_noPicture && refOnly && frame)
         {
                 // Try to grab previous image from buffer
+
                 ADMImage *prev; 
                         prev=cache->getImage(frame-1);
                         if(prev)
