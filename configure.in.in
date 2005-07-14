@@ -633,6 +633,10 @@ if test "x$have_sm" = "xyes"; then
    if test "x$have_sm" = "xno"; then
 	have_sm="yes"
      	AC_CHECK_LIB(smjs,JS_Init,,have_sm=no,-lm)
+        if test "x$have_sm" = "xno"; then
+             dnl fedora core 3 - firefox/thunderbird/mozilla have this lib
+             AC_CHECK_LIB(mozjs,JS_Init,have_sm="yes",have_sm=no,-lm)
+        fi
    fi
 fi
 if test "x$have_sm" = "xno"; then
