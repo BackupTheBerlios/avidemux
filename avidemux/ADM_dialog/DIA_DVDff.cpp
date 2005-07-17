@@ -62,22 +62,23 @@ bufferSize myBuffer[3]=
 };
 //____________________________________________
 
-uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
-		   				   uint32_t * br,uint32_t *fsize,FFcodecSetting *conf)
+uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming)
 {
 	
 
 	int ret;
-
+	FFcodecSetting *conf=(FFcodecSetting *)incoming->extraSettings;
+	ADM_assert(incoming->extraSettingsLen==sizeof(FFcodecSetting));
+	
 	gint r,b;
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+	gtk_register_dialog(dialog);
 	
-	mQ=*qz;
-	mB=*br;
-	mS=*fsize;	
-	mMode=*mode;
+	mQ=incoming->qz;
+	mB=incoming->bitrate;
+	mS=incoming->finalsize;	
+	mMode=incoming->mode;
 
 	memcpy(&localSettings,conf,sizeof(localSettings));
 	
@@ -100,34 +101,34 @@ uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 		switch(r)
 			{
 				case 0:
-					*mode = COMPRESS_CBR;				      
+					incoming->mode = COMPRESS_CBR;				      
 		      			value = (uint32_t) gtk_read_entry(WID(entry_bitrate));
 		      			if (value < 9900)
 			  			value *= 1000;
 		      			if (value > 16 && value < 9900000)
 					{
-			    			*br = value;
+			    			incoming->bitrate = value;
 			    			ret = 1;
 		      			}
 					
 					break;
 				case 1:
-					*mode = COMPRESS_CQ;		      			
+					incoming->mode = COMPRESS_CQ;		      			
 					value = (uint32_t) gtk_spin_button_get_value_as_int(
 								GTK_SPIN_BUTTON(WID(spinbutton_quant)));
 		      			if (value >= 2 && value <= 32)
 					{
-			    			*qz = value;
+			    			incoming->qz = value;
 		      			}
 		      			break;
 
 				case 2:
-		     			*mode = COMPRESS_2PASS;	
+		     			incoming->mode = COMPRESS_2PASS;	
 					value = (uint32_t)
 						gtk_read_entry(WID(entry_bitrate));
         				if((value>0)&&(value<8200)) // enough for DL DVDs
           				{
-       						*fsize=value;	
+       						incoming->finalsize=value;	
            				}
             				break;
 		  		default:
@@ -135,6 +136,7 @@ uint8_t DIA_DVDffParam(COMPRESSION_MODE * mode, uint32_t * qz,
 				}
 		
 	}
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 
 	return ret;

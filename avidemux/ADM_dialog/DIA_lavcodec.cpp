@@ -55,8 +55,7 @@ static  void updateMode( void );
 static  int cb_mod(GtkObject * object, gpointer user_data);
 
 
-int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
-		      uint32_t * br,uint32_t *fsize,FFcodecSetting *conf);
+uint8_t getFFCompressParams(COMPRES_PARAMS *incoming);
 
 static GtkWidget *dialog=NULL;		      
 static uint32_t mQ,mB,mS;
@@ -67,23 +66,23 @@ static COMPRESSION_MODE mMode;
 
 
 */		      		      
-int getFFCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
-		      uint32_t * br,uint32_t *fsize,FFcodecSetting *conf)
+uint8_t getFFCompressParams(COMPRES_PARAMS *incoming)
 {
 int ret=0;	
-	
+	FFcodecSetting *conf=(FFcodecSetting *)incoming->extraSettings;
+	ADM_assert(incoming->extraSettingsLen==sizeof(FFcodecSetting));
 	dialog=create_dialog1();
 	upload(dialog,conf);
 	
-	gtk_transient(dialog);
+	gtk_register_dialog(dialog);
 	
 #define HIST_SET(x) gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenuType)), x)
 #define VAL_SET(x) gtk_write_entry(WID(entryEntry), x)
 
-		mQ=*qz;
-		mB=*br;
-		mS=*fsize;	
-		mMode=*mode;
+		mQ=incoming->qz;
+		mB=incoming->bitrate;
+		mS=incoming->finalsize;	
+		mMode=incoming->mode;
 		
 	updateMode();	
 
@@ -102,38 +101,38 @@ int ret=0;
 		switch(r)
 			{
 				case 0:
-					*mode = COMPRESS_CBR;				      
+					incoming->mode = COMPRESS_CBR;				      
 		      			value = (uint32_t) gtk_read_entry(WID(entryEntry));
 		      			if (value < 3000)
 			  			value *= 1000;
 		      			if (value > 16 && value < 6000000)
 					{
-			    			*br = value;
+			    			incoming->bitrate = value;
 			    			ret = 1;						
 		      			}
 					
 					break;
 				case 1:
-					*mode = COMPRESS_CQ;		      			
+					incoming->mode = COMPRESS_CQ;		      			
 					value = (uint32_t) gtk_spin_button_get_value_as_int(
 								GTK_SPIN_BUTTON(WID(spinbuttonQuant)));
 		      			if (value >= 2 && value <= 32)
 						{
-			    			*qz = value;
+			    			incoming->qz = value;
 		      				}
 		      			break;
 
 				case 2:
-		     				*mode = COMPRESS_2PASS;		       				
+		     				incoming->mode = COMPRESS_2PASS;		       				
 						value = (uint32_t) gtk_read_entry(WID(entryEntry));
         					if((value>0)&&(value<4000))
           					{
-       							*fsize=value;
+       							incoming->finalsize=value;
 				      			
            					}						
             					break;
 				case 3:
-						*mode=COMPRESS_SAME;
+						incoming->mode=COMPRESS_SAME;
 						ret=1;
 						break;
 		  		default:
@@ -141,6 +140,7 @@ int ret=0;
 				}
 		
 	}
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 
 	return ret;

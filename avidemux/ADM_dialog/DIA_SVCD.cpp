@@ -53,13 +53,13 @@ static uint32_t 	mQ,mB,mS;
 static COMPRESSION_MODE mMode;
 
 
-uint8_t DIA_SVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
-		   	  uint32_t * br,uint32_t *fsize,Mpeg2encParam *conf)
+uint8_t DIA_SVCDParam(COMPRES_PARAMS *incoming)
 {	
 	int ret=0;
 	gint b;
 
-
+Mpeg2encParam *conf=(Mpeg2encParam *)incoming->extraSettings;
+ADM_assert(incoming->extraSettingsLen==sizeof(Mpeg2encParam));
 
 #define WID(x) lookup_widget(dialog,#x)
 
@@ -90,13 +90,13 @@ uint8_t DIA_SVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
-  	gtk_window_set_title (GTK_WINDOW (dialog), title);
+	gtk_register_dialog(dialog);
+  	gtk_window_set_title (GTK_WINDOW (dialog), incoming->descriptor);
 	
-	mQ=*qz;
-	mB=*br;
-	mS=*fsize;	
-	mMode=*mode;
+	mQ=incoming->qz;
+	mB=incoming->bitrate;
+	mS=incoming->finalsize;	
+	mMode=incoming->mode;
 
 	updateMode();	
 	
@@ -117,28 +117,29 @@ uint8_t DIA_SVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 		switch(r)
 			{
 				case 0:
-					*mode = COMPRESS_CBR;				      
+					incoming->mode = COMPRESS_CBR;				      
 		      			value = (uint32_t) gtk_read_entry(WID(entryBitrate));
-			    		*br = value * 1000;
+			    		incoming->bitrate = value * 1000;
 					break;
 				case 1:
-					*mode = COMPRESS_CQ;		      			
+					incoming->mode = COMPRESS_CQ;		      			
 					value = (uint32_t) gtk_spin_button_get_value_as_int(
 								GTK_SPIN_BUTTON(WID(spinbuttonQz)));
-			    		*qz = value;
+			    		incoming->qz = value;
 		      			break;
 
 				case 2:
-		     			*mode = COMPRESS_2PASS;	
+		     			incoming->mode = COMPRESS_2PASS;	
 					value = (uint32_t)
 						gtk_read_entry(WID(entryBitrate));
-       					*fsize=value;	
+       					incoming->finalsize=value;	
             				break;
 		  		default:
 		      			ADM_assert(0);
 				}
 		
 	}
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 
 	return ret;

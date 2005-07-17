@@ -31,39 +31,46 @@
 #include "ADM_encoder/adm_encx264.h"
 #include "ADM_codecs/ADM_x264param.h"
 
-#define SPIN_GET(x,y) {config->specific.y= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(WID(x))) ;}
+#define SPIN_GET(x,y) {specific->y= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(WID(x))) ;}
 
-#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(x)),(gfloat)config->specific.y) ;}
+#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(x)),(gfloat)specific->y) ;}
 
 #define MENU_SET(x,y) { gtk_option_menu_set_history (GTK_OPTION_MENU(WID(x)),y);}
 #define MENU_GET(x)   getRangeInMenu(WID(x))
 
-#define TOGGLE_SET(x,y) {gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(WID(x)),config->specific.y);}
-#define TOGGLE_GET(x,y) {config->specific.y=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(WID(x)));;}
+#define TOGGLE_SET(x,y) {gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(WID(x)),specific->y);}
+#define TOGGLE_GET(x,y) {specific->y=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(WID(x)));;}
                                 
 #define ENTRY_SET(x,y) {gtk_write_entry(WID(x),(int)y);}
 #define ENTRY_GET(x,y) {y=gtk_read_entry(WID(x));}
 
-#define CHECK_GET(x,y) {config->specific.y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
-#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),config->specific.y);}                                         
+#define CHECK_GET(x,y) {specific->y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
+#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),specific->y);}                                         
+
+uint8_t DIA_x264(COMPRES_PARAMS *config);
 
 static GtkWidget       *create_dialog1 (void);  
-uint8_t DIA_x264(X264Config *config);
-static COMPRES_PARAMS generic;
+
+static COMPRES_PARAMS generic={CodecDummy,"dummy","dummy","dummy",COMPRESS_CQ,4,1500,700,0,0,NULL,0};
 static GtkWidget *dialog;
 
 static void updateMode( void );
 static int cb_mod(GtkObject * object, gpointer user_data);
-
+static ADM_x264Param *specific;
 
 /*********************************************/
-uint8_t DIA_x264(X264Config *config)
+uint8_t DIA_x264(COMPRES_PARAMS *config)
 {
   
   uint8_t ret=0;
   
-        memcpy(&generic,&(config->generic),sizeof(generic));
+        ADM_assert(config->extraSettingsLen==sizeof(ADM_x264Param));
+  
+        memcpy(&generic,config,sizeof(generic));
+        specific=(ADM_x264Param *)config->extraSettings;
+       
         dialog=create_dialog1();
+        gtk_register_dialog(dialog);
         // Update
         SPIN_SET(spinbuttonQmin,qmin);
         SPIN_SET(spinbuttonQmax,qmax);
@@ -112,9 +119,9 @@ uint8_t DIA_x264(X264Config *config)
             default:
               ADM_assert(0);
           }
-          memcpy(&(config->generic),&generic,sizeof(generic));
+          memcpy(config,&generic,sizeof(generic));
         }
-        
+        gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
         return ret;
   

@@ -22,19 +22,25 @@
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_encoder/adm_encoder.h"
-#include "ADM_encoder/ADM_videocodeclist.h"
 
 //___________________________________
 
  static GtkWidget	*create_dialogVideoCodec (void) ;
- static SelectCodecType findCodec( void );
+ 
+extern uint32_t encoderGetNbEncoder(void);
+extern const char* encoderGetIndexedName(uint32_t i);
+ 
+ 
+// static SelectCodecType findCodec( void );
  static GtkWidget *dialog;
  static void okCallback(GtkButton * button, gpointer user_data);
  static void callBackCalc( void );
 extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
- 
+
 void okCallback(GtkButton * button, gpointer user_data)
 {
+	return ;
+	#if 0
 	SelectCodecType cur;
 
 		UNUSED_ARG(button);
@@ -43,7 +49,7 @@ void okCallback(GtkButton * button, gpointer user_data)
 		cur=findCodec();
 		videoCodecSetcodec(cur);
 		videoCodecConfigureUI();
-
+#endif
 }
 
 //___________________________________________________________
@@ -58,23 +64,29 @@ uint8_t DIA_videoCodec( SelectCodecType *codec )
 
 	uint8_t ret=0;
 	SelectCodecType old=*codec;
-	GtkWidget *widget[sizeof(mycodec)/sizeof(codecEnumByName)]; 
+	uint32_t nb;
+	GtkWidget *widget[30];
+
+		nb=encoderGetNbEncoder();
+	
 	dialog=create_dialogVideoCodec();
 	//gtk_transient(dialog);	
 	gtk_register_dialog(dialog);
 
 	
 	// now set the input one
-	for(uint32_t i=0;i<sizeof(mycodec)/sizeof(codecEnumByName);i++)
+	for(uint32_t i=0;i<nb;i++)
 	{
-		widget[i]=gtk_menu_item_new_with_mnemonic (mycodec[i].displayName);
+		widget[i]=gtk_menu_item_new_with_mnemonic (encoderGetIndexedName(i));
   		gtk_widget_show (widget[i]);
   		gtk_container_add (GTK_CONTAINER (WID(menu1)), widget[i]);
+#if 0  		
 		if(*codec==mycodec[i].type)
 			{
 				// set
 				gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenu_CodecList)), i);
 			}
+#endif			
 	}
 	gtk_signal_connect(GTK_OBJECT(WID(buttonConfigure)), "clicked",
 		       GTK_SIGNAL_FUNC(okCallback), (void *) 0);
@@ -84,7 +96,7 @@ uint8_t DIA_videoCodec( SelectCodecType *codec )
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
 	{
 		
-			*codec=findCodec();
+	//		*codec=findCodec();
 			ret=1;
 	
 	}
@@ -96,7 +108,7 @@ uint8_t DIA_videoCodec( SelectCodecType *codec )
 	gtk_unregister_dialog(dialog);
 	return ret;
 } 
-
+#if 0
 SelectCodecType findCodec( void )
 {
 uint8_t j;
@@ -108,7 +120,7 @@ uint8_t j;
 
 }
 
-
+#endif
 GtkWidget*
 create_dialogVideoCodec (void)
 {

@@ -26,6 +26,7 @@
 
 #ifdef USE_XVID_4
 #include "ADM_encoder/ADM_vidEncode.hxx"
+
 #include "ADM_codecs/ADM_xvid4param.h"
 
 
@@ -45,22 +46,22 @@ static int cb_mod(GtkObject * object, gpointer user_data);
 */		
 		
 		
-uint8_t DIA_xvid4(COMPRESSION_MODE * mode, uint32_t * qz,  uint32_t * br,uint32_t *fsize,
-		xvid4EncParam *param)
+uint8_t DIA_xvid4(COMPRES_PARAMS *incoming)
 {
 int b;
 int ret=0;
-
-		memcpy(&localParam,param,sizeof(localParam));
+		ADM_assert(incoming->extraSettingsLen==sizeof(localParam));
+		memcpy(&localParam,incoming->extraSettings,sizeof(localParam));
 		dialog=create_dialog1();
-		gtk_transient(dialog);
+		gtk_register_dialog(dialog);
+		
 #define HIST_SET(x) gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenuType)), x)
 #define VAL_SET(x) gtk_write_entry(WID(entryEntry), x)
 
-		mQ=*qz;
-		mB=*br;
-		mS=*fsize;	
-		mMode=*mode;
+		mQ=incoming->qz;
+		mB=incoming->bitrate;
+		mS=incoming->finalsize;	
+		mMode=incoming->mode;
 		updateMode();	
 
 		xvid4otherUpload(dialog);
@@ -74,48 +75,49 @@ int ret=0;
 		ret=1;
 		r=getRangeInMenu(WID(optionmenuType));
 		xvid4otherDownload(dialog);
-		memcpy(param,&localParam,sizeof(localParam));
+		memcpy(incoming->extraSettings,&localParam,sizeof(localParam));
 		switch(r)
 			{
 				case 0:
-					*mode = COMPRESS_CBR;				      
+					incoming->mode = COMPRESS_CBR;				      
 		      			value = (uint32_t) gtk_read_entry(WID(entryEntry));
 		      			if (value < 3000)
 			  			value *= 1000;
 		      			if (value > 16 && value < 6000000)
 					{
-			    			*br = value;
+			    			incoming->bitrate = value;
 			    			ret = 1;						
 		      			}
 					gtk_label_set_text(GTK_LABEL(WID(label11)),"Bitrate (kbps):");
 					break;
 				case 1:
-					*mode = COMPRESS_CQ;		      			
+					incoming->mode = COMPRESS_CQ;		      			
 					value = (uint32_t) gtk_spin_button_get_value_as_int(
 								GTK_SPIN_BUTTON(WID(spinbuttonQuant)));
 		      			if (value >= 2 && value <= 32)
 						{
-			    			*qz = value;
+			    			incoming->qz = value;
 		      				}
 		      			break;
 
 				case 2:
-		     				*mode = COMPRESS_2PASS;		       				
+		     				incoming->mode = COMPRESS_2PASS;		       				
 						value = (uint32_t) gtk_read_entry(WID(entryEntry));
         					if((value>0)&&(value<4000))
           					{
-       							*fsize=value;
+       							incoming->finalsize=value;
 				      			
            					}
 						gtk_label_set_text(GTK_LABEL(WID(label11)),"Size (MBytes):");
             					break;
 				case 3:
-						*mode=COMPRESS_SAME;
+						incoming->mode=COMPRESS_SAME;
 						break;
 		  		default:
 		      				ADM_assert(0);
 				}
 	}
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;
 

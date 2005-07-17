@@ -7,58 +7,51 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
-#include <stdio.h>
 #include <math.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
-#include <ADM_assert.h>
-
-#include "avifmt.h"
-#include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
+#include <stdio.h>
+#include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 
+#include "ADM_assert.h" 
 
+#include "ADM_library/default.h"
 
-#include "ADM_gui2/support.h"
-#include "config.h"
-#define GLADE_HOOKUP_OBJECT(component,widget,name) \
-  g_object_set_data_full (G_OBJECT (component), name, \
-    gtk_widget_ref (widget), (GDestroyNotify) gtk_widget_unref)
+//___________________________________
+#include "ADM_editor/ADM_edit.hxx"
+#include "ADM_video/ADM_genvideo.hxx"
 
-#define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
-  g_object_set_data (G_OBJECT (component), name, widget)
+#include "ADM_encoder/ADM_vidEncode.hxx"
+#include "ADM_encoder/adm_encoder.h"
+#include "ADM_encoder/adm_encmjpeg_param.h"
   
 
 static GtkWidget	*create_dialog1 (void);
 static     GtkObject *hscaleAdj;
 
-uint8_t DIA_mjpegCodecSetting( int *qual, int *swap )
+uint8_t DIA_mjpegCodecSetting(COMPRES_PARAMS *param)
 {
-
+	MJPEGConfig *config=(MJPEGConfig *)param->extraSettings;
+	ADM_assert(sizeof(MJPEGConfig)==param->extraSettingsLen);
 	uint8_t ret=0;
 	GtkWidget *dialog;
 	
 	dialog=create_dialog1();
-	gtk_transient(dialog);
-	#define SET(a,b) if(*b) 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(dialog,#a)),1);
-	#define GET(a,b)	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(dialog,#a)))) \
-							{ *b=1;;} else *b=0;
-	SET(checkbuttonUV,swap);
-	gtk_adjustment_set_value( GTK_ADJUSTMENT(hscaleAdj),(  gdouble  ) *qual );
+	gtk_register_dialog(dialog);
+	#define TSET(a,b) if(b) 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(dialog,#a)),1);
+	#define TGET(a,b)	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(dialog,#a)))) \
+							{ b=1;;} else b=0;
+	TSET(checkbuttonUV,(config->swapped));
+	gtk_adjustment_set_value( GTK_ADJUSTMENT(hscaleAdj),(  gdouble  ) config->qual );
 	
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
 	{
 		
-			GET(checkbuttonUV,swap);
-			*qual=(int)floor(GTK_ADJUSTMENT(hscaleAdj)->value);
+			TGET(checkbuttonUV,(config->swapped));
+			config->qual=(int)floor(GTK_ADJUSTMENT(hscaleAdj)->value);
 			ret=1;
 	
 	}
-	
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	
 	return ret;
