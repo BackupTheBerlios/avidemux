@@ -39,7 +39,7 @@ protected:
   uint32_t		_fps1000;
   
 public:
-    EncoderXvid4 (XVID4config *codecconfig );
+    EncoderXvid4 (COMPRES_PARAMS *codecconfig );
 	~EncoderXvid4() ; // can be called twice if needed ..
   virtual uint8_t isDualPass (void);
   virtual uint8_t configure (AVDMGenericVideoStream * instream);

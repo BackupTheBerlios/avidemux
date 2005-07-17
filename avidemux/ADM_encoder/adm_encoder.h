@@ -100,31 +100,6 @@ class Encoder
 }   ; 
 Encoder *getVideoEncoder( uint32_t w,uint32_t h );
 
-typedef enum
-{
-        CodecCopy,
-	CodecDivx	,
-	CodecXvid	,
-	CodecFF,
-	CodecMjpeg,
-	CodecH263,
-	CodecH263P,
-	CodecFFV1,
-	CodecSnow,
-	CodecHuff,
-	CodecVCD,
-	CodecSVCD,
-	CodecDVD,
-	CodecXVCD,
-	CodecXSVCD,
-	CodecXDVD,
-	CodecXvid4,
-        CodecFFhuff,
-#ifdef USE_X264
-        CodecX264,
-#endif        
-	CodecDummy	
-}SelectCodecType;
 
 typedef enum
 {

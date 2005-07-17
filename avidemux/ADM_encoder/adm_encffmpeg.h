@@ -16,11 +16,7 @@
  ***************************************************************************/
  #ifndef __ADM_encoder_ff__
 #define __ADM_encoder_ff__
-typedef struct FFMPEGConfig
-{
-		COMPRES_PARAMS generic;
-		FFcodecSetting specific;
-}FFMPEGConfig;
+
 
 
 class EncoderFFMPEG:public Encoder
@@ -32,9 +28,9 @@ protected:
   uint8_t			_internal;
   FF_CODEC_ID			_id;
   uint32_t			_fps;
-  FFcodecSetting 		_settings;
+  FFcodecSetting   _settings;
 public:
-    EncoderFFMPEG (FF_CODEC_ID id ,FFMPEGConfig *config);
+    EncoderFFMPEG (FF_CODEC_ID id ,COMPRES_PARAMS *codecParam);
 	~EncoderFFMPEG() { stop();}; // can be called twice if needed ..
   virtual uint8_t isDualPass (void);
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
@@ -58,7 +54,7 @@ protected:
 
 
 public:
-    	EncoderFFMPEGHuff (FFMPEGConfig *config);
+    	EncoderFFMPEGHuff (COMPRES_PARAMS *codecParam);
 	~EncoderFFMPEGHuff() { stop();}; // can be called twice if needed ..
   virtual uint8_t isDualPass (void) { return 0;};
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
@@ -79,7 +75,7 @@ protected:
 
 
 public:
-        EncoderFFMPEGFFHuff (FFMPEGConfig *config);
+        EncoderFFMPEGFFHuff (COMPRES_PARAMS *config);
         ~EncoderFFMPEGFFHuff() { stop();}; // can be called twice if needed ..
   virtual uint8_t isDualPass (void) { return 0;};
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
@@ -101,7 +97,7 @@ protected:
 
 
 public:
-    	EncoderFFMPEGFFV1 (FFMPEGConfig *config);
+    	EncoderFFMPEGFFV1 (COMPRES_PARAMS *config);
 	~EncoderFFMPEGFFV1() { stop();}; // can be called twice if needed ..
   virtual uint8_t isDualPass (void) { return 0;};
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
@@ -134,7 +130,7 @@ public:
 	uint8_t				_use_xvid_ratecontrol;	
 
 public:
-    			EncoderFFMPEGMpeg1 ( FF_CODEC_ID id, FFMPEGConfig *config);
+    			EncoderFFMPEGMpeg1 ( FF_CODEC_ID id, COMPRES_PARAMS *config);
   virtual		~EncoderFFMPEGMpeg1(); // can be called twice if needed ..
   virtual uint8_t isDualPass (void);
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
@@ -158,7 +154,7 @@ protected:
 
 
 public:
-    			EncodeFFMPEGSNow (FFMPEGConfig *config);
+    			EncodeFFMPEGSNow (COMPRES_PARAMS *config);
 			~EncodeFFMPEGSNow() { stop();}; // can be called twice if needed ..
   virtual uint8_t isDualPass (void) { return 0;};
   virtual uint8_t configure (AVDMGenericVideoStream * instream);

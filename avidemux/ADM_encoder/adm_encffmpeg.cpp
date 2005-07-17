@@ -37,7 +37,6 @@
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 #include "ADM_video/ADM_genvideo.hxx"
-//#include "ADM_codecs/ADM_divxEncode.h"
 #include "ADM_codecs/ADM_ffmpeg.h"
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encffmpeg.h"
@@ -45,19 +44,19 @@
 
 
 /*_________________________________________________*/
-EncoderFFMPEG::EncoderFFMPEG (FF_CODEC_ID id, FFMPEGConfig *config)
+EncoderFFMPEG::EncoderFFMPEG (FF_CODEC_ID id, COMPRES_PARAMS *config)
 {
   _codec = NULL;
   fd = NULL;
   strcpy (_logname, "");
   _frametogo = 0;
-//	memset(&_param,0,sizeof(_param));
-	memcpy(&_param,&(config->generic),sizeof(_param));
-	memcpy(&_settings,&(config->specific),sizeof(_settings));
+	memcpy(&_param,config,sizeof(_param));
+	ADM_assert(sizeof(_settings)==config->extraSettingsLen);
+	memcpy(&_settings,config->extraSettings,sizeof(_settings));
 	_id=id;
 };
 //---------------huff----------
-EncoderFFMPEGHuff::EncoderFFMPEGHuff(FFMPEGConfig *config) :
+EncoderFFMPEGHuff::EncoderFFMPEGHuff(COMPRES_PARAMS *config) :
 	EncoderFFMPEG(FF_HUFF,config)
 {
 	_id=FF_HUFF;
@@ -99,7 +98,7 @@ uint8_t EncoderFFMPEGHuff::configure (AVDMGenericVideoStream * instream)
   _fps=info->fps1000;
   _w = info->width;
   _h = info->height;
- // _vbuffer = new uint8_t[_w * _h * 3];
+
  _vbuffer=new ADMImage(_w,_h);
   ADM_assert (_vbuffer);
   _in = instream;
@@ -113,13 +112,11 @@ uint8_t EncoderFFMPEGHuff::configure (AVDMGenericVideoStream * instream)
 }
 
 //_________________ffhuff_______________________________
-EncoderFFMPEGFFHuff::EncoderFFMPEGFFHuff(FFMPEGConfig *config) :
+EncoderFFMPEGFFHuff::EncoderFFMPEGFFHuff(COMPRES_PARAMS *config) :
         EncoderFFMPEG(FF_FFHUFF,config)
 {
         _id=FF_FFHUFF;
         _frametogo=0;
-
-
 }
 uint8_t EncoderFFMPEGFFHuff::encode (uint32_t frame, uint32_t * len, uint8_t * out,
                           uint32_t * flags)
@@ -155,7 +152,6 @@ uint8_t EncoderFFMPEGFFHuff::configure (AVDMGenericVideoStream * instream)
   _fps=info->fps1000;
   _w = info->width;
   _h = info->height;
- // _vbuffer = new uint8_t[_w * _h * 3];
  _vbuffer=new ADMImage(_w,_h);
   ADM_assert (_vbuffer);
   _in = instream;
@@ -170,7 +166,7 @@ uint8_t EncoderFFMPEGFFHuff::configure (AVDMGenericVideoStream * instream)
 
 
 //-------------------ffv1------------------
-EncoderFFMPEGFFV1::EncoderFFMPEGFFV1(FFMPEGConfig *config) :
+EncoderFFMPEGFFV1::EncoderFFMPEGFFV1(COMPRES_PARAMS *config) :
 	EncoderFFMPEG(FF_HUFF,config)
 {
 	_id=FF_FFV1;
@@ -227,7 +223,7 @@ uint8_t EncoderFFMPEGFFV1::configure (AVDMGenericVideoStream * instream)
 
 //--------------end------------
 //************************* SNOW **************************
-EncodeFFMPEGSNow::EncodeFFMPEGSNow(FFMPEGConfig *config) :
+EncodeFFMPEGSNow::EncodeFFMPEGSNow(COMPRES_PARAMS *config) :
 	EncoderFFMPEG(FF_HUFF,config)
 {
 	_id=FF_SNOW;
@@ -268,8 +264,7 @@ uint8_t EncodeFFMPEGSNow::configure (AVDMGenericVideoStream * instream)
   _fps=info->fps1000;
   _w = info->width;
   _h = info->height;
-//  _vbuffer = new uint8_t[_w * _h * 3];
-_vbuffer=new ADMImage(_w,_h);
+  _vbuffer=new ADMImage(_w,_h);
   ADM_assert (_vbuffer);
   _in = instream;
 
@@ -330,23 +325,12 @@ EncoderFFMPEG::configure (AVDMGenericVideoStream * instream)
   _fps=info->fps1000;
   _w = info->width;
   _h = info->height;
- // _vbuffer = new uint8_t[_w * _h * 3];
+
  _vbuffer=new ADMImage(_w,_h);
   ADM_assert (_vbuffer);
   _in = instream;
 
 
-/*   COMPRES_PARAMS par;
-
-  memcpy (&par, &_param, sizeof (par));
-	if(! getFFCompressParams(&par.mode,&par.qz,
-		      &par.bitrate,&par.finalsize,&flag1, &flag2,&flag3))
-    {
-      //delete par;
-      return 0;
-    }
-    memcpy (&_param, &par, sizeof (par));
-*/    
   switch (_param.mode)
     {
     case COMPRESS_SAME:

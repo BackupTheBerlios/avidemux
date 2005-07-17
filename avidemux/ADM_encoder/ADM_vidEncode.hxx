@@ -15,7 +15,35 @@
  *                                                                         *
  ***************************************************************************/
  #ifndef ADM_VIDENCODE
- #define ADM_VIDENCORE
+ #define ADM_VIDENCODE
+ 
+ typedef enum SelectCodecType
+{
+    CodecCopy,
+	CodecDivx	,
+	CodecXvid	,
+	CodecFF,
+	CodecMjpeg,
+	CodecH263,
+	CodecH263P,
+	CodecFFV1,
+	CodecSnow,
+	CodecHuff,
+	CodecVCD,
+	CodecSVCD,
+	CodecDVD,
+	CodecXVCD,
+	CodecXSVCD,
+	CodecXDVD,
+	CodecXvid4,
+    CodecFFhuff,
+        
+#ifdef USE_X264
+    CodecX264,
+#endif        
+	CodecDummy	
+};
+
  typedef enum
 {
   COMPRESS_CQ,
@@ -24,13 +52,28 @@
   COMPRESS_SAME
 }COMPRESSION_MODE;
 
+#define ADM_ENC_CAP_CBR    0x001
+#define ADM_ENC_CAP_CQ     0x002
+#define ADM_ENC_CAP_2PASS  0x004
 
+#define ADM_EXTRA_PARAM_JS 0x100
+#define ADM_EXTRA_PARAM    0x200
 
-typedef struct
+struct COMPRES_PARAMS
 {
-    COMPRESSION_MODE 	mode;
+	const SelectCodecType		codec;
+	const char					*menuName;
+	const char 					*tagName;
+	const char					*descriptor;
+    COMPRESSION_MODE 			mode;
     uint32_t					qz,bitrate,finalsize;
+	const 		uint32_t		capabilities;
+	const 		uint32_t		extra_param;
+	void						*extraSettings;
+	const       uint32_t		extraSettingsLen;
+	uint8_t		(*configure)(struct COMPRES_PARAMS *par);
+};
 
-}COMPRES_PARAMS;
+//typedef struct COMPRES_PARAMS;
 
 #endif

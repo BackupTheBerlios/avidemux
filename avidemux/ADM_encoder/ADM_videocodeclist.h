@@ -1,4 +1,4 @@
-#ifndef ADM_VODEC_L
+#if 0 //ndef ADM_VODEC_L
 #define ADM_VODEC_L
 
 typedef struct codecEnumByName

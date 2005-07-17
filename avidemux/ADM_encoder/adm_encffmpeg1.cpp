@@ -55,7 +55,7 @@
 static ADM_newXvidRcVBV *_xrc=NULL;
 
 /*_________________________________________________*/
-EncoderFFMPEGMpeg1::EncoderFFMPEGMpeg1 (FF_CODEC_ID id, FFMPEGConfig *config)
+EncoderFFMPEGMpeg1::EncoderFFMPEGMpeg1 (FF_CODEC_ID id, COMPRES_PARAMS *config)
 : EncoderFFMPEG (id,config)
 
 {
@@ -64,8 +64,11 @@ EncoderFFMPEGMpeg1::EncoderFFMPEGMpeg1 (FF_CODEC_ID id, FFMPEGConfig *config)
  _lastQz=0;
  _lastBitrate=0;
  _totalframe=0;
- memcpy(&_param,&(config->generic),sizeof(_param));
- memcpy(&_settings,&(config->specific),sizeof(_settings));
+ 
+ 
+ memcpy(&_param,config,sizeof(_param));
+ ADM_assert(config->extraSettingsLen==sizeof(_settings));
+ memcpy(&_settings,config->extraSettings,sizeof(_settings));
  _use_xvid_ratecontrol=0;
  
 };

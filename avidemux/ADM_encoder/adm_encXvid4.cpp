@@ -54,7 +54,7 @@
  
  }
 /*_________________________________________________*/
-EncoderXvid4::EncoderXvid4 (XVID4config *codecconfig)
+EncoderXvid4::EncoderXvid4 (COMPRES_PARAMS *codecconfig)
 {
 
   _codec = NULL;  
@@ -63,8 +63,9 @@ EncoderXvid4::EncoderXvid4 (XVID4config *codecconfig)
   _pass1Done=0;
  
  
-  memcpy(&_param,&(codecconfig->generic),sizeof(_param));
-  memcpy(&encparam,&(codecconfig->specific),sizeof(encparam));
+  memcpy(&_param,codecconfig,sizeof(_param));
+  ADM_assert(codecconfig->extraSettingsLen==sizeof(encparam));
+  memcpy(&encparam,codecconfig->extraSettings,sizeof(encparam));
 
 
 };

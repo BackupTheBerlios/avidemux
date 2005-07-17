@@ -49,15 +49,17 @@
 extern int getMjpegCompressParams(int *qual,int *swap);
 
 /*_________________________________________________*/
-EncoderMjpeg::EncoderMjpeg	(  MJPEGConfig *conf)
+EncoderMjpeg::EncoderMjpeg	(  COMPRES_PARAMS *conf)
 		{
 			 	_codec=NULL;
 				fd=NULL;
 				entries=NULL;
 				strcpy(_logname,"");
        				_frametogo=0;
-				_q=conf->qual;
-				_swapped=conf->swapped;
+       			MJPEGConfig *cf=(MJPEGConfig *)conf->extraSettings;	
+       			ADM_assert(sizeof(MJPEGConfig)==conf->extraSettingsLen);
+				_q=cf->qual;
+				_swapped=cf->swapped;
 		} ;
 //--------------------------------
 uint8_t EncoderMjpeg::configure( AVDMGenericVideoStream *instream)
