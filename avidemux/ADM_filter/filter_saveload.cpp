@@ -48,6 +48,8 @@ extern FILTER  videofilters[MAX_FILTER];
 
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, AVDMGenericVideoStream *in);
 extern void filterCleanUp( void );
+extern int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
+
 /*
 
   	Try to rebuild filter from text file

@@ -59,7 +59,13 @@ bool
 PS_Stream::SegmentLimReached()
 {
 	off_t written = output_strm.SegmentSize();
-	return max_segment_size != 0 && written > max_segment_size;
+	if(!max_segment_size) return false;
+	if(written > max_segment_size)
+	{
+        printf("Mplex: current:%d max:%d, switching seg\n",written,max_segment_size);
+        return true;	
+	}
+	return false;
 }
 
 

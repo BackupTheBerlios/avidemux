@@ -144,7 +144,10 @@ void A_requantize( void )
 		{ \
 			break; \
 		}\
-		if(audiolen)	{muxer->writeAudioPacket(audiolen,audioBuffer);} \
+		if(audiolen)	\
+		{muxer->writeAudioPacket(audiolen,audioBuffer); \
+		encoding->feedAudioFrame(audiolen); \
+		} \
 		audioGot+=audiolen; \
 	} \
 }
@@ -179,6 +182,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	uint32_t	audioLen;
 	mplexMuxer	*muxer=NULL;
 	uint32_t	fps1000=0;
+	uint32_t order=0,display;
 	
 	
 	uint64_t size=0;
@@ -193,6 +197,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
  	
 	// get audio if any
 	audio=mpt_getAudioStream();
+	
 	if(audio)
 	{
 		fps1000=avifileinfo->fps1000;
@@ -209,6 +214,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 		// they (may) need to be resynced
 		muxer->forceRestamp();
 		
+		
 	}
 	else
 	{
@@ -217,7 +223,8 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 		{
 			GUI_Alert("Problem writing file");
 			goto _abt;
-		}			
+		}	
+				
 	}
 	
 	
@@ -226,11 +233,17 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	encoding=new DIA_encoding(avifileinfo->fps1000);
 
 	encoding->setPhasis("Requantizing.");
+	encoding->setCodec("Requant");
+	if(muxer)
+	        encoding->setContainer("Mpeg PS (DVD)");
+	    else
+	        encoding->setContainer("Mpeg video (.m2v)");
+	    
 	encoding->setFrame(0,frameEnd-frameStart);
-	
 	
 	for(uint32_t i=frameStart;i<frameEnd;i++)
 	{
+    	
 		encoding->setFrame(i-frameStart,frameEnd-frameStart);
 		
       		if(!encoding->isAlive()) goto _abt;

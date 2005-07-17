@@ -64,7 +64,7 @@
 #include "../ADM_assert.h"
 
 // / MEANX
-
+ void mixDump_c(uint8_t *p, uint32_t l);
 
 // useful constants
 #define I_TYPE 1
@@ -252,7 +252,7 @@ static uint64 cnt_b_i, cnt_b_ni;
 			inbytecnt += mloka1; \
 			rbuf += mloka1; \
 			if((rbuf-cbuf)<x)  \
-				{aprintf("Not enough : %lu %lu\n",x,rbuf-cbuf);RETURN}\
+				{printf("Not enough : %lu %lu\n",x,rbuf-cbuf);RETURN}\
 		} 
 		
 	#define FORCE_LOCK() \
@@ -2157,6 +2157,7 @@ int Mrequant_init (float quant_factor,int byteStuffing)
 
 int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 {	
+    int bufAvailable;
 	// recoding
 	mean_write=out;;
 	mean_wrotten=0;
@@ -2164,18 +2165,22 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 	mean_read=in;
 	mean_read_available=len;
 
-	while(mean_read_available+(rbuf-cbuf)>14)
+	while(mean_read_available+(rbuf-cbuf)>=4)
 	{
 		aprintf("Available :%lu\n",mean_read_available+(rbuf-cbuf));
-		// get next start code prefix
+	
+			// get next start code prefix
 		found = 0;
 		while (!found)
 		{
-		    if (!byte_stuff) {
-			LOCK(3)
+    		bufAvailable=mean_read_available+(rbuf-cbuf);
+		    if (!byte_stuff || bufAvailable<7 ) // Don't try to cleanup padding if there is not 'nough bytes 
+		    {
+			    LOCK(3)
 		    } else {
 			LOCK(6)
-			if ( (cbuf[0] == 0) && (cbuf[1] == 0) && (cbuf[2] == 0) && (cbuf[3] == 0) && (cbuf[4] == 0) && (cbuf[5] == 0) ) { SEEKR(1) }
+			if ( (cbuf[0] == 0) && (cbuf[1] == 0) && (cbuf[2] == 0) && (cbuf[3] == 0) && (cbuf[4] == 0) && (cbuf[5] == 0) ) 
+			{ SEEKR(1) }
 		    }
 		    if ( (cbuf[0] == 0) && (cbuf[1] == 0) && (cbuf[2] == 1) ) found = 1; // start code !
 		    else { COPY(1) } // continue search
@@ -2186,7 +2191,13 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 		LOCK(1)
 		ID = cbuf[0];
 		COPY(1)
-
+        
+		bufAvailable=mean_read_available+(rbuf-cbuf);
+        if(bufAvailable<6 && ID==0xB3) 
+        {
+            wbuf-=4; // Remove the fake start seq
+            goto _req_exit;
+        }
 		if (ID == 0x00) // pic header
 		{
 			LOCK(4)
@@ -2378,16 +2389,17 @@ int Mrequant_frame(uint8_t *in, uint32_t len,uint8_t *out, uint32_t *lenout)
 _req_exit:	
 	aprintf("Left1: %lu\n",rbuf-cbuf);	
 	// Some leftovers, 4 we added to force a startsync and hopefully some crap
-	if(rbuf-cbuf<9) rbuf=cbuf;
-	else
-		{
-			printf("There is too much left...:%lu\n",rbuf-cbuf);
-		}
+	if(rbuf!=cbuf)
+	{ 
+    	printf("LeftOver..:%d\n",rbuf-cbuf);
+    	mixDump_c(cbuf,rbuf-cbuf);
+    	rbuf=cbuf;
+    }
+	
 	WRITE;
 	
 	FORCE_LOCK();
-	assert(!mean_available);
-	aprintf("Left: %lu\n",rbuf-cbuf);	
+	assert(!mean_available);	
 	*lenout=mean_wrotten;
 	return 1;
 }

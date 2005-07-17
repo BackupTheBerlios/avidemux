@@ -20,10 +20,8 @@
  #ifndef __CONFCOUPLE__
  #define __CONFCOUPLE__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+//#include <string.h>
+
 
 class CONFcouple
 {

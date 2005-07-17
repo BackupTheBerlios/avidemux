@@ -56,13 +56,17 @@ extern "C" {
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_lavformat/ADM_lavformat.h"
 
+#include "ADM_encoder/adm_encConfig.h"
+#include "ADM_encoder/ADM_vidEncode.hxx"
+
+
 static uint8_t *_buffer=NULL,*_outbuffer=NULL;
 static void  end (void);
 extern const char *getStrFromAudioCodec( uint32_t codec);
-extern FFMPEGConfig ffmpegMpeg1Config;
-extern FFMPEGConfig ffmpegMpeg2Config;
-extern FFMPEGConfig ffmpegMpeg2ConfigDVD;
-//static FFMPEGConfig ffmpegConfigforXVCD;
+
+extern COMPRES_PARAMS ffmpeg1Codec,ffmpeg2DVDCodec,ffmpeg2SVCDCodec;	
+extern FFcodecSetting ffmpeg1Extra,ffmpeg2DVDExtra,ffmpeg2SVCDExtra;
+
 
 
 uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
@@ -76,11 +80,11 @@ static char *twoFake=NULL;
 void oplug_mpegff_conf( void )
 {
 
-	DIA_XVCDParam("XVCD/XSVCD",&ffmpegMpeg1Config.generic.mode,
-			&ffmpegMpeg1Config.generic.qz,
-			&ffmpegMpeg1Config.generic.bitrate,
-			&ffmpegMpeg1Config.generic.finalsize,
-			&ffmpegMpeg1Config.specific
+	DIA_XVCDParam("XVCD/XSVCD",&ffmpeg1Codec.mode,
+			&ffmpeg1Codec.qz,
+			&ffmpeg1Codec.bitrate,
+			&ffmpeg1Codec.finalsize,
+			&ffmpeg1Extra
 
 			);
 }
@@ -238,16 +242,17 @@ uint32_t  real_framenum=0;
         }
 	switch(current_codec)
 	{
+		
 		case CodecXVCD:
-			encoder=new EncoderFFMPEGMpeg1(FF_MPEG1,&ffmpegMpeg1Config);
+			encoder=new EncoderFFMPEGMpeg1(FF_MPEG1,&ffmpeg1Codec);
 			printf("\n Using ffmpeg mpeg1 encoder\n");
 			break;
 		case CodecXSVCD:
-			encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpegMpeg2Config);
+			encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpeg2SVCDCodec);
 			printf("\n Using ffmpeg mpeg2 encoder\n");
 			break;
 		case CodecXDVD:
-			encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpegMpeg2ConfigDVD);
+			encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpeg2DVDCodec);
 			printf("\n Using ffmpeg mpeg2 encoder (DVD)\n");
 			break;
 		

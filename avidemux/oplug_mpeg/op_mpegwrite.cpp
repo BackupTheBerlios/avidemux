@@ -91,8 +91,12 @@
 #warning FIXME: Duplicate define with mpeg2enc -> bad
 #define MPEG_PREFILL 5
 
-extern MPEG2ENCConfig mpeg2encSVCDConfig;
-extern MPEG2ENCConfig mpeg2encDVDConfig;
+#include "ADM_encoder/adm_encConfig.h"
+#include "ADM_encoder/ADM_vidEncode.hxx"
+
+extern Mpeg2encParam SVCDExtra,DVDExtra; 
+extern COMPRES_PARAMS SVCDCodec,DVDCodec;
+
 extern uint8_t audioShift;
 extern int32_t audioDelay;
 // IF set do 1st pass with CBR with max bitrate = average bitrate AND disabling padding
@@ -165,36 +169,37 @@ uint8_t  mpegWritter::save_svcd(char *name)
 				break;
 		}
 	}
-	switch(mpeg2encSVCDConfig.generic.mode)
+	switch(SVCDCodec.mode)
 	{
 		case COMPRESS_CBR:
 			return  save_regular(name, ADM_SVCD,
 						0, 
-						mpeg2encSVCDConfig.generic.bitrate,
-						mpeg2encSVCDConfig.specific.user_matrix,
-						mpeg2encSVCDConfig.specific.interlaced,
-    						mpeg2encSVCDConfig.specific.bff,         // WLA
-						mpeg2encSVCDConfig.specific.widescreen
+						SVCDCodec.bitrate,
+						SVCDExtra.user_matrix,
+						SVCDExtra.interlaced,
+    					SVCDExtra.bff,         // WLA
+						SVCDExtra.widescreen
 						);
 			break;
 		case COMPRESS_CQ:
 			return  save_regular(name, ADM_SVCD,
-					 	mpeg2encSVCDConfig.generic.qz,
-						8*mpeg2encSVCDConfig.specific.maxBitrate,
-						mpeg2encSVCDConfig.specific.user_matrix,
-						mpeg2encSVCDConfig.specific.interlaced,
-						mpeg2encSVCDConfig.specific.bff,         // WLA
-						mpeg2encSVCDConfig.specific.widescreen
+					 	SVCDCodec.qz,
+						8*SVCDExtra.maxBitrate,
+						SVCDExtra.user_matrix,
+						SVCDExtra.interlaced,
+						SVCDExtra.bff,         // WLA
+						SVCDExtra.widescreen
 								);
 			break;
 		case COMPRESS_2PASS:
-			return  save_dualpass(name,mpeg2encSVCDConfig.generic.finalsize,
-						8*mpeg2encSVCDConfig.specific.maxBitrate,
+			return  save_dualpass(name,SVCDCodec.finalsize,
+						8*SVCDExtra.maxBitrate,
 						ADM_SVCD,
-						mpeg2encSVCDConfig.specific.user_matrix,
-						mpeg2encSVCDConfig.specific.interlaced,
-						mpeg2encSVCDConfig.specific.bff,         // WLA
-						mpeg2encSVCDConfig.specific.widescreen
+						SVCDExtra.user_matrix,
+						SVCDExtra.interlaced,
+						SVCDExtra.bff,         // WLA
+						SVCDExtra.widescreen
+								
 								);
 		break;
 	}
@@ -247,39 +252,39 @@ WAVHeader		*info=NULL,tmpinfo;
 		}
 	}
 
-	switch(mpeg2encDVDConfig.generic.mode)
+	switch(DVDCodec.mode)
 	{
 		case COMPRESS_CBR:
 			printf("Dvd encoding in CBR mode\n");
 			return  save_regular(name, ADM_DVD,0, 
-						mpeg2encDVDConfig.generic.bitrate ,
-						mpeg2encDVDConfig.specific.user_matrix,
-						mpeg2encDVDConfig.specific.interlaced,
-						mpeg2encDVDConfig.specific.bff,         // WLA
-						mpeg2encDVDConfig.specific.widescreen
+						DVDCodec.bitrate ,
+						DVDExtra.user_matrix,
+						DVDExtra.interlaced,
+						DVDExtra.bff,         // WLA
+						DVDExtra.widescreen
 						);
 			break;
 		case COMPRESS_CQ:
 			printf("Dvd encoding in CQ mode\n");
 			return  save_regular(name, ADM_DVD,
-						 mpeg2encDVDConfig.generic.qz,
-						 8*mpeg2encDVDConfig.specific.maxBitrate ,
-						 mpeg2encDVDConfig.specific.user_matrix,
-						 mpeg2encDVDConfig.specific.interlaced,
-						mpeg2encDVDConfig.specific.bff,         // WLA
-						mpeg2encDVDConfig.specific.widescreen
+						 DVDCodec.qz,
+						 8*DVDExtra.maxBitrate ,
+						 DVDExtra.user_matrix,
+						 DVDExtra.interlaced,
+						 DVDExtra.bff,         // WLA
+						 DVDExtra.widescreen
 						);
 			break;
 		case COMPRESS_2PASS:
 			printf("Dvd encoding in 2pass mode\n");
 			return  save_dualpass(name,
-						mpeg2encDVDConfig.generic.finalsize,
-						8*mpeg2encDVDConfig.specific.maxBitrate,
+						DVDCodec.finalsize,
+						8*DVDExtra.maxBitrate,
 						ADM_DVD,
-						mpeg2encDVDConfig.specific.user_matrix,
-						mpeg2encDVDConfig.specific.interlaced,
-						mpeg2encDVDConfig.specific.bff,         // WLA
-						mpeg2encDVDConfig.specific.widescreen
+						DVDExtra.user_matrix,
+						DVDExtra.interlaced,
+						DVDExtra.bff,         // WLA
+						DVDExtra.widescreen
 						);
 		break;
 	}

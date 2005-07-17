@@ -20,7 +20,7 @@
 #undef free
 
 extern char *PathCanonize(const char *tmpname);
-
+extern int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
 // <prefs_gen>
 typedef enum {
 	UINT,

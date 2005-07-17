@@ -75,6 +75,7 @@ extern void  buildDistMatrix( void );
 extern void initScaleTab( void );
 extern uint8_t initGUI( void );
 extern void ADM_memStat( void );
+extern uint8_t oplug_mpegInit(void);
 extern "C"
 {
 extern void     VPInitLibrary();
@@ -190,7 +191,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
    	printf("Global SDL init...\n");
    	SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
    #endif
-
+    oplug_mpegInit();
 	if(SpidermonkeyInit() == true)
 		printf("Spidermonkey initialized.\n");
 
