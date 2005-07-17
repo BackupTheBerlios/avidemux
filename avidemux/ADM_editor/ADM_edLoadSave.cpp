@@ -155,7 +155,7 @@ printf("\n **Saving script project **\n");
 
   FILE *    fd;
 
-  if( !(fd = fopen (name, "wt")) ){
+  if( !(fd = qfopen (name, "wt")) ){
     fprintf(stderr,"\ncan't open script file \"%s\" for writing: %u (%s)\n",
                    name, errno, strerror(errno));
     return 0;
@@ -163,24 +163,31 @@ printf("\n **Saving script project **\n");
 
 // Save source and segment
 //______________________________________________
-  fprintf( fd,"//AD  <- These first 4 characters need to be the first 4 characters to identify the ECMAScript file to Avidemux");
-  fprintf (fd, "//\n");
-  fprintf (fd, "//--automatically built--\n");
-  fprintf (fd, "//--Project: %s\n\n",name);
+  qfprintf( fd,"//AD  <- These first 4 characters need to be the first 4 characters to identify the ECMAScript file to Avidemux");
+  qfprintf (fd, "//\n");
+  qfprintf (fd, "//--automatically built--\n");
+  qfprintf (fd, "//--Project: %s\n\n",name);
 
-  fprintf (fd, "var app = new Avidemux();\n");
-  fprintf (fd,"\n//** Video **\n");
-  fprintf (fd,"// %02ld videos source \n", _nb_video);
+  qfprintf (fd, "var app = new Avidemux();\n");
+  qfprintf (fd,"\n//** Video **\n");
+  qfprintf (fd,"// %02ld videos source \n", _nb_video);
+  char *nm;
   for (uint32_t i = 0; i < _nb_video; i++)
     {
+        nm=cleanupPath(_videos[i]._aviheader->getMyName() );
         if(!i)
-                fprintf (fd, "app.load(\"%s\");\n", _videos[i]._aviheader->getMyName ());
+        {
+                qfprintf (fd, "app.load(\"%s\");\n", nm);
+        }
         else
-        fprintf (fd, "app.append(\"%s\");\n", _videos[i]._aviheader->getMyName ());
+        {
+            qfprintf (fd, "app.append(\"%s\");\n", nm);
+        }
+        ADM_dealloc(nm);
     }
   
-  fprintf (fd,"//%02ld segments\n", _nb_segment);
-  fprintf (fd,"app.clearSegments();\n");
+  qfprintf (fd,"//%02ld segments\n", _nb_segment);
+  qfprintf (fd,"app.clearSegments();\n");
   
  
 
@@ -190,27 +197,27 @@ for (uint32_t i = 0; i < _nb_segment; i++)
                 src=_segments[i]._reference;
                 start=_segments[i]._start_frame;
                 nb=_segments[i]._nb_frames;
-          fprintf (fd, "app.addSegment(%lu,%lu,%lu);\n",src,start,nb);
+                qfprintf (fd, "app.addSegment(%lu,%lu,%lu);\n",src,start,nb);
     }
 // postproc
 //___________________________
 
         uint32_t pptype, ppstrength,ppswap;
                 video_body->getPostProc( &pptype, &ppstrength, &ppswap);
-                fprintf(fd,"\n//** Postproc **\n");
-                fprintf(fd,"app.video.setPostProc(%d,%d,%d);\n",pptype,ppstrength,ppswap);
+                qfprintf(fd,"\n//** Postproc **\n");
+                qfprintf(fd,"app.video.setPostProc(%d,%d,%d);\n",pptype,ppstrength,ppswap);
 
 
 // Filter
 //___________________________
-        fprintf(fd,"\n//** Filters **\n");
+        qfprintf(fd,"\n//** Filters **\n");
         filterSaveScriptJS(fd);
 // Video codec
 //___________________________
 uint8_t  *extraData ;
 uint32_t extraDataSize;
-
-        fprintf(fd,"\n//** Video Codec conf **\n");
+char *pth;
+        qfprintf(fd,"\n//** Video Codec conf **\n");
         //videoCodecGetConf(&extraDataSize,&extraData);
         //if(extraDataSize())
         // Fixme
@@ -220,8 +227,10 @@ uint32_t extraDataSize;
         strcat(namevcodec,".vcodec");
         saveVideoCodecConf(namevcodec);
         delete [] namevcodec;
-        fprintf(fd,"app.video.process=%s;\n",truefalse[videoProcessMode]);
-        fprintf(fd,"app.video.codec(\"%s\",\"%s\",\"%s.vcodec\");\n",videoCodecGetName(),videoCodecGetMode(),name);
+        qfprintf(fd,"app.video.process=%s;\n",truefalse[videoProcessMode]);
+        pth= cleanupPath(name );
+        qfprintf(fd,"app.video.codec(\"%s\",\"%s\",\"%s.vcodec\");\n",videoCodecGetName(),videoCodecGetMode(),pth);
+        ADM_dealloc(pth);
 // Audio Source
 //______________________________________________
 
@@ -230,8 +239,8 @@ uint32_t extraDataSize;
 
    uint32_t delay;
    
-   fprintf(fd,"\n//** Audio **\n");
-   fprintf(fd,"app.audio.reset();\n");
+   qfprintf(fd,"\n//** Audio **\n");
+   qfprintf(fd,"app.audio.reset();\n");
 
    // External audio ?
         char *audioName;
@@ -243,15 +252,15 @@ uint32_t extraDataSize;
         if(source!=AudioAvi)
                 fprintf(fd,"app.audio.load(%s,\"%s\");\n", audioSourceFromEnum(source),audioName); 
 
-   fprintf(fd,"app.audio.codec(\"%s\",%d);\n", audioCodecGetName(),audioGetBitrate()); 
-   fprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode]);
-   fprintf(fd,"app.audio.normalize=%s;\n",truefalse[audioGetNormalize()]);
-   fprintf(fd,"app.audio.delay=%d;\n",audioGetDelay());
+   qfprintf(fd,"app.audio.codec(\"%s\",%d);\n", audioCodecGetName(),audioGetBitrate()); 
+   qfprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode]);
+   qfprintf(fd,"app.audio.normalize=%s;\n",truefalse[audioGetNormalize()]);
+   qfprintf(fd,"app.audio.delay=%d;\n",audioGetDelay());
    // Change mono2stereo ?
    switch(audioGetChannelConv())
         {
-                case CHANNELCONV_2to1:  fprintf(fd,"app.audio.mono2stereo=true;\n");break;
-                case CHANNELCONV_1to2:  fprintf(fd,"app.audio.stereo2mono=true;\n");break;
+                case CHANNELCONV_2to1:  qfprintf(fd,"app.audio.mono2stereo=true;\n");break;
+                case CHANNELCONV_1to2:  qfprintf(fd,"app.audio.stereo2mono=true;\n");break;
                 case CHANNELCONV_NONE: ;break;
                 default:ADM_assert(0);
         }     
@@ -259,23 +268,23 @@ uint32_t extraDataSize;
         switch(audioGetFpsConv())
         {
                 case FILMCONV_NONE:      ;break;
-                case FILMCONV_PAL2FILM:  fprintf(fd,"app.audio.pal2film=true;\n");break;
-                case FILMCONV_FILM2PAL:  fprintf(fd,"app.audio.film2pal=true;\n");break;
+                case FILMCONV_PAL2FILM:  qfprintf(fd,"app.audio.pal2film=true;\n");break;
+                case FILMCONV_FILM2PAL:  qfprintf(fd,"app.audio.film2pal=true;\n");break;
                 default:ADM_assert(0);
         }
    // Resampling
         switch(audioGetResampling())
         {
                 case RESAMPLING_NONE:         ;break;
-                case RESAMPLING_DOWNSAMPLING:  fprintf(fd,"app.audio.downsample=true;\n");break;
-                case RESAMPLING_CUSTOM:        fprintf(fd,"app.audio.resample=%u;\n",audioGetResample());break;
+                case RESAMPLING_DOWNSAMPLING:  qfprintf(fd,"app.audio.downsample=true;\n");break;
+                case RESAMPLING_CUSTOM:        qfprintf(fd,"app.audio.resample=%u;\n",audioGetResample());break;
                 default:ADM_assert(0);
         }
         
-  fprintf(fd,"//app.Exit();\n");
-  fprintf(fd,"\n//End of script\n");
+  qfprintf(fd,"//app.Exit();\n");
+  qfprintf(fd,"\n//End of script\n");
   // All done
-  fclose (fd);
+  qfclose (fd);
   
   return 1;
 
