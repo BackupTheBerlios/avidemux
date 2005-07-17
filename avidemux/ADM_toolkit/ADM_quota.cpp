@@ -8,6 +8,8 @@
 #include "default.h"
 extern uint8_t DIA_quota(char *);
 extern void GUI_Alert(const char *);
+#include <libxml/tree.h>
+int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
 
 #ifdef USE_LIBXML2
 int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format){
@@ -52,8 +54,17 @@ struct qfile_t {
 	unsigned int ignore;
 };
 static qfile_t qfile[qfile_len];
-
+static int  qinited=0;
 FILE *qfopen(const char *path, const char *mode){
+    // Mean:Should be the first funtion to be called
+    // The qfile array may or may not be initialized with 0
+    // We will trigger an assert in the malloc if we send dummy
+    
+    if(!qinited)
+        {
+            qinited=1;
+            memset(qfile,0,sizeof(qfile));  
+        }
   FILE * FD = NULL;
   int fd;
 	while( !FD ){

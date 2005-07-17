@@ -16,7 +16,7 @@ ssize_t qwrite(int fd, const void *buf, size_t numbytes);
 /* qfclose stands for quota-fclose() */
 int qfclose(FILE *);
 
-#ifdef USE_LIBXML2
+#if 0 //def USE_LIBXML2
 #include <libxml/tree.h>
 int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
 #endif

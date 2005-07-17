@@ -51,7 +51,7 @@ extern "C"
 
 #include "ADM_assert.h"
 
-adm_fast_memcpy myMemcpy=NULL;
+adm_fast_memcpy myAdmMemcpy=NULL;
 /* Original comments from mplayer (file: aclib.c)
  This part of code was taken by me from Linux-2.4.3 and slightly modified
 for MMX, MMX2, SSE instruction set. I have done it since linux uses page aligned
@@ -464,10 +464,10 @@ uint8_t ADM_InitMemcpy(void)
   int               i, j, best;
   int               config_flags = 0;
 #undef memcpy
-        myMemcpy=memcpy;
+        myAdmMemcpy=memcpy;
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
         if(CpuCaps::hasMMX())
-                myMemcpy=mmx_memcpy;
+                myAdmMemcpy=mmx_memcpy;
 #endif
 #if 0
 	probe(memcpy,"libc");

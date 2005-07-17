@@ -406,4 +406,27 @@ FILE *file;
                 return 1;
 
 }
+/*
+    In some case (e.g. javascript), the reader expects unixish path 
+    c:/foo/bar/c.c
+    and the "natural" path is c:\foo\bar
+    
+    This function convert the later to the former
+
+*/
+extern char *slashToBackSlash(char *in)
+{
+    char *out,*cout;
+    int n;
+    n=strlen(in);
+    cout=out=(char *)ADM_alloc(n+1);   
+    for(int i=0;i<n+1;i++)
+    {
+        if(   in[i]=='\\') out[i]='/';
+        else    out[i]=in[i];
+        
+    }
+    return cout;
+    
+}
 //EOF
