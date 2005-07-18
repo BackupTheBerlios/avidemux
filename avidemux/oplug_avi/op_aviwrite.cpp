@@ -42,6 +42,7 @@
 #include "avilist.h"
 #include "op_aviwrite.hxx"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_toolkit/ADM_quota.h"
 #include "ADM_library/ADM_fileio.h"
 
 // MOD Feb 2005 by GMV
@@ -429,7 +430,7 @@ uint8_t aviWrite::saveBegin (char 	*name,
 
 //  Sanity Check
         ADM_assert (_out == NULL);
-        if (!(_out = fopen (name, "wb")))
+        if (!(_out = qfopen (name, "wb")))
         {
                 printf("Problem writing : %s\n",name);
                 return 0;
@@ -739,7 +740,7 @@ if(doODML!=NORMAL){
   delete _file;
   _file=NULL;
   
-  fclose (_out);
+  qfclose (_out);
   _out = NULL;
   return 1;
 

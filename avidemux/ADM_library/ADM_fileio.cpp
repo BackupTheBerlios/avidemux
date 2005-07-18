@@ -23,6 +23,7 @@
 #include <math.h>
 #include "default.h"
 #include "ADM_fileio.h"
+#include "ADM_toolkit/ADM_quota.h"
 
 #define ADM_FILE_BUFFER 4*256*1024 // 256 kB
 //#define ADMF_DEBUG
@@ -57,7 +58,7 @@ uint8_t ADMFile::flush(void)
         if(_fill)
         {
                 
-                fwrite(_buffer,_fill,1,_out);
+                qfwrite(_buffer,_fill,1,_out);
                 
                 _curPos+=_fill;
 #ifdef ADMF_DEBUG                
