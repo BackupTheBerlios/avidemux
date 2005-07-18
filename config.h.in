@@ -128,6 +128,9 @@
 /* Define to 1 if you have the `mad' library (-lmad). */
 #undef HAVE_LIBMAD
 
+/* Define to 1 if you have the `mozjs' library (-lmozjs). */
+#undef HAVE_LIBMOZJS
+
 /* Define to 1 if you have the `mp3lame' library (-lmp3lame). */
 #undef HAVE_LIBMP3LAME
 
