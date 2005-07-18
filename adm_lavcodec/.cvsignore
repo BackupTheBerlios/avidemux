@@ -1,6 +1,2 @@
-*.o
-*.a
-.deps
-.libs
-config.cpu
-Makefile
+Makefile.*
+.depend

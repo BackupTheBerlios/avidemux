@@ -70,11 +70,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
 	unsigned int planes = c->planes;
 	unsigned char *planemap = c->planemap;
   
-  
-	/* no supplementary picture */
-	if (buf_size == 0)
-		return 0;
-
 	if(c->pic.data[0])
 		avctx->release_buffer(avctx, &c->pic);
 
@@ -105,11 +100,13 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
 			dlen = be2me_16(*(unsigned short *)(lp+row*2));
 			/* Decode a row of this plane */
 			while(dlen > 0) {
+				if(dp + 1 >= buf+buf_size) return -1;
 				if ((count = *dp++) <= 127) {
 					count++;
 					dlen -= count + 1;
 					if (pixptr + count * px_inc > pixptr_end)
 					    break;
+					if(dp + count > buf+buf_size) return -1;
 					while(count--) {
 						*pixptr = *dp++;
 						pixptr += px_inc;
@@ -161,7 +158,6 @@ static int decode_init(AVCodecContext *avctx)
 	c->pic.data[0] = NULL;
 
     if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "Bad image size (w = %d, h = %d).\n", avctx->width, avctx->height);
         return 1;
     }
 

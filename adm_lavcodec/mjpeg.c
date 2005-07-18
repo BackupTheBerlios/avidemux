@@ -400,6 +400,19 @@ static void jpeg_put_comments(MpegEncContext *s)
         ptr[0] = size >> 8;
         ptr[1] = size;
     }
+
+    if(  s->avctx->pix_fmt == PIX_FMT_YUV420P 
+       ||s->avctx->pix_fmt == PIX_FMT_YUV422P
+       ||s->avctx->pix_fmt == PIX_FMT_YUV444P){
+        put_marker(p, COM);
+        flush_put_bits(p);
+        ptr = pbBufPtr(p);
+        put_bits(p, 16, 0); /* patched later */
+        put_string(p, "CS=ITU601", 1);
+        size = strlen("CS=ITU601")+3;
+        ptr[0] = size >> 8;
+        ptr[1] = size;
+    }
 }
 
 void mjpeg_picture_header(MpegEncContext *s)
@@ -663,7 +676,7 @@ static int encode_picture_lossless(AVCodecContext *avctx, unsigned char *buf, in
     if(avctx->pix_fmt == PIX_FMT_RGBA32){
         int x, y, i;
         const int linesize= p->linesize[0];
-        uint16_t (*buffer)[4]= s->rd_scratchpad;
+        uint16_t (*buffer)[4]= (void *) s->rd_scratchpad;
         int left[3], top[3], topleft[3];
 
         for(i=0; i<3; i++){
@@ -845,6 +858,7 @@ typedef struct MJpegDecodeContext {
     int restart_count;
 
     int buggy_avid;
+    int cs_itu601;
     int interlace_polarity;
 
     int mjpb_skiptosod;
@@ -882,11 +896,8 @@ static int mjpeg_decode_init(AVCodecContext *avctx)
     s->idct_put= s2.dsp.idct_put;
 
     s->mpeg_enc_ctx_allocated = 0;
-    s->buffer_size = 102400; /* smaller buffer should be enough,
-				but photojpg files could ahive bigger sizes */
-    s->buffer = av_malloc(s->buffer_size);
-    if (!s->buffer)
-	return -1;
+    s->buffer_size = 0;
+    s->buffer = NULL;
     s->start_code = -1;
     s->first_picture = 1;
     s->org_height = avctx->coded_height;
@@ -1133,16 +1144,16 @@ static int mjpeg_decode_sof(MJpegDecodeContext *s)
         if(s->rgb){
             s->avctx->pix_fmt = PIX_FMT_RGBA32;
         }else if(s->nb_components==3)
-            s->avctx->pix_fmt = PIX_FMT_YUV444P;
+            s->avctx->pix_fmt = s->cs_itu601 ? PIX_FMT_YUV444P : PIX_FMT_YUVJ444P;
         else
             s->avctx->pix_fmt = PIX_FMT_GRAY8;
         break;
     case 0x21:
-        s->avctx->pix_fmt = PIX_FMT_YUV422P;
+        s->avctx->pix_fmt = s->cs_itu601 ? PIX_FMT_YUV422P : PIX_FMT_YUVJ422P;
         break;
     default:
     case 0x22:
-        s->avctx->pix_fmt = PIX_FMT_YUV420P;
+        s->avctx->pix_fmt = s->cs_itu601 ? PIX_FMT_YUV420P : PIX_FMT_YUVJ420P;
         break;
     }
 
@@ -1571,10 +1582,11 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
 {
     int len, id;
 
-    /* XXX: verify len field validity */
     len = get_bits(&s->gb, 16);
     if (len < 5)
 	return -1;
+    if(8*len + get_bits_count(&s->gb) > s->gb.size_in_bits)
+        return -1;
 
     id = (get_bits(&s->gb, 16) << 16) | get_bits(&s->gb, 16);
     id = be2me_32(id);
@@ -1713,10 +1725,8 @@ out:
 
 static int mjpeg_decode_com(MJpegDecodeContext *s)
 {
-    /* XXX: verify len field validity */
     int len = get_bits(&s->gb, 16);
-    if (len >= 2 && len < 32768) {
-	/* XXX: any better upper bound */
+    if (len >= 2 && 8*len - 16 + get_bits_count(&s->gb) <= s->gb.size_in_bits) {
 	uint8_t *cbuf = av_malloc(len - 1);
 	if (cbuf) {
 	    int i;
@@ -1737,6 +1747,9 @@ static int mjpeg_decode_com(MJpegDecodeContext *s)
 		//	if (s->first_picture)
 		//	    printf("mjpeg: workarounding buggy AVID\n");
 	    }
+            else if(!strcmp(cbuf, "CS=ITU601")){
+                s->cs_itu601= 1;
+            }
 
 	    av_free(cbuf);
 	}
@@ -1809,10 +1822,6 @@ static int mjpeg_decode_frame(AVCodecContext *avctx,
     int start_code;
     AVFrame *picture = data;
 
-    /* no supplementary picture */
-    if (buf_size == 0)
-        return 0;
-
     buf_ptr = buf;
     buf_end = buf + buf_size;
     while (buf_ptr < buf_end) {
@@ -1829,7 +1838,7 @@ static int mjpeg_decode_frame(AVCodecContext *avctx,
 		{
 		    av_free(s->buffer);
 		    s->buffer_size = buf_end-buf_ptr;
-		    s->buffer = av_malloc(s->buffer_size);
+                    s->buffer = av_malloc(s->buffer_size + FF_INPUT_BUFFER_PADDING_SIZE);
 		    dprintf("buffer too small, expanding to %d bytes\n",
 			s->buffer_size);
 		}
@@ -1985,10 +1994,6 @@ static int mjpegb_decode_frame(AVCodecContext *avctx,
     uint32_t dqt_offs, dht_offs, sof_offs, sos_offs, second_field_offs;
     uint32_t field_size, sod_offs;
 
-    /* no supplementary picture */
-    if (buf_size == 0)
-        return 0;
-
     buf_ptr = buf;
     buf_end = buf + buf_size;
     
@@ -2098,10 +2103,6 @@ static int sp5x_decode_frame(AVCodecContext *avctx,
     uint8_t *buf_ptr, *buf_end, *recoded;
     int i = 0, j = 0;
 
-    /* no supplementary picture */
-    if (buf_size == 0)
-        return 0;
-
     if (!avctx->width || !avctx->height)
 	return -1;
 
@@ -2172,7 +2173,7 @@ static int sp5x_decode_frame(AVCodecContext *avctx,
     s->v_max = 2;
     
     s->qscale_table = av_mallocz((s->width+15)/16);
-    avctx->pix_fmt = PIX_FMT_YUV420P;
+    avctx->pix_fmt = s->cs_itu601 ? PIX_FMT_YUV420P : PIX_FMT_YUVJ420;
     s->interlaced = 0;
     
     s->picture.reference = 0;

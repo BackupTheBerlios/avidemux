@@ -85,13 +85,11 @@ int ff_h263_decode_init(AVCodecContext *avctx)
         s->h263_pred = 1;
         s->msmpeg4_version=5;
         break;
-	/* MEANX
     case CODEC_ID_WMV3:
         s->h263_msmpeg4 = 1;
         s->h263_pred = 1;
         s->msmpeg4_version=6;
         break;
-	*/
     case CODEC_ID_H263I:
         break;
     case CODEC_ID_FLV1:
@@ -141,9 +139,8 @@ int av_is_voppacked(AVCodecContext *avctx, int *vop_packed, int *gmc, int *qpel)
   /* MeanX */
 
 
-
 /**
- * retunrs the number of bytes consumed for building the current frame
+ * returns the number of bytes consumed for building the current frame
  */
 static int get_consumed_bytes(MpegEncContext *s, int buf_size){
     int pos= (get_bits_count(&s->gb)+7)>>3;
@@ -216,11 +213,10 @@ static int decode_slice(MpegEncContext *s){
             }
 
             /* DCT & quantize */
-	    s->dsp.clear_blocks(s->block[0]);
-            
+           
             s->mv_dir = MV_DIR_FORWARD;
             s->mv_type = MV_TYPE_16X16;
-//            s->mb_skiped = 0;
+//            s->mb_skipped = 0;
 //printf("%d %d %06X\n", ret, get_bits_count(&s->gb), show_bits(&s->gb, 24));
             ret= s->decode_mb(s, s->block);
 
@@ -301,7 +297,7 @@ static int decode_slice(MpegEncContext *s){
             s->workaround_bugs &= ~FF_BUG_NO_PADDING;
     }
 
-    // handle formats which dont have unique end markers
+    // handle formats which don't have unique end markers
     if(s->msmpeg4_version || (s->workaround_bugs&FF_BUG_NO_PADDING)){ //FIXME perhaps solve this more cleanly
         int left= s->gb.size_in_bits - get_bits_count(&s->gb);
         int max_extra=7;
@@ -472,7 +468,7 @@ uint64_t time= rdtsc();
         }else if(s->codec_id==CODEC_ID_H263){
             next= h263_find_frame_end(&s->parse_context, buf, buf_size);
         }else{
-            av_log(s->avctx, AV_LOG_ERROR, "this codec doesnt support truncated bitstreams\n");
+            av_log(s->avctx, AV_LOG_ERROR, "this codec does not support truncated bitstreams\n");
             return -1;
         }
         
@@ -524,7 +520,7 @@ retry:
         ret = h263_decode_picture_header(s);
     }
     
-    if(ret==FRAME_SKIPED) return get_consumed_bytes(s, buf_size);
+    if(ret==FRAME_SKIPPED) return get_consumed_bytes(s, buf_size);
 
     /* skip if the header was thrashed */
     if (ret < 0){
@@ -688,18 +684,20 @@ retry:
         s->gob_index = ff_h263_get_gob_height(s);
     
     // for hurry_up==5
-    /*
-    s->current_picture.pict_type= s->pict_type;
-    s->current_picture.key_frame= s->pict_type == I_TYPE;
-	*/
+    //s->current_picture.pict_type= s->pict_type;
+    //s->current_picture.key_frame= s->pict_type == I_TYPE;
+	//MEANX
 	pict->pict_type=s->current_picture.pict_type= s->pict_type;
    	pict->key_frame=s->current_picture.key_frame= s->pict_type == I_TYPE;
-/* MeanX : Get correct type */
-
-    /* skip b frames if we dont have reference frames */
+	//MEANX
+    /* skip B-frames if we don't have reference frames */
     if(s->last_picture_ptr==NULL && (s->pict_type==B_TYPE || s->dropable)) return get_consumed_bytes(s, buf_size);
     /* skip b frames if we are in a hurry */
     if(avctx->hurry_up && s->pict_type==B_TYPE) return get_consumed_bytes(s, buf_size);
+    if(   (avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type==B_TYPE)
+       || (avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type!=I_TYPE)
+       ||  avctx->skip_frame >= AVDISCARD_ALL) 
+        return get_consumed_bytes(s, buf_size);
     /* skip everything if we are in a hurry>=5 */
     if(avctx->hurry_up>=5) return get_consumed_bytes(s, buf_size);
     
@@ -799,7 +797,7 @@ assert(s->current_picture.pict_type == s->pict_type);
     /* we substract 1 because it is added on utils.c    */
     avctx->frame_number = s->picture_number - 1;
 
-    /* dont output the last pic after seeking */
+    /* don't output the last pic after seeking */
     if(s->last_picture_ptr || s->low_delay)
         *data_size = sizeof(AVFrame);
 #ifdef PRINT_FRAME_TIME

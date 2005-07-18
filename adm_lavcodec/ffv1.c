@@ -550,9 +550,9 @@ static int encode_init(AVCodecContext *avctx)
     FFV1Context *s = avctx->priv_data;
     int i;
 
-    if(avctx->strict_std_compliance >= 0){
-        av_log(avctx, AV_LOG_ERROR, "this codec is under development, files encoded with it wont be decodeable with future versions!!!\n"
-               "use vstrict=-1 to use it anyway\n");
+    if(avctx->strict_std_compliance >FF_COMPLIANCE_EXPERIMENTAL){
+        av_log(avctx, AV_LOG_ERROR, "this codec is under development, files encoded with it may not be decodeable with future versions!!!\n"
+               "use vstrict=-2 / -strict -2 to use it anyway\n");
         return -1;
     }
         
@@ -889,7 +889,7 @@ static int read_header(FFV1Context *f){
         case 0x10: f->avctx->pix_fmt= PIX_FMT_YUV422P; break;
         case 0x11: f->avctx->pix_fmt= PIX_FMT_YUV420P; break;
         case 0x20: f->avctx->pix_fmt= PIX_FMT_YUV411P; break;
-        case 0x33: f->avctx->pix_fmt= PIX_FMT_YUV410P; break;
+        case 0x22: f->avctx->pix_fmt= PIX_FMT_YUV410P; break;
         default:
             av_log(f->avctx, AV_LOG_ERROR, "format not supported\n");
             return -1;
@@ -952,10 +952,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
 
     AVFrame *picture = data;
 
-    /* no supplementary picture */
-    if (buf_size == 0)
-        return 0;
-
     ff_init_range_decoder(c, buf, buf_size);
     ff_build_rac_states(c, 0.05*(1LL<<32), 256-8);
 
@@ -968,8 +964,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
     }else{
         p->key_frame= 0;
 	p->pict_type= FF_P_TYPE; // MEANX : looks more like a P to me as user
- 
-
     }
 
     p->reference= 0;

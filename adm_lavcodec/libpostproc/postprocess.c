@@ -100,17 +100,6 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #define memalign(a,b) malloc(b)
 #endif
 
-/* MEANX : Use common alloc / free */
-extern void *ADM_alloc(size_t size);
-extern void *ADM_realloc(void *in,size_t size);
-extern void ADM_dezalloc(void *ptr);
-extern char *ADM_strdup( const char *in);
-
-#define free(x) ADM_dezalloc(x)
-#define memalign(y,x) ADM_alloc(x)
-#define malloc(x) ADM_alloc(x)
-
-/* MEANX */
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
 #define MAX(a,b) ((a) < (b) ? (b) : (a))
 #define ABS(a) ((a) > 0 ? (a) : (-(a)))
@@ -432,12 +421,39 @@ static inline void doHorizLowPass_C(uint8_t dst[], int stride, PPContext *c)
  * MMX2 version does correct clipping C version doesnt
  * not identical with the vertical one
  */
-
-static  inline void horizX1Filter(uint8_t *src, int stride, int QP)
+static inline void horizX1Filter(uint8_t *src, int stride, int QP)
 {
 	int y;
-	
-				
+	static uint64_t *lut= NULL;
+	if(lut==NULL)
+	{
+		int i;
+		lut= (uint64_t*)memalign(8, 256*8);
+		for(i=0; i<256; i++)
+		{
+			int v= i < 128 ? 2*i : 2*(i-256);
+/*
+//Simulate 112242211 9-Tap filter
+			uint64_t a= (v/16) & 0xFF;
+			uint64_t b= (v/8) & 0xFF;
+			uint64_t c= (v/4) & 0xFF;
+			uint64_t d= (3*v/8) & 0xFF;
+*/
+//Simulate piecewise linear interpolation
+			uint64_t a= (v/16) & 0xFF;
+			uint64_t b= (v*3/16) & 0xFF;
+			uint64_t c= (v*5/16) & 0xFF;
+			uint64_t d= (7*v/16) & 0xFF;
+			uint64_t A= (0x100 - a)&0xFF;
+			uint64_t B= (0x100 - b)&0xFF;
+			uint64_t C= (0x100 - c)&0xFF;
+			uint64_t D= (0x100 - c)&0xFF;
+
+			lut[i]   = (a<<56) | (b<<48) | (c<<40) | (d<<32) |
+				(D<<24) | (C<<16) | (B<<8) | (A);
+			//lut[i] = (v<<32) | (v<<24);
+		}
+	}
 
 	for(y=0; y<BLOCK_SIZE; y++)
 	{
@@ -449,15 +465,14 @@ static  inline void horizX1Filter(uint8_t *src, int stride, int QP)
 
 		if(d < QP)
 		{
+			int v = d * SIGN(-b);
 
-
-			int v = (d * SIGN(-b));
 			src[1] +=v/8;
 			src[2] +=v/4;
 			src[3] +=3*v/8;
 			src[4] -=3*v/8;
 			src[5] -=v/4;
-			src[6] -=v/8;		
+			src[6] -=v/8;
 
 		}
 		src+=stride;
@@ -704,18 +719,13 @@ static inline void postProcess(uint8_t src[], int srcStride, uint8_t dst[], int 
 /* -pp Command line Help
 */
 char *pp_help=
-"<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n"
-"long form example:\n"
-"vdeblock:autoq/hdeblock:autoq/linblenddeint	default,-vdeblock\n"
-"short form example:\n"
-"vb:a/hb:a/lb					de,-vb\n"
-"more examples:\n"
-"tn:64:128:256\n"
+"Available postprocessing filters:\n"
 "Filters			Options\n"
 "short	long name	short	long option	Description\n"
 "*	*		a	autoq		CPU power dependent enabler\n"
 "			c	chrom		chrominance filtering enabled\n"
 "			y	nochrom		chrominance filtering disabled\n"
+"			n	noluma		luma filtering disabled\n"
 "hb	hdeblock	(2 threshold)		horizontal deblocking filter\n"
 "	1. difference factor: default=32, higher -> more deblocking\n"
 "	2. flatness threshold: default=39, lower -> more deblocking\n"
@@ -734,11 +744,21 @@ char *pp_help=
 "ci	cubicipoldeint				cubic interpolating deinterlacer\n"
 "md	mediandeint				median deinterlacer\n"
 "fd	ffmpegdeint				ffmpeg deinterlacer\n"
+"l5	lowpass5				FIR lowpass deinterlacer\n"
 "de	default					hb:a,vb:a,dr:a\n"
 "fa	fast					h1:a,v1:a,dr:a\n"
+"ac						ha:a:128:7,va:a,dr:a\n"
 "tn	tmpnoise	(3 threshold)		temporal noise reducer\n"
 "			1. <= 2. <= 3.		larger -> stronger filtering\n"
 "fq	forceQuant	<quantizer>		force quantizer\n"
+"Usage:\n"
+"<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n"
+"long form example:\n"
+"vdeblock:autoq/hdeblock:autoq/linblenddeint	default,-vdeblock\n"
+"short form example:\n"
+"vb:a/hb:a/lb					de,-vb\n"
+"more examples:\n"
+"tn:64:128:256\n"
 ;
 
 pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
@@ -772,6 +792,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
 		char *filterName;
 		int q= 1000000; //PP_QUALITY_MAX;
 		int chrom=-1;
+		int luma=-1;
 		char *option;
 		char *options[OPTIONS_ARRAY_SIZE];
 		int i;
@@ -799,6 +820,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
 			if(!strcmp("autoq", option) || !strcmp("a", option)) q= quality;
 			else if(!strcmp("nochrom", option) || !strcmp("y", option)) chrom=0;
 			else if(!strcmp("chrom", option) || !strcmp("c", option)) chrom=1;
+			else if(!strcmp("noluma", option) || !strcmp("n", option)) luma=0;
 			else
 			{
 				options[numOfUnknownOptions] = option;
@@ -845,7 +867,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
 				filterNameOk=1;
 				if(!enable) break; // user wants to disable it
 
-				if(q >= filters[i].minLumQuality)
+				if(q >= filters[i].minLumQuality && luma)
 					ppMode->lumMode|= filters[i].mask;
 				if(chrom==1 || (chrom==-1 && filters[i].chromDefault))
 					if(q >= filters[i].minChromQuality)
@@ -1033,18 +1055,20 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 	int mbHeight= (height+15)>>4;
 	PPMode *mode = (PPMode*)vm;
 	PPContext *c = (PPContext*)vc;
-        int minStride= MAX(srcStride[0], dstStride[0]);
+	int minStride= MAX(ABS(srcStride[0]), ABS(dstStride[0]));
+	int absQPStride = ABS(QPStride);
 
-	if(c->stride < minStride || c->qpStride < QPStride)
+	// c->stride and c->QPStride are always positive
+	if(c->stride < minStride || c->qpStride < absQPStride)
 		reallocBuffers(c, width, height, 
 				MAX(minStride, c->stride), 
-				MAX(c->qpStride, QPStride));
+				MAX(c->qpStride, absQPStride));
 
 	if(QP_store==NULL || (mode->lumMode & FORCE_QUANT)) 
 	{
 		int i;
 		QP_store= c->forcedQPTable;
-		QPStride= 0;
+		absQPStride = QPStride = 0;
 		if(mode->lumMode & FORCE_QUANT)
 			for(i=0; i<mbWidth; i++) QP_store[i]= mode->forcedQuant;
 		else
@@ -1054,7 +1078,7 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 
 	if(pict_type & PP_PICT_TYPE_QP2){
 		int i;
-		const int count= mbHeight * QPStride;
+		const int count= mbHeight * absQPStride;
 		for(i=0; i<(count>>2); i++){
 			((uint32_t*)c->stdQPTable)[i] = (((uint32_t*)QP_store)[i]>>1) & 0x7F7F7F7F;
 		}
@@ -1062,6 +1086,7 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
 			c->stdQPTable[i] = QP_store[i]>>1;
 		}
                 QP_store= c->stdQPTable;
+		QPStride= absQPStride;		
 	}
 
 if(0){
@@ -1077,13 +1102,22 @@ for(y=0; y<mbHeight; y++){
 
 	if((pict_type&7)!=3)
 	{
-		int i;
-		const int count= mbHeight * QPStride;
-		for(i=0; i<(count>>2); i++){
-			((uint32_t*)c->nonBQPTable)[i] = ((uint32_t*)QP_store)[i] & 0x3F3F3F3F;
-		}
-		for(i<<=2; i<count; i++){
-			c->nonBQPTable[i] = QP_store[i] & 0x3F;
+		if (QPStride >= 0) {
+			int i;
+			const int count= mbHeight * QPStride;
+			for(i=0; i<(count>>2); i++){
+				((uint32_t*)c->nonBQPTable)[i] = ((uint32_t*)QP_store)[i] & 0x3F3F3F3F;
+			}
+			for(i<<=2; i<count; i++){
+				c->nonBQPTable[i] = QP_store[i] & 0x3F;
+			}
+		} else {
+			int i,j;
+			for(i=0; i<mbHeight; i++) {
+		    		for(j=0; j<absQPStride; j++) {
+					c->nonBQPTable[i*absQPStride+j] = QP_store[i*QPStride+j] & 0x3F;
+				}
+			}
 		}
 	}
 
@@ -1107,8 +1141,8 @@ for(y=0; y<mbHeight; y++){
 	}
 	else if(srcStride[1] == dstStride[1] && srcStride[2] == dstStride[2])
 	{
-		memcpy(dst[1], src[1], srcStride[1]*height);
-		memcpy(dst[2], src[2], srcStride[2]*height);
+		linecpy(dst[1], src[1], height, srcStride[1]);
+		linecpy(dst[2], src[2], height, srcStride[2]);
 	}
 	else
 	{

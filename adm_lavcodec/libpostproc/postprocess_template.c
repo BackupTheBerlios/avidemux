@@ -472,169 +472,6 @@ static inline void RENAME(vertRK1Filter)(uint8_t *src, int stride, int QP)
 }
 #endif
 
-#ifdef HAVE_ALTIVEC
-//MEANX
-static always_inline void vertX1Filter_altivec_template(int aligned,uint8_t *src, int stride, PPContext *co)
-{
-	//MEANX: Altivec version including clipping
-	//
-
-int16_t __attribute__ ((aligned(16))) v16[8];
-				
-
-#define VEC16 vector unsigned short
-#define VECS16 vector signed short
-#define VEC8 vector unsigned char
-#define VECS8 vector signed char
-#define VECS32 vector signed int
-
-
-#define LOAD_ALIGNED(dest,src) \
-		dest=(VEC8)vec_ld(0,(unsigned char* )src);
-
-#define LOAD_UNALIGNED(dest,src) \
-		MSQ=vec_ld(0, (unsigned char *)src);	\
-		LSQ= vec_ld(16, (unsigned char *)src);	\
-		dest=(VEC8)vec_perm(MSQ,LSQ, vec_lvsl(0, (unsigned char *)src));
-		
-#define STORE_ALIGNED(target,src)\
-	vec_st(src,0,target) ;
-			
-#define STORE_UNALIGNED(target,src) \
-	MSQ = vec_ld(0, target); \
-	LSQ = vec_ld(16, target);\
-	align = vec_lvsr(0, (unsigned char *)target); \
-	mask=vec_perm((VEC8 )vec_zero,(VEC8 )neg1,(VEC8)align); \
-	src=vec_perm((VEC8 )src,(VEC8)src,(VEC8)align ); \
-	MSQ = vec_sel( MSQ, (VEC8 )src, mask ); \
-	LSQ = vec_sel( (VEC8 )src, LSQ, mask ); \
-	vec_st( MSQ, 0, target ); \
-	vec_st( LSQ, 16, target ); 
-	
-
-
-	const VEC16 	vec_const=(VEC16)(4,0x11,0xFFFF,0,0,0,0,0);
-	const VEC8 	vec_zero=(VEC8)vec_splat(vec_const,3);		//0
-	const VEC16	neg1=vec_splat(vec_const,2); //FFFFF
-	const VEC16	vec_shift=vec_splat(vec_const,0); //4
-	
-	VEC8 	vec_src;
-	VEC8	MSQ,LSQ,mask,align,final;
-	VECS16 	vec_l0,vec_l1,vec_l2,vec_l3,vec_l4,vec_l5;	
-	VECS16 	vec_r0,vec_r1,vec_r2,vec_r3,vec_r4,vec_r5;	
-	VECS16 	vec_a,vec_b,vec_c,vec_b2,vec_sign,vec_invsign,vec_d,vec_d2;	
-	VECS16  v1,v2,vec_qp;
-	VEC8	sign,cmp;
-	
-	v16[0]=4*co->QP;
-	vec_qp=vec_ld(0,v16);
-	vec_qp=vec_splat(vec_qp,0);
-	src+=stride*5;
-	
-	#define LOAD_VECTORS(typ,x,y) \
-		LOAD_##typ(vec_src,y+stride*x); \
-		vec_l##x=(VECS16)vec_mergeh((VEC8)vec_zero,(VEC8)vec_src); \
-		vec_r##x=(VECS16)vec_mergel((VEC8)vec_zero,(VEC8)vec_src);  
-	
-	if(aligned)
-	{	
-		LOAD_VECTORS(ALIGNED,0,src);
-		LOAD_VECTORS(ALIGNED,1,src);
-		LOAD_VECTORS(ALIGNED,2,src);
-		LOAD_VECTORS(ALIGNED,3,src);
-		LOAD_VECTORS(ALIGNED,4,src);
-		LOAD_VECTORS(ALIGNED,5,src);
-	}
-	else
-	{
-		LOAD_VECTORS(UNALIGNED,0,src);
-		LOAD_VECTORS(UNALIGNED,1,src);
-		LOAD_VECTORS(UNALIGNED,2,src);
-		LOAD_VECTORS(UNALIGNED,3,src);
-		LOAD_VECTORS(UNALIGNED,4,src);
-		LOAD_VECTORS(UNALIGNED,5,src);
-	}
-	
-	//_____________________________________________________________________
-	
-	vec_a=vec_abs(vec_sub(vec_l1,vec_l2));  //a
-	vec_b2=vec_sub(vec_l2,vec_l3);		//b
-	vec_c=vec_abs(vec_sub(vec_l3,vec_l4));	//c
-	
-	vec_sign=(VECS16)vec_cmplt(vec_b2,(VECS16)vec_zero); //0xFF <0 , 0 >0 sign of b
-	vec_b=vec_abs(vec_b2);
-	
-	vec_d=vec_add(vec_b,vec_b);
-	vec_d2=vec_sub(vec_d,vec_a);
-	vec_d=vec_sub(vec_d2,vec_c);
-	vec_d2=vec_max(vec_d,(VECS16)vec_zero);  // 2*d everywhere
-	
-	cmp=(VEC8)vec_cmplt(vec_d2,vec_qp); 	// FF if 2d <vec qp
-	vec_d=vec_and(vec_d2,(VECS16)cmp);   // 0 if > , 2*d else, now v=0 is not little enough
-	
-	// time to add its sign to vec_d
-	//
-	vec_d2=vec_sub((VECS16)vec_zero,vec_d);  // vec_d2=-vec_d
-	vec_a=vec_and(vec_sign,vec_d);		// negative part
-	vec_b=vec_and( vec_nor(vec_sign,vec_sign)  ,vec_d2);
-	vec_d=vec_or(vec_a,vec_b);
-	
-	//_____________________________________________________________________
-	
-	
-#define PROCESS(x) \
-	v1=vec_sra(v2,vec_shift); \
-	vec_l##x=vec_max(vec_adds(vec_l##x,v1),(VECS16)vec_zero);	
-	
-#define PROCESSI(x) \
-	v1=vec_sra(v2,vec_shift); \
-	vec_l##x=vec_max(vec_subs(vec_l##x,v1),(VECS16)vec_zero);	
-		
-#define STORE_VECTORS(type,x,y) \
-		final=(VEC8)vec_pack(vec_l##x,vec_r##x); \
-		STORE_##type(y+stride*x,final); 		
-		
-	v2=vec_d;
-	PROCESS(0);				// *1
-	
-	v2=vec_add(vec_d,vec_d);
-	PROCESS(1);				// *2
-	
-	v2=vec_add(vec_add(vec_d,vec_d),vec_d);  // 3*
-	PROCESS(2);		
-	
-	v2=vec_add(vec_add(vec_d,vec_d),vec_d);  // -3*
-	PROCESSI(3);
-	
-	v2=vec_add(vec_d,vec_d);		//  *-2
-	PROCESSI(4);	
-	
-	v2=vec_d;				//  *-1
-	PROCESSI(5);
-		
-	if(aligned)
-	{	
-		STORE_VECTORS(ALIGNED,0,src);
-		STORE_VECTORS(ALIGNED,1,src);
-		STORE_VECTORS(ALIGNED,2,src);
-		STORE_VECTORS(ALIGNED,3,src);
-		STORE_VECTORS(ALIGNED,4,src);
-		STORE_VECTORS(ALIGNED,5,src);
-	}
-	else
-	{
-		STORE_VECTORS(UNALIGNED,0,src);
-		STORE_VECTORS(UNALIGNED,1,src);
-		STORE_VECTORS(UNALIGNED,2,src);
-		STORE_VECTORS(UNALIGNED,3,src);
-		STORE_VECTORS(UNALIGNED,4,src);
-		STORE_VECTORS(UNALIGNED,5,src);
-	
-	}
-
-// /MEANX
-}
-#endif
 /**
  * Experimental Filter 1
  * will not damage linear gradients
@@ -732,11 +569,6 @@ static inline void RENAME(vertX1Filter)(uint8_t *src, int stride, PPContext *co)
 	);
 #else
 
-#ifdef HAVE_ALTIVEC
-	
-		vertX1Filter_altivec_template(0,src,stride, co);
-#else
-
  	const int l1= stride;
 	const int l2= stride + l1;
 	const int l3= stride + l2;
@@ -772,7 +604,6 @@ static inline void RENAME(vertX1Filter)(uint8_t *src, int stride, PPContext *co)
 		}
 		src++;
 	}
-#endif
 #endif
 }
 
@@ -2815,7 +2646,7 @@ Switch between
  * accurate deblock filter
  */
 static always_inline void RENAME(do_a_deblock)(uint8_t *src, int step, int stride, PPContext *c){
-	int64_t dc_mask, eq_mask;
+	int64_t dc_mask, eq_mask, both_masks;
 	int64_t sums[10*8*2];
 	src+= step*3; // src points to begin of the 8x8 Block
 //START_TIMER
@@ -2923,8 +2754,10 @@ asm volatile(
 		: "r" (src), "r" ((long)step), "m" (c->pQPb), "m"(c->ppMode.flatnessThreshold)
 		: "%"REG_a
 		);
-	dc_mask&=eq_mask; //MEANX
-	if(dc_mask){
+
+	both_masks = dc_mask & eq_mask;
+
+	if(both_masks){
 		long offset= -8*step;
 		int64_t *temp_sums= sums;
 
@@ -3099,8 +2932,7 @@ asm volatile(
 		" js 1b						\n\t"
 
 		: "+r"(offset), "+r"(temp_sums)
-		//: "r" ((long)step), "r"(src - offset), "m"(dc_mask & eq_mask)
-		: "r" ((long)step), "r"(src - offset), "m"(dc_mask )
+		: "r" ((long)step), "r"(src - offset), "m"(both_masks)
 		);
 	}else
 		src+= step; // src points to begin of the 8x8 Block
@@ -3517,13 +3349,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 	QP_STORE_T QPs[], int QPStride, int isColor, PPContext *c2)
 {
 	PPContext __attribute__((aligned(8))) c= *c2; //copy to stack for faster access
-#ifdef 	ARCH_X86_64
-	int64_t  x,y;
-	int64_t copyAhead;
-#else	
-	int32_t x,y;
-	int32_t copyAhead;
-#endif	
+	int x,y;
 #ifdef COMPILE_TIME_MODE
 	const int mode= COMPILE_TIME_MODE;
 #else
@@ -3532,6 +3358,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 	int black=0, white=255; // blackest black and whitest white in the picture
 	int QPCorrecture= 256*256;
 
+	int copyAhead;
 #ifdef HAVE_MMX
 	int i;
 #endif
@@ -3541,8 +3368,8 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 
 	//FIXME remove
 	uint64_t * const yHistogram= c.yHistogram;
-	uint8_t * const tempSrc= c.tempSrc;
-	uint8_t * const tempDst= c.tempDst;
+	uint8_t * const tempSrc= srcStride > 0 ? c.tempSrc : c.tempSrc - 23*srcStride;
+	uint8_t * const tempDst= dstStride > 0 ? c.tempDst : c.tempDst - 23*dstStride;
 	//const int mbWidth= isColor ? (width+7)>>3 : (width+15)>>4;
 
 #ifdef HAVE_MMX
@@ -3640,7 +3467,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 		uint8_t *dstBlock= tempDst + dstStride;
 
 		// From this point on it is guranteed that we can read and write 16 lines downward
-		// finish 1 block before the next otherwise we´ll might have a problem
+		// finish 1 block before the next otherwise we might have a problem
 		// with the L1 Cache of the P4 ... or only a few blocks at a time or soemthing
 		for(x=0; x<width; x+=BLOCK_SIZE)
 		{
@@ -3668,7 +3495,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 				"prefetchnta 32(%%"REG_a", %0)	\n\t"
 				"prefetcht0 32(%%"REG_d", %2)	\n\t"
 			:: "r" (srcBlock), "r" ((long)srcStride), "r" (dstBlock), "r" ((long)dstStride),
-			"m" ((long)x), "m" ((long)copyAhead)
+			"g" ((long)x), "g" ((long)copyAhead)
 			: "%"REG_a, "%"REG_d
 			);
 
@@ -3704,8 +3531,8 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 			dstBlock+=8;
 			srcBlock+=8;
 		}
-		if(width==dstStride)
-			memcpy(dst, tempDst + 9*dstStride, copyAhead*dstStride);
+		if(width==ABS(dstStride))
+			linecpy(dst, tempDst + 9*dstStride, copyAhead, dstStride);
 		else
 		{
 			int i;
@@ -3727,7 +3554,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 		uint8_t *tempBlock2= c.tempBlocks + 8;
 #endif
 		int8_t *QPptr= &QPs[(y>>qpVShift)*QPStride];
-		int8_t *nonBQPptr= &c.nonBQPTable[(y>>qpVShift)*QPStride];
+		int8_t *nonBQPptr= &c.nonBQPTable[(y>>qpVShift)*ABS(QPStride)];
 		int QP=0;
 		/* can we mess with a 8x16 block from srcBlock/dstBlock downwards and 1 line upwards
 		   if not than use a temporary buffer */
@@ -3736,19 +3563,19 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 			int i;
 			/* copy from line (copyAhead) to (copyAhead+7) of src, these will be copied with
 			   blockcopy to dst later */
-			memcpy(tempSrc + srcStride*copyAhead, srcBlock + srcStride*copyAhead,
-				srcStride*MAX(height-y-copyAhead, 0) );
+			linecpy(tempSrc + srcStride*copyAhead, srcBlock + srcStride*copyAhead,
+				MAX(height-y-copyAhead, 0), srcStride);
 
 			/* duplicate last line of src to fill the void upto line (copyAhead+7) */
 			for(i=MAX(height-y, 8); i<copyAhead+8; i++)
-				memcpy(tempSrc + srcStride*i, src + srcStride*(height-1), srcStride);
+				memcpy(tempSrc + srcStride*i, src + srcStride*(height-1), ABS(srcStride));
 
 			/* copy up to (copyAhead+1) lines of dst (line -1 to (copyAhead-1))*/
-			memcpy(tempDst, dstBlock - dstStride, dstStride*MIN(height-y+1, copyAhead+1) );
+			linecpy(tempDst, dstBlock - dstStride, MIN(height-y+1, copyAhead+1), dstStride);
 
 			/* duplicate last line of dst to fill the void upto line (copyAhead) */
 			for(i=height-y+1; i<=copyAhead; i++)
-				memcpy(tempDst + dstStride*i, dst + dstStride*(height-1), dstStride);
+				memcpy(tempDst + dstStride*i, dst + dstStride*(height-1), ABS(dstStride));
 
 			dstBlock= tempDst + dstStride;
 			srcBlock= tempSrc;
@@ -3756,7 +3583,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 //printf("\n");
 
 		// From this point on it is guranteed that we can read and write 16 lines downward
-		// finish 1 block before the next otherwise we´ll might have a problem
+		// finish 1 block before the next otherwise we might have a problem
 		// with the L1 Cache of the P4 ... or only a few blocks at a time or soemthing
 		for(x=0; x<width; x+=BLOCK_SIZE)
 		{
@@ -3814,7 +3641,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 				"prefetchnta 32(%%"REG_a", %0)	\n\t"
 				"prefetcht0 32(%%"REG_d", %2)	\n\t"
 			:: "r" (srcBlock), "r" ((long)srcStride), "r" (dstBlock), "r" ((long)dstStride),
-			"m" ((long)x), "m" ((long)copyAhead)
+			 "g" ((long)x), "g" ((long)copyAhead)
 			: "%"REG_a, "%"REG_d
 			);
 
@@ -3890,18 +3717,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 
 #else
 				if(mode & H_X1_FILTER)
-#if defined( HAVE_ALTIVEC)
-				{ //MEANX
-					unsigned char __attribute__ ((aligned(16))) tempBlock[272];
-					transpose_16x8_char_toPackedAlign_altivec(tempBlock, dstBlock, dstStride);
-					vertX1Filter_altivec_template(1,tempBlock, 16, &c); // 16 !					
-				 	transpose_8x16_char_fromPackedAlign_altivec(dstBlock , tempBlock, dstStride);
-					//horizX1Filter_altivec(dstBlock-4, dstStride, QP);
-				}
-#else				
-					horizX1Filter(dstBlock-4, stride, QP); // Faster than altivec version
-#endif //altivec
-
+					horizX1Filter(dstBlock-4, stride, QP);
 				else if(mode & H_DEBLOCK)
 				{
 #ifdef HAVE_ALTIVEC
@@ -3971,8 +3787,8 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
 		if(y+15 >= height)
 		{
 			uint8_t *dstBlock= &(dst[y*dstStride]);
-			if(width==dstStride)
-				memcpy(dstBlock, tempDst + dstStride, dstStride*(height-y));
+			if(width==ABS(dstStride))
+				linecpy(dstBlock, tempDst + dstStride, height-y, dstStride);
 			else
 			{
 				int i;

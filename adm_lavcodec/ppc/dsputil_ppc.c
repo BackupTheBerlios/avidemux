@@ -24,8 +24,6 @@
 
 #ifdef HAVE_ALTIVEC
 #include "dsputil_altivec.h"
-#else
-#define NO_DCBZL 
 #endif
 
 extern void fdct_altivec(int16_t *block);
@@ -66,7 +64,16 @@ static unsigned char* perfname[] = {
   "hadamard8_diff16_altivec",
   "avg_pixels8_xy2_altivec",
   "clear_blocks_dcbz32_ppc",
-  "clear_blocks_dcbz128_ppc"
+  "clear_blocks_dcbz128_ppc",
+  "put_h264_chroma_mc8_altivec",
+  "avg_h264_chroma_mc8_altivec",
+  "put_h264_qpel16_h_lowpass_altivec",
+  "avg_h264_qpel16_h_lowpass_altivec",
+  "put_h264_qpel16_v_lowpass_altivec",
+  "avg_h264_qpel16_v_lowpass_altivec",
+  "put_h264_qpel16_hv_lowpass_altivec",
+  "avg_h264_qpel16_hv_lowpass_altivec",
+  ""
 };
 #include <stdio.h>
 #endif
@@ -134,7 +141,7 @@ POWERPC_PERF_START_COUNT(powerpc_clear_blocks_dcbz32, 1);
       ((unsigned long*)blocks)[3] = 0L;
       i += 16;
     }
-    for ( ; i < sizeof(DCTELEM)*6*64 ; i += 32) {
+    for ( ; i < sizeof(DCTELEM)*6*64-31 ; i += 32) {
 #ifndef __MWERKS__
       asm volatile("dcbz %0,%1" : : "b" (blocks), "r" (i) : "memory");
 #else
@@ -230,6 +237,9 @@ long check_dcbzl_effect(void)
 }
 #endif
 
+
+void dsputil_h264_init_ppc(DSPContext* c, AVCodecContext *avctx);
+
 void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx)
 {
     // Common optimizations whether Altivec is available or not
@@ -244,8 +254,10 @@ void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx)
   default:
     break;
   }
-  
+
 #ifdef HAVE_ALTIVEC
+  dsputil_h264_init_ppc(c, avctx);
+  
     if (has_altivec()) {
         mm_flags |= MM_ALTIVEC;
         
@@ -293,6 +305,8 @@ void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx)
 	}
 #endif //CONFIG_ENCODERS
 
+      if (avctx->lowres==0)
+      {
         if ((avctx->idct_algo == FF_IDCT_AUTO) ||
                 (avctx->idct_algo == FF_IDCT_ALTIVEC))
         {
@@ -304,6 +318,7 @@ void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx)
             c->idct_permutation_type = FF_NO_IDCT_PERM;
 #endif /* ALTIVEC_USE_REFERENCE_C_CODE */
         }
+      }
         
 #ifdef POWERPC_PERFORMANCE_REPORT
         {
@@ -312,10 +327,10 @@ void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx)
           {
 	    for (j = 0; j < POWERPC_NUM_PMC_ENABLED ; j++)
 	      {
-		perfdata[j][i][powerpc_data_min] = (unsigned long long)0xFFFFFFFFFFFFFFFF;
-		perfdata[j][i][powerpc_data_max] = (unsigned long long)0x0000000000000000;
-		perfdata[j][i][powerpc_data_sum] = (unsigned long long)0x0000000000000000;
-		perfdata[j][i][powerpc_data_num] = (unsigned long long)0x0000000000000000;
+		perfdata[j][i][powerpc_data_min] = 0xFFFFFFFFFFFFFFFFULL;
+		perfdata[j][i][powerpc_data_max] = 0x0000000000000000ULL;
+		perfdata[j][i][powerpc_data_sum] = 0x0000000000000000ULL;
+		perfdata[j][i][powerpc_data_num] = 0x0000000000000000ULL;
 	      }
 	  }
         }

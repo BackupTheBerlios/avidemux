@@ -529,26 +529,22 @@ static int encode_init(AVCodecContext *avctx)
             return -1;
         }
     }else s->context= 0;
-#if 0 //MEANX    
+    
     if(avctx->codec->id==CODEC_ID_HUFFYUV){
         if(avctx->pix_fmt==PIX_FMT_YUV420P){
             av_log(avctx, AV_LOG_ERROR, "Error: YV12 is not supported by huffyuv; use vcodec=ffvhuff or format=422p\n");
             return -1;
         }
-#endif
         if(avctx->context_model){
             av_log(avctx, AV_LOG_ERROR, "Error: per-frame huffman tables are not supported by huffyuv; use vcodec=ffvhuff\n");
             return -1;
         }
         if(s->interlaced != ( s->height > 288 ))
             av_log(avctx, AV_LOG_INFO, "using huffyuv 2.2.0 or newer interlacing flag\n");
-    
-
-  if(avctx->strict_std_compliance>=0){
-        av_log(avctx, AV_LOG_ERROR, "This codec is under development; files encoded with it may not be decodeable with future versions!!! Set vstrict=-1 / -strict -1 to use it anyway.\n");
+    }else if(avctx->strict_std_compliance>FF_COMPLIANCE_EXPERIMENTAL){
+        av_log(avctx, AV_LOG_ERROR, "This codec is under development; files encoded with it may not be decodable with future versions!!! Set vstrict=-2 / -strict -2 to use it anyway.\n");
         return -1;
     }
-
     
     ((uint8_t*)avctx->extradata)[0]= s->predictor;
     ((uint8_t*)avctx->extradata)[1]= s->bitstream_bpp;
@@ -831,7 +827,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
             p->data[0][1]= get_bits(&s->gb, 8);
             p->data[0][0]= get_bits(&s->gb, 8);
             
-            av_log(avctx, AV_LOG_ERROR, "YUY2 output isnt implemenetd yet\n");
+            av_log(avctx, AV_LOG_ERROR, "YUY2 output is not implemented yet\n");
             return -1;
         }else{
         
@@ -1000,14 +996,14 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
                         }
                     }
                 }
-                draw_slice(s, height); // just 1 large slice as this isnt possible in reverse order
+                draw_slice(s, height); // just 1 large slice as this is not possible in reverse order
                 break;
             default:
                 av_log(avctx, AV_LOG_ERROR, "prediction type not supported!\n");
             }
         }else{
 
-            av_log(avctx, AV_LOG_ERROR, "BGR24 output isnt implemenetd yet\n");
+            av_log(avctx, AV_LOG_ERROR, "BGR24 output is not implemented yet\n");
             return -1;
         }
     }
