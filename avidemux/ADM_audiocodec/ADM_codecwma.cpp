@@ -26,6 +26,7 @@
 #include "ADM_lavcodec.h"
 
 #include "fourcc.h"
+#include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"
@@ -69,7 +70,10 @@
 
     printf(" Using %ld bytes of extra header data\n",l);
     mixDump((uint8_t *)_context->extradata,_context->extradata_size);
-    if (avcodec_open(_context, &wmav2_decoder) < 0) 
+
+   AVCodec *codec=avcodec_find_decoder(CODEC_ID_WMAV2);
+   if(!codec) {GUI_Alert("Internal error opening codec WMA2");ADM_assert(0);} 
+    if (avcodec_open(_context, codec) < 0)
     {
         printf("\n WMA decoder init failed !\n");
         ADM_assert(0);
@@ -148,7 +152,10 @@ int max=0,pout=0;
         _context->extradata=NULL;
         _context->extradata_size=0;	
         printf(" Opening AMR codec\n");
-        if (avcodec_open(_context, &amr_nb_decoder) < 0) 
+
+        AVCodec *codec=avcodec_find_decoder(CODEC_ID_AMR_NB);
+        if(!codec) {GUI_Alert("Internal error opening codec AMR");ADM_assert(0);} 
+        if (avcodec_open(_context, codec) < 0)
         {
             printf("\n AMR decoder init failed !\n");
             ADM_assert(0);
