@@ -14,6 +14,7 @@
 #include "swscale.h"
 //#include "cpudetect.h"
 #include "../admmangle.h"
+#define always_inline inline
 #include "../../adm_lavcodec/bswap.h"
 //#include "../libvo/fastmemcpy.h"
 #include "wrapper.h"

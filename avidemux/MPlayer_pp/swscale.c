@@ -74,6 +74,7 @@ untested special converters
 #include "swscale.h"
 #include "swscale_internal.h"
 //#include "cpudetect.h"
+#define always_inline inline //MEANX
 #include "../../adm_lavcodec/bswap.h"
 #include "img_format.h"
 #include "rgb2rgb.h"
