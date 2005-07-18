@@ -42,7 +42,23 @@
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME  MODULE_CODEC
 #include "ADM_toolkit/ADM_debug.h"
-
+//****************************
+#define WRAP_Open(x) \
+{\
+AVCodec *codec=avcodec_find_decoder(x);\
+if(!codec) {GUI_Alert("Internal error finding codec"#x);ADM_assert(0);} \
+  if (avcodec_open(_context, codec) < 0)  \
+                      { \
+                                        printf(" Decoder init: Lavcodec :"#x" video decoder failed!\n"); \
+                                        GUI_Alert("Internal error opening "#x); \
+                                        ADM_assert(0); \
+                                } \
+                                else \
+                                { \
+                                        printf(" Decoder init: lavcodec "#x" video decoder initialized!\n"); \
+                                } \
+} 
+//****************************
 extern uint8_t DIA_lavDecoder(uint32_t *swapUv, uint32_t *showU);
 extern "C"
 {
@@ -523,29 +539,15 @@ uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *o
 decoderFFDiv3::decoderFFDiv3(uint32_t w,uint32_t h)    :decoderFF(w,h) 
 {
                       _refCopy=1; // YUV420 only
-		      if (avcodec_open(_context, &msmpeg4v3_decoder) < 0) 
-		      {
-					printf(" Decoder init: FFMpeg MS MPEG43 video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg MS MPEG43 video decoder initialized!\n");
-				}
+                        WRAP_Open(CODEC_ID_MSMPEG4V3);
 }              
 decoderFFMpeg4VopPacked::decoderFFMpeg4VopPacked(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
 // force low delay as avidemux don't handle B-frames
 
       _refCopy=1; // YUV420 only
-      if (avcodec_open(_context,& mpeg4_decoder) < 0)
-	      {
-				printf(" Decoder init: FFMpeg MPEG4 video decoder failed!\n");
-		}
-	else
-		{
-				printf(" Decoder init: FFMpeg MPEG4 video vop packed  decoder initialized!\n");
-		}
 	_allowNull=1;
+        WRAP_Open(CODEC_ID_MPEG4);
 }
 decoderFFMpeg4::decoderFFMpeg4(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
@@ -554,40 +556,19 @@ decoderFFMpeg4::decoderFFMpeg4(uint32_t w,uint32_t h)       :decoderFF(w,h)
 		  _context->flags|=CODEC_FLAG_LOW_DELAY;
                   _refCopy=1; // YUV420 only
  		//  _context->flags|=FF_DEBUG_VIS_MV;
-      if (avcodec_open(_context,& mpeg4_decoder) < 0)
-	      {
-					printf(" Decoder init: FFMpeg MPEG4 video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg MPEG4 video decoder initialized!\n");
-				}
+       WRAP_Open(CODEC_ID_MPEG4);
 }
 decoderFFDV:: decoderFFDV(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)        :decoderFF(w,h)
 {
       _context->extradata=(void *)d;
       _context->extradata_size=(int)l;
-      if (avcodec_open(_context,& dvvideo_decoder) < 0) 
-	      {
-					printf(" Decoder init: FFMpeg DV video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg DV video decoder initialized!\n");
-				}
+      WRAP_Open(CODEC_ID_DVVIDEO);
 	
 }
 decoderFFMP42::decoderFFMP42(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
       _refCopy=1; // YUV420 only
-      if (avcodec_open(_context,& msmpeg4v2_decoder) < 0)
-	      {
-					printf(" Decoder init: FFMpeg MP42 video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg MP42 video decoder initialized!\n");
-				}
+        WRAP_Open(CODEC_ID_MSMPEG4V2);
 
 }
 decoderFFMpeg12::decoderFFMpeg12(uint32_t w,uint32_t h,uint32_t extraLen,uint8_t *extraData)
@@ -596,15 +577,7 @@ decoderFFMpeg12::decoderFFMpeg12(uint32_t w,uint32_t h,uint32_t extraLen,uint8_t
 int got_picture=0;
   	_context->flags|=CODEC_FLAG_LOW_DELAY;
         _refCopy=1; // YUV420 only
-      if (avcodec_open(_context,& mpeg1video_decoder) < 0)
-	      {
-					printf(" Decoder init: FFMpeg Mpeg1/2 video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg Mpeg1/2 video decoder initialized!\n");
-				}
-
+      WRAP_Open(CODEC_ID_MPEG2VIDEO);
 }
 decoderFFSVQ3::decoderFFSVQ3(uint32_t w,uint32_t h,uint32_t extraLen,uint8_t *extraData)
 	    :decoderFF(w,h)
@@ -614,71 +587,33 @@ int got_picture=0;
   	_context->flags|=CODEC_FLAG_LOW_DELAY;
 	 _context->extradata=(void *)extraData;
       _context->extradata_size=(int)extraLen;
-      if (avcodec_open(_context,& svq3_decoder) < 0)
-	      {
-					printf(" Decoder init: FFMpeg SVQ3 video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg SVQ3 video decoder initialized"
-						" (%lu bytes of extra)!\n",extraLen);
-				}
-
+     WRAP_Open(CODEC_ID_SVQ3);
 }
 
 decoderFFH263::decoderFFH263(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
       _refCopy=1; // YUV420 only
-      if (avcodec_open(_context,& h263_decoder) < 0)
-	      {
-					printf(" Decoder init: FFMpeg h263 video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg h263 video decoder initialized!\n");
-				}
+      WRAP_Open(CODEC_ID_H263);
 
 }
 decoderFFV1::decoderFFV1(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
       _refCopy=1; // YUV420 only
-      if (avcodec_open(_context,& ffv1_decoder) < 0)
-	      {
-					printf(" Decoder init: FFMpeg ffV1 video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg ffv1 video decoder initialized!\n");
-				}
-
+      WRAP_Open(CODEC_ID_FFV1);
 }
 decoderFF_ffhuff::decoderFF_ffhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)       :decoderFF(w,h) 
 {
       _context->extradata=(void *)d;
       _context->extradata_size=(int)l;
       printf("FFhuff: We have :%d bytes of extra data\n",l);
-      if (avcodec_open(_context,& ffvhuff_decoder) < 0)
-              {
-                                        printf(" Decoder init: FFMpeg ffhuff video decoder failed!\n");
-                                }
-                                else
-                                {
-                                        printf(" Decoder init: FFMpeg ffhuff video decoder initialized!\n");
-                                }
+     WRAP_Open(CODEC_ID_FFVHUFF);
         
 }
 decoderFFH264::decoderFFH264(uint32_t w,uint32_t h)  :decoderFF(w,h) 
 {
   _refCopy=1; // YUV420 only
   printf("Initializing lavcodec H264 decoder\n");
-  if (avcodec_open(_context,& h264_decoder) < 0)
-  {
-    printf(" Decoder init: FFMpeg H264 video decoder failed!\n");
-  }
-  else
-  {
-    printf(" Decoder init: FFMpeg H264 video decoder initialized!\n");
-  }
+ WRAP_Open(CODEC_ID_H264);
   
 }
 decoderFFhuff::decoderFFhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)       :decoderFF(w,h) 
@@ -686,29 +621,14 @@ decoderFFhuff::decoderFFhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)       
       _context->extradata=(void *)d;
       _context->extradata_size=(int)l;
       
-      if (avcodec_open(_context,& huffyuv_decoder) < 0)
-	      {
-					printf(" Decoder init: FFMpeg huffy_uv video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg huffy_uv video decoder initialized!\n");
-				}
-	
+     WRAP_Open(CODEC_ID_HUFFYUV);
 }
 decoderFFWMV2::decoderFFWMV2(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)       :decoderFF(w,h)
 {
       _context->extradata=(void *)d;
       _context->extradata_size=(int)l;
       
-      if (avcodec_open(_context,& wmv2_decoder) < 0) 
-	      			{
-					printf(" Decoder init: FFMpeg WMV2 video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg WMV2 video decoder initialized!\n");		
-				}
+     WRAP_Open(CODEC_ID_WMV2);
 	
 }
 decoderFFcyuv::decoderFFcyuv(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)       :decoderFF(w,h)
@@ -716,43 +636,15 @@ decoderFFcyuv::decoderFFcyuv(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)       
       _context->extradata=(void *)d;
       _context->extradata_size=(int)l;
 
-      if (avcodec_open(_context,& cyuv_decoder) < 0)
-	      			{
-					printf(" Decoder init: FFMpeg cyuv video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg cyuv video decoder initialized!\n");
-				}
-
+      WRAP_Open(CODEC_ID_CYUV);
 }
 decoderFFMJPEG::decoderFFMJPEG(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
-
-
-      if (avcodec_open(_context,& mjpeg_decoder) < 0)
-	      			{
-					printf(" Decoder init: FFMpeg mjpeg video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg mjpeg video decoder initialized!\n");
-				}
-
+            WRAP_Open(CODEC_ID_MJPEG);
 }
 decoderSnow::decoderSnow(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
-
-
-      if (avcodec_open(_context,& snow_decoder) < 0)
-	      			{
-					printf(" Decoder init: FFMpeg snow video decoder failed!\n");
-				}
-				else
-				{
-					printf(" Decoder init: FFMpeg snow video decoder initialized!\n");
-				}
-
+           WRAP_Open(CODEC_ID_SNOW);
 }
 
 #endif

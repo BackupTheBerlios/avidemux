@@ -44,6 +44,12 @@
 
 static char LogName[500];
 
+#define WRAP_Open(x) \
+{\
+AVCodec *codec=avcodec_find_encoder(x);\
+if(!codec) {GUI_Alert("Internal error opening codec"#x);ADM_assert(0);} \
+  res=avcodec_open(_context, codec); \
+} 
 
 static myENC_RESULT res;
 ffmpegEncoder::ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id):encoder (width,
@@ -130,12 +136,16 @@ ffmpegEncoder::gopMpeg1 (void)
 {
   // small gop, 2 b frames allowed
   // min bitrate 500 max bitrate 2200
+int rate;
 
+        rate=_context->time_base.num;
+        rate=rate*1000;
+        rate/=_context->time_base.den;
 
 
   if (_id == FF_MPEG2)
     {
-      if (FRAME_FILM == identMovieType (_context->frame_rate))
+      if (FRAME_FILM == identMovieType (rate))
 	{
 	  printf ("\nPulldown activated...\n");
 	  _context->flags2 |= CODEC_FLAG2_32_PULLDOWN;
@@ -237,37 +247,37 @@ ffmpegEncoder::initContext (void)
   switch (_id)
     {
     case FF_MPEG4:
-      res = avcodec_open (_context, &mpeg4_encoder);
+      WRAP_Open(CODEC_ID_MPEG4);
       break;
     case FF_MSMP4V3:
-      res = avcodec_open (_context, &msmpeg4v3_encoder);
+      WRAP_Open(CODEC_ID_MSMPEG4V3);
       break;
     case FF_MPEG1:
-      res = avcodec_open (_context, &mpeg1video_encoder);
+      WRAP_Open(CODEC_ID_MPEG1VIDEO);
       break;
     case FF_MPEG2:
-      res = avcodec_open (_context, &mpeg2video_encoder);
+      WRAP_Open(CODEC_ID_MPEG2VIDEO);
       break;
     case FF_H263:
-      res = avcodec_open (_context, &h263_encoder);
+      WRAP_Open(CODEC_ID_H263);
       break;
     case FF_H263P:
-      res = avcodec_open (_context, &h263p_encoder);
+      WRAP_Open(CODEC_ID_H263P);
       break;
     case FF_HUFF:
-      res = avcodec_open (_context, &huffyuv_encoder);
+      WRAP_Open(CODEC_ID_HUFFYUV);
       break;
     case FF_FFV1:
-      res = avcodec_open (_context, &ffv1_encoder);
+      WRAP_Open(CODEC_ID_FFV1);
       break;
     case FF_MJPEG:
-      res = avcodec_open (_context, &mjpeg_encoder);
+      WRAP_Open(CODEC_ID_MJPEG);
       break;
     case FF_FFHUFF:
-        res=avcodec_open (_context, &ffvhuff_encoder);
+        WRAP_Open(CODEC_ID_FFVHUFF);
         break;
     case FF_SNOW:
-      res = avcodec_open (_context, &snow_encoder);
+      WRAP_Open(CODEC_ID_SNOW);
       break;
     default:
       ADM_assert (0);
@@ -336,10 +346,11 @@ ffmpegEncoderCQ::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
       _statfile = NULL;
 
     }
-
+ _context->time_base= (AVRational){fps1000,1000};
+/*
   _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;
-
+*/
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
 
@@ -424,9 +435,9 @@ ffmpegEncoderCBR::init (uint32_t val, uint32_t fps1000)
 //
   _br = val;
   mplayer_init ();
-  _context->frame_rate_base = 1000;
-  _context->frame_rate = fps1000;
-
+/*  _context->frame_rate_base = 1000;
+  _context->frame_rate = fps1000;*/
+_context->time_base= (AVRational){fps1000,1000};
   _context->bit_rate = _br;
 
   printf ("--> br: %lu", _br);
@@ -519,10 +530,10 @@ ffmpegEncoderVBR::init (uint32_t val, uint32_t fps1000)
   _qual = val;
   mplayer_init ();
 
-  _context->frame_rate_base = 1000;
-  _context->frame_rate = fps1000;
+//   _context->frame_rate_base = 1000;
+//   _context->frame_rate = fps1000;
 
-
+_context->time_base= (AVRational){fps1000,1000};
 
   /* If internal 2 passes mode is selected ... */
   _context->flags |= CODEC_FLAG_PASS2;
@@ -618,8 +629,9 @@ ffmpegEncoderVBRExternal::init (uint32_t val, uint32_t fps1000)
   _qual = val;
   mplayer_init ();
 
-  _context->frame_rate_base = 1000;
-  _context->frame_rate = fps1000;
+/*  _context->frame_rate_base = 1000;
+  _context->frame_rate = fps1000;*/
+  _context->time_base= (AVRational){fps1000,1000};
   _context->flags |= CODEC_FLAG_QSCALE;;
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
@@ -808,8 +820,9 @@ ffmpegEncoderHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   UNUSED_ARG (vbr);
   mplayer_init ();
 
-  _context->frame_rate_base = 1000;
-  _context->frame_rate = fps1000;
+_context->time_base= (AVRational){fps1000,1000};
+//   _context->frame_rate_base = 1000;
+//   _context->frame_rate = fps1000;
 
 
   _context->bit_rate = 0;
@@ -852,9 +865,9 @@ ffmpegEncoderFFHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   UNUSED_ARG (vbr);
   mplayer_init ();
 
-  _context->frame_rate_base = 1000;
-  _context->frame_rate = fps1000;
-
+/*  _context->frame_rate_base = 1000;
+  _context->frame_rate = fps1000;*/
+_context->time_base= (AVRational){fps1000,1000};
 
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
@@ -910,9 +923,9 @@ ffmpegEncoderFFV1::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   UNUSED_ARG (val);
   UNUSED_ARG (vbr);
   mplayer_init ();
-
-  _context->frame_rate_base = 1000;
-  _context->frame_rate = fps1000;
+_context->time_base= (AVRational){fps1000,1000};
+//   _context->frame_rate_base = 1000;
+//   _context->frame_rate = fps1000;
 
 
   _context->bit_rate = 0;
@@ -963,8 +976,9 @@ uint8_t
 
   _qual = (uint32_t) floor (f);
 
-  _context->frame_rate_base = 1000;
-  _context->frame_rate = fps1000;
+//   _context->frame_rate_base = 1000;
+//   _context->frame_rate = fps1000;
+_context->time_base= (AVRational){fps1000,1000};
   _context->flags = CODEC_FLAG_QSCALE;
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
