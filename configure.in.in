@@ -104,8 +104,8 @@ dnl    AC_PATH_PROG(PKG_CONFIG,pkg-config, AC_MSG_ERROR([*** pkg-config not foun
  	echo "************ Cannot identify gtk2 version ***************"
  	AC_MSG_ERROR([*** pkg-config installed incorrectly or gtk2-dev absent ! ***])
  fi
- VEROK=`perl -e '@a=split(".","'$GTK_VERSION'");
-                 if( $a[0] > 2 or ($a[0] == 2 and $a[1] >= 6) ){
+ VEROK=`echo "$GTK_VERSION" | perl -ne '@a=split(/\./,$_);
+                 if( $a[[0]] > 2 or ($a[[0]] == 2 and $a[[1]] >= 6) ){
                     print "OK";
                  }else{
                     print "FAILED";
