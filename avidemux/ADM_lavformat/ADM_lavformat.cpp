@@ -198,8 +198,9 @@ uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, 
     	switch(_fps1000)
 	{
 		case 25000:
-			c->frame_rate = 25025;  
-			c->frame_rate_base = 1001;	
+			 c->time_base= (AVRational){25025,1001};
+			//c->frame_rate = 25025;  
+			//c->frame_rate_base = 1001;	
 			break;
 		case 23976:
 /*
@@ -208,8 +209,9 @@ uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, 
 			break;
 */
 		case  29970:
-			c->frame_rate = 30000;  
-			c->frame_rate_base = 1001;	
+			 c->time_base= (AVRational){30000,1001};
+			//c->frame_rate = 30000;  
+			//c->frame_rate_base = 1001;	
 			break;
 		default:
 			GUI_Alert("FPS is not suitable!");

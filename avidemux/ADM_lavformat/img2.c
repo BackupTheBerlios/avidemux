@@ -20,7 +20,7 @@
 #include "avformat.h"
 
 /* XXX: this is a hack */
-int loop_input; //MEANX: yes...
+int loop_input; //MEANX
 
 typedef struct {
     int img_first;
@@ -40,14 +40,12 @@ static const IdStrMap img_tags[] = {
     { CODEC_ID_MJPEG     , "jpeg"},
     { CODEC_ID_MJPEG     , "jpg"},
     { CODEC_ID_LJPEG     , "ljpg"},
-#if 0 //MEANX
     { CODEC_ID_PNG       , "png"},
     { CODEC_ID_PPM       , "ppm"},
     { CODEC_ID_PGM       , "pgm"},
     { CODEC_ID_PGMYUV    , "pgmyuv"},
     { CODEC_ID_PBM       , "pbm"},
     { CODEC_ID_PAM       , "pam"},
-#endif //MEANX
     { CODEC_ID_MPEG1VIDEO, "mpg1-img"},
     { CODEC_ID_MPEG2VIDEO, "mpg2-img"},
     { CODEC_ID_MPEG4     , "mpg4-img"},
@@ -97,16 +95,6 @@ static enum CodecID av_str2id(const IdStrMap *tags, const char *str)
         tags++;
     }
     return CODEC_ID_NONE;
-}
-
-static const char *av_id2str(const IdStrMap *tags, enum CodecID id)
-{
-    while (tags->id) {
-        if(tags->id == id)
-            return tags->str;
-        tags++;
-    }
-    return NULL;
 }
 
 /* return -1 if no image found */
@@ -198,12 +186,10 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
         st->need_parsing= 1;
     }
         
-    if (!ap || !ap->frame_rate) {
-        st->codec.frame_rate      = 25;
-        st->codec.frame_rate_base = 1;
+    if (!ap || !ap->time_base.num) {
+        av_set_pts_info(st, 60, 1, 25);
     } else {
-        st->codec.frame_rate      = ap->frame_rate;
-        st->codec.frame_rate_base = ap->frame_rate_base;
+        av_set_pts_info(st, 60, ap->time_base.num, ap->time_base.den);
     }
     
     if(ap && ap->width && ap->height){
@@ -219,9 +205,7 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
         s->img_number = first_index;
         /* compute duration */
         st->start_time = 0;
-        st->duration = ((int64_t)AV_TIME_BASE * 
-                        (last_index - first_index + 1) * 
-                        st->codec.frame_rate_base) / st->codec.frame_rate;
+        st->duration = last_index - first_index + 1;
     }
     
     if(ap->video_codec_id){
@@ -234,6 +218,8 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
         st->codec.codec_type = CODEC_TYPE_VIDEO;
         st->codec.codec_id = av_str2id(img_tags, s->path);
     }
+    if(st->codec.codec_type == CODEC_TYPE_VIDEO && ap->pix_fmt != PIX_FMT_NONE)
+        st->codec.pix_fmt = ap->pix_fmt;
 
     return 0;
 }
@@ -348,10 +334,10 @@ static int img_write_packet(AVFormatContext *s, AVPacket *pkt)
     }
     
     if(codec->codec_id == CODEC_ID_RAWVIDEO){
-        int size = (codec->width * codec->height)>>2;
-        put_buffer(pb[0], pkt->data         , 4*size);
-        put_buffer(pb[1], pkt->data + 4*size,   size);
-        put_buffer(pb[2], pkt->data + 5*size,   size);
+        int ysize = codec->width * codec->height;
+        put_buffer(pb[0], pkt->data        , ysize);
+        put_buffer(pb[1], pkt->data + ysize, (pkt->size - ysize)/2);
+        put_buffer(pb[2], pkt->data + ysize +(pkt->size - ysize)/2, (pkt->size - ysize)/2);
         put_flush_packet(pb[1]);
         put_flush_packet(pb[2]);
         url_fclose(pb[1]);
