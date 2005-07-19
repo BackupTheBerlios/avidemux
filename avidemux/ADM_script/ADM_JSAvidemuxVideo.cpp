@@ -32,7 +32,7 @@
 extern VF_FILTERS filterGetTagFromName(char *inname);
 extern uint8_t indexMpeg(char *mpeg,char *file,uint8_t aid);
 extern uint8_t A_ListAllBlackFrames( char *file );
-extern uint8_t loadVideoCodecConf( char *name);
+extern uint8_t loadVideoCodecConfString( char *name);
 extern int ADM_saveRaw (char *name);
 extern int A_saveJpg (char *name);
 extern uint8_t loadVideoCodecConf( char *name);
@@ -229,9 +229,7 @@ JSBool ADM_JSAvidemuxVideo::Codec(JSContext *cx, JSObject *obj, uintN argc,
 	if(argc > 3)
 		return JS_FALSE;
 	printf("Codec ... \n");
-	if(!loadVideoCodecConf(JS_GetStringBytes(JSVAL_TO_STRING(argv[2]))))
-		*rval = BOOLEAN_TO_JSVAL(false);
-	else
+	
 	{// begin valid
 		printf("Valid codec conf %s found.\n",JS_GetStringBytes(JSVAL_TO_STRING(argv[2])));
 		char *codec,*conf;
@@ -249,7 +247,14 @@ JSBool ADM_JSAvidemuxVideo::Codec(JSContext *cx, JSObject *obj, uintN argc,
 			if(!videoCodecConfigure(conf,0,NULL))
 				*rval = BOOLEAN_TO_JSVAL(false);
 			else
+                        {
 				*rval = BOOLEAN_TO_JSVAL(true);
+                                if(!loadVideoCodecConfString(JS_GetStringBytes(JSVAL_TO_STRING(argv[2]))))
+                                        *rval = BOOLEAN_TO_JSVAL(false);
+                                else
+                                        *rval = BOOLEAN_TO_JSVAL(true);
+                        }
+
 		}// end conf
 	}// end valid
 	return JS_TRUE;

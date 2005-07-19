@@ -155,19 +155,23 @@ uint8_t  *extraData ;
 uint32_t extraDataSize;
 char *pth;
         qfprintf(fd,"\n//** Video Codec conf **\n");
-        //videoCodecGetConf(&extraDataSize,&extraData);
-        //if(extraDataSize())
-        // Fixme
-        char *namevcodec;
-        namevcodec=new char[strlen(name)+10];
-        strcpy(namevcodec,name);
-        strcat(namevcodec,".vcodec");
-        saveVideoCodecConf(namevcodec);
-        delete [] namevcodec;
-//        qfprintf(fd,"app.video.process=%s;\n",truefalse[videoProcessMode]);
+        videoCodecGetConf(&extraDataSize,&extraData);
+        
         pth= cleanupPath(name );
-        qfprintf(fd,"app.video.codec(\"%s\",\"%s\",\"%s.vcodec\");\n",videoCodecGetName(),videoCodecGetMode(),pth);
+        qfprintf(fd,"app.video.codec(\"%s\",\"%s\",\"",videoCodecGetName(),videoCodecGetMode());
         ADM_dealloc(pth);
+        // Now deal with extra data
+        qfprintf(fd,"%d ",extraDataSize);
+        if(extraDataSize)
+        {
+                for(int i=0;i<extraDataSize;i++)
+                {
+                        qfprintf(fd,"%02x ",extraData[i]);
+                }
+
+        }
+        qfprintf(fd,"\");\n");
+        
 // Audio Source
 //______________________________________________
 

@@ -485,11 +485,6 @@ const char *videoCodecGetName( void )
 	printf("\n Mmmm get video  codec  name failed..\n");
 	return NULL;
 }
-char *videoCodecGetConf(void)
-{
-
-
-}
 ///
 ///  Prompt for a codec and allow configuration
 ///
@@ -703,40 +698,33 @@ uint8_t *extra=NULL;
 	fclose(fd);
 	return 1;
 }
-
-/**
-	Save the video codec and its configuration from a file
-	(given as sole argument)
-
-*/
-uint8_t saveVideoCodecConf( char *name)
+/***********************/
+uint8_t loadVideoCodecConfString( char *cmd)
 {
-FILE *fd=NULL;
-	fd=qfopen(name,"wt");
-	if(!fd)
-		return 0;
-	qfprintf(fd,"ADVC\n");
-// and video codec
-	qfprintf(fd,"Video codec : %s\n",videoCodecGetName() );
-// video config
-	uint32_t 	extraSize;
-	uint8_t 	*extra;
-	qfprintf(fd,"Video conf : %s\n",videoCodecGetConf(&extraSize,&extra)  );
+#define MAX_STRING 4000
+char    str[MAX_STRING*3];
+char    str_extra[MAX_STRING*3];
+char    str_tmp[MAX_STRING*3];
+uint32_t    nb;
+uint32_t extraSize=0;
+uint8_t *extra=NULL;
 
-	// Raw hexDump the opt string
-	// which contains
-	qfprintf(fd,"Video extraConf size : %lu\n",extraSize);
-	if(extraSize)
-	{
-		for(uint32_t l=extraSize;l>0;l--)
-		{
-			qfprintf(fd,"%02x ",*extra++);
-		}
-		qfprintf(fd,"\n");
-	}
-	qfclose(fd);
-	return 1;
+        sscanf(cmd,"%d ",&extraSize);
+        ADM_assert(extraSize<MAX_STRING);
+        if(extraSize)
+        {
+                while(*cmd!=' ') cmd++;
+                for(uint32_t k=0;k<extraSize;k++)
+                {
+                        str_extra[k]=mk_hex(*cmd,*(cmd+1));
+                        cmd+=3;
+                }
+                extra=(uint8_t *)str_extra;
+                videoCodecSetConf(str,extraSize,extra);
+        }
+        return 1;
 }
+
 uint8_t mk_hex(uint8_t a,uint8_t b)
 {
 int a1,b1;
@@ -766,7 +754,7 @@ int a1,b1;
 
 }
 // Old stuff
-const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
+uint8_t videoCodecGetConf( uint32_t *optSize, uint8_t **data)
 {
         static char conf[4000];
         static char tmp[2000];
@@ -786,10 +774,8 @@ const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
         }
 
         confSize=*optSize;
-        Add(confSize);
-
-        aprintf("Conf :%s (%d) (%d)\n",conf,videoProcessMode,confSize);
-        return conf;
+        printf("Conf size : %d\n",confSize);
+        return 1;
 
 }
 
@@ -802,10 +788,20 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
         //printf("-Video filter by name : %s\n",name);
 
         param=videoCodecGetDescriptor(current_codec);
-        ADM_assert(param);
+        if(!param)
+        {
+                GUI_Alert("Fatal error");
+                printf("Current codec:%d\n",current_codec);
+                ADM_assert(0);
+        }
         if(extraLen)
                 {
-                                ADM_assert(extraLen==param->extraSettingsLen);
+                                if(extraLen!=param->extraSettingsLen)
+                                {
+                                        printf("Codec:%s\n",param->descriptor);
+                                        printf("Expected :%d got:%d\n",param->extraSettingsLen,extraLen);
+                                        ADM_assert(0);
+                                }
                                 memcpy(param->extraSettings,extraData,param->extraSettingsLen);
                 }
 
