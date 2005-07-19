@@ -309,37 +309,7 @@ uint8_t audioCodecSetByName( const char *name)
 		}
 #define Add(x) {sprintf(tmp,"%s=%d ",#x,x);strcat(conf,tmp);}
 
-uint8_t audioCodecSetConf(char *name )
-{
- const char *tmp;
- uint8_t newmode,oldmode;
-	aprintf("-Audio filter by name : %s\n",name);
 
-	oldmode=audioProcessMode;
-	Read(audioProcessMode);
-	newmode=audioProcessMode;
-	audioProcessMode=oldmode;
-
-	Read(audioMP3mode);
-	Read(audioMP3bitrate);
-	Read(audioMP3preset);
-	UI_setAProcessToggleStatus( newmode );
-	return 1;
-}
-
-const char *audioCodecGetConf( void )
-{
- static char conf[400];
-	static char tmp[200];
-	conf[0]=0;
-	Add(audioProcessMode);
-	Add(audioMP3mode);
-	Add(audioMP3bitrate);
-	Add(audioMP3preset);
-
-	return conf;
-
-}
 const char *audioCodecGetName( void )
 {
 	for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
@@ -413,6 +383,11 @@ void audioCodecSelect( void )
 	audioPrintCurrentCodec();
 
 
+}
+uint32_t audioProcessMode(void)
+{
+        if(activeAudioEncoder==AUDIOENC_COPY) return 0;
+        return 1;
 }
 /*
 	Refresh   activeAudioEncoder value
@@ -754,7 +729,7 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 AVDMProcessAudioStream *lastFilter=NULL;
 
 	// if audio is set to copy, we just return the first filter
-	if(!audioProcessMode)
+	if(!audioProcessMode())
 	{
  			lastFilter = new AVDMProcessAudio_Null(currentaudiostream,
 					    starttime, size);

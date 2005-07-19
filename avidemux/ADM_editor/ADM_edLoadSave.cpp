@@ -75,71 +75,8 @@ uint8_t ADM_Composer::getMarkers(uint32_t *start, uint32_t *end)
 
 uint8_t ADM_Composer::saveWorbench (char *name)
 {
-printf("\n **Saving workbench **\n");
-  char *    tmp;
-
-  if (!_nb_segment)
-    return 1;
-
-  FILE *    fd;
-
-  if( !(fd = qfopen (name, "wt")) )
-    return 1;
-
-  qfprintf (fd, "ADMW0002\n");
-  qfprintf (fd,"%02ld videos\n", _nb_video);
-
-  for (uint32_t i = 0; i < _nb_video; i++)
-    {
-      qfprintf (fd, "Name : %s\n", _videos[i]._aviheader->getMyName ());
-    }
-  qfprintf (fd,"%02ld segments\n", _nb_segment);
-
-  for (uint32_t i = 0; i < _nb_segment; i++)
-    {
-      qfprintf (fd, "Start : %lu\n", _segments[i]._start_frame);
-      qfprintf (fd, "Size : %lu\n", _segments[i]._nb_frames);
-      qfprintf (fd, "Ref :   %lu\n", _segments[i]._reference);
-    }
-// Dump video codec
-	qfprintf(fd,"Audio codec : %s\n",audioCodecGetName() );
-// audio filter
-	qfprintf(fd,"Audio filter : %s\n",audioFilterGetName());
-// audio conf
-	qfprintf(fd,"Audio conf : %s\n",audioCodecGetConf());
-
-
-	qfprintf(fd,"Video start-end : %lu %lu\n",frameStart,frameEnd);
-	
-
-  qfprintf(fd,"container :%d\n", UI_GetCurrentFormat());
-  // All done
-  qfclose (fd);
-  // try to load filters
-  tmp = (char *) ADM_alloc (strlen (name) + 10);
-  ADM_assert (tmp);
-  strcpy (tmp, name);
-  strcat (tmp, ".flt");
-
-  filterSaveXml (tmp, 1);
-  
-   // save codec settings if any
-  strcpy (tmp, name);
-  strcat (tmp, ".vcodec");
-
-  saveVideoCodecConf(tmp);
-  
-  ADM_dealloc(tmp);
-  
-  
- 
-  
-  
-  
-  
-  return 1;
-
-
+        GUI_Alert("Unsupported");
+        return 0;
 }
 /*______________________________________________
         Save the project as a script
@@ -227,7 +164,7 @@ char *pth;
         strcat(namevcodec,".vcodec");
         saveVideoCodecConf(namevcodec);
         delete [] namevcodec;
-        qfprintf(fd,"app.video.process=%s;\n",truefalse[videoProcessMode]);
+//        qfprintf(fd,"app.video.process=%s;\n",truefalse[videoProcessMode]);
         pth= cleanupPath(name );
         qfprintf(fd,"app.video.codec(\"%s\",\"%s\",\"%s.vcodec\");\n",videoCodecGetName(),videoCodecGetMode(),pth);
         ADM_dealloc(pth);
@@ -253,7 +190,7 @@ char *pth;
                 fprintf(fd,"app.audio.load(%s,\"%s\");\n", audioSourceFromEnum(source),audioName); 
 
    qfprintf(fd,"app.audio.codec(\"%s\",%d);\n", audioCodecGetName(),audioGetBitrate()); 
-   qfprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode]);
+   //qfprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode()]);
    qfprintf(fd,"app.audio.normalize=%s;\n",truefalse[audioGetNormalize()]);
    qfprintf(fd,"app.audio.delay=%d;\n",audioGetDelay());
    // Change mono2stereo ?
@@ -297,159 +234,7 @@ char *pth;
 
 uint8_t ADM_Composer::loadWorbench (char *name)
 {
-
-  char    str[4000];
-  char    str_extra[4000];
-  char    str_tmp[4000];
-  char    filename2[1024];
-  uint32_t    nb;
-  FILE *    fd;
-  char *    tmp;
-  char *s;
-
-
-
-  fd = fopen (name, "rt");
-  if(!fd)
-  {
-	GUI_Alert("Trouble opening that file");
-	return 0;
-
-  }
-  fgets(str,99,fd);
-  if(strcmp(str,"ADMW0002\n"))
-  {
-	GUI_Alert("This does not look like\n a avidemux2 file...");
-	fclose(fd);
-	return 0;
-  }
-  // read nb_ videos
-  fscanf (fd, "%02lu videos\n", &nb);
-  printf ("WKB Reading workbench, %ld videos to go\n", nb);
-  cleanup ();
-  for (uint32_t i = 0; i < nb; i++)
-    {
-	    fgets (str_tmp, 390, fd);
-	    // remove last char (CR or LF)
-	    str_tmp[strlen(str_tmp)-1]=0;
-	    s=str_tmp;
-	    s+=strlen("Name : ");
-	    printf("adding %s\n",s);
-	    if(ADM_OK!=addFile (s))
-	    {
-		char *p;
-		strncpy(filename2,name,sizeof(filename2));
-		filename2[sizeof(filename2)-1] = '\0';
-		if( (p = rindex(filename2,'/')) ){
-			*(++p) = '\0';
-		}else{
-			filename2[0] = '\0';
-		}
-		if( (p = rindex(s,'/')) ){
-			p++;
-		}else{
-			p = s;
-		}
-		strncat(filename2,p,sizeof(filename2)-strlen(filename2));
-		filename2[sizeof(filename2)-1] = '\0';
-		if( !strncmp(s,filename2,sizeof(filename2)) ){
-			/* we don't have a second filename */
-			GUI_Alert("Problem reading file,\nexpect crash");
-			fclose(fd);
-			_nb_video=i;
-			if(_nb_video>1) _nb_video--;
-			return 0;
-		}
-		printf(" could not open %s file..\n", s);
-		printf(" adding %s instead\n", filename2);
-		if(ADM_OK!=addFile (filename2)){
-	    		GUI_Alert("Problem reading file,\nexpect crash");
-			fclose(fd);
-			_nb_video=i;
-			if(_nb_video>1) _nb_video--;
-			return 0;
-		}
-	   }
-
-    }
-    _nb_video=nb;
-
-     // read nb_ seg
-  fscanf (fd, "%02lu segments\n", &nb);
-  printf ("WKB Reading workbench, %ld segments to go\n", nb);
-   _nb_segment=nb;
- for (uint32_t i = 0; i < nb; i++)
-    {
-      fscanf (fd, "Start : %lu\n", &_segments[i]._start_frame);
-      fscanf (fd, "Size : %lu\n", &_segments[i]._nb_frames);
-      fscanf (fd, "Ref :   %lu\n", &_segments[i]._reference);
-        updateAudioTrack (i);
-	printf("segment :%lu done\n",i);
-    }
-// Dump video codec
-	fscanf(fd,"Audio codec : %s\n",str );
- 	audioCodecSetByName(str);
-// read audio filter
-	//fscanf(fd,"Audio filter : %s\n",str);
-	fgets(str,200,fd);
- 	 audioFilterSetByName( str);
-// audio conf
-	fgets(str,200,fd);
-	audioCodecSetConf(str);
-
-
-	if(2==fscanf(fd,"Video start-end : %lu %lu\n",&edFrameStart,&edFrameEnd))
-	{
-		uint8_t val = 0;
-		prefs->get(FEATURE_IGNORESAVEDMARKERS,&val);
-		if( val ){
-			printf("Ignored start end!\n");
-			_haveMarkers=0;
-		}else{
-			printf("Got start end!\n");
-			_haveMarkers=1;
-		}
-	}
-	else
-	{
-		_haveMarkers=0;
-	}
-	int cont;
-	if(1==fscanf(fd,"container :%d\n", &cont))
-	{
-		UI_SetCurrentFormat( (ADM_OUT_FORMAT) cont );
-	}
-//***
-    printf(" .. all loaded\n");
-  fclose (fd);
-  _total_frames = 0;
-  // update total frames
-  for (uint32_t n = 0; n < _nb_segment; n++)
-    {
-      _total_frames += _segments[n]._nb_frames;
-    }
-  dumpSeg ();
-  printf ("\n Total frames : %lu \n", _total_frames);
-
-// try to load filters
-  tmp = (char *) ADM_alloc (strlen (name) + 10);
-  ADM_assert (tmp);
-  strcpy (tmp, name);
-  strcat (tmp, ".flt");
-
-
-  filterLoadXml(tmp, 1);
-
- // load codec settings if any
-  strcpy (tmp, name);
-  strcat (tmp, ".vcodec");
-
-
-  loadVideoCodecConf(tmp);
-  
-    
-  ADM_dealloc (tmp);
-  return 1;
-
+ GUI_Alert("Old format project file\nNo more supported.");
+ return 0;
 }
 //EOF

@@ -67,7 +67,7 @@ uint32_t end;
 	CodecFamilty family;
 	family= videoCodecGetFamily();
 	// in case of copy mode, we stick to avi file format
-	if(!videoProcessMode)
+	if(!videoProcessMode())
 	{
 		family=CodecFamilyAVI;
 		if( UI_GetCurrentFormat()==ADM_PS ||UI_GetCurrentFormat()==ADM_TS )  // exception
@@ -77,7 +77,7 @@ uint32_t end;
 	}
 	printf("**saving:**\n");
 	// Check if we need to do a sanity B frame check
-	if(!videoProcessMode)
+	if(!videoProcessMode())
 	{	
 		uint32_t pb;
 		end=avifileinfo->nb_frames;
@@ -178,7 +178,7 @@ uint32_t end;
 					break;
 		case CodecFamilyMpeg:
 					printf(" Mpeg family\n");
-					if(!videoProcessMode)
+					if(!videoProcessMode())
 					{
 						
 						printf("Using pass through\n");
@@ -286,8 +286,8 @@ void  A_SaveAudioNVideo(char *name)
 
      video_body->getVideoInfo(&info);
 
-     printf("\n video process mode : %d",videoProcessMode);
-     if (!videoProcessMode)
+     printf("\n video process mode : %d",videoProcessMode());
+     if (!videoProcessMode())
      {
        			if(video_body->isMultiSeg()) needSmart=1;
           			video_body->getFlags(frameStart,&fl);

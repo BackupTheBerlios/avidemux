@@ -53,7 +53,7 @@ uint8_t ogmSave(char  *name)
 {
 uint8_t ret;
 	ADM_ogmWrite *writter;
-	if(videoProcessMode)
+	if(videoProcessMode())
 		writter=new ADM_ogmWriteProcess;
 	else
 		writter=new ADM_ogmWriteCopy;

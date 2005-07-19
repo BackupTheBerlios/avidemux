@@ -341,7 +341,7 @@ switch(mux)
          // Set info for audio if any
          if(muxer)
          {
-            if(!audioProcessMode)
+            if(!audioProcessMode())
                   encoding->setAudioCodec("Copy");
             else
                   encoding->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));

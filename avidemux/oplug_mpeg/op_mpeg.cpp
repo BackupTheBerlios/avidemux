@@ -125,7 +125,7 @@ void oplug_mpeg_vcd_ps(char *inname)
 		GUI_Alert("We need an audio track!");
 		return;
 	}
-	if(audioProcessMode)
+	if(audioProcessMode())
 	{
 	  AVDMGenericAudioStream *audio=NULL;
 		audio = buildFakeAudioFilter (currentaudiostream,0,0x1000);
@@ -310,7 +310,7 @@ WAVHeader *info=NULL,tmpinfo;
 		GUI_Alert("We need an audio track!");
 		return;
 	}
-	if(audioProcessMode)
+	if(audioProcessMode())
 	{
 	  AVDMGenericAudioStream *audio=NULL;
 		audio = buildFakeAudioFilter (currentaudiostream,0,0x1000);
@@ -387,7 +387,7 @@ WAVHeader *info=NULL,tmpinfo;
                 GUI_Alert("We need an audio track!");
                 return;
         }
-        if(audioProcessMode)
+        if(audioProcessMode())
         {
           AVDMGenericAudioStream *audio=NULL;
                 audio = buildFakeAudioFilter (currentaudiostream,0,0x1000);

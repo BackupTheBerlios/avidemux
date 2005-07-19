@@ -224,7 +224,7 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
   work->setCodec("Copy");
   work->setAudioCodec("---");
   work->setPhasis("Saving");
-  if(!audioProcessMode)
+  if(!audioProcessMode())
      work->setAudioCodec("Copy");
   else
      work->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));

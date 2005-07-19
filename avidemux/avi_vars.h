@@ -114,21 +114,12 @@ EXTERN uint8_t guiOutputDisplay
 	If set to 1, means video is in process mode_preview
 	If set to 0, copy mode
 */
-EXTERN uint32_t audioProcessMode
-#ifdef __DECLARE__
-=0; // 1-> Full processing mode, 0 copy mode
-#endif
-;
+EXTERN uint32_t audioProcessMode(void);
 /**
 	If set to 1, means video is in process mode_preview
 	If set to 0, copy mode
 */
-EXTERN uint32_t videoProcessMode
-#ifdef __DECLARE__
-=0; // 1-> Full processing mode, 0 copy mode
-#endif
-;
-
+EXTERN uint32_t videoProcessMode(void);
 
 EXTERN uint32_t frameStart,frameEnd;
 

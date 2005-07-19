@@ -203,7 +203,7 @@ GenericAviSave::setupAudio (void)
    }
   printf (" mux mode : %d mux param %d\n", muxMode, muxParam);
 
-  if (audioProcessMode)	// else Raw copy mode
+  if (audioProcessMode())	// else Raw copy mode
     {
       if (currentaudiostream->isCompressed ())
 	{

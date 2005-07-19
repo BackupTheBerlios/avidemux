@@ -425,7 +425,7 @@ DIA_encoding		*encoding;
 	printf("\n--encoding started--\n");
 	if(_muxer)
 	{
-            if(audioProcessMode)
+            if(audioProcessMode())
                 encoding->setAudioCodec(getStrFromAudioCodec(_audio->getInfo()->encoding));
             else
                 encoding->setAudioCodec("Copy");
@@ -1082,7 +1082,7 @@ uint32_t fps1000;
 AVDMGenericAudioStream *mpt_getAudioStream(void)
 {
 AVDMGenericAudioStream *audio=NULL;
-	if (audioProcessMode)	// else Raw copy mode
+	if (audioProcessMode())	// else Raw copy mode
 	{
 		if (currentaudiostream->isCompressed ())
 		{

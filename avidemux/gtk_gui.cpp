@@ -223,14 +223,10 @@ int nw;
 		return;
     case ACT_VideoCodecChanged:
     		nw=UI_getCurrentVCodec();
-                if(!nw) videoProcessMode=0;
-                        else videoProcessMode=1;
     		videoCodecChanged(nw);
 		return;
    case ACT_AudioCodecChanged:
                 nw=UI_getCurrentACodec();
-                if(!nw) audioProcessMode=0;
-                        else audioProcessMode=1;
    		audioCodecChanged(nw);
     		
 		return;
@@ -324,16 +320,17 @@ int nw;
       delete prefs;
       prefs=NULL;
       exit (0);
+#if 0
     case ACT_AudioModeToggle:
       if( !recursive )
       {
-        audioProcessMode ^= 1;
         recursive = 1;
         UI_setAProcessToggleStatus(audioProcessMode);
         recursive = 0;
         printf ("\n audio is now : %d\n", audioProcessMode);
       }
       return;
+
     case ACT_VideoModeToggle:
       if( !recursive )
       {
@@ -368,7 +365,6 @@ int nw;
       }
       return;
       break;
-
     case ACT_VideoModeCopy:
       if( !recursive )
       {
@@ -390,6 +386,7 @@ int nw;
         printf ("\n video is now : %d\n", videoProcessMode);
       }
       return;
+#endif
       break;
 /*			case ACT_SelectEncoder:
 				
@@ -2231,7 +2228,7 @@ int A_audioSave(char *name)
 {
 	if (!currentaudiostream)	// yes it is checked 2 times so what ?
 	return 0;
-	if (audioProcessMode)
+	if (audioProcessMode())
 	{
 		if (currentaudiostream->isCompressed ())
 			if (!currentaudiostream->isDecompressable ())
@@ -2254,7 +2251,7 @@ int A_audioSave(char *name)
 int A_saveDVDPS(char *name)
 {
 // if we are in process mode
-			if(videoProcessMode)
+			if(videoProcessMode())
 			{
     				oplug_mpeg_dvd_ps(name);
 			}

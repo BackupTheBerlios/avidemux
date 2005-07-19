@@ -82,7 +82,7 @@ WAVHeader	*info=NULL;
 		}
 */
 		//
-		if(audioProcessMode)
+		if(audioProcessMode())
 		{
 			uint16_t fcc;
 			
@@ -189,7 +189,7 @@ WAVHeader	*info=NULL;
 		{
 			uint32_t exlen;
 			uint8_t  *exdata;
-			if(!audioProcessMode)
+			if(!audioProcessMode())
 			{
 			currentaudiostream->extraData(&exlen,&exdata);
 			}

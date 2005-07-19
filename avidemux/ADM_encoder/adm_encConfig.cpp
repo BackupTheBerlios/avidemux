@@ -97,7 +97,6 @@ SelectCodecType current_codec=CodecFF;
 
 
 
-extern uint32_t videoProcessMode;
 
 uint8_t loadVideoCodecConf( char *name);
 uint8_t saveVideoCodecConf( char *name);
@@ -131,33 +130,6 @@ CodecFamilty videoCodecGetFamily( void )
 	stuff and will be merged with xml stuff to allow
 	save config / load config
 */
-void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
-{
- const char *tmp;
- int  mode = 0;
- uint32_t videoProcess;
- COMPRES_PARAMS *param;
-	//printf("-Video filter by name : %s\n",name);
-
-	Read(videoProcess);
-	// it is a toggle !
-	if(videoProcess!=videoProcessMode)
-	{ // need to toggle it !
-
-		videoProcessMode=videoProcess^1;
-		UI_setVProcessToggleStatus( videoProcess );
-	}
-	else
-	printf("Already in good mode (%d)\n",videoProcessMode);
-	param=videoCodecGetDescriptor(current_codec);
-	ADM_assert(param);
-	if(extraLen)
-		{
-				ADM_assert(extraLen==param->extraSettingsLen);
-				memcpy(param->extraSettings,extraData,param->extraSettingsLen);
-		}
-
-}
 //******************************************************************
 // Return the COMPRES_PARAMS corresponding to the given codec Id
 //****************************************************************
@@ -180,37 +152,13 @@ COMPRES_PARAMS *videoCodecGetDescriptor(SelectCodecType codec)
 
 */
 
-const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
-{
-	static char conf[4000];
-	static char tmp[2000];
-	uint32_t confSize=0;
-	conf[0]=0;
-
-	*optSize=0;
-	*data=NULL;
-
-	COMPRES_PARAMS *param;
-	param=videoCodecGetDescriptor(current_codec);
-	ADM_assert(param);
-	if(param->extraSettingsLen)
-	{
-		*data=(uint8_t *)param->extraSettings;
-		*optSize=param->extraSettingsLen;
-	}
-
-
-	uint8_t videoProcess=videoProcessMode;
-	Add(videoProcess);
-	confSize=*optSize;
-	Add(confSize);
-
-	aprintf("Conf :%s (%d) (%d)\n",conf,videoProcessMode,confSize);
-	return conf;
-
-}
 
 //%
+uint32_t videoProcessMode(void)
+{
+        if(current_codec==CodecCopy) return 0;
+        return 1;
+}
 void EncoderSaveMpeg(char *name)
 {
 uint8_t raw;
@@ -420,12 +368,6 @@ void videoCodecChanged(int newcodec)
     int nb=encoderGetNbEncoder();
 	ADM_assert(newcodec<=nb);
 	current_codec=AllVideoCodec[newcodec]->codec;
-	if(current_codec==CodecCopy)
-	{
-		videoProcessMode=0;
-	}
-	else
-		videoProcessMode=1;
 }
 /************************************/
 void encoderPrint(void)
@@ -823,6 +765,52 @@ int a1,b1;
 	return (a1<<4)+b1;
 
 }
+// Old stuff
+const char  *videoCodecGetConf( uint32_t *optSize, uint8_t **data)
+{
+        static char conf[4000];
+        static char tmp[2000];
+        uint32_t confSize=0;
+        conf[0]=0;
+
+        *optSize=0;
+        *data=NULL;
+
+        COMPRES_PARAMS *param;
+        param=videoCodecGetDescriptor(current_codec);
+        ADM_assert(param);
+        if(param->extraSettingsLen)
+        {
+                *data=(uint8_t *)param->extraSettings;
+                *optSize=param->extraSettingsLen;
+        }
+
+        confSize=*optSize;
+        Add(confSize);
+
+        aprintf("Conf :%s (%d) (%d)\n",conf,videoProcessMode,confSize);
+        return conf;
+
+}
+
+void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
+{
+ const char *tmp;
+ int  mode = 0;
+ uint32_t videoProcess;
+ COMPRES_PARAMS *param;
+        //printf("-Video filter by name : %s\n",name);
+
+        param=videoCodecGetDescriptor(current_codec);
+        ADM_assert(param);
+        if(extraLen)
+                {
+                                ADM_assert(extraLen==param->extraSettingsLen);
+                                memcpy(param->extraSettings,extraData,param->extraSettingsLen);
+                }
+
+}
+
 
 
 // EOF

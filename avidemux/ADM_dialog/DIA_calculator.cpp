@@ -127,7 +127,7 @@ void prepare( void )
 
 	// Now get audio info
 	track1=0;
-	if(audioProcessMode && currentaudiostream)
+	if(audioProcessMode() && currentaudiostream)
 	{
 		stream=buildFakeAudioFilter(currentaudiostream,
 				0, 0xffffffff);
@@ -292,7 +292,7 @@ aviInfo info;
                         // Fetch info from filter
                 
                         
-                        if(videoProcessMode)
+                        if(videoProcessMode())
                                 picSize=getPicSize();
                         else
                                 picSize=info.width*info.height;
