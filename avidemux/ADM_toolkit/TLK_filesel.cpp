@@ -203,20 +203,28 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	char *tmpname;
 	gchar *selected_filename;
         uint8_t res;
-        GtkFileChooserAction which=GTK_FILE_CHOOSER_ACTION_OPEN;
         
-        if(rw) which=GTK_FILE_CHOOSER_ACTION_SAVE;
-
 	if(rname)
 		*rname=NULL;
 
-        dialog=dialog = gtk_file_chooser_dialog_new ("Open File",
+        if(rw)
+        {
+                        dialog=dialog = gtk_file_chooser_dialog_new ("Save",
                                       NULL,
-                                      which,
+                                      GTK_FILE_CHOOSER_ACTION_SAVE,
+                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                      GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+                                      NULL);
+        }
+        else
+        {
+          dialog=dialog = gtk_file_chooser_dialog_new ("Open File",
+                                      NULL,
+                                      GTK_FILE_CHOOSER_ACTION_OPEN,
                                       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                       GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
                                       NULL);
-    
+        }
         gtk_window_set_title (GTK_WINDOW (dialog),label);
         gtk_register_dialog(dialog);
         if(rw)
