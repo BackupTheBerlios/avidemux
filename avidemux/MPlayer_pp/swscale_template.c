@@ -759,22 +759,20 @@ static inline void RENAME(yuv2yuvX)(SwsContext *c, int16_t *lumFilter, int16_t *
 				    int16_t *chrFilter, int16_t **chrSrc, int chrFilterSize,
 				    uint8_t *dest, uint8_t *uDest, uint8_t *vDest, int dstW, int chrDstW)
 {
-	long int longChrDstW=(long int)chrDstW;
-	long int longDstW=(long int)dstW;
 #ifdef HAVE_MMX
 	if(uDest != NULL)
 	{
 		asm volatile(
 				YSCALEYUV2YV12X(0, CHR_MMX_FILTER_OFFSET)
 				:: "r" (&c->redDither),
-				"r" (uDest), "m" (longChrDstW)
+				"r" (uDest), "p" ((long)chrDstW)
 				: "%"REG_a, "%"REG_d, "%"REG_S
 			);
 
 		asm volatile(
 				YSCALEYUV2YV12X(4096, CHR_MMX_FILTER_OFFSET)
 				:: "r" (&c->redDither),
-				"r" (vDest), "m" (longChrDstW)
+				"r" (vDest), "p" ((long)chrDstW)
 				: "%"REG_a, "%"REG_d, "%"REG_S
 			);
 	}
@@ -782,7 +780,7 @@ static inline void RENAME(yuv2yuvX)(SwsContext *c, int16_t *lumFilter, int16_t *
 	asm volatile(
 			YSCALEYUV2YV12X(0, LUM_MMX_FILTER_OFFSET)
 			:: "r" (&c->redDither),
-			   "r" (dest), "m" (longDstW)
+			   "r" (dest), "p" ((long)dstW)
 			: "%"REG_a, "%"REG_d, "%"REG_S
 		);
 #else
@@ -2515,8 +2513,7 @@ FUNNY_UV_CODE
 	{
 #endif
 	long xInc_shr16 = (long) (xInc >> 16);
-	int xInc_mask = xInc & 0xffff;
-        int longDstWidth=(long int)dstWidth;	
+	int xInc_mask = xInc & 0xffff; 
 	asm volatile(
 		"xor %%"REG_a", %%"REG_a"	\n\t" // i
 		"xor %%"REG_b", %%"REG_b"		\n\t" // xx
@@ -2532,7 +2529,7 @@ FUNNY_UV_CODE
 		"addl %%edi, %%esi		\n\t" //src[xx+1]*2*xalpha + src[xx]*(1-2*xalpha)
 		"mov %1, %%"REG_D"		\n\t"
 		"shrl $9, %%esi			\n\t"
-		"movw %%si, (%%"REG_d", %%"REG_a", 2)\n\t"
+		"movw %%si, (%%"REG_D", %%"REG_a", 2)\n\t"
 
 		"movzbl  (%5, %%"REG_b"), %%edi	\n\t" //src[xx]
 		"movzbl 1(%5, %%"REG_b"), %%esi	\n\t" //src[xx+1]
@@ -2550,7 +2547,13 @@ FUNNY_UV_CODE
 		"cmp %2, %%"REG_a"		\n\t"
 		" jb 1b				\n\t"
 
-		:: "m" (src1), "m" (dst), "m" (longDstWidth), "m" (xInc_shr16), "m" (xInc_mask),
+/* GCC-3.3 makes MPlayer crash on IA-32 machines when using "g" operand here,
+   which is needed to support GCC-4.0 */
+#if defined(ARCH_X86_64) && ((__GNUC__ > 3) || ( __GNUC__ == 3 && __GNUC_MINOR__ >= 4))
+		:: "m" (src1), "m" (dst), "g" ((long)dstWidth), "m" (xInc_shr16), "m" (xInc_mask),
+#else
+		:: "m" (src1), "m" (dst), "m" ((long)dstWidth), "m" (xInc_shr16), "m" (xInc_mask),
+#endif
 		"r" (src2)
 		: "%"REG_a, "%"REG_b, "%ecx", "%"REG_D, "%esi"
 		);
