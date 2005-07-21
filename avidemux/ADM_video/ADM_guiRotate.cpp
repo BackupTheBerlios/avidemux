@@ -38,7 +38,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidRotate.h"
 
-#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
@@ -68,7 +68,7 @@ static ROTATE_PARAM par;
 
 #define WIDG(widget_name) lookup_widget(dialog,#widget_name)
 
-
+static ColYuvRgb    *rgbConv=NULL;
 uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
 
 {
@@ -83,6 +83,8 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
   // Get info from previous filter
   w= _in->getInfo()->width;
   h= _in->getInfo()->height;
+        rgbConv=new ColYuvRgb(w,h);
+        rgbConv->reset(w,h);
 
 
 //  video_yuv_orig=(uint8_t *)malloc(w*h*4);
@@ -98,7 +100,8 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
   ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l, video_yuv_orig, &f));
 
   memcpy(video_yuv, video_yuv_orig->data, (w*h*3)>>1);
-  COL_yv12rgb(w, h,video_yuv, video_rgb);
+  //COL_yv12rgb(w, h,video_yuv, video_rgb);
+  rgbConv->scale(video_yuv,video_rgb);
 
   ADM_assert(_param);
   memcpy(&par,_param,sizeof(par));
@@ -128,7 +131,8 @@ uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
 
   video_rgb =  video_yuv = NULL;
   video_yuv_orig =NULL;
-
+  delete rgbConv;
+  rgbConv=NULL;
   return ret;
 }
 
@@ -186,7 +190,9 @@ void gui_update(GtkButton * button, gpointer user_data)
 
   printf("w: %ld, h: %ld\n", par.width, par.height);
 
-  COL_yv12rgb(par.width, par.height,video_yuv, video_rgb);
+  //COL_yv12rgb(par.width, par.height,video_yuv, video_rgb);
+  rgbConv->reset(par.width,par.height);
+  rgbConv->scale(video_yuv,video_rgb);
 
   gtk_widget_set_usize(WIDG(drawingarea1), par.width, par.height);
   GUI_RGBDisplay(video_rgb, par.width, par.height,( void *)WIDG(drawingarea1));

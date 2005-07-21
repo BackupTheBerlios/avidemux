@@ -33,8 +33,10 @@
 #include <ADM_assert.h>
 
 #include "prototype.h"
-#include "ADM_colorspace/colorspace.h"
+//#include "ADM_colorspace/colorspace.h"
 //#include "ADM_gui/GUI_vars.h"
+#include "ADM_colorspace/ADM_rgb.h"
+
 #include "ADM_gui2/GUI_render.h"
 
 #include "ADM_gui2/GUI_accelRender.h"
@@ -44,12 +46,14 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 
 #include "prefs.h"
+
 static uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h);
 
 
 uint8_t  GUI_InitRender (GtkWidget *g, uint32_t w,uint32_t h);
 
 
+static ColYuvRgb rgbConverter(640,480);
 
 extern GtkWidget *getDrawWidget( void );
 static AccelRender *accel_mode=NULL;
@@ -216,6 +220,7 @@ ADM_RENDER_TYPE render;
         }
         if(!accel_mode)
         {
+                rgbConverter.reset(renderW,renderH);
                 printf("No accel used for rendering\n");
         }
 	
@@ -251,7 +256,9 @@ uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h)
 
 uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h)
 {
-    COL_yv12rgb (w, h,in, out);
+    //COL_yv12rgb (w, h,in, out);
+    rgbConverter.reset(w,h);
+    rgbConverter.scale(in,out);
     return 1;
 }
 

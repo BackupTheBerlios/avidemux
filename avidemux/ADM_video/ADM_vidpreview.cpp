@@ -37,7 +37,7 @@
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
-#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace/ADM_rgb.h"
 #include "prototype.h"
 #include <ADM_assert.h>
 
@@ -53,7 +53,7 @@ static uint32_t 	uw, uh;
 int 			lock;
 uint8_t		needDestroy=0;
 extern void UI_setPreviewToggleStatus(uint8_t s);
-
+static ColYuvRgb    rgbConv(100,100);
 // Init previewer
 //
 uint8_t GUI_StillAlive( void )
@@ -72,7 +72,7 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
       ADM_assert(rgb_render=new uint8_t [w*h*4]);
        uw=w;
        uh=h;
-
+       rgbConv.reset(w,h); 
        dialog=create_dialog1();
        gtk_widget_set_usize (lookup_widget(dialog,"drawingarea1"),w,h);
 
@@ -100,7 +100,8 @@ uint8_t  GUI_PreviewUpdate(uint8_t *data)
        {
 
 		// First convert YV12 to RGB
-	       COL_yv12rgb( uw, uh,data, rgb_render);
+	      // COL_yv12rgb( uw, uh,data, rgb_render);
+	      rgbConv.scale(data,rgb_render);
 	       previewRender();
 	       if(lock==1)
 	    	{
@@ -119,7 +120,8 @@ uint8_t  GUI_PreviewRun(uint8_t *data)
        {
 
 		// First convert YV12 to RGB
-	       	COL_yv12rgb( uw, uh,data, rgb_render);
+	       	//COL_yv12rgb( uw, uh,data, rgb_render);
+	       	 rgbConv.scale(data,rgb_render);
 	       	previewRender();
 		// add a new handler
 		#define WID(x) lookup_widget(dialog,#x)

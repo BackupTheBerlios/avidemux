@@ -36,7 +36,7 @@
 # include <math.h>
 #include "ADM_library/default.h"
 
-#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_gui2/support.h"
 
 
@@ -74,7 +74,7 @@ static void             eq2_changed( void);
 
 static void frame_changed( void );
 static Eq2Settings mySettings;
-
+static ColYuvRgb    *rgbConv=NULL;
 /************************************************************************/
 uint8_t DIA_getEQ2Param(Eq2_Param *param, AVDMGenericVideoStream *in)
 {
@@ -102,6 +102,8 @@ uint8_t r=0;
         memcpy(UPLANE(imgdisplay),UPLANE(imgsrc),(w*h)>>2);
         memcpy(VPLANE(imgdisplay),VPLANE(imgsrc),(w*h)>>2);
         
+        rgbConv=new ColYuvRgb(w,h);
+        rgbConv->reset(w,h);
 
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
@@ -155,7 +157,7 @@ uint8_t r=0;
         delete imgsrc;
         delete imgdisplay;
         delete [] rgbbuffer;
-        
+        delete rgbConv;
 
         rgbbuffer=NULL;
         imgdst=NULL;
@@ -270,7 +272,8 @@ uint32_t stride;
         src+=stride;
     }
     //
-    COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
+    //COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
+     rgbConv->scale(imgdisplay->data,(uint8_t *)rgbbuffer );
 }
 
 //**

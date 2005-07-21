@@ -43,7 +43,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_library/default.h"
 
-#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace/ADM_rgb.h"
 
 #include "ADM_library/ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
@@ -70,7 +70,7 @@ static uint32_t *rgbbuffer=NULL;
 static AVDMGenericVideoStream *incoming;
 static ASHARP_PARAM  myHue;
 static float      hue,sat;
-
+static ColYuvRgb    *rgbConv=NULL;
 //
 //      Video is in YV12 Colorspace
 //
@@ -85,7 +85,8 @@ uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in)
         // Allocate space for green-ised video
         w=in->getInfo()->width;
         h=in->getInfo()->height;
-
+        rgbConv=new ColYuvRgb(w,h);
+        rgbConv->reset(w,h);
         rgbbuffer=new uint32_t[w*h];
 
         imgdst=new ADMImage(w,h);
@@ -135,7 +136,8 @@ uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in)
         delete imgsrc;
         delete imgdisplay;
         delete [] rgbbuffer;
-        
+        delete rgbConv;
+        rgbConv=NULL;
 
         rgbbuffer=NULL;
         imgdst=NULL;
@@ -259,7 +261,8 @@ uint32_t ww,hh;
         src+=stride;
     }
     //
-    COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
+    //COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
+    rgbConv->scale(imgdisplay->data,(uint8_t *)rgbbuffer);
 }
 
 GtkWidget*

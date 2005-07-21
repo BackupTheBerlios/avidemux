@@ -48,6 +48,7 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 
+#include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_colorspace/colorspace.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
@@ -119,7 +120,7 @@ static uint32_t _w,_h;
 static int32_t myY,myU,myV;
 
 extern int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b);
-
+ColYuvRgb *rgbConv=NULL;
 uint8_t ADMVideoSubtitle::configure(AVDMGenericVideoStream *instream)
 {
 UNUSED_ARG(instream);
@@ -127,6 +128,7 @@ UNUSED_ARG(instream);
 uint8_t ret=0;
 int charset=0;
 uint32_t l,f;
+
 		// look up old one
 		if(_conf->_charset)
 		{
@@ -140,6 +142,9 @@ uint32_t l,f;
 		sourceImage		=new ADMImage(_w,_h);//uint8_t[_w*_h*2];
 		targetImage		=new uint8_t[_w*_h*2];
 		targetImageRGB		=new uint8_t[_w*_h*4];
+		
+        rgbConv=new ColYuvRgb(_w,_h);
+        rgbConv->reset(_w,_h);
 
 		ADM_assert(instream->getFrameNumberNoAlloc(curframe,
 						&l,
@@ -192,6 +197,8 @@ uint32_t l,f;
 
 		sourceImage=NULL;
 		targetImage=targetImageRGB=NULL;
+		delete rgbConv;
+		rgbConv=NULL;
 		return 1;
 
 }
@@ -430,7 +437,8 @@ uint32_t page=_w*_h;
 		}
 	}
 	// convert to rgb
-	ADM_assert(COL_yv12rgb(_w,_h,targetImage,targetImageRGB));
+	//ADM_assert(COL_yv12rgb(_w,_h,targetImage,targetImageRGB));
+	rgbConv->scale(targetImage,targetImageRGB);
 
 }
 

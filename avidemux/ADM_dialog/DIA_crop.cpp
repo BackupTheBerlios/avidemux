@@ -45,7 +45,7 @@
 #include "ADM_library/default.h"
 #include "ADM_library/ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_assert.h"
 
 static GtkWidget	*create_dialog1 (void);
@@ -66,7 +66,7 @@ static void 		frame_changed( void );
 
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 
-
+static ColYuvRgb    *rgbConv=NULL;
 static uint8_t *working=NULL;
 static uint8_t *original=NULL;
 static GtkWidget *dialog=NULL;
@@ -118,7 +118,8 @@ int DIA_getCropParams(	char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in)
 	imgsrc=new ADMImage(width,height);
 	incoming=in;
 	
-	
+	 rgbConv=new ColYuvRgb(width,height);
+     rgbConv->reset(width,height);
 	
 	gtk_widget_set_usize(WID(drawingarea1), width,height);
 	gtk_window_set_title (GTK_WINDOW (dialog), name);
@@ -171,6 +172,7 @@ int DIA_getCropParams(	char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in)
 	gtk_widget_destroy(dialog);
 	delete working;	
 	delete imgsrc;
+	delete rgbConv;
 	working=NULL;
 	dialog=NULL;
 	original=NULL;
@@ -308,7 +310,8 @@ void ui_update( )
 	uint8_t *buffer=working;
 	
 	//
-	COL_yv12rgb(  w,   h,original,buffer );
+	//COL_yv12rgb(  w,   h,original,buffer );
+	rgbConv->scale(original,buffer);
 	// do top
 	in=buffer;
 	for(y=0;y<top;y++)

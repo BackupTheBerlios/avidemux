@@ -37,7 +37,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidContrast.h"
 
-#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
@@ -57,7 +57,7 @@ static gboolean gui_draw (GtkWidget * widget,
 			  GdkEventExpose * event, gpointer user_data);
 
 //static int croplock;
-
+static ColYuvRgb    *rgbConv=NULL;
 static void gui_update (GtkButton * button, gpointer user_data);
 
 
@@ -86,6 +86,10 @@ uint8_t ADMVideoContrast::configure (AVDMGenericVideoStream * instream)
   w = _in->getInfo ()->width;
   h = _in->getInfo ()->height;
 
+  rgbConv=new ColYuvRgb(w,h);
+  rgbConv->reset(w,h);
+
+  
   aImage = new ADMImage (w, h);
 
   video2 = (uint8_t *) ADM_alloc (w * h * 4);
@@ -101,8 +105,9 @@ uint8_t ADMVideoContrast::configure (AVDMGenericVideoStream * instream)
   // From now we work in RGB !
   memcpy (video2, aImage->data, (w * h * 3)>>1);
 
-  COL_yv12rgb (w, h, video2, video3);
-
+  //COL_yv12rgb (w, h, video2, video3);
+  rgbConv->scale(video2,video3);
+  
   ADM_assert (_param);
   memcpy (&par, _param, sizeof (par));
   sw = w;
@@ -129,7 +134,8 @@ uint8_t ADMVideoContrast::configure (AVDMGenericVideoStream * instream)
   aImage = NULL;
 
   buildContrastTable (_param->coef, _param->offset, _tableFlat, _tableNZ);
-
+  delete rgbConv;
+  rgbConv=NULL;
   return r;
 
 }
@@ -239,7 +245,8 @@ gui_update (GtkButton * button, gpointer user_data)
 		  tablechroma, sw >> 1, sh >> 1);
     }
 
-  COL_yv12rgb (sw, sh, video2, video3);
+  //COL_yv12rgb (sw, sh, video2, video3);
+  rgbConv->scale(video2,video3);
   GUI_RGBDisplay (video3, sw, sh, (void *) WID (drawingarea1));
 
 

@@ -53,7 +53,7 @@
 #include "ADM_library/default.h"
 
 
-#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_video/ADM_vidChromaShift.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
@@ -86,7 +86,7 @@ static gboolean gui_draw( void );
 static gboolean gui_update( void );
 static void update(void);
 
-
+static ColYuvRgb    *rgbConv=NULL;
 uint8_t ADMVideoChromaShift::configure( AVDMGenericVideoStream *instream)
 
 {
@@ -101,6 +101,9 @@ uint32_t l,f;
 							ww=_in->getInfo()->width;
 							hh= _in->getInfo()->height;
 
+							rgbConv=new ColYuvRgb(ww,hh);
+                            rgbConv->reset(ww,hh);
+							
 							printf("\n Chromashift in : %lu  x %lu\n",ww,hh);
 
 							video_src=new ADMImage(ww,hh);// uint8_t [ww*hh*2];
@@ -132,6 +135,8 @@ uint32_t l,f;
 							delete [] video_rgb;
 							video_working=NULL;
 							video_src=NULL;
+							delete rgbConv;
+							rgbConv=NULL;
 
 					return ret;
 }
@@ -202,7 +207,8 @@ void update( void)
 		if(shift_v)
 			ADMVideoChromaShift::fixup(video_working,ww,hh,shift_v*2);
 
-		COL_yv12rgb(ww,hh,video_working,video_rgb);
+		//COL_yv12rgb(ww,hh,video_working,video_rgb);
+		rgbConv->scale(video_working,video_rgb);
 		chromadraw(dialog,ww,hh);
 	//	printf("\n Updated..\n");
 }

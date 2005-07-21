@@ -44,13 +44,13 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_library/default.h"
 
-#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace/ADM_rgb.h"
 
 #include "ADM_library/ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidEqualizer.h"
 #include "ADM_assert.h"
-
+static ColYuvRgb    *rgbConv=NULL;
 uint8_t DIA_getEqualizer(EqualizerParam *param, ADMImage *image);
 
 static GtkWidget	*create_dialog1 (void);
@@ -98,7 +98,8 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 	// Allocate space for green-ised video
 	w=in->getInfo()->width;
 	h=in->getInfo()->height;
-	
+	  rgbConv=new ColYuvRgb(w,h);
+        rgbConv->reset(w,h);
 	rgbbuffer=new uint32_t[w*h];
 	bargraph=new uint32_t [256*256];
 	histogram=new uint32_t [256*128];
@@ -171,7 +172,8 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 	delete [] bargraph;
 	delete [] histogram;
         delete [] histogramout;
-        
+    delete rgbConv;
+    rgbConv=NULL;    
 	histogram=NULL;
         histogramout=NULL;
 	bargraph=NULL;
@@ -310,7 +312,8 @@ void update( void)
         }
 	// udate u & v
 	// now convert to rgb
-	COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
+	//COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
+	rgbConv->scale(imgdisplay->data,(uint8_t *)rgbbuffer );
 	draw();
 }
 // Compute histogram
