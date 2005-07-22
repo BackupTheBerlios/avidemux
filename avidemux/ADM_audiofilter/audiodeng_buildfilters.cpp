@@ -77,6 +77,15 @@ static const externalSource Sources[]=
         {AudioNone,"NONE"}
 };
 
+static DRCparam drcSetup=
+{
+    1,
+    0.001,//double   mFloor;
+    0.2, //double   mAttackTime;
+    1.0, //double   mDecayTime;
+    2.0, //double   mRatio;
+    -12.0 ,//double   mThresholdDB;
+};
 
 extern int DIA_getLameSettings(int *pmode, int *pbitrate,ADM_LAME_PRESET *preset);
 extern void UI_PrintCurrentACodec( const char *s);
@@ -564,7 +573,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
       {
 	  AVDMProcessAudio_Compress *pdrc = NULL;
 	  printf("\n  DRC activated...\n");
-	  pdrc = new AVDMProcessAudio_Compress(lastFilter);
+	  pdrc = new AVDMProcessAudio_Compress(lastFilter,&drcSetup);
 	  drc = (AVDMProcessAudioStream *) pdrc;
 	  lastFilter = drc;
 	  filters[filtercount++] = lastFilter;

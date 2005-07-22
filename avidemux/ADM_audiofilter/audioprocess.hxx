@@ -91,14 +91,48 @@ public:
 };
 
 //_______________________________________________________________
+typedef struct DRCparam
+{
+    uint32_t mUseGain;
+    double   mFloor;
+    double   mAttackTime;
+    double   mDecayTime;
+    double   mRatio;
+    double   mThresholdDB;
+   // double   mGainDB;  
+};
 class AVDMProcessAudio_Compress : public AVDMBufferedAudioStream
 {
 protected:
-				 int16_t   _table[32768*2+1];				
-				 virtual uint32_t 	grab(uint8_t *obuffer);				
+#define DRC_WINDOW 100
+				 uint8_t            filled;
+				 DRCparam           _param;			
+				 virtual uint32_t 	grab(uint8_t *obuffer);
+				 
+				 double             mCircle[DRC_WINDOW];
+				 double             mLevelCircle[DRC_WINDOW];	
+				 int                mCircleSize;
+				 
+				 int                mCirclePos;	
+				 double             mRMSSum;
+				 double             mThreshold;
+				 double             mGain;
+				 double             mAttackFactor;
+				 double             mDecayFactor;	
+				 double             mLastLevel;
+				 double             mGainDB;
+				 
+				 double             AvgCircle(double value);
+				 void               Follow(double x, double *outEnv, int maxBack);
+				 float              DoCompression(float value, double env);
+				 void               drc_cleanup(void);
+	#define ONE_CHUNK 1000			 
+				 double             follow[ONE_CHUNK/2];
+				 double             value[ONE_CHUNK/2];
+				 	
 public:
 						
-        AVDMProcessAudio_Compress(AVDMGenericAudioStream *instream);
+        AVDMProcessAudio_Compress(AVDMGenericAudioStream *instream,DRCparam *p);
 		 ~AVDMProcessAudio_Compress();
 
      		
