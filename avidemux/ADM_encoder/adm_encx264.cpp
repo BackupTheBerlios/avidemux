@@ -44,15 +44,16 @@
 
 
 /*_________________________________________________*/
-EncoderX264::EncoderX264 (X264Config *codecconfig)
+EncoderX264::EncoderX264 (COMPRES_PARAMS  *codecconfig)
 {
 
   _codec = NULL;  
   strcpy (_logname, "");
   _frametogo = 0;
   _pass1Done=0;
-  memcpy(&_param,&(codecconfig->generic),sizeof(_param));
-  memcpy(&_codecParam,&(codecconfig->specific),sizeof(_codecParam));
+  memcpy(&_param,codecconfig,sizeof(_param));
+  ADM_assert(codecconfig->extraSettingsLen==sizeof(_codecParam));
+  memcpy(&_codecParam,(codecconfig->extraSettings),sizeof(_codecParam));
 
 
 };

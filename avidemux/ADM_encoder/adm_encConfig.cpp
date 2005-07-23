@@ -632,13 +632,13 @@ Encoder *e=NULL;
 				  		e=new   EncoderXvid4( &Xvid4Codec);
 				    	break;
 #endif
-#if 0 // DISABLE
+
 #ifdef USE_X264
                 case CodecX264:
-                                        e=new EncoderX264(&x264Extra);
+                                        e=new EncoderX264(&x264Codec);
                                         break;
 #endif
-
+#if 0
 #ifdef USE_XX_XVID
       	 				case CodecXvid :
 				  		e=new   EncoderXvid( &xvidExtra);

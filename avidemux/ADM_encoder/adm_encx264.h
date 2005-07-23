@@ -42,7 +42,7 @@ class EncoderX264: public Encoder
     ADM_x264Param           _codecParam;
     uint32_t                _totalframe;
   public:
-    EncoderX264    ( X264Config  *conf)  ;
+    EncoderX264    ( COMPRES_PARAMS  *conf)  ;
     ~EncoderX264    ()  ;
     virtual uint8_t isDualPass( void ) ;                       // mjpeg is always monopass
     virtual uint8_t configure(AVDMGenericVideoStream *instream) ;
