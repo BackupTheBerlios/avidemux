@@ -138,9 +138,9 @@ ffmpegEncoder::gopMpeg1 (void)
   // min bitrate 500 max bitrate 2200
 int rate;
 
-        rate=_context->time_base.num;
+        rate=_context->time_base.den;
         rate=rate*1000;
-        rate/=_context->time_base.den;
+        rate/=_context->time_base.num;
 
 
   if (_id == FF_MPEG2)
@@ -346,7 +346,7 @@ ffmpegEncoderCQ::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
       _statfile = NULL;
 
     }
- _context->time_base= (AVRational){fps1000,1000};
+ _context->time_base= (AVRational){1000,fps1000};
 /*
   _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;
@@ -437,7 +437,7 @@ ffmpegEncoderCBR::init (uint32_t val, uint32_t fps1000)
   mplayer_init ();
 /*  _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;*/
-_context->time_base= (AVRational){fps1000,1000};
+_context->time_base= (AVRational){1000,fps1000};
   _context->bit_rate = _br;
 
   printf ("--> br: %lu", _br);
@@ -533,7 +533,7 @@ ffmpegEncoderVBR::init (uint32_t val, uint32_t fps1000)
 //   _context->frame_rate_base = 1000;
 //   _context->frame_rate = fps1000;
 
-_context->time_base= (AVRational){fps1000,1000};
+_context->time_base= (AVRational){1000,fps1000};
 
   /* If internal 2 passes mode is selected ... */
   _context->flags |= CODEC_FLAG_PASS2;
@@ -631,7 +631,7 @@ ffmpegEncoderVBRExternal::init (uint32_t val, uint32_t fps1000)
 
 /*  _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;*/
-  _context->time_base= (AVRational){fps1000,1000};
+  _context->time_base= (AVRational){1000,fps1000};
   _context->flags |= CODEC_FLAG_QSCALE;;
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
@@ -820,7 +820,7 @@ ffmpegEncoderHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   UNUSED_ARG (vbr);
   mplayer_init ();
 
-_context->time_base= (AVRational){fps1000,1000};
+_context->time_base= (AVRational){1000,fps1000};
 //   _context->frame_rate_base = 1000;
 //   _context->frame_rate = fps1000;
 
@@ -867,7 +867,7 @@ ffmpegEncoderFFHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
 
 /*  _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;*/
-_context->time_base= (AVRational){fps1000,1000};
+_context->time_base= (AVRational){1000,fps1000};
 
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
@@ -923,7 +923,7 @@ ffmpegEncoderFFV1::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   UNUSED_ARG (val);
   UNUSED_ARG (vbr);
   mplayer_init ();
-_context->time_base= (AVRational){fps1000,1000};
+_context->time_base= (AVRational){1000,fps1000};
 //   _context->frame_rate_base = 1000;
 //   _context->frame_rate = fps1000;
 
@@ -978,7 +978,7 @@ uint8_t
 
 //   _context->frame_rate_base = 1000;
 //   _context->frame_rate = fps1000;
-_context->time_base= (AVRational){fps1000,1000};
+_context->time_base= (AVRational){1000,fps1000};
   _context->flags = CODEC_FLAG_QSCALE;
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
