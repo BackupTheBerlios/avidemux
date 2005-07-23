@@ -356,6 +356,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 			break;
 
 		case PIX_FMT_YUV422P:
+                case PIX_FMT_YUVJ422P:
 			//printf("422p\n");
 			stridex[0]=	_frame.linesize[0 ];
 			stridex[1]=	_frame.linesize[1 ];
