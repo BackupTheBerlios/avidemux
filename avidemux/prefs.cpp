@@ -4,6 +4,7 @@
 #include <strings.h>
 #include <unistd.h>	/* access(), R_OK */
 #include <errno.h>	/* errno, ENOENT */
+#include <dirent.h>
 
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -20,7 +21,8 @@
 #undef free
 
 extern char *PathCanonize(const char *tmpname);
-extern int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
+extern int  qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
+static char *checkDirAccess(char *home);
 // <prefs_gen>
 typedef enum {
 	UINT,
@@ -113,7 +115,7 @@ int num_opts = 66;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2
-
+const char *ADM_DIR_NAME="/.avidemux";
 /*
 ** we cannot put this into the header file, cause libxml headers
 ** are not reachable in all directories/Makefiles
@@ -232,9 +234,12 @@ int preferences::load(){
 #else
 int preferences::load(){
    xmlNodePtr p;
-   char rcfile[1024];
+   char *rcfile;
    char *home;
+   char *dir_adm;
+   
    char buf[1024];
+   DIR   *dir;
 #if defined(CYG_MANGLING)
 	home="c:/";
 #else
@@ -244,8 +249,9 @@ int preferences::load(){
 		return RC_FAILED;
 	}
 #endif
-	snprintf(rcfile, 1024, "%s/.avidemuxrc", home);
-	rcfile[1023] = '\0';
+        // check the directory exists
+        if((rcfile=checkDirAccess(home))==NULL) return RC_FAILED;
+        // Now build the filename
 	if( access(rcfile,R_OK) == -1 ){
 		if( errno != ENOENT )
 			fprintf(stderr,"can't read(%s): %d (%s)\n",
@@ -372,12 +378,11 @@ int preferences::save(){
 
 int preferences::save_xml_to_file(){
    char *home;
-   char rcfile[1024];
-   char rcfilenew[1024];
+   char *rcfile;
+   char *rcfilenew;
 #if defined(CYG_MANGLING)
 	home="c:/";
-	snprintf(rcfile,1024,"%s/.avidemuxrc",home);
-	rcfile[1023] = '\0';
+        if((rcfile=checkDirAccess(home))==NULL) return RC_FAILED;
 	xmlSetDocCompressMode(xdoc,9);
 	if( xmlSaveFormatFile(rcfile,xdoc,1) == -1 ){
            fprintf(stderr,"\ncan't save xml tree to file. Filesystem full?\n\n");
@@ -386,35 +391,37 @@ int preferences::save_xml_to_file(){
 	return RC_OK;
 
 #else
-	if( !(home=getenv("HOME")) )
-	{
-		fprintf(stderr,"can't getenv(HOME).\n");
-		return RC_FAILED;
-	}
-	snprintf(rcfilenew,1024,"%s/.avidemuxrc.new",home);
-	rcfilenew[1023] = '\0';
+	
+         if((rcfile=checkDirAccess(home))==NULL) return RC_FAILED;
+         rcfilenew=new char[strlen(rcfile)+5];
+        strcpy(rcfilenew,rcfile);
+        strcat(rcfilenew,".new");
         if( unlink(rcfilenew) == -1 && errno != ENOENT ){
            fprintf(stderr,"can't unlink(%s): %d (%s)\n",
                    rcfilenew, errno, strerror(errno));
+           delete [] rcfilenew;
            return RC_FAILED;
         }
 	xmlSetDocCompressMode(xdoc,9);
 	if( qxmlSaveFormatFile(rcfilenew,xdoc,1) == -1 ){
+           delete [] rcfilenew;
 	   return RC_FAILED;
 	}
-	snprintf(rcfile,1024,"%s/.avidemuxrc",home);
-	rcfile[1023] = '\0';
+
         if( unlink(rcfile) == -1 && errno != ENOENT ){
            fprintf(stderr,"can't unlink(%s): %d (%s)\n",
                    rcfile, errno, strerror(errno));
+           delete [] rcfilenew;
            return RC_FAILED;
         }
         if( link(rcfilenew,rcfile) == -1 ){
            fprintf(stderr,"can't create \"%s\": %d (%s)\n",
                    rcfile, errno, strerror(errno));
+           delete [] rcfilenew;
            return RC_FAILED;
         }
         unlink(rcfilenew); // rc/errno handling is done on next call ;-)
+        delete [] rcfilenew;
 	return RC_OK;
 #endif
 }
@@ -890,4 +897,48 @@ const char **preferences::get_lastfiles(void){
 
 // the one and only global preferences object
 preferences *prefs = new preferences();
+//****************************************************
+//      Check we have access to the directory
+//      create if needed
+//      return absolute path to the config file
+//****************************************************
+char *checkDirAccess(char *home)
+{
+static char build[1024];
+static char *built=NULL;
+char *dirname=NULL;
+DIR *dir=NULL;
+//
+        if(built) return built;
+ // Try to open the .avidemux directory
+        dirname=new char[strlen(home)+strlen(ADM_DIR_NAME)+2];
+        strcpy(dirname,home);
+        strcat(dirname,ADM_DIR_NAME);
+        if((dir=opendir(dirname))==NULL)
+        {
+                // Try to create it
+                char *sys=new char[strlen(dirname)+strlen("mkdir ")+2];
+                strcpy(sys,"mkdir ");
+                strcat(sys,dirname);
+                printf("Creating dir :%s\n",sys);
+                system(sys);
+                delete [] sys;
+                if((dir=opendir(dirname))==NULL)
+                {
+                        GUI_Alert("Cannot create the HOME/.avidemux directory");
+                        delete [] dirname;
+                        return NULL;
+                }                
+        }
+        closedir(dir);
+        delete [] dirname;
 
+        // Now built the filename
+        strncpy(build,home,1023);
+        strncat(build,ADM_DIR_NAME,1023-strlen(build));
+        strncat(build,"/config",1023-strlen(build));
+        built=build;
+        printf("Config file seems to be %s\n",built);
+        return built;
+}
+// EOF
