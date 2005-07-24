@@ -21,8 +21,6 @@
 #ifndef __EGG_TRAY_ICON_H__
 #define __EGG_TRAY_ICON_H__
 
-#ifndef CYG_MANGLING
-
 #include <gtk/gtkplug.h>
 #include <gdk/gdkx.h>
 #include <X11/Xatom.h>
@@ -79,13 +77,6 @@ GtkOrientation egg_tray_icon_get_orientation (EggTrayIcon *icon);
 EggTrayIcon *egg_tray_icon_new            (const gchar *name);
 
 G_END_DECLS
-#else
-/*************** win32 ***************/
-void systray_modify_tooltip (char* text) ;
-void systray_remove_nid(void);
-void systray_init(GdkPixbuf *pixbuf,  char* text) ;
-
-#endif
 #endif /* __EGG_TRAY_ICON_H__ */
 
 

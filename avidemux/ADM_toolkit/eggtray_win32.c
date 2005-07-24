@@ -31,7 +31,7 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include <stdio.h>
-
+#include <systray.h>
 #define WM_TRAYMESSAGE           WM_USER /* User defined WM Message */
 #define SYSTRAY_LBUTTONDBLCLK    0
 #define SYSTRAY_LBUTTONCLK       1
@@ -245,6 +245,20 @@ void systray_remove_nid(void)
   DestroyWindow(nid.hWnd);
   Shell_NotifyIcon(NIM_DELETE,&nid);
 }
+//*********************************************************
+//*********************************************************
+//*********************************************************
+void *adm_new_systray(GdkPixbuf *pixbuf, char *name)
+{
+  return (void *)systray_init(pixbuf,  name);
 
-
+}
+void adm_delete_systray(void *systray)
+{
+ systray_remove_nid() ;
+}
+void adm_change_tooltip(void *systray, const char *tips)
+{
+    void systray_remove_nid(tips) ;    
+}
 #endif

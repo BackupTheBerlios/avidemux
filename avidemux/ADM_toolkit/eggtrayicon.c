@@ -20,14 +20,14 @@
 #include "config.h"
 #ifndef CYG_MANGLING
 
-
+#include <gtk/gtk.h>
 #include <gtk/gtkversion.h>
 
-#if ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION >= 2))
 
 #include "eggtrayicon.h"
 #include <string.h>
-
+#include "systray.h"
+#include "../ADM_assert.h"
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 #define SYSTEM_TRAY_BEGIN_MESSAGE   1
 #define SYSTEM_TRAY_CANCEL_MESSAGE  2
@@ -55,8 +55,7 @@ static void egg_tray_icon_unrealize (GtkWidget *widget);
 
 static void egg_tray_icon_update_manager_window (EggTrayIcon *icon);
 
-GType
-egg_tray_icon_get_type (void)
+GType egg_tray_icon_get_type (void)
 {
   static GType our_type = 0;
 
@@ -81,8 +80,7 @@ egg_tray_icon_get_type (void)
   return our_type;
 }
 
-static void
-egg_tray_icon_init (EggTrayIcon *icon)
+static void egg_tray_icon_init (EggTrayIcon *icon)
 {
   icon->stamp = 1;
   icon->orientation = GTK_ORIENTATION_HORIZONTAL;
@@ -90,8 +88,7 @@ egg_tray_icon_init (EggTrayIcon *icon)
   gtk_widget_add_events (GTK_WIDGET (icon), GDK_PROPERTY_CHANGE_MASK);
 }
 
-static void
-egg_tray_icon_class_init (EggTrayIconClass *klass)
+static void egg_tray_icon_class_init (EggTrayIconClass *klass)
 {
   GObjectClass *gobject_class = (GObjectClass *)klass;
   GtkWidgetClass *widget_class = (GtkWidgetClass *)klass;
@@ -113,8 +110,7 @@ egg_tray_icon_class_init (EggTrayIconClass *klass)
 						      G_PARAM_READABLE));
 }
 
-static void
-egg_tray_icon_get_property (GObject    *object,
+static void egg_tray_icon_get_property (GObject    *object,
                             guint       prop_id,
                             GValue     *value,
                             GParamSpec *pspec)
@@ -132,8 +128,7 @@ egg_tray_icon_get_property (GObject    *object,
     }
 }
 
-static void
-egg_tray_icon_get_orientation_property (EggTrayIcon *icon)
+static void egg_tray_icon_get_orientation_property (EggTrayIcon *icon)
 {
   Display *xdisplay;
   Atom type;
@@ -184,8 +179,7 @@ egg_tray_icon_get_orientation_property (EggTrayIcon *icon)
     XFree (prop.prop);
 }
 
-static GdkFilterReturn
-egg_tray_icon_manager_filter (GdkXEvent *xevent, GdkEvent *event, gpointer user_data)
+static GdkFilterReturn egg_tray_icon_manager_filter (GdkXEvent *xevent, GdkEvent *event, gpointer user_data)
 {
   EggTrayIcon *icon = user_data;
   XEvent *xev = (XEvent *)xevent;
@@ -212,8 +206,7 @@ egg_tray_icon_manager_filter (GdkXEvent *xevent, GdkEvent *event, gpointer user_
   return GDK_FILTER_CONTINUE;
 }
 
-static void
-egg_tray_icon_unrealize (GtkWidget *widget)
+static void egg_tray_icon_unrealize (GtkWidget *widget)
 {
   EggTrayIcon *icon = EGG_TRAY_ICON (widget);
   GdkWindow *root_window;
@@ -236,8 +229,7 @@ egg_tray_icon_unrealize (GtkWidget *widget)
     (* GTK_WIDGET_CLASS (parent_class)->unrealize) (widget);
 }
 
-static void
-egg_tray_icon_send_manager_message (EggTrayIcon *icon,
+static void egg_tray_icon_send_manager_message (EggTrayIcon *icon,
 				    long         message,
 				    Window       window,
 				    long         data1,
@@ -266,8 +258,7 @@ egg_tray_icon_send_manager_message (EggTrayIcon *icon,
   gdk_error_trap_pop ();
 }
 
-static void
-egg_tray_icon_send_dock_request (EggTrayIcon *icon)
+static void egg_tray_icon_send_dock_request (EggTrayIcon *icon)
 {
   egg_tray_icon_send_manager_message (icon,
 				      SYSTEM_TRAY_REQUEST_DOCK,
@@ -276,8 +267,7 @@ egg_tray_icon_send_dock_request (EggTrayIcon *icon)
 				      0, 0);
 }
 
-static void
-egg_tray_icon_update_manager_window (EggTrayIcon *icon)
+static void egg_tray_icon_update_manager_window (EggTrayIcon *icon)
 {
   Display *xdisplay;
 
@@ -321,8 +311,7 @@ egg_tray_icon_update_manager_window (EggTrayIcon *icon)
     }
 }
 
-static void
-egg_tray_icon_realize (GtkWidget *widget)
+static void egg_tray_icon_realize (GtkWidget *widget)
 {
   EggTrayIcon *icon = EGG_TRAY_ICON (widget);
   GdkScreen *screen;
@@ -364,8 +353,7 @@ egg_tray_icon_realize (GtkWidget *widget)
 			 egg_tray_icon_manager_filter, icon);
 }
 
-EggTrayIcon *
-egg_tray_icon_new_for_xscreen (Screen *xscreen, const char *name)
+EggTrayIcon *egg_tray_icon_new_for_xscreen (Screen *xscreen, const char *name)
 {
   GdkDisplay *display;
   GdkScreen *screen;
@@ -376,22 +364,19 @@ egg_tray_icon_new_for_xscreen (Screen *xscreen, const char *name)
   return egg_tray_icon_new_for_screen (screen, name);
 }
 
-EggTrayIcon *
-egg_tray_icon_new_for_screen (GdkScreen *screen, const char *name)
+EggTrayIcon *egg_tray_icon_new_for_screen (GdkScreen *screen, const char *name)
 {
   g_return_val_if_fail (GDK_IS_SCREEN (screen), NULL);
 
   return g_object_new (EGG_TYPE_TRAY_ICON, "screen", screen, "title", name, NULL);
 }
 
-EggTrayIcon*
-egg_tray_icon_new (const gchar *name)
+EggTrayIcon *egg_tray_icon_new (const gchar *name)
 {
   return g_object_new (EGG_TYPE_TRAY_ICON, "title", name, NULL);
 }
 
-guint
-egg_tray_icon_send_message (EggTrayIcon *icon,
+guint egg_tray_icon_send_message (EggTrayIcon *icon,
 			    gint         timeout,
 			    const gchar *message,
 			    gint         len)
@@ -450,8 +435,7 @@ egg_tray_icon_send_message (EggTrayIcon *icon,
   return stamp;
 }
 
-void
-egg_tray_icon_cancel_message (EggTrayIcon *icon,
+void egg_tray_icon_cancel_message (EggTrayIcon *icon,
 			      guint        id)
 {
   g_return_if_fail (EGG_IS_TRAY_ICON (icon));
@@ -462,15 +446,45 @@ egg_tray_icon_cancel_message (EggTrayIcon *icon,
 				      id, 0, 0);
 }
 
-GtkOrientation
-egg_tray_icon_get_orientation (EggTrayIcon *icon)
+GtkOrientation egg_tray_icon_get_orientation (EggTrayIcon *icon)
 {
   g_return_val_if_fail (EGG_IS_TRAY_ICON (icon), GTK_ORIENTATION_HORIZONTAL);
 
   return icon->orientation;
 }
-#endif   /* ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION >= 2)) */
+/**************************************************************/
+static GtkWidget   *systray_icon = NULL;
+static GtkWidget   *evbox = NULL;
+static GtkTooltips *systray_icon_tooltips = NULL;
 
+void *adm_new_systray(GdkPixbuf *pixbuf, char *name)
+{
+GtkWidget   *img;
+  systray_icon = GTK_WIDGET (egg_tray_icon_new ("Avidemux"));
+  img = gtk_image_new_from_pixbuf (pixbuf);
+  evbox = gtk_event_box_new ();
+  gtk_container_add (GTK_CONTAINER (systray_icon), evbox);
+  gtk_container_add (GTK_CONTAINER (evbox), img);
+  gtk_widget_show_all (systray_icon);
+  gtk_widget_realize (systray_icon);
+  gtk_widget_show (systray_icon);
+
+  systray_icon_tooltips = gtk_tooltips_new ();
+  gtk_tooltips_enable (systray_icon_tooltips);
+
+  gtk_tooltips_set_tip (systray_icon_tooltips, systray_icon, "avidemux", "");
+  return (void *)systray_icon;
+}
+void adm_delete_systray(void *systray)
+{
+ ADM_assert( (void*)systray_icon==systray);
+ gtk_widget_destroy(systray_icon);
+}
+void adm_change_tooltip(void *systray, const char *tips)
+{
+ ADM_assert( (void*)systray_icon==systray);
+ gtk_tooltips_set_tip (systray_icon_tooltips, systray_icon, tips, "");
+}
 #endif   /* not defined GUI_DISABLE_SYSTRAY */
 
 
