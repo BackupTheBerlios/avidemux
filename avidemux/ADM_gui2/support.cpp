@@ -31,6 +31,7 @@
 #include "xpm/xpm_nextblack.xpm"
 #include "xpm/gnome-calculator.xpm"
 #include "xpm/gnome-calculator_small.xpm"
+#include "xpm/systray.xpm"
 typedef struct name2xpm
 {
 	const char *name;
@@ -58,7 +59,8 @@ name2xpm iconTranslation[]=
         {"avidemux_icon.xpm",           (const char **)avidemux_icon_xpm},
         {"xpm_prevblack.xpm",           xpm_prevblack},
         {"gnome-calculator.xpm",        (const char **)gnome_calculator_xpm},
-        {"gnome-calculator_small.xpm",  (const char **)gnome_calculator_small_xpm}
+        {"gnome-calculator_small.xpm",  (const char **)gnome_calculator_small_xpm},
+        {"systray.xpm",                 (const char **)systray_xpm}
 };
 GdkPixbuf	*create_pixbuf                  (const gchar     *filename)
 {
