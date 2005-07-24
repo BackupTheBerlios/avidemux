@@ -8,6 +8,7 @@
 #ifdef CYG_MANGLING
 #include "windows.h"
 #include "winbase.h"
+#include "io.h"
 #include "ADM_assert.h" 
 void ADM_usleep(unsigned long us)
 {
@@ -35,8 +36,9 @@ uint64_t ftello_adm(FILE *f)
 	fgetpos(f,&pos);
 	return (uint64_t)pos;
 }
-uint64_t fseeko_adm(FILE *f,fpos_t off,int whence)
+int fseeko_adm(FILE *f,fpos_t off,int whence)
 {
+    int64_t pos;
 	switch(whence)
 	{
 		case SEEK_SET:
@@ -44,7 +46,10 @@ uint64_t fseeko_adm(FILE *f,fpos_t off,int whence)
 			return 0;
 			break;
 		case SEEK_END:
-			fseek(f,0,SEEK_END);
+		    ADM_assert(!off);
+		    pos=_filelengthi64(fileno(f)) ;
+		    if(pos==-1) return -1;		   
+			fsetpos(f,&pos);
 			return 0;
 			break;
 		case SEEK_CUR:
