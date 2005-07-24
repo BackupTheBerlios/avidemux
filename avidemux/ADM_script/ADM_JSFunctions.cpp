@@ -11,6 +11,7 @@
 //
 #include "config.h"
 #include <stdlib.h>
+#include <dirent.h>
 #include <math.h>
 #include "ADM_JSAvidemux.h"
 #include "ADM_library/default.h"
@@ -39,6 +40,9 @@ JSBool fileWriteSelect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 JSBool fileReadSelect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
+JSBool allFilesFrom(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool nextFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+
 static JSFunctionSpec adm_functions[] = {
   /*    name          native          nargs    */
   {"displayError",      displayError,         1},
@@ -46,6 +50,8 @@ static JSFunctionSpec adm_functions[] = {
   {"fileReadSelect",    fileReadSelect,        0},
   {"fileWriteSelect",   fileWriteSelect,        0},
   {"print",             print,        0},
+  {"allFilesFrom",      allFilesFrom,        0},
+  {"nextFile",          nextFile,        0},
   {0}
 };
 uint8_t JS_AvidemuxFunction(JSContext *cx,JSObject *global)
@@ -123,3 +129,65 @@ JSBool print(JSContext *cx, JSObject *obj, uintN argc,
         fprintf(stderr,"JSConsole:%s\n",str);
         return JS_TRUE;
 }// end AddSegment
+/*****************************************************
+        To process a whole directiry at a time
+*******************************************************/
+#define ADM_MAX_DIR 1024
+static char *dirs[ADM_MAX_DIR];
+static int dirmax=0;
+static int curdir=0;
+static void cleanup( void );
+void cleanup( void )
+{
+        for(int i=0;i<dirmax;i++)
+                ADM_dealloc(dirs[i]);
+        dirmax=0;
+        curdir=0;
+}
+JSBool allFilesFrom(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+char *str;
+DIR *dir;
+struct dirent *direntry;
+        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+        cleanup();
+        // default return value
+        if(argc != 1)
+                return JS_FALSE;
+        str=JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+        dir=opendir(str);
+        if(!dir)
+        {
+                *rval=INT_TO_JSVAL(0); // No files
+                return JS_TRUE;
+        }
+        while((direntry=readdir(dir)) && dirmax<ADM_MAX_DIR-1)
+        {
+                dirs[dirmax]=(char *)ADM_alloc(strlen(str)+strlen(direntry->d_name)+2);
+                strcpy(dirs[dirmax],str);
+                strcat(dirs[dirmax],direntry->d_name);
+                //printf("File:<%s>\n",dirs[dirmax]);
+                dirmax++;
+        }
+        closedir(dir);
+        *rval=INT_TO_JSVAL(dirmax);
+        return JS_TRUE;
+}
+
+JSBool nextFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+char *n;
+        if(argc != 0)
+                return JS_FALSE;
+
+        if(curdir==dirmax)
+        {
+                n="";
+        }
+        else
+        {
+                n=dirs[curdir++];
+        }
+        *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,n));
+        return JS_TRUE;
+}
