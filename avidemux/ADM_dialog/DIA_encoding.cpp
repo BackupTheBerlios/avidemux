@@ -71,6 +71,7 @@ DIA_encoding::DIA_encoding( uint32_t fps1000 )
 	_lastTime=0;
 	_lastFrame=0;
 	_fps_average=0;
+        tray=NULL;
 
 }
 void DIA_encoding::setFps(uint32_t fps)
@@ -100,6 +101,8 @@ void DIA_stop( void)
 }
 DIA_encoding::~DIA_encoding( )
 {
+        if(tray) delete tray;
+        tray=NULL;
 	ADM_assert(dialog);
 	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
@@ -165,10 +168,12 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 
            if(nb==0) // restart ?
            {
+                                        if(!tray) tray=new ADM_tray("Encoding");
 					clock.reset();
        					_lastTime=clock.getElapsedMS();;
        					_lastFrame=0;
        					_fps_average=0;
+                                        tray->setPercent(0);
 					  UI_purge();
 					  return;
 	  }
@@ -196,6 +201,7 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 			fps=(uint32_t)floor(d);
 			sprintf(string,"%lu",fps);
    			gtk_label_set_text(GTK_LABEL(WID(label_fps)),string);
+                        
 
 		}
 
@@ -219,6 +225,7 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 		// update progress bar
 		 float f=nb;
 		 f=f/total;
+                tray->setPercent((int)(f*100.));
 		gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
 		sprintf(string,"Done : %02d%%",(int)(100*f));

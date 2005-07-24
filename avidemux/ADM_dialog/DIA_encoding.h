@@ -1,7 +1,11 @@
 /*
 
 */
+#ifndef ADM_ENCODING_H
+#define ADM_ENCODING_H
+
 #include "ADM_toolkit/TLK_clock.h"
+#include "ADM_tray/ADM_tray.h"
 #define MAX_BR_SLOT 200
 class DIA_encoding
 {
@@ -21,6 +25,7 @@ private:
 		void setSize(int size);
 		void setAudioSize(int size);
 		void setVideoSize(int size);
+                ADM_tray *tray;
 public:
 		DIA_encoding( uint32_t fps1000 );
 		~DIA_encoding( );
@@ -38,3 +43,5 @@ public:
 		
  		uint8_t isAlive(void);
 };
+
+#endif

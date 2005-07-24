@@ -15,7 +15,7 @@ SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_mpeg2dec ADM_mpegindexer libMpeg2Dec oplug_mpegFF ADM_h263 ADM_gui2 ADM_dialog \
 	ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame ADM_requant \
 	ADM_script oplug_ogm ADM_xvidratectl ADM_lavformat ADM_mplex ADM_ocr MPlayer_pp \
-	ADM_mpegdemuxer
+	ADM_mpegdemuxer ADM_tray
 
 EXTRA_DIST = main.cpp avi_vars.h avilist.cpp avilist.h callbacks.cpp callbacks.h gtk_gui.cpp gtkgui.h gui_action.hxx gui_navigate.cpp   gui_savenew.cpp  guiplay.cpp interface.h  support.h  prototype.h ADM_lavcodec.h  prefs.h prefs.cpp prefs.in mmx_macros.h ADM_assert.h
 
@@ -62,6 +62,7 @@ avidemux2_LDADD   =  \
 ./ADM_mpegindexer/libADM_mpegindexer.a   \
 ./ADM_dialog/libADM_dialog.a  \
 ./libMpeg2Dec/liblibMpeg2Dec.a   \
+./ADM_tray/libADM_tray.a \
 ./ADM_toolkit/libADM_toolkit.a  \
 ./ADM_dialog/libADM_dialog2.a  \
 ./ADM_colorspace/libADM_colorspace.a \
