@@ -115,7 +115,11 @@ int num_opts = 66;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2
+#ifdef CYG_MANGLING
+const char *ADM_DIR_NAME="\\avidemux";
+#else
 const char *ADM_DIR_NAME="/.avidemux";
+#endif
 /*
 ** we cannot put this into the header file, cause libxml headers
 ** are not reachable in all directories/Makefiles
@@ -241,7 +245,7 @@ int preferences::load(){
    char buf[1024];
    DIR   *dir;
 #if defined(CYG_MANGLING)
-	home="c:/";
+	home="c:\\";
 #else
 	if( ! (home=getenv("HOME")) )
 	{
@@ -381,7 +385,7 @@ int preferences::save_xml_to_file(){
    char *rcfile;
    char *rcfilenew;
 #if defined(CYG_MANGLING)
-	home="c:/";
+	home="c:\\";
         if((rcfile=checkDirAccess(home))==NULL) return RC_FAILED;
 	xmlSetDocCompressMode(xdoc,9);
 	if( xmlSaveFormatFile(rcfile,xdoc,1) == -1 ){
