@@ -192,7 +192,6 @@ NOTIFYICONDATA systray_init(GdkPixbuf *pixbuf,  char* text)
   GdkPixmap *pm;
   GdkBitmap *mask;
 
-  return; // Crash
   gdk_pixbuf_render_pixmap_and_mask(pixbuf, &pm, &mask, 128);
 
   char* locenc=NULL;
@@ -228,7 +227,6 @@ void systray_modify_icon (GdkPixmap *pm, GdkBitmap *mask)
 
 void systray_modify_tooltip (char* text) 
 {
-  return ; // Crash
   char *locenc=NULL;
 
   if(text) {
@@ -241,7 +239,6 @@ void systray_modify_tooltip (char* text)
 
 void systray_remove_nid(void) 
 {
- return; // crash
   DestroyWindow(nid.hWnd);
   Shell_NotifyIcon(NIM_DELETE,&nid);
 }
@@ -250,7 +247,10 @@ void systray_remove_nid(void)
 //*********************************************************
 void *adm_new_systray(GdkPixbuf *pixbuf, char *name)
 {
-  return (void *)systray_init(pixbuf,  name);
+void *r;
+  systray_init(pixbuf,  name);
+  r=(void *)0xdead;
+  return r;
 
 }
 void adm_delete_systray(void *systray)
@@ -259,6 +259,6 @@ void adm_delete_systray(void *systray)
 }
 void adm_change_tooltip(void *systray, const char *tips)
 {
-    void systray_remove_nid(tips) ;    
+    systray_modify_tooltip (tips ) ;
 }
 #endif
