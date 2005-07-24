@@ -21,7 +21,7 @@
 class ADM_tray
 {
 protected:
-
+        void    *sys;
 public:
                 ADM_tray(char *name);
                 ~ADM_tray();

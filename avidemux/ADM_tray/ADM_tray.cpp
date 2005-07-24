@@ -30,7 +30,7 @@ http://savannah.nongnu.org/cvs/?group=mldonkey
 
 extern "C"
 {
-#include "ADM_toolkit/eggtrayicon.h"
+#include "ADM_toolkit/systray.h"
 }
 #include <ADM_assert.h>
 #include "default.h"
@@ -41,9 +41,6 @@ extern "C"
 
 static int nbTray=0;
 
-static GtkWidget   *systray_icon = NULL;
-static GtkWidget   *evbox = NULL;
-static GtkTooltips *systray_icon_tooltips = NULL;
 extern GdkPixbuf        *create_pixbuf                  (const gchar     *filename);
 /*
 class ADM_tray
@@ -68,19 +65,7 @@ ADM_tray::ADM_tray(char *name)
   GdkPixbuf   *pixbuf;
 
   pixbuf=create_pixbuf("systray.xpm");
-  systray_icon = GTK_WIDGET (egg_tray_icon_new ("Avidemux"));
-  img = gtk_image_new_from_pixbuf (pixbuf);
-  evbox = gtk_event_box_new ();
-  gtk_container_add (GTK_CONTAINER (systray_icon), evbox);
-  gtk_container_add (GTK_CONTAINER (evbox), img);
-  gtk_widget_show_all (systray_icon);
-  gtk_widget_realize (systray_icon);
-  gtk_widget_show (systray_icon);
-
-  systray_icon_tooltips = gtk_tooltips_new ();
-  gtk_tooltips_enable (systray_icon_tooltips);
-
-  gtk_tooltips_set_tip (systray_icon_tooltips, systray_icon, "avidemux", "");
+  sys=adm_new_systray(pixbuf,name);
 
   
 
@@ -89,14 +74,16 @@ ADM_tray::~ADM_tray()
 {
         nbTray--;
         ADM_assert(!nbTray);
-        gtk_widget_destroy(systray_icon);
-        systray_icon=NULL;
+        if(sys)
+                adm_delete_systray(sys);
+        sys=NULL;
 }
 uint8_t ADM_tray::setPercent(int percent)
 {
 char percentS[40];
         sprintf(percentS,"%d %%",percent);
-         gtk_tooltips_set_tip (systray_icon_tooltips, systray_icon, percentS, "");
+        if(sys)
+                adm_change_tooltip(sys,percentS);
         return 1;
 }
 uint8_t ADM_tray::setStatus(int working)
