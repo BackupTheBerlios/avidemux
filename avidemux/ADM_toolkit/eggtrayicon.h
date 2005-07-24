@@ -21,7 +21,7 @@
 #ifndef __EGG_TRAY_ICON_H__
 #define __EGG_TRAY_ICON_H__
 
-#ifndef GUI_DISABLE_SYSTRAY
+#ifndef CYG_MANGLING
 
 #include <gtk/gtkplug.h>
 #include <gdk/gdkx.h>
@@ -59,12 +59,13 @@ struct _EggTrayIconClass
   GtkPlugClass parent_class;
 };
 
+
 GType        egg_tray_icon_get_type       (void);
 
 EggTrayIcon *egg_tray_icon_new_for_screen (GdkScreen   *screen,
 					   const gchar *name);
 
-EggTrayIcon *egg_tray_icon_new            (const gchar *name);
+
 
 guint        egg_tray_icon_send_message   (EggTrayIcon *icon,
 					   gint         timeout,
@@ -75,8 +76,16 @@ void         egg_tray_icon_cancel_message (EggTrayIcon *icon,
 
 GtkOrientation egg_tray_icon_get_orientation (EggTrayIcon *icon);
 
-G_END_DECLS
+EggTrayIcon *egg_tray_icon_new            (const gchar *name);
 
+G_END_DECLS
+#else
+/*************** win32 ***************/
+void systray_modify_tooltip (char* text) ;
+void systray_remove_nid(void);
+void systray_init(GdkPixbuf *pixbuf,  char* text) ;
+
+#endif
 #endif /* __EGG_TRAY_ICON_H__ */
 
-#endif /* not defined GUI_DISABLE_SYSTRAY */
+
