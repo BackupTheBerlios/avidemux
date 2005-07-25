@@ -18,7 +18,11 @@
  ***************************************************************************/
  #ifndef COLYUVRGB_H
  #define COLYUVRGB_H
- 
+ typedef enum ADM_colorspace
+ {
+    ADM_COLOR_RGB24,
+    ADM_COLOR_RGB32A  
+ };
  /* Convert YV12 to RGB32, the reset must be called at least once before using scale */
  class ColBase
  {
@@ -33,7 +37,7 @@
      virtual   uint8_t reset(uint32_t neww, uint32_t newh)=0;
      virtual   uint8_t scale(uint8_t *src, uint8_t *target)=0;  
  };
- //********************************************
+ //************ YV12 to RB32********************************
  class ColYuvRgb : public ColBase
  {
   protected:
@@ -46,16 +50,20 @@
  };
  //********************************************
 
-  /* Convert RGB24 to YV12, the reset must be called at least once before using scale */
-  class ColRgb24ToYV12  : public ColBase
+  /* Convert RGB24/32 to YV12, the reset must be called at least once before using scale */
+  class ColRgbToYV12  : public ColBase
   {
   protected:
-    
+                ADM_colorspace _colorspace;
   public:
-                ColRgb24ToYV12(uint32_t w, uint32_t h) : ColBase(w,h) {};
-                ~ColRgb24ToYV12(){clean();};
+                ColRgbToYV12(uint32_t w, uint32_t h,ADM_colorspace col) : ColBase(w,h) 
+                    {
+                            _colorspace=col;
+                    };
+                ~ColRgbToYV12(){clean();};
       virtual  uint8_t reset(uint32_t neww, uint32_t newh);
-      virtual  uint8_t scale(uint8_t *src, uint8_t *target);     
+      virtual  uint8_t scale(uint8_t *src, uint8_t *target);  
+               uint8_t changeColorSpace(ADM_colorspace col);   
       
   };
 //********************************************

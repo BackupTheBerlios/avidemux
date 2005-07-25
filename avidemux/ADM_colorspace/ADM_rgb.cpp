@@ -179,15 +179,17 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- uint8_t ColRgb24ToYV12::reset(uint32_t ww, uint32_t hh)
+ uint8_t ColRgbToYV12::reset(uint32_t ww, uint32_t hh)
  {
  int flags=0;
-	
-   CLEANUP();
+ int c;	
+    clean();
     FLAGS();
+    if(_colorspace==ADM_COLOR_RGB24) c=IMGFMT_RGB24;
+            else                     c=IMGFMT_RGB32;
 	 _context=(void *)sws_getContext(
 				    		ww,hh,
-						IMGFMT_RGB24 ,
+						c ,
 		 				ww,hh,
 	   					IMGFMT_YV12,
 	    					flags, NULL, NULL,NULL);
@@ -198,7 +200,7 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
     return 1;
 }
 //***********************************************
- uint8_t ColRgb24ToYV12::scale(uint8_t *src, uint8_t *target)
+ uint8_t ColRgbToYV12::scale(uint8_t *src, uint8_t *target)
  {
     uint8_t *srd[3];
 	uint8_t *dst[3];
@@ -213,8 +215,10 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
 			srd[0]=src;
 			srd[1]=0;
 			srd[2]=0;
-
-			ssrc[0]=w*3;
+            if(_colorspace==ADM_COLOR_RGB24)
+			    ssrc[0]=w*3;
+			else
+			    ssrc[0]=w*4;
 			ssrc[1]=0;
 			ssrc[2]=0;
 
@@ -229,6 +233,13 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
      
         return 1;
  }
+ uint8_t ColRgbToYV12::changeColorSpace(ADM_colorspace col)
+ {
+    if(col==_colorspace) return 1;
+    _colorspace=col;
+       
+ }
+ //*************************
 static inline void SwapMe(uint8_t *tgt,uint8_t *src,int nb);
 void SwapMe(uint8_t *tgt,uint8_t *src,int nb)
 {
