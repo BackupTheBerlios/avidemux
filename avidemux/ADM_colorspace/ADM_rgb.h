@@ -21,7 +21,8 @@
  typedef enum ADM_colorspace
  {
     ADM_COLOR_RGB24,
-    ADM_COLOR_RGB32A  
+    ADM_COLOR_RGB32A,
+    ADM_COLOR_RGB16
  };
  /* Convert YV12 to RGB32, the reset must be called at least once before using scale */
  class ColBase
@@ -54,16 +55,19 @@
   class ColRgbToYV12  : public ColBase
   {
   protected:
+                int             _bmpMode;
                 ADM_colorspace _colorspace;
   public:
                 ColRgbToYV12(uint32_t w, uint32_t h,ADM_colorspace col) : ColBase(w,h) 
                     {
                             _colorspace=col;
+                            _bmpMode=0;
                     };
                 ~ColRgbToYV12(){clean();};
       virtual  uint8_t reset(uint32_t neww, uint32_t newh);
       virtual  uint8_t scale(uint8_t *src, uint8_t *target);  
                uint8_t changeColorSpace(ADM_colorspace col);   
+               uint8_t setBmpMode(void);
       
   };
 //********************************************

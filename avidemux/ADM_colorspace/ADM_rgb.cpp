@@ -185,9 +185,14 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
  int c;	
     clean();
     FLAGS();
-    if(_colorspace==ADM_COLOR_RGB24) c=IMGFMT_RGB24;
-            else                     c=IMGFMT_RGB32;
-	 _context=(void *)sws_getContext(
+    switch(_colorspace)
+    {
+                case ADM_COLOR_RGB24:c=IMGFMT_RGB24;break;
+                case ADM_COLOR_RGB32A:c=IMGFMT_RGB32;break;
+                case ADM_COLOR_RGB16:c=IMGFMT_RGB16;break;
+                default: ADM_assert(0);
+    }
+         _context=(void *)sws_getContext(
 				    		ww,hh,
 						c ,
 		 				ww,hh,
@@ -199,37 +204,58 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
     h=hh;
     return 1;
 }
+uint8_t ColRgbToYV12::setBmpMode(void)
+{
+        _bmpMode=1;
+        return 1;
+}
+
 //***********************************************
  uint8_t ColRgbToYV12::scale(uint8_t *src, uint8_t *target)
  {
     uint8_t *srd[3];
-	uint8_t *dst[3];
-	int ssrc[3];
-	int ddst[3];
+        uint8_t *dst[3];
+        int ssrc[3];
+        int ddst[3];
+        int mul=0;
 
-	ADM_assert(_context);
-	
-			uint32_t page;
+        ADM_assert(_context);
 
-			page=w*h;
-			srd[0]=src;
-			srd[1]=0;
-			srd[2]=0;
-            if(_colorspace==ADM_COLOR_RGB24)
-			    ssrc[0]=w*3;
-			else
-			    ssrc[0]=w*4;
-			ssrc[1]=0;
-			ssrc[2]=0;
+        uint32_t page;
 
-			
-			dst[0]=target;
-			dst[1]=target+page;
-			dst[2]=target+((page*5)>>2);
-			ddst[0]=w;
-			ddst[1]=ddst[2]=w>>1;
+        page=w*h;
+        srd[0]=src;
+        srd[1]=0;
+        srd[2]=0;
 
-			sws_scale((SwsContext *)_context,srd,ssrc,0,h,dst,ddst);
+        switch(_colorspace)
+        {
+                case ADM_COLOR_RGB16:  mul=2;
+                        break;
+                case ADM_COLOR_RGB24:  mul=3;
+                        break;
+                case ADM_COLOR_RGB32A:  mul=4;
+                        break;
+        }
+        ssrc[0]=mul*w;
+        ssrc[1]=0;
+        ssrc[2]=0;
+
+        dst[0]=target;
+        dst[1]=target+page;
+        dst[2]=target+((page*5)>>2);
+        ddst[0]=w;
+        ddst[1]=ddst[2]=w>>1;
+        if(_bmpMode)
+        {
+                ssrc[0]=-mul*w;
+                srd[0]=src+mul*w*(h-1);
+                dst[2]=target+page;
+                dst[1]=target+((page*5)>>2);
+        }
+
+
+        sws_scale((SwsContext *)_context,srd,ssrc,0,h,dst,ddst);
      
         return 1;
  }
