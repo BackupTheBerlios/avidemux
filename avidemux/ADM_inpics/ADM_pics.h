@@ -25,7 +25,13 @@
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
 
-
+typedef enum
+{
+	PIC_BMP=1,
+	PIC_JPEG=2,
+	PIC_BMP2=3,
+	PIC_PNG=4
+};
 
 class picHeader         :public vidHeader
 {
