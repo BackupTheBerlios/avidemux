@@ -140,6 +140,14 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
       *type = Nuppel_FileType;
       return 1;
     }
+    uint32_t id2=id&0xFFFFFF;
+    if (magic[0]==0x474e5089) 
+    {
+
+      printf (" \n PNG file detected...\n");
+      *type = BMP_FileType;
+      return 1;
+    }
   if (magic[0] == R32(0x05364d42) ||
  		(magic[0] &0xffff)== R32(0xd8ff) 
 		||
