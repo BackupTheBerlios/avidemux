@@ -255,7 +255,15 @@ dnl config.h
  if test "x$have_xx_xvid" = "xyes"; then
  	AC_DEFINE(USE_XX_XVID,1,[use xvid api])
  fi
-
+dnl __________________libpng  ______________
+AC_MSG_CHECKING(for libpng )
+have_png=yes
+AC_CHECK_HEADER(png.h,,have_png=no)
+AC_CHECK_LIB(png,png_malloc,,have_png=no)
+ 
+if test "x$have_png" = "xyes"; then
+	AC_DEFINE(USE_PNG,1,[Png is available])
+fi
 dnl __________________xvid 1.0 ______________
 AC_MSG_CHECKING(for xvid codec 1.0)
 AC_CHECK_HEADER(xvid.h,,have_xvid4=no)
