@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
- 
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -31,222 +31,63 @@
 
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_rgb16.h"
-void                  	rgbrgb(uint32_t r,uint32_t g,uint32_t b,uint32_t *y,uint32_t *u,uint32_t *v,uint32_t scale);
 
 
-
-// constructor for mjpeg, init encoder and stuff
-decoderRGB16::decoderRGB16(uint32_t w,uint32_t h) :decoders(w,h)
+decoderRGB16::decoderRGB16(uint32_t w, uint32_t h):decoders(w, h)
 {
-		planar=new uint8_t[_w*_h*2];
+    planar = new uint8_t[_w * _h * 2];
+    color=new ColRgbToYV12(w,h,ADM_COLOR_RGB24);
+    color->reset(w,h);
+    color->setBmpMode();
 }
 decoderRGB16::~decoderRGB16()
 {
-		delete [] planar;
+    delete[]planar;
+    delete color;
 }
 
-//
-//
-//
-//	Y  =      (0.257 * R) + (0.504 * G) + (0.098 * B) + 16
-//	Cr = V =  (0.439 * R) - (0.368 * G) - (0.071 * B) + 128
-//	Cb = U = -(0.148 * R) - (0.291 * G) + (0.439 * B) + 128
-//
-//
-//
-
-uint8_t 	decoderRGB16::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag) 	
+static inline void SwapMe(uint8_t *tgt,uint8_t *src,int nb);
+void SwapMe(uint8_t *tgt,uint8_t *src,int nb)
 {
-uint32_t xx,yy,i;
-uint8_t *ry,*ru,*rv;
-uint16_t *in16   ;
-uint32_t  r,g,b;
-uint32_t  y,u,v;
-
- 	  if(flag)
-		       *flag=AVI_KEY_FRAME;
-
-         if(len==(3*_w*_h)) // rgb 24 ?
-         {
-           	printf("\n RGB24");
-         		return uncompressRGB24(  in,out, len);
-           }
-
-         	ry=out->data;
-          ru=planar;
-          rv=planar+_w*_h;
-          in16=(uint16_t *)in;
-
-         for( yy=_h;yy>0;yy--)
-         {
-           in16=(uint16_t *)in+(yy-1)*_w;
-         	for(xx =_w;xx>0;xx--)
-          {
-                   i=*in16++;
-           	     r=( ( i & 0x7C00 )>>10); 			// 0111 1100 0000 0000
-           	     g= (( i & 0x03E0)>>5);             // 0000 0011 1110 0000
-           	     b=( ( i & 0x001F));                   // 0000 0000 0001 1111
-
-                 	rgbrgb(r,g,b,&y,&u,&v,20);
-                     *ry++=(uint8_t)y;
-                     *ru++=(uint8_t)u;
-                     *rv++=(uint8_t)v;
-            }
-          }
-
-
-            // now shrink  u,v to v12
-            //
-            uint8_t *ru2,*rv2,a,bb,c,d;
-            uint32_t s;
-
-          ru=planar;
-          rv=planar+_w*_h;
-
-            rv2=out->data+_w*_h;
-            ru2=rv2+(_w*_h>>2);
-            for( yy=_h>>1;yy>0;yy--)
-            {
-		     for(xx =_w>>1;xx>0;xx--)
-            	{
-              	       a=*ru;
-                      	bb=*(ru+1);
-                        c=*(ru+_w);
-                        d=*(ru+_w+1);
-                        s=a+bb+c+d;
-                        s>>=2;
-                        *ru2++=s;
-                        ru+=2;
-
-                         a=*rv;
-                      	bb=*(rv+1);
-                        c=*(rv+_w);
-                        d=*(rv+_w+1);
-                        s=a+bb+c+d;
-                        s>>=2;
-                        *rv2++=s;
-                        rv+=2;
-             		}
-                   ru+=_w;
-                   rv+=_w;
-
-              }
-
-         return 1;
+    uint8_t r,g,b;
+   nb=nb;
+   while(nb--)
+   {
+       r=*src++;
+       g=*src++;
+       b=*src++;
+       *tgt++=b;
+       *tgt++=g;
+       *tgt++=r;
+       
+   }
+   return;
+    
 }
-uint8_t 	decoderRGB16::uncompressRGB24(uint8_t *in,ADMImage *out,uint32_t len) 	
+
+uint8_t decoderRGB16::uncompress(uint8_t * in, ADMImage * out,
+				 uint32_t len, uint32_t * flag)
 {
-UNUSED_ARG(len);
-uint32_t xx,yy; //i;
-uint8_t *ry,*ru,*rv;
-uint8_t *in8   ;
-uint32_t  r,g,b;
-uint32_t  y,u,v;
+    uint32_t xx,mul;
+    
+        xx=_w*_h;
 
+        if (flag)
+                *flag = AVI_KEY_FRAME;
 
-         	ry=out->data;
-          ru=planar;
-          rv=planar+_w*_h;
+    
+    if (len == (3 * xx))	// rgb 24 ?
+        color->changeColorSpace(ADM_COLOR_RGB24);
+    else if(len==(4*xx))
+                color->changeColorSpace(ADM_COLOR_RGB32A);
+        else if(len==2*xx)
+                        color->changeColorSpace(ADM_COLOR_RGB16);
+                                else return 0;
 
-         for( yy=_h;yy>0;yy--)
-         {
-           in8=(uint8_t *)in;
-           in8+=(yy-1)*3*_w;
-         	for(xx =_w;xx>0;xx--)
-          {
-            		b=*in8++;
-             		g=*in8++;
-            		r=*in8++;
+    mul=len/xx; // Byte/pixel in rgb colorspace
 
-                               	rgbrgb(r,g,b,&y,&u,&v,23);
+    if(! color->scale(in,out->data)) return 0;
 
-                     *ry++=(uint8_t)y;
-                     *ru++=(uint8_t)u;
-                     *rv++=(uint8_t)v;
-            }
-          }
-            // now shrink  u,v to v12
-            //
-            uint8_t *ru2,*rv2,a,bb,c,d;
-            uint32_t s;
-
-          ru=planar;
-          rv=planar+_w*_h;
-
-            rv2=out->data+_w*_h;
-            ru2=rv2+(_w*_h>>2);
-            for( yy=_h>>1;yy>0;yy--)
-            {
-		     for(xx =_w>>1;xx>0;xx--)
-            	{
-              	       a=*ru;
-                      	bb=*(ru+1);
-                        c=*(ru+_w);
-                        d=*(ru+_w+1);
-                        s=a+bb+c+d;
-                        s>>=2;
-                        *ru2++=s;
-                        ru+=2;
-
-                         a=*rv;
-                      	bb=*(rv+1);
-                        c=*(rv+_w);
-                        d=*(rv+_w+1);
-                        s=a+bb+c+d;
-                        s>>=2;
-                        *rv2++=s;
-                        rv+=2;
-             		}
-                   ru+=_w;
-                   rv+=_w;
-
-              }
-
-         return 1;
+        return 1;
 }
-//__________________________________
-//
-//  Convert RGB triplet to YUV scale
-//
-//
-//__________________________________
-
-#define CLIP(x) if(x>255) x=255; if(x<0) x=0;
-void                  	rgbrgb(uint32_t r,
-											uint32_t g,
-           								uint32_t b,
-                   					uint32_t *y,
-                        				uint32_t *u,
-                            		uint32_t *v,uint32_t scale)
-{
-
-int32_t yy,uu,vv;
-//                 		y= ((0.257 * r) + (0.504 * g) + (0.098 * b))*8.+16. ;
-// multiply *2^23 8388608
-                    yy=r*2155872+g*4227858+822083*b;
-
-						vv= 3682598*r;
-      					vv-=3087007*g;
-           			vv-=595591*b;
-					uu= 3682598*b;
-     				uu-= 1241513*r;
-         			uu-=2441084*g;
-
-                  yy>>=scale;
-                  yy+=16;
-
-              	vv>>=scale;
-                  vv+=128;
-
-                  uu>>=scale;
-                  uu+=128;
-				      CLIP(yy);
-                     CLIP(vv);
-                     CLIP(uu);
-            *u=uu;
-            *v=vv;
-            *y=yy;
-
-
- }
-
+//EOF
