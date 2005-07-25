@@ -66,6 +66,7 @@ extern "C" {
 #endif
 #include "ADM_codecs/ADM_mpeg.h"
 #include "ADM_codecs/ADM_vp3.h"
+#include "ADM_codecs/ADM_png.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
 #include "prefs.h"
@@ -187,6 +188,14 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 
 			  	     	return(decoders *)( new decoderFFhuff(w,h,extraLen,extraData));
 	   }
+#ifdef USE_PNG
+	   if(fourCC::check(fcc,(uint8_t *)"PNG "))
+          {
+
+                                        return(decoders *)( new decoderPng(w,h));
+           } 
+#endif
+	   
   if(fourCC::check(fcc,(uint8_t *)"FFVH"))
           {
 
