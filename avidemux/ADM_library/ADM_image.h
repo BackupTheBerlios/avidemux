@@ -23,7 +23,7 @@
 #ifndef ADM_IMAGE
 #define ADM_IMAGE
 #include "ADM_assert.h"
-
+#include "ADM_colorspace/ADM_rgb.h"
 
 typedef enum ADM_ASPECT
 {
@@ -59,9 +59,16 @@ public:
 	ADM_ASPECT	_aspect;	/// Aspect ratio
 	uint32_t	flags;		/// Flags for this image (AVI_KEY_FRAME/AVI_B_FRAME)
 
+// This 3 fields are only used to convery container (reference to other datas)
+// Between codec & editor
 	uint8_t         _isRef;         /// If True means the datas are just a link to data we don't own!
+        ADM_colorspace  _colorspace;    /// Colorspace we are moving, default is YV12
         uint8_t         _noPicture;     /// No picture to display
+
+// End of section dedicated to codec/editor transfer
+
         void            commonInit(uint32_t w,uint32_t h); /// sub constructor
+        
         uint32_t        GetPitch(ADM_PLANE plane)
                                 {
                                         switch(plane)

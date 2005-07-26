@@ -53,6 +53,7 @@ void    ADMImage::commonInit(uint32_t w,uint32_t h)
         imgCurNb++;
         _planes[0]=_planes[1]=_planes[2]=NULL;
         _noPicture=0;
+        _colorspace=ADM_COLOR_YV12;
 
 }
 ADMImage::ADMImage(uint32_t width, uint32_t height)
