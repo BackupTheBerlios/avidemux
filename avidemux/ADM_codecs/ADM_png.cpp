@@ -45,7 +45,7 @@ decoderPng::decoderPng(uint32_t w,uint32_t h) :decoders(w,h)
     
         rows=NULL;
         decoded=NULL;
-        color=NULL;
+        colorspace=ADM_COLOR_RGB24;
     
        
        //****************************
@@ -54,13 +54,7 @@ decoderPng::decoderPng(uint32_t w,uint32_t h) :decoders(w,h)
        decoded=new uint8_t[4*w*h]; // We take a bit more to be able to decode 32 bits png
                                     // without causing a segfault
        rows=new uint8_t * [h];
-      
-       
-      color=new ColRgbToYV12(_w,_h,ADM_COLOR_RGB24);
-      color->reset(_w,_h); 
-       
-      colorspace=ADM_COLOR_RGB24;
-      recalc();
+       recalc();
 }
 void decoderPng::Init(void)
 {
@@ -85,7 +79,7 @@ decoderPng::~decoderPng()
 {
  	  delete [] rows;
      delete [] decoded;
-     if(color) delete color;
+     
 }
 void decoderPng::recalc(void)
 {
@@ -130,7 +124,6 @@ uint8_t 	decoderPng::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t 
             // Switch to 32 bits
             colorspace=ADM_COLOR_RGB32A;
             recalc();
-            color->changeColorSpace(colorspace);   
         }
         else
         if(colorspace==ADM_COLOR_RGB32A &&  colortype==PNG_COLOR_TYPE_RGB)
@@ -138,13 +131,21 @@ uint8_t 	decoderPng::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t 
              // Switch to 24 bits
             colorspace=ADM_COLOR_RGB24;
             recalc();
-            color->changeColorSpace(colorspace);  
-            
         }
-        
-        // Convert to yv12
-        color->scale(decoded,out->data);
-		return 1;	
+        ADM_assert(out->_isRef);
+        out->_planes[0]=decoded;
+        out->_planes[1]=NULL;
+        out->_planes[2]=NULL;
+
+        if(colorspace==ADM_COLOR_RGB32A)
+                out->_planeStride[0]=_w*4;
+        else
+                out->_planeStride[0]=_w*3;
+        out->_planeStride[1]=0;
+        out->_planeStride[2]=0;
+        out->_colorspace=colorspace;
+
+        return 1;	
 }
 // ******************************************************
 //    Memory based IO

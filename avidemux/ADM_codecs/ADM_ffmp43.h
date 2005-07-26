@@ -37,7 +37,7 @@
                                         
      					decoderFF(uint32_t w,uint32_t h);
          		virtual		~decoderFF();
-                        virtual         uint8_t dontcopy(void) { return _refCopy;}   
+                        virtual         uint8_t dontcopy(void) { return 1;}   
     			virtual 	uint8_t 	uncompress(uint8_t *in,ADMImage *out,
 						uint32_t len,uint32_t *flag=NULL) 		;
    		       virtual 		void 	setParam( void );

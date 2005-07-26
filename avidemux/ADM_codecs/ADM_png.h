@@ -16,7 +16,7 @@
  #ifndef PNG_H_A
  #define PNG_H_A
 #ifdef USE_PNG
- #include "ADM_colorspace/ADM_rgb.h"
+ 
  typedef struct memAccess
  {
     int     size;
@@ -33,7 +33,6 @@
 				      void      *png_ptr;
                       void      *info_ptr;
                       void      *end_info;
-                      ColRgbToYV12   *color;
                       
                       uint8_t   **rows;
                       uint8_t   *decoded;
@@ -44,7 +43,7 @@
      						        decoderPng(uint32_t w,uint32_t h);
          		virtual			    ~decoderPng();
     			virtual uint8_t 	uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag=NULL);
-   		       	
+   		       	        uint8_t            dontcopy(void){return 1;}
 	
 
 }   ;

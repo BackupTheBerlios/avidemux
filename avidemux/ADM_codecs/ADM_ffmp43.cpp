@@ -250,9 +250,8 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 			
 		if(len==0 && !_allowNull) // Null frame, silently skipped
 				{
-            				if(flagz) *flagz=AVI_KEY_FRAME;
-              				printf("\n ff4: null frame\n");
-                                        if(dontcopy())
+                                        if(flagz) *flagz=AVI_KEY_FRAME;
+                                        printf("\n ff4: null frame\n");
                                         {
                                                 // search the last image
                                                 if(_context->coded_frame->data)
@@ -264,7 +263,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
                                                 else                                                
                                                         out->_noPicture=1;                                                
                                         }
-					return 1;
+                                        return 1;
 				}
 
 		ret= avcodec_decode_video(_context,&_frame,&got_picture, in, len);
@@ -285,8 +284,8 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 						printf("Probably pseudo black frame...\n");
 						out->_Qp=2;
 						out->flags=0; // assume P ?
-                                                if(dontcopy())
-                                                        clonePic(_context->coded_frame,out);
+
+                                                clonePic(_context->coded_frame,out);
 						if(flagz)
 							*flagz=out->flags;
 						return 1;
@@ -324,215 +323,37 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 			}
  			return 1;
 		}
-		// convert ffmpeg to our format : yv12
-		uint8_t **src;
-		uint32_t stridex[3];
-		uint8_t  *inx[3];
-		//printf("cspace %d\n", _context->pix_fmt);
 
-		switch(_context->pix_fmt)
-		{
-		case PIX_FMT_YUV411P:
-			stridex[0]=	_frame.linesize[0 ];
-			stridex[1]=	_frame.linesize[1 ];
-			stridex[2]=	_frame.linesize[2 ];
+                switch(_context->pix_fmt)
+                {
+                case PIX_FMT_YUV411P:
+                        out->_colorspace=ADM_COLOR_YUV411;
+                        break;
 
-			inx[0]=_frame.data[0];
-			inx[1]=_frame.data[1];
-			inx[2]=_frame.data[2];
-
-
-			COL_411_YV12(inx,stridex,_internalBuffer,_w,_h);
-
-			oBuff[0]=_internalBuffer;
-		 	oBuff[1]=_internalBuffer+_w*_h;
- 		 	oBuff[2]=oBuff[1]+((_w*_h)>>2);
-			src= (uint8_t **)oBuff;
-			_frame.linesize[0 ]=_w;
-			_frame.linesize[1 ]=_w>>1;
-			_frame.linesize[2 ]=_w>>1;
-			
-			
-			break;
-
-		case PIX_FMT_YUV422P:
+                case PIX_FMT_YUV422P:
                 case PIX_FMT_YUVJ422P:
-			//printf("422p\n");
-			stridex[0]=	_frame.linesize[0 ];
-			stridex[1]=	_frame.linesize[1 ];
-			stridex[2]=	_frame.linesize[2 ];
+                        out->_colorspace=ADM_COLOR_YUV422;
+                        break;
 
-			inx[0]=_frame.data[0];
-			inx[1]=_frame.data[1];
-			inx[2]=_frame.data[2];
-
-			
-			COL_422_YV12(inx,stridex,_internalBuffer,_w,_h);
-
-			oBuff[0]=_internalBuffer;
-		 	oBuff[1]=_internalBuffer+_w*_h;
- 		 	oBuff[2]=oBuff[1]+((_w*_h)>>2);
-			src= (uint8_t **)oBuff;
-			_frame.linesize[0 ]=_w;
-			_frame.linesize[1 ]=_w>>1;
-			_frame.linesize[2 ]=_w>>1;
-		
-			
-			break;
-		
-		case PIX_FMT_YUV420P:
-		case PIX_FMT_YUVJ420P:
-		// Default is YV12 or I420
-		// In that case depending on swap u/v
-		// we do it or not
-	                        if(dontcopy())
-                                {
-                                        clonePic(&_frame,out);
-                                        if(flagz)
-                                                               *flagz=out->flags;
-                                        return 1;
-                                }
-				//printf("420p\n");
-				src= (uint8_t **) _frame.data;
-				
-				if(_frame.qstride && _frame.qscale_table)	
-				{
-				if(out->quant)
-				{
-					{
-						uint8_t *src,*dst;
-						src=(uint8_t *)_frame.qscale_table;
-						dst=out->quant;
-						// Pack them
-						// /16 width = >>4
-						// /16 height= >>4
-						out->_qStride=(_w+15)>>4;
-						for(uint32_t y=0;y<((_h+15)>>4);y++)
-						{				
-							memcpy(dst,src,out->_qStride);
-							src+=_frame.qstride;
-							dst+=out->_qStride;
-							
-						}
-					}
-				}
-				}
-				else out->_qStride=0;
-
-			break;
-/*
-uint8_t COL_RawRGB32toYV12(uint8_t *data1,uint8_t *data2, uint8_t *oy,uint8_t *oy2, 
-				uint8_t *u, uint8_t *v,uint32_t lineSize)
-*/			
-		case PIX_FMT_RGBA32:
-				{
-				uint32_t stride;
-				uint8_t *data1,*data2;
-				uint8_t *oy,*oy2,*u,*v;
-				
-						
-						stride=	_frame.linesize[0 ];
-						data1=(uint8_t *)_frame.data[0];
-						data2=(uint8_t *)_frame.data[0]+stride;
-						oy=out->data;
-						oy2=out->data+_w;
-						if(!_swapUV)
-						{
-							u=out->data+(_w*_h);
-							v=out->data+((_w*_h*5)>>2);
-						
-						}
-						else
-						{
-							v=out->data+(_w*_h);
-							u=out->data+((_w*_h*5)>>2);	
-						}
-						
-						 COL_RawRGB32toYV12(data1,data2, oy,oy2, 
-							u, v,_w,_h,stride)	;
-						_lastQ=0; //_context->quality;	
-						if(flagz)
-						{
-							*flagz=frameType();
-						}
-						
- 						return 1;
-				}
-		default:
-				printf("\n Unhandled colorspace:%d\n",_context->pix_fmt);
-				return 0;
-				
-		}
-		// Pack the output so that stride=width
-		
-		uint8_t *tmp;
-		tmp=src[0];
-		uint8_t *otmp= out->data;
-		uint32_t stride;
-
-                ADM_assert(!dontcopy());
-
-		stride=  _frame.linesize[0 ];
-
-		for(uint32_t y=_h;y>0;y--)
-			{
-				 	memcpy(otmp,tmp,_w);
-				  	tmp+=stride;
-   				  	otmp+=_w;
-				}
-		
-
-		if(!_swapUV)
-		{
-			tmp= src[1];
-			stride=  _frame.linesize[1];
-		}
-		else
-		{
-			tmp= src[2];			
-			stride=  _frame.linesize[2];
-		}
-			
-
-		otmp= out->data+((5*_w*_h)>>2);
-
-		for(uint32_t y=_h>>1;y>0;y--)
-			{
-				 	memcpy(otmp,tmp,_w>>1);
-				  	tmp+=stride;
-   				  	otmp+=_w>>1;
-				}
-		if(!_swapUV)
-		{
-			tmp= src[2];			
-			stride=  _frame.linesize[2];
-		}
-		else
-		{
-			tmp= src[1];
-			stride=  _frame.linesize[1];
-		}
-		otmp= out->data+_w*_h;
-
-		for(uint32_t y=_h>>1;y>0;y--)
-			{
-				 	memcpy(otmp,tmp,_w>>1);
-				  	tmp+=stride;
-   				  	otmp+=_w>>1;
-				}
-
-		_lastQ=0; //_context->quality;
-	//	printf("FF %d :: \n",_frame.pict_type);
-		out->_Qp=(_frame.quality*32)/FF_LAMBDA_MAX;
-		//printf("%d %d\n",_frame.quality,FF_LAMBDA_MAX);
-		out->flags=frameType();
-		if(flagz)
-		{
-
-			*flagz=out->flags;
-		}
-		
- 		return 1;
+                case PIX_FMT_YUV420P:
+                case PIX_FMT_YUVJ420P:
+                // Default is YV12 or I420
+                // In that case depending on swap u/v
+                // we do it or not
+                        out->_colorspace=ADM_COLOR_YV12;
+                        break;
+                break;
+                case PIX_FMT_RGBA32:
+                        out->_colorspace=ADM_COLOR_RGB32A;
+                        break;
+                default:
+                                printf("\n Unhandled colorspace:%d\n",_context->pix_fmt);
+                                return 0;
+                }
+                clonePic(&_frame,out);
+                if(flagz)
+                        *flagz=out->flags;
+                return 1;
 }
 
 
