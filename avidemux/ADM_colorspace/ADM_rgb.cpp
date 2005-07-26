@@ -340,7 +340,10 @@ int c=0;
  
     switch(_colorspace)
     {
+     
+                case ADM_COLOR_BGR24:c=IMGFMT_BGR24;break;
                 case ADM_COLOR_RGB24:c=IMGFMT_RGB24;break;
+                case ADM_COLOR_BGR32A:c=IMGFMT_BGR32;break;
                 case ADM_COLOR_RGB32A:c=IMGFMT_RGB32;break;
                 case ADM_COLOR_RGB16:c=IMGFMT_RGB16;break;
                 case ADM_COLOR_YUV422:c=IMGFMT_422P;break;
@@ -404,8 +407,10 @@ uint8_t COL_Generic2YV12::transform(uint8_t **planes, uint32_t *strides,uint8_t 
         {
                 case ADM_COLOR_RGB16:  mul=2;
                         break;
+                case ADM_COLOR_BGR24:
                 case ADM_COLOR_RGB24:  mul=3;
                         break;
+                case ADM_COLOR_BGR32A:
                 case ADM_COLOR_RGB32A:  mul=4;
                         break;
                 default: ADM_assert(0);
@@ -423,15 +428,13 @@ uint8_t COL_Generic2YV12::transform(uint8_t **planes, uint32_t *strides,uint8_t 
         dst[2]=target+((page*5)>>2);
         ddst[0]=w;
         ddst[1]=ddst[2]=w>>1;
-//         if(_bmpMode)
-//         {
-//                 ssrc[0]=-mul*w;
-//                 srd[0]=src+mul*w*(h-1);
-//                 dst[2]=target+page;
-//                 dst[1]=target+((page*5)>>2);
-//         }
-
-
+        if(_colorspace==ADM_COLOR_BGR24 || _colorspace==ADM_COLOR_BGR32A)
+        {
+                ssrc[0]=-mul*w;
+                srd[0]=planes[0]+mul*w*(h-1);
+                dst[1]=target+page;
+                dst[2]=target+((page*5)>>2);
+        }
         sws_scale((SwsContext *)_context,srd,ssrc,0,h,dst,ddst);
      
         return 1;

@@ -23,6 +23,8 @@
  typedef enum ADM_colorspace
  {
     ADM_COLOR_RGB24,
+    ADM_COLOR_BGR24,
+    ADM_COLOR_BGR32A,
     ADM_COLOR_RGB32A,
     ADM_COLOR_RGB16,
     ADM_COLOR_YV12 = ADM_COLOR_IS_YUV,
