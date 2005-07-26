@@ -76,10 +76,13 @@ extern void initScaleTab( void );
 extern uint8_t initGUI( void );
 extern void ADM_memStat( void );
 extern uint8_t oplug_mpegInit(void);
+extern void     COL_init(void);
 
 extern "C"
 {
 extern void     VPInitLibrary();
+
+
 };
 
 
@@ -180,7 +183,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
     initScaleTab();
 
     loadEncoderConfig();
-    
+    COL_init();
    
     if (argc >= 2)
     {
