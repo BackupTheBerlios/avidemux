@@ -18,11 +18,16 @@
  ***************************************************************************/
  #ifndef COLYUVRGB_H
  #define COLYUVRGB_H
+
+#define ADM_COLOR_IS_YUV 0x1000
  typedef enum ADM_colorspace
  {
     ADM_COLOR_RGB24,
     ADM_COLOR_RGB32A,
-    ADM_COLOR_RGB16
+    ADM_COLOR_RGB16,
+    ADM_COLOR_YV12 = ADM_COLOR_IS_YUV,
+    ADM_COLOR_YUV422,
+    ADM_COLOR_YUV411
  };
  /* Convert YV12 to RGB32, the reset must be called at least once before using scale */
  class ColBase
@@ -83,4 +88,20 @@
       virtual  uint8_t scale(uint8_t *src, uint8_t *target);     
       
   };
+//*************************************
+class COL_Generic2YV12 
+{
+protected:
+                void        *_context;
+                uint32_t    w,h;  
+                uint8_t     clean(void);
+                ADM_colorspace _colorspace;
+    
+public:
+        
+                COL_Generic2YV12(uint32_t w, uint32_t h,ADM_colorspace) ;
+                ~COL_Generic2YV12(){clean();};
+                uint8_t transform(uint8_t **planes, uint32_t *strides,uint8_t *target);
+                
+};
  #endif

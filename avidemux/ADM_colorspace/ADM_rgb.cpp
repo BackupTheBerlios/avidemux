@@ -52,7 +52,15 @@ extern "C" {
 #define FLAGS()
 #endif
 
+void COL_init(void);
 
+void COL_init(void)
+{
+// int flags;
+//         FLAGS();
+//         sws_rgb2rgb_init(flags);
+
+}
  //***********************************************
  ColBase::ColBase(uint32_t ww, uint32_t hh)
  {
@@ -185,6 +193,7 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
  int c;	
     clean();
     FLAGS();
+    flags|=SWS_BILINEAR;
     switch(_colorspace)
     {
                 case ADM_COLOR_RGB24:c=IMGFMT_RGB24;break;
@@ -309,3 +318,125 @@ void SwapMe(uint8_t *tgt,uint8_t *src,int nb)
         return 1;
      
 }
+//***************************************************
+//***************************************************
+//***************************************************
+//***************************************************
+//***************************************************
+//***************************************************
+
+COL_Generic2YV12::COL_Generic2YV12(uint32_t ww, uint32_t hh,ADM_colorspace col)
+{
+int flags=0;
+int c=0; 
+
+        FLAGS();
+        flags|=SWS_BILINEAR;
+        _context=NULL;
+        w=ww;
+        h=hh;
+        _colorspace=col;
+      
+ 
+    switch(_colorspace)
+    {
+                case ADM_COLOR_RGB24:c=IMGFMT_RGB24;break;
+                case ADM_COLOR_RGB32A:c=IMGFMT_RGB32;break;
+                case ADM_COLOR_RGB16:c=IMGFMT_RGB16;break;
+                case ADM_COLOR_YUV422:c=IMGFMT_422P;break;
+                case ADM_COLOR_YUV411:c=IMGFMT_411P;break;
+                default: ADM_assert(0);
+    }
+         _context=(void *)sws_getContext(
+                                                ww,hh,
+                                                c ,
+                                                ww,hh,
+                                                IMGFMT_YV12,
+                                                flags, NULL, NULL,NULL);
+
+    if(!_context) ADM_assert(0);
+}
+
+uint8_t COL_Generic2YV12::clean(void)
+{
+        if(_context)
+                {
+                        sws_freeContext((SwsContext *)_context);
+                }
+                _context=NULL; 
+                return 1;  
+}
+uint8_t COL_Generic2YV12::transform(uint8_t **planes, uint32_t *strides,uint8_t *target)
+{
+ uint8_t *srd[3];
+        uint8_t *dst[3];
+        int ssrc[3];
+        int ddst[3];
+        int mul=0;
+
+        ADM_assert(_context);
+
+        uint32_t page;
+
+        page=w*h;
+     
+        if(_colorspace & ADM_COLOR_IS_YUV)
+        {
+                srd[0]=planes[0];
+                srd[1]=planes[1];
+                srd[2]=planes[2];
+
+                ssrc[0]=strides[0];
+                ssrc[1]=strides[1];
+                ssrc[2]=strides[2];
+
+        
+                dst[0]=target;
+                dst[1]=target+page;
+                dst[2]=target+((page*5)>>2);
+                ddst[0]=w;
+                ddst[1]=ddst[2]=w>>1;
+                sws_scale((SwsContext *)_context,srd,ssrc,0,h,dst,ddst);
+                return 1;
+        }
+        // Else RGB like colorspace
+        switch(_colorspace)
+        {
+                case ADM_COLOR_RGB16:  mul=2;
+                        break;
+                case ADM_COLOR_RGB24:  mul=3;
+                        break;
+                case ADM_COLOR_RGB32A:  mul=4;
+                        break;
+                default: ADM_assert(0);
+        }
+        srd[0]=planes[0];
+        srd[1]=0;
+        srd[2]=0;
+
+        ssrc[0]=mul*w;
+        ssrc[1]=0;
+        ssrc[2]=0;
+
+        dst[0]=target;
+        dst[1]=target+page;
+        dst[2]=target+((page*5)>>2);
+        ddst[0]=w;
+        ddst[1]=ddst[2]=w>>1;
+//         if(_bmpMode)
+//         {
+//                 ssrc[0]=-mul*w;
+//                 srd[0]=src+mul*w*(h-1);
+//                 dst[2]=target+page;
+//                 dst[1]=target+((page*5)>>2);
+//         }
+
+
+        sws_scale((SwsContext *)_context,srd,ssrc,0,h,dst,ddst);
+     
+        return 1;
+}
+//***************************************************
+//***************************************************
+//***************************************************
+//EOF
