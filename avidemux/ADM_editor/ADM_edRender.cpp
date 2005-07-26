@@ -452,8 +452,8 @@ uint32_t left,ww;
                                 return 1;
                         }
         }
-	// Quant ?
-	if(!tmpImage->quant || !tmpImage->_qStride)
+	// If not quant and it is already YV12, we can stop here
+	if((!tmpImage->quant || !tmpImage->_qStride) && tmpImage->_colorspace==ADM_COLOR_YV12)
 	{      
 		image->_Qp=2;
 		image->duplicate(tmpImage);
@@ -487,13 +487,9 @@ uint32_t left,ww;
 	tmpImage->_Qp=image->_Qp=(uint32_t)floor(sum);
 	
 	// Pp deactivated ?
-	if(!_pp.postProcType || !_pp.postProcStrength)
-	{
-                // nothing to do
-                if(_pp.swapuv)
-		      image->duplicateSwapUV(tmpImage);
-                else
-                        image->duplicate(tmpImage);
+	if(!_pp.postProcType || !_pp.postProcStrength || tmpImage->_colorspace!=ADM_COLOR_YV12)
+         {
+                dupe(tmpImage,image,&(_videos[seg]));
 		cache->updateFrameNum(image,frame);
                 if(refOnly) delete tmpImage;
 		aprintf("EdCache: Postproc disabled\n");
@@ -505,7 +501,9 @@ uint32_t left,ww;
 	if(tmpImage->flags & AVI_KEY_FRAME) type=1;
 		else if(tmpImage->flags & AVI_B_FRAME) type=3;
 			else type=2;
-	
+
+        ADM_assert(tmpImage->_colorspace==ADM_COLOR_YV12);
+
 	// we do postproc !
 	// keep
 	uint8_t *oBuff[3],*iBuff[3];
@@ -623,6 +621,29 @@ _next:
 		return 1;	
 
 }
+uint8_t ADM_Composer::dupe(ADMImage *src,ADMImage *dst,_VIDEOS *vid)
+{
+                if(src->_colorspace!=ADM_COLOR_YV12)
+                {
+                        // We need to do some colorspace conversion
+                        // Is there already one ?
+                        if(!vid->color)
+                        {
+                                vid->color=new COL_Generic2YV12(src->_width,src->_height,src->_colorspace);
+                        }
+                        // Since it is not YV12 it MUST be a ref
+                        ADM_assert(src->_isRef);
+                        vid->color->transform(src->_planes,src->_planeStride,dst->data);
+                        return 1;
+                }
+                // nothing to do
+                if(_pp.swapuv)
+                      dst->duplicateSwapUV(src);
+                else
+                        dst->duplicate(src);
+                return 1;
+}
+
 uint8_t ADM_Composer::setPostProc( uint32_t type, uint32_t strength, uint32_t swapuv)
 {
 	if(!_nb_video) return 0;

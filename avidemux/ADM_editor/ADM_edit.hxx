@@ -73,6 +73,7 @@ typedef struct
 {
   	vidHeader 							*_aviheader;
   	decoders							*decoder;
+        COL_Generic2YV12                                                *color;
 
 	uint32_t  							_audio_size;
 	uint64_t							_audio_duration; //! IN SAMPLE
@@ -101,6 +102,9 @@ typedef struct
 class ADM_Composer
 {
   private:
+                                        uint8_t dupe(ADMImage *src,ADMImage *dst,_VIDEOS *vid); 
+                                                                                // Duplicate img, do colorspace
+                                                                                // if needed
   					uint32_t	_internalFlags;
   					ADM_PP 		_pp;
 					ADMImage	*_imageBuffer;

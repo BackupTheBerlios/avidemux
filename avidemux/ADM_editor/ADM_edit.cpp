@@ -179,6 +179,8 @@ ADM_Composer::deleteAllVideos (void)
       // if there is a video decoder...
       if (_videos[vid].decoder)
 	delete _videos[vid].decoder;
+      if(_videos[vid].color)
+        delete _videos[vid].color;
       // prevent from crashing
       _videos[vid]._aviheader->close ();
       delete _videos[vid]._aviheader;
