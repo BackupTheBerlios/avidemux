@@ -92,6 +92,10 @@ uint32_t type,value;
   updatePostProc(&_pp);
   _imageBuffer=NULL;    
   _internalFlags=0;
+  // Start with a clean base
+  memset (_videos, 0, sizeof (_videos));
+  memset (_segments, 0, sizeof (_segments));
+  
 }
 /**
 	Remap 1:1 video to segments
@@ -113,6 +117,7 @@ uint8_t ADM_Composer::resetSeg( void )
 	}
 
   	_nb_segment=_nb_video;
+  	
 	dumpSeg();
 	return 1;
 }
@@ -190,6 +195,7 @@ ADM_Composer::deleteAllVideos (void)
     }
 
   memset (_videos, 0, sizeof (_videos));
+  
   
   if(_imageBuffer)
   	delete _imageBuffer;
