@@ -40,7 +40,7 @@ extern "C" {
 #define CLEANUP() \
     if(_context) \
     {\
-        if(ww==w || hh==h)\
+        if(ww==w && hh==h)\
            return 1; \
         clean();  \
     }
