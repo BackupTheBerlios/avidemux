@@ -72,6 +72,7 @@ DIA_encoding::DIA_encoding( uint32_t fps1000 )
 	_lastFrame=0;
 	_fps_average=0;
         tray=NULL;
+        tray=new ADM_tray("Encoding");
 
 }
 void DIA_encoding::setFps(uint32_t fps)
@@ -165,15 +166,15 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
            //	nb/total=timestart/totaltime -> total time =timestart*total/nb
            //
            //
-
+    
            if(nb==0) // restart ?
            {
-                                        if(!tray) tray=new ADM_tray("Encoding");
+                                       
 					clock.reset();
        					_lastTime=clock.getElapsedMS();;
        					_lastFrame=0;
        					_fps_average=0;
-                                        tray->setPercent(0);
+                       tray->setPercent(0);
 					  UI_purge();
 					  return;
 	  }
