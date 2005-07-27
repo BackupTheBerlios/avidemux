@@ -36,6 +36,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <fcntl.h>	/* O_RDONLY */
+#include <errno.h>
 
 #include "config.h"
 
@@ -936,14 +937,24 @@ extern void GUI_PreviewEnd (void);
 int A_openAvi2 (char *name, uint8_t mode)
 {
   uint8_t res;
+  char str[512];
 
   if (playing)
     return 0;
   /// check if name exists
   FILE *fd;
   fd = fopen (name, "rb");
-  if (!fd)
+  if (!fd){
+    if( errno == EACCES ){
+       snprintf(str,512,"can't open \"%s\": permission problem.\n",name);
+       GUI_Alert(str);
+    }
+    if( errno == ENOENT ){
+       snprintf(str,512,"can't open \"%s\": file does not exist.\n",name);
+       GUI_Alert(str);
+    }
     return 0;
+  }
   fclose (fd);
 
 
