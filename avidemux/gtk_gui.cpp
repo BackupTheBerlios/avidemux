@@ -938,6 +938,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 {
   uint8_t res;
   char str[512];
+  char *longname;
 
   if (playing)
     return 0;
@@ -982,10 +983,14 @@ int A_openAvi2 (char *name, uint8_t mode)
 
     }
   DIA_StartBusy ();
+  /*
+  ** we may get a relative patch by cmdline
+  */
+  longname = PathCanonize(name);
   if (mode)
-    res = video_body->addFile (name, 1);
+    res = video_body->addFile (longname, 1);
   else
-    res = video_body->addFile (name);
+    res = video_body->addFile (longname);
   DIA_StopBusy ();
 
   // forget last project file
@@ -996,6 +1001,7 @@ int A_openAvi2 (char *name, uint8_t mode)
 
   if (res!=ADM_OK)			// an error occured
     {
+	ADM_dealloc(longname);
     	if(ADM_IGN==res) 
 	{
 		return 0;
@@ -1010,7 +1016,6 @@ int A_openAvi2 (char *name, uint8_t mode)
 
     { int fd,i;
       char magic[4];
-      char *longname = PathCanonize(name);
 
 	/* check myself it is a project file (transparent detected and read
         ** by video_body->addFile (name);
@@ -1039,8 +1044,8 @@ int A_openAvi2 (char *name, uint8_t mode)
 			break;
 		}
 	UI_setTitle(longname+i);
-	ADM_dealloc(longname);
     }
+	ADM_dealloc(longname);
 	return 1;
 }
 
