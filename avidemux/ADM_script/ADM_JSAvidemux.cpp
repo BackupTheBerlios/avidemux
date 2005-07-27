@@ -76,6 +76,7 @@ JSFunctionSpec ADM_JSAvidemux::avidemux_methods[] =
         { "clearSegments", ClearSegments ,0,0,0}, // Clear all segments
         { "addSegment", AddSegment ,3,0,0}, // Clear all segments
 	{ "goToTime", GoToTime, 3, 0, 0 },	// more current frame to time index
+	{ "forceUnpack", forceUnpack, 0, 0, 0 },
 	{ 0 }
 };
 
@@ -435,6 +436,19 @@ JSBool ADM_JSAvidemux::GoToTime(JSContext *cx, JSObject *obj, uintN argc,
 	if(argc != 3)
 		return JS_FALSE;
 	*rval = INT_TO_JSVAL(A_jumpToTime(JSVAL_TO_INT(argv[0]),JSVAL_TO_INT(argv[1]),JSVAL_TO_INT(argv[2])));
+	return JS_TRUE;
+}// end GoToTime
+
+JSBool ADM_JSAvidemux::forceUnpack(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin GoToTime
+	ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+	// default return value
+	*rval = BOOLEAN_TO_JSVAL(false);
+	if(argc != 0)
+		return JS_FALSE;
+    video_body->setEnv(ENV_EDITOR_PVOP);
+	*rval = INT_TO_JSVAL(1);
 	return JS_TRUE;
 }// end GoToTime
 
