@@ -415,7 +415,7 @@ uint32_t left,ww;
                 ww=_imageBuffer->_width;
                 left=0;
        }
-	
+	tmpImage->_colorspace=ADM_COLOR_YV12;
 	// Do pp, and use imageBuffer as intermediate buffer
 	if (!_videos[seg].decoder->uncompress (compBuffer, tmpImage, len, &flags))
 	    {
