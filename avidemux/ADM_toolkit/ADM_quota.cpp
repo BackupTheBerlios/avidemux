@@ -8,6 +8,15 @@
 #include "default.h"
 extern uint8_t DIA_quota(char *);
 extern void GUI_Alert(const char *);
+struct qfile_t {
+        const char *filename;
+        unsigned int ignore;
+};
+#define qfile_len 2^15
+#define qfprintf_buf_len 8192
+#define msg_len 512
+static qfile_t qfile[qfile_len];
+
 #include <libxml/tree.h>
 int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
 
@@ -21,7 +30,7 @@ int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format){
   FILE *FD;
   int fd;
   xmlChar *p;
-	xmlDocDumpFormatMemory(cur,&mem,&numbytes,format);
+ 	xmlDocDumpFormatMemory(cur,&mem,&numbytes,format);
 	FD = qfopen(filename,"wb"); /* includes error handling, :-) */
 	if( !FD ){
 		free(mem);
@@ -39,32 +48,23 @@ int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format){
 	free(mem);
 	return 0;
 }
+uint8_t  quotaInit(void)
+{
+            memset(qfile,0,sizeof(qfile));  
+            return 1;
+}
 #endif
 
 /* why here?: don't use mean's malloc rewrites for all of the xml2 library */
 #include "ADM_assert.h"
 
-#define qfile_len 2^15
-#define qfprintf_buf_len 8192
-#define msg_len 512
 
 /* store open filenames and it's current "ignore"-status */
-struct qfile_t {
-	const char *filename;
-	unsigned int ignore;
-};
-static qfile_t qfile[qfile_len];
-static int  qinited=0;
 FILE *qfopen(const char *path, const char *mode){
     // Mean:Should be the first funtion to be called
     // The qfile array may or may not be initialized with 0
     // We will trigger an assert in the malloc if we send dummy
     
-    if(!qinited)
-        {
-            qinited=1;
-            memset(qfile,0,sizeof(qfile));  
-        }
   FILE * FD = NULL;
   int fd;
 	while( !FD ){

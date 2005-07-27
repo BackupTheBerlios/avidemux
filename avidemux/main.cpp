@@ -88,6 +88,7 @@ extern void     VPInitLibrary();
 
 void sig_segfault_handler(int signo);
 
+extern uint8_t  quotaInit(void);
 extern void ADMImage_stat( void );
 int global_argc;
 char **global_argv;
@@ -156,6 +157,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 	ADM_InitMemcpy();
 	
 // Load .avidemuxrc
+    quotaInit();
     prefs->load();
 
    if(!initGUI())
@@ -184,6 +186,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 
     loadEncoderConfig();
     COL_init();
+    
    
     if (argc >= 2)
     {
