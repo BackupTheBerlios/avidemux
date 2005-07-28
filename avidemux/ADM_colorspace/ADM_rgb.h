@@ -42,8 +42,8 @@
   public:
                 ColBase(uint32_t w, uint32_t h);
                 ~ColBase();
-     virtual   uint8_t reset(uint32_t neww, uint32_t newh)=0;
-     virtual   uint8_t scale(uint8_t *src, uint8_t *target)=0;  
+     virtual   uint8_t reset(uint32_t neww, uint32_t newh) {return 0;};
+     virtual   uint8_t scale(uint8_t *src, uint8_t *target){return 0;};  
  };
  //************ YV12 to RB32********************************
  class ColYuvRgb : public ColBase
