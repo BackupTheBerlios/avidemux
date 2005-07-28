@@ -3,6 +3,10 @@
 //
 // Description: 
 //
+//  YUY2 does not work on win32, U&V seems to be zeroed
+//
+//  The pitch stride has to be changed as there could be some padding depending on the OS
+//
 //
 // Author: mean <fixounet@free.fr>, (C) 2004
 //
@@ -34,7 +38,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <ADM_assert.h>
-#include "ADM_colorspace/colorspace.h"
+#include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_gui2/GUI_render.h"
 
 #include "ADM_gui2/GUI_accelRender.h"
@@ -52,13 +56,12 @@ static SDL_Overlay *sdl_overlay=NULL;
 static SDL_Surface *sdl_display=NULL;
 static SDL_Rect disp;
 
-#define FORCEYV12
-//#define TEST_YU2 1
+static ColBase *color=NULL;
 
-extern void YV12_422( uint8_t *in, uint8_t *out, uint32_t w,uint32_t h);
 sdlAccelRender::sdlAccelRender( void)
 {
-
+        useYV12=1;
+        decoded=NULL;
 }
 uint8_t sdlAccelRender::end( void)
 {
@@ -68,16 +71,24 @@ uint8_t sdlAccelRender::end( void)
 	}
 	if(sdl_display)
 	{
+    	SDL_UnlockSurface(sdl_display);
 		SDL_FreeSurface(sdl_display);
 	}
 	if(sdl_running)
 	{
 		SDL_QuitSubSystem(SDL_INIT_VIDEO);
 	}
+	if(decoded)
+	{
+        delete [] decoded;
+        decoded=NULL;	
+	}
 	sdl_running=0;
 	sdl_overlay=NULL;
 	sdl_display=NULL;
 	printf("SDL killed\n");
+	
+	
 }
 uint8_t sdlAccelRender::init( GtkWidget * window, uint32_t w, uint32_t h)
 {
@@ -92,6 +103,11 @@ int flags;
 	disp.x=0;
 	disp.y=0;
 
+	if(!useYV12)
+	{
+            color=new ColBase(720,480);
+            decoded=new uint8_t[w*h*2];
+    }
 	/* Hack to get SDL to use GTK window, ugly but works */
 #if !defined(CONFIG_DARWIN) && !defined(CYG_MANGLING)
 	{ char SDL_windowhack[32];
@@ -106,7 +122,7 @@ int flags;
         	return 0;
     	  }
 	sdl_running=1;
-	flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE ;//| SDL_NOFRAME;
+	flags = SDL_ANYFORMAT | SDL_HWPALETTE | SDL_HWSURFACE | SDL_NOFRAME;
   	bpp= SDL_VideoModeOK( w, h,  16, flags );
 	sdl_display= SDL_SetVideoMode( w, h,  bpp, flags );	
 	if(!sdl_display)
@@ -116,16 +132,15 @@ int flags;
 		return 0;
 	
 	}
+	SDL_LockSurface(sdl_display);
+	int cspace;
 	
-	
+	if(useYV12) cspace=SDL_YV12_OVERLAY;
+	    else    cspace=SDL_YUY2_OVERLAY;
 	//_______________________________________________________
 	sdl_overlay=SDL_CreateYUVOverlay((w),(h),
-#if (defined(CONFIG_DARWIN)|| defined(TEST_YU2)	) && !defined(FORCEYV12)
-		SDL_YUY2_OVERLAY
-#else		
-		SDL_YV12_OVERLAY
-#endif		
-		,sdl_display);
+        cspace,		
+		sdl_display);
 	if(!sdl_overlay)
 	{
 		end();
@@ -133,7 +148,8 @@ int flags;
 		return 0;
 	}
 	
-	printf("SDL_init ok, type is : %d,planes :%d\n",sdl_overlay->hw_overlay,sdl_overlay->planes);
+	int pitch=sdl_overlay->pitches[0];
+	printf("SDL_init ok, type is : %d,planes :%d pitch:%d\n",sdl_overlay->hw_overlay,sdl_overlay->planes,pitch);
 	if(!sdl_overlay->hw_overlay)
 	{
 		printf("** HW Acceleration disabled **\n");
@@ -141,27 +157,66 @@ int flags;
 		printf("** Darwin**\n");
 	#endif
 	}
+	if(!useYV12) color->reset(w,h);
 	return 1;
+}
+static void interleave(uint8_t *dst,uint8_t *src,int width, int stride, int lines)
+{
+    for(int y=0;y<lines;y++)
+    {
+        memcpy(dst,src,width);
+        src+=width;
+        dst+=stride;          
+    }   
 }
 uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h)
 {
-
+int pitch;
+int page=w*h;
 	ADM_assert(sdl_overlay);
 	SDL_LockYUVOverlay(sdl_overlay);	
+	pitch=sdl_overlay->pitches[0];
+//	printf("SDL: new pitch :%d\n",pitch);
+	if(useYV12)
+	{
+    	if(pitch==w)
+            memcpy(sdl_overlay->pixels[0],ptr,w*h);
+        else
+            interleave(sdl_overlay->pixels[0],ptr,w,pitch,h);
+            
+        pitch=sdl_overlay->pitches[1];
+        if(pitch==(w>>1))
+            memcpy(sdl_overlay->pixels[1],ptr+page,(w*h)>>2);
+        else
+            interleave(sdl_overlay->pixels[1],ptr+page,w>>1,pitch,h>>1);
+       
+        pitch=sdl_overlay->pitches[2];
+        if(pitch==(w>>1))
+            memcpy(sdl_overlay->pixels[2],ptr+(page*5)/4,(w*h)>>2);
+        else
+            interleave(sdl_overlay->pixels[2],ptr+(page*5)/4,w>>1,pitch,h>>1);  	
+	}else
+	{
+        color->reset(w,h);
+        if(pitch==2*w)
+        {
+            color->scale(ptr,sdl_overlay->pixels[0]);
+        }
+        else
+        {
+            color->scale(ptr,decoded);
+            interleave(sdl_overlay->pixels[0],decoded,2*w,pitch,h);
+        }
+    }	
 	
-#if (defined(CONFIG_DARWIN) || defined(TEST_YU2)	)&&!defined(FORCEYV12)
-	YV12_422( ptr, sdl_overlay->pixels[0],   w,  h);
-#else
-	memcpy(sdl_overlay->pixels[0],ptr,w*h);
-	memcpy(sdl_overlay->pixels[1],ptr+h*w,(w*h)>>2);
-	memcpy(sdl_overlay->pixels[2],ptr+((w*h*5)>>2),(w*h)>>2);
-#endif		
 	disp.w=w;
 	disp.h=h;
 	disp.x=0;
 	disp.y=0;
+	
 	SDL_UnlockYUVOverlay(sdl_overlay);
 	SDL_DisplayYUVOverlay(sdl_overlay,&disp);
+	
 	//printf("*\n");
 	return 1;
 }

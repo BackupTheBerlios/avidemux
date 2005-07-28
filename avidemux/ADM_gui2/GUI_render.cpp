@@ -35,7 +35,7 @@
 #include "prototype.h"
 //#include "ADM_colorspace/colorspace.h"
 //#include "ADM_gui/GUI_vars.h"
-#include "ADM_colorspace/ADM_rgb.h"
+
 
 #include "ADM_gui2/GUI_render.h"
 
@@ -46,6 +46,7 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 
 #include "prefs.h"
+#include "ADM_colorspace/ADM_rgb.h"
 
 static uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h);
 
