@@ -142,6 +142,7 @@ int rate;
         rate=rate*1000;
         rate/=_context->time_base.num;
 
+        _context->me_range=255; // Fix motion vector for picky players (pioneer)
 
   if (_id == FF_MPEG2)
     {
