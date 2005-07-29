@@ -22,6 +22,7 @@ const ADM_CONTAINER container[]=
   MK_CONT(OGM),
   MK_CONT(ES),
   MK_CONT(PS),
+  MK_CONT(TS),
   MK_CONT(AVI_DUAL),
   MK_CONT(AVI_UNP),
   MK_CONT(FMT_DUMMY)  

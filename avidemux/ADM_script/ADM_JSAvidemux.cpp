@@ -49,6 +49,7 @@ extern uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss);
 extern uint8_t addFile(char *name);
 
 uint8_t A_setContainer(const char *cont);
+const char *getCurrentContainerAsString(void);
 
 JSPropertySpec ADM_JSAvidemux::avidemux_properties[] = 
 { 
@@ -77,6 +78,8 @@ JSFunctionSpec ADM_JSAvidemux::avidemux_methods[] =
         { "addSegment", AddSegment ,3,0,0}, // Clear all segments
 	{ "goToTime", GoToTime, 3, 0, 0 },	// more current frame to time index
 	{ "forceUnpack", forceUnpack, 0, 0, 0 },
+        { "setContainer", setContainer, 1, 0, 0 },
+
 	{ 0 }
 };
 
@@ -452,6 +455,19 @@ JSBool ADM_JSAvidemux::forceUnpack(JSContext *cx, JSObject *obj, uintN argc,
 	return JS_TRUE;
 }// end GoToTime
 
+JSBool ADM_JSAvidemux::setContainer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+
+ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+        // default return value
+        *rval = BOOLEAN_TO_JSVAL(false);
+        if(argc != 1)
+                return JS_FALSE;
+        char *str = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+        if(A_setContainer(str))
+                *rval = BOOLEAN_TO_JSVAL( true);
+        return JS_TRUE;
+}
 uint8_t A_setContainer(const char *cont)
 {
        for(int i=0;i<NB_CONT;i++)
@@ -465,4 +481,17 @@ uint8_t A_setContainer(const char *cont)
        }
        printf("Cannot set output format \"%s\"\n",cont);
        return 0;
+}
+
+const char *getCurrentContainerAsString(void)
+{
+        ADM_OUT_FORMAT cont=UI_GetCurrentFormat();
+        for(int i=0;i<sizeof(container)/sizeof(ADM_CONTAINER);i++)
+        {
+                if(container[i].type==cont) 
+                        return container[i].name;
+        }
+        ADM_assert(0);
+        return NULL;
+
 }
