@@ -51,6 +51,7 @@ extern uint32_t frameStart,frameEnd;
 static uint32_t edFrameStart,edFrameEnd;
 uint8_t loadVideoCodecConf( char *name);
 uint8_t saveVideoCodecConf( char *name);
+const char *getCurrentContainerAsString(void);
 //extern int audioMP3bitrate ;
 extern const char              *audioSourceFromEnum(AudioSource src);
 // Ugly, will have to clean it later
@@ -221,7 +222,9 @@ char *pth;
                 case RESAMPLING_CUSTOM:        qfprintf(fd,"app.audio.resample=%u;\n",audioGetResample());break;
                 default:ADM_assert(0);
         }
+  // container
         
+  qfprintf(fd,"app.setContainer(\"%s\");\n",getCurrentContainerAsString());
   qfprintf(fd,"//app.Exit();\n");
   qfprintf(fd,"\n//End of script\n");
   // All done
