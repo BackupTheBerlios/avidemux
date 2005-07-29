@@ -81,8 +81,6 @@ extern void updateLoaded( void );
 extern void setPostProc(int v,int s);
 extern void HandleAction(Action action) ;
 static void call_buildtimemap( char *p);
-static void call_audioproc(char *p) ;
-static void call_videoproc(char *p) ;
 static void call_quit(char *p) ;
 static void setBegin(char *p)   ;
 static void setEnd(char *p)      ;
@@ -158,14 +156,12 @@ AUTOMATON reaction_table[]=
 		
 		{"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
 		{"run",			1,"load and run a script",		(one_arg_type)parseECMAScript},
-		{"audio-process",	0,"activate audio processing",		call_audioproc},
 		{"audio-normalize",	1,"activate normalization",		call_normalize},
 		{"audio-downsample",	1,"activate 48->44 downsampling",	call_downsample},
 		{"audio-resample",	1,"resample to x hz",			call_resample},
 		{"audio-mono2stereo",	0,"channel: convert mono to stereo",	call_mono2stereo},
 		{"audio-stereo2mono",	0,"channel: convert stereo tp mono",	call_stereo2mono},
 		
-		{"video-process",	0,"activate video processing",		call_videoproc},	
 		{"filters",		1,"load a filter preset",		filterLoadXml}   ,
 		{"codec-conf",		1,"load a codec configuration",		(one_arg_type )loadVideoCodecConf}   ,
 		{"vcd-res",		0,"set VCD resolution",			(one_arg_type)setVCD}              ,
@@ -203,9 +199,9 @@ AUTOMATON reaction_table[]=
 		{"audio-map",		0,"build audio map (MP3 VBR)",	call_buildtimemap},
 		{"audio-bitrate",	1,"set audio encoding bitrate",	call_audiobitrate},
 		{"fps",	1	,"set frames per second",	call_fps},
-		{"audio-codec",		1,"set audio codec (MP2/MP3/AC3/NONE/TOOLAME)",call_audiocodec},
+		{"audio-codec",		1,"set audio codec (MP2/MP3/AC3/NONE/TOOLAME/COPY)",call_audiocodec},
 		
-		{"video-codec",		1,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD)",				call_videocodec},
+		{"video-codec",		1,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD/COPY)",				call_videocodec},
 		{"video-conf",		1	,"set video codec conf (cq=q|cbr=br|2pass=size)[,mbr=br][,matrix=(0|1|2|3)]",				call_videoconf},
 //		{"2pass-log",		1	,"select the log file for 2 passes mode",				encoderSetLogFile},
 		{"set-pp",		2	,"set post processing default value, value(1=hdeblok|2=vdeblock|4=dering) and strength (0-5)",	(one_arg_type )	call_setPP},
@@ -332,8 +328,6 @@ int searchReactionTable(char *string)
 //_________________________________________________________________________
 
 void call_quit        (char *p) { UNUSED_ARG(p); exit(0);                            }
-void call_audioproc   (char *p) { UNUSED_ARG(p); HandleAction(ACT_AudioModeProcess); }
-void call_videoproc   (char *p) { UNUSED_ARG(p); HandleAction(ACT_VideoModeProcess); }
 
 
 
@@ -426,7 +420,8 @@ void call_audiocodec(char *p)
 	else if(!strcmp(p,"VORBIS"))
 		audioCodecSetcodec( AUDIOENC_VORBIS );		
 #endif		
-		
+	else if(!strcmp(p,"COPY"))
+		audioCodecSetcodec( AUDIOENC_COPY );		
 	else{
 		audioCodecSetcodec( AUDIOENC_NONE );
 		fprintf(stderr,"audio codec \"%s\" unknown.\n",p);
