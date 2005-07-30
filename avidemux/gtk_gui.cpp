@@ -108,6 +108,7 @@ void A_saveAudioDecodedTest (char *name);
 void A_openBrokenAvi (char *name);
 int A_openAvi2 (char *name, uint8_t mode);
 int A_appendAvi (char *name);
+void A_externalAudioTrack( void );
 extern void A_SaveAudioNVideo (char *name);
 void HandleAction (Action action);
 uint8_t A_rebuildKeyFrame (void);
@@ -548,15 +549,9 @@ case ACT_Pipe2Other:
     case ACT_CutWizard:
       ADM_cutWizard ();
       break;
-    case ACT_SecondAudioAC3:
-	      A_handleSecondTrack (2);
-      break;
-    case ACT_SecondAudioMP3:
-      A_handleSecondTrack (1);
-      break;
-    case ACT_SecondAudioNONE:
-      A_handleSecondTrack (0);
-      break;
+    case ACT_SecondAudioTrack:
+                A_externalAudioTrack();
+                break;
 
     case ACT_OpenAvi:
       GUI_FileSelRead ("Select AVI file...",(SELFILE_CB *) A_openAvi);
@@ -1572,6 +1567,7 @@ int A_loadNone( void )
 //
 //_____________________________________________________________
 AudioSource currentAudioSource=AudioAvi;
+AudioSource secondAudioSource=AudioNone;
 char *currentAudioName=NULL;
 //_____________________________________________________________
 //
@@ -1811,78 +1807,6 @@ cleanUp (void)
 extern uint8_t selecEncoder (uint8_t * codec);
 
 
-/*void A_selectEncoder ( void )
-{
-		
-       selecEncoder( &codec_in_use );
-} */
-/*
-  		0-> None
-    	1->	MP3
-     	2-> AC3
-
-*/
-void
-A_handleSecondTrack (int tracktype)
-{
-  /* lock which one is selected in GUI */
-char *trackName=NULL;
-	 if (secondaudiostream)
-	{
-	  delete secondaudiostream;
-	  secondaudiostream = NULL;
-	  printf ("\n second audio stream destroyed\n");
-	}
-	GUI_FileSelRead("Second Track", &trackName);
-	if(!trackName)
-		{
-			printf("Cancelled\n");
-			return ;
-		}
-	switch(tracktype)
-	{
-		case 0:
-			return;
-			break;
-		case 1: //MP3
-		{
-			 AVDMMP3AudioStream *tmp;
-
-  			tmp = new AVDMMP3AudioStream ();
-  			if (!tmp->open (trackName))
-    			{
-      				delete tmp;
-      				printf ("\n Cancelled MP3 load\n");
-    			}
-  			else
-    			{
-      				secondaudiostream = tmp;      
-      				printf ("\n MP3 loaded\n");
-				GUI_Info("Second track loaded.");
-    			}
-		}
-			break;
-		case 2: //AC3
-			{
-			AVDMAC3AudioStream *tmp;
-
-  			tmp = new AVDMAC3AudioStream ();
-  			if (!tmp->open (trackName))
-    			{
-      				delete tmp;
-      				printf ("\n Cancelled AC3 load\n");
-    			}
-  			else
-    			{
-      				secondaudiostream = tmp;
-      				printf ("\n AC3 loaded\n");
-				GUI_Info("Second track loaded.");
-    			}
-			}
-			break;
-		default: ADM_assert(0);
-	}
-}
 
 
 #warning fixme
@@ -2423,6 +2347,102 @@ void A_audioTrack( void )
                         ADM_assert(0);
         }
 }
+void A_externalAudioTrack( void )
+{
+        uint32_t nb=0,*infos=NULL;
+        AudioSource old,nw;        
+        uint8_t r=0;
+        uint32_t oldtrack,newtrack;
+
+//secondaudiostream
+
+
+        nw=secondAudioSource;
+        r=DIA_audioTrack(&nw, NULL,0, NULL);
+        if(!r) return;
+
+        if(secondAudioSource!=AudioNone)
+        {
+                 delete secondaudiostream;
+                 secondAudioSource=AudioNone;
+                 secondaudiostream=NULL;
+        }
+        switch( nw)
+        {
+                case AudioNone:break;
+                case AudioMP3:
+                        {
+                        AVDMMP3AudioStream *tmp;
+                        char               *name=NULL;
+                        GUI_FileSelRead("MP3 to use as 2nd track",&name);
+                        if(!name) break;
+
+                        tmp = new AVDMMP3AudioStream ();
+                        if (!tmp->open (name))
+                        {
+                                delete tmp;
+                                GUI_Alert("Error loading that mp3");
+                        }
+                        else
+                        {
+                                secondaudiostream = tmp;     
+                                secondAudioSource=AudioMP3;
+                                printf ("\n MP3 loaded\n");
+                                GUI_Info("Second track loaded.");
+                        }
+                        }
+                        break;
+                case AudioAC3:
+                          {
+                        AVDMAC3AudioStream *tmp;
+                        char               *name=NULL;
+                        GUI_FileSelRead("AC3 to use as 2nd track",&name);
+                        if(!name) break;
+
+                        tmp = new AVDMAC3AudioStream ();
+                        if (!tmp->open (name))
+                        {
+                                delete tmp;
+                                GUI_Alert("Error loading that ac3");
+                        }
+                        else
+                        {
+                                secondaudiostream = tmp;     
+                                secondAudioSource=AudioAC3;
+                                printf ("\n AC3 loaded\n");
+                                GUI_Info("Second track loaded.");
+                        }
+                        }
+                        break;
+                case AudioWav:
+                         {
+                        AVDMWavAudioStream *tmp;
+                        char               *name=NULL;
+                        GUI_FileSelRead("Wav to use as 2nd track",&name);
+                        if(!name) break;
+
+                        tmp = new AVDMWavAudioStream ();
+                        if (!tmp->open (name))
+                        {
+                                delete tmp;
+                                GUI_Alert("Error loading that Wav");
+                        }
+                        else
+                        {
+                                secondaudiostream = tmp;     
+                                secondAudioSource=AudioAC3;
+                                printf ("\n AC3 loaded\n");
+                                GUI_Info("Second track loaded.");
+                        }}
+                        break;
+                default:
+                ADM_assert(0);
+        }
+}
+
+
+             
+
 //****************
 uint8_t A_TimeShift(void)
 {

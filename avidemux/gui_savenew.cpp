@@ -75,6 +75,14 @@ uint32_t end;
 			family=CodecFamilyMpeg;
 		}
 	}
+        else
+        {
+                if(UI_GetCurrentFormat()==ADM_AVI_DUAL)
+                {
+                        GUI_Alert("Dual audio can only be used \n in copy mode (video Codec=copy)");
+                        return 0;
+                }
+        }
 	printf("**saving:**\n");
 	// Check if we need to do a sanity B frame check
 	if(!videoProcessMode())

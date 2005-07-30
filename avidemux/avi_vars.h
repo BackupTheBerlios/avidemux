@@ -85,10 +85,6 @@ EXTERN AVDMGenericAudioStream *secondaudiostream
 #endif
 ;
 
-EXTERN uint8_t secondaudiostream_isac3
-#ifdef __DECLARE__
-=0 // else mp3
-#endif
 ;
 EXTERN aviInfo   *avifileinfo
 #ifdef __DECLARE__

@@ -121,11 +121,7 @@ ACT_DecoderOption   ,
 ACT_SelectEncoder,
 ACT_Fast,
 
-ACT_SecondAudioAC3,
-ACT_SecondAudioMP3,
-ACT_SecondAudioNONE,
-
-
+ACT_SecondAudioTrack,
 
 ACT_SelectDevOSS,
 ACT_SelectDevDummy,
