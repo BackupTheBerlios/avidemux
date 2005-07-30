@@ -28,6 +28,7 @@
 #include "callbacks.h"
 //#include "avi_vars.h"
 #include "default.h"
+#include "prefs.h"
 
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -50,6 +51,9 @@ static void DIA_stop( void);
 static uint8_t stopReq=0;
 DIA_encoding::DIA_encoding( uint32_t fps1000 )
 {
+uint32_t useTray=0;
+        if(!prefs->get(FEATURE_USE_SYSTRAY,&useTray)) useTray=0;
+
 	ADM_assert(dialog==NULL);
 	stopReq=0;
 	
@@ -59,6 +63,7 @@ DIA_encoding::DIA_encoding( uint32_t fps1000 )
 	_current=0;
 	setFps(fps1000);
 	dialog=create_dialog1();
+        
 	gtk_register_dialog(dialog);
 	//gtk_transient(dialog);
 	gtk_signal_connect(GTK_OBJECT(WID(closebutton1)), "clicked",
@@ -67,12 +72,15 @@ DIA_encoding::DIA_encoding( uint32_t fps1000 )
 		       GTK_SIGNAL_FUNC(on_destroy_abort), NULL);
 	gtk_widget_show(dialog);
 //	gtk_window_set_modal(GTK_WINDOW(dialog), 1);
-	UI_iconify();
+        if(useTray)
+	       UI_iconify();
 	_lastTime=0;
 	_lastFrame=0;
 	_fps_average=0;
         tray=NULL;
-        tray=new ADM_tray("Encoding");
+        
+        if(useTray)
+                tray=new ADM_tray("Encoding");
 
 }
 void DIA_encoding::setFps(uint32_t fps)
@@ -174,7 +182,8 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
        					_lastTime=clock.getElapsedMS();;
        					_lastFrame=0;
        					_fps_average=0;
-                       tray->setPercent(0);
+                                        if(tray)
+                                                tray->setPercent(0);
 					  UI_purge();
 					  return;
 	  }
@@ -226,7 +235,8 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 		// update progress bar
 		 float f=nb;
 		 f=f/total;
-                tray->setPercent((int)(f*100.));
+                if(tray)
+                        tray->setPercent((int)(f*100.));
 		gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
 		sprintf(string,"Done : %02d%%",(int)(100*f));
