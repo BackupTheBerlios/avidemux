@@ -146,7 +146,7 @@ COMPRES_PARAMS	ffmpegFFV1=
 {
 		CodecFFV1,
 		"FFV1 (lavcodec)",
-		"FFHUFF",
+		"FFV1",
 		"Lavcodec FFV1",
 		COMPRESS_CQ,
 		4,
