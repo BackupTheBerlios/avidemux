@@ -391,7 +391,7 @@ float duration;
 	_videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
         if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
         {
-                GUI_Alert("It is possible the audio track is MP3 VBR.\nUse audio/build time map.");
+                GUI_Info_HIG("VBR MP3 audio detected", "For impeccable A/V synchronization, use \"Audio -> Build VBR Time Map\".");
         }
 
     }
