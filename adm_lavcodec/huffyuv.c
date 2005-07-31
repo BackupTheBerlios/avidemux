@@ -529,7 +529,7 @@ static int encode_init(AVCodecContext *avctx)
             return -1;
         }
     }else s->context= 0;
-    
+#if 0  //MEANX   
     if(avctx->codec->id==CODEC_ID_HUFFYUV){
         if(avctx->pix_fmt==PIX_FMT_YUV420P){
             av_log(avctx, AV_LOG_ERROR, "Error: YV12 is not supported by huffyuv; use vcodec=ffvhuff or format=422p\n");
@@ -545,7 +545,7 @@ static int encode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "This codec is under development; files encoded with it may not be decodable with future versions!!! Set vstrict=-2 / -strict -2 to use it anyway.\n");
         return -1;
     }
-    
+#endif
     ((uint8_t*)avctx->extradata)[0]= s->predictor;
     ((uint8_t*)avctx->extradata)[1]= s->bitstream_bpp;
     ((uint8_t*)avctx->extradata)[2]= s->interlaced ? 0x10 : 0x20;
