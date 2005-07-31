@@ -85,6 +85,7 @@
                 VF_ASHARP,
 		VF_CNR2,
 		VF_DELTA,
+                VF_UNBLEND,
 		VF_DUMMY
  	 }VF_FILTERS;
  	
