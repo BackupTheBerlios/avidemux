@@ -49,6 +49,7 @@ static char LogName[500];
 AVCodec *codec=avcodec_find_encoder(x);\
 if(!codec) {GUI_Alert("Internal error opening codec"#x);ADM_assert(0);} \
   res=avcodec_open(_context, codec); \
+  if(res<0) {GUI_Alert("Internal error with context for  codec"#x);ADM_assert(0);} \
 } 
 
 static myENC_RESULT res;
