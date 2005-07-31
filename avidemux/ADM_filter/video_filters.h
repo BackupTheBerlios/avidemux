@@ -84,6 +84,7 @@
                 VF_MSHARPEN,
                 VF_ASHARP,
 		VF_CNR2,
+		VF_DELTA,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

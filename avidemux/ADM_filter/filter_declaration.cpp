@@ -117,6 +117,7 @@ printf(  "*********************\n");
         REGISTERX("hue","Mplayer Hue",VF_HUE,1,hue_create,hue_script);
         REGISTERX("eq2","Mplayer Eq2",VF_EQ2,1,Eq2_create,Eq2_script);
         REGISTERX("cnr2","CNR2 (MarcFD/Tritical)",VF_CNR2,1,cnr2_create,cnr2_script);
+        REGISTERX("delta","Luma delta",VF_DELTA,1,delta_create,delta_script);
 		
 	registerFilter("-------------- Smoother -------------",VF_INVALID,2,NULL,NULL);
 	//   registerFilter("Temporal smoother",tempsmooth_create);	
