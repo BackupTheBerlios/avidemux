@@ -1,39 +1,8 @@
 //
-//      chroma noise reduction II (version 2.6.1) - Avisynth filter reducing noise on chroma
-//      Copyright (C) 2002 Marc Fauconneau
+//      Try to detect blended image
+//      Mean (C) 2005
+//      GPL v2.0
 //
-//      Inspired by :
-//  chroma noise reduction (version 1.1) - VirtualDub filter reducing noise on chroma
-//  Copyright (C) 2000 Gilles Mouchard
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-//
-//  Please contact me for any bugs or questions.
-//  marc.fd@libertysurf.fr
-//
-//  Change log :
-//         30/06/2004 - ver 2.6.1 - YUY2 opts as I had slowed it down - tritical 
-//         29/06/2004 - ver 2.6  - Some bug fixes and some code cleanup 
-//                                 and rewriting (tritical - kes25c@mizzou.edu)
-//         18/11/2003 - ver 2.51 - Further bug fixes (by Klaus Post)
-//         13/11/2003 - ver 2.5  - Bug fixes (by Klaus Post)
-//         15/12/2002 - ver 2.4  - Bug fixes
-//         13/11/2002 - ver 2.3  - YV12 mode, scd (scenechange detection)
-//         01/08/2002 - ver 2.2  - Ugly bug fixed
-//         31/07/2002 - ver 2.1  - Bug Fixes (thx to dividee ;)
-//         20/07/2002 - ver 2.0  - Avisynth filter coded (from scratch)
 
 
 #include "config.h"
