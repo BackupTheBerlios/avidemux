@@ -43,7 +43,9 @@ uint8_t  DIA_GetIntegerValue(int *value, int min, int max, const char *title, co
 	while(ret==-1)
 	{
 		dialog=create_dialog2(min,max);
-		gtk_transient(dialog);
+		gtk_register_dialog(dialog);
+                gtk_widget_grab_focus (WID(spinbutton1));
+                gtk_widget_grab_default(WID(okbutton1));
 		sprintf(string,"%d",*value);
 
         	//gtk_entry_set_text(GTK_ENTRY(lookup_widget(dialog,"entry1")),string);
@@ -66,7 +68,8 @@ uint8_t  DIA_GetIntegerValue(int *value, int min, int max, const char *title, co
 		}
 		else
 			ret=0;
-	gtk_widget_destroy(dialog);
+                gtk_unregister_dialog(dialog);
+                gtk_widget_destroy(dialog);
 	};
 	return ret;
 }
@@ -207,6 +210,7 @@ GtkWidget	*create_dialog2 (int mmin, int mmax)
   gtk_widget_show (spinbutton1);
   gtk_box_pack_start (GTK_BOX (vbox1), spinbutton1, FALSE, FALSE, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton1), TRUE);
+  GTK_WIDGET_UNSET_FLAGS (spinbutton1, GTK_CAN_DEFAULT);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
