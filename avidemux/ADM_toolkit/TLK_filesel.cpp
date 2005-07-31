@@ -43,7 +43,10 @@
 static void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw, char **name=NULL);
 char            *PathCanonize(const char *tmpname);
 void            PathStripName(char *str);
+uint8_t         initFileSelector(void);
 
+static GtkFileFilter   *filter_avi=NULL,*filter_mpeg=NULL,*filter_image=NULL,*filter_all=NULL;
+static uint8_t          setFilter( GtkWidget *dialog);
 
 /**
 	Select a file
@@ -72,6 +75,8 @@ DIR *dir=NULL;
                                       GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
                                       NULL);
 	gtk_window_set_title (GTK_WINDOW (dialog),title);
+        initFileSelector();
+        setFilter(dialog);
 	gtk_transient(dialog);
 	if(source)
 	{
@@ -203,7 +208,8 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 	char *tmpname;
 	gchar *selected_filename;
         uint8_t res;
-        
+
+       
 	if(rname)
 		*rname=NULL;
 
@@ -215,6 +221,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
                                       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                       GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
                                       NULL);
+                        
         }
         else
         {
@@ -225,6 +232,10 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
                                       GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
                                       NULL);
         }
+        /**********/
+        initFileSelector();
+        setFilter(dialog);
+        /**********/
         gtk_window_set_title (GTK_WINDOW (dialog),label);
         gtk_register_dialog(dialog);
         if(rw)
@@ -241,7 +252,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
                 if( (dir=opendir(str)) )
                 {
                         closedir(dir);
-                        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)str);
+                        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),(gchar *)str);
                 }
                 delete [] str;
         }
@@ -413,4 +424,51 @@ void PathSplit(char *str, char **root, char **ext)
 		*root=full;
 		return ;
 }
+/* Mean:It seems it is attached to the dialog & destroyed with it
+   As it leads to crash if we don't recreate them each time....*/
+uint8_t         initFileSelector(void)
+{
 
+#define ADD_PAT(x,y) gtk_file_filter_add_pattern(x,"*."#y);
+        
+        filter_avi=gtk_file_filter_new();
+        gtk_file_filter_set_name(filter_avi,"Avi (*.avi)");
+        ADD_PAT(filter_avi,avi);
+        ADD_PAT(filter_avi,AVI);
+        
+        filter_mpeg=gtk_file_filter_new();
+        gtk_file_filter_set_name(filter_mpeg,"Mpeg (*.m*,*.vob)");
+        ADD_PAT(filter_mpeg,[mM][12][Vv]);
+        ADD_PAT(filter_mpeg,[Mm][pP][gG]);
+        ADD_PAT(filter_mpeg,[Vv][Oo][Bb]);
+        ADD_PAT(filter_mpeg,ts);
+        ADD_PAT(filter_mpeg,TS);
+
+       
+        filter_image=gtk_file_filter_new();
+        gtk_file_filter_set_name(filter_image,"Images");
+        ADD_PAT(filter_image,png);
+        ADD_PAT(filter_image,bmp);
+        ADD_PAT(filter_image,jpg);
+
+        ADD_PAT(filter_image,PNG);
+        ADD_PAT(filter_image,BMP);
+        ADD_PAT(filter_image,JPG);
+
+
+        
+        filter_all=gtk_file_filter_new();
+        gtk_file_filter_set_name(filter_all,"All");
+        gtk_file_filter_add_pattern (filter_all, "*");
+
+        return 1;
+}
+
+uint8_t setFilter( GtkWidget *dialog)
+{
+        gtk_file_chooser_add_filter     (GTK_FILE_CHOOSER(dialog), filter_avi);
+        gtk_file_chooser_add_filter     (GTK_FILE_CHOOSER(dialog), filter_mpeg);
+        gtk_file_chooser_add_filter     (GTK_FILE_CHOOSER(dialog), filter_image);
+        gtk_file_chooser_add_filter     (GTK_FILE_CHOOSER(dialog), filter_all);
+        return 1;
+}
