@@ -159,6 +159,12 @@ int ret=0;
 
 	return ret;
 }
+
+/*
+GUI_Info: display an info dialog.
+Deprecated - use GUI_Info_HIG instead.
+*/
+
 void             GUI_Info(const char *alertstring)
 {
         GtkWidget *dialog;
@@ -179,10 +185,43 @@ void             GUI_Info(const char *alertstring)
 
 }
 
+/*
+GUI_Info_HIG: display an info dialog.
+Takes primary and secondary strings, as described in GNOME HIG 2.0.
+*/
+
+void GUI_Info_HIG(const char *primary, const char *secondary)
+{
+	GtkWidget *dialog;
+	
+	if(beQuiet)
+	{
+		if (secondary)
+			printf("Info: %s\n%s\n", primary, secondary);
+		else
+			printf("Info: %s\n", primary);
+		return;
+	}
+	dialog=create_dialogInfo();
+	char *alertstring;
+	if (secondary)
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary, NULL);
+	else
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>", NULL);
+	gtk_label_set_text(GTK_LABEL(WID(label1)), alertstring);
+	gtk_label_set_use_markup(GTK_LABEL(WID(label1)), TRUE);
+	gtk_register_dialog(dialog);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_unregister_dialog(dialog);
+	gtk_widget_destroy(dialog);
+	UI_purge();
+}
+
 /**
 	GUI_Alert : Just display an alert string in a dialog box
 	The string can contain \n for multi lines display
-
+	
+	Deprecated - for error alerts, use GUI_Error_HIG.
 */
 void 		GUI_Alert(const char *alertstring)
 {
@@ -202,6 +241,38 @@ void 		GUI_Alert(const char *alertstring)
         gtk_widget_destroy(dialog);
 	UI_purge();
 
+}
+
+/*
+GUI_Error_HIG: display an error dialog.
+Takes primary and secondary strings, as described in GNOME HIG 2.0.
+*/
+
+void GUI_Error_HIG(const char *primary, const char *secondary)
+{
+	GtkWidget *dialog;
+
+	if(beQuiet)
+	{
+		if (secondary)
+			printf("Error: %s\n%s\n", primary, secondary);
+		else
+			printf("Error: %s\n", primary);
+		return;
+	}
+	dialog=create_dialogWarning();
+	char *alertstring;
+	if (secondary)
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary, NULL);
+	else
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>", NULL);
+	gtk_label_set_text(GTK_LABEL(WID(label1)), alertstring);
+	gtk_label_set_use_markup(GTK_LABEL(WID(label1)), TRUE);
+	gtk_register_dialog(dialog);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_unregister_dialog(dialog);
+	gtk_widget_destroy(dialog);
+	UI_purge();
 }
 
 /**
@@ -308,7 +379,7 @@ create_dialogYN (void)
   gtk_widget_show (hbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), hbox1, TRUE, TRUE, 0);
 
-  image1 = gtk_image_new_from_stock ("gtk-dialog-warning", GTK_ICON_SIZE_DIALOG);
+  image1 = gtk_image_new_from_stock ("gtk-dialog-question", GTK_ICON_SIZE_DIALOG);
   gtk_misc_set_alignment (GTK_MISC (image1), 0.5, 0.0);
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
@@ -325,12 +396,12 @@ create_dialogYN (void)
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
-  buttonYes = gtk_button_new_from_stock ("gtk-cancel");
+  buttonYes = gtk_button_new_from_stock ("gtk-no");
   gtk_widget_show (buttonYes);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonYes, GTK_RESPONSE_NO);
   GTK_WIDGET_SET_FLAGS (buttonYes, GTK_CAN_DEFAULT);
 
-  buttonNo = gtk_button_new_from_stock ("gtk-ok");
+  buttonNo = gtk_button_new_from_stock ("gtk-yes");
   gtk_widget_show (buttonNo);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonNo, GTK_RESPONSE_YES);
   GTK_WIDGET_SET_FLAGS (buttonNo, GTK_CAN_DEFAULT);
