@@ -77,6 +77,7 @@ extern uint8_t initGUI( void );
 extern void ADM_memStat( void );
 extern uint8_t oplug_mpegInit(void);
 extern void     COL_init(void);
+extern uint8_t  initFileSelector(void);
 
 extern "C"
 {
@@ -153,6 +154,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #ifdef USE_XVID_4
 	xvid4_init();
 #endif
+        initFileSelector();
 	CpuCaps::init();
 	ADM_InitMemcpy();
 	
