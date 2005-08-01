@@ -87,7 +87,7 @@ class  ADMVideoLavPPDeint:public AVDMGenericVideoStream
 };
 
 
-static FILTER_PARAM lavppdeint_param={1,{"subname"}};
+static FILTER_PARAM lavppdeint_param={2,{"deintType","autolevel"}};
 //*************************************************************
 //
 
