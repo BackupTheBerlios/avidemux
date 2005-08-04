@@ -2236,7 +2236,7 @@ uint32_t count;
       }
       if (count >= info.nb_frames - 1)
 	{
-	  GUI_Alert ("You don't want to \n remove all frames !");
+	  GUI_Error_HIG ("You can't remove all frames", NULL);
 	  return 0;
 	}
 
