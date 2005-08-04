@@ -77,5 +77,7 @@ CALLBACK(preview1                              ,ACT_PreviewToggle);
 CALLBACK(display_output1                       ,ACT_OuputToggle);
 CALLBACK(second_audio_track1                   ,ACT_SecondAudioTrack);
 
-
+CALLBACK(vcd1                                   ,ACT_AUTO_VCD);
+CALLBACK(svcd1                                  ,ACT_AUTO_SVCD);
+CALLBACK(dvd1                                   ,ACT_AUTO_DVD);
 
