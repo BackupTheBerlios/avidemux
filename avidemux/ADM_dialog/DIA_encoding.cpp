@@ -25,8 +25,6 @@
 
 
 
-#include "callbacks.h"
-//#include "avi_vars.h"
 #include "default.h"
 #include "prefs.h"
 

@@ -15,19 +15,19 @@
 #include <gtk/gtk.h>
 
 #include "config.h"
-#include "avifmt.h"
-#include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
+#include "ADM_library/default.h"
+// #include "avifmt.h"
+// #include "avifmt2.h"
+// #include "avio.hxx"
+// #include "fourcc.h"
 
 #include <ADM_assert.h>
 
 #include "ADM_audiofilter/audioprocess.hxx"
-#include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
 
+#include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_gui2/support.h"
 
 

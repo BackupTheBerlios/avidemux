@@ -26,17 +26,20 @@
 #include <gtk/gtk.h>
 
 #include "config.h"
-#include "ADM_gui2/support.h"
 #include "ADM_library/default.h"
-#include "ADM_toolkit/toolkit.hxx"
-//___________________________________
-#include "avi_vars.h"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_encoder/adm_encoder.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
+
+#include "ADM_gui2/support.h"
+
+#include "ADM_toolkit/toolkit.hxx"
+//___________________________________
+
+
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_encoder/ADM_vidEncode.hxx"
+#include "ADM_encoder/adm_encoder.h"
 
 #include "ADM_toolkit/filesel.h"
 #include "ADM_mpegdemuxer/dmx_identify.h"

@@ -15,14 +15,12 @@
 # include <math.h>
 # include <config.h>
 
-#include "callbacks.h"
-#include "avi_vars.h"
+#include "ADM_library/default.h"
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-#include "ADM_library/default.h"
 #include "ADM_assert.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 //#include "ADM_gui/GUI_xvidparam.h"

@@ -13,11 +13,14 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-
 #include "config.h"
-#include "callbacks.h"
-#include "interface.h"
-#include "support.h"
+#include "ADM_library/default.h"
+
+#include "ADM_gui2/support.h"
+#include "ADM_toolkit/toolkit.hxx"
+#include "ADM_toolkit/toolkit_gtk.h"
+#include "ADM_toolkit/toolkit_gtk_include.h"
+
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
@@ -26,13 +29,6 @@
 #define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
   g_object_set_data (G_OBJECT (component), name, widget)
 
-#include "callbacks.h"
-#include "interface.h"
-#include "ADM_gui2/support.h"
-#include "avi_vars.h"
-#include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit_gtk_include.h"
 
 #define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),y);}	
 

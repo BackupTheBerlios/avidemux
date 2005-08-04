@@ -12,8 +12,7 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-#include "callbacks.h"
-//#include "avi_vars.h"
+
 #include "default.h"
 
 
