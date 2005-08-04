@@ -30,6 +30,7 @@ public:
 
 private:
     FILE *strm;
+    int strm_fd;
     char filename_pat[MAXPATHLEN];
     char cur_filename[MAXPATHLEN];
 

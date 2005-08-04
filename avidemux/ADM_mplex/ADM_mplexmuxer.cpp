@@ -99,13 +99,20 @@ static  vector<IBitStream *> inputs;
 
 static int slaveThread( void );
 
+admMutex mutex_slaveThread_problem;
+admCond  *cond_slaveThread_problem;
+char * kind_of_slaveThread_problem;
+unsigned int kind_of_slaveThread_problem_rc;
+extern uint8_t DIA_quota( char * msg );
+
 typedef  void * (*THRINP)(void *p);
 //___________________________________________________________________________
 mplexMuxer::mplexMuxer( void )
 {
         _running=0;
         _restamp=0;
-
+	cond_slaveThread_problem = new admCond(&mutex_slaveThread_problem);
+	kind_of_slaveThread_problem = 0;
 }
 //___________________________________________________________________________
 mplexMuxer::~mplexMuxer()
@@ -285,6 +292,10 @@ uint16_t a1,a2,a3,a4,ff;
                 }
         }
         r= channelvideo->write(buf,len);
+	if( cond_slaveThread_problem->iswaiting() ){
+                kind_of_slaveThread_problem_rc = DIA_quota(kind_of_slaveThread_problem);
+		cond_slaveThread_problem->wakeup();
+	}
         if(channelvideo->fillingUp())
         {
                 //printf("Output buffer filling up, sleeping a bit\n");

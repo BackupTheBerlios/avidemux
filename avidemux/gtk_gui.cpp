@@ -979,7 +979,7 @@ int A_openAvi2 (char *name, uint8_t mode)
     }
   DIA_StartBusy ();
   /*
-  ** we may get a relative patch by cmdline
+  ** we may get a relative path by cmdline
   */
   longname = PathCanonize(name);
   if (mode)
