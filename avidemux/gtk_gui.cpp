@@ -291,10 +291,6 @@ int nw;
         printf ("\n Ouput is now : %d", guiOutputDisplay);
       return;
 
-    case ACT_MpegIndex:
-      A_mpegIndexer ();
-      return;
-      break;
 #ifdef HAVE_AUDIO      
     	case ACT_SelectDevOSS:
 				   AVDM_switch (DEVICE_OSS);
@@ -456,6 +452,10 @@ int nw;
   // we have an AVI loaded
   switch (action)
     {
+        case ACT_AUTO_VCD:
+        case ACT_AUTO_SVCD:
+        case ACT_AUTO_DVD:
+                GUI_Error_HIG("Not available yet",NULL);
      case ACT_TimeShift:
                 A_TimeShift();
                 break;
@@ -1890,32 +1890,7 @@ computeIT (int size, int nb, int brate, uint32_t * frame, uint32_t * rsize)
   *rsize = 0;
   *frame = 0;
 }
-extern int DIA_mpegIndexer (char **mpegFile, char **indexFile, int *aid,
-			    int already = 0);
 
-//________________________________
-void
-A_mpegIndexer (void)
-{
-  char *mpeg, *file;
-  int id;
-  if (DIA_mpegIndexer (&mpeg, &file, &id))
-    {
-      if ((mpeg == NULL) || (file == NULL))
-	{
-	  GUI_Alert ("Please select at least one file to process!");
-	  return;
-	}
-      printf ("\n indexing :%s to \n%s\n (audio %x)", mpeg, file,id);
-      if (indexMpeg (mpeg, file, (uint8_t) id))
-	GUI_Info ("Index done");
-
-    }
-  else
-    {
-      printf ("\n cancelled\n");
-    }
-}
 /*
 	Save a raw video stream without any container
 	Usefull to cut mpeg stream or extract raw h263/mpeg4 stream
