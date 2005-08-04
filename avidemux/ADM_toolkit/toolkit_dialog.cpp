@@ -187,28 +187,47 @@ void             GUI_Info(const char *alertstring)
 
 /*
 GUI_Info_HIG: display an info dialog.
-Takes primary and secondary strings, as described in GNOME HIG 2.0.
+Takes primary and optional secondary string, as described in GNOME HIG 2.0.
+
+@primary: primary string
+@secondary_format: printf()-style format string for secondary text, or NULL for no secondary text
+@...: arguments for secondary_format
 */
 
-void GUI_Info_HIG(const char *primary, const char *secondary)
+void GUI_Info_HIG(const char *primary, const char *secondary_format, ...)
 {
 	GtkWidget *dialog;
 	
+	va_list ap;
+	va_start(ap, secondary_format);
+	
+	char *secondary;
+	char *alertstring;
+	
+	if (secondary_format)
+	{
+		secondary = g_strdup_vprintf(secondary_format, ap);
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary, NULL);
+	}
+	else
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>", NULL);
+	
+	va_end(ap);
+	
 	if(beQuiet)
 	{
-		if (secondary)
+		if (secondary_format)
 			printf("Info: %s\n%s\n", primary, secondary);
 		else
 			printf("Info: %s\n", primary);
 		return;
 	}
+	
+	g_free(secondary);
+
 	dialog=create_dialogInfo();
-	char *alertstring;
-	if (secondary)
-		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary, NULL);
-	else
-		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>", NULL);
 	gtk_label_set_text(GTK_LABEL(WID(label1)), alertstring);
+	g_free(alertstring);
 	gtk_label_set_use_markup(GTK_LABEL(WID(label1)), TRUE);
 	gtk_register_dialog(dialog);
 	gtk_dialog_run(GTK_DIALOG(dialog));
