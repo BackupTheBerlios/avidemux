@@ -12,7 +12,7 @@ avidemux2_SOURCES =   guiplay.cpp  \
 SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_colorspace ADM_editor ADM_encoder ADM_filter  ADM_inpics ADM_nuv \
 	ADM_toolkit oplug_mpeg xpm ADM_video oplug_avi ADM_audiodevice ADM_vp32 \
-	ADM_mpeg2dec ADM_mpegindexer libMpeg2Dec oplug_mpegFF ADM_h263 ADM_gui2 ADM_dialog \
+	libMpeg2Dec oplug_mpegFF ADM_h263 ADM_gui2 ADM_dialog \
 	ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame ADM_requant \
 	ADM_script oplug_ogm ADM_xvidratectl ADM_lavformat ADM_mplex ADM_ocr MPlayer_pp \
 	ADM_mpegdemuxer ADM_tray
@@ -52,14 +52,11 @@ avidemux2_LDADD   =  \
 ./ADM_inpics/libADM_inpics.a  ./ADM_3gp/libADM_3gp.a \
 ./ADM_h263/libADM_h263.a   \
 ./ADM_nuv/libADM_nuv.a  ./ADM_ogm/libADM_ogm.a ./ADM_audiodevice/libADM_audiodevice.a \
-./ADM_mpeg2dec/libADM_mpeg2dec.a \
 ./ADM_xvidratectl/libADM_xvidratectl.a  \
 ./ADM_ocr/libADM_ocr.a \
 ./ADM_dialog/libADM_dialog.a  \
 ./ADM_mpegdemuxer/libADM_mpegdemuxer.a   \
-./ADM_mpeg2dec/libADM_mpeg2dec.a \
 ./ADM_mpegdemuxer/libADM_mpegdemuxer.a   \
-./ADM_mpegindexer/libADM_mpegindexer.a   \
 ./ADM_dialog/libADM_dialog.a  \
 ./libMpeg2Dec/liblibMpeg2Dec.a   \
 ./ADM_tray/libADM_tray.a \
