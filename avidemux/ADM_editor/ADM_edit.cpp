@@ -30,7 +30,6 @@
 #include "ADM_h263/ADM_h263.h"
 #include "ADM_3gp/ADM_3gp.h"
 #include "ADM_openDML/ADM_openDML.h"
-#include "ADM_mpeg2dec/ADM_mpegscan.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
@@ -279,7 +278,6 @@ UNUSED_ARG(mode);
 		break;
 	}
       OPEN_AS (BMP_FileType, picHeader);
-      OPEN_AS (MpegIdx_FileType, mpeg2decHeader);
       OPEN_AS (_3GPP_FileType, _3GPHeader);
        OPEN_AS (Ogg_FileType, oggHeader);
 

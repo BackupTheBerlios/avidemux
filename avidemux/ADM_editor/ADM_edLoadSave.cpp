@@ -34,7 +34,6 @@
 #include "ADM_nuv/ADM_nuv.h"
 #include "ADM_h263/ADM_h263.h"
 
-#include "ADM_mpeg2dec/ADM_mpegscan.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_editor/ADM_edit.hxx"
