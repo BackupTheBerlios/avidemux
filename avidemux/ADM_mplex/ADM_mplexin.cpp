@@ -17,7 +17,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
-
+#ifdef CYG_MANGLING
+#include <io.h>
+#endif
 #include "interact.hpp"
 
 #undef malloc
