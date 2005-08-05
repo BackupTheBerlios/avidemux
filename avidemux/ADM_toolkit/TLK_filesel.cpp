@@ -387,6 +387,25 @@ void		PathStripName(char *str)
 			 len--;
 		}
 }
+
+/*
+	Get the filename without path
+
+*/
+char *GetFileName(char *str)
+{
+	char *filename;
+#ifndef CYG_MANGLING		
+	filename = strrchr(str, '/');
+#else
+	filename = strrchr(str, '\\');
+#endif
+	if (filename)
+		return filename+1;
+	else
+		return str;
+}
+
 /*
 	Split patch into absolute path+name and extention
 
