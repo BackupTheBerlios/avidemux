@@ -1344,7 +1344,7 @@ int A_saveJpg (char *name)
     	fclose(fd);
     	delete [] buffer;
 	delete codec;
-  	GUI_Info ("Done.");
+  	GUI_Info_HIG ("Done", "Saved \"%s\".", GetFileName(name));
 	return 1;
 }
 #else
@@ -1421,7 +1421,7 @@ void A_saveBunchJpg(char *name)
 		fwrite (buffer, sz, 1, fd);
     		fclose(fd);
 	}
-	GUI_Info ("Done.");
+	GUI_Info_HIG("Done", "Saved %d images.", curImg-frameStart);
 _bunch_abort:	
     	delete [] buffer;
 	delete [] src;
@@ -1525,7 +1525,7 @@ sz = avifileinfo->width* avifileinfo->height * 3;
     	fclose(fd);
     	ADM_dealloc(out);
 
-  GUI_Info ("Done.");
+  GUI_Info_HIG ("Done", "Saved \"%s\".", GetFileName(name));
 
 }
 
@@ -2363,7 +2363,7 @@ void A_externalAudioTrack( void )
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioMP3;
                                 printf ("\n MP3 loaded\n");
-                                GUI_Info("Second track loaded.");
+                                GUI_Info_HIG("Second track loaded", NULL);
                         }
                         }
                         break;
@@ -2385,7 +2385,7 @@ void A_externalAudioTrack( void )
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioAC3;
                                 printf ("\n AC3 loaded\n");
-                                GUI_Info("Second track loaded.");
+                                GUI_Info_HIG("Second track loaded", NULL);
                         }
                         }
                         break;
@@ -2407,7 +2407,7 @@ void A_externalAudioTrack( void )
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioAC3;
                                 printf ("\n AC3 loaded\n");
-                                GUI_Info("Second track loaded.");
+                                GUI_Info_HIG("Second track loaded", NULL);
                         }}
                         break;
                 default:
