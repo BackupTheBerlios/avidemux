@@ -6,7 +6,7 @@ bin_PROGRAMS = avidemux2
 avidemux2_SOURCES =   guiplay.cpp  \
 	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp callbacks.cpp avilist.cpp \
 	main.cpp prefs.cpp ADM_guiBitrate.cpp ADM_requantize.cpp ADM_pp.cpp \
-	ADM_memsupport.cpp
+	ADM_memsupport.cpp gui_autodrive.cpp
 #avidemux_LDADD   = ./ADM_library/libADM_library.a ./ADM_audio/libADM_audio.a ./ADM_audiocodec/libADM_audiocodec.a ./ADM_audiofilter/libADM_audiofilter.a ./ADM_codecs/libADM_codecs.a ./ADM_colorspace/libADM_colorspace.a ./ADM_editor/libADM_editor.a ./ADM_encoder/libADM_encoder.a ./ADM_filter/libADM_filter.a ../ADM_gui2/libADM_gui2.a /ADM_gui/libADM_gui.a ./ADM_inpics/libADM_inpics.a ./ADM_nuv/libADM_nuv.a ./ADM_toolkit/libADM_toolkit.a ./oplug_mpeg/liboplug_mpeg.a ./ADM_video/libADM_video.a ./oplug_avi/liboplug_avi.a ./ADM_audiodevice/libADM_audiodevice.a ./ADM_vp32/libADM_vp32.a ./ADM_mpeg2dec/libADM_mpeg2dec.a ./ADM_mpegindexer/libADM_mpegindexer.a ./libMpeg2Dec/liblibMpeg2Dec.a ./oplug_mpegFF/liboplug_mpegFF.a  -L/usr/X11R6/lib -lm -lXext -lX11
 
 SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \

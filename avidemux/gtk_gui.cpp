@@ -171,6 +171,7 @@ extern void      videoCodecConfigureUI(void);
 extern void audioCodecChanged(int newcodec);
 extern void videoCodecChanged(int newcodec);
 extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
+extern uint8_t A_autoDrive(Action action);
 extern int ignore_change;
 
 extern uint8_t ADM_ocr_engine( void);
@@ -455,7 +456,8 @@ int nw;
         case ACT_AUTO_VCD:
         case ACT_AUTO_SVCD:
         case ACT_AUTO_DVD:
-                GUI_Error_HIG("Not available yet",NULL);
+                A_autoDrive( action);
+                break;
      case ACT_TimeShift:
                 A_TimeShift();
                 break;
