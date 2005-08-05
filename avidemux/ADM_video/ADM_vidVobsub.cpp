@@ -40,8 +40,6 @@
 #include "ADM_video/ADM_vidFlipV.h"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_mpeg2dec/ADM_mpegpacket.h"
-#include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
 
 #include "ADM_toolkit/filesel.h"
 
@@ -157,7 +155,8 @@ uint32_t top=0,bottom=0;
     ADM_assert(nb<_vobSubInfo->nbLines);
     
     // Seek & decode
-    _parser->_asyncJump2(0,_vobSubInfo->lines[nb].fileOffset);
+    //_parser->_asyncJump2(0,_vobSubInfo->lines[nb].fileOffset);
+    _parser->setPos(_vobSubInfo->lines[nb].fileOffset,0);
     if(!handleSub(nb))
         {
                 printf("Error reading getBimap\n");
@@ -246,9 +245,12 @@ uint8_t ADMVideoVobSub::setup(void)
                 {
                         printf("Opening index \n");
                        
-                        
-                        _parser=new ADM_mpegDemuxerProgramStream(_param->index+0x20,0xe0);
-                        
+                        MPEG_TRACK track;
+                        memset(&track,0,sizeof(track));
+                        track.pes=_param->index+0x20;
+                        track.pid=0;
+                       // _parser=new ADM_mpegDemuxerProgramStream(_param->index+0x20,0xe0);
+                        _parser=new dmx_demuxerPS(1,&track,0);
                         if(!_parser->open(dup))
                         {
                                 printf("Mpeg Parser : opening %s failed\n",_param->subname);
@@ -399,8 +401,9 @@ uint32_t sub;
         // If it is a new sub, decode it...
         if(sub!=_currentSub )
         {                
-                 _parser->_asyncJump2(0,_vobSubInfo->lines[sub].fileOffset);
-                 _initialPts=_parser->getPTS();
+                // _parser->_asyncJump2(0,_vobSubInfo->lines[sub].fileOffset);
+                _parser->setPos(_vobSubInfo->lines[sub].fileOffset,0);
+                 //_initialPts=_parser->getPTS();
                  handleSub(sub);
                 _currentSub=sub;
                 Palettte2Display(); // Create the bitmap

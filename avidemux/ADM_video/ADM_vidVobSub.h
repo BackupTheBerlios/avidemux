@@ -10,7 +10,7 @@
 
 #ifndef _VOBSUB_V_
 #define _VOBSUB_V_
-
+#include "ADM_mpegdemuxer/dmx_demuxerPS.h"
 #define VS_MAXPACKET 128*1024
 
 #define NOSUB 0xffffffff
@@ -67,7 +67,7 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
         uint8_t                         handleSub( uint32_t idx );/// Decode a sub packet
         uint32_t                        lookupSub(uint64_t time);/// Return sub index corresponding to time
         
-        ADM_mpegDemuxerProgramStream    *_parser;        
+        dmx_demuxerPS                   *_parser;        
         uint8_t                         *_data;                 /// Data for packet
         VobSubInfo                      *_vobSubInfo;           /// Info of the index file
         vobSubParam                     *_param;

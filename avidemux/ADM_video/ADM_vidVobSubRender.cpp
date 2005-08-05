@@ -64,8 +64,6 @@
 #include "ADM_video/ADM_vidFlipV.h"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_mpeg2dec/ADM_mpegpacket.h"
-#include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
 
 #include "ADM_toolkit/filesel.h"
 
@@ -239,11 +237,13 @@ uint16_t date,next,dum;
 uint8_t  command;
         _subSize=0;
 uint32_t pts;
+uint64_t posA,posR;
+        _parser->getPos(&posA,&posR);
         // Read data
-aprintf("**Cur:%llx next:%llx\n",_parser->getAbsPos(),_vobSubInfo->lines[idx+1].fileOffset);        
-while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
+aprintf("**Cur:A:%llx R:%llx next:%llx\n",posA,posR,_vobSubInfo->lines[idx+1].fileOffset);        
+while(posA<_vobSubInfo->lines[idx+1].fileOffset)
 {        
-        aprintf("**Cur:%llx next:%llx\n",_parser->getAbsPos(),_vobSubInfo->lines[idx+1].fileOffset);
+        aprintf("**Cur: A:%llx R:%llx next:%llx\n",posA,posR,_vobSubInfo->lines[idx+1].fileOffset);
         _subSize=_parser->read16i();
         if(!_subSize)
         {
@@ -296,6 +296,7 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
                                 case 01: // start date
                                         break;
                                 case 02: // stop date
+#if 0                                
                                         pts=_parser->getPTS();
                                         if(!_vobSubInfo->lines[idx].stopTime)
                                         {
@@ -311,6 +312,7 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
                                                         _vobSubInfo->lines[idx].stopTime);
                                         
                                         }
+#endif                                        
                                         break;
                                 case 03: // Pallette 4 nibble= 16 bits
                                          dum=readword();
@@ -387,6 +389,7 @@ while(_parser->getAbsPos()+8<_vobSubInfo->lines[idx+1].fileOffset)
                         } //End switch command     
                 }// end while
         }
+        _parser->getPos(&posA,&posR);
   }     
   return 1;
 }
