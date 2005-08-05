@@ -63,7 +63,6 @@ extern int A_appendAvi (char *name);
 extern void A_saveAudio(char *name);
 extern int A_loadNone( void );
 extern void A_saveAudioDecodedTest(char *name);
-extern uint8_t indexMpeg(char *mpeg,char *file,uint8_t aid);
 extern void A_SaveAudioNVideo(char *name);
 extern int A_loadMP3(char *name);
 extern int A_loadAC3(char *name);
@@ -93,7 +92,6 @@ static void call_downsample(char *p) 	;
 static void call_help(char *p) 	;
 static void call_setAudio(char *p) 	;
 //static void call_load(char *p) 	;
-static void call_indexMpeg(char *in,char *out,char *aid) 	;
 static void call_autosplit(char *p) 	;
 static void call_audiobitrate(char *p) 	;
 static void call_fps(char *p) 	;
@@ -178,8 +176,6 @@ AUTOMATON reaction_table[]=
 		{"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
 		{"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	ADM_saveRaw},
 		{"save-uncompressed-audio",1,"save uncompressed audio",A_saveAudioDecodedTest},
-		{"index-mpeg",		3,"create index of vob/mpeg : vob.vob index.index audio#",
-								((one_arg_type )call_indexMpeg)},
 		{"load",		1,"load video or workbench",		(one_arg_type )A_openAvi},
 		{"load-workbench",	1,"load workbench file",		(one_arg_type)A_openAvi},
 		{"append",		1,"append video",			(one_arg_type)A_appendAvi},
@@ -508,14 +504,6 @@ void call_help(char *p)
 			}
 	
 			call_quit(NULL);
-}
-void call_indexMpeg(char *in,char *out, char *id)
-{
-uint32_t aid;
-					      if(id==NULL) return;
-								sscanf(id,"%x",&aid);
-              	indexMpeg(in,out,(uint8_t)aid);
-               	printf("\n __\n");
 }
 void call_requant(char *p, char *q, char *n)
 {
