@@ -59,8 +59,6 @@
 #include "ADM_video/ADM_vidFlipV.h"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_mpeg2dec/ADM_mpegpacket.h"
-#include "ADM_mpeg2dec/ADM_mpegpacket_PS.h"
 
 #include "ADM_toolkit/filesel.h"
 
