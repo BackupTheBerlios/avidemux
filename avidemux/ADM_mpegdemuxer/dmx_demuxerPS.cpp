@@ -31,7 +31,7 @@
 uint8_t         dmx_demuxerPS::changePid(uint32_t newpid,uint32_t newpes)
 {
           myPid=newpes & 0xff;
-          if(myPid<9 || (myPid>0xA0&&myPid<0xA9)) myPid|=0xff00;
+          if(myPid<9 || (myPid>0xA0&&myPid<0xA9) || (myPid>=0x20 && myPid<0x27)) myPid|=0xff00;
         _pesBufferStart=0;  // Big value so that we read
         _pesBufferLen=0;
         _pesBufferIndex=0;
@@ -71,7 +71,7 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks,uint32_t multi)
                 memset(mask,1,256); // take all tracks
         }
 
-        if(myPid<9 || (myPid>0xA0&&myPid<0xA9)) myPid|=0xff00;
+        if(myPid<9 || (myPid>0xA0&&myPid<0xA9) || (myPid>=0x20 && myPid<0x27)) myPid|=0xff00;
 
 
 
