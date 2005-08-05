@@ -30,7 +30,7 @@
 #include "ADM_script/ADM_container.h"
 
 extern VF_FILTERS filterGetTagFromName(char *inname);
-extern uint8_t indexMpeg(char *mpeg,char *file,uint8_t aid);
+//extern uint8_t indexMpeg(char *mpeg,char *file,uint8_t aid);
 extern uint8_t A_ListAllBlackFrames( char *file );
 extern uint8_t loadVideoCodecConfString( char *name);
 extern int ADM_saveRaw (char *name);
@@ -48,7 +48,7 @@ JSFunctionSpec ADM_JSAvidemuxVideo::avidemuxvideo_methods[] =
 {
 	{ "clear", Clear, 0, 0, 0 },	// clear
 	{ "add", Add, 3, 0, 0 },	// add
-	{ "indexMPEG", IndexMPEG, 3, 0, 0 },	// Index an MPEG
+//	{ "indexMPEG", IndexMPEG, 3, 0, 0 },	// Index an MPEG
 	{ "addFilter", AddFilter, 10, 0, 0 },	// Add filter to filter chain
 	{ "codec", Codec, 3, 0, 0 },	// Set the video codec
 	{ "codecConf", CodecConf, 1, 0, 0 },	// load video codec config
@@ -181,18 +181,7 @@ JSBool ADM_JSAvidemuxVideo::Add(JSContext *cx, JSObject *obj, uintN argc,
 	return JS_TRUE;
 }// end Add
 
-JSBool ADM_JSAvidemuxVideo::IndexMPEG(JSContext *cx, JSObject *obj, uintN argc, 
-                                       jsval *argv, jsval *rval)
-{// begin IndexMPEG
-	ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
-	// default return value
-	*rval = BOOLEAN_TO_JSVAL(false);
-	if(argc != 3)
-		return JS_FALSE;
-	printf("Indexing MPEG... \n");
-	*rval = BOOLEAN_TO_JSVAL(indexMpeg(JS_GetStringBytes(JSVAL_TO_STRING(argv[0])),JS_GetStringBytes(JSVAL_TO_STRING(argv[1])),JSVAL_TO_INT(argv[2])));
-	return JS_TRUE;
-}// end IndexMPEG
+
 
 JSBool ADM_JSAvidemuxVideo::AddFilter(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
