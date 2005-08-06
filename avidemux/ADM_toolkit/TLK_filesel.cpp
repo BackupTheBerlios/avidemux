@@ -485,9 +485,10 @@ uint8_t         initFileSelector(void)
 
 uint8_t setFilter( GtkWidget *dialog)
 {
+        gtk_file_chooser_add_filter     (GTK_FILE_CHOOSER(dialog), filter_all);
         gtk_file_chooser_add_filter     (GTK_FILE_CHOOSER(dialog), filter_avi);
         gtk_file_chooser_add_filter     (GTK_FILE_CHOOSER(dialog), filter_mpeg);
         gtk_file_chooser_add_filter     (GTK_FILE_CHOOSER(dialog), filter_image);
-        gtk_file_chooser_add_filter     (GTK_FILE_CHOOSER(dialog), filter_all);
+        
         return 1;
 }
