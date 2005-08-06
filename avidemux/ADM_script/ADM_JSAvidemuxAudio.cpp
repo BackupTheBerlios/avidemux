@@ -58,6 +58,8 @@ JSFunctionSpec ADM_JSAvidemuxAudio::avidemuxaudio_methods[] =
 	{ "load", Load, 2, 0, 0 },	// load audio stream
 	{ "reset", Reset, 0, 0, 0 },	// reset audio stream
 	{ "codec", Codec, 2, 0, 0 },	// set output codec
+        { "getNbTracks", getNbTracks, 0, 0, 0 },    // set output codec
+        { "setTrack", setTrack, 1, 0, 0 },    // set output codec
 	{ 0 }
 };
 
@@ -322,4 +324,37 @@ JSBool ADM_JSAvidemuxAudio::Codec(JSContext *cx, JSObject *obj, uintN argc,
 		*rval = BOOLEAN_TO_JSVAL(true);
 	}// end set bitrate
 	return JS_TRUE;
+}// end Codec
+JSBool ADM_JSAvidemuxAudio::getNbTracks(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{
+uint32_t nb=0;
+uint32_t *infos;
+        // default return value
+        ADM_JSAvidemuxAudio *p = (ADM_JSAvidemuxAudio *)JS_GetPrivate(cx, obj);
+
+        // default return value
+       
+        video_body->getAudioStreamsInfo(0,&nb, &infos);
+        delete [] infos;
+        *rval = INT_TO_JSVAL(nb);
+        return JS_TRUE;
+}// end Codec
+JSBool ADM_JSAvidemuxAudio::setTrack(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{
+uint32_t nb=0,nw=0;
+uint32_t *infos;
+        // default return value
+        ADM_JSAvidemuxAudio *p = (ADM_JSAvidemuxAudio *)JS_GetPrivate(cx, obj);
+
+        // default return value
+       if(argc != 1)
+                return JS_FALSE;
+        video_body->getAudioStreamsInfo(0,&nb, &infos);
+        delete [] infos;
+        nw=(JSVAL_TO_INT(argv[0]));
+        if(nw>nb) return JS_FALSE;
+        video_body->changeAudioStream(0,nw);
+        return JS_TRUE;
 }// end Codec
