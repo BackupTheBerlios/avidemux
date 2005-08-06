@@ -895,7 +895,7 @@ case ACT_Pipe2Other:
       if (GUI_Question ("Rebuild all Keyframes?"))
 	{
 	  A_rebuildKeyFrame ();
-	  GUI_Alert ("Save your file and restart Avidemux!");
+	  //GUI_Alert ("Save your file and restart Avidemux!");
 	}
       break;
 
