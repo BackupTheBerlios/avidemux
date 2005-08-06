@@ -387,10 +387,7 @@ float duration;
 	duration*=1000;			// duration in seconds
 	duration*=_wavinfo->frequency;  	// In sample
 	_videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
-        if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
-        {
-                GUI_Info_HIG("VBR MP3 audio detected", "For impeccable A/V synchronization, use \"Audio -> Build VBR Time Map\".");
-        }
+       
 
     }
 
@@ -421,6 +418,16 @@ float duration;
   _segments[_nb_segment]._nb_frames   =   _videos[_nb_video]._nb_video_frames ;
 
   _videos[_nb_video]._isAudioVbr=0;
+//****************************
+   if(_wavinfo)
+        if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
+        {
+                GUI_Question("VBR MP3 audio detected\nFor impeccable A/V synchronization, use \"Audio -> Build VBR Time Map\"\nDo it now ?");
+                {
+                _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
+                }
+        }
+
   // next one please
 	_nb_video++;
 	_nb_segment++;
