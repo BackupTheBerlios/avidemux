@@ -584,7 +584,12 @@ TryAgain:
 						}
 						// else warn user
 						if(!ispacked)
-							GUI_Alert("\n Please used Misc->Rebuild frame for BFrames!");
+                                                {
+                                                        if(GUI_Question("You should use Tool->Rebuild frame. Do it now ?"))
+                                                        {
+                                                                rebuildFrameType();
+							}
+                                                }
 					}
 				}
 				else
