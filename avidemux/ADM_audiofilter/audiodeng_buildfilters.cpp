@@ -589,7 +589,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 	  		||  (lastFilter->getInfo()->channels != 2)
 			)
 	    	{
-			GUI_Alert(" input is not stereo@48 khz\n Downsample disabled\n");
+			GUI_Info_HIG("Downsample disabled", "Input is not stereo, 48 kHz.");
 	  	} 
 		else
 	    	{
@@ -782,8 +782,7 @@ uint8_t init;
  				else
 				{
 					delete vorbis;
-					GUI_Alert("VORBIS initialization failed\n"
-							" NOT ACTIVATED");
+					GUI_Error_HIG("Vorbis initialization failed", "Not activated.");
 				}
 		}
 		break;
@@ -801,8 +800,7 @@ uint8_t init;
  				else
 				{
 					delete faac;
-					GUI_Alert("FAAC initialization failed\n"
-							" NOT ACTIVATED");
+					GUI_Error_HIG("FAAC initialization failed", "Not activated.");
 				}
 		}
 		break;
@@ -826,8 +824,7 @@ uint8_t init;
 				  } else
 			    	{
 						delete plame;
-						GUI_Alert("Lame initialization failed\n"
-							" NOT ACTIVATED");
+						GUI_Error_HIG("LAME initialization failed", "Not activated.");
 			    	}
 			   }
 		    break;
@@ -851,7 +848,7 @@ uint8_t init;
 				  } else
 			    {
 			    		delete mp2enc;
-					GUI_Alert("FF MP2 initialization failed\n NOT ACTIVATED");
+					GUI_Error_HIG("FFmpeg MP2 initialization failed", "Not activated.");
 			    }
 			    }
     	  break;
@@ -871,8 +868,7 @@ uint8_t init;
 			} else
 			{
 				delete toolame_enc;
-				GUI_Alert("LibToolame initialization failed\n"
-					" NOT ACTIVATED");
+				GUI_Error_HIG("tooLAME initialization failed", "Not activated.");
 			}
 		}
     	  break;
@@ -893,7 +889,7 @@ uint8_t init;
 				  } else
 			    {
 			    		delete ac3enc;
-					GUI_Alert("FF AC3enc initialization failed\n NOT ACTIVATED");
+					GUI_Error_HIG("FFmpeg AC3 initialization failed", "Not activated.");
 			    }
 		  }
     	  break;

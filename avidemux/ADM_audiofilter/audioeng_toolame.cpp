@@ -80,7 +80,7 @@ uint8_t AVDMProcessAudio_TooLame::init(char *outfile,
 	
 	if(!prefs->get(TOOLAME_PATH, &toolamepath))
 	{
-		GUI_Alert("Toolame not defined in path!");
+		GUI_Error_HIG("tooLAME not defined in path", NULL);
 		return 0;
 	}
 	

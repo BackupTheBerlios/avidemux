@@ -97,7 +97,7 @@ uint8_t AVDMProcessAudio_LibToolame::init( uint32_t mode, uint32_t bitrate)
       
  /*   if(_wavheader->frequency<32000)
     	{
-		GUI_Alert("Frequency should be at least 32khz");
+		GUI_Error_HIG("Incompatible audio frequency", "Samplerate should be at least 32 kHz.");
 		return 0;
 	}*/
     comp=_instream->getLength();
