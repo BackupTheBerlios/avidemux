@@ -1296,10 +1296,14 @@ extern uint8_t DIA_dmx(char *file,DMX_TYPE format,uint32_t nbTracks, MPEG_TRACK 
 uint8_t         ADM_Composer::tryIndexing(char *name)
 {
  unsigned int autoidx = 0;
-      if (!GUI_Question ("This looks like mpeg\n Do you want to index it?"))
+ prefs->get(FEATURE_TRYAUTOIDX,&autoidx);
+      if (!autoidx)
         {
+          if (!GUI_Question ("This looks like mpeg\n Do you want to index it?"))
+            {
                 return 0;
-        }
+            }
+		}  
           char      *idx;
           DMX_TYPE  type;
           uint32_t  nbTrack=0,audioTrack=0;
