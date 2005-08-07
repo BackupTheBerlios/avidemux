@@ -79,7 +79,7 @@ uint32_t end;
         {
                 if(UI_GetCurrentFormat()==ADM_AVI_DUAL)
                 {
-                        GUI_Alert("Dual audio can only be used \n in copy mode (video Codec=copy)");
+                        GUI_Error_HIG("Dual audio can only be used in copy mode", "Select Copy as the video codec.");
                         return 0;
                 }
         }
@@ -101,7 +101,7 @@ uint32_t end;
 		{
 			if(pb)
 			{
-				GUI_Alert("The video starts/ends by lonely B frame\nPlease remove them");
+				GUI_Error_HIG("Cannot save the file", "The video starts/ends with a lonely B-frame. Please remove it.");
 				return 0;
 			}
 			if(!GUI_Question("Warning !\n Bframe has lost its reference frame\nContinue ?"))
@@ -162,7 +162,7 @@ uint32_t end;
 	switch(family)
 	{
 		case CodecFamilyAVI:
-					printf(" Avi family\n");
+					printf(" AVI family\n");
 					switch(UI_GetCurrentFormat())
 					{
 						case ADM_AVI:
@@ -181,11 +181,11 @@ uint32_t end;
 								A_SaveUnpackedVop(name);
 								break;
 						default:
-								GUI_Alert("Output format is not compatible!");
+								GUI_Error_HIG("Incompatible output format", NULL);
 					}
 					break;
 		case CodecFamilyMpeg:
-					printf(" Mpeg family\n");
+					printf(" MPEG family\n");
 					if(!videoProcessMode())
 					{
 						
@@ -197,7 +197,7 @@ uint32_t end;
 						          mpeg_passthrough(name,UI_GetCurrentFormat());
                                                           break;
                                                   default:
-                                                        GUI_Alert("Output format is not compatible!");
+                                                        GUI_Error_HIG("Incompatible output format", NULL);
                                                 }
 					}
 					else
@@ -210,7 +210,7 @@ uint32_t end;
 								EncoderSaveMpeg(name);
 								break;
 							default:
-								GUI_Alert("Output format is not compatible!");
+								GUI_Error_HIG("Incompatible output format", NULL);
 						}
 					
 					}
@@ -224,7 +224,7 @@ uint32_t end;
                                 oplug_mpegff(name,UI_GetCurrentFormat());;
                                 break;
                         default:
-                            GUI_Alert("Output format is not compatible!");
+                            GUI_Error_HIG("Incompatible output format", NULL);
                     }
                     break;
                 default:
@@ -241,7 +241,7 @@ char *name;
 
 		if(! secondaudiostream)
 		{
-				 	GUI_Alert("Please select a second track in misc menu!");
+				 	GUI_Error_HIG("There is no second track", "Select a second audio track in the Audio menu.");
 				  	return;
 		}
 		if(!inname)
@@ -254,7 +254,7 @@ char *name;
      		nw=new   GenericAviSaveCopyDualAudio(secondaudiostream);
 		if(!nw->saveAvi(name))
 	     	{
-        		GUI_Alert(" AVI NOT saved");
+        		GUI_Error_HIG("AVI not saved", NULL);
        		}
        		else
         		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
@@ -270,14 +270,14 @@ GenericAviSave	*nw;
 	video_body->getVideoInfo(&info);
 	if( !isMpeg4Compatible(  info.fcc))
 	{
-		GUI_Alert("This cannot have packed vop!");
+		GUI_Error_HIG("This cannot have packed VOP", "It is not MPEG-4 video. File will not be saved.");
 		return 0;
         }
 	//
 	nw=new   GenericAviSaveCopy(1);
 	if(!nw->saveAvi(name))
 	{
-        	GUI_Alert(" AVI NOT saved");
+        	GUI_Error_HIG("AVI not saved", NULL);
 	}
 	else
         	GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
@@ -343,14 +343,14 @@ void  A_SaveAudioNVideo(char *name)
 			printf("\n Process mode\n");
      		nw=new   GenericAviSaveProcess;
 #else
-			GUI_Alert("\n No encoder , cannot save in process mode");
+			GUI_Error_HIG("No encoder", "Cannot save in process mode.");
    			return ;
 #endif
 
         }
      if(!nw->saveAvi(name))
      {
-        	GUI_Alert(" AVI NOT saved");
+        	GUI_Error_HIG("AVI not saved", NULL);
        }
        else
         	GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));

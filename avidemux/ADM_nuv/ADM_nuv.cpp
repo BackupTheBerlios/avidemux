@@ -775,7 +775,7 @@ uint32_t rcount=0;
 						_mythData=new mythHeader;
 						if(frame.packetlength!=sizeof(mythHeader))
 							{
-								GUI_Alert("\n Mmm size mismatch\n Expect a crash..");
+								GUI_Error_HIG("Size mismatch", "Expect a crash.");
 
 							}
 						uint64_t old;

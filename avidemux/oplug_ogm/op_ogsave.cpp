@@ -109,7 +109,7 @@ uint8_t error=0;
 		_fd=fopen(name,"wb");
 		if(!_fd)
 		{
-			GUI_Alert("Problem writing to that file\n");
+			GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", name);
 			return 0;
 		}
 
@@ -123,7 +123,7 @@ uint8_t error=0;
 		{
 			fclose(_fd);
 			_fd=NULL;
-			GUI_Alert("Troubles initializing video\n");
+			GUI_Error_HIG("Could not initialize video", NULL);
 			return 0;
 		
 		}
@@ -131,7 +131,7 @@ uint8_t error=0;
 		{
 			fclose(_fd);
 			_fd=NULL;
-			GUI_Alert("Troubles initializing audio\n");
+			GUI_Error_HIG("Could not initialize audio", NULL);
 			return 0;
 		
 		}

@@ -431,7 +431,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					i=tom.read32();
 					if(i&0xffff)
 					{
-						GUI_Alert("Expect troubles...\n");
+						GUI_Error_HIG("Expect troubles", NULL);
 					}
 					if(!_rdWav->channels) _rdWav->channels=1;
 					if(_rdWav->bitspersample<8) _rdWav->bitspersample=8;
@@ -700,7 +700,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 						_videoExtraData=new uint8_t[ _videoExtraLen ];
 						if(!tom.readPayload(_videoExtraData+4,_videoExtraLen-4 ))
 						{
-							GUI_Alert("Problem reading SVQ3 headers");
+							GUI_Error_HIG("Problem reading SVQ3 headers", NULL);
 						}
 						_videoExtraData[0]='S';
 						_videoExtraData[1]='V';
@@ -1045,7 +1045,7 @@ uint32_t i,j,cur;
 	}
 	else // there is not ssts
 	{
-		GUI_Alert("No stts table !");
+		GUI_Error_HIG("No stts table", NULL);
 		ADM_assert(0);	
 	}
 	return 1;

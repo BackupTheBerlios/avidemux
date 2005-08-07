@@ -74,7 +74,7 @@ uint8_t ossAudioDevice::init(uint32_t channel, uint32_t fq)
     if (oss_fd == -1) {
 	if( errno == EACCES )
 	{
-           GUI_Alert("There is permission problem on /dev/dsp");
+           GUI_Error_HIG("Could not open OSS audio device", "Check the permissions for /dev/dsp.");
 	  }
 	else
            printf("\n Error initializing OSS: Error : %d", errno);

@@ -287,7 +287,7 @@ uint8_t                 dmxHeader::open(char *name)
                 _index=new dmxIndex[_nbFrames+1];
                 if(!_index)
                         {
-                                        GUI_Alert("out of memory!!");
+                                        GUI_Error_HIG("Out of memory", NULL);
                                         ADM_assert(0);
                         }
                 memset(_index,0,_nbFrames*sizeof(dmxIndex));
@@ -462,7 +462,7 @@ uint8_t                 dmxHeader::open(char *name)
                         // switch DTS->PTS
                         if(!renumber())
                         {
-                                GUI_Alert("Mpeg renumbering error !");
+                                GUI_Error_HIG("MPEG renumbering error", NULL);
                                 return 0;
                         }
                         //Dump();

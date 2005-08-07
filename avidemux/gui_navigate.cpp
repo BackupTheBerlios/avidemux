@@ -75,7 +75,7 @@ uint32_t flags;
       {
         if( !GUI_getFrame(curframe + 1,rdr_decomp_buffer,&flags))
         	{
-            	GUI_Alert("Decompressing Error NF");
+            	GUI_Error_HIG("Decompressing error", "Cannot decode next frame.");
            	}
            else
            {
@@ -109,14 +109,14 @@ void GUI_NextKeyFrame(void)
 		if(!video_body->getNKFrame(&f))
 		//if( !GUI_getFrameNKF(&f ,rdr_decomp_buffer))
         	{
-            //	GUI_Alert("Decompressing Error");
+            //	GUI_Error_HIG("Decompressing error", NULL);
            	}
 		else
 		{
 			curframe=f;
 			if( !GUI_getFrame(curframe,rdr_decomp_buffer,&flags))
         		{
-            			GUI_Alert("Decompressing Error NKF");
+            			GUI_Error_HIG("Decompressing error", "Cannot decode keyframe.");
 			}
 			
 			renderUpdateImage(rdr_decomp_buffer->data);
@@ -378,7 +378,7 @@ uint32_t flags;
 
 	if( !GUI_getFrame(frame ,rdr_decomp_buffer,&flags))
 	{
-		GUI_Alert("Decompressing Error GF");
+		GUI_Error_HIG("Decompressing error", "Cannot decode the frame.");
 		return 0;
 	}
 
@@ -413,14 +413,14 @@ void GUI_PreviousKeyFrame(void)
 		if(!video_body->getPKFrame(&f))
 		//if( !GUI_getFrameNKF(&f ,rdr_decomp_buffer))
         	{
-            //	GUI_Alert("Decompressing Error");
+            //	GUI_Error_HIG("Decompressing error", NULL);
            	}
 		else
 		{
 			curframe=f;
 			if( !GUI_getFrame(curframe,rdr_decomp_buffer,&flags))
         		{
-            			GUI_Alert("Decompressing Error NKF");
+            			GUI_Error_HIG("Decompressing error", "Cannot decode keyframe.");
 			}
 			
 			renderUpdateImage(rdr_decomp_buffer->data);

@@ -82,14 +82,14 @@ float bn,sn;
 		case WAV_MP2: audioType=AUDIO_ID_MP2;break;
 		case WAV_AC3: audioType=AUDIO_ID_AC3;break;
 		default:
-			GUI_Alert("Audio type is not suitable for DVD!");
+			GUI_Error_HIG("Incompatible audio", "For DVD, audio must be MP2 or AC3.");
 			return 0;
 	}
 	
 	pack=mux_open(filename,(int)vbitrate,fps,(int)abitrate,(int)frequency,audioType);
 	if(!pack)
 	{
-		GUI_Alert("Init of lvemux failed!");
+		GUI_Error_HIG("lvemux init failed", NULL);
 		return 0;
 	}
 	packStream=(void *)pack;

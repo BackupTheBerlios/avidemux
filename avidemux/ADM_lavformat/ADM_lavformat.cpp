@@ -214,7 +214,7 @@ uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, 
 			//c->frame_rate_base = 1001;	
 			break;
 		default:
-			GUI_Alert("FPS is not suitable!");
+			GUI_Error_HIG("Incompatible frame rate", NULL);
 			return 0;
 	}
 

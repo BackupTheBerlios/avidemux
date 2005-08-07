@@ -173,12 +173,12 @@ uint8_t raw;
                                 raw=2;
                                 break;
 		default:
-				GUI_Alert("Please select mpeg output");
+				GUI_Error_HIG("Wrong output format", "Select MPEG as the output.");
 				return;
 	}
 	if(current_codec!=CodecDVD && raw==2)
         {
-                GUI_Alert("Please select DVD to export as mpeg TS");
+                GUI_Error_HIG("Wrong video codec", "Select DVD as the video codec for MPEG TS output.");
                 return;
         }
 	switch(current_codec)
@@ -622,7 +622,7 @@ Encoder *e=NULL;
          			if( !((w==128) && (h=96)) &&
             		! ((w==176) && (h=144)))
               			{
-								  	GUI_Alert("Only Qcif and SubQcif allowed \n for H263 codec");
+								  	GUI_Error_HIG("Only QCIF and subQCIF are allowed for H.263", NULL);
 								    return 0;
 						}
 				  		e=new   EncoderFFMPEG(FF_H263,&ffmpegH263Codec);
@@ -790,7 +790,7 @@ void videoCodecSetConf(  char *name,uint32_t extraLen, uint8_t *extraData)
         param=videoCodecGetDescriptor(current_codec);
         if(!param)
         {
-                GUI_Alert("Fatal error");
+                GUI_Error_HIG("Fatal error", NULL);
                 printf("Current codec:%d\n",current_codec);
                 ADM_assert(0);
         }

@@ -930,7 +930,7 @@ DIR *dir=NULL;
                 delete [] sys;
                 if((dir=opendir(dirname))==NULL)
                 {
-                        GUI_Alert("Cannot create the HOME/.avidemux directory");
+                        GUI_Error_HIG("Cannot create the .avidemux directory", NULL);
                         delete [] dirname;
                         return NULL;
                 }                

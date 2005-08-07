@@ -1,6 +1,6 @@
 /* XPM */
 static char * systray_xpm[] = {
-"32 34 425 2",
+"32 32 425 2",
 "  	c None",
 ". 	c #E7D3D5",
 "+ 	c #EBE0E9",

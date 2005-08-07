@@ -142,7 +142,7 @@ uint32_t  real_framenum=0;
             case ADM_TS:
                     if(!currentaudiostream)
                     {
-                        GUI_Alert("There is no audio track.");
+                        GUI_Error_HIG("There is no audio track", NULL);
                         return ;
                     }
                     audio=mpt_getAudioStream();
@@ -153,7 +153,7 @@ uint32_t  real_framenum=0;
             {
                 if(!currentaudiostream)
                 {
-                        GUI_Alert("There is no audio track.");
+                        GUI_Error_HIG("There is no audio track", NULL);
                         return ;
                 }
                 audio=mpt_getAudioStream();
@@ -163,7 +163,7 @@ uint32_t  real_framenum=0;
                 // Later check if it is SVCD
                 if(!audio)
                 {
-                        GUI_Alert("Audio track is  not suitable!\n");
+                        GUI_Error_HIG("Audio track is not suitable", NULL);
                         return;
                 }
                 // Check
@@ -173,7 +173,7 @@ uint32_t  real_framenum=0;
                 {
                         if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
                         {
-                            GUI_Alert("This is not compatible with VCD mpeg.\n");
+                            GUI_Error_HIG("Incompatible audio", "For VCD, audio must be 44.1 kHz MP2.");
                             deleteAudioFilter();
                             return ;
                         }
@@ -195,7 +195,7 @@ uint32_t  real_framenum=0;
                                 (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
                             {
                                 deleteAudioFilter();
-                                GUI_Alert("Audio track is not suitable!\n");
+                                GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2 or AC3.");
                                 return ;
                             }
                             mux=MUXER_DVD;
@@ -236,7 +236,7 @@ uint32_t  real_framenum=0;
             file=fopen(name,"wb");
             if(!file)
             {
-                    GUI_Alert("Cannot open output file !");
+                    GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", name);
                     return ;
             }
         }
@@ -324,7 +324,7 @@ switch(mux)
 					encoding->setFrame(i,total);
 					if(!encoder->encode( i, &len,(uint8_t *) _buffer,&flags))
 					{
-						GUI_Alert(" Error in pass 1!");
+						GUI_Error_HIG("Error in pass 1", NULL);
 					}
 					encoding->feedFrame(len);
 					encoding->setQuant(encoder->getLastQz());
@@ -352,7 +352,7 @@ switch(mux)
        	// get frame
 				if(!encoder->encode( i, &len,(uint8_t *) _outbuffer,&flags))
 				{
-					GUI_Alert("Error in pass 2");
+					GUI_Error_HIG("Error in pass 2", NULL);
 					goto finish;
 				}
 				if(!len) continue;
