@@ -448,7 +448,7 @@ FILE *f;
 
 		f=fopen(name,"wt");
 		if(!f)
-		{ 	GUI_Alert("Cannot write file!");
+		{ 	GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", GetFileName(name));
 			return;
 		}
                 filterSaveScriptFD(f);
