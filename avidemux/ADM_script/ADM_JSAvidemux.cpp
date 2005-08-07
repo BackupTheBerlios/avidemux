@@ -391,14 +391,11 @@ static void updateAll(void)
                         {
                                 GUI_Error_HIG ("OOPS","Something bad happened when executing that script");
                         }
-                        if(frameStart>=avifileinfo->nb_frames) frameStart=0;
-                        if(frameEnd>=avifileinfo->nb_frames) 
-                        {
-                                if(avifileinfo->nb_frames) 
-                                        frameEnd=avifileinfo->nb_frames-1;
-                                else
-                                        frameEnd=0;
-                        }
+                        frameStart=0;
+                        if(avifileinfo->nb_frames)
+                                frameEnd=avifileinfo->nb_frames-1;
+                        else
+                                frameEnd=0;
 }
 JSBool ADM_JSAvidemux::ClearSegments(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
