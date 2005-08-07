@@ -1296,7 +1296,7 @@ extern uint8_t DIA_dmx(char *file,DMX_TYPE format,uint32_t nbTracks, MPEG_TRACK 
 uint8_t         ADM_Composer::tryIndexing(char *name)
 {
  unsigned int autoidx = 0;
- prefs->get(FEATURE_TRYAUTOIDX,&autoidx);
+      prefs->get(FEATURE_TRYAUTOIDX,&autoidx);
       if (!autoidx)
         {
           if (!GUI_Question ("This looks like mpeg\n Do you want to index it?"))
@@ -1320,11 +1320,17 @@ uint8_t         ADM_Composer::tryIndexing(char *name)
                 if(type==DMX_MPG_PS || type==DMX_MPG_TS)
                 {
                        if(nbTrack>2)
+		       if(autoidx)
+			{
+				printf("Using autoindex\n");
+			}else
+		       {
                         if(!DIA_dmx(name,type,nbTrack,tracks,&audioTrack))
                         {
                                 delete [] tracks;
                                 return 0;
                         }
+		       }
                 }
                 idx=new char[strlen(name)+5];
                 strcpy(idx,name);
