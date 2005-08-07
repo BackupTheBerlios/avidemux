@@ -86,7 +86,8 @@ void  update_status_bar(ADMImage *frame)
  
 	UI_updateFrameCount( curframe);
 	UI_updateTimeCount( curframe,avifileinfo->fps1000);
-	UI_setFrameType(  frame->flags,frame->_Qp);
+        if(frame)
+	       UI_setFrameType(  frame->flags,frame->_Qp);
     // progress bar
     len = 100;
     len=len / (double) avifileinfo->nb_frames;
