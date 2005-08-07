@@ -100,7 +100,7 @@ printf("\n **Saving script project **\n");
 
 // Save source and segment
 //______________________________________________
-  qfprintf( fd,"//AD  <- These first 4 characters need to be the first 4 characters to identify the ECMAScript file to Avidemux");
+  qfprintf( fd,"//AD  <- Needed to identify");
   qfprintf (fd, "//\n");
   qfprintf (fd, "//--automatically built--\n");
   qfprintf (fd, "//--Project: %s\n\n",name);
