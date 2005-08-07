@@ -1925,7 +1925,12 @@ int ADM_saveRaw (char *name)
     {
       work->update (i - frameStart, frameEnd - frameStart);
       if(!work->isAlive()) goto _abt;
-      ADM_assert (video_body->getFlags (i, &flags));
+      if(!video_body->getFlags (i, &flags))
+        {
+                if(i==frameEnd-1) goto _abt;
+                ADM_assert (video_body->getFlags (i, &flags));
+        }
+      
       if (flags & AVI_B_FRAME)	// oops
 	{
 	  // se search for the next i /p
