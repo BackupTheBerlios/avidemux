@@ -102,14 +102,11 @@ uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming)
 				case 0:
 					incoming->mode = COMPRESS_CBR;				      
 		      			value = (uint32_t) gtk_read_entry(WID(entry_bitrate));
-		      			if (value < 9900)
-			  			value *= 1000;
-		      			if (value > 16 && value < 9900000)
+		      			if (value > 16 && value < 9900)
 					{
 			    			incoming->bitrate = value;
 			    			ret = 1;
 		      			}
-					
 					break;
 				case 1:
 					incoming->mode = COMPRESS_CQ;		      			
@@ -237,7 +234,7 @@ uint32_t b;
 	    {
 	    	case COMPRESS_CBR:
 			HIST_SET(0);			
-			b=mB/1000;
+			b=mB;
 			VAL_SET(b);
 			gtk_widget_set_sensitive(WID(spinbutton_quant),0);
 			gtk_widget_set_sensitive(WID(entry_bitrate),1);
