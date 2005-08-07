@@ -27,7 +27,7 @@ uint8_t saveGlyph(void)
   ADM_dealloc(name);
   if(!out)
   {
-    GUI_Alert("Problem writing");
+    GUI_Error_HIG("Could not write the file", NULL);
     return 0;
   }
 #define WRITE(x) fwrite(&(x),sizeof(x),1,out);
@@ -68,7 +68,7 @@ uint8_t loadGlyph(char *name)
   out=fopen(name,"rb");
   if(!out)
   {
-    GUI_Alert("Problem reading");
+    GUI_Error_HIG("File error", "Could not read \"%s\".", name);
     return 0;
   }
 #define READ(x) fread(&(x),sizeof(x),1,out);

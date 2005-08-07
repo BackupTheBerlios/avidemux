@@ -208,13 +208,13 @@ _again:
    fileout=(char *)gtk_label_get_text(GTK_LABEL(WID(labelSrt)));
    if(!fileout)
     {
-        GUI_Alert("Ouptut file incorrect!");
+        GUI_Error_HIG("Incorrect output file", NULL);
         goto _again;
     }
     out=fopen(fileout,"wb");
     if(!out)
     {
-        GUI_Alert("Ouptut file incorrect!");
+        GUI_Error_HIG("Output file error", "Could not open \"%s\" for writing.", fileout);
         goto _again;
     }
      
@@ -223,7 +223,7 @@ _again:
    
     if(!nbSub)
     {
-        GUI_Alert("Problem loading sub!");
+        GUI_Error_HIG("Problem loading sub", NULL);
         delete vobsub;
         vobsub=NULL;
         goto _again;
@@ -777,7 +777,7 @@ char text[1024];
             
                     if(!nbGlyphs)
                     {
-                        GUI_Alert("No glyphs to save!");
+                        GUI_Error_HIG("No glyphs to save", NULL);
                         break;
                     }                  
                     saveGlyph();                                      
