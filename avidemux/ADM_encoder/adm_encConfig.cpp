@@ -255,7 +255,7 @@ int videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
 			if(!strcasecmp(cs,"cbr"))
 				{
 						compmode=COMPRESS_CBR;
-						iparam*=1000;
+						//iparam*=1000;
 						aprintf("cbr Mode\n");
 				}
 			if(!strcasecmp(cs,"2pass"))
