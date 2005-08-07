@@ -75,7 +75,7 @@ uint8_t ADM_Composer::getMarkers(uint32_t *start, uint32_t *end)
 
 uint8_t ADM_Composer::saveWorbench (char *name)
 {
-        GUI_Alert("Unsupported");
+        GUI_Error_HIG("Unsupported", NULL);
         return 0;
 }
 /*______________________________________________
@@ -240,7 +240,7 @@ char *pth;
 
 uint8_t ADM_Composer::loadWorbench (char *name)
 {
- GUI_Alert("Old format project file\nNo more supported.");
+ GUI_Error_HIG("Old format project file", "No more supported.");
  return 0;
 }
 //EOF

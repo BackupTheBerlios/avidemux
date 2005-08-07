@@ -572,8 +572,7 @@ TryAgain:
                                                                                 UI_SetCurrentFormat(ADM_AVI_UNP);
 										goto TryAgain;
 									}
-									GUI_Alert("Could not unpack it\n"
-									", using backup decoder= not frame accurate.");
+									GUI_Error_HIG("Could not unpack the video", "Using backup decoder - not frame accurate.");
 									}
 								}
 #if  1 //def USE_DIVX
@@ -583,7 +582,7 @@ TryAgain:
 								vid->decoder=getDecoderVopPacked(info.fcc, info.width,info.height,0,NULL);
 								ispacked=1;
 #else
-								GUI_Alert("Troubles ahead : This a vop packed avi..");
+								GUI_Info_HIG("Troubles ahead", "This a VOP packed AVI.");
 #endif
 
 							}
@@ -1333,7 +1332,7 @@ uint8_t         ADM_Composer::tryIndexing(char *name)
                         delete [] tracks;
                 delete [] idx;
 
-                if(!r) GUI_Alert("Indexing failed."); 
+                if(!r) GUI_Error_HIG("Indexing failed", NULL); 
                 return r;
 }
 //
