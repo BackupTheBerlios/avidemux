@@ -6,7 +6,7 @@
 #include "ADM_JSAvidemux.h"
 
 extern uint8_t JS_AvidemuxFunction(JSContext *cx,JSObject *global);
-
+extern void A_Resync(void);
 // expose our main javascript context to the entire program
 JSObject *g_pObject;
 JSContext *g_pCx;
@@ -88,4 +88,6 @@ bool parseECMAScript(const char *name)
 		JSBool ok = JS_ExecuteScript(g_pCx, g_pObject, pJSScript, &rval);
 		JS_DestroyScript(g_pCx,pJSScript);
 	}// end execute external file
+        A_Resync();
+                        
 }// end parseECMAScript

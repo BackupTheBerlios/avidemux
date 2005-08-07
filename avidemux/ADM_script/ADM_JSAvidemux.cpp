@@ -385,6 +385,21 @@ JSBool ADM_JSAvidemux::SaveOGM(JSContext *cx, JSObject *obj, uintN argc,
 	*rval = BOOLEAN_TO_JSVAL(A_saveDVDPS(pTempStr));
 	return JS_TRUE;
 }// end SaveOGM
+static void updateAll(void)
+{
+                        if (!video_body->updateVideoInfo (avifileinfo))
+                        {
+                                GUI_Error_HIG ("OOPS","Something bad happened when executing that script");
+                        }
+                        if(frameStart>=avifileinfo->nb_frames) frameStart=0;
+                        if(frameEnd>=avifileinfo->nb_frames) 
+                        {
+                                if(avifileinfo->nb_frames) 
+                                        frameEnd=avifileinfo->nb_frames-1;
+                                else
+                                        frameEnd=0;
+                        }
+}
 JSBool ADM_JSAvidemux::ClearSegments(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {// begin ClearSegments
@@ -395,6 +410,7 @@ JSBool ADM_JSAvidemux::ClearSegments(JSContext *cx, JSObject *obj, uintN argc,
                 return JS_FALSE;
         printf("clearing segments \n");
         *rval = BOOLEAN_TO_JSVAL(video_body->deleteAllSegments());
+        updateAll();
         return JS_TRUE;
 }// end ClearSegments
 /*
@@ -413,6 +429,7 @@ JSBool ADM_JSAvidemux::AddSegment(JSContext *cx, JSObject *obj, uintN argc,
         int c = JSVAL_TO_INT(argv[2]);
         aprintf("adding segment :%d %d %d\n",a,b,c);
         *rval = BOOLEAN_TO_JSVAL( video_body->addSegment(a,b,c));
+        updateAll();
         return JS_TRUE;
 }// end AddSegment
 
