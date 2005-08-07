@@ -105,7 +105,7 @@ void oplug_mpeg_vcd(char *inname)
 	if( mpg->save_vcd(name))
 		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
 	else
-		GUI_Alert("Failed !");
+		GUI_Error_HIG("Saving failed", NULL);
 
 	delete(mpg);
 }
@@ -122,7 +122,7 @@ void oplug_mpeg_vcd_ps(char *inname)
 	// First check audio
 	if(!currentaudiostream)
 	{
-		GUI_Alert("We need an audio track!");
+		GUI_Error_HIG("There is no audio track", NULL);
 		return;
 	}
 	if(audioProcessMode())
@@ -141,26 +141,26 @@ void oplug_mpeg_vcd_ps(char *inname)
 	}
 	if(info->frequency!=44100 )
 	{
-		GUI_Alert("audio must be 44.1khz for VCD PS!");
+		GUI_Error_HIG("Incompatible audio frequency", "For VCD PS, samplerate must be 44.1 kHz.\nUse the resample audio filter.");
 		return;
 	}
 	if( info->encoding!=WAV_MP2 )
 	{
 		printf("Encoding : %d\n",info->encoding);
-		GUI_Alert("audio must be MP2 for VCD PS!");
+		GUI_Error_HIG("Incompatible audio codec", "For VCD PS, audio must be MP2.");
 		return;
 	}
 	if( info->channels!=2 )
 	{
 		
-		GUI_Alert("audio must be stereo for VCD PS!");
+		GUI_Error_HIG("Audio must be stereo for VCD PS", NULL);
 		return;
 	}
 	
 	// Second, check video
 	if(strcmp(videoCodecGetName(),"VCD"))// && strcmp(videoCodecGetName(),"XSVCD"))
 	{
-		GUI_Alert("You need to select VCD as video codec!");
+		GUI_Error_HIG("Wrong video codec", "Select VCD as the video codec.");
 		return;
 	}
 	
@@ -200,7 +200,7 @@ void oplug_mpeg_svcd(char *inname)
 	if( mpg->save_svcd(name))
 		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
 	else
-		GUI_Alert("Failed !");
+		GUI_Error_HIG("Saving failed", NULL);
 
 	delete(mpg);
 }
@@ -215,7 +215,7 @@ AVDMGenericAudioStream *stream;
 	// First check audio
 	if(!currentaudiostream)
 	{
-		GUI_Alert("We need an audio track!");
+		GUI_Error_HIG("There is no audio track", NULL);
 		return;
 	}
 	stream=mpt_getAudioStream();
@@ -228,20 +228,20 @@ AVDMGenericAudioStream *stream;
 	printf("ch :%x\n",info.channels);
 	if(info.frequency!=44100 )
 	{
-		GUI_Alert("audio must be 44.1khz for SVCD PS!");
+		GUI_Error_HIG("Incompatible audio frequency", "For SVCD PS, samplerate must be 44.1 kHz.\nUse the resample audio filter.");
 		return;
 	}
 	if( (info.encoding!=WAV_MP2 ))
 	{
 		printf("Encoding : %d\n",info.encoding);
-		GUI_Alert("audio must be MP2 for SVCD PS!");
+		GUI_Error_HIG("Incompatible audio codec", "For SVCD PS, audio must be MP2.");
 		return;
 	}
 	
 	// Second, check video
 	if(strcmp(videoCodecGetName(),"SVCD"))// && strcmp(videoCodecGetName(),"XSVCD"))
 	{
-		GUI_Alert("You need to select SVCD as video codec!");
+		GUI_Error_HIG("Wrong video codec", "Select SVCD as the video codec.");
 		return;
 	}
 	
@@ -261,7 +261,7 @@ AVDMGenericAudioStream *stream;
 	if( mpg->save_svcd(name))
 		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
 	else
-		GUI_Alert("Failed !");
+		GUI_Error_HIG("Saving failed", NULL);
 
 	delete(mpg);
 	
@@ -290,7 +290,7 @@ char *name=NULL;
 	if( mpg->save_dvd(name))
 		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
 	else
-		GUI_Alert("Failed !");
+		GUI_Error_HIG("Saving failed", NULL);
 
 	delete(mpg);
 }
@@ -307,7 +307,7 @@ WAVHeader *info=NULL,tmpinfo;
 	// First check audio
 	if(!currentaudiostream)
 	{
-		GUI_Alert("We need an audio track!");
+		GUI_Error_HIG("There is no audio track", NULL);
 		return;
 	}
 	if(audioProcessMode())
@@ -326,20 +326,20 @@ WAVHeader *info=NULL,tmpinfo;
 	}
 	if(info->frequency!=48000 )
 	{
-		GUI_Alert("audio must be 48khz for DVD PS!");
+		GUI_Error_HIG("Incompatible audio frequency", "For DVD PS, audio samplerate must be 48 kHz.\nUse the resample audio filter.");
 		return;
 	}
 	if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3))
 	{
 		printf("Encoding : %d\n",info->encoding);
-		GUI_Alert("audio must be MP2 or AC3 for DVD PS!");
+		GUI_Error_HIG("Incompatible audio codec", "For DVD PS, audio must be MP2 or AC3.");
 		return;
 	}
 	
 	// Second, check video
 	if(strcmp(videoCodecGetName(),"DVD"))// && strcmp(videoCodecGetName(),"XSVCD"))
 	{
-		GUI_Alert("You need to select DVD as video codec!");
+		GUI_Error_HIG("Wrong video codec", "Select DVD as the video codec.");
 		return;
 	}
 	
@@ -365,7 +365,7 @@ void oplug_mpeg_dvd_run(char *name)
 	if( mpg->save_dvd(name))
 		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
 	else
-		GUI_Alert("Failed !");
+		GUI_Error_HIG("Saving failed", NULL);
 
 	delete(mpg);
 
@@ -384,7 +384,7 @@ WAVHeader *info=NULL,tmpinfo;
         // First check audio
         if(!currentaudiostream)
         {
-                GUI_Alert("We need an audio track!");
+                GUI_Error_HIG("There is no audio track", NULL);
                 return;
         }
         if(audioProcessMode())
@@ -403,20 +403,20 @@ WAVHeader *info=NULL,tmpinfo;
         }
         if(info->frequency!=48000 )
         {
-                GUI_Alert("audio must be 48khz for DVD PS!");
+                GUI_Error_HIG("Incompatible audio frequency", "For DVD, samplerate must be 48 kHz.\nUse the resample audio filter.");
                 return;
         }
         if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3))
         {
                 printf("Encoding : %d\n",info->encoding);
-                GUI_Alert("audio must be MP2 or AC3 for DVD PS!");
+                GUI_Error_HIG("Incompatible audio codec", "For DVD, audio must be MP2 or AC3.");
                 return;
         }
         
         // Second, check video
         if(strcmp(videoCodecGetName(),"DVD"))// && strcmp(videoCodecGetName(),"XSVCD"))
         {
-                GUI_Alert("You need to select DVD as video codec!");
+                GUI_Error_HIG("Wrong video codec", "Select DVD as the video codec.");
                 return;
         }
         
@@ -442,7 +442,7 @@ void oplug_mpeg_ts_run(char *name)
         if( mpg->save_dvd(name))
                 GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
         else
-                GUI_Alert("Failed !");
+                GUI_Error_HIG("Saving failed", NULL);
 
         delete(mpg);
 
@@ -456,7 +456,7 @@ void oplug_mpeg_vcd_run(char *name)
 	if( mpg->save_vcd(name))
 		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
 	else
-		GUI_Alert("Failed !");
+		GUI_Error_HIG("Saving failed", NULL);
 
 	delete(mpg);
 

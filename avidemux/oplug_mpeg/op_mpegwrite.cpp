@@ -449,7 +449,7 @@ DIA_encoding		*encoding;
 					aImage,&flags))
 				{
 						delete encoding;
-               					GUI_Alert("Encoding error !");
+               					GUI_Error_HIG("Encoding error", NULL);
 						if(fd)
 							qfclose(fd);
 						end();
@@ -575,7 +575,7 @@ if(!reuse)
 	// WLA
 	{
 		delete encoding;
-		GUI_Alert("Error in pass 1");
+		GUI_Error_HIG("Error in pass 1", NULL);
 		delete [] statname;
 		return 0;
 	}
@@ -585,7 +585,7 @@ if(!reuse)
 	// WLA
 	{
 		delete encoding;
-		GUI_Alert("Error in pass 2");
+		GUI_Error_HIG("Error in pass 2", NULL);
 		delete [] statname;
 		return 0;
 	}
@@ -681,7 +681,7 @@ int intra,q;
 		_codec->setQuantize(q);
         	if(!incoming->getFrameNumberNoAlloc(i, &size,aImage,&flags))
 		{
-        		GUI_Alert("Encoding error !");
+        		GUI_Error_HIG("Encoding error", NULL);
 			end();
 			return 0 ;
 		}
@@ -851,7 +851,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 	{
         	if(!incoming->getFrameNumberNoAlloc(i, &size,aImage,&flags))
 		{
-               		GUI_Alert("Encoding error !");
+               		GUI_Error_HIG("Encoding error", NULL);
 			if(!_audio)
 				qfclose(fd);
 			end();
@@ -987,7 +987,7 @@ uint8_t mpegWritter::init(char *name,ADM_MPEGTYPE type,uint8_t interlaced,uint8_
 	UNUSED_ARG(type);
        if(! 	identMovieType(_fps1000))
 	{
-               		GUI_Alert("Frame rate incompatible !");
+               		GUI_Error_HIG("Incompatible frame rate", NULL);
 			return 0;
 	}
 
