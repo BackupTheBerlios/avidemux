@@ -422,7 +422,7 @@ float duration;
    if(_wavinfo)
         if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
         {
-                GUI_Question("VBR MP3 audio detected\nFor impeccable A/V synchronization, use \"Audio -> Build VBR Time Map\"\nDo it now ?");
+                GUI_YesNo("VBR MP3 audio detected","For impeccable A/V synchronization, use \"Audio -> Build VBR Time Map\"\nDo it now ?");
                 {
                 _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
                 }
@@ -558,8 +558,8 @@ TryAgain:
 								// can only unpack avi
 								if(!count && type==AVI_FileType)
 								{
-									if( forced || GUI_Question(
-									"It looks like Vop packed divx.\n"
+									if( forced || GUI_YesNo(
+									"Packed Bitstream detected",
 									"Do you want me to unpack it ?"))
 									{
 									OpenDMLHeader *dml=NULL;
@@ -591,7 +591,7 @@ TryAgain:
 						// else warn user
 						if(!ispacked)
                                                 {
-                                                        if(GUI_Question("You should use Tool->Rebuild frame. Do it now ?"))
+                                                        if(GUI_YesNo("Index is not up to date","You should use Tool->Rebuild frame. Do it now ?"))
                                                         {
                                                                 rebuildFrameType();
 							}
