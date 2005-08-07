@@ -89,7 +89,7 @@ uint8_t GenericAviSaveCopy::setupVideo (char *name)
 			   audio_filter2
 		))
     	{
-      		GUI_Alert ("Cannot initiate save:");
+      		GUI_Error_HIG ("Cannot initiate save", NULL);
       		return 0;
     	}
 	if(audio_filter2)

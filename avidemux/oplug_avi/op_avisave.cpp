@@ -125,7 +125,7 @@ uint32_t size;
   if (!setupAudio ())
     {
       guiStop();
-      GUI_Alert ("Error initalizing audio filters");
+      GUI_Error_HIG ("Error initalizing audio filters", NULL);
 	   deleteAudioFilter ();
 		delete writter;
       writter = NULL;
@@ -136,7 +136,7 @@ uint32_t size;
    if (!setupVideo (name))
     {
       guiStop();
-      GUI_Alert ("Error initalizing video filters");
+      GUI_Error_HIG ("Error initalizing video filters", NULL);
       deleteAudioFilter ();
       delete   	writter;
       
@@ -209,7 +209,7 @@ GenericAviSave::setupAudio (void)
 	{
 	  if (!currentaudiostream->isDecompressable ())
 	    {
-	      GUI_Alert ("I cannot decompress that \n audio stream!");
+	      GUI_Error_HIG ("Cannot decompress the audio stream", NULL);
 	      return 0;
 	    }
 	}
@@ -415,7 +415,7 @@ uint8_t   GenericAviSave::reigniteChunk( uint32_t dataLen, uint8_t *data )
 			   audio_filter,
 			   audio_filter2))
     {
-      GUI_Alert ("Cannot initiate save:");
+      GUI_Error_HIG ("Cannot initiate save", NULL);
 
       return 0;
     }

@@ -88,7 +88,7 @@ GenericAviSaveProcess::setupVideo (char *name)
     {
       delete 	_encode;
       _encode = NULL;
-      GUI_Alert ("Init of filter failed");
+      GUI_Error_HIG ("Filter init failed", NULL);
       return 0;
     };
  
@@ -146,7 +146,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
 	  if (guiUpdate (cf, frametogo))
 	    {
 	    abt:
-	      GUI_Alert ("Aborting!");
+	      GUI_Error_HIG ("Aborting", NULL);
 	      delete[]buffer;
 	      return 0;
 	    }
