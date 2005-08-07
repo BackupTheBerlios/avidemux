@@ -115,7 +115,7 @@ DIR *dir=NULL;
 			last=selected_filename[strlen(selected_filename) - 1]; 
 			 if (last == '/' || last =='\\' )
 			 {
-      	  					GUI_Alert("Cannot open directory as file !");
+      	  					GUI_Error_HIG("Cannot open directory as a file", NULL);
 						return 0;
 			}
 			else
@@ -171,7 +171,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 				// try to open it..
 				if(!fd)
 				{
-					GUI_Alert("Cannot open this file !");
+					GUI_Error_HIG("File error", "Cannot open \"%s\".", name);
 					return;
 				}
 			}
@@ -187,7 +187,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 				fd=fopen(name,"wb");
 				if(!fd)
 				{
-					GUI_Alert("No write access to that file !");
+					GUI_Error_HIG("Cannot write the file", "No write access to \"%s\".", name);
 					return;
 				}
 			}
@@ -265,7 +265,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 #else			
                         if (*(selected_filename + strlen(selected_filename) - 1) == '/'){
 #endif	 
-                        GUI_Alert("Cannot open directory as file !");
+                        GUI_Error_HIG("Cannot open directory as a file", NULL);
                 }
                 else
                 {

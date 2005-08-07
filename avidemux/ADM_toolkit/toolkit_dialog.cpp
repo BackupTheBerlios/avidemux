@@ -316,7 +316,70 @@ void GUI_Error_HIG(const char *primary, const char *secondary_format, ...)
 }
 
 /**
-	Return the line number of a selction
+GUI_YesNo: display a question dialog with Yes/No buttons.
+Returns 1 if the answer is yes, 0 if the answer is no.
+In silent mode, always return 0.
+
+Takes primary and optional secondary string.
+
+Note: Yes/No alerts are not recommended - if possible, use GUI_Confirmation_HIG.
+See GNOME HIG 2.0, Chapter 3, section "Alerts" for more details.
+
+@primary: primary string
+@secondary_format: printf()-style format string for secondary text, or NULL for no secondary text
+@...: arguments for secondary_format
+*/
+int GUI_YesNo(const char *primary, const char *secondary_format, ...)
+{
+	int ret=0;
+	GtkWidget *dialog;
+	
+	va_list ap;
+	va_start(ap, secondary_format);
+
+	char *alertstring;
+	
+	if (secondary_format)
+	{
+		char *secondary = g_strdup_vprintf(secondary_format, ap);
+		if (beQuiet)
+		{
+			printf("Info: %s\n%s\n", primary, secondary);
+			g_free(secondary);
+			return 0;
+		}
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary, NULL);
+		g_free(secondary);
+	}
+	else
+	{	
+		if (beQuiet)
+		{
+			printf("Info: %s\n", primary);
+			return 0;
+		}
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>", NULL);
+	}
+	
+	va_end(ap);
+
+	dialog=create_dialogYN();
+	gtk_label_set_text(GTK_LABEL(WID(label1)), alertstring);
+	g_free(alertstring);
+	gtk_label_set_use_markup(GTK_LABEL(WID(label1)), TRUE);
+	gtk_register_dialog(dialog);
+	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_YES)
+	{
+		ret=1;
+	}
+	gtk_unregister_dialog(dialog);
+	gtk_widget_destroy(dialog);
+	UI_purge();
+	return ret;
+}
+
+/**
+	Return the line number of a selection
 	0 if no selection of fails
 
 */
