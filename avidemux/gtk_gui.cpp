@@ -133,7 +133,7 @@ extern void saveMpegFile (char *name);
 extern void A_SaveAudioDualAudio (char *a);
 
 extern uint8_t ADM_aviUISetMuxer(  void );
-
+void A_Resync(void);
 
 static void updateSecondAudioTrack (void);
 void A_audioTrack(void);
@@ -236,6 +236,8 @@ int nw;
     
     case ACT_RunScript:
     			 GUI_FileSelRead ("Select ecmascript to run ",(SELFILE_CB *) parseECMAScript);
+                        
+                        //
     		return;
 		
     case ACT_RecentFiles:
@@ -2446,6 +2448,14 @@ int value;
 
         update=0;
 
+}
+void A_Resync(void)
+{
+// Just in case update file info
+        rebuild_status_bar();
+        if(!avifileinfo) return;
+        if(curframe>avifileinfo->nb_frames) curframe=frameEnd;
+        UI_setMarkers (frameStart, frameEnd);
 }
 // EOF
 
