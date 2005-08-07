@@ -329,14 +329,15 @@ JSBool ADM_JSAvidemuxAudio::getNbTracks(JSContext *cx, JSObject *obj, uintN argc
                                        jsval *argv, jsval *rval)
 {
 uint32_t nb=0;
-uint32_t *infos;
+uint32_t *infos=NULL;
         // default return value
         ADM_JSAvidemuxAudio *p = (ADM_JSAvidemuxAudio *)JS_GetPrivate(cx, obj);
 
         // default return value
        
         video_body->getAudioStreamsInfo(0,&nb, &infos);
-        delete [] infos;
+        if(infos)
+                delete [] infos;
         *rval = INT_TO_JSVAL(nb);
         return JS_TRUE;
 }// end Codec
@@ -344,7 +345,7 @@ JSBool ADM_JSAvidemuxAudio::setTrack(JSContext *cx, JSObject *obj, uintN argc,
                                        jsval *argv, jsval *rval)
 {
 uint32_t nb=0,nw=0;
-uint32_t *infos;
+uint32_t *infos=NULL;
         // default return value
         ADM_JSAvidemuxAudio *p = (ADM_JSAvidemuxAudio *)JS_GetPrivate(cx, obj);
 
