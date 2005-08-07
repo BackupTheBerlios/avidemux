@@ -136,6 +136,10 @@ for (uint32_t i = 0; i < _nb_segment; i++)
                 nb=_segments[i]._nb_frames;
                 qfprintf (fd, "app.addSegment(%lu,%lu,%lu);\n",src,start,nb);
     }
+// Markers
+//
+        qfprintf(fd,"app.markerA=%d;\n",frameStart);
+        qfprintf(fd,"app.markerB=%d;\n",frameEnd);
 // postproc
 //___________________________
 

@@ -65,6 +65,7 @@ uint8_t
 
     };
   printf("\n Frame 2 seg failed! (%lu)\n",framenum);
+  dumpSeg();
   return 0;
 
 
@@ -225,7 +226,10 @@ uint32_t ADM_Composer::getFlags (uint32_t frame, uint32_t * flags)
   uint32_t
     seg;
   if (!convFrame2Seg (frame, &seg, &relframe))
+  {
+        printf("Error for frame %u\n",frame);
     return 0;
+  }
   uint32_t
     ref =
     _segments[seg].

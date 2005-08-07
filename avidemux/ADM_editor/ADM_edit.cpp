@@ -116,7 +116,7 @@ uint8_t ADM_Composer::resetSeg( void )
 	}
 
   	_nb_segment=_nb_video;
-  	
+  	computeTotalFrames();
 	dumpSeg();
 	return 1;
 }
@@ -160,6 +160,7 @@ uint8_t ADM_Composer::deleteAllSegments (void)
 
   memset (_segments, 0, sizeof (_segments));
   _nb_segment = 0;
+  _total_frames=computeTotalFrames();
   return 1;
 
 }
@@ -707,7 +708,7 @@ uint8_t ADM_Composer::addSegment(uint32_t source,uint32_t start, uint32_t nb)
         seg->_nb_frames=nb;
         _nb_segment++;
         updateAudioTrack (_nb_segment-1);
-        
+        _total_frames=computeTotalFrames();
 
         return 1;
 }
