@@ -714,6 +714,7 @@ uint8_t *extra=NULL;
         if(extraSize)
         {
                 while(*cmd!=' ') cmd++;
+                cmd++; // skip the first ' '
                 for(uint32_t k=0;k<extraSize;k++)
                 {
                         str_extra[k]=mk_hex(*cmd,*(cmd+1));
