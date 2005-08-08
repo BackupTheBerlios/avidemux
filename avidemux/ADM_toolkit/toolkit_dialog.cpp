@@ -46,6 +46,7 @@
   g_object_set_data (G_OBJECT (component), name, widget)
 
 static GtkWidget	*create_dialogYN (void);
+static GtkWidget	*create_dialogConfirmation (const char *confirm_text);
 static GtkWidget	*create_dialogWarning (void);
 static GtkWidget       *create_dialogInfo (void);
 static int beQuiet=0;
@@ -316,6 +317,69 @@ void GUI_Error_HIG(const char *primary, const char *secondary_format, ...)
 }
 
 /**
+GUI_Confirmation_HIG: display a confirmation dialog with Cancel and custom confirmation button.
+See GNOME HIG 2.0, chapter 3, section "Alerts" for more details.
+
+Returns 1 if the answer is yes, 0 if the answer is no.
+In silent mode, always return 0.
+
+Takes primary and optional secondary string.
+
+@button_confirm: confirmation button text
+@primary: primary string
+@secondary_format: printf()-style format string for secondary text, or NULL for no secondary text
+@...: arguments for secondary_format
+*/
+int GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const char *secondary_format, ...)
+{
+	int ret=0;
+	GtkWidget *dialog;
+	
+	va_list ap;
+	va_start(ap, secondary_format);
+
+	char *alertstring;
+	
+	if (secondary_format)
+	{
+		char *secondary = g_strdup_vprintf(secondary_format, ap);
+		if (beQuiet)
+		{
+			printf("Info: %s\n%s\n", primary, secondary);
+			g_free(secondary);
+			return 0;
+		}
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>\n\n", secondary, NULL);
+		g_free(secondary);
+	}
+	else
+	{	
+		if (beQuiet)
+		{
+			printf("Info: %s\n", primary);
+			return 0;
+		}
+		alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", primary, "</span>", NULL);
+	}
+	
+	va_end(ap);
+
+	dialog=create_dialogConfirmation(button_confirm);
+	gtk_label_set_text(GTK_LABEL(WID(label1)), alertstring);
+	g_free(alertstring);
+	gtk_label_set_use_markup(GTK_LABEL(WID(label1)), TRUE);
+	gtk_register_dialog(dialog);
+	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_YES)
+	{
+		ret=1;
+	}
+	gtk_unregister_dialog(dialog);
+	gtk_widget_destroy(dialog);
+	UI_purge();
+	return ret;
+}
+
+/**
 GUI_YesNo: display a question dialog with Yes/No buttons.
 Returns 1 if the answer is yes, 0 if the answer is no.
 In silent mode, always return 0.
@@ -323,7 +387,7 @@ In silent mode, always return 0.
 Takes primary and optional secondary string.
 
 Note: Yes/No alerts are not recommended - if possible, use GUI_Confirmation_HIG.
-See GNOME HIG 2.0, Chapter 3, section "Alerts" for more details.
+See GNOME HIG 2.0, chapter 3, section "Alerts" for more details.
 
 @primary: primary string
 @secondary_format: printf()-style format string for secondary text, or NULL for no secondary text
@@ -524,7 +588,76 @@ create_dialogYN (void)
 }
 
 
+GtkWidget*
+create_dialogConfirmation (const char *confirm_text)
+{
+  GtkWidget *dialog1;
+  GtkWidget *dialog_vbox1;
+  GtkWidget *hbox1;
+  GtkWidget *image1;
+  GtkWidget *label1;
+  GtkWidget *dialog_action_area1;
+  GtkWidget *buttonCancel;
+  GtkWidget *buttonYes;
 
+  dialog1 = gtk_dialog_new ();
+  gtk_window_set_title (GTK_WINDOW (dialog1), _(""));
+  
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
+  gtk_window_set_resizable (GTK_WINDOW (dialog1), FALSE);
+  gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);  
+
+  dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
+  gtk_box_set_spacing (GTK_BOX (dialog_vbox1), 12);
+  gtk_widget_show (dialog_vbox1);
+
+  hbox1 = gtk_hbox_new (FALSE, 0);
+  gtk_box_set_spacing (GTK_BOX (hbox1), 12);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox1), 6);
+  gtk_widget_show (hbox1);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox1), hbox1, TRUE, TRUE, 0);
+
+  image1 = gtk_image_new_from_stock ("gtk-dialog-warning", GTK_ICON_SIZE_DIALOG);
+  gtk_misc_set_alignment (GTK_MISC (image1), 0.5, 0.0);
+  gtk_widget_show (image1);
+  gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
+
+  label1 = gtk_label_new (_("label1"));
+  gtk_label_set_line_wrap (GTK_LABEL(label1), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label1), 0.5, 0.0);
+  gtk_label_set_selectable (GTK_LABEL(label1), TRUE);
+  gtk_widget_show (label1);
+  gtk_box_pack_start (GTK_BOX (hbox1), label1, TRUE, TRUE, 0);
+  //gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_CENTER);
+
+  dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
+  gtk_widget_show (dialog_action_area1);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
+
+  buttonCancel = gtk_button_new_from_stock ("gtk-cancel");
+  gtk_widget_show (buttonCancel);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonCancel, GTK_RESPONSE_NO);
+  GTK_WIDGET_SET_FLAGS (buttonYes, GTK_CAN_DEFAULT);
+
+  buttonYes = gtk_button_new_from_stock (confirm_text);
+  gtk_widget_show (buttonYes);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonYes, GTK_RESPONSE_YES);
+  GTK_WIDGET_SET_FLAGS (buttonYes, GTK_CAN_DEFAULT);
+
+  /* Store pointers to all widgets, for use by lookup_widget(). */
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, image1, "image1");
+  GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonCancel, "buttonCancel");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonYes, "buttonYes");
+
+  gtk_widget_grab_default (buttonYes);
+  return dialog1;
+}
 
 
 GtkWidget*

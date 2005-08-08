@@ -423,7 +423,7 @@ float duration;
    if(_wavinfo)
         if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
         {
-                GUI_YesNo("VBR MP3 audio detected","For impeccable A/V synchronization, use \"Audio -> Build VBR Time Map\"\nDo it now ?");
+                GUI_Confirmation_HIG("Build Time Map", "Build VBR time map?", "Avidemux detected VBR MP3 audio in this file. For keeping audio/video in sync, time map is needed. Build it now?\n\nYou can do it later with \"Audio -> Build VBR Time Map\".");
                 {
                 _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
                 }
