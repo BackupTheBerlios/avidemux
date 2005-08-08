@@ -60,6 +60,7 @@ JSFunctionSpec ADM_JSAvidemuxAudio::avidemuxaudio_methods[] =
 	{ "codec", Codec, 2, 0, 0 },	// set output codec
         { "getNbTracks", getNbTracks, 0, 0, 0 },    // set output codec
         { "setTrack", setTrack, 1, 0, 0 },    // set output codec
+        { "lamePreset", lamePreset, 1, 0, 0 },    // set output codec
 	{ 0 }
 };
 
@@ -358,4 +359,25 @@ uint32_t *infos=NULL;
         if(nw>nb) return JS_FALSE;
         video_body->changeAudioStream(0,nw);
         return JS_TRUE;
+}// end Codec
+JSBool ADM_JSAvidemuxAudio::lamePreset(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{
+uint32_t nb=0,nw=0;
+uint32_t *infos=NULL;
+        // default return value
+        ADM_JSAvidemuxAudio *p = (ADM_JSAvidemuxAudio *)JS_GetPrivate(cx, obj);
+#ifdef HAVE_LIBMP3LAME
+        // default return value
+       if(argc != 1)
+                return JS_FALSE;
+        char *pArg0 = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+        if(audioLamePreset(pArg0))
+                *rval=BOOLEAN_TO_JSVAL(true);
+        else
+                *rval=BOOLEAN_TO_JSVAL(false);
+        return JS_TRUE;
+#else
+        return JS_FALSE;
+#endif
 }// end Codec
