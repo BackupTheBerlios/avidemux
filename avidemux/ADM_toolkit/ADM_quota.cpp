@@ -7,7 +7,6 @@
 
 #include "default.h"
 extern uint8_t DIA_quota(char *);
-extern void GUI_Alert(const char *);
 struct qfile_t {
         const char *filename;
         unsigned int ignore;
@@ -19,6 +18,8 @@ static qfile_t qfile[qfile_len];
 
 #include <libxml/tree.h>
 int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
+
+#include "toolkit.hxx"
 
 #ifdef USE_LIBXML2
 int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format){
@@ -89,7 +90,7 @@ FILE *qfopen(const char *path, const char *mode){
 		  char msg[msg_len];
 			ADM_assert(snprintf(msg,msg_len,"can't open \"%s\": %u (%s)\n", path, errno, strerror(errno))!=-1);
 			fprintf(stderr,"qfopen(): %s",msg);
-			GUI_Alert(msg);
+			GUI_Error_HIG(msg,NULL);
 			return NULL;
 		}
 	}
@@ -178,7 +179,7 @@ ssize_t qwrite(int fd, const void *buf, size_t numbytes){
 					        (qfile[fd].filename?qfile[fd].filename:"__unknown__"),
 						errno, strerror(errno))!=-1);
 		fprintf(stderr,"qwrite(): %s",msg);
-		GUI_Alert(msg);
+		GUI_Error_HIG(msg,NULL);
 		return -1;
 	}
 }
