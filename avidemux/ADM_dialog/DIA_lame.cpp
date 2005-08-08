@@ -24,7 +24,7 @@
 
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-
+#include "ADM_audiofilter/audioeng_lame.h"
 
 
 #define NB_BITRATE 11
@@ -43,12 +43,6 @@ static int BTR[] = {		// see interface.c if you change this !
 };
   
 
-static const ADM_PRESET_DEFINITION	presetDefinition[]=
-{
-	{ADM_LAME_PRESET_CBR,"CBR"},
-	{ADM_LAME_PRESET_ABR,"ABR"},
-	{ADM_LAME_PRESET_EXTREME,"Extreme"}
-};    
 
  static GtkWidget	*create_dialog1 (void);
   
