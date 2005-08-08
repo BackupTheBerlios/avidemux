@@ -14,6 +14,12 @@ typedef struct ADM_PRESET_DEFINITION
 	ADM_LAME_PRESET preset;
 	const char	*name;
 }ADM_PRESET_DEFINITION;
+static const ADM_PRESET_DEFINITION      presetDefinition[]=
+{
+        {ADM_LAME_PRESET_CBR,"CBR"},
+        {ADM_LAME_PRESET_ABR,"ABR"},
+        {ADM_LAME_PRESET_EXTREME,"Extreme"}
+};    
 
 
 #ifdef HAVE_LIBMP3LAME

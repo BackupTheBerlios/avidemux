@@ -711,6 +711,23 @@ void audioSetResample(uint32_t fq)
 	audioResampleMode=RESAMPLING_CUSTOM;
 	audioFreq=fq;
 }
+uint8_t audioLamePreset(const char *name)
+{
+#ifdef HAVE_LIBMP3LAME
+int nb=sizeof(presetDefinition)/sizeof(ADM_PRESET_DEFINITION);
+        for(int i=0;i<nb;i++)   
+        {
+                if(!strcasecmp(presetDefinition[i].name,name))
+                        {
+                           audioMP3preset=    presetDefinition[i].preset;
+                           return 1; 
+                        }
+        }
+//
+        printf("AudioLame : Unknown preset  :%s\n",name);
+#endif
+        return 0;
+}
 /*
 	Build a fake filter chain without normalizer
 		to avoid to have to scan the file to get the max amplitude value

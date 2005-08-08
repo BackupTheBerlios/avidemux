@@ -125,6 +125,7 @@ uint8_t                 A_changeAudioStream(AVDMGenericAudioStream *newaudio,Aud
 AudioSource             getCurrentAudioSource(char **name);
 const char              *audioSourceFromEnum(AudioSource *src);
 AudioSource             audioSourceFromString(const char *name);
+uint8_t     audioLamePreset(const char *name);
 //
 
 
