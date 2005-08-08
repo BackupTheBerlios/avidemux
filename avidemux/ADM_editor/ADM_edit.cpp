@@ -59,6 +59,7 @@ extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
 
 extern uint8_t loadVideoCodecConf( char *name);
 extern uint8_t parseScript(char *name);
+const char *VBR_MSG="Avidemux detected VBR MP3 audio in this file. For keeping audio/video in sync, time map is needed. Build it now?\n\nYou can do it later with \"Audio -> Build VBR Time Map\".";
 //
 //
 
@@ -423,7 +424,7 @@ float duration;
    if(_wavinfo)
         if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
         {
-                GUI_Confirmation_HIG("Build Time Map", "Build VBR time map?", "Avidemux detected VBR MP3 audio in this file. For keeping audio/video in sync, time map is needed. Build it now?\n\nYou can do it later with \"Audio -> Build VBR Time Map\".");
+                GUI_Confirmation_HIG("Build Time Map", "Build VBR time map?", VBR_MSG);
                 {
                 _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
                 }
