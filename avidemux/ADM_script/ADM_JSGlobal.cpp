@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ADM_library/default.h"
+#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_JSGlobal.h"
 #include "ADM_JSAvidemux.h"
 
@@ -23,10 +24,17 @@ JSClass g_globalClass =
 void
 printJSError(JSContext *cx, const char *message, JSErrorReport *report)
 {// begin printJSError
-	printf("Spidermonkey ECMAScript Error: %s:%d:\n      %s\n",
+int quiet=isQuiet();
+        if(quiet)
+                GUI_Verbose();
+         GUI_Error_HIG("Spidermonkey ECMAScript Error", 
+	"file: %s: line %d:\n Msg:%s\n",
 		report->filename,
 		report->lineno,
 		message);
+        if(quiet)
+                GUI_Quiet();
+
 }// end printJSError
 
 bool SpidermonkeyInit()

@@ -79,6 +79,7 @@ JSFunctionSpec ADM_JSAvidemux::avidemux_methods[] =
 	{ "goToTime", GoToTime, 3, 0, 0 },	// more current frame to time index
 	{ "forceUnpack", forceUnpack, 0, 0, 0 },
         { "setContainer", setContainer, 1, 0, 0 },
+        { "rebuildIndex", rebuildIndex, 0, 0, 0 },
 
 	{ 0 }
 };
@@ -467,6 +468,17 @@ JSBool ADM_JSAvidemux::forceUnpack(JSContext *cx, JSObject *obj, uintN argc,
     video_body->setEnv(ENV_EDITOR_PVOP);
 	*rval = INT_TO_JSVAL(1);
 	return JS_TRUE;
+}// end GoToTime
+JSBool ADM_JSAvidemux::rebuildIndex(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin GoToTime
+        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+        // default return value
+        *rval = BOOLEAN_TO_JSVAL(false);
+        if(argc != 0)
+                return JS_FALSE;
+        video_body->rebuildFrameType();
+        return JS_TRUE;
 }// end GoToTime
 
 JSBool ADM_JSAvidemux::setContainer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
