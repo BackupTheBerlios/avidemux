@@ -1409,23 +1409,23 @@ int parse_custom_matrixfile(char *fname, int dbug)
 void parse_custom_option(char *arg,mpeg2parm *param)
     {
 
-    if	(strcmp(arg, "kvcd") == 0)
+    if	(strcasecmp(arg, "kvcd") == 0)
     	param->hf_quant = 3;
-    else if (strcmp(arg, "hi-res") == 0)
+    else if (strcasecmp(arg, "hi-res") == 0)
     	param->hf_quant = 2;
-    else if (strcmp(arg, "default") == 0)
+    else if (strcasecmp(arg, "default") == 0)
     	{
     	param->hf_quant = 0;
     	param->hf_q_boost = 0;
     	}
-    else if (strcmp(arg, "tmpgenc") == 0)
+    else if (strcasecmp(arg, "tmpgenc") == 0)
     	param->hf_quant = 4;
     else if (strncasecmp(arg, "file=", 5) == 0)
     	{
     	if  (parse_custom_matrixfile(arg + 5, arg[0] == 'F' ? 1 : 0) == 0)
     	    param->hf_quant = 5;
     	}
-    else if (strcmp(arg, "help") == 0)
+    else if (strcasecmp(arg, "help") == 0)
     	{
     	fprintf(stderr, "Quantization matrix names:\n\n");
     	fprintf(stderr, "\thelp - this message\n");
