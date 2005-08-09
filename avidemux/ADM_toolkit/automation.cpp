@@ -400,23 +400,23 @@ void call_setAudio (char *p)
 }
 void call_audiocodec(char *p)
 {
-	if(!strcmp(p,"MP2"))
+	if(!strcasecmp(p,"MP2"))
 		audioCodecSetcodec( AUDIOENC_MP2 );
-	else if(!strcmp(p,"AC3"))
+	else if(!strcasecmp(p,"AC3"))
 		audioCodecSetcodec( AUDIOENC_AC3 );
 #ifdef HAVE_LIBMP3LAME		
-	else if(!strcmp(p,"MP3"))
+	else if(!strcasecmp(p,"MP3"))
 		 audioCodecSetcodec( AUDIOENC_MP3 );
 #endif
-	else if(!strcmp(p,"NONE"))
+	else if(!strcasecmp(p,"NONE"))
 		audioCodecSetcodec( AUDIOENC_NONE );
-	else if(!strcmp(p,"TOOLAME"))
+	else if(!strcasecmp(p,"TOOLAME"))
 		audioCodecSetcodec( AUDIOENC_2LAME );		
 #ifdef USE_VORBIS		
-	else if(!strcmp(p,"VORBIS"))
+	else if(!strcasecmp(p,"VORBIS"))
 		audioCodecSetcodec( AUDIOENC_VORBIS );		
 #endif		
-	else if(!strcmp(p,"COPY"))
+	else if(!strcasecmp(p,"COPY"))
 		audioCodecSetcodec( AUDIOENC_COPY );		
 	else{
 		audioCodecSetcodec( AUDIOENC_NONE );
