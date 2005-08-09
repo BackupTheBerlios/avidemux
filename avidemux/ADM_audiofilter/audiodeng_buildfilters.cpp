@@ -294,7 +294,7 @@ uint8_t audioCodecSetByName( const char *name)
 {
 		for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
 		{
-			if(!strcmp(name,myCodecList[i].name))
+			if(!strcasecmp(name,myCodecList[i].name))
 			{
 
 				audioCodecSetcodec(myCodecList[i].codec);
