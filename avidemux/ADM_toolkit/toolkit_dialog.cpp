@@ -638,7 +638,7 @@ create_dialogConfirmation (const char *confirm_text)
   buttonCancel = gtk_button_new_from_stock ("gtk-cancel");
   gtk_widget_show (buttonCancel);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonCancel, GTK_RESPONSE_NO);
-  GTK_WIDGET_SET_FLAGS (buttonYes, GTK_CAN_DEFAULT);
+  GTK_WIDGET_SET_FLAGS (buttonCancel, GTK_CAN_DEFAULT);
 
   buttonYes = gtk_button_new_from_stock (confirm_text);
   gtk_widget_show (buttonYes);
