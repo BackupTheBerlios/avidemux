@@ -2452,8 +2452,9 @@ int value;
 void A_Resync(void)
 {
 // Just in case update file info
-        rebuild_status_bar();
         if(!avifileinfo) return;
+        rebuild_status_bar();
+        
         if(curframe>avifileinfo->nb_frames) curframe=frameEnd;
         UI_setMarkers (frameStart, frameEnd);
 }
