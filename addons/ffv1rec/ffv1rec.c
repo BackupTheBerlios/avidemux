@@ -45,6 +45,9 @@
 #include "../../avidemux/ADM_toolkit/ADM_cpuCap.h"
 #include "ffv1.h"
 #include "frequencies.h"
+
+adm_fast_memcpy myMemcpy;
+
 #define _VERSION_ "0.2.3"
 
 

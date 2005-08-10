@@ -414,12 +414,14 @@ int res;
 	_context=avcodec_alloc_context();
 	memset(&_frame,0,sizeof(_frame));
 	if(info->ntsc)
-		_context->frame_rate         	= 29970;
+		_context->time_base= (AVRational){1000,29970};
+		//_context->frame_rate         	= 29970;
 	else
-		_context->frame_rate         	= 25000;
+		_context->time_base= (AVRational){1000,25000};
+		//_context->frame_rate         	= 25000;
 	_context->width=info->width;
 	_context->height=info->height;
-	_context->frame_rate_base=1000;
+	//_context->frame_rate_base=1000;
 	_context->strict_std_compliance=-1;
 	
 	pagesize=info->width*info->height;
