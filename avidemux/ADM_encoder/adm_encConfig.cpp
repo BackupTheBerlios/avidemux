@@ -414,12 +414,14 @@ const char *encoderGetName(void)
 void loadEncoderConfig ( void )
 {
  char *name;
+#if 0 //
 		if(!prefs->get(CODECS_PREFERREDCODEC, &name))
 		{
 			printf("could not get prefered codec!\n");
 			return;
 		}
 		videoCodecSelectByName(name);
+#endif
 		/* change some hardcoded defaults ... */
 #if 0 //def USE_XX_XVID
 		prefs->get(CODECS_XVID_ENCTYPE,   (uint*)&(xvidConfig.generic.mode));
