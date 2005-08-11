@@ -86,7 +86,8 @@ DIA_working::DIA_working( void )
 	GtkWidget *dialog;
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 	_priv=(void *)_priv;
 	postCtor();
 }
@@ -95,7 +96,8 @@ DIA_working::DIA_working( const char *title )
 GtkWidget *dialog;
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+	//gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 	_priv=(void *)dialog;;
 	gtk_window_set_title (GTK_WINDOW (dialog), title);
 	postCtor();
@@ -200,6 +202,7 @@ uint8_t DIA_working::isAlive (void )
 DIA_working::~DIA_working()
 {
 	closeDialog();
+        
 }
 
 void DIA_working::closeDialog( void )
@@ -209,6 +212,7 @@ void DIA_working::closeDialog( void )
 	dialog=(GtkWidget *)_priv;
 	if(dialog)
 	{
+                gtk_unregister_dialog(dialog);
 		gtk_widget_destroy(dialog);
 		_priv=NULL;
 	}

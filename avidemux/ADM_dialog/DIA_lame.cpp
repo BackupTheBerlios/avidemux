@@ -57,7 +57,8 @@ int DIA_getLameSettings(int *pmode, int *pbitrate,ADM_LAME_PRESET *preset)
   GtkWidget *Tpreset[10];
 
   	dialog=create_dialog1();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 
 	// Set mode
 	int mindex;
@@ -122,7 +123,7 @@ int DIA_getLameSettings(int *pmode, int *pbitrate,ADM_LAME_PRESET *preset)
 		
 		
 	}
-	
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;	    
   }

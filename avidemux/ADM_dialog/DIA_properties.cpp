@@ -58,7 +58,8 @@ void DIA_properties( void )
 	gmc=info & ADM_GMC_ON;
 	
 	dialog = create_dialog();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 #define FILL_ENTRY(x) gtk_label_set_text((GtkLabel *) lookup_widget(dialog,#x),text);
 	sprintf(text, "%lu x %lu  ", avifileinfo->width,		avifileinfo->height);
 
@@ -134,6 +135,7 @@ void DIA_properties( void )
 	  }
 
 	gtk_dialog_run(GTK_DIALOG(dialog));	
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 		
 }  

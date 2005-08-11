@@ -40,7 +40,8 @@ uint8_t ret=0;
 char string[1025];
 	
 	dialog=create_dialog1();
-	gtk_transient(dialog);		
+//	gtk_transient(dialog);		
+        gtk_register_dialog(dialog);
 	sprintf(string,"%lu MB",init>>20);
 	_init=init;
   	gtk_label_set_text(GTK_LABEL(WID(labelVideoIn)),string);
@@ -63,7 +64,7 @@ char string[1025];
 		*perce=(float)GTK_ADJUSTMENT(sliderAdjustment)->value;
 		*quality=0;		
 	}
-
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	dialog=NULL;
 	return ret;

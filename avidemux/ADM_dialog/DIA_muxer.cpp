@@ -47,7 +47,8 @@ uint8_t  DIA_setUserMuxParam( int *mode, int *param, int *muxsize)
 	int ret=0;
 
                 dialog=create_dialog1();
-		gtk_transient(dialog);
+//		gtk_transient(dialog);
+                gtk_register_dialog(dialog);
                 switch(*mode)
                 	{
                    	case MUX_REGULAR:
@@ -93,6 +94,7 @@ uint8_t  DIA_setUserMuxParam( int *mode, int *param, int *muxsize)
 
 	        	        	*muxsize=ADJ_GET(spinbutton3);
             }
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	 return ret;
 }

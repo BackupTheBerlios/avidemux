@@ -41,7 +41,8 @@ gtk_editable_delete_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), 0,-1)
 gtk_editable_insert_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), str, strlen(str), &r);}
 
 			dialog=create_dialog1();
-			gtk_transient(dialog);
+//			gtk_transient(dialog);
+                        gtk_register_dialog(dialog);
 			sprintf(str,"%ld",*maxbitrate);
 			FILL_ENTRY(entryBitrate);
 			sprintf(str,"%ld",*qz);
@@ -77,6 +78,7 @@ gtk_editable_insert_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), str, 
 					*opts=NULL;
 
 			}
+                gtk_unregister_dialog(dialog);
 		gtk_widget_destroy(dialog);		
 		return ret;
 }

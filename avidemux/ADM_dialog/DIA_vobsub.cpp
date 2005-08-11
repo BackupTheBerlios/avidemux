@@ -71,8 +71,8 @@ uint8_t DIA_vobsub(vobSubParam *param)
   while(!ext)
   {
     dialog=create_dialog1();
-    
-    gtk_transient(dialog);
+    gtk_register_dialog(dialog);
+    //gtk_transient(dialog);
     gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonSelect), GTK_RESPONSE_APPLY);
     
     
@@ -128,6 +128,7 @@ uint8_t DIA_vobsub(vobSubParam *param)
                 break;
         }
         delete [] fq;          
+        gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
   
   }

@@ -106,7 +106,8 @@ int DIA_getCropParams(	char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in)
 	uint8_t ret=0;
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 	
 	left=param->left;
 	right=param->right;
@@ -166,7 +167,7 @@ int DIA_getCropParams(	char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in)
 		param->bottom=bottom;
 		ret=1;
 	}
-
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	delete working;	
 	delete imgsrc;

@@ -47,7 +47,8 @@
   int ret=0;
 
   	dialog=create_dialogAudio();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 
 	#define SET(a,b) if(*b) 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(dialog,#a)),1);
 			SET(checkbuttonNormalize,normalized);			
@@ -128,7 +129,7 @@
 					ret=0;
 					break;	
 	}
-	
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;	    
   }

@@ -35,7 +35,8 @@ gtk_editable_delete_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), 0,-1)
 gtk_editable_insert_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), str, strlen(str), &r);}
 
 	dialog=create_d3doption();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 
 	FILL_ENTRY(entry1,luma);
 	FILL_ENTRY(entry2,chroma);
@@ -58,7 +59,7 @@ gtk_editable_insert_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), str, 
 			*temporal=(double)atoi(s);
 			ret=1;
 	}
-
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 
 	return ret;

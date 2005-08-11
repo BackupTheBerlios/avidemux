@@ -74,7 +74,8 @@ unsigned int renderI;
 ADM_RENDER_TYPE render;
 	
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 //****************************	
 #define SET_CPU(x,y) gtk_widget_set_sensitive(WID(check##x),0); \
         if(CpuCaps::has##y()) gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(check##x)),1);
@@ -196,7 +197,7 @@ ADM_RENDER_TYPE render;
                         prefs->set(DEVICE_AUDIO_ALSA_DEVICE, str);
 		
 	}
-
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	dialog=NULL;
 	return ret;

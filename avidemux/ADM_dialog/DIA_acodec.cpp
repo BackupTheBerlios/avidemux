@@ -66,7 +66,8 @@ uint8_t DIA_audioCodec( AUDIOENCODER *codec )
 	AUDIOENCODER old=*codec;
 	
 	dialog=create_dialogAudioCodec();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 
 	
 	// now set the input one
@@ -87,6 +88,7 @@ uint8_t DIA_audioCodec( AUDIOENCODER *codec )
 	{
 		*codec=old;
 	}
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	
 	return ret;

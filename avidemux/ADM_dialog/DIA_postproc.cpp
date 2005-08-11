@@ -29,7 +29,8 @@ int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap)
 	int ret=0;
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 #define SET_TOG(x,y) { if(*pplevel & x)  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(y),1);    else \
                                      gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(y),0); }
 #define GET_TOG(x,y) { if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(y)))   \
@@ -57,7 +58,7 @@ int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap)
 		*swap=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(SwapUV)));
 		ret=1;
 	}
-
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 
 	return ret;

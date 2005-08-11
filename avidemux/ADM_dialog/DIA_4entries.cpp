@@ -36,7 +36,8 @@ gtk_editable_delete_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), 0,-1)
 gtk_editable_insert_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), str, strlen(str), &r);}
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
   	gtk_window_set_title (GTK_WINDOW (dialog), title);
 	FILL_ENTRY(entryLeft,left);
 	FILL_ENTRY(entryRight,right);
@@ -54,7 +55,7 @@ gtk_editable_insert_text(GTK_EDITABLE(lookup_widget(dialog,#widget_name)), str, 
 			*bottom=gtk_read_entry(WID(entryBottom));
 			ret=1;
 	}
-
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 
 	return ret;

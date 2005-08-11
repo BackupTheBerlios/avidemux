@@ -44,7 +44,8 @@ GtkWidget *dialog;
 	
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 	
 	CHECK_SET(checkbuttonSwap,swapUv);
 	CHECK_SET(checkbutton2,showU);
@@ -54,6 +55,7 @@ GtkWidget *dialog;
 		CHECK_GET(checkbuttonSwap,swapUv);
 		CHECK_GET(checkbutton2,showU);
 	}
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 
 	return ret;

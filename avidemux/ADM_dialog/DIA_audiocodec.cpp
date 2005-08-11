@@ -55,7 +55,8 @@ int ret=0;
 
 	UNUSED_ARG(title);
 	dialog=create_dialog1();
-	gtk_transient(dialog);		
+//	gtk_transient(dialog);		
+        gtk_register_dialog(dialog);
 	for(uint32_t i=0;i<NB_BITRATE;i++)
 		if(*pbitrate==BTR[i])
 			{
@@ -83,7 +84,7 @@ int ret=0;
 					ret=1;
 																						
 	}
-	
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;	    
 

@@ -41,7 +41,8 @@ uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *sharp,
 	gint r;
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 	// Now update the entries
 	if(*order==0) // BFF
 	{
@@ -66,7 +67,7 @@ uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *sharp,
 		*order=RADIO_GET(radiobuttonTFF);	
 		ret=1;
 	}
-
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 
 	return ret;

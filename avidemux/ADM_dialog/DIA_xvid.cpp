@@ -60,7 +60,8 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 	gint r,b;
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+//	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
 
 	// set the right select button
  	switch (*mode)
@@ -131,6 +132,7 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 		      				ADM_assert(0);
 				}
 	}
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;
 

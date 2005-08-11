@@ -50,7 +50,8 @@ uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 	{
 	
 	dialog=create_dialog1();
-	gtk_transient(dialog);	
+//	gtk_transient(dialog);	
+        gtk_register_dialog(dialog);
   	gtk_window_set_title (GTK_WINDOW (dialog), title);
 	// set the right select button
  switch (*mode)
@@ -138,8 +139,8 @@ uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 				}
 	}
 	else
-	ret=0;
-
+	       ret=0;
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	}
 	return ret;
