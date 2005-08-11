@@ -77,7 +77,8 @@ DIR *dir=NULL;
 	gtk_window_set_title (GTK_WINDOW (dialog),title);
         initFileSelector();
         setFilter(dialog);
-	gtk_transient(dialog);
+        gtk_register_dialog(dialog);
+//	gtk_transient(dialog);
 	if(source)
 	{
 		dupe=PathCanonize(source);
@@ -134,6 +135,7 @@ DIR *dir=NULL;
 			}
 			}
 	}	
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;
 }
