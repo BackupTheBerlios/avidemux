@@ -145,6 +145,17 @@ COMPRES_PARAMS *videoCodecGetDescriptor(SelectCodecType codec)
 		printf("Warning ! codec %d not found\n",codec);
 		return NULL;
 }
+uint8_t         videoCodecSetFinalSize(uint32_t size)
+{
+        COMPRES_PARAMS *mode;
+                mode=videoCodecGetDescriptor(current_codec);
+                if(!mode) return 0;
+                mode->finalsize=size;
+                if(mode->capabilities & ADM_ENC_CAP_2PASS)
+                        mode->mode=COMPRESS_2PASS;
+        return 1;
+
+}
 /*
 	We return 2 things :
 			The codec conf : i.e. mode process or not
