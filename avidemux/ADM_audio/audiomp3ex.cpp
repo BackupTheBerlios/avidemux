@@ -47,6 +47,7 @@ uint8_t AVDMMP3AudioStream::open(char *name)
 		delete _wavheader;
 		_wavheader=NULL;
 		fclose(fd);
+                fd=NULL;
 		return 0;		
 	}
     fseek(fd, 0, SEEK_END);
