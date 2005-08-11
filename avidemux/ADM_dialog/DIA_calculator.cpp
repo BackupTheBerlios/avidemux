@@ -62,6 +62,7 @@ uint32_t numberOfVideoFrames;
 static uint32_t videoSize,videoBitrate;
 
 static uint32_t getPicSize(void);
+extern uint8_t         videoCodecSetFinalSize(uint32_t size);;
 //************************************
 void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 {
@@ -80,6 +81,8 @@ void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 		if(GTK_RESPONSE_APPLY==gtk_dialog_run(GTK_DIALOG(dialog)))
 		{
 			update();
+                        videoCodecSetFinalSize(videoSize);
+                        
 		}
 	else
 		{
@@ -262,7 +265,7 @@ aviInfo info;
 	
 	// and compute
 	//
-	uint32_t videoSize;
+	//uint32_t videoSize;
 	
 	if(audioSize>=totalSize) sprintf(string,"** NO ROOM LEFT**");
 	else
