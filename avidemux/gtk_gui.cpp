@@ -2457,6 +2457,7 @@ void A_Resync(void)
         
         if(curframe>avifileinfo->nb_frames) curframe=frameEnd;
         UI_setMarkers (frameStart, frameEnd);
+        GUI_GoToFrame(curframe);
 }
 // EOF
 
