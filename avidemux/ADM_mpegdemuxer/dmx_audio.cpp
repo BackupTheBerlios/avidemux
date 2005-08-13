@@ -101,9 +101,20 @@ dmxAudioStream::open (char *name)
   fgets (string, MAX_LINE, file);
   sscanf (string, "Type     : %c\n", &type);	// ES for now
 
-
+char *start;
   fgets (string, MAX_LINE, file);
-  sscanf (string, "File     : %s\n", realname);
+  //sscanf (string, "File     : %s\n", realname);
+  start=strstr(string,":");
+  ADM_assert(start);
+  strcpy(realname,start+2);
+
+  int l=strlen(realname)-1;
+  while(l&&(realname[l]==0x0a || realname[l]==0x0d))
+  {
+           realname[l]=0;
+           l--;
+  }
+
 
   fgets (string, MAX_LINE, file);
   sscanf(string,"Append   : %d\n",&multi);
