@@ -123,6 +123,7 @@ public:
                         uint32_t strideu, uint32_t stridev);
 
 };
+void drawString(ADMImage *dst, int x, int y, const char *s) ;
 #define YPLANE(x) (x->data)
 #define UPLANE(x) (x->data+(x->_width*x->_height))
 #define VPLANE(x) (x->data+(5*(x->_width*x->_height)>>2))
