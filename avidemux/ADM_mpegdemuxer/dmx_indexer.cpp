@@ -203,6 +203,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         while(1)
         {
                                 if(!demuxer->sync(&streamid,&syncAbs,&syncRel,&pts,&dts)) break;   
+                                
                                 update++;
                                 //aprintf("\t\tSync : %x at %"LLX"\n",streamid,syncAbs);
                                 if(update>100)
@@ -216,6 +217,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                         lastStamp.hh,lastStamp.mm,lastStamp.ss);
 //uint32_t done,uint32_t total, uint32_t nbImage, uint32_t hh, uint32_t mm, uint32_t ss);
                                                 update=0;
+                                                if(work->isAborted()) break;
                                         }
                                 switch(streamid)
                                         {
