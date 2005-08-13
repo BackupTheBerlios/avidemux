@@ -39,6 +39,25 @@ Indexer progress dialog
 
 static GtkWidget *dialog=NULL;
 static GtkWidget       *create_dialog1 (void);
+static int abted;
+static gint on_destroy_abort(GtkObject * object, gpointer user_data)
+{
+DIA_progressIndexing *pf;
+
+        UNUSED_ARG(object);
+        UNUSED_ARG(user_data);
+
+        pf=(DIA_progressIndexing *)user_data;
+        if(!GUI_Confirmation_HIG("Continue indexing","Abort Requested","Do you want to abort indexing ?"))
+        {
+         //       pf->abortRequest();
+                abted=1;
+        }
+
+        return TRUE;
+
+};
+
 
 DIA_progressIndexing::DIA_progressIndexing(char *name)
 {
@@ -47,6 +66,10 @@ DIA_progressIndexing::DIA_progressIndexing(char *name)
         gtk_label_set_text(GTK_LABEL(WID(labelName)),name);
         gtk_widget_show(dialog);
         clock.reset();
+        aborted=0;
+        abted=0;
+        gtk_signal_connect(GTK_OBJECT(dialog), "delete_event",
+                       GTK_SIGNAL_FUNC(on_destroy_abort), (void *) this);
 
 }
 DIA_progressIndexing::~DIA_progressIndexing()
@@ -55,6 +78,16 @@ DIA_progressIndexing::~DIA_progressIndexing()
         gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
         dialog=NULL;
+}
+uint8_t       DIA_progressIndexing::isAborted(void) 
+{
+        return abted;
+}
+uint8_t DIA_progressIndexing::abortRequest(void)
+{
+        aborted=1;
+        abted=1;
+        return 1;
 }
 uint8_t       DIA_progressIndexing::update(uint32_t done,uint32_t total, uint32_t nbImage, uint32_t hh, uint32_t mm, uint32_t ss)
 {
