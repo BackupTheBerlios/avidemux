@@ -424,7 +424,7 @@ float duration;
    if(_wavinfo)
         if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
         {
-                GUI_Confirmation_HIG("Build Time Map", "Build VBR time map?", VBR_MSG);
+                if(GUI_Confirmation_HIG("Build Time Map", "Build VBR time map?", VBR_MSG))
                 {
                 _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
                 }
