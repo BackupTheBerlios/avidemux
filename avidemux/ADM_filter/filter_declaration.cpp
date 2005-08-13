@@ -64,6 +64,8 @@ printf(  "*********************\n");
         REGISTERX("asharp","ASharp by MarcFD",VF_ASHARP,1,asharp_create,asharp_script);
 	REGISTERX("whirl","Whirl",VF_WHIRL,1,whirl_create,whirl_script);
         REGISTERX("unblend","Unblend by Bach",VF_UNBLEND,1,unblend_create,unblend_script);
+        REGISTERX("fieldunblend","Field Unblend",VF_FIELDUNBLEND,1,fieldunblend_create,fieldunblend_script);
+
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
 //	REGISTERX("mpivtc","Mplayer ivtc",VF_MPDETC,1,mpdetc_create,mpdetc_script);	
