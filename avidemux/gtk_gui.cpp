@@ -202,7 +202,7 @@ int nw;
     {
         case ACT_HANDLE_JOB:
                                 GUI_jobs();
-                                break;
+                                return;
         case ACT_RECENT0:
         case ACT_RECENT1:        
         case ACT_RECENT2:
@@ -2474,11 +2474,12 @@ void A_addJob(void)
         base=getBaseDir();
         if(!base) return;
         // Now time to built it
-        fullname=new char[strlen(name)+strlen(base)+2];
+        fullname=new char[strlen(name)+strlen(base)+2+4];
         
         strcpy(fullname,base);
         strcat(fullname,"/");
         strcat(fullname,name);
+        strcat(fullname,".js");
 
         if(!video_body->saveAsScript(fullname))
         {
