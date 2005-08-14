@@ -494,3 +494,60 @@ uint8_t setFilter( GtkWidget *dialog)
         
         return 1;
 }
+//*****************************
+static char basedir[1024];
+int baseDirDone=0;
+#ifdef CYG_MANGLING
+const char *ADM_DIR_NAME="\\avidemux";
+#else
+const char *ADM_DIR_NAME="/.avidemux";
+#endif
+
+char *getBaseDir(void)
+{
+char *dirname=NULL;
+DIR *dir=NULL;
+char *home;
+//
+        if(baseDirDone) return basedir;
+// Get the base directory
+#if defined(CYG_MANGLING)
+        home="c:\\";
+#else
+        if( ! (home=getenv("HOME")) )
+        {
+                GUI_Error_HIG("Oops","can't determine $HOME.");
+                return NULL;
+        }
+#endif
+
+ // Try to open the .avidemux directory
+        dirname=new char[strlen(home)+strlen(ADM_DIR_NAME)+2];
+        strcpy(dirname,home);
+        strcat(dirname,ADM_DIR_NAME);
+        if((dir=opendir(dirname))==NULL)
+        {
+                // Try to create it
+                char *sys=new char[strlen(dirname)+strlen("mkdir ")+2];
+                strcpy(sys,"mkdir ");
+                strcat(sys,dirname);
+                printf("Creating dir :%s\n",sys);
+                system(sys);
+                delete [] sys;
+                if((dir=opendir(dirname))==NULL)
+                {
+                        GUI_Error_HIG("Oops","Cannot create the .avidemux directory", NULL);
+                        delete [] dirname;
+                        return NULL;
+                }                
+        }
+        closedir(dir);
+        delete [] dirname;
+
+        // Now built the filename
+        strncpy(basedir,home,1023);
+        strncat(basedir,ADM_DIR_NAME,1023-strlen(basedir));
+        baseDirDone=1;
+        printf("Using %s as base directory for prefs/jobs/...\n",basedir);
+        return basedir;
+}
