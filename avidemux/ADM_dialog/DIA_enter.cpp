@@ -19,7 +19,7 @@
 
 
 #include "ADM_dialog/DIA_enter.h"
-
+static GtkWidget        *create_dialog3 (void);
 static GtkWidget	*create_dialog1 (void);
 static GtkWidget	*create_dialog2 (int mmin, int mmax);
 
@@ -115,11 +115,39 @@ uint8_t  DIA_GetFloatValue(float *value, float min, float max, const char *title
 	return ret;
 }
 
+//***************************************************
+uint8_t  DIA_enterString_HIG(const char *title, const char *second, char **outname)
+{
+        int ret=0;
+        GtkWidget *dialog;
+        
 
+        char *alertstring;
+        *outname=NULL;
+     
+        alertstring = g_strconcat("<span size=\"larger\" weight=\"bold\">", title, "</span>\n\n", NULL);
+                
 
+        dialog=create_dialog3();
+        gtk_label_set_text(GTK_LABEL(WID(label1)), alertstring);
+        g_free(alertstring);
 
+        gtk_label_set_text(GTK_LABEL(WID(label2)), second);
 
+        gtk_label_set_use_markup(GTK_LABEL(WID(label1)), TRUE);
+        gtk_register_dialog(dialog);
 
+        if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+        {
+                ret=1;
+                *outname=ADM_strdup( gtk_editable_get_chars(GTK_EDITABLE ((WID(entry1))), 0, -1));
+        }
+        gtk_unregister_dialog(dialog);
+        gtk_widget_destroy(dialog);
+        UI_purge();
+        return ret;
+}
+//***************************************************
 GtkWidget	*create_dialog1 (void)
 {
   GtkWidget *dialog1;
@@ -238,5 +266,76 @@ GtkWidget	*create_dialog2 (int mmin, int mmax)
   gtk_widget_grab_focus (okbutton1);
   gtk_widget_grab_default (okbutton1);
   return dialog1;
+}
+
+
+GtkWidget *create_dialog3 (void)
+{
+  GtkWidget *dialog3;
+  GtkWidget *dialog_vbox1;
+  GtkWidget *vbox1;
+  GtkWidget *label1;
+  GtkWidget *hbox1;
+  GtkWidget *label2;
+  GtkWidget *entry1;
+  GtkWidget *dialog_action_area1;
+  GtkWidget *cancelbutton1;
+  GtkWidget *okbutton1;
+
+  dialog3 = gtk_dialog_new ();
+  gtk_window_set_type_hint (GTK_WINDOW (dialog3), GDK_WINDOW_TYPE_HINT_DIALOG);
+
+  dialog_vbox1 = GTK_DIALOG (dialog3)->vbox;
+  gtk_widget_show (dialog_vbox1);
+
+  vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox1);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
+
+  label1 = gtk_label_new (_("label1"));
+  gtk_widget_show (label1);
+  gtk_box_pack_start (GTK_BOX (vbox1), label1, TRUE, TRUE, 0);
+
+  hbox1 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox1);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, TRUE, TRUE, 0);
+
+  label2 = gtk_label_new (_("label2"));
+  gtk_widget_show (label2);
+  gtk_box_pack_start (GTK_BOX (hbox1), label2, FALSE, FALSE, 0);
+
+  entry1 = gtk_entry_new ();
+  gtk_widget_show (entry1);
+  gtk_box_pack_start (GTK_BOX (hbox1), entry1, TRUE, TRUE, 0);
+  GTK_WIDGET_SET_FLAGS (entry1, GTK_CAN_DEFAULT);
+
+  dialog_action_area1 = GTK_DIALOG (dialog3)->action_area;
+  gtk_widget_show (dialog_action_area1);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
+
+  cancelbutton1 = gtk_button_new_from_stock ("gtk-cancel");
+  gtk_widget_show (cancelbutton1);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog3), cancelbutton1, GTK_RESPONSE_CANCEL);
+  GTK_WIDGET_SET_FLAGS (cancelbutton1, GTK_CAN_DEFAULT);
+
+  okbutton1 = gtk_button_new_from_stock ("gtk-ok");
+  gtk_widget_show (okbutton1);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog3), okbutton1, GTK_RESPONSE_OK);
+  GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
+
+  /* Store pointers to all widgets, for use by lookup_widget(). */
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog3, dialog3, "dialog3");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog3, dialog_vbox1, "dialog_vbox1");
+  GLADE_HOOKUP_OBJECT (dialog3, vbox1, "vbox1");
+  GLADE_HOOKUP_OBJECT (dialog3, label1, "label1");
+  GLADE_HOOKUP_OBJECT (dialog3, hbox1, "hbox1");
+  GLADE_HOOKUP_OBJECT (dialog3, label2, "label2");
+  GLADE_HOOKUP_OBJECT (dialog3, entry1, "entry1");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog3, dialog_action_area1, "dialog_action_area1");
+  GLADE_HOOKUP_OBJECT (dialog3, cancelbutton1, "cancelbutton1");
+  GLADE_HOOKUP_OBJECT (dialog3, okbutton1, "okbutton1");
+
+  gtk_widget_grab_default (okbutton1);
+  return dialog3;
 }
 
