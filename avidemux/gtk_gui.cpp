@@ -134,7 +134,7 @@ extern void A_SaveAudioDualAudio (char *a);
 
 extern uint8_t ADM_aviUISetMuxer(  void );
 void A_Resync(void);
-
+void A_addJob(void);
 static void updateSecondAudioTrack (void);
 void A_audioTrack(void);
 extern int A_Save( char *name);
@@ -179,7 +179,7 @@ uint8_t A_TimeShift(void);
 PARAM_MUX muxMode = MUX_REGULAR;
 int muxParam = 0;
 
-
+extern uint8_t GUI_jobs(void);
 extern bool parseECMAScript(const char *name);
 //___________________________________________
 // serialization of user event throught gui
@@ -200,6 +200,9 @@ void HandleAction (Action action)
 int nw;
   switch (action)
     {
+        case ACT_HANDLE_JOB:
+                                GUI_jobs();
+                                break;
         case ACT_RECENT0:
         case ACT_RECENT1:        
         case ACT_RECENT2:
@@ -518,6 +521,9 @@ case ACT_Pipe2Other:
     case ACT_SaveWork:
       GUI_FileSelWrite ("Select workbench to save ", A_saveWorkbench);
       break;
+    case ACT_ADD_JOB:
+        A_addJob();
+        break;
     case ACT_SaveCurrentWork:
       if( actual_workbench_file ){
         char *tmp = ADM_strdup(actual_workbench_file);
@@ -2459,5 +2465,27 @@ void A_Resync(void)
         UI_setMarkers (frameStart, frameEnd);
         GUI_GoToFrame(curframe);
 }
-// EOF
+void A_addJob(void)
+{
+        char *name,*fullname,*base;
+        if(!DIA_enterString_HIG("Save job","Please enter job name",&name)) return;
+        if(!name || !*name) return;
 
+        base=getBaseDir();
+        if(!base) return;
+        // Now time to built it
+        fullname=new char[strlen(name)+strlen(base)+2];
+        
+        strcpy(fullname,base);
+        strcat(fullname,"/");
+        strcat(fullname,name);
+
+        if(!video_body->saveAsScript(fullname))
+        {
+                GUI_Error_HIG("Saving failed","Saving the job failed. Maybe you have permission issue with ~/.avidemux");
+        }
+
+        delete fullname;
+        ADM_dealloc(name);
+}
+// EOF
