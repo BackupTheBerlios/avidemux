@@ -12,9 +12,9 @@ CALLBACK( save_audio1         			,ACT_SaveWave);
 CALLBACK( save_as_avi1       			,ACT_SaveAvi);
 CALLBACK(avi_muxer_options1 			,ACT_SetMuxParam);
 
-CALLBACK(load_project         			,ACT_OpenAvi); 
+//CALLBACK(load_project         			,ACT_OpenAvi); 
 CALLBACK(save_project_as1              		,ACT_SaveWork);
-CALLBACK(save_current_project                	,ACT_SaveCurrentWork);
+//CALLBACK(save_current_project                	,ACT_SaveCurrentWork);
  
  CALLBACK(video_informations1	                 ,ACT_AviInfo);
  CALLBACK(save_image1               		 ,ACT_SaveImg);
@@ -80,4 +80,7 @@ CALLBACK(second_audio_track1                   ,ACT_SecondAudioTrack);
 CALLBACK(vcd1                                   ,ACT_AUTO_VCD);
 CALLBACK(svcd1                                  ,ACT_AUTO_SVCD);
 CALLBACK(dvd1                                   ,ACT_AUTO_DVD);
+
+CALLBACK(add_to_joblist1                       ,ACT_ADD_JOB);
+CALLBACK(joblist1                              ,ACT_HANDLE_JOB);
 
