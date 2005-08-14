@@ -350,7 +350,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  spinbuttonMpegSplit_adj = gtk_adjustment_new (690, 10, 1500, 10, 100, 100);
+  spinbuttonMpegSplit_adj = gtk_adjustment_new (690, 10, 5000, 10, 100, 100);
   spinbuttonMpegSplit = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonMpegSplit_adj), 1, 0);
   gtk_widget_show (spinbuttonMpegSplit);
   gtk_table_attach (GTK_TABLE (table2), spinbuttonMpegSplit, 1, 2, 2, 3,
