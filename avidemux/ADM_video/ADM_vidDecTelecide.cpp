@@ -89,12 +89,9 @@ char *Telecide::printConf( void )
   uint8_t GetHintingData(unsigned char *video, unsigned int *hint);
   void BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
             int src_pitch, int row_size, int height);
-  void DrawString(ADMImage *dst, int x, int y, const char *s);
-  void DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
-void DrawString(ADMImage *dst, int x, int y, const char *s)
-{
-        printf("Decomb:%s\n",s);
-}
+//  void DrawString(ADMImage *dst, int x, int y, const char *s);
+ // void DrawStringYUY2(uint8_t *dst, int x, int y, const char *s);
+#define DrawString drawString
 
 uint8_t Telecide::getCoupledConf( CONFcouple **couples)
 {

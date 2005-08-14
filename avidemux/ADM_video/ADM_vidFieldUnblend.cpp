@@ -170,6 +170,41 @@ uint8_t *s1,*s2;
                 }
         return df;
 }
+static float computeDiff2(ADMImage *src1,ADMImage *src2,ADMImage *cand)
+{
+float df=0;
+int delta;
+uint32_t ww,hh;
+uint8_t *s1,*s2,*d1;
+int a1,a2,t1;
+        s1=YPLANE(src1);
+        s2=YPLANE(src2);
+        
+        d1=YPLANE(cand);
+        ww=src1->_width;
+        hh=src1->_height;
+
+          for(int y=0;y<hh;y++)
+                for(int x=0;x<ww;x++)
+                {
+                        a1=*s1;
+                        a2=*s2;
+                        t1=*d1;
+                        if(a1==a2) ;
+                        else
+                        if(a1>a2)
+                        {
+                                if(t1 <=a1 && t1>=a2) df+=1;
+                                        else df-=1;
+                        }else
+                                if(t1 <=a2 && t1>=a1) df+=1;
+                                        else df-=1;
+                        s1++;
+                        s2++;
+                        d1++;
+                }
+        return df;
+}
 uint8_t vidFieldUnblend::getFrameNumberNoAlloc (uint32_t inframe,
                                 uint32_t * len,
                                 ADMImage * data, uint32_t * flags)
@@ -190,42 +225,25 @@ uint8_t vidFieldUnblend::getFrameNumberNoAlloc (uint32_t inframe,
         srcN=vidCache->getImage(inframe+2);
         src=vidCache->getImage(inframe);
 
-        merge(srcP,srcN,_uncompressed);
-        distMerged=computeDiff(src,_uncompressed);
-        distN=computeDiff(srcN,src);
-        distP=computeDiff(srcP,src);
+//        merge(srcP,srcN,_uncompressed);
+        distMerged=computeDiff2(srcP,srcN,src);
         final=src;
-        if(distN>100 && distP > 100 && distMerged>100)
-        {
-                distN/=_info.width*_info.height;
-                distP/=_info.width*_info.height;
-                distMerged/=_info.width*_info.height;
-                distM=distN+distP;
-                distM=distM/2;                
-
-                distN/=distM/100.;
-                distP/=distM/100.;
-                distMerged/=distM/100.;
-                
-                if(distMerged<_param->threshold)
-                {
-                        if(distP<distN)
-                                final=srcP;
-                        else
-                                final=srcN;
-                }
         
+        distMerged/=_info.width*_info.height;
+        distMerged*=100;
+
+        if(distMerged>_param->threshold)
+        {
+                // which is closer N or P ?
+                if(computeDiff(srcN,src)>computeDiff(srcP,src))
+                        final=srcP;     
+                else
+                        final=srcN;
         }
         if(_param->show)
         {
                 sprintf(txt," M %02.1f",distMerged);
                 drawString(final,2,2,txt);
-                sprintf(txt," N %02.1f",distN);
-                drawString(final,2,3,txt);
-                sprintf(txt," P %02.1f",distP);
-                drawString(final,2,4,txt);
-                sprintf(txt," A %02.1f",distM);
-                drawString(final,2,5,txt);
                 if(final!=src)
                 {
                 sprintf(txt," Replaced");

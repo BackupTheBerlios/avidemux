@@ -70,10 +70,8 @@ extern uint8_t 	PutHintingData(unsigned char *video, unsigned int hint);
 extern uint8_t 	GetHintingData(unsigned char *video, unsigned int *hint);
 extern void 	BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
             		int src_pitch, int row_size, int height);
-extern  void 	DrawString(ADMImage *dst, int x, int y, const char *s);
-#define DrawString(a,b,c,d) DrawString(NULL,b,c,d)
-extern  void 	DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
+#define DrawString drawString
 
 #ifdef USE_SSE
 	#define DECIMATE_MMX_BUILD_PLANE 1
@@ -153,11 +151,9 @@ public:
 				ADMImage *data,uint32_t *flags);
 
     	uint8_t   	*GetFrame(int n);
-	void   		DrawShow(uint8_t  *src, int useframe, bool forced, int dropframe,
+	void   		DrawShow(ADMImage  *src, int useframe, bool forced, int dropframe,
 		                              double metric, int inframe );
-	void   		DrawShowYUY2(uint8_t  *src, int useframe, bool forced, int dropframe,
-		                              double metric, int inframe );
-    	void   		FindDuplicate(int frame, int *chosen, double *metric, bool *forced   );
+        void   		FindDuplicate(int frame, int *chosen, double *metric, bool *forced   );
     	void   		FindDuplicate2(int frame, int *chosen, bool *forced );
     	void   		FindDuplicateYUY2(int frame, int *chosen, double *metric, bool *force);
     	void   		FindDuplicate2YUY2(int frame, int *chosen, bool *forced );
@@ -292,7 +288,7 @@ Decimate::~Decimate(void)
 		sum=NULL;
 }
 //________________________________________________________
-void Decimate::DrawShow(uint8_t  *src, int useframe, bool forced, int dropframe,
+void Decimate::DrawShow(ADMImage  *src, int useframe, bool forced, int dropframe,
 						double metric, int inframe)
 {
 	char buf[80];
@@ -396,23 +392,23 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		if (show == true)
 		{
 			sprintf(buf, "Decimate %s", VERSION);
-			DrawString(src->data, 0, 0, buf);
+			DrawString(src, 0, 0, buf);
 			sprintf(buf, "Copyright 2003 Donald Graft");
-			DrawString(src->data, 0, 1, buf);
+			DrawString(src, 0, 1, buf);
 			sprintf(buf,"%d: %3.2f", start, showmetrics[0]);
-			DrawString(src->data, 0, 3, buf);
+			DrawString(src, 0, 3, buf);
 			sprintf(buf,"%d: %3.2f", start + 1, showmetrics[1]);
-			DrawString(src->data, 0, 4, buf);
+			DrawString(src, 0, 4, buf);
 			sprintf(buf,"%d: %3.2f", start + 2, showmetrics[2]);
-			DrawString(src->data, 0, 5, buf);
+			DrawString(src, 0, 5, buf);
 			sprintf(buf,"%d: %3.2f", start + 3, showmetrics[3]);
-			DrawString(src->data, 0, 6, buf);
+			DrawString(src, 0, 6, buf);
 			sprintf(buf,"%d: %3.2f", start + 4, showmetrics[4]);
-			DrawString(src->data, 0, 7, buf);
+			DrawString(src, 0, 7, buf);
 			sprintf(buf,"in frm %d, use frm %d", inframe, useframe);
-			DrawString(src->data, 0, 8, buf);
+			DrawString(src, 0, 8, buf);
 			sprintf(buf,"dropping frm %d%s", dropframe, last_forced == true ? ", forced!" : "");
-			DrawString(src->data, 0, 9, buf);
+			DrawString(src, 0, 9, buf);
 		}
 		if (debug)
 		{	
@@ -467,26 +463,26 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			{
 
 				sprintf(buf, "Decimate %s", VERSION);
-				DrawString(src->data, 0, 0, buf);
+				DrawString(src, 0, 0, buf);
 				sprintf(buf, "Copyright 2003 Donald Graft");
-				DrawString(src->data, 0, 1, buf);
+				DrawString(src, 0, 1, buf);
 				sprintf(buf,"%d: %3.2f", start, showmetrics[0]);
-				DrawString(src->data, 0, 3, buf);
+				DrawString(src, 0, 3, buf);
 				sprintf(buf,"%d: %3.2f", start + 1, showmetrics[1]);
-				DrawString(src->data, 0, 4, buf);
+				DrawString(src, 0, 4, buf);
 				sprintf(buf,"%d: %3.2f", start + 2, showmetrics[2]);
-				DrawString(src->data, 0, 5, buf);
+				DrawString(src, 0, 5, buf);
 				sprintf(buf,"%d: %3.2f", start + 3, showmetrics[3]);
-				DrawString(src->data, 0, 6, buf);
+				DrawString(src, 0, 6, buf);
 				sprintf(buf,"%d: %3.2f", start + 4, showmetrics[4]);
-				DrawString(src->data, 0, 7, buf);
+				DrawString(src, 0, 7, buf);
 				sprintf(buf,"infrm %d", inframe);
-				DrawString(src->data, 0, 8, buf);
+				DrawString(src, 0, 8, buf);
 				if (last_forced == false)
 					sprintf(buf,"chose %d, passing through", dropframe);
 				else
 					sprintf(buf,"chose %d, passing through, forced!", dropframe);
-				DrawString(src->data, 0, 9, buf);
+				DrawString(src, 0, 9, buf);
 			}
 			if (debug)
 			{
@@ -625,26 +621,26 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		{
 
 			sprintf(buf, "Decimate %s", VERSION);
-			DrawString(dst->data, 0, 0, buf);
+			DrawString(dst, 0, 0, buf);
 			sprintf(buf, "Copyright 2003 Donald Graft");
-			DrawString(dst->data, 0, 1, buf);
+			DrawString(dst, 0, 1, buf);
 			sprintf(buf,"%d: %3.2f", start, showmetrics[0]);
-			DrawString(dst->data, 0, 3, buf);
+			DrawString(dst, 0, 3, buf);
 			sprintf(buf,"%d: %3.2f", start + 1, showmetrics[1]);
-			DrawString(dst->data, 0, 4, buf);
+			DrawString(dst, 0, 4, buf);
 			sprintf(buf,"%d: %3.2f", start + 2, showmetrics[2]);
-			DrawString(dst->data, 0, 5, buf);
+			DrawString(dst, 0, 5, buf);
 			sprintf(buf,"%d: %3.2f", start + 3, showmetrics[3]);
-			DrawString(dst->data, 0, 6, buf);
+			DrawString(dst, 0, 6, buf);
 			sprintf(buf,"%d: %3.2f", start + 4, showmetrics[4]);
-			DrawString(dst->data, 0, 7, buf);
+			DrawString(dst, 0, 7, buf);
 			sprintf(buf,"infrm %d", inframe);
-			DrawString(dst->data, 0, 8, buf);
+			DrawString(dst, 0, 8, buf);
 			if (last_forced == false)
 				sprintf(buf,"chose %d, blending %d and %d",dropframe, inframe, nextfrm);
 			else
 				sprintf(buf,"chose %d, blending %d and %d, forced!", dropframe, inframe, nextfrm);
-			DrawString(dst->data, 0, 9, buf);
+			DrawString(dst, 0, 9, buf);
 		}
 		//return dst;
 		//memcpy(data,dst,*len);
@@ -668,28 +664,28 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 
 
 			sprintf(buf, "Decimate %s", VERSION);
-			DrawString(src->data, 0, 0, buf);
+			DrawString(src, 0, 0, buf);
 			sprintf(buf, "Copyright 2003 Donald Graft");
-			DrawString(src->data, 0, 1, buf);
+			DrawString(src, 0, 1, buf);
 			sprintf(buf,"in frm %d, use frm %d", inframe, useframe);
-			DrawString(src->data, 0, 3, buf);
+			DrawString(src, 0, 3, buf);
 			sprintf(buf,"%d: %3.2f (%s)", start, showmetrics[0],
 					Dshow[0] ? "new" : "dup");
-			DrawString(src->data, 0, 4, buf);
+			DrawString(src, 0, 4, buf);
 			sprintf(buf,"%d: %3.2f (%s)", start + 1, showmetrics[1],
 					Dshow[1] ? "new" : "dup");
-			DrawString(src->data, 0, 5, buf);
+			DrawString(src, 0, 5, buf);
 			sprintf(buf,"%d: %3.2f (%s)", start + 2, showmetrics[2],
 					Dshow[2] ? "new" : "dup");
-			DrawString(src->data, 0, 6, buf);
+			DrawString(src, 0, 6, buf);
 			sprintf(buf,"%d: %3.2f (%s)", start + 3, showmetrics[3],
 					Dshow[3] ? "new" : "dup");
-			DrawString(src->data, 0, 7, buf);
+			DrawString(src, 0, 7, buf);
 			sprintf(buf,"%d: %3.2f (%s)", start + 4, showmetrics[4],
 					Dshow[4] ? "new" : "dup");
-			DrawString(src->data, 0, 8, buf);
+			DrawString(src, 0, 8, buf);
 			sprintf(buf,"Dropping frm %d%s", dropframe, last_forced == true ? " forced!" : "");
-			DrawString(src->data, 0, 9, buf);
+			DrawString(src, 0, 9, buf);
 		}
 		if (debug)
 		{	
@@ -741,7 +737,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			/* It's film, so decimate in the normal way. */
 			if (useframe >= dropframe) useframe++;
 			GETFRAME(useframe, src);
-			DrawShow(src->data, useframe, forced, dropframe, metric, inframe);			
+			DrawShow(src, useframe, forced, dropframe, metric, inframe);			
 			//memcpy(data,src,*len);
 
 			data->duplicate(src);
@@ -753,7 +749,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		{
 			/* It's a video cycle. Output the first frame of the cycle. */
 			GETFRAME(useframe, src);
-			DrawShow(src->data, 0, forced, dropframe, metric, inframe);
+			DrawShow(src, 0, forced, dropframe, metric, inframe);
 			//return src;
 			//memcpy(data,src,*len);
 
@@ -766,7 +762,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 		{
 			/* It's a video cycle. Output the last frame of the cycle. */
 			GETFRAME(useframe+1, src);
-			DrawShow(src->data, 0, forced, dropframe, metric, inframe);
+			DrawShow(src, 0, forced, dropframe, metric, inframe);
 			//return src;
 			//memcpy(data,src,*len);
 
@@ -866,7 +862,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 #ifdef DECIMATE_MMX_BUILD_PLANE
 			}
 #endif
-			DrawShow(dst->data, 0, forced, dropframe, metric, inframe);
+			DrawShow(dst, 0, forced, dropframe, metric, inframe);
 			vidCache->unlockAll();
 			//return dst;
 			//memcpy(data,dst,*len);

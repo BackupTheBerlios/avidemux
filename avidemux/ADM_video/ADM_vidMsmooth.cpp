@@ -75,8 +75,9 @@ extern uint8_t 	GetHintingData(unsigned char *video, unsigned int *hint);
 extern void 	BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,
             		int src_pitch, int row_size, int height);
 //extern  void 	DrawString(uint8_t *dst, int x, int y, const char *s);
-extern  void    DrawString(ADMImage *dst, int x, int y, const char *s);
-#define DrawString(a,b,c,d) DrawString(NULL,b,c,d)
+//extern  void    DrawString(ADMImage *dst, int x, int y, const char *s);
+//#define DrawString(a,b,c,d) DrawString(NULL,b,c,d)
+#define DrawString drawString
 
 extern  void 	DrawStringYUY2(uint8_t *dst, int x, int y, const char *s); 
 
@@ -276,9 +277,9 @@ uint8_t Msmooth::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			char buf[80];
 			//env->MakeWritable(&mask);
 			sprintf(buf, "0.2 beta");
-			DrawString(mask->data, 0, 0, buf);
+			DrawString(mask, 0, 0, buf);
 			sprintf(buf, "From Donald Graft");
-			DrawString(mask->data, 0, 1, buf);
+			DrawString(mask, 0, 1, buf);
 		}
 		//return mask;
 		memcpy(data->data,mask->data,(_info.width*_info.height*3)>>1);
@@ -372,9 +373,9 @@ done:
 		char buf[80];
 		//env->MakeWritable(&deliver);
 		sprintf(buf, "0.2beta");
-		DrawString(deliver->data, 0, 0, buf);
+		DrawString(deliver, 0, 0, buf);
 		sprintf(buf, "Donald Graft");
-		DrawString(deliver->data, 0, 1, buf);
+		DrawString(deliver, 0, 1, buf);
 	}
 	memcpy(data->data,deliver->data,(_info.width*_info.height*3)>>1);
 	//return(deliver);
