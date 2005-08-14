@@ -33,6 +33,11 @@
 #include "ADM_video/ADM_vidDecTel_param.h"
 #define MENU_SET(x,y) { gtk_option_menu_set_history (GTK_OPTION_MENU(WID(x)),param->y);}
 #define MENU_GET(x,y) { param->y	= getRangeInMenu(WID(x));}
+
+#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),param->y);}
+#define CHECK_GET(x,y) {param->y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
+
+
 static GtkWidget	*create_dialog1 (void);
 
 uint8_t DIA_getDecombTelecide(TelecideParam *param)
@@ -53,6 +58,7 @@ int ret=0;
 	MENU_SET(optionmenuPost,post);
 	MENU_SET(optionmenuBlend,blend);
 	MENU_SET(optionmenuChroma,chroma);
+        CHECK_SET(checkbuttonShow,show);
 	gtk_register_dialog(dialog);
 	
 	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
@@ -63,6 +69,7 @@ int ret=0;
 		MENU_GET(optionmenuPost,post);
 		MENU_GET(optionmenuBlend,blend);
 		MENU_GET(optionmenuChroma,chroma);
+                CHECK_GET(checkbuttonShow,show);
 		#define RD_ENTRY(x,y) {param->y=gtk_read_entry_float(WID(x));}
 		RD_ENTRY(entryVthresh,vthresh);
 		RD_ENTRY(entryBthresh,bthresh);
@@ -76,7 +83,9 @@ int ret=0;
 }
 
 //________________________________________
-GtkWidget	*create_dialog1 (void)
+
+GtkWidget*
+create_dialog1 (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
@@ -123,17 +132,20 @@ GtkWidget	*create_dialog1 (void)
   GtkWidget *entryVthresh;
   GtkWidget *label10;
   GtkWidget *entryNT;
+  GtkWidget *label11;
+  GtkWidget *checkbuttonShow;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (dialog1), _("Decomb Telecide"));
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
 
-  table1 = gtk_table_new (10, 2, FALSE);
+  table1 = gtk_table_new (11, 2, FALSE);
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), table1, TRUE, TRUE, 0);
 
@@ -142,7 +154,6 @@ GtkWidget	*create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label1, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
   optionmenuField = gtk_option_menu_new ();
@@ -168,7 +179,6 @@ GtkWidget	*create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
   optionmenuBack = gtk_option_menu_new ();
@@ -224,7 +234,6 @@ GtkWidget	*create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
 
   label4 = gtk_label_new (_("Postprocessing"));
@@ -232,7 +241,6 @@ GtkWidget	*create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 3, 4,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
 
   optionmenuPost = gtk_option_menu_new ();
@@ -262,7 +270,6 @@ GtkWidget	*create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 4, 5,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
 
   optionmenuChroma = gtk_option_menu_new ();
@@ -288,7 +295,6 @@ GtkWidget	*create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label6, 0, 1, 5, 6,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
 
   optionmenuBlend = gtk_option_menu_new ();
@@ -314,7 +320,6 @@ GtkWidget	*create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label7, 0, 1, 6, 7,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
 
   entryBthresh = gtk_entry_new ();
@@ -328,7 +333,6 @@ GtkWidget	*create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label8, 0, 1, 7, 8,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label8), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label8), 0, 0.5);
 
   entryDthresh = gtk_entry_new ();
@@ -342,7 +346,6 @@ GtkWidget	*create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label9, 0, 1, 8, 9,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
 
   entryVthresh = gtk_entry_new ();
@@ -356,13 +359,25 @@ GtkWidget	*create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), label10, 0, 1, 9, 10,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
 
   entryNT = gtk_entry_new ();
   gtk_widget_show (entryNT);
   gtk_table_attach (GTK_TABLE (table1), entryNT, 1, 2, 9, 10,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  label11 = gtk_label_new (_("Show"));
+  gtk_widget_show (label11);
+  gtk_table_attach (GTK_TABLE (table1), label11, 0, 1, 10, 11,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
+
+  checkbuttonShow = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkbuttonShow);
+  gtk_table_attach (GTK_TABLE (table1), checkbuttonShow, 1, 2, 10, 11,
+                    (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
@@ -379,55 +394,8 @@ GtkWidget	*create_dialog1 (void)
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), okbutton1, GTK_RESPONSE_OK);
   GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
 
-/*  g_signal_connect ((gpointer) bottom_field_first1, "activate",
-                    G_CALLBACK (on_bottom_field_first1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) top_field_first1, "activate",
-                    G_CALLBACK (on_top_field_first1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) never1, "activate",
-                    G_CALLBACK (on_never1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) when_forward_is_still_combed1, "activate",
-                    G_CALLBACK (on_when_forward_is_still_combed1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) always_try1, "activate",
-                    G_CALLBACK (on_always_try1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) no_strategy1, "activate",
-                    G_CALLBACK (on_no_strategy1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) telecine_3_1, "activate",
-                    G_CALLBACK (on_telecine_3_1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) pal_secam1, "activate",
-                    G_CALLBACK (on_pal_secam1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) ntsc_converted_from_pal1, "activate",
-                    G_CALLBACK (on_ntsc_converted_from_pal1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) no_postprocessing1, "activate",
-                    G_CALLBACK (on_no_postprocessing1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) item1, "activate",
-                    G_CALLBACK (on_item1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) postproc_on_best_match1, "activate",
-                    G_CALLBACK (on_postproc_on_best_match1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) ignore_chroma_to_decide1, "activate",
-                    G_CALLBACK (on_ignore_chroma_to_decide1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) use_chroma_to_decide1, "activate",
-                    G_CALLBACK (on_use_chroma_to_decide1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) interpolate1, "activate",
-                    G_CALLBACK (on_interpolate1_activate),
-                    NULL);
-  g_signal_connect ((gpointer) blend1, "activate",
-                    G_CALLBACK (on_blend1_activate),
-                    NULL);
-*/
+
+
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
@@ -474,6 +442,8 @@ GtkWidget	*create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, entryVthresh, "entryVthresh");
   GLADE_HOOKUP_OBJECT (dialog1, label10, "label10");
   GLADE_HOOKUP_OBJECT (dialog1, entryNT, "entryNT");
+  GLADE_HOOKUP_OBJECT (dialog1, label11, "label11");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbuttonShow, "checkbuttonShow");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
@@ -481,3 +451,4 @@ GtkWidget	*create_dialog1 (void)
   return dialog1;
 }
 
+//EOF
