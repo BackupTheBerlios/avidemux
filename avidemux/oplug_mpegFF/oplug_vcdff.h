@@ -16,6 +16,6 @@
  ***************************************************************************/
 #ifdef USE_FFMPEG
 #include "ADM_editor/ADM_outputfmt.h"
-void oplug_mpegff(char *name,ADM_OUT_FORMAT type);
+uint8_t oplug_mpegff(char *name,ADM_OUT_FORMAT type);
 
 #endif

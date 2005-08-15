@@ -89,7 +89,7 @@ void oplug_mpegff_conf( void )
 			);
 }
 
-void oplug_mpegff(char *name, ADM_OUT_FORMAT type)
+uint8_t oplug_mpegff(char *name, ADM_OUT_FORMAT type)
 {
 AVDMGenericVideoStream *_incoming;
 EncoderFFMPEGMpeg1  *encoder;
@@ -105,6 +105,7 @@ uint32_t size;
 ADM_MUXER_TYPE mux;
 uint32_t  audio_encoding=0;
 uint32_t  real_framenum=0;
+uint8_t   ret=0;
 	
 	twoPass=new char[strlen(name)+6];
 	twoFake=new char[strlen(name)+6];
@@ -124,7 +125,7 @@ uint32_t  real_framenum=0;
 
 	
 	total=_incoming->getInfo()->nb_frames;
-	if(!total) return ;	
+	if(!total) return 0;	
 // ________alternate config____________
 	
 
@@ -143,7 +144,7 @@ uint32_t  real_framenum=0;
                     if(!currentaudiostream)
                     {
                         GUI_Error_HIG("There is no audio track", NULL);
-                        return ;
+                        return 0;
                     }
                     audio=mpt_getAudioStream();
                     mux=MUXER_TS;
@@ -154,7 +155,7 @@ uint32_t  real_framenum=0;
                 if(!currentaudiostream)
                 {
                         GUI_Error_HIG("There is no audio track", NULL);
-                        return ;
+                        return 0;
                 }
                 audio=mpt_getAudioStream();
                 // Have to check the type
@@ -164,7 +165,7 @@ uint32_t  real_framenum=0;
                 if(!audio)
                 {
                         GUI_Error_HIG("Audio track is not suitable", NULL);
-                        return;
+                        return 0;
                 }
                 // Check
                 WAVHeader *hdr=audio->getInfo();	
@@ -175,7 +176,7 @@ uint32_t  real_framenum=0;
                         {
                             GUI_Error_HIG("Incompatible audio", "For VCD, audio must be 44.1 kHz MP2.");
                             deleteAudioFilter();
-                            return ;
+                            return 0;
                         }
                         mux=MUXER_VCD;
                         printf("X*CD: Using VCD PS\n");
@@ -196,7 +197,7 @@ uint32_t  real_framenum=0;
                             {
                                 deleteAudioFilter();
                                 GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2 or AC3.");
-                                return ;
+                                return 0 ;
                             }
                             mux=MUXER_DVD;
                             printf("X*VCD: Using DVD PS\n");
@@ -228,7 +229,7 @@ uint32_t  real_framenum=0;
                 muxer=NULL;
                 deleteAudioFilter();
                 printf("Muxer init failed\n");
-                return ;
+                return 0 ;
             }
         }
         else
@@ -237,7 +238,7 @@ uint32_t  real_framenum=0;
             if(!file)
             {
                     GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", name);
-                    return ;
+                    return 0 ;
             }
         }
 	switch(current_codec)
@@ -264,7 +265,7 @@ uint32_t  real_framenum=0;
   	if(!encoder->configure(_incoming))
   	{
 		delete encoder;
-		return;
+		return 0;
 	}
 
 
@@ -393,11 +394,11 @@ switch(mux)
 				encoding->feedFrame(len);
 					if(!encoding->isAlive ())
 						{
-									 goto finish;
-									 return ;
+                                                         ret=0;        
+							 goto finish;
 						}
 			}
-			
+			ret=1;
 finish:
 			delete encoding;
 			GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
@@ -414,7 +415,7 @@ finish:
 				muxer=NULL;
 			}
 			delete encoder;
-			return ;
+			return ret;
 }
 	
 void end (void)
