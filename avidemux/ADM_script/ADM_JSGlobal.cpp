@@ -83,11 +83,17 @@ void SpidermonkeyDestroy()
 	JS_DestroyContext(g_pCx);
 	JS_DestroyRuntime(g_pRt);
 }// end SpidermonkeyDestroy
-
+static int jscu=0;
+void JS_setSuccess(int s)
+{
+        jscu=s;
+        printf("[Ecma] success :%d\n",jscu);
+}
 bool parseECMAScript(const char *name)
 {// begin parseECMAScript
 	jsval rval;
 	uintN lineno = 0;
+        jscu=0;
 	printf("Spidermonkey compiling \"%s\"\n",name);
 	JSScript *pJSScript = JS_CompileFile(g_pCx, g_pObject, name);
 	if(pJSScript != NULL)
@@ -97,5 +103,6 @@ bool parseECMAScript(const char *name)
 		JS_DestroyScript(g_pCx,pJSScript);
 	}// end execute external file
         A_Resync();
+        return jscu;
                         
 }// end parseECMAScript

@@ -39,7 +39,7 @@ extern int A_openAvi (char *name);
 extern int A_Save (char *name);
 extern int A_appendAvi (char *name);
 extern int A_saveDVDPS(char *name);
-extern int ogmSave(char *name);
+extern uint8_t ogmSave(char *name);
 extern int GUI_GoToFrame(uint32_t frame);
 extern int filterLoadXml(char *docname,uint8_t silent);
 extern int A_delete(uint32_t start, uint32_t end);

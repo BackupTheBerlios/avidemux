@@ -33,7 +33,7 @@
 
 #include "ADM_JSGlobal.h"
 #include "ADM_toolkit/filesel.h"
-
+extern int JS_setSuccess(int a);;
 JSBool displayError(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool displayInfo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool fileWriteSelect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
@@ -42,6 +42,8 @@ JSBool print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 
 JSBool allFilesFrom(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool nextFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool setSuccess(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval);
 
 static JSFunctionSpec adm_functions[] = {
   /*    name          native          nargs    */
@@ -52,8 +54,11 @@ static JSFunctionSpec adm_functions[] = {
   {"print",             print,        0},
   {"allFilesFrom",      allFilesFrom,        0},
   {"nextFile",          nextFile,        0},
+  {"setSuccess",          setSuccess,        1},
+
   {0}
 };
+
 uint8_t JS_AvidemuxFunction(JSContext *cx,JSObject *global)
 {
         if( JS_DefineFunctions(cx, global, adm_functions)==true) return 1;
@@ -61,6 +66,21 @@ uint8_t JS_AvidemuxFunction(JSContext *cx,JSObject *global)
         printf("Error in JSAvidemuxfunction\n");
         return 0;
 }
+JSBool setSuccess(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin AddSegment
+ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+int Jscript_succeed=0;
+        // default return value
+        if(argc != 1)
+                return JS_FALSE;
+        
+        Jscript_succeed=JSVAL_TO_BOOLEAN(argv[0]);
+        JS_setSuccess(Jscript_succeed);
+        
+        return JS_TRUE;
+}// end AddSegment
+
 JSBool displayError(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {// begin AddSegment
