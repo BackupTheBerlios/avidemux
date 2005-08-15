@@ -230,7 +230,11 @@ char *pth;
   qfprintf(fd,"app.setContainer(\"%s\");\n",getCurrentContainerAsString());
   if(outputname)
   {
-        qfprintf(fd,"app.save(\"%s\");\n",outputname);
+        qfprintf(fd,"setSuccess(app.save(\"%s\"));\n",outputname);
+  }
+  else
+  {
+        qfprintf(fd,"setSuccess(%d);\n",1);
   }
   qfprintf(fd,"//app.Exit();\n");
   qfprintf(fd,"\n//End of script\n");
