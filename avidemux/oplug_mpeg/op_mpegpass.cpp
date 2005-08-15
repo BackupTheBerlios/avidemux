@@ -69,7 +69,7 @@
 
 uint8_t isMpeg12Compatible(uint32_t fourcc);
 extern const char *getStrFromAudioCodec( uint32_t codec); 
-void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
+uint8_t mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
 {
   uint32_t len, flags;
   AVDMGenericAudioStream *audio=NULL;
@@ -81,6 +81,7 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
   
   double total_wanted=0;
   double total_got=0;
+  uint8_t ret=0;
  
   ADMMpegMuxer *muxer=NULL;
   
@@ -90,19 +91,19 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
 	if(!isMpeg12Compatible(avifileinfo->fcc))
   	{
   		GUI_Error_HIG("This is not MPEG compatible", "You can't use the Copy codec.");
-		return ;
+		return 0 ;
   	}
   	if(!currentaudiostream)
   	{
   		GUI_Error_HIG("There is no audio track", NULL);
-		return ;
+		return 0;
   	}
   
 	ADM_assert (video_body->getFlags (frameStart, &flags));
         if(!(flags&AVI_KEY_FRAME))
         {
                 GUI_Error_HIG("The first frame is not intra", "You can't use Copy as the video codec.");
-                return ;
+                return 0;
         }
 	
   	audio=mpt_getAudioStream();
@@ -114,7 +115,7 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
 	if(!audio)
 	{
 		GUI_Error_HIG("Audio track is not suitable", NULL);
-		return;
+		return 0;
 	}
 	// Check
 	WAVHeader *hdr=audio->getInfo();
@@ -154,7 +155,7 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
                         if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
                         {
                                 GUI_Error_HIG("Incompatible audio", "For VCD, audio must be 44.1 kHz MP2.");
-                                return ;
+                                return 0 ;
                         }
                         mux=MUXER_VCD;
                         printf("PassThrough: Using VCD PS\n");        
@@ -175,7 +176,7 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
                                 {
                                         deleteAudioFilter();
                                         GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2 or AC3.");
-                                        return ;
+                                        return 0;
                                 }
                                 mux=MUXER_DVD;
                                 printf("PassThrough: Using DVD PS\n");
@@ -206,14 +207,14 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
         if(!muxer)
          {
                  printf("No muxer ?\n");
-                 return ;
+                 return 0;
         }
 	if(!muxer->open(name,0,mux,avifileinfo,audio->getInfo()))
 	{
 		delete muxer;
 		muxer=NULL;
 		printf("Muxer init failed\n");
-		return ;
+		return 0;
 		
 	}
         
@@ -270,7 +271,11 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
 		}
 
 	}
-	if (!found)	    goto _abt;
+	if (!found)
+        {
+                    ret=0;
+        	    goto _abt;
+        }
 	  // Write the found frame
 	video_body->getRaw (found, buffer, &len);
 	
@@ -329,11 +334,13 @@ void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
 	}
 
     }
+    ret=1;
 _abt:
   delete work;
   muxer->close();
   delete muxer;
   delete buffer;
   deleteAudioFilter();
+  return ret;
 
 }

@@ -80,13 +80,14 @@ extern uint8_t  DIA_mpeg2opt(uint32_t *maxbitrate, uint32_t *qz, char *opt1,char
 
 uint8_t oplug_mpegInit(void);
 static uint8_t oplug_mpegStore(void);
-static void oplug_mpeg_dvd_run(char *name);
-static void oplug_mpeg_vcd_run(char *name);
-static void oplug_mpeg_ts_run(char *name);
+static uint8_t oplug_mpeg_dvd_run(char *name);
+static uint8_t oplug_mpeg_vcd_run(char *name);
+static uint8_t oplug_mpeg_ts_run(char *name);
 //************************************************
-void oplug_mpeg_vcd(char *inname)
+uint8_t  oplug_mpeg_vcd(char *inname)
 {
 	char *name;
+        uint8_t ret;
 
 	mpegWritter *mpg = new mpegWritter();
 	ADM_assert(mpg);
@@ -94,7 +95,7 @@ void oplug_mpeg_vcd(char *inname)
 	if(!inname)
 	{
 	 	GUI_FileSelWrite("VCD file to save", &name);
-		if(!name) return;
+		if(!name) return 0;
 	}	
 	else
 	{
@@ -102,15 +103,12 @@ void oplug_mpeg_vcd(char *inname)
 	}
 
 
-	if( mpg->save_vcd(name))
-		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
-	else
-		GUI_Error_HIG("Saving failed", NULL);
-
+	ret=mpg->save_vcd(name);
 	delete(mpg);
+        return ret;
 }
 //_______________________________________
-void oplug_mpeg_vcd_ps(char *inname)
+uint8_t oplug_mpeg_vcd_ps(char *inname)
 {
 	
 	char *name=NULL;
@@ -123,7 +121,7 @@ void oplug_mpeg_vcd_ps(char *inname)
 	if(!currentaudiostream)
 	{
 		GUI_Error_HIG("There is no audio track", NULL);
-		return;
+		return 0;
 	}
 	if(audioProcessMode())
 	{
@@ -142,51 +140,52 @@ void oplug_mpeg_vcd_ps(char *inname)
 	if(info->frequency!=44100 )
 	{
 		GUI_Error_HIG("Incompatible audio frequency", "For VCD PS, samplerate must be 44.1 kHz.\nUse the resample audio filter.");
-		return;
+		return 0;
 	}
 	if( info->encoding!=WAV_MP2 )
 	{
 		printf("Encoding : %d\n",info->encoding);
 		GUI_Error_HIG("Incompatible audio codec", "For VCD PS, audio must be MP2.");
-		return;
+		return 0;
 	}
 	if( info->channels!=2 )
 	{
 		
 		GUI_Error_HIG("Audio must be stereo for VCD PS", NULL);
-		return;
+		return 0;
 	}
 	
 	// Second, check video
 	if(strcmp(videoCodecGetName(),"VCD"))// && strcmp(videoCodecGetName(),"XSVCD"))
 	{
 		GUI_Error_HIG("Wrong video codec", "Select VCD as the video codec.");
-		return;
+		return 0;
 	}
 	
  	if(!inname)
 	{
 	 	GUI_FileSelWrite("VCD file to save", &name);
-		if(!name) return;
+		if(!name) return 0;
 	}
 	else
 	{
 		name=inname;
 	}
-	oplug_mpeg_vcd_run(name);
+	return oplug_mpeg_vcd_run(name);
 
 	
 	
 }
 //_______________________________________
-void oplug_mpeg_svcd(char *inname)
+uint8_t oplug_mpeg_svcd(char *inname)
 {
 	char *name;
+        uint8_t ret;
 
 	if(!inname)
 	{
 	 	GUI_FileSelWrite("SVCD file to save", &name);
-		if(!name) return;
+		if(!name) return 0;
 	}
 	else
 	{
@@ -197,17 +196,15 @@ void oplug_mpeg_svcd(char *inname)
    	mpegWritter *mpg = new mpegWritter();
 	ADM_assert(mpg);
 
-	if( mpg->save_svcd(name))
-		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
-	else
-		GUI_Error_HIG("Saving failed", NULL);
-
+	ret=mpg->save_svcd(name);
 	delete(mpg);
+        return ret;
 }
 //_______________________________________
-void oplug_mpeg_svcd_ps(char *inname)
+uint8_t oplug_mpeg_svcd_ps(char *inname)
 {
 char *name=NULL;
+uint8_t ret;
 WAVHeader info;
 AVDMGenericAudioStream *stream;	
 	
@@ -216,7 +213,7 @@ AVDMGenericAudioStream *stream;
 	if(!currentaudiostream)
 	{
 		GUI_Error_HIG("There is no audio track", NULL);
-		return;
+		return 0;
 	}
 	stream=mpt_getAudioStream();
 	memcpy(&info,stream->getInfo(),sizeof(info));
@@ -229,26 +226,26 @@ AVDMGenericAudioStream *stream;
 	if(info.frequency!=44100 )
 	{
 		GUI_Error_HIG("Incompatible audio frequency", "For SVCD PS, samplerate must be 44.1 kHz.\nUse the resample audio filter.");
-		return;
+		return 0;
 	}
 	if( (info.encoding!=WAV_MP2 ))
 	{
 		printf("Encoding : %d\n",info.encoding);
 		GUI_Error_HIG("Incompatible audio codec", "For SVCD PS, audio must be MP2.");
-		return;
+		return 0;
 	}
 	
 	// Second, check video
 	if(strcmp(videoCodecGetName(),"SVCD"))// && strcmp(videoCodecGetName(),"XSVCD"))
 	{
 		GUI_Error_HIG("Wrong video codec", "Select SVCD as the video codec.");
-		return;
+		return 0;
 	}
 	
  	if(!inname)
 	{
 	 	GUI_FileSelWrite("SVCD file to save", &name);
-		if(!name) return;
+		if(!name) return 0;
 	}
 	else
 	{
@@ -258,25 +255,22 @@ AVDMGenericAudioStream *stream;
 	mpegWritter *mpg = new mpegWritter(MUXER_SVCD);
 	ADM_assert(mpg);
 
-	if( mpg->save_svcd(name))
-		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
-	else
-		GUI_Error_HIG("Saving failed", NULL);
-
+	ret= mpg->save_svcd(name);
 	delete(mpg);
-	
+        return ret;	
 
 }
 
 //_______________________________________
-void oplug_mpeg_dvd(char *inname)
+uint8_t oplug_mpeg_dvd(char *inname)
 {
 char *name=NULL;
+uint8_t ret=0;
 
  	if(!inname)
 	{
 	 	GUI_FileSelWrite("DVD file to save", &name);
-		if(!name) return;
+		if(!name) return 0;
 	}
 	else
 	{
@@ -287,19 +281,17 @@ char *name=NULL;
    mpegWritter *mpg = new mpegWritter();
 	ADM_assert(mpg);
 
-	if( mpg->save_dvd(name))
-		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
-	else
-		GUI_Error_HIG("Saving failed", NULL);
-
+	ret= mpg->save_dvd(name);
 	delete(mpg);
+        return ret;
 }
 // Save a PS stream : Mpeg2 video + MP2 or AC3 audio
 //_______________________________________
-void oplug_mpeg_dvd_ps(char *inname)
+uint8_t oplug_mpeg_dvd_ps(char *inname)
 {
 char *name=NULL;
 WAVHeader *info=NULL,tmpinfo;
+uint8_t ret=0;
 
 	// do some check on audio & video
 	// audio must be either AC3 or mp2 at 48 khz
@@ -308,7 +300,7 @@ WAVHeader *info=NULL,tmpinfo;
 	if(!currentaudiostream)
 	{
 		GUI_Error_HIG("There is no audio track", NULL);
-		return;
+		return 0;
 	}
 	if(audioProcessMode())
 	{
@@ -327,56 +319,55 @@ WAVHeader *info=NULL,tmpinfo;
 	if(info->frequency!=48000 )
 	{
 		GUI_Error_HIG("Incompatible audio frequency", "For DVD PS, audio samplerate must be 48 kHz.\nUse the resample audio filter.");
-		return;
+		return 0;
 	}
 	if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3))
 	{
 		printf("Encoding : %d\n",info->encoding);
 		GUI_Error_HIG("Incompatible audio codec", "For DVD PS, audio must be MP2 or AC3.");
-		return;
+		return 0;
 	}
 	
 	// Second, check video
 	if(strcmp(videoCodecGetName(),"DVD"))// && strcmp(videoCodecGetName(),"XSVCD"))
 	{
 		GUI_Error_HIG("Wrong video codec", "Select DVD as the video codec.");
-		return;
+		return 0;
 	}
 	
  	if(!inname)
 	{
 	 	GUI_FileSelWrite("DVD file to save", &name);
-		if(!name) return;
+		if(!name) return 0;
 	}
 	else
 	{
 		name=inname;
 	}
-	oplug_mpeg_dvd_run(name);
-
+	ret=oplug_mpeg_dvd_run(name);
+        return ret;
 
 }
 //_______________________________________
-void oplug_mpeg_dvd_run(char *name)
+uint8_t oplug_mpeg_dvd_run(char *name)
 {
+        uint8_t ret=0;
    	mpegWritter *mpg = new mpegWritter(MUXER_DVD);
 	ADM_assert(mpg);
 
-	if( mpg->save_dvd(name))
-		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
-	else
-		GUI_Error_HIG("Saving failed", NULL);
-
+	ret= mpg->save_dvd(name);
 	delete(mpg);
+        return ret;
 
 }
 //
 // Save a TS stream : DVD into Ts wrapper
 //_______________________________________
-void oplug_mpeg_ts(char *inname)
+uint8_t oplug_mpeg_ts(char *inname)
 {
 char *name=NULL;
 WAVHeader *info=NULL,tmpinfo;
+uint8_t ret=0;
 
         // do some check on audio & video
         // audio must be either AC3 or mp2 at 48 khz
@@ -385,7 +376,7 @@ WAVHeader *info=NULL,tmpinfo;
         if(!currentaudiostream)
         {
                 GUI_Error_HIG("There is no audio track", NULL);
-                return;
+                return 0;
         }
         if(audioProcessMode())
         {
@@ -404,61 +395,56 @@ WAVHeader *info=NULL,tmpinfo;
         if(info->frequency!=48000 )
         {
                 GUI_Error_HIG("Incompatible audio frequency", "For DVD, samplerate must be 48 kHz.\nUse the resample audio filter.");
-                return;
+                return 0;
         }
         if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3))
         {
                 printf("Encoding : %d\n",info->encoding);
                 GUI_Error_HIG("Incompatible audio codec", "For DVD, audio must be MP2 or AC3.");
-                return;
+                return 0;
         }
         
         // Second, check video
         if(strcmp(videoCodecGetName(),"DVD"))// && strcmp(videoCodecGetName(),"XSVCD"))
         {
                 GUI_Error_HIG("Wrong video codec", "Select DVD as the video codec.");
-                return;
+                return 0;
         }
         
         if(!inname)
         {
                 GUI_FileSelWrite("DVD file to save", &name);
-                if(!name) return;
+                if(!name) return 0;
         }
         else
         {
                 name=inname;
         }
-        oplug_mpeg_ts_run(name);
+        return oplug_mpeg_ts_run(name);
 
 
 }
 //_______________________________________
-void oplug_mpeg_ts_run(char *name)
+uint8_t  oplug_mpeg_ts_run(char *name)
 {
         mpegWritter *mpg = new mpegWritter(MUXER_TS);
         ADM_assert(mpg);
-
-        if( mpg->save_dvd(name))
-                GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
-        else
-                GUI_Error_HIG("Saving failed", NULL);
-
+        uint8_t ret=0;
+        ret=mpg->save_dvd(name);
         delete(mpg);
+        return ret;
 
 }
 //_______________________________________
-void oplug_mpeg_vcd_run(char *name)
+uint8_t oplug_mpeg_vcd_run(char *name)
 {
    	mpegWritter *mpg = new mpegWritter(MUXER_VCD);
 	ADM_assert(mpg);
+        uint8_t ret=0;
 
-	if( mpg->save_vcd(name))
-		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
-	else
-		GUI_Error_HIG("Saving failed", NULL);
-
+	ret=mpg->save_vcd(name);
 	delete(mpg);
+        return ret;
 
 }
 uint8_t oplug_mpegInit(void)
