@@ -195,7 +195,7 @@ char *pth;
         if(!audioName) audioName="";
 
         if(source!=AudioAvi)
-                fprintf(fd,"app.audio.load(%s,\"%s\");\n", audioSourceFromEnum(source),audioName); 
+                qfprintf(fd,"app.audio.load(\"%s\",\"%s\");\n", audioSourceFromEnum(source),audioName); 
 
    qfprintf(fd,"app.audio.codec(\"%s\",%d);\n", audioCodecGetName(),audioGetBitrate()); 
    //qfprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode()]);
