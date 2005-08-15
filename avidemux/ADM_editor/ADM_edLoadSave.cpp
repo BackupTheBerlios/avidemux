@@ -81,7 +81,7 @@ uint8_t ADM_Composer::saveWorbench (char *name)
 /*______________________________________________
         Save the project as a script
 ______________________________________________*/
-uint8_t ADM_Composer::saveAsScript (char *name)
+uint8_t ADM_Composer::saveAsScript (char *name, char *outputname)
 {
 const char *truefalse[]={"false","true"};
 printf("\n **Saving script project **\n");
@@ -228,6 +228,10 @@ char *pth;
   // container
         
   qfprintf(fd,"app.setContainer(\"%s\");\n",getCurrentContainerAsString());
+  if(outputname)
+  {
+        qfprintf(fd,"app.save(\"%s\");\n",outputname);
+  }
   qfprintf(fd,"//app.Exit();\n");
   qfprintf(fd,"\n//End of script\n");
   // All done

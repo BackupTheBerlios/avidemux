@@ -160,7 +160,7 @@ class ADM_Composer
   				virtual 			~ADM_Composer();
   						void		clean( void );
   						void		dumpSeg(void);
-                                                uint8_t         saveAsScript (char *name);
+                                                uint8_t         saveAsScript (char *name,char *out);
 						uint8_t 	saveWorbench(char *name)      ;
 						uint8_t 	loadWorbench(char *name)      ;
 						uint8_t     resetSeg( void );

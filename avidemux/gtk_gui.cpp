@@ -1989,7 +1989,7 @@ A_saveWorkbench (char *name)
 #if 0
   video_body->saveWorbench (name);
 #else
-  video_body->saveAsScript(name);
+  video_body->saveAsScript(name,NULL);
 #endif
   if( actual_workbench_file )
      ADM_dealloc(actual_workbench_file);
@@ -2467,12 +2467,20 @@ void A_Resync(void)
 }
 void A_addJob(void)
 {
-        char *name,*fullname,*base;
+        char *name,*fullname,*base,*final=NULL;
         if(!DIA_enterString_HIG("Save job","Please enter job name",&name)) return;
         if(!name || !*name) return;
 
         base=getBaseDir();
         if(!base) return;
+
+        // Now get final file
+        GUI_FileSelWrite("Select the file to save to when doing the jobs",&final);
+        if(!final || !*final) 
+        {
+                ADM_dealloc(name);
+                return;
+        }
         // Now time to built it
         fullname=new char[strlen(name)+strlen(base)+2+4];
         
@@ -2481,12 +2489,13 @@ void A_addJob(void)
         strcat(fullname,name);
         strcat(fullname,".js");
 
-        if(!video_body->saveAsScript(fullname))
+        if(!video_body->saveAsScript(fullname,final))
         {
                 GUI_Error_HIG("Saving failed","Saving the job failed. Maybe you have permission issue with ~/.avidemux");
         }
 
         delete fullname;
         ADM_dealloc(name);
+        ADM_dealloc(final);
 }
 // EOF
