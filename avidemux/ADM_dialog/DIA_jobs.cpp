@@ -195,7 +195,9 @@ GtkTreeIter iter;
         }
 }
 //*************************************
-GtkWidget       *create_dialog1 (void)
+
+GtkWidget*
+create_dialog1 (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
@@ -231,10 +233,12 @@ GtkWidget       *create_dialog1 (void)
   treeview1 = gtk_tree_view_new ();
   gtk_widget_show (treeview1);
   gtk_container_add (GTK_CONTAINER (scrolledwindow1), treeview1);
+  gtk_widget_set_size_request (treeview1, 300, -1);
 
   vbuttonbox1 = gtk_vbutton_box_new ();
   gtk_widget_show (vbuttonbox1);
   gtk_box_pack_start (GTK_BOX (hbox1), vbuttonbox1, FALSE, FALSE, 0);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (vbuttonbox1), GTK_BUTTONBOX_START);
 
   buttonDeleteAll = gtk_button_new_with_mnemonic (_("Delete All Jobs"));
   gtk_widget_show (buttonDeleteAll);
