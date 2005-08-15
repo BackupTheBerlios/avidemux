@@ -53,16 +53,17 @@
 #include "ADM_gui2/GUI_ui.h"
 #include "oplug_mpegFF/oplug_vcdff.h"
 
-static void  A_SaveAudioNVideo(char *name);
+static uint8_t  A_SaveAudioNVideo(char *name);
  extern int A_SaveUnpackedVop( char *name);
- extern void ogmSave(char *name);
- extern void ADM_saveRaw(char *name);
- void A_SaveAudioDualAudio(char *name);
- extern void mpeg_passthrough(char *name,ADM_OUT_FORMAT format);
+ extern uint8_t ogmSave(char *name);
+ extern uint8_t ADM_saveRaw(char *name);
+ uint8_t A_SaveAudioDualAudio(char *name);
+ extern uint8_t mpeg_passthrough(char *name,ADM_OUT_FORMAT format);
 
 int A_Save( char *name)
 {
 uint32_t end;
+int ret=0;
 	// depending on the type we save a avi, a mpeg or a XVCD
 	CodecFamilty family;
 	family= videoCodecGetFamily();
@@ -166,19 +167,19 @@ uint32_t end;
 					switch(UI_GetCurrentFormat())
 					{
 						case ADM_AVI:
-								A_SaveAudioNVideo(name);
+								ret=A_SaveAudioNVideo(name);
 								break;
 						case ADM_OGM:
-								ogmSave(name);
+								ret=ogmSave(name);
 								break;
 						case ADM_ES:
-								ADM_saveRaw(name);
+								ret=ADM_saveRaw(name);
 								break;
 						case ADM_AVI_DUAL:
-								A_SaveAudioDualAudio(name);
+								ret=A_SaveAudioDualAudio(name);
 								break;
 						case ADM_AVI_UNP:
-								A_SaveUnpackedVop(name);
+								ret=A_SaveUnpackedVop(name);
 								break;
 						default:
 								GUI_Error_HIG("Incompatible output format", NULL);
@@ -194,7 +195,7 @@ uint32_t end;
                                                 {
                                                   case ADM_PS:
                                                   case ADM_TS:
-						          mpeg_passthrough(name,UI_GetCurrentFormat());
+						          ret=mpeg_passthrough(name,UI_GetCurrentFormat());
                                                           break;
                                                   default:
                                                         GUI_Error_HIG("Incompatible output format", NULL);
@@ -207,7 +208,7 @@ uint32_t end;
 							case ADM_PS:
 							case ADM_ES:
                                                         case ADM_TS:
-								EncoderSaveMpeg(name);
+								ret=EncoderSaveMpeg(name);
 								break;
 							default:
 								GUI_Error_HIG("Incompatible output format", NULL);
@@ -221,7 +222,7 @@ uint32_t end;
                         case ADM_TS:
                         case ADM_PS:
                         case ADM_ES:
-                                oplug_mpegff(name,UI_GetCurrentFormat());;
+                                ret=oplug_mpegff(name,UI_GetCurrentFormat());;
                                 break;
                         default:
                             GUI_Error_HIG("Incompatible output format", NULL);
@@ -232,33 +233,30 @@ uint32_t end;
                             return 0;
         }
         getFirstVideoFilter(0,avifileinfo->nb_frames);
-        return 1;
+        return ret;
 }
-void  A_SaveAudioDualAudio(char *inname)
+uint8_t  A_SaveAudioDualAudio(char *inname)
 {
 GenericAviSaveCopyDualAudio *nw;
 char *name;
+uint8_t ret=0;
 
 		if(! secondaudiostream)
 		{
 				 	GUI_Error_HIG("There is no second track", "Select a second audio track in the Audio menu.");
-				  	return;
+				  	return 0;
 		}
 		if(!inname)
 			GUI_FileSelWrite("Select dual audio AVI to write", & name);
 		else
 			name=inname;
 			
-		if(!name) return;
+		if(!name) return 0;
 
      		nw=new   GenericAviSaveCopyDualAudio(secondaudiostream);
-		if(!nw->saveAvi(name))
-	     	{
-        		GUI_Error_HIG("AVI not saved", NULL);
-       		}
-       		else
-        		GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
+		ret=nw->saveAvi(name);
        		delete nw;
+                return ret;
 
 }
 //___________________________________
@@ -286,11 +284,12 @@ GenericAviSave	*nw;
 	return 1;
 }
 //___________________________________
-void  A_SaveAudioNVideo(char *name)
+uint8_t  A_SaveAudioNVideo(char *name)
 {
 	 uint32_t needSmart=0,fl;
      GenericAviSave	*nw;
      aviInfo info;
+     uint8_t ret=0;
 
      video_body->getVideoInfo(&info);
 
@@ -322,7 +321,7 @@ void  A_SaveAudioNVideo(char *name)
              		{
 				int value=4;;
 	 			 if( ! GUI_getIntegerValue(&value, 2, 31, "Q Factor (set 4)"))
-	  					return ;
+	  					return 0;
 
                       		nw=new   GenericAviSaveSmart(value);
                  	}
@@ -348,14 +347,8 @@ void  A_SaveAudioNVideo(char *name)
 #endif
 
         }
-     if(!nw->saveAvi(name))
-     {
-        	GUI_Error_HIG("AVI not saved", NULL);
-       }
-       else
-        	GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
+     ret=nw->saveAvi(name);
+     delete nw;
 
-       delete nw;
-
-
+return ret;
 }

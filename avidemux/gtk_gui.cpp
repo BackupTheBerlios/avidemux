@@ -109,7 +109,7 @@ void A_openBrokenAvi (char *name);
 int A_openAvi2 (char *name, uint8_t mode);
 int A_appendAvi (char *name);
 void A_externalAudioTrack( void );
-extern void A_SaveAudioNVideo (char *name);
+
 void HandleAction (Action action);
 uint8_t A_rebuildKeyFrame (void);
 extern int GUI_handleFilter (void);
@@ -130,7 +130,7 @@ uint8_t GUI_getDoubleValue (double *valye, float min, float max,
 extern void GUI_setMarks (uint32_t a, uint32_t b);
 extern void saveMpegFile (char *name);
 //static void A_selectEncoder ( void );
-extern void A_SaveAudioDualAudio (char *a);
+extern uint8_t A_SaveAudioDualAudio (char *a);
 
 extern uint8_t ADM_aviUISetMuxer(  void );
 void A_Resync(void);
@@ -145,7 +145,7 @@ extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
 void ADM_cutWizard (void);
 void computeIT (int size, int nb, int brate, uint32_t * frame,
 		uint32_t * rsize);
-int ADM_saveRaw (char *name);
+uint8_t  ADM_saveRaw (char *name);
 static char * actual_workbench_file;
 void A_saveWorkbench (char *name);
 void updateLoaded (void);
@@ -153,7 +153,7 @@ extern void encoderSetLogFile (char *name);
 extern void videoCodecSelect (void);
 extern uint8_t DIA_about( void );
 extern uint8_t DIA_RecentFiles( char **name );
-extern void mpeg_passthrough(  char *name,ADM_OUT_FORMAT format );
+extern uint8_t mpeg_passthrough(  char *name,ADM_OUT_FORMAT format );
 static void A_videoCheck( void);
 extern uint8_t parseScript(char *scriptname);
 int A_saveDVDPS(char *name);
@@ -1907,11 +1907,11 @@ computeIT (int size, int nb, int brate, uint32_t * frame, uint32_t * rsize)
 	Usefull to cut mpeg stream or extract raw h263/mpeg4 stream
 
 */
-int ADM_saveRaw (char *name)
+uint8_t ADM_saveRaw (char *name)
 {
   uint32_t len, flags;
   FILE *fd, *fi;
-  uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3];
+  uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3],ret=0;
   char *idx;
   DIA_working *work;
 
@@ -1932,10 +1932,18 @@ int ADM_saveRaw (char *name)
   for (uint32_t i = frameStart; i < frameEnd; i++)
     {
       work->update (i - frameStart, frameEnd - frameStart);
-      if(!work->isAlive()) goto _abt;
+      if(!work->isAlive())
+      {
+                 ret=0;
+                 goto _abt;
+      }
       if(!video_body->getFlags (i, &flags))
         {
-                if(i==frameEnd-1) goto _abt;
+                if(i==frameEnd-1)
+                {
+                         ret=1;
+                         goto _abt;
+                }
                 ADM_assert (video_body->getFlags (i, &flags));
         }
       
@@ -1955,7 +1963,10 @@ int ADM_saveRaw (char *name)
 
 	    }
 	  if (!found)
+          {
+            ret=0;
 	    goto _abt;
+          }
 	  // Write the found frame
 	  video_body->getRaw (found, buffer, &len);
 	  fwrite (buffer, len, 1, fd);
@@ -1975,11 +1986,12 @@ int ADM_saveRaw (char *name)
 	}
 
     }
+    ret=1;
 _abt:
   fclose (fd);
   fclose (fi);
   delete work;
-  return 1;
+  return ret;
 
 }
 
