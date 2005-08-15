@@ -63,7 +63,7 @@ extern int A_appendAvi (char *name);
 extern void A_saveAudio(char *name);
 extern int A_loadNone( void );
 extern void A_saveAudioDecodedTest(char *name);
-extern void A_SaveAudioNVideo(char *name);
+extern uint8_t A_SaveAudioNVideo(char *name);
 extern int A_loadMP3(char *name);
 extern int A_loadAC3(char *name);
 extern int A_loadWave(char *name);
@@ -132,7 +132,7 @@ extern int32_t audioDelay;
 
 extern int global_argc;
 extern char **global_argv;
-extern void	ADM_saveRaw(char *name );
+extern uint8_t	ADM_saveRaw(char *name );
 //_________________________________________________________________________
 
 typedef 	void 			(*one_arg_type)(char *arg);
@@ -174,7 +174,7 @@ AUTOMATON reaction_table[]=
 		{"save-unpacked-vop",	1,"save avi, unpacking vop",(one_arg_type)A_SaveUnpackedVop},		
 		{"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
 		{"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
-		{"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	ADM_saveRaw},
+		{"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	(one_arg_type)ADM_saveRaw},
 		{"save-uncompressed-audio",1,"save uncompressed audio",A_saveAudioDecodedTest},
 		{"load",		1,"load video or workbench",		(one_arg_type )A_openAvi},
 		{"load-workbench",	1,"load workbench file",		(one_arg_type)A_openAvi},
