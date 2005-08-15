@@ -51,13 +51,13 @@
 //_______________________________________________
 uint8_t ogmSave(char  *name)
 {
-uint8_t ret;
+uint8_t ret=0;
 	ADM_ogmWrite *writter;
 	if(videoProcessMode())
 		writter=new ADM_ogmWriteProcess;
 	else
 		writter=new ADM_ogmWriteCopy;
-	writter->save(name);
+	ret=writter->save(name);
 	
 	delete writter;
 	return ret;
