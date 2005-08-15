@@ -116,9 +116,11 @@ GenericAviSave::~GenericAviSave ()
 uint8_t  GenericAviSave::saveAvi (char *name)
 {
 uint32_t size;
+uint8_t ret=0;
   strcpy(_name,name);
   //frametogo = frameEnd - frameStart + 1;
   frametogo=0;
+  
   writter = new aviWrite ();
     // 1- setup audio
   guiStart();
@@ -167,7 +169,7 @@ uint32_t size;
      
      
     };				// end for
-
+    ret=1;
 abortme:
   guiStop ();
   //__________________________________
@@ -179,7 +181,7 @@ abortme:
   deleteAudioFilter ();
   // resync GUI
   printf ("\n Saving AVI (v_engine)... done\n");
-  return 1;
+  return ret;
 }
 
 //_________________________________________________________________
