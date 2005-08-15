@@ -72,10 +72,15 @@ GtkWidget *videowids[10];
 uint32_t k;
 unsigned int renderI;
 ADM_RENDER_TYPE render;
+uint32_t useTray=0;
 	
 	dialog=create_dialog1();
 //	gtk_transient(dialog);
         gtk_register_dialog(dialog);
+
+        if(!prefs->get(FEATURE_USE_SYSTRAY,&useTray)) useTray=0;
+        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonSystray)),useTray);
+        
 //****************************	
 #define SET_CPU(x,y) gtk_widget_set_sensitive(WID(check##x),0); \
         if(CpuCaps::has##y()) gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(check##x)),1);
@@ -180,6 +185,11 @@ ADM_RENDER_TYPE render;
                 render=myVideoDevice[k].type;
                 renderI=(int)render;
                 prefs->set(DEVICE_VIDEODEVICE,renderI);
+        
+                //**************
+                useTray=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonSystray)));
+                prefs->set(FEATURE_USE_SYSTRAY,useTray);
+                
                 
                 ///*********
 		lavcodec_mpeg=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbutton_lavcodec)));
@@ -242,9 +252,8 @@ gint r;
 
 
 }
-
-GtkWidget*
-create_dialog1 (void)
+//*************************
+GtkWidget *create_dialog1 (void)
 {
   GtkWidget *dialog;
   GtkWidget *dialog_vbox1;
@@ -253,9 +262,11 @@ create_dialog1 (void)
   GtkWidget *table2;
   GtkWidget *label21;
   GtkWidget *label22;
-  GtkWidget *label12;
   GtkWidget *checkbutton_lavcodec;
   GtkWidget *checkbuttonOpenDML;
+  GtkWidget *checkbuttonSystray;
+  GtkWidget *label40;
+  GtkWidget *label12;
   GtkObject *spinbuttonMpegSplit_adj;
   GtkWidget *spinbuttonMpegSplit;
   GtkWidget *label20;
@@ -297,6 +308,7 @@ create_dialog1 (void)
   dialog = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (dialog), _("Preferences"));
   gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
+  gtk_window_set_type_hint (GTK_WINDOW (dialog), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -310,7 +322,7 @@ create_dialog1 (void)
   gtk_widget_show (frame3);
   gtk_box_pack_start (GTK_BOX (vbox1), frame3, FALSE, FALSE, 0);
 
-  table2 = gtk_table_new (3, 2, FALSE);
+  table2 = gtk_table_new (4, 2, FALSE);
   gtk_widget_show (table2);
   gtk_container_add (GTK_CONTAINER (frame3), table2);
 
@@ -319,7 +331,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table2), label21, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label21), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label21), 0, 0.5);
 
   label22 = gtk_label_new (_("Use openDML rather\n      than split for big files "));
@@ -327,16 +338,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table2), label22, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label22), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label22), 0, 0.5);
-
-  label12 = gtk_label_new (_("Mpeg auto split (MB)"));
-  gtk_widget_show (label12);
-  gtk_table_attach (GTK_TABLE (table2), label12, 0, 1, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label12), 0, 0.5);
 
   checkbutton_lavcodec = gtk_check_button_new_with_mnemonic (_(" "));
   gtk_widget_show (checkbutton_lavcodec);
@@ -350,10 +352,30 @@ create_dialog1 (void)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
+  checkbuttonSystray = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkbuttonSystray);
+  gtk_table_attach (GTK_TABLE (table2), checkbuttonSystray, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  label40 = gtk_label_new (_("Go to systray when encoding"));
+  gtk_widget_show (label40);
+  gtk_table_attach (GTK_TABLE (table2), label40, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label40), 0, 0.5);
+
+  label12 = gtk_label_new (_("Mpeg auto split (MB)"));
+  gtk_widget_show (label12);
+  gtk_table_attach (GTK_TABLE (table2), label12, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label12), 0, 0.5);
+
   spinbuttonMpegSplit_adj = gtk_adjustment_new (690, 10, 5000, 10, 100, 100);
   spinbuttonMpegSplit = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonMpegSplit_adj), 1, 0);
   gtk_widget_show (spinbuttonMpegSplit);
-  gtk_table_attach (GTK_TABLE (table2), spinbuttonMpegSplit, 1, 2, 2, 3,
+  gtk_table_attach (GTK_TABLE (table2), spinbuttonMpegSplit, 1, 2, 3, 4,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonMpegSplit), TRUE);
@@ -362,7 +384,6 @@ create_dialog1 (void)
   gtk_widget_show (label20);
   gtk_frame_set_label_widget (GTK_FRAME (frame3), label20);
   gtk_label_set_use_markup (GTK_LABEL (label20), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label20), GTK_JUSTIFY_LEFT);
 
   frame4 = gtk_frame_new (NULL);
   gtk_widget_show (frame4);
@@ -377,7 +398,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table3), label24, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label24), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label24), 0, 0.5);
 
   optionmenuVideo = gtk_option_menu_new ();
@@ -395,7 +415,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table3), label39, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label39), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label39), 0, 0.5);
 
   buttonPP = gtk_button_new_with_mnemonic (_("Change"));
@@ -408,7 +427,6 @@ create_dialog1 (void)
   gtk_widget_show (label23);
   gtk_frame_set_label_widget (GTK_FRAME (frame4), label23);
   gtk_label_set_use_markup (GTK_LABEL (label23), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label23), GTK_JUSTIFY_LEFT);
 
   frame6 = gtk_frame_new (NULL);
   gtk_widget_show (frame6);
@@ -423,7 +441,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table4), label29, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label29), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label29), 0, 0.5);
 
   label30 = gtk_label_new (_("Alsa Device :"));
@@ -431,7 +448,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table4), label30, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label30), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label30), 0, 0.5);
 
   entryAlsa = gtk_entry_new ();
@@ -455,7 +471,6 @@ create_dialog1 (void)
   gtk_widget_show (label28);
   gtk_frame_set_label_widget (GTK_FRAME (frame6), label28);
   gtk_label_set_use_markup (GTK_LABEL (label28), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label28), GTK_JUSTIFY_LEFT);
 
   frame8 = gtk_frame_new (NULL);
   gtk_widget_show (frame8);
@@ -470,7 +485,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table6), label33, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label33), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label33), 0, 0.5);
 
   label36 = gtk_label_new (_("SSE2"));
@@ -478,7 +492,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table6), label36, 2, 3, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label36), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label36), 0, 0.5);
 
   checkMMX = gtk_check_button_new_with_mnemonic ("");
@@ -522,7 +535,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table6), label32, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label32), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label32), 0, 0.5);
 
   label35 = gtk_label_new (_("SSE"));
@@ -530,7 +542,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table6), label35, 2, 3, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label35), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label35), 0, 0.5);
 
   label37 = gtk_label_new (_("Altivec"));
@@ -538,7 +549,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table6), label37, 2, 3, 2, 3,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label37), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label37), 0, 0.5);
 
   label34 = gtk_label_new (_("3DNOW"));
@@ -546,14 +556,12 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table6), label34, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label34), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label34), 0, 0.5);
 
   label38 = gtk_label_new (_("<b>Cpu</b>"));
   gtk_widget_show (label38);
   gtk_frame_set_label_widget (GTK_FRAME (frame8), label38);
   gtk_label_set_use_markup (GTK_LABEL (label38), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label38), GTK_JUSTIFY_LEFT);
 
   dialog_action_area1 = GTK_DIALOG (dialog)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -577,9 +585,11 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog, table2, "table2");
   GLADE_HOOKUP_OBJECT (dialog, label21, "label21");
   GLADE_HOOKUP_OBJECT (dialog, label22, "label22");
-  GLADE_HOOKUP_OBJECT (dialog, label12, "label12");
   GLADE_HOOKUP_OBJECT (dialog, checkbutton_lavcodec, "checkbutton_lavcodec");
   GLADE_HOOKUP_OBJECT (dialog, checkbuttonOpenDML, "checkbuttonOpenDML");
+  GLADE_HOOKUP_OBJECT (dialog, checkbuttonSystray, "checkbuttonSystray");
+  GLADE_HOOKUP_OBJECT (dialog, label40, "label40");
+  GLADE_HOOKUP_OBJECT (dialog, label12, "label12");
   GLADE_HOOKUP_OBJECT (dialog, spinbuttonMpegSplit, "spinbuttonMpegSplit");
   GLADE_HOOKUP_OBJECT (dialog, label20, "label20");
   GLADE_HOOKUP_OBJECT (dialog, frame4, "frame4");
