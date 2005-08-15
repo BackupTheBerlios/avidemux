@@ -48,9 +48,9 @@ static void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param,
 static void encoderPrint(void);
 static const char *encoderGetName(void);
 // Put that in a proper include...
-extern void oplug_mpeg_vcd(char *name);
+/*extern void oplug_mpeg_vcd(char *name);
 extern void oplug_mpeg_svcd(char *name);
-extern void oplug_mpeg_dvd(char *name);
+extern void oplug_mpeg_dvd(char *name);*/
 
 
 
@@ -170,9 +170,10 @@ uint32_t videoProcessMode(void)
         if(current_codec==CodecCopy) return 0;
         return 1;
 }
-void EncoderSaveMpeg(char *name)
+uint8_t EncoderSaveMpeg(char *name)
 {
 uint8_t raw;
+uint8_t ret=0;
 	switch(UI_GetCurrentFormat())
 	{
 		case ADM_ES: 	raw=1;
@@ -185,39 +186,39 @@ uint8_t raw;
                                 break;
 		default:
 				GUI_Error_HIG("Wrong output format", "Select MPEG as the output.");
-				return;
+				return 0;
 	}
 	if(current_codec!=CodecDVD && raw==2)
         {
                 GUI_Error_HIG("Wrong video codec", "Select DVD as the video codec for MPEG TS output.");
-                return;
+                return 0;
         }
 	switch(current_codec)
 	{
 		case CodecVCD:
 				if(raw)
-					oplug_mpeg_vcd(name);
+					ret=oplug_mpeg_vcd(name);
 				else
-					oplug_mpeg_vcd_ps(name);
+					ret=oplug_mpeg_vcd_ps(name);
 				break;
 		case CodecSVCD:
 				if(raw)
-					oplug_mpeg_svcd(name);
+					ret=oplug_mpeg_svcd(name);
 				else
-					oplug_mpeg_svcd_ps(name);
+					ret=oplug_mpeg_svcd_ps(name);
 				break;
 		case CodecDVD:
                                 switch(raw)
                                 {
-                                        case 2:oplug_mpeg_ts(name);break;
-                                        case 1:oplug_mpeg_dvd(name);break;
-                                        case 0:oplug_mpeg_dvd_ps(name);break;
+                                        case 2:ret=oplug_mpeg_ts(name);break;
+                                        case 1:ret=oplug_mpeg_dvd(name);break;
+                                        case 0:ret=oplug_mpeg_dvd_ps(name);break;
                                         default : ADM_assert(0);
                                 }
 				break;
 		default:ADM_assert(0);
 	}
-
+        return ret;
 }
 
 /*
