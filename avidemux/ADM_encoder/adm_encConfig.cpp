@@ -279,6 +279,7 @@ int videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
 						compmode=COMPRESS_SAME;
 						aprintf("Follow mode\n");
 				}
+
 			// search for other options
 			if(!strcasecmp(cs,"mbr")){
 			   compmode = NO_COMPRESSION_MODE;
@@ -308,7 +309,18 @@ int videoCodecConfigureAVI(  char *cmdString,uint32_t optSize, uint8_t *opt)
 			         break;
 			   }
 			}
-
+                        if (!strcmp(cs,"ws")){
+                                switch( current_codec )
+                                {
+                                    case CodecDVD:
+                                        DVDExtra.widescreen = 1;
+                                    case CodecSVCD:
+                                        SVCDExtra.widescreen = 1;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
 			if(compmode==UNSET_COMPRESSION_MODE)
 			{
 				printf("\n ***** Unknown mode for video codec (%s)\n",cmdString);
