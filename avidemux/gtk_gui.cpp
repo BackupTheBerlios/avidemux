@@ -138,6 +138,7 @@ void A_addJob(void);
 static void updateSecondAudioTrack (void);
 void A_audioTrack(void);
 extern int A_Save( char *name);
+int A_SaveWrapper( char *name);
 static uint32_t getAudioByteCount( uint32_t start, uint32_t end);
 extern void mpegToIndex (char *name);
 static void A_mpegIndexer (void);
@@ -783,7 +784,7 @@ case ACT_Pipe2Other:
       break;
 //----------------------test-----------------------
     case ACT_SaveAvi:
-      GUI_FileSelWrite ("Select  file to save ",(SELFILE_CB *)A_Save); // A_SaveAudioNVideo);
+      GUI_FileSelWrite ("Select  file to save ",(SELFILE_CB *)A_SaveWrapper); // A_SaveAudioNVideo);
       break;
 //---------------------------------------------------
     case ACT_Copy:
@@ -2509,5 +2510,17 @@ void A_addJob(void)
         delete fullname;
         ADM_dealloc(name);
         ADM_dealloc(final);
+}
+int A_SaveWrapper(char *name)
+{
+        if(A_Save(name))
+        {
+                GUI_Info_HIG ("Done", "File %s has been successfully saved.",GetFileName(name));
+        }
+        else
+        {
+                GUI_Error_HIG ("Failed", "File %s was NOT saved correctly.",GetFileName(name));
+        }
+        return 1;
 }
 // EOF
