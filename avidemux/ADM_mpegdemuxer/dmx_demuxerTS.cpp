@@ -112,7 +112,9 @@ uint8_t dmx_demuxerTS::setProbeSize(uint32_t sz)
 }
 uint8_t dmx_demuxerTS::open(char *name)
 {
-        if(! parser->open(name,0)) return 0;
+FP_TYPE fp=FP_DONT_APPEND;
+        
+        if(! parser->open(name,&fp)) return 0;
         _size=parser->getSize();
         return 1;
 }
