@@ -53,7 +53,7 @@ GtkWidget *dialog;
 	UNUSED_ARG(object);
 	dial=(DIA_working *)user_data;
 	dialog=(GtkWidget *)dial->_priv;
-
+        gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	dial->_priv=NULL;
 	UI_purge();
@@ -107,7 +107,7 @@ void DIA_working :: postCtor( void )
 GtkWidget 	*dialog;
 
 		dialog=(GtkWidget *)_priv;
-		gtk_window_set_modal(GTK_WINDOW(dialog), 1);
+		//gtk_window_set_modal(GTK_WINDOW(dialog), 1);
 		gtk_signal_connect(GTK_OBJECT(lookup_widget(dialog,"closebutton1")), "clicked",
 		       GTK_SIGNAL_FUNC(on_work_abort), (void *) this);
 
