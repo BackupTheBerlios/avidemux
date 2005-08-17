@@ -503,7 +503,15 @@ uint8_t aviWrite::saveBegin (char 	*name,
 		odml_nbrof_streams=_mainheader.dwStreams;
 		aprintf("\nnumber of streams: %lu\n",odml_nbrof_streams);
 		// get number of frames per index
+
 		odml_index_size=(long)ceil(1000000.0/(double)_mainheader.dwMicroSecPerFrame*600.0);	// one index per 10 Minutes; decrease if 4GB are not enough for this amount of time 
+                aprintf("\n old number of frames per index: %lu\n",odml_index_size);
+                double fps=invideostream->dwRate/invideostream->dwScale;      
+
+                        aprintf("Fps1000:%f\n",fps);
+                        fps=600*fps; // 10 mn worth;
+                odml_index_size=floor(fps);
+
 		aprintf("\nnumber of frames per index: %lu\n",odml_index_size);
 		// get number or indexes per stream
 		odml_nbrof_index=(long)ceil((double)nb_frame/(double)odml_index_size);
