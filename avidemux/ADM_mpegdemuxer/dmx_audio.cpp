@@ -240,7 +240,7 @@ _nxt:
       printf ("No audio at all!\n");              
       return 0;
     }
-
+printf("Filling audio header\n");
   // now fill in the header
   _length = _index[nbIndex - 1].count[mainAudio];
   for(int i=0;i<nbTrack;i++)
@@ -255,8 +255,9 @@ _nxt:
   
     _destroyable = 1;
     strcpy (_name, "dmx audio");
-    demuxer->setPos (0, 0);
+    //demuxer->setPos (0, 0);
   }
+  printf("Audio index loaded, probing...\n");
   if(!probeAudio()) return 0;
         
   demuxer->changePid(_tracks[currentTrack].myPid,_tracks[currentTrack].myPes);
