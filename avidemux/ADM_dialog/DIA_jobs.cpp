@@ -69,6 +69,7 @@ GtkCellRenderer *renderer;
 
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
+        
         store=gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
         
         // initialize our job structure
@@ -80,22 +81,21 @@ GtkCellRenderer *renderer;
         memset(jobs.status,0,jobs.nb*sizeof(JOB_STATUS));
 
         gtk_tree_view_set_model(GTK_TREE_VIEW(WID(treeview1)),GTK_TREE_MODEL (store));
-
+        gtk_tree_view_columns_autosize(GTK_TREE_VIEW(WID(treeview1)));
 
         // Add columns
 
         renderer = gtk_cell_renderer_text_new ();
-
         column = gtk_tree_view_column_new_with_attributes ("Name", renderer,
-                                                      "text", (GdkModifierType) 0,
+                                                      "markup", (GdkModifierType) 0,
                                                       NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column);
-
+#if 0
         column2 = gtk_tree_view_column_new_with_attributes ("Status", renderer,
-                                                      "text", (GdkModifierType) 1,
+                                                      "markup", (GdkModifierType) 1,
                                                       NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column2);
-
+#endif
         //
         #define ASSOCIATE(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
             ASSOCIATE(buttonDelete,COMMAND_DELETE);
@@ -183,15 +183,19 @@ uint32_t n=0xffff;
 void updateStatus(void)
 {
 GtkTreeIter iter;
+char *str;
         gtk_list_store_clear (jobs.store);
         for (uint32_t i = 0; i < jobs.nb; i++)
         {
-                gtk_list_store_append (jobs.store, &iter);
-                gtk_list_store_set (jobs.store, &iter, 0,GetFileName(jobs.name[i]),-1);
-                gtk_list_store_set (jobs.store, &iter, 1,StringStatus[jobs.status[i]], -1);
-                
-                
+                str = g_strconcat("<span weight=\"heavy\">", 
+                GetFileName(jobs.name[i]), "</span>\n",  
+               "<span size=\"smaller\" style=\"oblique\" >", 
+                StringStatus[jobs.status[i]], "</span> ",NULL);
 
+                gtk_list_store_append (jobs.store, &iter);
+                gtk_list_store_set (jobs.store, &iter, 0,str,-1);
+
+                g_free(str);
         }
 }
 //*************************************
@@ -233,7 +237,7 @@ create_dialog1 (void)
   treeview1 = gtk_tree_view_new ();
   gtk_widget_show (treeview1);
   gtk_container_add (GTK_CONTAINER (scrolledwindow1), treeview1);
-  gtk_widget_set_size_request (treeview1, 300, -1);
+  //gtk_widget_set_size_request (treeview1, 300, -1);
 
   vbuttonbox1 = gtk_vbutton_box_new ();
   gtk_widget_show (vbuttonbox1);
