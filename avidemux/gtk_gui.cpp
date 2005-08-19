@@ -2478,23 +2478,16 @@ void A_Resync(void)
         UI_setMarkers (frameStart, frameEnd);
         GUI_GoToFrame(curframe);
 }
+uint8_t  DIA_job_select(char **jobname, char **filename);
 void A_addJob(void)
 {
         char *name,*fullname,*base,*final=NULL;
-        if(!DIA_enterString_HIG("Save job","Please enter job name",&name)) return;
-        if(!name || !*name) return;
+
+        if(!DIA_job_select(&name,&final)) return;
+        if(!name || !final) return;
+        if(!*name || !*final) return;
 
         base=getBaseDir();
-        if(!base) return;
-
-        // Now get final file
-        GUI_FileSelWrite("Select the file to save to when doing the jobs",&final);
-        if(!final || !*final) 
-        {
-                ADM_dealloc(name);
-                return;
-        }
-        // Now time to built it
         fullname=new char[strlen(name)+strlen(base)+2+4];
         
         strcpy(fullname,base);
