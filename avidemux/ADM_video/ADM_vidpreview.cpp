@@ -40,11 +40,16 @@
 #include "ADM_colorspace/ADM_rgb.h"
 #include "prototype.h"
 #include <ADM_assert.h>
+#include "gui_action.hxx"
+
+extern void HandleAction (Action action);
 
 static GtkWidget	*create_dialog1 (void);
 
 static void 			previewRender(void);
 static gboolean		preview_exit(GtkButton * button, gpointer user_data);
+static gboolean         cb_prev(GtkButton * button, gpointer user_data);
+static gboolean         cb_next(GtkButton * button, gpointer user_data);
 static gboolean 		preview_exit_short (GtkWidget * widget,GdkEvent * event, gpointer user_data);
 
 static uint8_t *rgb_render=NULL;
@@ -82,13 +87,17 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
 			     dialog,
 			     (GtkDestroyNotify) preview_exit_short);
 	// add callback for button
-	gtk_signal_connect(GTK_OBJECT(lookup_widget(dialog,"closebutton1")), "clicked",
-                      GTK_SIGNAL_FUNC(preview_exit),                   (void *) NULL);
+// 	gtk_signal_connect(GTK_OBJECT(lookup_widget(dialog,"closebutton1")), "clicked",
+//                       GTK_SIGNAL_FUNC(preview_exit),                   (void *) NULL);
+
+        gtk_signal_connect(GTK_OBJECT(WID(buttonNext)), "clicked",
+                       GTK_SIGNAL_FUNC(cb_next),                   (void *) NULL);
+        gtk_signal_connect(GTK_OBJECT(WID(buttonPrev)), "clicked",
+                       GTK_SIGNAL_FUNC(cb_prev),                   (void *) NULL);
 
 	// add callback for redraw
-	gtk_signal_connect(GTK_OBJECT(lookup_widget(dialog,"drawingarea1")), "expose_event",
-		       GTK_SIGNAL_FUNC(previewRender),
-		       NULL);
+	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
+		       GTK_SIGNAL_FUNC(previewRender),    NULL);
        lock=0;
        needDestroy=1;
        gtk_widget_show(  dialog);
@@ -194,39 +203,84 @@ gboolean preview_exit_short (GtkWidget * widget, GdkEvent * event, gpointer user
     }
 	return FALSE;
 }
-GtkWidget		*create_dialog1 (void)
+static gboolean         cb_prev(GtkButton * button, gpointer user_data)
+{
+        HandleAction(ACT_PreviousFrame);
+        return TRUE;
+}
+static gboolean         cb_next(GtkButton * button, gpointer user_data)
+{
+        HandleAction(ACT_NextFrame);
+        return FALSE;
+}
+
+GtkWidget*
+create_dialog1 (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
+  GtkWidget *vbox1;
+  GtkWidget *toolbar1;
+  GtkIconSize tmp_toolbar_icon_size;
+  GtkWidget *toolitem1;
+  GtkWidget *buttonPrev;
+  GtkWidget *toolitem2;
+  GtkWidget *buttonNext;
   GtkWidget *drawingarea1;
   GtkWidget *dialog_action_area1;
-  GtkWidget *closebutton1;
 
   dialog1 = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (dialog1), _("Preview"));
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
 
+  vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox1);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
+
+  toolbar1 = gtk_toolbar_new ();
+  gtk_widget_show (toolbar1);
+  gtk_box_pack_start (GTK_BOX (vbox1), toolbar1, FALSE, FALSE, 0);
+  gtk_toolbar_set_style (GTK_TOOLBAR (toolbar1), GTK_TOOLBAR_BOTH);
+  tmp_toolbar_icon_size = gtk_toolbar_get_icon_size (GTK_TOOLBAR (toolbar1));
+
+  toolitem1 = (GtkWidget*) gtk_tool_item_new ();
+  gtk_widget_show (toolitem1);
+  gtk_container_add (GTK_CONTAINER (toolbar1), toolitem1);
+
+  buttonPrev = gtk_button_new_from_stock ("gtk-media-previous");
+  gtk_widget_show (buttonPrev);
+  gtk_container_add (GTK_CONTAINER (toolitem1), buttonPrev);
+
+  toolitem2 = (GtkWidget*) gtk_tool_item_new ();
+  gtk_widget_show (toolitem2);
+  gtk_container_add (GTK_CONTAINER (toolbar1), toolitem2);
+
+  buttonNext = gtk_button_new_from_stock ("gtk-media-next");
+  gtk_widget_show (buttonNext);
+  gtk_container_add (GTK_CONTAINER (toolitem2), buttonNext);
+
   drawingarea1 = gtk_drawing_area_new ();
   gtk_widget_show (drawingarea1);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox1), drawingarea1, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox1), drawingarea1, TRUE, TRUE, 0);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
-  closebutton1 = gtk_button_new_from_stock ("gtk-close");
-  gtk_widget_show (closebutton1);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), closebutton1, GTK_RESPONSE_CLOSE);
-  GTK_WIDGET_SET_FLAGS (closebutton1, GTK_CAN_DEFAULT);
-
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, toolbar1, "toolbar1");
+  GLADE_HOOKUP_OBJECT (dialog1, toolitem1, "toolitem1");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonPrev, "buttonPrev");
+  GLADE_HOOKUP_OBJECT (dialog1, toolitem2, "toolitem2");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonNext, "buttonNext");
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
-  GLADE_HOOKUP_OBJECT (dialog1, closebutton1, "closebutton1");
 
   return dialog1;
 }
