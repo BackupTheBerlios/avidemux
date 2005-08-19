@@ -16,7 +16,7 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 									DIA_DVDff.cpp DIA_lavdecoder.cpp DIA_lame.cpp DIA_calculator.cpp DIA_equalizer.cpp \
 				DIA_vobsub.cpp DIA_x264.cpp DIA_ocr.cpp DIA_lavpp_deint.cpp DIA_hue.cpp DIA_eq2.cpp \
 				DIA_dgbob.cpp DIA_msharpen.cpp DIA_asharp.cpp DIA_dmx.cpp DIA_idx_pg.cpp DIA_gototime.cpp \
-				DIA_audioTrack.cpp DIA_cnr2.cpp DIA_resizeWiz.cpp DIA_jobs.cpp
+				DIA_audioTrack.cpp DIA_cnr2.cpp DIA_resizeWiz.cpp DIA_jobs.cpp DIA_jobs_save.cpp
 
 libADM_dialog2_a_SOURCES = DIA_quota.cpp
 
