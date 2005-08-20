@@ -32,35 +32,48 @@
 #include "xpm/gnome-calculator.xpm"
 #include "xpm/gnome-calculator_small.xpm"
 #include "xpm/systray.xpm"
+#include "xpm/avidemux_icon.inc"
+
+typedef enum ADM_Icon
+{
+        A_ICON_XPM,
+        A_ICON_PNG
+};
+
 typedef struct name2xpm
 {
+        const ADM_Icon icon;
 	const char *name;
-	const char **xpm;
+	const void *data;
+        
 }name2xpm;
 
 //static const char *xpm_Kbackward[] = {
 
 name2xpm iconTranslation[]=
 {
-	{"Kbackward.xpm",		xpm_Kbackward},	
-	{"Kbackward.xpm",		xpm_Kbackward},	
-	{"Kforward.xpm",		xpm_Kforward},
-	{"backward.xpm",		xpm_backward},	
-	{"forward.xpm",			xpm_forward},
-	{"about.xpm",			xpm_about},
-	{"begin.xpm",			xpm_begin},
-	{"end.xpm",			xpm_end},
-	{"play.xpm",			xpm_play},
-	{"stop.xpm",			xpm_stop},
-	{"markA.xpm",			xpm_markA},
-	{"markB.xpm",			xpm_markB},
-	{"xpm_nextblack.xpm",           xpm_nextblack},
-	{"xpm_prevblack.xpm",           xpm_prevblack},
-        {"avidemux_icon.xpm",           (const char **)avidemux_icon_xpm},
-        {"xpm_prevblack.xpm",           xpm_prevblack},
-        {"gnome-calculator.xpm",        (const char **)gnome_calculator_xpm},
-        {"gnome-calculator_small.xpm",  (const char **)gnome_calculator_small_xpm},
-        {"systray.xpm",                 (const char **)systray_xpm}
+	{A_ICON_XPM,"Kbackward.xpm",	(void *)	xpm_Kbackward},	
+	{A_ICON_XPM,"Kbackward.xpm",	(void *)	xpm_Kbackward},	
+	{A_ICON_XPM,"Kforward.xpm",	(void *)	xpm_Kforward},
+	{A_ICON_XPM,"backward.xpm",	(void *)	xpm_backward},	
+	{A_ICON_XPM,"forward.xpm",	(void *)	xpm_forward},
+	{A_ICON_XPM,"about.xpm",	(void *)	xpm_about},
+	{A_ICON_XPM,"begin.xpm",	(void *)	xpm_begin},
+	{A_ICON_XPM,"end.xpm",		(void *)	xpm_end},
+	{A_ICON_XPM,"play.xpm",		(void *)	xpm_play},
+	{A_ICON_XPM,"stop.xpm",		(void *)	xpm_stop},
+	{A_ICON_XPM,"markA.xpm",	(void *)	xpm_markA},
+	{A_ICON_XPM,"markB.xpm",	(void *)	xpm_markB},
+	{A_ICON_XPM,"xpm_nextblack.xpm",(void *)        xpm_nextblack},
+	{A_ICON_XPM,"xpm_prevblack.xpm",(void *)        xpm_prevblack},
+        {A_ICON_XPM,"avidemux_icon.xpm",(void *)        avidemux_icon_xpm},
+        {A_ICON_XPM,"xpm_prevblack.xpm",(void *)        xpm_prevblack},
+        {A_ICON_XPM,"gnome-calculator.xpm",(void *)     gnome_calculator_xpm},
+        {A_ICON_XPM,"gnome-calculator_small.xpm",(void *) gnome_calculator_small_xpm},
+        {A_ICON_PNG,"avidemux_icon_small.png",         (void *) avidemux_icon},
+
+
+        {A_ICON_XPM,"systray.xpm",                 (void *)systray_xpm},
 };
 GdkPixbuf	*create_pixbuf                  (const gchar     *filename)
 {
@@ -80,10 +93,20 @@ GdkPixbuf	*create_pixbuf                  (const gchar     *filename)
 	}
 
    GdkPixbuf *pix=NULL;
-
-   
-
-  pix= gdk_pixbuf_new_from_xpm_data(iconTranslation[found].xpm);
+   guint8 *gpix;
+   switch(iconTranslation[found].icon)
+        {
+        case A_ICON_XPM:        
+                pix= gdk_pixbuf_new_from_xpm_data((const char **)iconTranslation[found].data);
+                break;
+        case A_ICON_PNG:
+                gpix=( guint8 *)iconTranslation[found].data;
+                pix=gdk_pixbuf_new_from_inline (-1, gpix, FALSE, NULL);
+                break;
+        default:
+                ADM_assert(0);
+        
+        }
   
   return pix;
 }
