@@ -388,6 +388,7 @@ JSBool ADM_JSAvidemux::SaveOGM(JSContext *cx, JSObject *obj, uintN argc,
 }// end SaveOGM
 static void updateAll(void)
 {
+        if(!avifileinfo) return;
                         if (!video_body->updateVideoInfo (avifileinfo))
                         {
                                 GUI_Error_HIG ("OOPS","Something bad happened when executing that script");
