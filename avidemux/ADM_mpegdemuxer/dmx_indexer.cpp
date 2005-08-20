@@ -427,7 +427,7 @@ double d;
         if(!demuxer->getAllPTS(stats)) return 0;
         fprintf(fd,"# Video 1st PTS : %07u\n",firstPts);
         if(firstPts==ADM_NO_PTS) return 1;
-        for(int i=0;i<nbTracks;i++)
+        for(int i=1;i<nbTracks;i++)
         {
                 p=stats[i];
                 if(p==ADM_NO_PTS)
