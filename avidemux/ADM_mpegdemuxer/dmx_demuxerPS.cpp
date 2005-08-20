@@ -52,7 +52,7 @@ dmx_demuxerPS::dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks,uint32_t multi)
         tracked=NULL;
 
         nbTracked=nb;
-        
+        for(int i=0;i<256;i++) trackPTS[i]=ADM_NO_PTS;
         myPid=tracks[0].pes;
         
         if(nb!=256)     // Only pick one track as main, and a few as informative
@@ -113,6 +113,26 @@ uint8_t       dmx_demuxerPS::getStats(uint64_t *oseen)
         }
         return 1;
 }
+uint8_t         dmx_demuxerPS::getAllPTS(uint64_t *stat)
+{
+        if(nbTracked!=256)
+        {
+                stat[0]=0;
+                for(int i=1;i<nbTracked;i++)
+                {
+                        stat[i]=trackPTS[tracked[i]];
+                }
+        }
+        else
+        {
+                 for(int i=0;i<nbTracked;i++)
+                {
+                        stat[i]=trackPTS[i];
+                }
+        }
+        return 1;
+}
+
 uint8_t dmx_demuxerPS::setProbeSize(uint32_t sz)
 {
 		_probeSize=sz;
@@ -378,6 +398,10 @@ _again:
         if(mask[globstream &0xff])
         {
                 seen[globstream& 0xff]+=len;
+                if(trackPTS[globstream&0xff]==ADM_NO_PTS && pts!=ADM_NO_PTS)
+                {
+                        trackPTS[globstream & 0xff]=pts;
+                }
                
         }
         // Here keep track of other tracks
@@ -390,6 +414,7 @@ _again:
         It is assumed that parser is just after the packet startcode
 
 */
+
 uint8_t dmx_demuxerPS::getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *olen,uint64_t *opts,uint64_t *odts)
 {
 

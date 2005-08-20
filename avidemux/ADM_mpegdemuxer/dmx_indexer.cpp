@@ -47,7 +47,7 @@
 static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
 static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel,uint32_t nbTracks);
 static uint8_t gopUpdate(dmx_demuxer *demuxer);
-
+uint8_t dumpPts(FILE *fd,dmx_demuxer *demuxer,uint64_t firstPts,uint32_t nbTracks);
 uint8_t dmx_indexer(char *mpeg,char *file);
 
 static const uint32_t FPS[16]={
@@ -111,6 +111,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         uint8_t  mpegTypeChar;
         uint32_t update=0;
         uint32_t multi=0;
+        uint64_t firstPicPTS=ADM_NO_PTS;
         
         
 
@@ -271,6 +272,8 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                         continue;
                                                         printf("No sequence start yet, skipping..\n");
                                                 }
+                                                if(firstPicPTS==ADM_NO_PTS && pts!=ADM_NO_PTS)
+                                                        firstPicPTS=pts;
                                                 grabbing=0;
                                                 total_frame++;
                                                 val=demuxer->read16i();
@@ -322,6 +325,9 @@ stop_found:
           demuxer->getPos(&lastAbs,&lastRel);
           if(nbPushed)  gopDump(out,demuxer,lastAbs,lastRel,nbTracks);
 
+         dumpPts(out,demuxer,firstPicPTS,nbTracks);
+
+        /* Now update......... */
           fseeko(out,0,SEEK_SET);
         // Update if needed
         uint32_t compfps,delta=computeTimeDifference(&firstStamp,&lastStamp);
@@ -362,6 +368,8 @@ stop_found:
         {
                 printf("Seems to be frame encoded\n");
         }
+
+        // Now dump the delta PTS
         // *****************Update header*************
         fprintf(out,"ADMX0003\n");
         fprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
@@ -410,6 +418,34 @@ uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel)
         ADM_assert(nbPushed<MAX_PUSHED);
         return 1;
 
+}
+uint8_t dumpPts(FILE *fd,dmx_demuxer *demuxer,uint64_t firstPts,uint32_t nbTracks)
+{
+uint64_t stats[nbTracks],p;
+double d;
+
+        if(!demuxer->getAllPTS(stats)) return 0;
+        fprintf(fd,"# Video 1st PTS : %07u\n",firstPts);
+        if(firstPts==ADM_NO_PTS) return 1;
+        for(int i=0;i<nbTracks;i++)
+        {
+                p=stats[i];
+                if(p==ADM_NO_PTS)
+                {
+                        fprintf(fd,"# track %d no pts\n",i);
+                }
+                else
+                {
+                        
+                        d=firstPts; // it is in 90 khz tick
+                        d-=stats[i];
+                        d/=90.;
+                        fprintf(fd,"# track %d PTS : %07u ",i,stats[i]);
+                        fprintf(fd," delta=%04d ms\n",(int)d);
+                }
+
+        }
+        return 1;
 }
 /*** Pop the whold gop ***/
 uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel,uint32_t nbTracks)

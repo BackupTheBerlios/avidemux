@@ -47,6 +47,7 @@ class dmx_demuxerPS: public dmx_demuxer
                   uint32_t      maxPid;
 
                   uint64_t      seen[256];                                  
+                  uint64_t      trackPTS[256];                                  
                   uint8_t       mask[256];    
                   uint8_t       *tracked   ;
                   uint32_t      nbTracked;
@@ -78,6 +79,7 @@ class dmx_demuxerPS: public dmx_demuxer
 
                   uint8_t         hasAudio(void) { return 1;} // MAYBE has audio
                   uint8_t         getStats(uint64_t *stat);
+                  uint8_t         getAllPTS(uint64_t *stat);
                   uint8_t         changePid(uint32_t newpid,uint32_t newpes);
 
 // Inlined
