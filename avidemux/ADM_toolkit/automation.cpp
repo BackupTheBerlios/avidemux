@@ -548,7 +548,6 @@ void show_info(char *p){
    if( wavinfo )
     {
       printf("   Codec: %s\n",getStrFromAudioCodec(wavinfo->encoding));     
-      
       printf("   Mode: ");
       switch( wavinfo->channels ){
          case 1:  printf("MONO\n"); break;
@@ -557,7 +556,13 @@ void show_info(char *p){
       }
       printf("   BitRate: %u Bps / %u kbps\n", wavinfo->byterate, wavinfo->byterate*8/1000);
       printf("   Frequency: %u Hz\n", wavinfo->frequency);
-      printf("   Duration: %u MBytes\n", video_body->getAudioLength()>>20);
+      { double du = video_body->getAudioLength();
+        uint16_t hh, mm, ss, ms;
+         du*=1000;
+         du/=wavinfo->byterate;
+         ms2time((uint32_t)floor(du), &hh, &mm, &ss, &ms);
+         printf("   Duration: %02d:%02d:%02d.%03d (%lu MBytes)\n", hh, mm, ss, ms, video_body->getAudioLength()>>20);
+      }
    }else{
       printf("   Codec: NONE\n");
       printf("   Mode: NONE\n");
