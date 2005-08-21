@@ -282,7 +282,7 @@ _next:
 
       for(int i=0;i<foundPid;i++)
       {
-        if(allPid[i].pes>=0xE0 && allPid[i].pes<0xE9)
+        if(allPid[i].pes>=0xE0 && allPid[i].pes<=0xEA)
         {
             vPid=trk[0].pes=allPid[i].pes;
             trk[0].pid=allPid[i].pid;
