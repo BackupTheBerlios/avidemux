@@ -190,7 +190,8 @@ JSBool ADM_JSAvidemuxAudio::JSSetProperty(JSContext *cx, JSObject *obj, jsval id
 				break;
 			case delay_prop:
 				priv->getObject()->m_nDelay = JSVAL_TO_INT(*vp);
-				audioFilterDelay(priv->getObject()->m_nDelay);
+				//audioFilterDelay(priv->getObject()->m_nDelay);
+                                UI_setTimeShift(1, priv->getObject()->m_nDelay); 
 				break;
 			case film2pal_prop:
 				priv->getObject()->m_bFilm2PAL = JSVAL_TO_BOOLEAN(*vp);
