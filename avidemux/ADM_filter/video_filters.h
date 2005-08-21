@@ -87,6 +87,7 @@
 		VF_DELTA,
                 VF_UNBLEND,
                 VF_FIELDUNBLEND,
+                VF_MOSAIC,
 		VF_DUMMY
  	 }VF_FILTERS;
  	
