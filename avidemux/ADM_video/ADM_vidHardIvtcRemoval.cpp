@@ -145,33 +145,7 @@ vidHardPDRemoval::~vidHardPDRemoval ()
   cand2=NULL;
   rebuild=NULL;
 }
-static void merge(ADMImage *src1,ADMImage *src2,ADMImage *tgt)
-{
-uint32_t ww,hh;
-uint8_t *s1,*s2,*out;
-int o;
 
-        s1=YPLANE(src1);
-        s2=YPLANE(src2);
-        out=YPLANE(tgt);
-        ww=src1->_width;
-        hh=src1->_height;
-        for(int y=0;y<hh;y++)
-                for(int x=0;x<ww;x++)
-                {
-                        o=*s1+*s2;
-                        o>>=1;
-                        *out=o;
-                        s1++;
-                        s2++;
-                        out++;
-
-                }
-
-
-
-
-}
 static float computeDiff(ADMImage *src1,ADMImage *src2,uint32_t noise)
 {
 float df=0;
@@ -262,37 +236,6 @@ int a1,a2;
                 }
         return 1;
 }
-static uint8_t tinyAverage(uint8_t *dst, uint8_t *src1, uint8_t *src2,uint32_t w, uint32_t h)
-{
-int delta;
-uint32_t ww,hh;
-uint8_t *s1,*s2,*d1;
-int a1,a2;
-        s1=src1;
-        s2=src2;
-        
-        d1=dst;
-        ww=w;
-        hh=h;
-
-          for(int y=0;y<hh;y++)
-                for(int x=0;x<ww;x++)
-                {
-                        a1=*s1;
-                        a2=*s2;
-                        a1=a1+a2;
-                        a1>>=1;
-                        if(a1<0) a1=0;
-                        if(a1>255) a1=255;
-                        *d1=a1;                         
-
-                        s1++;
-                        s2++;
-                        d1++;
-                }
-        return 1;
-}
-
 /*
 
                 src=blend of srcP and R         => src= 1/2(srcP+R)
@@ -357,20 +300,6 @@ int a1,a2,t1;
 
 
 }
-static uint8_t    averageF(ADMImage *tgt,ADMImage *src,ADMImage *srcP)
-{
-int delta;
-uint32_t ww,hh;
-uint8_t *s1,*s2,*d1;
-int a1,a2,t1;
-
-        tinyAverage(YPLANE(tgt),YPLANE(src),YPLANE(srcP),tgt->_width,tgt->_height);
-        tinyAverage(UPLANE(tgt),UPLANE(src),UPLANE(srcP),tgt->_width>>1,tgt->_height>>1);
-        tinyAverage(VPLANE(tgt),VPLANE(src),VPLANE(srcP),tgt->_width>>1,tgt->_height>>1);
-        return 1;
-
-
-}
 static uint8_t    restore(ADMImage *tgt,ADMImage *srcP,ADMImage *src,ADMImage *srcN,ADMImage *srcNN)
 {
 int delta;
@@ -429,7 +358,7 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
 #else
         unblend(cand1,src,srcP);
         unblend(cand2,srcN,srcNN);
-        averageF(rebuild,cand1,cand2);
+        rebuild->merge(cand1,cand2);
 #endif  
 #if 0
         data->duplicate(rebuild);
@@ -438,13 +367,13 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
 #endif
 
         // And remerge...
-        averageF(cand1,srcP,rebuild);
-        averageF(cand2,srcNN,rebuild);
+        cand1->merge(srcP,rebuild);
+        cand2->merge(srcNN,rebuild);
         
-        distP=computeDiff(cand1,src,_param->noise);
-        distN=computeDiff(cand2,srcN,_param->noise);
-        distM=computeDiff(src,srcP,_param->noise);
-        distR=computeDiff(src,srcN,_param->noise);
+        distP=ADMImage::lumaDiff(cand1,src,_param->noise);
+        distN=ADMImage::lumaDiff(cand2,srcN,_param->noise);
+        distM=ADMImage::lumaDiff(src,srcP,_param->noise);
+        distR=ADMImage::lumaDiff(src,srcN,_param->noise);
         
         
         
