@@ -64,7 +64,7 @@ printf(  "*********************\n");
         REGISTERX("asharp","ASharp by MarcFD",VF_ASHARP,1,asharp_create,asharp_script);
 	REGISTERX("whirl","Whirl",VF_WHIRL,1,whirl_create,whirl_script);
         REGISTERX("unblend","Unblend by Bach",VF_UNBLEND,1,unblend_create,unblend_script);
-        REGISTERX("fieldunblend","Field Unblend",VF_FIELDUNBLEND,1,fieldunblend_create,fieldunblend_script);
+        REGISTERX("hardivtcremove","Hard IVTC removal",VF_HARDIVTC,1,hardivtc_create,hardivtc_script);
         REGISTERX("mosaic","Mosaic",VF_MOSAIC,1,
                 mosaic_create,mosaic_script);
 

@@ -86,7 +86,7 @@
 		VF_CNR2,
 		VF_DELTA,
                 VF_UNBLEND,
-                VF_FIELDUNBLEND,
+                VF_HARDIVTC,
                 VF_MOSAIC,
 		VF_DUMMY
  	 }VF_FILTERS;
