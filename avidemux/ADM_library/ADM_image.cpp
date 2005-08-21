@@ -1,14 +1,16 @@
-//
-// C++ Implementation: %{MODULE}
-//
-// Description:
-//
-//
-// Author: %{AUTHOR} <%{EMAIL}>, (C) %{YEAR}
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
+/***************************************************************************
+    copyright            : (C) 2003-2005 by mean
+    email                : fixounet@free.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 #include "config.h"
 
 #include <stdlib.h>
@@ -18,6 +20,7 @@
 #include "ADM_library/default.h"
 
 #include "ADM_library/ADM_image.h"
+#include "ADM_toolkit/ADM_cpuCap.h"
 //#include "ADM_assert.h"
 void ADMImage_stat( void );
 
@@ -247,8 +250,4 @@ uint8_t ADMImage::copyQuantInfo(ADMImage *src)
 	
 	return 1;
 }
-
-
-
-
-
+//EOF
