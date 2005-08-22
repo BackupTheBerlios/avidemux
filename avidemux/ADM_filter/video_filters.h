@@ -88,6 +88,7 @@
                 VF_UNBLEND,
                 VF_HARDIVTC,
                 VF_MOSAIC,
+                VF_BLENDREMOVAL,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

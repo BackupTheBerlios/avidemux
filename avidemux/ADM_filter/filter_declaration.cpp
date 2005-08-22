@@ -63,10 +63,7 @@ printf(  "*********************\n");
         REGISTERX("msharpen","MSharpen by Donald Graft",VF_MSHARPEN,1,msharpen_create,msharpen_script);
         REGISTERX("asharp","ASharp by MarcFD",VF_ASHARP,1,asharp_create,asharp_script);
 	REGISTERX("whirl","Whirl",VF_WHIRL,1,whirl_create,whirl_script);
-        REGISTERX("unblend","Unblend by Bach",VF_UNBLEND,1,unblend_create,unblend_script);
-        REGISTERX("hardivtcremove","Hard IVTC removal",VF_HARDIVTC,1,hardivtc_create,hardivtc_script);
-        REGISTERX("mosaic","Mosaic",VF_MOSAIC,1,
-                mosaic_create,mosaic_script);
+        REGISTERX("mosaic","Mosaic",VF_MOSAIC,1,     mosaic_create,mosaic_script);
 
 
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
@@ -101,6 +98,14 @@ printf(  "*********************\n");
 	REGISTERX("dgbob","DGBob",VF_DGBOB,1,dgbob_create,dgbob_script);
 
 	REGISTER("","Partial",VF_PARTIAL,0,partial_create);
+
+
+        registerFilter("-------- Deblender ---------",VF_INVALID,2,NULL,NULL);
+
+        REGISTERX("blendremover","Blend Remover",VF_BLENDREMOVAL,1,blendremove_create,blendremove_script);
+        REGISTERX("hardivtcremove","Hard pulldown removal",VF_HARDIVTC,1,hardivtc_create,hardivtc_script);
+// Does not work
+//        REGISTERX("unblend","Unblend by Bach",VF_UNBLEND,1,unblend_create,unblend_script);
 	registerFilter("-------- Convolution Kernel ---------",VF_INVALID,2,NULL,NULL);
 	REGISTERX("sharpen","Sharpen",VF_SHARPEN,1,sharpen_create,sharpen_script);
    	REGISTERX("mean","Mean",VF_MEAN,1,mean_create,mean_script);
