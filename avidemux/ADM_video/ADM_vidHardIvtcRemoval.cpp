@@ -38,6 +38,8 @@
 #include "ADM_video/ADM_cache.h"
 #include "ADM_filter/video_filters.h"
 #include "ADM_dialog/DIA_enter.h"
+#include "ADM_toolkit/ADM_cpuCap.h"
+
 
 #define MUL 1
 // Set it to 2 for post separate field
@@ -146,96 +148,9 @@ vidHardPDRemoval::~vidHardPDRemoval ()
   rebuild=NULL;
 }
 
-static float computeDiff(ADMImage *src1,ADMImage *src2,uint32_t noise)
-{
-float df=0;
-int delta;
-uint32_t ww,hh;
-uint8_t *s1,*s2;
 
-        s1=YPLANE(src1);
-        s2=YPLANE(src2);
-        ww=src1->_width;
-        hh=src1->_height;
 
-          for(int y=0;y<hh;y++)
-                for(int x=0;x<ww;x++)
-                {
-                        delta=abs(*s1-*s2);
-                        if(delta>noise)
-                                df+=delta;
-                        s1++;
-                        s2++;
 
-                }
-        return df;
-}
-static float computeDiff2(ADMImage *src1,ADMImage *src2,ADMImage *cand)
-{
-float df=0;
-int delta;
-uint32_t ww,hh;
-uint8_t *s1,*s2,*d1;
-int a1,a2,t1;
-        s1=YPLANE(src1);
-        s2=YPLANE(src2);
-        
-        d1=YPLANE(cand);
-        ww=src1->_width;
-        hh=src1->_height;
-
-          for(int y=0;y<hh;y++)
-                for(int x=0;x<ww;x++)
-                {
-                        a1=*s1;
-                        a2=*s2;
-                        t1=*d1;
-                        if(a1==a2) ;
-                        else
-                        if(a1>a2)
-                        {
-                                if(t1 <=a1 && t1>=a2) df+=1;
-                                        else df-=1;
-                        }else
-                                if(t1 <=a2 && t1>=a1) df+=1;
-                                        else df-=1;
-                        s1++;
-                        s2++;
-                        d1++;
-                }
-        return df;
-}
-
-// so srcR=2*src-srcP
-static uint8_t tinyUnblend(uint8_t *dst, uint8_t *src1, uint8_t *src2,uint32_t w, uint32_t h)
-{
-int delta;
-uint32_t ww,hh;
-uint8_t *s1,*s2,*d1;
-int a1,a2;
-        s1=src1;
-        s2=src2;
-        
-        d1=dst;
-        ww=w;
-        hh=h;
-
-          for(int y=0;y<hh;y++)
-                for(int x=0;x<ww;x++)
-                {
-                        a1=*s1;
-                        a2=*s2;
-                        a1=2*a1-a2;
-                        if(a1<0) a1=0;
-                        if(a1>255) a1=255;
-                        *d1=a1;                         
-
-                        s1++;
-                        s2++;
-                        d1++;
-                }
-        return 1;
-}
 /*
 
                 src=blend of srcP and R         => src= 1/2(srcP+R)
@@ -285,27 +200,78 @@ int a1,a2,a3,a4,sum,delta;
                 }
         return 1;
 }
-
-static uint8_t    unblend(ADMImage *tgt,ADMImage *src,ADMImage *srcP)
+#if defined (ARCH_X86 ) || defined (ARCH_X86_64 )
+static uint8_t tinyRestoreMMX(uint8_t *dst, uint8_t *srcP, uint8_t *src,uint8_t *srcN,uint8_t *srcNN,uint32_t w, uint32_t h)
 {
-int delta;
-uint32_t ww,hh;
-uint8_t *s1,*s2,*d1;
-int a1,a2,t1;
 
-        tinyUnblend(YPLANE(tgt),YPLANE(src),YPLANE(srcP),tgt->_width,tgt->_height);
-        tinyUnblend(UPLANE(tgt),UPLANE(src),UPLANE(srcP),tgt->_width>>1,tgt->_height>>1);
-        tinyUnblend(VPLANE(tgt),VPLANE(src),VPLANE(srcP),tgt->_width>>1,tgt->_height>>1);
+
+uint8_t *s,*sp,*sn,*snn,*d1;
+int a1,a2,a3,a4,sum,delta,l,ll;
+
+        sp=srcP;
+        s=src;
+        sn=srcN;
+        snn=srcNN;
+        
+        d1=dst;
+
+        l=w*h;
+        ll=l>>2;
+        __asm__(
+                         "pxor %%mm7,%%mm7"
+                ::
+                 );
+        for(int x=0;x<ll;x++)
+                {
+                        __asm__(
+                        "movd           (%0),%%mm0 \n"
+                        "movd           (%1),%%mm1 \n"
+                        "movd           (%2),%%mm2 \n"
+                        "movd           (%3),%%mm3 \n"
+                        "punpcklbw      %%mm7,%%mm0 \n"
+                        "punpcklbw      %%mm7,%%mm1 \n"
+                        "punpcklbw      %%mm7,%%mm2 \n"
+                        "punpcklbw      %%mm7,%%mm3 \n"  //sum=2*m1+2*m2-m0-m3;
+                        
+                        "paddw          %%mm2,%%mm1 \n"
+                        "paddw          %%mm1,%%mm1 \n"
+                        "paddw          %%mm3,%%mm0 \n"
+                        
+                        "psubusw        %%mm0,%%mm1 \n" // mm1=sum
+                        "psraw          $1,%%mm1 \n"    //2 
+                        "packuswb       %%mm1,  %%mm1\n"
+                        "movd           %%mm1,(%4) \n"
+
+                : : "r" (sp),"r" (s),"r"(sn),"r"(snn),"r"(d1)
+                );
+
+                        s+=4;
+                        sp+=4;
+                        sn+=4;
+                        snn+=4;
+                        d1+=4;
+                }
+        if(l&3) tinyRestore(d1, sp, s,sn,snn,l&3, 1);
         return 1;
-
-
 }
+#endif
+
 static uint8_t    restore(ADMImage *tgt,ADMImage *srcP,ADMImage *src,ADMImage *srcN,ADMImage *srcNN)
 {
 int delta;
 uint32_t ww,hh;
 uint8_t *s1,*s2,*d1;
 int a1,a2,t1;
+
+#if defined (ARCH_X86 ) || defined (ARCH_X86_64 )
+        if(CpuCaps::hasMMX())
+        {
+              tinyRestoreMMX(YPLANE(tgt),YPLANE(srcP),YPLANE(src),YPLANE(srcN),YPLANE(srcNN),tgt->_width,tgt->_height);
+              tinyRestoreMMX(UPLANE(tgt),UPLANE(srcP),UPLANE(src),UPLANE(srcN),UPLANE(srcNN),tgt->_width>>1,tgt->_height>>1);
+              tinyRestoreMMX(VPLANE(tgt),VPLANE(srcP),VPLANE(src),VPLANE(srcN),VPLANE(srcNN),tgt->_width>>1,tgt->_height>>1);
+              return 1;
+        }
+#endif
 
         tinyRestore(YPLANE(tgt),YPLANE(srcP),YPLANE(src),YPLANE(srcN),YPLANE(srcNN),tgt->_width,tgt->_height);
         tinyRestore(UPLANE(tgt),UPLANE(srcP),UPLANE(src),UPLANE(srcN),UPLANE(srcNN),tgt->_width>>1,tgt->_height>>1);
@@ -322,15 +288,26 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
 
 	
 	ADMImage *srcP,*srcN,*srcNN,*src,*final,*display;
-        float distMerged, distN,distP,distM,distR;
+        float distMerged, distN,distP,distM,distR,skip=0;
         char txt[255];
 
+        
         if(inframe<1 || inframe>inframe>_info.nb_frames-2 )
+        {
+                skip=1;
+        }
+        if(inframe>_lastRemoved+1 && inframe<_lastRemoved+5 )
+        {
+                skip=1;
+        }
+        
+        if(skip)
         {
                 data->duplicate(vidCache->getImage(inframe));
                 vidCache->unlockAll();
                 return 1;
         }
+        
         if(_lastRemoved==inframe-1)
         {
                 data->duplicate(rebuild);
@@ -343,7 +320,7 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
                 return 1;
         }
 
-        data->duplicate(rebuild);
+        //data->duplicate(rebuild);
 
         srcP=vidCache->getImage(inframe-1);
         src=vidCache->getImage(inframe);
@@ -354,10 +331,10 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
         // If then we got R1 very close to R2, and that AR is very close to src
         // Decide it is hard telecined (frame blending)
 #if 1
-       restore(rebuild,srcP,src,srcN,srcNN);
+        restore(rebuild,srcP,src,srcN,srcNN);
 #else
-        unblend(cand1,src,srcP);
-        unblend(cand2,srcN,srcNN);
+        cand1->substract(src,srcP);
+        cand2->substract(srcN,srcNN);
         rebuild->merge(cand1,cand2);
 #endif  
 #if 0
