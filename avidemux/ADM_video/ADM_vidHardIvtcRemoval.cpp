@@ -46,7 +46,11 @@
 
 #include "ADM_vidBlendRemoval_param.h"
 
+#define PROGRESSIVE  0x00000001
+#define MAGIC_NUMBER (0xdeadbeef)
+#define IN_PATTERN   0x00000002
 
+extern uint8_t PutHintingData(unsigned char *video, unsigned int hint);
 
 class vidHardPDRemoval:public AVDMGenericVideoStream
 {
@@ -90,7 +94,17 @@ char *vidHardPDRemoval::printConf (void)
   sprintf ((char *) buf, " Field Unblend Thresh:%d Noise:%d",_param->threshold,_param->noise);
   return buf;
 }
+static void hint(ADMImage *img)
+{
+       unsigned int hint;
 
+                 hint= PROGRESSIVE;
+                
+                 hint |= IN_PATTERN;
+                
+                PutHintingData(YPLANE(img), hint);  
+
+}
 #define MAX_BLOCKS 50
 /*************************************/
 vidHardPDRemoval::vidHardPDRemoval (AVDMGenericVideoStream * in, CONFcouple * couples)
@@ -286,7 +300,7 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
         char txt[255];
 
         
-        if(inframe<1 || inframe>inframe>_info.nb_frames-2 )
+        if(inframe<1 || inframe>inframe>_info.nb_frames-3 )
         {
                 skip=1;
         }
@@ -298,6 +312,7 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
         if(skip)
         {
                 data->duplicate(vidCache->getImage(inframe));
+                hint(data);
                 vidCache->unlockAll();
                 return 1;
         }
@@ -305,6 +320,7 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
         if(_lastRemoved==inframe-1)
         {
                 data->duplicate(rebuild);
+                hint(data);
                 if(_param->show&&inframe)
                 {
                         sprintf(txt," Telecined 2");
@@ -320,6 +336,13 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
         src=vidCache->getImage(inframe);
         srcN=vidCache->getImage(inframe+1);
         srcNN=vidCache->getImage(inframe+2);
+
+        if(!src || !srcP || !srcN || !srcNN)
+        {
+                data->duplicate(vidCache->getImage(inframe));
+                vidCache->unlockAll();
+                return 1;
+        }
         
         // Let's rebuild the pseudo R, where we have A AR RB B
         // If then we got R1 very close to R2, and that AR is very close to src
@@ -390,6 +413,7 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
         if(distN<_param->threshold && distP<_param->threshold)
         {
                 data->duplicate(rebuild);
+                hint(data);
                 _lastRemoved=inframe;
                 if(_param->show && inframe == _lastRemoved+5)
                 {
