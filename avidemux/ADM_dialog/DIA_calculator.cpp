@@ -203,8 +203,8 @@ aviInfo info;
 	}
 	else
 	{//AVI or OGM
-		s74=690;
-		s80=730;
+		s74=650;
+		s80=695;
 		dvd=4300;
 	}
 	
