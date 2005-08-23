@@ -185,7 +185,12 @@ uint8_t vidBlendRemoval::getFrameNumberNoAlloc (uint32_t inframe,
         srcP=vidCache->getImage(inframe-1);
         src=vidCache->getImage(inframe);
         srcN=vidCache->getImage(inframe+1);
-        
+        if(!srcP || !src || !srcN)
+        {
+                data->duplicate(vidCache->getImage(inframe));
+                vidCache->unlockAll();
+                return 1;
+        }
        
         rebuild->merge(srcP,srcN);
         
