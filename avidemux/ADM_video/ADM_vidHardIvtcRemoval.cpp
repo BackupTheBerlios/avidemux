@@ -44,12 +44,9 @@
 #define MUL 1
 // Set it to 2 for post separate field
 
-typedef struct HARD_IVTC_PARAM
-{
-        uint32_t threshold;
-        uint32_t noise;
-        uint32_t show;
-}HARD_IVTC_PARAM;
+#include "ADM_vidBlendRemoval_param.h"
+
+
 
 class vidHardPDRemoval:public AVDMGenericVideoStream
 {
@@ -57,7 +54,7 @@ class vidHardPDRemoval:public AVDMGenericVideoStream
 protected:
   virtual char *printConf (void);
   VideoCache *vidCache;
-  HARD_IVTC_PARAM *_param;
+  BLEND_REMOVER_PARAM *_param;
   uint32_t              _lastRemoved;
   ADMImage              *cand1,*cand2,*rebuild;
 public:
@@ -72,24 +69,19 @@ public:
 };
 
 static FILTER_PARAM field_unblend_template =
-  { 3,"threshold","show","noise"};
+  { 4,"threshold","show","noise","identical"};
 
 BUILD_CREATE (hardivtc_create, vidHardPDRemoval);
 SCRIPT_CREATE (hardivtc_script, vidHardPDRemoval, field_unblend_template);
 //*************************************
 uint8_t vidHardPDRemoval::configure (AVDMGenericVideoStream * in)
 {
-int v;
-        _param->show=GUI_YesNo("Metrics","Do you want to print metrics on screen ?" );
-        v=_param->threshold;
-        if(DIA_GetIntegerValue(&v, 2, 99,"Treshold","Treshold value (smaller = harder to match)"))
-                _param->threshold=v;
-
-        v=_param->noise;
-        if(DIA_GetIntegerValue(&v, 2, 99,"Noise","Noise threshold"))
-                _param->noise=v;
-        _lastRemoved=0xFFFF;
-        return 1;
+        if(DIA_blendRemoval(_param))
+        {
+                _lastRemoved=0xFFFFFFF;
+                return 1;
+        }
+        return 0;
 }
 /*************************************/
 char *vidHardPDRemoval::printConf (void)
@@ -113,8 +105,8 @@ vidHardPDRemoval::vidHardPDRemoval (AVDMGenericVideoStream * in, CONFcouple * co
   cand2=new ADMImage(_info.width,_info.height);
   rebuild=new ADMImage(_info.width,_info.height);
 
- _param=new HARD_IVTC_PARAM;
- _lastRemoved=0xFFFF;
+ _param=new BLEND_REMOVER_PARAM;
+ _lastRemoved=0xFFFFFFF;
  if(couples)
  {
 #undef GET
@@ -122,12 +114,14 @@ vidHardPDRemoval::vidHardPDRemoval (AVDMGenericVideoStream * in, CONFcouple * co
       GET (threshold);
       GET (show);
       GET (noise);
+      GET (identical);
   }
   else
   {
         _param->threshold=10;
         _param->show=0;
         _param->noise=5;
+        _param->identical=2;
   }
 }
 //____________________________________________________________________
@@ -370,6 +364,20 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
          }
 
         medium=medium/(_info.width*_info.height);
+        medium*=1000;
+
+        if(medium<_param->identical)
+        {
+                 data->duplicate(src);
+                 vidCache->unlockAll();
+                if(_param->show)
+                {
+                        sprintf(txt," %% %02.1f : Identical",medium);
+                        drawString(data,2,3,txt);
+
+                }
+                return 1;
+        }
         double mn;
 
         if(inframe == _lastRemoved+5)
@@ -404,6 +412,8 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
                 sprintf(txt," R %02.1f",distR);
                 drawString(display,2,2,txt);
 
+                sprintf(txt," %% %02.1f",medium);
+                drawString(display,2,3,txt);
 
                 if(_lastRemoved==inframe)
                 {
@@ -421,12 +431,13 @@ uint8_t vidHardPDRemoval::getCoupledConf (CONFcouple ** couples)
 {
 
   ADM_assert (_param);
-  *couples = new CONFcouple (3);
+  *couples = new CONFcouple (4);
 #undef CSET
 #define CSET(x)  (*couples)->setCouple(#x,(_param->x))
   CSET (threshold);
   CSET (show);
   CSET (noise);
+  CSET (identical);
   
   return 1;
 }
