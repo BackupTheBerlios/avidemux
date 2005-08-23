@@ -40,17 +40,11 @@
 #include "ADM_dialog/DIA_enter.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
 
-
+#include "ADM_vidBlendRemoval_param.h"
 #define MUL 1
 // Set it to 2 for post separate field
 
-typedef struct BLEND_REMOVER_PARAM
-{
-        uint32_t threshold;
-        uint32_t noise;
-        uint32_t show;
-        uint32_t identical;
-}BLEND_REMOVER_PARAM;
+
 
 class vidBlendRemoval:public AVDMGenericVideoStream
 {
@@ -80,21 +74,12 @@ SCRIPT_CREATE (blendremove_script, vidBlendRemoval, field_unblend_template);
 //*************************************
 uint8_t vidBlendRemoval::configure (AVDMGenericVideoStream * in)
 {
-int v;
-        _param->show=GUI_YesNo("Metrics","Do you want to print metrics on screen ?" );
-        v=_param->threshold;
-        if(DIA_GetIntegerValue(&v, 2, 99,"Treshold","Treshold value (smaller = harder to match)"))
-                _param->threshold=v;
-
-        v=_param->noise;
-        if(DIA_GetIntegerValue(&v, 2, 99,"Noise","Noise threshold"))
-                _param->noise=v;
-        v=_param->identical;
-        if(DIA_GetIntegerValue(&v, 2, 99,"Identical","% from which picture are considered static"))
-                _param->identical=v;
-
-        _lastRemoved=0xFFFF;
-        return 1;
+        if(DIA_blendRemoval(_param))
+        {
+                _lastRemoved=0xFFFFFFF;
+                return 1;
+        }
+        return 0;
 }
 /*************************************/
 char *vidBlendRemoval::printConf (void)
