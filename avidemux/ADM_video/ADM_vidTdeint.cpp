@@ -4,7 +4,7 @@
         Tdeint
 
     copyright            : Tritical, ported to avidemux by mean
-   
+   http://bengal.missouri.edu/~kes25c/
  ***************************************************************************/
 /*
 **                TDeinterlace v1.0b4 for AviSynth 2.5.x
@@ -63,21 +63,18 @@
 #define child_GetParity(x) 0 //FIXME!!
 #define OutputDebugString printf
 
-typedef struct TDEINT_PARAM
-{
-    
-}TDEINT_PARAM;
+#include "ADM_vidTDeint_param.h"
 #define PRM(x) x
 class vidTDeint:public AVDMGenericVideoStream
 {
 
 protected:
-  virtual char          *printConf (void);
-  VideoCache            *vidCache;
-  ADMImage              *rebuild,*scratch,*scratch2;
-  TDEINT_PARAM          *_param;
-  /* Will go to param */
-    int mode, order, field, ovrDefault, type, mtnmode;
+virtual char          *printConf (void);
+VideoCache            *vidCache;
+ADMImage              *rebuild,*scratch,*scratch2;
+TDEINT_PARAM          *_param;
+/* Will go to param */
+int mode, order, field, ovrDefault, type, mtnmode;
 	int mthreshL, mthreshC, map, cthresh, MI, link;
 	int countOvr, nfrms, nfrms2, orderS, fieldS;
 	int mthreshLS, mthreshCS, typeS, cthresh6, AP;
@@ -91,20 +88,20 @@ protected:
 	bool autoFO, useClip2, tryWeave, denoise;
 	const char* ovr;
 	char buf[120];
-  /* Will go to param */
-  void  copyFrame(ADMImage *dst,ADMImage *src);
+/* Will go to param */
+void  copyFrame(ADMImage *dst,ADMImage *src);
 
-  unsigned char cubicInt(unsigned char p1, unsigned char p2, unsigned char p3,unsigned char p4);
-  void                  copyForUpsize(ADMImage *dst, ADMImage *src, int np);
-  void                  setMaskForUpsize(ADMImage *msk, int np);
-  void                  createMotionMapYV12(ADMImage *prv2, ADMImage *prv, 
-	                        ADMImage *src, ADMImage *nxt, ADMImage *nxt2, ADMImage *mask, int n);
-  void                  createMotionMap2YV12(ADMImage *prv2, ADMImage *prv, 
-	                        ADMImage *src, ADMImage *nxt, ADMImage *nxt2, ADMImage *mask, int n)	;
-  void                  linkFULL_YV12(ADMImage *mask) ;	
-  void  linkYtoUV_YV12(ADMImage *mask)  ;                                               
-  void  linkUVtoY_YV12(ADMImage *mask) ;
-  void  denoiseYV12(ADMImage *mask) ;
+unsigned char         cubicInt(unsigned char p1, unsigned char p2, unsigned char p3,unsigned char p4);
+void  copyForUpsize(ADMImage *dst, ADMImage *src, int np);
+void  setMaskForUpsize(ADMImage *msk, int np);
+void  createMotionMapYV12(ADMImage *prv2, ADMImage *prv, 
+	                       ADMImage *src, ADMImage *nxt, ADMImage *nxt2, ADMImage *mask, int n);
+void  createMotionMap2YV12(ADMImage *prv2, ADMImage *prv, 
+	                       ADMImage *src, ADMImage *nxt, ADMImage *nxt2, ADMImage *mask, int n)	;
+void  linkFULL_YV12(ADMImage *mask) ;	
+void  linkYtoUV_YV12(ADMImage *mask)  ;                                               
+void  linkUVtoY_YV12(ADMImage *mask) ;
+void  denoiseYV12(ADMImage *mask) ;
 bool  checkCombedYV12(ADMImage *src) ;
 void  subtractFieldsYV12(ADMImage *prv, ADMImage *src, ADMImage *nxt) ;
 void  mapColorsYV12(ADMImage *dst, ADMImage *mask);
@@ -120,39 +117,58 @@ void  smartELADeintYV12(ADMImage *dst, ADMImage *mask,
 		ADMImage *prv, ADMImage *src, ADMImage *nxt);
 void  createWeaveFrameYV12(ADMImage *dst, ADMImage *prv, 
 		ADMImage *src, ADMImage *nxt);
-int getHint(ADMImage *src, unsigned int &storeHint, int &hintField);
+int  getHint(ADMImage *src, unsigned int &storeHint, int &hintField);
 void putHint(ADMImage *src, unsigned int hint, int fieldt);
-  void apPostCheck(ADMImage *dst, ADMImage *mask);
-
+void apPostCheck(ADMImage *dst, ADMImage *mask);
+void reset(void);
 public:
 
                         vidTDeint (AVDMGenericVideoStream * in, CONFcouple * setup);
         virtual         ~vidTDeint ();
-  virtual uint8_t getFrameNumberNoAlloc (uint32_t frame, uint32_t * len,
-                                         ADMImage * data, uint32_t * flags);
-  uint8_t configure (AVDMGenericVideoStream * instream);
-  virtual uint8_t getCoupledConf (CONFcouple ** couples);
+virtual uint8_t getFrameNumberNoAlloc (uint32_t frame, uint32_t * len,
+                                        ADMImage * data, uint32_t * flags);
+uint8_t configure (AVDMGenericVideoStream * instream);
+virtual uint8_t getCoupledConf (CONFcouple ** couples);
 
 };
 
-static FILTER_PARAM field_unblend_template =
-  { 0,"threshold","show","noise","identical"};
+static FILTER_PARAM tdeint_template =
+  { 21,
+"mode",
+"order",
+"field",
+"mthreshL",
+"mthreshC",
+"map",
+"type",
+"debug",
+"mtnmode",
+"sharp",
+"full",
+"cthresh",
+"blockx",
+"blocky",
+"chroma",
+"MI",
+"tryWeave",
+"link",
+"denoise",
+"AP",
+"APType"
+
+  };
 
 BUILD_CREATE (tdeint_create, vidTDeint);
-SCRIPT_CREATE (tdeint_script, vidTDeint, field_unblend_template);
+SCRIPT_CREATE (tdeint_script, vidTDeint, tdeint_template);
 
 
 
 #include "ADM_vidTdeint_util.txt"
-/*
-dst->GetWritePtr(plane), dst->GetPitch(plane), src->GetReadPtr(plane), 
-					src->GetPitch(plane), src->GetRowSize(plane), src->GetHeight(plane))
-*/
 //*************************************
 uint8_t vidTDeint::configure (AVDMGenericVideoStream * in)
 {
 int v;
-        
+        // Reset
         return 0;
 }
 /*************************************/
@@ -177,8 +193,59 @@ vidTDeint::vidTDeint (AVDMGenericVideoStream * in, CONFcouple * couples)
   scratch2=new ADMImage(_info.width,_info.height);
 
   	input = cArray = NULL;
+  _param=new TDEINT_PARAM;
+  if(!couples)
+  {
+  
+                _param->mode=0;
+                _param->order=-1;
+                _param->field=-1;
+                _param->mthreshL=6;
+                _param->mthreshC=6;
+                _param->map=0;
+                _param->type=2;
+                _param->debug=0;
+                _param->mtnmode=1;
+                _param->sharp=1;
+                _param->full=1;
+                _param->cthresh=6;
+                _param->blockx=16;
+                _param->blocky=16;
+                _param->chroma=0;
+                _param->MI=64;
+                _param->tryWeave=false;
+                _param->link=2;
+                _param->denoise=true;
+                _param->AP=254;
+                _param->APType=254;
+  }
+  else
+  {
+                GET(mode);
+                GET(order);
+                GET(field);
+                GET(mthreshL);
+                GET(mthreshC);
+                GET(map);
+                GET(type);
+                GET(debug);
+                GET(mtnmode);
+                GET(sharp);
+                GET(full);
+                GET(cthresh);
+                GET(blockx);
+                GET(blocky);
+                GET(chroma);
+                GET(MI);
+                GET(tryWeave);
+                GET(link);
+                GET(denoise);
+                GET(AP);
+                GET(APType);
 
-/* Dummy setup */
+  
+  
+  }
 
     order=1;
     orderS=1;
@@ -210,84 +277,102 @@ vidTDeint::vidTDeint (AVDMGenericVideoStream * in, CONFcouple * couples)
     AP=254;
     APType=254;
     
-/* Dummy setup */
- /*
- if(couples)
- {
-#undef GET
-#define GET(x) couples->getCouple(#x,&(_param->x))
-      GET (threshold);
-      GET (show);
-      GET (noise);
-      GET (identical);
-  }
-  else
-  {
-        _param->threshold=10;
-        _param->show=0;
-        _param->noise=5;
-        _param->identical=2;
-  }*/
-  xhalf = blockx >> 1;
-	yhalf = blocky >> 1;
-	xshift = blockx == 4 ? 2 : blockx == 8 ? 3 : blockx == 16 ? 4 : blockx == 32 ? 5 :
-		blockx == 64 ? 6 : blockx == 128 ? 7 : blockx == 256 ? 8 : blockx == 512 ? 9 : 
-		blockx == 1024 ? 10 : 11;
-	yshift = blocky == 4 ? 2 : blocky == 8 ? 3 : blocky == 16 ? 4 : blocky == 32 ? 5 :
-		blocky == 64 ? 6 : blocky == 128 ? 7 : blocky == 256 ? 8 : blocky == 512 ? 9 : 
-		blocky == 1024 ? 10 : 11;
-	if (((!full && mode == 0) || tryWeave) && mode >= 0)
-	{
-    	int sz;
-    	
-    	sz=(((_info.width+xhalf)>>xshift)+1)*(((_info.height+yhalf)>>yshift)+1)*4;
-		cArray = new int[sz];;
-		
-	}
-	
-	nfrms = nfrms2 = _info.nb_frames - 1;
-	accumP = accumN = 0;
-	cthresh6 = cthresh * 6;
-	passHint = 0xFFFFFFFF;
-	autoFO = false;
-	if (order == -1) autoFO = true;
+    reset();
+
+}
+void vidTDeint::reset (void)
+{
+
+#define CLONE(x) x=_param->x
+CLONE(mode);
+CLONE(order);
+CLONE(field);
+CLONE(mthreshL);
+CLONE(mthreshC);
+CLONE(map);
+CLONE(type);
+CLONE(debug);
+CLONE(mtnmode);
+CLONE(sharp);
+CLONE(full);
+CLONE(cthresh);
+CLONE(blockx);
+CLONE(blocky);
+CLONE(chroma);
+CLONE(MI);
+CLONE(tryWeave);
+CLONE(link);
+CLONE(denoise);
+CLONE(AP);
+CLONE(APType);
+
+orderS=order;
+fieldS=field;
+mthreshLS=  mthreshL;
+mthreshCS=mthreshC;
+
+
+         xhalf = blockx >> 1;
+        yhalf = blocky >> 1;
+        xshift = blockx == 4 ? 2 : blockx == 8 ? 3 : blockx == 16 ? 4 : blockx == 32 ? 5 :
+                blockx == 64 ? 6 : blockx == 128 ? 7 : blockx == 256 ? 8 : blockx == 512 ? 9 : 
+                blockx == 1024 ? 10 : 11;
+        yshift = blocky == 4 ? 2 : blocky == 8 ? 3 : blocky == 16 ? 4 : blocky == 32 ? 5 :
+                blocky == 64 ? 6 : blocky == 128 ? 7 : blocky == 256 ? 8 : blocky == 512 ? 9 : 
+                blocky == 1024 ? 10 : 11;
+        if (((!full && mode == 0) || tryWeave) && mode >= 0)
+        {
+        int sz;
+        
+        sz=(((_info.width+xhalf)>>xshift)+1)*(((_info.height+yhalf)>>yshift)+1)*4;
+                if(cArray) delete [] cArray;
+                cArray = new int[sz];;
+                
+        }
+        
+        nfrms = nfrms2 = _info.nb_frames - 1;
+        accumP = accumN = 0;
+        cthresh6 = cthresh * 6;
+        passHint = 0xFFFFFFFF;
+        autoFO = false;
+        if (order == -1) autoFO = true;
 #if 0
-	if (mode < 0) 
-	{
-		_info.height *= 2;
-		field = 1;
-	}
-	
-	if (mode == 1)
-	{
-		vi.num_frames *= 2;
-		nfrms2 = vi.num_frames - 1;
-		vi.SetFPS(vi.fps_numerator*2, vi.fps_denominator);
-	}
-	else
-#endif	 
-	if (field == -1 && mode!=1)
-	{
-		// telecide matches off the bottom field so we want field=0 in that case.
-		// tfm can match off top or bottom, but it will indicate which in its hints
-		// and field is adjusted appropriately then... so we use field=0 by default
-		// if hints=true.  Otherwise, if hints=false, we default to field = 1.
-		if (hints) field = 0;
-		else field = 1;
-	}
-	orderS = order; 
-	fieldS = field; 
-	mthreshLS = mthreshL; 
-	mthreshCS = mthreshC;
-	typeS = type;
-	if (debug)
-	{
-		sprintf(buf,"TDeint:  %s (%s) by tritical\n", "B4", "08 2005");
-		OutputDebugString(buf);
-		sprintf(buf,"TDeint:  mode = %d (%s)\n", mode, mode == 0 ? "normal - same rate" : 
-				mode == 1 ? "bob - double rate" : mode == -2 ? "upsize - ELA" : "upsize - ELA-2");
-		OutputDebugString(buf);
-	}
+        if (mode < 0) 
+        {
+                _info.height *= 2;
+                field = 1;
+        }
+        
+        if (mode == 1)
+        {
+                vi.num_frames *= 2;
+                nfrms2 = vi.num_frames - 1;
+                vi.SetFPS(vi.fps_numerator*2, vi.fps_denominator);
+        }
+        else
+#endif   
+        if (field == -1 && mode!=1)
+        {
+                // telecide matches off the bottom field so we want field=0 in that case.
+                // tfm can match off top or bottom, but it will indicate which in its hints
+                // and field is adjusted appropriately then... so we use field=0 by default
+                // if hints=true.  Otherwise, if hints=false, we default to field = 1.
+                if (hints) field = 0;
+                else field = 1;
+        }
+        orderS = order; 
+        fieldS = field; 
+        mthreshLS = mthreshL; 
+        mthreshCS = mthreshC;
+        typeS = type;
+        if (debug)
+        {
+                sprintf(buf,"TDeint:  %s (%s) by tritical\n", "B4", "08 2005");
+                OutputDebugString(buf);
+                sprintf(buf,"TDeint:  mode = %d (%s)\n", mode, mode == 0 ? "normal - same rate" : 
+                                mode == 1 ? "bob - double rate" : mode == -2 ? "upsize - ELA" : "upsize - ELA-2");
+                OutputDebugString(buf);
+        }
 }
 //____________________________________________________________________
 vidTDeint::~vidTDeint ()
@@ -301,6 +386,8 @@ vidTDeint::~vidTDeint ()
   scratch=NULL;
   delete scratch2;
   scratch2=NULL;
+  if(cArray) delete [] cArray;
+  cArray=NULL;
 }
 
 
@@ -310,16 +397,33 @@ vidTDeint::~vidTDeint ()
 
 uint8_t vidTDeint::getCoupledConf (CONFcouple ** couples)
 {
-#if 0
+
   ADM_assert (_param);
-  *couples = new CONFcouple (4);
+  *couples = new CONFcouple (21);
 #undef CSET
 #define CSET(x)  (*couples)->setCouple(#x,(_param->x))
-  CSET (threshold);
-  CSET (show);
-  CSET (noise);
-  CSET (identical);
-#endif  
+CSET(mode);
+CSET(order);
+CSET(field);
+CSET(mthreshL);
+CSET(mthreshC);
+CSET(map);
+CSET(type);
+CSET(debug);
+CSET(mtnmode);
+CSET(sharp);
+CSET(full);
+CSET(cthresh);
+CSET(blockx);
+CSET(blocky);
+CSET(chroma);
+CSET(MI);
+CSET(tryWeave);
+CSET(link);
+CSET(denoise);
+CSET(AP);
+CSET(APType);
+
   return 1;
 }
 
@@ -335,7 +439,7 @@ uint8_t vidTDeint::getFrameNumberNoAlloc (uint32_t n,
         char txt[255];
 
         
-        if(n<1 || n>_info.nb_frames-2 )
+        if(n<1 || n>_info.nb_frames-3 )
         {
                 skip=1;
         }
