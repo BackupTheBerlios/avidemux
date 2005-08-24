@@ -250,4 +250,16 @@ uint8_t ADMImage::copyQuantInfo(ADMImage *src)
 	
 	return 1;
 }
+
+uint8_t BitBlit(uint8_t *dst, uint32_t pitchDst,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height)
+{
+    
+    for(int y=0;y<height;y++)
+    {
+        memcpy(dst,src,width);
+        src+=pitchSrc;
+        dst+=pitchDst;   
+    }
+    return 1;
+}
 //EOF
