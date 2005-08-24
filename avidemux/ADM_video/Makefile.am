@@ -33,7 +33,7 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp ADM_vidDeintASM.cpp ADM_vidVlad.cpp \
 	ADM_vidMSharpen.cpp ADM_vidAsharp.cpp \
 	ADM_vidCNR2.cpp  ADM_vidDelta.cpp ADM_vidUnblend.cpp \
 	ADM_vidHardIvtcRemoval.cpp  ADM_vidMosaic.cpp \
-	ADM_vidBlendRemoval.cpp
+	ADM_vidBlendRemoval.cpp ADM_vidTdeint.cpp
 				
 
 
