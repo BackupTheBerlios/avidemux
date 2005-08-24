@@ -69,6 +69,7 @@ printf(  "*********************\n");
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
 //	REGISTERX("mpivtc","Mplayer ivtc",VF_MPDETC,1,mpdetc_create,mpdetc_script);	
+        REGISTERX("tdeint","TDeint by Tritical",VF_TDEINT,1,tdeint_create,tdeint_script);
 	REGISTERX("telecide","Decomb telecide",VF_DECOMB,1,decomb_create,decomb_script);
 	REGISTERX("decimate","Decomb decimate",VF_DECIMATE,1,decimate_create,decimate_script);
 	

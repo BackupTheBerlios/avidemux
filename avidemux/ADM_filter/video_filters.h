@@ -89,6 +89,7 @@
                 VF_HARDIVTC,
                 VF_MOSAIC,
                 VF_BLENDREMOVAL,
+                VF_TDEINT,
 		VF_DUMMY
  	 }VF_FILTERS;
  	
