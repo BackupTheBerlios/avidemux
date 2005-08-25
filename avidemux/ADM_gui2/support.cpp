@@ -32,7 +32,7 @@
 #include "xpm/gnome-calculator.xpm"
 #include "xpm/gnome-calculator_small.xpm"
 #include "xpm/systray.xpm"
-#include "xpm/avidemux_icon.inc"
+#include "xpm/avidemux_icon_small.inc"
 #include "xpm/gnome_calc_small.inc"
 #include "xpm/gnome_calculator.inc"
 typedef enum ADM_Icon
@@ -71,7 +71,7 @@ name2xpm iconTranslation[]=
         {A_ICON_XPM,"xpm_prevblack.xpm",(void *)        xpm_prevblack},
         {A_ICON_PNG,"gnome-calculator.xpm",(void *)     gnome_calculator},
         {A_ICON_PNG,"gnome-calculator_small.xpm",(void *) gnome_calculator_small},
-        {A_ICON_PNG,"avidemux_icon_small.png",         (void *) avidemux_icon},
+        {A_ICON_PNG,"avidemux_icon_small.png",         (void *) avidemux_icon_small},
 
 
         {A_ICON_XPM,"systray.xpm",                 (void *)systray_xpm},
