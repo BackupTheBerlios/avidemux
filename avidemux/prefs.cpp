@@ -110,10 +110,11 @@ static opt_def opt_defs [] = {
 	{"feature.disable_nuv_resync",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.tryautoidx",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.use_odml",		UINT,	"0",	NULL,	"0",	"1"	},
-	{"feature.use_systray",		UINT,	"0",	NULL,	"0",	"1"	}
+	{"feature.use_systray",		UINT,	"0",	NULL,	"0",	"1"	},
+	{"feature.reuse_2pass_log",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 67;
+int num_opts = 68;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

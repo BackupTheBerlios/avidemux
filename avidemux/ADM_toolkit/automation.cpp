@@ -75,7 +75,6 @@ extern void A_Save(char *name);
 extern void videoCodecSelectByName(const char *name);
 extern int videoCodecConfigure(char *p,uint32_t i, uint8_t  *c);
 #include "oplug_mpeg/op_mpeg.h"
-extern void encoderSetLogFile(char *name)     ;
 extern void updateLoaded( void );
 extern void setPostProc(int v,int s);
 extern void HandleAction(Action action) ;
@@ -122,6 +121,7 @@ static int call_bframe(void);
 static int call_packedvop(void);
 static int call_saveDVD(char *a);
 static int set_output_format(const char *str);
+static void set_reuse_2pass_log(char *p);
 static void setVar(char *in);
 //
 uint8_t trueFalse(char *p);
@@ -199,7 +199,7 @@ AUTOMATON reaction_table[]=
 		
 		{"video-codec",		1,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD/COPY)",				call_videocodec},
 		{"video-conf",		1	,"set video codec conf (cq=q|cbr=br|2pass=size)[,mbr=br][,matrix=(0|1|2|3)]",				call_videoconf},
-//		{"2pass-log",		1	,"select the log file for 2 passes mode",				encoderSetLogFile},
+		{"reuse-2pass-log",	0	,"reuse 2pass logfile if it exists",	set_reuse_2pass_log},
 		{"set-pp",		2	,"set post processing default value, value(1=hdeblok|2=vdeblock|4=dering) and strength (0-5)",	(one_arg_type )	call_setPP},
 
 		{"autosplit",		1	,"split every N MBytes",call_autosplit},
@@ -700,4 +700,7 @@ char *script_getVar(char *in, int *r)
 
 }
 
+void set_reuse_2pass_log(char *p){
+   prefs->set(FEATURE_REUSE_2PASS_LOG,1);
+}
 //EOF

@@ -532,6 +532,7 @@ uint8_t  mpegWritter::save_dualpass(char *name,uint32_t final_size,uint32_t bitr
 {
 AVDMGenericVideoStream	 *incoming;
 char *statname;
+uint8_t reuse=0;
 
 	incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
 	_w=incoming->getInfo()->width;
@@ -555,14 +556,14 @@ char *statname;
 
 
 	// check if stat file exists ?
-	uint8_t reuse=0;
 #if 1 //ndef CYG_MANGLING	
-	FILE *fd;	
-	fd=fopen(statname,"rt");
-	if(fd)
-	{
-		fclose(fd);
-		if(GUI_Question("Reuse log file ?")) reuse=1;
+	{ FILE *fd;	
+		fd=fopen(statname,"rt");
+		if(fd){
+			fclose(fd);
+			prefs->get(FEATURE_REUSE_2PASS_LOG,(uint8_t*)&reuse);
+			if( !reuse && GUI_Question("Reuse log file ?") ) reuse=1;
+		}
 	}
 #endif	
 	//_ratecontrol=new ADM_oldXvidRc(_fps1000,statname);
