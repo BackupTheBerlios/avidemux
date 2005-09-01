@@ -34,7 +34,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#define TEST_V2V
+//#define TEST_V2V
 
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -164,7 +164,7 @@ uint8_t     OneTrack::dump(uint32_t number,FILE *fdIdx, FILE *fdSub,uint32_t *ou
             timestamp=(uint32_t)floor(lines[i].pts/90.);
             ms2time(timestamp,&hh,&mm,&ss,&ms);
             position=lines[i].start;
-            printf("Stream :%d position :%x offset:%x total:%x\n",i,position,original,original+position);
+            //printf("Stream :%d position :%x offset:%x total:%x\n",i,position,original,original+position);
             position+=original;          
             fprintf(fdIdx,"timestamp: %02d:%02d:%02d:%03d, filepos: %08x\n",hh,mm,ss,ms,position); 
         }
@@ -252,6 +252,7 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
    nameVobSub="toto.idx";
 #endif
    
+        printf("v2v: Ifo:%s Vob:%s Vsub:%s\n",nameIfo,nameVob,nameVobSub);
 
    memset(language,0,sizeof(language));
    memset(palette,0,sizeof(uint32_t)*16);
@@ -420,7 +421,7 @@ int vobsub_parse_ifo(const char *const name,
 		                 | block[0xe] << 8 | block[0xf];
 		        // 8+32*4+8*2+4+dvd_time_t+user_ops_t
 		        // 9c+dvd_time+user_ops_t=9c+4+8=0xA8  
-		        mixDump(block,0x800);      
+		        //mixDump(block,0x800);      
 		        for (idx = 0; idx < 16; ++idx) 
 		        {
   		        
