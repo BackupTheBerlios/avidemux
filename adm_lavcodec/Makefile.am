@@ -24,6 +24,7 @@ EXTEND_PPC=ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c ppc/dsputil_altivec.c \
 	ppc/gmc_altivec.c \
 	ppc/idct_altivec.c \
 	ppc/fdct_altivec.c \
+	ppc/dsputil_h264_altivec.c \
 	ppc/mpegvideo_altivec.c
 
 else
