@@ -315,9 +315,9 @@ uint8_t oggHeader::open(char *name)
                 _videostream.dwRate=25000;
 
 
-		SWAP32(header->video.width);
-		SWAP32(header->video.height);
-		SWAP64(header->time_unit);
+		SWAP32(header.video.width);
+		SWAP32(header.video.height);
+		SWAP64(header.time_unit);
 
               _mainaviheader.dwMicroSecPerFrame=header.time_unit;;     // assuming per sample=1
 
