@@ -264,6 +264,7 @@ int A_SaveUnpackedVop( char *name)
 {
   aviInfo info;
 GenericAviSave	*nw;
+int ret;
 
 	video_body->getVideoInfo(&info);
 	if( !isMpeg4Compatible(  info.fcc))
@@ -273,15 +274,9 @@ GenericAviSave	*nw;
         }
 	//
 	nw=new   GenericAviSaveCopy(1);
-	if(!nw->saveAvi(name))
-	{
-        	GUI_Error_HIG("AVI not saved", NULL);
-	}
-	else
-        	GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
-
+	ret=nw->saveAvi(name);
 	delete nw;
-	return 1;
+	return ret;
 }
 //___________________________________
 uint8_t  A_SaveAudioNVideo(char *name)
