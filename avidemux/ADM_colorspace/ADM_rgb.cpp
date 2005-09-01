@@ -49,7 +49,11 @@ extern "C" {
 		#define ADD(x,y) if( CpuCaps::has##x()) flags|=SWS_CPU_CAPS_##y;
 #define FLAGS()		ADD(MMX,MMX);				ADD(3DNOW,3DNOW);		ADD(MMXEXT,MMX2);
 #else
+#ifdef USE_ALTIVEC
+#define FLAGS() flags|=SWS_CPU_CAPS_ALTIVEC;
+#else
 #define FLAGS()
+#endif
 #endif
 
 void COL_init(void);
