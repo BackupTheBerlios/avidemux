@@ -182,6 +182,7 @@ int muxParam = 0;
 
 extern uint8_t GUI_jobs(void);
 extern bool parseECMAScript(const char *name);
+static int A_vob2vobsub(void);
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -201,6 +202,9 @@ void HandleAction (Action action)
 int nw;
   switch (action)
     {
+        case ACT_V2V:
+                                A_vob2vobsub();
+                                break;
         case ACT_HANDLE_JOB:
                                 GUI_jobs();
                                 return;
@@ -2515,5 +2519,23 @@ int A_SaveWrapper(char *name)
                 GUI_Error_HIG ("Failed", "File %s was NOT saved correctly.",GetFileName(name));
         }
         return 1;
+}
+uint8_t  DIA_v2v(char **vobname, char **ifoname,char **vobsubname);
+uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo);
+int A_vob2vobsub(void)
+{
+        char *vob=NULL;
+        char *ifo=NULL;
+        char *vsub=NULL;
+        int r=0;
+        if(DIA_v2v(&vob,&ifo,&vsub))
+        {
+                r=ADM_vob2vobsub(vob,vsub,ifo);
+                ADM_dealloc(vob);
+                ADM_dealloc(ifo);
+                ADM_dealloc(vsub);
+        }
+        return r;
+
 }
 // EOF
