@@ -121,7 +121,11 @@ int             language=0;
         while(line<nb_lines)
         {
                 fgets(str,1023,file); 
-                if(!strncmp(str,"palette:",7))                 fillPalette(str,sub);
+                if(!strncmp(str,"palette:",7))
+                {
+                                 fillPalette(str,sub);
+                                 sub->hasPalette=1;
+                }
                 else 
                 {
                         if(!strncmp(str,"timestamp: ",10) && language)        
@@ -155,6 +159,11 @@ int             language=0;
         }
 subSuccess:        
         success=1;
+        if(!sub->hasPalette)
+        {
+            for(int j=0;j<16;j++)
+                sub->Palette[j]=j;   
+        }
 subAbort:        
         if(success)
         {

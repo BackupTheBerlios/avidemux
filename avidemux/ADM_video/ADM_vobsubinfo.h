@@ -40,6 +40,7 @@ typedef struct vobSubLanguage
 
 typedef struct VobSubInfo
 {
+        uint32_t        hasPalette;
         uint32_t        Palette[16];
         uint32_t        nbLines;
         uint32_t        width;

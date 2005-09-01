@@ -12,7 +12,7 @@ typedef struct TDEINT_PARAM
           0 - same rate output
           1 - double rate output (bobbing)
 
-      default -  0  (int)
+      default -  0  (int)  >>>>>>>FOR AVIDEMUX ONLY 0 IS SUPPORTED <<<<
 */
 	int mode;
 	

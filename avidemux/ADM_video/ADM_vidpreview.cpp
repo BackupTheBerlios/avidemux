@@ -45,14 +45,14 @@
 extern void HandleAction (Action action);
 
 static GtkWidget	*create_dialog1 (void);
-
+static uint8_t      stacked=0;
 static void 			previewRender(void);
 static gboolean		preview_exit(GtkButton * button, gpointer user_data);
 static gboolean         cb_prev(GtkButton * button, gpointer user_data);
 static gboolean         cb_next(GtkButton * button, gpointer user_data);
 static gboolean 		preview_exit_short (GtkWidget * widget,GdkEvent * event, gpointer user_data);
 
-static uint8_t *rgb_render=NULL;
+static uint8_t *rgb_render=NULL,*rgb_alternate=NULL;
 static GtkWidget *dialog=NULL;
 static uint32_t 	uw, uh;
 int 			lock;
@@ -73,8 +73,13 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
 		{
 			printf("\n Warning rgb render not null...\n");
 			delete [] rgb_render;
+			delete [] rgb_alternate;
+			rgb_alternate=NULL;
+			rgb_render=NULL;
 		}
-      ADM_assert(rgb_render=new uint8_t [w*h*4]);
+	   stacked=0;
+       ADM_assert(rgb_render=new uint8_t [w*h*4]);
+       ADM_assert(rgb_alternate=new uint8_t [w*h*4]);
        uw=w;
        uh=h;
        rgbConv.reset(w,h); 
@@ -102,6 +107,24 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
        needDestroy=1;
        gtk_widget_show(  dialog);
 }
+
+static uint8_t stack(uint8_t *out, uint8_t *in, int width,int height)
+{
+ uint8_t *o1,*o2,*i;
+ int x,y;
+        o1=out;
+        o2=out+((width*height)>>1);
+        i=in;
+        for(y=0;y<height>>1;y++)
+        {
+            memcpy(o1,i,width); 
+            memcpy(o2,i+width,width);  
+            o1+=width;
+            o2+=width;
+            i+=2*width;        
+        }   
+    return 1;
+}
 // return 1 if preview is still running
 uint8_t  GUI_PreviewUpdate(uint8_t *data)
 {
@@ -110,7 +133,16 @@ uint8_t  GUI_PreviewUpdate(uint8_t *data)
 
 		// First convert YV12 to RGB
 	      // COL_yv12rgb( uw, uh,data, rgb_render);
-	      rgbConv.scale(data,rgb_render);
+	      if(!stacked)
+	      {
+	            rgbConv.scale(data,rgb_render);
+          }else
+          {
+                 stack(rgb_alternate,data, uw,uh);
+                 stack(rgb_alternate+uw*uh,data+uw*uh, uw>>1,uh>>1);
+                 stack(rgb_alternate+((5*uw*uh)>>2),data+((5*uw*uh)>>2), uw>>1,uh>>1);
+                 rgbConv.scale(rgb_alternate,rgb_render);
+          }
 	       previewRender();
 	       if(lock==1)
 	    	{
@@ -156,6 +188,8 @@ void GUI_PreviewEnd(void)
  		{
  		 	delete [] rgb_render;
  		 	rgb_render=NULL;
+ 		 	delete [] rgb_alternate;
+			rgb_alternate=NULL;
  		}
 	dialog=NULL;
   	needDestroy=0;

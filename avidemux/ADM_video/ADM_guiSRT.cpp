@@ -219,7 +219,7 @@ gint answer;
 	printf("In:Y:%d U:%d V:%d\n",*coly,*colu,*colv);
 
        	dialog = create_dialog1();
-	
+	    gtk_register_dialog(dialog);
 	
 	if(sub)    	strcpy( subString, sub);
 	if(font) 	 strcpy( fontString, font);
@@ -319,7 +319,7 @@ gint answer;
 				*delay= (int32_t)gtk_read_entry(WID(entry_delay));
 				ret=1;
 	}
-	
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	dialog=NULL;
 	return ret;

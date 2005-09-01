@@ -91,7 +91,7 @@ extern "C" {
 uint8_t ADMVideoVobSub::forward(uint32_t v)
 {
         aprintf("Current : %lu forwarding : %lu\n",_curOffset,v);
-         ADM_assert(_curOffset+v<_subSize);
+         if(_curOffset+v>=_subSize) return 0;
          _curOffset+=v;
          return 1;
 
@@ -275,7 +275,7 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
             return 0;       
         }
         
-        forward(_dataSize-4);    // go to the command block
+        if(!forward(_dataSize-4)) return 0;    // go to the command block
         
         
         while(2)
@@ -379,6 +379,11 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
                                                 _original->clear();
                                                 decodeRLE(odd,0,even);
                                                 decodeRLE(even,1,0);
+                                                if(!_vobSubInfo->hasPalette)
+                                                {
+                                                    // guess palette   
+                                                    guessPalette();
+                                                }
                                                 }
                                         }
                                         break;   
@@ -393,6 +398,82 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
   }     
   return 1;
 }
+/*
+    Try to guess the palette...
+*/
+uint8_t ADMVideoVobSub::guessPalette(void)
+{
+ int  stat[4];
+ uint32_t sum,sumalpha,y,x;
+ uint8_t *in,*inmax,*inalpha;
+ int background,foreground,candidate1,candidate2;
+ 
+    memset(stat,0,4*sizeof(int));
+   
+    in=_original->_bitmap ;
+    y=_original->_width*_original->_height;
+    inmax=in+y;
+    for(x=0;x<y;x++)
+    {
+        stat[(*in)&0x03]++;
+        in++; 
+           
+    }  
+    // normally just between 0 & 3
+    sum=stat[0]+stat[1]+stat[2]+stat[3];
+   
+    #define PERC(x) stat[x]*=10000;stat[x]/=sum;//alpha[x]*=1000;alpha[x]/=sumalpha;
+    PERC(0);
+    PERC(1);
+    PERC(2);
+    PERC(3);
+    int nbColor=0;
+    for(int i=0;i<4;i++) 
+    {
+        printf("Color : %d percent :%d \n",i,stat[i]);
+    }
+#define NB_COLOR nbColor=0;for(int i=0;i<4;i++) if(stat[i]) nbColor++;
+#define SEARCH_MAX(OUT) max=0;for(int o=0;o<4;o++) if(stat[o]>max) {max=stat[o];OUT=o;}stat[OUT]=0;
+#define SET_COLOR(x,color) for(int k=0;k<4;k++) _YUVPalette[x+4*k]=color;
+    // Search Max
+    int max=0;
+    memset(_YUVPalette,0,sizeof(_YUVPalette));
+    
+    // The most common color is background
+    SEARCH_MAX(background);
+    SET_COLOR(background,0);
+    printf("Background is %d\n",background);
+ 
+    // Search for A/B /C
+    in=_original->_bitmap ;
+    while(in<inmax)
+    {
+        if(*in!=background) break;
+        in++;   
+    };
+    candidate1=*in; 
+    while(in<inmax)
+    {
+        if(*in!=candidate1) break;
+        in++;   
+    };
+    // if we have background / candidate / candidate2
+    //  we consider candidate to be blending and candidate2 to be solid
+    candidate2=*in;
+    if(candidate2!=background)
+    {
+        SET_COLOR(candidate1,0x40);
+        SET_COLOR(candidate2,0xFF); 
+    }else 
+    // We have background / candidate / background
+    // candidate is then considered solid color
+    {
+        SET_COLOR(candidate2,0xff);
+    }
+    return 1;
+    
+}
+
 vobSubBitmap::vobSubBitmap(uint32_t w, uint32_t h)
 {
   uint32_t page;

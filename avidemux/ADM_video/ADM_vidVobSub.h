@@ -56,6 +56,7 @@ class  ADMVideoVobSub:public AVDMGenericVideoStream
 
  protected:
         virtual char                    *printConf(void);
+        uint8_t                         guessPalette(void);
         uint8_t                         readbyte(void);         /// Read a byte from buffer
         uint16_t                        readword(void);         /// Read a 16 bits word from buffer
         uint8_t                         forward(uint32_t v);    /// Read a 16 bits word from buffer
