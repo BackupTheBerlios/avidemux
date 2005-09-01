@@ -321,6 +321,14 @@ uint32_t val,hnt;
 //              Update PTS/DTS
 //              Keep track of other pes len
 //
+ uint8_t         dmx_demuxerPS::getPacketInfo(uint8_t **data, uint32_t *len, uint32_t *usableLen,uint64_t *pts)
+ {
+            *data=_pesBuffer;
+            *len=_pesBufferLen;
+            *usableLen=_pesBufferLen-_pesBufferIndex;
+            *pts=_pesPTS;
+            return 1;
+ }
 uint8_t dmx_demuxerPS::refill(void)
 {
 uint32_t globstream,len;
@@ -408,6 +416,92 @@ _again:
          parser->forward(len);
         goto _again;
         return 0;
+}
+/***************************************************
+    Alternate refill, we read the whole packet
+****************************************************/
+uint8_t dmx_demuxerPS::refillFull(uint8_t *outstream)
+{
+uint32_t globstream,len;
+uint8_t  stream,substream;
+uint64_t abs,pts,dts;
+        // Resync on our stream
+_again2:
+        *outstream=0;
+        if(!parser->sync(&stream)) 
+        {
+                uint64_t pos;
+                parser->getpos(&pos);
+                printf("DmxPS: cannot sync  at %llu/%llu\n",pos,_size);
+                _lastErr=1;
+                return 0;
+        }
+        parser->getpos(&abs);
+        if(_probeSize)
+        {
+        	uint64_t pos;
+                parser->getpos(&pos);
+                if(pos>_probeSize)
+                {
+                		printf("Probe exceeded\n");
+                		return 0;
+                }
+        }
+// Handle out of band stuff        
+        if(stream==PACK_START_CODE) 
+        {
+        		parser->forward(8);
+        		goto _again2;
+        }
+        if( stream==PADDING_CODE ||stream==SYSTEM_START_CODE) 
+        {
+                        len=parser->read16i();
+                        //printf("\tForwarding %lu bytes\n",len);
+        		parser->forward(len);
+        		goto _again2;
+        }
+        // Only keep relevant parts
+        // i.e. a/v : C0 C9 E0 E9
+        // subs 20-29
+        // private data 1/2
+#define INSIDE(min,max) (stream>=min && stream<max)
+        if(!(  INSIDE(0xC0,0xC9) || INSIDE(0xE0,0xE9) || INSIDE(0x20,0x29) || stream==PRIVATE_STREAM_1 || stream==PRIVATE_STREAM_2
+        			)) goto _again2;
+        // Ok we got a candidate
+        parser->getpos(&abs);
+        abs-=4;
+        if(!getPacketInfo(stream,&substream,&len,&pts,&dts))   
+        {
+                goto _again2;
+        }
+        if(len>MAX_PES_BUFFER) goto _again2;
+
+        if(stream==PRIVATE_STREAM_1) globstream=0xFF00+substream;
+                else                 globstream=stream;
+      //  seen[globstream & 0xFF]+=len;
+        
+            uint32_t headerLen;
+            uint64_t curPos,totalLen;
+            
+                 parser->getpos(&curPos);
+                 headerLen=curPos-abs;
+                _oldPesStart=_pesBufferStart;
+                _oldPesLen=_pesBufferLen;
+                _oldPTS=_pesPTS;
+                _oldDTS=_pesDTS;
+            
+                totalLen=headerLen+len;
+                    
+                _pesDTS=dts;
+                _pesPTS=pts;
+                _pesBufferStart=abs;
+                _pesBufferLen=totalLen;
+                _pesBufferIndex=headerLen;
+                parser->setpos(abs);
+                *outstream=globstream;
+                if(!parser->read32(totalLen,_pesBuffer)) return 0;
+                return 1;
+       
 }
 /*
         Retrieve info about the packet we just met

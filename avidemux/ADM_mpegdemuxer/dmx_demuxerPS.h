@@ -67,7 +67,8 @@ class dmx_demuxerPS: public dmx_demuxer
                   uint8_t         stamp(void); 
 
                   uint64_t        elapsed(void);
-                
+                  uint8_t         forceRefill(uint8_t *outstream) {return refillFull(outstream);}
+                  
                   uint8_t         getPos( uint64_t *abs,uint64_t *rel);
                   uint8_t         setPos( uint64_t abs,uint64_t  rel);
                 
@@ -81,6 +82,9 @@ class dmx_demuxerPS: public dmx_demuxer
                   uint8_t         getStats(uint64_t *stat);
                   uint8_t         getAllPTS(uint64_t *stat);
                   uint8_t         changePid(uint32_t newpid,uint32_t newpes);
+                  //************ Used for vobsub **************
+                  uint8_t         getPacketInfo(uint8_t **data, uint32_t *len, uint32_t *usableLen,uint64_t *pts);
+                  uint8_t         refillFull(uint8_t *outstream);
 
 // Inlined
 uint8_t         read8i(void)
