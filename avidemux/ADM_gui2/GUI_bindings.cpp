@@ -186,6 +186,7 @@ buttonCallBack_S buttonCallback[]=
 
         {"CheckButtonTimeshift"         ,"toggled"             ,ACT_TimeShift},
         {"spinbuttonTimeShift"          ,"value_changed"       ,ACT_TimeShift}
+       // {"spinbuttonTimeShift"          ,"editing_done"       ,ACT_TimeShift}
   
 };
 
