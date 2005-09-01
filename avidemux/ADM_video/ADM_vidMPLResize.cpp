@@ -193,7 +193,7 @@ uint8_t AVDMVideoStreamMPResize::reset(uint32_t nw, uint32_t old,uint32_t algo)
 		ADD(3DNOW,3DNOW);
 		ADD(MMXEXT,MMX2);
 #endif	
-#if 0 //def USE_ALTIVEC
+#ifdef USE_ALTIVEC
 		flags|=SWS_CPU_CAPS_ALTIVEC;
 #endif
 				    _context=sws_getContext(
