@@ -320,6 +320,7 @@ void gtk_write_entry_string(GtkWidget *entry, char *value)
 {
 
 gint r;
+                if(!value) return;
 		
 		gtk_editable_delete_text(GTK_EDITABLE(entry), 0,-1);
 		gtk_editable_insert_text(GTK_EDITABLE(entry), value, strlen(value), &r);
