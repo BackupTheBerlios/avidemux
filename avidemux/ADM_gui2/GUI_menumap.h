@@ -83,4 +83,5 @@ CALLBACK(dvd1                                   ,ACT_AUTO_DVD);
 
 CALLBACK(add_to_joblist1                       ,ACT_ADD_JOB);
 CALLBACK(joblist1                              ,ACT_HANDLE_JOB);
+CALLBACK(v2v                                   ,ACT_V2V);
 
