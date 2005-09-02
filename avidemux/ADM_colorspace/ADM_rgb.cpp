@@ -56,6 +56,13 @@ extern "C" {
 #endif
 #endif
 
+#ifdef ADM_BIG_ENDIAN
+              #define TARGET_COLORSPACE      IMGFMT_BGR32
+#else
+              #define TARGET_COLORSPACE      IMGFMT_RGB32
+#endif
+
+
 void COL_init(void);
 
 void COL_init(void)
@@ -99,7 +106,7 @@ void COL_init(void)
 				    		ww,hh,
 						IMGFMT_YV12 ,
 		 				ww,hh,
-	   					IMGFMT_RGB32,
+                                                TARGET_COLORSPACE,
 	    					flags, NULL, NULL,NULL);
 
     if(!_context) ADM_assert(0);
@@ -201,7 +208,7 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
     switch(_colorspace)
     {
                 case ADM_COLOR_RGB24:c=IMGFMT_RGB24;break;
-                case ADM_COLOR_RGB32A:c=IMGFMT_RGB32;break;
+                case ADM_COLOR_RGB32A:c=TARGET_COLORSPACE;break;
                 case ADM_COLOR_RGB16:c=IMGFMT_RGB16;break;
                 default: ADM_assert(0);
     }
@@ -348,7 +355,7 @@ int c=0;
                 case ADM_COLOR_BGR24:c=IMGFMT_BGR24;break;
                 case ADM_COLOR_RGB24:c=IMGFMT_RGB24;break;
                 case ADM_COLOR_BGR32A:c=IMGFMT_BGR32;break;
-                case ADM_COLOR_RGB32A:c=IMGFMT_RGB32;break;
+                case ADM_COLOR_RGB32A:c=TARGET_COLORSPACE;break;
                 case ADM_COLOR_RGB16:c=IMGFMT_RGB16;break;
                 case ADM_COLOR_YUV422:c=IMGFMT_422P;break;
                 case ADM_COLOR_YUV411:c=IMGFMT_411P;break;
