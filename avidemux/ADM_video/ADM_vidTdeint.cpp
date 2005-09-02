@@ -164,12 +164,14 @@ SCRIPT_CREATE (tdeint_script, vidTDeint, tdeint_template);
 
 
 #include "ADM_vidTdeint_util.txt"
+extern uint8_t  DIA_tdeint(TDEINT_PARAM *param);
 //*************************************
 uint8_t vidTDeint::configure (AVDMGenericVideoStream * in)
 {
-int v;
-        // Reset
-        return 0;
+uint8_t r;
+        r= DIA_tdeint(_param);
+        if(r) reset();
+        return r;
 }
 /*************************************/
 char *vidTDeint::printConf (void)
