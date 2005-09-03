@@ -62,6 +62,8 @@
   Integrated luma prescaling adjustment for saturation/contrast/brightness adjustment. 
 
 */
+#include "config.h"
+#ifdef USE_ALTIVEC
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -71,7 +73,7 @@
 #include "rgb2rgb.h"
 #include "swscale.h"
 #include "swscale_internal.h"
-#include "../mangle.h"
+//#include "../mangle.h"
 #include "img_format.h" //FIXME try to reduce dependency of such stuff
 
 #undef PROFILE_THE_BEAST
@@ -933,3 +935,5 @@ altivec_yuv2packedX (SwsContext *c,
   if (vCCoeffsBank) free (vCCoeffsBank);
 
 }
+#endif
+

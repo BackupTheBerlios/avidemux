@@ -5,7 +5,7 @@ noinst_LIBRARIES = libMPlayer_pp.a
 
 libMPlayer_pp_a_METASOURCES = AUTO
 
-libMPlayer_pp_a_SOURCES = swscale.c yuv2rgb.c rgb2rgb.c
+libMPlayer_pp_a_SOURCES = swscale.c yuv2rgb.c rgb2rgb.c yuv2rgb_altivec.c
 
 
 EXTRA_DIST = 
