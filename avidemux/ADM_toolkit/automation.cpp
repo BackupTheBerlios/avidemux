@@ -68,7 +68,7 @@ extern int A_loadMP3(char *name);
 extern int A_loadAC3(char *name);
 extern int A_loadWave(char *name);
 extern void GUI_Quiet( void);
-extern bool parseECMAScript(const char *name);
+extern bool A_parseECMAScript(const char *name);
 extern void GUI_Verbose( void);
 extern void audioFilter_SetBitrate( int i);
 extern void A_Save(char *name);
@@ -153,7 +153,7 @@ AUTOMATON reaction_table[]=
 {	
 		
 		{"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
-		{"run",			1,"load and run a script",		(one_arg_type)parseECMAScript},
+		{"run",			1,"load and run a script",		(one_arg_type)A_parseECMAScript},
 		{"audio-normalize",	1,"activate normalization",		call_normalize},
 		{"audio-downsample",	1,"activate 48->44 downsampling",	call_downsample},
 		{"audio-resample",	1,"resample to x hz",			call_resample},

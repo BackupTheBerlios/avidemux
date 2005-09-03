@@ -182,6 +182,7 @@ int muxParam = 0;
 
 extern uint8_t GUI_jobs(void);
 extern bool parseECMAScript(const char *name);
+extern void A_parseECMAScript(const char *name);
 static int A_vob2vobsub(void);
 //___________________________________________
 // serialization of user event throught gui
@@ -243,7 +244,7 @@ int nw;
 		return;
     
     case ACT_RunScript:
-    			 GUI_FileSelRead ("Select ecmascript to run ",(SELFILE_CB *) parseECMAScript);
+    			 GUI_FileSelRead ("Select ecmascript to run ",(SELFILE_CB *) A_parseECMAScript);
                         
                         //
     		return;
@@ -2013,6 +2014,14 @@ A_saveWorkbench (char *name)
   actual_workbench_file = ADM_strdup(name);
 }
 
+void A_parseECMAScript(const char *name){
+  bool ret = parseECMAScript(name);
+   if( ret == 0 ){
+      if( actual_workbench_file )
+         ADM_dealloc(actual_workbench_file);
+      actual_workbench_file = ADM_strdup(name);
+   }
+}
 //---------------------
 extern int DIA_audioEncoder(int *pmode, int *pbitrate,const char *title);
 /**---------------------------------------------------
