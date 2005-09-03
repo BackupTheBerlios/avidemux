@@ -58,7 +58,7 @@ if test -r configure.in.in; then
 fi
 
 echo "*** Creating aclocal.m4"
-$ACLOCAL > aclocal.log || exit 1
+$ACLOCAL -I m4 > aclocal.log || exit 1
 echo "*** Creating configure"
 call_and_fix_autoconf
 
@@ -104,7 +104,7 @@ if test -r configure.in.in; then
   strip_makefile
   $MAKE -f $makefile_wo top_srcdir=. ./configure.in
 fi
-$ACLOCAL
+$ACLOCAL -I m4
 $AUTOHEADER
 $AUTOMAKE --foreign --include-deps
 #perl admin/am_edit
@@ -136,7 +136,7 @@ fi
 
 subdir_dist()
 {
-$ACLOCAL
+$ACLOCAL -I m4
 $AUTOHEADER
 $AUTOMAKE --foreign --include-deps
 #perl ../admin/am_edit
