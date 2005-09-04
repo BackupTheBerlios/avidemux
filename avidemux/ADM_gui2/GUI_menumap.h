@@ -14,6 +14,7 @@ CALLBACK(avi_muxer_options1 			,ACT_SetMuxParam);
 
 //CALLBACK(load_project         			,ACT_OpenAvi); 
 CALLBACK(save_project_as1              		,ACT_SaveWork);
+CALLBACK(save_project1                          ,ACT_SaveCurrentWork);
 //CALLBACK(save_current_project                	,ACT_SaveCurrentWork);
  
  CALLBACK(video_informations1	                 ,ACT_AviInfo);
