@@ -132,8 +132,15 @@ uint32_t 	AVDMProcessAudio_SoxResample::grab(uint8_t *obuffer)
       }
       // we did not get a single byte
       if(rdall==startrd)
-      {
-      	return MINUS_ONE;
+      { // Nothing read
+        if( (_tail-_head)<256) // Why 256, why not ?
+        {       // And buffer empty
+      	 return MINUS_ONE;
+        }
+        else // Padd if needed so that we can resample
+        {
+                onechunk=_tail-_head;
+        }
       }
     
     	// input buffer is full , convert it
