@@ -63,7 +63,7 @@
 
 */
 #include "config.h"
-#ifdef USE_ALTIVEC
+#ifdef HAVE_ALTIVEC
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
