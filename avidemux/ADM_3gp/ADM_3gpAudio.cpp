@@ -39,7 +39,7 @@
 //
 //_______________________________________________________
 
-_3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *incoming,uint32_t extraLen,uint8_t *extraData)
+_3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *incoming,uint32_t extraLen,uint8_t *extraData,uint32_t duration)
 {
 	_nb_chunks=nbchunk;
 	_fd=fd;
@@ -83,6 +83,7 @@ _3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *inco
 	printf("Encoding   :%d\n",_wavheader->encoding);
 	printf("Channels   :%d\n",_wavheader->channels);
 	printf("Extra data :%lu\n",_extraLen);
+        _audioDuration=duration;
     	goToTime(0);
 }
  uint8_t	_3gpAudio::goToTime(uint32_t mstime)
@@ -123,18 +124,32 @@ uint8_t _3gpAudio::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
 
 uint32_t r=0;
+double delta;
 	if(_current_index>=_nb_chunks)  return 0;
 	
 	  fseeko(_fd,_index[_current_index].offset,SEEK_SET);
 	  r=fread(dest,1,_index[_current_index].size,_fd);
 	  if(_current_index==_nb_chunks-1)
 	  {
-	  	printf("3gp: Last sample\n");
-	  	*samples=1024;
+	  	
+                // Assume the last sample is the same size as the previous one
+	  	//*samples=1024;
+                delta=_index[_nb_chunks-1].time;
+                delta=delta/1000;
+                if(_audioDuration>delta)
+                {
+                        delta=_audioDuration-delta;
+                        // delta is the duration of the current chunk in us
+                        delta*=_wavheader->frequency;
+                        delta/=1000.; // mss -> second
+                        *samples=(uint32_t)floor(delta);
+                }else *samples=1024;
+                printf("3gp: Last sample %d\n",*samples);
+                
 	  }
 	  else
 	  {
-	  	double delta;
+	  	
 		delta=_index[_current_index+1].time-_index[_current_index].time;
 		
 		// delta is the duration of the current chunk in us

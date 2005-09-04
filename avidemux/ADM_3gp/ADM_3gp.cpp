@@ -193,6 +193,7 @@ _3GPHeader::_3GPHeader(void)
 	_otherExtraStart=0;
 	_otherExtraSize=0;
 	_audioExtraData=0;
+        _audioDuration=0;
 	
 
 }
@@ -321,7 +322,7 @@ uint8_t    _3GPHeader::open(char *name)
 	if(_nbAudioChunk)
 	{
 	      _isaudiopresent=1;
-	      _audioTrack=new _3gpAudio( _audioIdx, _nbAudioChunk,_fd,_rdWav,_audioExtraLen,_audioExtraData);
+	      _audioTrack=new _3gpAudio( _audioIdx, _nbAudioChunk,_fd,_rdWav,_audioExtraLen,_audioExtraData,_audioDuration);
 	}
 	printf("3gp/mov file successfully read..\n");
 	return 1;
@@ -330,7 +331,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 {
 	static uint32_t current=0;
 	static uint32_t nbSz,nbCo,nbSc,nbSync;
-	static uint32_t duration;
+	//static uint32_t duration;
 	static uint32_t _lastW, _lastH;
 	static uint32_t nest=0;
 	static uint32_t nbStts;
@@ -338,7 +339,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 	uint32_t type;
 	uint32_t n=0,j,wh,i,l=0;
 	uint32_t tag=0xff;
-
+        double duration=0;
 	// Skippable : Edit edts dinf
 	//		udta : user data
 	
@@ -619,7 +620,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				//
 				{
 				uint32_t tmpscale;
-				double duration;
+				
 				printf("Decoding mdhd\n");
 				tom.skipBytes(4); // flags + version
 				tom.skipBytes(4); // creation time
@@ -647,7 +648,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					break;
 				case MKFCCR('s','o','u','n'): //'soun':
 					current=2;
-					printf("hdlr audio found \n ");
+                                         _audioDuration=duration;
+					printf("hdlr audio found (duration %f ms)\n ",duration);
 					break;
 				default:
 					printf("hdlr found but ignored \n");
@@ -655,6 +657,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					printf("\n");
 				}
 				tom.skipAtom();
+                                duration=0;
 				break;
 			case MKFCCR('s','t','s','d') : //'stsd':
 				tom.read32();

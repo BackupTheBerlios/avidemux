@@ -50,13 +50,13 @@ protected:
 		FILE						*_fd;
 		uint32_t					_extraLen;
 		uint8_t						*_extraData;
-		
+		uint32_t                                         _audioDuration;
 		
 		
 public:
 					_3gpAudio(_3gpIndex *idx,
 						uint32_t nbchunk, FILE * fd,WAVHeader *incoming,
-						uint32_t extraLen,uint8_t *extraData);
+						uint32_t extraLen,uint8_t *extraData,uint32_t duration);
 	virtual				~_3gpAudio();
         virtual uint32_t 		read(uint32_t len,uint8_t *buffer);
         virtual uint8_t  		goTo(uint32_t newoffset);
@@ -82,7 +82,7 @@ protected:
 	  
 	  uint32_t			_otherExtraStart;
 	  uint32_t			_otherExtraSize;
-	  
+	  uint32_t                      _audioDuration;
 	  uint8_t			*_audioExtraData;
 	  uint32_t			_audioExtraLen;
 	uint8_t 				parseAtomTree(adm_atom *atom);
