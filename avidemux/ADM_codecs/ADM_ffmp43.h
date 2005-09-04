@@ -202,5 +202,15 @@ class decoderFFcyuv : public decoderFF
      				          	decoderFFcyuv(uint32_t w,uint32_t h,uint32_t l,uint8_t *d) ;
 	
 }   ;
+class decoderCamtasia : public decoderFF
+{
+           protected:
+                                
+                        
+     public:
+                                                decoderCamtasia(uint32_t w,uint32_t h,uint32_t bpp) ;
+        
+}   ;
+
 
 #endif

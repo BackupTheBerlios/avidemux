@@ -346,6 +346,9 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
                 case PIX_FMT_RGBA32:
                         out->_colorspace=ADM_COLOR_RGB32A;
                         break;
+                case PIX_FMT_RGB555:
+                        out->_colorspace=ADM_COLOR_BGR555;
+                        break;
                 default:
                                 printf("\n Unhandled colorspace:%d\n",_context->pix_fmt);
                                 return 0;
@@ -467,6 +470,11 @@ decoderFFMJPEG::decoderFFMJPEG(uint32_t w,uint32_t h)       :decoderFF(w,h)
 decoderSnow::decoderSnow(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
            WRAP_Open(CODEC_ID_SNOW);
+}
+decoderCamtasia::decoderCamtasia(uint32_t w,uint32_t h,uint32_t bpp)       :decoderFF(w,h)
+{
+           _context->bits_per_sample=bpp;
+           WRAP_Open(CODEC_ID_TSCC);
 }
 
 #endif

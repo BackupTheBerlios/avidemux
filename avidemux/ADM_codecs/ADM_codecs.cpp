@@ -206,6 +206,12 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 
 			  	     	return(decoders *)( new decoderFFSVQ3(w,h,extraLen,extraData));
 	   }
+ if(fourCC::check(fcc,(uint8_t *)"tscc"))
+          {
+
+                                        return(decoders *)( new decoderCamtasia(w,h,16));
+//stream->biBitCount)); // Fixme should be bit per pixel
+           }
 
     if(fourCC::check(fcc,(uint8_t *)"WMV2"))
           {

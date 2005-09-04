@@ -354,6 +354,8 @@ int c=0;
      
                 case ADM_COLOR_BGR24:c=IMGFMT_BGR24;break;
                 case ADM_COLOR_RGB24:c=IMGFMT_RGB24;break;
+                case ADM_COLOR_RGB555:c=IMGFMT_RGB15;break;
+                case ADM_COLOR_BGR555:c=IMGFMT_BGR15;break;
                 case ADM_COLOR_BGR32A:c=IMGFMT_BGR32;break;
                 case ADM_COLOR_RGB32A:c=TARGET_COLORSPACE;break;
                 case ADM_COLOR_RGB16:c=IMGFMT_RGB16;break;
@@ -416,7 +418,10 @@ uint8_t COL_Generic2YV12::transform(uint8_t **planes, uint32_t *strides,uint8_t 
         // Else RGB like colorspace
         switch(_colorspace)
         {
-                case ADM_COLOR_RGB16:  mul=2;
+                case ADM_COLOR_RGB16:  
+                case ADM_COLOR_RGB555:  
+                case ADM_COLOR_BGR555:
+                                        mul=2;
                         break;
                 case ADM_COLOR_BGR24:
                 case ADM_COLOR_RGB24:  mul=3;

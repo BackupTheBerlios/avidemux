@@ -116,7 +116,7 @@ untested special converters
 #define isBGR(x)       (((x)&IMGFMT_BGR_MASK)==IMGFMT_BGR)
 #define isSupportedIn(x)  ((x)==IMGFMT_YV12 || (x)==IMGFMT_YUY2 || (x)==IMGFMT_UYVY\
 			|| (x)==IMGFMT_BGR32|| (x)==IMGFMT_BGR24|| (x)==IMGFMT_BGR16|| (x)==IMGFMT_BGR15\
-			|| (x)==IMGFMT_RGB32|| (x)==IMGFMT_RGB24\
+			|| (x)==IMGFMT_RGB32|| (x)==IMGFMT_RGB24|| (x)==IMGFMT_RGB16|| (x)==IMGFMT_RGB15\
 			|| (x)==IMGFMT_Y800 || (x)==IMGFMT_YVU9\
 			|| (x)==IMGFMT_444P || (x)==IMGFMT_422P || (x)==IMGFMT_411P)
 #define isSupportedOut(x) ((x)==IMGFMT_YV12 || (x)==IMGFMT_YUY2 || (x)==IMGFMT_UYVY\
