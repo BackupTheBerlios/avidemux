@@ -770,16 +770,35 @@ have_sdl=no
 SDL_CFLAGS=
 SDL_LIBS=
 
+dnl if test "x$with_sdl" != "xno"; then
+dnl 	AM_PATH_SDL(, [
+dnl			have_sdl=yes
+dnl			AC_DEFINE(USE_SDL,1,[Use SDL ])
+dnl		], [
+dnl			if test "x$with_sdl" = "xyes"; then
+dnl				AC_MSG_ERROR([SDL support requested but not found.])
+dnl			fi
+dnl		])
+dnl fi
+
 if test "x$with_sdl" != "xno"; then
-	AM_PATH_SDL(, [
-			have_sdl=yes
-			AC_DEFINE(USE_SDL,1,[Use SDL ])
-		], [
-			if test "x$with_sdl" = "xyes"; then
-				AC_MSG_ERROR([SDL support requested but not found.])
-			fi
-		])
+AC_PATH_PROG(SDL_CONFIG, sdl-config, "no")
+ if test "$SDL_CONFIG" = "no" ; then
+                SDL_LIBS=""
+                SDL_CFLAGS=""
+                have_sdl=no
+        else
+
+                SDL_CFLAGS=`$SDL_CONFIG  --cflags`
+                SDL_LIBS=`$SDL_CONFIG  --libs`                  
+                CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
+                have_sdl=yes
+ fi
+if test "x$have_sdl" = "xyes" ;  then
+        AC_DEFINE(USE_SDL,1,[Use SDL ])
 fi
+fi
+
 AC_SUBST(SDL_CFLAGS)
 AC_SUBST(SDL_LIBS)
 
