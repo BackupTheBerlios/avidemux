@@ -90,9 +90,16 @@ uint8_t AVDMWavAudioStream::open(char *name)
     t32 = read32();
     if (!fourCC::check( t32, (uint8_t *) "data"))
       {
-	  printf("\n no data chunk..aborting..\n");
-	  goto drop;
-      }
+          // Maybe other chunk, skip at most one
+          t32=read32();
+          fseek(fd,t32,SEEK_CUR);
+          t32 = read32();
+          if (!fourCC::check( t32, (uint8_t *) "data"))
+          {
+	       printf("\n no data chunk..aborting..\n");
+	       goto drop;
+          }
+       }
 
     _length = read32();
     printf("\n %lu bytes data \n", _totallen);
