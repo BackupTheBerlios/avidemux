@@ -273,7 +273,9 @@ uint8_t mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
 	}
 	if (!found)
         {
-                    ret=0;
+                        // Last gop might be incomplete
+                    if( abs(i-frameEnd)<25) ret=1;
+                    else ret=0;
         	    goto _abt;
         }
 	  // Write the found frame
