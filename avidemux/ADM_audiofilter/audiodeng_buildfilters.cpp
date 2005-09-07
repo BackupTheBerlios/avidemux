@@ -529,15 +529,14 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
                 else    // We have to add a silence of -sstart seconds
                 {
                 
-                        // First the raw one 
                         firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
-                                            0, size);
+                                            sstart, size);
                         filtercount = 0;
                         lastFilter = firstFilter;
                         filters[filtercount++] = firstFilter;
                         // Then the silence
                         AVDMProcessAudio_TimeShift *ts;
-                        ts = new AVDMProcessAudio_TimeShift(lastFilter, sstart);
+                        ts = new AVDMProcessAudio_TimeShift(lastFilter, audioDelay);
                         tshift = (AVDMProcessAudioStream *) ts;
                         lastFilter = tshift;
                         
