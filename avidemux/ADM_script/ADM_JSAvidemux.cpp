@@ -36,7 +36,7 @@
 
 
 extern int A_openAvi (char *name);
-extern int A_Save (char *name);
+extern int A_Save (const char *name);
 extern int A_appendAvi (char *name);
 extern int A_saveDVDPS(char *name);
 extern uint8_t ogmSave(char *name);

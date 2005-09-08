@@ -49,13 +49,13 @@ class ADM_ogmWrite
 				
 				AVDMGenericAudioStream	*audioFilter;
 				
-			virtual uint8_t		initVideo(char *name);
+			virtual uint8_t		initVideo(const char *name);
 			virtual uint8_t		writeVideo(uint32_t frame);
 					
 	public:
 					ADM_ogmWrite(void);				
 					~ADM_ogmWrite(void);
-			uint8_t 	save(char *name);
+			uint8_t 	save(const char *name);
 };
 
 class ADM_ogmWriteCopy : public ADM_ogmWrite

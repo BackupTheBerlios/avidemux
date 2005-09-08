@@ -38,35 +38,35 @@ class	mpegWritter
 				ADM_MUXER_TYPE	        _outputAs;                                
 				ADMImage		*aImage;
 				uint8_t			*_buffer_out;
-				uint8_t			init(char *name,ADM_MPEGTYPE type,
+				uint8_t			init(const char *name,ADM_MPEGTYPE type,
 				uint8_t 		interlaced,
 				uint8_t 		bff, // WLA
 				uint8_t 		widescreen);
 				uint8_t			end( void );
-				uint8_t			save_regular(char *name, ADM_MPEGTYPE mpegtype,
+				uint8_t			save_regular(const char *name, ADM_MPEGTYPE mpegtype,
 							int qz, int bitrate,int matrix,uint8_t interlaced,
 								uint8_t bff, // WLA
 								uint8_t widescreen);
-				uint8_t  		save_dualpass(char *name,uint32_t final_size,
+				uint8_t  		save_dualpass(const char *name,uint32_t final_size,
 								uint32_t maxbitrate,
 								ADM_MPEGTYPE mpegtype,
 								int matrix,uint8_t interlaced,
 								uint8_t bff, // WLA
 								uint8_t widescreen);
 				uint8_t  		save(char *name,ADM_MPEGTYPE mode);
-				uint8_t  		dopass1(char *name,char *statname,
+				uint8_t  		dopass1(const char *name,char *statname,
 								uint32_t final_size,uint32_t maxbitrate,
 								ADM_MPEGTYPE mpegtype,
 								int matrix,uint8_t interlaced,
 								uint8_t bff, // WLA
 								uint8_t widescreen);
-				uint8_t  		dopass2(char *name,char *statname, 
+				uint8_t  		dopass2(const char *name,char *statname, 
 								uint32_t final_size,uint32_t maxbitrate,
 								ADM_MPEGTYPE mpegtype,
 								int matrix,uint8_t interlaced,
 								uint8_t bff, // WLA
 								uint8_t widescreen);
-				uint8_t 		initLveMux( char *name,ADM_MUXER_TYPE type );
+				uint8_t 		initLveMux(const char *name,ADM_MUXER_TYPE type );
 				AVDMGenericAudioStream	*_audio;
 				ADMMpegMuxer		*_muxer;
 				double			_audioOneFrame;
@@ -77,8 +77,8 @@ class	mpegWritter
 							mpegWritter( void );
 							mpegWritter( ADM_MUXER_TYPE ps  );	
 							~mpegWritter();
-			uint8_t 			save_vcd(char *name);
-			uint8_t 			save_svcd(char *name);
-			uint8_t 			save_dvd(char *name);
+			uint8_t 			save_vcd(const char *name);
+			uint8_t 			save_svcd(const char *name);
+			uint8_t 			save_dvd(const char *name);
 };
 #endif

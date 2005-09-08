@@ -49,7 +49,7 @@
 #include "oplug_ogm/op_ogsave.h"
 
 //_______________________________________________
-uint8_t ogmSave(char  *name)
+uint8_t ogmSave(const char  *name)
 {
 uint8_t ret=0;
 	ADM_ogmWrite *writter;
@@ -98,7 +98,7 @@ ADM_ogmWrite::~ADM_ogmWrite()
 
 }
 //_______________________________________________
-uint8_t ADM_ogmWrite::save(char *name)
+uint8_t ADM_ogmWrite::save(const char *name)
 {
 
 uint8_t *bufr;
@@ -166,7 +166,7 @@ uint8_t error=0;
 	return !error;
 }
 // Dummy ones
-uint8_t	ADM_ogmWrite::initVideo(char *name)
+uint8_t	ADM_ogmWrite::initVideo(const char *name)
 {
 		ADM_assert(0);
 		return 0;

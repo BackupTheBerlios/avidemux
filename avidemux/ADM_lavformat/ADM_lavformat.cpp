@@ -93,7 +93,7 @@ lavMuxer::~lavMuxer()
 	close();
 }
 //___________________________________________________________________________
-uint8_t lavMuxer::open( char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader)
+uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader)
 {
  AVCodecContext *c;
  	_type=type;

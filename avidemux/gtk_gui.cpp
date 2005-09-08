@@ -130,14 +130,14 @@ uint8_t GUI_getDoubleValue (double *valye, float min, float max,
 extern void GUI_setMarks (uint32_t a, uint32_t b);
 extern void saveMpegFile (char *name);
 //static void A_selectEncoder ( void );
-extern uint8_t A_SaveAudioDualAudio (char *a);
+extern uint8_t A_SaveAudioDualAudio (const char *a);
 
 extern uint8_t ADM_aviUISetMuxer(  void );
 void A_Resync(void);
 void A_addJob(void);
 static void updateSecondAudioTrack (void);
 void A_audioTrack(void);
-extern int A_Save( char *name);
+extern int A_Save(const char *name);
 int A_SaveWrapper( char *name);
 static uint32_t getAudioByteCount( uint32_t start, uint32_t end);
 extern void mpegToIndex (char *name);
@@ -146,7 +146,7 @@ extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
 void ADM_cutWizard (void);
 void computeIT (int size, int nb, int brate, uint32_t * frame,
 		uint32_t * rsize);
-uint8_t  ADM_saveRaw (char *name);
+uint8_t  ADM_saveRaw (const char *name);
 static char * actual_workbench_file;
 void A_saveWorkbench (char *name);
 void updateLoaded (void);
@@ -154,20 +154,19 @@ extern void encoderSetLogFile (char *name);
 extern void videoCodecSelect (void);
 extern uint8_t DIA_about( void );
 extern uint8_t DIA_RecentFiles( char **name );
-extern uint8_t mpeg_passthrough(  char *name,ADM_OUT_FORMAT format );
+extern uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format );
 static void A_videoCheck( void);
 extern uint8_t parseScript(char *scriptname);
 int A_saveDVDPS(char *name);
 static void	A_setPostproc( void );
-extern uint8_t ogmSave(char  *name);
+extern uint8_t ogmSave(const char  *name);
 //
 static uint8_t A_pass(char *name);
 uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss);
 //__________
 extern uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss);
-extern uint8_t ogmSave(char *fd);
 extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
-extern int A_SaveUnpackedVop( char *name);
+extern int A_SaveUnpackedVop(const char *name);
 extern void      videoCodecConfigureUI(void);
 extern void audioCodecChanged(int newcodec);
 extern void videoCodecChanged(int newcodec);
@@ -182,7 +181,7 @@ int muxParam = 0;
 
 extern uint8_t GUI_jobs(void);
 extern bool parseECMAScript(const char *name);
-extern void A_parseECMAScript(const char *name);
+void A_parseECMAScript(const char *name);
 static int A_vob2vobsub(void);
 //___________________________________________
 // serialization of user event throught gui
@@ -1913,7 +1912,7 @@ computeIT (int size, int nb, int brate, uint32_t * frame, uint32_t * rsize)
 	Usefull to cut mpeg stream or extract raw h263/mpeg4 stream
 
 */
-uint8_t ADM_saveRaw (char *name)
+uint8_t ADM_saveRaw (const char *name)
 {
   uint32_t len, flags;
   FILE *fd, *fi;

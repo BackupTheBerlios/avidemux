@@ -16,12 +16,12 @@
  ***************************************************************************/
 
 
-uint8_t oplug_mpeg_vcd(char *name);
-uint8_t oplug_mpeg_vcd_ps(char *name);
-uint8_t oplug_mpeg_svcd(char *name=NULL);
-uint8_t oplug_mpeg_dvd(char *name=NULL);
-uint8_t oplug_mpeg_dvd_ps(char *name=NULL);
-uint8_t oplug_mpeg_svcd_ps(char *inname=NULL);
-uint8_t oplug_mpeg_ts(char *inname=NULL);
+uint8_t oplug_mpeg_vcd(const char *name);
+uint8_t oplug_mpeg_vcd_ps(const char *name);
+uint8_t oplug_mpeg_svcd(const char *name=NULL);
+uint8_t oplug_mpeg_dvd(const char *name=NULL);
+uint8_t oplug_mpeg_dvd_ps(const char *name=NULL);
+uint8_t oplug_mpeg_svcd_ps(const char *inname=NULL);
+uint8_t oplug_mpeg_ts(const char *inname=NULL);
 
 

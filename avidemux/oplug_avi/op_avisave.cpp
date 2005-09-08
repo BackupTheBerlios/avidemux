@@ -113,7 +113,7 @@ GenericAviSave::~GenericAviSave ()
 //
 //___________________________________________________________
 //
-uint8_t  GenericAviSave::saveAvi (char *name)
+uint8_t  GenericAviSave::saveAvi (const char *name)
 {
 uint32_t size;
 uint8_t ret=0;
@@ -135,7 +135,7 @@ uint8_t ret=0;
       return 0;
     }
    
-   if (!setupVideo (name))
+   if (!setupVideo (_name))
     {
       guiStop();
       GUI_Error_HIG ("Error initalizing video filters", NULL);

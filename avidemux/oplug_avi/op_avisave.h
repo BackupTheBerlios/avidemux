@@ -73,7 +73,7 @@
      public:
      						GenericAviSave( void );
 			           	virtual ~GenericAviSave( void );
-           				virtual uint8_t saveAvi( char *name );
+           				virtual uint8_t saveAvi(const char *name );
    };
 extern uint32_t muxSize;
 uint8_t ADM_aviSetSplitSize(uint32_t size);

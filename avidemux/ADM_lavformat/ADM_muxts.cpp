@@ -303,7 +303,7 @@ entryPacket *tsMuxer::getPacket( void)
  return r;   
 }
 
-uint8_t tsMuxer::open( char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader)
+uint8_t tsMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader)
 {
     ADM_assert(type==MUXER_TS);
     outFile=fopen(filename,"wb");

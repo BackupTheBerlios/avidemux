@@ -47,11 +47,6 @@ static void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param,
 								uint32_t extraConf, uint8_t *extraData);
 static void encoderPrint(void);
 static const char *encoderGetName(void);
-// Put that in a proper include...
-/*extern void oplug_mpeg_vcd(char *name);
-extern void oplug_mpeg_svcd(char *name);
-extern void oplug_mpeg_dvd(char *name);*/
-
 
 
 uint32_t encoderGetNbEncoder(void);
@@ -170,7 +165,7 @@ uint32_t videoProcessMode(void)
         if(current_codec==CodecCopy) return 0;
         return 1;
 }
-uint8_t EncoderSaveMpeg(char *name)
+uint8_t EncoderSaveMpeg(const char *name)
 {
 uint8_t raw;
 uint8_t ret=0;

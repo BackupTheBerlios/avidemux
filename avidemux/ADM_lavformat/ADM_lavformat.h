@@ -35,7 +35,7 @@ protected:
                 ADM_MUXER_TYPE _muxerType;
 
 public:
-        virtual uint8_t open( char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, 
+        virtual uint8_t open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, 
                                 aviInfo *info, WAVHeader *audioheader)=0;
         virtual uint8_t writeAudioPacket(uint32_t len, uint8_t *buf)=0;
         virtual uint8_t writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe )=0;
@@ -56,7 +56,7 @@ class lavMuxer : public ADMMpegMuxer
 public:
 		lavMuxer(void );
 		~lavMuxer(  );
-	virtual uint8_t open( char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
+	virtual uint8_t open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
         virtual uint8_t writeAudioPacket(uint32_t len, uint8_t *buf);
         virtual uint8_t writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe );
         virtual uint8_t forceRestamp(void);
@@ -75,7 +75,7 @@ protected:
 public:
                 mplexMuxer(void );
                 ~mplexMuxer(  );
-        virtual uint8_t open( char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
+        virtual uint8_t open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
         virtual uint8_t writeAudioPacket(uint32_t len, uint8_t *buf);
         virtual uint8_t writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe );
         virtual uint8_t forceRestamp(void);
@@ -136,7 +136,7 @@ protected:
 public:
                 tsMuxer(void );
                 ~tsMuxer(  );
-        virtual uint8_t open( char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
+        virtual uint8_t open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
         virtual uint8_t writeAudioPacket(uint32_t len, uint8_t *buf);
         virtual uint8_t writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe );
         virtual uint8_t forceRestamp(void);

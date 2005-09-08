@@ -80,13 +80,13 @@ extern uint8_t  DIA_mpeg2opt(uint32_t *maxbitrate, uint32_t *qz, char *opt1,char
 
 uint8_t oplug_mpegInit(void);
 static uint8_t oplug_mpegStore(void);
-static uint8_t oplug_mpeg_dvd_run(char *name);
-static uint8_t oplug_mpeg_vcd_run(char *name);
-static uint8_t oplug_mpeg_ts_run(char *name);
+static uint8_t oplug_mpeg_dvd_run(const char *name);
+static uint8_t oplug_mpeg_vcd_run(const char *name);
+static uint8_t oplug_mpeg_ts_run(const char *name);
 //************************************************
-uint8_t  oplug_mpeg_vcd(char *inname)
+uint8_t  oplug_mpeg_vcd(const char *inname)
 {
-	char *name;
+	const char *name;
         uint8_t ret;
 
 	mpegWritter *mpg = new mpegWritter();
@@ -94,7 +94,7 @@ uint8_t  oplug_mpeg_vcd(char *inname)
 
 	if(!inname)
 	{
-	 	GUI_FileSelWrite("VCD file to save", &name);
+	 	GUI_FileSelWrite("VCD file to save", (char**)&name);
 		if(!name) return 0;
 	}	
 	else
@@ -108,10 +108,10 @@ uint8_t  oplug_mpeg_vcd(char *inname)
         return ret;
 }
 //_______________________________________
-uint8_t oplug_mpeg_vcd_ps(char *inname)
+uint8_t oplug_mpeg_vcd_ps(const char *inname)
 {
 	
-	char *name=NULL;
+	const char *name=NULL;
 	WAVHeader *info=NULL,tmpinfo;
 
 	// do some check on audio & video
@@ -164,7 +164,7 @@ uint8_t oplug_mpeg_vcd_ps(char *inname)
 	
  	if(!inname)
 	{
-	 	GUI_FileSelWrite("VCD file to save", &name);
+	 	GUI_FileSelWrite("VCD file to save", (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -177,14 +177,14 @@ uint8_t oplug_mpeg_vcd_ps(char *inname)
 	
 }
 //_______________________________________
-uint8_t oplug_mpeg_svcd(char *inname)
+uint8_t oplug_mpeg_svcd(const char *inname)
 {
-	char *name;
+	const char *name;
         uint8_t ret;
 
 	if(!inname)
 	{
-	 	GUI_FileSelWrite("SVCD file to save", &name);
+	 	GUI_FileSelWrite("SVCD file to save", (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -201,9 +201,9 @@ uint8_t oplug_mpeg_svcd(char *inname)
         return ret;
 }
 //_______________________________________
-uint8_t oplug_mpeg_svcd_ps(char *inname)
+uint8_t oplug_mpeg_svcd_ps(const char *inname)
 {
-char *name=NULL;
+const char *name=NULL;
 uint8_t ret;
 WAVHeader info;
 AVDMGenericAudioStream *stream;	
@@ -244,7 +244,7 @@ AVDMGenericAudioStream *stream;
 	
  	if(!inname)
 	{
-	 	GUI_FileSelWrite("SVCD file to save", &name);
+	 	GUI_FileSelWrite("SVCD file to save", (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -262,14 +262,14 @@ AVDMGenericAudioStream *stream;
 }
 
 //_______________________________________
-uint8_t oplug_mpeg_dvd(char *inname)
+uint8_t oplug_mpeg_dvd(const char *inname)
 {
-char *name=NULL;
+const char *name=NULL;
 uint8_t ret=0;
 
  	if(!inname)
 	{
-	 	GUI_FileSelWrite("DVD file to save", &name);
+	 	GUI_FileSelWrite("DVD file to save", (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -287,9 +287,9 @@ uint8_t ret=0;
 }
 // Save a PS stream : Mpeg2 video + MP2 or AC3 audio
 //_______________________________________
-uint8_t oplug_mpeg_dvd_ps(char *inname)
+uint8_t oplug_mpeg_dvd_ps(const char *inname)
 {
-char *name=NULL;
+const char *name=NULL;
 WAVHeader *info=NULL,tmpinfo;
 uint8_t ret=0;
 
@@ -337,7 +337,7 @@ uint8_t ret=0;
 	
  	if(!inname)
 	{
-	 	GUI_FileSelWrite("DVD file to save", &name);
+	 	GUI_FileSelWrite("DVD file to save", (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -349,7 +349,7 @@ uint8_t ret=0;
 
 }
 //_______________________________________
-uint8_t oplug_mpeg_dvd_run(char *name)
+uint8_t oplug_mpeg_dvd_run(const char *name)
 {
         uint8_t ret=0;
    	mpegWritter *mpg = new mpegWritter(MUXER_DVD);
@@ -363,9 +363,9 @@ uint8_t oplug_mpeg_dvd_run(char *name)
 //
 // Save a TS stream : DVD into Ts wrapper
 //_______________________________________
-uint8_t oplug_mpeg_ts(char *inname)
+uint8_t oplug_mpeg_ts(const char *inname)
 {
-char *name=NULL;
+const char *name=NULL;
 WAVHeader *info=NULL,tmpinfo;
 uint8_t ret=0;
 
@@ -413,7 +413,7 @@ uint8_t ret=0;
         
         if(!inname)
         {
-                GUI_FileSelWrite("DVD file to save", &name);
+                GUI_FileSelWrite("DVD file to save", (char**)&name);
                 if(!name) return 0;
         }
         else
@@ -425,7 +425,7 @@ uint8_t ret=0;
 
 }
 //_______________________________________
-uint8_t  oplug_mpeg_ts_run(char *name)
+uint8_t  oplug_mpeg_ts_run(const char *name)
 {
         mpegWritter *mpg = new mpegWritter(MUXER_TS);
         ADM_assert(mpg);
@@ -436,7 +436,7 @@ uint8_t  oplug_mpeg_ts_run(char *name)
 
 }
 //_______________________________________
-uint8_t oplug_mpeg_vcd_run(char *name)
+uint8_t oplug_mpeg_vcd_run(const char *name)
 {
    	mpegWritter *mpg = new mpegWritter(MUXER_VCD);
 	ADM_assert(mpg);

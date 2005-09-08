@@ -89,7 +89,7 @@ void oplug_mpegff_conf( void )
 			);
 }
 
-uint8_t oplug_mpegff(char *name, ADM_OUT_FORMAT type)
+uint8_t oplug_mpegff(const char *name, ADM_OUT_FORMAT type)
 {
 AVDMGenericVideoStream *_incoming;
 EncoderFFMPEGMpeg1  *encoder;

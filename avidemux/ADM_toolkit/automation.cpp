@@ -71,7 +71,7 @@ extern void GUI_Quiet( void);
 extern bool A_parseECMAScript(const char *name);
 extern void GUI_Verbose( void);
 extern void audioFilter_SetBitrate( int i);
-extern void A_Save(char *name);
+extern void A_Save(const char *name);
 extern void videoCodecSelectByName(const char *name);
 extern int videoCodecConfigure(char *p,uint32_t i, uint8_t  *c);
 #include "oplug_mpeg/op_mpeg.h"
@@ -108,9 +108,9 @@ extern void show_info(char *p);
 extern const char *getStrFromAudioCodec( uint32_t codec);
 extern void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm, uint16_t * ss, uint16_t * ms);
 extern uint8_t ADM_aviSetSplitSize(uint32_t size);
-extern uint8_t ogmSave(char *fd);
+extern uint8_t ogmSave(const char *fd);
 static void set_autoindex(char *p);
-extern int A_SaveUnpackedVop( char *name);
+extern int A_SaveUnpackedVop(const char *name);
 extern int A_saveDVDPS(char *name);
 extern void A_saveWorkbench (char *name);
 extern uint8_t A_rebuildKeyFrame (void);
@@ -132,7 +132,7 @@ extern int32_t audioDelay;
 
 extern int global_argc;
 extern char **global_argv;
-extern uint8_t	ADM_saveRaw(char *name );
+extern uint8_t	ADM_saveRaw(const char *name );
 //_________________________________________________________________________
 
 typedef 	void 			(*one_arg_type)(char *arg);

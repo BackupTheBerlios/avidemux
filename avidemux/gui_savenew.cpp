@@ -53,14 +53,14 @@
 #include "ADM_gui2/GUI_ui.h"
 #include "oplug_mpegFF/oplug_vcdff.h"
 
-static uint8_t  A_SaveAudioNVideo(char *name);
- extern int A_SaveUnpackedVop( char *name);
- extern uint8_t ogmSave(char *name);
- extern uint8_t ADM_saveRaw(char *name);
- uint8_t A_SaveAudioDualAudio(char *name);
- extern uint8_t mpeg_passthrough(char *name,ADM_OUT_FORMAT format);
+static uint8_t  A_SaveAudioNVideo(const char *name);
+ extern int A_SaveUnpackedVop(const char *name);
+ extern uint8_t ogmSave(const char *name);
+ extern uint8_t ADM_saveRaw(const char *name);
+ uint8_t A_SaveAudioDualAudio(const char *name);
+ extern uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format);
 
-int A_Save( char *name)
+int A_Save(const char *name)
 {
 uint32_t end;
 int ret=0;
@@ -235,10 +235,10 @@ int ret=0;
         getFirstVideoFilter(0,avifileinfo->nb_frames);
         return ret;
 }
-uint8_t  A_SaveAudioDualAudio(char *inname)
+uint8_t  A_SaveAudioDualAudio(const char *inname)
 {
 GenericAviSaveCopyDualAudio *nw;
-char *name;
+const char *name;
 uint8_t ret=0;
 
 		if(! secondaudiostream)
@@ -247,7 +247,7 @@ uint8_t ret=0;
 				  	return 0;
 		}
 		if(!inname)
-			GUI_FileSelWrite("Select dual audio AVI to write", & name);
+			GUI_FileSelWrite("Select dual audio AVI to write", (char**)& name);
 		else
 			name=inname;
 			
@@ -260,7 +260,7 @@ uint8_t ret=0;
 
 }
 //___________________________________
-int A_SaveUnpackedVop( char *name)
+int A_SaveUnpackedVop(const char *name)
 {
   aviInfo info;
 GenericAviSave	*nw;
@@ -279,7 +279,7 @@ int ret;
 	return ret;
 }
 //___________________________________
-uint8_t  A_SaveAudioNVideo(char *name)
+uint8_t  A_SaveAudioNVideo(const char *name)
 {
 	 uint32_t needSmart=0,fl;
      GenericAviSave	*nw;

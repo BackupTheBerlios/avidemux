@@ -69,7 +69,7 @@
 
 uint8_t isMpeg12Compatible(uint32_t fourcc);
 extern const char *getStrFromAudioCodec( uint32_t codec); 
-uint8_t mpeg_passthrough(  char *name,ADM_OUT_FORMAT format )
+uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 {
   uint32_t len, flags;
   AVDMGenericAudioStream *audio=NULL;

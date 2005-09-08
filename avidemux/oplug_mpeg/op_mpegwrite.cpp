@@ -152,7 +152,7 @@ mpegWritter::~mpegWritter(  )
 
 }
 /*---------------------------------------------------------------------------------------*/
-uint8_t  mpegWritter::save_svcd(char *name)
+uint8_t  mpegWritter::save_svcd(const char *name)
 {
 	if(_outputAs)
 	{
@@ -227,7 +227,7 @@ uint8_t  mpegWritter::save_svcd(char *name)
 	} \
 }
 /*---------------------------------------------------------------------------------------*/
-uint8_t  mpegWritter::save_dvd(char *name)
+uint8_t  mpegWritter::save_dvd(const char *name)
 {
 AVDMGenericAudioStream 	*tmp=NULL;
 WAVHeader		*info=NULL,tmpinfo;	
@@ -295,7 +295,7 @@ WAVHeader		*info=NULL,tmpinfo;
 // 										Do the actual save
 // ______________________________________________
 
-uint8_t  mpegWritter::save_vcd(char *name)
+uint8_t  mpegWritter::save_vcd(const char *name)
 {
 
 // look if we have a suitable audio
@@ -322,7 +322,7 @@ uint8_t  mpegWritter::save_vcd(char *name)
 	Save as with the external mpeg2enc
 
 */
-uint8_t mpegWritter::save_regular(char *name, ADM_MPEGTYPE mpegtype, int qz, int bitrate,int matrix,
+uint8_t mpegWritter::save_regular(const char *name, ADM_MPEGTYPE mpegtype, int qz, int bitrate,int matrix,
 					uint8_t interlaced,
 					uint8_t bff,        // WLA
 					uint8_t widescreen)
@@ -525,7 +525,7 @@ DIA_encoding		*encoding;
 
 DIA_encoding *encoding;
 /*-------------------------------------------------------------------------------------------------------------------*/
-uint8_t  mpegWritter::save_dualpass(char *name,uint32_t final_size,uint32_t bitrate,ADM_MPEGTYPE mpegtype,
+uint8_t  mpegWritter::save_dualpass(const char *name,uint32_t final_size,uint32_t bitrate,ADM_MPEGTYPE mpegtype,
 					int matrix,uint8_t interlaced,
 					uint8_t bff,        // WLA
 					uint8_t widescreen)
@@ -595,7 +595,7 @@ if(!reuse)
 	return 1;
 }
 /*-------------------------------------------------------------------------------------------------------*/
-uint8_t  mpegWritter::dopass1(char *name,char *statname,uint32_t final_size,uint32_t bitrate,
+uint8_t  mpegWritter::dopass1(const char *name,char *statname,uint32_t final_size,uint32_t bitrate,
 				ADM_MPEGTYPE mpegtype,int matrix,uint8_t interlaced,
 					uint8_t bff,        // WLA
 					uint8_t widescreen)
@@ -766,7 +766,7 @@ void print_quant_stat(const char *n){
    }
    ADM_dealloc( str );
 }
-uint8_t  mpegWritter::dopass2(char *name,char *statname,uint32_t final_size,uint32_t bitrate,
+uint8_t  mpegWritter::dopass2(const char *name,char *statname,uint32_t final_size,uint32_t bitrate,
 				ADM_MPEGTYPE mpegtype,int matrix,uint8_t interlaced,
 					uint8_t bff,        // WLA
 					uint8_t widescreen)
@@ -982,7 +982,7 @@ uint32_t		len,flags,type,outquant,audiolen;
 //	Construct mpeg2enc string parameter
 // ______________________________________________
 
-uint8_t mpegWritter::init(char *name,ADM_MPEGTYPE type,uint8_t interlaced,uint8_t bff,uint8_t widescreen) // WLA
+uint8_t mpegWritter::init(const char *name,ADM_MPEGTYPE type,uint8_t interlaced,uint8_t bff,uint8_t widescreen) // WLA
 {
 	UNUSED_ARG(name);
 	UNUSED_ARG(type);
@@ -1038,7 +1038,7 @@ int dummy_func_mpeg( int i )
 //
 //	Set up the audio chain for audio+video writting
 //
-uint8_t mpegWritter::initLveMux( char *name,ADM_MUXER_TYPE type )
+uint8_t mpegWritter::initLveMux(const char *name,ADM_MUXER_TYPE type )
 {
 double one_pcm_audio_frame;
 uint32_t fps1000;

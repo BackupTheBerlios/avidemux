@@ -20,7 +20,7 @@
 #include "time.h"
 void 		PathSplit(char *str, char **root, char **ext);
 void			PathStripName(char *str);
-char		*GetFileName(char *str);
+const char		*GetFileName(const char *str);
 char 		*PathCanonize(const char *tmpname);
 void		LowerCase(char *string);
 void 		GUI_Alert(const char *alertstring);

@@ -394,7 +394,7 @@ void		PathStripName(char *str)
 	Get the filename without path
 
 */
-char *GetFileName(char *str)
+const char *GetFileName(const char *str)
 {
 	char *filename;
 #ifndef CYG_MANGLING		
