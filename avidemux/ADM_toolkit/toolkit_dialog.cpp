@@ -53,7 +53,14 @@ static int beQuiet=0;
 
 static GtkWidget *widgetStack[10];
 static int	  widgetCount=0;
-
+void GUI_detransient(void )
+{
+        gtk_window_set_modal(GTK_WINDOW(widgetStack[0]), 0);
+}
+void GUI_retransient(void )
+{
+        gtk_window_set_modal(GTK_WINDOW(widgetStack[0]), 1);
+}
 void gtk_register_dialog(GtkWidget *newdialog)
 {
 

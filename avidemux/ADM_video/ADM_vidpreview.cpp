@@ -43,12 +43,15 @@
 #include "gui_action.hxx"
 
 extern void HandleAction (Action action);
+void GUI_detransient(void );
+void GUI_retransient(void );
 
 static GtkWidget	*create_dialog1 (void);
 static uint8_t      stacked=0;
 static void 			previewRender(void);
 static gboolean		preview_exit(GtkButton * button, gpointer user_data);
 static gboolean         cb_prev(GtkButton * button, gpointer user_data);
+static gboolean         cb_stack(GtkButton * button, gpointer user_data);
 static gboolean         cb_next(GtkButton * button, gpointer user_data);
 static gboolean 		preview_exit_short (GtkWidget * widget,GdkEvent * event, gpointer user_data);
 
@@ -99,13 +102,15 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
                        GTK_SIGNAL_FUNC(cb_next),                   (void *) NULL);
         gtk_signal_connect(GTK_OBJECT(WID(buttonPrev)), "clicked",
                        GTK_SIGNAL_FUNC(cb_prev),                   (void *) NULL);
-
+        gtk_signal_connect(GTK_OBJECT(WID(buttonStack)), "clicked",
+                       GTK_SIGNAL_FUNC(cb_stack),                   (void *) NULL);
 	// add callback for redraw
 	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
 		       GTK_SIGNAL_FUNC(previewRender),    NULL);
        lock=0;
        needDestroy=1;
        gtk_widget_show(  dialog);
+       GUI_detransient();
 }
 
 static uint8_t stack(uint8_t *out, uint8_t *in, int width,int height)
@@ -180,7 +185,9 @@ void GUI_PreviewEnd(void)
  	if(dialog && needDestroy)
  		{
 			//printf("+X\n");
+                        
  		 	gtk_widget_destroy(dialog);
+                        GUI_retransient();
 			//printf("-X\n");
 
  		}
@@ -215,8 +222,16 @@ gboolean preview_exit(GtkButton * button, gpointer user_data)
 	   		lock=-1;
 			GUI_PreviewEnd();
             		UI_setPreviewToggleStatus( 0);
+                        
        	}
 	return FALSE;
+}
+gboolean         cb_stack(GtkButton * button, gpointer user_data)
+{
+
+        stacked^=1;
+        return FALSE;
+
 }
 // Called when window is destroyed
 gboolean preview_exit_short (GtkWidget * widget, GdkEvent * event, gpointer user_data)
@@ -247,7 +262,6 @@ static gboolean         cb_next(GtkButton * button, gpointer user_data)
         HandleAction(ACT_NextFrame);
         return FALSE;
 }
-
 GtkWidget*
 create_dialog1 (void)
 {
@@ -260,6 +274,8 @@ create_dialog1 (void)
   GtkWidget *buttonPrev;
   GtkWidget *toolitem2;
   GtkWidget *buttonNext;
+  GtkWidget *toolitem3;
+  GtkWidget *buttonStack;
   GtkWidget *drawingarea1;
   GtkWidget *dialog_action_area1;
 
@@ -296,6 +312,14 @@ create_dialog1 (void)
   gtk_widget_show (buttonNext);
   gtk_container_add (GTK_CONTAINER (toolitem2), buttonNext);
 
+  toolitem3 = (GtkWidget*) gtk_tool_item_new ();
+  gtk_widget_show (toolitem3);
+  gtk_container_add (GTK_CONTAINER (toolbar1), toolitem3);
+
+  buttonStack = gtk_button_new_with_mnemonic (_("Stack Field"));
+  gtk_widget_show (buttonStack);
+  gtk_container_add (GTK_CONTAINER (toolitem3), buttonStack);
+
   drawingarea1 = gtk_drawing_area_new ();
   gtk_widget_show (drawingarea1);
   gtk_box_pack_start (GTK_BOX (vbox1), drawingarea1, TRUE, TRUE, 0);
@@ -313,9 +337,13 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, buttonPrev, "buttonPrev");
   GLADE_HOOKUP_OBJECT (dialog1, toolitem2, "toolitem2");
   GLADE_HOOKUP_OBJECT (dialog1, buttonNext, "buttonNext");
+  GLADE_HOOKUP_OBJECT (dialog1, toolitem3, "toolitem3");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonStack, "buttonStack");
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
 
   return dialog1;
 }
+
+
 
