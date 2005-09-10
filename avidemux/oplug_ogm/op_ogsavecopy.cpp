@@ -47,7 +47,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 
-uint8_t	ADM_ogmWriteCopy::initVideo(char *name)
+uint8_t	ADM_ogmWriteCopy::initVideo(const char *name)
 {
 uint32_t w,h;	
 int64_t dur64;

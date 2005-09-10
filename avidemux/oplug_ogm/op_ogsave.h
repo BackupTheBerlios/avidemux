@@ -62,7 +62,7 @@ class ADM_ogmWriteCopy : public ADM_ogmWrite
 {
 protected:
 			
-			virtual uint8_t		initVideo(char *name);			
+			virtual uint8_t		initVideo(const char *name);			
 			virtual uint8_t		writeVideo(uint32_t frame);
 			uint32_t 		searchForward(uint32_t startframe);
 			uint32_t		_lastIPFrameSent;	
@@ -76,7 +76,7 @@ class ADM_ogmWriteProcess : public ADM_ogmWrite
 protected:
 			AVDMGenericVideoStream  *_incoming;
 			Encoder 		*_encode;
-			virtual uint8_t	initVideo(char *name);			
+			virtual uint8_t	initVideo(const char *name);			
 			virtual uint8_t	writeVideo(uint32_t frame);	
 public:
 			ADM_ogmWriteProcess(void);

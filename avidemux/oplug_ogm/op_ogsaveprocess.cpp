@@ -52,7 +52,7 @@
 #define aprintf printf
 
 //________________________________________________
-uint8_t	ADM_ogmWriteProcess::initVideo(char *name)
+uint8_t	ADM_ogmWriteProcess::initVideo(const char *name)
 {		
 uint32_t w,h,fps1000,fcc;
 		
