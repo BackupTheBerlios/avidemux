@@ -71,7 +71,7 @@ static GtkWidget *guiVideoToggle=NULL;
 static GdkCursor *guiCursorBusy=NULL;
 static GdkCursor *guiCursorNormal=NULL;
 static gint	  guiCursorEvtMask=0;
-
+static void navKeyChange( void );
 // heek !
 static  GtkAdjustment *sliderAdjustment;
 // Needed for DND
@@ -276,7 +276,10 @@ uint8_t  bindGUI( void )
 	gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"boxCurFrame")), "focus_out_event", 	
                       GTK_SIGNAL_FUNC(UI_looseFocus),                   (void *) NULL);	 
 
-
+        
+        // navKey
+        gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"hscaleSensitive")), "value_changed",   
+                      GTK_SIGNAL_FUNC(navKeyChange),                   (void *) NULL);  
 
 
 		       
@@ -416,6 +419,40 @@ if(_upd_in_progres) return;
  _upd_in_progres--;
    
 }
+
+void navKeyChange( void )
+{
+GtkWidget *wid;
+GtkAdjustment *adj;
+double dir;
+Action action=ACT_DUMMY;
+
+if(_upd_in_progres) return;
+ _upd_in_progres++;
+
+        wid=lookup_widget(guiRootWindow,"hscaleSensitive");
+        adj=gtk_range_get_adjustment (GTK_RANGE(wid));
+
+        dir=(double)GTK_ADJUSTMENT(adj)->value;
+        if(abs(  (dir-1)*10)<1)
+        {
+                action=ACT_NextKFrame;
+        }
+        else if(abs((dir+1)*10)<1)
+                action=ACT_PreviousKFrame;
+        //
+        if(action!=ACT_DUMMY)
+        {
+                HandleAction(action);
+        }
+        // Set to zero
+        gtk_adjustment_set_value(adj,0);
+ _upd_in_progres--;
+   
+}
+
+
+
 void UI_setTitle(char *name)
 {
 	char title[1024];

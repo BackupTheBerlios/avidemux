@@ -208,7 +208,9 @@ create_mainWindow (void)
   GtkWidget *comboboxFormat;
   GtkWidget *label20;
   GtkWidget *guiDrawing;
+  GtkWidget *hbox20;
   GtkWidget *sliderNavigate;
+  GtkWidget *hscaleSensitive;
   GtkWidget *hbox17;
   GtkWidget *vbox3;
   GtkWidget *hbox10;
@@ -1136,11 +1138,22 @@ create_mainWindow (void)
   gtk_widget_set_size_request (guiDrawing, 496, 288);
   gtk_widget_set_sensitive (guiDrawing, FALSE);
 
+  hbox20 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox20);
+  gtk_box_pack_start (GTK_BOX (vbox10), hbox20, FALSE, FALSE, 0);
+
   sliderNavigate = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 99.99, 0.01, 1, 0)));
   gtk_widget_show (sliderNavigate);
-  gtk_box_pack_start (GTK_BOX (vbox10), sliderNavigate, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox20), sliderNavigate, TRUE, TRUE, 0);
   GTK_WIDGET_UNSET_FLAGS (sliderNavigate, GTK_CAN_FOCUS);
   gtk_scale_set_value_pos (GTK_SCALE (sliderNavigate), GTK_POS_LEFT);
+
+  hscaleSensitive = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, -1, 2, 1, 1, 1)));
+  gtk_widget_show (hscaleSensitive);
+  gtk_box_pack_start (GTK_BOX (hbox20), hscaleSensitive, FALSE, FALSE, 0);
+  gtk_widget_set_size_request (hscaleSensitive, 102, -1);
+  gtk_scale_set_value_pos (GTK_SCALE (hscaleSensitive), GTK_POS_RIGHT);
+  gtk_scale_set_digits (GTK_SCALE (hscaleSensitive), 0);
 
   hbox17 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox17);
@@ -1584,7 +1597,9 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, comboboxFormat, "comboboxFormat");
   GLADE_HOOKUP_OBJECT (mainWindow, label20, "label20");
   GLADE_HOOKUP_OBJECT (mainWindow, guiDrawing, "guiDrawing");
+  GLADE_HOOKUP_OBJECT (mainWindow, hbox20, "hbox20");
   GLADE_HOOKUP_OBJECT (mainWindow, sliderNavigate, "sliderNavigate");
+  GLADE_HOOKUP_OBJECT (mainWindow, hscaleSensitive, "hscaleSensitive");
   GLADE_HOOKUP_OBJECT (mainWindow, hbox17, "hbox17");
   GLADE_HOOKUP_OBJECT (mainWindow, vbox3, "vbox3");
   GLADE_HOOKUP_OBJECT (mainWindow, hbox10, "hbox10");
