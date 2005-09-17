@@ -125,11 +125,13 @@ GtkCellRenderer *renderer;
                                         if(sel>=jobs.nb) break;
                                         jobs.status[sel]=STATUS_RUNNING;
                                         updateStatus();
-
+                                        GUI_Quiet();
                                           if(parseECMAScript(jobs.name[sel])) jobs.status[sel]=STATUS_SUCCEED;
                                                         else jobs.status[sel]=STATUS_FAILED;
+                                        GUI_Verbose();
                                         break;
                         case COMMAND_RUN_ALL: 
+                                        GUI_Quiet();
                                         for(int i=0;i<jobs.nb;i++)
                                         {
                                                 if(jobs.status[i]==STATUS_DELETED) continue;
@@ -140,6 +142,7 @@ GtkCellRenderer *renderer;
                                                         else jobs.status[i]=STATUS_FAILED;
 
                                         }
+                                        GUI_Verbose();
                                         break;
                         case COMMAND_DELETE: 
                                         sel=getSelection(jobs.dialog);
