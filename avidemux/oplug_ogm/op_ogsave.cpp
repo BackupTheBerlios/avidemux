@@ -139,7 +139,8 @@ uint8_t error=0;
 		encoding_gui->setFps(_fps1000);
 		encoding_gui->reset();
 		// ___________________Then body_______________________
-		for(uint32_t j=0;j<=_togo && !error;j++)
+                uint32_t j=0;
+		for( j=0;j<=_togo && !error;j++)
 		{
 			encoding_gui->setFrame(j,_togo);
 			if(!encoding_gui->isAlive())
@@ -149,10 +150,8 @@ uint8_t error=0;
 			}
 			if(!writeVideo(j)) error=1;
 			if(!writeAudio(j)) error=1;
-			
-			
-
 		}
+                if(abs(j-_togo)>2 && error) error=0; // might be caused by late B frame
 		delete encoding_gui;
 		encoding_gui=NULL;
 		//________________ Flush______________________
