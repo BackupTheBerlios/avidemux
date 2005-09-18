@@ -1969,7 +1969,10 @@ uint8_t ADM_saveRaw (const char *name)
 	    }
 	  if (!found)
           {
-            ret=0;
+            if(abs(i-frameEnd)>2)
+                ret=0;
+            else
+                ret=1;  // Good enough
 	    goto _abt;
           }
 	  // Write the found frame
