@@ -86,3 +86,10 @@ CALLBACK(add_to_joblist1                       ,ACT_ADD_JOB);
 CALLBACK(joblist1                              ,ACT_HANDLE_JOB);
 CALLBACK(v2v                                   ,ACT_V2V);
 
+CALLBACK(zoom_1_4                                   ,ACT_ZOOM_1_4);
+CALLBACK(zoom_1_2                                   ,ACT_ZOOM_1_2);
+CALLBACK(zoom_1_1                                   ,ACT_ZOOM_1_1);
+CALLBACK(zoom_2_1                                   ,ACT_ZOOM_2_1);
+CALLBACK(zoom_4_1                                   ,ACT_ZOOM_4_1);
+
+
