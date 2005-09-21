@@ -42,5 +42,6 @@ typedef enum pipID
 	P_OTHER
 };
  void A_Pipe(pipID who,char *file=NULL );
+
 //EOF
 

@@ -44,10 +44,10 @@ avidemux2_LDADD   =  \
 ./ADM_lvemux/libADM_lvemux.a \
 ./ADM_filter/libADM_filter.a \
 ./ADM_video/libADM_video.a   ./ADM_encoder/libADM_encoder.a  \
-./MPlayer_pp/libMPlayer_pp.a \
 ./ADM_codecs/libADM_codecs.a ./ADM_vp32/libADM_vp32.a   ./ADM_audiofilter/libADM_audiofilter.a \
 ./libtoolame/liblibtoolame.a \
 ./ADM_gui2/libADM_gui2.a  \
+./MPlayer_pp/libMPlayer_pp.a \
 ./mpeg2enc/libmpeg2enc.a \
 ./ADM_inpics/libADM_inpics.a  ./ADM_3gp/libADM_3gp.a \
 ./ADM_h263/libADM_h263.a   \

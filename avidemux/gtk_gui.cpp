@@ -183,6 +183,8 @@ extern uint8_t GUI_jobs(void);
 extern bool parseECMAScript(const char *name);
 void A_parseECMAScript(const char *name);
 static int A_vob2vobsub(void);
+renderZoom currentZoom=ZOOM_1_1;
+
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -463,6 +465,21 @@ int nw;
   // we have an AVI loaded
   switch (action)
     {
+
+        case ACT_ZOOM_1_4:
+        case ACT_ZOOM_1_2:
+        case ACT_ZOOM_1_1:
+        case ACT_ZOOM_2_1:
+        case ACT_ZOOM_4_1:
+
+                currentZoom=(renderZoom)((action-ACT_ZOOM_1_4)+ZOOM_1_4);
+                renderResize (avifileinfo->width, avifileinfo->height,currentZoom);
+                renderUpdateImage (rdr_decomp_buffer->data);
+                renderRefresh ();
+
+                break;
+
+
         case ACT_AUTO_VCD:
         case ACT_AUTO_SVCD:
         case ACT_AUTO_DVD:
@@ -1130,7 +1147,7 @@ void  updateLoaded ()
     }
 
   // Init renderer
-  renderResize (avifileinfo->width, avifileinfo->height);
+  renderResize (avifileinfo->width, avifileinfo->height,currentZoom);
   curframe = 0;
   
 

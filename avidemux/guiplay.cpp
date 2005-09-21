@@ -56,6 +56,7 @@
 #include "gtkgui.h"
 #include "ADM_gui2/GUI_render.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
+
 //___________________________________
 #define AUDIO_PRELOAD 150
 //___________________________________
@@ -80,7 +81,7 @@ static uint32_t one_audio_frame = 0;
 static uint32_t one_frame;
 static uint8_t *wavbuf = NULL;
 AVDMProcessAudioStream *playback = NULL;
-
+extern renderZoom currentZoom;
 //static uint8_t Vbuffer[7.0*5.6*3];
 //AVDMGenericVideoStream *getFirstVideoFilter( void)
 //
@@ -156,7 +157,7 @@ void GUI_PlayAvi(void)
 #ifdef HAVE_AUDIO
     ComputePreload();
 #endif
-     renderResize(filter->getInfo()->width,filter->getInfo()->height);
+     renderResize(filter->getInfo()->width,filter->getInfo()->height,currentZoom);
      renderStartPlaying();
 // reset timer reference
     resetTime();
@@ -240,7 +241,7 @@ abort_play:
 	  delete  buffer;
 
 	   renderStopPlaying();
-	   renderResize(avifileinfo->width ,  avifileinfo->height);
+	   renderResize(avifileinfo->width ,  avifileinfo->height,currentZoom);
 	   getFirstVideoFilter( );
 	   //video_body->getUncompressedFrame(curframe, rdr_decomp_buffer,&flags);
 	   GUI_getFrame(curframe, rdr_decomp_buffer, &flags);
