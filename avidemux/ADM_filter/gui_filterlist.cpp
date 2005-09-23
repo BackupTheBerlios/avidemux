@@ -20,13 +20,30 @@ GtkWidget	*create_dialogList (void)
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
   GtkWidget *scrolledwindow1;
-  GtkWidget *treeview2;
+  GtkWidget *viewport1;
+  GtkWidget *notebook1;
+  GtkWidget *scrolledwindow2;
+  GtkWidget *treeview10;
+  GtkWidget *label1;
+  GtkWidget *treeview11;
+  GtkWidget *label2;
+  GtkWidget *treeview12;
+  GtkWidget *label3;
+  GtkWidget *treeview13;
+  GtkWidget *label4;
+  GtkWidget *treeview14;
+  GtkWidget *label8;
+  GtkWidget *treeview15;
+  GtkWidget *label15;
+  GtkWidget *treeview16;
+  GtkWidget *label7;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Select a video filter"));
+  gtk_window_set_title (GTK_WINDOW (dialog1), _("Select filter to add"));
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -34,34 +51,77 @@ GtkWidget	*create_dialogList (void)
   scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), scrolledwindow1, TRUE, TRUE, 0);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_SHADOW_IN);
 
- //__________ PATCH BEGIN HERE_________________________
+  viewport1 = gtk_viewport_new (NULL, NULL);
+  gtk_widget_show (viewport1);
+  gtk_container_add (GTK_CONTAINER (scrolledwindow1), viewport1);
 
- storeFilterList= gtk_list_store_new (1,  G_TYPE_STRING);
-   treeview2 = gtk_tree_view_new_with_model (GTK_TREE_MODEL (storeFilterList));
-   GtkTreeViewColumn *column;
-   GtkCellRenderer *renderer;
-  renderer = gtk_cell_renderer_text_new ();
-   /* Create a column, associating the "text" attribute of the
-    * cell_renderer to the first column of the model */
-   column = gtk_tree_view_column_new_with_attributes ("Filter", renderer,
-                                                      "text", 0,
-                                                      NULL);
-   /* Add the column to the view. */
-   gtk_tree_view_append_column (GTK_TREE_VIEW (treeview2), column);
-   //_______________PATCH END HERE____________________
+  notebook1 = gtk_notebook_new ();
+  gtk_widget_show (notebook1);
+  gtk_container_add (GTK_CONTAINER (viewport1), notebook1);
 
+  scrolledwindow2 = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_show (scrolledwindow2);
+  gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow2);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow2), GTK_SHADOW_IN);
 
+  treeview10 = gtk_tree_view_new ();
+  gtk_widget_show (treeview10);
+  gtk_container_add (GTK_CONTAINER (scrolledwindow2), treeview10);
 
-  /*treeview2 = gtk_tree_view_new ();*/
-  gtk_widget_show (treeview2);
+  label1 = gtk_label_new (_("Alteration"));
+  gtk_widget_show (label1);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), label1);
+  gtk_label_set_use_markup (GTK_LABEL (label1), TRUE);
 
+  treeview11 = gtk_tree_view_new ();
+  gtk_widget_show (treeview11);
+  gtk_container_add (GTK_CONTAINER (notebook1), treeview11);
 
+  label2 = gtk_label_new (_("Interlacing"));
+  gtk_widget_show (label2);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), label2);
 
-  gtk_container_add (GTK_CONTAINER (scrolledwindow1), treeview2);
-  gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (treeview2), FALSE);
-  gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview2), FALSE);
+  treeview12 = gtk_tree_view_new ();
+  gtk_widget_show (treeview12);
+  gtk_container_add (GTK_CONTAINER (notebook1), treeview12);
+
+  label3 = gtk_label_new (_("Deblender"));
+  gtk_widget_show (label3);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), label3);
+
+  treeview13 = gtk_tree_view_new ();
+  gtk_widget_show (treeview13);
+  gtk_container_add (GTK_CONTAINER (notebook1), treeview13);
+
+  label4 = gtk_label_new (_("Convolution"));
+  gtk_widget_show (label4);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 3), label4);
+
+  treeview14 = gtk_tree_view_new ();
+  gtk_widget_show (treeview14);
+  gtk_container_add (GTK_CONTAINER (notebook1), treeview14);
+
+  label8 = gtk_label_new (_("Luma/Chroma"));
+  gtk_widget_show (label8);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 4), label8);
+
+  treeview15 = gtk_tree_view_new ();
+  gtk_widget_show (treeview15);
+  gtk_container_add (GTK_CONTAINER (notebook1), treeview15);
+
+  label15 = gtk_label_new (_("Smoother"));
+  gtk_widget_show (label15);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 5), label15);
+
+  treeview16 = gtk_tree_view_new ();
+  gtk_widget_show (treeview16);
+  gtk_container_add (GTK_CONTAINER (notebook1), treeview16);
+
+  label7 = gtk_label_new (_("Subs"));
+  gtk_widget_show (label7);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 6), label7);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -81,11 +141,26 @@ GtkWidget	*create_dialogList (void)
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, scrolledwindow1, "scrolledwindow1");
-  GLADE_HOOKUP_OBJECT (dialog1, treeview2, "treeview2");
+  GLADE_HOOKUP_OBJECT (dialog1, viewport1, "viewport1");
+  GLADE_HOOKUP_OBJECT (dialog1, notebook1, "notebook1");
+  GLADE_HOOKUP_OBJECT (dialog1, scrolledwindow2, "scrolledwindow2");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview10, "treeview10");
+  GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview11, "treeview11");
+  GLADE_HOOKUP_OBJECT (dialog1, label2, "label2");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview12, "treeview12");
+  GLADE_HOOKUP_OBJECT (dialog1, label3, "label3");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview13, "treeview13");
+  GLADE_HOOKUP_OBJECT (dialog1, label4, "label4");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview14, "treeview14");
+  GLADE_HOOKUP_OBJECT (dialog1, label8, "label8");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview15, "treeview15");
+  GLADE_HOOKUP_OBJECT (dialog1, label15, "label15");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview16, "treeview16");
+  GLADE_HOOKUP_OBJECT (dialog1, label7, "label7");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
 
   return dialog1;
 }
-

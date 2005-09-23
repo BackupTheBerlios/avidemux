@@ -58,7 +58,7 @@ extern AVDMGenericVideoStream *filterCreateFromTag (VF_FILTERS tag,
 						    AVDMGenericVideoStream *
 						    in);
 
-
+extern const char  *filterGetNameFromTag(VF_FILTERS tag);
 typedef enum gui_act
 {
   A_BEGIN = 10,
@@ -89,7 +89,7 @@ static void on_action (gui_act action);
 static void on_action_double_click (GtkButton * button, gpointer user_data);
 static void on_action_double_click_1 (GtkButton * button, gpointer user_data);
 static void updateFilterList (void);
-
+static void wrapToolButton(GtkWidget * wid, gpointer user_data);
 //___________________________________________
 extern FILTER_ENTRY allfilters[MAX_FILTER];
 extern uint32_t nb_video_filter;
@@ -100,9 +100,12 @@ extern ADM_Composer *video_body;
 //_______________________________________
 
 extern GtkWidget *create_filterMain (void);
-extern GtkListStore *storeMainFilter;
+
 static GtkWidget *dialog;
 static GtkWidget *dialog2;
+static GtkListStore *store;
+static GtkTreeViewColumn *column;
+static GtkCellRenderer *renderer;
 
 /*
         Open the main filter dialog and call the handlers
@@ -133,45 +136,58 @@ GUI_handleFilter (void)
 
 
   dialog = create_filterMain ();
-  gtk_widget_set_size_request (lookup_widget (dialog, "treeview1"), 400, 400);
+  store=gtk_list_store_new (1, G_TYPE_STRING);
+  gtk_tree_view_set_model(GTK_TREE_VIEW(WID(treeview2)),GTK_TREE_MODEL (store));
+  gtk_tree_view_columns_autosize(GTK_TREE_VIEW(WID(treeview2)));
+  
+  //gtk_widget_set_size_request (WID(treeview2), 400, 400);
 
+  renderer = gtk_cell_renderer_text_new ();
+  column = gtk_tree_view_column_new_with_attributes ("", renderer,
+                                                      "markup", (GdkModifierType) 0,
+                                                      NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview2)), column);
 
+//#define CALLME(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
 
-#define CALLME(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
+#define CALLME(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)),"clicked",  GTK_SIGNAL_FUNC(wrapToolButton), (void *) y);
 
+  CALLME (toolbuttonAdd, A_ADD);
+  CALLME (toolbuttonRemove, A_REMOVE);
+  CALLME (toolbuttonProperties, A_CONFIGURE);
+  CALLME (toolbuttonUp, A_UP);
+  CALLME (toolbuttonDown, A_DOWN);
+  CALLME (toolbuttonVCD, A_VCD);
+  CALLME (toolbuttonSVCD, A_SVCD);
+  CALLME (toolbuttonDVD, A_DVD);
+  CALLME (toolbuttonSave, A_SAVE);
+  CALLME (toolbuttonOpen, A_LOAD);
+  CALLME (toolbuttonPreview, A_PREVIEW);
+  CALLME (toolbuttonPartial, A_PARTIAL);
+  CALLME (toolbuttonHD1, A_HALFD1);
+  CALLME (toolbutton13, A_SCRIPT);
 
-  CALLME (buttonAdd, A_ADD);
-  CALLME (buttonRemove, A_REMOVE);
-  CALLME (buttonConfigure, A_CONFIGURE);
-  CALLME (buttonUp, A_UP);
-  CALLME (buttonDown, A_DOWN);
-  CALLME (buttonVCD, A_VCD);
-  CALLME (buttonSVCD, A_SVCD);
-  CALLME (buttonDVD, A_DVD);
-  CALLME (buttonSave, A_SAVE);
-  CALLME (buttonLoad, A_LOAD);
-  CALLME (buttonPreview, A_PREVIEW);
-  CALLME (buttonPartial, A_PARTIAL);
-  CALLME (buttonHaldD1, A_HALFD1);
-  CALLME (buttonScript, A_SCRIPT);
   
   // Add double click
-	gtk_signal_connect (GTK_OBJECT (lookup_widget(dialog,"treeview1")),
-				"row-activated", 
-				GTK_SIGNAL_FUNC (on_action_double_click_1), 
-				(void *)NULL);
+  gtk_signal_connect (GTK_OBJECT (WID(treeview2)),
+        "row-activated", 
+        GTK_SIGNAL_FUNC (on_action_double_click_1), 
+        (void *)NULL);
 
   //      gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(treeview1),A_DOUBLECLICK);
 
+  gtk_widget_set_size_request (WID(treeview2), 400, 400);
+
   updateFilterList ();
   gtk_register_dialog (dialog);
-  gtk_widget_show (dialog);
+  //gtk_widget_show (dialog);
   
   gui_act ac;
   int run = 1, reply;
   while (run)
     {
       reply = gtk_dialog_run (GTK_DIALOG (dialog));
+      //printf("Action : %d\n",reply);
       if (reply > A_BEGIN && reply < A_END)
 	{
 	  ac = (gui_act) reply;
@@ -200,7 +216,18 @@ GUI_handleFilter (void)
   return 1;
 }
 
- 
+// gtk_dialog_add_action_widget seems buggy for toolbar button
+// workaround it...
+void wrapToolButton(GtkWidget * wid, gpointer user_data)
+{
+        gui_act action;
+        int dummy;
+
+        dummy=(int)user_data;
+
+        action=(gui_act) dummy;
+        gtk_dialog_response(GTK_DIALOG(dialog),action);
+}
 //
 // One of the button of the main dialog was pressed
 // Retrieve also the associated filter and handle
@@ -215,8 +242,8 @@ on_action (gui_act action)
   action_parameter = 0;
   if (nb_active_filter > 1)
     if (getSelectionNumber
-	(nb_active_filter - 1, lookup_widget (dialog, "treeview1"),
-	 storeMainFilter, &action_parameter))
+	(nb_active_filter - 1, WID(treeview2),
+	 store, &action_parameter))
       action_parameter++;
 
   switch (action)
@@ -338,8 +365,8 @@ on_action (gui_act action)
 	  updateFilterList ();
 
 	  setSelectionNumber (nb_active_filter - 1,
-			      lookup_widget (dialog, "treeview1"),
-			      storeMainFilter, action_parameter - 2);
+			      WID(treeview2),
+			      store, action_parameter - 2);
 
 	}
       break;
@@ -356,8 +383,8 @@ on_action (gui_act action)
 	  getFirstVideoFilter ();
 	  updateFilterList ();
 	  setSelectionNumber (nb_active_filter - 1,
-			      lookup_widget (dialog, "treeview1"),
-			      storeMainFilter, action_parameter);
+			      WID(treeview2),
+			      store, action_parameter);
 
 	}
       break;
@@ -465,58 +492,91 @@ extern GtkListStore *storeFilterList;
 	Return the tag identifying the filter selected
 
 */
-VF_FILTERS
-new_filter (void)
+#define NB_TREE 7
+VF_FILTERS new_filter (void)
 {
 
 //  GtkObject *selected;
   int position = 0;
   uint32_t sel, max = 0;
   VF_FILTERS tag = VF_INVALID;
-  GtkWidget *tree;
+  GtkWidget             *trees[NB_TREE];
+  GtkListStore          *stores[NB_TREE];
+  GtkTreeViewColumn     *columns[NB_TREE];
+  GtkCellRenderer       *renderers[NB_TREE];
+  int                   startFilter[NB_TREE];
+
+  char *str=NULL;
+
   GtkTreeIter iter;
   uint8_t ret = 0;
 
 
   dialog2 = create_dialogList ();
   gtk_register_dialog (dialog2);
-  tree = lookup_widget (dialog2, "treeview2");
-  gtk_widget_set_size_request (tree, 400, 400);
+  #define LOOK(x){ trees[x]=lookup_widget(dialog2,"treeview1"#x);\
+              stores[x]=gtk_list_store_new (1, G_TYPE_STRING);}
+  LOOK(0);
+  LOOK(1);
+  LOOK(2);
+  LOOK(3);
+  LOOK(4);
+  LOOK(5);
+  LOOK(6);
+
+  gtk_widget_set_size_request (dialog2, 600, 600);
+  int current_tree=-1;
   for (uint32_t i = 0; i < nb_video_filter; i++)
     {
-      if (allfilters[i].viewable)
+      if (allfilters[i].viewable==1)
 	{
-	  gtk_list_store_append (storeFilterList, &iter);
-	  gtk_list_store_set (storeFilterList, &iter, 0, allfilters[i].name,
-			      -1);
+                  str = g_strconcat("<span weight=\"heavy\" >", 
+                allfilters[i].name, "</span>\n",  
+               "<span size=\"smaller\" style=\"oblique\" >", 
+                allfilters[i].description, "</span> ",NULL);
+
+                
+
+	  gtk_list_store_append (stores[current_tree], &iter);
+	  gtk_list_store_set (stores[current_tree], &iter, 0,str ,-1);
+          g_free(str);
 	  max++;
-	}
+	}else 
+        {
+                current_tree++;
+                if(current_tree>=NB_TREE) break;
+                startFilter[current_tree]=i+1;
+        }
     }
   // Add double click
-  gtk_signal_connect (GTK_OBJECT (lookup_widget (dialog2, "treeview2")),
-		      "row-activated",
-		      GTK_SIGNAL_FUNC (on_action_double_click),
-		      (void *) dialog);
+  
 
-
-
+// Attach
+  for(int i=0;i<NB_TREE;i++)
+   {
+        gtk_tree_view_set_model(GTK_TREE_VIEW(trees[i]),GTK_TREE_MODEL (stores[i]));
+        gtk_tree_view_columns_autosize(GTK_TREE_VIEW(trees[i]));
+        renderers[i] = gtk_cell_renderer_text_new ();
+        columns[i] = gtk_tree_view_column_new_with_attributes ("", renderers[i],
+                                                      "markup", (GdkModifierType) 0,
+                                                      NULL);
+        gtk_tree_view_append_column (GTK_TREE_VIEW (trees[i]), columns[i]);
+        gtk_signal_connect (GTK_OBJECT (trees[i]),
+                      "row-activated",
+                      GTK_SIGNAL_FUNC (on_action_double_click),
+                      (void *) dialog);
+   }
   if (gtk_dialog_run (GTK_DIALOG (dialog2)) == GTK_RESPONSE_OK)
     {
-      if ((ret = getSelectionNumber (max, tree, storeFilterList, &sel)))
+        // 1- identify the current tab/treeview we are in
+        int page;
+
+                page=gtk_notebook_get_current_page(GTK_NOTEBOOK(lookup_widget(dialog2,"notebook1")));
+        // then get the selection
+
+      if ((ret = getSelectionNumber (max, trees[page], stores[page], &sel)))
 	{
-	  uint32_t idx = 0;
-	  for (unsigned int i = 0; i < nb_video_filter; i++)
-	    {
-	      if ((sel == idx) && (allfilters[i].viewable == 1))
-		{
-		  printf ("\n position : %d tag :%d idx:%lu\n", position, tag,
-			  idx);
-		  tag = allfilters[i].tag;
-		  i = nb_video_filter;
-		}
-	      else if (allfilters[i].viewable)
-		idx++;
-	    }
+                tag = allfilters[sel+startFilter[page]].tag;
 	}
     }
   gtk_unregister_dialog (dialog2);
@@ -527,14 +587,24 @@ new_filter (void)
 void
 updateFilterList (void)
 {
-  GtkTreeIter iter;
-  gtk_list_store_clear (storeMainFilter);
+GtkTreeIter iter;
+char *str;
+VF_FILTERS fil;
+  gtk_list_store_clear (store);
   for (uint32_t i = 1; i < nb_active_filter; i++)
     {
-      gtk_list_store_append (storeMainFilter, &iter);
-      gtk_list_store_set (storeMainFilter, &iter, 0,
-			  videofilters[i].filter->printConf (), -1);
+                gtk_list_store_append (store, &iter);
+                //str=videofilters[i].filter->printConf ();
+                fil=videofilters[i].tag;
+                
 
+                str = g_strconcat("<span weight=\"heavy\">", 
+                filterGetNameFromTag(fil), "</span>\n",  
+               "<span size=\"smaller\" style=\"oblique\" >", 
+                videofilters[i].filter->printConf (), "</span> ",NULL);
+
+                gtk_list_store_set (store, &iter, 0,str,-1);
+                g_free(str);
     }
 
 }

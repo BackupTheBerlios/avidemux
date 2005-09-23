@@ -100,6 +100,7 @@
 		VF_FILTERS 	tag;
 		uint8_t		viewable;
 		char		*filtername;
+                char            *description;
 		AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args);	
    }FILTER_ENTRY;
  	
@@ -143,7 +144,8 @@ void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable,
 			AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *),char *fname);
 void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
 		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
-		,char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args));
+		,char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args),
+                char *description);
 void 		filterListAll( void );
 VF_FILTERS 	filterGetTagFromName(char *inname);
 uint8_t 	filterAddScript(VF_FILTERS tags,uint32_t n,Arg *args);

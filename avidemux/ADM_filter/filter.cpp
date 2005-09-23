@@ -132,7 +132,7 @@ void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable
 }
 void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
 		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
-		,char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args))
+		,char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args),char *desc)
 {
         ADM_assert(nb_video_filter<(MAX_FILTER-1));
         allfilters[ nb_video_filter].name=name;
@@ -141,6 +141,7 @@ void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
         allfilters[ nb_video_filter].viewable=viewable;
 	allfilters[ nb_video_filter].filtername=filtername;
 	allfilters[ nb_video_filter].create_from_script=create_from_script;
+        allfilters[ nb_video_filter].description=desc;
         nb_video_filter ++;
 
         if(viewable==1)
@@ -282,6 +283,25 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
 				}
 			ADM_assert(0);
 			return NULL;                      
+}
+/*
+
+
+*/
+const char  *filterGetNameFromTag(VF_FILTERS tag)
+{
+
+                        ADM_assert(tag!=VF_INVALID);
+                        for(unsigned int i=0;i<nb_video_filter;i++)
+                                {
+                                        if(tag==allfilters[i].tag)
+                                                {
+                                                        return allfilters[i].name;
+                                                        
+                                                }
+                                }
+                        ADM_assert(0);
+                        return NULL;                      
 }
 /*____________________________________
 	Save and load current set of filters
