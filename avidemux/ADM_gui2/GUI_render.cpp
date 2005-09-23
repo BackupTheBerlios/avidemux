@@ -60,6 +60,7 @@ static renderZoom zoom=ZOOM_1_1;
 static ColYuvRgb rgbConverter(640,480);
 
 extern GtkWidget *getDrawWidget( void );
+extern uint8_t UI_shrink(uint32_t w,uint32_t h);
 static AccelRender *accel_mode=NULL;
 //_______________________________________
 
@@ -100,6 +101,11 @@ int mul,xx,yy;
                         delete resized;
                         resized=NULL;
         }
+        if(resizer)
+        {
+                delete resizer;
+                resizer=NULL;
+        }
         zoom=newzoom;
         switch(zoom)
         {
@@ -113,9 +119,11 @@ int mul,xx,yy;
         }
         xx=(w*mul+3)/4;
         yy=(h*mul+3)/4;
+
+        if(xx&1) xx++;
+        if(yy&1) yy++;
+
         screenBuffer=new uint8_t[xx*yy*4];
-	if(resizer) delete resizer;
-        resizer=NULL;
 
         if(zoom!=ZOOM_1_1)
         {
@@ -296,8 +304,14 @@ uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h)
     renderW = w;
     renderH = h;
 
+    // Shrink the main window
+    // so that we do not leave blanks everywhere
+    
+    //***
     gtk_widget_set_usize(win, w, h);
-	UI_purge();
+//     UI_purge();
+//     UI_shrink(w,h);
+//     UI_purge();
     return 1;
 }
 
