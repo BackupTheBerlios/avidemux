@@ -308,10 +308,12 @@ uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h)
     // so that we do not leave blanks everywhere
     
     //***
+  
+     /*UI_purge();
+     UI_shrink(w,h);
+     UI_purge();
+     */
     gtk_widget_set_usize(win, w, h);
-//     UI_purge();
-//     UI_shrink(w,h);
-//     UI_purge();
     return 1;
 }
 

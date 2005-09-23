@@ -382,7 +382,9 @@ uint8_t  bindGUI( void )
         GTK_SIGNAL_FUNC(DNDDataReceived),NULL);
     //CYB 2005.02.22: DND (END)
 
-        
+     // Allow shrink
+   GTK_WINDOW ( guiRootWindow ) ->allow_shrink = FALSE;
+   GTK_WINDOW ( guiDrawingArea ) ->allow_shrink = FALSE;
     return 1;
 
 }
