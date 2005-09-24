@@ -225,10 +225,17 @@ int a1,a2,a3,a4,sum,delta,l,ll;
 
         l=w*h;
         ll=l>>2;
+#ifdef GCC_2_95_X
+        __asm__(
+                         "pxor %mm7,%mm7"
+                ::
+                 );
+#else
         __asm__(
                          "pxor %%mm7,%%mm7"
                 ::
                  );
+#endif
         for(int x=0;x<ll;x++)
                 {
                         __asm__(

@@ -160,11 +160,19 @@ uint32_t left=count&3;
         high=EXPAND(high);
         low=EXPAND(low);
         count>>=2;
+#ifdef GCC_2_95_X
+         __asm__ __volatile__ (
+                                "movq "Mangle(high)", %mm0\n"
+                                "movq "Mangle(low)",  %mm1\n"                                
+                                "pxor %mm7        ,  %mm7\n"
+                                :: );
+#else
          __asm__ __volatile__ (
                                 "movq "Mangle(high)", %%mm0\n"
                                 "movq "Mangle(low)",  %%mm1\n"                                
                                 "pxor %%mm7        ,  %%mm7\n"
                                 :: );
+#endif
 
         while(count>0)
         {

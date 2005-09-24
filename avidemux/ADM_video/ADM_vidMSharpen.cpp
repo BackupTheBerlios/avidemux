@@ -291,10 +291,17 @@ int wh ,ww,hh;
   if(CpuCaps::hasMMX())
   {
   int off;
+#ifdef GCC_2_95_X
+        __asm__(
+                        ".align 16\n"
+                        "pxor  %mm7,%mm7\n"
+                : : );
+#else
         __asm__(
                         ".align 16\n"
                         "pxor  %%mm7,%%mm7\n"
                 : : );
+#endif
                         
   for (int y=1; y<h-1 ;y++) 
   {               

@@ -64,10 +64,17 @@ int a1,a2;
         rr=l&3;
 
 
+#ifdef GCC_2_95_X
+         __asm__(
+                         "pxor %mm7,%mm7"
+                ::
+                 );
+#else
          __asm__(
                          "pxor %%mm7,%%mm7"
                 ::
                  );
+#endif
 
           for(int y=0;y<ww;y++)
           {
@@ -145,12 +152,21 @@ uint32_t result=0;
         ll=l>>2;
         rr=l&3;
 
+#ifdef GCC_2_95_X
+         __asm__(
+                         "pxor %mm7,%mm7\n"
+                         "pxor %mm3,%mm3\n"
+                         "movq "Mangle(noise64)", %mm6\n"
+                :: 
+                 );
+#else
          __asm__(
                          "pxor %%mm7,%%mm7\n"
                          "pxor %%mm3,%%mm3\n"
                          "movq "Mangle(noise64)", %%mm6\n"
                 :: 
                  );
+#endif
 
           for(int y=0;y<ll;y++)
           {
@@ -266,10 +282,17 @@ int ll,rr;
         
         d1=dst;
       
+#ifdef GCC_2_95_X
+        __asm__(
+                         "pxor %mm7,%mm7"
+                ::
+                 );
+#else
         __asm__(
                          "pxor %%mm7,%%mm7"
                 ::
                  );
+#endif
         for(int x=0;x<ll;x++)
                 {
                         __asm__(

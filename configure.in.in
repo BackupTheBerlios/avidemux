@@ -566,7 +566,10 @@ AC_CHECK_LIB(vorbis,vorbis_info_init,,have_vorbis=no, -lm)
 if test "x$have_vorbis" = "xyes"; then
 	AC_CHECK_LIB(vorbisenc,vorbis_encode_init,,have_vorbis=no, -lm)
 	if test "x$have_vorbis" = "xyes"; then
-		AC_DEFINE(USE_VORBIS,1,[Vorbis audio codec])
+		AC_CHECK_LIB(vorbis,vorbis_synthesis_restart,,have_vorbis=no, -lm)
+		if test "x$have_vorbis" = "xyes"; then
+			AC_DEFINE(USE_VORBIS,1,[Vorbis audio codec])
+		fi
 	fi
 fi
 dnl __________________/VORBIS______________
@@ -1087,4 +1090,11 @@ if test prefs.in -nt prefs.h -o prefs.in -nt prefs.cpp; then
 	perl ../admin/prefs_gen.pl
 fi
 cd ..
-
+dnl _______________________________________________________
+dnl detect gcc 2.9x.x
+dnl _______________________________________________________
+if { echo '#if __GNUC__ == 2 && __GNUC_MINOR__ >= 95'
+     echo ' yes '
+     echo '#endif'; } | ${CC} -E - | grep yes > /dev/null; then
+   AC_DEFINE(GCC_2_95_X,1,we are using gcc 2.9x.x)
+fi
