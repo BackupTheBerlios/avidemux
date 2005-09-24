@@ -133,19 +133,15 @@ GUI_handleFilter (void)
 				 frameEnd - frameStart);
 
     }
-
-
   dialog = create_filterMain ();
   store=gtk_list_store_new (1, G_TYPE_STRING);
   gtk_tree_view_set_model(GTK_TREE_VIEW(WID(treeview2)),GTK_TREE_MODEL (store));
   gtk_tree_view_columns_autosize(GTK_TREE_VIEW(WID(treeview2)));
-  
   //gtk_widget_set_size_request (WID(treeview2), 400, 400);
 
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes ("", renderer,
-                                                      "markup", (GdkModifierType) 0,
-                                                      NULL);
+                                                      "markup", (GdkModifierType) 0, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview2)), column);
 
 //#define CALLME(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
@@ -167,12 +163,9 @@ GUI_handleFilter (void)
   CALLME (toolbuttonHD1, A_HALFD1);
   CALLME (toolbutton13, A_SCRIPT);
 
-  
   // Add double click
-  gtk_signal_connect (GTK_OBJECT (WID(treeview2)),
-        "row-activated", 
-        GTK_SIGNAL_FUNC (on_action_double_click_1), 
-        (void *)NULL);
+  gtk_signal_connect (GTK_OBJECT (WID(treeview2)), "row-activated", 
+        GTK_SIGNAL_FUNC (on_action_double_click_1),(void *)NULL);
 
   //      gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(treeview1),A_DOUBLECLICK);
 
@@ -180,7 +173,7 @@ GUI_handleFilter (void)
 
   updateFilterList ();
   gtk_register_dialog (dialog);
-  //gtk_widget_show (dialog);
+  gtk_widget_show (dialog);
   
   gui_act ac;
   int run = 1, reply;
@@ -204,12 +197,9 @@ GUI_handleFilter (void)
 	    run = 0;
 	    break;
 	  default:
-
 	    ADM_assert (0);
-
 	  }
-
-    }  
+    }
   gtk_unregister_dialog (dialog);
   gtk_widget_destroy (dialog);
 
@@ -514,15 +504,16 @@ VF_FILTERS new_filter (void)
 
   dialog2 = create_dialogList ();
   gtk_register_dialog (dialog2);
-  #define LOOK(x){ trees[x]=lookup_widget(dialog2,"treeview1"#x);\
-              stores[x]=gtk_list_store_new (1, G_TYPE_STRING);}
-  LOOK(0);
+  #define LOOK(x){ trees[x-1]=lookup_widget(dialog2,"treeview1"#x);\
+              stores[x-1]=gtk_list_store_new (1, G_TYPE_STRING);}
+  
   LOOK(1);
   LOOK(2);
   LOOK(3);
   LOOK(4);
   LOOK(5);
   LOOK(6);
+  LOOK(7);
 
   gtk_widget_set_size_request (dialog2, 600, 600);
   int current_tree=-1;

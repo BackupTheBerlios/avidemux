@@ -98,39 +98,27 @@ printf(  "*********************\n");
 	REGISTERX("kerneldeint","D. Graft Kernel deint","Kernel deinterlacer",VF_KRNDEINT,1,kerneldeint_create,kerneldeint_script);
 	REGISTERX("dgbob","DGBob","Bobber, convert each field into a full sized frame, double fps",VF_DGBOB,1,dgbob_create,dgbob_script);
 
-	
-
-
-        registerFilter("-------- Deblender ---------",VF_INVALID,2,NULL,NULL);
-
-        REGISTERX("blendremover","Blend Remover","Remove picture that are a blend between the previous and the next.",VF_BLENDREMOVAL,1,blendremove_create,blendremove_script);
-        REGISTERX("hardivtcremove","Hard pulldown removal","Try to remove ivtc that has been analog captured or resized.",VF_HARDIVTC,1,hardivtc_create,hardivtc_script);
-// Does not work
-//        REGISTERX("unblend","Unblend by Bach",VF_UNBLEND,1,unblend_create,unblend_script);
-	registerFilter("-------- Convolution Kernel ---------",VF_INVALID,2,NULL,NULL);
-	REGISTERX("sharpen","Sharpen","Sharpening kernel",VF_SHARPEN,1,sharpen_create,sharpen_script);
-   	REGISTERX("mean","Mean","Mean (blur) kernel",VF_MEAN,1,mean_create,mean_script);
-   	REGISTERX("median","Median","Median kernel 3x3.",VF_MEDIAN,1,median_create,median_script);
-	REGISTERX("largemedian","Median (5x5)","Median kernel 5x5.",VF_LARGEMEDIAN,1,largeMedian_create,largeMedian_script);
-    	REGISTERX("gaussian","Gauss Smooth","Gauss Smooth lernel",VF_GAUSSIAN,1,Gaussian_create,gaussian_script);
-       	
-    
 	registerFilter("------------ Luma/Chroma ------------",VF_INVALID,2,NULL,NULL);
-	      
- 	REGISTERX("swapuv","Swap u & v","Invert chroma U and chroma V",VF_SWAPUV,1,swapuv_create,swapuv_script);
-	REGISTERX("chromashift","Chroma shift","Shift chroma u/v to revert badly synced luma/chroma",VF_CHROMASHIFT,1,create_chromashift,chromashift_script);
+              
+        REGISTERX("swapuv","Swap u & v","Invert chroma U and chroma V",VF_SWAPUV,1,swapuv_create,swapuv_script);
+        REGISTERX("chromashift","Chroma shift","Shift chroma u/v to revert badly synced luma/chroma",VF_CHROMASHIFT,1,create_chromashift,chromashift_script);
 
-	REGISTERX("contrast","Contrast","Contrast adjuster",VF_CONTRAST,1,contrast_create,contrast_script);
-	REGISTERX("equalizer","Luma equalizer","Luma correction filter with histogram",VF_EQUALIZER,1,equalizer_create,equalizer_script);
+        REGISTERX("contrast","Contrast","Contrast adjuster",VF_CONTRAST,1,contrast_create,contrast_script);
+        REGISTERX("equalizer","Luma equalizer","Luma correction filter with histogram",VF_EQUALIZER,1,equalizer_create,equalizer_script);
 
-	REGISTERX("lumaonly","Luma only","Convert picture to grey/black and white",VF_LUMA,1,luma_create,luma_script);
-	REGISTERX("chromauonly","Chroma U only","Convert picture to grey, keeping only chroma u",VF_CHROMAU,1,chromaU_create,chromaU_script);
-	REGISTERX("chromavonly","Chroma V only","Convert picture to grey, keeping only chroma V",VF_CHROMAV,1,chromaV_create,chromaV_script);
+        REGISTERX("lumaonly","Luma only","Convert picture to grey/black and white",VF_LUMA,1,luma_create,luma_script);
+        REGISTERX("chromauonly","Chroma U only","Convert picture to grey, keeping only chroma u",VF_CHROMAU,1,chromaU_create,chromaU_script);
+        REGISTERX("chromavonly","Chroma V only","Convert picture to grey, keeping only chroma V",VF_CHROMAV,1,chromaV_create,chromaV_script);
         REGISTERX("hue","Mplayer Hue","Color equalizer ported from mplayer",VF_HUE,1,hue_create,hue_script);
         REGISTERX("eq2","Mplayer Eq2","Color equalizer2 ported from mplayer",VF_EQ2,1,Eq2_create,Eq2_script);
         REGISTERX("cnr2","CNR2 (MarcFD/Tritical)","Chroma Nois Reduction filter",VF_CNR2,1,cnr2_create,cnr2_script);
         REGISTERX("delta","Luma delta","Replace a  picture by the difference between that picture and the previous one",VF_DELTA,1,delta_create,delta_script);
-		
+                
+
+
+       
+    
+	
 	registerFilter("-------------- Smoother -------------",VF_INVALID,2,NULL,NULL);
 	//   registerFilter("Temporal smoother",tempsmooth_create);	
 	REGISTERX("stabilize","Stabilize","",VF_STABILIZE,1,stabilize_create,stabilize_script);
@@ -147,12 +135,26 @@ printf(  "*********************\n");
 	REGISTERX("forcedpp","Forced PostProcessing","",VF_FORCEDPP,1,forcedpp_create,forcedpp_script);
 	REGISTERX("soften","Soften","",VF_SOFTEN,1,soften_create,soften_script);
 	//REGISTERX("smoothclean","Smooth Clean",VF_SMOOTHCLEAN,0,smooth_create,smooth_script);
+        registerFilter("-------- Convolution Kernel ---------",VF_INVALID,2,NULL,NULL);
+        REGISTERX("sharpen","Sharpen","Sharpening kernel",VF_SHARPEN,1,sharpen_create,sharpen_script);
+        REGISTERX("mean","Mean","Mean (blur) kernel",VF_MEAN,1,mean_create,mean_script);
+        REGISTERX("median","Median","Median kernel 3x3.",VF_MEDIAN,1,median_create,median_script);
+        REGISTERX("largemedian","Median (5x5)","Median kernel 5x5.",VF_LARGEMEDIAN,1,largeMedian_create,largeMedian_script);
+        REGISTERX("gaussian","Gauss Smooth","Gauss Smooth lernel",VF_GAUSSIAN,1,Gaussian_create,gaussian_script);
+        
 #ifdef USE_FREETYPE   
 	registerFilter("----------------- Misc --------------",VF_INVALID,2,NULL,NULL);
 	REGISTERX("subtitle","Subtitler","",VF_SUBTILE,1,subtitle_create,subtitle_script);
 #endif
         REGISTERX("vobsub","VobSub","",VF_VOBSUB,1,vobsub_create,vobsub_script);
         //*********************
+ registerFilter("-------- Deblender ---------",VF_INVALID,2,NULL,NULL);
+
+        REGISTERX("blendremover","Blend Remover","Remove picture that are a blend between the previous and the next.",VF_BLENDREMOVAL,1,blendremove_create,blendremove_script);
+        REGISTERX("hardivtcremove","Hard pulldown removal","Try to remove ivtc that has been analog captured or resized.",VF_HARDIVTC,1,hardivtc_create,hardivtc_script);
+// Does not work
+//        REGISTERX("unblend","Unblend by Bach",VF_UNBLEND,1,unblend_create,unblend_script);
+        
         REGISTER("","Partial","",VF_PARTIAL,0,partial_create);
 //	REGISTER("","Remove Salt",VF_SALT,0,salt_create);
  printf("\n");
