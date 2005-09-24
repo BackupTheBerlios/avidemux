@@ -4,9 +4,9 @@
 #pragma align 4 (1)
 #endif
 #ifdef __GNUC__
-static const guint8 1[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 x1[] __attribute__ ((__aligned__ (4))) = 
 #else
-static const guint8 1[] = 
+static const guint8 x1[] = 
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */

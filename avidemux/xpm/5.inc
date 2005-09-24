@@ -1,12 +1,12 @@
 /* GdkPixbuf RGBA C-Source image dump */
 
 #ifdef __SUNPRO_C
-#pragma align 4 (5)
+#pragma align 4 (x5)
 #endif
 #ifdef __GNUC__
-static const guint8 5[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 x5[] __attribute__ ((__aligned__ (4))) = 
 #else
-static const guint8 5[] = 
+static const guint8 x5[] = 
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
