@@ -143,7 +143,7 @@ GUI_handleFilter (void)
   column = gtk_tree_view_column_new_with_attributes ("", renderer,
                                                       "markup", (GdkModifierType) 0, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview2)), column);
-
+  gtk_tree_view_column_set_spacing(column,26);
 //#define CALLME(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
 
 #define CALLME(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)),"clicked",  GTK_SIGNAL_FUNC(wrapToolButton), (void *) y);
@@ -521,10 +521,10 @@ VF_FILTERS new_filter (void)
     {
       if (allfilters[i].viewable==1)
 	{
-                  str = g_strconcat("<span weight=\"heavy\" >", 
+                  str = g_strconcat("<span size=\"larger\" weight=\"bold\">", 
                 allfilters[i].name, "</span>\n",  
-               "<span size=\"smaller\" style=\"oblique\" >", 
-                allfilters[i].description, "</span> ",NULL);
+                
+                allfilters[i].description, NULL);
 
                 
 
@@ -547,11 +547,14 @@ VF_FILTERS new_filter (void)
    {
         gtk_tree_view_set_model(GTK_TREE_VIEW(trees[i]),GTK_TREE_MODEL (stores[i]));
         gtk_tree_view_columns_autosize(GTK_TREE_VIEW(trees[i]));
+
         renderers[i] = gtk_cell_renderer_text_new ();
         columns[i] = gtk_tree_view_column_new_with_attributes ("", renderers[i],
                                                       "markup", (GdkModifierType) 0,
                                                       NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (trees[i]), columns[i]);
+
+        gtk_tree_view_column_set_spacing(columns[i],26);
         gtk_signal_connect (GTK_OBJECT (trees[i]),
                       "row-activated",
                       GTK_SIGNAL_FUNC (on_action_double_click),
@@ -589,10 +592,10 @@ VF_FILTERS fil;
                 fil=videofilters[i].tag;
                 
 
-                str = g_strconcat("<span weight=\"heavy\">", 
+                str = g_strconcat("<span size=\"larger\" weight=\"bold\">", 
                 filterGetNameFromTag(fil), "</span>\n",  
-               "<span size=\"smaller\" style=\"oblique\" >", 
-                videofilters[i].filter->printConf (), "</span> ",NULL);
+               
+                videofilters[i].filter->printConf (), NULL);
 
                 gtk_list_store_set (store, &iter, 0,str,-1);
                 g_free(str);
