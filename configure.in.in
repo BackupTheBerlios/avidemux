@@ -554,9 +554,9 @@ dnl __________________ac3______________
  	AC_CHECK_HEADERS([a52dec/a52.h], , have_ac3=no)
  	AC_CHECK_LIB( a52, a52_init, , have_ac3=no, -lm )
  
- 	if test "x$have_faac" = "xyes"; then
+ 	if test "x$have_ac3" = "xyes"; then
  		AC_DEFINE(USE_AC3,1,[liba52dec])
- 	elif test "x$with_faad2" = "xyes"; then
+ 	elif test "x$with_ac3" = "xyes"; then
  		AC_MSG_ERROR([a52dec support requested but not found.])
  	fi
   fi
