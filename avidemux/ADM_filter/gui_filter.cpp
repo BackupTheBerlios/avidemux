@@ -211,9 +211,15 @@ GUI_handleFilter (void)
 void wrapToolButton(GtkWidget * wid, gpointer user_data)
 {
         gui_act action;
+#ifdef ARCH_X86_64
+#define TPE long long int
+	long long int dummy;
+#else	
         int dummy;
+#define TPE int
+#endif
 
-        dummy=(int)user_data;
+        dummy=(TPE)user_data;
 
         action=(gui_act) dummy;
         gtk_dialog_response(GTK_DIALOG(dialog),action);
