@@ -640,8 +640,8 @@ Encoder *e=NULL;
 //					e=new   EncoderFFMPEG(FF_H263P,&ffmpeg4Extra);
 //				    	break;
       	 	case CodecH263 :
-         			if( !((w==128) && (h=96)) &&
-            		! ((w==176) && (h=144)))
+         			if( !((w==128) && (h==96)) &&
+            		! ((w==176) && (h==144)))
               			{
 								  	GUI_Error_HIG("Only QCIF and subQCIF are allowed for H.263", NULL);
 								    return 0;
