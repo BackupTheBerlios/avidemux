@@ -11,7 +11,7 @@ struct qfile_t {
         const char *filename;
         unsigned int ignore;
 };
-#define qfile_len 2^15
+#define qfile_len 32768 //2^15=13....
 #define qfprintf_buf_len 8192
 #define msg_len 512
 static qfile_t qfile[qfile_len];
