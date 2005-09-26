@@ -70,10 +70,9 @@ extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 static ADMImage *imgsrc,*imgdst,*imgdisplay;
 static GtkWidget *dialog=NULL;
 static uint32_t scaler[256];
-static int32_t points[8];
 static uint32_t w,h;
 static uint32_t *rgbbuffer=NULL;
-static uint32_t *bargraph=NULL;
+
 static uint32_t *histogram=NULL;
 static uint32_t *histogramout=NULL;
 static AVDMGenericVideoStream *incoming;
@@ -84,6 +83,8 @@ static const int cross[8]= {0,36,73,109,
 #define LINER 0x0000FFFF
 
 #define ZOOM_FACTOR 5
+
+#define A_RESET 99
 //
 //	Video is in YV12 Colorspace
 //
@@ -98,10 +99,10 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 	// Allocate space for green-ised video
 	w=in->getInfo()->width;
 	h=in->getInfo()->height;
-	  rgbConv=new ColYuvRgb(w,h);
+	rgbConv=new ColYuvRgb(w,h);
         rgbConv->reset(w,h);
 	rgbbuffer=new uint32_t[w*h];
-	bargraph=new uint32_t [256*256];
+	
 	histogram=new uint32_t [256*128];
         histogramout=new uint32_t [256*128];
 	
@@ -114,52 +115,61 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 	ADM_assert(in->getFrameNumberNoAlloc(max, &l, imgsrc,&f));
         memcpy(imgdisplay->data+w*h,imgsrc->data+w*h,(w*h)>>1);
 	// init local equalizer
-	memcpy(points,param->_points,8*sizeof(uint32_t));	
-	equalizerBuildScaler((int32_t *)points,(uint32_t *)scaler);
+		
+        memcpy(scaler,param->_scaler,sizeof(scaler));
 
 	dialog=create_dialog1();
 	gtk_register_dialog(dialog);
 
 	gtk_widget_set_usize(WID(drawingarea1), w,h);
-	gtk_widget_set_usize(WID(histogram), 256,256);
+
 	gtk_widget_set_usize(WID(drawingarea_histin), 256,128);
         gtk_widget_set_usize(WID(drawingarea_histout), 256,128);
 	
 	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonCancel), GTK_RESPONSE_CANCEL);
 	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button3),      GTK_RESPONSE_OK);
 	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonApply),  GTK_RESPONSE_APPLY);
+        gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonReset),  A_RESET);
 	  upload();
+
 	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
 		       GTK_SIGNAL_FUNC(draw),
 		       NULL);
 		       
-#define CONNECT(x) gtk_signal_connect(GTK_OBJECT(WID(spinbutton##x)), "value_changed",GTK_SIGNAL_FUNC(spinner),   NULL);
-	CONNECT(1);
-	CONNECT(2);
-	CONNECT(3);
-	CONNECT(4);
-	CONNECT(5);
-	CONNECT(6);
-	CONNECT(7);
-	CONNECT(8);
 	
 	gtk_signal_connect(GTK_OBJECT(WID(gui_scale)), "value_changed",GTK_SIGNAL_FUNC(frame_changed),   NULL);
-	gtk_widget_show(dialog);
-	compute_histogram();
-	spinner();
+  //      gtk_signal_connect(GTK_OBJECT(WID(curve1)), "curve-type-changed",GTK_SIGNAL_FUNC(spinner),   NULL);
 	
-	
+        /*
 
+        */
+        GtkWidget *curve=WID(curve1);
+        gtk_curve_set_range (GTK_CURVE(curve),0,255.,0.,255.);
+	
+        gtk_widget_show(dialog);
+        upload();
+        compute_histogram();
+        spinner();
 	ret=0;
 	int response;
+_again:
 	while( (response=gtk_dialog_run(GTK_DIALOG(dialog)))==GTK_RESPONSE_APPLY)
 	{
 		spinner();	
 	}
+        if(response==A_RESET)
+        {
+                gfloat duo[2]={0,255.};
+                gtk_curve_set_curve_type(GTK_CURVE(WID(curve1)),GTK_CURVE_TYPE_SPLINE);
+                gtk_curve_reset(GTK_CURVE(WID(curve1)));
+
+                goto _again;
+        }
+        
 	if(response==GTK_RESPONSE_OK)
         {
 		printf("Accepting new values\n");
-		memcpy(param->_points,points,8*sizeof(uint32_t));
+		memcpy(param->_scaler,scaler,sizeof(scaler));
 		ret=1;
 	}
 	gtk_unregister_dialog(dialog);
@@ -169,14 +179,14 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in)
 	delete imgsrc;
         delete imgdisplay;
 	delete [] rgbbuffer;
-	delete [] bargraph;
+	
 	delete [] histogram;
         delete [] histogramout;
     delete rgbConv;
     rgbConv=NULL;    
 	histogram=NULL;
         histogramout=NULL;
-	bargraph=NULL;
+	
 	rgbbuffer=NULL;
 	imgdst=NULL;
 	imgsrc=NULL;
@@ -223,46 +233,10 @@ void recalc( void )
 uint32_t y,tgt;
 	// compute the in-between field & display them
 	
-	equalizerBuildScaler((int32_t *)points,(uint32_t *)scaler);
-	// Show bargraph
-	memset(bargraph,0,256*256*sizeof(uint32_t));
-	for(uint32_t x=0;x<256;x++)
-	{
-		if(x&1)
-		{
-			tgt=x+((255-x)*256);
-			ADM_assert(tgt<256*256);
-			bargraph[tgt]=LINER;	
-		}
-		else
-		{		
-			tgt=x+((255-scaler[x])*256);
-			ADM_assert(tgt<256*256);
-			bargraph[tgt]=DRAW;	
-		}
-		
-	}
-	// Pur little cross over our drawing points
-	for(uint32_t i=0;i<8;i++)
-		drawCross(cross[i],points[i]);
-	// and draw
-        
-        
-        
-        
 	draw();
 }
 void drawCross(uint32_t x,uint32_t y)
 {
-uint32_t tgt=(255-y)*256+x;
-	if(x>0) bargraph[tgt-1]=CROSS;
-	if(x>1) bargraph[tgt-2]=CROSS;
-	if(x<255) bargraph[tgt+1]=CROSS;
-	if(x<254) bargraph[tgt+2]=CROSS;
-	if(y>0) bargraph[tgt-256]=CROSS;
-	if(y>1) bargraph[tgt-256*2]=CROSS;
-	if(y<255) bargraph[tgt+256]=CROSS;
-	if(y<254) bargraph[tgt+256*2]=CROSS;
 
 }
 void update( void)
@@ -382,18 +356,17 @@ void compute_histogram(void)
 /*---------------------------------------------------------------------------
 	Actually draw the working frame on screen
 */
-#define SPIN_GET(x,y) {points[x]= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(WID(y))) ;}
-#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(y)),(gfloat)points[x]) ;}
 gboolean draw (void)
 {
 	GtkWidget *draw;
+
 	draw=WID(drawingarea1);
 
 	GUI_RGBDisplay((uint8_t *)rgbbuffer, w,h, (void *)draw);
-	
+/*	
 	draw=WID(histogram);
 	GUI_RGBDisplay((uint8_t *)bargraph, 256,256, (void *)draw);
-	
+*/	
 	draw=WID(drawingarea_histin);
 	GUI_RGBDisplay((uint8_t *)histogram, 256,128, (void *)draw);
 	
@@ -405,31 +378,36 @@ gboolean draw (void)
 
 void read ( void)
 {
-	SPIN_GET(0,spinbutton1);
-	SPIN_GET(1,spinbutton2);
-	SPIN_GET(2,spinbutton3);
-	SPIN_GET(3,spinbutton4);
-	SPIN_GET(4,spinbutton5);
-	SPIN_GET(5,spinbutton6);
-	SPIN_GET(6,spinbutton7);
-	SPIN_GET(7,spinbutton8);
-	upload();
+uint32_t g;
+
+        gfloat sample[256];
+        gtk_curve_get_vector(GTK_CURVE(WID(curve1)),256,sample);
+        for(int i=0;i<256;i++)
+                {
+                        if(sample[i]<0) g=0;
+                        else if(sample[i]>255) g=255;
+                                else g=(uint32_t)sample[i];
+                        scaler[i]=g;
+                      //  printf("%u %u\n",i,scaler[i]);
+                }
 }
 
 void upload(void)
 {
-	SPIN_SET(0,spinbutton1);
-	SPIN_SET(1,spinbutton2);
-	SPIN_SET(2,spinbutton3);
-	SPIN_SET(3,spinbutton4);
-	SPIN_SET(4,spinbutton5);
-	SPIN_SET(5,spinbutton6);
-	SPIN_SET(6,spinbutton7);
-	SPIN_SET(7,spinbutton8);
-	
+#define SCALING 1
+gfloat g;
+
+        gfloat sample[256];
+        
+        for(int i=0;i<256/SCALING;i++)
+                {
+                       
+                       sample[i]=scaler[i*SCALING];
+                }
+        gtk_curve_set_vector(GTK_CURVE(WID(curve1)),256/SCALING,sample);
+        //gtk_curve_set_curve_type(GTK_CURVE(WID(curve1)),GTK_CURVE_TYPE_LINEAR);
+
 }
-
-
 GtkWidget*
 create_dialog1 (void)
 {
@@ -437,30 +415,13 @@ create_dialog1 (void)
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox1;
   GtkWidget *hbox2;
-  GtkWidget *histogram;
-  GtkWidget *frame1;
-  GtkWidget *vbox2;
-  GtkObject *spinbutton1_adj;
-  GtkWidget *spinbutton1;
-  GtkObject *spinbutton2_adj;
-  GtkWidget *spinbutton2;
-  GtkObject *spinbutton3_adj;
-  GtkWidget *spinbutton3;
-  GtkObject *spinbutton4_adj;
-  GtkWidget *spinbutton4;
-  GtkObject *spinbutton5_adj;
-  GtkWidget *spinbutton5;
-  GtkObject *spinbutton6_adj;
-  GtkWidget *spinbutton6;
-  GtkObject *spinbutton7_adj;
-  GtkWidget *spinbutton7;
-  GtkObject *spinbutton8_adj;
-  GtkWidget *spinbutton8;
-  GtkWidget *label1;
+  GtkWidget *curve1;
+  GtkWidget *vseparator1;
   GtkWidget *vbox3;
   GtkWidget *drawingarea_histin;
   GtkWidget *drawingarea_histout;
   GtkWidget *hbox1;
+  GtkWidget *buttonReset;
   GtkWidget *buttonCancel;
   GtkWidget *buttonApply;
   GtkWidget *button3;
@@ -470,6 +431,7 @@ create_dialog1 (void)
 
   dialog1 = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (dialog1), _("Equalizer"));
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -482,71 +444,14 @@ create_dialog1 (void)
   gtk_widget_show (hbox2);
   gtk_box_pack_start (GTK_BOX (vbox1), hbox2, TRUE, TRUE, 0);
 
-  histogram = gtk_drawing_area_new ();
-  gtk_widget_show (histogram);
-  gtk_box_pack_start (GTK_BOX (hbox2), histogram, FALSE, FALSE, 0);
-  gtk_widget_set_size_request (histogram, 100, 100);
+  curve1 = gtk_curve_new ();
+  gtk_widget_show (curve1);
+  gtk_box_pack_start (GTK_BOX (hbox2), curve1, FALSE, FALSE, 0);
+  gtk_curve_set_range (GTK_CURVE (curve1), 0, 1, 0, 1);
 
-  frame1 = gtk_frame_new (NULL);
-  gtk_widget_show (frame1);
-  gtk_box_pack_start (GTK_BOX (hbox2), frame1, TRUE, TRUE, 0);
-
-  vbox2 = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox2);
-  gtk_container_add (GTK_CONTAINER (frame1), vbox2);
-
-  spinbutton1_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
-  spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 0);
-  gtk_widget_show (spinbutton1);
-  gtk_box_pack_start (GTK_BOX (vbox2), spinbutton1, FALSE, FALSE, 0);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton1), TRUE);
-
-  spinbutton2_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
-  spinbutton2 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton2_adj), 1, 0);
-  gtk_widget_show (spinbutton2);
-  gtk_box_pack_start (GTK_BOX (vbox2), spinbutton2, FALSE, FALSE, 0);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton2), TRUE);
-
-  spinbutton3_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
-  spinbutton3 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton3_adj), 1, 0);
-  gtk_widget_show (spinbutton3);
-  gtk_box_pack_start (GTK_BOX (vbox2), spinbutton3, FALSE, FALSE, 0);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton3), TRUE);
-
-  spinbutton4_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
-  spinbutton4 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton4_adj), 1, 0);
-  gtk_widget_show (spinbutton4);
-  gtk_box_pack_start (GTK_BOX (vbox2), spinbutton4, FALSE, FALSE, 0);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton4), TRUE);
-
-  spinbutton5_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
-  spinbutton5 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton5_adj), 1, 0);
-  gtk_widget_show (spinbutton5);
-  gtk_box_pack_start (GTK_BOX (vbox2), spinbutton5, FALSE, FALSE, 0);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton5), TRUE);
-
-  spinbutton6_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
-  spinbutton6 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton6_adj), 1, 0);
-  gtk_widget_show (spinbutton6);
-  gtk_box_pack_start (GTK_BOX (vbox2), spinbutton6, FALSE, FALSE, 0);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton6), TRUE);
-
-  spinbutton7_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
-  spinbutton7 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton7_adj), 1, 0);
-  gtk_widget_show (spinbutton7);
-  gtk_box_pack_start (GTK_BOX (vbox2), spinbutton7, FALSE, FALSE, 0);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton7), TRUE);
-
-  spinbutton8_adj = gtk_adjustment_new (1, -255, 255, 1, 10, 10);
-  spinbutton8 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton8_adj), 1, 0);
-  gtk_widget_show (spinbutton8);
-  gtk_box_pack_start (GTK_BOX (vbox2), spinbutton8, FALSE, FALSE, 0);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton8), TRUE);
-
-  label1 = gtk_label_new (_("Settings"));
-  gtk_widget_show (label1);
-  gtk_frame_set_label_widget (GTK_FRAME (frame1), label1);
-  gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
+  vseparator1 = gtk_vseparator_new ();
+  gtk_widget_show (vseparator1);
+  gtk_box_pack_start (GTK_BOX (hbox2), vseparator1, FALSE, FALSE, 0);
 
   vbox3 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox3);
@@ -555,6 +460,7 @@ create_dialog1 (void)
   drawingarea_histin = gtk_drawing_area_new ();
   gtk_widget_show (drawingarea_histin);
   gtk_box_pack_start (GTK_BOX (vbox3), drawingarea_histin, TRUE, TRUE, 0);
+  gtk_widget_set_size_request (drawingarea_histin, 10, -1);
 
   drawingarea_histout = gtk_drawing_area_new ();
   gtk_widget_show (drawingarea_histout);
@@ -563,6 +469,10 @@ create_dialog1 (void)
   hbox1 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox1);
   gtk_box_pack_start (GTK_BOX (vbox1), hbox1, FALSE, TRUE, 0);
+
+  buttonReset = gtk_button_new_from_stock ("gtk-clear");
+  gtk_widget_show (buttonReset);
+  gtk_box_pack_start (GTK_BOX (hbox1), buttonReset, FALSE, FALSE, 0);
 
   buttonCancel = gtk_button_new_from_stock ("gtk-cancel");
   gtk_widget_show (buttonCancel);
@@ -594,22 +504,13 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, hbox2, "hbox2");
-  GLADE_HOOKUP_OBJECT (dialog1, histogram, "histogram");
-  GLADE_HOOKUP_OBJECT (dialog1, frame1, "frame1");
-  GLADE_HOOKUP_OBJECT (dialog1, vbox2, "vbox2");
-  GLADE_HOOKUP_OBJECT (dialog1, spinbutton1, "spinbutton1");
-  GLADE_HOOKUP_OBJECT (dialog1, spinbutton2, "spinbutton2");
-  GLADE_HOOKUP_OBJECT (dialog1, spinbutton3, "spinbutton3");
-  GLADE_HOOKUP_OBJECT (dialog1, spinbutton4, "spinbutton4");
-  GLADE_HOOKUP_OBJECT (dialog1, spinbutton5, "spinbutton5");
-  GLADE_HOOKUP_OBJECT (dialog1, spinbutton6, "spinbutton6");
-  GLADE_HOOKUP_OBJECT (dialog1, spinbutton7, "spinbutton7");
-  GLADE_HOOKUP_OBJECT (dialog1, spinbutton8, "spinbutton8");
-  GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
+  GLADE_HOOKUP_OBJECT (dialog1, curve1, "curve1");
+  GLADE_HOOKUP_OBJECT (dialog1, vseparator1, "vseparator1");
   GLADE_HOOKUP_OBJECT (dialog1, vbox3, "vbox3");
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea_histin, "drawingarea_histin");
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea_histout, "drawingarea_histout");
   GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonReset, "buttonReset");
   GLADE_HOOKUP_OBJECT (dialog1, buttonCancel, "buttonCancel");
   GLADE_HOOKUP_OBJECT (dialog1, buttonApply, "buttonApply");
   GLADE_HOOKUP_OBJECT (dialog1, button3, "button3");
@@ -617,7 +518,7 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, drawingarea1, "drawingarea1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
 
-  gtk_widget_grab_default (buttonApply);
+  //gtk_widget_grab_default (buttonApply);
   return dialog1;
 }
 
