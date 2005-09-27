@@ -115,7 +115,8 @@ OneTrack::~OneTrack()
 }
  uint8_t     OneTrack::addData(uint8_t *data,uint32_t len)
 {
-    if(len+index>limit) grow();
+    while(len+index>limit) grow();
+    
     memcpy(base+index,data,len);
     index+=len;
     return 1;   
