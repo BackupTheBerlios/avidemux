@@ -521,7 +521,7 @@ VF_FILTERS new_filter (void)
   LOOK(6);
   LOOK(7);
 
-  gtk_widget_set_size_request (dialog2, 600, 600);
+  gtk_widget_set_size_request (dialog2, -1, 520);
   int current_tree=-1;
   for (uint32_t i = 0; i < nb_video_filter; i++)
     {
@@ -555,12 +555,15 @@ VF_FILTERS new_filter (void)
         gtk_tree_view_columns_autosize(GTK_TREE_VIEW(trees[i]));
 
         renderers[i] = gtk_cell_renderer_text_new ();
+        GValue ypad = {0,};
+        g_value_init (&ypad, G_TYPE_INT);
+        g_value_set_int (&ypad, 12);
+        g_object_set_property(G_OBJECT(renderers[i]), "ypad", &ypad);
         columns[i] = gtk_tree_view_column_new_with_attributes ("", renderers[i],
                                                       "markup", (GdkModifierType) 0,
                                                       NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (trees[i]), columns[i]);
 
-        gtk_tree_view_column_set_spacing(columns[i],26);
         gtk_signal_connect (GTK_OBJECT (trees[i]),
                       "row-activated",
                       GTK_SIGNAL_FUNC (on_action_double_click),
