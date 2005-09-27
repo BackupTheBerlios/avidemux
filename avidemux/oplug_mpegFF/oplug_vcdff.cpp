@@ -401,7 +401,7 @@ switch(mux)
 			ret=1;
 finish:
 			delete encoding;
-			GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
+//			GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
 		 	end();
 			if(file)
 			{
