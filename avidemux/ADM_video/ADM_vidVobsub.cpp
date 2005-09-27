@@ -179,7 +179,9 @@ uint32_t top=0,bottom=0;
          *first=0;
          *last=oy-1;   
 #else
-        while(top<oy && !_original->isDirty(top)) top++;
+        if(oy>_original->_height) oy=_original->_height-1;
+
+        while(top<oy && !_original->isDirty(top) ) top++;
         
         if(top==oy)
         {
@@ -568,9 +570,18 @@ uint8_t ADMVideoVobSub::Palettte2Display( void )
         
         // Search the 1st/last non null line
         uint32_t top=0,bottom=0;
+
+        if(oy>_original->_height) oy=_original->_height-1;
+
         while(top<oy && !_original->isDirty(top)) top++;
         
         bottom=_original->_height-1;
+        if(top==bottom)
+        {
+                printf("Empty sub ?");
+                return 0;
+        }
+        
         while(bottom && !_original->isDirty(bottom)) bottom--;
         
         // If true it means we have 2 subs, one on top, one on bottom
