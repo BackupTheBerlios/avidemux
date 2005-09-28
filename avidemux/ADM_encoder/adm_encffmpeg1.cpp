@@ -237,7 +237,7 @@ uint8_t	EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 				_settings.override_ratecontrol=0;
 				_codec->setConfig(&_settings);			
 				flag1=1;
-     				_codec->init (_param.bitrate,_fps,flag1);
+     				_codec->init (_param.bitrate*1000,_fps,flag1);
 
       				break;
     case COMPRESS_2PASS:
