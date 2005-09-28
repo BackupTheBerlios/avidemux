@@ -1768,6 +1768,11 @@ A_saveAudioDecodedTest (char *name)
   sampleCurrent=0;
   gauge=0;
   
+  if( frameStart == frameEnd ){
+     /* JSC: we will write some bytes, but nobody should expect useful data */
+     GUI_Error_HIG("No frames to encode","Please check markers. Is \"A>\" == \">B\"?");
+  }
+
   while ((sampleCurrent<sampleTarget))
     {
       if(!saveFilter->getPacket(outbuffer + gauge,&len,&samples))
@@ -1779,7 +1784,8 @@ A_saveAudioDecodedTest (char *name)
       gauge += len;
       sampleCurrent+=samples;
       // update GUI                   
-	if (work->update (sampleCurrent>>10, sampleTarget>>10))	// abort request ?
+	// JSC: if "A>" == ">B" we will get >100% here => assert in work->update()
+	if (work->update ((sampleCurrent>>10 > sampleTarget>>10 ? sampleTarget>>10 : sampleCurrent>>10), sampleTarget>>10))	// abort request ?
 	    break;;
       if (gauge > OUTCHUNK)	// either out buffer is full	
 	{

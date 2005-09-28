@@ -340,7 +340,10 @@ DIA_encoding		*encoding;
    	incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
 	_total=incoming->getInfo()->nb_frames;
 	_fps1000=incoming->getInfo()->fps1000;
-	if(!_total) return 0;
+	if(!_total){
+		GUI_Error_HIG("No frames to encode","Please check markers. Is \"A>\" == \">B\"?");
+		return 0;
+	}
 
 	printf("Br:%d, qz:%d\n",bitrate,qz);
 	if(!_audio)
