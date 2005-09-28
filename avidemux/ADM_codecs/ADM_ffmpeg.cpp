@@ -440,7 +440,8 @@ ffmpegEncoderCBR::init (uint32_t val, uint32_t fps1000)
 /*  _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;*/
 _context->time_base= (AVRational){1000,fps1000};
-  _context->bit_rate = _br*1000;
+ 
+ _context->bit_rate = _br;
 
   printf ("--> br: %lu", _br);
 
