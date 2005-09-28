@@ -440,7 +440,7 @@ ffmpegEncoderCBR::init (uint32_t val, uint32_t fps1000)
 /*  _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;*/
 _context->time_base= (AVRational){1000,fps1000};
-  _context->bit_rate = _br;
+  _context->bit_rate = _br*1000;
 
   printf ("--> br: %lu", _br);
 
@@ -455,18 +455,19 @@ uint8_t
   int32_t sz = 0;
 
   encodePreamble (in->data);
-  _context->bit_rate = _br;
+  _context->bit_rate = _br; // ???
 
 
   if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
     return 0;
   _last_coded_frame=_context->real_pict_num;
   *len = (uint32_t) sz;
-  res.out_quantizer =
-    (int) floor (_context->coded_frame->quality / (float) FF_QP2LAMBDA);
   if (flags)
-//               if(_context->key_frame)
     *flags = frameType ();
+
+  res.total_bits = sz * 8;      // bytes -> bits
+  res.out_quantizer = (int) floor (_context->coded_frame->quality / (float) FF_QP2LAMBDA);
+
   return 1;
 
 }
