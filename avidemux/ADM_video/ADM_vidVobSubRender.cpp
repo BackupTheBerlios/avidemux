@@ -238,11 +238,13 @@ uint8_t  command;
         _subSize=0;
 uint32_t pts;
 uint64_t posA,posR;
+ uint32_t odd,even;
         _parser->getPos(&posA,&posR);
         // Read data
 aprintf("**Cur:A:%llx R:%llx next:%llx\n",posA,posR,_vobSubInfo->lines[idx+1].fileOffset);        
 while(posA<_vobSubInfo->lines[idx+1].fileOffset)
 {        
+        odd=even=0;
         aprintf("**Cur: A:%llx R:%llx next:%llx\n",posA,posR,_vobSubInfo->lines[idx+1].fileOffset);
         _subSize=_parser->read16i();
         if(!_subSize)
@@ -371,20 +373,10 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
                                 case 06: // RLE offset 
                                         // 2*16 bits : odd offset, even offset
                                         {
-                                        uint32_t odd,even;
+                                       
                                         odd=readword();                                        
                                         even=readword();
-                                        if(_original) 
-                                                {
-                                                _original->clear();
-                                                decodeRLE(odd,0,even);
-                                                decodeRLE(even,1,0);
-                                                if(!_vobSubInfo->hasPalette)
-                                                {
-                                                    // guess palette   
-                                                    guessPalette();
-                                                }
-                                                }
+ 
                                         }
                                         break;   
                                 default:                                                     
@@ -395,7 +387,20 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
                 }// end while
         }
         _parser->getPos(&posA,&posR);
-  }     
+        /*****/
+        if(_original && odd && even) 
+        {
+                _original->clear();
+                decodeRLE(odd,0,even);
+                decodeRLE(even,1,0);
+                if(!_vobSubInfo->hasPalette)
+                {
+                        // guess palette   
+                        guessPalette();
+                }
+        }
+        /*****/
+  }   // Next picture  
   return 1;
 }
 /*

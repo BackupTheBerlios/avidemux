@@ -58,7 +58,7 @@
 
 extern uint8_t DIA_vobsub(vobSubParam *param);
 
-static FILTER_PARAM vobsubParam={1,{"subname"}};
+static FILTER_PARAM vobsubParam={3,{"subname","index","subShift"}};
 //*************************************************************
 //
 
@@ -188,6 +188,7 @@ uint32_t top=0,bottom=0;
                 top=bottom=0;   // Empty bitmap ?
                 *first=top;
                 *last=bottom;
+                printf("Empry bitmap\n");
                 return NULL; 
         }
         bottom=oy-1;
