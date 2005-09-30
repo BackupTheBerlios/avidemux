@@ -934,6 +934,7 @@ uint32_t i,j,cur;
 			val=SttsC[0];
 		
 		}
+                if(count>nbCo) count=nbCo;
 		printf("created %u blocks\n",count);
 		// update timestamps on block
 		double dur=val;
