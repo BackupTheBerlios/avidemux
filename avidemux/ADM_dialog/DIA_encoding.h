@@ -11,12 +11,16 @@ class DIA_encoding
 {
 private:
 		Clock	clock;
-		uint32_t  _lastTime;
-		uint32_t  _lastFrame;
+		uint32_t  _lastTime;            // Start time used to calc. ETA
+		uint32_t  _lastFrame;           // Start frame used to calc. ETA
+		uint32_t  _nextSampleStartTime; // Next start time to be used for ETA
+		uint32_t  _nextSampleStartFrame; // Next start frame for ETA
+		uint32_t  _nextUpdate;           // Next time to update the GUI
 		uint32_t _fps_average;
 		uint64_t _totalSize;
 		uint64_t _audioSize;
 		uint64_t _videoSize;
+		uint32_t _bitrate_sum;           // Sum of bitrate array
 		uint32_t _bitrate[MAX_BR_SLOT];
 		uint32_t _roundup;
 		uint32_t _current;

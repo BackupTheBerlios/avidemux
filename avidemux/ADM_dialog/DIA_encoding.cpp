@@ -87,6 +87,7 @@ void DIA_encoding::setFps(uint32_t fps)
         ADM_assert(_roundup<MAX_BR_SLOT);
 	for(uint32_t i=0;i<_roundup;i++)
 		_bitrate[i]=0;
+  _bitrate_sum=0;
 	
 }
 gint on_destroy_abort(GtkObject * object, gpointer user_data)
@@ -164,6 +165,9 @@ void DIA_encoding::setContainer(const char *container)
 void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 {
 	uint32_t tim;
+#define  ETA_SAMPLE_PERIOD 60000 //Use last n millis to calculate ETA
+#define  GUI_UPDATE_RATE 1000  
+  static uint32_t _lastnb=0;
 
 	   ADM_assert(dialog);
 	   sprintf(string,"%lu/%lu",nb,total);
@@ -173,63 +177,67 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
            //
            //
     
-           if(nb==0) // restart ?
+           if(nb < _lastnb || _lastnb == 0) // restart ?
            {
+             _lastnb = nb;
                                        
 					clock.reset();
        					_lastTime=clock.getElapsedMS();;
        					_lastFrame=0;
        					_fps_average=0;
+
+                _nextUpdate = _lastTime + GUI_UPDATE_RATE;
+                _nextSampleStartTime=_lastTime + ETA_SAMPLE_PERIOD;
+                _nextSampleStartFrame=0;
                                         if(tray)
                                                 tray->setPercent(0);
 					  UI_purge();
 					  return;
 	  }
+             _lastnb = nb;
 
            tim=clock.getElapsedMS();;
 	//   printf("%lu / %lu\n",tim,_lastTime);
 	   if(_lastTime > tim) return;
-	   if( tim-_lastTime < 1000) return ; // refresh every 3  seconds
+	   if( tim < _nextUpdate) return ; 
+     _nextUpdate = tim+GUI_UPDATE_RATE;
 
            if(tim)
            {
 	   	double d;
-		uint32_t fps;
 
 	   	// compute fps
 		uint32_t deltaFrame, deltaTime;
 		deltaTime=tim-_lastTime;
 		deltaFrame=nb-_lastFrame;
-		if(deltaTime>500)
-		{
-			d=deltaTime;
-			d=1/d;
-			d*=deltaFrame;
-			d*=1000.;
-			fps=(uint32_t)floor(d);
-			sprintf(string,"%lu",fps);
+
+			sprintf(string,"%lu",(uint32_t)( deltaFrame*1000.0 / deltaTime ));
    			gtk_label_set_text(GTK_LABEL(WID(label_fps)),string);
                         
 
-		}
 
 
-	   	uint32_t sectogo,secdone;
 		uint32_t   hh,mm,ss;
 
-	  				secdone = tim;
-			 	  	d = secdone;
-	  				d /= nb;
-       					d*=total;
-	  				d -= secdone;
-					_lastTime=tim;
-					tim=(uint32_t)floor(d);
-					ms2time(tim,&hh,&mm,&ss);
+          double framesLeft=(total-nb);
+					ms2time((uint32_t)floor(0.5+deltaTime*framesLeft/deltaFrame),&hh,&mm,&ss);
 					sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
 					gtk_label_set_text(GTK_LABEL(WID(label_eta)),string);
 
               }
 
+           // Check if we should move on to the next sample period
+          if (tim >= _nextSampleStartTime + ETA_SAMPLE_PERIOD ) {
+            _lastTime=_nextSampleStartTime;
+            _lastFrame=_nextSampleStartFrame;
+            _nextSampleStartTime=tim;
+            _nextSampleStartFrame=0;
+          } else if (tim >= _nextSampleStartTime && _nextSampleStartFrame == 0 ) {
+            // Store current point for use later as the next sample period.
+            //
+            _nextSampleStartTime=tim;
+            _nextSampleStartFrame=nb;
+          }
 		// update progress bar
 		 float f=nb;
 		 f=f/total;
@@ -240,7 +248,6 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 		sprintf(string,"Done : %02d%%",(int)(100*f));
 		   gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
 		
-		_lastFrame=nb;
 
 	   	UI_purge();
 
@@ -273,11 +280,14 @@ void DIA_encoding::feedFrame(uint32_t size)
 	ADM_assert(dialog);
 	_totalSize+=size;
 	_videoSize+=size;
+
+  _bitrate_sum += (size - _bitrate[_current]); //Subtract old value and add new one to total
+
 	_bitrate[_current++]=size;
 	_current%=_roundup;
-	br=0;
-	for(uint32_t i=0;i<_roundup;i++)
-		br+=_bitrate[i];
+
+  br=_bitrate_sum;
+
 	br=(br*8)/1000;		
 	setBitrate(br);
 	setSize(_totalSize>>20);
