@@ -99,6 +99,7 @@ static void call_videocodec(char *p) ;
 static void call_videoconf(char *p) ;
 static int searchReactionTable(char *string);
 static void call_setPP(char *v,char *s);
+static void call_v2v(char *a,char *b,char *c);
 
 extern void updateLoaded(void );
 extern void A_requantize2( float percent, uint32_t quality, char *out_name );
@@ -116,6 +117,7 @@ extern void A_saveWorkbench (char *name);
 extern uint8_t A_rebuildKeyFrame (void);
 extern uint8_t A_setContainer(const char *cont);
 uint8_t scriptAddVar(char *var,char *value);
+extern uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo);
 //
 static int call_bframe(void);
 static int call_packedvop(void);
@@ -201,6 +203,7 @@ AUTOMATON reaction_table[]=
 		{"video-conf",		1	,"set video codec conf (cq=q|cbr=br|2pass=size)[,mbr=br][,matrix=(0|1|2|3)]",				call_videoconf},
 		{"reuse-2pass-log",	0	,"reuse 2pass logfile if it exists",	set_reuse_2pass_log},
 		{"set-pp",		2	,"set post processing default value, value(1=hdeblok|2=vdeblock|4=dering) and strength (0-5)",	(one_arg_type )	call_setPP},
+                {"vobsub",              3       ,"Create vobsub file (vobfile vosubfile ifofile)",  (one_arg_type ) call_v2v},
 
 		{"autosplit",		1	,"split every N MBytes",call_autosplit},
 		{"requant",		3	,"requantize mpeg2 : percent quality[0..3] output_name",
@@ -702,5 +705,9 @@ char *script_getVar(char *in, int *r)
 
 void set_reuse_2pass_log(char *p){
    prefs->set(FEATURE_REUSE_2PASS_LOG,1);
+}
+void call_v2v(char *a,char *b,char *c)
+{
+         ADM_vob2vobsub(a,b,c); //char *nameVob, char *nameVobSub, char *nameIfo);
 }
 //EOF
