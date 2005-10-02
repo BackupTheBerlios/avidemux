@@ -80,6 +80,7 @@ protected:
             uint32_t    nbLines;
             int         runCode;
             uint64_t    currentPTS;
+            int         firstOne;
             
             uint8_t     addData(uint8_t *data,uint32_t len);
             uint8_t     addLine(uint64_t pts,uint32_t start);
@@ -101,6 +102,7 @@ OneTrack::OneTrack(void)
     lines=new oneLine[MAX_LINE];
     nbLines=0;  
     runCode=0;
+    
 }
 uint8_t OneTrack::setLang(char *lang)
 {
@@ -137,6 +139,7 @@ uint8_t     OneTrack::grow(void)
     if(nbLines>=MAX_LINE) return 0;
     lines[nbLines].pts=pts;
     lines[nbLines].start=start;
+        
     nbLines++;
     return 1;   
 }
@@ -158,16 +161,20 @@ uint8_t     OneTrack::dump(uint32_t number,FILE *fdIdx, FILE *fdSub,uint32_t *ou
     fprintf(fdIdx,"# alt: English\n");
     fprintf(fdIdx,"# Vob/Cell ID: 1, 1 (PTS: 0)\n");
     (*out)++;
-    for(int i=0;i<nbLines;i++)
+    for(int i=1;i<nbLines;i++) // We shift PTS & position by 1 to workaround the display bug
     {   
         if(lines[i].pts!=ADM_NO_PTS)
         {     
             timestamp=(uint32_t)floor(lines[i].pts/90.);
             ms2time(timestamp,&hh,&mm,&ss,&ms);
-            position=lines[i].start;
+            position=lines[i-1].start;
             //printf("Stream :%d position :%x offset:%x total:%x\n",i,position,original,original+position);
             position+=original;          
             fprintf(fdIdx,"timestamp: %02d:%02d:%02d:%03d, filepos: %08x\n",hh,mm,ss,ms,position); 
+        }
+        else
+        {
+                printf("Sub %d, skipped line at %d\n",number,i);
         }
     }
     return 1;
@@ -178,48 +185,21 @@ uint32_t padding;
     
     if(!runCode) // new line
     {
-#ifndef ADM_VOBSUB_NO_PADDING        
-        if(nbLines) // If not the 1st, padd to have a boundary of 0x800
-        {
-                padding=index+PADDER_SIZE-1;
-                padding&=0xffffffff^(PADDER_SIZE-1);
-                padding-=index;
-                if(limit<padding+index) grow();
-                if(padding<6)
-                {
-                    memset(base+index,padding,0xff) ;
-                    index+=padding; 
-                }    
-                else
-                {
-                     padding-=6;
-                     base[index+0]=0;
-                     base[index+1]=0;
-                     base[index+2]=1;
-                     base[index+3]=0xbe;
-                     base[index+4]=padding>>8;
-                     base[index+5]=padding&0xff;
-                     index+=6;
-                     memset(base+index,0xff,padding);
-                     index+=padding;   
-                    
-                }         
-                
-   
-        }
-#endif        
-        currentPTS=ADM_NO_PTS;
+        currentPTS=pts;
         runCode=twofirst-usableSize;
         addLine(pts,index);
         addData(data,size);
         if(runCode<0) runCode=0;
-        currentPTS=pts;
         return 1; 
     }
     if(currentPTS==ADM_NO_PTS && pts!=ADM_NO_PTS)
         currentPTS=lines[nbLines-1].pts=pts;
     runCode-=usableSize;
-    if(runCode<0) runCode=0;
+    if(runCode<0)
+    {
+         printf("Overrun %d\n",runCode);
+         runCode=0;
+    }
     addData(data,size);
     return 1;
     
