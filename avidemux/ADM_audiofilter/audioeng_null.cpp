@@ -38,9 +38,10 @@
     
     
 AVDMProcessAudio_Null::AVDMProcessAudio_Null
-(AVDMGenericAudioStream * instream, uint32_t time_offset, uint32_t length):
+(AVDMGenericAudioStream * instream, uint32_t time_offset, uint32_t duration):
 AVDMBufferedAudioStream    (instream)
 {
+double dur;
     _wavheader = new WAVHeader;
 
     memcpy(_wavheader, _instream->getInfo(), sizeof(WAVHeader));
@@ -57,8 +58,12 @@ AVDMBufferedAudioStream    (instream)
     strcpy(_name, "PROC:NULL");
     _instream->goToTime(time_offset);
     _start_time = time_offset;
-    _size = length;
-    _length = length;
+
+    dur=duration;
+    dur=dur*_wavheader->byterate*1.1;
+    dur=dur/1000;
+    _size = (uint32_t)dur;
+    _length = (uint32_t)dur;
 
 };
 

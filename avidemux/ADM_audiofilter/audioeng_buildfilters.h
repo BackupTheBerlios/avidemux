@@ -20,12 +20,12 @@ AVDMProcessAudioStream *buildFakeAudioFilter(AVDMGenericAudioStream *currentaudi
 				uint32_t starttime, uint32_t size);
 
  AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t size);
+				uint32_t starttime, uint32_t duration);
 AVDMProcessAudioStream *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t size);
+				uint32_t starttime, uint32_t duration);
 
 AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t size);				
+				uint32_t starttime, uint32_t duration);				
 
 void deleteAudioFilter(void);								
 void audioFilter_configureFilters( void );

@@ -479,7 +479,7 @@ void audioCodecConfigure( void )
 
 
 AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t size)
+				uint32_t starttime, uint32_t duration)
 {
 
     AVDMProcessAudioStream *firstFilter = NULL;
@@ -504,11 +504,11 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 	if(audioFilmConv==FILMCONV_FILM2PAL)	
 	{
 		double d;
-		d=size;
+		d=duration;
 		d*=25000;
 		d/=23976;
-		size=(uint32_t)floor(d);
-		size=(size+1)&0xfffffffe;
+		duration=(uint32_t)floor(d);
+		duration=(duration+1)&0xfffffffe;
 	}
 //_______________________________________________________
     if (audioDelay && audioShift)
@@ -521,7 +521,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
                 if (sstart>=audioDelay) // just seek in the file
                 {
                         firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
-                                            sstart-audioDelay, size);
+                                            sstart-audioDelay, duration);
                         filtercount = 0;
                         lastFilter = firstFilter;
                         filters[filtercount++] = firstFilter;
@@ -530,7 +530,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
                 {
                 
                         firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
-                                            sstart, size);
+                                            sstart, duration);
                         filtercount = 0;
                         lastFilter = firstFilter;
                         filters[filtercount++] = firstFilter;
@@ -546,7 +546,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
       else // no delay
     {
         firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
-                                            starttime, size);
+                                            starttime, duration);
         filtercount = 0;
         lastFilter = firstFilter;
         filters[filtercount++] = firstFilter;
@@ -666,7 +666,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 }
 
 AVDMProcessAudioStream *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t size)
+				uint32_t starttime, uint32_t duration)
 {
 AVDMProcessAudioStream *lastFilter=NULL;
 int32_t sstart;
@@ -680,7 +680,7 @@ int32_t sstart;
                 else
                 {
                         sstart=audioDelay-sstart;
-                        lastFilter = new AVDMProcessAudio_Null(currentaudiostream,0, size);
+                        lastFilter = new AVDMProcessAudio_Null(currentaudiostream,0, duration);
                         filtercount = 0;
                         filters[filtercount++] = lastFilter;
 
@@ -694,7 +694,7 @@ int32_t sstart;
                 }
         }
 
-        lastFilter = new AVDMProcessAudio_Null(currentaudiostream,sstart, size);
+        lastFilter = new AVDMProcessAudio_Null(currentaudiostream,sstart, duration);
         filtercount = 0;
         filters[filtercount++] = lastFilter;
        
@@ -733,14 +733,14 @@ int nb=sizeof(presetDefinition)/sizeof(ADM_PRESET_DEFINITION);
 
 */
 AVDMProcessAudioStream *buildFakeAudioFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t size)
+				uint32_t starttime, uint32_t duration)
 {
 	uint8_t stored_norm;
 	AVDMProcessAudioStream *out;
 		stored_norm=audioNormalizeMode;	// Temporarily disable normalizing
 		
 		audioNormalizeMode=0;
-		out=buildAudioFilter(currentaudiostream,starttime,size);
+		out=buildAudioFilter(currentaudiostream,starttime,duration);
 		audioNormalizeMode=stored_norm;
 		return out;
 }
@@ -749,7 +749,7 @@ AVDMProcessAudioStream *buildFakeAudioFilter(AVDMGenericAudioStream *currentaudi
 */
 
 AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t size)
+				uint32_t starttime, uint32_t duration)
 {
 AVDMProcessAudioStream *lastFilter=NULL;
 
@@ -757,7 +757,7 @@ AVDMProcessAudioStream *lastFilter=NULL;
 	if(!audioProcessMode())
 	{
  			lastFilter = new AVDMProcessAudio_Null(currentaudiostream,
-					    starttime, size);
+					    starttime, duration);
     			filtercount = 0;
     			lastFilter = lastFilter;
     			filters[filtercount++] = lastFilter;
@@ -767,7 +767,7 @@ AVDMProcessAudioStream *lastFilter=NULL;
 
 
 // else we build the full chain
-			buildInternalAudioFilter(currentaudiostream,starttime, size);
+			buildInternalAudioFilter(currentaudiostream,starttime, duration);
 			lastFilter=filters[filtercount-1];
 // and add encoder...
 
