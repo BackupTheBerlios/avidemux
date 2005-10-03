@@ -218,7 +218,7 @@ GenericAviSave::setupAudio (void)
 
 	
       	audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart),
-				  (uint32_t) 0xffffffff);
+				  video_body->getTime (frameEnd-frameStart));
 
 //       if ((audio_filter)->getInfo ()->encoding == WAV_PCM)
 // // 	if (!GUI_Question ("Audio stream is not compressed\n Continue?"))
