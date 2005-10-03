@@ -58,7 +58,7 @@ int ret=0;
 #define VAL_SET(x) gtk_write_entry(WID(entryEntry), x)
 
 		mQ=incoming->qz;
-		mB=incoming->bitrate;
+		mB=incoming->bitrate; // in kbits
 		mS=incoming->finalsize;	
 		mMode=incoming->mode;
 		updateMode();	
@@ -80,13 +80,8 @@ int ret=0;
 				case 0:
 					incoming->mode = COMPRESS_CBR;				      
 		      			value = (uint32_t) gtk_read_entry(WID(entryEntry));
-		      			if (value < 3000)
-			  			value *= 1000;
-		      			if (value > 16 && value < 6000000)
-					{
-			    			incoming->bitrate = value;
-			    			ret = 1;						
-		      			}
+			    		incoming->bitrate = value;
+                                        ret = 1;
 					gtk_label_set_text(GTK_LABEL(WID(label11)),"Bitrate (kbps):");
 					break;
 				case 1:
@@ -250,7 +245,7 @@ uint32_t b;
 	    {
 	    	case COMPRESS_CBR:
 			HIST_SET(0);			
-			b=mB/1000;
+			b=mB;
 			VAL_SET(b);
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
 			gtk_widget_set_sensitive(WID(entryEntry),1);
