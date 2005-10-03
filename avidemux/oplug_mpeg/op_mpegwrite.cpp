@@ -1096,7 +1096,7 @@ AVDMGenericAudioStream *audio=NULL;
 			}
 		}
 	      	audio = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart),
-				  (uint32_t) 0xffffffff);
+				  video_body->getTime (frameEnd-frameStart));
 	}
   	else // copymode
 	{
