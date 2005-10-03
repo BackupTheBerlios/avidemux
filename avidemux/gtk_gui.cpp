@@ -206,7 +206,7 @@ int nw;
     {
         case ACT_V2V:
                                 A_vob2vobsub();
-                                break;
+                                return;
         case ACT_HANDLE_JOB:
                                 GUI_jobs();
                                 return;
@@ -1745,9 +1745,10 @@ A_saveAudioDecodedTest (char *name)
   /*          from begin and end of the audio stream. That was not good :) Now it runs correctly also if you use */
   /*          audio stream with same length then video, therefore is premature ending :) */
 
- 
+
+
 	saveFilter =	buildAudioFilter (currentaudiostream,
-			  video_body->getTime (frameStart), 0xffffffff);
+			  video_body->getTime (frameStart),(uint32_t) video_body->getTime (frameEnd-frameStart) );
    
     	DIA_working *work=new DIA_working("Saving audio");
 
