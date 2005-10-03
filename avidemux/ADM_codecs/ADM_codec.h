@@ -26,6 +26,11 @@
 #define ADM_GMC_ON	2
 #define ADM_VOP_ON	4
 
+/*
+        Bitrate in configuration will always be in **kBITS**
+
+*/
+
   typedef struct _my_ENC_RESULT_
     {
 		int is_key_frame;	// the current frame is encoded as a key frame

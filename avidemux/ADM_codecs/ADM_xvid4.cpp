@@ -542,7 +542,7 @@ int  ret;
 uint8_t xvid4EncoderCBR::init(uint32_t br,uint32_t fps1000, xvid4EncParam *param)
 {
     int xerr;
-    	printf("Using Xvid 4 codec with CBR mode = %lu\n",br);
+    	printf("Using Xvid 4 codec with CBR mode = %lu kbps\n",br);
     	_bitrate=br;
 	_fps1000=fps1000;
 	memcpy(&_param,param,sizeof(_param));
@@ -560,7 +560,7 @@ uint8_t xvid4EncoderCBR::init(uint32_t br,uint32_t fps1000, xvid4EncParam *param
 	plugins[0].param = &single;
 	
 	single.version = XVID_VERSION;
-	single.bitrate = _bitrate;
+	single.bitrate = _bitrate*1000; // Kb->bit
 
 	xvid_enc_create.plugins = plugins;
 	xvid_enc_create.num_plugins = 1;

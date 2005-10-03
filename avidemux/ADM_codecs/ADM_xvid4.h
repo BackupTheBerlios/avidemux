@@ -110,7 +110,7 @@
   {
      	protected :
       				
-             		uint32_t _bitrate;              
+             		uint32_t _bitrate;     // In kBits!         
 	
           public :
           		xvid4EncoderCBR(uint32_t width,uint32_t height) : xvid4Encoder(width,height)
