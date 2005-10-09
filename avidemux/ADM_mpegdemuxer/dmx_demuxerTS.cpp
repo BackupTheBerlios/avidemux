@@ -224,6 +224,7 @@ uint32_t mx;
 uint8_t         dmx_demuxerTS::sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts,uint64_t *dts)
 {
 uint32_t val,hnt;
+retry:
          *r=0;
 
                 val=0;
@@ -268,6 +269,13 @@ uint32_t val,hnt;
                 {       // pick what is needed from oldPesStart etc...
                         // since the beginning in the previous packet
                         uint32_t left=4-_pesBufferIndex;
+                                 if(left>_oldPesLen)
+                                 { // previous Packet which len is very shoty
+                                   // Ignore
+                                   _pesBufferIndex=0;
+                                   printf("Ignoring too short packet");
+                                   goto retry;
+                                 }
                                  left=_oldPesLen-left;
 #if 0
                                  printf("Next packet : %I64X Len :%lu, using previous packet %I64X len:%u as pos=%lu\n",
