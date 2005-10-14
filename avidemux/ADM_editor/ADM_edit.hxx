@@ -150,6 +150,7 @@ class ADM_Composer
                                                 uint8_t         tryIndexing(char *name);
 
   public:
+                                                uint8_t hasVBRVideos(void);
                                                 uint8_t addSegment(uint32_t source,uint32_t start, uint32_t nb);
                                                 uint8_t deleteAllSegments(void);
   						uint8_t	activateCache( void ){ _cached=1;_lastseg=0xffffff;return 1;}

@@ -638,6 +638,17 @@ _VIDEOS *vid;
 	}
 	return 1;
 }
+/*
+        If one of the videos has VBR audio we handle the whole editor audio has VBR
+        If it is CBR, it is not harmful 
+        and it avoid loosing the VBR info in case we do VBR time map upon loading
+*/
+uint8_t ADM_Composer::hasVBRVideos(void)
+{
+        for(int i=0;i<_nb_video;i++)
+                if(_videos[i]._isAudioVbr) return 1;
+        return 0;
+}
 /**
 	Set decoder settings (post process/swap u&v...)
 	for the segment referred by frame

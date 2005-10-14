@@ -73,7 +73,11 @@ AVDMEditAudioStream::AVDMEditAudioStream (ADM_Composer * father)
   else
     _codec = getAudioCodec (0);
   ADM_assert (_codec);
-  _vbr = 0;
+  _vbr = _father->hasVBRVideos();
+// See if one of the sons if VBR
+//_isAudioVbr
+
+  
 }
 
 // Seek....
