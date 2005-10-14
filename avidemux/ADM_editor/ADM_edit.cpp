@@ -421,14 +421,7 @@ float duration;
 
   _videos[_nb_video]._isAudioVbr=0;
 //****************************
-   if(_wavinfo)
-        if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
-        {
-                if(GUI_Confirmation_HIG("Build Time Map", "Build VBR time map?", VBR_MSG))
-                {
-                _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
-                }
-        }
+   
 
   // next one please
 	_nb_video++;
@@ -606,7 +599,18 @@ TryAgain:
 				}
 		printf(" End of B-frame check\n");
 		}
-
+// In case of vop packed
+// we will switch audio stream and loose the VBR information
+// so we do it afterward
+// We already increase _nb_video
+        if(_wavinfo)
+        if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
+        {
+                if(GUI_Confirmation_HIG("Build Time Map", "Build VBR time map?", VBR_MSG))
+                {
+                _videos[_nb_video-1]._isAudioVbr=_videos[_nb_video-1]._audiostream->buildAudioTimeLine ();
+                }
+        }
   return 1;
 }
 /**
