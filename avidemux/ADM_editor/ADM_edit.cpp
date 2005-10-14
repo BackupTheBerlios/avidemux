@@ -424,6 +424,15 @@ float duration;
    
 
   // next one please
+        if(_wavinfo)
+        if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
+        {
+                if(GUI_Confirmation_HIG("Build Time Map", "Build VBR time map?", VBR_MSG))
+                {
+                _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
+                }
+        }
+
 	_nb_video++;
 	_nb_segment++;
 
@@ -571,7 +580,8 @@ TryAgain:
 									}
 								}
 #if  1 //def USE_DIVX
-
+                                                                if(count)
+                                                                        GUI_Info_HIG("Weird", "The unpacking succeedeed but the index is still not up to date.");
 								printf("\n Switching codec...\n");
 								delete vid->decoder;
 								vid->decoder=getDecoderVopPacked(info.fcc, info.width,info.height,0,NULL);
@@ -599,18 +609,6 @@ TryAgain:
 				}
 		printf(" End of B-frame check\n");
 		}
-// In case of vop packed
-// we will switch audio stream and loose the VBR information
-// so we do it afterward
-// We already increase _nb_video
-        if(_wavinfo)
-        if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
-        {
-                if(GUI_Confirmation_HIG("Build Time Map", "Build VBR time map?", VBR_MSG))
-                {
-                _videos[_nb_video-1]._isAudioVbr=_videos[_nb_video-1]._audiostream->buildAudioTimeLine ();
-                }
-        }
   return 1;
 }
 /**
