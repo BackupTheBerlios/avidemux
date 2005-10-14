@@ -154,6 +154,7 @@ have_mad=yes
 have_divxdecore=yes
 have_divxencore=yes
 have_alsa=yes
+have_esd=yes
 have_xvid=yes
 have_mjpeg=yes
 have_lmpeg3=yes
@@ -349,6 +350,37 @@ AC_MSG_RESULT($have_consticonv)
 
 dnl __________________/OS dep stuff______________
 
+
+dnl
+dnl ESD sound daemon 
+dnl
+AC_ARG_WITH([esd],
+	AC_HELP_STRING([--without-esd], [Force compilation without esd (default: test)]),
+	[with_esd=${withval}], [with_esd=test])
+
+AC_MSG_CHECKING([if esd support is requested])
+AC_MSG_RESULT($with_esd)
+
+have_esd=no
+
+if test "x$with_esd" != "xno"; then
+	AC_MSG_CHECKING(for esd audio support)
+	AC_TRY_COMPILE([
+		#include <esd.h>
+	],[
+		int arg = ESD_BITS16;
+	],[
+		have_esd=yes
+	])
+	if test "x$have_esd" = "xyes"; then
+		AC_CHECK_LIB(esd,esd_close,,have_esd=no,-lesd)
+	fi
+	AC_MSG_RESULT($have_esd)
+
+	if test "x$have_esd" = "xyes"; then
+		AC_DEFINE(USE_ESD,1,[ESD detected])
+	fi
+fi
 
 dnl
 dnl Open Sound System support
@@ -1062,6 +1094,7 @@ echo " Faad2(decoder)      : $have_faad"
 echo " Faac (encoder)      : $have_faac"
 echo " A52/AC3             : $have_ac3"
 echo " FFMPEG              : $have_ff"
+echo " ESD                 : $have_esd"
 echo " aRTs                : $have_arts"
 echo " FreeType            : $have_freetype"
 echo " XML2                : $have_xml2"
