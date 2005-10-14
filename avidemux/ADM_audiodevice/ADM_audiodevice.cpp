@@ -47,6 +47,9 @@
 #include "ADM_audiodevice/ADM_deviceWin32.h"
 #endif
 
+#ifdef USE_ESD
+#include "ADM_deviceEsd.h"
+#endif
 
 #include "gui_action.hxx"
 #include "audio_out.h"
@@ -125,6 +128,7 @@ AUDIO_DEVICE id;
 			case DEVICE_COREAUDIO:
 			case DEVICE_SDL:
 			case DEVICE_WIN32:
+			case DEVICE_ESD:
 			
 						printf("Using real audio device\n");
 						AVDM_switch(id);
@@ -149,8 +153,12 @@ AUDIO_DEVICE id;
 			#ifdef CYG_MANGLING
 			AVDM_switch(DEVICE_WIN32);
 			#else
-			AVDM_switch(DEVICE_DUMMY);
-			printf("\n Using dummy\n");
+                #ifdef USE_ESD
+			        AVDM_switch(DEVICE_ESD);
+                #else
+			        AVDM_switch(DEVICE_DUMMY);
+			        printf("\n Using dummy\n");
+                #endif
 			#endif
 		#endif
 		}
@@ -179,6 +187,12 @@ void AVDM_switch(AUDIO_DEVICE action)
 		  case  DEVICE_OSS :
 								device=new 	 ossAudioDevice;
 								currentDevice=DEVICE_OSS;;
+								break;
+#endif
+#if defined(USE_ESD) && !defined(CYG_MANGLING)
+		  case  DEVICE_ESD :
+								device=new 	 esdAudioDevice;
+								currentDevice=DEVICE_ESD;;
 								break;
 #endif
 #ifdef USE_ARTS

@@ -18,7 +18,8 @@ typedef enum
 	DEVICE_ALSA,
 	DEVICE_COREAUDIO,
 	DEVICE_SDL,
-	DEVICE_WIN32
+	DEVICE_WIN32,
+    DEVICE_ESD
 }AUDIO_DEVICE;
 
 typedef struct DEVICELIST
@@ -47,6 +48,9 @@ static const DEVICELIST audioDeviceList[]=
 #endif	
 #ifdef CYG_MANGLING	
 	MKADID(WIN32),
+#endif	
+#ifdef USE_ESD	
+	MKADID(ESD),
 #endif	
 
 	MKADID(DUMMY)
