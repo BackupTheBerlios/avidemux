@@ -9,6 +9,8 @@ TGT=../avidemux_icon_small.inc \
 ../5.inc \
 ../6.inc \
 ../7.inc \
+../preview.inc \
+../output.inc \
 ../stock_filters-aging.inc
 
 ../%.inc : %.png	
