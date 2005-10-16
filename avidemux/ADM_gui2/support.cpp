@@ -42,6 +42,8 @@
 #include "xpm/6.inc"
 #include "xpm/5.inc"
 #include "xpm/7.inc"
+#include "xpm/preview.inc"
+#include "xpm/output.inc"
 typedef enum ADM_Icon
 {
         A_ICON_XPM,
@@ -78,6 +80,8 @@ name2xpm iconTranslation[]=
         {A_ICON_XPM,"xpm_prevblack.xpm",(void *)        xpm_prevblack},
         {A_ICON_PNG,"gnome-calculator.xpm",(void *)     gnome_calculator},
         {A_ICON_PNG,"gnome-calculator_small.xpm",(void *) gnome_calculator_small},
+        {A_ICON_PNG,"preview.png",(void *) preview},
+        {A_ICON_PNG,"output.png",(void *) output},
         {A_ICON_PNG,"1.png",(void *) x1},
         {A_ICON_PNG,"2.png",(void *) x2},
         {A_ICON_PNG,"3.png",(void *) x3},
