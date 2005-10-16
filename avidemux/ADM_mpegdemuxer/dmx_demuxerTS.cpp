@@ -44,7 +44,9 @@
 uint8_t         dmx_demuxerTS::changePid(uint32_t newpid,uint32_t newpes)
 {
           myPid=newpid;
-          
+          // Be sure our new Pid is taken care of
+          allPid[newpid]=1;
+
         _pesBufferStart=0;  // Big value so that we read
         _pesBufferLen=0;
         _pesBufferIndex=0;

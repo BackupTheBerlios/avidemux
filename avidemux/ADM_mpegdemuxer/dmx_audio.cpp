@@ -347,7 +347,7 @@ uint32_t read;
 
 uint8_t dmxAudioStream::probeAudio (void)
 {
-uint32_t read,offset,offset2,fq,br,chan,myPes;          
+uint32_t read,offset,offset2,fq,br,chan,myPes,blocksize;          
 uint8_t buffer[PROBE_SIZE];
 MpegAudioInfo mpegInfo;
 WAVHeader *hdr;
@@ -359,10 +359,11 @@ WAVHeader *hdr;
 
         demuxer->changePid(_tracks[i].myPid,_tracks[i].myPes);
         demuxer->setPos(0,0);
-        //
-        if(PROBE_SIZE!=demuxer->read(buffer,PROBE_SIZE))
+        printf("Probing track:%d, pid: %x pes:%x\n",i,_tracks[i].myPid,_tracks[i].myPes);
+         //
+        if(PROBE_SIZE!=(blocksize=demuxer->read(buffer,PROBE_SIZE)))
         {
-           printf("DmxAudio: Reading for track %d failed\n",i);
+           printf("DmxAudio: Reading for track %d failed (%u/%u)\n",i,blocksize,PROBE_SIZE);
            return 0;
         }
         myPes=_tracks[i].myPes;
