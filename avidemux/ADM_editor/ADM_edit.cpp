@@ -574,6 +574,14 @@ TryAgain:
 									{
                                                                                 // Set ouput to avi vop
                                                                                 UI_SetCurrentFormat(ADM_AVI_UNP);
+                                                                                // Create a new decoder
+                                                                                // As the current one have already decoded
+                                                                                // some pics
+                                                                                delete  _videos[_nb_video-1].decoder;
+                                                                                _videos[_nb_video-1].decoder=NULL;
+                                                                                printf("Creating fresh decoder\n");
+                                                                                 _videos[_nb_video-1].decoder = getDecoder (info.fcc,
+                                           info.width, info.height, l, d);
 										goto TryAgain;
 									}
 									GUI_Error_HIG("Could not unpack the video", "Using backup decoder - not frame accurate.");
