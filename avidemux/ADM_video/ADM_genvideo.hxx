@@ -39,7 +39,7 @@
 #include "ADM_library/ADM_image.h"
 
 
-void GUI_PreviewInit(uint32_t w , uint32_t h);
+void GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal);
 uint8_t 	GUI_PreviewUpdate(uint8_t *data);
 void 	GUI_PreviewEnd( void);
 uint8_t  	GUI_PreviewRun(uint8_t *data);

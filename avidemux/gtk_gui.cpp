@@ -918,6 +918,7 @@ case ACT_Pipe2Other:
       {
         editorReignitPreview();
 	editorUpdatePreview (curframe);
+        UI_setPreviewToggleStatus( 1);
       }
       break;
 

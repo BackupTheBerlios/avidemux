@@ -331,7 +331,7 @@ void 	editorReignitPreview( void )
 		unpackd=NULL;		
 	    }
 	    unpackd=new ADMImage(preview->getInfo()->width,preview->getInfo()->height);
-            GUI_PreviewInit(preview->getInfo()->width,preview->getInfo()->height);
+            GUI_PreviewInit(preview->getInfo()->width,preview->getInfo()->height,0);
 }
 
 

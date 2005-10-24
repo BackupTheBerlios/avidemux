@@ -60,8 +60,10 @@ static GtkWidget *dialog=NULL;
 static uint32_t 	uw, uh;
 int 			lock;
 uint8_t		needDestroy=0;
+static int      needResponse=0;
 extern void UI_setPreviewToggleStatus(uint8_t s);
 static ColYuvRgb    rgbConv(100,100);
+static int          isModal=0;
 // Init previewer
 //
 uint8_t GUI_StillAlive( void )
@@ -70,7 +72,7 @@ uint8_t GUI_StillAlive( void )
   	return 1;
 
 }
-void GUI_PreviewInit(uint32_t w , uint32_t h)
+void GUI_PreviewInit(uint32_t w , uint32_t h,uint32_t modal)
 {
 		if(rgb_render)
 		{
@@ -81,6 +83,7 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
 			rgb_render=NULL;
 		}
 	   stacked=0;
+           isModal=modal;
        ADM_assert(rgb_render=new uint8_t [w*h*4]);
        ADM_assert(rgb_alternate=new uint8_t [w*h*4]);
        uw=w;
@@ -90,27 +93,26 @@ void GUI_PreviewInit(uint32_t w , uint32_t h)
        gtk_widget_set_usize (lookup_widget(dialog,"drawingarea1"),w,h);
 
        // add callback for destroy
- 	gtk_object_set_data_full(GTK_OBJECT(dialog),
+       if(!isModal)
+        {
+ 	        gtk_object_set_data_full(GTK_OBJECT(dialog),
 			     "dialog",
 			     dialog,
 			     (GtkDestroyNotify) preview_exit_short);
-	// add callback for button
-// 	gtk_signal_connect(GTK_OBJECT(lookup_widget(dialog,"closebutton1")), "clicked",
-//                       GTK_SIGNAL_FUNC(preview_exit),                   (void *) NULL);
-
-        gtk_signal_connect(GTK_OBJECT(WID(buttonNext)), "clicked",
+                gtk_signal_connect(GTK_OBJECT(WID(buttonNext)), "clicked",
                        GTK_SIGNAL_FUNC(cb_next),                   (void *) NULL);
-        gtk_signal_connect(GTK_OBJECT(WID(buttonPrev)), "clicked",
+                gtk_signal_connect(GTK_OBJECT(WID(buttonPrev)), "clicked",
                        GTK_SIGNAL_FUNC(cb_prev),                   (void *) NULL);
-        gtk_signal_connect(GTK_OBJECT(WID(buttonStack)), "clicked",
+                gtk_signal_connect(GTK_OBJECT(WID(buttonStack)), "clicked",
                        GTK_SIGNAL_FUNC(cb_stack),                   (void *) NULL);
-	// add callback for redraw
-	gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
-		       GTK_SIGNAL_FUNC(previewRender),    NULL);
+
+        }
+        // add callback for redraw
+        gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
+                       GTK_SIGNAL_FUNC(previewRender),    NULL);
        lock=0;
        needDestroy=1;
        gtk_widget_show(  dialog);
-       GUI_detransient();
 }
 
 static uint8_t stack(uint8_t *out, uint8_t *in, int width,int height)
@@ -167,12 +169,13 @@ uint8_t  GUI_PreviewRun(uint8_t *data)
 
 		// First convert YV12 to RGB
 	       	//COL_yv12rgb( uw, uh,data, rgb_render);
-	       	 rgbConv.scale(data,rgb_render);
+	       	rgbConv.scale(data,rgb_render);
 	       	previewRender();
 		// add a new handler
-		#define WID(x) lookup_widget(dialog,#x)
-	        gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(okbutton1), GTK_RESPONSE_OK);
+
 		gtk_dialog_run(GTK_DIALOG(dialog));
+
+               // GUI_detransient();
 		return 1;
 
 	    }
@@ -187,7 +190,7 @@ void GUI_PreviewEnd(void)
 			//printf("+X\n");
                         
  		 	gtk_widget_destroy(dialog);
-                        GUI_retransient();
+                      //  GUI_retransient();
 			//printf("-X\n");
 
  		}
@@ -249,6 +252,8 @@ gboolean preview_exit_short (GtkWidget * widget, GdkEvent * event, gpointer user
     		GUI_PreviewEnd();
 		//printf("<\n");
        		UI_setPreviewToggleStatus( 0);
+                printf("Destroyed\n");
+                
     }
 	return FALSE;
 }
