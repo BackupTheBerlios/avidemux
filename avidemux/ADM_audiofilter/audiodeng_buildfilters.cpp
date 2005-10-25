@@ -50,7 +50,7 @@
 #include "avi_vars.h"
 #include "audioeng_toolame.h"
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
-
+#include "audioeng_lpcm.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO_FILTER
 #include "ADM_toolkit/ADM_debug.h"
@@ -421,8 +421,10 @@ void audioCodecConfigure( void )
 	
 	switch(activeAudioEncoder)
 	{
+                case AUDIOENC_LPCM:
 		case AUDIOENC_NONE:
 								return;
+
 #ifdef USE_FAAC
 		case AUDIOENC_FAAC:
 						
@@ -785,6 +787,14 @@ uint8_t init;
  				filters[filtercount++] = lastFilter;
 			#endif
 			break;
+                case AUDIOENC_LPCM:
+                {
+                                AVDMProcessAudio_Lpcm *lpcm;
+                                lpcm = new AVDMProcessAudio_Lpcm(lastFilter);
+                                lastFilter = lpcm;
+                                filters[filtercount++] = lastFilter;
+                }
+                break;
 #ifdef USE_VORBIS
 		case AUDIOENC_VORBIS:
 		{
