@@ -167,17 +167,7 @@ void MultiplexJob::SetupInputStreams( std::vector< IBitStream *> &inputs )
         }
 
         bs->UndoChanges( undo);
-        if( LPCMStream::Probe( *bs ) )
-        {
-            mjpeg_info ("File %s looks like an LPCM Audio stream.",
-                        bs->StreamName());
-            bs->UndoChanges( undo );
-            streams.push_back( new JobStream( bs,  LPCM_AUDIO) );
-            ++audio_tracks;
-            ++lpcm_tracks;
-            continue;
-        }
-        bs->UndoChanges( undo );
+       
 
         if( VideoStream::Probe( *bs ) )
         {
@@ -202,9 +192,23 @@ void MultiplexJob::SetupInputStreams( std::vector< IBitStream *> &inputs )
             continue;
         }
 #endif
+        //if( LPCMStream::Probe( *bs ) )
+        if(1)
+        {
+            mjpeg_info ("File %s looks like an LPCM Audio stream.",
+                        bs->StreamName());
+            bs->UndoChanges( undo );
+            streams.push_back( new JobStream( bs,  LPCM_AUDIO) );
+            ++audio_tracks;
+            ++lpcm_tracks;
+            continue;
+        }
+        bs->UndoChanges( undo );
+#if 0 // MEAN: Force LPCM when not recognized
         bad_file = true;
         delete bs;
         mjpeg_error ("File %s unrecogniseable!", bs->StreamName());
+#endif
     }
     
     if( bad_file )
