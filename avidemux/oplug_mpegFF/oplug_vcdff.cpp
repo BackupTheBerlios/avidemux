@@ -193,10 +193,10 @@ uint8_t   ret=0;
                         {
                             // mpeg2, we do only DVD right now
                             if(hdr->frequency!=48000 || 
-                                (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
+                                (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3 && hdr->encoding!=WAV_LPCM))
                             {
                                 deleteAudioFilter();
-                                GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2 or AC3.");
+                                GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2, AC3 or LPCM.");
                                 return 0 ;
                             }
                             mux=MUXER_DVD;
