@@ -321,10 +321,10 @@ uint8_t ret=0;
 		GUI_Error_HIG("Incompatible audio frequency", "For DVD PS, audio samplerate must be 48 kHz.\nUse the resample audio filter.");
 		return 0;
 	}
-	if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3))
+	if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3 && info->encoding!=WAV_LPCM))
 	{
 		printf("Encoding : %d\n",info->encoding);
-		GUI_Error_HIG("Incompatible audio codec", "For DVD PS, audio must be MP2 or AC3.");
+		GUI_Error_HIG("Incompatible audio codec", "For DVD PS, audio must be MP2,AC3 or LPCM.");
 		return 0;
 	}
 	
@@ -397,10 +397,10 @@ uint8_t ret=0;
                 GUI_Error_HIG("Incompatible audio frequency", "For DVD, samplerate must be 48 kHz.\nUse the resample audio filter.");
                 return 0;
         }
-        if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3))
+        if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3 && info->encoding!=WAV_LPCM))
         {
                 printf("Encoding : %d\n",info->encoding);
-                GUI_Error_HIG("Incompatible audio codec", "For DVD, audio must be MP2 or AC3.");
+                GUI_Error_HIG("Incompatible audio codec", "For DVD, audio must be MP2,AC3 or LPCM.");
                 return 0;
         }
         

@@ -160,10 +160,10 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                         mux=MUXER_VCD;
                         printf("PassThrough: Using VCD PS\n");        
                         }else
-                {    
+                {    // Mpeg2 
                         aviInfo info;
                         video_body->getVideoInfo(&info);
-                        if(hdr->frequency==44100 && info.width==480&&hdr->encoding == WAV_MP2 ) // SVCD ?
+                        if(hdr->frequency==44100 && info.width==480&& hdr->encoding == WAV_MP2 ) // SVCD ?
                         {
                                 mux=MUXER_SVCD;
                                 printf("PassThrough: Using SVCD PS\n");
@@ -172,10 +172,10 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                         {
                                  // mpeg2, we do only DVD right now
                                 if(hdr->frequency!=48000 || 
-                                (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3))
+                                (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3 && hdr->encoding!=WAV_LPCM))
                                 {
                                         deleteAudioFilter();
-                                        GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2 or AC3.");
+                                        GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2, AC3 or LPCM.");
                                         return 0;
                                 }
                                 mux=MUXER_DVD;
