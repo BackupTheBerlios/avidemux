@@ -101,6 +101,9 @@ typedef struct SUBCONF
 	uint8_t						loadSubtitle(void);
 	uint8_t						loadFont(void);
 	uint8_t 					subParse( subLine *in, char *string );
+        uint8_t                                         doChroma(void);
+        uint8_t                                         clearBuffers(void);
+        void                                            doAutoSplit(subLine *string);
 
  public:
  		

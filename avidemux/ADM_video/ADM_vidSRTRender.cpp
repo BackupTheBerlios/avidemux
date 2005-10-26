@@ -137,30 +137,16 @@ uint32_t	ADMVideoSubtitle::search(uint32_t time)
 void ADMVideoSubtitle::displayString(subLine *string)
 {
  
-	uint32_t base,last=0,line=0;	
-	char *ptr=NULL;
+	uint32_t base=0;	
 	uint32_t nbLine=0;
 	uint32_t i=0;
-	uint32_t suggestedLen=0;
-	
+	uint32_t overflow=0;
 
       aprintf("Sub: Rendering string %s\n",string);
-
-
 // bbase is the final position in line
 // in the image
 
-
-	base=0;
-
-	memset(_bitmapBuffer,0,_info.height*_info.width);
-	memset(_maskBuffer,0,_info.height*_info.width);
-  	memset(_bgBitmapBuffer,0,(_info.height*_info.width)>>1);
-  	memset(_bgMaskBuffer,0,_info.height*_info.width);
-
-	
-		
-	
+	clearBuffers();
 	nbLine=string->nbLine;
 	if(nbLine>SRT_MAX_LINE )
 	{
@@ -175,53 +161,194 @@ void ADMVideoSubtitle::displayString(subLine *string)
 		case 1:
 			base=_conf->_fontsize;; // 1 or 2 lines we dont use the upper line		
 			break;
-		default:break;
-		
+		default:
+                        base=0;
+                        break;
 	}	
 		
-	aprintf("Sub: %d lines to render\n",nbLine);						
- 
-  
-  	line=0;
+	aprintf("Sub: %d lines to render\n",nbLine);
 	// scan and display each line
 	for(i=0;i<nbLine;i++)
 	{
 		
-			displayLine(string->string[i],base,string->lineSize[i]);
+			if(string->lineSize[i]!=displayLine(string->string[i],base,string->lineSize[i]))
+                                overflow=1;
 			base+=_conf->_fontsize;
-			line++;
 		
 	}
-
-    	
+        if(overflow && _conf->_selfAdjustable) 
+        {
+                printf("Do autosplit\n");
+                doAutoSplit(string);
+        }
+    	doChroma();
 	
-	// now blur bitmap into mask..
-	memset(_maskBuffer,0,SRT_MAX_LINE*_conf->_fontsize*_info.width);
+	
+}
+/*
+        We merge the whole lines into one then split it
+        to avoid truncated subs
+*/
+void ADMVideoSubtitle::doAutoSplit(subLine *string)
+{
+        uint32_t base=0;    
+        uint32_t nbLine=0;
+        uint32_t i=0;
+        int      total=0,start,end,pivot;
 
-	uint32_t off;
-	uint8_t *src,*dst;
+        aprintf("Sub: Autospliting \n");
+        nbLine=string->nbLine;
 
-	off=0;
+        // Merge all strings into one
 
-	src=_bitmapBuffer;
-	dst=_maskBuffer;
+        for(int i=0;i<nbLine;i++) 
+                total+=1+string->lineSize[i];
+
+        ADM_GLYPH_T allwords[total];
+        int         offset[total];
+        int         sentence[total];
+        int         nbWords=0;
+        //
+        start=0;
+        for(int i=0;i<nbLine;i++) 
+        {
+                memcpy(&(allwords[start]),string->string[i],string->lineSize[i]*sizeof(ADM_GLYPH_T));
+                start+=string->lineSize[i];
+                allwords[start]=' ';
+                start++;
+        }
+        // Remove the last ' '
+        start--;
+        end=start;
+        // Here we go, we have now one line made of all merged sub
+        // We will put as much as possible into one displayed line
+        // then switch to the next one
+        //
+        printf("The new stuff is :<");
+        for(i=0;i<end;i++)
+                printf("%c",allwords[i]);
+        printf(">\n");
+        
+        // Split into words
+        pivot=0;
+        int car;
+        offset[0]=0;
+        nbWords=1;
+        while(pivot<end)
+        {
+                car=ADM_ASC(allwords[pivot]);
+                if(car==' ' || car=='.' || car ==',')
+                        {
+                                offset[nbWords++]=pivot;
+                        }
+                pivot++;
+        }
+        printf("Found %d words\n",nbWords); 
+        // Now  split
+        int nbSentence=0,len;
+        pivot=0;
+        sentence[0]=0;
+        // Try to display as much as possible in one line
+        // We build sentence here
+        while(pivot<nbWords)
+        {
+                for(i=pivot+1;i<nbWords;i++)
+                {
+                        len=offset[i]-offset[pivot];
+                        if(len!=displayLine(&(allwords[offset[pivot]]),0,len)) break;
+                }
+                sentence[nbSentence]=offset[pivot];
+                nbSentence++;
+                if(i>1 && i!=nbWords) i--;
+                pivot=i;
+        }
+        printf("0: %d,off:%d\n",sentence[0],offset[0]);
+        // Take the last word
+        sentence[nbSentence]=end;
+
+        if(nbSentence>SRT_MAX_LINE) nbSentence=SRT_MAX_LINE;
+        // now display
+        printf("Nb sentence:%d\n",nbSentence);
+        for(int j=0;j<nbSentence;j++)
+        {
+                printf("Sentence %d:",j);
+                for(int k=sentence[j];k<sentence[j+1];k++)
+                        printf("%c",allwords[k]);
+                printf("\n");
+        }
+        // now display
+        
+        switch(nbSentence)
+        {
+                case 0:
+                        base=2*_conf->_fontsize;; // 1 or 2 lines we dont use the upper line            
+                        break;
+                case 1:
+                        base=_conf->_fontsize;; // 1 or 2 lines we dont use the upper line              
+                        break;
+                default:
+                        base=0;
+                        break;
+        }
+        // scan and display each line
+        clearBuffers();
+        printf("Display\n");
+        for(i=0;i<nbSentence;i++)
+        {
+                        len=sentence[i+1]-sentence[i];
+                        displayLine(&(allwords[sentence[i]]),base,len);
+                        //displayLine(allwords,base,10);
+                        base+=_conf->_fontsize;
+        }
+        printf("/Display\n");
+        
+}
+/*
+        Once we have the subtitle built, we do the u& v planes
+        and some smoothing to avoid over sharpening on the chroma plane
+
+*/
+uint8_t ADMVideoSubtitle::doChroma(void)
+{
+// now blur bitmap into mask..
+        memset(_maskBuffer,0,SRT_MAX_LINE*_conf->_fontsize*_info.width);
+
+        uint32_t off;
+        uint8_t *src,*dst;
+
+        off=0;
+
+        src=_bitmapBuffer;
+        dst=_maskBuffer;
 
 
-	// We shrink it down for u & v by 2x2
-	// mask buffer->bitmap buffer
+        // We shrink it down for u & v by 2x2
+        // mask buffer->bitmap buffer
 
-	uint8_t tmp[_info.width*_info.height];
+        uint8_t tmp[_info.width*_info.height];
 
-	decimate(src,tmp,_info.width,_info.height);
-	lowPass(src,dst,_info.width,_info.height);
-	lowPass(tmp,src,_info.width>>1,_info.height>>1);
+        decimate(src,tmp,_info.width,_info.height);
+        lowPass(src,dst,_info.width,_info.height);
+        lowPass(tmp,src,_info.width>>1,_info.height>>1);
 
-  	if (_conf->_useBackgroundColor) 
-	{
-    		decimate(_bgMaskBuffer,_bgBitmapBuffer,_info.width,_info.height);
-    		//lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
-  	}
+        if (_conf->_useBackgroundColor) 
+        {
+                decimate(_bgMaskBuffer,_bgBitmapBuffer,_info.width,_info.height);
+                //lowPass(tmp,_bgBitmapBuffer,_info.width>>1,_info.height>>1);
+        }
   
+}
+/*
+        Clear the buffers in case we do a new sub or
+                redo one in case it overflows
+*/
+uint8_t ADMVideoSubtitle::clearBuffers(void)
+{
+        memset(_bitmapBuffer,0,_info.height*_info.width);
+        memset(_maskBuffer,0,_info.height*_info.width);
+        memset(_bgBitmapBuffer,0,(_info.height*_info.width)>>1);
+        memset(_bgMaskBuffer,0,_info.height*_info.width);
+        return 1;
 }
 // Display a full line centered on screen. It returns the
 // number of displayed chars.
