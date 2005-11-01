@@ -93,7 +93,7 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
                 {
                       skip_bits(&s,2);   //Chroma
                       skip_bits(&s,1);   // Low delay
-                      if(!get_bits(&s,1)) // VBV Info
+                      if(get_bits(&s,1)) // VBV Info
                       {
                         skip_bits(&s,16);
                         skip_bits(&s,16);
