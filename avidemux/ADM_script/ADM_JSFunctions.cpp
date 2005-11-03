@@ -33,6 +33,7 @@
 
 #include "ADM_JSGlobal.h"
 #include "ADM_toolkit/filesel.h"
+
 extern int JS_setSuccess(int a);;
 JSBool displayError(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool displayInfo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
@@ -43,6 +44,8 @@ JSBool print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 JSBool allFilesFrom(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool nextFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool setSuccess(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval);
+JSBool getVar(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval);
 
 static JSFunctionSpec adm_functions[] = {
@@ -55,6 +58,7 @@ static JSFunctionSpec adm_functions[] = {
   {"allFilesFrom",      allFilesFrom,        0},
   {"nextFile",          nextFile,        0},
   {"setSuccess",          setSuccess,        1},
+  {"getVar",          getVar,        1},
 
   {0}
 };
@@ -66,6 +70,30 @@ uint8_t JS_AvidemuxFunction(JSContext *cx,JSObject *global)
         printf("Error in JSAvidemuxfunction\n");
         return 0;
 }
+extern char *script_getVar(char *in, int *r);
+JSBool getVar(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin AddSegment
+        int out=0;
+        char *dupe=NULL;
+
+        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+        // default return value
+        if(argc != 1)
+                return JS_FALSE;
+        char  *stringa = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+        dupe=script_getVar(stringa ,&out);
+        
+        if(!dupe)
+                return JS_FALSE;
+        // if out=1 it is a string else a number
+        if(out)
+                *rval = STRING_TO_JSVAL(JS_NewStringCopyZ(cx,dupe));
+        else
+                *rval = INT_TO_JSVAL(atoi(dupe));
+        return JS_TRUE;
+}// end AddSegment
+
 JSBool setSuccess(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {// begin AddSegment
