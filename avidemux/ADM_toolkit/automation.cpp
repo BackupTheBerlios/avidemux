@@ -378,7 +378,7 @@ char *equal;
         }
         *equal=0; // Remove =
         
-        if(!(in,equal+1))
+        if(!scriptAddVar(in,equal+1))
                 printf("Warning setvar failed\n");        
 
 }
@@ -690,7 +690,7 @@ char *script_getVar(char *in, int *r)
         {
                 if(myVars[i].name)
                 {
-                        if(!strcmp(myVars[i].name,in+1)) // skip the  $ 
+                        if(!strcmp(myVars[i].name,in)) // skip the  $ 
                         {
                                 *r=myVars[i].isString;
                                 return ADM_strdup(myVars[i].string);
