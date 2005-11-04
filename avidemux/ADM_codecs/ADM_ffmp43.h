@@ -76,7 +76,7 @@ class decoderFFMpeg4 : public  decoderFF
 
 
      public:
-     		          				decoderFFMpeg4(uint32_t w,uint32_t h) ;
+     		          				decoderFFMpeg4(uint32_t w,uint32_t h,uint32_t l,uint8_t *d) ;
 			// mpeg4 can have B-frame
 			 virtual 	uint8_t 	bFramePossible(void) { return 1;}
 
@@ -136,7 +136,7 @@ class decoderFFH264 : public decoderFF
                                 
                         
   public:
-    decoderFFH264(uint32_t w,uint32_t h) ;
+    decoderFFH264(uint32_t w,uint32_t h,uint32_t l,uint8_t *d) ;
         
 }   ;
 class decoderFFhuff : public decoderFF

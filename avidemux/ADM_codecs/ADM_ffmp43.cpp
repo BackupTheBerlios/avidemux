@@ -374,12 +374,14 @@ decoderFFMpeg4VopPacked::decoderFFMpeg4VopPacked(uint32_t w,uint32_t h)       :d
 	_allowNull=1;
         WRAP_Open(CODEC_ID_MPEG4);
 }
-decoderFFMpeg4::decoderFFMpeg4(uint32_t w,uint32_t h)       :decoderFF(w,h)
+decoderFFMpeg4::decoderFFMpeg4(uint32_t w,uint32_t h,uint32_t l, uint8_t *d)       :decoderFF(w,h)
 {
 // force low delay as avidemux don't handle B-frames
 
-		  _context->flags|=CODEC_FLAG_LOW_DELAY;
+                  _context->flags|=CODEC_FLAG_LOW_DELAY;
                   _refCopy=1; // YUV420 only
+                  _context->extradata=(void *)d;
+                  _context->extradata_size=(int)l;
  		//  _context->flags|=FF_DEBUG_VIS_MV;
        WRAP_Open(CODEC_ID_MPEG4);
 }
@@ -434,9 +436,12 @@ decoderFF_ffhuff::decoderFF_ffhuff(uint32_t w,uint32_t h,uint32_t l,uint8_t *d) 
      WRAP_Open(CODEC_ID_FFVHUFF);
         
 }
-decoderFFH264::decoderFFH264(uint32_t w,uint32_t h)  :decoderFF(w,h) 
+decoderFFH264::decoderFFH264(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)  :decoderFF(w,h) 
 {
   _refCopy=1; // YUV420 only
+  _context->extradata=(void *)d;
+  _context->extradata_size=(int)l;
+
   printf("Initializing lavcodec H264 decoder\n");
  WRAP_Open(CODEC_ID_H264);
   

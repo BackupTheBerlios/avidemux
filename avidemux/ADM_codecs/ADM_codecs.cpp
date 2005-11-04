@@ -228,10 +228,10 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 
 			  	     	return(decoders *)( new decoderSnow(w,h));
 	   }
-           if(fourCC::check(fcc,(uint8_t *)"H264"))
+           if(fourCC::check(fcc,(uint8_t *)"H264")||fourCC::check(fcc,(uint8_t *)"avc1"))
            {
 
-             return(decoders *)( new decoderFFH264(w,h));
+             return(decoders *)( new decoderFFH264(w,h,extraLen,extraData));
            }           
 #endif
 
@@ -243,7 +243,7 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 
  	if(isMpeg4Compatible(fcc)==1)
     	{
-				       	return(decoders *)( new decoderFFMpeg4(w,h));
+				       	return(decoders *)( new decoderFFMpeg4(w,h,extraLen,extraData));
 				  //	return(decoders *)( new decoderXvid(w,h));
 				  //	return(decoders *)( new decoderDIVX(w,h));
 	}
