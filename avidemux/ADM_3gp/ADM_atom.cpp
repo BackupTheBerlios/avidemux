@@ -120,6 +120,13 @@ uint32_t adm_atom::getSize( void )
 {
 	return _atomSize-8;
 }
+uint32_t adm_atom::getRemainingSize( void )
+{
+        int64_t pos=ftello(_fd);
+        
+        return _atomStart+_atomSize-pos;
+}
+
 uint8_t adm_atom::readPayload( uint8_t *whereto, uint32_t rd)
 {
 	uint32_t pos;

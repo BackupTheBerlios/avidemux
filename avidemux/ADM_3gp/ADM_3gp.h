@@ -118,7 +118,7 @@ virtual 	uint8_t			close(void) ;
   //__________________________
   //				 Info
   //__________________________
-
+virtual   uint8_t                       getExtraHeaderData(uint32_t *len, uint8_t **data);
   //__________________________
   //				 Audio
   //__________________________

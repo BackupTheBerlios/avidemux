@@ -119,17 +119,7 @@ uint8_t  _3GPHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fr
 {
 uint32_t offset=_idx[framenum].offset; //+_mdatOffset;
 
-	if(_volHeaderLen && !framenum)
-	{
-
- 		fseeko(_fd,_volHeader,SEEK_SET);
- 		fread(ptr, _volHeaderLen, 1, _fd);
-
- 		fseeko(_fd,offset,SEEK_SET);
- 		fread(ptr+_volHeaderLen, _idx[framenum].size, 1, _fd);
-  		*framelen=_idx[framenum].size+_volHeaderLen;
- 		return 1;
-	}
+	
 
  	fseeko(_fd,offset,SEEK_SET);
  	fread(ptr, _idx[framenum].size, 1, _fd);
@@ -220,6 +210,24 @@ uint32_t _3GPHeader::getNbStream(void)
 	else
 		return 1;
 };
+uint8_t   _3GPHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
+{
+uint32_t old;
+        *len=0;*data=NULL;
+        if(!_volHeaderLen) return 1;
+        {
+        uint8_t *ptr=new uint8_t[_volHeaderLen];
+
+                printf("Adding VolHeader info\n");
+                old=ftello(_fd);
+                fseeko(_fd,_volHeader,SEEK_SET);
+                fread(ptr, _volHeaderLen, 1, _fd);
+                fseeko(_fd,old,SEEK_SET);
+                *len=_volHeaderLen;
+                *data=ptr; // MEM leak ? FIXME
+                return 1;
+        } 
+}
 //______________________________________
 //
 // Open and recursively read the atoms
@@ -272,6 +280,7 @@ uint8_t    _3GPHeader::open(char *name)
 	delete atom;
 	printf("Found video codec type :");fourCC::print(_videostream.fccHandler);printf("\n");
         if(!_idx) return 0;
+
         // If it is mpeg4 and we have extra data
         // Decode vol header to get the real width/height
         // The mpeg4/3GP/Mov header is often misleading
@@ -574,7 +583,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					printf("3GP:Tk %lu Nb sz:%lu nbFrame:%lu duration:%f us\n",
 							current,nbSz,nbo,last);
               				_videostream.dwRate=(uint32_t)floor(last);
-					if(_otherExtraSize)
+					if(_otherExtraSize  )
 					{
 						printf("We have some (%lu) extra data for video",_otherExtraSize);
 						_volHeader=_otherExtraStart;
@@ -730,6 +739,52 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				 _video_bih.biCompression=_videostream.fccHandler;
 				tom.skipAtom();
 				break;
+                        case MKFCCR('a','v','c','C'): //'avcC':
+                                {
+                                        // configuration data for h264
+                                        //tom.skipBytes(8);
+                                        _otherExtraStart=ftell(_fd);
+                                        _otherExtraSize=tom.getRemainingSize();;
+                                        printf("avcC size:%d\n",_otherExtraSize);
+                                        tom.skipAtom();
+                                        break;
+
+                                }
+                        case MKFCCR('a','v','c','1'): //'avc1':
+                                {
+                                        uint32_t u32;
+                                 _videostream.fccHandler=fourCC::get((uint8_t *)"H264");
+                                 _video_bih.biCompression=_videostream.fccHandler;
+                                tom.skipBytes(8);  // Skip header
+                                printf("Revision :%x\n",tom.read32());  // revision / level
+                                printf("Vendor   :");
+                                fourCC::print(tom.read32());  // vendor
+                                printf("\n");
+                                printf("Qual :%x\n",tom.read32()); // Qual1
+                                printf("Qual :%x\n",tom.read32()); // Qual1
+
+                                _video_bih.biWidth=_mainaviheader.dwWidth=tom.read16() ;
+                                _video_bih.biHeight=_mainaviheader.dwHeight=tom.read16(); 
+                                
+                                printf("w    :%d\n",_mainaviheader.dwWidth); // w/h
+                                printf("h    :%d\n",_mainaviheader.dwHeight); // w/h
+                                printf("hzR  :%x dpi\n",tom.read32()); // w2
+                                printf("vzR  :%x dpi\n",tom.read32()); // h2
+                                printf("DataS:%x\n",tom.read32()); // h2
+                                printf("Fr/Sa::%x\n",tom.read16()); // Frame per sample
+                                u32=tom.read();
+                                printf("Codec string :%d <",u32);
+                                for(int i=0;i<u32;i++) printf("%c",tom.read());
+                                printf(">\n");
+                                tom.skipBytes(32-1-u32); // skip leftover from name
+                                printf("Col  :%x\n",tom.read16()); // Qual1
+                                printf("Col  :%x\n",tom.read16()); // Qual1
+                                
+                                // look other atom following
+                                parseAtomTree(&tom);
+                                tom.skipAtom();
+                                }
+                                break;
 
 			case MKFCCR('e','s','d','s'): //'esds':
 					// in case of mpeg4 we only take

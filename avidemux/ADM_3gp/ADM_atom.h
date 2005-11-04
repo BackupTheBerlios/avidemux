@@ -33,6 +33,7 @@ public:
 		uint8_t	skipAtom( void );
 		uint32_t	getFCC( void );
 		uint32_t	getSize( void );
+                uint32_t        getRemainingSize( void );
 		uint8_t		readPayload( uint8_t *whereto, uint32_t rd );
 		uint8_t		isDone(void );
 		uint8_t		skipBytes(uint32_t nb );
