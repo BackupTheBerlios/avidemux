@@ -6,6 +6,7 @@
 
 
 */
+CALLBACK( show_builtin_support1                 ,ACT_BUILT_IN);
 CALLBACK( open_video1         			,ACT_OpenAvi); 
 CALLBACK( append_video1     			,ACT_AppendAvi);
 CALLBACK( save_audio1         			,ACT_SaveWave);
