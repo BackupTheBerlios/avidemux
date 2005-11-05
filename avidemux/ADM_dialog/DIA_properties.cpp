@@ -101,7 +101,7 @@ void DIA_properties( void )
 		    sprintf(text, "STEREO");
 		    break;
 		default:
-		    sprintf(text, "????");
+		    sprintf(text, "%d",wavinfo->channels);
 		    break;
 		}
 	     	FILL_ENTRY(label1_audiomode);
