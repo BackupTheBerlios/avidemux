@@ -183,6 +183,7 @@ extern uint8_t GUI_jobs(void);
 extern bool parseECMAScript(const char *name);
 void A_parseECMAScript(const char *name);
 static int A_vob2vobsub(void);
+uint8_t DIA_builtin(void);
 renderZoom currentZoom=ZOOM_1_1;
 
 //___________________________________________
@@ -204,6 +205,9 @@ void HandleAction (Action action)
 int nw;
   switch (action)
     {
+        case ACT_BUILT_IN:
+                                DIA_builtin();
+                                return;
         case ACT_V2V:
                                 A_vob2vobsub();
                                 return;
