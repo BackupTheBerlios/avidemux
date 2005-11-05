@@ -30,7 +30,14 @@
 	We ignore other chunk as they are not vital for our aim
 	and just keep moov/mdia/minf/stsd/stbl stuff
 
+Generic
+*********
 http://developer.apple.com/documentation/QuickTime/QTFF/QTFFChap2/chapter_3_section_5.html#//apple_ref/doc/uid/DontLinkBookID_69-CH204-BBCJEIIA
+
+version 2 media descriptor :
+****************************** http://developer.apple.com/documentation/QuickTime/Conceptual/QT7Win_Update_Guide/Chapter03/chapter_3_section_1.html#//apple_ref/doc/uid/TP40002476-CH314-BBCDGGBB
+
+
 
     begin                : Tue Jul  2003
     copyright            : (C) 2003 by mean
@@ -380,7 +387,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 	 	// these are container atoms,
 	     	// we go on , they includes other atom
 
-
+                        case MKFCCR('w','a','v','e'): //'wave':
 			case MKFCCR('s','t','b','l'): //'stbl':
 			case MKFCCR('m','d','i','a') : //'mdia':
 			case MKFCCR('m','i','n','f'): //'minf':
@@ -467,7 +474,10 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					tom.skipAtom();
 					break;					
 			case MKFCCR('m','p','4','a'): //'mp4a':
-					_rdWav=new WAVHeader;
+					
+                                        if(tom.getRemainingSize()>15) // skip the real mp4a atom, we only do the one in stds
+                                        {
+                                        _rdWav=new WAVHeader;
 					// Put safe default here, in case there 
 					// is no decodable information later on
 					memset(_rdWav,0,sizeof(WAVHeader));
@@ -479,25 +489,54 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					// According to 3gp doc we should have 28 bytes
 					// at least
 
-					if(tom.getSize()<28) break;
-					// 6 *0
-					tom.skipBytes(6);
-					tom.skipBytes(2); // data ref index
-					tom.skipBytes(4); // Version/revision
-					tom.skipBytes(4); // Vendor
-					_rdWav->channels=tom.read16();
-					printf("Channel :%d\n",_rdWav->channels);
-					printf("Sample  :%d\n",tom.read16());
-					tom.skipBytes(4);
-					_rdWav->frequency=tom.read16();
-					printf("Fq      :%d\n",_rdWav->frequency);
-					tom.skipBytes(2);
-					// There might be an esds atom here
-					// but
-					//   (1) i don't have the doc
-					//   (2) it does not seem vital
-
-					tom.skipAtom();
+					{
+                                                uint32_t u32;
+                                 
+                                                tom.skipBytes(8);  // Skip header
+                                                printf("Version  :%d\n",u32=tom.read16()); // Qual1
+                                                printf("Revision :%d\n",tom.read16());  // revision / level
+                                                printf("Vendor   :%d\n",tom.read32());  // Vendor
+                                                _rdWav->channels=tom.read16();
+                                                printf("Channels :%d\n",_rdWav->channels); // Channels
+                                                
+                                                printf("Bps      :%d\n",tom.read16()); // Bps
+                                                printf("CodecId  :%x\n",tom.read16()); // Bps
+                                                printf("Packetsiz:%x\n",tom.read16()); // Bps
+                                                if(u32<2)
+                                                {
+                                                        _rdWav->frequency=tom.read16();
+                                                        if(_rdWav->frequency<8000) _rdWav->frequency=48000;
+                                                        printf("Fq       :%d\n",_rdWav->frequency); // Bps
+                                                        tom.skipBytes(2); // Fixed point
+                                                }
+                                                
+                                                //
+                                                switch(u32)
+                                                {
+                                                        case 0:break;
+                                                        case 1:
+                                                                printf("Sample per packet   :%d\n",tom.read32());  // Vendor
+                                                                printf("Bytes  per packet   :%d\n",tom.read32());  // Vendor
+                                                                printf("Bytes per frame     :%d\n",tom.read32());  // Vendor
+                                                                printf("Bytes per sample    :%d\n",tom.read32());  // Vendor
+                                                                break;
+                                                        case 2:
+                                                                _rdWav->frequency=44100;
+                                                                tom.skipBytes(16);
+                                                                _rdWav->channels=tom.read32();
+                                                                printf("Channels            :%d\n",_rdWav->channels); // Channels
+                                                                printf("Tak(7F000)           :%x\n",tom.read32()); // Channels
+                                                                printf("Bites  per channel  :%d\n",tom.read32());  // Vendor
+                                                                printf("Format specific     :%x\n",tom.read32());  // Vendor
+                                                                printf("Byte per audio packe:%x\n",tom.read32());  // Vendor
+                                                                printf("LPCM                :%x\n",tom.read32());  // Vendor
+                                                                break;
+                                                }
+                                                // look other atom following
+                                                parseAtomTree(&tom);
+                                                tom.skipAtom();
+                                        }
+                                        } else tom.skipAtom();
 					break;
 			case MKFCCR('s','a','m','r'): //'mp4a':
 					tom.skipBytes(8);
