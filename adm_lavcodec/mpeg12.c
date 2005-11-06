@@ -310,7 +310,7 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
           //  put_bits(&s->pb, 4, s->frame_rate_index);
             
             if(s->avctx->rc_max_rate_header){ //MEANX use header for header :)
-                v = (s->avctx->rc_max_rate + 399) / 400;
+                v = (s->avctx->rc_max_rate_header + 399) / 400;
                 if (v > 0x3ffff && s->codec_id == CODEC_ID_MPEG1VIDEO)
                     v = 0x3ffff;
             }else{
