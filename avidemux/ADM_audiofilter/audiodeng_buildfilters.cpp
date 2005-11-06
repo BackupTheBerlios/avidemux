@@ -305,6 +305,20 @@ uint8_t audioCodecSetByName( const char *name)
 		printf("\n Mmmm Select audio codec by name failed...(%s).\n",name);
 		return 0;
 }
+AudioSource audioCodecGetFromName( const char *name)
+{
+                for(uint32_t i=0;i<sizeof(myCodecList)/sizeof(CODECLIST);i++)
+                {
+                        if(!strcasecmp(name,Sources[i].name))
+                        {
+
+                                return Sources[i].type;
+                        }
+
+                }
+                printf("\n Mmmm Select audio codec by name failed...(%s).\n",name);
+                return AudioNone;
+}
 	#define Read(x) { \
 		tmp=name; \
 		if((tmp=strstr(name,#x))) \

@@ -185,7 +185,7 @@ void A_parseECMAScript(const char *name);
 static int A_vob2vobsub(void);
 uint8_t DIA_builtin(void);
 renderZoom currentZoom=ZOOM_1_1;
-
+uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name);
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -2415,21 +2415,30 @@ void A_externalAudioTrack( void )
                  secondAudioSource=AudioNone;
                  secondaudiostream=NULL;
         }
-        switch( nw)
+        char               *name=NULL;
+        if(nw==AudioMP3|| nw==AudioAC3 || nw==AudioWav)
+        {
+                GUI_FileSelRead("Select 2nd track",&name);
+        }
+        A_setSecondAudioTrack(nw,name);
+        if(name) ADM_dealloc(name);
+}
+
+uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
+{
+        switch(nw)
         {
                 case AudioNone:break;
                 case AudioMP3:
                         {
                         AVDMMP3AudioStream *tmp;
-                        char               *name=NULL;
-                        GUI_FileSelRead("MP3 to use as 2nd track",&name);
                         if(!name) break;
-
                         tmp = new AVDMMP3AudioStream ();
                         if (!tmp->open (name))
                         {
                                 delete tmp;
                                 GUI_Error_HIG("Error loading the MP3 file", NULL);
+                                
                         }
                         else
                         {
@@ -2437,14 +2446,13 @@ void A_externalAudioTrack( void )
                                 secondAudioSource=AudioMP3;
                                 printf ("\n MP3 loaded\n");
                                 GUI_Info_HIG("Second track loaded", NULL);
+                                return 1;
                         }
                         }
                         break;
                 case AudioAC3:
                           {
                         AVDMAC3AudioStream *tmp;
-                        char               *name=NULL;
-                        GUI_FileSelRead("AC3 to use as 2nd track",&name);
                         if(!name) break;
 
                         tmp = new AVDMAC3AudioStream ();
@@ -2459,14 +2467,13 @@ void A_externalAudioTrack( void )
                                 secondAudioSource=AudioAC3;
                                 printf ("\n AC3 loaded\n");
                                 GUI_Info_HIG("Second track loaded", NULL);
+                                return 1;
                         }
                         }
                         break;
                 case AudioWav:
                          {
                         AVDMWavAudioStream *tmp;
-                        char               *name=NULL;
-                        GUI_FileSelRead("Wav to use as 2nd track",&name);
                         if(!name) break;
 
                         tmp = new AVDMWavAudioStream ();
@@ -2481,14 +2488,14 @@ void A_externalAudioTrack( void )
                                 secondAudioSource=AudioAC3;
                                 printf ("\n AC3 loaded\n");
                                 GUI_Info_HIG("Second track loaded", NULL);
+                                return 1;
                         }}
                         break;
                 default:
                 ADM_assert(0);
         }
+        return 0;
 }
-
-
              
 
 //****************

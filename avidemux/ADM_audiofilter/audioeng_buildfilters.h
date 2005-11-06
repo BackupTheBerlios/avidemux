@@ -78,6 +78,7 @@ typedef enum CHANNELCONV
 }CHANNELCONV;
 typedef enum
 {
+        AudioInvalid,
         AudioAvi=1,
         AudioMP3,
         AudioWav,
@@ -90,6 +91,7 @@ void audioCodecSetcodec(AUDIOENCODER codec);
 uint8_t audioReset(void);
 /*  for job/workspace stuff  */
 uint8_t audioCodecSetByName( const char *name);
+AudioSource audioCodecGetFromName( const char *name);
 const char *audioCodecGetName( void );
 
 const char *audioFilterGetName( void );

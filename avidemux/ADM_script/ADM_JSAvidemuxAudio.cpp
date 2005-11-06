@@ -34,6 +34,7 @@ extern int A_loadAC3 (char *name);
 extern int A_loadMP3 (char *name);
 extern int A_loadWave (char *name);
 extern void HandleAction(Action act);
+extern uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name);
 
 JSPropertySpec ADM_JSAvidemuxAudio::avidemuxaudio_properties[] = 
 { 
@@ -61,6 +62,7 @@ JSFunctionSpec ADM_JSAvidemuxAudio::avidemuxaudio_methods[] =
         { "getNbTracks", getNbTracks, 0, 0, 0 },    // set output codec
         { "setTrack", setTrack, 1, 0, 0 },    // set output codec
         { "lamePreset", lamePreset, 1, 0, 0 },    // set output codec
+        { "secondAudioTrack", secondAudioTrack, 2, 0, 0 },    // set audio track
 	{ 0 }
 };
 
@@ -361,6 +363,26 @@ uint32_t *infos=NULL;
         video_body->changeAudioStream(0,nw);
         return JS_TRUE;
 }// end Codec
+JSBool ADM_JSAvidemuxAudio::secondAudioTrack(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+        ADM_JSAvidemuxAudio *p = (ADM_JSAvidemuxAudio *)JS_GetPrivate(cx, obj);
+        if(argc != 2)
+                return JS_FALSE;
+        // First arg is MP3 etc...
+        char *name = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+        LowerCase(name);
+        // First search the codec by its name
+        AudioSource source;
+        if(AudioInvalid==(source=audioCodecGetFromName(name)))
+                return JS_FALSE;
+        // Now get the name
+        name = JS_GetStringBytes(JSVAL_TO_STRING(argv[1]));
+        if(A_setSecondAudioTrack(source,name))
+        {
+                return JS_TRUE;
+        }
+       return JS_FALSE;
+}
 JSBool ADM_JSAvidemuxAudio::lamePreset(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {
