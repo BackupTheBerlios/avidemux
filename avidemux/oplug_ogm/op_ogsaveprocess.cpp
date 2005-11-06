@@ -194,7 +194,11 @@ uint8_t	ADM_ogmWriteProcess::writeVideo(uint32_t frame)
 uint32_t len,flags;
 uint8_t ret;
 		 ret= _encode->encode ( frame, &len, _videoBuffer, &flags);
-		 if(!ret) return 0;
+		 if(!ret)
+                 {
+                        printf("OgmWrite: Error encoding frame %d\n",frame);
+                        return 0;
+                 }
 		 encoding_gui->feedFrame(len);
 		 encoding_gui->setQuant(_encode->getLastQz());		 
 		 return videoStream->write(len,_videoBuffer,flags,frame);
