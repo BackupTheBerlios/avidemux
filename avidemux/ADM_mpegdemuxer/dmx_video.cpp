@@ -310,7 +310,7 @@ char *start;
                 uint32_t currentImage=0;
                 uint32_t gop,imageStart,imageNb;
                 uint64_t abs,rel;
-
+		uint32_t update=0;
                 uint8_t  imgtype;
                 uint32_t imgsize;
                 uint64_t imgrel,imgabs;
@@ -375,8 +375,12 @@ char *start;
                                 }
                                 currentImage+=imageNb;
                                 read++;
-
-                        work->update(  read,_nbGop)   ;
+			update++;
+			if(update>1000)
+			{
+	                        work->update(  read,_nbGop)   ;
+				update=0;
+			}
                 }
                 delete work;
                 fclose(file);
