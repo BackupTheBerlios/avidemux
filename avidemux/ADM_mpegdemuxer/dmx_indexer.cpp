@@ -207,7 +207,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                 
                                 update++;
                                 //aprintf("\t\tSync : %x at %"LLX"\n",streamid,syncAbs);
-                                if(update>100)
+                                if(update>10000)
                                         {
                                                /* if(work->update(syncAbs>>16,demuxer->getSize()>>16))
                                                 {
