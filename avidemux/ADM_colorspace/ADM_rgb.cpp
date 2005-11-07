@@ -57,7 +57,10 @@ extern "C" {
 #endif
 
 #ifdef ADM_BIG_ENDIAN
-              #define TARGET_COLORSPACE      IMGFMT_BGR32
+              #define TARGET_COLORSPACE       IMGFMT_BGRA 
+//              #define TARGET_COLORSPACE       IMGFMT_ABGR
+//              #define TARGET_COLORSPACE       IMGFMT_RGB32
+//              #define TARGET_COLORSPACE      IMGFMT_BGR32
 #else
               #define TARGET_COLORSPACE      IMGFMT_RGB32
 #endif
