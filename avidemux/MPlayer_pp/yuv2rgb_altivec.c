@@ -666,7 +666,7 @@ static int altivec_uyvy_rgb32 (SwsContext *c,
 */
 SwsFunc yuv2rgb_init_altivec (SwsContext *c)
 {
-  if (!(c->flags & SWS_CPU_CAPS_ALTIVEC))    
+  if (!(c->flags & SWS_CPU_CAPS_ALTIVEC))
     return NULL;
 
   /*
@@ -691,8 +691,8 @@ SwsFunc yuv2rgb_init_altivec (SwsContext *c)
   case IMGFMT_NV21:
     if ((c->srcH & 0x1) != 0)
       return NULL;
-
-    switch(c->dstFormat){
+#warning "modificado INICIO"
+/*    switch(c->dstFormat){
     case IMGFMT_RGB24:
       MSG_WARN("ALTIVEC: Color Space RGB24\n");
       return altivec_yuv2_rgb24;
@@ -701,14 +701,19 @@ SwsFunc yuv2rgb_init_altivec (SwsContext *c)
       return altivec_yuv2_bgr24;
     case IMGFMT_RGB32:
       MSG_WARN("ALTIVEC: Color Space ARGB32\n");
-      return altivec_yuv2_argb32;
-    case IMGFMT_BGR32:
+       return altivec_yuv2_argb32;
+
+/*    case IMGFMT_BGR32:
       MSG_WARN("ALTIVEC: Color Space BGRA32\n");
       //      return profile_altivec_bgra32;
-
-      return altivec_yuv2_bgra32;
-    default: return NULL;
-    }
+*/
+      return altivec_yuv2_rgba32;
+//      return altivec_yuv2_bgra32;
+/*    default: 
+    		printf("ALTIVEC: src IMGFMT_NV21 dst desconocido %d\n",c->dstFormat);
+    		return NULL;
+    }*/
+#warning "modificado FIN"
     break;
 
   case IMGFMT_UYVY:
@@ -764,7 +769,6 @@ for (i=0; i<6;i++)
 #endif
  return;
 }
-
 
 void
 altivec_yuv2packedX (SwsContext *c,

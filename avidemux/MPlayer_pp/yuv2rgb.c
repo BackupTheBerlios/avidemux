@@ -604,18 +604,22 @@ SwsFunc yuv2rgb_get_func_ptr (SwsContext *c)
 	if(t) return t;
     }
 #endif
+
 #ifdef HAVE_ALTIVEC
+	printf("Soy un mac");
     if (c->flags & SWS_CPU_CAPS_ALTIVEC)
     {
 	SwsFunc t = yuv2rgb_init_altivec(c);
-	if(t) return t;
+	printf("\nantes\n");
+	if(t) 	return t;
+	printf("\ndespues\n");
     }
 #endif
 
     MSG_WARN("No accelerated colorspace conversion found\n");
 
     switch(c->dstFormat){
-    case IMGFMT_RGB32:
+	case IMGFMT_RGB32:
     case IMGFMT_BGR32: return yuv2rgb_c_32;
     case IMGFMT_RGB24: return yuv2rgb_c_24_rgb;
     case IMGFMT_BGR24: return yuv2rgb_c_24_bgr;
