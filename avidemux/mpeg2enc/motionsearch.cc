@@ -40,7 +40,7 @@
  */
 #define STATIC static
 #if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)
-#include "altivec/altivec_motion.h"
+//#include "altivec/altivec_motion.h"
 #  if ALTIVEC_TEST_MOTION
 #    undef STATIC
 #    define STATIC /* static */

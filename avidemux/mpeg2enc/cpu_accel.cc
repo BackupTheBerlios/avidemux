@@ -29,7 +29,7 @@
 #include "ADM_toolkit/ADM_cpuCap.h"
 
 #if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)
-extern int detect_altivec();
+int detect_altivec(){};
 #endif
 
 //#include "mjpeg_types.h"

@@ -41,7 +41,7 @@
 #include "fastintfns.h"
 #if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
 /* needed for ALTIVEC_BENCHMARK and print_benchmark_statistics() */
-#include "../utils/altivec/altivec_conf.h"
+//#include "../utils/altivec/altivec_conf.h"
 #endif
 #include "mpeg2parm.h"
 #include "ADM_codecs/ADM_codec.h"

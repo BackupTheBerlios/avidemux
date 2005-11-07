@@ -64,7 +64,7 @@
 #include "ADM_toolkit/ADM_cpuCap.h"
 
 #if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
-void enable_altivec_quantization(int opt->mpeg1);
+void enable_altivec_quantization(int op);//t->mpeg1);
 #endif
 
 

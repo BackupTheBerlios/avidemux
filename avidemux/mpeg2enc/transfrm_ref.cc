@@ -59,7 +59,7 @@
 #include "simd.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
 #if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)
-#include "../utils/altivec/altivec_transform.h"
+//#include "../utils/altivec/altivec_transform.h"
 #endif
 
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)

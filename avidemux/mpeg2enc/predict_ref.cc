@@ -60,7 +60,7 @@
 
 
 #if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
-#include "../utils/altivec/altivec_predict.h"
+//#include "../utils/altivec/altivec_predict.h"
 #endif
 
 void (*ppred_comp)( uint8_t *src, uint8_t *dst,
@@ -326,11 +326,11 @@ void init_predict(void)
 	    mjpeg_info("SETTING AltiVec for PREDICTION!");
 #  endif
 
-#  if ALTIVEC_TEST_FUNCTION(pred_comp)
-	    ppred_comp = ALTIVEC_TEST_SUFFIX(pred_comp);
-#  else
-	    ppred_comp = ALTIVEC_SUFFIX(pred_comp);
-#  endif
+//#  if ALTIVEC_TEST_FUNCTION(pred_comp)
+//	    ppred_comp = ALTIVEC_TEST_SUFFIX(pred_comp);
+//#  else
+//	    ppred_comp = ALTIVEC_SUFFIX(pred_comp);
+//#  endif
 	}
 #endif /* HAVE_ALTIVEC */
 }
