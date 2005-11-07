@@ -138,7 +138,7 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
        		  uint32_t bytes=_info.width*_param->top;
 		  uint32_t page=_info.width*_info.height;
        		
-       		  memset(srcY,0x00,bytes);
+       		  memset(srcY,0x10,bytes);
 		  memset(srcU,0x80,bytes>>2);
 		  memset(srcV,0x80,bytes>>2);
        		  // left & right
@@ -146,7 +146,7 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
 		  
        		  for(uint32_t y=_info.height;y>0;y--)
        		  {
-       		        memset(srcY,0,_param->left);
+       		        memset(srcY,0x10,_param->left);
        		        memset(srcY+stride-_param->right,0,_param->right);       		
        		        srcY+=stride;       		
 		 }
@@ -166,7 +166,7 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
        		
        		 bytes=_info.width*_param->bottom;
        	 	 srcY-=bytes;
-       		 memset(srcY,0x00,bytes);
+       		 memset(srcY,0x10,bytes);
 		// chroma
 		 srcU=UPLANE(data)+(page>>2)-1;
 		 srcU-=bytes>>2;

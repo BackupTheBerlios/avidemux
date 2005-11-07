@@ -151,7 +151,7 @@ uint8_t AVDMVideoAddBorder::getFrameNumberNoAlloc(uint32_t frame,
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
        		
 				// blacken screen
-				memset(YPLANE(data),0,_info.width*_info.height);
+				memset(YPLANE(data),16,_info.width*_info.height);
 				memset(UPLANE(data),128,(_info.width*_info.height)>>2);
 				memset(VPLANE(data),128,(_info.width*_info.height)>>2);
 
