@@ -172,14 +172,13 @@ uint8_t ADMVideoForcedPP::getFrameNumberNoAlloc(uint32_t frame,
 			 		return 0;
 
 			oBuff[0]=YPLANE(data);
-                        {
-                             oBuff[1]=VPLANE(data);
-                             oBuff[2]=UPLANE(data);
-                        }
+                        oBuff[1]=VPLANE(data);
+                        oBuff[2]=UPLANE(data);
+
 				
 			iBuff[0]=YPLANE(_uncompressed);
-		 	iBuff[1]=UPLANE(_uncompressed);
- 		 	iBuff[2]=VPLANE(_uncompressed);
+		 	iBuff[1]=VPLANE(_uncompressed);
+ 		 	iBuff[2]=UPLANE(_uncompressed);
 				
 				
 		        strideTab[0]=strideTab2[0]=_info.width;
