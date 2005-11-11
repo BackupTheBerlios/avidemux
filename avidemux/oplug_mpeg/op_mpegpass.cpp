@@ -102,7 +102,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 	ADM_assert (video_body->getFlags (frameStart, &flags));
         if(!(flags&AVI_KEY_FRAME))
         {
-                GUI_Error_HIG("The first frame is not intra frame", "Use the '<<' and the '>>' buttons to move using Intra frames.");
+                GUI_Error_HIG("The first frame is not intra frame", "Use the &lt;&lt; and the &gt;&gt; buttons to move using Intra frames.");
                 return 0;
         }
 	
