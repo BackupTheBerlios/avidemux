@@ -71,7 +71,7 @@ static GtkWidget *guiVideoToggle=NULL;
 static GdkCursor *guiCursorBusy=NULL;
 static GdkCursor *guiCursorNormal=NULL;
 static gint	  guiCursorEvtMask=0;
-static void navKeyChange( void );
+static void     volumeChange( void );
 // heek !
 static  GtkAdjustment *sliderAdjustment;
 // Needed for DND
@@ -82,7 +82,7 @@ extern void A_appendAvi (char *name);
 static void on_audio_change(void);
 static void on_video_change(void);
 static int update_ui=0;
-
+extern uint8_t AVDM_setVolume(int volume);
 #define AUDIO_WIDGET "comboboxAudio"
 #define VIDEO_WIDGET "comboboxVideo"
 #define FORMAT_WIDGET "comboboxFormat"
@@ -279,7 +279,7 @@ uint8_t  bindGUI( void )
         
         // navKey
         gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,"hscaleSensitive")), "value_changed",   
-                      GTK_SIGNAL_FUNC(navKeyChange),                   (void *) NULL);  
+                      GTK_SIGNAL_FUNC(volumeChange),                   (void *) NULL);  
 
 
 		       
@@ -422,33 +422,20 @@ if(_upd_in_progres) return;
    
 }
 
-void navKeyChange( void )
+void volumeChange( void )
 {
 GtkWidget *wid;
 GtkAdjustment *adj;
-double dir;
-Action action=ACT_DUMMY;
+int vol;
+
 
 if(_upd_in_progres) return;
  _upd_in_progres++;
 
         wid=lookup_widget(guiRootWindow,"hscaleSensitive");
         adj=gtk_range_get_adjustment (GTK_RANGE(wid));
-
-        dir=(double)GTK_ADJUSTMENT(adj)->value;
-        if(abs(  (dir-1)*10)<1)
-        {
-                action=ACT_NextKFrame;
-        }
-        else if(abs((dir+1)*10)<1)
-                action=ACT_PreviousKFrame;
-        //
-        if(action!=ACT_DUMMY)
-        {
-                HandleAction(action);
-        }
-        // Set to zero
-        gtk_adjustment_set_value(adj,0);
+        vol=(int)floor(adj->value+0.5);
+        AVDM_setVolume( vol);
  _upd_in_progres--;
    
 }
