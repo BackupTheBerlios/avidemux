@@ -39,6 +39,12 @@
 
 //#define OPENDML_VERBOSE
 
+#if defined( CYG_MANGLING) || defined(ARCH_X86_64)
+	#define PPACKED __attribute__ ((packed))
+#else
+	#define PPACKED 
+#endif
+
 typedef struct OPENDML_INDEX
 {
 	//uint32_t	fcc;
@@ -49,13 +55,13 @@ typedef struct OPENDML_INDEX
 	uint32_t	nbEntryInUse;
 	uint32_t	chunkId;
 	uint32_t	reserver[3];
-};
+}PPACKED;
 typedef struct OPENDML_ENTRY
 {
 	uint64_t 	offset;
 	uint32_t	size;
 	uint32_t	duration;
-};
+}PPACKED;
 
 typedef struct OPENML_SECONDARY_INDEX
 {
@@ -66,11 +72,8 @@ typedef struct OPENML_SECONDARY_INDEX
 	uint32_t	chunkId;
 	uint64_t	base;
 	uint32_t	reserver;
-}
-#ifdef CYG_MANGLING
-__attribute__ ((packed))
-#endif
-;
+}PPACKED;
+
 
 /*
 	Try to index if it is/was an openDML file
@@ -95,8 +98,10 @@ uint32_t total;
 		return 0;
         }
  	_videostream.dwLength= _mainaviheader.dwTotalFrames=total;
+	printf("\nBuilding odm audio tracks\n");
 	for(int i=0;i<_nbAudioTracks;i++)
         {
+		printf("\nDoing track %d of %d\n",i,_nbAudioTracks);
                 if(!scanIndex(     _audioTracks[i].trackNum,
                                 &(_audioTracks[i].index),
                                 &(_audioTracks[i].nbChunks)))
