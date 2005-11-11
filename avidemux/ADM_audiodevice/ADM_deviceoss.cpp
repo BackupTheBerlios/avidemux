@@ -33,6 +33,7 @@
 #else
 	#include <sys/soundcard.h>
 	const char *dsp = "/dev/dsp";
+        const char *device_mixer = "/dev/mixer";
 
 #endif
  
@@ -44,10 +45,28 @@
 #include  "ADM_audiodevice/ADM_deviceoss.h"
 #include "ADM_toolkit/toolkit.hxx"
 
+//_______________________________________________
+//
+//
+//_______________________________________________
+uint8_t  ossAudioDevice::setVolume(int volume) 
+{
+        int fd;
 
+        fd=open(device_mixer,O_RDONLY);
+        if(!fd)
+        {
+                printf("OSS: cannot open mixer\n");
+                return 0;
+        }
+        printf("Oss: New volume %d\n",volume);
+        // Assuming stereo
+        volume=volume+(volume<<8);
+        ioctl(fd, MIXER_WRITE(SOUND_MIXER_VOLUME), &volume);
+        close(fd);
+        return 1;
 
-
-
+}
 
 //_______________________________________________
 //

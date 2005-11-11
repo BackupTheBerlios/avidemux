@@ -29,6 +29,7 @@ uint8_t 	AVDM_AudioPlay(uint8_t *ptr, uint32_t nb);
 uint32_t 	AVDM_AudioSetup(uint32_t fq, uint32_t channel);
 void 		AVDM_AudioClose(void);
 AUDIO_DEVICE 	AVDM_getCurrentDevice( void);
+uint8_t         AVDM_setVolume(int volume);
 
 #endif
 #endif
