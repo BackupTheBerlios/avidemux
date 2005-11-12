@@ -196,6 +196,14 @@ char *pth;
 
         if(source!=AudioAvi)
                 qfprintf(fd,"app.audio.load(\"%s\",\"%s\");\n", audioSourceFromEnum(source),audioName); 
+        else 
+        { // Maybe not the 1st track
+          int source;
+               source=video_body->getCurrentAudioStreamNumber(0);
+               if(source)
+                        qfprintf(fd,"app.audio.setTrack(%d);\n", source); 
+                        
+        }
 
    qfprintf(fd,"app.audio.codec(\"%s\",%d);\n", audioCodecGetName(),audioGetBitrate()); 
    //qfprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode()]);
