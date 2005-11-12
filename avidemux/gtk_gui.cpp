@@ -2047,7 +2047,12 @@ A_saveWorkbench (char *name)
 }
 
 void A_parseECMAScript(const char *name){
-  bool ret = parseECMAScript(name);
+  bool ret;
+   if (playing){
+      GUI_PlayAvi();
+      curframe = 0;
+   }
+   ret = parseECMAScript(name);
    if( ret == 0 ){
       if( actual_workbench_file )
          ADM_dealloc(actual_workbench_file);
