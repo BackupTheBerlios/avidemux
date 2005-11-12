@@ -234,7 +234,8 @@ uint8_t alsaAudioDevice::play( uint32_t len, uint8_t *data )
 
 
 				default:
-						printf("Error : Play %s (len=%lu)\n", snd_strerror(ret),len);
+						printf("Alsa Error %d: Play %s (len=%lu)\n",ret, snd_strerror(ret),len);
+                                                
 						return 1;
 			}
 
@@ -469,9 +470,11 @@ uint8_t alsaAudioDevice::play( uint32_t len, uint8_t *data )
 							snd_pcm_wait(pcm_handle, 1000);
       							continue;
 
-
+                                case    -EPIPE:
+                                                snd_pcm_prepare(pcm_handle);
+                                                continue;
 				default:
-						printf("Error : Play %s (len=%lu)\n", snd_strerror(ret),len);
+						printf("ALSA Error %d : Play %s (len=%lu)\n",ret, snd_strerror(ret),len);
 						return 1;
 			}
 
