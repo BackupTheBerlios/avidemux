@@ -670,7 +670,7 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonRight), TRUE);
 
-  scale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 10, 10)));
+  scale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 110, 1, 10, 10)));
   gtk_widget_show (scale);
   gtk_box_pack_start (GTK_BOX (vbox1), scale, FALSE, TRUE, 0);
 
