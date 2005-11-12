@@ -277,6 +277,7 @@ int nw;
       audioFilter_configureFilters ();
       return;
     case ACT_Pref:
+        if(playing) return;
     	if(DIA_Preferences())
 	{
 	saveEncoderConfig ();
