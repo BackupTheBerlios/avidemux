@@ -297,7 +297,9 @@ JSBool ADM_JSAvidemux::Load(JSContext *cx, JSObject *obj, uintN argc,
 		return JS_FALSE;
 	char *pTempStr = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
 	printf("Loading \"%s\"\n",pTempStr);
-	*rval = BOOLEAN_TO_JSVAL(A_openAvi(pTempStr));
+        // Do a failure instead of returing ko
+        *rval = BOOLEAN_TO_JSVAL(JS_TRUE);
+        if(!A_openAvi(pTempStr)) return JS_FALSE;	
 	return JS_TRUE;
 }// end Load
 
