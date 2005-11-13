@@ -107,13 +107,15 @@ GtkCellRenderer *renderer;
         int running=1;
         while(running)
         {
-                int sel=0;
+                int sel=0,event;
                 updateStatus();
-                switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+                switch(event=gtk_dialog_run(GTK_DIALOG(dialog)))
                 {
                         case GTK_RESPONSE_OK : running=0;break;
                         case GTK_RESPONSE_APPLY : running=0;break;
-                        case GTK_RESPONSE_CANCEL : running=0;break;
+                        case GTK_RESPONSE_CANCEL :
+                        case GTK_RESPONSE_DELETE_EVENT:
+                                         running=0;break;
                         case COMMAND_DELETE_ALL:
                                         if(GUI_Confirmation_HIG("Sure!","Delete ALL jobs","Are you sure you want to delete all jobs ?"))
                                         {
@@ -154,7 +156,9 @@ GtkCellRenderer *renderer;
                                         break;
 
                         
-                        default: GUI_Alert("Unknown event");break;
+                        default:
+                                printf("Event:%d\n",event); 
+                                GUI_Alert("Unknown event");break;
                 }
                 
         }
