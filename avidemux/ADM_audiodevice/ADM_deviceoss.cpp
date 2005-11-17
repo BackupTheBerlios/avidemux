@@ -44,6 +44,7 @@
 #include <ADM_assert.h>
 #include  "ADM_audiodevice/ADM_deviceoss.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "prefs.h"
 
 //_______________________________________________
 //
@@ -52,18 +53,33 @@
 uint8_t  ossAudioDevice::setVolume(int volume) 
 {
         int fd;
+	int ret;
+	uint8_t which_vol = 0;
 
+	prefs->get(FEATURE_AUDIOBAR_USES_MASTER,&which_vol);
         fd=open(device_mixer,O_RDONLY);
         if(!fd)
         {
                 printf("OSS: cannot open mixer\n");
                 return 0;
         }
-        printf("Oss: New volume %d\n",volume);
+        printf("Oss: New %s volume %d\n",(which_vol?"master":"pcm"),volume);
         // Assuming stereo
         volume=volume+(volume<<8);
-        ioctl(fd, MIXER_WRITE(SOUND_MIXER_VOLUME), &volume);
+	if( which_vol ){
+        	ret = ioctl(fd, MIXER_WRITE(SOUND_MIXER_VOLUME), &volume);
+	}else{
+        	ret = ioctl(fd, MIXER_WRITE(SOUND_MIXER_PCM   ), &volume);
+	}
         close(fd);
+
+	if( ret ){
+		if( errno == EBADF ){
+			printf("set mixer failed: %u (possible access issue)\n",errno);
+		}else{
+			printf("set mixer failed: %u\n",errno);
+		}
+	}
         return 1;
 
 }

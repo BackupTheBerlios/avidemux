@@ -1362,7 +1362,7 @@ create_mainWindow (void)
   GTK_WIDGET_UNSET_FLAGS (sliderNavigate, GTK_CAN_FOCUS);
   gtk_scale_set_value_pos (GTK_SCALE (sliderNavigate), GTK_POS_LEFT);
 
-  hscaleSensitive = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (62.2951, 0, 100, 5, 5, 5)));
+  hscaleSensitive = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (62.2951, 0, 105, 5, 5, 5)));
   gtk_widget_show (hscaleSensitive);
   gtk_table_attach (GTK_TABLE (table2), hscaleSensitive, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
