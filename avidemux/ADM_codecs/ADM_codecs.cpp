@@ -260,7 +260,7 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 #endif
 
            }
-          if(fourCC::check(fcc,(uint8_t *)"YV12"))
+          if(fourCC::check(fcc,(uint8_t *)"YV12")||fourCC::check(fcc,(uint8_t *)"I420"))
           {
             			printf("\n using null codec\n");
 			       	return(decoders *)( new decoderNull(w,h));
