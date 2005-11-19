@@ -298,9 +298,6 @@ UNUSED_ARG(mode);
                 return addFile (name);
         }
         return 0;
-        //break;
-     
-      //return 0;
       break;
 	case WorkBench_FileType:
 
@@ -322,8 +319,8 @@ UNUSED_ARG(mode);
 	  printf ("\n not identified ...\n");
 	}
       else
-	printf
-	  ("\n successfully identified but no loader support detected...\n");
+	GUI_Error_HIG("File type identified but no loader support detected...",
+		"May be related to an old index file.");
       return 0;
     }
   // check opening was successful
