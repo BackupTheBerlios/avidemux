@@ -70,6 +70,7 @@ GtkCellRenderer *renderer;
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
         
+        
         store=gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
         
         // initialize our job structure
@@ -105,6 +106,7 @@ GtkCellRenderer *renderer;
         //
          
         int running=1;
+        gtk_widget_set_usize(WID(treeview1), 180, 300);
         while(running)
         {
                 int sel=0,event;
