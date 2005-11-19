@@ -35,6 +35,7 @@ codecs.xvid.enctype,			UINT,	0,	0,	99999
 codecs.xvid.quantizer,			UINT,	4,	2,	32
 codecs.xvid.bitrate,			UINT,	1500000,17,	5900000
 codecs.xvid.finalsize,			UINT,	700,	0,	3999
+codecs.preferredcodec,			STRING,	FFmpeg4
 filters.subtitle.fontname,		STRING, "/usr/X11R6/lib/X11/fonts/truetype/arial.ttf"
 filters.subtitle.charset,		STRING, "ISO-8859-1"
 filters.subtitle.fontsize,		UINT,	24,	1,	576
@@ -43,16 +44,8 @@ filters.subtitle.upercent,		INT,	0,	0,	255
 filters.subtitle.vpercent,		INT,	0,	0,	255
 filters.subtitle.selfadjustable,	UINT,	0,	0,	1
 filters.subtitle.usebackgroundcolor,	UINT,	0,	0,	1
-test.string,	STRING,	"abcdhfgd"
-test.int,	INT,	0,	-3,	3
-test.uint,	UINT,	1,	0,	3
-test.long,	LONG,	1,	-4,	999999999999
-test.ulong,	ULONG,	2,	0,	999999999999
-test.float,	FLOAT,	0.0,	-0.35,	0.35
 # codec metasettings for mpeg2enc based
 settings.mpegsplit, UINT,790,	400,	5000
-# codec settings
-codecs.preferredcodec,			STRING,	FFmpeg4
 device.audiodevice,			STRING,	OSS
 device.audio.alsa_device,               STRING, "plughw:0@0"
 device.videodevice,			UINT,	0,	0,	10
@@ -74,6 +67,8 @@ lame_path,				STRING, ""
 toolame_path,				STRING, ""
 lvemux_path,				STRING, ""
 requant_path,				STRING, ""
+# 0 - no messages, 1 - only error messages, 2 - all messages
+message_level,				UINT,	2,	0,	1
 # feature
 feature.swap_if_A_greater_than_B,	UINT,   1,      0,      1
 feature.svcdres.preferedsourceratio,	STRING, "1:1"

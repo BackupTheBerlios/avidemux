@@ -68,6 +68,7 @@ static opt_def opt_defs [] = {
 	{"codecs.xvid.quantizer",		UINT,	"4",	NULL,	"2",	"32"	},
 	{"codecs.xvid.bitrate",		UINT,	"1500000",NULL,	"17",	"5900000"},
 	{"codecs.xvid.finalsize",	UINT,	"700",	NULL,	"0",	"3999"	},
+	{"codecs.preferredcodec",		STRING,"FFmpeg4",NULL, NULL, NULL },
 	{"filters.subtitle.fontname",		STRING,"/usr/X11R6/lib/X11/fonts/truetype/arial.ttf",NULL, NULL, NULL },
 	{"filters.subtitle.charset",		STRING,"ISO-8859-1",NULL, NULL, NULL },
 	{"filters.subtitle.fontsize",		UINT,	"24",	NULL,	"1",	"576"	},
@@ -76,14 +77,7 @@ static opt_def opt_defs [] = {
 	{"filters.subtitle.vpercent",		INT,	"0",	NULL,	"0",	"255"	},
 	{"filters.subtitle.selfadjustable",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"filters.subtitle.usebackgroundcolor",		UINT,	"0",	NULL,	"0",	"1"	},
-	{"test.string",		STRING,"abcdhfgd",NULL, NULL, NULL },
-	{"test.int",		INT,	"0",	NULL,	"-3",	"3"	},
-	{"test.uint",		UINT,	"1",	NULL,	"0",	"3"	},
-	{"test.long",		LONG,	"1",	NULL,	"-4",	"999999999999"},
-	{"test.ulong",		ULONG,	"2",	NULL,	"0",	"999999999999"},
-	{"test.float",	FLOAT,	"0.0",	NULL,	"-0.35","0.35"	},
 	{"settings.mpegsplit",	UINT,	"790",	NULL,	"400",	"5000"	},
-	{"codecs.preferredcodec",		STRING,"FFmpeg4",NULL, NULL, NULL },
 	{"device.audiodevice",	STRING,"OSS",	NULL, NULL, NULL },
 	{"device.audio.alsa_device",		STRING,"plughw:0,0",NULL, NULL, NULL },
 	{"device.videodevice",		UINT,	"0",	NULL,	"0",	"10"	},
@@ -102,6 +96,7 @@ static opt_def opt_defs [] = {
 	{"toolame_path",		STRING,"",	NULL, NULL, NULL },
 	{"lvemux_path",		STRING,"",	NULL, NULL, NULL },
 	{"requant_path",		STRING,"",	NULL, NULL, NULL },
+	{"message_level",		UINT,	"2",	NULL,	"0",	"1"	},
 	{"feature.swap_if_A_greater_than_B",		UINT,	"1",	NULL,	"0",	"1"	},
 	{"feature.svcdres.preferedsourceratio",		STRING,"1:1",	NULL, NULL, NULL },
 	{"feature.saveprefsonexit",		UINT,	"1",	NULL,	"0",	"1"	},
@@ -115,7 +110,7 @@ static opt_def opt_defs [] = {
 	{"feature.audiobar_uses_master",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 69;
+int num_opts = 64;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

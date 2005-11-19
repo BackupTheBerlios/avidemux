@@ -2563,13 +2563,20 @@ void A_addJob(void)
 }
 int A_SaveWrapper(char *name)
 {
+  uint8_t msg_level = 2;
+	prefs->get(MESSAGE_LEVEL,&msg_level);
+
         if(A_Save(name))
         {
-                GUI_Info_HIG ("Done", "File %s has been successfully saved.",GetFileName(name));
+		if( msg_level == 2 ){
+                	GUI_Info_HIG ("Done", "File %s has been successfully saved.",GetFileName(name));
+		}
         }
         else
         {
-                GUI_Error_HIG ("Failed", "File %s was NOT saved correctly.",GetFileName(name));
+		if( msg_level >= 1 ){
+                	GUI_Error_HIG ("Failed", "File %s was NOT saved correctly.",GetFileName(name));
+		}
         }
         return 1;
 }
