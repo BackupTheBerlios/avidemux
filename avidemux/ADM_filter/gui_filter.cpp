@@ -441,9 +441,8 @@ on_action (gui_act action)
 	  ADM_assert (data);
 	  in->getFrameNumberNoAlloc (curframe, &l, data, &f);
 
-	  GUI_PreviewInit (w, h,1);
-	  GUI_PreviewRun (data->data);
-	  GUI_PreviewEnd ();
+          GUI_PreviewShow(w,h,data->data);
+
 	  ADM_dealloc (data);
 	}
 
