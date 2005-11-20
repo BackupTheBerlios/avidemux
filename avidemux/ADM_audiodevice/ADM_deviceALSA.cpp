@@ -509,12 +509,75 @@ uint8_t alsaAudioDevice::play( uint32_t len, uint8_t *data )
      return 1;
 }
 
+uint8_t alsaAudioDevice::setVolume(int volume){
+  snd_mixer_t *mixer_handle;
+  char *pcm_name;
+  uint8_t which_vol;
+  int rc;
+
+	if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &pcm_name) != RC_OK )
+		pcm_name = ADM_strdup("hw:0");
+	if( prefs->get(FEATURE_AUDIOBAR_USES_MASTER,&which_vol) != RC_OK )
+		which_vol = 0;
+
+	if( (rc=snd_mixer_open(&mixer_handle,0)) < 0 ){
+		printf("ALSA: snd_mixer_open failed: %d\n",rc);
+		ADM_dealloc(pcm_name);
+		return 0;
+	}
+	if( (rc=snd_mixer_attach(mixer_handle,pcm_name)) < 0 ){
+		printf("ALSA: snd_mixer_attach failed: %d\n",rc);
+		snd_mixer_close(mixer_handle);
+		ADM_dealloc(pcm_name);
+		return 0;
+	}
+	ADM_dealloc(pcm_name);
+	if( (rc=snd_mixer_selem_register(mixer_handle,NULL,NULL)) < 0 ){
+		printf("ALSA: snd_mixer_selem_register failed: %d\n",rc);
+		snd_mixer_close(mixer_handle);
+		return 0;
+	}
+	if( (rc=snd_mixer_load(mixer_handle)) < 0 ){
+		printf("ALSA: snd_mixer_load failed: %d\n",rc);
+		snd_mixer_close(mixer_handle);
+		return 0;
+	}
+	{ snd_mixer_elem_t *elem;
+	  snd_mixer_selem_id_t *sid;
+	  const char *str;
+		snd_mixer_selem_id_alloca(&sid);
+		for (elem = snd_mixer_first_elem(mixer_handle);
+		     elem;
+		     elem = snd_mixer_elem_next(elem)) {
+			snd_mixer_selem_get_id(elem, sid);
+			str = snd_mixer_selem_id_get_name(sid);
+			if( (which_vol == 0 && !strcmp(str,"PCM"))   ||
+			    (which_vol == 1 && !strcmp(str,"Master"))  ){
+			  long val=0, min=0, max=0;
+				snd_mixer_selem_get_playback_volume_range(elem,&min,&max);
+				/*
+				if( (rc=snd_mixer_selem_get_playback_volume(elem,SND_MIXER_SCHN_FRONT_LEFT,&val)) < 0 ){
+					printf("ALSA: snd_mixer_selem_get_playback_volume failed: %d\n",rc);
+				}
+				printf("ALSA: old val: %lu\n",val*100/max);
+				*/
+				if( (rc=snd_mixer_selem_set_playback_volume_all(elem,volume*max/100)) < 0 ){
+					printf("ALSA: snd_mixer_selem_set_playback_volume_all failed: %d\n",rc);
+				}
+				printf("ALSA: new %s val: %lu\n",(which_vol?"master":"pcm"),volume);
+				break;
+			}
+		}
+	}
+	snd_mixer_close(mixer_handle);
+	return 0;
+}
+
 #endif
 #else
 void dummy_alsa_fun( void);
 void dummy_alsa_fun( void)
  {
 }
-
 
 #endif
