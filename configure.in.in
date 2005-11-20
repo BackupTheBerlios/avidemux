@@ -765,8 +765,8 @@ dnl ________/SPIDERMONKEY__________
 
 
 
-dnl
-dnl xv output support
+dnl ______________________________
+dnl          Xvideo
 dnl
 AC_ARG_ENABLE([xv],
 	AC_HELP_STRING([--disable-xv], [Force compilation without XV support. (default: test)]),
@@ -782,7 +782,7 @@ if test "x$enable_xv" != "xno"; then
 			#include <stdio.h>
 			#include <X11/Intrinsic.h>
 		])
-	AC_CHECK_LIB(Xv, XvShmPutImage, , have_xv=no, -L/usr/X11R6/lib -lXext -lX11 -lm)
+	AC_CHECK_LIB(Xv, XvShmPutImage, , have_xv=no, -L/usr/X11R6/lib -L/usr/X11R6/lib64  -lXext -lX11 -lm)
 
 	if test "x$have_xv" = "xyes"; then
 		AC_DEFINE(USE_XV,1,[Try to use Xv extension])
