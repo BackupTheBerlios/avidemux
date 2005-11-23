@@ -121,25 +121,24 @@ GtkWidget 	*dialog;
 		gtk_widget_show(dialog);
 		UI_purge();
 		lastper=0;
+		_nextUpdate=0;
 }
 uint8_t DIA_working::update(uint32_t percent)
 {
-GtkWidget 	*dialog;
-uint32_t 		elapsed;
-char b[300];
-
-		UI_purge();
+	#define  GUI_UPDATE_RATE 1000
 
 		if(!_priv) return 1;
-		dialog=(GtkWidget *)_priv;
-
 		if(!percent) return 0;
 		if(percent==lastper) return 0;
 		aprintf("DIA_working::update(%lu) called\n", percent);
 		elapsed=_clock.getElapsedMS();
-		if(!elapsed) return 0;
-
+	if(elapsed<_nextUpdate) return 0;
+	_nextUpdate=elapsed+1000;
 		lastper=percent;
+
+	GtkWidget *dialog;
+	dialog=(GtkWidget *)_priv;
+
 		//
 		// 100/totalMS=percent/elapsed
 		// totalM=100*elapsed/percent
@@ -154,6 +153,7 @@ char b[300];
 
 		uint32_t sectogo=(uint32_t)floor(f);
 
+	char b[300];
    		int  mm,ss;
     			mm=sectogo/60;
       			ss=sectogo%60;
@@ -176,7 +176,6 @@ uint8_t DIA_working::update(uint32_t cur, uint32_t total)
 {
 		double d,n;
 		uint32_t percent;
-		UI_purge();
 		if(!_priv) return 1;
 
 		aprintf("DIA_working::update(uint32_t %lu,uint32_t %lu) called\n", cur, total);

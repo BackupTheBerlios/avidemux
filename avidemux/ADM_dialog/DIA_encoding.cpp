@@ -170,8 +170,6 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
   static uint32_t _lastnb=0;
 
 	   ADM_assert(dialog);
-	   sprintf(string,"%lu/%lu",nb,total);
-  	   gtk_label_set_text(GTK_LABEL(WID(label_frame)),string);
      	   //
            //	nb/total=timestart/totaltime -> total time =timestart*total/nb
            //
@@ -182,7 +180,7 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
              _lastnb = nb;
                                        
 					clock.reset();
-       					_lastTime=clock.getElapsedMS();;
+		_lastTime=clock.getElapsedMS();
        					_lastFrame=0;
        					_fps_average=0;
 
@@ -196,15 +194,14 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 	  }
              _lastnb = nb;
 
-           tim=clock.getElapsedMS();;
+	tim=clock.getElapsedMS();
 	//   printf("%lu / %lu\n",tim,_lastTime);
 	   if(_lastTime > tim) return;
 	   if( tim < _nextUpdate) return ; 
      _nextUpdate = tim+GUI_UPDATE_RATE;
 
-           if(tim)
-           {
-	   	double d;
+	sprintf(string,"%lu/%lu",nb,total);
+	gtk_label_set_text(GTK_LABEL(WID(label_frame)),string);
 
 	   	// compute fps
 		uint32_t deltaFrame, deltaTime;
@@ -223,8 +220,6 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 					ms2time((uint32_t)floor(0.5+deltaTime*framesLeft/deltaFrame),&hh,&mm,&ss);
 					sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
 					gtk_label_set_text(GTK_LABEL(WID(label_eta)),string);
-
-              }
 
            // Check if we should move on to the next sample period
           if (tim >= _nextSampleStartTime + ETA_SAMPLE_PERIOD ) {

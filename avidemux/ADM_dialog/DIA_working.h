@@ -26,6 +26,8 @@
 		private :
 				uint32_t 	lastper;
 				Clock	_clock;
+				uint32_t	_nextUpdate;
+				uint32_t 	elapsed;
 				void 		postCtor( void );
 		public:
 				void 		*_priv;

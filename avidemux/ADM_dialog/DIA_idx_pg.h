@@ -7,6 +7,7 @@ class DIA_progressIndexing
 protected:
                 Clock           clock;
                 uint32_t        aborted;
+		uint32_t	_nextUpdate;
         
 public:
                         DIA_progressIndexing(char *name);

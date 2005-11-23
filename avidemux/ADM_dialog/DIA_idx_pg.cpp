@@ -68,6 +68,7 @@ DIA_progressIndexing::DIA_progressIndexing(char *name)
         clock.reset();
         aborted=0;
         abted=0;
+	_nextUpdate=0;
         gtk_signal_connect(GTK_OBJECT(dialog), "delete_event",
                        GTK_SIGNAL_FUNC(on_destroy_abort), (void *) this);
 
@@ -91,13 +92,17 @@ uint8_t DIA_progressIndexing::abortRequest(void)
 }
 uint8_t       DIA_progressIndexing::update(uint32_t done,uint32_t total, uint32_t nbImage, uint32_t hh, uint32_t mm, uint32_t ss)
 {
+        uint32_t tim;
+	#define  GUI_UPDATE_RATE 1000
+
+	tim=clock.getElapsedMS();
+	if(tim>_nextUpdate)
+	{
         char string[256];
         double f;
-        uint32_t tim,tom;
-        uint32_t   zhh,zmm,zss;
+        	uint32_t   tom,zhh,zmm,zss;
 
-        UI_purge();
-
+		_nextUpdate=tim+GUI_UPDATE_RATE;
         sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
         gtk_label_set_text(GTK_LABEL(WID(labelTime)),string);
 
@@ -110,7 +115,6 @@ uint8_t       DIA_progressIndexing::update(uint32_t done,uint32_t total, uint32_
         gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
         /* compute ETL */
-         tim=clock.getElapsedMS();;
        // Do a simple relation between % and time
         // Elapsed time =total time*percent
         if(f<0.01) return 1;
@@ -122,8 +126,9 @@ uint8_t       DIA_progressIndexing::update(uint32_t done,uint32_t total, uint32_
         ms2time(tom,&zhh,&zmm,&zss);
         sprintf(string,"%02d:%02d:%02d",zhh,zmm,zss);
         gtk_label_set_text(GTK_LABEL(WID(label6)),string);
+        	UI_purge();
+	}
         return 1;
-
 }
 
 
