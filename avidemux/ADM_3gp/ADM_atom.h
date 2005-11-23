@@ -30,7 +30,8 @@ public:
 				adm_atom(FILE *fd);
 				adm_atom(FILE *fd,uint8_t full);
 				adm_atom(adm_atom *atom);
-		uint8_t	skipAtom( void );
+		uint8_t	        skipAtom( void );
+                uint32_t        getStartPos(void) {return _atomStart;}
 		uint32_t	getFCC( void );
 		uint32_t	getSize( void );
                 uint32_t        getRemainingSize( void );

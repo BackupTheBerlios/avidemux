@@ -32,7 +32,7 @@
 
 #include "ADM_library/fourcc.h"
 #include "ADM_3gp/ADM_atom.h"
-
+//#define _3G_LOGO
 #define aprintf printf
 //#define ATOM_DEBUG
 adm_atom::adm_atom(adm_atom *atom)
@@ -68,6 +68,11 @@ adm_atom::adm_atom(FILE *fd )
 	_atomStart=0;
 #ifdef ATOM_DEBUG
 	dumpAtom();
+#endif
+#ifdef _3G_LOGO
+        printf("Starting at %x  atom ",_atomStart);
+        fourCC::printBE(_atomFCC);
+        printf("\n");
 #endif
 
 }
@@ -161,6 +166,11 @@ uint8_t adm_atom::dumpAtom( void )
 uint8_t adm_atom::skipAtom( void )
 {
 	fseek(_fd,_atomStart+_atomSize,SEEK_SET);
+#ifdef _3G_LOGO
+        printf("Branching to %x ending atom ",_atomStart+_atomSize);
+        fourCC::printBE(_atomFCC);
+        printf("\n");
+#endif
 	return 1;
 
 

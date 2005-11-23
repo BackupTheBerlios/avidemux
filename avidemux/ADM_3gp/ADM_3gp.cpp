@@ -366,7 +366,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					for(uint32_t o=0;o<nest;o++) printf("\t");
 					printf("parsing atom ");
 					fourCC::printBE(tom.getFCC());
-					printf(" (size %lu)\n",tom.getSize());	
+					printf(" (size %lu) at 0x%x\n",tom.getSize(),tom.getStartPos());	
 #endif
 		nest++;
 		switch((tom.getFCC()))
@@ -376,7 +376,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					for(uint32_t o=0;o<nest;o++) printf("\t");
 					printf("skipping atom ");
 					fourCC::printBE(tom.getFCC());
-					printf("\n");	
+					printf(" (size %lu) at 0x%x\n",tom.getSize(),tom.getStartPos());   
 #endif
 					tom.skipAtom();
 					break;
@@ -638,14 +638,17 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 							nbSz,Sz,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
 							Sn,&nbo);
 					// Check for extra
+                                        
 					if(_otherExtraSize)
-					{	// Get extra data here
+					{
+                                               	// Get extra data here
 						printf("We have some (%lu) extra data for audio\n",_otherExtraSize);
+                                                uint32_t  oldPos=ftello(_fd);
 						_audioExtraData=new uint8_t[_otherExtraStart];
 						_audioExtraLen=_otherExtraSize;
 						fseek(_fd,_otherExtraStart,SEEK_SET);
 						fread(_audioExtraData,1,_otherExtraSize,_fd);
-					
+					        fseeko(_fd,oldPos,SEEK_SET);
 					}
 					if(nbo)
 						_nbAudioChunk=nbo;
