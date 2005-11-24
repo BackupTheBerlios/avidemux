@@ -447,7 +447,7 @@ uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 				printf("That filter cannot be created from script\n");
 				return 0;
 			}
-			filter=allfilters[i].create_from_script(videofilters[0].filter,n-1,&(args[1]));
+			filter=allfilters[i].create_from_script(videofilters[nb_active_filter-1].filter,n-1,&(args[1]));
 			if(!filter) return 0;
 			videofilters[nb_active_filter].filter=filter;
 			videofilters[nb_active_filter].tag=tag;						
