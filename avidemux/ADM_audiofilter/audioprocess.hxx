@@ -75,9 +75,10 @@ public:
 class AVDMProcessAudio_Normalize : public AVDMProcessAudioStream
 {
 protected:
-         int16_t   _table[32768*2+1];
-				 uint32_t								_max;
+#define MAX_AUDIO_CH 2
 				 uint32_t								_scanned;
+				 float								_dither_prior[MAX_AUDIO_CH];
+				 float								_ratio;
 public:
 
         AVDMProcessAudio_Normalize(AVDMGenericAudioStream *instream);

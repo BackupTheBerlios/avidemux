@@ -37,7 +37,7 @@ AVDMProcessAudio_Normalize::AVDMProcessAudio_Normalize(AVDMGenericAudioStream * 
     (instream)
 {
     // nothing special here...
-    _scanned = _max = 0;
+    _scanned = 0;
     _wavheader = new WAVHeader;
 
     memcpy(_wavheader, _instream->getInfo(), sizeof(WAVHeader));
@@ -60,9 +60,10 @@ AVDMProcessAudio_Normalize::AVDMProcessAudio_Normalize(AVDMGenericAudioStream * 
 //___________________________________________
 uint8_t AVDMProcessAudio_Normalize::preprocess(void)
 {
-    int16_t min = 0, max = 0, nratio;
+    int16_t min = 0, max = 0;
     int16_t *ptr;
-    uint32_t rd = 0, scanned = 0, ch = 0, ratio = 0;
+    uint32_t scanned = 0, ch = 0;
+    _ratio = 0;
 
     uint32_t percent=0;
     uint32_t current=0,llength=0;
@@ -105,7 +106,6 @@ uint8_t AVDMProcessAudio_Normalize::preprocess(void)
 							windowWorking->update(scanned,llength);
 					}
 		}
-	  rd += ch;
 	  ptr = (int16_t *) buffer;
 	  for (uint32_t i = 0; i < (ch >> 1); i++)
 	    {
@@ -113,7 +113,7 @@ uint8_t AVDMProcessAudio_Normalize::preprocess(void)
 		    max = *ptr;
 		if (*ptr < min)
 		    min = *ptr;
-
+		ptr++;
 	    }
 
       }
@@ -127,61 +127,31 @@ uint8_t AVDMProcessAudio_Normalize::preprocess(void)
     // rewind at the beginning
     _instream->goToTime(0);
     printf("\n maximum found : %d\n", max);
-    double db;
-    db = max;
-    db = db / 32767;
-    if (db)
-	db = 10 * log(db) / log(10);
+    double db_in, db_out;
+    db_out =  -3;
+    db_in = max;
+    db_in = db_in / 32767;
+    if (db_in)
+	db_in = 20 / log(10) * log(db_in);
     else
-	db = 0;
+	db_in = 0;
 
-    printf("--> %2.2f db / %2.2f \n", db, 10 * log(0.5) / log(10));
-    // Now we build the conversion table
-    // in from -max to max
-    // out from -32768 to 32768
-    int16_t j;
-    memset(_table, 65535, 0);
-    // we search the value righr about by
-    // step of 256 to cover round up error
-    _max = (max + 255) & 0xffffff00;
+    printf("--> %2.2f db / %2.2f \n", db_in, db_out);
 
     // search ratio
     if(max)
     {
-    ratio = 32768 / _max;
-    ratio = (int16_t) floor(ratio);
-    double fratio;
-    
-    fratio=ratio/2.;
-    nratio = (uint16_t) (ratio/2);
-    printf("\n Using ratio of : %u\n", nratio);
-    if (_max)
-      {
 
-	  for (uint32_t i = 0; i < 32768; i++)
-	    {
-		db = i;
-		db *= fratio;
-		// Clipping ?
-		if (db > 32767.)
-		  {
-		      //ADM_assert(0);
-		      db = 32767.;
-		  }
-		j = (int16_t) floor(db);
-		_table[32768 + i] = j;
-		_table[32768 - i] = -j;
-		
-//		printf("%d -> %d\n",i,j);
+    _ratio = expf(db_out * (1.0 / (20.0 / logf(10.0)))) * 32767;
+    _ratio = _ratio / max;
 
-	    }
-      }
+  //  printf("\n Using ratio of : %u\n", _ratio);
      }
 //skipit:
-    _max = max;
     _scanned = 1;
+    memset(_dither_prior, MAX_AUDIO_CH, 0);
+
     strcpy(_name, "PROC:NORM");
-    printf("\n table build");
     // Go to the beginning...
     //
     _instream->goToTime(0);
@@ -195,16 +165,27 @@ uint8_t AVDMProcessAudio_Normalize::preprocess(void)
 //___________________________________________
 uint32_t AVDMProcessAudio_Normalize::read(uint32_t len, uint8_t * buffer)
 {
-    uint32_t rd, i;
+    uint32_t rd, i, j,rd2;
     int16_t *s;
+    float f, dn;
+
     ADM_assert(_scanned);
+    ADM_assert(_wavheader->channels <= MAX_AUDIO_CH);
     rd = _instream->readDecompress(len, buffer);
     s = (int16_t *) buffer;
-    for (i = 0; i < (rd >> 1); i++)
-      {
-	  *s = _table[32768 + *s];
-	  s++;
-      }
+    rd2 = rd / 2 / _wavheader->channels;
+    for (i = 0; i < rd2; i++)
+	for (j = 0; j < _wavheader->channels; j++)
+      	{
+		// Triangle dithering
+		dn = (rand() / (float)RAND_MAX) * 2.0 - 1.0;
+		f = (float)*s;
+		f *= _ratio;
+	  	f += dn - _dither_prior[j];
+	  	*s = (int16_t) f;
+	  	s++;
+		_dither_prior[j] = dn;
+      	}
 
     return rd;
 
