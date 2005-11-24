@@ -203,7 +203,7 @@ uint8_t	ADMVideoSubtitle::subParse (subLine * in, char *string)
   	if(ADM_ASC(final[j+textindex])=='|') lllines++;
   }
 
-  printf("%lu -->%lu\n",in->startTime,in->endTime);
+  aprintf("%lu -->%lu\n",in->startTime,in->endTime);
   in->nbLine=lllines+1;
   in->string=new ADM_GLYPH_T *[in->nbLine];
   in->lineSize=new uint32_t[in->nbLine];
@@ -373,7 +373,7 @@ ADMVideoSubtitle::loadSRT (void)
 
     }
   ADM_utfEnd( );
-  printf(">> Sub: %d subs stored and loaded\n",_line); 	
+  aprintf(">> Sub: %d subs stored and loaded\n",_line); 	
   return 1;
   
 }

@@ -118,7 +118,11 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
       			GET(_bg_V_percent);
 
 			if(_conf->_baseLine>_info.height-_conf->_fontsize*SRT_MAX_LINE)
-					_conf->_baseLine=_conf->_fontsize*SRT_MAX_LINE;
+                        {
+                                printf("Base exceeded : base :%lu height :%lu bottom:%lu\n",
+                                        _conf->_baseLine,_info.height,_info.height-_conf->_fontsize*SRT_MAX_LINE);
+                                _conf->_baseLine=_conf->_fontsize*SRT_MAX_LINE;
+                        }
 
 			char *ft,*sub;
 			ft=(char *)ADM_alloc(500);

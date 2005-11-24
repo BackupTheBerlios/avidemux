@@ -170,7 +170,7 @@ uint32_t top=0,bottom=0;
         _original->buildYUV(_YUVPalette);
         ox=_original->_width;        
         oy=_original->_height;
-        printf("Original :%lu x %lu\n",ox,oy);
+        printf("Original :%lu x %lu (original  %d)\n",ox,oy,_vobSubInfo->height);
         ADM_assert(oy<=_vobSubInfo->height);
         
         // Search the 1st/last non null line
