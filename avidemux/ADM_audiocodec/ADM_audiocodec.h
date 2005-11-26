@@ -250,6 +250,28 @@ class ADM_AudiocodecWavSwapped : public     ADM_Audiocodec
 
    };
 
+ //****************************************************
+#define IMA_BUFFER 4096*8
+  class ADM_AudiocodecImaAdpcm : public     ADM_Audiocodec
+ {
+    protected:
+                       uint32_t                _inStock,_me,_channels;
+                       int                     ss_div,ss_mul; // ???
+                                void            *_contextVoid;
+                                uint8_t         _buffer[ IMA_BUFFER];
+                                uint32_t        _head,_tail;
 
+    public:
+                                ADM_AudiocodecImaAdpcm( uint32_t fourcc ,WAVHeader *info);
+                virtual         ~ADM_AudiocodecImaAdpcm() ;
+                virtual void    purge( void ) {};
+                virtual uint8_t beginDecompress( void ) {_head=_tail=0;return 1;};
+                virtual uint8_t endDecompress( void ) {_head=_tail=0;return 1;};
+                virtual uint8_t run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
+                                                          uint32_t * nbOut);
+                virtual uint8_t isCompressed( void ){ return 1;};
+                virtual uint8_t isDecompressable(void ){ return 1;};
+
+   };
 
 #endif
