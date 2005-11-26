@@ -73,6 +73,7 @@ typedef struct
 #define WAV_8BITS_UNSIGNED 	55 // dummy id
 #define WAV_AMRNB 	56 // dummy id
 #define WAV_ULAW	57 // dummy id
+#define WAV_IMAADPCM    17
 #include "ADM_audiocodec/ADM_audiocodec.h"
 #include "ADM_library/ADM_fileio.h"
 class AVDMGenericAudioStream
