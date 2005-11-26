@@ -468,6 +468,7 @@ const char *getStrFromAudioCodec( uint32_t codec)
 		case (WAV_AMRNB): return (const char *)"AMR narrow band";
 		case (WAV_MSADPCM): return (const char *)"MSADPCM";
 		case (WAV_ULAW): return (const char *)"ULAW";
+                case WAV_IMAADPCM: return (const char *)"IMA ADPCM";
                 case WAV_8BITS_UNSIGNED:return (const char *)"PCM 8bits";
 	}
 
