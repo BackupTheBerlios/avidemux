@@ -19,6 +19,7 @@
 		     		virtual uint8_t init( uint32_t channel,uint32_t fq ) ;
 	    			virtual uint8_t play( uint32_t len, uint8_t *data ) ;
 		      		virtual uint8_t stop( void ) ;
+		      		virtual uint8_t setVolume( int volume ) ;
 		 }     ;
 
 #endif

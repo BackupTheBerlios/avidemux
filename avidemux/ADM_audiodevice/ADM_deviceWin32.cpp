@@ -176,6 +176,16 @@ WAVEFORMATEX wav;
     return 1;
 }
 
+uint8_t  win32AudioDevice::setVolume(int volume) 
+{
+    DWORD value;
+    value=0xffff;
+    value*=volume;
+    value/=10;
+    value=value+(value<<16);
+    waveOutSetVolume(myDevice,value);
+	return 1;
+}
 //_______________________________________________
 //
 //
