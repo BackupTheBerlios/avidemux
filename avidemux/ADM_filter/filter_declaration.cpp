@@ -147,6 +147,8 @@ printf(  "*********************\n");
 	REGISTERX("subtitle","Subtitler","Add subtitles to the picture.",VF_SUBTILE,1,subtitle_create,subtitle_script);
 #endif
         REGISTERX("vobsub","VobSub","",VF_VOBSUB,1,vobsub_create,vobsub_script);
+        
+
         //*********************
  registerFilter("-------- Deblender ---------",VF_INVALID,2,NULL,NULL);
 
@@ -154,7 +156,7 @@ printf(  "*********************\n");
         REGISTERX("hardivtcremove","Hard pulldown removal","Remove IVTC that has been analog captured or resized.",VF_HARDIVTC,1,hardivtc_create,hardivtc_script);
         REGISTERX("whirl","Whirl","Useless whirlwind effect.",VF_WHIRL,1,whirl_create,whirl_script);
         REGISTERX("mosaic","Mosaic","Split the picture into tiny thumbnails.",VF_MOSAIC,1,     mosaic_create,mosaic_script);
-
+        REGISTERX("mpdelogo","MPlayer delogo","Blend a logo by interpolating its surrounding box.",VF_MPDELOGO,1,mpdelogo_create,mpdelogo_script);
 // Does not work
 //        REGISTERX("unblend","Unblend by Bach",VF_UNBLEND,1,unblend_create,unblend_script);
         

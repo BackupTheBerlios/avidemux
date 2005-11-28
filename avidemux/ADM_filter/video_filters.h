@@ -90,6 +90,7 @@
                 VF_MOSAIC,
                 VF_BLENDREMOVAL,
                 VF_TDEINT,
+                VF_MPDELOGO,
 		VF_DUMMY
  	 }VF_FILTERS;
  	
