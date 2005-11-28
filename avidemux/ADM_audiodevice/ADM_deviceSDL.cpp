@@ -246,6 +246,20 @@ uint8_t sdlAudioDevice::play(uint32_t nb,uint8_t * ptr)
 	
 	return 1;
 }
+
+uint8_t sdlAudioDevice::setVolume(int volume){
+#ifdef OSS_SUPPORT
+        ossAudioDevice dev;
+        dev.setVolume(volume);
+#else
+#ifdef ALSA_SUPPORT
+        alsaAudioDevice dev;
+        dev.setVolume(volume);
+#endif
+#endif
+	return 1;
+}
+
 #else
 void dummy_as_func( void);
 void dummy_as_func( void)
