@@ -100,6 +100,21 @@ uint8_t artsAudioDevice::play(uint32_t nb,uint8_t * ptr)
 			return arts_write(_stream, ptr, nb);
 
 }
+
+/*
+** JSC     Mon Nov 28 19:20:06 CET 2005
+** based on http://www.arts-project.org/doc/mcop-doc/artsd-faq.html
+** arts only works with OSS devices (or alsa devices using oss emulation)
+** so we only need OSS support here
+*/
+uint8_t artsAudioDevice::setVolume(int volume){
+#ifdef OSS_SUPPORT
+        ossAudioDevice dev;
+        dev.setVolume(volume);
+#endif
+        return 1;
+}
+
 #else
 void dummy_art_func( void);
 void dummy_art_func( void)
