@@ -90,6 +90,9 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 		case WAV_ULAW:
 				return getPacketPCM(dest,len,samples);
 				break;
+                case WAV_IMAADPCM:
+                                return getPacketADPCM(dest,len,samples);
+                                break;
 		case WAV_AC3:
 				return getPacketAC3(dest,len,samples);
 				break;
@@ -143,6 +146,27 @@ uint8_t		AVDMGenericAudioStream::getPacketWMA(uint8_t *dest, uint32_t *len,
 	return 0;
 
 }
+//*************
+uint8_t         AVDMGenericAudioStream::getPacketADPCM(uint8_t *dest, uint32_t *len,uint32_t *samples)
+{
+
+        uint32_t count,sample;
+
+                        // 4 bits per sample
+                        count=1024;
+                        if(_wavheader->channels==2) *samples=count;
+                        else *samples=count*2;
+
+                        if(packetTail-packetHead<count)
+                        {
+                                count=packetTail-packetHead;
+                                count&=0xffffffC;
+                        }
+                        memcpy(dest,&packetBuffer[packetHead],count);                   
+                        packetHead+=count;
+                        *len=count;
+                        return 1;
+}
 //___________________________
 uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len, 
 								uint32_t *samples)
@@ -172,7 +196,8 @@ uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len,
 				printf("Wav Packetizer: running empty, last packet sent\n");
 				return 0;
 			}
-                        if(_wavheader->encoding!=WAV_ULAW && _wavheader->encoding!=WAV_8BITS_UNSIGNED)
+                        if(_wavheader->encoding!=WAV_ULAW && _wavheader->encoding!=WAV_8BITS_UNSIGNED&&
+                                        _wavheader->encoding!=WAV_IMAADPCM)
 			{
 				*samples=sample/2;
 			}

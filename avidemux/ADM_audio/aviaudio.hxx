@@ -110,6 +110,8 @@ class AVDMGenericAudioStream
 								uint32_t *samples);
 					uint8_t		getPacketAAC(uint8_t *dest, uint32_t *len, 
 								uint32_t *samples);
+                                        uint8_t         getPacketADPCM(uint8_t *dest, uint32_t *len,
+                                                                uint32_t *samples);
 
        protected:
 				       	uint8_t  	readc( uint8_t *c);
