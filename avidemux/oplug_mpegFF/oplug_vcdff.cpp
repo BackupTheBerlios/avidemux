@@ -106,7 +106,8 @@ ADM_MUXER_TYPE mux;
 uint32_t  audio_encoding=0;
 uint32_t  real_framenum=0;
 uint8_t   ret=0;
-	
+uint32_t  sample_target=0;
+uint32_t  total_sample=0;
 	twoPass=new char[strlen(name)+6];
 	twoFake=new char[strlen(name)+6];
 
@@ -231,6 +232,13 @@ uint8_t   ret=0;
                 printf("Muxer init failed\n");
                 return 0 ;
             }
+                double sample_time;
+
+                sample_time=total;
+                sample_time*=1000;
+                sample_time/=_fps1000; // target_time in second
+                sample_time*=audio->getInfo()->frequency;
+                sample_target=(uint32_t)floor(sample_time);
         }
         else
         {
@@ -374,8 +382,10 @@ switch(mux)
 					real_framenum++;
 					// _muxer->writeVideoPacket(len,_buffer_out,
 					//i-MPEG_PREFILL,_codec->getCodedPictureNumber());
-					while(muxer->needAudio()) 
-					{				
+                                        if(total_sample<sample_target)
+                                        {
+					   while(muxer->needAudio() && total_sample<sample_target) 
+					   {				
 						if(!audio->getPacket(audioBuffer, &audioLen, &samples))	
 						{ 
 							break; 
@@ -384,9 +394,10 @@ switch(mux)
 						{
 							muxer->writeAudioPacket(audioLen,audioBuffer); 
 							encoding->feedAudioFrame(audioLen); 
+                                                        total_sample+=samples;
 						}
-
-					}
+					   }
+                                        }
 				
 				}
 				encoding->setFrame(i,total);
