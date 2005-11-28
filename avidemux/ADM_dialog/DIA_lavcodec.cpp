@@ -602,7 +602,7 @@ create_dialog1 (void)
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenuType), menu1);
 
-  spinbuttonQuant_adj = gtk_adjustment_new (4, 1, 31, 1, 10, 10);
+  spinbuttonQuant_adj = gtk_adjustment_new (4, 2, 31, 1, 10, 10);
   spinbuttonQuant = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonQuant_adj), 1, 0);
   gtk_widget_show (spinbuttonQuant);
   gtk_table_attach (GTK_TABLE (table3), spinbuttonQuant, 1, 2, 2, 3,
