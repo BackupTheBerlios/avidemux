@@ -272,6 +272,9 @@ uint32_t extraLen=0;
       
 	switch(wav.encoding)
 	{
+                case WAV_IMAADPCM:
+                        wav.blockalign=1024;
+                        break;
 		case WAV_AAC:
 		{
 		// nb sample in stream  
