@@ -1,6 +1,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_JSGlobal.h"
@@ -25,13 +26,24 @@ void
 printJSError(JSContext *cx, const char *message, JSErrorReport *report)
 {// begin printJSError
 int quiet=isQuiet();
+char buf[4];
+FILE *fd = fopen(report->filename,"rb");
         if(quiet)
                 GUI_Verbose();
-         GUI_Error_HIG("Spidermonkey ECMAScript Error", 
-	"file: %s: line %d:\n Msg:%s\n",
-		report->filename,
-		report->lineno,
-		message);
+	if( fd ){
+		fread(buf,1,4,fd);
+		fclose(fd);
+	}
+	if( strncmp(buf,"//AD",4) ){
+		GUI_Error_HIG("Spidermonkey ECMAScript Error",
+		              "Not an ECMAScript file. Try open it with 'File' -> 'Open...'");
+	}else{
+		GUI_Error_HIG("Spidermonkey ECMAScript Error", 
+			"file: %s: line %d:\n Msg:%s\n",
+			report->filename,
+			report->lineno,
+			message);
+	}
         if(quiet)
                 GUI_Quiet();
 

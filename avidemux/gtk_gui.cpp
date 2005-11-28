@@ -971,6 +971,8 @@ int A_openAvi2 (char *name, uint8_t mode)
 {
   uint8_t res;
   char *longname;
+  uint32_t magic[4];
+  uint32_t id = 0;
 
   if (playing)
     return 0;
@@ -986,6 +988,8 @@ int A_openAvi2 (char *name, uint8_t mode)
     }
     return 0;
   }
+  if( 4 == fread(magic,4,4,fd) )
+     id=R32(magic[0]);
   fclose (fd);
 
 
@@ -1037,11 +1041,16 @@ int A_openAvi2 (char *name, uint8_t mode)
 		return 0;
 	}
 	
-      currentaudiostream = NULL;
-      avifileinfo = NULL;
+	currentaudiostream = NULL;
+	avifileinfo = NULL;
 
-      GUI_Error_HIG ("Could not open the file", NULL);
-      return 0;
+	if( fourCC::check(id,(uint8_t *)"//AD") ){
+		GUI_Error_HIG("Cannot open project using the video loader.",
+		              "Try 'File' -> 'Load/Run Project...'");
+	}else{
+		GUI_Error_HIG ("Could not open the file", NULL);
+	}
+	return 0;
     }
 
     { int fd,i;
