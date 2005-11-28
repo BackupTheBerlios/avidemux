@@ -212,6 +212,7 @@ uint8_t  mpegWritter::save_svcd(const char *name)
 #define PACK_AUDIO \
 { \
 	uint32_t samples; \
+        if(audioGot<sample_target) \
 	while(_muxer->needAudio()) \
 	{				\
 		if(!_audio->getPacket(_audioBuffer, &audiolen, &samples))	\
@@ -336,6 +337,8 @@ uint32_t		len,flags;
 uint32_t 		outquant;
 uint32_t		audiolen=0;
 DIA_encoding		*encoding;
+uint32_t                sample_target=0;
+double                  sample_time;
 
    	incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
 	_total=incoming->getInfo()->nb_frames;
@@ -354,7 +357,11 @@ DIA_encoding		*encoding;
 	else
 	{
 		ADM_assert(_muxer);
-		
+                sample_time=_total;
+                sample_time*=1000;
+                sample_time/=_fps1000; // target_time in second
+                sample_time*=_audio->getInfo()->frequency;
+                sample_target=(uint32_t)floor(sample_time);
 
 	}
 
@@ -781,6 +788,8 @@ AVDMGenericVideoStream	*incoming;
 FILE			*fd=NULL;
 uint64_t		total_size=0;
 uint32_t		len,flags,type,outquant,audiolen;
+uint32_t                sample_target=0;
+double                  sample_time;
 
 	memset(quantstat,0,32);
 
@@ -849,7 +858,12 @@ uint32_t		len,flags,type,outquant,audiolen;
 	encoding->setPhasis("2nd Pass");
 	if(_muxer)
 	{
-		encoding->setAudioCodec(getStrFromAudioCodec(_audio->getInfo()->encoding));	
+		encoding->setAudioCodec(getStrFromAudioCodec(_audio->getInfo()->encoding));
+                sample_time=_total;
+                sample_time*=1000;
+                sample_time/=_fps1000; // target_time in second
+                sample_time*=_audio->getInfo()->frequency;
+                sample_target=(uint32_t)floor(sample_time);
 	}
 	for(uint32_t i=0;i<_total;i++)
 	{

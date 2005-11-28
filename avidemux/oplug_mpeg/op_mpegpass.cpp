@@ -52,6 +52,7 @@
 { \
 	uint32_t samples; \
 	uint32_t fill=0; \
+        if(total_got<target_sample) \
 	while(muxer->needAudio()) \
 	{				\
 		if(!audio->getPacket(buffer, &audiolen, &samples))	\
@@ -247,8 +248,20 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 // 	{
 //   		PACK_AUDIO(0)
 // 	}
-  PACK_AUDIO(0)
+  
   uint32_t cur=0;
+  uint32_t target_sample=0;
+  double target_time;
+  aviInfo info;
+        video_body->getVideoInfo(&info);
+        target_time=frameEnd-frameStart+1;
+        target_time*=1000;
+        target_time/=info.fps1000; // target_time in second
+        target_time*=audio->getInfo()->frequency;
+        target_sample=(uint32_t)floor(target_time);
+
+        PACK_AUDIO(0);
+
   for (uint32_t i = frameStart; i < frameEnd; i++)
     {
       
