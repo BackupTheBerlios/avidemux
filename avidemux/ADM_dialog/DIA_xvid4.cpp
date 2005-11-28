@@ -531,7 +531,7 @@ create_dialog1 (void)
   gtk_tooltips_set_tip (tooltips, entryEntry, _("Target video bitrate"), NULL);
   gtk_entry_set_width_chars (GTK_ENTRY (entryEntry), 10);
 
-  spinbuttonQuant_adj = gtk_adjustment_new (4, 1, 31, 0.1, 10, 10);
+  spinbuttonQuant_adj = gtk_adjustment_new (4, 2, 31, 0.1, 10, 10);
   spinbuttonQuant = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonQuant_adj), 1, 1);
   gtk_widget_show (spinbuttonQuant);
   gtk_box_pack_start (GTK_BOX (vbox22), spinbuttonQuant, FALSE, FALSE, 0);
