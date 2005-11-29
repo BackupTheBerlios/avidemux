@@ -147,6 +147,9 @@ uint8_t		AVDMGenericAudioStream::getPacketWMA(uint8_t *dest, uint32_t *len,
 
 }
 //*************
+// The packet is 1024 bytes long BUT the 4/8 bytes (mono/stereo) are used for predictor initialization
+//
+// See Mike Melanson nice doc http://www.multimedia.cx/simpleaudio.html
 uint8_t         AVDMGenericAudioStream::getPacketADPCM(uint8_t *dest, uint32_t *len,uint32_t *samples)
 {
 
@@ -154,8 +157,8 @@ uint8_t         AVDMGenericAudioStream::getPacketADPCM(uint8_t *dest, uint32_t *
 
                         // 4 bits per sample
                         count=1024;
-                        if(_wavheader->channels==2) *samples=count;
-                        else *samples=count*2;
+                        if(_wavheader->channels==2) *samples=count-8;
+                        else *samples=(count-4)*2;
 
                         if(packetTail-packetHead<count)
                         {
