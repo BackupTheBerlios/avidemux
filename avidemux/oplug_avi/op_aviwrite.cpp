@@ -274,6 +274,10 @@ uint32_t extraLen=0;
 	{
                 case WAV_IMAADPCM:
                         wav.blockalign=1024;
+                        header->dwScale         = wav.blockalign;
+                        header->dwSampleSize    = 1;
+                        header->dwInitialFrames =1;                             
+                        header->dwSuggestedBufferSize=2048;                                
                         break;
 		case WAV_AAC:
 		{
