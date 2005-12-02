@@ -1354,7 +1354,9 @@ int A_saveJpg (char *name)
   uint32_t sz,fl;
   FILE *fd;
   uint8_t *buffer=NULL;
+  uint8_t msglvl = 2;
 
+	prefs->get(MESSAGE_LEVEL,&msglvl);
 
 	sz = avifileinfo->width* avifileinfo->height * 3;
 	buffer=new uint8_t [sz];
@@ -1368,7 +1370,8 @@ int A_saveJpg (char *name)
 					&sz,
 					&fl))
 			{
-				GUI_Error_HIG("Cannot encode the frame", NULL);
+				if( msglvl >= 1 )
+					GUI_Error_HIG("Cannot encode the frame", NULL);
 				delete [] buffer;
 				delete codec;
 				return 0;
@@ -1377,7 +1380,8 @@ int A_saveJpg (char *name)
 	fd=fopen(name,"wb");
 	if(!fd)
 	{
-				GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", name);
+				if( msglvl >= 1 )
+					GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", name);
 				delete [] buffer;
 				delete codec;
 				return 0;
@@ -1387,7 +1391,8 @@ int A_saveJpg (char *name)
     	fclose(fd);
     	delete [] buffer;
 	delete codec;
-  	GUI_Info_HIG ("Done", "Saved \"%s\".", GetFileName(name));
+	if( msglvl == 2 )
+  		GUI_Info_HIG ("Done", "Saved \"%s\".", GetFileName(name));
 	return 1;
 }
 #else

@@ -68,7 +68,7 @@ toolame_path,				STRING, ""
 lvemux_path,				STRING, ""
 requant_path,				STRING, ""
 # 0 - no messages, 1 - only error messages, 2 - all messages
-message_level,				UINT,	2,	0,	1
+message_level,				UINT,	2,	0,	2
 # feature
 feature.swap_if_A_greater_than_B,	UINT,   1,      0,      1
 feature.svcdres.preferedsourceratio,	STRING, "1:1"

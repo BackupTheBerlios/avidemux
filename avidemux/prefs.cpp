@@ -96,7 +96,7 @@ static opt_def opt_defs [] = {
 	{"toolame_path",		STRING,"",	NULL, NULL, NULL },
 	{"lvemux_path",		STRING,"",	NULL, NULL, NULL },
 	{"requant_path",		STRING,"",	NULL, NULL, NULL },
-	{"message_level",		UINT,	"2",	NULL,	"0",	"1"	},
+	{"message_level",		UINT,	"2",	NULL,	"0",	"2"	},
 	{"feature.swap_if_A_greater_than_B",		UINT,	"1",	NULL,	"0",	"1"	},
 	{"feature.svcdres.preferedsourceratio",		STRING,"1:1",	NULL, NULL, NULL },
 	{"feature.saveprefsonexit",		UINT,	"1",	NULL,	"0",	"1"	},
