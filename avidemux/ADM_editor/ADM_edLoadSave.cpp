@@ -212,8 +212,8 @@ char *pth;
    // Change mono2stereo ?
    switch(audioGetChannelConv())
         {
-                case CHANNELCONV_2to1:  qfprintf(fd,"app.audio.mono2stereo=true;\n");break;
-                case CHANNELCONV_1to2:  qfprintf(fd,"app.audio.stereo2mono=true;\n");break;
+                case CHANNELCONV_2to1:  qfprintf(fd,"app.audio.stereo2mono=true;\n");break;
+                case CHANNELCONV_1to2:  qfprintf(fd,"app.audio.mono2stereo=true;\n");break;
                 case CHANNELCONV_NONE: ;break;
                 default:ADM_assert(0);
         }     
