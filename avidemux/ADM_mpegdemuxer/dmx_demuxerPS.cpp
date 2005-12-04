@@ -245,6 +245,7 @@ uint32_t mx;
                 }
                 if(!refill())
                 {
+                        printf("Refill failed at %d  \n",_pesBufferStart);
                         _lastErr=1;
                          return 0;
                 }
@@ -263,7 +264,7 @@ uint32_t val,hnt;
                 if(_lastErr)
                 {
                         _lastErr=0;
-                        printf("\n io error , aborting sync\n");
+                        printf("\n io error , aborting sync 1\n");
                         return 0;       
                 }
 
@@ -278,7 +279,7 @@ uint32_t val,hnt;
                         if(_lastErr)
                         {
                              _lastErr=0;
-                            printf("\n io error , aborting sync\n");
+                            printf("\n io error , aborting sync 2\n");
                             return 0;
                          }
 
@@ -382,6 +383,7 @@ _again:
         {
                 goto _again;
         }
+        if(!len) goto _again;
         if(len>MAX_PES_BUFFER) goto _again;
 
         if(stream==PRIVATE_STREAM_1) globstream=0xFF00+substream;
@@ -400,7 +402,11 @@ _again:
                 _pesBufferLen=len;
                 _pesBufferIndex=0;
 
-                if(!parser->read32(len,_pesBuffer)) return 0;
+                if(!parser->read32(len,_pesBuffer))
+                {
+                        printf("Read failed dmx_demuxerPS::refill %d\n",len);
+                        return 0;
+                }
                 return 1;
         }
         if(mask[globstream &0xff])
