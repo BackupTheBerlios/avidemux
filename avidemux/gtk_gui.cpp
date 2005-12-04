@@ -1421,10 +1421,14 @@ void A_saveBunchJpg(char *name)
   uint32_t curImg;
   char	 fullName[2048],*ext;
   DIA_working *working;
+  uint8_t msglvl = 2;
+
+	prefs->get(MESSAGE_LEVEL,&msglvl);
 
   	if(frameStart>frameEnd)
 		{
-			GUI_Error_HIG("Mark A > B", "Set your markers correctly.");
+			if( msglvl >= 1 )
+				GUI_Error_HIG("Mark A > B", "Set your markers correctly.");
 			return;
 		}
 	// Split name into base + extension
@@ -1449,7 +1453,8 @@ void A_saveBunchJpg(char *name)
                 working->update(curImg-frameStart,frameEnd-frameStart);	
 		if (!GUI_getFrame (curImg, src,NULL))
 		{
-			GUI_Error_HIG("Cannot decode frame", "Aborting.");
+			if( msglvl >= 1 )
+				GUI_Error_HIG("Cannot decode frame", "Aborting.");
 			goto _bunch_abort;
 		}
                 if(!working->isAlive()) goto _bunch_abort;
@@ -1458,7 +1463,8 @@ void A_saveBunchJpg(char *name)
 					&sz,
 					&fl))
 			{
-				GUI_Error_HIG("Cannot encode frame", "Aborting.");
+				if( msglvl >= 1 )
+					GUI_Error_HIG("Cannot encode frame", "Aborting.");
 				goto _bunch_abort;
 				
 			}
@@ -1466,14 +1472,16 @@ void A_saveBunchJpg(char *name)
 		fd=fopen(fullName,"wb");
 		if(!fd)
 		{
-				GUI_Error_HIG("Cannot write the file", "Aborting.");
+				if( msglvl >= 1 )
+					GUI_Error_HIG("Cannot write the file", "Aborting.");
 				goto _bunch_abort;
 
 		}
 		fwrite (buffer, sz, 1, fd);
     		fclose(fd);
 	}
-	GUI_Info_HIG("Done", "Saved %d images.", curImg-frameStart);
+	if( msglvl == 2 )
+		GUI_Info_HIG("Done", "Saved %d images.", curImg-frameStart);
 _bunch_abort:
         delete working	;
     	delete [] buffer;
@@ -1496,6 +1504,9 @@ A_saveImg (char *name)
   uint32_t sz;
   uint16_t s16;
   uint32_t s32;
+  uint8_t msglvl = 2;
+
+	prefs->get(MESSAGE_LEVEL,&msglvl);
 
 
 sz = avifileinfo->width* avifileinfo->height * 3;
@@ -1531,21 +1542,24 @@ sz = avifileinfo->width* avifileinfo->height * 3;
   	out=(uint8_t *)ADM_alloc(sz);
 	if(!out)
 	{
-		GUI_Error_HIG("Memory error", NULL);
+		if( msglvl >= 1 )
+			GUI_Error_HIG("Memory error", NULL);
 		return;
 	}
 
 	 if(!COL_yv12rgbBMP(bmph.biWidth, bmph.biHeight,rdr_decomp_buffer->data, out))
 	 {
-		GUI_Error_HIG("Error converting to BMP", NULL);
+		if( msglvl >= 1 )
+			GUI_Error_HIG("Error converting to BMP", NULL);
 		return;
  	}
  	fd = fopen (name, "wb");
   	if (!fd)
     	{
-      	GUI_Error_HIG ("Something bad happened", NULL);
-	ADM_dealloc(out);
-      	return;
+		if( msglvl >= 1 )
+      			GUI_Error_HIG ("Something bad happened", NULL);
+		ADM_dealloc(out);
+      		return;
     	}
 
 	// Bitmpap file header, not using tructure due to gcc padding it
@@ -1578,7 +1592,8 @@ sz = avifileinfo->width* avifileinfo->height * 3;
     	fclose(fd);
     	ADM_dealloc(out);
 
-  GUI_Info_HIG ("Done", "Saved \"%s\".", GetFileName(name));
+	if( msglvl == 2 )
+		GUI_Info_HIG ("Done", "Saved \"%s\".", GetFileName(name));
 
 }
 
