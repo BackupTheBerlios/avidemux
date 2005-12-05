@@ -77,7 +77,7 @@ JSBool getVar(JSContext *cx, JSObject *obj, uintN argc,
         int out=0;
         char *dupe=NULL;
 
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+       // ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
         // default return value
         if(argc != 1)
                 return JS_FALSE;
@@ -97,7 +97,7 @@ JSBool getVar(JSContext *cx, JSObject *obj, uintN argc,
 JSBool setSuccess(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {// begin AddSegment
-ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+//ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
 int Jscript_succeed=0;
         // default return value
         if(argc != 1)
@@ -112,7 +112,7 @@ int Jscript_succeed=0;
 JSBool displayError(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {// begin AddSegment
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+  //      ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
         // default return value
         if(argc != 1)
                 return JS_FALSE;
@@ -126,7 +126,7 @@ JSBool displayError(JSContext *cx, JSObject *obj, uintN argc,
 JSBool displayInfo(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {// begin AddSegment
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+    //    ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
         // default return value
         if(argc != 1)
                 return JS_FALSE;
@@ -140,7 +140,7 @@ JSBool displayInfo(JSContext *cx, JSObject *obj, uintN argc,
 JSBool fileReadSelect(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {// begin AddSegment
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+    //    ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
         char *name;
         // default return value
         if(argc != 0)
@@ -154,7 +154,7 @@ JSBool fileReadSelect(JSContext *cx, JSObject *obj, uintN argc,
 JSBool fileWriteSelect(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {// begin AddSegment
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+   //     ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
         char *name;
         // default return value
         if(argc != 0)
@@ -169,7 +169,7 @@ JSBool print(JSContext *cx, JSObject *obj, uintN argc,
                                        jsval *argv, jsval *rval)
 {// begin AddSegment
         char *str;
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+  //      ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
         // default return value
         if(argc != 1)
                 return JS_FALSE;
@@ -197,7 +197,7 @@ JSBool allFilesFrom(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
 char *str;
 DIR *dir;
 struct dirent *direntry;
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+       // ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
         cleanup();
         // default return value
         if(argc != 1)
