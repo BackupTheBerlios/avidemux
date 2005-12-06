@@ -228,7 +228,12 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 
 			  	     	return(decoders *)( new decoderSnow(w,h));
 	   }
-           if(fourCC::check(fcc,(uint8_t *)"H264")||fourCC::check(fcc,(uint8_t *)"avc1"))
+           if(  
+                fourCC::check(fcc,(uint8_t *)"H264")||fourCC::check(fcc,(uint8_t *)"avc1") ||
+                fourCC::check(fcc,(uint8_t *)"h264")||fourCC::check(fcc,(uint8_t *)"x264") ||
+                fourCC::check(fcc,(uint8_t *)"X264")
+
+                )
            {
 
              return(decoders *)( new decoderFFH264(w,h,extraLen,extraData));
