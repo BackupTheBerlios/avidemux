@@ -254,7 +254,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
                                         printf("\n ff4: null frame\n");
                                         {
                                                 // search the last image
-                                                if(_context->coded_frame->data)
+                                                if(_context->coded_frame && _context->coded_frame->data)
                                                 {
                                                         clonePic(_context->coded_frame,out);
                                                         if(flagz)
