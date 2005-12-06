@@ -44,9 +44,9 @@ protected:
 
 					uint32_t 		_type;
 
-					uint32_t    picHeader::read32(FILE *fd);
-					uint16_t    picHeader::read16(FILE *fd);
-					uint8_t    picHeader::read8(FILE *fd);
+					uint32_t    read32(FILE *fd);
+					uint16_t    read16(FILE *fd);
+					uint8_t     read8(FILE *fd);
 
 public:
 //  static int checkFourCC(uint8_t *in, uint8_t *fourcc);

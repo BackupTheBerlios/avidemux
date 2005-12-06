@@ -64,7 +64,7 @@ typedef enum FP_TYPE
                         
 
 #else
-uint32_t fileParser::read32i(void )
+uint32_t read32i(void )
 {
        uint32_t v;
        uint8_t c[4];
@@ -84,7 +84,7 @@ uint32_t fileParser::read32i(void )
        v= (p[0]<<24)+(p[1]<<16)+(p[2]<<8)+p[3];
        return v;
 }
-uint16_t fileParser::read16i(void )
+uint16_t read16i(void )
 {
   uint32_t v;
        uint8_t c[4];
@@ -104,7 +104,7 @@ uint16_t fileParser::read16i(void )
        v= (p[0]<<8)+p[1];
        return v;
 }
-uint8_t fileParser::read8i(void )
+uint8_t read8i(void )
 {
 uint8_t r;
         if(_off<_tail)

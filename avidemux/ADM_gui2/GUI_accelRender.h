@@ -12,7 +12,7 @@
 class AccelRender
 {
 	public:
-		AccelRender::AccelRender( void);
+                                AccelRender( void);
 		virtual	uint8_t init(GtkWidget * window, uint32_t w, uint32_t h)=0;
 		virtual	uint8_t end(void)=0;
 		virtual uint8_t display(uint8_t *ptr, uint32_t w, uint32_t h)=0;

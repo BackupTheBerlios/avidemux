@@ -108,7 +108,7 @@ uint8_t         read8i(void)
         read(&r,1);
         return r;
 }
-uint16_t         dmx_demuxerTS::read16i(void)
+uint16_t         read16i(void)
 {
  uint16_t r;
 uint8_t p[2];
@@ -125,7 +125,7 @@ uint8_t p[2];
         r=(p[0]<<8)+p[1];
         return r;
 }
-uint32_t         dmx_demuxerTS::read32i(void)                 
+uint32_t         read32i(void)                 
 {
 uint32_t r;
 uint8_t  *p;

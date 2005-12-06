@@ -145,8 +145,8 @@ class Decimate : public AVDMGenericVideoStream
 	
 public:
 				
-			Decimate::Decimate(AVDMGenericVideoStream *in,CONFcouple *couples);    
-			Decimate::~Decimate(void);
+			Decimate(AVDMGenericVideoStream *in,CONFcouple *couples);    
+			~Decimate(void);
 	uint8_t  	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 				ADMImage *data,uint32_t *flags);
 

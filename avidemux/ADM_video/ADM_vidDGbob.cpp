@@ -55,8 +55,8 @@ class DGbob : public AVDMGenericVideoStream
         void            update(void); 
 public:
                                 
-                        DGbob::DGbob(AVDMGenericVideoStream *in,CONFcouple *couples);    
-                        DGbob::~DGbob(void);
+                        DGbob(AVDMGenericVideoStream *in,CONFcouple *couples);    
+                        ~DGbob(void);
         uint8_t         getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
                                 ADMImage *data,uint32_t *flags);
         

@@ -112,32 +112,32 @@ private:
 
 public:
 	
-	void Telecide::CalculateMetrics(int n, unsigned char *crp, unsigned char *crpU, unsigned char *crpV, 
+	void CalculateMetrics(int n, unsigned char *crp, unsigned char *crpU, unsigned char *crpV, 
 				unsigned char *prp, unsigned char *prpU, unsigned char *prpV);
-	void Telecide::Show(ADMImage *dst, int frame);
-	void Telecide::Debug(int frame);
+	void Show(ADMImage *dst, int frame);
+	void Debug(int frame);
 
-	Telecide::Telecide(AVDMGenericVideoStream *in,CONFcouple *couples);		
+	       Telecide(AVDMGenericVideoStream *in,CONFcouple *couples);		
 			
-	Telecide::~Telecide();
+	       ~Telecide();
 
-	void Telecide::PutChosen(int frame, unsigned int chosen);
+	void PutChosen(int frame, unsigned int chosen);
 	
 
-	void Telecide::CacheInsert(int frame, unsigned int p, unsigned int pblock,
+	void CacheInsert(int frame, unsigned int p, unsigned int pblock,
 				unsigned int c, unsigned int cblock);
 	
-	bool Telecide::CacheQuery(int frame, unsigned int *p, unsigned int *pblock,
+	bool CacheQuery(int frame, unsigned int *p, unsigned int *pblock,
 				unsigned int *c, unsigned int *cblock);	
 
-	bool Telecide::PredictHardYUY2(int frame, unsigned int *predicted, unsigned int *predicted_metric) ;
+	bool PredictHardYUY2(int frame, unsigned int *predicted, unsigned int *predicted_metric) ;
 	
-	struct PREDICTION *Telecide::PredictSoftYUY2(int frame);
+	struct PREDICTION *PredictSoftYUY2(int frame);
 
-	void Telecide::WriteHints(unsigned char *dst, bool film, bool inpattern);
-	virtual uint8_t Telecide::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+	void WriteHints(unsigned char *dst, bool film, bool inpattern);
+	virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 				ADMImage *data,uint32_t *flags);
-	char *Telecide::printConf( void );
-	uint8_t Telecide::configure(AVDMGenericVideoStream *in);
-	uint8_t	Telecide::getCoupledConf( CONFcouple **couples);
+	char *printConf( void );
+	uint8_t configure(AVDMGenericVideoStream *in);
+	uint8_t	getCoupledConf( CONFcouple **couples);
 };
