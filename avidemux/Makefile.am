@@ -3,6 +3,10 @@ bin_PROGRAMS = avidemux2
 
 ## INCLUDES were found outside kdevelop specific part
 
+if BUILD_ALTIVEC
+libmpeg2enc_Altivec = ./mpeg2enc/altivec/libaltivec.la
+endif
+
 avidemux2_SOURCES =   guiplay.cpp  \
 	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp callbacks.cpp avilist.cpp \
 	main.cpp prefs.cpp ADM_guiBitrate.cpp ADM_requantize.cpp ADM_pp.cpp \
@@ -64,7 +68,8 @@ avidemux2_LDADD   =  \
 ./ADM_dialog/libADM_dialog2.a  \
 ./ADM_colorspace/libADM_colorspace.a \
 ../adm_lavcodec/libpostproc/libpostproc.a \
-./ADM_library/libADM_library.a 
+./ADM_library/libADM_library.a \
+$(libmpeg2enc_Altivec) 
 
 
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \

@@ -10,6 +10,10 @@ noinst_LIBRARIES = libmpeg2enc.a
 #quantize_x86.cc 
 #quantize.cc 
 
+if BUILD_ALTIVEC
+SUBDIRS = altivec
+endif
+
 libmpeg2enc_a_METASOURCES = AUTO
 libmpeg2enc_a_SOURCES = ADM_mpe2enc.cpp ADM_mpeg2enc.h ad_layer.cc conform.cc fdctdata.cc fdctref.cc \
 feedframe.cc idct.cc idctdata.cc macroblock.cc motionest.cc motionsearch.cc mpeg2enc.cc mpeg2param.cc \

@@ -129,6 +129,8 @@ dnl    AC_PATH_PROG(PKG_CONFIG,pkg-config, AC_MSG_ERROR([*** pkg-config not foun
    
    AC_SUBST(AS)
    AC_SUBST(ASFLAGS)
+   AC_SUBST(CCAS)
+   AC_SUBST(CCASFLAGS)
 
 dnl ______________________
 dnl AC_DEFINE(USE_DIV5,0,[Divx 5])
@@ -931,7 +933,8 @@ if test "x$have_altivec" = "xyes"; then
 		CFLAGS="$CFLAGS $ALTIVEC_SWITCH"
 		CXXFLAGS="$CXXFLAGS $ALTIVEC_SWITCH"
 		AC_DEFINE(ARCH_PPC,1,[Altivec for libmpeg2])
-		dnl AC_DEFINE(USE_ALTIVEC,1,[Altivec for mpeg2enc]) 
+		AC_DEFINE(USE_ALTIVEC,1,[Altivec for mpeg2enc]) 
+		AC_DEFINE(HAVE_ALTIVEC,1,[Altivec for mpeg2enc]) 
 
 fi
 echo "cpu done"
@@ -1106,6 +1109,7 @@ echo " X86                 : $use_mmx"
 echo " MacOsX(Darwin)      : $have_darwin"
 echo " Cygwin              : $use_cygwin"
 echo " Gcc supports vectors: $use_builtin"
+echo " Debug               : $use_debug"
  if test "x$have_xml2" = "xno"; then
  	echo "************ LIBXML2 IS MANDATORY ***************"
  	echo "************ get it from http://www.xmlsoft.org*********"

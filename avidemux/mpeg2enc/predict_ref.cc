@@ -60,7 +60,7 @@
 
 
 #if defined( HAVE_ALTIVEC) && defined(USE_ALTIVEC)
-//#include "../utils/altivec/altivec_predict.h"
+#include "altivec/altivec_predict.h"
 #endif
 
 void (*ppred_comp)( uint8_t *src, uint8_t *dst,
