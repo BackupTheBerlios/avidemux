@@ -224,7 +224,7 @@ uint8_t  mpegWritter::save_svcd(const char *name)
 			_muxer->writeAudioPacket(audiolen,_audioBuffer); \
 			encoding->feedAudioFrame(audiolen); \
 		}\
-		audioGot+=audiolen; \
+		audioGot+=samples; \
 	} \
 }
 /*---------------------------------------------------------------------------------------*/

@@ -55,16 +55,16 @@
         if(total_got<target_sample) \
 	while(muxer->needAudio()) \
 	{				\
-		if(!audio->getPacket(buffer, &audiolen, &samples))	\
+		if(!audio->getPacket(audiobuffer, &audiolen, &samples))	\
 		{ \
 			printf("passthrough:Could not get audio\n"); \
 			break; \
 		}\
 		if(audiolen) {\
-			muxer->writeAudioPacket(audiolen,buffer); \
+			muxer->writeAudioPacket(audiolen,audiobuffer); \
                         work->feedAudioFrame(audiolen);\
                         }\
-		total_got+=audiolen; \
+		total_got+=samples; \
 	} \
 }
 
@@ -75,7 +75,6 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
   uint32_t len, flags;
   AVDMGenericAudioStream *audio=NULL;
   uint32_t audiolen;
-  uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3];
   
   DIA_encoding *work;
   ADM_MUXER_TYPE mux;
@@ -260,6 +259,10 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
         target_time*=audio->getInfo()->frequency;
         target_sample=(uint32_t)floor(target_time);
 
+  uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3];
+  uint8_t *audiobuffer = new uint8_t[4*48000*2]; // 2 sec worth of lpcm
+
+
         PACK_AUDIO(0);
 
   for (uint32_t i = frameStart; i < frameEnd; i++)
@@ -354,7 +357,8 @@ _abt:
   delete work;
   muxer->close();
   delete muxer;
-  delete buffer;
+  delete [] buffer;
+  delete [] audiobuffer;
   deleteAudioFilter();
   return ret;
 
