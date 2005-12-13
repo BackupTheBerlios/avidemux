@@ -586,13 +586,13 @@ TryAgain:
 								}
 #if  1 //def USE_DIVX
                                                                 if(count)
-                                                                        GUI_Info_HIG("Weird", "The unpacking succeedeed but the index is still not up to date.");
+                                                                        GUI_Info_HIG(ADM_LOG_IMPORTANT,"Weird", "The unpacking succeedeed but the index is still not up to date.");
 								printf("\n Switching codec...\n");
 								delete vid->decoder;
 								vid->decoder=getDecoderVopPacked(info.fcc, info.width,info.height,0,NULL);
 								ispacked=1;
 #else
-								GUI_Info_HIG("Troubles ahead", "This a VOP packed AVI.");
+								GUI_Info_HIG(ADM_LOG_IMPORTANT,"Troubles ahead", "This a VOP packed AVI.");
 #endif
 
 							}

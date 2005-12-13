@@ -1354,9 +1354,6 @@ int A_saveJpg (char *name)
   uint32_t sz,fl;
   FILE *fd;
   uint8_t *buffer=NULL;
-  uint8_t msglvl = 2;
-
-	prefs->get(MESSAGE_LEVEL,&msglvl);
 
 	sz = avifileinfo->width* avifileinfo->height * 3;
 	buffer=new uint8_t [sz];
@@ -1370,8 +1367,7 @@ int A_saveJpg (char *name)
 					&sz,
 					&fl))
 			{
-				if( msglvl >= 1 )
-					GUI_Error_HIG("Cannot encode the frame", NULL);
+				GUI_Error_HIG("Cannot encode the frame", NULL);
 				delete [] buffer;
 				delete codec;
 				return 0;
@@ -1380,7 +1376,6 @@ int A_saveJpg (char *name)
 	fd=fopen(name,"wb");
 	if(!fd)
 	{
-				if( msglvl >= 1 )
 					GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", name);
 				delete [] buffer;
 				delete codec;
@@ -1391,8 +1386,8 @@ int A_saveJpg (char *name)
     	fclose(fd);
     	delete [] buffer;
 	delete codec;
-	if( msglvl == 2 )
-  		GUI_Info_HIG ("Done", "Saved \"%s\".", GetFileName(name));
+	
+  	GUI_Info_HIG (ADM_LOG_INFO,"Done", "Saved \"%s\".", GetFileName(name));
 	return 1;
 }
 #else
@@ -1421,13 +1416,9 @@ void A_saveBunchJpg(char *name)
   uint32_t curImg;
   char	 fullName[2048],*ext;
   DIA_working *working;
-  uint8_t msglvl = 2;
-
-	prefs->get(MESSAGE_LEVEL,&msglvl);
-
+  
   	if(frameStart>frameEnd)
 		{
-			if( msglvl >= 1 )
 				GUI_Error_HIG("Mark A > B", "Set your markers correctly.");
 			return;
 		}
@@ -1453,8 +1444,7 @@ void A_saveBunchJpg(char *name)
                 working->update(curImg-frameStart,frameEnd-frameStart);	
 		if (!GUI_getFrame (curImg, src,NULL))
 		{
-			if( msglvl >= 1 )
-				GUI_Error_HIG("Cannot decode frame", "Aborting.");
+			GUI_Error_HIG("Cannot decode frame", "Aborting.");
 			goto _bunch_abort;
 		}
                 if(!working->isAlive()) goto _bunch_abort;
@@ -1463,8 +1453,7 @@ void A_saveBunchJpg(char *name)
 					&sz,
 					&fl))
 			{
-				if( msglvl >= 1 )
-					GUI_Error_HIG("Cannot encode frame", "Aborting.");
+				GUI_Error_HIG("Cannot encode frame", "Aborting.");
 				goto _bunch_abort;
 				
 			}
@@ -1472,16 +1461,15 @@ void A_saveBunchJpg(char *name)
 		fd=fopen(fullName,"wb");
 		if(!fd)
 		{
-				if( msglvl >= 1 )
-					GUI_Error_HIG("Cannot write the file", "Aborting.");
+				GUI_Error_HIG("Cannot write the file", "Aborting.");
 				goto _bunch_abort;
 
 		}
 		fwrite (buffer, sz, 1, fd);
     		fclose(fd);
 	}
-	if( msglvl == 2 )
-		GUI_Info_HIG("Done", "Saved %d images.", curImg-frameStart);
+	
+	GUI_Info_HIG(ADM_LOG_INFO,"Done", "Saved %d images.", curImg-frameStart);
 _bunch_abort:
         delete working	;
     	delete [] buffer;
@@ -1504,10 +1492,7 @@ A_saveImg (char *name)
   uint32_t sz;
   uint16_t s16;
   uint32_t s32;
-  uint8_t msglvl = 2;
-
-	prefs->get(MESSAGE_LEVEL,&msglvl);
-
+  
 
 sz = avifileinfo->width* avifileinfo->height * 3;
 
@@ -1542,22 +1527,19 @@ sz = avifileinfo->width* avifileinfo->height * 3;
   	out=(uint8_t *)ADM_alloc(sz);
 	if(!out)
 	{
-		if( msglvl >= 1 )
-			GUI_Error_HIG("Memory error", NULL);
+		GUI_Error_HIG("Memory error", NULL);
 		return;
 	}
 
 	 if(!COL_yv12rgbBMP(bmph.biWidth, bmph.biHeight,rdr_decomp_buffer->data, out))
 	 {
-		if( msglvl >= 1 )
-			GUI_Error_HIG("Error converting to BMP", NULL);
+		GUI_Error_HIG("Error converting to BMP", NULL);
 		return;
  	}
  	fd = fopen (name, "wb");
   	if (!fd)
     	{
-		if( msglvl >= 1 )
-      			GUI_Error_HIG ("Something bad happened", NULL);
+      		GUI_Error_HIG ("Something bad happened", NULL);
 		ADM_dealloc(out);
       		return;
     	}
@@ -1592,8 +1574,8 @@ sz = avifileinfo->width* avifileinfo->height * 3;
     	fclose(fd);
     	ADM_dealloc(out);
 
-	if( msglvl == 2 )
-		GUI_Info_HIG ("Done", "Saved \"%s\".", GetFileName(name));
+
+        GUI_Info_HIG (ADM_LOG_INFO,"Done", "Saved \"%s\".", GetFileName(name));
 
 }
 
@@ -2235,12 +2217,12 @@ DIA_working *work;
   delete work;
   delete aImage;
   if(error==0)
-  	GUI_Info_HIG("No error found", NULL);
+  	GUI_Info_HIG(ADM_LOG_IMPORTANT,"No error found", NULL);
 else
 	{
 		char str[400];
 		sprintf(str,"Errors found in %u frames",error);
-		GUI_Info_HIG(str, NULL);
+		GUI_Info_HIG(ADM_LOG_IMPORTANT,str, NULL);
 
 	}
 	GUI_GoToFrame(curframe);
@@ -2480,7 +2462,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioMP3;
                                 printf ("\n MP3 loaded\n");
-                                GUI_Info_HIG("Second track loaded", NULL);
+                                GUI_Info_HIG(ADM_LOG_INFO,"Second track loaded", NULL);
                                 return 1;
                         }
                         }
@@ -2501,7 +2483,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioAC3;
                                 printf ("\n AC3 loaded\n");
-                                GUI_Info_HIG("Second track loaded", NULL);
+                                GUI_Info_HIG(ADM_LOG_INFO,"Second track loaded", NULL);
                                 return 1;
                         }
                         }
@@ -2522,7 +2504,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioAC3;
                                 printf ("\n AC3 loaded\n");
-                                GUI_Info_HIG("Second track loaded", NULL);
+                                GUI_Info_HIG(ADM_LOG_INFO,"Second track loaded", NULL);
                                 return 1;
                         }}
                         break;
@@ -2592,20 +2574,14 @@ void A_addJob(void)
 }
 int A_SaveWrapper(char *name)
 {
-  uint8_t msg_level = 2;
-	prefs->get(MESSAGE_LEVEL,&msg_level);
 
         if(A_Save(name))
         {
-		if( msg_level == 2 ){
-                	GUI_Info_HIG ("Done", "File %s has been successfully saved.",GetFileName(name));
-		}
+                GUI_Info_HIG (ADM_LOG_INFO,"Done", "File %s has been successfully saved.",GetFileName(name));
         }
         else
         {
-		if( msg_level >= 1 ){
-                	GUI_Error_HIG ("Failed", "File %s was NOT saved correctly.",GetFileName(name));
-		}
+                GUI_Error_HIG ("Failed", "File %s was NOT saved correctly.",GetFileName(name));
         }
         return 1;
 }

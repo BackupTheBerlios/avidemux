@@ -28,6 +28,8 @@
 #include "ADM_assert.h"
 #include "ADM_gui2/GUI_render.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_toolkit/toolkit.hxx"
+
 static GtkWidget	*create_dialog1 (void);
 static void setpp(void);
 
@@ -158,9 +160,16 @@ uint32_t useNuv=0;
         if(!prefs->get(FEATURE_DISABLE_NUV_RESYNC, &useNuv))
                 useNuv=0;
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonNuvResync)),useNuv);
-
-        // ___________Video accel device ______________________________________________
+        // _____________Message level_____________
+        //________________________________________
         GtkComboBox     *combo_box;
+        unsigned int msg=2;
+        prefs->get(MESSAGE_LEVEL,&msg);
+        combo_box=GTK_COMBO_BOX(WID(comboboxMessageLevel));
+        gtk_combo_box_set_active(combo_box,msg);
+        
+        // ___________Video accel device ______________________________________________
+        
         
         combo_box=GTK_COMBO_BOX(WID(comboboxVideoOutput));
         int vd=0;
@@ -208,6 +217,10 @@ uint32_t useNuv=0;
 		{
 			AVDM_switch(newdevice);
 		}
+                //
+                uint32_t s;
+                s=gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxMessageLevel)));
+                prefs->set(MESSAGE_LEVEL,s);
                 // video device
 
                 k=gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxVideoOutput)));
@@ -221,9 +234,9 @@ uint32_t useNuv=0;
                 
                 //*************
                 if(RADIO_GET(radiobuttonMaster))
-                        prefs->set(FEATURE_AUDIOBAR_USES_MASTER, 1);
+                        prefs->set(FEATURE_AUDIOBAR_USES_MASTER,(uint32_t) 1);
                 else
-                        prefs->set(FEATURE_AUDIOBAR_USES_MASTER, 0);
+                        prefs->set(FEATURE_AUDIOBAR_USES_MASTER,(uint32_t) 0);
 
                 ///*********
 		lavcodec_mpeg=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonLibavcodec)));

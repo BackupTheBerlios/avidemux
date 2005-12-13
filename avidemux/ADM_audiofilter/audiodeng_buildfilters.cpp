@@ -604,7 +604,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 	  		||  (lastFilter->getInfo()->channels != 2)
 			)
 	    	{
-			GUI_Info_HIG("Downsample disabled", "Input is not stereo, 48 kHz.");
+			GUI_Info_HIG(ADM_LOG_IMPORTANT,"Downsample disabled", "Input is not stereo, 48 kHz.");
 	  	} 
 		else
 	    	{

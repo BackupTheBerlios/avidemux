@@ -40,7 +40,7 @@ char     *name;
         }
         if(!nb)
         {
-                GUI_Info_HIG("Nothing to do.","There is no jobs stored, nothing to do");
+                GUI_Info_HIG(ADM_LOG_IMPORTANT,"Nothing to do.","There is no jobs stored, nothing to do");
                 return 1;
         }
         DIA_job(nb,jobName);

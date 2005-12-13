@@ -413,7 +413,7 @@ void ComputePreload(void)
     //
     if (!(small = playback->readDecompress(one_sec, wavbuf)))
       {
-	  printf("\n Error reading audio stream...");
+	  printf("\n Preload:Error reading audio stream...");
 	  return;
       }
     dauds += small >> 2;
