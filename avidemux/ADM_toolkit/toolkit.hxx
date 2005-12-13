@@ -18,6 +18,16 @@
 #ifndef __TOOLKIT__
 #define __TOOLKIT__
 #include "time.h"
+
+typedef enum ADM_LOG_LEVEL
+{
+        ADM_LOG_NONE=0,
+        ADM_LOG_IMPORTANT=1,
+        ADM_LOG_INFO=2,
+        ADM_LOG_DEBUG=3
+  
+};
+
 void 		PathSplit(char *str, char **root, char **ext);
 void			PathStripName(char *str);
 const char		*GetFileName(const char *str);
@@ -25,7 +35,7 @@ char 		*PathCanonize(const char *tmpname);
 void		LowerCase(char *string);
 void 		GUI_Alert(const char *alertstring);
 void            GUI_Info(const char *alertstring);
-void            GUI_Info_HIG(const char *primary, const char *secondary_format, ...);
+void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...);
 void            GUI_Error_HIG(const char *primary, const char *secondary_format, ...);
 int             GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const char *secondary_format, ...);
 int             GUI_YesNo(const char *primary, const char *secondary_format, ...);

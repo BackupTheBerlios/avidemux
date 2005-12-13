@@ -37,6 +37,7 @@
 #include "ADM_gui2/support.h"
 #include "toolkit_gtk.h"
 #include "ADM_assert.h"
+#include "prefs.h"
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
@@ -206,10 +207,19 @@ Takes primary and optional secondary string, as described in GNOME HIG 2.0.
 @secondary_format: printf()-style format string for secondary text, or NULL for no secondary text
 @...: arguments for secondary_format
 */
-void GUI_Info_HIG(const char *primary, const char *secondary_format, ...)
+void GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...)
 {
 	GtkWidget *dialog;
-	
+	uint32_t msglvl=2;
+
+        prefs->get(MESSAGE_LEVEL,&msglvl);
+
+        if(msglvl<=level)
+        {
+                printf("Info : %s \n",primary);
+                return;
+        }
+
 	va_list ap;
 	va_start(ap, secondary_format);
 
@@ -287,7 +297,15 @@ Takes primary and optional secondary string, as described in GNOME HIG 2.0.
 void GUI_Error_HIG(const char *primary, const char *secondary_format, ...)
 {
 	GtkWidget *dialog;
-	
+	uint32_t msglvl=2;
+
+        prefs->get(MESSAGE_LEVEL,&msglvl);
+        if(msglvl==ADM_LOG_NONE) 
+        {
+                printf("Error :%s\n",primary);
+                return;
+        }
+
 	va_list ap;
 	va_start(ap, secondary_format);
 
