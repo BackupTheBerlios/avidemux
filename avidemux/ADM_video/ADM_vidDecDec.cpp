@@ -376,7 +376,7 @@ uint8_t Decimate::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 	char buf[255];
 
 	*len=(_info.width*_info.height*3)>>1;
-	
+	num_frames_hi = _in->getInfo()->nb_frames; /* FIXME MEANX */
 	if (_param->mode == 0)
 	{
 		bool forced = false;
