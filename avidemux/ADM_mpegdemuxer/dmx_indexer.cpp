@@ -44,6 +44,8 @@
 #define MODULE_NAME MODULE_MPEG
 #include "ADM_toolkit/ADM_debug.h"
 
+//#define SHOW_PTS
+
 static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel);
 static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel,uint32_t nbTracks);
 static uint8_t gopUpdate(dmx_demuxer *demuxer);
@@ -109,7 +111,6 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         FILE *out;        
         DMX_TYPE mpegType;
         uint8_t  mpegTypeChar;
-        uint32_t update=0;
         uint32_t multi=0;
         uint64_t firstPicPTS=ADM_NO_PTS;
         
@@ -205,10 +206,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         {
                                 if(!demuxer->sync(&streamid,&syncAbs,&syncRel,&pts,&dts)) break;   
                                 
-                                update++;
                                 //aprintf("\t\tSync : %x at %"LLX"\n",streamid,syncAbs);
-                                if(update>10000)
-                                        {
                                                /* if(work->update(syncAbs>>16,demuxer->getSize()>>16))
                                                 {
                                                         // abort;
@@ -217,9 +215,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 work->update(syncAbs>>16,demuxer->getSize()>>16,nbImage,
                                                         lastStamp.hh,lastStamp.mm,lastStamp.ss);
 //uint32_t done,uint32_t total, uint32_t nbImage, uint32_t hh, uint32_t mm, uint32_t ss);
-                                                update=0;
                                                 if(work->isAborted()) break;
-                                        }
                                 switch(streamid)
                                         {
                                         /* Useless apparently
@@ -229,6 +225,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                         break;
                                         */
                                         case 0xB3: // sequence start
+                                                printf("Seq %d\n",nbGop);
                                                 if(grabbing) continue;
                                                 grabbing=1;    
                                                 
@@ -252,7 +249,13 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 demuxer->forward(4);
                                                 break;
                                         case 0xb8: // GOP
-                                                //aprintf("GOP %d\n",nbGop);
+                                                printf("GOP %d\n",nbGop);
+#ifdef SHOW_PTS
+                                                if(pts!=ADM_NO_PTS)
+                                                {
+                                                fprintf(out,"# %lu\n",pts/90);
+                                                }
+#endif
                                                 uint32_t gop;   
                                                 if(!seq_found) continue;
                                                 if(grabbing) 
@@ -266,7 +269,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 break;
                                         case 0x00 : // picture
                                                
-                                                
+                                                 printf("pic \n");
                                                 if(!seq_found)
                                                 { 
                                                         continue;
