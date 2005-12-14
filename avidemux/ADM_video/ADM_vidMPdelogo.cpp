@@ -38,15 +38,7 @@ extern "C" {
 #include "ADM_filter/video_filters.h"
 
 #include "ADM_video/ADM_cache.h"
-typedef struct MPDELOGO_PARAM
-{
-        uint32_t xoff;
-        uint32_t yoff;
-        uint32_t lw;
-        uint32_t lh;
-        uint32_t band;
-        uint32_t show;
-}MPDELOGO_PARAM;
+#include "ADM_vidMPdelogo.h"
 
 class  ADMVideoMPdelogo:public AVDMGenericVideoStream
  {
@@ -69,6 +61,8 @@ class  ADMVideoMPdelogo:public AVDMGenericVideoStream
 
 
  }     ;
+extern uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in);
+
 static FILTER_PARAM mpdelogoParam={6,{"xoff","yoff","lw","lh","band","show"}};
 
 BUILD_CREATE(mpdelogo_create,ADMVideoMPdelogo);
@@ -79,9 +73,7 @@ uint8_t ADMVideoMPdelogo::configure(AVDMGenericVideoStream * instream)
 {
     UNUSED_ARG(instream);
 
-   
-    return 0;
-
+    return DIA_getMPdelogo(_param,instream);
 }
 
 char *ADMVideoMPdelogo::printConf( void )
