@@ -63,7 +63,7 @@ GtkWidget *dialog;
 #ifdef USE_XVID_4
         CHECK_SET(checkbutton4)
 #endif
-#ifdef USE_264
+#ifdef USE_X264
         CHECK_SET(checkbutton5)
 #endif
 #ifdef USE_FREETYPE
