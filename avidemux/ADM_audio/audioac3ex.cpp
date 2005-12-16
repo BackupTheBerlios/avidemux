@@ -58,7 +58,7 @@ uint32_t syncoff;
         	}
     // else fill up wav header
     _wavheader->encoding = WAV_AC3;
-    _wavheader->channels = 2;
+    _wavheader->channels = chan;
     _wavheader->frequency = fq;
     _wavheader->bitspersample = 16;	// yes i know
     _wavheader->byterate = br;
