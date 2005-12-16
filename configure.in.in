@@ -216,7 +216,7 @@ dnl __________________x264 ______________
 AC_MSG_CHECKING(for x264 codec )
 AC_CHECK_HEADER(x264.h,,have_x264=no)
 if test "x$have_x264" = "xyes"; then
-   AC_CHECK_LIB(x264,x264_encoder_open,,have_x264=no,-lm)
+   AC_CHECK_LIB(x264,x264_encoder_open,,have_x264=no,-lm,-lpthread)
 fi
 if test "x$have_x264" = "xyes"; then
 	AC_DEFINE(USE_X264,1,[use x264 encoder])

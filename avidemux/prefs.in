@@ -45,7 +45,7 @@ filters.subtitle.vpercent,		INT,	0,	0,	255
 filters.subtitle.selfadjustable,	UINT,	0,	0,	1
 filters.subtitle.usebackgroundcolor,	UINT,	0,	0,	1
 # codec metasettings for mpeg2enc based
-settings.mpegsplit, UINT,790,	400,	5000
+settings.mpegsplit, 			UINT,	790,	400,	5000
 device.audiodevice,			STRING,	OSS
 device.audio.alsa_device,               STRING, "plughw:0@0"
 device.videodevice,			UINT,	0,	0,	10

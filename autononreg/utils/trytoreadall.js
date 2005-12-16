@@ -24,12 +24,12 @@ for(i=0;i<count;i++)
 		continue;
 	}
 	print(file+":match");
-	displayInfo(file);
+	//displayInfo(file);
 	/* Process it */
 	app.forceUnpack(); // automatic unpack
 	if(!app.load(file))
 	{
-		print("Faild to load "+file);
+		displayInfo("Faild to load "+file);
 		continue;
 	}
 }

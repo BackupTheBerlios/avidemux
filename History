@@ -5,6 +5,37 @@
 				Read returns 0
 				getPacket returns 0
 *********************** /TODO **************************
+
+
+
+********************************* Step2 *********************************
+                Fixed mpeg detection (lower threshold)
+                New filters: mosaic hard pd removal blend removal
+                Fixed size for output (74 &  70 mn)
+                
+
+                Fixed blank in path for mpeg    
+                unblend field, does not work very well
+                Fixed TS loading
+                Fixed slowdown in mpeg PS loading
+                Fixed huge junk chunk in mpeg->avi
+                Jobs
+
+test1
+                Fixed requantizer
+                Colorspace from mplayer
+                DRC
+                wizard for VCD etc.. that asks for aspect ratios
+                use ~/.avidemux for storage
+                Tray icon
+                Fixed win32 bigfile issue
+                PNG + use mplayer for importing BMP
+                SDL support for win32 enhanced (maybe macOsX too)
+                Dual audio fixed (sort of)
+                Jakub new dialog
+                Filter for open/save
+
+***********************************************************
         25 June
                 Multiple audio track for OGM + cleanup of the mess
         20 June
