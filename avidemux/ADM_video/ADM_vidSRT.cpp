@@ -49,10 +49,10 @@
 
 #include <prefs.h>
 
-static FILTER_PARAM subParam={14,{"_fontsize","_subname","_fontname","_charset",
+static FILTER_PARAM subParam={15,{"_fontsize","_subname","_fontname","_charset",
 				"_baseLine","_Y_percent","_U_percent","_V_percent",
 				"_selfAdjustable","_delay","_useBackgroundColor","_bg_Y_percent",
-      				"_bg_U_percent","_bg_V_percent"}};
+      				"_bg_U_percent","_bg_V_percent","_blend"}};
 
 SCRIPT_CREATE(subtitle_script,ADMVideoSubtitle,subParam);
 
@@ -96,6 +96,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 	_font = new ADMfont();									
 	if(couples)
 	{
+                int32_t b;
 			SUBCONF *_param;
 			_conf=NEW( SUBCONF);
 
@@ -116,7 +117,9 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 			GET(_bg_Y_percent);
       			GET(_bg_U_percent);
       			GET(_bg_V_percent);
-
+//                        GET(_blend);
+                        couples->getCouple("_blend",&b);
+                        _param->_blend=(BlendMode)b;
 			if(_conf->_baseLine>_info.height-_conf->_fontsize*SRT_MAX_LINE)
                         {
                                 printf("Base exceeded : base :%lu height :%lu bottom:%lu\n",
@@ -160,7 +163,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 			_conf->_bg_Y_percent=0;
 			_conf->_bg_U_percent=0;
 			_conf->_bg_V_percent=0;
-
+                        _conf->_blend=BLEND_SOLID;
 
 			prefs->get(FILTERS_SUBTITLE_FONTSIZE,&(_conf->_fontsize));
 			prefs->get(FILTERS_SUBTITLE_YPERCENT,&(_conf->_Y_percent));
@@ -193,10 +196,12 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 	_maskBuffer=new uint8_t[_info.width*_info.height];
   _bgBitmapBuffer=new uint8_t[(_info.width*_info.height)>>1];
 	_bgMaskBuffer=new uint8_t[_info.width*_info.height];
+        _dirty=new uint8_t[_info.height];
 	ADM_assert(_bitmapBuffer);
 	ADM_assert(_maskBuffer);
 	ADM_assert(_bgBitmapBuffer);
 	ADM_assert(_bgMaskBuffer);
+        ADM_assert(_dirty);
 }
 uint8_t	ADMVideoSubtitle::loadSubtitle( void )
 {
@@ -270,7 +275,7 @@ SUBCONF *_param;
 
 			_param=_conf; // keep macro happy
 			ADM_assert(_param);
-			*couples=new CONFcouple(14);
+			*couples=new CONFcouple(15);
 
 			CSET(_fontsize);
 			CSET(_subname);
@@ -286,6 +291,7 @@ SUBCONF *_param;
 			CSET(_bg_Y_percent);
 			CSET(_bg_U_percent);
 			CSET(_bg_V_percent);
+                        (*couples)->setCouple("_blend",(uint32_t)_param->_blend);
 
 		return 1;
 
@@ -317,6 +323,11 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 				delete [] _bgMaskBuffer;
 				_bgMaskBuffer=0;
 			}
+                if(_dirty)
+                {
+                                delete [] _dirty;
+                                _dirty=0;
+                }
 
 		if(_fd)
 		{

@@ -37,7 +37,14 @@ typedef struct subLine
 	ADM_GLYPH_T		**string;
 	
 }subLine;
-	
+
+typedef enum BlendMode
+{
+        BLEND_SOLID=1,
+        BLEND_DOTTED,
+        BLEND_DIMMER
+};
+
 typedef struct SUBCONF
 {
 		uint32_t _fontsize;
@@ -62,7 +69,7 @@ typedef struct SUBCONF
 		int32_t   _bg_Y_percent;
 		int32_t   _bg_U_percent;
 		int32_t   _bg_V_percent;
-
+                BlendMode _blend;
 
 
 	}SUBCONF;
@@ -96,6 +103,7 @@ typedef struct SUBCONF
 	uint8_t						*_maskBuffer;
 	uint8_t						*_bgBitmapBuffer;
 	uint8_t						*_bgMaskBuffer;
+        uint8_t                                         *_dirty;
 	uint8_t						blend(uint8_t *target,uint32_t baseLine);
 	ADMfont						*_font;
 	uint8_t						loadSubtitle(void);
@@ -104,6 +112,7 @@ typedef struct SUBCONF
         uint8_t                                         doChroma(void);
         uint8_t                                         clearBuffers(void);
         void                                            doAutoSplit(subLine *string);
+        uint8_t                                         isDirty(int line);
 
  public:
  		

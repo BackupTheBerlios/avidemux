@@ -182,8 +182,39 @@ void ADMVideoSubtitle::displayString(subLine *string)
                 doAutoSplit(string);
         }
     	doChroma();
+	// Compute the dirty state
+        // If a line is not set as dirty, it means it has no pixel in it
+        // In fact we do top/bottom and add a tiny bit to it
+        memset(_dirty,1,_info.height);
+
+        // First to top
+
+        int top=0,bottom=_info.height-1,limit;
+        while(top<_info.height && !isDirty(top)) top++;
+        if(top>_conf->_fontsize>>1) top-=_conf->_fontsize>>1;
+        memset(&(_dirty[0]),0,top); // Clear top
+        
+        // Then bottom
+        limit=(SRT_MAX_LINE+1)*_conf->_fontsize;
+        if(limit>=_info.height) limit=_info.height-1;
+
+
+        bottom=limit;
+        while(bottom>top && !isDirty(bottom)) bottom--;
+        if(bottom+(_conf->_fontsize>>1)<limit) bottom+=_conf->_fontsize>>1;
+        ADM_assert(bottom<=limit);
+        memset(&(_dirty[bottom]),0,limit-bottom+1);
+        //printf("Top:%d bottom :%d limit:%d\n",top,bottom,limit);
 	
-	
+}
+uint8_t ADMVideoSubtitle::isDirty(int line)
+{
+        uint8_t *base=_maskBuffer+_info.width*line;
+        for(int x=0;x<_info.width;x++)
+        {
+                if(base[x]) return 1;
+        }
+        return 0;
 }
 /*
         We merge the whole lines into one then split it
@@ -571,24 +602,65 @@ uint8_t ADMVideoSubtitle::blend(uint8_t *target,uint32_t baseLine)
 	mask=_maskBuffer;
   	bgMask=_bgMaskBuffer;
  	target+=start;
-  	for( y=hei;y>0;y--)
-	{
-      if(*mask) {
-	if(*mask>LUMA_LEVEL || _conf->_useBackgroundColor)
-			{
-				val=*mask*_conf->_Y_percent+128;
-				val>>=8;
-				*target=(uint8_t )val;
-			}
-	else { *target=0; }
-      } else if(_conf->_useBackgroundColor && *bgMask) {
-	*target=(uint8_t )_conf->_bg_Y_percent;
-      }	  
-      
-		target++;
-		mask++;
-      bgMask++;
-	}
+        // clip 
+        if(hei+start>_info.width*_info.height)
+        {
+                hei=_info.width*_info.height-start;
+        }
+// Luma
+        int bottom=baseLine+(SRT_MAX_LINE+1)*_conf->_fontsize;
+        if(bottom>_info.height) bottom=_info.height;
+        for( y=baseLine;y<bottom;y++)
+        {
+            if(!_dirty[y-baseLine])
+            {
+                target+=_info.width;
+                mask+=_info.width;
+                bgMask+=_info.width;
+                 continue;
+            }
+            for(int x=0;x<_info.width;x++)
+            {
+                if(*mask) {
+                                if(*mask>LUMA_LEVEL || _conf->_useBackgroundColor)
+                                {
+                                        val=*mask*_conf->_Y_percent+128;
+                                        val>>=8;
+                                        *target=(uint8_t )val;
+                                }
+                                else 
+                                        { *target=0; }
+                        } else 
+                        if(*bgMask)
+                        {
+                                if(_conf->_useBackgroundColor) 
+                                {
+                                        *target=(uint8_t )_conf->_bg_Y_percent;
+                                }
+                        }
+                        else
+                                {
+                                        switch(_conf->_blend)
+                                        {
+                                                case BLEND_SOLID: break;
+                                                case BLEND_DIMMER: *target=(*target*3)>>2;break;
+                                                case BLEND_DOTTED: 
+                                                {
+                                                        int odd;
+                                                                odd= y%_info.width;
+                                                                odd=odd&1;
+                                                                odd+=(1&(y/_info.width));
+                                                                odd&=1;
+                                                                if(odd) *target=0; 
+                                                }
+                                        }
+                                }
+                        
+                target++;
+                mask++;
+                bgMask++;
+              }
+        }
 	
 
 // do u & v
