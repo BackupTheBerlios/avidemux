@@ -376,6 +376,7 @@ uint32_t extraLen=0;
 			break;
           case WAV_8BITS_UNSIGNED:
                         wav.encoding=WAV_PCM;
+			header->dwScale 	= 1;
                         wav.bitspersample=8;
                         break;
                         
