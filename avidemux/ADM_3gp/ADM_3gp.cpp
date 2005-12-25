@@ -974,7 +974,7 @@ uint8_t	_3GPHeader::buildIndex(
 				uint32_t *Sn, 			uint32_t *outNbChunk)
 
 {
-uint32_t chunkCount[8000];
+
 uint32_t i,j,cur;
 
 	*outNbChunk=0;
@@ -1065,11 +1065,20 @@ uint32_t i,j,cur;
 	}
 	// if no sample to chunk we map directly
 	// first build the # of sample per chunk table
+        uint32_t totalchunk=0;
+        for(i=0;i<nbSc;i++)
+        {
+                totalchunk+=nbCo-(Sc[i]-1);
+        }
+        
+
+        uint32_t chunkCount[totalchunk+1];
 	for(i=0;i<nbSc;i++)
 	{
 		for(j=Sc[i]-1;j<nbCo;j++)
 		{
 			chunkCount[j]=Sn[i];
+                        ADM_assert(j<=totalchunk);
 		}
 		aprintf("(%d) sc: %lu sn:%lu\n",i,Sc[i],Sn[i]);
 	}
