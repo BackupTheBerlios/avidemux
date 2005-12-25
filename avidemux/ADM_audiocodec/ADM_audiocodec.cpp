@@ -100,6 +100,7 @@ ADM_Audiocodec *out;
 #ifdef USE_FAAD
 				case WAV_AAC:
 				case WAV_MP4:
+                                case 0x706D:  // Weird fourcc/id code used by mencoder
 						printf("\n MP4 audio \n");
 						out= (ADM_Audiocodec *) new ADM_faad(fourcc,info,
 								extra,extraData);
