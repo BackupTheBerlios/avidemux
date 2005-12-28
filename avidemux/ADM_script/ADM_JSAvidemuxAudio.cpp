@@ -201,7 +201,7 @@ JSBool ADM_JSAvidemuxAudio::JSSetProperty(JSContext *cx, JSObject *obj, jsval id
 				break;
 			case pal2film_prop:
 				priv->getObject()->m_bPAL2Film = JSVAL_TO_BOOLEAN(*vp);
-				audioFilterFilm2Pal(priv->getObject()->m_bPAL2Film);
+				audioFilterPal2Film(priv->getObject()->m_bPAL2Film);
 				break;
 			case mono2stereo_prop:
 				priv->getObject()->m_bMono2Stereo = JSVAL_TO_BOOLEAN(*vp);
