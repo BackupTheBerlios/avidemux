@@ -9,7 +9,7 @@
  ***************************************************************************
 
     begin                : Tue Jul 23 2003
-    copyright            : (C) 2002 by mean
+    copyright            : (C) 2002/2005 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -39,34 +39,23 @@
 //
 //_______________________________________________________
 
-_3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *incoming,uint32_t extraLen,uint8_t *extraData,uint32_t duration)
+// _3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *incoming,uint32_t extraLen,uint8_t *extraData,uint32_t duration)
+_3gpAudio::_3gpAudio(FILE *fd,_3gpTrack *track)
 {
-	_nb_chunks=nbchunk;
+	_nb_chunks=track->nbIndex;
 	_fd=fd;
 	_current_index=0;
 	_abs_position=0;
 	_rel_position=0;
 	_pos=0;
-	_index=idx;
+	_index=track->index;
 
-	_extraLen=extraLen;
-	_extraData=extraData;
+	_extraLen=track->extraDataSize;
+	_extraData=track->extraData;
 	
 	_wavheader=new WAVHeader;
-	memset(_wavheader,0,sizeof(WAVHeader));
-	// AMR like...
-	if(incoming==NULL)
-	{
-		_wavheader->bitspersample=16;
-		_wavheader->frequency=8000;
-		_wavheader->channels=1;
-		_wavheader->encoding=0xff00; //WAV_AMR_NB; // ??
-		_wavheader->byterate=16000;
-	}
-	else // what we just found...
-	{
-		memcpy(_wavheader,incoming,sizeof(WAVHeader));
-	}
+        memcpy(_wavheader,&(track->_rdWav),sizeof(WAVHeader));
+	
 
 	_destroyable=1;	
 	strcpy(_name,"3gp audio");	
@@ -74,7 +63,7 @@ _3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *inco
 	_length=0;
 	for(uint32_t i=0;i<_nb_chunks;i++)
 		{
-			_length+=_index[i].size;
+			_length+=track->index[i].size;
 		}
 	printf("\n 3gp audio : %lu bytes (%lu chunks)\n",_length,_nb_chunks);
 
@@ -83,7 +72,9 @@ _3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *inco
 	printf("Encoding   :%d\n",_wavheader->encoding);
 	printf("Channels   :%d\n",_wavheader->channels);
 	printf("Extra data :%lu\n",_extraLen);
-        _audioDuration=duration;
+        if(_nb_chunks)
+            _audioDuration=_index[_nb_chunks-1].time;
+       // _wavheader->frequency=48000;
     	goToTime(0);
 }
  uint8_t	_3gpAudio::goToTime(uint32_t mstime)

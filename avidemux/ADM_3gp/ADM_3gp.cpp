@@ -40,7 +40,7 @@ version 2 media descriptor :
 
 
     begin                : Tue Jul  2003
-    copyright            : (C) 2003 by mean
+    copyright            : (C) 2003/2006 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -83,17 +83,35 @@ typedef enum MP4_Tag
 	Tag_DecConfigDesc 	=0x04,
 	Tag_DecSpecificInfo 	=0x05
 };
-
+//****************************************************
+_3gpTrack::_3gpTrack(void)
+{
+    extraDataSize=0;
+    extraData=NULL;
+    index=NULL;
+    id=0;
+    memset(&_rdWav,0,sizeof(_rdWav));
+}
+_3gpTrack::~_3gpTrack()
+{
+    if(extraData) delete [] extraData;
+    if(index)   delete [] index;
+ 
+    index=NULL;
+    extraData=NULL;
+    
+}
+//****************************************************
 uint8_t _3GPHeader::setFlag(uint32_t frame,uint32_t flags){
     UNUSED_ARG(frame);
     UNUSED_ARG(flags);
     if(flags & AVI_KEY_FRAME)
     {
-		_idx[frame].intra=1;
+		VDEO.index[frame].intra=1;
     }
     else
     {
-		_idx[frame].intra=0;
+                VDEO.index[frame].intra=0;
     }
 	return 0;
 }
@@ -106,7 +124,7 @@ uint32_t _3GPHeader::getFlags(uint32_t frame,uint32_t *flags){
 		*flags=AVI_KEY_FRAME;
 	}
 	else
-	if(_idx[frame].intra) *flags=AVI_KEY_FRAME;
+     if(VDEO.index[frame].intra) *flags=AVI_KEY_FRAME;
 		else *flags=0;
 
 
@@ -124,18 +142,17 @@ uint8_t  _3GPHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fr
               }
 uint8_t  _3GPHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
 {
-uint32_t offset=_idx[framenum].offset; //+_mdatOffset;
+    uint32_t offset=VDEO.index[framenum].offset; //+_mdatOffset;
 
-	
 
- 	fseeko(_fd,offset,SEEK_SET);
- 	fread(ptr, _idx[framenum].size, 1, _fd);
-  	*framelen=_idx[framenum].size;
- 	return 1;
+    fseeko(_fd,offset,SEEK_SET);
+    fread(ptr, VDEO.index[framenum].size, 1, _fd);
+    *framelen=VDEO.index[framenum].size;
+    return 1;
 }
 _3GPHeader::~_3GPHeader()
 {
-	close();
+    close();
 
 }
 uint8_t    _3GPHeader::close( void )
@@ -145,16 +162,6 @@ uint8_t    _3GPHeader::close( void )
                	fclose(_fd);
              	}
               _fd=NULL;
-	if(_idx)
-	{
-		delete [] _idx;
-		_idx=NULL;
-	}
-	if(_rdWav)
-	{
-		delete _rdWav;
-		_rdWav=NULL;
-	}
 #define DEL(x) if(x) delete [] x;x=NULL;
 	DEL(Sz);
 	DEL(Co);
@@ -163,7 +170,6 @@ uint8_t    _3GPHeader::close( void )
 	DEL(Sync);
 	DEL(SttsN);
 	DEL(SttsC);
-	DEL(_audioExtraData);
  	return 1;
 }
 //
@@ -173,13 +179,6 @@ uint8_t    _3GPHeader::close( void )
 _3GPHeader::_3GPHeader(void)
 {
 	_fd=NULL;
-	_idx=NULL;
-	_audioIdx=NULL;
-	_volHeader=0;
-	_volHeaderLen=0;
-	_nbAudioChunk=0;
-	_audioTrack=NULL;
-	_rdWav=NULL;
 	 Sz=NULL;
 	 Co=NULL;
 	 Sc=NULL;
@@ -187,53 +186,40 @@ _3GPHeader::_3GPHeader(void)
 	 Sync=NULL;
 	 SttsN=NULL;
 	 SttsC=NULL;
-	_otherExtraStart=0;
-	_otherExtraSize=0;
-	_audioExtraData=0;
-        _audioDuration=0;
-	
+        nbAudioTrack=0;
+        _currentAudioTrack=0;
 
 }
 uint8_t	_3GPHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {  
-	if(!_nbAudioChunk)
-	{
-		*audio=NULL;
-		return 0;
-	}
-	*audio=_audioTrack;
-	return 1;
+    if(nbAudioTrack) 
+    {
+        *audio=_audioTracks[_currentAudioTrack];
+    }  else 
+        *audio=NULL;
+    return 1;
 };
 WAVHeader 	*_3GPHeader::getAudioInfo(void )
 { 	
-	if(!_nbAudioChunk)
+	if(!nbAudioTrack)
 		return NULL; 
-	return _audioTrack->getInfo();
+       
+        return _audioTracks[_currentAudioTrack]->getInfo();
 } ;
 uint32_t _3GPHeader::getNbStream(void)
 { 
-	if(_nbAudioChunk)
-		return 2;
-	else
-		return 1;
+    return 1+nbAudioTrack;
 };
 uint8_t   _3GPHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
 uint32_t old;
         *len=0;*data=NULL;
-        if(!_volHeaderLen) return 1;
+        if(_tracks[0].extraDataSize)
         {
-        uint8_t *ptr=new uint8_t[_volHeaderLen];
-
-                printf("Adding VolHeader info\n");
-                old=ftello(_fd);
-                fseeko(_fd,_volHeader,SEEK_SET);
-                fread(ptr, _volHeaderLen, 1, _fd);
-                fseeko(_fd,old,SEEK_SET);
-                *len=_volHeaderLen;
-                *data=ptr; // MEM leak ? FIXME
-                return 1;
-        } 
+            *len= VDEO.extraDataSize;
+            *data=VDEO.extraData;
+        }
+        return 1;
 }
 //______________________________________
 //
@@ -276,72 +262,64 @@ uint8_t    _3GPHeader::open(char *name)
               _videostream.fccHandler=fourCC::get((uint8_t *)"XXXX");
 	      _video_bih.biCompression=_videostream.fccHandler;
 
-	      _idx=NULL;
-	      _volHeader=_volHeaderLen=0;
-	  
-
-
 	printf("\n");
 	adm_atom *atom=new adm_atom(_fd);
 	parseAtomTree(atom);
 	delete atom;
 	printf("Found video codec type :");fourCC::print(_videostream.fccHandler);printf("\n");
-        if(!_idx) return 0;
+        if(!VDEO.index) return 0;
 
         // If it is mpeg4 and we have extra data
         // Decode vol header to get the real width/height
         // The mpeg4/3GP/Mov header is often misleading
         if(fourCC::check(_videostream.fccHandler,(uint8_t *)"DIVX"))
         {
-            if(_volHeaderLen)
+            if(VDEO.extraDataSize)
             {
-                uint32_t w=0,h=0;
-                uint8_t *data=new uint8_t[_volHeaderLen+16]; // padding issue
-                fseek(_fd,_volHeader,SEEK_SET);
-                fread(data,_volHeaderLen,1,_fd);
-                if(extractMpeg4Info(data,_volHeaderLen,&w,&h))
+                uint32_t w,h;
+                if(extractMpeg4Info(VDEO.extraData,VDEO.extraDataSize,&w,&h))
                 {
                     printf("MP4 Corrected size : %lu x %lu\n",w,h);
                     _video_bih.biWidth=_mainaviheader.dwWidth=w ;
                     _video_bih.biHeight=_mainaviheader.dwHeight=h;                               
                 }
-                delete [] data;            
             }
         
         }
         else
         {
+#if 0
         /*
             Same story for H263 : Analyze 1st frame to get the real width/height
         */
             if(fourCC::check(_videostream.fccHandler,(uint8_t *)"H263"))
             {
-                uint32_t len;
-                uint8_t *data;
-                uint32_t w=0,h=0;
-                        len=_idx[0].size;
-                        data=new uint8_t[len+16];
-                        fseek(_fd,_idx[0].offset,SEEK_SET);
-                        fread(data, len, 1, _fd);
-                        if(extractH263Info(data,len,&w,&h))
+                uint32_t w,h;
+                        if(extractH263Info(VDEO.extraData,VDEO.extraDataSize,&w,&h))
                         {
                             printf("H263 Corrected size : %lu x %lu\n",w,h);
                             _video_bih.biWidth=_mainaviheader.dwWidth=w ;
                             _video_bih.biHeight=_mainaviheader.dwHeight=h;                               
                         }
-                        delete [] data;
+                        
             }
+#endif
         
         }
+        
+        /*
+                Now build audio tracks
+        */
+        for(int audio=0;audio<nbAudioTrack;audio++)
+        {
+            _audioTracks[audio]=new _3gpAudio(_fd,&(_tracks[1+audio]));   
+            
+        }
         fseek(_fd,0,SEEK_SET);
-	
-	if(_nbAudioChunk)
-	{
-	      _isaudiopresent=1;
-	      _audioTrack=new _3gpAudio( _audioIdx, _nbAudioChunk,_fd,_rdWav,_audioExtraLen,_audioExtraData,_audioDuration);
-	}
-	printf("3gp/mov file successfully read..\n");
-	return 1;
+
+
+        printf("3gp/mov file successfully read..\n");
+        return 1;
 }
 uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 {
@@ -431,61 +409,62 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 
 			case MKFCCR('r','a','w',' '): //'raw ':
 					tom.skipBytes(8);
-					_rdWav=new WAVHeader;
-					memset(_rdWav,0,sizeof(WAVHeader));
+					
 					printf("Raw audio detected\n");
 					printf("Version : %u\n",tom.read16());
 					printf("Revision :%u\n",tom.read16());
 					printf("Vendor :%lu\n",tom.read32());
-					_rdWav->channels=tom.read16();
-					_rdWav->bitspersample=tom.read16();
-					_rdWav->encoding=tom.read16();
+                                        ADIO.channels=tom.read16();
+                                        ADIO.bitspersample=tom.read16();
+                                        ADIO.encoding=tom.read16();
 
-					printf("Channels :%lu\n",_rdWav->channels);
-					printf("S size :%lu\n",_rdWav->bitspersample);
-					printf("Compression :%u\n",_rdWav->encoding);
+                                        printf("Channels :%lu\n",ADIO.channels);
+                                        printf("S size :%lu\n",ADIO.bitspersample);
+                                        printf("Compression :%u\n",ADIO.encoding);
 					printf("Packet Size :%u\n",tom.read16());
 					i=tom.read32();
 					if(i&0xffff)
 					{
 						GUI_Error_HIG("Expect troubles", NULL);
 					}
-					if(!_rdWav->channels) _rdWav->channels=1;
-					if(_rdWav->bitspersample<8) _rdWav->bitspersample=8;
-					_rdWav->encoding=WAV_8BITS_UNSIGNED;
-					_rdWav->byterate=(i>>16);
-					_rdWav->frequency=_rdWav->byterate/((_rdWav->bitspersample>>3)*(_rdWav->channels));
+                                        if(!ADIO.channels) ADIO.channels=1;
+                                        if(ADIO.bitspersample<8) ADIO.bitspersample=8;
+                                        ADIO.encoding=WAV_8BITS_UNSIGNED;
+                                        ADIO.byterate=(i>>16);
+                                        ADIO.frequency=ADIO.byterate/((ADIO.bitspersample>>3)*(ADIO.channels));
 					printf("Bitrate :%lu (%x)\n",i,i);
-					printf("Byterate :%lu\n",_rdWav->byterate);
-					printf("Frequency :%lu\n",_rdWav->frequency);
+                                        printf("Byterate :%lu\n",ADIO.byterate);
+                                        printf("Frequency :%lu\n",ADIO.frequency);
 // hardcoded for now
 
 					tom.skipAtom();
 					break;
 			case MKFCCR('u','l','a','w'): //'ulaw ':
 					tom.skipBytes(8);
-					_rdWav=new WAVHeader;
-					memset(_rdWav,0,sizeof(WAVHeader));					
-					_rdWav->channels=1;
-					_rdWav->bitspersample=16;
-					_rdWav->frequency=7980; // FIXME ?
-					_rdWav->encoding=WAV_ULAW;	
-					_rdWav->byterate=_rdWav->frequency;	
+	                               printf("Version : %u\n",tom.read16());
+					printf("Revision :%u\n",tom.read16());
+					printf("Vendor :%lu\n",tom.read32());
+                                        ADIO.channels=tom.read16();
+                                        ADIO.bitspersample=tom.read16();
+                                        tom.read16();
+                                        ADIO.encoding=WAV_ULAW;
+                                        ADIO.byterate=ADIO.frequency=tom.read32();	
+                                        printf("Byterate  :%lu\n",ADIO.byterate);
+                                        printf("Frequency :%lu\n",ADIO.frequency);
+                                        printf("Bps       :%lu\n",ADIO.bitspersample);
 					tom.skipAtom();
 					break;					
 			case MKFCCR('m','p','4','a'): //'mp4a':
 					
                                         if(tom.getRemainingSize()>15) // skip the real mp4a atom, we only do the one in stds
                                         {
-                                        _rdWav=new WAVHeader;
 					// Put safe default here, in case there 
-					// is no decodable information later on
-					memset(_rdWav,0,sizeof(WAVHeader));
-					_rdWav->encoding=WAV_AAC;					
-					_rdWav->frequency=44100;
-					_rdWav->channels=2;
-					_rdWav->bitspersample=16;
-					_rdWav->byterate=128000/8;
+ 					// is no decodable information later on
+                                        ADIO.encoding=WAV_AAC;					
+                                        ADIO.frequency=44100;
+                                        ADIO.channels=2;
+                                        ADIO.bitspersample=16;
+                                        ADIO.byterate=128000/8;
 					// According to 3gp doc we should have 28 bytes
 					// at least
 
@@ -496,17 +475,17 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                                 printf("Version  :%d\n",u32=tom.read16()); // Qual1
                                                 printf("Revision :%d\n",tom.read16());  // revision / level
                                                 printf("Vendor   :%d\n",tom.read32());  // Vendor
-                                                _rdWav->channels=tom.read16();
-                                                printf("Channels :%d\n",_rdWav->channels); // Channels
+                                                ADIO.channels=tom.read16();
+                                                printf("Channels :%d\n",ADIO.channels); // Channels
                                                 
                                                 printf("Bps      :%d\n",tom.read16()); // Bps
                                                 printf("CodecId  :%x\n",tom.read16()); // Bps
                                                 printf("Packetsiz:%x\n",tom.read16()); // Bps
                                                 if(u32<2)
                                                 {
-                                                        _rdWav->frequency=tom.read16();
-                                                        if(_rdWav->frequency<8000) _rdWav->frequency=48000;
-                                                        printf("Fq       :%d\n",_rdWav->frequency); // Bps
+                                                        ADIO.frequency=tom.read16();
+                                                        if(ADIO.frequency<8000) ADIO.frequency=48000;
+                                                        printf("Fq       :%d\n",ADIO.frequency); // Bps
                                                         tom.skipBytes(2); // Fixed point
                                                 }
                                                 
@@ -521,10 +500,10 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                                                 printf("Bytes per sample    :%d\n",tom.read32());  // Vendor
                                                                 break;
                                                         case 2:
-                                                                _rdWav->frequency=44100;
+                                                                ADIO.frequency=44100;
                                                                 tom.skipBytes(16);
-                                                                _rdWav->channels=tom.read32();
-                                                                printf("Channels            :%d\n",_rdWav->channels); // Channels
+                                                                ADIO.channels=tom.read32();
+                                                                printf("Channels            :%d\n",ADIO.channels); // Channels
                                                                 printf("Tak(7F000)           :%x\n",tom.read32()); // Channels
                                                                 printf("Bites  per channel  :%d\n",tom.read32());  // Vendor
                                                                 printf("Format specific     :%x\n",tom.read32());  // Vendor
@@ -540,17 +519,16 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					break;
 			case MKFCCR('s','a','m','r'): //'mp4a':
 					tom.skipBytes(8);
-					_rdWav=new WAVHeader;
-					memset(_rdWav,0,sizeof(WAVHeader));
-					_rdWav->encoding=WAV_AMRNB;
+					
+                                        ADIO.encoding=WAV_AMRNB;
 					
 					#warning !!!!!!!!!!!!!!!
 					#warning decode WAV_AMRNB audio header!
 					#warning !!!!!!!!!!!!!!!
-					_rdWav->frequency=8000;
-					_rdWav->channels=1;
-					_rdWav->bitspersample=16;
-					_rdWav->byterate=12000/8;
+                                        ADIO.frequency=8000;
+                                        ADIO.channels=1;
+                                        ADIO.bitspersample=16;
+                                        ADIO.byterate=12000/8;
 					
 					tom.skipAtom();
 					break;					
@@ -606,57 +584,43 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					{
            				
 					
-					buildIndex(&_idx,myScale,
+					buildIndex(&_tracks[0],myScale,
 							nbSz,Sz,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
 							Sn,&nbo);
 					// Take the last entry in the video index as global time
 					// time in us
+                                        nbo=_tracks[0].nbIndex;
 					_videostream.dwLength= _mainaviheader.dwTotalFrames=nbo;
-					double last=_idx[nbo-1].time;
+					double last=VDEO.index[nbo-1].time;
 					// avoid rounding error
 					
-					last+=_idx[1].time; // ~ 1 Frame duration
+                                        last+=VDEO.index[1].time; // ~ 1 Frame duration
 					ADM_assert(last>0.1);
 					last=1000.*1000.*1000./last;
 					last*=nbo;
 					printf("3GP:Tk %lu Nb sz:%lu nbFrame:%lu duration:%f us\n",
 							current,nbSz,nbo,last);
               				_videostream.dwRate=(uint32_t)floor(last);
-					if(_otherExtraSize  )
-					{
-						printf("We have some (%lu) extra data for video",_otherExtraSize);
-						_volHeader=_otherExtraStart;
-						_volHeaderLen=_otherExtraSize;
-					}
 					if(nbSync)
-						sync(_idx,nbSz,nbSync,Sync);
+                                            sync(VDEO.index,nbSz,nbSync,Sync);
 					}
 					break;
 				case 2:
 					// audio
-					buildIndex(&_audioIdx,myScale,
+                                        buildIndex(&_tracks[1+nbAudioTrack],myScale,
 							nbSz,Sz,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
 							Sn,&nbo);
-					// Check for extra
-                                        
-					if(_otherExtraSize)
-					{
-                                               	// Get extra data here
-						printf("We have some (%lu) extra data for audio\n",_otherExtraSize);
-                                                uint32_t  oldPos=ftello(_fd);
-						_audioExtraData=new uint8_t[_otherExtraStart];
-						_audioExtraLen=_otherExtraSize;
-						fseek(_fd,_otherExtraStart,SEEK_SET);
-						fread(_audioExtraData,1,_otherExtraSize,_fd);
-					        fseeko(_fd,oldPos,SEEK_SET);
-					}
-					if(nbo)
-						_nbAudioChunk=nbo;
-					else
-						_nbAudioChunk=nbSz;
+                                        nbo=_tracks[1+nbAudioTrack].nbIndex;
+                                        // Check for extra
+
+
+                                        if(nbo)
+                                            _tracks[1+nbAudioTrack].nbIndex=nbo;
+                                        else
+                                            _tracks[1+nbAudioTrack].nbIndex=nbSz;
+                                        nbAudioTrack++;
 					break;
 				}
-				_otherExtraStart=_otherExtraSize=0;
 				DEL(Sz);
 				DEL(Co);
 				DEL(Sc);
@@ -699,7 +663,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					break;
 				case MKFCCR('s','o','u','n'): //'soun':
 					current=2;
-                                         _audioDuration=duration;
+                                        _audioDuration=(uint32_t)duration;
 					printf("hdlr audio found (duration %f ms)\n ",duration);
 					break;
 				default:
@@ -750,16 +714,16 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					// For SVQ3, the codec needs it to begin by SVQ3
 					// We go back by 4 bytes to get the 4CC
 						printf("SVQ3 atom found\n");
-						_videoExtraLen=tom.getSize()+4;
-						_videoExtraData=new uint8_t[ _videoExtraLen ];
-						if(!tom.readPayload(_videoExtraData+4,_videoExtraLen-4 ))
+						VDEO.extraDataSize=tom.getSize()+4;
+                                                VDEO.extraData=new uint8_t[ VDEO.extraDataSize ];
+                                                if(!tom.readPayload(VDEO.extraData+4,VDEO.extraDataSize-4 ))
 						{
 							GUI_Error_HIG("Problem reading SVQ3 headers", NULL);
 						}
-						_videoExtraData[0]='S';
-						_videoExtraData[1]='V';
-						_videoExtraData[2]='Q';
-						_videoExtraData[3]='3';
+                                                VDEO.extraData[0]='S';
+                                                VDEO.extraData[1]='V';
+                                                VDEO.extraData[2]='Q';
+                                                VDEO.extraData[3]='3';
 						_video_bih.biWidth=_mainaviheader.dwWidth=_lastW ;
               					_video_bih.biHeight=_mainaviheader.dwHeight=_lastH;
 
@@ -771,12 +735,13 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				break;
 
 			case MKFCCR('j','p','e','g'): //'jpeg':
-				_volHeader=ftell(_fd);
-				_volHeaderLen=tom.getSize();
+                                VDEO.extraDataSize=tom.getSize();
+                                VDEO.extraData=new uint8_t [VDEO.extraDataSize];
+                                tom.readPayload(VDEO.extraData,VDEO.extraDataSize);
 				_video_bih.biWidth=_mainaviheader.dwWidth=_lastW ;
               			_video_bih.biHeight=_mainaviheader.dwHeight=_lastH;
 
-				printf("Jpeg Header at %lu, size %lu \n",_volHeader,_volHeaderLen);
+                                printf("Jpeg Header size %lu \n",VDEO.extraDataSize);
 				_videostream.fccHandler=fourCC::get((uint8_t *)"MJPG");
 				 _video_bih.biCompression=_videostream.fccHandler;
 				tom.skipAtom();
@@ -785,9 +750,10 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                 {
                                         // configuration data for h264
                                         //tom.skipBytes(8);
-                                        _otherExtraStart=ftell(_fd);
-                                        _otherExtraSize=tom.getRemainingSize();;
-                                        printf("avcC size:%d\n",_otherExtraSize);
+                                    VDEO.extraDataSize=tom.getRemainingSize();
+                                    VDEO.extraData=new uint8_t [VDEO.extraDataSize];
+                                    tom.readPayload(VDEO.extraData,VDEO.extraDataSize);
+                                        printf("avcC size:%d\n",VDEO.extraDataSize);
                                         tom.skipAtom();
                                         break;
 
@@ -849,10 +815,21 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 								tom.skipBytes(1+1+3+4+4);	
 								break;
 							case Tag_DecSpecificInfo:
-
-								_otherExtraStart=ftell(_fd);
-								_otherExtraSize=l;
-								break;
+                                                                switch(current)
+                                                                {
+                                                                    case 1: // Video
+                                                                        VDEO.extraDataSize=l;
+                                                                        VDEO.extraData=new uint8_t[l];
+                                                                        fread(VDEO.extraData,VDEO.extraDataSize,1,_fd);
+								        break;
+                                                                    case 2:
+                                                                        printf("Esds for audio\n");
+                                                                        _tracks[1+nbAudioTrack].extraDataSize=l;
+                                                                        _tracks[1+nbAudioTrack].extraData=new uint8_t[l];
+                                                                        fread(_tracks[1+nbAudioTrack].extraData,
+                                                                            _tracks[1+nbAudioTrack].extraDataSize,1,_fd);
+                                                                        break;
+                                                                }
 							}
 					}
 					
@@ -965,8 +942,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 http://developer.apple.com/documentation/QuickTime/QTFF/QTFFChap2/chapter_3_section_5.html#//apple_ref/doc/uid/DontLinkBookID_69-CH204-BBCJEIIA
 */
 uint8_t	_3GPHeader::buildIndex(
-				_3gpIndex **idx,
-				uint32_t myScale,
+                            _3gpTrack *track,   
+                            uint32_t myScale,
 				uint32_t nbSz,	uint32_t *Sz,
 				uint32_t nbCo ,		uint32_t *Co,
 				uint32_t nbSc,		uint32_t *Sc,
@@ -1004,10 +981,10 @@ uint32_t i,j,cur;
 		// we try to avoid too big packet_size
 		// so we split them in packet size number
 
-		*idx=new _3gpIndex[nbCo];
-		memset(*idx,0,nbCo*sizeof(_3gpIndex));
-		*outNbChunk=nbCo;
-		_3gpIndex *ix=*idx;
+		track->index=new _3gpIndex[nbCo];
+                memset(track->index,0,nbCo*sizeof(_3gpIndex));
+                track->nbIndex=nbCo;
+                _3gpIndex *ix=track->index;
 		for(i=0;i<nbCo;i++)
 		{
 			ix[i].size=chunk_size;
@@ -1042,7 +1019,7 @@ uint32_t i,j,cur;
 		dur*=1000*1000.;	// in us now
 		for(uint32_t i=0;i<count;i++)
 		{
-			(*idx)[i].time=(uint64_t)floor(total);
+                        track->index[i].time=(uint64_t)floor(total);
 			total+=dur;		
 		}
 		
@@ -1055,12 +1032,12 @@ uint32_t i,j,cur;
 		
 	// We have different packet size
 	// Probably video
-	*idx=new _3gpIndex[nbSz];
-	memset(*idx,0,nbSz*sizeof(_3gpIndex));
+        track->index=new _3gpIndex[nbSz];
+        memset(track->index,0,nbSz*sizeof(_3gpIndex));
 
 	for(i=0;i<nbSz;i++)
 	{
-		(*idx)[i].size=Sz[i];
+                track->index[i].size=Sz[i];
 		aprintf("\t size : %d : %lu\n",i,Sz[i]);
 	}
 	// if no sample to chunk we map directly
@@ -1094,16 +1071,16 @@ uint32_t i,j,cur;
 		aprintf("--starting at %lu , %lu to go\n",Co[j],chunkCount[j]);
 		for(uint32_t k=0;k<chunkCount[j];k++)
 		{
-			(*idx)[cur].offset=Co[j]+tail;
-			tail+=(*idx)[cur].size;
-			aprintf(" sample : %d offset : %lu\n",cur,(*idx)[cur].offset);
+                        track->index[cur].offset=Co[j]+tail;
+                        tail+=track->index[cur].size;
+                        aprintf(" sample : %d offset : %lu\n",cur,track->index[cur].offset);
 			aprintf("Tail : %lu\n",tail);
 			cur++;
 		}
 
 
 	}
-	*outNbChunk=cur;;
+        track->nbIndex=cur;;
 	
 	
 	// Now deal with duration
@@ -1111,7 +1088,7 @@ uint32_t i,j,cur;
 	// we put each sample duration in the time entry
 	// then sum them up to get the absolute time position
 
-	uint32_t nbChunk=*outNbChunk;
+        uint32_t nbChunk=track->nbIndex;
 	if(nbStts)		//uint32_t nbStts,	uint32_t *SttsN,uint32_t SttsC,
 	{
 		uint32_t start=0;
@@ -1121,7 +1098,7 @@ uint32_t i,j,cur;
 			{
 				for(uint32_t j=0;j<SttsN[i];j++)
 				{
-					(*idx)[start].time=(uint64_t)SttsC[i];
+                                        track->index[start].time=(uint64_t)SttsC[i];
 					start++;
 					ADM_assert(start<=nbChunk);
 				}	
@@ -1131,7 +1108,7 @@ uint32_t i,j,cur;
 		{
 			// All same duration
 			for(uint32_t i=0;i<nbChunk;i++)
-				(*idx)[i].time=(uint64_t)SttsC[0]; // this is not an error!
+                                track->index[i].time=(uint64_t)SttsC[0]; // this is not an error!
 		
 		}
 		// now collapse
@@ -1141,13 +1118,13 @@ uint32_t i,j,cur;
 		
 		for(uint32_t i=0;i<nbChunk;i++)
 		{
-			thisone=(*idx)[i].time;
+                        thisone=track->index[i].time;
 			ftot=total;
 			ftot*=1000.*1000.;
 			ftot/=myScale;
-			(*idx)[i].time=(uint64_t)floor(ftot);
+                        track->index[i].time=(uint64_t)floor(ftot);
 			total+=thisone;
-			aprintf("Audio chunk : %lu time :%lu\n",i,(*idx)[i].time);
+                        aprintf("Audio chunk : %lu time :%lu\n",i,track->index[i].time);
 		}
 		// Time is now built, it is in us
 	
@@ -1193,6 +1170,26 @@ uint8_t 	_3GPHeader::sync(_3gpIndex *idx,uint32_t index_size, uint32_t sync_size
 
 uint8_t _3GPHeader::getFrameSize (uint32_t frame, uint32_t * size){
   if(frame >= _videostream.dwLength) return 0;
-  *size = _idx[frame].size;
+  *size = VDEO.index[frame].size;
   return 1;
+}
+  uint8_t   _3GPHeader::changeAudioStream(uint32_t newstream)
+{
+        if(newstream>nbAudioTrack) return 0;
+        _currentAudioTrack=newstream;
+        return 1;
+}
+uint32_t     _3GPHeader::getCurrentAudioStreamNumber(void) 
+{ 
+    return _currentAudioTrack;
+}
+ uint8_t   _3GPHeader::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+{
+        *nbStreams=nbAudioTrack;
+        if(nbAudioTrack)
+        {
+            *infos=new uint32_t[nbAudioTrack];
+            for(int i=0;i<nbAudioTrack;i++) (*infos)[i]=_tracks[i+1]._rdWav.encoding;
+        }
+        return 1;
 }

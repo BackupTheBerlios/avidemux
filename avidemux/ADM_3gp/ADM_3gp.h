@@ -34,6 +34,19 @@ typedef struct _3gpIndex
 	uint64_t time;
 
 }_3gpIndex;
+class _3gpTrack
+{
+public:
+    _3gpIndex   *index;
+    uint32_t    id;
+    uint32_t    nbIndex;
+    uint32_t    extraDataSize;
+    uint8_t     *extraData;
+    WAVHeader   _rdWav;
+                _3gpTrack(void);
+                ~_3gpTrack();
+};
+
 //
 //	Audio track
 //
@@ -54,9 +67,10 @@ protected:
 		
 		
 public:
-					_3gpAudio(_3gpIndex *idx,
-						uint32_t nbchunk, FILE * fd,WAVHeader *incoming,
-						uint32_t extraLen,uint8_t *extraData,uint32_t duration);
+					_3gpAudio(FILE *fd,_3gpTrack *trak);
+// _3gpIndex *idx,
+// 						uint32_t nbchunk, FILE * fd,WAVHeader *incoming,
+// 						uint32_t extraLen,uint8_t *extraData,uint32_t duration);
 	virtual				~_3gpAudio();
         virtual uint32_t 		read(uint32_t len,uint8_t *buffer);
         virtual uint8_t  		goTo(uint32_t newoffset);
@@ -67,34 +81,27 @@ public:
 
 };
 
-
-
+#define _3GP_MAX_TRACKS 8
+#define VDEO _tracks[0]
+#define ADIO _tracks[nbAudioTrack+1]._rdWav
 class _3GPHeader         :public vidHeader
 {
 protected:
        				
 	  FILE 				*_fd;
-	  _3gpIndex 			*_idx;
-	  _3gpIndex 			*_audioIdx;
-	  uint32_t			_nbAudioChunk;
-	  uint32_t			_volHeader;
-	  uint32_t			_volHeaderLen;
-	  
-	  uint32_t			_otherExtraStart;
-	  uint32_t			_otherExtraSize;
+          _3gpTrack                     _tracks[_3GP_MAX_TRACKS];
 	  uint32_t                      _audioDuration;
-	  uint8_t			*_audioExtraData;
-	  uint32_t			_audioExtraLen;
-	uint8_t 				parseAtomTree(adm_atom *atom);
-	  _3gpAudio			*_audioTrack;
-	uint8_t 				sync(_3gpIndex *idx,uint32_t index_size, uint32_t sync_size,uint32_t *sync);
-
+          uint32_t                      _currentAudioTrack;
+	uint8_t 			parseAtomTree(adm_atom *atom);
+	  _3gpAudio			*_audioTracks[_3GP_MAX_TRACKS-1];
+	uint8_t 			sync(_3gpIndex *idx,uint32_t index_size, uint32_t sync_size,uint32_t *sync);
+         uint32_t  nbAudioTrack;
 	 uint32_t *Sz,*Co,*Sc;
 	 uint32_t *Sn,*Sync;
 	 uint32_t *SttsN,*SttsC;
 
 
-	uint8_t		buildIndex(	_3gpIndex **idx,
+	uint8_t		buildIndex(	_3gpTrack *track,
 					uint32_t scale,
 					uint32_t nbSz,		uint32_t *Sz,
 					uint32_t nbChunk ,	uint32_t *Chunk,
@@ -103,7 +110,7 @@ protected:
 					uint32_t *Sn,			uint32_t *outNbChunk
 					);
 	uint32_t 		readPackedLen(adm_atom *tom );
-	WAVHeader		*_rdWav;
+	
 public:
 
 virtual   void 				Dump(void) {};
@@ -137,7 +144,10 @@ virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* frame
 												uint32_t *flags);
 virtual 	uint8_t  	getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)	;
  virtual     uint8_t getFrameSize (uint32_t frame, uint32_t * size);
-	     	 		
+// Multi track
+uint8_t        changeAudioStream(uint32_t newstream);
+uint32_t     getCurrentAudioStreamNumber(void);
+ uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
 };
 
 uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h);
