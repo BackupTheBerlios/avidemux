@@ -442,7 +442,7 @@ decoderFFH264::decoderFFH264(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)  :deco
   _context->extradata=(void *)d;
   _context->extradata_size=(int)l;
 
-  printf("Initializing lavcodec H264 decoder\n");
+  printf("Initializing lavcodec H264 decoder with %d extradata\n",l);
  WRAP_Open(CODEC_ID_H264);
   
 }
