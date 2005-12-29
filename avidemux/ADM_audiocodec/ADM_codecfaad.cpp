@@ -54,7 +54,17 @@ unsigned char chan;
 		{
 			_inited = 1;
 			faacDecInit2(_instance, d,l, &srate,&chan);
-			printf("Found :%d rate %d channels\n",srate,chan);		
+			printf("Found :%d rate %d channels\n",srate,chan);
+                        if(srate!=info->frequency)
+                        {
+                            printf("Frequency mismatch!!! %d to %d (SBR ?)\n",info->frequency,srate);
+                            info->frequency=srate;
+                        }	
+                        if(chan>2) // Ask for stereo !
+                        {
+                             printf("channel mismatch!!! %d to %d \n",info->channels,chan);
+                            info->channels=chan;
+                        }
 		}
 		else // we will init it later on...
 		{
