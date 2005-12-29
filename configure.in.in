@@ -541,17 +541,23 @@ dnl __________________/mad______________
  	have_faad=yes
  
  	AC_CHECK_HEADERS([faad.h], , have_faad=no)
- 	AC_CHECK_LIB( faad, faacDecInit, , have_faad=no )
- 
  	if test "x$have_faad" = "xyes"; then
- 		AC_DEFINE(USE_FAAD, 1, [Use faad audio decoder])
- 	elif test "x$with_faad2" = "xyes"; then
- 		AC_MSG_ERROR([FAAD2 support requested but not found.])
- 	fi
+ 		AC_CHECK_LIB( faad, faacDecInit, , have_faad=no )
+ 		if test "x$have_faad" = "xno"; then
+			have_faad=yes
+ 			AC_CHECK_LIB( faad, NeAACDecInit, , have_faad=no )
+		fi	
+ 		if test "x$have_faad" = "xyes"; then
+ 			AC_DEFINE(USE_FAAD, 1, [Use faad audio decoder])
+ 		elif test "x$with_faad2" = "xyes"; then
+ 			AC_MSG_ERROR([FAAD2 support requested but not found.])
+ 		fi
  
- 	if test "x$newfaad" = "xno"; then
- 		AC_DEFINE(OLD_FAAD_PROTO, 1, [Use classing FAAD support])
- 	fi
+ 		if test "x$newfaad" = "xno"; then
+ 			AC_DEFINE(OLD_FAAD_PROTO, 1, [Use classing FAAD support])
+ 		fi
+
+	fi
  fi
  
 
