@@ -18,8 +18,8 @@ SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_toolkit oplug_mpeg xpm ADM_video oplug_avi ADM_audiodevice ADM_vp32 \
 	libMpeg2Dec oplug_mpegFF ADM_h263 ADM_gui2 ADM_dialog \
 	ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame ADM_requant \
-	ADM_script oplug_ogm ADM_xvidratectl ADM_lavformat ADM_mplex ADM_ocr MPlayer_pp \
-	ADM_mpegdemuxer ADM_tray
+	ADM_script oplug_ogm ADM_xvidratectl ADM_mplex ADM_ocr MPlayer_pp \
+	ADM_mpegdemuxer ADM_tray ADM_lavutil ADM_lavformat
 
 EXTRA_DIST = main.cpp avi_vars.h avilist.cpp avilist.h callbacks.cpp callbacks.h gtk_gui.cpp gtkgui.h gui_action.hxx gui_navigate.cpp   gui_savenew.cpp  guiplay.cpp interface.h  support.h  prototype.h ADM_lavcodec.h  prefs.h prefs.cpp prefs.in mmx_macros.h ADM_assert.h
 
@@ -45,6 +45,7 @@ avidemux2_LDADD   =  \
 ./ADM_requant/libADM_requant.a \
 ./ADM_mplex/libADM_mplex.a \
 ./ADM_lavformat/libADM_lavformat.a \
+./ADM_lavutil/libADM_lavutil.a \
 ./ADM_lvemux/libADM_lvemux.a \
 ./ADM_filter/libADM_filter.a \
 ./ADM_video/libADM_video.a   ./ADM_encoder/libADM_encoder.a  \
@@ -74,7 +75,8 @@ $(libmpeg2enc_Altivec)
 
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 	$(SMONKEY_CFLAGS) \
-	-DADMLOCALE='"'$(ADM_LOCALEDIR)'"'
+	-DADMLOCALE='"'$(ADM_LOCALEDIR)'"' \
+	-IADM_lavutil
 
 # the library search path.
 avidemux2_LDFLAGS = $(all_libraries) -L/usr/X11R6/lib $(SDL_LIBS) $(GTK_LIBS) \
