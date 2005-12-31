@@ -12,5 +12,5 @@ EXTRA_DIST =
 
 ####### kdevelop will overwrite this part!!! (end)############
 
-INCLUDES= $(all_includes) 
+INCLUDES= $(all_includes)  -I../ADM_lavutil
 noinst_HEADERS = 

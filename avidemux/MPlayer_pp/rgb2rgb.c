@@ -15,7 +15,7 @@
 //#include "cpudetect.h"
 #include "../admmangle.h"
 #define always_inline inline
-#include "../../adm_lavcodec/bswap.h"
+#include "bswap.h"
 //#include "../libvo/fastmemcpy.h"
 #include "wrapper.h"
 #define FAST_BGR2YV12 // use 7 bit coeffs instead of 15bit
