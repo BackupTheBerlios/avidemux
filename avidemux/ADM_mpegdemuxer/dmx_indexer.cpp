@@ -225,7 +225,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                         break;
                                         */
                                         case 0xB3: // sequence start
-                                                printf("Seq %d\n",nbGop);
+                                                aprintf("Seq %d\n",nbGop);
                                                 if(grabbing) continue;
                                                 grabbing=1;    
                                                 
@@ -249,7 +249,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 demuxer->forward(4);
                                                 break;
                                         case 0xb8: // GOP
-                                                printf("GOP %d\n",nbGop);
+                                                aprintf("GOP %d\n",nbGop);
 #ifdef SHOW_PTS
                                                 if(pts!=ADM_NO_PTS)
                                                 {
@@ -269,7 +269,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 break;
                                         case 0x00 : // picture
                                                
-                                                 printf("pic \n");
+                                                 aprintf("pic \n");
                                                 if(!seq_found)
                                                 { 
                                                         continue;
