@@ -63,6 +63,8 @@ static uint8_t  *padder;
 #define MAX_BUFFER      (1*1024)
 #define MAX_LANGUAGE    10
 
+#define MIN_WRAP_VALUE (90*1000*60*1) // 1 mn
+
 typedef struct oneLine
 {
     uint64_t pts;
@@ -288,6 +290,7 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
    working=new DIA_working("Generating VobSub file");
    
    //*** Main Loop ***
+   uint32_t startPts=0,lastPts=0;
    while(1)
    {
        if(!demuxer->forceRefill(&stream)) goto _abt;
@@ -304,6 +307,29 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
        if(stream>=0x20 && stream<0x20+MAX_LANGUAGE)
        {
             demuxer->getPacketInfo(&data,&packetLen,&usedLen,&pts);
+            if(pts!=ADM_NO_PTS)
+            {
+                        // Wrap around ?
+                        if(lastPts)
+                        {
+                                if(pts<lastPts)
+                                {
+                                        if(lastPts-pts>MIN_WRAP_VALUE)
+                                        {
+                                                uint16_t hh,mm,ss,ms;
+                                                uint32_t timestamp;
+                                                printf("Wrapping at %u ",lastPts);
+                                                startPts+=lastPts;
+                                                timestamp=startPts/90;
+                                                ms2time(timestamp,&hh,&mm,&ss,&ms);
+                                                printf("%02d:%02d:%02d ",hh,mm,ss);
+                                        }
+                                }
+                        }
+
+                        lastPts=pts;
+                        pts+=startPts;
+            }
             blockSize=demuxer->read16i();
             allIndex[stream-0x20].run(blockSize,data,packetLen,usedLen, pts)  ;
        }
