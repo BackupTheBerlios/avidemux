@@ -35,9 +35,9 @@
 
 extern "C"
 {
-#include "../adm_lavcodec/common.h"
-#include "../adm_lavcodec/bswap.h"
-#include "../adm_lavcodec/bitstream.h"
+#include "common.h"
+#include "bswap.h"
+#include "../../adm_lavcodec/bitstream.h"
 }
 /*
     Extract width & height from vol header passed as arg
