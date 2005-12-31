@@ -138,7 +138,7 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
 		return 0;
 	}	
 	
-	c = &video_st->codec;
+	c = video_st->codec;
 	switch(_type)
 	{
                 case MUXER_TS:
@@ -234,7 +234,7 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
 	}
 
 		
-	c = &audio_st->codec;
+	c = audio_st->codec;
 	if(audioheader->encoding==WAV_AC3)
 		c->codec_id = CODEC_ID_AC3;
 	else

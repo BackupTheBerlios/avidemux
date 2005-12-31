@@ -191,7 +191,17 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     } else {
         av_set_pts_info(st, 60, ap->time_base.num, ap->time_base.den);
     }
-    
+#if 0 
+#warning BROKEN
+#warning BROKEN
+#warning BROKEN
+#warning BROKEN
+#warning BROKEN
+#warning BROKEN
+#warning BROKEN
+#warning BROKEN
+#warning BROKEN
+#warning BROKEN
     if(ap && ap->width && ap->height){
         st->codec.width = ap->width;
         st->codec.height= ap->height;
@@ -220,7 +230,7 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     }
     if(st->codec.codec_type == CODEC_TYPE_VIDEO && ap->pix_fmt != PIX_FMT_NONE)
         st->codec.pix_fmt = ap->pix_fmt;
-
+#endif
     return 0;
 }
 
