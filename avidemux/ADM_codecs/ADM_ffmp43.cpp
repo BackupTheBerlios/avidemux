@@ -47,6 +47,7 @@
 {\
 AVCodec *codec=avcodec_find_decoder(x);\
 if(!codec) {GUI_Alert("Internal error finding codec"#x);ADM_assert(0);} \
+  codecId=x; \
   if (avcodec_open(_context, codec) < 0)  \
                       { \
                                         printf(" Decoder init: Lavcodec :"#x" video decoder failed!\n"); \
@@ -136,7 +137,7 @@ void decoderFF::setParam( void )
 //-------------------------------
 decoderFF::decoderFF(uint32_t w,uint32_t h) :decoders(w,h)
 {
-
+                                codecId=0;
 //				memset(&_context,0,sizeof(_context));
 				_allowNull=0;
                                 _gmc=0;
@@ -279,7 +280,7 @@ uint8_t     decoderFF::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_
 				// Some encoder code a vop header with the 
 				// vop flag set to 0
 				// it is meant to mean frame skipped but very dubious
-				if(len<=8)
+				if(len<=8 && codecId==CODEC_ID_MPEG4)
 					{
 						printf("Probably pseudo black frame...\n");
 						out->_Qp=2;
@@ -377,7 +378,7 @@ decoderFFMpeg4VopPacked::decoderFFMpeg4VopPacked(uint32_t w,uint32_t h)       :d
 decoderFFMpeg4::decoderFFMpeg4(uint32_t w,uint32_t h,uint32_t l, uint8_t *d)       :decoderFF(w,h)
 {
 // force low delay as avidemux don't handle B-frames
-
+        printf("Using %d bytes of extradata for MPEG4 decoder\n",l);
                   _context->flags|=CODEC_FLAG_LOW_DELAY;
                   _refCopy=1; // YUV420 only
                   _context->extradata=(void *)d;

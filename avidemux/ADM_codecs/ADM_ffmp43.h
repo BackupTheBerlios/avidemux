@@ -23,6 +23,7 @@
  class decoderFF : public decoders
 {
      protected:
+                                        int                     codecId;
                                         uint8_t                 _refCopy;
 					AVCodecContext  	*_context;
 					AVFrame			_frame;
