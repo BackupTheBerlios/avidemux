@@ -60,7 +60,7 @@ unsigned char chan;
                             printf("Frequency mismatch!!! %d to %d (SBR ?)\n",info->frequency,srate);
                             info->frequency=srate;
                         }	
-                        if(chan>2) // Ask for stereo !
+                        if(chan!=info->channels) // Ask for stereo !
                         {
                              printf("channel mismatch!!! %d to %d \n",info->channels,chan);
                             info->channels=chan;
