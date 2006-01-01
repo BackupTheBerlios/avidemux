@@ -89,6 +89,7 @@ _3gpTrack::_3gpTrack(void)
     extraDataSize=0;
     extraData=NULL;
     index=NULL;
+    nbIndex=0;
     id=0;
     memset(&_rdWav,0,sizeof(_rdWav));
 }
