@@ -283,7 +283,7 @@ uint8_t    _3GPHeader::open(char *name)
                     _video_bih.biWidth=_mainaviheader.dwWidth=w ;
                     _video_bih.biHeight=_mainaviheader.dwHeight=h;                               
                 }
-            }
+            }else { printf("No extradata to probe\n");}
         
         }
         else
@@ -582,8 +582,9 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				uint32_t nbo;
 				case 1:
 					{
-           				
-					
+                                        // If we already built video track, ignore
+					if(_tracks[0].nbIndex) break;
+
 					buildIndex(&_tracks[0],myScale,
 							nbSz,Sz,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
 							Sn,&nbo);
@@ -595,7 +596,12 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					// avoid rounding error
 					
                                         last+=VDEO.index[1].time; // ~ 1 Frame duration
-					ADM_assert(last>0.1);
+                                        printf("Time code of last img  : %lf \n",last);
+					if(last<0.1)
+                                        {
+                                                last=25000;
+                                                printf("WARNING Erroneous fps !!!\n");
+                                        }
 					last=1000.*1000.*1000./last;
 					last*=nbo;
 					printf("3GP:Tk %lu Nb sz:%lu nbFrame:%lu duration:%f us\n",
@@ -620,6 +626,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                             _tracks[1+nbAudioTrack].nbIndex=nbSz;
                                         nbAudioTrack++;
 					break;
+                                default : printf("In atom track, the track type is unknown (%d)\n",current);
 				}
 				DEL(Sz);
 				DEL(Co);
@@ -818,9 +825,12 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                                                 switch(current)
                                                                 {
                                                                     case 1: // Video
-                                                                        VDEO.extraDataSize=l;
-                                                                        VDEO.extraData=new uint8_t[l];
-                                                                        fread(VDEO.extraData,VDEO.extraDataSize,1,_fd);
+                                                                        if(!VDEO.extraDataSize)
+                                                                        {
+                                                                                VDEO.extraDataSize=l;
+                                                                                VDEO.extraData=new uint8_t[l];
+                                                                                fread(VDEO.extraData,VDEO.extraDataSize,1,_fd);
+                                                                        }
 								        break;
                                                                     case 2:
                                                                         printf("Esds for audio\n");
@@ -829,6 +839,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                                                         fread(_tracks[1+nbAudioTrack].extraData,
                                                                             _tracks[1+nbAudioTrack].extraDataSize,1,_fd);
                                                                         break;
+                                                                    default: printf("Unknown track type for esds %d\n",current);
                                                                 }
 							}
 					}
@@ -836,7 +847,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				tom.skipAtom();
 				break;
 			case MKFCCR('m','p','4','v'): //'mp4v':
-				tom.skipBytes(24);				
+				tom.skipBytes(24);		
+                                current=1; // It is video, sure ;)
 				wh=tom.read32();
 				printf("MP4 : %ld x %ld \n",_video_bih.biWidth,_video_bih.biHeight);
 				
@@ -1042,12 +1054,16 @@ uint32_t i,j,cur;
 	}
 	// if no sample to chunk we map directly
 	// first build the # of sample per chunk table
-        uint32_t totalchunk=0;
-        for(i=0;i<nbSc;i++)
+        uint32_t totalchunk=0,max=0;
+
+        // Search the maximum
+        for(i=0;i<nbSc-1;i++)
         {
-                totalchunk+=nbCo-(Sc[i]-1);
+                totalchunk+=(Sc[i+1]-Sc[i])*Sn[i];
         }
-        
+        totalchunk+=(nbCo-Sc[nbSc-1]+1)*Sn[nbSc-1];
+
+        printf("#of chunk %d max per chunk %d Max # of sample %d\n",nbCo,max,totalchunk);
 
         uint32_t chunkCount[totalchunk+1];
 	for(i=0;i<nbSc;i++)

@@ -123,6 +123,7 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
                   skip_bits(&s,1); //  Marker
                   mh=get_bits(&s,13);
                 // /Here we go
+                printf("%d x %d \n",mw,mh);
                 *h=mh;
                 *w=mw;
                 return 1;;
