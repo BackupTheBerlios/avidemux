@@ -105,15 +105,9 @@ _3gpTrack::~_3gpTrack()
 uint8_t _3GPHeader::setFlag(uint32_t frame,uint32_t flags){
     UNUSED_ARG(frame);
     UNUSED_ARG(flags);
-    if(flags & AVI_KEY_FRAME)
-    {
-		VDEO.index[frame].intra=1;
-    }
-    else
-    {
-                VDEO.index[frame].intra=0;
-    }
-	return 0;
+    
+    VDEO.index[frame].intra=flags;
+    return 0;
 }
 
 uint32_t _3GPHeader::getFlags(uint32_t frame,uint32_t *flags){
@@ -124,11 +118,7 @@ uint32_t _3GPHeader::getFlags(uint32_t frame,uint32_t *flags){
 		*flags=AVI_KEY_FRAME;
 	}
 	else
-     if(VDEO.index[frame].intra) *flags=AVI_KEY_FRAME;
-		else *flags=0;
-
-
-	if(!frame) *flags=AVI_KEY_FRAME;
+        *flags=VDEO.index[frame].intra;
 
 	return 1;
 }
@@ -188,6 +178,7 @@ _3GPHeader::_3GPHeader(void)
 	 SttsC=NULL;
         nbAudioTrack=0;
         _currentAudioTrack=0;
+        _reordered=0;
 
 }
 uint8_t	_3GPHeader::getAudioStream(AVDMGenericAudioStream **audio)
@@ -267,7 +258,11 @@ uint8_t    _3GPHeader::open(char *name)
 	parseAtomTree(atom);
 	delete atom;
 	printf("Found video codec type :");fourCC::print(_videostream.fccHandler);printf("\n");
-        if(!VDEO.index) return 0;
+        if(!VDEO.index) 
+        {
+                printf("No index!\n");
+                return 0;
+        }
 
         // If it is mpeg4 and we have extra data
         // Decode vol header to get the real width/height
@@ -1178,7 +1173,7 @@ uint8_t 	_3GPHeader::sync(_3gpIndex *idx,uint32_t index_size, uint32_t sync_size
 	ADM_assert(index_size>=sync_size);
 	for(uint32_t i=0;i<sync_size;i++)
 	{
-		idx[sync[i]-1].intra=1;
+		idx[sync[i]-1].intra=AVI_KEY_FRAME;
 	}
 	return 1;
 
@@ -1208,4 +1203,86 @@ uint32_t     _3GPHeader::getCurrentAudioStreamNumber(void)
             for(int i=0;i<nbAudioTrack;i++) (*infos)[i]=_tracks[i+1]._rdWav.encoding;
         }
         return 1;
+}
+uint8_t                 _3GPHeader::isReordered( void )
+{ 
+        return _reordered;
+}
+/***************************************/
+uint8_t _3GPHeader::reorder( void )
+{
+_3gpIndex *index;
+uint8_t ret=1;
+uint32_t nbFrame= _videostream.dwLength;
+        // already done..
+        if( _reordered) return 1;
+        printf("Reordering...\n");
+        _3gpIndex *old,*nw;
+
+        old=VDEO.index;
+        ADM_assert(old);
+        
+        index=new _3gpIndex[nbFrame];
+        // clear B frame flag for last frames
+        old[nbFrame-1].intra &=~AVI_B_FRAME;
+
+                        //__________________________________________
+                        // the direct index is in DTS time (i.e. decoder time)
+                        // we will now do the PTS index, so that frame numbering is done
+                        // according to the frame # as they are seen by editor / user
+                        // I1 P0 B0 B1 P1 B2 B3 I2 B7 B8
+                        // xx I1 B0 B1 P0 B2 B3 P1 B7 B8
+                        //__________________________________________
+                        uint32_t forward=0;
+                        uint32_t curPTS=0;
+                        uint32_t dropped=0;
+
+                        for(uint32_t c=1;c<nbFrame;c++)
+                        {
+                                if(!(old[c].intra & AVI_B_FRAME))
+                                        {
+                                                                memcpy(&index[curPTS],
+                                                                                &old[forward],
+                                                                                sizeof(_3gpIndex));
+                                                                forward=c;
+                                                                curPTS++;
+                                                                dropped++;
+                                        }
+                                        else
+                                        {// we need  at lest 2 i/P frames to start decoding B frames
+                                                if(dropped>=1)
+                                                {
+                                                        memcpy(&index[curPTS],
+                                                                &old[c],
+                                                                sizeof(_3gpIndex));
+                                                        curPTS++;
+                                                }
+                                                else
+                                                {
+                                                printf("We dropped a frame (%d/%d).\n",dropped,c);
+                                                }
+                                        }
+                        }
+
+                        uint32_t last;
+
+
+                        // put back last I/P we had in store
+                        memcpy(&index[curPTS],
+                                &old[forward],
+                                sizeof(_3gpIndex));
+                        last=curPTS;
+
+                        _videostream.dwLength= _mainaviheader.dwTotalFrames=nbFrame=last+1;
+                        // last frame is always I
+
+                        delete [] old;
+
+                        VDEO.index=index;;
+                        VDEO.nbIndex= _mainaviheader.dwTotalFrames;
+                        // last frame cannot be B frame
+                        index[last].intra&=~AVI_B_FRAME;
+                         _reordered=ret;
+                        return ret;
+
 }

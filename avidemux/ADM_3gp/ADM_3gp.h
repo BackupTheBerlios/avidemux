@@ -30,7 +30,7 @@ typedef struct _3gpIndex
 {
 	uint64_t offset;
 	uint64_t size;
-	uint8_t  intra;
+	uint32_t intra;
 	uint64_t time;
 
 }_3gpIndex;
@@ -87,7 +87,7 @@ public:
 class _3GPHeader         :public vidHeader
 {
 protected:
-       				
+          uint8_t                       _reordered;		
 	  FILE 				*_fd;
           _3gpTrack                     _tracks[_3GP_MAX_TRACKS];
 	  uint32_t                      _audioDuration;
@@ -147,7 +147,10 @@ virtual 	uint8_t  	getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fram
 // Multi track
 uint8_t        changeAudioStream(uint32_t newstream);
 uint32_t     getCurrentAudioStreamNumber(void);
- uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
+uint8_t     getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
+uint8_t      isReordered( void );
+uint8_t      reorder( void );
+
 };
 
 uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h);
