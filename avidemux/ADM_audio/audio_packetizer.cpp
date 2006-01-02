@@ -90,9 +90,6 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 		case WAV_ULAW:
 				return getPacketPCM(dest,len,samples);
 				break;
-                case WAV_IMAADPCM:
-                                return getPacketADPCM(dest,len,samples);
-                                break;
 		case WAV_AC3:
 				return getPacketAC3(dest,len,samples);
 				break;
@@ -150,26 +147,6 @@ uint8_t		AVDMGenericAudioStream::getPacketWMA(uint8_t *dest, uint32_t *len,
 // The packet is 1024 bytes long BUT the 4/8 bytes (mono/stereo) are used for predictor initialization
 //
 // See Mike Melanson nice doc http://www.multimedia.cx/simpleaudio.html
-uint8_t         AVDMGenericAudioStream::getPacketADPCM(uint8_t *dest, uint32_t *len,uint32_t *samples)
-{
-
-        uint32_t count,sample;
-
-                        // 4 bits per sample
-                        count=1024;
-                        if(_wavheader->channels==2) *samples=count-8;
-                        else *samples=(count-4)*2;
-
-                        if(packetTail-packetHead<count)
-                        {
-                                count=packetTail-packetHead;
-                                count&=0xffffffC;
-                        }
-                        memcpy(dest,&packetBuffer[packetHead],count);                   
-                        packetHead+=count;
-                        *len=count;
-                        return 1;
-}
 //___________________________
 uint8_t		AVDMGenericAudioStream::getPacketPCM(uint8_t *dest, uint32_t *len, 
 								uint32_t *samples)

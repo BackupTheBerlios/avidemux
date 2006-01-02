@@ -104,6 +104,15 @@ uint8_t	AVDMAviAudioStream::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sa
 	fread(dest,1,_index[_current_index].size,_fd);
 	*len=_index[_current_index].size;
 	*samples=1024; // Common value
+        // A bit ugly..
+        if(_wavheader->encoding==WAV_IMAADPCM)
+        {       
+                // how many block ?
+                int count=*len/_wavheader->blockalign;
+                //nb sample in one block ?
+                *samples=2*(_wavheader->blockalign-4*_wavheader->channels)/(_wavheader->channels);
+                *samples*=count;
+        }
 	_current_index++;
 	return 1;
 }
