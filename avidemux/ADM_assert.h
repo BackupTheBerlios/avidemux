@@ -6,6 +6,8 @@
 #define ADM_ASSERT_H
 
 #include <assert.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #define ADM_assert(x) { if(!(x)) {assert(0);printf("Fatal error :"__FILE__"\n");  }}
 
 #ifdef __cplusplus
@@ -44,5 +46,6 @@ extern adm_fast_memcpy myAdmMemcpy;
         #define LLU "llu"
         #define cleanupPath(x) ADM_strdup(x)
 #endif
+
 
 #endif

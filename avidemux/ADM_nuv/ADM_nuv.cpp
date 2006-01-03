@@ -308,7 +308,7 @@ uint8_t *planes[3];
                          		READNUV(ptr);
                             		*framelen=  _videoIndex[framenum]._len;
 #ifdef DEBUG
-					printf("\n xvid : size : %lu",*framelen);
+					printf("\n xvid : size : %" PRIu32 ,*framelen);
 #endif
 
 					if(flags)
@@ -319,7 +319,7 @@ uint8_t *planes[3];
 									*flags=0;
 						}
 #ifdef DEBUG
-                             		printf("xvid flags : %lu\n",*flags);
+                             		printf("xvid flags : %" PRIu32 "\n",*flags);
 #endif
 					return 1;
 					break;
@@ -417,12 +417,12 @@ uint32_t nuvHeader::getFlags(uint32_t frame,uint32_t *flags)
 		{
        	*flags=AVI_KEY_FRAME;
 #ifdef DEBUG
-		printf("\n frame %lu is a keyframe\n",frame);
+		printf("\n frame %" PRIu32 " is a keyframe\n",frame);
 #endif
 		return  1;
 		}
 #ifdef DEBUG
-		printf("\n frame %lu is *NOT* a keyframe\n",frame);
+		printf("\n frame %" PRIu32 " is *NOT* a keyframe\n",frame);
 #endif
 
 	*flags=0;
@@ -474,7 +474,7 @@ uint32_t rcount=0;
 		_filesize=ftello(_fd);
 		fseeko(_fd,0,SEEK_SET);
 
-		printf("\n  Filesize : 	%llu",_filesize);
+		printf("\n  Filesize : 	%" PRIu64 ,_filesize);
 
 			// init lzo stuff
           if ( lzo_init() != LZO_E_OK )
@@ -496,7 +496,7 @@ uint32_t rcount=0;
 
 		}
 		Dump();
-		printf("\n Sizeof frame header : %d",sizeof(rtframeheader));
+		printf("\n Sizeof frame header : %" PRIu64, sizeof(rtframeheader));
 		//
 		//
 		//
@@ -537,7 +537,7 @@ uint32_t rcount=0;
 
 		byte_per_frame=(uint32_t )floor(double_per_frame+0.490f);
 
-		printf(" double : %0f\n byte per frame :%lu\n", double_per_frame,byte_per_frame);
+		printf(" double : %0f\n byte per frame :%" PRIu32 "\n", double_per_frame,byte_per_frame);
 
 
 
@@ -643,8 +643,8 @@ uint32_t rcount=0;
 						iestim=(uint32_t)floor(estim+0.49);
 						iestim-=iestim&3;
 #ifdef VERBOSE_SOUND
-						printf("\n Audio in stock : %lu\n",current_audio);
-						printf(  " Audio computed : %lu\n",iestim);
+						printf("\n Audio in stock : %" PRIu32 "\n",current_audio);
+						printf(  " Audio computed : %" PRIu32 "\n",iestim);
 						printf(  " delta          : %d\n",abs(iestim-current_audio));
 #endif
 						frame.packetlength=0;
@@ -663,7 +663,7 @@ uint32_t rcount=0;
 						overshot= current_audio-   iestim; // >0 means too much audio <0 means no enough
 						
 #ifdef VERBOSE_SOUND
-          					printf("\n Frame %lu, overshot %ld",v,overshot);
+          					printf("\n Frame %" PRIu32 ", overshot %" PRIu32,v,overshot);
 #endif
 						if(  (overshot < -THRESHOLD)&& _isPCM &&_audioResync)
 						{
@@ -675,7 +675,7 @@ uint32_t rcount=0;
 						n->_frame=(rtframeheader *)ADM_alloc(sizeof(rtframeheader));
 						n->_frame->packetlength=THRESHOLD;
 #ifdef VERBOSE_SOUND
-          					printf("\n Added %lu bytes",THRESHOLD);
+          					printf("\n Added %" PRIu32 " bytes",THRESHOLD);
 #endif
 
 						n->_frame->comptype='R';
@@ -724,7 +724,7 @@ uint32_t rcount=0;
 						{
 							printf("\n *****FFV1 Audio extension present but ignored !\n");
 						}
-						printf("\n FFV1 audio frequency : %lu\n:",_audio_frequency);
+						printf("\n FFV1 audio frequency : %" PRIu32 "\n:",_audio_frequency);
 						fseeko(_fd,old3,SEEK_SET);
 						// Now we recompute the audio # of bytes to keep sync_met
 						// compute audio duration
@@ -735,7 +735,7 @@ uint32_t rcount=0;
 						printf("\n Duration of a frame : %f ms\n",double_per_frame);
 						double_per_frame=double_per_frame*4.0f*(_audio_frequency/1000.);;
 						byte_per_frame=(uint32_t )floor(double_per_frame+0.490f);
-						printf(" double : %0f\n byte per frame :%lu\n", double_per_frame,byte_per_frame);
+						printf(" double : %0f\n byte per frame :%" PRIu32 "\n", double_per_frame,byte_per_frame);
 						break;
 				case 'M'	: // FFV1 video config
 						uint64_t old2;
@@ -747,9 +747,9 @@ uint32_t rcount=0;
 						fourCC::print(_ffv1_fourcc);
 						fourCC::print(_ffv1_extraLen);
 						printf("\n");
-						if(_ffv1_extraLen!=frame.packetlength-8)
+						if(_ffv1_extraLen!=(uint32_t)(frame.packetlength-8))
 						{
-							printf("extra ;  %lu , packet %lu\n",_ffv1_extraLen,
+							printf("extra ;  %" PRIu32 " , packet %" PRIu32 "\n",_ffv1_extraLen,
 											frame.packetlength);
 							ADM_assert(0);
 
@@ -841,7 +841,7 @@ uint32_t rcount=0;
 						if(overshot>THRESHOLD)
 							{
 #ifdef VERBOSE_SOUND
-          					printf("\n Skipped  %lu bytes",frame.packetlength);
+          					printf("\n Skipped  %" PRIu32 " bytes",frame.packetlength);
 #endif
 
 									overshot-=frame.packetlength;
@@ -885,8 +885,8 @@ uint32_t rcount=0;
 						iestim=(uint32_t)floor(estim+0.49);
 						iestim-=iestim&3;
 #ifdef VERBOSE_SOUND
-						printf("\n FINAL Audio in stock : %lu\n",current_audio);
-						printf(  " Audio computed : %lu\n",iestim);
+						printf("\n FINAL Audio in stock : %" PRIu32 "\n",current_audio);
+						printf(  " Audio computed : %" PRIu32 "\n",iestim);
 						printf(  " delta          : %d\n",abs(iestim-current_audio));
 #endif
 						if(current_audio<=iestim)
@@ -907,11 +907,11 @@ uint32_t rcount=0;
 						current_audio=iestim;
     					}
 
-        printf("\n Computed audio : %lu \n",current_audio);
+        printf("\n Computed audio : %" PRIu32 " \n",current_audio);
 		printf("\n Scanning completed.\n");
-		printf(" video : %lu",v);
-		printf(" audio : %lu",a);
-		printf(" jpegT : %lu",t);
+		printf(" video : %" PRIu32 "",v);
+		printf(" audio : %" PRIu32 "",a);
+		printf(" jpegT : %" PRIu32 "",t);
 
 		printf("\n Collapsing index....\n");
 
@@ -986,7 +986,7 @@ uint32_t rcount=0;
 			ADM_dealloc(p->_frame);
 			ADM_dealloc(p);
 		}
-		printf("\n Index collapsed, found %lu keyframes\n",kf);
+		printf("\n Index collapsed, found %" PRIu32 " keyframes\n",kf);
 		//
 		//	Build generic header so that client can use it...
 		//
@@ -1047,7 +1047,7 @@ uint32_t rcount=0;
 
 	for(uint32_t i=0;i<(uint32_t)(v-t);i++)
 		{
-			printf("frame %lu  : kf : %d	\n",	i,_videoIndex[i]._kf);
+			printf("frame %" PRIu32 "  : kf : %d	\n",	i,_videoIndex[i]._kf);
 		}
 
 #endif
@@ -1178,10 +1178,10 @@ uint8_t nuvHeader::saveIndex( const char *name,const char *org)
 	}
 	fprintf(fd,"ADNV\n"); // mark it as a avidemux index
 	fprintf(fd,"File: %s\n",org ); // mark it as a avidemux index
-	fprintf(fd,"wh: %lu %lu\n",DXFIELD(width), DXFIELD(height) ); // mark it as a avidemux index
-	fprintf(fd,"fps: %lu\n",_videostream.dwRate);
-	fprintf(fd,"Lzo Pos:%llu\n",_lzo_pos);
-	fprintf(fd,"Lzo Size:%llu\n",_lzo_size);
+	fprintf(fd,"wh: %" PRIu32 " %" PRIu32 "\n",DXFIELD(width), DXFIELD(height) ); // mark it as a avidemux index
+	fprintf(fd,"fps: %" PRIu32 "\n",_videostream.dwRate);
+	fprintf(fd,"Lzo Pos:%" PRIu64 "\n",_lzo_pos);
+	fprintf(fd,"Lzo Size:%" PRIu64 "\n",_lzo_size);
 	fprintf(fd,"\n");
 	fprintf(fd,"Myth:%d\n",_isMyth);
 	fprintf(fd,"Xvid:%d\n",_isXvid);
@@ -1196,10 +1196,10 @@ uint8_t nuvHeader::saveIndex( const char *name,const char *org)
 	}
 	fprintf(fd,"PCM:%d\n",_isPCM);
 	fprintf(fd,"Fq:%d\n",_audio_frequency);
-	fprintf(fd,"%lu video frames\n",_mainaviheader.dwTotalFrames);
+	fprintf(fd,"%" PRIu32 " video frames\n",_mainaviheader.dwTotalFrames);
 	for( int32_t j=0;j<_mainaviheader.dwTotalFrames;j++)
 	{
-		fprintf(fd,"Comp:%c  Pos :%llu Size:%lu Kf:%lu\n",
+		fprintf(fd,"Comp:%c  Pos :%" PRIu64 " Size:%" PRIu32 " Kf:%" PRIu32 "\n",
 				_videoIndex[j]._compression,
 				_videoIndex[j]._pos,
 				_videoIndex[j]._len,
@@ -1210,10 +1210,10 @@ uint8_t nuvHeader::saveIndex( const char *name,const char *org)
 	{
 		uint32_t nbc=0;
 		_audioTrack->getNbChunk(&nbc);
-		fprintf(fd,"Audio : %lu chunks\n",nbc);
+		fprintf(fd,"Audio : %" PRIu32 " chunks\n",nbc);
 		for(  j=0;j<nbc;j++)
 		{
-			fprintf(fd,"Comp:%c  Pos :%llu Size:%lu\n",
+			fprintf(fd,"Comp:%c  Pos :%" PRIu64 " Size:%" PRIu32 "\n",
 				_audioIndex[j]._compression,
 				_audioIndex[j]._pos,
 				_audioIndex[j]._len
@@ -1223,10 +1223,10 @@ uint8_t nuvHeader::saveIndex( const char *name,const char *org)
 	}
 	// Save sync points
 
-		fprintf(fd,"RSync : %lu chunks\n",_rcount);
+		fprintf(fd,"RSync : %" PRIu32 " chunks\n",_rcount);
 		for(  j=0;j<_rcount;j++)
 		{
-			fprintf(fd,"Comp:%c  Pos :%llu \n",
+			fprintf(fd,"Comp:%c  Pos :%" PRIu64 " \n",
 				_rIndex[j]._compression,
 				_rIndex[j]._pos
 				);
@@ -1310,14 +1310,14 @@ FILE *fd;
 
 	printf("\n ******** Nuppel index detected **********\n");
 
-	fscanf(fd,"wh: %lu %lu\n",&w,&h ); // mark it as a avidemux index
-	fscanf(fd,"fps: %lu\n",&fps );
-	fscanf(fd,"Lzo Pos:%llu\n",&_lzo_pos);
-	fscanf(fd,"Lzo Size:%llu\n",&_lzo_size);
+	fscanf(fd,"wh: %" SCNu32 " %" SCNu32 "\n",&w,&h ); // mark it as a avidemux index
+	fscanf(fd,"fps: %" SCNu32 "\n",&fps );
+	fscanf(fd,"Lzo Pos:%" SCNu64 "\n",&_lzo_pos);
+	fscanf(fd,"Lzo Size:%" SCNu64 "\n",&_lzo_size);
 	fgets(str,1000,fd);
-	fscanf(fd,"Myth:%d\n",&_isMyth);
-	fscanf(fd,"Xvid:%d\n",&_isXvid);
-	fscanf(fd,"FFV1:%d\n",&_isFFV1);
+	fscanf(fd,"Myth:%" SCNu8 "\n",&_isMyth);
+	fscanf(fd,"Xvid:%" SCNu8 "\n",&_isXvid);
+	fscanf(fd,"FFV1:%" SCNu8 "\n",&_isFFV1);
 	fscanf(fd,"ff4c:%x\n",&_ffv1_fourcc);	
 	
 	fscanf(fd,"extr:%x\n",&_ffv1_extraLen);
@@ -1340,18 +1340,18 @@ FILE *fd;
 		
 	}
 	
-	fscanf(fd,"PCM:%d\n",&_isPCM);
+	fscanf(fd,"PCM:%" SCNu8 "\n",&_isPCM);
 	fscanf(fd,"Fq:%d\n",&_audio_frequency);
-	fscanf(fd,"%lu video frames\n",&nb);
+	fscanf(fd,"%" SCNu32 " video frames\n",&nb);
 
-	aprintf("fps			: %lu\n",fps );
-	aprintf("Lzo Pos			:%llu Size:%llu\n",_lzo_pos,_lzo_size);
+	aprintf("fps			: %" PRIu32 "\n",fps );
+	aprintf("Lzo Pos			:%" PRIu64 " Size:%" PRIu64 "\n",_lzo_pos,_lzo_size);
 	aprintf("Myth			:%d\n",_isMyth);
 	aprintf("Xvid			:%d\n",_isXvid);
 	aprintf("FFV1			:%d (",_isFFV1);
 	fourCC::print(_ffv1_fourcc); aprintf(")\n");
 	aprintf("PCM			:%d\n",_isPCM);
-	aprintf("%lu video frames\n",nb);
+	aprintf("%" PRIu32 " video frames\n",nb);
 
 
 	rtfileheader *head=new rtfileheader;
@@ -1373,19 +1373,22 @@ FILE *fd;
 
 	_videoIndex=new nuvIndex[nb+1];
 	memset(_videoIndex,0,sizeof(nuvIndex)*nb);
-	aprintf("found %lu video frames\n",nb);
+	aprintf("found %" PRIu32 " video frames\n",nb);
 	// loop to read video
 	for(uint32_t j=0;j<nb;j++)
 	{
 		fgets(str,1000,fd);
 		//printf("%s",str);
-		sscanf(str,"Comp:%c  Pos :%llu Size:%lu Kf:%lu\n",
-				&(_videoIndex[j]._compression),
+		char compress = 0;
+		sscanf(str,"Comp:%c Pos :%" SCNu64 " Size:%" SCNu32 " Kf:%" SCNu32 "\n",
+				//&(_videoIndex[j]._compression),
+				&compress,
 				&(_videoIndex[j]._pos),
 				&(_videoIndex[j]._len),
 				&(_videoIndex[j]._kf));
+		_videoIndex[j]._compression = compress;
 /*
-		printf("Comp:%c  Pos :%llu Size:%lu Kf:%u\n",
+		printf("Comp:%c  Pos :%" PRIu64 " Size:%" PRIu32 " Kf:%u\n",
 				(_videoIndex[j]._compression),
 				(_videoIndex[j]._pos),
 				(_videoIndex[j]._len),
@@ -1393,7 +1396,7 @@ FILE *fd;
 */
 	}
 
-		aprintf("Initializing RTjpeg with %lu x %lu image\n",w,h);
+		aprintf("Initializing RTjpeg with %" PRIu32 " x %" PRIu32 " image\n",w,h);
 		int ww=w,hh=h;
 		int fmt=0;
 
@@ -1421,7 +1424,7 @@ FILE *fd;
 			fseeko(_fd,_lzo_pos,SEEK_SET);
 			fread(str,_lzo_size,1,_fd);
 			_rtjpeg->InitLong((char *)str, DXFIELD(width), DXFIELD(height) );
-			printf("Jpeg : %llu , %llu\n",_lzo_pos,_lzo_size);
+			printf("Jpeg : %" PRIu64 ", %" PRIu64 "\n",_lzo_pos,_lzo_size);
 		}
 
 
@@ -1453,19 +1456,21 @@ FILE *fd;
 		aprintf("\n Reading audio...\n");
 		fgets(str,1000,fd);
 		printf("%s\n",str);
-		sscanf(str,"Audio : %lu chunks\n",&nbc);
-		aprintf("%lu audio chunk\n",nbc);
+		sscanf(str,"Audio : %" SCNu32 " chunks\n",&nbc);
+		aprintf("%" PRIu32 " audio chunk\n",nbc);
 
 			_audioIndex=new nuvIndex[nbc+1];
 			memset(_audioIndex,0,sizeof(nuvIndex)*nbc);
 
 		for(uint32_t j=0;j<nbc;j++)
 		{
-			fscanf(fd,"Comp:%c  Pos :%llu Size:%lu\n",
-				&_audioIndex[j]._compression,
+			char compress = 0;
+			fscanf(fd,"Comp:%c  Pos :%" SCNu64 " Size:%" SCNu32 "\n",
+				&compress,
 				&_audioIndex[j]._pos,
 				&_audioIndex[j]._len
 				);
+				_audioIndex[j]._compression = compress;
 		}
 		_audioTrack=new nuvAudio(_audioIndex,nbc,_fd,_audio_frequency,NULL);
 		_isaudiopresent=1;
