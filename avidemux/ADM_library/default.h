@@ -25,11 +25,16 @@
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
-#else
-	#ifdef HAVE_INTTYPES_H
-		#include <inttypes.h>
-	#else
+#define GOT_TYPES
+#endif
 
+#ifdef HAVE_INTTYPES_H
+	#define __STDC_FORMAT_MACROS
+	#include <inttypes.h>
+	#define GOT_TYPES
+#endif
+
+#ifndef GOT_TYPES
 #define int16_t 	signed short int
 #define int32_t 	signed long  int
 
@@ -42,7 +47,6 @@
 #define uint8_t  	unsigned char
 #define int8_t   	signed char
 
-#endif
 #endif
 #define UNUSED_ARG(a) do {/* null */} while (&a == 0)
 
