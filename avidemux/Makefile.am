@@ -19,7 +19,7 @@ SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	libMpeg2Dec oplug_mpegFF ADM_h263 ADM_gui2 ADM_dialog \
 	ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame ADM_requant \
 	ADM_script oplug_ogm ADM_xvidratectl ADM_mplex ADM_ocr MPlayer_pp \
-	ADM_mpegdemuxer ADM_tray ADM_lavutil ADM_lavformat
+	ADM_mpegdemuxer ADM_tray ADM_lavutil ADM_lavformat ADM_lavcodec
 
 EXTRA_DIST = main.cpp avi_vars.h avilist.cpp avilist.h callbacks.cpp callbacks.h gtk_gui.cpp gtkgui.h gui_action.hxx gui_navigate.cpp   gui_savenew.cpp  guiplay.cpp interface.h  support.h  prototype.h ADM_lavcodec.h  prefs.h prefs.cpp prefs.in mmx_macros.h ADM_assert.h
 
@@ -31,8 +31,8 @@ EXTRA_DIST = main.cpp avi_vars.h avilist.cpp avilist.h callbacks.cpp callbacks.h
 
 
 avidemux2_LDADD   =  \
-  ../adm_lavcodec/libavcodec.a \
-  ../adm_lavcodec/libpostproc/libpostproc.a \
+  ADM_lavcodec/libavcodec.a \
+  ADM_lavcodec/libpostproc/libpostproc.a \
   ./ADM_script/libADM_script.a \
 ./ADM_editor/libADM_editor.a \
 ./ADM_library/libADM_library.a \
@@ -68,7 +68,7 @@ avidemux2_LDADD   =  \
 ./ADM_toolkit/libADM_toolkit.a  \
 ./ADM_dialog/libADM_dialog2.a  \
 ./ADM_colorspace/libADM_colorspace.a \
-../adm_lavcodec/libpostproc/libpostproc.a \
+./ADM_lavcodec/libpostproc/libpostproc.a \
 ./ADM_library/libADM_library.a \
 $(libmpeg2enc_Altivec) 
 
@@ -80,7 +80,7 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 
 # the library search path.
 avidemux2_LDFLAGS = $(all_libraries) -L/usr/X11R6/lib $(SDL_LIBS) $(GTK_LIBS) \
-	$(FREETYPE_LIBS) $(ARTS_LIBS) $(XML_LIBS) ../adm_lavcodec/libavcodec.a -lX11 -lXext 
+	$(FREETYPE_LIBS) $(ARTS_LIBS) $(XML_LIBS) ADM_lavcodec/libavcodec.a -lX11 -lXext 
 
 noinst_HEADERS = ADM_pp.h admmangle.h
 AM_CFLAGS = -g

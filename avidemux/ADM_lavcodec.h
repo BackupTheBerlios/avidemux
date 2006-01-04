@@ -18,6 +18,6 @@
   #define  __ADM_LAVC
   extern "C"
   {  
-  #include "../adm_lavcodec/avcodec.h"
+  #include "../ADM_lavcodec/avcodec.h"
   };
 #endif

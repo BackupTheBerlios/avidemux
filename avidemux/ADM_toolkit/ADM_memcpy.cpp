@@ -45,7 +45,7 @@
 #include "ADM_cpuCap.h"
 extern "C"
 {
-        #include "adm_lavcodec/dsputil.h"
+        #include "ADM_lavcodec/dsputil.h"
 
 
 

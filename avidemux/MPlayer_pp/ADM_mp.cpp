@@ -28,7 +28,7 @@
 
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 extern "C" {
-#include "../../adm_lavcodec/avcodec.h"
+#include "ADM_lavcodec/avcodec.h"
 }
 #endif
 

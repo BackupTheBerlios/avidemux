@@ -1,7 +1,7 @@
 libavcodec_a_METASOURCES = AUTO
 noinst_LIBRARIES = libavcodec.a
 SUBDIRS=libpostproc i386 ppc 
-LAVUTIL=../avidemux/ADM_lavutil 
+LAVUTIL=../ADM_lavutil 
 if BUILD_MMX_COMPATIBLE
 EXTEND_MMX = i386/cputest.c           \
 			i386/mpegvideo_mmx.c           i386/vp3dsp_mmx.c \
