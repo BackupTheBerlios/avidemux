@@ -459,10 +459,11 @@ uint8_t aviWrite::saveBegin (char 	*name,
 //
         memcpy (&_mainheader, inmainheader, sizeof (MainAVIHeader));
         _mainheader.dwFlags = AVIF_HASINDEX + AVIF_ISINTERLEAVED;
-        if(!_mainheader.dwMicroSecPerFrame)
+        if(_mainheader.dwMicroSecPerFrame<10000) // Less than 10 ms
         {
                 _mainheader.dwMicroSecPerFrame=40000;
         }
+        
 // update main header codec with video codev
         if (inaudiostream)
         {
@@ -486,7 +487,15 @@ uint8_t aviWrite::saveBegin (char 	*name,
   	_videostream.dwLength = nb_frame;
 	_videostream.fccType=fourCC::get((uint8_t *)"vids");
 	memcpy(&_bih,bih,sizeof(_bih));
-	
+
+        // Recompute image size
+uint32_t is;	
+        is=_bih.biWidth*_bih.biHeight;
+        is*=(_bih.biBitCount+7)/8;
+        _bih.biSizeImage=is;
+
+
+
 	// MOD Feb 2005 by GMV: initialize ODML data
 	// test for free data structures
 	if(odml_indexes!=NULL){
