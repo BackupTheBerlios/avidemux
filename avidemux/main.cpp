@@ -46,13 +46,11 @@ extern void xvid4_init(void);
 #endif
 
 typedef void *FCT_VOID(void *);
-
+uint8_t lavformat_init(void);
 #ifdef USE_FFMPEG
      extern "C" {
      extern void        avcodec_init(void );
      extern  void 	avcodec_register_all(void );
-     extern  int 	mpegps_init(void );
-     extern  int        movenc_init(void );
      extern uint8_t     ADM_InitMemcpy(void);
                        };
 #endif                       
@@ -178,9 +176,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
   
                 		avcodec_init();
 	                 	avcodec_register_all();
-				mpegps_init();
-                                movenc_init();
-	                  
+                                lavformat_init();
 #endif
 #ifdef HAVE_AUDIO
     AVDM_audioInit();

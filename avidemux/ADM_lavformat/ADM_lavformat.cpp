@@ -229,7 +229,7 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
     	switch(_fps1000)
 	{
 		case 25000:
-			 c->time_base= (AVRational){25025,1001};
+			 c->time_base= (AVRational){1001,25025};
 			//c->frame_rate = 25025;  
 			//c->frame_rate_base = 1001;	
 			break;
@@ -240,12 +240,18 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
 			break;
 */
 		case  29970:
-			 c->time_base= (AVRational){30000,1001};
+			 c->time_base= (AVRational){1001,30000};
 			//c->frame_rate = 30000;  
 			//c->frame_rate_base = 1001;	
 			break;
 		default:
-			GUI_Error_HIG("Incompatible frame rate", NULL);
+                        if(_type==MUXER_MP4)
+                        {
+                                c->time_base= (AVRational){1000,_fps1000};
+                                return 1;
+                        }
+                        else
+			     GUI_Error_HIG("Incompatible frame rate", NULL);
 			return 0;
 	}
 
@@ -269,7 +275,8 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
         switch(audioheader->encoding)
         {
                 case WAV_AC3: c->codec_id = CODEC_ID_AC3;break;
-                case WAV_MP2: case WAV_MP3: c->codec_id = CODEC_ID_MP2;break;
+                case WAV_MP2: c->codec_id = CODEC_ID_MP2;break;
+                case WAV_MP3: c->codec_id = CODEC_ID_MP3;break;
                 case WAV_AAC: c->codec_id = CODEC_ID_AAC;break;
                 default:
                         printf("Cant mux that ! audio\n"); 
@@ -477,6 +484,19 @@ uint8_t lavMuxer::audioEmpty( void)
 {
 	return 0;
 }
+extern "C"
+{
+     extern  int        mpegps_init(void );
+     extern  int        movenc_init(void );
+};
+extern URLProtocol file_protocol ;
+uint8_t lavformat_init(void)
+{
+                mpegps_init();
+                movenc_init();
+                register_protocol(&file_protocol);
+}
+
 //___________________________________________________________________________
 //EOF
 
