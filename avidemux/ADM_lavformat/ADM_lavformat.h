@@ -18,6 +18,7 @@ typedef enum
 	MUXER_VCD,
 	MUXER_SVCD,
         MUXER_TS,
+        MUXER_MP4,
 	MUXER_DUMMY
 }ADM_MUXER_TYPE;
 

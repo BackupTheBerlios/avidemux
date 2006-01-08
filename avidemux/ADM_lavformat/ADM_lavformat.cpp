@@ -112,6 +112,9 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
 		case MUXER_SVCD:
 			fmt = guess_format("svcd", NULL, NULL);
 			break;
+                case MUXER_MP4:
+                        fmt = guess_format("psp", NULL, NULL);
+                        break;
 		default:
 			fmt=NULL;
 	}
@@ -141,6 +144,34 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
 	c = video_st->codec;
 	switch(_type)
 	{
+                case MUXER_MP4:
+                        if(isMpeg4Compatible(info->fcc))
+                        {
+                                c->codec_id = CODEC_ID_MPEG4;
+                        }else
+                        {
+                                if(isH264Compatible(info->fcc))
+                                {
+                                        c->codec_id = CODEC_ID_H264;
+                                }
+                                else
+                                {
+                                         c->codec_id = CODEC_ID_MPEG4; // Default value
+                                        printf("Ooops, cant mux that...\n");
+                                        printf("Ooops, cant mux that...\n");
+                                        printf("Ooops, cant mux that...\n");
+                                        //return 0;
+                                }
+                        }
+                        c->rc_buffer_size=8*1024*224;
+                        c->rc_max_rate=9500*1000;
+                        c->rc_min_rate=0;
+                        if(!inbitrate)
+                                c->bit_rate=9000*1000;
+                        else
+                                c->bit_rate=inbitrate;
+        
+                        break;
                 case MUXER_TS:
                         c->codec_id = CODEC_ID_MPEG2VIDEO;
                         c->rc_buffer_size=8*1024*224;
@@ -235,10 +266,18 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
 
 		
 	c = audio_st->codec;
-	if(audioheader->encoding==WAV_AC3)
-		c->codec_id = CODEC_ID_AC3;
-	else
-		c->codec_id = CODEC_ID_MP2;
+        switch(audioheader->encoding)
+        {
+                case WAV_AC3: c->codec_id = CODEC_ID_AC3;break;
+                case WAV_MP2: case WAV_MP3: c->codec_id = CODEC_ID_MP2;break;
+                case WAV_AAC: c->codec_id = CODEC_ID_AAC;break;
+                default:
+                        printf("Cant mux that ! audio\n"); 
+                        printf("Cant mux that ! audio\n");
+                        c->codec_id = CODEC_ID_MP2;
+                        return 0;
+                        break;
+        }
 	c->codec_type = CODEC_TYPE_AUDIO;
 	
 	c->bit_rate = audioheader->byterate*8;
@@ -250,6 +289,10 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
 //----------------------
 	switch(_type)
 	{
+                case MUXER_MP4:
+                        oc->mux_rate=10080*1000; // Needed ?
+                        break;
+
                 case MUXER_TS:
                         oc->mux_rate=10080*1000;
                         break;
