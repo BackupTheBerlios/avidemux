@@ -114,6 +114,22 @@ uint8_t isMpeg12Compatible(uint32_t fourcc)
          return mpeg;
 #undef CHECK
 }
+uint8_t isH264Compatible( uint32_t fourcc)
+{
+     #define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+                                                {h264=1; }
+
+    uint8_t h264=0;
+
+                CHECK("X264");
+                CHECK("x264");
+                CHECK("h264");
+                CHECK("H264");
+                CHECK("AVC1");
+          return h264;
+
+      #undef CHECK
+}
 	
 uint8_t isMSMpeg4Compatible( uint32_t fourcc)
 {

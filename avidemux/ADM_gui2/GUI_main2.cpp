@@ -1126,7 +1126,7 @@ create_mainWindow (void)
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MPEG video"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MPEG PS A+V"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MPEG TS A+V"));
-
+  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MP4"));
   guiDrawing = gtk_drawing_area_new ();
   gtk_widget_show (guiDrawing);
   gtk_box_pack_start (GTK_BOX (hbox14), guiDrawing, TRUE, TRUE, 0);

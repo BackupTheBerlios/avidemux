@@ -537,6 +537,9 @@ uint32_t count=0;
 
 void OpenDMLHeader::Dump( void )
 {
+        printf(  "Main header\n" );
+        printf(  "______________________\n" );  
+
 #define X_DUMP(x) printf(#x":\t\t:%ld\n",_mainaviheader.x);
     	X_DUMP(dwStreams);
     	X_DUMP(dwMicroSecPerFrame) ;
