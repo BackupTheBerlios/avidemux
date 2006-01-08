@@ -126,6 +126,7 @@ uint8_t isH264Compatible( uint32_t fourcc)
                 CHECK("h264");
                 CHECK("H264");
                 CHECK("AVC1");
+                CHECK("avc1");
           return h264;
 
       #undef CHECK
@@ -244,12 +245,7 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 
 			  	     	return(decoders *)( new decoderSnow(w,h));
 	   }
-           if(  
-                fourCC::check(fcc,(uint8_t *)"H264")||fourCC::check(fcc,(uint8_t *)"avc1") ||
-                fourCC::check(fcc,(uint8_t *)"h264")||fourCC::check(fcc,(uint8_t *)"x264") ||
-                fourCC::check(fcc,(uint8_t *)"X264")
-
-                )
+           if(  isH264Compatible(fcc))
            {
 
              return(decoders *)( new decoderFFH264(w,h,extraLen,extraData));
