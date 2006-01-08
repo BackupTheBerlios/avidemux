@@ -402,7 +402,7 @@ uint8_t lavMuxer::needAudio( void )
 		return 0;
 }
 //___________________________________________________________________________
-uint8_t lavMuxer::writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe)
+uint8_t lavMuxer::writeVideoPacket(uint32_t len,uint32_t flags, uint8_t *buf,uint32_t frameno,uint32_t displayframe)
 {
 int ret;
 
@@ -430,6 +430,11 @@ double p,d;
 	pkt.data= buf;
 	pkt.size= len;
 	// Look if it is a gop start or seq start
+        if(_type==MUXER_MP4)
+        {
+                if(flags & AVI_KEY_FRAME) 
+                        pkt.flags |= PKT_FLAG_KEY;
+        }else
 	if(!buf[0] &&  !buf[1] && buf[2]==1)
 	{
 		if(buf[3]==0xb3 || buf[3]==0xb8 ) // Seq start or gop start

@@ -59,7 +59,8 @@ public:
 		~lavMuxer(  );
 	virtual uint8_t open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader);
         virtual uint8_t writeAudioPacket(uint32_t len, uint8_t *buf);
-        virtual uint8_t writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe );
+        virtual uint8_t writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe ) {ADM_assert(0);return 0;};
+        virtual uint8_t writeVideoPacket(uint32_t len, uint32_t flags,uint8_t *buf,uint32_t frameno,uint32_t displayframe );
         virtual uint8_t forceRestamp(void);
         virtual uint8_t close( void );
         virtual uint8_t audioEmpty( void);

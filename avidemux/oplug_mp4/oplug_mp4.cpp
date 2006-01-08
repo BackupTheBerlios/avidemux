@@ -112,8 +112,9 @@ uint32_t   width,height;
            // Loop
            for(int frame=0;frame<_incoming->getInfo()->nb_frames;frame++)
            {
+               video_body->getFlags(frame,&flags);
                video_body->getRaw(frame,videoBuffer,&len);
-               muxer->writeVideoPacket( len,videoBuffer,frame,frame);
+               muxer->writeVideoPacket( len,flags,videoBuffer,frame,frame);
                while(muxer->needAudio())
                {
                      if(!audio->getPacket(audioBuffer,&len,&sample)) break;
