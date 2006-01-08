@@ -81,7 +81,8 @@ class coders
    }  ;
    decoders *getCoder(uint32_t fcc,uint32_t w, uint32_t h);
    uint8_t isMpeg4Compatible( uint32_t fourcc);
-    uint8_t isMSMpeg4Compatible( uint32_t fourcc);
+   uint8_t isH264Compatible( uint32_t fourcc);
+   uint8_t isMSMpeg4Compatible( uint32_t fourcc);
 /*----------------------------------------------------------*/
 	class encoder
 	{

@@ -52,6 +52,7 @@ typedef void *FCT_VOID(void *);
      extern void        avcodec_init(void );
      extern  void 	avcodec_register_all(void );
      extern  int 	mpegps_init(void );
+     extern  int        movenc_init(void );
      extern uint8_t     ADM_InitMemcpy(void);
                        };
 #endif                       
@@ -178,6 +179,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
                 		avcodec_init();
 	                 	avcodec_register_all();
 				mpegps_init();
+                                movenc_init();
 	                  
 #endif
 #ifdef HAVE_AUDIO

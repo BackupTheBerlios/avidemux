@@ -20,6 +20,7 @@ typedef enum
 	ADM_ES,
 	ADM_PS,
         ADM_TS,
+        ADM_MP4,
 	ADM_FMT_DUMMY
 }ADM_OUT_FORMAT;
 

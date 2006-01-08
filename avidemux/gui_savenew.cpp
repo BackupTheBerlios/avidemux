@@ -43,6 +43,7 @@
 #include "oplug_avi/op_aviwrite.hxx"
 #include "oplug_avi/op_avisave.h"
 #include "oplug_avi/op_savecopy.h"
+#include "oplug_mp4/oplug_mp4.h"
 #include "ADM_encoder/adm_encoder.h"
 
 #include "oplug_avi/op_saveprocess.h"
@@ -75,6 +76,7 @@ int ret=0;
 		{
 			family=CodecFamilyMpeg;
 		}
+                        
 	}
         else
         {
@@ -166,6 +168,9 @@ int ret=0;
 					printf(" AVI family\n");
 					switch(UI_GetCurrentFormat())
 					{
+                                                case ADM_MP4:
+                                                                ret=oplug_mp4(name,ADM_MP4);
+                                                                break;
 						case ADM_AVI:
 								ret=A_SaveAudioNVideo(name);
 								break;
