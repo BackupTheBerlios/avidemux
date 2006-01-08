@@ -449,7 +449,21 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                         printf("Frequency :%lu\n",ADIO.frequency);
                                         printf("Bps       :%lu\n",ADIO.bitspersample);
 					tom.skipAtom();
-					break;					
+					break;		
+
+                        case MKFCCR('.','m','p','3'): //.mp3
+                                        tom.skipBytes(16);
+                                        ADIO.encoding=WAV_MP3;
+                                        ADIO.channels=tom.read16();
+                                        printf("mp3 audio\n");
+                                        printf("Channels :%d\n",ADIO.channels);
+                                        printf("Bps      :%d\n",tom.read16()); // Bps
+                                        printf("CodecId  :%x\n",tom.read16()); // Bps
+                                        printf("Packetsiz:%x\n",tom.read16()); // Bps
+                                        ADIO.frequency=tom.read16();  //Bps
+                                        printf("Fq        :%d\n",ADIO.frequency); // Bps
+                                        tom.skipAtom();
+                                        break;
 			case MKFCCR('m','p','4','a'): //'mp4a':
 					
                                         if(tom.getRemainingSize()>15) // skip the real mp4a atom, we only do the one in stds
