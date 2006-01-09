@@ -75,6 +75,56 @@ typedef struct OPENML_SECONDARY_INDEX
 }PPACKED;
 
 
+ static int readMasterIndex(OPENDML_INDEX *index,FILE *fd);
+ static int readSuperEntries(OPENDML_ENTRY *entries,int count,FILE *fd);
+ static int readSecondary(OPENML_SECONDARY_INDEX *index,FILE *fd);
+ /*
+     Go here to solve endianness issues
+ */
+ int readMasterIndex(OPENDML_INDEX *index,FILE *fd)
+ {
+     if(1!=fread(index,sizeof(OPENDML_INDEX),1,fd)) return 0;
+ #ifdef    ADM_BIG_ENDIAN
+ 
+ #define REV16(x)   index->x=R16(index->x)
+ #define REV32(x)   index->x=R32(index->x)
+ #define REV64(x)   index->x=R64(index->x)
+         REV16(longsPerEntry);
+         REV32(nbEntryInUse);
+         REV32(chunkId);
+ #endif
+     return 1;
+ }
+ int readSuperEntries(OPENDML_ENTRY *entries,int count,FILE *fd)
+ {
+     if(1!=fread(entries,sizeof(OPENDML_ENTRY)*count,1,fd)) return 0;
+ #ifdef ADM_BIG_ENDIAN
+     OPENDML_ENTRY *index;
+     for(int i=0;i<count;i++)
+     {
+         index=&(entries[i]);
+         REV64(offset);
+         REV32(size);
+         REV32(duration);
+     }
+ #endif
+ 
+     return 1;
+ }
+ int readSecondary(OPENML_SECONDARY_INDEX *index,FILE *fd)
+ {
+     if(1!=fread(index,sizeof(OPENML_SECONDARY_INDEX),1,fd)) return 0;
+ #ifdef ADM_BIG_ENDIAN
+         REV16(longsPerEntry);
+         REV32(nbEntryInUse);
+         REV32(chunkId);
+         REV64(base);
+         REV32(reserver);
+ #endif
+     return 1;
+ }
+
+
 /*
 	Try to index if it is/was an openDML file
 	with super Index
@@ -113,6 +163,7 @@ uint32_t total;
         printf("Odml indexing succeeded\n");
 	return 1;
 }
+
 /*
 	Build index for the given track
 	Returns also the number of chunk/frame found
@@ -137,7 +188,7 @@ uint32_t 	i,j;
 		return 0;
 	}
 	fseeko(_fd,_Tracks[track].indx.offset,SEEK_SET);
-	if(1!=fread(&masterIndex,sizeof(masterIndex),1,_fd))
+        if(!readMasterIndex(&masterIndex,_fd))   //if(1!=fread(&masterIndex,sizeof(masterIndex),1,_fd))
 		{
 			printf("Problem reading master index\n");
 			return 0;
@@ -154,7 +205,7 @@ uint32_t 	i,j;
 	
 	OPENDML_ENTRY superEntries[masterIndex.nbEntryInUse];
 	printf("We have %lu indeces\n",masterIndex.nbEntryInUse);
-	if(1!=fread(superEntries,sizeof(OPENDML_ENTRY)*masterIndex.nbEntryInUse,1,_fd))
+        if(!readSuperEntries(superEntries,masterIndex.nbEntryInUse,_fd)) //if(1!=fread(superEntries,sizeof(OPENDML_ENTRY)*masterIndex.nbEntryInUse,1,_fd))
 	{
 		printf("Problem reading indices\n");
 		return 0;
@@ -169,7 +220,7 @@ uint32_t 	i,j;
 		fseeko(_fd,superEntries[i].offset,SEEK_SET);
 		fread(&fcc,4,1,_fd);
 		fread(&len,4,1,_fd);				
-		if(1!=fread(&second,sizeof(second),1,_fd))
+                if(!readSecondary(&second,_fd)) //if(1!=fread(&second,sizeof(second),1,_fd))
 		{
 			printf("Problem reading secondary index (%u/%u) trying to continue \n",i,masterIndex.nbEntryInUse);
 			goto _cntue;
@@ -195,7 +246,8 @@ _cntue:
                 aprintf("Seeking to %llx\n",superEntries[i].offset);
 #endif                
 		fourCC::print(fcc);aprintf("\n");
-		if(1!=fread(&second,sizeof(second),1,_fd))
+		//if(1!=fread(&second,sizeof(second),1,_fd))
+                if(!readSecondary(&second,_fd))
 		{
 			printf("Problem reading secondary index (%u/%u) trying to continue \n",i,masterIndex.nbEntryInUse);
 			return 1;
@@ -233,7 +285,7 @@ _cntue:
                                         _idx[count].size);
 #endif                                
                                                                         
-				count++;									
+				count++;
 			
 			}
 		
