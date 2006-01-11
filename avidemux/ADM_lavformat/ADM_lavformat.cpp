@@ -93,7 +93,13 @@ lavMuxer::~lavMuxer()
 	close();
 }
 //___________________________________________________________________________
-uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader)
+uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader) 
+{
+        return open(filename,inbitrate,type,info,audioheader,0,NULL);
+}
+
+
+uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader,uint32_t extraSize,uint8_t *extraData)
 {
  AVCodecContext *c;
  	_type=type;
@@ -277,7 +283,11 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
                 case WAV_AC3: c->codec_id = CODEC_ID_AC3;break;
                 case WAV_MP2: c->codec_id = CODEC_ID_MP2;break;
                 case WAV_MP3: c->codec_id = CODEC_ID_MP3;break;
-                case WAV_AAC: c->codec_id = CODEC_ID_AAC;break;
+                case WAV_AAC: 
+                                c->extradata=extraData;
+                                c->extradata_size= extraSize;
+                                c->codec_id = CODEC_ID_AAC;
+                                break;
                 default:
                         printf("Cant mux that ! audio\n"); 
                         printf("Cant mux that ! audio\n");
@@ -349,37 +359,37 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
 	return 1;
 }
 //___________________________________________________________________________
-uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
+uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
 {
         
-	int ret;
-  	AVPacket pkt;
-	double f;
-	
+        int ret;
+        AVPacket pkt;
+        double f;
+
             av_init_packet(&pkt);
-	    
-	    f=_total;
-	    f*=1000.*1000.;
-	    f/=_audioByterate;
-            _total+=len;
-	    
-            pkt.dts=pkt.pts=(int64_t)floor(f+2000);
-	   
-            pkt.stream_index=1;
-           
-	  //  pkt.flags |= PKT_FLAG_KEY; 
+
+
+            f=sample;
+            f/=audio_st->codec->sample_rate; // in secons
+
+            f*=1000.*1000.;    // in us
+            pkt.dts=pkt.pts=(int64_t)floor(f);
+
+  //  pkt.flags |= PKT_FLAG_KEY; 
             pkt.data= buf;
             pkt.size= len;
+            pkt.stream_index=1;
+
             aprintf("A: frame  pts%d\n",pkt.pts); 
-                
+
             ret = av_write_frame(oc, &pkt);
-	    if(ret) 
-			{
-				printf("Error writing audio packet\n");
-				return 0;
-			}
-	
-	return 1;
+            _total=sample;
+            if(ret) 
+            {
+                        printf("Error writing audio packet\n");
+                        return 0;
+            }
+            return 1;
 }
 //___________________________________________________________________________
 uint8_t lavMuxer::needAudio( void )
