@@ -78,7 +78,7 @@ const char* encoderGetIndexedName(uint32_t i);
 
 #include "ADM_codecs/ADM_mjpegEncode.h"
 #include "adm_encmjpeg.h"
-
+#include "adm_encCopy.h"
 
 #define FF_TRELLIS 0 // use treillis for mpeg1 encoding
 /*
@@ -614,7 +614,9 @@ Encoder *e=NULL;
 
 		switch(current_codec)
 			{
-
+                case CodecCopy:
+                                        e=new   EncoderCopy(NULL);
+                                        break;
 					default:
 
       	 	case CodecFF :

@@ -69,7 +69,7 @@
 	#include "ADM_encoder/adm_encmjpeg.h"
 #endif
 
-
+#include "ADM_encoder/adm_encCopy.h"
 
 
 static uint8_t nb_encoder=0;
