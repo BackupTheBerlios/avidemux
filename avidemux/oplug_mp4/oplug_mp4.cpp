@@ -102,41 +102,27 @@ uint32_t total=0;
 uint32_t videoExtraDataSize=0;
 uint8_t  *videoExtraData=NULL;
 uint8_t *dummy;
-          _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
-          
-          videoBuffer=new uint8_t[_incoming->getInfo()->width*_incoming->getInfo()->height*3];
 
-       
-        // _________________Setup video_______________
-        if(!videoProcessMode())  // Copy
+
+          
+        // Setup video
+        if(!videoProcessMode())
         {
-                total=frameEnd-frameStart;
-                video_body->getVideoInfo(&info);
-                // If there is already extraData (e.g. coming from mov/mp4)
-                
-                video_body->getExtraHeaderData(&videoExtraDataSize,&dummy);
-                if(videoExtraDataSize)
-                {
-                        printf("We have extradata for video in copy mode (%d)\n",videoExtraDataSize);
-                        videoExtraData=new uint8_t[videoExtraDataSize];
-                        memcpy(videoExtraData,dummy,videoExtraDataSize);
-                }
-        }else                   // Process
+             _incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
+        }else
         {
-                _incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
-                _encode = getVideoEncoder (_incoming->getInfo()->width,_incoming->getInfo()->height);
-                total= _incoming->getInfo()->nb_frames;
-                if (!_encode)
+                _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
+        }
+           videoBuffer=new uint8_t[_incoming->getInfo()->width*_incoming->getInfo()->height*3];
+           _encode = getVideoEncoder (_incoming->getInfo()->width,_incoming->getInfo()->height);
+           total= _incoming->getInfo()->nb_frames;
+           if (!_encode)
                 {
                         GUI_Error_HIG ("Cannot initialize the video stream", NULL);
                         goto  stopit;
                 }
 
                 // init compressor
-                TwoPassLogFile=new char[strlen(name)+6];
-                strcpy(TwoPassLogFile,name);
-                strcat(TwoPassLogFile,".stat");
-                _encode->setLogFile(TwoPassLogFile,total);
                   if (!_encode->configure (_incoming))
                 {
                         GUI_Error_HIG ("Filter init failed", NULL);
@@ -145,7 +131,10 @@ uint8_t *dummy;
                 
                 if (_encode->isDualPass ())
                 {
-                        
+                        TwoPassLogFile=new char[strlen(name)+6];
+                        strcpy(TwoPassLogFile,name);
+                        strcat(TwoPassLogFile,".stat");
+                        _encode->setLogFile(TwoPassLogFile,total);
                         if(!prepareDualPass(videoBuffer,TwoPassLogFile,encoding_gui,_encode,total))
                                 goto stopit;
                 }
@@ -162,23 +151,15 @@ uint8_t *dummy;
                         videoExtraData=new uint8_t[videoExtraDataSize];
                         memcpy(videoExtraData,dummy,videoExtraDataSize);
                 }
-                _incoming=  NULL;
-        }
         // _________________Setup video (cont) _______________
-         // ___________ Read 1st frame _________________
-                if(!videoProcessMode())
-                 {
-                        video_body->getFrameNoAlloc (frameStart + 0, videoBuffer, &len,
-                                      &flags);
-                 }else
-                {
-                        ADM_assert(_encode);
-                         if(!_encode->encode ( 0, &len, videoBuffer, &flags))
-                         {
-                                GUI_Error_HIG ("Error while encoding", NULL);
-                                goto  stopit;
-                         }
-                }
+        // ___________ Read 1st frame _________________
+             
+             ADM_assert(_encode);
+             if(!_encode->encode ( 0, &len, videoBuffer, &flags))
+             {
+                        GUI_Error_HIG ("Error while encoding", NULL);
+                        goto  stopit;
+              }
            // If needed get VOL header
            if(isMpeg4Compatible(info.fcc) && !videoExtraDataSize)
            {
@@ -233,25 +214,17 @@ uint8_t *dummy;
                      encoding_gui->feedAudioFrame(len);
                      sample_got+=sample;
                }
-                 if(!videoProcessMode())
-                 {
-                        video_body->getFrameNoAlloc (frameStart + frame, videoBuffer, &len,
-                                      &flags);
-                 }else
-                {
-                        ADM_assert(_encode);
-                         if(!_encode->encode ( frame, &len, videoBuffer, &flags))
-                         {
-                                GUI_Error_HIG ("Error while encoding", NULL);
-                                goto  stopit;
-                         }
+               ADM_assert(_encode);
+               if(!_encode->encode ( frame, &len, videoBuffer, &flags))
+               {
+                        GUI_Error_HIG ("Error while encoding", NULL);
+                        goto  stopit;
                 }
+                
                muxer->writeVideoPacket( len,flags,videoBuffer,frame,frame);
 
                encoding_gui->setFrame(frame,total);
                encoding_gui->feedFrame(len);
-
-             
            }
            ret=1;
            muxer->close();
