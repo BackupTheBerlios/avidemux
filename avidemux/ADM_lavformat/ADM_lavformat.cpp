@@ -95,11 +95,12 @@ lavMuxer::~lavMuxer()
 //___________________________________________________________________________
 uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader) 
 {
-        return open(filename,inbitrate,type,info,audioheader,0,NULL);
+        return open(filename,inbitrate,type,info,0,NULL,audioheader,0,NULL);
 }
 
 
-uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader,uint32_t extraSize,uint8_t *extraData)
+uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info,uint32_t videoExtraDataSize,
+                        uint8_t *videoExtraData, WAVHeader *audioheader,uint32_t audioextraSize,uint8_t *audioextraData)
 {
  AVCodecContext *c;
  	_type=type;
@@ -119,7 +120,7 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
 			fmt = guess_format("svcd", NULL, NULL);
 			break;
                 case MUXER_MP4:
-                        fmt = guess_format("psp", NULL, NULL);
+                        fmt = guess_format("mp4", NULL, NULL);
                         break;
 		default:
 			fmt=NULL;
@@ -168,6 +169,11 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
                                         printf("Ooops, cant mux that...\n");
                                         //return 0;
                                 }
+                        }
+                        if(videoExtraDataSize)
+                        {
+                                c->extradata=videoExtraData;
+                                c->extradata_size= videoExtraDataSize;
                         }
                         c->rc_buffer_size=8*1024*224;
                         c->rc_max_rate=9500*1000;
@@ -284,8 +290,8 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
                 case WAV_MP2: c->codec_id = CODEC_ID_MP2;break;
                 case WAV_MP3: c->codec_id = CODEC_ID_MP3;break;
                 case WAV_AAC: 
-                                c->extradata=extraData;
-                                c->extradata_size= extraSize;
+                                c->extradata=audioextraData;
+                                c->extradata_size= audioextraSize;
                                 c->codec_id = CODEC_ID_AAC;
                                 break;
                 default:

@@ -75,7 +75,7 @@ static char *twoFake=NULL;
 
 extern AVDMGenericAudioStream *mpt_getAudioStream(void);
 uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total);
-
+uint8_t extractVolHeader(uint8_t *data,uint32_t dataSize,uint32_t *headerSize);
 uint8_t oplug_mp4(const char *name, ADM_OUT_FORMAT type)
 {
 AVDMGenericVideoStream *_incoming;
@@ -99,18 +99,29 @@ DIA_encoding *encoding_gui=NULL;
 Encoder         *_encode=NULL;
 char            *TwoPassLogFile=NULL;
 uint32_t total=0;
-
+uint32_t videoExtraDataSize=0;
+uint8_t  *videoExtraData=NULL;
+uint8_t *dummy;
           _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
           
           videoBuffer=new uint8_t[_incoming->getInfo()->width*_incoming->getInfo()->height*3];
 
        
         // _________________Setup video_______________
-        if(!videoProcessMode())
+        if(!videoProcessMode())  // Copy
         {
                 total=frameEnd-frameStart;
                 video_body->getVideoInfo(&info);
-        }else
+                // If there is already extraData (e.g. coming from mov/mp4)
+                
+                video_body->getExtraHeaderData(&videoExtraDataSize,&dummy);
+                if(videoExtraDataSize)
+                {
+                        printf("We have extradata for video in copy mode (%d)\n",videoExtraDataSize);
+                        videoExtraData=new uint8_t[videoExtraDataSize];
+                        memcpy(videoExtraData,dummy,videoExtraDataSize);
+                }
+        }else                   // Process
         {
                 _incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
                 _encode = getVideoEncoder (_incoming->getInfo()->width,_incoming->getInfo()->height);
@@ -138,9 +149,52 @@ uint32_t total=0;
                         if(!prepareDualPass(videoBuffer,TwoPassLogFile,encoding_gui,_encode,total))
                                 goto stopit;
                 }
+                
+                info.width=_incoming->getInfo()->width;
+                info.height=_incoming->getInfo()->height;
+                info.nb_frames=_incoming->getInfo()->nb_frames;
+                info.fps1000=_incoming->getInfo()->fps1000;
+                info.fcc=*(uint32_t *)_encode->getCodecName(); //FIXME
+                _encode->hasExtraHeaderData( &videoExtraDataSize,&dummy);
+                if(videoExtraDataSize)
+                {
+                        printf("We have extradata for video in copy mode (%d)\n",videoExtraDataSize);
+                        videoExtraData=new uint8_t[videoExtraDataSize];
+                        memcpy(videoExtraData,dummy,videoExtraDataSize);
+                }
                 _incoming=  NULL;
         }
-           
+        // _________________Setup video (cont) _______________
+         // ___________ Read 1st frame _________________
+                if(!videoProcessMode())
+                 {
+                        video_body->getFrameNoAlloc (frameStart + 0, videoBuffer, &len,
+                                      &flags);
+                 }else
+                {
+                        ADM_assert(_encode);
+                         if(!_encode->encode ( 0, &len, videoBuffer, &flags))
+                         {
+                                GUI_Error_HIG ("Error while encoding", NULL);
+                                goto  stopit;
+                         }
+                }
+           // If needed get VOL header
+           if(isMpeg4Compatible(info.fcc) && !videoExtraDataSize)
+           {
+                // And put them as extradata for esds atom
+                uint32_t voslen=0;
+               
+                if(extractVolHeader(videoBuffer,len,&voslen))
+                {
+                        if(voslen)
+                        {
+                                videoExtraDataSize=voslen;
+                                videoExtraData=new uint8_t[videoExtraDataSize];
+                                memcpy(videoExtraData,videoBuffer,videoExtraDataSize);
+                        }
+                } else  printf("Oops should be settings data for esds\n");
+            }
 
 // ____________Setup audio__________________
           audio=mpt_getAudioStream();
@@ -156,10 +210,9 @@ uint32_t total=0;
                 name,
                 2000000, // Muxrate
                 MUXER_MP4,
-                &info,
+                &info,videoExtraDataSize,videoExtraData,
                 audio->getInfo(),extraDataSize,extraData))
                          goto stopit;
-         
            //_____________ Loop _____________________
           encoding_gui=new DIA_encoding(info.fps1000);
           encoding_gui->setContainer("MP4");
@@ -170,8 +223,16 @@ uint32_t total=0;
           else
                 encoding_gui->setCodec(_encode->getDisplayName());
            //
-           for(int frame=0;frame<total;frame++)
+           muxer->writeVideoPacket( len,flags,videoBuffer,0,0);
+           for(int frame=1;frame<total;frame++)
            {
+                while(muxer->needAudio())
+               {
+                     if(!audio->getPacket(audioBuffer,&len,&sample)) break;
+                     muxer->writeAudioPacket(len,audioBuffer,sample_got);
+                     encoding_gui->feedAudioFrame(len);
+                     sample_got+=sample;
+               }
                  if(!videoProcessMode())
                  {
                         video_body->getFrameNoAlloc (frameStart + frame, videoBuffer, &len,
@@ -190,13 +251,7 @@ uint32_t total=0;
                encoding_gui->setFrame(frame,total);
                encoding_gui->feedFrame(len);
 
-               while(muxer->needAudio())
-               {
-                     if(!audio->getPacket(audioBuffer,&len,&sample)) break;
-                     muxer->writeAudioPacket(len,audioBuffer,sample_got);
-                     encoding_gui->feedAudioFrame(len);
-                     sample_got+=sample;
-               }
+             
            }
            ret=1;
            muxer->close();
@@ -206,6 +261,7 @@ stopit:
            if(videoBuffer) delete [] videoBuffer;
            if(muxer) delete muxer;
            if(_encode) delete _encode;	
+           if(videoExtraData) delete [] videoExtraData;
            // Cleanup
            deleteAudioFilter ();
            return ret;
@@ -265,6 +321,39 @@ void end (void)
 {
 
 }
-	
+uint8_t extractVolHeader(uint8_t *data,uint32_t dataSize,uint32_t *headerSize)
+{
+    // Search startcode
+    uint8_t b;
+    uint32_t idx=0;
+    uint32_t mw,mh;
+    uint32_t time_inc;
+    
+    *headerSize=0;
+
+    while(dataSize)
+    {
+        uint32_t startcode=0xffffffff;
+        while(dataSize>2)
+        {
+            startcode=(startcode<<8)+data[idx];
+            idx++;
+            dataSize--;
+            if((startcode&0xffffff)==1) break;
+        }
+     
+            printf("Startcodec:%x\n",data[idx]);
+            if(data[idx]==0xB6 && idx>4) // vop start 
+            {
+                printf("Vop start found at %d\n",idx);
+                *headerSize=idx-4;
+                return 1;
+            }
+            
+        }
+        printf("No vop start found\n");
+        return 0;
+    
+}	
 #endif	
 // EOF
