@@ -161,7 +161,7 @@ uint32_t getPicSize(void)
 uint32_t size;
          AVDMGenericVideoStream *last;
                 last=getLastVideoFilter();
-                size=last->getInfo()->width*last->getInfo()->width;
+                size=last->getInfo()->width*last->getInfo()->height;
         
                 return size;
 }
