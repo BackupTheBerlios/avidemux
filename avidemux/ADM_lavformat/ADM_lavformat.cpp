@@ -375,13 +375,13 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             av_init_packet(&pkt);
 
 
-            f=sample;
-            f/=audio_st->codec->sample_rate; // in secons
+            f=sample*1000.*1000.;
+            f=f/(double)audio_st->codec->sample_rate; // in secons
 
-            f*=1000.*1000.;    // in us
+            
             pkt.dts=pkt.pts=(int64_t)floor(f);
 
-  //  pkt.flags |= PKT_FLAG_KEY; 
+            pkt.flags |= PKT_FLAG_KEY; 
             pkt.data= buf;
             pkt.size= len;
             pkt.stream_index=1;

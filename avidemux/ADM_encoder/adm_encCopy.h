@@ -27,6 +27,7 @@ class EncoderCopy:public Encoder
 protected:
         uint32_t _frameStart;
         uint32_t _total;
+        uint32_t _lastIPFrameSent;
 public:
     EncoderCopy (COMPRES_PARAMS *codecconfig );
         ~EncoderCopy() ; // can be called twice if needed ..
