@@ -51,6 +51,8 @@ AVDMProcessAudio_Faac::AVDMProcessAudio_Faac(AVDMGenericAudioStream * instream)
     _instream->goToTime(0);	// rewind
     _length = _instream->getLength();    
     _handle=NULL;
+    _extraData=NULL;
+    _extraSize=0;
 };
 
 
@@ -62,6 +64,8 @@ AVDMProcessAudio_Faac::~AVDMProcessAudio_Faac()
     	 faacEncClose(_handle);
     _handle=NULL;
     _wavheader=NULL;
+    if(_extraData) delete [] _extraData;
+    _extraData=NULL;
 
 };
 
@@ -78,6 +82,7 @@ uint8_t AVDMProcessAudio_Faac::init( uint32_t bitrate)
 {
 unsigned long int samples_input, max_bytes_output;
 faacEncConfigurationPtr cfg;
+int ret=0;
 
      _handle = faacEncOpen(_wavheader->frequency,
                                  _wavheader->channels,
@@ -102,12 +107,23 @@ faacEncConfigurationPtr cfg;
     cfg->outputFormat = 0; // 0 Raw 1 ADTS
     cfg->inputFormat = FAAC_INPUT_16BIT;
     cfg->useLfe=1;	
-    if (!faacEncSetConfiguration(_handle, cfg)) 
+    if (!(ret=faacEncSetConfiguration(_handle, cfg))) 
     {
-        printf("FAAC: Cannot set conf for faac with fq=%lu chan=%lu br=%lu\n",
-				_wavheader->frequency,_wavheader->channels,bitrate);
+        printf("FAAC: Cannot set conf for faac with fq=%lu chan=%lu br=%lu (err:%d)\n",
+				_wavheader->frequency,_wavheader->channels,bitrate,ret);
 	return 0;
     }
+     unsigned char *data=NULL;
+     unsigned long size=0;
+     if((ret=faacEncGetDecoderSpecificInfo(_handle, &data,&size)))
+     {
+        printf("FAAC: GetDecoderSpecific info failed (err:%d)\n",ret);
+        return 0;
+     }
+     _extraSize=size;
+     _extraData=new uint8_t[size];
+     memcpy(_extraData,data,size);
+
     // update
     _wavheader->byterate=(bitrate*1000)/8;
 //    _wavheader->dwScale=1024;
@@ -126,7 +142,12 @@ faacEncConfigurationPtr cfg;
     
     return 1;
 }
-
+uint8_t         AVDMProcessAudio_Faac::extraData(uint32_t *l,uint8_t **d)
+{
+                        *l=_extraSize;
+                        *d=_extraData;
+                return 1;
+}
 //_____________________________________________
 uint32_t AVDMProcessAudio_Faac::grab(uint8_t * obuffer)
 {
