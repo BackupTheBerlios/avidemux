@@ -102,7 +102,7 @@ uint32_t total=0;
 uint32_t videoExtraDataSize=0;
 uint8_t  *videoExtraData=NULL;
 uint8_t *dummy;
-
+WAVHeader *audioinfo=NULL;
 
           
         // Setup video
@@ -111,7 +111,7 @@ uint8_t *dummy;
              _incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
         }else
         {
-                _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
+             _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
         }
            videoBuffer=new uint8_t[_incoming->getInfo()->width*_incoming->getInfo()->height*3];
            _encode = getVideoEncoder (_incoming->getInfo()->width,_incoming->getInfo()->height);
@@ -179,11 +179,9 @@ uint8_t *dummy;
 
 // ____________Setup audio__________________
           audio=mpt_getAudioStream();
-          if(!audio)
-          {
-                GUI_Error_HIG ("Cannot initialize the audio stream", NULL);
-                                goto  stopit;
-          }
+          
+          
+          if(audio) audioinfo=audio->getInfo();
 // ____________Setup Muxer _____________________
            muxer= new lavMuxer;
            audio->extraData(&extraDataSize,&extraData);  
@@ -192,7 +190,7 @@ uint8_t *dummy;
                 2000000, // Muxrate
                 MUXER_MP4,
                 &info,videoExtraDataSize,videoExtraData,
-                audio->getInfo(),extraDataSize,extraData))
+                audioinfo,extraDataSize,extraData))
                          goto stopit;
            //_____________ Loop _____________________
           encoding_gui=new DIA_encoding(info.fps1000);

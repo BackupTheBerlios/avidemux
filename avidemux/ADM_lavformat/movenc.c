@@ -41,6 +41,12 @@ typedef struct MOVIentry {
     unsigned int entries;
 } MOVIentry;
 
+typedef struct MOVAtom {
+    unsigned long startPos;
+    unsigned int  atomName;
+} MOVAtom;
+
+
 typedef struct MOVIndex {
     int         mode;
     int         entry;
@@ -91,6 +97,13 @@ const CodecTag ff_mov_obj_type[] = {
     { CODEC_ID_PCM_S16BE , 230 },
     { 0,0  },
 };
+const unsigned char mov_fake_avcC[]= {               // Put dummy avcC atom.
+             0x01,0x4D,0x40,0x1F,0xFF,0xE1,0x00,0x14,
+             0x27,0x4D,0x40,0x1F,0xA9,0x18,0x0A,0x00,
+             0x8B,0x60,0x0D,0x41,0x80,0x41,0x8C,0x2B,
+             0x5E,0xF7,0xC0,0x40,0x01,0x00,0x04,0x28,
+             0xCE,0x09,0xC8};
+
 
 //FIXME supprt 64bit varaint with wide placeholders
 static int updateSize (ByteIOContext *pb, int pos)
@@ -102,6 +115,23 @@ static int updateSize (ByteIOContext *pb, int pos)
 
     return curpos - pos;
 }
+static int mov_start_atom(ByteIOContext *pb, MOVAtom *atom,unsigned int name)
+{
+
+    // memorize place
+    atom->atomName=name;
+    atom->startPos= url_ftell(pb);
+    put_be32(pb,0);    // Place holder for size
+    put_be32(pb,name);
+    return 1;
+} 
+static int mov_end_atom(ByteIOContext *pb, MOVAtom *atom,unsigned int name)
+{
+unsigned long int pos;
+    assert(name==atom->atomName);
+    updateSize (pb,  atom->startPos);
+    return 1;
+} 
 
 /* Chunk offset atom */
 static int mov_write_stco_tag(ByteIOContext *pb, MOVTrack* track)
@@ -362,6 +392,34 @@ static int mov_write_svq3_tag(ByteIOContext *pb)
     put_byte(pb, 0);
     return 0x15;
 }
+static int mov_write_h264_tag(ByteIOContext *pb,MOVTrack* track)
+{
+        // First put avcC atom
+        
+        
+        MOVAtom avc1,avcc;
+        int i,size;
+        unsigned char *data;
+
+        // If we don(t have avcC atom as extradata, put fake datas
+        if(track->vosLen)
+        {
+                size=track->vosLen;
+                data=track->vosData;
+        }
+        else
+        {
+                size=35;
+                data=mov_fake_avcC;
+        }
+         
+        mov_start_atom(pb, &avcc,'avcC');
+        for(i=0;i<size;i++)
+                        put_byte(pb,data[i]);
+        mov_end_atom(pb,&avcc,'avcC');
+        
+        return 1;
+}
 
 static unsigned int descrLength(unsigned int len)
 {
@@ -553,7 +611,8 @@ static int mov_write_video_tag(ByteIOContext *pb, MOVTrack* track)
         mov_write_d263_tag(pb);
     else if(track->enc->codec_id == CODEC_ID_SVQ3)
         mov_write_svq3_tag(pb);
-
+    else if(track->enc->codec_id == CODEC_ID_H264)
+        mov_write_h264_tag(pb,track);
     return updateSize (pb, pos);
 }
 
@@ -1402,7 +1461,7 @@ static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
         }
     }
 
-    if ((enc->codec_id == CODEC_ID_MPEG4 || enc->codec_id == CODEC_ID_AAC)
+    if ((enc->codec_id == CODEC_ID_MPEG4 || enc->codec_id == CODEC_ID_AAC || enc->codec_id==CODEC_ID_H264)
         && trk->vosLen == 0) {
 //        assert(enc->extradata_size);
 

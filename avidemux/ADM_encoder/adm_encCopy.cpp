@@ -68,10 +68,12 @@ EncoderCopy::~EncoderCopy()
 const char *EncoderCopy::getDisplayName(void ) {return "Copy";}
 
 
-
+// that one is used as fourcc
    const char *EncoderCopy::getCodecName(void ) 
    {
-        return "Copy";
+aviInfo info;
+video_body->getVideoInfo(&info);
+        return fourCC::tostring(info.fcc );
    }
    const char *EncoderCopy::getFCCHandler(void )
    {

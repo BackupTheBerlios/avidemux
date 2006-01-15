@@ -275,6 +275,8 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	
 	// Audio
 	//________
+        if(audioheader)
+        {
 	audio_st = av_new_stream(oc, 1);
 	if (!audio_st) 
 	{
@@ -306,7 +308,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	c->bit_rate = audioheader->byterate*8;
 	c->sample_rate = audioheader->frequency;
 	c->channels = audioheader->channels;
-	
+        }
 	
 	
 //----------------------
@@ -372,6 +374,8 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
         AVPacket pkt;
         double f;
 
+           if(!audio_st) return 0;
+
             av_init_packet(&pkt);
 
 
@@ -401,6 +405,8 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
 uint8_t lavMuxer::needAudio( void )
 {
 	
+        if(!audio_st) return 0;
+
 	double f;
 	uint64_t dts;
 	 	f=_total;
