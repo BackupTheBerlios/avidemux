@@ -78,8 +78,8 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
 uint8_t extractVolHeader(uint8_t *data,uint32_t dataSize,uint32_t *headerSize);
 uint8_t oplug_mp4(const char *name, ADM_OUT_FORMAT type)
 {
-AVDMGenericVideoStream *_incoming;
-AVDMGenericAudioStream  *audio;
+AVDMGenericVideoStream *_incoming=NULL;
+AVDMGenericAudioStream  *audio=NULL;
 
 uint8_t		audioBuffer[48000];
 uint8_t         *videoBuffer=NULL;
@@ -178,13 +178,23 @@ WAVHeader *audioinfo=NULL;
             }
 
 // ____________Setup audio__________________
-          audio=mpt_getAudioStream();
-          
-          
-          if(audio) audioinfo=audio->getInfo();
+          if(currentaudiostream)
+          {
+                audio=mpt_getAudioStream();
+                if(!audio)
+                {
+                        GUI_Error_HIG ("Cannot initialize the audio stream", NULL);
+                        goto  stopit;
+                }
+          } 
+          if(audio)
+          {
+                 audioinfo=audio->getInfo();
+                audio->extraData(&extraDataSize,&extraData);
+           }
 // ____________Setup Muxer _____________________
            muxer= new lavMuxer;
-           audio->extraData(&extraDataSize,&extraData);  
+           
            if(!muxer->open(
                 name,
                 2000000, // Muxrate

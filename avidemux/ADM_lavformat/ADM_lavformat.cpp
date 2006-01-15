@@ -308,6 +308,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	c->bit_rate = audioheader->byterate*8;
 	c->sample_rate = audioheader->frequency;
 	c->channels = audioheader->channels;
+        _audioByterate=audioheader->byterate;
         }
 	
 	
@@ -360,7 +361,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	printf("lavformat mpeg muxer initialized\n");
 	
 	_running=1;
-	_audioByterate=audioheader->byterate;
+
 	one=(1000*1000*1000)/_fps1000;
 	_curDTS=one;
 
