@@ -102,6 +102,12 @@ class coders
 						uint8_t 	*out,
 						uint32_t 	*len,
 			       			uint32_t 	*flags)=0;
+                virtual         uint8_t getExtraData (uint32_t * l, uint8_t ** d)
+                                        {
+                                                *l=0;
+                                                *d=NULL;
+                                                return 0;
+                                        }
      };
 
 

@@ -20,6 +20,8 @@
         void            *_pic;
         uint8_t         preamble(uint32_t fps1000,ADM_x264Param *param);
         ADM_x264Param   _param;
+        uint8_t         *extraData;
+        uint32_t        extraSize;
 
   public :
     X264Encoder(uint32_t width,uint32_t height)   : encoder(width,height)
@@ -27,6 +29,8 @@
       _handle=NULL;                             
       _inited=0;
       _pic=NULL;
+      extraData=NULL;
+      extraSize=0;
     } ;
     ~X264Encoder();
                      
@@ -39,7 +43,7 @@
                                     uint8_t         *out,
                                     uint32_t        *len,
                                     uint32_t        *flags);
-                                
+   virtual         uint8_t getExtraData (uint32_t * l, uint8_t ** d);
 
 };
 //***************** CQ **************** 

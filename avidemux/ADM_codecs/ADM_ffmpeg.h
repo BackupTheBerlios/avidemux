@@ -84,7 +84,7 @@ class ffmpegEncoder:public encoder
   virtual uint8_t getResult (void *ress);
   virtual uint8_t encode (ADMImage * in, uint8_t * out, uint32_t * len,
 			  uint32_t * flags);
-  uint8_t getExtraData (uint32_t * l, uint8_t ** d);
+  virtual uint8_t getExtraData (uint32_t * l, uint8_t ** d);
   virtual uint8_t setCustomMatrices (uint16_t * intra, uint16_t * inter);
   virtual uint8_t setGopSize (uint32_t size);	// !!! IT DOES NOT WORK, DONE TOO LATE!!!!
   	  uint32_t getCodedFrame(void);

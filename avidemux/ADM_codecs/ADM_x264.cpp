@@ -35,6 +35,16 @@ extern "C"
 #define HANDLE ((x264_t *)_handle)                     
 #define PICS ((x264_picture_t *)_pic)                     
 
+
+typedef struct avcc // for avcc atom
+{
+            uint8_t * sps;
+            int       sps_length;
+            uint8_t * pps;
+            int       pps_length;
+} avcc;
+
+
 // Yes, ugly FIXME
 static  x264_param_t          param;
 static  myENC_RESULT          x_res;
@@ -77,9 +87,111 @@ uint8_t   X264Encoder::preamble(uint32_t fps1000,ADM_x264Param *zparam)
         _handle=(void *)xhandle;
         _pic=(void *)new x264_picture_t;
         printf("X264 init ok\n");
+
+        // Create avcc atom as extradata
+
+/*
+        UINT8  configurationVersion = 1;
+        UINT8  AVCProfileIndication;
+        UINT8  profile_compatibility;
+        UINT8  AVCLevelIndication;
+        bit(6) reserved = 111111b;
+        unsigned int(2) lengthSizeMinusOne;
+        bit(3) reserved = 111b;
+        unsigned int(5) numOfSequenceParameterSets;
+        for (i=0; i< numOfSequenceParameterSets;  i++)
+       {       
+
+                UINT16 sequenceParameterSetLength ;
+
+                bit(8*sequenceParameterSetLength) sequenceParameterSetNALUnit;
+
+        }
+        UINT8  numOfPictureParameterSets;
+        for (i=0; i< numOfPictureParameterSets;  i++)
+       {
+                UINT16 pictureParameterSetLength;
+                bit(8*pictureParameterSetLength) pictureParameterSetNALUnit;
+        }
+*/
+/*
+           0  0x01,
+           1  0x4D, // AVCProfileIndication
+           2  0x40, // profile_compatibility
+           3  0x1F, // AVCLevelIndication
+
+           4  0xFF,0xE1, // lengthSizeMinusOne=3 (4) / NumSeq=1
+
+           6  0x00,0x14, // sequenceParameterSetLength
+
+                0x27,0x4D,0x40,0x1F,0xA9,0x18,0x0A,0x00,
+                0x8B,0x60,0x0D,0x41,0x80,0x41,0x8C,0x2B,
+                0x5E,0xF7,0xC0,0x40,
+
+             0x01,               // numOfPictureParameterSets 
+             0x00,0x04,          sequenceParameterSetLength
+                0x28,0xCE,0x09,0xC8};
+
+*/
+        // 1024 bytes should be enough
+#define MAX_HEADER_X264 1024 // should be enough
+    extraData=new uint8_t[MAX_HEADER_X264];
+        
+x264_nal_t       * nal;
+int                nal_count;
+uint32_t           offset=0;;
+
+        extraSize=0;
+        x264_encoder_headers( HANDLE, &nal, &nal_count );
+        printf("Nb nal :%d\n",nal_count);
+    // Fill header
+        extraData[0]=1; // Version
+        extraData[1]=0x42; // AVCProfileIndication
+        extraData[2]=0x00; // profile_compatibility
+        extraData[3]=0x0D; // AVCLevelIndication
+
+        extraData[4]=0xFF; // lengthSizeMinusOne 
+        extraData[5]=0xE0+1; // nonReferenceDegredationPriorityLow        
+
+        offset=6;
+
+        
+
+        extraData[offset]=(1+nal[1].i_payload)>>8;
+        extraData[offset+1]=(1+nal[1].i_payload)&0xff;
+
+        offset+=2;
+
+        extraData[offset++]=0x67;
+
+        memcpy(extraData+offset,nal[1].p_payload,nal[1].i_payload);
+
+        offset+=nal[1].i_payload;
+
+        extraData[offset]=1; // numOfPictureParameterSets
+        offset++;
+
+        extraData[offset]=(1+nal[2].i_payload)>>8;
+        extraData[offset+1]=(1+nal[2].i_payload)&0xff;
+
+        offset+=2;
+        extraData[offset++]=0x68;
+
+        memcpy(extraData+offset,nal[2].p_payload,nal[2].i_payload);
+
+        offset+=nal[1].i_payload;
+        extraSize=offset;
+
+        ADM_assert(offset<MAX_HEADER_X264);
         return 1;
   
 }
+ uint8_t X264Encoder::getExtraData (uint32_t * l, uint8_t ** d)
+{
+        *l=extraSize;
+        *d=extraData;
+        return 1;
+} 
 // should never be called (pure)
 //*******************************
 uint8_t         X264Encoder::init( uint32_t val,uint32_t fps1000,ADM_x264Param *param )
@@ -100,7 +212,11 @@ uint8_t         X264Encoder::stopEncoder(void )
     delete PICS;
     _pic=NULL;
   }
-  
+  if(extraData)
+   {
+        delete [] extraData;
+        extraData=NULL;
+  }
 }
 X264Encoder::~X264Encoder()
 {
