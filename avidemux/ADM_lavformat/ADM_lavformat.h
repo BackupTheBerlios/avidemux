@@ -29,6 +29,7 @@ protected:
                 uint32_t _frameNo;
                 uint32_t _fps1000;
                 uint32_t _audioByterate;
+                uint32_t _audioFq;
                 uint32_t _total;
                 uint32_t _running;
                 ADM_MUXER_TYPE _type;
@@ -51,7 +52,8 @@ public:
 };
 class lavMuxer : public ADMMpegMuxer
 {
-
+private:
+                uint32_t  sample2time_us( uint32_t sample );
 		
 
 public:

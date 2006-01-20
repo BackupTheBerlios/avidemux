@@ -86,6 +86,7 @@ lavMuxer::lavMuxer( void )
 	_frameNo=0;
 	_running=0;
 	_curDTS=0;
+        _audioFq=0;
 }
 //___________________________________________________________________________
 lavMuxer::~lavMuxer()
@@ -286,11 +287,16 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 
 		
 	c = audio_st->codec;
+        c->frame_size=1024; //For AAC mainly, sample per frame
         switch(audioheader->encoding)
         {
                 case WAV_AC3: c->codec_id = CODEC_ID_AC3;break;
                 case WAV_MP2: c->codec_id = CODEC_ID_MP2;break;
                 case WAV_MP3: c->codec_id = CODEC_ID_MP3;break;
+                case WAV_PCM: 
+                                // One chunk is 10 ms (1/100 of fq)
+                                c->frame_size=audioheader->frequency/100;
+                                c->codec_id = CODEC_ID_PCM_S16LE;break;
                 case WAV_AAC: 
                                 c->extradata=audioextraData;
                                 c->extradata_size= audioextraSize;
@@ -306,10 +312,11 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	c->codec_type = CODEC_TYPE_AUDIO;
 	
 	c->bit_rate = audioheader->byterate*8;
-	c->sample_rate = audioheader->frequency;
+	_audioFq=c->sample_rate = audioheader->frequency;
 	c->channels = audioheader->channels;
         _audioByterate=audioheader->byterate;
         }
+        // /audio
 	
 	
 //----------------------
@@ -362,7 +369,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	
 	_running=1;
 
-	one=(1000*1000*1000)/_fps1000;
+	one=(1000*1000*1000)/_fps1000; 
 	_curDTS=one;
 
 	return 1;
@@ -380,27 +387,35 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             av_init_packet(&pkt);
 
 
-            f=sample*1000.*1000.;
-            f=f/(double)audio_st->codec->sample_rate; // in secons
-
-            
-            pkt.dts=pkt.pts=(int64_t)floor(f);
+            pkt.dts=pkt.pts=(int64_t)sample2time_us(sample);
 
             pkt.flags |= PKT_FLAG_KEY; 
             pkt.data= buf;
             pkt.size= len;
             pkt.stream_index=1;
 
-            aprintf("A: frame  pts%d\n",pkt.pts); 
+            aprintf("A: sample: %d frame_pts: %d fq: %d\n",(uint32_t )sample,pkt.dts,audio_st->codec->sample_rate); 
 
             ret = av_write_frame(oc, &pkt);
-            _total=sample;
+            _total=pkt.dts;
             if(ret) 
             {
                         printf("Error writing audio packet\n");
                         return 0;
             }
             return 1;
+}
+//________________________________________________________________________
+uint32_t  lavMuxer::sample2time_us( uint32_t sample )
+{
+double f;
+
+                f=sample;
+                f*=1000.*1000.;
+                f/=_audioFq;              // Sample / Frequency = time in seconds *10E6 to get in in us
+                
+                return (uint64_t)floor(f);
+
 }
 //___________________________________________________________________________
 uint8_t lavMuxer::needAudio( void )
@@ -409,14 +424,11 @@ uint8_t lavMuxer::needAudio( void )
         if(!audio_st) return 0;
 
 	double f;
-	uint64_t dts;
-	 	f=_total;
-	    	f*=1000.*1000.;
-	    	f/=_audioByterate;
-		f+=2000;
-		dts=(uint64_t)floor(f);
+	uint64_t dts=_total;  // Last audio dts
+
+		
 		aprintf("Need audio  ?: %llu / %llu : %llu\n ",dts,_curDTS,_curDTS+one);
-		if((dts>=_curDTS) && (dts<=_curDTS+one)) return 1;
+		if((dts+5000>=_curDTS) && (dts<=_curDTS+one)) return 1;
 		if(dts<=_curDTS)
 		{
 			printf("LavMuxer:Audio DTS is too low %llu / %llu!\n",dts,_curDTS);
