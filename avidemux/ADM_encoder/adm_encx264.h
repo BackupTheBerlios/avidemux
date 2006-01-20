@@ -53,7 +53,8 @@ class EncoderX264: public Encoder
     virtual uint8_t startPass1( void )   ;
     virtual const char *getCodecName(void ) {return "H264";}                              
     virtual const char *getFCCHandler(void ) {return "H264";}
-    virtual const char *getDisplayName(void ) {return "X264";}                                               
+    virtual const char *getDisplayName(void ) {return "X264";} 
+    virtual uint8_t    hasExtraHeaderData( uint32_t *l,uint8_t **data);      
 }   ;
 
 

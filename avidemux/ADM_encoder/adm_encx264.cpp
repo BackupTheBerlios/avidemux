@@ -63,6 +63,14 @@ EncoderX264::~EncoderX264 ()
   stop();
 
 };
+uint8_t EncoderX264::hasExtraHeaderData( uint32_t *l,uint8_t **data)
+{
+uint8_t r=0;
+        r=_codec->getExtraData(l,data);
+        printf("x264 has %d extra bytes\n",*l);
+        return r;
+
+}       
 //--------------------------------
 uint8_t         EncoderX264::configure (AVDMGenericVideoStream * instream)
 {
