@@ -91,7 +91,7 @@ aviInfo info;
                 _in=instream;
                 _frameStart=frameStart;
                 video_body->getVideoInfo(&info);
-                if(info.nb_frames>frameEnd+1)
+                if(info.nb_frames==frameEnd+1) // last frame included ?
                 {
                         _total=_total=frameEnd-frameStart+1;
                 }
@@ -100,7 +100,7 @@ aviInfo info;
                 
                 uint32_t end,flags;
 next:
-                end=frameStart+_total;
+                end=frameStart+_total-1;
                 video_body->getFlags(end,&flags);
                 if((flags & AVI_B_FRAME)&&_total)
                 {
