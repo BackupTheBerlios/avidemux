@@ -106,6 +106,7 @@ WAVHeader *audioinfo=NULL;
 
           
         // Setup video
+        
         if(!videoProcessMode())
         {
              _incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
@@ -113,9 +114,13 @@ WAVHeader *audioinfo=NULL;
         {
              _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
         }
+
            videoBuffer=new uint8_t[_incoming->getInfo()->width*_incoming->getInfo()->height*3];
            _encode = getVideoEncoder (_incoming->getInfo()->width,_incoming->getInfo()->height);
            total= _incoming->getInfo()->nb_frames;
+
+           encoding_gui=new DIA_encoding(_incoming->getInfo()->fps1000);
+
            if (!_encode)
                 {
                         GUI_Error_HIG ("Cannot initialize the video stream", NULL);
@@ -129,6 +134,12 @@ WAVHeader *audioinfo=NULL;
                         goto  stopit;
                 };
                 
+                encoding_gui->setContainer("MP4");
+                encoding_gui->setAudioCodec("None");
+                if(!videoProcessMode())
+                        encoding_gui->setCodec("Copy");
+                else
+                        encoding_gui->setCodec(_encode->getDisplayName());
                 if (_encode->isDualPass ())
                 {
                         TwoPassLogFile=new char[strlen(name)+6];
@@ -137,7 +148,8 @@ WAVHeader *audioinfo=NULL;
                         _encode->setLogFile(TwoPassLogFile,total);
                         if(!prepareDualPass(videoBuffer,TwoPassLogFile,encoding_gui,_encode,total))
                                 goto stopit;
-                }
+                }else
+                        encoding_gui->setPhasis ("Encoding");
                 
                 info.width=_incoming->getInfo()->width;
                 info.height=_incoming->getInfo()->height;
@@ -191,6 +203,8 @@ WAVHeader *audioinfo=NULL;
           {
                  audioinfo=audio->getInfo();
                 audio->extraData(&extraDataSize,&extraData);
+                encoding_gui->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
+
            }
 // ____________Setup Muxer _____________________
            muxer= new lavMuxer;
@@ -203,9 +217,10 @@ WAVHeader *audioinfo=NULL;
                 audioinfo,extraDataSize,extraData))
                          goto stopit;
            //_____________ Loop _____________________
-          encoding_gui=new DIA_encoding(info.fps1000);
+          
           encoding_gui->setContainer("MP4");
-
+          if(audio)
+                encoding_gui->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
           encoding_gui->setAudioCodec("None");
           if(!videoProcessMode())
                 encoding_gui->setCodec("Copy");
