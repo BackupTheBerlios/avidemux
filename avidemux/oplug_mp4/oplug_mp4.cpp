@@ -233,9 +233,12 @@ WAVHeader *audioinfo=NULL;
                 while(muxer->needAudio())
                {
                      if(!audio->getPacket(audioBuffer,&len,&sample)) break;
-                     muxer->writeAudioPacket(len,audioBuffer,sample_got);
-                     encoding_gui->feedAudioFrame(len);
-                     sample_got+=sample;
+                     if(len)
+                     {
+                        muxer->writeAudioPacket(len,audioBuffer,sample_got);
+                        encoding_gui->feedAudioFrame(len);
+                        sample_got+=sample;
+                     }
                }
                ADM_assert(_encode);
                if(!_encode->encode ( frame, &len, videoBuffer, &flags))
