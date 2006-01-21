@@ -82,7 +82,7 @@ lavMuxer::lavMuxer( void )
 	video_st=NULL;
 	_fps1000=0;
 	_audioByterate=0;
-	_total=0;
+	_lastAudioDts=0;
 	_frameNo=0;
 	_running=0;
 	_curDTS=0;
@@ -252,6 +252,11 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 			c->frame_rate_base = 1001;	
 			break;
 */
+                        if(_type==MUXER_MP4)
+                        {
+                                 c->time_base= (AVRational){1001,24000};
+                                break;
+                        }
 		case  29970:
 			 c->time_base= (AVRational){1001,30000};
 			//c->frame_rate = 30000;  
@@ -295,7 +300,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                 case WAV_MP3: c->codec_id = CODEC_ID_MP3;break;
                 case WAV_PCM: 
                                 // One chunk is 10 ms (1/100 of fq)
-                                c->frame_size=audioheader->frequency/100;
+                                c->frame_size=4;
                                 c->codec_id = CODEC_ID_PCM_S16LE;break;
                 case WAV_AAC: 
                                 c->extradata=audioextraData;
@@ -383,7 +388,7 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
         double f;
 
            if(!audio_st) return 0;
-
+           if(!len) return 1;
             av_init_packet(&pkt);
 
 
@@ -394,10 +399,10 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             pkt.size= len;
             pkt.stream_index=1;
 
-            aprintf("A: sample: %d frame_pts: %d fq: %d\n",(uint32_t )sample,pkt.dts,audio_st->codec->sample_rate); 
+            aprintf("A: sample: %d frame_pts: %d fq: %d\n",(int32_t )sample,(int32_t )pkt.dts,audio_st->codec->sample_rate); 
 
             ret = av_write_frame(oc, &pkt);
-            _total=pkt.dts;
+            _lastAudioDts=pkt.dts;
             if(ret) 
             {
                         printf("Error writing audio packet\n");
@@ -406,7 +411,7 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             return 1;
 }
 //________________________________________________________________________
-uint32_t  lavMuxer::sample2time_us( uint32_t sample )
+uint64_t  lavMuxer::sample2time_us( uint32_t sample )
 {
 double f;
 
@@ -424,7 +429,7 @@ uint8_t lavMuxer::needAudio( void )
         if(!audio_st) return 0;
 
 	double f;
-	uint64_t dts=_total;  // Last audio dts
+	uint64_t dts=_lastAudioDts;  // Last audio dts
 
 		
 		aprintf("Need audio  ?: %llu / %llu : %llu\n ",dts,_curDTS,_curDTS+one);

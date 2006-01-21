@@ -30,7 +30,8 @@ protected:
                 uint32_t _fps1000;
                 uint32_t _audioByterate;
                 uint32_t _audioFq;
-                uint32_t _total;
+                uint32_t _total; // deprecated, only for muxts
+                uint64_t _lastAudioDts;
                 uint32_t _running;
                 ADM_MUXER_TYPE _type;
                 uint8_t  _restamp;
@@ -53,7 +54,7 @@ public:
 class lavMuxer : public ADMMpegMuxer
 {
 private:
-                uint32_t  sample2time_us( uint32_t sample );
+                uint64_t  sample2time_us( uint32_t sample );
 		
 
 public:

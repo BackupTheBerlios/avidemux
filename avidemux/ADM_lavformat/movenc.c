@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
 #include "avi.h"
@@ -58,6 +58,7 @@ typedef struct MOVIndex {
     long        sampleCount;
     long        sampleDuration;
     int         hasKeyframes;
+    int         language;
     int         trackID;
     AVCodecContext *enc;
 
@@ -77,6 +78,9 @@ typedef struct MOVContext {
 } MOVContext;
 
 static int mov_write_esds_tag(ByteIOContext *pb, MOVTrack* track);
+
+/* output language code from iso639 language name */
+extern int ff_mov_iso639_to_lang(const char *lang, int mp4);
 
 const CodecTag ff_mov_obj_type[] = {
     { CODEC_ID_MPEG4     ,  32 },
@@ -667,6 +671,7 @@ static int mov_write_stbl_tag(ByteIOContext *pb, MOVTrack* track)
     mov_write_stts_tag(pb, track);
     if (track->enc->codec_type == CODEC_TYPE_VIDEO &&
         track->hasKeyframes)
+    //if(track->hasKeyframes) //MEANX
         mov_write_stss_tag(pb, track);
     mov_write_stsc_tag(pb, track);
     mov_write_stsz_tag(pb, track);
@@ -760,7 +765,7 @@ static int mov_write_mdhd_tag(ByteIOContext *pb, MOVTrack* track)
     put_be32(pb, track->time); /* modification time */
     put_be32(pb, track->timescale); /* time scale (sample rate for audio) */
     put_be32(pb, track->trackDuration); /* duration */
-    put_be16(pb, 0); /* language, 0 = english */
+    put_be16(pb, track->language); /* language */
     put_be16(pb, 0); /* reserved (quality) */
     return 32;
 }
@@ -1390,6 +1395,8 @@ static int mov_write_header(AVFormatContext *s)
                     av_log(s, AV_LOG_INFO, "Warning, using MS style audio codec tag, the file may be unplayable!\n");
             }
         }
+        /* don't know yet if mp4 or not */
+        //mov->tracks[i].language = ff_mov_iso639_to_lang(s->streams[i]->language, 1);
     }
 
     /* Default mode == MP4 */
