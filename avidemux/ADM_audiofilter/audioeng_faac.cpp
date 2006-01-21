@@ -58,14 +58,18 @@ AVDMProcessAudio_Faac::AVDMProcessAudio_Faac(AVDMGenericAudioStream * instream)
 
 AVDMProcessAudio_Faac::~AVDMProcessAudio_Faac()
 {
-    delete(_wavheader);
-    
+    printf("Deleting faac\n");
+
     if(_handle)
     	 faacEncClose(_handle);
     _handle=NULL;
+
+    if(_wavheader) delete(_wavheader);
     _wavheader=NULL;
+
     if(_extraData) delete [] _extraData;
     _extraData=NULL;
+    printf("Deleting faac\n");
 
 };
 
@@ -94,7 +98,7 @@ int ret=0;
 				_wavheader->frequency,_wavheader->channels,bitrate);
 	return 0;    
     }
-    printf("FAAC!Sample input:%lu\nmax byte output\n",samples_input,max_bytes_output);
+    printf(" FAAC : Sample input:%d, max byte output%d \n",samples_input,max_bytes_output);
     _incoming_frame=samples_input/_wavheader->channels;
     cfg= faacEncGetCurrentConfiguration(_handle);
     
@@ -106,7 +110,7 @@ int ret=0;
     cfg->bitRate = bitrate*1000;
     cfg->outputFormat = 0; // 0 Raw 1 ADTS
     cfg->inputFormat = FAAC_INPUT_16BIT;
-    cfg->useLfe=1;	
+    cfg->useLfe=0;	
     if (!(ret=faacEncSetConfiguration(_handle, cfg))) 
     {
         printf("FAAC: Cannot set conf for faac with fq=%lu chan=%lu br=%lu (err:%d)\n",
@@ -157,6 +161,7 @@ uint32_t len,sam;
 		return len;
 	return MINUS_ONE;
 }
+#define FA_BUFFER_SIZE (SIZE_INTERNAL/4)
 //______________________________________________
 uint8_t	AVDMProcessAudio_Faac::getPacket(uint8_t *dest, uint32_t *len, 
 					uint32_t *samples)
@@ -166,16 +171,29 @@ uint32_t nbSample=0;
 uint32_t rdall=0,asked,rd;
 int wr;
 
+faa_loop:
 	asked=_incoming_frame*2*_wavheader->channels;
 	rd=_instream->read(asked,buf);
-	
-	if(rd==0)
-		return 0;
-	if(rd==MINUS_ONE)
-		return 0;		
-	    
+/*	
+        if(rd==0 || rd==MINUS_ONE)
+        {
+                return 0;
+        }
+*/
+	if(rd<asked || rd==MINUS_ONE)
+        {
+                if(rd==MINUS_ONE)
+                {
+                        printf("Faac: incoming buffer empty\n");
+                        rd=0;
+                }
+                memset(buf+rd,0,asked-rd);      // Fill out with 0
+                rd=asked;
+                printf("Faac : feeding with 0\n");
+        }    
   // Now encode
   	nbSample= rd/(2*_wavheader->channels);
+        //printf("Sample..\n");
 	switch(_wavheader->channels)
 	{
 	case 1:
@@ -183,7 +201,7 @@ int wr;
                       (int32_t *)buf,
                       nbSample, // Nb sample for all channels
                       dest,
-                      64*1024
+                      FA_BUFFER_SIZE
 		      );
 		break;
 	case 2:
@@ -192,14 +210,19 @@ int wr;
                       (int32_t *)buf,
                       nbSample*2, // Nb sample for all channels
                       dest,
-                      64*1024
+                      FA_BUFFER_SIZE
 		      );
 		break;
 	}
 		     
 	*len=wr;
 	*samples=nbSample;
-	//printf("Faac: asked :%lu got %lu out len:%d sample:%d\n",asked,rd,wr,nbSample);
+        if(!wr) 
+        {
+                printf("FAAC: Got no datas, retrying\n");
+                goto faa_loop;
+        }
+	//aprintf("Faac: asked :%lu got %lu out len:%d sample:%d\n",asked,rd,wr,nbSample);
 	return 1;
 }
 
