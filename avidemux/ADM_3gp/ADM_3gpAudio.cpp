@@ -135,7 +135,8 @@ double delta;
                         delta/=1000.; // mss -> second
                         *samples=(uint32_t)floor(delta);
                 }else *samples=1024;
-                printf("3gp: Last sample %d\n",*samples);
+                printf("3gp: Last sample %d current chunk %d nb chunk %d\n",
+                                *samples,_current_index,_nb_chunks);
                 
 	  }
 	  else
