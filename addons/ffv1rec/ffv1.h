@@ -9,8 +9,8 @@
 #include "default.h"
 
 typedef void *(* adm_fast_memcpy)(void *to, const void *from, size_t len);
-extern adm_fast_memcpy myMemcpy;
-#define memcpy myMemcpy
+extern adm_fast_memcpy myAdmMemcpy;
+#define memcpy myAdmMemcpy
 /*          Video input iface        */
 typedef struct
 {

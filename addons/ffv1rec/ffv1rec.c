@@ -46,9 +46,9 @@
 #include "ffv1.h"
 #include "frequencies.h"
 
-adm_fast_memcpy myMemcpy;
+//adm_fast_memcpy myMemcpy;
 
-#define _VERSION_ "0.2.3"
+#define _VERSION_ "0.2.4 (2.1 branch)"
 
 
 /* Globals */
