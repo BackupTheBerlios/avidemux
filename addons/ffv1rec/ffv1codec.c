@@ -422,7 +422,7 @@ int res;
 	_context->width=info->width;
 	_context->height=info->height;
 	//_context->frame_rate_base=1000;
-	_context->strict_std_compliance=-1;
+	_context->strict_std_compliance=-2;
 	
 	pagesize=info->width*info->height;
 	_context->pix_fmt		=  PIX_FMT_YUV420P; //PIX_FMT_YV12;
