@@ -48,7 +48,7 @@
 
 //adm_fast_memcpy myMemcpy;
 
-#define _VERSION_ "0.2.4 (2.1 branch)"
+#define _VERSION_ "0.2.4 (2.2 branch)"
 
 
 /* Globals */
