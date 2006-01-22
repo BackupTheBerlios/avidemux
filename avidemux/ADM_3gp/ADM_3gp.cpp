@@ -789,13 +789,36 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                 {
                                         // configuration data for h264
                                         //tom.skipBytes(8);
+                                        int len,offset;
                                     VDEO.extraDataSize=tom.getRemainingSize();
                                     VDEO.extraData=new uint8_t [VDEO.extraDataSize];
                                     tom.readPayload(VDEO.extraData,VDEO.extraDataSize);
                                         printf("avcC size:%d\n",VDEO.extraDataSize);
-                                        tom.skipAtom();
-                                        break;
+                                    // Dump some info
+                                        #define MKD8(x) VDEO.extraData[x]
+                                        #define MKD16(x) ((MKD8(x)<<8)+MKD8(x+1))
+                                        #define MKD32(x) ((MKD16(x)<<16)+MKD16(x+2))
 
+                                     printf("avcC Revision             :%x\n", MKD8(0));
+                                     printf("avcC AVCProfileIndication :%x\n", MKD8(1));
+                                     printf("avcC profile_compatibility:%x\n", MKD8(2));
+                                     printf("avcC AVCLevelIndication   :%x\n", MKD8(3));
+
+                                     printf("avcC lengthSizeMinusOne   :%x\n", MKD8(4));
+                                     printf("avcC NumSeq               :%x\n", MKD8(5));
+                                     len=MKD16(6);
+                                     printf("avcC sequenceParSetLen    :%x ",len );
+                                     offset=8;
+                                     mixDump(VDEO.extraData+offset,len);
+
+                                     offset=8+len;
+                                     printf("\navcC numOfPictureParSets  :%x\n", MKD8(offset++));
+                                     len=MKD16(offset++);
+                                     printf("avcC Pic len              :%x\n",len);
+                                     mixDump(VDEO.extraData+offset,len);
+                                     printf("\n");
+                                     tom.skipAtom();
+                                     break;
                                 }
                         case MKFCCR('a','v','c','1'): //'avc1':
                                 {
