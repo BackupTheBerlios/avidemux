@@ -65,11 +65,13 @@ uint8_t   X264Encoder::preamble(uint32_t fps1000,ADM_x264Param *zparam)
         param.i_height=_h;
         param.i_csp=X264_CSP_I420;
         
-        param.vui.i_sar_width=_w;       // FIXME
-        param.vui.i_sar_height=_h;
+        param.vui.i_sar_width=1;       // FIXME
+        param.vui.i_sar_height=1;
         
         param.i_fps_num=fps1000;
         param.i_fps_den=1000;
+// ?
+        
 //        param.i_maxframes=0;
         if(zparam)
         {
@@ -78,6 +80,7 @@ uint8_t   X264Encoder::preamble(uint32_t fps1000,ADM_x264Param *zparam)
                 param.i_keyint_min=zparam->minKf;       // Min intra distance
                 param.i_bframe=zparam->nbBframe;        // 2 bframe
                 param.b_cabac=zparam->cabac;            // Arith coding on/off
+                if(zparam->globalHeader) param.b_repeat_headers = 0; // Global header
         }
         
         
@@ -86,104 +89,13 @@ uint8_t   X264Encoder::preamble(uint32_t fps1000,ADM_x264Param *zparam)
         
         _handle=(void *)xhandle;
         _pic=(void *)new x264_picture_t;
-        printf("X264 init ok\n");
+        printf("X264 init ok (atom mode : %d)\n",zparam->globalHeader);
 
-        // Create avcc atom as extradata
-
-/*
-        UINT8  configurationVersion = 1;
-        UINT8  AVCProfileIndication;
-        UINT8  profile_compatibility;
-        UINT8  AVCLevelIndication;
-        bit(6) reserved = 111111b;
-        unsigned int(2) lengthSizeMinusOne;
-        bit(3) reserved = 111b;
-        unsigned int(5) numOfSequenceParameterSets;
-        for (i=0; i< numOfSequenceParameterSets;  i++)
-       {       
-
-                UINT16 sequenceParameterSetLength ;
-
-                bit(8*sequenceParameterSetLength) sequenceParameterSetNALUnit;
-
-        }
-        UINT8  numOfPictureParameterSets;
-        for (i=0; i< numOfPictureParameterSets;  i++)
-       {
-                UINT16 pictureParameterSetLength;
-                bit(8*pictureParameterSetLength) pictureParameterSetNALUnit;
-        }
-*/
-/*
-           0  0x01,
-           1  0x4D, // AVCProfileIndication
-           2  0x40, // profile_compatibility
-           3  0x1F, // AVCLevelIndication
-
-           4  0xFF,0xE1, // lengthSizeMinusOne=3 (4) / NumSeq=1
-
-           6  0x00,0x14, // sequenceParameterSetLength
-
-                0x27,0x4D,0x40,0x1F,0xA9,0x18,0x0A,0x00,
-                0x8B,0x60,0x0D,0x41,0x80,0x41,0x8C,0x2B,
-                0x5E,0xF7,0xC0,0x40,
-
-             0x01,               // numOfPictureParameterSets 
-             0x00,0x04,          sequenceParameterSetLength
-                0x28,0xCE,0x09,0xC8};
-
-*/
-        // 1024 bytes should be enough
-#define MAX_HEADER_X264 1024 // should be enough
-    extraData=new uint8_t[MAX_HEADER_X264];
+        if(zparam->globalHeader) 
+                return createHeader();
+        else
+                return 1;
         
-x264_nal_t       * nal;
-int                nal_count;
-uint32_t           offset=0;;
-
-        extraSize=0;
-        x264_encoder_headers( HANDLE, &nal, &nal_count );
-        printf("Nb nal :%d\n",nal_count);
-    // Fill header
-        extraData[0]=1; // Version
-        extraData[1]=0x42; // AVCProfileIndication
-        extraData[2]=0x00; // profile_compatibility
-        extraData[3]=0x0D; // AVCLevelIndication
-
-        extraData[4]=0xFF; // lengthSizeMinusOne 
-        extraData[5]=0xE0+1; // nonReferenceDegredationPriorityLow        
-
-        offset=6;
-
-        
-
-        extraData[offset]=(1+nal[1].i_payload)>>8;
-        extraData[offset+1]=(1+nal[1].i_payload)&0xff;
-
-        offset+=2;
-
-        extraData[offset++]=0x67;
-
-        memcpy(extraData+offset,nal[1].p_payload,nal[1].i_payload);
-
-        offset+=nal[1].i_payload;
-
-        extraData[offset]=1; // numOfPictureParameterSets
-        offset++;
-
-        extraData[offset]=(1+nal[2].i_payload)>>8;
-        extraData[offset+1]=(1+nal[2].i_payload)&0xff;
-
-        offset+=2;
-        extraData[offset++]=0x68;
-
-        memcpy(extraData+offset,nal[2].p_payload,nal[2].i_payload);
-
-        offset+=nal[1].i_payload;
-        extraSize=offset;
-
-        ADM_assert(offset<MAX_HEADER_X264);
-        return 1;
   
 }
  uint8_t X264Encoder::getExtraData (uint32_t * l, uint8_t ** d)
@@ -366,6 +278,165 @@ X264EncoderPass2::~X264EncoderPass2()
 {
   stopEncoder(); 
 }
+  // Create avcc atom as extradata
 
+/*
+        UINT8  configurationVersion = 1;
+        UINT8  AVCProfileIndication;
+        UINT8  profile_compatibility;
+        UINT8  AVCLevelIndication;
+        bit(6) reserved = 111111b;
+        unsigned int(2) lengthSizeMinusOne;
+        bit(3) reserved = 111b;
+        unsigned int(5) numOfSequenceParameterSets;
+        for (i=0; i< numOfSequenceParameterSets;  i++)
+       {       
+
+                UINT16 sequenceParameterSetLength ;
+
+                bit(8*sequenceParameterSetLength) sequenceParameterSetNALUnit;
+
+        }
+        UINT8  numOfPictureParameterSets;
+        for (i=0; i< numOfPictureParameterSets;  i++)
+       {
+                UINT16 pictureParameterSetLength;
+                bit(8*pictureParameterSetLength) pictureParameterSetNALUnit;
+        }
+*/
+/*
+           0  0x01,
+           1  0x4D, // AVCProfileIndication
+           2  0x40, // profile_compatibility
+           3  0x1F, // AVCLevelIndication
+
+           4  0xFF,0xE1, // lengthSizeMinusOne=3 (4) / NumSeq=1
+
+           6  0x00,0x14, // sequenceParameterSetLength
+
+                0x27,0x4D,0x40,0x1F,0xA9,0x18,0x0A,0x00,
+                0x8B,0x60,0x0D,0x41,0x80,0x41,0x8C,0x2B,
+                0x5E,0xF7,0xC0,0x40,
+
+             0x01,               // numOfPictureParameterSets 
+             0x00,0x04,          sequenceParameterSetLength
+                0x28,0xCE,0x09,0xC8};
+
+*/
+#define MAX_HEADER_X264 1024 // should be enough
+/*_____________________________________________________________
+
+        Try to create the avcC atom and set it as extraData
+_______________________________________________________________*/
+
+#define H264_NAL_TYPE_SEQ_PARAM 0x7
+#define H264_NAL_TYPE_PIC_PARAM 0x8
+
+uint8_t         X264Encoder::createHeader( void )
+{
+x264_nal_t       * nal;
+int                nal_count;
+uint32_t           offset=0;;
+uint8_t            buffer[MAX_HEADER_X264];
+uint8_t            picParam[MAX_HEADER_X264];
+uint8_t            seqParam[MAX_HEADER_X264];
+int                picParamLen=0,seqParamLen=0,len;
+int                sz;
+
+        // 1024 bytes should be enough
+        extraData=new uint8_t[MAX_HEADER_X264];
+        extraSize=0;
+
+
+        if(x264_encoder_headers( HANDLE, &nal, &nal_count ))
+        {
+                printf("X264 : Cannot create header\n");
+                return 0;
+        }
+        printf("Nb nal :%d\n",nal_count);
+
+        // Now encode them
+        for(int i=0;i<nal_count;i++)
+        {
+                if (nal[i].i_type == H264_NAL_TYPE_SEQ_PARAM) 
+                {
+                        sz=x264_nal_encode(seqParam, &seqParamLen, 1, &nal[i]);
+                }else
+                if (nal[i].i_type == H264_NAL_TYPE_PIC_PARAM) 
+                {
+                        sz=x264_nal_encode(picParam, &picParamLen, 1, &nal[i]);
+                }else
+                {
+                        printf("?? type :%d in nal %d\n",nal[i].i_type,i);
+                        sz=x264_nal_encode(buffer, &len, 1, &nal[i]);
+                }
+                 if(sz<=0)
+                 {
+                        printf("X264 : Cannot encode nal  header %d\n",i);
+                        return 0;
+                 }
+        }
+        // Now that we got all the nals encoded, time to build the avcC atom
+        // Check we have everything we want
+        if(!picParamLen || !seqParamLen)
+        {
+                printf("X264 : Seqparam or PicParam not found\n");
+                return 0;
+        }
+        // Remove startcodes
+        if(picParam[0] || picParam[1] || picParam[2] || picParam[3]!=1 ||picParamLen<5 )
+        {
+                printf("x264:Wrong startcode for picParam\n");
+                return 0;
+        }
+        picParamLen-=4;
+
+        if(seqParam[0] || seqParam[1] || seqParam[2] || seqParam[3]!=1 ||seqParamLen<5 )
+        {
+                printf("x264:Wrong startcode for seqParam\n");
+                return 0;
+        }
+        seqParamLen-=4;
+        
+
+    // Fill header
+        extraData[0]=1; // Version
+        extraData[1]=0x42; // AVCProfileIndication
+        extraData[2]=0x00; // profile_compatibility
+        extraData[3]=0x0D; // AVCLevelIndication
+
+        extraData[4]=0xFF; // lengthSizeMinusOne 
+        extraData[5]=0xE0+1; // nonReferenceDegredationPriorityLow        
+
+        offset=6;
+
+        
+
+        extraData[offset]=seqParamLen>>8;
+        extraData[offset+1]=seqParamLen&0xff;
+
+        offset+=2;
+
+        memcpy(extraData+offset,seqParam+4,seqParamLen);
+        offset+=seqParamLen;
+
+        extraData[offset]=1; // numOfPictureParameterSets
+        offset++;
+
+        extraData[offset]=(picParamLen)>>8;
+        extraData[offset+1]=(picParamLen)&0xff;
+
+        offset+=2;
+       
+
+        memcpy(extraData+offset,picParam+4,picParamLen);
+        offset+=picParamLen;
+
+
+        extraSize=offset;
+
+        ADM_assert(offset<MAX_HEADER_X264);
+        return 1;
 //********
+}
 #endif

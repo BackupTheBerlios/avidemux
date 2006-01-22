@@ -22,7 +22,7 @@
         ADM_x264Param   _param;
         uint8_t         *extraData;
         uint32_t        extraSize;
-
+        uint8_t         createHeader( void );
   public :
     X264Encoder(uint32_t width,uint32_t height)   : encoder(width,height)
     {        

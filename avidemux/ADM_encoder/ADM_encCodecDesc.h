@@ -527,7 +527,8 @@ ADM_x264Param x264Extra=
   1,    //uint32_t cabac;
   250,  //uint32_t maxKf;
   5,    //uint32_t minKf;
-  2    //uint32_t nbBframe;  
+  2,    //uint32_t nbBframe;  
+  0     // uint32_t esAtom
   
 };
 extern uint8_t DIA_x264(COMPRES_PARAMS *conf);
@@ -541,7 +542,7 @@ COMPRES_PARAMS	x264Codec=
 		4,
 		1500,
 		700,
-		ADM_ENC_CAP_CBR+ADM_ENC_CAP_CQ+ADM_ENC_CAP_2PASS,
+		ADM_ENC_CAP_CBR+ADM_ENC_CAP_CQ+ADM_ENC_CAP_2PASS+ADM_ENC_CAP_GLOBAL,
 		ADM_EXTRA_PARAM,
 		&x264Extra,
 		sizeof(x264Extra)	,

@@ -98,7 +98,7 @@ class Encoder
               
 
 }   ; 
-Encoder *getVideoEncoder( uint32_t w,uint32_t h );
+Encoder *getVideoEncoder( uint32_t w,uint32_t h,uint32_t globalHeader=0 );
 
 
 typedef enum

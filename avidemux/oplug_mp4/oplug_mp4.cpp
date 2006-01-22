@@ -116,7 +116,9 @@ WAVHeader *audioinfo=NULL;
         }
 
            videoBuffer=new uint8_t[_incoming->getInfo()->width*_incoming->getInfo()->height*3];
-           _encode = getVideoEncoder (_incoming->getInfo()->width,_incoming->getInfo()->height);
+                // Set global header encoding, needed for H264
+           _encode = getVideoEncoder (_incoming->getInfo()->width,
+                        _incoming->getInfo()->height,1);
            total= _incoming->getInfo()->nb_frames;
 
            encoding_gui=new DIA_encoding(_incoming->getInfo()->fps1000);

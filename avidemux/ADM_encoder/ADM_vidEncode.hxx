@@ -55,6 +55,7 @@
 #define ADM_ENC_CAP_CBR    0x001
 #define ADM_ENC_CAP_CQ     0x002
 #define ADM_ENC_CAP_2PASS  0x004
+#define ADM_ENC_CAP_GLOBAL 0x008
 
 #define ADM_EXTRA_PARAM_JS 0x100
 #define ADM_EXTRA_PARAM    0x200

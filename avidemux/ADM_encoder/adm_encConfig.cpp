@@ -605,7 +605,7 @@ void setVideoEncoderSettings(COMPRESSION_MODE mode, uint32_t  param, uint32_t ex
 		}
 	}
 }
-Encoder *getVideoEncoder( uint32_t w,uint32_t h )
+Encoder *getVideoEncoder( uint32_t w,uint32_t h,uint32_t globalHeaderFlag )
 
 {
 
@@ -658,8 +658,13 @@ Encoder *e=NULL;
 
 #ifdef USE_X264
                 case CodecX264:
+                                        #warning GROSS HACK
+                                {
+                                        x264Extra.globalHeader=globalHeaderFlag;
                                         e=new EncoderX264(&x264Codec);
+                                        x264Extra.globalHeader=0;
                                         break;
+                                }
 #endif
 #if 0
 #ifdef USE_XX_XVID
