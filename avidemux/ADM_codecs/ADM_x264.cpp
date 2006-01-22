@@ -401,9 +401,9 @@ int                sz;
 
     // Fill header
         extraData[0]=1; // Version
-        extraData[1]=0x42; // AVCProfileIndication
-        extraData[2]=0x00; // profile_compatibility
-        extraData[3]=0x0D; // AVCLevelIndication
+        extraData[1]=seqParam[4+1]; //0x42; // AVCProfileIndication
+        extraData[2]=seqParam[4+2]; //0x00; // profile_compatibility
+        extraData[3]=seqParam[4+3]; //0x0D; // AVCLevelIndication
 
         extraData[4]=0xFF; // lengthSizeMinusOne 
         extraData[5]=0xE0+1; // nonReferenceDegredationPriorityLow        
