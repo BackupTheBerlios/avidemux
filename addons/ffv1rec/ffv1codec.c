@@ -97,7 +97,9 @@ typedef enum
 	FF_MJPEG=3,
 	FF_MPEG4=4,
 	FF_XVID=5,
-        FF_FFHUFF=6
+        FF_FFHUFF=6,
+	FF_MPEG1=7,
+	FF_MPEG2=8
 } FFCODEC;
 
 typedef struct codecName
@@ -114,6 +116,8 @@ codecName listOfCodec[]=
 {FF_MJPEG,"MJPEG"},
 {FF_MPEG4,"MPEG4"},
 {FF_XVID,"XVID"},
+{FF_MPEG1,"MPEG1"},
+{FF_MPEG2,"MPEG2"},
 };
 
 FFCODEC codec=FF_FFV1;
@@ -441,6 +445,8 @@ int res;
 		case FF_FFV1: 	res=avcodec_open(_context,&ffv1_encoder);break;
 		case FF_MJPEG: res=avcodec_open(_context,&mjpeg_encoder);break;
 		case FF_MPEG4: res=avcodec_open(_context,&mpeg4_encoder);break;
+		case FF_MPEG1: res=avcodec_open(_context,&mpeg1video_encoder);break;
+		case FF_MPEG2: res=avcodec_open(_context,&mpeg2video_encoder);break;
 		default: assert(0);
 	}
 
@@ -466,6 +472,8 @@ unsigned long int getVideoFourCC( void )
 		case FF_MJPEG: 		return 'GPJM';
 		case FF_MPEG4: 		return 'XVID';
 		case FF_XVID: 		return 'DIVX';
+		case FF_MPEG1: 		return 'GEPM';
+		case FF_MPEG2: 		return 'GEPM';
 		default: assert(0);
 	}
 	return 0;

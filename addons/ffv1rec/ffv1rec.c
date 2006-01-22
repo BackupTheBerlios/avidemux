@@ -9,6 +9,7 @@
     Improvements also by
     	E Strickland 
 	Michael Teske
+	Levente Novak
  ***************************************************************************/
 
 /***************************************************************************
@@ -117,12 +118,12 @@ void usage()
    fprintf(stderr, "\nFFV1 Recording Tool v0.52    (c)Mean/Roman HOCHLEITNER\n");
    fprintf(stderr, "\nA nuvrec derivative, compressing with lavcodec ffv1 codec\n");
    fprintf(stderr, "Usage: nuvrec [options] filename \n\n");
-   fprintf(stderr, "options: -q n .......... Quality 2..31                 ]\n");
+   fprintf(stderr, "options: -q n .......... Quality 2-31                  ]\n");
    fprintf(stderr, "options: -Z   .......... Use mpeg quant                ]\n");
    fprintf(stderr, "         -M n .......... Motion estimation (1-6) [1]   ]\n");
-   fprintf(stderr, "         -d n .......... K frame distance(1.500)[200]  ]\n");
-   fprintf(stderr, "         -l n .......... Luminance Threshold   0..20 [1]\n");
-   fprintf(stderr, "         -c n .......... Chrominance Threshold 0..20 [1]\n");
+   fprintf(stderr, "         -d n .......... K frame distance(1-500)[200]  ]\n");
+   fprintf(stderr, "         -l n .......... Luminance Threshold   0-20 [1]\n");
+   fprintf(stderr, "         -c n .......... Chrominance Threshold 0-20 [1]\n");
    fprintf(stderr, "         -W n .......... Width       [352 PAL, 352 NTSC]\n");
    fprintf(stderr, "         -H n .......... Height      [288 PAL, 240 NTSC]\n");
    fprintf(stderr, "         -t min ........ Length (3.5 = 3m 30s) [forever]\n");
@@ -140,7 +141,7 @@ void usage()
    fprintf(stderr, "         -s ............ SECAM\n");
    fprintf(stderr, "         -Q ............ shut up\n");
    fprintf(stderr, "         -z ............ video only (i.e. no audio)\n");
-   fprintf(stderr, "         -C ............ select video codec (MJPEG|HUFFYUV|FFV1|MPEG4|XVID)\n");
+   fprintf(stderr, "         -C ............ select video codec (MJPEG|HUFFYUV|FFHUFF|FFV1|MPEG1|MPEG2|MPEG4|XVID)\n");
    fprintf(stderr, "         -b ............ set the audio frequency [44100]\n");
    fprintf(stderr, "         -2 ............ split every  2 Gbytes [NO]\n");
    fprintf(stderr, "         -h ............ this help\n");
