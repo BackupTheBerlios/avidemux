@@ -161,6 +161,9 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                                 if(isH264Compatible(info->fcc))
                                 {
                                         c->codec_id = CODEC_ID_H264;
+                                        c->codec=new AVCodec;
+                                        memset(c->codec,0,sizeof(AVCodec));
+                                        c->codec->name=ADM_strdup("H264");
                                 }
                                 else
                                 {

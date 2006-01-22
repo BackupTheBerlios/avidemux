@@ -76,6 +76,11 @@ static char *twoFake=NULL;
 extern AVDMGenericAudioStream *mpt_getAudioStream(void);
 uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total);
 uint8_t extractVolHeader(uint8_t *data,uint32_t dataSize,uint32_t *headerSize);
+
+/*
+
+
+*/
 uint8_t oplug_mp4(const char *name, ADM_OUT_FORMAT type)
 {
 AVDMGenericVideoStream *_incoming=NULL;
@@ -103,7 +108,7 @@ uint32_t videoExtraDataSize=0;
 uint8_t  *videoExtraData=NULL;
 uint8_t *dummy;
 WAVHeader *audioinfo=NULL;
-
+int prefill=1;
           
         // Setup video
         
@@ -203,10 +208,16 @@ WAVHeader *audioinfo=NULL;
           } 
           if(audio)
           {
-                 audioinfo=audio->getInfo();
+                audioinfo=audio->getInfo();
                 audio->extraData(&extraDataSize,&extraData);
-                encoding_gui->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
+                if(audioProcessMode())
+                        encoding_gui->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
+                else
+                         encoding_gui->setAudioCodec("Copy");
 
+           }else
+           {
+                encoding_gui->setAudioCodec("None");
            }
 // ____________Setup Muxer _____________________
            muxer= new lavMuxer;
@@ -223,13 +234,15 @@ WAVHeader *audioinfo=NULL;
           encoding_gui->setContainer("MP4");
           if(audio)
                 encoding_gui->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
-          encoding_gui->setAudioCodec("None");
           if(!videoProcessMode())
                 encoding_gui->setCodec("Copy");
           else
                 encoding_gui->setCodec(_encode->getDisplayName());
            //
            muxer->writeVideoPacket( len,flags,videoBuffer,0,0);
+
+           
+
            for(int frame=1;frame<total;frame++)
            {
                 while(muxer->needAudio())
@@ -248,15 +261,24 @@ WAVHeader *audioinfo=NULL;
                         GUI_Error_HIG ("Error while encoding", NULL);
                         goto  stopit;
                 }
-                
-               muxer->writeVideoPacket( len,flags,videoBuffer,frame,frame);
+                // If the encoder pops empty frames at the beginning, wait a bit
+                if(len) prefill=0;
+                if(!len && prefill) continue; // Prefilling encoder if needed
+                muxer->writeVideoPacket( len,flags,videoBuffer,frame,frame);
 
                encoding_gui->setFrame(frame,total);
                encoding_gui->feedFrame(len);
+               if(!encoding_gui->isAlive())
+                {
+                        if(GUI_YesNo("Stop Request", "Do you want to abort encoding ?"))
+                                goto stopit;
+                }
+               
            }
            ret=1;
-           muxer->close();
+           
 stopit:
+           if(muxer) muxer->close();
            if(encoding_gui) delete encoding_gui;
            if(TwoPassLogFile) delete [] TwoPassLogFile;
            if(videoBuffer) delete [] videoBuffer;
