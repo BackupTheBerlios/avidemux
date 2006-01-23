@@ -168,12 +168,25 @@ uint8_t         X264Encoder::encode( ADMImage        *in,
         }
 
         // Write
-        uint32_t size=0;
-        for(uint32_t i=0;i<nbNal;i++)
-        {
-          sizemax=0xfffffff;;
-          size+= x264_nal_encode(out + size, &sizemax, 1, &nal[i]);          
-        }
+
+                uint32_t size=0,thisnal=0;
+                for(uint32_t i=0;i<nbNal;i++)
+                {
+                        sizemax=0xfffffff;;
+                        if(!param.b_repeat_headers) size+=4;
+                        thisnal= x264_nal_encode(out + size, &sizemax, param.b_repeat_headers , &nal[i]);          
+                        if(!param.b_repeat_headers)
+                        {       // Need to put size (assuming nal_size=4)
+                                out[size+0-4]=(thisnal>>24)&0xff;
+                                out[size+1-4]=(thisnal>>16)&0xff;
+                                out[size+2-4]=(thisnal>>8)&0xff;
+                                out[size+3-4]=(thisnal>>0)&0xff;
+                                
+                        }
+                        size+=thisnal;
+                }
+      
+        
         *len=size;
         x_res.is_key_frame=0;
         switch(pic_out.i_type)
@@ -360,15 +373,15 @@ int                sz;
         {
                 if (nal[i].i_type == H264_NAL_TYPE_SEQ_PARAM) 
                 {
-                        sz=x264_nal_encode(seqParam, &seqParamLen, 1, &nal[i]);
+                        sz=x264_nal_encode(seqParam, &seqParamLen, 0, &nal[i]);
                 }else
                 if (nal[i].i_type == H264_NAL_TYPE_PIC_PARAM) 
                 {
-                        sz=x264_nal_encode(picParam, &picParamLen, 1, &nal[i]);
+                        sz=x264_nal_encode(picParam, &picParamLen, 0, &nal[i]);
                 }else
                 {
                         printf("?? type :%d in nal %d\n",nal[i].i_type,i);
-                        sz=x264_nal_encode(buffer, &len, 1, &nal[i]);
+                        sz=x264_nal_encode(buffer, &len, 0, &nal[i]);
                 }
                  if(sz<=0)
                  {
@@ -383,29 +396,16 @@ int                sz;
                 printf("X264 : Seqparam or PicParam not found\n");
                 return 0;
         }
-        // Remove startcodes
-        if(picParam[0] || picParam[1] || picParam[2] || picParam[3]!=1 ||picParamLen<5 )
-        {
-                printf("x264:Wrong startcode for picParam\n");
-                return 0;
-        }
-        picParamLen-=4;
-
-        if(seqParam[0] || seqParam[1] || seqParam[2] || seqParam[3]!=1 ||seqParamLen<5 )
-        {
-                printf("x264:Wrong startcode for seqParam\n");
-                return 0;
-        }
-        seqParamLen-=4;
+        
         
 
     // Fill header
         extraData[0]=1; // Version
-        extraData[1]=seqParam[4+1]; //0x42; // AVCProfileIndication
-        extraData[2]=seqParam[4+2]; //0x00; // profile_compatibility
-        extraData[3]=seqParam[4+3]; //0x0D; // AVCLevelIndication
+        extraData[1]=seqParam[1]; //0x42; // AVCProfileIndication
+        extraData[2]=seqParam[2]; //0x00; // profile_compatibility
+        extraData[3]=seqParam[3]; //0x0D; // AVCLevelIndication
 
-        extraData[4]=0xFF; // lengthSizeMinusOne 
+        extraData[4]=0xFC+3;   // lengthSizeMinusOne 
         extraData[5]=0xE0+1; // nonReferenceDegredationPriorityLow        
 
         offset=6;
@@ -417,7 +417,7 @@ int                sz;
 
         offset+=2;
 
-        memcpy(extraData+offset,seqParam+4,seqParamLen);
+        memcpy(extraData+offset,seqParam,seqParamLen);
         offset+=seqParamLen;
 
         extraData[offset]=1; // numOfPictureParameterSets
@@ -429,7 +429,7 @@ int                sz;
         offset+=2;
        
 
-        memcpy(extraData+offset,picParam+4,picParamLen);
+        memcpy(extraData+offset,picParam,picParamLen);
         offset+=picParamLen;
 
 
