@@ -58,13 +58,14 @@ adm_atom::adm_atom(adm_atom *atom)
 }
 adm_atom::adm_atom(FILE *fd )
 {
-
+uint32_t orgpos;
 	_fd=fd;
+        orgpos=ftello(fd);
 	fseek(_fd,0,SEEK_END);
 	_atomFCC=fourCC::get((uint8_t *)"MOVI");
 	_atomSize=ftell(_fd);
 
-	fseek(_fd,0,SEEK_SET);
+	fseek(_fd,orgpos,SEEK_SET);
 	_atomStart=0;
 #ifdef ATOM_DEBUG
 	dumpAtom();

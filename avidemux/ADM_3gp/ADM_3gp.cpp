@@ -113,8 +113,10 @@ uint8_t _3GPHeader::setFlag(uint32_t frame,uint32_t flags){
 
 uint32_t _3GPHeader::getFlags(uint32_t frame,uint32_t *flags){
 	if(frame>= (uint32_t)_videostream.dwLength) return 0;
-
-	if(fourCC::check(_videostream.fccHandler,(uint8_t *)"MJPG"))
+#warning FIXME : UGLY
+	if(fourCC::check(_videostream.fccHandler,(uint8_t *)"MJPG")
+        || fourCC::check(_videostream.fccHandler,(uint8_t *)"DVDS") // Fixme should be done on the fly
+        )
 	{
 		*flags=AVI_KEY_FRAME;
 	}
@@ -256,6 +258,22 @@ uint8_t    _3GPHeader::open(char *name)
 
 	printf("\n");
 	adm_atom *atom=new adm_atom(_fd);
+        // Check it is not mdat start(ADM_memcpy_0)     
+        uint8_t check[4];
+        fseeko(_fd,4,SEEK_SET);
+        fread(check,4,1,_fd);
+        fseeko(_fd,0,SEEK_SET);
+        if(check[0]=='m' && check[1]=='d' &&check[2]=='a' && check[3]=='t')
+        {
+                        uint32_t of;
+                                        atom->read32();
+                                        atom->read32();
+                                        atom->read32();
+                                        of=atom->read32();
+                                        fseeko(_fd,of,SEEK_SET);        
+                                        delete atom;
+                                        atom=new adm_atom(_fd);
+        }
 	parseAtomTree(atom);
 	delete atom;
 	printf("Found video codec type :");fourCC::print(_videostream.fccHandler);printf("\n");
@@ -355,7 +373,10 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					tom.skipAtom();
 					break;
 			case MKFCCR('m','d','a','t') : //'mdat':
-					tom.skipAtom();
+                                        {
+                                        tom.skipAtom();
+                                
+                                        }
 					break;
 
 	 	// these are container atoms,
@@ -450,6 +471,21 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                         printf("Bps       :%lu\n",ADIO.bitspersample);
 					tom.skipAtom();
 					break;		
+                        case MKFCCR('t','w','o','s'): //'twos ':
+                                        tom.skipBytes(8);
+                                       printf("Version : %u\n",tom.read16());
+                                        printf("Revision :%u\n",tom.read16());
+                                        printf("Vendor :%lu\n",tom.read32());
+                                        ADIO.channels=tom.read16();
+                                        ADIO.bitspersample=tom.read16();
+                                        tom.read16();
+                                        ADIO.encoding=WAV_PCM;
+                                        ADIO.byterate=ADIO.frequency=tom.read32();      
+                                        printf("Byterate  :%lu\n",ADIO.byterate);
+                                        printf("Frequency :%lu\n",ADIO.frequency);
+                                        printf("Bps       :%lu\n",ADIO.bitspersample);
+                                        tom.skipAtom();
+                                        break;          
 
                         case MKFCCR('.','m','p','3'): //.mp3
                                         tom.skipBytes(16);
@@ -734,7 +770,21 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				tom.skipAtom();
 				printf("tkhd : %ld %ld\n",_lastW,_lastH);
 				break;
+                        case MKFCCR('d','v','c',' ') : //'dvc ':
+/*
+                                tom.skipBytes(24);
+                                wh=tom.read32();
+                                tom.skipBytes(40);
+*/
 
+                                _video_bih.biWidth=_mainaviheader.dwWidth=_lastW ;
+                                _video_bih.biHeight=_mainaviheader.dwHeight=_lastH ;
+
+                                printf("DV : %ld x %ld \n",_video_bih.biWidth,_video_bih.biHeight);
+                                _videostream.fccHandler=fourCC::get((uint8_t *)"DVDS");
+                                _video_bih.biCompression=_videostream.fccHandler;
+                                tom.skipAtom();
+                                break;
 			case MKFCCR('s','2','6','3') : //'s263':
 				tom.skipBytes(24);
 				wh=tom.read32();
@@ -940,6 +990,22 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				}
 				tom.skipAtom();
 				break;
+                        case MKFCCR('c','o','6','4'): //'co64':
+                                printf("Incomplete support for 64 bits quicktime!!\n");
+                                tom.read32();
+                                nbCo=tom.read32();
+                                Co=new uint32_t[nbCo];
+                                for(j=0;j< nbCo;j++)
+                                {
+                                        tom.read32(); // ignore MSB
+                                        Co[j]=tom.read32();
+                                        aprintf("Chunk offset : %lu / %lu  : %lu\n",
+                                                j,nbCo,Co[j]);
+                                }
+
+                                tom.skipAtom();
+                                break;
+
 			case MKFCCR('s','t','c','o'): //'stco':
 
 				tom.read32();
