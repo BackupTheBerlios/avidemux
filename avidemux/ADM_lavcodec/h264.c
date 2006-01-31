@@ -7458,7 +7458,13 @@ static int decode_nal_units(H264Context *h, uint8_t *buf, int buf_size){
         ptr= decode_nal(h, buf + buf_index, &dst_length, &consumed, h->is_avc ? nalsize : buf_size - buf_index);
         if(ptr[dst_length - 1] == 0) dst_length--;
         bit_length= 8*dst_length - decode_rbsp_trailing(ptr + dst_length - 1);
-
+	/* MEANX */
+	if(bit_length<=0)
+	{
+                av_log(h->s.avctx, AV_LOG_ERROR, "h264: bit length computing error, broken stream ? \n");
+		return -1;
+	}
+	/* /MEANX */
         if(s->avctx->debug&FF_DEBUG_STARTCODE){
             av_log(h->s.avctx, AV_LOG_DEBUG, "NAL %d at %d/%d length %d\n", h->nal_unit_type, buf_index, buf_size, dst_length);
         }
