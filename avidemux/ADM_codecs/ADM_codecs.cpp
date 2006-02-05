@@ -89,6 +89,7 @@ uint8_t isMpeg4Compatible( uint32_t fourcc)
 	       	CHECK("xvid");
 	       	CHECK("XVID");
           	CHECK("BLZ0");
+		CHECK("M4S2");
 
           return divx4;
 
