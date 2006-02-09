@@ -27,6 +27,7 @@
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
+#include "ADM_toolkit/ADM_quota.h"
 #include "ADM_dialog/DIA_idx_pg.h"
 
 
@@ -161,7 +162,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         
         demuxer->open(realname);
 
-        out=fopen(file,"wt");
+        out=qfopen(file,"wt");
         if(!out)
         {
                         printf("\n Error : cannot open index !");
@@ -169,28 +170,31 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                         delete [] realname;
                         return 0;
         }
-        fprintf(out,"ADMX0003\n");
-        fprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
-        fprintf(out,"File     : %s\n",realname);
-        fprintf(out,"Append   : %d\n",multi);
-        fprintf(out,"Image    : %c\n",'P'); // Progressive
-        fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",0,0,0); // width...
-        fprintf(out,"Nb Gop   : %05lu \n",0); // width...
-        fprintf(out,"Nb Images: %08lu \n",0); // width...
-        fprintf(out,"Nb Audio : %02lu\n",nbTracks-1); 
-        fprintf(out,"Main aud : %02lu\n",preferedAudio); 
-        fprintf(out,"Streams  : ");
+        qfprintf(out,"ADMX0003\n");
+        qfprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
+        qfprintf(out,"File     : %s\n",realname);
+        qfprintf(out,"Append   : %d\n",multi);
+        qfprintf(out,"Image    : %c\n",'P'); // Progressive
+        qfprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",0,0,0); // width...
+        qfprintf(out,"Nb Gop   : %05lu \n",0); // width...
+        qfprintf(out,"Nb Images: %08lu \n",0); // width...
+        qfprintf(out,"Nb Audio : %02lu\n",nbTracks-1); 
+        qfprintf(out,"Main aud : %02lu\n",preferedAudio); 
+        qfprintf(out,"Streams  : ");
         for(int s=0;s<nbTracks;s++)
         {
-                if(!s) fprintf(out,"V%04x:%04x ",tracks[0].pid,tracks[0].pes);
-                        else fprintf(out,"A%04x:%04x ",tracks[s].pid,tracks[s].pes);                
+                if(!s){
+			qfprintf(out,"V%04x:%04x ",tracks[0].pid,tracks[0].pes);
+		}else{
+			qfprintf(out,"A%04x:%04x ",tracks[s].pid,tracks[s].pes);                
+		}
         }
-        fprintf(out,"\n");
-        fprintf(out,"# NGop NImg nbImg type:abs:rel:size ...\n"); 
+        qfprintf(out,"\n");
+        qfprintf(out,"# NGop NImg nbImg type:abs:rel:size ...\n"); 
 
         uint8_t  firstGop=1;
         uint8_t  grabbing=0,seq_found=0;
-        uint32_t imageW=0, imageH=0, imageFps=0;
+        uint32_t imageW=0, imageH=0, imageAR=0, imageFps=0;
         uint32_t total_frame=0,val;
 
         uint32_t temporal_ref,ftype;
@@ -245,6 +249,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                 imageW=val>>20;
                                                 imageW=((imageW+15)&~15);
                                                 imageH= (((val>>8) & 0xfff)+15)& ~15;
+						imageAR=(val>>4)&0xf;
                                                 imageFps= FPS[val & 0xf];
                                                 demuxer->forward(4);
                                                 break;
@@ -253,7 +258,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
 #ifdef SHOW_PTS
                                                 if(pts!=ADM_NO_PTS)
                                                 {
-                                                fprintf(out,"# %lu\n",pts/90);
+                                                qfprintf(out,"# %lu\n",pts/90);
                                                 }
 #endif
                                                 uint32_t gop;   
@@ -330,6 +335,12 @@ stop_found:
 
          dumpPts(out,demuxer,firstPicPTS,nbTracks);
 
+	if( imageAR == 2 || imageAR == 3 ){
+		qfprintf(out,"# Video Aspect Ratio : %s\n", (imageAR == 2 ? "4:3" : "16:9"));
+	}else{
+		GUI_Error_HIG("Can't determine aspect ratio",NULL);
+	}
+
         /* Now update......... */
           fseeko(out,0,SEEK_SET);
         // Update if needed
@@ -374,16 +385,16 @@ stop_found:
 
         // Now dump the delta PTS
         // *****************Update header*************
-        fprintf(out,"ADMX0003\n");
-        fprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
-        fprintf(out,"File     : %s\n",realname);
-        fprintf(out,"Append   : %d\n",multi);
-        fprintf(out,"Image    : %c\n",type); // Progressive
-        fprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",imageW,imageH,imageFps); // width...
-        fprintf(out,"Nb Gop   : %05lu \n",nbGop); // width...
-        fprintf(out,"Nb Images: %08lu \n",nbImage); // width...
+        qfprintf(out,"ADMX0003\n");
+        qfprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
+        qfprintf(out,"File     : %s\n",realname);
+        qfprintf(out,"Append   : %d\n",multi);
+        qfprintf(out,"Image    : %c\n",type); // Progressive
+        qfprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",imageW,imageH,imageFps); // width...
+        qfprintf(out,"Nb Gop   : %05lu \n",nbGop); // width...
+        qfprintf(out,"Nb Images: %08lu \n",nbImage); // width...
 
-        fclose(out);
+        qfclose(out);
         delete work;  
 
         printf("*********Indexing stopped***********\n");
@@ -428,14 +439,14 @@ uint64_t stats[nbTracks],p;
 double d;
 
         if(!demuxer->getAllPTS(stats)) return 0;
-        fprintf(fd,"# Video 1st PTS : %07u\n",firstPts);
+        qfprintf(fd,"# Video 1st PTS : %07u\n",firstPts);
         if(firstPts==ADM_NO_PTS) return 1;
         for(int i=1;i<nbTracks;i++)
         {
                 p=stats[i];
                 if(p==ADM_NO_PTS)
                 {
-                        fprintf(fd,"# track %d no pts\n",i);
+                        qfprintf(fd,"# track %d no pts\n",i);
                 }
                 else
                 {
@@ -443,8 +454,8 @@ double d;
                         d=firstPts; // it is in 90 khz tick
                         d-=stats[i];
                         d/=90.;
-                        fprintf(fd,"# track %d PTS : %07u ",i,stats[i]);
-                        fprintf(fd," delta=%04d ms\n",(int)d);
+                        qfprintf(fd,"# track %d PTS : %07u ",i,stats[i]);
+                        qfprintf(fd," delta=%04d ms\n",(int)d);
                 }
 
         }
@@ -459,21 +470,21 @@ uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel,uint32_t
 uint64_t stats[nbTracks];
 
         frames[nbPushed-1].size=demuxer->elapsed()+2;
-        fprintf(fd,"V %03u %06u %02u ",nbGop,nbImage,nbPushed);
+        qfprintf(fd,"V %03u %06u %02u ",nbGop,nbImage,nbPushed);
 
         // For each picture Type : abs position : relat position : size
         for(uint32_t i=0;i<nbPushed;i++) 
         {
 
-                fprintf(fd,"%c:%08"LLX",%05x",
+                qfprintf(fd,"%c:%08"LLX",%05x",
                         Type[frames[i].type],
                         frames[i].abs,
                         frames[i].rel);
-                fprintf(fd,",%05x ",
+                qfprintf(fd,",%05x ",
                         frames[i].size);
         }
         
-        fprintf(fd,"\n");
+        qfprintf(fd,"\n");
 
         // audio if any
         //*******************************************
@@ -484,16 +495,16 @@ uint64_t stats[nbTracks];
         {
                 demuxer->getStats(stats);
                 
-                fprintf(fd,"A %u %"LLX" ",nbImage,abs);
+                qfprintf(fd,"A %u %"LLX" ",nbImage,abs);
                 for(uint32_t i=1;i<nbTracks;i++)
                 {
-                        fprintf(fd,":%"LLX" ",stats[i]);
+                        qfprintf(fd,":%"LLX" ",stats[i]);
                 }
-                fprintf(fd,"\n");
+                qfprintf(fd,"\n");
                 
         }
         // Print some gop stamp infos, does not hurt
-        fprintf(fd,"# Timestamp %02d:%02d:%02d,%03d\n",lastStamp.hh,lastStamp.mm,lastStamp.ss,lastStamp.ff);
+        qfprintf(fd,"# Timestamp %02d:%02d:%02d,%03d\n",lastStamp.hh,lastStamp.mm,lastStamp.ss,lastStamp.ff);
         nbGop++;
         nbImage+=nbPushed;
         nbPushed=0;
