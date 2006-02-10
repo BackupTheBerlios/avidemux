@@ -24,6 +24,7 @@
 
 #include <dirent.h>
 #include <errno.h>
+#include <sys/stat.h>
 #ifndef CYG_MANGLING
 	#include <unistd.h>
 #endif
@@ -179,12 +180,40 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 			}
 			else // write
 			{
-				if(fd)
-				{
+				if(fd){
+				  struct stat buf;
+				  int fdino;
 					fclose(fd);
 					if(!GUI_Question("Overwrite file ?"))
 						return;
+	                                /*
+	                                ** JSC Fri Feb 10 00:07:30 CET 2006
+	                                ** compare existing output file inode against each current open files inode
+	                                ** i'm ignoring st_dev, so we may get false positives
+	                                ** i'm testing until fd=1024, should be MAXFD computed by configure
+	                                ** keep in mind:
+	                                ** you can overwrite .idx files, they are loaded into memory and closed soon
+	                                ** you cannot overwrite segment data files, all files are keeped open and
+	                                **   are detected here
+	                                */
+					if( lstat(name,&buf) == -1 ){
+						fprintf(stderr,"lstat(%s) failed\n",name);
+						return;
+					}
+					fdino = buf.st_ino;
+					for(int i=0;i<1024;i++){
+						if( fstat(i,&buf) != -1 ){
+							if( buf.st_ino == fdino ){
+							  char str[512];
+								snprintf(str,512,"File \"%s\" exists and is opened by avidemux",name);
+								GUI_Error_HIG(str,
+								              "It could be possible that you try to overwrite an input file!");
+								return;
+							}
+						}
+					}
 				}
+
 				// check we have right access to it
 				fd=fopen(name,"wb");
 				if(!fd)
