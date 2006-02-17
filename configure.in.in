@@ -38,7 +38,13 @@ AC_CANONICAL_HOST
 dnl Perform program name transformation
 AC_ARG_PROGRAM
 dnl Automake doc recommends to do this only here. (Janos)
-AM_INIT_AUTOMAKE(avidemux,2.1.00cvs)
+if [[ -f .svn/entries ]]; then
+   rev=`awk -F\" '$1 ~ /revision=$/ { print $2 }' .svn/entries`
+   test -z "$rev" && rev="unknown"
+   AM_INIT_AUTOMAKE(avidemux,"2.2.0 svn rev $rev")
+else
+   AM_INIT_AUTOMAKE(avidemux,"2.2.0")
+fi
 
 dnl almost the same like KDE_SET_PEFIX but the path is /usr/local
 dnl
