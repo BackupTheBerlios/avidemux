@@ -109,6 +109,7 @@ uint8_t  *videoExtraData=NULL;
 uint8_t *dummy;
 WAVHeader *audioinfo=NULL;
 int prefill=1;
+uint32_t displayFrame=0;
           
         // Setup video
         
@@ -174,7 +175,7 @@ int prefill=1;
         // ___________ Read 1st frame _________________
              
              ADM_assert(_encode);
-             if(!_encode->encode ( 0, &len, videoBuffer, &flags))
+             if(!_encode->encode ( 0, &len, videoBuffer, &flags,&displayFrame))
              {
                         GUI_Error_HIG ("Error while encoding", NULL);
                         goto  stopit;
@@ -256,7 +257,7 @@ int prefill=1;
                      }
                }
                ADM_assert(_encode);
-               if(!_encode->encode ( frame, &len, videoBuffer, &flags))
+               if(!_encode->encode ( frame, &len, videoBuffer, &flags,&displayFrame))
                {
                         GUI_Error_HIG ("Error while encoding", NULL);
                         goto  stopit;
@@ -264,7 +265,7 @@ int prefill=1;
                 // If the encoder pops empty frames at the beginning, wait a bit
                 if(len) prefill=0;
                 if(!len && prefill) continue; // Prefilling encoder if needed
-                muxer->writeVideoPacket( len,flags,videoBuffer,frame,frame);
+                muxer->writeVideoPacket( len,flags,videoBuffer,frame,displayFrame);
 
                encoding_gui->setFrame(frame,total);
                encoding_gui->feedFrame(len);
