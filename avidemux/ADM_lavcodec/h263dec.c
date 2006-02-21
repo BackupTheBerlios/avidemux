@@ -519,8 +519,17 @@ retry:
     } else {
         ret = h263_decode_picture_header(s);
     }
+        //MEANX we need to do it here also for quicktime file / ctts atom 
+        // we need the correct frame type, and qt file may contain 
+        // vop not coded frame.
+        pict->pict_type=s->current_picture.pict_type= s->pict_type;
+        pict->key_frame=s->current_picture.key_frame= s->pict_type == I_TYPE;
+        //MEANX
 
-    if(ret==FRAME_SKIPPED) return get_consumed_bytes(s, buf_size);
+    if(ret==FRAME_SKIPPED) 
+    {
+        return get_consumed_bytes(s, buf_size);
+    }
 
     /* skip if the header was thrashed */
     if (ret < 0){
@@ -688,10 +697,6 @@ retry:
     // for hurry_up==5
     //s->current_picture.pict_type= s->pict_type;
     //s->current_picture.key_frame= s->pict_type == I_TYPE;
-    	//MEANX
-	pict->pict_type=s->current_picture.pict_type= s->pict_type;
-   	pict->key_frame=s->current_picture.key_frame= s->pict_type == I_TYPE;
-	//MEANX
     /* skip B-frames if we don't have reference frames */
     if(s->last_picture_ptr==NULL && (s->pict_type==B_TYPE || s->dropable)) return get_consumed_bytes(s, buf_size);
     /* skip b frames if we are in a hurry */
