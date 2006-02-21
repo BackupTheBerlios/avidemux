@@ -156,10 +156,12 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                         if(isMpeg4Compatible(info->fcc))
                         {
                                 c->codec_id = CODEC_ID_MPEG4;
+                                c->has_b_frames=1; // in doubt...
                         }else
                         {
                                 if(isH264Compatible(info->fcc))
                                 {
+                                        c->has_b_frames=1; // in doubt...
                                         c->codec_id = CODEC_ID_H264;
                                         c->codec=new AVCodec;
                                         memset(c->codec,0,sizeof(AVCodec));
@@ -453,7 +455,7 @@ double p,d;
   	AVPacket pkt;
             av_init_packet(&pkt);
 	    
-	p=displayframe+2;      // Pts
+	p=displayframe+1;      // Pts
 	p=(p*1000*1000*1000);
 	p=p/_fps1000;
 	
