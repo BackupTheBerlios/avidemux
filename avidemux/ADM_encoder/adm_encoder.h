@@ -80,6 +80,12 @@ class Encoder
 				virtual ~Encoder( void );
 				virtual uint8_t isDualPass( void )=0;
 				virtual uint8_t configure(AVDMGenericVideoStream *instream)=0;
+                                virtual uint8_t encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags,uint32_t *displayFrameNo)
+                                {
+                                        *displayFrameNo=frame;
+                                        return encode(frame,len,out,flags);
+                                }
+
 				virtual uint8_t encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags)=0;
 				virtual uint8_t stop( void)=0;
 				virtual uint8_t getLastQz( void) { return 31;};

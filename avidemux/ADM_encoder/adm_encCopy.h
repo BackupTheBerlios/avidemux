@@ -35,6 +35,8 @@ public:
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
   virtual uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
                           uint32_t * flags);
+  virtual uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
+                          uint32_t * flags,uint32_t *displayFrame);
   virtual uint8_t setLogFile (const char *p, uint32_t fr);
   virtual uint8_t stop (void);
   virtual uint8_t startPass2 (void);

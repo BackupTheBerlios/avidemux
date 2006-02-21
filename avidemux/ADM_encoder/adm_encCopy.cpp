@@ -110,9 +110,16 @@ next:
 
                 return 1;
 }
-/****************************************************************/
 uint8_t EncoderCopy::encode (uint32_t frame, uint32_t * len, uint8_t * out,
                           uint32_t * flags)
+{
+        return encode (  frame,  len,  out, flags,NULL);
+}
+
+
+/****************************************************************/
+uint8_t EncoderCopy::encode (uint32_t frame, uint32_t * len, uint8_t * out,
+                          uint32_t * flags,uint32_t *displayFrame)
 {
         uint8_t ret=0;
 
@@ -125,6 +132,7 @@ uint8_t EncoderCopy::encode (uint32_t frame, uint32_t * len, uint8_t * out,
         if(!video_body->isReordered(frameStart+frame))
         {
                ret=video_body->getFrameNoAlloc (_frameStart + frame, out, len,flags);
+               if(displayFrame) *displayFrame=frame;
                return ret;
         }
         // it has PTS/DTS stuff so we need to reorder it
@@ -142,6 +150,7 @@ uint8_t EncoderCopy::encode (uint32_t frame, uint32_t * len, uint8_t * out,
                                         aprintf("\tP Frame not sent, sending it :%lu\n",forward);
                                         ret = video_body->getFrameNoAlloc (forward, out, len,flags);
                                         _lastIPFrameSent=forward;
+                                        if(displayFrame) *displayFrame=forward-_frameStart;
 
                                 }
                                 else
@@ -150,6 +159,7 @@ uint8_t EncoderCopy::encode (uint32_t frame, uint32_t * len, uint8_t * out,
                                         // send n-1
                                         aprintf("\tP Frame already, sending  :%lu\n",frameStart+frame-1);
                                         ret = video_body->getFrameNoAlloc (_frameStart+frame-1,out, len,flags);
+                                        if(displayFrame) *displayFrame=frame-1;
 
                                 }
 
@@ -161,12 +171,14 @@ uint8_t EncoderCopy::encode (uint32_t frame, uint32_t * len, uint8_t * out,
                                 {
                                         aprintf("\tSending Last B-frame :(%lu)\n",_frameStart + frame-1);
                                         ret= video_body->getFrameNoAlloc (_frameStart + frame-1,out, len,flags);
+                                        if(displayFrame) *displayFrame=frame-1;
 
                                 }
                                 else
                                 {
                                         aprintf("\tJust sending it :(%lu)-(%lu)\n",_frameStart + frame,_lastIPFrameSent);
                                         ret= video_body->getFrameNoAlloc (_frameStart + frame, out, len,flags);
+                                        if(displayFrame) *displayFrame=frame;
 
                                 }
                         }
