@@ -479,8 +479,9 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                         ADIO.channels=tom.read16();
                                         ADIO.bitspersample=tom.read16();
                                         tom.read16();
-                                        ADIO.encoding=WAV_PCM;
-                                        ADIO.byterate=ADIO.frequency=tom.read32();      
+                                        ADIO.encoding=WAV_LPCM;
+                                        ADIO.frequency=tom.read32();      
+                                        ADIO.byterate=ADIO.frequency*ADIO.bitspersample*ADIO.channels/8;
                                         printf("Byterate  :%lu\n",ADIO.byterate);
                                         printf("Frequency :%lu\n",ADIO.frequency);
                                         printf("Bps       :%lu\n",ADIO.bitspersample);
@@ -599,7 +600,23 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                         ADIO.byterate=12000/8;
 					
 					tom.skipAtom();
-					break;					
+					break;
+                        case MKFCCR('c','t','t','s'): // Composition time to sample             
+                                {
+                                int nbCtts=0;
+                                printf("ctts:%lu\n",tom.read32()); // version & flags
+                                nbCtts=tom.read32();
+                                printf("Composition Time ctts atom found (%lu)\n",nbCtts);
+                                printf("Using myscale %lu\n",myScale);
+                                if(nbCtts>5) nbCtts=45;
+                                for(i=0;i<nbCtts;i++)
+                                {
+                                        printf("-->ctts: pts/dts nb :%02u",tom.read32());
+                                        printf("  offset:%04u (unscaled)\n",tom.read32());       
+                                }
+                                tom.skipAtom(); 
+                                }
+                                break;  
 			case MKFCCR('s','t','t','s'): // time sample table stts
 				
 				printf("stts:%lu\n",tom.read32()); // version & flags
@@ -1107,7 +1124,8 @@ uint32_t i,j,cur;
 		uint32_t nbPacket;
 
 		chunk_size=Sz[0]/nbCo;
-
+                
+                printf(" chunk_size : %lu %u / %u \n",chunk_size,Sz[0],nbCo);
 		*outNbChunk=nbPacket=nbCo*(1+(chunk_size/packet_size));
 		printf("All the same size : %lu\n",chunk_size);
 		printf("Using packet size of %lu, %lu packets ..\n",packet_size,*outNbChunk);
