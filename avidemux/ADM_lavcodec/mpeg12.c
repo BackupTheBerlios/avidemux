@@ -550,7 +550,10 @@ int tff,rff; //MEANX
         put_bits(&s->pb, 1, s->q_scale_type);
         put_bits(&s->pb, 1, s->intra_vlc_format);
         put_bits(&s->pb, 1, s->alternate_scan);
-        put_bits(&s->pb, 1, s->repeat_first_field);
+/*
+  MEANX PULLDOWN      put_bits(&s->pb, 1, s->repeat_first_field);
+*/
+        put_bits(&s->pb, 1, rff);
         s->progressive_frame = s->progressive_sequence;
         put_bits(&s->pb, 1, s->chroma_420_type=s->progressive_frame);
         put_bits(&s->pb, 1, s->progressive_frame);
