@@ -40,7 +40,7 @@ typedef struct MOVIentry {
     unsigned int samplesInChunk;
     char         key_frame;
     unsigned int entries;
-    int32_t      pts_dts_offset;        // Assume 1 sample per chunk
+    int32_t      pts_dts_offset;        // MEANX Assume 1 sample per chunk, unit is us
 } MOVIentry;
 
 typedef struct MOVAtom {
@@ -60,7 +60,7 @@ typedef struct MOVIndex {
     long        sampleCount;
     long        sampleDuration;
     int         hasKeyframes;
-    int         needCtts;
+    int         needCtts;/* Meanx */
     int         language;
     int         trackID;
     AVCodecContext *enc;
@@ -122,6 +122,7 @@ static offset_t updateSize (ByteIOContext *pb, offset_t pos)
 
     return curpos - pos;
 }
+/* Meanx */
 static int mov_start_atom(ByteIOContext *pb, MOVAtom *atom,unsigned int name)
 {
 
@@ -139,7 +140,7 @@ unsigned long int pos;
     return updateSize (pb,  atom->startPos);
     
 } 
-
+/* /Meanx */
 /* Chunk offset atom */
 static int mov_write_stco_tag(ByteIOContext *pb, MOVTrack* track)
 {
@@ -205,6 +206,7 @@ static int mov_write_stsz_tag(ByteIOContext *pb, MOVTrack* track)
     }
     return updateSize (pb, pos);
 }
+/* Meanx */
 /*
         Composition time to sample atom
 */
@@ -213,7 +215,7 @@ int mov_write_ctts_tag(ByteIOContext *pb, MOVTrack* track)
 int index = 0, oldval = -1, i;
 MOVAtom ctts;
 int cl,id;
-double offset;
+int64_t offset;
         
         
         mov_start_atom(pb, &ctts,'ctts');
@@ -224,10 +226,12 @@ double offset;
            cl = i / MOV_INDEX_CLUSTER_SIZE; // could be smarter
            id = i % MOV_INDEX_CLUSTER_SIZE;
 
-           offset=(double)track->cluster[cl][id].pts_dts_offset;
-           offset/=1000000.;
-           offset*= track->timescale;
-           offset+=0.5; // round up
+           offset=(int64_t)track->cluster[cl][id].pts_dts_offset;
+           offset*= (int64_t)track->timescale;
+           offset+=500000; // round up
+           offset/=(int64_t)1000000; // us -> s
+           
+           
            // pts_dts offset is in us
          
            //offset=av_rescale_rnd(offset,  track->timescale,1000*1000, AV_ROUND_UP);
@@ -238,6 +242,7 @@ double offset;
         
 
 }
+/* /Meanx */
 /* Sample to chunk atom */
 static int mov_write_stsc_tag(ByteIOContext *pb, MOVTrack* track)
 {
@@ -693,10 +698,12 @@ static int mov_write_stbl_tag(ByteIOContext *pb, MOVTrack* track)
         track->hasKeyframes)
         {
                 mov_write_stss_tag(pb, track);
-             //   if(track->enc->has_b_frames && track->needCtts)
+/* Meanx */
+                if(track->enc->has_b_frames)
                 {
                     mov_write_ctts_tag(pb, track);     
                 }
+/* /Meanx */
         }
     mov_write_stsc_tag(pb, track);
     mov_write_stsz_tag(pb, track);
@@ -1593,6 +1600,7 @@ static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
         trk->cluster[cl][id].key_frame = !!(pkt->flags & PKT_FLAG_KEY);
         if(trk->cluster[cl][id].key_frame)
             trk->hasKeyframes = 1;
+/* Meanx */
         if(enc->has_b_frames)
         {
                 // 
@@ -1602,6 +1610,7 @@ static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
         {
                 trk->cluster[cl][id].pts_dts_offset=0;
         }
+/* /Meanx */
     }
     trk->enc = enc;
     trk->entry++;
