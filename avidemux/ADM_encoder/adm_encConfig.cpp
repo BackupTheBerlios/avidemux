@@ -79,6 +79,7 @@ const char* encoderGetIndexedName(uint32_t i);
 #include "ADM_codecs/ADM_mjpegEncode.h"
 #include "adm_encmjpeg.h"
 #include "adm_encCopy.h"
+#include "adm_encyv12.h"
 
 #define FF_TRELLIS 0 // use treillis for mpeg1 encoding
 /*
@@ -618,7 +619,9 @@ Encoder *e=NULL;
                                         e=new   EncoderCopy(NULL);
                                         break;
 					default:
-
+                case CodecYV12 :
+                                                e=new   EncoderYV12( );
+                                        break;
       	 	case CodecFF :
 				  		e=new   EncoderFFMPEG(FF_MPEG4,&ffmpegMpeg4);
 				    	break;

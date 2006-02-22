@@ -36,11 +36,12 @@
 	CodecXSVCD,
 	CodecXDVD,
 	CodecXvid4,
-    CodecFFhuff,
+        CodecFFhuff,
         
 #ifdef USE_X264
     CodecX264,
 #endif        
+        CodecYV12,
 	CodecDummy	
 };
 

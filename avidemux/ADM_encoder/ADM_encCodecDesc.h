@@ -2,6 +2,24 @@
 #define ADM_CODEC_CONFIG_
 
 #include "ADM_vidEncode.hxx"
+// Yv12
+
+COMPRES_PARAMS  yv12codec=
+{
+                CodecYV12,
+                "YV12 (raw)",
+                "YV12",
+                "YV12",
+                COMPRESS_CQ,
+                1,
+                1500,
+                700,
+                ADM_ENC_CAP_CQ,
+                0,
+                NULL,
+                0,
+                NULL
+};
 /********************** FFMPEG MPEG4*************************/
 uint8_t getFFCompressParams(COMPRES_PARAMS *incoming);
 
@@ -575,6 +593,7 @@ COMPRES_PARAMS *AllVideoCodec[]=
 &ffmpegHUFF,
 &ffmpegFFHUFF,
 &ffmpegFFV1,
+&yv12codec,
 //&ffmpegSnow,
 &DUMMYONE  
 
