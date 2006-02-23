@@ -40,7 +40,7 @@
 #include "ADM_filter/video_filters.h"
 
 
-static FILTER_PARAM nullParam={0,{""}};
+static FILTER_PARAM nullParam={2,{"chroma","luma"}};
 
 
 SCRIPT_CREATE(largeMedian_script,ADMVideoLargeMedian,nullParam);
