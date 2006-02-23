@@ -54,7 +54,6 @@
 EncoderYV12::EncoderYV12 (void)
 {
 
-  strcpy (_logname, "");
   _frametogo = 0;
 };
 EncoderYV12::~EncoderYV12 ()
@@ -69,16 +68,15 @@ uint8_t         EncoderYV12::configure (AVDMGenericVideoStream * instream)
   ADM_assert (instream);
   ADV_Info *info;
 
-        //uint32_t flag1,flag2,flag3;
   _in=instream;
   info = instream->getInfo ();
   _w = info->width;
   _h = info->height;
+  _frametogo=info->nb_frames;
   _vbuffer=new ADMImage(_w,_h);
   ADM_assert(_vbuffer);
-        printf ("\n Yv12 Encoder ready , w: %lu h:%lu mode:%d", _w, _h, _state);
-        return 1;
-
+  printf ("\n Yv12 Encoder ready , w: %lu h:%lu mode:%d", _w, _h, _state);
+  return 1;
 }
 
 
@@ -106,7 +104,7 @@ EncoderYV12::encode (uint32_t frame, uint32_t * len, uint8_t * out,
       printf ("\n Error : Cannot read incoming frame !");
       return 0;
     }
-
+  l=(_w*_h*3)>>1;
   *len=l;
   *flags=AVI_KEY_FRAME;
   memcpy(out,_vbuffer->data,l);

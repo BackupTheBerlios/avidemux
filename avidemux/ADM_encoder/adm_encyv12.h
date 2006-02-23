@@ -25,10 +25,7 @@ class EncoderYV12:public Encoder
 {
 
 protected:
-        uint32_t _frameStart;
-        uint32_t _total;
-        
-        
+
 public:
         EncoderYV12 (void );
         ~EncoderYV12() ; // can be called twice if needed ..
@@ -46,7 +43,7 @@ public:
           uint8_t startPass1(void) {return 0;}
           uint8_t startPass2(void) {return 0;}
           uint8_t setLogFile(const char*, uint32_t) {return 0;}
-          uint8_t hasExtraHeaderData(unsigned int*l, unsigned char**v) { *l=0;*v=NULL;return 0;};
+          uint8_t hasExtraHeaderData(uint32_t *l, uint8_t **v) { *l=0;*v=NULL;return 0;};
           const char *getCodecName(void) { return "YV12"; } 
           const char *getFCCHandler(void) { return "YV12"; } 
           const char *getDisplayName(void) { return "YV12"; } 
