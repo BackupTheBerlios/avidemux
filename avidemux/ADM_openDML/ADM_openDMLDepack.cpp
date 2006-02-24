@@ -90,7 +90,9 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 		{
 			if(nbDuped)
 			{
+                                aprintf(" skipped\n");
 				nbDuped--;
+                                aprintf("At %u, %d duped!\n",img,nbDuped);
 			}
 			else
 			{
@@ -101,7 +103,10 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 			img++;
 			continue;
 		}
-		
+		if(nbDuped)
+                {
+                        aprintf("At %u, %d duped!\n",img,nbDuped);
+                }
 		// now search vop header in this
 		// Search first vop
 		
@@ -115,6 +120,19 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 		
 		if(nbVop==1) // only one vop
 		{
+                        if(myVops[0].type==AVI_KEY_FRAME)
+                        {
+                                if(nbDuped)
+                                {
+                                        ADM_assert(targetIndex);
+                                        if(newIndex[targetIndex-1].intra==AVI_B_FRAME)
+                                        {
+                                                printf("Trying to fix wrong vop packed\n");
+                                                targetIndex--;
+                                                nbDuped--;
+                                        }
+                                }
+                        }
 			memcpy(&newIndex[targetIndex],&_idx[img],sizeof(_idx[0]));
 			newIndex[targetIndex].intra=myVops[0].type;
 			aprintf("Only one frame found\n");
@@ -131,6 +149,10 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 				
 		
 		uint32_t place;
+                if(nbVop>2)
+                {
+                        aprintf("At %u, %d vop!\n",img,nbVop);
+                }
 		for(uint32_t j=0;j<nbVop;j++)
 		{
 
@@ -194,7 +216,7 @@ uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop)
 				// Analyse a bit the vop header
 				uint8_t coding_type=begin[1];
 				coding_type>>=6;
-				aprintf("\t %d Img type:%s\n",*nb,s_voptype[coding_type]);
+				aprintf("\t at %u %d Img type:%s\n",off,*nb,s_voptype[coding_type]);
 				switch(coding_type)
 				{
 					case 0: voptype=AVI_KEY_FRAME;break;
