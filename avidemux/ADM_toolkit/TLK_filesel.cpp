@@ -196,10 +196,12 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 	                                ** you cannot overwrite segment data files, all files are keeped open and
 	                                **   are detected here
 	                                */
+#ifndef CYG_MANGLING
 					if( lstat(name,&buf) == -1 ){
 						fprintf(stderr,"lstat(%s) failed\n",name);
 						return;
 					}
+#endif
 					fdino = buf.st_ino;
 					for(int i=0;i<1024;i++){
 						if( fstat(i,&buf) != -1 ){
