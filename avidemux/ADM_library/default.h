@@ -32,6 +32,9 @@
 	#define __STDC_FORMAT_MACROS
 	#include <inttypes.h>
 	#define GOT_TYPES
+#ifndef SCNu8
+#define SCNu8 "u"
+#endif
 #endif
 
 #ifndef GOT_TYPES
