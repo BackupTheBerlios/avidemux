@@ -184,8 +184,30 @@ have_darwin=no
 have_amd64=no
 have_ppc=no
 have_x264=yes
+dnl ____________________ Cygwin / mingwin ? ___________
+use_cygwin=no
+AC_MSG_CHECKING(win32 host)
+
+
+AC_TRY_COMPILE([
+	#if !defined(__CYGWIN__) &&!defined(__MINGW32__)
+		#error
+	#endif
+
+],
+int z=0
+,[
+  use_cygwin=yes
+])
+
+AC_MSG_RESULT($use_cygwin)
+
 dnl _____________ needed for multithreaded x264 and for mplex_________
-LDFLAGS="$LDFLAGS -lpthread "
+if test "x$use_cygwin" = "xyes"; then
+	LDFLAGS="$LDFLAGS -lpthreadGC1 -lX11 -lXext -L/usr/X11R6/lib"
+else
+	LDFLAGS="$LDFLAGS -lpthread "
+fi
 dnl _________________ malloc.h ___________________
 
 AC_CHECK_HEADERS(malloc.h,have_malloc_h=yes)
@@ -721,24 +743,6 @@ CXXFLAGS="$CXXFLAGS -pg "
 CFLAGS="$CFLAGS -pg "
 LDFLAGS="$LDFLAGS -pg "
 fi
-dnl ____________________ Cygwin / mingwin ? ___________
-use_cygwin=no
-AC_MSG_CHECKING(win32 host)
-
-
-AC_TRY_COMPILE([
-	#if !defined(__CYGWIN__) &&!defined(__MINGW32__)
-		#error
-	#endif
-
-],
-int z=0
-,[
-  use_cygwin=yes
-])
-
-AC_MSG_RESULT($use_cygwin)
-
 dnl __________________SPIDERMONKEY ______________
 have_sm=yes
 SMONKEY_CFLAGS=""
@@ -783,6 +787,9 @@ dnl ________/SPIDERMONKEY__________
 dnl ______________________________
 dnl          Xvideo
 dnl
+if test "x$use_cygwin" = "xyes"; then
+	enable_xv="no";
+else
 AC_ARG_ENABLE([xv],
 	AC_HELP_STRING([--disable-xv], [Force compilation without XV support. (default: test)]),
 	[enable_xv=${enableval}], [enable_xv=test])
@@ -805,7 +812,7 @@ if test "x$enable_xv" != "xno"; then
 		AC_MSG_ERROR([XV support requested but not found.])
 	fi
 fi
-
+fi
 dnl
 dnl SDL
 dnl
