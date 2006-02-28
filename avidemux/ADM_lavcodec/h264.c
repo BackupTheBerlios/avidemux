@@ -7680,9 +7680,13 @@ static int decode_frame(AVCodecContext *avctx,
 
     {
         Picture *out = s->current_picture_ptr;
-#if 0 //decode order
-        *data_size = sizeof(AVFrame);
-#else
+/*#if 0 //decode order*/
+        if(s->flags& CODEC_FLAG_LOW_DELAY)
+                *data_size = sizeof(AVFrame);
+        else
+        {
+/*#else*/
+
         /* Sort B-frames into display order */
         Picture *cur = s->current_picture_ptr;
         Picture *prev = h->delayed_output_pic;
@@ -7743,8 +7747,8 @@ static int decode_frame(AVCodecContext *avctx,
         if(prev && prev != out && prev->reference == 1)
             prev->reference = 0;
         h->delayed_output_pic = out;
-#endif
-
+/*#endif*/
+        }
         if(out)
             *pict= *(AVFrame*)out;
         else
