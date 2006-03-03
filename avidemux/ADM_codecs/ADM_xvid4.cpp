@@ -32,7 +32,7 @@
 #include "ADM_codecs/ADM_xvid4.h"
 #include "xvid.h"
 #include <ADM_assert.h>
-
+#include "ADM_toolkit/ADM_cpuCap.h"
 
 static const int motion_presets[] = {	
 			0,
@@ -121,6 +121,13 @@ uint8_t 	xvid4Encoder::getResult( void *ress)
 }
 void     xvid4Encoder::createUpdate(void )
 {
+uint32_t nbThread=0;
+                xvid_enc_create.num_threads=0;
+                if(nbThread=ADM_useNbThreads())
+                {
+                        printf("Xvid4 : using %u threads..\n",nbThread);
+                        xvid_enc_create.num_threads=nbThread;
+                }
 		xvid_enc_create.max_bframes=_param.bframes;
 		xvid_enc_create.max_key_interval=_param.max_key_interval;		
 		xvid_enc_create.bquant_ratio = 	_param.bquant_ratio;
