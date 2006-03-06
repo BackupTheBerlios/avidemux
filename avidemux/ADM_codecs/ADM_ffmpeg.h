@@ -45,29 +45,29 @@ typedef enum
 
 class ffmpegEncoder:public encoder
 {
-  protected:uint8_t _init;
-  uint8_t _swap;
-  AVCodecContext *_context;
-  AVFrame _frame;
-  FF_CODEC_ID _id;
-  uint32_t _last_coded_frame;
-  void mplayer_init (void);
-  uint8_t initContext (void);
-  uint8_t gopMpeg1 (void);
-  uint32_t frameType (void);
-  uint8_t encodePreamble (uint8_t * in);
-  uint8_t _settingsPresence;
-  FFcodecSetting _settings;
-    public:uint8_t setConfig (FFcodecSetting * set);
-  uint8_t setLogFile (const char *name);
-    ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id);
+  protected:
+        uint8_t         _init;
+        uint8_t         _swap;
+        AVCodecContext *_context;
+        AVFrame         _frame;
+        FF_CODEC_ID     _id;
+        uint32_t        _last_coded_frame;
+        uint8_t         _settingsPresence;
+        uint8_t         _isMT;
+        FFcodecSetting  _settings;
+        void            mplayer_init (void);
+        uint8_t         initContext (void);
+        uint8_t         gopMpeg1 (void);
+        uint32_t        frameType (void);
+        uint8_t         encodePreamble (uint8_t * in);
 
-
-    virtual ~ ffmpegEncoder ()
-  {
-    printf ("\n destroying..\n");
-    stopEncoder ();
-  }
+    public:
+        uint8_t         setConfig (FFcodecSetting * set);
+        uint8_t         setLogFile (const char *name);
+        void            encoderMT(void);
+        ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id);
+                        ~ ffmpegEncoder ();
+  
   virtual uint8_t stopEncoder (void)
   {
     if (_init)

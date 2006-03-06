@@ -40,6 +40,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
 #include "ADM_codecs/ADM_ffmpeg.h"
+#include "ADM_toolkit/ADM_cpuCap.h"
 //#define TEST_NOB 1
 
 static char LogName[500];
@@ -73,8 +74,20 @@ ffmpegEncoder::ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id):e
   _frame.linesize[0] = _w;
   _frame.linesize[1] = _w >> 1;
   _frame.linesize[2] = _w >> 1;
+  _isMT=0;
 
 };
+ffmpegEncoder::~ ffmpegEncoder ()
+  {
+    printf ("[codec] FF base encoder destroying..\n");
+    if(  _isMT)
+    {
+                printf ("[codec] killing threads\n");
+                avcodec_thread_free(_context);
+                _isMT=0;
+    }
+    stopEncoder ();
+  }
 
 /*
    	Initialize codec in Q mode
@@ -249,15 +262,18 @@ ffmpegEncoder::initContext (void)
   switch (_id)
     {
     case FF_MPEG4:
+      encoderMT();
       WRAP_Open(CODEC_ID_MPEG4);
       break;
     case FF_MSMP4V3:
       WRAP_Open(CODEC_ID_MSMPEG4V3);
       break;
     case FF_MPEG1:
+      encoderMT();
       WRAP_Open(CODEC_ID_MPEG1VIDEO);
       break;
     case FF_MPEG2:
+      encoderMT();
       WRAP_Open(CODEC_ID_MPEG2VIDEO);
       break;
     case FF_H263:
@@ -293,7 +309,23 @@ ffmpegEncoder::initContext (void)
   return 1;
 
 }
+void ffmpegEncoder::encoderMT(void)
+{
+uint32_t nbThread=0;
+                
+        nbThread=ADM_useNbThreads();
+        if(nbThread)
+        {
+                printf("[codec]Enabling MT encoder with %u threads\n",nbThread);
+                 if(0>avcodec_thread_init(_context,nbThread))
+                 {
+                        printf("[codec]Failed!!\n");
+                        return ;
+                 }
+                _isMT=1;
+        }
 
+}
 /*
 		Set user selected matrices.
 
