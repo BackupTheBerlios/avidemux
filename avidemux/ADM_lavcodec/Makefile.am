@@ -55,9 +55,9 @@ libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c $(EXTEND_AMR) \
 		golomb.c 	4xm.c 	cabac.c 	asv1.c vcr1.c cljr.c 	faandct.c 	 	parser.c \
 		roqvideo.c 	xan.c 	rpza.c 	msrle.c 	msvideo1.c 	cinepak.c 	vqavideo.c \
 		idcinvideo.c 	smc.c 	flicvideo.c 	interplayvideo.c 	dpcm.c 	8bps.c vmdav.c \
-	truemotion1.c flac.c g726.c 	qtrle.c lcl.c 	snow.c  \
+		truemotion1.c flac.c g726.c 	qtrle.c lcl.c 	snow.c  \
 		rangecoder.c bitstream.c h264idct.c h261.c amr.c tscc.c \
-		resample2.c imgresample.c
+		resample2.c imgresample.c pthread.c
 	
 
 EXTRA_DIST = 
