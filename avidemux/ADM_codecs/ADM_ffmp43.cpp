@@ -42,6 +42,8 @@
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME  MODULE_CODEC
 #include "ADM_toolkit/ADM_debug.h"
+#include "ADM_toolkit/ADM_cpuCap.h"
+
 //****************************
 #define WRAP_Open(x) \
 {\
@@ -103,7 +105,22 @@ uint32_t u,v;
                                         }
 
 }
-
+void decoderFF::decoderMultiThread(void)
+{
+uint32_t nbThread=0;
+                
+        nbThread=ADM_useNbThreads();
+        if(nbThread)
+        {
+                printf("[codec]Enabling MT decoder with %u threads\n",nbThread);
+                 if(0>avcodec_thread_init(_context,nbThread))
+                 {
+                        printf("[codec]Failed!!\n");
+                        return ;
+                 }
+                _usingMT=1;
+        }
+}
 uint8_t  decoderFF::isDivxPacked( void )
 {
 	int vop, gmc,qpel;
@@ -143,6 +160,7 @@ decoderFF::decoderFF(uint32_t w,uint32_t h) :decoders(w,h)
                                 _gmc=0;
 				_context=NULL;
                                 _refCopy=0;
+                                _usingMT=0;
 #if LIBAVCODEC_BUILD >= 4624
    	_context=avcodec_alloc_context();
 #else
@@ -176,6 +194,13 @@ decoderFF::decoderFF(uint32_t w,uint32_t h) :decoders(w,h)
 
 decoderFF::~decoderFF()
 {
+                if(_usingMT) 
+                {
+                        printf("[decoder] Killing decoding threads\n");
+                        avcodec_thread_free(_context);
+                        _usingMT=0;
+                }
+
 		avcodec_close(_context);
 		ADM_dealloc(_context);
 		delete [] _internalBuffer;	
@@ -187,26 +212,36 @@ uint32_t  decoderFF::frameType( void )
 {
 	uint32_t flag=0;
 
-	#define SET(x) flag=x;aprintf(" Frame is %s\n",#x);
+AVFrame *target;
+	#define SET(x) {flag=x;aprintf(" Frame is %s\n",#x);}
 
-	switch(_frame.pict_type)
+
+        target=&_frame;
+	switch(target->pict_type)
 	{
 		case FF_B_TYPE:
 				SET(AVI_B_FRAME);
-				if(_frame.key_frame)
+				if(target->key_frame)
 					aprintf("\n But keyframe is  set\n");
 				break;
 		
 		case FF_I_TYPE:
 				SET(AVI_KEY_FRAME);
-				if(!_frame.key_frame)
-					aprintf("\n But keyframe is not set\n");
+				if(!target->key_frame)
+                                {
+                                        if(codecId==CODEC_ID_H264)
+                                        {
+                                                SET(AVI_P_FRAME);
+                                        }
+					else
+                                                printf("\n But keyframe is not set\n");
+                                }
 				break;
                 case FF_S_TYPE:
                                 _gmc=1; // No break, just inform that gmc is there
 		case FF_P_TYPE:
 				SET(AVI_P_FRAME);
-				if(_frame.key_frame)
+				if(target->key_frame)
 					aprintf("\n But keyframe is  set\n");
 				break;
 		default:
@@ -217,7 +252,10 @@ uint32_t  decoderFF::frameType( void )
 }
 uint8_t decoderFF::decodeHeaderOnly(void )
 {
-	_context->hurry_up=5;
+        if(codecId==CODEC_ID_H264)
+                _context->hurry_up=4;
+        else
+	       _context->hurry_up=5;
 	printf("\n FFmpeg: Hurry up\n");
 	return 1;
 }
@@ -373,6 +411,7 @@ decoderFFMpeg4VopPacked::decoderFFMpeg4VopPacked(uint32_t w,uint32_t h)       :d
 
       _refCopy=1; // YUV420 only
 	_allowNull=1;
+        decoderMultiThread();
         WRAP_Open(CODEC_ID_MPEG4);
 }
 decoderFFMpeg4::decoderFFMpeg4(uint32_t w,uint32_t h,uint32_t l, uint8_t *d)       :decoderFF(w,h)
@@ -383,6 +422,7 @@ decoderFFMpeg4::decoderFFMpeg4(uint32_t w,uint32_t h,uint32_t l, uint8_t *d)    
                   _refCopy=1; // YUV420 only
                   _context->extradata=(void *)d;
                   _context->extradata_size=(int)l;
+        decoderMultiThread();
  		//  _context->flags|=FF_DEBUG_VIS_MV;
        WRAP_Open(CODEC_ID_MPEG4);
 }
@@ -405,6 +445,7 @@ decoderFFMpeg12::decoderFFMpeg12(uint32_t w,uint32_t h,uint32_t extraLen,uint8_t
 int got_picture=0;
   	_context->flags|=CODEC_FLAG_LOW_DELAY;
         _refCopy=1; // YUV420 only
+        decoderMultiThread();
       WRAP_Open(CODEC_ID_MPEG2VIDEO);
 }
 decoderFFSVQ3::decoderFFSVQ3(uint32_t w,uint32_t h,uint32_t extraLen,uint8_t *extraData)
@@ -442,7 +483,7 @@ decoderFFH264::decoderFFH264(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)  :deco
   _refCopy=1; // YUV420 only
   _context->extradata=(void *)d;
   _context->extradata_size=(int)l;
-
+ _context->flags|=CODEC_FLAG_LOW_DELAY;
   printf("Initializing lavcodec H264 decoder with %d extradata\n",l);
  WRAP_Open(CODEC_ID_H264);
   
@@ -473,6 +514,12 @@ decoderFFMJPEG::decoderFFMJPEG(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
             WRAP_Open(CODEC_ID_MJPEG);
 }
+decoderFFTheora::decoderFFTheora(uint32_t w,uint32_t h,uint32_t l,uint8_t *d)       :decoderFF(w,h)
+{
+            _context->extradata=(void *)d;
+            _context->extradata_size=(int)l;
+            WRAP_Open(CODEC_ID_THEORA);
+}
 decoderSnow::decoderSnow(uint32_t w,uint32_t h)       :decoderFF(w,h)
 {
            WRAP_Open(CODEC_ID_SNOW);
@@ -482,5 +529,6 @@ decoderCamtasia::decoderCamtasia(uint32_t w,uint32_t h,uint32_t bpp)       :deco
            _context->bits_per_sample=bpp;
            WRAP_Open(CODEC_ID_TSCC);
 }
+
 
 #endif

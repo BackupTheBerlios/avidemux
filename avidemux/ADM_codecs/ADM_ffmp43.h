@@ -32,8 +32,10 @@
 					uint32_t		_swapUV;	
 					uint32_t  		frameType( void );
 					uint8_t                 clonePic(AVFrame *src,ADMImage *out);
+                                        void                    decoderMultiThread();
 					uint32_t		_showMv;
                                         uint32_t                _gmc;
+                                        uint32_t                _usingMT;
      public:
                                         
      					decoderFF(uint32_t w,uint32_t h);
@@ -212,6 +214,14 @@ class decoderCamtasia : public decoderFF
                                                 decoderCamtasia(uint32_t w,uint32_t h,uint32_t bpp) ;
         
 }   ;
-
+class decoderFFTheora : public decoderFF
+{
+           protected:
+                                
+                        
+     public:
+                                                decoderFFTheora(uint32_t w,uint32_t h,uint32_t l,uint8_t *d) ;
+        
+}   ;
 
 #endif
