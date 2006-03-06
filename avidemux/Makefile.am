@@ -66,11 +66,13 @@ avidemux2_LDADD   =  \
 ./ADM_dialog/libADM_dialog.a  \
 ./libMpeg2Dec/liblibMpeg2Dec.a   \
 ./ADM_tray/libADM_tray.a \
-./ADM_toolkit/libADM_toolkit.a  \
 ./ADM_dialog/libADM_dialog2.a  \
 ./ADM_colorspace/libADM_colorspace.a \
+  ADM_lavcodec/libavcodec.a \
+./ADM_lavutil/libADM_lavutil.a \
 ./ADM_lavcodec/libpostproc/libpostproc.a \
 ./ADM_library/libADM_library.a \
+./ADM_toolkit/libADM_toolkit.a  \
 $(libmpeg2enc_Altivec) 
 
 
