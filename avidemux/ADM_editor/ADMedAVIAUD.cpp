@@ -73,20 +73,37 @@ _VIDEOS *currentVideo;
 			return r;		
 		}
 		// could not get the cound, rewind and retry
-		printf("EditorPacket:Read failed; retrying\n");
+		printf("EditorPacket:Read failed; retrying (were at seg %lu"   ,_audioseg);
+                printf("sample %llu\n",_audioSample); // FIXME use proper stuff
+                printf("/ %lld)\n",_segments[_audioseg]._audio_duration);
 		if(_audioseg == (_nb_segment - 1))
 		{		
 			printf("EditorPacket : End of *last* stream\n");
 			return 0;
 		}
-		currentVideo->_audiostream->goToTime(0);
-		r=currentVideo->_audiostream->getPacket(dest,len,samples);
-		if(r)
-		{
-			// read it again sam
-			_audioSample+=*samples;
-		}
-		return r;
+                // If we get here, it means we have less audio that it should   
+                // In the current segment. Generally we repeat the segment
+                // Except if the missing data is less than 20 ms, we will compensate later
+                float drift;
+
+                drift=(float)_segments[_audioseg]._audio_duration;
+                drift-=(float)_audioSample;
+                drift/=(float)currentVideo->_audiostream->getInfo()->frequency;
+                drift*=1000.;
+                printf("Seg :%u, Drop %3.3f ms\n",_audioseg,drift);
+                if(drift>10.)
+                {
+                        printf("Drop too high, filling...\n");
+                        currentVideo->_audiostream->goToTime(0);
+                        r=currentVideo->_audiostream->getPacket(dest,len,samples);
+                        if(r)
+                        {
+                                printf("Filled with data from beginning (%u bytes %u samples)\n",*len,*samples);
+                                // read it again sam
+                                _audioSample+=*samples;
+                        }
+                        return r;
+                }
 	}
 	// We have to switch seg
 	// We may have overshot a bit, but...
@@ -100,11 +117,11 @@ _VIDEOS *currentVideo;
 	}
 	// switch segment
 	// We adjust the audiosample to avoid adding cumulative shift
-#if 1	
-	_audioSample-=_segments[_audioseg]._audio_duration;	
-#else	
-	_audioSample=0;
-#endif	
+        uint8_t ret;
+        int64_t adjust=_audioSample-=_segments[_audioseg]._audio_duration;
+
+        if(adjust>0) _audioSample=adjust;
+	       else  _audioSample=0;
 	_audioseg++;
 	// Next audio seg has audio ?
         
@@ -122,7 +139,14 @@ _VIDEOS *currentVideo;
 	_videos[AUDIOSEG]._audiostream->goToTime(starttime);	
 	; // Fresh start samuel
 	printf("EditorPacket : switching to segment %lu\n",_audioseg);
-	return getAudioPacket(dest, len, samples);
+	ret= getAudioPacket(dest, len, samples);
+        if(adjust<0)
+        {
+                adjust=-adjust;
+                if(adjust>_audioSample) _audioSample=0;
+                else _audioSample-=adjust;
+        }
+        return ret;
 }
 //__________________________________________________
 //
