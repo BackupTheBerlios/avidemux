@@ -188,35 +188,26 @@ uint32_t AVDMAviAudioStream::read(uint32_t len, uint8_t * buffer)
 		togo -= avail;
 
 		_current_index++;
-		if (_current_index>=_nb_chunks)
-		  {
-#ifdef VERBOSE_L3
-
-		printf("\n OVR: %lu rel:%lu len:%lu", _abs_position,
-		       _rel_position, togo);
-#endif
-#if 0
-		    _abs_position =_index[0].offset ;
-            	     _rel_position = 0;
-		     _current_index=0;
-		      ADM_assert(len >= togo);
-        	      _pos+=len;
-                      _pos-=togo;
-		      return (len - togo);
-#endif
-			return 0;	      
-
-		  }
+		if (togo && _current_index>=_nb_chunks)
+		      {
+                                printf("\n OVR: %lu rel:%lu lentogo:%lu blocklen %lu", _abs_position,
+	               	               _rel_position, togo,_index[_current_index].size);
+                               printf("Grabbed :%u\n",len-togo);
+                               ADM_assert(len>=togo);
+			       return len-togo;
+                                //return 0;
+		      }
+                
     	else
      	{
 #ifdef VERBOSE_L3
-		printf("\n CONT: %lu rel:%lu len:%lu", _abs_position,
+		printf("\n CONT: %lu rel:%lu len:%lu ", _abs_position,
 		       _rel_position, togo);
 #endif
 		_abs_position = _index[_current_index].offset;
 		_rel_position = 0;
 		fseeko(_fd,_abs_position,SEEK_SET);
-	    }
+        }
       }
     }
     while (togo);

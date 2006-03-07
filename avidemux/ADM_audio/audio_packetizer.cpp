@@ -317,7 +317,7 @@ uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 			}
 			if(packetHead+startOffset+mpegInfo.size>packetTail)
 			{
-				printf("MP3 packetizer: not enough data (start %lu size %lu, needs %lu)\n"
+				printf("MP3 packetizer: not enough data (start %lu needs %lu, available %lu)\n"
 						,startOffset,mpegInfo.size,packetTail-packetHead);
 				packetHead+=1;
 				return 0;
