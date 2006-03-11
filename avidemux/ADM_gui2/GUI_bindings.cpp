@@ -115,7 +115,7 @@ extern aviInfo   *avifileinfo;
 extern GtkWidget	*create_mainWindow (void);
 extern void guiCallback(GtkMenuItem * menuitem, gpointer user_data);
 extern void HandleAction(Action act);
-extern void UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_data);
+extern gboolean UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_data);
 extern void fileReadWrite(SELFILE_CB cb, int rw, char *name);
 
 // To build vcodec
@@ -316,11 +316,8 @@ uint8_t  bindGUI( void )
     gtk_range_set_update_policy (GTK_RANGE (guiSlider), GTK_UPDATE_CONTINUOUS);	    
     
     // keyboard events
-    /*
-     gtk_signal_connect_after(GTK_OBJECT(guiRootWindow), "key_press_event",
-		       GTK_SIGNAL_FUNC(UI_on_key_press),
-		       NULL);
-   */
+    
+   
  	gtk_signal_connect(GTK_OBJECT(guiDrawingArea), "expose_event",
 		       GTK_SIGNAL_FUNC(on_drawingarea1_expose_event),
 		       NULL);
@@ -385,6 +382,9 @@ uint8_t  bindGUI( void )
      // Allow shrink
    //GTK_WINDOW ( guiRootWindow ) ->allow_shrink = FALSE;
    //GTK_WINDOW ( guiDrawingArea ) ->allow_shrink = FALSE;
+
+   // By default enable arrow keys
+   UI_arrow_enabled();
     return 1;
 
 }
@@ -956,5 +956,17 @@ uint8_t UI_shrink(uint32_t w,uint32_t h)
         gtk_widget_set_usize(guiRootWindow, w, h);
         return 1;
 }
+// Override arrow keys to quickly navigate
+uint8_t UI_arrow_enabled(void)
+{
+  g_signal_connect(GTK_OBJECT(guiRootWindow), "key_press_event",
+                       GTK_SIGNAL_FUNC(UI_on_key_press),
+                       NULL);
+   
 
+}
+uint8_t UI_arrow_disabled(void)
+{
+
+}
 // EOF

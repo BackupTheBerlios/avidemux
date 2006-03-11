@@ -41,7 +41,7 @@ extern void HandleAction(Action act);
 // We have to duplicate the ALT ... shortcut
 // because of change of focus ?
 
-void UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_data)
+gboolean UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_data)
 {
     UNUSED_ARG(widget);
     UNUSED_ARG(user_data);
@@ -66,117 +66,12 @@ void UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_data)
 	}
 	// ALT+x
 	//_____________
-	if(alt)
-	{
 	
-		switch(event->keyval)
-		{
-			case GDK_l:
-			case GDK_L: action=ACT_OpenAvi;break;
-			case GDK_s:
-			case GDK_S: action=ACT_SaveWork;break;
-				
-			// repeat Keyboard stuff
-			case GDK_B:
-			
-				if(shift)
-					action=ACT_GotoMarkA;
-				else
-					action=ACT_MarkA;
-				break;
-			case GDK_E:
-			
-				if(shift)
-					action=ACT_GotoMarkB;
-				else
-					action=ACT_MarkB;
-				break;
-			default:
-				return;		
-		}
-		HandleAction(action);
-		return;
-	
-	}
 	action=ACT_DUMMY;
-	// CTRL+x
-	//_____________
-	if(TRUE==ctrl)
-	{
-	  switch (event->keyval)
-	  {
-	  	case GDK_A:
-		case GDK_a:
-					action=ACT_AppendAvi;break;
-					
-	  	case GDK_c:
-		case GDK_C:	action=ACT_Copy;break;
-		
-				
-	  	case GDK_bracketleft:
-					action = ACT_GotoMarkA;break;
-		case GDK_bracketright:
-					action = ACT_GotoMarkB;break;
-					
-		case GDK_F:
-		case GDK_f:
-					action=ACT_VideoParameter;break;					
-					
-	  	case GDK_G:
-		case GDK_g:
-					action=ACT_Goto;break;
-
-	  	
-		case GDK_M:
-		case GDK_m:
-					action=ACT_SaveImg;break;
-		
-		case GDK_O:
-		case GDK_o:
-					action=ACT_OpenAvi;break;
-		case GDK_P:
-		case GDK_p:
-					action=ACT_DecoderOption;break;					
-		
-		case GDK_S:
-		case GDK_s:
-					action=ACT_SaveAvi;break;
-		case GDK_u:
-		case GDK_U:
-					action=ACT_SetMuxParam;break;
-		case GDK_v:
-		case GDK_V:		action=ACT_Paste;break;		
-		
-		case GDK_X:
-		case GDK_x:
-					action=ACT_Delete;break;					
-					
-		default:
-			break;
-
-	  }
-	}
-
-	if(action!=ACT_DUMMY)
-	{
-		HandleAction(action);
-		return;
-	}
+	
 
     switch (event->keyval)
-	{
-	case GDK_F1:
-		action=ACT_VideoModeToggle;break;
-	case GDK_F2:
-		action=ACT_AudioModeToggle;break;
-			
-	case GDK_space:
-		action=ACT_PlayAvi;
-		break;
-	case GDK_X:
-		action=ACT_Delete;
-		break;
-	
+	{	
 	case GDK_Up:
 		action=ACT_NextKFrame;
 		break;
@@ -220,38 +115,11 @@ void UI_on_key_press(GtkWidget *widget, GdkEventKey* event, gpointer user_data)
 		}
 		break;
 		
-		// Delete A-B section
-	case GDK_Delete: case GDK_KP_Delete:
-		action = ACT_Delete;
-		break;
-		
-		// Go to first frame
-	case GDK_Home: case GDK_KP_Home:
-		//case GDK_Page_Up:  case GDK_KP_Page_Up:
-		action = ACT_Begin;
-		break;
-
-		// Go to last frame
-	case GDK_End: case GDK_KP_End:
-		//case GDK_Page_Down: case GDK_KP_Page_Down:
-		action = ACT_End;
-		break;
-
-		// Set A marker
-	case GDK_bracketleft:
-		action = ACT_MarkA;
-		break;
-
-		// Set B marker
-		case GDK_bracketright:
-	action = ACT_MarkB;
-		break;
-
-		default:
-			printf("Key : %x not handled\n",event->keyval);
-		return;
-		break;
-	}
-
-	HandleAction(action);
+        }
+        if(action!=ACT_DUMMY) // For me to handle
+        {
+	       HandleAction(action);
+               return TRUE;
+        }
+        return FALSE;
 }
