@@ -302,22 +302,36 @@ uint8_t    _3GPHeader::open(char *name)
         }
         else
         {
-#if 0
+
         /*
             Same story for H263 : Analyze 1st frame to get the real width/height
         */
             if(fourCC::check(_videostream.fccHandler,(uint8_t *)"H263"))
             {
-                uint32_t w,h;
-                        if(extractH263Info(VDEO.extraData,VDEO.extraDataSize,&w,&h))
+                uint32_t w,h,sz,sz2;
+                uint8_t *bfer=NULL;
+                sz=VDEO.index[0].size;
+                if(sz)
+                {
+                        bfer=new uint8_t[sz];
+                        if(getFrameNoAlloc(0,bfer,&sz2))
+                        {
+                        if(extractH263Info(bfer,sz,&w,&h))
                         {
                             printf("H263 Corrected size : %lu x %lu\n",w,h);
                             _video_bih.biWidth=_mainaviheader.dwWidth=w ;
                             _video_bih.biHeight=_mainaviheader.dwHeight=h;                               
                         }
-                        
+                        else
+                        {
+                                  printf("H263 COULD NOT EXTRACT SIZE, using : %lu x %lu\n",
+                                      _video_bih.biWidth,  _video_bih.biHeight);
+                        }
+                        }
+                        delete [] bfer;
+                }
             }
-#endif
+
         
         }
         
@@ -694,7 +708,15 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
               				_videostream.dwRate=(uint32_t)floor(last);
 					if(nbSync)
                                             sync(VDEO.index,nbSz,nbSync,Sync);
-					}
+					else
+                                         { // All frame keyframe ?
+                                            printf("3gp:All frame keyframes ??\n");
+                                            for(uint32_t i=0;i<nbo;i++)
+                                            {
+                                                VDEO.index[i].intra=AVI_KEY_FRAME;
+                                            }
+                                         }
+                                        }
 					break;
 				case 2:
 					// audio
@@ -803,6 +825,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                 tom.skipAtom();
                                 break;
 			case MKFCCR('s','2','6','3') : //'s263':
+                        case MKFCCR('h','2','6','3') : //'s263':
 				tom.skipBytes(24);
 				wh=tom.read32();
 				tom.skipBytes(40);
