@@ -108,6 +108,10 @@ class coders
                                                 *d=NULL;
                                                 return 0;
                                         }
+                virtual         uint32_t getPTS_FrameNum(void)
+                                {
+                                        return 0;
+                                }
      };
 
 

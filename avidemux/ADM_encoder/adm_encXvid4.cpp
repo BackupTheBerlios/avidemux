@@ -183,14 +183,18 @@ EncoderXvid4::setLogFile (const char *lofile, uint32_t nbframe)
 //______________________________
 uint8_t
 EncoderXvid4::encode (uint32_t frame, uint32_t * len, uint8_t * out,
-		     uint32_t * flags)
+		     uint32_t * flags,uint32_t *displayFrame)
 {
   uint32_t l, f,q;
+  uint8_t r;
   //ENC_RESULT enc;
 
   ADM_assert (_codec);
   ADM_assert (_in);
-
+  if(displayFrame)
+  {
+        *displayFrame=frame;
+  }
   if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
     {
       printf ("\n Error : Cannot read incoming frame !");
@@ -220,12 +224,20 @@ EncoderXvid4::encode (uint32_t frame, uint32_t * len, uint8_t * out,
     case enc_CQ:
     case enc_Pass1:
     case enc_Pass2:
-      		return _codec->encode (_vbuffer, out, len, flags);
+      		r= _codec->encode (_vbuffer, out, len, flags);
+                if(displayFrame)
+                {
+                        *displayFrame=_codec->getPTS_FrameNum();
+                        if(!*displayFrame) *displayFrame=frame;
+                        //printf("DTS: %u PTS: %u\n",frame,*displayFrame);
+                }
+                return r;
       		break;
   
     default:
       		ADM_assert (0);
     }
+  
     return 1;   
  
 }

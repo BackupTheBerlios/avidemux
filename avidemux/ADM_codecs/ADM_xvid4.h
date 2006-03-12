@@ -59,7 +59,8 @@
 					   			uint32_t 	*len,
 			       					uint32_t 	*flags)=0;
 				
-
+                                virtual uint32_t getPTS_FrameNum(void);
+                                
    };
  
    class xvid4EncoderCQ : public    xvid4Encoder

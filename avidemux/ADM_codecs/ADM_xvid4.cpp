@@ -62,8 +62,33 @@ static  xvid_enc_plugin_t plugins[7];
 static  xvid_enc_frame_t xvid_enc_frame;
 static 	xvid_enc_stats_t xvid_enc_stats;
 static  xvid_gbl_info_t xvid_gbl_info;
+static  uint32_t xvid_framenum;
 #define MMSET(x) memset(&x,0,sizeof(x))
 
+/******/
+static int adm_hook(void *handle,
+                         int opt,
+                         void *param1,
+                         void *param2)
+{
+     xvid_plg_data_t *data = (xvid_plg_data_t *) param1;
+    // printf("Pass %d value %d\n",opt,data->frame_num);
+        if(opt==XVID_PLG_FRAME)
+                {
+                       
+                        xvid_framenum=data->frame_num;
+                        //printf("Before called with %u\n",xvid_framenum);
+                }
+        
+
+        return 0;
+}
+
+uint32_t xvid4Encoder::getPTS_FrameNum(void)
+{
+        if(xvid_enc_create.max_bframes) return xvid_framenum+2;
+        return xvid_framenum;
+}
 void xvid4_init(void);
 /*
 	System wide init, do it once for all 
@@ -376,11 +401,15 @@ uint8_t xvid4EncoderCQ::init(uint32_t q,uint32_t fps1000, xvid4EncParam *param)
 	plugins[0].func = xvid_plugin_single;
 	plugins[0].param = &single;
 	
+        plugins[1].func = adm_hook;
+        plugins[1].param = NULL;
+
+
 	single.version = XVID_VERSION;
 	single.bitrate = 1500;
 
 	xvid_enc_create.plugins = plugins;
-	xvid_enc_create.num_plugins = 1;
+	xvid_enc_create.num_plugins = 2;
 	
 	//Framerate
 	xvid_enc_create.fincr = 1000;
@@ -430,6 +459,7 @@ int ret;
 	postAmble(flags);
 	
 	*len=xvid_res.total_bits=ret;
+        if(!ret) printf("Skipped\n");
 	xvid_res.total_bits*=8;
 	
 	return 1;
@@ -460,11 +490,14 @@ uint8_t xvid4EncoderVBRExternal::init(uint32_t q,uint32_t fps1000, xvid4EncParam
 	plugins[0].func = xvid_plugin_single;
 	plugins[0].param = &single;
 	
+        plugins[1].func = adm_hook;
+        plugins[1].param = NULL;
+
 	single.version = XVID_VERSION;
 	single.bitrate = 1500;
 
 	xvid_enc_create.plugins = plugins;
-	xvid_enc_create.num_plugins = 1;
+	xvid_enc_create.num_plugins = 2;
 	
 	//Framerate
 	xvid_enc_create.fincr = 1000;
@@ -565,12 +598,15 @@ uint8_t xvid4EncoderCBR::init(uint32_t br,uint32_t fps1000, xvid4EncParam *param
 
 	plugins[0].func = xvid_plugin_single;
 	plugins[0].param = &single;
-	
+        
+        plugins[1].func = adm_hook;
+        plugins[1].param = NULL;	
+
 	single.version = XVID_VERSION;
 	single.bitrate = _bitrate*1000; // Kb->bit
 
 	xvid_enc_create.plugins = plugins;
-	xvid_enc_create.num_plugins = 1;
+	xvid_enc_create.num_plugins = 2;
 	
 	//Framerate
 	xvid_enc_create.fincr = 1000;
@@ -627,7 +663,7 @@ int ret;
 	
 	*len=xvid_res.total_bits=ret;
 	xvid_res.total_bits*=8;
-	
+	if(!ret) printf("Skipped\n");
 	return 1;
 
 }
@@ -657,6 +693,7 @@ uint8_t xvid4EncoderPass1::init(uint32_t br,uint32_t fps1000, xvid4EncParam *par
 	plugins[0].func = xvid_plugin_2pass1;
 	plugins[0].param = &pass1;
 	
+
 	pass1.version = XVID_VERSION;
 	pass1.filename = (char *)_param.logName;
 
@@ -717,7 +754,7 @@ int ret;
 	
 	*len=xvid_res.total_bits=ret;
 	xvid_res.total_bits*=8;
-	
+	if(!ret) printf("Skipped\n");
 	return 1;
 
 }
@@ -746,7 +783,9 @@ uint8_t xvid4EncoderPass2::init(uint32_t br,uint32_t fps1000, xvid4EncParam *par
 
 	plugins[0].func = xvid_plugin_2pass2;
 	plugins[0].param = &pass2;
-	
+	plugins[1].func = adm_hook;
+        plugins[1].param = NULL;
+
 	pass2.version = XVID_VERSION;
 	pass2.filename = (char *)_param.logName;
 
@@ -767,7 +806,7 @@ uint8_t xvid4EncoderPass2::init(uint32_t br,uint32_t fps1000, xvid4EncParam *par
 	
 	
 	xvid_enc_create.plugins = plugins;
-	xvid_enc_create.num_plugins = 1;
+	xvid_enc_create.num_plugins = 2;
 	
 	//Framerate
 	xvid_enc_create.fincr = 1000;
@@ -820,7 +859,7 @@ int ret;
 	
 	*len=xvid_res.total_bits=ret;
 	xvid_res.total_bits*=8;
-	
+	if(!ret) printf("Skipped\n");
 	return 1;
 
 }
