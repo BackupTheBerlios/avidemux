@@ -79,7 +79,7 @@ uint32_t useMaster=0;
 uint32_t useAutoIndex=0;
 uint32_t useSwap=0;
 uint32_t useNuv=0;
-	
+uint32_t mthreads=0;	
 	dialog=create_dialog1();
 //	gtk_transient(dialog);
         gtk_register_dialog(dialog);
@@ -116,7 +116,12 @@ uint32_t useNuv=0;
                str = ADM_strdup("plughw:0,0");
         gtk_write_entry_string(WID(entryALSADevice), str);
         ADM_dealloc(str);
-
+	// Multithreads
+	if(!prefs->get(FEATURE_MULTI_THREAD, &mthreads))
+	{
+		mthreads=0;		
+	}
+	 SPIN_SET(mthreads,spinbutton1);
 	// VCD/SVCD split point		
 	if(!prefs->get(SETTINGS_MPEGSPLIT, &autosplit))
 	{
@@ -248,6 +253,12 @@ uint32_t useNuv=0;
                 SPIN_GET(autosplit,spinbuttonMPEGSplit);
 		prefs->set(SETTINGS_MPEGSPLIT, autosplit);
                 
+                //
+                SPIN_GET(mthreads,spinbutton1);
+                if(mthreads<2) mthreads=0;
+                prefs->set(FEATURE_MULTI_THREAD, mthreads);
+                //
+
                 useAutoIndex=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonAutoindex)));
                 prefs->set(FEATURE_TRYAUTOIDX, useAutoIndex);
 
@@ -309,7 +320,8 @@ gint r;
 
 }
 //*************************
-GtkWidget       *create_dialog1 (void)
+GtkWidget*
+create_dialog1 (void)
 {
   GtkWidget *Preferences;
   GtkWidget *dialog_vbox1;
@@ -351,6 +363,14 @@ GtkWidget       *create_dialog1 (void)
   GtkWidget *label16;
   GtkWidget *comboboxVideoOutput;
   GtkWidget *label24;
+  GtkWidget *table3;
+  GtkWidget *hbox6;
+  GtkWidget *label27;
+  GtkWidget *hbox7;
+  GtkObject *spinbutton1_adj;
+  GtkWidget *spinbutton1;
+  GtkWidget *label28;
+  GtkWidget *label26;
   GtkWidget *dialog_action_area1;
   GtkWidget *okbutton1;
 
@@ -553,6 +573,39 @@ GtkWidget       *create_dialog1 (void)
   gtk_widget_show (label24);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 4), label24);
 
+  table3 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_show (table3);
+  gtk_container_add (GTK_CONTAINER (notebook1), table3);
+
+  hbox6 = gtk_hbox_new (FALSE, 12);
+  gtk_widget_show (hbox6);
+  gtk_table_attach (GTK_TABLE (table3), hbox6, 0, 2, 0, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox6), 12);
+
+  label27 = gtk_label_new_with_mnemonic (_("Enable multithreading :"));
+  gtk_widget_show (label27);
+  gtk_box_pack_start (GTK_BOX (hbox6), label27, FALSE, FALSE, 0);
+
+  hbox7 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox7);
+  gtk_box_pack_start (GTK_BOX (hbox6), hbox7, TRUE, TRUE, 0);
+
+  spinbutton1_adj = gtk_adjustment_new (0, 0, 4, 1, 10, 10);
+  spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 0);
+  gtk_widget_show (spinbutton1);
+  gtk_box_pack_start (GTK_BOX (hbox7), spinbutton1, TRUE, TRUE, 0);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton1), TRUE);
+
+  label28 = gtk_label_new (_("Threads"));
+  gtk_widget_show (label28);
+  gtk_box_pack_start (GTK_BOX (hbox7), label28, FALSE, FALSE, 0);
+
+  label26 = gtk_label_new (_("MultiThread"));
+  gtk_widget_show (label26);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 5), label26);
+
   dialog_action_area1 = GTK_DIALOG (Preferences)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
@@ -605,6 +658,13 @@ GtkWidget       *create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (Preferences, label16, "label16");
   GLADE_HOOKUP_OBJECT (Preferences, comboboxVideoOutput, "comboboxVideoOutput");
   GLADE_HOOKUP_OBJECT (Preferences, label24, "label24");
+  GLADE_HOOKUP_OBJECT (Preferences, table3, "table3");
+  GLADE_HOOKUP_OBJECT (Preferences, hbox6, "hbox6");
+  GLADE_HOOKUP_OBJECT (Preferences, label27, "label27");
+  GLADE_HOOKUP_OBJECT (Preferences, hbox7, "hbox7");
+  GLADE_HOOKUP_OBJECT (Preferences, spinbutton1, "spinbutton1");
+  GLADE_HOOKUP_OBJECT (Preferences, label28, "label28");
+  GLADE_HOOKUP_OBJECT (Preferences, label26, "label26");
   GLADE_HOOKUP_OBJECT_NO_REF (Preferences, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (Preferences, okbutton1, "okbutton1");
 
