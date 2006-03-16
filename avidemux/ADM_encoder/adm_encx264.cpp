@@ -56,7 +56,7 @@ EncoderX264::EncoderX264 (COMPRES_PARAMS  *codecconfig)
   ADM_assert(codecconfig->extraSettingsLen==sizeof(_codecParam));
   memcpy(&_codecParam,(codecconfig->extraSettings),sizeof(_codecParam));
   _codecParam.nbThreads=ADM_useNbThreads();
-
+  _logfile=NULL;
 
 };
 EncoderX264::~EncoderX264 ()
@@ -115,7 +115,8 @@ uint8_t         EncoderX264::configure (AVDMGenericVideoStream * instream)
      case COMPRESS_2PASS:
                // printf("\n X264 dual size: %lu (%s)\n",_param.finalsize,_logname);
                 _state = enc_Pass1;
-                _codec = new X264EncoderPass2 (_w, _h);
+                _codec = new X264EncoderPass1 (_w, _h);
+                _codecParam.logfile=_logfile;
                   //strcpy(encparam.logName,_logname);
                   //printf("Using %s as stat file\n",encparam.logName);
                         
@@ -161,6 +162,8 @@ uint8_t    EncoderX264::isDualPass (void)
 uint8_t    EncoderX264::setLogFile (const char *lofile, uint32_t nbframe)
 {
  // strcpy (_logname, lofile);
+  _logfile=ADM_strdup(lofile);
+  printf("Enc X264, using %s as logfile\n",_logfile);
   _frametogo = nbframe;
   _totalframe= nbframe;
   return 1;
@@ -225,6 +228,7 @@ uint8_t
 {
   if(_codec)        delete       _codec;
   _codec = NULL;
+  if(_logfile) delete [] _logfile;
                 
 
   return 1;
@@ -272,7 +276,14 @@ uint8_t
   _frametogo=0;
   return 1;
 }
-
+uint8_t    EncoderX264::getLastQz(void)
+{
+    uint8_t q;
+    _my_ENC_RESULT_ res;
+    ADM_assert(_codec);
+    _codec->getResult((void *)&res);
+    return res.out_quantizer;
+}
 #endif
 
 

@@ -35,6 +35,7 @@ class EncoderX264: public Encoder
   protected:
                                 
     X264Encoder            *_codec;
+    char                    *_logfile;
     uint32_t                _q;
     uint32_t                _pass1Done;
     uint32_t                _fps1000;
@@ -56,7 +57,8 @@ class EncoderX264: public Encoder
     virtual const char *getCodecName(void ) {return "H264";}                              
     virtual const char *getFCCHandler(void ) {return "H264";}
     virtual const char *getDisplayName(void ) {return "X264";} 
-    virtual uint8_t    hasExtraHeaderData( uint32_t *l,uint8_t **data);      
+    virtual uint8_t    hasExtraHeaderData( uint32_t *l,uint8_t **data);
+    virtual uint8_t    getLastQz(void);
 }   ;
 
 

@@ -66,7 +66,7 @@ uint8_t   X264Encoder::preamble(uint32_t fps1000,ADM_x264Param *zparam)
  
         printf("Opening X264 for %lu x %lu\n",_w,_h);
   
-        param.cpu=0; // Will be slow ...
+        param.cpu=0; 
 #define ADX_CHECK(x)  if(CpuCaps::has##x()) param.cpu|=X264_CPU_##x;        
         ADX_CHECK(MMX);
         ADX_CHECK(SSE);
@@ -240,6 +240,7 @@ uint8_t         X264Encoder::getResult( void *ress)
 //*******************CQ*****************
 uint8_t         X264EncoderCQ::init( uint32_t val,uint32_t fps1000,ADM_x264Param *zparam )
 {
+    printf("X264 CQ\n");
   memset(&param,0,sizeof(param));
   x264_param_default( &param );
 
@@ -255,6 +256,7 @@ X264EncoderCQ::~X264EncoderCQ()
 //*********************CBR***************
 uint8_t         X264EncoderCBR::init( uint32_t val,uint32_t fps1000,ADM_x264Param *zparam )
 {
+    printf("X264 pass CBR\n");
   memset(&param,0,sizeof(param));
   x264_param_default( &param );
   param.rc.b_cbr=1;
@@ -270,6 +272,7 @@ X264EncoderCBR::~X264EncoderCBR()
 //*********************Pass1***************
 uint8_t         X264EncoderPass1::init( uint32_t val,uint32_t fps1000,ADM_x264Param *zparam )
 {
+    printf("X264 pass 1\n");
   memset(&param,0,sizeof(param));
   x264_param_default( &param );
   
@@ -278,7 +281,11 @@ uint8_t         X264EncoderPass1::init( uint32_t val,uint32_t fps1000,ADM_x264Pa
   
   param.rc.b_stat_write = 1;
   param.rc.b_stat_read = 0;
-  param.rc.psz_stat_out = "/tmp/x264_log.tmp"; //FIXME
+  if(!zparam->logfile)
+    param.rc.psz_stat_out = "/tmp/x264_log.tmp"; 
+  else
+      param.rc.psz_stat_out =zparam->logfile; 
+  printf("x264 codec using %s as statfile\n",param.rc.psz_stat_out);
   return preamble(fps1000,zparam); 
 }
 X264EncoderPass1::~X264EncoderPass1()
@@ -288,6 +295,7 @@ X264EncoderPass1::~X264EncoderPass1()
 //*********************Pass1***************
 uint8_t         X264EncoderPass2::init( uint32_t val,uint32_t fps1000,ADM_x264Param *zparam )
 {
+    printf("X264 pass 2\n");
   memset(&param,0,sizeof(param));
   x264_param_default( &param );
   
@@ -300,7 +308,12 @@ uint8_t         X264EncoderPass2::init( uint32_t val,uint32_t fps1000,ADM_x264Pa
   param.rc.b_stat_read = 1;
   
   
-  param.rc.psz_stat_in = "/tmp/x264_log.tmp"; // FIXME
+  if(!zparam->logfile)
+      param.rc.psz_stat_in = "/tmp/x264_log.tmp"; 
+  else
+      param.rc.psz_stat_in =zparam->logfile; 
+  printf("x264 codec using %s as statfile\n",param.rc.psz_stat_in);
+
   return preamble(fps1000,zparam); 
 }
 X264EncoderPass2::~X264EncoderPass2()

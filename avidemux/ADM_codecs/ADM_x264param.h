@@ -22,6 +22,23 @@ typedef struct ADM_x264Param
   uint32_t nbBframe;  
   uint32_t globalHeader;
   uint32_t nbThreads;
+  
+  // 
+  char  *logfile;
+  //
+  uint32_t sceneCut;
+  
+  //
+  
+  uint32_t b_bframe_adaptive;
+  
+  // inloop deblocking filter
+  
+  uint32_t b_deblocking_filter;
+  int32_t  i_deblocking_filter_alphac0;
+  int32_t  i_deblocking_filter_beta;
+  
+  // Block size
     
 }ADM_x264Param;
 
