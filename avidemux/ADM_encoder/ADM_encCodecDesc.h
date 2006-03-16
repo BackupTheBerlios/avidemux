@@ -546,7 +546,8 @@ ADM_x264Param x264Extra=
   250,  //uint32_t maxKf;
   5,    //uint32_t minKf;
   2,    //uint32_t nbBframe;  
-  0     // uint32_t esAtom
+  0,     // uint32_t esAtom
+  0     // nbThreads
   
 };
 extern uint8_t DIA_x264(COMPRES_PARAMS *conf);

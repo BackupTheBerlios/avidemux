@@ -29,7 +29,7 @@ extern "C"
 {
         #include "x264.h"
 };        
-
+#include "ADM_toolkit/ADM_cpuCap.h"
 #include <ADM_assert.h>
 
 #define HANDLE ((x264_t *)_handle)                     
@@ -48,6 +48,12 @@ typedef struct avcc // for avcc atom
 // Yes, ugly FIXME
 static  x264_param_t          param;
 static  myENC_RESULT          x_res;
+
+uint32_t X264Encoder::getPTS_FrameNum(void)
+{
+    if( param.i_bframe) return ptsFrame+2;
+    return ptsFrame;
+}
 //********************************************* 
 // Set the common stuff prior to codec opening
 // ratecontrol stuff is left to the caller
@@ -61,6 +67,14 @@ uint8_t   X264Encoder::preamble(uint32_t fps1000,ADM_x264Param *zparam)
         printf("Opening X264 for %lu x %lu\n",_w,_h);
   
         param.cpu=0; // Will be slow ...
+#define ADX_CHECK(x)  if(CpuCaps::has##x()) param.cpu|=X264_CPU_##x;        
+        ADX_CHECK(MMX);
+        ADX_CHECK(SSE);
+        ADX_CHECK(SSE2);
+        ADX_CHECK(MMXEXT);
+        ADX_CHECK(3DNOW);
+        
+        param.i_threads=zparam->nbThreads;
         param.i_width=_w;
         param.i_height=_h;
         param.i_csp=X264_CSP_I420;
@@ -90,7 +104,7 @@ uint8_t   X264Encoder::preamble(uint32_t fps1000,ADM_x264Param *zparam)
         _handle=(void *)xhandle;
         _pic=(void *)new x264_picture_t;
         printf("X264 init ok (atom mode : %d)\n",zparam->globalHeader);
-
+        if(param.i_threads>1) printf("X264 using %d threads\n",param.i_threads);
         if(zparam->globalHeader) 
                 return createHeader();
         else
@@ -160,7 +174,7 @@ uint8_t         X264Encoder::encode( ADMImage        *in,
         PICS->img.i_stride[2]=_w>>1;
         
         PICS->i_type=X264_TYPE_AUTO;
-        
+        PICS->i_pts=curFrame++;
         if(x264_encoder_encode(HANDLE, &nal, &nbNal, PICS,&pic_out) < 0) 
         {
           printf("Error encoding with x264\n");
@@ -189,6 +203,8 @@ uint8_t         X264Encoder::encode( ADMImage        *in,
         
         *len=size;
         x_res.is_key_frame=0;
+        ptsFrame=(uint32_t)pic_out.i_pts; // In fact it is the picture number in out case
+        //printf("Frame :%lld \n",pic_out.i_pts);
         switch(pic_out.i_type)
         {
           case X264_TYPE_IDR:   //FIXME: Only works if nb ref frame==1

@@ -38,6 +38,7 @@
 
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encx264.h"
+#include "ADM_toolkit/ADM_cpuCap.h"
 
 
 #define aprintf printf
@@ -54,6 +55,7 @@ EncoderX264::EncoderX264 (COMPRES_PARAMS  *codecconfig)
   memcpy(&_param,codecconfig,sizeof(_param));
   ADM_assert(codecconfig->extraSettingsLen==sizeof(_codecParam));
   memcpy(&_codecParam,(codecconfig->extraSettings),sizeof(_codecParam));
+  _codecParam.nbThreads=ADM_useNbThreads();
 
 
 };
@@ -164,15 +166,23 @@ uint8_t    EncoderX264::setLogFile (const char *lofile, uint32_t nbframe)
   return 1;
 
 }
-
+uint8_t
+        EncoderX264::encode (uint32_t frame, uint32_t * len, uint8_t * out,
+                             uint32_t * flags)
+{
+    return encode(frame,len,out,flags,NULL);
+}
 //______________________________
 uint8_t
     EncoderX264::encode (uint32_t frame, uint32_t * len, uint8_t * out,
-                          uint32_t * flags)
+                          uint32_t * flags,uint32_t *displayFrame)
 {
   uint32_t l, f,q;
+  uint8_t r=0;
   //ENC_RESULT enc;
 
+  if(displayFrame) *displayFrame=frame;
+  
   ADM_assert (_codec);
   ADM_assert (_in);
 
@@ -191,7 +201,14 @@ uint8_t
     case enc_CQ:
     case enc_Pass1:
     case enc_Pass2:
-      return _codec->encode (_vbuffer, out, len, flags);
+      r= _codec->encode (_vbuffer, out, len, flags);
+      if(displayFrame)
+      {
+          *displayFrame=_codec->getPTS_FrameNum();
+          if(!*displayFrame) *displayFrame=frame;
+                        //printf("DTS: %u PTS: %u\n",frame,*displayFrame);
+      }
+      return r;
       break;
   
     default:

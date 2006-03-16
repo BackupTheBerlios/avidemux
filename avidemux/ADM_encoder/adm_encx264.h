@@ -47,6 +47,8 @@ class EncoderX264: public Encoder
     virtual uint8_t isDualPass( void ) ;                       // mjpeg is always monopass
     virtual uint8_t configure(AVDMGenericVideoStream *instream) ;
     virtual uint8_t encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags);
+    virtual uint8_t encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags,uint32_t *displayFrameNo);
+   
     virtual uint8_t setLogFile( const char *p,uint32_t fr); // for dual pass only
     virtual uint8_t stop( void);
     virtual uint8_t startPass2( void )  ;

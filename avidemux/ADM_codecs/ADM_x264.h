@@ -23,6 +23,8 @@
         uint8_t         *extraData;
         uint32_t        extraSize;
         uint8_t         createHeader( void );
+        uint32_t        ptsFrame;
+        uint32_t        curFrame;
   public :
     X264Encoder(uint32_t width,uint32_t height)   : encoder(width,height)
     {        
@@ -31,6 +33,8 @@
       _pic=NULL;
       extraData=NULL;
       extraSize=0;
+      ptsFrame=0;
+      curFrame=0;
     } ;
     ~X264Encoder();
                      
@@ -44,6 +48,7 @@
                                     uint32_t        *len,
                                     uint32_t        *flags);
    virtual         uint8_t getExtraData (uint32_t * l, uint8_t ** d);
+   virtual         uint32_t getPTS_FrameNum(void);
 
 };
 //***************** CQ **************** 

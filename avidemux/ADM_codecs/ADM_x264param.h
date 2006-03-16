@@ -21,6 +21,7 @@ typedef struct ADM_x264Param
   uint32_t minKf;
   uint32_t nbBframe;  
   uint32_t globalHeader;
+  uint32_t nbThreads;
     
 }ADM_x264Param;
 
