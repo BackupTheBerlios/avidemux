@@ -60,7 +60,10 @@ ffmpegEncoder::postAmble (ADMBitstream * out, uint32_t sz)
   out->ptsFrame = _context->real_pict_num;;
   out->len = (uint32_t) sz;
   out->flags = frameType ();;
-  out->out_quantizer =(int) floor (_context->coded_frame->quality / (float) FF_QP2LAMBDA);
+  if(!_context->coded_frame->quality)
+      out->out_quantizer=(int) floor (_frame.quality / (float) FF_QP2LAMBDA);
+  else
+      out->out_quantizer =(int) floor (_context->coded_frame->quality / (float) FF_QP2LAMBDA);
 
 }
 //static myENC_RESULT res;
@@ -426,6 +429,7 @@ uint8_t ffmpegEncoderCQ::encode (ADMImage * in, ADMBitstream * out)
   
   _frame.quality = (int) floor (FF_QP2LAMBDA * _qual + 0.5);
   r=ffmpegEncoder::encode(in,out);
+  out->out_quantizer=_qual;
   if (_vbr)			// update for lavcodec internal
     {
       if (!_statfile)

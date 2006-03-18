@@ -140,7 +140,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
       //__________________________________
       //   now go to main loop.....
       //__________________________________
-        ADMBitstream bitstream;
+        
         bitstream.data=buffer;
       	for (uint32_t cf = 0; cf < frametogo; cf++)
 	{
@@ -208,6 +208,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
       		return 0;
     	}
   aprintf("Setup video done\n");
+  bitstream.data=vbuffer;
   return 1;
   //---------------------
 }
@@ -233,8 +234,8 @@ uint8_t
 GenericAviSaveProcess::writeVideoChunk (uint32_t frame)
 {
   uint8_t    	ret1;
-  ADMBitstream bitstream;
-  bitstream.data=vbuffer;
+  
+  
 
   // CBR or CQ
 

@@ -27,6 +27,7 @@
 			Encoder 	*_encode;
 			uint8_t		_notnull;
                        	char 		*TwoPassLogFile;
+                        ADMBitstream    bitstream;
 
 			virtual uint8_t	setupVideo( char *name  );
 			virtual uint8_t	writeVideoChunk(uint32_t frame );
