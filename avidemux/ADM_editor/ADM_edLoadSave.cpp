@@ -148,6 +148,12 @@ for (uint32_t i = 0; i < _nb_segment; i++)
                 qfprintf(fd,"\n//** Postproc **\n");
                 qfprintf(fd,"app.video.setPostProc(%d,%d,%d);\n",pptype,ppstrength,ppswap);
 
+// fps
+	if( avifileinfo ){
+	  aviInfo info;
+		video_body->getVideoInfo(&info);
+		qfprintf(fd,"\napp.video.setFps1000(%u);\n",info.fps1000);
+	}
 
 // Filter
 //___________________________
