@@ -102,6 +102,16 @@ uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming)
 				case 0:
 					incoming->mode = COMPRESS_CBR;				      
 		      			value = (uint32_t) gtk_read_entry(WID(entry_bitrate));
+					// validate against max/min bitrate
+					if( value > conf->maxBitrate * 8 / 1000 ){
+						GUI_Info_HIG(ADM_LOG_IMPORTANT,"Bitrate out of range","choosing maxBitrate instead");
+						value = conf->maxBitrate * 8 / 1000;
+					}
+					if( value < conf->minBitrate * 8 / 1000 ){
+						GUI_Info_HIG(ADM_LOG_IMPORTANT,"Bitrate out of range","choosing minBitrate instead");
+						value = conf->minBitrate * 8 / 1000;
+					}
+					// validate against some fixed values - min/maxBitrate may be also out of range
 		      			if (value > 16 && value < 9900)
 					{
 			    			incoming->bitrate = value;
