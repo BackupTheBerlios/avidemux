@@ -18,6 +18,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
 #include <ADM_assert.h>
 
 #include "config.h"
@@ -293,9 +296,31 @@ UNUSED_ARG(mode);
         {
 	       return addFile(tmpname);
         }
-        if(tryIndexing(name))
+	/* check for "Read-only file system" */
+	{ int fd = open(tmpname,O_CREAT|O_EXCL|O_WRONLY,S_IRUSR|S_IWUSR);
+		if( fd >= 0 ){
+			close(fd);
+			unlink(tmpname);
+		}else if( errno == EROFS ){
+		  char *tmpdir = getenv("TMPDIR");
+#ifdef CYG_MANGLING
+			if( !tmpdir )
+				tmpdir = "c:";
+			snprintf(tmpname,256,"%s%s.idx",tmpdir,strrchr(name,'\'));
+#else
+			if( !tmpdir )
+				tmpdir = "/tmp";
+			snprintf(tmpname,256,"%s%s.idx",tmpdir,strrchr(name,'/'));
+#endif
+			tmpname[255] = '\0';
+		}
+        	if(ADM_fileExist(tmpname)){
+			return addFile(tmpname);
+        	}
+	}
+        if(tryIndexing(name,tmpname))
         {
-                return addFile (name);
+                return addFile (tmpname);
         }
         return 0;
       break;
@@ -1313,7 +1338,7 @@ uint8_t r=0;
 //_________________________________________
 extern uint8_t DIA_dmx(char *file,DMX_TYPE format,uint32_t nbTracks, MPEG_TRACK *tracks, uint32_t *selectedTracks);
 //
-uint8_t         ADM_Composer::tryIndexing(char *name)
+uint8_t         ADM_Composer::tryIndexing(char *name,char *idxname)
 {
  unsigned int autoidx = 0;
       prefs->get(FEATURE_TRYAUTOIDX,&autoidx);
@@ -1352,9 +1377,14 @@ uint8_t         ADM_Composer::tryIndexing(char *name)
                         }
 		       }
                 }
-                idx=new char[strlen(name)+5];
-                strcpy(idx,name);
-                strcat(idx,".idx");
+		if( idxname ){
+			idx=new char[strlen(idxname)];
+			strcpy(idx,idxname);
+		}else{
+                	idx=new char[strlen(name)+5];
+                	strcpy(idx,name);
+                	strcat(idx,".idx");
+		}
 
                 r=dmx_indexer(name,idx,audioTrack,0,nbTrack,tracks);
 

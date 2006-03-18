@@ -147,7 +147,7 @@ class ADM_Composer
 						uint8_t 	getMagic(char *name,uint32_t *magic);
 						uint8_t 	identify(char *name, fileType *type);
 						uint32_t 	searchForwardSeg(uint32_t startframe);
-                                                uint8_t         tryIndexing(char *name);
+                                                uint8_t         tryIndexing(char *name,char *idxname=NULL);
 
   public:
                                                 uint8_t hasVBRVideos(void);
