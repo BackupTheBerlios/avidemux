@@ -334,7 +334,7 @@ switch(mux)
 				{
                                         bitstream.cleanup(i);
 					encoding->setFrame(i,total);
-                                        if(!encoder->encode( i, &bitstream));//&len,(uint8_t *) _buffer,&flags))
+                                        if(!encoder->encode( i, &bitstream))//&len,(uint8_t *) _buffer,&flags))
 					{
 						GUI_Error_HIG("Error in pass 1", NULL);
 					}
@@ -364,7 +364,7 @@ switch(mux)
 			{
        	// get frame
                                 bitstream.cleanup(i);
-                                if(!encoder->encode( i,&bitstream));// &len,(uint8_t *) _outbuffer,&flags))
+                                if(!encoder->encode( i,&bitstream))// &len,(uint8_t *) _outbuffer,&flags))
 				{
 					GUI_Error_HIG("Error in pass 2", NULL);
 					goto finish;
