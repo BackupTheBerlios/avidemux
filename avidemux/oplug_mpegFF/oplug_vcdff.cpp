@@ -108,6 +108,7 @@ uint32_t  real_framenum=0;
 uint8_t   ret=0;
 uint32_t  sample_target=0;
 uint32_t  total_sample=0;
+ADMBitstream bitstream;
 	twoPass=new char[strlen(name)+6];
 	twoFake=new char[strlen(name)+6];
 
@@ -328,15 +329,17 @@ switch(mux)
 			{
 				encoding->setPhasis ("Pass 1/2");
 				encoder->startPass1();
+                                bitstream.data=_buffer;
 				for(uint32_t i=0;i<total;i++)
 				{
+                                        bitstream.cleanup(i);
 					encoding->setFrame(i,total);
-					if(!encoder->encode( i, &len,(uint8_t *) _buffer,&flags))
+                                        if(!encoder->encode( i, &bitstream));//&len,(uint8_t *) _buffer,&flags))
 					{
 						GUI_Error_HIG("Error in pass 1", NULL);
 					}
-					encoding->feedFrame(len);
-					encoding->setQuant(encoder->getLastQz());
+					encoding->feedFrame(bitstream.len);
+					encoding->setQuant(bitstream.out_quantizer);
 				}
 			}
 				encoder->startPass2();
@@ -356,29 +359,30 @@ switch(mux)
                   encoding->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
          }
 		// 2nd or Uniq Pass
+                bitstream.data=_outbuffer;
 		for(uint32_t i=0;i<total;i++)
 			{
        	// get frame
-				if(!encoder->encode( i, &len,(uint8_t *) _outbuffer,&flags))
+                                bitstream.cleanup(i);
+                                if(!encoder->encode( i,&bitstream));// &len,(uint8_t *) _outbuffer,&flags))
 				{
 					GUI_Error_HIG("Error in pass 2", NULL);
 					goto finish;
 				}
-				if(!len) continue;
+                                if(!bitstream.len) continue;
 				
 				if(file)
 				{
-					fwrite(_outbuffer,len,1,file);
+                                    fwrite(_outbuffer,bitstream.len,1,file);
 				}
 				else
 				{
 					uint32_t samples; 
-					uint32_t dts=encoder->getDTS();
 					
 					//printf("%lu %lu\n",i,dts);
 					
-					muxer->writeVideoPacket(len,_outbuffer,
-							real_framenum,dts);
+                                        muxer->writeVideoPacket(bitstream.len,_outbuffer,
+                                                bitstream.dtsFrame,bitstream.ptsFrame);
 					real_framenum++;
 					// _muxer->writeVideoPacket(len,_buffer_out,
 					//i-MPEG_PREFILL,_codec->getCodedPictureNumber());
@@ -401,8 +405,8 @@ switch(mux)
 				
 				}
 				encoding->setFrame(i,total);
-				encoding->setQuant(encoder->getLastQz());
-				encoding->feedFrame(len);
+                                encoding->setQuant(bitstream.out_quantizer);
+                                encoding->feedFrame(bitstream.len);
 					if(!encoding->isAlive ())
 						{
                                                          ret=0;        

@@ -108,19 +108,22 @@ uint32_t w,h,fps1000,fcc;
       			_encode->startPass1 ();
 			encoding_gui->setCodec((char *)_encode->getCodecName());
 			encoding_gui->setPhasis("Pass one");
+                        ADMBitstream bitstream;
+                        bitstream.data=_videoBuffer;
       			//__________________________________
       			//   now go to main loop.....
       			//__________________________________
       			for (uint32_t cf = 0; cf < _togo; cf++)
-			{	  
-	  			if (!_encode->encode (cf, &len, _videoBuffer, &flag))
+			{	
+                                bitstream.cleanup(cf); 
+	  			if (!_encode->encode (cf, &bitstream))
 				{
 					printf("\n Encoding of frame %lu failed !\n",cf);
 	    				return 0;
 				}
-				encoding_gui->feedFrame(len);
+                                encoding_gui->feedFrame(bitstream.len);
 				encoding_gui->setFrame(cf,_togo);
-				encoding_gui->setQuant(_encode->getLastQz());
+                                encoding_gui->setQuant(bitstream.out_quantizer);
 				if(!encoding_gui->isAlive())
 				{
 					return 0;
@@ -193,15 +196,18 @@ uint8_t	ADM_ogmWriteProcess::writeVideo(uint32_t frame)
 {
 uint32_t len,flags;
 uint8_t ret;
-		 ret= _encode->encode ( frame, &len, _videoBuffer, &flags);
+ADMBitstream bitstream; 
+                 bitstream.data=_videoBuffer;
+                 bitstream.dtsFrame=frame;
+                 ret= _encode->encode ( frame, &bitstream);
 		 if(!ret)
                  {
                         printf("OgmWrite: Error encoding frame %d\n",frame);
                         return 0;
                  }
-		 encoding_gui->feedFrame(len);
-		 encoding_gui->setQuant(_encode->getLastQz());		 
-		 return videoStream->write(len,_videoBuffer,flags,frame);
+                 encoding_gui->feedFrame(bitstream.len);
+                 encoding_gui->setQuant(bitstream.out_quantizer);		 
+                 return videoStream->write(bitstream.len,_videoBuffer,bitstream.flags,frame);
 }
 //___________________________________________________
 ADM_ogmWriteProcess::ADM_ogmWriteProcess( void)

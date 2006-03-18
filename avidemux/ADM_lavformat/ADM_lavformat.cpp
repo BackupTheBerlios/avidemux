@@ -468,7 +468,7 @@ double p,d;
 	
 	pkt.dts=(int64_t)floor(d);
 	pkt.pts=(int64_t)floor(p);
-	
+       // printf("Lavformat : Pts :%u dts:%u",displayframe,frameno);
 	aprintf("Lavformat : Pts :%llu dts:%llu",pkt.pts,pkt.dts);
 	pkt.stream_index=0;
            

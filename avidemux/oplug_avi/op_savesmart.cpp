@@ -145,6 +145,7 @@ GenericAviSaveSmart::writeVideoChunk (uint32_t frame)
 uint8_t GenericAviSaveSmart::writeVideoChunk_recode (uint32_t frame)
 {
 uint32_t len;
+ADMBitstream bitstream;
 	aprintf("Frame %lu encoding\n",frame);
 	video_body->getFlags ( frame, &_videoFlag);
 	if (_videoFlag & AVI_KEY_FRAME)
@@ -162,10 +163,13 @@ uint32_t len;
 	if (! video_body->getUncompressedFrame (frame, aImage))
 		return 0;
 	// 2-encode it
-	if (!_encoder->encode (aImage, vbuffer, &len, &_videoFlag))
+        bitstream.data=vbuffer;
+        bitstream.cleanup(frame);
+        if (!_encoder->encode (aImage, &bitstream));//vbuffer, &len, &_videoFlag))
 		return 0;
+        _videoFlag=bitstream.flags;
 	// 3-write it
-	return writter->saveVideoFrame (len, _videoFlag, vbuffer);
+	return writter->saveVideoFrame (bitstream.len, _videoFlag, vbuffer);
 }
 //_________________________________________________________
 uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)

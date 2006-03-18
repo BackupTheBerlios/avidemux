@@ -140,7 +140,8 @@ _mainaviheader.dwMicroSecPerFrame=0;
       //__________________________________
       //   now go to main loop.....
       //__________________________________
-
+        ADMBitstream bitstream;
+        bitstream.data=buffer;
       	for (uint32_t cf = 0; cf < frametogo; cf++)
 	{
 	  if (guiUpdate (cf, frametogo))
@@ -150,14 +151,16 @@ _mainaviheader.dwMicroSecPerFrame=0;
 	      delete[]buffer;
 	      return 0;
 	    }
-
-	  if (!_encode->encode (cf, &len, buffer, &flag))
+            
+	//  if (!_encode->encode (cf, &len, buffer, &flag))
+            bitstream.cleanup(cf);
+            if (!_encode->encode (cf, &bitstream))
 		{
 			printf("\n Encoding of frame %lu failed !\n",cf);
 	    		goto abt;
 		}
-	   encoding_gui->setQuant(_encode->getLastQz());
-	   encoding_gui->feedFrame(len);		
+	   encoding_gui->setQuant(bitstream.out_quantizer);
+	   encoding_gui->feedFrame(bitstream.len);		
 	}
 //      guiStop ();
 	encoding_gui->reset();
@@ -229,9 +232,9 @@ GenericAviSaveProcess::~GenericAviSaveProcess ()
 uint8_t
 GenericAviSaveProcess::writeVideoChunk (uint32_t frame)
 {
-  uint32_t    len1;
   uint8_t    	ret1;
-
+  ADMBitstream bitstream;
+  bitstream.data=vbuffer;
 
   // CBR or CQ
 
@@ -249,7 +252,9 @@ GenericAviSaveProcess::writeVideoChunk (uint32_t frame)
 	      }
 	}
   // first read
-  ret1 = _encode->encode ( frame, &len1, vbuffer, &_videoFlag);
+  bitstream.cleanup(frame);
+  ret1 = _encode->encode ( frame,&bitstream);// &len1, vbuffer, &_videoFlag);
+  _videoFlag=bitstream.flags;
   if (!ret1)
     return 0;
   // check for split
@@ -268,16 +273,16 @@ GenericAviSaveProcess::writeVideoChunk (uint32_t frame)
 							if(!reigniteChunk(dataLen,data)) return 0;
 						}
 				 }
-	encoding_gui->feedFrame(len1);	
-	encoding_gui->setQuant(_encode->getLastQz());	
+	encoding_gui->feedFrame(bitstream.len);	
+        encoding_gui->setQuant(bitstream.out_quantizer);	
         // If we have several null B frames dont write them
-	if(len1) _notnull=1;
+        if(bitstream.len) _notnull=1;
 	else	if( !_notnull)
 	{
 		printf("Frame : %lu dropped\n",frame);
 	 	return 1;			 
 	 }
-  	return writter->saveVideoFrame (len1, _videoFlag, vbuffer);
+         return writter->saveVideoFrame (bitstream.len, _videoFlag, vbuffer);
 
 }
 

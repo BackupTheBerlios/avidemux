@@ -121,30 +121,22 @@ uint8_t Mpeg2enc::init(  uint32_t qz, uint32_t maxbr, uint32_t fps1000,
 ---------------------------------------------------------
 */
 
- uint8_t  Mpeg2enc::getResult( void *ress)
- {
-	return 0;
- }
  /*---------------------------------------------------------
 		Mpeg2CBRcodec
 ---------------------------------------------------------
 */
 
-uint8_t Mpeg2enc::encode(		ADMImage 	*in,
-						   			uint8_t	*out,
-						   			uint32_t 	*len,
-			       						uint32_t 	*flags,
-									uint32_t *quant)
+uint8_t Mpeg2enc::encode(ADMImage *in,ADMBitstream *out)
 {
 int q,f,l;
 uint8_t r;
-	*flags=0;
-	f=(int)*flags;
-	l=(int)*len;
-	r=mpegenc_encode((char *)in->data,(char *)out,&l,&f,&q);
-	*quant=(uint32_t)q;
-	*flags=(uint32_t )f;
-	*len=(uint32_t)l;
+	out->flags=0;
+	f=(int)out->flags;
+	l=(int)out->len;
+	r=mpegenc_encode((char *)in->data,(char *)out->data,&l,&f,&q);
+        out->out_quantizer=(uint32_t)q;
+	out->flags=(uint32_t )f;
+	out->len=(uint32_t)l;
 	return r;
 
 }

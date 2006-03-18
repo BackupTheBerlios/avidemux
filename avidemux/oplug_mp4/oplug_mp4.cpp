@@ -89,7 +89,7 @@ AVDMGenericAudioStream  *audio=NULL;
 uint8_t		audioBuffer[48000];
 uint8_t         *videoBuffer=NULL;
 
-uint32_t len,flags;
+uint32_t alen;//,flags;
 uint32_t size;
 
 uint8_t   ret=0;
@@ -110,7 +110,7 @@ uint8_t *dummy;
 WAVHeader *audioinfo=NULL;
 int prefill=1;
 uint32_t displayFrame=0;
-          
+ADMBitstream    bitstream;
         // Setup video
         
         if(!videoProcessMode())
@@ -175,18 +175,21 @@ uint32_t displayFrame=0;
         // ___________ Read 1st frame _________________
              
              ADM_assert(_encode);
-             if(!_encode->encode ( 0, &len, videoBuffer, &flags,&displayFrame))
+             bitstream.data=videoBuffer;
+             bitstream.cleanup(0);
+             if(!_encode->encode ( 0, &bitstream));//&len, videoBuffer, &flags,&displayFrame))
              {
                         GUI_Error_HIG ("Error while encoding", NULL);
                         goto  stopit;
               }
+           //len=bitstream.len;
            // If needed get VOL header
            if(isMpeg4Compatible(info.fcc) && !videoExtraDataSize)
            {
                 // And put them as extradata for esds atom
                 uint32_t voslen=0;
                
-                if(extractVolHeader(videoBuffer,len,&voslen))
+                if(extractVolHeader(videoBuffer,bitstream.len,&voslen))
                 {
                         if(voslen)
                         {
@@ -240,7 +243,7 @@ uint32_t displayFrame=0;
           else
                 encoding_gui->setCodec(_encode->getDisplayName());
            //
-           muxer->writeVideoPacket( len,flags,videoBuffer,0,0);
+          muxer->writeVideoPacket( bitstream.len,bitstream.flags,videoBuffer,0,0);
 
            
 
@@ -248,27 +251,28 @@ uint32_t displayFrame=0;
            {
                 while(muxer->needAudio())
                {
-                     if(!audio->getPacket(audioBuffer,&len,&sample)) break;
-                     if(len)
+                     if(!audio->getPacket(audioBuffer,&alen,&sample)) break;
+                     if(alen)
                      {
-                        muxer->writeAudioPacket(len,audioBuffer,sample_got);
-                        encoding_gui->feedAudioFrame(len);
+                        muxer->writeAudioPacket(alen,audioBuffer,sample_got);
+                        encoding_gui->feedAudioFrame(alen);
                         sample_got+=sample;
                      }
                }
                ADM_assert(_encode);
-               if(!_encode->encode ( frame, &len, videoBuffer, &flags,&displayFrame))
+               bitstream.cleanup(frame);
+               if(!_encode->encode ( frame, &bitstream));//&len, videoBuffer, &flags,&displayFrame))
                {
                         GUI_Error_HIG ("Error while encoding", NULL);
                         goto  stopit;
                 }
                 // If the encoder pops empty frames at the beginning, wait a bit
-                if(len) prefill=0;
-                if(!len && prefill) continue; // Prefilling encoder if needed
-                muxer->writeVideoPacket( len,flags,videoBuffer,frame,displayFrame);
+                if(bitstream.len) prefill=0;
+                if(!bitstream.len && prefill) continue; // Prefilling encoder if needed
+                muxer->writeVideoPacket( bitstream.len,bitstream.flags,videoBuffer,bitstream.dtsFrame,bitstream.ptsFrame);
 
                encoding_gui->setFrame(frame,total);
-               encoding_gui->feedFrame(len);
+               encoding_gui->feedFrame(bitstream.len);
                if(!encoding_gui->isAlive())
                 {
                         if(GUI_YesNo("Stop Request", "Do you want to abort encoding ?"))
@@ -295,6 +299,7 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
       uint32_t len, flag;
       FILE *tmp;
       uint8_t reuse=0;
+      ADMBitstream bitstream;
 
         aprintf("\n** Dual pass encoding**\n");
 
@@ -313,6 +318,7 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
                 encoding_gui->setPhasis ("1st Pass");
                 aprintf("**Pass 1:%lu\n",total);
                 _encode->startPass1 ();
+                bitstream.data=buffer;
                 for (uint32_t cf = 0; cf < total; cf++)
                 {
                         encoding_gui->setFrame (cf, total);
@@ -322,13 +328,14 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
                                 GUI_Error_HIG ("Aborting", NULL);
                                 return 0;
                         }
-                        if (!_encode->encode (cf, &len, buffer, &flag))
+                        bitstream.cleanup(cf);
+                        if (!_encode->encode (cf,&bitstream))// &len, buffer, &flag))
                         {
                                 printf("\n Encoding of frame %lu failed !\n",cf);
                                 return 0;
                         }
-                        encoding_gui->setQuant(_encode->getLastQz());
-                        encoding_gui->feedFrame(len);                
+                        encoding_gui->setQuant(bitstream.out_quantizer);
+                        encoding_gui->feedFrame(bitstream.len);                
                 }
                 encoding_gui->reset();
                 aprintf("**Pass 1:done\n");

@@ -1351,21 +1351,20 @@ ________________________________________________________*/
 int A_saveJpg (char *name)
 {
   ffmpegEncoderFFMjpeg *codec=NULL;
-  uint32_t sz,fl;
   FILE *fd;
   uint8_t *buffer=NULL;
-
+  uint32_t sz;
+  
+  ADMBitstream bitstream;
+  
 	sz = avifileinfo->width* avifileinfo->height * 3;
 	buffer=new uint8_t [sz];
 	ADM_assert(buffer);
-
+        bitstream.data=buffer;
 
 		codec=new  ffmpegEncoderFFMjpeg( avifileinfo->width,avifileinfo->height,FF_MJPEG)  ;
 		codec->init( 95,25000);
-		if(!codec->encode(rdr_decomp_buffer,
-				 	buffer,
-					&sz,
-					&fl))
+		if(!codec->encode(rdr_decomp_buffer,&bitstream))
 			{
 				GUI_Error_HIG("Cannot encode the frame", NULL);
 				delete [] buffer;
@@ -1382,7 +1381,7 @@ int A_saveJpg (char *name)
 				return 0;
 
 	}
-	fwrite (buffer, sz, 1, fd);
+	fwrite (buffer, bitstream.len, 1, fd);
     	fclose(fd);
     	delete [] buffer;
 	delete codec;
@@ -1416,7 +1415,7 @@ void A_saveBunchJpg(char *name)
   uint32_t curImg;
   char	 fullName[2048],*ext;
   DIA_working *working;
-  
+  ADMBitstream bitstream;
   	if(frameStart>frameEnd)
 		{
 				GUI_Error_HIG("Mark A > B", "Set your markers correctly.");
@@ -1438,7 +1437,7 @@ void A_saveBunchJpg(char *name)
 		codec->init( 95,25000);
 
         working=new DIA_working("Saving as set of jpegs");
-		
+        bitstream.data=	buffer;
 	for(curImg=frameStart;curImg<=frameEnd;curImg++)
 	{	
                 working->update(curImg-frameStart,frameEnd-frameStart);	
@@ -1448,10 +1447,7 @@ void A_saveBunchJpg(char *name)
 			goto _bunch_abort;
 		}
                 if(!working->isAlive()) goto _bunch_abort;
-		if(!codec->encode(src,
-				 	buffer,
-					&sz,
-					&fl))
+		if(!codec->encode(src,&bitstream))
 			{
 				GUI_Error_HIG("Cannot encode frame", "Aborting.");
 				goto _bunch_abort;
@@ -1465,7 +1461,7 @@ void A_saveBunchJpg(char *name)
 				goto _bunch_abort;
 
 		}
-		fwrite (buffer, sz, 1, fd);
+		fwrite (buffer, bitstream.len, 1, fd);
     		fclose(fd);
 	}
 	

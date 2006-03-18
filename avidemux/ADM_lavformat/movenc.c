@@ -20,6 +20,7 @@
 #include "avformat.h"
 #include "avi.h"
 #include "avio.h"
+#include "mov.h"
 
 #undef NDEBUG
 #include <assert.h>
@@ -85,25 +86,6 @@ static int mov_write_esds_tag(ByteIOContext *pb, MOVTrack* track);
 /* output language code from iso639 language name */
 extern int ff_mov_iso639_to_lang(const char *lang, int mp4);
 
-const CodecTag ff_mov_obj_type[] = {
-    { CODEC_ID_MPEG4     ,  32 },
-    { CODEC_ID_AAC       ,  64 },
-    { CODEC_ID_MPEG1VIDEO, 106 },
-    { CODEC_ID_MPEG2VIDEO,  96 },//mpeg2 profiles
-    { CODEC_ID_MP2       , 107 },//FIXME mpeg2 mpeg audio -> 105
-    { CODEC_ID_MP3       , 107 },//FIXME mpeg2 mpeg audio -> 105
-    { CODEC_ID_H264      ,  33 },
-    { CODEC_ID_H263      , 242 },
-    { CODEC_ID_H261      , 243 },
-    { CODEC_ID_MJPEG     , 108 },
-    { CODEC_ID_PCM_S16LE , 224 },
-    { CODEC_ID_VORBIS    , 225 },
-    { CODEC_ID_AC3       , 226 },
-    { CODEC_ID_PCM_ALAW  , 227 },
-    { CODEC_ID_PCM_MULAW , 228 },
-    { CODEC_ID_PCM_S16BE , 230 },
-    { 0,0  },
-};
 const unsigned char mov_fake_avcC[]= {               // Put dummy avcC atom.
              0x01,0x4D,0x40,0x1F,0xFF,0xE1,0x00,0x14,
              0x27,0x4D,0x40,0x1F,0xA9,0x18,0x0A,0x00,
@@ -1493,7 +1475,7 @@ static int mov_write_header(AVFormatContext *s)
             }
         }
         /* don't know yet if mp4 or not */
-        //mov->tracks[i].language = ff_mov_iso639_to_lang(s->streams[i]->language, 1);
+        mov->tracks[i].language = ff_mov_iso639_to_lang(s->streams[i]->language, 1);
     }
 
     /* Default mode == MP4 */

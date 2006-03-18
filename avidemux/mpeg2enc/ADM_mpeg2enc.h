@@ -32,25 +32,16 @@ class Mpeg2enc: public encoder
 				mpeg2parm	 	_settings;
 				uint8_t			_firstFrame;
           public :
-          			Mpeg2enc(uint32_t width,uint32_t height);
-		  virtual ~Mpeg2enc();
-                  virtual    uint8_t stopEncoder(void );
+          			   Mpeg2enc(uint32_t width,uint32_t height);
+		  virtual         ~Mpeg2enc();
+                  virtual       uint8_t stopEncoder(void );
 		  virtual	uint8_t init(uint32_t a, uint32_t b) {return 1;};
                   virtual 	uint8_t init(  uint32_t qz, uint32_t maxbr, uint32_t fps1000,
 						uint8_t interlaced, uint8_t bff, uint8_t wide,
 						uint8_t fast); // WLA
 
-                  virtual    uint8_t  getResult( void *ress);
 		  virtual	uint8_t setQuantize( uint32_t quant) {return 0;};;
-		  virtual 	uint8_t encode(		ADMImage 	*in,
-						   			uint8_t	*out,
-						   			uint32_t 	*len,
-			       						uint32_t 	*flags	) {return 0;};
-                  virtual 	uint8_t encode(		ADMImage 	*in,
-						   			uint8_t	*out,
-						   			uint32_t 	*len,
-			       						uint32_t 	*flags,
-									uint32_t *quant);
+                  virtual 	uint8_t encode(ADMImage *in,ADMBitstream *out);
 		virtual 	uint8_t setMatrix(int matrix);	
 				uint8_t	disablePadding( void );
 				uint32_t getCodedPictureNumber( void );
