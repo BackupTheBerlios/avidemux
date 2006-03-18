@@ -197,7 +197,7 @@ AUTOMATON reaction_table[]=
 		{"audio-map",		0,"build audio map (MP3 VBR)",	call_buildtimemap},
 		{"audio-bitrate",	1,"set audio encoding bitrate",	call_audiobitrate},
 		{"fps",	1	,"set frames per second",	call_fps},
-		{"audio-codec",		1,"set audio codec (MP2/MP3/AC3/NONE (WAV PCM)/TOOLAME/COPY)",call_audiocodec},
+		{"audio-codec",		1,"set audio codec (MP2/MP3/AC3/NONE (WAV PCM)/TWOLAME/COPY)",call_audiocodec},
 		
 		{"video-codec",		1,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD/COPY)",				call_videocodec},
 		{"video-conf",		1	,"set video codec conf (cq=q|cbr=br|2pass=size)[,mbr=br][,matrix=(0|1|2|3)]",				call_videoconf},
@@ -413,7 +413,7 @@ void call_audiocodec(char *p)
 #endif
 	else if(!strcasecmp(p,"NONE"))
 		audioCodecSetcodec( AUDIOENC_NONE );
-	else if(!strcasecmp(p,"TOOLAME"))
+	else if(!strcasecmp(p,"TWOLAME"))
 		audioCodecSetcodec( AUDIOENC_2LAME );		
 #ifdef USE_VORBIS		
 	else if(!strcasecmp(p,"VORBIS"))

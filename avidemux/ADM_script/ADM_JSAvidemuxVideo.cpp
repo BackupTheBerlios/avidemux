@@ -217,6 +217,16 @@ JSBool ADM_JSAvidemuxVideo::Codec(JSContext *cx, JSObject *obj, uintN argc,
 	*rval = BOOLEAN_TO_JSVAL(false);
 	if(argc > 3)
 		return JS_FALSE;
+        if(argc==1) //Ony codec given
+        {
+            char *codec;
+            codec = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+            if(!videoCodecSelectByName(codec)) 
+                *rval = BOOLEAN_TO_JSVAL(false);
+            else
+                *rval = BOOLEAN_TO_JSVAL(true);
+            return JS_TRUE;
+        }
 	printf("Codec ... \n");
 	
 	{// begin valid

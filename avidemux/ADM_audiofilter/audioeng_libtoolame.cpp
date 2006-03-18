@@ -39,7 +39,7 @@
 
 extern "C"
 {
-#include "libtoolame/toolame.h"
+#include "libtoolame/twolame.h"
 }
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO_FILTER
@@ -47,7 +47,7 @@ extern "C"
 
 
 
-static toolame_options_struct *options=NULL;
+static twolame_options_struct *options=NULL;
 // Ctor: Duplicate
 //__________
 
@@ -71,7 +71,7 @@ AVDMProcessAudio_LibToolame::~AVDMProcessAudio_LibToolame()
     	delete(_wavheader);
 
     if(options)
-    	toolame_close( &options);
+    	twolame_close( &options);
 
 	options=NULL;
 	_wavheader=NULL;
@@ -91,7 +91,7 @@ uint8_t AVDMProcessAudio_LibToolame::init( uint32_t mode, uint32_t bitrate)
 
     int ret;//, ratio;
     double comp;
-    MPEG_mode mmode;    	
+    TWOLAME_MPEG_mode mmode;    	
     
 	_wavheader->byterate=(bitrate*1000)>>3;         
       
@@ -110,40 +110,45 @@ uint8_t AVDMProcessAudio_LibToolame::init( uint32_t mode, uint32_t bitrate)
     printf("Incoming : %lu bytes, fq : %lu, channel : %lu bitrate: %lu outgoing : %lu\n",
     	_instream->getLength(),_wavheader->frequency,_wavheader->channels,bitrate,_length);
 		
-	options=toolame_init();
+	options=twolame_init();
 	if(!options)
 	{
 		printf("Libtoolame init failed\n");
 		return 0;
 	}
-	
-  	toolame_set_out_samplerate (options, _wavheader->frequency);	
-	if(_wavheader->channels==1) mmode=MONO;
+        twolame_set_in_samplerate(options, _wavheader->frequency);
+  	twolame_set_out_samplerate (options, _wavheader->frequency);
+        twolame_set_num_channels(options, _wavheader->channels);
+	if(_wavheader->channels==1) mmode=TWOLAME_MONO;
 	else
 	switch (mode)
 	{
 	    case ADM_STEREO:
-		mmode = STEREO;
+		mmode = TWOLAME_STEREO;
 		break;
 	    case ADM_JSTEREO:
-		mmode = JOINT_STEREO;
+		mmode = TWOLAME_JOINT_STEREO;
 		break;
 	    case ADM_MONO:
-	    	mmode=MONO;
+	    	mmode=TWOLAME_MONO;
 		break;
 				
 	   default:
-		printf("\n **** unknown mode ***\n");
-		mmode = STEREO;
+		printf("\n **** unknown mode, going stereo ***\n");
+		mmode = TWOLAME_STEREO;
 		break;
 
 	}
-	toolame_set_mode(options,mmode);
-   	toolame_set_error_protection(options,TRUE);	
+	twolame_set_mode(options,mmode);
+   	twolame_set_error_protection(options,TRUE);	
     	//toolame_setPadding (options,TRUE);
-	toolame_set_bitrate (options,bitrate);
-	toolame_set_verbosity(options, 2);
-	toolame_init_params(options);	
+	twolame_set_bitrate (options,bitrate);
+	twolame_set_verbosity(options, 2);
+        if(twolame_init_params(options))
+        {
+            printf("Twolame init failed\n");
+            return 0;
+        }
 	
 
 	printf("Libtoolame successfully initialized\n");
@@ -189,13 +194,13 @@ uint32_t AVDMProcessAudio_LibToolame::grab(uint8_t * obuffer)
   	// 
 	if(_wavheader->channels==1)
 	{
-		nbout =toolame_encode_buffer(options, _buffer, _buffer,
+		nbout =twolame_encode_buffer(options, _buffer, _buffer,
 			  rdall>>1, obuffer,8192  );
 		aprintf("in:%d out;%d\n",rdall,nbout);	
 	}		
 	else
 	{
-		nbout= toolame_encode_buffer_interleaved(options, _buffer,
+		nbout= twolame_encode_buffer_interleaved(options, _buffer,
 			  rdall>>2, obuffer, ONE_CHUNK*2);
 		aprintf("2Lame: in:%d out:%d frame:%d\n",rdall,nbout,nbframe);	  
 		
