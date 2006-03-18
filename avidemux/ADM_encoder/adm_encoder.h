@@ -28,97 +28,87 @@
 typedef enum
 {
 
-	enc_CQ=1,
-	enc_CBR,
-	enc_Pass1,
-	enc_Pass2,
-	enc_Same,
-	enc_Invalid
-
-}encoderState;
+  enc_CQ = 1,
+  enc_CBR,
+  enc_Pass1,
+  enc_Pass2,
+  enc_Same,
+  enc_Invalid
+} encoderState;
 
 
 typedef struct entry_s
 	/* max 28 bytes/frame or 5 Mb for 2-hour movie */
-	{
-		int quant;
-		int text_bits;
-		int motion_bits;
-		int total_bits;
-		float mult;
-		int is_key_frame;
-		int drop;
-	} entry;
+{
+  int quant;
+  int text_bits;
+  int motion_bits;
+  int total_bits;
+  float mult;
+  int is_key_frame;
+  int drop;
+} entry;
 
 
 class Encoder
 {
- 	
-	protected:
-				encoderState 		_state;
-				uint32_t		_w,_h;
-				ADMImage		*_vbuffer;
-             			 AVDMGenericVideoStream *_in;
-				char 			_logname[500];
-				COMPRES_PARAMS 		_param;
 
-	// VBR
-				FILE 			*fd;
-                    		uint32_t		_frametogo;
-                        	entry			*entries;
- 				double 			m_fQuant;
-                          	long long  		m_lEncodedBits,m_lExpectedBits;
-                          	long long		old_bits;
+protected:
+  encoderState _state;
+  uint32_t _w, _h;
+  ADMImage *_vbuffer;
+  AVDMGenericVideoStream *_in;
+  char _logname[500];
+  COMPRES_PARAMS _param;
 
-                         	uint8_t 		computeParameters( void );
-				uint8_t  		getQuantVBR(   uint32_t frame,   int64_t previousbits,
-								uint16_t *oquant,uint8_t *qf);
+  // VBR
+  FILE *fd;
+  uint32_t _frametogo;
+  entry *entries;
+  uint8_t computeParameters (void);
 // -- vbr
 
-	public:
-				Encoder	( void ) { _w=_h=0; _vbuffer=NULL;entries=NULL;};
-				virtual ~Encoder( void );
-				virtual uint8_t isDualPass( void )=0;
-				virtual uint8_t configure(AVDMGenericVideoStream *instream)=0;
-                                virtual uint8_t encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags,uint32_t *displayFrameNo)
-                                {
-                                        *displayFrameNo=frame;
-                                        return encode(frame,len,out,flags);
-                                }
+public:
+    Encoder (void)
+  {
+    _w = _h = 0;
+    _vbuffer = NULL;
+    entries = NULL;
+  };
+  virtual ~ Encoder (void);
+  virtual uint8_t isDualPass (void) = 0;
+  virtual uint8_t configure (AVDMGenericVideoStream * instream) = 0;
+  virtual uint8_t encode (uint32_t frame, ADMBitstream * out) = 0;
+  virtual uint8_t stop (void) = 0;
+  virtual uint8_t setLogFile (const char *o, uint32_t frames) = 0;
+  virtual uint8_t startPass1 (void) = 0;
+  virtual uint8_t startPass2 (void) = 0;
+  virtual uint8_t hasExtraHeaderData (uint32_t * l, uint8_t ** data)
+  {
+    *data = NULL;
+    *l = 0;
+    return 1;
+  }
+  virtual const char *getCodecName (void) = 0;
+  virtual const char *getFCCHandler (void) = 0;
+  virtual const char *getDisplayName (void) = 0;
 
-				virtual uint8_t encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags)=0;
-				virtual uint8_t stop( void)=0;
-				virtual uint8_t getLastQz( void) { return 31;};
-				virtual uint8_t setLogFile( const char *o,uint32_t frames)=0;
-				virtual uint8_t startPass1( void )=0;		
-				virtual uint8_t startPass2( void )=0;	
-				virtual uint8_t hasExtraHeaderData( uint32_t *l,uint8_t **data)
-					{
-						*data=NULL;
-						*l= 0;
-						return 1;
-					}
-			        virtual const char *getCodecName(void ) =0;
-              			virtual const char *getFCCHandler(void ) =0;
-              			virtual const char *getDisplayName(void ) =0;
-              
 
-}   ; 
-Encoder *getVideoEncoder( uint32_t w,uint32_t h,uint32_t globalHeader=0 );
+};
+Encoder *getVideoEncoder (uint32_t w, uint32_t h, uint32_t globalHeader = 0);
 
 
 typedef enum
 {
-	CodecFamilyAVI,
-	CodecFamilyMpeg,
-	CodecFamilyXVCD
-}CodecFamilty;
+  CodecFamilyAVI,
+  CodecFamilyMpeg,
+  CodecFamilyXVCD
+} CodecFamilty;
 
-extern  CodecFamilty videoCodecGetFamily( void );
-extern void videoCodecConfigureUI( void );
-extern int videoCodecConfigure(char *p,uint32_t i, uint8_t  *c);
-extern void videoCodecSelect( void );
-extern void videoCodecSetcodec(SelectCodecType codec);
-extern uint8_t EncoderSaveMpeg(const char *name);
+extern CodecFamilty videoCodecGetFamily (void);
+extern void videoCodecConfigureUI (void);
+extern int videoCodecConfigure (char *p, uint32_t i, uint8_t * c);
+extern void videoCodecSelect (void);
+extern void videoCodecSetcodec (SelectCodecType codec);
+extern uint8_t EncoderSaveMpeg (const char *name);
 #endif
-

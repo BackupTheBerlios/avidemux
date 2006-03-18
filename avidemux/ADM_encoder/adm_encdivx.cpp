@@ -39,138 +39,148 @@
 #include "ADM_codecs/ADM_divxEncode.h"
 #include "ADM_encoder/adm_encdivx.h"
 
-extern  int getCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
-		      uint32_t * br,uint32_t *fs);
+extern int getCompressParams (COMPRESSION_MODE * mode, uint32_t * qz,
+			      uint32_t * br, uint32_t * fs);
 
 /*_________________________________________________*/
-EncoderDivx::EncoderDivx	(DIVXConfig *config  )
-		{
-			 	_codec=NULL;
-				fd=NULL;
-				entries=NULL;
-				strcpy(_logname,"");
-       				_frametogo=0;
-				memcpy(&_param,&(config->generic),sizeof(_param));           
-		} ;
+EncoderDivx::EncoderDivx (DIVXConfig * config)
+{
+  _codec = NULL;
+  fd = NULL;
+  entries = NULL;
+  strcpy (_logname, "");
+  _frametogo = 0;
+  memcpy (&_param, &(config->generic), sizeof (_param));
+};
 //--------------------------------
-uint8_t EncoderDivx::configure( AVDMGenericVideoStream *instream)
-
+uint8_t
+EncoderDivx::configure (AVDMGenericVideoStream * instream)
 {
-     //  COMPRES_PARAMS par;
+  //  COMPRES_PARAMS par;
 
-		ADM_assert(instream);
-        ADV_Info 			*info;
+  ADM_assert (instream);
+  ADV_Info *info;
 
-		info=instream->getInfo(  );
-		_w=info->width;
-		_h=info->height;
-		_vbuffer=new uint8_t[_w*_h*3];
-		ADM_assert(_vbuffer);
+  info = instream->getInfo ();
+  _w = info->width;
+  _h = info->height;
+  _vbuffer = new uint8_t[_w * _h * 3];
+  ADM_assert (_vbuffer);
 
 
-		switch(_param.mode)
-		{
-		case COMPRESS_CQ :	_state=	enc_CQ;
-					    					_codec=new divxEncoderCQ(_w,_h);
-										_codec->init( _param.qz,info->fps1000);
-										break;
-		case COMPRESS_CBR :	_state=	enc_CBR;
-					    					_codec=new divxEncoderCBR(_w,_h);
-										_codec->init( _param.bitrate,info->fps1000);           //qz,bitrate,finalsize;
-										break;
-		case COMPRESS_2PASS: _state=	enc_Pass1;
-                     								_codec=new divxEncoderCQ(_w,_h);
-                     								_codec->init( 2,info->fps1000);
-										break;
-		default:
-					ADM_assert(0);
+  switch (_param.mode)
+    {
+    case COMPRESS_CQ:
+      _state = enc_CQ;
+      _codec = new divxEncoderCQ (_w, _h);
+      _codec->init (_param.qz, info->fps1000);
+      break;
+    case COMPRESS_CBR:
+      _state = enc_CBR;
+      _codec = new divxEncoderCBR (_w, _h);
+      _codec->init (_param.bitrate, info->fps1000);	//qz,bitrate,finalsize;
+      break;
+    case COMPRESS_2PASS:
+      _state = enc_Pass1;
+      _codec = new divxEncoderCQ (_w, _h);
+      _codec->init (2, info->fps1000);
+      break;
+    default:
+      ADM_assert (0);
 
-        }
-       		_in=instream;
-		printf("\n Divx Encoder , w: %lu h:%lu mode:%d",_w,_h, _state);
-		return 1;
+    }
+  _in = instream;
+  printf ("\n Divx Encoder , w: %lu h:%lu mode:%d", _w, _h, _state);
+  return 1;
 
 }
 
 
 
-uint8_t EncoderDivx::startPass1( void )
+uint8_t
+EncoderDivx::startPass1 (void)
 {
-		   	ADM_assert(_state==  enc_Pass1);
-			_frametogo=0;
-			printf("\n Starting pass 1\n");
-			printf(" Creating logfile :%s\n",_logname);
-        		fd=fopen(_logname,"wt");
-                   	if(!fd)
-			{
-					printf("\n cannot create logfile !\n");
-                    			return 0;
-			}
-			return 1;
+  ADM_assert (_state == enc_Pass1);
+  _frametogo = 0;
+  printf ("\n Starting pass 1\n");
+  printf (" Creating logfile :%s\n", _logname);
+  fd = fopen (_logname, "wt");
+  if (!fd)
+    {
+      printf ("\n cannot create logfile !\n");
+      return 0;
+    }
+  return 1;
 }
 
 
-uint8_t EncoderDivx::isDualPass( void )
+uint8_t
+EncoderDivx::isDualPass (void)
 {
- 		if((_state==enc_Pass1) ||(_state==enc_Pass2))
-		{
-        	return 1;
-		}
-		return 0;
+  if ((_state == enc_Pass1) || (_state == enc_Pass2))
+    {
+      return 1;
+    }
+  return 0;
 
 }
-uint8_t EncoderDivx::setLogFile( const char *lofile,uint32_t nbframe )
+uint8_t
+EncoderDivx::setLogFile (const char *lofile, uint32_t nbframe)
 {
-	strcpy(_logname,lofile);
-	_frametogo=nbframe;
-	return 1;
+  strcpy (_logname, lofile);
+  _frametogo = nbframe;
+  return 1;
 
 }
 
 //______________________________
-uint8_t EncoderDivx::encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags)
+uint8_t
+EncoderDivx::encode (uint32_t frame, uint32_t * len, uint8_t * out,
+		     uint32_t * flags)
 {
-uint32_t l,f;
-myENC_RESULT enc;
+  uint32_t l, f;
+  myENC_RESULT enc;
 
-		ADM_assert(_codec);
-		ADM_assert(_in);
+  ADM_assert (_codec);
+  ADM_assert (_in);
 
-		if(!_in->getFrameNumberNoAlloc(frame,&l,_vbuffer,&f))
-		{
-				printf("\n Error : Cannot read incoming frame !");
-				return 0;
-		}
+  if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
+    {
+      printf ("\n Error : Cannot read incoming frame !");
+      return 0;
+    }
 
- 		switch(_state)
-		{
-    				case enc_CBR:
-				case enc_CQ:
-							return _codec->encode(   _vbuffer,out,len,flags);
-							break;
-				case enc_Pass1:
+  switch (_state)
+    {
+    case enc_CBR:
+    case enc_CQ:
+      return _codec->encode (_vbuffer, out, len, flags);
+      break;
+    case enc_Pass1:
 
-                              break;
+      break;
 
-				default:
-							ADM_assert(0);
-        }
-		return 0;
+    default:
+      ADM_assert (0);
+    }
+  return 0;
 }
 
 //_______________________________
-uint8_t EncoderDivx::stop( void)
+uint8_t
+EncoderDivx::stop (void)
 {
- 	delete _codec;
-	_codec=0;
-	return 1;
+  delete _codec;
+  _codec = 0;
+  return 1;
 
 }
 
-uint8_t EncoderDivx::startPass2( void )
+uint8_t
+EncoderDivx::startPass2 (void)
 {
 
-	return 0;
+  return 0;
 }
 
 #endif

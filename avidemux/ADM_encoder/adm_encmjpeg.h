@@ -21,27 +21,45 @@
 #ifdef USE_FFMPEG
 #include "ADM_encoder/adm_encmjpeg_param.h"
 
-class EncoderMjpeg: public Encoder
+class EncoderMjpeg:public Encoder
 {
- 	
-	protected:
-				
- 							ffmpegEncoderFFMjpeg		*_codec;
-							uint32_t						_q;
-							uint8_t 						_swapped;
-	public:
-							EncoderMjpeg	( COMPRES_PARAMS  *conf)  ;
-							virtual uint8_t isDualPass( void ) { return 0;}; 			// mjpeg is always monopass
-							virtual uint8_t configure(AVDMGenericVideoStream *instream) ;
-							virtual uint8_t encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags);
-							virtual uint8_t setLogFile( const char *p,uint32_t fr); // for dual pass only
-							virtual uint8_t stop( void);
-							virtual uint8_t startPass2( void ) 		 { assert(0);}; // for dual pass only
-							virtual uint8_t startPass1( void ) 		 { assert(0);}; // for dual pass only
-						  virtual const char *getCodecName(void ) {return "MJPG";}				
-						  virtual const char *getFCCHandler(void ) {return "MJPG";}
-							virtual const char *getDisplayName(void ) {return "Mjpeg";}						  
-}   ;
+
+protected:
+
+  ffmpegEncoderFFMjpeg * _codec;
+  uint32_t _q;
+  uint8_t _swapped;
+public:
+    EncoderMjpeg (COMPRES_PARAMS * conf);
+  virtual uint8_t isDualPass (void)
+  {
+    return 0;
+  };				// mjpeg is always monopass
+  virtual uint8_t configure (AVDMGenericVideoStream * instream);
+  virtual uint8_t encode (uint32_t frame, ADMBitstream *out);
+  virtual uint8_t setLogFile (const char *p, uint32_t fr);	// for dual pass only
+  virtual uint8_t stop (void);
+  virtual uint8_t startPass2 (void)
+  {
+    assert (0);
+  };				// for dual pass only
+  virtual uint8_t startPass1 (void)
+  {
+    assert (0);
+  };				// for dual pass only
+  virtual const char *getCodecName (void)
+  {
+    return "MJPG";
+  }
+  virtual const char *getFCCHandler (void)
+  {
+    return "MJPG";
+  }
+  virtual const char *getDisplayName (void)
+  {
+    return "Mjpeg";
+  }
+};
 
 
 #endif

@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
- 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -46,83 +46,86 @@
 
 #include "ADM_encoder/adm_encmjpeg.h"
 
-extern int getMjpegCompressParams(int *qual,int *swap);
+extern int getMjpegCompressParams (int *qual, int *swap);
 
 /*_________________________________________________*/
-EncoderMjpeg::EncoderMjpeg	(  COMPRES_PARAMS *conf)
-		{
-			 	_codec=NULL;
-				fd=NULL;
-				entries=NULL;
-				strcpy(_logname,"");
-       				_frametogo=0;
-       			MJPEGConfig *cf=(MJPEGConfig *)conf->extraSettings;	
-       			ADM_assert(sizeof(MJPEGConfig)==conf->extraSettingsLen);
-				_q=cf->qual;
-				_swapped=cf->swapped;
-		} ;
-//--------------------------------
-uint8_t EncoderMjpeg::configure( AVDMGenericVideoStream *instream)
-
+EncoderMjpeg::EncoderMjpeg (COMPRES_PARAMS * conf)
 {
-        ADV_Info 			*info;	
+  _codec = NULL;
+  fd = NULL;
+  entries = NULL;
+  strcpy (_logname, "");
+  _frametogo = 0;
+  MJPEGConfig *cf = (MJPEGConfig *) conf->extraSettings;
+  ADM_assert (sizeof (MJPEGConfig) == conf->extraSettingsLen);
+  _q = cf->qual;
+  _swapped = cf->swapped;
+};
+//--------------------------------
+uint8_t
+EncoderMjpeg::configure (AVDMGenericVideoStream * instream)
+{
+  ADV_Info *info;
 //         int q,s;
 
-   		ADM_assert(instream);
-		_in=instream;
+  ADM_assert (instream);
+  _in = instream;
 
-		info=instream->getInfo(  );
-		_w=info->width;
-		_h=info->height;
+  info = instream->getInfo ();
+  _w = info->width;
+  _h = info->height;
 
-		
-//		_vbuffer=new uint8_t[_w*_h*3];
-		_vbuffer=new ADMImage(_w,_h);
-		ADM_assert(_vbuffer);
 
-   //	_codec=new mjpegEncoder(_w,_h);
-  	_codec=new  ffmpegEncoderFFMjpeg( _w,_h,FF_MJPEG)  ;
+//              _vbuffer=new uint8_t[_w*_h*3];
+  _vbuffer = new ADMImage (_w, _h);
+  ADM_assert (_vbuffer);
 
-		_codec->init( _q,info->fps1000,0);
+  //   _codec=new mjpegEncoder(_w,_h);
+  _codec = new ffmpegEncoderFFMjpeg (_w, _h, FF_MJPEG);
 
-	return 1;
+  _codec->init (_q, info->fps1000, 0);
+
+  return 1;
 }
 
-                           	
+
 
 
 
 //______________________________
-uint8_t EncoderMjpeg::encode( uint32_t frame,uint32_t *len,uint8_t *out,uint32_t *flags)
+uint8_t
+EncoderMjpeg::encode (uint32_t frame, ADMBitstream *out)
 {
-uint32_t l,f;
+  uint32_t l, f;
 
 
-		ADM_assert(_codec);
-		ADM_assert(_in);
+  ADM_assert (_codec);
+  ADM_assert (_in);
 
-		if(!_in->getFrameNumberNoAlloc(frame,&l,_vbuffer,&f))
-		{
-				printf("\n Error : Cannot read incoming frame !");
-				return 0;
-		}	
-		return _codec->encode(   _vbuffer,out,len,flags);
-	}
+  if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
+    {
+      printf ("\n Error : Cannot read incoming frame !");
+      return 0;
+    }
+  return _codec->encode (_vbuffer, out);
+}
 
 //_______________________________
-uint8_t EncoderMjpeg::stop( void)
+uint8_t
+EncoderMjpeg::stop (void)
 {
- 	delete _codec;
-	_codec=0;
-	return 1;
+  delete _codec;
+  _codec = 0;
+  return 1;
 
 }
 
-uint8_t EncoderMjpeg::setLogFile( const char *p,uint32_t fr) { // for dual pass only
+uint8_t
+EncoderMjpeg::setLogFile (const char *p, uint32_t fr)
+{				// for dual pass only
 
-UNUSED_ARG(p);
-UNUSED_ARG(fr);
-	return 1;
+  UNUSED_ARG (p);
+  UNUSED_ARG (fr);
+  return 1;
 }
-#endif		
-	
+#endif

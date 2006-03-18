@@ -20,9 +20,9 @@
 #include "ADM_codecs/ADM_xvid4param.h"
 typedef struct XVID4config
 {
-		COMPRES_PARAMS 	generic;
-		xvid4EncParam   specific;	
-}XVID4config;
+  COMPRES_PARAMS generic;
+  xvid4EncParam specific;
+} XVID4config;
 
 
 class EncoderXvid4:public Encoder
@@ -30,31 +30,38 @@ class EncoderXvid4:public Encoder
 
 protected:
 
-  xvid4Encoder 		*_codec;
-  xvid4EncParam 	encparam;
-  
-  
-  uint32_t		_totalframe;
-  uint8_t		_pass1Done;  
-  uint32_t		_fps1000;
-  
+  xvid4Encoder * _codec;
+  xvid4EncParam encparam;
+
+
+  uint32_t _totalframe;
+  uint8_t _pass1Done;
+  uint32_t _fps1000;
+
 public:
-    EncoderXvid4 (COMPRES_PARAMS *codecconfig );
-	~EncoderXvid4() ; // can be called twice if needed ..
+    EncoderXvid4 (COMPRES_PARAMS * codecconfig);
+   ~EncoderXvid4 ();		// can be called twice if needed ..
   virtual uint8_t isDualPass (void);
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
-          uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
-			  uint32_t * flags,uint32_t *displayFrame);
-  virtual uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
-                          uint32_t * flags) {return encode(frame,len,out,flags,NULL);}
+ 
+  virtual uint8_t encode (uint32_t frame, ADMBitstream *out);
   virtual uint8_t setLogFile (const char *p, uint32_t fr);
   virtual uint8_t stop (void);
   virtual uint8_t startPass2 (void);
   virtual uint8_t startPass1 (void);
-  virtual const char *getCodecName(void ) {return "XVID";}				
-  virtual const char *getFCCHandler(void ) {return "xvid";}
-  virtual const char *getDisplayName(void ) {return "Xvid4";}  
-  virtual uint8_t     getLastQz( void);
+  virtual const char *getCodecName (void)
+  {
+    return "XVID";
+  }
+  virtual const char *getFCCHandler (void)
+  {
+    return "xvid";
+  }
+  virtual const char *getDisplayName (void)
+  {
+    return "Xvid4";
+  }
+
 };
 
 

@@ -42,86 +42,87 @@
 
 #ifdef USE_DIVX
 #include "ADM_codecs/ADM_divxEncode.h"
-#include "ADM_encoder/adm_encdivx.h"       
+#include "ADM_encoder/adm_encdivx.h"
 
 #endif
 
 #ifdef USE_XX_XVID
-	#include "ADM_codecs/ADM_xvid.h"
-	#include "ADM_encoder/adm_encxvid.h"
+#include "ADM_codecs/ADM_xvid.h"
+#include "ADM_encoder/adm_encxvid.h"
 
 #endif
 #ifdef USE_XVID_4
-	#include "ADM_codecs/ADM_xvid4.h"
-	#include "ADM_codecs/ADM_xvid4param.h"
-	#include "ADM_encoder/adm_encXvid4.h"
+#include "ADM_codecs/ADM_xvid4.h"
+#include "ADM_codecs/ADM_xvid4param.h"
+#include "ADM_encoder/adm_encXvid4.h"
 
 #endif
 
 
 #ifdef USE_FFMPEG
-    #include "ADM_codecs/ADM_ffmpeg.h"
-	#include "ADM_encoder/adm_encffmpeg.h"
+#include "ADM_codecs/ADM_ffmpeg.h"
+#include "ADM_encoder/adm_encffmpeg.h"
 #endif
 
 #ifdef USE_FFMPEG
-    #include "ADM_codecs/ADM_mjpegEncode.h"
-	#include "ADM_encoder/adm_encmjpeg.h"
+#include "ADM_codecs/ADM_mjpegEncode.h"
+#include "ADM_encoder/adm_encmjpeg.h"
 #endif
 
 #include "ADM_encoder/adm_encCopy.h"
 
 
-static uint8_t nb_encoder=0;
+static uint8_t nb_encoder = 0;
 
 
 
 //----------------------------------
-Encoder::~Encoder( void )
+Encoder::~Encoder (void)
 {
 #define CLEAN(x) if(x) { delete [] x;x=NULL;}
 
-		//CLEAN(_vbuffer);
-		if(_vbuffer) delete _vbuffer;
-		_vbuffer=NULL;
-		CLEAN(entries);
+  //CLEAN(_vbuffer);
+  if (_vbuffer)
+    delete _vbuffer;
+  _vbuffer = NULL;
+  CLEAN (entries);
 
 }
 //---------------------------------
-void register_Encoders( void )
+void
+register_Encoders (void)
 {
-	printf("\n Registering Encoders\n");
-	printf(  "*********************\n");
+  printf ("\n Registering Encoders\n");
+  printf ("*********************\n");
 #ifdef USE_DIVX
-			nb_encoder++;
-			printf("Divx  encoder registred\n");
+  nb_encoder++;
+  printf ("Divx  encoder registred\n");
 #endif
 #ifdef USE_FFMPEG
-			nb_encoder++;
-			printf("Mjpeg encoder registred\n");
+  nb_encoder++;
+  printf ("Mjpeg encoder registred\n");
 
 #endif
 #ifdef USE_XX_XVID
 
-			{
-				nb_encoder++;
-				printf("Xvid  encoder registred\n");
-			}
+  {
+    nb_encoder++;
+    printf ("Xvid  encoder registred\n");
+  }
 
 #endif
 #ifdef USE_XVID_4
 
-			{
-				nb_encoder++;
-				printf("Xvid-4  encoder registred\n");
-			}
+  {
+    nb_encoder++;
+    printf ("Xvid-4  encoder registred\n");
+  }
 
 #endif
 #ifdef USE_FFMPEG
-				nb_encoder++;
-				printf("FFMPEG  encoder registred\n");
+  nb_encoder++;
+  printf ("FFMPEG  encoder registred\n");
 #endif
-            printf("\n %d encoder registered\n",nb_encoder);
+  printf ("\n %d encoder registered\n", nb_encoder);
 
 }
-

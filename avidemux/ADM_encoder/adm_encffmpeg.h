@@ -14,7 +14,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- #ifndef __ADM_encoder_ff__
+#ifndef __ADM_encoder_ff__
 #define __ADM_encoder_ff__
 
 
@@ -24,26 +24,34 @@ class EncoderFFMPEG:public Encoder
 
 protected:
 
-  ffmpegEncoder 		*_codec;
-  uint8_t			_internal;
-  FF_CODEC_ID			_id;
-  uint32_t			_fps;
-  FFcodecSetting   _settings;
+  ffmpegEncoder * _codec;
+  uint8_t _internal;
+  FF_CODEC_ID _id;
+  uint32_t _fps;
+  FFcodecSetting _settings;
 public:
-    EncoderFFMPEG (FF_CODEC_ID id ,COMPRES_PARAMS *codecParam);
-	~EncoderFFMPEG() { stop();}; // can be called twice if needed ..
+    EncoderFFMPEG (FF_CODEC_ID id, COMPRES_PARAMS * codecParam);
+   ~EncoderFFMPEG ()
+  {
+    stop ();
+  };				// can be called twice if needed ..
   virtual uint8_t isDualPass (void);
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
-  virtual uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
-			  uint32_t * flags);
+  virtual uint8_t encode (uint32_t frame,ADMBitstream *out);
   virtual uint8_t setLogFile (const char *p, uint32_t fr);
   virtual uint8_t stop (void);
   virtual uint8_t startPass2 (void);
   virtual uint8_t startPass1 (void);
-  virtual const char *getDisplayName(void ) {return "LavCodec";}
-  virtual const char *getCodecName(void ) ; //{return "DX50";}
-  virtual const char *getFCCHandler(void ) {return "divx";}
-  virtual uint8_t    getLastQz( void) ;
+  virtual const char *getDisplayName (void)
+  {
+    return "LavCodec";
+  }
+  virtual const char *getCodecName (void);	//{return "DX50";}
+  virtual const char *getFCCHandler (void)
+  {
+    return "divx";
+  }
+
 
 };
 
@@ -54,18 +62,39 @@ protected:
 
 
 public:
-    	EncoderFFMPEGHuff (COMPRES_PARAMS *codecParam);
-	~EncoderFFMPEGHuff() { stop();}; // can be called twice if needed ..
-  virtual uint8_t isDualPass (void) { return 0;};
+  EncoderFFMPEGHuff (COMPRES_PARAMS * codecParam);
+  ~EncoderFFMPEGHuff ()
+  {
+    stop ();
+  };				// can be called twice if needed ..
+  virtual uint8_t isDualPass (void)
+  {
+    return 0;
+  };
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
-  virtual uint8_t setLogFile (const char *p, uint32_t fr)  { UNUSED_ARG(p); UNUSED_ARG(fr); return 1;};
-  virtual uint8_t startPass2 (void) { return 1;};
-  virtual uint8_t startPass1 (void) { return 1;};
-  virtual const char *getDisplayName(void ) {return "LavCodec HUFFYUV";}
-  virtual const char *getFCCHandler(void ) {return "HFYU";}
-  virtual uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
-			  uint32_t * flags);
-  virtual uint8_t hasExtraHeaderData( uint32_t *l,uint8_t **data);
+  virtual uint8_t setLogFile (const char *p, uint32_t fr)
+  {
+    UNUSED_ARG (p);
+    UNUSED_ARG (fr);
+    return 1;
+  };
+  virtual uint8_t startPass2 (void)
+  {
+    return 1;
+  };
+  virtual uint8_t startPass1 (void)
+  {
+    return 1;
+  };
+  virtual const char *getDisplayName (void)
+  {
+    return "LavCodec HUFFYUV";
+  }
+  virtual const char *getFCCHandler (void)
+  {
+    return "HFYU";
+  }
+  virtual uint8_t hasExtraHeaderData (uint32_t * l, uint8_t ** data);
 
 };
 class EncoderFFMPEGFFHuff:public EncoderFFMPEG
@@ -75,18 +104,39 @@ protected:
 
 
 public:
-        EncoderFFMPEGFFHuff (COMPRES_PARAMS *config);
-        ~EncoderFFMPEGFFHuff() { stop();}; // can be called twice if needed ..
-  virtual uint8_t isDualPass (void) { return 0;};
+  EncoderFFMPEGFFHuff (COMPRES_PARAMS * config);
+  ~EncoderFFMPEGFFHuff ()
+  {
+    stop ();
+  };				// can be called twice if needed ..
+  virtual uint8_t isDualPass (void)
+  {
+    return 0;
+  };
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
-  virtual uint8_t setLogFile (const char *p, uint32_t fr)  { UNUSED_ARG(p); UNUSED_ARG(fr); return 1;};
-  virtual uint8_t startPass2 (void) { return 1;};
-  virtual uint8_t startPass1 (void) { return 1;};
-  virtual const char *getDisplayName(void ) {return "LavCodec HUFFYUV";}
-  virtual const char *getFCCHandler(void ) {return "HFYU";}
-  virtual uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
-                          uint32_t * flags);
-  virtual uint8_t hasExtraHeaderData( uint32_t *l,uint8_t **data);
+  virtual uint8_t setLogFile (const char *p, uint32_t fr)
+  {
+    UNUSED_ARG (p);
+    UNUSED_ARG (fr);
+    return 1;
+  };
+  virtual uint8_t startPass2 (void)
+  {
+    return 1;
+  };
+  virtual uint8_t startPass1 (void)
+  {
+    return 1;
+  };
+  virtual const char *getDisplayName (void)
+  {
+    return "LavCodec HUFFYUV";
+  }
+  virtual const char *getFCCHandler (void)
+  {
+    return "HFYU";
+  }
+  virtual uint8_t hasExtraHeaderData (uint32_t * l, uint8_t ** data);
 
 };
 
@@ -97,18 +147,39 @@ protected:
 
 
 public:
-    	EncoderFFMPEGFFV1 (COMPRES_PARAMS *config);
-	~EncoderFFMPEGFFV1() { stop();}; // can be called twice if needed ..
-  virtual uint8_t isDualPass (void) { return 0;};
+  EncoderFFMPEGFFV1 (COMPRES_PARAMS * config);
+  ~EncoderFFMPEGFFV1 ()
+  {
+    stop ();
+  };				// can be called twice if needed ..
+  virtual uint8_t isDualPass (void)
+  {
+    return 0;
+  };
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
-  virtual uint8_t setLogFile (const char *p, uint32_t fr)  { UNUSED_ARG(p); UNUSED_ARG(fr); return 1;};
-  virtual uint8_t startPass2 (void) { return 1;};
-  virtual uint8_t startPass1 (void) { return 1;};
-  virtual const char *getDisplayName(void ) {return "LavCodec FFV1";}
-  virtual const char *getFCCHandler(void ) {return "FFV1";}
-  virtual uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
-			  uint32_t * flags);
-  virtual uint8_t hasExtraHeaderData( uint32_t *l,uint8_t **data);
+  virtual uint8_t setLogFile (const char *p, uint32_t fr)
+  {
+    UNUSED_ARG (p);
+    UNUSED_ARG (fr);
+    return 1;
+  };
+  virtual uint8_t startPass2 (void)
+  {
+    return 1;
+  };
+  virtual uint8_t startPass1 (void)
+  {
+    return 1;
+  };
+  virtual const char *getDisplayName (void)
+  {
+    return "LavCodec FFV1";
+  }
+  virtual const char *getFCCHandler (void)
+  {
+    return "FFV1";
+  }
+  virtual uint8_t hasExtraHeaderData (uint32_t * l, uint8_t ** data);
 
 };
 
@@ -116,35 +187,27 @@ public:
 class EncoderFFMPEGMpeg1:public EncoderFFMPEG
 {
 private:
-	uint8_t  setMatrix( void);
-	uint8_t	_lastQz;
-	uint32_t	_lastBitrate;
+  uint8_t setMatrix (void);
+  uint8_t _lastQz;
+  uint32_t _lastBitrate;
 
 public:
 
-	
-  	uint32_t			_totalframe;
-	uint32_t			_pass1Done;
-	uint8_t  			updateStats (uint32_t len);
-	uint32_t 			getDTS( void );
-	uint8_t				_use_xvid_ratecontrol;	
+
+    uint32_t _totalframe;
+  uint32_t _pass1Done;
+  uint8_t _use_xvid_ratecontrol;
 
 public:
-    			EncoderFFMPEGMpeg1 ( FF_CODEC_ID id, COMPRES_PARAMS *config);
-  virtual		~EncoderFFMPEGMpeg1(); // can be called twice if needed ..
+    EncoderFFMPEGMpeg1 (FF_CODEC_ID id, COMPRES_PARAMS * config);
+    virtual ~ EncoderFFMPEGMpeg1 ();	// can be called twice if needed ..
   virtual uint8_t isDualPass (void);
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
-  virtual uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
-			  uint32_t * flags);
+  virtual uint8_t encode (uint32_t frame, ADMBitstream *out);
   virtual uint8_t setLogFile (const char *p, uint32_t fr);
   virtual uint8_t stop (void);
   virtual uint8_t startPass2 (void);
   virtual uint8_t startPass1 (void);
-  	   //uint8_t getQuantizer( void );
-	   //uint32_t getBitrate( void );
- virtual uint8_t    getLastQz( void) ;	   
-
-
 };
 
 class EncodeFFMPEGSNow:public EncoderFFMPEG
@@ -154,18 +217,39 @@ protected:
 
 
 public:
-    			EncodeFFMPEGSNow (COMPRES_PARAMS *config);
-			~EncodeFFMPEGSNow() { stop();}; // can be called twice if needed ..
-  virtual uint8_t isDualPass (void) { return 0;};
+  EncodeFFMPEGSNow (COMPRES_PARAMS * config);
+  ~EncodeFFMPEGSNow ()
+  {
+    stop ();
+  };				// can be called twice if needed ..
+  virtual uint8_t isDualPass (void)
+  {
+    return 0;
+  };
   virtual uint8_t configure (AVDMGenericVideoStream * instream);
-  virtual uint8_t setLogFile (const char *p, uint32_t fr)  { UNUSED_ARG(p); UNUSED_ARG(fr); return 1;};
-  virtual uint8_t startPass2 (void) { return 1;};
-  virtual uint8_t startPass1 (void) { return 1;};
-  virtual const char *getDisplayName(void ) {return "LavCodec Snow";}
-  virtual const char *getFCCHandler(void ) {return "SNOW";}
-  virtual uint8_t encode (uint32_t frame, uint32_t * len, uint8_t * out,
-			  uint32_t * flags);
-  virtual uint8_t hasExtraHeaderData( uint32_t *l,uint8_t **data);
+  virtual uint8_t setLogFile (const char *p, uint32_t fr)
+  {
+    UNUSED_ARG (p);
+    UNUSED_ARG (fr);
+    return 1;
+  };
+  virtual uint8_t startPass2 (void)
+  {
+    return 1;
+  };
+  virtual uint8_t startPass1 (void)
+  {
+    return 1;
+  };
+  virtual const char *getDisplayName (void)
+  {
+    return "LavCodec Snow";
+  }
+  virtual const char *getFCCHandler (void)
+  {
+    return "SNOW";
+  }
+  virtual uint8_t hasExtraHeaderData (uint32_t * l, uint8_t ** data);
 
 };
 #endif

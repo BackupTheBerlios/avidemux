@@ -20,9 +20,9 @@
 
 typedef struct MJPEGConfig
 {
-		
-		int		qual;
-		int		swapped;
-}MJPEGConfig;
+
+  int qual;
+  int swapped;
+} MJPEGConfig;
 
 #endif

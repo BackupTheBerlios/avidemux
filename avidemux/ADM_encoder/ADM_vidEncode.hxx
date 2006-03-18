@@ -14,44 +14,44 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- #ifndef ADM_VIDENCODE
- #define ADM_VIDENCODE
- 
- typedef enum SelectCodecType
+#ifndef ADM_VIDENCODE
+#define ADM_VIDENCODE
+
+typedef enum SelectCodecType
 {
-    CodecCopy,
-	CodecDivx	,
-	CodecXvid	,
-	CodecFF,
-	CodecMjpeg,
-	CodecH263,
-	CodecH263P,
-	CodecFFV1,
-	CodecSnow,
-	CodecHuff,
-	CodecVCD,
-	CodecSVCD,
-	CodecDVD,
-	CodecXVCD,
-	CodecXSVCD,
-	CodecXDVD,
-	CodecXvid4,
-        CodecFFhuff,
-        
+  CodecCopy,
+  CodecDivx,
+  CodecXvid,
+  CodecFF,
+  CodecMjpeg,
+  CodecH263,
+  CodecH263P,
+  CodecFFV1,
+  CodecSnow,
+  CodecHuff,
+  CodecVCD,
+  CodecSVCD,
+  CodecDVD,
+  CodecXVCD,
+  CodecXSVCD,
+  CodecXDVD,
+  CodecXvid4,
+  CodecFFhuff,
+
 #ifdef USE_X264
-    CodecX264,
-#endif        
-        CodecYV12,
-	CodecDummy	
+  CodecX264,
+#endif
+  CodecYV12,
+  CodecDummy
 };
 
- typedef enum
+typedef enum
 {
   COMPRESS_CQ,
   COMPRESS_CBR,
   COMPRESS_2PASS,
   COMPRESS_SAME
-}COMPRESSION_MODE;
+} COMPRESSION_MODE;
 
 #define ADM_ENC_CAP_CBR    0x001
 #define ADM_ENC_CAP_CQ     0x002
@@ -63,17 +63,17 @@
 
 struct COMPRES_PARAMS
 {
-	const SelectCodecType		codec;
-	const char					*menuName;
-	const char 					*tagName;
-	const char					*descriptor;
-    COMPRESSION_MODE 			mode;
-    uint32_t					qz,bitrate,finalsize;
-	const 		uint32_t		capabilities;
-	const 		uint32_t		extra_param;
-	void						*extraSettings;
-	const       uint32_t		extraSettingsLen;
-	uint8_t		(*configure)(struct COMPRES_PARAMS *par);
+  const SelectCodecType codec;
+  const char *menuName;
+  const char *tagName;
+  const char *descriptor;
+  COMPRESSION_MODE mode;
+  uint32_t qz, bitrate, finalsize;
+  const uint32_t capabilities;
+  const uint32_t extra_param;
+  void *extraSettings;
+  const uint32_t extraSettingsLen;
+    uint8_t (*configure) (struct COMPRES_PARAMS * par);
 };
 
 //typedef struct COMPRES_PARAMS;
