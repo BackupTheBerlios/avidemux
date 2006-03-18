@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,8 +24,8 @@
 #ifndef _MEM_H
 #define _MEM_H
 
-void *toolame_malloc (unsigned long, char *);
-void toolame_free (void **);
+void *twolame_malloc (unsigned long, char *);
+void twolame_free (void **);
 
 #endif
 

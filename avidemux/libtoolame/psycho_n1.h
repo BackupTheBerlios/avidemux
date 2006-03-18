@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,6 +23,6 @@
 #ifndef	_PSYCHO_N1_H_
 #define	_PSYCHO_N1_H_
 
-void psycho_n1(toolame_options *glopts, FLOAT ltmin[2][SBLIMIT], int stereo);
+void psycho_n1(twolame_options *glopts, FLOAT ltmin[2][SBLIMIT], int stereo);
 
 #endif

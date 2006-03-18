@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -51,11 +52,12 @@
 **       Ron Mayer; mayer@acuson.com
 **
 */
+
 #include <stdio.h>
 #include <math.h>
+
+#include "twolame.h"
 #include "common.h"
-#include "toolame.h"
-#include "toolame_global_flags.h"
 #include "fft.h"
 
 
@@ -1222,7 +1224,7 @@ static void fht (FLOAT * fz)
    MFC March 2003 */
 static FLOAT atan_t[ATANSIZE];
 
-static INLINE FLOAT atan_table(FLOAT y, FLOAT x) {
+static inline FLOAT atan_table(FLOAT y, FLOAT x) {
   int index;
 
   index = (int)(ATANSCALE * fabs(y/x));

@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,14 +23,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "twolame.h"
 #include "common.h"
-#include "toolame.h"
-#include "toolame_global_flags.h"
 #include "bitbuffer.h"
 #include "energy.h"
 
-void do_energy_levels(toolame_options *glopts, bit_stream *bs)
-//void do_energy_levels(toolame_options *glopts, unsigned char *mp2buffer, int frameEnd, short int *leftpcm, short int *rightpcm)
+
+void do_energy_levels(twolame_options *glopts, bit_stream *bs)
+//void do_energy_levels(twolame_options *glopts, unsigned char *mp2buffer, int frameEnd, short int *leftpcm, short int *rightpcm)
 {
   /* Reference:
      Using the BWF Energy Levels in AudioScience Bitstreams

@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,12 +25,12 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "twolame.h"
 #include "common.h"
-#include "toolame.h"
-#include "toolame_global_flags.h"
 #include "bitbuffer.h"
 #include "availbits.h"
 #include "encode.h"
+
 
 static const FLOAT multiple[64] = {
   2.00000000000000, 1.58740105196820, 1.25992104989487,
@@ -65,7 +66,6 @@ static const FLOAT multiple[64] = {
    
 
 #define NUMTABLES 5
-int vbrstats[15] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /* There are really only 9 distinct lines in the allocation tables 
    each member of this table is an index into */
@@ -119,7 +119,7 @@ static const int line[5][SBLIMIT] = {
 };
 
 /* This is ISO11172 Table B.1 */
-FLOAT scalefactor[64] = { /* Equation for nth element = 2 / (cuberoot(2) ^ n) */
+static const FLOAT scalefactor[64] = { /* Equation for nth element = 2 / (cuberoot(2) ^ n) */
   2.00000000000000, 1.58740105196820, 1.25992104989487,
   1.00000000000000, 0.79370052598410, 0.62996052494744, 0.50000000000000,
   0.39685026299205, 0.31498026247372, 0.25000000000000, 0.19842513149602,
@@ -154,77 +154,84 @@ static const FLOAT SNR[18] = {
    0.00,  7.00, 11.00, 16.00, 20.84, 25.28, 31.59, 37.75, 43.84,
   49.89, 55.93, 61.96, 67.98, 74.01, 80.03, 86.05, 92.01, 98.01 };
 
-int tablenum=0;
+void encode_init( twolame_options *glopts ) {
+	frame_info *frame = &glopts->frame;
+	frame_header *header = &glopts->header;
+	int bsp, br_per_ch, sfrq;
+	
+	bsp = header->bitrate_index;
+	br_per_ch = glopts->bitrate / frame->nch;
+	sfrq = (int) (glopts->samplerate_out/1000.0);
+	
+	/* decision rules refer to per-channel bitrates (kbits/sec/chan) */
+	if (header->version == TWOLAME_MPEG1) {	/* MPEG-1 */
+		if ((sfrq == 48 && br_per_ch >= 56)
+		|| (br_per_ch >= 56 && br_per_ch <= 80))
+			glopts->tablenum = 0;
+		else if (sfrq != 48 && br_per_ch >= 96)
+			glopts->tablenum = 1;
+		else if (sfrq != 32 && br_per_ch <= 48)
+			glopts->tablenum = 2;
+		else
+			glopts->tablenum = 3;
+	} else { /* MPEG-2 LSF */
+		glopts->tablenum = 4;
+	}
+	
+	frame->sblimit = table_sblimit[glopts->tablenum];
+	//fprintf(stderr,"encode_init: using tablenum %i with sblimit %i\n",glopts->tablenum, frame->sblimit);
+	
+	
+	#define DUMPTABLESx
+	#ifdef DUMPTABLES 
+	{
+		int tablenumber,j,sblimit, sb;
+		fprintf(stdout,"Tables B.21,b,c,d from ISO11172 and the LSF table from ISO13818\n");
+		for (tablenumber=0;tablenumber<NUMTABLES;tablenumber++) {
+			/* Print Table Header */
+			fprintf(stdout,"Tablenum %i\n",tablenumber);
+			fprintf(stdout,"sb nbal ");
+			for (j=0;j<16;j++)
+				fprintf(stdout,"%6i ",j);
+			fprintf(stdout,"\n");
+			fprintf(stdout,"-----------------------------------------------------------------------------------------------------------------------\n");
+			
+			sblimit = table_sblimit[tablenumber];
+			for (sb=0;sb<SBLIMIT;sb++) {
+				int thisline = line[tablenumber][sb];
+				fprintf(stdout,"%2i %4i ",sb,nbal[thisline]);
+				if (nbal[thisline] != 0) {
+					for (j=0; j<(1<<nbal[thisline]); j++)
+						fprintf(stdout,"%6i ", steps[ step_index[thisline][j] ]);
+				}
+				fprintf(stdout,"\n");
+			}
+			fprintf(stdout,"\n");
+		}
+	}
+	#endif
 
-int encode_init( toolame_options *glopts ) {
-  frame_info *frame = &glopts->frame;
-  frame_header *header = &glopts->header;
-  int bsp, br_per_ch, sfrq;
-
-  bsp = header->bitrate_index;
-  br_per_ch = glopts->bitrate / frame->nch;
-  sfrq = (int) (glopts->samplerate_out/1000.0);
-
-  /* decision rules refer to per-channel bitrates (kbits/sec/chan) */
-  if (header->version == MPEG1) {	/* MPEG-1 */
-    if ((sfrq == 48 && br_per_ch >= 56)
-	|| (br_per_ch >= 56 && br_per_ch <= 80))
-      tablenum = 0;
-    else if (sfrq != 48 && br_per_ch >= 96)
-      tablenum = 1;
-    else if (sfrq != 32 && br_per_ch <= 48)
-      tablenum = 2;
-    else
-      tablenum = 3;
-  } else {			/* MPEG-2 LSF */
-    tablenum = 4;
-  }
-  //fprintf(stderr,"encode_init: using tablenum %i with sblimit %i\n",tablenum, table_sblimit[tablenum]);
-  
-#define DUMPTABLESx
-#ifdef DUMPTABLES 
-  {
-    int tablenumber,j,sblimit, sb;
-    fprintf(stdout,"Tables B.21,b,c,d from ISO11172 and the LSF table from ISO13818\n");
-    for (tablenumber=0;tablenumber<NUMTABLES;tablenumber++) {
-      /* Print Table Header */
-      fprintf(stdout,"Tablenum %i\n",tablenumber);
-      fprintf(stdout,"sb nbal ");
-      for (j=0;j<16;j++)
-	fprintf(stdout,"%6i ",j);
-      fprintf(stdout,"\n");
-      fprintf(stdout,"-----------------------------------------------------------------------------------------------------------------------\n");
-      
-      sblimit = table_sblimit[tablenumber];
-      for (sb=0;sb<SBLIMIT;sb++) {
-	int thisline = line[tablenumber][sb];
-	fprintf(stdout,"%2i %4i ",sb,nbal[thisline]);
-	if (nbal[thisline] != 0)
-	  for (j=0; j<(1<<nbal[thisline]); j++)
-	    fprintf(stdout,"%6i ", steps[ step_index[thisline][j] ]);
-	fprintf(stdout,"\n");
-      }
-      fprintf(stdout,"\n");
-    }
-    exit(0);
-  }
-#endif
-  return (table_sblimit[tablenum]);
 }
 
 
-int js_bound (int m_ext)
+int get_js_bound (int m_ext)
 {
-  /* layer 2 only */
-  static const int jsb_table[4] = { 4, 8, 12, 16 };
-
-  if (m_ext < 0 || m_ext > 3) {
-    fprintf (stderr, "js_bound bad modext (%d)\n", m_ext);
-    exit (1);
-  }
-  return (jsb_table[m_ext]);
+	static const int jsb_table[4] = { 4, 8, 12, 16 };
+	
+	if (m_ext < 0 || m_ext > 3) {
+		fprintf (stderr, "get_js_bound() bad modext (%d)\n", m_ext);
+		exit (1);
+	}
+	return (jsb_table[m_ext]);
 }
 
+int get_alloc_table_bits (int tablenum, int sb, int ba)
+{
+	int thisline = line[tablenum][sb];
+	int thisstep_index = step_index[thisline][ba];
+	
+	return bits[thisstep_index];
+}
 
 /* 
    scale_factor_calc
@@ -300,7 +307,7 @@ void scalefactor_calc (FLOAT sb_sample[][3][SCALE_BLOCK][SBLIMIT],
 }
 
 
-static INLINE FLOAT mod (FLOAT a)
+static inline FLOAT mod (FLOAT a)
 {
   return (a > 0) ? a : -a;
 }
@@ -329,7 +336,7 @@ void combine_lr (FLOAT sb_sample[2][3][SCALE_BLOCK][SBLIMIT],
 
    MFC FIX: Feb 2003 - is this only needed for psy model 1?
 */
-void find_sf_max (toolame_options *glopts,
+void find_sf_max (twolame_options *glopts,
 		unsigned int sf_index[2][3][SBLIMIT],
 		FLOAT sf_max[2][SBLIMIT])
 {
@@ -359,7 +366,7 @@ void find_sf_max (toolame_options *glopts,
     and
     Table C.4 "LayerII Scalefactors Transmission Pattern"
 */
-void sf_transmission_pattern (toolame_options *glopts,
+void sf_transmission_pattern (twolame_options *glopts,
 		unsigned int sf_index[2][3][SBLIMIT],
 		unsigned int sf_selectinfo[2][SBLIMIT] )
 {
@@ -428,7 +435,7 @@ void sf_transmission_pattern (toolame_options *glopts,
     }
 }
 
-void write_header (toolame_options *glopts, bit_stream * bs)
+void write_header (twolame_options *glopts, bit_stream * bs)
 {
   frame_header * header = &glopts->header;
 
@@ -455,7 +462,7 @@ void write_header (toolame_options *glopts, bit_stream * bs)
  4,3,2, or 0 bits depending on the quantization table used.
 
 ************************************************************************/
-void write_bit_alloc (toolame_options *glopts,
+void write_bit_alloc (twolame_options *glopts,
 		unsigned int bit_alloc[2][SBLIMIT],
 		bit_stream * bs)
 {
@@ -468,10 +475,10 @@ void write_bit_alloc (toolame_options *glopts,
   for (sb = 0; sb < sblimit; sb++) {
     if (sb < jsbound) {
       for (ch = 0; ch < ((sb < jsbound) ? nch : 1); ch++)
-	buffer_putbits (bs, bit_alloc[ch][sb], nbal[ line[tablenum][sb] ]); // (*alloc)[sb][0].bits);
+	buffer_putbits (bs, bit_alloc[ch][sb], nbal[ line[glopts->tablenum][sb] ]); // (*alloc)[sb][0].bits);
     }
     else
-      buffer_putbits (bs, bit_alloc[0][sb], nbal[ line[tablenum][sb] ]); //(*alloc)[sb][0].bits);
+      buffer_putbits (bs, bit_alloc[0][sb], nbal[ line[glopts->tablenum][sb] ]); //(*alloc)[sb][0].bits);
   }
 }
 
@@ -487,7 +494,7 @@ void write_bit_alloc (toolame_options *glopts,
 
 ************************************************************************/
 
-void write_scalefactors ( toolame_options *glopts,
+void write_scalefactors ( twolame_options *glopts,
 		unsigned int bit_alloc[2][SBLIMIT],
 		unsigned int sf_selectinfo[2][SBLIMIT],
 		unsigned int sf_index[2][3][SBLIMIT],
@@ -556,7 +563,7 @@ static const FLOAT b[18] = {
 
 ************************************************************************/
 void
-subband_quantization ( toolame_options *glopts,
+subband_quantization ( twolame_options *glopts,
 		unsigned int sf_index[2][3][SBLIMIT],
 		FLOAT sb_samples[2][3][SCALE_BLOCK][SBLIMIT],
 		unsigned int j_scale[3][SBLIMIT],
@@ -595,7 +602,7 @@ subband_quantization ( toolame_options *glopts,
 	    
 	    {
 	      /* 'index' indicates which "step line" we are using */
-	      int index = line[tablenum][sb];
+	      int index = line[glopts->tablenum][sb];
 	      
 	      /* Find the "step index" within that line */
 	      qnt_coeff_index = step_index[index][bit_alloc[ch][sb]];
@@ -637,7 +644,7 @@ subband_quantization ( toolame_options *glopts,
  that are not a power of 2.
 
 ***********************************************************************/
-void write_samples ( toolame_options *glopts, 
+void write_samples ( twolame_options *glopts, 
 		unsigned int sbband[2][3][SCALE_BLOCK][SBLIMIT],
 		unsigned int bit_alloc[2][SBLIMIT],
 		bit_stream * bs)
@@ -655,7 +662,7 @@ void write_samples ( toolame_options *glopts,
 	for (ch = 0; ch < ((sb < jsbound) ? nch : 1); ch++)
 
 	  if (bit_alloc[ch][sb]) {
-	    int thisline = line[tablenum][sb];
+	    int thisline = line[glopts->tablenum][sb];
 	    int thisstep_index = step_index[thisline][bit_alloc[ch][sb]];
 	    /* Check how many samples per codeword */
 	    if (group[thisstep_index] == 3) {
@@ -708,7 +715,7 @@ void write_samples ( toolame_options *glopts,
 *
 ************************************************************************/
 
-int bits_for_nonoise ( toolame_options * glopts,
+int bits_for_nonoise ( twolame_options * glopts,
 		FLOAT SMR[2][SBLIMIT],
 		unsigned int scfsi[2][SBLIMIT], FLOAT min_mnr,
 		unsigned int bit_alloc[2][SBLIMIT])
@@ -740,17 +747,17 @@ int bits_for_nonoise ( toolame_options * glopts,
      channels in each subband. If we're above the jsbound, then pretend we only
      have one channel */
   for (sb = 0; sb < jsbound; ++sb)
-    bbal += nch * nbal[ line[tablenum][sb] ]; //(*alloc)[sb][0].bits;
+    bbal += nch * nbal[ line[glopts->tablenum][sb] ]; //(*alloc)[sb][0].bits;
   for (sb = jsbound; sb < sblimit; ++sb)
-    bbal += nbal[ line[tablenum][sb] ]; //(*alloc)[sb][0].bits;
+    bbal += nbal[ line[glopts->tablenum][sb] ]; //(*alloc)[sb][0].bits;
   req_bits = banc + bbal + berr;
 
   for (sb = 0; sb < sblimit; ++sb)
     for (ch = 0; ch < ((sb < jsbound) ? nch : 1); ++ch) {
-      int thisline = line[tablenum][sb];
+      int thisline = line[glopts->tablenum][sb];
       
       /* How many possible steps are there to choose from ? */
-      maxAlloc = (1 << nbal[ line[tablenum][sb] ]) -1; //(*alloc)[sb][0].bits) - 1;
+      maxAlloc = (1 << nbal[ line[glopts->tablenum][sb] ]) -1; //(*alloc)[sb][0].bits) - 1;
       sel_bits = sc_bits = smp_bits = 0;
       /* Keep choosing the next number of steps (and hence our SNR value)
 	 until we have the required MNR value */
@@ -786,7 +793,7 @@ int bits_for_nonoise ( toolame_options * glopts,
 
 
 /* must be called before calling main_bit_allocation */
-void init_bit_allocation( toolame_options * glopts )
+int init_bit_allocation( twolame_options * glopts )
 {
 	frame_info *frame = &glopts->frame;
 	frame_header *header = &glopts->header;
@@ -835,17 +842,13 @@ void init_bit_allocation( toolame_options * glopts )
 		if ((glopts->vbr_upper_index < glopts->lower_index) ||
           (glopts->vbr_upper_index > glopts->upper_index)) {
 			fprintf(stderr,"Can't satisfy upper bitrate index constraint. out of bounds. %i\n", glopts->vbr_upper_index);
-			exit(2);
+			return -2;
 		}
 		else
 			glopts->upper_index = glopts->vbr_upper_index;
 	}
     
     
-	if (glopts->verbosity > 2) {
-		fprintf (stdout, "VBR bitrate index limits [%i -> %i]\n", glopts->lower_index, glopts->upper_index);
-	}
-
 	/* set up a conversion table for bitrateindex->bits for this version/sampl freq 
 	This will be used to find the best bitrate to cope with the number of bits that
 	are needed (as determined by vbr_bits_for_nonoise)
@@ -855,6 +858,7 @@ void init_bit_allocation( toolame_options * glopts )
 			(int) (1152.0 / (glopts->samplerate_out/1000.0) * (FLOAT) glopts->bitrate);
 	}
 
+	return 0;
 }
 
 
@@ -882,7 +886,7 @@ void init_bit_allocation( toolame_options * glopts )
 *     This function calls *_bits_for_nonoise() and *_a_bit_allocation().
 *
 ************************************************************************/
-void main_bit_allocation (toolame_options * glopts,
+void main_bit_allocation (twolame_options * glopts,
 		FLOAT SMR[2][SBLIMIT],
 		unsigned int scfsi[2][SBLIMIT],
 		unsigned int bit_alloc[2][SBLIMIT], int *adb )
@@ -895,17 +899,17 @@ void main_bit_allocation (toolame_options * glopts,
   int guessindex = 0;
 
 
-  if ((mode = frame->actual_mode) == JOINT_STEREO) {
-    header->mode = STEREO;
+  if ((mode = frame->actual_mode) == TWOLAME_JOINT_STEREO) {
+    header->mode = TWOLAME_STEREO;
     header->mode_ext = 0;
     frame->jsbound = frame->sblimit;
     if ((rq_db = bits_for_nonoise (glopts, SMR, scfsi, 0, bit_alloc)) > *adb) {
-      header->mode = JOINT_STEREO;
+      header->mode = TWOLAME_JOINT_STEREO;
       mode_ext = 4;		/* 3 is least severe reduction */
       lay = header->lay;
       do {
 	--mode_ext;
-	frame->jsbound = js_bound (mode_ext);
+	frame->jsbound = get_js_bound (mode_ext);
 	rq_db = bits_for_nonoise (glopts, SMR, scfsi, 0, bit_alloc);
       }
       while ((rq_db > *adb) && (mode_ext > 0));
@@ -953,20 +957,20 @@ void main_bit_allocation (toolame_options * glopts,
     *adb = available_bits( glopts );
 
     /* update the statistics */
-    vbrstats[header->bitrate_index]++;
+    glopts->vbrstats[header->bitrate_index]++;
 
-    if (glopts->verbosity > 2) {
+    if (glopts->verbosity > 3) {
       /* print out the VBR stats every 1000th frame */
       int i;
       if ((glopts->vbr_frame_count++ % 1000) == 0) {
 	for (i = 1; i < 15; i++)
-	  fprintf (stdout, "%4i ", vbrstats[i]);
-	fprintf (stdout, "\n");
+	  fprintf (stderr, "%4i ", glopts->vbrstats[i]);
+	fprintf (stderr, "\n");
       }
 
       /* Print out *every* frames bitrateindex, bits required, and bits available at this bitrate */
       if (glopts->verbosity > 5)
-	fprintf (stdout,
+	fprintf (stderr,
 		 "> bitrate index %2i has %i bits available to encode the %i bits\n",
 		 header->bitrate_index, *adb,
 		 bits_for_nonoise (glopts, SMR, scfsi, glopts->vbrlevel, bit_alloc));
@@ -996,8 +1000,8 @@ static void vbr_maxmnr (FLOAT mnr[2][SBLIMIT], char used[2][SBLIMIT], int sblimi
       if (mnr[ch][sb] < vbrlevel) {
 	*min_sb = sb;
 	*min_ch = ch;
-	//fprintf(stdout,".");
-	//fflush(stdout);
+	//fprintf(stderr,".");
+	//fflush(stderr);
 	return;
       }
 #endif
@@ -1010,7 +1014,7 @@ static void vbr_maxmnr (FLOAT mnr[2][SBLIMIT], char used[2][SBLIMIT], int sblimi
 	*min_sb = sb;
 	*min_ch = ch;
       }
-  //fprintf(stdout,"Min sb: %i\n",*min_sb);
+  //fprintf(stderr,"Min sb: %i\n",*min_sb);
 }
 
 
@@ -1028,7 +1032,7 @@ each subband gets its required bits, why quibble?
 This function doesn't chew much CPU, so I haven't made any attempt
 to do this yet.
 *********************/
-int vbr_bit_allocation (toolame_options *glopts,
+int vbr_bit_allocation (twolame_options *glopts,
 			FLOAT SMR[2][SBLIMIT],
 			unsigned int scfsi[2][SBLIMIT],
 			unsigned int bit_alloc[2][SBLIMIT], int *adb )
@@ -1057,7 +1061,7 @@ int vbr_bit_allocation (toolame_options *glopts,
 
   /* No need to worry about jsbound here as JS is disabled for VBR mode */
   for (sb = 0; sb < sblimit; sb++)
-    bbal += nch * nbal[ line[tablenum][sb] ]; 
+    bbal += nch * nbal[ line[glopts->tablenum][sb] ]; 
   *adb -= bbal + berr + banc;
   ad = *adb;
 
@@ -1074,7 +1078,7 @@ int vbr_bit_allocation (toolame_options *glopts,
     vbr_maxmnr (mnr, used, sblimit, nch, &min_sb, &min_ch, glopts->vbrlevel);
 
     if (min_sb > -1) {		/* there was something to find */
-      int thisline = line[tablenum][min_sb]; {
+      int thisline = line[glopts->tablenum][min_sb]; {
 	/* find increase in bit allocation in subband [min] */
 	int nextstep_index = step_index[thisline][bit_alloc[min_ch][min_sb]+1];					  
 	increment = SCALE_BLOCK * group[nextstep_index] * bits[nextstep_index];
@@ -1112,7 +1116,7 @@ int vbr_bit_allocation (toolame_options *glopts,
 	thisstep_index = step_index[thisline][ba];
 	mnr[min_ch][min_sb] = SNR[thisstep_index] - SMR[min_ch][min_sb];
 	/* Check if this min_sb subband has been fully allocated max bits */
-	if (ba >= (1 << nbal[ line[tablenum][min_sb] ]) -1 ) //(*alloc)[min_sb][0].bits) - 1)
+	if (ba >= (1 << nbal[ line[glopts->tablenum][min_sb] ]) -1 ) //(*alloc)[min_sb][0].bits) - 1)
 	  used[min_ch][min_sb] = 2;	/* don't let this sb get any more bits */
       } else
 	used[min_ch][min_sb] = 2;	/* can't increase this alloc */
@@ -1179,7 +1183,7 @@ static void maxmnr (FLOAT mnr[2][SBLIMIT], char used[2][SBLIMIT], int sblimit,
 *
 ************************************************************************/
 
-int a_bit_allocation (toolame_options * glopts, FLOAT SMR[2][SBLIMIT],
+int a_bit_allocation (twolame_options * glopts, FLOAT SMR[2][SBLIMIT],
 			    unsigned int scfsi[2][SBLIMIT],
 			    unsigned int bit_alloc[2][SBLIMIT], int *adb)
 {
@@ -1206,9 +1210,9 @@ int a_bit_allocation (toolame_options * glopts, FLOAT SMR[2][SBLIMIT],
 	}
 
 	for (sb = 0; sb < jsbound; sb++)
-		bbal += nch * nbal[ line[tablenum][sb] ]; //(*alloc)[sb][0].bits;
+		bbal += nch * nbal[ line[glopts->tablenum][sb] ]; //(*alloc)[sb][0].bits;
 	for (sb = jsbound; sb < sblimit; sb++)
-		bbal += nbal[ line[tablenum][sb] ]; //(*alloc)[sb][0].bits;
+		bbal += nbal[ line[glopts->tablenum][sb] ]; //(*alloc)[sb][0].bits;
 	*adb -= bbal + berr + banc;
 	ad = *adb;
 
@@ -1227,7 +1231,7 @@ int a_bit_allocation (toolame_options * glopts, FLOAT SMR[2][SBLIMIT],
     maxmnr (mnr, used, sblimit, nch, &min_sb, &min_ch);
 
     if (min_sb > -1) {		/* there was something to find */
-      int thisline = line[tablenum][min_sb]; {
+      int thisline = line[glopts->tablenum][min_sb]; {
 	/* find increase in bit allocation in subband [min] */
 	int nextstep_index = step_index[thisline][bit_alloc[min_ch][min_sb]+1];					  
 	increment = SCALE_BLOCK * group[nextstep_index] * bits[nextstep_index];
@@ -1265,7 +1269,7 @@ int a_bit_allocation (toolame_options * glopts, FLOAT SMR[2][SBLIMIT],
 	thisstep_index = step_index[thisline][ba];
 	mnr[min_ch][min_sb] = SNR[thisstep_index] - SMR[min_ch][min_sb];
 	/* Check if this min_sb subband has been fully allocated max bits */
-	if (ba >= (1 << nbal[ line[tablenum][min_sb] ]) -1 ) //(*alloc)[min_sb][0].bits) - 1)
+	if (ba >= (1 << nbal[ line[glopts->tablenum][min_sb] ]) -1 ) //(*alloc)[min_sb][0].bits) - 1)
 	  used[min_ch][min_sb] = 2;	/* don't let this sb get any more bits */
       } else
 	used[min_ch][min_sb] = 2;	/* can't increase this alloc */

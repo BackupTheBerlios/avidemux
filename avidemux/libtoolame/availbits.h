@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +23,7 @@
 #ifndef	_AVAILBITS_H_
 #define	_AVAILBITS_H_
 
-int available_bits ( toolame_options * glopts );
+int available_bits ( twolame_options * glopts );
 
 #endif
 

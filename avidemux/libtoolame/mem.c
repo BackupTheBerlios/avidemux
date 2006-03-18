@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -32,21 +33,21 @@
 *
 *******************************************************************************/
 
-void *toolame_malloc (unsigned long block, char *item)
+void *twolame_malloc (unsigned long block, char *item)
 {
-
-  void *ptr;
-
-  ptr = (void *) malloc (block);
-
-  if (ptr != NULL) {
-    memset (ptr, 0, block);
-  } else {
-    fprintf (stderr, "Unable to allocate %s\n", item);
-    exit (0);
-  }
-  
-  return (ptr);
+	
+	void *ptr;
+	
+	ptr = (void *) malloc (block);
+	
+	if (ptr != NULL) {
+		memset (ptr, 0, block);
+	} else {
+		fprintf (stderr, "Unable to allocate %ld bytes for %s\n", block, item);
+		return NULL;
+	}
+	
+	return (ptr);
 }
 
 
@@ -56,11 +57,11 @@ void *toolame_malloc (unsigned long block, char *item)
 *
 *****************************************************************************/
 
-void toolame_free (void **ptr_addr)
+void twolame_free (void **ptr_addr)
 {
 
-  if (*ptr_addr != NULL) {
-    free (*ptr_addr);
-    *ptr_addr = NULL;
-  }
+	if (*ptr_addr != NULL) {
+		free (*ptr_addr);
+		*ptr_addr = NULL;
+	}
 }

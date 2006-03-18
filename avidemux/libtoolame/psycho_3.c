@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -9,7 +10,7 @@
  *  version 2.1 of the License, or (at your option) any later version.
  *
  *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  but WITHOUT ANY WARRANTY; without even the impelied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
  *
@@ -23,9 +24,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+
+#include "twolame.h"
 #include "common.h"
-#include "toolame.h"
-#include "toolame_global_flags.h"
 #include "mem.h"
 #include "fft.h"
 #include "ath.h"
@@ -40,11 +41,7 @@
    a tiny fraction slower than the dist10 code, and nothing has been optimized)
    MFC Feb 2003 */
 
-/* Keep a table to fudge the adding of dB */
-#define DBTAB 1000
-static FLOAT dbtable[DBTAB];
-
-INLINE FLOAT psycho_3_add_db (FLOAT a, FLOAT b)
+static inline FLOAT psycho_3_add_db (psycho_3_mem *mem, FLOAT a, FLOAT b)
 {
   /* MFC - if the difference between a and b is large (>99), then just return the
      largest one. (about 10% of the time)
@@ -65,16 +62,16 @@ INLINE FLOAT psycho_3_add_db (FLOAT a, FLOAT b)
 
   idiff = (int) fdiff;
   if (idiff >= 0) {
-    return (a + dbtable[idiff]);
+    return (a + mem->dbtable[idiff]);
   }
 
-  return (b + dbtable[-idiff]);
+  return (b + mem->dbtable[-idiff]);
 }
 
 
 
 /* ISO11172 Sec D.1 Step 1 - Window with HANN and then perform the FFT */
-void psycho_3_fft(FLOAT sample[BLKSIZE], FLOAT energy[BLKSIZE])
+static void psycho_3_fft(FLOAT sample[BLKSIZE], FLOAT energy[BLKSIZE])
 {
   FLOAT x_real[BLKSIZE];
   int i;
@@ -97,7 +94,7 @@ void psycho_3_fft(FLOAT sample[BLKSIZE], FLOAT energy[BLKSIZE])
 }
 
 /* Sect D.1 Step 1 - convert the energies into dB */
-void psycho_3_powerdensityspectrum(FLOAT energy[BLKSIZE], FLOAT power[HBLKSIZE]) {
+static void psycho_3_powerdensityspectrum(FLOAT energy[BLKSIZE], FLOAT power[HBLKSIZE]) {
   int i;
   for (i=1;i<HBLKSIZE;i++) {	
     if (energy[i] < 1E-20)
@@ -108,7 +105,7 @@ void psycho_3_powerdensityspectrum(FLOAT energy[BLKSIZE], FLOAT power[HBLKSIZE])
 }
 
 /* Sect D.1 Step 2 - Determine the sound pressure level in each subband */
-void psycho_3_spl(FLOAT *Lsb, FLOAT *power, FLOAT *scale) {
+static void psycho_3_spl(FLOAT *Lsb, FLOAT *power, FLOAT *scale) {
   int i;
   FLOAT Xmax[SBLIMIT];
 
@@ -132,7 +129,7 @@ void psycho_3_spl(FLOAT *Lsb, FLOAT *power, FLOAT *scale) {
 /* Sect D.1 Step4b 
    A tone within the range (start -> end), must be 7.0 dB greater than
    all it's neighbours within +/- srange. Don't count its immediate neighbours. */
-void psycho_3_tonal_label_range(FLOAT *power, int *tonelabel, int *maxima, FLOAT *Xtm, int start, int end, int srange) {
+static void psycho_3_tonal_label_range(psycho_3_mem *mem, FLOAT *power, int *tonelabel, int *maxima, FLOAT *Xtm, int start, int end, int srange) {
   int j,k;
 
   for (k=start;k<end;k++)  /* Search for all the maxima in this range */
@@ -147,8 +144,8 @@ void psycho_3_tonal_label_range(FLOAT *power, int *tonelabel, int *maxima, FLOAT
 	   the adjacent spectral lines
 	   Xtm[k] = 10 * log10( pow(10.0, 0.1*power[k-1]) + pow(10.0, 0.1*power[k]) 
 	                      + pow(10.0, 0.1*power[k+1]) ); */
-	FLOAT temp = psycho_3_add_db(power[k-1], power[k]);
-	Xtm[k] = psycho_3_add_db(temp, power[k+1]);
+	FLOAT temp = psycho_3_add_db(mem, power[k-1], power[k]);
+	Xtm[k] = psycho_3_add_db(mem, temp, power[k+1]);
 	
 	/* *ALL* spectral lines within +/- srange are set to -inf dB 
 	   So that when we do the noise calculate, they are not counted */
@@ -159,7 +156,7 @@ void psycho_3_tonal_label_range(FLOAT *power, int *tonelabel, int *maxima, FLOAT
 }
 
 /* Sect D.1 Step 4 Label the Tonal Components */
-void psycho_3_tonal_label (FLOAT power[HBLKSIZE], int *tonelabel, FLOAT Xtm[HBLKSIZE])
+static void psycho_3_tonal_label (psycho_3_mem *mem, FLOAT power[HBLKSIZE], int *tonelabel, FLOAT Xtm[HBLKSIZE])
 {
   int i;
   int maxima[HBLKSIZE];
@@ -185,23 +182,23 @@ void psycho_3_tonal_label (FLOAT power[HBLKSIZE], int *tonelabel, FLOAT Xtm[HBLK
        - once a tone is found, the neighbours are immediately set to -inf dB
     */
 
-    psycho_3_tonal_label_range(power, tonelabel, maxima, Xtm, 2, 63, 2);
-    psycho_3_tonal_label_range(power, tonelabel, maxima, Xtm, 63,127,3);
-    psycho_3_tonal_label_range(power, tonelabel, maxima, Xtm, 127,255,6);
-    psycho_3_tonal_label_range(power, tonelabel, maxima, Xtm, 255,500,12);
+    psycho_3_tonal_label_range(mem, power, tonelabel, maxima, Xtm, 2, 63, 2);
+    psycho_3_tonal_label_range(mem, power, tonelabel, maxima, Xtm, 63,127,3);
+    psycho_3_tonal_label_range(mem, power, tonelabel, maxima, Xtm, 127,255,6);
+    psycho_3_tonal_label_range(mem, power, tonelabel, maxima, Xtm, 255,500,12);
 
   }
 }
 
 
 
-void psycho_3_init_add_db (void)
+static void psycho_3_init_add_db (psycho_3_mem *mem)
 {
   int i;
   FLOAT x;
   for (i = 0; i < DBTAB; i++) {
     x = (FLOAT) i / 10.0;
-    dbtable[i] = 10 * log10 (1 + pow (10.0, x / 10.0)) - x;
+    mem->dbtable[i] = 10 * log10 (1 + pow (10.0, x / 10.0)) - x;
   }
 }
 
@@ -210,7 +207,7 @@ void psycho_3_init_add_db (void)
    during the tone labelling).
    Find the "geometric mean" of these energies - i.e. find the best spot to put the
    sum of energies within this critical band. */
-void psycho_3_noise_label (psycho_3_mem *mem, FLOAT power[HBLKSIZE], FLOAT energy[BLKSIZE], int *tonelabel, int *noiselabel, FLOAT Xnm[HBLKSIZE]) {
+static void psycho_3_noise_label (psycho_3_mem *mem, FLOAT power[HBLKSIZE], FLOAT energy[BLKSIZE], int *tonelabel, int *noiselabel, FLOAT Xnm[HBLKSIZE]) {
   int i,j;
   int cbands = mem->cbands;
   int *cbandindex = mem->cbandindex;
@@ -228,7 +225,7 @@ void psycho_3_noise_label (psycho_3_mem *mem, FLOAT power[HBLKSIZE], FLOAT energ
 	 adding the energies. The tone energies have already been removed */
       if (power[j] != DBMIN) {
 	/* Found a noise energy, add it to the sum */
-	sum = psycho_3_add_db(power[j], sum);
+	sum = psycho_3_add_db(mem, power[j], sum);
 	
 	/* calculations for the geometric mean 
 	   FIXME MFC Feb 2003: Would it just be easier to
@@ -240,15 +237,19 @@ void psycho_3_noise_label (psycho_3_mem *mem, FLOAT power[HBLKSIZE], FLOAT energ
 	centreweight += (j - cbandindex[i]) * energy[j]; /* And the energy moment */
       }
     }
-
-    if (sum<=DBMIN) 
+    /* MEANX, crash on AMD64 without this hack. Probably a better way to do this */
+    int meanx=0;
+    if(esum<0.00001) meanx=1;
+    if (sum<=DBMIN || meanx) 
       /* If the energy sum is really small, just pretend the noise occurs 
 	 in the centre frequency line */
       centre = (cbandindex[i] + cbandindex[i+1])/2;
     else
+    {
       /* Otherwise, work out the mean position of the noise, and put it there. */
       centre = cbandindex[i] + (int)(centreweight/esum);
-
+    }
+    // /MEANX
     Xnm[centre] = sum;
     noiselabel[centre] = NOISE;
   }
@@ -257,7 +258,7 @@ void psycho_3_noise_label (psycho_3_mem *mem, FLOAT power[HBLKSIZE], FLOAT energ
 /* ISO11172 D.1 Step 5
    Get rid of noise/tones that aren't greater than the ATH
    If two tones are within 0.5bark, then delete the tone with the lower energy */
-void psycho_3_decimation(FLOAT *ath, int *tonelabel, FLOAT *Xtm, int *noiselabel, FLOAT *Xnm, FLOAT *bark) {
+static void psycho_3_decimation(FLOAT *ath, int *tonelabel, FLOAT *Xtm, int *noiselabel, FLOAT *Xnm, FLOAT *bark) {
   int i;
 
   /* Delete components which aren't above the ATH */
@@ -287,7 +288,7 @@ void psycho_3_decimation(FLOAT *ath, int *tonelabel, FLOAT *Xtm, int *noiselabel
    NOTE: Only a subset of other frequencies is checked. According to the 
    standard different subbands are subsampled to different amounts.
    See psycho_3_init and freq_subset */
-void psycho_3_threshold(FLOAT *LTg, int *tonelabel, FLOAT *Xtm, int *noiselabel, FLOAT *Xnm, FLOAT *bark, FLOAT *ath, int bit_rate, int *freq_subset) {
+static void psycho_3_threshold(psycho_3_mem *mem, FLOAT *LTg, int *tonelabel, FLOAT *Xtm, int *noiselabel, FLOAT *Xnm, FLOAT *bark, FLOAT *ath, int bit_rate, int *freq_subset) {
   int i,j,k;
   FLOAT LTtm[SUBSIZE];
   FLOAT LTnm[SUBSIZE];
@@ -317,7 +318,7 @@ void psycho_3_threshold(FLOAT *LTg, int *tonelabel, FLOAT *Xtm, int *noiselabel,
 	    vf = (-17 * dz);
 	  else
 	    vf = -(dz - 1) * (17 - 0.15 * Xtm[k]) - 17;
-	  LTtm[j] = psycho_3_add_db (LTtm[j], av + vf);
+	  LTtm[j] = psycho_3_add_db (mem, LTtm[j], av + vf);
 	}    
       }
     }
@@ -339,7 +340,7 @@ void psycho_3_threshold(FLOAT *LTg, int *tonelabel, FLOAT *Xtm, int *noiselabel,
 	    vf = (-17 * dz);
 	  else
 	    vf = -(dz - 1) * (17 - 0.15 * Xnm[k]) - 17;
-	  LTnm[j] = psycho_3_add_db (LTnm[j], av + vf);
+	  LTnm[j] = psycho_3_add_db (mem, LTnm[j], av + vf);
 	}    
       }
     }
@@ -348,16 +349,16 @@ void psycho_3_threshold(FLOAT *LTg, int *tonelabel, FLOAT *Xtm, int *noiselabel,
   /* ISO11172 D.1 Step 7
      Calculate the global masking threhold */
   for (i=0;i<SUBSIZE;i++) {
-    LTg[i] = psycho_3_add_db(LTnm[i], LTtm[i]);
+    LTg[i] = psycho_3_add_db(mem, LTnm[i], LTtm[i]);
     if (bit_rate < 96)
-      LTg[i] = psycho_3_add_db(ath[freq_subset[i]], LTg[i]);
+      LTg[i] = psycho_3_add_db(mem, ath[freq_subset[i]], LTg[i]);
     else
-      LTg[i] = psycho_3_add_db(ath[freq_subset[i]]-12.0, LTg[i]);
+      LTg[i] = psycho_3_add_db(mem, ath[freq_subset[i]]-12.0, LTg[i]);
   }
 }
 
   /* Find the minimum LTg for each subband. ISO11172 Sec D.1 Step 8 */
-void psycho_3_minimummasking(FLOAT *LTg, FLOAT *LTmin, int *freq_subset) {
+static void psycho_3_minimummasking(FLOAT *LTg, FLOAT *LTmin, int *freq_subset) {
   int i;
 
   for (i=0;i<SBLIMIT;i++)
@@ -374,15 +375,15 @@ void psycho_3_minimummasking(FLOAT *LTg, FLOAT *LTmin, int *freq_subset) {
 /* ISO11172 Sect D.1 Step 9
    Calculate the signal-to-mask ratio 
    MFC FIXME Feb 2003 for better calling from
-   toolame, add a "float SMR[]" array and return it */
-void psycho_3_smr(FLOAT *LTmin, FLOAT *Lsb) {
+   twolame, add a "float SMR[]" array and return it */
+static void psycho_3_smr(FLOAT *LTmin, FLOAT *Lsb) {
   int i;
   for (i=0;i<SBLIMIT;i++) {
     LTmin[i] = Lsb[i] - LTmin[i];
   }
 }
 
-psycho_3_mem *psycho_3_init( toolame_options *glopts ) {
+static psycho_3_mem *psycho_3_init( twolame_options *glopts ) {
   int i;
   int cbase = 0; /* current base index for the bark range calculation */
   FLOAT sfreq;
@@ -395,7 +396,7 @@ psycho_3_mem *psycho_3_init( toolame_options *glopts ) {
   int cbands=0;
   int *cbandindex;
 
-  mem = (psycho_3_mem *)toolame_malloc(sizeof(psycho_3_mem), "psycho_3_mem");
+  mem = (psycho_3_mem *)twolame_malloc(sizeof(psycho_3_mem), "psycho_3_mem");
   mem->off[0]=mem->off[1]=256;
   freq_subset = mem->freq_subset;
   bark = mem->bark;
@@ -403,7 +404,7 @@ psycho_3_mem *psycho_3_init( toolame_options *glopts ) {
   cbandindex = mem->cbandindex;
 
   /* Initialise the tables for the adding dB */
-  psycho_3_init_add_db();
+  psycho_3_init_add_db(mem);
   
   /* For each spectral line calculate the bark and the ATH (in dB) */
   sfreq = (FLOAT)glopts->samplerate_out;
@@ -487,7 +488,7 @@ psycho_3_mem *psycho_3_init( toolame_options *glopts ) {
   return(mem);
 }
 
-void psycho_3_dump(int *tonelabel, FLOAT *Xtm, int *noiselabel, FLOAT *Xnm) {
+static void psycho_3_dump(int *tonelabel, FLOAT *Xtm, int *noiselabel, FLOAT *Xnm) {
   int i;
   fprintf(stdout,"3 Ton:");
   for (i=1;i<HAN_SIZE;i++) {
@@ -503,7 +504,7 @@ void psycho_3_dump(int *tonelabel, FLOAT *Xtm, int *noiselabel, FLOAT *Xnm) {
   }
   fprintf(stdout,"\n");
 }
-void psycho_3 (toolame_options *glopts, short int buffer[2][1152], FLOAT scale[2][32], FLOAT ltmin[2][32])
+void psycho_3 (twolame_options *glopts, short int buffer[2][1152], FLOAT scale[2][32], FLOAT ltmin[2][32])
 {
   psycho_3_mem *mem;
   frame_info *frame = &glopts->frame;
@@ -543,12 +544,12 @@ void psycho_3 (toolame_options *glopts, short int buffer[2][1152], FLOAT scale[2
     psycho_3_fft(sample, energy);
     psycho_3_powerdensityspectrum(energy, power);    
     psycho_3_spl(Lsb, power, &scale[k][0]);
-    psycho_3_tonal_label (power, tonelabel, Xtm);
+    psycho_3_tonal_label (mem, power, tonelabel, Xtm);
     psycho_3_noise_label (mem, power, energy, tonelabel, noiselabel, Xnm);
-    if (glopts->verbosity > 20)
+    if (glopts->verbosity > 8)
       psycho_3_dump(tonelabel, Xtm, noiselabel, Xnm);
     psycho_3_decimation(mem->ath, tonelabel, Xtm, noiselabel, Xnm, mem->bark);
-    psycho_3_threshold(LTg, tonelabel, Xtm, noiselabel, Xnm, mem->bark, mem->ath, glopts->bitrate / nch, mem->freq_subset);
+    psycho_3_threshold(mem, LTg, tonelabel, Xtm, noiselabel, Xnm, mem->bark, mem->ath, glopts->bitrate / nch, mem->freq_subset);
     psycho_3_minimummasking(LTg, &ltmin[k][0], mem->freq_subset);
     psycho_3_smr(&ltmin[k][0], Lsb);
   }
@@ -556,5 +557,5 @@ void psycho_3 (toolame_options *glopts, short int buffer[2][1152], FLOAT scale[2
 
 
 void psycho_3_deinit(psycho_3_mem **mem) {
-  toolame_free( (void **) mem );
+  twolame_free( (void **) mem );
 }

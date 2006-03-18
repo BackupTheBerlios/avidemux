@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,9 +25,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+
+#include "twolame.h"
 #include "common.h"
-#include "toolame.h"
-#include "toolame_global_flags.h"
 #include "mem.h"
 #include "fft.h"
 #include "psycho_2.h"
@@ -53,7 +54,7 @@ static const FLOAT bmax[27] = { 20.0, 20.0, 20.0, 20.0, 20.0, 17.0, 15.0,
   4.5, 4.5, 4.5, 3.5, 3.5, 3.5
 };
 
-void psycho_2_read_absthr (absthr, table)
+static void psycho_2_read_absthr (absthr, table)
      FLOAT *absthr;
      int table;
 {
@@ -74,7 +75,7 @@ void psycho_2_read_absthr (absthr, table)
 /********************************
  * init psycho model 2
  ********************************/
-psycho_2_mem *psycho_2_init (toolame_options *glopts, int sfreq)
+psycho_2_mem *psycho_2_init (twolame_options *glopts, int sfreq)
 {
   psycho_2_mem *mem;
   FLOAT *cbval, *rnorm;
@@ -93,13 +94,14 @@ psycho_2_mem *psycho_2_init (toolame_options *glopts, int sfreq)
   int sfreq_idx;
 
   {
-    mem = (psycho_2_mem *)toolame_malloc(sizeof(psycho_2_mem), "psycho_2_mem");
-
-    mem->tmn = (FLOAT *) toolame_malloc (sizeof (DCB), "tmn");
-    mem->s = (FCB *) toolame_malloc (sizeof (FCBCB), "s");
-    mem->lthr = (FHBLK *) toolame_malloc (sizeof (F2HBLK), "lthr");
-    mem->r = (F2HBLK *) toolame_malloc (sizeof (F22HBLK), "r");
-    mem->phi_sav = (F2HBLK *) toolame_malloc (sizeof (F22HBLK), "phi_sav");
+    mem = (psycho_2_mem *)twolame_malloc(sizeof(psycho_2_mem), "psycho_2_mem");
+	if (!mem) return NULL;
+	
+    mem->tmn = (FLOAT *) twolame_malloc (sizeof (DCB), "tmn");
+    mem->s = (FCB *) twolame_malloc (sizeof (FCBCB), "s");
+    mem->lthr = (FHBLK *) twolame_malloc (sizeof (F2HBLK), "lthr");
+    mem->r = (F2HBLK *) twolame_malloc (sizeof (F22HBLK), "r");
+    mem->phi_sav = (F2HBLK *) twolame_malloc (sizeof (F22HBLK), "phi_sav");
 
     //static int new = 0, old = 1, oldest = 0;
     mem->new=0;
@@ -138,7 +140,7 @@ psycho_2_mem *psycho_2_init (toolame_options *glopts, int sfreq)
     break;
   default:
     fprintf (stderr, "error, invalid sampling frequency: %d Hz\n", sfreq);
-    exit (-1);
+    return NULL;
   }
   fprintf (stderr, "absthr[][] sampling frequency index: %d\n", sfreq_idx);
   psycho_2_read_absthr (mem->absthr, sfreq_idx);
@@ -235,7 +237,7 @@ psycho_2_mem *psycho_2_init (toolame_options *glopts, int sfreq)
     }
   }
 
-  if (glopts->verbosity > 10){
+  if (glopts->verbosity > 5){
     /* Dump All the Values to STDOUT and exit */
     int wlow, whigh=0;
     fprintf(stdout,"psy model 2 init\n");
@@ -251,8 +253,8 @@ psycho_2_mem *psycho_2_init (toolame_options *glopts, int sfreq)
   return(mem);
 }
 
-void psycho_2 (toolame_options *glopts, short int buffer[2][1152],
-	  short int savebuf[2][1152],
+void psycho_2 (twolame_options *glopts, short int buffer[2][1152],
+	  short int savebuf[2][1056],
 		FLOAT smr[2][32])
 {
   psycho_2_mem *mem;
@@ -520,12 +522,12 @@ void psycho_2 (toolame_options *glopts, short int buffer[2][1152],
 }
 
 void psycho_2_deinit(psycho_2_mem **mem) {
-  toolame_free( (void **) &(*mem)->tmn );
-  toolame_free( (void **) &(*mem)->s );
-  toolame_free( (void **) &(*mem)->lthr );
-  toolame_free( (void **) &(*mem)->r );
-  toolame_free( (void **) &(*mem)->phi_sav );
+  twolame_free( (void **) &(*mem)->tmn );
+  twolame_free( (void **) &(*mem)->s );
+  twolame_free( (void **) &(*mem)->lthr );
+  twolame_free( (void **) &(*mem)->r );
+  twolame_free( (void **) &(*mem)->phi_sav );
 
-  toolame_free ( (void **) mem );
+  twolame_free ( (void **) mem );
 }
 

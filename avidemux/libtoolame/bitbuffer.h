@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -39,7 +40,7 @@ bit_stream * buffer_init( unsigned char *buffer, int buffer_size );
 void buffer_deinit( bit_stream ** bs );
 
 void buffer_put1bit (bit_stream *, int);
-INLINE void buffer_putbits (bit_stream *, unsigned int, int);
+inline void buffer_putbits (bit_stream *, unsigned int, int);
 unsigned long buffer_sstell (bit_stream *);
 
 #endif

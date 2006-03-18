@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,14 +24,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "twolame.h"
 #include "common.h"
-#include "toolame.h"
-#include "toolame_global_flags.h"
 #include "dab.h"
 
 
 void
-dab_crc_calc (toolame_options *glopts,
+dab_crc_calc (twolame_options *glopts,
 	     unsigned int bit_alloc[2][SBLIMIT],
 	     unsigned int scfsi[2][SBLIMIT],
 	     unsigned int scalar[2][3][SBLIMIT], 
@@ -103,7 +103,7 @@ void dab_crc_update (unsigned int data, unsigned int length, unsigned int *crc)
 */
 
 /*
-  Just after the available bits calculation in toolame, 
+  Just after the available bits calculation in twolame, 
   allocated some bits for the DAB stuff 
 */
 

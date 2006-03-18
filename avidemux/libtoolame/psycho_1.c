@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,15 +24,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+#include "twolame.h"
 #include "common.h"
-#include "toolame.h"
-#include "toolame_global_flags.h"
 #include "mem.h"
 #include "fft.h"
 #include "psycho_1.h"
-
-#define DBTAB 1000
-FLOAT dbtable[DBTAB];
 
 /**********************************************************************
 
@@ -43,7 +41,7 @@ FLOAT dbtable[DBTAB];
 **********************************************************************/
 
 
-int *psycho_1_read_cbound (int lay, int freq, int *crit_band)	
+static int *psycho_1_read_cbound (int lay, int freq, int *crit_band)	
 /* this function reads in critical  band boundaries */
 {
 
@@ -61,7 +59,7 @@ int *psycho_1_read_cbound (int lay, int freq, int *crit_band)
   }
 
   *crit_band = SecondCriticalBand[freq][0];
-  cbound = (int *) toolame_malloc (sizeof (int) * *crit_band, "cbound");
+  cbound = (int *) twolame_malloc (sizeof (int) * *crit_band, "cbound");
   for (i = 0; i < *crit_band; i++) {
     k = SecondCriticalBand[freq][i + 1];
     if (k != 0) {
@@ -75,7 +73,7 @@ int *psycho_1_read_cbound (int lay, int freq, int *crit_band)
 }
 
 /* reads in the frequency bands and bark values */
-void psycho_1_read_freq_band (g_ptr *ltg, int lay, int freq, int *sub_size)  {
+static void psycho_1_read_freq_band (g_ptr *ltg, int lay, int freq, int *sub_size)  {
 
 #include "psycho_1_freqtable.h"
 
@@ -89,7 +87,7 @@ void psycho_1_read_freq_band (g_ptr *ltg, int lay, int freq, int *sub_size)  {
   /* read input for freq. subbands */
 
   *sub_size = SecondFreqEntries[freq] + 1;
-  *ltg = (g_ptr) toolame_malloc (sizeof (g_thres) * *sub_size, "ltg");
+  *ltg = (g_ptr) twolame_malloc (sizeof (g_thres) * *sub_size, "ltg");
   (*ltg)[0].line = 0;		/* initialize global masking threshold */
   (*ltg)[0].bark = 0.0;
   (*ltg)[0].hear = 0.0;
@@ -107,7 +105,7 @@ void psycho_1_read_freq_band (g_ptr *ltg, int lay, int freq, int *sub_size)  {
 }
 
 
-void psycho_1_make_map (int sub_size, mask power[HAN_SIZE], g_thres * ltg)
+static void psycho_1_make_map (int sub_size, mask power[HAN_SIZE], g_thres * ltg)
 /* this function calculates the global masking threshold */
 {
   int i, j;
@@ -117,17 +115,17 @@ void psycho_1_make_map (int sub_size, mask power[HAN_SIZE], g_thres * ltg)
       power[j].map = i;
 }
 
-void psycho_1_init_add_db (void)
+static void psycho_1_init_add_db (psycho_1_mem *mem)
 {
   int i;
   FLOAT x;
   for (i = 0; i < DBTAB; i++) {
     x = (FLOAT) i / 10.0;
-    dbtable[i] = 10 * log10 (1 + pow (10.0, x / 10.0)) - x;
+    mem->dbtable[i] = 10 * log10 (1 + pow (10.0, x / 10.0)) - x;
   }
 }
 
-INLINE FLOAT add_db (FLOAT a, FLOAT b)
+static inline FLOAT add_db (psycho_1_mem *mem, FLOAT a, FLOAT b)
 {
   /* MFC - if the difference between a and b is large (>99), then just return the
      largest one. (about 10% of the time)
@@ -148,10 +146,10 @@ INLINE FLOAT add_db (FLOAT a, FLOAT b)
 
   idiff = (int) fdiff;
   if (idiff >= 0) {
-    return (a + dbtable[idiff]);
+    return (a + mem->dbtable[idiff]);
   }
 
-  return (b + dbtable[-idiff]);
+  return (b + mem->dbtable[-idiff]);
 }
 
 /****************************************************************
@@ -162,7 +160,7 @@ INLINE FLOAT add_db (FLOAT a, FLOAT b)
 *    
 *
 ****************************************************************/
-void psycho_1_hann_fft_pickmax (FLOAT sample[FFT_SIZE], mask power[HAN_SIZE],
+static void psycho_1_hann_fft_pickmax (FLOAT sample[FFT_SIZE], mask power[HAN_SIZE],
 		       FLOAT spike[SBLIMIT], FLOAT energy[FFT_SIZE])
 {
   FLOAT x_real[FFT_SIZE];
@@ -215,11 +213,12 @@ void psycho_1_hann_fft_pickmax (FLOAT sample[FFT_SIZE], mask power[HAN_SIZE],
 *
 ****************************************************************/
 
-void psycho_1_tonal_label (mask power[HAN_SIZE], int *tone)
+static void psycho_1_tonal_label (psycho_1_mem *mem, int *tone)
 /* this function extracts (tonal)  sinusoidals from the spectrum  */
 {
   int i, j, last = LAST, first, run, last_but_one = LAST;	/* dpwe */
   FLOAT max;
+  mask *power = mem->power;
 
   *tone = LAST;
   for (i = 2; i < HAN_SIZE - 12; i++) {
@@ -267,8 +266,8 @@ void psycho_1_tonal_label (mask power[HAN_SIZE], int *tone)
       }
       if (first > 1 && first < 500) {	/* calculate the sum of the */
 	FLOAT tmp;		/* powers of the components */
-	tmp = add_db (power[first - 1].x, power[first + 1].x);
-	power[first].x = add_db (power[first].x, tmp);
+	tmp = add_db (mem, power[first - 1].x, power[first + 1].x);
+	power[first].x = add_db (mem, power[first].x, tmp);
       }
       for (j = 1; j <= run; j++) {
 	power[first - j].x = power[first + j].x = DBMIN;
@@ -298,17 +297,20 @@ void psycho_1_tonal_label (mask power[HAN_SIZE], int *tone)
 *
 ****************************************************************/
 
-void psycho_1_noise_label (int crit_band, int *cbound, mask * power, int *noise, g_thres * ltg,
-		  FLOAT energy[FFT_SIZE])
+static void psycho_1_noise_label (psycho_1_mem *mem, int *noise,
+        FLOAT energy[FFT_SIZE])
 {
   int i, j, centre, last = LAST;
   FLOAT index, weight, sum;
+  int crit_band = mem->crit_band;
+  int *cbound = mem->cbound;
+  mask *power = mem->power;
   /* calculate the remaining spectral */
   for (i = 0; i < crit_band - 1; i++) {	/* lines for non-tonal components   */
     for (j = cbound[i], weight = 0.0, sum = DBMIN; j < cbound[i + 1]; j++) {
       if (power[j].type != TONE) {
 	if (power[j].x != DBMIN) {
-	  sum = add_db (power[j].x, sum);
+	  sum = add_db (mem, power[j].x, sum);
 	  /* Weight is used in finding the geometric mean of the noise energy within a subband */
 	  weight += CF * energy[j] * (FLOAT) (j - cbound[i]) / (FLOAT) (cbound[i + 1] - cbound[i]);	/* correction */
 	  power[j].x = DBMIN;
@@ -357,7 +359,7 @@ void psycho_1_noise_label (int crit_band, int *cbound, mask * power, int *noise,
 *
 ****************************************************************/
 
-void psycho_1_subsampling (mask power[HAN_SIZE], g_thres * ltg, int *tone, int *noise)
+static void psycho_1_subsampling (mask power[HAN_SIZE], g_thres * ltg, int *tone, int *noise)
 {
   int i, old;
 
@@ -428,9 +430,12 @@ void psycho_1_subsampling (mask power[HAN_SIZE], g_thres * ltg, int *tone, int *
 ****************************************************************/
 
 /* mainly just changed the way range checking was done MFC Nov 1999 */
-void psycho_1_threshold (int sub_size, mask power[HAN_SIZE], g_thres * ltg, int *tone, int *noise,
+static void psycho_1_threshold (psycho_1_mem *mem, int *tone, int *noise,
 		int bit_rate)
 {
+  int sub_size = mem->sub_size;
+  mask *power = mem->power;
+  g_thres *ltg = mem->ltg;
   int k, t;
   FLOAT dz, tmps, vf;
 
@@ -451,7 +456,7 @@ void psycho_1_threshold (int sub_size, mask power[HAN_SIZE], g_thres * ltg, int 
 	  vf = (-17 * dz);
 	else
 	  vf = -(dz - 1) * (17 - 0.15 * power[t].x) - 17;
-	ltg[k].x = add_db (ltg[k].x, tmps + vf);
+	ltg[k].x = add_db (mem, ltg[k].x, tmps + vf);
       }
       t = power[t].next;
     }
@@ -470,14 +475,14 @@ void psycho_1_threshold (int sub_size, mask power[HAN_SIZE], g_thres * ltg, int 
 	  vf = (-17 * dz);
 	else
 	  vf = -(dz - 1) * (17 - 0.15 * power[t].x) - 17;
-	ltg[k].x = add_db (ltg[k].x, tmps + vf);
+	ltg[k].x = add_db (mem, ltg[k].x, tmps + vf);
       }
       t = power[t].next;
     }
     if (bit_rate < 96)
-      ltg[k].x = add_db (ltg[k].hear, ltg[k].x);
+      ltg[k].x = add_db (mem, ltg[k].hear, ltg[k].x);
     else
-      ltg[k].x = add_db (ltg[k].hear - 12.0, ltg[k].x);
+      ltg[k].x = add_db (mem, ltg[k].hear - 12.0, ltg[k].x);
   }
 
 }
@@ -489,7 +494,7 @@ void psycho_1_threshold (int sub_size, mask power[HAN_SIZE], g_thres * ltg, int 
 *
 ****************************************************************/
 
-void psycho_1_minimum_mask (int sub_size, g_thres * ltg, FLOAT ltmin[SBLIMIT], int sblimit)
+static void psycho_1_minimum_mask (int sub_size, g_thres * ltg, FLOAT ltmin[SBLIMIT], int sblimit)
 {
   FLOAT min;
   int i, j;
@@ -516,7 +521,7 @@ void psycho_1_minimum_mask (int sub_size, g_thres * ltg, FLOAT ltmin[SBLIMIT], i
 *
 *****************************************************************/
 
-void psycho_1_smr (FLOAT ltmin[SBLIMIT], FLOAT spike[SBLIMIT], FLOAT scale[SBLIMIT],
+static void psycho_1_smr (FLOAT ltmin[SBLIMIT], FLOAT spike[SBLIMIT], FLOAT scale[SBLIMIT],
 	  int sblimit)
 {
   int i;
@@ -531,7 +536,9 @@ void psycho_1_smr (FLOAT ltmin[SBLIMIT], FLOAT spike[SBLIMIT], FLOAT scale[SBLIM
   }
 }
 
-void psycho_1_dump(mask power[HAN_SIZE], int *tone, int *noise) {
+
+/*
+static void psycho_1_dump(mask power[HAN_SIZE], int *tone, int *noise) {
   int t;
 
   fprintf(stdout,"1 Ton: ");
@@ -550,8 +557,10 @@ void psycho_1_dump(mask power[HAN_SIZE], int *tone, int *noise) {
   }
   fprintf(stdout,"\n");
 }
+*/
 
-void psycho_1 (toolame_options *glopts, short buffer[2][1152], FLOAT scale[2][SBLIMIT],
+
+void psycho_1 (twolame_options *glopts, short buffer[2][1152], FLOAT scale[2][SBLIMIT],
 	       FLOAT ltmin[2][SBLIMIT])
 {
   psycho_1_mem *mem;
@@ -567,10 +576,10 @@ void psycho_1 (toolame_options *glopts, short buffer[2][1152], FLOAT scale[2][SB
 
   /* call functions for critical boundaries, freq. */
   if (!glopts->p1mem) {			/* bands, bark values, and mapping */
-    mem = (psycho_1_mem *)toolame_malloc(sizeof(psycho_1_mem), "psycho_1_mem");
+    mem = (psycho_1_mem *)twolame_malloc(sizeof(psycho_1_mem), "psycho_1_mem");
 
-    mem->power = (mask_ptr) toolame_malloc (sizeof (mask) * HAN_SIZE, "power");
-    if (header->version == MPEG1) {
+    mem->power = (mask_ptr) twolame_malloc (sizeof (mask) * HAN_SIZE, "power");
+    if (header->version == TWOLAME_MPEG1) {
       mem->cbound = psycho_1_read_cbound (header->lay, header->samplerate_idx, &mem->crit_band);
       psycho_1_read_freq_band (&mem->ltg, header->lay, header->samplerate_idx, &mem->sub_size);
     } else {
@@ -581,7 +590,7 @@ void psycho_1 (toolame_options *glopts, short buffer[2][1152], FLOAT scale[2][SB
     for (i = 0; i < 1408; i++)
       mem->fft_buf[0][i] = mem->fft_buf[1][i] = 0;
 
-    psycho_1_init_add_db ();		/* create the add_db table */
+    psycho_1_init_add_db (mem);		/* create the add_db table */
 
     mem->off[0]=256;
     mem->off[1]=256;
@@ -616,11 +625,11 @@ void psycho_1 (toolame_options *glopts, short buffer[2][1152], FLOAT scale[2][SB
     mem->off[k] %= 1408;
 
     psycho_1_hann_fft_pickmax (sample, mem->power, &spike[k][0], energy);
-    psycho_1_tonal_label (mem->power, &tone);
-    psycho_1_noise_label (mem->crit_band, mem->cbound, mem->power, &noise, mem->ltg, energy);
+    psycho_1_tonal_label (mem, &tone);
+    psycho_1_noise_label (mem, &noise, energy);
     //psycho_1_dump(power, &tone, &noise) ;
     psycho_1_subsampling (mem->power, mem->ltg, &tone, &noise);
-    psycho_1_threshold (mem->sub_size, mem->power, mem->ltg, &tone, &noise, glopts->bitrate / nch);
+    psycho_1_threshold (mem, &tone, &noise, glopts->bitrate / nch);
     psycho_1_minimum_mask (mem->sub_size, mem->ltg, &ltmin[k][0], sblimit);
     psycho_1_smr (&ltmin[k][0], &spike[k][0], &scale[k][0], sblimit);
   }
@@ -628,8 +637,8 @@ void psycho_1 (toolame_options *glopts, short buffer[2][1152], FLOAT scale[2][SB
 }
 
 void psycho_1_deinit(psycho_1_mem **mem) {
-  toolame_free( (void **) &(*mem)->cbound);
-  toolame_free( (void **) &(*mem)->ltg);
-  toolame_free( (void **) &(*mem)->power);
-  toolame_free( (void **) mem);
+  twolame_free( (void **) &(*mem)->cbound);
+  twolame_free( (void **) &(*mem)->ltg);
+  twolame_free( (void **) &(*mem)->power);
+  twolame_free( (void **) mem);
 }

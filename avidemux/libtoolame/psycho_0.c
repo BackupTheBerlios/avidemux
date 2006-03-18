@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,9 +23,9 @@
 
 #include <stdio.h>
 #include <math.h>
+
+#include "twolame.h"
 #include "common.h"
-#include "toolame.h"
-#include "toolame_global_flags.h"
 #include "ath.h"
 #include "mem.h"
 #include "psycho_0.h"
@@ -49,10 +50,10 @@
    logs, whatever. Fiddle with the numbers until we get a good SMR output */
 
 
-static psycho_0_mem *psycho_0_init (toolame_options *glopts, int sfreq)
+static psycho_0_mem *psycho_0_init (twolame_options *glopts, int sfreq)
 {
 	FLOAT freqperline = (FLOAT)sfreq/1024.0;
-	psycho_0_mem *mem = (psycho_0_mem *)toolame_malloc(sizeof(psycho_0_mem), "psycho_0_mem");
+	psycho_0_mem *mem = (psycho_0_mem *)twolame_malloc(sizeof(psycho_0_mem), "psycho_0_mem");
 	int sb, i;
 	
 	for (sb=0;sb<SBLIMIT;sb++) {
@@ -72,7 +73,7 @@ static psycho_0_mem *psycho_0_init (toolame_options *glopts, int sfreq)
 
 
 
-void psycho_0(toolame_options *glopts, FLOAT SMR[2][SBLIMIT], unsigned int scalar[2][3][SBLIMIT])
+void psycho_0(twolame_options *glopts, FLOAT SMR[2][SBLIMIT], unsigned int scalar[2][3][SBLIMIT])
 {
 	psycho_0_mem *mem;
 	int nch = glopts->frame.nch;
@@ -118,7 +119,7 @@ void psycho_0(toolame_options *glopts, FLOAT SMR[2][SBLIMIT], unsigned int scala
 
 
 void psycho_0_deinit(psycho_0_mem **mem) {
-	toolame_free( (void **)mem);
+	twolame_free( (void **)mem);
 }
 
 

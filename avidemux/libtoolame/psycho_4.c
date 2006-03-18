@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,9 +24,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+
+#include "twolame.h"
 #include "common.h"
-#include "toolame.h"
-#include "toolame_global_flags.h"
 #include "mem.h"
 #include "fft.h"
 #include "ath.h"
@@ -85,24 +86,21 @@ static const FLOAT minval[27] = {
 };
 
 
-#define TRIGTABLESIZE 6284
-#define TRIGTABLESCALE 2000.0
 /* Table covers angles from  0 to TRIGTABLESIZE/TRIGTABLESCALE (3.142) radians 
    In steps of 1/TRIGTABLESCALE (0.0005) radians. 
    Largest absolute error: 0.0005
    Only create a table for cos, and then use trig to work out sin.
    sin(theta) = cos(PI/2 - theta)
    MFC March 2003 */
-static FLOAT cos_table[TRIGTABLESIZE];
-void psycho_4_trigtable_init(void) {
+static void psycho_4_trigtable_init(psycho_4_mem *p4mem) {
 
   int i;
   for (i=0;i<TRIGTABLESIZE;i++) {
-    cos_table[i] = cos((FLOAT)i/TRIGTABLESCALE);
+    p4mem->cos_table[i] = cos((FLOAT)i/TRIGTABLESCALE);
   }
 }
 
-INLINE FLOAT psycho_4_cos(FLOAT phi) {
+static inline FLOAT psycho_4_cos(psycho_4_mem *p4mem, FLOAT phi) {
   int index;
   int sign=1;
 
@@ -113,13 +111,13 @@ INLINE FLOAT psycho_4_cos(FLOAT phi) {
     index -= TRIGTABLESIZE;
     sign*=-1;
   }
-  return(sign * cos_table[index]);
+  return(sign * p4mem->cos_table[index]);
 }
 /* The spreading function.  Values returned in units of energy
    Argument 'bark' is the difference in bark values between the
    centre of two partitions.
    This has been taken from LAME. MFC Feb 2003 */
-FLOAT psycho_4_spreading_function(FLOAT bark) {
+static FLOAT psycho_4_spreading_function(FLOAT bark) {
 
     FLOAT tempx,x,tempy,temp;
     tempx = bark;
@@ -144,7 +142,7 @@ FLOAT psycho_4_spreading_function(FLOAT bark) {
 
 #ifdef LAME
     /* I'm not sure where the magic value of 0.6609193 comes from.
-       toolame will just keep using the rnorm to normalise the spreading function
+       twolame will just keep using the rnorm to normalise the spreading function
        MFC Feb 2003 */
     /* Normalization.  The spreading function should be normalized so that:
          +inf
@@ -162,7 +160,7 @@ FLOAT psycho_4_spreading_function(FLOAT bark) {
 /********************************
  * init psycho model 2
  ********************************/
-psycho_4_mem *psycho_4_init (toolame_options *glopts, int sfreq)
+static psycho_4_mem *psycho_4_init (twolame_options *glopts, int sfreq)
 {
   psycho_4_mem *mem;
   FLOAT *cbval, *rnorm;
@@ -175,13 +173,13 @@ psycho_4_mem *psycho_4_init (toolame_options *glopts, int sfreq)
   int i, j;
 
   {
-    mem = (psycho_4_mem *)toolame_malloc(sizeof(psycho_4_mem), "psycho_4_mem");
+    mem = (psycho_4_mem *)twolame_malloc(sizeof(psycho_4_mem), "psycho_4_mem");
 
-    mem->tmn = (FLOAT *) toolame_malloc (sizeof (DCB), "tmn");
-    mem->s = (FCB *) toolame_malloc (sizeof (FCBCB), "s");
-    mem->lthr = (FHBLK *) toolame_malloc (sizeof (F2HBLK), "lthr");
-    mem->r = (F2HBLK *) toolame_malloc (sizeof (F22HBLK), "r");
-    mem->phi_sav = (F2HBLK *) toolame_malloc (sizeof (F22HBLK), "phi_sav");
+    mem->tmn = (FLOAT *) twolame_malloc (sizeof (DCB), "tmn");
+    mem->s = (FCB *) twolame_malloc (sizeof (FCBCB), "s");
+    mem->lthr = (FHBLK *) twolame_malloc (sizeof (F2HBLK), "lthr");
+    mem->r = (F2HBLK *) twolame_malloc (sizeof (F22HBLK), "r");
+    mem->phi_sav = (F2HBLK *) twolame_malloc (sizeof (F22HBLK), "phi_sav");
 
     mem->new=0;
     mem->old=1;
@@ -202,7 +200,7 @@ psycho_4_mem *psycho_4_init (toolame_options *glopts, int sfreq)
 
 
   /* Set up the SIN/COS tables */
-  psycho_4_trigtable_init();
+  psycho_4_trigtable_init(mem);
 
   /* calculate HANN window coefficients */
   for (i = 0; i < BLKSIZE; i++)
@@ -278,7 +276,7 @@ psycho_4_mem *psycho_4_init (toolame_options *glopts, int sfreq)
     tmn[j] = MAX(15.5+cbval[j], 24.5);
 
 
-  if (glopts->verbosity > 10) {
+  if (glopts->verbosity > 6) {
     /* Dump All the Values to STDOUT */
     int wlow, whigh=0;
     int ntot=0;
@@ -299,9 +297,9 @@ psycho_4_mem *psycho_4_init (toolame_options *glopts, int sfreq)
 }
 
 
-void psycho_4 (toolame_options *glopts, 
+void psycho_4 (twolame_options *glopts, 
 		short int buffer[2][1152],
-		short int savebuf[2][1152],
+		short int savebuf[2][1056],
 		FLOAT smr[2][32])
 /* to match prototype : FLOAT args are always FLOAT */
 {
@@ -421,12 +419,12 @@ void psycho_4 (toolame_options *glopts,
   
       {
 	temp1 =
-	  r[ch][new][j] * psycho_4_cos(phi[j]) -
-	  r_prime * psycho_4_cos(phi_prime);
+	  r[ch][new][j] * psycho_4_cos(mem, phi[j]) -
+	  r_prime * psycho_4_cos(mem, phi_prime);
 	/* Remember your grade 11 trig? sin(theta) = cos(PI/2 - theta) */
 	temp2 =
-	  r[ch][new][j] * psycho_4_cos(PI2 - phi[j]) - 
-	  r_prime * psycho_4_cos(PI2 - phi_prime); 
+	  r[ch][new][j] * psycho_4_cos(mem, PI2 - phi[j]) - 
+	  r_prime * psycho_4_cos(mem, PI2 - phi_prime); 
       }
 
 
@@ -562,13 +560,13 @@ void psycho_4 (toolame_options *glopts,
 
 
 void psycho_4_deinit(psycho_4_mem **mem) {
-    toolame_free( (void **) &(*mem)->tmn );
-    toolame_free( (void **) &(*mem)->s );
-    toolame_free( (void **) &(*mem)->lthr );
-    toolame_free( (void **) &(*mem)->r );
-    toolame_free( (void **) &(*mem)->phi_sav );
+    twolame_free( (void **) &(*mem)->tmn );
+    twolame_free( (void **) &(*mem)->s );
+    twolame_free( (void **) &(*mem)->lthr );
+    twolame_free( (void **) &(*mem)->r );
+    twolame_free( (void **) &(*mem)->phi_sav );
 
-    toolame_free( (void **) mem);
+    twolame_free( (void **) mem);
 };
 
 

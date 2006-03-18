@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,10 +24,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "twolame.h"
 #include "common.h"
-#include "toolame.h"
-#include "toolame_global_flags.h"
+#include "bitbuffer.h"
+#include "encode.h"
 #include "crc.h"
+
 
 /*****************************************************************************
 *
@@ -34,7 +37,7 @@
 *
 *****************************************************************************/
 
-void crc_calc (toolame_options *glopts, unsigned int bit_alloc[2][SBLIMIT],
+void crc_calc (twolame_options *glopts, unsigned int bit_alloc[2][SBLIMIT],
 	       unsigned int scfsi[2][SBLIMIT], unsigned int *crc)
 {
   int i, k;
@@ -43,7 +46,6 @@ void crc_calc (toolame_options *glopts, unsigned int bit_alloc[2][SBLIMIT],
   int nch = frame->nch;
   int sblimit = frame->sblimit;
   int jsbound = frame->jsbound;
-  alloc_table *alloc = glopts->alloc_tab;
 
   *crc = 0xffff;		/* changed from '0' 92-08-11 shn */
   crc_update (header->bitrate_index, 4, crc);
@@ -58,7 +60,9 @@ void crc_calc (toolame_options *glopts, unsigned int bit_alloc[2][SBLIMIT],
 
   for (i = 0; i < sblimit; i++)
     for (k = 0; k < ((i < jsbound) ? nch : 1); k++)
-      crc_update (bit_alloc[k][i], (*alloc)[i][0].bits, crc);
+      crc_update ( bit_alloc[k][i],
+                   get_alloc_table_bits(glopts->tablenum, i, bit_alloc[k][i]),
+                   crc );
 
   for (i = 0; i < sblimit; i++)
     for (k = 0; k < nch; k++)

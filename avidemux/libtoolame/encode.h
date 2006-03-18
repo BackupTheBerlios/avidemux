@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,9 +24,11 @@
 #ifndef	_ENCODE_H_
 #define	_ENCODE_H_
 
-int encode_init(toolame_options *glopts);
+void encode_init(twolame_options *glopts);
 
-int js_bound (int m_ext);
+int get_js_bound(int m_ext);
+
+int get_alloc_table_bits (int tablenum, int sb, int ba);
 
 void scalefactor_calc (FLOAT sb_sample[][3][SCALE_BLOCK][SBLIMIT],
 			   unsigned int scalar[][3][SBLIMIT], int nch,
@@ -34,27 +37,27 @@ void scalefactor_calc (FLOAT sb_sample[][3][SCALE_BLOCK][SBLIMIT],
 void combine_lr (FLOAT sb_sample[2][3][SCALE_BLOCK][SBLIMIT],
 		     FLOAT joint_sample[3][SCALE_BLOCK][SBLIMIT], int sblimit);
 
-void find_sf_max (toolame_options *glopts,
+void find_sf_max (twolame_options *glopts,
               unsigned int sf_index[2][3][SBLIMIT],
               FLOAT sf_max[2][SBLIMIT]);
 
-void sf_transmission_pattern (toolame_options *glopts,
+void sf_transmission_pattern (twolame_options *glopts,
               unsigned int sf_index[2][3][SBLIMIT],
 			  unsigned int sf_selectinfo[2][SBLIMIT]);
 
-void write_header (toolame_options *glopts, bit_stream * bs);
+void write_header (twolame_options *glopts, bit_stream * bs);
 
-void write_bit_alloc (toolame_options *glopts, 
+void write_bit_alloc (twolame_options *glopts, 
               unsigned int bit_alloc[2][SBLIMIT],
               bit_stream * bs);
 
-void write_scalefactors (toolame_options *glopts, 
+void write_scalefactors (twolame_options *glopts, 
              unsigned int bit_alloc[2][SBLIMIT],
 			 unsigned int sf_selectinfo[2][SBLIMIT],
 			 unsigned int scalar[2][3][SBLIMIT],
 			 bit_stream * bs);
 
-void subband_quantization (toolame_options *glopts,
+void subband_quantization (twolame_options *glopts,
               unsigned int sf_index[2][3][SBLIMIT],
 		      FLOAT sb_samples[2][3][SCALE_BLOCK][SBLIMIT],
 		      unsigned int j_scale[3][SBLIMIT],
@@ -62,7 +65,7 @@ void subband_quantization (toolame_options *glopts,
 		      unsigned int bit_alloc[2][SBLIMIT],
 		      unsigned int sbband[2][3][SCALE_BLOCK][SBLIMIT]);
 
-void write_samples (toolame_options *glopts,
+void write_samples (twolame_options *glopts,
               unsigned int sbband[2][3][SCALE_BLOCK][SBLIMIT],
 		      unsigned int bit_alloc[2][SBLIMIT], bit_stream * bs);
 
@@ -71,21 +74,21 @@ void write_samples (toolame_options *glopts,
    Bit Allocation Stuff 
 ******************************************************/
 
-int bits_for_nonoise (toolame_options * glopts, FLOAT SMR[2][SBLIMIT],
+int bits_for_nonoise (twolame_options * glopts, FLOAT SMR[2][SBLIMIT],
 			  unsigned int scfsi[2][SBLIMIT], FLOAT min_mnr,
 			  unsigned int bit_alloc[2][SBLIMIT]);
 
-void init_bit_allocation( toolame_options * glopts );
+int init_bit_allocation( twolame_options * glopts );
 
-void main_bit_allocation (toolame_options * glopts, FLOAT SMR[2][SBLIMIT],
+void main_bit_allocation (twolame_options * glopts, FLOAT SMR[2][SBLIMIT],
 			  unsigned int scfsi[2][SBLIMIT],
 			  unsigned int bit_alloc[2][SBLIMIT], int *adb );
 
-int vbr_bit_allocation (toolame_options * glopts, FLOAT SMR[2][SBLIMIT],
+int vbr_bit_allocation (twolame_options * glopts, FLOAT SMR[2][SBLIMIT],
 		    unsigned int scfsi[2][SBLIMIT],
 		    unsigned int bit_alloc[2][SBLIMIT], int *adb);
 
-int a_bit_allocation (toolame_options * glopts, FLOAT SMR[2][SBLIMIT],
+int a_bit_allocation (twolame_options * glopts, FLOAT SMR[2][SBLIMIT],
 		      unsigned int scfsi[2][SBLIMIT],
 		      unsigned int bit_alloc[2][SBLIMIT], int *adb );
 

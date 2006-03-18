@@ -1,7 +1,8 @@
 /*
- *  tooLAME: an optimized mpeg 1/2 layer 2 audio encoder
+ *  TwoLAME: an optimized MPEG Audio Layer Two encoder
  *
  *  Copyright (C) 2001-2004 Michael Cheng
+ *  Copyright (C) 2004-2005 The TwoLAME Project
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -18,17 +19,16 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
  */
+ 
 
-#include <stdlib.h>
-#include <string.h>
+#ifndef	_UTIL_H_
+#define	_UTIL_H_
 
-#include "toolame.h"
-//#include "../config.h" MEANX
+// non-public prototypes
+const char* twolame_mpeg_version_name (int version);
+int twolame_get_bitrate_index (int bitrate, TWOLAME_MPEG_version version);
+int twolame_get_samplerate_index (long sample_rate);
+int twolame_get_version_for_samplerate (long sample_rate);
 
 
-const char* get_toolame_version( void )
-{
-	static const char* str = "2.0n by Nicholas Humfrey"; //MEANX
-	
-	return str;
-}
+#endif // _UTIL_H_
