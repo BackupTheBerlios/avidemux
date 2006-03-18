@@ -461,9 +461,7 @@ mpegWritter::save_regular (const char *name, ADM_MPEGTYPE mpegtype, int qz, int 
 #warning FIXME
 #warning FIXME
 #warning FIXME
-	  _muxer->writeVideoPacket (bitstream.len, _buffer_out,
-				    i - MPEG_PREFILL,
-				    _codec->getCodedPictureNumber ());
+	  _muxer->writeVideoPacket (&bitstream);
 	  PACK_AUDIO;
 
 	}
@@ -496,9 +494,7 @@ mpegWritter::save_regular (const char *name, ADM_MPEGTYPE mpegtype, int qz, int 
           qfwrite (_buffer_out, bitstream.len, 1, fd);
       else
 	{
-            _muxer->writeVideoPacket (bitstream.len, _buffer_out,
-				    _total - MPEG_PREFILL + i,
-				    _codec->getCodedPictureNumber ());
+            _muxer->writeVideoPacket (&bitstream);
 	  PACK_AUDIO;
 	}
 
@@ -948,8 +944,7 @@ mpegWritter::dopass2 (const char *name, char *statname, uint32_t final_size, uin
 	{
 
 	  // write video
-	  _muxer->writeVideoPacket (len, _buffer_out, i - MPEG_PREFILL,
-				    _codec->getCodedPictureNumber ());
+	  _muxer->writeVideoPacket (&bitstream);
 
 	  PACK_AUDIO;
 	}
@@ -1005,9 +1000,7 @@ mpegWritter::dopass2 (const char *name, char *statname, uint32_t final_size, uin
       else
 	{
 	  // write video
-            _muxer->writeVideoPacket (bitstream.len, _buffer_out,
-				    _total + i - MPEG_PREFILL,
-				    _codec->getCodedPictureNumber ());
+            _muxer->writeVideoPacket (&bitstream);
 	  PACK_AUDIO;
 
 	}

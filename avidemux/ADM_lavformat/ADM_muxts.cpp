@@ -479,20 +479,23 @@ uint8_t tsMuxer::pes2ts(channel *chan,uint64_t pcr,uint8_t tim )
         }
         return 1;
 }
-uint8_t tsMuxer::writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe )
+uint8_t tsMuxer::writeVideoPacket(ADMBitstream *bitstream )
 {
 #define MAX_PES 64000
-uint32_t l;
+uint32_t l,len;
+uint8_t *buf;
 
        //writeAudioPacket2();
-       _curPTS=videoTime(frameno); 
+       _curPTS=videoTime(bitstream->dtsFrame); 
+       len=bitstream->len;
+       buf=bitstream->data;
        while(len)
        {
                 if(len>MAX_PES)
                         l=MAX_PES;
                 else
-                        l=len;
-                if(!writeVideoPacket2(l,buf, frameno, displayframe ))
+                    l=len;
+                if(!writeVideoPacket2(l,buf, bitstream->dtsFrame, bitstream->ptsFrame ))
                 {
                     return 0;    
                 }

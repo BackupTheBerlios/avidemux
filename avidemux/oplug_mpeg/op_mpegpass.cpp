@@ -84,6 +84,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
   uint8_t ret=0;
  
   ADMMpegMuxer *muxer=NULL;
+  ADMBitstream bitstream;
   
   	printf("Saving as mpg PS to file %s\n",name);
   
@@ -262,7 +263,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
   uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3];
   uint8_t *audiobuffer = new uint8_t[4*48000*2]; // 2 sec worth of lpcm
 
-
+        bitstream.data=buffer;
         PACK_AUDIO(0);
 
   for (uint32_t i = frameStart; i < frameEnd; i++)
@@ -295,20 +296,23 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
         	    goto _abt;
         }
 	  // Write the found frame
-	video_body->getRaw (found, buffer, &len);
-	
-	muxer->writeVideoPacket (len,buffer,cur++,found-frameStart);	
-        work->feedFrame(len);
+	video_body->getRaw (found, bitstream.data, &bitstream.len);
+        bitstream.dtsFrame=cur++;
+        bitstream.ptsFrame=found;
+        muxer->writeVideoPacket(&bitstream);
+//	muxer->writeVideoPacket (len,buffer,cur++,found-frameStart);	
+        work->feedFrame(bitstream.len);
 	PACK_AUDIO(0)
 	
 	  
 	  // and the B frames
 	for (uint32_t j = i; j < found; j++)
 	    {
-		video_body->getRaw (j, buffer, &len);
-		
-		muxer->writeVideoPacket (len,buffer,cur++,j-frameStart);
-                work->feedFrame(len);
+                video_body->getRaw (j, bitstream.data, &bitstream.len);
+                bitstream.dtsFrame=cur++;
+                bitstream.ptsFrame=j-frameStart;
+		muxer->writeVideoPacket (&bitstream);
+                work->feedFrame(bitstream.len);
 		PACK_AUDIO(0)
 		
     	    }
@@ -319,11 +323,13 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 		if(i==frameStart) // Pack sequ_start with the frame
 		{
 			// Check if seq header is there..
-			video_body->getRaw (i, buffer, &len);
+			video_body->getRaw (i, bitstream.data, &bitstream.len);
 			if(buffer[0]==0 && buffer[1]==0 && buffer[2]==1 && buffer[3]==0xb3) // Seq start
 			{
-				muxer->writeVideoPacket (len,buffer,cur++,i-frameStart);
-                                work->feedFrame(len);
+                                bitstream.dtsFrame=cur++;
+                                bitstream.ptsFrame=i-frameStart;
+				muxer->writeVideoPacket (&bitstream);
+                                work->feedFrame(bitstream.len);
 				PACK_AUDIO(0)
 				
 				
@@ -333,19 +339,22 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 				uint32_t seq;
 				video_body->getRawStart (frameStart, buffer, &seq);  		
 	  			video_body->getRaw (i, buffer+seq, &len);
-				
-				muxer->writeVideoPacket (len+seq,buffer,cur++,i-frameStart);
-                                work->feedFrame(len);
+                                bitstream.len=len+seq;
+                                bitstream.dtsFrame=cur++;
+                                bitstream.ptsFrame=i-frameStart;
+				muxer->writeVideoPacket (&bitstream);
+                                work->feedFrame(bitstream.len);
 				PACK_AUDIO(0)
 				
 			}
 		}
 		else
 		{
-			video_body->getRaw (i, buffer, &len);
-			
-			muxer->writeVideoPacket (len,buffer,cur++,i-frameStart);
-                        work->feedFrame(len);
+			video_body->getRaw (i, buffer, &bitstream.len);
+                        bitstream.dtsFrame=cur++;
+                        bitstream.ptsFrame=i-frameStart;
+			muxer->writeVideoPacket (&bitstream);
+                        work->feedFrame(bitstream.len);
 			PACK_AUDIO(0)
 			
 		}

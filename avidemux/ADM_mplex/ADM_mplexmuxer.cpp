@@ -203,21 +203,21 @@ static uint8_t seq_start_code [] = {0x00, 0x00, 0x01, 0xB3};
 static uint8_t gop_start_code [] = {0x00, 0x00, 0x01, 0xB8};
 
 //___________________________________________________________________________
-uint8_t mplexMuxer::writeVideoPacket(uint32_t len, uint8_t *buf,uint32_t frameno,uint32_t displayframe)
+uint8_t mplexMuxer::writeVideoPacket(ADMBitstream *bitstream)
 {
 uint8_t r=0;   
 uint16_t a1,a2,a3,a4,ff;           
         if(_restamp) // restamp timecode ?
         {
-           if ( !memcmp(buf, seq_start_code, 4) || !memcmp(buf, gop_start_code, 4) )
+            if ( !memcmp(bitstream->data, seq_start_code, 4) || !memcmp(bitstream->data, gop_start_code, 4) )
                 {
                         uint8_t *ptr;
                         uint32_t size;
                         
-                        ptr=buf;
-                        size=len;
+                        ptr=bitstream->data;
+                        size=bitstream->len;
                         // There is a gop a or seq header
-                        if(buf[3]==0xb3) // Seq
+                        if(bitstream->data[3]==0xb3) // Seq
                         {
                                 while((ptr[0] || ptr[1] || ptr[2]!=1 || ptr[3]!=0xB8 ) && size>0)
                                 {
@@ -233,7 +233,7 @@ uint16_t a1,a2,a3,a4,ff;
                         else
                         {       // Now we are at gop start with a packet size
                                 // Compute the current gop timestamp
-                                double newtime=displayframe;
+                                double newtime=bitstream->ptsFrame;
                                 uint32_t hh,mm,ss,ms;
                                 
                                 ptr+=4; // skip gop header go to timestamp
@@ -291,7 +291,7 @@ uint16_t a1,a2,a3,a4,ff;
         
                 }
         }
-        r= channelvideo->write(buf,len);
+        r= channelvideo->write(bitstream->data,bitstream->len);
 	if( cond_slaveThread_problem->iswaiting() ){
                 kind_of_slaveThread_problem_rc = DIA_quota(kind_of_slaveThread_problem);
 		cond_slaveThread_problem->wakeup();

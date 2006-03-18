@@ -447,7 +447,7 @@ uint8_t lavMuxer::needAudio( void )
 		return 0;
 }
 //___________________________________________________________________________
-uint8_t lavMuxer::writeVideoPacket(uint32_t len,uint32_t flags, uint8_t *buf,uint32_t frameno,uint32_t displayframe)
+uint8_t lavMuxer::writeVideoPacket(ADMBitstream *bitstream)
 {
 int ret;
 
@@ -455,11 +455,11 @@ double p,d;
   	AVPacket pkt;
             av_init_packet(&pkt);
 	    
-	p=displayframe+1;      // Pts
+	p=bitstream->ptsFrame+1;      // Pts
 	p=(p*1000*1000*1000);
 	p=p/_fps1000;
 	
-	d=frameno;		// dts
+        d=bitstream->dtsFrame;		// dts
 	d=(d*1000*1000*1000);
 	d=d/_fps1000;
 	
@@ -472,17 +472,17 @@ double p,d;
 	aprintf("Lavformat : Pts :%llu dts:%llu",pkt.pts,pkt.dts);
 	pkt.stream_index=0;
            
-	pkt.data= buf;
-	pkt.size= len;
+        pkt.data= bitstream->data;
+        pkt.size= bitstream->len;
 	// Look if it is a gop start or seq start
         if(_type==MUXER_MP4)
         {
-                if(flags & AVI_KEY_FRAME) 
+            if(bitstream->flags & AVI_KEY_FRAME) 
                         pkt.flags |= PKT_FLAG_KEY;
         }else
-	if(!buf[0] &&  !buf[1] && buf[2]==1)
+            if(!bitstream->data[0] &&  !bitstream->data[1] && bitstream->data[2]==1)
 	{
-		if(buf[3]==0xb3 || buf[3]==0xb8 ) // Seq start or gop start
+            if(bitstream->data[3]==0xb3 || bitstream->data[3]==0xb8 ) // Seq start or gop start
 		pkt.flags |= PKT_FLAG_KEY;
 		//printf("Intra\n"); 
 	}
@@ -493,7 +493,7 @@ double p,d;
 		printf("Error writing video packet\n");
 		return 0;
 	}
-	aprintf("V: frame %lu pts%d\n",frameno,pkt.pts);
+        aprintf("V: frame %lu pts%d\n",bitstream->dtsFrame,pkt.pts);
 	
 	return 1;
 }

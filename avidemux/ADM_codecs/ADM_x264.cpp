@@ -217,7 +217,10 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
 
 
   out->len = size;
-  out->ptsFrame = (uint32_t) pic_out.i_pts;	// In fact it is the picture number in out case
+  if(param.i_bframe)
+    out->ptsFrame = (uint32_t) pic_out.i_pts+2;	// In fact it is the picture number in out case
+  else
+    out->ptsFrame = (uint32_t) pic_out.i_pts;	// In fact it is the picture number in out case
   //printf("Frame :%lld \n",pic_out.i_pts);
   switch (pic_out.i_type)
     {

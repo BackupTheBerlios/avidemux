@@ -381,8 +381,7 @@ switch(mux)
 					
 					//printf("%lu %lu\n",i,dts);
 					
-                                        muxer->writeVideoPacket(bitstream.len,_outbuffer,
-                                                bitstream.dtsFrame,bitstream.ptsFrame);
+                                        muxer->writeVideoPacket(&bitstream);
 					real_framenum++;
 					// _muxer->writeVideoPacket(len,_buffer_out,
 					//i-MPEG_PREFILL,_codec->getCodedPictureNumber());

@@ -161,7 +161,10 @@ void A_requantize( void )
 	  			fwrite (outbuffer, lenout, 1, file); \
 			else\
 			{\
-				muxer->writeVideoPacket(lenout,outbuffer,d-frameStart,p-frameStart); \
+			        bitstream.dtsFrame=d-frameStart;\
+			        bitstream.ptsFrame=p-frameStart;\
+			        bitstream.len=lenout; \
+				muxer->writeVideoPacket(&bitstream); \
 				aprintf("Requant in %x %x %x %x\n",buffer[0],buffer[1],buffer[2],buffer[3]); \
 				aprintf("Requant out %x %x %x %x %x %x\n",outbuffer[0],\
 					outbuffer[1],outbuffer[2],outbuffer[3],outbuffer[4],outbuffer[5]); \
@@ -183,7 +186,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	mplexMuxer	*muxer=NULL;
 	uint32_t	fps1000=0;
 	uint32_t order=0,display;
-	
+        ADMBitstream    bitstream;
 	
 	uint64_t size=0;
 	uint32_t fsize=0;
@@ -193,7 +196,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
  
 	Mrequant_init (percent,1);
 	
-	
+        bitstream.data=outbuffer;
  	
 	// get audio if any
 	audio=mpt_getAudioStream();
@@ -290,7 +293,9 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	  					fwrite (outbuffer, lenout, 1, file); 
 					else
 					{
-						muxer->writeVideoPacket(lenout,outbuffer,0,0); 
+                                                bitstream.len=lenout;
+                                                bitstream.ptsFrame=bitstream.dtsFrame=0;
+						muxer->writeVideoPacket(&bitstream); 
 						aprintf("in:%03lu out:%03lu\n",len>>10,lenout>>10); 
 						PACK_AUDIO; 
 					}
@@ -310,7 +315,9 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 	  					fwrite (outbuffer, lenout, 1, file); 
 					else
 					{
-						muxer->writeVideoPacket(lenout,outbuffer,0,0); 
+                                                bitstream.len=lenout;
+                                                bitstream.ptsFrame=bitstream.dtsFrame=0;
+                                                muxer->writeVideoPacket(&bitstream);
 						PACK_AUDIO; 
 						aprintf("in:%03lu out:%03lu\n",len>>10,lenout>>10);
 					}
