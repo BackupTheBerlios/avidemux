@@ -39,106 +39,109 @@
    	Initialize codec
 */
 
-decoderVP3::decoderVP3(uint32_t w,uint32_t h) :decoders(w,h)
+decoderVP3::decoderVP3 (uint32_t w, uint32_t h):decoders (w, h)
 {
-           _handle=NULL;
-            StartDecoder(&_handle, w, h);
-			 _handle->PostProcessEnabled=1;
-			 _handle->PostProcessingLevel = 6;
+  _handle = NULL;
+  StartDecoder (&_handle, w, h);
+  _handle->PostProcessEnabled = 1;
+  _handle->PostProcessingLevel = 6;
 }
 
-decoderVP3::~decoderVP3()
+decoderVP3::~decoderVP3 ()
 {
- 	   StopDecoder(&_handle);
+  StopDecoder (&_handle);
 
 }
 
-void decoderVP3::setParam( void )
+void
+decoderVP3::setParam (void)
 {
-int value=0;
-		value=  _handle->PostProcessingLevel;
-	  if(  DIA_GetIntegerValue(&value, 0, 9, "Post Processing level","Enter PostProc"))
-	  {
-			 	 _handle->PostProcessingLevel =(int)floor(value);
-			  printf(" New VP3 postprocessing value : %d\n", _handle->PostProcessingLevel );
-			}
-     return;
+  int value = 0;
+  value = _handle->PostProcessingLevel;
+  if (DIA_GetIntegerValue
+      (&value, 0, 9, "Post Processing level", "Enter PostProc"))
+    {
+      _handle->PostProcessingLevel = (int) floor (value);
+      printf (" New VP3 postprocessing value : %d\n",
+	      _handle->PostProcessingLevel);
+    }
+  return;
 }
 
 /*
    	Uncompress frame, set flags if needed
 */
-uint8_t 	decoderVP3::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag) 		
+uint8_t
+  decoderVP3::uncompress (uint8_t * in, ADMImage * out, uint32_t len,
+			  uint32_t * flag)
 {
-    UNUSED_ARG(flag);
-      	if (DecodeFrameToYUV(_handle, (char *)in, len, _w, _h)) 
-       {
-	    	fprintf(stderr, "DecodeFrameToYUV error\n");
-	    	return 0;
-		}
-		// now unpack to out
-//		memset(out+_w*_h,128,(_w*_h)>>1);
-		
-		uint8_t *ti,*to;
-		uint8_t *ti2,*to2;
-		
-		uint32_t stride;
-		
-		to=out->data+(_w*_h)-_w;
-		
-		if(  _handle->PostProcessingLevel) 
-		{
-			    	ti=&(_handle-> PostProcessBuffer[_handle->ReconYDataOffset]);
-			}
-			else
-			{
-					ti=&(_handle-> LastFrameRecon[_handle->ReconYDataOffset]);
-				}
+  UNUSED_ARG (flag);
+  if (DecodeFrameToYUV (_handle, (char *) in, len, _w, _h))
+    {
+      fprintf (stderr, "DecodeFrameToYUV error\n");
+      return 0;
+    }
+  // now unpack to out
+//              memset(out+_w*_h,128,(_w*_h)>>1);
 
-		stride=_handle->Configuration.YStride;
-		
-		// luma
-		for(uint32_t y=_h;y>0;y--)
-		{
-			memcpy(to,ti,_w);
-			to-=_w;
-			ti+=stride;							
-		}
-	
-		to2=out->data+_w*_h;
-		to=to2+((_w*_h)>>2);
-       memset(to,128,_w>>1);
-       memset(to2,128,_w>>1);
-		
-		to+=((_w*_h)>>2) - (_w>>1);
-		to2+=((_w*_h)>>2) - (_w>>1);
-		if(  _handle->PostProcessingLevel) 
-		{
-					ti=&(_handle-> PostProcessBuffer[_handle->ReconUDataOffset]);
-					ti2=&(_handle-> PostProcessBuffer[_handle->ReconVDataOffset]);
+  uint8_t *ti, *to;
+  uint8_t *ti2, *to2;
 
-			}
-			else
-		{		
-		ti=&(_handle-> LastFrameRecon[_handle->ReconUDataOffset]);
-		ti2=&(_handle-> LastFrameRecon[_handle->ReconVDataOffset]);
-        }
-		stride=_handle->Configuration.UVStride;
-		
-		// chorma u &v
-		for(uint32_t y=_h>>1;y>0;y--)
-		{
-			memcpy(to,ti,_w>>1);
-			memcpy(to2,ti2,_w>>1);
+  uint32_t stride;
 
-			to-=_w>>1;
-			ti+=stride;							
-			to2-=_w>>1;
-			ti2+=stride;							
+  to = out->data + (_w * _h) - _w;
 
-		}
-          
-		return 1;	
+  if (_handle->PostProcessingLevel)
+    {
+      ti = &(_handle->PostProcessBuffer[_handle->ReconYDataOffset]);
+    }
+  else
+    {
+      ti = &(_handle->LastFrameRecon[_handle->ReconYDataOffset]);
+    }
+
+  stride = _handle->Configuration.YStride;
+
+  // luma
+  for (uint32_t y = _h; y > 0; y--)
+    {
+      memcpy (to, ti, _w);
+      to -= _w;
+      ti += stride;
+    }
+
+  to2 = out->data + _w * _h;
+  to = to2 + ((_w * _h) >> 2);
+  memset (to, 128, _w >> 1);
+  memset (to2, 128, _w >> 1);
+
+  to += ((_w * _h) >> 2) - (_w >> 1);
+  to2 += ((_w * _h) >> 2) - (_w >> 1);
+  if (_handle->PostProcessingLevel)
+    {
+      ti = &(_handle->PostProcessBuffer[_handle->ReconUDataOffset]);
+      ti2 = &(_handle->PostProcessBuffer[_handle->ReconVDataOffset]);
+
+    }
+  else
+    {
+      ti = &(_handle->LastFrameRecon[_handle->ReconUDataOffset]);
+      ti2 = &(_handle->LastFrameRecon[_handle->ReconVDataOffset]);
+    }
+  stride = _handle->Configuration.UVStride;
+
+  // chorma u &v
+  for (uint32_t y = _h >> 1; y > 0; y--)
+    {
+      memcpy (to, ti, _w >> 1);
+      memcpy (to2, ti2, _w >> 1);
+
+      to -= _w >> 1;
+      ti += stride;
+      to2 -= _w >> 1;
+      ti2 += stride;
+
+    }
+
+  return 1;
 }
-
-

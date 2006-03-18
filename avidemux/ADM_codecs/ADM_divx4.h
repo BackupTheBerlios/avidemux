@@ -18,15 +18,19 @@
  *                                                                         *
  ***************************************************************************/
 #ifdef USE_DIVX
- class decoderDIVX : public decoders
+class decoderDIVX:public decoders
 {
-     protected:
-					void				*_handle;
-     public:
-     									decoderDIVX(uint32_t w,uint32_t h);
-         		virtual					~decoderDIVX();
-    			virtual 			uint8_t 	uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag=NULL) 		;
-   		       virtual 			void 	setParam( void );
-		       virtual 			uint8_t 	bFramePossible(void) { return 0;}
-}   ;
+protected:
+  void *_handle;
+public:
+    decoderDIVX (uint32_t w, uint32_t h);
+    virtual ~ decoderDIVX ();
+  virtual uint8_t uncompress (uint8_t * in, uint8_t * out, uint32_t len,
+			      uint32_t * flag = NULL);
+  virtual void setParam (void);
+  virtual uint8_t bFramePossible (void)
+  {
+    return 0;
+  }
+};
 #endif

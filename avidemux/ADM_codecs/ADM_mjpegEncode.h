@@ -17,28 +17,23 @@
 #ifndef __MJPEG_ENC__
 #define   __MJPEG_ENC__
 
-class mjpegEncoder : public encoder
-  	{
-     	protected :
-      			          uint8_t _qual;
-							uint8_t _swap;
-          public :
-          			mjpegEncoder(uint32_t width,uint32_t height)   :encoder(width,height)
-             				{
-									_qual=75;									
-									_swap=0;
-									
-                   			} ;
-                  uint8_t stopEncoder(void );
-                  virtual 	uint8_t init( uint32_t val,uint32_t fps1000);
-				 					uint8_t init( uint32_t val,uint32_t fps1000,uint8_t sw);
-                  uint8_t 	getResult( void *ress); // for dual pass only
-                  virtual 	uint8_t encode(
-        											uint8_t 	*in,
-						   						 	uint8_t 	*out,
-						   							uint32_t 	*len,
-			       								uint32_t 	*flags);
-			               			               
-     };
+class mjpegEncoder:public encoder
+{
+protected:uint8_t _qual;
+  uint8_t _swap;
+public:  mjpegEncoder (uint32_t width, uint32_t height):encoder (width,
+							    height)
+  {
+    _qual = 75;
+    _swap = 0;
+
+  };
+  uint8_t stopEncoder (void);
+  virtual uint8_t init (uint32_t val, uint32_t fps1000);
+  uint8_t init (uint32_t val, uint32_t fps1000, uint8_t sw);
+  virtual uint8_t encode (uint8_t * in,
+			  uint8_t * out, uint32_t * len, uint32_t * flags);
+
+};
 
 #endif

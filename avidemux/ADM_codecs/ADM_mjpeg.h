@@ -15,14 +15,15 @@
  *                                                                         *
  ***************************************************************************/
 
-	    class decoderMjpeg : decoders
+class decoderMjpeg:decoders
 {
-     protected:
-                              	uint8_t		 _swap;
+protected:
+  uint8_t _swap;
 
-     public:
-                                                        decoderMjpeg(uint32_t w,uint32_t h);
-                        virtual                      ~decoderMjpeg();
-                	virtual void 		setParam( void );
-                        virtual uint8_t         uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag=NULL)           ;
-}   ;
+public:
+  decoderMjpeg (uint32_t w, uint32_t h);
+  virtual ~ decoderMjpeg ();
+  virtual void setParam (void);
+  virtual uint8_t uncompress (uint8_t * in, uint8_t * out, uint32_t len,
+			      uint32_t * flag = NULL);
+};

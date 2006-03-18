@@ -14,22 +14,23 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- #ifndef __VP3__
- #define __VP3__
- 
+#ifndef __VP3__
+#define __VP3__
 
-  class decoderVP3: public decoders
+
+class decoderVP3:public decoders
 {
-     protected:
-				      PB_INSTANCE *_handle;
-   
-							    
-     public:
-     						decoderVP3(uint32_t w,uint32_t h);
-         		virtual			~decoderVP3();
-    			virtual uint8_t 	uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag=NULL);
-   		       	virtual void 		setParam( void );
-	
+protected:
+  PB_INSTANCE * _handle;
 
-}   ;
+
+public:
+  decoderVP3 (uint32_t w, uint32_t h);
+  virtual ~ decoderVP3 ();
+  virtual uint8_t uncompress (uint8_t * in, ADMImage * out, uint32_t len,
+			      uint32_t * flag = NULL);
+  virtual void setParam (void);
+
+
+};
 #endif

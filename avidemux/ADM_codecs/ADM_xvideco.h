@@ -15,17 +15,18 @@
  *                                                                         *
  ***************************************************************************/
 #ifdef USE_XX_XVID
-   class decoderXvid : decoders
+class decoderXvid:decoders
 {
-     protected:
-      			void *_handle;
+protected:
+  void *_handle;
 
 
-     public:
-     										decoderXvid(uint32_t w,uint32_t h);
-         		virtual					~decoderXvid();
-    			virtual uint8_t 	uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag=NULL) 		;	
-		       virtual 			void setParam( void );
-}   ;
+public:
+    decoderXvid (uint32_t w, uint32_t h);
+    virtual ~ decoderXvid ();
+  virtual uint8_t uncompress (uint8_t * in, uint8_t * out, uint32_t len,
+			      uint32_t * flag = NULL);
+  virtual void setParam (void);
+};
 
 #endif

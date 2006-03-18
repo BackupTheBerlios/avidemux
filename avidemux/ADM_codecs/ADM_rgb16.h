@@ -18,18 +18,22 @@
 #define ADM_RGB16_H
 
 #include "ADM_colorspace/ADM_rgb.h"
- class decoderRGB16 : decoders
+class decoderRGB16:decoders
 {
-     protected:
-                                                uint8_t         *planar;
-                                                ColRgbToYV12    *color;
+protected:
+  uint8_t * planar;
+  ColRgbToYV12 *color;
 
-     public:
-                                uint8_t         dontcopy(void) { return 1;} 
-                                                decoderRGB16(uint32_t w,uint32_t h);
-                        virtual	                ~decoderRGB16();
-                        virtual uint8_t         uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag=NULL);	
-                        
-}   ;
+public:
+    uint8_t dontcopy (void)
+  {
+    return 1;
+  }
+  decoderRGB16 (uint32_t w, uint32_t h);
+  virtual ~ decoderRGB16 ();
+  virtual uint8_t uncompress (uint8_t * in, ADMImage * out, uint32_t len,
+			      uint32_t * flag = NULL);
+
+};
 
 #endif

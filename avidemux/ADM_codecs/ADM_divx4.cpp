@@ -45,76 +45,77 @@
 #include "ADM_toolkit/ADM_debug.h"
 #include "ADM_divxInc.h"
 //________________________________________________
-void decoderDIVX::setParam( void )
-{ 	 
+void
+decoderDIVX::setParam (void)
+{
 
-        return; // no param for ffmpeg
+  return;			// no param for ffmpeg
 }
 //-------------------------------
-decoderDIVX::decoderDIVX(uint32_t w,uint32_t h) :decoders(w,h)
+decoderDIVX::decoderDIVX (uint32_t w, uint32_t h):decoders (w, h)
 {
-DEC_INIT decinit;
-		// All default are good for us
-		memset(&decinit,0,sizeof(decinit));
+  DEC_INIT decinit;
+  // All default are good for us
+  memset (&decinit, 0, sizeof (decinit));
 
-		decinit.codec_version=500;
+  decinit.codec_version = 500;
 
-		ADM_assert(DEC_OK==decore(&_handle,DEC_OPT_INIT,&decinit,NULL));
+  ADM_assert (DEC_OK == decore (&_handle, DEC_OPT_INIT, &decinit, NULL));
 
-DivXBitmapInfoHeader header;
+  DivXBitmapInfoHeader header;
 
 
-		memset(&header,0,sizeof(header));
+  memset (&header, 0, sizeof (header));
 
-		header.biSize=sizeof(DivXBitmapInfoHeader);
-	//	header.biBitCount=24;
-		header.biWidth=_w;
-		header.biHeight=_h;
-		header.biCompression=fourCC::get((uint8_t *)"YV12");
-		ADM_assert(DEC_OK==decore(_handle,DEC_OPT_SETOUT,&header,NULL));
+  header.biSize = sizeof (DivXBitmapInfoHeader);
+  //      header.biBitCount=24;
+  header.biWidth = _w;
+  header.biHeight = _h;
+  header.biCompression = fourCC::get ((uint8_t *) "YV12");
+  ADM_assert (DEC_OK == decore (_handle, DEC_OPT_SETOUT, &header, NULL));
 
-		printf("\n Divx 5.0.5 decoder initialized\n");
+  printf ("\n Divx 5.0.5 decoder initialized\n");
 
 
 }
 
 //_____________________________________________________
 
-decoderDIVX::~decoderDIVX()
+decoderDIVX::~decoderDIVX ()
 {
-		ADM_assert(DEC_OK==decore(_handle,DEC_OPT_RELEASE,NULL,NULL));
-		_handle=NULL;
-		printf("Divx 5.0.5 destroyed\n");
+  ADM_assert (DEC_OK == decore (_handle, DEC_OPT_RELEASE, NULL, NULL));
+  _handle = NULL;
+  printf ("Divx 5.0.5 destroyed\n");
 }
 
 
-uint8_t     decoderDIVX::uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flagz)
-
+uint8_t
+  decoderDIVX::uncompress (uint8_t * in, uint8_t * out, uint32_t len,
+			   uint32_t * flagz)
 {
- 		DEC_FRAME 		decframe;
-		DEC_FRAME_INFO 	decframeinfo;
+  DEC_FRAME decframe;
+  DEC_FRAME_INFO decframeinfo;
 
-		memset(&decframe,0,sizeof(decframe));
-		memset(&decframeinfo,0,sizeof(decframeinfo));
+  memset (&decframe, 0, sizeof (decframe));
+  memset (&decframeinfo, 0, sizeof (decframeinfo));
 
-		decframe.bmp=out;
-		decframe.bitstream=in;
-		decframe.length=len;
-		decframe.stride=0;
-		decframe.render_flag=1;
+  decframe.bmp = out;
+  decframe.bitstream = in;
+  decframe.length = len;
+  decframe.stride = 0;
+  decframe.render_flag = 1;
 
-		if(DEC_OK!=decore(_handle,DEC_OPT_FRAME,&decframe,&decframeinfo))
-		{
-			printf("\n **ERROR decoding frame with divx !**\n");
-			return 0;
-		}
-		if(flagz)
-		{
-			aprintf("type : %d \n",decframeinfo.prediction_type);
-			*flagz=0;
-		}
-		return 1;
+  if (DEC_OK != decore (_handle, DEC_OPT_FRAME, &decframe, &decframeinfo))
+    {
+      printf ("\n **ERROR decoding frame with divx !**\n");
+      return 0;
+    }
+  if (flagz)
+    {
+      aprintf ("type : %d \n", decframeinfo.prediction_type);
+      *flagz = 0;
+    }
+  return 1;
 }
 
 #endif
-

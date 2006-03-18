@@ -14,16 +14,26 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-  class decoderNull   : public  decoders
- {
-    protected:
-    		
-    public:
-    			decoderNull(uint32_t w,uint32_t h) :decoders(w,h) {}		
-    			virtual ~decoderNull() {};	
-    			virtual uint8_t 	uncompress(uint8_t *in,ADMImage *out,uint32_t len)
-       						{ memcpy(out->data,in,len);return 1;}
-			virtual uint8_t 	uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *f)
-       						{ memcpy(out->data,in,len);return 1;}	
-   }  ;
+class decoderNull:public decoders
+{
+protected:
 
+public:
+  decoderNull (uint32_t w, uint32_t h):decoders (w, h)
+  {
+  }
+  virtual ~ decoderNull ()
+  {
+  };
+  virtual uint8_t uncompress (uint8_t * in, ADMImage * out, uint32_t len)
+  {
+    memcpy (out->data, in, len);
+    return 1;
+  }
+  virtual uint8_t uncompress (uint8_t * in, ADMImage * out, uint32_t len,
+			      uint32_t * f)
+  {
+    memcpy (out->data, in, len);
+    return 1;
+  }
+};

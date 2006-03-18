@@ -12,6 +12,6 @@
  *                                                                         *
  ***************************************************************************/
 #ifdef USE_DIVX
-		#include "encore2.h"
-		#include "decore.h"
+#include "encore2.h"
+#include "decore.h"
 #endif

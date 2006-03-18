@@ -19,7 +19,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
- 
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,14 +33,14 @@
 
 #include "ADM_assert.h"
 
-static myENC_RESULT xvid_res;
+//static myENC_RESULT xvid_res;
 
 
 #ifdef USE_XX_XVID
 #include "ADM_codecs/ADM_xvid.h"
 #include "xvid.h"
 
-void *dllHandle=NULL;
+void *dllHandle = NULL;
 
 // api v2.0
 /*
@@ -51,227 +51,222 @@ XVID_PROTO xx_xvid_encore=NULL;
 XVID_PROTO xx_xvid_decore=NULL;
 */
 //
-static XVID_ENC_FRAME 	fr;
-static XVID_ENC_PARAM 	xparam;
-static XVID_ENC_STATS 	xstats;
+static XVID_ENC_FRAME fr;
+static XVID_ENC_PARAM xparam;
+static XVID_ENC_STATS xstats;
 
 
 
 
-uint8_t 	xvidEncoder::getResult( void *ress)
-{
- 	myENC_RESULT *res;
 
-		res=(myENC_RESULT *)ress;
-
-		memcpy(res,&xvid_res,sizeof(myENC_RESULT));
-		return 1;
-
-}
 /*
 		Returns stat in Xvid Format 
 */
-void			*xvidEncoder::getXvidStat( void )
+void *
+xvidEncoder::getXvidStat (void)
 {
-	
-		return (void *)&xstats;
-	
+
+  return (void *) &xstats;
+
 }
 //____________________________________________
 //
 //  Initialize the compressor
 //
-uint8_t     xvidEncoder::stopEncoder(void )
+uint8_t xvidEncoder::stopEncoder (void)
 {
-    int ret;
+  int
+    ret;
 
-    ADM_assert(_init);
-    
-    ret = xvid_encore(_handle, XVID_ENC_DESTROY, 0, 0);
-    _init = 0;
-    _handle=NULL;
-    if (ret == XVID_ERR_OK)
-		return 1;
-    return 0;
+  ADM_assert (_init);
+
+  ret = xvid_encore (_handle, XVID_ENC_DESTROY, 0, 0);
+  _init = 0;
+  _handle = NULL;
+  if (ret == XVID_ERR_OK)
+    return 1;
+  return 0;
 }
 // Take from Xvid VFW code
-static int const divx4_motion_presets[7] = {
-	0,
-	PMV_EARLYSTOP16,
-	PMV_EARLYSTOP16 | PMV_ADVANCEDDIAMOND16,
-	PMV_EARLYSTOP16 | PMV_HALFPELREFINE16,
-	PMV_EARLYSTOP16 | PMV_HALFPELREFINE16 | PMV_EARLYSTOP8 |
-		PMV_HALFPELREFINE8,
-	PMV_EARLYSTOP16 | PMV_HALFPELREFINE16 | PMV_EARLYSTOP8 |
-		PMV_HALFPELREFINE8,
-	PMV_EARLYSTOP16 | PMV_HALFPELREFINE16 | PMV_EXTSEARCH16 | PMV_EARLYSTOP8 |
-		PMV_HALFPELREFINE8
+static int const
+  divx4_motion_presets[7] = {
+  0,
+  PMV_EARLYSTOP16,
+  PMV_EARLYSTOP16 | PMV_ADVANCEDDIAMOND16,
+  PMV_EARLYSTOP16 | PMV_HALFPELREFINE16,
+  PMV_EARLYSTOP16 | PMV_HALFPELREFINE16 | PMV_EARLYSTOP8 | PMV_HALFPELREFINE8,
+  PMV_EARLYSTOP16 | PMV_HALFPELREFINE16 | PMV_EARLYSTOP8 | PMV_HALFPELREFINE8,
+  PMV_EARLYSTOP16 | PMV_HALFPELREFINE16 | PMV_EXTSEARCH16 | PMV_EARLYSTOP8 |
+    PMV_HALFPELREFINE8
 };
 
 
 /* Divx4 quality to general encoder flag presets */
-static int const divx4_general_presets[7] = {
-	0,
-	0,
-	0,
-	0 | XVID_HALFPEL,
-	0 | XVID_INTER4V | XVID_HALFPEL,
-	0 | XVID_INTER4V | XVID_HALFPEL,
-	0 | XVID_INTER4V | XVID_HALFPEL
+static int const
+  divx4_general_presets[7] = {
+  0,
+  0,
+  0,
+  0 | XVID_HALFPEL,
+  0 | XVID_INTER4V | XVID_HALFPEL,
+  0 | XVID_INTER4V | XVID_HALFPEL,
+  0 | XVID_INTER4V | XVID_HALFPEL
 };
 
 
 
-void     xvidEncoder::checkFlags(xvidEncParam *extend )
+void
+xvidEncoder::checkFlags (xvidEncParam * extend)
 {
 
-	if(  !extend)
-	{
-		// default : HPel & H263Quant
-		encode_flags=0;
-	   	encode_flags |= XVID_HALFPEL;
-		encode_flags |= XVID_H263QUANT;
-		motion_flags=divx4_motion_presets[4];
-		return;
-	}
-	//
-		encode_flags=0;
-		encode_flags|=extend->quantizer;
-		encode_flags|=divx4_general_presets[extend->gui_option];
-		motion_flags=divx4_motion_presets[extend->gui_option];
-		if(extend->interlaced)
-			encode_flags|=XVID_INTERLACING;
+  if (!extend)
+    {
+      // default : HPel & H263Quant
+      encode_flags = 0;
+      encode_flags |= XVID_HALFPEL;
+      encode_flags |= XVID_H263QUANT;
+      motion_flags = divx4_motion_presets[4];
+      return;
+    }
+  //
+  encode_flags = 0;
+  encode_flags |= extend->quantizer;
+  encode_flags |= divx4_general_presets[extend->gui_option];
+  motion_flags = divx4_motion_presets[extend->gui_option];
+  if (extend->interlaced)
+    encode_flags |= XVID_INTERLACING;
 }
 
-void     xvidEncoder::dumpConf(void )
+void
+xvidEncoder::dumpConf (void)
 {
 
-	#define CHK(x) if( encode_flags & XVID_##x) printf("\n"#x" is set");
+#define CHK(x) if( encode_flags & XVID_##x) printf("\n"#x" is set");
 
- CHK(CUSTOM_QMATRIX              );
-CHK(H263QUANT                   );
-CHK(MPEGQUANT                   );
-CHK(HALFPEL                     );
-CHK(ADAPTIVEQUANT               );
-CHK(LUMIMASKING         );
+  CHK (CUSTOM_QMATRIX);
+  CHK (H263QUANT);
+  CHK (MPEGQUANT);
+  CHK (HALFPEL);
+  CHK (ADAPTIVEQUANT);
+  CHK (LUMIMASKING);
 //CHK(LATEINTRA                   );
 
-CHK(INTERLACING         );
-CHK(TOPFIELDFIRST               );
-CHK(ALTERNATESCAN               );
-CHK(HINTEDME_GET                );
-CHK(HINTEDME_SET                );
-CHK(INTER4V                     );
-CHK(ME_ZERO                     );
-CHK(ME_LOGARITHMIC              );
-CHK(ME_FULLSEARCH               );
-CHK(ME_PMVFAST                  );
-CHK(ME_EPZS                     );
+  CHK (INTERLACING);
+  CHK (TOPFIELDFIRST);
+  CHK (ALTERNATESCAN);
+  CHK (HINTEDME_GET);
+  CHK (HINTEDME_SET);
+  CHK (INTER4V);
+  CHK (ME_ZERO);
+  CHK (ME_LOGARITHMIC);
+  CHK (ME_FULLSEARCH);
+  CHK (ME_PMVFAST);
+  CHK (ME_EPZS);
 
 #undef CHK
 #define CHK(x) if( motion_flags & PMV_##x) printf("\n"#x" is set");
-CHK(EARLYSTOP16);
-CHK(ADVANCEDDIAMOND16);
-CHK(HALFPELREFINE16);
-CHK(EARLYSTOP8);
-CHK(HALFPELREFINE8);
-CHK(EXTSEARCH16);
+  CHK (EARLYSTOP16);
+  CHK (ADVANCEDDIAMOND16);
+  CHK (HALFPELREFINE16);
+  CHK (EARLYSTOP8);
+  CHK (HALFPELREFINE8);
+  CHK (EXTSEARCH16);
 
-printf("Max key interval : %d\n",xparam.max_key_interval);
+  printf ("Max key interval : %d\n", xparam.max_key_interval);
 }
 
 // *************************************************
 // *************************************************
-//									CBR
+//                                                                      CBR
 // *************************************************
 // *************************************************
-uint8_t xvidEncoderCBR::init(uint32_t br,uint32_t fps1000)
+uint8_t xvidEncoderCBR::init (uint32_t br, uint32_t fps1000)
 {
-    UNUSED_ARG(fps1000);
- 	return initExtented(br,NULL);
+  UNUSED_ARG (fps1000);
+  return initExtented (br, NULL);
 }
-uint8_t xvidEncoderCBR::init(uint32_t br,uint32_t fps1000,uint32_t extra)
+uint8_t xvidEncoderCBR::init (uint32_t br, uint32_t fps1000, uint32_t extra)
 {
-  UNUSED_ARG(fps1000);
-  UNUSED_ARG(extra);
-  return initExtented(br,NULL);
+  UNUSED_ARG (fps1000);
+  UNUSED_ARG (extra);
+  return initExtented (br, NULL);
 }
 
-uint8_t 	xvidEncoderCBR::initExtented(uint32_t br,xvidEncParam *extend)
+uint8_t xvidEncoderCBR::initExtented (uint32_t br, xvidEncParam * extend)
 {
-    	XVID_INIT_PARAM xinit;
-     	int xerr;
-      encode_flags=0;
-      checkFlags(extend);
+  XVID_INIT_PARAM
+    xinit;
+  int
+    xerr;
+  encode_flags = 0;
+  checkFlags (extend);
 
 
-     	memset(&xinit,0,sizeof(xinit));
-	    memset(&fr, 0, sizeof(fr));
-    //---
-			_br=br;
-    	printf(" Xvid : Compressing %lu x %lu video in CBR %lu\n", _w, _h, _br);
-    	ADM_assert(0 == _init);
+  memset (&xinit, 0, sizeof (xinit));
+  memset (&fr, 0, sizeof (fr));
+  //---
+  _br = br;
+  printf (" Xvid : Compressing %lu x %lu video in CBR %lu\n", _w, _h, _br);
+  ADM_assert (0 == _init);
 
-   	xinit.cpu_flags = XVID_CPU_MMX;
-		xvid_init(NULL, 0, &xinit, NULL);
+  xinit.cpu_flags = XVID_CPU_MMX;
+  xvid_init (NULL, 0, &xinit, NULL);
 
-		xparam.width = _w;
-		xparam.height = _h;	
-   	xparam.fincr = 1;
-   	xparam.fbase =25;
-	
-		xparam.rc_bitrate = _br;
-    xparam.rc_reaction_delay_factor = 16;
-    xparam.rc_averaging_period = 100;
-    xparam.rc_buffer = 100;
+  xparam.width = _w;
+  xparam.height = _h;
+  xparam.fincr = 1;
+  xparam.fbase = 25;
 
-		xparam.min_quantizer = 2;		
-		xparam.max_quantizer = 31;
-		xparam.max_key_interval = extend->max_key_interval;		
-		xerr = xvid_encore(NULL, XVID_ENC_CREATE, &xparam, NULL);
- 		if( XVID_ERR_OK!=xerr)
-  	{
-      	printf("\n Error initializing xvid !!!");
-       return 0;
-     }
-	
-		_handle=xparam.handle;
-		dumpConf();
- 		return 1;      
-}      
+  xparam.rc_bitrate = _br;
+  xparam.rc_reaction_delay_factor = 16;
+  xparam.rc_averaging_period = 100;
+  xparam.rc_buffer = 100;
+
+  xparam.min_quantizer = 2;
+  xparam.max_quantizer = 31;
+  xparam.max_key_interval = extend->max_key_interval;
+  xerr = xvid_encore (NULL, XVID_ENC_CREATE, &xparam, NULL);
+  if (XVID_ERR_OK != xerr)
+    {
+      printf ("\n Error initializing xvid !!!");
+      return 0;
+    }
+
+  _handle = xparam.handle;
+  dumpConf ();
+  return 1;
+}
 
 
 //
-//	Encode a single frame
+//      Encode a single frame
 //
-uint8_t xvidEncoderCBR::encode(
-				ADMImage * in,
-			    uint8_t * out,
-			    uint32_t * len,
-       		uint32_t * flags)
+uint8_t
+  xvidEncoderCBR::encode (ADMImage * in,
+			  uint8_t * out, uint32_t * len, uint32_t * flags)
 {
 
-	XVID_ENC_FRAME xframe;
-	
- 	int xerr;
+  XVID_ENC_FRAME xframe;
 
-	// general features
+  int xerr;
 
-	xframe.general = encode_flags;
-	xframe.motion =  motion_flags;
+  // general features
 
-	xframe.bitstream = out;
-	xframe.length = -1; 	// this is written by the routine
+  xframe.general = encode_flags;
+  xframe.motion = motion_flags;
 
-	xframe.image = in->data;
-    xframe.colorspace = XVID_CSP_YV12;	// defined in <xvid.h>
+  xframe.bitstream = out;
+  xframe.length = -1;		// this is written by the routine
 
-    xframe.intra = -1; // let the codec decide between I-frame (1) and P-frame (0)
-	xframe.quant = 0;
-//        xframe.quant = QUANTI;	// is quant != 0, use a fixed quant (and ignore bitrate)
+  xframe.image = in->data;
+  xframe.colorspace = XVID_CSP_YV12;	// defined in <xvid.h>
+
+  xframe.intra = -1;		// let the codec decide between I-frame (1) and P-frame (0)
+  xframe.quant = 0;
+//        xframe.quant = QUANTI;        // is quant != 0, use a fixed quant (and ignore bitrate)
 
 
-	xerr = xvid_encore(_handle, XVID_ENC_ENCODE, &xframe, &xstats);
+  xerr = xvid_encore (_handle, XVID_ENC_ENCODE, &xframe, &xstats);
 
 /*	        enc_result->is_key_frame = xframe.intra;
 	        enc_result->quantizer = xframe.quant;
@@ -280,120 +275,121 @@ uint8_t xvidEncoderCBR::encode(
 	        enc_result->texture_bits = enc_result->total_bits - enc_result->motion_bits;
 */
 
-         	 xvid_res.is_key_frame = xframe.intra;
-		 xvid_res.out_quantizer=xstats.quant;
-	        xvid_res.quantizer = xframe.quant;
-	        xvid_res.total_bits = xframe.length * 8;
-	        xvid_res.motion_bits = xstats.hlength * 8;
-	        xvid_res.texture_bits = xvid_res.total_bits - xvid_res.motion_bits;
+  xvid_res.is_key_frame = xframe.intra;
+  xvid_res.out_quantizer = xstats.quant;
+  xvid_res.quantizer = xframe.quant;
+  xvid_res.total_bits = xframe.length * 8;
+  xvid_res.motion_bits = xstats.hlength * 8;
+  xvid_res.texture_bits = xvid_res.total_bits - xvid_res.motion_bits;
 /*  This is statictical data, e.g. for 2-pass.
     If you are not interested in any of this, you can use NULL instead of &xstats
 */
 
-	*len = xframe.length;
- 	
- 	*flags=0;
-  	if(xerr!=XVID_ERR_OK) return 0;
- 	if( xframe.intra)
-  	{
-      	*flags=AVI_KEY_FRAME;
-     }
+  *len = xframe.length;
 
-	return 1;
+  *flags = 0;
+  if (xerr != XVID_ERR_OK)
+    return 0;
+  if (xframe.intra)
+    {
+      *flags = AVI_KEY_FRAME;
+    }
+
+  return 1;
 }
 
 // *************************************************
 // *************************************************
-//									CQ
+//                                                                      CQ
 // *************************************************
 // *************************************************
 
-uint8_t xvidEncoderCQ::init(uint32_t q,uint32_t fps1000)
+uint8_t xvidEncoderCQ::init (uint32_t q, uint32_t fps1000)
 {
-    UNUSED_ARG(fps1000);
- 	return initExtented(q,NULL);
+  UNUSED_ARG (fps1000);
+  return initExtented (q, NULL);
 }
-uint8_t xvidEncoderCQ::init(uint32_t q,uint32_t fps1000,uint32_t extra)
+uint8_t xvidEncoderCQ::init (uint32_t q, uint32_t fps1000, uint32_t extra)
 {
-        UNUSED_ARG(fps1000);
-	    UNUSED_ARG(extra);
-		return initExtented(q,NULL);
+  UNUSED_ARG (fps1000);
+  UNUSED_ARG (extra);
+  return initExtented (q, NULL);
 }
 
-uint8_t 	xvidEncoderCQ::initExtented(uint32_t q,xvidEncParam *extend) 
+uint8_t xvidEncoderCQ::initExtented (uint32_t q, xvidEncParam * extend)
 {
-    	XVID_INIT_PARAM xinit;
-     	int xerr;
+  XVID_INIT_PARAM
+    xinit;
+  int
+    xerr;
 
-	checkFlags(extend);
-	memset(&xinit,0,sizeof(xinit));
-        memset(&fr, 0, sizeof(fr));
-	//xinit.cpu_flags=XVID_CPU_FORCE;
-	xinit.cpu_flags = XVID_CPU_MMX;
-    //---
-	_q=q;
-    	printf(" Xvid : Compressing %lu x %lu video in CQ %lu\n", _w, _h, _q);
-    	ADM_assert(0 == _init);
-
-   	
-	xvid_init(NULL, 0, &xinit, NULL);
-
-	xparam.width = _w;
-	xparam.height = _h;	
-   	xparam.fincr = 1;
-   	xparam.fbase =25;
-	
-	xparam.rc_bitrate = 1000;
-  	xparam.rc_reaction_delay_factor = 16;
-  	xparam.rc_averaging_period = 100;
-  	xparam.rc_buffer = 100;
+  checkFlags (extend);
+  memset (&xinit, 0, sizeof (xinit));
+  memset (&fr, 0, sizeof (fr));
+  //xinit.cpu_flags=XVID_CPU_FORCE;
+  xinit.cpu_flags = XVID_CPU_MMX;
+  //---
+  _q = q;
+  printf (" Xvid : Compressing %lu x %lu video in CQ %lu\n", _w, _h, _q);
+  ADM_assert (0 == _init);
 
 
-	xparam.min_quantizer = _q;		
-	xparam.max_quantizer = _q;
-	xparam.max_key_interval = extend->max_key_interval;
+  xvid_init (NULL, 0, &xinit, NULL);
 
-	xerr = xvid_encore(NULL, XVID_ENC_CREATE, &xparam, NULL);
- 	if( XVID_ERR_OK!=xerr)
-  	{
-      	printf("\n Error initializing xvid !!!");
-       return 0;
-     }
-	_handle=xparam.handle;
-	dumpConf();
- 	return 1;
+  xparam.width = _w;
+  xparam.height = _h;
+  xparam.fincr = 1;
+  xparam.fbase = 25;
+
+  xparam.rc_bitrate = 1000;
+  xparam.rc_reaction_delay_factor = 16;
+  xparam.rc_averaging_period = 100;
+  xparam.rc_buffer = 100;
+
+
+  xparam.min_quantizer = _q;
+  xparam.max_quantizer = _q;
+  xparam.max_key_interval = extend->max_key_interval;
+
+  xerr = xvid_encore (NULL, XVID_ENC_CREATE, &xparam, NULL);
+  if (XVID_ERR_OK != xerr)
+    {
+      printf ("\n Error initializing xvid !!!");
+      return 0;
+    }
+  _handle = xparam.handle;
+  dumpConf ();
+  return 1;
 }
-	
+
 //
 
-uint8_t xvidEncoderCQ::encode(
-				ADMImage * in,
-			    uint8_t * out,
-			    uint32_t * len,
-       		uint32_t * flags)
+uint8_t
+  xvidEncoderCQ::encode (ADMImage * in,
+			 uint8_t * out, uint32_t * len, uint32_t * flags)
 {
 
-	XVID_ENC_FRAME xframe;
+  XVID_ENC_FRAME xframe;
 
- 	int xerr;
+  int xerr;
 
-	memset(&xframe,0,sizeof(xframe));
+  memset (&xframe, 0, sizeof (xframe));
 
-	xframe.general = encode_flags;
-	xframe.motion = motion_flags;
+  xframe.general = encode_flags;
+  xframe.motion = motion_flags;
 
-	xframe.bitstream = out;
-	xframe.length = -1; 	// this is written by the routine
+  xframe.bitstream = out;
+  xframe.length = -1;		// this is written by the routine
 
-	xframe.image = in->data;
-    	xframe.colorspace = XVID_CSP_YV12;	// defined in <xvid.h>
+  xframe.image = in->data;
+  xframe.colorspace = XVID_CSP_YV12;	// defined in <xvid.h>
 
-    	xframe.intra = -1; // let the codec decide between I-frame (1) and P-frame (0)
-	xframe.quant = _q;
-//        xframe.quant = QUANTI;	// is quant != 0, use a fixed quant (and ignore bitrate)
+  xframe.intra = -1;		// let the codec decide between I-frame (1) and P-frame (0)
+  xframe.quant = _q;
+//        xframe.quant = QUANTI;        // is quant != 0, use a fixed quant (and ignore bitrate)
 
 
-	xerr = xvid_encore(_handle, XVID_ENC_ENCODE, &xframe, &xstats);
+  xerr = xvid_encore (_handle, XVID_ENC_ENCODE, &xframe, &xstats);
 
 /*	        enc_result->is_key_frame = xframe.intra;
 	        enc_result->quantizer = xframe.quant;
@@ -401,98 +397,96 @@ uint8_t xvidEncoderCQ::encode(
 	        enc_result->motion_bits = xstats.hlength * 8;
 	        enc_result->texture_bits = enc_result->total_bits - enc_result->motion_bits;
 */
-          	 xvid_res.is_key_frame = xframe.intra;
-	        xvid_res.quantizer = xframe.quant;
-	        xvid_res.total_bits = xframe.length * 8;
-	        xvid_res.motion_bits = xstats.hlength * 8;
-	        xvid_res.texture_bits = xvid_res.total_bits - xvid_res.motion_bits;
-		xvid_res.out_quantizer=xstats.quant;
+  xvid_res.is_key_frame = xframe.intra;
+  xvid_res.quantizer = xframe.quant;
+  xvid_res.total_bits = xframe.length * 8;
+  xvid_res.motion_bits = xstats.hlength * 8;
+  xvid_res.texture_bits = xvid_res.total_bits - xvid_res.motion_bits;
+  xvid_res.out_quantizer = xstats.quant;
 /*  This is statictical data, e.g. for 2-pass.
     If you are not interested in any of this, you can use NULL instead of &xstats
 */
 
-	*len = xframe.length;
- 	
- 	*flags=0;
-  	if(xerr!=XVID_ERR_OK) return 0;
- 	if( xframe.intra)
-  	{
-      	*flags=AVI_KEY_FRAME;
-     }
+  *len = xframe.length;
 
-	return 1;
+  *flags = 0;
+  if (xerr != XVID_ERR_OK)
+    return 0;
+  if (xframe.intra)
+    {
+      *flags = AVI_KEY_FRAME;
+    }
 
-}
-// *************************************************
-// *************************************************
-//									CQ
-// *************************************************
-// *************************************************
-
- uint8_t xvidEncoderVBR::encode(
-				ADMImage * in,
-			    uint8_t * out,
-			    uint32_t * len,
-       		uint32_t * flags)
-{
-    	uint16_t q;
-	uint8_t   kf;
-
-		q=(*flags)>>8;
-		kf=(*flags) & 1;
-		return encodeVBR(in,out,len,flags,q,kf);
-
+  return 1;
 
 }
- uint8_t xvidEncoderVBR::encodeVBR(
-				ADMImage * in,
-			    uint8_t * out,
-			    uint32_t * len,
-       		uint32_t * flags,
-				uint16_t	 nq,
-				uint8_t forcekey)
+// *************************************************
+// *************************************************
+//                                                                      CQ
+// *************************************************
+// *************************************************
+
+uint8_t
+  xvidEncoderVBR::encode (ADMImage * in,
+			  uint8_t * out, uint32_t * len, uint32_t * flags)
+{
+  uint16_t q;
+  uint8_t kf;
+
+  q = (*flags) >> 8;
+  kf = (*flags) & 1;
+  return encodeVBR (in, out, len, flags, q, kf);
+
+
+}
+uint8_t
+  xvidEncoderVBR::encodeVBR (ADMImage * in,
+			     uint8_t * out,
+			     uint32_t * len,
+			     uint32_t * flags, uint16_t nq, uint8_t forcekey)
 {
 
-	XVID_ENC_FRAME xframe;
+  XVID_ENC_FRAME xframe;
 
- 	int xerr;
+  int xerr;
 
-	memset(&xframe,0,sizeof(xframe));
+  memset (&xframe, 0, sizeof (xframe));
 
-	xframe.general = encode_flags;
-	xframe.motion = motion_flags;
+  xframe.general = encode_flags;
+  xframe.motion = motion_flags;
 
-	xframe.bitstream = out;
-	xframe.length = -1; 	// this is written by the routine
+  xframe.bitstream = out;
+  xframe.length = -1;		// this is written by the routine
 
-	xframe.image = in->data;
-   	xframe.colorspace = XVID_CSP_YV12;	// defined in <xvid.h>
+  xframe.image = in->data;
+  xframe.colorspace = XVID_CSP_YV12;	// defined in <xvid.h>
 
-	if(  forcekey)
-    			xframe.intra = 1; // let the codec decide between I-frame (1) and P-frame (0)
-	else
-    			xframe.intra = 0; // let the codec decide between I-frame (1) and P-frame (0)
+  if (forcekey)
+    xframe.intra = 1;		// let the codec decide between I-frame (1) and P-frame (0)
+  else
+    xframe.intra = 0;		// let the codec decide between I-frame (1) and P-frame (0)
 
-	xframe.quant = nq;
-	xerr = xvid_encore(_handle, XVID_ENC_ENCODE, &xframe, &xstats);
+  xframe.quant = nq;
+  xerr = xvid_encore (_handle, XVID_ENC_ENCODE, &xframe, &xstats);
 
-          	 xvid_res.is_key_frame = xframe.intra;
-	        xvid_res.quantizer = xframe.quant;
-		xvid_res.out_quantizer=xstats.quant;
-	        xvid_res.total_bits = xframe.length * 8;
-	        xvid_res.motion_bits = xstats.hlength * 8;
-	        xvid_res.texture_bits = xvid_res.total_bits - xvid_res.motion_bits;
+  xvid_res.is_key_frame = xframe.intra;
+  xvid_res.quantizer = xframe.quant;
+  xvid_res.out_quantizer = xstats.quant;
+  xvid_res.total_bits = xframe.length * 8;
+  xvid_res.motion_bits = xstats.hlength * 8;
+  xvid_res.texture_bits = xvid_res.total_bits - xvid_res.motion_bits;
 
-	*len = xframe.length;
- 	
- 	*flags=0;
-  	if(xerr!=XVID_ERR_OK) return 0;
- 	if( xframe.intra)
-  	{
-      	*flags=AVI_KEY_FRAME;
-     }
+  *len = xframe.length;
 
-	return 1;
+  *flags = 0;
+  if (xerr != XVID_ERR_OK)
+    return 0;
+  if (xframe.intra)
+    {
+      *flags = AVI_KEY_FRAME;
+    }
+
+  return 1;
 
 }
 

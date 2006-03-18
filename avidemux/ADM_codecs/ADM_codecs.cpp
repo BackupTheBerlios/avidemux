@@ -25,12 +25,13 @@
 #include <math.h>
 
 
- #include "ADM_vp32/ADM_vp3.h"
- 
+#include "ADM_vp32/ADM_vp3.h"
+
 #ifdef USE_FFMPEG
-extern "C" {	
+extern "C"
+{
 #include "ADM_lavcodec.h"
-} ;
+};
 #endif
 #include "ADM_library/default.h"
 #ifdef BIG_ENDIAN
@@ -58,7 +59,7 @@ extern "C" {
 #endif
 
 #ifdef USE_DIVX
-	#include "ADM_codecs/ADM_divx4.h"
+#include "ADM_codecs/ADM_divx4.h"
 #endif
 
 #ifdef USE_THEORA
@@ -71,186 +72,197 @@ extern "C" {
 #include <ADM_assert.h>
 #include "prefs.h"
 
-extern uint8_t GUI_Question(char *);
-extern  uint8_t use_fast_ffmpeg;
-uint8_t isMpeg12Compatible(uint32_t fourcc);
-uint8_t isMpeg4Compatible( uint32_t fourcc)
+extern uint8_t GUI_Question (char *);
+extern uint8_t use_fast_ffmpeg;
+uint8_t isMpeg12Compatible (uint32_t fourcc);
+uint8_t
+isMpeg4Compatible (uint32_t fourcc)
 {
-     #define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
 						{divx4=1; }
 
-    uint8_t divx4=0;
+  uint8_t divx4 = 0;
 
-    		CHECK("FMP4");
-    		CHECK("fmp4");
-    		CHECK("DIVX");
-      		CHECK("divx");
-	       	CHECK("DX50");
-	       	CHECK("xvid");
-	       	CHECK("XVID");
-          	CHECK("BLZ0");
-		CHECK("M4S2");
+  CHECK ("FMP4");
+  CHECK ("fmp4");
+  CHECK ("DIVX");
+  CHECK ("divx");
+  CHECK ("DX50");
+  CHECK ("xvid");
+  CHECK ("XVID");
+  CHECK ("BLZ0");
+  CHECK ("M4S2");
 
-          return divx4;
+  return divx4;
 
-      #undef CHECK
-}
-#ifdef ADM_BIG_ENDIAN
-	#define SWAP32(x) x=R32(x)
-#else
-	#define SWAP32(x) ;
-#endif
-
-uint8_t isMpeg12Compatible(uint32_t fourcc)
-{
- #define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
-						{mpeg=1; }
-
-    uint8_t mpeg=0;	
-    	CHECK("MPEG");
-	CHECK("mpg1");
-	CHECK("mpg2");
-	SWAP32(fourcc);
-        if(fourcc==0x10000002) mpeg=1;
-         return mpeg;
 #undef CHECK
 }
-uint8_t isH264Compatible( uint32_t fourcc)
+#ifdef ADM_BIG_ENDIAN
+#define SWAP32(x) x=R32(x)
+#else
+#define SWAP32(x) ;
+#endif
+
+uint8_t
+isMpeg12Compatible (uint32_t fourcc)
 {
-     #define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+						{mpeg=1; }
+
+  uint8_t mpeg = 0;
+  CHECK ("MPEG");
+  CHECK ("mpg1");
+  CHECK ("mpg2");
+  SWAP32 (fourcc);
+  if (fourcc == 0x10000002)
+    mpeg = 1;
+  return mpeg;
+#undef CHECK
+}
+uint8_t
+isH264Compatible (uint32_t fourcc)
+{
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
                                                 {h264=1; }
 
-    uint8_t h264=0;
+  uint8_t h264 = 0;
 
-                CHECK("X264");
-                CHECK("x264");
-                CHECK("h264");
-                CHECK("H264");
-                CHECK("AVC1");
-                CHECK("avc1");
-          return h264;
+  CHECK ("X264");
+  CHECK ("x264");
+  CHECK ("h264");
+  CHECK ("H264");
+  CHECK ("AVC1");
+  CHECK ("avc1");
+  return h264;
 
-      #undef CHECK
+#undef CHECK
 }
-	
-uint8_t isMSMpeg4Compatible( uint32_t fourcc)
+
+uint8_t
+isMSMpeg4Compatible (uint32_t fourcc)
 {
-     #define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
 						{divx3=1; }
 
-    uint8_t divx3=0;
+  uint8_t divx3 = 0;
 
-    		CHECK("MP43");
-    		CHECK("mp43");
-   		 CHECK("div3");
-    		CHECK("DIV3");
-    		CHECK("DIV4");
-    		CHECK("div4");
-    		CHECK("COL1");
+  CHECK ("MP43");
+  CHECK ("mp43");
+  CHECK ("div3");
+  CHECK ("DIV3");
+  CHECK ("DIV4");
+  CHECK ("div4");
+  CHECK ("COL1");
 
-          return divx3;
+  return divx3;
 
-      #undef CHECK
+#undef CHECK
 }
 
-uint8_t decoders::uncompress(uint8_t *in,ADMImage *out,uint32_t len,uint32_t *flag) {
-    UNUSED_ARG(in);
-    UNUSED_ARG(out);
-    UNUSED_ARG(len);
-    UNUSED_ARG(flag);
-	return 0;
-}
-decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extraLen,uint8_t *extraData)
+uint8_t
+  decoders::uncompress (uint8_t * in, ADMImage * out, uint32_t len,
+			uint32_t * flag)
 {
-    UNUSED_ARG(fcc);
-    UNUSED_ARG(extraLen);
-    UNUSED_ARG(extraData);
-   	return(decoders *)( new decoderFFMpeg4VopPacked(w,h));
+  UNUSED_ARG (in);
+  UNUSED_ARG (out);
+  UNUSED_ARG (len);
+  UNUSED_ARG (flag);
+  return 0;
+}
+decoders *
+getDecoderVopPacked (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
+		     uint8_t * extraData)
+{
+  UNUSED_ARG (fcc);
+  UNUSED_ARG (extraLen);
+  UNUSED_ARG (extraData);
+  return (decoders *) (new decoderFFMpeg4VopPacked (w, h));
 
 }
- decoders *getDecoder(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extraLen,uint8_t *extraData)
- {
-				
-			if(isMSMpeg4Compatible(fcc)==1)
-			{
-				// For div3, no problem we take ffmpeg
+decoders *
+getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
+	    uint8_t * extraData)
+{
 
-					return(decoders *)( new decoderFFDiv3(w,h));
-			}
-			
-#ifdef USE_FFMPEG	  
-    if(fourCC::check(fcc,(uint8_t *)"dvsd")
-      || fourCC::check(fcc,(uint8_t *)"DVDS")
-      || fourCC::check(fcc,(uint8_t *)"CDVC")
-       )
-          {
-				
-			  	     	return(decoders *)( new decoderFFDV(w,h,extraLen,extraData));
-			 }
-#endif	
-#ifdef USE_FFMPEG	  
-    if(fourCC::check(fcc,(uint8_t *)"MP42"))
-          {
-				
-			  	     	return(decoders *)( new decoderFFMP42(w,h));
-			    }
-#endif	
-#ifdef USE_FFMPEG	  
-    if(fourCC::check(fcc,(uint8_t *)"H263"))
-          {
-				
-			  	     	return(decoders *)( new decoderFFH263(w,h));
-			    }
-    if(fourCC::check(fcc,(uint8_t *)"HFYU"))
-          {
+  if (isMSMpeg4Compatible (fcc) == 1)
+    {
+      // For div3, no problem we take ffmpeg
 
-			  	     	return(decoders *)( new decoderFFhuff(w,h,extraLen,extraData));
-	   }
-#ifdef USE_PNG
-	   if(fourCC::check(fcc,(uint8_t *)"PNG "))
-          {
+      return (decoders *) (new decoderFFDiv3 (w, h));
+    }
 
-                                        return(decoders *)( new decoderPng(w,h));
-           } 
+#ifdef USE_FFMPEG
+  if (fourCC::check (fcc, (uint8_t *) "dvsd")
+      || fourCC::check (fcc, (uint8_t *) "DVDS")
+      || fourCC::check (fcc, (uint8_t *) "CDVC"))
+    {
+
+      return (decoders *) (new decoderFFDV (w, h, extraLen, extraData));
+    }
 #endif
-	   
-  if(fourCC::check(fcc,(uint8_t *)"FFVH"))
-          {
+#ifdef USE_FFMPEG
+  if (fourCC::check (fcc, (uint8_t *) "MP42"))
+    {
 
-                                        return(decoders *)( new decoderFF_ffhuff(w,h,extraLen,extraData));
-           }
-    if(fourCC::check(fcc,(uint8_t *)"SVQ3"))
-          {
+      return (decoders *) (new decoderFFMP42 (w, h));
+    }
+#endif
+#ifdef USE_FFMPEG
+  if (fourCC::check (fcc, (uint8_t *) "H263"))
+    {
 
-			  	     	return(decoders *)( new decoderFFSVQ3(w,h,extraLen,extraData));
-	   }
- if(fourCC::check(fcc,(uint8_t *)"tscc"))
-          {
+      return (decoders *) (new decoderFFH263 (w, h));
+    }
+  if (fourCC::check (fcc, (uint8_t *) "HFYU"))
+    {
 
-                                        return(decoders *)( new decoderCamtasia(w,h,16));
+      return (decoders *) (new decoderFFhuff (w, h, extraLen, extraData));
+    }
+#ifdef USE_PNG
+  if (fourCC::check (fcc, (uint8_t *) "PNG "))
+    {
+
+      return (decoders *) (new decoderPng (w, h));
+    }
+#endif
+
+  if (fourCC::check (fcc, (uint8_t *) "FFVH"))
+    {
+
+      return (decoders *) (new decoderFF_ffhuff (w, h, extraLen, extraData));
+    }
+  if (fourCC::check (fcc, (uint8_t *) "SVQ3"))
+    {
+
+      return (decoders *) (new decoderFFSVQ3 (w, h, extraLen, extraData));
+    }
+  if (fourCC::check (fcc, (uint8_t *) "tscc"))
+    {
+
+      return (decoders *) (new decoderCamtasia (w, h, 16));
 //stream->biBitCount)); // Fixme should be bit per pixel
-           }
+    }
 
-    if(fourCC::check(fcc,(uint8_t *)"WMV2"))
-          {
+  if (fourCC::check (fcc, (uint8_t *) "WMV2"))
+    {
 
-			  	     	return(decoders *)( new decoderFFWMV2(w,h,extraLen,extraData));
-	   }
- 	if(fourCC::check(fcc,(uint8_t *)"FFV1"))
-          {
+      return (decoders *) (new decoderFFWMV2 (w, h, extraLen, extraData));
+    }
+  if (fourCC::check (fcc, (uint8_t *) "FFV1"))
+    {
 
-			  	     	return(decoders *)( new decoderFFV1(w,h));
-	   }
-	   if(fourCC::check(fcc,(uint8_t *)"SNOW"))
-          {
+      return (decoders *) (new decoderFFV1 (w, h));
+    }
+  if (fourCC::check (fcc, (uint8_t *) "SNOW"))
+    {
 
-			  	     	return(decoders *)( new decoderSnow(w,h));
-	   }
-           if(  isH264Compatible(fcc))
-           {
+      return (decoders *) (new decoderSnow (w, h));
+    }
+  if (isH264Compatible (fcc))
+    {
 
-             return(decoders *)( new decoderFFH264(w,h,extraLen,extraData));
-           }           
+      return (decoders *) (new decoderFFH264 (w, h, extraLen, extraData));
+    }
 #endif
 
 /*
@@ -259,96 +271,100 @@ decoders *getDecoderVopPacked(uint32_t fcc,uint32_t w, uint32_t h,uint32_t extra
 		(ugly hack for ugly hack....)
 */
 
- 	if(isMpeg4Compatible(fcc)==1)
-    	{
-				       	return(decoders *)( new decoderFFMpeg4(w,h,extraLen,extraData));
-				  //	return(decoders *)( new decoderXvid(w,h));
-				  //	return(decoders *)( new decoderDIVX(w,h));
-	}
+  if (isMpeg4Compatible (fcc) == 1)
+    {
+      return (decoders *) (new decoderFFMpeg4 (w, h, extraLen, extraData));
+      //    return(decoders *)( new decoderXvid(w,h));
+      //    return(decoders *)( new decoderDIVX(w,h));
+    }
 
-          if(fourCC::check(fcc,(uint8_t *)"MJPG") || fourCC::check(fcc,(uint8_t *)"mjpa"))
-          {
+  if (fourCC::check (fcc, (uint8_t *) "MJPG")
+      || fourCC::check (fcc, (uint8_t *) "mjpa"))
+    {
 #if  0
- //#ifdef USE_MJPEG
-                      			printf("\n using mjpeg codec\n");
-			  				     	return(decoders *)( new decoderMjpeg(w,h));
+      //#ifdef USE_MJPEG
+      printf ("\n using mjpeg codec\n");
+      return (decoders *) (new decoderMjpeg (w, h));
 #else
-                      		printf("\n using FF mjpeg codec\n");
-			  	     	return(decoders *)( new decoderFFMJPEG(w,h));
+      printf ("\n using FF mjpeg codec\n");
+      return (decoders *) (new decoderFFMJPEG (w, h));
 #endif
 
-           }
-          if(fourCC::check(fcc,(uint8_t *)"YV12")||fourCC::check(fcc,(uint8_t *)"I420"))
-          {
-            			printf("\n using null codec\n");
-			       	return(decoders *)( new decoderNull(w,h));
-           }
-	if(fourCC::check(fcc,(uint8_t *)"UYVY"))
-          {
-            			printf("\n using uyvy codec\n");
-			       	return(decoders *)( new decoderUYVY(w,h));
-           }
-	if(fourCC::check(fcc,(uint8_t *)"YUY2"))
-          {
-            			printf("\n using YUY2 codec\n");
-			       	return(decoders *)( new decoderYUY2(w,h));
-           }
+    }
+  if (fourCC::check (fcc, (uint8_t *) "YV12")
+      || fourCC::check (fcc, (uint8_t *) "I420"))
+    {
+      printf ("\n using null codec\n");
+      return (decoders *) (new decoderNull (w, h));
+    }
+  if (fourCC::check (fcc, (uint8_t *) "UYVY"))
+    {
+      printf ("\n using uyvy codec\n");
+      return (decoders *) (new decoderUYVY (w, h));
+    }
+  if (fourCC::check (fcc, (uint8_t *) "YUY2"))
+    {
+      printf ("\n using YUY2 codec\n");
+      return (decoders *) (new decoderYUY2 (w, h));
+    }
 
-	   
-	   
-	if((fcc==0)   ||   fourCC::check(fcc,(uint8_t *)"RGB "))
-  			{
-            // RGB 16 Codecs
-            			printf("\n using RGB codec\n");
-			       	return(decoders *)( new decoderRGB16(w,h));
 
-       	}
+
+  if ((fcc == 0) || fourCC::check (fcc, (uint8_t *) "RGB "))
+    {
+      // RGB 16 Codecs
+      printf ("\n using RGB codec\n");
+      return (decoders *) (new decoderRGB16 (w, h));
+
+    }
 #ifdef USE_THEORA
 
-         if(fourCC::check(fcc,(uint8_t *)"VP31"))
-         {
-							printf("\n using Theora codec\n");
-			       	return(decoders *)( new decoderTheora(w,h));
-	}
+  if (fourCC::check (fcc, (uint8_t *) "VP31"))
+    {
+      printf ("\n using Theora codec\n");
+      return (decoders *) (new decoderTheora (w, h));
+    }
 #else
-   if(fourCC::check(fcc,(uint8_t *)"VP31"))
-         {
-							printf("\n using VP3 codec\n");
-			       	return(decoders *)( new decoderVP3(w,h));
-			    }
-#endif         
-	if(isMpeg12Compatible(fcc))
-	{        	
-		uint32_t  lavcodec_mpeg=0;
-		printf("\n using Mpeg1/2 codec (libmpeg2)\n");
-		if(!prefs->get(FEATURE_USE_LAVCODEC_MPEG, &lavcodec_mpeg))
-		{
-		 lavcodec_mpeg=0;
-		}
-		if(lavcodec_mpeg)
-		{
-			return(decoders *)( new decoderFFMpeg12(w,h,extraLen,extraData));
-		}
-		else
-		{
-	    		return(decoders *)( new decoderMpeg(w,h,extraLen,extraData));
-		}
-	    //  
+  if (fourCC::check (fcc, (uint8_t *) "VP31"))
+    {
+      printf ("\n using VP3 codec\n");
+      return (decoders *) (new decoderVP3 (w, h));
+    }
+#endif
+  if (isMpeg12Compatible (fcc))
+    {
+      uint32_t lavcodec_mpeg = 0;
+      printf ("\n using Mpeg1/2 codec (libmpeg2)\n");
+      if (!prefs->get (FEATURE_USE_LAVCODEC_MPEG, &lavcodec_mpeg))
+	{
+	  lavcodec_mpeg = 0;
 	}
+      if (lavcodec_mpeg)
+	{
+	  return (decoders *) (new
+			       decoderFFMpeg12 (w, h, extraLen, extraData));
+	}
+      else
+	{
+	  return (decoders *) (new decoderMpeg (w, h, extraLen, extraData));
+	}
+      //  
+    }
 
-        // default : null decoder
-  			printf("\n using invalid codec for \n");
-     		fourCC::print(fcc);
+  // default : null decoder
+  printf ("\n using invalid codec for \n");
+  fourCC::print (fcc);
 
-       	return(decoders *)( new decoders(w,h));
+  return (decoders *) (new decoders (w, h));
 
 
-    	
-   }
 
-uint8_t coders::compress(ADMImage *in,uint8_t *out,uint32_t *len){
-    UNUSED_ARG(in);
-    UNUSED_ARG(out);
-    UNUSED_ARG(len);
-	return 0;
+}
+
+uint8_t coders::compress (ADMImage * in, ADMBitstream * out)
+{
+  UNUSED_ARG (in);
+  UNUSED_ARG (out);
+
+  return 0;
 }

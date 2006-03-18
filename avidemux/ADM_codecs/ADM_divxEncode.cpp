@@ -41,109 +41,107 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
 
-static 	ENC_RESULT 			result;
-static   	tagDivXBitmapInfoHeader 	tag;
-static 	SETTINGS 				setting;
+static ENC_RESULT result;
+static tagDivXBitmapInfoHeader tag;
+static SETTINGS setting;
 
-myENC_RESULT 	res;
+myENC_RESULT res;
 
-divxEncoder::divxEncoder(uint32_t width,uint32_t height) :encoder (width,height)
+divxEncoder::divxEncoder (uint32_t width, uint32_t height):encoder (width,
+	 height)
 {
-                             _init=0;
-			     _handle=NULL;
+  _init = 0;
+  _handle = NULL;
 }
-uint8_t     divxEncoder::stopEncoder(void )
+uint8_t divxEncoder::stopEncoder (void)
 {
-    int ret;
+  int
+    ret;
 
-    ADM_assert(_init);
-    ret = encore(_handle, ENC_OPT_RELEASE, 0, 0);
-    _init = 0;
-    if (ret == ENC_OK)
-		return 1;
-    return 0;
-}
-//
-//	Return encoding result from the last encoded frame
-//
-uint8_t divxEncoder::getResult( void *ress)
-{
-   memcpy(ress,&res,sizeof(res));
-   return 1;
-}
-
-uint8_t divxEncoder::init( uint32_t val,uint32_t fps1000) {
-    UNUSED_ARG(val);
-    UNUSED_ARG(fps1000);
-	ADM_assert(0);
-}
-
-uint8_t divxEncoder::encode(
-				uint8_t * in,
-			    	uint8_t * out,
-			    	uint32_t * len,
-       				uint32_t * flags)
-{
-
-    int ret;
-ENC_FRAME frame;
-
-    ADM_assert(_init);
-	memset(&frame,0,sizeof(frame));
-	frame.image=in;
-	frame.bitstream=out;
-
-    ret = encore(_handle, ENC_OPT_ENCODE, &frame, &result);
-    if(ENC_OK!=ret)
-    {
-		printf("Error encoding frame divx :%d \n",ret);
-		return 0;
-    }
-    *len = (uint32_t) frame.length;
-    *flags=0;
-    switch(result.cType)
-    {
-		case '0':
-				*flags=0;
-				*len=0;
-				break;
-		case 'I':
-				*flags=AVI_KEY_FRAME;
-				break;
-		case 'P':
-				break;
-		case 'B':
-				*flags=AVI_B_FRAME;
-				break;
-
-    }
+  ADM_assert (_init);
+  ret = encore (_handle, ENC_OPT_RELEASE, 0, 0);
+  _init = 0;
+  if (ret == ENC_OK)
     return 1;
+  return 0;
 }
-uint8_t divxEncoder::params( uint32_t fps1000 )
+//
+//      Return encoding result from the last encoded frame
+//
+
+
+
+uint8_t divxEncoder::init (uint32_t val, uint32_t fps1000)
+{
+  UNUSED_ARG (val);
+  UNUSED_ARG (fps1000);
+  ADM_assert (0);
+}
+
+uint8_t
+  divxEncoder::encode (uint8_t * in,
+		       uint8_t * out, uint32_t * len, uint32_t * flags)
 {
 
-	if(ENCORE_VERSION != encore(0, ENC_OPT_VERSION, 0, 0))
-	//? interfaces are incompatible, encoding can?t be performed
-	{
-		printf("\n Header & lib mismatch for divx !!!\n");
-        	return 0;
-	}
+  int ret;
+  ENC_FRAME frame;
 
-	memset(&tag,0,sizeof(tag));
-	//tag.biSize=sizeof(tag);
-	tag.biWidth=_w;
-	tag.biHeight=_h;
-	tag.biBitCount=24;
-	tag.biCompression=fourCC::get((uint8_t *)"YV12");
+  ADM_assert (_init);
+  memset (&frame, 0, sizeof (frame));
+  frame.image = in;
+  frame.bitstream = out;
 
-  	memset(&setting,0,sizeof(setting));
-	setting.use_bidirect=0;
-	setting.input_frame_period=fps1000;
-	setting.input_clock=fps1000;
-	setting.complexity_modulation=0.5;
-	setting.quality=5;
+  ret = encore (_handle, ENC_OPT_ENCODE, &frame, &result);
+  if (ENC_OK != ret)
+    {
+      printf ("Error encoding frame divx :%d \n", ret);
+      return 0;
+    }
+  *len = (uint32_t) frame.length;
+  *flags = 0;
+  switch (result.cType)
+    {
+    case '0':
+      *flags = 0;
+      *len = 0;
+      break;
+    case 'I':
+      *flags = AVI_KEY_FRAME;
+      break;
+    case 'P':
+      break;
+    case 'B':
+      *flags = AVI_B_FRAME;
+      break;
 
-	return 1;
+    }
+  return 1;
+}
+uint8_t divxEncoder::params (uint32_t fps1000)
+{
+
+  if (ENCORE_VERSION != encore (0, ENC_OPT_VERSION, 0, 0))
+    //? interfaces are incompatible, encoding can?t be performed
+    {
+      printf ("\n Header & lib mismatch for divx !!!\n");
+      return 0;
+    }
+
+  memset (&tag, 0, sizeof (tag));
+  //tag.biSize=sizeof(tag);
+  tag.biWidth = _w;
+  tag.biHeight = _h;
+  tag.biBitCount = 24;
+  tag.biCompression = fourCC::get ((uint8_t *) "YV12");
+
+  memset (&setting, 0, sizeof (setting));
+  setting.use_bidirect = 0;
+  setting.input_frame_period = fps1000;
+  setting.input_clock = fps1000;
+  setting.complexity_modulation = 0.5;
+  setting.quality = 5;
+
+  return 1;
 }
 
 /**--------------------------------------
@@ -152,31 +150,32 @@ uint8_t divxEncoder::params( uint32_t fps1000 )
 ------------------------------------------
 */
 
-uint8_t divxEncoderCQ::init(uint32_t q,uint32_t fps1000)
+uint8_t divxEncoderCQ::init (uint32_t q, uint32_t fps1000)
 {
-    UNUSED_ARG(fps1000);
-    _q=q;
+  UNUSED_ARG (fps1000);
+  _q = q;
 
-	printf(" Compressing %lu x %lu video in qz %lu\n", _w, _h, _q);
+  printf (" Compressing %lu x %lu video in qz %lu\n", _w, _h, _q);
 
 // check header and lib match -> good idea !
 
 
-	if(!params(fps1000)) return 0;
+  if (!params (fps1000))
+    return 0;
 
-	setting.vbr_mode=RCMODE_1PASS_CONSTANT_Q;
-	setting.quantizer=_q;
-    	ADM_assert(0 == _init);
+  setting.vbr_mode = RCMODE_1PASS_CONSTANT_Q;
+  setting.quantizer = _q;
+  ADM_assert (0 == _init);
 
-	if(ENC_OK!=encore((void *)&_handle, ENC_OPT_INIT, &tag, &setting))
-	{
-		printf("\n error initializing divx !\n");
-		return 0;
+  if (ENC_OK != encore ((void *) &_handle, ENC_OPT_INIT, &tag, &setting))
+    {
+      printf ("\n error initializing divx !\n");
+      return 0;
 
-	}
-	printf("\n Divx initialized  OK in CQ mode!\n");
-    _init = 1;
-    return 1;
+    }
+  printf ("\n Divx initialized  OK in CQ mode!\n");
+  _init = 1;
+  return 1;
 }
 /**--------------------------------------
 	Initialiaze divxencoder
@@ -184,30 +183,31 @@ uint8_t divxEncoderCQ::init(uint32_t q,uint32_t fps1000)
 ------------------------------------------
 */
 
-uint8_t divxEncoderCBR::init(uint32_t q,uint32_t fps1000)
+uint8_t divxEncoderCBR::init (uint32_t q, uint32_t fps1000)
 {
-    UNUSED_ARG(fps1000);
-    _br=q;
+  UNUSED_ARG (fps1000);
+  _br = q;
 
-	printf(" Compressing %lu x %lu video in CBR %lu\n", _w, _h, _br);
+  printf (" Compressing %lu x %lu video in CBR %lu\n", _w, _h, _br);
 
 // check header and lib match -> good idea !
 
-	if(!params(fps1000)) return 0;
+  if (!params (fps1000))
+    return 0;
 
-	setting.vbr_mode=RCMODE_502_1PASS; //RCMODE_VBV_1PASS;
-	setting.bitrate=_br;
-    	ADM_assert(0 == _init);
+  setting.vbr_mode = RCMODE_502_1PASS;	//RCMODE_VBV_1PASS;
+  setting.bitrate = _br;
+  ADM_assert (0 == _init);
 
-	if(ENC_OK!=encore((void*)&_handle, ENC_OPT_INIT, &tag, &setting))
-	{
-		printf("\n error initializing divx !\n");
-		return 0;
+  if (ENC_OK != encore ((void *) &_handle, ENC_OPT_INIT, &tag, &setting))
+    {
+      printf ("\n error initializing divx !\n");
+      return 0;
 
-	}
-    _init = 1;
-    printf("\n Divx initialized OK in CBR mode  !\n");
-    return 1;
+    }
+  _init = 1;
+  printf ("\n Divx initialized OK in CBR mode  !\n");
+  return 1;
 }
 
 

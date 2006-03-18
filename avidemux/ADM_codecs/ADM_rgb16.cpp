@@ -33,47 +33,49 @@
 #include "ADM_codecs/ADM_rgb16.h"
 
 
-decoderRGB16::decoderRGB16(uint32_t w, uint32_t h):decoders(w, h)
+decoderRGB16::decoderRGB16 (uint32_t w, uint32_t h):decoders (w, h)
 {
-    
+
 }
-decoderRGB16::~decoderRGB16()
+decoderRGB16::~decoderRGB16 ()
 {
-    
+
 }
 
 
-uint8_t decoderRGB16::uncompress(uint8_t * in, ADMImage * out,
-				 uint32_t len, uint32_t * flag)
+uint8_t
+  decoderRGB16::uncompress (uint8_t * in, ADMImage * out,
+			    uint32_t len, uint32_t * flag)
 {
-int xx;
-        xx=_w*_h;
+  int xx;
+  xx = _w * _h;
 
-        if (flag)
-                *flag = AVI_KEY_FRAME;
+  if (flag)
+    *flag = AVI_KEY_FRAME;
 
-   // We dont do much here ...
-     
-    if (len == (3 * xx))        // rgb 24 ?
+  // We dont do much here ...
+
+  if (len == (3 * xx))		// rgb 24 ?
     {
-        out->_colorspace=ADM_COLOR_BGR24;
-        out->_planeStride[0]=3*_w;
+      out->_colorspace = ADM_COLOR_BGR24;
+      out->_planeStride[0] = 3 * _w;
     }
-    else if(len==(4*xx))
-          {
-                out->_colorspace=ADM_COLOR_BGR32A;
-                out->_planeStride[0]=4*_w;
-          }
+  else if (len == (4 * xx))
+    {
+      out->_colorspace = ADM_COLOR_BGR32A;
+      out->_planeStride[0] = 4 * _w;
+    }
 /*        else if(len==2*xx)
                         color->changeColorSpace(ADM_COLOR_RGB16);*/
-                                else return 0;
+  else
+    return 0;
 
-        ADM_assert(out->_isRef);
-        out->_planes[0]=in;
-        out->_planes[1]=NULL;
-        out->_planes[2]=NULL;
-        out->_planeStride[1]=0;
-        out->_planeStride[2]=0;
-        return 1;
+  ADM_assert (out->_isRef);
+  out->_planes[0] = in;
+  out->_planes[1] = NULL;
+  out->_planes[2] = NULL;
+  out->_planeStride[1] = 0;
+  out->_planeStride[2] = 0;
+  return 1;
 }
 //EOF

@@ -16,155 +16,118 @@
  *                                                                         *
  ***************************************************************************/
 
- #ifdef USE_XVID_4
+#ifdef USE_XVID_4
 
 
- 
- #include "ADM_codecs/ADM_xvid4param.h"
- 
- class xvid4Encoder	: public encoder
-  	{
-     	protected :
-      			
-          		uint8_t 	_init;
-	              	void 		*_handle;
-			uint32_t  	encode_flags;
-			uint32_t 	motion_flags;
-			uint32_t 	_fps1000;
-			xvid4EncParam 	_param;	   
-     			void 		dumpConf(void);
-			void 		checkFlags( xvid4EncParam *extend=NULL ); 
-			void 		encUpdate( void );   
-			void 		createUpdate( void );  
-			
-			uint8_t      	preAmble(uint8_t *in );
-			uint8_t     	postAmble(uint32_t *flags ) ;
-			void 		dump(void);
 
-          public :
-	  				xvid4Encoder(uint32_t width,uint32_t height)   : encoder(width,height)
-             				{
-                                		_init=0;   
-						_handle=NULL;                             
-                   			} ;
-					~xvid4Encoder();
-             				void		*getXvidStat( void );          			
-                  			uint8_t 	stopEncoder(void );
-              			virtual uint8_t 	init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );
-				
-					uint8_t		init(uint32_t a, uint32_t b) {return 0;} // not used
-              			  	uint8_t 	getResult( void *ress);                
-              			virtual uint8_t 	encode(	ADMImage 	*in,
-					   	 		uint8_t 	*out,
-					   			uint32_t 	*len,
-			       					uint32_t 	*flags)=0;
-				
-                                virtual uint32_t getPTS_FrameNum(void);
-                                
-   };
- 
-   class xvid4EncoderCQ : public    xvid4Encoder
+#include "ADM_codecs/ADM_xvid4param.h"
+
+class xvid4Encoder:public encoder
+{
+protected:uint8_t _init;
+  void *_handle;
+  uint32_t encode_flags;
+  uint32_t motion_flags;
+  uint32_t _fps1000;
+  xvid4EncParam _param;
+  void dumpConf (void);
+  void checkFlags (xvid4EncParam * extend = NULL);
+  void createUpdate (void);
+
+  uint8_t preAmble (uint8_t * in);
+  uint8_t postAmble (ADMBitstream * out);
+  void dump (void);
+
+public:  xvid4Encoder (uint32_t width, uint32_t height):encoder (width,
+							    height)
   {
-     	protected :
-      				
-             		uint32_t _q;              
-	
-          public :
-          		xvid4EncoderCQ(uint32_t width,uint32_t height) : xvid4Encoder(width,height)
-             				{
+    _init = 0;
+    _handle = NULL;
+  };
+  ~xvid4Encoder ();
+  void *getXvidStat (void);
+  uint8_t stopEncoder (void);
+  virtual uint8_t init (uint32_t val, uint32_t fps1000,
+			xvid4EncParam * param);
 
-                   			} ;
-			
-            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );	
-            		virtual 	uint8_t encode(
-        	  				ADMImage 	*in,
-					 	uint8_t 	*out,
-						uint32_t 	*len,
-						uint32_t 	*flags);
-   };
-      class xvid4EncoderVBRExternal : public    xvid4Encoder
+  uint8_t init (uint32_t a, uint32_t b)
   {
-     	protected :
-      				
-             		uint32_t _q;              
-	
-          public :
-          		xvid4EncoderVBRExternal(uint32_t width,uint32_t height) : xvid4Encoder(width,height)
-             				{
+    return 0;
+  }				// not used
+  virtual uint8_t encode (ADMImage * in, ADMBitstream * out) ;
+};
 
-                   			} ;
-			
-            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );	
-            		virtual 	uint8_t encode(
-        	  				ADMImage 	*in,
-					 	uint8_t 	*out,
-						uint32_t 	*len,
-						uint32_t 	*flags);
-					uint8_t encodeVBR(
-        	  				ADMImage 	*in,
-					 	uint8_t 	*out,
-						uint32_t 	*len,
-						uint32_t	quant,
-						uint32_t 	*flags);
-   };
-   class xvid4EncoderCBR : public    xvid4Encoder
+class xvid4EncoderCQ:public xvid4Encoder
+{
+protected:uint32_t _q;
+
+public:xvid4EncoderCQ (uint32_t width, uint32_t height):xvid4Encoder (width,
+								 height)
   {
-     	protected :
-      				
-             		uint32_t _bitrate;     // In kBits!         
-	
-          public :
-          		xvid4EncoderCBR(uint32_t width,uint32_t height) : xvid4Encoder(width,height)
-             				{
 
-                   			} ;
-			
-            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );	
-            		virtual 	uint8_t encode(
-        	  				ADMImage 	*in,
-					 	uint8_t 	*out,
-						uint32_t 	*len,
-						uint32_t 	*flags);
-   };
-   class xvid4EncoderPass1 : public    xvid4Encoder
+  };
+
+  virtual uint8_t init (uint32_t val, uint32_t fps1000,
+			xvid4EncParam * param);
+  virtual uint8_t encode (ADMImage * in, ADMBitstream * out);
+};
+class xvid4EncoderVBRExternal:public xvid4Encoder
+{
+protected:uint32_t _q;
+
+public:xvid4EncoderVBRExternal (uint32_t width,
+			   uint32_t height):xvid4Encoder (width,
+							  height)
   {
-     	protected :
-      				
-             		          
-	
-          public :
-          		xvid4EncoderPass1(uint32_t width,uint32_t height) : xvid4Encoder(width,height)
-             				{
 
-                   			} ;
-			
-            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );	
-            		virtual 	uint8_t encode(
-        	  				ADMImage 	*in,
-					 	uint8_t 	*out,
-						uint32_t 	*len,
-						uint32_t 	*flags);
-   };
- class xvid4EncoderPass2 : public    xvid4Encoder
+  };
+
+  virtual uint8_t init (uint32_t val, uint32_t fps1000,
+			xvid4EncParam * param);
+  virtual uint8_t encode (ADMImage * in, ADMBitstream * out);
+  
+};
+class xvid4EncoderCBR:public xvid4Encoder
+{
+protected:uint32_t _bitrate;	// In kBits!         
+
+public:xvid4EncoderCBR (uint32_t width,
+		   uint32_t height):xvid4Encoder (width, height)
   {
-     	protected :
-      				
-             		uint32_t _bitrate;              
-	
-          public :
-          		xvid4EncoderPass2(uint32_t width,uint32_t height) : xvid4Encoder(width,height)
-             				{
 
-                   			} ;
-			
-            		virtual 	uint8_t init( uint32_t val,uint32_t fps1000,xvid4EncParam *param );	
-            		virtual 	uint8_t encode(
-        	  				ADMImage 	*in,
-					 	uint8_t 	*out,
-						uint32_t 	*len,
-						uint32_t 	*flags);
-   };
+  };
 
-   
- #endif
+  virtual uint8_t init (uint32_t val, uint32_t fps1000,
+			xvid4EncParam * param);
+  virtual uint8_t encode (ADMImage * in, ADMBitstream * out);
+};
+class xvid4EncoderPass1:public xvid4Encoder
+{
+protected: public:xvid4EncoderPass1 (uint32_t width,
+		     uint32_t height):xvid4Encoder (width,
+						    height)
+  {
 
+  };
+
+  virtual uint8_t init (uint32_t val, uint32_t fps1000,
+			xvid4EncParam * param);
+  
+};
+class xvid4EncoderPass2:public xvid4Encoder
+{
+protected:uint32_t _bitrate;
+
+public:xvid4EncoderPass2 (uint32_t width,
+		     uint32_t height):xvid4Encoder (width, height)
+  {
+
+  };
+
+  virtual uint8_t init (uint32_t val, uint32_t fps1000,
+			xvid4EncParam * param);
+  
+};
+
+
+#endif

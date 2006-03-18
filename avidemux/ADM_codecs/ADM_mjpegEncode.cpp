@@ -31,7 +31,8 @@
 #include "ADM_colorspace/colorspace.h"
 
 
-extern "C" {
+extern "C"
+{
 #include "mjpegtools/jpegutils.h"
 }
 
@@ -39,92 +40,89 @@ extern "C" {
 #include "ADM_codecs/ADM_mjpegEncode.h"
 
 //
-//	The given parameter is the compression ratio of jpeg
+//      The given parameter is the compression ratio of jpeg
 //
-uint8_t mjpegEncoder::init( uint32_t val,uint32_t fps1000)   
+uint8_t
+mjpegEncoder::init (uint32_t val, uint32_t fps1000)
 {
-	UNUSED_ARG(fps1000);
-          _qual=val;
- 			return 1;
+  UNUSED_ARG (fps1000);
+  _qual = val;
+  return 1;
 }
-uint8_t mjpegEncoder::init( uint32_t val,uint32_t fps1000,uint8_t s)
+uint8_t mjpegEncoder::init (uint32_t val, uint32_t fps1000, uint8_t s)
 {
-	UNUSED_ARG(fps1000);
-          _qual=val;
-			_swap=s;
- 			return 1;
+  UNUSED_ARG (fps1000);
+  _qual = val;
+  _swap = s;
+  return 1;
 }
-          		
-uint8_t  mjpegEncoder::stopEncoder(void )
+
+uint8_t mjpegEncoder::stopEncoder (void)
 {
 
-       	return 1;
+  return 1;
 }
  /*
- * jpeg_data:       buffer with input / output jpeg
- * len:             Length of jpeg buffer
- * itype:           LAV_INTER_NONE: Not interlaced
- *                  LAV_INTER_TOP_FIRST: Interlaced, top-field-first
- *                  LAV_INTER_BOTTOM_FIRST: Interlaced, bottom-field-first
- * ctype            Chroma format for decompression.
- *                  Currently always 420 and hence ignored.
- * raw0             buffer with input / output raw Y channel
- * raw1             buffer with input / output raw U/Cb channel
- * raw2             buffer with input / output raw V/Cr channel
- * width            width of Y channel (width of U/V is width/2)
- * height           height of Y channel (height of U/V is height/2)
+  * jpeg_data:       buffer with input / output jpeg
+  * len:             Length of jpeg buffer
+  * itype:           LAV_INTER_NONE: Not interlaced
+  *                  LAV_INTER_TOP_FIRST: Interlaced, top-field-first
+  *                  LAV_INTER_BOTTOM_FIRST: Interlaced, bottom-field-first
+  * ctype            Chroma format for decompression.
+  *                  Currently always 420 and hence ignored.
+  * raw0             buffer with input / output raw Y channel
+  * raw1             buffer with input / output raw U/Cb channel
+  * raw2             buffer with input / output raw V/Cr channel
+  * width            width of Y channel (width of U/V is width/2)
+  * height           height of Y channel (height of U/V is height/2)
 
 
-int decode_jpeg_raw (unsigned char *jpeg_data, int len,
-                     int itype, int ctype, int width, int height,
-                     unsigned char *raw0, unsigned char *raw1,
-                     unsigned char *raw2);
+  int decode_jpeg_raw (unsigned char *jpeg_data, int len,
+  int itype, int ctype, int width, int height,
+  unsigned char *raw0, unsigned char *raw1,
+  unsigned char *raw2);
 
-*/
+  */
 
-uint8_t mjpegEncoder::encode(						uint8_t 	*in,
-						   													 	uint8_t 	*out,
-													   							uint32_t 	*len,
-			       															uint32_t 	*flags)
+uint8_t
+  mjpegEncoder::encode (uint8_t * in,
+			uint8_t * out, uint32_t * len, uint32_t * flags)
 {
-uint8_t *y,*u,*v;
-uint32_t delta;
-int l;  		
+  uint8_t *y, *u, *v;
+  uint32_t delta;
+  int l;
 
-    	//
-     	delta=_w*_h;
-       // separate planes
-		y=(uint8_t *)in;
+  //
+  delta = _w * _h;
+  // separate planes
+  y = (uint8_t *) in;
 
-		if(!_swap)
-		{
-	      	u=y+delta;
-	       v=u+(delta>>2);
-		}
-		else
-		{
-	      	v=y+delta;
-	       u=v+(delta>>2);
-		}
+  if (!_swap)
+    {
+      u = y + delta;
+      v = u + (delta >> 2);
+    }
+  else
+    {
+      v = y + delta;
+      u = v + (delta >> 2);
+    }
 
-  		l=encode_jpeg_raw ((unsigned char *)out,
-						delta,			// insize /2 , should be enough as buffering
-						_qual,									// int quality, ??
-                    0,0,                             // ctype /i type
-						  _w, _h,
-                     y,
-						u,
-                     v);
-	//	printf("\n size: %d",l);
-		*len=l;
-		*flags=AVI_KEY_FRAME;
+  l = encode_jpeg_raw ((unsigned char *) out, delta,	// insize /2 , should be enough as buffering
+		       _qual,	// int quality, ??
+		       0, 0,	// ctype /i type
+		       _w, _h, y, u, v);
+  //      printf("\n size: %d",l);
+  *len = l;
+  *flags = AVI_KEY_FRAME;
 
- 	return 1;
+  return 1;
 }
 
-uint8_t mjpegEncoder::getResult( void *ress) {  // for dual pass only
-	ADM_assert(0);
-	UNUSED_ARG(ress);
+uint8_t mjpegEncoder::getResult (void *ress)
+{				// for dual pass only
+  ADM_assert (0);
+  UNUSED_ARG (ress);
 
 }
 

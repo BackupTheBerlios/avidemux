@@ -14,31 +14,33 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- #ifdef USE_THEORA
- #ifndef __theora__
- #define __theora__
- 
- extern "C" {
+#ifdef USE_THEORA
+#ifndef __theora__
+#define __theora__
+
+extern "C"
+{
 #include "theora/theora.h"
 }
-  class decoderTheora : public decoders
+class decoderTheora:public decoders
 {
-     protected:
-     
-     
-						theora_info      _tinfo;
-						theora_state     _tstate;
+protected:
 
-				
-							    
-     public:
-     										decoderTheora(uint32_t w,uint32_t h);
-         		virtual					~decoderTheora();
-    			virtual uint8_t 	uncompress(uint8_t *in,uint8_t *out,uint32_t len,uint32_t *flag=NULL) 		;	
-   		       	virtual 			void setParam( void );
-	
 
-}   ;
+  theora_info _tinfo;
+  theora_state _tstate;
 
-  #endif
+
+
+public:
+    decoderTheora (uint32_t w, uint32_t h);
+    virtual ~ decoderTheora ();
+  virtual uint8_t uncompress (uint8_t * in, uint8_t * out, uint32_t len,
+			      uint32_t * flag = NULL);
+  virtual void setParam (void);
+
+
+};
+
+#endif
 #endif

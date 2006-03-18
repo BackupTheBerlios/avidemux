@@ -51,9 +51,19 @@ AVCodec *codec=avcodec_find_encoder(x);\
 if(!codec) {GUI_Alert("Internal error opening codec"#x);ADM_assert(0);} \
   res=avcodec_open(_context, codec); \
   if(res<0) {GUI_Alert("Internal error with context for  codec"#x);ADM_assert(0);} \
-} 
+}
 
-static myENC_RESULT res;
+
+void
+ffmpegEncoder::postAmble (ADMBitstream * out, uint32_t sz)
+{
+  out->ptsFrame = _context->real_pict_num;;
+  out->len = (uint32_t) sz;
+  out->flags = frameType ();;
+  out->out_quantizer =(int) floor (_context->coded_frame->quality / (float) FF_QP2LAMBDA);
+
+}
+//static myENC_RESULT res;
 ffmpegEncoder::ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id):encoder (width,
 	 height)
 {
@@ -74,31 +84,35 @@ ffmpegEncoder::ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id):e
   _frame.linesize[0] = _w;
   _frame.linesize[1] = _w >> 1;
   _frame.linesize[2] = _w >> 1;
-  _isMT=0;
+  _isMT = 0;
 
 };
-ffmpegEncoder::~ ffmpegEncoder ()
-  {
-    printf ("[codec] FF base encoder destroying..\n");
-    if(  _isMT)
+uint8_t   ffmpegEncoder::encode(ADMImage *in,ADMBitstream *out)
+{
+    int32_t sz = 0;
+
+    encodePreamble (in->data);
+    if ((sz = avcodec_encode_video (_context, out->data, _w * _h * 3, &_frame)) < 0)
+        return 0;
+    postAmble(out,sz);
+    return 1;
+}
+ffmpegEncoder::~ffmpegEncoder ()
+{
+  printf ("[codec] FF base encoder destroying..\n");
+  if (_isMT)
     {
-                printf ("[codec] killing threads\n");
-                avcodec_thread_free(_context);
-                _isMT=0;
+      printf ("[codec] killing threads\n");
+      avcodec_thread_free (_context);
+      _isMT = 0;
     }
-    stopEncoder ();
-  }
+  stopEncoder ();
+}
 
 /*
    	Initialize codec in Q mode
 
 */
-uint8_t
-ffmpegEncoder::getResult (void *ress)
-{
-  memcpy (ress, &res, sizeof (res));
-  return 1;
-}
 
 uint8_t
 ffmpegEncoder::encodePreamble (uint8_t * in)
@@ -150,13 +164,13 @@ ffmpegEncoder::gopMpeg1 (void)
 {
   // small gop, 2 b frames allowed
   // min bitrate 500 max bitrate 2200
-int rate;
+  int rate;
 
-        rate=_context->time_base.den;
-        rate=rate*1000;
-        rate/=_context->time_base.num;
+  rate = _context->time_base.den;
+  rate = rate * 1000;
+  rate /= _context->time_base.num;
 
-        _context->me_range=255; // Fix motion vector for picky players (pioneer)
+  _context->me_range = 255;	// Fix motion vector for picky players (pioneer)
 
   if (_id == FF_MPEG2)
     {
@@ -182,30 +196,30 @@ int rate;
     }
   if (_settingsPresence)
     {
-    	if(_settings.widescreen) 
+      if (_settings.widescreen)
 	{
-		_context->sample_aspect_ratio.num=16;
-		_context->sample_aspect_ratio.den=9;
+	  _context->sample_aspect_ratio.num = 16;
+	  _context->sample_aspect_ratio.den = 9;
 	}
-	else
+      else
 	{
-		_context->sample_aspect_ratio.num=4;
-		_context->sample_aspect_ratio.den=3;
+	  _context->sample_aspect_ratio.num = 4;
+	  _context->sample_aspect_ratio.den = 3;
 	}
 
       _context->rc_max_rate_header = _settings.maxBitrate * 8;	//1800*1000;// 2400 max, 700 min
-      _context->rc_buffer_size_header=_settings.bufferSize * 8 * 1024;
+      _context->rc_buffer_size_header = _settings.bufferSize * 8 * 1024;
       // If we don't have a maxrate, don't set buffer_size
-      if(1 && !_settings.override_ratecontrol) // FIXME
-      
-      {
-      		_context->rc_buffer_size = _context->rc_buffer_size_header;
-		_context->rc_max_rate    = _context->rc_max_rate_header;
-	}
-	else
+      if (1 && !_settings.override_ratecontrol)	// FIXME
+
 	{
-		_context->rc_buffer_size=0; // for xvid, no VBV so no ratecontrol
-		_context->rc_max_rate   = 0;
+	  _context->rc_buffer_size = _context->rc_buffer_size_header;
+	  _context->rc_max_rate = _context->rc_max_rate_header;
+	}
+      else
+	{
+	  _context->rc_buffer_size = 0;	// for xvid, no VBV so no ratecontrol
+	  _context->rc_max_rate = 0;
 	}
       _context->gop_size = _settings.gop_size;
 
@@ -214,7 +228,7 @@ int rate;
     {
       _context->rc_buffer_size = 200 * 8 * 1024;	// 40 for VCD  & 200 for SVCD
       _context->gop_size = _settings.gop_size;
-      
+
     }
   _context->rc_buffer_aggressivity = 1.0;
   _context->rc_initial_cplx = 3;
@@ -223,27 +237,29 @@ int rate;
 
   _context->scenechange_threshold = 0xfffffff;	// Don't insert I frame out of order
 
-  _frame.interlaced_frame=_settings.interlaced;
-  if (_settings.interlaced) 
-  	_frame.top_field_first=!_settings.bff;
-  
+  _frame.interlaced_frame = _settings.interlaced;
+  if (_settings.interlaced)
+    _frame.top_field_first = !_settings.bff;
+
 #if defined(CODEC_FLAG_INTERLACED_DCT)
   _context->flags |= _settings.interlaced ? CODEC_FLAG_INTERLACED_DCT : 0;
 #endif
 #if defined(CODEC_FLAG_INTERLACED_ME)
   _context->flags |= _settings.interlaced ? CODEC_FLAG_INTERLACED_ME : 0;
 #endif
-  
+
   //
   //_context->dsp_mask= FF_MM_FORCE;
   printf ("Mpeg12 settings:\n____________\n");
-  printf ("FF Max rate   (header) : %lu kbps\n", (_context->rc_max_rate_header) / 1000);
-  printf ("FF Buffer Size(header) : %lu bits / %lu kB\n", (_context->rc_buffer_size_header),
+  printf ("FF Max rate   (header) : %lu kbps\n",
+	  (_context->rc_max_rate_header) / 1000);
+  printf ("FF Buffer Size(header) : %lu bits / %lu kB\n",
+	  (_context->rc_buffer_size_header),
 	  _context->rc_buffer_size_header / (8 * 1024));
   printf ("FF Max rate   (rc) : %lu kbps\n", (_context->rc_max_rate) / 1000);
-  printf ("FF Buffer Size(rc) : %lu bits / %lu kB\n", (_context->rc_buffer_size),
-	  _context->rc_buffer_size / (8 * 1024));
-  
+  printf ("FF Buffer Size(rc) : %lu bits / %lu kB\n",
+	  (_context->rc_buffer_size), _context->rc_buffer_size / (8 * 1024));
+
   printf ("FF GOP Size    : %lu\n", _context->gop_size);
   return 1;
 }
@@ -257,45 +273,48 @@ ffmpegEncoder::initContext (void)
   // player compatiblity               
   if (_id == FF_MPEG1 || _id == FF_MPEG2)
     gopMpeg1 ();
- // if (_id == FF_HUFF || _id == FF_FFV1)
-    _context->strict_std_compliance = -1;
+  // if (_id == FF_HUFF || _id == FF_FFV1)
+  _context->strict_std_compliance = -1;
+  if (_id == FF_HUFF || _id == FF_FFV1 ||_id == FF_FFHUFF )
+    _context->strict_std_compliance = -2;
+  
   switch (_id)
     {
     case FF_MPEG4:
-      encoderMT();
-      WRAP_Open(CODEC_ID_MPEG4);
+      encoderMT ();
+      WRAP_Open (CODEC_ID_MPEG4);
       break;
     case FF_MSMP4V3:
-      WRAP_Open(CODEC_ID_MSMPEG4V3);
+      WRAP_Open (CODEC_ID_MSMPEG4V3);
       break;
     case FF_MPEG1:
-      encoderMT();
-      WRAP_Open(CODEC_ID_MPEG1VIDEO);
+      encoderMT ();
+      WRAP_Open (CODEC_ID_MPEG1VIDEO);
       break;
     case FF_MPEG2:
-      encoderMT();
-      WRAP_Open(CODEC_ID_MPEG2VIDEO);
+      encoderMT ();
+      WRAP_Open (CODEC_ID_MPEG2VIDEO);
       break;
     case FF_H263:
-      WRAP_Open(CODEC_ID_H263);
+      WRAP_Open (CODEC_ID_H263);
       break;
     case FF_H263P:
-      WRAP_Open(CODEC_ID_H263P);
+      WRAP_Open (CODEC_ID_H263P);
       break;
     case FF_HUFF:
-      WRAP_Open(CODEC_ID_HUFFYUV);
+      WRAP_Open (CODEC_ID_HUFFYUV);
       break;
     case FF_FFV1:
-      WRAP_Open(CODEC_ID_FFV1);
+      WRAP_Open (CODEC_ID_FFV1);
       break;
     case FF_MJPEG:
-      WRAP_Open(CODEC_ID_MJPEG);
+      WRAP_Open (CODEC_ID_MJPEG);
       break;
     case FF_FFHUFF:
-        WRAP_Open(CODEC_ID_FFVHUFF);
-        break;
+      WRAP_Open (CODEC_ID_FFVHUFF);
+      break;
     case FF_SNOW:
-      WRAP_Open(CODEC_ID_SNOW);
+      WRAP_Open (CODEC_ID_SNOW);
       break;
     default:
       ADM_assert (0);
@@ -309,21 +328,22 @@ ffmpegEncoder::initContext (void)
   return 1;
 
 }
-void ffmpegEncoder::encoderMT(void)
+void
+ffmpegEncoder::encoderMT (void)
 {
-uint32_t nbThread=0;
-                
-        nbThread=ADM_useNbThreads();
-        if(nbThread)
-        {
-                printf("[codec]Enabling MT encoder with %u threads\n",nbThread);
-                 if(0>avcodec_thread_init(_context,nbThread))
-                 {
-                        printf("[codec]Failed!!\n");
-                        return ;
-                 }
-                _isMT=1;
-        }
+  uint32_t nbThread = 0;
+
+  nbThread = ADM_useNbThreads ();
+  if (nbThread)
+    {
+      printf ("[codec]Enabling MT encoder with %u threads\n", nbThread);
+      if (0 > avcodec_thread_init (_context, nbThread))
+	{
+	  printf ("[codec]Failed!!\n");
+	  return;
+	}
+      _isMT = 1;
+    }
 
 }
 /*
@@ -380,7 +400,9 @@ ffmpegEncoderCQ::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
       _statfile = NULL;
 
     }
- _context->time_base= (AVRational){1000,fps1000};
+  _context->time_base = (AVRational)
+  {
+  1000, fps1000};
 /*
   _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;
@@ -391,44 +413,19 @@ ffmpegEncoderCQ::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   return initContext ();
 }
 
-uint32_t ffmpegEncoder::getCodedFrame(void)
+uint32_t ffmpegEncoder::getCodedFrame (void)
 {
-	return _last_coded_frame;
+  return _last_coded_frame;
 }
 
-uint8_t
-  ffmpegEncoderCQ::encode (ADMImage * in,
-			   uint8_t * out, uint32_t * len, uint32_t * flags)
+uint8_t ffmpegEncoderCQ::encode (ADMImage * in, ADMBitstream * out)
 {
-  int32_t sz = 0;
-  uint32_t f;
-  encodePreamble (in->data);
-
+  int32_t    sz = 0;
+  uint32_t    f;
+  uint8_t    r=0;
+  
   _frame.quality = (int) floor (FF_QP2LAMBDA * _qual + 0.5);
-
-  //_context->quality=_qual;
-
-  if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
-    return 0;
-  _last_coded_frame=_context->real_pict_num;
-  *len = (uint32_t) sz;
-  f = frameType ();
-  if (flags)
-    *flags = f;
-  res.is_key_frame = 0;
-  if (f == AVI_KEY_FRAME)
-    res.is_key_frame = 1;
-  res.texture_bits = _context->i_tex_bits + _context->p_tex_bits;
-  res.motion_bits = _context->mv_bits;
-  res.total_bits = sz * 8;	// bytes -> bits
-  res.quantizer = 2;
-  res.out_quantizer =
-    (int) floor (_context->coded_frame->quality / (float) FF_QP2LAMBDA);
-
-
-  //      printf("text : %d motion %d\n",res.texture_bits,res.motion_bits);
-
-
+  r=ffmpegEncoder::encode(in,out);
   if (_vbr)			// update for lavcodec internal
     {
       if (!_statfile)
@@ -460,8 +457,7 @@ _____________________________________________
 
 */
 
-uint8_t
-ffmpegEncoderCBR::init (uint32_t val, uint32_t fps1000)
+uint8_t ffmpegEncoderCBR::init (uint32_t val, uint32_t fps1000)
 {
 //       mpeg4_encoder
   //
@@ -471,9 +467,11 @@ ffmpegEncoderCBR::init (uint32_t val, uint32_t fps1000)
   mplayer_init ();
 /*  _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;*/
-_context->time_base= (AVRational){1000,fps1000};
- 
- _context->bit_rate = _br;
+  _context->time_base = (AVRational)
+  {
+  1000, fps1000};
+
+  _context->bit_rate = _br;
 
   printf ("--> br: %lu", _br);
 
@@ -481,80 +479,22 @@ _context->time_base= (AVRational){1000,fps1000};
 
 }
 
-uint8_t
-  ffmpegEncoderCBR::encode (ADMImage * in,
-			    uint8_t * out, uint32_t * len, uint32_t * flags)
-{
-  int32_t sz = 0;
-
-  encodePreamble (in->data);
-  _context->bit_rate = _br; // ???
-
-
-  if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
-    return 0;
-  _last_coded_frame=_context->real_pict_num;
-  *len = (uint32_t) sz;
-  if (flags)
-    *flags = frameType ();
-
-  res.total_bits = sz * 8;      // bytes -> bits
-  res.out_quantizer = (int) floor (_context->coded_frame->quality / (float) FF_QP2LAMBDA);
-
-  return 1;
-
-}
 
 //------------------------------------------------------------------------------
 //              VBR
 //------------------------------------------------------------------------------
-uint8_t
-  ffmpegEncoderVBR::encode (ADMImage * in,
-			    uint8_t * out, uint32_t * len, uint32_t * flags)
+uint8_t ffmpegEncoderVBR::encode (ADMImage * in, ADMBitstream * out)
 {
-  uint16_t q;
-  uint8_t kf;
+    uint16_t q;
+    uint8_t kf;
 
-  q = (*flags) >> 8;
-  kf = (*flags) & 1;
-
-  return encodeVBR (in, out, len, flags, q, kf);
+    q=out->in_quantizer;
+    _frame.quality = (int) floor (FF_QP2LAMBDA * q + 0.5);
+    return ffmpegEncoder::encode(in,out);
 
 }
-
-/*----------------------------- ffmpeg VBR , internal 2 pass engine --------------------*/
-uint8_t
-  ffmpegEncoderVBR::encodeVBR (ADMImage * in,
-			       uint8_t * out,
-			       uint32_t * len,
-			       uint32_t * flags, uint16_t nq,
-			       uint8_t forcekey)
-{
-  UNUSED_ARG (nq);
-  UNUSED_ARG (forcekey);
-  int32_t sz = 0;
-
-  encodePreamble (in->data);
-
-
-  if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
-    return 0;
-  _last_coded_frame=_context->real_pict_num;
-  *len = (uint32_t) sz;
-  if (flags)
-    *flags = frameType ();
-  res.out_quantizer =
-    (int) floor (_context->coded_frame->quality / (float) FF_QP2LAMBDA);
-  return 1;
-
-
-}
-
 /*
    			val is the average bitrate wanted, else it is useless
-
-
-
 */
 uint8_t
 ffmpegEncoderVBR::init (uint32_t val, uint32_t fps1000)
@@ -569,7 +509,9 @@ ffmpegEncoderVBR::init (uint32_t val, uint32_t fps1000)
 //   _context->frame_rate_base = 1000;
 //   _context->frame_rate = fps1000;
 
-_context->time_base= (AVRational){1000,fps1000};
+  _context->time_base = (AVRational)
+  {
+  1000, fps1000};
 
   /* If internal 2 passes mode is selected ... */
   _context->flags |= CODEC_FLAG_PASS2;
@@ -604,53 +546,14 @@ ffmpegEncoderVBR::~ffmpegEncoderVBR ()
 
 //--------------------- FFmpeg VBR, external Qzation engine ------------------
 uint8_t
-  ffmpegEncoderVBRExternal::encode (ADMImage * in,
-				    uint8_t * out,
-				    uint32_t * len, uint32_t * flags)
+ffmpegEncoderVBRExternal::encode (ADMImage * in, ADMBitstream * out)
 {
   uint16_t q;
   uint8_t kf;
 
-  q = (*flags) >> 16;
-  kf = (*flags) & 1;
-
-  return encodeVBR (in, out, len, flags, q, kf);
-
-}
-
-uint8_t
-  ffmpegEncoderVBRExternal::encodeVBR (ADMImage * in,
-				       uint8_t * out,
-				       uint32_t * len,
-				       uint32_t * flags,
-				       uint16_t nq, uint8_t forcekey)
-{
-  UNUSED_ARG (nq);
-  UNUSED_ARG (forcekey);
-  int32_t sz = 0;
-  uint32_t f;
-  encodePreamble (in->data);
-
-
-
-  //_frame.quality=nq;
-  _frame.quality = (int) floor (FF_QP2LAMBDA * nq + 0.5);
-  if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
-    return 0;
-  _last_coded_frame=_context->real_pict_num;
-  *len = (uint32_t) sz;
-  f = frameType ();
-  if (flags)
-    *flags = f;
-  res.out_quantizer =
-    (int) floor (_context->coded_frame->quality / (float) FF_QP2LAMBDA);
-  if (f == AVI_KEY_FRAME)
-    res.is_key_frame = 1;
-  else
-    res.is_key_frame = 0;
-  return 1;
-
-
+  q=out->in_quantizer;
+  _frame.quality = (int) floor (FF_QP2LAMBDA * q + 0.5);
+  return ffmpegEncoder::encode(in,out);
 }
 
 
@@ -667,7 +570,9 @@ ffmpegEncoderVBRExternal::init (uint32_t val, uint32_t fps1000)
 
 /*  _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;*/
-  _context->time_base= (AVRational){1000,fps1000};
+  _context->time_base = (AVRational)
+  {
+  1000, fps1000};
   _context->flags |= CODEC_FLAG_QSCALE;;
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
@@ -836,18 +741,6 @@ ffmpegEncoder::init (uint32_t val, uint32_t fps1000, uint8_t sw)
   return init (val, fps1000);
 }
 
-uint8_t
-  ffmpegEncoder::encode (ADMImage * in, uint8_t * out, uint32_t * len,
-			 uint32_t * flags)
-{
-  UNUSED_ARG (in);
-  UNUSED_ARG (out);
-  UNUSED_ARG (len);
-  UNUSED_ARG (flags);
-  ADM_assert (0);
-  return 0;
-}
-
 //------------------------------
 uint8_t
 ffmpegEncoderHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
@@ -856,7 +749,9 @@ ffmpegEncoderHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   UNUSED_ARG (vbr);
   mplayer_init ();
 
-_context->time_base= (AVRational){1000,fps1000};
+  _context->time_base = (AVRational)
+  {
+  1000, fps1000};
 //   _context->frame_rate_base = 1000;
 //   _context->frame_rate = fps1000;
 
@@ -867,35 +762,10 @@ _context->time_base= (AVRational){1000,fps1000};
 
   return initContext ();
 }
-
-
-
-uint8_t
-  ffmpegEncoderHuff::encode (ADMImage * in,
-			     uint8_t * out, uint32_t * len, uint32_t * flags)
-{
-  int32_t sz = 0;
-
-  encodePreamble (in->data);
-
-
-
-  //_context->quality=_qual;
-
-  if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
-    return 0;
-  _last_coded_frame=_context->real_pict_num;
-  *len = (uint32_t) sz;
-  if (flags)
-    *flags = AVI_KEY_FRAME;
-  res.is_key_frame = _frame.key_frame;
-  return 1;
-
-}
 //__________________________________
 //------------------------------
 uint8_t
-ffmpegEncoderFFHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
+  ffmpegEncoderFFHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
 {
   UNUSED_ARG (val);
   UNUSED_ARG (vbr);
@@ -903,7 +773,9 @@ ffmpegEncoderFFHuff::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
 
 /*  _context->frame_rate_base = 1000;
   _context->frame_rate = fps1000;*/
-_context->time_base= (AVRational){1000,fps1000};
+  _context->time_base = (AVRational)
+  {
+  1000, fps1000};
 
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
@@ -912,30 +784,6 @@ _context->time_base= (AVRational){1000,fps1000};
   return initContext ();
 }
 
-
-
-uint8_t
-  ffmpegEncoderFFHuff::encode (ADMImage * in,
-                             uint8_t * out, uint32_t * len, uint32_t * flags)
-{
-  int32_t sz = 0;
-
-  encodePreamble (in->data);
-
-
-
-  //_context->quality=_qual;
-
-  if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
-    return 0;
-  _last_coded_frame=_context->real_pict_num;
-  *len = (uint32_t) sz;
-  if (flags)
-    *flags = AVI_KEY_FRAME;
-  res.is_key_frame = _frame.key_frame;
-  return 1;
-
-}
 
 //_______________________________________
 uint8_t
@@ -959,7 +807,9 @@ ffmpegEncoderFFV1::init (uint32_t val, uint32_t fps1000, uint8_t vbr)
   UNUSED_ARG (val);
   UNUSED_ARG (vbr);
   mplayer_init ();
-_context->time_base= (AVRational){1000,fps1000};
+  _context->time_base = (AVRational)
+  {
+  1000, fps1000};
 //   _context->frame_rate_base = 1000;
 //   _context->frame_rate = fps1000;
 
@@ -969,31 +819,6 @@ _context->time_base= (AVRational){1000,fps1000};
   _context->gop_size = 250;
   printf ("FFV1 codec initializing...\n");
   return initContext ();
-}
-
-
-
-uint8_t
-  ffmpegEncoderFFV1::encode (ADMImage * in,
-			     uint8_t * out, uint32_t * len, uint32_t * flags)
-{
-  int32_t sz = 0;
-
-  encodePreamble (in->data);
-
-
-
-  //_context->quality=_qual;
-
-  if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
-    return 0;
-  _last_coded_frame=_context->real_pict_num;
-  *len = (uint32_t) sz;
-  if (flags)
-    *flags = AVI_KEY_FRAME;
-  res.is_key_frame = _frame.key_frame;
-  return 1;
-
 }
 
 /*---
@@ -1014,7 +839,9 @@ uint8_t
 
 //   _context->frame_rate_base = 1000;
 //   _context->frame_rate = fps1000;
-_context->time_base= (AVRational){1000,fps1000};
+  _context->time_base = (AVRational)
+  {
+  1000, fps1000};
   _context->flags = CODEC_FLAG_QSCALE;
   _context->bit_rate = 0;
   _context->bit_rate_tolerance = 1024 * 8 * 1000;
@@ -1026,28 +853,9 @@ _context->time_base= (AVRational){1000,fps1000};
 
 
 uint8_t
-  ffmpegEncoderFFMjpeg::encode (ADMImage * in,
-				uint8_t * out, uint32_t * len,
-				uint32_t * flags)
+ffmpegEncoderFFMjpeg::encode (ADMImage * in, ADMBitstream * out)
 {
-  int32_t sz = 0;
-
-  encodePreamble (in->data);
-
-
-
-//       _frame.quality=_qual;
   _frame.quality = (int) floor (FF_QP2LAMBDA * _qual + 0.5);
-
-
-  if ((sz = avcodec_encode_video (_context, out, _w * _h * 3, &_frame)) < 0)
-    return 0;
-  _last_coded_frame=_context->real_pict_num;
-  *len = (uint32_t) sz;
-  if (flags)
-    *flags = AVI_KEY_FRAME;
-  res.is_key_frame = _frame.key_frame;
-  return 1;
-
+  return ffmpegEncoder::encode(in,out);
 }
 #endif
