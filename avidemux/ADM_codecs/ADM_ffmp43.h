@@ -162,6 +162,10 @@ protected:
 
 public:
   decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
+  virtual uint8_t bFramePossible (void)
+  {
+      return 1;
+  }
 
 };
 class decoderFFhuff:public decoderFF

@@ -163,6 +163,7 @@ uint8_t    _3GPHeader::close( void )
 	DEL(Sync);
 	DEL(SttsN);
 	DEL(SttsC);
+        DEL(Ctts);
  	return 1;
 }
 //
@@ -179,6 +180,8 @@ _3GPHeader::_3GPHeader(void)
 	 Sync=NULL;
 	 SttsN=NULL;
 	 SttsC=NULL;
+         Ctts=NULL;
+         nbCtts=0;
         nbAudioTrack=0;
         _currentAudioTrack=0;
         _reordered=0;
@@ -345,6 +348,21 @@ uint8_t    _3GPHeader::open(char *name)
         }
         fseek(_fd,0,SEEK_SET);
 
+        /* Do we have a ctts atom ? if so it contains B frame and we can guesstimate them */
+        if(Ctts)
+        {
+            uint32_t scope=nbCtts;
+            if(scope>_videostream.dwLength) scope=_videostream.dwLength;
+            for(uint32_t i=0;i<scope;i++)
+            {
+                if( _tracks[0].index[i].intra!=AVI_KEY_FRAME && 
+                    (10>Ctts[i] )) //|| Ctts[i]>0xfffff000))
+                    _tracks[0].index[i].intra=AVI_B_FRAME;
+                
+            }
+            _tracks[0].index[0].intra=AVI_KEY_FRAME;
+            
+        }
 
         printf("3gp/mov file successfully read..\n");
         return 1;
@@ -617,17 +635,40 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					break;
                         case MKFCCR('c','t','t','s'): // Composition time to sample             
                                 {
-                                int nbCtts=0;
+                                    uint32_t n,i,j,k,v;
                                 printf("ctts:%lu\n",tom.read32()); // version & flags
-                                nbCtts=tom.read32();
-                                printf("Composition Time ctts atom found (%lu)\n",nbCtts);
-                                printf("Using myscale %lu\n",myScale);
-                                if(nbCtts>5) nbCtts=45;
-                                for(i=0;i<nbCtts;i++)
-                                {
-                                        printf("-->ctts: pts/dts nb :%02u",tom.read32());
-                                        printf("  offset:%04u (unscaled)\n",tom.read32());       
-                                }
+                                n=tom.read32();
+                                
+                                    Ctts=new uint32_t[n*4]; // keep a safe margin
+                                
+                                    for(i=0;i<n;i++)
+                                    {
+                                        j=tom.read32();
+                                        v=tom.read32();
+                                        if(j>10)
+                                        {
+                                            printf("Too much element %u\n",j);
+                                            nbCtts=0;
+                                            break;
+                                        }
+                                        if(i<20)
+                                        {
+                                            printf("Ctts: nb: %u (%x) val:%u (%x)\n",j,j,v,v);   
+                                        }
+                                        for(k=0;k<j;k++)
+                                        {
+                                            Ctts[nbCtts++]=v;
+                                        }
+                                    }
+                                    if(!nbCtts)
+                                    {
+                                        delete [] Ctts;
+                                        Ctts=NULL;
+                                        printf("Destroying Ctts, seems invalid\n");
+                                    }
+                                    printf("Found %u elements\n",nbCtts);
+                                
+                                
                                 tom.skipAtom(); 
                                 }
                                 break;  

@@ -98,7 +98,7 @@ protected:
          uint32_t  nbAudioTrack;
 	 uint32_t *Sz,*Co,*Sc;
 	 uint32_t *Sn,*Sync;
-	 uint32_t *SttsN,*SttsC;
+	 uint32_t *SttsN,*SttsC,*Ctts,nbCtts;
 
 
 	uint8_t		buildIndex(	_3gpTrack *track,
