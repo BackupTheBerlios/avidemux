@@ -311,13 +311,13 @@ UNUSED_ARG(mode);
 #ifdef CYG_MANGLING
 			if( !tmpdir )
 				tmpdir = "c:";
-			snprintf(tmpname,256,"%s%s.idx",tmpdir,strrchr(name,'\'));
+			snprintf(tmpname,256,"%s%s.idx",tmpdir,strrchr(name,'\\'));
 #else
 			if( !tmpdir )
 				tmpdir = "/tmp";
 			snprintf(tmpname,256,"%s%s.idx",tmpdir,strrchr(name,'/'));
 #endif
-			tmpname[255] = '\0';
+			tmpname[255] = 0;
 		}
         	if(ADM_fileExist(tmpname)){
 			return addFile(tmpname);
