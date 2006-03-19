@@ -297,7 +297,12 @@ UNUSED_ARG(mode);
 	       return addFile(tmpname);
         }
 	/* check for "Read-only file system" */
-	{ int fd = open(tmpname,O_CREAT|O_EXCL|O_WRONLY,S_IRUSR|S_IWUSR);
+	{
+#ifdef CYG_MANGLING		
+		int fd = open(tmpname,O_CREAT|O_EXCL|O_WRONLY);
+#else
+		int fd = open(tmpname,O_CREAT|O_EXCL|O_WRONLY,S_IRUSR|S_IWUSR);
+#endif
 		if( fd >= 0 ){
 			close(fd);
 			unlink(tmpname);
