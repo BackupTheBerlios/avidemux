@@ -455,19 +455,30 @@ double p,d;
   	AVPacket pkt;
             av_init_packet(&pkt);
 	    
-	p=bitstream->ptsFrame+1;      // Pts
+        p=bitstream->ptsFrame+1;      // Pts           // Time p/fps1000=out/den  out=p*den*1000/fps1000
 	p=(p*1000*1000*1000);
-	p=p/_fps1000;
+        p=p/_fps1000;                  // in us
 	
         d=bitstream->dtsFrame;		// dts
 	d=(d*1000*1000*1000);
 	d=d/_fps1000;
 	
 	
-	_curDTS=(int64_t)floor(d);
-	
+	_curDTS=(int64_t)floor(d);	
+        
+        // Rescale
+#define RESCALE(x) x=x*video_st->codec->time_base.den*1000.;\
+                   x=x/_fps1000;
+        
+        p=bitstream->ptsFrame+1;
+        RESCALE(p);
+        
+        d=bitstream->dtsFrame;
+        RESCALE(d);
+        
 	pkt.dts=(int64_t)floor(d);
 	pkt.pts=(int64_t)floor(p);
+        
        // printf("Lavformat : Pts :%u dts:%u",displayframe,frameno);
 	aprintf("Lavformat : Pts :%llu dts:%llu",pkt.pts,pkt.dts);
 	pkt.stream_index=0;
