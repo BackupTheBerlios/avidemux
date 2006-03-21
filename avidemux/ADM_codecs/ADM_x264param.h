@@ -13,32 +13,51 @@
 #define __X264_PARM_
 typedef struct ADM_x264Param
 {
-
-  uint32_t qmin;
-  uint32_t qmax;
-  uint32_t cabac;
-  uint32_t maxKf;
-  uint32_t minKf;
-  uint32_t nbBframe;
-  uint32_t globalHeader;
-  uint32_t nbThreads;
-
-  // 
-  char *logfile;
+  uint32_t  globalHeader;
+  uint32_t  nbThreads;
+  char      *logfile;
   //
-  uint32_t sceneCut;
-
+  uint32_t KeyframeBoost;
+  uint32_t BframeReduction;
+  uint32_t BitrateVariability;
+  //
+  uint32_t  MinQp;
+  uint32_t  MaxQp;
+  uint32_t  QpStep;
+  //
+  uint32_t  SceneCut;
+  uint32_t  MinIdr;
+  uint32_t  MaxIdr;
+  //
+  uint32_t  _8x8;
+  uint32_t  _8x8P;
+  uint32_t  _8x8B;
+  uint32_t  _4x4;
+  uint32_t  _8x8I;
+  uint32_t  _4x4I;
+  //
+  uint32_t  MaxBFrame;
+  int32_t   Bias;
+  //
+  uint32_t BasReference;
+  uint32_t BidirME;
+  uint32_t Adaptative;
+  uint32_t Weighted;
+  uint32_t DirectMode;
+  //
+  uint32_t PartitionDecision;
+  uint32_t Method;
+  uint32_t AR_Num;
+  uint32_t AR_Den;
+  uint32_t DeblockingFilter;
+  int32_t  Strength;
+  int32_t  Threshold;
+  uint32_t CABAC;
+  uint32_t Trellis;
+  uint32_t ChromaME;
   //
 
-  uint32_t b_bframe_adaptive;
-
-  // inloop deblocking filter
-
-  uint32_t b_deblocking_filter;
-  int32_t i_deblocking_filter_alphac0;
-  int32_t i_deblocking_filter_beta;
-
-  // Block size
+  //
 
 } ADM_x264Param;
 

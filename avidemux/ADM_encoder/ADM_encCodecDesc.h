@@ -516,16 +516,49 @@ COMPRES_PARAMS Xvid4Codec = {
 #include "ADM_encoder/adm_encx264.h"
 
 ADM_x264Param x264Extra = {
-
-
-  2,				//uint32_t qmin;
-  51,				//uint32_t qmax;
-  1,				//uint32_t cabac;
-  250,				//uint32_t maxKf;
-  5,				//uint32_t minKf;
-  2,				//uint32_t nbBframe;  
-  0,				// uint32_t esAtom
-  0				// nbThreads
+0,//     uint32_t  globalHeader;
+0,//     uint32_t  nbThreads;
+NULL,//     char      *logfile;
+//     //
+40,//     uint32_t KeyframeBoost;
+30,//     uint32_t BframeReduction;
+60,//     uint32_t BitrateVariability;
+//     //
+10,//     uint32_t  MinQp;
+51,//     uint32_t  MaxQp;
+4,//     uint32_t  QpStep;
+//     //
+40,//     uint32_t  SceneCut;
+25,//     uint32_t  MinIdr;
+250,//     uint32_t  MaxIdr;
+//     //
+1,//     uint32_t  _8x8;
+1,//     uint32_t   _8x8P;
+1,//     uint32_t   _8x8B;
+0,//     uint32_t   _4x4;
+1,//     uint32_t   _8X8I;
+1,//     uint32_t   _4x4I;
+//     //
+2,//     uint32_t  MaxBFrame;
+0,//     int32_t   Bias;
+//     //
+0,//     uint32_t BasReference;
+0,//     uint32_t BidirME;
+1,//     uint32_t Adaptative;
+1,//     uint32_t Weighted;
+1,//     uint32_t DirectMode;
+//     //
+4,//     uint32_t PartitionDecision;
+1,//     uint32_t Method;
+1,//     uint32_t AR_Num;
+1,//     uint32_t AR_Den;
+1,//     uint32_t DeblockingFilter;
+0,//     int32_t  Strength;
+0,//     int32_t  Threshold;
+1,//     uint32_t CABAC;
+1,//     uint32_t Trellis;
+1 //        ChromaME
+  
 };
 extern uint8_t DIA_x264 (COMPRES_PARAMS * conf);
 COMPRES_PARAMS x264Codec = {

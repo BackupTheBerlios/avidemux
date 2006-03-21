@@ -91,6 +91,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
 //        param.i_maxframes=0;
   if (zparam)
     {
+        /*
       param.i_frame_reference = 1;	//  ref frame like mpeg1/2/4
       param.i_keyint_max = zparam->maxKf;	// Max intra distance
       param.i_keyint_min = zparam->minKf;	// Min intra distance
@@ -98,6 +99,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
       param.b_cabac = zparam->cabac;	// Arith coding on/off
       if (zparam->globalHeader)
 	param.b_repeat_headers = 0;	// Global header
+        */
     }
 
 
