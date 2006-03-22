@@ -46,7 +46,8 @@ typedef struct avcc		// for avcc atom
 
 
 // Yes, ugly FIXME
-static x264_param_t param;
+static x264_param_t     param;
+static ADM_x264Param    admParam;
 
 /*
 uint32_t X264Encoder::getPTS_FrameNum(void)
@@ -55,11 +56,9 @@ uint32_t X264Encoder::getPTS_FrameNum(void)
     return ptsFrame;
 }
 */
-//********************************************* 
-// Set the common stuff prior to codec opening
-// ratecontrol stuff is left to the caller
-// to initialize
-//*********************************************
+//**********************************************************
+// Do the translation avidemux parameters->x264 parameters
+//**********************************************************
 uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
 {
 
@@ -81,28 +80,54 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   param.i_height = _h;
   param.i_csp = X264_CSP_I420;
 
-  param.vui.i_sar_width = 1;	// FIXME
-  param.vui.i_sar_height = 1;
+#define MKPARAM(x,y) param.x = zparam->y;
+  
+  MKPARAM(vui.i_sar_width , AR_Num);	// FIXME
+  MKPARAM(vui.i_sar_height, AR_Den);
 
   param.i_fps_num = fps1000;
   param.i_fps_den = 1000;
-// ?
-
-//        param.i_maxframes=0;
-  if (zparam)
-    {
-        /*
-      param.i_frame_reference = 1;	//  ref frame like mpeg1/2/4
-      param.i_keyint_max = zparam->maxKf;	// Max intra distance
-      param.i_keyint_min = zparam->minKf;	// Min intra distance
-      param.i_bframe = zparam->nbBframe;	// 2 bframe
-      param.b_cabac = zparam->cabac;	// Arith coding on/off
-      if (zparam->globalHeader)
-	param.b_repeat_headers = 0;	// Global header
-        */
-    }
-
-
+  
+  // KeyframeBoost ?
+  // BframeReduction ?
+  // BitrateVariability ?
+  // PartitionDecision ?
+  
+  param.i_frame_reference = 1;
+  
+  MKPARAM(analyse.i_direct_mv_pred,DirectMode+1);
+  MKPARAM(rc.i_qp_min,MinQp);
+  MKPARAM(rc.i_qp_max,MaxQp);
+  MKPARAM(rc.i_qp_max,QpStep);
+  MKPARAM(i_scenecut_threshold,SceneCut);
+  MKPARAM(i_keyint_min,MinIdr);
+  MKPARAM(i_keyint_max,MaxIdr);
+  MKPARAM(i_bframe,MaxBFrame);
+  MKPARAM(i_bframe_bias,Bias);
+  MKPARAM( b_bframe_pyramid,BasReference );
+  MKPARAM(analyse. b_bidir_me,BidirME );
+  MKPARAM( b_bframe_adaptive, Adaptative);
+  MKPARAM( analyse.b_weighted_bipred, Weighted);
+  MKPARAM( b_cabac , CABAC);
+  MKPARAM( analyse.i_trellis, Trellis);
+  
+  MKPARAM(analyse.b_chroma_me,ChromaME);
+  MKPARAM(b_deblocking_filter,DeblockingFilter);
+  MKPARAM(i_deblocking_filter_alphac0,Strength );
+  MKPARAM(i_deblocking_filter_beta, Threshold);
+  
+  MKPARAM(analyse.i_me_method,Method);
+//  MKPARAM(PartitionDecision,Method);
+  MKPARAM(analyse.b_transform_8x8,_8x8);
+  
+#define MES(x,y) if(zparam->x) {param.analyse.inter |=X264_ANALYSE_##y;}
+  param.analyse.inter=0;
+  MES(  _8x8P,  PSUB16x16);
+  MES(  _8x8B,  BSUB16x16);
+  MES(  _4x4,   PSUB8x8);
+  MES(  _8x8I,  I8x8);
+  MES(  _4x4I,  I4x4);
+  param.i_log_level=X264_LOG_INFO;
   xhandle = x264_encoder_open (&param);
   if (!xhandle)
     return 0;
@@ -255,6 +280,7 @@ uint8_t
   printf ("X264 CQ\n");
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
+  memcpy(&admParam,zparam,sizeof(admParam));
 
 //  param.rc.i_rc_buffer_size=-1;
   param.rc.i_qp_constant = val;
@@ -273,6 +299,8 @@ uint8_t
   printf ("X264 pass CBR\n");
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
+  memcpy(&admParam,zparam,sizeof(admParam));
+  
   param.rc.b_cbr = 1;
   param.rc.i_bitrate = val / 1000;
 //  param.rc.i_rc_buffer_size=val/1000;
@@ -291,6 +319,7 @@ uint8_t
   printf ("X264 pass 1\n");
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
+  memcpy(&admParam,zparam,sizeof(admParam));
 
 //  param.rc.i_rc_buffer_size=-1;
   param.rc.i_qp_constant = 2;
@@ -316,6 +345,8 @@ uint8_t
   printf ("X264 pass 2\n");
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
+  
+  memcpy(&admParam,zparam,sizeof(admParam));
 
   param.rc.b_cbr = 1;
   param.rc.i_bitrate = val;
