@@ -128,18 +128,24 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MES(  _8x8I,  I8x8);
   MES(  _4x4I,  I4x4);
   param.i_log_level=X264_LOG_INFO;
+  
+  if(zparam->globalHeader)
+      param.b_repeat_headers=0;
+  else
+      param.b_repeat_headers=1;
   xhandle = x264_encoder_open (&param);
   if (!xhandle)
     return 0;
 
   _handle = (void *) xhandle;
-  _pic = (void *) new
-    x264_picture_t;
+  _pic = (void *) new    x264_picture_t;
   printf ("X264 init ok (atom mode : %d)\n", zparam->globalHeader);
   if (param.i_threads > 1)
     printf ("X264 using %d threads\n", param.i_threads);
   if (zparam->globalHeader)
+  {
     return createHeader ();
+  }
   else
     return 1;
 
