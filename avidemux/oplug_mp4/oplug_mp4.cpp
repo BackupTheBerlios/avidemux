@@ -348,6 +348,7 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
                 printf("Pass2 ignition failed\n");
                 return 0;
         }
+        encoding_gui->setPhasis ("2nd Pass");
         return 1;
 }
 void end (void)
