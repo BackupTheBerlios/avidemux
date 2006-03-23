@@ -80,7 +80,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   param.i_height = _h;
   param.i_csp = X264_CSP_I420;
 
-#define MKPARAM(x,y) param.x = zparam->y;
+#define MKPARAM(x,y) {param.x = zparam->y;printf(#x" = %d\n",param.x);}
   
   MKPARAM(vui.i_sar_width , AR_Num);	// FIXME
   MKPARAM(vui.i_sar_height, AR_Den);
@@ -98,7 +98,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MKPARAM(analyse.i_direct_mv_pred,DirectMode+1);
   MKPARAM(rc.i_qp_min,MinQp);
   MKPARAM(rc.i_qp_max,MaxQp);
-  MKPARAM(rc.i_qp_max,QpStep);
+  MKPARAM(rc.i_qp_step,QpStep);
   MKPARAM(i_scenecut_threshold,SceneCut);
   MKPARAM(i_keyint_min,MinIdr);
   MKPARAM(i_keyint_max,MaxIdr);
@@ -110,7 +110,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MKPARAM( analyse.b_weighted_bipred, Weighted);
   MKPARAM( b_cabac , CABAC);
   MKPARAM( analyse.i_trellis, Trellis);
-  
+  MKPARAM(analyse.i_subpel_refine,PartitionDecision);
   MKPARAM(analyse.b_chroma_me,ChromaME);
   MKPARAM(b_deblocking_filter,DeblockingFilter);
   MKPARAM(i_deblocking_filter_alphac0,Strength );
@@ -120,7 +120,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
 //  MKPARAM(PartitionDecision,Method);
   MKPARAM(analyse.b_transform_8x8,_8x8);
   
-#define MES(x,y) if(zparam->x) {param.analyse.inter |=X264_ANALYSE_##y;}
+#define MES(x,y) if(zparam->x) {param.analyse.inter |=X264_ANALYSE_##y;printf(#x" is on\n");}
   param.analyse.inter=0;
   MES(  _8x8P,  PSUB16x16);
   MES(  _8x8B,  BSUB16x16);
@@ -285,7 +285,7 @@ uint8_t
 //  param.rc.i_rc_buffer_size=-1;
   param.rc.i_qp_constant = val;
   // should be ~ the same as CQ mode (?)
-  return preamble (fps1000, zparam);
+  return preamble (fps1000, &admParam);
 }
 X264EncoderCQ::~X264EncoderCQ ()
 {
@@ -321,6 +321,19 @@ uint8_t
   x264_param_default (&param);
   memcpy(&admParam,zparam,sizeof(admParam));
 
+  // in case of pass 1 we switch off some options
+  // As mplayer does it
+  admParam.PartitionDecision = 1;
+  admParam.Method = X264_ME_DIA;
+  
+  admParam._8x8 = 0;
+  admParam._8x8P = 0;
+  admParam._8x8B = 0;
+  admParam._8x8I = 0;
+  admParam._4x4I = 0;
+  admParam.Weighted = 0;
+  admParam.Trellis = 0;
+  
 //  param.rc.i_rc_buffer_size=-1;
   param.rc.i_qp_constant = 2;
 
@@ -331,7 +344,7 @@ uint8_t
   else
     param.rc.psz_stat_out = zparam->logfile;
   printf ("x264 codec using %s as statfile\n", param.rc.psz_stat_out);
-  return preamble (fps1000, zparam);
+  return preamble (fps1000, &admParam);
 }
 X264EncoderPass1::~X264EncoderPass1 ()
 {
@@ -342,7 +355,8 @@ uint8_t
   X264EncoderPass2::init (uint32_t val, uint32_t fps1000,
 			  ADM_x264Param * zparam)
 {
-  printf ("X264 pass 2\n");
+    val=val/1000; // bps->kdps
+  printf ("X264 pass 2, using bitrate of %u\n",val);
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
   
@@ -363,7 +377,7 @@ uint8_t
     param.rc.psz_stat_in = zparam->logfile;
   printf ("x264 codec using %s as statfile\n", param.rc.psz_stat_in);
 
-  return preamble (fps1000, zparam);
+  return preamble (fps1000, &admParam);
 }
 X264EncoderPass2::~X264EncoderPass2 ()
 {
