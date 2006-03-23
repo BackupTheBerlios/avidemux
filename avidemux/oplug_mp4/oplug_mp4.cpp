@@ -324,7 +324,7 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
                 for (uint32_t cf = 0; cf < total; cf++)
                 {
                         encoding_gui->setFrame (cf, total);
-                        if (encoding_gui->isAlive())
+                        if (!encoding_gui->isAlive())
                         {
                                 abt:
                                 GUI_Error_HIG ("Aborting", NULL);
