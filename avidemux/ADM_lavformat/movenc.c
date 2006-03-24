@@ -693,6 +693,7 @@ static int mov_write_ctts_tag(ByteIOContext *pb, MOVTrack* track)
     uint32_t entries = 0;
     uint32_t atom_size;
     int i;
+    int notequal=0;
 
     ctts_entries = av_malloc((track->entry + 1) * sizeof(*ctts_entries)); /* worst case */
     ctts_entries[0].count = 1;
@@ -700,23 +701,29 @@ static int mov_write_ctts_tag(ByteIOContext *pb, MOVTrack* track)
     for (i=1; i<track->entry; i++) {
         int cl = i / MOV_INDEX_CLUSTER_SIZE;
         int id = i % MOV_INDEX_CLUSTER_SIZE;
+        
         if (track->cluster[cl][id].cts == ctts_entries[entries].duration) {
             ctts_entries[entries].count++; /* compress */
         } else {
             entries++;
+            notequal++;
             ctts_entries[entries].duration = track->cluster[cl][id].cts;
             ctts_entries[entries].count = 1;
         }
     }
     entries++; /* last one */
-    atom_size = 16 + (entries * 8);
-    put_be32(pb, atom_size); /* size */
-    put_tag(pb, "ctts");
-    put_be32(pb, 0); /* version & flags */
-    put_be32(pb, entries); /* entry count */
-    for (i=0; i<entries; i++) {
-        put_be32(pb, ctts_entries[i].count);
-        put_be32(pb, ctts_entries[i].duration);
+    atom_size=0;
+    if(notequal>1)
+    {
+        atom_size = 16 + (entries * 8);
+        put_be32(pb, atom_size); /* size */
+        put_tag(pb, "ctts");
+        put_be32(pb, 0); /* version & flags */
+        put_be32(pb, entries); /* entry count */
+        for (i=0; i<entries; i++) {
+            put_be32(pb, ctts_entries[i].count);
+            put_be32(pb, ctts_entries[i].duration);
+        }
     }
     av_free(ctts_entries);
     return atom_size;
