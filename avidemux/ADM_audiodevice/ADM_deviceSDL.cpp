@@ -27,7 +27,12 @@
 
 
 #include "ADM_toolkit/toolkit.hxx"
+#ifdef OSS_SUPPORT
 #include "ADM_audiodevice/ADM_deviceoss.h"
+#endif
+#ifdef ALSA_SUPPORT
+#include "ADM_audiodevice/ADM_deviceALSA.h"
+#endif
 #include "ADM_audiodevice/ADM_deviceSDL.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME  MODULE_ADEVICE
