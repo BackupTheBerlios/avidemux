@@ -380,10 +380,7 @@ xvid4Encoder::postAmble (ADMBitstream * out)
 
     }
   out->out_quantizer = xvid_enc_stats.quant;
-  if (xvid_enc_create.max_bframes)
-      out->ptsFrame= xvid_framenum + 2;
-  else
-      out->ptsFrame= xvid_framenum ;
+  out->ptsFrame= xvid_framenum; 
   return 1;
 }
 

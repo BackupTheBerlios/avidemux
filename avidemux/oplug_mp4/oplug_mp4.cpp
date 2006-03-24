@@ -111,6 +111,7 @@ WAVHeader *audioinfo=NULL;
 int prefill=1;
 uint32_t displayFrame=0;
 ADMBitstream    bitstream;
+uint32_t        frameWrite=0;
         // Setup video
         
         if(videoProcessMode())
@@ -185,7 +186,7 @@ ADMBitstream    bitstream;
               }
            //len=bitstream.len;
            // If needed get VOL header
-           if(isMpeg4Compatible(info.fcc) && !videoExtraDataSize)
+           if(isMpeg4Compatible(info.fcc) && !videoExtraDataSize && bitstream.len)
            {
                 // And put them as extradata for esds atom
                 uint32_t voslen=0;
@@ -244,7 +245,11 @@ ADMBitstream    bitstream;
           else
                 encoding_gui->setCodec(_encode->getDisplayName());
            //
-          muxer->writeVideoPacket( &bitstream);
+          if(bitstream.len)
+          {
+            muxer->writeVideoPacket( &bitstream);
+            frameWrite++;
+          }
 
            
 
@@ -261,7 +266,7 @@ ADMBitstream    bitstream;
                      }
                }
                ADM_assert(_encode);
-               bitstream.cleanup(frame);
+               bitstream.cleanup(frameWrite);
                if(!_encode->encode ( frame, &bitstream))//&len, videoBuffer, &flags,&displayFrame))
                {
                         printf("MP4:Frame %u error\n",frame);
@@ -271,6 +276,7 @@ ADMBitstream    bitstream;
                 // If the encoder pops empty frames at the beginning, wait a bit
                 if(bitstream.len) prefill=0;
                 if(!bitstream.len && prefill) continue; // Prefilling encoder if needed
+                frameWrite++;
                 muxer->writeVideoPacket( &bitstream);
 
                encoding_gui->setFrame(frame,total);

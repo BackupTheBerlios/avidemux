@@ -49,13 +49,6 @@ typedef struct avcc		// for avcc atom
 static x264_param_t     param;
 static ADM_x264Param    admParam;
 
-/*
-uint32_t X264Encoder::getPTS_FrameNum(void)
-{
-    if( param.i_bframe) return ptsFrame+2;
-    return ptsFrame;
-}
-*/
 //**********************************************************
 // Do the translation avidemux parameters->x264 parameters
 //**********************************************************
@@ -251,7 +244,7 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
 
   out->len = size;
   if(param.i_bframe)
-    out->ptsFrame = (uint32_t) pic_out.i_pts+2;	// In fact it is the picture number in out case
+    out->ptsFrame = (uint32_t) pic_out.i_pts;	// In fact it is the picture number in out case
   else
     out->ptsFrame = (uint32_t) pic_out.i_pts;	// In fact it is the picture number in out case
   //printf("Frame :%lld \n",pic_out.i_pts);
