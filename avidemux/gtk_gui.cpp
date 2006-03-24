@@ -147,7 +147,7 @@ void ADM_cutWizard (void);
 void computeIT (int size, int nb, int brate, uint32_t * frame,
 		uint32_t * rsize);
 uint8_t  ADM_saveRaw (const char *name);
-static char * actual_workbench_file;
+char * actual_workbench_file;
 void A_saveWorkbench (char *name);
 void updateLoaded (void);
 extern void encoderSetLogFile (char *name);
@@ -2055,16 +2055,18 @@ A_saveWorkbench (char *name)
 
 void A_parseECMAScript(const char *name){
   bool ret;
+  char *longname = PathCanonize(name);
    if (playing){
       GUI_PlayAvi();
       curframe = 0;
    }
-   ret = parseECMAScript(name);
+   ret = parseECMAScript(longname);
    if( ret == 0 ){
       if( actual_workbench_file )
          ADM_dealloc(actual_workbench_file);
-      actual_workbench_file = ADM_strdup(name);
+      actual_workbench_file = ADM_strdup(longname);
    }
+   ADM_dealloc(longname);
 }
 //---------------------
 extern int DIA_audioEncoder(int *pmode, int *pbitrate,const char *title);

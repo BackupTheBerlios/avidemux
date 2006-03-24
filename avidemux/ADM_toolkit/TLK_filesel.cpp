@@ -40,6 +40,7 @@
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 
+extern char * actual_workbench_file;
 
 static void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw, char **name=NULL);
 char            *PathCanonize(const char *tmpname);
@@ -197,8 +198,8 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 	                                **   are detected here
 	                                */
 #ifndef CYG_MANGLING
-					if( lstat(name,&buf) == -1 ){
-						fprintf(stderr,"lstat(%s) failed\n",name);
+					if( stat(name,&buf) == -1 ){
+						fprintf(stderr,"stat(%s) failed\n",name);
 						return;
 					}
 #endif
@@ -210,6 +211,20 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 								snprintf(str,512,"File \"%s\" exists and is opened by avidemux",name);
 								GUI_Error_HIG(str,
 								              "It could be possible that you try to overwrite an input file!");
+								return;
+							}
+						}
+					}
+					/*
+	                                ** compare output file against actual EMCAscript file
+					** need to stat() to avoid symlink (/home/x.js) vs. real file (/export/home/x.js) case
+	                                */
+					if( actual_workbench_file ){
+						if( stat(actual_workbench_file,&buf) != -1 ){
+							if( buf.st_ino == fdino ){
+							  char str[512];
+								snprintf(str,512,"File \"%s\" exists and is the actual ECMAscript file",name);
+								GUI_Error_HIG(str,"It could be possible that you try to overwrite an input file!");
 								return;
 							}
 						}
