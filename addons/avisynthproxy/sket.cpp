@@ -60,7 +60,7 @@ uint8_t Sket::waitConnexion(void)
   while(1) 
   {
 		printf("Waiting for client to connect...\n");
-		workSocket = SOCKET_ERROR;
+		workSocket = (SOCKET)SOCKET_ERROR;
 		while( workSocket == SOCKET_ERROR ) 
 		{
 			workSocket = accept( mySocket, (SOCKADDR*) &service, &slen );
@@ -84,7 +84,7 @@ uint8_t Sket::receive(uint32_t *cmd, uint32_t *frame,uint32_t *payload_size,uint
 	*cmd=header.cmd;
 	*payload_size=header.payloadLen;
 	*frame=header.frame;
-	if(header.magic!=MAGGIC)
+	if(header.magic!=(uint32_t)MAGGIC)
 	{
 		printf("Wrong magic\n");
 		exit(-1);
