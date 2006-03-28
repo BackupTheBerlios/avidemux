@@ -368,7 +368,7 @@ WAVHeader *hdr;
         }
         myPes=_tracks[i].myPes;
         // Try mp2/3
-        if(myPes>=0xC0 && myPes<0xC9)
+        if(myPes>=0xC0 && myPes<=0xC9)
         {
                 if(getMpegFrameInfo(buffer,PROBE_SIZE,&mpegInfo,NULL,&offset))
                 {

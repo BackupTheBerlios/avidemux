@@ -307,13 +307,13 @@ _next:
 
         if(!id) continue;
 
-        if((code>=0xC0 && code < 0xC9) || code==0xbd)
+        if((code>=0xC0 && code <= 0xC9) || code==0xbd)
         {
             demuxer.changePid(id,code);
             demuxer.setPos(0,0);
             read=demuxer.read(buffer,BUFFER_SIZE);
             if(read!=BUFFER_SIZE) continue;
-            if(code>=0xC0 && code < 0xC9) // Mpeg audio
+            if(code>=0xC0 && code <= 0xC9) // Mpeg audio
             {
               if(getMpegFrameInfo(buffer,read,&mpegInfo,NULL,&offset))
                    {
