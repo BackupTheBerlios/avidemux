@@ -155,7 +155,8 @@ uint8_t     EncoderFFMPEGMpeg1::encode (uint32_t frame, ADMBitstream *out)
 	nq = MPEG1_MAX_Q;
 
       //printf("asked :%d ",nq);
-      out->flags = (nq << 16) + nf;	// ugly but help to keep interface
+      out->in_quantizer=nq;
+      out->flags=nf;
       if (!_codec->encode (_vbuffer, out))
 	return 0;
       if (!out->len)

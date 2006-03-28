@@ -136,7 +136,7 @@ ffmpegEncoder::encodePreamble (uint8_t * in)
 
   _frame.key_frame = 0;
   _frame.pict_type = 0;
-  _frame.quality = 0;
+// No!  _frame.quality = 0;
   return 1;
 }
 
@@ -553,12 +553,13 @@ ffmpegEncoderVBR::~ffmpegEncoderVBR ()
 uint8_t
 ffmpegEncoderVBRExternal::encode (ADMImage * in, ADMBitstream * out)
 {
-  uint16_t q;
-  uint8_t kf;
-
+    uint8_t r;
+    uint32_t q;
   q=out->in_quantizer;
   _frame.quality = (int) floor (FF_QP2LAMBDA * q + 0.5);
-  return ffmpegEncoder::encode(in,out);
+  r= ffmpegEncoder::encode(in,out);
+  out->out_quantizer=q;
+  return r;
 }
 
 
