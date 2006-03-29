@@ -63,7 +63,11 @@ uint8_t avsHeader::open(char *name)
     }
     struct sockaddr_in  service;
     service.sin_family = AF_INET;
+#ifdef DEBUG_NET
     service.sin_addr.s_addr = inet_addr("192.168.0.10");
+#else
+    service.sin_addr.s_addr = inet_addr("127.0.0.1");
+#endif    
     service.sin_port = htons(9999);
     
     if(connect(mySocket,(struct sockaddr *)&service,sizeof(service)))
@@ -113,6 +117,7 @@ uint8_t avsHeader::open(char *name)
 uint8_t  avsHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
 {
     uint32_t page=(_mainaviheader.dwWidth*_mainaviheader.dwHeight*3)>>1;
+    *framelen=page;
     if(framenum>=_mainaviheader.dwTotalFrames)
     {
         printf("Avisynth proxy out of bound %u / %u\n",framenum,_mainaviheader.dwTotalFrames);
