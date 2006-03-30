@@ -132,7 +132,7 @@ WAVHeader *wav;
         *infos=NULL;
         *nbStreams=0;
         wav=getAudioInfo( );
-        if(!wav) return 0;
+        if(!wav) return 1;
         *nbStreams=1;
         *infos=new uint32_t[1];
         *infos[0]=wav->encoding;
