@@ -41,7 +41,7 @@ class avsHeader         :public vidHeader
 
         virtual 	WAVHeader *getAudioInfo(void ) { return NULL ;} ;
         virtual 	uint8_t			getAudioStream(AVDMGenericAudioStream **audio)
-        {  *audio=NULL;return 0;};
+        {  *audio=NULL;return 1;};
 
 // Frames
   //__________________________
