@@ -31,6 +31,7 @@
 #define MODULE_NAME MODULE_3GP
 #include "ADM_toolkit/ADM_debug.h"
 
+#include "ADM_toolkit/TLK_clock.h"
 #define MAGGIC 0xDEADBEEF
 
 avsHeader::avsHeader()
@@ -118,6 +119,7 @@ uint8_t  avsHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 {
     uint32_t page=(_mainaviheader.dwWidth*_mainaviheader.dwHeight*3)>>1;
     *framelen=page;
+    
     if(framenum>=_mainaviheader.dwTotalFrames)
     {
         printf("Avisynth proxy out of bound %u / %u\n",framenum,_mainaviheader.dwTotalFrames);
@@ -128,10 +130,12 @@ uint8_t  avsHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
         printf("Get frame failed for frame %u\n",framenum);
         return 0;   
     }
+    
     return 1;
 }
 uint8_t avsHeader::askFor(uint32_t cmd,uint32_t frame, uint32_t payloadsize,uint8_t *payload)
 {
+   
     if(!sendData(cmd,frame,0,NULL))
     {
         printf("Send Cmd %u failed for frame %u\n",cmd,frame);
@@ -144,11 +148,12 @@ uint8_t avsHeader::askFor(uint32_t cmd,uint32_t frame, uint32_t payloadsize,uint
         printf("Rx Cmd %u failed for frame %u\n",cmd,frame);
         return 0;   
     }
+  
     // Check!
     ADM_assert(outframe==frame);
     ADM_assert(reply==cmd+1);
     ADM_assert(size==payloadsize);
-    printf("Cmd %u on frame %u succeed\n",cmd,frame);
+    aprintf("Cmd %u on frame %u succeed\n",cmd,frame);
     return 1;
     
 }

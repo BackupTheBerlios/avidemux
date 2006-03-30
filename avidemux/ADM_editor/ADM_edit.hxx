@@ -54,6 +54,7 @@ typedef enum
 		Script_FileType=12,
 		NewMpeg_FileType=13,
 		ECMAScript_FileType=14,
+                AvsProxy_FileType=15,
 		DUMMY_FILETYPE=99
 }fileType;
 

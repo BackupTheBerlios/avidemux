@@ -30,6 +30,7 @@
 #include "ADM_nuv/ADM_nuv.h"
 #include "ADM_h263/ADM_h263.h"
 #include "ADM_3gp/ADM_3gp.h"
+#include "ADM_avsproxy/ADM_avsproxy.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
@@ -138,6 +139,12 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
       printf (" \n Nuppelvideo file detected...\n");
       *type = Nuppel_FileType;
       return 1;
+    }
+    if (fourCC::check (id, (uint8_t *) "ADAP"))
+    {
+        printf (" \n Avisynth proxy file detected...\n");
+        *type = AvsProxy_FileType;
+        return 1;
     }
     uint32_t id2=id&0xFFFFFF;
     if (magic[0]==0x474e5089) 
