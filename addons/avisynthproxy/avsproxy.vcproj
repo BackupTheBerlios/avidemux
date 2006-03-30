@@ -164,6 +164,7 @@
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;C:\Program Files\Microsoft Platform SDK\Lib&quot;"
+				DelayLoadDLLs="avisynth.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="./avsproxy.pdb"
 				SubSystem="1"

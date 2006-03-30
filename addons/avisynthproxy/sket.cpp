@@ -19,7 +19,11 @@ Sket::Sket(void)
 
   sockaddr_in service;
   service.sin_family = AF_INET;
+#ifdef DEBUG
+  service.sin_addr.s_addr = inet_addr("192.168.0.10");
+#else
   service.sin_addr.s_addr = inet_addr("127.0.0.1");
+#endif
   service.sin_port = htons(port);
 
    if (bind( mySocket,   (SOCKADDR*) &service,  sizeof(service)) == SOCKET_ERROR) 
@@ -29,6 +33,7 @@ Sket::Sket(void)
 	mySocket=0;
     exit(-1);
   }
+   // Set high buffer + low delay
   printf("Socket bound to port %u\n",port);
 }
 Sket::~Sket()
@@ -63,7 +68,7 @@ uint8_t Sket::waitConnexion(void)
 		workSocket = (SOCKET)SOCKET_ERROR;
 		while( workSocket == SOCKET_ERROR ) 
 		{
-			workSocket = accept( mySocket, (SOCKADDR*) &service, &slen );
+			workSocket = accept( mySocket, NULL, NULL );
 		}
 		printf("Client connected.\n");   
 		break;
