@@ -9,12 +9,27 @@
 #include "windows.h"
 #include "winbase.h"
 #include "io.h"
+#include "winsock2.h"
+#define WIN32_CLASH
 #include "ADM_assert.h" 
 void ADM_usleep(unsigned long us)
 {
 	Sleep(us/1000);
 }
-
+uint8_t win32_netInit(void)
+{
+WSADATA wsaData;
+	int iResult;
+		printf("Initializing WinSock\n");
+		iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+		if (iResult != NO_ERROR)
+		{
+			printf("Error at WSAStartup()\n");
+			return 0;
+		}	
+		printf("WinSock ok\n");
+		return 1;
+}
 void gettimeofday(struct timeval *p, void *tz)
 {
 unsigned long int sec;
