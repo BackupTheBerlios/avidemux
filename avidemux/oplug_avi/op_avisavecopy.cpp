@@ -51,7 +51,7 @@
 
 
 static void updateUserData(uint8_t *start, uint32_t len);
-
+uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);
 uint8_t GenericAviSaveCopy::setupVideo (char *name)
 {
   //  Setup avi file output, all is coming from original avi
@@ -212,60 +212,46 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
 void updateUserData(uint8_t *start, uint32_t len)
 {
 	// lookup startcode
-	uint32_t sync;
-	
-	while(len)
+	uint32_t sync,off,rlen;
+	uint8_t code;
+	uint8_t *end=start+len;
+	while(ADM_findMpegStartCode(start, end,&code,&off))
 	{
-		sync=0xFFFFFFFF;
-		while(len)
+		// update
+		start+=off;
+		rlen=end-start;
+		if(code!=0xb2 || rlen<4)
+		    continue;
+    	
+		printf("User data found\n");
+		// looks ok ?
+		if(!strncmp((char *)start,"DivX",4))
 		{
-			sync=sync<<8;
-			sync+=*start++;
-			sync&=0xFFFFFF;	// suboptimal...
-			len--;
-			if(sync==0x000001)
-			{
-				break;
-			}	
-		}
-		if(*start==0xb2 && len)
-		{
-			printf("User data found\n");
-			start++; //skip the b2
-			len--;
-			// looks ok ?
-			if(strncmp((char *)start,"DivX",len))
-			{
-#if 0						
-				memset(start,0,4); // should work better
-#else				
 
+    		    //
+    		    start+=4;
+    		    rlen-=4; // skip "DivX"
 				// looks for a p while not null
 				// if there isnt we will reach a new startcode
 				// and it will stop
-				while((*start!='p') && len) 
+				while((*start!='p') && rlen) 
 				{
 					if(!*start)
 					{
-						len=0;
+						rlen=0;
+						break;
 					}
-					else
-					{
-						len--;
-						start++;
-					}
+					rlen--;
+					start++;
 				}
-				if(!len) 
+				if(!rlen) 
 					{
 						printf("Unpacketizer:packed marker not found!\n");
 					}
-				else	*start='n'; // remove 'p'
-				
-				return;
-#endif				
-			
-			}
-			
+				else	
+				        *start='n'; // remove 'p'
+				return;			
 		}
 	}
 }
+//EOF
