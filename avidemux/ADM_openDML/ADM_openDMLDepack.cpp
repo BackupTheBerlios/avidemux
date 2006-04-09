@@ -41,6 +41,7 @@ typedef struct vopS
 }vopS;
 #define MAX_VOP 10
 static uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop);
+uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);
 
 static const char *s_voptype[4]={"I frame","P frame","B frame","D frame"};
 uint8_t OpenDMLHeader::unpackPacked( void )
@@ -202,19 +203,20 @@ _abortUnpack:
 // needed to update the index
 uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop)
 {
-	uint32_t startCode=0xffffffff;
+	
 	uint32_t off=0;
+	uint32_t globalOff=0;
 	uint32_t voptype;
+	uint8_t code;
 	*nb=0;
 	while(begin<end-3)
 	{
-		startCode=(startCode<<8)+*begin;
-		if((startCode & 0xffffff00) == 0x100)
-		{
-			if(*begin==0xb6)
+    	if( ADM_findMpegStartCode(begin, end,&code,&off))
+    	{
+        	if(code==0xb6)
 			{
 				// Analyse a bit the vop header
-				uint8_t coding_type=begin[1];
+				uint8_t coding_type=begin[off];
 				coding_type>>=6;
 				aprintf("\t at %u %d Img type:%s\n",off,*nb,s_voptype[coding_type]);
 				switch(coding_type)
@@ -225,16 +227,19 @@ uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop)
 					case 3: printf("Glouglou\n");voptype=0;break;
 				
 				}
-				vop[*nb].offset=off-3;
+        	    vop[*nb].offset=globalOff+off-4;
 				vop[*nb].type=voptype;
 				*nb=(*nb)+1;
+				begin+=off+1;
+				globalOff+=off+1;
+				continue;
 			
 			}	
-		}
-		off++;
-		begin++;
-	
-	}
-
-	return 0;
+        	begin+=off;
+        	globalOff+=off;
+        	continue;
+    	}
+    	return 1; 
+    }   
+	return 1;
 }
