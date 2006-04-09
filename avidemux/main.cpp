@@ -90,6 +90,7 @@ void sig_segfault_handler(int signo);
 
 extern uint8_t  quotaInit(void);
 extern void ADMImage_stat( void );
+extern uint8_t win32_netInit(void);
 int global_argc;
 char **global_argv;
 int CpuCaps::myCpuCaps=0;
@@ -146,6 +147,8 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 
 #ifndef CYG_MANGLING    
     g_thread_init(NULL);
+#else
+    win32_netInit();    
 #endif
     gtk_set_locale();
     gtk_init(&argc, &argv);
