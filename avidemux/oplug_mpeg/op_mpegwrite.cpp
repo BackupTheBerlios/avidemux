@@ -152,6 +152,25 @@ mpegWritter::~mpegWritter ()
 
 }
 /*---------------------------------------------------------------------------------------*/
+#define PACK_AUDIO \
+{ \
+	uint32_t samples; \
+        if(audioGot<sample_target) \
+	while(_muxer->needAudio()) \
+	{				\
+		if(!_audio->getPacket(_audioBuffer, &audiolen, &samples))	\
+		{ \
+			break; \
+		}\
+		if(audiolen) \
+		{\
+			_muxer->writeAudioPacket(audiolen,_audioBuffer); \
+			encoding->feedAudioFrame(audiolen); \
+		}\
+		audioGot+=samples; \
+	} \
+}
+/*---------------------------------------------------------------------------------------*/
 uint8_t
 mpegWritter::save_svcd (const char *name)
 {
@@ -191,24 +210,7 @@ mpegWritter::save_svcd (const char *name)
 
 
 
-#define PACK_AUDIO \
-{ \
-	uint32_t samples; \
-        if(audioGot<sample_target) \
-	while(_muxer->needAudio()) \
-	{				\
-		if(!_audio->getPacket(_audioBuffer, &audiolen, &samples))	\
-		{ \
-			break; \
-		}\
-		if(audiolen) \
-		{\
-			_muxer->writeAudioPacket(audiolen,_audioBuffer); \
-			encoding->feedAudioFrame(audiolen); \
-		}\
-		audioGot+=samples; \
-	} \
-}
+
 /*---------------------------------------------------------------------------------------*/
 uint8_t
 mpegWritter::save_dvd (const char *name)
@@ -683,7 +685,7 @@ mpegWritter::dopass1 (const char *name, char *statname, uint32_t final_size, uin
   bitstream.data = _buffer_out;
   for (uint32_t i = 0; i < _total; i++)
     {
-      _codec->setQuantize (q);
+      
       if (!incoming->getFrameNumberNoAlloc (i, &size, aImage, &flags))
 	{
 	  GUI_Error_HIG ("Encoding error", NULL);
@@ -693,6 +695,7 @@ mpegWritter::dopass1 (const char *name, char *statname, uint32_t final_size, uin
       if (i < MPEG_PREFILL)
 	{
 	  bitstream.cleanup (i);
+	  bitstream.in_quantizer=q;
 	  _codec->encode (aImage, &bitstream);
 	  //_buffer_out , &len,&flags,&outquant);
 	  continue;
@@ -901,7 +904,7 @@ mpegWritter::dopass2 (const char *name, char *statname, uint32_t final_size, uin
 	  quantstat[bitstream.out_quantizer]++;
 	  continue;
 	}
-      encoding->feedFrame (len);	// Set
+     	// Set
       //
       ADM_rframe ftype, ztype;
       uint32_t qz;
@@ -934,7 +937,7 @@ mpegWritter::dopass2 (const char *name, char *statname, uint32_t final_size, uin
       ADM_assert (_ratecontrol->
 		  logPass2 (bitstream.out_quantizer, ftype, bitstream.len));
       total_size += bitstream.len;
-
+      encoding->feedFrame (bitstream.len);
       if (!_muxer)
 	{
 	  qfwrite (_buffer_out, bitstream.len, 1, fd);
@@ -1007,6 +1010,7 @@ mpegWritter::dopass2 (const char *name, char *statname, uint32_t final_size, uin
 
       //      printf("\n pipe opened %ld\n",i);
       encoding->feedFrame (bitstream.len);	// Set
+      encoding->setQuant (bitstream.out_quantizer);
       encoding->setFrame (i, MPEG_PREFILL);
 
     }
