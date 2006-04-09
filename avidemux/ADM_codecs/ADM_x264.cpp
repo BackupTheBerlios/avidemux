@@ -104,6 +104,15 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MKPARAM( b_cabac , CABAC);
   MKPARAM( analyse.i_trellis, Trellis);
   MKPARAM(analyse.i_subpel_refine,PartitionDecision);
+  if(zparam->PartitionDecision>=6)
+  {
+      int rank,parity;
+      rank=((zparam->PartitionDecision-6)>>1)+6;
+      parity=zparam->PartitionDecision&1;
+      
+      param.analyse.i_subpel_refine=rank;
+      param.analyse.b_bframe_rdo=parity;
+  }
   MKPARAM(analyse.b_chroma_me,ChromaME);
   MKPARAM(b_deblocking_filter,DeblockingFilter);
   MKPARAM(i_deblocking_filter_alphac0,Strength );
