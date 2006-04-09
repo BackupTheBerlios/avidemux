@@ -16,6 +16,7 @@ class avsHeader         :public vidHeader
 {
     protected:
         int         mySocket;
+        uint8_t     bindMe(uint32_t port);
         uint8_t     sendData(uint32_t cmd,uint32_t frame, uint32_t payload_size,uint8_t *payload);
         uint8_t     receiveData(uint32_t *cmd, uint32_t *frame,uint32_t *payload_size,uint8_t *payload);
         uint8_t     askFor(uint32_t cmd,uint32_t frame, uint32_t payloadsize,uint8_t *payload);

@@ -10,10 +10,7 @@
 #include <string.h>
 
 #include "math.h"
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+
 
 #include <errno.h>
 
@@ -32,7 +29,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "ADM_toolkit/TLK_clock.h"
-#define MAGGIC 0xDEADBEEF
+
 
 avsHeader::avsHeader()
 {
@@ -42,40 +39,14 @@ avsHeader::avsHeader()
 {
     close();   
 }
-uint8_t avsHeader::close(void)
-{
-    if(mySocket)
-    {
-        int er;
-        er=shutdown(mySocket,SHUT_RDWR);
-        if(er) printf("Error when socket shutdown  %d\n",er);
-        mySocket=0;
-    }
-    return 1;
-}
+
 
 uint8_t avsHeader::open(char *name)
 {
-    mySocket = socket(PF_INET, SOCK_STREAM, 0);
-    if(mySocket==-1)
-    {
-        printf("Socket failed\n");
+   
+    mySocket=bindMe(9999);
+    if(!mySocket)
         return 0;
-    }
-    struct sockaddr_in  service;
-    service.sin_family = AF_INET;
-#ifdef DEBUG_NET
-    service.sin_addr.s_addr = inet_addr("192.168.0.10");
-#else
-    service.sin_addr.s_addr = inet_addr("127.0.0.1");
-#endif    
-    service.sin_port = htons(9999);
-    
-    if(connect(mySocket,(struct sockaddr *)&service,sizeof(service)))
-    {
-        printf("Socket connect %d\n",errno);
-        return 0;
-    }
     // now time to grab some info
     avsInfo info;
     if(!askFor(AvsCmd_GetInfo,0,sizeof(info),(uint8_t*)&info))
@@ -132,100 +103,6 @@ uint8_t  avsHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
     }
     
     return 1;
-}
-uint8_t avsHeader::askFor(uint32_t cmd,uint32_t frame, uint32_t payloadsize,uint8_t *payload)
-{
-   
-    if(!sendData(cmd,frame,0,NULL))
-    {
-        printf("Send Cmd %u failed for frame %u\n",cmd,frame);
-        return 0;
-    }
-    // Wait reply
-    uint32_t size,reply,outframe;
-    if(!receiveData(&reply,&outframe,&size,payload))
-    {
-        printf("Rx Cmd %u failed for frame %u\n",cmd,frame);
-        return 0;   
-    }
-  
-    // Check!
-    ADM_assert(outframe==frame);
-    ADM_assert(reply==cmd+1);
-    ADM_assert(size==payloadsize);
-    aprintf("Cmd %u on frame %u succeed\n",cmd,frame);
-    return 1;
-    
-}
-uint8_t avsHeader::receiveData(uint32_t *cmd, uint32_t *frame,uint32_t *payload_size,uint8_t *payload)
-{
-        SktHeader header;
-        memset(&header,0,sizeof(header));
-
-
-        if( sizeof(header)!=recv(mySocket,(char *)&header,sizeof(header),0))
-        {
-            printf("Error in receivedata: header\n");
-            exit(-1);
-        }
-        *cmd=header.cmd;
-        *payload_size=header.payloadLen;
-        *frame=header.frame;
-        if(header.magic!=(uint32_t)MAGGIC)
-        {
-            printf("Wrong magic\n");
-            exit(-1);
-        }
-        if(header.payloadLen)
-        {
-            int togo=header.payloadLen;
-            int chunk;
-            while(togo)
-            {
-                chunk=recv(mySocket,(char *)payload,togo,0);
-                if(chunk<0)
-                {
-                    printf("Error in receivedata: body\n");
-                    exit(-1);
-                }
-                togo-=chunk;
-                payload+=chunk;
-            }
-        }
-
-        return 1;
-}
-
-
-uint8_t avsHeader::sendData(uint32_t cmd,uint32_t frame, uint32_t payload_size,uint8_t *payload)
-{
-        SktHeader header;
-        memset(&header,0,sizeof(header));
-
-        header.cmd=cmd;
-        header.payloadLen=payload_size;
-        header.frame=frame;
-        header.magic=(uint32_t)MAGGIC;
-	
-        if(sizeof(header)!= send(mySocket,(char *)&header,sizeof(header),0))
-        {
-            printf("Error in senddata: header\n");
-            exit(-1);
-        }
-        int togo=payload_size;
-        int chunk;
-        while(togo)
-        {
-            chunk=send(mySocket,(char *)payload,togo,0);
-            if(chunk<0)
-            {
-                printf("Error in senddata: body\n");
-                exit(-1);
-            }
-            togo-=chunk;
-            payload+=chunk;
-        }
-        return 1;
 }
 
 
