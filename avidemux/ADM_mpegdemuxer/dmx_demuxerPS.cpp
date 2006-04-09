@@ -261,6 +261,8 @@ uint32_t val,hnt;
 
                 // preload
                 hnt=(read8i()<<16) + (read8i()<<8) +read8i();
+                hnt<<=8;
+                hnt+=read8i();
                 if(_lastErr)
                 {
                         _lastErr=0;
@@ -268,14 +270,12 @@ uint32_t val,hnt;
                         return 0;       
                 }
 
-                while((hnt!=0x00001))
+                while(((hnt&0xffffff00)!=0x00001))
                 {
 
                         hnt<<=8;
                         val=read8i();
-                        hnt+=val;
-                        hnt&=0xffffff;
- 
+                        hnt+=val;                     
                         if(_lastErr)
                         {
                              _lastErr=0;
@@ -285,7 +285,7 @@ uint32_t val,hnt;
 
                 }
 
-                *stream=read8i();
+                *stream=val;
                 // Case 1 : assume we are still in the same packet
                 if(_pesBufferIndex>=4)
                 {
