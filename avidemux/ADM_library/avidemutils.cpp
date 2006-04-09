@@ -31,6 +31,8 @@
 #include "subchunk.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"
+
+uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);
 void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size);
 //_________________________________________________
 //      Convert a frame number into equivalent in ms
@@ -188,4 +190,30 @@ void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size)
 		src++;
 	}
 
+}
+/*
+
+    Find mpeg1/2/4 video startcode
+    00 00 01 xx yy
+    return xx + offset to yy
+
+*/
+uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset)
+{
+    uint32_t startcode=0xffffffff;
+    uint8_t  *ptr=start;
+  
+    
+    while(ptr<end)
+	{
+		startcode=(startcode<<8)+*ptr;		
+		if((startcode&0xffffff00)==0x100)
+		{
+			*outstartcode=*ptr;
+			*offset=ptr-start+1;
+			return 1;
+		}
+		ptr++;
+	}
+	return 0; // startcode not found
 }
