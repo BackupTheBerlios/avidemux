@@ -28,7 +28,7 @@
 #include <malloc.h>
 #include <math.h>
 #include <vector>
-
+#define __int64_t long long int
 #define in64 (__int64)(unsigned short)
 
 #define ATHLON  // comment this out if using the Intel compiler, or you need Pentium/K6 support
@@ -62,7 +62,7 @@ typedef	long			PixOffset;
 struct AVSFunction {
   const char* name;
   const char* param_types;
-  AVSValue (__cdecl *apply)(AVSValue args, void* user_data, IScriptEnvironment* env);
+  AVSValue __cdecl (*apply)(AVSValue args, void* user_data, IScriptEnvironment* env);
   void* user_data;
 };
 

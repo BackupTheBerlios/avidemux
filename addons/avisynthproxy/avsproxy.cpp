@@ -11,6 +11,9 @@
 #include <io.h>
 #include <fcntl.h>
 #include <windef.h>*/
+
+#define __int64_t long long int
+
 #include "internal.h"
 #include "sket.h"
 #include "avsHeader.h"
