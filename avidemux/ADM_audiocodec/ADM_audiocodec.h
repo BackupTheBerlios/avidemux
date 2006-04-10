@@ -86,18 +86,22 @@ class ADM_AudiocodecWavSwapped : public     ADM_Audiocodec
 
    };
 #ifdef USE_AC3
+#define ADM_AC3_BUFFER (50000*2)
     class ADM_AudiocodecAC3 : public     ADM_Audiocodec
  {
-    protected:				
+    protected:
+        void        *ac3_handle;
+        void        *ac3_sample;
+
     public:
-                						ADM_AudiocodecAC3( uint32_t fourcc );
-                	virtual			~ADM_AudiocodecAC3();
-         			virtual         void 	purge( void ) {};
-                 virtual 			uint8_t beginDecompress( void );
-                 virtual 			uint8_t endDecompress( void );
-                 virtual 			uint8_t run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut);
-                 virtual			uint8_t isCompressed( void ){ return 1;};
-                 virtual			uint8_t isDecompressable(void ){ return 1;};
+                                                ADM_AudiocodecAC3( uint32_t fourcc );
+                 virtual                         ~ADM_AudiocodecAC3();
+                 virtual         void            purge( void ) {};
+                 virtual        uint8_t         beginDecompress( void );
+                 virtual                        uint8_t endDecompress( void );
+                 virtual    uint8_t run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut);
+                 virtual    uint8_t isCompressed( void ){ return 1;};
+                 virtual    uint8_t isDecompressable(void ){ return 1;};
 
    };
 #endif
