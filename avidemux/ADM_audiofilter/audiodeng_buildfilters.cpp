@@ -88,6 +88,7 @@ static DRCparam drcSetup=
 };
 
 extern int DIA_getLameSettings(int *pmode, int *pbitrate,ADM_LAME_PRESET *preset);
+extern int DIA_getVorbisSettings(int *pbitrate, int *mode);
 extern void UI_PrintCurrentACodec( const char *s);
 
 #define MAX_AUDIO_FILTER 10
@@ -188,6 +189,13 @@ void audioCodecChanged(int newcodec)
 	ADM_assert(newcodec<sizeof(myCodecList) /sizeof(CODECLIST));
 	activeAudioEncoder=myCodecList[newcodec].codec;
 
+	if (activeAudioEncoder == AUDIOENC_VORBIS) {
+		if (audioMP3mode == 0 && audioMP3bitrate > 11)
+			audioMP3bitrate = 4;
+	} else {
+		if (audioMP3bitrate < 48)
+			audioMP3bitrate = 128;
+	}
 }
 
 uint32_t audioFilterGetNbEncoder(void)
@@ -449,7 +457,7 @@ void audioCodecConfigure( void )
 #ifdef USE_VORBIS
 		case AUDIOENC_VORBIS:
 						
-							DIA_audioEncoder(&audioMP3mode, &audioMP3bitrate,"VORBIS parameter");
+							DIA_getVorbisSettings(&audioMP3bitrate, &audioMP3mode);
 							return;
 						return;
 #endif		
@@ -814,7 +822,7 @@ uint8_t init;
 		{
 				AVDMProcessAudio_Vorbis *vorbis;
 				vorbis = new AVDMProcessAudio_Vorbis(lastFilter);
-				if(vorbis->init(audioMP3bitrate))
+				if(vorbis->init(audioMP3bitrate, audioMP3mode))
 				{
 					lastFilter = vorbis;
 					filters[filtercount++] = lastFilter;

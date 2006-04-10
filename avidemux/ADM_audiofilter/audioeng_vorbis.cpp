@@ -91,32 +91,40 @@ AVDMProcessAudio_Vorbis::~AVDMProcessAudio_Vorbis()
 
 
 //________________________________________________
-//   Init lame encoder
+//   Init Vorbis encoder
 // frequence    : Impose frequency , 0 means reuse the incoming fq
-// mode                         : ADM_STEREO etc...
-// bitrate              : Bitrate in kbps (96,192...)
+// mode			: VBR CBR
+// bitrate for CBR	: bitrate in kbps (96,192...)
+//		  for VBR	: quality (0, 1, 2, ... 11)
+//				
 // return 0 : init failed
 //                              1 : init succeeded
 //_______________________________________________
-uint8_t AVDMProcessAudio_Vorbis::init( uint32_t bitrate)
+uint8_t AVDMProcessAudio_Vorbis::init( uint32_t bitrate, uint8_t mode)
 {
-
-
-ogg_packet header1,header2,header3;
+	ogg_packet header1,header2,header3;
+	int err;
 
  	vorbis_info_init(&VI) ;
  
-	if(0>vorbis_encode_init(&VI,
+	if (mode==0) {  //VBR
+		err=vorbis_encode_init_vbr(&VI,
+			      _wavheader->channels,
+			       _wavheader->frequency,
+			      ((float)bitrate-1)/10
+			      );
+	} else {  //CBR
+		err=vorbis_encode_init(&VI,
 			      _wavheader->channels,
 			       _wavheader->frequency,
 			      -1, // Max bitrate      
 			      bitrate*1000, //long nominal_bitrate,
 			      -1 //long min_bitrate))
-			      ))
-	{
+			      );
+	}
+	if (err!=0) {
 		printf("vorbis init error\n");
 		return 0;
-	
 	}
 	vorbis_analysis_init(&VD, &VI) ;
 	vorbis_block_init(&VD, &VB);
@@ -148,7 +156,10 @@ ogg_packet header1,header2,header3;
 	vorbis_comment_clear(&VC);
 			
 	printf("\nVorbis encoder initialized\n");
-	printf("Bitrate :%lu\n",bitrate);
+	if (mode==0)
+		printf("VBR Quality:%i\n",bitrate-1);
+	else
+		printf("CBR Bitrate:%lu\n",bitrate);
 	printf("Channels:%lu\n",_wavheader->channels);
 	printf("Frequenc:%lu\n",_wavheader->frequency);
     return 1;

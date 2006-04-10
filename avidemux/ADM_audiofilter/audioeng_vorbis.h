@@ -33,7 +33,7 @@ protected:
 	 uint8_t	*_extraData;
 	 
 public:
-			uint8_t	init( uint32_t bitrate);		
+			uint8_t	init( uint32_t bitrate, uint8_t mode);		
 		virtual ~AVDMProcessAudio_Vorbis();				
 			AVDMProcessAudio_Vorbis(AVDMGenericAudioStream *instream);	
      		virtual uint8_t	getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);		
