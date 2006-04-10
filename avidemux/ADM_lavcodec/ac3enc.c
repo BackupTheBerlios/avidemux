@@ -1403,7 +1403,7 @@ static int AC3_encode_frame(AVCodecContext *avctx,
             v = 14 - log2_tab(input_samples, N);
             if (v < 0)
                 v = 0;
-            exp_samples[i][ch] = v - 8;
+            exp_samples[i][ch] = v - 9; //MEAN : patch Justin ruggles
             lshift_tab(input_samples, N, v);
 
             /* do the MDCT */
