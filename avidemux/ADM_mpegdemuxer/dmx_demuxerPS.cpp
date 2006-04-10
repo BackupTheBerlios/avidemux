@@ -260,22 +260,20 @@ uint32_t val,hnt;
                 hnt=0;
 
                 // preload
-                hnt=(read8i()<<16) + (read8i()<<8) +read8i();
-                hnt<<=8;
-                hnt+=read8i();
+                hnt=read32i();
                 if(_lastErr)
                 {
                         _lastErr=0;
                         printf("\n io error , aborting sync 1\n");
                         return 0;       
                 }
-
-                while(((hnt&0xffffff00)!=0x00001))
+                val=hnt&0xff;
+                while(((hnt&0xffffff00)!=0x100))
                 {
 
                         hnt<<=8;
                         val=read8i();
-                        hnt+=val;                     
+                        hnt+=val;
                         if(_lastErr)
                         {
                              _lastErr=0;
