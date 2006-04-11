@@ -103,12 +103,13 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MKPARAM( analyse.b_weighted_bipred, Weighted);
   MKPARAM( b_cabac , CABAC);
   MKPARAM( analyse.i_trellis, Trellis);
-  MKPARAM(analyse.i_subpel_refine,PartitionDecision);
-  if(zparam->PartitionDecision>=6)
+  MKPARAM(analyse.i_subpel_refine,PartitionDecision+1);
+#define MIN_RDO 6
+  if(zparam->PartitionDecision+1>=MIN_RDO)
   {
       int rank,parity;
-      rank=((zparam->PartitionDecision-6)>>1)+6;
-      parity=zparam->PartitionDecision&1;
+      rank=((zparam->PartitionDecision+1-MIN_RDO)>>1)+MIN_RDO;
+      parity=(zparam->PartitionDecision+1-MIN_RDO)&1;
       
       param.analyse.i_subpel_refine=rank;
       param.analyse.b_bframe_rdo=parity;
