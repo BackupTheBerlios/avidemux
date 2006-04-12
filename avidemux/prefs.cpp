@@ -108,10 +108,11 @@ static opt_def opt_defs [] = {
 	{"feature.use_systray",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.reuse_2pass_log",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.audiobar_uses_master",		UINT,	"0",	NULL,	"0",	"1"	},
-	{"feature.multi_thread",		UINT,	"0",	NULL,	"0",	"4"	}
+	{"feature.multi_thread",		UINT,	"0",	NULL,	"0",	"4"	},
+	{"downmixing.prologic",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 65;
+int num_opts = 66;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2
