@@ -25,11 +25,12 @@
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
+#include "prefs.h"
 
 #ifdef USE_AC3
 extern "C" {
-#include "a52dec/a52.h"
-#include "a52dec/mm_accel.h"
+#include "ADM_liba52/a52.h"
+#include "ADM_liba52/mm_accel.h"
 };
 
 #define AC3_HANDLE ((a52_state_t *)ac3_handle)
@@ -61,6 +62,17 @@ ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc) :   ADM_Audiocodec(fourcc
         printf("Cannot init a52 sample\n");
         ADM_assert(0);   
     }
+    
+    if(prefs->get(DOWNMIXING_PROLOGIC,&_downmix)!=RC_OK)
+    {       
+        _downmix=0;
+    }
+    if(_downmix)
+    {
+        _downmix=A52_DOLBY2;
+        printf("Using DLP2 downmixing\n");
+    }
+    else    _downmix=A52_DOLBY;
 }
 ADM_AudiocodecAC3::~ADM_AudiocodecAC3( )
 {
@@ -116,11 +128,16 @@ uint8_t ADM_AudiocodecAC3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
             break;
         }
         // Decode
-        if(flags & A52_STEREO)
-            flags = A52_ADJUST_LEVEL+A52_STEREO;
-        else
-            flags = A52_ADJUST_LEVEL+A52_MONO;
-        sample_t level = 16384, bias = 0;
+        {
+            if(flags & A52_STEREO)
+                flags = A52_ADJUST_LEVEL|_downmix;
+            else
+            {
+                flags = A52_ADJUST_LEVEL|A52_MONO;
+                chan=1;
+            }
+        }
+        sample_t level = 32767, bias = 0;
        
         if (a52_frame(AC3_HANDLE, ptr, &flags, &level, bias))
         {
@@ -145,19 +162,21 @@ uint8_t ADM_AudiocodecAC3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
             // integer
             else
             {
-                int16_t *cur;
-                for(int k=0;k<chan;k++)
                 {
-                    sample_t *sample=(sample_t *)ac3_sample;
-                    sample+=256*k;
-                    cur=ptrOut+k;
-                    for (int j = 0; j < 256; j++)
+                    int16_t *cur;
+                    for(int k=0;k<chan;k++)
                     {
-                        *cur = (int16_t) ceil(*sample++);
-                        cur+=chan;
+                        sample_t *sample=(sample_t *)ac3_sample;
+                        sample+=256*k;
+                        cur=ptrOut+k;
+                        for (int j = 0; j < 256; j++)
+                        {
+                            *cur = (int16_t) ceil(*sample++);
+                            cur+=chan;
+                        }
                     }
+                    ptrOut+=chan*256;
                 }
-                ptrOut+=chan*256;
             }
         } // 0.. 6
     }

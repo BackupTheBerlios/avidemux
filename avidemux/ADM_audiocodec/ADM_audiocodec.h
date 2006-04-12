@@ -92,6 +92,7 @@ class ADM_AudiocodecWavSwapped : public     ADM_Audiocodec
     protected:
         void        *ac3_handle;
         void        *ac3_sample;
+        uint32_t    _downmix;
 
     public:
                                                 ADM_AudiocodecAC3( uint32_t fourcc );
