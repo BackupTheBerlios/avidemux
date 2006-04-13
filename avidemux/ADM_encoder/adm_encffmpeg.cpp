@@ -396,15 +396,14 @@ uint8_t EncoderFFMPEG::encode (uint32_t frame, ADMBitstream *out)
     case enc_Same:
       {
 	uint32_t inq;
-	if (out->flags & AVI_KEY_FRAME)
-	  out->flags = 1;
+        if (_vbuffer->flags & AVI_KEY_FRAME)
+            out->flags = AVI_KEY_FRAME;
 	else
-	  out->flags = 0;
+	   out->flags = 0;
 	inq = _vbuffer->_Qp;
-
-	//      inq>>=1;        // ?
-
-	out->flags += (inq << 16);
+        if(inq>31) inq=31;
+        if(inq<2) inq=2;
+        out->in_quantizer =inq;
 
 	if (!_codec->encode (_vbuffer, out ))
 	  {

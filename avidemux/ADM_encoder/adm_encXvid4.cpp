@@ -190,8 +190,8 @@ uint8_t
   switch (_state)
     {
     case enc_Same:
-      out->flags = _vbuffer->flags;
-      out->flags &= 0xffff;
+      
+      out->flags=0;
       if (frame < (encparam.bframes + 1))
 	{
 	  out->flags = AVI_KEY_FRAME;
@@ -206,7 +206,7 @@ uint8_t
 	  if (q > 31)
 	    q = 31;
 	}
-      out->flags += (q << 16);
+        out->in_quantizer =q;
 
     case enc_CBR:
     case enc_CQ:
