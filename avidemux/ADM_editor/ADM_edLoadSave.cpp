@@ -215,14 +215,8 @@ char *pth;
    //qfprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode()]);
    qfprintf(fd,"app.audio.normalize=%s;\n",truefalse[audioGetNormalize()]);
    qfprintf(fd,"app.audio.delay=%d;\n",audioGetDelay());
-   // Change mono2stereo ?
-   switch(audioGetChannelConv())
-        {
-                case CHANNELCONV_2to1:  qfprintf(fd,"app.audio.stereo2mono=true;\n");break;
-                case CHANNELCONV_1to2:  qfprintf(fd,"app.audio.mono2stereo=true;\n");break;
-                case CHANNELCONV_NONE: ;break;
-                default:ADM_assert(0);
-        }     
+
+
    // Change fps ?
         switch(audioGetFpsConv())
         {
