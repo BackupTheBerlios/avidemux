@@ -89,15 +89,9 @@ ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc) :   ADM_Audiocodec(fourcc
         ADM_assert(0);   
     }
     
-    if(prefs->get(DOWNMIXING_PROLOGIC,&_downmix)!=RC_OK)
-    {       
+       
         _downmix=0;
-    }
-    if(_downmix)
-    {
-        _downmix=A52_DOLBY;
-    }
-    else    _downmix=A52_DOLBY;
+   
 }
 ADM_AudiocodecAC3::~ADM_AudiocodecAC3( )
 {
