@@ -185,7 +185,7 @@ static int M32_2_DB1(int16_t *in,int16_t *out,uint32_t nbSample,uint32_t chan)
         surround=((int32_t)in[3]+(int32_t)in[4])*DB1_coef[1];
         out[0]=(int16_t)((MIX(0,0)+MIX(1,1)-surround)>>SHIFTED);
         out[1]=(int16_t)((MIX(2,0)+MIX(1,1)+surround)>>SHIFTED);
-        in+=5;
+        in+=chan;
         out+=2;
     }
     return nbSample*2*2;
