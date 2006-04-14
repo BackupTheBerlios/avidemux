@@ -43,7 +43,6 @@ typedef struct a52_state_s a52_state_t;
 #define A52_CHANNEL1 8
 #define A52_CHANNEL2 9
 #define A52_DOLBY 10
-#define A52_DOLBY2 11 //MEANX
 #define A52_CHANNEL_MASK 15
 
 #define A52_LFE 16
