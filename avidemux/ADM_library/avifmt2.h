@@ -70,18 +70,7 @@ typedef struct _avistdindex_chunk {
  #define AVI_B_FRAME		 0x4000	 // hopefully it is not used..
 #endif
 
-#ifndef WAVHEADER_
-#define WAVHEADER_
-typedef struct
-{
-	uint16_t	encoding;	
-	uint16_t	channels;					/* 1 = mono, 2 = stereo */
-	uint32_t	frequency;				/* One of 11025, 22050, or 44100 48000 Hz */
-	uint32_t	byterate;					/* Average bytes per second */
-	uint16_t	blockalign;				/* Bytes per sample block */
-	uint16_t	bitspersample;		/* One of 8, 12, 16, or 4 for ADPCM */
-} WAVHeader;
-#endif
+#include "ADM_audio/ADM_audiodef.h"
 
 void Endian_AviMainHeader(MainAVIHeader *m);
 void Endian_BitMapInfo( BITMAPINFOHEADER *b);

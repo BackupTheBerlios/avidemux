@@ -203,14 +203,7 @@ JSBool ADM_JSAvidemuxAudio::JSSetProperty(JSContext *cx, JSObject *obj, jsval id
 				priv->getObject()->m_bPAL2Film = JSVAL_TO_BOOLEAN(*vp);
 				audioFilterPal2Film(priv->getObject()->m_bPAL2Film);
 				break;
-			case mono2stereo_prop:
-				priv->getObject()->m_bMono2Stereo = JSVAL_TO_BOOLEAN(*vp);
-				audioFilterMono2Stereo(priv->getObject()->m_bMono2Stereo);
-				break;
-			case stereo2mono_prop:
-				priv->getObject()->m_bStereo2Mono = JSVAL_TO_BOOLEAN(*vp);
-				audioFilterStereo2Mono(priv->getObject()->m_bStereo2Mono);
-				break;
+
 		}
 	}
 	return JS_TRUE;

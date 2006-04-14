@@ -85,8 +85,6 @@ static void setEnd(char *p)      ;
 //static void saveRawAudio(char *p)      ;
 static void call_normalize(char *p) ;
 static void call_resample(char *p) 	;
-static void call_mono2stereo(char *p);
-static void call_stereo2mono(char *p);
 static void call_downsample(char *p) 	;
 static void call_help(char *p) 	;
 static void call_setAudio(char *p) 	;
@@ -159,8 +157,6 @@ AUTOMATON reaction_table[]=
 		{"audio-normalize",	1,"activate normalization",		call_normalize},
 		{"audio-downsample",	1,"activate 48->44 downsampling",	call_downsample},
 		{"audio-resample",	1,"resample to x hz",			call_resample},
-		{"audio-mono2stereo",	0,"channel: convert mono to stereo",	call_mono2stereo},
-		{"audio-stereo2mono",	0,"channel: convert stereo tp mono",	call_stereo2mono},
 		
 		{"filters",		1,"load a filter preset",		filterLoadXml}   ,
 		{"codec-conf",		1,"load a codec configuration",		(one_arg_type )loadVideoCodecConf}   ,
@@ -595,13 +591,6 @@ int set_output_format(const char *str){
   	return A_setContainer(str);
 }
 
-void call_mono2stereo(char *p){
-   audioFilterMono2Stereo(1);
-}
-
-void call_stereo2mono(char *p){
-   audioFilterStereo2Mono(1);
-}
 /*
         return 0 if p is 0 or false or off
         else 1
