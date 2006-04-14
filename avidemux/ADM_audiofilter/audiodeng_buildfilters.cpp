@@ -51,6 +51,8 @@
 #include "audioeng_toolame.h"
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
 #include "audioeng_lpcm.h"
+#include "audioeng_mixer.h"
+#include "prefs.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO_FILTER
 #include "ADM_toolkit/ADM_debug.h"
@@ -101,10 +103,10 @@ static int  audioFreq=48000;
 static RESAMPLING  audioResampleMode = RESAMPLING_NONE;
 static int  audioDRC = 0;
 static FILMCONV audioFilmConv=FILMCONV_NONE;
-static CHANNELCONV audioChannelConv=CHANNELCONV_NONE;
 static int audioMP3mode = 0;
 static int audioMP3bitrate = 128;
 static ADM_LAME_PRESET audioMP3preset=ADM_LAME_PRESET_CBR;
+static CHANNEL_CONF audioMixing=CHANNEL_INVALID;
 // These are globals for the moment
 int 	   audioShift = 0;
 int	   audioDelay=0;
@@ -132,7 +134,7 @@ uint8_t audioReset(void )
         audioNormalizeMode=0;
         audioResampleMode = RESAMPLING_NONE;
         audioFilmConv=FILMCONV_NONE;
-        audioChannelConv=CHANNELCONV_NONE;
+        audioMixing=CHANNEL_INVALID;
         return 1;
 }
 //************
@@ -170,10 +172,6 @@ uint32_t audioGetDelay(void)
 FILMCONV audioGetFpsConv(void)
 {
         return audioFilmConv;
-}
-CHANNELCONV audioGetChannelConv(void)
-{
-        return audioChannelConv;
 }
 
 uint32_t audioGetBitrate(void)
@@ -227,22 +225,6 @@ uint8_t audioFilterDelay(int32_t delay)
 	return 1;
 
 }
-uint8_t audioFilterMono2Stereo(uint8_t onoff)
-{
-	if(onoff)
-		audioChannelConv=CHANNELCONV_1to2;
-	else
-		audioChannelConv=CHANNELCONV_NONE;
-	return 1;
-}
-uint8_t audioFilterStereo2Mono(uint8_t onoff)
-{
-	if(onoff)
-		audioChannelConv=CHANNELCONV_2to1;
-	else
-		audioChannelConv=CHANNELCONV_NONE;
-	return 1;
-}
 RESAMPLING  audioGetResampling(void)
 {
         return audioResampleMode;
@@ -285,12 +267,12 @@ void audioFilter_SetBitrate( int i)
 }
 
 extern  int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
-  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv,CHANNELCONV *channel);
+  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv,CHANNEL_CONF *channel);
 
 void audioFilter_configureFilters( void )
 {
 	 DIA_getAudioFilter(&audioNormalizeMode,&audioResampleMode,&audioShift,&audioDelay,&audioDRC,&audioFreq,
-	 		&audioFilmConv,&audioChannelConv );
+	 		&audioFilmConv,&audioMixing );
 
 }
 
@@ -365,7 +347,7 @@ uint8_t audioFilterSetByName( const char *name)
 	Read(audioShift);
 	Read(audioDelay);
 	Read(audioFreq);
-	Read(audioChannelConv);
+	Read(audioMixing);
 	return 1;
 }
 
@@ -382,7 +364,7 @@ const char *audioFilterGetName( void )
 	Add(audioShift);
 	Add(audioDelay);
 	Add(audioFreq);
-	Add(audioChannelConv);
+	Add(audioMixing);
 	return conf;
 
 }
@@ -592,6 +574,14 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 
 
       }
+      
+      if( audioMixing!=CHANNEL_INVALID && lastFilter->getInfo()->channels>2)
+      {
+          AVDMProcessAudio_Mixer *mixer;
+          mixer=new AVDMProcessAudio_Mixer( lastFilter,audioMixing);
+          lastFilter = mixer;
+          filters[filtercount++] = lastFilter;
+      }
     if (audioDRC)
       {
 	  AVDMProcessAudio_Compress *pdrc = NULL;
@@ -659,26 +649,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 	
 		
       	}   
-	switch(audioChannelConv)
-	{
-		case CHANNELCONV_NONE:break;
-		case CHANNELCONV_2to1:
-				AVDMProcessStereo2Mono *s2m;
-				s2m = new AVDMProcessStereo2Mono(lastFilter);
-				lastFilter = s2m;
-				filters[filtercount++] = lastFilter;	
-				break;
-		case CHANNELCONV_1to2:
-				AVDMProcessMono2Stereo *m2s;
-				m2s = new AVDMProcessMono2Stereo(lastFilter);
-				lastFilter = m2s;
-				filters[filtercount++] = lastFilter;	
-				break;
-		default:
-				ADM_assert(0);
-	
-	
-	}   		
+		
 	
 	
 //_______________________________________________________
@@ -721,8 +692,33 @@ int32_t sstart;
         lastFilter = new AVDMProcessAudio_Null(currentaudiostream,sstart, duration);
         filtercount = 0;
         filters[filtercount++] = lastFilter;
-       
-	return lastFilter;
+        
+        
+        // Downmix for local playback ?
+        
+        uint32_t downmix;
+        if(prefs->get(DOWNMIXING_PROLOGIC,&downmix)!=RC_OK)
+        {       
+            downmix=0;
+        }
+        if( downmix && lastFilter->getInfo()->channels>2)
+        {
+            CHANNEL_CONF mix;
+            if(downmix==1) 
+            {
+                printf("Downmixing to prologic\n");
+                mix=CHANNEL_DOLBY_PROLOGIC;
+            }
+            else
+            {   
+                printf("Downmixing to prologic2\n");  
+                mix=CHANNEL_DOLBY_PROLOGIC2;
+            }
+            AVDMProcessAudio_Mixer *mixer;
+            mixer=new AVDMProcessAudio_Mixer( lastFilter,mix);
+            lastFilter = mixer;
+            filters[filtercount++] = lastFilter;
+        }	return lastFilter;
 }
 void audioForceDownSample( void)
 {

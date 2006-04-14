@@ -69,13 +69,6 @@ typedef enum FILMCONV
 	FILMCONV_LAST
 }FILMCONV;
 
-typedef enum CHANNELCONV
-{
-	CHANNELCONV_NONE=0,
-	CHANNELCONV_2to1=1,
-	CHANNELCONV_1to2=2,
-	CHANNELCONV_last
-}CHANNELCONV;
 typedef enum
 {
         AudioInvalid,
@@ -121,7 +114,6 @@ uint8_t audioGetDownsample(void);
 uint32_t audioGetResample(void);
 uint32_t audioGetDelay(void);
 FILMCONV audioGetFpsConv(void);
-CHANNELCONV audioGetChannelConv(void);
 RESAMPLING  audioGetResampling(void);
 /*-----*/
 uint8_t                 A_changeAudioStream(AVDMGenericAudioStream *newaudio,AudioSource so,char *name);

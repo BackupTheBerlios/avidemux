@@ -48,12 +48,7 @@ double dur;
     _wavheader->encoding = WAV_PCM;
     
     // bug spotted by jmisack
-      _wavheader->bitspersample=16;
-      
-      
-    // Case AC3 Downmixing to stereo ...
-    if( _wavheader->channels >2)
-    		_wavheader->channels =2;
+    _wavheader->bitspersample=16;
     _wavheader->byterate =_wavheader->channels * _wavheader->frequency * 2;
     strcpy(_name, "PROC:NULL");
     _instream->goToTime(time_offset);
