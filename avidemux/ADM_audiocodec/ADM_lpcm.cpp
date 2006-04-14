@@ -62,7 +62,7 @@ uint8_t ADM_AudiocodecWavSwapped::isDecompressable( void )
 {
  	return 1;
 }
-uint8_t ADM_AudiocodecWavSwapped::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut)
+uint8_t ADM_AudiocodecWavSwapped::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
 {
 		*nbOut=0;
             // if we have instored ...

@@ -149,7 +149,7 @@
  }
  // This codec expects more or less one packet at a time !
  
- uint8_t ADM_vorbis::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut)
+ uint8_t ADM_vorbis::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
 {
 ogg_packet packet;
 float **sample_pcm;

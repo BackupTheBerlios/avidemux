@@ -98,7 +98,7 @@ signed int r;
 #endif
   return r;
 }
-uint8_t ADM_AudiocodecMP3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut)
+uint8_t ADM_AudiocodecMP3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
 {
 int i;
 signed int Sample;

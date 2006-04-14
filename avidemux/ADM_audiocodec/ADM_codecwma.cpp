@@ -89,7 +89,7 @@
 /*-------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------*/
 
-uint8_t ADM_AudiocodecWMA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut)
+uint8_t ADM_AudiocodecWMA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
 {
 int out=0;
 int max=0,pout=0;
@@ -171,7 +171,7 @@ int max=0,pout=0;
 /*-------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------*/
 #define AMR_PACKET 32
-uint8_t ADM_AudiocodecAMR::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut)
+uint8_t ADM_AudiocodecAMR::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
 {
 int out;
 int max=0,pout=0,toread;

@@ -118,7 +118,7 @@ ADM_AudiocodecImaAdpcm::~ADM_AudiocodecImaAdpcm()
 
 }
 uint8_t ADM_AudiocodecImaAdpcm::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
-                                                          uint32_t * nbOut)
+                                     uint32_t * nbOut,ADM_ChannelMatrix *matrix)
 {
 int produced=0,one;
 uint8_t  *start;

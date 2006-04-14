@@ -47,7 +47,7 @@ ADM_Audiocodec8Bits::~ADM_Audiocodec8Bits( )
 {
 
 }
-uint8_t ADM_Audiocodec8Bits::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut)
+uint8_t ADM_Audiocodec8Bits::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
 {
 	uint32_t n=0;
 	int16_t o;

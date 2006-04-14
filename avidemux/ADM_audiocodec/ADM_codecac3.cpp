@@ -36,6 +36,32 @@ extern "C" {
 #define AC3_HANDLE ((a52_state_t *)ac3_handle)
 #define AC3_SAMPLE ((sample_t *)ac3_sample)
 
+static const int channel[15]=
+{
+    0,1,2,3,
+    3,4,4,5,
+    0,0,0,0,
+    0,0,0
+};
+
+static const CHANNEL_CONF AC3_CONF[15]=
+{
+    CHANNEL_INVALID,
+    CHANNEL_MONO,
+    CHANNEL_STEREO,
+    CHANNEL_3F,
+    CHANNEL_2F_1R, //4
+    CHANNEL_3F_1R, //5
+    CHANNEL_2F_2R,
+    CHANNEL_3F_2R,
+    CHANNEL_INVALID,
+    CHANNEL_INVALID, //9
+    CHANNEL_DOLBY_SURROUND,
+    CHANNEL_INVALID,
+    CHANNEL_INVALID,
+    CHANNEL_INVALID,
+    CHANNEL_INVALID
+};
 
 ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc) :   ADM_Audiocodec(fourcc)
 {
@@ -70,7 +96,6 @@ ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc) :   ADM_Audiocodec(fourcc
     if(_downmix)
     {
         _downmix=A52_DOLBY2;
-        printf("Using DLP2 downmixing\n");
     }
     else    _downmix=A52_DOLBY;
 }
@@ -98,7 +123,7 @@ uint8_t ADM_AudiocodecAC3::endDecompress( void )
     
 
 */
-uint8_t ADM_AudiocodecAC3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut)
+uint8_t ADM_AudiocodecAC3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
 {
     uint32_t avail;
     uint32_t length;
@@ -127,16 +152,8 @@ uint8_t ADM_AudiocodecAC3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
             // not enough data
             break;
         }
-        // Decode
-        {
-            if(flags & A52_STEREO)
-                flags = A52_ADJUST_LEVEL|_downmix;
-            else
-            {
-                flags = A52_ADJUST_LEVEL|A52_MONO;
-                chan=1;
-            }
-        }
+        chan=channel[flags & A52_CHANNEL_MASK];
+        ADM_assert(chan);
         sample_t level = 32767, bias = 0;
        
         if (a52_frame(AC3_HANDLE, ptr, &flags, &level, bias))
@@ -150,6 +167,12 @@ uint8_t ADM_AudiocodecAC3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
         ptr+=length;
         nbIn-=length;
         *nbOut += 256 * 2 * chan*6;
+        if(matrix)   
+        {
+            matrix->nbChannel=channel[flags & A52_CHANNEL_MASK];
+            matrix->channelConfiguration=AC3_CONF[flags & A52_CHANNEL_MASK];
+            
+        }
         for (int i = 0; i < 6; i++)
         {
             if (a52_block(AC3_HANDLE))

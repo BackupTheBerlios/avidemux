@@ -97,7 +97,7 @@ uint8_t ADM_faad::endDecompress( void )
 	 faacDecPostSeekReset(_instance, 0);
 }
 uint8_t ADM_faad::run( uint8_t * ptr, uint32_t nbIn, 
-			uint8_t * outptr,   uint32_t * nbOut)
+                       uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
 {
 long int res;
 void *outbuf;
