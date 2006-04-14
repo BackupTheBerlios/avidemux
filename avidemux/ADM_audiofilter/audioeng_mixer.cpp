@@ -311,6 +311,6 @@ uint32_t AVDMProcessAudio_Mixer::grab(uint8_t * obuffer)
     MIXER *call=matrixCall[_output][_input];
     if(!call)
         return (uint32_t)MCOPY((int16_t *)mixBuffer,(int16_t *)obuffer,NB_SAMPLE,ADM_channel_mixer[_input]);
-    return (uint32_t)call((int16_t *)mixBuffer,(int16_t *)obuffer,NB_SAMPLE,0);
+    return (uint32_t)call((int16_t *)mixBuffer,(int16_t *)obuffer,NB_SAMPLE,ADM_channel_mixer[_input]);
     
 }
