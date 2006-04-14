@@ -79,10 +79,7 @@ uint8_t A_autoDrive(Action action)
                                         {
                                                 audioFilterResample(44100);
                                         }
-                                        if(currentaudiostream->getInfo()->channels==1)
-                                        {
-                                                audioFilterMono2Stereo(1);
-                                        }
+#warning use mixer!!
                                         audioFilter_SetBitrate(224);
                                 }
                                 break;
@@ -106,7 +103,8 @@ uint8_t A_autoDrive(Action action)
                                         }
                                         if(currentaudiostream->getInfo()->channels==1)
                                         {
-                                                audioFilterMono2Stereo(1);
+//                                                 audioFilterMono2Stereo(1);
+#warning USE mixer
                                         }
                                         audioFilter_SetBitrate(160);
                                 }
