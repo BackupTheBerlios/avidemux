@@ -282,19 +282,16 @@ void FillAudio(void)
 {
     uint32_t oaf = 0;
     uint32_t load = 0;
-    uint32_t channels;
+    uint32_t channels,fq;
     
     if (!audio_available)
 	return;
     if (!currentaudiostream)
 	return;			// audio ?
 
-// compute time divergence
-	if(wavinfo->channels>2)   
-    			channels=2;
-      else
-      	 	channels= wavinfo->channels;
- 	  
+
+    channels= playback->getInfo()->channels;
+    fq=playback->getInfo()->frequency;  
     do
       {
 	  double db_vid, db_clock, db_wav;
@@ -309,7 +306,7 @@ void FillAudio(void)
 	  db_clock /= 1000;
 
 	  db_wav = dauds;	// for ms
-	  db_wav /= wavinfo->frequency;
+          db_wav /= fq;
 	  db_wav /= 2;		// 16 bits / sample
 	  db_wav /=channels;
 
@@ -365,22 +362,8 @@ void ComputePreload(void)
 
 
 
-    // compute start position     
-   		if(wavinfo->channels>2)   
-    			channels=2;
-      else
-      	 	channels= wavinfo->channels;
- 	    
-     one_audio_frame = (one_frame * wavinfo->frequency * channels * 2);	// 1000 *nb audio bytes per ms
-
-    one_audio_frame /= 1000;
-
-    printf("\n 1 audio frame = %lu bytes (1)", one_audio_frame);
-    // 3 sec buffer..               
-    wavbuf =
-	(uint8_t *)
-	ADM_alloc((4 * 3 *  channels * wavinfo->frequency));
-    ADM_assert(wavbuf);
+   
+    
 
     double db;
     // go to the beginning...
@@ -392,6 +375,16 @@ void ComputePreload(void)
     //      currentaudiostream->goToTime( (uint32_t)floor(db+0.49));        
 
     playback = buildPlaybackFilter(currentaudiostream,(uint32_t) (db + 0.49), 0xffffffff);
+    
+    channels= playback->getInfo()->channels;
+    one_audio_frame = (one_frame * wavinfo->frequency * channels * 2);	// 1000 *nb audio bytes per ms
+    one_audio_frame /= 1000;
+    printf("\n 1 audio frame = %lu bytes (1)", one_audio_frame);
+    // 3 sec buffer..               
+    wavbuf =
+            (uint8_t *)
+            ADM_alloc((4 * 3 *  channels * wavinfo->frequency));
+    ADM_assert(wavbuf);
     // Call it twice to be sure it is properly setup
      latency = AVDM_AudioSetup(playback->getInfo()->frequency,  channels );
      AVDM_AudioClose();
