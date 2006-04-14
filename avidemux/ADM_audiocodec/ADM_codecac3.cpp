@@ -95,7 +95,7 @@ ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc) :   ADM_Audiocodec(fourcc
     }
     if(_downmix)
     {
-        _downmix=A52_DOLBY2;
+        _downmix=A52_DOLBY;
     }
     else    _downmix=A52_DOLBY;
 }
