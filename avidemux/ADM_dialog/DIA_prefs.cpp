@@ -555,7 +555,7 @@ GtkWidget*
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label20), 0, 0.5);
 
-    label29 = gtk_label_new (_("Downsampling"));
+    label29 = gtk_label_new (_("Local Playback Downmixing"));
     gtk_widget_show (label29);
     gtk_table_attach (GTK_TABLE (table1), label29, 0, 1, 2, 3,
                       (GtkAttachOptions) (GTK_FILL),
@@ -567,6 +567,7 @@ GtkWidget*
     gtk_table_attach (GTK_TABLE (table1), comboboxDownMix, 1, 2, 2, 3,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (GTK_FILL), 0, 0);
+    gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("No downmixing (multichannel)"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("Dolby Prologic"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("Dolby Prologic 2"));
 

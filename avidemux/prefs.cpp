@@ -109,7 +109,7 @@ static opt_def opt_defs [] = {
 	{"feature.reuse_2pass_log",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.audiobar_uses_master",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.multi_thread",		UINT,	"0",	NULL,	"0",	"4"	},
-	{"downmixing.prologic",		UINT,	"0",	NULL,	"0",	"1"	}
+	{"downmixing.prologic",		UINT,	"2",	NULL,	"0",	"2"	}
 };
 
 int num_opts = 66;

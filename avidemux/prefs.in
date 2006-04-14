@@ -83,4 +83,4 @@ feature.reuse_2pass_log,                UINT,   0,      0,      1
 feature.audiobar_uses_master,           UINT,   0,      0,      1
 feature.multi_thread,                   UINT,   0,      0,      4
 # prologic 1/2
-downmixing.prologic,			UINT,	0,	0,	1
+downmixing.prologic,			UINT,	2,	0,	2
