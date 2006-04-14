@@ -54,6 +54,7 @@
 
 uint8_t alsaAudioDevice::init( uint32_t channel,uint32_t fq )
 {
+    printf("[Alsa]Initialing fq :%u channel %u\n",fq,channel);
 	_freq=fq;
 	_channels=channel;
 	_init=0;
@@ -197,7 +198,7 @@ If your hardware does not support a buffersize of 2^n, you can use the function 
 	  return(0);
 	}
 
-    printf("\n Alsa successfully initialized\n");
+        printf("[Alsa]Success initializing: fq :%u channel %u\n",fq,channel);
 
     // 2=fully initialized
     _init=2;
@@ -435,7 +436,7 @@ If your hardware does not support a buffersize of 2^n, you can use the function 
 	  return(0);
 	}
 
-    printf("\n Alsa successfully initialized\n");
+        printf("[Alsa]Success initializing: fq :%u channel %u\n",fq,channel);
 
     // 2=fully initialized
     _init=2;
@@ -452,7 +453,7 @@ uint8_t alsaAudioDevice::play( uint32_t len, uint8_t *data )
     	// convert data in bytes to sample
 	if(2!=_init) return 0;
     	len>>=1;
-	if(_channels==2) len>>=1;
+        len=len/_channels;
     	while(1)
 	{
         	ret=snd_pcm_writei(pcm_handle, data, len);

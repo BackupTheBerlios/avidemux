@@ -249,7 +249,7 @@ void AVDM_AudioClose(void)
 //_______________________________________________
 uint32_t AVDM_AudioSetup(uint32_t fq, uint32_t channel)
 {
-	if(channel>2) channel=2;
+	
 	return device->init(channel,fq);
 }
 uint8_t         AVDM_setVolume(int volume)
