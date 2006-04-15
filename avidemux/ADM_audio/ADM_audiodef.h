@@ -44,6 +44,6 @@ class ADM_ChannelMatrix
         CHANNEL_CONF    channelConfiguration;
         uint8_t         channelLayout[8];
         
-        ADM_ChannelMatrix::ADM_ChannelMatrix(void) {memset(this,0,sizeof(ADM_ChannelMatrix));}
+        ADM_ChannelMatrix(void) {memset(this,0,sizeof(ADM_ChannelMatrix));}
 };
 #endif
