@@ -214,7 +214,7 @@ void GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *sec
 
         prefs->get(MESSAGE_LEVEL,&msglvl);
 
-        if(msglvl<=level)
+        if(msglvl<level)
         {
                 printf("Info : %s \n",primary);
                 return;
