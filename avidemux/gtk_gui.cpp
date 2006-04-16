@@ -1024,7 +1024,9 @@ int A_openAvi2 (char *name, uint8_t mode)
   if (mode)
     res = video_body->addFile (longname, 1);
   else
+  {
     res = video_body->addFile (longname);
+  }
   DIA_StopBusy ();
 
   // forget last project file
@@ -1073,6 +1075,19 @@ int A_openAvi2 (char *name, uint8_t mode)
 	prefs->set_lastfile(longname);
         UI_updateRecentMenu();
 	updateLoaded ();
+        if(currentaudiostream)
+        {
+            uint32_t nbAudio,*infos=NULL;
+            if(video_body->getAudioStreamsInfo(curframe+1,&nbAudio,&infos))
+            {
+                if(nbAudio>1)
+                {   // Multiple track warn user
+                    GUI_Info_HIG(ADM_LOG_INFO,"Multiple Audio Tracks","The file you just loaded contains several audio tracks.\n"
+                            "Go to Audio->MainTrack to select the active one.");
+                }
+            }
+            
+        }
 	for(i=strlen(longname);i>=0;i--)
 #ifdef CYG_MANGLING
 		if( longname[i] == '\\' ){
