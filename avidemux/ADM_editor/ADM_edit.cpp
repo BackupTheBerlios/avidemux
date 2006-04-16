@@ -1375,14 +1375,18 @@ uint8_t         ADM_Composer::tryIndexing(char *name,char *idxname)
 		       if(autoidx)
 			{
 				printf("Using autoindex\n");
-			}else
+			}
+/*                        else
 		       {
+                           
                         if(!DIA_dmx(name,type,nbTrack,tracks,&audioTrack))
                         {
                                 delete [] tracks;
                                 return 0;
                         }
 		       }
+*/
+                        audioTrack=0;
                 }
 		if( idxname ){
 			idx=new char[strlen(idxname)];
