@@ -46,8 +46,7 @@ AVDMProcessAudio_Film2Pal::AVDMProcessAudio_Film2Pal(AVDMGenericAudioStream * in
 
     memcpy(_wavheader, _instream->getInfo(), sizeof(WAVHeader));
     _wavheader->encoding = WAV_PCM;
-    _wavheader->byterate =
-	_wavheader->channels * _wavheader->frequency * 2;
+    _wavheader->byterate = _wavheader->channels * _wavheader->frequency * 2;
     _instream->goToTime(0);
     strcpy(_name, "PROC:F2PL");
     _length = instream->getLength();
@@ -81,12 +80,12 @@ uint32_t 	AVDMProcessAudio_Film2Pal::grab(uint8_t *obuffer)
     uint8_t *out=NULL,*copy=NULL;
     uint32_t min;
     
-    org=rd = _instream->readDecompress(8192*4, _bufferin);
+    org=rd = _instream->readDecompress(1024*_wavheader->channels*2, _bufferin);
     if(!rd) return MINUS_ONE;        
    
     
    
-    min=_wavheader->channels*2;
+    min=_wavheader->channels*2; // 1 sample at a time
     
     rendered=0;
     
@@ -96,15 +95,11 @@ uint32_t 	AVDMProcessAudio_Film2Pal::grab(uint8_t *obuffer)
     
     while(rd>=min)
     {
-    	for(uint32_t i=0;i<min;i++)
-	{
-		*out++=*copy++;
-		
-	}
-	
+        memcpy(out,copy,min);
+        out+=min;
+        copy+=min;
 	rendered+=min;
 	rd-=min;
-	
 	_target+=(PAL_SAM-FILM_SAM);
 	//_______________________________________
 	// Remove sample
@@ -112,9 +107,8 @@ uint32_t 	AVDMProcessAudio_Film2Pal::grab(uint8_t *obuffer)
 	//_______________________________________
 	// Fps higher=we have to accelerate sound = remove samples
 	// The compression factor is 1-((25-24)/25)	
-	while(_target>PAL_SAM)
-	{
-					
+	while(_target>PAL_SAM && rendered>=min)
+	{	
 		rendered-=min;	
 		out-=min;
 		_target=_target-PAL_SAM;
@@ -182,13 +176,11 @@ uint32_t 	AVDMProcessAudio_Pal2Film::grab(uint8_t *obuffer)
     out=obuffer;
     while(rd>min)
     {
-    	for(uint32_t i=0;i<min;i++)
-	{
-		*out++=*copy++;
-		rendered++;
-		rd--;
-		
-	}	
+        memcpy(out,copy,min);
+        out+=min;
+        copy+=min;
+        rendered+=min;
+        rd-=min;
 	_target+=(PAL_SAM-FILM_SAM);
 	//_______________________________________
 	// Duplicate sample
@@ -199,12 +191,9 @@ uint32_t 	AVDMProcessAudio_Pal2Film::grab(uint8_t *obuffer)
 
 	while(_target>FILM_SAM)
 	{
-		for(uint32_t i=0;i<min;i++)
-		{
-			*out++=*(copy-min+i);
-			rendered++;
-		
-		}			
+                memcpy(out,copy-min,min);
+                out+=min;
+                rendered+=min;			
 		_target=_target-FILM_SAM;
 	}
     }
