@@ -25,7 +25,8 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
         DIA_contrast.cpp \
         DIA_srt.cpp \
         DIA_rotate.cpp \
-        DIA_conv.cpp
+        DIA_conv.cpp \
+	DIA_coloryuv.cpp
 
 
 libADM_dialog2_a_SOURCES = DIA_quota.cpp
