@@ -32,9 +32,7 @@
 #include "ADM_library/default.h"
 #include "audio_out.h"
 #include <ADM_assert.h>
-#ifdef OSS_SUPPORT
 #include "ADM_audiodevice/ADM_deviceoss.h"
-#endif
 #ifdef ALSA_SUPPORT
 #include "ADM_audiodevice/ADM_deviceALSA.h"
 #endif

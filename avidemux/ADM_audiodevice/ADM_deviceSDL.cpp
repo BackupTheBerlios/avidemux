@@ -27,9 +27,7 @@
 
 
 #include "ADM_toolkit/toolkit.hxx"
-#ifdef OSS_SUPPORT
 #include "ADM_audiodevice/ADM_deviceoss.h"
-#endif
 #ifdef ALSA_SUPPORT
 #include "ADM_audiodevice/ADM_deviceALSA.h"
 #endif
