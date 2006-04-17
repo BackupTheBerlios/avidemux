@@ -21,7 +21,6 @@
 #include <string.h>
 
 
-#include <gtk/gtk.h>
 #include <time.h>
 #include <sys/time.h>
 
