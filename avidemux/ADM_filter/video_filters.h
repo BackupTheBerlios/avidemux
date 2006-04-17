@@ -91,6 +91,7 @@
                 VF_BLENDREMOVAL,
                 VF_TDEINT,
                 VF_MPDELOGO,
+                VF_COLOR_YUV,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

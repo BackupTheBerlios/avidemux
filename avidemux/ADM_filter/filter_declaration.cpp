@@ -108,7 +108,8 @@ printf(  "*********************\n");
         REGISTERX("chromavonly","Chroma V only","Convert picture to grey, keeping only chroma V.",VF_CHROMAV,1,chromaV_create,chromaV_script);
        
         REGISTERX("delta","Luma delta","Difference between current and previous picture.",VF_DELTA,1,delta_create,delta_script);
-                
+        REGISTERX("coloryuv","Avisynth ColorYuv","Alter colors (auto white nalance etc...).\n Ported from avisynth.",VF_COLOR_YUV,1,coloryuv_create,coloryuv_script);
+                 
 
 
        
