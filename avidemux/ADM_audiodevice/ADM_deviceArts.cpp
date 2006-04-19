@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
- 
+#ifndef CYG_MANGLING 
 #ifdef USE_ARTS
 #include <artsc.h>
 
@@ -120,4 +120,5 @@ void dummy_art_func( void);
 void dummy_art_func( void)
  {
 }
+#endif
 #endif
