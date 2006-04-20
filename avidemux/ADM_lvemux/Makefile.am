@@ -1,7 +1,8 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
 noinst_PROGRAMS = libADM_lvemux.o
 
-libADM_lavmux_o_LDFLAGS =  -r
+libADM_lvemux_o_LDFLAGS =  -r
+
 
 LIBS =  
 LDFLAGS = 
