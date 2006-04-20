@@ -5,7 +5,7 @@ INCLUDES = $(all_includes)
 
 libADM_audiocodec_o_METASOURCES = AUTO
 LIBS =  
-rADM_audiocodec_o_LDFLAGS =  -r
+libADM_audiocodec_o_LDFLAGS =  -r
 LDFLAGS = 
 
 libADM_audiocodec_o_SOURCES = ADM_codecwma.cpp ADM_ffwma.cpp mad.cpp \
