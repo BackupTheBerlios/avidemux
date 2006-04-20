@@ -1,10 +1,14 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_LIBRARIES = libADM_nuv.a
+noinst_PROGRAMS = libADM_nuv.o
+libADM_nuv_o_LDFLAGS =  -r
+
+LIBS =  
+LDFLAGS = 
 
 
-libADM_nuv_a_METASOURCES = AUTO
+libADM_nuv_o_METASOURCES = AUTO
 
-libADM_nuv_a_SOURCES = minilzo.c ADM_nuvAudio.cpp ADM_nuv.cpp RTjpeg.c RTjpegN.cpp ADM_rtGlob.h RToldformat.cpp
+libADM_nuv_o_SOURCES = minilzo.c ADM_nuvAudio.cpp ADM_nuv.cpp RTjpeg.c RTjpegN.cpp ADM_rtGlob.h RToldformat.cpp
 
 
 EXTRA_DIST = ADM_nuv.cpp ADM_nuv.h ADM_nuvAudio.cpp lzoconf.h minilzo.h nuppel.h RTjpegN.h RTjpeg.h  minilzo.c  RTjpeg.c mmx.h

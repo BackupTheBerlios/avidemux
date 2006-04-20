@@ -1,10 +1,13 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_LIBRARIES = libADM_script.a
+noinst_PROGRAMS = libADM_script.o
 
+libADM_script_o_LDFLAGS =  -r
+LIBS =  
+LDFLAGS = 
 
-libADM_script_a_METASOURCES = AUTO
+libADM_script_o_METASOURCES = AUTO
 
-libADM_script_a_SOURCES =   \
+libADM_script_o_SOURCES =   \
 		 ADM_JSAvidemux.cpp ADM_JSAvidemux.h ADM_JSGlobal.cpp \
 		ADM_JSGlobal.h ADM_Avidemux.cpp ADM_AvidemuxAudio.cpp ADM_JSAvidemuxAudio.cpp \
 	ADM_AvidemuxVideo.cpp ADM_JSAvidemuxVideo.cpp ADM_JSFunctions.cpp

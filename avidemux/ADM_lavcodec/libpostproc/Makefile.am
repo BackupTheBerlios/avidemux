@@ -1,10 +1,13 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_LIBRARIES = libpostproc.a
+noinst_PROGRAMS = libpostproc.o
 
 
-libpostproc_a_METASOURCES = AUTO
+libpostproc_o_METASOURCES = AUTO
+libpostproc_o_LDFLAGS =  -r
+LIBS =  
+LDFLAGS = 
 
-libpostproc_a_SOURCES =  postprocess.c
+libpostproc_o_SOURCES =  postprocess.c
 	
 
 

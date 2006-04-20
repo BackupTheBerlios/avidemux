@@ -1,10 +1,14 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_LIBRARIES = libADM_lavutil.a
+noinst_PROGRAMS = libADM_lavutil.o
 
+libADM_lavutil_o_LDFLAGS =  -r
 
-libADM_lavutil_a_METASOURCES = AUTO
+LIBS =  
+LDFLAGS = 
 
-libADM_lavutil_a_SOURCES =  eval.c  integer.c  intfloat_readwrite.c  mathematics.c  rational.c
+libADM_lavutil_o_METASOURCES = AUTO
+
+libADM_lavutil_o_SOURCES =  eval.c  integer.c  intfloat_readwrite.c  mathematics.c  rational.c
 
 
 EXTRA_DIST = 

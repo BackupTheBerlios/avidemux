@@ -1,10 +1,14 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_LIBRARIES = libADM_lvemux.a
+noinst_PROGRAMS = libADM_lvemux.o
 
+libADM_lavmux_o_LDFLAGS =  -r
 
-libADM_lvemux_a_METASOURCES = AUTO
+LIBS =  
+LDFLAGS = 
 
-libADM_lvemux_a_SOURCES =  mux_out.c mux_out.h ADM_muxer.cpp
+libADM_lvemux_o_METASOURCES = AUTO
+
+libADM_lvemux_o_SOURCES =  mux_out.c mux_out.h ADM_muxer.cpp
 
 
 EXTRA_DIST = 

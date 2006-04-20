@@ -1,11 +1,14 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_LIBRARIES = libADM_library.a
+noinst_PROGRAMS = libADM_library.o
 
+libADM_library_o_LDFLAGS =  -r
+LIBS =  
+LDFLAGS = 
 INCLUDES = $(all_includes)
 
-libADM_library_a_METASOURCES = AUTO
+libADM_library_o_METASOURCES = AUTO
 
-libADM_library_a_SOURCES = subchunk.cpp riffparser.cpp fourcc.cpp broken.cpp \
+libADM_library_o_SOURCES = subchunk.cpp riffparser.cpp fourcc.cpp broken.cpp \
 		aviio.cpp aviindexer.cpp aviframe.cpp avidemutils.cpp ADM_image.cpp \
 	ADM_fileio.cpp ADM_print.cpp ADM_imageUtils.cpp ADM_bitstream.cpp
 

@@ -1,10 +1,14 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_LIBRARIES = libADM_requant.a
+noinst_PROGRAMS = libADM_requant.o
+libADM_requant_o_LDFLAGS =  -r
+
+LIBS =  
+LDFLAGS = 
 
 
-libADM_requant_a_METASOURCES = AUTO
+libADM_requant_o_METASOURCES = AUTO
 
-libADM_requant_a_SOURCES =  tcrequant.c
+libADM_requant_o_SOURCES =  tcrequant.c
 
 
 EXTRA_DIST = 

@@ -1,10 +1,14 @@
-noinst_LIBRARIES = libADM_ocr.a
+noinst_PROGRAMS = libADM_ocr.o
+libADM_ocr_o_LDFLAGS =  -r
+
+LIBS =  
+LDFLAGS = 
 
 INCLUDES = $(all_includes)  $(GTK_CFLAGS)
 
-libADM_ocr_a_METASOURCES = AUTO
+libADM_ocr_o_METASOURCES = AUTO
 
-libADM_ocr_a_SOURCES =  adm_ocr.cpp adm_glyph.cpp adm_leftturn.cpp ADM_vob2vobsub.cpp
+libADM_ocr_o_SOURCES =  adm_ocr.cpp adm_glyph.cpp adm_leftturn.cpp ADM_vob2vobsub.cpp
 
 
 EXTRA_DIST = 

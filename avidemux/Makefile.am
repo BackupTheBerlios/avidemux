@@ -32,50 +32,50 @@ EXTRA_DIST = main.cpp avi_vars.h avilist.cpp avilist.h callbacks.cpp callbacks.h
 
 
 avidemux2_LDADD   =  \
-  ADM_lavcodec/libavcodec.a \
-  ADM_lavcodec/libpostproc/libpostproc.a \
-  ./ADM_script/libADM_script.a \
-./ADM_editor/libADM_editor.a \
-./ADM_library/libADM_library.a \
-./ADM_openDML/libADM_openDML.a \
-./oplug_ogm/liboplug_ogm.a \
-./ADM_audiocodec/libADM_audiocodec.a ./ADM_audio/libADM_audio.a \
-./oplug_avi/liboplug_avi.a \
-./oplug_mp4/liboplug_mp4.a \
-./oplug_mpeg/liboplug_mpeg.a \
-./oplug_mpegFF/liboplug_mpegFF.a  \
-./ADM_requant/libADM_requant.a \
-./ADM_mplex/libADM_mplex.a \
-./ADM_lavformat/libADM_lavformat.a \
-./ADM_lavutil/libADM_lavutil.a \
-./ADM_lvemux/libADM_lvemux.a \
-./ADM_filter/libADM_filter.a \
-./ADM_video/libADM_video.a   ./ADM_encoder/libADM_encoder.a  \
-./ADM_codecs/libADM_codecs.a ./ADM_vp32/libADM_vp32.a   ./ADM_audiofilter/libADM_audiofilter.a \
-./libtoolame/liblibtoolame.a \
-./ADM_gui2/libADM_gui2.a  \
-./MPlayer_pp/libMPlayer_pp.a \
-./mpeg2enc/libmpeg2enc.a \
-./ADM_liba52/libliba52.a \
-./ADM_inpics/libADM_inpics.a  ./ADM_3gp/libADM_3gp.a \
-./ADM_avsproxy/libADM_avsproxy.a \
-./ADM_h263/libADM_h263.a   \
-./ADM_nuv/libADM_nuv.a  ./ADM_ogm/libADM_ogm.a ./ADM_audiodevice/libADM_audiodevice.a \
-./ADM_xvidratectl/libADM_xvidratectl.a  \
-./ADM_ocr/libADM_ocr.a \
-./ADM_dialog/libADM_dialog.a  \
-./ADM_mpegdemuxer/libADM_mpegdemuxer.a   \
-./ADM_mpegdemuxer/libADM_mpegdemuxer.a   \
-./ADM_dialog/libADM_dialog.a  \
-./libMpeg2Dec/liblibMpeg2Dec.a   \
-./ADM_tray/libADM_tray.a \
-./ADM_dialog/libADM_dialog2.a  \
-./ADM_colorspace/libADM_colorspace.a \
-  ADM_lavcodec/libavcodec.a \
-./ADM_lavutil/libADM_lavutil.a \
-./ADM_lavcodec/libpostproc/libpostproc.a \
-./ADM_library/libADM_library.a \
-./ADM_toolkit/libADM_toolkit.a  \
+  ADM_lavcodec/ADMlibavcodec.o \
+./ADM_lavutil/libADM_lavutil.o \
+  ADM_lavcodec/libpostproc/libpostproc.o \
+  ./ADM_script/libADM_script.o \
+./ADM_editor/libADM_editor.o \
+./ADM_library/libADM_library.o \
+./ADM_openDML/libADM_openDML.o \
+./oplug_ogm/liboplug_ogm.o \
+./ADM_audiocodec/libADM_audiocodec.o \
+./ADM_audio/libADM_audio.o \
+./oplug_avi/liboplug_avi.o \
+./oplug_mp4/liboplug_mp4.o \
+./oplug_mpeg/liboplug_mpeg.o \
+./oplug_mpegFF/liboplug_mpegFF.o  \
+./ADM_requant/libADM_requant.o \
+./ADM_mplex/libADM_mplex.o \
+./ADM_lavformat/libADM_lavformat.o \
+./ADM_lvemux/libADM_lvemux.o \
+./ADM_filter/libADM_filter.o \
+./ADM_video/libADM_video.o \
+./ADM_encoder/libADM_encoder.o  \
+./ADM_codecs/libADM_codecs.o \
+./ADM_vp32/libADM_vp32.o   \
+./ADM_audiofilter/libADM_audiofilter.o \
+./libtoolame/liblibtoolame.o \
+./ADM_gui2/libADM_gui2.o  \
+./MPlayer_pp/libMPlayer_pp.o \
+./ADM_colorspace/libADM_colorspace.o \
+./ADM_toolkit/libADM_toolkit.o  \
+./ADM_3gp/libADM_3gp.o \
+./ADM_avsproxy/libADM_avsproxy.o \
+./ADM_audiodevice/libADM_audiodevice.o \
+./ADM_ocr/libADM_ocr.o \
+./ADM_tray/libADM_tray.o \
+./ADM_nuv/libADM_nuv.o  \
+./ADM_ogm/libADM_ogm.o \
+./ADM_h263/libADM_h263.o   \
+./ADM_inpics/libADM_inpics.o  \
+./ADM_dialog/libADM_dialog.o  \
+./mpeg2enc/libmpeg2enc.o \
+./ADM_xvidratectl/libADM_xvidratectl.o  \
+./ADM_mpegdemuxer/libADM_mpegdemuxer.o   \
+./ADM_liba52/libADM_liba52.o \
+./libMpeg2Dec/liblibMpeg2Dec.o   \
 $(libmpeg2enc_Altivec) 
 
 
@@ -86,7 +86,7 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 
 # the library search path.
 avidemux2_LDFLAGS = $(all_libraries)  $(SDL_LIBS) $(GTK_LIBS) \
-	$(FREETYPE_LIBS) $(ARTS_LIBS) $(XML_LIBS) ADM_lavcodec/libavcodec.a  
+	$(FREETYPE_LIBS) $(ARTS_LIBS) $(XML_LIBS) 
 
 noinst_HEADERS = ADM_pp.h admmangle.h
 AM_CFLAGS = -g

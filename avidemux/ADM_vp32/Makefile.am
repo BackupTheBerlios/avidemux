@@ -1,11 +1,15 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_LIBRARIES = libADM_vp32.a
+noinst_PROGRAMS = libADM_vp32.o
+libADM_vp32_o_LDFLAGS =  -r
+
+LIBS =  
+LDFLAGS = 
 
 ## INCLUDES were found outside kdevelop specific part
 
-libADM_vp32_a_METASOURCES = AUTO
+libADM_vp32_o_METASOURCES = AUTO
 
-libADM_vp32_a_SOURCES = BlockMapping.c DCT_decode.c dct_globals.c DDecode.c DFrameR.c DSystemDependant.c FrameIni.c Frarray.c Huffman.c IDctPart.c pb_globals.c postproc.c Quantize.c Reconstruct.c unpack.c vfwPback.c vfwpbdll_if.c YUVtofromRGB.c 
+libADM_vp32_o_SOURCES = BlockMapping.c DCT_decode.c dct_globals.c DDecode.c DFrameR.c DSystemDependant.c FrameIni.c Frarray.c Huffman.c IDctPart.c pb_globals.c postproc.c Quantize.c Reconstruct.c unpack.c vfwPback.c vfwpbdll_if.c YUVtofromRGB.c 
 
 SUBDIRS = include 
 

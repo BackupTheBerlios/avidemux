@@ -1,6 +1,10 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_LIBRARIES = libmpeg2enc.a
+noinst_PROGRAMS = libmpeg2enc.o
 
+
+liblibmpeg2enc_o_LDFLAGS =  -r
+LIBS =  
+LDFLAGS = 
 ## INCLUDES were found outside kdevelop specific part
 
 #quantize.cc 
@@ -14,8 +18,8 @@ if BUILD_ALTIVEC
 SUBDIRS = altivec
 endif
 
-libmpeg2enc_a_METASOURCES = AUTO
-libmpeg2enc_a_SOURCES = ADM_mpe2enc.cpp ADM_mpeg2enc.h ad_layer.cc conform.cc fdctdata.cc fdctref.cc \
+libmpeg2enc_o_METASOURCES = AUTO
+libmpeg2enc_o_SOURCES = ADM_mpe2enc.cpp ADM_mpeg2enc.h ad_layer.cc conform.cc fdctdata.cc fdctref.cc \
 feedframe.cc idct.cc idctdata.cc macroblock.cc motionest.cc motionsearch.cc mpeg2enc.cc mpeg2param.cc \
 mpeg2setup.cc mpegconsts.cc predict.cc predict_ref.cc putbits.cc puthdr.cc putmpg.cc putpic.cc putseq.cc \
 putvlc.cc \

@@ -1,11 +1,15 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_LIBRARIES = libMPlayer_pp.a
+noinst_PROGRAMS = libMPlayer_pp.o
+libMPlayer_pp_o_LDFLAGS =  -r
+
+LIBS =  
+LDFLAGS = 
 
 #INCLUDES = $(all_includes)
 
-libMPlayer_pp_a_METASOURCES = AUTO
+libMPlayer_pp_o_METASOURCES = AUTO
 
-libMPlayer_pp_a_SOURCES = swscale.c yuv2rgb.c rgb2rgb.c yuv2rgb_altivec.c ADM_mp.cpp
+libMPlayer_pp_o_SOURCES = swscale.c yuv2rgb.c rgb2rgb.c yuv2rgb_altivec.c ADM_mp.cpp
 
 
 EXTRA_DIST = 
