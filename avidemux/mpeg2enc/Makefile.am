@@ -2,7 +2,7 @@
 noinst_PROGRAMS = libmpeg2enc.o
 
 
-liblibmpeg2enc_o_LDFLAGS =  -r
+libmpeg2enc_o_LDFLAGS =  -r
 LIBS =  
 LDFLAGS = 
 ## INCLUDES were found outside kdevelop specific part
