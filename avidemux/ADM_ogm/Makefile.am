@@ -1,14 +1,10 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_PROGRAMS = libADM_ogm.o
-libADM_ogm_o_LDFLAGS =  -r
-
-LIBS =  
-LDFLAGS = 
+noinst_LIBRARIES = libADM_ogm.a
 
 
-libADM_ogm_o_METASOURCES = AUTO
+libADM_ogm_a_METASOURCES = AUTO
 
-libADM_ogm_o_SOURCES = ADM_oghead.h ADM_ogm.h ADM_ogm.cpp ADM_ogmpages.cpp \
+libADM_ogm_a_SOURCES = ADM_oghead.h ADM_ogm.h ADM_ogm.cpp ADM_ogmpages.cpp \
 	ADM_ogmpages.h ADM_ogmAudio.cpp ADM_ogmreorder.cpp
 
 

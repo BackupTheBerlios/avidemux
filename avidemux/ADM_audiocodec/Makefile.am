@@ -1,14 +1,10 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_PROGRAMS = libADM_audiocodec.o
+noinst_LIBRARIES = libADM_audiocodec.a
 
 INCLUDES = $(all_includes)
 
-libADM_audiocodec_o_METASOURCES = AUTO
-LIBS =  
-libADM_audiocodec_o_LDFLAGS =  -r
-LDFLAGS = 
-
-libADM_audiocodec_o_SOURCES = ADM_codecwma.cpp ADM_ffwma.cpp mad.cpp \
+libADM_audiocodec_a_METASOURCES = AUTO
+libADM_audiocodec_a_SOURCES = ADM_codecwma.cpp ADM_ffwma.cpp mad.cpp \
 	audiocodec_ogg.cpp ADM_codecwav.cpp ADM_codecmp3.cpp ADM_codecac3.cpp ADM_audiocodec.cpp \
 	ADM_lpcm.cpp ADM_8bits.cpp ADM_codecfaad.cpp ADM_codeculaw.cpp \
 ADM_codecimaadpcm.cpp

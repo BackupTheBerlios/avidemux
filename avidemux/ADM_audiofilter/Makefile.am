@@ -1,14 +1,11 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_PROGRAMS = libADM_audiofilter.o
+noinst_LIBRARIES = libADM_audiofilter.a
 
 #INCLUDES = $(all_includes)
 
-libADM_audiofilter_o_METASOURCES = AUTO
-libADM_audiofilter_o_LDFLAGS =  -r
-LIBS =  
-LDFLAGS = 
+libADM_audiofilter_a_METASOURCES = AUTO
 
-libADM_audiofilter_o_SOURCES = audiodeng_buildfilters.cpp audioeng_ffmp2.cpp \
+libADM_audiofilter_a_SOURCES = audiodeng_buildfilters.cpp audioeng_ffmp2.cpp \
 		audioeng_tshift.cpp audioeng_rawshift.cpp audioeng_null.cpp audioeng_normalize.cpp \
 		audioeng_mono.cpp audioeng_lame.cpp audioeng_buff.cpp audioeng_6dbpress.cpp \
 		audioeng_44sample.cpp audioprocess.cpp audioeng_toolame.cpp audioeng_toolame.h \

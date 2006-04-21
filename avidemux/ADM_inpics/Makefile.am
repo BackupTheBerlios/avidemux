@@ -1,14 +1,11 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_PROGRAMS = libADM_inpics.o
-libADM_inpics_o_LDFLAGS =  -r
-LIBS =  
-LDFLAGS = 
+noinst_LIBRARIES = libADM_inpics.a
 
 INCLUDES = $(all_includes)
 
-libADM_inpics_o_METASOURCES = AUTO
+libADM_inpics_a_METASOURCES = AUTO
 
-libADM_inpics_o_SOURCES = ADM_pics.cpp bitmap.h
+libADM_inpics_a_SOURCES = ADM_pics.cpp bitmap.h
 
 
 EXTRA_DIST = ADM_pics.cpp ADM_pics.h 

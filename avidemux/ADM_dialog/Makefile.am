@@ -1,14 +1,11 @@
 
-noinst_PROGRAMS = libADM_dialog.o 
+noinst_LIBRARIES = libADM_dialog.a 
 
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS)  
-libADM_dialog_o_LDFLAGS =  -r
-LIBS =  
-LDFLAGS = 
 
-libADM_dialog_o_METASOURCES = AUTO
+libADM_dialog_a_METASOURCES = AUTO
 
-libADM_dialog_o_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
+libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 	DIA_audiocodec.cpp DIA_properties.cpp DIA_mjpeg.cpp DIA_about.cpp DIA_recent.cpp \
 	DIA_indexer.cpp DIA_resize.cpp DIA_4entries.cpp DIA_dnr.cpp DIA_working.cpp \
 	DIA_working.h DIA_busy.cpp DIA_busy.h DIA_exLame.cpp DIA_pipe.cpp DIA_mpeg2opt.cpp \
@@ -31,6 +28,8 @@ libADM_dialog_o_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
         DIA_conv.cpp \
 	DIA_coloryuv.cpp \
 	DIA_quota.cpp
+
+
 
 EXTRA_DIST = DIA_encoding.h 
 

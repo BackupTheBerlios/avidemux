@@ -1,15 +1,11 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_PROGRAMS = libADM_gui2.o
-libADM_gui2_o_LDFLAGS =  -r
-
-LIBS =  
-LDFLAGS = 
+noinst_LIBRARIES = libADM_gui2.a
 
 ## INCLUDES were found outside kdevelop specific part
 
-libADM_gui2_o_METASOURCES = AUTO
+libADM_gui2_a_METASOURCES = AUTO
 
-libADM_gui2_o_SOURCES = GUI_main2.cpp support.cpp GUI_bindings.cpp GUI_render.cpp GUI_xvDraw.cpp GUI_render.h GUI_ui.h GUI_keymap.cpp GUI_xvDraw.h GUI_menumap.h GUI_sdlDraw.cpp
+libADM_gui2_a_SOURCES = GUI_main2.cpp support.cpp GUI_bindings.cpp GUI_render.cpp GUI_xvDraw.cpp GUI_render.h GUI_ui.h GUI_keymap.cpp GUI_xvDraw.h GUI_menumap.h GUI_sdlDraw.cpp
 
 
 EXTRA_DIST = GUI_main2.cpp support.cpp support.h 

@@ -1,9 +1,5 @@
-libavcodec_o_METASOURCES = AUTO
-noinst_PROGRAMS = ADMlibavcodec.o
-ADMlibavcodec_o_LDFLAGS =  -r
-LIBS =  
-LDFLAGS = 
-
+libavcodec_a_METASOURCES = AUTO
+noinst_LIBRARIES = libavcodec.a
 SUBDIRS=libpostproc i386 ppc 
 LAVUTIL=../ADM_lavutil 
 if BUILD_MMX_COMPATIBLE
@@ -49,10 +45,10 @@ fft_sse.o:i386/fft_sse.c
 vp3dsp_sse2.o:i386/vp3dsp_sse2.c
 	$(CC) -o $@ $< -c  $(CFLAGS) $(all_includes)   -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -msse -I$(LAVUTIL) -I../..
 
-ADMlibavcodec_o_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c $(EXTEND_AMR) \
+libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c $(EXTEND_AMR) \
 		adpcm.c 	allcodecs.c 	cyuv.c 	dsputil.c 	dv.c \
 		error_resilience.c 		fdctref.c 	fft.c 	h263.c 	h263dec.c 	huffyuv.c 	imgconvert.c \
-		jfdctfst.c 	jfdctint.c 	jrevdct.c 	mace.c 	mdct.c 	 	mjpeg.c \
+		imgresample.c 	jfdctfst.c 	jfdctint.c 	jrevdct.c 	mace.c 	mdct.c 	 	mjpeg.c \
 		motion_est.c 	mpeg12.c 	mpegaudio.c 	mpegaudiodec.c 	mpegvideo.c 	msmpeg4.c 	 \
 		pcm.c 	ratecontrol.c 	raw.c 	resample.c 	rv10.c 	simple_idct.c 	svq1.c \
 		utils.c 	wmadec.c 	indeo3.c 	vp3.c 	vp3dsp.c 	h264.c 	ffv1.c 	ra144.c 	ra288.c \

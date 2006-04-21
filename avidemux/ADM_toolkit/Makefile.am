@@ -1,15 +1,11 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_PROGRAMS = libADM_toolkit.o
-libADM_toolkit_o_LDFLAGS =  -r
-
-LIBS =  
-LDFLAGS = 
+noinst_LIBRARIES = libADM_toolkit.a
 
 ## INCLUDES were found outside kdevelop specific part
 
-libADM_toolkit_o_METASOURCES = AUTO
+libADM_toolkit_a_METASOURCES = AUTO
 
-libADM_toolkit_o_SOURCES = automation.cpp choice.cpp toolkit.cpp filesel.cpp \
+libADM_toolkit_a_SOURCES = automation.cpp choice.cpp toolkit.cpp filesel.cpp \
 	toolkit_gtk.h toolkit_dialog.cpp toolkit_gtk_include.h TLK_filesel.cpp TLK_clock.h \
 	TLK_clock.cpp ADM_debug.h ADM_debug.cpp ADM_debugID.h ADM_cpuCap.cpp win32.cpp \
 	ADM_memory.cpp ADM_memcpy.cpp ADM_quota.cpp eggtrayicon.c eggtray_win32.c

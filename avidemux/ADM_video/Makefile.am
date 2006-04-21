@@ -1,14 +1,12 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_PROGRAMS = libADM_video.o
+noinst_LIBRARIES = libADM_video.a
 
 ## INCLUDES were found outside kdevelop specific part
 
-libADM_video_o_LDFLAGS =  -r
-libADM_video_o_METASOURCES = AUTO
+libADM_video_a_METASOURCES = AUTO
 #INCLUDES = $(all_includes) 
-LIBS =  
-LDFLAGS = 
-libADM_video_o_SOURCES = ADM_vidFields.cpp \
+
+libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidDeintASM.cpp \
  ADM_vidVlad.cpp \
  ADM_guiMedianBig.cpp \

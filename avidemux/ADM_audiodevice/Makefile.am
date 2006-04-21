@@ -1,14 +1,11 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_PROGRAMS = libADM_audiodevice.o
+noinst_LIBRARIES = libADM_audiodevice.a
 
 ## INCLUDES were found outside kdevelop specific part
 
-libADM_audiodevice_o_METASOURCES = AUTO
-libADM_audiodevice_o_LDFLAGS =  -r
-LIBS =  
-LDFLAGS = 
+libADM_audiodevice_a_METASOURCES = AUTO
 
-libADM_audiodevice_o_SOURCES = ADM_deviceArts.cpp ADM_audiodevice.cpp \
+libADM_audiodevice_a_SOURCES = ADM_deviceArts.cpp ADM_audiodevice.cpp \
 	ADM_deviceoss.cpp oss_out.cpp ADM_deviceALSA.cpp ADM_deviceALSA.h ADM_deviceAudioCore.cpp \
 	ADM_deviceSDL.cpp ADM_deviceWin32.cpp ADM_deviceEsd.cpp
 

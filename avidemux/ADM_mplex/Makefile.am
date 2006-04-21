@@ -1,16 +1,12 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_PROGRAMS = libADM_mplex.o
-libADM_mplex_o_LDFLAGS =  -r
-
-LIBS =  
-LDFLAGS = 
+noinst_LIBRARIES = libADM_mplex.a
 
 ## INCLUDES were found outside kdevelop specific part
 
-libADM_mplex_o_METASOURCES = AUTO
-#INCLUDES = $oall_includes) 
+libADM_mplex_a_METASOURCES = AUTO
+#INCLUDES = $(all_includes) 
 
-libADM_mplex_o_SOURCES = ac3strm_in.cpp audiostrm.hpp audiostrm_out.cpp \
+libADM_mplex_a_SOURCES = ac3strm_in.cpp audiostrm.hpp audiostrm_out.cpp \
 	aunit.hpp bits.cpp bits.hpp buffer.cpp buffer.hpp dtsstrm_in.cpp inputstrm.cpp \
 	inputstrm.hpp interact.cpp interact.hpp lpcmstrm_in.cpp mpastrm_in.cpp \
 	mplexconsts.hpp multiplexor.cpp multiplexor.hpp outputstrm.hpp padstrm.cpp padstrm.hpp \

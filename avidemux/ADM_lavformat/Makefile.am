@@ -1,14 +1,10 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-noinst_PROGRAMS = libADM_lavformat.o
-libADM_lavformat_o_LDFLAGS =  -r
-
-LIBS =  
-LDFLAGS = 
+noinst_LIBRARIES = libADM_lavformat.a
 
 
-libADM_lavformat_o_METASOURCES = AUTO
+libADM_lavformat_a_METASOURCES = AUTO
 
-libADM_lavformat_o_SOURCES =  mpeg.c utils.c avio.c ADM_lavformat.cpp \
+libADM_lavformat_a_SOURCES =  mpeg.c utils.c avio.c ADM_lavformat.cpp \
 aviobuf.c cutils.c img2.c file.c mpegtsenc.c ADM_muxts.cpp movenc.c \
 avienc.c wav.c mov.c
 
