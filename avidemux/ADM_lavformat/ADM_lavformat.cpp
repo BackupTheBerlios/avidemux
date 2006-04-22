@@ -123,6 +123,9 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                 case MUXER_MP4:
                         fmt = guess_format("mp4", NULL, NULL);
                         break;
+                case MUXER_PSP:
+                        fmt = guess_format("psp", NULL, NULL);
+                        break;                        
 		default:
 			fmt=NULL;
 	}

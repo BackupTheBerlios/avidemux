@@ -21,6 +21,7 @@
 
 void setSVCD( void );
 void setVCD( void );
+void setPSP(void);
 void setDVD( void );
 void setHalfD1( void );
 

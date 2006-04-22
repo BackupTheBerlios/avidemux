@@ -169,8 +169,9 @@ int ret=0;
 					switch(UI_GetCurrentFormat())
 					{
                                                 case ADM_MP4:
-                                                                ret=oplug_mp4(name,ADM_MP4);
-                                                                break;
+                                                case ADM_PSP:
+                                                    ret=oplug_mp4(name,UI_GetCurrentFormat());
+                                                    break;
 						case ADM_AVI:
 								ret=A_SaveAudioNVideo(name);
 								break;

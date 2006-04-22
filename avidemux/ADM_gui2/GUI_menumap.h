@@ -82,6 +82,7 @@ CALLBACK(second_audio_track1                   ,ACT_SecondAudioTrack);
 CALLBACK(vcd1                                   ,ACT_AUTO_VCD);
 CALLBACK(svcd1                                  ,ACT_AUTO_SVCD);
 CALLBACK(dvd1                                   ,ACT_AUTO_DVD);
+CALLBACK(psp1                                   ,ACT_AUTO_PSP);
 
 CALLBACK(add_to_joblist1                       ,ACT_ADD_JOB);
 CALLBACK(joblist1                              ,ACT_HANDLE_JOB);

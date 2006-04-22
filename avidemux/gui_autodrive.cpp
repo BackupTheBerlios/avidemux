@@ -38,10 +38,7 @@
 
 
 #include "ADM_encoder/adm_encConfig.h"
-
-extern void setVCD (void);
-extern void setSVCD (void);
-extern void setDVD (void);
+#include "ADM_filter/vidVCD.h"
 
 uint8_t A_autoDrive(Action action)
 {
@@ -53,11 +50,47 @@ uint8_t A_autoDrive(Action action)
         }
 
         // Set output format to mpeg PS
+        // Except for PSP
+      if(action==ACT_AUTO_PSP)
+        UI_SetCurrentFormat(ADM_PSP);
+      else
         UI_SetCurrentFormat(ADM_PS);
         
         
         switch(action)
         {
+                case ACT_AUTO_PSP:
+                                // Resize
+                                setPSP();
+                                // Video codec
+#ifdef USE_XVID_4
+                    if(!videoCodecSelectByName("XVID4")) 
+#else
+                    if(!videoCodecSelectByName("FFMpeg4))            
+#endif
+                    {
+                        GUI_Error_HIG("Codec Error", "Cannot select mpeg4 sp codec.");
+                        return 0;
+                    }
+                                // Audio Codec
+                                if((currentaudiostream->getInfo()->frequency==44100)&&
+                                    (currentaudiostream->getInfo()->channels==2)&&
+                                    (currentaudiostream->getInfo()->encoding==WAV_AAC))
+                                {
+                                    audioCodecSetcodec(AUDIOENC_COPY);
+                                }
+                                else
+                                {
+                                    audioCodecSetcodec(AUDIOENC_FAAC);
+                                    // ? Needed ?
+                                    if(currentaudiostream->getInfo()->frequency!=44100)
+                                    {
+                                        audioFilterResample(44100);
+                                    }
+                                    audioFilter_SetBitrate(160);
+                                }
+                                break;
+                                return 1;
                 case ACT_AUTO_VCD:
                                 // Check video size
                                 setVCD();

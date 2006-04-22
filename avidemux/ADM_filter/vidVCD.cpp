@@ -72,7 +72,8 @@ static targetFmt VCD={352, 352, 288, 240};
 static targetFmt SVCD={480, 720, 576, 480};
 static targetFmt DVD={720, 720, 576, 480};
 static targetFmt DVDHD1={352, 720, 576, 480};
-targetFmt *allFormats[4]={&VCD,&SVCD,&DVD,&DVDHD1};
+static targetFmt PSP={480, 480, 272, 272};
+targetFmt *allFormats[5]={&VCD,&SVCD,&DVD,&DVDHD1,&PSP};
 
 #define ARME(x) format=RESWIZ_##x;
 
@@ -82,6 +83,12 @@ void setVCD (void)
 
   ARME (VCD);
   computeResize();
+}
+void setPSP (void)
+{
+
+    ARME (PSP);
+    computeResize();
 }
 void setSVCD (void)
 {

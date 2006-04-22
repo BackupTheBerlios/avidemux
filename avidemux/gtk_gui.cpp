@@ -488,6 +488,7 @@ int nw;
         case ACT_AUTO_VCD:
         case ACT_AUTO_SVCD:
         case ACT_AUTO_DVD:
+        case ACT_AUTO_PSP:
                 A_autoDrive( action);
                 break;
      case ACT_TimeShift:

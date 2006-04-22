@@ -112,6 +112,12 @@ int prefill=1;
 uint32_t displayFrame=0;
 ADMBitstream    bitstream;
 uint32_t        frameWrite=0;
+ADM_MUXER_TYPE muxerType=MUXER_MP4;
+
+           if(type==ADM_PSP)
+               muxerType=MUXER_PSP;
+           else
+               muxerType=MUXER_MP4;
         // Setup video
         
         if(videoProcessMode())

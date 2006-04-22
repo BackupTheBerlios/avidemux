@@ -132,6 +132,7 @@ create_mainWindow (void)
   GtkWidget *vcd1;
   GtkWidget *svcd1;
   GtkWidget *dvd1;
+  GtkWidget *psp1; //MEANX: manual patch
   GtkWidget *go1;
   GtkWidget *go1_menu;
   GtkWidget *play_video1;
@@ -757,6 +758,11 @@ create_mainWindow (void)
   gtk_widget_show (dvd1);
   gtk_container_add (GTK_CONTAINER (help1_menu), dvd1);
 
+  psp1 = gtk_menu_item_new_with_mnemonic (_("PSP"));
+  gtk_widget_show (psp1);
+  gtk_container_add (GTK_CONTAINER (help1_menu), psp1);
+
+  
   go1 = gtk_menu_item_new_with_mnemonic (_("_Go"));
   gtk_widget_show (go1);
   gtk_container_add (GTK_CONTAINER (menuBar), go1);
@@ -1127,6 +1133,7 @@ create_mainWindow (void)
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MPEG PS A+V"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MPEG TS A+V"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MP4"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MP4/PSP"));
   guiDrawing = gtk_drawing_area_new ();
   gtk_widget_show (guiDrawing);
   gtk_box_pack_start (GTK_BOX (hbox14), guiDrawing, TRUE, TRUE, 0);
@@ -1523,6 +1530,7 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, vcd1, "vcd1");
   GLADE_HOOKUP_OBJECT (mainWindow, svcd1, "svcd1");
   GLADE_HOOKUP_OBJECT (mainWindow, dvd1, "dvd1");
+  GLADE_HOOKUP_OBJECT (mainWindow, psp1, "psp1");
   GLADE_HOOKUP_OBJECT (mainWindow, go1, "go1");
   GLADE_HOOKUP_OBJECT (mainWindow, go1_menu, "go1_menu");
   GLADE_HOOKUP_OBJECT (mainWindow, play_video1, "play_video1");
