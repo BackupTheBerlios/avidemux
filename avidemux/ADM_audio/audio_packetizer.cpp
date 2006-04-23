@@ -315,8 +315,11 @@ _retry:
 			{
 				// Error decoding mpeg
 				printf("MPInfo:** CANNOT FIND MPEG START CODE**\n");
-				packetHead+=1;
-                                goto _retry;
+                                if(packetTail>packetHead+4) // Flush
+                                    packetHead=packetTail-4;
+                                else
+				    packetHead+=1;
+                                return 0;
 			}
 			if(packetHead+startOffset+mpegInfo.size>packetTail)
 			{
