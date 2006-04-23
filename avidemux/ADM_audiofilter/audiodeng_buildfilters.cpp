@@ -265,14 +265,22 @@ void audioFilter_SetBitrate( int i)
 {
 	audioMP3bitrate=i;
 }
-
+#include "ADM_gui2/GUI_ui.h"
 extern  int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
   			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv,CHANNEL_CONF *channel);
 
 void audioFilter_configureFilters( void )
 {
+    int olddelay=audioDelay;
+    int oldshift=audioShift;
 	 DIA_getAudioFilter(&audioNormalizeMode,&audioResampleMode,&audioShift,&audioDelay,&audioDRC,&audioFreq,
 	 		&audioFilmConv,&audioMixing );
+         if(audioDelay!=olddelay ||oldshift!= audioShift)
+         {  // Refresh
+             
+             UI_setTimeShift(audioShift,audioDelay);
+             
+         }
 
 }
 
