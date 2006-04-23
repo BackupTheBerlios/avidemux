@@ -53,6 +53,7 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 	uint32_t instock=0,rd=0;	
 
 	ADM_assert(_wavheader);
+_refill:
 	shrink();
 	instock=packetTail-packetHead;
 	
@@ -79,7 +80,8 @@ uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len,
 	{
 		case WAV_MP2:
 		case WAV_MP3:
-				return getPacketMP3(dest,len,samples);
+                                if(! getPacketMP3(dest,len,samples)) goto _refill;
+                                return 1;
 				break;
 		case WAV_AAC:
 				return getPacketAAC(dest,len,samples);
@@ -295,6 +297,7 @@ uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 	MpegAudioInfo mpegInfo,mpegTemp;
 			
 			ADM_assert(_wavheader->encoding==WAV_MP2||_wavheader->encoding==WAV_MP3);
+_retry:                        
 			if(packetTail<packetHead+4)
 			{
 				printf("PKTZ: MP3Buffer empty:%lu / %lu\n",packetHead,packetTail);
@@ -313,7 +316,7 @@ uint8_t		AVDMGenericAudioStream::getPacketMP3(uint8_t *dest, uint32_t *len,
 				// Error decoding mpeg
 				printf("MPInfo:** CANNOT FIND MPEG START CODE**\n");
 				packetHead+=1;
-				return 0;
+                                goto _retry;
 			}
 			if(packetHead+startOffset+mpegInfo.size>packetTail)
 			{
