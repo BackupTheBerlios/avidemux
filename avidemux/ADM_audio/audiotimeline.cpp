@@ -47,7 +47,7 @@ uint8_t AVDMGenericAudioStream::buildAudioTimeLine(void)
 {
 
 uint32_t in,d=0,rd=0,ms10,offset=0,index=0; //,left=0,len=0;;
-
+uint32_t retry=50;
 		// we do nothing in case of WAV or unhandler stream
   		// that left only MP3 for now ...
      if (_wavheader->encoding != WAV_MP3 &&_wavheader->encoding != WAV_MP2 )
@@ -94,6 +94,11 @@ uint32_t in,d=0,rd=0,ms10,offset=0,index=0; //,left=0,len=0;;
                 		// read a packet
 				if(!getPacket(internalBuffer, &len,&sample))
 				{
+                                    if(!index && retry)
+                                    {
+                                        retry--;
+                                        continue;
+                                    }
 					printf("MapVBR:Get packet failed\n");
 					break;
 				}		  
@@ -104,6 +109,16 @@ uint32_t in,d=0,rd=0,ms10,offset=0,index=0; //,left=0,len=0;;
          }
 
 end:         
+        if(!index)
+        {
+            delete [] _audioMap;
+            _audioMap=NULL;
+            _wavheader->blockalign=1152; // Mark it as VBR
+            delete work;
+            goTo(0);	// Purge
+            printf("Build VBR failed!\n");
+            return 0;
+        }
       _nbMap=index;
       _wavheader->blockalign=1152; // Mark it as VBR
       printf("\n Nb entries in timeline : %lu\n",_nbMap);
