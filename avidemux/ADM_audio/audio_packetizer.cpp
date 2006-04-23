@@ -71,7 +71,7 @@ _refill:
 			break;
 		}
 	}
-	if(!instock)
+	if(instock<4)
 	{
 		printf("Pkt : incoming buffer empty\n");
 		return 0;
