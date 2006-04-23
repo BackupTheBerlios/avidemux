@@ -98,7 +98,7 @@ int ret=0;
 				_wavheader->frequency,_wavheader->channels,bitrate);
 	return 0;    
     }
-    printf(" FAAC : Sample input:%d, max byte output%d \n",samples_input,max_bytes_output);
+    printf(" [FAAC] : Sample input:%d, max byte output%d \n",samples_input,max_bytes_output);
     _incoming_frame=samples_input/_wavheader->channels;
     cfg= faacEncGetCurrentConfiguration(_handle);
     
@@ -107,13 +107,13 @@ int ret=0;
     cfg->mpegVersion = MPEG4;
     cfg->useTns = 0;
     cfg->allowMidside = 1;
-    cfg->bitRate = bitrate*1000;
+    cfg->bitRate = (bitrate*1000)/_wavheader->channels; // It is per channel
     cfg->outputFormat = 0; // 0 Raw 1 ADTS
     cfg->inputFormat = FAAC_INPUT_16BIT;
     cfg->useLfe=0;	
     if (!(ret=faacEncSetConfiguration(_handle, cfg))) 
     {
-        printf("FAAC: Cannot set conf for faac with fq=%lu chan=%lu br=%lu (err:%d)\n",
+        printf("[FAAC] Cannot set conf for faac with fq=%lu chan=%lu br=%lu (err:%d)\n",
 				_wavheader->frequency,_wavheader->channels,bitrate,ret);
 	return 0;
     }
@@ -135,13 +135,14 @@ int ret=0;
     _wavheader->blockalign=4096;
     _wavheader->bitspersample=0;
     
-    printf("Faac init*zes\n");
+    printf("[Faac] Initialized :\n");
     
-    printf("Version        : %s\n",cfg->name);
-    printf("Bitrate        : %lu\n",cfg->bitRate);
-    printf("Mpeg2 (1)/4(0) : %u\n",cfg->mpegVersion);
-    printf("Use lfe      ) : %u\n",cfg->useLfe);
-    printf("Sample output  : %lu\n",_incoming_frame);
+    printf("[Faac]Version        : %s\n",cfg->name);
+    printf("[Faac]Bitrate        : %lu\n",cfg->bitRate);
+    printf("[Faac]Mpeg2 (1)/4(0) : %u\n",cfg->mpegVersion);
+    printf("[Faac]Use lfe      ) : %u\n",cfg->useLfe);
+    printf("[Faac]Sample output  : %lu\n",_incoming_frame);
+    printf("[Faac]Bitrate        : %lu\n",cfg->bitRate*_wavheader->channels);
 
     
     return 1;
