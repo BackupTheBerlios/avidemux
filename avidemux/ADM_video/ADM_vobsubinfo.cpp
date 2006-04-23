@@ -149,7 +149,7 @@ int             language=0;
                                 {
                                         if(!strncmp(str,"size:",5))       // Catch original screen dimension
                                         {
-                                                sscanf(str,"size:%lux%lu",&(sub->width),&(sub->height));
+                                            sscanf(str,"size:%"SCNu32"x%"SCNu32"",&(sub->width),&(sub->height));
                                         }
                                 
                                 }
