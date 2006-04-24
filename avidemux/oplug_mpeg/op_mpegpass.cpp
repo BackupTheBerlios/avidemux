@@ -40,7 +40,8 @@
 #include "ADM_codecs/ADM_mpeg.h"
 #include "ADM_lavcodec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
-
+#include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
+static uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position);
 
 
 /**
@@ -68,6 +69,25 @@
 	} \
 }
 
+#define WRITE_AND_REMOVE_END_CODE \
+{\
+if(lookupSeqEnd(&bitstream,&position)) \
+{ \
+    ADMBitstream bs2; \
+    printf("$$$$$$*************************************$$$$$$$$$$$$$$$$$$$$$$$Found Seq end at %u in %u packet\n",position,bitstream.len); \
+    if(position) \
+{\
+        bs2.data=bitstream.data;\
+                bs2.len=position;\
+                        muxer->writeVideoPacket(&bs2);\
+}\
+        bs2.data=bitstream.data+position+4;\
+                bs2.len=bitstream.len-position-4;\
+                        if(bs2.len) muxer->writeVideoPacket(&bs2);\
+} \
+else muxer->writeVideoPacket(&bitstream); \
+}
+                    
 uint8_t isMpeg12Compatible(uint32_t fourcc);
 extern const char *getStrFromAudioCodec( uint32_t codec); 
 uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
@@ -262,7 +282,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 
   uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3];
   uint8_t *audiobuffer = new uint8_t[4*48000*2]; // 2 sec worth of lpcm
-
+  uint32_t position;
         bitstream.data=buffer;
         PACK_AUDIO(0);
 
@@ -299,8 +319,8 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 	video_body->getRaw (found, bitstream.data, &bitstream.len);
         bitstream.dtsFrame=cur++;
         bitstream.ptsFrame=found;
-        muxer->writeVideoPacket(&bitstream);
-//	muxer->writeVideoPacket (len,buffer,cur++,found-frameStart);	
+        WRITE_AND_REMOVE_END_CODE;   
+        
         work->feedFrame(bitstream.len);
 	PACK_AUDIO(0)
 	
@@ -311,7 +331,8 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                 video_body->getRaw (j, bitstream.data, &bitstream.len);
                 bitstream.dtsFrame=cur++;
                 bitstream.ptsFrame=j-frameStart;
-		muxer->writeVideoPacket (&bitstream);
+                
+                WRITE_AND_REMOVE_END_CODE;   
                 work->feedFrame(bitstream.len);
 		PACK_AUDIO(0)
 		
@@ -324,7 +345,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 		{
 			// Check if seq header is there..
 			video_body->getRaw (i, bitstream.data, &bitstream.len);
-			if(buffer[0]==0 && buffer[1]==0 && buffer[2]==1 && buffer[3]==0xb3) // Seq start
+                        if(buffer[0]==0 && buffer[1]==0 && buffer[2]==1 && buffer[3]==SEQ_START_CODE) // Seq start
 			{
                                 bitstream.dtsFrame=cur++;
                                 bitstream.ptsFrame=i-frameStart;
@@ -353,7 +374,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
 			video_body->getRaw (i, buffer, &bitstream.len);
                         bitstream.dtsFrame=cur++;
                         bitstream.ptsFrame=i-frameStart;
-			muxer->writeVideoPacket (&bitstream);
+                        WRITE_AND_REMOVE_END_CODE;   
                         work->feedFrame(bitstream.len);
 			PACK_AUDIO(0)
 			
@@ -372,3 +393,29 @@ _abt:
   return ret;
 
 }
+
+uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,
+                              uint32_t *offset);
+
+uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position)
+{
+    uint8_t *ptr=bitstream->data,*end,code;
+    uint32_t len=bitstream->len,offset;
+    
+    end=ptr+len;
+    while(ADM_findMpegStartCode(ptr, end,&code,&offset))
+    {
+        if(code==SEQ_END_CODE)
+        {
+            *position=ptr-bitstream->data+offset-4;
+            return 1;
+        }
+        ptr+=offset;
+    }
+    return 0;
+}
+
+
+//EOF
+
+        
