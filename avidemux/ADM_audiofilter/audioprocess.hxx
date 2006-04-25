@@ -203,8 +203,7 @@ protected:
 
 				
 	  uint32_t		_frequency;
-	  ResampleStruct	_resample;
-	  ResampleStruct	_resample2;
+	  ResampleStruct	*_resamples;
 	  uint8_t		_pass;
 	  uint32_t		_head,_tail;
 	  virtual uint32_t 	grab(uint8_t *obuffer);

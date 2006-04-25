@@ -29,9 +29,10 @@ AVDMProcessAudio_SoxResample::~AVDMProcessAudio_SoxResample()
 { 
 	if(!_pass)
 	{
-		sox_stop(&_resample);
-		sox_stop(&_resample2);
+            for(int i=0;i<_wavheader->channels;i++)
+                sox_stop(&(_resamples[i]));
 	}
+        delete [] _resamples;
   	delete _wavheader;
 };   
 
@@ -62,10 +63,15 @@ AVDMProcessAudio_SoxResample::AVDMProcessAudio_SoxResample(AVDMGenericAudioStrea
 			(unsigned long int)_length);
 	if(!_pass)
 	{
-    		ADM_assert( sox_init(_instream->getInfo()->frequency, frequency,&_resample)) ;
-		ADM_assert( sox_init(_instream->getInfo()->frequency, frequency,&_resample2)) ;
+            int org=_instream->getInfo()->frequency;
+            _resamples=new ResampleStruct[_wavheader->channels];
+            for(int i=0;i<_wavheader->channels;i++)
+            {
+                printf("[Sox Resample] from %d to %d for track %i\n",org,frequency,i);
+                ADM_assert( sox_init(org,frequency,&(_resamples[i]))) ;
+            }
 	}
-    	_head=_tail=0;
+        _head=_tail=0;
 }
 // we need to purge the buffers when going async
 
@@ -73,15 +79,17 @@ AVDMProcessAudio_SoxResample::AVDMProcessAudio_SoxResample(AVDMGenericAudioStrea
 uint8_t AVDMProcessAudio_SoxResample::goToTime(uint32_t newoffset) 
 {
 	ADM_assert(!newoffset);
-	printf("Resample : Going back to beginning\n");
+        printf("[Sox Resample] : Going back to beginning\n");
 	_instream->goToTime(0);
 	_headBuff=_tailBuff=0;
 	if(!_pass)
 	{
-		sox_stop(&_resample);
-		sox_stop(&_resample2);
-		ADM_assert( sox_init(_instream->getInfo()->frequency, _frequency,&_resample)) ;
-		ADM_assert( sox_init(_instream->getInfo()->frequency, _frequency,&_resample2)) ;
+            for(int i=0;i<_wavheader->channels;i++)
+            {
+               sox_stop(&(_resamples[i]));
+               ADM_assert( sox_init(_instream->getInfo()->frequency, _frequency,
+                           &(_resamples[i]))) ;
+            }
 	}
 	_head=_tail=0;
 	return 1;
@@ -91,14 +99,14 @@ uint32_t 	AVDMProcessAudio_SoxResample::grab(uint8_t *obuffer)
 
     uint32_t rd = 0, rdall = 0, startrd=0;
     uint8_t *in;
-    uint32_t nbout,nbout2, asked,nb_in,nb_in2;
+    uint32_t nbout, asked,nb_in;
     uint32_t onechunk;   
     uint8_t *myBuffer;
     uint32_t snbout=0;
     static int32_t total=0;
     // the buffer is 750 kbytes
- 
-    onechunk=(8192*2)*_wavheader->channels;
+#define BLK_SIZE 8192 // Block size in sample
+    onechunk=BLK_SIZE*2*_wavheader->channels;
     myBuffer=(uint8_t *)_buffer;
         
     // passthrought mode
@@ -130,6 +138,8 @@ uint32_t 	AVDMProcessAudio_SoxResample::grab(uint8_t *obuffer)
 	      break;
 	  }
       }
+      ADM_assert(PROCESS_BUFFER_SIZE>_tail);
+      
       // we did not get a single byte
       if(rdall==startrd)
       { // Nothing read
@@ -143,77 +153,38 @@ uint32_t 	AVDMProcessAudio_SoxResample::grab(uint8_t *obuffer)
         }
       }
     
-    	// input buffer is full , convert it
-	// Switch to sample from bytes
-     if(_wavheader->channels==1)
-     {
-    
-	while(_tail-_head>=onechunk)
-	{
-    		nb_in=(_tail-_head)>>1;
-		nbout=8192;
-    		if(!sox_run	(&_resample, (int16_t *)(myBuffer+_head), (int16_t *)obuffer,&nb_in, &nbout,0))
-    		{
-    			printf("Sox run error!!\n");
-			return 0;
-    		}   
-	
-		_head=_head+(nb_in*2);
-		snbout+=nbout*2;
-		obuffer+=nbout*2;
-		//printf("This round : %lu , total %lu\n",nbout*2,snbout);
-	}	
-     }  
-     // stereo
-     //___________________________________________________
-     // do left & right
-     // input buffer is full , convert it
-     // Switch to sample from bytes
-     else
-     {
-	
+
 	while(1)
 	{
-    		nb_in=(_tail-_head)>>2;
-		nb_in2=nb_in;
-		nbout=8192;
-    		nbout2=8192;
-    		if(!sox_run	(&_resample, (int16_t *)(myBuffer+_head), (int16_t *)obuffer,
-					&nb_in, &nbout,1))
-    		{
-    			printf("Sox run error!!\n");
-			return 0;
-    		}   
-		
-		if(!sox_run	(&_resample2, (int16_t *)(myBuffer+_head+2), (int16_t *)(obuffer+2),
-					&nb_in2, &nbout2,1))
-    		{
-    			printf("Sox run error!!\n");
-			return 0;
-    		}   
-		ADM_assert(nb_in==nb_in2);
-		ADM_assert(nbout==nbout2);
-		_head=_head+(nb_in*4);
-		snbout+=nbout*4;
-		obuffer+=nbout*4;
-		if(!nbout) break;
-		//printf("This round : %lu , total %lu\n",nbout*2,snbout);
+                nb_in=(_tail-_head)/(2*_wavheader->channels);
+                if(!nb_in) break;
+                nbout=BLK_SIZE;
+                uint32_t nbi=nb_in;
+                for(int i=0;i<_wavheader->channels;i++)
+                {
+                    nbout=BLK_SIZE;;
+                    if(!sox_run	(&(_resamples[i]), (int16_t *)(myBuffer+_head+2*i), 
+                                    (int16_t *)(obuffer+2*i),
+                                    &nbi, &nbout,_wavheader->channels-1))
+                    {
+                        printf("[Sox Resample] run error!!\n");
+                        return 0;
+                    }
+                    
+                }
+                _head=_head+(nbi*2*_wavheader->channels);
+                snbout+=nbout*2*_wavheader->channels;
+                obuffer+=nbout*2*_wavheader->channels;
+                if(!nbout) break;
 	}
-      }
+      
       	ADM_assert(_tail>=_head);
 	ADM_assert(snbout<PROCESS_BUFFER_SIZE);
 	if(PROCESS_BUFFER_SIZE-_tail < MINIMUM_BUFFER)
 	{
-		// copy to beginning
-		//printf("Reset : %ld, %lu %lu = %lu\n",total,_tail,_head,_tail-_head);
 		_tail=_tail-_head;
-		/*for(uint32_t j=0;j<_tail;j++)
-		{
-			myBuffer[j]=myBuffer[j+_head];
-		}*/
 		memmove(myBuffer,myBuffer+_head,_tail);
 		_head=0;
-		//printf("Reset : %ld, %lu\n",total,_tail);
 		total=0;		
 	}
 	ADM_assert( 0==(_head&1));
