@@ -307,7 +307,6 @@ mpegWritter::save_regular (const char *name, ADM_MPEGTYPE mpegtype, int qz, int 
   uint32_t sample_target = 0;
   double sample_time;
   ADMBitstream bitstream;
-
   incoming = getLastVideoFilter (frameStart, frameEnd - frameStart);
   _total = incoming->getInfo ()->nb_frames;
   _fps1000 = incoming->getInfo ()->fps1000;
@@ -447,6 +446,7 @@ mpegWritter::save_regular (const char *name, ADM_MPEGTYPE mpegtype, int qz, int 
 	  return 0;
 	}
       bitstream.cleanup (i);
+      bitstream.in_quantizer=0;
       _codec->encode (aImage, &bitstream);
       //_buffer_out , &len,&flags,&outquant);
       total_size += bitstream.len;
