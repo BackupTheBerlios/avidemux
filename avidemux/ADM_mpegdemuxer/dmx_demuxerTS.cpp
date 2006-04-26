@@ -219,7 +219,7 @@ uint32_t mx;
                 if(!refill())
                 {
                         _lastErr=1;
-                         return 0;
+                         return mx;
                 }
                 return mx+read(w,len);
 }

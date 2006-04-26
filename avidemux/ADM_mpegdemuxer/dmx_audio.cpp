@@ -331,13 +331,15 @@ uint32_t read;
                 
                         if(_pos+size>=_length) 
                         {       
-                                printf("DMX_audio Going out of bound\n");
-                                return 0;
+                            printf("DMX_audio Going out of bound (position : %u asked %u end%u)\n",_pos,size,_length);
+                            size=_length-_pos;
+                            if(_pos==_length) return 0;
                         }
                         if(!(size=demuxer->read(ptr,size)))
                         {
-                                printf("DMX_audio Read failed\n");
-                                 return 0;
+                            printf("DMX_audio Read failed (got:%u)\n",size);
+                            _pos+=size;
+                            return 0;
                         }
                         _pos+=size;     
                         return size;
