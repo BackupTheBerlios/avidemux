@@ -185,8 +185,10 @@ int cb_mod(GtkObject * object, gpointer user_data)
     CHECK(BidirME);\
     CHECK(Adaptative);\
     CHECK(Weighted);\
+    CHECK(MixedRefs); \
     CHECK(CABAC);\
     SPIN(Trellis);\
+    SPIN(NoiseReduction);\
     CHECK(DeblockingFilter); \
     CHECK(ChromaME); \
     \
@@ -200,6 +202,7 @@ int cb_mod(GtkObject * object, gpointer user_data)
     SPIN(MinIdr);\
     SPIN(MaxIdr);\
     \
+    SPIN(MaxRefFrames); \
     SPIN(MaxBFrame);\
     SPIN(Bias);\
     SPIN(Strength);\
@@ -208,6 +211,7 @@ int cb_mod(GtkObject * object, gpointer user_data)
     ENTRY(AR_Den);\
     \
     COMBO(PartitionDecision); \
+    SPIN(Range);\
     COMBO(Method); \
     COMBO(DirectMode); \
     PSEUDO(8x8); \
@@ -435,7 +439,7 @@ GtkWidget*
                       (GtkAttachOptions) (0), 5, 1);
     gtk_misc_set_alignment (GTK_MISC (labelQuantizer), 0, 0.5);
 
-    spinbuttonQuantizer_adj = gtk_adjustment_new (26, 0, 51, 1, 10, 10);
+    spinbuttonQuantizer_adj = gtk_adjustment_new (4, 0, 51, 1, 10, 10);
     spinbuttonQuantizer = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonQuantizer_adj), 1, 0);
     gtk_widget_show (spinbuttonQuantizer);
     gtk_table_attach (GTK_TABLE (tableBitrate), spinbuttonQuantizer, 1, 2, 2, 3,
@@ -551,6 +555,7 @@ GtkWidget*
     gtk_table_attach (GTK_TABLE (table11), spinbuttonMaxRefFrames, 1, 2, 1, 2,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
+    gtk_tooltips_set_tip (tooltips, spinbuttonMaxRefFrames, _("Set how many previous frames can be referenced by a P/B-frame. Numbers above 5 do not seem to improve quality greatly. Numbers are 3 to 5 are recommended"), NULL);
     gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonMaxRefFrames), TRUE);
 
     labelMaxRefFrames = gtk_label_new (_("Max. Ref. frames"));
@@ -580,7 +585,7 @@ GtkWidget*
     gtk_table_attach (GTK_TABLE (table11), checkbuttonMixedRefs, 2, 3, 1, 2,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 15, 0);
-    gtk_tooltips_set_tip (tooltips, checkbuttonMixedRefs, _("Calculate referencing individually based on each partition."), NULL);
+    gtk_tooltips_set_tip (tooltips, checkbuttonMixedRefs, _("Calculate referencing individually based on each partition"), NULL);
 
     spinbuttonRange_adj = gtk_adjustment_new (0, 0, 64, 1, 10, 10);
     spinbuttonRange = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonRange_adj), 1, 0);
@@ -696,7 +701,7 @@ GtkWidget*
     gtk_box_pack_start (GTK_BOX (hbox4), labelTrellis, TRUE, TRUE, 4);
     gtk_misc_set_alignment (GTK_MISC (labelTrellis), 1, 0.5);
 
-    spinbuttonTrellis_adj = gtk_adjustment_new (0, 0, 2, 1, 10, 10);
+    spinbuttonTrellis_adj = gtk_adjustment_new (1, 0, 2, 1, 10, 10);
     spinbuttonTrellis = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonTrellis_adj), 1, 0);
     gtk_widget_show (spinbuttonTrellis);
     gtk_box_pack_start (GTK_BOX (hbox4), spinbuttonTrellis, FALSE, TRUE, 1);
@@ -820,7 +825,7 @@ GtkWidget*
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (labelMaxConsecutive), 0, 0.5);
 
-    spinbuttonMaxBFrame_adj = gtk_adjustment_new (3, 0, 15, 1, 10, 10);
+    spinbuttonMaxBFrame_adj = gtk_adjustment_new (3, 0, 16, 1, 10, 10);
     spinbuttonMaxBFrame = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonMaxBFrame_adj), 1, 0);
     gtk_widget_show (spinbuttonMaxBFrame);
     gtk_table_attach (GTK_TABLE (table5), spinbuttonMaxBFrame, 1, 2, 0, 1,
@@ -838,7 +843,7 @@ GtkWidget*
     gtk_table_attach (GTK_TABLE (table6), checkbuttonBidirME, 1, 2, 0, 1,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
-    gtk_tooltips_set_tip (tooltips, checkbuttonBidirME, _("Jointly optimize both Motion Vector's in B-frames"), NULL);
+    gtk_tooltips_set_tip (tooltips, checkbuttonBidirME, _("Jointly optimize both Motion Vector's in B-frames. This will improve quality but also slow the encoding"), NULL);
 
     checkbuttonWeighted = gtk_check_button_new_with_mnemonic (_("Weighted biprediction"));
     gtk_widget_show (checkbuttonWeighted);
@@ -861,7 +866,7 @@ GtkWidget*
     gtk_table_attach (GTK_TABLE (table6), checkbuttonBasReference, 0, 1, 0, 1,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 5, 0);
-    gtk_tooltips_set_tip (tooltips, checkbuttonBasReference, _("Allow B-frames to make references non-linearly to improves bitrate usage"), NULL);
+    gtk_tooltips_set_tip (tooltips, checkbuttonBasReference, _("Allow B-frames to make references non-linearly to improves bitrate usage and quality"), NULL);
 
     hbox1 = gtk_hbox_new (FALSE, 0);
     gtk_widget_show (hbox1);
@@ -1071,7 +1076,7 @@ GtkWidget*
     gtk_tooltips_set_tip (tooltips, spinbuttonMinIdr, _("Set minimum frame interval between IDR frames. Defines the minimum amount a frame can be reused and referenced by other frames before a new clean one is established"), NULL);
     gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonMinIdr), TRUE);
 
-    spinbuttonMaxIdr_adj = gtk_adjustment_new (300, 0, 1000, 1, 10, 10);
+    spinbuttonMaxIdr_adj = gtk_adjustment_new (300, 1, 1000, 1, 10, 10);
     spinbuttonMaxIdr = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonMaxIdr_adj), 1, 0);
     gtk_widget_show (spinbuttonMaxIdr);
     gtk_table_attach (GTK_TABLE (table4), spinbuttonMaxIdr, 1, 2, 2, 3,
@@ -1232,9 +1237,8 @@ GtkWidget*
     GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
     GLADE_HOOKUP_OBJECT_NO_REF (dialog1, tooltips, "tooltips");
 
-    //gtk_widget_grab_default (comboboxDirectMode);
+  //  gtk_widget_grab_default (comboboxDirectMode);
     return dialog1;
 }
-
 
 #endif

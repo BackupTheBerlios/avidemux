@@ -25,6 +25,7 @@ typedef struct ADM_x264Param
   uint32_t  MaxQp;
   uint32_t  QpStep;
   //
+  uint32_t  MaxRefFrames;
   uint32_t  SceneCut;
   uint32_t  MinIdr;
   uint32_t  MaxIdr;
@@ -46,6 +47,7 @@ typedef struct ADM_x264Param
   uint32_t DirectMode;
   //
   uint32_t PartitionDecision;
+  uint32_t Range;
   uint32_t Method;
   uint32_t AR_Num;
   uint32_t AR_Den;
@@ -55,6 +57,8 @@ typedef struct ADM_x264Param
   uint32_t CABAC;
   uint32_t Trellis;
   uint32_t ChromaME;
+  uint32_t MixedRefs;
+  uint32_t NoiseReduction;
   //
 
   //

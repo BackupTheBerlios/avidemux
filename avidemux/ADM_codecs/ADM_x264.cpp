@@ -92,6 +92,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MKPARAM(rc.i_qp_min,MinQp);
   MKPARAM(rc.i_qp_max,MaxQp);
   MKPARAM(rc.i_qp_step,QpStep);
+  MKPARAM(i_frame_reference,MaxRefFrames);
   MKPARAM(i_scenecut_threshold,SceneCut);
   MKPARAM(i_keyint_min,MinIdr);
   MKPARAM(i_keyint_max,MaxIdr);
@@ -120,8 +121,11 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MKPARAM(i_deblocking_filter_beta, Threshold);
   
   MKPARAM(analyse.i_me_method,Method);
+  MKPARAM(analyse.i_me_range,Range);
 //  MKPARAM(PartitionDecision,Method);
   MKPARAM(analyse.b_transform_8x8,_8x8);
+  MKPARAM(analyse.b_mixed_references,MixedRefs);
+  MKPARAM(analyse.i_noise_reduction,NoiseReduction);
   
 #define MES(x,y) if(zparam->x) {param.analyse.inter |=X264_ANALYSE_##y;printf(#x" is on\n");}
   param.analyse.inter=0;

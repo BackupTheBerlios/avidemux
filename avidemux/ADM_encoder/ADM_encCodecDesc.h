@@ -528,6 +528,7 @@ NULL,//     char      *logfile;
 51,//     uint32_t  MaxQp;
 4,//     uint32_t  QpStep;
 //     //
+1, //     uint32_t maxRefScene
 40,//     uint32_t  SceneCut;
 25,//     uint32_t  MinIdr;
 250,//     uint32_t  MaxIdr;
@@ -549,6 +550,7 @@ NULL,//     char      *logfile;
 1,//     uint32_t DirectMode;
 //     //
 4,//     uint32_t PartitionDecision;
+16, //Range
 1,//     uint32_t Method;
 1,//     uint32_t AR_Num;
 1,//     uint32_t AR_Den;
@@ -557,7 +559,9 @@ NULL,//     char      *logfile;
 0,//     int32_t  Threshold;
 1,//     uint32_t CABAC;
 1,//     uint32_t Trellis;
-1 //        ChromaME
+1, //        ChromaME
+0, // Mixed Ref
+0 //NoiseReduction
   
 };
 extern uint8_t DIA_x264 (COMPRES_PARAMS * conf);
