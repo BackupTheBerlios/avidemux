@@ -920,6 +920,10 @@ case ACT_Pipe2Other:
 	        editorKillPreview ();
         }
       GUI_handleFilter ();
+      if( getLastVideoFilter()->getInfo()->width % 8 ){
+         GUI_Error_HIG("Width is not a multiple of 8",
+                       "This will make trouble for avi files.");
+      }
       if (mode_preview)
       {
         editorReignitPreview();
