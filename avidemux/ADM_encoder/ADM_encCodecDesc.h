@@ -564,6 +564,8 @@ NULL,//     char      *logfile;
 0 //NoiseReduction
   
 };
+
+ADM_x264Param x264ExtraDefault=x264Extra;
 extern uint8_t DIA_x264 (COMPRES_PARAMS * conf);
 COMPRES_PARAMS x264Codec = {
   CodecX264,

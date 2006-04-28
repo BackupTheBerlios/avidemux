@@ -37,6 +37,8 @@
 #define TOGGLE_SET(x,y) {gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(WID(x)),specific->y);}
 #define TOGGLE_GET(x,y) {specific->y=gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(WID(x)));;}
                                 
+#define ENABLE(x)    gtk_widget_set_sensitive(WID(x),1)
+#define DISABLE(x)    gtk_widget_set_sensitive(WID(x),0)
 
 
 uint8_t DIA_x264(COMPRES_PARAMS *config);
@@ -51,12 +53,19 @@ static int cb_mod(GtkObject * object, gpointer user_data);
 static ADM_x264Param *specific;
 static void upload(GtkWidget *dialog,ADM_x264Param *param);
 static void download(GtkWidget *dialog,ADM_x264Param *param);
+extern ADM_x264Param x264ExtraDefault;
 /*********************************************/
 #define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton##x)),y) ;}
 #define SPIN_GET(x,y)  {y=(int32_t)gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbutton##x))) ;}
 #define ENTRY_SET(x,y) {gtk_write_entry(WID(entry##x),y);}        
 #define ENTRY_GET(x,y) {y=gtk_read_entry(WID(entry##x));}        
 
+
+typedef enum x264_actions
+{
+    ACTION_LOAD_DEFAULT=10,
+    ACTION_LOAD_INVALID
+};
 uint8_t DIA_x264(COMPRES_PARAMS *config)
 {
   
@@ -69,14 +78,29 @@ uint8_t DIA_x264(COMPRES_PARAMS *config)
        
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
+        gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonResetDefaults),ACTION_LOAD_DEFAULT);
+        DISABLE(buttonLoadDefaults);
+        DISABLE(buttonSaveDefaults);
         upload(dialog,specific);
         
         updateMode();
         
         gtk_signal_connect(GTK_OBJECT(WID(comboboxMode)), "changed",
                            GTK_SIGNAL_FUNC(cb_mod), NULL);
-        
-        if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+        int reply=0;
+        while(1)
+        {
+            reply=gtk_dialog_run(GTK_DIALOG(dialog));
+            if(reply==ACTION_LOAD_DEFAULT)
+            {
+                printf("Resetting to default\n");
+                upload(dialog,&x264ExtraDefault);
+                continue;
+            }
+            
+            break;
+        };
+        if(reply==GTK_RESPONSE_OK)
         {
             uint32_t b;
           ret=1;
@@ -112,8 +136,6 @@ uint8_t DIA_x264(COMPRES_PARAMS *config)
 
 void updateMode( void )
 {
-#define ENABLE(x)    gtk_widget_set_sensitive(WID(x),1)
-#define DISABLE(x)    gtk_widget_set_sensitive(WID(x),0)
   uint32_t b;
                 // set the right select button
 #define COMBO(x) gtk_combo_box_set_active(GTK_COMBO_BOX(WID(comboboxMode)),x);
