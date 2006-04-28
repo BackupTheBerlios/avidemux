@@ -66,7 +66,7 @@ uint8_t A_autoDrive(Action action)
 #ifdef USE_XVID_4
                     if(!videoCodecSelectByName("XVID4")) 
 #else
-                    if(!videoCodecSelectByName("FFMpeg4))            
+                    if(!videoCodecSelectByName("FFMpeg4"))            
 #endif
                     {
                         GUI_Error_HIG("Codec Error", "Cannot select mpeg4 sp codec.");
