@@ -144,6 +144,7 @@ _abrt:
         return 0;
   }
   _tracks=new dmxAudioTrack[nbAudioStream];
+  memset(_tracks,0,sizeof(dmxAudioTrack)*nbAudioStream);
   nbTrack=nbAudioStream;
   _index=new dmxAudioIndex[nbGop+1];
   fgets (string, MAX_LINE, file);
@@ -233,6 +234,26 @@ _nxt:
       
       read++;
     }
+    // now read offset
+    {
+    int trackNo,offset,pts;
+    while(1)
+    {
+        if (!fgets (string, MAX_LINE, file))
+            break;
+        if(strncmp(string,"# track ",8)) continue;
+        if(3!=sscanf(string,"# track %d PTS : %d  delta=%d ms",&trackNo,&pts,&offset))
+        {
+            printf("Error reading time offset for line [%s]\n",string);
+            break;
+        }
+        ADM_assert(trackNo);
+        ADM_assert(trackNo<nbTrack+1);
+        trackNo--;
+        _tracks[trackNo].avSync=offset;
+        
+    }
+    } // /read offset
   fclose (file);
   nbIndex = read;
   if (!read)
