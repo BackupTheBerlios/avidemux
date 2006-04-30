@@ -632,7 +632,7 @@ uint32_t  dmxHeader::getCurrentAudioStreamNumber(void)
   if(!_audioStream) return 0;
   return _audioStream->currentTrack;
 }
-uint8_t  dmxHeader::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+uint8_t  dmxHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
 {
     if(!_audioStream)
     {

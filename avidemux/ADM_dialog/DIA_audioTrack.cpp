@@ -39,9 +39,9 @@
 #define NB_TRACK_MAX (8+4)
 static GtkWidget *create_dialog1 (void);
 extern const char *getStrFromAudioCodec( uint32_t codec);
-uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, uint32_t *infos);
+uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, audioInfo *infos);
 //************************************
-uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, uint32_t *infos)
+uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, audioInfo *infos)
 {
 uint8_t r=0;
 GtkWidget *menu,*dialog;
@@ -62,7 +62,8 @@ int old;
         
         for(unsigned int i=0;i<nbTrack;i++)
         {
-                sprintf(string,"Audio track %d (%s)",i,getStrFromAudioCodec(infos[i]));
+                sprintf(string,"Audio track %d (%s/%d channels/%d kbit per s/%d ms shift)",i,getStrFromAudioCodec(infos[i].encoding),
+                        infos[i].channels,infos[i].bitrate,infos[i].av_sync);
                 ADD_STRING();
         }
         // Add none

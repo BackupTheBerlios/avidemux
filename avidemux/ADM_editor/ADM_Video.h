@@ -26,6 +26,14 @@
 
 #include "ADM_audio/aviaudio.hxx"
 
+typedef struct audioInfo
+{
+    uint32_t encoding;  // Same as in wavheader
+    uint32_t bitrate;   // In kbits
+    uint32_t channels;  //
+    uint32_t frequency; // In hertz
+    int32_t  av_sync;   // in ms
+};
 
 typedef struct aviInfo
 {
@@ -35,6 +43,7 @@ typedef struct aviInfo
   	uint32_t   fcc;	
 }  ;
 
+uint8_t WAV2AudioInfo(WAVHeader *hdr,audioInfo *info);
 
 class vidHeader
 {
@@ -77,7 +86,7 @@ virtual	uint8_t			isReordered( void ) { return 0;} // by default we don"t do fra
 
 virtual 	WAVHeader              *getAudioInfo(void ) =0 ;
 virtual 	uint8_t			getAudioStream(AVDMGenericAudioStream **audio)=0;
-virtual         uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
+virtual         uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info);
 virtual         uint8_t                 changeAudioStream(uint32_t newstream);
 virtual         uint32_t                getCurrentAudioStreamNumber(void) { return 0;}
 // Frames

@@ -1402,13 +1402,18 @@ uint32_t     _3GPHeader::getCurrentAudioStreamNumber(void)
 { 
     return _currentAudioTrack;
 }
- uint8_t   _3GPHeader::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+ uint8_t   _3GPHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
 {
         *nbStreams=nbAudioTrack;
         if(nbAudioTrack)
         {
-            *infos=new uint32_t[nbAudioTrack];
-            for(int i=0;i<nbAudioTrack;i++) (*infos)[i]=_tracks[i+1]._rdWav.encoding;
+            *infos=new audioInfo[nbAudioTrack];
+            for(int i=0;i<nbAudioTrack;i++)
+            {
+                WAV2AudioInfo(&(_tracks[i+1]._rdWav),&((*infos)[i]));
+            }
+                
+             //   (*infos)[i]=_tracks[i+1]._rdWav.encoding;
         }
         return 1;
 }

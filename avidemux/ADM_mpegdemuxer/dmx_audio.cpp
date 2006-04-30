@@ -429,15 +429,19 @@ uint8_t dmxAudioStream::changeAudioTrack(uint32_t newtrack)
       //
       return 1;
 }
-uint8_t                 dmxAudioStream::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+uint8_t                 dmxAudioStream::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
 {
     *nbStreams=0;
     *infos=NULL;
     if(!nbTrack) return 1;
     *nbStreams=nbTrack;
-    *infos=new uint32_t [nbTrack];
+    *infos=new audioInfo [nbTrack];
     for(int i=0;i<nbTrack;i++)
-        (*infos)[i]=_tracks[i].wavHeader.encoding;
+    {
+     //   (*infos)[i]=_tracks[i].wavHeader.encoding;
+        WAV2AudioInfo(&(_tracks[i].wavHeader),&((*infos)[i]));
+        (*infos)[i].av_sync=_tracks[i].avSync;
+    }
     return 1;
 }
 

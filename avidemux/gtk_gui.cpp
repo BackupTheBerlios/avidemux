@@ -1082,7 +1082,8 @@ int A_openAvi2 (char *name, uint8_t mode)
 	updateLoaded ();
         if(currentaudiostream)
         {
-            uint32_t nbAudio,*infos=NULL;
+            uint32_t nbAudio;
+            audioInfo *infos=NULL;
             if(video_body->getAudioStreamsInfo(curframe+1,&nbAudio,&infos))
             {
                 if(nbAudio>1)
@@ -1091,6 +1092,7 @@ int A_openAvi2 (char *name, uint8_t mode)
                             "Go to Audio->MainTrack to select the active one.");
                 }
             }
+            if(infos) delete [] infos;
             
         }
 	for(i=strlen(longname);i>=0;i--)
@@ -2377,10 +2379,11 @@ uint32_t type,strength,swap;
  	}
 
 }
-extern uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, uint32_t *infos);
+extern uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, audioInfo *infos);
 void A_audioTrack( void )
 {
-        uint32_t nb,*infos;
+    uint32_t nb;
+    audioInfo *infos=NULL;
         AudioSource old,nw;        
         uint8_t r=0;
         uint32_t oldtrack,newtrack;
@@ -2394,7 +2397,7 @@ void A_audioTrack( void )
         newtrack=oldtrack=video_body->getCurrentAudioStreamNumber(0);
         nw=old=currentAudioSource;
         r=DIA_audioTrack(&nw, &newtrack,nb, infos);
-        delete [] infos;
+        if(infos) delete [] infos;
         // Change track here
         if(old==nw && (nw!=AudioAvi)) return;
 

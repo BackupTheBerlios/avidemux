@@ -147,7 +147,7 @@ virtual 	uint8_t  	getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fram
 // Multi track
 uint8_t        changeAudioStream(uint32_t newstream);
 uint32_t     getCurrentAudioStreamNumber(void);
-uint8_t     getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
+uint8_t     getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
 uint8_t      isReordered( void );
 uint8_t      reorder( void );
 

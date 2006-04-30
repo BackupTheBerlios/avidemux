@@ -37,6 +37,7 @@ public:
                       ~dmxAudioTrack() {};
       uint32_t        myPes,myPid;
       WAVHeader       wavHeader;
+      int32_t         avSync;
 };
 class dmxAudioStream : public AVDMGenericAudioStream
 {
@@ -58,7 +59,7 @@ class dmxAudioStream : public AVDMGenericAudioStream
         virtual                 ~dmxAudioStream() ;                    
         virtual uint8_t         goTo(uint32_t offset);
         virtual uint32_t        read(uint32_t size,uint8_t *ptr);
-                  uint8_t        getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos);
+                  uint8_t        getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
                   uint8_t        changeAudioTrack(uint32_t newtrack);
 }
 ;

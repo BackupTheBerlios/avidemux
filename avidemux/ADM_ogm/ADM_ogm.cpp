@@ -379,7 +379,7 @@ double fps;
 		return 1;
 
 }
-uint8_t   oggHeader::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+uint8_t   oggHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
 {
 uint32_t nb=0;
         if(_audioTracks[0].audioTrack!=0xff) nb++;
@@ -388,8 +388,17 @@ uint32_t nb=0;
         *infos=NULL;
         if(nb)
         {
-                *infos=new uint32_t[nb];
-                for(int i=0;i<nb;i++) (*infos)[i]=_audioTracks[i].encoding;
+                *infos=new audioInfo[nb];
+                for(int i=0;i<nb;i++)
+                {
+//                    WAV2AudioInfo(&(_audioTracks[i]),infos[i]);
+                    infos[i]->encoding=_audioTracks[i].encoding;
+                    infos[i]->channels=_audioTracks[i].channels;
+                    infos[i]->bitrate=(_audioTracks[i].byterate*8)/1000;
+                    infos[i]->frequency=_audioTracks[i].frequency;
+                    infos[i]->av_sync=0;
+                }
+                    //(*infos)[i]=_audioTracks[i].encoding;
         }
         return 1;
 }

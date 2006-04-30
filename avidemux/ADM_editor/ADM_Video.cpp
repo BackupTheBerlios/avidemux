@@ -125,7 +125,7 @@ uint8_t vidHeader::getRawStart (uint8_t * ptr, uint32_t * len)
   *len = 0;
   return 1;
 }
-uint8_t                 vidHeader::getAudioStreamsInfo(uint32_t *nbStreams, uint32_t **infos)
+uint8_t                 vidHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
 {
 WAVHeader *wav;
 
@@ -134,8 +134,9 @@ WAVHeader *wav;
         wav=getAudioInfo( );
         if(!wav) return 1;
         *nbStreams=1;
-        *infos=new uint32_t[1];
-        *infos[0]=wav->encoding;
+        *infos=new audioInfo[1];
+        WAV2AudioInfo(wav,*infos);
+        (*infos)->av_sync=0;
         return 1;
 
 }

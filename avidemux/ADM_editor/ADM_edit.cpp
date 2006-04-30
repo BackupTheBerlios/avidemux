@@ -866,7 +866,7 @@ uint8_t ADM_Composer::removeFrames (uint32_t start, uint32_t end)
 // Select audio track
 //
 //******************************
-uint8_t ADM_Composer::getAudioStreamsInfo(uint32_t frame,uint32_t *nbStreams, uint32_t **infos)
+uint8_t ADM_Composer::getAudioStreamsInfo(uint32_t frame,uint32_t *nbStreams, audioInfo **infos)
 {
 uint32_t seg,rel,reference;
 
@@ -1283,7 +1283,15 @@ uint8_t ADM_Composer::updateAudioTrack (uint32_t seg)
 #warning FIXME, does not work if audio track is shorter
 
 }
-
+uint8_t WAV2AudioInfo(WAVHeader *hdr,audioInfo *info)
+{
+    info->bitrate=(hdr->byterate*8)/1000;
+    info->channels=hdr->channels;
+    info->encoding=hdr->encoding;
+    info->frequency=hdr->frequency;
+    info->av_sync=0;
+    return 1;
+}
 
 
 //__________________________________________________
