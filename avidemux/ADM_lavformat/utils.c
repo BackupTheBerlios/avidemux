@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
 
@@ -465,6 +465,12 @@ int av_open_input_stream(AVFormatContext **ic_ptr,
 {
     int err;
     AVFormatContext *ic;
+    AVFormatParameters default_ap;
+
+    if(!ap){
+        ap=&default_ap;
+        memset(ap, 0, sizeof(default_ap));
+    }
 
     ic = av_alloc_format_context();
     if (!ic) {
@@ -508,7 +514,8 @@ int av_open_input_stream(AVFormatContext **ic_ptr,
 }
 
 /** Size of probe buffer, for guessing file type from file contents. */
-#define PROBE_BUF_SIZE 2048
+#define PROBE_BUF_MIN 2048
+#define PROBE_BUF_MAX 131072
 
 /**
  * Open a media file as input. The codec are not opened. Only the file
@@ -526,8 +533,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
                        int buf_size,
                        AVFormatParameters *ap)
 {
-    int err, must_open_file, file_opened;
-    uint8_t buf[PROBE_BUF_SIZE];
+    int err, must_open_file, file_opened, probe_size;
     AVProbeData probe_data, *pd = &probe_data;
     ByteIOContext pb1, *pb = &pb1;
 
@@ -535,7 +541,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
     pd->filename = "";
     if (filename)
         pd->filename = filename;
-    pd->buf = buf;
+    pd->buf = NULL;
     pd->buf_size = 0;
 
     if (!fmt) {
@@ -561,22 +567,23 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
         if (buf_size > 0) {
             url_setbufsize(pb, buf_size);
         }
-        if (!fmt) {
+
+        for(probe_size= PROBE_BUF_MIN; probe_size<=PROBE_BUF_MAX && !fmt; probe_size<<=1){
             /* read probe data */
-            pd->buf_size = get_buffer(pb, buf, PROBE_BUF_SIZE);
+            pd->buf= av_realloc(pd->buf, probe_size);
+            pd->buf_size = get_buffer(pb, pd->buf, probe_size);
             if (url_fseek(pb, 0, SEEK_SET) == (offset_t)-EPIPE) {
                 url_fclose(pb);
                 if (url_fopen(pb, filename, URL_RDONLY) < 0) {
+                    file_opened = 0;
                     err = AVERROR_IO;
                     goto fail;
                 }
             }
+            /* guess file format */
+            fmt = av_probe_input_format(pd, 1);
         }
-    }
-
-    /* guess file format */
-    if (!fmt) {
-        fmt = av_probe_input_format(pd, 1);
+        av_freep(&pd->buf);
     }
 
     /* if still no format found, error */
@@ -606,6 +613,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
         goto fail;
     return 0;
  fail:
+    av_freep(&pd->buf);
     if (file_opened)
         url_fclose(pb);
     *ic_ptr = NULL;
@@ -643,7 +651,7 @@ static int get_audio_frame_size(AVCodecContext *enc, int size)
         /* specific hack for pcm codecs because no frame size is
            provided */
         switch(enc->codec_id) {
-#if 0 //MEANX
+#if 0 //MEANX		
         case CODEC_ID_PCM_S32LE:
         case CODEC_ID_PCM_S32BE:
         case CODEC_ID_PCM_U32LE:
@@ -661,7 +669,7 @@ static int get_audio_frame_size(AVCodecContext *enc, int size)
                 return -1;
             frame_size = size / (3 * enc->channels);
             break;
-#endif
+#endif //MEANX	    
         case CODEC_ID_PCM_S16LE:
         case CODEC_ID_PCM_S16BE:
         case CODEC_ID_PCM_U16LE:
@@ -1131,7 +1139,7 @@ static void av_update_cur_dts(AVFormatContext *s, AVStream *ref_st, int64_t time
  * @param timestamp timestamp in the timebase of the given stream
  */
 int av_add_index_entry(AVStream *st,
-                            int64_t pos, int64_t timestamp, int distance, int flags)
+                            int64_t pos, int64_t timestamp, int size, int distance, int flags)
 {
     AVIndexEntry *entries, *ie;
     int index;
@@ -1168,6 +1176,7 @@ int av_add_index_entry(AVStream *st,
     ie->pos = pos;
     ie->timestamp = timestamp;
     ie->min_distance= distance;
+    ie->size= size;
     ie->flags = flags;
 
     return index;
@@ -1193,7 +1202,7 @@ static void av_build_index_raw(AVFormatContext *s)
         if (pkt->stream_index == 0 && st->parser &&
             (pkt->flags & PKT_FLAG_KEY)) {
             av_add_index_entry(st, st->parser->frame_offset, pkt->dts,
-                            0, AVINDEX_KEYFRAME);
+                            0, 0, AVINDEX_KEYFRAME);
         }
         av_free_packet(pkt);
     }
@@ -1347,6 +1356,12 @@ int av_seek_frame_binary(AVFormatContext *s, int stream_index, int64_t target_ts
                 break;
         }
         pos_limit= pos_max;
+    }
+
+    if(ts_min > ts_max){
+        return -1;
+    }else if(ts_min == ts_max){
+        pos_limit= pos_min;
     }
 
     no_change=0;
@@ -1848,7 +1863,7 @@ static int try_decode_frame(AVStream *st, const uint8_t *data, int size)
  */
 int av_find_stream_info(AVFormatContext *ic)
 {
-    int i, count, ret, read_size;
+    int i, count, ret, read_size, j;
     AVStream *st;
     AVPacket pkt1, *pkt;
     AVPacketList *pktl=NULL, **ppktl;
@@ -1888,7 +1903,7 @@ int av_find_stream_info(AVFormatContext *ic)
             if (!has_codec_parameters(st->codec))
                 break;
             /* variable fps and no guess at the real fps */
-            if(   st->codec->time_base.den >= 1000LL*st->codec->time_base.num
+            if(   st->codec->time_base.den >= 101LL*st->codec->time_base.num
                && duration_count[i]<20 && st->codec->codec_type == CODEC_TYPE_VIDEO)
                 break;
             if(st->parser && st->parser->parser->split && !st->codec->extradata)
@@ -1919,8 +1934,12 @@ int av_find_stream_info(AVFormatContext *ic)
             ret = -1; /* we could not have all the codec parameters before EOF */
             for(i=0;i<ic->nb_streams;i++) {
                 st = ic->streams[i];
-                if (!has_codec_parameters(st->codec))
+                if (!has_codec_parameters(st->codec)){
+                    char buf[256];
+                    avcodec_string(buf, sizeof(buf), st->codec, 0);
+                    av_log(ic, AV_LOG_INFO, "Could not find codec parameters (%s)\n", buf);
                     break;
+                }
             }
             if (i == ic->nb_streams)
                 ret = 0;
@@ -2018,21 +2037,29 @@ int av_find_stream_info(AVFormatContext *ic)
         st = ic->streams[i];
         if (st->codec->codec_type == CODEC_TYPE_VIDEO) {
             if(st->codec->codec_id == CODEC_ID_RAWVIDEO && !st->codec->codec_tag && !st->codec->bits_per_sample)
-                // MEANX st->codec->codec_tag= avcodec_pix_fmt_to_codec_tag(st->codec->pix_fmt);
+                st->codec->codec_tag= avcodec_pix_fmt_to_codec_tag(st->codec->pix_fmt);
 
-            if(duration_count[i] && st->codec->time_base.num*1000LL <= st->codec->time_base.den &&
-               st->time_base.num*duration_sum[i]/duration_count[i]*1000LL > st->time_base.den){
-                AVRational fps1;
-                int64_t num, den;
+            if(duration_count[i] && st->codec->time_base.num*101LL <= st->codec->time_base.den &&
+               st->time_base.num*duration_sum[i]/duration_count[i]*101LL > st->time_base.den){
+                int64_t num, den, error, best_error;
 
                 num= st->time_base.den*duration_count[i];
                 den= st->time_base.num*duration_sum[i];
 
-                av_reduce(&fps1.num, &fps1.den, num*1001, den*1000, FFMAX(st->time_base.den, st->time_base.num)/4);
-                av_reduce(&st->r_frame_rate.num, &st->r_frame_rate.den, num, den, FFMAX(st->time_base.den, st->time_base.num)/4);
-                if(fps1.num < st->r_frame_rate.num && fps1.den == 1 && (fps1.num==24 || fps1.num==30)){ //FIXME better decission
-                    st->r_frame_rate.num= fps1.num*1000;
-                    st->r_frame_rate.den= fps1.den*1001;
+                best_error= INT64_MAX;
+                for(j=1; j<60*12; j++){
+                    error= ABS(1001*12*num - 1001*j*den);
+                    if(error < best_error){
+                        best_error= error;
+                        av_reduce(&st->r_frame_rate.num, &st->r_frame_rate.den, j, 12, INT_MAX);
+                    }
+                }
+                for(j=24; j<=30; j+=6){
+                    error= ABS(1001*12*num - 1000*12*j*den);
+                    if(error < best_error){
+                        best_error= error;
+                        av_reduce(&st->r_frame_rate.num, &st->r_frame_rate.den, j*1000, 1001, INT_MAX);
+                    }
                 }
             }
 
@@ -2718,8 +2745,9 @@ int parse_frame_rate(int *frame_rate, int *frame_rate_base, const char *arg)
     }
     else {
         /* Finally we give up and parse it as double */
-        *frame_rate_base = DEFAULT_FRAME_RATE_BASE; //FIXME use av_d2q()
-        *frame_rate = (int)(strtod(arg, 0) * (*frame_rate_base) + 0.5);
+        AVRational time_base = av_d2q(strtod(arg, 0), DEFAULT_FRAME_RATE_BASE);
+        *frame_rate_base = time_base.den;
+        *frame_rate = time_base.num;
     }
     if (!*frame_rate || !*frame_rate_base)
         return -1;
@@ -2742,6 +2770,7 @@ int parse_frame_rate(int *frame_rate, int *frame_rate_base, const char *arg)
  *  S+[.m...]
  * @endcode
  */
+#ifndef CONFIG_WINCE
 int64_t parse_date(const char *datestr, int duration)
 {
     const char *p;
@@ -2849,6 +2878,7 @@ int64_t parse_date(const char *datestr, int duration)
     }
     return negative ? -t : t;
 }
+#endif /* CONFIG_WINCE */
 
 /**
  * Attempts to find a specific tag in a URL.
@@ -3151,6 +3181,12 @@ void av_frac_add(AVFrac *f, int64_t incr)
 
     num = f->num + incr;
     den = f->den;
+    ///MEANX
+    if(!den)
+    {
+		return;
+    }
+    ///MEANX
     if (num < 0) {
         f->val += num / den;
         num = num % den;
@@ -3224,7 +3260,7 @@ int av_read_image(ByteIOContext *pb, const char *filename,
                   AVImageFormat *fmt,
                   int (*alloc_cb)(void *, AVImageInfo *info), void *opaque)
 {
-    char buf[PROBE_BUF_SIZE];
+    uint8_t buf[PROBE_BUF_MIN];
     AVProbeData probe_data, *pd = &probe_data;
     offset_t pos;
     int ret;
@@ -3233,7 +3269,7 @@ int av_read_image(ByteIOContext *pb, const char *filename,
         pd->filename = filename;
         pd->buf = buf;
         pos = url_ftell(pb);
-        pd->buf_size = get_buffer(pb, buf, PROBE_BUF_SIZE);
+        pd->buf_size = get_buffer(pb, buf, PROBE_BUF_MIN);
         url_fseek(pb, pos, SEEK_SET);
         fmt = av_probe_image_format(pd);
     }

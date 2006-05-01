@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
 #include "bitstream.h"
@@ -1262,32 +1262,25 @@ static int mpeg_mux_end(AVFormatContext *ctx)
 
 static int mpegps_probe(AVProbeData *p)
 {
+    uint32_t code= -1;
+    int sys=0, pspack=0, priv1=0, vid=0;
     int i;
-    int size= FFMIN(20, p->buf_size);
-    uint32_t code=0xFF;
 
-    /* we search the first start code. If it is a packet start code,
-       then we decide it is mpeg ps. We do not send highest value to
-       give a chance to mpegts */
-    /* NOTE: the search range was restricted to avoid too many false
-       detections */
-
-    for (i = 0; i < size; i++) {
-        code = (code << 8) | p->buf[i];
+    for(i=0; i<p->buf_size; i++){
+        code = (code<<8) + p->buf[i];
         if ((code & 0xffffff00) == 0x100) {
-            if (code == PACK_START_CODE ||
-                code == SYSTEM_HEADER_START_CODE ||
-                (code >= 0x1e0 && code <= 0x1ef) ||
-                (code >= 0x1c0 && code <= 0x1df) ||
-                code == PRIVATE_STREAM_2 ||
-                code == PROGRAM_STREAM_MAP ||
-                code == PRIVATE_STREAM_1 ||
-                code == PADDING_STREAM)
-                return AVPROBE_SCORE_MAX - 2;
-            else
-                return 0;
+            switch(code){
+            case SYSTEM_HEADER_START_CODE:    sys++; break;
+            case         PRIVATE_STREAM_1:  priv1++; break;
+            case          PACK_START_CODE: pspack++; break;
+            case       (VIDEO_ID + 0x100):    vid++; break;
+            }
         }
     }
+    if(sys && sys*9 <= pspack*10)
+        return AVPROBE_SCORE_MAX/2+2; // +1 for .mpg
+    if((priv1 || vid) && (priv1+vid)*9 <= pspack*10)
+        return AVPROBE_SCORE_MAX/2+2; // +1 for .mpg
     return 0;
 }
 
@@ -1548,7 +1541,7 @@ static int mpegps_read_pes_header(AVFormatContext *s,
         int i;
         for(i=0; i<s->nb_streams; i++){
             if(startcode == s->streams[i]->id) {
-                av_add_index_entry(s->streams[i], *ppos, dts, 0, AVINDEX_KEYFRAME /* FIXME keyframe? */);
+                av_add_index_entry(s->streams[i], *ppos, dts, 0, 0, AVINDEX_KEYFRAME /* FIXME keyframe? */);
             }
         }
     }

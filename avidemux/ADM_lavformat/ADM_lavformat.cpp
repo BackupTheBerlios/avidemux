@@ -274,11 +274,13 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                         if(_type==MUXER_MP4)
                         {
                                 c->time_base= (AVRational){1000,_fps1000};
-                                return 1;
+                                break;
                         }
                         else
-			     GUI_Error_HIG("Incompatible frame rate", NULL);
-			return 0;
+                        {
+                            GUI_Error_HIG("Incompatible frame rate", NULL);
+                            return 0;
+                        }
 	}
 
 			
