@@ -242,5 +242,6 @@ int to_escape=0;
         *cur++=incoming[i];
         if(incoming[i]=='\\') *cur++=incoming[i];
     }
+    *cur++=0;
     return out;
 }

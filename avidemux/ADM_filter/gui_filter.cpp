@@ -244,9 +244,6 @@ on_action (gui_act action)
 
   switch (action)
     {
-    case A_SCRIPT:
-      GUI_FileSelWrite ("Save as script", filterSaveScript);
-      break;
       // Add
     case A_ADD:
       tag = new_filter ();

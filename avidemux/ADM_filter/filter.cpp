@@ -47,7 +47,7 @@ static uint32_t lastStart=0, lastNb=0;
 
 extern ADM_Composer *video_body;
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *conf, AVDMGenericVideoStream *in) ;
-
+extern char *ADM_escape(const ADM_filename *incoming);
 //
 static   AVDMGenericVideoStream *preview=NULL;
 // Ugly should be dynamically allocated
@@ -460,51 +460,7 @@ uint8_t 	filterAddScript(VF_FILTERS tag,uint32_t n,Arg *args)
 	printf("Tag not found\n");
 	return 0;
 }
-// Save the current filter list as a script sample
-//
-void filterSaveScript(char *name)
-{
-FILE *f;
 
-		f=fopen(name,"wt");
-		if(!f)
-		{ 	GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", GetFileName(name));
-			return;
-		}
-                filterSaveScriptFD(f);
-                fclose(f);
-}
-void filterSaveScriptFD(FILE *f)
-{
-		for(int i=1;i<nb_active_filter;i++)
-		{
-			VF_FILTERS tag=videofilters[i].tag;
-			fprintf(f,"AddVideoFilter(");
-			for(unsigned int j=0;j<nb_video_filter;j++)
-				{
-					if(tag==allfilters[j].tag)
-					{	
-						fprintf(f,allfilters[j].filtername);
-						break;	
-					}
-				}
-			// get args
-			CONFcouple *couple;
-			char *arg,*value;
-			if(videofilters[i].filter->getCoupledConf( &couple))
-			{
-				for(int j=0;j<couple->getNumber();j++)
-				{
-					 couple->getEntry(j, &arg,&value);
-				 	fprintf(f,",%s=%s",arg,value);
-				}
-				delete couple;
-			}
-			fprintf(f,");\n");			
-		
-		}
-		
-}	
 void filterSaveScriptJS(FILE *f)
 {
                 for(int i=1;i<nb_active_filter;i++)
@@ -521,13 +477,17 @@ void filterSaveScriptJS(FILE *f)
                                 }
                         // get args
                         CONFcouple *couple;
-                        char *arg,*value;
+                        char *arg,*value,*filtered=NULL;
                         if(videofilters[i].filter->getCoupledConf( &couple))
                         {
                                 for(int j=0;j<couple->getNumber();j++)
                                 {
                                          couple->getEntry(j, &arg,&value);
-                                         qfprintf(f,",\"%s=%s\"",arg,value);
+                                        // Filter out backslash
+                                         filtered=ADM_escape((ADM_filename *)value);
+                                         qfprintf(f,",\"%s=%s\"",arg,filtered);
+                                         if(filtered) delete [] filtered ;
+                                         filtered=NULL;
                                 }
                                 delete couple;
                         }

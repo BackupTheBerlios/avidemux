@@ -139,8 +139,6 @@ int  filterLoadXml(char *name,uint8_t silent);
  int filterLoad(char *name,uint8_t silent);
  void filterSave(char *name,uint8_t silent);
 CONFcouple *filterBuildCouple(FILTER_PARAM *param,uint32_t n,Arg *args);
-void filterSaveScript(char *name);
-void filterSaveScriptFD(FILE *f);
 void filterSaveScriptJS(FILE *f);
 void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable,
 			AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *),char *fname);
