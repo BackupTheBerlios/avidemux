@@ -789,7 +789,7 @@ int preferences::set(options option, const ADM_filename * val){
 	// set value
 	if( opt_defs[option].current_val )
 		ADM_dealloc(opt_defs[option].current_val);
-	opt_defs[option].current_val = ADM_escape(val);
+	opt_defs[option].current_val = ADM_strdup((char *)val);
 	if( ! opt_defs[option].current_val )
 		return RC_FAILED;
 	return RC_OK;
