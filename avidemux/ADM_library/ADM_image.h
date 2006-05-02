@@ -130,6 +130,28 @@ void drawString(ADMImage *dst, int x, int y, const char *s) ;
 #define UPLANE(x) (x->data+(x->_width*x->_height))
 #define VPLANE(x) (x->data+(5*(x->_width*x->_height)>>2))
 
+//
+//  Simple image resizer
+//
+
+
+class ADMImageResizer
+{
+private:
+        void    *_context;
+        uint32_t orgWidth,orgHeight;
+        uint32_t destWidth,destHeight;
+public:
+                ADMImageResizer(uint32_t ow,uint32_t oh, uint32_t dw, uint32_t dh);
+                ~ADMImageResizer();
+       uint8_t  resize(ADMImage *src,ADMImage *dest);
+};
+
+
+
+
+// Misc utilities
+
 uint8_t BitBlit(uint8_t *dst, uint32_t pitchDest,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height);
 
 #endif

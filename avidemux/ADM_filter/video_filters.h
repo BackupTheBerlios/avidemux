@@ -92,6 +92,7 @@
                 VF_TDEINT,
                 VF_MPDELOGO,
                 VF_COLOR_YUV,
+                VF_ANIMATED,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

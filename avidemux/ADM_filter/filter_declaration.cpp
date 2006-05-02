@@ -158,6 +158,10 @@ printf(  "*********************\n");
         REGISTERX("whirl","Whirl","Useless whirlwind effect.",VF_WHIRL,1,whirl_create,whirl_script);
         REGISTERX("mosaic","Mosaic","Split the picture into tiny thumbnails.",VF_MOSAIC,1,     mosaic_create,mosaic_script);
         REGISTERX("mpdelogo","MPlayer delogo","Blend a logo by interpolating its surrounding box.",VF_MPDELOGO,1,mpdelogo_create,mpdelogo_script);
+        REGISTERX("animatedmenu","Animated Menu",
+            "Create a video made of 6 mini window\n, very useful to do DVD menus.",
+            VF_ANIMATED,1,animated_create,animated_script);
+
 // Does not work
 //        REGISTERX("unblend","Unblend by Bach",VF_UNBLEND,1,unblend_create,unblend_script);
         
