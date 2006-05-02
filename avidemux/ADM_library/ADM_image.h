@@ -123,6 +123,8 @@ public:
                         uint32_t strideu, uint32_t stridev);
         uint8_t merge(ADMImage *src1,ADMImage *src2);
         uint8_t substract(ADMImage *src1,ADMImage *src2);
+        uint8_t blacken(void);
+        uint8_t copyTo(ADMImage *target, uint32_t x, uint32_t y);
 static uint32_t lumaDiff(ADMImage *src1,ADMImage *src2,uint32_t noise);
 };
 void drawString(ADMImage *dst, int x, int y, const char *s) ;

@@ -13,7 +13,14 @@
  ***************************************************************************/
 #ifndef ADM_VID_ANIMATED_H
 #define ADM_VID_ANIMATED_H
+
+
 #define MAX_VIGNETTE 6
+#define VIGNETTE_WIDTH  160
+#define VIGNETTE_HEIGHT 120
+#define LEFT_MARGIN 50
+#define TOP_MARGIN 50
+
 #include "ADM_vidAnimated_param.h"
 #include "ADM_video/ADM_cache.h"
 
@@ -25,7 +32,10 @@ class  ADMVideoAnimated:public AVDMGenericVideoStream
         virtual     char            *printConf(void) ;
                     ANIMATED_PARAM  *_param;
                     ADMImageResizer *_resizer;
-                    VideoCache      *caches[MAX_VIGNETTE];
+                    ADMImage        *_image;
+                    VideoCache      *_caches[MAX_VIGNETTE];
+                    uint8_t         setup( void);
+                    uint8_t         cleanup( void);
     public:
                     ADMVideoAnimated(  AVDMGenericVideoStream *in,CONFcouple *setup);
                     ~ADMVideoAnimated();

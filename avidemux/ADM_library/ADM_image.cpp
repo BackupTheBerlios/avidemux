@@ -250,7 +250,54 @@ uint8_t ADMImage::copyQuantInfo(ADMImage *src)
 	
 	return 1;
 }
+uint8_t ADMImage::blacken(void)
+{
+        memset(YPLANE(this),0,_width*_height);
+        memset(UPLANE(this),128,(_width*_height)>>2);
+        memset(VPLANE(this),128,(_width*_height)>>2);
+        return 1;
 
+}
+/*
+    Copy "this" image into dest image at x,y position
+
+*/
+uint8_t ADMImage::copyTo(ADMImage *dest, uint32_t x,uint32_t y)
+{
+      
+    uint32_t box_w=_width, box_h=_height;
+    // Clip if needed
+    if(y>dest->_height)
+    {
+        printf("Y out : %u %u\n",y,dest->_height);
+         return 1;
+    }
+    if(x>dest->_width) 
+    {
+        printf("X out : %u %u\n",x,dest->_width);
+         return 1;
+    }
+    
+    if(x+box_w>dest->_width) box_w=dest->_width-x;
+    if(y+box_h>dest->_height) box_h=dest->_height-y;
+
+    // do y
+    BitBlit(YPLANE(dest)+x+dest->_width*y,dest->_width,
+            data,_width,
+            box_w,box_h);
+    // Do u
+    BitBlit(UPLANE(dest)+x/2+(dest->_width*y)/4,dest->_width/2,
+            UPLANE(this),_width>>1,
+            box_w>>1,box_h>>1);
+
+    BitBlit(VPLANE(dest)+x/2+(dest->_width*y)/4,dest->_width/2,
+            VPLANE(this),_width>>1,
+            box_w>>1,box_h>>1);
+
+
+    return 1;
+
+}
 uint8_t BitBlit(uint8_t *dst, uint32_t pitchDst,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height)
 {
     

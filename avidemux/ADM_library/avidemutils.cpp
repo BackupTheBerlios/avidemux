@@ -223,9 +223,11 @@ uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode
 //**********************************************************
 char *ADM_escape(const ADM_filename *incoming)
 {
-int l=strlen((char *)incoming);
 char *out,*cur;
 int to_escape=0;
+int l=0;
+
+    if(incoming)     l=strlen((char *)incoming);
     if(!l)
     {
         printf("[ADM_escape] Null string ?\n");

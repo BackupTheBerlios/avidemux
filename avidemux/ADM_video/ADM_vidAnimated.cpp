@@ -42,10 +42,14 @@ static FILTER_PARAM animated_template={8,
 BUILD_CREATE(animated_create,ADMVideoAnimated);
 SCRIPT_CREATE(animated_script,ADMVideoAnimated,animated_template);
 
+static const int x_coordinate[3]={LEFT_MARGIN,360-(VIGNETTE_WIDTH)/2,720-VIGNETTE_WIDTH-LEFT_MARGIN};
+static const int y_coordinate[2]={TOP_MARGIN,TOP_MARGIN+VIGNETTE_HEIGHT+TOP_MARGIN};
+
+
 uint8_t ADMVideoAnimated::configure(AVDMGenericVideoStream *in)
 {
 
-  
+   setup();
    return 0;
 }
 
@@ -55,9 +59,35 @@ char *ADMVideoAnimated::printConf( void )
    sprintf((char *)buf," Animated Menu ");
    return buf;
 }
+uint8_t ADMVideoAnimated::setup( void)
+{
+    cleanup();
+    for(int i=0;i<MAX_VIGNETTE;i++) _caches[i]=new VideoCache(18,_in);  // 18 is good for mpeg2
+    _resizer=new ADMImageResizer(_in->getInfo()->width,_in->getInfo()->height,
+            VIGNETTE_WIDTH,VIGNETTE_HEIGHT);
+    _image=new ADMImage(VIGNETTE_WIDTH,VIGNETTE_HEIGHT);
 
+}
+uint8_t ADMVideoAnimated::cleanup( void)
+{
+   
+    for(int i=0;i<MAX_VIGNETTE;i++) 
+    {
+        if(_caches[i]) delete _caches[i];
+        _caches[i]=NULL;
+    }
+    if(_resizer) delete _resizer;
+    if(_image) delete _image;
+    _resizer=NULL;
+    _image=NULL;
+
+}
 ADMVideoAnimated::ADMVideoAnimated(AVDMGenericVideoStream *in,CONFcouple *couples) 
 {
+   _resizer=NULL;
+   _image=NULL;
+    for(int i=0;i<MAX_VIGNETTE;i++) _caches[i]=NULL;
+
    _in=in;
    memcpy(&_info,_in->getInfo(),sizeof(_info));    
    _info.encoding=1;
@@ -80,8 +110,8 @@ ADMVideoAnimated::ADMVideoAnimated(AVDMGenericVideoStream *in,CONFcouple *couple
    {
 #define MKP(x,y) _param->x=y;
             MKP(isNTSC,0);
-            MKP(backgroundImg,NULL);
-#undef MKP(x,y)
+            MKP(backgroundImg,(ADM_filename *)"taist.jpg");
+#undef MKP
 #define MKP(x,y) _param->timecode[x]=y
         MKP(0,0);
         MKP(1,100);
@@ -93,6 +123,7 @@ ADMVideoAnimated::ADMVideoAnimated(AVDMGenericVideoStream *in,CONFcouple *couple
    if(_param->isNTSC) _info.height=480;
         else _info.height=576;
     _info.width=720;
+    setup();
 }
 //____________________________________________________________________
 ADMVideoAnimated::~ADMVideoAnimated()
@@ -100,6 +131,7 @@ ADMVideoAnimated::~ADMVideoAnimated()
    delete _param;
    _param=NULL;
    _uncompressed=NULL;
+   cleanup();
 }
 #define BYTE uint8_t 
 #ifndef MAX
@@ -108,13 +140,46 @@ ADMVideoAnimated::~ADMVideoAnimated()
 #ifndef MIN
 #define MIN(x,y) ((x)<(y) ?(x):(y))
 #endif
+//_____________________________________________________________
+// It is slow as we should do the resize in place (one 
+//   bunch of memcpy saved)
+// Since it is killing the editor cache anyway, speed it not an issue
 //______________________________________________________________
 uint8_t ADMVideoAnimated::getFrameNumberNoAlloc(uint32_t frame,
   uint32_t *len,
   ADMImage *data,
   uint32_t *flags)
   {
-     
+    ADMImage *in;
+    uint32_t offset,pool;
+
+    // Clean the image
+    data->blacken();
+
+     // Do 3 top
+     for(int line=0;line<2;line++)
+        for(int i=0;i<3;i++)
+        {
+            pool=i+(3*line);
+            if(_param->timecode[pool]+frame<_in->getInfo()->nb_frames) 
+            {
+                in=_caches[pool]->getImage(_param->timecode[pool]+frame);
+                if(in) 
+                {
+                     _resizer->resize(in,_image);
+                    _caches[pool]->unlockAll();
+                }else
+                {   
+                    _image->blacken();
+                }
+            }else
+            {   // Blacken
+                 _image->blacken();
+            }
+            // Blit
+
+            _image->copyTo(data,x_coordinate[i],y_coordinate[line]);
+        }
 
 	return 1;
 
@@ -125,7 +190,7 @@ uint8_t	ADMVideoAnimated::getCoupledConf( CONFcouple **couples)
 {
    
       ADM_assert(_param);
-      *couples=new CONFcouple(19);
+      *couples=new CONFcouple(8);
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
        CSET(isNTSC);
        CSET(backgroundImg);

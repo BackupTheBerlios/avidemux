@@ -54,7 +54,7 @@ int flags=0;
             _context=(void *)sws_getContext(
                         orgWidth,orgHeight,
                         IMGFMT_YV12,
-                        destWidth,orgWidth,
+                        destWidth,destHeight,
                         IMGFMT_YV12,
                         flags, NULL, NULL,NULL);
             
