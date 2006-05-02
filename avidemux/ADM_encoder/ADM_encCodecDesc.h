@@ -408,6 +408,25 @@ COMPRES_PARAMS SVCDCodec = {
   sizeof (SVCDExtra),
   DIA_SVCDParam
 };
+//*******************
+#if defined REQUANT_AS_CODE
+uint32_t RequantFactorExtra=1000; // 1000* the actual requant factor
+COMPRES_PARAMS RequantCodec = {
+    CodecRequant,
+    "REQUANT",
+    "REQUANT",
+    "Mpeg2 Requantizer",
+    COMPRESS_CQ,
+    4,
+    1500,
+    700,
+    ADM_ENC_CAP_CQ,
+    ADM_EXTRA_PARAM,
+    &RequantFactorExtra,
+    sizeof (RequantFactorExtra),
+    DIA_Requant
+};
+#endif
 //********************************************
 Mpeg2encParam DVDExtra = {
   (9000 * 1000) >> 3,		// Max BR

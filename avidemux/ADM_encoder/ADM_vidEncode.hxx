@@ -42,6 +42,7 @@ typedef enum SelectCodecType
   CodecX264,
 #endif
   CodecYV12,
+  CodecRequant,
   CodecDummy
 };
 

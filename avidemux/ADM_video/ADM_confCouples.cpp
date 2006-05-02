@@ -108,6 +108,15 @@ uint8_t CONFcouple::setCouple(const char *myname,const char *val)
 	cur++;
 	return 1;
 }
+uint8_t CONFcouple::setCouple(const char *myname,const ADM_filename *val)
+{
+	ADM_assert(cur<nb);
+
+	name[cur]=ADM_strdup(myname);
+	value[cur]=ADM_strdup((char *)val);
+	cur++;
+	return 1;
+}
 
 
 uint8_t CONFcouple::getCouple(const char *myname,uint32_t *val)
@@ -135,6 +144,15 @@ uint8_t CONFcouple::getCouple(const char *myname,char **val)
 	ADM_assert(index!=-1);
 	ADM_assert(index<(int)nb);
 	*val=ADM_strdup(value[index]);
+	return 1;
+}
+uint8_t CONFcouple::getCouple(const char *myname,ADM_filename **val)
+{
+	int32_t index=lookupName(myname);
+
+	ADM_assert(index!=-1);
+	ADM_assert(index<(int)nb);
+	*val=(ADM_filename *)ADM_strdup(value[index]);
 	return 1;
 }
 uint8_t CONFcouple::getCouple(const char *myname,float *val)

@@ -95,7 +95,7 @@ DIR *dir=NULL;
 	}
 	else	//use pref
 	{
-		if( prefs->get(LASTDIR_READ,&tmpname))
+		if( prefs->get(LASTDIR_READ,(ADM_filename **)&tmpname))
 		{
 			
 	
@@ -287,9 +287,9 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
         gtk_window_set_title (GTK_WINDOW (dialog),label);
         gtk_register_dialog(dialog);
         if(rw)
-                res=prefs->get(LASTDIR_WRITE,&tmpname); 
+                res=prefs->get(LASTDIR_WRITE,(ADM_filename **)&tmpname); 
         else
-               res=prefs->get(LASTDIR_READ,&tmpname); 
+               res=prefs->get(LASTDIR_READ,(ADM_filename **)&tmpname); 
         if(res)
 	{
                 DIR *dir;
@@ -322,9 +322,9 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
                         char *str=PathCanonize(name);
                         PathStripName(str);
                         if(rw)
-                                prefs->set(LASTDIR_WRITE,str);			
+                                prefs->set(LASTDIR_WRITE,(ADM_filename *)str);			
                         else
-                                prefs->set(LASTDIR_READ,str);                        
+                                prefs->set(LASTDIR_READ,(ADM_filename *)str);                        
                         delete [] str;
 
                 }

@@ -69,7 +69,7 @@ static uint8_t ADM_utfEnd( void);
 uint8_t	ADMVideoSubtitle::loadFont (void)
 {
  
-  if (!_font->initFreeType (_conf->_fontname))
+  if (!_font->initFreeType ((char *)_conf->_fontname))
     {
       printf ("\n Free type init failed for font %s!", _conf->_fontname);
     }

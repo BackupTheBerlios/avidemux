@@ -38,12 +38,14 @@ class CONFcouple
 			uint8_t setCouple(const char *name,uint32_t value);
 			uint8_t setCouple(const char *name,int32_t value);
 			uint8_t setCouple(const char *name,const char *value);
+			uint8_t setCouple(const char *name,const ADM_filename *value);
 			uint8_t setCouple(const char *name,double value);
 			uint8_t setCouple(const char *name,float value);
 
 			uint8_t getCouple(const char *name,int32_t *value);
 			uint8_t getCouple(const char *name,uint32_t *value);
 			uint8_t getCouple(const char *name,char **value);
+			uint8_t getCouple(const char *name,ADM_filename **value);
 			uint8_t getCouple(const char *name,double *value);
 			uint8_t getCouple(const char *name,float *value);
 			uint32_t getNumber(void) { return nb;};

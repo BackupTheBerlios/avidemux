@@ -54,7 +54,7 @@ uint8_t  ossAudioDevice::setVolume(int volume)
 {
         int fd;
 	int ret;
-	uint8_t which_vol = 0;
+	uint32_t which_vol = 0;
 
 	prefs->get(FEATURE_AUDIOBAR_USES_MASTER,&which_vol);
         fd=open(device_mixer,O_RDONLY);

@@ -14,7 +14,8 @@ my $cpp_str = "typedef enum {\n".
               "\tULONG,\n".
               "\tLONG,\n".
               "\tFLOAT,\n".
-              "\tSTRING\n".
+              "\tSTRING,\n".
+              "\tFILENAME\n".
               "} types;\n".
               "\n".
               "typedef struct {\n".
@@ -46,7 +47,7 @@ while(<$fd>){
 		$cpp_str .= "\t{\"$N\",";
 		$cpp_str .= "\t" if( length($c)%8 != 3 );
 		$cpp_str .= "\t$b,";
-		if( $b eq "STRING" ){
+		if(( $b eq "STRING" )||($b eq "FILENAME")){
 			$c =~ s/^"//;
 			$c =~ s/"$//;
                         $c =~ s/@/,/; # Replace % by , needed by alsa stuff
@@ -58,7 +59,7 @@ while(<$fd>){
 		$cpp_str .= "\t" if( length($c) < 5 );
 		$cpp_str .= "NULL,";
 		# max min processing
-		if( $b eq "STRING" ){
+		if(( $b eq "STRING" )||($b eq "FILENAME")){
 			$cpp_str .= " NULL, NULL },\n";
 		}else{
 			$d =~ s/^\s*,\s*//;

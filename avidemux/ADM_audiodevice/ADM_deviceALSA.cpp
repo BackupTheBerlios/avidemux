@@ -513,7 +513,7 @@ uint8_t alsaAudioDevice::play( uint32_t len, uint8_t *data )
 uint8_t alsaAudioDevice::setVolume(int volume){
   snd_mixer_t *mixer_handle;
   char *pcm_name;
-  uint8_t which_vol;
+  uint32_t which_vol;
   int rc;
 
 	if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &pcm_name) != RC_OK )

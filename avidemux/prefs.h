@@ -92,6 +92,7 @@ class preferences {
 		int get(options option,          long *val);
 		int get(options option, float *val);
 		int get(options option, char **val);
+                int get(options option, ADM_filename **val);
 		int get(options option, uint8_t *val);
 		int get(options option, uint16_t *val);
 		const char * get_str_min(options option);
@@ -106,6 +107,7 @@ class preferences {
 		int set(options option, const          long val);
 		int set(options option, const          float val);
 		int set(options option, const          char * val);
+                int set(options option, const ADM_filename * val);
 		int set_lastfile(const char* file);
 		const char **get_lastfiles(void);
 };

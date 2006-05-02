@@ -151,45 +151,49 @@ uint32_t l,f;
 						sourceImage,
 						&f));
 				
-		 if(GUI_subtitleParam(	_conf->_fontname,
-		 					_conf->_subname,
-							&charset,
-							(int *)&_conf->_fontsize,
-		 					&(_conf->_baseLine),
-							&(_conf->_Y_percent),
-							&(_conf->_U_percent),
-							&(_conf->_V_percent),
-							&(_conf->_selfAdjustable),
-							&(_conf->_delay),
-							&(_conf->_useBackgroundColor)
+		 if(GUI_subtitleParam(	
+                        (char *)_conf->_fontname,
+                        (char *)_conf->_subname,
+                        &charset,
+                        (int *)&_conf->_fontsize,
+                        &(_conf->_baseLine),
+                        &(_conf->_Y_percent),
+                        &(_conf->_U_percent),
+                        &(_conf->_V_percent),
+                        &(_conf->_selfAdjustable),
+                        &(_conf->_delay),
+                        &(_conf->_useBackgroundColor)
 							))
 		 {
-			 	printf("\n Font : %s", _conf->_fontname);
-			 	printf("\n Sub  : %s", _conf->_subname);
-			  	printf("\n Font size : %ld",_conf->_fontsize);
-				printf("\n Charset : %d",charset);
-				printf("\n Y : %ld",_conf->_Y_percent);
-				printf("\n U : %ld",_conf->_U_percent);
-				printf("\n V : %ld",_conf->_V_percent);
-				if(charset<(int)(sizeof(names)/sizeof(unicd)))
-					{
-						strcpy(_conf->_charset,names[charset].name    );
-						printf("\n Charset : %s\n",   names[charset].name    );
-					}
+                    printf("\n Font : %s", _conf->_fontname);
+                    printf("\n Sub  : %s", _conf->_subname);
+                    printf("\n Font size : %ld",_conf->_fontsize);
+                    printf("\n Charset : %d",charset);
+                    printf("\n Y : %ld",_conf->_Y_percent);
+                    printf("\n U : %ld",_conf->_U_percent);
+                    printf("\n V : %ld",_conf->_V_percent);
+                    if(charset<(int)(sizeof(names)/sizeof(unicd)))
+                    {
+                        strcpy(_conf->_charset,names[charset].name    );
+                        printf("\n Charset : %s\n",   names[charset].name    );
+                    }
 
-				loadSubtitle();
-				loadFont();
+                    loadSubtitle();
+                    loadFont();
 				
-				prefs->set(FILTERS_SUBTITLE_FONTNAME,_conf->_fontname);
-				prefs->set(FILTERS_SUBTITLE_CHARSET,_conf->_charset);
-				prefs->set(FILTERS_SUBTITLE_FONTSIZE,_conf->_fontsize);
-                                prefs->set(FILTERS_SUBTITLE_YPERCENT,_conf->_Y_percent);
-                                prefs->set(FILTERS_SUBTITLE_UPERCENT,_conf->_U_percent);
-                                prefs->set(FILTERS_SUBTITLE_VPERCENT,_conf->_V_percent);
-                                prefs->set(FILTERS_SUBTITLE_SELFADJUSTABLE,_conf->_selfAdjustable);
-                                prefs->set(FILTERS_SUBTITLE_USEBACKGROUNDCOLOR,_conf->_useBackgroundColor);
-				
-				ret=1;
+                    prefs->set(FILTERS_SUBTITLE_FONTNAME,
+                            (ADM_filename *)_conf->_fontname);
+                    prefs->set(FILTERS_SUBTITLE_CHARSET,
+                            _conf->_charset);
+                    prefs->set(FILTERS_SUBTITLE_FONTSIZE,_conf->_fontsize);
+                    prefs->set(FILTERS_SUBTITLE_YPERCENT,_conf->_Y_percent);
+                    prefs->set(FILTERS_SUBTITLE_UPERCENT,_conf->_U_percent);
+                    prefs->set(FILTERS_SUBTITLE_VPERCENT,_conf->_V_percent);
+                    prefs->set(FILTERS_SUBTITLE_SELFADJUSTABLE,
+                                _conf->_selfAdjustable);
+                    prefs->set(FILTERS_SUBTITLE_USEBACKGROUNDCOLOR,
+                                _conf->_useBackgroundColor);
+                    ret=1;
 		}
 		delete  sourceImage;
 		delete [] targetImage;

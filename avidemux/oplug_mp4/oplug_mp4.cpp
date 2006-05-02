@@ -190,6 +190,11 @@ ADM_MUXER_TYPE muxerType=MUXER_MP4;
                         GUI_Error_HIG ("Error while encoding", NULL);
                         goto  stopit;
               }
+              if(!bitstream.flags & AVI_KEY_FRAME)
+              {
+                  GUI_Error_HIG ("KeyFrame error", "The beginning frame is not a key frame.\nPlease move the A marker.");
+                  goto  stopit; 
+              }
            //len=bitstream.len;
            // If needed get VOL header
            if(isMpeg4Compatible(info.fcc) && !videoExtraDataSize && bitstream.len)

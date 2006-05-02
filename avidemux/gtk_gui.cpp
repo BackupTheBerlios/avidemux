@@ -327,7 +327,7 @@ int nw;
       ADM_assert(0);
       break;
     case ACT_Exit:
-      { uint8_t saveprefsonexit;
+      { uint32_t saveprefsonexit;
          prefs->get(FEATURE_SAVEPREFSONEXIT,&saveprefsonexit);
          if( saveprefsonexit )
             prefs->save ();
@@ -767,7 +767,7 @@ case ACT_Pipe2Other:
   
     case ACT_MarkA:
     case ACT_MarkB:
-      uint8_t swapit;
+      uint32_t swapit;
       if( prefs->get(FEATURE_SWAP_IF_A_GREATER_THAN_B, &swapit) != RC_OK )
          swapit = 1;
       if (action == ACT_MarkA)

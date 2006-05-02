@@ -22,6 +22,7 @@
 #define MAXIMUM_SIZE 2048
 
 
+typedef unsigned char ADM_filename ;
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>

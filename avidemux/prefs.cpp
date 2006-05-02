@@ -24,6 +24,7 @@ extern char *getBaseDir(void);
 extern char *PathCanonize(const char *tmpname);
 extern int  qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
 static char *checkDirAccess(char *home);
+extern char *ADM_escape(const ADM_filename *incoming);
 // <prefs_gen>
 typedef enum {
 	UINT,
@@ -31,7 +32,8 @@ typedef enum {
 	ULONG,
 	LONG,
 	FLOAT,
-	STRING
+	STRING,
+	FILENAME
 } types;
 
 typedef struct {
@@ -69,7 +71,7 @@ static opt_def opt_defs [] = {
 	{"codecs.xvid.bitrate",		UINT,	"1500000",NULL,	"17",	"5900000"},
 	{"codecs.xvid.finalsize",	UINT,	"700",	NULL,	"0",	"3999"	},
 	{"codecs.preferredcodec",		STRING,"FFmpeg4",NULL, NULL, NULL },
-	{"filters.subtitle.fontname",		STRING,"/usr/X11R6/lib/X11/fonts/truetype/arial.ttf",NULL, NULL, NULL },
+	{"filters.subtitle.fontname",		FILENAME,"/usr/X11R6/lib/X11/fonts/truetype/arial.ttf",NULL, NULL, NULL },
 	{"filters.subtitle.charset",		STRING,"ISO-8859-1",NULL, NULL, NULL },
 	{"filters.subtitle.fontsize",		UINT,	"24",	NULL,	"1",	"576"	},
 	{"filters.subtitle.ypercent",	INT,	"255",	NULL,	"0",	"255"	},
@@ -83,12 +85,12 @@ static opt_def opt_defs [] = {
 	{"device.videodevice",		UINT,	"0",	NULL,	"0",	"10"	},
 	{"default.postproc_type",		UINT,	"3",	NULL,	"0",	"7"	},
 	{"default.postproc_value",		UINT,	"3",	NULL,	"0",	"5"	},
-	{"lastfiles.file1",		STRING,"",	NULL, NULL, NULL },
-	{"lastfiles.file2",		STRING,"",	NULL, NULL, NULL },
-	{"lastfiles.file3",		STRING,"",	NULL, NULL, NULL },
-	{"lastfiles.file4",		STRING,"",	NULL, NULL, NULL },
-	{"lastdir_read",		STRING,"",	NULL, NULL, NULL },
-	{"lastdir_write",		STRING,"",	NULL, NULL, NULL },
+	{"lastfiles.file1",		FILENAME,"",	NULL, NULL, NULL },
+	{"lastfiles.file2",		FILENAME,"",	NULL, NULL, NULL },
+	{"lastfiles.file3",		FILENAME,"",	NULL, NULL, NULL },
+	{"lastfiles.file4",		FILENAME,"",	NULL, NULL, NULL },
+	{"lastdir_read",		FILENAME,"",	NULL, NULL, NULL },
+	{"lastdir_write",		FILENAME,"",	NULL, NULL, NULL },
 	{"lame_cli",		STRING,"",	NULL, NULL, NULL },
 	{"pipe_cmd",		STRING,"",	NULL, NULL, NULL },
 	{"pipe_param",		STRING,"",	NULL, NULL, NULL },
@@ -442,7 +444,7 @@ int preferences::save_xml_to_file(){
 #endif
 }
 #endif
-
+/*
 int preferences::get(options option, uint8_t *val){
    unsigned int x;
 	if( get(option,&x) == RC_OK ){
@@ -453,7 +455,7 @@ int preferences::get(options option, uint8_t *val){
 	}
 	return RC_FAILED;
 }
-
+*/
 int preferences::get(options option, uint16_t *val){
    unsigned int x;
 	if( get(option,&x) == RC_OK ){
@@ -545,7 +547,17 @@ int preferences::get(options option, char **val){
 		return RC_OK;
 	return RC_FAILED; // strdup() out of memory
 }
-
+#warning incorrect!
+int preferences::get(options option, ADM_filename **val){
+   const char *p = opt_defs[option].current_val;
+	if( !p )
+		p = opt_defs[option].default_val;
+	// no type check : every value can be represented by a string
+	// not an error -> it's a magic feature
+	if( (*val = (ADM_filename *)ADM_strdup(p) ) )
+		return RC_OK;
+	return RC_FAILED; // strdup() out of memory
+}
 int preferences::set(options option, const unsigned int val){
    unsigned int l,r;
    char buf[1024];
@@ -759,6 +771,25 @@ int preferences::set(options option, const char * val){
 	if( opt_defs[option].current_val )
 		ADM_dealloc(opt_defs[option].current_val);
 	opt_defs[option].current_val = ADM_strdup(val);
+	if( ! opt_defs[option].current_val )
+		return RC_FAILED;
+	return RC_OK;
+}
+#warning incorrect!
+int preferences::set(options option, const ADM_filename * val){
+	// check type of option
+	if( opt_defs[option].type != FILENAME ){
+		fprintf(stderr,"preferences::set(%s,string) called for type %d\n",
+			opt_defs[option].name,opt_defs[option].type);
+		ADM_assert(0);
+	}
+	// check val
+	if( ! val )
+		return RC_FAILED;
+	// set value
+	if( opt_defs[option].current_val )
+		ADM_dealloc(opt_defs[option].current_val);
+	opt_defs[option].current_val = ADM_escape(val);
 	if( ! opt_defs[option].current_val )
 		return RC_FAILED;
 	return RC_OK;

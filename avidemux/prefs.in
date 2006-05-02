@@ -36,7 +36,7 @@ codecs.xvid.quantizer,			UINT,	4,	2,	32
 codecs.xvid.bitrate,			UINT,	1500000,17,	5900000
 codecs.xvid.finalsize,			UINT,	700,	0,	3999
 codecs.preferredcodec,			STRING,	FFmpeg4
-filters.subtitle.fontname,		STRING, "/usr/X11R6/lib/X11/fonts/truetype/arial.ttf"
+filters.subtitle.fontname,		FILENAME, "/usr/X11R6/lib/X11/fonts/truetype/arial.ttf"
 filters.subtitle.charset,		STRING, "ISO-8859-1"
 filters.subtitle.fontsize,		UINT,	24,	1,	576
 filters.subtitle.ypercent,		INT,	255,	0,	255
@@ -53,12 +53,12 @@ device.videodevice,			UINT,	0,	0,	10
 default.postproc_type,			UINT,	3,	0,	7
 default.postproc_value,			UINT,	3,	0,	5
 # lastfiles
-lastfiles.file1,			STRING,	""
-lastfiles.file2,			STRING,	""
-lastfiles.file3,			STRING,	""
-lastfiles.file4,			STRING,	""
-lastdir_read,				STRING,	""
-lastdir_write,				STRING,	""
+lastfiles.file1,			FILENAME,	""
+lastfiles.file2,			FILENAME,	""
+lastfiles.file3,			FILENAME,	""
+lastfiles.file4,			FILENAME,	""
+lastdir_read,				FILENAME,	""
+lastdir_write,				FILENAME,	""
 # lame
 lame_cli,				STRING, ""
 pipe_cmd,				STRING, ""

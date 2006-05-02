@@ -530,7 +530,7 @@ mpegWritter::save_dualpass (const char *name, uint32_t final_size, uint32_t bitr
 {
   AVDMGenericVideoStream *incoming;
   char *statname;
-  uint8_t reuse = 0;
+  uint32_t reuse = 0;
 
   incoming = getLastVideoFilter (frameStart, frameEnd - frameStart);
   _w = incoming->getInfo ()->width;
@@ -562,7 +562,7 @@ mpegWritter::save_dualpass (const char *name, uint32_t final_size, uint32_t bitr
     if (fd)
       {
 	fclose (fd);
-	prefs->get (FEATURE_REUSE_2PASS_LOG, (uint8_t *) & reuse);
+	prefs->get (FEATURE_REUSE_2PASS_LOG, (uint32_t *) & reuse);
 	if (!reuse && GUI_Question ("Reuse log file ?"))
 	  reuse = 1;
       }

@@ -54,8 +54,8 @@ typedef struct SUBCONF
 		int32_t    _Y_percent;
 		int32_t    _U_percent;
 		int32_t    _V_percent;
-		char	   *_fontname;
-		char		*_subname;
+		ADM_filename	*_fontname;
+		ADM_filename	*_subname;
 		char 		*_charset;
 		uint32_t	_selfAdjustable;   /** Automatic line breaks */
 		int32_t		_delay;            

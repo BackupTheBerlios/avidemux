@@ -31,7 +31,7 @@
 #include "subchunk.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"
-
+char *ADM_escape(const ADM_filename *incoming);
 uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);
 void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size);
 //_________________________________________________
@@ -216,4 +216,31 @@ uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode
 		ptr++;
 	}
 	return 0; // startcode not found
+}
+//**********************************************************
+// Convert \ to \\ 
+// Needed for win32 which uses \ to store filename+path
+//**********************************************************
+char *ADM_escape(const ADM_filename *incoming)
+{
+int l=strlen((char *)incoming);
+char *out,*cur;
+int to_escape=0;
+    if(!l)
+    {
+        printf("[ADM_escape] Null string ?\n");
+        out=new char[1];
+        out[0]=0;
+        return out;
+    }
+    
+    for(int i=0;i<l;i++) if(incoming[i]=='\\') to_escape++;
+    out=new char[l+to_escape+1];
+    cur=out;
+    for(int i=0;i<l;i++)
+    {
+        *cur++=incoming[i];
+        if(incoming[i]=='\\') *cur++=incoming[i];
+    }
+    return out;
 }

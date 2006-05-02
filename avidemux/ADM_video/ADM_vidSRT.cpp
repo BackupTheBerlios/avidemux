@@ -93,7 +93,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
  	_line=0;
 	_oldframe=0;
 	_oldline=0;
-	_font = new ADMfont();									
+	_font = new ADMfont();	
 	if(couples)
 	{
                 int32_t b;
@@ -127,24 +127,27 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
                                 _conf->_baseLine=_conf->_fontsize*SRT_MAX_LINE;
                         }
 
-			char *ft,*sub;
-			ft=(char *)ADM_alloc(500);
-			sub=(char *)ADM_alloc(500);
-			strcpy(ft,_conf->_subname); _conf->_subname=ft;
-			strcpy(sub,_conf->_fontname); _conf->_fontname=sub;
+                    char *ft,*sub;
+                        ft=(char *)ADM_alloc(500);
+                        sub=(char *)ADM_alloc(500);
+                        strcpy(ft,(char *)_conf->_subname); 
+                        _conf->_subname=(ADM_filename *)ft;
+                        strcpy(sub,(char *)_conf->_fontname); 
+                        _conf->_fontname=(ADM_filename *)sub;
 
-			sub=(char *)ADM_alloc(500);
-			strcpy(sub,_conf->_charset); _conf->_charset=sub;
-			loadSubtitle();
-			loadFont();
+                        sub=(char *)ADM_alloc(500);
+                        strcpy(sub,_conf->_charset);
+                        _conf->_charset=sub;
+                        loadSubtitle();
+                        loadFont();
 
 	}
 	else
 	{
 			_conf=NEW( SUBCONF);
 
-			_conf->_fontname=(char *)ADM_alloc(500);
-			_conf->_subname=(char *)ADM_alloc(500);
+			_conf->_fontname=(ADM_filename *)ADM_alloc(500);
+			_conf->_subname=(ADM_filename *)ADM_alloc(500);
 			_conf->_charset=(char *)ADM_alloc(500);
 			_conf->_fontname[0]=0;
 			_conf->_subname[0]=0;
@@ -176,7 +179,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 			// later. we can't used the length of the current string
 			{ char *tmp;
 			   prefs->get(FILTERS_SUBTITLE_FONTNAME,&tmp);
-			   strcpy(_conf->_fontname,tmp);
+			   strcpy((char *)_conf->_fontname,tmp);
 			   ADM_dealloc(tmp);
 			   
 			   prefs->get(FILTERS_SUBTITLE_CHARSET,&tmp);
@@ -206,7 +209,7 @@ ADMVideoSubtitle::ADMVideoSubtitle(AVDMGenericVideoStream *in,CONFcouple *couple
 uint8_t	ADMVideoSubtitle::loadSubtitle( void )
 {
 unsigned char c,d;
-			_fd=fopen(_conf->_subname,"rt");
+			_fd=fopen((char *)_conf->_subname,"rt");
 			if(!_fd)
 			{
 				GUI_Error_HIG("Could not open subtitle file", NULL);
