@@ -15,9 +15,7 @@
 #define ADM_VID_ANIMATED_H
 
 
-#define MAX_VIGNETTE 6
-#define VIGNETTE_WIDTH  160
-#define VIGNETTE_HEIGHT 120
+
 #define LEFT_MARGIN 50
 #define TOP_MARGIN 50
 

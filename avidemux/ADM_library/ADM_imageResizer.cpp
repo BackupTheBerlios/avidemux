@@ -41,7 +41,7 @@ int flags=0;
     destWidth=dw;
     destHeight=dh;
 
-    flags=SWS_BILINEAR;
+    flags=SWS_SPLINE;
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
         #define ADD(x,y) if( CpuCaps::has##x()) flags|=SWS_CPU_CAPS_##y;
         ADD(MMX,MMX);		

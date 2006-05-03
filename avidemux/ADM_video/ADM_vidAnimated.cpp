@@ -34,23 +34,21 @@
 #include "ADM_filter/video_filters.h"
 #include"ADM_video/ADM_vidAnimated.h"
 
-static FILTER_PARAM animated_template={8,
+static FILTER_PARAM animated_template={10,
     {"tc0","tc1","tc2",
     "tc3","tc4","tc5",
-    "isNTSC","backgroundImg"
+    "isNTSC","backgroundImg","vignetteW","vignetteH"
     }};
 BUILD_CREATE(animated_create,ADMVideoAnimated);
 SCRIPT_CREATE(animated_script,ADMVideoAnimated,animated_template);
 
-static const int x_coordinate[3]={LEFT_MARGIN,360-(VIGNETTE_WIDTH)/2,720-VIGNETTE_WIDTH-LEFT_MARGIN};
-static const int y_coordinate[2]={TOP_MARGIN,TOP_MARGIN+VIGNETTE_HEIGHT+TOP_MARGIN};
-
+extern uint8_t DIA_animated(ANIMATED_PARAM *param);
 
 uint8_t ADMVideoAnimated::configure(AVDMGenericVideoStream *in)
 {
-
+    DIA_animated(_param);
    setup();
-   return 0;
+   return 1;
 }
 
 char *ADMVideoAnimated::printConf( void )
@@ -64,8 +62,8 @@ uint8_t ADMVideoAnimated::setup( void)
     cleanup();
     for(int i=0;i<MAX_VIGNETTE;i++) _caches[i]=new VideoCache(18,_in);  // 18 is good for mpeg2
     _resizer=new ADMImageResizer(_in->getInfo()->width,_in->getInfo()->height,
-            VIGNETTE_WIDTH,VIGNETTE_HEIGHT);
-    _image=new ADMImage(VIGNETTE_WIDTH,VIGNETTE_HEIGHT);
+            _param->vignetteW,_param->vignetteH);
+    _image=new ADMImage(_param->vignetteW,_param->vignetteH);
 
 }
 uint8_t ADMVideoAnimated::cleanup( void)
@@ -97,6 +95,8 @@ ADMVideoAnimated::ADMVideoAnimated(AVDMGenericVideoStream *in,CONFcouple *couple
    {
         GET(isNTSC);
         GET(backgroundImg);
+        GET(vignetteW);
+        GET(vignetteH);
 #undef GET
 #define GET(x)  couples->getCouple((char *)"tc"#x,&(_param->timecode[x]))
         GET(0);
@@ -110,6 +110,8 @@ ADMVideoAnimated::ADMVideoAnimated(AVDMGenericVideoStream *in,CONFcouple *couple
    {
 #define MKP(x,y) _param->x=y;
             MKP(isNTSC,0);
+            MKP(vignetteW,160);
+            MKP(vignetteH,120);
             MKP(backgroundImg,(ADM_filename *)"taist.jpg");
 #undef MKP
 #define MKP(x,y) _param->timecode[x]=y
@@ -155,6 +157,8 @@ uint8_t ADMVideoAnimated::getFrameNumberNoAlloc(uint32_t frame,
 
     // Clean the image
     data->blacken();
+ const int x_coordinate[3]={LEFT_MARGIN,360-(_param->vignetteW)/2,720-(_param->vignetteW)-LEFT_MARGIN};
+ const int y_coordinate[2]={TOP_MARGIN,TOP_MARGIN+(_param->vignetteH)+TOP_MARGIN};
 
      // Do 3 top
      for(int line=0;line<2;line++)
@@ -190,10 +194,12 @@ uint8_t	ADMVideoAnimated::getCoupledConf( CONFcouple **couples)
 {
    
       ADM_assert(_param);
-      *couples=new CONFcouple(8);
+      *couples=new CONFcouple(10);
 #define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
        CSET(isNTSC);
        CSET(backgroundImg);
+        CSET(vignetteW);
+        CSET(vignetteH);
 #undef CSET
 #define CSET(x)  (*couples)->setCouple((char *)"tc"#x,(_param->timecode[x]))
         CSET(0);
