@@ -179,11 +179,16 @@ uint8_t picHeader::open(char *inname)
 	end--;
 	nnum++;
     };
+char realname[250];
+char realstring[250];
+
     if (nnum == 1) {
 	printf("\n only one file!");
-	return 0;
-
+        _nb_file=1;
+         sprintf(realstring, "%%s.%s",extension);
     }
+    else
+    {
     nnum--;
     end++;
     _first = atoi(end);
@@ -191,9 +196,7 @@ uint8_t picHeader::open(char *inname)
     *(end) = 0;
     printf("\n Path : %s\n", name);
 
-    char realname[250];
-    char realstring[250];
-
+    
     sprintf(realstring, "%%s%%0%lud.%s", nnum, extension);
     printf("\n string : %s", realstring);
 
@@ -207,6 +210,7 @@ uint8_t picHeader::open(char *inname)
 	    break;
 	fclose(fd);
 	_nb_file++;
+    }
     }
     printf("\n found %lu images\n", _nb_file);
 
