@@ -199,7 +199,28 @@ uint8_t ADMImage::duplicateSwapUV(ADMImage *src)
 {
         return duplicateMacro(src,0);
 }
+uint8_t ADMImage::pack(uint8_t invertChroma)
+{
+int u=1,v=2;
+    if(invertChroma) {u=2;v=1;}
+    ADM_assert(_planeStride[0]>=_width);
+    // Pack luma
+    uint8_t *src,*dest;
 
+    src=_planes[0];
+    dest=YPLANE(this);
+    BitBlit(dest,_width,src,_planeStride[0],_width,_height);
+
+    src=_planes[u];
+    dest=UPLANE(this);
+    BitBlit(dest,_width>>1,src,_planeStride[u],_width>>1,_height>>1);
+
+    src=_planes[v];
+    dest=VPLANE(this);
+    BitBlit(dest,_width>>1,src,_planeStride[v],_width>>1,_height>>1);
+
+    return 1;
+}
 uint8_t ADMImage::duplicateFull(ADMImage *src)
 {
 	// Sanity check

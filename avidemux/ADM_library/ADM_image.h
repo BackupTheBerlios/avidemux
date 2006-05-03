@@ -125,6 +125,7 @@ public:
         uint8_t substract(ADMImage *src1,ADMImage *src2);
         uint8_t blacken(void);
         uint8_t copyTo(ADMImage *target, uint32_t x, uint32_t y);
+        uint8_t pack(uint8_t invertChroma);     /// Transfer data from planes to regular packed space
 static uint32_t lumaDiff(ADMImage *src1,ADMImage *src2,uint32_t noise);
 };
 void drawString(ADMImage *dst, int x, int y, const char *s) ;
