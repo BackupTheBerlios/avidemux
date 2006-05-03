@@ -31,9 +31,11 @@ class  ADMVideoAnimated:public AVDMGenericVideoStream
                     ANIMATED_PARAM  *_param;
                     ADMImageResizer *_resizer;
                     ADMImage        *_image;
+                    ADMImage        *_BkgGnd;
                     VideoCache      *_caches[MAX_VIGNETTE];
                     uint8_t         setup( void);
                     uint8_t         cleanup( void);
+                    uint8_t         loadImage(void);
     public:
                     ADMVideoAnimated(  AVDMGenericVideoStream *in,CONFcouple *setup);
                     ~ADMVideoAnimated();

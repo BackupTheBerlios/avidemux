@@ -34,6 +34,9 @@
 #include "ADM_filter/video_filters.h"
 #include"ADM_video/ADM_vidAnimated.h"
 
+
+#include "ADM_inpics/ADM_pics.h"
+
 static FILTER_PARAM animated_template={10,
     {"tc0","tc1","tc2",
     "tc3","tc4","tc5",
@@ -41,7 +44,7 @@ static FILTER_PARAM animated_template={10,
     }};
 BUILD_CREATE(animated_create,ADMVideoAnimated);
 SCRIPT_CREATE(animated_script,ADMVideoAnimated,animated_template);
-
+extern uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t,ADMImage *image);
 extern uint8_t DIA_animated(ANIMATED_PARAM *param);
 
 uint8_t ADMVideoAnimated::configure(AVDMGenericVideoStream *in)
@@ -64,7 +67,7 @@ uint8_t ADMVideoAnimated::setup( void)
     _resizer=new ADMImageResizer(_in->getInfo()->width,_in->getInfo()->height,
             _param->vignetteW,_param->vignetteH);
     _image=new ADMImage(_param->vignetteW,_param->vignetteH);
-
+    loadImage();
 }
 uint8_t ADMVideoAnimated::cleanup( void)
 {
@@ -76,15 +79,18 @@ uint8_t ADMVideoAnimated::cleanup( void)
     }
     if(_resizer) delete _resizer;
     if(_image) delete _image;
+    if(_BkgGnd) delete _BkgGnd;
     _resizer=NULL;
     _image=NULL;
+    _BkgGnd=NULL;
 
 }
 ADMVideoAnimated::ADMVideoAnimated(AVDMGenericVideoStream *in,CONFcouple *couples) 
 {
    _resizer=NULL;
    _image=NULL;
-    for(int i=0;i<MAX_VIGNETTE;i++) _caches[i]=NULL;
+   _BkgGnd=NULL;
+   for(int i=0;i<MAX_VIGNETTE;i++) _caches[i]=NULL;
 
    _in=in;
    memcpy(&_info,_in->getInfo(),sizeof(_info));    
@@ -112,7 +118,7 @@ ADMVideoAnimated::ADMVideoAnimated(AVDMGenericVideoStream *in,CONFcouple *couple
             MKP(isNTSC,0);
             MKP(vignetteW,160);
             MKP(vignetteH,120);
-            MKP(backgroundImg,(ADM_filename *)"taist.jpg");
+            MKP(backgroundImg,(ADM_filename *)ADM_strdup("/tmp/taist.jpg"));
 #undef MKP
 #define MKP(x,y) _param->timecode[x]=y
         MKP(0,0);
@@ -130,6 +136,7 @@ ADMVideoAnimated::ADMVideoAnimated(AVDMGenericVideoStream *in,CONFcouple *couple
 //____________________________________________________________________
 ADMVideoAnimated::~ADMVideoAnimated()
 {
+   if(_param->backgroundImg) ADM_dealloc(_param->backgroundImg);
    delete _param;
    _param=NULL;
    _uncompressed=NULL;
@@ -156,7 +163,13 @@ uint8_t ADMVideoAnimated::getFrameNumberNoAlloc(uint32_t frame,
     uint32_t offset,pool;
 
     // Clean the image
-    data->blacken();
+    if(_BkgGnd)
+        data ->duplicate(_BkgGnd);
+    else
+        {
+                data->blacken();
+                printf("No background image\n");
+        }
  const int x_coordinate[3]={LEFT_MARGIN,360-(_param->vignetteW)/2,720-(_param->vignetteW)-LEFT_MARGIN};
  const int y_coordinate[2]={TOP_MARGIN,TOP_MARGIN+(_param->vignetteH)+TOP_MARGIN};
 
@@ -174,10 +187,12 @@ uint8_t ADMVideoAnimated::getFrameNumberNoAlloc(uint32_t frame,
                     _caches[pool]->unlockAll();
                 }else
                 {   
+                    printf("[Animated] Failed to get image %u for pool %u\n",_param->timecode[pool]+frame,pool);
                     _image->blacken();
                 }
             }else
-            {   // Blacken
+            {   // Blacken 
+                printf("[Animated] out of bound : %u for pool %u\n",_param->timecode[pool]+frame,pool);
                  _image->blacken();
             }
             // Blit
@@ -211,7 +226,103 @@ uint8_t	ADMVideoAnimated::getCoupledConf( CONFcouple **couples)
 
       return 1;
 }
+uint8_t	ADMVideoAnimated::loadImage(void)
+{
+picHeader *pic=NULL;
+decoders *decoder=NULL;
+ADMImage  *fullSize=NULL;
+ADMImageResizer *resizer=NULL;
+uint32_t len=0,flags=0;
+uint32_t w,h;
+uint8_t *extraData=NULL;
+uint32_t extraDataSize=0;
 
+uint8_t *rdBuffer=NULL;
+
+    if(_BkgGnd) delete _BkgGnd;
+    _BkgGnd=NULL;
+
+    // open the jpg file and load it to binary
+    
+    pic=new picHeader;
+    if(!pic->open((char *)_param->backgroundImg))
+    {
+        printf("[Animated] Cannot load background image\n");
+        goto skipIt;
+    }
+  
+    // Ok, now we need its size
+    
+    w=pic->getWidth();
+    h=pic->getHeight();
+    printf("[Animated]Pic: %d x %d\n",w,h);
+    pic->getExtraHeaderData(&extraDataSize,&extraData);
+    //********
+    {
+        aviInfo info;
+        pic->getVideoInfo(&info);
+        decoder=getDecoder (info.fcc, w,h,extraDataSize,extraData);
+    }
+     if(!decoder) 
+    {
+        printf("[Animated]Cannot get decoder\n");
+        goto skipIt;
+    }
+    // Build new image
+    fullSize=new ADMImage(w,h);
+    fullSize->blacken();
+    rdBuffer=new uint8_t[w*h*3];     // Hardcoded!
+    if(!pic->getFrameNoAlloc(0,rdBuffer,&len))
+    {
+        printf("[Animated]Get frame failed\n");
+        goto skipIt;
+    }
+    // Decode it
+    if(!decoder->uncompress (rdBuffer, fullSize, len,&flags))
+    {
+        printf("[Animated]Decoding failed\n");
+        goto skipIt;
+    }
+    if(fullSize->_colorspace!=ADM_COLOR_YV12)
+    {
+        printf("[Animated]Wrong colorspace, only yv12 supported\n");
+        goto skipIt;
+    }
+    // Need to packit ?
+    if(fullSize->_planeStride[0])
+        fullSize->pack(0);
+    // Resize it
+    _BkgGnd=new ADMImage(_info.width,_info.height);
+    resizer=new ADMImageResizer(w,h,_info.width,_info.height);
+    //Util_saveJpg ("/tmp/before.jpg",w,h,fullSize);
+    if(!resizer->resize(fullSize,_BkgGnd))
+    {
+        delete _BkgGnd;
+        _BkgGnd=NULL;
+        printf("[Animated]Resize failed\n");
+        
+    }else
+    {
+        printf("[Animated]Image ready\n");
+    }
+    
+skipIt:
+    {
+        if(decoder) delete decoder;
+        decoder=NULL;
+        if(pic)     delete pic;
+        pic=NULL;
+        if(fullSize)     delete fullSize;
+        fullSize=NULL;
+        if(resizer)     delete resizer;
+        resizer=NULL;
+        if(rdBuffer)     delete [] rdBuffer;
+        rdBuffer=NULL;
+    }
+    return 1;
+
+
+}
 
 
 // EOF
