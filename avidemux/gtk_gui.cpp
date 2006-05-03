@@ -186,6 +186,7 @@ static int A_vob2vobsub(void);
 uint8_t DIA_builtin(void);
 renderZoom currentZoom=ZOOM_1_1;
 uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name);
+uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t,ADMImage *image);
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -1372,44 +1373,7 @@ A_playAvi (void)
 ________________________________________________________*/
 int A_saveJpg (char *name)
 {
-  ffmpegEncoderFFMjpeg *codec=NULL;
-  FILE *fd;
-  uint8_t *buffer=NULL;
-  uint32_t sz;
-  
-  ADMBitstream bitstream;
-  
-	sz = avifileinfo->width* avifileinfo->height * 3;
-	buffer=new uint8_t [sz];
-	ADM_assert(buffer);
-        bitstream.data=buffer;
-
-		codec=new  ffmpegEncoderFFMjpeg( avifileinfo->width,avifileinfo->height,FF_MJPEG)  ;
-		codec->init( 95,25000);
-		if(!codec->encode(rdr_decomp_buffer,&bitstream))
-			{
-				GUI_Error_HIG("Cannot encode the frame", NULL);
-				delete [] buffer;
-				delete codec;
-				return 0;
-			}
-
-	fd=fopen(name,"wb");
-	if(!fd)
-	{
-					GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", name);
-				delete [] buffer;
-				delete codec;
-				return 0;
-
-	}
-	fwrite (buffer, bitstream.len, 1, fd);
-    	fclose(fd);
-    	delete [] buffer;
-	delete codec;
-	
-  	GUI_Info_HIG (ADM_LOG_INFO,"Done", "Saved \"%s\".", GetFileName(name));
-	return 1;
+    return (int) Util_saveJpg (name,avifileinfo->width, avifileinfo->height,rdr_decomp_buffer);
 }
 #else
 
@@ -1422,6 +1386,40 @@ static int b=1;
  	
 }
 #endif
+
+uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t h,ADMImage *image)
+{
+  ffmpegEncoderFFMjpeg *codec=NULL;
+  FILE *fd;
+  uint8_t *buffer=NULL;
+  uint32_t sz;
+  ADMBitstream bitstream;
+
+        sz = w*h*3;
+        buffer=new uint8_t[sz];
+        bitstream.data=buffer;
+        codec=new  ffmpegEncoderFFMjpeg(w,h,FF_MJPEG)  ;
+        codec->init( 95,25000);
+        if(!codec->encode(image,&bitstream))
+        {
+                GUI_Error_HIG("Cannot encode the frame", NULL);
+                delete [] buffer;
+                delete codec;
+                return 0;
+        }
+        delete codec;
+        fd=fopen(name,"wb");
+        if(!fd)
+        {
+                GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", name);
+                delete [] buffer;
+                return 0;
+        }
+        fwrite (buffer, bitstream.len, 1, fd);
+        fclose(fd);
+        delete [] buffer;
+        return 1;
+}
 /**
 	Save the selection  as a bunch of jpeg 95% qual
 	Used mainly to make animated DVD menu 
