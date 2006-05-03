@@ -35,6 +35,7 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_toolkit/filesel.h"
 #include "ADM_library/default.h"
 
 #include "ADM_library/ADM_image.h"
@@ -51,7 +52,11 @@ static GtkWidget	*create_dialog1 (void);
 #define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(x)),(gfloat)param->y) ;}
 #define CHECK_GET(x,y) {param->y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
 #define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),param->y);}	
+#define ENTRY_SET(x,y) {gtk_write_entry_string(WID(x),(char *)y);}
+#define ENTRY_GET(x,y) {y= (ADM_filename *) ADM_strdup(gtk_editable_get_chars(GTK_EDITABLE ((WID(x))), 0, -1));}
+#define ASSOCIATE(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
 
+#define LOAD_BGD 0x101
 
 uint8_t DIA_animated(ANIMATED_PARAM *param)
 {
@@ -66,18 +71,44 @@ uint8_t DIA_animated(ANIMATED_PARAM *param)
         CHECK_SET(checkbuttonStd,isNTSC);
         SPIN_SET(spinbuttonvignetteW,vignetteW);
         SPIN_SET(spinbuttonvignetteH,vignetteH);
+        if(param->backgroundImg)
+            ENTRY_SET(entryBgd,param->backgroundImg);
         for(int i=0;i<MAX_VIGNETTE;i++)
         {
                 gtk_spin_button_set_value(GTK_SPIN_BUTTON(lookup_widget(dialog,entries[i])),
                     (gfloat)param->timecode[i]) ;
         }
 
+        ASSOCIATE(button1,LOAD_BGD);
         gtk_widget_show(dialog);
-        if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+        int action;
+
+        while(1)
+        {
+            action=gtk_dialog_run(GTK_DIALOG(dialog));
+            if(action==LOAD_BGD)
+            {
+                char *nw;
+                    GUI_FileSelRead("Select background picture", &nw);
+                    if(nw)
+                    {
+                        ENTRY_SET(entryBgd,nw);
+                        ADM_dealloc(nw);
+                    }
+                continue;
+            }
+            break;
+        }
+        if(action==GTK_RESPONSE_OK)
         {
             CHECK_GET(checkbuttonStd,isNTSC);
             SPIN_GET(spinbuttonvignetteW,vignetteW);
             SPIN_GET(spinbuttonvignetteH,vignetteH);
+
+            if(param->backgroundImg) ADM_dealloc(param->backgroundImg);
+            param->backgroundImg=NULL;
+            ENTRY_GET(entryBgd,param->backgroundImg);
+
             for(int i=0;i<MAX_VIGNETTE;i++)
             {
                 
