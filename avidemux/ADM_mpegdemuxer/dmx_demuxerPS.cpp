@@ -631,6 +631,12 @@ uint8_t align=0;
   //                    printf("\n Subid : %x",*subid);
                                 switch(*substream)
                                 {
+                                // DTS
+                                        case 0x88:case 0x89:case 0x8A:case 0x8B:
+                                        
+                                                *substream=*substream-0x48;
+                                                break;
+
                                 //AC3
                                         case 0x80:case 0x81:case 0x82:case 0x83:
                                         case 0x84:case 0x85:case 0x86:case 0x87:
@@ -650,6 +656,7 @@ uint8_t align=0;
                                                 break;
                              
                                 default:
+                                                printf("Unkown substream %x\n",*substream);
                                                 *substream=0xff;
                                 }
                                 // skip audio header (if not sub)

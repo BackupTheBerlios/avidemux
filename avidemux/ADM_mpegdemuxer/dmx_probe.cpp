@@ -132,6 +132,7 @@ int     audio,video;
         for(int i=0;i<9;i++) if(seen[i]>MIN_DETECT) audio++;
         for(int i=0xc0;i<0xc9;i++) if(seen[i]>MIN_DETECT) audio++;
         for(int i=0xA0;i<0xA9;i++) if(seen[i]>MIN_DETECT) audio++;
+        for(int i=0x40;i<0x49;i++) if(seen[i]>MIN_DETECT) audio++;
 
         *nbTracks=audio+1;      
         *tracks=new MPEG_TRACK[*nbTracks];
@@ -143,6 +144,7 @@ int     audio,video;
         for(int i=0;i<9;i++) if(seen[i]>MIN_DETECT) DOME;
         for(int i=0xc0;i<0xc9;i++) if(seen[i]>MIN_DETECT) DOME;
         for(int i=0xA0;i<0xA9;i++) if(seen[i]>MIN_DETECT) DOME;
+        for(int i=0x40;i<0x49;i++) if(seen[i]>MIN_DETECT) DOME;
 
         // Now go a bit deeper and try to extract infos
         #define BUFFER_SIZE (10*1024)
