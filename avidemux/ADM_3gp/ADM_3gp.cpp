@@ -905,6 +905,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				break;
 
 			case MKFCCR('j','p','e','g'): //'jpeg':
+                        case MKFCCR('A','V','D','J'): //'jpeg':
                                 VDEO.extraDataSize=tom.getSize();
                                 VDEO.extraData=new uint8_t [VDEO.extraDataSize];
                                 tom.readPayload(VDEO.extraData,VDEO.extraDataSize);
