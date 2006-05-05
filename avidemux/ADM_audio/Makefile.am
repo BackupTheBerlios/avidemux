@@ -7,7 +7,7 @@ libADM_audio_a_METASOURCES = AUTO
 
 libADM_audio_a_SOURCES = audio_mpegidentify.cpp aviaudio.cpp audiowavex.cpp \
 		audiotimeline.cpp audiosource_ext.cpp audiomp3ex.cpp audiogen.cpp audioac3ex.cpp \
-		ADM_a52info.cpp audio_packetizer.cpp ADM_mp3info.cpp ADM_aacinfo.cpp
+		ADM_a52info.cpp audio_packetizer.cpp ADM_mp3info.cpp ADM_aacinfo.cpp ADM_dcainfo.cpp
 
 
 EXTRA_DIST = audioac3ex.cpp audiogen.cpp audioex.h audiomode.hxx audiomp3ex.cpp audiosource_ext.cpp audiosource_ext.h audiotimeline.cpp audiowavex.cpp aviaudio.cpp aviaudio.hxx audio_mpegidentify.cpp 

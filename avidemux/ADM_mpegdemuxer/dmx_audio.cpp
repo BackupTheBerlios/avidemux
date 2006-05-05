@@ -40,6 +40,7 @@
 #include "dmx_audio.h"
 #include "ADM_audio/ADM_mp3info.h"
 #include "ADM_audio/ADM_a52info.h"
+#include "ADM_audio/ADM_dcainfo.h"
 #define MAX_LINE 4096
 #define PROBE_SIZE (4096*2)
 
@@ -424,6 +425,20 @@ WAVHeader *hdr;
                                 continue;
                         }
                 }
+        }
+
+        if(myPes<=0x49 && myPes>=0x40)
+        {
+             
+              uint32_t flags,samplerate,bitrate,framelength,syncoff,chan;
+              if(ADM_DCAGetInfo(buffer,PROBE_SIZE,&samplerate,&bitrate,&chan,&syncoff))
+              {
+                                hdr->byterate=bitrate;
+                                hdr->frequency=samplerate;
+                                hdr->encoding=WAV_DTS;
+                                hdr->channels=chan;
+                                continue;
+               }
         }
         // Default 48khz stereo lpcm
         if(myPes>=0xA0 && myPes<0xA9)

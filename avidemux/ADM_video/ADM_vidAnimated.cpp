@@ -44,6 +44,10 @@ static FILTER_PARAM animated_template={10,
     }};
 BUILD_CREATE(animated_create,ADMVideoAnimated);
 SCRIPT_CREATE(animated_script,ADMVideoAnimated,animated_template);
+
+#define LOOKUP 4
+#define CACHE_SIZE (LOOKUP*2+3)
+
 extern uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t,ADMImage *image);
 extern uint8_t DIA_animated(ANIMATED_PARAM *param);
 
@@ -63,7 +67,7 @@ char *ADMVideoAnimated::printConf( void )
 uint8_t ADMVideoAnimated::setup( void)
 {
     cleanup();
-    for(int i=0;i<MAX_VIGNETTE;i++) _caches[i]=new VideoCache(18,_in);  // 18 is good for mpeg2
+    for(int i=0;i<MAX_VIGNETTE;i++) _caches[i]=new VideoCache(CACHE_SIZE,_in);  // 18 is good for mpeg2
     _resizer=new ADMImageResizer(_in->getInfo()->width,_in->getInfo()->height,
             _param->vignetteW,_param->vignetteH);
     _image=new ADMImage(_param->vignetteW,_param->vignetteH);
@@ -118,7 +122,11 @@ ADMVideoAnimated::ADMVideoAnimated(AVDMGenericVideoStream *in,CONFcouple *couple
             MKP(isNTSC,0);
             MKP(vignetteW,160);
             MKP(vignetteH,120);
+#ifdef CYG_MANGLING
+       MKP(backgroundImg,(ADM_filename *)ADM_strdup("c:\\test.jpg"));
+#else
             MKP(backgroundImg,(ADM_filename *)ADM_strdup("/tmp/taist.jpg"));
+#endif
 #undef MKP
 #define MKP(x,y) _param->timecode[x]=y
         MKP(0,0);
@@ -180,6 +188,14 @@ uint8_t ADMVideoAnimated::getFrameNumberNoAlloc(uint32_t frame,
             pool=i+(3*line);
             if(_param->timecode[pool]+frame<_in->getInfo()->nb_frames) 
             {
+                // Load LOOKUP frames ...
+                if(!(frame%LOOKUP))
+                    for(int lookup=0;lookup<LOOKUP;lookup++)
+                    {
+                        _caches[pool]->getImage(_param->timecode[pool]+frame+lookup);
+                    }
+                // Unlock them
+                _caches[pool]->unlockAll();
                 in=_caches[pool]->getImage(_param->timecode[pool]+frame);
                 if(in) 
                 {

@@ -205,7 +205,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         nbGop=0;
         nbImage=0;
         grabbing=0;
-        printf("*********Indexing started***********\n");
+        printf("*********Indexing started (%d audio tracks)***********\n",nbTracks);
         while(1)
         {
                                 if(!demuxer->sync(&streamid,&syncAbs,&syncRel,&pts,&dts)) break;   

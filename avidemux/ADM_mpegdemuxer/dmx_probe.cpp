@@ -42,6 +42,9 @@
 #include "ADM_dialog/DIA_busy.h"
 #include "ADM_audio/ADM_mp3info.h"
 #include "ADM_audio/ADM_a52info.h"
+#include "ADM_audio/ADM_dcainfo.h"
+
+
 
 #define MAX_PROBE (10*1024*1024LL) // Scans the 4 first meg
 #define MIN_DETECT (10*1024) // Need this to say the stream is present
@@ -158,7 +161,8 @@ int     audio,video;
         {
 
                 pes=(*tracks)[i].pes;
-                if((pes<0xC9 && pes>=0xc0) || ((pes<9)))
+                // Anything but PCM
+                if((pes<0xC9 && pes>=0xc0) || ((pes<9)) || ((pes>=0x40 && pes<=0x49)))
                 {
                         demuxer->changePid(0,pes);
                         demuxer->setPos(0,0);
@@ -175,6 +179,18 @@ int     audio,video;
                                         }
                                 }else
                                 {
+
+                                    if(pes>=0x40 && pes<=0x49)
+                                    {
+                                    uint32_t chan,samplerate,bitrate,framelength,syncoff;
+                                        if(ADM_DCAGetInfo(buffer,BUFFER_SIZE,&samplerate,&bitrate,&chan, &syncoff))
+                                        {
+                                                (*tracks)[i].channels=chan;
+                                                (*tracks)[i].bitrate=bitrate;
+                                        }
+
+                                    }
+                                    else
                                         if(getMpegFrameInfo(buffer,read,&mpegInfo,NULL,&offset))
                                         {
                                                 if(mpegInfo.mode!=3)  (*tracks)[i].channels=2;

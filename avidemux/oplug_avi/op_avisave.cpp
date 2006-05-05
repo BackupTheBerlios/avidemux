@@ -456,6 +456,7 @@ const char *getStrFromAudioCodec( uint32_t codec)
 {
 	switch(codec)
 	{
+                case WAV_DTS: return (const char *)"DTS";
 		case WAV_PCM: return (const char *)"PCM";
 		case WAV_MP2: return (const char *)"MP2";
 		case WAV_MP3: return (const char *)"MP3";
