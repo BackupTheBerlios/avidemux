@@ -82,6 +82,12 @@ ADM_Audiocodec *out;
 					out= (ADM_Audiocodec *) new ADM_AudiocodecAC3(fourcc);
                   break;
 #endif
+#ifdef USE_LIBDCA
+                                case WAV_DTS:
+                                    printf("\n Audio codec:  DTS\n");
+                                    out= (ADM_Audiocodec *) new ADM_AudiocodecDCA(fourcc);
+                                    break;
+#endif
 #ifdef USE_MP3
 				case WAV_MP3:
 				case WAV_MP2:

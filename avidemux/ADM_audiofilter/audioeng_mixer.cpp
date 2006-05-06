@@ -68,6 +68,7 @@ AVDMProcessAudio_Mixer::AVDMProcessAudio_Mixer(AVDMGenericAudioStream * instream
         case 1: _input=CHANNEL_MONO;break;
         case 2: _input=CHANNEL_STEREO;break;
         default:
+            printf("Invalid channel configuration %u\n",chan);
             ADM_assert(0);
     }
     printf("[mixer]Input channels : %u : %u \n",src->channels,ADM_channel_mixer[_input]);

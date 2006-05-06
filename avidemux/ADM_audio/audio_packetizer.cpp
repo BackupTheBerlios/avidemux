@@ -37,6 +37,7 @@ Split a stream into packet(s)
 #include "ADM_audio/ADM_a52info.h"
 #include "ADM_audio/ADM_mp3info.h"
 #include "ADM_audio/ADM_aacinfo.h"
+#include "ADM_audio/ADM_dcainfo.h"
 
 #define MINSTOCK 5000
 #define MINUS_ONE 0xffffffff	
@@ -78,6 +79,9 @@ _refill:
 	}
 	switch(_wavheader->encoding)
 	{
+                case WAV_DTS:
+                                return getPacketDTS(dest,len,samples);
+                                break;
 		case WAV_MP2:
 		case WAV_MP3:
                                 if(! getPacketMP3(dest,len,samples)) goto _refill;
@@ -278,6 +282,86 @@ uint8_t		AVDMGenericAudioStream::getPacketAC3(uint8_t *dest, uint32_t *len,
 			
 			
 			return 1;
+}
+uint8_t		AVDMGenericAudioStream::getPacketDTS(uint8_t *dest, uint32_t *len,uint32_t *samples)
+{
+uint32_t instock,rd;
+uint32_t startOffset,endOffset;
+uint8_t  lock=0;
+uint8_t  headerfound=0;
+
+                ADM_assert(_wavheader->encoding==WAV_DTS);
+                ADM_assert(packetTail>=packetHead);
+                if(packetTail<packetHead+6)
+                {
+                        printf("PKTZ:DTS Buffer empty\n");
+                        return 0;
+                }
+
+
+                uint32_t flags,sample_rate,bit_rate,syncoff,chan;
+                int found=0;
+                uint32_t start,size=0;
+
+                start=packetHead;
+
+                while(start+8<packetTail)
+                {
+                        if(packetBuffer[start]!=0x07f || packetBuffer[start+1]!=0xfe|| 
+                            packetBuffer[start+2]!=0x80|| packetBuffer[start+3]!=0x01)
+                        {	
+                            if(!lock)
+                            {
+                                    printf("DTS: searching sync ");
+                                    lock=1;
+                            }
+                            else
+                            {
+                                    printf(".");
+                            }
+                        start++;
+                        continue;
+                        }
+//int ADM_DCAGetInfo(uint8_t *buf, uint32_t len, uint32_t *fq, uint32_t *br, uint32_t *chan,uint32_t *syncoff,uint32_t *flags);
+                        size= ADM_DCAGetInfo (&packetBuffer[start],packetTail-start,  &sample_rate,&bit_rate, &chan,&syncoff,&flags);
+                        if(!size)
+                        {
+                                printf("DTS: Cannot sync\n");
+                                start++;
+                                continue;
+                        }
+                        if(size+packetHead<=packetTail)
+                        {
+                                // Found
+                                memcpy(dest,&packetBuffer[start],size);
+                                packetHead=start+size;
+                                found=1;
+                                break;
+                        }
+                        else
+                        {	// not enought data left
+                                headerfound=1;
+                                printf("DtsPkt: Need %lu have:%lu\n",size,packetTail-packetHead);
+                                break;
+                        }
+                }
+                if(!found)
+                {
+                        printf("DTSpak: Cannot find packet (%lu)\n",packetTail-packetHead);
+                        if(!headerfound)
+                        {
+                            // no header found, we can skip up to the 6 last bytes
+                            uint32_t left;
+                                left=packetTail-packetHead;
+                                if(left>6) left=6;
+                                packetHead=packetTail-left;
+                                printf("DtsPak: No ac3 header found, purging buffer (%lu - %lu)\n",packetHead,packetTail);
+                        }
+                        return 0;
+                }
+                *len=size;
+                *samples=512;
+                return 1;
 }
 /*
 

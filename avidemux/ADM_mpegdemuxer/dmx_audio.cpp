@@ -431,9 +431,10 @@ WAVHeader *hdr;
         {
              
               uint32_t flags,samplerate,bitrate,framelength,syncoff,chan;
-              if(ADM_DCAGetInfo(buffer,PROBE_SIZE,&samplerate,&bitrate,&chan,&syncoff))
+//int ADM_DCAGetInfo(uint8_t *buf, uint32_t len, uint32_t *fq, uint32_t *br, uint32_t *chan,uint32_t *syncoff,uint32_t *flags);
+              if(ADM_DCAGetInfo(buffer,PROBE_SIZE,&samplerate,&bitrate,&chan,&syncoff,&flags))
               {
-                                hdr->byterate=bitrate;
+                                hdr->byterate=bitrate/8;
                                 hdr->frequency=samplerate;
                                 hdr->encoding=WAV_DTS;
                                 hdr->channels=chan;

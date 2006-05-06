@@ -107,7 +107,25 @@ class ADM_AudiocodecWavSwapped : public     ADM_Audiocodec
 
    };
 #endif
+#ifdef USE_LIBDCA
+ class ADM_AudiocodecDCA : public     ADM_Audiocodec
+ {
+    protected:
+        void        *dts_handle;
 
+    public:
+                                                ADM_AudiocodecDCA( uint32_t fourcc );
+                 virtual                         ~ADM_AudiocodecDCA();
+                 virtual         void            purge( void ) {};
+                 virtual        uint8_t         beginDecompress( void );
+                 virtual                        uint8_t endDecompress( void );
+                 virtual    uint8_t run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,
+                                         ADM_ChannelMatrix *matrix=NULL);
+                 virtual    uint8_t isCompressed( void ){ return 1;};
+                 virtual    uint8_t isDecompressable(void ){ return 1;};
+
+   };
+#endif
     class ADM_Audiocodec8Bits : public     ADM_Audiocodec
  {
     protected:

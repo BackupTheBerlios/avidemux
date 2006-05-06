@@ -182,11 +182,12 @@ int     audio,video;
 
                                     if(pes>=0x40 && pes<=0x49)
                                     {
-                                    uint32_t chan,samplerate,bitrate,framelength,syncoff;
-                                        if(ADM_DCAGetInfo(buffer,BUFFER_SIZE,&samplerate,&bitrate,&chan, &syncoff))
+                                    uint32_t chan,samplerate,bitrate,framelength,syncoff,flags;
+                                        if(ADM_DCAGetInfo(buffer,read,&samplerate,&bitrate,&chan, &syncoff,&flags))
                                         {
                                                 (*tracks)[i].channels=chan;
                                                 (*tracks)[i].bitrate=bitrate;
+                                                if(syncoff) printf("[probe] There are some %u heading bytes\n",syncoff);
                                         }
 
                                     }
