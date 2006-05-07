@@ -299,7 +299,7 @@ uint8_t  headerfound=0;
                 }
 
 
-                uint32_t flags,sample_rate,bit_rate,syncoff,chan;
+                uint32_t flags,sample_rate,bit_rate,syncoff,chan,nbs;
                 int found=0;
                 uint32_t start,size=0;
 
@@ -323,7 +323,7 @@ uint8_t  headerfound=0;
                         continue;
                         }
 //int ADM_DCAGetInfo(uint8_t *buf, uint32_t len, uint32_t *fq, uint32_t *br, uint32_t *chan,uint32_t *syncoff,uint32_t *flags);
-                        size= ADM_DCAGetInfo (&packetBuffer[start],packetTail-start,  &sample_rate,&bit_rate, &chan,&syncoff,&flags);
+                        size= ADM_DCAGetInfo (&packetBuffer[start],packetTail-start,  &sample_rate,&bit_rate, &chan,&syncoff,&flags,&nbs);
                         if(!size)
                         {
                                 printf("DTS: Cannot sync\n");
@@ -360,7 +360,7 @@ uint8_t  headerfound=0;
                         return 0;
                 }
                 *len=size;
-                *samples=256;
+                *samples=nbs;
                 return 1;
 }
 /*

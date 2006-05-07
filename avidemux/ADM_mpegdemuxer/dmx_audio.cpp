@@ -430,9 +430,9 @@ WAVHeader *hdr;
         if(myPes<=0x49 && myPes>=0x40)
         {
              
-              uint32_t flags,samplerate,bitrate,framelength,syncoff,chan;
+              uint32_t flags,samplerate,bitrate,framelength,syncoff,chan,nbs;
 //int ADM_DCAGetInfo(uint8_t *buf, uint32_t len, uint32_t *fq, uint32_t *br, uint32_t *chan,uint32_t *syncoff,uint32_t *flags);
-              if(ADM_DCAGetInfo(buffer,PROBE_SIZE,&samplerate,&bitrate,&chan,&syncoff,&flags))
+              if(ADM_DCAGetInfo(buffer,PROBE_SIZE,&samplerate,&bitrate,&chan,&syncoff,&flags,&nbs))
               {
                                 hdr->byterate=bitrate/8;
                                 hdr->frequency=samplerate;

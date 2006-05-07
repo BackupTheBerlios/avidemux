@@ -182,8 +182,8 @@ int     audio,video;
 
                                     if(pes>=0x40 && pes<=0x49)
                                     {
-                                    uint32_t chan,samplerate,bitrate,framelength,syncoff,flags;
-                                        if(ADM_DCAGetInfo(buffer,read,&samplerate,&bitrate,&chan, &syncoff,&flags))
+                                    uint32_t chan,samplerate,bitrate,framelength,syncoff,flags,nbs;
+                                        if(ADM_DCAGetInfo(buffer,read,&samplerate,&bitrate,&chan, &syncoff,&flags,&nbs))
                                         {
                                                 (*tracks)[i].channels=chan;
                                                 (*tracks)[i].bitrate=bitrate;

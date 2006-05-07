@@ -45,23 +45,25 @@ static const int channel[15]=
     0,0,0
 };
 
-static const CHANNEL_CONF DTS_CONF[15]=
+static const CHANNEL_CONF DTS_CONF[16]=
 {
+    CHANNEL_MONO,   //0
     CHANNEL_INVALID,
-    CHANNEL_MONO,
     CHANNEL_STEREO,
-    CHANNEL_3F,
-    CHANNEL_2F_1R, //4
-    CHANNEL_3F_1R, //5
+    CHANNEL_INVALID,
+    CHANNEL_INVALID,
+    CHANNEL_3F,      //5
+    CHANNEL_2F_1R, 
+    CHANNEL_3F_1R, 
     CHANNEL_2F_2R,
-    CHANNEL_3F_2R,
-    CHANNEL_INVALID,
-    CHANNEL_INVALID, //9
-    CHANNEL_DOLBY_SURROUND,
+    CHANNEL_3F_2R, //9
     CHANNEL_INVALID,
     CHANNEL_INVALID,
     CHANNEL_INVALID,
-    CHANNEL_INVALID
+    CHANNEL_INVALID,
+    CHANNEL_INVALID,
+    CHANNEL_INVALID // 15
+    
 };
 ADM_AudiocodecDCA::ADM_AudiocodecDCA( uint32_t fourcc) :   ADM_Audiocodec(fourcc)
 {
@@ -113,7 +115,7 @@ uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
     //  Ready to decode
     while(nbIn)
     {
-        if(nbIn<7)
+        if(nbIn<DTS_HEADER_SIZE)
         {
             if(nbIn)
                 printf("[DTS]: no data to decode avail %u\n",nbIn);
@@ -133,7 +135,7 @@ uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
             break;
         }
      
-        sample_t level = 32767, bias = 0;
+        sample_t level = 1, bias = 0;
         
        
         if (dts_frame(DTS_HANDLE, ptr, &flags, &level, bias))
@@ -145,12 +147,15 @@ uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
             *nbOut+=256*2*chan;
             break;
         };
+        flags &= DTS_CHANNEL_MASK;
+        flags |= DTS_ADJUST_LEVEL;
         chan= channel[flags & DTS_CHANNEL_MASK];
+        
         ADM_assert(chan);
-        if(matrix)   
+        if(matrix)
         {
-            matrix->nbChannel=channel[flags & DTS_CHANNEL_MASK];
-            matrix->channelConfiguration=CHANNEL_STEREO; // FIXME
+            matrix->nbChannel=chan;
+            matrix->channelConfiguration=DTS_CONF[flags & DTS_CHANNEL_MASK];
             
         }
         ptr+=length;
@@ -160,21 +165,29 @@ uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
         for (int i = 0; i < dts_blocks_num (DTS_HANDLE); i++) 
         {
             if (dts_block (DTS_HANDLE))
+            {
+                printf("\n[DTS] dts_block failed on block %d/%d\n",i,dts_blocks_num (DTS_HANDLE));
                 break;
+            }
             // Convert to uint16_t
             sample_t *sample_base=(sample_t *)dts_samples(DTS_HANDLE);
             cur=ptrOut;
             ptrOut+=256*chan;
             *nbOut+=256*2*chan;
+            int32_t i;
             for(int k=0;k<chan;k++)
                     {
-                        sample_t *sample=(sample_t *)sample_base;
-                        sample+=256*k;
+                        sample_t *sample32=(sample_t *)sample_base;
+                        sample32+=256*k;
                         cur=ptrOut+k;
                         for (int j = 0; j < 256; j++)
                         {
-                            *cur = (int16_t) ceil(*sample++);
+                            i=(int32_t)((*sample32)*(32767.));
+                            if(i > 32767) i=32767 ;
+                            if(i < -32768) i=-32768 ;
+                            *cur = (int16_t) i;
                             cur+=chan;
+                            sample32++;
                         }
                     }
         }

@@ -50,11 +50,11 @@ static const uint8_t dts_channels[] =
 /*
     Return frame size
 */
-int  ADM_DCAGetInfo(uint8_t *buf, uint32_t len, uint32_t *fq, uint32_t *br, uint32_t *chan,uint32_t *syncoff,uint32_t *flagso)
+int  ADM_DCAGetInfo(uint8_t *buf, uint32_t len, uint32_t *fq, uint32_t *br, uint32_t *chan,uint32_t *syncoff,uint32_t *flagso,uint32_t *nbSample)
 {
 uint8_t *end=buf+len-4-DTS_HEADER_SIZE;
 uint8_t *cur=buf-1;
-uint32_t size,len1,len2,flags,sr,framesize=0,index;
+uint32_t size,len1,len2,flags,sr,framesize=0,index,nbBlocks;
              // Assume 16 bits big endian
             // Search for 7F FE 80 01 as sync start
             *syncoff=0;
@@ -80,7 +80,7 @@ uint32_t size,len1,len2,flags,sr,framesize=0,index;
                 skip_bits(&s,5);
                 skip_bits(&s,1);
                 //Nb Samples
-                len1=(get_bits(&s,7)+1)*32;
+                nbBlocks=(get_bits(&s,7)+1);
                 // Frame size in bit
                 len2=get_bits(&s,14);
                 framesize=len2+1;
@@ -102,7 +102,8 @@ uint32_t size,len1,len2,flags,sr,framesize=0,index;
 #endif
                 *syncoff=cur-buf;
                 if(*syncoff) printf("[dts] Dropped %u bytes\n",*syncoff);
-                *chan=2; // FIXME
+                *chan=dts_channels[flags & 0xf]; 
+                *nbSample=nbBlocks*32;
                 return framesize;
                 
                 
