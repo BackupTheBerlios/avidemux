@@ -975,6 +975,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                 printf("DataS:%x\n",tom.read32()); // h2
                                 printf("Fr/Sa::%x\n",tom.read16()); // Frame per sample
                                 u32=tom.read();
+                                if(u32>31) u32=31;
                                 printf("Codec string :%d <",u32);
                                 for(int i=0;i<u32;i++) printf("%c",tom.read());
                                 printf(">\n");
