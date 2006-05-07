@@ -292,7 +292,7 @@ uint8_t  headerfound=0;
 
                 ADM_assert(_wavheader->encoding==WAV_DTS);
                 ADM_assert(packetTail>=packetHead);
-                if(packetTail<packetHead+6)
+                if(packetTail<packetHead+DTS_HEADER_SIZE)
                 {
                         printf("PKTZ:DTS Buffer empty\n");
                         return 0;
@@ -305,7 +305,7 @@ uint8_t  headerfound=0;
 
                 start=packetHead;
 
-                while(start+8<packetTail)
+                while(start+DTS_HEADER_SIZE<packetTail)
                 {
                         if(packetBuffer[start]!=0x07f || packetBuffer[start+1]!=0xfe|| 
                             packetBuffer[start+2]!=0x80|| packetBuffer[start+3]!=0x01)
@@ -353,14 +353,14 @@ uint8_t  headerfound=0;
                             // no header found, we can skip up to the 6 last bytes
                             uint32_t left;
                                 left=packetTail-packetHead;
-                                if(left>6) left=6;
+                                if(left>DTS_HEADER_SIZE-1) left=DTS_HEADER_SIZE-1;
                                 packetHead=packetTail-left;
-                                printf("DtsPak: No ac3 header found, purging buffer (%lu - %lu)\n",packetHead,packetTail);
+                                printf("DtsPak: No dts header found, purging buffer (%lu - %lu)\n",packetHead,packetTail);
                         }
                         return 0;
                 }
                 *len=size;
-                *samples=512;
+                *samples=256;
                 return 1;
 }
 /*
