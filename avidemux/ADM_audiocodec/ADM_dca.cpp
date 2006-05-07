@@ -136,8 +136,15 @@ uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
         }
      
         sample_t level = 1, bias = 0;
+        flags &=DTS_CHANNEL_MASK;
+        flags |= DTS_ADJUST_LEVEL;
         
-       
+        chan= channel[flags & DTS_CHANNEL_MASK];
+        if(flags & DTS_LFE)
+        {
+            if(chan==5) chan++;
+            printf("LFE\n");
+        }
         if (dts_frame(DTS_HANDLE, ptr, &flags, &level, bias))
         {
             printf("\n DTS_frame failed!");
@@ -147,20 +154,22 @@ uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
             *nbOut+=256*2*chan;
             break;
         };
-        flags &= DTS_CHANNEL_MASK;
-        flags |= DTS_ADJUST_LEVEL;
-        chan= channel[flags & DTS_CHANNEL_MASK];
-        
+
         ADM_assert(chan);
         if(matrix)
         {
             matrix->nbChannel=chan;
             matrix->channelConfiguration=DTS_CONF[flags & DTS_CHANNEL_MASK];
+            if(chan==6)
+            {
+                    matrix->channelConfiguration=CHANNEL_3F_2R_LFE;
+            }
             
         }
         ptr+=length;
         nbIn-=length;
         int16_t *cur;
+        *nbOut += 256 * 2 * chan*dts_blocks_num (DTS_HANDLE);
         // Each block is 256 samples
         for (int i = 0; i < dts_blocks_num (DTS_HANDLE); i++) 
         {
@@ -169,27 +178,21 @@ uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
                 printf("\n[DTS] dts_block failed on block %d/%d\n",i,dts_blocks_num (DTS_HANDLE));
                 break;
             }
-            // Convert to uint16_t
-            sample_t *sample_base=(sample_t *)dts_samples(DTS_HANDLE);
-            cur=ptrOut;
-            ptrOut+=256*chan;
-            *nbOut+=256*2*chan;
-            int32_t i;
-            for(int k=0;k<chan;k++)
+             {
+                    int16_t *cur;
+                    for(int k=0;k<chan;k++)
                     {
-                        sample_t *sample32=(sample_t *)sample_base;
-                        sample32+=256*k;
+                        sample_t *sample=(sample_t *)dts_samples(DTS_HANDLE);
+                        sample+=256*k;
                         cur=ptrOut+k;
                         for (int j = 0; j < 256; j++)
                         {
-                            i=(int32_t)((*sample32)*(32767.));
-                            if(i > 32767) i=32767 ;
-                            if(i < -32768) i=-32768 ;
-                            *cur = (int16_t) i;
+                            *cur = (int16_t) ceil((*sample++)*32767.);
                             cur+=chan;
-                            sample32++;
                         }
                     }
+                    ptrOut+=chan*256;
+                }
         }
     }
     return 1; 
