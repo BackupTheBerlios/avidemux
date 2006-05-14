@@ -150,7 +150,7 @@ uint32_t downmix;
                 useMaster=0;
         
         if(useMaster) RADIO_SET(radiobuttonMaster,1);
-                else RADIO_SET(radiobuttonMaster,0);
+                else RADIO_SET(radiobuttonPCM,1);
 
 
         if(!prefs->get(FEATURE_TRYAUTOIDX, &useAutoIndex))
