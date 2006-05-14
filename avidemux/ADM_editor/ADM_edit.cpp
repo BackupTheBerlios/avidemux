@@ -14,6 +14,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -21,6 +23,10 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#ifdef CYG_MANGLING
+#include "sys/stat.h"
+#endif
+
 #include <ADM_assert.h>
 
 #include "config.h"
@@ -300,15 +306,12 @@ UNUSED_ARG(mode);
         }
 	/* check for "Read-only file system" */
 	{
-#ifdef CYG_MANGLING		
-		int fd = open(tmpname,O_CREAT|O_EXCL|O_WRONLY);
-#else
-		int fd = open(tmpname,O_CREAT|O_EXCL|O_WRONLY,S_IRUSR|S_IWUSR);
-#endif
-		if( fd >= 0 ){
-			close(fd);
-			unlink(tmpname);
-                        printf("Filesystem is writable\n");
+                int fd = open(tmpname,O_CREAT|O_EXCL|O_WRONLY,S_IRUSR|S_IWUSR);
+                if( fd >= 0 )
+                {
+                    close(fd);
+                    unlink(tmpname);
+                    printf("Filesystem is writable\n");
 		}else if( errno == EROFS ){
 		  char *tmpdir = getenv("TMPDIR");
 #ifdef CYG_MANGLING
