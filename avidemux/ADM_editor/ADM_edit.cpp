@@ -308,9 +308,11 @@ UNUSED_ARG(mode);
 		if( fd >= 0 ){
 			close(fd);
 			unlink(tmpname);
+                        printf("Filesystem is writable\n");
 		}else if( errno == EROFS ){
 		  char *tmpdir = getenv("TMPDIR");
 #ifdef CYG_MANGLING
+                        printf("Filesystem is not writable, looking for somewhere else\n");
 			if( !tmpdir )
 				tmpdir = "c:";
 			snprintf(tmpname,256,"%s%s.idx",tmpdir,strrchr(name,'\\'));
@@ -320,11 +322,14 @@ UNUSED_ARG(mode);
 			snprintf(tmpname,256,"%s%s.idx",tmpdir,strrchr(name,'/'));
 #endif
 			tmpname[255] = 0;
+                        printf("Storing index in %s\n",tmpname);
 		}
-        	if(ADM_fileExist(tmpname)){
-			return addFile(tmpname);
-        	}
-	}
+                if(ADM_fileExist(tmpname))
+                {
+                    printf("Index present, loading it\n");
+                    return addFile(tmpname);
+                }
+        }
         if(tryIndexing(name,tmpname))
         {
                 return addFile (tmpname);
