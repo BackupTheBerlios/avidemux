@@ -323,11 +323,11 @@ UNUSED_ARG(mode);
 #endif
 			tmpname[255] = 0;
                         printf("Storing index in %s\n",tmpname);
-		}
-                if(ADM_fileExist(tmpname))
-                {
-                    printf("Index present, loading it\n");
-                    return addFile(tmpname);
+                    if(ADM_fileExist(tmpname))
+                    {
+                        printf("Index present, loading it\n");
+                        return addFile(tmpname);
+                    }
                 }
         }
         if(tryIndexing(name,tmpname))
