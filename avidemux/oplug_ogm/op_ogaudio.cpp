@@ -71,7 +71,8 @@ WAVHeader	*info=NULL;
 			encoding_gui->setAudioCodec("None");
 			return 1;
 		}
-		if(audioProcessMode() && currentaudiostream->isCompressed() && currentaudiostream->isDecompressable())
+		if(audioProcessMode() && currentaudiostream->isCompressed() 
+                        && !currentaudiostream->isDecompressable())
 		{
                     return 0;
 		}
