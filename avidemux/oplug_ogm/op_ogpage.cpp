@@ -86,10 +86,10 @@ uint32_t zero4=0;
 uint8_t ogm_page::writeDirect(uint32_t size, uint8_t *data)
 {
 uint32_t chunk;
-	
+        ADM_assert(size<MAX_OGM_PAGESIZE);	
 	#define COM_OFFSET 0	
 	memcpy(_page+COM_OFFSET,data,size);
-	size+COM_OFFSET;
+	size+=COM_OFFSET;
 	_current_lacing=0;
 	_current_off=size;
 	_fresh=1;
