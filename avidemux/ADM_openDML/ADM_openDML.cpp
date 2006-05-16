@@ -311,7 +311,7 @@ uint32_t rd;
 
 		// then bih stuff
 		int32_t extra;
-		_fd=fopen(name,"rb");
+//		_fd=fopen(name,"rb");
 		
 		fseeko(_fd,_Tracks[vidTrack].strf.offset,SEEK_SET);		
 		extra=_Tracks[vidTrack].strf.size-sizeof(_video_bih);
