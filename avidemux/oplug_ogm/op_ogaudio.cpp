@@ -62,11 +62,10 @@ uint8_t		ADM_ogmWrite::initAudio(void)
 {
 uint32_t 	tstart;
 WAVHeader	*info=NULL;
-
+                audioStream=NULL;
 		if(!currentaudiostream)
 		{
-			audioFilter=NULL;
-			audioStream=NULL;
+			audioFilter=NULL;	
 			_audioBuffer=NULL;
 			encoding_gui->setAudioCodec("None");
 			return 1;
