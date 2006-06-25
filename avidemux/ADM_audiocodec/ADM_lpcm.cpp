@@ -33,17 +33,12 @@
 
 ADM_AudiocodecWavSwapped::ADM_AudiocodecWavSwapped( uint32_t fourcc ) : ADM_Audiocodec(fourcc)
 {
-		_instore=0;
 }
 ADM_AudiocodecWavSwapped::~ADM_AudiocodecWavSwapped()
 {
 
 }
 
-void ADM_AudiocodecWavSwapped::purge()
-{
-	_instore=0;
-}
 uint8_t ADM_AudiocodecWavSwapped::beginDecompress()
 {
          return 1;
@@ -62,39 +57,25 @@ uint8_t ADM_AudiocodecWavSwapped::isDecompressable( void )
 {
  	return 1;
 }
-uint8_t ADM_AudiocodecWavSwapped::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+
+uint8_t ADM_AudiocodecWavSwapped::run(uint8_t * inptr, uint32_t nbIn, float *outptr, uint32_t * nbOut, ADM_ChannelMatrix *matrix)
 {
-		*nbOut=0;
-            // if we have instored ...
-	    	if((_instore+nbIn)<2) return 1;
-		if(_instore)
-		{
-			*(outptr+1)=_hold;;
-			*(outptr)=*ptr++;
-			*nbOut+=2;
-			nbIn--;
-			_instore=0;
-			outptr+=2;
-		}
-		_instore=0;
-		if((nbIn&1))
-			{
-				_hold=*(ptr+nbIn-1);
-				_instore=1;
-				nbIn--;
-			}
+	if (nbIn < 2)
+		return 1;
 
-			uint8_t *i1;
-			i1=ptr;
-			*nbOut+=nbIn;
-			for(uint32_t i=nbIn>>1;i>0;i--)
-			{
-				*(outptr+1)=*(i1);
-				*(outptr)=*(i1+1);
-				outptr+=2;
-				i1+=2;
-			}
+	if (nbIn&1) {
+		printf("Error: nbIn (%i) odd in lpcm", nbIn);
+		abort();
+	}
 
-			return 1;
+	int16_t sample;
+	*nbOut=nbIn / 2;
+	for (int i = 0; i < *nbOut; i++) {
+		sample = (*inptr << 8 | *(inptr+1));
+		*(outptr++) = (float)sample / 32768;
+		inptr += 2;
+	}
+
+	return 1;
 }
 

@@ -27,10 +27,9 @@
 
 
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_audiodevice.h"
 #include "ADM_audiodevice/ADM_deviceoss.h"
-#ifdef ALSA_SUPPORT
 #include "ADM_audiodevice/ADM_deviceALSA.h"
-#endif
 #include "ADM_audiodevice/ADM_deviceSDL.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME  MODULE_ADEVICE
@@ -142,11 +141,10 @@ void SDL_callback(void *userdata, Uint8 *stream, int len)
 //
 //
 //_______________________________________________
-uint8_t sdlAudioDevice::init(uint32_t channel, uint32_t fq) 
+uint8_t sdlAudioDevice::init(uint8_t channels, uint32_t fq) 
 {
-	
 SDL_AudioSpec spec,result;
-
+_channels = channels;
 		
 		printf("Opening SDL Audio, fq=%d\n",fq);
 		if(_inUse) 
@@ -163,7 +161,7 @@ SDL_AudioSpec spec,result;
 		memset(&spec,0,sizeof(spec));
 		memset(&result,0,sizeof(result));
 		spec.freq=fq;
-		spec.channels=channel;
+		spec.channels=channels;
 		spec.samples=65536>>4; // 1 second worth of audio
 		spec.callback=SDL_callback;
 		spec.userdata=NULL;
@@ -196,14 +194,13 @@ SDL_AudioSpec spec,result;
 //
 //
 //_______________________________________________
-uint8_t sdlAudioDevice::play(uint32_t nb,uint8_t * ptr)
+uint8_t sdlAudioDevice::play(uint32_t len, float *data)
  {
  	// First put stuff into the buffer
 	uint8_t *src;
-	uint32_t nb_sample,left;
+	uint32_t left;
 
-	nb_sample=nb>>1;
-	
+	dither16bit(len, data);
 	
 	// Check we have room left
 	if(wr_ptr>=rd_ptr)
@@ -214,7 +211,7 @@ uint8_t sdlAudioDevice::play(uint32_t nb,uint8_t * ptr)
 	{
 		left=rd_ptr-wr_ptr;
 	}
-	if(nb_sample+1>left)
+	if(len+1>left)
 	{
 		printf("AudioCore:Buffer full!\n");
 		
@@ -226,20 +223,20 @@ uint8_t sdlAudioDevice::play(uint32_t nb,uint8_t * ptr)
 	
 	SDL_LockAudio();
 	
-	if(wr_ptr+nb_sample<BUFFER_SIZE)
+	if(wr_ptr+len<BUFFER_SIZE)
 	{
-		memcpy(src,ptr,nb_sample*2);
-		wr_ptr+=nb_sample;
+		memcpy(src,data,len*2);
+		wr_ptr+=len;
 	}
 	else
 	{
 		left=BUFFER_SIZE-wr_ptr-1;
-		memcpy(src,ptr,left*2);
-		memcpy(audioBuffer,ptr+left*2,(nb_sample-left)*2);
-		wr_ptr=nb_sample-left;	
+		memcpy(src,data,left*2);
+		memcpy(audioBuffer,data+left*2,(len-left)*2);
+		wr_ptr=len-left;	
 	}
 	
-	aprintf("AudioCore: Putting %lu bytes rd:%lu wr:%lu \n",nb,rd_ptr,wr_ptr);
+	//aprintf("AudioSDL: Putting %lu bytes rd:%lu wr:%lu \n",len*2,rd_ptr,wr_ptr);
 	SDL_UnlockAudio();
  	if(!frameCount)
 	{

@@ -76,6 +76,7 @@ class AVDMGenericAudioStream
                                         ADM_ChannelMatrix _channelMatrix;
     #define SIZE_INTERNAL 64*1024 
 					uint8_t 	internalBuffer[2 * SIZE_INTERNAL];
+					float 	internalBuffer_float[SIZE_INTERNAL];
 					uint8_t 	packetBuffer[2 * SIZE_INTERNAL];
 					uint32_t	packetHead,packetTail;
 					uint8_t		isPaketizable( void);
@@ -127,9 +128,11 @@ class AVDMGenericAudioStream
 					uint8_t			isDestroyable( void ) { return _destroyable;}
 					uint8_t			isCompressed( void );
 					uint8_t			isDecompressable( void );
-          			virtual uint32_t		readDecompress( uint32_t size,uint8_t *ptr );
+          			virtual uint32_t		readDecompress( uint32_t size,uint8_t *ptr );//deprecated
+          			virtual uint32_t		readDecompress(uint32_t size, float *ptr);
 				virtual uint8_t		 	goTo(uint32_t offset)=0;
-				virtual uint32_t		read(uint32_t size,uint8_t *ptr)=0;
+				virtual uint32_t		read(uint32_t size,uint8_t *ptr)=0;//deprecated
+				virtual uint32_t		read(uint32_t size,float *ptr){return 0;}
 //-----------------
 					WAVHeader 		*getInfo(void) { return _wavheader;}
 					

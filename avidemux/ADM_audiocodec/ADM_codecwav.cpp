@@ -38,10 +38,6 @@ ADM_AudiocodecWav::~ADM_AudiocodecWav()
 
 }
 
-void ADM_AudiocodecWav::purge()
-{
-
-}
 uint8_t ADM_AudiocodecWav::beginDecompress()
 {
          return 1;
@@ -60,13 +56,17 @@ uint8_t ADM_AudiocodecWav::isDecompressable( void )
 {
  	return 1;
 }
-uint8_t ADM_AudiocodecWav::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecWav::run(uint8_t * inptr, uint32_t nbIn, float * outptr, uint32_t * nbOut, ADM_ChannelMatrix *matrix)
 {
-            	
+	int16_t *in = (int16_t *) inptr;
 
- 		memcpy(outptr,ptr,nbIn);
-   		*nbOut=nbIn;
-       return 1;
+	*nbOut=nbIn / 2;
+	for (int i = 0; i < *nbOut; i++) {
+		*(outptr++) = (float)*in / 32768;
+		in++;
+	}
+
+	return 1;
 }
 
 

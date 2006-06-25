@@ -136,29 +136,17 @@ ADM_Audiocodec *out;
 
 ADM_Audiocodec::ADM_Audiocodec( uint32_t fourcc ) {
     UNUSED_ARG(fourcc);
-	_running=0;
 	_init=0;
 }
 
 ADM_Audiocodec::~ADM_Audiocodec()
 {}
 
-uint8_t ADM_Audiocodec::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix){
-    UNUSED_ARG(ptr);
-    UNUSED_ARG(nbIn);
-    UNUSED_ARG(outptr);
-    UNUSED_ARG(nbOut);
-	return 0;
-}
+void ADM_Audiocodec::int2float(float *data, uint32_t nb_sample) {
+	int16_t *iptr = (int16_t *) data;
 
-
-ADM_AudiocodecUnknown::~ADM_AudiocodecUnknown(){
-}
-
-uint8_t ADM_AudiocodecUnknown::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix){
-    UNUSED_ARG(ptr);
-    UNUSED_ARG(nbIn);
-    UNUSED_ARG(outptr);
-    UNUSED_ARG(nbOut);
-	return 0;
+	while (nb_sample  > 0) {
+		nb_sample--;
+		data[nb_sample] = (float) iptr[nb_sample] / 32768;
+	}
 }

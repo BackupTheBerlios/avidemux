@@ -42,10 +42,12 @@
 
 int ms_ima_adpcm_decode_block(unsigned short *output,
   unsigned char *input, int channels, int block_size);
+#if 0
 int dk4_ima_adpcm_decode_block(unsigned short *output,
   unsigned char *input, int channels, int block_size);
 int qt_ima_adpcm_decode_block(unsigned short *output,
   unsigned char *input, int channels);
+#endif
 
 
 // pertinent tables for IMA ADPCM
@@ -117,17 +119,18 @@ ADM_AudiocodecImaAdpcm::~ADM_AudiocodecImaAdpcm()
 {
 
 }
-uint8_t ADM_AudiocodecImaAdpcm::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
-                                     uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+
+uint8_t ADM_AudiocodecImaAdpcm::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
 {
 int produced=0,one;
 uint8_t  *start;
 // Add to buffer
   
   ADM_assert((_tail+nbIn)<IMA_BUFFER);
-  memcpy(&(_buffer[_tail]),ptr,nbIn);
+  memcpy(&(_buffer[_tail]),inptr,nbIn);
   _tail+=nbIn;
   *nbOut=0;
+
   if((_tail-_head)<ss_mul) 
         return 0;
 
@@ -150,8 +153,10 @@ uint8_t  *start;
                 _tail-=_head;
                 _head=0;
         }
-      *nbOut=produced;
-      return 1;
+	*nbOut = produced / 2;
+	int2float(outptr, *nbOut);
+
+	return 1;
   }
 #if 0
   else if (_me == 0x61)
@@ -244,6 +249,7 @@ static void decode_nibbles(unsigned short *output,
   }
 }
 
+#if 0
 int qt_ima_adpcm_decode_block(unsigned short *output,
   unsigned char *input, int channels)
 {
@@ -304,6 +310,7 @@ int qt_ima_adpcm_decode_block(unsigned short *output,
 
   return QT_IMA_ADPCM_SAMPLES_PER_BLOCK * channels;
 }
+#endif
 
 int ms_ima_adpcm_decode_block(unsigned short *output,
   unsigned char *input, int channels, int block_size)
@@ -374,7 +381,7 @@ int ms_ima_adpcm_decode_block(unsigned short *output,
 
   return (block_size - MS_IMA_ADPCM_PREAMBLE_SIZE * channels) * 2;
 }
-
+#if 0
 int dk4_ima_adpcm_decode_block(unsigned short *output,
   unsigned char *input, int channels, int block_size)
 {
@@ -411,6 +418,7 @@ int dk4_ima_adpcm_decode_block(unsigned short *output,
 
   return (block_size - MS_IMA_ADPCM_PREAMBLE_SIZE * channels) * 2 - channels;
 }
+#endif
 /********************************************************************************/
 /********************************************************************************/
 #if 0

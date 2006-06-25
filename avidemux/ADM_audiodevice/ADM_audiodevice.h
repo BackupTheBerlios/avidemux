@@ -9,49 +9,36 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+#ifndef ADM_AUDIODEVICE_H
+#define ADM_AUDIODEVICE_H
 
-typedef enum
-{
-	DEVICE_OSS=1,
-	DEVICE_DUMMY,
-	DEVICE_ARTS,
-	DEVICE_ALSA,
-	DEVICE_COREAUDIO,
-	DEVICE_SDL,
-	DEVICE_WIN32,
-    DEVICE_ESD
-}AUDIO_DEVICE;
+#include <ADM_assert.h>
 
-typedef struct DEVICELIST
+ class audioDevice
+ {
+        protected:
+			uint8_t _channels;
+
+			float _dither[256];
+			void dither16bit(uint32_t len, float *data);
+        public:
+                                        audioDevice(void);
+                        virtual uint8_t init(uint8_t channel, uint32_t fq ) {ADM_assert(0);return 0;}
+                        virtual uint8_t stop(void) {ADM_assert(0);return 0;}
+                        virtual uint8_t play(uint32_t len, uint8_t *data) {ADM_assert(0);return 0;}//deprecate
+                        virtual uint8_t play(uint32_t len, float *data) {ADM_assert(0);return 0;}
+                        virtual uint8_t setVolume(int volume) {return 1;}
+}   ;
+
+class dummyAudioDevice : public audioDevice
 {
-	AUDIO_DEVICE id;
-	char	     *name;
-};
-#define MKADID(x) {DEVICE_##x,#x}
-static const DEVICELIST audioDeviceList[]=
-{
-	
-#ifdef OSS_SUPPORT	
-	MKADID(OSS),
-#endif	
-#ifdef USE_ARTS
-	MKADID(ARTS),
-#endif	
-#ifdef ALSA_SUPPORT
-	MKADID(ALSA),
-#endif	
-#ifdef CONFIG_DARWIN
-	MKADID(COREAUDIO),
+		  public:
+                                        dummyAudioDevice(void) {};
+                        virtual uint8_t init(uint8_t channels, uint32_t fq)
+                                {printf("\n Null audio device"); UNUSED_ARG(fq); UNUSED_ARG(channels); return 1;}
+                        virtual uint8_t play(uint32_t len, float *data)
+                                {UNUSED_ARG(len); UNUSED_ARG(data); return 1;}
+                        virtual uint8_t stop(void) {return 1;}
+}   ;
+
 #endif
-#if	defined(USE_SDL) && !defined(CYG_MANGLING)	
-	MKADID(SDL),
-#endif	
-#ifdef CYG_MANGLING	
-	MKADID(WIN32),
-#endif	
-#ifdef USE_ESD	
-	MKADID(ESD),
-#endif	
-
-	MKADID(DUMMY)
-};

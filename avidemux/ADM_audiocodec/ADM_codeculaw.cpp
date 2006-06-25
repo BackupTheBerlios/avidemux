@@ -46,31 +46,27 @@ ADM_AudiocodecUlaw::~ADM_AudiocodecUlaw()
 }
 
 
-uint8_t ADM_AudiocodecUlaw::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecUlaw::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
 {
 uint8_t byt1;
 int16_t out;
-int16_t *pout;
 
 int mant,mexp,sign;
 
-		*nbOut=nbIn*2;
-		pout=(int16_t *)outptr;
-		
-            // if we have instored ...
-	    	
-			for(uint32_t i=0;i<nbIn;i++)
-			{
-				byt1=*ptr++;
-				byt1=~byt1;
-				sign=(byt1&0x80);
-				mexp=(byt1>>4)&0x7;
-				mant=byt1&0xf;
-				out=expon[mexp]+(mant<<(mexp+3));
-				if(sign) out=-out;
-				*pout++=out;
-			}
+	*nbOut=nbIn;
 
-			return 1;
+	for(uint32_t i=0;i<nbIn;i++)
+	{
+		byt1=*inptr++;
+		byt1=~byt1;
+		sign=(byt1&0x80);
+		mexp=(byt1>>4)&0x7;
+		mant=byt1&0xf;
+		out=expon[mexp]+(mant<<(mexp+3));
+		if(sign) out=-out;
+		*outptr++=(float)out / 32768;
+	}
+
+	return 1;
 }
 

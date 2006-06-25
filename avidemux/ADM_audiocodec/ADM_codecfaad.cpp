@@ -28,7 +28,6 @@
 #include "ADM_audiocodec/ADM_audiocodec.h"
 #include "faad.h"
 
-static uint32_t xin,xout;
 
 ADM_faad::ADM_faad( uint32_t fourcc ,WAVHeader *info,uint32_t l,uint8_t *d) :   ADM_Audiocodec(fourcc)
 {
@@ -96,9 +95,9 @@ uint8_t ADM_faad::endDecompress( void )
 	_inbuffer=0;
 	 faacDecPostSeekReset(_instance, 0);
 }
-uint8_t ADM_faad::run( uint8_t * ptr, uint32_t nbIn, 
-                       uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+uint8_t ADM_faad::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
 {
+uint32_t xin;
 long int res;
 void *outbuf;
 faacDecFrameInfo info;
@@ -118,14 +117,14 @@ uint8_t first=0;
 		{
 			// Try
 			printf("Trying with %d bytes\n",nbIn);
-			res=faacDecInit(_instance,ptr,nbIn,&srate,&chan);
+			res=faacDecInit(_instance,inptr,nbIn,&srate,&chan);
 			if(res>=0)
 			{
 				printf("Faad Inited : rate:%d chan:%d off:%ld\n",srate,chan,res);
 				_inited=1;
 				first=1;
 				_inbuffer=0;
-				ptr+=res;
+				inptr+=res;
 				nbIn-=res;
 				
 			}
@@ -140,8 +139,8 @@ uint8_t first=0;
 		{
 			max=FAAD_BUFFER-_inbuffer;
 			if(nbIn<max) max=nbIn;
-			memcpy(_buffer+_inbuffer,ptr,max);
-			ptr+=max;
+			memcpy(_buffer+_inbuffer,inptr,max);
+			inptr+=max;
 			nbIn-=max;
 			_inbuffer+=max;
 			/*
@@ -175,21 +174,18 @@ uint8_t first=0;
 			xin=info.bytesconsumed ;
 			if(xin>_inbuffer) xin=0;
 			
-			xout=info.samples*2;
-			
-			//printf("in:%d out:%d\n",xin,xout);
-			
 			memmove(_buffer,_buffer+xin,_inbuffer-xin);
 			_inbuffer-=xin;
-			if(xout)
+			if(info.samples)
 			{
-				memcpy(outptr,outbuf,xout);
-				*nbOut+=xout;
-				outptr+=xout;
+				*nbOut+= info.samples;
+				int16_t *in = (int16_t *) outbuf;
+				for (int i = 0; i < info.samples; i++) {
+					*(outptr++) = (float)*in / 32768;
+					in++;
+				}
 			}
 		}while(nbIn);
 		return 1;
 }
-                 
-          
 #endif

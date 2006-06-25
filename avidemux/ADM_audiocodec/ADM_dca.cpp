@@ -103,12 +103,12 @@ uint8_t ADM_AudiocodecDCA::endDecompress( void )
     return 1;
 }
 
-uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecDCA::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
 {
     uint32_t avail;
     uint32_t length,syncoff;
-    int flags = 0, samprate = 0, bitrate = 0, chan = 2,frame_length;
-    int16_t *ptrOut = (int16_t *) outptr;
+    int flags = 0, samprate = 0, bitrate = 0, frame_length;
+    uint8_t chan = 2;
     *nbOut=0;
 
 
@@ -122,7 +122,7 @@ uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
             break;
         }
         //length = ADM_DCAGetInfo(ptr,nbIn, &samprate, &bitrate, &chan,&syncoff,&flags);
-        length = dts_syncinfo (DTS_HANDLE,  ptr, &flags, &samprate,&bitrate, &frame_length);
+        length = dts_syncinfo (DTS_HANDLE,  inptr, &flags, &samprate,&bitrate, &frame_length);
 
         if(!length)
         {
@@ -145,13 +145,13 @@ uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
             if(chan==5) chan++;
             printf("LFE\n");
         }
-        if (dts_frame(DTS_HANDLE, ptr, &flags, &level, bias))
+        if (dts_frame(DTS_HANDLE, inptr, &flags, &level, bias))
         {
             printf("\n DTS_frame failed!");
-            ptr+=length;
+            inptr+=length;
             nbIn-=length;
-            ptrOut+=256*chan;
-            *nbOut+=256*2*chan;
+            outptr+=256*chan;
+            *nbOut+=256*chan;
             break;
         };
 
@@ -166,37 +166,33 @@ uint8_t ADM_AudiocodecDCA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
             }
             
         }
-        ptr+=length;
+        inptr+=length;
         nbIn-=length;
-        int16_t *cur;
-        *nbOut += 256 * 2 * chan*dts_blocks_num (DTS_HANDLE);
         // Each block is 256 samples
-        for (int i = 0; i < dts_blocks_num (DTS_HANDLE); i++) 
-        {
-            if (dts_block (DTS_HANDLE))
-            {
-                printf("\n[DTS] dts_block failed on block %d/%d\n",i,dts_blocks_num (DTS_HANDLE));
-                break;
-            }
-             {
-                    int16_t *cur;
-                    for(int k=0;k<chan;k++)
-                    {
-                        sample_t *sample=(sample_t *)dts_samples(DTS_HANDLE);
-                        sample+=256*k;
-                        cur=ptrOut+k;
-                        for (int j = 0; j < 256; j++)
-                        {
-                            *cur = (int16_t) ceil((*sample++)*32767.);
-                            cur+=chan;
-                        }
-                    }
-                    ptrOut+=chan*256;
-                }
-        }
+        *nbOut += 256 * chan * dts_blocks_num(DTS_HANDLE);
+	float *cur;
+	for (int i = 0; i < dts_blocks_num(DTS_HANDLE); i++) {
+		if (dts_block (DTS_HANDLE)) {
+			printf("\n[DTS] dts_block failed on block %d/%d\n",i,dts_blocks_num (DTS_HANDLE));
+			// in that case we silent out the chunk
+			memset(outptr, 0, 256 * chan * sizeof(float));
+		} else {
+			float *cur;
+			for (int k = 0; k < chan; k++) {
+				sample_t *sample=(sample_t *)dts_samples(DTS_HANDLE);
+				sample += 256 * k;
+				cur = outptr + k;
+				for (int j = 0; j < 256; j++) {
+					*cur = *sample++;
+					cur+=chan;
+				}
+			}
+		}
+		outptr += chan * 256;
+	}
     }
-    return 1; 
 
+    return 1; 
 }
 
 #endif

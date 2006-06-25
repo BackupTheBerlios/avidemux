@@ -41,7 +41,8 @@ public:
         virtual uint32_t read(uint32_t len,uint8_t *buffer)=0;
         virtual uint8_t  goTo(uint32_t newoffset);
         virtual uint8_t  goToTime(uint32_t newoffset);
-	virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer)=0;
+	virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer)=0;//deprecated
+	virtual uint32_t readDecompress(uint32_t len,float *buffer){return 0;}
 
 
 };
@@ -52,7 +53,8 @@ protected:
 			 int16_t   _buffer[PROCESS_BUFFER_SIZE];
 			// uint32_t  	_bufferlen;
 
-			 virtual uint32_t grab(uint8_t *outbuffer)=0;
+			 virtual uint32_t grab(uint8_t *outbuffer)=0;//deprecated
+			 virtual uint32_t grab(float *outbuffer){return 0;}
 			 uint32_t	_headBuff,_tailBuff;
 public:
 
@@ -61,13 +63,14 @@ public:
 				virtual uint8_t  configure( void )  { return 1;};
 //
 
-        virtual uint32_t read(uint32_t len,uint8_t *buffer);
+        virtual uint32_t read(uint32_t len,uint8_t *buffer);//deprecated
+        virtual uint32_t read(uint32_t len,float *buffer);
         virtual uint8_t  goTo(uint32_t newoffset);
         virtual uint8_t  goToTime(uint32_t newoffset);
-	virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer)
-						{
-             		return read(len,buffer);
-						};
+	virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer)//deprecated
+						{ return read(len,buffer); }
+	virtual uint32_t readDecompress(uint32_t len,float *buffer)
+						{ return read(len,buffer); }
 
 
 };
@@ -176,7 +179,8 @@ public:
 				~AVDMProcessAudio_Null();
         			AVDMProcessAudio_Null(AVDMGenericAudioStream *instream
 						,uint32_t time_offset, uint32_t duration);
-       		virtual uint32_t 	grab(uint8_t *obuffer);
+       		virtual uint32_t 	grab(uint8_t *obuffer);//deprecated
+       		virtual uint32_t 	grab(float *obuffer);
 		virtual uint8_t  goToTime(uint32_t newoffset);
      		
 };

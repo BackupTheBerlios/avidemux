@@ -66,7 +66,15 @@ AVDMProcessAudio_Null::~AVDMProcessAudio_Null()
 {
     delete(_wavheader);
 };
-uint32_t 	AVDMProcessAudio_Null::grab(uint8_t *obuffer)
+uint32_t 	AVDMProcessAudio_Null::grab(uint8_t *obuffer)//deprecated
+{
+uint32_t rdall=0;
+  rdall = _instream->readDecompress(1000, obuffer);
+  if (rdall == 0)
+	      return MINUS_ONE;	// we could not get a single byte ! End of stream
+  return rdall;
+}
+uint32_t 	AVDMProcessAudio_Null::grab(float *obuffer)
 {
 uint32_t rdall=0;
   rdall = _instream->readDecompress(1000, obuffer);

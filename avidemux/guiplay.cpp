@@ -79,7 +79,7 @@ static int32_t delta;
 static uint16_t audio_available = 0;
 static uint32_t one_audio_frame = 0;
 static uint32_t one_frame;
-static uint8_t *wavbuf = NULL;
+static float *wavbuf = NULL;
 AVDMProcessAudioStream *playback = NULL;
 extern renderZoom currentZoom;
 //static uint8_t Vbuffer[7.0*5.6*3];
@@ -282,8 +282,9 @@ void FillAudio(void)
 {
     uint32_t oaf = 0;
     uint32_t load = 0;
-    uint32_t channels,fq;
-    
+	uint8_t channels;
+	uint32_t fq;
+
     if (!audio_available)
 	return;
     if (!currentaudiostream)
@@ -307,7 +308,6 @@ void FillAudio(void)
 
 	  db_wav = dauds;	// for ms
           db_wav /= fq;
-	  db_wav /= 2;		// 16 bits / sample
 	  db_wav /=channels;
 
 	  delta = (long int) floor(1000. * (db_wav - db_vid));
@@ -331,7 +331,6 @@ void FillAudio(void)
 		dauds += oaf;
 		load += oaf;
 	    }
-
       }
     while (delta < AUDIO_PRELOAD);
     AVDM_AudioPlay(wavbuf, EVEN(load));
@@ -364,10 +363,6 @@ void ComputePreload(void)
       }
 
 
-
-   
-    
-
     double db;
     // go to the beginning...
 
@@ -380,12 +375,12 @@ void ComputePreload(void)
     playback = buildPlaybackFilter(currentaudiostream,(uint32_t) (db + 0.49), 0xffffffff);
     
     channels= playback->getInfo()->channels;
-    one_audio_frame = (one_frame * wavinfo->frequency * channels * 2);	// 1000 *nb audio bytes per ms
+    one_audio_frame = (one_frame * wavinfo->frequency * channels);	// 1000 *nb audio bytes per ms
     one_audio_frame /= 1000;
     printf("\n 1 audio frame = %lu bytes (1)", one_audio_frame);
     // 3 sec buffer..               
     wavbuf =
-            (uint8_t *)
+            (float *)
             ADM_alloc((4 * 3 *  channels * wavinfo->frequency));
     ADM_assert(wavbuf);
     // Call it twice to be sure it is properly setup

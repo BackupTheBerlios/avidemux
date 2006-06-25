@@ -19,13 +19,13 @@
                  class artsAudioDevice : public audioDevice
 	 {
 		 protected :
-		 			arts_stream_t _stream;
+		 		arts_stream_t _stream;
 		  public:
-		  			artsAudioDevice() {_stream=NULL;};
-				    virtual ~artsAudioDevice() {stop();;};
-		     		virtual uint8_t init( uint32_t channel,uint32_t fq ) ;
-	    			virtual uint8_t play( uint32_t len, uint8_t *data );		
-		      		virtual uint8_t stop( void ) ;
+		  			artsAudioDevice() {_stream=NULL;}
+				virtual ~artsAudioDevice() {stop();}
+		     		virtual uint8_t init(uint8_t channels, uint32_t fq);
+	    			virtual uint8_t play(uint32_t len, float *data);
+		      		virtual uint8_t stop(void);
 				uint8_t setVolume(int volume);
 		 };
 #endif

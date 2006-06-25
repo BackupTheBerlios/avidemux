@@ -77,28 +77,8 @@ uint8_t ADM_AudiocodecMP3::endDecompress( void )
     _head=_tail=0;
     return 1;
 }
-static inline signed int scale(mad_fixed_t sample)
-{
-signed int r;
-    /* round */
-    sample += (1L << (MAD_F_FRACBITS - 16));
 
-    /* clip */
-    if (sample >= MAD_F_ONE)
-	sample = MAD_F_ONE - 1;
-    else if (sample < -MAD_F_ONE)
-	sample = -MAD_F_ONE;
-
-    /* quantize */
-    r= sample >> (MAD_F_FRACBITS + 1 - 16);	
-// this was wrong    
-//#ifdef ADM_BIG_ENDIAN && 0 
-#if defined(ADM_BIG_ENDIAN)   && 0
-	r= (r>>8)+((r&0xff)<<8);	
-#endif
-  return r;
-}
-uint8_t ADM_AudiocodecMP3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecMP3::run(uint8_t * inptr, uint32_t nbIn, float *outptr, uint32_t * nbOut, ADM_ChannelMatrix *matrix)
 {
 int i;
 signed int Sample;
@@ -111,12 +91,11 @@ signed int Sample;
         _head=0;
      }
      ADM_assert(_tail+nbIn<ADM_MP3_BUFFER);
-     memcpy(_buffer+_tail,ptr,nbIn);
+     memcpy(_buffer+_tail,inptr,nbIn);
      _tail+=nbIn;
-     
+
      // Now feed to libmad
      mad_stream_buffer(Stream, _buffer+_head, _tail-_head);
-     int16_t *o=(int16_t *) outptr;
      while(1)
      {
          Stream->error = MAD_ERROR_NONE;
@@ -149,25 +128,20 @@ signed int Sample;
         }
 
         mad_synth_frame(Synth, Frame);
-        for (i = 0; i < Synth->pcm.length; i++)
-        {
-            /* Left channel */
-                Sample = scale(Synth->pcm.samples[0][i]);
-                *(o++) = Sample;
-                *nbOut += 2;
-                /* Right channel. If the decoded stream is monophonic then
-                 * the right output channel is the same as the left one.
-                */
-                // mean: in case of mono, we take only one channel....
-                if (MAD_NCHANNELS(&(Frame->header)) == 2)
-                {
-                    Sample = scale(Synth->pcm.samples[1][i]);
-                    *(o++) = Sample;
-                    *nbOut += 2;
-                }
-          }
-     
+	if (MAD_NCHANNELS(&(Frame->header)) == 2) {//Stereo
+		for (i = 0; i < Synth->pcm.length; i++) {
+			*(outptr++) = (float) mad_f_todouble(Synth->pcm.samples[0][i]);
+			*(outptr++) = (float) mad_f_todouble(Synth->pcm.samples[1][i]);
+		}
+		*nbOut += Synth->pcm.length * 2;
+	} else {//Mono
+		for (i = 0; i < Synth->pcm.length; i++) {
+			*(outptr++) = (float) mad_f_todouble(Synth->pcm.samples[0][i]);
+		}
+		*nbOut += Synth->pcm.length;
+	}
      }
+
      return 0;
 }
 

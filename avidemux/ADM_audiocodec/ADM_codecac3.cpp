@@ -34,9 +34,8 @@ extern "C" {
 };
 
 #define AC3_HANDLE ((a52_state_t *)ac3_handle)
-#define AC3_SAMPLE ((sample_t *)ac3_sample)
 
-static const int channel[15]=
+static const uint8_t channel[15]=
 {
     0,1,2,3,
     3,4,4,5,
@@ -112,19 +111,15 @@ uint8_t ADM_AudiocodecAC3::endDecompress( void )
     
     return 1;
 }
-/*
-    The memcpy to internal buffer is normally not needed, but just to be on the safe side....
-    
 
-*/
-uint8_t ADM_AudiocodecAC3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+
+uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   uint32_t *nbOut, ADM_ChannelMatrix *matrix)
 {
     uint32_t avail;
     uint32_t length;
-    int flags = 0, samprate = 0, bitrate = 0, chan = 2;
-    int16_t *ptrOut = (int16_t *) outptr;
+    int flags = 0, samprate = 0, bitrate = 0;
+    uint8_t chan = 2;
     *nbOut=0;
-
 
     //  Ready to decode
     while(nbIn)
@@ -135,7 +130,7 @@ uint8_t ADM_AudiocodecAC3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
                 printf("[a52]: no data to decode avail %u\n",nbIn);
             break;
         }
-        length = a52_syncinfo(ptr, &flags, &samprate, &bitrate);
+        length = a52_syncinfo(inptr, &flags, &samprate, &bitrate);
         if(length==0)
         {
             printf("[a52] No startcode found\n");
@@ -148,54 +143,44 @@ uint8_t ADM_AudiocodecAC3::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr, 
         }
         chan=channel[flags & A52_CHANNEL_MASK];
         ADM_assert(chan);
-        sample_t level = 32767, bias = 0;
-       
-        if (a52_frame(AC3_HANDLE, ptr, &flags, &level, bias))
+        sample_t level = 1, bias = 0;
+
+        if (a52_frame(AC3_HANDLE, inptr, &flags, &level, bias))
         {
             printf("\n A52_frame failed!");
-            ptr+=length;
+            inptr+=length;
             nbIn-=length;
-            *nbOut += 256 * 2 * chan*6;
+            *nbOut += 256 * chan * 6;
             break;
         };
-        ptr+=length;
+        inptr+=length;
         nbIn-=length;
-        *nbOut += 256 * 2 * chan*6;
-        if(matrix)   
+        *nbOut += 256 * chan * 6;
+        if(matrix)
         {
             matrix->nbChannel=channel[flags & A52_CHANNEL_MASK];
             matrix->channelConfiguration=AC3_CONF[flags & A52_CHANNEL_MASK];
-            
         }
-        for (int i = 0; i < 6; i++)
-        {
-            if (a52_block(AC3_HANDLE))
-            {
-                printf("\n A52_block failed! on fblock :%lu", i);
-                // in that case we silent out the chunk
-                memset(ptrOut, 0, 256 * 2 * chan);
-            }
-            // convert the float in ac3_sample to
-            // integer
-            else
-            {
-                {
-                    int16_t *cur;
-                    for(int k=0;k<chan;k++)
-                    {
-                        sample_t *sample=(sample_t *)ac3_sample;
-                        sample+=256*k;
-                        cur=ptrOut+k;
-                        for (int j = 0; j < 256; j++)
-                        {
-                            *cur = (int16_t) ceil(*sample++);
-                            cur+=chan;
-                        }
-                    }
-                    ptrOut+=chan*256;
-                }
-            }
-        } // 0.. 6
+
+	float *cur;
+	for (int i = 0; i < 6; i++) {
+		if (a52_block(AC3_HANDLE)) {
+			printf("\n A52_block failed! on fblock :%lu", i);
+			// in that case we silent out the chunk
+			memset(outptr, 0, 256 * chan * sizeof(float));
+		} else {
+			for (int k = 0; k < chan; k++) {
+				sample_t *sample=(sample_t *)ac3_sample;
+				sample += 256 * k;
+				cur = outptr + k;
+				for (int j = 0; j < 256; j++) {
+					*cur = *sample++;
+					cur+=chan;
+				}
+			}
+		}
+		outptr += chan * 256;
+        }
     }
     return 1; 
 

@@ -19,18 +19,15 @@
 	 class alsaAudioDevice : public audioDevice
 	 {
 		 protected :
-				 uint32_t 	_freq;
-				 uint32_t _channels;
-
-				 //	0-> no init done
-				 //	1-> device opened but init failed
-				 //	2->fully initialized
-				 uint32_t _init;
+				//	0-> no init done
+				//	1-> device opened but init failed
+				//	2->fully initialized
+				uint32_t _init;
 		  public:
-		  			alsaAudioDevice(void);
-		     		virtual uint8_t init( uint32_t channel,uint32_t fq ) ;
-	    			virtual uint8_t play( uint32_t len, uint8_t *data ) ;
-		      		virtual uint8_t stop( void ) ;
+					alsaAudioDevice(void);
+		     		virtual uint8_t init(uint8_t channel,uint32_t fq);
+	    			virtual uint8_t play(uint32_t len, float *data);
+		      		virtual uint8_t stop(void) ;
 				uint8_t setVolume(int volume);
 		 }     ;
 #endif

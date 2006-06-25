@@ -40,7 +40,7 @@
  
 
 #include "ADM_library/default.h"
-#include "audio_out.h"
+#include "ADM_audiodevice.h"
 #include <ADM_assert.h>
 #include  "ADM_audiodevice/ADM_deviceoss.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -100,10 +100,11 @@ uint8_t  ossAudioDevice::stop(void) {
 //
 //
 //_______________________________________________
-uint8_t ossAudioDevice::init(uint32_t channel, uint32_t fq) 
+uint8_t ossAudioDevice::init(uint8_t channels, uint32_t fq) 
 {
-	
-    printf("\n OSS  : %lu Hz, %lu channels", fq, channel);
+	_channels = channels;
+ 
+    printf("\n OSS  : %lu Hz, %lu channels", fq, channels);
     // open OSS device
     oss_fd = open(dsp, O_WRONLY | O_NONBLOCK);
     if (oss_fd == -1) {
@@ -120,13 +121,13 @@ uint8_t ossAudioDevice::init(uint32_t channel, uint32_t fq)
         printf("\n Error setting up OSS(SPEED): Error : %d", errno);
         return 0;
     }
-    if (channel > 2) {
-        if (ioctl (oss_fd, SNDCTL_DSP_CHANNELS, &channel) < 0) {
+    if (channels > 2) {
+        if (ioctl (oss_fd, SNDCTL_DSP_CHANNELS, &channels) < 0) {
 	    printf("\n Error setting up OSS(CHANNELS): Error : %d", errno);
 	    return 0;
         }
     } else {
-        int chan = channel - 1;
+        int chan = channels - 1;
         if (ioctl (oss_fd, SNDCTL_DSP_STEREO, &chan) < 0) {
 	    printf("\n Error setting up OSS(STEREO): Error : %d", errno);
 	    return 0;
@@ -149,15 +150,18 @@ uint8_t ossAudioDevice::init(uint32_t channel, uint32_t fq)
 //
 //
 //_______________________________________________
-uint8_t ossAudioDevice::play(uint32_t nb,uint8_t * ptr)
- {
-    uint32_t w;
+uint8_t ossAudioDevice::play(uint32_t len, float *data)
+{
+	uint32_t w;
 
-    if (!oss_fd)
-	return 0;
-    w = write(oss_fd, ptr, nb);
+	if (!oss_fd)
+		return 0;
 
-    return 1;
+	dither16bit(len, data);
+
+	w = write(oss_fd, data, len*2);
+
+	return 1;
 }
 #else
 void dummy_oss_func( void);

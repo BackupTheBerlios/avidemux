@@ -149,7 +149,7 @@
  }
  // This codec expects more or less one packet at a time !
  
- uint8_t ADM_vorbis::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+ uint8_t ADM_vorbis::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
 {
 ogg_packet packet;
 float **sample_pcm;
@@ -160,7 +160,7 @@ int	nb_synth;
 	packet.b_o_s=0;
 	packet.e_o_s=0;
 	packet.bytes=nbIn;
-	packet.packet=ptr;
+	packet.packet=inptr;
         packet.granulepos=-1;
 	if(!vorbis_synthesis(&STRUCT->vblock,&packet))
 	{
@@ -173,31 +173,12 @@ int	nb_synth;
 		return 0;
 	 }
 	 
-	 // Now convert the float / per channel samples to interleaved 16 bits pcm audio
- 
- 	 float scale =   32767.f * STRUCT->ampscale;
-	 int16_t *out;
-	 int channels,val;	 
+	 for (uint32_t samp = 0; samp < nb_synth; samp++)
+	 	for (uint8_t chan = 0; chan < STRUCT->vinfo.channels; chan++)
+			*outptr++ = sample_pcm[chan][samp] * STRUCT->ampscale;
 
-	 
-	 channels=STRUCT->vinfo.channels;
-	 out=(int16_t *)outptr;
-	 *nbOut=channels*2*nb_synth;
-	 
-	 for(uint32_t samp=0;samp<nb_synth;samp++)
-	 {
-	 for(uint32_t chan=0;chan<channels;chan++)
-	 {
-	 	     
-	        val=(int)floor(sample_pcm[chan][samp]*scale);
-		
-		if(val>32767)	
-		  	val=32767;
-		if(val<-32768)
-		  	val=-32768;
-		*out++=val;      
-	  }
-	  }
+	 *nbOut = STRUCT->vinfo.channels * nb_synth;
+
 	// Puge them
 	 vorbis_synthesis_read(&STRUCT->vdsp,nb_synth); 
 	 aprintf("This round : in %d bytes, out %d bytes synthetized:%d\n",nbIn,*nbOut,nb_synth);

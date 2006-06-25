@@ -27,7 +27,7 @@ protected:
 	 uint32_t	_incoming_frame;
          uint32_t 	grab(uint8_t *obuffer);
 	 void  		*_handle;
-	 uint8_t	dropBuffer[SIZE_INTERNAL];
+	 float		dropBuffer[SIZE_INTERNAL];
 	 uint64_t	_oldpos;
 	 uint32_t	_extraLen;
 	 uint8_t	*_extraData;

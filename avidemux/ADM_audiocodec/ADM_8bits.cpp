@@ -47,30 +47,18 @@ ADM_Audiocodec8Bits::~ADM_Audiocodec8Bits( )
 {
 
 }
-uint8_t ADM_Audiocodec8Bits::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+uint8_t ADM_Audiocodec8Bits::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
 {
-	uint32_t n=0;
-	int16_t o;
-	int16_t *pout;
-	int8_t *pin;
-
-	pout=(int16_t *)outptr;
-	pin=(int8_t *)ptr;
-
-	for(n=nbIn;n>0;n--)
-	{
+	for (int n = 0; n < nbIn; n++) {
 		if(_unsign)
-			o=(*pin-128);
+			*(outptr++) = (*inptr - 128) / 256;
 		else
-			o=*pin;			
-		o*=256;
-		*pout=o;
-		pin++;
-		pout++;
+			*(outptr++) = *inptr / 256;
+		inptr++;
 	}
-	*nbOut=nbIn<<1;
-	return 1;
+	*nbOut=nbIn;
 
+	return 1;
 }
 
 

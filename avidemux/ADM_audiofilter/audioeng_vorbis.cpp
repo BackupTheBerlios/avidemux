@@ -178,13 +178,11 @@ uint32_t len,sam;
 uint8_t	AVDMProcessAudio_Vorbis::getPacket(uint8_t *dest, uint32_t *len, 
 					uint32_t *samples)
 {
-int16_t  *buf=(int16_t *)dropBuffer;
 uint32_t nbSample=0;
-uint32_t rdall=0,asked,rd;
-int wr;
-float s;
+uint32_t asked,rd;
+float **float_samples;
 ogg_packet op ;
-uint64_t total=0;
+//uint64_t total=0;
 #define FRAME 1024
 #define ROUNDMAX 3000
 
@@ -199,70 +197,41 @@ while(count--)
 	vorbis_bitrate_addblock(&VB) ;
 	//printf("Blockout\n");
 	
-	if(vorbis_bitrate_flushpacket(&VD, &op)) 
-	{
-		if(op.bytes<2) continue; // avoid the 1byte sized packet
-		
-            
-	    memcpy(dest, op.packet,op.bytes);
-	    *len=op.bytes;
-	    *samples=op.granulepos-_oldpos;
-	    _oldpos=op.granulepos;
-	  //  aprintf("1st packet :sampl:%lu len :%lu sample:%lu abs:%llu\n",*samples,op.bytes,total,op.granulepos);
-	    return 1;
-	}
+		if(vorbis_bitrate_flushpacket(&VD, &op)) 
+		{
+			if(op.bytes<2) continue; // avoid the 1byte sized packet
+
+			memcpy(dest, op.packet,op.bytes);
+			*len=op.bytes;
+			*samples=op.granulepos-_oldpos;
+			_oldpos=op.granulepos;
+			//  aprintf("1st packet :sampl:%lu len :%lu sample:%lu abs:%llu\n",*samples,op.bytes,total,op.granulepos);
+			return 1;
+		}
         }
 
-	asked=FRAME*2*_wavheader->channels;
-	rd=_instream->read(asked,(uint8_t *)buf);
+	asked=FRAME*_wavheader->channels;
+	rd=_instream->read(asked,(float *)dropBuffer);
+
 	if(!rd)
 	{
 		rd=asked;
-		memset(buf,0,rd);
+		memset(dropBuffer,0,rd);
 		printf("Vorbis : No audio : padding\n");
-	
 	}
-
-	nbSample=rd/(2*_wavheader->channels);
+	nbSample=rd/_wavheader->channels;
 	
-	total+=nbSample;
+	//total+=nbSample;
 	//aprintf("Nb Sample:%lu\n",nbSample);
 	// Now we got out samples, encode them
-	float **float_samples;
-	
 	float_samples=vorbis_analysis_buffer(&VD, nbSample) ;
 	
 	// Put our samples in incoming buffer
-	switch(_wavheader->channels)
-	{
-		case 1:
-			{
-			for(int i=0;i<nbSample;i++)
-			{
-				s=buf[i];
-				s/=32768.;
-			 	float_samples[0][i]=s;
-			}
-			}
-			break;
-		case 2:
-			{
-			for(int i=0;i<nbSample;i++)
-			{
-				s=buf[i*2];
-				s/=32768.;
-			 	float_samples[0][i]=s;
-				s=buf[i*2+1];
-				s/=32768.;
-			 	float_samples[1][i]=s;
-
-			}
-			}
-			break;
-		default:
-			ADM_assert(0);
-
-	
+	for (int i = 0; i < nbSample; i++)
+		for (int j = 0; j < _wavheader->channels; j++) {
+			float_samples[j][i] = dropBuffer[i * _wavheader->channels + j];
+			if (float_samples[j][i] > 1) float_samples[j][i] = 1;
+			if (float_samples[j][i] < -1) float_samples[j][i] = -1;
 	}
 	// Buffer full, go go go
 	 vorbis_analysis_wrote(&VD, nbSample) ; 

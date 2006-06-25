@@ -43,7 +43,7 @@
 
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
-#include "ADM_audiodevice/ADM_deviceoss.h"
+#include "ADM_audiodevice.h"
 #include "ADM_audiodevice/ADM_deviceWin32.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME  MODULE_ADEVICE
@@ -116,12 +116,12 @@ uint8_t  win32AudioDevice::stop(void)
 //
 //
 //_______________________________________________
-uint8_t win32AudioDevice::init(uint32_t channel, uint32_t fq) 
+uint8_t win32AudioDevice::init(uint8_t channels, uint32_t fq) 
 {
-	
-
 WAVEFORMATEX wav;
 		
+	_channels = channels;
+
 		printf("Opening Win32 Audio, fq=%d\n",fq);
 
 		if(_inUse) 
@@ -143,9 +143,9 @@ WAVEFORMATEX wav;
 		
 		wav.wFormatTag=WAVE_FORMAT_PCM;
 		wav.nSamplesPerSec=fq;
-		wav.nChannels=channel;
-		wav.nBlockAlign=2*channel;
-		wav.nAvgBytesPerSec=2*channel*fq;		
+		wav.nChannels=channels;
+		wav.nBlockAlign=2*channels;
+		wav.nAvgBytesPerSec=2*channels*fq;		
 		wav.wBitsPerSample=16;
 		
 		myError=waveOutOpen(&myDevice,WAVE_MAPPER,
@@ -190,12 +190,14 @@ uint8_t  win32AudioDevice::setVolume(int volume)
 //
 //
 //_______________________________________________
-uint8_t win32AudioDevice::play(uint32_t nb,uint8_t * ptr)
+uint8_t win32AudioDevice::play(uint32_t len, float *data)
  {
  uint32_t av=0;
 	WAVEHDR *hdr;
 
-   ADM_assert(nb<BUCKET_SIZE);
+	dither16bit(len, data);
+	len = len * 2;
+   ADM_assert(len<BUCKET_SIZE);
    // First do clean up
 #if 0   
       for(uint32_t i=0;i<NB_BUCKET;i++)
@@ -221,8 +223,8 @@ uint8_t win32AudioDevice::play(uint32_t nb,uint8_t * ptr)
    {
       if(buckets[i].fre)
       {
-            memcpy(buckets[i].hdr.lpData,ptr,nb);
-            buckets[i].hdr.dwBufferLength=nb;
+            memcpy(buckets[i].hdr.lpData,data,len);
+            buckets[i].hdr.dwBufferLength=len;
             buckets[i].fre=0;
             hdr=&(buckets[i].hdr);
             myError=waveOutWrite(

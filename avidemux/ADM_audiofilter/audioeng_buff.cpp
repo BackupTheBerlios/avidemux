@@ -94,4 +94,53 @@ more:
     goto more;
 };
 
+uint32_t AVDMBufferedAudioStream::read(uint32_t len, float *buffer)
+{
+    uint32_t avail = 0;
+    uint32_t got = 0;
+    uint32_t grabbed;
+    // this disable the filter
+    // return _instream->read(len,buffer);
+
+more:
+
+
+    // have we already got what's needed ?
+    avail=_tailBuff-_headBuff;
+ //    printf("\n asked : %lu, available : %lu",len,avail);  
+    // got everything ?
+    if (avail >= len)
+      {	
+	  memcpy(buffer, internalBuffer_float + _headBuff, sizeof(float) * len);
+	  _headBuff+=len;
+	  got+=len;
+//	  printf("Got : %lu\n",got);
+	  return got;
+      }
+    // first empty what was available
+    memcpy(buffer, internalBuffer_float + _headBuff, sizeof(float) * avail);
+
+    got+=avail;
+    len -= avail;
+    buffer+=avail;
+    _headBuff+=avail;
+
+
+    // rewind to beginning
+    _tailBuff=_headBuff=0;
+
+    //printf("\n grabing...");
+    grabbed = grab(internalBuffer_float);
+  //  printf("grabbed :%lu\n",grabbed);
+    // Minus one means we could not get a single byte
+    if (grabbed == MINUS_ONE)
+      {
+	  printf("\n ** end stream **\n");
+	  _tailBuff=_headBuff=0;	
+	  return got;		// we got everything  !
+      }
+    _tailBuff+=grabbed;
+    goto more;
+};
+
 // EOF

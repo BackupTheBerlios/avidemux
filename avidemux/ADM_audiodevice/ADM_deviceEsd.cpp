@@ -30,12 +30,10 @@
  
 
 #include "ADM_library/default.h"
-#include "audio_out.h"
+#include "ADM_audiodevice.h"
 #include <ADM_assert.h>
 #include "ADM_audiodevice/ADM_deviceoss.h"
-#ifdef ALSA_SUPPORT
 #include "ADM_audiodevice/ADM_deviceALSA.h"
-#endif
 #include  "ADM_audiodevice/ADM_deviceEsd.h"
 #include "ADM_toolkit/toolkit.hxx"
 
@@ -60,15 +58,16 @@ uint8_t  esdAudioDevice::stop(void) {
 //
 //
 //_______________________________________________
-uint8_t esdAudioDevice::init(uint32_t channel, uint32_t fq) 
+uint8_t esdAudioDevice::init(uint8_t channels, uint32_t fq) 
 {
 esd_format_t format;
+_channels = channels;
 
     format=ESD_STREAM | ESD_PLAY | ESD_BITS16;
-    if(channel==1) format|=ESD_MONO;
+    if(channels==1) format|=ESD_MONO;
         else format|=ESD_STEREO;
 
-    printf("\n ESD  : %lu Hz, %lu channels", fq, channel);
+    printf("\n ESD  : %lu Hz, %lu channels", fq, channels);
     esdDevice=esd_play_stream(format,fq,NULL,"avidemux");
     if(esdDevice<=0) 
     {
@@ -90,10 +89,11 @@ esd_format_t format;
 //
 //
 //_______________________________________________
-uint8_t esdAudioDevice::play(uint32_t nb,uint8_t * ptr)
- {
-    write(esdDevice,ptr, nb);
-    return 1;
+uint8_t esdAudioDevice::play(uint32_t len, float *data)
+{
+	dither16bit(len, data);
+	write(esdDevice, data, len*2);
+	return 1;
 }
 
 uint8_t esdAudioDevice::setVolume(int volume){

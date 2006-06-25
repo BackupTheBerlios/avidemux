@@ -33,7 +33,8 @@
 #include <AudioToolbox/DefaultAudioOutput.h>
 
 #include <ADM_assert.h>
-#include "ADM_audiodevice/ADM_deviceoss.h"
+#include "ADM_audiodevice.h"
+#include "ADM_audiodevice/ADM_deviceAudioCore.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME  MODULE_ADEVICE
 #include "ADM_toolkit/ADM_debug.h"
@@ -165,10 +166,9 @@ OSStatus	MyRenderer(	void 				*inRefCon,
 //
 //
 //_______________________________________________
-uint8_t coreAudioDevice::init(uint32_t channel, uint32_t fq) 
+uint8_t coreAudioDevice::init(uint8_t channels, uint32_t fq) 
 {
-	
-
+_channels = channels;
 OSStatus 		err;
 ComponentDescription 	desc;
 AudioUnitInputCallback 	input;
@@ -217,10 +217,10 @@ UInt32			kFramesPerSlice=512;
 								| kLinearPCMFormatFlagIsBigEndian
 								| kLinearPCMFormatFlagIsPacked;
 
-	streamFormat.mBytesPerPacket = channel * sizeof (UInt16);	
+	streamFormat.mBytesPerPacket = channels * sizeof (UInt16);	
 	streamFormat.mFramesPerPacket = 1;	
-	streamFormat.mBytesPerFrame = channel * sizeof (UInt16);		
-	streamFormat.mChannelsPerFrame = channel;	
+	streamFormat.mBytesPerFrame = channels * sizeof (UInt16);		
+	streamFormat.mChannelsPerFrame = channels;	
 	streamFormat.mBitsPerChannel = sizeof (UInt16) * 8;	
 	
 	verify_noerr(AudioUnitSetProperty(
@@ -266,13 +266,14 @@ UInt32			kFramesPerSlice=512;
 //
 //
 //_______________________________________________
-uint8_t coreAudioDevice::play(uint32_t nb,uint8_t * ptr)
+uint8_t coreAudioDevice::play(uint32_t len, float *data)
  {
  	// First put stuff into the buffer
 	uint8_t *src;
-	uint32_t nb_sample,left;
+	uint32_t left;
 
-	nb_sample=nb>>1;
+	dither16bit(len, data);
+
 	pthread_mutex_lock(&lock);
 
 	// Check we have room left
@@ -284,7 +285,7 @@ uint8_t coreAudioDevice::play(uint32_t nb,uint8_t * ptr)
 	{
 		left=rd_ptr-wr_ptr;
 	}
-	if(nb_sample+1>left)
+	if(len+1>left)
 	{
 		printf("AudioCore:Buffer full!\n");
 		pthread_mutex_unlock(&lock);
@@ -293,19 +294,19 @@ uint8_t coreAudioDevice::play(uint32_t nb,uint8_t * ptr)
 
 	// We have room left, copy it
 	src=(uint8_t *)&audioBuffer[wr_ptr];
-	if(wr_ptr+nb_sample<BUFFER_SIZE)
+	if(wr_ptr+len<BUFFER_SIZE)
 	{
-		memcpy(src,ptr,nb_sample*2);
-		wr_ptr+=nb_sample;
+		memcpy(src,data,len*2);
+		wr_ptr+=len;
 	}
 	else
 	{
 		left=BUFFER_SIZE-wr_ptr-1;
-		memcpy(src,ptr,left*2);
-		memcpy(audioBuffer,ptr+left*2,(nb_sample-left)*2);
-		wr_ptr=nb_sample-left;	
+		memcpy(src,data,left*2);
+		memcpy(audioBuffer,data+left*2,(len-left)*2);
+		wr_ptr=len-left;	
 	}
-	aprintf("AudioCore: Putting %lu bytes rd:%lu wr:%lu \n",nb,rd_ptr,wr_ptr);
+	//aprintf("AudioCore: Putting %lu bytes rd:%lu wr:%lu \n",len*2,rd_ptr,wr_ptr);
 	pthread_mutex_unlock(&lock);	
  	if(!frameCount)
 	{

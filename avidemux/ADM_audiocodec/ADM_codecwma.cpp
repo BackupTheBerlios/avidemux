@@ -89,7 +89,7 @@
 /*-------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------*/
 
-uint8_t ADM_AudiocodecWMA::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecWMA::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
 {
 int out=0;
 int max=0,pout=0;
@@ -104,7 +104,7 @@ int max=0,pout=0;
         }
         //
         ADM_assert(nbIn+_tail<ADMWA_BUF);
-        memcpy(_buffer+_tail,ptr,nbIn);
+        memcpy(_buffer+_tail,inptr,nbIn);
         _tail+=nbIn;
         while(_tail-_head>_blockalign)
         {
@@ -120,6 +120,9 @@ int max=0,pout=0;
                 *nbOut+=pout;
                 outptr+=pout;
         }
+	*nbOut = *nbOut / 2;
+	int2float(outptr, *nbOut);
+
         return 1;
 }
 ///************************************************
@@ -169,7 +172,7 @@ int max=0,pout=0;
 /*-------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------*/
 #define AMR_PACKET 32
-uint8_t ADM_AudiocodecAMR::run( uint8_t * ptr, uint32_t nbIn, uint8_t * outptr,   uint32_t * nbOut,ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecAMR::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
 {
 int out;
 int max=0,pout=0,toread;
@@ -184,7 +187,7 @@ int max=0,pout=0,toread;
         }
         //
         ADM_assert(nbIn+_tail<ADM_AMR_BUFFER);
-        memcpy(_buffer+_tail,ptr,nbIn);
+        memcpy(_buffer+_tail,inptr,nbIn);
         _tail+=nbIn;
         while(_tail-_head>AMR_PACKET)
         {
@@ -192,7 +195,7 @@ int max=0,pout=0,toread;
                 
                 if(out<0)
                 {
-                        printf( " *** WMA decoding error ***\n");
+                        printf( " *** AMR decoding error ***\n");
                         _head+=1; // Try skipping some bytes
                         continue;
                 }
@@ -200,8 +203,10 @@ int max=0,pout=0,toread;
                 _head+=out; // consumed bytes
                 *nbOut+=pout;
                 outptr+=pout;
-
         }
+	*nbOut = *nbOut / 2;
+	int2float(outptr, *nbOut);
+
         return 1;
 }
 
