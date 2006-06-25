@@ -404,7 +404,21 @@ uint32_t left,ww;
 
         if(refOnly)
         {       // This is only an empty Shell
-                tmpImage=new ADMImage(_imageBuffer->_width,_imageBuffer->_height,1);
+                uint32_t w,h;
+                if(_scratch) // Can we reuse the old scratch memory ?
+                {
+                    _scratch->getWidthHeight(&w,&h);
+                    if(w!=_imageBuffer->_width || _imageBuffer->_height!=h)
+                    {
+                        delete _scratch;
+                        _scratch=NULL;
+                    }
+                }
+                if(!_scratch)
+                {
+                  _scratch=new ADMImage(_imageBuffer->_width,_imageBuffer->_height,1);
+                }
+                tmpImage=_scratch;
                 ww=_imageBuffer->_width & 0xfffff0;
                 left=_imageBuffer->_width & 0xf;
 
@@ -429,8 +443,6 @@ uint32_t left,ww;
                         {
                                 image->duplicate(prev);
                                 cache->updateFrameNum(image,frame);
-                                if(refOnly)
-                                        delete tmpImage;
                                 return 1;
                         }
                 }
@@ -458,7 +470,7 @@ uint32_t left,ww;
 		image->_Qp=2;
 		image->duplicate(tmpImage);
 		cache->updateFrameNum(image,frame);
-                if(refOnly) delete tmpImage;
+          //      if(refOnly) delete tmpImage;
 		aprintf("EdCache: No quant avail\n");
 		return 1;
 	}
@@ -491,7 +503,7 @@ uint32_t left,ww;
          {
                 dupe(tmpImage,image,&(_videos[seg]));
 		cache->updateFrameNum(image,frame);
-                if(refOnly) delete tmpImage;
+               // if(refOnly) delete tmpImage;
 		aprintf("EdCache: Postproc disabled\n");
 		return 1;	
 	}
@@ -615,7 +627,7 @@ uint32_t left,ww;
                 }
 _next:
                 // update some infos
-                if(refOnly) delete tmpImage;
+             //   if(refOnly) delete tmpImage;
 		cache->updateFrameNum(image,frame);
 		aprintf("EdCache: Postproc done\n");
 		return 1;	

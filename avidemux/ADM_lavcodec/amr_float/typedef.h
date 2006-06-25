@@ -11,12 +11,16 @@
 
 #ifndef _TYPEDEF_H
 #define _TYPEDEF_H
+#include "config.h"
+#include "../../ADM_library/default.h"
+#if 0 //MEANX
 
-typedef char Word8;
-typedef unsigned char UWord8;
-typedef short Word16;
-typedef long Word32;
-typedef float Float32;
-typedef double Float64;
-
+#else
+#define Word8	int8_t
+#define UWord8	uint8_t
+#define Word16	int16_t
+#define Word32	int32_t
+#define Float32	float
+#define Float64 double
+#endif
 #endif

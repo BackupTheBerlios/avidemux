@@ -50,28 +50,28 @@
        :  ADM_Audiocodec(fourcc)
  {
     _tail=_head=0;
-    ADM_assert(fourcc==WAV_WMA);	
+    ADM_assert(fourcc==WAV_WMA || fourcc==WAV_QDM2);	
     _contextVoid=(void *)avcodec_alloc_context();
     ADM_assert(_contextVoid);
     // Fills in some values...
     _context->sample_rate = info->frequency;
-    
     _context->channels = info->channels;
-    /*
-    _context->bit_rate = info->byterate<<3; // byte -> bits
-    */
-//    _context->fourcc = fourcc;
-    _context->block_align = info->blockalign;       // ...
-    _context->codec_id = CODEC_ID_WMAV2;
+    _context->block_align = info->blockalign;      
+    if(fourcc==WAV_WMA)
+        _context->codec_id = CODEC_ID_WMAV2;
+    else
+        if(fourcc==WAV_QDM2)
+        _context->codec_id = CODEC_ID_QDM2;
+            else ADM_assert(0);
+
     _blockalign=info->blockalign;
-  
     _context->extradata=(void *)d;
     _context->extradata_size=(int)l;
 
     printf(" Using %ld bytes of extra header data\n",l);
     mixDump((uint8_t *)_context->extradata,_context->extradata_size);
 
-   AVCodec *codec=avcodec_find_decoder(CODEC_ID_WMAV2);
+   AVCodec *codec=avcodec_find_decoder(_context->codec_id);
    if(!codec) {GUI_Error_HIG("Internal error", "Cannot open WMA2 codec.");ADM_assert(0);} 
     if (avcodec_open(_context, codec) < 0)
     {
@@ -109,18 +109,16 @@ int max=0,pout=0;
         while(_tail-_head>_blockalign)
         {
                 out=avcodec_decode_audio(_context,(int16_t *)outptr,&pout,_buffer+_head,_tail-_head);
-                //printf("Align:%d In: %d out:%d\n",_blockalign,out,pout);
                 if(out<0)
                 {
                         printf( " *** WMA decoding error ***\n");
                         _head+=1; // Try skipping some bytes
                         continue;
                 }
-            
+                //printf("This round %d Consumed %d produced %d\n",_tail-_head,out,pout);
                 _head+=out; // consumed bytes
                 *nbOut+=pout;
                 outptr+=pout;
-
         }
         return 1;
 }
@@ -135,7 +133,7 @@ int max=0,pout=0;
             _tail=_head=0;
             return 1;
    };
-   
+/* AMR specific */
  ADM_AudiocodecAMR::ADM_AudiocodecAMR(uint32_t fourcc,WAVHeader *info)
        :  ADM_Audiocodec(fourcc)
  {

@@ -460,7 +460,7 @@ void  DestroyHuffTree( HUFF_ENTRY * * root_ptr)
         }    
         
         // Once all sub trees to this node are destroyed then free the memory for this node. 
-        free( (char *) *root_ptr );
+        SystemGlobalFree( (char *) *root_ptr );
         *root_ptr = NULL;
     }
 }

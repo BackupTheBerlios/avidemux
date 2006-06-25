@@ -97,7 +97,7 @@ static int              slaveRunning=0;
 
 static  vector<IBitStream *> inputs;
 
-static int slaveThread( void );
+static int slaveThread( WAVHeader *audioheader );
 
 admMutex mutex_slaveThread_problem;
 admCond  *cond_slaveThread_problem;
@@ -120,13 +120,22 @@ mplexMuxer::~mplexMuxer()
         close();
 }
 //___________________________________________________________________________
+uint8_t mplexMuxer::audioEof(void)
+{
+        channelaudio->abort();
+}
+
+//___________________________________________________________________________
 uint8_t mplexMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader)
 {
         printf("Opening mplex muxer (%s)\n",filename);
         _running=1;
-     
-        channelaudio=new Transfert();
-        channelvideo=new Transfert();
+#define MIN_BUFFER (1024*1024)
+        if(audioheader->encoding==WAV_LPCM)
+            channelaudio=new Transfert(2*MIN_BUFFER);
+        else
+            channelaudio=new Transfert(MIN_BUFFER);
+        channelvideo=new Transfert(0);
         
         outputStream=new FileOutputStream ( filename );
         
@@ -149,25 +158,45 @@ uint8_t mplexMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE
         
         pthread_t slave;
         slaveRunning=1;
-        ADM_assert(!pthread_create(&slave,NULL,(THRINP)slaveThread,NULL));
+        ADM_assert(!pthread_create(&slave,NULL,(THRINP)slaveThread,audioheader));
 
         WAIT1();        
         
         printf("Init ok\n");
         return 1;
 }
-int slaveThread( void )
+static uint8_t wavToStreamType(WAVHeader *hdr,mplexStreamDescriptor *desc)
+{
+    ADM_assert(hdr);
+    desc->frequency=hdr->frequency;
+    desc->channel=hdr->channels;
+    switch(hdr->encoding)
+    {
+        case WAV_LPCM:  desc->kind= LPCM_AUDIO;break;
+        case WAV_AC3:   desc->kind=  AC3_AUDIO;;break;
+        case WAV_MP2: case WAV_MP3:   desc->kind=  MPEG_AUDIO;;break;
+        case WAV_DTS:    desc->kind=  DTS_AUDIO;;break;
+        default: return 0;
+    }
+  return 1;
+}
+extern const char *getStrFromAudioCodec( uint32_t codec);
+int slaveThread( WAVHeader *audioheader )
 {
         MultiplexJob job;
+        mplexStreamDescriptor audioDesc;
+        mplexStreamDescriptor videoDesc;
+
         printf("Slave thread : creating job & muxer\n");
 
         
         printf("output file created\n");
+        wavToStreamType(audioheader,&audioDesc);
+        audioin=new IFileBitStream(channelaudio,&audioDesc);
         
-        audioin=new IFileBitStream(channelaudio);
-        
-        printf("audio done, creating video bitstream\n");
-        videoin=new IFileBitStream(channelvideo);
+        printf("audio done (%s), creating video bitstream\n",getStrFromAudioCodec(audioheader->encoding));
+        videoDesc.kind=MPEG_VIDEO;
+        videoin=new IFileBitStream(channelvideo,&videoDesc);
         
         printf("Both stream ready\n");
          

@@ -108,12 +108,14 @@ uint32_t videoExtraDataSize=0;
 uint8_t  *videoExtraData=NULL;
 uint8_t *dummy,err;
 WAVHeader *audioinfo=NULL;
-int prefill=1;
+int prefill=0;
 uint32_t displayFrame=0;
 ADMBitstream    bitstream;
 uint32_t        frameWrite=0;
 ADM_MUXER_TYPE muxerType=MUXER_MP4;
-
+uint8_t dualPass=0;
+uint8_t r=0;
+uint32_t skipping=1;
            if(type==ADM_PSP)
                muxerType=MUXER_PSP;
            else
@@ -143,28 +145,33 @@ ADM_MUXER_TYPE muxerType=MUXER_MP4;
                 }
 
                 // init compressor
-                  if (!_encode->configure (_incoming))
-                {
-                        GUI_Error_HIG ("Filter init failed", NULL);
-                        goto  stopit;
-                };
-                
                 encoding_gui->setContainer("MP4");
                 encoding_gui->setAudioCodec("None");
                 if(!videoProcessMode())
                         encoding_gui->setCodec("Copy");
                 else
                         encoding_gui->setCodec(_encode->getDisplayName());
-                if (_encode->isDualPass ())
+                TwoPassLogFile=new char[strlen(name)+6];
+                strcpy(TwoPassLogFile,name);
+                strcat(TwoPassLogFile,".stat");
+                _encode->setLogFile(TwoPassLogFile,total);
+
+                if (!_encode->configure (_incoming))
                 {
-                        TwoPassLogFile=new char[strlen(name)+6];
-                        strcpy(TwoPassLogFile,name);
-                        strcat(TwoPassLogFile,".stat");
-                        _encode->setLogFile(TwoPassLogFile,total);
+                     GUI_Error_HIG ("Filter init failed", NULL);
+                     goto  stopit;
+                };
+
+                dualPass=_encode->isDualPass();
+                if(dualPass)
+                {
+                       
                         if(!prepareDualPass(videoBuffer,TwoPassLogFile,encoding_gui,_encode,total))
                                 goto stopit;
                 }else
+                {
                         encoding_gui->setPhasis ("Encoding");
+                }
                 
                 info.width=_incoming->getInfo()->width;
                 info.height=_incoming->getInfo()->height;
@@ -183,12 +190,19 @@ ADM_MUXER_TYPE muxerType=MUXER_MP4;
              
              ADM_assert(_encode);
              bitstream.data=videoBuffer;
+             
+preFilling:
              bitstream.cleanup(0);
-             if(!(err=_encode->encode ( 0, &bitstream)))//&len, videoBuffer, &flags,&displayFrame))
+             if(!(err=_encode->encode ( prefill, &bitstream)))//&len, videoBuffer, &flags,&displayFrame))
              {
                         printf("MP4:First frame error\n");
                         GUI_Error_HIG ("Error while encoding", NULL);
                         goto  stopit;
+              }
+              if(!bitstream.len)
+              {
+                prefill++;
+                goto preFilling;
               }
               if(!bitstream.flags & AVI_KEY_FRAME)
               {
@@ -278,15 +292,27 @@ ADM_MUXER_TYPE muxerType=MUXER_MP4;
                }
                ADM_assert(_encode);
                bitstream.cleanup(frameWrite);
-               if(!_encode->encode ( frame, &bitstream))//&len, videoBuffer, &flags,&displayFrame))
+               if(!prefill || frame+prefill<total) 
+               {
+                  r=_encode->encode ( prefill+frame, &bitstream);
+               }
+                else
+                {
+                    r=_encode->encode ( total-1, &bitstream);
+                }
+               if(!r)
                {
                         printf("MP4:Frame %u error\n",frame);
                         GUI_Error_HIG ("Error while encoding", NULL);
                         goto  stopit;
                 }
-                // If the encoder pops empty frames at the beginning, wait a bit
-                if(bitstream.len) prefill=0;
-                if(!bitstream.len && prefill) continue; // Prefilling encoder if needed
+                if(!bitstream.len && skipping)
+                {
+                    printf("Frame skipped (xvid ?)\n");
+                    continue;
+                }
+                skipping=0;
+            //    printf("Prefill %u FrameWrite :%u Frame %u PtsFrame :%u\n",prefill,frameWrite,frame,bitstream.ptsFrame);
                 frameWrite++;
                 muxer->writeVideoPacket( &bitstream);
 

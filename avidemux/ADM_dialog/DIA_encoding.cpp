@@ -71,7 +71,10 @@ uint32_t useTray=0;
 	gtk_widget_show(dialog);
 //	gtk_window_set_modal(GTK_WINDOW(dialog), 1);
         if(useTray)
+	{
+               gtk_window_iconify(GTK_WINDOW(dialog));
 	       UI_iconify();
+	}
 	_lastTime=0;
 	_lastFrame=0;
 	_fps_average=0;
@@ -166,7 +169,7 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 {
 	uint32_t tim;
 #define  ETA_SAMPLE_PERIOD 60000 //Use last n millis to calculate ETA
-#define  GUI_UPDATE_RATE 1000  
+#define  GUI_UPDATE_RATE 500  
   static uint32_t _lastnb=0;
 
 	   ADM_assert(dialog);
@@ -241,6 +244,7 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
 		gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
 		sprintf(string,"Done : %02d%%",(int)(100*f));
+                if(isQuiet()) printf("[Encoding]%s\n",string);
 		   gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
 		
 

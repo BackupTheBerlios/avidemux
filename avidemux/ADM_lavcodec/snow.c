@@ -3870,6 +3870,8 @@ redo_frame:
 //        int bits= put_bits_count(&s->c.pb);
 
         //FIXME optimize
+ if(!(avctx->flags2 & CODEC_FLAG2_MEMC_ONLY)){ //MEANX BACKPORT
+
      if(pict->data[plane_index]) //FIXME gray hack
         for(y=0; y<h; y++){
             for(x=0; x<w; x++){
@@ -3933,6 +3935,22 @@ redo_frame:
 {START_TIMER
         predict_plane(s, s->spatial_dwt_buffer, plane_index, 1);
 STOP_TIMER("pred-conv")}
+// MEANX BACKPORT
+ }else{
+            //ME/MC only
+            if(pict->pict_type == I_TYPE){
+                for(y=0; y<h; y++){
+                    for(x=0; x<w; x++){
+                        s->current_picture.data[plane_index][y*s->current_picture.linesize[plane_index] + x]=
+                            pict->data[plane_index][y*pict->linesize[plane_index] + x];
+                    }
+                }
+            }else{
+                memset(s->spatial_dwt_buffer, 0, sizeof(DWTELEM)*w*h);
+                predict_plane(s, s->spatial_dwt_buffer, plane_index, 1);
+            }
+      }
+// /MEANX
         if(s->avctx->flags&CODEC_FLAG_PSNR){
             int64_t error= 0;
 

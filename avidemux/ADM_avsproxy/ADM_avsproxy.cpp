@@ -43,10 +43,12 @@ avsHeader::avsHeader()
 
 uint8_t avsHeader::open(char *name)
 {
-   
-    mySocket=bindMe(9999);
-    if(!mySocket)
+    mySocket=0;
+    if(!bindMe(9999))
+    {
+        printf("[avsProxy]Open failed\n");
         return 0;
+    }
     // now time to grab some info
     avsInfo info;
     if(!askFor(AvsCmd_GetInfo,0,sizeof(info),(uint8_t*)&info))

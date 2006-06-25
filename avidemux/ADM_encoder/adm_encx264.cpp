@@ -115,6 +115,7 @@ EncoderX264::configure (AVDMGenericVideoStream * instream)
 	}
       break;
     case COMPRESS_2PASS:
+    case COMPRESS_2PASS_BITRATE:
       // printf("\n X264 dual size: %lu (%s)\n",_param.finalsize,_logname);
       _state = enc_Pass1;
       _codec = new X264EncoderPass1 (_w, _h);
@@ -226,28 +227,27 @@ uint8_t EncoderX264::stop (void)
   return 1;
 
 }
+uint32_t ADM_computeBitrate(uint32_t fps1000, uint32_t nbFrame, uint32_t sizeInMB);
 uint8_t EncoderX264::startPass2 (void)
 {
-  float
-    br;
-  uint32_t
-    finalSize;
+  
+  uint32_t    bitrate;
 
   ADM_assert (_state == enc_Pass1);
   printf ("\n Starting pass 2 (%dx%d)\n", _w, _h);
 
 
-  finalSize = _param.finalsize;
+  
 
-
-
-  br = finalSize * 8;
-  br *= 1024 * 1024;
-  br = br / _totalframe;	// bit / frame
-  br = br * _fps1000;
-  br = br / 1000;
-
-  finalSize = (int) floor (br);
+  if(_param.mode==COMPRESS_2PASS)
+  {
+      bitrate=ADM_computeBitrate(_fps1000, _totalframe, _param.finalsize);
+      printf("[x264] Size %u, average bitrate %u kb/s\n",_param.finalsize,bitrate);
+  }else if(_param.mode==COMPRESS_2PASS_BITRATE)
+  {
+      bitrate=_param.avg_bitrate*1000;
+      printf("[x264] Average bitrate %u kb/s\n",bitrate);
+  }else ADM_assert(0);
 
   _state = enc_Pass2;
   // Delete codec and start new one
@@ -262,7 +262,7 @@ uint8_t EncoderX264::startPass2 (void)
   _codec = new X264EncoderPass2 (_w, _h);
   // strcpy(encparam.logName,_logname);
   //printf("Using %s as stat file, average bitrate %d kbps\n",_logname,finalSize/1000);
-  if (!_codec->init ((uint32_t) br, _fps1000, &_codecParam))
+  if (!_codec->init (bitrate, _fps1000, &_codecParam))
     {
       printf ("Error initializing x264 pass1 mode\n");
       return 0;

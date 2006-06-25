@@ -73,6 +73,7 @@ typedef enum {
 	FEATURE_REUSE_2PASS_LOG,
 	FEATURE_AUDIOBAR_USES_MASTER,
 	FEATURE_MULTI_THREAD,
+	FEATURE_MPEG_NO_LIMIT,
 	DOWNMIXING_PROLOGIC
 } options;
 // </prefs_gen>
@@ -113,5 +114,6 @@ class preferences {
 };
 
 extern preferences *prefs;
-
+int initPrefs(  void );
+int destroyPrefs(  void );
 #endif

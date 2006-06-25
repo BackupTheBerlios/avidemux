@@ -67,19 +67,10 @@ public:
   uint8_t setLogFile (const char *name);
   void encoderMT (void);
     ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id);
-   ~ffmpegEncoder ();
+   virtual ~ffmpegEncoder ();
 
-  virtual uint8_t stopEncoder (void)
-  {
-    if (_init)
-      {
-	_init = 0;
-	avcodec_close (_context);
-	ADM_dealloc (_context);
-	_context = NULL;
-      }
-    return 1;
-  }
+  virtual uint8_t stopEncoder (void);
+  
   virtual uint8_t init (uint32_t val, uint32_t fps1000);
   virtual uint8_t init (uint32_t val, uint32_t fps1000, uint8_t sw);
   virtual uint8_t encode (ADMImage * in, ADMBitstream * out);
@@ -105,14 +96,8 @@ public:  ffmpegEncoderCQ (uint32_t width, uint32_t height,
 
   virtual uint8_t init (uint32_t val, uint32_t fps1000, uint8_t vbr = 0);
   virtual uint8_t encode (ADMImage * in, ADMBitstream * out);
-  virtual ~ ffmpegEncoderCQ ()
-  {
-    stopEncoder ();
-    if (_statfile)
-      {
-	fclose (_statfile);
-      }
-  }
+  virtual ~ ffmpegEncoderCQ ();
+  
 };
 
 

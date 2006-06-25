@@ -88,7 +88,7 @@ const CodecTag ff_mov_obj_type[] = {
     { CODEC_ID_AAC       , 102 }, /* MPEG2 AAC Main */
     { CODEC_ID_AAC       , 103 }, /* MPEG2 AAC Low */
     { CODEC_ID_AAC       , 104 }, /* MPEG2 AAC SSR */
-    { CODEC_ID_MP3       , 105 },
+    { CODEC_ID_MP3       , 107 }, /* MEANX Compatibility with xine was 105*/
     { CODEC_ID_MPEG1VIDEO, 106 },
     { CODEC_ID_MP2       , 107 },
     { CODEC_ID_MJPEG     , 108 },

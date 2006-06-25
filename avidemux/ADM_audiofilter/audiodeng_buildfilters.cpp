@@ -78,6 +78,29 @@ static const externalSource Sources[]=
         {AudioAC3,"AC3"},
         {AudioNone,"NONE"}
 };
+typedef struct Mixer_String
+{
+  char         *name;
+  CHANNEL_CONF conf;
+};
+
+#define DOME(x) {#x,CHANNEL_##x}
+static Mixer_String Mixer_strings[]=
+{
+  {"NONE",CHANNEL_INVALID},
+  DOME(MONO),
+  DOME(STEREO),
+  DOME(2F_1R),
+  DOME(3F),
+  DOME(3F_1R),
+  DOME(2F_2R),
+  DOME(3F_2R),
+  DOME(3F_2R_LFE),
+  DOME(DOLBY_SURROUND),
+  DOME(DOLBY_PROLOGIC),
+  DOME(DOLBY_PROLOGIC2)
+
+};
 
 static DRCparam drcSetup=
 {
@@ -111,6 +134,29 @@ static CHANNEL_CONF audioMixing=CHANNEL_INVALID;
 int 	   audioShift = 0;
 int	   audioDelay=0;
 //**********
+
+const char              *getCurrentMixerString(void)
+{
+        uint32_t nb=sizeof(Mixer_strings)/sizeof(Mixer_String);
+        for(uint32_t i=0;i<nb;i++)
+                if(audioMixing==Mixer_strings[i].conf) return Mixer_strings[i].name;
+        ADM_assert(0);
+
+}
+uint8_t                    setCurrentMixerFromString(const char *name)
+{
+        uint32_t nb=sizeof(Mixer_strings)/sizeof(Mixer_String);
+        for(uint32_t i=0;i<nb;i++)
+                if(!strcasecmp(name,Mixer_strings[i].name)) 
+                {
+                  audioMixing= Mixer_strings[i].conf;
+                  return 1;
+                }
+        return 0;
+
+}
+//**********
+
 const char              *audioSourceFromEnum(AudioSource src)
 {
         uint32_t nb=sizeof(Sources)/sizeof(externalSource);
@@ -435,6 +481,7 @@ void audioCodecConfigure( void )
 	{
                 case AUDIOENC_LPCM:
 		case AUDIOENC_NONE:
+		case AUDIOENC_COPY:
 								return;
 
 #ifdef USE_FAAC
@@ -583,7 +630,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 
       }
       
-      if( audioMixing!=CHANNEL_INVALID && lastFilter->getInfo()->channels>2)
+      if( (audioMixing!=CHANNEL_INVALID ))
       {
           AVDMProcessAudio_Mixer *mixer;
           mixer=new AVDMProcessAudio_Mixer( lastFilter,audioMixing);

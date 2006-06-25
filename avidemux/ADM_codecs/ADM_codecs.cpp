@@ -179,6 +179,15 @@ getDecoderVopPacked (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
   return (decoders *) (new decoderFFMpeg4VopPacked (w, h));
 
 }
+decoders *getDecoderH264noLogic (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
+		     uint8_t * extraData)
+{
+  UNUSED_ARG (fcc);
+  UNUSED_ARG (extraLen);
+  UNUSED_ARG (extraData);
+  return (decoders *) (new decoderFFH264 (w, h, extraLen, extraData,0));
+
+}
 decoders *
 getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
 	    uint8_t * extraData)
@@ -261,7 +270,7 @@ getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
   if (isH264Compatible (fcc))
     {
 
-      return (decoders *) (new decoderFFH264 (w, h, extraLen, extraData));
+      return (decoders *) (new decoderFFH264 (w, h, extraLen, extraData,1));
     }
 #endif
 

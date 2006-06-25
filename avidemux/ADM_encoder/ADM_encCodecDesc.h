@@ -13,6 +13,7 @@ COMPRES_PARAMS yv12codec = {
   1,
   1500,
   700,
+  1000,
   ADM_ENC_CAP_CQ,
   0,
   NULL,
@@ -71,6 +72,7 @@ COMPRES_PARAMS ffmpegH263Codec = {
   4,
   1500,
   700,
+  1000, // AVG
   ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
   ADM_EXTRA_PARAM,
   &ffmpeg4Extra,
@@ -86,6 +88,7 @@ COMPRES_PARAMS ffmpegH263PCodec = {
   4,
   1500,
   700,
+  1000, // AVG
   ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
   ADM_EXTRA_PARAM,
   &ffmpeg4Extra,
@@ -101,6 +104,7 @@ COMPRES_PARAMS ffmpegMpeg4 = {
   4,
   1500,
   700,
+  1000, // AVG
   ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
   ADM_EXTRA_PARAM,
   &ffmpeg4Extra,
@@ -116,6 +120,7 @@ COMPRES_PARAMS ffmpegSnow = {
   4,
   1500,
   700,
+  1000, // AVG
   ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
   ADM_EXTRA_PARAM,
   &ffmpeg4Extra,
@@ -131,6 +136,7 @@ COMPRES_PARAMS ffmpegFFHUFF = {
   4,
   1500,
   700,
+  1000, // AVG
   ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
   ADM_EXTRA_PARAM,
   &ffmpeg4Extra,
@@ -147,6 +153,7 @@ COMPRES_PARAMS ffmpegHUFF = {
   1500,
   700,
   0,
+  1000, // AVG
   ADM_EXTRA_PARAM,
   &ffmpeg4Extra,
   sizeof (ffmpeg4Extra),
@@ -162,6 +169,7 @@ COMPRES_PARAMS ffmpegFFV1 = {
   1500,
   700,
   0,
+  1000, // AVG
   ADM_EXTRA_PARAM,
   &ffmpeg4Extra,
   sizeof (ffmpeg4Extra),
@@ -175,7 +183,7 @@ COMPRES_PARAMS MjpegCodec = {
   "Mjpeg",
   "Mjpeg (lavcodec)",
   COMPRESS_CQ,
-  4, 1500, 700,
+  4, 1500, 700,1000, // AVG
   ADM_ENC_CAP_CQ,
   ADM_EXTRA_PARAM,
   &MjpegExtra,
@@ -235,6 +243,7 @@ COMPRES_PARAMS ffmpeg1Codec = {
   4,
   1500,
   700,
+  1000, // AVG
   ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
   ADM_EXTRA_PARAM,
   &ffmpeg1Extra,
@@ -294,7 +303,8 @@ COMPRES_PARAMS ffmpeg2DVDCodec = {
   4,
   1500,
   700,
-  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
+  1000, // AVG
+  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS+ADM_ENC_CAP_2PASS_BR,
   ADM_EXTRA_PARAM,
   &ffmpeg2DVDExtra,
   sizeof (ffmpeg2DVDExtra),
@@ -352,8 +362,8 @@ COMPRES_PARAMS ffmpeg2SVCDCodec = {
   COMPRESS_CQ,
   4,
   1500,
-  700,
-  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
+  700,1000, // AVG
+  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS+ADM_ENC_CAP_2PASS_BR,
   ADM_EXTRA_PARAM,
   &ffmpeg2SVCDExtra,
   sizeof (ffmpeg2SVCDExtra),
@@ -371,6 +381,7 @@ COMPRES_PARAMS VCDCodec = {
   4,
   1500,
   700,
+  1000, // AVG
   ADM_ENC_CAP_CBR,
   ADM_EXTRA_PARAM,
   NULL,
@@ -402,6 +413,7 @@ COMPRES_PARAMS SVCDCodec = {
   4,
   1500,
   700,
+  1000, // AVG
   ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
   ADM_EXTRA_PARAM,
   &SVCDExtra,
@@ -420,6 +432,7 @@ COMPRES_PARAMS RequantCodec = {
     4,
     1500,
     700,
+    1000, // AVG
     ADM_ENC_CAP_CQ,
     ADM_EXTRA_PARAM,
     &RequantFactorExtra,
@@ -446,6 +459,7 @@ COMPRES_PARAMS DVDCodec = {
   4,
   1500,
   700,
+  1000, // AVG
   ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
   ADM_EXTRA_PARAM,
   &DVDExtra,
@@ -508,7 +522,9 @@ xvid4EncParam xvid4Extra = {
   0,				// turbo
   0,				// Packed bitstream - Not Xvid Default
   1,				// closed_gop
-  0				// bframe_threshold
+  0,				// bframe_threshold
+  0,                            // Use inter
+  0                             // Use intra
 };
 extern uint8_t DIA_xvid4 (COMPRES_PARAMS * incoming);
 COMPRES_PARAMS Xvid4Codec = {
@@ -520,7 +536,8 @@ COMPRES_PARAMS Xvid4Codec = {
   4,
   1500,
   700,
-  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
+  1000, // AVG
+  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS +ADM_ENC_CAP_2PASS_BR,
   ADM_EXTRA_PARAM,
   &xvid4Extra,
   sizeof (xvid4Extra),
@@ -566,7 +583,7 @@ NULL,//     char      *logfile;
 0,//     uint32_t BidirME;
 1,//     uint32_t Adaptative;
 1,//     uint32_t Weighted;
-1,//     uint32_t DirectMode;
+0,//     uint32_t DirectMode;
 //     //
 4,//     uint32_t PartitionDecision;
 16, //Range
@@ -595,7 +612,8 @@ COMPRES_PARAMS x264Codec = {
   4,
   1500,
   700,
-  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS + ADM_ENC_CAP_GLOBAL,
+  1000, // AVG
+  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS + ADM_ENC_CAP_GLOBAL+ADM_ENC_CAP_2PASS_BR,
   ADM_EXTRA_PARAM,
   &x264Extra,
   sizeof (x264Extra),
@@ -604,10 +622,10 @@ COMPRES_PARAMS x264Codec = {
 
 #endif
 COMPRES_PARAMS DUMMYONE =
-  { CodecDummy, "dummy", "dummy", "dummy", COMPRESS_CQ, 4, 1500, 700, 0, 0,
+  { CodecDummy, "dummy", "dummy", "dummy", COMPRESS_CQ, 4, 1500, 700,1000, 0, 0,
 NULL, 0 };
 COMPRES_PARAMS CopyCodec =
-  { CodecCopy, "Copy", "Copy", "Copy", COMPRESS_CQ, 4, 1500, 700, 0, 0, NULL,
+  { CodecCopy, "Copy", "Copy", "Copy", COMPRESS_CQ, 4, 1500, 700,1000, 0, 0, NULL,
 0 };
 
 COMPRES_PARAMS *AllVideoCodec[] = {

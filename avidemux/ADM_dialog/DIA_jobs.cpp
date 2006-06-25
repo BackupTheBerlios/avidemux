@@ -87,7 +87,7 @@ GtkCellRenderer *renderer;
         // Add columns
 
         renderer = gtk_cell_renderer_text_new ();
-        column = gtk_tree_view_column_new_with_attributes ("Name", renderer,
+        column = gtk_tree_view_column_new_with_attributes (_("Name"), renderer,
                                                       "markup", (GdkModifierType) 0,
                                                       NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column);
@@ -119,7 +119,7 @@ GtkCellRenderer *renderer;
                         case GTK_RESPONSE_DELETE_EVENT:
                                          running=0;break;
                         case COMMAND_DELETE_ALL:
-                                        if(GUI_Confirmation_HIG("Sure!","Delete ALL jobs","Are you sure you want to delete all jobs ?"))
+                                        if(GUI_Confirmation_HIG(_("Sure!"),_("Delete ALL jobs"),_("Are you sure you want to delete all jobs ?")))
                                         {
                                                 for(int i=0;i<jobs.nb;i++) jobs.status[i]=STATUS_DELETED;
                                         }
@@ -151,7 +151,7 @@ GtkCellRenderer *renderer;
                         case COMMAND_DELETE: 
                                         sel=getSelection(jobs.dialog);
                                         if(sel>=jobs.nb) break;
-                                        if(GUI_Confirmation_HIG("Sure!","Delete job","Are you sure you want to delete %s job ?",GetFileName(jobs.name[sel])))
+                                        if(GUI_Confirmation_HIG(_("Sure!"),_("Delete job"),_("Are you sure you want to delete %s job ?"),GetFileName(jobs.name[sel])))
                                         {
                                                 jobs.status[sel]=STATUS_DELETED;
                                         }
@@ -160,7 +160,7 @@ GtkCellRenderer *renderer;
                         
                         default:
                                 printf("Event:%d\n",event); 
-                                GUI_Alert("Unknown event");break;
+                                GUI_Alert(_("Unknown event"));break;
                 }
                 
         }
@@ -199,7 +199,7 @@ char *str;
                 str = g_strconcat("<span weight=\"heavy\">", 
                 GetFileName(jobs.name[i]), "</span>\n",  
                "<span size=\"smaller\" style=\"oblique\" >", 
-                StringStatus[jobs.status[i]], "</span> ",NULL);
+                _(StringStatus[jobs.status[i]]), "</span> ",NULL);
 
                 gtk_list_store_append (jobs.store, &iter);
                 gtk_list_store_set (jobs.store, &iter, 0,str,-1);

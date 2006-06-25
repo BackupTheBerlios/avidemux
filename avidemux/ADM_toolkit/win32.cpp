@@ -12,6 +12,7 @@
 #include "winsock2.h"
 #define WIN32_CLASH
 #include "ADM_assert.h" 
+uint8_t win32_netInit(void);
 void ADM_usleep(unsigned long us)
 {
 	Sleep(us/1000);

@@ -41,7 +41,7 @@
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encffmpeg.h"
 
-
+uint32_t ADM_computeBitrate(uint32_t fps1000, uint32_t nbFrame, uint32_t sizeInMB);
 
 /*_________________________________________________*/
 EncoderFFMPEG::EncoderFFMPEG (FF_CODEC_ID id, COMPRES_PARAMS * config)
@@ -343,14 +343,7 @@ uint8_t EncoderFFMPEG::startPass1 (void)
   ADM_assert (_state == enc_Pass1);
   _frametogo = 0;
   printf ("\n Starting pass 1\n");
-  printf (" Creating logfile :%s\n", _logname);
-/*  fd = fopen (_logname, "wt");
-  if (!fd)
-    {
-      printf ("\n cannot create logfile !\n");
-      return 0;
-    }
-*/
+  printf (" Creating logfile :<%s>\n", _logname);
   return 1;
 }
 
@@ -368,6 +361,7 @@ uint8_t EncoderFFMPEG::setLogFile (const char *lofile, uint32_t nbframe)
 {
   strcpy (_logname, lofile);
   _frametogo = nbframe;
+  printf("EncoderFF : using <%s> as logfile, for %u frames\n",lofile,nbframe);
   return 1;
 
 }
@@ -470,22 +464,9 @@ uint8_t EncoderFFMPEG::startPass2 (void)
   printf ("\n ready to encode in 2pass : %s\n", _logname);
 
   // compute average bitrate
-  double
-    db,
-    ti;
-  uint32_t
-    vbr = 0;
-  db = _param.finalsize;
-  db = db * 1024. * 1024. * 8.;
-  // now deb is in Bits
+  uint32_t    vbr = 0;
 
-  // compute duration
-  ti = frameEnd - frameStart + 1;
-  ti *= 1000;
-  ti /= _fps;			// nb sec
-  db = db / ti;
-
-  vbr = (uint32_t) floor (db);
+    vbr= ADM_computeBitrate(_fps, _frametogo,_param.finalsize);
 
   _codec->setLogFile (_logname);
   _codec->init (vbr, _fps);

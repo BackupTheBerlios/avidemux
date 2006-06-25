@@ -103,11 +103,12 @@ protected:
 
 	uint8_t		buildIndex(	_3gpTrack *track,
 					uint32_t scale,
-					uint32_t nbSz,		uint32_t *Sz,
+					uint32_t nbSz,		uint32_t *Sz, uint32_t szIndentical,
 					uint32_t nbChunk ,	uint32_t *Chunk,
 					uint32_t nbSc,		uint32_t *Sc,
 					uint32_t nbStts,uint32_t *SttsN,uint32_t *SttsC,
-					uint32_t *Sn,			uint32_t *outNbChunk
+					uint32_t *Sn,			uint32_t *outNbChunk,
+                                            uint32_t isAudio
 					);
 	uint32_t 		readPackedLen(adm_atom *tom );
 	

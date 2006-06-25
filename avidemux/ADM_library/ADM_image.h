@@ -112,6 +112,12 @@ public:
 
                 
 		~ADMImage();
+        uint8_t getWidthHeight(uint32_t *w,uint32_t *h)
+                    {
+                          *w=_width;
+                          *h=_height;
+                          return 1;
+                    }
 	uint8_t duplicate(ADMImage *src);	/// copy an image to ourself, including info
         uint8_t duplicateSwapUV(ADMImage *src); /// copy an image to ourself, including info
 	uint8_t duplicateFull(ADMImage *src);	/// copy an image to ourself, including info

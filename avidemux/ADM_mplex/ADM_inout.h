@@ -39,7 +39,7 @@ private:
 class IFileBitStream : public IBitStream
 {
 public:
-        IFileBitStream( Transfert *trans,  unsigned int buf_size = BUFFER_SIZE);
+        IFileBitStream( Transfert *trans, mplexStreamDescriptor *streamDesc, unsigned int buf_size = BUFFER_SIZE);
         ~IFileBitStream();
 
 private:

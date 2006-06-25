@@ -40,6 +40,7 @@ extern "C"
 #include "ADM_gui2/support.h"
 
 static int nbTray=0;
+static  GdkPixbuf   **pixbuf=NULL;
 
 extern GdkPixbuf        *create_pixbuf                  (const gchar     *filename);
 /*
@@ -54,20 +55,32 @@ public:
         setStatus(int working);
 
 };*/
-
+static char *animated[]={
+    "film1.png","film3.png","film5.png","film7.png","film9.png",
+    "film11.png","film13.png","film15.png","film17.png","film19.png",
+    "film21.png","film23.png"};
 ADM_tray::ADM_tray(char *name)
 {
         ADM_assert(!nbTray);
         nbTray++;
 
 
-  GtkWidget   *img;
-  GdkPixbuf   *pixbuf;
+  int nb=sizeof(animated)/sizeof(char *);
+  if(!pixbuf)
+  {
+      pixbuf=new GdkPixbuf*[nb];
+      for(int i=0;i<nb;i++)
+      {
+        pixbuf[i]=create_pixbuf(animated[i]);
+        if(!pixbuf[i])
+        {
+          printf("Failed to create <%s>\n",animated[i]);
+          ADM_assert(0);
+        }
+      }
 
-  pixbuf=create_pixbuf("systray.xpm");
-  sys=adm_new_systray(pixbuf,name);
-
-  
+  }
+  sys=adm_new_systray(pixbuf,nb,name);
 
 }
 ADM_tray::~ADM_tray()
@@ -83,7 +96,10 @@ uint8_t ADM_tray::setPercent(int percent)
 char percentS[40];
         sprintf(percentS,"%d %%",percent);
         if(sys)
+        {
+                adm_changeIcon_systray();
                 adm_change_tooltip(sys,percentS);
+        }
         return 1;
 }
 uint8_t ADM_tray::setStatus(int working)

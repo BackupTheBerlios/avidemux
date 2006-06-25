@@ -64,6 +64,10 @@ typedef struct xvid4EncParam
   int packed;
   int closed_gop;
   int bframe_threshold;
+  int useCustomIntra;
+  int useCustomInter;
+  uint8_t  intraMatrix[64];
+  uint8_t  interMatrix[64];
   char logName[200];
 } xvid4EncParam;
 

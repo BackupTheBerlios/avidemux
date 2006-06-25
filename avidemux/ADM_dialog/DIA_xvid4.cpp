@@ -17,6 +17,7 @@
 
 
 #include "ADM_gui2/support.h"
+#include "ADM_toolkit/filesel.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
@@ -30,43 +31,112 @@
 
 
 static xvid4EncParam localParam;
-static uint32_t mQ,mB,mS;
+static uint32_t mQ,mB,mS,mA;
 static GtkWidget *dialog=NULL;
 static COMPRESSION_MODE mMode;
 
 
-static GtkWidget	*create_dialog1 (void);
+static GtkWidget *create_dialog1 (void);
+static GtkWidget *create_dialog3 (void);
+
 static void xvid4otherUpload(GtkWidget *dialog);
 static void xvid4otherDownload(GtkWidget *dialog);
+static uint8_t editMatrix(uint8_t *inter, uint8_t *intra);
 static void updateMode( void );
+
 static int cb_mod(GtkObject * object, gpointer user_data);
-/*uint8_t DIA_xvid4(COMPRESSION_MODE * mode, uint32_t * qz,  uint32_t * br,uint32_t *fsize,
-		xvid4EncParam *param);
-*/		
-		
-		
+
+#define CALL_Z(x,y)  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),XVID4_RESPONSE_##y);
+
+typedef enum XVID4_CODE
+{
+    XVID4_RESPONSE_MODE_CHANGED,
+    XVID4_RESPONSE_EDIT_MATRIX,
+    XVID4_RESPONSE_LOAD_MATRIX,
+    XVID4_RESPONSE_SAVE_MATRIX,
+    XVID4_RESPONSE_LAST,
+};
 uint8_t DIA_xvid4(COMPRES_PARAMS *incoming)
 {
 int b;
 int ret=0;
-		ADM_assert(incoming->extraSettingsLen==sizeof(localParam));
-		memcpy(&localParam,incoming->extraSettings,sizeof(localParam));
-		dialog=create_dialog1();
-		gtk_register_dialog(dialog);
-		
+int code;
+      ADM_assert(incoming->extraSettingsLen==sizeof(localParam));
+      memcpy(&localParam,incoming->extraSettings,sizeof(localParam));
+      dialog=create_dialog1();
+      gtk_register_dialog(dialog);
+
 #define HIST_SET(x) gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenuType)), x)
 #define VAL_SET(x) gtk_write_entry(WID(entryEntry), x)
 
-		mQ=incoming->qz;
-		mB=incoming->bitrate; // in kbits
-		mS=incoming->finalsize;	
-		mMode=incoming->mode;
-		updateMode();	
+      mQ=incoming->qz;
+      mB=incoming->bitrate; // in kbits
+      mS=incoming->finalsize;	
+      mA=incoming->avg_bitrate;
+      mMode=incoming->mode;
+      updateMode();	
 
-		xvid4otherUpload(dialog);
- 		gtk_signal_connect(GTK_OBJECT(WID(optionmenuType)), "changed",
+      xvid4otherUpload(dialog);
+      gtk_signal_connect(GTK_OBJECT(WID(optionmenuType)), "changed",
                       GTK_SIGNAL_FUNC(cb_mod),                   (void *) 0);
-	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+
+    CALL_Z(buttonCreateCustomMatrix,EDIT_MATRIX);
+    CALL_Z(buttonLoadMatrix,LOAD_MATRIX);
+      
+_again:
+        code=gtk_dialog_run(GTK_DIALOG(dialog));
+        if(code==XVID4_RESPONSE_EDIT_MATRIX)
+        {
+          uint8_t intra[64],inter[64];
+              memcpy(intra,localParam.intraMatrix,64);
+              memcpy(inter,localParam.interMatrix,64);
+              if(editMatrix(intra,inter))
+              {
+                    memcpy(localParam.intraMatrix,intra,64);
+                    memcpy(localParam.interMatrix,inter,64);
+              }
+              goto _again;
+        }
+        if(code==XVID4_RESPONSE_LOAD_MATRIX)
+        {
+          uint8_t intra[64],inter[64];
+          char *name;
+          FILE *file=NULL;
+               GUI_FileSelRead("Select Xvid matrix file to load", &name);
+               if(!name)
+               {
+                    goto _again;
+               }
+              printf("Loading Matrix\n");
+              file=fopen(name,"rb");
+              if(!file)
+              {
+_erLoad:
+                  if(name) ADM_dealloc(name);
+                  if(file) fclose(file);
+                  GUI_Error_HIG("Error Loading","Error loadind the custom matrix file.");
+                  goto _again;
+              }
+              // Read it
+              if(64!=fread(intra,1,64,file))
+              {
+                  printf("Error reading intra\n");
+                  goto _erLoad;
+              }
+              if(64!=fread(inter,1,64,file))
+              {
+                  printf("Error reading inter\n");
+                  goto _erLoad;
+              }
+              // Ok
+              fclose(file);
+              memcpy(localParam.intraMatrix,intra,64);
+              memcpy(localParam.interMatrix,inter,64);
+              GUI_Info_HIG(ADM_LOG_INFO,"Matrix Loaded","The custom matrix file has been successfully loaded.");
+              goto _again;
+        }
+
+	if(code==GTK_RESPONSE_OK)
 	{
 
 		
@@ -105,6 +175,13 @@ int ret=0;
 						gtk_label_set_text(GTK_LABEL(WID(label11)),"Size (MBytes):");
             					break;
 				case 3:
+		     				incoming->mode = COMPRESS_2PASS_BITRATE;	
+						value = (uint32_t) gtk_read_entry(WID(entryEntry));
+						incoming->avg_bitrate=value;
+						gtk_label_set_text(GTK_LABEL(WID(label11)),"Average bitrate (kb/s):");
+            					break;
+
+				case 4:
 						incoming->mode=COMPRESS_SAME;
 						break;
 		  		default:
@@ -135,12 +212,15 @@ int ret=0;
 				printf(#y":%d\n",localParam.y);}
 
 #define CHECK_GET(x,y) {localParam.y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
-#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),localParam.y);}							
+#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),localParam.y);}			//*****************************************************
 void xvid4otherUpload(GtkWidget *dialog)
 {
 	MENU_SET(optionmenuMS,guiLevel);
 	MENU_SET(optionmenuVHQ,vhqmode);
-
+        if(localParam.useCustomIntra || localParam.useCustomInter)
+        {
+            RADIO_SET(radiobuttonCustomMatrix,		1);
+        }else
 	if(localParam.mpegQuantizer)
 		RADIO_SET(radiobuttonMpeg,		1);
 	else
@@ -188,7 +268,7 @@ void xvid4otherUpload(GtkWidget *dialog)
 }
 // Read the ui fields and set localParam
 // accordingly
-
+//*****************************************************
 
 void xvid4otherDownload(GtkWidget *dialog)
 {
@@ -196,6 +276,15 @@ void xvid4otherDownload(GtkWidget *dialog)
 	MENU_GET(optionmenuVHQ,vhqmode);
 	
 	localParam.mpegQuantizer=RADIO_GET(radiobuttonMpeg);
+        if(RADIO_GET(radiobuttonCustomMatrix))
+        {
+            localParam.useCustomIntra=1;
+            localParam.useCustomInter=1;
+        }else
+        {
+            localParam.useCustomIntra=0;
+            localParam.useCustomInter=0;
+        }
 	CHECK_GET(checkbuttonInterlaced,	interlaced);
 	CHECK_GET(checkbutton4MV,		inter4mv);
 	CHECK_GET(checkbuttonTrellis,		trellis);
@@ -236,7 +325,7 @@ void xvid4otherDownload(GtkWidget *dialog)
 	
 	
 }
-
+//*****************************************************
 void updateMode( void )
 {
 uint32_t b;
@@ -259,6 +348,13 @@ uint32_t b;
 			gtk_widget_set_sensitive(WID(entryEntry),1);
 			gtk_label_set_text(GTK_LABEL(WID(label11)),"Target size (MBytes):");
 			break;
+                case COMPRESS_2PASS_BITRATE:
+			HIST_SET(3);
+			VAL_SET(mA);
+			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
+			gtk_widget_set_sensitive(WID(entryEntry),1);
+			gtk_label_set_text(GTK_LABEL(WID(label11)),"Average bitrate (kb/s):");
+			break;
 
 	    	case COMPRESS_CQ:
 			HIST_SET(1);
@@ -267,14 +363,16 @@ uint32_t b;
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbuttonQuant)),(gfloat)mQ);
 			break;
 		case COMPRESS_SAME:
-			HIST_SET(3);
+			HIST_SET(4);
 			gtk_widget_set_sensitive(WID(entryEntry),0);
 			gtk_widget_set_sensitive(WID(spinbuttonQuant),0);
 			
 			break;
 
 		}
-}		
+}
+
+//*****************************************************
 int cb_mod(GtkObject * object, gpointer user_data)
 {
 int r;
@@ -284,15 +382,114 @@ int r;
 		case 0: mMode=COMPRESS_CBR ;break;
 		case 1: mMode=COMPRESS_CQ ;break;
 		case 2: mMode=COMPRESS_2PASS ;break;
-		case 3: mMode=COMPRESS_SAME;break;
+                case 3: mMode=COMPRESS_2PASS_BITRATE ;break;
+		case 4: mMode=COMPRESS_SAME;break;
 	
 	}
 	updateMode();
 	printf("Changed!!!\n");
+        return 0;
+
+}
+//*****************************************************
+uint8_t editMatrix(uint8_t *intra, uint8_t *inter)
+{
+GtkWidget *dialog=NULL;
+GtkWidget *spinbutton1;
+GtkObject *spinbutton1_adj;
+GtkWidget *intraCell[64],*interCell[64];
+uint8_t ret=0;
+int code;
+int col, row;
+
+      dialog=create_dialog3();
+      gtk_register_dialog(dialog);
+      //
+      for(int i=0;i<64;i++)
+      {  //Intra
+          col=i%8;
+          row=i>>3;
+          spinbutton1_adj = gtk_adjustment_new (intra[i], 8, 255, 1, 10, 10);
+          intraCell[i]=spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 0);
+     //     gtk_widget_show (spinbutton1);
+          gtk_table_attach (GTK_TABLE (WID(tableIntra)), spinbutton1, col, col+1, row, row+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+
+       }
+      for(int i=0;i<64;i++)
+      {  //Inter
+          col=i%8;
+          row=i>>3;
+          spinbutton1_adj = gtk_adjustment_new (inter[i], 1, 255, 1, 10, 10);
+          interCell[i]=spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 0);
+      //    gtk_widget_show (spinbutton1);
+          gtk_table_attach (GTK_TABLE (WID(tableInter)), spinbutton1, col, col+1, row, row+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+       }
+      for(int i=0;i<64;i++)
+      {
+        gtk_widget_show (intraCell[i]);
+        gtk_widget_show (interCell[i]);
+      }
+      //
+
+      CALL_Z(button12,SAVE_MATRIX)
+_loop:
+      code=gtk_dialog_run(GTK_DIALOG(dialog));
+      if(code==XVID4_RESPONSE_SAVE_MATRIX)
+      {
+        printf("Save\n");
+        char *name;
+        FILE *fd;
+        GUI_FileSelWrite("Select Custom Matrix File to write",&name);
+        if(!name) goto _loop;
+        fd=fopen(name,"wb");
+        if(!fd)
+        {
+            GUI_Error_HIG("Error Writing","Error writing the custom matrix file.");
+            ADM_dealloc(name);
+            goto _loop;
+        }
+        for(int i=0;i<64;i++)
+        {
+          inter[i]=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(interCell[i]));
+          intra[i]=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(intraCell[i]));
+        }
+        fwrite(intra,1,64,fd);
+        fwrite(inter,1,64,fd);
+        fclose(fd);
+        ADM_dealloc(name);
+        goto _loop;
+      }
+      if(code==GTK_RESPONSE_OK)
+      {
+        printf("Accept\n");
+        ret=1;
+        for(int i=0;i<64;i++)
+        {
+          intra[i]=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(intraCell[i]));
+          inter[i]=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(interCell[i]));
+        }
+      }else
+      printf("refused\n");
+/*
+      for(int i=1;i<65;i++)
+      {
+        wid=findMatrixWidget("intra
+      }
+*/
+
+      gtk_unregister_dialog(dialog);
+      gtk_widget_destroy(dialog);
+      return ret;
 
 }
 //-------------------- Glade-2 here----------		
 //_____KK_______
+
 
 GtkWidget*
 create_dialog1 (void)
@@ -314,6 +511,7 @@ create_dialog1 (void)
   GtkWidget *one_pass_cbr1;
   GtkWidget *one_pass_quantizer1;
   GtkWidget *two_pass1;
+  GtkWidget *two_pass__average_bitrate1;
   GtkWidget *same_qz_as_input1;
   GtkWidget *entryEntry;
   GtkObject *spinbuttonQuant_adj;
@@ -329,12 +527,12 @@ create_dialog1 (void)
   GtkWidget *vbox23;
   GtkWidget *checkbuttonTurbo;
   GtkWidget *checkbuttonPacked;
-  GtkWidget *label8;
+  GtkWidget *labelMain;
   GtkWidget *vbox6;
   GtkWidget *hbox8;
   GtkWidget *vbox8;
-  GtkWidget *label13;
-  GtkWidget *label14;
+  GtkWidget *labelMotionSearchPrecision;
+  GtkWidget *labelVHQMode;
   GtkWidget *vbox7;
   GtkWidget *optionmenuMS;
   GtkWidget *menu2;
@@ -357,36 +555,45 @@ create_dialog1 (void)
   GtkWidget *checkbutton4MV;
   GtkWidget *checkbuttonHQAC;
   GtkWidget *hbox9;
-  GtkWidget *label15;
+  GtkWidget *labelIFrameIntervalMin;
   GtkObject *spinbuttonIMinPeriod_adj;
   GtkWidget *spinbuttonIMinPeriod;
-  GtkWidget *label16;
+  GtkWidget *labelIFrameIntervalMax;
   GtkObject *spinbuttonIMaxPeriod_adj;
   GtkWidget *spinbuttonIMaxPeriod;
-  GtkWidget *frame2;
+  GtkWidget *frameAdvancedSimpleProfile;
   GtkWidget *vbox9;
   GtkWidget *hbox11;
-  GtkWidget *label18;
+  GtkWidget *labelNumberOfBFrames;
   GtkObject *spinbuttonBFrame_adj;
   GtkWidget *spinbuttonBFrame;
   GtkWidget *hbox12;
   GtkWidget *checkbuttonQPel;
   GtkWidget *checkbuttonGMC;
-  GtkWidget *label17;
-  GtkWidget *label2;
+  GtkWidget *labelAdvancedSimpleProfile;
+  GtkWidget *labelMotionEstimation;
   GtkWidget *vbox10;
   GtkWidget *hbox13;
-  GtkWidget *label19;
+  GtkWidget *labelQuantizationType;
   GtkWidget *radiobuttonH263;
   GSList *radiobuttonH263_group = NULL;
   GtkWidget *radiobuttonMpeg;
-  GtkWidget *checkbuttonTrellis;
-  GtkWidget *frame3;
+  GtkWidget *radiobuttonCustomMatrix;
+  GtkWidget *hbox20;
+  GtkWidget *labelLoadCustomMatrix;
+  GtkWidget *buttonLoadMatrix;
+  GtkWidget *alignment6;
+  GtkWidget *hbox21;
+  GtkWidget *image1;
+  GtkWidget *label13;
+  GtkWidget *vseparator1;
+  GtkWidget *buttonCreateCustomMatrix;
+  GtkWidget *frameQuantizationRestrictions;
   GtkWidget *hbox14;
   GtkWidget *vbox11;
-  GtkWidget *label20;
-  GtkWidget *label21;
-  GtkWidget *label22;
+  GtkWidget *labelIFrameQuantizerMin;
+  GtkWidget *labelPFrameQuantizerMin;
+  GtkWidget *labelBFrameQuantizaterMin;
   GtkWidget *vbox12;
   GtkObject *spinbuttonIMin_adj;
   GtkWidget *spinbuttonIMin;
@@ -395,9 +602,9 @@ create_dialog1 (void)
   GtkObject *spinbuttonBMin_adj;
   GtkWidget *spinbuttonBMin;
   GtkWidget *vbox13;
-  GtkWidget *label24;
-  GtkWidget *label25;
-  GtkWidget *label26;
+  GtkWidget *labelIFrameQuantizerMax;
+  GtkWidget *labelPFrameQuantizerMax;
+  GtkWidget *labelBFrameQuantizerMax;
   GtkWidget *vbox14;
   GtkObject *spinbuttonIMax_adj;
   GtkWidget *spinbuttonIMax;
@@ -405,37 +612,38 @@ create_dialog1 (void)
   GtkWidget *spinbuttonPMax;
   GtkObject *spinbuttonBMax_adj;
   GtkWidget *spinbuttonBMax;
-
-  GtkWidget *label3;
+  GtkWidget *labelQuantizerRestrictions;
+  GtkWidget *checkbuttonTrellis;
+  GtkWidget *labelQuantization;
   GtkWidget *vbox15;
-  GtkWidget *frame4;
+  GtkWidget *frameTwoPassTuning;
   GtkWidget *vbox16;
   GtkWidget *hbox;
   GtkWidget *vbox17;
-  GtkWidget *label30;
-  GtkWidget *label31;
-  GtkWidget *label32;
-  GtkWidget *label28;
-  GtkWidget *label29;
+  GtkWidget *labelIFrameBoost;
+  GtkWidget *labelIFrameCloserThan;
+  GtkWidget *labelAreReducedBy;
+  GtkWidget *labelMaxOverflowImprovement;
+  GtkWidget *labelMaxOverflowDegradation;
   GtkWidget *vbox18;
   GtkWidget *entryIBoost;
   GtkWidget *entryIInterv;
   GtkWidget *entryIreduction;
   GtkWidget *entryMaxOvrImp;
   GtkWidget *entryMaxOvrDeg;
-  GtkWidget *label27;
-  GtkWidget *frame5;
+  GtkWidget *labelTwoPassTuning;
+  GtkWidget *frameCurveCompression;
   GtkWidget *hbox18;
   GtkWidget *vbox19;
-  GtkWidget *label37;
-  GtkWidget *label38;
-  GtkWidget *label39;
+  GtkWidget *labelHighBitrateScenes;
+  GtkWidget *labelLowBitrateScenes;
+  GtkWidget *labelOverflowControlStrength;
   GtkWidget *vbox20;
   GtkWidget *entryHiPass;
   GtkWidget *entryLowPass;
   GtkWidget *entryOvrControl;
-  GtkWidget *label36;
-  GtkWidget *label4;
+  GtkWidget *labelCurveCompression;
+  GtkWidget *labelSecondPass;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
@@ -446,6 +654,7 @@ create_dialog1 (void)
   dialog1 = gtk_dialog_new ();
   gtk_container_set_border_width (GTK_CONTAINER (dialog1), 2);
   gtk_window_set_title (GTK_WINDOW (dialog1), _("XviD encoding options"));
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -481,19 +690,16 @@ create_dialog1 (void)
   label10 = gtk_label_new (_("Encoding type:"));
   gtk_widget_show (label10);
   gtk_box_pack_start (GTK_BOX (vbox21), label10, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
 
   label11 = gtk_label_new (_("Bitrate (kb/s):"));
   gtk_widget_show (label11);
   gtk_box_pack_start (GTK_BOX (vbox21), label11, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
 
   label12 = gtk_label_new (_("Quantizer:"));
   gtk_widget_show (label12);
   gtk_box_pack_start (GTK_BOX (vbox21), label12, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label12), 0, 0.5);
 
   vbox22 = gtk_vbox_new (FALSE, 5);
@@ -515,9 +721,13 @@ create_dialog1 (void)
   gtk_widget_show (one_pass_quantizer1);
   gtk_container_add (GTK_CONTAINER (menu1), one_pass_quantizer1);
 
-  two_pass1 = gtk_menu_item_new_with_mnemonic (_("Two pass"));
+  two_pass1 = gtk_menu_item_new_with_mnemonic (_("Two pass, final size"));
   gtk_widget_show (two_pass1);
   gtk_container_add (GTK_CONTAINER (menu1), two_pass1);
+
+  two_pass__average_bitrate1 = gtk_menu_item_new_with_mnemonic (_("Two pass, average bitrate"));
+  gtk_widget_show (two_pass__average_bitrate1);
+  gtk_container_add (GTK_CONTAINER (menu1), two_pass__average_bitrate1);
 
   same_qz_as_input1 = gtk_menu_item_new_with_mnemonic (_("Same Qz as input"));
   gtk_widget_show (same_qz_as_input1);
@@ -531,7 +741,7 @@ create_dialog1 (void)
   gtk_tooltips_set_tip (tooltips, entryEntry, _("Target video bitrate"), NULL);
   gtk_entry_set_width_chars (GTK_ENTRY (entryEntry), 10);
 
-  spinbuttonQuant_adj = gtk_adjustment_new (4, 2, 31, 0.1, 10, 10);
+  spinbuttonQuant_adj = gtk_adjustment_new (4, 1, 31, 0.1, 10, 10);
   spinbuttonQuant = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonQuant_adj), 1, 1);
   gtk_widget_show (spinbuttonQuant);
   gtk_box_pack_start (GTK_BOX (vbox22), spinbuttonQuant, FALSE, FALSE, 0);
@@ -540,7 +750,6 @@ create_dialog1 (void)
   label9 = gtk_label_new (_("Variable bitrate mode"));
   gtk_widget_show (label9);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label9);
-  gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
 
   hbox7 = gtk_hbox_new (FALSE, 10);
   gtk_widget_show (hbox7);
@@ -588,10 +797,9 @@ create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (vbox23), checkbuttonPacked, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, checkbuttonPacked, _("Enables Divx like packed vop, DO NOT SET, it is ugly"), NULL);
 
-  label8 = gtk_label_new (_("Main"));
-  gtk_widget_show (label8);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), label8);
-  gtk_label_set_justify (GTK_LABEL (label8), GTK_JUSTIFY_LEFT);
+  labelMain = gtk_label_new (_("Main"));
+  gtk_widget_show (labelMain);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), labelMain);
 
   vbox6 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox6);
@@ -608,16 +816,15 @@ create_dialog1 (void)
   gtk_widget_show (vbox8);
   gtk_box_pack_start (GTK_BOX (hbox8), vbox8, FALSE, FALSE, 0);
 
-  label13 = gtk_label_new (_("Motion search precision:"));
-  gtk_widget_show (label13);
-  gtk_box_pack_start (GTK_BOX (vbox8), label13, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label13), GTK_JUSTIFY_LEFT);
+  labelMotionSearchPrecision = gtk_label_new (_("Motion search precision:"));
+  gtk_widget_show (labelMotionSearchPrecision);
+  gtk_box_pack_start (GTK_BOX (vbox8), labelMotionSearchPrecision, TRUE, TRUE, 0);
 
-  label14 = gtk_label_new (_("VHQ mode:"));
-  gtk_widget_show (label14);
-  gtk_box_pack_start (GTK_BOX (vbox8), label14, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label14), GTK_JUSTIFY_FILL);
-  gtk_misc_set_alignment (GTK_MISC (label14), 0, 0.5);
+  labelVHQMode = gtk_label_new (_("VHQ mode:"));
+  gtk_widget_show (labelVHQMode);
+  gtk_box_pack_start (GTK_BOX (vbox8), labelVHQMode, TRUE, TRUE, 0);
+  gtk_label_set_justify (GTK_LABEL (labelVHQMode), GTK_JUSTIFY_FILL);
+  gtk_misc_set_alignment (GTK_MISC (labelVHQMode), 0, 0.5);
 
   vbox7 = gtk_vbox_new (FALSE, 10);
   gtk_widget_show (vbox7);
@@ -706,16 +913,15 @@ create_dialog1 (void)
   checkbuttonHQAC = gtk_check_button_new_with_mnemonic (_("HQ _AC"));
   gtk_widget_show (checkbuttonHQAC);
   gtk_box_pack_start (GTK_BOX (hbox10), checkbuttonHQAC, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonHQAC, _("Enable a better prediction of AC component"), NULL);
+  gtk_tooltips_set_tip (tooltips, checkbuttonHQAC, _("Enable a better prediction of AC component. Turns on Lumi masking - applies more compression to dark/light areas that the eye cannot notice easily"), NULL);
 
   hbox9 = gtk_hbox_new (FALSE, 10);
   gtk_widget_show (hbox9);
   gtk_box_pack_start (GTK_BOX (vbox6), hbox9, FALSE, FALSE, 0);
 
-  label15 = gtk_label_new (_("I-frame interval - Min:"));
-  gtk_widget_show (label15);
-  gtk_box_pack_start (GTK_BOX (hbox9), label15, FALSE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label15), GTK_JUSTIFY_LEFT);
+  labelIFrameIntervalMin = gtk_label_new (_("I-frame interval - Min:"));
+  gtk_widget_show (labelIFrameIntervalMin);
+  gtk_box_pack_start (GTK_BOX (hbox9), labelIFrameIntervalMin, FALSE, FALSE, 0);
 
   spinbuttonIMinPeriod_adj = gtk_adjustment_new (1, 1, 9, 1, 10, 10);
   spinbuttonIMinPeriod = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonIMinPeriod_adj), 1, 0);
@@ -723,10 +929,9 @@ create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (hbox9), spinbuttonIMinPeriod, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, spinbuttonIMinPeriod, _("Minimum space between I-frames, 1 will disable forced I-frame spacing"), NULL);
 
-  label16 = gtk_label_new (_("Max:"));
-  gtk_widget_show (label16);
-  gtk_box_pack_start (GTK_BOX (hbox9), label16, FALSE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label16), GTK_JUSTIFY_LEFT);
+  labelIFrameIntervalMax = gtk_label_new (_("Max:"));
+  gtk_widget_show (labelIFrameIntervalMax);
+  gtk_box_pack_start (GTK_BOX (hbox9), labelIFrameIntervalMax, FALSE, FALSE, 0);
 
   spinbuttonIMaxPeriod_adj = gtk_adjustment_new (250, 1, 500, 1, 10, 10);
   spinbuttonIMaxPeriod = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonIMaxPeriod_adj), 1, 0);
@@ -734,23 +939,22 @@ create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (hbox9), spinbuttonIMaxPeriod, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, spinbuttonIMaxPeriod, _("Maximum number of frames allowed between I-frames"), NULL);
 
-  frame2 = gtk_frame_new (NULL);
-  gtk_widget_show (frame2);
-  gtk_box_pack_start (GTK_BOX (vbox6), frame2, FALSE, FALSE, 0);
+  frameAdvancedSimpleProfile = gtk_frame_new (NULL);
+  gtk_widget_show (frameAdvancedSimpleProfile);
+  gtk_box_pack_start (GTK_BOX (vbox6), frameAdvancedSimpleProfile, FALSE, FALSE, 0);
 
   vbox9 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox9);
-  gtk_container_add (GTK_CONTAINER (frame2), vbox9);
+  gtk_container_add (GTK_CONTAINER (frameAdvancedSimpleProfile), vbox9);
   gtk_container_set_border_width (GTK_CONTAINER (vbox9), 5);
 
   hbox11 = gtk_hbox_new (FALSE, 10);
   gtk_widget_show (hbox11);
   gtk_box_pack_start (GTK_BOX (vbox9), hbox11, FALSE, FALSE, 0);
 
-  label18 = gtk_label_new (_("Number of B-frames:"));
-  gtk_widget_show (label18);
-  gtk_box_pack_start (GTK_BOX (hbox11), label18, FALSE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label18), GTK_JUSTIFY_LEFT);
+  labelNumberOfBFrames = gtk_label_new (_("Number of B-frames:"));
+  gtk_widget_show (labelNumberOfBFrames);
+  gtk_box_pack_start (GTK_BOX (hbox11), labelNumberOfBFrames, FALSE, FALSE, 0);
 
   spinbuttonBFrame_adj = gtk_adjustment_new (1, 0, 3, 1, 1, 1);
   spinbuttonBFrame = gtk_spin_button_new (GTK_ADJUSTMENT (spinbuttonBFrame_adj), 1, 0);
@@ -772,15 +976,13 @@ create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (hbox12), checkbuttonGMC, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, checkbuttonGMC, _("Global Motion Compensation can save bits on camera pans, zooming and rotation"), NULL);
 
-  label17 = gtk_label_new (_("Advanced Simple Profile"));
-  gtk_widget_show (label17);
-  gtk_frame_set_label_widget (GTK_FRAME (frame2), label17);
-  gtk_label_set_justify (GTK_LABEL (label17), GTK_JUSTIFY_LEFT);
+  labelAdvancedSimpleProfile = gtk_label_new (_("Advanced Simple Profile"));
+  gtk_widget_show (labelAdvancedSimpleProfile);
+  gtk_frame_set_label_widget (GTK_FRAME (frameAdvancedSimpleProfile), labelAdvancedSimpleProfile);
 
-  label2 = gtk_label_new (_("Motion Estimation"));
-  gtk_widget_show (label2);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), label2);
-  gtk_label_set_justify (GTK_LABEL (label2), GTK_JUSTIFY_LEFT);
+  labelMotionEstimation = gtk_label_new (_("Motion Estimation"));
+  gtk_widget_show (labelMotionEstimation);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), labelMotionEstimation);
 
   vbox10 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox10);
@@ -791,10 +993,9 @@ create_dialog1 (void)
   gtk_widget_show (hbox13);
   gtk_box_pack_start (GTK_BOX (vbox10), hbox13, FALSE, FALSE, 0);
 
-  label19 = gtk_label_new (_("Quantization type:"));
-  gtk_widget_show (label19);
-  gtk_box_pack_start (GTK_BOX (hbox13), label19, FALSE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label19), GTK_JUSTIFY_LEFT);
+  labelQuantizationType = gtk_label_new (_("Quantization type:"));
+  gtk_widget_show (labelQuantizationType);
+  gtk_box_pack_start (GTK_BOX (hbox13), labelQuantizationType, FALSE, FALSE, 0);
 
   radiobuttonH263 = gtk_radio_button_new_with_mnemonic (NULL, _("_H.263"));
   gtk_widget_show (radiobuttonH263);
@@ -810,41 +1011,76 @@ create_dialog1 (void)
   gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobuttonMpeg), radiobuttonH263_group);
   radiobuttonH263_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobuttonMpeg));
 
-  checkbuttonTrellis = gtk_check_button_new_with_mnemonic (_("_Trellis quantization"));
-  gtk_widget_show (checkbuttonTrellis);
-  gtk_box_pack_start (GTK_BOX (vbox10), checkbuttonTrellis, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, checkbuttonTrellis, _("Rate distortion quantization, will find optimal encoding for each block"), NULL);
+  radiobuttonCustomMatrix = gtk_radio_button_new_with_mnemonic (NULL, _("_Custom Matrix"));
+  gtk_widget_show (radiobuttonCustomMatrix);
+  gtk_box_pack_start (GTK_BOX (hbox13), radiobuttonCustomMatrix, FALSE, FALSE, 0);
+  gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobuttonCustomMatrix), radiobuttonH263_group);
+  radiobuttonH263_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobuttonCustomMatrix));
 
-  frame3 = gtk_frame_new (NULL);
-  gtk_widget_show (frame3);
-  gtk_box_pack_start (GTK_BOX (vbox10), frame3, FALSE, FALSE, 0);
+  hbox20 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox20);
+  gtk_box_pack_start (GTK_BOX (vbox10), hbox20, FALSE, TRUE, 0);
+
+  labelLoadCustomMatrix = gtk_label_new (_("Load Custom Matrix:  "));
+  gtk_widget_show (labelLoadCustomMatrix);
+  gtk_box_pack_start (GTK_BOX (hbox20), labelLoadCustomMatrix, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (labelLoadCustomMatrix), GTK_JUSTIFY_RIGHT);
+
+  buttonLoadMatrix = gtk_button_new ();
+  gtk_widget_show (buttonLoadMatrix);
+  gtk_box_pack_start (GTK_BOX (hbox20), buttonLoadMatrix, FALSE, FALSE, 0);
+
+  alignment6 = gtk_alignment_new (0.5, 0.5, 0, 0);
+  gtk_widget_show (alignment6);
+  gtk_container_add (GTK_CONTAINER (buttonLoadMatrix), alignment6);
+
+  hbox21 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox21);
+  gtk_container_add (GTK_CONTAINER (alignment6), hbox21);
+
+  image1 = gtk_image_new_from_stock ("gtk-open", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image1);
+  gtk_box_pack_start (GTK_BOX (hbox21), image1, FALSE, FALSE, 0);
+
+  label13 = gtk_label_new_with_mnemonic (_("Open CQM file"));
+  gtk_widget_show (label13);
+  gtk_box_pack_start (GTK_BOX (hbox21), label13, FALSE, FALSE, 0);
+
+  vseparator1 = gtk_vseparator_new ();
+  gtk_widget_show (vseparator1);
+  gtk_box_pack_start (GTK_BOX (hbox20), vseparator1, FALSE, TRUE, 0);
+
+  buttonCreateCustomMatrix = gtk_button_new_with_mnemonic (_("Edit Custom Matrix"));
+  gtk_widget_show (buttonCreateCustomMatrix);
+  gtk_box_pack_start (GTK_BOX (hbox20), buttonCreateCustomMatrix, FALSE, FALSE, 0);
+
+  frameQuantizationRestrictions = gtk_frame_new (NULL);
+  gtk_widget_show (frameQuantizationRestrictions);
+  gtk_box_pack_start (GTK_BOX (vbox10), frameQuantizationRestrictions, FALSE, FALSE, 0);
 
   hbox14 = gtk_hbox_new (FALSE, 10);
   gtk_widget_show (hbox14);
-  gtk_container_add (GTK_CONTAINER (frame3), hbox14);
+  gtk_container_add (GTK_CONTAINER (frameQuantizationRestrictions), hbox14);
   gtk_container_set_border_width (GTK_CONTAINER (hbox14), 5);
 
   vbox11 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox11);
   gtk_box_pack_start (GTK_BOX (hbox14), vbox11, FALSE, FALSE, 0);
 
-  label20 = gtk_label_new (_("I-frame quantizer - Min:"));
-  gtk_widget_show (label20);
-  gtk_box_pack_start (GTK_BOX (vbox11), label20, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label20), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label20), 0, 0.5);
+  labelIFrameQuantizerMin = gtk_label_new (_("I-frame quantizer - Min:"));
+  gtk_widget_show (labelIFrameQuantizerMin);
+  gtk_box_pack_start (GTK_BOX (vbox11), labelIFrameQuantizerMin, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelIFrameQuantizerMin), 0, 0.5);
 
-  label21 = gtk_label_new (_("P-frame quantizer - Min:"));
-  gtk_widget_show (label21);
-  gtk_box_pack_start (GTK_BOX (vbox11), label21, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label21), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label21), 0, 0.5);
+  labelPFrameQuantizerMin = gtk_label_new (_("P-frame quantizer - Min:"));
+  gtk_widget_show (labelPFrameQuantizerMin);
+  gtk_box_pack_start (GTK_BOX (vbox11), labelPFrameQuantizerMin, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelPFrameQuantizerMin), 0, 0.5);
 
-  label22 = gtk_label_new (_("B-frame quantizer - Min:"));
-  gtk_widget_show (label22);
-  gtk_box_pack_start (GTK_BOX (vbox11), label22, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label22), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label22), 0, 0.5);
+  labelBFrameQuantizaterMin = gtk_label_new (_("B-frame quantizer - Min:"));
+  gtk_widget_show (labelBFrameQuantizaterMin);
+  gtk_box_pack_start (GTK_BOX (vbox11), labelBFrameQuantizaterMin, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelBFrameQuantizaterMin), 0, 0.5);
 
   vbox12 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox12);
@@ -872,23 +1108,20 @@ create_dialog1 (void)
   gtk_widget_show (vbox13);
   gtk_box_pack_start (GTK_BOX (hbox14), vbox13, FALSE, FALSE, 0);
 
-  label24 = gtk_label_new (_("Max:"));
-  gtk_widget_show (label24);
-  gtk_box_pack_start (GTK_BOX (vbox13), label24, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label24), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label24), 0, 0.5);
+  labelIFrameQuantizerMax = gtk_label_new (_("Max:"));
+  gtk_widget_show (labelIFrameQuantizerMax);
+  gtk_box_pack_start (GTK_BOX (vbox13), labelIFrameQuantizerMax, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelIFrameQuantizerMax), 0, 0.5);
 
-  label25 = gtk_label_new (_("Max:"));
-  gtk_widget_show (label25);
-  gtk_box_pack_start (GTK_BOX (vbox13), label25, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label25), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label25), 0, 0.5);
+  labelPFrameQuantizerMax = gtk_label_new (_("Max:"));
+  gtk_widget_show (labelPFrameQuantizerMax);
+  gtk_box_pack_start (GTK_BOX (vbox13), labelPFrameQuantizerMax, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelPFrameQuantizerMax), 0, 0.5);
 
-  label26 = gtk_label_new (_("Max:"));
-  gtk_widget_show (label26);
-  gtk_box_pack_start (GTK_BOX (vbox13), label26, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label26), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label26), 0, 0.5);
+  labelBFrameQuantizerMax = gtk_label_new (_("Max:"));
+  gtk_widget_show (labelBFrameQuantizerMax);
+  gtk_box_pack_start (GTK_BOX (vbox13), labelBFrameQuantizerMax, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelBFrameQuantizerMax), 0, 0.5);
 
   vbox14 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox14);
@@ -912,15 +1145,18 @@ create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (vbox14), spinbuttonBMax, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, spinbuttonBMax, _("Maximum quantizer allowed for B-frames"), NULL);
 
-  label26 = gtk_label_new (_("Quantizer restrictions"));
-  gtk_widget_show (label26);
-  gtk_frame_set_label_widget (GTK_FRAME (frame3), label26);
-  gtk_label_set_justify (GTK_LABEL (label26), GTK_JUSTIFY_LEFT);
+  labelQuantizerRestrictions = gtk_label_new (_("Quantizer restrictions"));
+  gtk_widget_show (labelQuantizerRestrictions);
+  gtk_frame_set_label_widget (GTK_FRAME (frameQuantizationRestrictions), labelQuantizerRestrictions);
 
-  label3 = gtk_label_new (_("Quantization"));
-  gtk_widget_show (label3);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), label3);
-  gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
+  checkbuttonTrellis = gtk_check_button_new_with_mnemonic (_("_Trellis quantization"));
+  gtk_widget_show (checkbuttonTrellis);
+  gtk_box_pack_start (GTK_BOX (vbox10), checkbuttonTrellis, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, checkbuttonTrellis, _("Rate distortion quantization, will find optimal encoding for each block"), NULL);
+
+  labelQuantization = gtk_label_new (_("Quantization"));
+  gtk_widget_show (labelQuantization);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), labelQuantization);
 
   vbox15 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox15);
@@ -929,13 +1165,13 @@ create_dialog1 (void)
                                       FALSE, FALSE, GTK_PACK_START);
   gtk_container_set_border_width (GTK_CONTAINER (vbox15), 5);
 
-  frame4 = gtk_frame_new (NULL);
-  gtk_widget_show (frame4);
-  gtk_box_pack_start (GTK_BOX (vbox15), frame4, FALSE, FALSE, 0);
+  frameTwoPassTuning = gtk_frame_new (NULL);
+  gtk_widget_show (frameTwoPassTuning);
+  gtk_box_pack_start (GTK_BOX (vbox15), frameTwoPassTuning, FALSE, FALSE, 0);
 
   vbox16 = gtk_vbox_new (FALSE, 10);
   gtk_widget_show (vbox16);
-  gtk_container_add (GTK_CONTAINER (frame4), vbox16);
+  gtk_container_add (GTK_CONTAINER (frameTwoPassTuning), vbox16);
   gtk_container_set_border_width (GTK_CONTAINER (vbox16), 5);
 
   hbox = gtk_hbox_new (FALSE, 10);
@@ -946,35 +1182,30 @@ create_dialog1 (void)
   gtk_widget_show (vbox17);
   gtk_box_pack_start (GTK_BOX (hbox), vbox17, TRUE, TRUE, 0);
 
-  label30 = gtk_label_new (_("I-frame boost (%):"));
-  gtk_widget_show (label30);
-  gtk_box_pack_start (GTK_BOX (vbox17), label30, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label30), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label30), 0, 0.5);
+  labelIFrameBoost = gtk_label_new (_("I-frame boost (%):"));
+  gtk_widget_show (labelIFrameBoost);
+  gtk_box_pack_start (GTK_BOX (vbox17), labelIFrameBoost, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelIFrameBoost), 0, 0.5);
 
-  label31 = gtk_label_new (_("I-frames closer than ... frames..."));
-  gtk_widget_show (label31);
-  gtk_box_pack_start (GTK_BOX (vbox17), label31, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label31), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label31), 0, 0.5);
+  labelIFrameCloserThan = gtk_label_new (_("I-frames closer than ... frames..."));
+  gtk_widget_show (labelIFrameCloserThan);
+  gtk_box_pack_start (GTK_BOX (vbox17), labelIFrameCloserThan, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelIFrameCloserThan), 0, 0.5);
 
-  label32 = gtk_label_new (_("...are reduced by (%):"));
-  gtk_widget_show (label32);
-  gtk_box_pack_start (GTK_BOX (vbox17), label32, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label32), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label32), 0, 0.5);
+  labelAreReducedBy = gtk_label_new (_("...are reduced by (%):"));
+  gtk_widget_show (labelAreReducedBy);
+  gtk_box_pack_start (GTK_BOX (vbox17), labelAreReducedBy, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelAreReducedBy), 0, 0.5);
 
-  label28 = gtk_label_new (_("Max overflow improvement (%):"));
-  gtk_widget_show (label28);
-  gtk_box_pack_start (GTK_BOX (vbox17), label28, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label28), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label28), 0, 0.5);
+  labelMaxOverflowImprovement = gtk_label_new (_("Max overflow improvement (%):"));
+  gtk_widget_show (labelMaxOverflowImprovement);
+  gtk_box_pack_start (GTK_BOX (vbox17), labelMaxOverflowImprovement, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelMaxOverflowImprovement), 0, 0.5);
 
-  label29 = gtk_label_new (_("Max overflow degradation (%):"));
-  gtk_widget_show (label29);
-  gtk_box_pack_start (GTK_BOX (vbox17), label29, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label29), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label29), 0, 0.5);
+  labelMaxOverflowDegradation = gtk_label_new (_("Max overflow degradation (%):"));
+  gtk_widget_show (labelMaxOverflowDegradation);
+  gtk_box_pack_start (GTK_BOX (vbox17), labelMaxOverflowDegradation, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelMaxOverflowDegradation), 0, 0.5);
 
   vbox18 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox18);
@@ -988,7 +1219,7 @@ create_dialog1 (void)
   entryIInterv = gtk_entry_new ();
   gtk_widget_show (entryIInterv);
   gtk_box_pack_start (GTK_BOX (vbox18), entryIInterv, FALSE, FALSE, 0);
-  gtk_widget_set_size_request (entryIInterv, 158, -2);
+  gtk_widget_set_size_request (entryIInterv, 158, -1);
   gtk_tooltips_set_tip (tooltips, entryIInterv, _("I-frames appearing in the range below this value will be treated as consecutive keyframes"), NULL);
 
   entryIreduction = gtk_entry_new ();
@@ -1006,41 +1237,37 @@ create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (vbox18), entryMaxOvrDeg, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, entryMaxOvrDeg, _("How much of the overflow the codec can eat into during oversized sections - larger values will bridge the gap faster"), NULL);
 
-  label27 = gtk_label_new (_("Two pass tuning"));
-  gtk_widget_show (label27);
-  gtk_frame_set_label_widget (GTK_FRAME (frame4), label27);
-  gtk_label_set_justify (GTK_LABEL (label27), GTK_JUSTIFY_LEFT);
+  labelTwoPassTuning = gtk_label_new (_("Two pass tuning"));
+  gtk_widget_show (labelTwoPassTuning);
+  gtk_frame_set_label_widget (GTK_FRAME (frameTwoPassTuning), labelTwoPassTuning);
 
-  frame5 = gtk_frame_new (NULL);
-  gtk_widget_show (frame5);
-  gtk_box_pack_start (GTK_BOX (vbox15), frame5, FALSE, FALSE, 0);
+  frameCurveCompression = gtk_frame_new (NULL);
+  gtk_widget_show (frameCurveCompression);
+  gtk_box_pack_start (GTK_BOX (vbox15), frameCurveCompression, FALSE, FALSE, 0);
 
   hbox18 = gtk_hbox_new (FALSE, 10);
   gtk_widget_show (hbox18);
-  gtk_container_add (GTK_CONTAINER (frame5), hbox18);
+  gtk_container_add (GTK_CONTAINER (frameCurveCompression), hbox18);
   gtk_container_set_border_width (GTK_CONTAINER (hbox18), 5);
 
   vbox19 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox19);
   gtk_box_pack_start (GTK_BOX (hbox18), vbox19, TRUE, TRUE, 0);
 
-  label37 = gtk_label_new (_("High bitrate scenes (%):"));
-  gtk_widget_show (label37);
-  gtk_box_pack_start (GTK_BOX (vbox19), label37, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label37), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label37), 0, 0.5);
+  labelHighBitrateScenes = gtk_label_new (_("High bitrate scenes (%):"));
+  gtk_widget_show (labelHighBitrateScenes);
+  gtk_box_pack_start (GTK_BOX (vbox19), labelHighBitrateScenes, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelHighBitrateScenes), 0, 0.5);
 
-  label38 = gtk_label_new (_("Low bitrate scenes (%):"));
-  gtk_widget_show (label38);
-  gtk_box_pack_start (GTK_BOX (vbox19), label38, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label38), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label38), 0, 0.5);
+  labelLowBitrateScenes = gtk_label_new (_("Low bitrate scenes (%):"));
+  gtk_widget_show (labelLowBitrateScenes);
+  gtk_box_pack_start (GTK_BOX (vbox19), labelLowBitrateScenes, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelLowBitrateScenes), 0, 0.5);
 
-  label39 = gtk_label_new (_("Overflow control strength (%):"));
-  gtk_widget_show (label39);
-  gtk_box_pack_start (GTK_BOX (vbox19), label39, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label39), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label39), 0, 0.5);
+  labelOverflowControlStrength = gtk_label_new (_("Overflow control strength (%):"));
+  gtk_widget_show (labelOverflowControlStrength);
+  gtk_box_pack_start (GTK_BOX (vbox19), labelOverflowControlStrength, TRUE, TRUE, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelOverflowControlStrength), 0, 0.5);
 
   vbox20 = gtk_vbox_new (FALSE, 5);
   gtk_widget_show (vbox20);
@@ -1061,15 +1288,13 @@ create_dialog1 (void)
   gtk_box_pack_start (GTK_BOX (vbox20), entryOvrControl, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, entryOvrControl, _("0 = default from core (let XviD decide), else overflow payback percent per frame"), NULL);
 
-  label36 = gtk_label_new (_("Curve compression"));
-  gtk_widget_show (label36);
-  gtk_frame_set_label_widget (GTK_FRAME (frame5), label36);
-  gtk_label_set_justify (GTK_LABEL (label36), GTK_JUSTIFY_LEFT);
+  labelCurveCompression = gtk_label_new (_("Curve compression"));
+  gtk_widget_show (labelCurveCompression);
+  gtk_frame_set_label_widget (GTK_FRAME (frameCurveCompression), labelCurveCompression);
 
-  label4 = gtk_label_new (_("Second Pass"));
-  gtk_widget_show (label4);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 3), label4);
-  gtk_label_set_justify (GTK_LABEL (label4), GTK_JUSTIFY_LEFT);
+  labelSecondPass = gtk_label_new (_("Second Pass"));
+  gtk_widget_show (labelSecondPass);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 3), labelSecondPass);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -1084,7 +1309,6 @@ create_dialog1 (void)
   gtk_widget_show (okbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), okbutton1, GTK_RESPONSE_OK);
   GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
-
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
@@ -1104,6 +1328,7 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, one_pass_cbr1, "one_pass_cbr1");
   GLADE_HOOKUP_OBJECT (dialog1, one_pass_quantizer1, "one_pass_quantizer1");
   GLADE_HOOKUP_OBJECT (dialog1, two_pass1, "two_pass1");
+  GLADE_HOOKUP_OBJECT (dialog1, two_pass__average_bitrate1, "two_pass__average_bitrate1");
   GLADE_HOOKUP_OBJECT (dialog1, same_qz_as_input1, "same_qz_as_input1");
   GLADE_HOOKUP_OBJECT (dialog1, entryEntry, "entryEntry");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonQuant, "spinbuttonQuant");
@@ -1118,12 +1343,12 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, vbox23, "vbox23");
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonTurbo, "checkbuttonTurbo");
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonPacked, "checkbuttonPacked");
-  GLADE_HOOKUP_OBJECT (dialog1, label8, "label8");
+  GLADE_HOOKUP_OBJECT (dialog1, labelMain, "labelMain");
   GLADE_HOOKUP_OBJECT (dialog1, vbox6, "vbox6");
   GLADE_HOOKUP_OBJECT (dialog1, hbox8, "hbox8");
   GLADE_HOOKUP_OBJECT (dialog1, vbox8, "vbox8");
-  GLADE_HOOKUP_OBJECT (dialog1, label13, "label13");
-  GLADE_HOOKUP_OBJECT (dialog1, label14, "label14");
+  GLADE_HOOKUP_OBJECT (dialog1, labelMotionSearchPrecision, "labelMotionSearchPrecision");
+  GLADE_HOOKUP_OBJECT (dialog1, labelVHQMode, "labelVHQMode");
   GLADE_HOOKUP_OBJECT (dialog1, vbox7, "vbox7");
   GLADE_HOOKUP_OBJECT (dialog1, optionmenuMS, "optionmenuMS");
   GLADE_HOOKUP_OBJECT (dialog1, menu2, "menu2");
@@ -1146,75 +1371,85 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, checkbutton4MV, "checkbutton4MV");
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonHQAC, "checkbuttonHQAC");
   GLADE_HOOKUP_OBJECT (dialog1, hbox9, "hbox9");
-  GLADE_HOOKUP_OBJECT (dialog1, label15, "label15");
+  GLADE_HOOKUP_OBJECT (dialog1, labelIFrameIntervalMin, "labelIFrameIntervalMin");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonIMinPeriod, "spinbuttonIMinPeriod");
-  GLADE_HOOKUP_OBJECT (dialog1, label16, "label16");
+  GLADE_HOOKUP_OBJECT (dialog1, labelIFrameIntervalMax, "labelIFrameIntervalMax");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonIMaxPeriod, "spinbuttonIMaxPeriod");
-  GLADE_HOOKUP_OBJECT (dialog1, frame2, "frame2");
+  GLADE_HOOKUP_OBJECT (dialog1, frameAdvancedSimpleProfile, "frameAdvancedSimpleProfile");
   GLADE_HOOKUP_OBJECT (dialog1, vbox9, "vbox9");
   GLADE_HOOKUP_OBJECT (dialog1, hbox11, "hbox11");
-  GLADE_HOOKUP_OBJECT (dialog1, label18, "label18");
+  GLADE_HOOKUP_OBJECT (dialog1, labelNumberOfBFrames, "labelNumberOfBFrames");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonBFrame, "spinbuttonBFrame");
   GLADE_HOOKUP_OBJECT (dialog1, hbox12, "hbox12");
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonQPel, "checkbuttonQPel");
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonGMC, "checkbuttonGMC");
-  GLADE_HOOKUP_OBJECT (dialog1, label17, "label17");
-  GLADE_HOOKUP_OBJECT (dialog1, label2, "label2");
+  GLADE_HOOKUP_OBJECT (dialog1, labelAdvancedSimpleProfile, "labelAdvancedSimpleProfile");
+  GLADE_HOOKUP_OBJECT (dialog1, labelMotionEstimation, "labelMotionEstimation");
   GLADE_HOOKUP_OBJECT (dialog1, vbox10, "vbox10");
   GLADE_HOOKUP_OBJECT (dialog1, hbox13, "hbox13");
-  GLADE_HOOKUP_OBJECT (dialog1, label19, "label19");
+  GLADE_HOOKUP_OBJECT (dialog1, labelQuantizationType, "labelQuantizationType");
   GLADE_HOOKUP_OBJECT (dialog1, radiobuttonH263, "radiobuttonH263");
   GLADE_HOOKUP_OBJECT (dialog1, radiobuttonMpeg, "radiobuttonMpeg");
-  GLADE_HOOKUP_OBJECT (dialog1, checkbuttonTrellis, "checkbuttonTrellis");
-  GLADE_HOOKUP_OBJECT (dialog1, frame3, "frame3");
+  GLADE_HOOKUP_OBJECT (dialog1, radiobuttonCustomMatrix, "radiobuttonCustomMatrix");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox20, "hbox20");
+  GLADE_HOOKUP_OBJECT (dialog1, labelLoadCustomMatrix, "labelLoadCustomMatrix");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonLoadMatrix, "buttonLoadMatrix");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment6, "alignment6");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox21, "hbox21");
+  GLADE_HOOKUP_OBJECT (dialog1, image1, "image1");
+  GLADE_HOOKUP_OBJECT (dialog1, label13, "label13");
+  GLADE_HOOKUP_OBJECT (dialog1, vseparator1, "vseparator1");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonCreateCustomMatrix, "buttonCreateCustomMatrix");
+  GLADE_HOOKUP_OBJECT (dialog1, frameQuantizationRestrictions, "frameQuantizationRestrictions");
   GLADE_HOOKUP_OBJECT (dialog1, hbox14, "hbox14");
   GLADE_HOOKUP_OBJECT (dialog1, vbox11, "vbox11");
-  GLADE_HOOKUP_OBJECT (dialog1, label20, "label20");
-  GLADE_HOOKUP_OBJECT (dialog1, label21, "label21");
-  GLADE_HOOKUP_OBJECT (dialog1, label22, "label22");
+  GLADE_HOOKUP_OBJECT (dialog1, labelIFrameQuantizerMin, "labelIFrameQuantizerMin");
+  GLADE_HOOKUP_OBJECT (dialog1, labelPFrameQuantizerMin, "labelPFrameQuantizerMin");
+  GLADE_HOOKUP_OBJECT (dialog1, labelBFrameQuantizaterMin, "labelBFrameQuantizaterMin");
   GLADE_HOOKUP_OBJECT (dialog1, vbox12, "vbox12");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonIMin, "spinbuttonIMin");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonPMin, "spinbuttonPMin");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonBMin, "spinbuttonBMin");
   GLADE_HOOKUP_OBJECT (dialog1, vbox13, "vbox13");
-  GLADE_HOOKUP_OBJECT (dialog1, label24, "label24");
-  GLADE_HOOKUP_OBJECT (dialog1, label25, "label25");
-  GLADE_HOOKUP_OBJECT (dialog1, label26, "label26");
+  GLADE_HOOKUP_OBJECT (dialog1, labelIFrameQuantizerMax, "labelIFrameQuantizerMax");
+  GLADE_HOOKUP_OBJECT (dialog1, labelPFrameQuantizerMax, "labelPFrameQuantizerMax");
+  GLADE_HOOKUP_OBJECT (dialog1, labelBFrameQuantizerMax, "labelBFrameQuantizerMax");
   GLADE_HOOKUP_OBJECT (dialog1, vbox14, "vbox14");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonIMax, "spinbuttonIMax");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonPMax, "spinbuttonPMax");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonBMax, "spinbuttonBMax");
-  GLADE_HOOKUP_OBJECT (dialog1, label26, "label26");
-  GLADE_HOOKUP_OBJECT (dialog1, label3, "label3");
+  GLADE_HOOKUP_OBJECT (dialog1, labelQuantizerRestrictions, "labelQuantizerRestrictions");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbuttonTrellis, "checkbuttonTrellis");
+  GLADE_HOOKUP_OBJECT (dialog1, labelQuantization, "labelQuantization");
   GLADE_HOOKUP_OBJECT (dialog1, vbox15, "vbox15");
-  GLADE_HOOKUP_OBJECT (dialog1, frame4, "frame4");
+  GLADE_HOOKUP_OBJECT (dialog1, frameTwoPassTuning, "frameTwoPassTuning");
   GLADE_HOOKUP_OBJECT (dialog1, vbox16, "vbox16");
   GLADE_HOOKUP_OBJECT (dialog1, hbox, "hbox");
   GLADE_HOOKUP_OBJECT (dialog1, vbox17, "vbox17");
-  GLADE_HOOKUP_OBJECT (dialog1, label30, "label30");
-  GLADE_HOOKUP_OBJECT (dialog1, label31, "label31");
-  GLADE_HOOKUP_OBJECT (dialog1, label32, "label32");
-  GLADE_HOOKUP_OBJECT (dialog1, label28, "label28");
-  GLADE_HOOKUP_OBJECT (dialog1, label29, "label29");
+  GLADE_HOOKUP_OBJECT (dialog1, labelIFrameBoost, "labelIFrameBoost");
+  GLADE_HOOKUP_OBJECT (dialog1, labelIFrameCloserThan, "labelIFrameCloserThan");
+  GLADE_HOOKUP_OBJECT (dialog1, labelAreReducedBy, "labelAreReducedBy");
+  GLADE_HOOKUP_OBJECT (dialog1, labelMaxOverflowImprovement, "labelMaxOverflowImprovement");
+  GLADE_HOOKUP_OBJECT (dialog1, labelMaxOverflowDegradation, "labelMaxOverflowDegradation");
   GLADE_HOOKUP_OBJECT (dialog1, vbox18, "vbox18");
   GLADE_HOOKUP_OBJECT (dialog1, entryIBoost, "entryIBoost");
   GLADE_HOOKUP_OBJECT (dialog1, entryIInterv, "entryIInterv");
   GLADE_HOOKUP_OBJECT (dialog1, entryIreduction, "entryIreduction");
   GLADE_HOOKUP_OBJECT (dialog1, entryMaxOvrImp, "entryMaxOvrImp");
   GLADE_HOOKUP_OBJECT (dialog1, entryMaxOvrDeg, "entryMaxOvrDeg");
-  GLADE_HOOKUP_OBJECT (dialog1, label27, "label27");
-  GLADE_HOOKUP_OBJECT (dialog1, frame5, "frame5");
+  GLADE_HOOKUP_OBJECT (dialog1, labelTwoPassTuning, "labelTwoPassTuning");
+  GLADE_HOOKUP_OBJECT (dialog1, frameCurveCompression, "frameCurveCompression");
   GLADE_HOOKUP_OBJECT (dialog1, hbox18, "hbox18");
   GLADE_HOOKUP_OBJECT (dialog1, vbox19, "vbox19");
-  GLADE_HOOKUP_OBJECT (dialog1, label37, "label37");
-  GLADE_HOOKUP_OBJECT (dialog1, label38, "label38");
-  GLADE_HOOKUP_OBJECT (dialog1, label39, "label39");
+  GLADE_HOOKUP_OBJECT (dialog1, labelHighBitrateScenes, "labelHighBitrateScenes");
+  GLADE_HOOKUP_OBJECT (dialog1, labelLowBitrateScenes, "labelLowBitrateScenes");
+  GLADE_HOOKUP_OBJECT (dialog1, labelOverflowControlStrength, "labelOverflowControlStrength");
   GLADE_HOOKUP_OBJECT (dialog1, vbox20, "vbox20");
   GLADE_HOOKUP_OBJECT (dialog1, entryHiPass, "entryHiPass");
   GLADE_HOOKUP_OBJECT (dialog1, entryLowPass, "entryLowPass");
   GLADE_HOOKUP_OBJECT (dialog1, entryOvrControl, "entryOvrControl");
-  GLADE_HOOKUP_OBJECT (dialog1, label36, "label36");
-  GLADE_HOOKUP_OBJECT (dialog1, label4, "label4");
+  GLADE_HOOKUP_OBJECT (dialog1, labelCurveCompression, "labelCurveCompression");
+  GLADE_HOOKUP_OBJECT (dialog1, labelSecondPass, "labelSecondPass");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
@@ -1223,5 +1458,108 @@ create_dialog1 (void)
   return dialog1;
 }
 
+GtkWidget*
+create_dialog3 (void)
+{
+  GtkWidget *dialog3;
+  GtkWidget *dialog_vbox3;
+  GtkWidget *vbox26;
+  GtkWidget *frame7;
+  GtkWidget *alignment12;
+  GtkWidget *tableIntra;
+  GtkWidget *label19;
+  GtkWidget *frame6;
+  GtkWidget *alignment11;
+  GtkWidget *tableInter;
+  GtkWidget *label18;
+  GtkWidget *dialog_action_area4;
+  GtkWidget *button12;
+  GtkWidget *button13;
+  GtkWidget *button14;
 
+  dialog3 = gtk_dialog_new ();
+  gtk_window_set_title (GTK_WINDOW (dialog3), _("Edit Custom Matrix"));
+  gtk_window_set_type_hint (GTK_WINDOW (dialog3), GDK_WINDOW_TYPE_HINT_DIALOG);
+
+  dialog_vbox3 = GTK_DIALOG (dialog3)->vbox;
+  gtk_widget_show (dialog_vbox3);
+
+  vbox26 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox26);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox3), vbox26, TRUE, TRUE, 0);
+
+  frame7 = gtk_frame_new (NULL);
+  gtk_widget_show (frame7);
+  gtk_box_pack_start (GTK_BOX (vbox26), frame7, TRUE, TRUE, 0);
+
+  alignment12 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment12);
+  gtk_container_add (GTK_CONTAINER (frame7), alignment12);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment12), 0, 0, 12, 0);
+
+  tableIntra = gtk_table_new (8, 8, FALSE);
+  gtk_widget_show (tableIntra);
+  gtk_container_add (GTK_CONTAINER (alignment12), tableIntra);
+
+  label19 = gtk_label_new (_("<b>Intra Matrix</b>"));
+  gtk_widget_show (label19);
+  gtk_frame_set_label_widget (GTK_FRAME (frame7), label19);
+  gtk_label_set_use_markup (GTK_LABEL (label19), TRUE);
+
+  frame6 = gtk_frame_new (NULL);
+  gtk_widget_show (frame6);
+  gtk_box_pack_start (GTK_BOX (vbox26), frame6, TRUE, TRUE, 0);
+
+  alignment11 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment11);
+  gtk_container_add (GTK_CONTAINER (frame6), alignment11);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment11), 0, 0, 12, 0);
+
+  tableInter = gtk_table_new (8, 8, FALSE);
+  gtk_widget_show (tableInter);
+  gtk_container_add (GTK_CONTAINER (alignment11), tableInter);
+
+  label18 = gtk_label_new (_("<b>Inter Matrix</b>"));
+  gtk_widget_show (label18);
+  gtk_frame_set_label_widget (GTK_FRAME (frame6), label18);
+  gtk_label_set_use_markup (GTK_LABEL (label18), TRUE);
+
+  dialog_action_area4 = GTK_DIALOG (dialog3)->action_area;
+  gtk_widget_show (dialog_action_area4);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area4), GTK_BUTTONBOX_END);
+
+  button12 = gtk_button_new_from_stock ("gtk-save");
+  gtk_widget_show (button12);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog3), button12, 0);
+  GTK_WIDGET_SET_FLAGS (button12, GTK_CAN_DEFAULT);
+
+  button13 = gtk_button_new_from_stock ("gtk-cancel");
+  gtk_widget_show (button13);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog3), button13, GTK_RESPONSE_CANCEL);
+  GTK_WIDGET_SET_FLAGS (button13, GTK_CAN_DEFAULT);
+
+  button14 = gtk_button_new_from_stock ("gtk-ok");
+  gtk_widget_show (button14);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog3), button14, GTK_RESPONSE_OK);
+  GTK_WIDGET_SET_FLAGS (button14, GTK_CAN_DEFAULT);
+
+  /* Store pointers to all widgets, for use by lookup_widget(). */
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog3, dialog3, "dialog3");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog3, dialog_vbox3, "dialog_vbox3");
+  GLADE_HOOKUP_OBJECT (dialog3, vbox26, "vbox26");
+  GLADE_HOOKUP_OBJECT (dialog3, frame7, "frame7");
+  GLADE_HOOKUP_OBJECT (dialog3, alignment12, "alignment12");
+  GLADE_HOOKUP_OBJECT (dialog3, tableIntra, "tableIntra");
+  GLADE_HOOKUP_OBJECT (dialog3, label19, "label19");
+  GLADE_HOOKUP_OBJECT (dialog3, frame6, "frame6");
+  GLADE_HOOKUP_OBJECT (dialog3, alignment11, "alignment11");
+  GLADE_HOOKUP_OBJECT (dialog3, tableInter, "tableInter");
+  GLADE_HOOKUP_OBJECT (dialog3, label18, "label18");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog3, dialog_action_area4, "dialog_action_area4");
+  GLADE_HOOKUP_OBJECT (dialog3, button12, "button12");
+  GLADE_HOOKUP_OBJECT (dialog3, button13, "button13");
+  GLADE_HOOKUP_OBJECT (dialog3, button14, "button14");
+
+  return dialog3;
+}
 #endif

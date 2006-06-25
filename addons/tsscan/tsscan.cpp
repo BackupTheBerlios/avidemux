@@ -222,7 +222,9 @@ void decodePMT(void)
 		switch(buffer[index])
 		{
 			case 0x2: type="mpeg video";break;
-			case 0x3: type="mpeg audio";break;
+			case 0x3: type="mpeg1 audio";break;
+			case 0x4: type="mpeg2 audio";break;
+			case 0x1b: type="h264 video";break;
 			default:;
 		}
 		printf("\tStream Type    :0x%x (%s)\n",buffer[index],type);

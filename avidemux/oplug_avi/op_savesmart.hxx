@@ -20,6 +20,7 @@
  class GenericAviSaveSmart : public   GenericAviSave
  {
      protected :
+                                uint32_t        _hasBframe;
      #warning HARDCODED MAX IMAGE SIZE
      				
 				ADMImage	*aImage;

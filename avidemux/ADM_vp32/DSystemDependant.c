@@ -247,5 +247,5 @@ char * SytemGlobalAlloc( unsigned int Size )
 
 void SystemGlobalFree( char * MemPtr )
 {
-    free( MemPtr );
+    ADM_dezalloc( MemPtr );
 }

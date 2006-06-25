@@ -1315,9 +1315,9 @@ FILE *fd;
 	fscanf(fd,"Lzo Pos:%" SCNu64 "\n",&_lzo_pos);
 	fscanf(fd,"Lzo Size:%" SCNu64 "\n",&_lzo_size);
 	fgets(str,1000,fd);
-	fscanf(fd,"Myth:%" SCNu8 "\n",&_isMyth);
-	fscanf(fd,"Xvid:%" SCNu8 "\n",&_isXvid);
-	fscanf(fd,"FFV1:%" SCNu8 "\n",&_isFFV1);
+	fscanf(fd,"Myth:%"SCNu8"\n",&_isMyth);
+	fscanf(fd,"Xvid:%"SCNu8"\n",&_isXvid);
+	fscanf(fd,"FFV1:%"SCNu8"\n",&_isFFV1);
 	fscanf(fd,"ff4c:%x\n",&_ffv1_fourcc);	
 	
 	fscanf(fd,"extr:%x\n",&_ffv1_extraLen);

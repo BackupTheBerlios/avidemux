@@ -228,7 +228,7 @@ static int M2to1(int16_t *in,int16_t *out,uint32_t nbSample,uint32_t chan)
         *out++=*in;
         in+=2;   
     }
-    return nbSample*2*nbSample;
+    return nbSample*2;
     
 }
 static int M1to2(int16_t *in,int16_t *out,uint32_t nbSample,uint32_t chan)
@@ -238,7 +238,23 @@ static int M1to2(int16_t *in,int16_t *out,uint32_t nbSample,uint32_t chan)
         out[0]=out[1]=*in++;
         out+=2;   
     }
-    return nbSample*2*nbSample*2;
+    return nbSample*2*2;
+    
+}
+static int MNto1(int16_t *in,int16_t *out,uint32_t nbSample,uint32_t chan)
+{
+int32_t sum;
+int den=(chan+1)&0xfe;
+    for(int i=0;i<nbSample;i++)
+    {
+        sum=0;
+        for(int j=0;j<chan;j++)
+          sum+=in[j];
+        out[0]=sum/den;
+        out++;
+        in+=chan;
+    }
+    return nbSample*2;
     
 }
 
@@ -251,9 +267,9 @@ static MIXER *matrixCall[CHANNEL_LAST][CHANNEL_LAST] // output / input
 // INVALID=0,    MONO,STEREO, 2F_1R,            3F,   3F_1R,  2F_2R,  3F_2R,          3F_2R_LFE,  SURROUND, PROLOGIC,  PROLOGIC2,
     {NULL,NULL,NULL,NULL,                           NULL,NULL,NULL,NULL,                  NULL,NULL,NULL,NULL},
     //MONO    
-    {NULL,NULL,M2to1,NULL,                          NULL,NULL,NULL,NULL,                  NULL,NULL,NULL,NULL},
+    {NULL,NULL,M2to1,MNto1,                          MNto1,MNto1,MNto1,MNto1,                  MNto1,M2to1,M2to1,M2to1},
     // STEREO
-    {NULL,M1to2,NULL,NULL,                          NULL,NULL,NULL,NULL,                  NULL,M2to1,M2to1,M2to1},
+    {NULL,M1to2,NULL,NULL,                          M3_2_DB1,M31_2_DB1,M22_2_DB2,M32_2_DB2,    M32_2_DB2,NULL,NULL,NULL},
     // 2F1R
     {NULL,NULL,NULL,NULL,                           NULL,NULL,NULL,NULL,                  NULL,NULL,NULL,NULL},
     // 3F

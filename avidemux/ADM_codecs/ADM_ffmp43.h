@@ -158,13 +158,13 @@ public:
 class decoderFFH264:public decoderFF
 {
 protected:
-
+  uint32_t _lowDelay;
 
 public:
-  decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d);
+  decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d,uint32_t lowdelay);
   virtual uint8_t bFramePossible (void)
   {
-      return 1;
+      return _lowDelay;
   }
 
 };

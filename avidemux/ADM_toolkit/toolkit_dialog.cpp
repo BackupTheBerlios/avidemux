@@ -559,7 +559,7 @@ create_dialogYN (void)
   GtkWidget *buttonNo;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _(""));
+  gtk_window_set_title (GTK_WINDOW (dialog1), "");
   
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
   gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
@@ -631,7 +631,7 @@ create_dialogConfirmation (const char *confirm_text)
   GtkWidget *buttonYes;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _(""));
+  gtk_window_set_title (GTK_WINDOW (dialog1), "");
   
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
   gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
@@ -753,7 +753,7 @@ GtkWidget       *create_dialogInfo (void)
   GtkWidget *closebutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _(""));
+  gtk_window_set_title (GTK_WINDOW (dialog1), "");
   
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
   gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
@@ -816,7 +816,7 @@ create_dialogWarning (void)
   GtkWidget *closebutton1;
 
   dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _(""));
+  gtk_window_set_title (GTK_WINDOW (dialog1), "");
   
   gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
   gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);

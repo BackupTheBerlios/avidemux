@@ -51,13 +51,15 @@ typedef enum
   COMPRESS_CQ,
   COMPRESS_CBR,
   COMPRESS_2PASS,
-  COMPRESS_SAME
+  COMPRESS_SAME,
+  COMPRESS_2PASS_BITRATE
 } COMPRESSION_MODE;
 
 #define ADM_ENC_CAP_CBR    0x001
 #define ADM_ENC_CAP_CQ     0x002
 #define ADM_ENC_CAP_2PASS  0x004
 #define ADM_ENC_CAP_GLOBAL 0x008
+#define ADM_ENC_CAP_2PASS_BR  0x010
 
 #define ADM_EXTRA_PARAM_JS 0x100
 #define ADM_EXTRA_PARAM    0x200
@@ -69,7 +71,7 @@ struct COMPRES_PARAMS
   const char *tagName;
   const char *descriptor;
   COMPRESSION_MODE mode;
-  uint32_t qz, bitrate, finalsize;
+  uint32_t qz, bitrate, finalsize,avg_bitrate;  // avg_bitrate is in kb/s!!
   const uint32_t capabilities;
   const uint32_t extra_param;
   void *extraSettings;

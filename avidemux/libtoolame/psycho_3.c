@@ -542,6 +542,12 @@ void psycho_3 (twolame_options *glopts, short int buffer[2][1152], FLOAT scale[2
     mem->off[k] %= 1408;
 
     psycho_3_fft(sample, energy);
+    //MEANX prevent valgrind complains
+    memset(power,0,HBLKSIZE*sizeof(FLOAT));
+    memset(noiselabel,0,HBLKSIZE*sizeof(int));
+    memset(Xtm,0,HBLKSIZE*sizeof(FLOAT));
+    memset(Xnm,0,HBLKSIZE*sizeof(FLOAT));
+    // /MEANX
     psycho_3_powerdensityspectrum(energy, power);    
     psycho_3_spl(Lsb, power, &scale[k][0]);
     psycho_3_tonal_label (mem, power, tonelabel, Xtm);

@@ -116,13 +116,15 @@ ADM_Audiocodec *out;
 						printf("\n ULAW codec\n");
 						out=(ADM_Audiocodec *) new ADM_AudiocodecUlaw(fourcc,info);
 						break;
-              	case WAV_WMA:
-        				printf("\n Audio codec:  ffWMA\n");
-				
-					out= (ADM_Audiocodec *) new ADM_AudiocodecWMA(fourcc,info,extra,extraData);
-                  break;
-		  
-            	default:
+            case WAV_WMA:
+                printf("\n Audio codec:  ffWMA\n");
+                out= (ADM_Audiocodec *) new ADM_AudiocodecWMA(fourcc,info,extra,extraData);
+                break;
+            case WAV_QDM2:
+                printf("\n Audio codec:  ffQDM2\n");
+                out= (ADM_Audiocodec *) new ADM_AudiocodecWMA(fourcc,info,extra,extraData);
+                break;
+            default:
              			printf("\n Unknown codec : %lu",fourcc);
              			out= (ADM_Audiocodec *) new ADM_AudiocodecUnknown(fourcc);
         	}

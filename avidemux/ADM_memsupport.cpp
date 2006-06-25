@@ -48,7 +48,7 @@ void *av_realloc(void *ptr, unsigned int size);
 void ADM_memStat( void );
 void ADM_memStat( void )
 {
-	printf("Global mem stat\n");
+	printf("Global mem stat\n______________\n");
 	printf("\tMemory consumed :%lu (MB)\n",ADM_consumed>>20);
 
 }

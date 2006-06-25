@@ -65,6 +65,7 @@ GenericAviSaveSmart::GenericAviSaveSmart(uint32_t qf) : GenericAviSave()
 	ADM_assert(qf>=2 && qf<32);
 	_nextip=0;
 	encoderReady=0;
+        _hasBframe=0;
 }
 uint8_t	GenericAviSaveSmart::setupVideo (char *name)
 {
@@ -103,6 +104,13 @@ int value=4;;
   _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
   encoding_gui->setFps(_incoming->getInfo()->fps1000);
   encoding_gui->setPhasis("Smart Copy");
+  // B frame ?
+    for(int i=frameStart;i<frameEnd;i++)
+    {
+      if(!video_body->getFlags ( i, &_videoFlag)) break;
+      if(_videoFlag & AVI_B_FRAME) _hasBframe=1;
+    }
+    if(_hasBframe) printf("The original file has bframe, expect a shift of 1 frame\n");
   //
   return 1;
   //---------------------
@@ -165,7 +173,7 @@ ADMBitstream bitstream;
 	// 2-encode it
         bitstream.data=vbuffer;
         bitstream.cleanup(frame);
-        if (!_encoder->encode (aImage, &bitstream));//vbuffer, &len, &_videoFlag))
+        if (!_encoder->encode (aImage, &bitstream))//vbuffer, &len, &_videoFlag))
 		return 0;
         _videoFlag=bitstream.flags;
 	// 3-write it
@@ -314,7 +322,7 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
 	 2,//		qmin;
 	 31,//		qmax;
 	 3,//		max_qdiff;
-	 0,//		max_b_frames;
+	 1,//		max_b_frames;
 	 0, //		mpeg_quant;
 	 1, //
 	 -2, // 		luma_elim_threshold;
@@ -357,7 +365,7 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
 // 	uint8_t				setConfig(FFcodecSetting *set);	
 			ffmpegEncoderCQ *tmp;		
 			tmp = new ffmpegEncoderCQ (info.width, info.height,FF_MPEG4);					
-			
+			myConfig.max_b_frames=_hasBframe; // In fact does the original have b frame ?
 			tmp->setConfig(&myConfig);
 			printf("\n init qz %ld\n",qz);
 	    		ret= tmp->init (qz,25000);
@@ -372,10 +380,11 @@ GenericAviSaveSmart::initEncoder (uint32_t qz)
 		 else
 		 {
 #ifdef USE_FFMPEG			 
-			 if(isMSMpeg4Compatible(info.fcc) )
+			 if(isMSMpeg4Compatible(info.fcc) ) // DIV3
 			 {
 				 ffmpegEncoderCQ *tmp;
 				  tmp = new ffmpegEncoderCQ (info.width, info.height,FF_MSMP4V3);
+                                  myConfig.max_b_frames=0;
 				  tmp->setConfig(&myConfig);
 			    	  ret= tmp->init (qz,25000);
 			    	  _encoder=tmp;

@@ -91,6 +91,8 @@ decoders *getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
 		      uint8_t * extraData);
 decoders *getDecoderVopPacked (uint32_t fcc, uint32_t w, uint32_t h,
 			       uint32_t extraLen, uint8_t * extraData);
+decoders *getDecoderH264noLogic (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
+		     uint8_t * extraData);
 
 class coders
 {

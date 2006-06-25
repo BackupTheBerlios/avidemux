@@ -42,8 +42,24 @@
 #include "xpm/6.inc"
 #include "xpm/5.inc"
 #include "xpm/7.inc"
+#include "xpm/systray.inc"
+#include "xpm/systray2.inc"
 #include "xpm/preview.inc"
 #include "xpm/output.inc"
+
+#include "xpm/film1.inc"
+#include "xpm/film3.inc"
+#include "xpm/film5.inc"
+#include "xpm/film7.inc"
+#include "xpm/film9.inc"
+#include "xpm/film11.inc"
+#include "xpm/film13.inc"
+#include "xpm/film15.inc"
+#include "xpm/film17.inc"
+#include "xpm/film19.inc"
+#include "xpm/film21.inc"
+#include "xpm/film23.inc"
+
 typedef enum ADM_Icon
 {
         A_ICON_XPM,
@@ -90,9 +106,24 @@ name2xpm iconTranslation[]=
         {A_ICON_PNG,"6.png",(void *) x6},
         {A_ICON_PNG,"7.png",(void *) x7},
         {A_ICON_PNG,"avidemux_icon_small.png",         (void *) avidemux_icon_small},
-
-
-        {A_ICON_XPM,"systray.xpm",                 (void *)systray_xpm},
+        {A_ICON_PNG,"systray.png",                 (void *)systray},
+        {A_ICON_PNG,"systray2.png",                 (void *)systray2},
+	// Jakub nice animation
+#define MKFILM(x) 	{A_ICON_PNG,"film"#x".png",                 (void *)film##x},
+	MKFILM(1)
+	MKFILM(3)
+	MKFILM(5)
+	MKFILM(7)
+	MKFILM(9)
+	MKFILM(11)
+	MKFILM(13)
+	MKFILM(15)
+	MKFILM(17)
+	MKFILM(19)
+	MKFILM(21)
+	MKFILM(23)
+	// DUMMY
+	{A_ICON_PNG,"systray.xpm",                 (void *)systray}
 };
 GdkPixbuf	*create_pixbuf                  (const gchar     *filename)
 {

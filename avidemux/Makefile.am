@@ -20,7 +20,7 @@ SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame ADM_requant \
 	ADM_script oplug_ogm ADM_xvidratectl ADM_mplex ADM_ocr MPlayer_pp \
 	ADM_mpegdemuxer ADM_tray ADM_lavutil ADM_lavformat ADM_lavcodec oplug_mp4 \
-	ADM_avsproxy  ADM_liba52
+	ADM_avsproxy  ADM_liba52 ADM_libMad
 
 EXTRA_DIST = main.cpp avi_vars.h avilist.cpp avilist.h callbacks.cpp callbacks.h gtk_gui.cpp gtkgui.h gui_action.hxx gui_navigate.cpp   gui_savenew.cpp  guiplay.cpp interface.h  support.h  prototype.h ADM_lavcodec.h  prefs.h prefs.cpp prefs.in mmx_macros.h ADM_assert.h
 
@@ -59,6 +59,7 @@ avidemux2_LDADD   =  \
 ./MPlayer_pp/libMPlayer_pp.a \
 ./mpeg2enc/libmpeg2enc.a \
 ./ADM_liba52/libADM_liba52.a \
+./ADM_libMad/libADM_mad.a \
 ./ADM_inpics/libADM_inpics.a  ./ADM_3gp/libADM_3gp.a \
 ./ADM_avsproxy/libADM_avsproxy.a \
 ./ADM_h263/libADM_h263.a   \

@@ -72,6 +72,9 @@ static GdkCursor *guiCursorBusy=NULL;
 static GdkCursor *guiCursorNormal=NULL;
 static gint	  guiCursorEvtMask=0;
 static void     volumeChange( void );
+
+static char     *customNames[ADM_MAC_CUSTOM_SCRIPT];
+static uint32_t ADM_nbCustom=0;
 // heek !
 static  GtkAdjustment *sliderAdjustment;
 // Needed for DND
@@ -82,6 +85,8 @@ extern void A_appendAvi (char *name);
 static void on_audio_change(void);
 static void on_video_change(void);
 static int update_ui=0;
+static void GUI_initCustom(void);
+const char * GUI_getCustomScript(uint32_t nb);
 extern uint8_t AVDM_setVolume(int volume);
 #define AUDIO_WIDGET "comboboxAudio"
 #define VIDEO_WIDGET "comboboxVideo"
@@ -210,8 +215,20 @@ uint8_t ret=0;
 		//gtk_window_set_keep_below(GTK_WINDOW(guiRootWindow), 1);
 		renderInit();
 		GUI_initCursor(  );
-		
+
+
+               
 	return ret;
+}
+/**
+    Get the custom entry 
+
+*/
+const char * GUI_getCustomScript(uint32_t nb)
+{
+    ADM_assert(nb<ADM_nbCustom);
+    return customNames[nb];
+
 }
 /** 
 	Set the parameter widget as transient 
@@ -335,7 +352,7 @@ uint8_t  bindGUI( void )
                 for(uint32_t i=0;i<nbVid;i++)
                 {
                         name=encoderGetIndexedName(i);
-                        gtk_combo_box_append_text      (combo_box,name);
+                        gtk_combo_box_append_text      (combo_box,_(name));
                 }
 
         gtk_combo_box_set_active(combo_box,0);
@@ -351,7 +368,7 @@ uint8_t  bindGUI( void )
                 for(uint32_t i=0;i<nbAud;i++)
                 {
                         name=audioFilterGetIndexedName(i);
-                        gtk_combo_box_append_text      (combo_box,name);	
+                        gtk_combo_box_append_text      (combo_box,_(name));	
                 }
         gtk_combo_box_set_active(combo_box,0);
 	on_audio_change();
@@ -385,8 +402,59 @@ uint8_t  bindGUI( void )
 
    // By default enable arrow keys
    UI_arrow_enabled();
+  // Add custom menu
+ GUI_initCustom();
     return 1;
 
+}
+/****
+
+**/
+void GUI_initCustom(void )
+{
+  GtkWidget *menuEntry=lookup_widget(guiRootWindow,"custom1");
+  char *customdir=ADM_getCustomDir();
+  if(!menuEntry)
+  {
+      printf("No custom menu...\n");
+      return;
+  }
+  if(!customdir) 
+  {
+      printf("No custom dir...\n");
+      return;
+  }
+  /* Collect the name */
+   if(! buildDirectoryContent(&ADM_nbCustom,customdir, customNames,ADM_MAC_CUSTOM_SCRIPT))
+    {
+      printf("Failed to build custom dir content");
+      return;
+    }
+  if(!ADM_nbCustom)
+  {
+      printf("No custom script\n");
+  }
+  printf("Found %u custom scripts, adding them\n",ADM_nbCustom);
+ GtkWidget *go,*menu;
+ int rank;
+
+  menu = gtk_menu_new ();
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuEntry), menu);
+
+#define CALLBACK(x,y) gtk_signal_connect(GTK_OBJECT(x), "activate", \
+                      GTK_SIGNAL_FUNC(guiCallback),                   (void *) y)
+
+  for(int i=0;i<ADM_nbCustom;i++)
+  {
+    go = gtk_menu_item_new_with_mnemonic (GetFileName(customNames[i]));
+    gtk_widget_show (go);
+    gtk_container_add (GTK_CONTAINER (menu), go);
+    rank=ACT_CUSTOM_BASE+i;
+    CALLBACK( go                 ,rank);
+  }
+
+  #undef CALLBACK
+  printf("Menu built\n");
 }
 gboolean  on_drawingarea1_expose_event(GtkWidget * widget,  GdkEventExpose * event, gpointer user_data)
 {

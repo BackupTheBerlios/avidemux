@@ -31,8 +31,8 @@ static uint32_t imgCurNb=0;
 
 void ADMImage_stat( void )
 {
-	printf("Images stat:");
-	printf("___________");
+	printf("\nImages stat:\n");
+	printf("___________\n");
 	printf("Max memory consumed (MB)     : %lu\n",imgMaxMem>>10);
 	printf("Current memory consumed (MB) : %lu\n",imgCurMem>>10);
 	printf("Max image used               : %lu\n",imgMaxNb);

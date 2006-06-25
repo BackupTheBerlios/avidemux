@@ -39,7 +39,7 @@
 #define TH_WRITE 2
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit_gtk.h"
-
+uint8_t ADM_mkdir(const char *name);
 extern char * actual_workbench_file;
 
 static void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw, char **name=NULL);
@@ -541,15 +541,72 @@ uint8_t setFilter( GtkWidget *dialog)
         return 1;
 }
 //*****************************
-static char basedir[1024];
+static char basedir[1024]={0};
+static char jobdir[1024]={0};
+static char customdir[1024]={0};
 int baseDirDone=0;
+int jobDirDone=0;
+int customDirDone=0;
 #ifdef CYG_MANGLING
 const char *ADM_DIR_NAME="\\avidemux";
 #else
 const char *ADM_DIR_NAME="/.avidemux";
 #endif
+/*
 
-char *getBaseDir(void)
+*/
+/*
+      Get the  directory where jobs are stored
+******************************************************/
+
+char *ADM_getCustomDir(void)
+{
+  if(customDirDone) return customdir;
+
+  char *rootDir;
+  rootDir=ADM_getBaseDir();
+  strncpy(customdir,rootDir,1023);
+#if defined(CYG_MANGLING)
+  strcat(customdir,"\\custom"); 
+#else
+  strcat(customdir,"/custom");
+#endif
+  if(!ADM_mkdir(customdir))
+  {
+                GUI_Error_HIG("Oops","can't create custom directory (%s).",customdir);
+                return NULL;
+  }
+  customDirDone=1;
+  return customdir;
+}
+/*
+      Get the  directory where jobs are stored
+******************************************************/
+
+char *ADM_getJobDir(void)
+{
+  if(jobDirDone) return jobdir;
+
+  char *rootDir;
+  rootDir=ADM_getBaseDir();
+  strncpy(jobdir,rootDir,1023);
+#if defined(CYG_MANGLING)
+  strcat(jobdir,"\\jobs"); 
+#else
+  strcat(jobdir,"/jobs");
+#endif
+  if(!ADM_mkdir(jobdir))
+  {
+                GUI_Error_HIG("Oops","can't create job directory (%s).",jobdir);
+                return NULL;
+  }
+  jobDirDone=1;
+  return jobdir;
+}
+/*
+      Get the root directory for .avidemux stuff
+******************************************************/
+char *ADM_getBaseDir(void)
 {
 char *dirname=NULL;
 DIR *dir=NULL;
@@ -558,7 +615,12 @@ char *home;
         if(baseDirDone) return basedir;
 // Get the base directory
 #if defined(CYG_MANGLING)
-        home="c:\\";
+        if( ! (home=getenv("USERPROFILE")) )
+        {
+                    GUI_Error_HIG("Oops","can't determine $USERPROFILE.");
+                    home="c:\\";
+        }
+
 #else
         if( ! (home=getenv("HOME")) )
         {
@@ -571,23 +633,12 @@ char *home;
         dirname=new char[strlen(home)+strlen(ADM_DIR_NAME)+2];
         strcpy(dirname,home);
         strcat(dirname,ADM_DIR_NAME);
-        if((dir=opendir(dirname))==NULL)
+        if(!ADM_mkdir(dirname))
         {
-                // Try to create it
-                char *sys=new char[strlen(dirname)+strlen("mkdir ")+2];
-                strcpy(sys,"mkdir ");
-                strcat(sys,dirname);
-                printf("Creating dir :%s\n",sys);
-                system(sys);
-                delete [] sys;
-                if((dir=opendir(dirname))==NULL)
-                {
                         GUI_Error_HIG("Oops","Cannot create the .avidemux directory", NULL);
                         delete [] dirname;
                         return NULL;
-                }                
         }
-        closedir(dir);
         delete [] dirname;
 
         // Now built the filename
@@ -597,3 +648,76 @@ char *home;
         printf("Using %s as base directory for prefs/jobs/...\n",basedir);
         return basedir;
 }
+/*----------------------------------------
+      Create a directory
+      If it already exists, do nothing
+------------------------------------------*/
+uint8_t ADM_mkdir(const char *dirname)
+{
+DIR *dir=NULL;
+              // Check it already exists ?
+              dir=opendir(dirname);
+              if(dir)
+              { 
+                  printf("Directory %s exists.Good.\n",dirname);
+                  closedir(dir);
+                  return 1;
+              }
+#if defined(CYG_MANGLING)
+                if(mkdir(dirname))
+                {
+                    printf("Oops: mkdir failed on %s\n",dirname);   
+                    return 0;
+                }
+                
+#else    
+                char *sys=new char[strlen(dirname)+strlen("mkdir ")+2];
+                strcpy(sys,"mkdir ");
+                strcat(sys,dirname);
+                printf("Creating dir :%s\n",sys);
+                system(sys);
+                delete [] sys;
+#endif		
+              if((dir=opendir(dirname))==NULL)
+                {
+                        return 0;
+                }
+              closedir(dir); 
+              return 1;
+}
+uint8_t buildDirectoryContent(uint32_t *outnb,const char *base, char *jobName[],int maxElems)
+{
+
+DIR *dir;
+struct dirent *direntry;
+int dirmax=0,len;
+         dir=opendir(base);
+        if(!dir)
+        {
+                return 0;
+        }
+        while((direntry=readdir(dir)))
+        {
+                len=strlen(direntry->d_name);
+                if(len<4) continue;
+                if(direntry->d_name[len-1]!='s' || direntry->d_name[len-2]!='j' || direntry->d_name[len-3]!='.')
+                {
+                        printf("ignored:%s\n",direntry->d_name);
+                        continue;
+                }
+                jobName[dirmax]=(char *)ADM_alloc(strlen(base)+strlen(direntry->d_name)+2);
+                strcpy(jobName[dirmax],base);
+                strcat(jobName[dirmax],"/");
+                strcat(jobName[dirmax],direntry->d_name);
+                dirmax++;
+                if(dirmax>=maxElems)
+                {
+                        printf("[jobs]: Max # of jobs exceeded\n");
+                         break;
+                }
+        }
+        closedir(dir);
+        *outnb=dirmax;
+        return 1;
+}
+//EOF

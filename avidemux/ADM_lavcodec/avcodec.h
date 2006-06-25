@@ -371,6 +371,7 @@ extern int motion_estimation_method;
 #define CODEC_FLAG2_AUD           0x00000200 ///< H.264 access unit delimiters
 #define CODEC_FLAG2_BRDO          0x00000400 ///< b-frame rate-distortion optimization
 //MEANX: NEVER EVER USE CLOSED GOP ?
+#define CODEC_FLAG2_MEMC_ONLY     0x00001000 /// MEANX BACKPORT
 #define CODEC_FLAG2_32_PULLDOWN   0x80000000 
 
 /* Unsupported options :

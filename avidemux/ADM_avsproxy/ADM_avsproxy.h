@@ -20,6 +20,8 @@ class avsHeader         :public vidHeader
         uint8_t     sendData(uint32_t cmd,uint32_t frame, uint32_t payload_size,uint8_t *payload);
         uint8_t     receiveData(uint32_t *cmd, uint32_t *frame,uint32_t *payload_size,uint8_t *payload);
         uint8_t     askFor(uint32_t cmd,uint32_t frame, uint32_t payloadsize,uint8_t *payload);
+        uint8_t     rxData(uint32_t howmuch, uint8_t *where);
+        uint8_t     txData(uint32_t howmuch, uint8_t *where);
     public:
 
 

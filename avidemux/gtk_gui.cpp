@@ -187,6 +187,7 @@ uint8_t DIA_builtin(void);
 renderZoom currentZoom=ZOOM_1_1;
 uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name);
 uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t,ADMImage *image);
+extern const char * GUI_getCustomScript(uint32_t nb);
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -204,6 +205,13 @@ void HandleAction (Action action)
   // independant load not loaded
 //------------------------------------------------
 int nw;
+  if(action>=ACT_CUSTOM_BASE && action <ACT_CUSTOM_END)
+  {
+      int i=action-ACT_CUSTOM_BASE;
+      const char *custom=GUI_getCustomScript(i);
+      A_parseECMAScript(custom);
+      return ;
+  }
   switch (action)
     {
         case ACT_BUILT_IN:
@@ -1094,7 +1102,8 @@ int A_openAvi2 (char *name, uint8_t mode)
                 }
             }
             if(infos) delete [] infos;
-            
+            // Revert mixer to copy
+            setCurrentMixerFromString("NONE");
         }
 	for(i=strlen(longname);i>=0;i--)
 #ifdef CYG_MANGLING
@@ -2574,7 +2583,7 @@ void A_addJob(void)
         if(!name || !final) return;
         if(!*name || !*final) return;
 
-        base=getBaseDir();
+        base=ADM_getJobDir();
         fullname=new char[strlen(name)+strlen(base)+2+4];
         
         strcpy(fullname,base);

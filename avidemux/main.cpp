@@ -80,7 +80,8 @@ extern uint8_t  initFileSelector(void);
 
 extern "C"
 {
-extern void     VPInitLibrary();
+extern void VPInitLibrary(void);
+extern void VPDeInitLibrary(void);
 
 
 };
@@ -97,7 +98,7 @@ int CpuCaps::myCpuCaps=0;
 int main(int argc, char *argv[])
 {
 // Check for big files
-
+int sdl_version=0;
 #ifdef     __USE_LARGEFILE
 #ifdef   __USE_LARGEFILE64
 printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
@@ -112,6 +113,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 
 //#define ALOCALES "/usr/local/share/locale"
   bindtextdomain ("avidemux", ADMLOCALE);
+  bind_textdomain_codeset ("avidemux", "UTF-8");
   textdomain ("avidemux");
   printf("Locales for %s appear to be in %s\n","avidemux", ADMLOCALE);
   printf("\nI18N : %s \n",dgettext("avidemux","_File"));
@@ -132,18 +134,35 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 	printf(" FreeBSD   : Anish Mistry, amistry@am-productions.biz\n");
 
 
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
-	printf("Arcc X86 X86_64 activated.\n"); 	
+#if defined( ARCH_X86)  
+      printf("Compiled for X86 Arch.\n");
+#endif
+#if defined(ARCH_X86_64)
+      printf("Compiled for X86_64 Arch.\n");
 #endif
    
 
-#ifdef USE_XX_XVID_CVS
-	printf("Probing XvidCVS library....\n");
- 	dloadXvidCVS(  );
-#endif
+    // the one and only global preferences object
+    printf("Initializing prefs\n");
+    initPrefs();
+    
+
    VPInitLibrary();
    register_Encoders( );
     atexit(onexit);
+#ifdef USE_SDL
+    sdl_version=(SDL_Linked_Version()->major*1000)+(SDL_Linked_Version()->minor*100)+
+          (SDL_Linked_Version()->patch);
+    
+    printf("SDL support on Version %d\n",sdl_version);
+#endif
+ #ifdef USE_SDL
+  if(sdl_version>1209)
+  {
+   	printf("Global SDL init...\n");
+   	SDL_Init(SDL_INIT_EVERYTHING); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
+  }
+   #endif
 
 #ifndef CYG_MANGLING    
     g_thread_init(NULL);
@@ -198,26 +217,34 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 			  gtk_timeout_add( 300, (GtkFunction )automation, NULL );
 				//automation();				
 		}
-   #ifdef USE_SDL
+#ifdef USE_SDL
+  if(sdl_version<=1209)
+  {
    	printf("Global SDL init...\n");
    	SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
-   #endif
-    oplug_mpegInit();
+  }
+#endif
+      oplug_mpegInit();
 	if(SpidermonkeyInit() == true)
 		printf("Spidermonkey initialized.\n");
 
     gtk_main();
-
-	SpidermonkeyDestroy();
-
+    printf("Normal exit\n");
     return 0;
 }
 void onexit( void )
 {
-	filterCleanUp();
-	ADMImage_stat();
-	ADM_memStat();
-	printf("\n Goodbye...\n\n");
+  printf("Cleaning up\n");
+        VPDeInitLibrary();
+        delete video_body;
+  printf("Cleaning up spidermonkey\n");
+        SpidermonkeyDestroy();
+        destroyPrefs();
+        filterCleanUp();
+  printf("End of cleanup\n");
+        ADMImage_stat();
+        ADM_memStat();
+        printf("\n Goodbye...\n\n");
 }
 void sig_segfault_handler(int signo)
 {

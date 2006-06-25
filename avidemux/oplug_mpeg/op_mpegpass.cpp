@@ -55,20 +55,31 @@ static uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position);
 	uint32_t fill=0; \
         if(total_got<target_sample) \
 	while(muxer->needAudio()) \
-	{				\
+	{	\
+                if(x)   \
+                    if(total_got>target_sample) break; \
 		if(!audio->getPacket(audiobuffer, &audiolen, &samples))	\
 		{ \
 			printf("passthrough:Could not get audio\n"); \
-			break; \
+			audiolen=0; \
 		}\
 		if(audiolen) {\
 			muxer->writeAudioPacket(audiolen,audiobuffer); \
                         work->feedAudioFrame(audiolen);\
-                        }\
+                        }else \
+                { \
+                    printf("[MPEG Audio] Read failed current %u max %u \n",total_got,target_sample); \
+                    total_got=target_sample; \
+                    muxer->audioEof(); \
+                    break; \
+                }\
 		total_got+=samples; \
 	} \
+  }
+#if 0
+        printf("Current %u target %u\n",(uint32_t)total_got,(uint32_t)target_sample); \
 }
-
+#endif
 #define WRITE_AND_REMOVE_END_CODE \
 {\
 if(lookupSeqEnd(&bitstream,&position)) \
@@ -100,7 +111,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
   ADM_MUXER_TYPE mux;
   
   double total_wanted=0;
-  double total_got=0;
+  uint32_t total_got=0;
   uint8_t ret=0;
  
   ADMMpegMuxer *muxer=NULL;
@@ -180,7 +191,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                         }
                         mux=MUXER_VCD;
                         printf("PassThrough: Using VCD PS\n");        
-                        }else
+                }else
                 {    // Mpeg2 
                         aviInfo info;
                         video_body->getVideoInfo(&info);
@@ -191,16 +202,25 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                         }
                         else
                         {
+                            uint32_t valid=0;
+                                if(!prefs->get(FEATURE_MPEG_NO_LIMIT,&valid)) valid=0;
                                  // mpeg2, we do only DVD right now
-                                if(hdr->frequency!=48000 || 
-                                (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3 && hdr->encoding!=WAV_LPCM))
+                                if(hdr->frequency==48000) valid=1;
+                                if((hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3 && hdr->encoding!=WAV_LPCM
+                                && hdr->encoding!=WAV_DTS))
                                 {
-                                        deleteAudioFilter();
-                                        GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2, AC3 or LPCM.");
-                                        return 0;
+                                  valid=0;  
                                 }
-                                mux=MUXER_DVD;
-                                printf("PassThrough: Using DVD PS\n");
+                    
+                                if(!valid)
+                                {
+                                       deleteAudioFilter();
+                                       GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2(stereo), AC3, DTS or LPCM (stereo).");
+                                       return 0;
+                                }
+                         
+                               mux=MUXER_DVD;
+                               printf("PassThrough: Using DVD PS\n");
                         }
                 }
 
@@ -284,6 +304,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
   uint8_t *audiobuffer = new uint8_t[4*48000*2]; // 2 sec worth of lpcm
   uint32_t position;
         bitstream.data=buffer;
+        // Prefill buffer
         PACK_AUDIO(0);
 
   for (uint32_t i = frameStart; i < frameEnd; i++)
@@ -322,7 +343,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
         WRITE_AND_REMOVE_END_CODE;   
         
         work->feedFrame(bitstream.len);
-	PACK_AUDIO(0)
+	PACK_AUDIO(1)
 	
 	  
 	  // and the B frames
@@ -334,7 +355,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                 
                 WRITE_AND_REMOVE_END_CODE;   
                 work->feedFrame(bitstream.len);
-		PACK_AUDIO(0)
+		PACK_AUDIO(1)
 		
     	    }
 	  i = found;		// Will be plussed by for
@@ -351,7 +372,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                                 bitstream.ptsFrame=i-frameStart;
 				muxer->writeVideoPacket (&bitstream);
                                 work->feedFrame(bitstream.len);
-				PACK_AUDIO(0)
+				PACK_AUDIO(1)
 				
 				
 			}
@@ -365,7 +386,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                                 bitstream.ptsFrame=i-frameStart;
 				muxer->writeVideoPacket (&bitstream);
                                 work->feedFrame(bitstream.len);
-				PACK_AUDIO(0)
+				PACK_AUDIO(1)
 				
 			}
 		}
@@ -376,7 +397,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                         bitstream.ptsFrame=i-frameStart;
                         WRITE_AND_REMOVE_END_CODE;   
                         work->feedFrame(bitstream.len);
-			PACK_AUDIO(0)
+			PACK_AUDIO(1)
 			
 		}
 	}
@@ -417,5 +438,3 @@ uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position)
 
 
 //EOF
-
-        

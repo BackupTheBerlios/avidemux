@@ -346,6 +346,9 @@ void ComputePreload(void)
     uint32_t latency, one_sec;
     uint32_t small;
     uint32_t channels;
+
+    wavbuf = 0;
+
     if (!currentaudiostream)	// audio ?
       {
 	  return;

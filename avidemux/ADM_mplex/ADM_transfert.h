@@ -31,9 +31,10 @@ class admCond
 private:
         pthread_cond_t  _cond;
         admMutex        *_condtex;
+
+public:        
         uint8_t         waiting;
         uint8_t         aborted;
-public:        
                         admCond( admMutex *tex);
                         ~admCond();        
                 uint8_t wait(void);
@@ -54,8 +55,11 @@ protected:
         uint8_t  aborted;
         uint8_t  *buffer;   
         uint32_t head,tail;     
+        uint8_t  dumpStatus(void);
+        uint32_t transfered_r,transfered_w;
+        uint32_t _minRequired;
 public:        
-                Transfert( void );
+                Transfert( uint32_t minimumBuffer );
                 ~Transfert(  );
         uint32_t read(uint8_t *buf, uint32_t nb  );
         uint8_t write(uint8_t *buf, uint32_t nb  );
@@ -64,6 +68,7 @@ public:
         uint8_t eof( void ) {return aborted;}; 
         uint8_t fillingUp( void);
         uint8_t clientLock( void);
+        uint8_t audioEof(void );
         
 };
 

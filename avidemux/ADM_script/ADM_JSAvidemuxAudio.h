@@ -28,6 +28,7 @@ public:
         static JSBool getNbTracks(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool setTrack(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool lamePreset(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        static JSBool mixer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool secondAudioTrack(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
 	static JSPropertySpec avidemuxaudio_properties[];

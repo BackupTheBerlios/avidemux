@@ -51,9 +51,6 @@ static uint32_t edFrameStart,edFrameEnd;
 uint8_t loadVideoCodecConf( char *name);
 uint8_t saveVideoCodecConf( char *name);
 const char *getCurrentContainerAsString(void);
-//extern int audioMP3bitrate ;
-extern const char              *audioSourceFromEnum(AudioSource src);
-// Ugly, will have to clean it later
 
 uint8_t ADM_Composer::getMarkers(uint32_t *start, uint32_t *end)
 {
@@ -140,6 +137,12 @@ for (uint32_t i = 0; i < _nb_segment; i++)
 //
         qfprintf(fd,"app.markerA=%d;\n",frameStart);
         qfprintf(fd,"app.markerB=%d;\n",frameEnd);
+// Reordering : Warning works only for video with one source video
+        if(video_body->isReordered(0))
+        {
+            qfprintf(fd,"app.rebuildIndex();\n");
+        }
+        
 // postproc
 //___________________________
 
@@ -215,6 +218,17 @@ char *pth;
    //qfprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode()]);
    qfprintf(fd,"app.audio.normalize=%s;\n",truefalse[audioGetNormalize()]);
    qfprintf(fd,"app.audio.delay=%d;\n",audioGetDelay());
+   qfprintf(fd,"app.audio.mixer(\"%s\");\n",getCurrentMixerString());
+
+    // VBR ?
+    if(currentaudiostream)
+    {
+        uint32_t encoding=currentaudiostream->getInfo()->encoding;
+        if(currentaudiostream->isVBR() && (encoding==WAV_MP3 || encoding==WAV_MP2))
+        {
+            qfprintf(fd,"app.audio.scanVBR();\n");
+        }
+    }
 
 
    // Change fps ?
@@ -233,6 +247,8 @@ char *pth;
                 case RESAMPLING_CUSTOM:        qfprintf(fd,"app.audio.resample=%u;\n",audioGetResample());break;
                 default:ADM_assert(0);
         }
+  // Mixer
+
   // container
         
   qfprintf(fd,"app.setContainer(\"%s\");\n",getCurrentContainerAsString());

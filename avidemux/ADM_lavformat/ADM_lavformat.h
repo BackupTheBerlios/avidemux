@@ -50,6 +50,7 @@ public:
         virtual uint8_t close( void )=0;
         virtual uint8_t audioEmpty( void)=0;
         virtual uint8_t needAudio(void)=0;
+        virtual uint8_t audioEof(void) {return 1;}
 
                 ADMMpegMuxer(void) {};
                 virtual ~ADMMpegMuxer(void) {};
@@ -94,6 +95,7 @@ public:
         virtual uint8_t close( void );
         virtual uint8_t audioEmpty( void);
         virtual uint8_t needAudio(void);
+        virtual uint8_t audioEof(void);
 
 };
 #define TS_PACKET_SIZE 188

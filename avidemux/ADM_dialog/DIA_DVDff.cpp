@@ -38,7 +38,7 @@ static GtkWidget	*create_dialog1 (void);
 #define VAL_SET(x) 	gtk_write_entry(WID(entry_bitrate), x)
 
 static GtkWidget 	*dialog=NULL;		      
-static uint32_t 	mQ,mB,mS;
+static uint32_t 	mQ,mB,mS,mA;
 static COMPRESSION_MODE mMode;
 static FFcodecSetting localSettings;
 
@@ -77,6 +77,7 @@ uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming)
 	mQ=incoming->qz;
 	mB=incoming->bitrate;
 	mS=incoming->finalsize;	
+	mA=incoming->avg_bitrate;	
 	mMode=incoming->mode;
 
 	memcpy(&localSettings,conf,sizeof(localSettings));
@@ -137,6 +138,11 @@ uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming)
        						incoming->finalsize=value;	
            				}
             				break;
+                                case 3:
+                                    incoming->mode = COMPRESS_2PASS_BITRATE;	
+                                    value = (uint32_t)gtk_read_entry(WID(entry_bitrate));
+                                    incoming->avg_bitrate=value;	
+                                    break;
 		  		default:
 		      			ADM_assert(0);
 				}
@@ -227,6 +233,7 @@ int r;
 		case 0: mMode=COMPRESS_CBR ;break;
 		case 1: mMode=COMPRESS_CQ ;break;
 		case 2: mMode=COMPRESS_2PASS ;break;
+                case 3: mMode=COMPRESS_2PASS_BITRATE ;break;
 	
 	}
 	updateMode();
@@ -258,6 +265,13 @@ uint32_t b;
 			gtk_widget_set_sensitive(WID(entry_bitrate),1);
 			gtk_label_set_text(GTK_LABEL(WID(label3)),"Size (MBytes):");
 			break;
+		case COMPRESS_2PASS_BITRATE:
+			HIST_SET(3);
+			VAL_SET(mA);
+			gtk_widget_set_sensitive(WID(spinbutton_quant),0);
+			gtk_widget_set_sensitive(WID(entry_bitrate),1);
+			gtk_label_set_text(GTK_LABEL(WID(label3)),"Average bitrate (kb/s):");
+			break;
 
 	    	case COMPRESS_CQ:
 			HIST_SET(1);
@@ -286,6 +300,7 @@ create_dialog1 (void)
   GtkWidget *single_pass___bitrate1;
   GtkWidget *single_pass___quantizer1;
   GtkWidget *two_pass__1;
+  GtkWidget *two_pass__2;
   GtkWidget *entry_bitrate;
   GtkObject *spinbutton_quant_adj;
   GtkWidget *spinbutton_quant;
@@ -398,9 +413,14 @@ create_dialog1 (void)
   gtk_widget_show (single_pass___quantizer1);
   gtk_container_add (GTK_CONTAINER (menu1), single_pass___quantizer1);
 
-  two_pass__1 = gtk_menu_item_new_with_mnemonic (_("Two Pass  "));
+  two_pass__1 = gtk_menu_item_new_with_mnemonic (_("Two Pass (filesize) "));
   gtk_widget_show (two_pass__1);
   gtk_container_add (GTK_CONTAINER (menu1), two_pass__1);
+
+  two_pass__2 = gtk_menu_item_new_with_mnemonic (_("Two Pass (bitrate) "));
+  gtk_widget_show (two_pass__2);
+  gtk_container_add (GTK_CONTAINER (menu1), two_pass__2);
+
 
   gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu_mode), menu1);
 

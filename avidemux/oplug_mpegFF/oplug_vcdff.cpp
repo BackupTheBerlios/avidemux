@@ -278,7 +278,7 @@ ADMBitstream bitstream;
 	}
 
 
-	_buffer=new uint8_t[_page];
+	_buffer=new uint8_t[_page*2]; // Might overflow if _page only
 	_outbuffer=new uint8_t[_page];
 
 	ADM_assert(  _buffer);

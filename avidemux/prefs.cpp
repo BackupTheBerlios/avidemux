@@ -19,12 +19,13 @@
 #include <ADM_assert.h>
 
 #undef free
-extern char *getBaseDir(void);
+extern char *ADM_getBaseDir(void);
 #define CONFIG "config"
 extern char *PathCanonize(const char *tmpname);
 extern int  qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
 static char *checkDirAccess(char *home);
 extern char *ADM_escape(const ADM_filename *incoming);
+class preferences *prefs;
 // <prefs_gen>
 typedef enum {
 	UINT,
@@ -111,10 +112,11 @@ static opt_def opt_defs [] = {
 	{"feature.reuse_2pass_log",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.audiobar_uses_master",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.multi_thread",		UINT,	"0",	NULL,	"0",	"4"	},
+	{"feature.mpeg_no_limit",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"downmixing.prologic",		UINT,	"2",	NULL,	"0",	"2"	}
 };
 
-int num_opts = 66;
+int num_opts = 67;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2
@@ -243,7 +245,7 @@ int preferences::load(){
    char buf[1024];
    DIR   *dir;
 
-        dir_adm=getBaseDir();
+        dir_adm=ADM_getBaseDir();
         if(!dir_adm) return RC_FAILED;
 
         rcfile=new char[strlen(dir_adm)+4+strlen(CONFIG)];
@@ -385,7 +387,7 @@ int preferences::save_xml_to_file(){
    char *rcfile;
    char *rcfilenew;
 
-        dir_adm=getBaseDir();
+        dir_adm=ADM_getBaseDir();
         if(!dir_adm) return RC_FAILED;
 
         rcfile=new char[strlen(dir_adm)+4+strlen(CONFIG)];
@@ -941,7 +943,16 @@ const char **preferences::get_lastfiles(void){
 #endif
 	return (const char**)internal_lastfiles;
 }
+int initPrefs(  void )
+{
+  prefs = new preferences();
+  return 1;
+}
+int destroyPrefs(  void )
+{
+  delete prefs;
+  prefs=NULL;
+  return 1;
+}
 
-// the one and only global preferences object
-preferences *prefs = new preferences();
 // EOF

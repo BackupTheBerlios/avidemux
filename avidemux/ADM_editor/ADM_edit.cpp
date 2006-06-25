@@ -26,7 +26,9 @@
 #ifdef CYG_MANGLING
 #include "sys/stat.h"
 #endif
-
+#ifdef ADM_BSD_FAMILY
+#include "sys/stat.h"
+#endif
 #include <ADM_assert.h>
 
 #include "config.h"
@@ -105,6 +107,7 @@ uint32_t type,value;
   // Start with a clean base
   memset (_videos, 0, sizeof (_videos));
   memset (_segments, 0, sizeof (_segments));
+  _scratch=NULL;
   
 }
 /**
@@ -222,6 +225,11 @@ ADM_Composer::~ADM_Composer ()
   if(_imageBuffer)
   	delete _imageBuffer;
   _imageBuffer=NULL;
+  if(_scratch)
+    {
+      delete _scratch;
+      _scratch=NULL;
+    }
 
 }
 
@@ -508,6 +516,7 @@ TryAgain:
 
 		vid= &(_videos[_nb_video-1]);
 		vid->_reorderReady=0;
+                vid->_unpackReady=0;
 		// we only try if we got everything needed...
 		if(!vid->decoder)
 		{
@@ -519,6 +528,17 @@ TryAgain:
 			printf("\n no  B- frame with that codec \n");
 			return 1;
 		}
+                if(isH264Compatible(info.fcc))
+                {
+                    if(GUI_Confirmation_HIG("Use that mode","H264 detected","If the file is using bframe as reference, it can lead to crash or stutteting.\nAvidemux can use another mode which is safed but <b>YOU WILL LOOSE FRAME ACCURACY</b>.\nDo you want to use that mode ?"))
+                    {
+                              printf("Switching to non low delay codec\n");
+                              _videos[_nb_video-1].decoder = getDecoderH264noLogic (info.fcc,  info.width, info.height, l, d);
+                              return 1;
+                    }
+
+
+                }
 		printf("\n checking for B-Frames...\n");
 		if( vid->_nb_video_frames >12) // 12
 		{
@@ -699,6 +719,7 @@ _VIDEOS *vid;
 						{
 							aviInfo    info;
 							_videos[i]._aviheader->getVideoInfo (&info);
+                                                        
 							printf(" Video %lu has been reordered\n",i);
 						}
 

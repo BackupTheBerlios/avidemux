@@ -27,7 +27,7 @@
 #include "ADM_audiocodec/ADM_audiocodec.h"
 
 #ifdef USE_MP3
-#include "mad.h"
+#include "../ADM_libMad/mad.h"
 
 #define Stream ((mad_stream *)_stream)
 #define Frame ((mad_frame *)_frame)

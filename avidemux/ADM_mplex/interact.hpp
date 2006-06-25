@@ -83,18 +83,7 @@ public:
  *
  **********************************************************************/
 
-enum StreamKind
-  {
-    MPEG_AUDIO,
-    AC3_AUDIO,
-    LPCM_AUDIO,
-    DTS_AUDIO,
-    MPEG_VIDEO
-#ifdef ZALPHA
-    ,
-    Z_ALPHA
-#endif
-  };
+#include "streamType.h"
 
 class JobStream
 {

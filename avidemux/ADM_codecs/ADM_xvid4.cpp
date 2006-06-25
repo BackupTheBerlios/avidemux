@@ -363,6 +363,20 @@ xvid4Encoder::preAmble (uint8_t * in)
   xvid_enc_frame.input.plane[0] = in;
   xvid_enc_frame.input.plane[1] = in + (_w * _h);
   xvid_enc_frame.input.plane[2] = in + ((_w * _h * 5) >> 2);
+
+  /* Custome matrices */
+  if(_param.useCustomIntra) 
+  {
+  if(!xvid_enc_frame.quant_intra_matrix)  
+      printf("[Xvid4]Using custom intra matrix\n");
+      xvid_enc_frame.quant_intra_matrix=_param.intraMatrix;
+  }
+  if(_param.useCustomInter)
+  {
+    if(!xvid_enc_frame.quant_inter_matrix)
+      printf("[Xvid4]Using custom inter matrix\n");
+     xvid_enc_frame.quant_inter_matrix=_param.interMatrix;
+  }
   return 1;
 }
 

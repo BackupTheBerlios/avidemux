@@ -690,7 +690,7 @@ int dc1394_init(void);
 
 #ifdef HAVE_AV_CONFIG_H
 
-#include "os_support.h"
+//#include "os_support.h"
 
 int strstart(const char *str, const char *val, const char **ptr);
 int stristart(const char *str, const char *val, const char **ptr);

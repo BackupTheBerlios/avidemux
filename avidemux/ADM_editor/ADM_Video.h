@@ -57,7 +57,8 @@ protected:
 	  	void			*_audiostreaminfo;
 		char			*_name;
 		uint32_t		_videoExtraLen;
-		uint8_t			*_videoExtraData;		  
+		uint8_t			*_videoExtraData;
+                	  
 public:
 //  static int checkFourCC(uint8_t *in, uint8_t *fourcc);
          vidHeader();
@@ -79,7 +80,6 @@ virtual	uint8_t			isReordered( void ) { return 0;} // by default we don"t do fra
   uint32_t				getHeight( void ) { return _mainaviheader.dwHeight;};
   uint8_t					setMyName( char *name);
   char						*getMyName( void);
-  
   //__________________________
   //				 Audio
   //__________________________

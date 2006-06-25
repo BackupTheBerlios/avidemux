@@ -98,7 +98,8 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_guiCrop.cpp \
  ADM_vidColorYuv.cpp  \
  ADM_guiResize.cpp \
- ADM_vidAnimated.cpp
+ ADM_vidAnimated.cpp \
+ ADM_vidMcDeint.cpp
 
 				
 
@@ -145,7 +146,8 @@ EXTRA_DIST = ADM_genvideo.cpp \
  ADM_vidEq2.cpp \
  ADM_vidCNR2.cpp \
  ADM_vidYuvColor.cpp \
- ADM_vidAnimated.cpp
+ ADM_vidAnimated.cpp \
+ ADM_vidMcDeint.cpp
 
 
 ####### kdevelop will overwrite this part!!! (end)############

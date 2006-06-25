@@ -35,7 +35,6 @@ extern "C"
 #undef realloc
 #undef free
 #include <ADM_assert.h>
-
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
@@ -307,7 +306,11 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
         {
                 case WAV_AC3: c->codec_id = CODEC_ID_AC3;break;
                 case WAV_MP2: c->codec_id = CODEC_ID_MP2;break;
-                case WAV_MP3: c->codec_id = CODEC_ID_MP3;break;
+                case WAV_MP3:
+#warning FIXME : Probe deeper
+                            c->frame_size=1152;
+                            c->codec_id = CODEC_ID_MP3;
+                            break;
                 case WAV_PCM: 
                                 // One chunk is 10 ms (1/100 of fq)
                                 c->frame_size=4;
@@ -327,6 +330,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	c->codec_type = CODEC_TYPE_AUDIO;
 	
 	c->bit_rate = audioheader->byterate*8;
+        c->rc_buffer_size=(c->bit_rate/(2*8)); // 500 ms worth
 	_audioFq=c->sample_rate = audioheader->frequency;
 	c->channels = audioheader->channels;
         _audioByterate=audioheader->byterate;

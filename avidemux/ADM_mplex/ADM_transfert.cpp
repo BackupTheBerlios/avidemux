@@ -32,7 +32,7 @@
 // minimum amount of audio buffer we need
 #define MIN_REQUIRED    (1024*1024)
 //#define MPLEX_D
-
+#define threadFailure(x) if(!(x)){printf("Condition "#x" failed at line %d\n",__LINE__);dumpStatus();ADM_assert(0);}
 //**************** Mutex *******************
 admMutex::admMutex(void)
 {
@@ -108,14 +108,16 @@ uint8_t admCond::abort( void )
 //**************** Transfert *******************
 // *** Lot of race here : FIXME
 
-Transfert::Transfert(void)
+Transfert::Transfert(uint32_t minBuffer)
 {
         cond=new admCond(&mutex);
         clientCond=new admCond(&mutex);
+        _minRequired=minBuffer;
         buffer=new uint8_t[TRANSFERT_BUFFER];
 
         aborted=0;
-        
+        transfered_r=0;
+        transfered_w=0;
         
         head=tail=0;
         
@@ -126,6 +128,27 @@ Transfert::~Transfert()
         delete clientCond;
         delete [] buffer;
         
+}
+uint8_t Transfert::dumpStatus(void)
+{
+    printf("Mplex threading status : \n");
+    printf("Aborted :%d\n",aborted);
+    printf("head :%u\n",head);
+    printf("tail :%u\n",tail);
+    printf("mutex :%u\n",mutex.isLocked());
+    printf("cond :%u\n",cond->iswaiting());
+    printf("Clientcond :%u\n",clientCond->iswaiting());
+    printf("Written : %u bytes\n",transfered_w);
+    printf("Read : %u bytes\n",transfered_r);
+
+    printf("cond waiting :%u\n",cond->waiting);
+    printf("cond aborted :%u\n",cond->aborted);
+
+    printf("clientCond waiting :%u\n",clientCond->waiting);
+    printf("clientCond aborted :%u\n",clientCond->aborted);
+
+    
+    return 1;
 }
 uint32_t Transfert:: read(uint8_t *buf, uint32_t nb  )
 {
@@ -145,7 +168,7 @@ uint32_t fill=0;
                 memcpy(buf,buffer+head,nb);                
                 head+=nb;
                 r+=nb;
-                
+                transfered_r+=nb;
                 goto endit;                                                    
         }
         
@@ -160,8 +183,8 @@ uint32_t fill=0;
                 
                 goto endit;
          }
-         
-         ADM_assert(!clientCond->iswaiting());
+         if(clientCond->iswaiting()) printf("Client : %d\n",clientCond->waiting);
+         threadFailure(!clientCond->iswaiting());
          
 #ifdef MPLEX_D      
          printf("Wanted : %lu , left :%lu\n",nb,fill);   
@@ -187,6 +210,7 @@ endit:
                 }
         }
         mutex.unlock();
+        transfered_w+=r;
         return r;               
 }
 //*********************************
@@ -222,10 +246,11 @@ uint8_t Transfert:: write(uint8_t *buf, uint32_t nb  )
         if(nb+tail>=TRANSFERT_BUFFER)
         {
                 printf("\n When writting %lu bytes, we overflow the existing %lu bytes\n",nb,tail-head);
-                ADM_assert(0);
+                threadFailure(0);
         
         }
-        memcpy(buffer+tail,buf,nb);        
+        memcpy(buffer+tail,buf,nb);       
+        transfered_w+=nb;
         tail+=nb;
         
         if(cond->iswaiting())
@@ -245,9 +270,9 @@ uint8_t Transfert::needData( void )
   uint8_t r=0;
         mutex.lock(); 
         l=tail-head;
-        ADM_assert(l>=0);
+        threadFailure(l>=0);
         mutex.unlock();
-        if(l<MIN_REQUIRED) r=1;
+        if(l<_minRequired) r=1;
         if(cond->iswaiting()) r=1;
 //        return cond->iswaiting();
         return r;
@@ -269,6 +294,12 @@ uint8_t Transfert::clientLock( void )
 #endif         
 
         mutex.lock();
+        // Redo check under same mutex lock
+        if((tail-head)<HIGH_LVL)
+        {
+            mutex.unlock();
+            return 1;
+        }
         clientCond->wait();               
         return 1;
 

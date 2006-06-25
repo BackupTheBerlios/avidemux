@@ -507,13 +507,15 @@ decoderFF_ffhuff::decoderFF_ffhuff (uint32_t w, uint32_t h, uint32_t l, uint8_t 
   WRAP_Open (CODEC_ID_FFVHUFF);
 
 }
-decoderFFH264::decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
+decoderFFH264::decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d, uint32_t lowdelay):decoderFF (w,
 	   h)
 {
+  _lowDelay=lowdelay;
   _refCopy = 1;			// YUV420 only
   _context->extradata = (void *) d;
   _context->extradata_size = (int) l;
-  _context->flags |= CODEC_FLAG_LOW_DELAY;
+  if(lowdelay)
+    _context->flags |= CODEC_FLAG_LOW_DELAY;
   printf ("Initializing lavcodec H264 decoder with %d extradata\n", l);
   WRAP_Open (CODEC_ID_H264);
 

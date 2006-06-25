@@ -87,6 +87,9 @@ GtkWidget *dialog;
 #ifdef USE_FAAD
         CHECK_SET(checkbutton12)
 #endif
+#ifdef USE_LIBDCA
+        CHECK_SET(checkbutton13)
+#endif
 
 
         gtk_register_dialog(dialog);
@@ -104,7 +107,9 @@ create_dialog1 (void)
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox1;
+  GtkWidget *vbox2;
   GtkWidget *label1;
+  GtkWidget *hseparator1;
   GtkWidget *table2;
   GtkWidget *label6;
   GtkWidget *label8;
@@ -130,6 +135,8 @@ create_dialog1 (void)
   GtkWidget *label13;
   GtkWidget *checkbutton11;
   GtkWidget *checkbutton12;
+  GtkWidget *label14;
+  GtkWidget *checkbutton13;
   GtkWidget *dialog_action_area1;
   GtkWidget *closebutton1;
 
@@ -144,12 +151,20 @@ create_dialog1 (void)
   gtk_widget_show (vbox1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
 
+  vbox2 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox2);
+  gtk_box_pack_start (GTK_BOX (vbox1), vbox2, TRUE, TRUE, 0);
+
   label1 = gtk_label_new (_("If an option is not checked, it means\nyou must RECOMPILE avidemux to have\nsupport for it!"));
   gtk_widget_show (label1);
-  gtk_box_pack_start (GTK_BOX (vbox1), label1, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox2), label1, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_FILL);
 
-  table2 = gtk_table_new (12, 2, FALSE);
+  hseparator1 = gtk_hseparator_new ();
+  gtk_widget_show (hseparator1);
+  gtk_box_pack_start (GTK_BOX (vbox2), hseparator1, TRUE, TRUE, 0);
+
+  table2 = gtk_table_new (13, 2, FALSE);
   gtk_widget_show (table2);
   gtk_box_pack_start (GTK_BOX (vbox1), table2, TRUE, TRUE, 0);
 
@@ -309,6 +324,19 @@ create_dialog1 (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
+  label14 = gtk_label_new (_("libDCA/libDTS"));
+  gtk_widget_show (label14);
+  gtk_table_attach (GTK_TABLE (table2), label14, 0, 1, 12, 13,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label14), 0, 0.5);
+
+  checkbutton13 = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkbutton13);
+  gtk_table_attach (GTK_TABLE (table2), checkbutton13, 1, 2, 12, 13,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
@@ -322,7 +350,9 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox2, "vbox2");
   GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
+  GLADE_HOOKUP_OBJECT (dialog1, hseparator1, "hseparator1");
   GLADE_HOOKUP_OBJECT (dialog1, table2, "table2");
   GLADE_HOOKUP_OBJECT (dialog1, label6, "label6");
   GLADE_HOOKUP_OBJECT (dialog1, label8, "label8");
@@ -348,6 +378,8 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, label13, "label13");
   GLADE_HOOKUP_OBJECT (dialog1, checkbutton11, "checkbutton11");
   GLADE_HOOKUP_OBJECT (dialog1, checkbutton12, "checkbutton12");
+  GLADE_HOOKUP_OBJECT (dialog1, label14, "label14");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbutton13, "checkbutton13");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, closebutton1, "closebutton1");
 

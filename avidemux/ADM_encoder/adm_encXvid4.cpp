@@ -119,7 +119,11 @@ EncoderXvid4::configure (AVDMGenericVideoStream * instream)
 	}
       break;
     case COMPRESS_2PASS:
-      printf ("\n Xvid dual size: %lu (%s)\n", _param.finalsize, _logname);
+    case COMPRESS_2PASS_BITRATE:
+      if(_param.mode==COMPRESS_2PASS)
+          printf ("\n Xvid dual size: %lu (%s)\n", _param.finalsize, _logname);
+      else
+          printf ("\n Xvid dual avg br: %u kb/s (%s)\n", _param.avg_bitrate, _logname);
       _state = enc_Pass1;
       _codec = new xvid4EncoderPass1 (_w, _h);
       strcpy (encparam.logName, _logname);
@@ -236,28 +240,25 @@ uint8_t EncoderXvid4::stop (void)
   return 1;
 
 }
+extern uint32_t ADM_computeBitrate(uint32_t fps1000, uint32_t nbFrame, uint32_t sizeInMB);
 uint8_t EncoderXvid4::startPass2 (void)
 {
-  uint32_t
-    finalSize;
-  float
-    br;
+  uint32_t     finalSize;
+  uint32_t         br;
 
   ADM_assert (_state == enc_Pass1);
   printf ("\n Starting pass 2 (%dx%d)\n", _w, _h);
 
-
-  finalSize = _param.finalsize;
-
-
-
-  br = finalSize * 8;
-  br *= 1024 * 1024;
-  br = br / _totalframe;	// bit / frame
-  br = br * _fps1000;
-  br = br / 1000;
-
-  finalSize = (int) floor (br);
+  if(_param.mode==COMPRESS_2PASS)
+  {
+    
+    br=ADM_computeBitrate( _fps1000,_totalframe,_param.finalsize);
+    printf("[Xvid4] Final Size: %u MB, avg bitrate %u kb/s \n",_param.finalsize,br/1000);
+  }else if(_param.mode==COMPRESS_2PASS_BITRATE)
+  {
+    br=_param.avg_bitrate*1000;
+    printf("[Xvid4] 2pass avg bitrate %u kb/s\n",br/1000);
+  }else ADM_assert(0);
 
   _state = enc_Pass2;
   // Delete codec and start new one
@@ -267,13 +268,11 @@ uint8_t EncoderXvid4::startPass2 (void)
 	_codec;
       _codec = NULL;
     }
-  printf ("\n Xvid dual size: %lu MB\n", _param.finalsize);
 
   _codec = new xvid4EncoderPass2 (_w, _h);
   strcpy (encparam.logName, _logname);
-  printf ("Using %s as stat file, average bitrate %d kbps\n", _logname,
-	  finalSize / 1000);
-  if (!_codec->init (finalSize, _fps1000, &encparam))
+  printf ("Using %s as stat file, average bitrate %d kbps\n", _logname,	  br / 1000);
+  if (!_codec->init (br, _fps1000, &encparam))
     {
       printf ("Error initializing Xvid4 pass1 mode\n");
       return 0;

@@ -78,35 +78,35 @@ targetFmt *allFormats[5]={&VCD,&SVCD,&DVD,&DVDHD1,&PSP};
 #define ARME(x) format=RESWIZ_##x;
 
 
-void setVCD (void)
+uint8_t setVCD (void)
 {
 
   ARME (VCD);
-  computeResize();
+  return computeResize();
 }
-void setPSP (void)
+uint8_t setPSP (void)
 {
 
     ARME (PSP);
-    computeResize();
+    return computeResize();
 }
-void setSVCD (void)
+uint8_t setSVCD (void)
 {
 
   ARME (SVCD);
-  computeResize();
+  return computeResize();
 }
-void setDVD (void)
+uint8_t setDVD (void)
 {
 
   ARME (DVD);
-  computeResize();
+  return computeResize();
 }
-void setHalfD1 (void)
+uint8_t setHalfD1 (void)
 {
 
   ARME (DVD_HD1);
-  computeResize();
+  return computeResize();
 }
 
 

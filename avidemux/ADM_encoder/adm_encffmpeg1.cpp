@@ -246,6 +246,7 @@ EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
 
       break;
     case COMPRESS_2PASS:
+    case COMPRESS_2PASS_BITRATE:
       {
 	_settings.override_ratecontrol = 1;
 	ffmpegEncoderCQ *cdec = NULL;
@@ -360,33 +361,30 @@ EncoderFFMPEGMpeg1::stop (void)
   return 1;
 }
 //_______________________________
+extern uint32_t ADM_computeBitrate(uint32_t fps1000, uint32_t nbFrame, uint32_t sizeInMB);
 uint8_t
 EncoderFFMPEGMpeg1::startPass2 (void)
 {
-  uint32_t vbr;
-  uint32_t avg_bitrate;
+  uint32_t br,avg_bitrate;
+  
   ADM_assert (_state == enc_Pass1);
   printf ("\n-------* Starting pass 2*-------------\n");
 
+ if(_param.mode==COMPRESS_2PASS)
+  {
+    br=ADM_computeBitrate( _fps,_totalframe,_param.finalsize);
+    printf("[FFmpeg Mpeg1/2] Final Size: %u MB, avg bitrate %u kb/s \n",_param.finalsize,br/1000);
+  }else if(_param.mode==COMPRESS_2PASS_BITRATE)
+  {
+    br=_param.avg_bitrate*1000;
+    printf("[FFmpeg Mpeg1/2] 2pass avg bitrate %u kb/s\n",br/1000);
+  }else ADM_assert(0);
+ 
 
-  float db, ti;
-
-
-  db = _param.finalsize;
-  db = db * 1024. * 1024. * 8.;
-  // now deb is in Bits
-  db = db / _totalframe;	// bit / frame
-  db = db * _fps;
-  db /= 1000.;
-
-  avg_bitrate = (uint32_t) floor (db);
+  avg_bitrate = br;
 
   printf ("\n ** Total size     : %lu MBytes \n", _param.finalsize);
   printf (" ** Total frame    : %lu  \n", _totalframe);
-  printf (" ** Average bitrate: %d \n", avg_bitrate / 1000);
-
-
-
 
   printf ("\n VBR parameters computed\n");
   _state = enc_Pass2;
@@ -399,9 +397,6 @@ EncoderFFMPEGMpeg1::startPass2 (void)
 
   if (!_use_xvid_ratecontrol)
     {
-
-
-
       _codec = new ffmpegEncoderVBR (_w, _h, 0, _id);	//0 -> external 1 -> internal
       _settings.override_ratecontrol = 0;
       _codec->setConfig (&_settings);

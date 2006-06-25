@@ -93,6 +93,7 @@
                 VF_MPDELOGO,
                 VF_COLOR_YUV,
                 VF_ANIMATED,
+                VF_MCDEINT,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

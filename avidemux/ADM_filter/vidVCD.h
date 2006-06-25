@@ -19,9 +19,9 @@
  ***************************************************************************/
 
 
-void setSVCD( void );
-void setVCD( void );
-void setPSP(void);
-void setDVD( void );
-void setHalfD1( void );
+uint8_t setSVCD( void );
+uint8_t setVCD( void );
+uint8_t setPSP(void);
+uint8_t setDVD( void );
+uint8_t setHalfD1( void );
 

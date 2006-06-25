@@ -39,17 +39,22 @@ typedef unsigned char ADM_filename ;
 #endif
 
 #ifndef GOT_TYPES
-#define int16_t 	signed short int
+#ifdef ARCH_X86_64
+#define int32_t 	signed int
+#define int64_t 	signed long int 
+#define uint64_t 	unsigned long  int
+#else
 #define int32_t 	signed long  int
-
-#define uint16_t 	unsigned short int
-#define uint32_t 	unsigned long  int
-
 #define int64_t 	signed long  long
 #define uint64_t 	unsigned long  long
 
+#endif
 #define uint8_t  	unsigned char
 #define int8_t   	signed char
+
+#define int16_t 	signed short int
+#define uint16_t 	unsigned short int
+#define uint32_t 	unsigned long  int
 
 #endif
 #define UNUSED_ARG(a) do {/* null */} while (&a == 0)
@@ -65,9 +70,9 @@ typedef unsigned char ADM_filename ;
 #define ADM_IGN 2
 
 // For win32, useless else
-
+#ifdef __cplusplus
 uint64_t ftello_adm(FILE *f);
 int fseeko_adm(FILE *f,fpos_t off,int whence);
-
+#endif
 
 #endif

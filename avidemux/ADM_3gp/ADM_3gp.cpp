@@ -74,7 +74,8 @@ version 2 media descriptor :
 #define MODULE_NAME MODULE_3GP
 #include "ADM_toolkit/ADM_debug.h"
 
-#define _3GP_VERBOSE
+//#define _3GP_VERBOSE
+#define MAX_CHUNK_SIZE (3*1024)
 // 14496-1 / 8.2.1
 typedef enum MP4_Tag
 {
@@ -83,6 +84,7 @@ typedef enum MP4_Tag
 	Tag_DecConfigDesc 	=0x04,
 	Tag_DecSpecificInfo 	=0x05
 };
+uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 //****************************************************
 _3gpTrack::_3gpTrack(void)
 {
@@ -269,11 +271,16 @@ uint8_t    _3GPHeader::open(char *name)
         if(check[0]=='m' && check[1]=='d' &&check[2]=='a' && check[3]=='t')
         {
                         uint32_t of;
-                                        atom->read32();
-                                        atom->read32();
-                                        atom->read32();
+                                        printf("Data first, header later...\n");
                                         of=atom->read32();
+                                        if(of==1)
+                                        {
+                                          atom->read32();
+                                          atom->read32();
+                                          of=atom->read32();
+                                        }
                                         fseeko(_fd,of,SEEK_SET);        
+                                        printf("Header starts at %x\n",of);
                                         delete atom;
                                         atom=new adm_atom(_fd);
         }
@@ -360,17 +367,19 @@ uint8_t    _3GPHeader::open(char *name)
                     _tracks[0].index[i].intra=AVI_B_FRAME;
                 
             }
-            _tracks[0].index[0].intra=AVI_KEY_FRAME;
+            
             
         }
-
+        _tracks[0].index[0].intra=AVI_KEY_FRAME;
+        // Update usec per frame
+        _mainaviheader.dwMicroSecPerFrame=ADM_UsecFromFps1000( _videostream.dwRate);;;   
         printf("3gp/mov file successfully read..\n");
         return 1;
 }
 uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 {
 	static uint32_t current=0;
-	static uint32_t nbSz,nbCo,nbSc,nbSync;
+	static uint32_t nbSz,nbCo,nbSc,nbSync,SzIndentical;
 	//static uint32_t duration;
 	static uint32_t _lastW, _lastH;
 	static uint32_t nest=0;
@@ -555,6 +564,34 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 
 
                                         }
+                    case MKFCCR('Q','D','M','2'): // QDM2
+                                        {
+                                        tom.skipBytes(8);
+                                        printf("QDM2 audio\n");
+                                        printf("Version : %u\n",tom.read16());
+                                        printf("Revision :%u\n",tom.read16());
+                                        printf("Vendor :%lu\n",tom.read32());
+                                        ADIO.channels=tom.read16();
+                                        ADIO.bitspersample=tom.read16();
+                                        tom.read16();
+                                        ADIO.encoding=WAV_QDM2;
+                                        ADIO.byterate=ADIO.frequency=tom.read32();
+                                        ADIO.byterate*=ADIO.bitspersample/8;
+                                        ADIO.byterate*=ADIO.channels;
+                                        
+                                        printf("Byterate  :%lu\n",ADIO.byterate);
+                                        printf("Frequency :%lu\n",ADIO.frequency);
+                                        printf("Bps       :%lu\n",ADIO.bitspersample);
+                                        tom.skipBytes(26);
+
+                                        _tracks[nbAudioTrack+1].extraDataSize=tom.getRemainingSize();
+                                        _tracks[nbAudioTrack+1].extraData=new uint8_t [_tracks[nbAudioTrack+1].extraDataSize];
+                                        tom.readPayload(_tracks[nbAudioTrack+1].extraData,_tracks[nbAudioTrack+1].extraDataSize);
+                                        mixDump(_tracks[nbAudioTrack+1].extraData,_tracks[nbAudioTrack+1].extraDataSize);
+                                        break;          
+
+
+                                        }
 			case MKFCCR('m','p','4','a'): //'mp4a':
 					
                                         if(tom.getRemainingSize()>15) // skip the real mp4a atom, we only do the one in stds
@@ -715,6 +752,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				nbSc=0;
 				nbSync=0;
 				nbStts=0;
+                                SzIndentical=0;
 				//myScale=1000;
 				parseAtomTree(&tom);
 				switch(current)
@@ -726,8 +764,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					if(_tracks[0].nbIndex) break;
 
 					buildIndex(&_tracks[0],myScale,
-							nbSz,Sz,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
-							Sn,&nbo);
+							nbSz,Sz,SzIndentical,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
+							Sn,&nbo,0);
 					// Take the last entry in the video index as global time
 					// time in us
                                         nbo=_tracks[0].nbIndex;
@@ -762,8 +800,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				case 2:
 					// audio
                                         buildIndex(&_tracks[1+nbAudioTrack],myScale,
-							nbSz,Sz,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
-							Sn,&nbo);
+							nbSz,Sz,SzIndentical,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
+							Sn,&nbo,1);
                                         nbo=_tracks[1+nbAudioTrack].nbIndex;
                                         // Check for extra
 
@@ -1000,15 +1038,30 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					{
 						tag=tom.read();
 						l=readPackedLen(&tom);
-						printf("\t Tag : %lu Len : %lu\n",tag,l);
+						printf("\t Tag : %u Len : %u\n",tag,l);
 						switch(tag)
 						{
 							case Tag_ES_Desc:
 								tom.skipBytes(3);
 								break;
 							case Tag_DecConfigDesc:
-								tom.skipBytes(1+1+3+4+4);	
+                                                        {
+                                                                uint8_t objectTypeIndication=tom.read();
+                                                                printf("\tDecConfigDesc : Tag %u\n",objectTypeIndication);
+                                                                if(current==2 && ADIO.encoding==WAV_AAC)
+                                                                {
+                                                                  switch(objectTypeIndication)
+                                                                  {
+                                                                      case 0x6b:ADIO.encoding=WAV_MP3;break;
+                                                                      case 0x6d:ADIO.encoding=WAV_MP3;break;
+                                                                      case 226:ADIO.encoding=WAV_AC3;break;
+                                                                      break;
+                                                              
+                                                                  }
+                                                                }
+								tom.skipBytes(1+3+4+4);	
 								break;
+                                                        }
 							case Tag_DecSpecificInfo:
                                                                 switch(current)
                                                                 {
@@ -1052,15 +1105,13 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				tom.read32();
 				n=tom.read32();
               			nbSz=tom.read32();
-
+                                SzIndentical=0;
 				printf("%lu frames /%lu nbsz..\n",n,nbSz);
 				if(n)
 					{
-						Sz=new uint32_t[1];
-						#warning could be smarter...
-						printf("All samples are the same size...(%ld)\n",nbSz);
-							Sz[0]=nbSz;
-							nbSz=0;
+                                              printf("\t\t%u frames of the same size %u\n",nbSz,SzIndentical);
+                                              SzIndentical=n;
+                                              Sz=NULL;
 					}
 				else
 				{
@@ -1093,6 +1144,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 
 				tom.read32();
 				nbCo=tom.read32();
+                                printf("\t\tnbCo:%u\n",nbCo);
 				Co=new uint32_t[nbCo];
 				for(j=0;j< nbCo;j++)
 				{
@@ -1152,19 +1204,21 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 	Sc[nbSc] hold the fist chunk that has   Sn[j] chunk in it
 
 	Stsz holds the size of each sample
-	If they are all the same size, nbSz=0 and nbSz[0] holds the size
+	If they are all the same size, nbSz=is the # of frames and Sz=NULL  SzIndentical is the size frame
+        IF they are not all the same size, nbSz is the # of sizes (normally same as # of samples) SzIndentical=0 and Sz contains the size
 
 
 http://developer.apple.com/documentation/QuickTime/QTFF/QTFFChap2/chapter_3_section_5.html#//apple_ref/doc/uid/DontLinkBookID_69-CH204-BBCJEIIA
+
 */
 uint8_t	_3GPHeader::buildIndex(
                             _3gpTrack *track,   
                             uint32_t myScale,
-				uint32_t nbSz,	uint32_t *Sz,
+				uint32_t nbSz,	uint32_t *Sz,uint32_t SzIndentical,
 				uint32_t nbCo ,		uint32_t *Co,
 				uint32_t nbSc,		uint32_t *Sc,
 				uint32_t nbStts,	uint32_t *SttsN,uint32_t *SttsC,
-				uint32_t *Sn, 			uint32_t *outNbChunk)
+				uint32_t *Sn, 			uint32_t *outNbChunk,uint32_t isAudio)
 
 {
 
@@ -1178,74 +1232,119 @@ uint32_t i,j,cur;
 	ADM_assert(Sc);
 	ADM_assert(Sn);
 	ADM_assert(Co);
-	ADM_assert(Sz);
-
+	if(!SzIndentical)
+        {
+          ADM_assert(Sz);
+        }
 	// first set size
-	if(!nbSz)// in that case they are all the same size, i.e.audio
-	{		// ugly hack...
-		uint32_t chunk_size=0;
-		uint32_t cur_entry=0;
-		uint32_t cur_size=0;
-		uint32_t packet_size=8000;
-		uint32_t nbPacket;
+	if(SzIndentical)// in that case they are all the same size, i.e.audio
+	{
+          uint32_t totalBytes=SzIndentical*nbSz;
+          printf("All the same size : %u (total size %u bytes)\n",SzIndentical,totalBytes);
+              //
+              // Each chunk contains N samples=N bytes
+              int samplePerChunk[nbCo];
+              memset(samplePerChunk,0,nbCo*sizeof(int));
+              for( i=0;i<nbSc;i++)
+              {
+                  for(int j=Sc[i]-1;j<nbCo;j++)
+                  {
 
-		chunk_size=Sz[0]/nbCo;
-                
-                printf(" chunk_size : %lu %u / %u \n",chunk_size,Sz[0],nbCo);
-		*outNbChunk=nbPacket=nbCo*(1+(chunk_size/packet_size));
-		printf("All the same size : %lu\n",chunk_size);
-		printf("Using packet size of %lu, %lu packets ..\n",packet_size,*outNbChunk);
-		// we try to avoid too big packet_size
-		// so we split them in packet size number
+                        samplePerChunk[j]=Sn[i];
+                  }
+              }
+              int total=0;
+              for( i=0;i<nbCo;i++)
+              {
+                  aprintf("%u -> %u samples %u bytes\n",i,samplePerChunk[i],samplePerChunk[i]*SzIndentical);
+                  total+=samplePerChunk[i];
+              }
+              printf("Total size in byte : %u\n",total*SzIndentical);
+              track->index=new _3gpIndex[nbCo];
+              memset(track->index,0,nbCo*sizeof(_3gpIndex));
+              track->nbIndex=nbCo;;
+              int max=0;
+              totalBytes=0;
+              for(i=0;i<nbCo;i++)
+              {
+                  uint32_t sz;
 
-		track->index=new _3gpIndex[nbCo];
-                memset(track->index,0,nbCo*sizeof(_3gpIndex));
-                track->nbIndex=nbCo;
-                _3gpIndex *ix=track->index;
-		for(i=0;i<nbCo;i++)
-		{
-			ix[i].size=chunk_size;
-			ix[i].offset=Co[i];;
-			aprintf("Size : %lu offset : %lu\n",ix[i].size,ix[i].offset);
-		}
-		// Time to update audio (as we are probably in audio)
-		// they should be all the same duration
-		// since they are all the same size...
-		ADM_assert(nbStts==1);
-		uint32_t count,val;
-				
-		if(SttsC[0]==1)
-		{		
-			count=nbCo;
-			val=SttsN[0];
-		}
-		else
-		{
-			count=SttsN[0];
-			val=SttsC[0];
-		
-		}
-                if(count>nbCo) count=nbCo;
-		printf("created %u blocks\n",count);
-		// update timestamps on block
-		double dur=val;
-		double total=0;
-		
-		dur=dur/myScale;
-		dur/=count;		// we got the duration of one block
-		dur*=1000*1000.;	// in us now
-		for(uint32_t i=0;i<count;i++)
-		{
-                        track->index[i].time=(uint64_t)floor(total);
-			total+=dur;		
-		}
-		
-		
-		return 1;
+                  track->index[i].offset=Co[i];
+                  sz=samplePerChunk[i]*SzIndentical;
+                  track->index[i].size=sz;
+                  track->index[i].time=0; // No seek
+                  if(sz>MAX_CHUNK_SIZE)
+                  {
+                      max+=sz/MAX_CHUNK_SIZE;
+                  }
+                  
+                  totalBytes+=track->index[i].size;
+              }
+              // Now time to update the time...
+              // Normally they have all the same duration
+              if(nbStts!=1) printf("WARNING: Same size, different duration\n");
 
-		
-		
-	}
+              float sampleDuration,totalDuration=0;
+              
+                sampleDuration=SttsC[0];
+                sampleDuration*=1000.*1000.;
+                sampleDuration/=myScale;    // Duration of one sample
+                for(i=0;i<nbCo;i++)
+                {
+                        track->index[i].time=(uint64_t)floor(totalDuration);
+                        totalDuration+=sampleDuration*samplePerChunk[i];
+                        aprintf("Audio chunk : %lu time :%lu\n",i,track->index[i].time);
+                }
+                if(max && isAudio) // We have some big chunks we need to split them
+                {
+                      // rebuild a new index
+                      printf("We have %u chunks that are too big, adjusting..\n",max);
+                      uint32_t newNbCo=track->nbIndex+max;
+                      uint32_t w=0;
+                      uint32_t one_go;
+
+                        one_go=MAX_CHUNK_SIZE/SzIndentical;
+                        one_go=one_go*SzIndentical;
+
+                     _3gpIndex *newindex=new _3gpIndex[newNbCo];
+
+                    int64_t time_increment=(int64_t)((one_go/SzIndentical)*sampleDuration);  // Nb sample*duration of one sample
+                    for(i=0;i<track->nbIndex;i++)
+                    {
+                      uint32_t sz;
+                          sz=track->index[i].size;
+                          if(sz<MAX_CHUNK_SIZE)
+                          {
+                              memcpy(&(newindex[w]),&(track->index[i]),sizeof(_3gpIndex));
+                              w++;
+                              continue;
+                          }
+                          // We have to split it...
+                          int part=0;
+                          while(sz>one_go)
+                          {
+                                newindex[w].offset=track->index[i].offset+part*one_go;
+                                newindex[w].size=one_go;
+                                newindex[w].time=track->index[i].time+part*time_increment; 
+                                w++;
+                                part++;
+                                sz-=one_go;
+                          }
+                          // The last one...
+                                newindex[w].offset=track->index[i].offset+part*one_go;
+                                newindex[w].size=sz;
+                                newindex[w].time=track->index[i].time+part*time_increment+((time_increment*sz)/one_go); 
+                                w++;
+                    }
+                    delete [] track->index;
+                    track->index=newindex;
+                    track->nbIndex=newNbCo;
+                }
+          return 1;
+      }
+          // Else we build an index per sample
+          //
+	
 		
 	// We have different packet size
 	// Probably video
@@ -1301,6 +1400,8 @@ uint32_t i,j,cur;
 
 
 	}
+        
+        
         track->nbIndex=cur;;
 	
 	

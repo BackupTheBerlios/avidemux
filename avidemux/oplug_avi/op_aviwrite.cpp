@@ -51,7 +51,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 #include "prefs.h"
 // END MOD Feb 2005 by GMV
-
+uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 //------------
 typedef struct
 {
@@ -459,10 +459,8 @@ uint8_t aviWrite::saveBegin (char 	*name,
 //
         memcpy (&_mainheader, inmainheader, sizeof (MainAVIHeader));
         _mainheader.dwFlags = AVIF_HASINDEX + AVIF_ISINTERLEAVED;
-        if(_mainheader.dwMicroSecPerFrame<10000) // Less than 10 ms
-        {
-                _mainheader.dwMicroSecPerFrame=40000;
-        }
+
+
         
 // update main header codec with video codev
         if (inaudiostream)
@@ -487,6 +485,14 @@ uint8_t aviWrite::saveBegin (char 	*name,
   	_videostream.dwLength = nb_frame;
 	_videostream.fccType=fourCC::get((uint8_t *)"vids");
 	memcpy(&_bih,bih,sizeof(_bih));
+
+// Update usecperframe
+double f;
+        f=_videostream.dwRate;
+        f*=1000;
+        f/=_videostream.dwScale;
+        _mainheader.dwMicroSecPerFrame=ADM_UsecFromFps1000( (uint32_t)floor(f));
+        
 
         // Recompute image size
 uint32_t is;	

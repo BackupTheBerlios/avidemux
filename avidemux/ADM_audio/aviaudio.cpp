@@ -68,8 +68,8 @@ AVDMAviAudioStream::AVDMAviAudioStream(		odmlIndex *idx,
     _nb_chunks=nbchunk;
     strcpy(_name, "FILE:AVI");
 
-     _codec=getAudioCodec(wav->encoding,wav,_extraLen,_extraData);
-     ADM_assert(_codec);
+     //_codec=getAudioCodec(wav->encoding,wav,_extraLen,_extraData);
+     //ADM_assert(_codec);
 
     _current_index = 0;
 
