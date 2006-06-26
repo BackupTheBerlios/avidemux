@@ -141,29 +141,7 @@ public:
 
      		
 };
-//_____________________________________________
-class AVDMProcessMono2Stereo : public AVDMBufferedAudioStream
-{
-protected:
-                virtual uint32_t 	grab(uint8_t *obuffer);	
-			uint8_t		_engaged;
-public:
-						
-        AVDMProcessMono2Stereo(AVDMGenericAudioStream *instream);
-        ~AVDMProcessMono2Stereo();
-     		
-};
-class AVDMProcessStereo2Mono : public AVDMBufferedAudioStream
-{
-protected:
-                virtual uint32_t 	grab(uint8_t *obuffer);	
-			uint8_t		_engaged;
-public:
-						
-        AVDMProcessStereo2Mono(AVDMGenericAudioStream *instream);
-        ~AVDMProcessStereo2Mono();
-     		
-};
+
 
 //_____________________________________________
 class AVDMProcessAudio_Null : public AVDMBufferedAudioStream
