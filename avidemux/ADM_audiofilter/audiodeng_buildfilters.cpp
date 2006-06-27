@@ -48,7 +48,6 @@
   	Ugly should get ride of it. Temporary fix.
 */
 #include "avi_vars.h"
-#include "audioeng_toolame.h"
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
 #include "audioeng_lpcm.h"
 #include "audioeng_mixer.h"
@@ -864,6 +863,7 @@ uint8_t init;
                 {
                                 AVDMProcessAudio_Lpcm *lpcm;
                                 lpcm = new AVDMProcessAudio_Lpcm(lastFilter);
+				lpcm->init();
                                 lastFilter = lpcm;
                                 filters[filtercount++] = lastFilter;
                 }

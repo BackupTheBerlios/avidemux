@@ -86,6 +86,7 @@ class AVDMGenericAudioStream
        					uint32_t	_pos;
 					uint8_t		_destroyable;
 					char   		_name[20];
+					uint8_t	_eos;
          					// This is for writing..
 			              	uint32_t	_dlen;
 					AviList		*_LAll;

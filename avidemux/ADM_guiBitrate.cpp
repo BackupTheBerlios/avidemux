@@ -60,7 +60,6 @@
 #include "oplug_mpeg/op_mpeg.h"
 #include "oplug_mpegFF/oplug_vcdff.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_audiofilter/audioeng_piper.h"
 #include "prefs.h"
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_gui2/GUI_render.h"

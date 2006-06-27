@@ -60,7 +60,7 @@
 
 
 audioDevice::audioDevice(void) {
-	memset(_dither, 0, 256*4);
+	memset(_dither, 0, 256*sizeof(float));
 }
 
 /*do triangle dither and convert to int16_t with minimal overhead*/

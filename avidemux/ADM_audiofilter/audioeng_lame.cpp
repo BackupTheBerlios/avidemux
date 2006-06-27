@@ -29,15 +29,9 @@
 #ifdef HAVE_LIBMP3LAME
 #include "lame/lame.h"
 
-#include "avifmt.h"
-#include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
-//#include "aviaudio.hxx"
+#include "default.h"
 #include "audioprocess.hxx"
-//#include "../toolkit.hxx"
 
-extern uint32_t audioMP3bitrate; // ugly, should be local
 lame_global_flags *myflags = NULL;
 
 // Ctor: Duplicate
@@ -55,8 +49,6 @@ AVDMProcessAudio_Lame::AVDMProcessAudio_Lame(AVDMGenericAudioStream * instream):
     strcpy(_name, "PROC:LAME");
     _instream->goToTime(0);	// rewind
     _length = _instream->getLength();
-  
-    
 };
 
 AVDMProcessAudio_Lame::~AVDMProcessAudio_Lame()
@@ -78,10 +70,8 @@ uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
 					uint32_t bitrate,
 					ADM_LAME_PRESET preset)
 {
-
-    int ret, ratio;
-    MPEG_mode_e mmode;
-    double dratio;
+	int ret;
+	MPEG_mode_e mmode;
 
     myflags = lame_init();
     if (myflags == NULL)
@@ -90,7 +80,9 @@ uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
 	// recompute output length
 	// since we compress recompute the length in bytes
     double comp;
-    
+
+	_chunk = 4096;
+
     comp=_instream->getLength();
     comp/=2; // 16 bits sample
     comp/=_wavheader->channels; // We got sample
@@ -101,7 +93,6 @@ uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
     printf("Incoming : %lu bytes, fq : %lu, channel : %lu bitrate: %lu outgoing : %lu\n",
     			_instream->getLength(),_wavheader->frequency,_wavheader->channels,bitrate,_length);
     //initLame(frequence,mode,bitrate);	
-	
     ret = lame_set_in_samplerate(myflags, _instream->getInfo()->frequency);
     ret = lame_set_num_channels(myflags, _instream->getInfo()->channels);
 
@@ -133,10 +124,6 @@ uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
      	printf("\n mono audio mp3");
   	}
 
-   _mode=mmode;
-
-   
-
     ret = lame_set_brate(myflags, bitrate);
     ret = lame_set_mode(myflags, mmode);	// 0 stereo 1 jstero
     ret = lame_init_params(myflags);
@@ -163,7 +150,10 @@ uint8_t AVDMProcessAudio_Lame::initLame(uint32_t frequence,
     
     
     }
-    
+
+	_in = new float [_chunk];
+	ADM_assert(_in);
+
     lame_print_config(myflags);
     lame_print_internals(myflags);
 
@@ -178,70 +168,24 @@ uint8_t	AVDMProcessAudio_Lame::isVBR(void )
 //_____________________________________________
 uint32_t AVDMProcessAudio_Lame::grab(uint8_t * obuffer)
 {
+	int32_t nbout;
 
-    uint32_t rd = 0, rdall = 0;
-    uint8_t *in;
-    int32_t nbout;
-    uint32_t asked, done;
+	if (readChunk() == 0)
+		return MINUS_ONE;	// End of stream
 
-#define ONE_CHUNK (8192)
-//      
-// Read n samples
-    // Go to the beginning of current block
-    in = _bufferin;
-    while (rdall < ONE_CHUNK)
-      {
-	  // don't ask too much front.
-	  asked = ONE_CHUNK - rdall;
-	  rd = _instream->read(asked, in + rdall);
-	  rdall += rd;
-	  if (rd == 0)
-	      break;
-      }
-    // Block not filled
-    if (rdall != ONE_CHUNK)
-      {
-	  printf("\n not enough...%lu\n", rdall);
-	  if (rdall == 0)
-	      return MINUS_ONE;	// we could not get a single byte ! End of stream
-	  // Else fillout with 0
-	  memset(in + rdall, 0, ONE_CHUNK - rdall);
-      }
-    // input buffer is full , convert it
-    if(_mode==MONO)
-    {
-           nbout = lame_encode_buffer(myflags,	/* global context handlei        */
-					   (int16_t *) _bufferin,	/* PCM data for left and right
-									   channel, interleaved          */
-		             (int16_t *) _bufferin,
-					   ONE_CHUNK >> 1,	/* number of samples per channel,
-								   _not_ number of samples in
-								   pcm[]                         */
-					   obuffer,	/* pointer to encoded MP3 stream */
-					   16 * 1024);	/* number of valid octets in this
-							   stream */
-      }
-      else
-    {
-    nbout = lame_encode_buffer_interleaved(myflags,	/* global context handlei        */
-					   (int16_t *) _bufferin,	/* PCM data for left and right
-									   channel, interleaved          */
-					   ONE_CHUNK >> 2,	/* number of samples per channel,
-								   _not_ number of samples in
-								   pcm[]                         */
-					   obuffer,	/* pointer to encoded MP3 stream */
-					   16 * 1024);	/* number of valid octets in this
-							   stream */
-          }
-    if (nbout < 0)
-      {
-	  printf("n Error !!! : %ld\n", nbout);
+	dither16bit();
 
-	  ADM_assert(nbout > 0);
-	  return MINUS_ONE;
-      }
-    done = (uint32_t) nbout;
-    return done;
+	if (_wavheader->channels == 1)
+		nbout = lame_encode_buffer(myflags, (int16_t *) _in, (int16_t *)_in, _chunk, obuffer, 16 * 1024);
+	else
+		nbout = lame_encode_buffer_interleaved(myflags, (int16_t *)_in, _chunk/2, obuffer, 16 * 1024);
+
+	if (nbout < 0) {
+		printf("\n Error !!! : %ld\n", nbout);
+		return MINUS_ONE;
+	}
+
+	return (uint32_t) nbout;
 }
 
 

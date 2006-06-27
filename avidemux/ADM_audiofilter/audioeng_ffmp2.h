@@ -16,46 +16,31 @@
  ***************************************************************************/
 #ifndef FFaudioMP2
 #define FFaudioMP2
- 
- //_____________________________________________
+
 class AVDMProcessAudio_FFmpeg : public AVDMBufferedAudioStream
 {
-protected:
-         uint32_t _mode;
-         uint32_t _bitrate;
-         uint32_t _fq;
-         uint32_t _size;
-				 uint8_t  _bufferin[PROCESS_BUFFER_SIZE];
-         uint32_t 	grab(uint8_t *obuffer);
-		     void  	*_context;
-		     uint8_t	*_bfer;
-		     int			_codec;
-public:
-				uint8_t	init(												 uint32_t bitrate);		
-				~AVDMProcessAudio_FFmpeg();				
-		        AVDMProcessAudio_FFmpeg(int codecid,AVDMGenericAudioStream *instream	);		
-     		
+	protected:
+		uint32_t grab(uint8_t *obuffer);
+		void *_context;
+		int _codec;
+
+	public:
+		uint8_t init(uint32_t bitrate);
+		~AVDMProcessAudio_FFmpeg();
+		AVDMProcessAudio_FFmpeg(int codecid,AVDMGenericAudioStream *instream);
 };
+
 class AVDMProcessAudio_FFmp2 : public AVDMProcessAudio_FFmpeg
 {
-protected:
-        
-		   	
-public:
-			
-				~AVDMProcessAudio_FFmp2();				
-		  	AVDMProcessAudio_FFmp2(AVDMGenericAudioStream *instream	);		
-     		
+	public:
+		~AVDMProcessAudio_FFmp2() {}
+		AVDMProcessAudio_FFmp2(AVDMGenericAudioStream *instream);
 };
+
 class AVDMProcessAudio_FFAC3 : public AVDMProcessAudio_FFmpeg
 {
-protected:
-                 
-		   	
-public:
-			
-				~AVDMProcessAudio_FFAC3();				
-		  	AVDMProcessAudio_FFAC3(AVDMGenericAudioStream *instream	);		
-     		
+	public:
+		~AVDMProcessAudio_FFAC3() {}
+		AVDMProcessAudio_FFAC3(AVDMGenericAudioStream *instream);
 };
 #endif

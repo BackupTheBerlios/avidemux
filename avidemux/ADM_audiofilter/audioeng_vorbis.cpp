@@ -29,13 +29,7 @@
 
 #include "ADM_lavcodec.h"
 
-#include "avifmt.h"
-#include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
-//#include "aviaudio.hxx"
 #include "audioprocess.hxx"
-#include "ADM_toolkit/toolkit.hxx"
 #include "vorbis/vorbisenc.h"
 #include "ADM_audiofilter/audioeng_vorbis.h"
 
@@ -55,7 +49,6 @@ typedef struct vorbisStruct
 AVDMProcessAudio_Vorbis::AVDMProcessAudio_Vorbis(AVDMGenericAudioStream * instream)
 :AVDMBufferedAudioStream    (instream)
 {
-
     _wavheader = new WAVHeader;    
     memcpy(_wavheader, _instream->getInfo(), sizeof(WAVHeader));
    _wavheader->encoding=WAV_OGG;

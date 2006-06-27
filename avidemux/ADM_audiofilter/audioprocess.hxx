@@ -48,32 +48,36 @@ public:
 };
 class AVDMBufferedAudioStream : public  AVDMProcessAudioStream
 {
-protected:
+	protected:
+		float _dither[256];
+		void dither16bit();
 
-			 int16_t   _buffer[PROCESS_BUFFER_SIZE];
-			// uint32_t  	_bufferlen;
+		float *_in;
+		uint32_t _chunk;
+		uint32_t readChunk();
 
-			 virtual uint32_t grab(uint8_t *outbuffer)=0;//deprecated
-			 virtual uint32_t grab(float *outbuffer){return 0;}
-			 uint32_t	_headBuff,_tailBuff;
-public:
+		int16_t   _buffer[PROCESS_BUFFER_SIZE];
+		// uint32_t  	_bufferlen;
 
-        AVDMBufferedAudioStream(AVDMGenericAudioStream *instream);
-				virtual uint8_t  preprocess( void ) {return 1;};
-				virtual uint8_t  configure( void )  { return 1;};
-//
+		virtual uint32_t grab(uint8_t *outbuffer)=0;//deprecated
+		virtual uint32_t grab(float *outbuffer){return 0;}
+		uint32_t _headBuff,_tailBuff;
 
-        virtual uint32_t read(uint32_t len,uint8_t *buffer);//deprecated
-        virtual uint32_t read(uint32_t len,float *buffer);
-        virtual uint8_t  goTo(uint32_t newoffset);
-        virtual uint8_t  goToTime(uint32_t newoffset);
-	virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer)//deprecated
-						{ return read(len,buffer); }
-	virtual uint32_t readDecompress(uint32_t len,float *buffer)
-						{ return read(len,buffer); }
+	public:
+		AVDMBufferedAudioStream(AVDMGenericAudioStream *instream);
+		virtual ~AVDMBufferedAudioStream();
 
+		virtual uint8_t  preprocess( void ) {return 1;};
+		virtual uint8_t  configure( void )  { return 1;};
 
+		virtual uint32_t read(uint32_t len,uint8_t *buffer);//deprecated
+		virtual uint32_t read(uint32_t len,float *buffer);
+		virtual uint8_t  goTo(uint32_t newoffset);
+		virtual uint8_t  goToTime(uint32_t newoffset);
+		virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer) { return read(len,buffer); }//deprecated
+		virtual uint32_t readDecompress(uint32_t len,float *buffer) { return read(len,buffer); }
 };
+
 //_____________________________________________
 class AVDMProcessAudio_Normalize : public AVDMProcessAudioStream
 {

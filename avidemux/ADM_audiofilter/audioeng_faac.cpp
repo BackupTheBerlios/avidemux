@@ -28,17 +28,10 @@
 
 #include "ADM_lavcodec.h"
 
-#include "avifmt.h"
-#include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
-//#include "aviaudio.hxx"
 #include "audioprocess.hxx"
-#include "ADM_toolkit/toolkit.hxx"
 #include "faac.h"
 #include "ADM_audiofilter/audioeng_faac.h"
 
-static uint16_t remap[4096];
 // Ctor: Duplicate
 //__________
 
@@ -58,8 +51,6 @@ AVDMProcessAudio_Faac::AVDMProcessAudio_Faac(AVDMGenericAudioStream * instream)
 
 AVDMProcessAudio_Faac::~AVDMProcessAudio_Faac()
 {
-    printf("Deleting faac\n");
-
     if(_handle)
     	 faacEncClose(_handle);
     _handle=NULL;
@@ -70,7 +61,6 @@ AVDMProcessAudio_Faac::~AVDMProcessAudio_Faac()
     if(_extraData) delete [] _extraData;
     _extraData=NULL;
     printf("Deleting faac\n");
-
 };
 
 
@@ -99,7 +89,6 @@ int ret=0;
 	return 0;    
     }
     printf(" [FAAC] : Sample input:%d, max byte output%d \n",samples_input,max_bytes_output);
-    _incoming_frame=samples_input/_wavheader->channels;
     cfg= faacEncGetCurrentConfiguration(_handle);
     
     // Set default conf, same as ffmpeg
@@ -134,14 +123,19 @@ int ret=0;
 //    _wavheader->dwSampleSize=0;
     _wavheader->blockalign=4096;
     _wavheader->bitspersample=0;
-    
+
+	_chunk=samples_input;
+	_in = new float [_chunk];
+	ADM_assert(_in);
+
+
     printf("[Faac] Initialized :\n");
     
     printf("[Faac]Version        : %s\n",cfg->name);
     printf("[Faac]Bitrate        : %lu\n",cfg->bitRate);
     printf("[Faac]Mpeg2 (1)/4(0) : %u\n",cfg->mpegVersion);
     printf("[Faac]Use lfe      ) : %u\n",cfg->useLfe);
-    printf("[Faac]Sample output  : %lu\n",_incoming_frame);
+    printf("[Faac]Sample output  : %lu\n",_chunk / _wavheader->channels);
     printf("[Faac]Bitrate        : %lu\n",cfg->bitRate*_wavheader->channels);
 
     
@@ -154,76 +148,29 @@ uint8_t         AVDMProcessAudio_Faac::extraData(uint32_t *l,uint8_t **d)
                 return 1;
 }
 //_____________________________________________
+
 uint32_t AVDMProcessAudio_Faac::grab(uint8_t * obuffer)
 {
-uint32_t len,sam;
+	uint32_t len,sam;
 	printf("Faac: Read\n");
 	if(getPacket(obuffer,&len,&sam))
 		return len;
 	return MINUS_ONE;
 }
+
 #define FA_BUFFER_SIZE (SIZE_INTERNAL/4)
 //______________________________________________
-uint8_t	AVDMProcessAudio_Faac::getPacket(uint8_t *dest, uint32_t *len, 
-					uint32_t *samples)
-{				
-uint8_t  *buf=dropBuffer;
-uint32_t nbSample=0;
-uint32_t rdall=0,asked,rd;
-int wr;
+uint8_t	AVDMProcessAudio_Faac::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
+{
+	*samples = _chunk / _wavheader->channels;
+	*len = 0;
 
-faa_loop:
-	asked=_incoming_frame*2*_wavheader->channels;
-	rd=_instream->read(asked,buf);
-/*	
-        if(rd==0 || rd==MINUS_ONE)
-        {
-                return 0;
-        }
-*/
-	if(rd<asked || rd==MINUS_ONE)
-        {
-                if(rd==MINUS_ONE)
-                {
-                        printf("Faac: incoming buffer empty\n");
-                        rd=0;
-                }
-                memset(buf+rd,0,asked-rd);      // Fill out with 0
-                rd=asked;
-                printf("Faac : feeding with 0\n");
-        }    
-  // Now encode
-  	nbSample= rd/(2*_wavheader->channels);
-        //printf("Sample..\n");
-	switch(_wavheader->channels)
-	{
-	case 1:
-        	wr = faacEncEncode(_handle,
-                      (int32_t *)buf,
-                      nbSample, // Nb sample for all channels
-                      dest,
-                      FA_BUFFER_SIZE
-		      );
-		break;
-	case 2:
-		
-		wr = faacEncEncode(_handle,
-                      (int32_t *)buf,
-                      nbSample*2, // Nb sample for all channels
-                      dest,
-                      FA_BUFFER_SIZE
-		      );
-		break;
-	}
-		     
-	*len=wr;
-	*samples=nbSample;
-        if(!wr) 
-        {
-                printf("FAAC: Got no datas, retrying\n");
-                goto faa_loop;
-        }
-	//aprintf("Faac: asked :%lu got %lu out len:%d sample:%d\n",asked,rd,wr,nbSample);
+	if (readChunk() == 0)
+		return 1;	// End of stream
+
+	dither16bit();
+	*len = faacEncEncode(_handle, (int32_t *)_in, _chunk, dest, FA_BUFFER_SIZE);
+
 	return 1;
 }
 

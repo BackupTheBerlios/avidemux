@@ -59,7 +59,6 @@ AVDMProcessAudio_LibToolame::AVDMProcessAudio_LibToolame(AVDMGenericAudioStream 
    
     _instream->goToTime(0);	// rewind
     _length = _instream->getLength();
-    _bfer=NULL;
     options=NULL;
     _wavheader->encoding=WAV_MP2;	
 };
@@ -89,7 +88,7 @@ AVDMProcessAudio_LibToolame::~AVDMProcessAudio_LibToolame()
 uint8_t AVDMProcessAudio_LibToolame::init( uint32_t mode, uint32_t bitrate)
 {
 
-    int ret;//, ratio;
+    int ret;
     double comp;
     TWOLAME_MPEG_mode mmode;    	
     
@@ -100,6 +99,8 @@ uint8_t AVDMProcessAudio_LibToolame::init( uint32_t mode, uint32_t bitrate)
 		GUI_Error_HIG("Incompatible audio frequency", "Samplerate should be at least 32 kHz.");
 		return 0;
 	}*/
+	_chunk = 4096;
+
     comp=_instream->getLength();
     comp/=2; // 16 bits sample
     comp/=_wavheader->channels; // We got sample
@@ -150,62 +151,32 @@ uint8_t AVDMProcessAudio_LibToolame::init( uint32_t mode, uint32_t bitrate)
             return 0;
         }
 	
+	_in = new float [_chunk];
+	ADM_assert(_in);
 
 	printf("Libtoolame successfully initialized\n");
     return 1;       
 }
-#define ONE_CHUNK 8192
-//_____________________________________________
+
 uint32_t AVDMProcessAudio_LibToolame::grab(uint8_t * obuffer)
 {
+	int32_t nbout;
 
-    uint32_t rd = 0, rdall = 0;
-    uint8_t *in;
-    int nbout,nbframe;
-    uint32_t asked, done;
-    uint8_t *myBuffer;
-    
-    myBuffer=(uint8_t *)_buffer;
+	if (readChunk() == 0)
+		return MINUS_ONE;	// End of stream
 
+	dither16bit();
 
-//      
-// Read n samples
-    // Go to the beginning of current block
-    in = _bfer;
-    while (rdall < (uint32_t)ONE_CHUNK)
-      {
-	  // don't ask too much front.
-	  asked = ONE_CHUNK - rdall;
-	  rd = _instream->read(asked, myBuffer + rdall);
-	  rdall += rd;
-	  if (rd == 0)
-	      break;
-      }
-    // Block not filled
-    if (rdall != (uint32_t)ONE_CHUNK)
-      {
-	  printf("\n not enough...%lu\n", rdall);
-	  if (rdall == 0)
-	      return MINUS_ONE;	// we could not get a single byte ! End of stream
-	  // Else fillout with 0
-	  memset(_buffer + rdall, 0, ONE_CHUNK - rdall);
-      }
-    
-  	// 
-	if(_wavheader->channels==1)
-	{
-		nbout =twolame_encode_buffer(options, _buffer, _buffer,
-			  rdall>>1, obuffer,8192  );
-		aprintf("in:%d out;%d\n",rdall,nbout);	
-	}		
+	if (_wavheader->channels == 1)
+		nbout =twolame_encode_buffer(options, (int16_t *) _in, (int16_t *) _in, _chunk, obuffer, _chunk);
 	else
-	{
-		nbout= twolame_encode_buffer_interleaved(options, _buffer,
-			  rdall>>2, obuffer, ONE_CHUNK*2);
-		aprintf("2Lame: in:%d out:%d frame:%d\n",rdall,nbout,nbframe);	  
-		
+		nbout= twolame_encode_buffer_interleaved(options, (int16_t *) _in, _chunk/2, obuffer, _chunk*2);
+
+	if (nbout < 0) {
+		printf("\n Error !!! : %ld\n", nbout);
+		return MINUS_ONE;
 	}
-    done = (uint32_t) nbout;
-    return done;
+
+	return (uint32_t) nbout;
 }	
 // EOF

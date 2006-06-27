@@ -28,12 +28,7 @@ static const ADM_PRESET_DEFINITION      presetDefinition[]=
 class AVDMProcessAudio_Lame : public AVDMBufferedAudioStream
 {
 protected:
-         uint32_t _mode;
-         uint32_t _bitrate;
-         uint32_t _fq;
-         uint32_t _size;
 	ADM_LAME_PRESET _preset;
-				 uint8_t  _bufferin[PROCESS_BUFFER_SIZE];
           virtual uint32_t 	grab(uint8_t *obuffer);
 
 		

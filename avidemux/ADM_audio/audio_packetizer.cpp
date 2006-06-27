@@ -46,14 +46,18 @@ Split a stream into packet(s)
 uint8_t AVDMGenericAudioStream::flushPacket(void)
 {
 	packetTail=packetHead=0;
+	_eos = 0;
 	return 1;
 }
-uint8_t		AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len, 
-						uint32_t *samples)
+uint8_t AVDMGenericAudioStream::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
 	uint32_t instock=0,rd=0;	
 
+	if (_eos)
+		return 0;
+
 	ADM_assert(_wavheader);
+
 _refill:
 	shrink();
 	instock=packetTail-packetHead;
@@ -69,6 +73,8 @@ _refill:
 		else
 		{
 			printf("**PKTZ:READ ERROR\n");
+			printf("**END OF AUDIO STREAM\n");
+			_eos = 1;
 			break;
 		}
 	}
