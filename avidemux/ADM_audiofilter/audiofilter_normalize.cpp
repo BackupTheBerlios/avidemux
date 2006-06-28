@@ -133,7 +133,6 @@ uint32_t AUDMAudioFilterNormalize::fill( uint32_t max, float * buffer,AUD_Status
     uint32_t rd, i, j,rd2;
 
     *status=AUD_OK;
-    shrink();
     if(!_scanned) preprocess();
     rd = _previous->fill(max, _incomingBuffer,status);
     if(!rd)
