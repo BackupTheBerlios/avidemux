@@ -21,15 +21,20 @@
 #include "config.h"
 #include "avifmt.h"
 #include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
+
+
 
 #include "audioeng_process.h"
 #include "audiofilter_mixer.h"
 
 typedef int *DOWMIXER_f(float *in,float *out,uint32_t nbSample,uint32_t chan);
 
-
+static float CLIP(float in)
+{
+  if(in>1.0) in=1.0;
+  if(in<-1.0) in=-1.0;
+  return in;
+}
 
 AUDMAudioFilterMixer::AUDMAudioFilterMixer(AUDMAudioFilter *instream,CHANNEL_CONF out):AUDMAudioFilter (instream)
 {
@@ -72,17 +77,15 @@ AUDMAudioFilterMixer::~AUDMAudioFilterMixer()
     Dolby Prologic 2 downmixing 3-2
  ----------------------------------------- 
 */
-#define SHIFTED 12
-#define SCALE (2<<SHIFTED)
-#define XSCALE (SCALE*0.3225)
-const int DB2_coef[5]={
-    (int)(XSCALE),
-    (int)(0.707*XSCALE),
-    (int)(XSCALE),
-    (int)(0.8165*XSCALE),
-    (int)(0.5774*XSCALE)
+#define SCALER2 0.325
+const float DB2_coef[5]={
+    SCALER2*1.0,      // LEFT
+    SCALER2*0.707,  // CENTER
+    SCALER2*1.0,  // RIGHT
+    SCALER2*0.8165,  // SL
+    SCALER2*0.5774  // SR
 };
-#define MIX(a,b) (((int32_t)in[a])*DB2_coef[b]) 
+#define MIX(a,b) ((in[a])*DB2_coef[b]) 
 /* -----------------------------------------
     Dolby Prologic 2 downmixing 3-2
  ----------------------------------------- 
@@ -92,12 +95,14 @@ static int M32_2_DB2(float *in,float *out,uint32_t nbSample,uint32_t chan)
 {       
     for(int i=0;i<nbSample;i++)
     {
-        out[0]=(int16_t)((MIX(0,0)+MIX(1,1)-MIX(3,3) -MIX(4,4))>>SHIFTED);
-        out[1]=(int16_t)((MIX(2,2)+MIX(1,1)+MIX(3,4) +MIX(4,3))>>SHIFTED);
+        out[0]=((MIX(0,0)+MIX(1,1)-MIX(3,3) -MIX(4,4)));
+        out[1]=((MIX(2,2)+MIX(1,1)+MIX(3,4) +MIX(4,3)));
+        CLIP(out[0]);
+        CLIP(out[1]);
         in+=chan;
         out+=2;
     }
-    return nbSample*2*2;
+    return nbSample*2;
 }
 /* -----------------------------------------
     Dolby Prologic 2 downmixing 2-2
@@ -107,19 +112,22 @@ static int M22_2_DB2(float *in,float *out,uint32_t nbSample,uint32_t chan)
 {       
     for(int i=0;i<nbSample;i++)
     {
-        out[0]=(int16_t)((MIX(0,0)-MIX(2,3) -MIX(3,4))>>SHIFTED);
-        out[1]=(int16_t)((MIX(1,2)+MIX(3,3) +MIX(2,4))>>SHIFTED);
+        out[0]=((MIX(0,0)-MIX(2,3) -MIX(3,4)));
+        out[1]=((MIX(1,2)+MIX(3,3) +MIX(2,4)));
+        CLIP(out[0]);
+        CLIP(out[1]);
         in+=chan;
         out+=2;
     }
-    return nbSample*2*2;
+    return nbSample*2;
 }
 ///******************************************************************
 ///                Dolby Prologic 1
 ///******************************************************************
-const int DB1_coef[2]={
-    (int)(XSCALE),
-    (int)(0.707*XSCALE),
+#define SCALER1 0.325  // Too low
+const float DB1_coef[2]={
+    SCALER1*1,
+    SCALER1*0.707,
     
 };
 #undef MIX
@@ -130,16 +138,18 @@ const int DB1_coef[2]={
 */
 static int M3_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
 {       
-    int32_t center;
+    float center;
     for(int i=0;i<nbSample;i++)
     {
-        center=((int32_t)in[1]*DB1_coef[1]);
-        out[0]=(int16_t)((MIX(0,0)+center)>>SHIFTED);
-        out[1]=(int16_t)((MIX(2,0)+center)>>SHIFTED);
+        center=in[1]*DB1_coef[1];
+        out[0]=MIX(0,0)+center ;
+        out[1]=MIX(2,0)+center ;
+        CLIP(out[0]);
+        CLIP(out[1]);
         in+=5;
         out+=2;
     }
-    return nbSample*2*2;
+    return nbSample*2;
 }
 /* -----------------------------------------
     Dolby Prologic 1 downmixing 3-1
@@ -147,13 +157,15 @@ static int M3_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
 */
 static int M31_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
 {       
-    int32_t rear,center;
+    float rear,center;
     for(int i=0;i<nbSample;i++)
     {
-        center=((int32_t)in[1]*DB1_coef[1]);
-        rear=((int32_t)in[3]*DB1_coef[1]);
-        out[0]=(int16_t)((MIX(0,0)+center -rear)>>SHIFTED);
-        out[1]=(int16_t)((MIX(2,0)+center+rear)>>SHIFTED);
+        center=in[1]*DB1_coef[1];
+        rear=in[3]*DB1_coef[1];
+        out[0]=MIX(0,0)+center -rear;
+        out[1]=MIX(2,0)+center+rear;
+        CLIP(out[0]);
+        CLIP(out[1]);
         in+=5;
         out+=2;
     }
@@ -161,12 +173,14 @@ static int M31_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
 }
 static int M32_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
 {       
-    int32_t surround;
+    float surround;
     for(int i=0;i<nbSample;i++)
     {
-        surround=((int32_t)in[3]+(int32_t)in[4])*DB1_coef[1];
-        out[0]=(int16_t)((MIX(0,0)+MIX(1,1)-surround)>>SHIFTED);
-        out[1]=(int16_t)((MIX(2,0)+MIX(1,1)+surround)>>SHIFTED);
+        surround= in[3]+in[4]*DB1_coef[1];
+        out[0]=MIX(0,0)+MIX(1,1)-surround;
+        out[1]=MIX(2,0)+MIX(1,1)+surround;
+        CLIP(out[0]);
+        CLIP(out[1]);
         in+=chan;
         out+=2;
     }
@@ -182,8 +196,10 @@ static int M22_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
     for(int i=0;i<nbSample;i++)
     {
         surround=(in[2]+in[3])*DB1_coef[1];
-        out[0]=(int16_t)((MIX(0,0)-surround));
-        out[1]=(int16_t)((MIX(1,0)+surround));
+        out[0]=MIX(0,0)-surround;
+        out[1]=MIX(1,0)+surround;
+        CLIP(out[0]);
+        CLIP(out[1]);
         in+=4;
         out+=2;
     }
@@ -198,8 +214,8 @@ static int M22_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
 */
 static int MCOPY(float *in,float *out,uint32_t nbSample,uint32_t chan)
 {
-    memcpy(out,in,nbSample*2*chan);
-    return nbSample*2*chan;
+    memcpy(out,in,nbSample*chan);
+    return nbSample*chan;
     
 }
 static int M2to1(float *in,float *out,uint32_t nbSample,uint32_t chan)
@@ -209,7 +225,7 @@ static int M2to1(float *in,float *out,uint32_t nbSample,uint32_t chan)
         *out++=*in;
         in+=2;   
     }
-    return nbSample*2;
+    return nbSample;
     
 }
 static int M1to2(float *in,float *out,uint32_t nbSample,uint32_t chan)
@@ -219,7 +235,7 @@ static int M1to2(float *in,float *out,uint32_t nbSample,uint32_t chan)
         out[0]=out[1]=*in++;
         out+=2;   
     }
-    return nbSample*2*2;
+    return nbSample*2;
     
 }
 static int MNto1(float *in,float *out,uint32_t nbSample,uint32_t chan)
@@ -231,11 +247,11 @@ int den=(chan+1)&0xfe;
         sum=0;
         for(int j=0;j<chan;j++)
           sum+=in[j];
-        out[0]=sum/den;
+        out[0]=sum/(float)den;
         out++;
         in+=chan;
     }
-    return nbSample*2;
+    return nbSample;
     
 }
 
@@ -287,6 +303,9 @@ uint32_t AUDMAudioFilterMixer::fill(uint32_t max,float *output,AUD_Status *statu
     window=NB_SAMPLE*ADM_channel_mixer[_input];
     ADM_assert(window);
     ADM_assert((AUD_PROCESS_BUFFER_SIZE/2)>window);
+    
+    // Hysteresis
+    if((_tail-_head)<(AUD_PROCESS_BUFFER_SIZE>>2))
     while ((_tail < AUD_PROCESS_BUFFER_SIZE/2))
     {
           // don't ask too much front.

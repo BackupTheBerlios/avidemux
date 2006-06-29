@@ -22,11 +22,8 @@
 
 #include "config.h"
 #include "avifmt.h"
-#include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
-
 #include "audioprocess.hxx"
+
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_dialog/DIA_working.h"
 #include "audioeng_process.h"

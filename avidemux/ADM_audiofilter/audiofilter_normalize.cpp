@@ -21,16 +21,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 #include <math.h>
 
-#include "config.h"
+#include <ADM_assert.h>
+
 #include "avifmt.h"
 #include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
 
-#include "audioprocess.hxx"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_dialog/DIA_working.h"
 #include "audioeng_process.h"
