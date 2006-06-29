@@ -80,7 +80,7 @@ static uint16_t audio_available = 0;
 static uint32_t one_audio_frame = 0;
 static uint32_t one_frame;
 static float *wavbuf = NULL;
-AVDMProcessAudioStream *playback = NULL;
+AUDMAudioFilter *playback = NULL;
 extern renderZoom currentZoom;
 //static uint8_t Vbuffer[7.0*5.6*3];
 //AVDMGenericVideoStream *getFirstVideoFilter( void)
@@ -320,10 +320,8 @@ void FillAudio(void)
 	  // if delta is small, it means we are late on audio
 	  if (delta < AUDIO_PRELOAD)
 	    {
-		if (!
-		    (oaf =
-		     playback->readDecompress(one_audio_frame,
-					      (wavbuf + load))))
+              AUD_Status status;
+		if (! (oaf = playback->fill(2*one_audio_frame,  (wavbuf + load),&status)))
 		  {
 		      printf("\n Error reading audio stream...\n");
 		      return;
@@ -402,7 +400,8 @@ void ComputePreload(void)
     one_sec=EVEN(one_sec);
     one_audio_frame=EVEN(one_audio_frame);
     //
-    if (!(small = playback->readDecompress(one_sec, wavbuf)))
+    AUD_Status status;
+    if (!(small = playback->fill(one_sec*2, wavbuf,&status)))
       {
 	  printf("\n Preload:Error reading audio stream...");
 	  return;
