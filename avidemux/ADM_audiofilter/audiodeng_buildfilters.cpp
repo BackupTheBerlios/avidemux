@@ -53,6 +53,13 @@
 #include "audioeng_mixer.h"
 #include "prefs.h"
 #include "ADM_toolkit/ADM_debugID.h"
+#include "audioeng_process.h"
+
+#include "audiofilter_bridge.h"
+#include "audiofilter_mixer.h"
+#include "audiofilter_normalize.h"
+
+
 #define MODULE_NAME MODULE_AUDIO_FILTER
 #include "ADM_toolkit/ADM_debug.h"
 extern void UI_setAProcessToggleStatus( uint8_t status );
@@ -116,7 +123,8 @@ extern int DIA_getVorbisSettings(int *pbitrate, int *mode);
 extern void UI_PrintCurrentACodec( const char *s);
 
 #define MAX_AUDIO_FILTER 10
-static AVDMProcessAudioStream *filters[MAX_AUDIO_FILTER];
+//static AVDMProcessAudioStream *filters[MAX_AUDIO_FILTER];
+static AUDMAudioFilter *filtersFloat[MAX_AUDIO_FILTER];
 static uint32_t filtercount = 0;
 static AUDIOENCODER  activeAudioEncoder=  AUDIOENC_NONE;
 /*----------------------------------*/
@@ -542,13 +550,13 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 				uint32_t starttime, uint32_t duration)
 {
 
-    AVDMProcessAudioStream *firstFilter = NULL;
-    AVDMProcessAudioStream *lastFilter = NULL;
-    AVDMProcessAudioStream *normalize = NULL;
-    AVDMProcessAudioStream *downsample = NULL;
-    AVDMProcessAudioStream *resample = NULL;
-    AVDMProcessAudioStream *tshift = NULL;
-    AVDMProcessAudioStream *drc = NULL;
+  AUDMAudioFilter *firstFilter = NULL;
+  AUDMAudioFilter *lastFilter = NULL;
+  AUDMAudioFilter *normalize = NULL;
+  AUDMAudioFilter *downsample = NULL;
+  AUDMAudioFilter *resample = NULL;
+  AUDMAudioFilter *tshift = NULL;
+  AUDMAudioFilter *drc = NULL;
 
 
     printf("\n Audio codec : %d",activeAudioEncoder);
@@ -570,6 +578,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 		duration=(uint32_t)floor(d);
 		duration=(duration+1)&0xfffffffe;
 	}
+#if 0        
 //_______________________________________________________
     if (audioDelay && audioShift)
       {
@@ -604,12 +613,12 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
                 }
       }
       else // no delay
+#endif      
     {
-        firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
-                                            starttime, duration);
+        firstFilter = new AUDMAudioFilter_Bridge(NULL,currentaudiostream, starttime);
         filtercount = 0;
         lastFilter = firstFilter;
-        filters[filtercount++] = firstFilter;
+        filtersFloat[filtercount++] = firstFilter;
     }
 
 
@@ -617,25 +626,21 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
     if ( audioNormalizeMode)	// Normalize activated ?
       {
 	  printf("\n  normalize activated...\n");
-	  normalize = new AVDMProcessAudio_Normalize(lastFilter);
+
+          normalize = new AUDMAudioFilterNormalize(lastFilter);
 	  lastFilter = normalize;
-	  filters[filtercount++] = lastFilter;
-	  // Preprocess input if needed....
-
-	  currentaudiostream->beginDecompress();
-	  normalize->preprocess();
-	  currentaudiostream->endDecompress();
-
+          filtersFloat[filtercount++] = lastFilter;
 
       }
       
       if( (audioMixing!=CHANNEL_INVALID ))
       {
-          AVDMProcessAudio_Mixer *mixer;
-          mixer=new AVDMProcessAudio_Mixer( lastFilter,audioMixing);
+          AUDMAudioFilter *mixer;
+          mixer=new AUDMAudioFilterMixer( lastFilter,audioMixing);
           lastFilter = mixer;
-          filters[filtercount++] = lastFilter;
+          filtersFloat[filtercount++] = lastFilter;
       }
+#if 0
     if (audioDRC)
       {
 	  AVDMProcessAudio_Compress *pdrc = NULL;
@@ -704,25 +709,27 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 		
       	}   
 		
-	
+#endif	
 	
 //_______________________________________________________
 
 
 
     currentaudiostream->beginDecompress();
-    return lastFilter;
+#if 0    
+return lastFilter;
+#endif
+  return NULL;
 }
 
-AVDMProcessAudioStream *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t duration)
+AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream, uint32_t starttime, uint32_t duration)
 {
-AVDMProcessAudioStream *lastFilter=NULL;
+  AUDMAudioFilter *lastFilter=NULL;
 int32_t sstart;
 
         // Do we need to go back
         sstart=(int32_t)starttime;
-
+#if 0
         if(audioShift && audioDelay)
         {
                 if(sstart>audioDelay) sstart-=audioDelay;
@@ -742,10 +749,10 @@ int32_t sstart;
                                 return lastFilter;
                 }
         }
-
-        lastFilter = new AVDMProcessAudio_Null(currentaudiostream,sstart, duration);
+#endif
+        lastFilter = new AUDMAudioFilter_Bridge(NULL,currentaudiostream,sstart);
         filtercount = 0;
-        filters[filtercount++] = lastFilter;
+        filtersFloat[filtercount++] = lastFilter;
         
         
         // Downmix for local playback ?
@@ -768,11 +775,12 @@ int32_t sstart;
                 printf("Downmixing to prologic2\n");  
                 mix=CHANNEL_DOLBY_PROLOGIC2;
             }
-            AVDMProcessAudio_Mixer *mixer;
-            mixer=new AVDMProcessAudio_Mixer( lastFilter,mix);
+            AUDMAudioFilterMixer *mixer;
+            mixer=new AUDMAudioFilterMixer( lastFilter,mix);
             lastFilter = mixer;
-            filters[filtercount++] = lastFilter;
-        }	return lastFilter;
+            filtersFloat[filtercount++] = lastFilter;
+        }	
+        return lastFilter;
 }
 void audioForceDownSample( void)
 {
@@ -825,30 +833,32 @@ AVDMProcessAudioStream *buildFakeAudioFilter(AVDMGenericAudioStream *currentaudi
 AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t duration)
 {
-AVDMProcessAudioStream *lastFilter=NULL;
+AUDMAudioFilter *lastFilter=NULL;
 
 	// if audio is set to copy, we just return the first filter
 	if(!audioProcessMode())
 	{
- 			lastFilter = new AVDMProcessAudio_Null(currentaudiostream,
-					    starttime, duration);
+#if 0          
+ 			lastFilter = new AVDMProcessAudio_Null(currentaudiostream,	   starttime, duration);
     			filtercount = 0;
     			lastFilter = lastFilter;
     			filters[filtercount++] = lastFilter;
 			return lastFilter;
+#endif  
+            return NULL;
 	}
 
-
+#if 0
 
 // else we build the full chain
 			buildInternalAudioFilter(currentaudiostream,starttime, duration);
 			lastFilter=filters[filtercount-1];
 // and add encoder...
 
-
+#endif
 //_______________________________________________________
 uint8_t init;
-
+#if 0
 		switch(activeAudioEncoder)
 		{
 		case 	AUDIOENC_NONE:
@@ -998,10 +1008,13 @@ uint8_t init;
   }
 //_______________________________________________________
 
-
+#endif
 
     currentaudiostream->beginDecompress();
+#if 0
     return lastFilter;
+#endif
+  return NULL;
 }
 
 // delete audio filters
@@ -1010,8 +1023,8 @@ void deleteAudioFilter(void)
 {
     for (uint32_t i = 0; i < filtercount; i++)
       {
-	  delete filters[i];
-	  filters[i] = NULL;
+        delete filtersFloat[i];
+        filtersFloat[i] = NULL;
       }
     filtercount = 0;
     if (currentaudiostream)
@@ -1024,6 +1037,7 @@ void deleteAudioFilter(void)
 
 AVDMGenericAudioStream *buildRawAudioFilter( uint32_t startTime, uint32_t duration, int32_t shift)
 {
+#if 0
 AVDMProcessAudioStream *firstFilter = NULL;
 AVDMProcessAudioStream *lastFilter = NULL;
  
@@ -1034,5 +1048,6 @@ AVDMProcessAudioStream *lastFilter = NULL;
 	filters[filtercount++] = lastFilter;
 	return lastFilter;
 	
-	
+#endif 
+  return NULL;
 }

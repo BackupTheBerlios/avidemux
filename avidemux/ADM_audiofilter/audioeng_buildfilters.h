@@ -14,14 +14,20 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#ifndef ADM_AUDIO_BUILDFILTER_H
+#define  ADM_AUDIO_BUILDFILTER_H
 
+#include "ADM_audiofilter/audioeng_process.h"
 #include "ADM_audiofilter/audioprocess.hxx"
+#include "ADM_audiofilter/audioeng_process.h"
+
+
 AVDMProcessAudioStream *buildFakeAudioFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t size);
 
  AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t duration);
-AVDMProcessAudioStream *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
+ AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t duration);
 
 void deleteAudioFilter(void);								
@@ -121,5 +127,5 @@ const char              *getCurrentMixerString(void);
 uint8_t                 setCurrentMixerFromString(const char *string);
 uint8_t                 audioLamePreset(const char *name);
 //
-
+#endif
 

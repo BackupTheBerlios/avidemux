@@ -19,7 +19,7 @@
 #define __Audio_ENG_Process__
 
 #define AUD_PROCESS_BUFFER_SIZE 48000*2*4 // should be enougth 4 seconds of stereo
-
+#include "ADM_audio/ADM_audiodef.h"
 typedef enum AUD_Status
 {
     AUD_OK=1,
