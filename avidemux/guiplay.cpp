@@ -100,55 +100,53 @@ void GUI_PlayAvi(void)
     // check we got everything...
     if (!avifileinfo)
 	return;
-  if((curframe+1)>=  	avifileinfo->nb_frames-1)
+  if((curframe+1)>= avifileinfo->nb_frames-1)
   {
-  	 printf("No frame left\n");
-  	 return;
+      printf("No frame left\n");
+      return;
    }
     if (avifileinfo->fps1000 == 0)
-	return;
+        return;
     if (playing)
       {
-	  stop_req = 1;
-	  return;
+        stop_req = 1;
+        return;
       }
-	uint32_t played_frame=0;
-      uint32_t remaining=avifileinfo->nb_frames-curframe;
+  uint32_t played_frame=0;
+  uint32_t remaining=avifileinfo->nb_frames-curframe;
 
 
     if(guiOutputDisplay)
     {
-			filter=getLastVideoFilter(curframe,remaining);
-			if(mode_preview)
-			{
-				editorKillPreview ();
-				//video_body->desactivateCache();
-				 UI_setPreviewToggleStatus( 0 );
-				 mode_preview=0;
-			}
-	}
-		else
-	{
-			filter=getFirstVideoFilter(curframe,remaining );
-	}
+                filter=getLastVideoFilter(curframe,remaining);
+                if(mode_preview)
+                {
+                      editorKillPreview ();
+                      UI_setPreviewToggleStatus( 0 );
+                      mode_preview=0;
+                }
+    }
+    else
+    {
+            filter=getFirstVideoFilter(curframe,remaining );
+    }
     max=filter->getInfo()->nb_frames;
 
     // compute how much a frame lasts in ms
-    one_frame = (uint32_t) floor(10000000 / filter->getInfo()->fps1000);
+    one_frame = (uint32_t) floor(1000.*1000.*10. / filter->getInfo()->fps1000);
     err = one_frame % 10;
-    one_frame /= 10;
+    one_frame /= 10; // Duration of a frame in ms, err =leftover in 1/10 ms
     buffer=new ADMImage(filter->getInfo()->width,filter->getInfo()->height);
     // go to RealTime...    
     printf(" One frame : %lu, err=%lu ms\n", one_frame, err);
     // read frame in chunk
-  //  if (!video_body->getUncompressedFrame(curframe + 1, rdr_decomp_buffer))
     if(!filter->getFrameNumberNoAlloc(1,&framelen,buffer,&flags))
-      {
-	  printf("\n cannot read frame!\n");
-	  return;
-      }
-    	curframe++;
-	played_frame++;
+    {
+        printf("\n cannot read frame!\n");
+        goto abort_play;
+    }
+      curframe++;
+      played_frame++;
     // prepare 1st frame
 
     stop_req = 0;
@@ -162,31 +160,30 @@ void GUI_PlayAvi(void)
 // reset timer reference
     resetTime();
     do
-      {
-	  	vids++;		
-	  	renderUpdateImage(buffer->data);
-     	if(mode_preview&&!guiOutputDisplay)
-     	{
-        	
-      		editorUpdatePreview(played_frame);
-      	}
-	  update_status_bar(buffer);
-	  if (time_a == 0)
-	      time_a = getTime(0);
-	  // mark !
-	  //printf("\n Rendering %lu frame\n",curframe);
-	  // read frame in chunk
-//	if (!video_body->getUncompressedFrame(curframe + 1, rdr_decomp_buffer))
-	if((played_frame)>=(max-1))
-	{
-		printf("\n End met (%lu  / %lu )\n",played_frame,max);
-		goto abort_play;
-	}
-  if(!filter->getFrameNumberNoAlloc(played_frame+1,&framelen,buffer,&flags))
     {
-		printf("\n cannot read frame!\n");
-  		goto abort_play;
-	    }
+        vids++;
+        renderUpdateImage(buffer->data);
+        if(mode_preview&&!guiOutputDisplay)
+        {	
+            editorUpdatePreview(played_frame);
+        }
+        update_status_bar(buffer);
+        if (time_a == 0)
+            time_a = getTime(0);
+        // mark !
+        //printf("\n Rendering %lu frame\n",curframe);
+        // read frame in chunk
+
+        if((played_frame)>=(max-1))
+        {
+            printf("\n End met (%lu  / %lu )\n",played_frame,max);
+            goto abort_play;
+         }
+        if(!filter->getFrameNumberNoAlloc(played_frame+1,&framelen,buffer,&flags))
+        {
+            printf("\n cannot read frame!\n");
+            goto abort_play;
+        }
 	curframe++;
 	played_frame++;
 
@@ -222,13 +219,12 @@ void GUI_PlayAvi(void)
 		    GUI_Sleep(delta - 10);
 	    }
      	//
-      		 uint16_t  p;
+            UI_purge();
             if(mode_preview)
-		      		p=3;
-       	  else
-          		p=1;
-	     	for(;p>0;p--)
-    			UI_purge();
+            {
+              UI_purge();
+              UI_purge(); 
+            }
       }
     while (!stop_req);
 
@@ -293,45 +289,44 @@ void FillAudio(void)
 
     channels= playback->getInfo()->channels;
     fq=playback->getInfo()->frequency;  
-    do
-      {
 	  double db_vid, db_clock, db_wav;
 
 	  db_vid = vids;
 	  db_vid *= 1000.;
-	  db_vid /= avifileinfo->fps1000;
+          db_vid /= avifileinfo->fps1000;  // In second
+
+          do
+          {
 
 
+          db_clock = getTime(1);
+          db_clock /= 1000;  // in seconds
 
-	  db_clock = getTime(1);
-	  db_clock /= 1000;
-
-	  db_wav = dauds;	// for ms
+          db_wav = dauds;	// for ms
           db_wav /= fq;
-	  db_wav /=channels;
 
 	  delta = (long int) floor(1000. * (db_wav - db_vid));
 #if 0
 	  printf(" v:%2.2lf   wav:%2.2lf t:%2.2lf delta : %ld  \r",
 		 db_vid, db_wav, db_clock, delta);
 #endif
-	  // if delta grows, it means we are pumping
-	  // too much audio (audio will come too early)
-	  // if delta is small, it means we are late on audio
-	  if (delta < AUDIO_PRELOAD)
-	    {
+          // if delta grows, it means we are pumping
+          // too much audio (audio will come too early)
+          // if delta is small, it means we are late on audio
+          if (delta < AUDIO_PRELOAD)
+          {
               AUD_Status status;
-		if (! (oaf = playback->fill(2*one_audio_frame,  (wavbuf + load),&status)))
-		  {
-		      printf("\n Error reading audio stream...\n");
-		      return;
-		  }
-		dauds += oaf;
-		load += oaf;
-	    }
+                 if (! (oaf = playback->fill(2*one_audio_frame,  (wavbuf + load),&status)))
+                 {
+                      printf("\n Error reading audio stream...\n");
+                      return;
+                 }
+                dauds += oaf/channels;
+                load += oaf;
+          }
       }
     while (delta < AUDIO_PRELOAD);
-    AVDM_AudioPlay(wavbuf, EVEN(load));
+    AVDM_AudioPlay(wavbuf, load);
 }
 
 
@@ -374,40 +369,39 @@ void ComputePreload(void)
     
     channels= playback->getInfo()->channels;
     one_audio_frame = (one_frame * wavinfo->frequency * channels);	// 1000 *nb audio bytes per ms
-    one_audio_frame /= 1000;
+    one_audio_frame /= 1000; // In elemtary info (float)
     printf("\n 1 audio frame = %lu bytes (1)", one_audio_frame);
     // 3 sec buffer..               
-    wavbuf =
-            (float *)
-            ADM_alloc((4 * 3 *  channels * wavinfo->frequency));
+    wavbuf =  (float *)  ADM_alloc((3 *  channels * wavinfo->frequency*wavinfo->channels));
     ADM_assert(wavbuf);
     // Call it twice to be sure it is properly setup
      latency = AVDM_AudioSetup(playback->getInfo()->frequency,  channels );
      AVDM_AudioClose();
      latency = AVDM_AudioSetup(playback->getInfo()->frequency,  channels );
 
-   	 if (!latency)
+      if (!latency)
       {
-	  GUI_Error_HIG("Trouble initializing audio device", NULL);
-	  return;
+          GUI_Error_HIG("Trouble initializing audio device", NULL);
+          return;
       }
     // compute preload                      
     //_________________
     // we preload 1/4 a second
      currentaudiostream->beginDecompress();
-    one_sec = (wavinfo->frequency *  channels  >> 2);
-    // petr
-    one_sec=EVEN(one_sec);
-    one_audio_frame=EVEN(one_audio_frame);
-    //
-    AUD_Status status;
-    if (!(small = playback->fill(one_sec*2, wavbuf,&status)))
+     one_sec = (wavinfo->frequency *  channels)  >> 2;
+    
+     AUD_Status status;
+    uint32_t fill=0;
+    while(fill<one_sec)
+    {
+      if (!(small = playback->fill(one_sec-fill, wavbuf,&status)))
       {
-	  printf("\n Preload:Error reading audio stream...");
-	  return;
+        break;
       }
-    dauds += small >> 2;
-    AVDM_AudioPlay(wavbuf, small);
+    fill+=small;
+    }
+    dauds += fill/channels;  // In sample
+    AVDM_AudioPlay(wavbuf, fill);
     audio_available = 1;
 }
 
