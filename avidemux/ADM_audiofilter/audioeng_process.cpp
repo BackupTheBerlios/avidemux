@@ -44,9 +44,10 @@ uint8_t  AUDMAudioFilter::rewind(void)
   _head=_tail=0;
   return _previous->rewind();
 }
+
 uint8_t AUDMAudioFilter::shrink(void)
 {
-  if(_tail>AUD_PROCESS_BUFFER_SIZE)
+  if(_tail>AUD_PROCESS_BUFFER_SIZE/2)
   {
     memmove(&_incomingBuffer[_head],&_incomingBuffer[_tail],sizeof(float)*(_tail-_head));
     _tail-=_head;

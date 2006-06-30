@@ -310,6 +310,7 @@ uint32_t AUDMAudioFilterMixer::fill(uint32_t max,float *output,AUD_Status *statu
     if((_tail-_head)<(AUD_PROCESS_BUFFER_SIZE>>2))
     while ((_tail < AUD_PROCESS_BUFFER_SIZE/2))
     {
+      printf("[Mixer] Filling\n");
           // don't ask too much front.
         asked = AUD_PROCESS_BUFFER_SIZE/2 - _tail;
         rd = _previous->fill(asked,&_incomingBuffer[_tail],status);

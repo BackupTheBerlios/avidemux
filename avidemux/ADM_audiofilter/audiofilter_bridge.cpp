@@ -48,32 +48,46 @@ uint8_t AUDMAudioFilter_Bridge::rewind(void)
 }
 uint32_t   AUDMAudioFilter_Bridge::fill(uint32_t max,float *output,AUD_Status *status)
 {
-  uint32_t asked,total=0;
+  uint32_t asked,asked2,total=0;
   //
+  ADM_assert(_tail>=_head);
   shrink();
+  ADM_assert(_tail>=_head);
   // Hysteresis
-  if((_tail-_head)<(AUD_PROCESS_BUFFER_SIZE>>2))
-    while ((_tail < AUD_PROCESS_BUFFER_SIZE/2))
+  if((_tail-_head)<(AUD_PROCESS_BUFFER_SIZE>>2)) // Less than 1/4 full
   {
-    // don't ask too much front.
-    asked = AUD_PROCESS_BUFFER_SIZE/2 - _tail;
-    asked = _incoming->readDecompress(asked, &(_incomingBuffer[_tail]));
-    total+=asked;
-    if (!asked )
+    printf("___\n");
+    while ((  _tail < (3*AUD_PROCESS_BUFFER_SIZE)/4)) // Fill up to 3/5--3/4
     {
-      *status=AUD_END_OF_STREAM;
-      break;
+      printf("tail :%u head %u sz %u tail-head : %u 3-4 %u\n",
+             _tail,_head,AUD_PROCESS_BUFFER_SIZE,_tail-_head,((3*AUD_PROCESS_BUFFER_SIZE)>>2));
+      // don't ask too much front.
+      asked2=asked = (3*AUD_PROCESS_BUFFER_SIZE)/4-_tail;
+      printf("Asked2:%u\n",asked2); 
+      asked = _incoming->readDecompress(asked, &(_incomingBuffer[_tail]));
+
+      total+=asked;
+      if (!asked )
+      {
+        *status=AUD_END_OF_STREAM;
+        break;
+      }
+      _tail+=asked;
     }
-    _tail+=asked;
   }
   // Now fill output
   // We could probably skip the buffering step
   // one extra memcpy gained
   uint32_t available;
+  ADM_assert(_tail>=_head);
   available=_tail-_head;
   if(available>max) available=max;
   memcpy(output,&(_incomingBuffer[_head]),available*sizeof(float));
   _head+=available;
+  if(!available)
+  {
+    printf("[bridge] No data in %u max %u\n",_tail-_head,max);
+  }
   return available;
 }
 //EOF
