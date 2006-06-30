@@ -29,8 +29,12 @@
 
 #include "audioeng_process.h"
 
-
 #include "audiofilter_bridge.h"
+
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_AUDIO_FILTER
+#include "ADM_toolkit/ADM_debug.h"
+
 
 AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGenericAudioStream *incoming, uint32_t startInMs) : AUDMAudioFilter(NULL)
 {
@@ -38,6 +42,7 @@ AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGen
   memcpy(&_wavHeader,_incoming->getInfo(),sizeof(_wavHeader));
   _startTime=startInMs;
   rewind();
+  // FIXME : Compute duration in ms
 }
 AUDMAudioFilter_Bridge::~AUDMAudioFilter_Bridge()
 {
@@ -48,33 +53,17 @@ uint8_t AUDMAudioFilter_Bridge::rewind(void)
 }
 uint32_t   AUDMAudioFilter_Bridge::fill(uint32_t max,float *output,AUD_Status *status)
 {
+#if 0
+  *status=AUD_OK;
+  return  _incoming->readDecompress(max, output);
+   
+#else
   uint32_t asked,asked2,total=0;
   //
   ADM_assert(_tail>=_head);
   shrink();
   ADM_assert(_tail>=_head);
-  // Hysteresis
-  if((_tail-_head)<(AUD_PROCESS_BUFFER_SIZE>>2)) // Less than 1/4 full
-  {
-    printf("___\n");
-    while ((  _tail < (3*AUD_PROCESS_BUFFER_SIZE)/4)) // Fill up to 3/5--3/4
-    {
-      printf("tail :%u head %u sz %u tail-head : %u 3-4 %u\n",
-             _tail,_head,AUD_PROCESS_BUFFER_SIZE,_tail-_head,((3*AUD_PROCESS_BUFFER_SIZE)>>2));
-      // don't ask too much front.
-      asked2=asked = (3*AUD_PROCESS_BUFFER_SIZE)/4-_tail;
-      printf("Asked2:%u\n",asked2); 
-      asked = _incoming->readDecompress(asked, &(_incomingBuffer[_tail]));
-
-      total+=asked;
-      if (!asked )
-      {
-        *status=AUD_END_OF_STREAM;
-        break;
-      }
-      _tail+=asked;
-    }
-  }
+  fillIncomingBuffer(status);
   // Now fill output
   // We could probably skip the buffering step
   // one extra memcpy gained
@@ -86,8 +75,37 @@ uint32_t   AUDMAudioFilter_Bridge::fill(uint32_t max,float *output,AUD_Status *s
   _head+=available;
   if(!available)
   {
-    printf("[bridge] No data in %u max %u\n",_tail-_head,max);
+    printf("[bridge] No data in %u max %u out %u\n",_tail-_head,max,available);
   }
+
   return available;
+#endif
 }
+
+uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
+{
+  uint32_t asked;
+  *status=AUD_OK;
+  // Hysteresis
+  if((_tail-_head)<(AUD_PROCESS_BUFFER_SIZE>>2)) // Less than 1/4 full
+  {
+
+    while ((  _tail < (3*AUD_PROCESS_BUFFER_SIZE)/5)) // Fill up to 3/5--3/4
+    {
+      // don't ask too much front.
+      asked = (3*AUD_PROCESS_BUFFER_SIZE)/4-_tail;
+      asked = _incoming->readDecompress(asked, &(_incomingBuffer[_tail]));
+     // asked=_previous->fill(max,&(_incomingBuffer[_tail]),status);
+
+      if (!asked )
+      {
+        *status=AUD_END_OF_STREAM;
+        break;
+      }
+      _tail+=asked;
+    }
+  }
+  return 1;
+}
+
 //EOF

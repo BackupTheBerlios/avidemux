@@ -28,6 +28,12 @@
 #include "ADM_dialog/DIA_working.h"
 #include "audioeng_process.h"
 
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_AUDIO_FILTER
+#include "ADM_toolkit/ADM_debug.h"
+
+
+
 AUDMAudioFilter::AUDMAudioFilter(AUDMAudioFilter *previous)
 {
   _previous=previous;
@@ -49,9 +55,44 @@ uint8_t AUDMAudioFilter::shrink(void)
 {
   if(_tail>AUD_PROCESS_BUFFER_SIZE/2)
   {
-    memmove(&_incomingBuffer[_head],&_incomingBuffer[_tail],sizeof(float)*(_tail-_head));
+    memmove(&_incomingBuffer[0],&_incomingBuffer[_head],sizeof(float)*(_tail-_head));
     _tail-=_head;
     _head=0;
   }
   return 1;
 }
+/*
+    If the incoming data is getting low (less than 1/4) fill it up 
+*/
+uint8_t AUDMAudioFilter::fillIncomingBuffer(AUD_Status *status)
+{
+  uint32_t asked;
+  *status=AUD_OK;
+  // Hysteresis
+  if((_tail-_head)<(AUD_PROCESS_BUFFER_SIZE>>2)) // Less than 1/4 full
+ {
+
+  while ((  _tail < (3*AUD_PROCESS_BUFFER_SIZE)/5)) // Fill up to 3/5--3/4
+  {
+      // don't ask too much front.
+    asked = (3*AUD_PROCESS_BUFFER_SIZE)/4-_tail;
+    //asked = _incoming->readDecompress(asked, &(_incomingBuffer[_tail]));
+    asked=_previous->fill(asked,&(_incomingBuffer[_tail]),status);
+
+    if (!asked )
+    {
+      *status=AUD_END_OF_STREAM;
+      break;
+    }
+    _tail+=asked;
+  }
+ }
+ return 1;
+}
+
+
+WAVHeader  *AUDMAudioFilter::getInfo(void)
+{
+  return &(_wavHeader);
+}
+//EOF

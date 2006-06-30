@@ -21,6 +21,7 @@ class AUDMAudioFilter_Bridge : public AUDMAudioFilter
   protected:
     AVDMGenericAudioStream *_incoming;
     uint32_t _startTime;
+    virtual uint8_t fillIncomingBuffer(AUD_Status *status);
   public:
     AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGenericAudioStream *incoming, uint32_t startInMs);
     virtual                ~AUDMAudioFilter_Bridge();

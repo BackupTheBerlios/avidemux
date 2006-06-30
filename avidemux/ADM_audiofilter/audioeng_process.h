@@ -43,6 +43,9 @@ class AUDMAudioFilter
     WAVHeader       _wavHeader;     // _wavHeader->byterate holds the size in # of float (NOT SAMPLE)
     
     AUDMAudioFilter *_previous;
+    
+    virtual uint8_t fillIncomingBuffer(AUD_Status *status);
+    
   public:
                                 AUDMAudioFilter(AUDMAudioFilter *previous);
          virtual                ~AUDMAudioFilter();
@@ -51,7 +54,7 @@ class AUDMAudioFilter
                                                                                            // Output MAXIMUM max float value
                                                                                            // Not sample! float!
          
-         virtual    WAVHeader  *getInfo(void) {return &_wavHeader;}
+         virtual    WAVHeader  *getInfo(void);
          virtual    uint8_t    rewind(void)  ;                                              // go back to the beginning
 };
 #endif

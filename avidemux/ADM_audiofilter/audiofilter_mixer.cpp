@@ -306,25 +306,7 @@ uint32_t AUDMAudioFilterMixer::fill(uint32_t max,float *output,AUD_Status *statu
     ADM_assert(window);
     ADM_assert((AUD_PROCESS_BUFFER_SIZE/2)>window);
     
-    // Hysteresis
-    if((_tail-_head)<(AUD_PROCESS_BUFFER_SIZE>>2))
-    while ((_tail < AUD_PROCESS_BUFFER_SIZE/2))
-    {
-      printf("[Mixer] Filling\n");
-          // don't ask too much front.
-        asked = AUD_PROCESS_BUFFER_SIZE/2 - _tail;
-        rd = _previous->fill(asked,&_incomingBuffer[_tail],status);
-        if (!rd)
-        {
-          if(*status==AUD_END_OF_STREAM)
-          {
-            break;
-          }
-          ADM_assert(0);
-        }
-        _tail+=rd;
-          
-    }
+    fillIncomingBuffer(status);
     // Block not filled ?
     if((_tail-_head)%window)
     {

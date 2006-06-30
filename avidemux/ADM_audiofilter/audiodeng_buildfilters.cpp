@@ -726,6 +726,7 @@ AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 {
   AUDMAudioFilter *lastFilter=NULL;
 int32_t sstart;
+uint32_t channels;
 
         // Do we need to go back
         sstart=(int32_t)starttime;
@@ -758,11 +759,13 @@ int32_t sstart;
         // Downmix for local playback ?
         
         uint32_t downmix;
+        
         if(prefs->get(DOWNMIXING_PROLOGIC,&downmix)!=RC_OK)
         {       
             downmix=0;
         }
-        if( downmix && lastFilter->getInfo()->channels>2)
+        channels=lastFilter->getInfo()->channels;
+        if( downmix && channels>2)
         {
             CHANNEL_CONF mix;
             if(downmix==1) 
