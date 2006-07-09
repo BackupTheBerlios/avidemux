@@ -49,16 +49,9 @@ char stringFQ[60];
 	stringMode[0]=0;
 	deletePostProc(pp);
 	aprintf("updating post proc\n");
-	if(pp->fastMode)
-	{
-		if(pp->postProcType&1) strcat(stringMode,"h1:a,");
-		if(pp->postProcType&2) strcat(stringMode,"v1:a,");		
-	}
-	else
-	{
-		if(pp->postProcType&1) strcat(stringMode,"hb:a,");
-		if(pp->postProcType&2) strcat(stringMode,"vb:a,");		
-	}
+
+	if(pp->postProcType&1) strcat(stringMode,"ha:a:128:7,");
+	if(pp->postProcType&2) strcat(stringMode,"va:a:128:7,");
 	if(pp->postProcType&4) strcat(stringMode,"dr:a,");
 	if(pp->forcedQuant)  
 		{
@@ -103,11 +96,6 @@ void initPostProc(ADM_PP *pp,uint32_t w, uint32_t h)
 	pp->w=w;
 	pp->h=h;
         pp->swapuv=0;
-#ifdef HAVE_ALTIVEC	
-	pp->fastMode=0;
-#else	
-	pp->fastMode=1;
-#endif	
 	aprintf("Initializing postproc\n");
 	
 

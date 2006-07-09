@@ -304,6 +304,24 @@ X264EncoderCQ::~X264EncoderCQ ()
 {
   stopEncoder ();
 }
+//*******************AQ*****************
+uint8_t
+  X264EncoderAQ::init (uint32_t val, uint32_t fps1000, ADM_x264Param * zparam)
+{
+  printf ("X264 AQ\n");
+  memset (&param, 0, sizeof (param));
+  x264_param_default (&param);
+  memcpy(&admParam,zparam,sizeof(admParam));
+
+//  param.rc.i_rc_buffer_size=-1;
+  param.rc.i_rf_constant = val;
+  // should be ~ the same as CQ mode (?)
+  return preamble (fps1000, &admParam);
+}
+X264EncoderAQ::~X264EncoderAQ ()
+{
+  stopEncoder ();
+}
 //*********************CBR***************
 uint8_t
   X264EncoderCBR::init (uint32_t val, uint32_t fps1000,

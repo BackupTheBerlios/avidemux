@@ -103,6 +103,17 @@ EncoderX264::configure (AVDMGenericVideoStream * instream)
 	  return 0;
 	}
       break;
+    case COMPRESS_AQ:
+      printf ("\n X264 AQ mode: %ld", _param.qz);
+      _state = enc_CQ;
+      _codec = new X264EncoderAQ (_w, _h);
+
+      if (!_codec->init (_param.qz, info->fps1000, &_codecParam))
+	{
+	  printf ("Error initi X264 AQ mode\n");
+	  return 0;
+	}
+      break;
     case COMPRESS_CBR:
       printf ("\n X264 cbr mode: %lu", _param.bitrate);
       _state = enc_CBR;

@@ -119,10 +119,12 @@ uint8_t DIA_x264(COMPRES_PARAMS *config)
               generic.avg_bitrate=b;
               break;
 
+            case COMPRESS_AQ:
             case COMPRESS_CQ:              
               SPIN_GET(Quantizer,b);
               generic.qz=b;
               break;            
+
             default:
               ADM_assert(0);
           }
@@ -145,7 +147,7 @@ void updateMode( void )
   switch (generic.mode)
   {
     case COMPRESS_CBR:
-        COMBO( 1);                  
+        COMBO(2);
       b=generic.bitrate/1000;
       ENTRY_SET(Target,b);     
       gtk_label_set_text(GTK_LABEL(WID(labelTarget)),"Target bitrate (kb/s):");
@@ -155,7 +157,7 @@ void updateMode( void )
       break;
 
     case COMPRESS_2PASS:
-        COMBO(2);                  
+        COMBO(3);
       b=generic.finalsize;
       ENTRY_SET(Target,b);     
       gtk_label_set_text(GTK_LABEL(WID(labelTarget)),"Target FinalSize (MB):");
@@ -163,7 +165,7 @@ void updateMode( void )
       ENABLE(entryTarget);
       break;
  case COMPRESS_2PASS_BITRATE:
-      COMBO(3);
+      COMBO(4);
       b=generic.avg_bitrate;
       ENTRY_SET(Target,b);     
       gtk_label_set_text(GTK_LABEL(WID(labelTarget)),"Dual pass, avg bitate (kb/s):");
@@ -172,12 +174,21 @@ void updateMode( void )
       break;
 
     case COMPRESS_CQ:
-        COMBO(0);                  
+        COMBO(1);
       b=generic.qz;
       SPIN_SET(Quantizer,b);     
       ENABLE(spinbuttonQuantizer);
       DISABLE(entryTarget);
       break;
+
+    case COMPRESS_AQ:
+        COMBO(0);
+      b=generic.qz;
+      SPIN_SET(Quantizer,b);
+      ENABLE(spinbuttonQuantizer);
+      DISABLE(entryTarget);
+      break;
+
     default:
       ADM_assert(0);
 #undef COMBO
@@ -189,10 +200,11 @@ int cb_mod(GtkObject * object, gpointer user_data)
   r=gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxMode)));
   switch(r)
   {
-    case 1: generic.mode=COMPRESS_CBR ;break;
-    case 0: generic.mode=COMPRESS_CQ ;break;
-    case 2: generic.mode=COMPRESS_2PASS ;break;
-    case 3: generic.mode=COMPRESS_2PASS_BITRATE ;break;
+    case 0: generic.mode=COMPRESS_AQ ;break;
+    case 1: generic.mode=COMPRESS_CQ ;break;
+    case 2: generic.mode=COMPRESS_CBR ;break;
+    case 3: generic.mode=COMPRESS_2PASS ;break;
+    case 4: generic.mode=COMPRESS_2PASS_BITRATE ;break;
     default: ADM_assert(0);
         
   }
@@ -509,6 +521,7 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (tableBitrate), comboboxMode, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
+  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxMode), _("Single Pass - Quality Quantizer (Average)"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxMode), _("Single Pass - Quality Quantizer (Constant)"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxMode), _("Single Pass - Bitrate (Average)"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxMode), _("Two Pass - File Size"));

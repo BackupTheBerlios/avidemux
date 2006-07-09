@@ -275,6 +275,11 @@ videoCodecConfigureAVI (char *cmdString, uint32_t optSize, uint8_t * opt)
       iparam = atoi (cs + equal + 1);
       printf ("codec conf is %s\n", cs);
       // search the codec
+      if (!strcasecmp (cs, "aq"))
+	{
+	  compmode = COMPRESS_AQ;
+	  aprintf ("aq Mode\n");
+	}
       if (!strcasecmp (cs, "cq"))
 	{
 	  compmode = COMPRESS_CQ;
@@ -528,6 +533,9 @@ videoCodecGetMode (void)
   ADM_assert (mode);
   switch (mode->mode)
     {
+    case COMPRESS_AQ:
+      sprintf (string, "AQ=%d", mode->qz);
+      break;
     case COMPRESS_CQ:
       sprintf (string, "CQ=%d", mode->qz);
       break;
@@ -639,6 +647,10 @@ setVideoEncoderSettings (COMPRESSION_MODE mode, uint32_t param,
     case COMPRESS_CBR:
       aprintf ("CBR : %lu kbps\n", param);
       zparam->bitrate = param;
+      break;
+    case COMPRESS_AQ:
+      aprintf ("AQ : %lu q\n", param);
+      zparam->qz = param;
       break;
     case COMPRESS_CQ:
       aprintf ("CQ : %lu q\n", param);

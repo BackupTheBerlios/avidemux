@@ -318,6 +318,7 @@ void setpp(void)
                 prefs->set(DEFAULT_POSTPROC_VALUE,strength);
 
         }
+	video_body->setPostProc(type, strength, uv);
 }
 /*
 void on_callback_lame(GtkButton * button, gpointer user_data)

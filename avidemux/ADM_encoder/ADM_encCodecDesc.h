@@ -608,8 +608,8 @@ COMPRES_PARAMS x264Codec = {
   "x264",
   "X264",
   "x264 h264 encoder",
-  COMPRESS_CQ,
-  4,
+  COMPRESS_AQ,
+  26,
   1500,
   700,
   1000, // AVG

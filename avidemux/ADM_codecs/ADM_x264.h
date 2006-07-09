@@ -64,6 +64,21 @@ public:X264EncoderCQ (uint32_t width, uint32_t height):X264Encoder (width,
 			ADM_x264Param * param);
 
 };
+//***************** AQ **************** 
+class X264EncoderAQ:public X264Encoder
+{
+protected:uint32_t _q;
+
+public:X264EncoderAQ (uint32_t width, uint32_t height):X264Encoder (width,
+							       height)
+  {
+
+  };
+  ~X264EncoderAQ ();
+  virtual uint8_t init (uint32_t val, uint32_t fps1000,
+			ADM_x264Param * param);
+
+};
 //***************** CBR ****************
 class X264EncoderCBR:public X264Encoder
 {
