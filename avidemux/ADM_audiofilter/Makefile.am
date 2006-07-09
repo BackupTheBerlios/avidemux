@@ -12,7 +12,7 @@ libADM_audiofilter_a_SOURCES = audiodeng_buildfilters.cpp audioeng_ffmp2.cpp \
 		audioeng_soxresample.cpp audioeng_sox.cpp ADM_libresample.cpp audioeng_libtoolame.cpp \
 		audioeng_film2pal.cpp audioeng_faac.cpp audioeng_vorbis.cpp audioeng_lpcm.cpp \
 		audioeng_mixer.cpp audiofilter_normalize.cpp audioeng_process.cpp \
-		audiofilter_mixer.cpp audiofilter_bridge.cpp
+		audiofilter_mixer.cpp audiofilter_bridge.cpp audioencoder.cpp audioencoder_faac.cpp
 
 
 
