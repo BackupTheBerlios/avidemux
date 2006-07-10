@@ -33,13 +33,15 @@
 
 //#include "ADM_gui/GUI_mp3.h"
 #include "ADM_audiofilter/audioeng_ffmp2.h"
-#include "ADM_audiofilter/audioeng_libtoolame.h"
 
 
 #include "ADM_audiofilter/audioencoder.h"
 #ifdef USE_FAAC
 #include "ADM_audiofilter/audioencoder_faac.h"
 #endif
+#include "ADM_audiofilter/audioencoder_lame_param.h"
+#include "ADM_audiofilter/audioencoder_twolame_param.h"
+#include "ADM_audiofilter/audioencoder_faac_param.h"
 #ifdef HAVE_LIBMP3LAME
 	#include "lame/lame.h"
 #endif

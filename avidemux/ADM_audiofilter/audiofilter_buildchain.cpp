@@ -25,7 +25,11 @@
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
+#include "ADM_audio/audiomode.hxx"
 #include "ADM_audiofilter/audiofilter_limiter_param.h"
+#include "ADM_audiofilter/audioencoder_lame_param.h"
+#include "ADM_audiofilter/audioencoder_twolame_param.h"
+#include "ADM_audiofilter/audioencoder_faac_param.h"
 
 #include "audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
