@@ -13,7 +13,6 @@
  ***************************************************************************/
 #include "config.h"
 #ifdef HAVE_LIBMP3LAME
-#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -83,16 +82,16 @@ uint8_t AUDMEncoder_Lame::init(ADM_audioEncoderDescriptor *config)
 	// recompute output length
 	
       
-      ret = lame_set_in_samplerate(MYFLAGS, _incoming->getInfo()->frequency);
-      ret = lame_set_num_channels(MYFLAGS, _incoming->getInfo()->channels);
+      ret = lame_set_in_samplerate(MYFLAGS, _wavheader->frequency);
+      ret = lame_set_num_channels(MYFLAGS, _wavheader->channels);
 
     
-    frequence = _instream->getInfo()->frequency;
+      frequence = _wavheader->frequency;
     printf("\n output frequency : %lu\n", frequence);
     ret = lame_set_out_samplerate(MYFLAGS, frequence);
 
     ret = lame_set_quality(MYFLAGS, 2);
-    if (_instream->getInfo()->channels == 2)
+    if (_wavheader->channels == 2)
       {
         switch (lameConf->mode)
 	    {

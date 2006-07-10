@@ -13,7 +13,6 @@
  ***************************************************************************/
 #include "config.h"
 
-#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -82,7 +81,7 @@ uint8_t AUDMEncoder_Twolame::init(ADM_audioEncoderDescriptor *config)
   if (_twolameOptions == NULL)
     return 0;
       
-  if(_incoming->getInfo()->channels>2)
+  if(_wavheader->channels>2)
   {
     printf("[TwoLame]Too many channels\n");
     return 0; 
@@ -93,8 +92,8 @@ uint8_t AUDMEncoder_Twolame::init(ADM_audioEncoderDescriptor *config)
   _chunk = 1152;
 
  
-  printf("[TwoLame]Incoming : %lu bytes, fq : %lu, channel : %lu bitrate: %lu outgoing : %lu\n",
-         _instream->getLength(),_wavheader->frequency,_wavheader->channels,config->bitrate,_length);
+  printf("[TwoLame]Incoming :fq : %lu, channel : %lu bitrate: %lu \n",
+        _wavheader->frequency,_wavheader->channels,config->bitrate);
 		
  
   twolame_set_in_samplerate(OPTIONS, _wavheader->frequency);
