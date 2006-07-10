@@ -28,7 +28,9 @@
 //
 
 #include "lame/lame.h"
+#include "ADM_audiofilter/audioencoder_lame_param.h"
 #include "ADM_audiofilter/audioencoder_lame.h"
+
 
 
 #define MYFLAGS (lame_global_flags *)lameFlags

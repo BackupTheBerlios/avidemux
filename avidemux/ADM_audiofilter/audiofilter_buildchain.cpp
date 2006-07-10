@@ -45,6 +45,7 @@
 #endif
 
 #include "ADM_audiofilter/audioencoder_twolame.h"
+#include "ADM_audiofilter/audioencoder_lavcodec.h"
 
 
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
@@ -462,7 +463,50 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
                 }
               break;
 #endif
+    case AUDIOENC_AC3:
+    case AUDIOENC_MP2:
+                    {
+                      AUDMEncoder_Lavcodec *lavcodec = NULL;
+                      uint32_t fourc;
+                      
+                      if(activeAudioEncoder==AUDIOENC_AC3) fourc=WAV_AC3;
+                      else fourc=WAV_MP2;
+                    
+                      lavcodec = new AUDMEncoder_Lavcodec(fourc,lastFilter);
+                      init = lavcodec->init(&lavcodecDescriptor);
+                      if (init)
+                      {
+                        output=lavcodec;
+                      } else
+                      {
+                        delete lavcodec;
+                        GUI_Error_HIG("Lavcodec audio initialization failed", "Not activated.");
+                      }
+                    }
+              break;
+#if 0          
+    case  AUDIOENC_AC3:
+{
+	  		AVDMProcessAudio_FFAC3 *ac3enc = NULL;
+			  // First get parameters from user
 
+			  ac3enc = new AVDMProcessAudio_FFAC3(lastFilter);
+			  printf("\n Init of FFmpeg AC3 with bitrate %d , mode %d ",
+				 audioMP3bitrate, audioMP3mode);
+			  init = ac3enc->init((uint32_t) audioMP3bitrate);
+
+			  if (init)
+{
+						lastFilter = ac3enc;
+						filters[filtercount++] = lastFilter;
+  } else
+{
+			    		delete ac3enc;
+					GUI_Error_HIG("FFmpeg AC3 initialization failed", "Not activated.");
+  }
+  }
+    	  break;
+#endif
 #if 0
 //______________________________________________________
 
@@ -503,29 +547,7 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
                           }
               }
     	  break;
-#if 0          
-    case  AUDIOENC_AC3:
-{
-	  		AVDMProcessAudio_FFAC3 *ac3enc = NULL;
-			  // First get parameters from user
 
-			  ac3enc = new AVDMProcessAudio_FFAC3(lastFilter);
-			  printf("\n Init of FFmpeg AC3 with bitrate %d , mode %d ",
-				 audioMP3bitrate, audioMP3mode);
-			  init = ac3enc->init((uint32_t) audioMP3bitrate);
-
-			  if (init)
-{
-						lastFilter = ac3enc;
-						filters[filtercount++] = lastFilter;
-  } else
-{
-			    		delete ac3enc;
-					GUI_Error_HIG("FFmpeg AC3 initialization failed", "Not activated.");
-  }
-  }
-    	  break;
-#endif
     default:
       ADM_assert(0);
   }

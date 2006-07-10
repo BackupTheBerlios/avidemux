@@ -31,8 +31,6 @@
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_audiofilter/audioeng_film2pal.h"
 
-//#include "ADM_gui/GUI_mp3.h"
-#include "ADM_audiofilter/audioeng_ffmp2.h"
 
 
 #include "ADM_audiofilter/audioencoder.h"

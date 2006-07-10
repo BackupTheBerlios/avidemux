@@ -41,6 +41,15 @@ ADM_audioEncoderDescriptor  twolameDescriptor=
   sizeof(twolameParam),
   &twolameParam
 };
+/********** Lavcodec **************/
+ADM_audioEncoderDescriptor  lavcodecDescriptor=
+{
+  "LAvcodec encoder",
+  128,
+  6,    
+  0,
+  NULL
+};
 
 
 #endif
