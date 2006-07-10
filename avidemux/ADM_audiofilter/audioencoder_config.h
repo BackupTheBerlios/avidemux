@@ -3,6 +3,7 @@
 
 #include "audioencoder_faac_param.h"
 #include "audioencoder_lame_param.h"
+#include "audioencoder_twolame_param.h"
 /**** FAAC ****/
 FAAC_encoderParam aacParam={128};
 ADM_audioEncoderDescriptor aacDescriptor=
@@ -26,6 +27,19 @@ ADM_audioEncoderDescriptor  lameDescriptor=
   2,      // Lame can only do stereo
   sizeof(lameParam),
   &lameParam
+};
+/**** TWOLAME ****/
+TWOLAME_encoderParam twolameParam=
+{
+  ADM_STEREO
+};
+ADM_audioEncoderDescriptor  twolameDescriptor=
+{
+  "TwoLame encoder",
+  128,
+  2,      // Lame can only do stereo
+  sizeof(twolameParam),
+  &twolameParam
 };
 
 

@@ -14,58 +14,52 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 #include <math.h>
 
-#include "config.h"
-#include "avifmt.h"
-#include "avifmt2.h"
-
+#include <ADM_assert.h>
+#include "ADM_library/default.h"
+#include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_audiofilter/audiofilter_limiter_param.h"
 
 #include "audioprocess.hxx"
-#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_audiofilter/audioeng_film2pal.h"
-
-#include "ADM_audiofilter/audioeng_ffmp2.h"
-#include "ADM_audiofilter/audioeng_libtoolame.h"
 
 
+/* ************* Encoder *********** */
 #include "ADM_audiofilter/audioencoder.h"
 #ifdef USE_FAAC
 #include "ADM_audiofilter/audioencoder_faac.h"
 #endif
 #ifdef HAVE_LIBMP3LAME
-#include "lame/lame.h"
-
 #include "ADM_audiofilter/audioencoder_lame.h"
 #endif
-#ifdef USE_VORBIS
-#include "audioeng_vorbis.h"
-#endif
 
-#include "gui_action.hxx"
+#include "ADM_audiofilter/audioencoder_twolame.h"
+
 
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
 #include "audioeng_lpcm.h"
-#include "audioeng_mixer.h"
-#include "prefs.h"
-#include "ADM_toolkit/ADM_debugID.h"
-#include "audioeng_process.h"
 
+#include "prefs.h"
+
+
+/* ************ Filters *********** */
 #include "audiofilter_bridge.h"
 #include "audiofilter_mixer.h"
 #include "audiofilter_normalize.h"
 #include "audiofilter_limiter.h"
 
-
+/* ************ Conf *********** */
 #include "audioencoder_config.h"
 
+
+#include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO_FILTER
 #include "ADM_toolkit/ADM_debug.h"
 
@@ -451,7 +445,7 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
               {
                 AUDMEncoder_Lame *plame = NULL;
 
-                         //FIXME!!!   plame = new AUDMEncoder_Lame(lastFilter);
+                            plame = new AUDMEncoder_Lame(lastFilter);
                             init = plame->init(&lameDescriptor);
                             if (init)
                             {
@@ -489,26 +483,23 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
   }
   }
     	  break;
+#endif    	  
     case  AUDIOENC_2LAME:
-{
-	  		AVDMProcessAudio_LibToolame *toolame_enc = NULL;
-			  toolame_enc = new AVDMProcessAudio_LibToolame(lastFilter);
-			  printf("\n Init of toolame with bitrate %d , mode %d ",
-				 audioMP3bitrate, audioMP3mode);
-			  init = toolame_enc->init((uint32_t)audioMP3mode,
-			  			(uint32_t) audioMP3bitrate);
-
-			if (init)
-{
-				lastFilter = toolame_enc;
-				filters[filtercount++] = lastFilter;
-  } else
-{
-				delete toolame_enc;
-				GUI_Error_HIG("tooLAME initialization failed", "Not activated.");
-  }
-  }
+              {
+                  AUDMEncoder_Twolame *toolame_enc = NULL;
+                          toolame_enc = new AUDMEncoder_Twolame(lastFilter);
+                          init = toolame_enc->init(&twolameDescriptor);
+                          if (init)
+                          {
+                            output=toolame_enc;
+                          } else
+                          {
+                            delete toolame_enc;
+                            GUI_Error_HIG("TWOLAME initialization failed", "Not activated.");
+                          }
+              }
     	  break;
+#if 0          
     case  AUDIOENC_AC3:
 {
 	  		AVDMProcessAudio_FFAC3 *ac3enc = NULL;

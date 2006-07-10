@@ -25,8 +25,7 @@
 
 #include <ADM_assert.h>
 
-#include "avifmt.h"
-#include "avifmt2.h"
+#include "ADM_library/default.h"
 
 #include "audioprocess.hxx"
 #include "audioeng_process.h"

@@ -20,9 +20,7 @@
 #include <math.h>
 
 #include <ADM_assert.h>
-
-#include "avifmt.h"
-#include "avifmt2.h"
+#include "ADM_library/default.h"
 
 #include "audioprocess.hxx"
 #include "audioeng_process.h"
@@ -39,6 +37,7 @@ AUDMEncoder_Lame::AUDMEncoder_Lame(AUDMAudioFilter * instream)  :AUDMEncoder    
 {
   printf("[Lame] Creating lame\n");
   lameFlags=NULL;
+  _wavheader->encoding=WAV_MP3;
 };
 
 AUDMEncoder_Lame::~AUDMEncoder_Lame()
