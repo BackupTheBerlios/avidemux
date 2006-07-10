@@ -16,7 +16,7 @@ libADM_audiofilter_a_SOURCES = audiodeng_buildfilters.cpp  \
 		audiofilter_limiter.cpp audiofilter_buildchain.cpp \
 		audioencoder_lame.cpp audioencoder_twolame.cpp \
 		audioencoder_faac.cpp audioencoder_lavcodec.cpp \
-		audioencoder_vorbis.cpp
+		audioencoder_vorbis.cpp audioencoder_pcm.cpp
 
 
 

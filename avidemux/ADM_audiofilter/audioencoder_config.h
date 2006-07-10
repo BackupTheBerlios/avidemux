@@ -66,7 +66,15 @@ ADM_audioEncoderDescriptor  vorbisDescriptor=
   sizeof(vorbisParam),
   &vorbisParam
 };
-
+/********** PCM **************/
+ADM_audioEncoderDescriptor  pcmDescriptor=
+{
+  "PCM encoder",
+  128,
+  6,    
+  0,
+  NULL
+};
 #endif
 //EOF
 

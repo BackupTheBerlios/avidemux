@@ -52,7 +52,7 @@
 
 
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
-#include "audioeng_lpcm.h"
+#include "ADM_audiofilter/audioencoder_pcm.h"
 
 #include "prefs.h"
 
@@ -393,26 +393,34 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 
   switch(activeAudioEncoder)
   {
-#if 0
-    case 	AUDIOENC_NONE:
-			// If we are dealing with big endian and using raw wav
-			// we have to swap the endianness 
-#ifdef ADM_BIG_ENDIAN						
- 				lastFilter = new AVDMProcessAudio_LEBE(lastFilter);
- 				filters[filtercount++] = lastFilter;
-#endif
-			break;
-    case AUDIOENC_LPCM:
-{
-                                AVDMProcessAudio_Lpcm *lpcm;
-                                lpcm = new AVDMProcessAudio_Lpcm(lastFilter);
-				lpcm->init();
-                                lastFilter = lpcm;
-                                filters[filtercount++] = lastFilter;
-  }
-                break;
 
-#endif	
+                  case AUDIOENC_LPCM:
+                  case AUDIOENC_NONE:
+                  {
+                    AUDMEncoder_PCM *pcm;
+                    uint32_t fourcc,revert=0;
+                    
+                    if(activeAudioEncoder==AUDIOENC_LPCM) fourcc=WAV_LPCM;
+                    else          fourcc=WAV_PCM;
+                    
+#ifdef ADM_BIG_ENDIAN                    
+                    if(fourcc==WAV_PCM)
+#else
+                    if(fourcc==WAV_LPCM)
+#endif
+                        revert=1;
+                    pcm = new AUDMEncoder_PCM(revert,fourcc,lastFilter);
+                    if(pcm->init(&pcmDescriptor))
+                    {
+                      output=pcm;
+                    }
+                    else
+                    {
+                      delete pcm;
+                      GUI_Error_HIG("(L)PCM initialization failed", "Not activated.");
+                    }
+                  }
+                  break;
 #ifdef USE_VORBIS
              case AUDIOENC_VORBIS:
                 {
@@ -487,54 +495,6 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
                       }
                     }
               break;
-#if 0          
-    case  AUDIOENC_AC3:
-{
-	  		AVDMProcessAudio_FFAC3 *ac3enc = NULL;
-			  // First get parameters from user
-
-			  ac3enc = new AVDMProcessAudio_FFAC3(lastFilter);
-			  printf("\n Init of FFmpeg AC3 with bitrate %d , mode %d ",
-				 audioMP3bitrate, audioMP3mode);
-			  init = ac3enc->init((uint32_t) audioMP3bitrate);
-
-			  if (init)
-{
-						lastFilter = ac3enc;
-						filters[filtercount++] = lastFilter;
-  } else
-{
-			    		delete ac3enc;
-					GUI_Error_HIG("FFmpeg AC3 initialization failed", "Not activated.");
-  }
-  }
-    	  break;
-#endif
-#if 0
-//______________________________________________________
-
-    case  AUDIOENC_MP2:
-{
-	  		AVDMProcessAudio_FFmp2 *mp2enc = NULL;
-			  // First get parameters from user
-
-			  mp2enc = new AVDMProcessAudio_FFmp2(lastFilter);
-			  printf("\n Init of FFmpeg with bitrate %d , mode %d ",
-				 audioMP3bitrate, audioMP3mode);
-			  init = mp2enc->init((uint32_t) audioMP3bitrate);
-
-			  if (init)
-{
-						lastFilter = mp2enc;
-						filters[filtercount++] = lastFilter;
-  } else
-{
-			    		delete mp2enc;
-					GUI_Error_HIG("FFmpeg MP2 initialization failed", "Not activated.");
-  }
-  }
-    	  break;
-#endif    	  
     case  AUDIOENC_2LAME:
               {
                   AUDMEncoder_Twolame *toolame_enc = NULL;
