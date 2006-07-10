@@ -8,9 +8,9 @@ libADM_audiofilter_a_METASOURCES = AUTO
 libADM_audiofilter_a_SOURCES = audiodeng_buildfilters.cpp  \
 		audioeng_tshift.cpp audioeng_rawshift.cpp audioeng_null.cpp  \
 		audioeng_buff.cpp  \
-		audioprocess.cpp audioeng_lebe.cpp \
+		audioprocess.cpp  \
 		audioeng_soxresample.cpp audioeng_sox.cpp ADM_libresample.cpp  \
-		audioeng_film2pal.cpp   audioeng_lpcm.cpp \
+		audioeng_film2pal.cpp    \
 		 audiofilter_normalize.cpp audioeng_process.cpp \
 		audiofilter_mixer.cpp audiofilter_bridge.cpp audioencoder.cpp \
 		audiofilter_limiter.cpp audiofilter_buildchain.cpp \

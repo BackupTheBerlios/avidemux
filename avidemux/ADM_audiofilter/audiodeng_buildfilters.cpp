@@ -50,7 +50,7 @@
 */
 #include "avi_vars.h"
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
-#include "audioeng_lpcm.h"
+
 #include "prefs.h"
 #include "ADM_toolkit/ADM_debugID.h"
 #include "audioeng_process.h"

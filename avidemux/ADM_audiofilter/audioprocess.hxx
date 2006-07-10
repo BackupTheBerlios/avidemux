@@ -79,26 +79,6 @@ class AVDMBufferedAudioStream : public  AVDMProcessAudioStream
 };
 
 //_____________________________________________
-class AVDMProcessAudio_Normalize : public AVDMProcessAudioStream
-{
-protected:
-#define MAX_AUDIO_CH 2
-				 uint32_t								_scanned;
-				 float								_dither_prior[MAX_AUDIO_CH];
-				 float								_ratio;
-public:
-
-        AVDMProcessAudio_Normalize(AVDMGenericAudioStream *instream);
-        ~AVDMProcessAudio_Normalize();
-				virtual uint8_t  preprocess( void ) ;
-
-        virtual uint32_t read(uint32_t len,uint8_t *buffer);
-			  virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer);
-        virtual uint8_t  goToTime(uint32_t newoffset);
-
-};
-
-
 
 //_____________________________________________
 class AVDMProcessAudio_Null : public AVDMBufferedAudioStream
@@ -213,22 +193,6 @@ public:
         virtual uint32_t read(uint32_t len,uint8_t *buffer);
 				virtual uint8_t  goToTime(uint32_t newoffset);
 			  virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer);
-     		
-};
-//_____________________________________________
-class AVDMProcessAudio_LEBE : public AVDMProcessAudioStream
-{
-protected:
-		
-public:
-						
-				~AVDMProcessAudio_LEBE();
-
-        		AVDMProcessAudio_LEBE(AVDMGenericAudioStream *instream 	);		 
-        virtual uint32_t read(uint32_t len,uint8_t *buffer);
-	virtual uint8_t  goTo(uint32_t newoffset);
-    	virtual uint8_t  goToTime(uint32_t newoffset);
-  	virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer);
      		
 };
 #endif
