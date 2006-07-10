@@ -175,14 +175,13 @@ uint8_t	AUDMEncoder_Lame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samp
         if (_wavheader->channels == 1)
         {
           nbout = lame_encode_buffer(MYFLAGS, (int16_t *)&(tmpbuffer[tmphead]),(int16_t *)&(tmpbuffer[tmphead]), _chunk, dest, 16 * 1024);
-          tmphead+=_chunk;
+          
         }
         else
         {
           nbout = lame_encode_buffer_interleaved(MYFLAGS, (int16_t *)&(tmpbuffer[tmphead]), _chunk/2, dest, 16 * 1024);
-          tmphead+=_chunk>>1;
         }
-
+        tmphead+=_chunk;
         if (nbout < 0) {
           printf("\n Error !!! : %ld\n", nbout);
           return MINUS_ONE;

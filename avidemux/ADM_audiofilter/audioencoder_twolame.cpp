@@ -89,7 +89,7 @@ uint8_t AUDMEncoder_Twolame::init(ADM_audioEncoderDescriptor *config)
   _wavheader->byterate=(config->bitrate*1000)>>3;         
       
  
-  _chunk = 1152;
+  _chunk = 1152*_wavheader->channels;
 
  
   printf("[TwoLame]Incoming :fq : %lu, channel : %lu bitrate: %lu \n",
@@ -159,14 +159,12 @@ uint8_t	AUDMEncoder_Twolame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *s
   if (_wavheader->channels == 1)
   {
     nbout =twolame_encode_buffer(OPTIONS, (int16_t *)&(tmpbuffer[tmphead]),(int16_t *)&(tmpbuffer[tmphead]), _chunk, dest, 16 * 1024);
-    tmphead+=_chunk;
   }
   else
   {
     nbout = twolame_encode_buffer_interleaved(OPTIONS, (int16_t *)&(tmpbuffer[tmphead]), _chunk/2, dest, 16 * 1024);
-    tmphead+=_chunk>>1;
   }
-
+  tmphead+=_chunk;
   if (nbout < 0) {
     printf("\n Error !!! : %ld\n", nbout);
     return MINUS_ONE;
