@@ -20,12 +20,16 @@
 
 #define AUD_PROCESS_BUFFER_SIZE 48000*2*4 // should be enougth 4 seconds of stereo
 #include "ADM_audio/ADM_audiodef.h"
+/**
+  This enumerate is used to give a more accurate error when no audio is output from
+  an audio filter.
+*/
 typedef enum AUD_Status
 {
-    AUD_OK=1,
-    AUD_ERROR,
-    AUD_NEED_DATA,  // Useless?
-    AUD_END_OF_STREAM
+  AUD_OK=1,           ///< No error
+  AUD_ERROR,          ///< No data was caused by an error
+  AUD_NEED_DATA,      ///< Filter was stalled, should not happend
+  AUD_END_OF_STREAM   ///< End of incoming stream, this is the nominal error case
 };
 /*
     incoming --> incomingBuffer  || Processing  --> fill (into next in chain buffer)
@@ -34,27 +38,52 @@ typedef enum AUD_Status
 */
 
 
-
+/**
+  This class is the base class for all audio filter.
+  Note that all datas are handled as float!
+*/
 class AUDMAudioFilter
 {
   protected:
-    float           _incomingBuffer[AUD_PROCESS_BUFFER_SIZE];
+    //! This will be used to store data coming from the previous filter
+    float           _incomingBuffer[AUD_PROCESS_BUFFER_SIZE]; 
+    
+    
+    //! Pointer to read/write indeces in the _incomingBuffer
     uint32_t        _head,_tail;    
-    WAVHeader       _wavHeader;     // _wavHeader->byterate holds the size in # of float (NOT SAMPLE)
-    
+
+    //! Describe the output wav format, _wavHeader->byterate holds the size in # of float (NOT SAMPLE)
+    WAVHeader       _wavHeader;
+
+    //! Pointer to the previous filter in the chain
     AUDMAudioFilter *_previous;
-    
+
+    //! Fill up the incoming buffer, it is called to pull data from the previous filter
+    //! \param status Status of the fill operation
     virtual uint8_t fillIncomingBuffer(AUD_Status *status);
-    
+
   public:
-                                AUDMAudioFilter(AUDMAudioFilter *previous);
-         virtual                ~AUDMAudioFilter();
-                    uint8_t    shrink( void);
-         virtual    uint32_t   fill(uint32_t max,float *output,AUD_Status *status)=0;      // Fill buffer: incoming -> us
-                                                                                           // Output MAXIMUM max float value
-                                                                                           // Not sample! float!
-         
-         virtual    WAVHeader  *getInfo(void);
-         virtual    uint8_t    rewind(void)  ;                                              // go back to the beginning
+/** Constructor
+    \param previous : Pointer to previous in chain filter 
+*/
+    AUDMAudioFilter(AUDMAudioFilter *previous);
+    
+//! Destructor                                
+    virtual                ~AUDMAudioFilter();
+                                
+//! Compact the _incomingBuffer to avoid overflow
+    uint8_t    shrink( void); 
+
+//! To be called by the next in chain filter. Fills output with processed datas up to max float
+//! \param max : Max number of float to put
+//! \param output : Where to store output float
+//! \param status : Status of the fill operation
+    virtual    uint32_t   fill(uint32_t max,float *output,AUD_Status *status)=0;
+                                                                                     
+//! Returns the output wavheader infos field
+        virtual    WAVHeader  *getInfo(void);
+        
+//! Rewind the stream to the beginning. Used mainly by the normalize filter 
+        virtual    uint8_t    rewind(void)  ;                                      
 };
 #endif

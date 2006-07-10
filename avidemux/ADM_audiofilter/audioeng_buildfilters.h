@@ -22,8 +22,6 @@
 #include "ADM_audiofilter/audioeng_process.h"
 
 
-AVDMProcessAudioStream *buildFakeAudioFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t size);
 
  AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t duration);

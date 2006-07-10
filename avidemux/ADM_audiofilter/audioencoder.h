@@ -11,14 +11,25 @@
 class AUDMEncoder : public AVDMBufferedAudioStream
 {
   protected:
-    uint32_t        grab(uint8_t *obuffer);
+    //
+    uint32_t grab(uint8_t *outbuffer);
+    uint32_t grab(float *outbuffer);
+
+    //
     void            *_handle;
     uint8_t         *_extraData;
     uint32_t        _extraSize;
     AUDMAudioFilter *_incoming;
     uint8_t         cleanup(void);
-  public:
     
+    float          *tmpbuffer;
+    uint8_t        refillBuffer(int minimum); // Mininum is in float
+    uint32_t       tmphead,tmptail;
+  public:
+    //
+    uint32_t read(uint32_t len,uint8_t *buffer);
+    uint32_t read(uint32_t len,float *buffer);
+    //
     virtual ~AUDMEncoder();
     AUDMEncoder(AUDMAudioFilter *in);	
     virtual uint8_t getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)=0;

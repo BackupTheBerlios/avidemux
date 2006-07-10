@@ -25,6 +25,7 @@
 #include "avifmt2.h"
 #include "avio.hxx"
 #include "fourcc.h"
+#include "ADM_audiofilter/audiofilter_limiter_param.h"
 #include "audioprocess.hxx"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
@@ -33,8 +34,11 @@
 //#include "ADM_gui/GUI_mp3.h"
 #include "ADM_audiofilter/audioeng_ffmp2.h"
 #include "ADM_audiofilter/audioeng_libtoolame.h"
+
+
+#include "ADM_audiofilter/audioencoder.h"
 #ifdef USE_FAAC
-	#include "ADM_audiofilter/audioeng_faac.h"
+#include "ADM_audiofilter/audioencoder_faac.h"
 #endif
 #ifdef HAVE_LIBMP3LAME
 	#include "lame/lame.h"
@@ -58,6 +62,7 @@
 #include "audiofilter_bridge.h"
 #include "audiofilter_mixer.h"
 #include "audiofilter_normalize.h"
+#include "audiofilter_limiter.h"
 
 
 #define MODULE_NAME MODULE_AUDIO_FILTER
@@ -640,18 +645,17 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
           lastFilter = mixer;
           filtersFloat[filtercount++] = lastFilter;
       }
-#if 0
+
     if (audioDRC)
       {
-	  AVDMProcessAudio_Compress *pdrc = NULL;
-	  printf("\n  DRC activated...\n");
-	  pdrc = new AVDMProcessAudio_Compress(lastFilter,&drcSetup);
-	  drc = (AVDMProcessAudioStream *) pdrc;
-	  lastFilter = drc;
-	  filters[filtercount++] = lastFilter;
+          AUDMAudioFilterLimiter *pdrc = NULL;
+          printf("\n  DRC activated...\n");
+          pdrc = new AUDMAudioFilterLimiter(lastFilter,&drcSetup);
+          lastFilter = (AUDMAudioFilter *)pdrc;
+          filtersFloat[filtercount++] = lastFilter;
 
       }
-
+#if 0
       switch(audioResampleMode)
       {
       	
@@ -812,23 +816,7 @@ int nb=sizeof(presetDefinition)/sizeof(ADM_PRESET_DEFINITION);
 #endif
         return 0;
 }
-/*
-	Build a fake filter chain without normalizer
-		to avoid to have to scan the file to get the max amplitude value
 
-*/
-AVDMProcessAudioStream *buildFakeAudioFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t duration)
-{
-	uint8_t stored_norm;
-	AVDMProcessAudioStream *out;
-		stored_norm=audioNormalizeMode;	// Temporarily disable normalizing
-		
-		audioNormalizeMode=0;
-		out=buildAudioFilter(currentaudiostream,starttime,duration);
-		audioNormalizeMode=stored_norm;
-		return out;
-}
 /**
 		Build filter to save
 */
@@ -837,6 +825,7 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 				uint32_t starttime, uint32_t duration)
 {
 AUDMAudioFilter *lastFilter=NULL;
+AVDMProcessAudioStream *output=NULL;
 
 	// if audio is set to copy, we just return the first filter
 	if(!audioProcessMode())
@@ -851,19 +840,20 @@ AUDMAudioFilter *lastFilter=NULL;
             return NULL;
 	}
 
-#if 0
+
 
 // else we build the full chain
 			buildInternalAudioFilter(currentaudiostream,starttime, duration);
-			lastFilter=filters[filtercount-1];
+                        lastFilter=filtersFloat[filtercount-1];
 // and add encoder...
 
-#endif
+
 //_______________________________________________________
 uint8_t init;
-#if 0
+
 		switch(activeAudioEncoder)
 		{
+#if 0
 		case 	AUDIOENC_NONE:
 			// If we are dealing with big endian and using raw wav
 			// we have to swap the endianness 
@@ -898,16 +888,17 @@ uint8_t init;
 				}
 		}
 		break;
-#endif			
+#endif		
+#endif	
 #ifdef USE_FAAC
 		case AUDIOENC_FAAC:
 		{
-				AVDMProcessAudio_Faac *faac;
-				faac = new AVDMProcessAudio_Faac(lastFilter);
+                                AUDMEncoder_Faac *faac;
+                                faac = new AUDMEncoder_Faac(lastFilter);
 				if(faac->init(audioMP3bitrate))
 				{
-					lastFilter = faac;
-					filters[filtercount++] = lastFilter;
+                                        output=faac;
+                                        
 				}
  				else
 				{
@@ -917,6 +908,7 @@ uint8_t init;
 		}
 		break;
 #endif		
+#if 0
 #ifdef HAVE_LIBMP3LAME
 		case AUDIOENC_MP3:
         		{
@@ -1005,19 +997,17 @@ uint8_t init;
 			    }
 		  }
     	  break;
-
+#endif
       default:
       ADM_assert(0);
   }
 //_______________________________________________________
 
-#endif
+
 
     currentaudiostream->beginDecompress();
-#if 0
-    return lastFilter;
-#endif
-  return NULL;
+
+    return output;
 }
 
 // delete audio filters

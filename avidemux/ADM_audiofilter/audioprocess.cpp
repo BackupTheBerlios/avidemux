@@ -9,7 +9,7 @@
 
 AVDMProcessAudioStream::AVDMProcessAudioStream(AVDMGenericAudioStream *instream){
 	// we need a input stream !
-	ADM_assert(instream);
+	//ADM_assert(instream);
 	// store init parameters
 	_instream = instream;
 }

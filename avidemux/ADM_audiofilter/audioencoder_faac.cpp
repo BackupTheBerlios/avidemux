@@ -47,7 +47,7 @@ AUDMEncoder_Faac::~AUDMEncoder_Faac()
         faacEncClose(_handle);
     _handle=NULL;
 
-    printf("Deleting faac\n");
+    printf("[FAAC] Deleting faac\n");
     cleanup();
 };
 
@@ -140,7 +140,6 @@ uint8_t         AUDMEncoder_Faac::extraData(uint32_t *l,uint8_t **d)
 uint32_t AUDMEncoder_Faac::grab(uint8_t * obuffer)
 {
     uint32_t len,sam;
-    printf("Faac: Read\n");
     if(getPacket(obuffer,&len,&sam))
         return len;
     return MINUS_ONE;
@@ -150,13 +149,25 @@ uint32_t AUDMEncoder_Faac::grab(uint8_t * obuffer)
 //______________________________________________
 uint8_t	AUDMEncoder_Faac::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
-        *samples = _chunk / _wavheader->channels;
+  uint32_t count=0;
+_again:
+        *samples = _chunk/_wavheader->channels;
         *len = 0;
 
-        if (readChunk() == 0)
-              return 1;	// End of stream
-
-        *len = faacEncEncode(_handle, (int32_t *)_in, _chunk, dest, FA_BUFFER_SIZE);
+        if(!refillBuffer(_chunk ))
+        {
+          return 0; 
+        }
+        ADM_assert(tmptail>=tmphead);
+        *len = faacEncEncode(_handle, (int32_t *)&(tmpbuffer[tmphead]), _chunk, dest, FA_BUFFER_SIZE);
+        if(!*len) 
+        {
+          count++;
+          if(count<20)
+            goto _again;
+          *samples=0;
+        }
+        tmphead+=_chunk;
         return 1;
 }
 

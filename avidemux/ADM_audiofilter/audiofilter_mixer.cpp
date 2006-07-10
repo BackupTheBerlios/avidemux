@@ -31,7 +31,7 @@
 
 typedef int *DOWMIXER_f(float *in,float *out,uint32_t nbSample,uint32_t chan);
 
-static float CLIP(float in)
+static inline float CLIP(float in)
 {
   if(in>1.0) in=1.0;
   if(in<-1.0) in=-1.0;
