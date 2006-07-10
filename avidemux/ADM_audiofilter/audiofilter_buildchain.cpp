@@ -30,6 +30,7 @@
 #include "ADM_audiofilter/audioencoder_lame_param.h"
 #include "ADM_audiofilter/audioencoder_twolame_param.h"
 #include "ADM_audiofilter/audioencoder_faac_param.h"
+#include "ADM_audiofilter/audioencoder_vorbis_param.h"
 
 #include "audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
@@ -43,7 +44,9 @@
 #ifdef HAVE_LIBMP3LAME
 #include "ADM_audiofilter/audioencoder_lame.h"
 #endif
-
+#ifdef USE_VORBIS
+#include "ADM_audiofilter/audioencoder_vorbis.h"
+#endif
 #include "ADM_audiofilter/audioencoder_twolame.h"
 #include "ADM_audiofilter/audioencoder_lavcodec.h"
 
@@ -408,25 +411,25 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
                                 filters[filtercount++] = lastFilter;
   }
                 break;
-#ifdef USE_VORBIS
-    case AUDIOENC_VORBIS:
-{
-				AVDMProcessAudio_Vorbis *vorbis;
-				vorbis = new AVDMProcessAudio_Vorbis(lastFilter);
-				if(vorbis->init(audioMP3bitrate, audioMP3mode))
-{
-					lastFilter = vorbis;
-					filters[filtercount++] = lastFilter;
-  }
- 				else
-{
-					delete vorbis;
-					GUI_Error_HIG("Vorbis initialization failed", "Not activated.");
-  }
-  }
-		break;
-#endif		
+
 #endif	
+#ifdef USE_VORBIS
+             case AUDIOENC_VORBIS:
+                {
+                  AUDMEncoder_Vorbis *vorbis;
+                  vorbis = new AUDMEncoder_Vorbis(lastFilter);
+                  if(vorbis->init(&vorbisDescriptor))
+                  {
+                    output=vorbis;
+                  }
+                  else
+                  {
+                    delete vorbis;
+                    GUI_Error_HIG("Vorbis initialization failed", "Not activated.");
+                  }
+                }
+                  break;
+#endif		
 #ifdef USE_FAAC
     case AUDIOENC_FAAC:
                   {

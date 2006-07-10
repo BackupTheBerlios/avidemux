@@ -43,9 +43,6 @@
 #ifdef HAVE_LIBMP3LAME
 	#include "lame/lame.h"
 #endif
-#ifdef USE_VORBIS
-	#include "audioeng_vorbis.h"
-#endif
 
 #include "gui_action.hxx"
 /*

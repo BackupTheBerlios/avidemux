@@ -4,6 +4,7 @@
 #include "audioencoder_faac_param.h"
 #include "audioencoder_lame_param.h"
 #include "audioencoder_twolame_param.h"
+#include "audioencoder_vorbis_param.h"
 /**** FAAC ****/
 FAAC_encoderParam aacParam={128};
 ADM_audioEncoderDescriptor aacDescriptor=
@@ -50,7 +51,21 @@ ADM_audioEncoderDescriptor  lavcodecDescriptor=
   0,
   NULL
 };
-
+/************** Vorbis **************/
+VORBIS_encoderParam vorbisParam=
+{
+  ADM_VORBIS_CBR,
+  0
+  
+};
+ADM_audioEncoderDescriptor  vorbisDescriptor=
+{
+  "Vorbis encoder",
+  128,
+  6,      // Lame can only do stereo
+  sizeof(vorbisParam),
+  &vorbisParam
+};
 
 #endif
 //EOF
