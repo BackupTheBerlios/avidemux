@@ -34,7 +34,6 @@ AUDMEncoder::AUDMEncoder(AUDMAudioFilter *in)  :AVDMBufferedAudioStream  (NULL)
   memcpy(_wavheader, _incoming->getInfo(), sizeof(WAVHeader));
   _wavheader->encoding=WAV_AAC;
   _incoming->rewind();	// rewind
-  _handle=NULL;
   _extraData=NULL;
   _extraSize=0;
   tmpbuffer=new float[_wavheader->frequency*_wavheader->channels];
@@ -108,17 +107,7 @@ uint32_t AUDMEncoder::read(uint32_t len,uint8_t *buffer)
   ADM_assert(0);
   return 0; 
 }
-uint32_t AUDMEncoder::read(uint32_t len,float *buffer)
-{
-  ADM_assert(0);
-  return 0; 
-}
-uint32_t AUDMEncoder::grab(float *outbuffer)
-{
-  ADM_assert(0);
-  return 0; 
 
-}
 uint32_t AUDMEncoder::grab(uint8_t * obuffer)
 {
   uint32_t len,sam;

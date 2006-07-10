@@ -129,12 +129,7 @@ int ret=0;
     
     return 1;
 }
-uint8_t         AUDMEncoder_Faac::extraData(uint32_t *l,uint8_t **d)
-{
-                        *l=_extraSize;
-                        *d=_extraData;
-                return 1;
-}
+
 //_____________________________________________
 
 
