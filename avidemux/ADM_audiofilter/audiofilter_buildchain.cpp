@@ -42,6 +42,8 @@
 #endif
 #ifdef HAVE_LIBMP3LAME
 #include "lame/lame.h"
+
+#include "ADM_audiofilter/audioencoder_lame.h"
 #endif
 #ifdef USE_VORBIS
 #include "audioeng_vorbis.h"
@@ -428,47 +430,42 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 #endif	
 #ifdef USE_FAAC
     case AUDIOENC_FAAC:
-{
-  AUDMEncoder_Faac *faac;
-  faac = new AUDMEncoder_Faac(lastFilter);
-  if(faac->init(&aacDescriptor))
-  {
-    output=faac;
-                                        
-  }
-  else
-  {
-    delete faac;
-    GUI_Error_HIG("FAAC initialization failed", "Not activated.");
-  }
-}
-		break;
+                  {
+                      AUDMEncoder_Faac *faac;
+                          faac = new AUDMEncoder_Faac(lastFilter);
+                          if(faac->init(&aacDescriptor))
+                          {
+                              output=faac;
+                          }
+                            else
+                          {
+                              delete faac;
+                              GUI_Error_HIG("FAAC initialization failed", "Not activated.");
+                          }
+                  }
+                  break;
 #endif		
-#if 0
+
 #ifdef HAVE_LIBMP3LAME
     case AUDIOENC_MP3:
-{
-	  		AVDMProcessAudio_Lame *plame = NULL;
+              {
+                AUDMEncoder_Lame *plame = NULL;
 
-		  		plame = new AVDMProcessAudio_Lame(lastFilter);
-				printf("\n Init of lame with bitrate %d , mode %d ",
-							 audioMP3bitrate, audioMP3mode);
-			  	init = plame->initLame(0, 	(uint32_t) audioMP3mode,
-			      					(uint32_t) audioMP3bitrate,
-								audioMP3preset);
-
-			  	if (init)
-{
-						lastFilter = plame;
-						filters[filtercount++] = lastFilter;
-  } else
-{
-						delete plame;
-						GUI_Error_HIG("LAME initialization failed", "Not activated.");
-  }
-  }
-		    break;
+                         //FIXME!!!   plame = new AUDMEncoder_Lame(lastFilter);
+                            init = plame->init(&lameDescriptor);
+                            if (init)
+                            {
+                                  output=plame;
+                            } else
+                            {
+                                  delete plame;
+                                  GUI_Error_HIG("LAME initialization failed", "Not activated.");
+                            }
+                }
+              break;
 #endif
+
+#if 0
 //______________________________________________________
 
     case  AUDIOENC_MP2:

@@ -86,7 +86,23 @@ uint8_t AUDMEncoder::refillBuffer(int minimum)
       tmptail+=nb;
   }
 }
+// FIXME , incomplete dithering
+#warning FIXME, incorrect dithering
+uint8_t       AUDMEncoder::dither16(float *start, uint32_t nb)
+{
+    float dp;
+    int16_t *data_int = (int16_t *)start;
+    float *data = start;
+    uint16_t len = nb;
 
+    for (int i = 0; i < len; i++)
+    {
+      *data_int = (int16_t)(*data * 32765 );
+      data++;
+      data_int++;
+      }
+      return 1;
+}
 uint32_t AUDMEncoder::read(uint32_t len,uint8_t *buffer)
 {
   ADM_assert(0);
@@ -97,17 +113,18 @@ uint32_t AUDMEncoder::read(uint32_t len,float *buffer)
   ADM_assert(0);
   return 0; 
 }
-uint32_t AUDMEncoder::grab(uint8_t *outbuffer)
-{
-  ADM_assert(0);
-  return 0; 
-  
-}
 uint32_t AUDMEncoder::grab(float *outbuffer)
 {
   ADM_assert(0);
   return 0; 
 
+}
+uint32_t AUDMEncoder::grab(uint8_t * obuffer)
+{
+  uint32_t len,sam;
+  if(getPacket(obuffer,&len,&sam))
+    return len;
+  return MINUS_ONE;
 }
 
 //EOF

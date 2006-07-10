@@ -19,7 +19,6 @@
 class AUDMEncoder_Faac : public AUDMEncoder
 {
 protected:
-         uint32_t 	grab(uint8_t *obuffer);
          void           *_handle;
          
 public:

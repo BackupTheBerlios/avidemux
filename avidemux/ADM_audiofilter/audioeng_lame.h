@@ -2,28 +2,12 @@
 #ifndef __ADM_LAME_H
 #define __ADM_LAME_H
 
-typedef enum ADM_LAME_PRESET
-{
-	ADM_LAME_PRESET_CBR,
-	ADM_LAME_PRESET_ABR,
-	ADM_LAME_PRESET_EXTREME
-};
 
-typedef struct ADM_PRESET_DEFINITION
-{
-	ADM_LAME_PRESET preset;
-	const char	*name;
-}ADM_PRESET_DEFINITION;
-static const ADM_PRESET_DEFINITION      presetDefinition[]=
-{
-        {ADM_LAME_PRESET_CBR,"CBR"},
-        {ADM_LAME_PRESET_ABR,"ABR"},
-        {ADM_LAME_PRESET_EXTREME,"Extreme"}
-};    
 
 
 #ifdef HAVE_LIBMP3LAME
 #ifndef LAME_NO_DECLARE
+#include "ADM_audiofilter/audioencoder_lame_param.h"
 //_____________________________________________
 class AVDMProcessAudio_Lame : public AVDMBufferedAudioStream
 {

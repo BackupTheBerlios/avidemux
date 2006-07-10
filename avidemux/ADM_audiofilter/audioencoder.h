@@ -11,6 +11,7 @@ typedef struct ADM_audioEncoderDescriptor
 {
   const     char *name;
   uint32_t  bitrate;
+  uint32_t  maxChannels;
   uint32_t  paramSize;
   void     *param;
 };
@@ -32,6 +33,7 @@ class AUDMEncoder : public AVDMBufferedAudioStream
     
     float          *tmpbuffer;
     uint8_t        refillBuffer(int minimum); // Mininum is in float
+    uint8_t        dither16(float *start, uint32_t nb); //
     uint32_t       tmphead,tmptail;
   public:
     //

@@ -137,13 +137,6 @@ uint8_t         AUDMEncoder_Faac::extraData(uint32_t *l,uint8_t **d)
 }
 //_____________________________________________
 
-uint32_t AUDMEncoder_Faac::grab(uint8_t * obuffer)
-{
-    uint32_t len,sam;
-    if(getPacket(obuffer,&len,&sam))
-        return len;
-    return MINUS_ONE;
-}
 
 #define FA_BUFFER_SIZE (SIZE_INTERNAL/4)
 //______________________________________________
