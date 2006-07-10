@@ -24,7 +24,7 @@
 
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_audiofilter/audioeng_lame.h"
+#include "ADM_audiofilter/audioencoder_lame_param.h"
 
 
 #define NB_BITRATE 11
