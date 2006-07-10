@@ -62,9 +62,10 @@
 #include "audiofilter_limiter.h"
 
 
+#include "audioencoder_config.h"
+
 #define MODULE_NAME MODULE_AUDIO_FILTER
 #include "ADM_toolkit/ADM_debug.h"
-
 
 #define MAX_AUDIO_FILTER 10
 
@@ -430,7 +431,7 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 {
   AUDMEncoder_Faac *faac;
   faac = new AUDMEncoder_Faac(lastFilter);
-  if(faac->init(audioMP3bitrate))
+  if(faac->init(&aacDescriptor))
   {
     output=faac;
                                         

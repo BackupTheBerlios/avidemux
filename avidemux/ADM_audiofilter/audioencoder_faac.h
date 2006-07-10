@@ -23,7 +23,7 @@ protected:
          void           *_handle;
          
 public:
-                uint8_t	init( uint32_t bitrate);
+                        uint8_t init(ADM_audioEncoderDescriptor *config);
                 virtual ~AUDMEncoder_Faac();
                         AUDMEncoder_Faac(AUDMAudioFilter *instream);	
                 virtual uint8_t	getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);

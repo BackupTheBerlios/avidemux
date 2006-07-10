@@ -60,7 +60,7 @@ AUDMEncoder_Faac::~AUDMEncoder_Faac()
 // return 0 : init failed
 //                              1 : init succeeded
 //_______________________________________________
-uint8_t AUDMEncoder_Faac::init( uint32_t bitrate)
+uint8_t AUDMEncoder_Faac::init(ADM_audioEncoderDescriptor *config)
 {
 unsigned long int samples_input, max_bytes_output;
 faacEncConfigurationPtr cfg;
@@ -73,7 +73,7 @@ int ret=0;
     if(!_handle)
     {
           printf("Cannot open faac with fq=%lu chan=%lu br=%lu\n",
-          _wavheader->frequency,_wavheader->channels,bitrate);
+          _wavheader->frequency,_wavheader->channels,config->bitrate);
           return 0;
     }
     printf(" [FAAC] : Sample input:%d, max byte output%d \n",samples_input,max_bytes_output);
@@ -84,14 +84,14 @@ int ret=0;
     cfg->mpegVersion = MPEG4;
     cfg->useTns = 0;
     cfg->allowMidside = 1;
-    cfg->bitRate = (bitrate*1000)/_wavheader->channels; // It is per channel
+    cfg->bitRate = (config->bitrate*1000)/_wavheader->channels; // It is per channel
     cfg->outputFormat = 0; // 0 Raw 1 ADTS
     cfg->inputFormat = FAAC_INPUT_FLOAT;
     cfg->useLfe=0;	
     if (!(ret=faacEncSetConfiguration(_handle, cfg))) 
     {
         printf("[FAAC] Cannot set conf for faac with fq=%lu chan=%lu br=%lu (err:%d)\n",
-				_wavheader->frequency,_wavheader->channels,bitrate,ret);
+				_wavheader->frequency,_wavheader->channels,config->bitrate,ret);
 	return 0;
     }
      unsigned char *data=NULL;
@@ -106,7 +106,7 @@ int ret=0;
      memcpy(_extraData,data,size);
 
     // update
-    _wavheader->byterate=(bitrate*1000)/8;
+     _wavheader->byterate=(config->bitrate*1000)/8;
 //    _wavheader->dwScale=1024;
 //    _wavheader->dwSampleSize=0;
     _wavheader->blockalign=4096;

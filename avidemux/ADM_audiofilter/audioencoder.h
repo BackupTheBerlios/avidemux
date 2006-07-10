@@ -7,6 +7,14 @@
 #ifndef AUDIO_ENCODER_H
 #define AUDIO_ENCODER_H
 
+typedef struct ADM_audioEncoderDescriptor
+{
+  const     char *name;
+  uint32_t  bitrate;
+  uint32_t  paramSize;
+  void     *param;
+};
+
  //_____________________________________________
 class AUDMEncoder : public AVDMBufferedAudioStream
 {
@@ -32,6 +40,7 @@ class AUDMEncoder : public AVDMBufferedAudioStream
     //
     virtual ~AUDMEncoder();
     AUDMEncoder(AUDMAudioFilter *in);	
+    virtual uint8_t init(ADM_audioEncoderDescriptor *config)=0;
     virtual uint8_t getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)=0;
     virtual uint8_t packetPerFrame( void) {return 1;}
     virtual uint8_t extraData(uint32_t *l,uint8_t **d) {*l=0;*d=NULL;return 1;}
