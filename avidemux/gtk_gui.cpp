@@ -1851,7 +1851,7 @@ A_saveAudioDecodedTest (char *name)
   fclose (out);
   ADM_dealloc (outbuffer);
   delete work;
-  deleteAudioFilter ();
+  deleteAudioFilter (saveFilter);
   currentaudiostream->endDecompress ();
   printf ("AudioSave: actually written %u\n", written);
   printf ("Audiosave: target sample:%llu, got :%llu\n",sampleTarget,sampleCurrent);

@@ -253,7 +253,7 @@ abort_play:
       {
 	  if (wavbuf)
 	      ADM_dealloc(wavbuf);
-	  deleteAudioFilter();
+          deleteAudioFilter(NULL);
 	  currentaudiostream->endDecompress();
 	  AVDM_AudioClose();
 

@@ -128,8 +128,8 @@ uint8_t ret=0;
     {
       guiStop();
       GUI_Error_HIG ("Error initalizing audio filters", NULL);
-	   deleteAudioFilter ();
-		delete writter;
+      deleteAudioFilter (audio_filter);
+      delete writter;
       writter = NULL;
      // guiStop();
       return 0;
@@ -139,7 +139,7 @@ uint8_t ret=0;
     {
       guiStop();
       GUI_Error_HIG ("Error initalizing video filters", NULL);
-      deleteAudioFilter ();
+      deleteAudioFilter (audio_filter);
       delete   	writter;
       
       writter = NULL;
@@ -178,7 +178,7 @@ abortme:
   writter->setEnd ();
   delete       writter;
   writter = NULL;
-  deleteAudioFilter ();
+  deleteAudioFilter (audio_filter);
   // resync GUI
   printf ("\n Saving AVI (v_engine)... done\n");
   return ret;

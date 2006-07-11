@@ -214,7 +214,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                     
                                 if(!valid)
                                 {
-                                       deleteAudioFilter();
+                                        deleteAudioFilter(audio);
                                        GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2(stereo), AC3, DTS or LPCM (stereo).");
                                        return 0;
                                 }
@@ -410,7 +410,7 @@ _abt:
   delete muxer;
   delete [] buffer;
   delete [] audiobuffer;
-  deleteAudioFilter();
+  deleteAudioFilter(audio);
   return ret;
 
 }

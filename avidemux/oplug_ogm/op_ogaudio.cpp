@@ -295,7 +295,7 @@ uint8_t		ADM_ogmWrite::endAudio(void)
 	if(audioStream) audioStream->flush();
 	if(audioFilter) 
 	{
-		deleteAudioFilter();
+                deleteAudioFilter(audioFilter);
 		audioFilter=NULL;
 	}
 	return 1;

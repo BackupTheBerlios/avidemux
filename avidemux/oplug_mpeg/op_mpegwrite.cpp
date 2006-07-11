@@ -513,7 +513,7 @@ mpegWritter::save_regular (const char *name, ADM_MPEGTYPE mpegtype, int qz, int 
       _muxer->close ();
       delete _muxer;
       _muxer = NULL;
-      deleteAudioFilter ();
+      deleteAudioFilter (_audio);
       _audio = NULL;
     }
   end ();

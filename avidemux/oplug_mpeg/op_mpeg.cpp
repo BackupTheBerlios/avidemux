@@ -126,11 +126,11 @@ uint8_t oplug_mpeg_vcd_ps(const char *inname)
 	if(audioProcessMode())
 	{
 	  AVDMGenericAudioStream *audio=NULL;
-		audio = buildFakeAudioFilter (currentaudiostream,0,0x1000);
+		audio = buildAudioFilter (currentaudiostream,0,0x1000);
 		info=audio->getInfo();
 		memcpy(&tmpinfo,info,sizeof(tmpinfo));
 		info=&tmpinfo;
-		deleteAudioFilter();
+                deleteAudioFilter(audio);
 	
 	}
 	else
@@ -218,7 +218,7 @@ AVDMGenericAudioStream *stream;
 	stream=mpt_getAudioStream();
 	memcpy(&info,stream->getInfo(),sizeof(info));
 	
-	deleteAudioFilter();
+        deleteAudioFilter(stream);
 	printf("Incoming audio:\n");
 	printf("fq :%d\n",info.frequency);
 	printf("co :%x\n",info.encoding);
@@ -305,11 +305,11 @@ uint8_t ret=0;
 	if(audioProcessMode())
 	{
 	  AVDMGenericAudioStream *audio=NULL;
-		audio = buildFakeAudioFilter (currentaudiostream,0,0x1000);
+		audio = buildAudioFilter (currentaudiostream,0,0x1000);
 		info=audio->getInfo();
 		memcpy(&tmpinfo,info,sizeof(tmpinfo));
 		info=&tmpinfo;
-		deleteAudioFilter();
+                deleteAudioFilter(audio);
 	
 	}
 	else
@@ -381,11 +381,11 @@ uint8_t ret=0;
         if(audioProcessMode())
         {
           AVDMGenericAudioStream *audio=NULL;
-                audio = buildFakeAudioFilter (currentaudiostream,0,0x1000);
+                audio = buildAudioFilter (currentaudiostream,0,0x1000);
                 info=audio->getInfo();
                 memcpy(&tmpinfo,info,sizeof(tmpinfo));
                 info=&tmpinfo;
-                deleteAudioFilter();
+                deleteAudioFilter(audio);
         
         }
         else

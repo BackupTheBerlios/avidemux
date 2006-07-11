@@ -120,7 +120,7 @@ void A_requantize( void )
 		audioSize=0;
 	}
 	//
-	deleteAudioFilter();
+        deleteAudioFilter(audio);
 	printf("Found audio :%lu\n",audioSize);
 	if(! DIA_Requant(&percent,&quality,size,audioSize)) return;
 	
@@ -338,7 +338,7 @@ _abt:
 			muxer=NULL;
 		   }
 	Mrequant_end();
-	deleteAudioFilter();
+        deleteAudioFilter(audio);
 	GUI_Info_HIG(ADM_LOG_INFO,"Done", "Successfully saved \"%s\".", GetFileName(out_name));
 
 }

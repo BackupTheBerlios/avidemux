@@ -177,7 +177,7 @@ ADMBitstream bitstream;
                         if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
                         {
                             GUI_Error_HIG("Incompatible audio", "For VCD, audio must be 44.1 kHz MP2.");
-                            deleteAudioFilter();
+                            deleteAudioFilter(audio);
                             return 0;
                         }
                         mux=MUXER_VCD;
@@ -197,7 +197,7 @@ ADMBitstream bitstream;
                             if(hdr->frequency!=48000 || 
                                 (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3 && hdr->encoding!=WAV_LPCM))
                             {
-                                deleteAudioFilter();
+                                deleteAudioFilter(audio);
                                 GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2, AC3 or LPCM.");
                                 return 0 ;
                             }
@@ -229,7 +229,7 @@ ADMBitstream bitstream;
             {
                 delete muxer;
                 muxer=NULL;
-                deleteAudioFilter();
+                deleteAudioFilter(audio);
                 printf("Muxer init failed\n");
                 return 0 ;
             }

@@ -160,7 +160,10 @@ uint8_t ossAudioDevice::play(uint32_t len, float *data)
 	dither16bit(len, data);
 
 	w = write(oss_fd, data, len*2);
-
+        if(w!=len*2)
+        {
+          printf("[OSS] Warning : %u / %u\n",w,len*2); 
+        }
 	return 1;
 }
 #else

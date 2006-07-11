@@ -336,7 +336,7 @@ stopit:
            if(_encode) delete _encode;	
            if(videoExtraData) delete [] videoExtraData;
            // Cleanup
-           deleteAudioFilter ();
+           deleteAudioFilter (audio);
            return ret;
 }
 uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total)
