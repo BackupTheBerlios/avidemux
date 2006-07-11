@@ -5,7 +5,7 @@
 #include "audioencoder_lame_param.h"
 #include "audioencoder_twolame_param.h"
 #include "audioencoder_vorbis_param.h"
-
+extern int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor);
 extern int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor);
 
 /**** FAAC ****/
@@ -84,7 +84,7 @@ VORBIS_encoderParam vorbisParam=
 ADM_audioEncoderDescriptor  vorbisDescriptor=
 {
   AUDIOENC_VORBIS,
-  NULL,
+  DIA_getVorbisSettings,
   "Vorbis encoder",
   128,
   6,      // Lame can only do stereo

@@ -111,7 +111,7 @@ uint8_t AUDMEncoder_Vorbis::init(ADM_audioEncoderDescriptor *config)
                     err=vorbis_encode_init_vbr(&VI,
                                 _wavheader->channels,
                                 _wavheader->frequency,
-                                ((float)config->bitrate-1)/10 // FIXME FIXME
+                                vorbisConf->quality
                               );
                     break;
     default:
