@@ -191,7 +191,7 @@ char *pth;
 // Audio
 //______________________________________________
 
-   uint32_t delay;
+   uint32_t delay,bitrate;
    
    qfprintf(fd,"\n//** Audio **\n");
    qfprintf(fd,"app.audio.reset();\n");
@@ -213,8 +213,15 @@ char *pth;
                         qfprintf(fd,"app.audio.setTrack(%d);\n", source); 
                         
         }
-
-   qfprintf(fd,"app.audio.codec(\"%s\",%d);\n", audioCodecGetName(),audioGetBitrate()); 
+   getAudioExtraConf(&bitrate,&extraDataSize,&extraData);
+   qfprintf(fd,"app.audio.codec(\"%s\",%d,%d,\"", audioCodecGetName(),bitrate,extraDataSize); 
+   for(int i=0;i<extraDataSize;i++)
+   {
+     qfprintf(fd,"%02x ",extraData[i]);
+   }
+   qfprintf(fd,"\");\n");
+   
+   
    //qfprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode()]);
    qfprintf(fd,"app.audio.normalize=%s;\n",truefalse[audioGetNormalize()]);
    qfprintf(fd,"app.audio.delay=%d;\n",audioGetDelay());
