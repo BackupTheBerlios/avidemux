@@ -38,6 +38,7 @@ AUDMEncoder::AUDMEncoder(AUDMAudioFilter *in)  :AVDMBufferedAudioStream  (NULL)
   _extraSize=0;
   tmpbuffer=new float[_wavheader->frequency*_wavheader->channels];
   tmphead=tmptail=0;
+  eof_met=0;
 };
 /********************/
 AUDMEncoder::~AUDMEncoder()
@@ -63,10 +64,10 @@ uint8_t AUDMEncoder::refillBuffer(int minimum)
   uint32_t filler=_wavheader->frequency*_wavheader->channels;
   uint32_t nb;
   AUD_Status status;
-  
+  if(eof_met) return 0;
   while(1)
   {
-    if(tmptail-tmphead>minimum) return 1;
+    if((tmptail-tmphead)>=minimum) return 1;
   
     if(tmphead && tmptail>filler/2)
     {
@@ -78,9 +79,15 @@ uint8_t AUDMEncoder::refillBuffer(int minimum)
     if(!nb)
     {
       if(status!=AUD_END_OF_STREAM) ADM_assert(0);
-      if(tmphead==tmptail) return 0;
-      memset(&tmpbuffer[tmptail],0,(minimum-(tmptail-tmphead))*sizeof(float));
-      tmptail=tmphead+minimum;
+      
+      if((tmptail-tmphead)<minimum)
+      {
+        memset(&tmpbuffer[tmptail],0,sizeof(float)*(minimum-(tmptail-tmphead)));
+        tmptail=tmphead+minimum;
+        eof_met=1;  
+        return minimum;
+      }
+      else continue;
     } else
       tmptail+=nb;
   }

@@ -33,7 +33,7 @@ class AUDMEncoder : public AVDMBufferedAudioStream
     //
     uint32_t grab(uint8_t *outbuffer);
     uint32_t grab(float *outbuffer) {ADM_assert(0);return 1;}
-
+    uint32_t  eof_met;
     //
     uint8_t         *_extraData;
     uint32_t        _extraSize;

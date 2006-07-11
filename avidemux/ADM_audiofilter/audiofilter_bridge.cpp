@@ -95,11 +95,11 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
       // don't ask too much front.
       asked = (3*AUD_PROCESS_BUFFER_SIZE)/4-_tail;
       asked = _incoming->readDecompress(asked, &(_incomingBuffer[_tail]));
-     // asked=_previous->fill(max,&(_incomingBuffer[_tail]),status);
 
       if (!asked )
       {
         *status=AUD_END_OF_STREAM;
+        printf("[Bridge] End of stream\n");
         break;
       }
       _tail+=asked;
