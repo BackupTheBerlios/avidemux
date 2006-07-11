@@ -132,14 +132,14 @@ void prepare( void )
 	track1=0;
 	if(audioProcessMode() && currentaudiostream)
 	{
-		stream=buildFakeAudioFilter(currentaudiostream,
+		stream=buildAudioFilter(currentaudiostream,
 				0, 0xffffffff);
 	
 		if(stream)
 		{
 			track1=(stream->getInfo()->byterate*8)/1000;
 		}
-		deleteAudioFilter();
+                deleteAudioFilter(stream);
 	}else
 	{
 		if(currentaudiostream) track1=(currentaudiostream->getInfo()->byterate*8)/1000;
