@@ -27,7 +27,6 @@
 #include "avifmt2.h"
 #include "avio.hxx"
 #include "fourcc.h"
-#include "riffparser.h"
 #include "subchunk.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"

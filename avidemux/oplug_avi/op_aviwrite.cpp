@@ -37,7 +37,6 @@
 #include "avifmt2.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "fourcc.h"
-#include "riffparser.h"
 #include "subchunk.h"
 #include "avilist.h"
 #include "op_aviwrite.hxx"

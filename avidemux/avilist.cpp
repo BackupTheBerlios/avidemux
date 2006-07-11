@@ -38,7 +38,6 @@
 #include <ADM_assert.h>
 
 #include "fourcc.h"
-#include "riffparser.h"
 #include "subchunk.h"
 #include "avilist.h"
 #include "ADM_toolkit/toolkit.hxx"
