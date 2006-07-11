@@ -28,7 +28,7 @@
  AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t duration);
 
-void deleteAudioFilter(void);								
+ void deleteAudioFilter(AVDMGenericAudioStream *in);
 void audioFilter_configureFilters( void );
 
 // Build a simple filter chain

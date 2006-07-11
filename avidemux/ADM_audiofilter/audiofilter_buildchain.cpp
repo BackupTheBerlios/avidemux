@@ -62,6 +62,7 @@
 #include "audiofilter_mixer.h"
 #include "audiofilter_normalize.h"
 #include "audiofilter_limiter.h"
+#include "audiofilter_sox.h"
 
 /* ************ Conf *********** */
 #include "audioencoder_config.h"
@@ -94,6 +95,7 @@ extern FILMCONV audioFilmConv;
 extern CHANNEL_CONF audioMixing;
 extern int audioMP3mode;
 extern int audioMP3bitrate;
+extern RESAMPLING  audioResampleMode;
 
 static DRCparam drcSetup=
 {
@@ -201,52 +203,40 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 }
       
       if( (audioMixing!=CHANNEL_INVALID ))
-{
-  AUDMAudioFilter *mixer;
-  mixer=new AUDMAudioFilterMixer( lastFilter,audioMixing);
-  lastFilter = mixer;
-  filtersFloat[filtercount++] = lastFilter;
-}
+          {
+            AUDMAudioFilter *mixer;
+            mixer=new AUDMAudioFilterMixer( lastFilter,audioMixing);
+            lastFilter = mixer;
+            filtersFloat[filtercount++] = lastFilter;
+          }
 
     if (audioDRC)
-{
-  AUDMAudioFilterLimiter *pdrc = NULL;
-  printf("\n  DRC activated...\n");
-  pdrc = new AUDMAudioFilterLimiter(lastFilter,&drcSetup);
-  lastFilter = (AUDMAudioFilter *)pdrc;
-  filtersFloat[filtercount++] = lastFilter;
+          {
+            AUDMAudioFilterLimiter *pdrc = NULL;
+            printf("\n  DRC activated...\n");
+            pdrc = new AUDMAudioFilterLimiter(lastFilter,&drcSetup);
+            lastFilter = (AUDMAudioFilter *)pdrc;
+            filtersFloat[filtercount++] = lastFilter;
+          
+          }
 
-}
-#if 0
       switch(audioResampleMode)
-{
-      	
-      	case RESAMPLING_NONE: break;
-  case RESAMPLING_DOWNSAMPLING:
-	 	if ((lastFilter->getInfo()->frequency != 48000) 
-	  		||  (lastFilter->getInfo()->channels != 2)
-			)
-{
-			GUI_Info_HIG(ADM_LOG_IMPORTANT,"Downsample disabled", "Input is not stereo, 48 kHz.");
-} 
-		else
-{
-			printf("\n downsample activated....");
-			downsample = new AVDMProcessAudio_Resample(lastFilter, 2);
-			lastFilter = downsample;
-			filters[filtercount++] = lastFilter;
-}
-		break;
-  case RESAMPLING_CUSTOM:
-		printf("\n resampling to %d\n",audioFreq);
-		resample = new AVDMProcessAudio_SoxResample(lastFilter, audioFreq);
-		lastFilter = resample;
-		filters[filtercount++] = lastFilter;	
-		break;
-	
-		
-}
-	
+          {
+                  
+            case RESAMPLING_NONE: break;
+            case RESAMPLING_CUSTOM:
+            {
+                      AUDMAudioFilterSox  *resample=NULL;
+                      resample = new AUDMAudioFilterSox(lastFilter, audioFreq);
+                      lastFilter = resample;
+                      filtersFloat[filtercount++] = lastFilter;	
+            }
+                      break;
+
+            default:
+                      ADM_assert(0);
+          }
+#if 0	
       switch(audioFilmConv)
 {
   default:
@@ -529,13 +519,15 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
      delete audio filters
 *******************************************************************************************************************
 */
-void deleteAudioFilter(void)
+void deleteAudioFilter(AVDMGenericAudioStream *in)
 {
   for (uint32_t i = 0; i < filtercount; i++)
   {
     delete filtersFloat[i];
     filtersFloat[i] = NULL;
   }
+  if(in)
+    delete in;
   filtercount = 0;
   if (currentaudiostream)
     currentaudiostream->endDecompress();

@@ -124,7 +124,7 @@ int  audioFreq=48000;
 int  audioDRC = 0;
 FILMCONV audioFilmConv=FILMCONV_NONE;
 
-static RESAMPLING  audioResampleMode = RESAMPLING_NONE;
+RESAMPLING  audioResampleMode = RESAMPLING_NONE;
 int audioMP3mode = 0;
 int audioMP3bitrate = 128;
 static ADM_LAME_PRESET audioMP3preset=ADM_LAME_PRESET_CBR;

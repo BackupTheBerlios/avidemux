@@ -73,27 +73,29 @@
  * lowpass-filtered to the output Nyquist freqency.
  * Get the idea? :)
  */
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 #include <math.h>
 
-#include "config.h"
-#include "avifmt.h"
-#include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
+#include <ADM_assert.h>
+
+#include "ADM_library/default.h"
+
 #include "audioprocess.hxx"
 #include "resampl.h"
+
+#include "audioeng_sox.h"
 /* this Float MUST match that in filter.c */
-#define Float double/*float*/
+#define Float float
 #define ISCALE 0x10000
 
 /* largest factor for which exact-coefficients upsampling will be used */
 #define NQMAX 511
-#define ST_SAMPLE_MAX 0x7fffL
-#define ST_SAMPLE_MIN (-ST_SAMPLE_MAX - 1L)
+#define ST_SAMPLE_MAX 1
+#define ST_SAMPLE_MIN -1
 
 
 #define BUFFSIZE 8192 /*16384*/  /* Total I/O buffer size */
@@ -224,8 +226,8 @@ int i;
 ***************************************************/
 
 int sox_run(	ResampleStruct *r, 
-		int16_t *ibuf, 
-		int16_t *obuf, 
+		float *ibuf, 
+		float *obuf, 
                 uint32_t *isamp, 
 		uint32_t *osamp,
 		uint32_t inc)
@@ -330,7 +332,7 @@ int sox_run(	ResampleStruct *r,
 		else if (ftemp <= ST_SAMPLE_MIN)
 			*obuf = ST_SAMPLE_MIN;
 		else
-			*obuf = (int16_t) floor(ftemp);
+			*obuf = ftemp;
 		obuf+=1+inc;
 		
         }
