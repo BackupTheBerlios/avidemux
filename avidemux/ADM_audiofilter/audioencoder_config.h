@@ -7,13 +7,13 @@
 #include "audioencoder_vorbis_param.h"
 extern int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor);
 extern int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor);
-
+extern int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor);
 /**** FAAC ****/
 FAAC_encoderParam aacParam={128};
 ADM_audioEncoderDescriptor aacDescriptor=
 {
         AUDIOENC_FAAC,
-        NULL,
+        DIA_defaultSettings,
         "FAAC encoder",
         128,
         6,      // AAC can do 5.1
@@ -45,7 +45,7 @@ TWOLAME_encoderParam twolameParam=
 ADM_audioEncoderDescriptor  twolameDescriptor=
 {
   AUDIOENC_2LAME,
-  NULL,
+  DIA_defaultSettings,
   "TwoLame encoder",
   128,
   2,      // Lame can only do stereo
@@ -56,8 +56,8 @@ ADM_audioEncoderDescriptor  twolameDescriptor=
 ADM_audioEncoderDescriptor  lavcodecMP2Descriptor=
 {
   AUDIOENC_MP2,
-  NULL,
-  "LAvcodec encoder",
+  DIA_defaultSettings,
+  "LAvcodec MP2 encoder",
   128,
   2,    
   0,
@@ -66,8 +66,8 @@ ADM_audioEncoderDescriptor  lavcodecMP2Descriptor=
 ADM_audioEncoderDescriptor  lavcodecAC3Descriptor=
 {
   AUDIOENC_AC3,
-  NULL,
-  "LAvcodec encoder",
+  DIA_defaultSettings,
+  "LAvcodec AC3 encoder",
   128,
   6,    
   0,

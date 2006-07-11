@@ -158,7 +158,7 @@ uint8_t AUDMEncoder_Vorbis::init(ADM_audioEncoderDescriptor *config)
       printf("[Vorbis]CBR Bitrate:%lu\n",config->bitrate);
       break;
     case ADM_VORBIS_VBR: //FIXME FIXME FIXME
-      printf("[Vorbis]VBR Quality:%i\n",config->bitrate-1);
+      printf("[Vorbis]VBR Quality:%f\n",vorbisConf->quality);
     break;
     default:
       ADM_assert(0);
