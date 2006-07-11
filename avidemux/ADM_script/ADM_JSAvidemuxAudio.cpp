@@ -58,10 +58,9 @@ JSFunctionSpec ADM_JSAvidemuxAudio::avidemuxaudio_methods[] =
 	{ "save", Save, 1, 0, 0 },	// save audio stream
 	{ "load", Load, 2, 0, 0 },	// load audio stream
 	{ "reset", Reset, 0, 0, 0 },	// reset audio stream
-	{ "codec", Codec, 2, 0, 0 },	// set output codec
+	{ "codec", Codec, 4, 0, 0 },	// set output codec
         { "getNbTracks", getNbTracks, 0, 0, 0 },    // set output codec
         { "setTrack", setTrack, 1, 0, 0 },    // set output codec
-        { "lamePreset", lamePreset, 1, 0, 0 },    // set output codec
         { "secondAudioTrack", secondAudioTrack, 2, 0, 0 },    // set audio track
         { "mixer", mixer, 1, 0, 0 },    // set mixer configuration
 	{ 0 }
@@ -302,14 +301,15 @@ JSBool ADM_JSAvidemuxAudio::Reset(JSContext *cx, JSObject *obj, uintN argc,
 	*rval = BOOLEAN_TO_JSVAL(true);
 	return JS_TRUE;
 }// end Reset
-
+extern uint8_t    mk_hex (uint8_t a, uint8_t b);
+// Codec/ Bitrate / extrdataSize / extrdata
 JSBool ADM_JSAvidemuxAudio::Codec(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {// begin Codec
 	ADM_JSAvidemuxAudio *p = (ADM_JSAvidemuxAudio *)JS_GetPrivate(cx, obj);
 	// default return value
 	*rval = BOOLEAN_TO_JSVAL(false);
-	if(argc != 2)
+	if(argc != 4)
 		return JS_FALSE;
 	char *name = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
 	LowerCase(name);
@@ -318,7 +318,27 @@ JSBool ADM_JSAvidemuxAudio::Codec(JSContext *cx, JSObject *obj, uintN argc,
 		*rval = BOOLEAN_TO_JSVAL(false);
 	else
 	{// begin set bitrate
-		audioFilter_SetBitrate(JSVAL_TO_INT(argv[1]));
+		//audioFilter_SetBitrate(JSVAL_TO_INT(argv[1]));
+          uint32_t bitrate,size;
+          char  *extra;
+          uint8_t *data=NULL;
+                bitrate=JSVAL_TO_INT(argv[1]);
+                size=JSVAL_TO_INT(argv[2]);
+                extra=JS_GetStringBytes(JSVAL_TO_STRING(argv[3])); 
+                if(size)
+                {
+                          data=new uint8_t[size];
+                          while (*extra != ' ')
+                            extra++;
+                          extra++;			// skip the first ' '
+                          for (uint32_t k = 0; k < size; k++)
+                            {
+                              data[k] = mk_hex (*extra, *(extra + 1));
+                              extra += 3;
+                            }
+                         setAudioExtraConf(bitrate,size,data);
+                         delete [] data; 
+                }
 		*rval = BOOLEAN_TO_JSVAL(true);
 	}// end set bitrate
 	return JS_TRUE;
@@ -377,27 +397,6 @@ JSBool ADM_JSAvidemuxAudio::secondAudioTrack(JSContext *cx, JSObject *obj, uintN
         }
        return JS_FALSE;
 }
-JSBool ADM_JSAvidemuxAudio::lamePreset(JSContext *cx, JSObject *obj, uintN argc, 
-                                       jsval *argv, jsval *rval)
-{
-uint32_t nb=0,nw=0;
-uint32_t *infos=NULL;
-        // default return value
-        ADM_JSAvidemuxAudio *p = (ADM_JSAvidemuxAudio *)JS_GetPrivate(cx, obj);
-#ifdef HAVE_LIBMP3LAME
-        // default return value
-       if(argc != 1)
-                return JS_FALSE;
-        char *pArg0 = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-        if(audioLamePreset(pArg0))
-                *rval=BOOLEAN_TO_JSVAL(true);
-        else
-                *rval=BOOLEAN_TO_JSVAL(false);
-        return JS_TRUE;
-#else
-        return JS_FALSE;
-#endif
-}// end Codec
 JSBool ADM_JSAvidemuxAudio::mixer(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {
