@@ -8,8 +8,10 @@
 #define AUDIO_ENCODER_H
 /*!
   This structure defines an audio encoder
+  \param encoder Encoder attached to this descriptor
    \param name The name of the codec
   \param bitrate The bitrate in kb/s
+  \param configure Function to call to configure the codec
   \param maxChannels The maximum # of channels this codec supports
   \param param : An opaque structure that contains the codec specific configuration datas
 */
@@ -17,6 +19,7 @@
 typedef struct ADM_audioEncoderDescriptor
 {
   AUDIOENCODER encoder;
+  int       (*configure)(ADM_audioEncoderDescriptor *descritor);
   const     char *name;
   uint32_t  bitrate;
   uint32_t  maxChannels;

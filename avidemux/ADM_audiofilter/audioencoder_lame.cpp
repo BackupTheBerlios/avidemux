@@ -115,6 +115,8 @@ uint8_t AUDMEncoder_Lame::init(ADM_audioEncoderDescriptor *config)
 
         ret = lame_set_brate(MYFLAGS, config->bitrate);
         ret = lame_set_mode(MYFLAGS, mmode);	// 0 stereo 1 jstero
+        ret = lame_set_quality(MYFLAGS, lameConf->quality);	// 0 stereo 1 jstero
+        printf("[Lame]Using quality of %d\n",lame_get_quality(MYFLAGS));
         ret = lame_init_params(MYFLAGS);
     if (ret == -1)
 	return 0;
@@ -184,7 +186,7 @@ uint8_t	AUDMEncoder_Lame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samp
         tmphead+=_chunk;
         if (nbout < 0) {
           printf("\n Error !!! : %ld\n", nbout);
-          return MINUS_ONE;
+          return 0;
         }
         *len=nbout;
         return 1;

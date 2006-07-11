@@ -24,6 +24,7 @@ typedef struct LAME_encoderParam
 {
   ADM_LAME_PRESET preset;
   ADM_mode        mode;
+  uint32_t        quality;
 };
 
 #endif

@@ -5,11 +5,15 @@
 #include "audioencoder_lame_param.h"
 #include "audioencoder_twolame_param.h"
 #include "audioencoder_vorbis_param.h"
+
+extern int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor);
+
 /**** FAAC ****/
 FAAC_encoderParam aacParam={128};
 ADM_audioEncoderDescriptor aacDescriptor=
 {
         AUDIOENC_FAAC,
+        NULL,
         "FAAC encoder",
         128,
         6,      // AAC can do 5.1
@@ -20,11 +24,13 @@ ADM_audioEncoderDescriptor aacDescriptor=
 LAME_encoderParam lameParam=
 {
   ADM_LAME_PRESET_CBR,
-  ADM_STEREO
+  ADM_STEREO,
+  2
 };
 ADM_audioEncoderDescriptor  lameDescriptor=
 {
   AUDIOENC_MP3,
+  DIA_getLameSettings,
   "Lame encoder",
   128,
   2,      // Lame can only do stereo
@@ -39,6 +45,7 @@ TWOLAME_encoderParam twolameParam=
 ADM_audioEncoderDescriptor  twolameDescriptor=
 {
   AUDIOENC_2LAME,
+  NULL,
   "TwoLame encoder",
   128,
   2,      // Lame can only do stereo
@@ -49,6 +56,7 @@ ADM_audioEncoderDescriptor  twolameDescriptor=
 ADM_audioEncoderDescriptor  lavcodecMP2Descriptor=
 {
   AUDIOENC_MP2,
+  NULL,
   "LAvcodec encoder",
   128,
   2,    
@@ -58,6 +66,7 @@ ADM_audioEncoderDescriptor  lavcodecMP2Descriptor=
 ADM_audioEncoderDescriptor  lavcodecAC3Descriptor=
 {
   AUDIOENC_AC3,
+  NULL,
   "LAvcodec encoder",
   128,
   6,    
@@ -75,6 +84,7 @@ VORBIS_encoderParam vorbisParam=
 ADM_audioEncoderDescriptor  vorbisDescriptor=
 {
   AUDIOENC_VORBIS,
+  NULL,
   "Vorbis encoder",
   128,
   6,      // Lame can only do stereo
@@ -85,6 +95,7 @@ ADM_audioEncoderDescriptor  vorbisDescriptor=
 ADM_audioEncoderDescriptor  pcmDescriptor=
 {
   AUDIOENC_NONE,
+  NULL,
   "PCM encoder",
   128,
   6,    
@@ -94,6 +105,7 @@ ADM_audioEncoderDescriptor  pcmDescriptor=
 ADM_audioEncoderDescriptor  lpcmDescriptor=
 {
   AUDIOENC_LPCM,
+  NULL,
   "LPCM encoder",
   128,
   6,    
@@ -108,7 +120,8 @@ ADM_audioEncoderDescriptor *allDescriptors[]=
       &lavcodecMP2Descriptor,
       &vorbisDescriptor ,
       &pcmDescriptor,
-      &lpcmDescriptor
+      &lpcmDescriptor,
+      &lameDescriptor
 };
 #define NB_AUDIO_DESCRIPTOR (sizeof(allDescriptors)/sizeof(ADM_audioEncoderDescriptor *))
 #endif

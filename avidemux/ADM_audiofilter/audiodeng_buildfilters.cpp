@@ -455,75 +455,7 @@ uint32_t audioProcessMode(void)
 */
 	 
 
-/* _____________________________________________________
-  		Handle the configure signal from GUI
 
-				pop up GUI 
-
-*/
-void audioCodecConfigure( void )
-{
-	int mode,bitrate;
-	ADM_LAME_PRESET preset;
-	bitrate= audioMP3bitrate;
-	preset=audioMP3preset;
-	mode=audioMP3mode;
-	
-	switch(activeAudioEncoder)
-	{
-                case AUDIOENC_LPCM:
-		case AUDIOENC_NONE:
-		case AUDIOENC_COPY:
-								return;
-
-#ifdef USE_FAAC
-		case AUDIOENC_FAAC:
-						
-							DIA_audioEncoder(&audioMP3mode, &audioMP3bitrate,"AAC parameter");
-							return;
-						return;
-#endif	
-#ifdef USE_VORBIS
-		case AUDIOENC_VORBIS:
-						
-							DIA_getVorbisSettings(&audioMP3bitrate, &audioMP3mode);
-							return;
-						return;
-#endif		
-#ifdef HAVE_LIBMP3LAME								
-		case AUDIOENC_MP3:
-						DIA_getLameSettings(&audioMP3mode, &audioMP3bitrate,&audioMP3preset);
-						return;
-						break;
-#endif
-
-		case AUDIOENC_MP2:
-							if (DIA_audioEncoder(&mode, &bitrate,"MP2 parameter"))
-								{
-									audioMP3mode=mode;
-									audioMP3bitrate=bitrate;
-								}
-								return;
-		case AUDIOENC_2LAME:
-							if (DIA_audioEncoder(&mode, &bitrate,"Toolame parameter"))
-								{
-									audioMP3mode=mode;
-									audioMP3bitrate=bitrate;
-								}
-								return;								
-		case AUDIOENC_AC3:
-							if (DIA_audioEncoder(&mode, &bitrate,"AC3 parameter"))
-								{
-									audioMP3mode=mode;
-									audioMP3bitrate=bitrate;										
-								}
-								return;
-		default:
-					ADM_assert(0);																				
-		
-	}
-	
-}
 void audioForceDownSample( void)
 {
 	audioResampleMode=RESAMPLING_DOWNSAMPLING;

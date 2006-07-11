@@ -527,8 +527,41 @@ ADM_audioEncoderDescriptor *getAudioDescriptor( AUDIOENCODER encoder)
   }
   ADM_assert(0);
   return NULL;
+}
+
+uint8_t getAudioExtraConf(uint32_t *bitrate,uint32_t *extraDataSize, uint8_t **extradata)
+{
+  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor(activeAudioEncoder);
   
+  *bitrate=descriptor->bitrate;
+  *extraDataSize=descriptor->paramSize;
+  *extradata=(uint8_t *)descriptor->param;
+  return 1;
   
 }
+uint8_t setAudioExtraConf(uint32_t bitrate,uint32_t extraDataSize, uint8_t *extradata)
+{
+  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor(activeAudioEncoder);
+  if(extraDataSize!=descriptor->paramSize)
+  {
+    printf("Invalid descriptor for codec\n");
+    return 0; 
+  }
+  printf("Valid descriptor found for audio codec\n");
+  descriptor->bitrate=bitrate;
+  memcpy(descriptor->param,extradata,extraDataSize);
+  return 1;
+  
+}
+
+void audioCodecConfigure( void )
+{
+  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor(activeAudioEncoder);
+  if(descriptor->configure)
+  {
+    descriptor->configure(descriptor); 
+  }
+}
+
 
 

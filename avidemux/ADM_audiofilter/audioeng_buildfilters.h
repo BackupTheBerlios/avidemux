@@ -124,6 +124,9 @@ AudioSource             audioSourceFromString(const char *name);
 const char              *getCurrentMixerString(void);
 uint8_t                 setCurrentMixerFromString(const char *string);
 uint8_t                 audioLamePreset(const char *name);
+//*****
+uint8_t getAudioExtraConf(uint32_t *bitrate,uint32_t *extraDataSize, uint8_t **extradata);
+uint8_t setAudioExtraConf(uint32_t bitrate,uint32_t extraDataSize, uint8_t *extradata);
 //
 #endif
 
