@@ -13,8 +13,10 @@
   \param maxChannels The maximum # of channels this codec supports
   \param param : An opaque structure that contains the codec specific configuration datas
 */
+#include "audioeng_buildfilters.h"
 typedef struct ADM_audioEncoderDescriptor
 {
+  AUDIOENCODER encoder;
   const     char *name;
   uint32_t  bitrate;
   uint32_t  maxChannels;

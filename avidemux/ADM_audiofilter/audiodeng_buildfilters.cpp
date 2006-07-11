@@ -229,16 +229,9 @@ uint32_t audioGetBitrate(void)
 
 void audioCodecChanged(int newcodec)
 {
-	ADM_assert(newcodec<sizeof(myCodecList) /sizeof(CODECLIST));
-	activeAudioEncoder=myCodecList[newcodec].codec;
+      ADM_assert(newcodec<sizeof(myCodecList) /sizeof(CODECLIST));
+      activeAudioEncoder=myCodecList[newcodec].codec;
 
-	if (activeAudioEncoder == AUDIOENC_VORBIS) {
-		if (audioMP3mode == 0 && audioMP3bitrate > 11)
-			audioMP3bitrate = 4;
-	} else {
-		if (audioMP3bitrate < 48)
-			audioMP3bitrate = 128;
-	}
 }
 
 uint32_t audioFilterGetNbEncoder(void)

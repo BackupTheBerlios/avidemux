@@ -107,6 +107,8 @@ static DRCparam drcSetup=
   -12.0 ,//double   mThresholdDB;
 };
 
+static ADM_audioEncoderDescriptor *getAudioDescriptor( AUDIOENCODER encoder);
+
 //
 // Build audio filters
 // Starttime : starttime in ms
@@ -120,12 +122,6 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 
   AUDMAudioFilter *firstFilter = NULL;
   AUDMAudioFilter *lastFilter = NULL;
-  AUDMAudioFilter *normalize = NULL;
-  AUDMAudioFilter *downsample = NULL;
-  AUDMAudioFilter *resample = NULL;
-  AUDMAudioFilter *tshift = NULL;
-  AUDMAudioFilter *drc = NULL;
-
 
   printf("\n Audio codec : %d",activeAudioEncoder);
 // In fact it is more a decompress filter than a null filter
@@ -196,7 +192,7 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 {
   printf("\n  normalize activated...\n");
 
-  normalize = new AUDMAudioFilterNormalize(lastFilter);
+  AUDMAudioFilterNormalize *normalize = new AUDMAudioFilterNormalize(lastFilter);
   lastFilter = normalize;
   filtersFloat[filtercount++] = lastFilter;
 
@@ -356,7 +352,8 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 {
   AUDMAudioFilter *lastFilter=NULL;
   AVDMProcessAudioStream *output=NULL;
-
+  AUDMEncoder             *tmpfilter=NULL;
+  
 	// if audio is set to copy, we just return the first filter
   if(!audioProcessMode())
   {
@@ -380,7 +377,8 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 
 //_______________________________________________________
   uint8_t init;
-
+  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor( activeAudioEncoder);
+  
   switch(activeAudioEncoder)
   {
 
@@ -400,15 +398,7 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 #endif
                         revert=1;
                     pcm = new AUDMEncoder_PCM(revert,fourcc,lastFilter);
-                    if(pcm->init(&pcmDescriptor))
-                    {
-                      output=pcm;
-                    }
-                    else
-                    {
-                      delete pcm;
-                      GUI_Error_HIG("(L)PCM initialization failed", "Not activated.");
-                    }
+                    tmpfilter=pcm;
                   }
                   break;
 #ifdef USE_VORBIS
@@ -416,32 +406,16 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
                 {
                   AUDMEncoder_Vorbis *vorbis;
                   vorbis = new AUDMEncoder_Vorbis(lastFilter);
-                  if(vorbis->init(&vorbisDescriptor))
-                  {
-                    output=vorbis;
-                  }
-                  else
-                  {
-                    delete vorbis;
-                    GUI_Error_HIG("Vorbis initialization failed", "Not activated.");
-                  }
-                }
+                  tmpfilter=vorbis;
                   break;
+                }
 #endif		
 #ifdef USE_FAAC
     case AUDIOENC_FAAC:
                   {
                       AUDMEncoder_Faac *faac;
                           faac = new AUDMEncoder_Faac(lastFilter);
-                          if(faac->init(&aacDescriptor))
-                          {
-                              output=faac;
-                          }
-                            else
-                          {
-                              delete faac;
-                              GUI_Error_HIG("FAAC initialization failed", "Not activated.");
-                          }
+                          tmpfilter=faac;
                   }
                   break;
 #endif		
@@ -452,15 +426,7 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
                 AUDMEncoder_Lame *plame = NULL;
 
                             plame = new AUDMEncoder_Lame(lastFilter);
-                            init = plame->init(&lameDescriptor);
-                            if (init)
-                            {
-                                  output=plame;
-                            } else
-                            {
-                                  delete plame;
-                                  GUI_Error_HIG("LAME initialization failed", "Not activated.");
-                            }
+                            tmpfilter=plame;
                 }
               break;
 #endif
@@ -474,30 +440,14 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
                       else fourc=WAV_MP2;
                     
                       lavcodec = new AUDMEncoder_Lavcodec(fourc,lastFilter);
-                      init = lavcodec->init(&lavcodecDescriptor);
-                      if (init)
-                      {
-                        output=lavcodec;
-                      } else
-                      {
-                        delete lavcodec;
-                        GUI_Error_HIG("Lavcodec audio initialization failed", "Not activated.");
-                      }
+                      tmpfilter=lavcodec;
                     }
               break;
     case  AUDIOENC_2LAME:
               {
                   AUDMEncoder_Twolame *toolame_enc = NULL;
                           toolame_enc = new AUDMEncoder_Twolame(lastFilter);
-                          init = toolame_enc->init(&twolameDescriptor);
-                          if (init)
-                          {
-                            output=toolame_enc;
-                          } else
-                          {
-                            delete toolame_enc;
-                            GUI_Error_HIG("TWOLAME initialization failed", "Not activated.");
-                          }
+                          tmpfilter=toolame_enc;
               }
     	  break;
 
@@ -506,7 +456,13 @@ AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
   }
 //_______________________________________________________
 
-
+  if(!tmpfilter->init(descriptor))
+  {
+    delete tmpfilter;
+    tmpfilter=NULL;
+    GUI_Error_HIG("Encoder initialization failed", "Not activated."); 
+  }
+  output=tmpfilter;
 
   currentaudiostream->beginDecompress();
 
@@ -559,6 +515,20 @@ AVDMProcessAudioStream *lastFilter = NULL;
 #endif 
   return NULL;
 }
-
+/**********************************************/
+ADM_audioEncoderDescriptor *getAudioDescriptor( AUDIOENCODER encoder)
+{
+  for(int i=0;i<NB_AUDIO_DESCRIPTOR;i++)
+  {
+    if(allDescriptors[i]->encoder==encoder)
+    {
+      return    allDescriptors[i];
+    }
+  }
+  ADM_assert(0);
+  return NULL;
+  
+  
+}
 
 
