@@ -15,12 +15,12 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * mostly by Michael Niedermayer <michaelni@gmx.at>
  */
 #include "../dsputil.h"
-#include "mmx.h"
+#include "x86_cpu.h"
 
 static const __attribute__ ((aligned(8))) uint64_t round_tab[3]={
 0x0000000000000000ULL,

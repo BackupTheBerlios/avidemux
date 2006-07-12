@@ -15,10 +15,11 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #undef SPREADW
 #undef PMAXW
+#undef PMAX
 #ifdef HAVE_MMX2
 #define SPREADW(a) "pshufw $0, " #a ", " #a " \n\t"
 #define PMAXW(a,b) "pmaxsw " #a ", " #b "     \n\t"
@@ -51,7 +52,7 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
     long last_non_zero_p1;
     int level=0, q; //=0 is cuz gcc says uninitalized ...
     const uint16_t *qmat, *bias;
-    __align8 int16_t temp_block[64];
+    DECLARE_ALIGNED_8(int16_t, temp_block[64]);
 
     assert((7&(int)(&temp_block[0])) == 0); //did gcc align it correctly?
 

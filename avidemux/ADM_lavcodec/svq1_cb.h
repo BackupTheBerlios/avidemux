@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * Ported to mplayer by Arpi <arpi@thot.banki.hu>
  * Ported to libavcodec by Nick Kurshev <nickols_k@mail.ru>
@@ -764,9 +764,10 @@ static const int8_t svq1_inter_codebook_8x8[6144] = {
 };
 
 /* list of codebooks for inter-coded vectors */
-static const int8_t* const svq1_inter_codebooks[4] = {
+static const int8_t* const svq1_inter_codebooks[6] = {
     svq1_inter_codebook_4x2, svq1_inter_codebook_4x4,
-    svq1_inter_codebook_8x4, svq1_inter_codebook_8x8
+    svq1_inter_codebook_8x4, svq1_inter_codebook_8x8,
+    NULL, NULL,
 };
 
 static const int8_t svq1_inter_codebook_sum[4][16*6] = {
@@ -1538,9 +1539,10 @@ static const int8_t svq1_intra_codebook_8x8[6144] = {
 };
 
 /* list of codebooks for intra-coded vectors */
-static const int8_t* const svq1_intra_codebooks[4] = {
+static const int8_t* const svq1_intra_codebooks[6] = {
     svq1_intra_codebook_4x2, svq1_intra_codebook_4x4,
-    svq1_intra_codebook_8x4, svq1_intra_codebook_8x8
+    svq1_intra_codebook_8x4, svq1_intra_codebook_8x8,
+    NULL, NULL,
 };
 
 static const int8_t svq1_intra_codebook_sum[4][16*6] = {

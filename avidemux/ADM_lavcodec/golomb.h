@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
 
@@ -435,6 +435,10 @@ static inline void set_ur_golomb_jpegls(PutBitContext *pb, int i, int k, int lim
 
     e= (i>>k) + 1;
     if(e<limit){
+        while(e > 31) {
+            put_bits(pb, 31, 0);
+            e -= 31;
+        }
         put_bits(pb, e, 1);
         if(k)
             put_bits(pb, k, i&((1<<k)-1));

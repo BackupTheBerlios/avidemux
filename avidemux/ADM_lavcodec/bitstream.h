@@ -135,31 +135,40 @@ typedef struct RL_VLC_ELEM {
     uint8_t run;
 } RL_VLC_ELEM;
 
-#if defined(ARCH_SPARC) || defined(ARCH_ARMV4L)
+#if defined(ARCH_SPARC) || defined(ARCH_ARMV4L) || defined(ARCH_MIPS)
 #define UNALIGNED_STORES_ARE_BAD
 #endif
 
 /* used to avoid missaligned exceptions on some archs (alpha, ...) */
 #if defined(ARCH_X86) || defined(ARCH_X86_64)
+#    define unaligned16(a) (*(const uint16_t*)(a))
 #    define unaligned32(a) (*(const uint32_t*)(a))
+#    define unaligned64(a) (*(const uint64_t*)(a))
 #else
 #    ifdef __GNUC__
-static inline uint32_t unaligned32(const void *v) {
-    struct Unaligned {
-        uint32_t i;
-    } __attribute__((packed));
-
-    return ((const struct Unaligned *) v)->i;
+#    define unaligned(x)                                \
+static inline uint##x##_t unaligned##x(const void *v) { \
+    struct Unaligned {                                  \
+        uint##x##_t i;                                  \
+    } __attribute__((packed));                          \
+                                                        \
+    return ((const struct Unaligned *) v)->i;           \
 }
 #    elif defined(__DECC)
-static inline uint32_t unaligned32(const void *v) {
-    return *(const __unaligned uint32_t *) v;
+#    define unaligned(x)                                        \
+static inline uint##x##_t unaligned##x##(const void *v) {       \
+    return *(const __unaligned uint##x##_t *) v;                \
 }
 #    else
-static inline uint32_t unaligned32(const void *v) {
-    return *(const uint32_t *) v;
+#    define unaligned(x)                                        \
+static inline uint##x##_t unaligned##x##(const void *v) {       \
+    return *(const uint##x##_t *) v;                            \
 }
 #    endif
+unaligned(16)
+unaligned(32)
+unaligned(64)
+#undef unaligned
 #endif //!ARCH_X86
 
 #ifndef ALT_BITSTREAM_WRITER
@@ -168,9 +177,6 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
     unsigned int bit_buf;
     int bit_left;
 
-#ifdef STATS
-    st_out_bit_counts[st_current_index] += n;
-#endif
     //    printf("put_bits=%d %x\n", n, value);
     assert(n == 32 || value < (1U << n));
 
@@ -574,21 +580,15 @@ static inline int get_bits_count(GetBitContext *s){
  * @author BERO
  */
 static inline int get_xbits(GetBitContext *s, int n){
-    register int tmp;
+    register int sign;
     register int32_t cache;
     OPEN_READER(re, s)
     UPDATE_CACHE(re, s)
     cache = GET_CACHE(re,s);
-    if ((int32_t)cache<0) { //MSB=1
-        tmp = NEG_USR32(cache,n);
-    } else {
-    //   tmp = (-1<<n) | NEG_USR32(cache,n) + 1; mpeg12.c algo
-    //   tmp = - (NEG_USR32(cache,n) ^ ((1 << n) - 1)); h263.c algo
-        tmp = - NEG_USR32(~cache,n);
-    }
+    sign=(~cache)>>31;
     LAST_SKIP_BITS(re, s, n)
     CLOSE_READER(re, s)
-    return tmp;
+    return (NEG_USR32(sign ^ cache, n) ^ sign) - sign;
 }
 
 static inline int get_sbits(GetBitContext *s, int n){
@@ -790,20 +790,6 @@ void free_vlc(VLC *vlc);
     SKIP_BITS(name, gb, n)\
 }
 
-// deprecated, dont use get_vlc for new code, use get_vlc2 instead or use GET_VLC directly
-static inline int get_vlc(GetBitContext *s, VLC *vlc)
-{
-    int code;
-    VLC_TYPE (*table)[2]= vlc->table;
-
-    OPEN_READER(re, s)
-    UPDATE_CACHE(re, s)
-
-    GET_VLC(code, re, s, table, vlc->bits, 3)
-
-    CLOSE_READER(re, s)
-    return code;
-}
 
 /**
  * parses a vlc code, faster then get_vlc()

@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /**
@@ -46,16 +46,18 @@ void *av_malloc(unsigned int size)
 {
     void *ptr;
 #ifdef MEMALIGN_HACK
-    int diff;
+    long diff;
 #endif
 
-    /* lets disallow possible ambiguous cases */
-    if(size > INT_MAX)
+    /* let's disallow possible ambiguous cases */
+    if(size > (INT_MAX-16) )
         return NULL;
 
 #ifdef MEMALIGN_HACK
-    ptr = malloc(size+16+1);
-    diff= ((-(int)ptr - 1)&15) + 1;
+    ptr = malloc(size+16);
+    if(!ptr)
+        return ptr;
+    diff= ((-(long)ptr - 1)&15) + 1;
     ptr += diff;
     ((char*)ptr)[-1]= diff;
 #elif defined (HAVE_MEMALIGN)
@@ -103,12 +105,12 @@ void *av_realloc(void *ptr, unsigned int size)
     int diff;
 #endif
 
-    /* lets disallow possible ambiguous cases */
-    if(size > INT_MAX)
+    /* let's disallow possible ambiguous cases */
+    if(size > (INT_MAX-16) )
         return NULL;
 
 #ifdef MEMALIGN_HACK
-    //FIXME this isnt aligned correctly though it probably isnt needed
+    //FIXME this isn't aligned correctly, though it probably isn't needed
     if(!ptr) return av_malloc(size);
     diff= ((char*)ptr)[-1];
     return realloc(ptr - diff, size + diff) + diff;
@@ -117,7 +119,11 @@ void *av_realloc(void *ptr, unsigned int size)
 #endif
 }
 
-/* NOTE: ptr = NULL is explicetly allowed */
+/**
+ * Free memory which has been allocated with av_malloc(z)() or av_realloc().
+ * NOTE: ptr = NULL is explicetly allowed
+ * Note2: it is recommended that you use av_freep() instead
+ */
 void av_free(void *ptr)
 {
     /* XXX: this test should not be needed on most libcs */

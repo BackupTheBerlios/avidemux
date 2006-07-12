@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * gmc & q-pel & 32/64 bit based MC by Michael Niedermayer <michaelni@gmx.at>
  */
@@ -30,6 +30,7 @@
 #include "mpegvideo.h"
 #include "simple_idct.h"
 #include "faandct.h"
+#include "snow.h"
 
 /* snow.c */
 void ff_spatial_dwt(int *buffer, int width, int height, int stride, int type, int decomposition_count);
@@ -62,7 +63,7 @@ const uint8_t ff_zigzag248_direct[64] = {
 };
 
 /* not permutated inverse zigzag_direct + 1 for MMX quantizer */
-uint16_t __align8 inv_zigzag_direct16[64] = {0, };
+DECLARE_ALIGNED_8(uint16_t, inv_zigzag_direct16[64]) = {0, };
 
 const uint8_t ff_alternate_horizontal_scan[64] = {
     0,  1,   2,  3,  8,  9, 16, 17,
@@ -291,35 +292,34 @@ static int sse16_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 }
 
 
+#ifdef CONFIG_SNOW_ENCODER //dwt is in snow.c
 static inline int w_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int w, int h, int type){
-#ifdef CONFIG_SNOW_ENCODER //idwt is in snow.c
     int s, i, j;
     const int dec_count= w==8 ? 3 : 4;
-    int tmp[16*16];
-#if 0
+    int tmp[32*32];
     int level, ori;
     static const int scale[2][2][4][4]={
       {
         {
-            //8x8 dec=3
+            // 9/7 8x8 dec=3
             {268, 239, 239, 213},
             {  0, 224, 224, 152},
             {  0, 135, 135, 110},
         },{
-            //16x16 dec=4
+            // 9/7 16x16 or 32x32 dec=4
             {344, 310, 310, 280},
             {  0, 320, 320, 228},
             {  0, 175, 175, 136},
             {  0, 129, 129, 102},
         }
       },{
-        {//FIXME 5/3
-            //8x8 dec=3
+        {
+            // 5/3 8x8 dec=3
             {275, 245, 245, 218},
             {  0, 230, 230, 156},
             {  0, 138, 138, 113},
         },{
-            //16x16 dec=4
+            // 5/3 16x16 or 32x32 dec=4
             {352, 317, 317, 286},
             {  0, 328, 328, 233},
             {  0, 180, 180, 140},
@@ -327,29 +327,28 @@ static inline int w_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, in
         }
       }
     };
-#endif
 
     for (i = 0; i < h; i++) {
         for (j = 0; j < w; j+=4) {
-            tmp[16*i+j+0] = (pix1[j+0] - pix2[j+0])<<4;
-            tmp[16*i+j+1] = (pix1[j+1] - pix2[j+1])<<4;
-            tmp[16*i+j+2] = (pix1[j+2] - pix2[j+2])<<4;
-            tmp[16*i+j+3] = (pix1[j+3] - pix2[j+3])<<4;
+            tmp[32*i+j+0] = (pix1[j+0] - pix2[j+0])<<4;
+            tmp[32*i+j+1] = (pix1[j+1] - pix2[j+1])<<4;
+            tmp[32*i+j+2] = (pix1[j+2] - pix2[j+2])<<4;
+            tmp[32*i+j+3] = (pix1[j+3] - pix2[j+3])<<4;
         }
         pix1 += line_size;
         pix2 += line_size;
     }
 
-    ff_spatial_dwt(tmp, w, h, 16, type, dec_count);
+    ff_spatial_dwt(tmp, w, h, 32, type, dec_count);
 
     s=0;
-#if 0
+    assert(w==h);
     for(level=0; level<dec_count; level++){
         for(ori= level ? 1 : 0; ori<4; ori++){
-            int sx= (ori&1) ? 1<<level: 0;
-            int stride= 16<<(dec_count-level);
+            int size= w>>(dec_count-level);
+            int sx= (ori&1) ? size : 0;
+            int stride= 32<<(dec_count-level);
             int sy= (ori&2) ? stride>>1 : 0;
-            int size= 1<<level;
 
             for(i=0; i<size; i++){
                 for(j=0; j<size; j++){
@@ -359,19 +358,8 @@ static inline int w_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, in
             }
         }
     }
-#endif
-    for (i = 0; i < h; i++) {
-        for (j = 0; j < w; j+=4) {
-            s+= ABS(tmp[16*i+j+0]);
-            s+= ABS(tmp[16*i+j+1]);
-            s+= ABS(tmp[16*i+j+2]);
-            s+= ABS(tmp[16*i+j+3]);
-        }
-    }
     assert(s>=0);
-
-    return s>>2;
-#endif
+    return s>>9;
 }
 
 static int w53_8_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int h){
@@ -389,6 +377,15 @@ static int w53_16_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int 
 static int w97_16_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int h){
     return w_c(v, pix1, pix2, line_size, 16, h, 0);
 }
+
+int w53_32_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int h){
+    return w_c(v, pix1, pix2, line_size, 32, h, 1);
+}
+
+int w97_32_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int h){
+    return w_c(v, pix1, pix2, line_size, 32, h, 0);
+}
+#endif
 
 static void get_pixels_c(DCTELEM *restrict block, const uint8_t *pixels, int line_size)
 {
@@ -1143,7 +1140,7 @@ static void gmc1_c(uint8_t *dst, uint8_t *src, int stride, int h, int x16, int y
     }
 }
 
-static void gmc_c(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int oy,
+void ff_gmc_c(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int oy,
                   int dxx, int dxy, int dyx, int dyy, int shift, int r, int width, int height)
 {
     int y, vx, vy;
@@ -1486,6 +1483,17 @@ H264_CHROMA_MC(put_       , op_put)
 H264_CHROMA_MC(avg_       , op_avg)
 #undef op_avg
 #undef op_put
+
+static inline void copy_block2(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h)
+{
+    int i;
+    for(i=0; i<h; i++)
+    {
+        ST16(dst   , LD16(src   ));
+        dst+=dstStride;
+        src+=srcStride;
+    }
+}
 
 static inline void copy_block4(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int h)
 {
@@ -2052,6 +2060,68 @@ QPEL_MC(0, avg_       , _       , op_avg)
 
 #if 1
 #define H264_LOWPASS(OPNAME, OP, OP2) \
+static void OPNAME ## h264_qpel2_h_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
+    const int h=2;\
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;\
+    int i;\
+    for(i=0; i<h; i++)\
+    {\
+        OP(dst[0], (src[0]+src[1])*20 - (src[-1]+src[2])*5 + (src[-2]+src[3]));\
+        OP(dst[1], (src[1]+src[2])*20 - (src[0 ]+src[3])*5 + (src[-1]+src[4]));\
+        dst+=dstStride;\
+        src+=srcStride;\
+    }\
+}\
+\
+static void OPNAME ## h264_qpel2_v_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
+    const int w=2;\
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;\
+    int i;\
+    for(i=0; i<w; i++)\
+    {\
+        const int srcB= src[-2*srcStride];\
+        const int srcA= src[-1*srcStride];\
+        const int src0= src[0 *srcStride];\
+        const int src1= src[1 *srcStride];\
+        const int src2= src[2 *srcStride];\
+        const int src3= src[3 *srcStride];\
+        const int src4= src[4 *srcStride];\
+        OP(dst[0*dstStride], (src0+src1)*20 - (srcA+src2)*5 + (srcB+src3));\
+        OP(dst[1*dstStride], (src1+src2)*20 - (src0+src3)*5 + (srcA+src4));\
+        dst++;\
+        src++;\
+    }\
+}\
+\
+static void OPNAME ## h264_qpel2_hv_lowpass(uint8_t *dst, int16_t *tmp, uint8_t *src, int dstStride, int tmpStride, int srcStride){\
+    const int h=2;\
+    const int w=2;\
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;\
+    int i;\
+    src -= 2*srcStride;\
+    for(i=0; i<h+5; i++)\
+    {\
+        tmp[0]= (src[0]+src[1])*20 - (src[-1]+src[2])*5 + (src[-2]+src[3]);\
+        tmp[1]= (src[1]+src[2])*20 - (src[0 ]+src[3])*5 + (src[-1]+src[4]);\
+        tmp+=tmpStride;\
+        src+=srcStride;\
+    }\
+    tmp -= tmpStride*(h+5-2);\
+    for(i=0; i<w; i++)\
+    {\
+        const int tmpB= tmp[-2*tmpStride];\
+        const int tmpA= tmp[-1*tmpStride];\
+        const int tmp0= tmp[0 *tmpStride];\
+        const int tmp1= tmp[1 *tmpStride];\
+        const int tmp2= tmp[2 *tmpStride];\
+        const int tmp3= tmp[3 *tmpStride];\
+        const int tmp4= tmp[4 *tmpStride];\
+        OP2(dst[0*dstStride], (tmp0+tmp1)*20 - (tmpA+tmp2)*5 + (tmpB+tmp3));\
+        OP2(dst[1*dstStride], (tmp1+tmp2)*20 - (tmp0+tmp3)*5 + (tmpA+tmp4));\
+        dst++;\
+        tmp++;\
+    }\
+}\
 static void OPNAME ## h264_qpel4_h_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride){\
     const int h=4;\
     uint8_t *cm = cropTbl + MAX_NEG_CROP;\
@@ -2398,6 +2468,7 @@ static void OPNAME ## h264_qpel ## SIZE ## _mc32_c(uint8_t *dst, uint8_t *src, i
 
 H264_LOWPASS(put_       , op_put, op2_put)
 H264_LOWPASS(avg_       , op_avg, op2_avg)
+H264_MC(put_, 2)
 H264_MC(put_, 4)
 H264_MC(put_, 8)
 H264_MC(put_, 16)
@@ -2415,7 +2486,7 @@ H264_MC(avg_, 16)
 #define op_scale2(x)  dst[x] = clip_uint8( (src[x]*weights + dst[x]*weightd + offset) >> (log2_denom+1))
 #define H264_WEIGHT(W,H) \
 static void weight_h264_pixels ## W ## x ## H ## _c(uint8_t *block, int stride, int log2_denom, int weight, int offset){ \
-    int attribute_unused x, y; \
+    int y; \
     offset <<= log2_denom; \
     if(log2_denom) offset += 1<<(log2_denom-1); \
     for(y=0; y<H; y++, block += stride){ \
@@ -2440,10 +2511,9 @@ static void weight_h264_pixels ## W ## x ## H ## _c(uint8_t *block, int stride, 
         op_scale1(15); \
     } \
 } \
-static void biweight_h264_pixels ## W ## x ## H ## _c(uint8_t *dst, uint8_t *src, int stride, int log2_denom, int weightd, int weights, int offsetd, int offsets){ \
-    int attribute_unused x, y; \
-    int offset = (offsets + offsetd + 1) >> 1; \
-    offset = ((offset << 1) + 1) << log2_denom; \
+static void biweight_h264_pixels ## W ## x ## H ## _c(uint8_t *dst, uint8_t *src, int stride, int log2_denom, int weightd, int weights, int offset){ \
+    int y; \
+    offset = ((offset + 1) | 1) << log2_denom; \
     for(y=0; y<H; y++, dst += stride, src += stride){ \
         op_scale2(0); \
         op_scale2(1); \
@@ -2499,6 +2569,24 @@ static void wmv2_mspel8_h_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int
         src+=srcStride;
     }
 }
+
+#ifdef CONFIG_CAVS_DECODER
+/* AVS specific */
+void ff_cavsdsp_init(DSPContext* c, AVCodecContext *avctx);
+
+void ff_put_cavs_qpel8_mc00_c(uint8_t *dst, uint8_t *src, int stride) {
+    put_pixels8_c(dst, src, stride, 8);
+}
+void ff_avg_cavs_qpel8_mc00_c(uint8_t *dst, uint8_t *src, int stride) {
+    avg_pixels8_c(dst, src, stride, 8);
+}
+void ff_put_cavs_qpel16_mc00_c(uint8_t *dst, uint8_t *src, int stride) {
+    put_pixels16_c(dst, src, stride, 16);
+}
+void ff_avg_cavs_qpel16_mc00_c(uint8_t *dst, uint8_t *src, int stride) {
+    avg_pixels16_c(dst, src, stride, 16);
+}
+#endif /* CONFIG_CAVS_DECODER */
 
 static void wmv2_mspel8_v_lowpass(uint8_t *dst, uint8_t *src, int dstStride, int srcStride, int w){
     uint8_t *cm = cropTbl + MAX_NEG_CROP;
@@ -3115,6 +3203,9 @@ void ff_set_cmp(DSPContext* c, me_cmp_func *cmp, int type){
         case FF_CMP_DCT:
             cmp[i]= c->dct_sad[i];
             break;
+        case FF_CMP_DCT264:
+            cmp[i]= c->dct264_sad[i];
+            break;
         case FF_CMP_DCTMAX:
             cmp[i]= c->dct_max[i];
             break;
@@ -3139,12 +3230,14 @@ void ff_set_cmp(DSPContext* c, me_cmp_func *cmp, int type){
         case FF_CMP_NSSE:
             cmp[i]= c->nsse[i];
             break;
+#ifdef CONFIG_SNOW_ENCODER
         case FF_CMP_W53:
             cmp[i]= c->w53[i];
             break;
         case FF_CMP_W97:
             cmp[i]= c->w97[i];
             break;
+#endif
         default:
             av_log(NULL, AV_LOG_ERROR,"internal error in cmp function selection\n");
         }
@@ -3326,7 +3419,7 @@ static int hadamard8_intra8x8_c(/*MpegEncContext*/ void *s, uint8_t *src, uint8_
 
 static int dct_sad8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
-    uint64_t __align8 aligned_temp[sizeof(DCTELEM)*64/8];
+    DECLARE_ALIGNED_8(uint64_t, aligned_temp[sizeof(DCTELEM)*64/8]);
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     int sum=0, i;
 
@@ -3341,9 +3434,62 @@ static int dct_sad8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2
     return sum;
 }
 
+#ifdef CONFIG_GPL
+#define DCT8_1D {\
+    const int s07 = SRC(0) + SRC(7);\
+    const int s16 = SRC(1) + SRC(6);\
+    const int s25 = SRC(2) + SRC(5);\
+    const int s34 = SRC(3) + SRC(4);\
+    const int a0 = s07 + s34;\
+    const int a1 = s16 + s25;\
+    const int a2 = s07 - s34;\
+    const int a3 = s16 - s25;\
+    const int d07 = SRC(0) - SRC(7);\
+    const int d16 = SRC(1) - SRC(6);\
+    const int d25 = SRC(2) - SRC(5);\
+    const int d34 = SRC(3) - SRC(4);\
+    const int a4 = d16 + d25 + (d07 + (d07>>1));\
+    const int a5 = d07 - d34 - (d25 + (d25>>1));\
+    const int a6 = d07 + d34 - (d16 + (d16>>1));\
+    const int a7 = d16 - d25 + (d34 + (d34>>1));\
+    DST(0,  a0 + a1     ) ;\
+    DST(1,  a4 + (a7>>2)) ;\
+    DST(2,  a2 + (a3>>1)) ;\
+    DST(3,  a5 + (a6>>2)) ;\
+    DST(4,  a0 - a1     ) ;\
+    DST(5,  a6 - (a5>>2)) ;\
+    DST(6, (a2>>1) - a3 ) ;\
+    DST(7, (a4>>2) - a7 ) ;\
+}
+
+static int dct264_sad8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
+    MpegEncContext * const s= (MpegEncContext *)c;
+    int16_t dct[8][8];
+    int i;
+    int sum=0;
+
+    s->dsp.diff_pixels(dct, src1, src2, stride);
+
+#define SRC(x) dct[i][x]
+#define DST(x,v) dct[i][x]= v
+    for( i = 0; i < 8; i++ )
+        DCT8_1D
+#undef SRC
+#undef DST
+
+#define SRC(x) dct[x][i]
+#define DST(x,v) sum += ABS(v)
+    for( i = 0; i < 8; i++ )
+        DCT8_1D
+#undef SRC
+#undef DST
+    return sum;
+}
+#endif
+
 static int dct_max8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
-    uint64_t __align8 aligned_temp[sizeof(DCTELEM)*64/8];
+    DECLARE_ALIGNED_8(uint64_t, aligned_temp[sizeof(DCTELEM)*64/8]);
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     int sum=0, i;
 
@@ -3362,7 +3508,7 @@ void simple_idct(DCTELEM *block); //FIXME
 
 static int quant_psnr8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
-    uint64_t __align8 aligned_temp[sizeof(DCTELEM)*64*2/8];
+    DECLARE_ALIGNED_8 (uint64_t, aligned_temp[sizeof(DCTELEM)*64*2/8]);
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     DCTELEM * const bak = ((DCTELEM*)aligned_temp)+64;
     int sum=0, i;
@@ -3387,8 +3533,8 @@ static int quant_psnr8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *s
 static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
     const uint8_t *scantable= s->intra_scantable.permutated;
-    uint64_t __align8 aligned_temp[sizeof(DCTELEM)*64/8];
-    uint64_t __align8 aligned_bak[stride];
+    DECLARE_ALIGNED_8 (uint64_t, aligned_temp[sizeof(DCTELEM)*64/8]);
+    DECLARE_ALIGNED_8 (uint64_t, aligned_bak[stride]);
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     uint8_t * const bak= (uint8_t*)aligned_bak;
     int i, last, run, bits, level, distoration, start_i;
@@ -3466,7 +3612,7 @@ static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int
 static int bit8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
     const uint8_t *scantable= s->intra_scantable.permutated;
-    uint64_t __align8 aligned_temp[sizeof(DCTELEM)*64/8];
+    DECLARE_ALIGNED_8 (uint64_t, aligned_temp[sizeof(DCTELEM)*64/8]);
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     int i, last, run, bits, level, start_i;
     const int esc_length= s->ac_esc_length;
@@ -3587,6 +3733,9 @@ static int vsse16_c(/*MpegEncContext*/ void *c, uint8_t *s1, uint8_t *s2, int st
 WARPER8_16_SQ(hadamard8_diff8x8_c, hadamard8_diff16_c)
 WARPER8_16_SQ(hadamard8_intra8x8_c, hadamard8_intra16_c)
 WARPER8_16_SQ(dct_sad8x8_c, dct_sad16_c)
+#ifdef CONFIG_GPL
+WARPER8_16_SQ(dct264_sad8x8_c, dct264_sad16_c)
+#endif
 WARPER8_16_SQ(dct_max8x8_c, dct_max16_c)
 WARPER8_16_SQ(quant_psnr8x8_c, quant_psnr16_c)
 WARPER8_16_SQ(rd8x8_c, rd16_c)
@@ -3639,6 +3788,8 @@ static void ff_jref_idct1_add(uint8_t *dest, int line_size, DCTELEM *block)
 
     dest[0] = cm[dest[0] + ((block[0] + 4)>>3)];
 }
+
+static void just_return() { return; }
 
 /* init static data */
 void dsputil_static_init(void)
@@ -3719,6 +3870,8 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 
     c->h264_idct_add= ff_h264_idct_add_c;
     c->h264_idct8_add= ff_h264_idct8_add_c;
+    c->h264_idct_dc_add= ff_h264_idct_dc_add_c;
+    c->h264_idct8_dc_add= ff_h264_idct8_dc_add_c;
 
     c->get_pixels = get_pixels_c;
     c->diff_pixels = diff_pixels_c;
@@ -3728,7 +3881,7 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->add_pixels8 = add_pixels8_c;
     c->add_pixels4 = add_pixels4_c;
     c->gmc1 = gmc1_c;
-    c->gmc = gmc_c;
+    c->gmc = ff_gmc_c;
     c->clear_blocks = clear_blocks_c;
     c->pix_sum = pix_sum_c;
     c->pix_norm1 = pix_norm1_c;
@@ -3820,6 +3973,7 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     dspfunc(put_h264_qpel, 0, 16);
     dspfunc(put_h264_qpel, 1, 8);
     dspfunc(put_h264_qpel, 2, 4);
+    dspfunc(put_h264_qpel, 3, 2);
     dspfunc(avg_h264_qpel, 0, 16);
     dspfunc(avg_h264_qpel, 1, 8);
     dspfunc(avg_h264_qpel, 2, 4);
@@ -3853,6 +4007,10 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->biweight_h264_pixels_tab[8]= biweight_h264_pixels2x4_c;
     c->biweight_h264_pixels_tab[9]= biweight_h264_pixels2x2_c;
 
+#ifdef CONFIG_CAVS_DECODER
+    ff_cavsdsp_init(c,avctx);
+#endif
+
     c->put_mspel_pixels_tab[0]= put_mspel8_mc00_c;
     c->put_mspel_pixels_tab[1]= put_mspel8_mc10_c;
     c->put_mspel_pixels_tab[2]= put_mspel8_mc20_c;
@@ -3870,6 +4028,9 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->hadamard8_diff[4]= hadamard8_intra16_c;
     SET_CMP_FUNC(dct_sad)
     SET_CMP_FUNC(dct_max)
+#ifdef CONFIG_GPL
+    SET_CMP_FUNC(dct264_sad)
+#endif
     c->sad[0]= pix_abs16_c;
     c->sad[1]= pix_abs8_c;
     c->sse[0]= sse16_c;
@@ -3884,10 +4045,12 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->vsse[4]= vsse_intra16_c;
     c->nsse[0]= nsse16_c;
     c->nsse[1]= nsse8_c;
+#ifdef CONFIG_SNOW_ENCODER
     c->w53[0]= w53_16_c;
     c->w53[1]= w53_8_c;
     c->w97[0]= w97_16_c;
     c->w97[1]= w97_8_c;
+#endif
 
     c->add_bytes= add_bytes_c;
     c->diff_bytes= diff_bytes_c;
@@ -3908,6 +4071,19 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 
     c->try_8x8basis= try_8x8basis_c;
     c->add_8x8basis= add_8x8basis_c;
+
+#ifdef CONFIG_SNOW_ENCODER
+    c->vertical_compose97i = ff_snow_vertical_compose97i;
+    c->horizontal_compose97i = ff_snow_horizontal_compose97i;
+    c->inner_add_yblock = ff_snow_inner_add_yblock;
+#endif
+
+    c->shrink[0]= ff_img_copy_plane;
+    c->shrink[1]= ff_shrink22;
+    c->shrink[2]= ff_shrink44;
+    c->shrink[3]= ff_shrink88;
+
+    c->prefetch= just_return;
 
 #ifdef HAVE_MMX
     dsputil_init_mmx(c, avctx);

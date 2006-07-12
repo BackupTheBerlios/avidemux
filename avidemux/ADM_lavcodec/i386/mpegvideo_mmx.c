@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * Optimized for ia32 cpus by Nick Kurshev <nickols_k@mail.ru>
  * h263, mpeg1, mpeg2 dequantizer & draw_edges by Michael Niedermayer <michaelni@gmx.at>
@@ -23,7 +23,7 @@
 #include "../dsputil.h"
 #include "../mpegvideo.h"
 #include "../avcodec.h"
-#include "mmx.h"
+#include "x86_cpu.h"
 
 extern uint8_t zigzag_direct_noperm[64];
 extern uint16_t inv_zigzag_direct16[64];
@@ -699,7 +699,8 @@ void MPV_common_init_mmx(MpegEncContext *s)
         s->dct_unquantize_h263_inter = dct_unquantize_h263_inter_mmx;
         s->dct_unquantize_mpeg1_intra = dct_unquantize_mpeg1_intra_mmx;
         s->dct_unquantize_mpeg1_inter = dct_unquantize_mpeg1_inter_mmx;
-        s->dct_unquantize_mpeg2_intra = dct_unquantize_mpeg2_intra_mmx;
+        if(!(s->flags & CODEC_FLAG_BITEXACT))
+            s->dct_unquantize_mpeg2_intra = dct_unquantize_mpeg2_intra_mmx;
         s->dct_unquantize_mpeg2_inter = dct_unquantize_mpeg2_inter_mmx;
 
         draw_edges = draw_edges_mmx;

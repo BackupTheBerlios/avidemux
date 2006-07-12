@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
 /**
@@ -69,7 +69,7 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 ...
 */
 
-//Changelog: use the CVS log
+//Changelog: use the Subversion log
 
 #include "config.h"
 #include <inttypes.h>
@@ -161,7 +161,7 @@ static struct PPFilter filters[]=
         {NULL, NULL,0,0,0,0} //End Marker
 };
 
-static char *replaceTable[]=
+static const char *replaceTable[]=
 {
         "default",      "hdeblock:a,vdeblock:a,dering:a",
         "de",           "hdeblock:a,vdeblock:a,dering:a",
@@ -759,14 +759,15 @@ char *pp_help=
 "vb:a/hb:a/lb                                   de,-vb\n"
 "more examples:\n"
 "tn:64:128:256\n"
+"\n"
 ;
 
 pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
 {
         char temp[GET_MODE_BUFFER_SIZE];
         char *p= temp;
-        char *filterDelimiters= ",/";
-        char *optionDelimiters= ":";
+        const char *filterDelimiters= ",/";
+        const char *optionDelimiters= ":";
         struct PPMode *ppMode;
         char *filterToken;
 

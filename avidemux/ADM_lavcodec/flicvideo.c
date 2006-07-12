@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
 
@@ -415,7 +415,7 @@ static int flic_decode_frame_8BPP(AVCodecContext *avctx,
     return buf_size;
 }
 
-int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
+static int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
                                       void *data, int *data_size,
                                       uint8_t *buf, int buf_size)
 {

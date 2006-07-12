@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
 
@@ -110,7 +110,7 @@ void ff_build_rac_states(RangeCoder *c, int factor, int max_p){
         c->one_state[    i]=     p8;
     }
 
-    for(i=0; i<256; i++)
+    for(i=1; i<255; i++)
         c->zero_state[i]= 256-c->one_state[256-i];
 #if 0
     for(i=0; i<256; i++)
