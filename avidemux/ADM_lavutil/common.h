@@ -6,16 +6,12 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#if defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
-#    define CONFIG_WIN32
-#endif
-
-#if defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(EMULATE_INTTYPES)
-#    define EMULATE_INTTYPES
-#endif
-
 #ifndef M_PI
 #define M_PI    3.14159265358979323846
+#endif
+
+#if ( defined(__PIC__) || defined(__pic__) ) && ! defined(PIC)
+#    define PIC
 #endif
 
 #ifdef HAVE_AV_CONFIG_H
@@ -99,7 +95,7 @@
     typedef unsigned short uint16_t;
     typedef unsigned int   uint32_t;
 
-#   ifdef CONFIG_WIN32
+#   ifdef __MINGW32__
         typedef signed __int64   int64_t;
         typedef unsigned __int64 uint64_t;
 #   else /* other OS */
@@ -140,6 +136,18 @@
 #define INT16_MAX       0x7fff
 #endif
 
+#ifndef INT32_MIN
+#define INT32_MIN       (-0x7fffffff-1)
+#endif
+
+#ifndef INT32_MAX
+#define INT32_MAX       0x7fffffff
+#endif
+
+#ifndef UINT32_MAX
+#define UINT32_MAX      0xffffffff
+#endif
+
 #ifndef INT64_MIN
 #define INT64_MIN       (-0x7fffffffffffffffLL-1)
 #endif
@@ -170,13 +178,7 @@ typedef uint64_t      uint_fast64_t;
 #    endif
 #endif
 
-#if defined(CONFIG_OS2) || defined(CONFIG_SUNOS)
-static inline float floorf(float f) {
-    return floor(f);
-}
-#endif
-
-#ifdef CONFIG_WIN32
+#ifdef __MINGW32__
 
 /* windows */
 
@@ -200,9 +202,14 @@ static inline float floorf(float f) {
 
 #        define snprintf _snprintf
 #        define vsnprintf _vsnprintf
+
+#        ifdef CONFIG_WINCE
+#            define perror(a)
+#        endif
+
 #    endif
 
-/* CONFIG_WIN32 end */
+/* __MINGW32__ end */
 #elif defined (CONFIG_OS2)
 /* OS/2 EMX */
 
@@ -238,9 +245,16 @@ static inline float floorf(float f) {
 #        endif
 #    endif /* HAVE_AV_CONFIG_H */
 
-#endif /* !CONFIG_WIN32 && !CONFIG_OS2 */
+#endif /* !__MINGW32__ && !CONFIG_OS2 */
 
 #ifdef HAVE_AV_CONFIG_H
+
+#if defined(__MINGW32__) && !defined(BUILD_AVUTIL) && defined(BUILD_SHARED_AV)
+#  define FF_IMPORT_ATTR __declspec(dllimport)
+#else
+#  define FF_IMPORT_ATTR
+#endif
+
 
 #    include "bswap.h"
 
@@ -255,6 +269,8 @@ static inline float floorf(float f) {
 #    else
 #        if defined(ARCH_X86_64) && defined(PIC)
 #            define MANGLE(a) #a"(%%rip)"
+#        elif defined(CONFIG_DARWIN)
+#            define MANGLE(a) "_" #a
 #        else
 #            define MANGLE(a) #a
 #        endif
@@ -262,25 +278,21 @@ static inline float floorf(float f) {
 
 /* debug stuff */
 
-#    ifndef DEBUG
+#    if !defined(DEBUG) && !defined(NDEBUG)
 #        define NDEBUG
 #    endif
 #    include <assert.h>
 
 /* dprintf macros */
-#    if defined(CONFIG_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
-
-inline void dprintf(const char* fmt,...) {}
-
+#    ifdef DEBUG
+#        define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, __VA_ARGS__)
 #    else
+#        define dprintf(fmt,...)
+#    endif
 
-#        ifdef DEBUG
-#            define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, __VA_ARGS__)
-#        else
-#            define dprintf(fmt,...)
-#        endif
-
-#    endif /* !CONFIG_WIN32 */
+#    ifdef CONFIG_WINCE
+#            define abort()
+#    endif
 
 #    define av_abort()      do { av_log(NULL, AV_LOG_ERROR, "Abort at %s:%d\n", __FILE__, __LINE__); abort(); } while (0)
 
@@ -312,32 +324,8 @@ extern const uint32_t inverse[256];
 #    define FASTDIV(a,b)   ((a)/(b))
 #endif
 
-/* define it to include statistics code (useful only for optimizing
-   codec efficiency */
-//#define STATS
-
-#ifdef STATS
-
-enum {
-    ST_UNKNOWN,
-    ST_DC,
-    ST_INTRA_AC,
-    ST_INTER_AC,
-    ST_INTRA_MB,
-    ST_INTER_MB,
-    ST_MV,
-    ST_NB,
-};
-
-extern int st_current_index;
-extern unsigned int st_bit_counts[ST_NB];
-extern unsigned int st_out_bit_counts[ST_NB];
-
-void print_stats(void);
-#endif
-
 /* misc math functions */
-extern const uint8_t ff_log2_tab[256];
+extern FF_IMPORT_ATTR const uint8_t ff_log2_tab[256];
 
 static inline int av_log2(unsigned int v)
 {
@@ -398,24 +386,33 @@ static inline int mid_pred(int a, int b, int c)
 #endif
 }
 
+/**
+ * clip a signed integer value into the amin-amax range
+ * @param a value to clip
+ * @param amin minimum value of the clip range
+ * @param amax maximum value of the clip range
+ * @return cliped value
+ */
 static inline int clip(int a, int amin, int amax)
 {
-    if (a < amin)
-        return amin;
-    else if (a > amax)
-        return amax;
-    else
-        return a;
+    if (a < amin)      return amin;
+    else if (a > amax) return amax;
+    else               return a;
 }
 
-static inline int clip_uint8(int a)
+/**
+ * clip a signed integer value into the 0-255 range
+ * @param a value to clip
+ * @return cliped value
+ */
+static inline uint8_t clip_uint8(int a)
 {
     if (a&(~255)) return (-a)>>31;
     else          return a;
 }
 
 /* math */
-extern const uint8_t ff_sqrt_tab[128];
+extern FF_IMPORT_ATTR const uint8_t ff_sqrt_tab[128];
 
 int64_t ff_gcd(int64_t a, int64_t b);
 
@@ -464,6 +461,20 @@ static inline int ff_get_fourcc(const char *s){
             level= (level^mask)-mask;
 #endif
 
+#define GET_UTF8(val, GET_BYTE, ERROR)\
+    val= GET_BYTE;\
+    {\
+        int ones= 7 - av_log2(val ^ 255);\
+        if(ones==1)\
+            ERROR\
+        val&= 127>>ones;\
+        while(--ones > 0){\
+            int tmp= GET_BYTE - 128;\
+            if(tmp>>6)\
+                ERROR\
+            val= (val<<6) + tmp;\
+        }\
+    }
 
 #if __CPU__ >= 686 && !defined(RUNTIME_CPUDETECT)
 #define COPY3_IF_LT(x,y,a,b,c,d)\
@@ -577,7 +588,7 @@ tend= read_time();\
 /* btw, rintf() is existing on fbsd too -- alex */
 static always_inline long int lrintf(float x)
 {
-#ifdef CONFIG_WIN32
+#ifdef __MINGW32__
 #  ifdef ARCH_X86
     int32_t i;
     asm volatile(
@@ -591,7 +602,7 @@ static always_inline long int lrintf(float x)
 #  endif /* ARCH_X86 */
 #else
     return (int)(rint(x));
-#endif /* CONFIG_WIN32 */
+#endif /* __MINGW32__ */
 }
 #else
 #ifndef _ISOC9X_SOURCE

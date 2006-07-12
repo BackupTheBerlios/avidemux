@@ -4,7 +4,7 @@ noinst_LIBRARIES = libADM_lavutil.a
 
 libADM_lavutil_a_METASOURCES = AUTO
 
-libADM_lavutil_a_SOURCES =  eval.c  integer.c  intfloat_readwrite.c  mathematics.c  rational.c
+libADM_lavutil_a_SOURCES =    integer.c  intfloat_readwrite.c  mathematics.c  rational.c md5.c crc.c
 
 
 EXTRA_DIST = 
