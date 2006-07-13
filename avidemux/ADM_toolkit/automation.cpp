@@ -151,7 +151,7 @@ typedef struct AUTOMATON
 
 AUTOMATON reaction_table[]=
 {	
-		
+                {"gui",		        0,"don't be in silent mode",		(one_arg_type)GUI_Verbose}   ,
 		{"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
 		{"run",			1,"load and run a script",		(one_arg_type)A_parseECMAScript},
 		{"audio-normalize",	1,"activate normalization",		call_normalize},
