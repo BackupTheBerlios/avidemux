@@ -112,8 +112,6 @@ int ret=0;
     _wavheader->bitspersample=0;
 
     _chunk=samples_input;
-    _in = new float [_chunk];
-    ADM_assert(_in);
 
 
     printf("[Faac] Initialized :\n");

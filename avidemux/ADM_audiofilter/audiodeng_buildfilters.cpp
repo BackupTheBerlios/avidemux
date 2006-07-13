@@ -29,26 +29,12 @@
 #include "audioprocess.hxx"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_audiofilter/audioeng_film2pal.h"
-
 
 
 #include "ADM_audiofilter/audioencoder.h"
-#ifdef USE_FAAC
-#include "ADM_audiofilter/audioencoder_faac.h"
-#endif
-#include "ADM_audiofilter/audioencoder_lame_param.h"
-#include "ADM_audiofilter/audioencoder_twolame_param.h"
-#include "ADM_audiofilter/audioencoder_faac_param.h"
-#ifdef HAVE_LIBMP3LAME
-	#include "lame/lame.h"
-#endif
-
-#include "gui_action.hxx"
 /*
   	Ugly should get ride of it. Temporary fix.
 */
-#include "avi_vars.h"
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
 
 #include "prefs.h"
@@ -63,6 +49,7 @@
 
 #define MODULE_NAME MODULE_AUDIO_FILTER
 #include "ADM_toolkit/ADM_debug.h"
+
 extern void UI_setAProcessToggleStatus( uint8_t status );
 extern uint8_t DIA_audioCodec( AUDIOENCODER *codec );
 extern int DIA_audioEncoder(int *pmode, int *pbitrate,const char *title);
@@ -111,11 +98,7 @@ static Mixer_String Mixer_strings[]=
 
 
 
-extern int DIA_getLameSettings(int *pmode, int *pbitrate,ADM_LAME_PRESET *preset);
-extern int DIA_getVorbisSettings(int *pbitrate, int *mode);
 extern void UI_PrintCurrentACodec( const char *s);
-
-
 
 AUDIOENCODER  activeAudioEncoder=  AUDIOENC_NONE;
 /*----------------------------------*/
@@ -123,13 +106,10 @@ int  audioNormalizeMode = 0;
 int  audioFreq=48000;
 int  audioDRC = 0;
 FILMCONV audioFilmConv=FILMCONV_NONE;
-
 RESAMPLING  audioResampleMode = RESAMPLING_NONE;
-int audioMP3mode = 0;
-int audioMP3bitrate = 128;
-static ADM_LAME_PRESET audioMP3preset=ADM_LAME_PRESET_CBR;
 CHANNEL_CONF audioMixing=CHANNEL_INVALID;
 // These are globals for the moment
+//************************************
 int 	   audioShift = 0;
 int	   audioDelay=0;
 //**********
@@ -219,10 +199,6 @@ FILMCONV audioGetFpsConv(void)
         return audioFilmConv;
 }
 
-uint32_t audioGetBitrate(void)
-{
-        return audioMP3bitrate;
-} 
 /*----------------------------------*/
 //
 
@@ -299,10 +275,6 @@ void audioFilterResample(uint32_t onoff)
 
 } 
 //______________________________
-void audioFilter_SetBitrate( int i)
-{
-	audioMP3bitrate=i;
-}
 #include "ADM_gui2/GUI_ui.h"
 extern  int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
   			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv,CHANNEL_CONF *channel);
@@ -465,22 +437,5 @@ void audioSetResample(uint32_t fq)
 
 	audioResampleMode=RESAMPLING_CUSTOM;
 	audioFreq=fq;
-}
-uint8_t audioLamePreset(const char *name)
-{
-#ifdef HAVE_LIBMP3LAME
-int nb=sizeof(presetDefinition)/sizeof(ADM_PRESET_DEFINITION);
-        for(int i=0;i<nb;i++)   
-        {
-                if(!strcasecmp(presetDefinition[i].name,name))
-                        {
-                           audioMP3preset=    presetDefinition[i].preset;
-                           return 1; 
-                        }
-        }
-//
-        printf("AudioLame : Unknown preset  :%s\n",name);
-#endif
-        return 0;
 }
 

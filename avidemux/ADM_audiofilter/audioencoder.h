@@ -32,13 +32,14 @@ typedef struct ADM_audioEncoderDescriptor
 
 */
  //_____________________________________________
-class AUDMEncoder : public AVDMBufferedAudioStream
+class AUDMEncoder : public AVDMGenericAudioStream
 {
   protected:
     //
     uint32_t grab(uint8_t *outbuffer);
     uint32_t grab(float *outbuffer) {ADM_assert(0);return 1;}
     uint32_t  eof_met;
+    uint32_t  _chunk;
     //
     uint8_t         *_extraData;
     uint32_t        _extraSize;
@@ -60,6 +61,7 @@ class AUDMEncoder : public AVDMBufferedAudioStream
     virtual uint8_t getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)=0;
     virtual uint8_t packetPerFrame( void) {return 1;}
     virtual uint8_t extraData(uint32_t *l,uint8_t **d) {*l=_extraSize;*d=_extraData;return 1;}
+            uint8_t  goTo(uint32_t timeMS) {ADM_assert(0);return 1;}
 };
 
 #endif

@@ -42,7 +42,7 @@
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-#include "ADM_audiofilter/audioeng_film2pal.h"
+
 
 #include "ADM_filter/video_filters.h"
 
@@ -106,7 +106,7 @@ void prepare( void )
 	aviInfo info;
 	char string[200];
 	 uint16_t mm,hh,ss,ms;
-	 AVDMProcessAudioStream *stream;
+         AVDMGenericAudioStream *stream;
 	 
 	 if(frameStart<frameEnd) numberOfVideoFrames=frameEnd-frameStart;
 	 else			 numberOfVideoFrames=frameStart-frameEnd;
@@ -132,8 +132,7 @@ void prepare( void )
 	track1=0;
 	if(audioProcessMode() && currentaudiostream)
 	{
-		stream=buildAudioFilter(currentaudiostream,
-				0, 0xffffffff);
+		stream=buildAudioFilter(currentaudiostream,0, 0xffffffff);
 	
 		if(stream)
 		{

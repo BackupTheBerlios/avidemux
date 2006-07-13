@@ -23,177 +23,44 @@
 #define MINUS_ONE 0xffffffff
 #define PROCESS_BUFFER_SIZE 48000*4*4 // should be enougth
 #define MINIMUM_BUFFER   8192*4
-//_______________________________________
-//_______________________________________
-class AVDMProcessAudioStream : public AVDMGenericAudioStream
+/*! Base class for chained action. This class is derivated from AVDMGenericAudioStream and has two
+    specificities :
+        1- All instances are meant to be chained to another instance of AVDMGenericAudioStream
+              A->B->C
+        2- They store both input & output so that you can ask for a specific number of bytes form them
+*/
+class AVDMBufferedAudioStream : public  AVDMGenericAudioStream
 {
-protected:
-       AVDMGenericAudioStream *_instream;
-
-
-public:
-
-        AVDMProcessAudioStream(AVDMGenericAudioStream *instream);
-	virtual uint8_t  preprocess( void );
-	virtual uint8_t  configure( void );
-//
-
-        virtual uint32_t read(uint32_t len,uint8_t *buffer)=0;
-        virtual uint8_t  goTo(uint32_t newoffset);
-        virtual uint8_t  goToTime(uint32_t newoffset);
-	virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer)=0;//deprecated
-	virtual uint32_t readDecompress(uint32_t len,float *buffer){return 0;}
-
-
-};
-class AVDMBufferedAudioStream : public  AVDMProcessAudioStream
-{
-	protected:
-		float _dither[256];
-		void dither16bit();
-
-		float *_in;
-		uint32_t _chunk;
-		uint32_t readChunk();
-
-		int16_t   _buffer[PROCESS_BUFFER_SIZE];
-		// uint32_t  	_bufferlen;
-
-		virtual uint32_t grab(uint8_t *outbuffer)=0;//deprecated
-		virtual uint32_t grab(float *outbuffer){return 0;}
-		uint32_t _headBuff,_tailBuff;
-
-	public:
-		AVDMBufferedAudioStream(AVDMGenericAudioStream *instream);
-		virtual ~AVDMBufferedAudioStream();
-
-		virtual uint8_t  preprocess( void ) {return 1;};
-		virtual uint8_t  configure( void )  { return 1;};
-
-		virtual uint32_t read(uint32_t len,uint8_t *buffer)=0;//deprecated
-		virtual uint32_t read(uint32_t len,float *buffer)=0;
-		virtual uint8_t  goTo(uint32_t newoffset);
-		virtual uint8_t  goToTime(uint32_t newoffset);
-		virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer) { return read(len,buffer); }//deprecated
-		virtual uint32_t readDecompress(uint32_t len,float *buffer) { return read(len,buffer); }
-};
-
-//_____________________________________________
-
-//_____________________________________________
-class AVDMProcessAudio_Null : public AVDMBufferedAudioStream
-{
-protected:
-				 uint32_t _served;
-         			uint32_t _start_time;
-         			uint32_t _size;
-        
-	
-public:
-						
-				~AVDMProcessAudio_Null();
-        			AVDMProcessAudio_Null(AVDMGenericAudioStream *instream
-						,uint32_t time_offset, uint32_t duration);
-       		virtual uint32_t 	grab(uint8_t *obuffer);//deprecated
-       		virtual uint32_t 	grab(float *obuffer);
-		virtual uint8_t  goToTime(uint32_t newoffset);
-     		
-};
-//_______________________________________________________________
-class AVDMProcessAudio_Resample : public AVDMBufferedAudioStream
-{
-protected:
-
-				 uint8_t 		_quality;
-
- 			  virtual uint32_t 	grab(uint8_t *obuffer);
-				void 							InitialSRC( void );
-				uint32_t  				DownKernel(uint8_t *out);
-
-public:
-						
-        AVDMProcessAudio_Resample(AVDMGenericAudioStream *instream,uint8_t qual);
-			  ~AVDMProcessAudio_Resample() { delete _wavheader;};    	     		
-};
-//_______________________________________________________________
-class AVDMProcessAudio_SoxResample : public AVDMBufferedAudioStream
-{
-protected:
-
-				
-	  uint32_t		_frequency;
-	  ResampleStruct	*_resamples;
-	  uint8_t		_pass;
-	  uint32_t		_head,_tail;
-	  virtual uint32_t 	grab(uint8_t *obuffer);
-	  
-
-public:
-						
-          AVDMProcessAudio_SoxResample(AVDMGenericAudioStream *instream,uint32_t  frequency);
-	  ~AVDMProcessAudio_SoxResample();  
-	   virtual uint8_t  goToTime(uint32_t newoffset);	     		
-};
-//_____________________________________________
-class AVDMProcessAudio_RawShift : public AVDMProcessAudioStream
-{
-protected:
-
-
-			
-        		 uint32_t  _starttime;		// actual start time
-			 int32_t   _msoff;		// copy of parameter
-			 uint8_t   _filterOn;		// filter active ?
-     			 uint32_t  _startoffset;
-			 uint32_t  _sampleOffset;
-
-
-		
-public:
-						
-				~AVDMProcessAudio_RawShift();
-        			AVDMProcessAudio_RawShift(AVDMGenericAudioStream *instream,
-					int32_t msoffset,
-					uint32_t starttime	);		 // offset in ms
-        	virtual uint32_t read(uint32_t len,uint8_t *buffer);
-		virtual uint8_t  goTo(uint32_t newoffset);
-		virtual uint8_t  goToTime(uint32_t newoffset);
-		virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer);
   
-		virtual uint8_t		isVBR(void ) { return _instream->isVBR();};
-		virtual uint8_t		extraData(uint32_t *l,uint8_t **d)
-					{
-						 return _instream->extraData(l,d);
-					}
-		virtual	uint8_t		getPacket(uint8_t *dest, uint32_t *len, 
-							uint32_t *samples);
-		   		
+        protected:
+                AVDMGenericAudioStream *_instream;
+                
+                /*! Used for int->float dithering */
+                float _dither[256];
+                /*! Used for int->float dithering */
+                void dither16bit();
+                /*! Used for int->float dithering */
+                float *_in;
+                /*! _chunk is the size of an elementary packed, depends on the codec used */
+                uint32_t _chunk;
+
+                
+                virtual uint32_t grab(uint8_t *outbuffer)=0;//deprecated
+                virtual uint32_t grab(float *outbuffer){return 0;}
+                uint32_t _headBuff,_tailBuff;
+
+        public:
+                        AVDMBufferedAudioStream(AVDMGenericAudioStream *instream);
+                virtual ~AVDMBufferedAudioStream();
+
+
+                virtual uint32_t read(uint32_t len,uint8_t *buffer)=0;//deprecated
+                virtual uint32_t read(uint32_t len,float *buffer)=0;
+                virtual uint8_t  goTo(uint32_t newoffset);
+                virtual uint8_t  goToTime(uint32_t newoffset);
+                virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer) { return read(len,buffer); }//deprecated
+                virtual uint32_t readDecompress(uint32_t len,float *buffer) { return read(len,buffer); }
 };
- //_____________________________________________
-class AVDMProcessAudio_TimeShift : public AVDMProcessAudioStream
-{
-protected:
 
-
-			
-         int32_t  _timeoffset;
-				 int32_t  _byteoffset;				
-				 int32_t  _outpos;
-
-		
-public:
-						
-				~AVDMProcessAudio_TimeShift();
-				/*uint8_t	initLame(uint32_t frequence,
-												 uint32_t mode,
-												 uint32_t bitrate);*/
-
-        AVDMProcessAudio_TimeShift(AVDMGenericAudioStream *instream,
-															int32_t msoffset	);		 // offset in ms
-        virtual uint32_t read(uint32_t len,uint8_t *buffer);
-				virtual uint8_t  goToTime(uint32_t newoffset);
-			  virtual uint32_t readDecompress(uint32_t len,uint8_t *buffer);
-     		
-};
 #endif
 // EOF

@@ -33,12 +33,12 @@
 #include "audioprocess.hxx"
 //#include "../toolkit.hxx"
 //
-AVDMBufferedAudioStream::AVDMBufferedAudioStream(AVDMGenericAudioStream * instream):AVDMProcessAudioStream
-    (instream)
+AVDMBufferedAudioStream::AVDMBufferedAudioStream(AVDMGenericAudioStream * instream):AVDMGenericAudioStream()
 {
-	_in = NULL;
-	_chunk = 4096;
-	memset(_dither, 0, 256*sizeof(float));
+        _instream=instream;
+        _in = NULL;
+        _chunk = 4096;
+        memset(_dither, 0, 256*sizeof(float));
 
     _headBuff=_tailBuff=0;
 }
@@ -165,29 +165,18 @@ void AVDMBufferedAudioStream::dither16bit()
 		}
 }
 
-uint32_t AVDMBufferedAudioStream::readChunk()
-{
-	int32_t rd = 0, rdall = 0;
-	uint32_t asked;
 
-	while (rdall < _chunk) {
-		// don't ask too much front.
-		asked = _chunk - rdall;
-		rd = _instream->read(asked, _in + rdall);
-		if (rd < 1)
-			break;
-		rdall += rd;
-	}
+uint8_t AVDMBufferedAudioStream::goTo(uint32_t newoffset) {
+        ADM_assert(!newoffset);
+        goToTime(0);
+        return 1;
+}
 
-	// Block not filled
-	if (rdall != _chunk) {
-		printf("\n not enough...%lu\n", rdall);
-		if (rdall == 0)
-			return 0;	// we could not get a single byte ! End of stream
-		// Else fillout with 0
-		memset(_in + rdall, 0, (_chunk - rdall) * sizeof(float));
-	}
-	return rdall;
+uint8_t AVDMBufferedAudioStream::goToTime(uint32_t newoffset) {
+        ADM_assert(!newoffset);
+        _instream->goToTime(0);
+        _headBuff=_tailBuff=0;
+        return 1;
 }
 
 // EOF

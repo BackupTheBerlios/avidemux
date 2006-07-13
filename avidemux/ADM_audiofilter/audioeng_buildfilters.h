@@ -23,8 +23,7 @@
 
 
 
- AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t duration);
+ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,uint32_t starttime, uint32_t duration);
  AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t duration);
 

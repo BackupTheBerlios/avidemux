@@ -27,7 +27,7 @@
 #include "audioeng_process.h"
 #include "audioencoder.h"
 
-AUDMEncoder::AUDMEncoder(AUDMAudioFilter *in)  :AVDMBufferedAudioStream  (NULL)
+AUDMEncoder::AUDMEncoder(AUDMAudioFilter *in)  :AVDMGenericAudioStream  ()
 {
   _wavheader = new WAVHeader;
   _incoming=in;

@@ -63,6 +63,7 @@
 #include "audiofilter_normalize.h"
 #include "audiofilter_limiter.h"
 #include "audiofilter_sox.h"
+#include "audiofilter_film2pal.h"
 
 /* ************ Conf *********** */
 #include "audioencoder_config.h"
@@ -116,7 +117,7 @@ static ADM_audioEncoderDescriptor *getAudioDescriptor( AUDIOENCODER encoder);
 //_______________________________________
 
 
-AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiostream,
+AVDMBufferedAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t duration)
 {
 
@@ -131,18 +132,6 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
   So we correct the filter length beforehand to avoid the 24/25 too short audio */
 	
 
-#if 0
-  /*   */
-  if(audioFilmConv==FILMCONV_FILM2PAL)	
-  {
-    double d;
-    d=duration;
-    d*=25000;
-    d/=23976;
-    duration=(uint32_t)floor(d);
-    duration=(duration+1)&0xfffffffe;
-  }
-#endif
 #if 0        
 //_______________________________________________________
     if (audioDelay && audioShift)
@@ -188,15 +177,15 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
 
 
 //_______________________________________________________
- if ( audioNormalizeMode)	// Normalize activated ?
-{
-  printf("\n  normalize activated...\n");
-
-  AUDMAudioFilterNormalize *normalize = new AUDMAudioFilterNormalize(lastFilter);
-  lastFilter = normalize;
-  filtersFloat[filtercount++] = lastFilter;
-
-}
+      if ( audioNormalizeMode)	// Normalize activated ?
+      {
+        printf("\n  normalize activated...\n");
+      
+        AUDMAudioFilterNormalize *normalize = new AUDMAudioFilterNormalize(lastFilter);
+        lastFilter = normalize;
+        filtersFloat[filtercount++] = lastFilter;
+      
+      }
       
       if( (audioMixing!=CHANNEL_INVALID ))
           {
@@ -232,37 +221,30 @@ AVDMProcessAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *current
             default:
                       ADM_assert(0);
           }
-#if 0	
+
       switch(audioFilmConv)
-{
-  default:
-		ADM_assert(0);
-  case FILMCONV_NONE:
-		break;
-  case FILMCONV_PAL2FILM:		
-	 AVDMProcessAudio_Pal2Film *p2f;
-		printf("\n Pal2Film\n");
-		
-		p2f = new AVDMProcessAudio_Pal2Film(lastFilter);
-		lastFilter = p2f;
-		filters[filtercount++] = lastFilter;	
-		break;
-	 	
-	
-  case FILMCONV_FILM2PAL:
-		AVDMProcessAudio_Film2Pal *f2p;
-		printf("\n Film2pal\n");
-		
-		f2p = new AVDMProcessAudio_Film2Pal(lastFilter);
-		lastFilter = f2p;
-		filters[filtercount++] = lastFilter;	
-		break;
-	
-		
-}   
-		
-#endif	
-	
+        {
+          default:
+                        ADM_assert(0);
+          case FILMCONV_NONE:
+                        break;
+          case FILMCONV_PAL2FILM:		
+                  AUDMAudioFilterPal2Film *p2f;
+                        p2f = new AUDMAudioFilterPal2Film(lastFilter);
+                        lastFilter = p2f;
+                        filtersFloat[filtercount++] = lastFilter;	
+                        break;
+                        
+                
+          case FILMCONV_FILM2PAL:
+                    AUDMAudioFilterFilm2Pal *f2p;
+                        f2p = new AUDMAudioFilterFilm2Pal(lastFilter);
+                        lastFilter = f2p;
+                        filtersFloat[filtercount++] = lastFilter;	
+                        break;
+                
+                        
+        }   
 //_______________________________________________________
 
 
@@ -347,11 +329,11 @@ AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 *******************************************************************************************************************
 */
 
-AVDMProcessAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
+AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
                                          uint32_t starttime, uint32_t duration)
 {
   AUDMAudioFilter *lastFilter=NULL;
-  AVDMProcessAudioStream *output=NULL;
+  AVDMGenericAudioStream *output=NULL;
   AUDMEncoder             *tmpfilter=NULL;
   
 	// if audio is set to copy, we just return the first filter
@@ -562,6 +544,17 @@ void audioCodecConfigure( void )
     descriptor->configure(descriptor); 
   }
 }
+uint32_t audioGetBitrate(void)
+{
+  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor(activeAudioEncoder);
+  return descriptor->bitrate;
+} 
+void audioFilter_SetBitrate( int i)
+{
+  ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor(activeAudioEncoder);
+  descriptor->bitrate=i;
+}
+
 
 
 
