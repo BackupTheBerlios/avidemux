@@ -45,7 +45,7 @@
                         char				*_trackname;
 			uint32_t			_audioCurrent2;
 
-
+                        uint8_t    doOneTrack (uint32_t index,AVDMGenericAudioStream *stream,uint32_t target,uint32_t *current);
 		                   virtual uint8_t setupAudio( void);
                         	 virtual uint8_t writeAudioChunk(uint32_t frame );
 				 //virtual uint8_t setupVideo (char *name);

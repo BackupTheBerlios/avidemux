@@ -79,6 +79,58 @@ uint8_t GenericAviSaveCopyDualAudio::setupAudio (void)
   return 1;
 }
 //---------------------------------------------------------------------------
+uint8_t    GenericAviSaveCopyDualAudio::doOneTrack (uint32_t index,AVDMGenericAudioStream *stream,uint32_t target,uint32_t *current)
+{
+  uint32_t    len;
+  uint32_t sample,packetLen,packets=0;
+  
+  _audioInBuffer=0;
+  // VBR mode, one packet per frame
+  if(stream->packetPerFrame()     || stream->isVBR() )
+  {
+    while(*current<target)
+    {
+      if(!stream->getPacket(abuffer,&packetLen,&sample))
+      {
+        printf("AVIWR:Could not read packet\n");
+        return 0;
+      }
+      *current+=sample;
+      if(!index)
+        writter->saveAudioFrame (packetLen,abuffer);
+      else
+        writter->saveAudioFrameDual (packetLen,abuffer);
+      encoding_gui->feedAudioFrame(packetLen);
+    }
+	 	
+  }
+  else // CBR mode, pack them
+  {
+    sample=0;
+    // _audioTarget is the # of sample we want
+    while(*current<target)
+    {
+      if(!stream->getPacket(abuffer+_audioInBuffer,&packetLen,&sample))
+      {
+        printf("AVIWR:Could not read packet\n");
+        break;
+      }
+      _audioInBuffer+=packetLen;
+      *current+=sample;		
+      packets++;
+    }
+    if (_audioInBuffer)
+    {
+      if(!index)
+        writter->saveAudioFrame (_audioInBuffer, abuffer);
+      else
+        writter->saveAudioFrameDual (_audioInBuffer,abuffer);
+      encoding_gui->feedAudioFrame(_audioInBuffer);	  
+    }
+  }
+  return 1;
+}
+// **************************************************************
 uint8_t
 GenericAviSaveCopyDualAudio::writeAudioChunk (uint32_t frame)
 {
@@ -94,94 +146,8 @@ GenericAviSaveCopyDualAudio::writeAudioChunk (uint32_t frame)
   t=t*1000*audio_filter->getInfo()->frequency;
   _audioTarget=(uint32_t )floor(t);
   
-  	uint32_t sample,packetLen,packets=0;
-	
-	_audioInBuffer=0;
-	if(audio_filter->packetPerFrame()
-		|| audio_filter->isVBR() )
-	{
-		while(_audioCurrent<_audioTarget)
-		{
-			if(!audio_filter->getPacket(abuffer,&packetLen,&sample))
-			{
-				printf("AVIWR:Could not read packet\n");
-				return 0;
-			}
-			_audioCurrent+=sample;
-	 		writter->saveAudioFrame (packetLen,abuffer);
-			encoding_gui->feedAudioFrame(packetLen);
-		}
-	 	
-	}
-	else
-	{
-		sample=0;
-		// _audioTarget is the # of sample we want
-		while(_audioCurrent<_audioTarget)
-		{
-			if(!audio_filter->getPacket(abuffer+_audioInBuffer,&packetLen,&sample))
-			{
-				printf("AVIWR:Could not read packet\n");
-				break;
-			}
-			_audioInBuffer+=packetLen;
-			_audioTotal+=packetLen;
-			_audioCurrent+=sample;		
-			packets++;
-		}
-	}
-
-      if (_audioInBuffer)
-	{
-	  writter->saveAudioFrame (_audioInBuffer, abuffer);
-	  encoding_gui->feedAudioFrame(_audioInBuffer);	  
-	}
-	//_____________________________________________________
-	// now do track2
-	//_____________________________________________________
-      
-	_audioInBuffer=0;
-	if(audio_filter2->packetPerFrame()
-		|| audio_filter2->isVBR() )
-	{
-		while(_audioCurrent2<_audioTarget)
-		{
-			if(!audio_filter2->getPacket(abuffer,&packetLen,&sample))
-			{
-				printf("AVIWR:Could not read packet\n");
-				return 0;
-			}
-			_audioCurrent2+=sample;
-			_audioTotal+=packetLen;
-	 		writter->saveAudioFrameDual (packetLen,abuffer);
-			encoding_gui->feedAudioFrame(packetLen);
-		}
-	 	
-	}
-	else
-	{
-		sample=0;
-		// _audioTarget is the # of sample we want
-		while(_audioCurrent2<_audioTarget)
-		{
-			if(!audio_filter2->getPacket(abuffer+_audioInBuffer,&packetLen,&sample))
-			{
-				printf("AVIWR:Could not read packet\n");
-				break;
-			}
-			_audioInBuffer+=packetLen;
-			_audioTotal+=packetLen;
-			_audioCurrent2+=sample;	
-			packets++;
-		}
-	}
-
-      if (_audioInBuffer)
-	{
-	  writter->saveAudioFrameDual (_audioInBuffer, abuffer);
-	  encoding_gui->feedAudioFrame(_audioInBuffer);
-	  _audioInBuffer=0;
-	}
-      return 1;
+  if(!doOneTrack(0,audio_filter,_audioTarget,&_audioCurrent)) return 0;
+  if(!doOneTrack(1,audio_filter2,_audioTarget,&_audioCurrent2)) return 0;
+  return 1;
 }
 //____________
