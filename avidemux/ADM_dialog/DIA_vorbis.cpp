@@ -112,7 +112,7 @@ int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor)
     }else
     {
       vorbisParam->mode=ADM_VORBIS_VBR;
-      vorbisParam->quality=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(WID(spinbuttonQuality))) ;
+      vorbisParam->quality=gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(spinbuttonQuality))) ;
     }
     break;
     case CHECK_HAS_CHANGED:

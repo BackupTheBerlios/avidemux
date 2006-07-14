@@ -111,7 +111,7 @@ uint8_t AUDMEncoder_Vorbis::init(ADM_audioEncoderDescriptor *config)
                     err=vorbis_encode_init_vbr(&VI,
                                 _wavheader->channels,
                                 _wavheader->frequency,
-                                vorbisConf->quality
+                                vorbisConf->quality/10
                               );
                     break;
     default:
@@ -158,7 +158,7 @@ uint8_t AUDMEncoder_Vorbis::init(ADM_audioEncoderDescriptor *config)
       printf("[Vorbis]CBR Bitrate:%lu\n",config->bitrate);
       break;
     case ADM_VORBIS_VBR: //FIXME FIXME FIXME
-      printf("[Vorbis]VBR Quality:%f\n",vorbisConf->quality);
+      printf("[Vorbis]VBR Quality:%.1f\n",vorbisConf->quality);
     break;
     default:
       ADM_assert(0);
@@ -169,7 +169,7 @@ uint8_t AUDMEncoder_Vorbis::init(ADM_audioEncoderDescriptor *config)
   return 1;
 }
 
-#define ROUNDMAX 30
+#define ROUNDMAX 3000
 
 uint8_t	AUDMEncoder_Vorbis::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
