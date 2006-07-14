@@ -74,10 +74,15 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
           int ready=_previous->fill(AUD_PROCESS_BUFFER_SIZE>>2,_incomingBuffer,&status);
           if(!ready)
           {
-            if(status==AUD_END_OF_STREAM) break; 
-          } else 
-          {
-            ADM_assert(0); 
+            if(status==AUD_END_OF_STREAM) 
+            {
+              break; 
+            }
+           else 
+            {
+              printf("Unknown cause : %d\n",status);
+              ADM_assert(0); 
+            }
           }
           ADM_assert(!(ready %_wavHeader.channels));
           
