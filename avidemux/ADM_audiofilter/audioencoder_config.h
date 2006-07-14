@@ -77,8 +77,8 @@ ADM_audioEncoderDescriptor  lavcodecAC3Descriptor=
 /************** Vorbis **************/
 VORBIS_encoderParam vorbisParam=
 {
-  ADM_VORBIS_CBR,
-  0
+  ADM_VORBIS_VBR,
+  3
   
 };
 ADM_audioEncoderDescriptor  vorbisDescriptor=

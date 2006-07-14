@@ -177,7 +177,7 @@ int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor)
     gtk_label_set_use_markup (GTK_LABEL (label1), TRUE);
     gtk_misc_set_alignment (GTK_MISC (label1), 0, 0.5);
 
-    label2 = gtk_label_new (_("<b>Quality :</b>"));
+    label2 = gtk_label_new (_("<b>Bitrate :</b>"));
     gtk_widget_show (label2);
     gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 1, 2,
                       (GtkAttachOptions) (GTK_FILL),
@@ -185,7 +185,7 @@ int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor)
     gtk_label_set_use_markup (GTK_LABEL (label2), TRUE);
     gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
 
-    label3 = gtk_label_new (_("<b>Bitrate :</b>"));
+    label3 = gtk_label_new (_("<b>Quality :</b>"));
     gtk_widget_show (label3);
     gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 2, 3,
                       (GtkAttachOptions) (GTK_FILL),
