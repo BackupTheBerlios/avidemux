@@ -496,7 +496,7 @@ float duration;
         if(_wavinfo)
         if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
         {
-                if(GUI_Confirmation_HIG("Build Time Map", "Build VBR time map?", VBR_MSG))
+          if(GUI_Confirmation_HIG(_("Build Time Map"),_( "Build VBR time map?"), VBR_MSG))
                 {
                 _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
                 }
@@ -530,7 +530,7 @@ TryAgain:
 		}
                 if(isH264Compatible(info.fcc))
                 {
-                    if(GUI_Confirmation_HIG("Use that mode","H264 detected","If the file is using bframe as reference, it can lead to crash or stutteting.\nAvidemux can use another mode which is safed but <b>YOU WILL LOOSE FRAME ACCURACY</b>.\nDo you want to use that mode ?"))
+                  if(GUI_Confirmation_HIG(_("Use that mode"),_("H264 detected"),_("If the file is using bframe as reference, it can lead to crash or stutteting.\nAvidemux can use another mode which is safed but <b>YOU WILL LOOSE FRAME ACCURACY</b>.\nDo you want to use that mode ?")))
                     {
                               printf("Switching to non low delay codec\n");
                               _videos[_nb_video-1].decoder = getDecoderH264noLogic (info.fcc,  info.width, info.height, l, d);
@@ -644,8 +644,8 @@ TryAgain:
 								if(!count && type==AVI_FileType)
 								{
 									if( forced || GUI_YesNo(
-									"Packed Bitstream detected",
-									"Do you want me to unpack it ?"))
+                                                                                _("Packed Bitstream detected"),
+                                                                        _("Do you want me to unpack it ?")))
 									{
 									OpenDMLHeader *dml=NULL;
 									count++;	
@@ -685,7 +685,7 @@ TryAgain:
 						// else warn user
 						if(!ispacked)
                                                 {
-                                                        if(GUI_YesNo("Index is not up to date","You should use Tool->Rebuild frame. Do it now ?"))
+                                                  if(GUI_YesNo(_("Index is not up to date"),_("You should use Tool->Rebuild frame. Do it now ?")))
                                                         {
                                                                 rebuildFrameType();
 							}
@@ -1412,7 +1412,7 @@ uint8_t         ADM_Composer::tryIndexing(char *name,char *idxname)
       prefs->get(FEATURE_TRYAUTOIDX,&autoidx);
       if (!autoidx)
         {
-          if (!GUI_Question ("This looks like mpeg\n Do you want to index it?"))
+          if (!GUI_Question (_("This looks like mpeg\n Do you want to index it?")))
             {
                 return 0;
             }

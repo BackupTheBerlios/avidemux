@@ -48,7 +48,7 @@ DIA_progressIndexing *pf;
         UNUSED_ARG(user_data);
 
         pf=(DIA_progressIndexing *)user_data;
-        if(!GUI_Confirmation_HIG("Continue indexing","Abort Requested","Do you want to abort indexing ?"))
+        if(!GUI_Confirmation_HIG(_("Continue indexing"),_("Abort Requested"),_("Do you want to abort indexing ?")))
         {
          //       pf->abortRequest();
                 abted=1;

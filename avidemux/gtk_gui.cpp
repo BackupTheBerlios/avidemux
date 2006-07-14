@@ -258,7 +258,7 @@ int nw;
 		return;
     
     case ACT_RunScript:
-    			 GUI_FileSelRead ("Select ecmascript to run ",(SELFILE_CB *) A_parseECMAScript);
+                GUI_FileSelRead (_("Select ecmascript to run "),(SELFILE_CB *) A_parseECMAScript);
                         
                         //
     		return;
@@ -460,12 +460,12 @@ int nw;
                 A_TimeShift();
                 break;
 	case ACT_OpenAvi:
-          GUI_FileSelRead ("Select AVI file...", (SELFILE_CB *)A_openAvi);
+          GUI_FileSelRead (_("Select AVI file..."), (SELFILE_CB *)A_openAvi);
 	  break;
 
 	case ACT_BrokenAvi:
 	  printf ("\n Opening in broken mode...\n");
-	  GUI_FileSelRead ("Select AVI file...", A_openBrokenAvi);
+          GUI_FileSelRead (_("Select AVI file..."), A_openBrokenAvi);
 	  break;
 
 
@@ -515,9 +515,9 @@ int nw;
 			}
     			break;
     case ACT_SaveUnpackedMpeg4:
-    			if(GUI_Question("This is to be used to undo packed vop on mpeg4.\nContinue ?"))
+      if(GUI_Question(_("This is to be used to undo packed vop on mpeg4.\nContinue ?")))
 			{ 
-				GUI_FileSelWrite ("Select Avi file to write", (SELFILE_CB *)A_SaveUnpackedVop);
+                          GUI_FileSelWrite (_("Select Avi file to write"), (SELFILE_CB *)A_SaveUnpackedVop);
 				
 			}
     			break;
@@ -535,7 +535,7 @@ int nw;
     			A_saveDVDPS(NULL);
     			break;
     case ACT_SaveOGM:
-    			 GUI_FileSelWrite ("Select OGM file to write", (SELFILE_CB *)ogmSave);
+                        GUI_FileSelWrite (_("Select OGM file to write"), (SELFILE_CB *)ogmSave);
     			break;
 				
     case ACT_FrameChanged:
@@ -556,7 +556,7 @@ case ACT_Pipe2Other:
     	break;
 #endif
     case ACT_SaveWork:
-      GUI_FileSelWrite ("Select workbench to save ", A_saveWorkbench);
+      GUI_FileSelWrite (_("Select workbench to save "), A_saveWorkbench);
       break;
     case ACT_ADD_JOB:
         A_addJob();
@@ -567,7 +567,7 @@ case ACT_Pipe2Other:
          A_saveWorkbench( tmp ); // will write "actual_workbench_file" itself
          ADM_dealloc(tmp);
       }else{
-         GUI_FileSelWrite ("Select workbench to save ", A_saveWorkbench);
+        GUI_FileSelWrite (_("Select workbench to save "), A_saveWorkbench);
       }
       break;
         case ACT_JumpToFrame: 
@@ -591,7 +591,7 @@ case ACT_Pipe2Other:
                 }
                 break;
     case ACT_SaveRaw:
-      GUI_FileSelWrite ("Select raw file to save ", (SELFILE_CB *)ADM_saveRaw);
+      GUI_FileSelWrite (_("Select raw file to save "), (SELFILE_CB *)ADM_saveRaw);
       break;
     case ACT_CutWizard:
       ADM_cutWizard ();
@@ -601,17 +601,17 @@ case ACT_Pipe2Other:
                 break;
 
     case ACT_OpenAvi:
-      GUI_FileSelRead ("Select AVI file...",(SELFILE_CB *) A_openAvi);
+      GUI_FileSelRead (_("Select AVI file..."),(SELFILE_CB *) A_openAvi);
       break;
     case ACT_BrokenAvi:
-      GUI_FileSelRead ("Select AVI file...", A_openBrokenAvi);
+      GUI_FileSelRead (_("Select AVI file..."), A_openBrokenAvi);
       break;
     case ACT_AppendAvi:
-      GUI_FileSelRead ("Select AVI file to append...",(SELFILE_CB *) A_appendAvi);
+      GUI_FileSelRead (_("Select AVI file to append..."),(SELFILE_CB *) A_appendAvi);
       break;
     case ACT_SaveWave:
       	{
-	GUI_FileSelWrite ("Select file to save audio",(SELFILE_CB *)A_audioSave);
+          GUI_FileSelWrite (_("Select file to save audio"),(SELFILE_CB *)A_audioSave);
 	
 	}
       break;
@@ -645,14 +645,14 @@ case ACT_Pipe2Other:
       break;
 
     case ACT_SaveBunchJPG:
-    	GUI_FileSelWrite ("Select Jpeg sequence to save ", A_saveBunchJpg);      
+      GUI_FileSelWrite (_("Select Jpeg sequence to save "), A_saveBunchJpg);      
     	break;
     case ACT_SaveImg:
-      GUI_FileSelWrite ("Select BMP to save ", A_saveImg);
+      GUI_FileSelWrite (_("Select BMP to save "), A_saveImg);
       //GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       break;
     case ACT_SaveJPG :
-    	GUI_FileSelWrite ("Select Jpeg to save ", (SELFILE_CB *)A_saveJpg);
+      GUI_FileSelWrite (_("Select Jpeg to save "), (SELFILE_CB *)A_saveJpg);
       	//GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       	break;
     
@@ -708,7 +708,7 @@ case ACT_Pipe2Other:
       GUI_NextPrevBlackFrame(-1);
       break;
     case ACT_AllBlackFrames:    
-       GUI_FileSelWrite ("Select file to save", (SELFILE_CB *)A_ListAllBlackFrames);
+      GUI_FileSelWrite (_("Select file to save"), (SELFILE_CB *)A_ListAllBlackFrames);
         break;                        
     
     case ACT_PreviousFrame:
@@ -760,13 +760,13 @@ case ACT_Pipe2Other:
       break;
 
     case ACT_AudioSourceMP3:
-      GUI_FileSelRead ("Select MP3 to load ", (SELFILE_CB *)A_loadMP3);
+      GUI_FileSelRead (_("Select MP3 to load "), (SELFILE_CB *)A_loadMP3);
       break;
     case ACT_AudioSourceAC3:
-      GUI_FileSelRead ("Select AC3 to load ", (SELFILE_CB *)A_loadAC3);
+      GUI_FileSelRead (_("Select AC3 to load "), (SELFILE_CB *)A_loadAC3);
       break;
     case ACT_AudioSourceWAV:
-      GUI_FileSelRead ("Select WAV to load ",(SELFILE_CB *) A_loadWave);
+      GUI_FileSelRead (_("Select WAV to load "),(SELFILE_CB *) A_loadWave);
       break;
     case ACT_AudioSourceNone:
       //currentaudiostream=(AVDMGenericAudioStream *)NULL;
@@ -820,7 +820,7 @@ case ACT_Pipe2Other:
       break;
 //----------------------test-----------------------
     case ACT_SaveAvi:
-      GUI_FileSelWrite ("Select  file to save ",(SELFILE_CB *)A_SaveWrapper); // A_SaveAudioNVideo);
+      GUI_FileSelWrite (_("Select  file to save "),(SELFILE_CB *)A_SaveWrapper); // A_SaveAudioNVideo);
       break;
 //---------------------------------------------------
     case ACT_Copy:
@@ -851,7 +851,7 @@ case ACT_Pipe2Other:
 		break;
     case ACT_ResetSegments:
        if(avifileinfo)
-	if(GUI_Question("Are you sure ?"))
+         if(GUI_Question(_("Are you sure ?")))
 	{
 		video_body->resetSeg();
   		video_body->getVideoInfo (avifileinfo);
@@ -942,7 +942,7 @@ case ACT_Pipe2Other:
       break;
 
     case ACT_RebuildKF:
-      if (GUI_Question ("Rebuild all Keyframes?"))
+      if (GUI_Question (_("Rebuild all Keyframes?")))
 	{
 	  A_rebuildKeyFrame ();
 	  //GUI_Info_HIG ("Done", "Save your file and restart Avidemux.");
@@ -2327,13 +2327,13 @@ void A_audioTrack( void )
         switch( nw)
         {
                 case AudioMP3:
-                        GUI_FileSelRead ("Select MP3 to load ", (SELFILE_CB *)A_loadMP3);
+                  GUI_FileSelRead (_("Select MP3 to load "), (SELFILE_CB *)A_loadMP3);
                         break;
                 case AudioAC3:
-                        GUI_FileSelRead ("Select AC3 to load ", (SELFILE_CB *)A_loadAC3);
+                  GUI_FileSelRead (_("Select AC3 to load "), (SELFILE_CB *)A_loadAC3);
                         break;
                 case AudioWav:
-                        GUI_FileSelRead ("Select WAV to load ",(SELFILE_CB *) A_loadWave);
+                  GUI_FileSelRead (_("Select WAV to load "),(SELFILE_CB *) A_loadWave);
                         break;
                 case AudioNone:
                           A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
@@ -2379,7 +2379,7 @@ void A_externalAudioTrack( void )
         char               *name=NULL;
         if(nw==AudioMP3|| nw==AudioAC3 || nw==AudioWav)
         {
-                GUI_FileSelRead("Select 2nd track",&name);
+          GUI_FileSelRead(_("Select 2nd track"),&name);
         }
         A_setSecondAudioTrack(nw,name);
         if(name) ADM_dealloc(name);

@@ -94,7 +94,7 @@ uint8_t  oplug_mpeg_vcd(const char *inname)
 
 	if(!inname)
 	{
-	 	GUI_FileSelWrite("VCD file to save", (char**)&name);
+                GUI_FileSelWrite(_("VCD file to save"), (char**)&name);
 		if(!name) return 0;
 	}	
 	else
@@ -184,7 +184,7 @@ uint8_t oplug_mpeg_svcd(const char *inname)
 
 	if(!inname)
 	{
-	 	GUI_FileSelWrite("SVCD file to save", (char**)&name);
+                GUI_FileSelWrite(_("SVCD file to save"), (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -244,7 +244,7 @@ AVDMGenericAudioStream *stream;
 	
  	if(!inname)
 	{
-          GUI_FileSelWrite(_("SVCD file to save"), (char**)&name);
+               GUI_FileSelWrite(_("SVCD file to save"), (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -269,7 +269,7 @@ uint8_t ret=0;
 
  	if(!inname)
 	{
-	 	GUI_FileSelWrite("DVD file to save", (char**)&name);
+                GUI_FileSelWrite(_("DVD file to save"), (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -337,7 +337,7 @@ uint8_t ret=0;
 	
  	if(!inname)
 	{
-	 	GUI_FileSelWrite("DVD file to save", (char**)&name);
+                GUI_FileSelWrite(_("DVD file to save"), (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -413,7 +413,7 @@ uint8_t ret=0;
         
         if(!inname)
         {
-                GUI_FileSelWrite("DVD file to save", (char**)&name);
+                GUI_FileSelWrite(_("DVD file to save"), (char**)&name);
                 if(!name) return 0;
         }
         else

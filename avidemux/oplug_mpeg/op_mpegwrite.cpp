@@ -563,7 +563,7 @@ mpegWritter::save_dualpass (const char *name, uint32_t final_size, uint32_t bitr
       {
 	fclose (fd);
 	prefs->get (FEATURE_REUSE_2PASS_LOG, (uint32_t *) & reuse);
-	if (!reuse && GUI_Question ("Reuse log file ?"))
+        if (!reuse && GUI_Question (_("Reuse log file ?")))
 	  reuse = 1;
       }
   }

@@ -373,7 +373,7 @@ void on_callback_sub(GtkButton * button, gpointer user_data)
 	      UNUSED_ARG(button);
 	UNUSED_ARG(user_data);
         //GUI_FileSelRead("TTF font to use", fontCB);
-	FileSel_SelectRead("Subtitle to load", subString,
+        FileSel_SelectRead(_("Subtitle to load"), subString,
 		MAX_STRING,subString);
 	gtk_label_set_text(GTK_LABEL(WID(label_sub)),subString);
 }
@@ -383,7 +383,7 @@ void on_callback_font(GtkButton * button, gpointer user_data)
         UNUSED_ARG(button);
 	UNUSED_ARG(user_data);
         //GUI_FileSelRead("TTF font to use", fontCB);
-	FileSel_SelectRead("TTF font to use", fontString,
+        FileSel_SelectRead(_("TTF font to use"), fontString,
 		MAX_STRING,fontString);
 	gtk_label_set_text(GTK_LABEL(WID(label_font)),fontString);
 	

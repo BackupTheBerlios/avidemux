@@ -89,7 +89,7 @@ uint8_t DIA_animated(ANIMATED_PARAM *param)
             if(action==LOAD_BGD)
             {
                 char *nw;
-                    GUI_FileSelRead("Select background picture", &nw);
+                    GUI_FileSelRead(_("Select background picture"), &nw);
                     if(nw)
                     {
                         ENTRY_SET(entryBgd,nw);

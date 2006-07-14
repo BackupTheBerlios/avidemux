@@ -320,7 +320,7 @@ preFilling:
                encoding_gui->feedFrame(bitstream.len);
                if(!encoding_gui->isAlive())
                 {
-                        if(GUI_YesNo("Stop Request", "Do you want to abort encoding ?"))
+                  if(GUI_YesNo(_("Stop Request"), _("Do you want to abort encoding ?")))
                                 goto stopit;
                 }
                
@@ -351,7 +351,7 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
         if((tmp=fopen(TwoPassLogFile,"rt")))
         {
                 fclose(tmp);
-                if(GUI_Question("\n Reuse the existing log-file ?"))
+                if(GUI_Question(_("\n Reuse the existing log-file ?")))
                 {
                         reuse=1;
                 }

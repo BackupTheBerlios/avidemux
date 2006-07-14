@@ -446,9 +446,9 @@ on_action (gui_act action)
       break;
     case A_LOAD:
 #ifdef USE_LIBXML2
-      GUI_FileSelRead ("Load set of filters", filterLoadXml);
+      GUI_FileSelRead (_("Load set of filters"), filterLoadXml);
 #else
-      GUI_FileSelRead ("Load set of filters", filterLoad);
+      GUI_FileSelRead (_("Load set of filters"), filterLoad);
 #endif
       updateFilterList ();
       break;

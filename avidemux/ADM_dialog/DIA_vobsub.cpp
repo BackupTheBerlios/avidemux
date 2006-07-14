@@ -95,7 +95,7 @@ uint8_t DIA_vobsub(vobSubParam *param)
               case GTK_RESPONSE_APPLY:
               {
                 char *file;
-                        GUI_FileSelRead("Select .idx file",&file); 
+                        GUI_FileSelRead(_("Select .idx file"),&file); 
                         if(file)
                         {
                           if(name) ADM_dealloc(name);

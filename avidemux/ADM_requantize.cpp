@@ -127,7 +127,7 @@ void A_requantize( void )
 	printf("Using shrink factor %f, with qual=%lu\n",percent,quality);
 	
 	// now get the name
-	GUI_FileSelWrite("Requantized file to write ?", &out_name);
+        GUI_FileSelWrite(_("Requantized file to write ?"), &out_name);
 	if(!out_name) return;
 	
 	A_requantize2(percent,quality,out_name);

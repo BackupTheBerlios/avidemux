@@ -253,7 +253,7 @@ uint8_t ret=0;
 				  	return 0;
 		}
 		if(!inname)
-			GUI_FileSelWrite("Select dual audio AVI to write", (char**)& name);
+                  GUI_FileSelWrite(_("Select dual audio AVI to write"), (char**)& name);
 		else
 			name=inname;
 			
@@ -318,7 +318,7 @@ uint8_t  A_SaveAudioNVideo(const char *name)
 
 #ifdef HAVE_ENCODER
 			if(needSmart &&
-   										GUI_Question("You may need smart copy.\n Enable it ?"))
+                        GUI_Question(_("You may need smart copy.\n Enable it ?")))
              		{
 				int value=4;;
 	 			 if( ! GUI_getIntegerValue(&value, 2, 31, "Q Factor (set 4)"))

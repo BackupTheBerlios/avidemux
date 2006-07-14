@@ -148,7 +148,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                         delete fp;
                                         if(type==FP_APPEND)
                                         {
-                                                if(GUI_Question("There is several mpeg file, append them ?"))
+                                          if(GUI_Question(_("There is several mpeg file, append them ?")))
                                                         multi=1;
                                         }
                                         dmx=new dmx_demuxerPS(nbTracks,tracks,multi);

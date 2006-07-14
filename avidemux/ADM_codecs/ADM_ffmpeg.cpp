@@ -48,9 +48,9 @@ static char LogName[500];
 #define WRAP_Open(x) \
 {\
 AVCodec *codec=avcodec_find_encoder(x);\
-if(!codec) {GUI_Alert("Internal error opening codec"#x);ADM_assert(0);} \
+if(!codec) {GUI_Alert(_("Internal error opening codec"#x));ADM_assert(0);} \
   res=avcodec_open(_context, codec); \
-  if(res<0) {GUI_Alert("Internal error with context for  codec"#x);ADM_assert(0);} \
+  if(res<0) {GUI_Alert(_("Internal error with context for  codec"#x));ADM_assert(0);} \
 }
 /*****************************************/
 uint8_t ffmpegEncoder::stopEncoder(void)

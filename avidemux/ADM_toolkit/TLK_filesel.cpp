@@ -185,7 +185,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 				  struct stat buf;
 				  int fdino;
 					fclose(fd);
-					if(!GUI_Question("Overwrite file ?"))
+                                        if(!GUI_Question(_("Overwrite file ?")))
 						return;
 	                                /*
 	                                ** JSC Fri Feb 10 00:07:30 CET 2006

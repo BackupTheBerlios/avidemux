@@ -146,7 +146,7 @@ JSBool fileReadSelect(JSContext *cx, JSObject *obj, uintN argc,
         if(argc != 0)
                 return JS_FALSE;
         if(!name) return JS_FALSE;
-        GUI_FileSelRead("Open file (Read mode)", &name);
+        GUI_FileSelRead(_("Open file (Read mode)"), &name);
         *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,name));
         ADM_dealloc(name);
         return JS_TRUE;
@@ -159,7 +159,7 @@ JSBool fileWriteSelect(JSContext *cx, JSObject *obj, uintN argc,
         // default return value
         if(argc != 0)
                 return JS_FALSE;
-        GUI_FileSelWrite("Open file (Write mode)", &name);
+        GUI_FileSelWrite(_("Open file (Write mode)"), &name);
         if(!name) return JS_FALSE;
         *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,name));
         ADM_dealloc(name);

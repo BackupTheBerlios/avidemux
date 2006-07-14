@@ -319,7 +319,7 @@ switch(mux)
 			fd=fopen(twoPass,"rt");
 			if(fd)
 			{
-				if(GUI_Question("Reuse log file ?"))
+                          if(GUI_Question(_("Reuse log file ?")))
 				{
 					reuse=1;
 				}

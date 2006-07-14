@@ -48,7 +48,7 @@
 #define WRAP_Open(x) \
 {\
 AVCodec *codec=avcodec_find_decoder(x);\
-if(!codec) {GUI_Alert("Internal error finding codec"#x);ADM_assert(0);} \
+if(!codec) {GUI_Alert(_("Internal error finding codec"#x));ADM_assert(0);} \
   codecId=x; \
   if (avcodec_open(_context, codec) < 0)  \
                       { \

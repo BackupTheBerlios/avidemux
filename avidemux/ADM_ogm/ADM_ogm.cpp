@@ -359,7 +359,7 @@ double fps;
 			_isaudiopresent=1;
 			if(_audioTracks[1].audioTrack!=0xff
 				&&_audioTracks[1].nbAudioPacket 
-				&& GUI_Question("Take second track ?"))
+                                                && GUI_Question(_("Take second track ?")))
 			{
                                 _currentAudioTrack=1;
 				_audio=new oggAudio( name, &_audioTracks[0],1 );

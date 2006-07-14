@@ -19,7 +19,7 @@ uint8_t saveGlyph(void)
     
   admGlyph *glyph=head.next;
     
-  GUI_FileSelWrite("Select Glyphfile to save to", &name);
+  GUI_FileSelWrite(_("Select Glyphfile to save to"), &name);
   if(!name)
     return 0;
     
@@ -59,7 +59,7 @@ uint8_t loadGlyph(char *name)
     
   if(head.next)
   {
-    if(!GUI_Question("Erase current glyphs ?"))
+    if(!GUI_Question(_("Erase current glyphs ?")))
       return 0;
     destroyGlyphTree(&head);
     nbGlyphs=0;

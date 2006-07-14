@@ -71,7 +71,7 @@ ADMVideoPalShift::ADMVideoPalShift(  AVDMGenericVideoStream *in,CONFcouple *setu
 }
  uint8_t ADMVideoPalShift::configure( AVDMGenericVideoStream *instream) 
 {
-	if(GUI_Question("Try reverse ?"))
+  if(GUI_Question(_("Try reverse ?")))
 	{
 		*_reverse=1;
 	}

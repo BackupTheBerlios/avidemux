@@ -83,7 +83,7 @@ uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
     _info.fps1000=_param->newfps;   
     
   }  
-  if(GUI_Question("Use linear blend ?"))
+  if(GUI_Question(_("Use linear blend ?")))
   {
         _param->use_linear=1;        
   }

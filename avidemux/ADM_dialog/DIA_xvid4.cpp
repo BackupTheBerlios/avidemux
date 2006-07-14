@@ -102,7 +102,7 @@ _again:
           uint8_t intra[64],inter[64];
           char *name;
           FILE *file=NULL;
-               GUI_FileSelRead("Select Xvid matrix file to load", &name);
+          GUI_FileSelRead(_("Select Xvid matrix file to load"), &name);
                if(!name)
                {
                     goto _again;
@@ -444,7 +444,7 @@ _loop:
         printf("Save\n");
         char *name;
         FILE *fd;
-        GUI_FileSelWrite("Select Custom Matrix File to write",&name);
+        GUI_FileSelWrite(_("Select Custom Matrix File to write"),&name);
         if(!name) goto _loop;
         fd=fopen(name,"wb");
         if(!fd)

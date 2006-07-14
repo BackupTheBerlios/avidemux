@@ -588,7 +588,7 @@ ReplyType glyphToText(admGlyph *glyph)
                     return ReplySkipAll;
                     break;
                 case GTK_RESPONSE_CLOSE:
-                    if(GUI_Question("Sure ?")) return ReplyClose;
+                  if(GUI_Question(_("Sure ?"))) return ReplyClose;
                     break; // Abort
                     
                 }
@@ -751,7 +751,7 @@ char text[1024];
         case actionSaveSub:
                 {
                     char *srt=NULL;
-                    GUI_FileSelWrite("Select SRT to save", &srt);
+                    GUI_FileSelWrite(_("Select SRT to save"), &srt);
                     if(srt)
                     {
                         gtk_label_set_text(GTK_LABEL(WID(labelSrt)),srt);
@@ -763,7 +763,7 @@ char text[1024];
             {
                  char *gly=NULL;
                     
-                    GUI_FileSelRead("Select Glyoh to save", &gly);
+                    GUI_FileSelRead(_("Select Glyoh to save"), &gly);
                     if(gly)
                     {
                             loadGlyph(gly);

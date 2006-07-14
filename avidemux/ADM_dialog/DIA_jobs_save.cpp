@@ -44,7 +44,7 @@ char *tmp=NULL,*tmp2=NULL;
                                         {
                                         
                                         int r;
-                                                GUI_FileSelWrite("Select video to write",&tmp);
+                                                GUI_FileSelWrite(_("Select video to write"),&tmp);
                                                 if(!tmp) continue;
                                                 gtk_editable_delete_text(GTK_EDITABLE(WID(entryOutputFileName)), 0,-1);
                                                 gtk_editable_insert_text(GTK_EDITABLE(WID(entryOutputFileName)), tmp, strlen(tmp), &r);
