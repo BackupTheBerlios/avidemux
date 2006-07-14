@@ -26,6 +26,7 @@
 #include "avio.hxx"
 #include "fourcc.h"
 #include "ADM_audiofilter/audiofilter_limiter_param.h"
+#include "ADM_audiofilter/audiofilter_normalize_param.h"
 #include "audioprocess.hxx"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
@@ -102,7 +103,7 @@ extern void UI_PrintCurrentACodec( const char *s);
 
 AUDIOENCODER  activeAudioEncoder=  AUDIOENC_NONE;
 /*----------------------------------*/
-int  audioNormalizeMode = 0;
+GAINparam audioGain;
 int  audioFreq=48000;
 int  audioDRC = 0;
 FILMCONV audioFilmConv=FILMCONV_NONE;
@@ -156,25 +157,30 @@ AudioSource             audioSourceFromString(const char *name)
 //**********
 uint8_t audioReset(void )
 {
-        audioNormalizeMode=0;
-        audioResampleMode = RESAMPLING_NONE;
-        audioFilmConv=FILMCONV_NONE;
-        audioMixing=CHANNEL_INVALID;
-        return 1;
+  audioGain.mode=ADM_NO_GAIN;
+  audioResampleMode = RESAMPLING_NONE;
+  audioFilmConv=FILMCONV_NONE;
+  audioMixing=CHANNEL_INVALID;
+  return 1;
 }
 //************
-uint8_t audioGetNormalize(void)
+uint8_t audioGetNormalizeMode(void)
 {
-        return audioNormalizeMode;
+  return audioGain.mode;
 
 }
+int32_t  audioGetNormalizeValue(void)
+{
+  return audioGain.gain10;
+
+}
+
 uint8_t audioGetDownsample(void)
 {
         switch(audioResampleMode)
         {
         case RESAMPLING_CUSTOM:
         case RESAMPLING_NONE: return 0;
-        case RESAMPLING_DOWNSAMPLING: return 1;
         default: ADM_assert(0);
         }
         return 0;
@@ -220,9 +226,13 @@ const char* audioFilterGetIndexedName(uint32_t i)
 	return myCodecList[i].menuName;
 }
 
-void audioFilterNormalize(uint8_t onoff)
+void audioFilterNormalizeMode(uint8_t onoff)
 {
-	audioNormalizeMode=onoff;
+  audioGain.mode=(ADM_GAINMode)onoff;
+}
+void audioFilterNormalizeValue(int v)
+{
+  audioGain.gain10=v;
 }
 
 uint8_t audioFilterDelay(int32_t delay)
@@ -256,13 +266,6 @@ uint8_t audioFilterPal2Film(uint8_t onoff)
         return 1;
 }
 
-void audioFilterDownsample(uint8_t onoff)
-{
-	if(onoff)
-		audioResampleMode=RESAMPLING_DOWNSAMPLING;
-	else
-		audioResampleMode=RESAMPLING_NONE;
-}
 void audioFilterResample(uint32_t onoff)
 {
 	if(onoff)
@@ -276,14 +279,14 @@ void audioFilterResample(uint32_t onoff)
 } 
 //______________________________
 #include "ADM_gui2/GUI_ui.h"
-extern  int DIA_getAudioFilter(int *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
+extern  int DIA_getAudioFilter(GAINparam *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
   			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv,CHANNEL_CONF *channel);
 
 void audioFilter_configureFilters( void )
 {
     int olddelay=audioDelay;
     int oldshift=audioShift;
-	 DIA_getAudioFilter(&audioNormalizeMode,&audioResampleMode,&audioShift,&audioDelay,&audioDRC,&audioFreq,
+	 DIA_getAudioFilter(&audioGain,&audioResampleMode,&audioShift,&audioDelay,&audioDRC,&audioFreq,
 	 		&audioFilmConv,&audioMixing );
          if(audioDelay!=olddelay ||oldshift!= audioShift)
          {  // Refresh
@@ -359,7 +362,8 @@ uint8_t audioFilterSetByName( const char *name)
 	const char *tmp;
 	aprintf("-Audio filter by name : %s\n",name);
 
-	Read(audioNormalizeMode);
+	Read(audioGain.mode);
+        Read(audioGain.gain10);
 	Read(audioResampleMode);
 	Read(audioDRC);
 	Read(audioShift);
@@ -376,7 +380,8 @@ const char *audioFilterGetName( void )
 	conf[0]=0;
 	#undef Add
 	#define Add(x) {sprintf(tmp,"%s=%d ",#x,x);strcat(conf,tmp);}
-	Add(audioNormalizeMode);
+	Add(audioGain.mode);
+        Add(audioGain.gain10);
 	Add(audioResampleMode);
 	Add(audioDRC);
 	Add(audioShift);
@@ -428,10 +433,6 @@ uint32_t audioProcessMode(void)
 	 
 
 
-void audioForceDownSample( void)
-{
-	audioResampleMode=RESAMPLING_DOWNSAMPLING;
-}
 void audioSetResample(uint32_t fq)
 {
 

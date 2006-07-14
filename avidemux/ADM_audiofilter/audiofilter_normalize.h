@@ -9,7 +9,9 @@ class AUDMAudioFilterNormalize : public AUDMAudioFilter
               uint32_t    _scanned;
               uint8_t     preprocess(void);
   public:
-                          AUDMAudioFilterNormalize(AUDMAudioFilter *previous);
+    // gainDB10 is the gain in DB multiplied by 10
+    // 0 meaning automatic
+                          AUDMAudioFilterNormalize(AUDMAudioFilter *previous,GAINparam *param);
     virtual                ~AUDMAudioFilterNormalize();
     virtual    uint32_t   fill(uint32_t max,float *output,AUD_Status *status);
 };

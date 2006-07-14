@@ -85,7 +85,6 @@ static void setEnd(char *p)      ;
 //static void saveRawAudio(char *p)      ;
 static void call_normalize(char *p) ;
 static void call_resample(char *p) 	;
-static void call_downsample(char *p) 	;
 static void call_help(char *p) 	;
 static void call_setAudio(char *p) 	;
 //static void call_load(char *p) 	;
@@ -155,7 +154,6 @@ AUTOMATON reaction_table[]=
 		{"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
 		{"run",			1,"load and run a script",		(one_arg_type)A_parseECMAScript},
 		{"audio-normalize",	1,"activate normalization",		call_normalize},
-		{"audio-downsample",	1,"activate 48->44 downsampling",	call_downsample},
 		{"audio-resample",	1,"resample to x hz",			call_resample},
 		
 		{"filters",		1,"load a filter preset",		filterLoadXml}   ,
@@ -335,11 +333,9 @@ int call_saveDVD(char *a)
 
 void call_normalize   (char *p)
 {
-        audioFilterNormalize(trueFalse(p));	
-}
-void call_downsample    (char *p)
-{
-	audioFilterDownsample(trueFalse(p));	
+  int32_t i;
+  sscanf(p,"%d",&i);
+        audioFilterNormalizeMode(i);	
 }
 void call_resample    (char *p)
 {

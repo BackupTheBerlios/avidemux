@@ -223,7 +223,8 @@ char *pth;
    
    
    //qfprintf(fd,"app.audio.process=%s;\n",truefalse[audioProcessMode()]);
-   qfprintf(fd,"app.audio.normalize=%s;\n",truefalse[audioGetNormalize()]);
+   qfprintf(fd,"app.audio.normalizeMode=%d;\n",audioGetNormalizeMode());
+   qfprintf(fd,"app.audio.normalizeValue=%d;\n",audioGetNormalizeValue());
    qfprintf(fd,"app.audio.delay=%d;\n",audioGetDelay());
    qfprintf(fd,"app.audio.mixer(\"%s\");\n",getCurrentMixerString());
 
@@ -250,7 +251,6 @@ char *pth;
         switch(audioGetResampling())
         {
                 case RESAMPLING_NONE:         ;break;
-                case RESAMPLING_DOWNSAMPLING:  qfprintf(fd,"app.audio.downsample=true;\n");break;
                 case RESAMPLING_CUSTOM:        qfprintf(fd,"app.audio.resample=%u;\n",audioGetResample());break;
                 default:ADM_assert(0);
         }

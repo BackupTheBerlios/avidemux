@@ -18,6 +18,8 @@ public:
 	bool m_bPAL2Film;
 	bool m_bMono2Stereo;
 	bool m_bStereo2Mono;
+        int  m_nNormalizeMode;
+        int  m_nNormalizeValue;
 };
 
 #endif

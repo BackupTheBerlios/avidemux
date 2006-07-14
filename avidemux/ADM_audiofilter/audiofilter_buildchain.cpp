@@ -31,6 +31,7 @@
 #include "ADM_audiofilter/audioencoder_twolame_param.h"
 #include "ADM_audiofilter/audioencoder_faac_param.h"
 #include "ADM_audiofilter/audioencoder_vorbis_param.h"
+#include "ADM_audiofilter/audiofilter_normalize_param.h"
 
 #include "audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
@@ -89,7 +90,7 @@ extern uint32_t audioProcessMode(void);
 
 extern AUDIOENCODER  activeAudioEncoder;
 
-extern int  audioNormalizeMode ;
+extern GAINparam audioGain;
 extern int  audioFreq;
 extern int  audioDRC;
 extern FILMCONV audioFilmConv;
@@ -177,11 +178,11 @@ AVDMBufferedAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *curren
 
 
 //_______________________________________________________
-      if ( audioNormalizeMode)	// Normalize activated ?
+      if ( audioGain.mode!=ADM_NO_GAIN)	// Normalize activated ?
       {
-        printf("\n  normalize activated...\n");
+        printf("\n  normalize activated..\n");
       
-        AUDMAudioFilterNormalize *normalize = new AUDMAudioFilterNormalize(lastFilter);
+        AUDMAudioFilterNormalize *normalize = new AUDMAudioFilterNormalize(lastFilter,&audioGain);
         lastFilter = normalize;
         filtersFloat[filtercount++] = lastFilter;
       

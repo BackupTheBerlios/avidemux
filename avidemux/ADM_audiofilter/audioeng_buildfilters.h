@@ -56,7 +56,6 @@ typedef enum AUDIOENCODER
 typedef enum RESAMPLING
 {
 	RESAMPLING_NONE=0,
-	RESAMPLING_DOWNSAMPLING=1, // Need to hardcode downsampling to 2 for automation
 	RESAMPLING_CUSTOM=2,
 	RESAMPLING_LAST
 }RESAMPLING;
@@ -96,7 +95,8 @@ uint8_t audioCodecSetConf(char *conf );
 AVDMGenericAudioStream *mpt_getAudioStream(void);
 
 /* -- Set filter --*/
-void audioFilterNormalize(uint8_t onoff);
+void audioFilterNormalizeMode(uint8_t onoff);
+void audioFilterNormalizeValue(int value);
 void audioFilterDownsample(uint8_t onoff);
 void audioFilterResample(uint32_t onoff);
 uint8_t audioFilterDelay(int32_t delay);
@@ -109,7 +109,8 @@ uint8_t audioFilterStereo2Mono(uint8_t onoff);
 void audioFilter_SetBitrate( int i);
 /* -- Get filter -- */
 uint32_t audioGetBitrate(void);
-uint8_t audioGetNormalize(void);
+uint8_t audioGetNormalizeMode(void);
+int32_t audioGetNormalizeValue(void);
 uint8_t audioGetDownsample(void);
 uint32_t audioGetResample(void);
 uint32_t audioGetDelay(void);

@@ -31,14 +31,26 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_dialog/DIA_working.h"
 #include "audioeng_process.h"
+#include "audiofilter_normalize_param.h"
 #include "audiofilter_normalize.h"
 // Ctor
 //__________
 
-AUDMAudioFilterNormalize::AUDMAudioFilterNormalize(AUDMAudioFilter * instream):AUDMAudioFilter (instream)
+AUDMAudioFilterNormalize::AUDMAudioFilterNormalize(AUDMAudioFilter * instream,GAINparam *param):AUDMAudioFilter (instream)
 {
+  float db_out;
     // nothing special here...
-    _scanned = 0;
+  switch(param->mode)
+  {
+    case ADM_NO_GAIN: _ratio=1;_scanned=1;printf("[Gain] Gain of 1.0\n");break; 
+    case ADM_GAIN_AUTOMATIC: _ratio=1;_scanned=0;printf("[Gain] Automatic gain\n");break;
+    case ADM_GAIN_MANUAL: 
+                _scanned=1;
+                db_out =  param->gain10/100.0; // Dbout is in DB (!)
+                _ratio = pow10f(db_out);
+                printf("[Gain] %f db (p=%d)\n", (float)(param->gain10)/10.,param->gain10);
+                printf("[Gain] Linear ratio of : %03.3f\n", _ratio);
+  }
     _previous->rewind();
 };
 

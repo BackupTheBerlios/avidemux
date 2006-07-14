@@ -36,14 +36,15 @@ public:
 	enum
 	{
                 audioprocess_prop,
-		normalize_prop,
 		downsample_prop,
 		resample_prop,
 		delay_prop,
 		film2pal_prop,
 		pal2film_prop,
 		mono2stereo_prop,
-		stereo2mono_prop
+		stereo2mono_prop,
+                normalizemode_prop,
+                normalizevalue_prop
 	};
 	static JSClass m_classAvidemuxAudio;
         

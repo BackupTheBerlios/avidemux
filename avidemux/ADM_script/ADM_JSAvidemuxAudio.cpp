@@ -40,8 +40,6 @@ JSPropertySpec ADM_JSAvidemuxAudio::avidemuxaudio_properties[] =
 { 
 
         { "process", audioprocess_prop, JSPROP_ENUMERATE },        // process audio when saving
-
-	{ "normalize", normalize_prop, JSPROP_ENUMERATE },	// normalize audio
 	{ "downsample", downsample_prop, JSPROP_ENUMERATE },	// downsample
 	{ "resample", resample_prop, JSPROP_ENUMERATE },	// resample
 	{ "delay", delay_prop, JSPROP_ENUMERATE },	// set audio delay
@@ -49,6 +47,8 @@ JSPropertySpec ADM_JSAvidemuxAudio::avidemuxaudio_properties[] =
 	{ "pal2film", pal2film_prop, JSPROP_ENUMERATE },	// convert pal to film
 	{ "mono2stereo", mono2stereo_prop, JSPROP_ENUMERATE },	// convert mono to stereo
 	{ "stereo2mono", stereo2mono_prop, JSPROP_ENUMERATE },	// convert stereo to mono
+        { "normalizeMode", normalizemode_prop, JSPROP_ENUMERATE },	//
+        { "normalizeValue", normalizevalue_prop, JSPROP_ENUMERATE },	//
 	{ 0 }
 };
 
@@ -133,9 +133,6 @@ JSBool ADM_JSAvidemuxAudio::JSGetProperty(JSContext *cx, JSObject *obj, jsval id
                         case audioprocess_prop:
                                 *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_bAudioProcess);
                                 break;
-			case normalize_prop:
-				*vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_bNormalize);
-				break;
 			case downsample_prop:
 				*vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_bDownsample);
 				break;
@@ -157,6 +154,13 @@ JSBool ADM_JSAvidemuxAudio::JSGetProperty(JSContext *cx, JSObject *obj, jsval id
 			case stereo2mono_prop:
 				*vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_bStereo2Mono);
 				break;
+                        case normalizemode_prop:
+                              *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_nNormalizeMode);
+                              break;
+                        case normalizevalue_prop:
+                          *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_nNormalizeValue);
+                          break;
+                              
 /*
 			case audio_prop:
 				*vp = OBJECT_TO_JSVAL(priv->getObject()->m_pAudio);
@@ -178,14 +182,6 @@ JSBool ADM_JSAvidemuxAudio::JSSetProperty(JSContext *cx, JSObject *obj, jsval id
                                 priv->getObject()->m_bNormalize = JSVAL_TO_BOOLEAN(*vp);
                                 UI_setAProcessToggleStatus(priv->getObject()->m_bAudioProcess);
                                 break;
-			case normalize_prop:
-				priv->getObject()->m_bNormalize = JSVAL_TO_BOOLEAN(*vp);
-				audioFilterNormalize(priv->getObject()->m_bNormalize);
-				break;
-			case downsample_prop:
-				priv->getObject()->m_bDownsample = JSVAL_TO_BOOLEAN(*vp);
-				audioFilterDownsample(priv->getObject()->m_bDownsample);
-				break;
 			case resample_prop:
 				priv->getObject()->m_nResample = JSVAL_TO_INT(*vp);
 				audioFilterResample(priv->getObject()->m_nResample);
@@ -203,6 +199,14 @@ JSBool ADM_JSAvidemuxAudio::JSSetProperty(JSContext *cx, JSObject *obj, jsval id
 				priv->getObject()->m_bPAL2Film = JSVAL_TO_BOOLEAN(*vp);
 				audioFilterPal2Film(priv->getObject()->m_bPAL2Film);
 				break;
+                        case normalizemode_prop:
+                          priv->getObject()->m_nNormalizeMode = JSVAL_TO_INT(*vp);
+                          audioFilterNormalizeMode(priv->getObject()->m_nNormalizeMode);
+                          break;
+                        case normalizevalue_prop:
+                          priv->getObject()->m_nNormalizeValue = JSVAL_TO_INT(*vp);
+                          audioFilterNormalizeValue(priv->getObject()->m_nNormalizeValue);
+                          break;
 
 		}
 	}
