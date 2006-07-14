@@ -153,7 +153,7 @@ CONFcouple *couple;
 			xdoc=xmlParseFile(docname);
 			if(!xdoc)
 				{
-					GUI_Error_HIG("Problem reading XML filters", NULL);
+                                  GUI_Error_HIG(_("Problem reading XML filters"), NULL);
 					return 0;
 				}
 			node=xdoc->children;
@@ -161,7 +161,7 @@ CONFcouple *couple;
 			if(nb_filters==-1)
 					{
 							xmlFreeDoc(xdoc);
-							GUI_Error_HIG("No filter found", NULL);
+                                                        GUI_Error_HIG(_("No filter found"), NULL);
 							return 0;
 					}
 
@@ -197,7 +197,7 @@ CONFcouple *couple;
 				subnode=nextByName(subnode ,(char *)"Filter");
 				if(!node)
 					{
-						GUI_Error_HIG("Could not find a filter", NULL);
+                                          GUI_Error_HIG(_("Could not find a filter"), NULL);
 						return 0;
 					}
 
@@ -205,7 +205,7 @@ CONFcouple *couple;
 				if(itag==-1)
 					{
 							xmlFreeDoc(xdoc);
-							GUI_Error_HIG("No tag found", NULL);
+                                                        GUI_Error_HIG(_("No tag found"), NULL);
 							return 0;
 					}
 				// now we got the tag
@@ -285,7 +285,7 @@ xmlNodePtr nextByName(xmlNodePtr node,char *name)
 					node=node->next;
 					if(!node)
 					{
-						GUI_Error_HIG("Node not found", NULL);
+                                          GUI_Error_HIG(_("Node not found"), NULL);
 						return NULL;
 					}
 				};

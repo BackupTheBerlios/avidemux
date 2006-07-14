@@ -118,7 +118,7 @@ DIR *dir=NULL;
 			last=selected_filename[strlen(selected_filename) - 1]; 
 			 if (last == '/' || last =='\\' )
 			 {
-      	  					GUI_Error_HIG("Cannot open directory as a file", NULL);
+                           GUI_Error_HIG(_("Cannot open directory as a file"), NULL);
 						return 0;
 			}
 			else
@@ -175,7 +175,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 				// try to open it..
 				if(!fd)
 				{
-					GUI_Error_HIG("File error", "Cannot open \"%s\".", name);
+                                  GUI_Error_HIG(_("File error"), _("Cannot open \"%s\"."), name);
 					return;
 				}
 			}
@@ -210,7 +210,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 							  char str[512];
 								snprintf(str,512,"File \"%s\" exists and is opened by avidemux",name);
 								GUI_Error_HIG(str,
-								              "It could be possible that you try to overwrite an input file!");
+                                                                    _("It could be possible that you try to overwrite an input file!"));
 								return;
 							}
 						}
@@ -224,7 +224,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 							if( buf.st_ino == fdino ){
 							  char str[512];
 								snprintf(str,512,"File \"%s\" exists and is the actual ECMAscript file",name);
-								GUI_Error_HIG(str,"It could be possible that you try to overwrite an input file!");
+                                                                GUI_Error_HIG(str,_("It could be possible that you try to overwrite an input file!"));
 								return;
 							}
 						}
@@ -235,7 +235,7 @@ void fileReadWrite(SELFILE_CB *cb, int rw, char *name)
 				fd=fopen(name,"wb");
 				if(!fd)
 				{
-					GUI_Error_HIG("Cannot write the file", "No write access to \"%s\".", name);
+                                  GUI_Error_HIG(_("Cannot write the file"),_( "No write access to \"%s\"."), name);
 					return;
 				}
 			}
@@ -313,7 +313,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
 #else			
                         if (*(selected_filename + strlen(selected_filename) - 1) == '/'){
 #endif	 
-                        GUI_Error_HIG("Cannot open directory as a file", NULL);
+                        GUI_Error_HIG(_("Cannot open directory as a file"), NULL);
                 }
                 else
                 {
@@ -573,7 +573,7 @@ char *ADM_getCustomDir(void)
 #endif
   if(!ADM_mkdir(customdir))
   {
-                GUI_Error_HIG("Oops","can't create custom directory (%s).",customdir);
+    GUI_Error_HIG(_("Oops"),_("can't create custom directory (%s)."),customdir);
                 return NULL;
   }
   customDirDone=1;
@@ -597,7 +597,7 @@ char *ADM_getJobDir(void)
 #endif
   if(!ADM_mkdir(jobdir))
   {
-                GUI_Error_HIG("Oops","can't create job directory (%s).",jobdir);
+    GUI_Error_HIG(_("Oops"),_("can't create job directory (%s)."),jobdir);
                 return NULL;
   }
   jobDirDone=1;
@@ -617,14 +617,14 @@ char *home;
 #if defined(CYG_MANGLING)
         if( ! (home=getenv("USERPROFILE")) )
         {
-                    GUI_Error_HIG("Oops","can't determine $USERPROFILE.");
+          GUI_Error_HIG(_("Oops"),_("can't determine $USERPROFILE."));
                     home="c:\\";
         }
 
 #else
         if( ! (home=getenv("HOME")) )
         {
-                GUI_Error_HIG("Oops","can't determine $HOME.");
+          GUI_Error_HIG(_("Oops"),_("can't determine $HOME."));
                 return NULL;
         }
 #endif
@@ -635,7 +635,7 @@ char *home;
         strcat(dirname,ADM_DIR_NAME);
         if(!ADM_mkdir(dirname))
         {
-                        GUI_Error_HIG("Oops","Cannot create the .avidemux directory", NULL);
+          GUI_Error_HIG(_("Oops"),_("Cannot create the .avidemux directory"), NULL);
                         delete [] dirname;
                         return NULL;
         }

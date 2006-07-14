@@ -145,7 +145,7 @@ ADMBitstream bitstream;
             case ADM_TS:
                     if(!currentaudiostream)
                     {
-                        GUI_Error_HIG("There is no audio track", NULL);
+                      GUI_Error_HIG(_("There is no audio track"), NULL);
                         return 0;
                     }
                     audio=mpt_getAudioStream();
@@ -156,7 +156,7 @@ ADMBitstream bitstream;
             {
                 if(!currentaudiostream)
                 {
-                        GUI_Error_HIG("There is no audio track", NULL);
+                  GUI_Error_HIG(_("There is no audio track"), NULL);
                         return 0;
                 }
                 audio=mpt_getAudioStream();
@@ -166,7 +166,7 @@ ADMBitstream bitstream;
                 // Later check if it is SVCD
                 if(!audio)
                 {
-                        GUI_Error_HIG("Audio track is not suitable", NULL);
+                  GUI_Error_HIG(_("Audio track is not suitable"), NULL);
                         return 0;
                 }
                 // Check
@@ -176,7 +176,7 @@ ADMBitstream bitstream;
                 {
                         if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
                         {
-                            GUI_Error_HIG("Incompatible audio", "For VCD, audio must be 44.1 kHz MP2.");
+                            GUI_Error_HIG(("Incompatible audio"),_( "For VCD, audio must be 44.1 kHz MP2."));
                             deleteAudioFilter(audio);
                             return 0;
                         }
@@ -198,7 +198,7 @@ ADMBitstream bitstream;
                                 (hdr->encoding != WAV_MP2 && hdr->encoding!=WAV_AC3 && hdr->encoding!=WAV_LPCM))
                             {
                                 deleteAudioFilter(audio);
-                                GUI_Error_HIG("Incompatible audio", "For DVD, audio must be 48 kHz MP2, AC3 or LPCM.");
+                                GUI_Error_HIG(_("Incompatible audio"), _("For DVD, audio must be 48 kHz MP2, AC3 or LPCM."));
                                 return 0 ;
                             }
                             mux=MUXER_DVD;
@@ -246,7 +246,7 @@ ADMBitstream bitstream;
             file=fopen(name,"wb");
             if(!file)
             {
-                    GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", name);
+              GUI_Error_HIG(_("File error"), _("Cannot open \"%s\" for writing."), name);
                     return 0 ;
             }
         }
@@ -336,7 +336,7 @@ switch(mux)
 					encoding->setFrame(i,total);
                                         if(!encoder->encode( i, &bitstream))//&len,(uint8_t *) _buffer,&flags))
 					{
-						GUI_Error_HIG("Error in pass 1", NULL);
+                                          GUI_Error_HIG(_("Error in pass 1"), NULL);
 					}
 					encoding->feedFrame(bitstream.len);
 					encoding->setQuant(bitstream.out_quantizer);
@@ -366,7 +366,7 @@ switch(mux)
                                 bitstream.cleanup(i);
                                 if(!encoder->encode( i,&bitstream))// &len,(uint8_t *) _outbuffer,&flags))
 				{
-					GUI_Error_HIG("Error in pass 2", NULL);
+                                  GUI_Error_HIG(_("Error in pass 2"), NULL);
 					goto finish;
 				}
                                 if(!bitstream.len) continue;

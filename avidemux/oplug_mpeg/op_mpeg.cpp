@@ -120,7 +120,7 @@ uint8_t oplug_mpeg_vcd_ps(const char *inname)
 	// First check audio
 	if(!currentaudiostream)
 	{
-		GUI_Error_HIG("There is no audio track", NULL);
+          GUI_Error_HIG(_("There is no audio track"), NULL);
 		return 0;
 	}
 	if(audioProcessMode())
@@ -139,32 +139,32 @@ uint8_t oplug_mpeg_vcd_ps(const char *inname)
 	}
 	if(info->frequency!=44100 )
 	{
-		GUI_Error_HIG("Incompatible audio frequency", "For VCD PS, samplerate must be 44.1 kHz.\nUse the resample audio filter.");
+          GUI_Error_HIG(_("Incompatible audio frequency"),_( "For VCD PS, samplerate must be 44.1 kHz.\nUse the resample audio filter."));
 		return 0;
 	}
 	if( info->encoding!=WAV_MP2 )
 	{
 		printf("Encoding : %d\n",info->encoding);
-		GUI_Error_HIG("Incompatible audio codec", "For VCD PS, audio must be MP2.");
+                GUI_Error_HIG(_("Incompatible audio codec"),_( "For VCD PS, audio must be MP2."));
 		return 0;
 	}
 	if( info->channels!=2 )
 	{
 		
-		GUI_Error_HIG("Audio must be stereo for VCD PS", NULL);
+                GUI_Error_HIG(_("Audio must be stereo for VCD PS"), NULL);
 		return 0;
 	}
 	
 	// Second, check video
 	if(strcmp(videoCodecGetName(),"VCD"))// && strcmp(videoCodecGetName(),"XSVCD"))
 	{
-		GUI_Error_HIG("Wrong video codec", "Select VCD as the video codec.");
+          GUI_Error_HIG(_("Wrong video codec"), _("Select VCD as the video codec."));
 		return 0;
 	}
 	
  	if(!inname)
 	{
-	 	GUI_FileSelWrite("VCD file to save", (char**)&name);
+          GUI_FileSelWrite(_("VCD file to save"), (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -212,7 +212,7 @@ AVDMGenericAudioStream *stream;
 	// First check audio
 	if(!currentaudiostream)
 	{
-		GUI_Error_HIG("There is no audio track", NULL);
+          GUI_Error_HIG(_("There is no audio track"), NULL);
 		return 0;
 	}
 	stream=mpt_getAudioStream();
@@ -225,26 +225,26 @@ AVDMGenericAudioStream *stream;
 	printf("ch :%x\n",info.channels);
 	if(info.frequency!=44100 )
 	{
-		GUI_Error_HIG("Incompatible audio frequency", "For SVCD PS, samplerate must be 44.1 kHz.\nUse the resample audio filter.");
+          GUI_Error_HIG(_("Incompatible audio frequency"), _("For SVCD PS, samplerate must be 44.1 kHz.\nUse the resample audio filter."));
 		return 0;
 	}
 	if( (info.encoding!=WAV_MP2 ))
 	{
 		printf("Encoding : %d\n",info.encoding);
-		GUI_Error_HIG("Incompatible audio codec", "For SVCD PS, audio must be MP2.");
+                GUI_Error_HIG(_("Incompatible audio codec"), _("For SVCD PS, audio must be MP2."));
 		return 0;
 	}
 	
 	// Second, check video
 	if(strcmp(videoCodecGetName(),"SVCD"))// && strcmp(videoCodecGetName(),"XSVCD"))
 	{
-		GUI_Error_HIG("Wrong video codec", "Select SVCD as the video codec.");
+          GUI_Error_HIG(_("Wrong video codec"), _("Select SVCD as the video codec."));
 		return 0;
 	}
 	
  	if(!inname)
 	{
-	 	GUI_FileSelWrite("SVCD file to save", (char**)&name);
+          GUI_FileSelWrite(_("SVCD file to save"), (char**)&name);
 		if(!name) return 0;
 	}
 	else
@@ -299,7 +299,7 @@ uint8_t ret=0;
 	// First check audio
 	if(!currentaudiostream)
 	{
-		GUI_Error_HIG("There is no audio track", NULL);
+          GUI_Error_HIG(_("There is no audio track"), NULL);
 		return 0;
 	}
 	if(audioProcessMode())
@@ -318,20 +318,20 @@ uint8_t ret=0;
 	}
 	if(info->frequency!=48000 )
 	{
-		GUI_Error_HIG("Incompatible audio frequency", "For DVD PS, audio samplerate must be 48 kHz.\nUse the resample audio filter.");
+          GUI_Error_HIG(_("Incompatible audio frequency"), _("For DVD PS, audio samplerate must be 48 kHz.\nUse the resample audio filter."));
 		return 0;
 	}
 	if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3 && info->encoding!=WAV_LPCM))
 	{
 		printf("Encoding : %d\n",info->encoding);
-		GUI_Error_HIG("Incompatible audio codec", "For DVD PS, audio must be MP2,AC3 or LPCM.");
+                GUI_Error_HIG(_("Incompatible audio codec"),_( "For DVD PS, audio must be MP2,AC3 or LPCM."));
 		return 0;
 	}
 	
 	// Second, check video
 	if(strcmp(videoCodecGetName(),"DVD"))// && strcmp(videoCodecGetName(),"XSVCD"))
 	{
-		GUI_Error_HIG("Wrong video codec", "Select DVD as the video codec.");
+                GUI_Error_HIG(_("Wrong video codec"), _("Select DVD as the video codec."));
 		return 0;
 	}
 	
@@ -375,7 +375,7 @@ uint8_t ret=0;
         // First check audio
         if(!currentaudiostream)
         {
-                GUI_Error_HIG("There is no audio track", NULL);
+                GUI_Error_HIG(_("There is no audio track"), NULL);
                 return 0;
         }
         if(audioProcessMode())
@@ -394,20 +394,20 @@ uint8_t ret=0;
         }
         if(info->frequency!=48000 )
         {
-                GUI_Error_HIG("Incompatible audio frequency", "For DVD, samplerate must be 48 kHz.\nUse the resample audio filter.");
+          GUI_Error_HIG(_("Incompatible audio frequency"),_( "For DVD, samplerate must be 48 kHz.\nUse the resample audio filter."));
                 return 0;
         }
         if( (info->encoding!=WAV_MP2 && info->encoding!=WAV_AC3 && info->encoding!=WAV_LPCM))
         {
                 printf("Encoding : %d\n",info->encoding);
-                GUI_Error_HIG("Incompatible audio codec", "For DVD, audio must be MP2,AC3 or LPCM.");
+                GUI_Error_HIG(_("Incompatible audio codec"),_( "For DVD, audio must be MP2,AC3 or LPCM."));
                 return 0;
         }
         
         // Second, check video
         if(strcmp(videoCodecGetName(),"DVD"))// && strcmp(videoCodecGetName(),"XSVCD"))
         {
-                GUI_Error_HIG("Wrong video codec", "Select DVD as the video codec.");
+          GUI_Error_HIG(_("Wrong video codec"), _("Select DVD as the video codec."));
                 return 0;
         }
         

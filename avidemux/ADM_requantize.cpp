@@ -210,7 +210,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 		if(!muxer->open(out_name,0,MUXER_DVD,&info,audio->getInfo()))
 		//if(!muxer->open(out_name,0,fps1000,audio->getInfo(),(float)audioInc))
 		{
-			GUI_Error_HIG("Muxer init failed", NULL);
+                  GUI_Error_HIG(_("Muxer init failed"), NULL);
 			goto _abt;
 		}
 		// The requantizer will not alter the gop timestamp
@@ -224,7 +224,7 @@ void A_requantize2( float percent, uint32_t quality, char *out_name )
 		file=fopen(out_name,"wb");
 		if(!file)
 		{
-			GUI_Error_HIG("File error", "Cannot open \"%s\" for writing.", out_name);
+                  GUI_Error_HIG(_("File error"),_( "Cannot open \"%s\" for writing."), out_name);
 			goto _abt;
 		}	
 				

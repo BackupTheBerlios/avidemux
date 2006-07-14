@@ -338,7 +338,7 @@ stop_found:
 	if( imageAR == 2 || imageAR == 3 ){
 		qfprintf(out,"# Video Aspect Ratio : %s\n", (imageAR == 2 ? "4:3" : "16:9"));
 	}else{
-		GUI_Error_HIG("Can't determine aspect ratio",NULL);
+          GUI_Error_HIG(_("Can't determine aspect ratio"),NULL);
 	}
 
         /* Now update......... */

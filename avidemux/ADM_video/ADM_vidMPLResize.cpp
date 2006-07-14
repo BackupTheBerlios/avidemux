@@ -140,9 +140,9 @@ uint32_t ww,hh;
 		ww=*w;
 		hh=*h;
   		if(!DIA_resize(&ww,&hh,algo,ow,oh,fps)) return 0;
-		if(!ww || !hh) GUI_Error_HIG("Width and height cannot be 0", NULL);
+                if(!ww || !hh) GUI_Error_HIG(_("Width and height cannot be 0"), NULL);
 		else
-			if( ww&1 || hh &1) GUI_Error_HIG("Width and height cannot be odd", NULL);
+                  if( ww&1 || hh &1) GUI_Error_HIG(_("Width and height cannot be odd"), NULL);
 			else
 			{
 				*w=ww;

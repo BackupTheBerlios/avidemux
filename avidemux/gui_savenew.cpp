@@ -82,7 +82,7 @@ int ret=0;
         {
                 if(UI_GetCurrentFormat()==ADM_AVI_DUAL)
                 {
-                        GUI_Error_HIG("Dual audio can only be used in copy mode", "Select Copy as the video codec.");
+                  GUI_Error_HIG(_("Dual audio can only be used in copy mode"),_( "Select Copy as the video codec."));
                         return 0;
                 }
         }
@@ -188,7 +188,7 @@ int ret=0;
 								ret=A_SaveUnpackedVop(name);
 								break;
 						default:
-								GUI_Error_HIG("Incompatible output format", NULL);
+                                                  GUI_Error_HIG(_("Incompatible output format"), NULL);
 					}
 					break;
 		case CodecFamilyMpeg:
@@ -204,7 +204,7 @@ int ret=0;
 						          ret=mpeg_passthrough(name,UI_GetCurrentFormat());
                                                           break;
                                                   default:
-                                                        GUI_Error_HIG("Incompatible output format", NULL);
+                                                    GUI_Error_HIG(_("Incompatible output format"), NULL);
                                                 }
 					}
 					else
@@ -217,7 +217,7 @@ int ret=0;
 								ret=EncoderSaveMpeg(name);
 								break;
 							default:
-								GUI_Error_HIG("Incompatible output format", NULL);
+                                                          GUI_Error_HIG(_("Incompatible output format"), NULL);
 						}
 					
 					}
@@ -231,7 +231,7 @@ int ret=0;
                                 ret=oplug_mpegff(name,UI_GetCurrentFormat());;
                                 break;
                         default:
-                            GUI_Error_HIG("Incompatible output format", NULL);
+                          GUI_Error_HIG(_("Incompatible output format"), NULL);
                     }
                     break;
                 default:
@@ -249,7 +249,7 @@ uint8_t ret=0;
 
 		if(! secondaudiostream)
 		{
-				 	GUI_Error_HIG("There is no second track", "Select a second audio track in the Audio menu.");
+                  GUI_Error_HIG(_("There is no second track"), _("Select a second audio track in the Audio menu."));
 				  	return 0;
 		}
 		if(!inname)
@@ -275,7 +275,7 @@ int ret;
 	video_body->getVideoInfo(&info);
 	if( !isMpeg4Compatible(  info.fcc))
 	{
-		GUI_Error_HIG("This cannot have packed VOP", "It is not MPEG-4 video. File will not be saved.");
+          GUI_Error_HIG(_("This cannot have packed VOP"),_( "It is not MPEG-4 video. File will not be saved."));
 		return 0;
         }
 	//
@@ -343,7 +343,7 @@ uint8_t  A_SaveAudioNVideo(const char *name)
 			printf("\n Process mode\n");
      		nw=new   GenericAviSaveProcess;
 #else
-			GUI_Error_HIG("No encoder", "Cannot save in process mode.");
+			GUI_Error_HIG(_("No encoder"),_( "Cannot save in process mode."));
    			return ;
 #endif
 

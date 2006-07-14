@@ -393,7 +393,7 @@ static void updateAll(void)
         if(!avifileinfo) return;
                         if (!video_body->updateVideoInfo (avifileinfo))
                         {
-                                GUI_Error_HIG ("OOPS","Something bad happened when executing that script");
+                          GUI_Error_HIG (_("OOPS"),_("Something bad happened when executing that script"));
                         }
                         frameStart=0;
                         if(avifileinfo->nb_frames)

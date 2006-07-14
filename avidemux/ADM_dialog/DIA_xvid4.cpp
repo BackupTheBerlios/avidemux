@@ -114,7 +114,7 @@ _again:
 _erLoad:
                   if(name) ADM_dealloc(name);
                   if(file) fclose(file);
-                  GUI_Error_HIG("Error Loading","Error loadind the custom matrix file.");
+                  GUI_Error_HIG(_("Error Loading"),_("Error loadind the custom matrix file."));
                   goto _again;
               }
               // Read it
@@ -449,7 +449,7 @@ _loop:
         fd=fopen(name,"wb");
         if(!fd)
         {
-            GUI_Error_HIG("Error Writing","Error writing the custom matrix file.");
+            GUI_Error_HIG(_("Error Writing"),_("Error writing the custom matrix file."));
             ADM_dealloc(name);
             goto _loop;
         }

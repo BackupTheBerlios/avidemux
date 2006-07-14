@@ -381,7 +381,7 @@ void ComputePreload(void)
 
       if (!latency)
       {
-          GUI_Error_HIG("Trouble initializing audio device", NULL);
+          GUI_Error_HIG(_("Trouble initializing audio device"), NULL);
           return;
       }
     // compute preload                      

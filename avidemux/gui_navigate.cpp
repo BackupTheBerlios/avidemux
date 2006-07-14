@@ -75,7 +75,7 @@ uint32_t flags;
       {
         if( !GUI_getFrame(curframe + 1,rdr_decomp_buffer,&flags))
         	{
-            	GUI_Error_HIG("Decompressing error", "Cannot decode next frame.");
+                  GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode next frame."));
            	}
            else
            {
@@ -116,7 +116,7 @@ void GUI_NextKeyFrame(void)
 			curframe=f;
 			if( !GUI_getFrame(curframe,rdr_decomp_buffer,&flags))
         		{
-            			GUI_Error_HIG("Decompressing error", "Cannot decode keyframe.");
+                          GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode keyframe."));
 			}
 			
 			renderUpdateImage(rdr_decomp_buffer->data);
@@ -378,7 +378,7 @@ uint32_t flags;
 
 	if( !GUI_getFrame(frame ,rdr_decomp_buffer,&flags))
 	{
-		GUI_Error_HIG("Decompressing error", "Cannot decode the frame.");
+          GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode the frame."));
 		return 0;
 	}
 
@@ -420,7 +420,7 @@ void GUI_PreviousKeyFrame(void)
 			curframe=f;
 			if( !GUI_getFrame(curframe,rdr_decomp_buffer,&flags))
         		{
-            			GUI_Error_HIG("Decompressing error", "Cannot decode keyframe.");
+                          GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode keyframe."));
 			}
 			
 			renderUpdateImage(rdr_decomp_buffer->data);

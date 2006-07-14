@@ -54,12 +54,12 @@ aviInfo    info;
 						
 	if(!_nb_video)
 	{
-		GUI_Error_HIG("No video loaded", NULL);
+          GUI_Error_HIG(_("No video loaded"), NULL);
 		return 0;
 	}
 	if(!isIndexable())
 	{
-		GUI_Error_HIG("Not indexable", "DivX 5 + packed?");
+          GUI_Error_HIG(_("Not indexable"),_( "DivX 5 + packed?"));
 		return 0;
 	}
                         vi=&(_videos[0]);
@@ -119,7 +119,7 @@ aviInfo    info;
 	  				{
        						delete work;
 						vi->decoder->decodeFull();
-            					GUI_Error_HIG("Aborted", NULL);
+                                                GUI_Error_HIG(_("Aborted"), NULL);
 						delete [] compBuffer;
 						delete  prepBuffer;
                                                 delete  prepBufferNoCopy;

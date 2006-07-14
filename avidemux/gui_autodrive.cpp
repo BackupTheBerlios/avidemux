@@ -48,7 +48,7 @@ uint8_t A_autoDrive(Action action)
         //
         if(!currentaudiostream)
         {
-                GUI_Error_HIG("No audio track", "An audio track is necessary to create such file");
+          GUI_Error_HIG(_("No audio track"),_( "An audio track is necessary to create such file"));
                 return 0;
         }
 
@@ -66,7 +66,7 @@ uint8_t A_autoDrive(Action action)
                     if(!videoCodecSelectByName("FFMpeg4"))            
 #endif
                     {
-                        GUI_Error_HIG("Codec Error", "Cannot select mpeg4 sp codec.");
+                      GUI_Error_HIG(_("Codec Error"),_( "Cannot select mpeg4 sp codec."));
                         return 0;
                     }
                                 // Audio Codec
@@ -81,7 +81,7 @@ uint8_t A_autoDrive(Action action)
 #ifdef USE_FAAC
                                     audioCodecSetcodec(AUDIOENC_FAAC);
 #else
-                                    GUI_Error_HIG("Codec Error", "You don't have FAAC!.\nIt is needed to create PSP compatible video.");
+                                    GUI_Error_HIG(_("Codec Error"),_( "You don't have FAAC!.\nIt is needed to create PSP compatible video."));
 #endif
                                     // ? Needed ?
                                     if(currentaudiostream->getInfo()->frequency!=44100)

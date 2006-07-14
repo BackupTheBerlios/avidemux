@@ -320,7 +320,7 @@ on_action (gui_act action)
 	  conf = videofilters[action_parameter].conf;
 	  if (videofilters[action_parameter].tag == VF_PARTIAL)	// cannot recurse
 	    {
-	      GUI_Error_HIG ("The filter is already partial", NULL);
+              GUI_Error_HIG (_("The filter is already partial"), NULL);
 	    }
 	  else
 	    {
@@ -455,13 +455,13 @@ on_action (gui_act action)
     case A_SAVE:
       if (nb_active_filter < 2)
 	{
-	  GUI_Error_HIG ("Nothing to save", NULL);
+          GUI_Error_HIG (_("Nothing to save"), NULL);
 	}
       else
 #ifdef USE_LIBXML2
-	GUI_FileSelWrite ("Save set of filters", filterSaveXml);
+            GUI_FileSelWrite (_("Save set of filters"), filterSaveXml);
 #else
-	GUI_FileSelWrite ("Save set of filters", filterSave);
+	GUI_FileSelWrite (_("Save set of filters"), filterSave);
 
 #endif
       break;

@@ -140,7 +140,7 @@ uint32_t skipping=1;
 
            if (!_encode)
                 {
-                        GUI_Error_HIG ("Cannot initialize the video stream", NULL);
+                  GUI_Error_HIG (_("Cannot initialize the video stream"), NULL);
                         goto  stopit;
                 }
 
@@ -158,7 +158,7 @@ uint32_t skipping=1;
 
                 if (!_encode->configure (_incoming))
                 {
-                     GUI_Error_HIG ("Filter init failed", NULL);
+                      GUI_Error_HIG (_("Filter init failed"), NULL);
                      goto  stopit;
                 };
 
@@ -196,7 +196,7 @@ preFilling:
              if(!(err=_encode->encode ( prefill, &bitstream)))//&len, videoBuffer, &flags,&displayFrame))
              {
                         printf("MP4:First frame error\n");
-                        GUI_Error_HIG ("Error while encoding", NULL);
+                        GUI_Error_HIG (_("Error while encoding"), NULL);
                         goto  stopit;
               }
               if(!bitstream.len)
@@ -206,7 +206,7 @@ preFilling:
               }
               if(!bitstream.flags & AVI_KEY_FRAME)
               {
-                  GUI_Error_HIG ("KeyFrame error", "The beginning frame is not a key frame.\nPlease move the A marker.");
+                GUI_Error_HIG (_("KeyFrame error"),_( "The beginning frame is not a key frame.\nPlease move the A marker."));
                   goto  stopit; 
               }
            //len=bitstream.len;
@@ -233,7 +233,7 @@ preFilling:
                 audio=mpt_getAudioStream();
                 if(!audio)
                 {
-                        GUI_Error_HIG ("Cannot initialize the audio stream", NULL);
+                        GUI_Error_HIG (_("Cannot initialize the audio stream"), NULL);
                         goto  stopit;
                 }
           } 
@@ -303,7 +303,7 @@ preFilling:
                if(!r)
                {
                         printf("MP4:Frame %u error\n",frame);
-                        GUI_Error_HIG ("Error while encoding", NULL);
+                        GUI_Error_HIG (_("Error while encoding"), NULL);
                         goto  stopit;
                 }
                 if(!bitstream.len && skipping)
@@ -370,7 +370,7 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
                         if (!encoding_gui->isAlive())
                         {
                                 abt:
-                                GUI_Error_HIG ("Aborting", NULL);
+                                    GUI_Error_HIG (_("Aborting"), NULL);
                                 return 0;
                         }
                         bitstream.cleanup(cf);

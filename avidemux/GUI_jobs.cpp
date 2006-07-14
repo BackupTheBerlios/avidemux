@@ -34,7 +34,7 @@ char     *name;
 
         if(!buildDirectoryContent(&nb,ADM_getJobDir(),jobName,MAX_JOBS))
         {
-                GUI_Error_HIG("Oops","Something very wrong happened when buildint joblist");
+          GUI_Error_HIG(_("Oops"),_("Something very wrong happened when buildint joblist"));
                 return 0;
         }
         if(!nb)

@@ -483,7 +483,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					i=tom.read32();
 					if(i&0xffff)
 					{
-						GUI_Error_HIG("Expect troubles", NULL);
+                                          GUI_Error_HIG(_("Expect troubles"), NULL);
 					}
                                         if(!ADIO.channels) ADIO.channels=1;
                                         if(ADIO.bitspersample<8) ADIO.bitspersample=8;
@@ -926,7 +926,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                                 VDEO.extraData=new uint8_t[ VDEO.extraDataSize ];
                                                 if(!tom.readPayload(VDEO.extraData+4,VDEO.extraDataSize-4 ))
 						{
-							GUI_Error_HIG("Problem reading SVQ3 headers", NULL);
+                                                  GUI_Error_HIG(_("Problem reading SVQ3 headers"), NULL);
 						}
                                                 VDEO.extraData[0]='S';
                                                 VDEO.extraData[1]='V';
@@ -1454,7 +1454,7 @@ uint32_t i,j,cur;
 	}
 	else // there is not ssts
 	{
-		GUI_Error_HIG("No stts table", NULL);
+          GUI_Error_HIG(_("No stts table"), NULL);
 		ADM_assert(0);	
 	}
 	return 1;

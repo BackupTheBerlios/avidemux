@@ -312,8 +312,8 @@ mpegWritter::save_regular (const char *name, ADM_MPEGTYPE mpegtype, int qz, int 
   _fps1000 = incoming->getInfo ()->fps1000;
   if (!_total)
     {
-      GUI_Error_HIG ("No frames to encode",
-		     "Please check markers. Is \"A>\" == \">B\"?");
+      GUI_Error_HIG (_("No frames to encode"),
+                     _("Please check markers. Is \"A>\" == \">B\"?"));
       return 0;
     }
 
@@ -439,7 +439,7 @@ mpegWritter::save_regular (const char *name, ADM_MPEGTYPE mpegtype, int qz, int 
       if (!incoming->getFrameNumberNoAlloc (i, &size, aImage, &flags))
 	{
 	  delete encoding;
-	  GUI_Error_HIG ("Encoding error", NULL);
+          GUI_Error_HIG (_("Encoding error"), NULL);
 	  if (fd)
 	    qfclose (fd);
 	  end ();
@@ -580,7 +580,7 @@ mpegWritter::save_dualpass (const char *name, uint32_t final_size, uint32_t bitr
       // WLA
       {
 	delete encoding;
-	GUI_Error_HIG ("Error in pass 1", NULL);
+        GUI_Error_HIG (_("Error in pass 1"), NULL);
 	delete[]statname;
 	return 0;
       }
@@ -592,7 +592,7 @@ mpegWritter::save_dualpass (const char *name, uint32_t final_size, uint32_t bitr
     // WLA
     {
       delete encoding;
-      GUI_Error_HIG ("Error in pass 2", NULL);
+      GUI_Error_HIG (_("Error in pass 2"), NULL);
       delete[]statname;
       return 0;
     }
@@ -688,7 +688,7 @@ mpegWritter::dopass1 (const char *name, char *statname, uint32_t final_size, uin
       
       if (!incoming->getFrameNumberNoAlloc (i, &size, aImage, &flags))
 	{
-	  GUI_Error_HIG ("Encoding error", NULL);
+          GUI_Error_HIG (_("Encoding error"), NULL);
 	  end ();
 	  return 0;
 	}
@@ -889,7 +889,7 @@ mpegWritter::dopass2 (const char *name, char *statname, uint32_t final_size, uin
     {
       if (!incoming->getFrameNumberNoAlloc (i, &size, aImage, &flags))
 	{
-	  GUI_Error_HIG ("Encoding error", NULL);
+          GUI_Error_HIG (_("Encoding error"), NULL);
 	  if (!_audio)
 	    qfclose (fd);
 	  end ();
@@ -1041,7 +1041,7 @@ mpegWritter::init (const char *name, ADM_MPEGTYPE type, uint8_t interlaced, uint
   UNUSED_ARG (type);
   if (!identMovieType (_fps1000))
     {
-      GUI_Error_HIG ("Incompatible frame rate", NULL);
+      GUI_Error_HIG (_("Incompatible frame rate"), NULL);
       return 0;
     }
 

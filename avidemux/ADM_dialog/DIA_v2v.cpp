@@ -89,19 +89,19 @@ char *tmp=NULL,*tmp2=NULL,*tmp3=NULL;
                                            tmp=gtk_editable_get_chars(GTK_EDITABLE (WID(entryVob)), 0, -1);
                                            if(!tmp || !*tmp)
                                            {
-                                                        GUI_Error_HIG("Invalid vobname","Please select or enter a valid vob name");
+                                             GUI_Error_HIG(_("Invalid vobname"),_("Please select or enter a valid vob name"));
                                                         continue;
                                             }
                                            tmp2=gtk_editable_get_chars(GTK_EDITABLE (WID(entryIfo)), 0, -1);
                                            if(!tmp2 || !*tmp2)
                                            {
-                                                        GUI_Error_HIG("Invalid ifo","Please select or enter a valid ifo file");
+                                             GUI_Error_HIG(_("Invalid ifo"),_("Please select or enter a valid ifo file"));
                                                         continue;
                                             }
                                            tmp3=gtk_editable_get_chars(GTK_EDITABLE (WID(entryVobSub)), 0, -1);
                                            if(!tmp3 || !*tmp3 )
                                            {
-                                                        GUI_Error_HIG("Invalid vobsubname","Please select or enter a valid vobsub file");
+                                             GUI_Error_HIG(_("Invalid vobsubname"),_("Please select or enter a valid vobsub file"));
                                                         continue;
                                             }
                                             if(*vobname) ADM_dealloc(*vobname);

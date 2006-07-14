@@ -212,7 +212,7 @@ unsigned char c,d;
 			_fd=fopen((char *)_conf->_subname,"rt");
 			if(!_fd)
 			{
-				GUI_Error_HIG("Could not open subtitle file", NULL);
+                          GUI_Error_HIG(_("Could not open subtitle file"), NULL);
 				return 0;
 			}
 			// Try to detect utf16 files			
@@ -235,7 +235,7 @@ unsigned char c,d;
 						loadSRT();
 						break;
 			default:
-					GUI_Error_HIG("Cannot identify subtitle format", NULL);
+                          GUI_Error_HIG(_("Cannot identify subtitle format"), NULL);
 			}
 
   // Apply delay to subtitles

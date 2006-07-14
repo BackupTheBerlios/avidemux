@@ -300,7 +300,7 @@ char *start;
                 _index=new dmxIndex[_nbFrames+1];
                 if(!_index)
                         {
-                                        GUI_Error_HIG("Out of memory", NULL);
+                          GUI_Error_HIG(_("Out of memory"), NULL);
                                         ADM_assert(0);
                         }
                 memset(_index,0,_nbFrames*sizeof(dmxIndex));
@@ -473,7 +473,7 @@ char *start;
                         // switch DTS->PTS
                         if(!renumber())
                         {
-                                GUI_Error_HIG("MPEG renumbering error", NULL);
+                          GUI_Error_HIG(_("MPEG renumbering error"), NULL);
                                 return 0;
                         }
                         //Dump();

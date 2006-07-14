@@ -367,15 +367,15 @@ UNUSED_ARG(mode);
 	  printf ("\n not identified ...\n");
 	}
       else
-	GUI_Error_HIG("File type identified but no loader support detected...",
-		"May be related to an old index file.");
+        GUI_Error_HIG(_("File type identified but no loader support detected..."),
+                      _("May be related to an old index file."));
       return 0;
     }
 
    // check opening was successful
    if (ret == 0) {
      char str[512+1];
-      snprintf(str,512,"Attempt to open %s failed!", name);
+     snprintf(str,512,_("Attempt to open %s failed!"), name);
       str[512] = '\0';
       GUI_Error_HIG(str,NULL);
       delete _videos[_nb_video]._aviheader;;
@@ -399,7 +399,7 @@ UNUSED_ARG(mode);
                  (strlen(str)?" and ":""),
                  (strlen(str)?" are ":" is ") );
          str[512] = '\0';
-         GUI_Error_HIG(str,"You cannot mix different video dimensions yet. Using the partial video filter later, will not work around this problem. The workaround is:\n1.) \"resize\" / \"add border\" / \"crop\" each stream to the same resolution\n2.) concatinate them together");
+         GUI_Error_HIG(str,_("You cannot mix different video dimensions yet. Using the partial video filter later, will not work around this problem. The workaround is:\n1.) \"resize\" / \"add border\" / \"crop\" each stream to the same resolution\n2.) concatinate them together"));
          delete _videos[_nb_video]._aviheader;;
          return 0;
       }
@@ -665,12 +665,12 @@ TryAgain:
                                            info.width, info.height, l, d);
 										goto TryAgain;
 									}
-									GUI_Error_HIG("Could not unpack the video", "Using backup decoder - not frame accurate.");
+                                                                        GUI_Error_HIG(_("Could not unpack the video"),_( "Using backup decoder - not frame accurate."));
 									}
 								}
 #if  1 //def USE_DIVX
                                                                 if(count)
-                                                                        GUI_Info_HIG(ADM_LOG_IMPORTANT,"Weird", "The unpacking succeedeed but the index is still not up to date.");
+                                                                        GUI_Info_HIG(ADM_LOG_IMPORTANT,_("Weird"),_( "The unpacking succeedeed but the index is still not up to date."));
 								printf("\n Switching codec...\n");
 								delete vid->decoder;
 								vid->decoder=getDecoderVopPacked(info.fcc, info.width,info.height,0,NULL);
@@ -1464,7 +1464,7 @@ uint8_t         ADM_Composer::tryIndexing(char *name,char *idxname)
                         delete [] tracks;
                 delete [] idx;
 
-                if(!r) GUI_Error_HIG("Indexing failed", NULL); 
+                if(!r) GUI_Error_HIG(_("Indexing failed"), NULL); 
                 return r;
 }
 //

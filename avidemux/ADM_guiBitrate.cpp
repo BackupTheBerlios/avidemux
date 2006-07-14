@@ -102,7 +102,7 @@ void GUI_displayBitrate( void )
 	max=0;
 	if(!(frameEnd>frameStart))
 	{
-		GUI_Error_HIG("No data", NULL);
+          GUI_Error_HIG(_("No data"), NULL);
 		return ;
 	}
 
@@ -134,7 +134,7 @@ void GUI_displayBitrate( void )
 	printf("\n Total : %lu bytes, max %d bytes round %d\n",total,max,round);
 	if(!max)
 	{
-		GUI_Error_HIG("No data", NULL);
+          GUI_Error_HIG(_("No data"), NULL);
 		return ;
 	}
 	nb_frame=frameEnd-frameStart;
