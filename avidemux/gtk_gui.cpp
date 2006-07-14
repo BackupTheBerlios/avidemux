@@ -1099,8 +1099,8 @@ int A_openAvi2 (char *name, uint8_t mode)
             {
                 if(nbAudio>1)
                 {   // Multiple track warn user
-                    GUI_Info_HIG(ADM_LOG_INFO,"Multiple Audio Tracks","The file you just loaded contains several audio tracks.\n"
-                            "Go to Audio->MainTrack to select the active one.");
+                  GUI_Info_HIG(ADM_LOG_INFO,_("Multiple Audio Tracks"),_("The file you just loaded contains several audio tracks.\n"
+                      "Go to Audio->MainTrack to select the active one."));
                 }
             }
             if(infos) delete [] infos;
@@ -1497,7 +1497,7 @@ void A_saveBunchJpg(char *name)
     		fclose(fd);
 	}
 	
-	GUI_Info_HIG(ADM_LOG_INFO,"Done", "Saved %d images.", curImg-frameStart);
+        GUI_Info_HIG(ADM_LOG_INFO,_("Done"),_( "Saved %d images."), curImg-frameStart);
 _bunch_abort:
         delete working	;
     	delete [] buffer;
@@ -1603,7 +1603,7 @@ sz = avifileinfo->width* avifileinfo->height * 3;
     	ADM_dealloc(out);
 
 
-        GUI_Info_HIG (ADM_LOG_INFO,"Done", "Saved \"%s\".", GetFileName(name));
+        GUI_Info_HIG (ADM_LOG_INFO,_("Done"),_( "Saved \"%s\"."), GetFileName(name));
 
 }
 
@@ -2160,11 +2160,11 @@ DIA_working *work;
   delete work;
   delete aImage;
   if(error==0)
-  	GUI_Info_HIG(ADM_LOG_IMPORTANT,"No error found", NULL);
+    GUI_Info_HIG(ADM_LOG_IMPORTANT,_("No error found"), NULL);
 else
 	{
 		char str[400];
-		sprintf(str,"Errors found in %u frames",error);
+                sprintf(str,_("Errors found in %u frames"),error);
 		GUI_Info_HIG(ADM_LOG_IMPORTANT,str, NULL);
 
 	}
@@ -2406,7 +2406,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioMP3;
                                 printf ("\n MP3 loaded\n");
-                                GUI_Info_HIG(ADM_LOG_INFO,"Second track loaded", NULL);
+                                GUI_Info_HIG(ADM_LOG_INFO,_("Second track loaded"), NULL);
                                 return 1;
                         }
                         }
@@ -2427,7 +2427,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioAC3;
                                 printf ("\n AC3 loaded\n");
-                                GUI_Info_HIG(ADM_LOG_INFO,"Second track loaded", NULL);
+                                GUI_Info_HIG(ADM_LOG_INFO,_("Second track loaded"), NULL);
                                 return 1;
                         }
                         }
@@ -2448,7 +2448,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioAC3;
                                 printf ("\n AC3 loaded\n");
-                                GUI_Info_HIG(ADM_LOG_INFO,"Second track loaded", NULL);
+                                GUI_Info_HIG(ADM_LOG_INFO,_("Second track loaded"), NULL);
                                 return 1;
                         }}
                         break;
@@ -2521,7 +2521,7 @@ int A_SaveWrapper(char *name)
 
         if(A_Save(name))
         {
-                GUI_Info_HIG (ADM_LOG_INFO,"Done", "File %s has been successfully saved.",GetFileName(name));
+          GUI_Info_HIG (ADM_LOG_INFO,_("Done"),_( "File %s has been successfully saved."),GetFileName(name));
         }
         else
         {

@@ -676,7 +676,7 @@ TryAgain:
 								vid->decoder=getDecoderVopPacked(info.fcc, info.width,info.height,0,NULL);
 								ispacked=1;
 #else
-								GUI_Info_HIG(ADM_LOG_IMPORTANT,"Troubles ahead", "This a VOP packed AVI.");
+								GUI_Info_HIG(ADM_LOG_IMPORTANT,_("Troubles ahead"), _("This a VOP packed AVI."));
 #endif
 
 							}

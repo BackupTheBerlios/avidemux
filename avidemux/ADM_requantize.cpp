@@ -339,6 +339,6 @@ _abt:
 		   }
 	Mrequant_end();
         deleteAudioFilter(audio);
-	GUI_Info_HIG(ADM_LOG_INFO,"Done", "Successfully saved \"%s\".", GetFileName(out_name));
+	GUI_Info_HIG(ADM_LOG_INFO,_("Done"),( "Successfully saved \"%s\"."), GetFileName(out_name));
 
 }

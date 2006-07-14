@@ -132,7 +132,7 @@ _erLoad:
               fclose(file);
               memcpy(localParam.intraMatrix,intra,64);
               memcpy(localParam.interMatrix,inter,64);
-              GUI_Info_HIG(ADM_LOG_INFO,"Matrix Loaded","The custom matrix file has been successfully loaded.");
+              GUI_Info_HIG(ADM_LOG_INFO,_("Matrix Loaded"),_("The custom matrix file has been successfully loaded."));
               goto _again;
         }
 

@@ -105,11 +105,11 @@ uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming)
 		      			value = (uint32_t) gtk_read_entry(WID(entry_bitrate));
 					// validate against max/min bitrate
 					if( value > conf->maxBitrate * 8 / 1000 ){
-						GUI_Info_HIG(ADM_LOG_IMPORTANT,"Bitrate out of range","choosing maxBitrate instead");
+                                          GUI_Info_HIG(ADM_LOG_IMPORTANT,_("Bitrate out of range"),_("choosing maxBitrate instead"));
 						value = conf->maxBitrate * 8 / 1000;
 					}
 					if( value < conf->minBitrate * 8 / 1000 ){
-						GUI_Info_HIG(ADM_LOG_IMPORTANT,"Bitrate out of range","choosing minBitrate instead");
+                                          GUI_Info_HIG(ADM_LOG_IMPORTANT,_("Bitrate out of range"),_("choosing minBitrate instead"));
 						value = conf->minBitrate * 8 / 1000;
 					}
 					// validate against some fixed values - min/maxBitrate may be also out of range
