@@ -31,6 +31,8 @@ typedef struct ADM_audioEncoderDescriptor
   Base class for all audio encoder.It does the reverse of the bridge class and offers a proper GenericAudioStreamAPI
 
 */
+#define DITHER_SIZE 4800
+#define DITHER_CHANNELS 6
  //_____________________________________________
 class AUDMEncoder : public AVDMGenericAudioStream
 {
@@ -48,7 +50,11 @@ class AUDMEncoder : public AVDMGenericAudioStream
     
     float          *tmpbuffer;
     uint8_t        refillBuffer(int minimum); // Mininum is in float
+
+    float           rand_table[DITHER_CHANNELS][DITHER_SIZE];
+    void            initDither();
     uint8_t        dither16(float *start, uint32_t nb); //
+
     uint32_t       tmphead,tmptail;
   public:
     //

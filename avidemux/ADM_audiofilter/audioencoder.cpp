@@ -38,6 +38,7 @@ AUDMEncoder::AUDMEncoder(AUDMAudioFilter *in)  :AVDMGenericAudioStream  ()
   tmpbuffer=new float[_wavheader->frequency*_wavheader->channels];
   tmphead=tmptail=0;
   eof_met=0;
+  initDither();
 };
 /********************/
 AUDMEncoder::~AUDMEncoder()
@@ -91,23 +92,43 @@ uint8_t AUDMEncoder::refillBuffer(int minimum)
       tmptail+=nb;
   }
 }
-// FIXME , incomplete dithering
-#warning FIXME, incorrect dithering
-uint8_t       AUDMEncoder::dither16(float *start, uint32_t nb)
-{
-    float dp;
-    int16_t *data_int = (int16_t *)start;
-    float *data = start;
-    uint16_t len = nb;
 
-    for (int i = 0; i < len; i++)
-    {
-      *data_int = (int16_t)(*data * 32765 );
-      data++;
-      data_int++;
-      }
-      return 1;
+void AUDMEncoder::initDither()
+{
+	float d, dp;
+	for (int c = 0; c < DITHER_CHANNELS; c++) {
+		dp = 0;
+		for (int i = 0; i < DITHER_SIZE-1; i++) {
+			d = rand() / (float)RAND_MAX * 2.0 - 1.0;
+			rand_table[c][i] = d - dp;
+			dp = d;
+		}
+  		rand_table[c][DITHER_SIZE-1] = 0 - dp;
+	}
 }
+
+uint8_t AUDMEncoder::dither16(float *start, uint32_t nb)
+{
+	static uint16_t nr = 0;
+	int16_t *data_int = (int16_t *)start;
+	float *data = start;
+	uint32_t len = nb / _wavheader->channels;
+
+	for (int i = 0; i < len; i++) {
+		for (int c = 0; c < _wavheader->channels; c++) {
+			if (*data > 1) *data = 1;
+			if (*data < -1) *data = -1;
+			*data_int = (int16_t)(*data * 32765 + rand_table[c][nr]);
+			data++;
+			data_int++;
+		}
+		nr++;
+		if (nr > DITHER_SIZE)
+			nr = 0;
+	}
+	return 1;
+}
+
 uint32_t AUDMEncoder::read(uint32_t len,uint8_t *buffer)
 {
   ADM_assert(0);
