@@ -98,12 +98,12 @@ uint8_t	 AVDMProcessAudio_RawShift::getPacket(uint8_t *dest, uint32_t *len, uint
                 }
                 if(_hold>0)
                 {
-                  _hold-=*samples;
+                  _hold-=(int32_t)*samples;
                   if(_hold<=0)
                   {
                     _hold=0;  
                     _instream->goToTime(  _starttime);
-                    printf("[RawShift] Rewinding\n");
+                    printf("[RawShift] Rewinding to %u ms \n",_starttime);
                   }
                 }
               return r;

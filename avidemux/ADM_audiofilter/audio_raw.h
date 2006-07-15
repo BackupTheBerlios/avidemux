@@ -13,11 +13,17 @@
  ***************************************************************************/
 #ifndef AUDIO_RSHIFT_H
 #define AUDIO_RSHIFT_H
+/**
+  This class implements a timeshift directly on the bistream bits
+  If the shift is <0, it amounts to duplicate the head of the bistream
+  Shift >0 means seeking forward in the stream
+
+*/
 class AVDMProcessAudio_RawShift : public AVDMBufferedAudioStream
 {
   protected:
-    uint32_t _starttime; //< Starting time in ms
-    int32_t  _hold;      //< Nb of audioSample to duplicate
+    uint32_t _starttime; /*< Starting time in ms*/
+    int32_t  _hold;      /*< Nb of audioSample to duplicate*/
   public :
     virtual uint32_t read(uint32_t len,uint8_t *buffer);
     virtual uint8_t  goTo(uint32_t newoffset);

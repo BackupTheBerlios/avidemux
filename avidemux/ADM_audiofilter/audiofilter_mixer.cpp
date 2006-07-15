@@ -287,52 +287,51 @@ static MIXER *matrixCall[CHANNEL_LAST][CHANNEL_LAST] // output / input
 uint32_t AUDMAudioFilterMixer::fill(uint32_t max,float *output,AUD_Status *status)
 {
 
-    uint32_t rd = 0, rdall = 0;
+    uint32_t rd = 0;
     uint8_t *in,*out;
-    int32_t nbout;
-    uint32_t asked, done,window;
-#undef NB_SAMPLE
-#define NB_SAMPLE (256)
+    uint32_t window;
+    int nbSampleMax=max/ADM_channel_mixer[_output];;
 
 
 // Fill incoming buffer
     shrink();
-    window=NB_SAMPLE*ADM_channel_mixer[_input];
-    ADM_assert(window);
-    ADM_assert((AUD_PROCESS_BUFFER_SIZE/2)>window);
-    
     fillIncomingBuffer(status);
     // Block not filled ?
-    if((_tail-_head)%window)
+    if((_tail-_head)<ADM_channel_mixer[_input])
     {
-      if(*status==AUD_END_OF_STREAM)
+      if(*status==AUD_END_OF_STREAM && _head)
       {
-        int leftover=(_tail-_head)%window;
-        leftover=1+window-leftover;
-        memset(&_incomingBuffer[_tail],0,sizeof(float)*leftover);
-        printf("[Mixer] not enough, filling with zero...%lu\n", leftover);
-        _tail+=leftover;
-        
+        memset(&_incomingBuffer[_head],0,sizeof(float) * ADM_channel_mixer[_input]);
+        _tail=_head+ADM_channel_mixer[_input];
+        printf("[Mixer] Warning asked %u symbols, a window is %u symbols\n",max,window);
+      }
+      else
+      {
+        return 0;
       }
     }
-    int left=(_tail-_head)%window;
-    int workingSet=(_tail-_head)-left;
-    
-    if(!workingSet)
-    {
-      *status=AUD_END_OF_STREAM;
-      return 0;
-    }
+    // How many ?
+
     // Let's go
     int processed=0;
-    int outWindow=ADM_channel_mixer[_output];
-    ADM_assert(max>2*outWindow);
-    max-=2*outWindow;
+    int available=0;
+    if(!nbSampleMax)
+    {
+      printf("[Mixer] Warning max %u, channels %u\n",max,ADM_channel_mixer[_input]);
+    }
+    available=(_tail-_head)/ADM_channel_mixer[_input]; // nb Sample
+    ADM_assert(available);
+    if(available > nbSampleMax) available=nbSampleMax;
+    
+    ADM_assert(available);
     
     // Now do the downsampling
     MIXER *call=matrixCall[_output][_input];
     if(!call)
-        return (uint32_t)MCOPY(&_incomingBuffer[_head],output,NB_SAMPLE,ADM_channel_mixer[_input]);
-    return (uint32_t)call(&_incomingBuffer[_head],output,NB_SAMPLE,ADM_channel_mixer[_input]);
+        rd= (uint32_t)MCOPY(&_incomingBuffer[_head],output,available,ADM_channel_mixer[_input]);
+    else
+        rd= (uint32_t)call(&_incomingBuffer[_head],output,available,ADM_channel_mixer[_input]);
+    _head+=available*ADM_channel_mixer[_input];
+    return rd;
     
 }
