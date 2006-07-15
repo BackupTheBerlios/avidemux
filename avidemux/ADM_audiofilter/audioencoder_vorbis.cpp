@@ -218,16 +218,17 @@ uint8_t	AUDMEncoder_Vorbis::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sa
     uint32_t nbSample=(tmptail-tmphead)/_wavheader->channels;
     if(nbSample>1024) nbSample=1024;
     float_samples=vorbis_analysis_buffer(&VD, nbSample) ;
-    tmphead+=nbSample*_wavheader->channels;	
+    int index=tmphead;
     // Put our samples in incoming buffer
     for (int i = 0; i < nbSample; i++)
       for (int j = 0; j < _wavheader->channels; j++) {
-      float_samples[j][i] = tmpbuffer[tmphead+i * _wavheader->channels + j];
+      float_samples[j][i] = tmpbuffer[index++];
       if (float_samples[j][i] > 1) float_samples[j][i] = 1;
       if (float_samples[j][i] < -1) float_samples[j][i] = -1;
       }
       // Buffer full, go go go
       vorbis_analysis_wrote(&VD, nbSample) ;  
+      tmphead+=nbSample*_wavheader->channels;	
   }
   return 0;
 	
