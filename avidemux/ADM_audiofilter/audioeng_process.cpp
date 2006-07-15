@@ -57,6 +57,10 @@ uint8_t AUDMAudioFilter::shrink(void)
     _tail-=_head;
     _head=0;
   }
+  if(_head==_tail)
+  {
+    _head=_tail=0;
+  }
   return 1;
 }
 /*
