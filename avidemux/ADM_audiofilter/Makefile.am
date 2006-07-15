@@ -7,8 +7,8 @@ libADM_audiofilter_a_METASOURCES = AUTO
 
 libADM_audiofilter_a_SOURCES = audiodeng_buildfilters.cpp  \
 		audioeng_buff.cpp  \
-		audioeng_sox.cpp   \
-		 audiofilter_normalize.cpp audioeng_process.cpp \
+		audiolib_sox.cpp   \
+		audiofilter_normalize.cpp audioeng_process.cpp \
 		audiofilter_mixer.cpp audiofilter_bridge.cpp audioencoder.cpp \
 		audiofilter_limiter.cpp audiofilter_buildchain.cpp \
 		audiofilter_sox.cpp audiofilter_film2pal.cpp \

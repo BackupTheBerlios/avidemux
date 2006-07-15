@@ -15,7 +15,7 @@
 #ifndef AUDM_AUDIO_SOX_H
 #define AUDM_AUDIO_SOX_H
 
-#include "audioeng_sox.h"
+#include "audiolib_sox.h"
 class AUDMAudioFilterSox : public AUDMAudioFilter
 {
   protected:

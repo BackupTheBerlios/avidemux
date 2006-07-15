@@ -19,7 +19,6 @@
 #define __AudioProcess__
 
 #include "ADM_audio/aviaudio.hxx"
-#include "ADM_audiofilter/audioeng_sox.h"
 #define MINUS_ONE 0xffffffff
 #define PROCESS_BUFFER_SIZE 48000*4*4 // should be enougth
 #define MINIMUM_BUFFER   8192*4

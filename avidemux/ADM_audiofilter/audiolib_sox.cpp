@@ -87,7 +87,7 @@
 #include "audioprocess.hxx"
 #include "resampl.h"
 
-#include "audioeng_sox.h"
+#include "audiolib_sox.h"
 /* this Float MUST match that in filter.c */
 #define Float float
 #define ISCALE 0x10000
