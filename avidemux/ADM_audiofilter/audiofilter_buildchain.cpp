@@ -98,6 +98,8 @@ extern CHANNEL_CONF audioMixing;
 extern int audioMP3mode;
 extern int audioMP3bitrate;
 extern RESAMPLING  audioResampleMode;
+extern int   audioShift ;
+extern int   audioDelay;
 
 static DRCparam drcSetup=
 {
@@ -118,63 +120,22 @@ static ADM_audioEncoderDescriptor *getAudioDescriptor( AUDIOENCODER encoder);
 //_______________________________________
 
 
-AVDMBufferedAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiostream,
+AUDMAudioFilter *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t duration)
 {
 
   AUDMAudioFilter *firstFilter = NULL;
   AUDMAudioFilter *lastFilter = NULL;
-
-  printf("\n Audio codec : %d",activeAudioEncoder);
-// In fact it is more a decompress filter than a null filter
-  //
-/* Mean: Ugly hack, in case of Film2Pal filter, the filter will need
-  more samples in than out (assuming we changed the fps)
-  So we correct the filter length beforehand to avoid the 24/25 too short audio */
-	
-
-#if 0        
-//_______________________________________________________
-    if (audioDelay && audioShift)
-{
-                printf("\n Time shift activated with %d %d ms", audioShift,audioDelay);
-                // Depending on starttime & delay
-                // we may have or not to add silence
-                int32_t sstart=(int32_t)starttime;
-                
-                if (sstart>=audioDelay) // just seek in the file
-{
-                        firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
-                                            sstart-audioDelay, duration);
-                        filtercount = 0;
-                        lastFilter = firstFilter;
-                        filters[filtercount++] = firstFilter;
-}
-                else    // We have to add a silence of -sstart seconds
-{
-                
-                        firstFilter = new AVDMProcessAudio_Null(currentaudiostream,
-                                            sstart, duration);
-                        filtercount = 0;
-                        lastFilter = firstFilter;
-                        filters[filtercount++] = firstFilter;
-                        // Then the silence
-                        AVDMProcessAudio_TimeShift *ts;
-                        ts = new AVDMProcessAudio_TimeShift(lastFilter, audioDelay);
-                        tshift = (AVDMProcessAudioStream *) ts;
-                        lastFilter = tshift;
-                        
-                        filters[filtercount++] = lastFilter;
-}
-}
-      else // no delay
-#endif      
-{
-  firstFilter = new AUDMAudioFilter_Bridge(NULL,currentaudiostream, starttime);
+  
+  deleteAudioFilter(NULL);
+  int32_t timeShiftMs=audioDelay*audioShift;
+  
+  
+  firstFilter = new AUDMAudioFilter_Bridge(NULL,currentaudiostream, starttime,timeShiftMs);
   filtercount = 0;
   lastFilter = firstFilter;
   filtersFloat[filtercount++] = firstFilter;
-}
+
 
 
 //_______________________________________________________
@@ -251,10 +212,7 @@ AVDMBufferedAudioStream *buildInternalAudioFilter(AVDMGenericAudioStream *curren
 
 
     currentaudiostream->beginDecompress();
-#if 0    
-return lastFilter;
-#endif
-  return NULL;
+    return lastFilter;
 }
 /*
 *******************************************************************************************************************
@@ -269,28 +227,9 @@ AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 
         // Do we need to go back
   sstart=(int32_t)starttime;
-#if 0
-        if(audioShift && audioDelay)
-{
-                if(sstart>audioDelay) sstart-=audioDelay;
-                else
-{
-                        sstart=audioDelay-sstart;
-                        lastFilter = new AVDMProcessAudio_Null(currentaudiostream,0, duration);
-                        filtercount = 0;
-                        filters[filtercount++] = lastFilter;
-
-                        AVDMProcessAudio_TimeShift *ts;
-                                ts = new AVDMProcessAudio_TimeShift(lastFilter,    sstart);
-
-                                lastFilter = ts;
-                                printf("\n Time shift activated with %d %d ms", audioShift,audioDelay);
-                                filters[filtercount++] = lastFilter;
-                                return lastFilter;
-}
-}
-#endif
-        lastFilter = new AUDMAudioFilter_Bridge(NULL,currentaudiostream,sstart);
+  int32_t timeShiftMs=audioDelay*audioShift;
+        
+  lastFilter = new AUDMAudioFilter_Bridge(NULL,currentaudiostream,sstart,timeShiftMs);
         filtercount = 0;
         filtersFloat[filtercount++] = lastFilter;
         
@@ -333,8 +272,8 @@ AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
                                          uint32_t starttime, uint32_t duration)
 {
-  AUDMAudioFilter *lastFilter=NULL;
-  AVDMGenericAudioStream *output=NULL;
+  AUDMAudioFilter         *lastFilter=NULL;
+  AVDMGenericAudioStream  *output=NULL;
   AUDMEncoder             *tmpfilter=NULL;
   
 	// if audio is set to copy, we just return the first filter
@@ -353,8 +292,8 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 
 
 // else we build the full chain
-  buildInternalAudioFilter(currentaudiostream,starttime, duration);
-  lastFilter=filtersFloat[filtercount-1];
+  lastFilter=buildInternalAudioFilter(currentaudiostream,starttime, duration);
+  
 // and add encoder...
 
 

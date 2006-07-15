@@ -36,16 +36,50 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 
-AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGenericAudioStream *incoming, uint32_t startInMs) : AUDMAudioFilter(NULL)
+AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGenericAudioStream *incoming,
+                          uint32_t startInMs,int32_t shiftMs) : AUDMAudioFilter(NULL)
 {
   _incoming=incoming;
   memcpy(&_wavHeader,_incoming->getInfo(),sizeof(_wavHeader));
   _startTime=startInMs;
+  shiftMs=-shiftMs;
+  _shift=shiftMs;
+  _hold=0;
   rewind();
-  // FIXME : Compute duration in ms
+  printf("[Bridge] Starting with time %u, shift %d\n",startInMs,-shiftMs);
+  // If shiftMS is > 0, it means we have to go in the future, just increse _startTime
+  if(shiftMs>0)
+  {
+    _startTime+=_shift;
+  }
+  else if(shiftMs<0) // In that case we have to go either in the past and/or duplicate frames
+  {
+    shiftMs=-shiftMs;
+    if(_startTime>shiftMs)  
+    {
+      _startTime-=shiftMs;
+    }else
+    {
+      double nbSample;
+      
+      shiftMs-=_startTime;
+      _startTime=0;
+      nbSample=shiftMs;
+      nbSample*=_wavHeader.frequency; 
+      nbSample/=1000.;
+      nbSample*=_wavHeader.channels;
+      _hold=(int32_t)nbSample;
+      
+      
+    }
+    
+  }
+  printf("[Bridge] Ending with time %u, sample %u\n",_startTime,_hold);
+  rewind();
 }
 AUDMAudioFilter_Bridge::~AUDMAudioFilter_Bridge()
 {
+  printf("[Bridge] Destroying bridge\n");
 }
 uint8_t AUDMAudioFilter_Bridge::rewind(void)
 {
@@ -103,6 +137,16 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
         break;
       }
       _tail+=asked;
+      if(_hold>0)
+      {
+        _hold-=asked;
+        if(_hold<=0)
+        {
+          printf("[Bridge] Looping\n");
+          rewind();
+          _hold=0;
+        }
+      }
     }
   }
   return 1;

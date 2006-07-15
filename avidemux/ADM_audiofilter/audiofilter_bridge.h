@@ -20,10 +20,12 @@ class AUDMAudioFilter_Bridge : public AUDMAudioFilter
 {
   protected:
     AVDMGenericAudioStream *_incoming;
-    uint32_t _startTime;
+    uint32_t _startTime; /*< Starting time in ms */
+    int32_t  _shift;  /*< Shift in Ms */
+    int32_t  _hold;   /*< Nb Sample to repeat */
     virtual uint8_t fillIncomingBuffer(AUD_Status *status);
   public:
-    AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGenericAudioStream *incoming, uint32_t startInMs);
+    AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGenericAudioStream *incoming, uint32_t startInMs,int32_t shiftMS);
     virtual                ~AUDMAudioFilter_Bridge();
     virtual    uint32_t   fill(uint32_t max,float *output,AUD_Status *status);      // Fill buffer: incoming -> us
                                                                                            // Output MAXIMUM max float value
