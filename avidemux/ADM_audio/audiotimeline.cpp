@@ -32,9 +32,6 @@
 #include "fourcc.h"
 #include "aviaudio.hxx"
 
-#ifdef USE_MP3
-#include "ADM_audiocodec/avdm_mad.h"
-#endif
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_dialog/DIA_working.h"
 
