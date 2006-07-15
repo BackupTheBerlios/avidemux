@@ -126,8 +126,6 @@ static void setVar(char *in);
 uint8_t trueFalse(char *p);
 //_________________________________________________________________________
 
-extern uint8_t audioShift;
-extern int32_t audioDelay;
 
 extern int global_argc;
 extern char **global_argv;

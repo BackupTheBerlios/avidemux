@@ -97,8 +97,7 @@
 extern Mpeg2encParam SVCDExtra, DVDExtra;
 extern COMPRES_PARAMS SVCDCodec, DVDCodec;
 
-extern uint8_t audioShift;
-extern int32_t audioDelay;
+
 // IF set do 1st pass with CBR with max bitrate = average bitrate AND disabling padding
 // else do 1st pass with constant Q=6
 //#define ADM_1PASS_CBR 1
@@ -1139,8 +1138,7 @@ mpegWritter::initLveMux (const char *name, ADM_MUXER_TYPE type)
 }
 
 
-AVDMGenericAudioStream *
-mpt_getAudioStream (void)
+AVDMGenericAudioStream *mpt_getAudioStream (void)
 {
   AVDMGenericAudioStream *audio = NULL;
   if (audioProcessMode ())	// else Raw copy mode
@@ -1152,20 +1150,13 @@ mpt_getAudioStream (void)
 	      return NULL;
 	    }
 	}
-      audio =
-	buildAudioFilter (currentaudiostream,
-			  video_body->getTime (frameStart),
-			  video_body->getTime (frameEnd - frameStart));
+      audio =  buildAudioFilter (currentaudiostream,  video_body->getTime (frameStart));
     }
   else				// copymode
     {
       // else prepare the incoming raw stream
       // audio copy mode here
-      int32_t shift = 0;
-      if (audioDelay && audioShift)
-	shift = audioDelay;
-      audio = buildRawAudioFilter (video_body->getTime (frameStart),
-				   0xffffffff, shift);
+      audio = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
     }
   return audio;
 }

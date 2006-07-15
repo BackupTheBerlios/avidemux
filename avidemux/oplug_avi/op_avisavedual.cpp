@@ -50,8 +50,6 @@
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/audioex.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-extern uint8_t audioShift;
-extern int32_t audioDelay;
 
 GenericAviSaveCopyDualAudio::GenericAviSaveCopyDualAudio (AVDMGenericAudioStream	*track)
 			: GenericAviSaveCopy()
@@ -71,10 +69,8 @@ uint8_t GenericAviSaveCopyDualAudio::setupAudio (void)
   int32_t shift=0;
   if(!audio_filter2) return 0;
   if(!currentaudiostream) return 0;
-  if(audioDelay && audioShift) shift=audioDelay;
   
-  audio_filter=buildRawAudioFilter( video_body->getTime (frameStart), 
-      		0xffffffff, shift);
+  audio_filter=buildAudioFilter( currentaudiostream,video_body->getTime (frameStart));
   audio_filter2->goToTime(0);
   return 1;
 }

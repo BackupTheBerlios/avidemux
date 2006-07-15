@@ -23,17 +23,13 @@
 
 
 
- AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,uint32_t starttime, uint32_t duration);
+ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *stream, uint32_t startTime);
  AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 				uint32_t starttime, uint32_t duration);
 
  void deleteAudioFilter(AVDMGenericAudioStream *in);
 void audioFilter_configureFilters( void );
 
-// Build a simple filter chain
-// That is starting from startTime in ms, has a duration of duration ms and is shifter
-// by shift ms
-AVDMGenericAudioStream *buildRawAudioFilter( uint32_t startTime, uint32_t duration, int32_t shift);				
 
 
 void audioCodecConfigure( void );

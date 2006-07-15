@@ -56,7 +56,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 extern const char *getStrFromAudioCodec( uint32_t codec);	
-extern int audioDelay,audioShift;
+
 //__________________________________________________
 uint8_t		ADM_ogmWrite::initAudio(void)
 {
@@ -76,35 +76,17 @@ WAVHeader	*info=NULL;
                     return 0;
 		}
                 audioStream=new ogm_page(_fd,2);		//
+                audioFilter=buildAudioFilter(currentaudiostream, video_body->getTime (frameStart));
+                if(!audioFilter) return 0;
 		if(audioProcessMode())
 		{
 			uint16_t fcc;
 			
-			audioFilter=  buildAudioFilter (currentaudiostream,
-					video_body->getTime (frameStart),
-					video_body->getTime (frameEnd-frameStart));
-                        if(!audioFilter) return 0;
 			fcc=audioFilter->getInfo()->encoding;
 			encoding_gui->setAudioCodec(getStrFromAudioCodec(fcc));
 		}
 		else	// Copymode
 		{
-			 int32_t shift=0;
-      			if(audioDelay && audioShift) shift=audioDelay;
-			
-			// In case of ogm we cannot use the
-			// shift filter as it would override the getpacket specific
-			// to ogm container and destroy needed infos
-			if(currentaudiostream->getInfo()->encoding==WAV_OGG)
-			{
-				audioFilter=currentaudiostream;
-				currentaudiostream->goToTime(video_body->getTime (frameStart));
-			}
-			else
-			{
-      				audioFilter=buildRawAudioFilter( video_body->getTime (frameStart), 
-      					0xffffffff, shift);
-			}
 			encoding_gui->setAudioCodec("Copy");
 			
 		}

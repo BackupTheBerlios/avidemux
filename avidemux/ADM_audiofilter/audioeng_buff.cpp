@@ -39,8 +39,7 @@ AVDMBufferedAudioStream::AVDMBufferedAudioStream(AVDMGenericAudioStream * instre
         _in = NULL;
         _chunk = 4096;
         memset(_dither, 0, 256*sizeof(float));
-
-    _headBuff=_tailBuff=0;
+        _headBuff=_tailBuff=0;
 }
 
 AVDMBufferedAudioStream::~AVDMBufferedAudioStream()

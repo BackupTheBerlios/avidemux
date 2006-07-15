@@ -35,7 +35,7 @@
 
 #include "audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-
+#include "ADM_audiofilter/audio_raw.h"
 
 /* ************* Encoder *********** */
 #include "ADM_audiofilter/audioencoder.h"
@@ -120,8 +120,7 @@ static ADM_audioEncoderDescriptor *getAudioDescriptor( AUDIOENCODER encoder);
 //_______________________________________
 
 
-AUDMAudioFilter *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiostream,
-				uint32_t starttime, uint32_t duration)
+AUDMAudioFilter *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiostream,uint32_t starttime)
 {
 
   AUDMAudioFilter *firstFilter = NULL;
@@ -229,6 +228,8 @@ AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
   sstart=(int32_t)starttime;
   int32_t timeShiftMs=audioDelay*audioShift;
         
+  deleteAudioFilter(NULL);
+  
   lastFilter = new AUDMAudioFilter_Bridge(NULL,currentaudiostream,sstart,timeShiftMs);
         filtercount = 0;
         filtersFloat[filtercount++] = lastFilter;
@@ -269,8 +270,7 @@ AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
 *******************************************************************************************************************
 */
 
-AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,
-                                         uint32_t starttime, uint32_t duration)
+AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostream,  uint32_t starttime)
 {
   AUDMAudioFilter         *lastFilter=NULL;
   AVDMGenericAudioStream  *output=NULL;
@@ -279,20 +279,17 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
 	// if audio is set to copy, we just return the first filter
   if(!audioProcessMode())
   {
-#if 0          
- 			lastFilter = new AVDMProcessAudio_Null(currentaudiostream,	   starttime, duration);
-    			filtercount = 0;
-    			lastFilter = lastFilter;
-    			filters[filtercount++] = lastFilter;
-			return lastFilter;
-#endif  
-            return NULL;
+    int32_t timeShiftMs=audioDelay*audioShift;
+    deleteAudioFilter(NULL);
+    output = new AVDMProcessAudio_RawShift(currentaudiostream, starttime, timeShiftMs);
+    return output;
+
   }
 
 
 
 // else we build the full chain
-  lastFilter=buildInternalAudioFilter(currentaudiostream,starttime, duration);
+  lastFilter=buildInternalAudioFilter(currentaudiostream,starttime);
   
 // and add encoder...
 
@@ -410,32 +407,6 @@ void deleteAudioFilter(AVDMGenericAudioStream *in)
   if (currentaudiostream)
     currentaudiostream->endDecompress();
 
-}
-/*
-*******************************************************************************************************************
-// Build a simple filter chain
-// That is starting from startTime in ms, has a duration of duration ms and is shifter
-// by shift ms
-
-*******************************************************************************************************************
-*/
-
-
-AVDMGenericAudioStream *buildRawAudioFilter( uint32_t startTime, uint32_t duration, int32_t shift)
-{
-#if 0
-AVDMProcessAudioStream *firstFilter = NULL;
-AVDMProcessAudioStream *lastFilter = NULL;
- 
-	// Start from a clean state
-	printf("Building raw audio filter with start:%lu duration:%lu shift:%d\n",startTime,duration,shift);
-	deleteAudioFilter();	
-	lastFilter=new AVDMProcessAudio_RawShift(currentaudiostream,shift,startTime);
-	filters[filtercount++] = lastFilter;
-	return lastFilter;
-	
-#endif 
-  return NULL;
 }
 /**********************************************/
 ADM_audioEncoderDescriptor *getAudioDescriptor( AUDIOENCODER encoder)

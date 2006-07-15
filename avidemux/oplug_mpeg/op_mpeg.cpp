@@ -126,7 +126,7 @@ uint8_t oplug_mpeg_vcd_ps(const char *inname)
 	if(audioProcessMode())
 	{
 	  AVDMGenericAudioStream *audio=NULL;
-		audio = buildAudioFilter (currentaudiostream,0,0x1000);
+		audio = buildAudioFilter (currentaudiostream,0);
 		info=audio->getInfo();
 		memcpy(&tmpinfo,info,sizeof(tmpinfo));
 		info=&tmpinfo;
@@ -305,7 +305,7 @@ uint8_t ret=0;
 	if(audioProcessMode())
 	{
 	  AVDMGenericAudioStream *audio=NULL;
-		audio = buildAudioFilter (currentaudiostream,0,0x1000);
+		audio = buildAudioFilter (currentaudiostream,0);
 		info=audio->getInfo();
 		memcpy(&tmpinfo,info,sizeof(tmpinfo));
 		info=&tmpinfo;
@@ -381,7 +381,7 @@ uint8_t ret=0;
         if(audioProcessMode())
         {
           AVDMGenericAudioStream *audio=NULL;
-                audio = buildAudioFilter (currentaudiostream,0,0x1000);
+                audio = buildAudioFilter (currentaudiostream,0);
                 info=audio->getInfo();
                 memcpy(&tmpinfo,info,sizeof(tmpinfo));
                 info=&tmpinfo;

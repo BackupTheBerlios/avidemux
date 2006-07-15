@@ -58,9 +58,6 @@ extern int muxParam;
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 
-extern uint8_t audioShift;
-extern int32_t audioDelay;
-
 const char *getStrFromAudioCodec( uint32_t codec);
 //_________________________
 uint8_t ADM_aviUISetMuxer(  void )
@@ -217,8 +214,7 @@ GenericAviSave::setupAudio (void)
 	}
 
 	
-      	audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart),
-				  video_body->getTime (frameEnd-frameStart));
+      	audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
 
 //       if ((audio_filter)->getInfo ()->encoding == WAV_PCM)
 // // 	if (!GUI_Question ("Audio stream is not compressed\n Continue?"))
@@ -232,11 +228,8 @@ GenericAviSave::setupAudio (void)
     {
       // else prepare the incoming raw stream
       // audio copy mode here
-      int32_t shift=0;
-      if(audioDelay && audioShift) shift=audioDelay;
       encoding_gui->setAudioCodec("Copy");
-      audio_filter=buildRawAudioFilter( video_body->getTime (frameStart), 
-      		0xffffffff, shift);
+      audio_filter=buildAudioFilter( currentaudiostream,video_body->getTime (frameStart));
     }
 
    

@@ -1792,8 +1792,7 @@ A_saveAudioDecodedTest (char *name)
 
 
 
-	saveFilter =	buildAudioFilter (currentaudiostream,
-			  video_body->getTime (frameStart),(uint32_t) video_body->getTime (frameEnd-frameStart) );
+        saveFilter =  buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
    
     	DIA_working *work=new DIA_working("Saving audio");
 
@@ -2463,8 +2462,6 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
 uint8_t A_TimeShift(void)
 {
 static int update=0;
-// extern int audioShift;
-// extern int audioDelay;
 int onoff;
 int value;
         if(update) return 1;
