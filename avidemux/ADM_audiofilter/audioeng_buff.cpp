@@ -17,21 +17,17 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <stream.h>
 #include <ADM_assert.h>
 #include <math.h>
 
-#include "config.h"
-#include "avifmt.h"
-#include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
-//#include "aviaudio.hxx"
+#include "ADM_library/default.h"
+
 #include "audioprocess.hxx"
-//#include "../toolkit.hxx"
 //
 AVDMBufferedAudioStream::AVDMBufferedAudioStream(AVDMGenericAudioStream * instream):AVDMGenericAudioStream()
 {

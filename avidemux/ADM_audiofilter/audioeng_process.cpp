@@ -20,12 +20,10 @@
 #include <math.h>
 
 #include <ADM_assert.h>
+#include "ADM_library/default.h"
 
-#include "avifmt.h"
 #include "audioprocess.hxx"
 
-#include "ADM_toolkit/toolkit.hxx"
-#include "ADM_dialog/DIA_working.h"
 #include "audioeng_process.h"
 
 #include "ADM_toolkit/ADM_debugID.h"

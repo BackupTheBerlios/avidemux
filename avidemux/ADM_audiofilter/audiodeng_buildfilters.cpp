@@ -14,17 +14,15 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ADM_assert.h>
 #include <math.h>
 
-#include "config.h"
-#include "avifmt.h"
-#include "avifmt2.h"
-#include "avio.hxx"
-#include "fourcc.h"
+#include "ADM_library/default.h"
+
 #include "ADM_audiofilter/audiofilter_limiter_param.h"
 #include "ADM_audiofilter/audiofilter_normalize_param.h"
 #include "audioprocess.hxx"
@@ -33,13 +31,9 @@
 
 
 #include "ADM_audiofilter/audioencoder.h"
-/*
-  	Ugly should get ride of it. Temporary fix.
-*/
+
 #include "ADM_audiocodec/ADM_audiocodeclist.h"
 
-#include "prefs.h"
-#include "ADM_toolkit/ADM_debugID.h"
 #include "audioeng_process.h"
 
 #include "audiofilter_bridge.h"
@@ -47,7 +41,9 @@
 #include "audiofilter_normalize.h"
 #include "audiofilter_limiter.h"
 
+#include "prefs.h"
 
+#include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO_FILTER
 #include "ADM_toolkit/ADM_debug.h"
 

@@ -37,12 +37,11 @@ AVDMProcessAudio_RawShift::AVDMProcessAudio_RawShift(AVDMGenericAudioStream * in
 {
     _wavheader = new WAVHeader;
     memcpy(_wavheader, _instream->getInfo(), sizeof(WAVHeader));
+    _starttime=starttime;
     
-    // first go to the begining....
-        _starttime=starttime;
-        msoff=-msoff;
-        _hold=0;
-        printf("[Raw shift] : Start:%u ms, shift  %d\n",_starttime,msoff);
+    _hold=0;
+    printf("[Raw shift] : Start:%u ms, shift  %d\n",_starttime,msoff);
+    msoff=-msoff;
         if (msoff > 0) // just seek in the file
         {
                 _starttime+=msoff;
@@ -65,14 +64,18 @@ AVDMProcessAudio_RawShift::AVDMProcessAudio_RawShift(AVDMGenericAudioStream * in
                         _starttime=0;
                         int32_t dupe;
                         _instream->goToTime(0);
-                        _hold=(msoff*_wavheader->frequency); // in sample
+                        _hold=(msoff*_wavheader->frequency)/1000; // in sample
                 }
         }
     _length = instream->getLength();
     printf("[Raw shift] : Start:%u ms, offset in sample  %d\n",_starttime,_hold);
-
-
 };
+
+AVDMProcessAudio_RawShift::~AVDMProcessAudio_RawShift()
+{
+  delete _wavheader;
+}
+
 //
 //	If filterOn, it means we have to dupe sampleOffset sample, going back to start
 //		and do it again
@@ -135,12 +138,5 @@ uint8_t AVDMProcessAudio_RawShift::goTo(uint32_t newoffset)
         _instream->goToTime(  _starttime);
         return 1;
 };
-
-
-AVDMProcessAudio_RawShift::~AVDMProcessAudio_RawShift()
-{
-    delete _wavheader;
-
-}
 // EOF
 
