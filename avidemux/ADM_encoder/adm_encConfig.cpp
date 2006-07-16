@@ -841,8 +841,7 @@ loadVideoCodecConfString (char *cmd)
   return 1;
 }
 
-uint8_t
-mk_hex (uint8_t a, uint8_t b)
+uint8_t mk_hex (uint8_t a, uint8_t b)
 {
   int a1, b1;
   a1 = a;

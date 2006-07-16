@@ -10,9 +10,10 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include "config.h"
+#include <config.h>
 #include <stdlib.h>
 #include "ADM_JSAvidemuxVideo.h"
+#include "ADM_JSGlobal.h"
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_gui2/GUI_ui.h"
@@ -48,7 +49,6 @@ JSFunctionSpec ADM_JSAvidemuxVideo::avidemuxvideo_methods[] =
 {
 	{ "clear", Clear, 0, 0, 0 },	// clear
 	{ "add", Add, 3, 0, 0 },	// add
-//	{ "indexMPEG", IndexMPEG, 3, 0, 0 },	// Index an MPEG
 	{ "addFilter", AddFilter, 10, 0, 0 },	// Add filter to filter chain
 	{ "codec", Codec, 3, 0, 0 },	// Set the video codec
 	{ "codecConf", CodecConf, 1, 0, 0 },	// load video codec config
@@ -147,6 +147,8 @@ JSBool ADM_JSAvidemuxVideo::JSSetProperty(JSContext *cx, JSObject *obj, jsval id
                 switch(JSVAL_TO_INT(id))
                 {
                         case videoprocess_prop:
+				if(JSVAL_IS_BOOLEAN(*vp) == false)
+					break;
                                 priv->getObject()->m_bVideoProcess = JSVAL_TO_BOOLEAN(*vp);
                                 UI_setVProcessToggleStatus(priv->getObject()->m_bVideoProcess);
                                 break;
@@ -164,7 +166,9 @@ JSBool ADM_JSAvidemuxVideo::Clear(JSContext *cx, JSObject *obj, uintN argc,
 	if(argc != 0)
 		return JS_FALSE;
 	printf("Clearing Video... \n");
+	jsrefcount nRefCount = JS_SuspendRequest(cx);
 	*rval = BOOLEAN_TO_JSVAL(video_body->deleteAllSegments());
+	JS_ResumeRequest(cx,nRefCount);
 	return JS_TRUE;
 }// end Clear
 
@@ -176,8 +180,12 @@ JSBool ADM_JSAvidemuxVideo::Add(JSContext *cx, JSObject *obj, uintN argc,
 	*rval = BOOLEAN_TO_JSVAL(false);
 	if(argc != 3)
 		return JS_FALSE;
+	if(JSVAL_IS_INT(argv[0]) == false || JSVAL_IS_INT(argv[1]) == false  || JSVAL_IS_INT(argv[2]) == false)
+		return JS_FALSE;
 	printf("Adding Video... \n");
+	jsrefcount nRefCount = JS_SuspendRequest(cx);
 	*rval = BOOLEAN_TO_JSVAL(video_body->addSegment(JSVAL_TO_INT(argv[0]),JSVAL_TO_INT(argv[1]),JSVAL_TO_INT(argv[2])));
+	JS_ResumeRequest(cx,nRefCount);
 	return JS_TRUE;
 }// end Add
 
@@ -201,11 +209,15 @@ JSBool ADM_JSAvidemuxVideo::AddFilter(JSContext *cx, JSObject *obj, uintN argc,
         for(int i=0;i<argc;i++) 
         {
                 args[i].type=APM_STRING;
+		if(JSVAL_IS_STRING(argv[i]) == false)
+			return JS_FALSE;
                 v=ADM_strdup(JS_GetStringBytes(JSVAL_TO_STRING(argv[i])));
                 args[i].arg.string=v;
         }
+	jsrefcount nRefCount = JS_SuspendRequest(cx);
                 *rval= BOOLEAN_TO_JSVAL(filterAddScript(filter,argc,args));
          for(int i=0;i<argc;i++) ADM_dealloc(args[i].arg.string);
+	JS_ResumeRequest(cx,nRefCount);
         return JS_TRUE;
 }// end AddFilter
 
@@ -217,24 +229,18 @@ JSBool ADM_JSAvidemuxVideo::Codec(JSContext *cx, JSObject *obj, uintN argc,
 	*rval = BOOLEAN_TO_JSVAL(false);
 	if(argc > 3)
 		return JS_FALSE;
-        if(argc==1) //Ony codec given
-        {
-            char *codec;
-            codec = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-            if(!videoCodecSelectByName(codec)) 
-                *rval = BOOLEAN_TO_JSVAL(false);
-            else
-                *rval = BOOLEAN_TO_JSVAL(true);
-            return JS_TRUE;
-        }
 	printf("Codec ... \n");
+	if(JSVAL_IS_STRING(argv[0]) == false || JSVAL_IS_STRING(argv[1]) == false  || JSVAL_IS_STRING(argv[2]) == false)
+		return JS_FALSE;
 	
 	{// begin valid
 		printf("Valid codec conf %s found.\n",JS_GetStringBytes(JSVAL_TO_STRING(argv[2])));
-		char *codec,*conf;
+		char *codec,*conf,*codecConfString;
 		codec = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
 		conf = JS_GetStringBytes(JSVAL_TO_STRING(argv[1]));
-		if(!videoCodecSelectByName(codec)) 
+		codecConfString = JS_GetStringBytes(JSVAL_TO_STRING(argv[2]));
+		jsrefcount nRefCount = JS_SuspendRequest(cx);
+		if(!videoCodecSelectByName(codec))
 			*rval = BOOLEAN_TO_JSVAL(false);
 		else
 		{// begin conf
@@ -248,13 +254,14 @@ JSBool ADM_JSAvidemuxVideo::Codec(JSContext *cx, JSObject *obj, uintN argc,
 			else
                         {
 				*rval = BOOLEAN_TO_JSVAL(true);
-                                if(!loadVideoCodecConfString(JS_GetStringBytes(JSVAL_TO_STRING(argv[2]))))
+                                if(!loadVideoCodecConfString(codecConfString))
                                         *rval = BOOLEAN_TO_JSVAL(false);
                                 else
                                         *rval = BOOLEAN_TO_JSVAL(true);
                         }
 
 		}// end conf
+		JS_ResumeRequest(cx,nRefCount);
 	}// end valid
 	return JS_TRUE;
 }// end Codec
@@ -267,9 +274,13 @@ JSBool ADM_JSAvidemuxVideo::CodecConf(JSContext *cx, JSObject *obj, uintN argc,
 	*rval = BOOLEAN_TO_JSVAL(false);
 	if(argc != 1)
 		return JS_FALSE;
+	if(JSVAL_IS_STRING(argv[0]) == false)
+		return JS_FALSE;
 	char *pTempStr = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
 	printf("Codec Conf Video \"%s\"\n",pTempStr);
+	jsrefcount nRefCount = JS_SuspendRequest(cx);
 	*rval = INT_TO_JSVAL(loadVideoCodecConf(pTempStr));
+	JS_ResumeRequest(cx,nRefCount);
 	return JS_TRUE;
 }// end CodecConf
 
@@ -281,9 +292,13 @@ JSBool ADM_JSAvidemuxVideo::Save(JSContext *cx, JSObject *obj, uintN argc,
 	*rval = BOOLEAN_TO_JSVAL(false);
 	if(argc != 1)
 		return JS_FALSE;
+	if(JSVAL_IS_STRING(argv[0]) == false)
+		return JS_FALSE;
 	char *pTempStr = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
 	printf("Saving Video \"%s\"\n",pTempStr);
+	jsrefcount nRefCount = JS_SuspendRequest(cx);
 	*rval = INT_TO_JSVAL(ADM_saveRaw(pTempStr));
+	JS_ResumeRequest(cx,nRefCount);
 	return JS_TRUE;
 }// end Save
 
@@ -295,9 +310,13 @@ JSBool ADM_JSAvidemuxVideo::SaveJPEG(JSContext *cx, JSObject *obj, uintN argc,
 	*rval = BOOLEAN_TO_JSVAL(false);
 	if(argc != 1)
 		return JS_FALSE;
+	if(JSVAL_IS_STRING(argv[0]) == false)
+		return JS_FALSE;
 	char *pTempStr = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
 	printf("Saving JPEG \"%s\"\n",pTempStr);
+	jsrefcount nRefCount = JS_SuspendRequest(cx);
 	*rval = INT_TO_JSVAL(A_saveJpg(pTempStr));
+	JS_ResumeRequest(cx,nRefCount);
 	return JS_TRUE;
 }// end SaveJPG
 
@@ -309,7 +328,11 @@ JSBool ADM_JSAvidemuxVideo::ListBlackFrames(JSContext *cx, JSObject *obj, uintN 
 	*rval = BOOLEAN_TO_JSVAL(false);
 	if(argc != 1)
 		return JS_FALSE;
+	if(JSVAL_IS_STRING(argv[0]) == false)
+		return JS_FALSE;
+	jsrefcount nRefCount = JS_SuspendRequest(cx);
 	A_ListAllBlackFrames(JS_GetStringBytes(JSVAL_TO_STRING(argv[0])));
+	JS_ResumeRequest(cx,nRefCount);
 	*rval = BOOLEAN_TO_JSVAL(true);
 	return JS_TRUE;
 }// end ListBlackFrames
@@ -322,7 +345,11 @@ JSBool ADM_JSAvidemuxVideo::PostProcess(JSContext *cx, JSObject *obj, uintN argc
 	*rval = BOOLEAN_TO_JSVAL(false);
 	if(argc != 3)
 		return JS_FALSE;
+	if(JSVAL_IS_INT(argv[0]) == false || JSVAL_IS_INT(argv[1]) == false || JSVAL_IS_INT(argv[2]) == false)
+		return JS_FALSE;
+	jsrefcount nRefCount = JS_SuspendRequest(cx);
 	int rtn = video_body->setPostProc(JSVAL_TO_INT(argv[0]),JSVAL_TO_INT(argv[1]),JSVAL_TO_INT(argv[2]));
+	JS_ResumeRequest(cx,nRefCount);
 	*rval = BOOLEAN_TO_JSVAL(rtn);
 	return JS_TRUE;
 }// end PostProcess
@@ -354,15 +381,21 @@ aviInfo info;
         
         ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
         // default return value
+	if(argc != 1)
+		return JS_FALSE;
+	if(JSVAL_IS_INT(argv[0]) == false)
+		return JS_FALSE;
         fps=JSVAL_TO_INT(argv[0]);
         if(fps>100000 || fps<2000)
         {      
                 printf("Fps too low\n");
                 return JS_FALSE;
         }       
-        info.fps1000=fps;
+ 	jsrefcount nRefCount = JS_SuspendRequest(cx);
+       info.fps1000=fps;
         video_body->updateVideoInfo(&info);
         video_body->getVideoInfo (avifileinfo);
+	JS_ResumeRequest(cx,nRefCount);
         return JS_TRUE;
 }// end PostProcess
 
@@ -404,7 +437,9 @@ JSBool ADM_JSAvidemuxVideo::GetFCC(JSContext *cx, JSObject *obj, uintN argc,
 {// begin PostProcess
 aviInfo info;
 
+	jsrefcount nRefCount = JS_SuspendRequest(cx);
         video_body->getVideoInfo(&info);
+	JS_ResumeRequest(cx,nRefCount);
         
         ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
         // default return value
@@ -425,6 +460,8 @@ int32_t info;
         ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
         // default return value
         *rval=JS_FALSE;
+	if(argc != 0)
+		return JS_FALSE;
         if(info & ADM_VOP_ON) *rval=JS_TRUE;
         return JS_TRUE;
 }// end PostProcess
@@ -437,6 +474,8 @@ uint32_t info;
         ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
         // default return value
         *rval=JS_FALSE;
+	if(argc != 0)
+		return JS_FALSE;
         if(info & ADM_GMC_ON) *rval=JS_TRUE;
         return JS_TRUE;
 }// end PostProcess
@@ -449,6 +488,8 @@ uint32_t info;
         ADM_JSAvidemuxVideo *p = (ADM_JSAvidemuxVideo *)JS_GetPrivate(cx, obj);
         // default return value
         *rval=JS_FALSE;
+	if(argc != 0)
+		return JS_FALSE;
         if(info & ADM_QPEL_ON) *rval=JS_TRUE;
         return JS_TRUE;
 }// end PostProcess
