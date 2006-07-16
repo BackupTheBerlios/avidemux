@@ -144,7 +144,7 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
         {
           printf("[Bridge] Looping\n");
           rewind();
-          _tail=_head=0;
+          //_tail=_head=0;
           _hold=0;
         }
       }
