@@ -370,9 +370,6 @@ JSBool ADM_JSAvidemuxAudio::Codec(JSContext *cx, JSObject *obj, uintN argc,
                 if(size)
                 {
                           data=new uint8_t[size];
-                          while (*extra != ' ')
-                            extra++;
-                          extra++;			// skip the first ' '
                           for (uint32_t k = 0; k < size; k++)
                             {
                               data[k] = mk_hex (*extra, *(extra + 1));
