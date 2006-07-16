@@ -298,6 +298,18 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
   uint8_t init;
   ADM_audioEncoderDescriptor *descriptor=getAudioDescriptor( activeAudioEncoder);
   
+  if(!lastFilter)
+  {
+    printf(" buildInternalAudioFilter failed\n");
+    return 0;
+  }
+  if(lastFilter->getInfo()->channels > descriptor->maxChannels)
+  {
+    GUI_Error_HIG(_("Codec Error"),_("The number of channels is greater than what the selected audio codec can do.\n"
+        "Either change codec or use the mixer filter to have less channels."));
+    deleteAudioFilter(NULL);
+    return 0; 
+  }
   switch(activeAudioEncoder)
   {
 

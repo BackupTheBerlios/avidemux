@@ -204,25 +204,10 @@ GenericAviSave::setupAudio (void)
 
   if (audioProcessMode())	// else Raw copy mode
     {
-      if (currentaudiostream->isCompressed ())
-	{
-	  if (!currentaudiostream->isDecompressable ())
-	    {
-              GUI_Error_HIG (_("Cannot decompress the audio stream"), NULL);
-	      return 0;
-	    }
-	}
-
-	
-      	audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
-
-//       if ((audio_filter)->getInfo ()->encoding == WAV_PCM)
-// // 	if (!GUI_Question ("Audio stream is not compressed\n Continue?"))
-// // 	  {
-// // 	    deleteAudioFilter ();
-// // 	    return 0;
-// // 	  }
-	  encoding_gui->setAudioCodec(getStrFromAudioCodec(audio_filter->getInfo()->encoding));
+      
+      audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
+      if(!audio_filter) return 0;
+      encoding_gui->setAudioCodec(getStrFromAudioCodec(audio_filter->getInfo()->encoding));
     }
   else // copymode
     {
@@ -230,6 +215,7 @@ GenericAviSave::setupAudio (void)
       // audio copy mode here
       encoding_gui->setAudioCodec("Copy");
       audio_filter=buildAudioFilter( currentaudiostream,video_body->getTime (frameStart));
+      if(!audio_filter) return 0;
     }
 
    
