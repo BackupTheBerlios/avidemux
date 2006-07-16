@@ -38,7 +38,7 @@ AUDMEncoder::AUDMEncoder(AUDMAudioFilter *in)  :AVDMGenericAudioStream  ()
   tmpbuffer=new float[_wavheader->frequency*_wavheader->channels];
   tmphead=tmptail=0;
   eof_met=0;
-  initDither();
+  
 };
 /********************/
 AUDMEncoder::~AUDMEncoder()
@@ -95,8 +95,9 @@ uint8_t AUDMEncoder::refillBuffer(int minimum)
 
 static float rand_table[DITHER_CHANNELS][DITHER_SIZE];
 
-void AUDMEncoder::initDither()
+void AUDMEncoder_initDither(void)
 {
+  printf("Initializing Dithering tables\n");
 	float d, dp;
 	for (int c = 0; c < DITHER_CHANNELS; c++) {
 		dp = 0;
