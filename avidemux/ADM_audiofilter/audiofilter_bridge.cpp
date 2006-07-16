@@ -83,6 +83,7 @@ AUDMAudioFilter_Bridge::~AUDMAudioFilter_Bridge()
 }
 uint8_t AUDMAudioFilter_Bridge::rewind(void)
 {
+  printf("[Bridge] Going to time %d\n",_startTime);
   return _incoming->goToTime(_startTime);
 }
 uint32_t   AUDMAudioFilter_Bridge::fill(uint32_t max,float *output,AUD_Status *status)
@@ -128,6 +129,16 @@ uint8_t AUDMAudioFilter_Bridge::fillIncomingBuffer(AUD_Status *status)
     {
       // don't ask too much front.
       asked = (3*AUD_PROCESS_BUFFER_SIZE)/4-_tail;
+      if(_hold)
+      {
+        int32_t sam;
+         
+        sam=_hold/_wavHeader.channels;
+        sam++;
+        sam*=_wavHeader.channels;
+        if(asked>sam) asked=sam;
+        
+      }
       asked = _incoming->readDecompress(asked, &(_incomingBuffer[_tail]));
 
       if (!asked )
