@@ -51,7 +51,6 @@ class AUDMEncoder : public AVDMGenericAudioStream
     float          *tmpbuffer;
     uint8_t        refillBuffer(int minimum); // Mininum is in float
 
-    float           rand_table[DITHER_CHANNELS][DITHER_SIZE];
     void            initDither();
     uint8_t        dither16(float *start, uint32_t nb); //
 

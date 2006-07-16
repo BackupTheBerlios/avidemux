@@ -93,6 +93,8 @@ uint8_t AUDMEncoder::refillBuffer(int minimum)
   }
 }
 
+static float rand_table[DITHER_CHANNELS][DITHER_SIZE];
+
 void AUDMEncoder::initDither()
 {
 	float d, dp;
