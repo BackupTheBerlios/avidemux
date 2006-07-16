@@ -8,6 +8,18 @@
 extern int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor);
 extern int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor);
 extern int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor);
+/**** Copy ****/
+
+ADM_audioEncoderDescriptor copyDescriptor=
+{
+  AUDIOENC_COPY,
+  DIA_defaultSettings,
+  "Copy encoder",
+  128,
+  99,
+  0,
+  NULL
+};
 /**** FAAC ****/
 FAAC_encoderParam aacParam={128};
 ADM_audioEncoderDescriptor aacDescriptor=
@@ -114,6 +126,7 @@ ADM_audioEncoderDescriptor  lpcmDescriptor=
 };
 ADM_audioEncoderDescriptor *allDescriptors[]=
 {
+      &copyDescriptor,
       &aacDescriptor,
       &twolameDescriptor,
       &lavcodecAC3Descriptor,
