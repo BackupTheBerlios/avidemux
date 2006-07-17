@@ -42,11 +42,8 @@
 */
 uint8_t ADM_Composer::getMagic (char *name, uint32_t * magic)
 {
-  FILE *
-    tmp;
-  uint8_t
-    ret =
-    1;
+  FILE *    tmp;
+  uint8_t    ret =    1;
 
   tmp = fopen (name, "rb");
   if (!tmp)
@@ -227,7 +224,14 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
       		return 1;
 
     }
-      
+    if(fourCC::check(R32(magic[2]),(uint8_t *)"matr") &&
+       fourCC::check(R32(magic[3]),(uint8_t *)"oska") )
+    {
+      printf (" \n Matroska file detected..\n");
+      *type = Matroska_FileType;
+      return 1;
+
+    }    
   printf ("\n unrecognized file detected...\n");
   fourCC::print(magic[0]); printf("\n");
   fourCC::print(magic[1]);

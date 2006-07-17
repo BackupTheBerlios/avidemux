@@ -55,6 +55,7 @@ typedef enum
 		NewMpeg_FileType=13,
 		ECMAScript_FileType=14,
                 AvsProxy_FileType=15,
+                Matroska_FileType=16,
 		DUMMY_FILETYPE=99
 }fileType;
 
