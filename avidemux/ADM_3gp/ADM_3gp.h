@@ -119,7 +119,7 @@ virtual   uint32_t 			getNbStream(void) ;
 virtual   uint8_t 			needDecompress(void) { return 1;};
 
 			_3GPHeader( void ) ;
-       		    	~_3GPHeader(  ) ;
+                        virtual	~_3GPHeader(  ) ;
 // AVI io
 virtual 	uint8_t			open(char *name);
 virtual 	uint8_t			close(void) ;
