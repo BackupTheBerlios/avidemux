@@ -169,6 +169,8 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #else
     win32_netInit();    
 #endif
+    gdk_threads_init();
+    gdk_threads_enter();
     gtk_set_locale();
     gtk_init(&argc, &argv);
     gdk_rgb_init();
@@ -230,6 +232,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 		printf("Spidermonkey initialized.\n");
 
     gtk_main();
+    gdk_threads_leave();
     printf("Normal exit\n");
     return 0;
 }
@@ -238,8 +241,12 @@ void onexit( void )
   printf("Cleaning up\n");
         VPDeInitLibrary();
         delete video_body;
-  printf("Cleaning up spidermonkey\n");
-        SpidermonkeyDestroy();
+	// wait for thread to finish executing
+	printf("Waiting for Spidermonkey to finish...\n");
+	pthread_mutex_lock(&g_pSpiderMonkeyMutex);
+	printf("Cleaning up Spidermonkey.\n");
+	SpidermonkeyDestroy();
+	pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
         destroyPrefs();
         filterCleanUp();
   printf("End of cleanup\n");
