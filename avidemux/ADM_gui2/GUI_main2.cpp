@@ -1027,7 +1027,7 @@ create_mainWindow (void)
   gtk_box_pack_start (GTK_BOX (vbox7), comboboxVideo, FALSE, FALSE, 0);
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxVideo), _("Copy"));
 
-  buttonConfV = gtk_button_new_with_mnemonic ("Configure");
+  buttonConfV = gtk_button_new_with_mnemonic (_("Configure"));
   gtk_widget_show (buttonConfV);
   gtk_box_pack_start (GTK_BOX (vbox7), buttonConfV, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, buttonConfV, _("Configure video encoder"), NULL);
@@ -1067,7 +1067,7 @@ create_mainWindow (void)
   gtk_box_pack_start (GTK_BOX (vbox8), comboboxAudio, FALSE, FALSE, 0);
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxAudio), _("Copy"));
 
-  buttonConfA = gtk_button_new_with_mnemonic ("Configure");
+  buttonConfA = gtk_button_new_with_mnemonic (_("Configure"));
   gtk_widget_show (buttonConfA);
   gtk_box_pack_start (GTK_BOX (vbox8), buttonConfA, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, buttonConfA, _("Configure audio encoder"), NULL);
