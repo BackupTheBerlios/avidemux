@@ -187,7 +187,7 @@ int slaveThread( WAVHeader *audioheader )
         mplexStreamDescriptor audioDesc;
         mplexStreamDescriptor videoDesc;
 
-        printf("Slave thread : creating job & muxer\n");
+        printf("[Muxer Slave Thread] Slave thread : creating job & muxer\n");
 
         
         printf("output file created\n");

@@ -50,9 +50,9 @@ uint8_t mkvHeader::needDecompress(void)
 {
   return 1; 
 }
- mkvHeader::mkvHeader( void )
+ mkvHeader::mkvHeader( void ) : vidHeader()
 {
-  
+  _fd=NULL;
 }
  mkvHeader::~mkvHeader(  )
 {
@@ -61,6 +61,7 @@ uint8_t mkvHeader::needDecompress(void)
 
 uint8_t mkvHeader::open(char *name)
 {
+  printf("[Matroska] Open\n");
   return 0;
 }
 

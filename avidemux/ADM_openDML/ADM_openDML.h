@@ -88,7 +88,7 @@ protected:
 	  uint8_t			_reordered;	/// set to DTS ?
 	  
 	  
-	  
+          char                         *myName;
 	  uint32_t 			countAudioTrack( void );
 	  uint32_t  			searchAudioTrack(uint32_t which);
 	  // _____________________________________________

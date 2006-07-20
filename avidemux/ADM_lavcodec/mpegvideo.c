@@ -398,7 +398,7 @@ static int alloc_picture(MpegEncContext *s, Picture *pic, int shared){
         }
 
         if(pic->linesize[1] != pic->linesize[2]){
-            av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed (uv stride mismatch)\n");
+          av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed (uv stride mismatch %d/%d)\n",pic->linesize[1] , pic->linesize[2]);
             return -1;
         }
 

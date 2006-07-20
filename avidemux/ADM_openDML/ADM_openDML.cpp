@@ -32,6 +32,8 @@
 #include "ADM_openDML/ADM_openDML.h"
 #include "ADM_toolkit/toolkit.hxx"
 
+#include "ADM_odml_audio.h"
+
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_ODML
 #include "ADM_toolkit/ADM_debug.h"
@@ -139,7 +141,11 @@ uint8_t    OpenDMLHeader::close( void )
 		delete [] _audioTracks;
 		_audioTracks=NULL;
 	}
-
+        if(myName)
+        {
+          ADM_dealloc(myName);
+          myName=NULL; 
+        }
  	return 1;
 }
 //
@@ -161,7 +167,7 @@ OpenDMLHeader::OpenDMLHeader(void)
         _audioTracks=NULL;
         _nbAudioTracks=0;
         _currentAudioTrack=0;
-
+        myName=NULL;
 }
 uint8_t	OpenDMLHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {  	
@@ -199,12 +205,14 @@ uint8_t badAvi=0;
 uint32_t rd;
 
 	printf("** opening OpenDML files **");	
+        
 	_fd=fopen(name,"rb");
 	if(!_fd)
 	{
 		printf("\n cannot open %s \n",name);
 		return 0;
 	}
+        myName=ADM_strdup(name);
 #define CLR(x)              memset(& x,0,sizeof(  x));
 
               CLR( _videostream);
@@ -466,7 +474,7 @@ uint32_t rd;
                                 track=&(_audioTracks[i]);
                                 _audioTracks[i].track= new AVDMAviAudioStream(track->index,
                                                 track->nbChunks,
-                                                _fd,
+                                                myName,
                                                 track->wavHeader,
                                                 0,
                                                 track->extraDataLen,track->extraData);

@@ -138,11 +138,11 @@ uint8_t AUDMEncoder_Twolame::init(ADM_audioEncoderDescriptor *config)
 
 uint8_t	AUDMEncoder_Twolame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
-  uint32_t nbout;
+  int nbout;
   
   *samples = 1152; //FIXME
   *len = 0;
-
+  ADM_assert(tmptail>=tmphead);
   if(!refillBuffer(_chunk ))
   {
     return 0; 
@@ -165,9 +165,10 @@ uint8_t	AUDMEncoder_Twolame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *s
     nbout = twolame_encode_buffer_interleaved(OPTIONS, (int16_t *)&(tmpbuffer[tmphead]), _chunk/2, dest, 16 * 1024);
   }
   tmphead+=_chunk;
+  ADM_assert(tmptail>=tmphead);
   if (nbout < 0) {
     printf("\n Error !!! : %ld\n", nbout);
-    return MINUS_ONE;
+    return 0;
   }
   *len=nbout;
   return 1;

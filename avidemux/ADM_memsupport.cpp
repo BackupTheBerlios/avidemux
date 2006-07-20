@@ -32,6 +32,8 @@
 
 #include <ADM_assert.h>
 
+#include "ADM_toolkit/ADM_threads.h"
+
 #undef memalign
 #undef malloc
 #undef free
@@ -67,7 +69,9 @@ uint32_t *backdoor;
 	backdoor=(uint32_t *)(c-8);
 	*backdoor=(0xdead<<16)+l-lorg;
 	backdoor[1]=size;
+        
 	ADM_consumed+=size;
+        
 	return c;
 
 }
@@ -93,7 +97,9 @@ void ADM_dezalloc(void *ptr)
 	size=backdoor[1];
         *backdoor=0xbeefbeef; // Scratch sig
 	free(c-offset);
+
 	ADM_consumed-=size;
+
 }
 
 void *operator new( size_t t)

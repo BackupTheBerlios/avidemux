@@ -61,6 +61,7 @@ uint8_t lavformat_init(void);
 	}
 #endif
 #include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_toolkit/ADM_threads.h"
 void onexit( void );
 //extern void automation(int argc, char **argv);
 extern int automation(void );
@@ -95,6 +96,7 @@ extern uint8_t win32_netInit(void);
 int global_argc;
 char **global_argv;
 int CpuCaps::myCpuCaps=0;
+
 int main(int argc, char *argv[])
 {
 // Check for big files

@@ -36,16 +36,23 @@ It is an fopen/fwrite lookalike interface to chunks
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_library/fourcc.h"
 #include "ADM_openDML/ADM_openDML.h"
-#include "aviaudio.hxx"
+#include "ADM_audio/aviaudio.hxx"
+#include "ADM_openDML/ADM_odml_audio.h"
 #include "ADM_audiocodec/ADM_audiocodec.h"
 
 
 //___________________________________
 //
 //___________________________________
+AVDMAviAudioStream::~AVDMAviAudioStream() 
+{
+  // Call base destructor
+  fclose(_fd);
+  _fd=NULL;
+}
 AVDMAviAudioStream::AVDMAviAudioStream(		odmlIndex *idx,
 						uint32_t nbchunk,
-						FILE  	*fd,
+						const char *name,
 				       		WAVHeader * wav, 
 						uint32_t preload,
 						uint32_t extraLen,
@@ -76,7 +83,10 @@ AVDMAviAudioStream::AVDMAviAudioStream(		odmlIndex *idx,
     printf("\n Audio streamer initialized");
     _abs_position = 0;
     _rel_position = 0;
-    _fd=fd;
+    // Ugly hack to reopen the same file...
+    _fd=fopen(name,"rb");
+    ADM_assert(_fd);
+    //_fd=fd;
     _wavheader = wav;
     _length = 0;
 

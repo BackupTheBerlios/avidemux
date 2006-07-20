@@ -67,6 +67,7 @@ uint8_t AUDMEncoder::refillBuffer(int minimum)
   if(eof_met) return 0;
   while(1)
   {
+    ADM_assert(tmptail>=tmphead);
     if((tmptail-tmphead)>=minimum) return 1;
   
     if(tmphead && tmptail>filler/2)
@@ -75,6 +76,7 @@ uint8_t AUDMEncoder::refillBuffer(int minimum)
       tmptail-=tmphead;
       tmphead=0;
     }
+    ADM_assert(filler>tmptail);
     nb=_incoming->fill( (filler-tmptail)/2,&tmpbuffer[tmptail],&status);
     if(!nb)
     {

@@ -11,39 +11,10 @@
 //
 #ifndef _ADM_TRANSFERT_
 #define _ADM_TRANSFERT_
-#include <pthread.h>
+
 #define TRANSFERT_BUFFER 1024*1024*10
-class admMutex
-{
-private:
-                uint8_t _locked;
-public: 
-                pthread_mutex_t _tex;       
-                        admMutex( void);
-                        ~admMutex();        
-                uint8_t lock(void);
-                uint8_t unlock(void);
-                uint8_t isLocked(void);
-};
 
-class admCond
-{
-private:
-        pthread_cond_t  _cond;
-        admMutex        *_condtex;
-
-public:        
-        uint8_t         waiting;
-        uint8_t         aborted;
-                        admCond( admMutex *tex);
-                        ~admCond();        
-                uint8_t wait(void);
-                uint8_t wakeup(void);
-                uint8_t iswaiting(void);
-                uint8_t abort(void);
-                
-};
-
+#include "ADM_toolkit/ADM_threads.h"
 
 class Transfert
 {
