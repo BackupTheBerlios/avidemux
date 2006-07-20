@@ -236,7 +236,7 @@ static two_arg_type two;
 static int index;
 			argv=global_argv;
 			argc=global_argc;
-			usleep(100000); // let gtk start
+			ADM_usleep(100000); // let gtk start
 			GUI_Quiet();
 			printf("\n *** Automated : %d entries*************\n",NB_AUTO);
 			// we need to process

@@ -22,10 +22,12 @@
 
 
 #include "ADM_library/default.h"
+
+
 #include "avi_vars.h"
-//#include "aviaudio.hxx"
-#include "ADM_audiofilter/audioprocess.hxx"
 #include <ADM_assert.h>
+#include "ADM_audiofilter/audioprocess.hxx"
+
 #include "ADM_dialog/DIA_encoding.h"
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
@@ -41,9 +43,18 @@
 #include "ADM_lavcodec.h"
 #include "ADM_codecs/ADM_ffmp43.h"
 #include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
+
+#include "ADM_encoder/ADM_vidEncode.hxx"
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_encoder/adm_encoder.h"
+#include "ADM_encoder/adm_encCopy.h"
+
+#include "ADM_toolkit/ADM_threads.h"
+#include "ADM_mplex/ADM_mthread.h"
+
 static uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position);
-
-
+uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,  uint32_t *offset);
+static int copyVideoSlave( muxerMT *context );
 /**
 	Save a cut and audio edited to mpeg-PS
 	Usefull for editing PVR captured files for example
@@ -76,29 +87,7 @@ static uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position);
 		total_got+=samples; \
 	} \
   }
-#if 0
-        printf("Current %u target %u\n",(uint32_t)total_got,(uint32_t)target_sample); \
-}
-#endif
-#define WRITE_AND_REMOVE_END_CODE \
-{\
-if(lookupSeqEnd(&bitstream,&position)) \
-{ \
-    ADMBitstream bs2; \
-    printf("$$$$$$*************************************$$$$$$$$$$$$$$$$$$$$$$$Found Seq end at %u in %u packet\n",position,bitstream.len); \
-    if(position) \
-{\
-        bs2.data=bitstream.data;\
-                bs2.len=position;\
-                        muxer->writeVideoPacket(&bs2);\
-}\
-        bs2.data=bitstream.data+position+4;\
-                bs2.len=bitstream.len-position-4;\
-                        if(bs2.len) muxer->writeVideoPacket(&bs2);\
-} \
-else muxer->writeVideoPacket(&bitstream); \
-}
-                    
+
 uint8_t isMpeg12Compatible(uint32_t fourcc);
 extern const char *getStrFromAudioCodec( uint32_t codec); 
 uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
@@ -225,15 +214,6 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                 }
 
   	        muxer=new mplexMuxer();
-#if 0
-#warning TEST
-#warning TEST
-#warning TEST
-#warning TEST
-#warning TEST
-#warning TEST
-                muxer=new lavMuxer();
-#endif
                 break;
         case ADM_TS:     
              printf("Using TS output format\n");   
@@ -279,15 +259,6 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
     default:
         ADM_assert(0);
   }
-  // preamble
-  /*
-  video_body->getRawStart (frameStart, buffer, &len);
-  muxer->writeVideoPacket (len,buffer);
-*/
-// 	while(total_got<3000)
-// 	{
-//   		PACK_AUDIO(0)
-// 	}
   
   uint32_t cur=0;
   uint32_t target_sample=0;
@@ -304,105 +275,65 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
   uint8_t *audiobuffer = new uint8_t[4*48000*2]; // 2 sec worth of lpcm
   uint32_t position;
         bitstream.data=buffer;
-        // Prefill buffer
-        PACK_AUDIO(0);
-
-  for (uint32_t i = frameStart; i < frameEnd; i++)
-    {
-      
-      work->setFrame(i - frameStart, frameEnd - frameStart);
-      
-      if(!work->isAlive()) goto _abt;
-      ADM_assert (video_body->getFlags (i, &flags));
-      if (flags & AVI_B_FRAME)	// oops
-	{
-	  // se search for the next i /p
-	  uint32_t found = 0;
-
-	for (uint32_t j = i + 1; j < frameEnd; j++)
-	{
-		ADM_assert (video_body->getFlags (j, &flags));
-		if (!(flags & AVI_B_FRAME))
-		{
-			found = j;
-			break;
-		}
-
-	}
-	if (!found)
-        {
-                        // Last gop might be incomplete
-                    if( abs(i-frameEnd)<25) ret=1;
-                    else ret=0;
-        	    goto _abt;
-        }
-	  // Write the found frame
-	video_body->getRaw (found, bitstream.data, &bitstream.len);
-        bitstream.dtsFrame=cur++;
-        bitstream.ptsFrame=found;
-        WRITE_AND_REMOVE_END_CODE;   
         
-        work->feedFrame(bitstream.len);
-	PACK_AUDIO(1)
-	
-	  
-	  // and the B frames
-	for (uint32_t j = i; j < found; j++)
-	    {
-                video_body->getRaw (j, bitstream.data, &bitstream.len);
-                bitstream.dtsFrame=cur++;
-                bitstream.ptsFrame=j-frameStart;
-                
-                WRITE_AND_REMOVE_END_CODE;   
-                work->feedFrame(bitstream.len);
-		PACK_AUDIO(1)
-		
-    	    }
-	  i = found;		// Will be plussed by for
-	}
-      else			// P or I frame
-	{
-		if(i==frameStart) // Pack sequ_start with the frame
-		{
-			// Check if seq header is there..
-			video_body->getRaw (i, bitstream.data, &bitstream.len);
-                        if(buffer[0]==0 && buffer[1]==0 && buffer[2]==1 && buffer[3]==SEQ_START_CODE) // Seq start
-			{
-                                bitstream.dtsFrame=cur++;
-                                bitstream.ptsFrame=i-frameStart;
-				muxer->writeVideoPacket (&bitstream);
-                                work->feedFrame(bitstream.len);
-				PACK_AUDIO(1)
-				
-				
-			}
-			else // need to add seq start
-			{
-				uint32_t seq;
-				video_body->getRawStart (frameStart, buffer, &seq);  		
-	  			video_body->getRaw (i, buffer+seq, &len);
-                                bitstream.len=len+seq;
-                                bitstream.dtsFrame=cur++;
-                                bitstream.ptsFrame=i-frameStart;
-				muxer->writeVideoPacket (&bitstream);
-                                work->feedFrame(bitstream.len);
-				PACK_AUDIO(1)
-				
-			}
-		}
-		else
-		{
-			video_body->getRaw (i, buffer, &bitstream.len);
-                        bitstream.dtsFrame=cur++;
-                        bitstream.ptsFrame=i-frameStart;
-                        WRITE_AND_REMOVE_END_CODE;   
-                        work->feedFrame(bitstream.len);
-			PACK_AUDIO(1)
-			
-		}
-	}
+     /***************************
+      Special case : Multithreaded
+     ***************************/
+        if(mux==MUXER_VCD || mux==MUXER_SVCD || mux==MUXER_DVD)
+        {
+          pthread_t audioThread,videoThread,muxerThread;
+          EncoderCopy *copy=new EncoderCopy(NULL);
+          muxerMT context;
+          
+          copy->configure(NULL);
+          // 
+          memset(&context,0,sizeof(context));
+          context.videoEncoder=copy;
+          context.audioEncoder=audio;
+          context.muxer=( mplexMuxer *)muxer;
+          context.nbVideoFrame=copy->getNbFrame();
+          context.audioTargetSample=target_sample;
+          context.audioBuffer=audiobuffer;
+          context.bitstream=&bitstream;
 
-    }
+           // start audio thread
+          ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)defaultAudioSlave,&context)); 
+          ADM_assert(!pthread_create(&videoThread,NULL,(THRINP)copyVideoSlave,&context)); 
+          while(1)
+          {
+            accessMutex.lock();
+            if(context.audioDone==2 || context.videoDone==2 || !work->isAlive()) //ERROR
+            {
+              context.audioAbort=1;
+              context.videoAbort=1;
+              printf("[Copy] aborting\n");
+            }
+            if(context.audioDone && context.videoDone)
+            {
+              printf("[Copy]Both audio & video done\n");
+              if(context.audioDone==1 && context.videoDone==1) ret=1;
+              else ret=0;
+              accessMutex.unlock();
+              goto _abt;
+            }
+             // Update UI
+             
+            work->feedAudioFrame(context.feedAudio);
+            work->setFrame(context.currentVideoFrame,frameEnd-frameStart);
+             //encoding->setQuant(bitstream.out_quantizer);
+            work->feedFrame(context.feedVideo);
+            context.feedAudio=0;
+            context.feedVideo=0;
+            accessMutex.unlock();
+            ADM_usleep(1000*1000);
+             
+          }    
+    
+    
+        }
+        
+        ADM_assert(0);
+
     ret=1;
 _abt:
   delete work;
@@ -415,9 +346,10 @@ _abt:
 
 }
 
-uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,
-                              uint32_t *offset);
 
+
+
+//************************************************
 uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position)
 {
     uint8_t *ptr=bitstream->data,*end,code;
@@ -435,6 +367,62 @@ uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position)
     }
     return 0;
 }
+//*******************************
+int copyVideoSlave( muxerMT *context )
+{
+  printf("[CopyVideoThread] Starting\n");
+  uint32_t position;
+  for(uint32_t i=0;i<context->nbVideoFrame;i++)
+  {
 
+    context->bitstream->cleanup(i);
+    if(context->videoAbort)
+    {
+      context->videoDone=1;
+      context->muxer->audioEof();
+      return 1;
+    }
+    if(!context->videoEncoder->encode( i,context->bitstream))
+    {
+      accessMutex.lock();
+      context->videoDone=2;
+      context->muxer->audioEof();
+      accessMutex.unlock();
+      printf("[CopyVideoThread] Exiting on error\n");
+      return 1;
+    }
+    if(!context->bitstream->len)
+      continue;
+    
+    if(lookupSeqEnd(context->bitstream,&position))
+    {
+        ADMBitstream bs2; 
+                if(position) 
+                {
+                  bs2.data=context->bitstream->data;
+                  bs2.len=position;
+                  context->muxer->writeVideoPacket(&bs2);
+                }
+                bs2.data=context->bitstream->data+position+4;
+                bs2.len=context->bitstream->len-position-4;
+                if(bs2.len) context->muxer->writeVideoPacket(&bs2);
+    } 
+    else 
+      context->muxer->writeVideoPacket(context->bitstream); 
+  
+
+    accessMutex.lock();
+    context->currentVideoFrame=i;
+    context->feedVideo+=context->bitstream->len;
+    accessMutex.unlock();
+  }        
+  accessMutex.lock();
+  context->videoDone=1;
+  context->muxer->audioEof();
+  accessMutex.unlock();
+
+  printf("[CopyVideoThread] Exiting\n");
+  return 1;
+}
 
 //EOF

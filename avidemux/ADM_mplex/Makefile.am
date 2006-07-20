@@ -12,7 +12,8 @@ libADM_mplex_a_SOURCES = ac3strm_in.cpp audiostrm.hpp audiostrm_out.cpp \
 	mplexconsts.hpp multiplexor.cpp multiplexor.hpp outputstrm.hpp padstrm.cpp padstrm.hpp \
 	stillsstream.cpp stillsstream.hpp stream_params.cpp stream_params.hpp systems.cpp \
 	systems.hpp vector.cpp vector.hpp videostrm.hpp videostrm_in.cpp videostrm_out.cpp \
-	mpegconsts.c ADM_mplexmuxer.cpp ADM_mplexin.cpp ADM_mplexout.cpp ADM_transfert.cpp
+	mpegconsts.c ADM_mplexmuxer.cpp ADM_mplexin.cpp ADM_mplexout.cpp ADM_transfert.cpp \
+	ADM_mthread.cpp
 
 EXTRA_DIST = 
 ####### kdevelop will overwrite this part!!! (end)############

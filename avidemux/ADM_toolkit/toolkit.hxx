@@ -79,7 +79,6 @@ void            GUI_Quiet(void);
 
 	void gettimeofday(struct timeval *p, void *tz);
 	#define timezone int
-	#define usleep ADM_usleep
 	#define TIMZ int
 #endif
 #else

@@ -17,33 +17,31 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef __ADM_encoder_copy__
-#define __ADM_encoder_copy__
+#ifndef ADM_MTHREADS_H
+#define ADM_MTHREADS_H
+typedef  void * (*THRINP)(void *p);
 
+extern admMutex accessMutex;
 
-class EncoderCopy:public Encoder
+typedef struct muxerMT
 {
-
-protected:
-  uint32_t _frameStart;
-  uint32_t _total;
-  uint32_t _lastIPFrameSent;
-public:
-    EncoderCopy (COMPRES_PARAMS * codecconfig);
-   ~EncoderCopy ();		// can be called twice if needed ..
-  virtual uint8_t isDualPass (void);
-  virtual uint8_t configure (AVDMGenericVideoStream * instream);
-  virtual uint8_t encode (uint32_t frame, ADMBitstream *out);
-  virtual uint8_t setLogFile (const char *p, uint32_t fr);
-  virtual uint8_t stop (void);
-  virtual uint8_t startPass2 (void);
-  virtual uint8_t startPass1 (void);
-  virtual const char *getCodecName (void);
-  virtual const char *getFCCHandler (void);
-  virtual const char *getDisplayName (void);
-  virtual uint8_t hasExtraHeaderData (uint32_t * l, uint8_t ** data);
-          uint32_t getNbFrame(void) {return _total;} //<Must be called only after configure call !
+  Encoder                   *videoEncoder;
+  AVDMGenericAudioStream    *audioEncoder;
+  mplexMuxer                *muxer;
+  ADMBitstream              *bitstream;
+  uint32_t                  nbVideoFrame;
+  uint32_t                  audioTargetSample;
+  uint8_t                   *audioBuffer;
+  uint32_t                  audioDone;
+  uint32_t                  videoDone;
+  uint32_t                  currentVideoFrame;
+  uint32_t                  feedAudio;
+  uint32_t                  feedVideo;
+  uint32_t                  audioAbort;
+  uint32_t                  videoAbort;
 };
 
+extern int defaultAudioSlave( muxerMT *context );
+extern int defaultVideoSlave( muxerMT *context );
 
 #endif

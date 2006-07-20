@@ -59,11 +59,12 @@ extern "C" {
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
-#include "ADM_toolkit/ADM_threads.cpp"
+#include "ADM_toolkit/ADM_threads.h"
+#include "ADM_mplex/ADM_mthread.h"
 #warning REMOVE unistd
 #include "unistd.h"
 
-typedef  void * (*THRINP)(void *p);
+
 
 static uint8_t *_buffer=NULL,*_outbuffer=NULL;
 static void  end (void);
@@ -72,27 +73,6 @@ extern const char *getStrFromAudioCodec( uint32_t codec);
 extern COMPRES_PARAMS ffmpeg1Codec,ffmpeg2DVDCodec,ffmpeg2SVCDCodec;	
 extern FFcodecSetting ffmpeg1Extra,ffmpeg2DVDExtra,ffmpeg2SVCDExtra;
 
-admMutex accessMutex;
-
-typedef struct muxerMT
-{
-  EncoderFFMPEGMpeg1        *videoEncoder;
-  AVDMGenericAudioStream    *audioEncoder;
-  ADMMpegMuxer              *muxer;
-  ADMBitstream              *bitstream;
-  uint32_t                  nbVideoFrame;
-  uint32_t                  audioTargetSample;
-  uint8_t                   *audioBuffer;
-  uint32_t                  audioDone;
-  uint32_t                  videoDone;
-  uint32_t                  currentVideoFrame;
-  uint32_t                  feedAudio;
-  uint32_t                  feedVideo;
-};
-
-    static int audioSlave( muxerMT *context );
-    static int videoSlave( muxerMT *context );
-    
 
 
 uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
@@ -401,25 +381,30 @@ switch(mux)
            memset(&context,0,sizeof(context));
            context.videoEncoder=encoder;
            context.audioEncoder=audio;
-           context.muxer=muxer;
+           context.muxer=(mplexMuxer *)muxer;
            context.nbVideoFrame=total;
            context.audioTargetSample=sample_target;
            context.audioBuffer=audioBuffer;
            context.bitstream=&bitstream;
 
            // start audio thread
-           ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)audioSlave,&context)); 
-           ADM_assert(!pthread_create(&videoThread,NULL,(THRINP)videoSlave,&context)); 
+           ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)defaultAudioSlave,&context)); 
+           ADM_assert(!pthread_create(&videoThread,NULL,(THRINP)defaultVideoSlave,&context)); 
            while(1)
            {
              accessMutex.lock();
+             if(context.audioDone==2 || context.videoDone==2) //ERROR
+             {
+               context.audioAbort=1;
+               context.videoAbort=1;
+             }
              if(context.audioDone && context.videoDone)
              {
                printf("[mpegFF]Both audio & video done\n");
                if(context.audioDone==1 && context.videoDone==1) ret=1;
                else ret=0;
                accessMutex.unlock();
-               goto finish;
+               goto finishvcdff;
              }
              // Update UI
              
@@ -430,7 +415,7 @@ switch(mux)
              context.feedAudio=0;
              context.feedVideo=0;
              accessMutex.unlock();
-             usleep(1000*1000);
+             ADM_usleep(1000*1000);
              
            }
            
@@ -444,7 +429,7 @@ switch(mux)
                                 if(!encoder->encode( i,&bitstream))// &len,(uint8_t *) _outbuffer,&flags))
 				{
                                   GUI_Error_HIG(_("Error in pass 2"), NULL);
-					goto finish;
+					goto finishvcdff;
 				}
                                 if(!bitstream.len) continue;
 				
@@ -486,11 +471,12 @@ switch(mux)
 					if(!encoding->isAlive ())
 						{
                                                          ret=0;        
-							 goto finish;
+							 goto finishvcdff;
 						}
 			}
 			ret=1;
-finish:
+finishvcdff:
+                        printf("[MPEGFF] Finishing..\n");
 			delete encoding;
 //			GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
 		 	end();
@@ -532,65 +518,5 @@ typedef struct muxerMT
   ADMMpegMuxer              *muxer;
 };
 */
-//*******************************************************
-int audioSlave( muxerMT *context )
-{
-  uint32_t total_sample=0;
-  uint32_t samples,audioLen;
-  printf("[AudioThread] Starting\n");
-  while(context->audioEncoder->getPacket(context->audioBuffer, &audioLen, &samples) && total_sample<context->audioTargetSample)
-  { 
-//      printf("Audio %u packet\n",audioLen);
-
-      while(!context->muxer->needAudio()) ;
-      if(audioLen) 
-      {
-        context->muxer->writeAudioPacket(audioLen,context->audioBuffer); 
-      }
-      accessMutex.lock();
-      context->feedAudio+=audioLen;
-      accessMutex.unlock();
-
-  }
-  accessMutex.lock();
-  context->audioDone=1;
-  accessMutex.unlock();
-  printf("[AudioThread] Exiting\n");
-  return 1;
-}
-//*******************************************************
-int videoSlave( muxerMT *context )
-{
-  printf("[VideoThread] Starting\n");
-  for(uint32_t i=0;i<context->nbVideoFrame;i++)
-  {
-
-      context->bitstream->cleanup(i);
-      if(!context->videoEncoder->encode( i,context->bitstream))
-      {
-           accessMutex.lock();
-           context->videoDone=2;
-           accessMutex.unlock();
-  
-            return 1;
-      }
-      if(context->bitstream->len)
-        context->muxer->writeVideoPacket(context->bitstream);
-      
-      accessMutex.lock();
-      context->currentVideoFrame=i;
-      context->feedVideo+=context->bitstream->len;
-      accessMutex.unlock();
-          
-
-  }
-  accessMutex.lock();
-  context->videoDone=1;
-  accessMutex.unlock();
-
-  printf("[VideoThread] Exiting\n");
-  return 1;
-}
-
 #endif	
 // EOF

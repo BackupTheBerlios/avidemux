@@ -97,16 +97,7 @@ void GUI_Sleep(uint32_t ms)
 {
     if (ms < 10)
 	return;
-#ifdef CYG_MANGLING
-	usleep(ms*1000);
-#else
-    ms -= 10;
-    timespec ts, tr;
-    ts.tv_sec = 0;
-    ts.tv_nsec = ms * 1000 * 1000;
-    nanosleep(&ts, &tr);
-#endif
-    
+    ADM_usleep(ms*1000);
 }
 
 void MenuAppend(GtkMenu * menu, const char *text)
@@ -125,7 +116,7 @@ void runDialog(volatile int *lock)
 	      while (!*lock)
 	      {
 				while (gtk_events_pending())    		  	gtk_main_iteration();         
-        		usleep(  50000L);			// wait 50 ms
+        		ADM_usleep(  50000L);			// wait 50 ms
         	}
 }
 

@@ -23,13 +23,6 @@
 
 #include "config.h"
 
-#ifdef CYG_MANGLING
-#define WIN32_CLASH
-#define WAIT1() ADM_usleep(1000) // Allow slave thread to start
-#else
-#define WAIT1() sleep(1)
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -124,6 +117,10 @@ uint8_t mplexMuxer::audioEof(void)
 {
         channelaudio->abort();
 }
+uint8_t mplexMuxer::videoEof(void)
+{
+  channelvideo->abort();
+}
 
 //___________________________________________________________________________
 uint8_t mplexMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE type, aviInfo *info, WAVHeader *audioheader)
@@ -160,7 +157,7 @@ uint8_t mplexMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE
         slaveRunning=1;
         ADM_assert(!pthread_create(&slave,NULL,(THRINP)slaveThread,audioheader));
 
-        WAIT1();        
+        ADM_usleep(1000*50); // Allow slave thread to start
         
         printf("Init ok\n");
         return 1;
@@ -350,7 +347,7 @@ uint8_t mplexMuxer::close( void )
                 while(slaveRunning)
                 {
                         printf("Waiting for slave thread to end\n");
-                        WAIT1();
+                        ADM_usleep(100*1000);
                 }
                         // Flush
                         // Cause deadlock :

@@ -96,6 +96,7 @@ public:
         virtual uint8_t audioEmpty( void);
         virtual uint8_t needAudio(void);
         virtual uint8_t audioEof(void);
+        virtual uint8_t videoEof(void);
 
 };
 #define TS_PACKET_SIZE 188
