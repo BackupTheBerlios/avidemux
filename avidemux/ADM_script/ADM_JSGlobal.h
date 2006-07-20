@@ -5,7 +5,7 @@
 
 #include <jsapi.h>
 #include <pthread.h>
-
+#define WIN32_CLASH
 // javscript debugging helper
 void printJSError(JSContext *cx, const char *message, JSErrorReport *report);
 bool SpidermonkeyInit();
@@ -19,8 +19,11 @@ void *StartThreadSpidermonkey(void *pData);
 #else
 #define JSVAR(a,b,c) extern a b
 #endif
-
+#if defined( CYG_MANGLING) && defined(JSDECLARE)
+ pthread_t g_pThreadSpidermonkey ;
+#else
 JSVAR( pthread_t, g_pThreadSpidermonkey , 0);
+#endif
 JSVAR( pthread_mutex_t, g_pSpiderMonkeyMutex , PTHREAD_MUTEX_INITIALIZER);
 // expose our main javascript context to the entire program
 JSVAR( bool, g_bJSSuccess , 0);

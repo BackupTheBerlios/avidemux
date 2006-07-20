@@ -19,7 +19,7 @@
 #include <string.h>
 #include <math.h>
 #include <pthread.h>
-
+#define WIN32_CLASH
 #include "ADM_library/default.h"
 
 #include "ADM_toolkit/toolkit.hxx"

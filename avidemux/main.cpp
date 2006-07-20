@@ -22,7 +22,8 @@
 #include <glib.h>
 #include <signal.h>
 #include <config.h>
-
+#include <pthread.h>
+#define WIN32_CLASH
 #include <gtk/gtk.h>
 
 #ifdef HAVE_DCGETTEXT

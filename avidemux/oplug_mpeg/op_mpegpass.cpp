@@ -24,6 +24,8 @@
 #include "ADM_library/default.h"
 
 
+#include "ADM_toolkit/ADM_threads.h"
+#define WIN32_CLASH
 #include "avi_vars.h"
 #include <ADM_assert.h>
 #include "ADM_audiofilter/audioprocess.hxx"
@@ -49,7 +51,6 @@
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encCopy.h"
 
-#include "ADM_toolkit/ADM_threads.h"
 #include "ADM_mplex/ADM_mthread.h"
 
 static uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position);

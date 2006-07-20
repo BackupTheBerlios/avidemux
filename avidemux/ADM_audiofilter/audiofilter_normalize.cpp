@@ -47,7 +47,11 @@ AUDMAudioFilterNormalize::AUDMAudioFilterNormalize(AUDMAudioFilter * instream,GA
     case ADM_GAIN_MANUAL: 
                 _scanned=1;
                 db_out =  param->gain10/100.0; // Dbout is in DB (!)
+#ifndef CYG_MANGLING
                 _ratio = pow10f(db_out);
+#else
+		_ratio= pow(10,db_out);
+#endif
                 printf("[Gain] %f db (p=%d)\n", (float)(param->gain10)/10.,param->gain10);
                 printf("[Gain] Linear ratio of : %03.3f\n", _ratio);
   }

@@ -105,7 +105,7 @@ uint32_t got=0;
 int rx;
     while(got<howmuch)
     {
-        rx=recv(mySocket,where,howmuch-got,0);
+        rx=recv(mySocket,(char *)where,howmuch-got,0);
         if(rx<0)
         {
           perror("RxData");

@@ -21,7 +21,7 @@
 #ifndef __AVIFMT2__
 #define __AVIFMT2__
 
-#ifndef WIN32_CLASH
+#if !defined( WIN32_CLASH) || !defined(CYG_MANGLING)
 typedef struct
 {
     uint32_t 		biSize;

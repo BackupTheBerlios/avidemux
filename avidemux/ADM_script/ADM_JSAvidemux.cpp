@@ -12,6 +12,8 @@
 #include "config.h"
 #include <stdlib.h>
 #include <math.h>
+#include <pthread.h>
+#define WIN32_CLASH
 #include "ADM_JSAvidemux.h"
 #include "ADM_library/default.h"
 #include "ADM_toolkit/toolkit.hxx"

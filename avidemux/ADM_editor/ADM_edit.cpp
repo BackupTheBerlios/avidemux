@@ -23,6 +23,9 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#include <pthread.h>
+#define WIN32_CLASH
+//#include <unistd.h>
 #ifdef CYG_MANGLING
 #include "sys/stat.h"
 #endif

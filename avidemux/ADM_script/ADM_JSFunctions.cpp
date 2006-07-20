@@ -14,10 +14,13 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef CYG_MANGLING
 #include <sys/wait.h>
 #include <sys/param.h>
+#endif
 #include <errno.h>
 #include <dirent.h>
+#include <limits.h>
 #include <math.h>
 #include <vector>
 #include <string>
@@ -259,7 +262,13 @@ char *n;
         *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,n));
         return JS_TRUE;
 }
+#ifdef CYG_MANGLING
 
+JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+		return JS_FALSE;
+}
+#else
 JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {// begin systemExecute
 	// default return value
@@ -355,6 +364,14 @@ JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 		*rval = INT_TO_JSVAL(-1);	// failure
 	return JS_TRUE;
 }// end systemExecute
+#endif
+#ifdef CYG_MANGLING
+
+JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+		return JS_FALSE;
+}
+#else
 
 JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {// begin systemInclude
@@ -408,3 +425,4 @@ JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 	}// end error including
 	return JS_TRUE;
 }// end systemInclude
+#endif
