@@ -22,10 +22,11 @@
 class admMutex
 {
   private:
-    uint8_t _locked;
+    uint8_t       _locked;
+    const char    *_name;
   public: 
     pthread_mutex_t _tex;       
-    admMutex( void);
+    admMutex( const char *name=NULL);
     ~admMutex();        
     uint8_t lock(void);
     uint8_t unlock(void);

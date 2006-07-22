@@ -237,6 +237,7 @@ static int index;
 			argv=global_argv;
 			argc=global_argc;
 			ADM_usleep(100000); // let gtk start
+                        gdk_threads_enter();
 			GUI_Quiet();
 			printf("\n *** Automated : %d entries*************\n",NB_AUTO);
 			// we need to process
@@ -298,7 +299,8 @@ static int index;
 					} // end while
           GUI_Verbose();
           printf("\n ********** Automation ended***********\n");
-          return 0;
+          gdk_threads_leave();
+          return FALSE; // Do not call me anymore
 }
 //_________________________________________________________________________
 
@@ -465,17 +467,13 @@ void call_autosplit(char *p)
 
 void setBegin(char *p) 
 {	
-uint32_t i;
-		sscanf(p,"%lu",&i);
-		frameStart=i;  
-		printf("\n Start %lu\n",frameStart);
+    frameStart=atoi(p);  
+    printf("\n Start %u\n",frameStart);
 }
 void setEnd(char *p) 
 {	
-uint32_t i;
-		sscanf(p,"%lu",&i);
-		frameEnd=i;  
-		printf("\n End %lu\n",frameStart);
+    frameEnd=atoi(p);
+    printf("\n End %u\n",frameStart);
 
 }
 void call_help(char *p)

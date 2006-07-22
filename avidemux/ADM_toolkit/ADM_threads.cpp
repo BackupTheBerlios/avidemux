@@ -25,8 +25,9 @@
 #define THR_CHECK(x) {int r=(x);if(r) {printf("Threading error :%d %s\n", \
                       r,strerror(r));ADM_assert(0);}}
 //**************** Mutex *******************
-admMutex::admMutex(void)
+admMutex::admMutex(const char *name)
 {
+  _name=name; // Should always be const, so it is okay to not copy
   THR_CHECK(pthread_mutex_init(&_tex,NULL));
   _locked=0;
 }
