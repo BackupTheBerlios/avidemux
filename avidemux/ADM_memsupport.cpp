@@ -41,14 +41,27 @@
 
 static uint32_t ADM_consumed=0;
 static admMutex memAccess("MemAccess");
-
+static int doMemStat=0;
 extern "C" {
 
 void *av_malloc(unsigned int size);
 void av_free(void *ptr);
 void *av_realloc(void *ptr, unsigned int size);
 }
+//**************
 void ADM_memStat( void );
+void ADM_memStatInit( void );
+void ADM_memStatEnd( void );
+//**************
+void ADM_memStatInit( void )
+{
+  ADM_consumed=0;
+  doMemStat=1;
+}
+void ADM_memStatEnd( void )
+{
+  doMemStat=0;
+}
 void ADM_memStat( void )
 {
 	printf("Global mem stat\n______________\n");
@@ -60,47 +73,53 @@ void *ADM_alloc(size_t size)
 char *c;
 uint64_t l,lorg;
 uint32_t *backdoor;
-memAccess.lock();
-	l=(uint64_t)malloc(size+32);
-	// Get next boundary
-	lorg=l;
-	l=(l+15)& 0xfffffffffffffff0LL;
-	l+=16;
-	c=(char *)l;
-	backdoor=(uint32_t *)(c-8);
-	*backdoor=(0xdead<<16)+l-lorg;
-	backdoor[1]=size;
-memAccess.unlock();
-	ADM_consumed+=size;
+int dome=doMemStat;
+        if(dome)
+            memAccess.lock();
+        l=(uint64_t)malloc(size+32);
+        // Get next boundary
+        lorg=l;
+        l=(l+15)& 0xfffffffffffffff0LL;
+        l+=16;
+        c=(char *)l;
+        backdoor=(uint32_t *)(c-8);
+        *backdoor=(0xdead<<16)+l-lorg;
+        backdoor[1]=size;
+        if(dome)
+          memAccess.unlock();
+        ADM_consumed+=size;
         
 	return c;
 
 }
 void ADM_dezalloc(void *ptr)
 {
-	uint32_t *backdoor;
-	uint32_t size,offset;
-	char	 *c=(char *)ptr;
+  int dome=doMemStat;
+        uint32_t *backdoor;
+        uint32_t size,offset;
+        char	 *c=(char *)ptr;
 
-	if(!ptr) return;
+        if(!ptr) return;
 
-	backdoor=(uint32_t *)ptr;
-	backdoor-=2;
-	if(*backdoor==0xbeefbeef)
+        backdoor=(uint32_t *)ptr;
+        backdoor-=2;
+        if(*backdoor==0xbeefbeef)
         {
                 printf("Double free gotcha!\n");
                 ADM_assert(0);
         }
-	ADM_assert(((*backdoor)>>16)==0xdead);
+        ADM_assert(((*backdoor)>>16)==0xdead);
         
-	
-	offset=backdoor[0]&0xffff;
-	size=backdoor[1];
+        
+        offset=backdoor[0]&0xffff;
+        size=backdoor[1];
         *backdoor=0xbeefbeef; // Scratch sig
-memAccess.lock();        
-      free(c-offset);
-      ADM_consumed-=size;
-memAccess.unlock();
+        if(dome)
+            memAccess.lock();        
+        free(c-offset);
+        ADM_consumed-=size;
+        if(dome)
+          memAccess.unlock();
 }
 
 void *operator new( size_t t)

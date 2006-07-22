@@ -75,17 +75,17 @@ extern uint8_t dloadXvidCVS( void );
 extern void  buildDistMatrix( void );
 extern void initScaleTab( void );
 extern uint8_t initGUI( void );
-extern void ADM_memStat( void );
 extern uint8_t oplug_mpegInit(void);
 extern void     COL_init(void);
 extern uint8_t  initFileSelector(void);
 extern void AUDMEncoder_initDither(void);
+extern void ADM_memStat( void );
+extern void ADM_memStatInit( void );
+extern void ADM_memStatEnd( void );
 extern "C"
 {
 extern void VPInitLibrary(void);
 extern void VPDeInitLibrary(void);
-
-
 };
 
 
@@ -144,6 +144,9 @@ int sdl_version=0;
 printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #endif
 #endif
+
+   // Start counting memory
+  ADM_memStatInit(  );
 
     printf("Initializing prefs\n");
     initPrefs();
@@ -254,7 +257,7 @@ void onexit( void )
         filterCleanUp();
         printf("End of cleanup\n");
         ADMImage_stat();
-        ADM_memStat();
+        ADM_memStatEnd(  );
         printf("\n Goodbye...\n\n");
 }
 void sig_segfault_handler(int signo)
