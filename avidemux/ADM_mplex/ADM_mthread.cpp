@@ -82,13 +82,13 @@ int defaultAudioSlave( muxerMT *context )
 
   }
   accessMutex.lock();
-  if(total_sample<context->audioTargetSample)
-    context->audioDone=2;
-  else
-    context->audioDone=1;
+  // Let's say audio is always ok, shall we :)
+  context->audioDone=1;
   context->muxer->audioEof();
   accessMutex.unlock();
   printf("[AudioThread] Exiting\n");
+  printf("[AudioThread] Target %u, got %u, %f %%\n",context->audioTargetSample,total_sample,
+         (float)total_sample/(float)context->audioTargetSample);
   return 1;
 }
 //*******************************************************

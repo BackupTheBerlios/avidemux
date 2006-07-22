@@ -257,6 +257,7 @@ void onexit( void )
         filterCleanUp();
         printf("End of cleanup\n");
         ADMImage_stat();
+        ADM_memStat(  );
         ADM_memStatEnd(  );
         printf("\n Goodbye...\n\n");
 }
