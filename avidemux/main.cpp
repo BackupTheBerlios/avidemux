@@ -102,11 +102,6 @@ int main(int argc, char *argv[])
 {
 // Check for big files
 int sdl_version=0;
-#ifdef     __USE_LARGEFILE
-#ifdef   __USE_LARGEFILE64
-printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
-#endif
-#endif
 
 /*
 	Initialize Gettext if available
@@ -125,16 +120,16 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 
 
 // thx smurf uk :)
-     signal(11, sig_segfault_handler); // show stacktrace on default
+    signal(11, sig_segfault_handler); // show stacktrace on default
 
-    	printf("\n*******************\n");
-    	printf("  Avidemux 2, v  " VERSION "\n");
-    	printf("*******************\n");
-	printf(" http://fixounet.free.fr/avidemux\n");
-	printf(" Code      : Mean & JSC \n");
-	printf(" GFX       : Nestor Di , nestordi@augcyl.org\n");
-	printf(" Testing   : Jakub Misak\n");
-	printf(" FreeBSD   : Anish Mistry, amistry@am-productions.biz\n");
+    printf("\n*******************\n");
+    printf("  Avidemux 2, v  " VERSION "\n");
+    printf("*******************\n");
+    printf(" http://fixounet.free.fr/avidemux\n");
+    printf(" Code      : Mean & JSC \n");
+    printf(" GFX       : Nestor Di , nestordi@augcyl.org\n");
+    printf(" Testing   : Jakub Misak\n");
+    printf(" FreeBSD   : Anish Mistry, amistry@am-productions.biz\n");
 
 
 #if defined( ARCH_X86)  
@@ -143,35 +138,37 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #if defined(ARCH_X86_64)
       printf("Compiled for X86_64 Arch.\n");
 #endif
-   
 
-    // the one and only global preferences object
+#ifdef     __USE_LARGEFILE
+#ifdef   __USE_LARGEFILE64
+printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
+#endif
+#endif
+
     printf("Initializing prefs\n");
     initPrefs();
-    
 
-   VPInitLibrary();
-   register_Encoders( );
-    atexit(onexit);
+  VPInitLibrary();
+  register_Encoders( );
+  atexit(onexit);
+  
 #ifdef USE_SDL
     sdl_version=(SDL_Linked_Version()->major*1000)+(SDL_Linked_Version()->minor*100)+
           (SDL_Linked_Version()->patch);
-    
     printf("SDL support on Version %d\n",sdl_version);
-#endif
- #ifdef USE_SDL
   if(sdl_version>1209)
   {
-   	printf("Global SDL init...\n");
-   	SDL_Init(SDL_INIT_EVERYTHING); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
+      printf("Global SDL init...\n");
+      SDL_Init(SDL_INIT_EVERYTHING); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
   }
-   #endif
-
-
-    g_thread_init(NULL);
-#ifdef CYG_MANGLING    
-    win32_netInit();    
 #endif
+
+
+    
+#ifdef CYG_MANGLING    
+    win32_netInit();
+#endif
+    g_thread_init(NULL);
     gdk_threads_init();
     gdk_threads_enter();
     gtk_set_locale();
@@ -179,66 +176,64 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
     gdk_rgb_init();
     AUDMEncoder_initDither();
 #ifdef USE_XVID_4
-	xvid4_init();
+    xvid4_init();
 #endif
-        initFileSelector();
-	CpuCaps::init();
-	ADM_InitMemcpy();
-	
+    initFileSelector();
+    CpuCaps::init();
+    ADM_InitMemcpy();
+        
 // Load .avidemuxrc
     quotaInit();
     prefs->load();
 
-   if(!initGUI())
-    	{
-		printf("\n Fatal : could not init GUI\n");
-		exit(-1);	
-	}
+  if(!initGUI())
+        {
+                printf("\n Fatal : could not init GUI\n");
+                exit(-1);	
+        }
 
     video_body = new ADM_Composer;
 #ifdef HAVE_ENCODER
      registerVideoFilters(  );
 #endif
-     
+
 #ifdef USE_FFMPEG
-  
-                		avcodec_init();
-	                 	avcodec_register_all();
-                                lavformat_init();
+    avcodec_init();
+    avcodec_register_all();
+    lavformat_init();
 #endif
 #ifdef HAVE_AUDIO
     AVDM_audioInit();
-#endif    
+#endif
+
     buildDistMatrix();
     initScaleTab();
 
-    loadEncoderConfig();
     COL_init();
-    
-   
+
 #ifdef USE_SDL
   if(sdl_version<=1209)
   {
-   	printf("Global SDL init...\n");
-   	SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
+    printf("Global SDL init...\n");
+    SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
   }
 #endif
-        oplug_mpegInit();
-        if(SpidermonkeyInit() == true)
-            printf("Spidermonkey initialized.\n");
-        if (argc >= 2)
-        {
+    oplug_mpegInit();
+    if(SpidermonkeyInit() == true)
+        printf("Spidermonkey initialized.\n");
+    else
+    {
+      ADM_assert(0); 
+    }
+typedef gboolean GCALL       (void *);
+    if (argc >= 2)
+    {
+      global_argc=argc;
+      global_argv=argv;
+      g_timeout_add(200,(GCALL *)automation,NULL);
+    }
 
-          global_argc=argc;
-          global_argv=argv;
-#if 1                    
-          gtk_timeout_add( 500, (GtkFunction )automation, NULL );
-#else
-            automation();
-#endif
-        }
 
-        
     gtk_main();
     gdk_threads_leave();
     printf("Normal exit\n");
@@ -249,15 +244,15 @@ void onexit( void )
   printf("Cleaning up\n");
         VPDeInitLibrary();
         delete video_body;
-	// wait for thread to finish executing
-	printf("Waiting for Spidermonkey to finish...\n");
-	pthread_mutex_lock(&g_pSpiderMonkeyMutex);
-	printf("Cleaning up Spidermonkey.\n");
-	SpidermonkeyDestroy();
-	pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
+        // wait for thread to finish executing
+        printf("Waiting for Spidermonkey to finish...\n");
+        pthread_mutex_lock(&g_pSpiderMonkeyMutex);
+        printf("Cleaning up Spidermonkey.\n");
+        SpidermonkeyDestroy();
+        pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
         destroyPrefs();
         filterCleanUp();
-  printf("End of cleanup\n");
+        printf("End of cleanup\n");
         ADMImage_stat();
         ADM_memStat();
         printf("\n Goodbye...\n\n");
