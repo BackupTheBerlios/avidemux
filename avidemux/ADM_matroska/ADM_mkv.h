@@ -28,16 +28,17 @@ class mkvHeader         :public vidHeader
 {
   protected:
                                 
-    FILE 				*_fd;
-
-                        
-                
+    FILE                    *_fd;
+    int32_t                 _audioIndex;
+    int32_t                 _videoIndex;
+    uint8_t                 readVideoInfo( void);
+    void                    *_context;
   public:
 
 
-    virtual   void 				Dump(void);
-    virtual   uint32_t 			getNbStream(void) ;
-    virtual   uint8_t 			needDecompress(void);
+    virtual   void          Dump(void);
+    virtual   uint32_t      getNbStream(void) ;
+    virtual   uint8_t       needDecompress(void);
 
             mkvHeader( void );
    virtual  ~mkvHeader(  ) ;
