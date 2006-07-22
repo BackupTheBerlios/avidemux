@@ -363,7 +363,7 @@ ffmpegEncoder::encoderMT (void)
   uint32_t nbThread = 0;
 
   nbThread = ADM_useNbThreads ();
-  if (nbThread & 0)
+  if (nbThread )
     {
       printf ("[codec]Enabling MT encoder with %u threads\n", nbThread);
       if (0 > avcodec_thread_init (_context, nbThread))
