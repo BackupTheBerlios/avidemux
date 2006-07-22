@@ -40,6 +40,7 @@
 
 
 static uint32_t ADM_consumed=0;
+static admMutex memAccess("MemAccess");
 
 extern "C" {
 
@@ -59,7 +60,7 @@ void *ADM_alloc(size_t size)
 char *c;
 uint64_t l,lorg;
 uint32_t *backdoor;
-
+memAccess.lock();
 	l=(uint64_t)malloc(size+32);
 	// Get next boundary
 	lorg=l;
@@ -69,7 +70,7 @@ uint32_t *backdoor;
 	backdoor=(uint32_t *)(c-8);
 	*backdoor=(0xdead<<16)+l-lorg;
 	backdoor[1]=size;
-        
+memAccess.unlock();
 	ADM_consumed+=size;
         
 	return c;
@@ -96,10 +97,10 @@ void ADM_dezalloc(void *ptr)
 	offset=backdoor[0]&0xffff;
 	size=backdoor[1];
         *backdoor=0xbeefbeef; // Scratch sig
-	free(c-offset);
-
-	ADM_consumed-=size;
-
+memAccess.lock();        
+      free(c-offset);
+      ADM_consumed-=size;
+memAccess.unlock();
 }
 
 void *operator new( size_t t)
