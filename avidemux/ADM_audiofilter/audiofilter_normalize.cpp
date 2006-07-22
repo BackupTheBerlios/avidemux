@@ -48,7 +48,11 @@ AUDMAudioFilterNormalize::AUDMAudioFilterNormalize(AUDMAudioFilter * instream,GA
                 _scanned=1;
                 db_out =  param->gain10/100.0; // Dbout is in DB (!)
 #ifndef CYG_MANGLING
+#ifdef ADM_BSD_FAMILY
+		_ratio = powf(10.0,db_out);
+#else
                 _ratio = pow10f(db_out);
+#endif
 #else
 		_ratio= pow(10,db_out);
 #endif
