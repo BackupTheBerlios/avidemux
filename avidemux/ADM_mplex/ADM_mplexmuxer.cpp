@@ -92,7 +92,7 @@ static  vector<IBitStream *> inputs;
 
 static int slaveThread( WAVHeader *audioheader );
 
-admMutex mutex_slaveThread_problem;
+admMutex mutex_slaveThread_problem("mutex_slaveThread_problem");
 admCond  *cond_slaveThread_problem;
 char * kind_of_slaveThread_problem;
 unsigned int kind_of_slaveThread_problem_rc;

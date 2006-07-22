@@ -42,7 +42,7 @@
 #include "ADM_lavformat/ADM_lavformat.h"
 #include "ADM_mthread.h"
 
-admMutex accessMutex;
+admMutex accessMutex("accessMutex_MT_muxer");
 
 //*******************************************************
 int defaultAudioSlave( muxerMT *context )
