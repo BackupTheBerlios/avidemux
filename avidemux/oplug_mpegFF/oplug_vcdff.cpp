@@ -84,7 +84,7 @@ static char *twoPass=NULL;
 static char *twoFake=NULL;
 
 
-admMutex tmpLock;
+
 
 void oplug_mpegff_conf( void )
 {
