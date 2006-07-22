@@ -167,9 +167,9 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
   }
    #endif
 
-#ifndef CYG_MANGLING    
+
     g_thread_init(NULL);
-#else
+#ifdef CYG_MANGLING    
     win32_netInit();    
 #endif
     gdk_threads_init();
@@ -216,13 +216,6 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
     COL_init();
     
    
-    if (argc >= 2)
-    {
-			  global_argc=argc;
-			  global_argv=argv;
-			  gtk_timeout_add( 300, (GtkFunction )automation, NULL );
-				//automation();				
-		}
 #ifdef USE_SDL
   if(sdl_version<=1209)
   {
@@ -230,10 +223,22 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
    	SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
   }
 #endif
-      oplug_mpegInit();
-	if(SpidermonkeyInit() == true)
-		printf("Spidermonkey initialized.\n");
+        oplug_mpegInit();
+        if(SpidermonkeyInit() == true)
+            printf("Spidermonkey initialized.\n");
+        if (argc >= 2)
+        {
 
+          global_argc=argc;
+          global_argv=argv;
+#if 1                    
+          gtk_timeout_add( 500, (GtkFunction )automation, NULL );
+#else
+            automation();
+#endif
+        }
+
+        
     gtk_main();
     gdk_threads_leave();
     printf("Normal exit\n");
