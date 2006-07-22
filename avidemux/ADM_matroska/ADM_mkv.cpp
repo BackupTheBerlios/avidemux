@@ -70,11 +70,14 @@ void mkvHeader::Dump(void)
   printf("[MKV] %u frames\n",_videostream.dwLength);
   for(int i=0;i<_nbAudioTrack;i++)
   {
-    printf("[MKV] Track:%u index:%u fq:%u channels:%u codec:%u extradatalen:%lu\n",i,_audioTracks[i].streamIndex ,
+    printf("[MKV] Track:%u index:%u fq:%u channels:%u codec:%u extradatalen:%u length:%u nbchunk %u\n"
+            ,i,_audioTracks[i].streamIndex ,
             _audioTracks[i].wavHeader.frequency,
             _audioTracks[i].wavHeader.channels,
             _audioTracks[i].wavHeader.encoding,
-            _audioTracks[i].extraDataLen);
+            _audioTracks[i].extraDataLen,
+            _audioTracks[i].length,
+            _audioTracks[i].nbPackets);
     
   }
   printf("*********** MKV INFO***********\n");
@@ -113,6 +116,11 @@ uint8_t mkvHeader::close(void)
     delete [] _videoExtraData;
     _videoExtraData=NULL; 
   }
+  if(myName)
+  {
+    delete [] myName;
+    myName=NULL; 
+  }
 }
 /*
     __________________________________________________________
@@ -133,6 +141,7 @@ uint8_t mkvHeader::needDecompress(void)
   _context=NULL;
   _nbAudioTrack=0;
   _audioTracks=NULL;
+  myName=NULL;
 }
 /*
     __________________________________________________________
@@ -210,6 +219,9 @@ uint8_t mkvHeader::open(char *name)
     printf("[MKV] Failed reading video info\n");
     return 0; 
   }
+  myName=ADM_strdup(name);
+  prebuildIndex();
+
   for(int i=0;i<_nbAudioTrack;i++)
   {
     readAudioInfo(i); 
@@ -221,10 +233,60 @@ uint8_t mkvHeader::open(char *name)
     _curAudio=new mkvAudio(name,&_audioTracks[0]);
   }
   printf("[MKV] Successfully open\n");
+  
   Dump();
   return 1;
 }
+/*
+    __________________________________________________________
+*/
 
+ uint8_t  mkvHeader::prebuildIndex(void)
+{
+  AVPacket pkt1, *pkt = &pkt1;
+  int ret;
+  int nbVideo=0;
+  while(1)
+  {
+    ret = av_read_frame(CONTEXT, pkt);
+    if (ret < 0) 
+    {
+      break;
+    }
+    if(pkt->stream_index==_videoIndex) 
+    {
+      nbVideo++;
+    }
+    for(int i=0;i<_nbAudioTrack;i++)
+    {
+      if( pkt->stream_index==_audioTracks[i].streamIndex)
+      {
+        _audioTracks[i].nbPackets++;
+        _audioTracks[i].length+=pkt->size;
+      }
+    }
+  }
+  printf("\n[MKV]Preindexing done\n");
+  _videostream.dwLength=_mainaviheader.dwTotalFrames=nbVideo;
+  
+  rewind();
+        
+        
+  return 1;
+}
+uint8_t mkvHeader::rewind( void )
+{
+  int err;
+  AVInputFormat *format;
+  
+  
+  format= av_find_input_format("matroska");
+  av_close_input_file(CONTEXT);
+  _context=NULL;
+  err = av_open_input_file((AVFormatContext **)&_context, myName, format, 0, NULL);
+  ADM_assert(err>=0);
+  return 1;
+}
 /*
     __________________________________________________________
 */
@@ -266,7 +328,13 @@ uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
     }
     memcpy(ptr,pkt->data,pkt->size);
     *framelen=pkt->size;
-    *flags=AVI_KEY_FRAME;
+    if(flags)
+    {
+      if(pkt->flags  &  PKT_FLAG_KEY)
+        *flags=AVI_KEY_FRAME;
+      else
+        *flags=0;
+    }
     break;
   }
   return 1; 
@@ -334,17 +402,7 @@ uint8_t mkvHeader::readVideoInfo( void)
    
   }
   //
-  nbFrame=CONTEXT->streams[_videoIndex]->codec_info_nb_frames;
-  if(!nbFrame)
-  {
-    printf("[MKV]No info about nb frame, guessing from duration\n"); 
-    printf("[MKV] Duration :%lu\n",CONTEXT->streams[_videoIndex]->duration);
-    _videostream.dwLength=_mainaviheader.dwTotalFrames=500;
-  }else
-  {
-    _videostream.dwLength=_mainaviheader.dwTotalFrames=nbFrame; // FIXME 
-  }
-  
+  _videostream.dwLength=_mainaviheader.dwTotalFrames=5;
   printf("[MKV] Video info ok\n");
   Dump();
   return 1;

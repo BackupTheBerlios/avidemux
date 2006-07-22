@@ -61,6 +61,7 @@ mkvAudio::mkvAudio(char *name,mkvAudioTrak *track)
    _wavheader=&(track->wavHeader);
   _extraDataLen=track->extraDataLen;
   _extraData=track->extraData;
+  _length=track->length;
   
   // Open it
   AVInputFormat *format;

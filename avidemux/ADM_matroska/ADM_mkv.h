@@ -28,6 +28,8 @@ typedef struct mkvAudioTrak
   WAVHeader wavHeader;
   uint32_t  extraDataLen;
   uint8_t   *extraData;
+  uint32_t  nbPackets;
+  uint32_t  length;
   
 };
 
@@ -39,6 +41,7 @@ class mkvAudio : public AVDMGenericAudioStream
     WAVHeader               _wavHeader;
     uint32_t                _extraDataLen;
     uint8_t                 *_extraData;
+    char                    *myName;
   public:
                                 mkvAudio(char *name,mkvAudioTrak *track);
     virtual                     ~mkvAudio();
@@ -60,10 +63,13 @@ class mkvHeader         :public vidHeader
     int32_t                 _videoIndex;
     uint8_t                 readVideoInfo( void);
     uint8_t                 readAudioInfo( uint32_t track);
+    uint8_t                 prebuildIndex(void);
+    uint8_t                 rewind(void);
     void                    *_context;
     uint32_t                _nbAudioTrack;
     mkvAudioTrak            *_audioTracks;
     mkvAudio                *_curAudio;
+    char                    *myName;
   public:
 
 
