@@ -246,6 +246,7 @@ uint8_t mkvHeader::open(char *name)
   AVPacket pkt1, *pkt = &pkt1;
   int ret;
   int nbVideo=0;
+  printf("\n[MKV]Preindexing started, that can take a while...\n");
   while(1)
   {
     ret = av_read_frame(CONTEXT, pkt);
@@ -313,6 +314,7 @@ uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 {
   AVPacket pkt1, *pkt = &pkt1;
   int ret;
+  if(!framenum) rewind();
   while(1)
   {
     ret = av_read_frame(CONTEXT, pkt);
@@ -369,17 +371,18 @@ uint8_t mkvHeader::readVideoInfo( void)
   _video_bih.biHeight=enc->height;
   
  
-
+  uint32_t fcc=0;
   // Set codec
   switch(enc->codec_id)
   {
-    case CODEC_ID_H264: _videostream.fccHandler=fourCC::get((uint8_t *)"H264");break; 
-    case CODEC_ID_MPEG4: _videostream.fccHandler=fourCC::get((uint8_t *)"DIVX");break;
-    case CODEC_ID_MSMPEG4V3: _videostream.fccHandler=fourCC::get((uint8_t *)"DIV3");break;
+    case CODEC_ID_H264:      fcc=fourCC::get((uint8_t *)"H264");break; 
+    case CODEC_ID_MPEG4:     fcc=fourCC::get((uint8_t *)"DIVX");break;
+    case CODEC_ID_MSMPEG4V3: fcc=fourCC::get((uint8_t *)"DIV3");break;
     default:
       printf("[MKV] Unknown video fourcc %d\n",enc->codec_id);
       return 0;
   }
+  _video_bih.biCompression=_videostream.fccHandler=fcc;
   // Extradata ?
   if(enc->extradata && enc->extradata_size )
   {
