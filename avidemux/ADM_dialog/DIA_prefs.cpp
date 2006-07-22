@@ -549,15 +549,15 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), comboboxAudioOutput, 1, 3, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
-	#ifndef ALSA_SUPPORT
-	gtk_widget_set_sensitive(entryALSADevice, 0);
-	#endif
 
   entryALSADevice = gtk_entry_new ();
   gtk_widget_show (entryALSADevice);
   gtk_table_attach (GTK_TABLE (table1), entryALSADevice, 1, 3, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+#ifndef ALSA_SUPPORT
+gtk_widget_set_sensitive(entryALSADevice, 0);
+#endif
 
   radiobuttonMaster = gtk_radio_button_new_with_mnemonic (NULL, _("_Master"));
   gtk_widget_show (radiobuttonMaster);
