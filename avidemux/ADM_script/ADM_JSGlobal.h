@@ -35,14 +35,21 @@ JSVAR( JSRuntime, *g_pRt,NULL);
 JSVAR( JSClass, g_globalClass,)
 #ifdef JSDECLARE
 { 
-	"Global", 0, 
-	JS_PropertyStub,  JS_PropertyStub, 
-	JS_PropertyStub, JS_PropertyStub, 
-	JS_EnumerateStub, JS_ResolveStub, 
-	JS_ConvertStub,  JS_FinalizeStub }
+        "Global", 0, 
+        JS_PropertyStub,  JS_PropertyStub, 
+        JS_PropertyStub, JS_PropertyStub, 
+        JS_EnumerateStub, JS_ResolveStub, 
+        JS_ConvertStub,  JS_FinalizeStub }
 #endif
-	;
+        ;
+#if 0
+#define enterLock() {}
+#define leaveLock() {}
+#else
+#define enterLock() jsrefcount nRefCount = JS_SuspendRequest(cx)
+#define leaveLock() {JS_ResumeRequest(cx,nRefCount); }
 
+#endif
 #endif
 //EOF
 

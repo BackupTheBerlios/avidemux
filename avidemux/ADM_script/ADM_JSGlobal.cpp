@@ -90,30 +90,30 @@ void SpidermonkeyDestroy()
 
 void *StartThreadSpidermonkey(void *pData)
 {// begin StartThreadSpidermonkey
-	pthread_mutex_lock(&g_pSpiderMonkeyMutex);
-	/*
-	The following mailling list post describes how to CORRECTLY use
-	the threading API support with Spidermonkey
-	"Thread from SpiderMonkey newsgroup"
-	http://archive.gingerall.cz/archives/public/sablot2004/msg00117.html
-	*/
-	// Notify the Spidermonkey that we'll be processing in a thread
-	JS_SetContextThread(g_pCx);
-	JS_BeginRequest(g_pCx);
-	bool ret = false;
-	const char *pScriptFile = static_cast<const char *>(pData);
-	ret = parseECMAScript(pScriptFile);
-	if(ret == false)
-	{
-		if( actual_workbench_file )
-			ADM_dealloc(actual_workbench_file);
-		actual_workbench_file = ADM_strdup(pScriptFile);
-	}
-	// Notify Spidermonkey that our thread processing has finished
-	JS_EndRequest(g_pCx);
-	JS_ClearContextThread(g_pCx);
-	pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
-	return NULL;
+        pthread_mutex_lock(&g_pSpiderMonkeyMutex);
+        /*
+        The following mailling list post describes how to CORRECTLY use
+        the threading API support with Spidermonkey
+        "Thread from SpiderMonkey newsgroup"
+        http://archive.gingerall.cz/archives/public/sablot2004/msg00117.html
+        */
+        // Notify the Spidermonkey that we'll be processing in a thread
+        JS_SetContextThread(g_pCx);
+        JS_BeginRequest(g_pCx);
+        bool ret = false;
+        const char *pScriptFile = static_cast<const char *>(pData);
+        ret = parseECMAScript(pScriptFile);
+        if(ret == false)
+        {
+                if( actual_workbench_file )
+                        ADM_dealloc(actual_workbench_file);
+                actual_workbench_file = ADM_strdup(pScriptFile);
+        }
+        // Notify Spidermonkey that our thread processing has finished
+        JS_EndRequest(g_pCx);
+        JS_ClearContextThread(g_pCx);
+        pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
+        return NULL;
 }// end StartThreadSpidermonkey
 
 void JS_setSuccess(bool bSuccess)
