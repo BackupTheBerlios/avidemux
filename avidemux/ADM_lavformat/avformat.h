@@ -13,7 +13,7 @@ extern "C" {
 
 #include <time.h>
 #include <stdio.h>  /* FILE */
-#include "avcodec.h"
+#include "../ADM_lavcodec/avcodec.h"
 
 #include "avio.h"
 
