@@ -53,7 +53,7 @@ static const CHANNEL_CONF AC3_CONF[15]=
     CHANNEL_3F_1R, //5
     CHANNEL_2F_2R,
     CHANNEL_3F_2R,
-    CHANNEL_INVALID,
+    CHANNEL_3F_2R_LFE,
     CHANNEL_INVALID, //9
     CHANNEL_DOLBY_SURROUND,
     CHANNEL_INVALID,
@@ -141,8 +141,16 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
             // not enough data
             break;
         }
-        chan=channel[flags & A52_CHANNEL_MASK];
+        if(  ((flags&A52_CHANNEL_MASK)==A52_3F2R)  && (flags &  A52_LFE)) // 5.1...
+        {
+          chan=6; 
+        }else
+        {
+          flags&=A52_CHANNEL_MASK; // Skip LFE
+          chan=channel[flags];
+        }
         ADM_assert(chan);
+        
         sample_t level = 1, bias = 0;
 
         if (a52_frame(AC3_HANDLE, inptr, &flags, &level, bias))
@@ -160,26 +168,49 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
         {
             matrix->nbChannel=channel[flags & A52_CHANNEL_MASK];
             matrix->channelConfiguration=AC3_CONF[flags & A52_CHANNEL_MASK];
+            
+            // Only configuration filtered 3.2->5.1
+            if(flags & A52_LFE)
+            {
+                matrix->nbChannel++;
+                matrix->channelConfiguration=CHANNEL_3F_2R_LFE;
+            }
+            
         }
 
-	float *cur;
-	for (int i = 0; i < 6; i++) {
-		if (a52_block(AC3_HANDLE)) {
-			printf("\n A52_block failed! on fblock :%lu", i);
-			// in that case we silent out the chunk
-			memset(outptr, 0, 256 * chan * sizeof(float));
-		} else {
-			for (int k = 0; k < chan; k++) {
-				sample_t *sample=(sample_t *)ac3_sample;
-				sample += 256 * k;
-				cur = outptr + k;
-				for (int j = 0; j < 256; j++) {
-					*cur = *sample++;
-					cur+=chan;
-				}
-			}
-		}
-		outptr += chan * 256;
+        float *cur;
+        for (int i = 0; i < 6; i++) {
+                if (a52_block(AC3_HANDLE)) {
+                        printf("\n A52_block failed! on fblock :%lu", i);
+                        // in that case we silent out the chunk
+                        memset(outptr, 0, 256 * chan * sizeof(float));
+                } else {
+                        int start;
+                        if(flags & A52_LFE)
+                        {
+                          // The first one becomes the last one, LFE is output first in ac3dec
+                          sample_t *sample=(sample_t *)ac3_sample;
+                          cur = outptr + chan-1;
+                          for (int j = 0; j < 256; j++) {
+                            *cur = *sample++;
+                            cur+=chan;
+                          }
+                          start=1; 
+                        } else 
+                        {
+                          start=0; 
+                        }
+                        for (int k = start; k < chan; k++) {
+                                sample_t *sample=(sample_t *)ac3_sample;
+                                sample += 256 * k;
+                                cur = outptr + k-start;
+                                for (int j = 0; j < 256; j++) {
+                                        *cur = *sample++;
+                                        cur+=chan;
+                                }
+                        }
+                }
+                outptr += chan * 256;
         }
     }
     return 1; 
