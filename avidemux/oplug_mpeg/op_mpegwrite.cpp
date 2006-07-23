@@ -794,6 +794,7 @@ print_quant_stat (const char *n)
     }
   ADM_dealloc (str);
 }
+//****************************************************************
 uint8_t
 mpegWritter::dopass2 (const char *name, char *statname, uint32_t final_size, uint32_t bitrate, ADM_MPEGTYPE mpegtype, int matrix, uint8_t interlaced, uint8_t bff,	// WLA
 		      uint8_t widescreen)
@@ -884,6 +885,7 @@ mpegWritter::dopass2 (const char *name, char *statname, uint32_t final_size, uin
       sample_time *= _audio->getInfo ()->frequency;
       sample_target = (uint32_t) floor (sample_time);
     }
+  bitstream.data = _buffer_out;
   for (uint32_t i = 0; i < _total; i++)
     {
       if (!incoming->getFrameNumberNoAlloc (i, &size, aImage, &flags))
