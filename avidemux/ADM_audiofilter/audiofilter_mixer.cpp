@@ -128,7 +128,7 @@ const float DB1_coef[2]={
     
 };
 #undef MIX
-#define MIX(a,b) (((int32_t)in[a])*DB1_coef[b]) 
+#define MIX(a,b) (in[a]*DB1_coef[b])
 /* -----------------------------------------
     Dolby Prologic 1 downmixing 3-2
  ----------------------------------------- 
@@ -143,7 +143,7 @@ static int M3_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
         out[1]=MIX(2,0)+center ;
         CLIP(out[0]);
         CLIP(out[1]);
-        in+=5;
+        in+=chan;
         out+=2;
     }
     return nbSample*2;
@@ -166,14 +166,14 @@ static int M31_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
         in+=5;
         out+=2;
     }
-    return nbSample*2*2;
+    return nbSample*2;
 }
 static int M32_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
 {       
     float surround;
     for(int i=0;i<nbSample;i++)
     {
-        surround= in[3]+in[4]*DB1_coef[1];
+      surround= (in[3]+in[4])*DB1_coef[1];
         out[0]=MIX(0,0)+MIX(1,1)-surround;
         out[1]=MIX(2,0)+MIX(1,1)+surround;
         CLIP(out[0]);
@@ -181,7 +181,7 @@ static int M32_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
         in+=chan;
         out+=2;
     }
-    return nbSample*2*2;
+    return nbSample*2;
 }
 /* -----------------------------------------
     Dolby Prologic 1 downmixing 2-2
@@ -200,7 +200,7 @@ static int M22_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
         in+=4;
         out+=2;
     }
-    return nbSample*2*2;
+    return nbSample*2;
 }
 ///******************************************************************
 ///                Misc
