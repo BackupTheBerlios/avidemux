@@ -33,6 +33,10 @@
 #include "audioeng_process.h"
 #include "audiofilter_normalize_param.h"
 #include "audiofilter_normalize.h"
+
+#include "ADM_audio/aviaudio.hxx"
+extern AVDMGenericAudioStream *currentaudiostream;
+
 // Ctor
 //__________
 
@@ -83,10 +87,11 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
     float max[_wavHeader.channels];
     _previous->rewind();
 
-
     printf("\n Seeking for maximum value, that can take a while\n");
 
-      DIA_working *windowWorking=new DIA_working("Normalize : Scanning");;
+      llength=currentaudiostream->getLength()  / _wavHeader.byterate * _wavHeader.frequency * _wavHeader.channels;
+    
+      DIA_working *windowWorking=new DIA_working(_("Normalize : Scanning"));
 
       for(int i=0;i<_wavHeader.channels;i++) max[i]=0;
       while (1)
@@ -115,6 +120,15 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
             current=fabs(_incomingBuffer[index++]);
             if(current>max[chan]) max[chan]=current;
           }
+	  if(!windowWorking->isAlive() )
+    	  {
+    	    // cannot be aborted
+            delete windowWorking;
+            windowWorking=new DIA_working(_("Normalize : Scanning"));
+          }
+	  scanned+=ready;
+	  if(scanned<llength)
+            windowWorking->update(scanned,llength);
       }
     delete windowWorking;
 

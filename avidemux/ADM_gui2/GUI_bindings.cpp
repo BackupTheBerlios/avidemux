@@ -537,7 +537,7 @@ char	c='?';
 		default:c='?';break;
 	
 	}
-	sprintf(string,"Frame:%c(%02d)",c,qp);
+	sprintf(string,_("Frame:%c(%02d)"),c,qp);
 	gtk_label_set_text( wid,string);	
 
 }
