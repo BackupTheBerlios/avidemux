@@ -39,7 +39,7 @@ typedef unsigned char ADM_filename ;
 #endif
 
 #ifndef GOT_TYPES
-#ifdef ARCH_X86_64
+#ifdef ARCH_64_BITS
 #define int32_t 	signed int
 #define int64_t 	signed long int 
 #define uint64_t 	unsigned long  int

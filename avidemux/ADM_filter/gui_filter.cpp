@@ -211,7 +211,7 @@ GUI_handleFilter (void)
 void wrapToolButton(GtkWidget * wid, gpointer user_data)
 {
         gui_act action;
-#ifdef ARCH_X86_64
+#ifdef ARCH_64_BITS
 #define TPE long long int
 	long long int dummy;
 #else	
