@@ -84,6 +84,7 @@ AUDMAudioFilter_Bridge::~AUDMAudioFilter_Bridge()
 uint8_t AUDMAudioFilter_Bridge::rewind(void)
 {
   printf("[Bridge] Going to time %d\n",_startTime);
+  _incoming->flushPacket();
   return _incoming->goToTime(_startTime);
 }
 uint32_t   AUDMAudioFilter_Bridge::fill(uint32_t max,float *output,AUD_Status *status)

@@ -74,13 +74,13 @@ AUDMAudioFilterMixer::~AUDMAudioFilterMixer()
     Dolby Prologic 2 downmixing 3-2
  ----------------------------------------- 
 */
-#define SCALER2 0.325
+#define SCALER2 0.6
 const float DB2_coef[5]={
     SCALER2*1.0,      // LEFT
-    SCALER2*0.707,  // CENTER
+    SCALER2*0.7071,  // CENTER
     SCALER2*1.0,  // RIGHT
-    SCALER2*0.8165,  // SL
-    SCALER2*0.5774  // SR
+    SCALER2*0.866,  // SL
+    SCALER2*0.5  // SR
 };
 #define MIX(a,b) ((in[a])*DB2_coef[b]) 
 /* -----------------------------------------
@@ -121,7 +121,7 @@ static int M22_2_DB2(float *in,float *out,uint32_t nbSample,uint32_t chan)
 ///******************************************************************
 ///                Dolby Prologic 1
 ///******************************************************************
-#define SCALER1 0.325  // Too low
+#define SCALER1 0.6  // Too low
 const float DB1_coef[2]={
     SCALER1*1,
     SCALER1*0.707,
