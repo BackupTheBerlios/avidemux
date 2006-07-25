@@ -294,6 +294,9 @@ uint8_t
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
   memcpy(&admParam,zparam,sizeof(admParam));
+#if X264_BUILD >=48
+  param.rc.i_rc_method=X264_RC_CQP;
+#endif
 
 //  param.rc.i_rc_buffer_size=-1;
   param.rc.i_qp_constant = val;
@@ -314,6 +317,10 @@ uint8_t
   memcpy(&admParam,zparam,sizeof(admParam));
 
 //  param.rc.i_rc_buffer_size=-1;
+#if X264_BUILD >=48
+  param.rc.i_rc_method=X264_RC_CRF;
+#endif
+
   param.rc.i_rf_constant = val;
   // should be ~ the same as CQ mode (?)
   return preamble (fps1000, &admParam);
@@ -331,8 +338,11 @@ uint8_t
   memset (&param, 0, sizeof (param));
   x264_param_default (&param);
   memcpy(&admParam,zparam,sizeof(admParam));
-  
+#if X264_BUILD >=48
+  param.rc.i_rc_method=X264_RC_ABR;
+#else
   param.rc.b_cbr = 1;
+#endif
   param.rc.i_bitrate = val / 1000;
 //  param.rc.i_rc_buffer_size=val/1000;
 //  param.rc.i_rc_init_buffer=(val/1000)>>1;
@@ -366,6 +376,9 @@ uint8_t
   admParam.Trellis = 0;
   
 //  param.rc.i_rc_buffer_size=-1;
+#if X264_BUILD >=48
+  param.rc.i_rc_method=X264_RC_CQP;
+#endif
   param.rc.i_qp_constant = 2;
 
   param.rc.b_stat_write = 1;
@@ -392,8 +405,12 @@ uint8_t
   x264_param_default (&param);
   
   memcpy(&admParam,zparam,sizeof(admParam));
-
+#if X264_BUILD >=48
+  param.rc.i_rc_method=X264_RC_ABR;
+#else
   param.rc.b_cbr = 1;
+#endif
+
   param.rc.i_bitrate = val;
   //param.rc.i_rc_buffer_size=val;
   //param.rc.i_rc_init_buffer=val>>1;
