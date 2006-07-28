@@ -19,14 +19,7 @@
 
 #define MAXSONCONF 100
 
-typedef struct  PARTIAL_CONFIG
-{
-	 uint32_t _start,_end;
-	 uint32_t _confsize;
-	 uint32_t _tag;
-
-}PARTIAL_CONFIG;
-
+#include "ADM_vidPartial_param.h"
  class  ADMVideoPartial:public AVDMGenericVideoStream
  {
 

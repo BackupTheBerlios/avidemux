@@ -146,16 +146,14 @@ uint8_t ADMVideoPartial::getFrameNumberNoAlloc(uint32_t frame,
 		return _in->getFrameNumberNoAlloc(frame,len,data,flags);	                           
 }	      
 //
+extern uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous);
 uint8_t ADMVideoPartial::configure( AVDMGenericVideoStream *instream)
 {
-        UNUSED_ARG(instream);
-		//uint8_t  GUI_getIntegerValue(int *valye, int min, int max, char *title)
-               GUI_getIntegerValue((int *)&_param->_start, 0, avifileinfo->nb_frames-1, "Start frame ?")    ;
-               GUI_getIntegerValue((int *)&_param->_end, 0, avifileinfo->nb_frames-1, "End frame ?") ; 
-		
-		if(_param->_end<_param->_start) _param->_end=_param->_start;
+  uint8_t r=0;
+    r=DIA_getPartial(_param,_son,_in);
+    if(_param->_end<_param->_start) _param->_end=_param->_start;
 
-	 return 1;
+   return 1;
 }  
 
  		                                                                         
