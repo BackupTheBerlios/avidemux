@@ -32,7 +32,6 @@
 ./avidemux/ADM_audiofilter/audiofilter_mixer.cpp
 ./avidemux/ADM_audiofilter/audioeng_process.cpp
 ./avidemux/ADM_audiofilter/audiofilter_bridge.cpp
-./avidemux/ADM_audiofilter/audiofilter_vorbis.cpp
 ./avidemux/ADM_audiofilter/audioencoder.cpp
 ./avidemux/ADM_audiofilter/audioencoder_faac.cpp
 ./avidemux/ADM_audiofilter/audiofilter_buildchain.cpp
@@ -261,7 +260,6 @@
 ./avidemux/ADM_codecs/ADM_x264.cpp
 ./avidemux/ADM_codecs/ADM_xvid.cpp
 ./avidemux/ADM_audio/audiosource_ext.cpp
-./avidemux/ADM_audio/aviaudio.cpp
 ./avidemux/ADM_audio/audio_mpegidentify.cpp
 ./avidemux/ADM_audio/audiowavex.cpp
 ./avidemux/ADM_audio/audiomp3ex.cpp

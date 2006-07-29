@@ -19,7 +19,7 @@ libADM_audiofilter_a_SOURCES = audiodeng_buildfilters.cpp  \
 
 
 
-EXTRA_DIST = audioeng_buff.cpp    audioprocess.hxx audio audiodeng_buildfilters.cpp audioeng_buildfilters.h resampl.h
+EXTRA_DIST = audioeng_buff.cpp    audioprocess.hxx audiodeng_buildfilters.cpp audioeng_buildfilters.h resampl.h
 
 ####### kdevelop will overwrite this part!!! (end)############
 

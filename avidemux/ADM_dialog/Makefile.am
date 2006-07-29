@@ -1,7 +1,7 @@
 
 noinst_LIBRARIES = libADM_dialog.a 
 
-INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS)  
+INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@
 
 libADM_dialog_a_METASOURCES = AUTO
 

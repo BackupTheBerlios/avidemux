@@ -38,14 +38,12 @@ AC_CANONICAL_HOST
 dnl Perform program name transformation
 AC_ARG_PROGRAM
 dnl Automake doc recommends to do this only here. (Janos)
+AM_INIT_AUTOMAKE(avidemux,"2.3.0")
+ADM_SUBVERSION="\"\""
 if [[ -f .svn/entries ]]; then
-   rev=`awk -F\" '$1 ~ /revision=$/ { print $2 }' .svn/entries | tail -1`
-   test -z "$rev" && rev="unknown"
-   AM_INIT_AUTOMAKE(avidemux,"2.3.0 svn rev $rev")
-else
-   AM_INIT_AUTOMAKE(avidemux,"2.3.0")
+   rev=`svnversion . | sed 's/^.*://g' | sed 's/M$//g'`
+   ADM_SUBVERSION="\"$rev\""
 fi
-
 dnl almost the same like KDE_SET_PEFIX but the path is /usr/local
 dnl
 unset CDPATH
@@ -81,6 +79,7 @@ AC_SUBST(all_includes)
 AC_SUBST(all_libraries)
 dnl avoid po mess
 AC_SUBST(AUTODIRS)
+AC_SUBST(ADM_SUBVERSION)
 
 
 dnl ___ added to ease install in uncommon place __
@@ -1136,15 +1135,14 @@ fi
 dnl _______________________________________________________
 dnl autogen prefs..
 dnl _______________________________________________________
-cd avidemux/
-if test ../admin/prefs_gen.pl -nt prefs.in; then
-	touch prefs.in
+echo "Generating prefs if needed...(srcdir: <$srcdir> pwd:<$PWD>)"
+if test $srcdir/admin/prefs_gen.pl -nt $srcdir/avidemux/prefs.in; then
+	touch $srcdir/avidemux/prefs.in
 fi
-if test prefs.in -nt prefs.h -o prefs.in -nt prefs.cpp; then
+if test $srcdir/avidemux/prefs.in -nt $srcdir/avidemux/prefs.h -o $srcdir/avidemux/prefs.in -nt $srcdir/avidemux/prefs.cpp; then
 	echo "Regeneration preferences definitions"
-	perl ../admin/prefs_gen.pl
+	perl $srcdir/admin/prefs_gen.pl $srcdir/avidemux
 fi
-cd ..
 dnl _______________________________________________________
 dnl detect gcc 2.9x.x
 dnl _______________________________________________________
@@ -1156,3 +1154,4 @@ fi
 dnl
 dnl ##AC_CONFIG_FILES(po/Makefile.in)
 dnl ##AC_CONFIG_FILES(po/Makefile)
+dnl --end of file --

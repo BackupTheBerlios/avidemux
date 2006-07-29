@@ -3,10 +3,17 @@
 use strict;
 use IO::Handle;
 
-my $in  = "prefs.in";
-my $h   = "prefs.h";
-my $cpp = "prefs.cpp";
+my $srcdir=$ARGV[0];
+if(! defined($srcdir))
+{
+	print "srcdir not defined, using avidemux\n";
+	$srcdir="avidemux";
+}
 
+my $in  = "$srcdir/prefs.in";
+my $h   = "$srcdir/prefs.h";
+my $cpp = "$srcdir/prefs.cpp";
+#print "In:$in\n";
 my $h_str = "typedef enum {\n";
 my $cpp_str = "typedef enum {\n".
               "\tUINT,\n".
