@@ -12,7 +12,7 @@ call_and_fix_autoconf()
 {
   $AUTOCONF || exit 1
   if test -r configure.in.in ; then
-    perl -pi -e "print \"if test \\\"x\\\$with_fast_perl\\\" = \\\"xyes\\\"; then\
+    perl -pi.bak -e "print \"if test \\\"x\\\$with_fast_perl\\\" = \\\"xyes\\\"; then\
     \\n  perl -i.bak \\\$ac_aux_dir/conf.change.pl \\\$CONFIG_STATUS\
     \\\\\\n    || mv \\\$CONFIG_STATUS.bak \\\$CONFIG_STATUS\
     \\n  rm -f \\\$CONFIG_STATUS.bak\\nfi\
