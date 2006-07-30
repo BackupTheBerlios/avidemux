@@ -33,7 +33,9 @@ class AVDMProcessAudio_RawShift : public AVDMBufferedAudioStream
     
     AVDMProcessAudio_RawShift(AVDMGenericAudioStream * instream, uint32_t starttime, int32_t msoff);
     virtual ~AVDMProcessAudio_RawShift();
-  
+    uint8_t isVBR(void);
+    uint8_t packetPerFrame(void);
+
     //
             uint32_t read(uint32_t len,float *buffer) {ADM_assert(0);return 0;}
             uint32_t grab(uint8_t *outbuffer) {ADM_assert(0);return 0;}

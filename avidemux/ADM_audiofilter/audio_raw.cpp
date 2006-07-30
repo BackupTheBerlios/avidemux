@@ -109,6 +109,15 @@ uint8_t	 AVDMProcessAudio_RawShift::getPacket(uint8_t *dest, uint32_t *len, uint
               return r;
 
 }
+uint8_t AVDMProcessAudio_RawShift::isVBR(void)
+{
+  return  _instream->isVBR();
+}
+uint8_t AVDMProcessAudio_RawShift::packetPerFrame(void)
+{
+  return  _instream->packetPerFrame();
+}
+
 uint32_t AVDMProcessAudio_RawShift::read(uint32_t len, uint8_t * buffer)
 {
     return readDecompress(len, buffer);
