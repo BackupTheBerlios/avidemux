@@ -138,7 +138,7 @@ uint8_t AVDM_Fade::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 
   src=vidCache->getImage(tgt);
   if(!src) return 0;
-  if(tgt>_param->endFade || tgt <_param->startFade)
+  if(tgt>_param->endFade || tgt <_param->startFade ||_param->endFade==_param->startFade )
   {
     data->duplicate(src);
     vidCache->unlockAll();
