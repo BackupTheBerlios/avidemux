@@ -100,7 +100,7 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_guiResize.cpp \
  ADM_vidAnimated.cpp \
  ADM_vidMcDeint.cpp \
- ADM_vidReverse.cpp
+ ADM_vidReverse.cpp ADM_vidFade.cpp
 
 				
 
