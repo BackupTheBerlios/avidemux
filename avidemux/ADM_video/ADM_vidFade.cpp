@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <ADM_assert.h>
 
 #include "config.h"
@@ -34,6 +35,8 @@ class AVDM_Fade : public AVDMGenericVideoStream
 {
   VideoCache      *vidCache;
   VIDFADE_PARAM   *_param;
+  uint8_t         lookup[256][256];
+  uint8_t         buildLut(void);
   public:
                                 
                     AVDM_Fade(AVDMGenericVideoStream *in,CONFcouple *couples);    
@@ -52,12 +55,11 @@ BUILD_CREATE(fade_create,AVDM_Fade);
 SCRIPT_CREATE(fade_script,AVDM_Fade,fadeParam);
 
 /*************************************/
-
+uint8_t DIA_fade(VIDFADE_PARAM *param);
 uint8_t AVDM_Fade::configure(AVDMGenericVideoStream *in)
 {
   _in=in;
-  return 1;
-        
+  return DIA_fade(_param);
 }
 
 char *AVDM_Fade::printConf( void )
@@ -97,7 +99,7 @@ AVDM_Fade::AVDM_Fade(AVDMGenericVideoStream *in,CONFcouple *couples)
     _param->endFade=_info.nb_frames;
     _param->inOut=0;
   }
-  
+  buildLut();
 }
 //________________________________________________________
 uint8_t AVDM_Fade::getCoupledConf( CONFcouple **couples)
@@ -125,15 +127,66 @@ uint8_t AVDM_Fade::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
   ADMImage *src;
 
   num_frames=_info.nb_frames;   // ??
-  if(frame>=num_frames) return 0;
+  tgt=frame+_info.orgFrame;
+  if(frame>=num_frames)
+  {
+    printf("[Fade] out of bound\n");
+    return 0;
+  }
   
-  tgt=num_frames;
+  
 
   src=vidCache->getImage(tgt);
   if(!src) return 0;
-  data->duplicate(src);
-
+  if(tgt>_param->endFade || tgt <_param->startFade)
+  {
+    data->duplicate(src);
+    vidCache->unlockAll();
+    return 1;
+  }
+  uint8_t *s,*d,*index;
+  uint32_t count=_info.width*_info.height,w;
+  float num,den;
+  
+  den=_param->endFade-_param->startFade;
+  num=tgt-_param->startFade;
+  
+  num=num/den;
+  num*=255.;
+  w=(uint32_t)floor(num+0.4);
+  
+  s=src->data;
+  d=data->data;
+  
+  index=lookup[w];
+  
+  for(int i=0;i<count;i++)
+  {
+    *d++=index[*s++];
+  }
+  
+  memcpy(UPLANE(data),UPLANE(src),count>>2);
+  memcpy(VPLANE(data),VPLANE(src),count>>2);
   vidCache->unlockAll();
+  return 1;
+}
+
+uint8_t AVDM_Fade::buildLut(void)
+{
+  float f,ration;
+  for(int i=0;i<256;i++)
+  {
+    if(!_param->inOut) ration=255-i;
+    else ration=i;
+    ration/=255.;
+    for(int r=0;r<256;r++)
+    {
+      f=r;
+      f=f*ration;
+      lookup[i][r]=(uint8_t)(f+0.4);
+    }
+    
+  }
   return 1;
 }
 //EOF
