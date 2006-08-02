@@ -211,7 +211,7 @@ static int M22_2_DB1(float *in,float *out,uint32_t nbSample,uint32_t chan)
 */
 static int MCOPY(float *in,float *out,uint32_t nbSample,uint32_t chan)
 {
-    memcpy(out,in,nbSample*chan);
+    memcpy(out,in,nbSample*chan*sizeof(float));
     return nbSample*chan;
     
 }
