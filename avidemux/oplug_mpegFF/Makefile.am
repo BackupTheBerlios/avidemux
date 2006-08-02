@@ -8,6 +8,6 @@ liboplug_mpegFF_a_METASOURCES = AUTO
 liboplug_mpegFF_a_SOURCES = oplug_vcdff.cpp 
 
 
-EXTRA_DIST = oplug_vcdff.h oplug_vcdff.cpp oplug_encodervcd.h 
+EXTRA_DIST = oplug_encodervcd.h  oplug_vcdff.cpp  oplug_vcdff.h
 
 ####### kdevelop will overwrite this part!!! (end)############

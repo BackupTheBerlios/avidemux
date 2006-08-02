@@ -43,5 +43,24 @@ INCLUDES = $(all_includes)
 # From mpeg2enc 's Makefile.am
 %.o: %.s ; 	$(AS) $(ASFLAGS) -o $@ $<
 #
-EXTRA_DIST = mpeg2parm.h attributes.h mjpeg_types.h global.h transfrm_ref.h mpeg2enc.h  picture.hh simd.h fastintfns.h motionsearch.h mmxsse_motion.h quantize_ref.h format_codes.h ratectl.hh vlc.h syntaxparams.h tables.h predict_ref.h mpegconsts.h synchrolib.h mjpeg_logging.h mblock_sub44_sads_x86.h mblock_sub44_sads_x86_h.cc macroblock.hh cpu_accel.h yuv4mpeg.h  yuv4mpeg_intern.h mmx.h
+EXTRA_DIST = ADM_mpe2enc.cpp       global.h        \
+mmxsse_motion.h   predict_ref.cc   stats.cc \
+ADM_mpeg2Param.h      idct.cc                     motion.cc         predict_ref.h    synchrolib.cc \
+ADM_mpeg2enc.h        idct_mmx.cc                 motionest.cc      predict_x86.cc   synchrolib.h \
+ad_layer.cc           idctdata.cc                 motionsearch.cc   putbits.cc       syntaxparams.h \
+attributes.h          ioio.c                      motionsearch.h    puthdr.cc        tables.h \
+build_sub22_mests.cc  macroblock.cc               mpeg2enc.cc       putmpg.cc        transfrm.cc \
+build_sub44_mests.cc  macroblock.hh               mpeg2enc.h        putpic.cc        transfrm_ref.cc \
+conform.cc            mblock_bsad_mmx.cc          mpeg2enc_if.cc    putseq.cc        transfrm_ref.h \
+cpu_accel.cc          mblock_bsumsq_mmx.cc        mpeg2param.cc     putvlc.cc        transfrm_x86.cc \
+cpu_accel.h           mblock_sad_mmx.cc           mpeg2parm.h       quant_mmx2.cc    vlc.h \
+fastintfns.h          mblock_sad_mmxe.cc          mpeg2setup.cc     quantize.cc      writepic.cc \
+fdct_mmx.cc           mblock_sub44_sads_x86.cc    mpegconsts.cc     quantize_ref.cc  xx.c \
+fdct_x86.cc           mblock_sub44_sads_x86.h     mpegconsts.h      quantize_ref.h   yuv4mpeg.cc \
+fdctdata.cc           mblock_sub44_sads_x86_h.cc  picture.hh        quantize_x86.cc  yuv4mpeg.h \
+fdctref.cc            mblock_sumsq_mmx.cc         predcomp_mmx.cc   ratectl.cc       yuv4mpeg_intern.h \
+feedframe.cc          mjpeg_logging.h             predcomp_mmxe.cc  ratectl.hh       yuv4mpeg_ratio.cc \
+find_best_one_pel.cc  mjpeg_types.h               predict.cc        readpic.cc \
+format_codes.h        mmx.h                       predict_mmx.cc    simd.h
+
 noinst_HEADERS = ADM_mpeg2Param.h

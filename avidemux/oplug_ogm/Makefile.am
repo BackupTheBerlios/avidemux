@@ -4,3 +4,7 @@ liboplug_ogm_a_METASOURCES = AUTO
 
 liboplug_ogm_a_SOURCES = op_ogpage.cpp op_ogsave.cpp op_ogsavecopy.cpp op_ogsaveprocess.cpp op_ogaudio.cpp
 noinst_HEADERS = op_ogpage.h op_ogsave.h
+EXTRA_DIST = op_ogaudio.cpp  op_ogpage.h    op_ogsave.h  \
+op_ogsaveprocess.cpp \
+op_ogpage.cpp   op_ogsave.cpp  op_ogsavecopy.cpp
+

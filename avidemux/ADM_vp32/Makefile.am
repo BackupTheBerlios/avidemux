@@ -9,7 +9,11 @@ libADM_vp32_a_SOURCES = BlockMapping.c DCT_decode.c dct_globals.c DDecode.c DFra
 
 SUBDIRS = include 
 
-EXTRA_DIST = YUVtofromRGB.c VP32_license.txt vfwpbdll_if.c vfwPback.c unpack.c Reconstruct.c Quantize.c postproc.c pb_globals.c IDctPart.c Huffman.c Frarray.c FrameIni.c DSystemDependant.c DFrameR.c DDecode.c dct_globals.c DCT_decode.c BlockMapping.c ADM_vp3.h 
+EXTRA_DIST =  ADM_vp3.h       DFrameR.c           Huffman.c      YUVtofromRGB.c  unpack.c \
+BlockMapping.c  DSystemDependant.c  IDctPart.c     dct_globals.c   vfwPback.c \
+DCT_decode.c    FrameIni.c          Quantize.c     pb_globals.c    vfwpbdll_if.c \
+DDecode.c       Frarray.c           Reconstruct.c  postproc.c
+
 
 ####### kdevelop will overwrite this part!!! (end)############
  INCLUDES = $(all_includes) -I./include -DPOSTPROCESS

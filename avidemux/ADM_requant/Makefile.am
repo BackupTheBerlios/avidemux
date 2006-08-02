@@ -7,7 +7,7 @@ libADM_requant_a_METASOURCES = AUTO
 libADM_requant_a_SOURCES =  tcrequant.c
 
 
-EXTRA_DIST = 
+EXTRA_DIST = getvlc.h  putvlc.h  tcrequant.h
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES = $(all_includes) -g   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 

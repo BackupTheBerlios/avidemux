@@ -12,7 +12,16 @@ libADM_toolkit_a_SOURCES = automation.cpp choice.cpp toolkit.cpp filesel.cpp \
 	ADM_threads.cpp
 
 
-EXTRA_DIST = filesel.cpp filesel.h toolkit.cpp toolkit.hxx bitmap.h choice.cpp automation.cpp  win32.cpp ADM_quota.h
+EXTRA_DIST = ADM_cpuCap.cpp  ADM_memory.cpp   TLK_clock.h     \
+filesel.cpp         toolkit_gtk.h \
+ADM_cpuCap.h    ADM_quota.cpp    TLK_filesel.cpp  filesel.h       \
+toolkit_gtk_include.h \
+ADM_debug.cpp   ADM_quota.h      automation.cpp   systray.h    \
+win32.cpp \
+ADM_debug.h     ADM_threads.cpp  bitmap.h         toolkit.cpp \
+ADM_debugID.h   ADM_threads.h    choice.cpp       toolkit.hxx \
+ADM_memcpy.cpp  TLK_clock.cpp    eggtrayicon.h    toolkit_dialog.cpp
+
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES= $(all_includes) $(GTK_CFLAGS) $(SMONKEY_CFLAGS)

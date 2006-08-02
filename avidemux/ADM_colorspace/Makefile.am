@@ -7,7 +7,7 @@ libADM_colorspace_a_METASOURCES = AUTO
 libADM_colorspace_a_SOURCES = ADM_rgb.cpp yuv.cpp rgb2yuv.cpp
 
 
-EXTRA_DIST =  ADM_rgb.cpp ADM_rgb.h yuv.cpp rgb2yuv.cpp
+EXTRA_DIST =  ADM_rgb.cpp  ADM_rgb.h  colorspace.h  rgb2yuv.cpp  yuv.cpp
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES = $(all_includes)  $(ALTIVEC_SWITCH)

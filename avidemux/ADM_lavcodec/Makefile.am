@@ -62,7 +62,49 @@ libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c $(EXTEND_AMR) \
 		resample2.c imgresample.c pthread.c qdm2.c bitstream_filter.c eval.c
 	
 
-EXTRA_DIST = 
+EXTRA_DIST = ac3.h        faandct.h              internal.h     \
+oggvorbis.h    snow.h             vc1data.h \
+ac3tab.h     fastmemcpy.h           lzo.h              opt.h          sp5x.h             vorbis.h \
+avcodec.h    golomb.h               mpeg12data.h       os_support.h   svq1_cb.h          vp3data.h \
+bitstream.h  h261data.h             mpeg4data.h        qdm2data.h     svq1_vlc.h         wmadata.h \
+cabac.h      h263data.h             mpegaudio.h        ra144.h        swscale.h \
+cavsdata.h   h264data.h             mpegaudiodectab.h  ra288.h        truemotion1data.h \
+cookdata.h   imgconvert_template.h  mpegaudiotab.h     rangecoder.h   truespeech_data.h \
+dsputil.h    indeo2data.h           mpegvideo.h        rtjpeg.h       ulti_cb.h \
+dvdata.h     indeo3data.h           msmpeg4data.h      simple_idct.h  vc1acdata.h \
+4xm.c               dtsdec.c            indeo2.c               oggvorbis.c    svq3.c \
+8bps.c              dv.c                indeo3.c               opt.c          truemotion1.c \
+a52dec.c            dvbsub.c            interplayvideo.c       opts.c         truemotion2.c \
+aasc.c              dvbsubdec.c         jfdctfst.c             os2thread.c    truespeech.c \
+ac3dec.c            dvdsub.c            jfdctint.c             parser.c       tscc.c \
+ac3enc.c            dvdsubenc.c         jpeg_ls.c              pcm.c          tta.c \
+adpcm.c             error_resilience.c  jrevdct.c              png.c          ulti.c \
+adx.c               eval.c              kmvc.c                 pnm.c          utils.c \
+alac.c              faac.c              lcl.c                  pthread.c      vc1.c \
+allcodecs.c         faad.c              libgsm.c               qdm2.c         vcr1.c \
+amr.c               faandct.c           loco.c                 qdrw.c         vmdav.c \
+apiexample.c        fdctref.c           lzo.c                  qpeg.c         vorbis.c \
+asv1.c              fft-test.c          mace.c                 qtrle.c        vp3.c \
+avcodec.c           fft.c               mdct.c                 ra144.c        vp3dsp.c \
+avs.c               ffv1.c              mdec.c                 ra288.c        vqavideo.c \
+beosthread.c        flac.c              mem.c                  rangecoder.c   w32thread.c \
+bitstream.c         flacenc.c           mjpeg.c                ratecontrol.c  wmadec.c \
+bitstream_filter.c  flashsv.c           mmvideo.c              raw.c          wmv2.c \
+bmp.c               flicvideo.c         motion_est.c           resample.c     wnv1.c \
+cabac.c             fraps.c             motion_est_template.c  resample2.c    ws-snd1.c \
+cavs.c              g726.c              motion_test.c          roqvideo.c     x264.c \
+cavsdsp.c           golomb.c            mp3lameaudio.c         rpza.c         xan.c \
+cinepak.c           h261.c              mpeg12.c               rtjpeg.c       xl.c \
+cljr.c              h263.c              mpegaudio.c            rv10.c         xvid_rc.c \
+common.c            h263dec.c           mpegaudiodec.c         shorten.c      xvidff.c \
+cook.c              h264.c              mpegvideo.c            simple_idct.c  xvmcvideo.c \
+cscd.c              h264idct.c          msmpeg4.c              smacker.c      zmbv.c \
+cyuv.c              huffyuv.c           msrle.c                smc.c \
+dct-test.c          idcinvideo.c        msvideo1.c             snow.c \
+dpcm.c              imgconvert.c        nuv.c                  sonic.c \
+dsputil.c           imgresample.c       oggtheora.c            svq1.c \
+amr_float i386 libpostproc ppc 
+
 	
 	
 
