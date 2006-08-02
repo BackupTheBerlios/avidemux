@@ -11,7 +11,13 @@ libADM_library_a_SOURCES = subchunk.cpp  fourcc.cpp broken.cpp \
 	ADM_imageResizer.cpp
 
 
-EXTRA_DIST = avidemutils.cpp aviframe.cpp aviindexer.cpp aviio.cpp avifmt2.h avifmt.h avio.hxx broken.cpp default.h fourcc.cpp fourcc.h indexer.hxx  subchunk.cpp subchunk.h 
+EXTRA_DIST =  ADM_bitstream.cpp  ADM_image.cpp     \
+ADM_print.cpp     avifmt2.h       avio.hxx    fourcc.h \
+ADM_bitstream.h    ADM_image.h           ADM_print_priv.h  aviframe.cpp    broken.cpp  indexer.hxx \
+ADM_fileio.cpp     ADM_imageResizer.cpp  avidemutils.cpp \
+aviindexer.cpp  default.h   subchunk.cpp \
+ADM_fileio.h       ADM_imageUtils.cpp    avifmt.h          aviio.cpp       fourcc.cpp  subchunk.h
+
 
 ####### kdevelop will overwrite this part!!! (end)############
 noinst_HEADERS = ADM_image.h ADM_fileio.h

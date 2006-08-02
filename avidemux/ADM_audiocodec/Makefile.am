@@ -10,7 +10,12 @@ libADM_audiocodec_a_SOURCES = ADM_codecwma.cpp  \
 ADM_codecimaadpcm.cpp ADM_dca.cpp
 
 
-EXTRA_DIST = ADM_audiocodec.cpp ADM_audiocodec.h ADM_codecac3.cpp ADM_codecmp3.cpp ADM_codecwav.cpp adm_ogg.h audiocodec_ogg.cpp ADM_codecwma.cpp 
+EXTRA_DIST = \
+ADM_8bits.cpp         ADM_codecac3.cpp       ADM_codeculaw.cpp  ADM_ffwma.cpp  audiocodec_ogg.cpp \
+ADM_audiocodec.cpp    ADM_codecfaad.cpp      ADM_codecwav.cpp   ADM_lpcm.cpp \
+ADM_audiocodec.h      ADM_codecimaadpcm.cpp  ADM_codecwma.cpp   ADM_vorbis.h \
+ADM_audiocodeclist.h  ADM_codecmp3.cpp       ADM_dca.cpp        adm_ogg.h
+
 
 ####### kdevelop will overwrite this part!!! (end)############
 noinst_HEADERS = ADM_vorbis.h 

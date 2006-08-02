@@ -10,7 +10,11 @@ libADM_audiodevice_a_SOURCES = ADM_deviceArts.cpp ADM_audiodevice.cpp \
 	ADM_deviceSDL.cpp ADM_deviceWin32.cpp ADM_deviceEsd.cpp
 
 
-EXTRA_DIST = audio_out.h ADM_deviceoss.h ADM_deviceoss.cpp ADM_audiodevice.cpp ADM_deviceArts.cpp ADM_deviceArts.h 
+EXTRA_DIST = ADM_audiodevice.cpp  ADM_deviceArts.cpp       \
+ADM_deviceEsd.cpp  ADM_deviceWin32.cpp  audio_out.h \
+ADM_audiodevice.h    ADM_deviceArts.h         ADM_deviceEsd.h    ADM_deviceWin32.h    oss_out.cpp \
+ADM_deviceALSA.cpp   ADM_deviceAudioCore.cpp  ADM_deviceSDL.cpp  ADM_deviceoss.cpp \
+ADM_deviceALSA.h     ADM_deviceAudioCore.h    ADM_deviceSDL.h    ADM_deviceoss.h
 
 ####### kdevelop will overwrite this part!!! (end)############
 
