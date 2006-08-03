@@ -4,12 +4,13 @@ noinst_LIBRARIES = libADM_lavutil.a
 
 libADM_lavutil_a_METASOURCES = AUTO
 
-libADM_lavutil_a_SOURCES =    integer.c  intfloat_readwrite.c  mathematics.c  rational.c md5.c crc.c
+libADM_lavutil_a_SOURCES =  integer.c  intfloat_readwrite.c  mathematics.c  rational.c md5.c crc.c log.c  adler32.c lls.c
 
 
-EXTRA_DIST = avutil.h  common.h  integer.h     \
+EXTRA_DIST = avutil.h  common.h  integer.h   \
 mathematics.h  rational.h \
-bswap.h   crc.h     intfloat_readwrite.h  md5.h          x86_cpu.h
+bswap.h crc.h   intfloat_readwrite.h  md5.h    x86_cpu.h log.c \
+lls.h adler32.h adler32.c mem.c internal.h log.h lls.c
 
 
 ####### kdevelop will overwrite this part!!! (end)############
