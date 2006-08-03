@@ -59,14 +59,6 @@ void avcodec_register_all(void)
     register_avcodec(&oggvorbis_decoder);
 #endif //CONFIG_OGGVORBIS_DECODER
 #endif
-#ifdef CONFIG_LIBTHEORA
-#ifdef CONFIG_OGGTHEORA_ENCODER
-//    register_avcodec(&oggtheora_encoder);
-#endif //CONFIG_OGGTHEORA_ENCODER
-#ifdef CONFIG_OGGTHEORA_DECODER
-    register_avcodec(&oggtheora_decoder);
-#endif //CONFIG_OGGTHEORA_DECODER
-#endif
 #ifdef CONFIG_FAAC
 #ifdef CONFIG_FAAC_ENCODER
     register_avcodec(&faac_encoder);
@@ -229,11 +221,9 @@ void avcodec_register_all(void)
 #ifdef CONFIG_VC1_DECODER
     register_avcodec(&vc1_decoder);
 #endif //CONFIG_VC1_DECODER
-/* Reenable when it stops crashing on every file, causing bug report spam.
 #ifdef CONFIG_WMV3_DECODER
     register_avcodec(&wmv3_decoder);
 #endif //CONFIG_WMV3_DECODER
-*/
 #ifdef CONFIG_H263I_DECODER
     register_avcodec(&h263i_decoder);
 #endif //CONFIG_H263I_DECODER
@@ -378,7 +368,7 @@ void avcodec_register_all(void)
 #ifdef CONFIG_VP3_DECODER
     register_avcodec(&vp3_decoder);
 #endif //CONFIG_VP3_DECODER
-#if (defined CONFIG_THEORA_DECODER && !defined CONFIG_LIBTHEORA)
+#ifdef CONFIG_THEORA_DECODER
     register_avcodec(&theora_decoder);
 #endif //CONFIG_THEORA_DECODER
 #ifdef CONFIG_ASV1_DECODER
