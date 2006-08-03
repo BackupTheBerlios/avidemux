@@ -17,8 +17,8 @@ extern "C" {
 #define AV_STRINGIFY(s)         AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 
-#define LIBAVCODEC_VERSION_INT  ((51<<16)+(10<<8)+0)
-#define LIBAVCODEC_VERSION      51.10.0
+#define LIBAVCODEC_VERSION_INT  ((51<<16)+(11<<8)+0)
+#define LIBAVCODEC_VERSION      51.11.0
 #define LIBAVCODEC_BUILD        LIBAVCODEC_VERSION_INT
 
 #define LIBAVCODEC_IDENT        "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
@@ -201,8 +201,6 @@ enum CodecID {
     CODEC_ID_TTA,
     CODEC_ID_SMACKAUDIO,
 
-    CODEC_ID_OGGTHEORA= 0x16000,
-
     /* subtitle codecs */
     CODEC_ID_DVD_SUBTITLE= 0x17000,
     CODEC_ID_DVB_SUBTITLE,
@@ -340,7 +338,6 @@ typedef struct RcOverride{
 #define CODEC_FLAG2_MEMC_ONLY     0x00001000 ///< only do ME/MC (I frames -> ref, P frame -> ME+MC)
 //MEANX: NEVER EVER USE CLOSED GOP ?
 #define CODEC_FLAG2_32_PULLDOWN   0x80000000 
-
 
 /* Unsupported options :
  *              Syntax Arithmetic coding (SAC)
@@ -662,19 +659,6 @@ typedef struct AVFrame {
 } AVFrame;
 
 #define DEFAULT_FRAME_RATE_BASE 1001000
-
-/**
- * Used by av_log
- */
-typedef struct AVCLASS AVClass;
-struct AVCLASS {
-    const char* class_name;
-    const char* (*item_name)(void*); /* actually passing a pointer to an AVCodecContext
-                                        or AVFormatContext, which begin with an AVClass.
-                                        Needed because av_log is in libavcodec and has no visibility
-                                        of AVIn/OutputFormat */
-    struct AVOption *option;
-};
 
 /**
  * main external api structure.
@@ -1097,7 +1081,7 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int rc_max_rate;
-     int rc_max_rate_header; /*< That one is set in the header MEANX */
+    int rc_max_rate_header; /*< That one is set in the header MEANX */
 
 
     /**
@@ -1114,7 +1098,6 @@ typedef struct AVCodecContext {
      */
     int rc_buffer_size;
      int rc_buffer_size_header;  /*< That one is set in the header MEANX*/
-
     float rc_buffer_aggressivity;
 
     /**
@@ -1214,6 +1197,7 @@ typedef struct AVCodecContext {
 #define FF_IDCT_VP3          12
 #define FF_IDCT_IPP          13
 #define FF_IDCT_XVIDMMX      14
+#define FF_IDCT_CAVS         15
 
     /**
      * slice count.
@@ -2121,7 +2105,6 @@ extern AVCodec ac3_encoder;
 extern AVCodec mp2_encoder;
 extern AVCodec mp3lame_encoder;
 extern AVCodec oggvorbis_encoder;
-extern AVCodec oggtheora_encoder;
 extern AVCodec faac_encoder;
 extern AVCodec flac_encoder;
 extern AVCodec xvid_encoder;
@@ -2206,7 +2189,6 @@ extern AVCodec mace6_decoder;
 extern AVCodec huffyuv_decoder;
 extern AVCodec ffvhuff_decoder;
 extern AVCodec oggvorbis_decoder;
-extern AVCodec oggtheora_decoder;
 extern AVCodec cyuv_decoder;
 extern AVCodec h264_decoder;
 extern AVCodec indeo3_decoder;
@@ -2617,10 +2599,7 @@ extern AVBitStreamFilter noise_bsf;
 
 
 /* memory */
-void *av_malloc(unsigned int size);
 void *av_mallocz(unsigned int size);
-void *av_realloc(void *ptr, unsigned int size);
-void av_free(void *ptr);
 char *av_strdup(const char *s);
 void av_freep(void *ptr);
 void *av_fast_realloc(void *ptr, unsigned int *size, unsigned int min_size);
@@ -2638,26 +2617,6 @@ int img_crop(AVPicture *dst, const AVPicture *src,
 
 int img_pad(AVPicture *dst, const AVPicture *src, int height, int width, int pix_fmt,
             int padtop, int padbottom, int padleft, int padright, int *color);
-
-/* av_log API */
-
-#include <stdarg.h>
-
-#define AV_LOG_QUIET -1
-#define AV_LOG_ERROR 0
-#define AV_LOG_INFO 1
-#define AV_LOG_DEBUG 2
-
-#ifdef __GNUC__
-extern void av_log(void*, int level, const char *fmt, ...) __attribute__ ((__format__ (__printf__, 3, 4)));
-#else
-extern void av_log(void*, int level, const char *fmt, ...);
-#endif
-
-extern void av_vlog(void*, int level, const char *fmt, va_list);
-extern int av_log_get_level(void);
-extern void av_log_set_level(int);
-extern void av_log_set_callback(void (*)(void*, int, const char*, va_list));
 
 /* endian macros */
 #if !defined(BE_16) || !defined(BE_32) || !defined(LE_16) || !defined(LE_32)
