@@ -587,17 +587,7 @@ void OpenDMLHeader::Dump( void )
 	X_DUMP(dwSampleSize);
 	printf("\n");
 	  	  
-#undef X_DUMP
-#define X_DUMP(x) printf(#x":\t\t:%ld\n",(long int)_video_bih.x);
-    	X_DUMP( biSize);
-       	X_DUMP( biWidth);
-       	X_DUMP( biHeight);
-       	X_DUMP( biBitCount);
-       	X_DUMP( biCompression);fourCC::print(_video_bih.biCompression);printf("\n");
-        X_DUMP( biSizeImage);
-       	X_DUMP( biXPelsPerMeter);
-       	X_DUMP( biYPelsPerMeter);
-       	X_DUMP( biClrUsed);
+        printBih(&_video_bih);
 
         /*****************************************************************
                 Dump infos about all audio tracks found

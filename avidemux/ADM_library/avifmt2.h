@@ -41,6 +41,8 @@ typedef struct {
 	int	bmiColors[1];
 } BITMAPINFO, *LPBITMAPINFO;
 #endif //win32clash
+
+void printBih(BITMAPINFOHEADER *bi);
 /* Borrowed from vdub
 	Thanks to avery lee */
 #define AVI_INDEX_OF_CHUNKS 0X01

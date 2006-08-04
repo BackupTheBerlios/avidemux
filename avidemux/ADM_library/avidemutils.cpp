@@ -282,4 +282,18 @@ float f;
       return (uint32_t) floor(f);
 
 }
+void printBih(BITMAPINFOHEADER *bi)
+{
+#undef X_DUMP
+#define X_DUMP(x) printf(#x":\t\t:%ld\n",(long int)bi->x);
+    	X_DUMP( biSize);
+       	X_DUMP( biWidth);
+        X_DUMP( biHeight);
+        X_DUMP( biBitCount);
+        X_DUMP( biCompression);fourCC::print(bi->biCompression);printf("\n");
+        X_DUMP( biSizeImage);
+        X_DUMP( biXPelsPerMeter);
+        X_DUMP( biYPelsPerMeter);
+        X_DUMP( biClrUsed);
+}
 //EOF
