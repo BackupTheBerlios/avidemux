@@ -22,6 +22,46 @@
 
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
+typedef enum ADM_KNOWN_CHUNK
+{
+  ADM_CHUNK_HEADER_CHUNK ,
+  ADM_CHUNK_FILE_HEADER_CHUNK,
+  ADM_CHUNK_NO_AUDIO_CONCEAL,
+  ADM_CHUNK_STREAM_HEADER_CHUNK,
+  ADM_CHUNK_STREAM_GROUP_ID,
+  ADM_CHUNK_DATA_CHUNK,
+  ADM_CHUNK_UNKNOWN_CHUNK
+};
+typedef struct chunky
+{
+  const char *name;
+  uint8_t val[16];
+  ADM_KNOWN_CHUNK id; 
+};
+class asfChunk
+{
+  protected:
+    FILE        *_fd;
+    uint32_t    _chunkStart;
+    
+  public:
+            asfChunk(FILE *f);
+            ~asfChunk();
+  uint8_t   dump(void);
+  uint8_t   guId[16];
+  uint64_t  chunkLen;
+  
+  uint8_t   readChunkPayload(uint8_t *data, uint32_t *dataLen);
+  uint8_t   nextChunk(void);
+  uint8_t   skipChunk(void);
+  uint64_t  read64(void);
+  uint32_t  read32(void);
+  uint32_t  read16(void);
+  uint8_t   read8(void);
+  uint8_t   read(uint8_t *where, uint32_t how);
+  const chunky    *chunkId(void);
+};
+
 typedef struct asfAudioTrak
 {
   uint32_t  streamIndex;
@@ -61,22 +101,21 @@ class asfHeader         :public vidHeader
     FILE                    *_fd;
     int32_t                 _audioIndex;
     int32_t                 _videoIndex;
-    uint8_t                 readVideoInfo( void);
-    uint8_t                 readAudioInfo( uint32_t track);
-    uint8_t                 prebuildIndex(void);
-    uint8_t                 rewind(void);
-    void                    *_context;
+    uint8_t                 getHeaders( void);
     uint32_t                _nbAudioTrack;
     asfAudioTrak            *_audioTracks;
     asfAudio                *_curAudio;
     char                    *myName;
+    uint8_t                 loadVideo(asfChunk *s);
+    uint32_t                _extraDataLen;
+    uint8_t                 *_extraData;
   public:
 
 
     virtual   void          Dump(void);
     virtual   uint32_t      getNbStream(void) ;
     virtual   uint8_t       needDecompress(void);
-
+    virtual   uint8_t       getExtraHeaderData(uint32_t *len, uint8_t **data);
              asfHeader( void );
     virtual  ~asfHeader(  ) ;
 // AVI io
