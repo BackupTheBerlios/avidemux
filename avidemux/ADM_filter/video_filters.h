@@ -96,6 +96,7 @@
                 VF_MCDEINT,
                 VF_REVERSE,
                 VF_FADE,
+		VF_ASS,
 		VF_DUMMY
  	 }VF_FILTERS;
  	

@@ -22,6 +22,10 @@ SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_mpegdemuxer ADM_tray ADM_lavutil ADM_lavformat ADM_lavcodec oplug_mp4 \
 	ADM_avsproxy  ADM_liba52 ADM_libMad ADM_matroska ADM_asf
 
+if HAVE_FREETYPE
+SUBDIRS += libass
+endif
+
 EXTRA_DIST = ADM_assert.h    ADM_pp.h    avilist.cpp    gtkgui.h       interface.h   prototype.h \
 ADM_guiBitrate.cpp  ADM_requantize.cpp  avilist.h  gui_autodrive.cpp  main.cpp  support.h \
 ADM_lavcodec.h  GUI_jobs.cpp    callbacks.cpp  gui_navigate.cpp   mmx_macros.h \
@@ -85,6 +89,7 @@ avidemux2_LDADD   =  \
 ./ADM_lavcodec/libpostproc/libpostproc.a \
 ./ADM_library/libADM_library.a \
 ./ADM_toolkit/libADM_toolkit.a  \
+./libass/libass.a \
 $(libmpeg2enc_Altivec) 
 
 
@@ -95,7 +100,7 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 
 # the library search path.
 avidemux2_LDFLAGS = $(all_libraries)  $(SDL_LIBS) $(GTK_LIBS) \
-	$(FREETYPE_LIBS) $(ARTS_LIBS) $(XML_LIBS) 
+	$(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) 
 
 noinst_HEADERS = ADM_pp.h admmangle.h
 AM_CFLAGS = -g

@@ -149,6 +149,7 @@ printf(  "*********************\n");
 	registerFilter("----------------- Misc --------------",VF_INVALID,2,NULL,NULL);
 #ifdef USE_FREETYPE   
 	REGISTERX("subtitle","Subtitler","Add subtitles to the picture.",VF_SUBTILE,1,subtitle_create,subtitle_script);
+	REGISTERX("ass","ASS","Add ASS subtitles to the picture.",VF_ASS,1,ass_create,ass_script);
 #endif
         REGISTERX("vobsub","VobSub","",VF_VOBSUB,1,vobsub_create,vobsub_script);
         

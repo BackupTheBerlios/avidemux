@@ -100,7 +100,8 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_guiResize.cpp \
  ADM_vidAnimated.cpp \
  ADM_vidMcDeint.cpp \
- ADM_vidReverse.cpp ADM_vidFade.cpp
+ ADM_vidReverse.cpp ADM_vidFade.cpp \
+ ADM_vidASS.cpp
 
 				
 
@@ -161,11 +162,11 @@ ADM_vidCrop.cpp  ADM_vidMSmooth_param.h  ADM_vobsubinfo.h \
 ADM_vidDGbob.cpp ADM_vidMcDeint.cpp  ASM_vidDenoise.cpp \
 ADM_vidDGbob_param.h ADM_vidMcDeint_param.h  DIA_kerneldeint.cpp \
 ADM_vidDecDec.cpp  ADM_vidMosaic.cpp swscale_internal.h \
-ADM_vidTdeint_util.txt
+ADM_vidTdeint_util.txt ADM_vidASS.h ADM_vidASS.cpp
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES= $(all_includes) $(FREETYPE_CFLAGS) $(ALTIVEC_SWITCH)
 noinst_HEADERS = ADM_vidlavdeint.h ADM_mpdetc.h ADM_vidKernelDeint.h \
 					ADM_vidForcedPP.h ADM_vidSoften.h ADM_cache.h ADM_vidDecTel_param.h ADM_vidDecDec_param.h \
 					ADM_vidMSmooth_param.h ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \
-		ADM_lavpp_deintparam.h ADM_vidEq2.h 
+		ADM_lavpp_deintparam.h ADM_vidEq2.h ADM_vidASS.h

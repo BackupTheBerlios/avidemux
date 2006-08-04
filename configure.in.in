@@ -697,6 +697,8 @@ if test "x$with_freetype2" != "xno"; then
 
 	if test "x$have_freetype" = "xyes"; then
 		AC_DEFINE(USE_FREETYPE,1,"[Use FreeType2 font rendering]")
+		AM_CONDITIONAL(HAVE_FREETYPE, test "x$have_freetype" = "xyes" )
+
 	fi
 fi
 
