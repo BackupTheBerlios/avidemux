@@ -42,9 +42,10 @@ class asfChunk
 {
   protected:
     FILE        *_fd;
-    uint32_t    _chunkStart;
+    
     
   public:
+  uint32_t  _chunkStart;
             asfChunk(FILE *f);
             ~asfChunk();
   uint8_t   dump(void);
@@ -60,6 +61,36 @@ class asfChunk
   uint8_t   read8(void);
   uint8_t   read(uint8_t *where, uint32_t how);
   const chunky    *chunkId(void);
+};
+class asfPacket
+{
+  protected:
+    FILE        *_fd;
+    uint32_t  packetStart;
+    uint64_t  packetLen;
+    uint32_t  paddingType;
+    uint8_t   flags;
+    uint8_t   segmentId;
+  public:
+    
+              asfPacket(FILE *f);
+              ~asfPacket();
+    uint8_t   dump(void);
+    
+    
+  
+    uint8_t   readChunkPayload(uint8_t *data, uint32_t *dataLen);
+    uint8_t   nextPacket(void);
+    uint8_t   skipPacket(void);
+    
+    uint32_t  getPos(void);
+    uint32_t  getPayloadLen(void);
+    
+    uint64_t  read64(void);
+    uint32_t  read32(void);
+    uint32_t  read16(void);
+    uint8_t   read8(void);
+    uint8_t   read(uint8_t *where, uint32_t how);
 };
 
 typedef struct asfAudioTrak
@@ -97,16 +128,20 @@ class asfAudio : public AVDMGenericAudioStream
 class asfHeader         :public vidHeader
 {
   protected:
+    uint8_t                 getHeaders( void);
+    uint8_t                 buildIndex(void);
+    uint8_t                 loadVideo(asfChunk *s);
+    
+  protected:
                                 
     FILE                    *_fd;
     int32_t                 _audioIndex;
     int32_t                 _videoIndex;
-    uint8_t                 getHeaders( void);
     uint32_t                _nbAudioTrack;
     asfAudioTrak            *_audioTracks;
     asfAudio                *_curAudio;
     char                    *myName;
-    uint8_t                 loadVideo(asfChunk *s);
+    
     uint32_t                _extraDataLen;
     uint8_t                 *_extraData;
   public:

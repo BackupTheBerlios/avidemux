@@ -26,7 +26,7 @@
 
 #include "ADM_library/fourcc.h"
 #include "ADM_toolkit/toolkit.hxx"
-
+#include "ADM_dialog/DIA_working.h"
 #include "ADM_asf.h"
 
 
@@ -141,6 +141,7 @@ uint8_t asfHeader::open(char *name)
   {
     return 0; 
   }
+  buildIndex();
   return 1;
 }
 /*
@@ -198,12 +199,12 @@ uint8_t asfHeader::getHeaders(void)
   // The first header is header chunk
   chunk.nextChunk();
   id=chunk.chunkId();
-  
   if(id->id!=ADM_CHUNK_HEADER_CHUNK)
   {
     printf("[ASF] expected header chunk\n"); 
     return 0;
   }
+  printf("[ASF] getting headers\n");
   chunk.dump();
   nbSubChunk=chunk.read32();
   printf("NB subchunk :%u\n",nbSubChunk);
@@ -324,5 +325,74 @@ uint8_t asfHeader::loadVideo(asfChunk *s)
             }
             return 1;
 }
-
+/*
+    Scan the file to build an index
+    
+    Header Chunk
+            Chunk
+            Chunk
+            Chunk
+            
+    Data chunk
+            Chunk
+            Chunk
+            
+    We skip the 1st one, and just read the header of the 2nd one
+    
+*/
+uint8_t asfHeader::buildIndex(void)
+{
+  uint32_t fSize;
+  DIA_working *working;
+  const chunky *id;
+  uint32_t chunkFound;
+  uint32_t r=5;
+  uint32_t nbPacket=0,len;
+  
+  fseeko(_fd,0,SEEK_END);
+  fSize=ftello(_fd);
+  fseeko(_fd,0,SEEK_SET);
+  
+  asfChunk h(_fd);
+  printf("[ASF] Building index\n");
+  printf("[ASF] Searching data\n");
+  while(r--)
+  {
+    h.nextChunk();    // Skip headers
+    id=h.chunkId();
+    h.dump();
+    if(id->id==ADM_CHUNK_DATA_CHUNK) break;
+    h.skipChunk();
+  }
+  if(id->id!=ADM_CHUNK_DATA_CHUNK) return 0;
+  // Remove leftover from DATA_chunk
+ // Unknown	GUID	16
+//       Number of packets	UINT64	8
+//       Unknown	UINT8	1
+//       Unknown	UINT8	1
+//   
+  h.read32();
+  h.read32();
+  h.read32();
+  h.read32();
+  nbPacket=(uint32_t) h.read64();
+  h.read16();
+  
+  len=h.chunkLen-16-8-2-24;
+  
+  printf("[ASF] nbPacket  : %u\n",nbPacket);
+  printf("[ASF] len to go : %u\n",len);
+  
+  
+  
+  printf("[ASF] scanning data\n");
+  working=new DIA_working("indexing");
+  
+  // Scan packet & segment  
+  
+  delete working;
+  printf("[ASF]%u chunks found\n",chunkFound);
+  return 1;
+  
+}
 //EOF
