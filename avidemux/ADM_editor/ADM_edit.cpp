@@ -55,6 +55,7 @@
 #include "ADM_mpegdemuxer/dmx_identify.h"
 #include "ADM_mpegdemuxer/dmx_probe.h"
 #include "ADM_matroska/ADM_mkv.h"
+#include "ADM_asf/ADM_asf.h"
 #include "ADM_assert.h"
 #include "prefs.h"
 
@@ -277,6 +278,7 @@ UNUSED_ARG(mode);
       		break;
       OPEN_AS (Mp4_FileType, mp4Header);
       OPEN_AS (H263_FileType, h263Header);
+      OPEN_AS (ASF_FileType, asfHeader);
       OPEN_AS (NewMpeg_FileType,dmxHeader);
       // For AVI we first try top open it as openDML
       case AVI_FileType:

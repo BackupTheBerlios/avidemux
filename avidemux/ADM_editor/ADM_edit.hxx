@@ -56,6 +56,7 @@ typedef enum
 		ECMAScript_FileType=14,
                 AvsProxy_FileType=15,
                 Matroska_FileType=16,
+                ASF_FileType=17,
 		DUMMY_FILETYPE=99
 }fileType;
 
