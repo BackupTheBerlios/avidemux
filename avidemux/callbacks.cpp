@@ -90,7 +90,8 @@ void  update_status_bar(ADMImage *frame)
 	       UI_setFrameType(  frame->flags,frame->_Qp);
     // progress bar
     len = 100;
-    len=len / (double) avifileinfo->nb_frames;
+    if(avifileinfo->nb_frames>1)
+    	len=len / (double) (avifileinfo->nb_frames-1);
     len *= (double) curframe;
 
    
@@ -116,7 +117,8 @@ void rebuild_status_bar(void)
 	
     // progress bar
     len = 100;
-    len=len / (double) avifileinfo->nb_frames;
+    if(avifileinfo->nb_frames>1)
+    	len=len / (double) (avifileinfo->nb_frames-1);
     len *= (double) curframe;
 
 
@@ -142,7 +144,7 @@ uint32_t GUI_GetScale(void)
     float tg;
 
     percent = UI_readScale();
-    tg= avifileinfo->nb_frames * percent / 100.;
+    tg= (avifileinfo->nb_frames-1) * percent / 100.;
     
     return (uint32_t)floor(tg);;
 

@@ -410,7 +410,7 @@ void GUI_PreviousKeyFrame(void)
     f=curframe;
     if (avifileinfo)
       {
-		if(!video_body->getPKFrame(&f))
+		if(!video_body->getPKFrame(&f)&&curframe)
 		//if( !GUI_getFrameNKF(&f ,rdr_decomp_buffer))
         	{
             //	GUI_Error_HIG("Decompressing error", NULL);

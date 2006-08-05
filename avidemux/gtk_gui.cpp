@@ -187,6 +187,7 @@ renderZoom currentZoom=ZOOM_1_1;
 uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name);
 uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t,ADMImage *image);
 extern const char * GUI_getCustomScript(uint32_t nb);
+extern gboolean SliderIsShifted;
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -661,7 +662,8 @@ case ACT_Pipe2Other:
 	{
 	  ignore_change++;
 	  nf = GUI_GetScale ();
-	  GUI_GoToKFrame (nf);
+	  if (!SliderIsShifted) GUI_GoToKFrame (nf);
+	  else GUI_GoToFrame (nf);
 	  ignore_change--;
 
 	}

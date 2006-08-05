@@ -142,6 +142,10 @@ static int  UI_looseFocus( void);
 static void GUI_initCursor( void );
  void UI_BusyCursor( void );
  void UI_NormalCursor( void );
+// For checking if Slider shift key is pressed
+gboolean SliderIsShifted = FALSE;
+gboolean UI_SliderPressed(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+gboolean UI_SliderReleased(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 // Global
 GtkAccelGroup *accel_group;
 //
@@ -283,6 +287,14 @@ uint8_t  bindGUI( void )
 	
 	
 //	now add callbacks
+	
+	gtk_signal_connect(GTK_OBJECT(guiSlider), "button_press_event",
+                       GTK_SIGNAL_FUNC(UI_SliderPressed),
+                       NULL);
+
+	gtk_signal_connect(GTK_OBJECT(guiSlider), "button_release_event",
+                       GTK_SIGNAL_FUNC(UI_SliderReleased),
+                       NULL);
 #define ADD_SIGNAL(a,b,c)  gtk_signal_connect(GTK_OBJECT(a),b, \
 		       GTK_SIGNAL_FUNC(guiCallback), (void *) c);
 				       
@@ -334,6 +346,8 @@ uint8_t  bindGUI( void )
     gtk_scale_set_digits(GTK_SCALE(guiSlider), 2);
     // And continuous updates!
     gtk_range_set_update_policy (GTK_RANGE (guiSlider), GTK_UPDATE_CONTINUOUS);	    
+
+    gtk_range_set_range(GTK_RANGE(guiSlider),0,100.00);
     
     // keyboard events
     
@@ -1040,5 +1054,16 @@ uint8_t UI_arrow_enabled(void)
 uint8_t UI_arrow_disabled(void)
 {
 
+}
+gboolean UI_SliderPressed(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	if(event->state&GDK_SHIFT_MASK) SliderIsShifted=TRUE;
+	return FALSE;
+
+}
+gboolean UI_SliderReleased(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	SliderIsShifted=FALSE;
+	return FALSE;
 }
 // EOF
