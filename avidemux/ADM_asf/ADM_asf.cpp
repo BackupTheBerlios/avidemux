@@ -28,6 +28,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_dialog/DIA_working.h"
 #include "ADM_asf.h"
+#include "ADM_asfPacket.h"
 
 
 static const uint8_t asf_audio[16]={0x40,0x9e,0x69,0xf8,0x4d,0x5b,0xcf,0x11,0xa8,0xfd,0x00,0x80,0x5f,0x5c,0x44,0x2b};
@@ -115,6 +116,7 @@ uint8_t asfHeader::needDecompress(void)
   myName=NULL;
   _extraDataLen=0;
   _extraData=NULL;
+  _packetSize=0;
 }
 /*
     __________________________________________________________
@@ -195,6 +197,7 @@ uint8_t asfHeader::getHeaders(void)
   uint32_t i=0,nbSubChunk,hi,lo;
   const chunky *id;
   uint8_t gid[16];
+  uint32_t mn=0,mx=0;
   asfChunk chunk(_fd);
   // The first header is header chunk
   chunk.nextChunk();
@@ -234,8 +237,17 @@ uint8_t asfHeader::getHeaders(void)
             printf("Timestamp 3   : %04x\n",s->read32());
             printf("Preload       : %04x\n",s->read32());
             printf("Flags         : %04x\n",s->read32());
-            printf("Min size      : %04x\n",s->read32());
-            printf("Max size      : %04x\n",s->read32());
+            mx=s->read32();
+            mn=s->read32();
+            if(mx!=mn)
+            {
+              printf("Variable packet size!!\n");
+              delete s;
+              return 0; 
+            }
+            _packetSize=mx;
+            printf("Min size      : %04x\n",mx);
+            printf("Max size      : %04x\n",mn);
             printf("Uncompres.size: %04x\n",s->read32());
           }
           break;
@@ -389,7 +401,20 @@ uint8_t asfHeader::buildIndex(void)
   working=new DIA_working("indexing");
   
   // Scan packet & segment  
+  asfPacket *packet=new asfPacket(_fd,_packetSize);
   
+  packet->nextPacket();
+  packet->skipPacket();
+  packet->nextPacket();
+  packet->skipPacket();
+  packet->nextPacket();
+  packet->skipPacket();
+  packet->nextPacket();
+  packet->skipPacket();
+  packet->nextPacket();
+  
+  
+  delete packet;
   delete working;
   printf("[ASF]%u chunks found\n",chunkFound);
   return 1;
