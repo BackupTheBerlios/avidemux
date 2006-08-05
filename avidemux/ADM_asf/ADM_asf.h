@@ -22,6 +22,9 @@
 
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
+
+#include "ADM_toolkit/ADM_queue.h"
+
 typedef enum ADM_KNOWN_CHUNK
 {
   ADM_CHUNK_HEADER_CHUNK ,
@@ -103,6 +106,8 @@ class asfHeader         :public vidHeader
     uint8_t                 buildIndex(void);
     uint8_t                 loadVideo(asfChunk *s);
     uint32_t                _packetSize;
+    ADM_queue               readQueue;
+    uint32_t                curSeq;
     
   protected:
                                 

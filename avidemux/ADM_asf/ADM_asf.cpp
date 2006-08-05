@@ -144,6 +144,7 @@ uint8_t asfHeader::open(char *name)
     return 0; 
   }
   buildIndex();
+  curSeq=1;
   return 1;
 }
 /*
@@ -178,6 +179,38 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
   *framelen=0;
   if(flags)
     *flags=AVI_KEY_FRAME;
+  
+  uint32_t len=0;
+  
+  asfPacket *packet=new asfPacket(_fd,_packetSize,&readQueue);
+  
+  while(1)
+  {
+   
+    while(!readQueue.isEmpty())
+    {
+      asfBit *bit;
+      ADM_assert(readQueue.pop((void**)&bit));
+      printf(">found packet of size %d seq %d, while curseq =%d\n",bit->len,bit->sequence,curSeq);
+      if(bit->sequence!=curSeq)
+      {
+        printf("New sequence\n");
+        *framelen=len;
+        readQueue.pushBack(bit);
+        curSeq=bit->sequence;
+        goto gotcha;
+      }
+      // still same sequence ...add
+      memcpy(ptr+len,bit->data,bit->len);
+      len+=bit->len;
+    }
+    packet->nextPacket(2);
+    packet->skipPacket();
+  }
+gotcha:
+  delete packet;
+  *framelen=len;
+  printf(">>Len %d seq %d\n",len,curSeq);
   return 1; 
 }
 /*
@@ -398,24 +431,27 @@ uint8_t asfHeader::buildIndex(void)
   
   
   printf("[ASF] scanning data\n");
+#if 0
   working=new DIA_working("indexing");
   
   // Scan packet & segment  
-  asfPacket *packet=new asfPacket(_fd,_packetSize);
+  asfPacket *packet=new asfPacket(_fd,_packetSize,&readQueue);
   
-  packet->nextPacket();
+  packet->nextPacket(2);
   packet->skipPacket();
-  packet->nextPacket();
+  packet->nextPacket(2);
   packet->skipPacket();
-  packet->nextPacket();
+  packet->nextPacket(2);
   packet->skipPacket();
-  packet->nextPacket();
+  packet->nextPacket(2);
   packet->skipPacket();
-  packet->nextPacket();
+  packet->nextPacket(2);
   
   
   delete packet;
+  
   delete working;
+#endif  
   printf("[ASF]%u chunks found\n",chunkFound);
   return 1;
   

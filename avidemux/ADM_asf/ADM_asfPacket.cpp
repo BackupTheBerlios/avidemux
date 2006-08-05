@@ -29,16 +29,22 @@
 
 #include "ADM_asfPacket.h"
 
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_ASF
+#include "ADM_toolkit/ADM_debug.h"
 
-asfPacket::asfPacket(FILE *f,uint32_t pSize)
+//#define ASF_VERBOSE
+
+asfPacket::asfPacket(FILE *f,uint32_t pSize,ADM_queue *q)
  {
    _fd=f;
    pakSize=pSize;
    ADM_assert(pakSize);
    packetStart=ftello(f);;
-   printf("Packet created at %x\n",packetStart);
+   aprintf("Packet created at %x\n",packetStart);
    ADM_assert(_fd);
-
+   queue=q;
+   ADM_assert(q);
  }
  asfPacket::~asfPacket()
  {
@@ -71,8 +77,8 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
   
  
  */
- uint8_t   asfPacket::nextPacket(void)
- {
+uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
+{
    uint32_t atime,aduration,nbSeg,segType=0x80;
    uint32_t sequenceLen,len,streamId;
    int32_t   packetLen=0;
@@ -85,7 +91,7 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
      printf("not a 82 packet\n");
      return 0;
    }
-   printf("============== New packet ===============\n");
+   aprintf("============== New packet ===============\n");
    read16();          // Always 0 ????
    flags=read8();
    segmentId=read8();
@@ -100,7 +106,7 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
    // Read padding size (padding):
    paddingLen=readVCL(flags>>3);
    
-   printf("paddingLen :         %d\n",paddingLen);
+   aprintf("paddingLen :         %d\n",paddingLen);
    
 // Explicit (absolute) packet size	    
    if(((flags>>5)&3))
@@ -130,6 +136,7 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
    {
      nbSeg=1; 
    }
+#ifdef ASF_VERBOSE   
    printf("-----------------------\n");
    printf("Flags     :           0X%x",flags);
    
@@ -146,7 +153,7 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
    printf("Send      :           %d\n",atime);
    printf("Duration  :           %d\n",aduration);
    printf("# of seg  :           %d %x\n",nbSeg,segType);
-   
+#endif
    // Now read Segments....
    //
    uint32_t sequence, offset,replica,r;
@@ -157,12 +164,15 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
      r=read8(); // Read stream Id
      
      streamId=r&0x7f;
-     printf(">>>>>Stream Id : %x<<<<<\n",streamId);
-     if(r&0x80) printf("KeyFrame\n");
+     aprintf(">>>>>Stream Id : %x<<<<<\n",streamId);
+     if(r&0x80) 
+     {
+       aprintf("KeyFrame\n");
+     }
      sequence=readVCL(segmentId>>4);
      offset=readVCL(segmentId>>2);
      replica=readVCL(segmentId);
-     printf("replica                %d\n",replica);
+     aprintf("replica                %d\n",replica);
      // Skip replica data_len
      skip(replica);
      
@@ -171,12 +181,12 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
      {
        payloadLen=readVCL(segType);
        if(payloadLen)
-        printf("##len                    %d\n",payloadLen);
+        aprintf("##len                    %d\n",payloadLen);
        
      }
      remaining=ftello(_fd)-packetStart;
      remaining=pakSize-remaining-paddingLen;
-     printf("Remaining %d asked %d\n",remaining,payloadLen);
+     aprintf("Remaining %d asked %d\n",remaining,payloadLen);
      if(remaining<=0) 
      {
        printf("** Err: No data left (%d)\n",remaining); 
@@ -190,11 +200,13 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
        printf("** WARNING too big %d %d\n", remaining,packetLen);
        payloadLen=remaining;
      }
+#ifdef ASF_VERBOSE     
      printf("This segment %d bytes, %d /%d\n",packetLen,seg,nbSeg);
      printf("Offset                 %d\n",offset);
      printf("sequence               %d\n",sequence);
      printf("Grouping               %d\n",replica==1);
      printf("payloadLen             %d\n",payloadLen);
+#endif
      // Frag
      if(replica==1) // Grouping
      {
@@ -209,7 +221,14 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
          {
            
            printf("oops exceeding %d/%d\n",l,payloadLen);
-           skip(payloadLen);
+           if(streamId==streamWanted)
+           {
+             pushPacket(offset,sequence,payloadLen,streamId);
+             
+           }else
+           {
+            skip(payloadLen);
+           }
            break;
          }
          skip(l);
@@ -218,8 +237,12 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
        
      }else
      { // else we read "payloadLen" bytes and put them at offset "offset"
-       skip(payloadLen);
-       printf("Reading %d bytes\n",payloadLen);
+       if(streamId==streamWanted)
+       {
+         pushPacket(offset,sequence,payloadLen,streamId);    
+       }else
+        skip(payloadLen);
+       aprintf("Reading %d bytes\n",payloadLen);
      }
      
    }
@@ -231,6 +254,26 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
    return 1;
   
  }
+ 
+ 
+ uint8_t asfPacket::pushPacket(uint32_t offset,uint32_t sequence,uint32_t payloadLen,uint32_t stream)
+ {
+   asfBit *bit=new asfBit;
+   printf("Pushing packet stream=%d len=%d seq=%d\n",stream,payloadLen,sequence);
+   bit->sequence=sequence;
+   bit->offset=offset;
+   bit->len=payloadLen;
+   bit->data=new uint8_t[payloadLen];
+   bit->stream=stream;
+   if(!read(bit->data,bit->len))
+   {
+     delete bit;
+     return 0; 
+   }
+   queue->push((void *)bit);
+   return 1;
+ }
+ 
  uint32_t asfPacket::readVCL(uint32_t bitwise)
  {
    uint32_t r;
@@ -248,9 +291,9 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize)
  {
    uint32_t go;
    go=packetStart+ pakSize;
-   printf("Pos %x\n",ftello(_fd));
+   aprintf("Pos %x\n",ftello(_fd));
    fseeko(_fd,go,SEEK_SET);
-   printf("Skipping to %x\n",go);
+   aprintf("Skipping to %x\n",go);
   
    return 1; 
  }

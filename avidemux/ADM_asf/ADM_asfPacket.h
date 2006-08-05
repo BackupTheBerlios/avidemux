@@ -16,25 +16,40 @@
 
 #ifndef ASF_PACKET_H
 #define ASF_PACKET_H
+
+#include "ADM_toolkit/ADM_queue.h"
+
+typedef struct asfBit
+{
+  uint32_t sequence;
+  uint32_t offset;
+  uint32_t len;
+  uint32_t stream;
+  uint8_t  *data;
+};
+
 class asfPacket
 {
   protected:
-    uint32_t  readVCL(uint32_t bitwise);
-    uint8_t   skip( uint32_t how);
-    FILE        *_fd;
-    uint32_t  packetStart;
-    uint8_t   segmentId;
-    uint32_t  pakSize;
+    uint32_t        readVCL(uint32_t bitwise);
+    uint8_t         pushPacket(uint32_t offset,uint32_t sequence,uint32_t payloadLen,uint32_t stream);
+    uint8_t         skip( uint32_t how);
+    FILE            *_fd;
+    uint32_t        packetStart;
+    uint8_t         segmentId;
+    uint32_t        pakSize;
+    ADM_queue       *queue;
+
   public:
     
-    asfPacket(FILE *f,uint32_t pSize);
+    asfPacket(FILE *f,uint32_t pSize,ADM_queue *q);
     ~asfPacket();
     uint8_t   dump(void);
     
     
   
     uint8_t   readChunkPayload(uint8_t *data, uint32_t *dataLen);
-    uint8_t   nextPacket(void);
+    uint8_t   nextPacket(uint8_t streamWanted);
     uint8_t   skipPacket(void);
     
     uint32_t  getPos(void);
