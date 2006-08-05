@@ -1,6 +1,8 @@
 #ifndef ADM_CODEC_CONFIG_
 #define ADM_CODEC_CONFIG_
 
+uint8_t DIA_DVDffParam (COMPRES_PARAMS * incoming);
+
 #include "ADM_vidEncode.hxx"
 // Yv12
 
@@ -248,7 +250,7 @@ COMPRES_PARAMS ffmpeg1Codec = {
   ADM_EXTRA_PARAM,
   &ffmpeg1Extra,
   sizeof (ffmpeg1Extra),
-  NULL
+  DIA_DVDffParam
 };
 //************ ffmpeg mpeg2 DVD **********
 
@@ -293,7 +295,7 @@ FFcodecSetting ffmpeg2DVDExtra = {
   240,				// buffersize 240 KB for Mpeg2 /
   0				// DUMMY        
 };
-uint8_t DIA_DVDffParam (COMPRES_PARAMS * incoming);
+
 COMPRES_PARAMS ffmpeg2DVDCodec = {
   CodecXDVD,
   "DVD (lavc)",
