@@ -34,6 +34,7 @@
 
 #define _context ((AVCodecContext *)_contextVoid)
 
+static uint8_t scratchPad[48000*2];
 
    uint8_t ADM_AudiocodecWMA::beginDecompress( void ) 
    {
@@ -93,6 +94,7 @@ uint8_t ADM_AudiocodecWMA::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uin
 {
 int out=0;
 int max=0,pout=0;
+int16_t *run16;
 
         *nbOut=0;
         // Shrink
@@ -106,23 +108,30 @@ int max=0,pout=0;
         ADM_assert(nbIn+_tail<ADMWA_BUF);
         memcpy(_buffer+_tail,inptr,nbIn);
         _tail+=nbIn;
-        while(_tail-_head>_blockalign)
+        while(_tail-_head>=_blockalign)
         {
-                out=avcodec_decode_audio(_context,(int16_t *)outptr,&pout,_buffer+_head,_tail-_head);
-                if(out<0)
-                {
-                        printf( " *** WMA decoding error ***\n");
-                        _head+=1; // Try skipping some bytes
-                        continue;
-                }
-                //printf("This round %d Consumed %d produced %d\n",_tail-_head,out,pout);
-                _head+=out; // consumed bytes
-                *nbOut+=pout;
-                outptr+=pout;
+          out=avcodec_decode_audio(_context,(int16_t *)scratchPad,
+                                   &pout,_buffer+_head,_blockalign);
+                
+          if(out<0)
+          {
+            printf( " *** WMA decoding error (%u)***\n",_blockalign);
+            _head+=1; // Try skipping some bytes
+            continue;
+          }
+            
+          _head+=out; // consumed bytes
+          pout>>=1;
+          *nbOut+=pout;
+          run16=(int16_t *)scratchPad;
+          for(int i=0;i<pout;i++)
+          {
+            *outptr++=((float)run16[i])/32767.;
+          }
         }
-	*nbOut = *nbOut / 2;
-	int2float(outptr, *nbOut);
-
+        
+        
+        
         return 1;
 }
 ///************************************************
@@ -176,7 +185,6 @@ uint8_t ADM_AudiocodecAMR::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uin
 {
 int out;
 int pout=0;
-static uint8_t  buffer[8000*2]; // ~ 1 sec worth of data
 int16_t *run16;
 
 
@@ -194,7 +202,8 @@ int16_t *run16;
         _tail+=nbIn;
         while(_tail-_head>AMR_PACKET)
         {
-          out=avcodec_decode_audio(_context,(int16_t *)buffer,&pout,_buffer+_head,_tail-_head);
+          out=avcodec_decode_audio(_context,(int16_t *)scratchPad,
+                                   &pout,_buffer+_head,_tail-_head);
                 
                 if(out<0)
                 {
@@ -206,7 +215,7 @@ int16_t *run16;
                 _head+=out; // consumed bytes
                 pout>>=1;
                 *nbOut+=pout;
-                run16=(int16_t *)buffer;
+                run16=(int16_t *)scratchPad;
                 for(int i=0;i<pout;i++)
                 {
                   *outptr++=((float)run16[i])/32767.;
