@@ -111,6 +111,7 @@ uint8_t  asfAudio::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
   *len=0;
   uint32_t delta;
+  uint8_t r;
   while(1)
   {
    
@@ -128,7 +129,9 @@ uint8_t  asfAudio::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
       delete bit;
       return 1;
     }
-    if(!_packet->nextPacket(_streamId))
+    r=_packet->nextPacket(_streamId);
+    _packet->skipPacket();
+    if(!r)
     {
       printf("[ASF] Audio Packet Error\n");
       return 0; 
