@@ -121,6 +121,9 @@ class asfHeader         :public vidHeader
     
     uint32_t                _extraDataLen;
     uint8_t                 *_extraData;
+    
+    uint32_t                _dataStartOffset;
+    uint32_t                _videoStreamId;
   public:
 
 

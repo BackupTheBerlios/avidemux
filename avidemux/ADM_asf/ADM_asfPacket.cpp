@@ -45,6 +45,7 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize,ADM_queue *q)
    ADM_assert(_fd);
    queue=q;
    ADM_assert(q);
+   currentPacket=0;
  }
  asfPacket::~asfPacket()
  {
@@ -53,6 +54,7 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize,ADM_queue *q)
  {
    uint32_t remaining;
    *dataLen=0;
+   ADM_assert(0);
    return 1;
   
  }
@@ -91,6 +93,7 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
      printf("not a 82 packet\n");
      return 0;
    }
+   currentPacket++;
    aprintf("============== New packet ===============\n");
    read16();          // Always 0 ????
    flags=read8();
@@ -223,7 +226,7 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
            printf("oops exceeding %d/%d\n",l,payloadLen);
            if(streamId==streamWanted)
            {
-             pushPacket(offset,sequence,payloadLen,streamId);
+             pushPacket(currentPacket,offset,sequence,payloadLen,streamId);
              
            }else
            {
@@ -239,7 +242,7 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
      { // else we read "payloadLen" bytes and put them at offset "offset"
        if(streamId==streamWanted)
        {
-         pushPacket(offset,sequence,payloadLen,streamId);    
+         pushPacket(currentPacket,offset,sequence,payloadLen,streamId);    
        }else
         skip(payloadLen);
        aprintf("Reading %d bytes\n",payloadLen);
@@ -254,9 +257,15 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
    return 1;
   
  }
+ /*
+    Push a packet down the queue
+    The packet could be a complete one or a fragement
+    To know that, either look at the offset field which will be != for fragements
+    Or look if the sequence number is increasing
  
- 
- uint8_t asfPacket::pushPacket(uint32_t offset,uint32_t sequence,uint32_t payloadLen,uint32_t stream)
+ */
+
+ uint8_t asfPacket::pushPacket(uint32_t packetnb,uint32_t offset,uint32_t sequence,uint32_t payloadLen,uint32_t stream)
  {
    asfBit *bit=new asfBit;
    printf("Pushing packet stream=%d len=%d seq=%d\n",stream,payloadLen,sequence);
@@ -265,6 +274,7 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
    bit->len=payloadLen;
    bit->data=new uint8_t[payloadLen];
    bit->stream=stream;
+   bit->packet=packetnb;
    if(!read(bit->data,bit->len))
    {
      delete bit;

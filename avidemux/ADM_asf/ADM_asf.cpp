@@ -117,6 +117,7 @@ uint8_t asfHeader::needDecompress(void)
   _extraDataLen=0;
   _extraData=NULL;
   _packetSize=0;
+  _videoStreamId=0;
 }
 /*
     __________________________________________________________
@@ -288,6 +289,7 @@ uint8_t asfHeader::getHeaders(void)
       {
          // Client GID
         uint32_t audiovideo=0; // video=1, audio=2, 0=unknown
+        uint32_t sid;
         s->read(gid,16);
         printf("Type            :");
         for(int z=0;z<16;z++) printf("0x%02x,",gid[z]);
@@ -309,12 +311,14 @@ uint8_t asfHeader::getHeaders(void)
         printf("Reserved    : %08x\n",s->read64());
         printf("Total Size  : %04x\n",s->read32());
         printf("Size        : %04x\n",s->read32());
-        printf("Stream nb   : %04x\n",s->read16());
+        sid=s->read16();
+        printf("Stream nb   : %04x\n",sid);
         printf("Reserved    : %04x\n",s->read32());
         switch(audiovideo)
         {
           case 1: // Video
           {
+                    _videoStreamId=sid;
                     loadVideo(s);
                     break;
           }
@@ -360,7 +364,7 @@ uint8_t asfHeader::loadVideo(asfChunk *s)
             _videostream.fccHandler=_video_bih.biCompression;
             printf("Codec : <%s> (%04x)\n",
                     fourCC::tostring(_video_bih.biCompression),_video_bih.biCompression);
-            _videostream.dwLength=_mainaviheader.dwTotalFrames=5;
+            
             printBih(&_video_bih);
             if(x>sizeof(BITMAPINFOHEADER))
             {
@@ -431,28 +435,41 @@ uint8_t asfHeader::buildIndex(void)
   
   
   printf("[ASF] scanning data\n");
-#if 0
-  working=new DIA_working("indexing");
-  
-  // Scan packet & segment  
-  asfPacket *packet=new asfPacket(_fd,_packetSize,&readQueue);
-  
-  packet->nextPacket(2);
-  packet->skipPacket();
-  packet->nextPacket(2);
-  packet->skipPacket();
-  packet->nextPacket(2);
-  packet->skipPacket();
-  packet->nextPacket(2);
-  packet->skipPacket();
-  packet->nextPacket(2);
-  
-  
-  delete packet;
-  
-  delete working;
-#endif  
-  printf("[ASF]%u chunks found\n",chunkFound);
+  _dataStartOffset=ftello(_fd);
+  // Here we go
+  asfPacket *aPacket=new asfPacket(_fd,_packetSize,&readQueue);
+  uint32_t packet=0;
+  uint32_t sequence=1;
+  uint32_t nbImage=1;
+  while(packet<nbPacket)
+  {
+    while(!readQueue.isEmpty())
+    {
+      asfBit *bit=NULL;
+      ADM_assert(readQueue.pop((void**)&bit));
+      printf(">found packet of size %d seq %d, while curseq =%d\n",bit->len,bit->sequence,curSeq);
+      if(bit->sequence!=sequence)
+      {
+        printf("New sequence\n");
+        nbImage++;
+        readQueue.pushBack(bit);
+        if(sequence+1!=bit->sequence)
+        {
+          printf("!!!!!!!!!!!! non continuous sequence %u %u\n",sequence,bit->sequence); 
+        }
+        sequence=bit->sequence;
+        continue;
+      }
+      delete bit;
+    }
+    packet++;
+    aPacket->nextPacket(_videoStreamId);
+    aPacket->skipPacket();
+  }
+  delete aPacket;
+  fseeko(_fd,_dataStartOffset,SEEK_SET);
+  printf("[ASF]%u images found\n",nbImage);
+  _videostream.dwLength=_mainaviheader.dwTotalFrames=nbImage;
   return 1;
   
 }
