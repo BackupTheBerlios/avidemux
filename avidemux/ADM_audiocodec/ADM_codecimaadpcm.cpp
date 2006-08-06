@@ -49,6 +49,7 @@ int qt_ima_adpcm_decode_block(unsigned short *output,
   unsigned char *input, int channels);
 #endif
 
+extern uint8_t scratchPad[];
 
 // pertinent tables for IMA ADPCM
 static int adpcm_step[89] =
@@ -124,6 +125,7 @@ uint8_t ADM_AudiocodecImaAdpcm::run(uint8_t *inptr, uint32_t nbIn, float *outptr
 {
 int produced=0,one;
 uint8_t  *start;
+int16_t *run16;
 // Add to buffer
   
   ADM_assert((_tail+nbIn)<IMA_BUFFER);
@@ -140,23 +142,24 @@ uint8_t  *start;
         while((_tail-_head)>=ss_mul)
         {
                 start=(uint8_t *)&(_buffer[_head]);
-                one= 2 * ms_ima_adpcm_decode_block(
-                        (unsigned short *)outptr,start,_channels
-                , ss_mul);
+                one=  ms_ima_adpcm_decode_block(
+                        (unsigned short *)scratchPad,start,_channels , ss_mul);
                 _head+=ss_mul;
-                outptr+=one;
                 produced+=one;
+                run16=(int16_t *)scratchPad;
+                for(int i=0;i<one;i++)
+                {
+                  *outptr++=((float)run16[i])/32767.;
+                }
         }
-        if(_head>IMA_BUFFER/2)
+        if(_tail>IMA_BUFFER/2 && _head)
         {
                 memmove(_buffer,&_buffer[_head],_tail-_head);
                 _tail-=_head;
                 _head=0;
         }
-	*nbOut = produced / 2;
-	int2float(outptr, *nbOut);
-
-	return 1;
+        *nbOut=produced;
+        return 1;
   }
 #if 0
   else if (_me == 0x61)

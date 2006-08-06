@@ -141,12 +141,3 @@ ADM_Audiocodec::ADM_Audiocodec( uint32_t fourcc ) {
 
 ADM_Audiocodec::~ADM_Audiocodec()
 {}
-
-void ADM_Audiocodec::int2float(float *data, uint32_t nb_sample) {
-	int16_t *iptr = (int16_t *) data;
-
-	while (nb_sample  > 0) {
-		nb_sample--;
-		data[nb_sample] = (float) iptr[nb_sample] / 32768;
-	}
-}

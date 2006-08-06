@@ -22,7 +22,7 @@ class ADM_Audiocodec
 {
 	protected:
 		uint8_t	_init;
-		void int2float(float *data, uint32_t nb_sample);
+
 
 	public:
 		ADM_Audiocodec(uint32_t fourcc);

@@ -34,7 +34,7 @@
 
 #define _context ((AVCodecContext *)_contextVoid)
 
-static uint8_t scratchPad[48000*2];
+uint8_t scratchPad[48000*2];
 
    uint8_t ADM_AudiocodecWMA::beginDecompress( void ) 
    {
