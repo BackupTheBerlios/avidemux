@@ -56,7 +56,7 @@ asfAudio::  asfAudio(asfHeader *father)
    ADM_assert(_fd);
    fseeko(_fd,_dataStart,SEEK_SET);
    _packetSize=_father->_packetSize;
-   _packet=new asfPacket(_fd,_packetSize,&readQueue);
+   _packet=new asfPacket(_fd,_packetSize,&readQueue,_dataStart);
   
 }
 /*

@@ -177,7 +177,7 @@ uint8_t asfHeader::open(char *name)
       _isaudiopresent=1;
       _audioTrack=new asfAudio(this);
   }
-  _packet=new asfPacket(_fd,_packetSize,&readQueue);
+  _packet=new asfPacket(_fd,_packetSize,&readQueue,_dataStartOffset);
   curSeq=1;
   return 1;
 }
@@ -230,25 +230,18 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
   curSeq&=0xff;
   //
   uint32_t len=0;
-  aprintf("Framenum %u curSeq %u frameSeq=%u packetnb=%u \n",
-          framenum,curSeq,_index[framenum].segNb,_index[framenum].packetNb);
+  aprintf("Framenum %u len: %u curSeq %u frameSeq=%u packetnb=%u \n",
+         framenum,_index[framenum].frameLen,curSeq,
+         _index[framenum].segNb,_index[framenum].packetNb);
   // Seeking ?
   if(_index[framenum].segNb!=curSeq)
   {
-    uint32_t go;
-    asfIndex *idx=&_index[framenum];
-    go=idx->packetNb;
-    if(go){
-      go--;
-      go=_dataStartOffset+go*_packetSize;
-      printf("Seeking packetnb=%u start=%x end=%u (0x%x)\n",idx->packetNb,_dataStartOffset,go,go);
-    }
-    else
+    printf("Seeking.. curseq:%u wanted seq:%u\n",curSeq,_index[framenum].segNb);
+    if(!_packet->goToPacket(_index[framenum].packetNb))
     {
-      go=_dataStartOffset;
+      printf("[ASF] Cannot seek to frame %u\n",framenum);
+      return 0; 
     }
-    
-    fseeko(_fd,go,SEEK_SET);
     // Flush queue
     while(!readQueue.isEmpty())
     {
@@ -266,25 +259,51 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
   while(1)
   {
    
+    
+    
     while(!readQueue.isEmpty())
     {
       asfBit *bit;
       ADM_assert(readQueue.pop((void**)&bit));
-      aprintf(">found packet of size %d seq %d, while curseq =%d\n",bit->len,bit->sequence,curSeq);
-      // Backward ?
+      aprintf(">found packet of size %d seq %d, while curseq =%d wanted seg=%u current offset=%u\n",bit->len,bit->sequence,curSeq,_index[framenum].segNb,len);
+      // Here it is tricky
+      // if len==0 we are reading the first part of our frame
+      // The packet may starts with segments from the previous frame
+      // discard them
+      // Delta is just a security as it should be slightly >10
       delta=256+bit->sequence-_index[framenum].segNb;
       delta &=0xff;
-      if(_index[framenum].segNb > bit->sequence  && delta!=1)
+      if(!len) // Starting a new frame
       {
-        printf("Dropping seq=%u too old for %u delta %d\n",bit->sequence,_index[framenum].segNb,delta);
-        delete bit;
-        continue; 
+          if(_index[framenum].segNb != bit->sequence )
+          {
+            aprintf("Dropping seq=%u too old for %u delta %d\n",
+                  bit->sequence,_index[framenum].segNb,delta);
+            delete bit;
+            if(delta<230)
+            {
+              printf("Very suspicious\n");
+              printf("Very suspicious\n");
+              printf("Very suspicious\n");
+              printf("Very suspicious\n");
+              printf("Very suspicious\n");
+            }
+            continue; 
+          }
+          // We have found our first chunk
+          curSeq=bit->sequence;
+          memcpy(ptr,bit->data,bit->len);
+          len=bit->len;
+          delete bit;
+          continue;
       }
+      // Continuing a frame
+      // If the seq number is different it is the beginning of a new frame
       if(bit->sequence!=curSeq )
       {
         aprintf("New sequence %u->%u while loading %u frame\n",curSeq,bit->sequence,framenum);
         *framelen=len;
-        readQueue.pushBack(bit);
+        readQueue.pushBack(bit); // don't delete it, we will use it later...
         curSeq=bit->sequence;
         goto gotcha;
       }
@@ -292,7 +311,6 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
       memcpy(ptr+len,bit->data,bit->len);
       len+=bit->len;
       delete bit;
-      
     }
     if(!_packet->nextPacket(_videoStreamId))
     {
@@ -553,8 +571,8 @@ uint8_t asfHeader::buildIndex(void)
   
   // Here we go
   DIA_working *working=new DIA_working("indexing asf");
-  asfPacket *aPacket=new asfPacket(_fd,_packetSize,&readQueue);
-  uint32_t packet=0;
+  asfPacket *aPacket=new asfPacket(_fd,_packetSize,&readQueue,_dataStartOffset);
+  uint32_t packet=1;
   uint32_t sequence=1;
   
   nbImage=0;
@@ -594,7 +612,7 @@ uint8_t asfHeader::buildIndex(void)
         ADM_assert(nbImage<nbPacket*3);
         tmpIndex[nbImage].frameLen=0;
         tmpIndex[nbImage].segNb=bit->sequence;
-        tmpIndex[nbImage].packetNb=packet;
+        tmpIndex[nbImage].packetNb=bit->packet;
         tmpIndex[nbImage].flags=bit->flags;
         readQueue.pushBack(bit);
 

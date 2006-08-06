@@ -33,9 +33,8 @@
 #define MODULE_NAME MODULE_ASF
 #include "ADM_toolkit/ADM_debug.h"
 
-//#define ASF_VERBOSE
-
-asfPacket::asfPacket(FILE *f,uint32_t pSize,ADM_queue *q)
+ 
+asfPacket::asfPacket(FILE *f,uint32_t pSize,ADM_queue *q,uint32_t startDataOffset)
  {
    _fd=f;
    pakSize=pSize;
@@ -46,6 +45,7 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize,ADM_queue *q)
    queue=q;
    ADM_assert(q);
    currentPacket=0;
+   _startDataOffset=startDataOffset;
  }
  asfPacket::~asfPacket()
  {
@@ -57,6 +57,14 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize,ADM_queue *q)
    ADM_assert(0);
    return 1;
   
+ }
+ 
+ uint8_t asfPacket::goToPacket(uint32_t packet)
+ {
+   uint32_t offset=_startDataOffset+packet*pakSize;
+   fseeko(_fd,offset,SEEK_SET);
+   currentPacket=packet;
+   return 1;
  }
  /*
       Read ASF packet & segments 
@@ -88,6 +96,18 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
    uint8_t   flags;
     
    packetStart=ftello(_fd);
+#ifdef ADM_DEBUG
+   uint32_t round=packetStart-_startDataOffset;
+   if(round % pakSize)
+   {
+     printf("[ASF PACKET] we are starting a new packet at 0x%x\n",packetStart); 
+     printf("[ASF PACKET]but data starts at  0x%x\n",_startDataOffset);
+     printf("[ASF PACKET]and offset is not a multiple of length = %d\n",pakSize);
+     ADM_assert(0);
+     
+   }
+#endif
+   _offset=0;
    if(read8()!=0x82) 
    {
      printf("[ASF PACKET]At pos %x \n",ftello(_fd));
@@ -96,7 +116,7 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
      printf("[ASF PACKET]not a 82 packet\n");
      return 0;
    }
-   currentPacket++;
+   
    aprintf("============== New packet ===============\n");
    read16();          // Always 0 ????
    flags=read8();
@@ -123,8 +143,8 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
    if(!packetLen)
    {
      // Padding (relative) size
-     packetLen=ftello(_fd)-packetStart;
-     packetLen=pakSize-packetLen-paddingLen;
+     packetLen=pakSize-_offset;
+     packetLen=packetLen-paddingLen;
    }
 
    
@@ -192,8 +212,8 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
         aprintf("##len                    %d\n",payloadLen);
        
      }
-     remaining=ftello(_fd)-packetStart;
-     remaining=pakSize-remaining-paddingLen;
+     remaining=pakSize-_offset;
+     remaining=remaining-paddingLen;
      aprintf("Remaining %d asked %d\n",remaining,payloadLen);
      if(remaining<=0) 
      {
@@ -255,10 +275,11 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
      
    }
    // Do some sanity check
-   uint32_t pos=ftello(_fd);
-   pos-=packetStart;
-   pos=pakSize-pos;
-   if(pos!=paddingLen) printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! %d %d\n",pos,paddingLen);
+   if(_offset+paddingLen!=pakSize)
+   {
+     printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! %d %d\n",_offset,paddingLen);
+   }
+   currentPacket++;
    return 1;
   
  }
@@ -313,42 +334,6 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
   
    return 1; 
  }
- uint64_t  asfPacket::read64(void)
- {
-   uint64_t lo,hi;
-   lo=read32();
-   hi=read32();
-   return lo+(hi<<32); 
-  
- }
- uint32_t   asfPacket::read32(void)
- {
-   uint8_t c[4];
-  
-   fread(c,4,1,_fd);
-  
-   return c[0]+(c[1]<<8)+(c[2]<<16)+(c[3]<<24);
-  
- }
- uint32_t   asfPacket::read16(void)
- {
-   uint8_t c[2];
-  
-   fread(c,2,1,_fd);
-  
-   return c[0]+(c[1]<<8);
-  
- }
-
- uint8_t   asfPacket::read8(void)
- {
-   uint8_t c[1];
-  
-   fread(c,1,1,_fd);
-  
-   return c[0];
-  
- }
  uint8_t   asfPacket::read(uint8_t *where, uint32_t how)
  {
  
@@ -357,6 +342,9 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
      printf("[AsfPacket] Read error\n");
      return 0; 
    }
+   _offset+=how;
+   ADM_assert(_offset<=pakSize);
+
    return 1;
 
   
@@ -364,6 +352,9 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
  uint8_t   asfPacket::skip( uint32_t how)
  {
    fseeko(_fd,how,SEEK_CUR);
+   _offset+=how;
+   ADM_assert(_offset<=pakSize);
+
    return 1;
  }
  uint8_t   asfPacket::dump(void)
@@ -372,4 +363,8 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
    return 1;
   
  }
+#ifndef ASF_INLINE
+#include "ADM_asfIo.h"
+#endif
+
  //EOF
