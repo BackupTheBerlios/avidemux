@@ -24,6 +24,15 @@
 #include "ADM_audio/aviaudio.hxx"
 
 #include "ADM_toolkit/ADM_queue.h"
+#include "ADM_asfPacket.h"
+
+typedef struct asfIndex
+{
+  uint32_t packetNb;
+  uint32_t frameLen;
+  uint32_t segNb;
+  uint32_t flags;
+};
 
 typedef enum ADM_KNOWN_CHUNK
 {
@@ -108,7 +117,9 @@ class asfHeader         :public vidHeader
     uint32_t                _packetSize;
     ADM_queue               readQueue;
     uint32_t                curSeq;
-    
+    uint32_t                nbImage;
+    asfIndex                *_index;
+    asfPacket               *_packet;
   protected:
                                 
     FILE                    *_fd;

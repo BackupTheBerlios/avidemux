@@ -26,6 +26,7 @@ typedef struct asfBit
   uint32_t len;
   uint32_t stream;
   uint32_t packet;
+  uint32_t flags;
   uint8_t  *data;
 };
 
@@ -33,7 +34,7 @@ class asfPacket
 {
   protected:
     uint32_t        readVCL(uint32_t bitwise);
-    uint8_t         pushPacket(uint32_t packetnb,
+    uint8_t         pushPacket(uint32_t flags,uint32_t packetnb,
                                 uint32_t offset,uint32_t sequence,uint32_t payloadLen,uint32_t stream);
     uint8_t         skip( uint32_t how);
     FILE            *_fd;
