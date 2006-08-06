@@ -34,7 +34,7 @@
 
 #define _context ((AVCodecContext *)_contextVoid)
 
-uint8_t scratchPad[48000*2];
+uint8_t scratchPad[SCRATCH_PAD_SIZE];
 
    uint8_t ADM_AudiocodecWMA::beginDecompress( void ) 
    {
@@ -68,7 +68,6 @@ uint8_t scratchPad[48000*2];
     _blockalign=info->blockalign;
     _context->extradata=(void *)d;
     _context->extradata_size=(int)l;
-
     printf(" Using %ld bytes of extra header data\n",l);
     mixDump((uint8_t *)_context->extradata,_context->extradata_size);
 
@@ -111,7 +110,7 @@ int16_t *run16;
         while(_tail-_head>=_blockalign)
         {
           out=avcodec_decode_audio(_context,(int16_t *)scratchPad,
-                                   &pout,_buffer+_head,_blockalign);
+                                   &pout,_buffer+_head,_tail-_head);
                 
           if(out<0)
           {
@@ -119,7 +118,7 @@ int16_t *run16;
             _head+=1; // Try skipping some bytes
             continue;
           }
-            
+          ADM_assert(pout<SCRATCH_PAD_SIZE);
           _head+=out; // consumed bytes
           pout>>=1;
           *nbOut+=pout;
