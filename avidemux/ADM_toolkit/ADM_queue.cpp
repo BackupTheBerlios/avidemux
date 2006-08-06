@@ -37,6 +37,7 @@ ADM_queue::~ADM_queue()
 uint8_t ADM_queue::isEmpty(void)
 {
   if(head) return 0;
+  ADM_assert(!tail);
   return 1; 
 }
 uint8_t ADM_queue::push(void *data)
@@ -58,9 +59,10 @@ uint8_t ADM_queue::push(void *data)
 uint8_t ADM_queue::pushBack(void *data)
 {
   queueElem *elem=new queueElem;
-  
+
   elem->next=head;
   elem->data=data;
+  if(!head) tail=elem;
   head=elem;
   return 1;
 }
@@ -68,10 +70,15 @@ uint8_t ADM_queue::pop(void **data)
 {
   ADM_assert(head);
   *data=NULL;
-  if(isEmpty()) return 0; 
+  if(isEmpty()) return 0;
   *data=head->data;
+  queueElem *tmp=head;
   head=head->next;
-  delete head;
+  if(!head)
+  {
+    head=tail=NULL; 
+  }
+  delete tmp;
   return 1;
 }
 //EOF 
