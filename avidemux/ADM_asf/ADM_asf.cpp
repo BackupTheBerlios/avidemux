@@ -290,8 +290,9 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
       }
       // still same sequence ...add
       memcpy(ptr+len,bit->data,bit->len);
-      delete bit;
       len+=bit->len;
+      delete bit;
+      
     }
     if(!_packet->nextPacket(_videoStreamId))
     {
