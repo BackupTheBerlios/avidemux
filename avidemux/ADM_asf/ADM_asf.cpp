@@ -239,6 +239,7 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
   
   
   len=0;
+  uint32_t delta;
   while(1)
   {
    
@@ -248,9 +249,11 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
       ADM_assert(readQueue.pop((void**)&bit));
       aprintf(">found packet of size %d seq %d, while curseq =%d\n",bit->len,bit->sequence,curSeq);
       // Backward ?
-      if(_index[framenum].segNb > bit->sequence)
+      delta=256+bit->sequence-_index[framenum].segNb;
+      delta &=0xff;
+      if(_index[framenum].segNb > bit->sequence  && delta!=1)
       {
-        aprintf("Dropping seq=%u too old for %u\n",bit->sequence,_index[framenum].segNb);
+        printf("Dropping seq=%u too old for %u delta %d\n",bit->sequence,_index[framenum].segNb,delta);
         delete bit;
         continue; 
       }
