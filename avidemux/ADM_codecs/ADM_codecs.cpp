@@ -257,6 +257,12 @@ getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
 
       return (decoders *) (new decoderFFWMV2 (w, h, extraLen, extraData));
     }
+    if (fourCC::check (fcc, (uint8_t *) "WMV1"))
+    {
+
+      return (decoders *) (new decoderFFWMV1 (w, h, extraLen, extraData));
+    }
+  
   if (fourCC::check (fcc, (uint8_t *) "WMV3"))
     {
 
