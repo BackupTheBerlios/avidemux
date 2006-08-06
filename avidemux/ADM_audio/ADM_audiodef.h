@@ -14,7 +14,7 @@ typedef struct
     uint16_t	blockalign;				/* Bytes per sample block */
     uint16_t	bitspersample;		/* One of 8, 12, 16, or 4 for ADPCM */
 } WAVHeader;
-
+void printWavHeader(WAVHeader *hdr);
 typedef enum CHANNEL_CONF
 {
     CHANNEL_INVALID=0,

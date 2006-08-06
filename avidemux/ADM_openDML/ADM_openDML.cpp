@@ -624,16 +624,9 @@ void OpenDMLHeader::Dump( void )
 	      	
 	  
 #undef X_DUMP
-#define X_DUMP(x) printf("\n "#x":\t\t:%lu",_audioTracks[i].wavHeader->x);
 
-	  X_DUMP(encoding);
-	  X_DUMP(channels);	/* 1 = mono, 2 = stereo */
-	  X_DUMP(frequency);	/* One of 11025, 22050, or 44100 Hz */
-	  X_DUMP(byterate);	/* Average bytes per second */
-	  X_DUMP(blockalign);	/* Bytes per sample block */
-	  X_DUMP(bitspersample);	/* One of 8, 12, 16, or 4 for ADPCM */
-	  
-	  printf(" Extra Data  : %ld\n",_audioTracks[i].extraDataLen);
+        printWavHeader(_audioTracks[i].wavHeader);
+        printf(" Extra Data  : %ld\n",_audioTracks[i].extraDataLen);
 	if(_audioTracks[i].extraDataLen)
 	{
 		mixDump( _audioTracks[i].extraData, _audioTracks[i].extraDataLen);
