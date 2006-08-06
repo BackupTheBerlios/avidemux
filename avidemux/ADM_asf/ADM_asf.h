@@ -89,15 +89,18 @@ typedef struct asfAudioTrak
 class asfAudio : public AVDMGenericAudioStream
 {
   protected:
-    void                    *_context;
-    uint32_t                _trackIndex;
-    WAVHeader               _wavHeader;
     uint32_t                _extraDataLen;
     uint8_t                 *_extraData;
     char                    *myName;
-    
+    uint32_t                _streamId;
+    uint32_t                _dataStart;
+    asfPacket               *_packet;
+    FILE                    *_fd;
+    ADM_queue               readQueue;
+    uint32_t                _packetSize;
+    class asfHeader         *_father;
   public:
-                                asfAudio(char *name,asfAudioTrak *track);
+                                asfAudio(asfHeader *father);
     virtual                     ~asfAudio();
     virtual uint32_t            read(uint32_t len,uint8_t *buffer);
     virtual uint8_t             goTo(uint32_t newoffset);
@@ -114,12 +117,12 @@ class asfHeader         :public vidHeader
     uint8_t                 getHeaders( void);
     uint8_t                 buildIndex(void);
     uint8_t                 loadVideo(asfChunk *s);
-    uint32_t                _packetSize;
+    
     ADM_queue               readQueue;
     uint32_t                curSeq;
-    uint32_t                nbImage;
-    asfIndex                *_index;
     asfPacket               *_packet;
+    
+    asfAudio                *_audioTrack;
   protected:
                                 
     FILE                    *_fd;
@@ -128,13 +131,25 @@ class asfHeader         :public vidHeader
     uint32_t                _nbAudioTrack;
     asfAudioTrak            *_audioTracks;
     asfAudio                *_curAudio;
-    char                    *myName;
+    
     
     uint32_t                _extraDataLen;
     uint8_t                 *_extraData;
     
-    uint32_t                _dataStartOffset;
+    
     uint32_t                _videoStreamId;
+    
+  public: // Shared with audio track
+    uint32_t                _audioStreamId;
+    char                    *myName;
+    WAVHeader               *_wavHeader;
+    uint32_t                nbImage;
+    asfIndex                *_index;
+    uint32_t                _packetSize;
+    uint32_t                _dataStartOffset;
+    uint32_t                _audioExtraDataLen;
+    uint8_t                 *_audioExtraData;
+    
   public:
 
 

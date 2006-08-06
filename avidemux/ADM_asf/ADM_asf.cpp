@@ -41,7 +41,7 @@ static const uint8_t asf_video[16]={0xc0,0xef,0x19,0xbc,0x4d,0x5b,0xcf,0x11,0xa8
 WAVHeader *asfHeader::getAudioInfo(void )
 {
   
-  return NULL;
+  return _wavHeader;
 }
 /*
     __________________________________________________________
@@ -50,8 +50,8 @@ WAVHeader *asfHeader::getAudioInfo(void )
 uint8_t asfHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {
  
-  *audio=NULL;
-  return 0; 
+  *audio=_audioTrack;
+  return 1; 
 }
 /*
     __________________________________________________________
@@ -99,6 +99,13 @@ uint8_t asfHeader::close(void)
   if(_packet)
     delete _packet;
   _packet=NULL;
+  if(_wavHeader) delete _wavHeader;
+  _wavHeader=NULL;
+  if(_audioTrack) delete _audioTrack;
+  _audioTrack=NULL;
+  
+  if(_audioExtraData) delete _audioExtraData;
+  _audioExtraData=NULL;
 }
 uint8_t       asfHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
@@ -129,9 +136,14 @@ uint8_t asfHeader::needDecompress(void)
   _extraData=NULL;
   _packetSize=0;
   _videoStreamId=0;
+  _audioStreamId=0;
   nbImage=0;
   _index=NULL;
   _packet=NULL;
+  _wavHeader=NULL;
+  _audioTrack=NULL;
+  _audioExtraData=NULL;
+  _audioExtraDataLen=0;
 }
 /*
     __________________________________________________________
@@ -160,6 +172,11 @@ uint8_t asfHeader::open(char *name)
   }
   buildIndex();
   fseeko(_fd,_dataStartOffset,SEEK_SET);
+  if(_nbAudioTrack)
+  {
+      _isaudiopresent=1;
+      _audioTrack=new asfAudio(this);
+  }
   _packet=new asfPacket(_fd,_packetSize,&readQueue);
   curSeq=1;
   return 1;
@@ -221,9 +238,15 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
     uint32_t go;
     asfIndex *idx=&_index[framenum];
     go=idx->packetNb;
-    if(go>=1) go--;
-    go=_dataStartOffset+go*_packetSize;
-    printf("Seeking packetnb=%u start=%x end=%u (0x%x)\n",idx->packetNb,_dataStartOffset,go,go);
+    if(go){
+      go--;
+      go=_dataStartOffset+go*_packetSize;
+      printf("Seeking packetnb=%u start=%x end=%u (0x%x)\n",idx->packetNb,_dataStartOffset,go,go);
+    }
+    else
+    {
+      go=_dataStartOffset;
+    }
     
     fseeko(_fd,go,SEEK_SET);
     // Flush queue
@@ -397,7 +420,28 @@ uint8_t asfHeader::getHeaders(void)
           }
               break;
           case 2: // audio
-              break;
+          {
+            
+            _wavHeader=new WAVHeader;
+            s->read((uint8_t *)_wavHeader,sizeof(WAVHeader));
+            _audioExtraDataLen=s->read16();
+            printWavHeader(_wavHeader);
+            printf("Extension :%u bytes\n",_audioExtraDataLen);
+            if(_audioExtraDataLen)
+            {
+              _audioExtraData=new uint8_t[_audioExtraDataLen];
+              s->read(_audioExtraData,_audioExtraDataLen);
+            }
+              printf("#block in group   :%d\n",s->read8());
+              printf("#byte in group    :%d\n",s->read16());
+              printf("Align1            :%d\n",s->read16());
+              printf("Align2            :%d\n",s->read16());
+            
+              _audioStreamId=sid;
+            _nbAudioTrack++;
+            
+          }
+          break;
           default:break; 
           
         }
@@ -475,7 +519,7 @@ uint8_t asfHeader::buildIndex(void)
   fseeko(_fd,0,SEEK_SET);
   
   asfChunk h(_fd);
-  printf("[ASF] Building index\n");
+  printf("[ASF] ********** Building index **********\n");
   printf("[ASF] Searching data\n");
   while(r--)
   {
@@ -516,7 +560,7 @@ uint8_t asfHeader::buildIndex(void)
   asfIndex *tmpIndex=new asfIndex[nbPacket*3];
   memset(tmpIndex,0,sizeof(asfIndex)*nbPacket);
   len=0;
-  
+  tmpIndex[0].segNb=1;
   while(packet<nbPacket)
   {
     while(!readQueue.isEmpty())
@@ -575,6 +619,7 @@ uint8_t asfHeader::buildIndex(void)
   
   fseeko(_fd,_dataStartOffset,SEEK_SET);
   printf("[ASF]%u images found\n",nbImage);
+  printf("[ASF] ******** End of buildindex *******\n");
   _videostream.dwLength=_mainaviheader.dwTotalFrames=nbImage;
   return 1;
   
