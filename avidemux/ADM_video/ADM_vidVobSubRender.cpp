@@ -239,6 +239,8 @@ uint8_t  command;
 uint32_t pts;
 uint64_t posA,posR;
  uint32_t odd,even;
+int doneA=0;
+int doneB=0;
         _parser->getPos(&posA,&posR);
         // Read data
 aprintf("**Cur:A:%llx R:%llx next:%llx\n",posA,posR,_vobSubInfo->lines[idx+1].fileOffset);        
@@ -339,7 +341,8 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
                                         {
                                                 uint16_t a,b,c;
                                                 uint32_t nx1,nx2,ny1,ny2;
-                                                
+                                                if(doneA) return 1;
+                                                doneA++;
                                                 a=readword();
                                                 b=readword();
                                                 c=readword();
@@ -373,7 +376,9 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
                                 case 06: // RLE offset 
                                         // 2*16 bits : odd offset, even offset
                                         {
-                                       
+                                                if(doneB) return 1;
+                                                doneB++;
+
                                         odd=readword();                                        
                                         even=readword();
  

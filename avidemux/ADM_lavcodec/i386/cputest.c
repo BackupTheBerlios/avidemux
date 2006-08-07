@@ -2,7 +2,6 @@
    and R. Fisher). Converted to C and improved by Fabrice Bellard */
 
 #include <stdlib.h>
-#include "config.h" // MEANX
 #include "../dsputil.h"
 
 #ifdef ARCH_X86_64
@@ -61,15 +60,14 @@ int mm_support(void)
         cpuid(1, eax, ebx, ecx, std_caps);
         if (std_caps & (1<<23))
             rval |= MM_MMX;
-#if 1 || !defined( ADM_DEBUG)
+#if 0
         if (std_caps & (1<<25))
             rval |= MM_MMXEXT | MM_SSE;
-
         if (std_caps & (1<<26))
             rval |= MM_SSE2;
         if (ecx & 1)
             rval |= MM_SSE3;
-#endif        
+#endif
     }
 
     cpuid(0x80000000, max_ext_level, ebx, ecx, edx);

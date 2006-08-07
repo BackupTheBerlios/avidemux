@@ -365,13 +365,72 @@ uint8_t asfHeader::getHeaders(void)
   for(i=0;i<nbSubChunk;i++)
   {
     asfChunk *s=new asfChunk(_fd);
-    
+    uint32_t skip;
     s->nextChunk();
     printf("***************\n");  
     id=s->chunkId();
     s->dump();
     switch(id->id)
     {
+#if 0      
+      case ADM_CHUNK_HEADER_EXTENSION_CHUNK:
+      {
+        s->skip(16); // Clock type extension ????
+        printf("?? %d\n",s->read16());
+        printf("?? %d\n",s->read32());
+          
+        uint32_t streamNameCount;
+        uint32_t payloadCount;
+          
+          asfChunk *u=new asfChunk(_fd);
+          for(int zzz=0;zzz<8;zzz++)
+          {
+              u->nextChunk();
+              u->dump();
+              id=u->chunkId();
+              if(id->id==ADM_CHUNK_EXTENDED_STREAM_PROP)
+              {
+                  s->skip(8); // start time 
+                  s->skip(8); // end time
+                  printf("Bitrate         %u :\n",u->read32());
+                  printf("Buffer Size     %u :\n",u->read32());
+                  printf("BFill           %u :\n",u->read32());
+                  printf("Alt Bitrate     %u :\n",u->read32());
+                  printf("Alt Bsize       %u :\n",u->read32());
+                  printf("Alt Bfullness   %u :\n",u->read32());
+                  printf("Max object Size %u :\n",u->read32());
+                  printf("Flags           0x%x :\n",u->read32());
+                  printf("Stream no       %u :\n",u->read16());
+                  printf("Stream lang     %u :\n",u->read16());
+                  printf("Stream time/fra %lu :\n",u->read64());
+                  streamNameCount=u->read16();
+                  payloadCount=u->read16();
+                  printf("Stream Nm Count %u :\n",streamNameCount);
+                  printf("Payload count   %u :\n",payloadCount);
+                  for(int stream=0;stream<streamNameCount;stream++)
+                  {
+                    u->read16();
+                    skip=u->read16();
+                    u->skip(skip);
+                  }
+                  uint32_t size;
+                  for(int payload=0;payload<payloadCount;payload++)
+                  {
+                    for(int pp=0;pp<16;pp++) printf("0x%02x,",u->read8());
+                    printf("\n");
+                    skip=u->read16();
+                    size=u->read32();
+                    u->skip(size);
+                    printf("Extra Data : %d, skipd %d\n",size,skip);
+                  }
+                  printf("We are at %x\n",ftello(_fd));
+                }
+                u->skipChunk();
+          }
+          delete u;
+      }
+      break;
+#endif      
       case ADM_CHUNK_FILE_HEADER_CHUNK:
         {
             // Client GID
@@ -464,7 +523,6 @@ uint8_t asfHeader::getHeaders(void)
           default:break; 
           
         }
-        
       }
       break;
        default:
@@ -500,7 +558,10 @@ uint8_t asfHeader::loadVideo(asfChunk *s)
             _videostream.fccHandler=_video_bih.biCompression;
             printf("Codec : <%s> (%04x)\n",
                     fourCC::tostring(_video_bih.biCompression),_video_bih.biCompression);
-            
+            if(fourCC::check(_video_bih.biCompression,(uint8_t *)"DVR "))
+            {
+              _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"MPEG");
+            }
             printBih(&_video_bih);
             if(x>sizeof(BITMAPINFOHEADER))
             {

@@ -42,11 +42,16 @@ typedef enum ADM_KNOWN_CHUNK
   ADM_CHUNK_STREAM_HEADER_CHUNK,
   ADM_CHUNK_STREAM_GROUP_ID,
   ADM_CHUNK_DATA_CHUNK,
+  ADM_CHUNK_HEADER_EXTENSION_CHUNK,
+  ADM_CHUNK_CLOCK_TYPE_EX,
+  ADM_CHUNK_LANGUAGE_LIST_EX,
+  ADM_CHUNK_EXTENDED_STREAM_PROP,
   ADM_CHUNK_UNKNOWN_CHUNK
 };
 typedef struct chunky
 {
   const char *name;
+  uint32_t len;
   uint8_t val[16];
   ADM_KNOWN_CHUNK id; 
 };
@@ -65,7 +70,7 @@ class asfChunk
   uint64_t  chunkLen;
   
   uint8_t   readChunkPayload(uint8_t *data, uint32_t *dataLen);
-  uint8_t   nextChunk(void);
+  uint8_t   nextChunk(int shortChunk=0);
   uint8_t   skipChunk(void);
   uint64_t  read64(void);
   uint32_t  read32(void);
@@ -73,6 +78,7 @@ class asfChunk
   uint8_t   read8(void);
   uint8_t   read(uint8_t *where, uint32_t how);
   const chunky    *chunkId(void);
+  uint8_t   skip(uint32_t skip);
 };
 
 typedef struct asfAudioTrak
