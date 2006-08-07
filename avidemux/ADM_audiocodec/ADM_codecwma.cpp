@@ -57,7 +57,8 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
     // Fills in some values...
     _context->sample_rate = info->frequency;
     _context->channels = info->channels;
-    _context->block_align = info->blockalign;      
+    _blockalign=_context->block_align = info->blockalign;
+    _context->bit_rate = info->byterate*8;
     if(fourcc==WAV_WMA)
         _context->codec_id = CODEC_ID_WMAV2;
     else
@@ -65,7 +66,6 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
         _context->codec_id = CODEC_ID_QDM2;
             else ADM_assert(0);
 
-    _blockalign=info->blockalign;
     _context->extradata=(void *)d;
     _context->extradata_size=(int)l;
     printf(" Using %ld bytes of extra header data\n",l);
@@ -77,6 +77,15 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
     {
         printf("\n WMA decoder init failed !\n");
         ADM_assert(0);
+    }
+    if(!_blockalign)
+    { 
+      if(_context->block_align) _blockalign=_context->block_align;
+      else
+      {
+        printf("FFWMA : no blockalign taking 378\n");
+        _blockalign=378;   
+      }
     }
     printf("FFwma init successful (blockalign %d)\n",info->blockalign);
 }
