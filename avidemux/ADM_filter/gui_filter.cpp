@@ -173,12 +173,15 @@ GUI_handleFilter (void)
 
   updateFilterList ();
   gtk_register_dialog (dialog);
-  gtk_widget_show (dialog);
+  //gtk_widget_show (dialog);
   
   gui_act ac;
   int run = 1, reply;
   while (run)
     {
+#ifdef CYG_MANGLING
+      gtk_widget_hide(GTK_WIDGET(dialog));
+#endif
       reply = gtk_dialog_run (GTK_DIALOG (dialog));
       //printf("Action : %d\n",reply);
       if (reply > A_BEGIN && reply < A_END)

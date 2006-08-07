@@ -69,13 +69,14 @@ void gtk_register_dialog(GtkWidget *newdialog)
         // old one is no longer modal
         if(widgetCount)
         {
-//#ifndef CYG_MANGLING                
+#ifndef CYG_MANGLING                
                 gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount-1]), 0);
-                gtk_window_set_transient_for (GTK_WINDOW(newdialog),GTK_WINDOW(widgetStack[widgetCount-1]));
-//#endif                
+#endif
+                gtk_window_set_transient_for (GTK_WINDOW(newdialog),GTK_WINDOW(widgetStack[widgetCount-1]));              
         }
+#ifndef CYG_MANGLING
         gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount]), 1);
-        
+#endif
         widgetCount++;
 }
 void gtk_unregister_dialog(GtkWidget *newdialog)
@@ -89,8 +90,7 @@ void gtk_unregister_dialog(GtkWidget *newdialog)
 #ifndef CYG_MANGLING  		
 		gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount-1]), 1);
 #else
-		if(widgetCount>1) gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount-1]), 1);
-		else gtk_window_present(GTK_WINDOW(widgetStack[widgetCount-1]));
+		gtk_window_present(GTK_WINDOW(widgetStack[0]));
 #endif
 	}
 
