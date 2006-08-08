@@ -144,6 +144,7 @@ uint8_t asfHeader::needDecompress(void)
   _audioTrack=NULL;
   _audioExtraData=NULL;
   _audioExtraDataLen=0;
+  _audioLen=0;
 }
 /*
     __________________________________________________________
@@ -635,9 +636,9 @@ uint8_t asfHeader::buildIndex(void)
   asfPacket *aPacket=new asfPacket(_fd,_packetSize,&readQueue,_dataStartOffset);
   uint32_t packet=1;
   uint32_t sequence=1;
-  
+#define MAXIMAGE nbPacket*10
   nbImage=0;
-  asfIndex *tmpIndex=new asfIndex[nbPacket*3];
+  asfIndex *tmpIndex=new asfIndex[MAXIMAGE];
   memset(tmpIndex,0,sizeof(asfIndex)*nbPacket);
   len=0;
   tmpIndex[0].segNb=1;
@@ -647,47 +648,58 @@ uint8_t asfHeader::buildIndex(void)
     {
       asfBit *bit=NULL;
       ADM_assert(readQueue.pop((void**)&bit));
-      aprintf(">found packet of size %d seq %d, while curseq =%d\n",bit->len,bit->sequence,curSeq);
-      if(bit->sequence!=sequence)
+      if(bit->stream==_audioStreamId)
       {
-        tmpIndex[nbImage].frameLen=len;
-        aprintf("New sequence\n");
-        if( ((sequence+1)&0xff)!=(bit->sequence&0xff))
-        {
-            printf("!!!!!!!!!!!! non continuous sequence %u %u\n",sequence,bit->sequence); 
-#if 1            
-            // Let's insert a couple of null frame
-            int32_t delta,start,end;
-            
-            start=256+bit->sequence-sequence-1;
-            start&=0xff;
-            printf("!!!!!!!!!!!! Delta %d\n",start);
-            
-            for(int filler=0;filler<start;filler++)
-            {
-              tmpIndex[++nbImage].frameLen=0;
-            }
-#endif            
-        }
-        nbImage++;
-        ADM_assert(nbImage<nbPacket*3);
-        tmpIndex[nbImage].frameLen=0;
-        tmpIndex[nbImage].segNb=bit->sequence;
-        tmpIndex[nbImage].packetNb=bit->packet;
-        tmpIndex[nbImage].flags=bit->flags;
-        readQueue.pushBack(bit);
-
-        sequence=bit->sequence;
-        len=0;
-        continue;
+        _audioLen+=bit->len; 
       }
+      else if(bit->stream==_videoStreamId)
+      {
+          aprintf(">found packet of size %d seq %d, while curseq =%d\n",bit->len,bit->sequence,curSeq);
+          if(bit->sequence!=sequence)
+          {
+            tmpIndex[nbImage].frameLen=len;
+            aprintf("New sequence\n");
+            if( ((sequence+1)&0xff)!=(bit->sequence&0xff))
+            {
+                printf("!!!!!!!!!!!! non continuous sequence %u %u\n",sequence,bit->sequence); 
+    #if 1            
+                // Let's insert a couple of null frame
+                int32_t delta,start,end;
+                
+                start=256+bit->sequence-sequence-1;
+                start&=0xff;
+                printf("!!!!!!!!!!!! Delta %d\n",start);
+                
+                for(int filler=0;filler<start;filler++)
+                {
+                  tmpIndex[++nbImage].frameLen=0;
+                }
+    #endif            
+            }
+            nbImage++;
+            ADM_assert(nbImage<MAXIMAGE);
+            tmpIndex[nbImage].frameLen=0;
+            tmpIndex[nbImage].segNb=bit->sequence;
+            tmpIndex[nbImage].packetNb=bit->packet;
+            tmpIndex[nbImage].flags=bit->flags;
+            tmpIndex[nbImage].audioSeen=_audioLen;
+            readQueue.pushBack(bit);
+    
+            sequence=bit->sequence;
+            len=0;
+            continue;
+          }
       len+=bit->len;
+      }else
+      {
+        printf("Unmapped stream Id %d\n",bit->stream); 
+      }
       delete bit;
     }
     working->update(packet,nbPacket);
 
     packet++;
-    aPacket->nextPacket(_videoStreamId);
+    aPacket->nextPacket(0xff); // All packets
     aPacket->skipPacket();
   }
   delete aPacket;

@@ -249,7 +249,7 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
          {
            
            printf("oops exceeding %d/%d\n",l,payloadLen);
-           if(streamId==streamWanted)
+           if(streamId==streamWanted || streamWanted==0xff)
            {
              pushPacket(keyframe,currentPacket,offset,sequence,payloadLen,streamId);
              
@@ -265,7 +265,7 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
        
      }else
      { // else we read "payloadLen" bytes and put them at offset "offset"
-       if(streamId==streamWanted)
+       if(streamId==streamWanted|| streamWanted==0xff)
        {
          pushPacket(keyframe,currentPacket,offset,sequence,payloadLen,streamId);    
        }else

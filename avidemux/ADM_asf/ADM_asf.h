@@ -32,6 +32,7 @@ typedef struct asfIndex
   uint32_t frameLen;
   uint32_t segNb;
   uint32_t flags;
+  uint32_t audioSeen;
 };
 
 typedef enum ADM_KNOWN_CHUNK
@@ -155,7 +156,7 @@ class asfHeader         :public vidHeader
     uint32_t                _dataStartOffset;
     uint32_t                _audioExtraDataLen;
     uint8_t                 *_audioExtraData;
-    
+    uint32_t                _audioLen;
   public:
 
 

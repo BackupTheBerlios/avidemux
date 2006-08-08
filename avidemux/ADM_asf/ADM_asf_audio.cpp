@@ -49,7 +49,7 @@ asfAudio::  asfAudio(asfHeader *father)
     _wavheader=_father->_wavHeader;
    _extraDataLen=0;
    _extraData=NULL;
-   _length=0xffffff;
+   _length=_father->_audioLen;
    _streamId=_father->_audioStreamId;
    _dataStart=_father->_dataStartOffset;
    _fd=fopen(_father->myName,"rb");
@@ -57,6 +57,7 @@ asfAudio::  asfAudio(asfHeader *father)
    fseeko(_fd,_dataStart,SEEK_SET);
    _packetSize=_father->_packetSize;
    _packet=new asfPacket(_fd,_packetSize,&readQueue,_dataStart);
+   printf("[asfAudio] Length %u\n",_length);
   
 }
 /*
@@ -75,6 +76,33 @@ uint32_t            asfAudio::read(uint32_t len,uint8_t *buffer)
 
 uint8_t   asfAudio::goTo(uint32_t newoffset)
 {
+  // Look into the index until we find the audio
+  // just after the wanted value
+  for(int i=0;i<_father->nbImage;i++)
+  {
+    if(!_father->_index[i].audioSeen) continue;
+    if(_father->_index[i].audioSeen>=newoffset)
+    {
+      // Flush queue
+      while(!readQueue.isEmpty())
+      {
+        asfBit *bit;
+        ADM_assert(readQueue.pop((void**)&bit));
+        delete bit;
+      }
+      // Seek
+      if(!_packet->goToPacket(_father->_index[i].packetNb))
+      {
+        printf("[asfAudio] Cannot seek to frame %u\n",i);
+        return 0; 
+      }
+      printf("[asfAudio]For audio %u, seeking to packet %u\n",newoffset,_father->_index[i].packetNb);
+      _packet->nextPacket(_streamId);
+      _packet->skipPacket();
+      return 1;
+    }
+  }
+  printf("[asfAudio] Seek failed for offset=%u\n",newoffset);
   return 1; 
 }
 /*
@@ -83,6 +111,15 @@ uint8_t   asfAudio::goTo(uint32_t newoffset)
 
 uint8_t   asfAudio::goToTime(uint32_t newoffset)
 {
+  // Compute the linear version
+  float f;
+  uint32_t val;
+  
+  f=newoffset;
+  f*=_wavheader->byterate;
+  
+  val=(uint32_t)((f+459.)/1000.);
+  goTo(val);
   return 1; 
 }
 /*
