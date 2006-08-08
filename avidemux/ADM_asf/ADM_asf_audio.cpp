@@ -42,22 +42,25 @@ asfAudio::~asfAudio()
     __________________________________________________________
 */
                                
-asfAudio::  asfAudio(asfHeader *father)
+asfAudio::asfAudio(asfHeader *father,uint32_t myRank)
 {
   printf("[asfAudio] Creating track\n");
+    _myRank=myRank;
     _father=father;
-    _wavheader=_father->_wavHeader;
-   _extraDataLen=0;
-   _extraData=NULL;
-   _length=_father->_audioLen;
-   _streamId=_father->_audioStreamId;
-   _dataStart=_father->_dataStartOffset;
-   _fd=fopen(_father->myName,"rb");
-   ADM_assert(_fd);
-   fseeko(_fd,_dataStart,SEEK_SET);
-   _packetSize=_father->_packetSize;
-   _packet=new asfPacket(_fd,_packetSize,&readQueue,_dataStart);
-   printf("[asfAudio] Length %u\n",_length);
+    _track=&(_father->_allAudioTracks[myRank]);
+    
+    _wavheader=&(_track->wavHeader);
+    _extraDataLen=_track->extraDataLen;
+    _extraData=_track->extraData;
+    _length=_track->length;
+    _streamId=_track->streamIndex;
+    _dataStart=_father->_dataStartOffset;
+    _fd=fopen(_father->myName,"rb");
+    ADM_assert(_fd);
+    fseeko(_fd,_dataStart,SEEK_SET);
+    _packetSize=_father->_packetSize;
+    _packet=new asfPacket(_fd,_packetSize,&readQueue,_dataStart);
+    printf("[asfAudio] Length %u\n",_length);
   
 }
 /*
@@ -80,8 +83,8 @@ uint8_t   asfAudio::goTo(uint32_t newoffset)
   // just after the wanted value
   for(int i=0;i<_father->nbImage;i++)
   {
-    if(!_father->_index[i].audioSeen) continue;
-    if(_father->_index[i].audioSeen>=newoffset)
+    if(!_father->_index[i].audioSeen[_myRank]) continue;
+    if(_father->_index[i].audioSeen[_myRank]>=newoffset)
     {
       // Flush queue
       while(!readQueue.isEmpty())
@@ -128,10 +131,10 @@ uint8_t   asfAudio::goToTime(uint32_t newoffset)
 
 uint8_t   asfAudio::extraData(uint32_t *l,uint8_t **d)
 {
-  if(_father->_audioExtraData)
+  if(_extraData)
   {
-    *l=_father->_audioExtraDataLen;
-    *d=_father->_audioExtraData;  
+    *l=_extraDataLen;
+    *d=_extraData;  
   }
   else
   {

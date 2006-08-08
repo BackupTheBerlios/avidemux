@@ -40,8 +40,8 @@ static const uint8_t asf_video[16]={0xc0,0xef,0x19,0xbc,0x4d,0x5b,0xcf,0x11,0xa8
 
 WAVHeader *asfHeader::getAudioInfo(void )
 {
-  
-  return _wavHeader;
+  if(!_curAudio) return NULL;
+  return _curAudio->getInfo();
 }
 /*
     __________________________________________________________
@@ -50,7 +50,7 @@ WAVHeader *asfHeader::getAudioInfo(void )
 uint8_t asfHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {
  
-  *audio=_audioTrack;
+  *audio=_curAudio;
   return 1; 
 }
 /*
@@ -99,13 +99,13 @@ uint8_t asfHeader::close(void)
   if(_packet)
     delete _packet;
   _packet=NULL;
-  if(_wavHeader) delete _wavHeader;
-  _wavHeader=NULL;
-  if(_audioTrack) delete _audioTrack;
-  _audioTrack=NULL;
   
-  if(_audioExtraData) delete _audioExtraData;
-  _audioExtraData=NULL;
+  for(int i=0;i<_nbAudioTrack;i++)
+  {
+    asfAudioTrak *trk=&(_allAudioTracks[i]);
+    if(trk->extraData) delete [] trk->extraData;
+    delete trk; 
+  }
 }
 uint8_t       asfHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
 {
@@ -128,23 +128,20 @@ uint8_t asfHeader::needDecompress(void)
  asfHeader::asfHeader( void ) : vidHeader()
 {
   _fd=NULL;
-  _audioIndex=_videoIndex=-1;
-  _nbAudioTrack=0;
-  _audioTracks=NULL;
+  _videoIndex=-1;
   myName=NULL;
   _extraDataLen=0;
   _extraData=NULL;
   _packetSize=0;
   _videoStreamId=0;
-  _audioStreamId=0;
   nbImage=0;
   _index=NULL;
   _packet=NULL;
-  _wavHeader=NULL;
-  _audioTrack=NULL;
-  _audioExtraData=NULL;
-  _audioExtraDataLen=0;
-  _audioLen=0;
+  _curAudio=NULL;
+  memset(&_allAudioTracks,0,sizeof(_allAudioTracks));
+
+  _nbAudioTrack=0;
+  _currentAudioStream=0;
 }
 /*
     __________________________________________________________
@@ -173,13 +170,12 @@ uint8_t asfHeader::open(char *name)
   }
   buildIndex();
   fseeko(_fd,_dataStartOffset,SEEK_SET);
-  if(_nbAudioTrack)
-  {
-      _isaudiopresent=1;
-      _audioTrack=new asfAudio(this);
-  }
   _packet=new asfPacket(_fd,_packetSize,&readQueue,_dataStartOffset);
   curSeq=1;
+  if(_nbAudioTrack)
+  {
+    _curAudio=new asfAudio(this,_currentAudioStream);
+  }
   return 1;
 }
 /*
@@ -500,24 +496,22 @@ uint8_t asfHeader::getHeaders(void)
               break;
           case 2: // audio
           {
-            
-            _wavHeader=new WAVHeader;
-            s->read((uint8_t *)_wavHeader,sizeof(WAVHeader));
-            _audioExtraDataLen=s->read16();
-            printWavHeader(_wavHeader);
-            printf("Extension :%u bytes\n",_audioExtraDataLen);
-            if(_audioExtraDataLen)
+            asfAudioTrak *trk=&(_allAudioTracks[_nbAudioTrack]);
+            ADM_assert(_nbAudioTrack<ASF_MAX_AUDIO_TRACK);
+            trk->streamIndex=sid;
+            s->read((uint8_t *)&(trk->wavHeader),sizeof(WAVHeader));
+            trk->extraDataLen=s->read16();
+            printf("Extension :%u bytes\n",trk->extraDataLen);
+            if(trk->extraDataLen)
             {
-              _audioExtraData=new uint8_t[_audioExtraDataLen];
-              s->read(_audioExtraData,_audioExtraDataLen);
+              trk->extraData=new uint8_t[trk->extraDataLen];
+              s->read(trk->extraData,trk->extraDataLen);
             }
               printf("#block in group   :%d\n",s->read8());
               printf("#byte in group    :%d\n",s->read16());
               printf("Align1            :%d\n",s->read16());
               printf("Align2            :%d\n",s->read16());
-            
-              _audioStreamId=sid;
-            _nbAudioTrack++;
+              _nbAudioTrack++;
             
           }
           break;
@@ -534,6 +528,29 @@ uint8_t asfHeader::getHeaders(void)
   }
   printf("End of headers\n");
   return 1;
+}
+uint8_t    asfHeader::changeAudioStream(uint32_t newstream)
+{
+  ADM_assert(_currentAudioStream<_nbAudioTrack);
+  _currentAudioStream=newstream;
+  return 1;
+}
+uint32_t    asfHeader::getCurrentAudioStreamNumber(void)
+{
+  return _currentAudioStream;
+}
+uint8_t     asfHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
+{
+    *nbStreams=_nbAudioTrack;
+    if(_nbAudioTrack)
+    {
+      *infos=new audioInfo[_nbAudioTrack];
+      for(int i=0;i<_nbAudioTrack;i++)
+      {
+        WAV2AudioInfo(&(_allAudioTracks[i].wavHeader),&((*infos)[i]));
+      }
+    }
+    return 1;
 }
 uint8_t asfHeader::loadVideo(asfChunk *s)
 {
@@ -648,11 +665,7 @@ uint8_t asfHeader::buildIndex(void)
     {
       asfBit *bit=NULL;
       ADM_assert(readQueue.pop((void**)&bit));
-      if(bit->stream==_audioStreamId)
-      {
-        _audioLen+=bit->len; 
-      }
-      else if(bit->stream==_videoStreamId)
+      if(bit->stream==_videoStreamId)
       {
           aprintf(">found packet of size %d seq %d, while curseq =%d\n",bit->len,bit->sequence,curSeq);
           if(bit->sequence!=sequence)
@@ -682,19 +695,37 @@ uint8_t asfHeader::buildIndex(void)
             tmpIndex[nbImage].segNb=bit->sequence;
             tmpIndex[nbImage].packetNb=bit->packet;
             tmpIndex[nbImage].flags=bit->flags;
-            tmpIndex[nbImage].audioSeen=_audioLen;
+
+            for(int z=0;z<_nbAudioTrack;z++)
+            {
+              tmpIndex[nbImage].audioSeen[z]=_allAudioTracks[z].length;
+            }
             readQueue.pushBack(bit);
     
             sequence=bit->sequence;
             len=0;
             continue;
           }
-      len+=bit->len;
-      }else
+          len+=bit->len;
+      } // End of video stream Id
+      else  // Audio ?
       {
-        printf("Unmapped stream Id %d\n",bit->stream); 
+        int found=0;
+        for(int i=0;i<_nbAudioTrack && !found;i++)
+        {
+          if(bit->stream == _allAudioTracks[i].streamIndex)
+          {
+            
+            _allAudioTracks[i].length+=bit->len;
+            found=1;
+          }
+        }
+        if(!found) 
+        {
+          printf("Unmapped stream %u\n",bit->stream); 
+        }
       }
-      delete bit;
+     delete bit;
     }
     working->update(packet,nbPacket);
 

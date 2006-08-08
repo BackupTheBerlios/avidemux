@@ -26,13 +26,15 @@
 #include "ADM_toolkit/ADM_queue.h"
 #include "ADM_asfPacket.h"
 
+#define ASF_MAX_AUDIO_TRACK 8
+
 typedef struct asfIndex
 {
   uint32_t packetNb;
   uint32_t frameLen;
   uint32_t segNb;
   uint32_t flags;
-  uint32_t audioSeen;
+  uint32_t audioSeen[ASF_MAX_AUDIO_TRACK];
 };
 
 typedef enum ADM_KNOWN_CHUNK
@@ -84,18 +86,19 @@ class asfChunk
 
 typedef struct asfAudioTrak
 {
-  uint32_t  streamIndex;
-  WAVHeader wavHeader;
-  uint32_t  extraDataLen;
-  uint8_t   *extraData;
-  uint32_t  nbPackets;
-  uint32_t  length;
+  uint32_t     streamIndex;
+  uint32_t     extraDataLen;
+  uint8_t      *extraData;
+  uint32_t     nbPackets;
+  uint32_t     length;
+  WAVHeader    wavHeader;
   
 };
 
 class asfAudio : public AVDMGenericAudioStream
 {
   protected:
+    uint32_t                _myRank;
     uint32_t                _extraDataLen;
     uint8_t                 *_extraData;
     char                    *myName;
@@ -106,8 +109,9 @@ class asfAudio : public AVDMGenericAudioStream
     ADM_queue               readQueue;
     uint32_t                _packetSize;
     class asfHeader         *_father;
+    asfAudioTrak            *_track;
   public:
-                                asfAudio(asfHeader *father);
+                                asfAudio(asfHeader *father,uint32_t rank);
     virtual                     ~asfAudio();
     virtual uint32_t            read(uint32_t len,uint8_t *buffer);
     virtual uint8_t             goTo(uint32_t newoffset);
@@ -128,18 +132,12 @@ class asfHeader         :public vidHeader
     ADM_queue               readQueue;
     uint32_t                curSeq;
     asfPacket               *_packet;
-    
-    asfAudio                *_audioTrack;
+    uint32_t                _currentAudioStream;
   protected:
                                 
     FILE                    *_fd;
-    int32_t                 _audioIndex;
+
     int32_t                 _videoIndex;
-    uint32_t                _nbAudioTrack;
-    asfAudioTrak            *_audioTracks;
-    asfAudio                *_curAudio;
-    
-    
     uint32_t                _extraDataLen;
     uint8_t                 *_extraData;
     
@@ -147,16 +145,18 @@ class asfHeader         :public vidHeader
     uint32_t                _videoStreamId;
     
   public: // Shared with audio track
-    uint32_t                _audioStreamId;
     char                    *myName;
-    WAVHeader               *_wavHeader;
+    
     uint32_t                nbImage;
     asfIndex                *_index;
     uint32_t                _packetSize;
     uint32_t                _dataStartOffset;
-    uint32_t                _audioExtraDataLen;
-    uint8_t                 *_audioExtraData;
-    uint32_t                _audioLen;
+    uint32_t                _nbAudioTrack;
+    asfAudio                *_curAudio;
+    asfAudioTrak             _allAudioTracks[ASF_MAX_AUDIO_TRACK];
+    
+    
+    // / Shared
   public:
 
 
@@ -191,6 +191,12 @@ class asfHeader         :public vidHeader
     virtual uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
                                         uint32_t *flags);
     virtual uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)	;
+    //
+    //  Multiple audio channels
+    //
+    uint8_t           changeAudioStream(uint32_t newstream);
+    uint32_t          getCurrentAudioStreamNumber(void) ;
+    uint8_t           getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
 
 };
 #endif
