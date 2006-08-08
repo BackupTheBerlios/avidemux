@@ -438,7 +438,8 @@ uint8_t asfHeader::getHeaders(void)
             printf("Creation time : %08lx\n",s->read64());
             printf("Number of pack: %08lx\n",s->read64());
             printf("Timestamp 1   : %08lx\n",s->read64());
-            printf("Timestamp 2   : %08lx\n",s->read64());
+            _duration=s->read64();
+            printf("Timestamp 2   : %08lx\n",_duration);
             printf("Timestamp 3   : %04x\n",s->read32());
             printf("Preload       : %04x\n",s->read32());
             printf("Flags         : %04x\n",s->read32());
@@ -675,7 +676,7 @@ uint8_t asfHeader::buildIndex(void)
             if( ((sequence+1)&0xff)!=(bit->sequence&0xff))
             {
                 printf("!!!!!!!!!!!! non continuous sequence %u %u\n",sequence,bit->sequence); 
-    #if 1            
+    #if 1         
                 // Let's insert a couple of null frame
                 int32_t delta,start,end;
                 
@@ -744,6 +745,17 @@ uint8_t asfHeader::buildIndex(void)
   printf("[ASF]%u images found\n",nbImage);
   printf("[ASF] ******** End of buildindex *******\n");
   _videostream.dwLength=_mainaviheader.dwTotalFrames=nbImage;
+  if(!nbImage) return 0;
+  
+  // Update fps
+  // In fact it is an average fps
+  // FIXME
+  float f=nbImage;
+  f*=1000.*1000.*10000.;
+  f=f/_duration;
+  _videostream.dwScale=1000;
+  _videostream.dwRate=(uint32_t)floor(f+0.4);
+
   return 1;
   
 }

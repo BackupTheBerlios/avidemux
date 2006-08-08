@@ -133,6 +133,7 @@ class asfHeader         :public vidHeader
     uint32_t                curSeq;
     asfPacket               *_packet;
     uint32_t                _currentAudioStream;
+    uint64_t                _duration;  // Duration 100 ns
   protected:
                                 
     FILE                    *_fd;
