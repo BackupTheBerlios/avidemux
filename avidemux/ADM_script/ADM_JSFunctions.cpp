@@ -64,6 +64,7 @@ JSBool getVar(JSContext *cx, JSObject *obj, uintN argc,
                                        jsval *argv, jsval *rval);
 JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool pathOnly(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
 
 static JSFunctionSpec adm_functions[] = {
@@ -79,7 +80,7 @@ static JSFunctionSpec adm_functions[] = {
   {"getVar",          getVar,        1},
   {"exec",          systemExecute,        3},
   {"include",          systemInclude,        1},
-
+  {"pathOnly",          pathOnly,        1},
   {0}
 };
 
@@ -426,3 +427,20 @@ JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 	return JS_TRUE;
 }// end systemInclude
 #endif
+
+/********************** Extract Path from a filename **************/
+JSBool pathOnly(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{// begin systemExecute
+	// default return value
+  *rval = INT_TO_JSVAL(-1);
+
+  if(argc != 1)
+    return JS_FALSE;
+  if(JSVAL_IS_STRING(argv[0]) == false )
+    return JS_FALSE;
+  char *name=NULL;
+  char *orgName = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
+  PathStripName(orgName);
+  *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,orgName));
+  return JS_TRUE;
+}// end systemExecute
