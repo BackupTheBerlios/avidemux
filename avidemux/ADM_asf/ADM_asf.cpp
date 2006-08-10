@@ -492,7 +492,11 @@ uint8_t asfHeader::getHeaders(void)
           case 1: // Video
           {
                     _videoStreamId=sid;
-                    loadVideo(s);
+                    if(!loadVideo(s))
+                    {
+                      delete s;
+                      return 0; 
+                    }
                     break;
           }
               break;
@@ -580,7 +584,9 @@ uint8_t asfHeader::loadVideo(asfChunk *s)
                     fourCC::tostring(_video_bih.biCompression),_video_bih.biCompression);
             if(fourCC::check(_video_bih.biCompression,(uint8_t *)"DVR "))
             {
-              _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"MPEG");
+              // It is MS DVR, fail so that the mpeg2 indexer can take it from here
+              printf("This is MSDVR, not ASF\n");
+              return 0; 
             }
             printBih(&_video_bih);
             if(x>sizeof(BITMAPINFOHEADER))
