@@ -104,7 +104,7 @@ uint8_t asfHeader::close(void)
   {
     asfAudioTrak *trk=&(_allAudioTracks[i]);
     if(trk->extraData) delete [] trk->extraData;
-    delete trk; 
+    trk->extraData=NULL;
   }
 }
 uint8_t       asfHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
@@ -138,7 +138,8 @@ uint8_t asfHeader::needDecompress(void)
   _index=NULL;
   _packet=NULL;
   _curAudio=NULL;
-  memset(&_allAudioTracks,0,sizeof(_allAudioTracks));
+  printf("%u\n",sizeof(_allAudioTracks));
+  memset(&(_allAudioTracks[0]),0,sizeof(_allAudioTracks));
 
   _nbAudioTrack=0;
   _currentAudioStream=0;

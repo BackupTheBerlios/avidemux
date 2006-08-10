@@ -49,9 +49,10 @@ asfAudio::asfAudio(asfHeader *father,uint32_t myRank)
     _father=father;
     _track=&(_father->_allAudioTracks[myRank]);
     
-    _wavheader=&(_track->wavHeader);
+    _wavheader=new WAVHeader;
+    memcpy(_wavheader,&(_track->wavHeader),sizeof(WAVHeader));
     _extraDataLen=_track->extraDataLen;
-    _extraData=_track->extraData;
+    _extraData= _track->extraData;
     _length=_track->length;
     _streamId=_track->streamIndex;
     _dataStart=_father->_dataStartOffset;
@@ -60,6 +61,7 @@ asfAudio::asfAudio(asfHeader *father,uint32_t myRank)
     fseeko(_fd,_dataStart,SEEK_SET);
     _packetSize=_father->_packetSize;
     _packet=new asfPacket(_fd,_packetSize,&readQueue,_dataStart);
+    _destroyable=1;
     printf("[asfAudio] Length %u\n",_length);
   
 }
