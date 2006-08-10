@@ -181,6 +181,9 @@ MPEG_TRACK track;
                 track.pid=_tracks[mainAudio].myPid;
   switch (type)
     {
+    case 'M':
+                demuxer = new dmx_demuxerMSDVR (1,&track,0);
+                break;
     case 'P':
                 demuxer = new dmx_demuxerPS (1,&track,multi);
                 break;

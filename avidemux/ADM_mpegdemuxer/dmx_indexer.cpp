@@ -38,6 +38,7 @@
 #include "dmx_demuxerEs.h"
 #include "dmx_demuxerPS.h"
 #include "dmx_demuxerTS.h"
+#include "dmx_demuxerMSDVR.h"
 #include "dmx_identify.h"
 
 #define MIN_DELTA_PTS 150 // autofix in ms
@@ -126,6 +127,14 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         }
         switch(mpegType)
         {
+               case DMX_MPG_MSDVR:
+                                {
+                                  dmx_demuxerMSDVR *dmx;
+                                  dmx=new dmx_demuxerMSDVR(nbTracks,tracks,0);
+                                  demuxer=dmx;
+                                  mpegTypeChar='M';
+                                  break;
+                                }
                 case DMX_MPG_TS:
                                 {
                                 dmx_demuxerTS *dmx;

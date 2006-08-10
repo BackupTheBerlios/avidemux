@@ -40,6 +40,7 @@ DMX_TYPE dmxIdentify(char *name)
 {
 DMX_TYPE ret=DMX_MPG_UNKNOWN;
 uint64_t pos;
+uint32_t head1,head2;
 uint8_t stream;
 FP_TYPE fp=FP_DONT_APPEND;
         uint64_t size;
@@ -51,6 +52,15 @@ FP_TYPE fp=FP_DONT_APPEND;
         if(!parser->open(name,&fp))
         {
                 goto _fnd;
+        }
+        // Maybe ASF, MS-DVR file ?
+        head1=parser->read32i();
+        head2=parser->read32i();
+        parser->setpos(0);
+        if(head1==0x3026B275 && head2 ==0x8e66CF11)
+        {
+          delete parser;
+          return DMX_MPG_MSDVR;
         }
         // Try to see if it is a TS:
         if(probeTs(parser))

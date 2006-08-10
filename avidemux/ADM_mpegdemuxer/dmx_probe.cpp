@@ -60,6 +60,15 @@ uint8_t dmx_probe(char *file, DMX_TYPE  *type, uint32_t *nbTracks,MPEG_TRACK **t
         *type=dmxIdentify(file);
         switch(*type)
         {
+        case DMX_MPG_MSDVR:
+                {
+                  printf("This is MSDVR file\n"); 
+                  *nbTracks=1;
+                  *tracks=new MPEG_TRACK;
+                  (*tracks)->pes=0xE0;
+                  (*tracks)->pid=1;
+                  return 1;
+                }
         case DMX_MPG_ES:
                 {
                 *nbTracks=1;

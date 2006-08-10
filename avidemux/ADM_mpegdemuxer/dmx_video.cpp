@@ -40,6 +40,7 @@
 #include "dmx_demuxerEs.h"
 #include "dmx_demuxerPS.h"
 #include "dmx_demuxerTS.h"
+#include "dmx_demuxerMSDVR.h"
 
 #include "dmx_video.h"
 #include "dmx_audio.h"
@@ -63,7 +64,7 @@ dmxHeader::dmxHeader  (void)
         _index=NULL;
         _audioStream=NULL;
         _fieldEncoded=0;
-
+        demuxer=NULL;
 }
 //
 // Delete everything associated (cache...demuxer...)
@@ -263,6 +264,14 @@ char *start;
                 
                 switch(type)
                 {
+                        case 'M':
+                                {
+                                  MPEG_TRACK track;
+                                  track.pid=vTsId;
+                                  track.pes=vPid;
+                                  demuxer=new dmx_demuxerMSDVR(1,&track,0);
+                                  break;
+                                }
                         case 'T' :
                                 {
                                         MPEG_TRACK track;
