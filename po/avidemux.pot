@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-07-19 14:36+0300\n"
+"POT-Creation-Date: 2006-08-11 13:29+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: avidemux/ADM_audiocodec/ADM_codecwma.cpp:75
-#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:158
+#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:175
 msgid "Internal error"
 msgstr ""
 
@@ -25,7 +25,7 @@ msgstr ""
 msgid "Cannot open WMA2 codec."
 msgstr ""
 
-#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:158
+#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:175
 msgid "Cannot open AMR codec."
 msgstr ""
 
@@ -65,6 +65,11 @@ msgstr ""
 
 #: avidemux/oplug_avi/op_avisave.cpp:138
 msgid "Error initalizing video filters"
+msgstr ""
+
+#: avidemux/ADM_audiofilter/audiofilter_normalize.cpp:94
+#: avidemux/ADM_audiofilter/audiofilter_normalize.cpp:127
+msgid "Normalize : Scanning"
 msgstr ""
 
 #: avidemux/ADM_audiofilter/audiofilter_buildchain.cpp:308
@@ -1108,11 +1113,11 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_enter.cpp:172 avidemux/ADM_dialog/DIA_enter.cpp:230
 #: avidemux/ADM_dialog/DIA_enter.cpp:295
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:584
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:656
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:718
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:778
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:841
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:587
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:659
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:721
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:781
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:844
 msgid "label1"
 msgstr ""
 
@@ -2967,19 +2972,19 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_about.cpp:61 avidemux/ADM_gui2/GUI_main2.cpp:262
+#: avidemux/ADM_dialog/DIA_about.cpp:71 avidemux/ADM_gui2/GUI_main2.cpp:262
 msgid "Avidemux"
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_about.cpp:62
-msgid "© 2001-2005 Mean"
+#: avidemux/ADM_dialog/DIA_about.cpp:72
+msgid "© 2001-2006 Mean"
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_about.cpp:63
+#: avidemux/ADM_dialog/DIA_about.cpp:73
 msgid "Multiplatform video editor"
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_about.cpp:64
+#: avidemux/ADM_dialog/DIA_about.cpp:74
 msgid ""
 "Avidemux is free software; you can redistribute it and/or modify it \n"
 "under the terms of the GNU General Public License version 2 \n"
@@ -3333,7 +3338,7 @@ msgid ""
 "Public License instead of this License."
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_about.cpp:66
+#: avidemux/ADM_dialog/DIA_about.cpp:76
 msgid "http://www.avidemux.org"
 msgstr ""
 
@@ -3712,6 +3717,26 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_pipe.cpp:113
 msgid "Full parameter line"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Ready"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Succeeded"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25 avidemux/gtk_gui.cpp:2527
+msgid "Failed"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Deleted"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Running"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:90
@@ -4614,7 +4639,69 @@ msgstr ""
 msgid "Audio Encoder Settings"
 msgstr ""
 
-#: avidemux/ADM_gui2/GUI_main2.cpp:279 avidemux/main.cpp:119
+#: avidemux/ADM_dialog/DIA_partial.cpp:123
+#: avidemux/ADM_filter/gui_filtersub.cpp:144
+msgid "Partial"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_partial.cpp:137
+msgid "Start frame for partial :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_partial.cpp:144
+msgid "End frame for partial :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_partial.cpp:167
+msgid "Configure partialized filter"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:117
+msgid "Fade Filter"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:127
+msgid "Fade Type"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:139
+msgid "Out"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:140
+msgid "In"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:142
+msgid "Start Frame"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:149
+msgid "End Frame"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:71
+msgid "Can't read selected file"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:80
+msgid "Can't open selected directory"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:143
+msgid "Extract embedded fonts to"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:188
+msgid "You must select one file"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_bindings.cpp:554
+#, c-format
+msgid "Frame:%c(%02d)"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:279 avidemux/main.cpp:117
 msgid "_File"
 msgstr ""
 
@@ -5132,16 +5219,16 @@ msgid "Couldn't find pixmap file: %s"
 msgstr ""
 
 #: avidemux/oplug_ogm/op_ogsave.cpp:112
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:249
-#: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:1002
-#: avidemux/gtk_gui.cpp:1426 avidemux/gtk_gui.cpp:1765
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:258
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:1004
+#: avidemux/gtk_gui.cpp:1428 avidemux/gtk_gui.cpp:1767
 #: avidemux/ADM_requantize.cpp:227
 msgid "File error"
 msgstr ""
 
 #: avidemux/oplug_ogm/op_ogsave.cpp:112
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:249 avidemux/gtk_gui.cpp:1426
-#: avidemux/gtk_gui.cpp:1765 avidemux/ADM_requantize.cpp:227
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:258 avidemux/gtk_gui.cpp:1428
+#: avidemux/gtk_gui.cpp:1767 avidemux/ADM_requantize.cpp:227
 #, possible-c-format
 msgid "Cannot open \"%s\" for writing."
 msgstr ""
@@ -5154,36 +5241,36 @@ msgstr ""
 msgid "Could not initialize audio"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegwrite.cpp:314 avidemux/gtk_gui.cpp:1818
+#: avidemux/oplug_mpeg/op_mpegwrite.cpp:314 avidemux/gtk_gui.cpp:1820
 msgid "No frames to encode"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegwrite.cpp:315 avidemux/gtk_gui.cpp:1818
+#: avidemux/oplug_mpeg/op_mpegwrite.cpp:315 avidemux/gtk_gui.cpp:1820
 msgid "Please check markers. Is \"A>\" == \">B\"?"
 msgstr ""
 
 #: avidemux/oplug_mpeg/op_mpegwrite.cpp:441
 #: avidemux/oplug_mpeg/op_mpegwrite.cpp:690
-#: avidemux/oplug_mpeg/op_mpegwrite.cpp:891
+#: avidemux/oplug_mpeg/op_mpegwrite.cpp:893
 msgid "Encoding error"
 msgstr ""
 
 #: avidemux/oplug_mpeg/op_mpegwrite.cpp:565
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:322
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:331
 msgid "Reuse log file ?"
 msgstr ""
 
 #: avidemux/oplug_mpeg/op_mpegwrite.cpp:582
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:339
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:348
 msgid "Error in pass 1"
 msgstr ""
 
 #: avidemux/oplug_mpeg/op_mpegwrite.cpp:594
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:369
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:431
 msgid "Error in pass 2"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegwrite.cpp:1043
+#: avidemux/oplug_mpeg/op_mpegwrite.cpp:1045
 #: avidemux/ADM_lavformat/ADM_lavformat.cpp:280
 msgid "Incompatible frame rate"
 msgstr ""
@@ -5194,9 +5281,9 @@ msgstr ""
 
 #: avidemux/oplug_mpeg/op_mpeg.cpp:123 avidemux/oplug_mpeg/op_mpeg.cpp:215
 #: avidemux/oplug_mpeg/op_mpeg.cpp:302 avidemux/oplug_mpeg/op_mpeg.cpp:378
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:130
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:148
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:159
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:120
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:157
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:168
 msgid "There is no audio track"
 msgstr ""
 
@@ -5281,39 +5368,39 @@ msgstr ""
 msgid "For DVD, audio must be MP2,AC3 or LPCM."
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:125
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:115
 msgid "This is not MPEG compatible"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:125
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:115
 msgid "You can't use the Copy codec."
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:137
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:127
 msgid "The first frame is not intra frame"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:137
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:127
 msgid "Use the &lt;&lt; and the &gt;&gt; buttons to move using Intra frames."
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:149
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:169
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:139
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:178
 msgid "Audio track is not suitable"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:189
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:201
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:179
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:210
 #: avidemux/ADM_lvemux/ADM_muxer.cpp:85
 msgid "Incompatible audio"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:189
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:179
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:179
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:188
 msgid "For VCD, audio must be 44.1 kHz MP2."
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:218
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:208
 msgid "For DVD, audio must be 48 kHz MP2(stereo), AC3, DTS or LPCM (stereo)."
 msgstr ""
 
@@ -5329,11 +5416,11 @@ msgstr ""
 msgid "Select DVD as the video codec for MPEG TS output."
 msgstr ""
 
-#: avidemux/ADM_encoder/adm_encConfig.cpp:732
+#: avidemux/ADM_encoder/adm_encConfig.cpp:712
 msgid "Only QCIF and subQCIF are allowed for H.263"
 msgstr ""
 
-#: avidemux/ADM_encoder/adm_encConfig.cpp:911
+#: avidemux/ADM_encoder/adm_encConfig.cpp:891
 msgid "Fatal error"
 msgstr ""
 
@@ -5365,13 +5452,13 @@ msgstr ""
 msgid "No stts table"
 msgstr ""
 
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:201
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:210
 msgid "For DVD, audio must be 48 kHz MP2, AC3 or LPCM."
 msgstr ""
 
-#: avidemux/ADM_openDML/ADM_openDML.cpp:282
-#: avidemux/ADM_openDML/ADM_openDML.cpp:367
-#: avidemux/ADM_openDML/ADM_openDML.cpp:497
+#: avidemux/ADM_openDML/ADM_openDML.cpp:290
+#: avidemux/ADM_openDML/ADM_openDML.cpp:375
+#: avidemux/ADM_openDML/ADM_openDML.cpp:505
 msgid "Malformed header"
 msgstr ""
 
@@ -5383,7 +5470,7 @@ msgstr ""
 msgid "lvemux init failed"
 msgstr ""
 
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:705
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:708
 msgid "Alert"
 msgstr ""
 
@@ -5392,7 +5479,7 @@ msgstr ""
 msgid "Cannot open directory as a file"
 msgstr ""
 
-#: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:999
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:1001
 #, possible-c-format
 msgid "Cannot open \"%s\"."
 msgstr ""
@@ -5406,7 +5493,7 @@ msgstr ""
 msgid "It could be possible that you try to overwrite an input file!"
 msgstr ""
 
-#: avidemux/ADM_toolkit/TLK_filesel.cpp:238 avidemux/gtk_gui.cpp:1492
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:238 avidemux/gtk_gui.cpp:1494
 msgid "Cannot write the file"
 msgstr ""
 
@@ -5485,10 +5572,6 @@ msgstr ""
 msgid "Half D1 res"
 msgstr ""
 
-#: avidemux/ADM_filter/gui_filtersub.cpp:144
-msgid "Partial"
-msgstr ""
-
 #: avidemux/ADM_filter/gui_filtersub.cpp:156
 msgid "Save as script"
 msgstr ""
@@ -5517,38 +5600,38 @@ msgstr ""
 msgid "Miscellaneous"
 msgstr ""
 
-#: avidemux/ADM_filter/gui_filter.cpp:323
+#: avidemux/ADM_filter/gui_filter.cpp:326
 msgid "The filter is already partial"
 msgstr ""
 
-#: avidemux/ADM_filter/gui_filter.cpp:449
-#: avidemux/ADM_filter/gui_filter.cpp:451
+#: avidemux/ADM_filter/gui_filter.cpp:452
+#: avidemux/ADM_filter/gui_filter.cpp:454
 msgid "Load set of filters"
 msgstr ""
 
-#: avidemux/ADM_filter/gui_filter.cpp:458
+#: avidemux/ADM_filter/gui_filter.cpp:461
 msgid "Nothing to save"
 msgstr ""
 
-#: avidemux/ADM_filter/gui_filter.cpp:462
-#: avidemux/ADM_filter/gui_filter.cpp:464
+#: avidemux/ADM_filter/gui_filter.cpp:465
+#: avidemux/ADM_filter/gui_filter.cpp:467
 msgid "Save set of filters"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:372
+#: avidemux/ADM_editor/ADM_edit.cpp:377
 msgid "File type identified but no loader support detected..."
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:373
+#: avidemux/ADM_editor/ADM_edit.cpp:378
 msgid "May be related to an old index file."
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:380
+#: avidemux/ADM_editor/ADM_edit.cpp:385
 #, c-format
 msgid "Attempt to open %s failed!"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:404
+#: avidemux/ADM_editor/ADM_edit.cpp:409
 msgid ""
 "You cannot mix different video dimensions yet. Using the partial video "
 "filter later, will not work around this problem. The workaround is:\n"
@@ -5557,23 +5640,23 @@ msgid ""
 "2.) concatinate them together"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:501
+#: avidemux/ADM_editor/ADM_edit.cpp:506
 msgid "Build Time Map"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:501
+#: avidemux/ADM_editor/ADM_edit.cpp:506
 msgid "Build VBR time map?"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:535
+#: avidemux/ADM_editor/ADM_edit.cpp:540
 msgid "Use that mode"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:535
+#: avidemux/ADM_editor/ADM_edit.cpp:540
 msgid "H264 detected"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:535
+#: avidemux/ADM_editor/ADM_edit.cpp:540
 msgid ""
 "If the file is using bframe as reference, it can lead to crash or "
 "stutteting.\n"
@@ -5582,53 +5665,53 @@ msgid ""
 "Do you want to use that mode ?"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:649
+#: avidemux/ADM_editor/ADM_edit.cpp:654
 msgid "Packed Bitstream detected"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:650
+#: avidemux/ADM_editor/ADM_edit.cpp:655
 msgid "Do you want me to unpack it ?"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:670
+#: avidemux/ADM_editor/ADM_edit.cpp:675
 msgid "Could not unpack the video"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:670
+#: avidemux/ADM_editor/ADM_edit.cpp:675
 msgid "Using backup decoder - not frame accurate."
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:675
+#: avidemux/ADM_editor/ADM_edit.cpp:680
 msgid "Weird"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:675
+#: avidemux/ADM_editor/ADM_edit.cpp:680
 msgid "The unpacking succeedeed but the index is still not up to date."
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:681
+#: avidemux/ADM_editor/ADM_edit.cpp:686
 msgid "Troubles ahead"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:681
+#: avidemux/ADM_editor/ADM_edit.cpp:686
 msgid "This a VOP packed AVI."
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:690
+#: avidemux/ADM_editor/ADM_edit.cpp:695
 msgid "Index is not up to date"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:690
+#: avidemux/ADM_editor/ADM_edit.cpp:695
 msgid "You should use Tool->Rebuild frame. Do it now ?"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:1417
+#: avidemux/ADM_editor/ADM_edit.cpp:1422
 msgid ""
 "This looks like mpeg\n"
 " Do you want to index it?"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:1469
+#: avidemux/ADM_editor/ADM_edit.cpp:1474
 msgid "Indexing failed"
 msgstr ""
 
@@ -5723,330 +5806,326 @@ msgstr ""
 msgid "Cannot decode the frame."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:261
+#: avidemux/gtk_gui.cpp:262
 msgid "Select ecmascript to run "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:308 avidemux/gtk_gui.cpp:422
+#: avidemux/gtk_gui.cpp:309 avidemux/gtk_gui.cpp:423
 msgid "Obsolete"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:450
+#: avidemux/gtk_gui.cpp:451
 msgid "Not coded in this version"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:463 avidemux/gtk_gui.cpp:468 avidemux/gtk_gui.cpp:604
-#: avidemux/gtk_gui.cpp:607
+#: avidemux/gtk_gui.cpp:464 avidemux/gtk_gui.cpp:469 avidemux/gtk_gui.cpp:605
+#: avidemux/gtk_gui.cpp:608
 msgid "Select AVI file..."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:518
+#: avidemux/gtk_gui.cpp:519
 msgid ""
 "This is to be used to undo packed vop on mpeg4.\n"
 "Continue ?"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:520
+#: avidemux/gtk_gui.cpp:521
 msgid "Select Avi file to write"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:538
+#: avidemux/gtk_gui.cpp:539
 msgid "Select OGM file to write"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:559 avidemux/gtk_gui.cpp:570
+#: avidemux/gtk_gui.cpp:560 avidemux/gtk_gui.cpp:571
 msgid "Select workbench to save "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:594
+#: avidemux/gtk_gui.cpp:595
 msgid "Select raw file to save "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:610
+#: avidemux/gtk_gui.cpp:611
 msgid "Select AVI file to append..."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:614
+#: avidemux/gtk_gui.cpp:615
 msgid "Select file to save audio"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:648
+#: avidemux/gtk_gui.cpp:649
 msgid "Select Jpeg sequence to save "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:651
+#: avidemux/gtk_gui.cpp:652
 msgid "Select BMP to save "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:655
+#: avidemux/gtk_gui.cpp:656
 msgid "Select Jpeg to save "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:711
+#: avidemux/gtk_gui.cpp:713
 msgid "Select file to save"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:763 avidemux/gtk_gui.cpp:2329
+#: avidemux/gtk_gui.cpp:765 avidemux/gtk_gui.cpp:2331
 msgid "Select MP3 to load "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:766 avidemux/gtk_gui.cpp:2332
+#: avidemux/gtk_gui.cpp:768 avidemux/gtk_gui.cpp:2334
 msgid "Select AC3 to load "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:769 avidemux/gtk_gui.cpp:2335
+#: avidemux/gtk_gui.cpp:771 avidemux/gtk_gui.cpp:2337
 msgid "Select WAV to load "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:817
+#: avidemux/gtk_gui.cpp:819
 msgid "Out of bounds"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:823
+#: avidemux/gtk_gui.cpp:825
 msgid "Select  file to save "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:828 avidemux/gtk_gui.cpp:2241
+#: avidemux/gtk_gui.cpp:830 avidemux/gtk_gui.cpp:2243
 msgid "Marker A > B"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:828
+#: avidemux/gtk_gui.cpp:830
 msgid "Cannot copy."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:840
+#: avidemux/gtk_gui.cpp:842
 msgid "Something bad happened (II))"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:854
+#: avidemux/gtk_gui.cpp:856
 msgid "Are you sure ?"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:933
+#: avidemux/gtk_gui.cpp:935
 msgid "Width is not a multiple of 8"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:934
+#: avidemux/gtk_gui.cpp:936
 msgid "This will make trouble for avi files."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:945
+#: avidemux/gtk_gui.cpp:947
 msgid "Rebuild all Keyframes?"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:999
+#: avidemux/gtk_gui.cpp:1001
 msgid "Permission error"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1002
+#: avidemux/gtk_gui.cpp:1004
 #, possible-c-format
 msgid "\"%s\" does not exist."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1065
+#: avidemux/gtk_gui.cpp:1067
 msgid "Cannot open project using the video loader."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1066
+#: avidemux/gtk_gui.cpp:1068
 msgid "Try 'File' -> 'Load/Run Project...'"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1068
+#: avidemux/gtk_gui.cpp:1070
 msgid "Could not open the file"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1102
+#: avidemux/gtk_gui.cpp:1104
 msgid "Multiple Audio Tracks"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1102
+#: avidemux/gtk_gui.cpp:1104
 msgid ""
 "The file you just loaded contains several audio tracks.\n"
 "Go to Audio->MainTrack to select the active one."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1193
+#: avidemux/gtk_gui.cpp:1195
 msgid "No audio decoder found for this file"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1194
+#: avidemux/gtk_gui.cpp:1196
 msgid "Save (A+V) will generate bad AVI. Save audio will work."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1209
+#: avidemux/gtk_gui.cpp:1211
 msgid "Could not decode the frame"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1235
+#: avidemux/gtk_gui.cpp:1237
 msgid "Something failed"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1244 avidemux/gtk_gui.cpp:2260
+#: avidemux/gtk_gui.cpp:1246 avidemux/gtk_gui.cpp:2262
 msgid "Something bad happened (II)"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1307
+#: avidemux/gtk_gui.cpp:1309
 msgid "Cannot save the audio in copy mode"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1307
+#: avidemux/gtk_gui.cpp:1309
 msgid ""
 "Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1417
+#: avidemux/gtk_gui.cpp:1419
 msgid "Cannot encode the frame"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1453
+#: avidemux/gtk_gui.cpp:1455
 msgid "Mark A > B"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1453
+#: avidemux/gtk_gui.cpp:1455
 msgid "Set your markers correctly."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1478
+#: avidemux/gtk_gui.cpp:1480
 msgid "Cannot decode frame"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1478 avidemux/gtk_gui.cpp:1484
-#: avidemux/gtk_gui.cpp:1492
+#: avidemux/gtk_gui.cpp:1480 avidemux/gtk_gui.cpp:1486
+#: avidemux/gtk_gui.cpp:1494
 msgid "Aborting."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1484
+#: avidemux/gtk_gui.cpp:1486
 msgid "Cannot encode frame"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1500 avidemux/gtk_gui.cpp:1606
-#: avidemux/gtk_gui.cpp:2521 avidemux/ADM_requantize.cpp:342
+#: avidemux/gtk_gui.cpp:1502 avidemux/gtk_gui.cpp:1608
+#: avidemux/gtk_gui.cpp:2523 avidemux/ADM_requantize.cpp:342
 msgid "Done"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1500
+#: avidemux/gtk_gui.cpp:1502
 #, possible-c-format
 msgid "Saved %d images."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1558
+#: avidemux/gtk_gui.cpp:1560
 msgid "Memory error"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1564
+#: avidemux/gtk_gui.cpp:1566
 msgid "Error converting to BMP"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1570 avidemux/gtk_gui.cpp:2253
+#: avidemux/gtk_gui.cpp:1572 avidemux/gtk_gui.cpp:2255
 msgid "Something bad happened"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1606
+#: avidemux/gtk_gui.cpp:1608
 #, possible-c-format
 msgid "Saved \"%s\"."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1627 avidemux/gtk_gui.cpp:1692
+#: avidemux/gtk_gui.cpp:1629 avidemux/gtk_gui.cpp:1694
 msgid "Failed to open the file"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1627 avidemux/gtk_gui.cpp:1692
+#: avidemux/gtk_gui.cpp:1629 avidemux/gtk_gui.cpp:1694
 msgid "Not a WAV file?"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1628
+#: avidemux/gtk_gui.cpp:1630
 #, c-format
 msgid "WAV open file failed..."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1758
+#: avidemux/gtk_gui.cpp:1760
 msgid "Cannot decompress audio frame"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:1772
+#: avidemux/gtk_gui.cpp:1774
 msgid "Memory Error"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2162
+#: avidemux/gtk_gui.cpp:2164
 msgid "No error found"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2166
+#: avidemux/gtk_gui.cpp:2168
 #, c-format
 msgid "Errors found in %u frames"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2184
+#: avidemux/gtk_gui.cpp:2186
 msgid "Cannot decompress the audio stream"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2184
+#: avidemux/gtk_gui.cpp:2186
 msgid "Switch audio codec to Copy."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2215
+#: avidemux/gtk_gui.cpp:2217
 msgid "Cannot save the file"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2215
+#: avidemux/gtk_gui.cpp:2217
 msgid "There is a lonely B-frame at start/end. Please remove it."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2220
+#: avidemux/gtk_gui.cpp:2222
 msgid "Select Mpeg file..."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2241
+#: avidemux/gtk_gui.cpp:2243
 msgid "Cannot delete the selection."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2246
+#: avidemux/gtk_gui.cpp:2248
 msgid "You can't remove all frames"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2316
+#: avidemux/gtk_gui.cpp:2318
 msgid "Could not get tracks info"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2381
+#: avidemux/gtk_gui.cpp:2383
 msgid "Select 2nd track"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2400
+#: avidemux/gtk_gui.cpp:2402
 msgid "Error loading the MP3 file"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2408 avidemux/gtk_gui.cpp:2429
-#: avidemux/gtk_gui.cpp:2450
+#: avidemux/gtk_gui.cpp:2410 avidemux/gtk_gui.cpp:2431
+#: avidemux/gtk_gui.cpp:2452
 msgid "Second track loaded"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2422
+#: avidemux/gtk_gui.cpp:2424
 msgid "Error loading the AC3 file"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2443
+#: avidemux/gtk_gui.cpp:2445
 msgid "Error loading the WAV file"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2509
+#: avidemux/gtk_gui.cpp:2511
 msgid "Saving failed"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2509
+#: avidemux/gtk_gui.cpp:2511
 msgid "Saving the job failed. Maybe you have permission issue with ~/.avidemux"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2521
+#: avidemux/gtk_gui.cpp:2523
 #, possible-c-format
 msgid "File %s has been successfully saved."
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:2525
-msgid "Failed"
-msgstr ""
-
-#: avidemux/gtk_gui.cpp:2525
+#: avidemux/gtk_gui.cpp:2527
 #, possible-c-format
 msgid "File %s was NOT saved correctly."
 msgstr ""

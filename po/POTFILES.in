@@ -6,7 +6,6 @@
 ./avidemux/ADM_audiocodec/ADM_lpcm.cpp
 ./avidemux/ADM_audiocodec/ADM_codecwav.cpp
 ./avidemux/ADM_audiocodec/ADM_codecmp3.cpp
-./avidemux/ADM_audiocodec/ADM_ffwma.cpp
 ./avidemux/ADM_audiocodec/ADM_codeculaw.cpp
 ./avidemux/ADM_audiocodec/ADM_codecac3.cpp
 ./avidemux/ADM_audiocodec/ADM_codecimaadpcm.cpp
@@ -32,6 +31,7 @@
 ./avidemux/ADM_audiofilter/audiofilter_mixer.cpp
 ./avidemux/ADM_audiofilter/audioeng_process.cpp
 ./avidemux/ADM_audiofilter/audiofilter_bridge.cpp
+./avidemux/ADM_audiofilter/audiofilter_vorbis.cpp
 ./avidemux/ADM_audiofilter/audioencoder.cpp
 ./avidemux/ADM_audiofilter/audioencoder_faac.cpp
 ./avidemux/ADM_audiofilter/audiofilter_buildchain.cpp
@@ -66,6 +66,7 @@
 ./avidemux/ADM_mplex/padstrm.cpp
 ./avidemux/ADM_mplex/lpcmstrm_in.cpp
 ./avidemux/ADM_mplex/ADM_mplexin.cpp
+./avidemux/ADM_mplex/ADM_mthread.cpp
 ./avidemux/oplug_mp4/oplug_mp4.cpp
 ./avidemux/ADM_colorspace/rgb2yuv.cpp
 ./avidemux/ADM_colorspace/yuv.cpp
@@ -150,6 +151,9 @@
 ./avidemux/ADM_dialog/DIA_lavcodec.cpp
 ./avidemux/ADM_dialog/DIA_mcdeint.cpp
 ./avidemux/ADM_dialog/DIA_defaultAudio.cpp
+./avidemux/ADM_dialog/DIA_partial.cpp
+./avidemux/ADM_dialog/DIA_fade.cpp
+./avidemux/ADM_dialog/DIA_ass.cpp
 ./avidemux/ADM_gui2/GUI_bindings.cpp
 ./avidemux/ADM_gui2/GUI_sdlDraw.cpp
 ./avidemux/ADM_gui2/GUI_main2.cpp
@@ -203,6 +207,7 @@
 ./avidemux/ADM_openDML/ADM_riff.cpp
 ./avidemux/ADM_openDML/ADM_odml_regular.cpp
 ./avidemux/ADM_openDML/ADM_opendml_reindex.cpp
+./avidemux/ADM_openDML/ADM_odml_audio.cpp
 ./avidemux/mpeg2enc/ADM_mpe2enc.cpp
 ./avidemux/ADM_lvemux/ADM_muxer.cpp
 ./avidemux/ADM_toolkit/toolkit_dialog.cpp
@@ -218,6 +223,8 @@
 ./avidemux/ADM_toolkit/choice.cpp
 ./avidemux/ADM_toolkit/ADM_cpuCap.cpp
 ./avidemux/ADM_toolkit/TLK_filesel.cpp
+./avidemux/ADM_toolkit/ADM_threads.cpp
+./avidemux/ADM_toolkit/ADM_queue.cpp
 ./avidemux/ADM_filter/vidVCD.cpp
 ./avidemux/ADM_filter/filter_declaration.cpp
 ./avidemux/ADM_filter/filter_saveload.cpp
@@ -387,6 +394,9 @@
 ./avidemux/ADM_video/ADM_vidKernelDeint.cpp
 ./avidemux/ADM_video/ADM_vidMPdelogo.cpp
 ./avidemux/ADM_video/ADM_vidMcDeint.cpp
+./avidemux/ADM_video/ADM_vidFade.cpp
+./avidemux/ADM_video/ADM_vidReverse.cpp
+./avidemux/ADM_video/ADM_vidASS.cpp
 ./avidemux/gui_navigate.cpp
 ./avidemux/ADM_memsupport.cpp
 ./avidemux/avilist.cpp
@@ -425,3 +435,8 @@
 ./avidemux/guiplay.cpp
 ./avidemux/callbacks.cpp
 ./avidemux/ADM_matroska/ADM_mkv.cpp
+./avidemux/ADM_matroska/ADM_mkv_audio.cpp
+./avidemux/ADM_asf/ADM_asfChunk.cpp
+./avidemux/ADM_asf/ADM_asf.cpp
+./avidemux/ADM_asf/ADM_asf_audio.cpp
+./avidemux/ADM_asf/ADM_asfPacket.cpp

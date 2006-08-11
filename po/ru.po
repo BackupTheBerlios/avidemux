@@ -1,51 +1,53 @@
 # translation of ru.po to Russian
-# translation of avidemux.po to Russian
 # This file is distributed under the same license as the PACKAGE package.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# Alexandre Prokoudine <avp@altlinux.ru>, 2003
 #
+# Alexandre Prokoudine <avp@altlinux.ru>, 2003.
+# Mihail Zenkov <kreator@tut.by>, 2006.
 msgid ""
 msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-07-19 14:36+0300\n"
-"PO-Revision-Date: 2003-06-21 15:03+0400\n"
-"Last-Translator: Alexandre Prokoudine <avp@altlinux.ru>\n"
+"POT-Creation-Date: 2006-08-11 13:29+0300\n"
+"PO-Revision-Date: 2006-08-11 15:29+0300\n"
+"Last-Translator: Mihail Zenkov <kreator@tut.by>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.0.1\n"
+"X-Generator: KBabel 1.11.2\n"
 
 #: avidemux/ADM_audiocodec/ADM_codecwma.cpp:75
-#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:158
+#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:175
 msgid "Internal error"
-msgstr ""
+msgstr "WMA/QDM2: внутренняя ошибка"
 
 #: avidemux/ADM_audiocodec/ADM_codecwma.cpp:75
 msgid "Cannot open WMA2 codec."
-msgstr ""
+msgstr "Невозможно открыть WMA2 кодек."
 
-#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:158
+#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:175
 msgid "Cannot open AMR codec."
-msgstr ""
+msgstr "Невозможно открыть AMR кодек."
 
 #: avidemux/oplug_avi/op_avisavecopy.cpp:92
 #: avidemux/oplug_avi/op_avisave.cpp:399
 msgid "Cannot initiate save"
-msgstr ""
+msgstr "Ошибка при инициализации сохранения"
 
 #: avidemux/oplug_avi/op_saveprocess.cpp:71
 msgid ""
 "Width is not a multiple of 8\n"
 " continue anyway ?"
 msgstr ""
+"Ширина не кратна 8.\n"
+"Продолжить?"
 
 #: avidemux/oplug_avi/op_saveprocess.cpp:91
 #: avidemux/oplug_mp4/oplug_mp4.cpp:161
 #: avidemux/oplug_ogm/op_ogsaveprocess.cpp:75
 msgid "Filter init failed"
-msgstr ""
+msgstr "Невозможно инициализировать фильтр"
 
 #: avidemux/oplug_avi/op_saveprocess.cpp:125
 #: avidemux/oplug_mp4/oplug_mp4.cpp:354
@@ -54,24 +56,31 @@ msgid ""
 "\n"
 " Reuse the existing log-file ?"
 msgstr ""
+"\n"
+"Заменить существующий лог-файл?"
 
 #: avidemux/oplug_avi/op_saveprocess.cpp:150
 #: avidemux/oplug_mp4/oplug_mp4.cpp:373
 msgid "Aborting"
-msgstr ""
+msgstr "Прервать"
 
 #: avidemux/oplug_avi/op_avisave.cpp:127
 msgid "Error initalizing audio filters"
-msgstr ""
+msgstr "Ошибка при инициализации аудиофильтра"
 
 #: avidemux/oplug_avi/op_avisave.cpp:138
 msgid "Error initalizing video filters"
-msgstr ""
+msgstr "Ошибка при инициализации видеофильтра"
+
+#: avidemux/ADM_audiofilter/audiofilter_normalize.cpp:94
+#: avidemux/ADM_audiofilter/audiofilter_normalize.cpp:127
+msgid "Normalize : Scanning"
+msgstr "Нормализация: сканирование"
 
 #: avidemux/ADM_audiofilter/audiofilter_buildchain.cpp:308
 #: avidemux/gui_autodrive.cpp:69 avidemux/gui_autodrive.cpp:84
 msgid "Codec Error"
-msgstr ""
+msgstr "Ошибка аудиокодера"
 
 #: avidemux/ADM_audiofilter/audiofilter_buildchain.cpp:308
 msgid ""
@@ -79,52 +88,57 @@ msgid ""
 "do.\n"
 "Either change codec or use the mixer filter to have less channels."
 msgstr ""
+"Количество каналов больше, чем допускает аудиокодер.\n"
+"Используйте другой кодер или используйте микшер фильтр для уменьшения "
+"количества каналов."
 
 #: avidemux/ADM_nuv/ADM_nuv.cpp:567
 msgid "Sure you want to abort ?"
-msgstr ""
+msgstr "Вы уверены, что хотите прервать?"
 
 #: avidemux/ADM_nuv/ADM_nuv.cpp:778
 msgid "Size mismatch"
-msgstr ""
+msgstr "Размер не совпадает"
 
 #: avidemux/ADM_nuv/ADM_nuv.cpp:778
 msgid "Expect a crash."
-msgstr ""
+msgstr "Возможен крэш."
 
 #: avidemux/ADM_nuv/ADM_nuv.cpp:1070
 msgid "Do you want to save an index ?"
-msgstr ""
+msgstr "Хотите сохранить индекс?"
 
 #: avidemux/oplug_mp4/oplug_mp4.cpp:143
 msgid "Cannot initialize the video stream"
-msgstr ""
+msgstr "Ошибка при инициализации видеопотока"
 
 #: avidemux/oplug_mp4/oplug_mp4.cpp:199 avidemux/oplug_mp4/oplug_mp4.cpp:306
 msgid "Error while encoding"
-msgstr ""
+msgstr "Ошибка во время кодирования"
 
 #: avidemux/oplug_mp4/oplug_mp4.cpp:209
 msgid "KeyFrame error"
-msgstr ""
+msgstr "Ошибка"
 
 #: avidemux/oplug_mp4/oplug_mp4.cpp:209
 msgid ""
 "The beginning frame is not a key frame.\n"
 "Please move the A marker."
 msgstr ""
+"Первый кадр не ключевой.\n"
+"Пожалуйста, переместите метку A."
 
 #: avidemux/oplug_mp4/oplug_mp4.cpp:236
 msgid "Cannot initialize the audio stream"
-msgstr ""
+msgstr "Невозможно инициализировать аудиопоток."
 
 #: avidemux/oplug_mp4/oplug_mp4.cpp:323
 msgid "Stop Request"
-msgstr ""
+msgstr "Приостановлено"
 
 #: avidemux/oplug_mp4/oplug_mp4.cpp:323
 msgid "Do you want to abort encoding ?"
-msgstr ""
+msgstr "Хотите прервать кодирование?"
 
 #: avidemux/ADM_dialog/DIA_chromaShift.cpp:257
 msgid "ChromaShift"
@@ -160,7 +174,7 @@ msgstr ""
 #: avidemux/ADM_dialog/DIA_coloryuv.cpp:200
 #: avidemux/ADM_dialog/DIA_audio.cpp:327
 msgid "Gain"
-msgstr ""
+msgstr "Усиление"
 
 #: avidemux/ADM_dialog/DIA_coloryuv.cpp:207
 msgid "Luma Y"
@@ -185,9 +199,8 @@ msgid "Matrix"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_coloryuv.cpp:354
-#, fuzzy
 msgid "Opt"
-msgstr "Вывод"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_coloryuv.cpp:361
 msgid "Level"
@@ -204,7 +217,7 @@ msgstr ""
 #: avidemux/ADM_dialog/DIA_audio.cpp:257 avidemux/ADM_dialog/DIA_audio.cpp:290
 #: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:133
 msgid "None"
-msgstr "Ничего"
+msgstr "Не нужно"
 
 #: avidemux/ADM_dialog/DIA_coloryuv.cpp:374
 msgid "Rec.709"
@@ -234,7 +247,7 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_coloryuv.cpp:404
 msgid "AutoGain"
-msgstr ""
+msgstr "Автоусиление"
 
 #: avidemux/ADM_dialog/DIA_coloryuv.cpp:408
 msgid "Display Stats"
@@ -250,19 +263,19 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:368
 msgid "Encoding in Progress"
-msgstr ""
+msgstr "Кодирование"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:378
 msgid "<b><big>Encoding files</big></b>"
-msgstr ""
+msgstr "<b><big>Кодирование файлов</big></b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:391
 msgid "<b>Phasis:</b>"
-msgstr ""
+msgstr "<b>Стадия:</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:401
 msgid "<b>Frame:</b>"
-msgstr ""
+msgstr "<b>Кадр:</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:419
 msgid "00000/00000"
@@ -270,35 +283,35 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:427
 msgid "<b>Vid codec:</b>"
-msgstr ""
+msgstr "<b>Видеокодек:</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:438
 msgid "<b>Aud Codec:</b>"
-msgstr ""
+msgstr "<b>Аудиокодек</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:448
 msgid "<b>FPS:</b>"
-msgstr ""
+msgstr "<b>Кадров за секунду:</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:458
 msgid "<b>Vid Bitrate:</b>"
-msgstr ""
+msgstr "<b>Битрейт:</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:468
 msgid "<b>Quantizer:</b>"
-msgstr ""
+msgstr "<b>Коэффициент квантования:</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:478
 msgid "<b>Video Size:</b>"
-msgstr ""
+msgstr "<b>Размер видео:</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:489
 msgid "<b>Audio Size:</b>"
-msgstr ""
+msgstr "<b>Размер аудио</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:499
 msgid "<b>Total Size:</b>"
-msgstr ""
+msgstr "<b>Общий размер:</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:525
 #: avidemux/ADM_dialog/DIA_encoding.cpp:533
@@ -336,7 +349,7 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:593
 msgid "<b>Container:</b>"
-msgstr ""
+msgstr "<b>Контейнер:</b>"
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:617
 msgid "00:00:00 Time Left"
@@ -344,44 +357,43 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_encoding.cpp:640
 msgid "Pause / Abort"
-msgstr ""
+msgstr "Пауза / Прервать"
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:105
 msgid "Select Xvid matrix file to load"
-msgstr ""
+msgstr "Выберите файл для загрузки настроек матрицы"
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:117
 msgid "Error Loading"
-msgstr ""
+msgstr "Ошибка при загрузке"
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:117
 msgid "Error loadind the custom matrix file."
-msgstr ""
+msgstr "Ошибка при загрузке настроек матрицы."
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:135
 msgid "Matrix Loaded"
-msgstr ""
+msgstr "Матрица загружена"
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:135
 msgid "The custom matrix file has been successfully loaded."
-msgstr ""
+msgstr "Настройки матрицы успешно загружены."
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:447
 msgid "Select Custom Matrix File to write"
-msgstr ""
+msgstr "Выберите файл для сохранения настроек матрицы"
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:452
 msgid "Error Writing"
-msgstr ""
+msgstr "Ошибка при записи"
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:452
 msgid "Error writing the custom matrix file."
-msgstr ""
+msgstr "Ошибка записи настроек матрицы."
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:656
-#, fuzzy
 msgid "XviD encoding options"
-msgstr "Параметры декодера"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:690
 #: avidemux/ADM_dialog/DIA_lavcodec.cpp:554
@@ -507,14 +519,12 @@ msgid "VHQ mode:"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:836
-msgid ""
-"Higher settings give higher quality results, at the cost of slower encoding"
+msgid "Higher settings give higher quality results, at the cost of slower encoding"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:840 avidemux/ADM_dialog/DIA_xvid.cpp:357
-#, fuzzy
 msgid "0 - None"
-msgstr "Ничего"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:844
 msgid "1 - Very low"
@@ -613,9 +623,8 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:955
 #: avidemux/ADM_dialog/DIA_lavcodec.cpp:772
-#, fuzzy
 msgid "Number of B-frames:"
-msgstr "Перейти к кадру..."
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:963
 msgid ""
@@ -639,8 +648,7 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:977
 #: avidemux/ADM_dialog/DIA_lavcodec.cpp:792
-msgid ""
-"Global Motion Compensation can save bits on camera pans, zooming and rotation"
+msgid "Global Motion Compensation can save bits on camera pans, zooming and rotation"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:979
@@ -688,9 +696,8 @@ msgid "Load Custom Matrix:  "
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:1045
-#, fuzzy
 msgid "Open CQM file"
-msgstr "Открыть видеофайл"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:1053
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:1481
@@ -904,9 +911,8 @@ msgid "Animé"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvcd.cpp:293
-#, fuzzy
 msgid "K-VCD"
-msgstr "SVCD"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvcd.cpp:299
 msgid "Gop Size  (12):"
@@ -918,7 +924,7 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_builtin.cpp:144
 msgid "Builtin support for"
-msgstr ""
+msgstr "Включена поддержка"
 
 #: avidemux/ADM_dialog/DIA_builtin.cpp:158
 msgid ""
@@ -926,6 +932,8 @@ msgid ""
 "you must RECOMPILE avidemux to have\n"
 "support for it!"
 msgstr ""
+"Включить отключенные опции\n"
+"можно только при компиляции"
 
 #: avidemux/ADM_dialog/DIA_builtin.cpp:171
 msgid "X264"
@@ -981,29 +989,24 @@ msgid "libDCA/libDTS"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:191
-#, fuzzy
 msgid "Informations"
-msgstr "Информация о видео"
+msgstr "Информация"
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:209
-#, fuzzy
 msgid "Frame Rate"
-msgstr "Кадры : "
+msgstr "Частота кадров "
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:216
-#, fuzzy
 msgid "# of frames"
-msgstr "Перейти к кадру..."
+msgstr "# кадров"
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:223
-#, fuzzy
 msgid "Codec 4CC"
-msgstr "Видеокодек"
+msgstr "Кодек 4CC"
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:230
-#, fuzzy
 msgid "Video Duration  "
-msgstr "Информация о видео"
+msgstr "Длительность "
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:244
 #: avidemux/ADM_dialog/DIA_properties.cpp:272
@@ -1016,7 +1019,7 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:251
 msgid "Image size"
-msgstr ""
+msgstr "Разрешение"
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:291
 msgid "Vop packed"
@@ -1033,28 +1036,27 @@ msgstr ""
 #: avidemux/ADM_dialog/DIA_properties.cpp:330
 #: avidemux/ADM_gui2/GUI_main2.cpp:1010
 msgid "<b>Video</b>"
-msgstr ""
+msgstr "<b>Видео</b>"
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:343
-#, fuzzy
 msgid "Codec "
-msgstr "Видеокодек"
+msgstr "Кодек "
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:350
 msgid "Channels  "
-msgstr ""
+msgstr "Каналы  "
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:357
 msgid "Bitrate "
-msgstr ""
+msgstr "Битрейт"
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:364
 msgid "Frequency"
-msgstr ""
+msgstr "Частота"
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:371
 msgid "Audio duration  "
-msgstr ""
+msgstr "Длительность "
 
 #: avidemux/ADM_dialog/DIA_properties.cpp:413
 msgid "VBR"
@@ -1063,38 +1065,36 @@ msgstr ""
 #: avidemux/ADM_dialog/DIA_properties.cpp:426
 #: avidemux/ADM_dialog/DIA_dmx.cpp:222 avidemux/ADM_gui2/GUI_main2.cpp:1050
 msgid "<b>Audio</b>"
-msgstr ""
+msgstr "<b>Аудио</b>"
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:51
 msgid "Continue indexing"
-msgstr ""
+msgstr "Продолжить индексирование"
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:51
 msgid "Abort Requested"
-msgstr ""
+msgstr "Прервать"
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:51
 msgid "Do you want to abort indexing ?"
-msgstr ""
+msgstr "Вы хотите прервать индексирование?"
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:153
 msgid "Indexing..."
-msgstr ""
+msgstr "Индексирование..."
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:174
 #: avidemux/ADM_dialog/DIA_working.cpp:249
-#, fuzzy
 msgid "Time left :"
-msgstr " Время :"
+msgstr "Времени осталось:"
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:182
-#, fuzzy
 msgid "Timecode :"
-msgstr " Время :"
+msgstr "Время:"
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:190
 msgid "Nb pictures seen :"
-msgstr ""
+msgstr "Количество кадров:"
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:198
 #: avidemux/ADM_dialog/DIA_calculator.cpp:434
@@ -1103,7 +1103,7 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:214
 msgid "Indexing :"
-msgstr ""
+msgstr "Индексирование:"
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:222
 msgid "/dev/null"
@@ -1123,11 +1123,11 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_enter.cpp:172 avidemux/ADM_dialog/DIA_enter.cpp:230
 #: avidemux/ADM_dialog/DIA_enter.cpp:295
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:584
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:656
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:718
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:778
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:841
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:587
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:659
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:721
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:781
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:844
 msgid "label1"
 msgstr ""
 
@@ -1190,7 +1190,7 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_recent.cpp:96
 msgid "Recent files"
-msgstr "Недавно открывавшиеся файлы"
+msgstr "Недавно открытые файлы"
 
 #: avidemux/ADM_dialog/DIA_working.cpp:254
 msgid "0:0:0"
@@ -1198,24 +1198,23 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_busy.cpp:102
 msgid "Busy"
-msgstr ""
+msgstr "Занят"
 
 #: avidemux/ADM_dialog/DIA_gototime.cpp:73
-#, fuzzy
 msgid "Go to time"
-msgstr "Перейти к маркеру А"
+msgstr "Перейти ко времени"
 
 #: avidemux/ADM_dialog/DIA_gototime.cpp:88
 msgid "h"
-msgstr ""
+msgstr "ч"
 
 #: avidemux/ADM_dialog/DIA_gototime.cpp:98
 msgid "mn"
-msgstr ""
+msgstr "мин"
 
 #: avidemux/ADM_dialog/DIA_gototime.cpp:108
 msgid "s"
-msgstr ""
+msgstr "с"
 
 #: avidemux/ADM_dialog/DIA_tdeint.cpp:159
 msgid "TDeint param"
@@ -1301,7 +1300,7 @@ msgstr ""
 #: avidemux/ADM_dialog/DIA_tdeint.cpp:263
 #: avidemux/ADM_filter/gui_filterlist.cpp:173
 msgid "Denoise"
-msgstr ""
+msgstr "Уменьшение шума"
 
 #: avidemux/ADM_dialog/DIA_tdeint.cpp:276
 msgid "Link"
@@ -1372,9 +1371,8 @@ msgid "Equalizer"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_mpeg2opt.cpp:104
-#, fuzzy
 msgid "Mpeg2 options"
-msgstr "Параметры Avi Muxer"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_mpeg2opt.cpp:113
 msgid "Other arg"
@@ -1432,7 +1430,7 @@ msgstr ""
 #: avidemux/ADM_dialog/DIA_SVCD.cpp:410
 #: avidemux/ADM_filter/gui_filterlist.cpp:123
 msgid "Interlacing"
-msgstr ""
+msgstr "Черезстрочность"
 
 #: avidemux/ADM_dialog/DIA_SVCD.cpp:426 avidemux/ADM_dialog/DIA_resize.cpp:380
 #: avidemux/ADM_dialog/DIA_resize.cpp:402
@@ -1467,9 +1465,8 @@ msgid "Anime"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_SVCD.cpp:464 avidemux/ADM_dialog/DIA_DVDff.cpp:617
-#, fuzzy
 msgid "KVCD"
-msgstr "SVCD"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_SVCD.cpp:478 avidemux/ADM_dialog/DIA_DVDff.cpp:637
 msgid "Gop Size:"
@@ -1480,23 +1477,20 @@ msgid "Max Bitrate:"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_vobsub.cpp:98
-#, fuzzy
 msgid "Select .idx file"
-msgstr "Выбрать файл журнала"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_vobsub.cpp:196
 msgid "VobSub Settings"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_vobsub.cpp:213
-#, fuzzy
 msgid "Select .idx"
-msgstr "Выбрать файл журнала"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_vobsub.cpp:227
-#, fuzzy
 msgid "Select Language :"
-msgstr "Выбрать файл журнала"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_vobsub.cpp:241
 msgid "Select Sub"
@@ -1554,29 +1548,28 @@ msgid "Show the interlaced areas (test only!)"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:209
-#, fuzzy
 msgid "Audio Processing"
-msgstr "Аудиопроцеес"
+msgstr "Обработка аудио"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:227
 msgid "DRC"
-msgstr ""
+msgstr "Динамический компрессор"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:235
 msgid "Timeshift"
-msgstr ""
+msgstr "Задержка"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:244
 msgid "<b>Misc</b>"
-msgstr ""
+msgstr "<b>Прочее</b>"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:267
 msgid "Resample to hz"
-msgstr ""
+msgstr "Передескретизация"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:277
 msgid "<b>Resampling</b>"
-msgstr ""
+msgstr "<b>Передескретизация</b>"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:296
 msgid "Film -> PAL"
@@ -1588,34 +1581,33 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:308
 msgid "<b>Fps convert</b>"
-msgstr ""
+msgstr "<b>Изменение частоты кадров</b>"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:335
 msgid "Automatic ( max is -3dB)"
-msgstr ""
+msgstr "Нормализация (-3dB)"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:345
 msgid "Manual (db) : "
-msgstr ""
+msgstr "Вручную (dB) :"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:357
 msgid "<b>Gain</b>"
-msgstr ""
+msgstr "<b>Усиление</b>"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:369
-#, fuzzy
 msgid "No change"
-msgstr "Ничего"
+msgstr "Без изменений"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:370 avidemux/ADM_dialog/DIA_lame.cpp:169
 msgid "Mono"
-msgstr ""
+msgstr "Моно"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:371
 #: avidemux/ADM_dialog/DIA_audiocodec.cpp:160
 #: avidemux/ADM_dialog/DIA_lame.cpp:170
 msgid "Stereo"
-msgstr ""
+msgstr "Стерео"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:372
 msgid "Stereo+Surround"
@@ -1655,7 +1647,7 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:382
 msgid "<b>Mixer</b>"
-msgstr ""
+msgstr "<b>Микшер</b>"
 
 #: avidemux/ADM_dialog/DIA_resize.cpp:312
 msgid "Resize"
@@ -1737,9 +1729,8 @@ msgid "Crop Bottom:"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_vcodec.cpp:150
-#, fuzzy
 msgid "VideoCodec"
-msgstr "Видеокодек"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_vcodec.cpp:169
 msgid "FFmpeg Mpeg4"
@@ -1767,31 +1758,30 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_vcodec.cpp:199
 msgid "Configure Codec"
-msgstr ""
+msgstr "Настройка кодека"
 
 #: avidemux/ADM_dialog/DIA_vcodec.cpp:207 avidemux/ADM_gui2/GUI_main2.cpp:961
 msgid "Calculator"
-msgstr ""
+msgstr "Калькулятор"
 
 #: avidemux/ADM_dialog/DIA_pause.cpp:91
 msgid "Paused"
-msgstr ""
+msgstr "Пауза"
 
 #: avidemux/ADM_dialog/DIA_pause.cpp:107
 msgid ""
 "<b>Encoding is paused.</b>\n"
 "\n"
 "You can either resume or Abort it."
-msgstr ""
+msgstr "<b>Кодирование приостановлено.</b>"
 
 #: avidemux/ADM_dialog/DIA_pause.cpp:134
-#, fuzzy
 msgid "Abort"
-msgstr "_О программе"
+msgstr "Прервать"
 
 #: avidemux/ADM_dialog/DIA_pause.cpp:156
 msgid "Resume"
-msgstr ""
+msgstr "Продолжить"
 
 #: avidemux/ADM_dialog/DIA_srt.cpp:376
 msgid "Subtitle to load"
@@ -1834,9 +1824,8 @@ msgid "Ascii"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_srt.cpp:614
-#, fuzzy
 msgid "Select color"
-msgstr "Выбрать файл журнала"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_srt.cpp:627
 msgid "Select"
@@ -1867,19 +1856,16 @@ msgid "Temporal Thresh"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_color.cpp:71
-#, fuzzy
 msgid "Select Color"
-msgstr "Выбрать файл журнала"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_v2v.cpp:56
-#, fuzzy
 msgid "Select Vob file to scan"
-msgstr "Выбрать файл журнала"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_v2v.cpp:67
-#, fuzzy
 msgid "Select ifo file to use"
-msgstr "Выбрать файл журнала"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_v2v.cpp:78
 msgid "Select vobsub to write"
@@ -2044,9 +2030,8 @@ msgid "VobSub"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_ocr.cpp:217
-#, fuzzy
 msgid "Output Srt"
-msgstr "Вывод"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_ocr.cpp:222
 msgid "<b>Files</b>"
@@ -2057,14 +2042,12 @@ msgid "StartOcr"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_ocr.cpp:249
-#, fuzzy
 msgid "Current Glyph"
-msgstr "Текущее видео"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_ocr.cpp:263
-#, fuzzy
 msgid " Text:"
-msgstr " Время :"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_ocr.cpp:287
 msgid "Calibrate"
@@ -2107,9 +2090,8 @@ msgid "Filter Strength :"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_eq2.cpp:330
-#, fuzzy
 msgid "MPlayer eq2"
-msgstr "Воспроизвести "
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_eq2.cpp:356
 msgid "Brigh_tness:"
@@ -2152,19 +2134,16 @@ msgid "Mpeg, Select audio"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_dmx.cpp:151
-#, fuzzy
 msgid "File :"
-msgstr "_Файл"
+msgstr "Файл :"
 
 #: avidemux/ADM_dialog/DIA_dmx.cpp:159
-#, fuzzy
 msgid "Type :"
-msgstr " Время :"
+msgstr "Тип :"
 
 #: avidemux/ADM_dialog/DIA_dmx.cpp:167
-#, fuzzy
 msgid "Video stream :"
-msgstr "Сохранить как беззаголовочный видеопоток"
+msgstr "Видеопоток:"
 
 #: avidemux/ADM_dialog/DIA_dmx.cpp:175
 msgid "label5"
@@ -2180,11 +2159,11 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_dmx.cpp:199
 msgid "<b>Input file</b>"
-msgstr ""
+msgstr "<b>Входной файл</b>"
 
 #: avidemux/ADM_dialog/DIA_dmx.cpp:213
 msgid "Detected Audio :"
-msgstr ""
+msgstr "Обнаружено аудио:"
 
 #: avidemux/ADM_dialog/DIA_DVDff.cpp:108 avidemux/ADM_dialog/DIA_DVDff.cpp:112
 msgid "Bitrate out of range"
@@ -2335,8 +2314,7 @@ msgid ""
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_deblend.cpp:167
-msgid ""
-"If pixels are closer than noise threshold, they are considered identical"
+msgid "If pixels are closer than noise threshold, they are considered identical"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_deblend.cpp:176
@@ -2354,9 +2332,8 @@ msgid "Rotate"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_audiocodec.cpp:112
-#, fuzzy
 msgid "Audio settings"
-msgstr "Источник звука"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_audiocodec.cpp:121
 #: avidemux/ADM_dialog/DIA_x264.cpp:530
@@ -2372,9 +2349,8 @@ msgid "Joint Stereo"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_muxer.cpp:125
-#, fuzzy
 msgid "AVI muxer options"
-msgstr "Параметры Avi Muxer"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_muxer.cpp:138
 msgid "Mux audio every"
@@ -2385,9 +2361,8 @@ msgid "Split in packets of"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_muxer.cpp:168
-#, fuzzy
 msgid "video frame(s)"
-msgstr "Предыдущий кадр"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_muxer.cpp:176
 msgid "bytes"
@@ -2440,9 +2415,8 @@ msgid "Save the current codec configuration as the stored default settings"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:506
-#, fuzzy
 msgid "Reset Defaults"
-msgstr "Недавно открывавшиеся файлы"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:510
 msgid "Reload the initial default codec settings"
@@ -2755,9 +2729,8 @@ msgid ""
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:912
-#, fuzzy
 msgid "Use as reference"
-msgstr "Сохранить настройки"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:917
 msgid ""
@@ -2782,9 +2755,8 @@ msgid "<b>B-Frames</b>"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:939
-#, fuzzy
 msgid "Partitions & Frames"
-msgstr "Предыдущий кадр"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:967
 msgid "Set how much \"bitrate bonus\" a keyframe can get"
@@ -2840,8 +2812,7 @@ msgid "Enforce a maximum quantizer level"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:1073
-msgid ""
-"Define how much the quantizer rate can change between two consecutive frames"
+msgid "Define how much the quantizer rate can change between two consecutive frames"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:1076
@@ -2930,7 +2901,7 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_cnr2.cpp:309
 msgid "<b>Mode</b>"
-msgstr ""
+msgstr "<b>Режим</b>"
 
 #: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:94
 msgid "Lavc PP Deint"
@@ -3009,19 +2980,19 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_about.cpp:61 avidemux/ADM_gui2/GUI_main2.cpp:262
+#: avidemux/ADM_dialog/DIA_about.cpp:71 avidemux/ADM_gui2/GUI_main2.cpp:262
 msgid "Avidemux"
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_about.cpp:62
-msgid "© 2001-2005 Mean"
+#: avidemux/ADM_dialog/DIA_about.cpp:72
+msgid "© 2001-2006 Mean"
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_about.cpp:63
+#: avidemux/ADM_dialog/DIA_about.cpp:73
 msgid "Multiplatform video editor"
-msgstr ""
+msgstr "Кроссплатформенный видеоредактор"
 
-#: avidemux/ADM_dialog/DIA_about.cpp:64
+#: avidemux/ADM_dialog/DIA_about.cpp:74
 msgid ""
 "Avidemux is free software; you can redistribute it and/or modify it \n"
 "under the terms of the GNU General Public License version 2 \n"
@@ -3375,7 +3346,7 @@ msgid ""
 "Public License instead of this License."
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_about.cpp:66
+#: avidemux/ADM_dialog/DIA_about.cpp:76
 msgid "http://www.avidemux.org"
 msgstr ""
 
@@ -3464,9 +3435,8 @@ msgid "Not Yet!"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid.cpp:490
-#, fuzzy
 msgid "B Frames"
-msgstr "Кадры : "
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_mosaic.cpp:79
 msgid "Mosaic"
@@ -3533,9 +3503,8 @@ msgid "Initial Video size :"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_requant.cpp:145
-#, fuzzy
 msgid "Audio size :"
-msgstr "Источник звука"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_requant.cpp:152
 msgid "Final size (audio+video):"
@@ -3566,9 +3535,8 @@ msgid "Scene change detect"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_audioTrack.cpp:133
-#, fuzzy
 msgid "Audio selector"
-msgstr "Источник звука"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_audioTrack.cpp:142
 msgid "Select audio track"
@@ -3638,58 +3606,57 @@ msgid "2x 74 min. CD"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:542
-#, fuzzy
 msgid "DVD5"
-msgstr "DVD"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:546
 #: avidemux/ADM_gui2/GUI_main2.cpp:904
 msgid "Custom"
-msgstr ""
+msgstr "Предустановка"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:552
 msgid "<b>Target</b>"
-msgstr ""
+msgstr "<b>Цель</b>"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:572
 msgid "Track _1:"
-msgstr ""
+msgstr "Дорожка 1:"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:580
 msgid "Audio bitrate in kb/s for track 1 (0 for no audio)"
-msgstr ""
+msgstr "Битрейт (кб/с) для первой звуковой дорожки (0 если её нет)"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:588
 msgid "Track _2: "
-msgstr ""
+msgstr "Дорожка 2:"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:596
 msgid "Audio bitrate in kb/s for track 2 (optional)"
-msgstr ""
+msgstr "Битрейт (кб/с) для второй звуковой дорожки"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:600
 msgid "<b>Audio Bitrate</b>"
-msgstr ""
+msgstr "<b>Аудиобитрейт</b>"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:622
 msgid "Audio size (MB):"
-msgstr ""
+msgstr "Размер аудио (мб):"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:638
 msgid "Video size (MB):"
-msgstr ""
+msgstr "Размер видео(мб)"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:654
 msgid "Total size (MB):"
-msgstr ""
+msgstr "Общий размер (мб):"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:676
 msgid "Video bitrate:"
-msgstr ""
+msgstr "Видеобитрейт:"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:684
 msgid "Bits per pixel:"
-msgstr ""
+msgstr "Бит на пиксел:"
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:700
 msgid "0.0"
@@ -3697,40 +3664,39 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_calculator.cpp:708
 msgid "<b>Result</b>"
-msgstr ""
+msgstr "<b>Результат</b>"
 
 #: avidemux/ADM_dialog/DIA_quota.cpp:90
 msgid "Filesystem full / quota exceeded"
-msgstr ""
+msgstr "Файловая система переполнена"
 
 #: avidemux/ADM_dialog/DIA_quota.cpp:133
 msgid "Ignore"
-msgstr ""
+msgstr "Игнорировать"
 
 #: avidemux/ADM_dialog/DIA_quota.cpp:155
 msgid "Retry"
-msgstr ""
+msgstr "Повторить"
 
 #: avidemux/ADM_dialog/DIA_resizeWiz.cpp:93
 msgid "Resize for VCD/SVCD/...."
-msgstr ""
+msgstr "Изменение размера для VCD/SVCD/...."
 
 #: avidemux/ADM_dialog/DIA_resizeWiz.cpp:103
 msgid "Target type : "
-msgstr ""
+msgstr "Выходной тип:"
 
 #: avidemux/ADM_dialog/DIA_resizeWiz.cpp:110
 msgid "Source Aspect Ratio :"
-msgstr ""
+msgstr "Исходное соотношение сторон:"
 
 #: avidemux/ADM_dialog/DIA_resizeWiz.cpp:127
 msgid "Destination Aspect Ratio :"
-msgstr ""
+msgstr "Выходное соотношение сторон:"
 
 #: avidemux/ADM_dialog/DIA_resizeWiz.cpp:150
-#, fuzzy
 msgid "VCD"
-msgstr "SVCD"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_resizeWiz.cpp:151
 msgid "SVCD"
@@ -3761,54 +3727,74 @@ msgstr ""
 msgid "Full parameter line"
 msgstr ""
 
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Ready"
+msgstr "Готово"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Succeeded"
+msgstr "Выполнено"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25 avidemux/gtk_gui.cpp:2527
+msgid "Failed"
+msgstr "Ошибка"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Deleted"
+msgstr "Удалён"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Running"
+msgstr "Исполняется"
+
 #: avidemux/ADM_dialog/DIA_jobs.cpp:90
 msgid "Name"
-msgstr ""
+msgstr "Имя"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:122 avidemux/ADM_dialog/DIA_jobs.cpp:154
 msgid "Sure!"
-msgstr ""
+msgstr "Да"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:122
 msgid "Delete ALL jobs"
-msgstr ""
+msgstr "Удалить все задания"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:122
 msgid "Are you sure you want to delete all jobs ?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить все задания?"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:154
 msgid "Delete job"
-msgstr ""
+msgstr "Удалить задание"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:154
 #, c-format
 msgid "Are you sure you want to delete %s job ?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить задание %s ?"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:163
 msgid "Unknown event"
-msgstr ""
+msgstr "Неизвестное событие"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:230
 msgid "Jobs"
-msgstr ""
+msgstr "Задания"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:256
 msgid "Delete All Jobs"
-msgstr ""
+msgstr "Удалить все задания"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:261
 msgid "Delete Job"
-msgstr ""
+msgstr "Удалить задание"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:266
 msgid "Run all jobs"
-msgstr ""
+msgstr "Выполнить все задания"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:271
 msgid "Run Job"
-msgstr ""
+msgstr "Выполнить задание"
 
 #: avidemux/ADM_dialog/DIA_contrast.cpp:361
 msgid "Chroma v"
@@ -3855,9 +3841,8 @@ msgid "Decomb strategy"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_dectel.cpp:239
-#, fuzzy
 msgid "Postprocessing"
-msgstr "Видеопроцесс"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_dectel.cpp:254
 msgid "No postprocessing"
@@ -3917,41 +3902,40 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_vorbis.cpp:172
 msgid "<b>Mode :</b>"
-msgstr ""
+msgstr "<b>Режим:</b>"
 
 #: avidemux/ADM_dialog/DIA_vorbis.cpp:180
 #: avidemux/ADM_dialog/DIA_defaultAudio.cpp:109
 msgid "<b>Bitrate :</b>"
-msgstr ""
+msgstr "<b>Битрейт :</b>"
 
 #: avidemux/ADM_dialog/DIA_vorbis.cpp:188
 msgid "<b>Quality :</b>"
-msgstr ""
+msgstr "<b>Качество :</b>"
 
 #: avidemux/ADM_dialog/DIA_vorbis.cpp:202
 msgid "CBR (bitrate based)"
-msgstr ""
+msgstr "CBR (постоянный битрейт)"
 
 #: avidemux/ADM_dialog/DIA_vorbis.cpp:208
 msgid "VBR (Quality based)"
-msgstr ""
+msgstr "VBR (постоянное качество)"
 
 #: avidemux/ADM_dialog/DIA_lavdecoder.cpp:79
-#, fuzzy
 msgid "Libavcodec Decoder Option"
-msgstr "Параметры декодера"
+msgstr "Настройки декодера libavcodec"
 
 #: avidemux/ADM_dialog/DIA_lavdecoder.cpp:88
 msgid "Swap UV"
-msgstr ""
+msgstr "Поменять местами UV"
 
 #: avidemux/ADM_dialog/DIA_lavdecoder.cpp:92
 msgid "Show motion Vectors"
-msgstr ""
+msgstr "Показать движение векторов"
 
 #: avidemux/ADM_dialog/DIA_postproc.cpp:90
 msgid "Mplayer PostProc options"
-msgstr ""
+msgstr "Настройка постпроцессинга"
 
 #: avidemux/ADM_dialog/DIA_postproc.cpp:99
 msgid "Horizontal Deblocking"
@@ -3967,59 +3951,55 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_postproc.cpp:136
 msgid "Filter Strength"
-msgstr ""
+msgstr "Сила фильтра"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:47
-#, fuzzy
 msgid "Select video to write"
-msgstr "Выбрать файл журнала"
+msgstr "Выбор файла для сохранения"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:59
 msgid "Invalid filename"
-msgstr ""
+msgstr "Неверное имя"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:59
 msgid "Please select or enter a valid filename"
-msgstr ""
+msgstr "Пожалуйста, выберите или введите верное имя файла"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:65
 msgid "Invalid jobname"
-msgstr ""
+msgstr "Неверное имя задания"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:65
 msgid "Please select or enter a valid jobname"
-msgstr ""
+msgstr "Пожалуйста, выберите или введите верное имя задания"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:107
-#, fuzzy
 msgid "Save Job"
-msgstr "Сохранить звук"
+msgstr "Сохранение задания"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:126
-#, fuzzy
 msgid "Select the output file"
-msgstr "Выбрать файл журнала"
+msgstr "Выбор файла"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:140
 msgid "_Browse..."
-msgstr ""
+msgstr "_Просмотреть..."
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:149
 msgid "Job name displayed in the job list and used as the script filename"
-msgstr ""
+msgstr "Имя задания отображается в списке заданий и используется как имя скрипта."
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:158
 msgid "Filename of the audio/video output"
-msgstr ""
+msgstr "Имя файла для выходного аудио/видео"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:161
 msgid "_Job name:"
-msgstr ""
+msgstr "_Имя задания:"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:168
-#, fuzzy
 msgid "Output _file:"
-msgstr "Вывод"
+msgstr "Выходной _файл:"
 
 #: avidemux/ADM_dialog/DIA_decimate.cpp:116
 msgid "Decomb Decimate"
@@ -4074,129 +4054,124 @@ msgid "Slow (full luma and chroma)"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_lame.cpp:147
-#, fuzzy
 msgid "Lame Encoder Settings"
-msgstr "Параметры декодера"
+msgstr "Настройка кодера lame"
 
 #: avidemux/ADM_dialog/DIA_lame.cpp:171
 msgid "Joint-Stereo"
-msgstr ""
+msgstr "Объединенное стерео"
 
 #: avidemux/ADM_dialog/DIA_lame.cpp:185
 msgid "<b>Channel Mode:</b>"
-msgstr ""
+msgstr "<b>Режим:</b>"
 
 #: avidemux/ADM_dialog/DIA_lame.cpp:193
 msgid "<b>Bitrate:</b>"
-msgstr ""
+msgstr "<b>Битрейт:</b>"
 
 #: avidemux/ADM_dialog/DIA_lame.cpp:201
 msgid "<b>Mode:</b>"
-msgstr ""
+msgstr "<b>Режим:</b>"
 
 #: avidemux/ADM_dialog/DIA_lame.cpp:209
 msgid "<b>Quality:</b>"
-msgstr ""
+msgstr "<b>Качество:</b>"
 
 #: avidemux/ADM_dialog/DIA_acodec.cpp:138
-#, fuzzy
 msgid "AudioCodec"
-msgstr "Звуковой кодек"
+msgstr "Аудиокодек"
 
 #: avidemux/ADM_dialog/DIA_acodec.cpp:163
 msgid "Configure codec"
-msgstr ""
+msgstr "Настройка кодека"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:409
-#, fuzzy
 msgid "Preferences"
-msgstr "Сохранить настройки"
+msgstr "Свойства"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:433
 msgid "_Message level:"
-msgstr ""
+msgstr "_Уровень сообщений:"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:440
 msgid "No alerts"
-msgstr ""
+msgstr "Не показывать"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:441
 msgid "Display only error alerts"
-msgstr ""
+msgstr "Только сообщения об ошибках"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:442
 msgid "Display all alerts"
-msgstr ""
+msgstr "Все сообщения"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:444
 msgid "_Swap marks A and B if A > B"
-msgstr ""
+msgstr "_Менять местами метки A и B если A>B"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:448
 msgid "_Go to systray when encoding"
-msgstr ""
+msgstr "_Свернуть в трей во время кодирования"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:452
-#, fuzzy
 msgid "S_ave preferences on exit"
-msgstr "Сохранить настройки"
+msgstr "Сохранять свойства при выходе"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:456
 msgid "User Interface"
-msgstr ""
+msgstr "Интерфейс"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:467
 msgid "_Automatically index MPEG files"
-msgstr ""
+msgstr "_Автоматически индексировать MPEG файлы"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:471
 msgid "_Disable NuppelVideo resync"
-msgstr ""
+msgstr "Отключить ресинхронизацию NuppelVideo"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:475
 msgid "_Use libavcodec MPEG decoder"
-msgstr ""
+msgstr "Использовать libavcodec для декодирования MPEG"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:479
 msgid "_Set Default Postprocessing Level"
-msgstr ""
+msgstr "Уровень постпроцессинга"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:483
 msgid "Input"
-msgstr ""
+msgstr "Ввод"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:498
 msgid "_MPEG auto split (MB):"
-msgstr ""
+msgstr "Автоматически разделять MPEG (MB):"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:507
 msgid "_Use OpenDML (don't split large AVI files)"
-msgstr ""
+msgstr "Использовать OpenDML (не разделять большие AVI файлы)"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:511
 msgid "_Reuse 2-pass log"
-msgstr ""
+msgstr "Заменять лог файл второго прохода"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:515
 msgid "Allow non standard audio frequency for DVD output"
-msgstr ""
+msgstr "Допускать нестандартные аудиочастоты при сохранении DVD"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:519 avidemux/ADM_gui2/GUI_main2.cpp:981
 msgid "Output"
 msgstr "Вывод"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:533
-#, fuzzy
 msgid "_Audio output:"
-msgstr "Источник звука"
+msgstr "Вывод звука:"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:540
 msgid "ALSA _device:"
-msgstr ""
+msgstr "ALSA"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:562
 msgid "_Master"
-msgstr ""
+msgstr "Мастер"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:570
 msgid "_PCM"
@@ -4204,46 +4179,43 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:578
 msgid "_Volume bar controls:"
-msgstr ""
+msgstr "Регулятор громкости:"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:585
 msgid "Local Playback Downmixing"
-msgstr ""
+msgstr "Микшер редактора"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:597
 msgid "No downmixing (multichannel)"
-msgstr ""
+msgstr "Не смешивать"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:602
-#, fuzzy
 msgid "Audio"
-msgstr "Сохранить звук"
+msgstr "Аудио"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:619
 msgid "_Video output:"
-msgstr ""
+msgstr "Видеовывод:"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:623 avidemux/ADM_dialog/DIA_prefs.cpp:633
-#, fuzzy
 msgid "Video"
-msgstr "Video CD"
+msgstr "Видео"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:641
 msgid "Enable multithreading : "
-msgstr ""
+msgstr "Включить многопоточность : "
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:651 avidemux/ADM_dialog/DIA_prefs.cpp:662
 msgid "MultiThread"
-msgstr ""
+msgstr "Многопоточность"
 
 #: avidemux/ADM_dialog/DIA_prefs.cpp:658
 msgid "Threads"
-msgstr ""
+msgstr "Потоки"
 
 #: avidemux/ADM_dialog/DIA_lavcodec.cpp:527
-#, fuzzy
 msgid "FFmpeg encoding options"
-msgstr "Параметры декодера"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_lavcodec.cpp:611
 msgid "Set quantizer for a constant quantizer/quality encoding"
@@ -4290,9 +4262,8 @@ msgid ""
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_lavcodec.cpp:729
-#, fuzzy
 msgid "0: None"
-msgstr "Ничего"
+msgstr ""
 
 #: avidemux/ADM_dialog/DIA_lavcodec.cpp:733
 msgid "1: Full"
@@ -4676,76 +4647,137 @@ msgstr ""
 msgid "Audio Encoder Settings"
 msgstr ""
 
-#: avidemux/ADM_gui2/GUI_main2.cpp:279 avidemux/main.cpp:119
+#: avidemux/ADM_dialog/DIA_partial.cpp:123
+#: avidemux/ADM_filter/gui_filtersub.cpp:144
+msgid "Partial"
+msgstr "Частично"
+
+#: avidemux/ADM_dialog/DIA_partial.cpp:137
+msgid "Start frame for partial :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_partial.cpp:144
+msgid "End frame for partial :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_partial.cpp:167
+msgid "Configure partialized filter"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:117
+msgid "Fade Filter"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:127
+msgid "Fade Type"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:139
+#, fuzzy
+msgid "Out"
+msgstr "Вывод"
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:140
+msgid "In"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:142
+msgid "Start Frame"
+msgstr "Первый кадр"
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:149
+msgid "End Frame"
+msgstr "Последний кадр:"
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:71
+#, fuzzy
+msgid "Can't read selected file"
+msgstr "Невозможно сохранить файл"
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:80
+msgid "Can't open selected directory"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:143
+msgid "Extract embedded fonts to"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:188
+msgid "You must select one file"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_bindings.cpp:554
+#, c-format
+msgid "Frame:%c(%02d)"
+msgstr "Тип кадра:%c(%02d)"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:279 avidemux/main.cpp:117
 msgid "_File"
 msgstr "_Файл"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:286
 msgid "_Open..."
-msgstr ""
+msgstr "_Открыть..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:297
 msgid "_Append..."
-msgstr ""
+msgstr "_Присоединить..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:308
 msgid "_Save"
-msgstr ""
+msgstr "_Сохранить"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:319
 msgid "Save _Video..."
-msgstr ""
+msgstr "Сохранить видео..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:331
-#, fuzzy
 msgid "Save _BMP Image..."
-msgstr "Сохранить изображение"
+msgstr "Сохранить как BMP..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:335
-#, fuzzy
 msgid "Save _JPEG Image..."
-msgstr "Сохранить изображение"
+msgstr "Сохранить как JPEG..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:339
 msgid "Save _Selection as JPEG images..."
-msgstr ""
+msgstr "Сохранить выделенное как JPEG..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:348
 msgid "Requantize _MPEG..."
-msgstr ""
+msgstr "Изменение размера кванта для MPEG..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:357
 msgid "Save _Project"
-msgstr ""
+msgstr "Сохранить проект"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:365
 msgid "Save P_roject As..."
-msgstr ""
+msgstr "Сохранить проект как..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:373
 msgid "_Load/Run Project..."
-msgstr ""
+msgstr "Загрузить/Запустить проект..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:381
 msgid "A_dd to Joblist..."
-msgstr ""
+msgstr "Добавить в список заданий..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:385
 msgid "Show _Joblist"
-msgstr ""
+msgstr "Показать список заданий"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:397
 msgid "Proper_ties"
-msgstr ""
+msgstr "Свойства"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:408
-#, fuzzy
 msgid "AVI _Muxer Options"
-msgstr "Параметры Avi Muxer"
+msgstr "Настройка выходного AVI файла"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:417
 msgid "_Quit"
-msgstr ""
+msgstr "_Выход"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:428
 msgid "_Edit"
@@ -4753,162 +4785,151 @@ msgstr "_Правка"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:435
 msgid "_Reset Edits"
-msgstr ""
+msgstr "Отмена всех изменений"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:448
 msgid "Cu_t"
-msgstr ""
+msgstr "Вырезать"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:459
 msgid "_Copy"
-msgstr ""
+msgstr "Копировать"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:470
 msgid "_Paste"
-msgstr ""
+msgstr "Вставить"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:481
 msgid "_Delete"
-msgstr ""
+msgstr "Удалить"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:497
-#, fuzzy
 msgid "Set Marker _A"
-msgstr "Перейти к маркеру А"
+msgstr "Установить метку _A"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:504
-#, fuzzy
 msgid "Set Marker _B"
-msgstr "Перейти к маркеру B"
+msgstr "Установить метку _B"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:516
-#, fuzzy
 msgid "Pre_ferences"
-msgstr "Сохранить настройки"
+msgstr "Свойства"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:524
 msgid "_View"
-msgstr ""
+msgstr "Вид"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:531
 msgid "_Main Toolbar"
-msgstr ""
+msgstr "Панель инструментов"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:536
 msgid "_A/V Sidebar"
-msgstr ""
+msgstr "Боковая панель"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:546
 msgid "_Zoom 1:4"
-msgstr ""
+msgstr "Уменьшить 1:4"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:553
 msgid "Z_oom 1:2"
-msgstr ""
+msgstr "Уменьшить 1:2"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:560
 msgid "Zoom _1:1"
-msgstr ""
+msgstr "Исходный _1:1"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:567
 msgid "Zoom _2:1"
-msgstr ""
+msgstr "Увеличить _2:1"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:574
 msgid "Zoom _4:1"
-msgstr ""
+msgstr "Увеличить _4:1"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:581
-#, fuzzy
 msgid "Vi_deo"
-msgstr "Video CD"
+msgstr "Видео"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:588
-#, fuzzy
 msgid "_Decoder Options"
-msgstr "Параметры декодера"
+msgstr "Настройка декодера"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:595
 msgid "_Postprocessing"
-msgstr ""
+msgstr "Постпроцессинг"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:598
 msgid "Select postprocessing level"
-msgstr ""
+msgstr "Выбор уровня постпроцессинга"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:608
-#, fuzzy
 msgid "P_review"
 msgstr "Предпросмотр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:615
 msgid "Display _Output"
-msgstr ""
+msgstr "Показывать вывод"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:627
 msgid "_Frame Rate"
-msgstr ""
+msgstr "Частота кадров"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:631 avidemux/ADM_gui2/GUI_main2.cpp:680
 msgid "_Encoder"
-msgstr ""
+msgstr "Кодировщик"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:638
-#, fuzzy
 msgid "Fil_ters"
-msgstr "_Файл"
+msgstr "Фильтр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:645
-#, fuzzy
 msgid "_Audio"
-msgstr "Сохранить звук"
+msgstr "Аудио"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:652
 msgid "_Main Track"
-msgstr ""
+msgstr "Главная дорожка"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:656
 msgid "_Second Track"
-msgstr ""
+msgstr "Вторая дорожка"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:660
-#, fuzzy
 msgid "_Build VBR Time Map"
-msgstr "Создать карту времени VBR"
+msgstr "Построить временную карту VBR"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:669
 msgid "S_ave..."
-msgstr ""
+msgstr "Сохранить..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:687
-#, fuzzy
 msgid "_Filters"
-msgstr "_Файл"
+msgstr "Фильтр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:691
 msgid "_Tools"
-msgstr ""
+msgstr "Инструменты"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:698
 msgid "_Calculator"
-msgstr ""
+msgstr "Калькулятор"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:714
-#, fuzzy
 msgid "_Rebuild Frames (I & B)"
-msgstr "Перестроить кадры (I&B)"
+msgstr "Переупорядочить кадры (I & B)"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:718
 msgid "C_heck Frames (slow)"
-msgstr ""
+msgstr "Проверить кадры (медленно)"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:722
 msgid "_Bitrate Histogram"
-msgstr ""
+msgstr "Гистограмма битрейта"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:726
 msgid "_Scan for Black Frames..."
-msgstr ""
+msgstr "Искать чёрные кадры..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:735
 msgid "_VOB -> VobSub"
@@ -4920,92 +4941,79 @@ msgstr ""
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:743
 msgid "A_uto"
-msgstr ""
+msgstr "Авто"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:750
-#, fuzzy
 msgid "_VCD"
-msgstr "SVCD"
+msgstr ""
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:754
-#, fuzzy
 msgid "_SVCD"
-msgstr "SVCD"
+msgstr ""
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:758
-#, fuzzy
 msgid "_DVD"
-msgstr "DVD"
+msgstr ""
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:766
 msgid "_Go"
-msgstr ""
+msgstr "Переход"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:773
 msgid "_Play/Stop"
-msgstr ""
+msgstr "Воспроизвести/Остановить"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:784
-#, fuzzy
 msgid "P_revious Frame"
 msgstr "Предыдущий кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:795
-#, fuzzy
 msgid "_Next Frame"
 msgstr "Следующий кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:806
-#, fuzzy
 msgid "Pr_evious Intra Frame"
-msgstr "Предыдущий кадр"
+msgstr "Предыдущий ключевой кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:817
-#, fuzzy
 msgid "Next _Intra Frame"
-msgstr "Следующий кадр"
+msgstr "Следующий ключевой (I) кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:828
-#, fuzzy
 msgid "Previou_s Black Frame"
-msgstr "Предыдущий кадр"
+msgstr "Предыдущий черный кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:832
-#, fuzzy
 msgid "Ne_xt Black Frame"
-msgstr "Следующий кадр"
+msgstr "Следующий черный кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:836
 msgid "_First Frame"
-msgstr ""
+msgstr "Первый кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:847
 msgid "_Last Frame"
-msgstr ""
+msgstr "Последний кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:863
-#, fuzzy
 msgid "Go to Marker _A"
-msgstr "Перейти к маркеру А"
+msgstr "Перейти к метке _A"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:870
-#, fuzzy
 msgid "Go to Marker _B"
-msgstr "Перейти к маркеру B"
+msgstr "Перейти к метке _B"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:882
-#, fuzzy
 msgid "_Jump to Frame..."
 msgstr "Перейти к кадру..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:893
-#, fuzzy
 msgid "Jump to _Time..."
-msgstr "Перейти к кадру..."
+msgstr "Перейти ко времени..."
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:908
 msgid "_Help"
-msgstr ""
+msgstr "Справка"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:915
 msgid "_About"
@@ -5013,80 +5021,75 @@ msgstr "_О программе"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:923
 msgid "Show builtin support"
-msgstr ""
+msgstr "Поддерживаемые возможности"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:937
-#, fuzzy
 msgid "Open a file"
-msgstr "Открыть видеофайл"
+msgstr "Открыть файл"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:947
-#, fuzzy
 msgid "Save the file"
-msgstr "Сохранить изображение"
+msgstr "Сохранить файл"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:953
-#, fuzzy
 msgid "Audio/video file information"
-msgstr "Информация о видео"
+msgstr "Информация о текущем файле"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:964
 msgid "Bitrate/size calculator"
-msgstr ""
+msgstr "Вычисление битрейта/размера"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:978
 msgid "Preview filtered video in a new window"
-msgstr ""
+msgstr "Открыть предпросмотр в новом окне"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:987
 msgid "Display filtered output in the main window"
-msgstr ""
+msgstr "Предпросмотр в главном окне"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1028 avidemux/ADM_gui2/GUI_main2.cpp:1068
 msgid "Copy"
-msgstr ""
+msgstr "Копировать"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1030 avidemux/ADM_gui2/GUI_main2.cpp:1070
 msgid "Configure"
-msgstr ""
+msgstr "Настройка"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1033
 msgid "Configure video encoder"
-msgstr ""
+msgstr "Настройка видеокодера"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1038 avidemux/ADM_gui2/GUI_main2.cpp:1094
-#, fuzzy
 msgid "Filters"
-msgstr "_Файл"
+msgstr "Фильтры"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1041
 msgid "Video filters"
-msgstr ""
+msgstr "Видеофильтры"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1073
 msgid "Configure audio encoder"
-msgstr ""
+msgstr "Настройка аудиокодера"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1081
-#, fuzzy
 msgid "Audio filters"
-msgstr "Звуковое устройство"
+msgstr "Аудиофильтры"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1102
 msgid "Shift:"
-msgstr ""
+msgstr "Сдвиг:"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1105
 msgid "Enable time shift"
-msgstr ""
+msgstr "Включить сдвиг"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1111
 msgid "Audio/video time shift (ms)"
-msgstr ""
+msgstr "Сдвиг между аудио и видео (мс)"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1118
 msgid "<b>Format</b>"
-msgstr ""
+msgstr "<b>Контейнер</b>"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1133
 msgid "AVI, unp. VOP"
@@ -5094,12 +5097,11 @@ msgstr ""
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1134
 msgid "AVI, dual audio"
-msgstr ""
+msgstr "AVI, два аудио"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1136
-#, fuzzy
 msgid "MPEG video"
-msgstr "Воспроизвести видео"
+msgstr "MPEG видео"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1137
 msgid "MPEG PS A+V"
@@ -5119,7 +5121,7 @@ msgstr ""
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1160
 msgid "<b>Selection</b>"
-msgstr ""
+msgstr "<b>Выделено</b>"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1177 avidemux/ADM_gui2/GUI_main2.cpp:1185
 msgid " 0000000"
@@ -5131,7 +5133,7 @@ msgstr ""
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1200
 msgid "Go to marker A"
-msgstr "Перейти к маркеру А"
+msgstr "Перейти к метке А"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1202
 msgid "B:"
@@ -5139,16 +5141,15 @@ msgstr ""
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1209
 msgid "Go to marker B"
-msgstr "Перейти к маркеру B"
+msgstr "Перейти к метке B"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1221
-#, fuzzy
 msgid "Play"
-msgstr "Воспроизвести "
+msgstr "Воспроизвести"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1235
 msgid "Stop"
-msgstr ""
+msgstr "Остановить"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1247
 msgid "Previous frame"
@@ -5159,67 +5160,56 @@ msgid "Next frame"
 msgstr "Следующий кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1277
-#, fuzzy
 msgid "Previous keyframe"
-msgstr "Предыдущий кадр"
+msgstr "Предыдущий ключевой кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1292
-#, fuzzy
 msgid "Next keyframe"
-msgstr "Следующий кадр"
+msgstr "Следующий ключевой кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1306
 msgid "Selection: start"
-msgstr ""
+msgstr "Выделение: начало"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1317
-#, fuzzy
 msgid "Selection: end"
-msgstr "Выбрать файл журнала"
+msgstr "Выделение: конец"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1328
-#, fuzzy
 msgid "Previous black frame"
-msgstr "Предыдущий кадр"
+msgstr "Предыдущий черный кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1339
-#, fuzzy
 msgid "Next black frame"
-msgstr "Следующий кадр"
+msgstr "Следующий черный кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1350
-#, fuzzy
 msgid "First frame"
-msgstr "Следующий кадр"
+msgstr "Первый кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1361
-#, fuzzy
 msgid "Last frame"
-msgstr "Следующий кадр"
+msgstr "Последний кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1392
-#, fuzzy
 msgid "Frame: "
-msgstr "Кадры : "
+msgstr "Кадр:"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1399
-#, fuzzy
 msgid "Current frame"
-msgstr "Следующий кадр"
+msgstr "Текущий кадр"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1404
 msgid "/0000000"
 msgstr ""
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1411
-#, fuzzy
 msgid "Time: "
-msgstr " Время :"
+msgstr "Время:"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1418
-#, fuzzy
 msgid "Current time"
-msgstr "Текущее видео"
+msgstr "Текущее время"
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1419
 msgid "00:00:00.000"
@@ -5230,9 +5220,8 @@ msgid "/00:00:00,000"
 msgstr ""
 
 #: avidemux/ADM_gui2/GUI_main2.cpp:1429
-#, fuzzy
 msgid "Frame: ?"
-msgstr "Кадры : "
+msgstr "Тип кадра:"
 
 #: avidemux/ADM_gui2/support.cpp:249 avidemux/ADM_gui2/support.cpp:273
 #, c-format
@@ -5240,90 +5229,91 @@ msgid "Couldn't find pixmap file: %s"
 msgstr ""
 
 #: avidemux/oplug_ogm/op_ogsave.cpp:112
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:249
-#: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:1002
-#: avidemux/gtk_gui.cpp:1426 avidemux/gtk_gui.cpp:1765
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:258
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:1004
+#: avidemux/gtk_gui.cpp:1428 avidemux/gtk_gui.cpp:1767
 #: avidemux/ADM_requantize.cpp:227
 msgid "File error"
-msgstr ""
+msgstr "Файловая ошибка"
 
 #: avidemux/oplug_ogm/op_ogsave.cpp:112
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:249 avidemux/gtk_gui.cpp:1426
-#: avidemux/gtk_gui.cpp:1765 avidemux/ADM_requantize.cpp:227
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:258 avidemux/gtk_gui.cpp:1428
+#: avidemux/gtk_gui.cpp:1767 avidemux/ADM_requantize.cpp:227
 #, c-format
 msgid "Cannot open \"%s\" for writing."
-msgstr ""
+msgstr "Невозможно открыть для записи \"%s\""
 
 #: avidemux/oplug_ogm/op_ogsave.cpp:126
 msgid "Could not initialize video"
-msgstr ""
+msgstr "Невозможно инициализировать видео"
 
 #: avidemux/oplug_ogm/op_ogsave.cpp:134
 msgid "Could not initialize audio"
-msgstr ""
+msgstr "Невозможно инициализировать аудио"
 
-#: avidemux/oplug_mpeg/op_mpegwrite.cpp:314 avidemux/gtk_gui.cpp:1818
+#: avidemux/oplug_mpeg/op_mpegwrite.cpp:314 avidemux/gtk_gui.cpp:1820
 msgid "No frames to encode"
-msgstr ""
+msgstr "Нет кадров для кодирования"
 
-#: avidemux/oplug_mpeg/op_mpegwrite.cpp:315 avidemux/gtk_gui.cpp:1818
+#: avidemux/oplug_mpeg/op_mpegwrite.cpp:315 avidemux/gtk_gui.cpp:1820
 msgid "Please check markers. Is \"A>\" == \">B\"?"
-msgstr ""
+msgstr "Проверьте метки, должно быть \"A>\" == \">B\""
 
 #: avidemux/oplug_mpeg/op_mpegwrite.cpp:441
 #: avidemux/oplug_mpeg/op_mpegwrite.cpp:690
-#: avidemux/oplug_mpeg/op_mpegwrite.cpp:891
+#: avidemux/oplug_mpeg/op_mpegwrite.cpp:893
 msgid "Encoding error"
-msgstr ""
+msgstr "Ошибка кодирования"
 
 #: avidemux/oplug_mpeg/op_mpegwrite.cpp:565
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:322
-#, fuzzy
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:331
 msgid "Reuse log file ?"
-msgstr "Выбрать файл журнала"
+msgstr "Переписать лог файл?"
 
 #: avidemux/oplug_mpeg/op_mpegwrite.cpp:582
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:339
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:348
 msgid "Error in pass 1"
-msgstr ""
+msgstr "Ошибка при первом проходе."
 
 #: avidemux/oplug_mpeg/op_mpegwrite.cpp:594
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:369
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:431
 msgid "Error in pass 2"
-msgstr ""
+msgstr "Ошибка при втором проходе."
 
-#: avidemux/oplug_mpeg/op_mpegwrite.cpp:1043
+#: avidemux/oplug_mpeg/op_mpegwrite.cpp:1045
 #: avidemux/ADM_lavformat/ADM_lavformat.cpp:280
 msgid "Incompatible frame rate"
-msgstr ""
+msgstr "Недопустимая частота кадров"
 
 #: avidemux/oplug_mpeg/op_mpeg.cpp:97 avidemux/oplug_mpeg/op_mpeg.cpp:167
 msgid "VCD file to save"
-msgstr ""
+msgstr "VCD файл для сохранения"
 
 #: avidemux/oplug_mpeg/op_mpeg.cpp:123 avidemux/oplug_mpeg/op_mpeg.cpp:215
 #: avidemux/oplug_mpeg/op_mpeg.cpp:302 avidemux/oplug_mpeg/op_mpeg.cpp:378
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:130
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:148
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:159
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:120
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:157
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:168
 msgid "There is no audio track"
-msgstr ""
+msgstr "Звуковая дорожка отсутствует"
 
 #: avidemux/oplug_mpeg/op_mpeg.cpp:142 avidemux/oplug_mpeg/op_mpeg.cpp:228
 #: avidemux/oplug_mpeg/op_mpeg.cpp:321 avidemux/oplug_mpeg/op_mpeg.cpp:397
 msgid "Incompatible audio frequency"
-msgstr ""
+msgstr "Недопустимая частота дескретизации аудио."
 
 #: avidemux/oplug_mpeg/op_mpeg.cpp:142
 msgid ""
 "For VCD PS, samplerate must be 44.1 kHz.\n"
 "Use the resample audio filter."
 msgstr ""
+"Для VCD PS, частота дескретизации должна быть 44.1 кГц.<br>Используйте "
+"фильтр для передескретизации."
 
 #: avidemux/oplug_mpeg/op_mpeg.cpp:148 avidemux/oplug_mpeg/op_mpeg.cpp:234
 #: avidemux/oplug_mpeg/op_mpeg.cpp:327 avidemux/oplug_mpeg/op_mpeg.cpp:403
 msgid "Incompatible audio codec"
-msgstr ""
+msgstr "Недопустимый аудиокодек"
 
 #: avidemux/oplug_mpeg/op_mpeg.cpp:148
 msgid "For VCD PS, audio must be MP2."
@@ -5390,39 +5380,39 @@ msgstr ""
 msgid "For DVD, audio must be MP2,AC3 or LPCM."
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:125
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:115
 msgid "This is not MPEG compatible"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:125
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:115
 msgid "You can't use the Copy codec."
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:137
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:127
 msgid "The first frame is not intra frame"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:137
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:127
 msgid "Use the &lt;&lt; and the &gt;&gt; buttons to move using Intra frames."
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:149
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:169
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:139
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:178
 msgid "Audio track is not suitable"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:189
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:201
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:179
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:210
 #: avidemux/ADM_lvemux/ADM_muxer.cpp:85
 msgid "Incompatible audio"
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:189
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:179
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:179
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:188
 msgid "For VCD, audio must be 44.1 kHz MP2."
 msgstr ""
 
-#: avidemux/oplug_mpeg/op_mpegpass.cpp:218
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:208
 msgid "For DVD, audio must be 48 kHz MP2(stereo), AC3, DTS or LPCM (stereo)."
 msgstr ""
 
@@ -5438,11 +5428,11 @@ msgstr ""
 msgid "Select DVD as the video codec for MPEG TS output."
 msgstr ""
 
-#: avidemux/ADM_encoder/adm_encConfig.cpp:732
+#: avidemux/ADM_encoder/adm_encConfig.cpp:712
 msgid "Only QCIF and subQCIF are allowed for H.263"
 msgstr ""
 
-#: avidemux/ADM_encoder/adm_encConfig.cpp:911
+#: avidemux/ADM_encoder/adm_encConfig.cpp:891
 msgid "Fatal error"
 msgstr ""
 
@@ -5474,13 +5464,13 @@ msgstr ""
 msgid "No stts table"
 msgstr ""
 
-#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:201
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:210
 msgid "For DVD, audio must be 48 kHz MP2, AC3 or LPCM."
 msgstr ""
 
-#: avidemux/ADM_openDML/ADM_openDML.cpp:282
-#: avidemux/ADM_openDML/ADM_openDML.cpp:367
-#: avidemux/ADM_openDML/ADM_openDML.cpp:497
+#: avidemux/ADM_openDML/ADM_openDML.cpp:290
+#: avidemux/ADM_openDML/ADM_openDML.cpp:375
+#: avidemux/ADM_openDML/ADM_openDML.cpp:505
 msgid "Malformed header"
 msgstr ""
 
@@ -5492,17 +5482,16 @@ msgstr ""
 msgid "lvemux init failed"
 msgstr ""
 
-#: avidemux/ADM_toolkit/toolkit_dialog.cpp:705
-#, fuzzy
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:708
 msgid "Alert"
-msgstr "aRts"
+msgstr ""
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:121
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:316
 msgid "Cannot open directory as a file"
 msgstr ""
 
-#: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:999
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:1001
 #, c-format
 msgid "Cannot open \"%s\"."
 msgstr ""
@@ -5516,7 +5505,7 @@ msgstr ""
 msgid "It could be possible that you try to overwrite an input file!"
 msgstr ""
 
-#: avidemux/ADM_toolkit/TLK_filesel.cpp:238 avidemux/gtk_gui.cpp:1492
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:238 avidemux/gtk_gui.cpp:1494
 msgid "Cannot write the file"
 msgstr ""
 
@@ -5577,95 +5566,84 @@ msgstr ""
 
 #: avidemux/ADM_filter/gui_filtersub.cpp:52
 msgid "Video Filters"
-msgstr ""
+msgstr "Видеофильтры"
 
 #: avidemux/ADM_filter/gui_filtersub.cpp:112
-#, fuzzy
 msgid "VCD res"
-msgstr "Видеопроцесс"
+msgstr ""
 
 #: avidemux/ADM_filter/gui_filtersub.cpp:118
-#, fuzzy
 msgid "SVCD res"
-msgstr "SVCD"
+msgstr ""
 
 #: avidemux/ADM_filter/gui_filtersub.cpp:124
-#, fuzzy
 msgid "DVD res"
-msgstr "Видеопроцесс"
+msgstr ""
 
 #: avidemux/ADM_filter/gui_filtersub.cpp:130
 msgid "Half D1 res"
 msgstr ""
 
-#: avidemux/ADM_filter/gui_filtersub.cpp:144
-msgid "Partial"
-msgstr ""
-
 #: avidemux/ADM_filter/gui_filtersub.cpp:156
-#, fuzzy
 msgid "Save as script"
-msgstr "Сохранитm как AVI"
+msgstr "Сохранить скрипт"
 
 #: avidemux/ADM_filter/gui_filterlist.cpp:64
 msgid "Add Video Filter"
-msgstr ""
+msgstr "Добавить видеофильтр"
 
 #: avidemux/ADM_filter/gui_filterlist.cpp:98
-#, fuzzy
 msgid "Transformation"
-msgstr "Информация о видео"
+msgstr "Трансформация"
 
 #: avidemux/ADM_filter/gui_filterlist.cpp:148
 msgid "Colors"
-msgstr ""
+msgstr "Цвет"
 
 #: avidemux/ADM_filter/gui_filterlist.cpp:198
 msgid "Sharpen/Blur"
-msgstr ""
+msgstr "Резкость/Размывание"
 
 #: avidemux/ADM_filter/gui_filterlist.cpp:223
 msgid "Subtitles"
-msgstr ""
+msgstr "Субтитры"
 
 #: avidemux/ADM_filter/gui_filterlist.cpp:248
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Прочие"
 
-#: avidemux/ADM_filter/gui_filter.cpp:323
+#: avidemux/ADM_filter/gui_filter.cpp:326
 msgid "The filter is already partial"
-msgstr ""
+msgstr "Фильтр уже частично применён"
 
-#: avidemux/ADM_filter/gui_filter.cpp:449
-#: avidemux/ADM_filter/gui_filter.cpp:451
-#, fuzzy
+#: avidemux/ADM_filter/gui_filter.cpp:452
+#: avidemux/ADM_filter/gui_filter.cpp:454
 msgid "Load set of filters"
-msgstr "Загрузить список изменений"
+msgstr "Загрузка настроек фильтров"
 
-#: avidemux/ADM_filter/gui_filter.cpp:458
+#: avidemux/ADM_filter/gui_filter.cpp:461
 msgid "Nothing to save"
-msgstr ""
+msgstr "Нечего сохранять"
 
-#: avidemux/ADM_filter/gui_filter.cpp:462
-#: avidemux/ADM_filter/gui_filter.cpp:464
-#, fuzzy
+#: avidemux/ADM_filter/gui_filter.cpp:465
+#: avidemux/ADM_filter/gui_filter.cpp:467
 msgid "Save set of filters"
-msgstr "Выбрать файл журнала"
+msgstr "Сохранить настройки фильтров"
 
-#: avidemux/ADM_editor/ADM_edit.cpp:372
+#: avidemux/ADM_editor/ADM_edit.cpp:377
 msgid "File type identified but no loader support detected..."
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:373
+#: avidemux/ADM_editor/ADM_edit.cpp:378
 msgid "May be related to an old index file."
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:380
+#: avidemux/ADM_editor/ADM_edit.cpp:385
 #, c-format
 msgid "Attempt to open %s failed!"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:404
+#: avidemux/ADM_editor/ADM_edit.cpp:409
 msgid ""
 "You cannot mix different video dimensions yet. Using the partial video "
 "filter later, will not work around this problem. The workaround is:\n"
@@ -5674,25 +5652,23 @@ msgid ""
 "2.) concatinate them together"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:501
-#, fuzzy
+#: avidemux/ADM_editor/ADM_edit.cpp:506
 msgid "Build Time Map"
-msgstr "Создать карту времени VBR"
+msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:501
-#, fuzzy
+#: avidemux/ADM_editor/ADM_edit.cpp:506
 msgid "Build VBR time map?"
-msgstr "Создать карту времени VBR"
+msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:535
+#: avidemux/ADM_editor/ADM_edit.cpp:540
 msgid "Use that mode"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:535
+#: avidemux/ADM_editor/ADM_edit.cpp:540
 msgid "H264 detected"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:535
+#: avidemux/ADM_editor/ADM_edit.cpp:540
 msgid ""
 "If the file is using bframe as reference, it can lead to crash or "
 "stutteting.\n"
@@ -5701,59 +5677,61 @@ msgid ""
 "Do you want to use that mode ?"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:649
+#: avidemux/ADM_editor/ADM_edit.cpp:654
 msgid "Packed Bitstream detected"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:650
+#: avidemux/ADM_editor/ADM_edit.cpp:655
 msgid "Do you want me to unpack it ?"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:670
+#: avidemux/ADM_editor/ADM_edit.cpp:675
 msgid "Could not unpack the video"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:670
+#: avidemux/ADM_editor/ADM_edit.cpp:675
 msgid "Using backup decoder - not frame accurate."
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:675
+#: avidemux/ADM_editor/ADM_edit.cpp:680
 msgid "Weird"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:675
+#: avidemux/ADM_editor/ADM_edit.cpp:680
 msgid "The unpacking succeedeed but the index is still not up to date."
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:681
+#: avidemux/ADM_editor/ADM_edit.cpp:686
 msgid "Troubles ahead"
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:681
+#: avidemux/ADM_editor/ADM_edit.cpp:686
 msgid "This a VOP packed AVI."
 msgstr ""
 
-#: avidemux/ADM_editor/ADM_edit.cpp:690
+#: avidemux/ADM_editor/ADM_edit.cpp:695
 msgid "Index is not up to date"
-msgstr ""
+msgstr "Индекс не обновлён"
 
-#: avidemux/ADM_editor/ADM_edit.cpp:690
+#: avidemux/ADM_editor/ADM_edit.cpp:695
 msgid "You should use Tool->Rebuild frame. Do it now ?"
 msgstr ""
+"Вы должны использовать 'Инструменты->Переупорядочить кадры'. Сделять это "
+"сейчас?"
 
-#: avidemux/ADM_editor/ADM_edit.cpp:1417
+#: avidemux/ADM_editor/ADM_edit.cpp:1422
 msgid ""
 "This looks like mpeg\n"
 " Do you want to index it?"
-msgstr ""
+msgstr "Выглядит как mpeg<br>Хотите индексировать?"
 
-#: avidemux/ADM_editor/ADM_edit.cpp:1469
+#: avidemux/ADM_editor/ADM_edit.cpp:1474
 msgid "Indexing failed"
-msgstr ""
+msgstr "Ошибка при индексировании"
 
 #: avidemux/ADM_editor/ADM_edFrameType.cpp:57
 msgid "No video loaded"
-msgstr ""
+msgstr "Видео не загружено"
 
 #: avidemux/ADM_editor/ADM_edFrameType.cpp:62
 msgid "Not indexable"
@@ -5764,21 +5742,20 @@ msgid "DivX 5 + packed?"
 msgstr ""
 
 #: avidemux/ADM_editor/ADM_edFrameType.cpp:122
-#, fuzzy
 msgid "Aborted"
-msgstr "_О программе"
+msgstr "Прервано"
 
 #: avidemux/ADM_editor/ADM_edLoadSave.cpp:75
 msgid "Unsupported"
-msgstr ""
+msgstr "Не поддерживается"
 
 #: avidemux/ADM_editor/ADM_edLoadSave.cpp:286
 msgid "Old format project file"
-msgstr ""
+msgstr "Старый формат проекта"
 
 #: avidemux/ADM_editor/ADM_edLoadSave.cpp:286
 msgid "No more supported."
-msgstr ""
+msgstr "Больше не поддерживается."
 
 #: avidemux/ADM_codecs/ADM_ffmp43.cpp:51
 msgid "Internal error finding codec"
@@ -5829,357 +5806,344 @@ msgstr ""
 #: avidemux/gui_navigate.cpp:78 avidemux/gui_navigate.cpp:119
 #: avidemux/gui_navigate.cpp:381 avidemux/gui_navigate.cpp:423
 msgid "Decompressing error"
-msgstr ""
+msgstr "Ошибка при распаковке"
 
 #: avidemux/gui_navigate.cpp:78
 msgid "Cannot decode next frame."
-msgstr ""
+msgstr "Невозможно декодировать следующий кадр."
 
 #: avidemux/gui_navigate.cpp:119 avidemux/gui_navigate.cpp:423
 msgid "Cannot decode keyframe."
-msgstr ""
+msgstr "Невозможно декодировать ключевой кадр."
 
 #: avidemux/gui_navigate.cpp:381
 msgid "Cannot decode the frame."
-msgstr ""
+msgstr "Невозможно декодировать кадр."
 
-#: avidemux/gtk_gui.cpp:261
+#: avidemux/gtk_gui.cpp:262
 msgid "Select ecmascript to run "
-msgstr ""
+msgstr "Выбор ecmascript для исполнения"
 
-#: avidemux/gtk_gui.cpp:308 avidemux/gtk_gui.cpp:422
+#: avidemux/gtk_gui.cpp:309 avidemux/gtk_gui.cpp:423
 msgid "Obsolete"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:450
+#: avidemux/gtk_gui.cpp:451
 msgid "Not coded in this version"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:463 avidemux/gtk_gui.cpp:468 avidemux/gtk_gui.cpp:604
-#: avidemux/gtk_gui.cpp:607
-#, fuzzy
+#: avidemux/gtk_gui.cpp:464 avidemux/gtk_gui.cpp:469 avidemux/gtk_gui.cpp:605
+#: avidemux/gtk_gui.cpp:608
 msgid "Select AVI file..."
-msgstr "Выбрать файл журнала"
+msgstr "Выбор AVI файла..."
 
-#: avidemux/gtk_gui.cpp:518
+#: avidemux/gtk_gui.cpp:519
 msgid ""
 "This is to be used to undo packed vop on mpeg4.\n"
 "Continue ?"
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:520
-#, fuzzy
+#: avidemux/gtk_gui.cpp:521
 msgid "Select Avi file to write"
-msgstr "Выбрать файл журнала"
+msgstr "Сохранить AVI"
 
-#: avidemux/gtk_gui.cpp:538
-#, fuzzy
+#: avidemux/gtk_gui.cpp:539
 msgid "Select OGM file to write"
-msgstr "Выбрать файл журнала"
+msgstr "Сохранить OGM"
 
-#: avidemux/gtk_gui.cpp:559 avidemux/gtk_gui.cpp:570
+#: avidemux/gtk_gui.cpp:560 avidemux/gtk_gui.cpp:571
 msgid "Select workbench to save "
 msgstr ""
 
-#: avidemux/gtk_gui.cpp:594
-#, fuzzy
+#: avidemux/gtk_gui.cpp:595
 msgid "Select raw file to save "
-msgstr "Выбрать файл журнала"
+msgstr "Сохранить raw"
 
-#: avidemux/gtk_gui.cpp:610
+#: avidemux/gtk_gui.cpp:611
 msgid "Select AVI file to append..."
-msgstr ""
+msgstr "Присоединить AVI"
 
-#: avidemux/gtk_gui.cpp:614
+#: avidemux/gtk_gui.cpp:615
 msgid "Select file to save audio"
-msgstr ""
+msgstr "Сохранить аудио"
 
-#: avidemux/gtk_gui.cpp:648
+#: avidemux/gtk_gui.cpp:649
 msgid "Select Jpeg sequence to save "
-msgstr ""
+msgstr "Сохранить последовательность JPEG"
 
-#: avidemux/gtk_gui.cpp:651
+#: avidemux/gtk_gui.cpp:652
 msgid "Select BMP to save "
-msgstr ""
+msgstr "Сохранить BMP"
 
-#: avidemux/gtk_gui.cpp:655
+#: avidemux/gtk_gui.cpp:656
 msgid "Select Jpeg to save "
-msgstr ""
+msgstr "Сохранить JPEG"
 
-#: avidemux/gtk_gui.cpp:711
-#, fuzzy
+#: avidemux/gtk_gui.cpp:713
 msgid "Select file to save"
-msgstr "Выбрать файл журнала"
+msgstr "Сохранить"
 
-#: avidemux/gtk_gui.cpp:763 avidemux/gtk_gui.cpp:2329
+#: avidemux/gtk_gui.cpp:765 avidemux/gtk_gui.cpp:2331
 msgid "Select MP3 to load "
-msgstr ""
+msgstr "Загрузка MP3"
 
-#: avidemux/gtk_gui.cpp:766 avidemux/gtk_gui.cpp:2332
+#: avidemux/gtk_gui.cpp:768 avidemux/gtk_gui.cpp:2334
 msgid "Select AC3 to load "
-msgstr ""
+msgstr "Загрузка AC3"
 
-#: avidemux/gtk_gui.cpp:769 avidemux/gtk_gui.cpp:2335
+#: avidemux/gtk_gui.cpp:771 avidemux/gtk_gui.cpp:2337
 msgid "Select WAV to load "
-msgstr ""
+msgstr "Загрузка WAV"
 
-#: avidemux/gtk_gui.cpp:817
+#: avidemux/gtk_gui.cpp:819
 msgid "Out of bounds"
-msgstr ""
+msgstr "Выход за пределы"
 
-#: avidemux/gtk_gui.cpp:823
-#, fuzzy
+#: avidemux/gtk_gui.cpp:825
 msgid "Select  file to save "
-msgstr "Выбрать файл журнала"
+msgstr "Сохранить"
 
-#: avidemux/gtk_gui.cpp:828 avidemux/gtk_gui.cpp:2241
+#: avidemux/gtk_gui.cpp:830 avidemux/gtk_gui.cpp:2243
 msgid "Marker A > B"
-msgstr ""
+msgstr "Метка A > B"
 
-#: avidemux/gtk_gui.cpp:828
+#: avidemux/gtk_gui.cpp:830
 msgid "Cannot copy."
-msgstr ""
+msgstr "Невозможно копировать."
 
-#: avidemux/gtk_gui.cpp:840
+#: avidemux/gtk_gui.cpp:842
 msgid "Something bad happened (II))"
-msgstr ""
+msgstr "Ошибка при обновлении видео"
 
-#: avidemux/gtk_gui.cpp:854
+#: avidemux/gtk_gui.cpp:856
 msgid "Are you sure ?"
-msgstr ""
+msgstr "Вы уверены?"
 
-#: avidemux/gtk_gui.cpp:933
+#: avidemux/gtk_gui.cpp:935
 msgid "Width is not a multiple of 8"
-msgstr ""
+msgstr "Ширина не кратна 8"
 
-#: avidemux/gtk_gui.cpp:934
+#: avidemux/gtk_gui.cpp:936
 msgid "This will make trouble for avi files."
-msgstr ""
+msgstr "Это может вызвать проблемы в avi файле."
 
-#: avidemux/gtk_gui.cpp:945
-#, fuzzy
+#: avidemux/gtk_gui.cpp:947
 msgid "Rebuild all Keyframes?"
-msgstr "Перестроить кадры (I&B)"
+msgstr "Перестроить все ключевые кадры?"
 
-#: avidemux/gtk_gui.cpp:999
+#: avidemux/gtk_gui.cpp:1001
 msgid "Permission error"
-msgstr ""
+msgstr "Неверные права доступа"
 
-#: avidemux/gtk_gui.cpp:1002
+#: avidemux/gtk_gui.cpp:1004
 #, c-format
 msgid "\"%s\" does not exist."
-msgstr ""
+msgstr "\"%s\" не существует."
 
-#: avidemux/gtk_gui.cpp:1065
+#: avidemux/gtk_gui.cpp:1067
 msgid "Cannot open project using the video loader."
-msgstr ""
-
-#: avidemux/gtk_gui.cpp:1066
-msgid "Try 'File' -> 'Load/Run Project...'"
-msgstr ""
+msgstr "Невозможно открыть проект, используя загрузчик видео."
 
 #: avidemux/gtk_gui.cpp:1068
+msgid "Try 'File' -> 'Load/Run Project...'"
+msgstr "Попробуйте 'Файл' -> 'Загрузить/Запустить проект...'"
+
+#: avidemux/gtk_gui.cpp:1070
 msgid "Could not open the file"
-msgstr ""
+msgstr "Невозможно открыть файл"
 
-#: avidemux/gtk_gui.cpp:1102
+#: avidemux/gtk_gui.cpp:1104
 msgid "Multiple Audio Tracks"
-msgstr ""
+msgstr "Несколько аудио дорожек"
 
-#: avidemux/gtk_gui.cpp:1102
+#: avidemux/gtk_gui.cpp:1104
 msgid ""
 "The file you just loaded contains several audio tracks.\n"
 "Go to Audio->MainTrack to select the active one."
 msgstr ""
+"Файл содержит несколько звуковых дорожек.\n"
+"Вы можете выбрать любую, используя 'Аудио->Главная дорожка'."
 
-#: avidemux/gtk_gui.cpp:1193
+#: avidemux/gtk_gui.cpp:1195
 msgid "No audio decoder found for this file"
-msgstr ""
+msgstr "Не найден аудиодекодер для этого файла"
 
-#: avidemux/gtk_gui.cpp:1194
+#: avidemux/gtk_gui.cpp:1196
 msgid "Save (A+V) will generate bad AVI. Save audio will work."
-msgstr ""
+msgstr "Сохранение (Аудио+Видео) создаст плохой AVI файл. Сохранение только аудиопотока, будет работать."
 
-#: avidemux/gtk_gui.cpp:1209
+#: avidemux/gtk_gui.cpp:1211
 msgid "Could not decode the frame"
-msgstr ""
+msgstr "Невозможно декодировать кадр."
 
-#: avidemux/gtk_gui.cpp:1235
+#: avidemux/gtk_gui.cpp:1237
 msgid "Something failed"
-msgstr ""
+msgstr "Что-то неверно"
 
-#: avidemux/gtk_gui.cpp:1244 avidemux/gtk_gui.cpp:2260
+#: avidemux/gtk_gui.cpp:1246 avidemux/gtk_gui.cpp:2262
 msgid "Something bad happened (II)"
-msgstr ""
+msgstr "Ошибка при обновлении видео"
 
-#: avidemux/gtk_gui.cpp:1307
+#: avidemux/gtk_gui.cpp:1309
 msgid "Cannot save the audio in copy mode"
-msgstr ""
+msgstr "Невозможно сохранить аудио в режиме 'Копировать'"
 
-#: avidemux/gtk_gui.cpp:1307
-msgid ""
-"Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."
-msgstr ""
+#: avidemux/gtk_gui.cpp:1309
+msgid "Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."
+msgstr "Выберите WAV PCM как кодек, иначе аудио будет raw PCM."
 
-#: avidemux/gtk_gui.cpp:1417
+#: avidemux/gtk_gui.cpp:1419
 msgid "Cannot encode the frame"
-msgstr ""
+msgstr "Невозможно кодировать кадр"
 
-#: avidemux/gtk_gui.cpp:1453
+#: avidemux/gtk_gui.cpp:1455
 msgid "Mark A > B"
-msgstr ""
+msgstr "Метка A > B"
 
-#: avidemux/gtk_gui.cpp:1453
+#: avidemux/gtk_gui.cpp:1455
 msgid "Set your markers correctly."
-msgstr ""
+msgstr "Установить метки корректно."
 
-#: avidemux/gtk_gui.cpp:1478
+#: avidemux/gtk_gui.cpp:1480
 msgid "Cannot decode frame"
-msgstr ""
+msgstr "Невозможно декодировать кадр."
 
-#: avidemux/gtk_gui.cpp:1478 avidemux/gtk_gui.cpp:1484
-#: avidemux/gtk_gui.cpp:1492
+#: avidemux/gtk_gui.cpp:1480 avidemux/gtk_gui.cpp:1486
+#: avidemux/gtk_gui.cpp:1494
 msgid "Aborting."
-msgstr ""
+msgstr "Прервано."
 
-#: avidemux/gtk_gui.cpp:1484
+#: avidemux/gtk_gui.cpp:1486
 msgid "Cannot encode frame"
-msgstr ""
+msgstr "Невозможно кодировать кадр"
 
-#: avidemux/gtk_gui.cpp:1500 avidemux/gtk_gui.cpp:1606
-#: avidemux/gtk_gui.cpp:2521 avidemux/ADM_requantize.cpp:342
-#, fuzzy
+#: avidemux/gtk_gui.cpp:1502 avidemux/gtk_gui.cpp:1608
+#: avidemux/gtk_gui.cpp:2523 avidemux/ADM_requantize.cpp:342
 msgid "Done"
-msgstr "Ничего"
+msgstr "Выполнено"
 
-#: avidemux/gtk_gui.cpp:1500
-#, fuzzy, c-format
+#: avidemux/gtk_gui.cpp:1502
+#, c-format
 msgid "Saved %d images."
-msgstr "Сохранить изображение"
+msgstr "Сохранено изображения: %d "
 
-#: avidemux/gtk_gui.cpp:1558
+#: avidemux/gtk_gui.cpp:1560
 msgid "Memory error"
-msgstr ""
+msgstr "Ошибка выделения памяти"
 
-#: avidemux/gtk_gui.cpp:1564
+#: avidemux/gtk_gui.cpp:1566
 msgid "Error converting to BMP"
-msgstr ""
+msgstr "Ошибка при конвертации в BMP"
 
-#: avidemux/gtk_gui.cpp:1570 avidemux/gtk_gui.cpp:2253
+#: avidemux/gtk_gui.cpp:1572 avidemux/gtk_gui.cpp:2255
 msgid "Something bad happened"
-msgstr ""
+msgstr "Ошибка при открытии файла для записи"
 
-#: avidemux/gtk_gui.cpp:1606
+#: avidemux/gtk_gui.cpp:1608
 #, c-format
 msgid "Saved \"%s\"."
-msgstr ""
+msgstr "Сохранено \"%s\"."
 
-#: avidemux/gtk_gui.cpp:1627 avidemux/gtk_gui.cpp:1692
+#: avidemux/gtk_gui.cpp:1629 avidemux/gtk_gui.cpp:1694
 msgid "Failed to open the file"
-msgstr ""
+msgstr "Невозможно открыть файл"
 
-#: avidemux/gtk_gui.cpp:1627 avidemux/gtk_gui.cpp:1692
+#: avidemux/gtk_gui.cpp:1629 avidemux/gtk_gui.cpp:1694
 msgid "Not a WAV file?"
-msgstr ""
+msgstr "Файл не является WAV?"
 
-#: avidemux/gtk_gui.cpp:1628
+#: avidemux/gtk_gui.cpp:1630
 #, c-format
 msgid "WAV open file failed..."
-msgstr ""
+msgstr "Ошибка при открытии WAV файла"
 
-#: avidemux/gtk_gui.cpp:1758
+#: avidemux/gtk_gui.cpp:1760
 msgid "Cannot decompress audio frame"
-msgstr ""
+msgstr "Невозможно распаковать аудиокадр"
 
-#: avidemux/gtk_gui.cpp:1772
+#: avidemux/gtk_gui.cpp:1774
 msgid "Memory Error"
-msgstr ""
+msgstr "Ошибка выделения памяти"
 
-#: avidemux/gtk_gui.cpp:2162
+#: avidemux/gtk_gui.cpp:2164
 msgid "No error found"
-msgstr ""
+msgstr "Ошибки не найдены."
 
-#: avidemux/gtk_gui.cpp:2166
+#: avidemux/gtk_gui.cpp:2168
 #, c-format
 msgid "Errors found in %u frames"
-msgstr ""
+msgstr "Ошибки найдены в %u кадрах"
 
-#: avidemux/gtk_gui.cpp:2184
+#: avidemux/gtk_gui.cpp:2186
 msgid "Cannot decompress the audio stream"
-msgstr ""
+msgstr "Ошибка при распаковке аудиопотока"
 
-#: avidemux/gtk_gui.cpp:2184
+#: avidemux/gtk_gui.cpp:2186
 msgid "Switch audio codec to Copy."
-msgstr ""
+msgstr "Смените аудиокодек на 'Копировать'"
 
-#: avidemux/gtk_gui.cpp:2215
+#: avidemux/gtk_gui.cpp:2217
 msgid "Cannot save the file"
-msgstr ""
+msgstr "Невозможно сохранить файл"
 
-#: avidemux/gtk_gui.cpp:2215
+#: avidemux/gtk_gui.cpp:2217
 msgid "There is a lonely B-frame at start/end. Please remove it."
-msgstr ""
+msgstr "Обнаружен одинокий кадр типа 'B' в начале/конце. Пожалуйста, удалите его."
 
-#: avidemux/gtk_gui.cpp:2220
-#, fuzzy
+#: avidemux/gtk_gui.cpp:2222
 msgid "Select Mpeg file..."
-msgstr "Выбрать файл журнала"
+msgstr "Выберите Mpeg файл..."
 
-#: avidemux/gtk_gui.cpp:2241
+#: avidemux/gtk_gui.cpp:2243
 msgid "Cannot delete the selection."
-msgstr ""
+msgstr "Невозможно удалить выделенное."
 
-#: avidemux/gtk_gui.cpp:2246
+#: avidemux/gtk_gui.cpp:2248
 msgid "You can't remove all frames"
-msgstr ""
+msgstr "Вы не можете удалить все кадры."
 
-#: avidemux/gtk_gui.cpp:2316
+#: avidemux/gtk_gui.cpp:2318
 msgid "Could not get tracks info"
-msgstr ""
+msgstr "Невозможно получить информацию из аудиопотока."
 
-#: avidemux/gtk_gui.cpp:2381
+#: avidemux/gtk_gui.cpp:2383
 msgid "Select 2nd track"
-msgstr ""
+msgstr "Выбор второй дорожки"
 
-#: avidemux/gtk_gui.cpp:2400
+#: avidemux/gtk_gui.cpp:2402
 msgid "Error loading the MP3 file"
-msgstr ""
+msgstr "Ошибка при загрузке MP3 файла"
 
-#: avidemux/gtk_gui.cpp:2408 avidemux/gtk_gui.cpp:2429
-#: avidemux/gtk_gui.cpp:2450
+#: avidemux/gtk_gui.cpp:2410 avidemux/gtk_gui.cpp:2431
+#: avidemux/gtk_gui.cpp:2452
 msgid "Second track loaded"
-msgstr ""
+msgstr "Вторая дорожка загружена"
 
-#: avidemux/gtk_gui.cpp:2422
+#: avidemux/gtk_gui.cpp:2424
 msgid "Error loading the AC3 file"
-msgstr ""
+msgstr "Ошибка при открытии AC3 файла"
 
-#: avidemux/gtk_gui.cpp:2443
+#: avidemux/gtk_gui.cpp:2445
 msgid "Error loading the WAV file"
-msgstr ""
+msgstr "Ошибка при открытии WAV файла"
 
-#: avidemux/gtk_gui.cpp:2509
+#: avidemux/gtk_gui.cpp:2511
 msgid "Saving failed"
-msgstr ""
+msgstr "Ошибка при сохранении"
 
-#: avidemux/gtk_gui.cpp:2509
+#: avidemux/gtk_gui.cpp:2511
 msgid "Saving the job failed. Maybe you have permission issue with ~/.avidemux"
-msgstr ""
+msgstr "Ошибка при сохранении. Возможно, у вас неверные права доступа к ~/.avidemux."
 
-#: avidemux/gtk_gui.cpp:2521
+#: avidemux/gtk_gui.cpp:2523
 #, c-format
 msgid "File %s has been successfully saved."
-msgstr ""
+msgstr "Файл %s успешно сохранен."
 
-#: avidemux/gtk_gui.cpp:2525
-#, fuzzy
-msgid "Failed"
-msgstr "_Файл"
-
-#: avidemux/gtk_gui.cpp:2525
+#: avidemux/gtk_gui.cpp:2527
 #, c-format
 msgid "File %s was NOT saved correctly."
-msgstr ""
+msgstr "Файл %s сохранен не корректно."
 
 #: avidemux/GUI_jobs.cpp:37
 msgid "Something very wrong happened when buildint joblist"
@@ -6187,39 +6151,39 @@ msgstr ""
 
 #: avidemux/GUI_jobs.cpp:42
 msgid "Nothing to do."
-msgstr ""
+msgstr "Нечего выполнять."
 
 #: avidemux/GUI_jobs.cpp:42
 msgid "There is no jobs stored, nothing to do"
-msgstr ""
+msgstr "Нет заданий для исполнения."
 
 #: avidemux/ADM_audiodevice/ADM_deviceoss.cpp:113
 msgid "Could not open OSS audio device"
-msgstr ""
+msgstr "Невозможно открыть OSS аудиоустройство."
 
 #: avidemux/ADM_audiodevice/ADM_deviceoss.cpp:113
 msgid "Check the permissions for /dev/dsp."
-msgstr ""
+msgstr "Проверьте права доступа к /dev/dsp."
 
 #: avidemux/ADM_requantize.cpp:130
 msgid "Requantized file to write ?"
-msgstr ""
+msgstr "Сохранить файл с измененым квантом?"
 
 #: avidemux/ADM_requantize.cpp:213
 msgid "Muxer init failed"
-msgstr ""
+msgstr "Проблема при инициализации контейнера."
 
 #: avidemux/ADM_guiBitrate.cpp:105 avidemux/ADM_guiBitrate.cpp:137
 msgid "No data"
-msgstr ""
+msgstr "Нет данных."
 
 #: avidemux/gui_autodrive.cpp:51
 msgid "No audio track"
-msgstr ""
+msgstr "Отсутствует аудио дорожка"
 
 #: avidemux/gui_autodrive.cpp:51
 msgid "An audio track is necessary to create such file"
-msgstr ""
+msgstr "Необходима звуковая дорожка для создания данного файла."
 
 #: avidemux/gui_autodrive.cpp:69
 msgid "Cannot select mpeg4 sp codec."
@@ -6261,9 +6225,8 @@ msgid "Sure ?"
 msgstr ""
 
 #: avidemux/ADM_ocr/adm_ocr.cpp:754
-#, fuzzy
 msgid "Select SRT to save"
-msgstr "Выбрать файл журнала"
+msgstr ""
 
 #: avidemux/ADM_ocr/adm_ocr.cpp:766
 msgid "Select Glyoh to save"
@@ -6291,94 +6254,56 @@ msgstr ""
 
 #: avidemux/ADM_ocr/ADM_vob2vobsub.cpp:277
 msgid "Problem opening the mpeg files"
-msgstr ""
+msgstr "Проблема при открытии mpeg файла."
 
 #: avidemux/gui_savenew.cpp:85
 msgid "Dual audio can only be used in copy mode"
-msgstr ""
+msgstr "Две звуковые дорожки могут быть использованы только в режиме копирования."
 
 #: avidemux/gui_savenew.cpp:85
 msgid "Select Copy as the video codec."
-msgstr ""
+msgstr "Выберите 'Копировать' вместо видеокодека."
 
 #: avidemux/gui_savenew.cpp:191 avidemux/gui_savenew.cpp:207
 #: avidemux/gui_savenew.cpp:220 avidemux/gui_savenew.cpp:234
 msgid "Incompatible output format"
-msgstr ""
+msgstr "Несовместимый выходной формат"
 
 #: avidemux/gui_savenew.cpp:252
 msgid "There is no second track"
-msgstr ""
+msgstr "Не задана вторая аудиодорожка"
 
 #: avidemux/gui_savenew.cpp:252
 msgid "Select a second audio track in the Audio menu."
-msgstr ""
+msgstr "Выберите вторую аудиодорожку в меню 'Аудио'"
 
 #: avidemux/gui_savenew.cpp:256
 msgid "Select dual audio AVI to write"
-msgstr ""
+msgstr "Сохранение AVI файла с двумя звуковыми дорожками"
 
 #: avidemux/gui_savenew.cpp:278
 msgid "This cannot have packed VOP"
-msgstr ""
+msgstr "Невозможно добавить запакованный VOP"
 
 #: avidemux/gui_savenew.cpp:278
 msgid "It is not MPEG-4 video. File will not be saved."
-msgstr ""
+msgstr "Это не MPEG-4 видео. Файл не будет сохранен."
 
 #: avidemux/gui_savenew.cpp:321
 msgid ""
 "You may need smart copy.\n"
 " Enable it ?"
-msgstr ""
+msgstr "Возможно, вам нужно 'умное' копирование? Включить?"
 
 #: avidemux/gui_savenew.cpp:346
 msgid "No encoder"
-msgstr ""
+msgstr "Нет кодера."
 
 #: avidemux/gui_savenew.cpp:346
 msgid "Cannot save in process mode."
-msgstr ""
+msgstr "Сохранение возможно только в режиме копирования."
 
 #: avidemux/guiplay.cpp:384
 msgid "Trouble initializing audio device"
-msgstr ""
+msgstr "Проблема при инициализации аудиоустройства."
 
-#~ msgid "Append video"
-#~ msgstr "Добавить видеофайл"
-
-#~ msgid "Save as dual audio avi"
-#~ msgstr "Сохранить как AVI с двойной звуковой дорожкой"
-
-#~ msgid "Export as mpeg video"
-#~ msgstr "Экспортировать как MPEG"
-
-#~ msgid "XVCD (ffmpeg Mpeg1)"
-#~ msgstr "XVCD (ffmpeg Mpeg1)"
-
-#~ msgid "Save edit list"
-#~ msgstr "Сохранить список изменений"
-
-#~ msgid "External mpeg (mp2/mp3)"
-#~ msgstr "Внешний mpeg (mp2/mp3)"
-
-#~ msgid "External Wav"
-#~ msgstr "Внешний WAV"
-
-#~ msgid "External AC3"
-#~ msgstr "Внешний AC3"
-
-#~ msgid "Misc"
-#~ msgstr "Другое"
-
-#~ msgid "Index mpeg"
-#~ msgstr "Индекс MPEG-файла"
-
-#~ msgid "Cut Wizard"
-#~ msgstr "Хирург"
-
-#~ msgid "Change fps"
-#~ msgstr "Изменить FPS"
-
-#~ msgid "OSS"
-#~ msgstr "OSS"

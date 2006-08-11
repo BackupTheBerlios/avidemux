@@ -22,7 +22,7 @@ static GtkWidget       *create_dialog1 (void);
 static void             updateStatus(void);
 static int              getSelection(GtkWidget *dialog);
 extern bool parseECMAScript(const char *name);
-static const char *StringStatus[]={"Ready","Succeeded","Failed","Deleted","Running"};
+static const char *StringStatus[]={_("Ready"),_("Succeeded"),_("Failed"),_("Deleted"),_("Running")};
 
 
 typedef enum JOB_STATUS
