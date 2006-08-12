@@ -4,8 +4,8 @@
  
 #include "dmx_demuxer.h"
 
-#define MAX_PES_BUFFER (65*1024) // should be safe enough
-#define MAX_PES_STREAM 50       // should be enough too :)
+#define MAX_MSDVR_BUFFER (65*1024) // should be safe enough
+#define MAX_MSDVR_STREAM 50       // should be enough too :)
 
 #include "ADM_mpegdemuxer/dmx_mpegstartcode.h"
 /*
@@ -21,13 +21,19 @@
 
 
 */
+#include "ADM_toolkit/ADM_queue.h"
 class dmx_demuxerMSDVR: public dmx_demuxer
 {
   protected : 
+    uint32_t      _nbPackets;      
+    ADM_queue     demuxerQueue;
+    FILE          *_fd;
+    uint32_t      _dataStart;
     uint64_t      stampAbs;
     uint32_t      consumed;
-    fileParser    *parser;
+    void          *aParser;
     uint32_t       myPid;           // pid: high part =0xff if private stream, 00 if not
+    uint32_t       myPes;           // Id of asf packet
                   
     uint8_t       *_pesBuffer;
 
@@ -53,7 +59,6 @@ class dmx_demuxerMSDVR: public dmx_demuxer
     uint32_t      nbTracked;
                 
     uint8_t       refill(void);
-    uint8_t       getPacketInfo(uint8_t stream,uint8_t *substream,uint32_t *len,uint64_t *pts,uint64_t *dts);
     uint32_t      _multi;
                   
   public:
@@ -83,8 +88,8 @@ class dmx_demuxerMSDVR: public dmx_demuxer
     uint8_t         getAllPTS(uint64_t *stat);
     uint8_t         changePid(uint32_t newpid,uint32_t newpes);
                   //************ Used for vobsub **************
-    uint8_t         getPacketInfo(uint8_t **data, uint32_t *len, uint32_t *usableLen,uint64_t *pts);
-    uint8_t         refillFull(uint8_t *outstream);
+    uint8_t         getPacketInfo(uint8_t **data, uint32_t *len, uint32_t *usableLen,uint64_t *pts) { ADM_assert(0);return 1;};
+    uint8_t         refillFull(uint8_t *outstream) { ADM_assert(0);return 1;};
 
 // Inlined
     uint8_t         read8i(void)
