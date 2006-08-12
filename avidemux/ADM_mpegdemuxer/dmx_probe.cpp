@@ -52,7 +52,10 @@
 static uint8_t dmx_probePS(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
 static uint8_t dmx_probeTS(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
 static uint8_t dmx_probeTSBruteForce(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
+static uint8_t dmx_probeMSDVR(char *file, uint32_t *nbTracks,MPEG_TRACK **tracks);
 
+
+//****************************************************************************************
 uint8_t dmx_probe(char *file, DMX_TYPE  *type, uint32_t *nbTracks,MPEG_TRACK **tracks)
 {
 
@@ -62,6 +65,7 @@ uint8_t dmx_probe(char *file, DMX_TYPE  *type, uint32_t *nbTracks,MPEG_TRACK **t
         {
         case DMX_MPG_MSDVR:
                 {
+                  return dmx_probeMSDVR(file,nbTracks,tracks);
                   printf("This is MSDVR file\n"); 
                   *nbTracks=1;
                   *tracks=new MPEG_TRACK;
@@ -373,4 +377,132 @@ _next:
       *nbTracks=start;
       return 1;
 }
+/* ****************************************************** */
+#include "ADM_asf/ADM_asfPacket.h"
+#include "ADM_asf/ADM_asf.h"
 
+#define PROBE_BUF 32000
+#define MAX_MSVDR_STREAMS 6
+#define MAX_PACKET_PROBE 20000;
+#define DETECT_MIN 7000
+
+uint8_t dmx_probeMSDVR(char *file, uint32_t *nbTracks,MPEG_TRACK **ztracks)
+{
+  int r=5;
+  const chunky *id=NULL;
+  uint32_t nbPackets,dataStart;
+  ADM_queue queue;
+  MPEG_TRACK *tracks;
+  
+      printf("**** Probing MSDVR file ****\n");
+      // Assume first track is video 
+      *nbTracks=1;
+      tracks=new MPEG_TRACK[MAX_MSVDR_STREAMS];
+      *ztracks=tracks;
+      tracks[0].pes=0xE0;
+      tracks[0].pid=1;
+      // Now check for track up to 5
+      
+      FILE *fd=NULL;
+      
+      fd=fopen(file,"rb");
+      if(!fd)
+      {
+        printf("Demuxer MSDVR open failed\n");
+        return 0; 
+      }
+  // Get the data chunk and ignore others
+      asfChunk h(fd);
+
+      printf("[MSDVR] Searching data\n");
+      while(r--)
+      {
+        h.nextChunk();    // Skip headers
+        id=h.chunkId();
+        h.dump();
+        if(id->id==ADM_CHUNK_DATA_CHUNK) break;
+        h.skipChunk();
+      }
+      if(id->id!=ADM_CHUNK_DATA_CHUNK)
+      {
+        printf("[MSDVR] Cannot find data chunk\n");
+        return 0; 
+      }
+      h.read32();
+      h.read32();
+      h.read32();
+      h.read32();
+      nbPackets=(uint32_t) h.read64();
+      h.read16();
+  //********** Ready
+
+      uint8_t buffer[PROBE_BUF*2];
+      uint32_t probeceil=MAX_PACKET_PROBE;
+      uint32_t count=0;
+      
+      if(probeceil>nbPackets) probeceil=nbPackets;
+      
+      dataStart=ftello(fd);
+      asfPacket *packet;
+      packet=new asfPacket(fd,nbPackets,0x2000,&queue,dataStart);
+      
+      printf("[MSDVR] Opened ok\n");
+      // Read strem id from 2 to 5 and see if they are mpeg
+      for(uint32_t stream=2;stream<MAX_MSVDR_STREAMS;stream++)
+      {
+        packet->goToPacket(0);
+        count=0;
+        
+        uint32_t buflen=0,len=0;
+        uint8_t *tmp=buffer;
+        
+        while(count<probeceil && buflen<PROBE_BUF)
+        {
+          if(!packet->nextPacket(stream))
+          {
+            break; 
+          }
+          packet->skipPacket();
+          packet->packTo(tmp+buflen,&len);
+          buflen+=len;
+          count++;
+        }
+        printf("We have found %u bytes for streamId %u\n",buflen,stream);
+        if(buflen>=DETECT_MIN)
+        {  // We have a candidate
+           // What is it ? AC3 or MP2 or subs ? 
+          // AC3 ?
+          uint32_t fq, br, chan, sync;
+          
+          if(ADM_AC3GetInfo(buffer, buflen,&fq, &br,&chan,&sync))
+          {
+            tracks[*nbTracks].channels=chan;
+            tracks[*nbTracks].bitrate=(8*br)/1000;
+            tracks[*nbTracks].pid=stream;
+            tracks[*nbTracks].pes=0;
+            *nbTracks=*nbTracks+1;
+            continue;
+          }
+          // Maybe mpegaudio ?
+          MpegAudioInfo mpegInfo;
+          if(getMpegFrameInfo(buffer,buflen,&mpegInfo,NULL,&sync))
+          {
+            tracks[*nbTracks].channels=2;
+            if(mpegInfo.mode==3) 
+              tracks[*nbTracks].channels=1;
+            tracks[*nbTracks].bitrate=mpegInfo.bitrate;
+            tracks[*nbTracks].pid=stream;
+            tracks[*nbTracks].pes=0xC0;
+            *nbTracks=*nbTracks+1;
+            continue;
+          }
+
+        }
+        
+      }
+      packet->purge();
+      delete packet;
+      fclose(fd);
+      
+      return 1;
+}

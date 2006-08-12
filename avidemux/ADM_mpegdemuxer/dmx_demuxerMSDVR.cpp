@@ -32,9 +32,8 @@
 // ******************************************************
 uint8_t         dmx_demuxerMSDVR::changePid(uint32_t newpid,uint32_t newpes)
 {
-  myPid=newpes & 0xff;
+  myPid=newpid ;
   myPes=newpes;
-  if(myPid<9 || (myPid>=0xA0&&myPid<=0xA9) || (myPid>=0x20 && myPid<0x27) ||(myPid>=0x40 && myPid<=0x49) ) myPid|=0xff00;
   _pesBufferStart=0;  // Big value so that we read
   _pesBufferLen=0;
   _pesBufferIndex=0;
@@ -57,7 +56,7 @@ dmx_demuxerMSDVR::dmx_demuxerMSDVR(uint32_t nb,MPEG_TRACK *tracks,uint32_t multi
 
   nbTracked=nb;
   for(int i=0;i<256;i++) trackPTS[i]=ADM_NO_PTS;
-  myPid=tracks[0].pes;
+  myPid=tracks[0].pid;
   
   if(nb!=256)     // Only pick one track as main, and a few as informative
   {
@@ -66,19 +65,14 @@ dmx_demuxerMSDVR::dmx_demuxerMSDVR(uint32_t nb,MPEG_TRACK *tracks,uint32_t multi
     tracked=new uint8_t[nbTracked];
     for(int i=1;i<nb;i++)
     {
-      mask[tracks[i].pes&0xff]=1;
-      tracked[i]=tracks[i].pes&0xff;
+      mask[tracks[i].pid&0xff]=1;
+      tracked[i]=tracks[i].pid&0xff;
     }                
                 
   }else
   {
     memset(mask,1,256); // take all tracks
   }
-
-  if(myPid<9 || (myPid>0xA0&&myPid<0xA9) || (myPid>=0x20 && myPid<0x27))
-    myPid|=0xff00;
-
-
 
   _probeSize=0; 
   memset(seen,0,255*sizeof(uint64_t));     
@@ -339,25 +333,39 @@ uint8_t dmx_demuxerMSDVR::refill(void)
           _pesBufferStart=0;
           _pesBufferLen=0;
           _pesBufferIndex=0;
-
-          if(!PARSER->nextPacket(1))
+          while(!_pesBufferLen)
           {
-            printf("[MSDVR] Packet Error\n");
-            return 0; 
+              if(!PARSER->nextPacket(0xff))
+              {
+                  printf("[MSDVR] Packet Error\n");
+                  return 0; 
+              }
+          
+              PARSER->skipPacket();
+              // Now fill buffer
+              if(demuxerQueue.isEmpty()) continue;
+              while(!demuxerQueue.isEmpty())
+              {
+                asfBit *bit;
+                ADM_assert(demuxerQueue.pop((void**)&bit));
+                if(bit->stream!=myPid)
+                {
+                  if(bit->stream<0x100 && mask[bit->stream &0xff])
+                  {
+                    seen[bit->stream]+=bit->len;
+                  }
+                  delete bit;
+                }else
+                {
+                  _pesBufferStart=bit->packet;
+                  memcpy(&(_pesBuffer[_pesBufferLen]),bit->data,bit->len);
+                  _pesBufferLen+=bit->len;
+                  delete bit;
+                }
+              }
+              return 1;
           }
-          PARSER->skipPacket();
-          // Now fill buffer
-          while(!demuxerQueue.isEmpty())
-          {
-            asfBit *bit;
-            ADM_assert(demuxerQueue.pop((void**)&bit));
-            _pesBufferStart=bit->packet;
-            memcpy(&(_pesBuffer[_pesBufferLen]),bit->data,bit->len);
-            _pesBufferLen+=bit->len;
-            delete bit;
-           }
-           // Update our infos...
-           return 1;
+          return 0;
 }
 /***********************************************/
 uint8_t dmx_demuxerMSDVR::open(char *name)
