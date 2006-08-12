@@ -70,6 +70,7 @@ class asfPacket
 #endif    
     uint8_t   read(uint8_t *where, uint32_t how);
     uint8_t   purge(void);
+    uint8_t   packTo(uint8_t *buffer,uint32_t *len);
 };
 
 #endif

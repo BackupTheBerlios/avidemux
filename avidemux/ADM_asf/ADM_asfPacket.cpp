@@ -359,12 +359,14 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
 
    return 1;
  }
+ //****************************
  uint8_t   asfPacket::dump(void)
  {
   
    return 1;
   
  }
+ //****************************
  uint8_t asfPacket::purge(void)
  {
     // Flush queue
@@ -376,6 +378,22 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
    }
    return 1; 
  }
+ //****************************
+ uint8_t   asfPacket::packTo(uint8_t *buffer,uint32_t *len)
+ {
+   *len=0;
+   while(!queue->isEmpty())
+   {
+     asfBit *bit;
+     ADM_assert(queue->pop((void**)&bit));
+     memcpy(buffer,bit->data,bit->len);
+     *len+=bit->len;
+     delete bit;
+   }
+   return 1;
+ }
+ 
+ 
 #ifndef ASF_INLINE
 #include "ADM_asfIo.h"
 #endif
