@@ -138,6 +138,7 @@ uint8_t asfHeader::needDecompress(void)
   _index=NULL;
   _packet=NULL;
   _curAudio=NULL;
+  _nbPackets=0;
   printf("%u\n",sizeof(_allAudioTracks));
   memset(&(_allAudioTracks[0]),0,sizeof(_allAudioTracks));
 
@@ -171,7 +172,7 @@ uint8_t asfHeader::open(char *name)
   }
   buildIndex();
   fseeko(_fd,_dataStartOffset,SEEK_SET);
-  _packet=new asfPacket(_fd,_packetSize,&readQueue,_dataStartOffset);
+  _packet=new asfPacket(_fd,_nbPackets,_packetSize,&readQueue,_dataStartOffset);
   curSeq=1;
   if(_nbAudioTrack)
   {
@@ -240,13 +241,7 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
       printf("[ASF] Cannot seek to frame %u\n",framenum);
       return 0; 
     }
-    // Flush queue
-    while(!readQueue.isEmpty())
-    {
-      asfBit *bit;
-      ADM_assert(readQueue.pop((void**)&bit));
-      delete bit;
-    }
+    _packet->purge();
     curSeq=_index[framenum].segNb;
     printf("Seeking starting at seq=%u\n",curSeq);
   }
@@ -585,6 +580,7 @@ uint8_t asfHeader::loadVideo(asfChunk *s)
             if(fourCC::check(_video_bih.biCompression,(uint8_t *)"DVR "))
             {
               // It is MS DVR, fail so that the mpeg2 indexer can take it from here
+              _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"MPEG");
               printf("This is MSDVR, not ASF\n");
               return 0; 
             }
@@ -618,7 +614,7 @@ uint8_t asfHeader::buildIndex(void)
   const chunky *id;
   uint32_t chunkFound;
   uint32_t r=5;
-  uint32_t nbPacket=0,len;
+  uint32_t len;
   
   fseeko(_fd,0,SEEK_END);
   fSize=ftello(_fd);
@@ -646,28 +642,29 @@ uint8_t asfHeader::buildIndex(void)
   h.read32();
   h.read32();
   h.read32();
-  nbPacket=(uint32_t) h.read64();
+  _nbPackets=(uint32_t) h.read64();
   h.read16();
   
   len=h.chunkLen-16-8-2-24;
   
-  printf("[ASF] nbPacket  : %u\n",nbPacket);
+  printf("[ASF] nbPacket  : %u\n",_nbPackets);
   printf("[ASF] len to go : %u\n",len);
   printf("[ASF] scanning data\n");
   _dataStartOffset=ftello(_fd);
   
   // Here we go
   DIA_working *working=new DIA_working("indexing asf");
-  asfPacket *aPacket=new asfPacket(_fd,_packetSize,&readQueue,_dataStartOffset);
+  asfPacket *aPacket=new asfPacket(_fd,_nbPackets,_packetSize,
+                                   &readQueue,_dataStartOffset);
   uint32_t packet=1;
   uint32_t sequence=1;
-#define MAXIMAGE nbPacket*10
+#define MAXIMAGE (_nbPackets*3)
   nbImage=0;
   asfIndex *tmpIndex=new asfIndex[MAXIMAGE];
-  memset(tmpIndex,0,sizeof(asfIndex)*nbPacket);
+  memset(tmpIndex,0,sizeof(asfIndex)*MAXIMAGE);
   len=0;
   tmpIndex[0].segNb=1;
-  while(packet<nbPacket)
+  while(packet<_nbPackets)
   {
     while(!readQueue.isEmpty())
     {
@@ -735,7 +732,7 @@ uint8_t asfHeader::buildIndex(void)
       }
      delete bit;
     }
-    working->update(packet,nbPacket);
+    working->update(packet,_nbPackets);
 
     packet++;
     aPacket->nextPacket(0xff); // All packets

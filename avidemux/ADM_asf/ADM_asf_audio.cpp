@@ -60,7 +60,8 @@ asfAudio::asfAudio(asfHeader *father,uint32_t myRank)
     ADM_assert(_fd);
     fseeko(_fd,_dataStart,SEEK_SET);
     _packetSize=_father->_packetSize;
-    _packet=new asfPacket(_fd,_packetSize,&readQueue,_dataStart);
+    _packet=new asfPacket(_fd,_father->_nbPackets,_packetSize,
+                          &readQueue,_dataStart);
     _destroyable=1;
     printf("[asfAudio] Length %u\n",_length);
   
@@ -89,12 +90,7 @@ uint8_t   asfAudio::goTo(uint32_t newoffset)
     if(_father->_index[i].audioSeen[_myRank]>=newoffset)
     {
       // Flush queue
-      while(!readQueue.isEmpty())
-      {
-        asfBit *bit;
-        ADM_assert(readQueue.pop((void**)&bit));
-        delete bit;
-      }
+      _packet->purge();
       // Seek
       if(!_packet->goToPacket(_father->_index[i].packetNb))
       {

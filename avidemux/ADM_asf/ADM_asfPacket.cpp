@@ -34,7 +34,7 @@
 #include "ADM_toolkit/ADM_debug.h"
 
  
-asfPacket::asfPacket(FILE *f,uint32_t pSize,ADM_queue *q,uint32_t startDataOffset)
+asfPacket::asfPacket(FILE *f,uint32_t nb,uint32_t pSize,ADM_queue *q,uint32_t startDataOffset)
  {
    _fd=f;
    pakSize=pSize;
@@ -45,6 +45,7 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize,ADM_queue *q,uint32_t startDataOffse
    queue=q;
    ADM_assert(q);
    currentPacket=0;
+   _nbPackets=nb;
    _startDataOffset=startDataOffset;
  }
  asfPacket::~asfPacket()
@@ -55,6 +56,7 @@ asfPacket::asfPacket(FILE *f,uint32_t pSize,ADM_queue *q,uint32_t startDataOffse
    uint32_t remaining;
    *dataLen=0;
    ADM_assert(0);
+   purge();
    return 1;
   
  }
@@ -362,6 +364,17 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
   
    return 1;
   
+ }
+ uint8_t asfPacket::purge(void)
+ {
+    // Flush queue
+   while(!queue->isEmpty())
+   {
+     asfBit *bit;
+     ADM_assert(queue->pop((void**)&bit));
+     delete bit;
+   }
+   return 1; 
  }
 #ifndef ASF_INLINE
 #include "ADM_asfIo.h"

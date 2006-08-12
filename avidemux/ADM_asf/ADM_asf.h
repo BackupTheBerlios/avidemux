@@ -155,7 +155,7 @@ class asfHeader         :public vidHeader
     uint32_t                _nbAudioTrack;
     asfAudio                *_curAudio;
     asfAudioTrak             _allAudioTracks[ASF_MAX_AUDIO_TRACK];
-    
+    uint32_t                 _nbPackets;
     
     // / Shared
   public:
