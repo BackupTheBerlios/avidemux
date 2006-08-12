@@ -342,9 +342,7 @@ int nw;
          if( saveprefsonexit )
             prefs->save ();
       }
-      cleanUp ();
-      delete prefs;
-      prefs=NULL;
+      cleanUp (); 
       exit (0);
 #if 0
     case ACT_AudioModeToggle:
