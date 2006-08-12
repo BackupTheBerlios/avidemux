@@ -278,7 +278,17 @@ UNUSED_ARG(mode);
       		break;
       OPEN_AS (Mp4_FileType, mp4Header);
       OPEN_AS (H263_FileType, h263Header);
-      OPEN_AS (ASF_FileType, asfHeader);
+      
+      case ASF_FileType:
+              _videos[_nb_video]._aviheader=new asfHeader; 
+              ret = _videos[_nb_video]._aviheader->open(name); 
+              if(!ret)
+              {
+                delete _videos[_nb_video]._aviheader;;
+                printf("Trying mpeg\n"); 
+                goto thisIsMpeg; 
+              }
+              break;
       OPEN_AS (NewMpeg_FileType,dmxHeader);
       // For AVI we first try top open it as openDML
       case AVI_FileType:
@@ -310,6 +320,7 @@ UNUSED_ARG(mode);
        OPEN_AS (Ogg_FileType, oggHeader);
 
     case Mpeg_FileType:
+thisIsMpeg:
     	// look if the idx exists
 	char tmpname[256];
 	ADM_assert(strlen(name)+5<256);;
