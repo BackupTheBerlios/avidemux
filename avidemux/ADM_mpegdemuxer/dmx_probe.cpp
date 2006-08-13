@@ -383,7 +383,7 @@ _next:
 
 #define PROBE_BUF 32000
 #define MAX_MSVDR_STREAMS 6
-#define MAX_PACKET_PROBE 20000;
+#define MAX_PACKET_PROBE 2000;   // assuming a packet is 8kB we will probe around 15 Meg
 #define DETECT_MIN 7000
 
 uint8_t dmx_probeMSDVR(char *file, uint32_t *nbTracks,MPEG_TRACK **ztracks)
@@ -393,6 +393,10 @@ uint8_t dmx_probeMSDVR(char *file, uint32_t *nbTracks,MPEG_TRACK **ztracks)
   uint32_t nbPackets,dataStart;
   ADM_queue queue;
   MPEG_TRACK *tracks;
+  uint8_t     buffer[MAX_MSVDR_STREAMS][PROBE_BUF*2];
+  uint32_t    streamlen[MAX_MSVDR_STREAMS];
+  
+  memset(streamlen,0,MAX_MSVDR_STREAMS*sizeof(uint32_t));
   
       printf("**** Probing MSDVR file ****\n");
       // Assume first track is video 
@@ -434,9 +438,9 @@ uint8_t dmx_probeMSDVR(char *file, uint32_t *nbTracks,MPEG_TRACK **ztracks)
       h.read32();
       nbPackets=(uint32_t) h.read64();
       h.read16();
+      
   //********** Ready
 
-      uint8_t buffer[PROBE_BUF*2];
       uint32_t probeceil=MAX_PACKET_PROBE;
       uint32_t count=0;
       
@@ -447,62 +451,76 @@ uint8_t dmx_probeMSDVR(char *file, uint32_t *nbTracks,MPEG_TRACK **ztracks)
       packet=new asfPacket(fd,nbPackets,0x2000,&queue,dataStart);
       
       printf("[MSDVR] Opened ok\n");
-      // Read strem id from 2 to 5 and see if they are mpeg
-      for(uint32_t stream=2;stream<MAX_MSVDR_STREAMS;stream++)
+      // Parse and collect
+      while(count++<probeceil)
       {
-        packet->goToPacket(0);
-        count=0;
-        
-        uint32_t buflen=0,len=0;
-        uint8_t *tmp=buffer;
-        
-        while(count<probeceil && buflen<PROBE_BUF)
+        if(!packet->nextPacket(0xff))
         {
-          if(!packet->nextPacket(stream))
-          {
-            break; 
-          }
-          packet->skipPacket();
-          packet->packTo(tmp+buflen,&len);
-          buflen+=len;
-          count++;
+          break; 
         }
-        printf("We have found %u bytes for streamId %u\n",buflen,stream);
-        if(buflen>=DETECT_MIN)
+        packet->skipPacket();
+        // Now look into it
+        while(!queue.isEmpty())
+        {
+          asfBit *bit;
+          ADM_assert(queue.pop((void**)&bit));
+          if(bit->stream>=MAX_MSVDR_STREAMS)
+          {
+            printf("Found stream %u, ignored\n",bit->stream); 
+          }else
+          {
+            uint32_t len=streamlen[bit->stream];
+            if(len<PROBE_BUF)
+            {
+              uint8_t *ptr=buffer[bit->stream];
+              memcpy(ptr+len,bit->data,bit->len);
+              len+=bit->len;
+              streamlen[bit->stream]=len;
+            }
+          }
+          delete bit;
+      }
+      } // /while
+      // Now we have filled the buffers
+      // identifies the content
+      uint32_t sync;
+      for(int i=2;i<MAX_MSVDR_STREAMS;i++)
+      {
+        printf("We have found %u bytes for streamId %u\n",streamlen[i],i);
+        if(streamlen[i]>=PROBE_BUF)
         {  // We have a candidate
            // What is it ? AC3 or MP2 or subs ? 
-          // AC3 ?
-          uint32_t fq, br, chan, sync;
-          
-          if(ADM_AC3GetInfo(buffer, buflen,&fq, &br,&chan,&sync))
-          {
-            tracks[*nbTracks].channels=chan;
-            tracks[*nbTracks].bitrate=(8*br)/1000;
-            tracks[*nbTracks].pid=stream;
-            tracks[*nbTracks].pes=0;
-            *nbTracks=*nbTracks+1;
-            continue;
-          }
           // Maybe mpegaudio ?
           MpegAudioInfo mpegInfo;
-          if(getMpegFrameInfo(buffer,buflen,&mpegInfo,NULL,&sync))
+          if(getMpegFrameInfo(buffer[i],streamlen[i],&mpegInfo,NULL,&sync))
           {
             tracks[*nbTracks].channels=2;
             if(mpegInfo.mode==3) 
               tracks[*nbTracks].channels=1;
             tracks[*nbTracks].bitrate=mpegInfo.bitrate;
-            tracks[*nbTracks].pid=stream;
+            tracks[*nbTracks].pid=i;
             tracks[*nbTracks].pes=0xC0;
             *nbTracks=*nbTracks+1;
             continue;
           }
-
+          // AC3 ?
+          uint32_t fq, br, chan, sync;
+          
+          if(ADM_AC3GetInfo(buffer[i], streamlen[i],&fq, &br,&chan,&sync))
+          {
+            tracks[*nbTracks].channels=chan;
+            tracks[*nbTracks].bitrate=(8*br)/1000;
+            tracks[*nbTracks].pid=i;
+            tracks[*nbTracks].pes=0;
+            *nbTracks=*nbTracks+1;
+            continue;
+          }
+          
         }
         
-      }
+      } // /for
       packet->purge();
       delete packet;
       fclose(fd);
-      
       return 1;
 }
