@@ -145,6 +145,7 @@ int getRotateParams(	void )
 
 	ret=0;
 	dialog=create_dialog1();
+	gtk_register_dialog(dialog);
        GTK_ADJUSTMENT(adj_angle)->value= par.angle ;
     	gtk_widget_set_usize(WIDG(drawingarea1), par.width, par.height);
 
@@ -170,7 +171,7 @@ int getRotateParams(	void )
 			//printf("\n Angle : %3.2f\n", par.angle);
 				ret=1;
 	}
-
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 
 	return ret;

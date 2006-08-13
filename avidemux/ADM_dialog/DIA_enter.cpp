@@ -89,6 +89,7 @@ uint8_t  DIA_GetFloatValue(float *value, float min, float max, const char *title
 	while(ret==-1)
 	{
 		dialog=create_dialog1();
+		gtk_register_dialog(dialog);
 		sprintf(string,"%f",*value);
 
         	gtk_entry_set_text(GTK_ENTRY(lookup_widget(dialog,"entry1")),string);
@@ -110,6 +111,7 @@ uint8_t  DIA_GetFloatValue(float *value, float min, float max, const char *title
 		}
 		else
 			ret=0;
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	};
 	return ret;

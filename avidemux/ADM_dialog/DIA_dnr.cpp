@@ -33,7 +33,8 @@ GtkWidget *dialog;
 	uint8_t ret=0;
 
 	dialog=create_dialog1();
-	gtk_transient(dialog);
+	gtk_register_dialog(dialog);
+	//gtk_transient(dialog);
 	SETSPIN(spin_lumalock,*llock);
 	SETSPIN(spin_lumathresh,*lthresh);
 	SETSPIN(spin_chromalock,*clock);
@@ -50,7 +51,7 @@ GtkWidget *dialog;
 		GETSPIN(spin_scene,*scene);
 			ret=1;
 	}
-
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 
 	return ret;

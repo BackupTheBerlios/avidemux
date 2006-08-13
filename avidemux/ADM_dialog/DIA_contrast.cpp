@@ -155,6 +155,7 @@ getContrastParams (void)
     ret = 0;
 
   dialog = create_dialog1 ();
+  gtk_register_dialog(dialog);
   gtk_widget_set_usize (WID (drawingarea1), sw, sh);
 
 
@@ -196,7 +197,7 @@ getContrastParams (void)
 
       ret = 1;
     }
-
+  gtk_unregister_dialog(dialog);
   gtk_widget_destroy (dialog);
   dialog = NULL;
   adj_coeff = adj_coeff = NULL;

@@ -82,7 +82,7 @@ uint8_t AVDMFastVideoConvolution::configure(AVDMGenericVideoStream * instream)
     uint8_t ret=0;
 
 	dialog=create_dialog1();
-
+	gtk_register_dialog(dialog);
 	if(_param->luma) STOGGLE(luma);
 	if(_param->chroma) STOGGLE(chroma);
 
@@ -94,6 +94,7 @@ uint8_t AVDMFastVideoConvolution::configure(AVDMGenericVideoStream * instream)
 		ret=1;
 
 	}
+	gtk_register_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;
 

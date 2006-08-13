@@ -145,7 +145,7 @@ uint8_t DIA_getChromaShift( void )
 {
 	uint8_t ret=0;
 	dialog=create_ChromaShift();
-
+	gtk_register_dialog(dialog);
 	gtk_widget_set_usize(WID(drawingarea1), ww,hh);
 	gtk_widget_show(dialog);
 	upload();
@@ -172,7 +172,7 @@ uint8_t DIA_getChromaShift( void )
 		read();
 		ret=1;
 	}
-
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	dialog=NULL;
 	return ret;
