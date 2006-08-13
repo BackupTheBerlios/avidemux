@@ -214,6 +214,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
         nbGop=0;
         nbImage=0;
         grabbing=0;
+        uint64_t sSize=demuxer->getSize();
         printf("*********Indexing started (%d audio tracks)***********\n",nbTracks);
         while(1)
         {
@@ -225,10 +226,17 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                         // abort;
                                                         goto stop_found;
                                                 }*/
-                                                work->update(syncAbs>>16,demuxer->getSize()>>16,nbImage,
-                                                        lastStamp.hh,lastStamp.mm,lastStamp.ss);
+                                if(sSize>>16>50)
+                                {
+                                      work->update(syncAbs>>16,demuxer->getSize()>>16,nbImage,
+                                              lastStamp.hh,lastStamp.mm,lastStamp.ss);
+                                }else
+                                {
+                                      work->update(syncAbs,demuxer->getSize(),nbImage,
+                                               lastStamp.hh,lastStamp.mm,lastStamp.ss);
+                                }
 //uint32_t done,uint32_t total, uint32_t nbImage, uint32_t hh, uint32_t mm, uint32_t ss);
-                                                if(work->isAborted()) break;
+                                if(work->isAborted()) break;
                                 switch(streamid)
                                         {
                                         /* Useless apparently

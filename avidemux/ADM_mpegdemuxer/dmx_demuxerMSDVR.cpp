@@ -186,6 +186,11 @@ uint8_t  dmx_demuxerMSDVR::getPos( uint64_t *abs,uint64_t *rel)
   return 1;
 }
 // ******************************************************
+uint64_t dmx_demuxerMSDVR::getSize( void) 
+{
+  return (uint64_t)_nbPackets; 
+}
+// ******************************************************
 uint8_t dmx_demuxerMSDVR::setPos( uint64_t abs,uint64_t  rel)
 {
 				// Need to move ?

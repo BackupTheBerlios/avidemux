@@ -77,7 +77,7 @@ class dmx_demuxerMSDVR: public dmx_demuxer
     uint8_t         getPos( uint64_t *abs,uint64_t *rel);
     uint8_t         setPos( uint64_t abs,uint64_t  rel);
                 
-    uint64_t        getSize( void) { return _size;}          
+    uint64_t        getSize( void) ;       
     uint8_t         setProbeSize(uint32_t probe);                
                 
     uint32_t        read(uint8_t *w,uint32_t len);
