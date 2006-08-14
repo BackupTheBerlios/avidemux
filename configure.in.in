@@ -736,7 +736,30 @@ AC_SUBST(FREETYPE_LIBS)
 
 AC_MSG_CHECKING(/usr/local/ is full of divx)
 AC_MSG_RESULT("yes")
+dnl --------------- fontconfig ----------------
+AC_ARG_WITH([fontconfig],
+	AC_HELP_STRING([--without-fontconfig], [Force compilation without fontconfig (default: test)]),
+	[with_fontconfig=${withval}], [with_fontconfig=test])
 
+AC_MSG_CHECKING([if fontconfig support is required])
+AC_MSG_RESULT($with_fontconfig)
+
+have_fontconfig=no
+
+if test "x$with_fontconfig" != "xno"; then
+	have_fontconfig=yes
+	AC_CHECK_HEADER(fontconfig/fontconfig.h,,have_fontconfig=no)
+	if test "x$have_fontconfig" = "xyes"; then
+     		AC_CHECK_LIB(fontconfig,FcStrSetCreate,,have_fontconfig=no,-lm)
+	fi
+	if test "x$have_freetype" = "xyes"; then
+		AC_DEFINE(USE_FONTCONFIG,1,"[Use FontConfig helper functions ]")
+		AC_DEFINE(HAVE_FONTCONFIG,1,"[Use FontConfig helper functions ]")
+	fi
+fi
+
+
+dnl --------------- fontconfig ----------------
 dnl __________________________________________
 
 use_debug=0
