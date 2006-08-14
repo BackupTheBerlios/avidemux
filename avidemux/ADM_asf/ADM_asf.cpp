@@ -658,7 +658,7 @@ uint8_t asfHeader::buildIndex(void)
                                    &readQueue,_dataStartOffset);
   uint32_t packet=1;
   uint32_t sequence=1;
-#define MAXIMAGE (_nbPackets*3)
+#define MAXIMAGE (_nbPackets*4)
   nbImage=0;
   asfIndex *tmpIndex=new asfIndex[MAXIMAGE];
   memset(tmpIndex,0,sizeof(asfIndex)*MAXIMAGE);
@@ -755,10 +755,17 @@ uint8_t asfHeader::buildIndex(void)
   // In fact it is an average fps
   // FIXME
   float f=nbImage;
+  uint32_t ps;
+  
   f*=1000.*1000.*10000.;
   f=f/_duration;
+  ps=(uint32_t)f;
+  // Round up to the closed 0.5 = 500
+  ps=(ps+490)/500;
+  ps*=500;
+  
   _videostream.dwScale=1000;
-  _videostream.dwRate=(uint32_t)floor(f+0.4);
+  _videostream.dwRate=ps;
 
   return 1;
   
