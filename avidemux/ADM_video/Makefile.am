@@ -162,7 +162,8 @@ ADM_vidCrop.cpp  ADM_vidMSmooth_param.h  ADM_vobsubinfo.h \
 ADM_vidDGbob.cpp ADM_vidMcDeint.cpp  ASM_vidDenoise.cpp \
 ADM_vidDGbob_param.h ADM_vidMcDeint_param.h  DIA_kerneldeint.cpp \
 ADM_vidDecDec.cpp  ADM_vidMosaic.cpp swscale_internal.h \
-ADM_vidTdeint_util.txt ADM_vidASS.h ADM_vidASS.cpp
+ADM_vidTdeint_util.txt ADM_vidASS.h ADM_vidASS.cpp \
+ADM_vidAss_Params.h
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES= $(all_includes) $(FREETYPE_CFLAGS) $(ALTIVEC_SWITCH)

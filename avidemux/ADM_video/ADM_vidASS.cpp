@@ -6,7 +6,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+/*
+  Initial port from MPlayer by Moonz
 
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,104 +39,127 @@
 # endif
 #endif
 
-static FILTER_PARAM assParam={7,{/* float */ "font_scale",
-	/*float*/ "line_spacing",
-	/* int */ "top_margin",
-	/* int */ "bottom_margin",
-	/* bool */ "extract_embedded_fonts",
-	/* ADM_filename */ "fonts_dir",
-	/* ADM_filename */ "subfile" }};
+static FILTER_PARAM assParam={7,
+        { /* float */ "font_scale",
+          /*float*/ "line_spacing",
+          /* int */ "top_margin",
+          /* int */ "bottom_margin",
+          /* bool */ "extract_embedded_fonts",
+          /* ADM_filename */ "fonts_dir",
+          /* ADM_filename */ "subfile" }};
 
 SCRIPT_CREATE(ass_script,ADMVideoSubASS,assParam);
 BUILD_CREATE(ass_create,ADMVideoSubASS);
 
-char *ADMVideoSubASS::printConf() {
- 	static char buf[50];
-	sprintf((char *)buf," ASS Subtitles: ");
-	
-	char *filename = (char*)_params->subfile;
-	if(strrchr(filename, DIR_SEP) != NULL && *(strrchr(filename, DIR_SEP) + 1) != 0)
-		filename = strrchr(filename, DIR_SEP) + 1;
-	strncpy(buf+16, filename, 50-16);
-	buf[49] = 0;
- 	
-	return buf;
+char *ADMVideoSubASS::printConf() 
+{
+      static char buf[50];
+      sprintf((char *)buf," ASS/SSA Subtitles: ");
+      
+      char *filename = (char*)_params->subfile;
+      if(filename)
+      {
+          if(strrchr(filename, DIR_SEP) != NULL && *(strrchr(filename, DIR_SEP) + 1) != 0)
+              filename = strrchr(filename, DIR_SEP) + 1;
+          strncat(buf, filename, 49-strlen(buf));
+          buf[49] = 0;
+      }else
+      {
+        strcat(buf," (no sub)");       
+      }
+      return buf;
 }
 
 //_______________________________________________________________
 
-ADMVideoSubASS::ADMVideoSubASS(AVDMGenericVideoStream *in, CONFcouple *conf) {
-  	_in=in;		
-   	memcpy(&_info,_in->getInfo(),sizeof(_info));
-	_params = new ASSParams;
-	ADM_assert(_params);
-	
-	_ass_i = NULL;
-	_ass_t = NULL;
-	
-	if(conf) {
-		#define _COUPLE_GET(x) conf->getCouple(#x, &(_params->x));
-		_COUPLE_GET(font_scale)
-		_COUPLE_GET(line_spacing)
-		_COUPLE_GET(top_margin)
-		_COUPLE_GET(bottom_margin)
-		_COUPLE_GET(subfile)
-		_COUPLE_GET(fonts_dir)
-		_COUPLE_GET(extract_embedded_fonts)
-	}	
-	else {
-		_params->font_scale = 1.;
-		_params->line_spacing = _params->top_margin = _params->bottom_margin = 0;
-		_params->subfile = (ADM_filename*)ADM_alloc(sizeof(ADM_filename));
-		_params->fonts_dir = (ADM_filename*)ADM_alloc(6*sizeof(ADM_filename));
-		_params->subfile[0] = 0;
-		strcpy((char*)_params->fonts_dir, "/tmp/");
-		_params->extract_embedded_fonts = 1;
-		
-		#if 0
-		ADM_dealloc(_params->subfile);
-		_params->subfile = (ADM_filename*)ADM_alloc(sizeof(ADM_filename)*21);
-		strcpy((char*)_params->subfile, "/home/moonz/test.ass");
-		#endif
-	}
-	
-	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-  	ADM_assert(_uncompressed);
-  	_info.encoding=1;
-	
-	/* ASS initialization */
-	if(*_params->subfile != 0) {
-		ass_settings_t settings;
-		
-		_ass_i = ass_init();
-		_ass_t = ass_read_file((char*)_params->subfile);
-		
-		ADM_assert(_ass_i);
-		ADM_assert(_ass_t);
-		
-		_info.height += _params->top_margin + _params->bottom_margin;
-		settings.frame_width = _info.width;
-		settings.frame_height = _info.height;
-		settings.font_size_coeff = _params->font_scale;
-		settings.line_spacing = _params->line_spacing;
-		settings.top_margin = _params->top_margin;
-		settings.bottom_margin = _params->bottom_margin;
-		settings.aspect = ((double)_info.width) / ((double)_info.height);
-		
-		ass_configure(_ass_i, &settings);
-	}
+ADMVideoSubASS::ADMVideoSubASS(AVDMGenericVideoStream *in, CONFcouple *conf) 
+{
+        _in=in;		
+        memcpy(&_info,_in->getInfo(),sizeof(_info));
+        _params = new ASSParams;
+        ADM_assert(_params);
+        
+        _ass_i = NULL;
+        _ass_t = NULL;
+        
+        if(conf) {
+                #define _COUPLE_GET(x) conf->getCouple(#x, &(_params->x));
+                _COUPLE_GET(font_scale)
+                _COUPLE_GET(line_spacing)
+                _COUPLE_GET(top_margin)
+                _COUPLE_GET(bottom_margin)
+                _COUPLE_GET(subfile)
+                _COUPLE_GET(fonts_dir)
+                _COUPLE_GET(extract_embedded_fonts)
+        }	
+        else {
+                _params->font_scale = 1.;
+                _params->line_spacing = _params->top_margin = _params->bottom_margin = 0;
+                _params->subfile = NULL;
+                _params->fonts_dir = (ADM_filename*)ADM_alloc(6*sizeof(ADM_filename));
+                strcpy((char*)_params->fonts_dir, "/tmp/");
+                _params->extract_embedded_fonts = 1;
+                
+                #if 0
+                ADM_dealloc(_params->subfile);
+                _params->subfile = (ADM_filename*)ADM_alloc(sizeof(ADM_filename)*21);
+                strcpy((char*)_params->subfile, "/home/moonz/test.ass");
+                #endif
+        }
+
+        _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
+        ADM_assert(_uncompressed);
+        _info.encoding=1;
+
+        /* ASS initialization */
+        _ass_i = ass_init();
+        ADM_assert(_ass_i);
+        if(_params->subfile)
+              if(!init())
+              {
+                GUI_Error_HIG("Format ?","Are you sure this is an ass file ?"); 
+              }
+
+}
+// **********************************
+uint8_t ADMVideoSubASS::init(void)
+{
+  _ass_t = ass_read_file((char*)_params->subfile);
+  if(!_ass_t)
+  {
+    return 0;
+     
+  }
+  else
+  {
+    ass_settings_t settings;
+    memcpy(&_info,_in->getInfo(),sizeof(_info));
+    _info.height += _params->top_margin + _params->bottom_margin;
+    settings.frame_width = _info.width;
+    settings.frame_height = _info.height;
+    settings.font_size_coeff = _params->font_scale;
+    settings.line_spacing = _params->line_spacing;
+    settings.top_margin = _params->top_margin;
+    settings.bottom_margin = _params->bottom_margin;
+    settings.aspect = ((double)_info.width) / ((double)_info.height);
+    ass_configure(_ass_i, &settings);
+  }
+  return 1;
 }
 
-ADMVideoSubASS::~ADMVideoSubASS() {
- 	if(_uncompressed) DELETE(_uncompressed);
-	
-	if(_params) {
-		ADM_dealloc(_params->subfile);
-		ADM_dealloc(_params->fonts_dir);
-		DELETE(_params);
-	}
+//*******************************************
+ADMVideoSubASS::~ADMVideoSubASS() 
+{
+      if(_uncompressed) DELETE(_uncompressed);
+      
+      if(_params) 
+      {
+        DELETE(_params->subfile);
+        DELETE( _params->fonts_dir);
+        DELETE(_params);
+      }
 }
-
+//*******************************************
 #define _r(c)  ((c)>>24)
 #define _g(c)  (((c)>>16)&0xFF)
 #define _b(c)  (((c)>>8)&0xFF)
@@ -142,103 +168,153 @@ ADMVideoSubASS::~ADMVideoSubASS() {
 #define rgba2u(c)  ( (( 450*_r(c) - 376*_g(c) -  73*_b(c)) >> 10) + 128 )
 #define rgba2v(c)  ( ((-152*_r(c) - 298*_g(c) + 450*_b(c)) >> 10) + 128 )
 
-uint8_t ADMVideoSubASS::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len, ADMImage *data, uint32_t *flags) {
-	unsigned i, j, k, l, val;
-	uint8_t y, u, v, opacity, orig_u, orig_v;
-	uint8_t orig_y;
-	uint8_t *bitmap, *ydata, *udata, *vdata;
-	
-	ADM_assert(frame<_info.nb_frames);
-	ADM_assert(_params);
-	ADM_assert(_ass_i);
-	ADM_assert(_ass_t);
-	
-	long long where = (long long)(_info.orgFrame + frame) * 1000000LL / (long long)_info.fps1000;
-	
-	if(!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags))
-		return 0;
-	
-	/* Add black borders */
-	memset(YPLANE(data),16,_info.width*_info.height);
-	memset(UPLANE(data),128,(_info.width*_info.height)>>2);
-	memset(VPLANE(data),128,(_info.width*_info.height)>>2);
-	
-	memcpy(YPLANE(data) + _info.width * _params->top_margin, YPLANE(_uncompressed),
-		_in->getInfo()->width * _in->getInfo()->height);
-	memcpy(UPLANE(data) + (_info.width>>1) * (_params->top_margin>>1), UPLANE(_uncompressed),
-		(_in->getInfo()->width>>1) * (_in->getInfo()->height>>1));
-	memcpy(VPLANE(data) + (_info.width>>1) * (_params->top_margin>>1), VPLANE(_uncompressed),
-		(_in->getInfo()->width>>1) * (_in->getInfo()->height>>1));
-	
-	ass_image_t *img = ass_render_frame(_ass_i, _ass_t, where);
-	
-	while(img) {
-		y = rgba2y(img->color);
-		u = rgba2u(img->color);
-		v = rgba2v(img->color);
+uint8_t ADMVideoSubASS::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len, ADMImage *data, uint32_t *flags) 
+{
+        uint32_t  i, j, k, l, val;
+        uint8_t y, u, v, opacity;
+        int32_t orig_u, orig_v,klong,newu,newv;
+        uint8_t orig_y;
+        uint8_t *bitmap, *ydata, *udata, *vdata;
 
-		opacity = 255 - _a(img->color);
-		
-		bitmap = img->bitmap;
-		ydata = YPLANE(data) + img->dst_y * _info.width + img->dst_x;
-		udata = UPLANE(data) + (img->dst_y >> 1) * (_info.width >> 1) + (img->dst_x >> 1);
-		vdata = VPLANE(data) + (img->dst_y >> 1) * (_info.width >> 1) + (img->dst_x >> 1);
-		
-		for(i = 0; i < img->h; ++i) {
-			for(j = 0; j < img->w; ++j) {
-				k = *(bitmap+j) * opacity / 255;
-				orig_y = *(ydata+j);
-				*(ydata+j) = (k*y + (255-k)*orig_y) / 255;
-			}
-			
-			bitmap += img->stride;
-			ydata += _info.width;
-		}
-		
-		bitmap = img->bitmap;
-		
-		for(i = 0; i < img->h; i += 2) {
-			for(j = 0, l = 0; j < img->w; j += 2, ++l) {
-				val = 0;
-				val += *(bitmap + j);
-				val += *(bitmap + j + 1);
-				val += *(bitmap + img->stride + j);
-				val += *(bitmap + img->stride + j + 1);
-				val >>= 2;
-				
-				k = val * opacity / 255;
-				orig_u = *(udata+l);
-				orig_v = *(vdata+l);
-				
-				*(udata+l) = (k*u + (255-k)*orig_u) / 255;
-				*(vdata+l) = (k*v + (255-k)*orig_v) / 255;
-			}
-			
-			bitmap += img->stride << 1;
-			udata += _info.width >> 1;
-			vdata += _info.width >> 1;
-		}
-		
-		img = img->next;
-	}
-	
-	return 1;
+        if(frame>=_info.nb_frames)
+        {
+          printf("[SubAss] out of bound %u/%u\n",frame,_info.nb_frames); 
+        }
+        ADM_assert(_params);
+
+        int64_t  where = (int64_t)(_info.orgFrame + frame) * 1000000LL /
+                          (int64_t)_info.fps1000;
+
+        if(!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags))
+                return 0;
+
+        /* Add black borders top / bottom*/
+
+        uint32_t page=_info.width*_info.height;
+        uint32_t top, bottom;
+        top=_info.width * (_params->top_margin &0xfffe);
+        if(top>page) top=0;
+        
+        if(top)
+        {
+            memset(YPLANE(data),16,top);
+            memset(UPLANE(data),128,top>>2);
+            memset(VPLANE(data),128,top>>2);
+        }
+        memcpy(YPLANE(data) + top, YPLANE(_uncompressed),page-top);
+        memcpy(UPLANE(data) + (top>>2), UPLANE(_uncompressed), (page-top)>>2);
+        memcpy(VPLANE(data) + (top>>2), VPLANE(_uncompressed), (page-top)>>2);
+
+        // Now do bottom
+        top=_info.width * (_params->bottom_margin&0xfffe);
+        if(top>page) top=0;
+        if(top)
+        {
+            memset(YPLANE(data)+page-top,16,top);
+            memset(UPLANE(data)+((page-top)>>2),128,top>>2);
+            memset(VPLANE(data)+((page-top)>>2),128,top>>2);
+        }
+        // Do we have something to render ?
+        if(!_ass_i || !_ass_t)
+        {
+          printf("[Ass] No sub to render\n");
+          return 1; 
+        }
+
+        ass_image_t *img = ass_render_frame(_ass_i, _ass_t, where);
+
+        while(img) {
+                  y = rgba2y(img->color);
+                  u = rgba2u(img->color);
+                  v = rgba2v(img->color);
+
+                  opacity = 255 - _a(img->color);
+
+                  bitmap = img->bitmap;
+
+                  uint32_t offset=img->dst_y * _info.width +img->dst_x;
+                  uint32_t offset2=(img->dst_y>>1) * (_info.width>>1)+(img->dst_x >> 1); 
+
+                  ydata = YPLANE(data) + offset ;
+                  udata = UPLANE(data) + offset2 ;
+                  vdata = VPLANE(data) + offset2 ;
+
+                  for(i = 0; i < img->h; ++i) 
+                  {
+                          for(j = 0; j < img->w; ++j) 
+                          {
+                                  k = *(bitmap+j) * opacity / 255;
+                                  orig_y = *(ydata+j);
+                                  *(ydata+j) = (k*y + (255-k)*orig_y) / 255;
+                          }
+
+                          bitmap += img->stride;
+                          ydata += _info.width;
+                  }
+
+                  bitmap = img->bitmap;
+                  
+                  newu=u-128;
+                  newv=v-128;
+
+                  for(i = 0; i < img->h; i += 2) 
+                  {
+                          for(j = 0, l = 0; j < img->w; j += 2, ++l) 
+                          {
+                                  val = 0;
+                                  val += *(bitmap + j);
+                                  val += *(bitmap + j + 1);
+                                  val += *(bitmap + img->stride + j);
+                                  val += *(bitmap + img->stride + j + 1);
+                                  val >>= 2;
+
+                                  k = val * opacity / 255;
+                                  orig_u = *(udata+l);
+                                  orig_v = *(vdata+l);
+
+                                  orig_u=( k*u+(255-k)*orig_u)/255;
+                                  orig_v=( k*v+(255-k)*orig_v)/255;
+                                  *(udata+l) = orig_u;
+                                  *(vdata+l) = orig_v;
+                          }
+
+                          bitmap += img->stride << 1;
+                          udata += _info.width >> 1;
+                          vdata += _info.width >> 1;
+                  }
+
+                  img = img->next;
+        }
+
+        return 1;
 }
 
-uint8_t	ADMVideoSubASS::getCoupledConf(CONFcouple **conf) {
-	*conf=new CONFcouple(7);
-	
+uint8_t	ADMVideoSubASS::getCoupledConf(CONFcouple **conf) 
+{
+        *conf=new CONFcouple(7);
+
 #define _COUPLE_SET(x) (*conf)->setCouple(#x, _params->x);
-	_COUPLE_SET(font_scale)
-	_COUPLE_SET(line_spacing)
-	_COUPLE_SET(top_margin)
-	_COUPLE_SET(bottom_margin)
-	_COUPLE_SET(subfile)
-	_COUPLE_SET(fonts_dir)
-	_COUPLE_SET(extract_embedded_fonts)
-	
-	return 1;
+        _COUPLE_SET(font_scale)
+        _COUPLE_SET(line_spacing)
+        _COUPLE_SET(top_margin)
+        _COUPLE_SET(bottom_margin)
+        _COUPLE_SET(subfile)
+        _COUPLE_SET(fonts_dir)
+        _COUPLE_SET(extract_embedded_fonts)
+
+        return 1;
+}
+/************************************************/
+extern uint8_t DIA_ass(ASSParams *param);
+uint8_t ADMVideoSubASS::configure(AVDMGenericVideoStream *instream) 
+{
+  _in=instream;
+  if( DIA_ass(_params))
+  {
+    init();
+    return 1; 
+  }
+  return 0;
 }
 #endif /* HAVE_ENCODER */
-
 #endif /* USE_FREETYPE */
