@@ -226,7 +226,7 @@ uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosyn
                                                         // abort;
                                                         goto stop_found;
                                                 }*/
-                                if(sSize>>16>50)
+                                if((sSize>>16)>50)
                                 {
                                       work->update(syncAbs>>16,demuxer->getSize()>>16,nbImage,
                                               lastStamp.hh,lastStamp.mm,lastStamp.ss);
