@@ -146,6 +146,13 @@ static float xcoeffs[] =
 -0.0000000000,
 };
 
+static bool skip;
+
+void DolbySkip(bool on)
+{
+	skip = on;
+}
+
 void DolbyInit()
 {
 	memset(xv_left, 0, sizeof(float) * NZEROS);
@@ -154,6 +161,7 @@ void DolbyInit()
 
 float DolbyShiftLeft(float isamp)
 {
+if(!skip) {
 	float *p_xcoeffs = xcoeffs;
 	static int pos = 0;
 
@@ -174,10 +182,14 @@ float DolbyShiftLeft(float isamp)
 		pos = 0;
 
 	return sum;
+}else{
+	return isamp;
+}
 }
 
 float DolbyShiftRight(float isamp)
 {
+if(!skip) {
 	float *p_xcoeffs = xcoeffs;
 	static int pos = 0;
 
@@ -198,4 +210,7 @@ float DolbyShiftRight(float isamp)
 		pos = 0;
 
 	return -sum;
+}else{
+	return isamp;
+}
 }

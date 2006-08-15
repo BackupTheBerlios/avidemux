@@ -13,6 +13,7 @@
 #define AUDM_DOLBY_H
 
 extern void DolbyInit();
+extern void DolbySkip(bool on);
 extern float DolbyShiftLeft(float isamp);
 extern float DolbyShiftRight(float isamp);
 

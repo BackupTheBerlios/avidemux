@@ -33,6 +33,7 @@
 #include "audioeng_process.h"
 #include "audiofilter_normalize_param.h"
 #include "audiofilter_normalize.h"
+#include "audiofilter_dolby.h"
 
 #include "ADM_audio/aviaudio.hxx"
 extern AVDMGenericAudioStream *currentaudiostream;
@@ -86,7 +87,7 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
     uint32_t current=0,llength=0;
     float max[_wavHeader.channels];
     _previous->rewind();
-
+    DolbySkip(1);
     printf("\n Seeking for maximum value, that can take a while\n");
 
       llength=currentaudiostream->getLength()  / _wavHeader.byterate * _wavHeader.frequency * _wavHeader.channels;
@@ -159,6 +160,7 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
     printf("\n Using ratio of : %f\n", _ratio);
      }
     _scanned = 1;
+    DolbySkip(0);
     _previous->rewind();
     return 1;
 }

@@ -138,23 +138,15 @@ AUDMAudioFilter *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiost
 
 
 //_______________________________________________________
-      if ( audioGain.mode!=ADM_NO_GAIN)	// Normalize activated ?
-      {
-        printf("\n  normalize activated..\n");
-      
-        AUDMAudioFilterNormalize *normalize = new AUDMAudioFilterNormalize(lastFilter,&audioGain);
-        lastFilter = normalize;
-        filtersFloat[filtercount++] = lastFilter;
-      
-      }
-      
       if( (audioMixing!=CHANNEL_INVALID ))
           {
             AUDMAudioFilter *mixer;
             mixer=new AUDMAudioFilterMixer( lastFilter,audioMixing);
             lastFilter = mixer;
             filtersFloat[filtercount++] = lastFilter;
-          }
+            ch_route.copy = 0;
+          } else
+            ch_route.copy = 1;
 
     if (audioDRC)
           {
@@ -206,6 +198,16 @@ AUDMAudioFilter *buildInternalAudioFilter(AVDMGenericAudioStream *currentaudiost
                 
                         
         }   
+
+      if ( audioGain.mode!=ADM_NO_GAIN)	// Normalize activated ?
+      {
+        printf("\n  normalize activated..\n");
+      
+        AUDMAudioFilterNormalize *normalize = new AUDMAudioFilterNormalize(lastFilter,&audioGain);
+        lastFilter = normalize;
+        filtersFloat[filtercount++] = lastFilter;
+      
+      }
 //_______________________________________________________
 
 
@@ -281,7 +283,8 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
   AUDMAudioFilter         *lastFilter=NULL;
   AVDMGenericAudioStream  *output=NULL;
   AUDMEncoder             *tmpfilter=NULL;
-  
+  ch_route.mode = 0;
+
 	// if audio is set to copy, we just return the first filter
   if(!audioProcessMode())
   {
