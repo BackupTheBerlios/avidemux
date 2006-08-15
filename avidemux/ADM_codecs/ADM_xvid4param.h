@@ -36,6 +36,7 @@ typedef struct xvid4EncParam
 
   int qpel;
   int gmc;
+  int bvhq;
   int hqac;
 
   int chroma_opt;

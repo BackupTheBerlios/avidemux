@@ -499,6 +499,7 @@ xvid4EncParam xvid4Extra = {
   0,				//int greyscale;             
   0,				// qpel
   0,				// GMC
+  1,				// BVHQ
   1,				// hqac
   0,				// Chroma optim
   {2, 2, 2}

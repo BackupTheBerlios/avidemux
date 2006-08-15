@@ -291,6 +291,7 @@ xvid4Encoder::preAmble (uint8_t * in)
   SVOP (inter4mv, INTER4V);
   SVOP (trellis, TRELLISQUANT);
   SVOP (hqac, HQACPRED);
+  SVOP (bvhq, RD_BVOP);
   SVOP (greyscale, GREYSCALE);
   SVOP (cartoon, CARTOON);
   SVOP (chroma_opt, CHROMAOPT);

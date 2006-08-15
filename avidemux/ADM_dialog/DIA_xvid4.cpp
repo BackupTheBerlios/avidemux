@@ -233,6 +233,7 @@ void xvid4otherUpload(GtkWidget *dialog)
 	CHECK_SET(checkbuttonChroma,		chroma_opt);
 	CHECK_SET(checkbuttonChromaMotion,	chroma_me);
 	CHECK_SET(checkbuttonGMC,		gmc);
+	CHECK_SET(checkbuttonBVHQ,		bvhq);
 	CHECK_SET(checkbuttonQPel,		qpel);
 	CHECK_SET(checkbuttonHQAC,		hqac);
 	
@@ -293,6 +294,7 @@ void xvid4otherDownload(GtkWidget *dialog)
 	CHECK_GET(checkbuttonChroma,		chroma_opt);
 	CHECK_GET(checkbuttonChromaMotion,	chroma_me);
 	CHECK_GET(checkbuttonGMC,		gmc);
+	CHECK_GET(checkbuttonBVHQ,		bvhq);
 	CHECK_GET(checkbuttonQPel,		qpel);
 	CHECK_GET(checkbuttonHQAC,		hqac);
 	CHECK_GET(checkbuttonTurbo,		turbo);
@@ -570,6 +572,7 @@ create_dialog1 (void)
   GtkWidget *hbox12;
   GtkWidget *checkbuttonQPel;
   GtkWidget *checkbuttonGMC;
+  GtkWidget *checkbuttonBVHQ;
   GtkWidget *labelAdvancedSimpleProfile;
   GtkWidget *labelMotionEstimation;
   GtkWidget *vbox10;
@@ -975,6 +978,11 @@ create_dialog1 (void)
   gtk_widget_show (checkbuttonGMC);
   gtk_box_pack_start (GTK_BOX (hbox12), checkbuttonGMC, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, checkbuttonGMC, _("Global Motion Compensation can save bits on camera pans, zooming and rotation"), NULL);
+
+  checkbuttonBVHQ = gtk_check_button_new_with_mnemonic (_("_BVHQ"));
+  gtk_widget_show (checkbuttonBVHQ);
+  gtk_box_pack_start (GTK_BOX (hbox12), checkbuttonBVHQ, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, checkbuttonBVHQ, _("Produces nicer-looking B-frames"), NULL);
 
   labelAdvancedSimpleProfile = gtk_label_new (_("Advanced Simple Profile"));
   gtk_widget_show (labelAdvancedSimpleProfile);
@@ -1383,6 +1391,7 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, hbox12, "hbox12");
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonQPel, "checkbuttonQPel");
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonGMC, "checkbuttonGMC");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbuttonBVHQ, "checkbuttonBVHQ");
   GLADE_HOOKUP_OBJECT (dialog1, labelAdvancedSimpleProfile, "labelAdvancedSimpleProfile");
   GLADE_HOOKUP_OBJECT (dialog1, labelMotionEstimation, "labelMotionEstimation");
   GLADE_HOOKUP_OBJECT (dialog1, vbox10, "vbox10");
