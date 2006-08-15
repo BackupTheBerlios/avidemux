@@ -46,7 +46,7 @@ ADM_AudiocodecUlaw::~ADM_AudiocodecUlaw()
 }
 
 
-uint8_t ADM_AudiocodecUlaw::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecUlaw::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut)
 {
 uint8_t byt1;
 int16_t out;

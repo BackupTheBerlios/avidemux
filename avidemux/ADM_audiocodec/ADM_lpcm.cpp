@@ -30,10 +30,18 @@
 #include "fourcc.h"
 //#include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"
+#include "ADM_audiofilter/audiofilter_channel_route.h"
 
 ADM_AudiocodecWavSwapped::ADM_AudiocodecWavSwapped( uint32_t fourcc ) : ADM_Audiocodec(fourcc)
 {
+	ch_route.input_type[0] = CH_FRONT_LEFT;
+	ch_route.input_type[1] = CH_FRONT_RIGHT;
+	ch_route.input_type[2] = CH_FRONT_CENTER;
+	ch_route.input_type[3] = CH_LFE;
+	ch_route.input_type[4] = CH_REAR_LEFT;
+	ch_route.input_type[5] = CH_REAR_RIGHT;
 }
+
 ADM_AudiocodecWavSwapped::~ADM_AudiocodecWavSwapped()
 {
 
@@ -58,7 +66,7 @@ uint8_t ADM_AudiocodecWavSwapped::isDecompressable( void )
  	return 1;
 }
 
-uint8_t ADM_AudiocodecWavSwapped::run(uint8_t * inptr, uint32_t nbIn, float *outptr, uint32_t * nbOut, ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecWavSwapped::run(uint8_t * inptr, uint32_t nbIn, float *outptr, uint32_t * nbOut)
 {
 	if (nbIn < 2)
 		return 1;

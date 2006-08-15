@@ -78,7 +78,7 @@ uint8_t ADM_AudiocodecMP3::endDecompress( void )
     return 1;
 }
 
-uint8_t ADM_AudiocodecMP3::run(uint8_t * inptr, uint32_t nbIn, float *outptr, uint32_t * nbOut, ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecMP3::run(uint8_t * inptr, uint32_t nbIn, float *outptr, uint32_t * nbOut)
 {
 int i;
 signed int Sample;

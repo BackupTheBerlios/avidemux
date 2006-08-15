@@ -24,6 +24,8 @@
 #include "fourcc.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"
+#include "ADM_audiofilter/audiofilter_channel_route.h"
+
 #include "ADM_toolkit/ADM_cpuCap.h"
 #include "prefs.h"
 
@@ -35,34 +37,7 @@ extern "C" {
 
 #define AC3_HANDLE ((a52_state_t *)ac3_handle)
 
-static const uint8_t channel[15]=
-{
-    0,1,2,3,
-    3,4,4,5,
-    0,0,2,0,
-    0,0,0
-};
-
-static const CHANNEL_CONF AC3_CONF[15]=
-{
-    CHANNEL_INVALID,
-    CHANNEL_MONO,
-    CHANNEL_STEREO,
-    CHANNEL_3F,
-    CHANNEL_2F_1R, //4
-    CHANNEL_3F_1R, //5
-    CHANNEL_2F_2R,
-    CHANNEL_3F_2R,
-    CHANNEL_3F_2R_LFE,
-    CHANNEL_INVALID, //9
-    CHANNEL_DOLBY_SURROUND,
-    CHANNEL_INVALID,
-    CHANNEL_INVALID,
-    CHANNEL_INVALID,
-    CHANNEL_INVALID
-};
-
-ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc) :   ADM_Audiocodec(fourcc)
+ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc, WAVHeader *info) :   ADM_Audiocodec(fourcc)
 {
     int flags=0;
     ADM_assert(fourcc==WAV_AC3);
@@ -87,11 +62,10 @@ ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc) :   ADM_Audiocodec(fourcc
         printf("Cannot init a52 sample\n");
         ADM_assert(0);   
     }
-    
-       
         _downmix=0;
-   
+	_wavHeader = info;
 }
+
 ADM_AudiocodecAC3::~ADM_AudiocodecAC3( )
 {
     if(ac3_handle)
@@ -100,25 +74,24 @@ ADM_AudiocodecAC3::~ADM_AudiocodecAC3( )
         ac3_handle=NULL;
         ac3_sample=NULL;
     }
-    
 }
+
 uint8_t ADM_AudiocodecAC3::beginDecompress( void )
 {
 		return 1;
 }
+
 uint8_t ADM_AudiocodecAC3::endDecompress( void )
 {
-    
     return 1;
 }
 
-
-uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   uint32_t *nbOut, ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   uint32_t *nbOut)
 {
     uint32_t avail;
     uint32_t length;
     int flags = 0, samprate = 0, bitrate = 0;
-    uint8_t chan = 2;
+    uint8_t chan = _wavHeader->channels;
     *nbOut=0;
 
     //  Ready to decode
@@ -141,16 +114,32 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
             // not enough data
             break;
         }
-        if(  ((flags&A52_CHANNEL_MASK)==A52_3F2R)  && (flags &  A52_LFE)) // 5.1...
-        {
-          chan=6; 
-        }else
-        {
-          flags&=A52_CHANNEL_MASK; // Skip LFE
-          chan=channel[flags];
-        }
-        ADM_assert(chan);
-        
+
+	if (ch_route.mode < 1) {
+		CHANNEL_TYPE *p_ch_type = ch_route.input_type;
+		if (flags & A52_LFE) {
+			*(p_ch_type++) = CH_LFE;
+		}
+		switch (flags & A52_CHANNEL_MASK) {
+			case A52_MONO:
+				*(p_ch_type++) = CH_MONO;
+			break;
+			case A52_STEREO:
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+			break;
+			case A52_3F2R:
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_CENTER;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+				*(p_ch_type++) = CH_REAR_LEFT;
+				*(p_ch_type++) = CH_REAR_RIGHT;
+			break;
+			default:
+				ADM_assert(0);
+		}
+	}
+
         sample_t level = 1, bias = 0;
 
         if (a52_frame(AC3_HANDLE, inptr, &flags, &level, bias))
@@ -164,19 +153,6 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
         inptr+=length;
         nbIn-=length;
         *nbOut += 256 * chan * 6;
-        if(matrix)
-        {
-            matrix->nbChannel=channel[flags & A52_CHANNEL_MASK];
-            matrix->channelConfiguration=AC3_CONF[flags & A52_CHANNEL_MASK];
-            
-            // Only configuration filtered 3.2->5.1
-            if(flags & A52_LFE)
-            {
-                matrix->nbChannel++;
-                matrix->channelConfiguration=CHANNEL_3F_2R_LFE;
-            }
-            
-        }
 
         float *cur;
         for (int i = 0; i < 6; i++) {
@@ -185,25 +161,10 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
                         // in that case we silent out the chunk
                         memset(outptr, 0, 256 * chan * sizeof(float));
                 } else {
-                        int start;
-                        if(flags & A52_LFE)
-                        {
-                          // The first one becomes the last one, LFE is output first in ac3dec
-                          sample_t *sample=(sample_t *)ac3_sample;
-                          cur = outptr + chan-1;
-                          for (int j = 0; j < 256; j++) {
-                            *cur = *sample++;
-                            cur+=chan;
-                          }
-                          start=1; 
-                        } else 
-                        {
-                          start=0; 
-                        }
-                        for (int k = start; k < chan; k++) {
+                        for (int k = 0; k < chan; k++) {
                                 sample_t *sample=(sample_t *)ac3_sample;
                                 sample += 256 * k;
-                                cur = outptr + k-start;
+                                cur = outptr + k;
                                 for (int j = 0; j < 256; j++) {
                                         *cur = *sample++;
                                         cur+=chan;

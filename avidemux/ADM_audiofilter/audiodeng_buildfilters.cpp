@@ -87,7 +87,6 @@ static Mixer_String Mixer_strings[]=
   DOME(2F_2R),
   DOME(3F_2R),
   DOME(3F_2R_LFE),
-  DOME(DOLBY_SURROUND),
   DOME(DOLBY_PROLOGIC),
   DOME(DOLBY_PROLOGIC2)
 

@@ -74,7 +74,6 @@ typedef struct
 class AVDMGenericAudioStream
 {
    	protected:
-                                        ADM_ChannelMatrix _channelMatrix;
     #define SIZE_INTERNAL 64*1024 
 					uint8_t 	internalBuffer[2 * SIZE_INTERNAL];
 					float 	internalBuffer_float[SIZE_INTERNAL];

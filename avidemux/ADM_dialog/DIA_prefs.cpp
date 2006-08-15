@@ -595,6 +595,7 @@ gtk_widget_set_sensitive(entryALSADevice, 0);
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("No downmixing (multichannel)"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("Stereo"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("Dolby Prologic"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("Dolby Prologic 2"));
 #endif

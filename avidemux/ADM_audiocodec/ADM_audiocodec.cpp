@@ -25,6 +25,7 @@
 #include "fourcc.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"
+#include "ADM_audiofilter/audiofilter_channel_route.h"
 
 
 ADM_Audiocodec	*getAudioCodec(uint32_t fourcc,WAVHeader *info,uint32_t extra,uint8_t *extraData)
@@ -79,13 +80,13 @@ ADM_Audiocodec *out;
 				case WAV_AC3:
         				printf("\n Audio codec:  AC3\n");
 
-					out= (ADM_Audiocodec *) new ADM_AudiocodecAC3(fourcc);
+					out= (ADM_Audiocodec *) new ADM_AudiocodecAC3(fourcc, info);
                   break;
 #endif
 #ifdef USE_LIBDCA
                                 case WAV_DTS:
                                     printf("\n Audio codec:  DTS\n");
-                                    out= (ADM_Audiocodec *) new ADM_AudiocodecDCA(fourcc);
+                                    out= (ADM_Audiocodec *) new ADM_AudiocodecDCA(fourcc, info);
                                     break;
 #endif
 #ifdef USE_MP3
@@ -129,9 +130,10 @@ ADM_Audiocodec *out;
              			out= (ADM_Audiocodec *) new ADM_AudiocodecUnknown(fourcc);
         	}
 
+	ch_route.input_type[0] = CH_FRONT_LEFT;
+	ch_route.input_type[1] = CH_FRONT_RIGHT;
+
          return out;
-
-
 }
 
 ADM_Audiocodec::ADM_Audiocodec( uint32_t fourcc ) {
@@ -141,3 +143,4 @@ ADM_Audiocodec::ADM_Audiocodec( uint32_t fourcc ) {
 
 ADM_Audiocodec::~ADM_Audiocodec()
 {}
+

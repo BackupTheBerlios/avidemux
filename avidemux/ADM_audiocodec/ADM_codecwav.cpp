@@ -56,7 +56,7 @@ uint8_t ADM_AudiocodecWav::isDecompressable( void )
 {
  	return 1;
 }
-uint8_t ADM_AudiocodecWav::run(uint8_t * inptr, uint32_t nbIn, float * outptr, uint32_t * nbOut, ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecWav::run(uint8_t * inptr, uint32_t nbIn, float * outptr, uint32_t * nbOut)
 {
 	int16_t *in = (int16_t *) inptr;
 

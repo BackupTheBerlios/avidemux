@@ -15,7 +15,8 @@ libADM_audiofilter_a_SOURCES = audiodeng_buildfilters.cpp  \
 		audioencoder_lame.cpp audioencoder_twolame.cpp \
 		audioencoder_faac.cpp audioencoder_lavcodec.cpp \
 		audioencoder_vorbis.cpp audioencoder_pcm.cpp \
-		audio_raw.cpp
+		audio_raw.cpp audiofilter_channel_route.cpp \
+		audiofilter_dolby.cpp
 
 
 
@@ -34,7 +35,9 @@ audioencoder_lame.h         audioeng_process.h            audiofilter_sox.h \
 audioencoder_lame_param.h   audiofilter_bridge.cpp        audiolib_sox.cpp \
 audioencoder_lavcodec.cpp   audiofilter_bridge.h          audiolib_sox.h \
 audioencoder_lavcodec.h     audiofilter_buildchain.cpp    audioprocess.hxx \
-audioencoder_pcm.cpp        audiofilter_film2pal.cpp      resampl.h
+audioencoder_pcm.cpp        audiofilter_film2pal.cpp      resampl.h \
+audiofilter_channel_route.cpp audiofilter_dolby.cpp audiofilter_channel_route.h
+
 
 
 ####### kdevelop will overwrite this part!!! (end)############

@@ -74,6 +74,7 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   param.i_csp = X264_CSP_I420;
 
 #define MKPARAM(x,y) {param.x = zparam->y;printf(#x" = %d\n",param.x);}
+#define MKPARAMF(x,y) {param.x = (float)zparam->y / 100; printf(#x" = %.2f\n",param.x);}
   
   MKPARAM(vui.i_sar_width , AR_Num);	// FIXME
   MKPARAM(vui.i_sar_height, AR_Den);
@@ -83,8 +84,8 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   
   // KeyframeBoost ?
   // BframeReduction ?
-  // BitrateVariability ?
   // PartitionDecision ?
+  MKPARAMF(rc.f_qcompress,BitrateVariability);
   
   param.i_frame_reference = 1;
   

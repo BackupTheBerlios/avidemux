@@ -375,7 +375,6 @@
     gtk_combo_box_append_text (GTK_COMBO_BOX (combobox1), _("Stereo Front+Stero Rear"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (combobox1), _("5 channels"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (combobox1), _("5.1"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (combobox1), _("Dolby Surround"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (combobox1), _("Dolby Prologic"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (combobox1), _("Dolby Prologic 2"));
 

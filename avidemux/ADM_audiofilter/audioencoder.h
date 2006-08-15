@@ -16,6 +16,8 @@
   \param param : An opaque structure that contains the codec specific configuration datas
 */
 #include "audioeng_buildfilters.h"
+#include "audiofilter_channel_route.h"
+
 typedef struct ADM_audioEncoderDescriptor
 {
   AUDIOENCODER encoder;
@@ -54,6 +56,9 @@ class AUDMEncoder : public AVDMGenericAudioStream
 
  
     uint8_t        dither16(float *start, uint32_t nb); //
+
+    CHANNEL_TYPE ch_order[MAX_CHANNELS];
+    void reorderChannels(float *start, uint32_t nb);
 
     uint32_t       tmphead,tmptail;
   public:

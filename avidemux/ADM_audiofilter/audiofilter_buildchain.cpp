@@ -247,15 +247,21 @@ AUDMAudioFilter *buildPlaybackFilter(AVDMGenericAudioStream *currentaudiostream,
         if( downmix && channels>2)
         {
           CHANNEL_CONF mix;
-          if(downmix==1) 
-          {
-            printf("Downmixing to prologic\n");
-            mix=CHANNEL_DOLBY_PROLOGIC;
-          }
-          else
-          {   
-            printf("Downmixing to prologic2\n");  
-            mix=CHANNEL_DOLBY_PROLOGIC2;
+          switch (downmix) {
+		case 1:
+			printf("Downmixing to stereo\n");
+			mix=CHANNEL_STEREO;
+		break;
+		case 2:
+			printf("Downmixing to prologic\n");
+			mix=CHANNEL_DOLBY_PROLOGIC;
+		break;
+		case 3:
+			printf("Downmixing to prologic2\n");
+			mix=CHANNEL_DOLBY_PROLOGIC2;
+		break;
+		default:
+			ADM_assert(0);
           }
           AUDMAudioFilterMixer *mixer;
           mixer=new AUDMAudioFilterMixer( lastFilter,mix);

@@ -37,6 +37,12 @@
 
 AUDMEncoder_Faac::AUDMEncoder_Faac(AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
 {
+  ch_order[0] = CH_FRONT_CENTER;
+  ch_order[1] = CH_FRONT_LEFT;
+  ch_order[2] = CH_FRONT_RIGHT;
+  ch_order[3] = CH_REAR_LEFT;
+  ch_order[4] = CH_REAR_RIGHT;
+  ch_order[5] = CH_LFE;
 };
 
 
@@ -144,6 +150,7 @@ _again:
           return 0; 
         }
         ADM_assert(tmptail>=tmphead);
+        reorderChannels(&(tmpbuffer[tmphead]),_chunk);
         *len = faacEncEncode(_handle, (int32_t *)&(tmpbuffer[tmphead]), _chunk, dest, FA_BUFFER_SIZE);
         if(!*len) 
         {

@@ -24,6 +24,7 @@
 #include "fourcc.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"
+#include "ADM_audiofilter/audiofilter_channel_route.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
 #include "prefs.h"
 
@@ -37,35 +38,8 @@ extern "C"
 #include "ADM_audio/ADM_dcainfo.h"
 
 #define DTS_HANDLE ((dts_state_t *)dts_handle)
-static const int channel[15]=
-{
-    1,0,2,2,
-    2,3,3,4,
-    5,5,0,0,
-    0,0,0
-};
 
-static const CHANNEL_CONF DTS_CONF[16]=
-{
-    CHANNEL_MONO,   //0
-    CHANNEL_INVALID,
-    CHANNEL_STEREO,
-    CHANNEL_INVALID,
-    CHANNEL_INVALID,
-    CHANNEL_3F,      //5
-    CHANNEL_2F_1R, 
-    CHANNEL_3F_1R, 
-    CHANNEL_2F_2R,
-    CHANNEL_3F_2R, //9
-    CHANNEL_INVALID,
-    CHANNEL_INVALID,
-    CHANNEL_INVALID,
-    CHANNEL_INVALID,
-    CHANNEL_INVALID,
-    CHANNEL_INVALID // 15
-    
-};
-ADM_AudiocodecDCA::ADM_AudiocodecDCA( uint32_t fourcc) :   ADM_Audiocodec(fourcc)
+ADM_AudiocodecDCA::ADM_AudiocodecDCA( uint32_t fourcc, WAVHeader *info) :   ADM_Audiocodec(fourcc)
 {
     int flags=0;
     ADM_assert(fourcc==WAV_DTS);
@@ -84,7 +58,9 @@ ADM_AudiocodecDCA::ADM_AudiocodecDCA( uint32_t fourcc) :   ADM_Audiocodec(fourcc
         printf("Cannot init libdca\n");
         ADM_assert(0);   
     }
+	_wavHeader = info;
 }
+
 ADM_AudiocodecDCA::~ADM_AudiocodecDCA( )
 {
     if(dts_handle)
@@ -92,23 +68,24 @@ ADM_AudiocodecDCA::~ADM_AudiocodecDCA( )
         dts_free(DTS_HANDLE);
         dts_handle=NULL;
     }
-
 }
+
 uint8_t ADM_AudiocodecDCA::beginDecompress( void )
 {
     return 1;
 }
+
 uint8_t ADM_AudiocodecDCA::endDecompress( void )
 {
     return 1;
 }
 
-uint8_t ADM_AudiocodecDCA::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
+uint8_t ADM_AudiocodecDCA::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut)
 {
     uint32_t avail;
     uint32_t length,syncoff;
     int flags = 0, samprate = 0, bitrate = 0, frame_length;
-    uint8_t chan = 2;
+    uint8_t chan = _wavHeader->channels;
     *nbOut=0;
 
 
@@ -134,17 +111,36 @@ uint8_t ADM_AudiocodecDCA::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uin
             // not enough data
             break;
         }
-     
+
+	if (ch_route.mode < 1) {
+		CHANNEL_TYPE *p_ch_type = ch_route.input_type;
+		switch (flags & DTS_CHANNEL_MASK) {
+			case DTS_MONO:
+				*(p_ch_type++) = CH_MONO;
+			break;
+			case DTS_STEREO:
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+			break;
+			case DTS_3F2R:
+				*(p_ch_type++) = CH_FRONT_CENTER;
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+				*(p_ch_type++) = CH_REAR_LEFT;
+				*(p_ch_type++) = CH_REAR_RIGHT;
+			break;
+			default:
+				ADM_assert(0);
+		}
+		if (flags & DTS_LFE) {
+			*(p_ch_type++) = CH_LFE;
+		}
+	}
+
         sample_t level = 1, bias = 0;
         flags &=DTS_CHANNEL_MASK;
         flags |= DTS_ADJUST_LEVEL;
-        
-        chan= channel[flags & DTS_CHANNEL_MASK];
-        if(flags & DTS_LFE)
-        {
-            if(chan==5) chan++;
-            printf("LFE\n");
-        }
+
         if (dts_frame(DTS_HANDLE, inptr, &flags, &level, bias))
         {
             printf("\n DTS_frame failed!");
@@ -155,17 +151,6 @@ uint8_t ADM_AudiocodecDCA::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uin
             break;
         };
 
-        ADM_assert(chan);
-        if(matrix)
-        {
-            matrix->nbChannel=chan;
-            matrix->channelConfiguration=DTS_CONF[flags & DTS_CHANNEL_MASK];
-            if(chan==6)
-            {
-                    matrix->channelConfiguration=CHANNEL_3F_2R_LFE;
-            }
-            
-        }
         inptr+=length;
         nbIn-=length;
         // Each block is 256 samples

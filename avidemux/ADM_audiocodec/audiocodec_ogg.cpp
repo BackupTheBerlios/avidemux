@@ -39,6 +39,7 @@
 #include "fourcc.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"
+#include "ADM_audiofilter/audiofilter_channel_route.h"
 
 #ifdef USE_VORBIS
 
@@ -145,11 +146,16 @@
 	STRUCT->ampscale=1;
 	_init=1;
 
- 
+	ch_route.input_type[0] = CH_FRONT_LEFT;
+	ch_route.input_type[1] = CH_FRONT_RIGHT;
+	ch_route.input_type[2] = CH_REAR_LEFT;
+	ch_route.input_type[3] = CH_REAR_RIGHT;
+	ch_route.input_type[4] = CH_FRONT_CENTER;
+	ch_route.input_type[5] = CH_LFE;
  }
  // This codec expects more or less one packet at a time !
  
- uint8_t ADM_vorbis::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut, ADM_ChannelMatrix *matrix)
+ uint8_t ADM_vorbis::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut)
 {
 ogg_packet packet;
 float **sample_pcm;
