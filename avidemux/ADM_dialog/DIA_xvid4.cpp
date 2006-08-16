@@ -45,6 +45,7 @@ static uint8_t editMatrix(uint8_t *inter, uint8_t *intra);
 static void updateMode( void );
 
 static int cb_mod(GtkObject * object, gpointer user_data);
+static int ch_par_asinput(GtkObject * object, gpointer user_data);
 
 #define CALL_Z(x,y)  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),XVID4_RESPONSE_##y);
 
@@ -79,6 +80,9 @@ int code;
       xvid4otherUpload(dialog);
       gtk_signal_connect(GTK_OBJECT(WID(optionmenuType)), "changed",
                       GTK_SIGNAL_FUNC(cb_mod),                   (void *) 0);
+
+      gtk_signal_connect(GTK_OBJECT(WID(checkbutton_par_asinput)), "clicked",
+                      GTK_SIGNAL_FUNC(ch_par_asinput),                   (void *) 0);
 
     CALL_Z(buttonCreateCustomMatrix,EDIT_MATRIX);
     CALL_Z(buttonLoadMatrix,LOAD_MATRIX);
@@ -234,6 +238,7 @@ void xvid4otherUpload(GtkWidget *dialog)
 	CHECK_SET(checkbuttonChromaMotion,	chroma_me);
 	CHECK_SET(checkbuttonGMC,		gmc);
 	CHECK_SET(checkbuttonBVHQ,		bvhq);
+	CHECK_SET(checkbutton_par_asinput,	par_as_input);
 	CHECK_SET(checkbuttonQPel,		qpel);
 	CHECK_SET(checkbuttonHQAC,		hqac);
 	
@@ -243,6 +248,7 @@ void xvid4otherUpload(GtkWidget *dialog)
   	SPIN_SET(spinbuttonIMaxPeriod,  max_key_interval);
 	ENTRY_SET(entryIInterv,		min_key_interval);
 	SPIN_SET(spinbuttonBFrame,	bframes);
+	ch_par_asinput(NULL, NULL);
 	
 	SPIN_SET(spinbuttonIMax,	qmax[0]);
 	SPIN_SET(spinbuttonPMax,	qmax[1]);
@@ -295,6 +301,7 @@ void xvid4otherDownload(GtkWidget *dialog)
 	CHECK_GET(checkbuttonChromaMotion,	chroma_me);
 	CHECK_GET(checkbuttonGMC,		gmc);
 	CHECK_GET(checkbuttonBVHQ,		bvhq);
+	CHECK_GET(checkbutton_par_asinput,	par_as_input);
 	CHECK_GET(checkbuttonQPel,		qpel);
 	CHECK_GET(checkbuttonHQAC,		hqac);
 	CHECK_GET(checkbuttonTurbo,		turbo);
@@ -304,7 +311,11 @@ void xvid4otherDownload(GtkWidget *dialog)
 	SPIN_GET(spinbuttonIMaxPeriod,  max_key_interval);	
   	ENTRY_GET(entryIInterv,			kfthreshold);
 	SPIN_GET(spinbuttonBFrame,		bframes);
-	
+
+	SPIN_GET(spinbutton_par_width,	par_width);
+	SPIN_GET(spinbutton_par_height,	par_height);
+
+
   	ENTRY_GET(entryIBoost		,	keyframe_boost		);
 	
   	ENTRY_GET(entryHiPass		,	curve_compression_high	);
@@ -392,6 +403,25 @@ int r;
 	printf("Changed!!!\n");
         return 0;
 
+}
+//*****************************************************
+int ch_par_asinput(GtkObject * object, gpointer user_data)
+{
+	int on = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(WID(checkbutton_par_asinput)));
+	gtk_widget_set_sensitive(WID(spinbutton_par_width), on^1);
+	gtk_widget_set_sensitive(WID(spinbutton_par_height), on^1);
+
+	if (on) {
+		SPIN_GET(spinbutton_par_width,	par_width);
+		SPIN_GET(spinbutton_par_height,	par_height);
+		gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton_par_width)), video_body->getPARWidth());
+		gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton_par_height)), video_body->getPARHeight());
+	}else{
+		SPIN_SET(spinbutton_par_width,	par_width);
+		SPIN_SET(spinbutton_par_height,	par_height);
+	}
+
+	return 0;
 }
 //*****************************************************
 uint8_t editMatrix(uint8_t *intra, uint8_t *inter)
@@ -651,6 +681,17 @@ create_dialog1 (void)
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
   GtkTooltips *tooltips;
+
+  GtkWidget *frame_par1;
+  GtkWidget *hbox_par1;
+  GtkWidget *label_par1;
+  GtkWidget *label_par2;
+  GtkWidget *checkbutton_par_asinput;
+  GtkObject *spinbutton_par_width_adj;
+  GtkWidget *spinbutton_par_width;
+  GtkObject *spinbutton_par_height_adj;
+  GtkWidget *spinbutton_par_height;
+
 
   tooltips = gtk_tooltips_new ();
 
@@ -988,7 +1029,41 @@ create_dialog1 (void)
   gtk_widget_show (labelAdvancedSimpleProfile);
   gtk_frame_set_label_widget (GTK_FRAME (frameAdvancedSimpleProfile), labelAdvancedSimpleProfile);
 
-  labelMotionEstimation = gtk_label_new (_("Motion Estimation"));
+  frame_par1 = gtk_frame_new (NULL);
+  gtk_widget_show (frame_par1);
+  gtk_box_pack_start (GTK_BOX (vbox6), frame_par1, TRUE, TRUE, 1);
+  hbox_par1 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox_par1);
+  gtk_container_add (GTK_CONTAINER (frame_par1), hbox_par1);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox_par1), 5);
+
+  checkbutton_par_asinput = gtk_check_button_new_with_mnemonic (_("As input"));
+  gtk_widget_show (checkbutton_par_asinput);
+  gtk_box_pack_start (GTK_BOX (hbox_par1), checkbutton_par_asinput, FALSE, FALSE, 10);
+  gtk_tooltips_set_tip (tooltips, checkbutton_par_asinput, _("Get PAR from input video file"), NULL);
+
+  spinbutton_par_width_adj = gtk_adjustment_new (1, 1, 255, 1, 1, 1);
+  spinbutton_par_width = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_par_width_adj), 1, 0);
+  gtk_widget_show (spinbutton_par_width);
+  gtk_box_pack_start (GTK_BOX (hbox_par1), spinbutton_par_width, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, spinbutton_par_width, _("Pixel Width"), NULL);
+
+  label_par1 = gtk_label_new (_(":"));
+  gtk_widget_show (label_par1);
+  gtk_box_pack_start (GTK_BOX (hbox_par1), label_par1, FALSE, FALSE, 2);
+  gtk_label_set_justify (GTK_LABEL (label_par1), GTK_JUSTIFY_CENTER);
+
+  spinbutton_par_height_adj = gtk_adjustment_new (1, 1, 255, 1, 1, 1);
+  spinbutton_par_height = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_par_height_adj), 1, 0);
+  gtk_widget_show (spinbutton_par_height);
+  gtk_box_pack_start (GTK_BOX (hbox_par1), spinbutton_par_height, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, spinbutton_par_height, _("Pixel Height"), NULL);
+  label_par2 = gtk_label_new (_("Pixel Aspect Ratio"));
+  gtk_widget_show (label_par2);
+  gtk_frame_set_label_widget (GTK_FRAME (frame_par1), label_par2);
+  gtk_label_set_use_markup (GTK_LABEL (label_par2), TRUE);
+
+  labelMotionEstimation = gtk_label_new (_("Motion & Misc"));
   gtk_widget_show (labelMotionEstimation);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), labelMotionEstimation);
 
@@ -1393,6 +1468,9 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonGMC, "checkbuttonGMC");
   GLADE_HOOKUP_OBJECT (dialog1, checkbuttonBVHQ, "checkbuttonBVHQ");
   GLADE_HOOKUP_OBJECT (dialog1, labelAdvancedSimpleProfile, "labelAdvancedSimpleProfile");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbutton_par_asinput, "checkbutton_par_asinput");
+  GLADE_HOOKUP_OBJECT (dialog1, spinbutton_par_width, "spinbutton_par_width");
+  GLADE_HOOKUP_OBJECT (dialog1, spinbutton_par_height, "spinbutton_par_height");
   GLADE_HOOKUP_OBJECT (dialog1, labelMotionEstimation, "labelMotionEstimation");
   GLADE_HOOKUP_OBJECT (dialog1, vbox10, "vbox10");
   GLADE_HOOKUP_OBJECT (dialog1, hbox13, "hbox13");

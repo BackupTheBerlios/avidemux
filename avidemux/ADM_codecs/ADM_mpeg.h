@@ -27,6 +27,8 @@ protected:
   uint32_t _seqLen;
   uint8_t _seqFound;
   uint8_t *postprocessed;
+  uint8_t par_height;
+  uint8_t par_width;
 
   uint8_t init_codec (void);
   uint8_t kill_codec (void);
@@ -46,6 +48,14 @@ public:
     virtual ~ decoderMpeg ();
   virtual uint8_t uncompress (uint8_t * in, ADMImage * out,
 			      uint32_t len, uint32_t * flag = NULL);
+  virtual uint8_t getPARWidth (void)
+  {
+     return par_width;
+  }
+  virtual uint8_t getPARHeight (void)
+  {
+     return par_height;
+  }
   virtual uint8_t bFramePossible (void)
   {
     return 1;

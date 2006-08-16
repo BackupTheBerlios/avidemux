@@ -43,6 +43,9 @@ typedef struct xvid4EncParam
   int qmin[3];			// IPB
   int qmax[3];			// IPB
 
+  uint8_t par_as_input;
+  uint8_t par_width;
+  uint8_t par_height;
 
 
   // This if for 2 pass   

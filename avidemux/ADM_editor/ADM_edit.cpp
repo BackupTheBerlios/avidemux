@@ -757,6 +757,28 @@ uint8_t ADM_Composer::hasVBRVideos(void)
                 if(_videos[i]._isAudioVbr) return 1;
         return 0;
 }
+
+
+uint8_t ADM_Composer::getPARWidth()
+{
+  if (_nb_video)
+  {
+    return _videos[0].decoder->getPARWidth();
+  }
+  return 1;
+
+}
+
+uint8_t ADM_Composer::getPARHeight()
+{
+  if (_nb_video)
+  {
+    return _videos[0].decoder->getPARHeight();
+  }
+  return 1;
+
+}
+
 /**
 	Set decoder settings (post process/swap u&v...)
 	for the segment referred by frame

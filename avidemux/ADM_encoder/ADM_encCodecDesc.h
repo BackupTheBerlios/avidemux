@@ -507,6 +507,10 @@ xvid4EncParam xvid4Extra = {
   {31, 31, 31}
   ,				//qmax
 
+  1,				//par as input
+  1,				//par width
+  1,				//par height
+
   // This if for 2 pass   
   0,				//int keyframe_boost;
   0,				//int curve_compression_high;

@@ -213,6 +213,8 @@ class ADM_Composer
 					//    Info etc... to be removed later
 					//______________________________
 
+			     		uint8_t 			getPARWidth();
+			     		uint8_t 			getPARHeight();
 			     		uint8_t 			setDecodeParam( uint32_t frame );
 	 				AVIStreamHeader 	*getVideoStreamHeader(void ) ;
 	 				MainAVIHeader 		*getMainHeader(void );

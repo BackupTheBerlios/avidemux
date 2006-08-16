@@ -34,6 +34,9 @@
 #include <ADM_assert.h>
 #include "ADM_toolkit/ADM_cpuCap.h"
 
+#include "ADM_editor/ADM_edit.hxx"
+extern ADM_Composer *video_body;
+
 static const int motion_presets[] = {
   0,
   0,
@@ -364,6 +367,18 @@ xvid4Encoder::preAmble (uint8_t * in)
   xvid_enc_frame.input.plane[0] = in;
   xvid_enc_frame.input.plane[1] = in + (_w * _h);
   xvid_enc_frame.input.plane[2] = in + ((_w * _h * 5) >> 2);
+
+  if (_param.par_as_input) {
+	xvid_enc_frame.par_width = video_body->getPARWidth();
+	xvid_enc_frame.par_height = video_body->getPARHeight();
+  } else {
+	xvid_enc_frame.par_width = _param.par_width;
+	xvid_enc_frame.par_height = _param.par_height;
+  }
+  if (xvid_enc_frame.par_width != xvid_enc_frame.par_height)
+	xvid_enc_frame.par = XVID_PAR_EXT;
+  else
+	xvid_enc_frame.par = XVID_PAR_11_VGA;
 
   /* Custome matrices */
   if(_param.useCustomIntra) 

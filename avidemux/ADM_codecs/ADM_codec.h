@@ -48,6 +48,14 @@ public:
   virtual ~ decoders ()
   {
   };
+  virtual uint8_t getPARWidth (void)
+  {
+    return 1;
+  };
+  virtual uint8_t getPARHeight (void)
+  {
+    return 1;
+  };
   virtual void setParam (void)
   {
   };

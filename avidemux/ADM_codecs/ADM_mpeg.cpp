@@ -203,6 +203,10 @@ uint8_t
   t = (uint8_t *) MPEG2DEC->fbuf[0]->buf[0];
   mpeg2_cleanup (MPEG2DEC);
   info = mpeg2_info (MPEG2DEC);
+
+  par_width = info->sequence->pixel_width;
+  par_height = info->sequence->pixel_height;
+
   out->_noPicture = 0;		// For mpeg1/2 we ALWAYS have a picture
   if (out->quant && MPEG2DEC->decoder.quant_stride >= out->_qStride)
     {
