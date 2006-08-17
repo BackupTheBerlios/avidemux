@@ -62,11 +62,14 @@ uint8_t ADMVideoMPD3Dlow::configure(AVDMGenericVideoStream *instream)
 {
 
 			_in=instream;
-			DIA_d3d(&_param->param1,
+			if(DIA_d3d(&_param->param1,
 					&_param->param2,
-					&_param->param3);
-			setup();
-			return 1;
+					&_param->param3))
+			{
+				setup();
+				return 1;
+			}
+			return 0;
 }
 ADMVideoMPD3Dlow::~ADMVideoMPD3Dlow()
 {

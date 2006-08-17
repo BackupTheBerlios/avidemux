@@ -77,17 +77,21 @@ SCRIPT_CREATE (hardivtc_script, vidHardPDRemoval, field_unblend_template);
 //*************************************
 uint8_t vidHardPDRemoval::configure (AVDMGenericVideoStream * in)
 {
-int v;
+int v,w;
         _param->show=GUI_YesNo(_("Metrics"),_("Do you want to print metrics on screen ?" ));
         v=_param->threshold;
+        w=_param->noise;        
         if(DIA_GetIntegerValue(&v, 2, 99,"Treshold","Treshold value (smaller = harder to match)"))
-                _param->threshold=v;
-
-        v=_param->noise;
-        if(DIA_GetIntegerValue(&v, 2, 99,"Noise","Noise threshold"))
-                _param->noise=v;
-        _lastRemoved=0xFFFF;
-        return 1;
+        {
+                if(DIA_GetIntegerValue(&w, 2, 99,"Noise","Noise threshold"))
+                {
+                	_param->threshold=v;
+                    _param->noise=w;
+                    _lastRemoved=0xFFFF;
+                    return 1;
+                }
+        }
+        return 0;
 }
 /*************************************/
 char *vidHardPDRemoval::printConf (void)

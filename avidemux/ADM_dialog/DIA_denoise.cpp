@@ -49,13 +49,13 @@ uint8_t ADMVideoDenoise::configure(AVDMGenericVideoStream * instream)
 {
   UNUSED_ARG(instream);
 
-    return DIA_dnr(	&(_param->lumaThreshold),
+    if(DIA_dnr(	&(_param->lumaThreshold),
     				&(_param->lumaLock),
 				&(_param->chromaThreshold),
 				&(_param->chromaLock),
 				&(_param->sceneChange)
-               						);
+               						)) return 1;
 
-
+	return 0;
 }
  #endif

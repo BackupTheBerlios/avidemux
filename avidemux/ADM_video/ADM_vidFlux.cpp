@@ -120,19 +120,19 @@ uint8_t	ADMVideoFlux::getCoupledConf( CONFcouple **couples)
 uint8_t ADMVideoFlux::configure(AVDMGenericVideoStream *in)
 {
 UNUSED_ARG(in);
-int i;
+int i,j;
 		i=_param->temporal_threshold;
+		j=_param->spatial_threshold;
 	  if(GUI_getIntegerValue(&i,0,255,"Temporal  Threshold"))
 			{
-					_param->temporal_threshold=(uint32_t)i;
-			}
-		i=_param->spatial_threshold;
-	  if(GUI_getIntegerValue(&i,0,255,"Spatial  Threshold"))
-			{
-					_param->spatial_threshold=(uint32_t)i;
-			}			
-			return 1;
-	
+					if(GUI_getIntegerValue(&j,0,255,"Spatial  Threshold"))
+					{
+						_param->temporal_threshold=(uint32_t)i;						
+						_param->spatial_threshold=(uint32_t)j;
+					}	
+					return 1;
+			}		
+			return 0;	
 }
 ADMVideoFlux::~ADMVideoFlux()
 {

@@ -179,9 +179,6 @@ GUI_handleFilter (void)
   int run = 1, reply;
   while (run)
     {
-#ifdef CYG_MANGLING
-      gtk_widget_hide(GTK_WIDGET(dialog));
-#endif
       reply = gtk_dialog_run (GTK_DIALOG (dialog));
       //printf("Action : %d\n",reply);
       if (reply > A_BEGIN && reply < A_END)
@@ -259,8 +256,12 @@ on_action (gui_act action)
 	  videofilters[nb_active_filter].filter =
 	    filterCreateFromTag (tag, NULL,
 				 videofilters[nb_active_filter - 1].filter);
-	  videofilters[nb_active_filter].filter->
-	    configure (videofilters[nb_active_filter - 1].filter);
+	  if(!videofilters[nb_active_filter].filter->
+	    configure (videofilters[nb_active_filter - 1].filter))
+	  {
+	  	  delete videofilters[nb_active_filter].filter;
+	  	  break;
+	  }
 	  videofilters[nb_active_filter].filter->getCoupledConf (&couple);
 
 
@@ -332,17 +333,19 @@ on_action (gui_act action)
 				     filter,
 				     videofilters[action_parameter].tag,
 				     conf);
-	      replace->configure (videofilters[action_parameter - 1].filter);
-	      delete videofilters[action_parameter].filter;
-	      if (conf)
-		delete conf;
-	      videofilters[action_parameter].filter = replace;
-	      replace->getCoupledConf (&conf);
-	      videofilters[action_parameter].conf = conf;
-	      videofilters[action_parameter].tag = VF_PARTIAL;
+	      if(replace->configure (videofilters[action_parameter - 1].filter))
+	      {
+			delete videofilters[action_parameter].filter;
+			if (conf) delete conf;
+			videofilters[action_parameter].filter = replace;
+			replace->getCoupledConf (&conf);
+			videofilters[action_parameter].conf = conf;
+			videofilters[action_parameter].tag = VF_PARTIAL;
 //                updateVideoFilters ();
-	      getFirstVideoFilter ();
-	      updateFilterList ();
+			getFirstVideoFilter ();
+			updateFilterList ();
+	      }
+	      else delete replace;
 	    }
 	}
       break;

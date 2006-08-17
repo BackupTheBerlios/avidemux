@@ -70,7 +70,7 @@ BUILD_CREATE(resamplefps_create,ADMVideoResampleFPS);
  
 uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
 {
-  uint8_t r=1;
+  uint8_t r=0;
   float f=_param->newfps;
   
   f/=1000;
@@ -82,17 +82,16 @@ uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
     _param->newfps=(uint32_t)floor(f+0.4); 
     _info.fps1000=_param->newfps;   
     
-  }  
-  if(GUI_Question(_("Use linear blend ?")))
-  {
+    if(GUI_Question(_("Use linear blend ?")))
+    {
         _param->use_linear=1;        
-  }
-  else
-  {
+    }
+    else
+    {
         _param->use_linear=0;        
-  }
-
-    
+    }
+    r=1;
+  } 
   return r;        
 }
 char *ADMVideoResampleFPS::printConf( void )

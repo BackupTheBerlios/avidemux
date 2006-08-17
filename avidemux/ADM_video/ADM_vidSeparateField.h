@@ -17,7 +17,7 @@
 		      virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
           									ADMImage *data,uint32_t *flags);
 
-			virtual uint8_t 	configure( AVDMGenericVideoStream *instream) {return 0;};
+		      virtual uint8_t 	configure( AVDMGenericVideoStream *instream) {return 1;};
 
  }     ;
    class  AVDMVideoMergeField:public AVDMGenericVideoStream
@@ -34,7 +34,7 @@
 		      virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
           									ADMImage *data,uint32_t *flags);
 
-			virtual uint8_t configure( AVDMGenericVideoStream *instream) {return 0;};
+			virtual uint8_t configure( AVDMGenericVideoStream *instream) {return 1;};
 
  }     ;
    class  AVDMVideoStackField:public AVDMGenericVideoStream
@@ -51,7 +51,7 @@
 		      virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
           									ADMImage *data,uint32_t *flags);
 
-			virtual uint8_t configure( AVDMGenericVideoStream *instream) {return 0;};
+			virtual uint8_t configure( AVDMGenericVideoStream *instream) {return 1;};
 
  }     ;
    class  AVDMVideoUnStackField:public AVDMGenericVideoStream
@@ -68,7 +68,7 @@
                       virtual uint8_t   getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
                                                                                 ADMImage *data,uint32_t *flags);
 
-                        virtual uint8_t configure( AVDMGenericVideoStream *instream) {return 0;};
+                        virtual uint8_t configure( AVDMGenericVideoStream *instream) {return 1;};
 
  }     ;
 

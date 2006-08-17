@@ -60,7 +60,7 @@ SCRIPT_CREATE (delta_script, vidDelta, delta_template);
 /*************************************/
 uint8_t vidDelta::configure (AVDMGenericVideoStream * in)
 {
-        return 0;
+        return 1;
 }
 /*************************************/
 char *vidDelta::printConf (void)

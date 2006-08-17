@@ -91,23 +91,24 @@ char *AVDMVideoVlad::printConf(void)
 uint8_t AVDMVideoVlad::configure( AVDMGenericVideoStream *instream)
 {
 UNUSED_ARG(instream);
-int i;
+int i,j;
 		i=_param->ythresholdMask;
-	  if(GUI_getIntegerValue(&i,0,255,"Luma Temporal  Threshold"))
+		j=_param->cthresholdMask;
+	  	if(GUI_getIntegerValue(&i,0,255,"Luma Temporal  Threshold"))
+		{			
+			if(GUI_getIntegerValue(&j,0,255,"Chroma Temporal  Threshold"))
 			{
-					_param->ythresholdMask=i;
-			}
-	i=_param->cthresholdMask;			
-	if(GUI_getIntegerValue(&i,0,255,"Chroma Temporal  Threshold"))
-			{
-					_param->cthresholdMask=i;
-			}		
-		 ythresholdMask = (uint64_t)_param->ythresholdMask;
-	   cthresholdMask = (uint64_t)_param->cthresholdMask;	   
+				_param->ythresholdMask=i;
+				_param->cthresholdMask=j;
+		 		ythresholdMask = (uint64_t)_param->ythresholdMask;
+	   			cthresholdMask = (uint64_t)_param->cthresholdMask;	   
 
-		EXPAND(	ythresholdMask);
-		EXPAND(	cthresholdMask);					
-		return 1;
+				EXPAND(	ythresholdMask);
+				EXPAND(	cthresholdMask);					
+				return 1;				
+			}		
+		}
+		return 0;
 }     											
 AVDMVideoVlad::AVDMVideoVlad(  AVDMGenericVideoStream *in,CONFcouple *couples)
 		

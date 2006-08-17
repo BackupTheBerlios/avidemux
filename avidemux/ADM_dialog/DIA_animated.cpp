@@ -60,7 +60,7 @@ static GtkWidget	*create_dialog1 (void);
 
 uint8_t DIA_animated(ANIMATED_PARAM *param)
 {
-    uint8_t ret;
+    uint8_t ret=0;
     GtkWidget *dialog;
     const char *entries[MAX_VIGNETTE]={"spinbuttonTC0","spinbuttonTC1","spinbuttonTC2",
                             "spinbuttonTC3","spinbuttonTC4","spinbuttonTC5" };
@@ -80,7 +80,7 @@ uint8_t DIA_animated(ANIMATED_PARAM *param)
         }
 
         ASSOCIATE(button1,LOAD_BGD);
-        gtk_widget_show(dialog);
+        //gtk_widget_show(dialog);
         int action;
 
         while(1)
@@ -95,6 +95,7 @@ uint8_t DIA_animated(ANIMATED_PARAM *param)
                         ENTRY_SET(entryBgd,nw);
                         ADM_dealloc(nw);
                     }
+
                 continue;
             }
             break;

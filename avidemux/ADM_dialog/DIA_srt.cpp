@@ -203,7 +203,7 @@ uint32_t l,f;
 		targetImage=targetImageRGB=NULL;
 		delete rgbConv;
 		rgbConv=NULL;
-		return 1;
+		return ret;
 
 }
 
@@ -293,7 +293,6 @@ gint answer;
 	 gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
 		       GTK_SIGNAL_FUNC(gui_draw),
 		       NULL);
-
 
 	ret=0;
 	gtk_register_dialog(dialog);

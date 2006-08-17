@@ -69,6 +69,7 @@ void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 	if(!avifileinfo) return ;
 	
 	dialog=create_Calculator();
+	gtk_register_dialog(dialog);
         gtk_signal_connect(GTK_OBJECT(WID(optionmenu1)), "changed",
                       GTK_SIGNAL_FUNC(cb_mod),   (void *) 0);
         gtk_signal_connect(GTK_OBJECT(WID(optionmenu2)), "changed",
@@ -78,6 +79,7 @@ void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
         gtk_widget_set_sensitive(WID(entryCustom),0);
 	while(1)
 	{
+
 		if(GTK_RESPONSE_APPLY==gtk_dialog_run(GTK_DIALOG(dialog)))
 		{
 			update();
@@ -89,6 +91,7 @@ void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate )
 			break;
 		}
 	}
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	*sizeInMeg=videoSize;
 	*avgBitrate=videoBitrate;

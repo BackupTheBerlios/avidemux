@@ -53,9 +53,12 @@ extern uint8_t DIA_animated(ANIMATED_PARAM *param);
 
 uint8_t ADMVideoAnimated::configure(AVDMGenericVideoStream *in)
 {
-    DIA_animated(_param);
-   setup();
-   return 1;
+   if(DIA_animated(_param))
+   {
+      setup();
+      return 1;
+   }
+   return 0;
 }
 
 char *ADMVideoAnimated::printConf( void )

@@ -57,22 +57,21 @@ uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
 	int forced;
 		postproc=_param->postProcType;
 		strength=_param->postProcStrength;
+		forced=_param->forcedQuant;
 		uv=0;
 		if( DIA_getMPParams( &postproc,&strength,&uv))
 		{
-				_param->postProcType=postproc;
-				_param->postProcStrength=strength;
-                                
-				forced=_param->forcedQuant;
+
 				if( DIA_GetIntegerValue(&forced,2,31, "Quant Value","Enter forced Q:"))
 				{
+					_param->postProcType=postproc;
+					_param->postProcStrength=strength;
 					_param->forcedQuant=forced;
+					updatePostProc(&_postproc );				
+					return 1;
 				}
-
-				updatePostProc(&_postproc );				
-
 		}
-	return 1;	
+	return 0;	
  	
 }
 uint8_t	ADMVideoForcedPP::getCoupledConf( CONFcouple **couples)

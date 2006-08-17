@@ -156,7 +156,7 @@ uint8_t Msharpen::configure(AVDMGenericVideoStream *in)
 uint8_t r=0;
 	_in=in;
 	ADM_assert(_param);
-	r= DIA_getMSharpen(_param);
+	if(r= DIA_getMSharpen(_param))
         invstrength=255-_param->strength;       
 	return r;
 }

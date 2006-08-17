@@ -48,6 +48,7 @@ uint8_t DIA_Paused( void )
 		//  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button1), GTK_RESPONSE_CANCEL);
 		//  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(button2), GTK_RESPONSE_OK);
 		//gtk_transient(dialog);
+		gtk_register_dialog(dialog);
 		int i=gtk_dialog_run(GTK_DIALOG(dialog));
 		switch(i)
 		{
@@ -61,6 +62,7 @@ uint8_t DIA_Paused( void )
 				ret=2;	// continnue;
 				break;
 		}
+		gtk_unregister_dialog(dialog);
 		gtk_widget_destroy(dialog);
 	};
 	return ret;

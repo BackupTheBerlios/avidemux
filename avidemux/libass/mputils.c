@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include "mputils.h"
 
 #define APP_HOME_PATH ".avidemux"
@@ -51,7 +53,11 @@ no_utf8:
 }
 
 char *get_path(char *filename) {
+#ifndef CYG_MANGLING
 	char *home = getenv("HOME");
+#else
+	char *home = getenv("USERPROFILE");
+#endif
 	assert(home);
 	char *ret = (char*)malloc(strlen(home) + strlen(APP_HOME_PATH) + strlen(filename) + 3);
 	

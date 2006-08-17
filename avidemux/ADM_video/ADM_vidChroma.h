@@ -34,7 +34,7 @@
   					virtual ~ADMVideoChromaU();
 		          virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 			  		ADMImage *data,uint32_t *flags);
-				uint8_t configure( AVDMGenericVideoStream *instream) { UNUSED_ARG(instream); return 0;}
+				uint8_t configure( AVDMGenericVideoStream *instream) { UNUSED_ARG(instream); return 1;}
 							
  }     ;
 
@@ -52,7 +52,7 @@
   					ADMVideoChromaV(  AVDMGenericVideoStream *in,CONFcouple *setup);
   					virtual ~ADMVideoChromaV();
 		          virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,											ADMImage *data,uint32_t *flags);
-					uint8_t configure( AVDMGenericVideoStream *instream) { UNUSED_ARG(instream); return 0;}
+					uint8_t configure( AVDMGenericVideoStream *instream) { UNUSED_ARG(instream); return 1;}
 							
  }     ;
 

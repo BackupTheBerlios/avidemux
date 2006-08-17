@@ -32,7 +32,7 @@ Swap each line  (shift up for odd, down for even)
 		      virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
           									ADMImage *data,uint32_t *flags);
 			virtual uint8_t	*getBinaryConf( uint16_t *size) { *size=0;return (uint8_t *)0;}
-			virtual uint8_t 	configure( AVDMGenericVideoStream *instream) {return 0;};
+			virtual uint8_t 	configure( AVDMGenericVideoStream *instream) {return 1;};
 
  }     ;
   class  AVDMVideoKeepOdd:public AVDMGenericVideoStream
@@ -48,7 +48,7 @@ Swap each line  (shift up for odd, down for even)
 		      virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
           									ADMImage *data,uint32_t *flags);
 
-			virtual uint8_t 	configure( AVDMGenericVideoStream *instream) {return 0;};
+			virtual uint8_t 	configure( AVDMGenericVideoStream *instream) {return 1;};
 
  }     ;
   class  AVDMVideoKeepEven:public AVDMVideoKeepOdd
@@ -64,7 +64,6 @@ Swap each line  (shift up for odd, down for even)
 
 		      virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
           							ADMImage *data,uint32_t *flags);
-
 
  }     ;
 

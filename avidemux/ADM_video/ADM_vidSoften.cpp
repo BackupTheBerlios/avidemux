@@ -59,23 +59,26 @@ extern uint32_t fixMul[16];
 uint8_t ADMVideoMaskedSoften::configure( AVDMGenericVideoStream *instream)
 {
 	_in=instream;
-	int radius;
+	int radius, luma, chroma;
 	
 		radius=_param->radius;
+		luma=_param->luma;
+		chroma=_param->chroma;
 		if(DIA_GetIntegerValue(&radius,1,60, "Radius","Radius:"))
-			_param->radius=radius;
-			
-		radius=_param->luma;
-		if(DIA_GetIntegerValue(&radius,0,255, "Luma Threshold","Luma Threshold:"))
-			_param->luma=radius;
-		
-		radius=_param->chroma;
-		if(DIA_GetIntegerValue(&radius,0,255, "Chroma Threshold","Chroma Threshold:"))
-			_param->chroma=radius;
-					
-		
-	return 1;	
- 	
+		{
+			if(DIA_GetIntegerValue(&luma,0,255, "Luma Threshold","Luma Threshold:"))
+			{	
+				if(DIA_GetIntegerValue(&chroma,0,255, "Chroma Threshold","Chroma Threshold:"))
+				{
+					_param->radius=radius;
+					_param->luma=luma;
+					_param->chroma=chroma;
+					return 1;
+				}
+			}
+
+		}
+		return 0;
 }
 uint8_t	ADMVideoMaskedSoften::getCoupledConf( CONFcouple **couples)
 {

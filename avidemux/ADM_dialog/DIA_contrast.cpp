@@ -180,7 +180,7 @@ getContrastParams (void)
   CNX (hscaleBright, "value_changed");
   CNX (hscaleBright, "drag_data_received");
 
-  gtk_widget_show (dialog);
+  //gtk_widget_show (dialog);
 
   ret = 0;
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)

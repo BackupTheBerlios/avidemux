@@ -81,9 +81,10 @@ uint8_t ADMVideoKernelDeint::configure( AVDMGenericVideoStream *instream)
 {
 	_in=instream;
 	#define PX(x) &_param->x
-	DIA_kerneldeint(PX(order), PX(threshold), PX(sharp), 
-		PX(twoway), PX(map));
-	return 1;	
+	if(DIA_kerneldeint(PX(order), PX(threshold), PX(sharp), 
+		PX(twoway), PX(map)))
+					return 1;
+	return 0;	
  	
 }
 uint8_t	ADMVideoKernelDeint::getCoupledConf( CONFcouple **couples)

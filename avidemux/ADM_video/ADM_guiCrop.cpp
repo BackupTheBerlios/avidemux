@@ -44,13 +44,15 @@ uint8_t AVDMVideoStreamCrop::configure( AVDMGenericVideoStream *instream)
 {
 		uint8_t r;
 		uint32_t w,h;
-    	 	r= (DIA_getCropParams("Crop Settings",_param,instream ));
-		w=_param->left+_param->right;
-		h=_param->top+_param->bottom;
-		ADM_assert(w<instream->getInfo()->width);
-		ADM_assert(h<instream->getInfo()->height);
-		_info.width=instream->getInfo()->width-w;
-		_info.height=instream->getInfo()->height-h;
+    	if(r = (DIA_getCropParams("Crop Settings",_param,instream )))
+    	{
+			w=_param->left+_param->right;
+			h=_param->top+_param->bottom;
+			ADM_assert(w<instream->getInfo()->width);
+			ADM_assert(h<instream->getInfo()->height);
+			_info.width=instream->getInfo()->width-w;
+			_info.height=instream->getInfo()->height-h;
+		}
 		return r;
 }
 #endif

@@ -153,7 +153,7 @@ uint8_t ADMVideoPartial::configure( AVDMGenericVideoStream *instream)
     r=DIA_getPartial(_param,_son,_in);
     if(_param->_end<_param->_start) _param->_end=_param->_start;
 
-   return 1;
+   return r;
 }  
 
  		                                                                         

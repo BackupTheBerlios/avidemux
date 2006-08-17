@@ -222,20 +222,21 @@ uint8_t ADMVideoFields::doBlend(ADMImage *src,ADMImage *dst)
 }
 uint8_t ADMVideoFields::configure( AVDMGenericVideoStream *instream)
 {
-int i;
-		_in=instream;
-	  i=(int)_param->motion_trigger;
-	  if(GUI_getIntegerValue(&i,0,255,"Motion  Threshold"))
-			{
-					_param->motion_trigger=(uint8_t)i;
-			} 
-	  i=(int)_param->blend_trigger;
-	  if(GUI_getIntegerValue(&i,0,255,"Blend  Threshold"))
-			{
-					_param->blend_trigger=(uint8_t)i;
-			} 
+int i,j;
+	_in=instream;
+	i=(int)_param->motion_trigger;
+	j=(int)_param->blend_trigger;
+	if(GUI_getIntegerValue(&i,0,255,"Motion  Threshold"))
+	{
+		if(GUI_getIntegerValue(&j,0,255,"Blend  Threshold"))
+		{
+			_param->motion_trigger=(uint8_t)i;
+			_param->blend_trigger=(uint8_t)j;
 			return 1;
-	      
+		}
+	} 
+
+	return 0;    
 }      
 
 

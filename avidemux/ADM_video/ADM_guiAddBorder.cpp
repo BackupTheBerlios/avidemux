@@ -53,9 +53,9 @@ CROP_PARAMS *par;
 	 		memcpy(&_info,_in->getInfo(),sizeof(_info));
 			_info.width+=_param->right+_param->left;
 			_info.height+=_param->bottom+_param->top;
+			return 1;
 	 }
-	return 1;
-
+	 return 0;
 }
 
 #endif

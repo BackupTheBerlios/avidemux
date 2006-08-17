@@ -175,7 +175,9 @@ void GUI_displayBitrate( void )
 
 	}
 	GtkWidget *dialog=create_dialog1((max*8)/1000,display);
+	gtk_register_dialog(dialog);
 	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 }
 
