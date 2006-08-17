@@ -63,9 +63,18 @@ aviInfo aviinf;
 
   //	ADM_assert(_uncompressed);
 	ADM_assert(start+nb<=aviinf.nb_frames);
-
+        par_width=_in->getPARWidth();
+        par_height=_in->getPARHeight();
 	aprintf("\n Null stream initialized with start frame = %lu, nbframe=%lu \n",_start,nb);
   	
+}
+uint32_t   AVDMVideoStreamNull::getPARWidth(void)
+{
+  return par_width; 
+}
+uint32_t   AVDMVideoStreamNull::getPARHeight(void)
+{
+  return par_height;
 }
 AVDMVideoStreamNull::~AVDMVideoStreamNull()
 {

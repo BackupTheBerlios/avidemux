@@ -152,6 +152,7 @@ decoderMpeg::decoderMpeg (uint32_t w, uint32_t h, uint32_t extraLen, uint8_t * e
     }
   // store for future use
   _seqFound = 0;
+  par_width=par_height=1;
   postprocessed = NULL;
   // now init libmpeg2
   printf ("\n initializing mpeg2 decoder %lu x %lu\n", _w, _h);
@@ -207,6 +208,7 @@ uint8_t
   par_width = info->sequence->pixel_width;
   par_height = info->sequence->pixel_height;
 
+  aprintf("Mpeg  %u * %u\n",par_width,par_height);
   out->_noPicture = 0;		// For mpeg1/2 we ALWAYS have a picture
   if (out->quant && MPEG2DEC->decoder.quant_stride >= out->_qStride)
     {

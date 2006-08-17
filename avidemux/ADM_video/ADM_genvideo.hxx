@@ -109,6 +109,9 @@ typedef struct
           uint8_t 	unPackChroma(uint8_t *ssrc,uint8_t *ddst);
 /* /not really used */
    public:
+          virtual uint32_t   getPARWidth(void);
+          virtual uint32_t   getPARHeight(void);
+
    	// return 1 -> conf changed need rebuild, 0 means conf not changed
         virtual 	uint8_t 	configure( AVDMGenericVideoStream *instream)=0;
           			AVDMGenericVideoStream( void)  {_uncompressed=NULL;_in=NULL;};
@@ -138,22 +141,22 @@ class  AVDMVideoStreamNull :public AVDMGenericVideoStream
  {
 
  protected:
-				ADM_Composer 			*_in;
-				uint32_t			_start;
-
-				
-				
+                  ADM_Composer      *_in;
+                  uint32_t          _start;
+                  uint32_t          par_width,par_height;
 
  public:
 
-  				AVDMVideoStreamNull(  ADM_Composer *in,uint32_t framestart, uint32_t nb);
-  				virtual ~AVDMVideoStreamNull();
-
-
-          virtual 	uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-								ADMImage *data,uint32_t *flags);
-           	 	uint8_t configure( AVDMGenericVideoStream *instream);
-
+                          AVDMVideoStreamNull(  ADM_Composer *in,uint32_t framestart, uint32_t nb);
+                          virtual ~AVDMVideoStreamNull();
+    
+    
+        virtual	  uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+                                                          ADMImage *data,uint32_t *flags);
+                  uint8_t configure( AVDMGenericVideoStream *instream);
+    
+        virtual uint32_t   getPARWidth(void);
+        virtual uint32_t   getPARHeight(void);
 
  }     ;
 

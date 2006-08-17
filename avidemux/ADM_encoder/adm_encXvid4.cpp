@@ -54,7 +54,6 @@ EncoderXvid4::EncoderXvid4 (COMPRES_PARAMS * codecconfig)
   _frametogo = 0;
   _pass1Done = 0;
 
-
   memcpy (&_param, codecconfig, sizeof (_param));
   ADM_assert (codecconfig->extraSettingsLen == sizeof (encparam));
   memcpy (&encparam, codecconfig->extraSettings, sizeof (encparam));
@@ -75,7 +74,13 @@ EncoderXvid4::configure (AVDMGenericVideoStream * instream)
   ADV_Info *info;
 
   //uint32_t flag1,flag2,flag3;
-
+  if(encparam.par_as_input)
+  {
+    encparam.par_width=instream->getPARWidth();
+    encparam.par_height=instream->getPARHeight();
+  }
+  
+  //
   info = instream->getInfo ();
   _w = info->width;
   _h = info->height;

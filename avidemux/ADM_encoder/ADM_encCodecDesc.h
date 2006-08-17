@@ -507,7 +507,7 @@ xvid4EncParam xvid4Extra = {
   {31, 31, 31}
   ,				//qmax
 
-  1,				//par as input
+  0,				//par as input
   1,				//par width
   1,				//par height
 

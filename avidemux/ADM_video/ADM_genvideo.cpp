@@ -54,6 +54,26 @@ uint8_t AVDMGenericVideoStream::getPixel(int32_t x,int32_t y,uint8_t *data)
 
           return *(data+x+(y*_info.width));
 }
+
+uint32_t   AVDMGenericVideoStream::getPARWidth(void)
+{
+  if(_in)
+  {
+    return _in-> getPARWidth();
+  }
+  return 1;
+}
+/* If there is a father, retrieve PAR from him else assume it is 1:1 */
+uint32_t   AVDMGenericVideoStream::getPARHeight(void)
+{
+  if(_in)
+  {
+    return _in-> getPARHeight();
+  }
+  return 1;
+}
+
+
 uint8_t AVDMGenericVideoStream::getPixelU(int32_t x,int32_t y,uint8_t *data)
 {
 int32_t w=_info.width>>1;

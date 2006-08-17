@@ -161,6 +161,8 @@ class ADM_Composer
 						uint8_t	flushCache( void ){ _lastseg=0xffffff;return 1;}
 						uint8_t	desactivateCache( void ){ _cached=0;return 1;}
   						uint8_t 	getExtraHeaderData(uint32_t *len, uint8_t **data);
+                                                uint32_t getPARWidth(void);
+                                                uint32_t getPARHeight(void);
   								ADM_Composer();
   				virtual 			~ADM_Composer();
   						void		clean( void );
@@ -213,8 +215,6 @@ class ADM_Composer
 					//    Info etc... to be removed later
 					//______________________________
 
-			     		uint8_t 			getPARWidth();
-			     		uint8_t 			getPARHeight();
 			     		uint8_t 			setDecodeParam( uint32_t frame );
 	 				AVIStreamHeader 	*getVideoStreamHeader(void ) ;
 	 				MainAVIHeader 		*getMainHeader(void );

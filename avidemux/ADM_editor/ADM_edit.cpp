@@ -758,8 +758,10 @@ uint8_t ADM_Composer::hasVBRVideos(void)
         return 0;
 }
 
+/*
 
-uint8_t ADM_Composer::getPARWidth()
+*/
+uint32_t ADM_Composer::getPARWidth()
 {
   if (_nb_video)
   {
@@ -769,7 +771,7 @@ uint8_t ADM_Composer::getPARWidth()
 
 }
 
-uint8_t ADM_Composer::getPARHeight()
+uint32_t ADM_Composer::getPARHeight()
 {
   if (_nb_video)
   {
