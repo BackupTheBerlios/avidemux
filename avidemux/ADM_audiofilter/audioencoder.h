@@ -36,6 +36,8 @@ typedef struct ADM_audioEncoderDescriptor
 #define DITHER_SIZE 4800
 #define DITHER_CHANNELS 6
 void            AUDMEncoder_initDither();
+void dither16(float *start, uint32_t nb, uint8_t channels);
+
  //_____________________________________________
 class AUDMEncoder : public AVDMGenericAudioStream
 {
@@ -53,9 +55,6 @@ class AUDMEncoder : public AVDMGenericAudioStream
     
     float          *tmpbuffer;
     uint8_t        refillBuffer(int minimum); // Mininum is in float
-
- 
-    uint8_t        dither16(float *start, uint32_t nb); //
 
     CHANNEL_TYPE ch_order[MAX_CHANNELS];
     void reorderChannels(float *start, uint32_t nb);

@@ -272,7 +272,7 @@ uint8_t coreAudioDevice::play(uint32_t len, float *data)
 	uint8_t *src;
 	uint32_t left;
 
-	dither16bit(len, data);
+	dither16(data, len, _channels);
 
 	pthread_mutex_lock(&lock);
 

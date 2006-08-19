@@ -195,7 +195,7 @@ uint8_t win32AudioDevice::play(uint32_t len, float *data)
  uint32_t av=0;
 	WAVEHDR *hdr;
 
-	dither16bit(len, data);
+	dither16(data, len, _channels);
 	len = len * 2;
    ADM_assert(len<BUCKET_SIZE);
    // First do clean up

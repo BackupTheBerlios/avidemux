@@ -157,7 +157,7 @@ uint8_t ossAudioDevice::play(uint32_t len, float *data)
 	if (!oss_fd)
 		return 0;
 
-	dither16bit(len, data);
+	dither16(data, len, _channels);
 
 	w = write(oss_fd, data, len*2);
         if(w!=len*2)

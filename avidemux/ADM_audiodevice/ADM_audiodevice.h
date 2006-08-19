@@ -14,13 +14,13 @@
 
 #include <ADM_assert.h>
 
+void dither16(float *start, uint32_t nb, uint8_t channels);
+
  class audioDevice
  {
         protected:
 			uint8_t _channels;
 
-			float _dither[256];
-			void dither16bit(uint32_t len, float *data);
         public:
                                         audioDevice(void);
                         virtual uint8_t init(uint8_t channel, uint32_t fq ) {ADM_assert(0);return 0;}

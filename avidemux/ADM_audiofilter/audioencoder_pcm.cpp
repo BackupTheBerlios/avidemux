@@ -91,7 +91,7 @@ uint8_t	AUDMEncoder_PCM::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sampl
     return 0; 
   }
         // Do in place replace
-  dither16(&(tmpbuffer[tmphead]),_chunk);
+  dither16(&(tmpbuffer[tmphead]),_chunk,_wavheader->channels);
   if(!revert)
     memcpy(dest,&(tmpbuffer[tmphead]),_chunk*2);
   else

@@ -33,17 +33,10 @@ class AVDMBufferedAudioStream : public  AVDMGenericAudioStream
   
         protected:
                 AVDMGenericAudioStream *_instream;
-                
-                /*! Used for int->float dithering */
-                float _dither[256];
-                /*! Used for int->float dithering */
-                void dither16bit();
-                /*! Used for int->float dithering */
-                float *_in;
+
                 /*! _chunk is the size of an elementary packed, depends on the codec used */
                 uint32_t _chunk;
 
-                
                 virtual uint32_t grab(uint8_t *outbuffer)=0;//deprecated
                 virtual uint32_t grab(float *outbuffer){return 0;}
                 uint32_t _headBuff,_tailBuff;

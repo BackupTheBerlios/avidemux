@@ -152,9 +152,9 @@ uint8_t	AUDMEncoder_Twolame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *s
   {
     return 0; 
   }
-        // Do in place replace
-  dither16(&(tmpbuffer[tmphead]),_chunk);
-        
+
+  dither16(&(tmpbuffer[tmphead]),_chunk,_wavheader->channels);
+
   ADM_assert(tmptail>=tmphead);
   if (_wavheader->channels == 1)
   {

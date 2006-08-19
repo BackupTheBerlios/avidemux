@@ -200,7 +200,7 @@ uint8_t sdlAudioDevice::play(uint32_t len, float *data)
 	uint8_t *src;
 	uint32_t left;
 
-	dither16bit(len, data);
+	dither16(data, len, _channels);
 	
 	// Check we have room left
 	if(wr_ptr>=rd_ptr)

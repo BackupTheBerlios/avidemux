@@ -113,15 +113,15 @@ void AUDMEncoder_initDither(void)
 	}
 }
 
-uint8_t AUDMEncoder::dither16(float *start, uint32_t nb)
+void dither16(float *start, uint32_t len, uint8_t channels)
 {
 	static uint16_t nr = 0;
 	int16_t *data_int = (int16_t *)start;
 	float *data = start;
-	uint32_t len = nb / _wavheader->channels;
 
+	len /= channels;
 	for (int i = 0; i < len; i++) {
-		for (int c = 0; c < _wavheader->channels; c++) {
+		for (int c = 0; c < channels; c++) {
 			if (*data > 1) *data = 1;
 			if (*data < -1) *data = -1;
 			*data_int = (int16_t)(*data * 32765 + rand_table[c][nr]);
@@ -132,7 +132,6 @@ uint8_t AUDMEncoder::dither16(float *start, uint32_t nb)
 		if (nr > DITHER_SIZE)
 			nr = 0;
 	}
-	return 1;
 }
 
 void AUDMEncoder::reorderChannels(float *data, uint32_t nb)

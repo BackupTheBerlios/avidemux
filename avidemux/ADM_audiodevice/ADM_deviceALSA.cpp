@@ -218,7 +218,7 @@ uint8_t alsaAudioDevice::play( uint32_t len, float *data )
 	/* the PCM device pointed to by pcm_handle.       */
 	/* Returns the number of frames actually written. */
 
-	dither16bit(len, data);
+	dither16(data, len, _channels);
 
 	if(2!=_init) return 0;
         len=len/_channels;

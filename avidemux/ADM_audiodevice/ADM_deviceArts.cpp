@@ -32,6 +32,7 @@
 #include "ADM_audiodevice.h"
 #include  "ADM_audiodevice/ADM_deviceoss.h"
 #include  "ADM_audiodevice/ADM_deviceArts.h"
+
 uint8_t artsInitialized=0;
 //_______________________________________________
 //
@@ -101,7 +102,7 @@ uint8_t artsAudioDevice::play(uint32_t len, float *data)
 
 	if(!_stream) return 0;
 
-	dither16bit(len, data);
+	dither16(data, len, _channels);
 
 	return arts_write(_stream, data, len*2);
 }

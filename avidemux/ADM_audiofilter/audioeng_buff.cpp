@@ -32,16 +32,12 @@
 AVDMBufferedAudioStream::AVDMBufferedAudioStream(AVDMGenericAudioStream * instream):AVDMGenericAudioStream()
 {
         _instream=instream;
-        _in = NULL;
         _chunk = 4096;
-        memset(_dither, 0, 256*sizeof(float));
         _headBuff=_tailBuff=0;
 }
 
 AVDMBufferedAudioStream::~AVDMBufferedAudioStream()
 {
-	if (_in)
-		delete _in;
 }
 
 //
@@ -138,28 +134,6 @@ more:
     _tailBuff+=grabbed;
     goto more;
 };
-
-/*do triangle dither and convert to int16_t with minimal overhead*/
-void AVDMBufferedAudioStream::dither16bit()
-{
-	float dp;
-	int16_t *data_int = (int16_t *)_in;
-	float *data = _in;
-	uint16_t len = _chunk / _wavheader->channels;
-
-	for (int i = 0; i < len; i++)
-		for (int c = 0; c < _wavheader->channels; c++) {
-			if (*data > 1) *data = 1;
-			if (*data < -1) *data = -1;
-
-			dp = _dither[c];
-			_dither[c] = rand() / (float)RAND_MAX * 2.0 - 1.0;
-			*data_int = (int16_t)(*data * 32765 + _dither[c] - dp);//32767 - 2 to avoid clipping
-			data++;
-			data_int++;
-		}
-}
-
 
 uint8_t AVDMBufferedAudioStream::goTo(uint32_t newoffset) {
         ADM_assert(!newoffset);

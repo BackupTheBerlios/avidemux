@@ -91,7 +91,7 @@ _channels = channels;
 //_______________________________________________
 uint8_t esdAudioDevice::play(uint32_t len, float *data)
 {
-	dither16bit(len, data);
+	dither16(data, len, _channels);
 	write(esdDevice, data, len*2);
 	return 1;
 }

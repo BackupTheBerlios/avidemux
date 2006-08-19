@@ -134,9 +134,9 @@ uint8_t	AUDMEncoder_Lavcodec::getPacket(uint8_t *dest, uint32_t *len, uint32_t *
   {
     return 0; 
   }
-        // Do in place replace
-  dither16(&(tmpbuffer[tmphead]),_chunk);
-        
+
+  dither16(&(tmpbuffer[tmphead]),_chunk,_wavheader->channels);
+
   ADM_assert(tmptail>=tmphead);
   nbout = avcodec_encode_audio(CONTEXT, dest, 5000, (short *) &(tmpbuffer[tmphead]));
 
