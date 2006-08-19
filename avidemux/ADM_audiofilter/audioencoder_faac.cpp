@@ -37,12 +37,23 @@
 
 AUDMEncoder_Faac::AUDMEncoder_Faac(AUDMAudioFilter * instream)  :AUDMEncoder    (instream)
 {
-  ch_order[0] = CH_FRONT_CENTER;
-  ch_order[1] = CH_FRONT_LEFT;
-  ch_order[2] = CH_FRONT_RIGHT;
-  ch_order[3] = CH_REAR_LEFT;
-  ch_order[4] = CH_REAR_RIGHT;
-  ch_order[5] = CH_LFE;
+  uint32_t channels;
+  channels=instream->getInfo()->channels;
+  switch(channels)
+  {
+    case 1:ch_order[1] = CH_FRONT_LEFT;break;
+    case 2:
+      ch_order[0] = CH_FRONT_LEFT;
+      ch_order[1] = CH_FRONT_RIGHT;
+      break;
+    default :
+      ch_order[0] = CH_FRONT_CENTER;
+      ch_order[1] = CH_FRONT_LEFT;
+      ch_order[2] = CH_FRONT_RIGHT;
+      ch_order[3] = CH_REAR_LEFT;
+      ch_order[4] = CH_REAR_RIGHT;
+      ch_order[5] = CH_LFE;
+  }
 };
 
 
@@ -134,7 +145,52 @@ int ret=0;
 }
 
 //_____________________________________________
-
+//  Need to multiply the float by 65535, can't use
+//  generic fill buffer
+//----------------------------------------------
+uint8_t AUDMEncoder_Faac::refillBuffer(int minimum)
+{
+  uint32_t filler=_wavheader->frequency*_wavheader->channels;
+  uint32_t nb;
+  AUD_Status status;
+  if(eof_met) return 0;
+  while(1)
+  {
+    ADM_assert(tmptail>=tmphead);
+    if((tmptail-tmphead)>=minimum) return 1;
+  
+    if(tmphead && tmptail>filler/2)
+    {
+      memmove(&tmpbuffer[0],&tmpbuffer[tmphead],(tmptail-tmphead)*sizeof(float)); 
+      tmptail-=tmphead;
+      tmphead=0;
+    }
+    ADM_assert(filler>tmptail);
+    nb=_incoming->fill( (filler-tmptail)/2,&tmpbuffer[tmptail],&status);
+    if(!nb)
+    {
+      if(status!=AUD_END_OF_STREAM) ADM_assert(0);
+      
+      if((tmptail-tmphead)<minimum)
+      {
+        memset(&tmpbuffer[tmptail],0,sizeof(float)*(minimum-(tmptail-tmphead)));
+        tmptail=tmphead+minimum;
+        eof_met=1;  
+        return minimum;
+      }
+      else continue;
+    } else
+    {
+      float *s=&(tmpbuffer[tmptail]);
+      for(int i=0;i<nb;i++)
+      {
+        *s=*s*65535.;
+        s++;
+      }
+      tmptail+=nb;
+    }
+  }
+}
 
 #define FA_BUFFER_SIZE (SIZE_INTERNAL/4)
 //______________________________________________
@@ -150,7 +206,8 @@ _again:
           return 0; 
         }
         ADM_assert(tmptail>=tmphead);
-        reorderChannels(&(tmpbuffer[tmphead]),_chunk);
+        if(_wavheader->channels > 2)
+            reorderChannels(&(tmpbuffer[tmphead]),_chunk);
         *len = faacEncEncode(_handle, (int32_t *)&(tmpbuffer[tmphead]), _chunk, dest, FA_BUFFER_SIZE);
         if(!*len) 
         {
