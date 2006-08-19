@@ -42,13 +42,10 @@ JSPropertySpec ADM_JSAvidemuxAudio::avidemuxaudio_properties[] =
 { 
 
         { "process", audioprocess_prop, JSPROP_ENUMERATE },        // process audio when saving
-        { "downsample", downsample_prop, JSPROP_ENUMERATE },	// downsample
         { "resample", resample_prop, JSPROP_ENUMERATE },	// resample
         { "delay", delay_prop, JSPROP_ENUMERATE },	// set audio delay
         { "film2pal", film2pal_prop, JSPROP_ENUMERATE },	// convert film to pal
         { "pal2film", pal2film_prop, JSPROP_ENUMERATE },	// convert pal to film
-        { "mono2stereo", mono2stereo_prop, JSPROP_ENUMERATE },	// convert mono to stereo
-        { "stereo2mono", stereo2mono_prop, JSPROP_ENUMERATE },	// convert stereo to mono
         { "normalizeMode", normalizemode_prop, JSPROP_ENUMERATE },	//
         { "normalizeValue", normalizevalue_prop, JSPROP_ENUMERATE },	//
         { 0 }
@@ -135,9 +132,6 @@ JSBool ADM_JSAvidemuxAudio::JSGetProperty(JSContext *cx, JSObject *obj, jsval id
                         case audioprocess_prop:
                                 *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_bAudioProcess);
                                 break;
-                        case downsample_prop:
-                                *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_bDownsample);
-                                break;
                         case resample_prop:
                                 *vp = INT_TO_JSVAL(priv->getObject()->m_nResample);
                                 break;
@@ -149,12 +143,6 @@ JSBool ADM_JSAvidemuxAudio::JSGetProperty(JSContext *cx, JSObject *obj, jsval id
                                 break;
                         case pal2film_prop:
                                 *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_bPAL2Film);
-                                break;
-                        case mono2stereo_prop:
-                                *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_bMono2Stereo);
-                                break;
-                        case stereo2mono_prop:
-                                *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_bStereo2Mono);
                                 break;
                         case normalizemode_prop:
                               *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_nNormalizeMode);

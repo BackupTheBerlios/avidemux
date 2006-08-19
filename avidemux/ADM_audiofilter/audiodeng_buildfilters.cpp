@@ -170,17 +170,6 @@ int32_t  audioGetNormalizeValue(void)
 
 }
 
-uint8_t audioGetDownsample(void)
-{
-        switch(audioResampleMode)
-        {
-        case RESAMPLING_CUSTOM:
-        case RESAMPLING_NONE: return 0;
-        default: ADM_assert(0);
-        }
-        return 0;
-        
-}
 uint32_t audioGetResample(void)
 {
       return audioFreq;
