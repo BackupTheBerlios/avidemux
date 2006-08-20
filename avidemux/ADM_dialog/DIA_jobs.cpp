@@ -34,6 +34,14 @@ typedef enum JOB_STATUS
         STATUS_RUNNING
 };
 
+
+typedef struct ADM_Job_Descriptor
+{
+  JOB_STATUS  status;
+  ADM_date    startDate;
+  ADM_date    endDate;
+};
+
 typedef enum 
 {
         COMMAND_DELETE_ALL=1,
@@ -49,7 +57,7 @@ typedef struct JobsDescriptor
         GtkListStore *store;
         uint32_t  nb;
         char      **name;
-        JOB_STATUS *status;
+        ADM_Job_Descriptor *status;
 }JobsDescriptor;
 
 static JobsDescriptor jobs;
@@ -58,7 +66,7 @@ uint8_t  DIA_job(uint32_t nb, char **name)
 {
 GtkListStore *store;
 
-GtkTreeViewColumn *column,*column2;
+GtkTreeViewColumn *column,*column2,*column3;
 GtkCellRenderer *renderer;
 
         int ret=0;
@@ -71,15 +79,15 @@ GtkCellRenderer *renderer;
         gtk_register_dialog(dialog);
         
         
-        store=gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
+        store=gtk_list_store_new (3, G_TYPE_STRING, G_TYPE_STRING,G_TYPE_STRING);
         
         // initialize our job structure
         jobs.dialog=dialog;
         jobs.nb=nb;
         jobs.name=name;
-        jobs.status=new JOB_STATUS[nb];
+        jobs.status=new ADM_Job_Descriptor[nb];
         jobs.store=store;
-        memset(jobs.status,0,jobs.nb*sizeof(JOB_STATUS));
+        memset(jobs.status,0,jobs.nb*sizeof(ADM_Job_Descriptor));
 
         gtk_tree_view_set_model(GTK_TREE_VIEW(WID(treeview1)),GTK_TREE_MODEL (store));
         gtk_tree_view_columns_autosize(GTK_TREE_VIEW(WID(treeview1)));
@@ -87,16 +95,20 @@ GtkCellRenderer *renderer;
         // Add columns
 
         renderer = gtk_cell_renderer_text_new ();
-        column = gtk_tree_view_column_new_with_attributes (_("Name"), renderer,
+        column = gtk_tree_view_column_new_with_attributes (_("  Job Name  "), renderer,
                                                       "markup", (GdkModifierType) 0,
                                                       NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column);
-#if 0
-        column2 = gtk_tree_view_column_new_with_attributes ("Status", renderer,
+
+        column2 = gtk_tree_view_column_new_with_attributes (_("Started at"), renderer,
                                                       "markup", (GdkModifierType) 1,
                                                       NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column2);
-#endif
+        column3 = gtk_tree_view_column_new_with_attributes (_("Finished at"), renderer,
+            "markup", (GdkModifierType) 1,
+            NULL);
+        gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column3);
+
         //
         #define ASSOCIATE(x,y)   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),y)
             ASSOCIATE(buttonDelete,COMMAND_DELETE);
@@ -121,31 +133,36 @@ GtkCellRenderer *renderer;
                         case COMMAND_DELETE_ALL:
                                         if(GUI_Confirmation_HIG(_("Sure!"),_("Delete ALL jobs"),_("Are you sure you want to delete all jobs ?")))
                                         {
-                                                for(int i=0;i<jobs.nb;i++) jobs.status[i]=STATUS_DELETED;
+                                                for(int i=0;i<jobs.nb;i++) jobs.status[i].status=STATUS_DELETED;
                                         }
                                         break;
                         case COMMAND_RUN: 
                                         sel=getSelection(jobs.dialog);
                                         if(sel>=jobs.nb) break;
-                                        jobs.status[sel]=STATUS_RUNNING;
+                                        jobs.status[sel].status=STATUS_RUNNING;
                                         updateStatus();
                                         GUI_Quiet();
-                                          if(parseECMAScript(jobs.name[sel])) jobs.status[sel]=STATUS_SUCCEED;
-                                                        else jobs.status[sel]=STATUS_FAILED;
+                                        TLK_getDate(&(jobs.status[sel].startDate));
+                                        if(parseECMAScript(jobs.name[sel])) jobs.status[sel].status=STATUS_SUCCEED;
+                                        else jobs.status[sel].status=STATUS_FAILED;
+                                        TLK_getDate(&(jobs.status[sel].endDate));
                                         GUI_Verbose();
                                         break;
                         case COMMAND_RUN_ALL: 
                                         GUI_Quiet();
                                         for(int i=0;i<jobs.nb;i++)
                                         {
-                                                if(jobs.status[i]==STATUS_DELETED) continue;
-                                                if(jobs.status[i]==STATUS_SUCCEED) continue;
-                                                jobs.status[i]=STATUS_RUNNING;
-                                                updateStatus();
-                                                if(parseECMAScript(jobs.name[i])) jobs.status[i]=STATUS_SUCCEED;
-                                                        else jobs.status[i]=STATUS_FAILED;
+                                          if(jobs.status[i].status==STATUS_DELETED) continue;
+                                          if(jobs.status[i].status==STATUS_SUCCEED) continue;
+                                          jobs.status[i].status=STATUS_RUNNING;
+                                          TLK_getDate(&(jobs.status[i].startDate));
+                                          updateStatus();
+                                          if(parseECMAScript(jobs.name[i])) jobs.status[i].status=STATUS_SUCCEED;
+                                                        else jobs.status[i].status=STATUS_FAILED;
+                                        TLK_getDate(&(jobs.status[i].endDate));
 
                                         }
+                                        updateStatus();
                                         GUI_Verbose();
                                         break;
                         case COMMAND_DELETE: 
@@ -153,7 +170,7 @@ GtkCellRenderer *renderer;
                                         if(sel>=jobs.nb) break;
                                         if(GUI_Confirmation_HIG(_("Sure!"),_("Delete job"),_("Are you sure you want to delete %s job ?"),GetFileName(jobs.name[sel])))
                                         {
-                                                jobs.status[sel]=STATUS_DELETED;
+                                                jobs.status[sel].status=STATUS_DELETED;
                                         }
                                         break;
 
@@ -170,7 +187,7 @@ GtkCellRenderer *renderer;
         // Now delete the "deleted" jobs
         for(int i=0;i<jobs.nb;i++)
         {
-                if(jobs.status[i]==STATUS_DELETED)
+                if(jobs.status[i].status==STATUS_DELETED)
                 {
                         unlink(jobs.name[i]);
                 }
@@ -193,16 +210,28 @@ void updateStatus(void)
 {
 GtkTreeIter iter;
 char *str;
+ADM_date  *date;
         gtk_list_store_clear (jobs.store);
         for (uint32_t i = 0; i < jobs.nb; i++)
         {
                 str = g_strconcat("<span weight=\"heavy\">", 
                 GetFileName(jobs.name[i]), "</span>\n",  
                "<span size=\"smaller\" style=\"oblique\" >", 
-                _(StringStatus[jobs.status[i]]), "</span> ",NULL);
+                _(StringStatus[jobs.status[i].status]), "</span> ",NULL);
 
                 gtk_list_store_append (jobs.store, &iter);
                 gtk_list_store_set (jobs.store, &iter, 0,str,-1);
+                // Start date
+                date=&(jobs.status[i].startDate);
+                sprintf(str,"%02d:%02d:%02d",date->hours,
+                                          date->minutes,
+                                          date->seconds);
+                gtk_list_store_set (jobs.store, &iter, 1,str,-1);
+                date=&(jobs.status[i].endDate);
+                sprintf(str,"%02d:%02d:%02d",date->hours,
+                        date->minutes,
+                        date->seconds);
+                gtk_list_store_set (jobs.store, &iter, 2,str,-1);
 
                 g_free(str);
         }

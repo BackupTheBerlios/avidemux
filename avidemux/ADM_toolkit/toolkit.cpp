@@ -421,4 +421,22 @@ extern char *slashToBackSlash(char *in)
     return cout;
     
 }
+/*
+    
+*/
+void TLK_getDate(ADM_date *date)
+{
+  time_t timez;
+  tm *t;
+  time(&timez);
+  t=localtime(&timez);
+  if(t)
+  {
+    date->hours=t->tm_hour;
+    date->minutes=t->tm_min;
+    date->seconds=t->tm_sec;
+  }
+  
+}
+
 //EOF

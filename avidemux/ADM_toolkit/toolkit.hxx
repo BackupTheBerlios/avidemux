@@ -27,23 +27,27 @@ typedef enum ADM_LOG_LEVEL
         ADM_LOG_DEBUG=3
   
 };
-
-void 		PathSplit(char *str, char **root, char **ext);
-void			PathStripName(char *str);
-const char		*GetFileName(const char *str);
-char 		*PathCanonize(const char *tmpname);
-void		LowerCase(char *string);
-void 		GUI_Alert(const char *alertstring);
+typedef struct ADM_date
+{
+  uint32_t hours,minutes,seconds; 
+};
+void            TLK_getDate(ADM_date *date);
+void            PathSplit(char *str, char **root, char **ext);
+void	        PathStripName(char *str);
+const char      *GetFileName(const char *str);
+char            *PathCanonize(const char *tmpname);
+void            LowerCase(char *string);
+void            GUI_Alert(const char *alertstring);
 void            GUI_Info(const char *alertstring);
 void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...);
 void            GUI_Error_HIG(const char *primary, const char *secondary_format, ...);
 int             GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const char *secondary_format, ...);
 int             GUI_YesNo(const char *primary, const char *secondary_format, ...);
-int 			GUI_Question(const char *alertstring);
-void			GUI_Sleep(uint32_t ms);
-int 			GUI_Alternate(char *title,char *choice1,char *choice2);
-uint32_t 		getTime( int called );;
-void 		runDialog(volatile int *lock);
+int             GUI_Question(const char *alertstring);
+void            GUI_Sleep(uint32_t ms);
+int             GUI_Alternate(char *title,char *choice1,char *choice2);
+uint32_t        getTime( int called );;
+void            runDialog(volatile int *lock);
 // warning : they are in GUI_enter
 uint8_t  		GUI_getDoubleValue(double *valye, float min, float max, const char *title);
 uint8_t  		GUI_getIntegerValue(int *valye, int min, int max, const char *title);
