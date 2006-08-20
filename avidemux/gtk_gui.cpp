@@ -1246,6 +1246,7 @@ A_appendAvi (char *name)
     }
 
   ReSync ();
+  UI_setMarkers (frameStart, frameEnd);
   return 1;
 }
 
