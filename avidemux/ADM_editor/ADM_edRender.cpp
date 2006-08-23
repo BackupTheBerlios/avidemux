@@ -460,7 +460,7 @@ uint32_t left,ww;
                         {
                                 image->duplicate(prev);
                                 cache->updateFrameNum(image,frame);
-                                delete tmpImage;
+                               // Refonly !! delete tmpImage;
                                 return 1;
                         }
         }
