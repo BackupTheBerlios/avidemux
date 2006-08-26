@@ -119,7 +119,7 @@ uint8_t r=0;
 uint32_t skipping=1;
 pthread_t     audioThread;
 audioQueueMT context;
-PacketQueue   pq("MP4 audioQ",50,2*1024*1024);
+PacketQueue   *pq;//("MP4 audioQ",50,2*1024*1024);
 
            if(type==ADM_PSP)
                muxerType=MUXER_PSP;
@@ -281,19 +281,20 @@ preFilling:
             frameWrite++;
           }
 //_____________ Start Audio thread _____________________          
-          
+          pq=new PacketQueue("MP4 audioQ",50,2*1024*1024);
           memset(&context,0,sizeof(context));
           context.audioEncoder=audio;
           context.audioTargetSample=0xFFFF0000; ; //FIXME
-          context.packetQueue=&pq;
+          context.packetQueue=pq;
            // start audio thread
           ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)defaultAudioQueueSlave,&context)); 
           ADM_usleep(4000);
+//_____________GO !___________________
            for(int frame=1;frame<total;frame++)
            {
                while(muxer->needAudio())
                {
-                    if(pq.Pop(audioBuffer,&alen,&sample))
+                    if(pq->Pop(audioBuffer,&alen,&sample))
                     {
                      if(alen)
                      {
@@ -333,14 +334,25 @@ preFilling:
                encoding_gui->feedFrame(bitstream.len);
                if(!encoding_gui->isAlive())
                 {
-                  if(GUI_YesNo(_("Stop Request"), _("Do you want to abort encoding ?")))
-                                goto stopit;
+                    
+                    goto stopit;
                 }
                
            }
            ret=1;
            
 stopit:
+    // Flush slave Q
+    context.audioAbort=1;
+    pq->Abort();
+    // Wait for audio slave to be over
+    while(!context.audioDone)
+    {
+      printf("Waiting Audio thread\n");
+      ADM_usleep(500000); 
+    }
+          delete pq;
+    //
            if(muxer) muxer->close();
            if(encoding_gui) delete encoding_gui;
            if(TwoPassLogFile) delete [] TwoPassLogFile;

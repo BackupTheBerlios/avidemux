@@ -228,5 +228,17 @@ uint32_t PacketQueue::availableSpace(void)
   
   return space;
 }
+uint8_t PacketQueue::Abort(void)
+{
+  
+  Finished();
+  _mutex->lock();
+  _slotHead=_slotQueue=0;
+  _bufferQueue=_bufferHead=0;
+  _mutex->unlock();
+  _pusherCond->abort();
+  
+  return 1;
+}
 //EOF
 

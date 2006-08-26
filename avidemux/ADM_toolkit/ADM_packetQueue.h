@@ -49,6 +49,7 @@ class PacketQueue
           uint8_t   IsFull(void);
           uint8_t   IsEmpty(void);
           uint8_t   Finished(void);
+          uint8_t   Abort(void);
 };
 
 
