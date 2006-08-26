@@ -23,7 +23,7 @@
 
 
 #define THR_CHECK(x) {int r=(x);if(r) {printf("Threading error :%d %s\n", \
-                      r,strerror(r));ADM_assert(0);}}
+                      r,strerror(r));exit(0);}}
 //**************** Mutex *******************
 admMutex::admMutex(const char *name)
 {

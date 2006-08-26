@@ -18,6 +18,7 @@
 typedef struct  Slots
 {
   uint32_t      size;       //< Size of the packet
+  uint32_t      sample;
   uint32_t      startAt;    //< Index in the buffer where the packet start
 };
 /*!
@@ -43,8 +44,8 @@ class PacketQueue
   public:
           PacketQueue(const char *name,uint32_t nbSlot,uint32_t buffSize);
           ~PacketQueue();
-          uint8_t   Push(uint8_t *ptr, uint32_t size);
-          uint8_t   Pop(uint8_t *ptr, uint32_t *size);
+          uint8_t   Push(uint8_t *ptr, uint32_t size,uint32_t sample);
+          uint8_t   Pop(uint8_t *ptr, uint32_t *size,uint32_t *sample);
           uint8_t   IsFull(void);
           uint8_t   IsEmpty(void);
           uint8_t   Finished(void);

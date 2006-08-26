@@ -30,7 +30,7 @@
 
 PacketQueue::PacketQueue(const char *name,uint32_t nbSlot,uint32_t buffSize)
 {
-  memset(this,0,sizeof(PacketQueue));
+  
   _nbSlots=nbSlot;
   _bufferSize=buffSize;
   _name=ADM_strdup(name);
@@ -39,6 +39,10 @@ PacketQueue::PacketQueue(const char *name,uint32_t nbSlot,uint32_t buffSize)
   _mutex=new admMutex(_name);
   _pusherCond=new admCond(_mutex);
   _poperCond=new admCond(_mutex);
+  _slotQueue=_slotHead=0;
+  _bufferQueue=_bufferHead=0;
+  _eof=0;
+  printf("PacketQueue %s created\n",_name);
 }
 /*!
   Destructor
@@ -46,13 +50,12 @@ PacketQueue::PacketQueue(const char *name,uint32_t nbSlot,uint32_t buffSize)
 
 PacketQueue::~PacketQueue()
 {
-  if(_mutex) delete _mutex;
-  _mutex=NULL;
   if(_pusherCond) delete _pusherCond;
   _pusherCond=NULL;
   if(_poperCond) delete _poperCond;
   _poperCond=NULL;
-  
+  if(_mutex) delete _mutex;
+  _mutex=NULL;
   if(_name) ADM_dealloc(_name);
   _name=NULL;
   if(_buffer) delete [] _buffer;
@@ -68,7 +71,7 @@ uint8_t   PacketQueue::IsEmpty(void)
 {
   uint8_t r=0;
   
-  if(_slotHead!=_slotQueue)
+  if(_slotHead==_slotQueue)
   { 
       r=1;
   }
@@ -97,7 +100,7 @@ uint8_t  PacketQueue::Finished(void)
   \param size : packetsize
 
  */
-uint8_t   PacketQueue::Push(uint8_t *ptr, uint32_t size)
+uint8_t   PacketQueue::Push(uint8_t *ptr, uint32_t size,uint32_t sample)
 {
   uint8_t r=0;
   uint32_t slot;
@@ -106,7 +109,8 @@ uint8_t   PacketQueue::Push(uint8_t *ptr, uint32_t size)
   // First try to allocate a slot
   while(((_nbSlots+_slotHead-_slotQueue)%_nbSlots)==1)
   {
-    _pusherCond->wait(); 
+    _pusherCond->wait();
+    _mutex->lock(); 
   }
   // Ok we have a slot,
   // Now lets's see if we have enough data in the buffer (we are still under lock)
@@ -115,11 +119,15 @@ uint8_t   PacketQueue::Push(uint8_t *ptr, uint32_t size)
       available=availableSpace();
       if(available>=size)
       {
+        
          slot=_slotHead;
         _slotHead++;
         _slotHead%=_nbSlots;
         _slots[slot].size=size;
+        _slots[slot].sample=sample;
         _slots[slot].startAt=_bufferHead;
+        
+       // printf("Pushing slot %d at %u\n",slot,_bufferHead,_slots[slot].startAt);
         if(_bufferSize>=(_bufferHead+size))
         {
           memcpy(&_buffer[ _bufferHead],ptr,size);
@@ -130,8 +138,7 @@ uint8_t   PacketQueue::Push(uint8_t *ptr, uint32_t size)
           uint32_t part1=_bufferSize-_bufferHead;
           memcpy(&_buffer[ _bufferHead],ptr,part1);
           memcpy(&_buffer[ 0],ptr+part1,size-part1);
-          _bufferQueue=size-part1;
-          
+          _bufferHead=size-part1;
         }
         // Look if someone was waiting ...
         if(_poperCond->iswaiting())
@@ -142,6 +149,7 @@ uint8_t   PacketQueue::Push(uint8_t *ptr, uint32_t size)
         return 1;
       }
       _pusherCond->wait();
+      _mutex->lock();
   }
   _mutex->unlock();
   printf("[PKTQ] %s is eof\n",_name);
@@ -155,30 +163,40 @@ uint8_t   PacketQueue::Push(uint8_t *ptr, uint32_t size)
   \param size : returns packetsize
 
 */
-uint8_t   PacketQueue::Pop(uint8_t *ptr, uint32_t *size)
+uint8_t   PacketQueue::Pop(uint8_t *ptr, uint32_t *size,uint32_t *sample)
 {
   uint8_t r=0;
   uint32_t slot;
-  uint32_t available,sz;
+  uint32_t available,sz,position;
   _mutex->lock();
   // is there something ?
   while(IsEmpty() && !_eof)
   {
     _poperCond->wait();
+    _mutex->lock();
   }
-  if(_eof)
+  if(IsEmpty() && _eof)
   {
     *size=0;
     _mutex->unlock();
     return 0;
   }
+  //
+  //printf("Pop : Head %u Tail %u\n",_slotHead,_slotQueue);
   // ok, which slot ?
-  slot=_bufferQueue;
+  slot=_slotQueue;
+  _slotQueue++;
+  _slotQueue%=_nbSlots;
   sz=*size=_slots[slot].size;
+  *sample=_slots[slot].sample;
+  //printf("Poping slot %d at %u\n",slot,_bufferQueue,_slots[slot].startAt);
+  ADM_assert(_bufferQueue==_slots[slot].startAt);
+  
   if(_bufferSize>=(_bufferQueue+sz))
   {
     memcpy(ptr,&(_buffer[_bufferQueue]),sz);
     _bufferQueue+=sz;
+    _bufferQueue%=_bufferSize;
   }
   else  // Split
   {
