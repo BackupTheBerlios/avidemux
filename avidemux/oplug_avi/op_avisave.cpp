@@ -95,16 +95,34 @@ GenericAviSave::GenericAviSave ()
   _audioCurrent=_audioTarget=0;
  _audioTotal=0;  
  _file=NULL;
+ _pq=NULL;
+ memset(&_context,0,sizeof(_context));
+ _context.audioDone=1;
 }
 
 GenericAviSave::~GenericAviSave ()
 {
+  cleanupAudio();
   delete vbuffer;
   delete[]abuffer;
   _incoming=NULL;
   ADM_assert(!_file);
 }
-
+uint8_t GenericAviSave::cleanupAudio (void)
+{
+  printf("[AVI] Cleaning audio\n");
+  if(_pq)
+  {
+    while(!_context.audioDone)
+    {
+      printf("Waiting Audio thread\n");
+      ADM_usleep(500000); 
+    }
+    if(_pq) delete _pq;
+    _pq=NULL;
+  }
+  return 1;
+}
 //___________________________________________________________
 //      Generic Save Avi loop
 //
@@ -204,7 +222,6 @@ GenericAviSave::setupAudio (void)
 
   if (audioProcessMode())	// else Raw copy mode
     {
-      
       audio_filter = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
       if(!audio_filter) return 0;
       encoding_gui->setAudioCodec(getStrFromAudioCodec(audio_filter->getInfo()->encoding));
@@ -217,14 +234,18 @@ GenericAviSave::setupAudio (void)
       audio_filter=buildAudioFilter( currentaudiostream,video_body->getTime (frameStart));
       if(!audio_filter) return 0;
     }
-
-   
+    /* Setup audioQ */
+    pthread_t     audioThread;
+    _pq=new PacketQueue("AVI audioQ",50,2*1024*1024);
+    memset(&_context,0,sizeof(_context));
+    _context.audioEncoder=audio_filter;
+    _context.audioTargetSample=0xFFFF0000; ; //FIXME
+    _context.packetQueue=_pq;
+    // start audio thread
+    ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)defaultAudioQueueSlave,&_context)); 
+    ADM_usleep(4000);
   return 1;
 }
-
-
-
-
 //---------------------------------------------------------------------------
 uint8_t
 GenericAviSave::writeAudioChunk (uint32_t frame)
@@ -240,75 +261,62 @@ GenericAviSave::writeAudioChunk (uint32_t frame)
   t=t/fps1000;
   t=t*1000*audio_filter->getInfo()->frequency;
   _audioTarget=(uint32_t )floor(t);
-  
-  	uint32_t sample,packetLen,packets=0;
-	
 
-	if(audio_filter->packetPerFrame()
-		|| audio_filter->isVBR() )
-	{
-		while(_audioCurrent<_audioTarget)
-		{
-			if(!audio_filter->getPacket(abuffer,&packetLen,&sample))
-			{
-				printf("AVIWR:Could not read packet\n");
-				return 0;
-			}
-			_audioCurrent+=sample;
-	 		writter->saveAudioFrame (packetLen,abuffer);
-			encoding_gui->feedAudioFrame(packetLen);
-		}
-	 	return 1;
-	}
+        uint32_t sample,packetLen,packets=0;
 
-	sample=0;
-	// _audioTarget is the # of sample we want
-	while(_audioCurrent<_audioTarget)
-	{
-		if(!audio_filter->getPacket(abuffer+_audioInBuffer,&packetLen,&sample))
-		{
-			printf("AVIWR:Could not read packet\n");
-			break;
-		}
-		_audioInBuffer+=packetLen;
-		_audioTotal+=packetLen;
-		_audioCurrent+=sample;		
-		packets++;
-	}
-//   	printf("Aviwr:Fq:%lu fps1000:%lu frame:%lu Found %lu packet for %lu bytes , cur=%lu target=%lu total:%llu\n",
-// 					audio_filter->getInfo()->frequency,
-// 					fps1000,
-// 					frame,packets,_audioInBuffer,
-// 					_audioCurrent,_audioTarget,_audioTotal);
-//   
+
+        if(audio_filter->packetPerFrame()
+                || audio_filter->isVBR() )
+        {
+                while(_audioCurrent<_audioTarget)
+                {
+                  if(!_pq->Pop(abuffer,&packetLen,&sample))
+                  {
+                    return 0;
+                  }
+                  _audioCurrent+=sample;
+                  writter->saveAudioFrame (packetLen,abuffer);
+                  encoding_gui->feedAudioFrame(packetLen);
+                }
+                return 1;
+        }
+
+        sample=0;
+        // _audioTarget is the # of sample we want
+        while(_audioCurrent<_audioTarget)
+        {
+                if(!_pq->Pop(abuffer+_audioInBuffer,&packetLen,&sample))
+                  {
+                    printf("AVIWR:Could not read packet\n");
+                    break;
+                  }
+                _audioInBuffer+=packetLen;
+                _audioTotal+=packetLen;
+                _audioCurrent+=sample;		
+                packets++;
+        }
       switch (muxMode)
-	{
-
-	case MUX_N_FRAMES:
-	  stored_audio_frame++;
-	  if (stored_audio_frame < muxParam)
-	    return 1;
-	  stored_audio_frame = 0;
-	case MUX_REGULAR:
-
-	 
-	  break;
-	case MUX_N_BYTES:
-	  	if(_audioInBuffer<muxParam) return 1;
-		break;
-	  break;
-	default:
-	  ADM_assert (0);
-	}
-      
-     
-      
+        {
+        case MUX_N_FRAMES:
+          stored_audio_frame++;
+          if (stored_audio_frame < muxParam)
+            return 1;
+          stored_audio_frame = 0;
+        case MUX_REGULAR:
+          break;
+        case MUX_N_BYTES:
+                if(_audioInBuffer<muxParam) return 1;
+                break;
+          break;
+        default:
+          ADM_assert (0);
+        }
       if (_audioInBuffer)
-	{
-	  writter->saveAudioFrame (_audioInBuffer, abuffer);
-	  encoding_gui->feedAudioFrame(_audioInBuffer);
-	  _audioInBuffer=0;
-	}
+        {
+          writter->saveAudioFrame (_audioInBuffer, abuffer);
+          encoding_gui->feedAudioFrame(_audioInBuffer);
+          _audioInBuffer=0;
+        }
       return 1;
   
 }
@@ -316,25 +324,25 @@ GenericAviSave::writeAudioChunk (uint32_t frame)
 void
 GenericAviSave::guiStart (void)
 {
-	encoding_gui=new DIA_encoding(25000);
-	encoding_gui->setCodec("Copy");
-	encoding_gui->setFrame (0, 100);
-        encoding_gui->setContainer("Avi");
+      encoding_gui=new DIA_encoding(25000);
+      encoding_gui->setCodec("Copy");
+      encoding_gui->setFrame (0, 100);
+      encoding_gui->setContainer("Avi");
 
 }
 
 void
 GenericAviSave::guiStop (void)
 {
- 	ADM_assert(encoding_gui);
-  	delete encoding_gui;
-  	encoding_gui=NULL;
+      ADM_assert(encoding_gui);
+      delete encoding_gui;
+      encoding_gui=NULL;
 
 }
 void GenericAviSave::guiSetPhasis(char *str)
 {
-	ADM_assert(encoding_gui);
-	encoding_gui->setPhasis(str);
+      ADM_assert(encoding_gui);
+      encoding_gui->setPhasis(str);
 	
 }
 uint8_t
@@ -352,17 +360,17 @@ GenericAviSave::guiUpdate (uint32_t nb, uint32_t total)
 //
 uint8_t  GenericAviSave::handleMuxSize ( void )
 {
-	uint32_t pos;
-	
-			pos=writter->getPos();
-			if(pos>=muxSize*1024*1024)
-				{
-					 return 1  ;
-					
-				}
-				return 0;
-	
-	
+  uint32_t pos;
+  
+        pos=writter->getPos();
+        if(pos>=muxSize*1024*1024)
+                {
+                          return 1  ;
+                        
+                }
+                return 0;
+  
+      
 }
 //
 //	Finish the current avi and start a new one
@@ -408,53 +416,51 @@ uint8_t   GenericAviSave::reigniteChunk( uint32_t dataLen, uint8_t *data )
 */
 uint32_t GenericAviSave::searchForward(uint32_t startframe)
 {
-		uint32_t fw=startframe;
-		uint32_t flags;
-		uint8_t r;
+uint32_t fw=startframe;
+uint32_t flags;
+uint8_t r;
 
-			while(1)
-			{
-				fw++;
-				r=video_body->getFlags (fw, &flags);
-				if(!(flags & AVI_B_FRAME))
-				{
-					return fw;
+        while(1)
+        {
+                fw++;
+                r=video_body->getFlags (fw, &flags);
+                if(!(flags & AVI_B_FRAME))
+                {
+                        return fw;
 
-				}
-				ADM_assert(r);
-				if(!r)
-				{
-					printf("\n Could not locate last non B frame \n");
-					return 0;
-				}
+                }
+                ADM_assert(r);
+                if(!r)
+                {
+                        printf("\n Could not locate last non B frame \n");
+                        return 0;
+                }
 
-			}
+        }
 }
 
 const char *getStrFromAudioCodec( uint32_t codec)
 {
-	switch(codec)
-	{
-                case WAV_DTS: return (const char *)"DTS";
-		case WAV_PCM: return (const char *)"PCM";
-		case WAV_MP2: return (const char *)"MP2";
-		case WAV_MP3: return (const char *)"MP3";
-		case (WAV_WMA):  return (const char *)"WMA";
-		case (WAV_LPCM): return (const char *)"LPCM";	
-		case (WAV_AC3):  return (const char *)"AC3";
-		case (WAV_OGG): return (const char *)"Ogg Vorbis";
-		case (WAV_MP4): return (const char *)"MP4 audio";
-		case (WAV_AAC): return (const char *)"AAC";
-		case (WAV_QDM2): return (const char *)"QDM2";
-		case (WAV_AMRNB): return (const char *)"AMR narrow band";
-		case (WAV_MSADPCM): return (const char *)"MSADPCM";
-		case (WAV_ULAW): return (const char *)"ULAW";
-                case WAV_IMAADPCM: return (const char *)"IMA ADPCM";
-                case WAV_8BITS_UNSIGNED:return (const char *)"PCM 8bits";
-	}
-
-	return (const char *)"Unknown codec";
-
+      switch(codec)
+      {
+              case WAV_DTS: return (const char *)"DTS";
+              case WAV_PCM: return (const char *)"PCM";
+              case WAV_MP2: return (const char *)"MP2";
+              case WAV_MP3: return (const char *)"MP3";
+              case (WAV_WMA):  return (const char *)"WMA";
+              case (WAV_LPCM): return (const char *)"LPCM";	
+              case (WAV_AC3):  return (const char *)"AC3";
+              case (WAV_OGG): return (const char *)"Ogg Vorbis";
+              case (WAV_MP4): return (const char *)"MP4 audio";
+              case (WAV_AAC): return (const char *)"AAC";
+              case (WAV_QDM2): return (const char *)"QDM2";
+              case (WAV_AMRNB): return (const char *)"AMR narrow band";
+              case (WAV_MSADPCM): return (const char *)"MSADPCM";
+              case (WAV_ULAW): return (const char *)"ULAW";
+              case WAV_IMAADPCM: return (const char *)"IMA ADPCM";
+              case WAV_8BITS_UNSIGNED:return (const char *)"PCM 8bits";
+      }
+      return (const char *)"Unknown codec";
 }
 
 //---------------------------------------

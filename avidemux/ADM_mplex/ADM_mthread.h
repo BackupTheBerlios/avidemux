@@ -20,8 +20,7 @@
 #ifndef ADM_MTHREADS_H
 #define ADM_MTHREADS_H
 typedef  void * (*THRINP)(void *p);
-
-#include "ADM_toolkit/ADM_packetQueue.h"
+#include "ADM_toolkit/ADM_threads.h"
 extern admMutex accessMutex;
 
 typedef struct muxerMT
@@ -45,16 +44,5 @@ typedef struct muxerMT
 extern int defaultAudioSlave( muxerMT *context );
 extern int defaultVideoSlave( muxerMT *context );
 
-typedef struct audioQueueMT
-{
-  PacketQueue               *packetQueue;
-  AVDMGenericAudioStream    *audioEncoder;
-  uint32_t                  audioTargetSample;
-  volatile uint32_t                  audioDone;
-  uint32_t                  feedAudio;
-  volatile uint32_t                  audioAbort;
-};
-
-extern int defaultAudioQueueSlave( audioQueueMT *context );
 
 #endif

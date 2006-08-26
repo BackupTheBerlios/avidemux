@@ -22,6 +22,7 @@
  #include "ADM_dialog/DIA_encoding.h"
  #include "ADM_library/ADM_image.h"
  #include "ADM_library/ADM_fileio.h"
+#include "ADM_toolkit/ADM_audioQueue.h"
 
  class GenericAviSave
  {
@@ -53,9 +54,12 @@
 		uint32_t		_audioInBuffer;
                 uint32_t		_videoFlag;
 		uint32_t  	 	_lastIPFrameSent;
+                PacketQueue             *_pq;
+                audioQueueMT            _context;
+                uint8_t                 cleanupAudio();
 
-               			virtual uint8_t setupAudio( void);
-		                virtual uint8_t setupVideo( char *name )=0;
+                    virtual uint8_t setupAudio( void);
+                    virtual uint8_t setupVideo( char *name )=0;
                     virtual uint8_t writeAudioChunk(uint32_t  f);
                     virtual uint8_t writeVideoChunk(uint32_t frame )=0;
                     virtual void guiStart(void);

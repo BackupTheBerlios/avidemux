@@ -218,6 +218,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
 //
 GenericAviSaveProcess::~GenericAviSaveProcess ()
 {
+  cleanupAudio();
   if (_encode)
     delete      _encode;
   	_encode=NULL;

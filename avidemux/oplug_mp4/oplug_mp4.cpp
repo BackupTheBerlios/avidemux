@@ -59,6 +59,7 @@ extern "C" {
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 #include "ADM_mplex/ADM_mthread.h"
+#include "ADM_toolkit/ADM_audioQueue.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_MP4

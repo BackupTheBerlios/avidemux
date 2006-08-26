@@ -132,57 +132,5 @@ int defaultVideoSlave( muxerMT *context )
   printf("[VideoThread] Exiting\n");
   return 1;
 }
-/*
-      Slave thread that will put data in the packetQueue
-*/
-int defaultAudioQueueSlave( audioQueueMT *context )
-{
-#define QBUFFER 4096*4
-  uint32_t total_sample=0;
-  uint32_t samples,audioLen;
-  PacketQueue *queue=context->packetQueue;
-  AVDMGenericAudioStream *audioEncoder=context->audioEncoder;
-  
-  ADM_assert(queue);
-  ADM_assert(audioEncoder);
-  
-  uint8_t buffer[QBUFFER];
-  
-  printf("[AudioQueueThread] Starting\n");
-  while(audioEncoder->getPacket(buffer, &audioLen, &samples) && total_sample<context->audioTargetSample)
-  {
-    ADM_assert(samples<= QBUFFER);
-    total_sample+=samples;
-    //printf("Audio %u\n",samples);
-    accessMutex.lock();
-    if(context->audioAbort)
-    {
-      context->audioDone=1;
-      queue->Finished();
-      printf("[AudioQueueThread] Aborting\n");
-      printf("[AudioThread] Target %u, got %u, %f %%\n",context->audioTargetSample,total_sample,
-             (float)total_sample/(float)context->audioTargetSample);
-      accessMutex.unlock();
-      return 1;
-    }
-    accessMutex.unlock();
-    if(audioLen) 
-    {
-      queue->Push(buffer,audioLen,samples); 
-    }
-    accessMutex.lock();
-    context->feedAudio+=audioLen;
-    accessMutex.unlock();
-  }
-  accessMutex.lock();
-  // Let's say audio is always ok, shall we :)
-  context->audioDone=1;
-  queue->Finished();
-  accessMutex.unlock();
-  printf("[AudioQueueThread] Exiting\n");
-  printf("[AudioThread] Target %u, got %u, %f %%\n",context->audioTargetSample,total_sample,
-         (float)total_sample/(float)context->audioTargetSample);
-  return 1;
-}
 //EOF
 

@@ -121,6 +121,7 @@ int value=4;;
 //
 GenericAviSaveSmart::~GenericAviSaveSmart ()
 {
+  cleanupAudio();
   if (encoderReady && _encoder)
     {
       _encoder->stopEncoder ();

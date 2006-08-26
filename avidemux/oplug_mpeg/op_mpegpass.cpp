@@ -52,6 +52,7 @@
 #include "ADM_encoder/adm_encCopy.h"
 
 #include "ADM_mplex/ADM_mthread.h"
+#include "ADM_toolkit/ADM_audioQueue.h"
 
 static uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position);
 uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,  uint32_t *offset);
