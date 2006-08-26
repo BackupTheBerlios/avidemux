@@ -112,6 +112,7 @@ void A_externalAudioTrack( void );
 void HandleAction (Action action);
 uint8_t A_rebuildKeyFrame (void);
 extern int GUI_handleFilter (void);
+extern int GUI_handleVFilter (void);
 extern void filterCleanUp (void);
 int A_audioSave(char *name);
 static void ReSync (void);
@@ -928,7 +929,7 @@ case ACT_Pipe2Other:
                 
 	        editorKillPreview ();
         }
-      GUI_handleFilter ();
+      GUI_handleVFilter();
       if( getLastVideoFilter()->getInfo()->width % 8 ){
         GUI_Error_HIG(_("Width is not a multiple of 8"),
                       _("This will make trouble for avi files."));
