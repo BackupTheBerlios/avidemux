@@ -58,6 +58,7 @@ extern "C" {
 
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
+#include "ADM_mplex/ADM_mthread.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
 #define MODULE_NAME MODULE_MP4
@@ -116,6 +117,10 @@ ADM_MUXER_TYPE muxerType=MUXER_MP4;
 uint8_t dualPass=0;
 uint8_t r=0;
 uint32_t skipping=1;
+pthread_t     audioThread;
+audioQueueMT context;
+PacketQueue   pq("MP4 audioQ",50,2*1024*1024);
+
            if(type==ADM_PSP)
                muxerType=MUXER_PSP;
            else
@@ -260,7 +265,7 @@ preFilling:
                 &info,videoExtraDataSize,videoExtraData,
                 audioinfo,extraDataSize,extraData))
                          goto stopit;
-           //_____________ Loop _____________________
+//_____________ Loop _____________________
           
           encoding_gui->setContainer("MP4");
           if(audio)
@@ -275,20 +280,28 @@ preFilling:
             muxer->writeVideoPacket( &bitstream);
             frameWrite++;
           }
-
-           
-
+//_____________ Start Audio thread _____________________          
+          
+          memset(&context,0,sizeof(context));
+          context.audioEncoder=audio;
+          context.audioTargetSample=0xFFFF0000; ; //FIXME
+          context.packetQueue=&pq;
+           // start audio thread
+          ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)defaultAudioQueueSlave,&context)); 
+          ADM_usleep(4000);
            for(int frame=1;frame<total;frame++)
            {
-                while(muxer->needAudio())
+               while(muxer->needAudio())
                {
-                     if(!audio->getPacket(audioBuffer,&alen,&sample)) break;
+                    if(pq.Pop(audioBuffer,&alen,&sample))
+                    {
                      if(alen)
                      {
                         muxer->writeAudioPacket(alen,audioBuffer,sample_got);
                         encoding_gui->feedAudioFrame(alen);
                         sample_got+=sample;
                      }
+                    }else break;
                }
                ADM_assert(_encode);
                bitstream.cleanup(frameWrite);
