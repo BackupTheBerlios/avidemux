@@ -248,6 +248,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
   uint8_t *buffer = new uint8_t[avifileinfo->width * avifileinfo->height * 3];
   uint8_t *audiobuffer = new uint8_t[4*48000*2]; // 2 sec worth of lpcm
   uint32_t position;
+  EncoderCopy *copy=NULL;
         bitstream.data=buffer;
         
      /***************************
@@ -256,7 +257,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
         if(mux==MUXER_VCD || mux==MUXER_SVCD || mux==MUXER_DVD)
         {
           pthread_t audioThread,videoThread,muxerThread;
-          EncoderCopy *copy=new EncoderCopy(NULL);
+          copy=new EncoderCopy(NULL);
           muxerMT context;
           
           copy->configure(NULL);
@@ -305,10 +306,77 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
     
     
         }
-        
-        ADM_assert(0);
+        /**************************************************************************************/
+        /* If we get here, it means output is MPEG_TS */ 
+        /* We must use the audio packet Queue */
+        /**************************************************************************************/
+        ADM_assert(mux==MUXER_TS);
+        {
+            PacketQueue *pq;
+            uint32_t mx,sample;
+            pthread_t     audioThread;
+            copy=new EncoderCopy(NULL);
+            audioQueueMT context;
+            uint8_t r;
+            
+            copy->configure(NULL);
+            pq=new PacketQueue("TS audioQ",50,2*1024*1024);
+            memset(&context,0,sizeof(context));
+            context.audioEncoder=audio;
+            context.audioTargetSample=target_sample;
+            context.packetQueue=pq;
+              // start audio thread
+            ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)defaultAudioQueueSlave,&context));
+            // Go!
+             
+            ADM_usleep(4000);
+            mx=copy->getNbFrame();
+            printf("Writing %u frames\n",mx);
+            for(int frame=0;frame<mx;frame++)
+            {
+              while(muxer->needAudio())
+              {
+                if(pq->Pop(audiobuffer,&audiolen,&sample))
+                {
+                  if(audiolen)
+                  {
+                    muxer->writeAudioPacket(audiolen,audiobuffer);
+                    work->feedAudioFrame(audiolen);
+                  }
+                }else break;
+              }
+              ADM_assert(copy);
+              bitstream.cleanup(frame);
+              r=copy->encode ( frame, &bitstream);
+              if(!r)
+              {
+                printf("TS:Frame %u error\n",frame);
+                GUI_Error_HIG (_("Error while encoding"), NULL);
+                goto  stopit;
+              }
+              muxer->writeVideoPacket( &bitstream);
 
+              work->setFrame(frame,mx);
+              work->feedFrame(bitstream.len);
+              if(!work->isAlive())
+              {
+                goto stopit;
+              }
+            }
+        
     ret=1;
+stopit:
+    context.audioAbort=1;
+    pq->Abort();
+    // Wait for audio slave to be over
+    while(!context.audioDone)
+    {
+      printf("Waiting Audio thread\n");
+      ADM_usleep(500000); 
+    }
+    delete pq;
+  } // End ts case 
+  /************************************** TS End *********************************/
 _abt:
   delete work;
   muxer->close();
@@ -316,6 +384,7 @@ _abt:
   delete [] buffer;
   delete [] audiobuffer;
   deleteAudioFilter(audio);
+  if(copy) delete copy;
   return ret;
 
 }
