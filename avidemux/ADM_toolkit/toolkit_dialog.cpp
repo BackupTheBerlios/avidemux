@@ -75,6 +75,9 @@ void gtk_register_dialog(GtkWidget *newdialog)
                 gtk_window_set_transient_for (GTK_WINDOW(newdialog),GTK_WINDOW(widgetStack[widgetCount-1]));
         }
         gtk_window_set_modal(GTK_WINDOW(widgetStack[widgetCount]), 1);
+#ifdef CYG_MANGLING
+        gtk_window_set_icon(GTK_WINDOW(widgetStack[widgetCount]), gtk_window_get_icon (GTK_WINDOW(widgetStack[0])));
+#endif
         widgetCount++;
 }
 void gtk_unregister_dialog(GtkWidget *newdialog)
