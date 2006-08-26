@@ -61,33 +61,6 @@ static int copyVideoSlave( muxerMT *context );
 	Usefull for editing PVR captured files for example
 
 */
-#define PACK_AUDIO(x) \
-{ \
-	uint32_t samples; \
-	uint32_t fill=0; \
-        if(total_got<target_sample) \
-	while(muxer->needAudio()) \
-	{	\
-                if(x)   \
-                    if(total_got>target_sample) break; \
-		if(!audio->getPacket(audiobuffer, &audiolen, &samples))	\
-		{ \
-			printf("passthrough:Could not get audio\n"); \
-			audiolen=0; \
-		}\
-		if(audiolen) {\
-			muxer->writeAudioPacket(audiolen,audiobuffer); \
-                        work->feedAudioFrame(audiolen);\
-                        }else \
-                { \
-                    printf("[MPEG Audio] Read failed current %u max %u \n",total_got,target_sample); \
-                    total_got=target_sample; \
-                    muxer->audioEof(); \
-                    break; \
-                }\
-		total_got+=samples; \
-	} \
-  }
 
 uint8_t isMpeg12Compatible(uint32_t fourcc);
 extern const char *getStrFromAudioCodec( uint32_t codec); 
