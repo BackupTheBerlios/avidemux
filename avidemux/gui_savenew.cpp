@@ -24,7 +24,8 @@
 
 #include <time.h>
 #include <sys/time.h>
-
+#include <pthread.h>
+#define WIN32_CLASH
 #include "avi_vars.h"
 
 

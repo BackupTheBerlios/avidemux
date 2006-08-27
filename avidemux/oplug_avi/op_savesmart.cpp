@@ -23,7 +23,8 @@
 
 #include <time.h>
 #include <sys/time.h>
-
+#include <pthread.h>
+#define WIN32_CLASH
 #ifdef USE_FFMPEG
 extern "C" {
 	#include "ADM_lavcodec.h"
