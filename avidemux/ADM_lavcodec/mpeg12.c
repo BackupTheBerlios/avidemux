@@ -301,7 +301,12 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
                 put_bits(&s->pb,4,3); //16:9
             }
             else        //4:3
+            {
+              if(s->codec_id == CODEC_ID_MPEG2VIDEO)
                 put_bits(&s->pb, 4, 2);
+              else
+                put_bits(&s->pb, 4, 12); // MPEG1
+            }
   //MEANX PULLDOWN put_bits(&s->pb, 4, s->frame_rate_index);
  if((s->flags2 & CODEC_FLAG2_32_PULLDOWN) && (s->codec_id == CODEC_ID_MPEG2VIDEO))
             {           
