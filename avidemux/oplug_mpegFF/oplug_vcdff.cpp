@@ -364,6 +364,11 @@ switch(mux)
 					}
 					encoding->feedFrame(bitstream.len);
 					encoding->setQuant(bitstream.out_quantizer);
+                                        if(!encoding->isAlive())
+                                        {
+#warning FIXME                                          
+                                       //FIXME   goto finishvcdff;
+                                        }
 				}
 			}
 				encoder->startPass2();
@@ -408,7 +413,30 @@ switch(mux)
            while(1)
            {
              accessMutex.lock();
-             if(context.audioDone==2 || context.videoDone==2) //ERROR
+             if(!encoding->isAlive())
+             {
+               context.audioAbort=1;
+               context.videoAbort=1;
+               printf("[mpegFF]Waiting for slaves\n");
+               accessMutex.unlock();
+               while(1)
+               {
+                 accessMutex.lock();
+                 if(context.audioDone && context.videoDone)
+                 {
+                   printf("[mpegFF]Both audio & video done\n");
+                   if(context.audioDone==1 && context.videoDone==1) ret=1;
+                   else ret=0;
+                   accessMutex.unlock();
+                   goto finishvcdff;
+                 }
+                 accessMutex.unlock();
+                 ADM_usleep(50000);
+ 
+               }
+               
+             }
+             if(context.audioDone==2 || context.videoDone==2 ) //ERROR
              {
                context.audioAbort=1;
                context.videoAbort=1;
@@ -493,7 +521,6 @@ switch(mux)
 finishvcdff:
                         printf("[MPEGFF] Finishing..\n");
 			delete encoding;
-//			GUI_Info_HIG("Done", "Successfully saved \"%s\".", GetFileName(name));
 		 	end();
 			if(file)
 			{
@@ -501,10 +528,13 @@ finishvcdff:
 				file=NULL;
 			}
 			else
-			{
+			{  
+                            if(muxer)
+                            {
 				muxer->close();
 				delete muxer;
 				muxer=NULL;
+                            }
 			}
 			delete encoder;
 			return ret;

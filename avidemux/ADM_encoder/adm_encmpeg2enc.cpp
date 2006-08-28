@@ -247,19 +247,20 @@ uint8_t     EncoderMpeg2enc::configure (AVDMGenericVideoStream * instream)
   {
     case COMPRESS_CQ:
           qz=_param.qz;
-          br=_settings.maxBitrate;
+          br=8*_settings.maxBitrate;
           _state = enc_CQ;
       break;
     case COMPRESS_CBR:
           qz=0;
-          br=_param.bitrate;
+          br=8*_param.bitrate;
           _state = enc_CBR;
           break;
     case COMPRESS_2PASS:
     case COMPRESS_2PASS_BITRATE:
           qz=2;
-          br=_settings.maxBitrate;
+          br=0;
           _state = enc_Pass1;
+          _xrc = new ADM_newXvidRcVBV (_fps1000, _logname);
           break;
   }
   switch(_id)
@@ -364,17 +365,19 @@ uint8_t    EncoderMpeg2enc::startPass2 (void)
 
   if(_param.mode==COMPRESS_2PASS)
   {
-    br=ADM_computeBitrate( _fps1000,_totalframe,_param.finalsize);
+    br=8*ADM_computeBitrate( _fps1000,_totalframe,_param.finalsize);
     size=_param.finalsize;
     printf("[Mpeg2enc] Final Size: %u MB, avg bitrate %u kb/s \n",size,br/1000);
   }else if(_param.mode==COMPRESS_2PASS_BITRATE)
   {
     double d;
+    br=_param.avg_bitrate;
     d=_totalframe;
     d/=_fps1000;
     d*=_param.avg_bitrate*1000;
     d/=(8*1024*1024);
     size=(uint32_t )d;
+    br*=8;
     printf("[Mpeg2enc]  Final Size: %u MB 2pass avg bitrate %u kb/s\n",size,br/1000);
     
   }else ADM_assert(0);

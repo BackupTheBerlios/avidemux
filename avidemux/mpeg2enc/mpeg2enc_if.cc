@@ -275,6 +275,8 @@ int mpegenc_encode(  char *in,   char *out, int *size,int *flags,int *quant)
 }
 int mpegenc_end(void)
 {
+  uint8_t out[20]; // Temporary buffer to store SEQ_END_CODE
+         mpeg2enc_buffer=(unsigned char *)out;
 	 putseq_end();
 	 mpeg_cleanup(  );
 	 mpeg_freebuffers();
