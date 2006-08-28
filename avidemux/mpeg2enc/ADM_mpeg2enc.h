@@ -18,7 +18,7 @@
  *                                                                         *
  ***************************************************************************/
 #ifndef ADM_MPEGENC
-
+#define ADM_MPEGENC
 #include "mpeg2parm.h"
 #include "ADM_mpeg2Param.h"
 

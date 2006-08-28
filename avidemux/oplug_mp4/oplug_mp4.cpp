@@ -282,15 +282,18 @@ preFilling:
             muxer->writeVideoPacket( &bitstream);
             frameWrite++;
           }
-//_____________ Start Audio thread _____________________          
-          pq=new PacketQueue("MP4 audioQ",50,2*1024*1024);
-          memset(&context,0,sizeof(context));
-          context.audioEncoder=audio;
-          context.audioTargetSample=0xFFFF0000; ; //FIXME
-          context.packetQueue=pq;
-           // start audio thread
-          ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)defaultAudioQueueSlave,&context)); 
-          ADM_usleep(4000);
+//_____________ Start Audio thread _____________________
+          if(audio)
+          {          
+            pq=new PacketQueue("MP4 audioQ",50,2*1024*1024);
+            memset(&context,0,sizeof(context));
+            context.audioEncoder=audio;
+            context.audioTargetSample=0xFFFF0000; ; //FIXME
+            context.packetQueue=pq;
+            // start audio thread
+            ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)defaultAudioQueueSlave,&context)); 
+            ADM_usleep(4000);
+          }
 //_____________GO !___________________
            for(int frame=1;frame<total;frame++)
            {
@@ -345,15 +348,18 @@ preFilling:
            
 stopit:
     // Flush slave Q
-    context.audioAbort=1;
-    pq->Abort();
-    // Wait for audio slave to be over
-    while(!context.audioDone)
+    if(audio)
     {
-      printf("Waiting Audio thread\n");
-      ADM_usleep(500000); 
+        context.audioAbort=1;
+        pq->Abort();
+        // Wait for audio slave to be over
+        while(!context.audioDone)
+        {
+          printf("Waiting Audio thread\n");
+          ADM_usleep(500000); 
+        }
+        delete pq;
     }
-          delete pq;
     //
            if(muxer) muxer->close();
            if(encoding_gui) delete encoding_gui;

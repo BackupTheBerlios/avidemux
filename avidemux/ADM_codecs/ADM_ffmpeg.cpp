@@ -227,6 +227,7 @@ ffmpegEncoder::gopMpeg1 (void)
     {
       if (_settings.widescreen)
 	{
+          printf("WideScreen\n");
 	  _context->sample_aspect_ratio.num = 16;
 	  _context->sample_aspect_ratio.den = 9;
 	}

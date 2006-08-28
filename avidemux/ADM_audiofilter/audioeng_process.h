@@ -47,10 +47,9 @@ class AUDMAudioFilter
   protected:
     //! This will be used to store data coming from the previous filter
     float           _incomingBuffer[AUD_PROCESS_BUFFER_SIZE]; 
-    
-    
     //! Pointer to read/write indeces in the _incomingBuffer
-    uint32_t        _head,_tail;    
+    uint32_t        _head;
+    uint32_t        _tail;
 
     //! Describe the output wav format, _wavHeader->byterate holds the size in # of float (NOT SAMPLE)
     WAVHeader       _wavHeader;
@@ -61,7 +60,8 @@ class AUDMAudioFilter
     //! Fill up the incoming buffer, it is called to pull data from the previous filter
     //! \param status Status of the fill operation
     virtual uint8_t fillIncomingBuffer(AUD_Status *status);
-
+    //! length in float
+    uint32_t        _length; 
   public:
 /** Constructor
     \param previous : Pointer to previous in chain filter 
@@ -84,6 +84,7 @@ class AUDMAudioFilter
         virtual    WAVHeader  *getInfo(void);
         
 //! Rewind the stream to the beginning. Used mainly by the normalize filter 
-        virtual    uint8_t    rewind(void)  ;                                      
+        virtual   uint8_t    rewind(void)  ;
+                  uint32_t   getLength(void) {return _length;};
 };
 #endif

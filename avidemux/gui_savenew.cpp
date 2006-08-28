@@ -207,22 +207,8 @@ int ret=0;
                                                   default:
                                                     GUI_Error_HIG(_("Incompatible output format"), NULL);
                                                 }
-					}
-					else
-					{
-						switch(UI_GetCurrentFormat())
-						{
-							case ADM_PS:
-							case ADM_ES:
-                                                        case ADM_TS:
-								ret=EncoderSaveMpeg(name);
-								break;
-							default:
-                                                          GUI_Error_HIG(_("Incompatible output format"), NULL);
-						}
-					
-					}
-					break;
+                                                break;
+                                        } // THERE IS NO BREAK HERE, NOT A MISTAKE!
 		case CodecFamilyXVCD:
                     switch(UI_GetCurrentFormat())
                     {

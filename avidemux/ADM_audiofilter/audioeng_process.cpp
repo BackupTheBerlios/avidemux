@@ -36,7 +36,10 @@ AUDMAudioFilter::AUDMAudioFilter(AUDMAudioFilter *previous)
 {
   _previous=previous;
   if(_previous)
+  {
       memcpy(&_wavHeader,_previous->getInfo(),sizeof(_wavHeader));
+      _length=previous->getLength();
+  }
   _head=_tail=0; 
 }
 AUDMAudioFilter::~AUDMAudioFilter()

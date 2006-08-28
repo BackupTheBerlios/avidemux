@@ -84,6 +84,7 @@ uint32_t AUDMAudioFilterSox::fill(uint32_t max,float *output,AUD_Status *status)
     
     while(1)
     {
+      ADM_assert(_tail>=_head);
       nb_in=(_tail-_head)/(_wavHeader.channels); // Nb Sample
       if(nb_in*_wavHeader.channels>onechunk) nb_in=onechunk/_wavHeader.channels;
       

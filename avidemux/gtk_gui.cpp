@@ -67,7 +67,6 @@
 #include "gtkgui.h"
 //#include "ADM_gui/GUI_vars.h"
 #include "oplug_avi/GUI_mux.h"
-#include "oplug_mpeg/op_mpeg.h"
 #include "oplug_mpegFF/oplug_vcdff.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
@@ -157,7 +156,6 @@ extern uint8_t DIA_RecentFiles( char **name );
 extern uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format );
 static void A_videoCheck( void);
 extern uint8_t parseScript(char *scriptname);
-int A_saveDVDPS(char *name);
 static void	A_setPostproc( void );
 extern uint8_t ogmSave(const char  *name);
 //
@@ -531,9 +529,6 @@ int nw;
 			break;
 #endif
 			
-    case ACT_SaveDVDPS:
-    			A_saveDVDPS(NULL);
-    			break;
     case ACT_SaveOGM:
                         GUI_FileSelWrite (_("Select OGM file to write"), (SELFILE_CB *)ogmSave);
     			break;
@@ -2194,36 +2189,6 @@ int A_audioSave(char *name)
 	    {
 	       A_saveAudio(name);
 	    }
-	return 1;
-}
-//_____________________________
-int A_saveDVDPS(char *name)
-{
-// if we are in process mode
-			if(videoProcessMode())
-			{
-    				oplug_mpeg_dvd_ps(name);
-			}
-			else // copy mode
-			{
-			// do some sanitu check first
-				uint32_t fatal;
-				uint32_t end;
-				end=frameEnd;
-				if(end==avifileinfo->nb_frames-1) end++;
-				video_body->sanityCheckRef(frameStart,end,&fatal);
-				if(fatal)
-				{
-                                  GUI_Error_HIG(_("Cannot save the file"), _("There is a lonely B-frame at start/end. Please remove it."));
-					return 0;
-				}
-				printf("Using pass through\n");
-				if(!name)
-                                  GUI_FileSelWrite (_("Select Mpeg file..."), (SELFILE_CB *)A_pass);
-				else
-					mpeg_passthrough(name,ADM_PS);
-			}
-
 	return 1;
 }
 uint8_t A_pass(char *name)

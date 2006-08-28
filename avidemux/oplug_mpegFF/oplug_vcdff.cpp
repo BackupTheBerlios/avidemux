@@ -49,6 +49,7 @@ extern "C" {
 
 #include "ADM_codecs/ADM_ffmpeg.h"
 #include "ADM_encoder/adm_encffmpeg.h"
+#include "ADM_encoder/adm_encmpeg2enc.h"
 #include "oplug_mpegFF/oplug_vcdff.h"
 
 #include "ADM_dialog/DIA_encoding.h"
@@ -72,7 +73,7 @@ extern const char *getStrFromAudioCodec( uint32_t codec);
 
 extern COMPRES_PARAMS ffmpeg1Codec,ffmpeg2DVDCodec,ffmpeg2SVCDCodec;	
 extern FFcodecSetting ffmpeg1Extra,ffmpeg2DVDExtra,ffmpeg2SVCDExtra;
-
+extern COMPRES_PARAMS SVCDCodec, DVDCodec,VCDCodec;
 
 
 uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
@@ -101,7 +102,8 @@ void oplug_mpegff_conf( void )
 uint8_t oplug_mpegff(const char *name, ADM_OUT_FORMAT type)
 {
 AVDMGenericVideoStream *_incoming;
-EncoderFFMPEGMpeg1  *encoder;
+//EncoderFFMPEGMpeg1  *encoder;
+Encoder  *encoder;
 
 ADMMpegMuxer	*muxer=NULL;
 FILE 		*file=NULL;
@@ -181,7 +183,7 @@ ADMBitstream bitstream;
                 // Check
                 WAVHeader *hdr=audio->getInfo();	
                 audio_encoding=hdr->encoding;
-                if(current_codec==CodecXVCD)
+                if(current_codec==CodecXVCD ||current_codec==CodecVCD)
                 {
                         if(hdr->frequency!=44100 ||  hdr->encoding != WAV_MP2)
                         {
@@ -262,18 +264,31 @@ ADMBitstream bitstream;
 	switch(current_codec)
 	{
 		
-		case CodecXVCD:
-			encoder=new EncoderFFMPEGMpeg1(FF_MPEG1,&ffmpeg1Codec);
-			printf("\n Using ffmpeg mpeg1 encoder\n");
-			break;
-		case CodecXSVCD:
-			encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpeg2SVCDCodec);
-			printf("\n Using ffmpeg mpeg2 encoder\n");
-			break;
-		case CodecXDVD:
-			encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpeg2DVDCodec);
-			printf("\n Using ffmpeg mpeg2 encoder (DVD)\n");
-			break;
+                case CodecXVCD:
+                        encoder=new EncoderFFMPEGMpeg1(FF_MPEG1,&ffmpeg1Codec);
+                        printf("\n Using ffmpeg mpeg1 encoder\n");
+                        break;
+                case CodecXSVCD:
+                        encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpeg2SVCDCodec);
+                        printf("\n Using ffmpeg mpeg2 encoder\n");
+                        break;
+                case CodecXDVD:
+                        encoder=new EncoderFFMPEGMpeg1(FF_MPEG2,&ffmpeg2DVDCodec);
+                        printf("\n Using ffmpeg mpeg2 encoder (DVD)\n");
+                        break;
+                case CodecDVD:
+                  encoder=new EncoderMpeg2enc(MPEG2ENC_DVD,&DVDCodec);
+                  printf("\n Using mpeg2enc encoder (DVD)\n");
+                  break;
+                case CodecSVCD:
+                  encoder=new EncoderMpeg2enc(MPEG2ENC_SVCD,&SVCDCodec);
+                  printf("\n Using mpeg2enc encoder (SVCD)\n");
+                  break;
+                case CodecVCD:
+                  encoder=new EncoderMpeg2enc(MPEG2ENC_VCD,&VCDCodec);
+                  printf("\n Using mpeg2enc encoder (VCD)\n");
+                  break;
+                        
 		
 		default:
 		ADM_assert(0);
@@ -509,6 +524,28 @@ void end (void)
 	
 	twoPass=twoFake=NULL;
 	
+}
+AVDMGenericAudioStream *mpt_getAudioStream (void)
+{
+  AVDMGenericAudioStream *audio = NULL;
+  if (audioProcessMode ())	// else Raw copy mode
+  {
+    if (currentaudiostream->isCompressed ())
+    {
+      if (!currentaudiostream->isDecompressable ())
+      {
+        return NULL;
+      }
+    }
+    audio =  buildAudioFilter (currentaudiostream,  video_body->getTime (frameStart));
+  }
+  else				// copymode
+  {
+      // else prepare the incoming raw stream
+      // audio copy mode here
+    audio = buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
+  }
+  return audio;
 }
 /*
 typedef struct muxerMT

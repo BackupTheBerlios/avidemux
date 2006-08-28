@@ -90,7 +90,7 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
     DolbySkip(1);
     printf("\n Seeking for maximum value, that can take a while\n");
 
-      llength=currentaudiostream->getLength()  / _wavHeader.byterate * _wavHeader.frequency * _wavHeader.channels;
+    llength=_length ;
     
       DIA_working *windowWorking=new DIA_working(_("Normalize : Scanning"));
 
@@ -127,9 +127,12 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
             delete windowWorking;
             windowWorking=new DIA_working(_("Normalize : Scanning"));
           }
-	  scanned+=ready;
-	  if(scanned<llength)
+          scanned+=ready;
+          if(scanned<llength)
+          {
             windowWorking->update(scanned,llength);
+          //  printf("%u / %u\n",scanned,llength);
+          }
       }
     delete windowWorking;
 

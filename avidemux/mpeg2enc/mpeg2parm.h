@@ -4,7 +4,8 @@
 
 
 */
-
+#ifndef MPEG2PARAM_H
+#define MPEG2PARAM_H
 class mpeg2parm
 {
 public:
@@ -64,4 +65,4 @@ public:
  /* /MEANX */
 
 };
-
+#endif

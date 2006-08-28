@@ -46,6 +46,19 @@ AUDMAudioFilter_Bridge::AUDMAudioFilter_Bridge(AUDMAudioFilter *previous,AVDMGen
   _shift=shiftMs;
   _hold=0;
   rewind();
+  /*  */
+  WAVHeader *hdr=incoming->getInfo();
+  double duration;
+  duration=incoming->getLength();
+  if(hdr->byterate)
+  {
+      duration/=hdr->byterate;
+      duration*=hdr->frequency*hdr->channels;
+      _length=(uint32_t)floor(duration);
+  }else
+    _length=0xFFFF0000;
+  
+  /*  */
   printf("[Bridge] Starting with time %u, shift %d\n",startInMs,-shiftMs);
   // If shiftMS is > 0, it means we have to go in the future, just increse _startTime
   if(shiftMs>0)
