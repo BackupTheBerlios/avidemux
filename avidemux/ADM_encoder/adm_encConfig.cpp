@@ -37,7 +37,6 @@
 #include "ADM_toolkit/ADM_debug.h"
 
 #include "ADM_dialog/DIA_enter.h"
-#include "oplug_mpeg/op_mpeg.h"
 #include "ADM_gui2/GUI_ui.h"
 
 
@@ -173,6 +172,7 @@ videoProcessMode (void)
     return 0;
   return 1;
 }
+#if 0
 uint8_t
 EncoderSaveMpeg (const char *name)
 {
@@ -234,7 +234,7 @@ EncoderSaveMpeg (const char *name)
     }
   return ret;
 }
-
+#endif
 /*
 	Ultimately that will be dispatched on a per codec
 	stuff and will be merged with xml stuff to allow
@@ -905,6 +905,72 @@ videoCodecSetConf (char *name, uint32_t extraLen, uint8_t * extraData)
 
 }
 
-
+uint8_t oplug_mpegInit(void)
+{
+		// Init from prefs
+		// SVCD
+  prefs->get( CODECS_SVCD_ENCTYPE,    (unsigned int*)&SVCDCodec.mode);
+  prefs->get( CODECS_SVCD_BITRATE,    &SVCDCodec.bitrate);
+  prefs->get( CODECS_SVCD_QUANTIZER,  &SVCDCodec.qz);
+  prefs->get( CODECS_SVCD_FINALSIZE,  &SVCDCodec.finalsize);
+		
+  prefs->get( CODECS_SVCD_INTERLACED, &SVCDExtra.interlaced);
+  prefs->get( CODECS_SVCD_BFF,        &SVCDExtra.bff);
+  prefs->get( CODECS_SVCD_WIDESCREEN, &SVCDExtra.widescreen);
+  prefs->get( CODECS_SVCD_MATRIX,     &SVCDExtra.user_matrix);
+  prefs->get( CODECS_SVCD_GOPSIZE,    &SVCDExtra.gop_size);
+  prefs->get( CODECS_SVCD_MAXBITRATE, &SVCDExtra.maxBitrate);
+  SVCDExtra.maxBitrate = (SVCDExtra.maxBitrate*1000) >> 3;
+		//DVD
+  prefs->get( CODECS_DVD_ENCTYPE,    (unsigned int*)&SVCDCodec.mode);
+  prefs->get( CODECS_DVD_BITRATE,    &DVDCodec.bitrate);
+  prefs->get( CODECS_DVD_QUANTIZER,  &DVDCodec.qz);
+  prefs->get( CODECS_DVD_FINALSIZE,  &DVDCodec.finalsize);
+		                                    
+  prefs->get( CODECS_DVD_INTERLACED, &DVDExtra.interlaced);
+  prefs->get( CODECS_DVD_BFF,        &DVDExtra.bff);
+  prefs->get( CODECS_DVD_WIDESCREEN, &DVDExtra.widescreen);
+  prefs->get( CODECS_DVD_MATRIX,     &DVDExtra.user_matrix);
+  prefs->get( CODECS_DVD_GOPSIZE,    &DVDExtra.gop_size);
+  prefs->get( CODECS_DVD_MAXBITRATE, &DVDExtra.maxBitrate);
+  DVDExtra.maxBitrate = (DVDExtra.maxBitrate*1000) >> 3;
+  return 1;
+}
+uint8_t oplug_mpegStore(void)
+{
+  uint32_t br;
+		// Init from prefs
+		// SVCD
+  prefs->set( CODECS_SVCD_ENCTYPE,    (unsigned int)SVCDCodec.mode);
+  prefs->set( CODECS_SVCD_BITRATE,     SVCDCodec.bitrate);
+  prefs->set( CODECS_SVCD_QUANTIZER,   SVCDCodec.qz);
+  prefs->set( CODECS_SVCD_FINALSIZE,   SVCDCodec.finalsize);
+		                                   
+  prefs->set( CODECS_SVCD_INTERLACED,  SVCDExtra.interlaced);
+  prefs->set( CODECS_SVCD_BFF,         SVCDExtra.bff);
+  prefs->set( CODECS_SVCD_WIDESCREEN,  SVCDExtra.widescreen);
+  prefs->set( CODECS_SVCD_MATRIX,      SVCDExtra.user_matrix);
+  prefs->set( CODECS_SVCD_GOPSIZE,     SVCDExtra.gop_size);
+		
+  br=(SVCDExtra.maxBitrate<< 3)/1000;;
+  prefs->set( CODECS_SVCD_MAXBITRATE,  br);
+		
+		
+		//DVD
+  prefs->set( CODECS_DVD_ENCTYPE,    (unsigned int)DVDCodec.mode);
+  prefs->set( CODECS_DVD_BITRATE,     DVDCodec.bitrate);
+  prefs->set( CODECS_DVD_QUANTIZER,   DVDCodec.qz);
+  prefs->set( CODECS_DVD_FINALSIZE,   DVDCodec.finalsize);
+		                                  
+  prefs->set( CODECS_DVD_INTERLACED,  DVDExtra.interlaced);
+  prefs->set( CODECS_DVD_BFF,         DVDExtra.bff);
+  prefs->set( CODECS_DVD_WIDESCREEN,  DVDExtra.widescreen);
+  prefs->set( CODECS_DVD_MATRIX,      DVDExtra.user_matrix);
+  prefs->set( CODECS_DVD_GOPSIZE,     DVDExtra.gop_size);
+		
+  br=(DVDExtra.maxBitrate<< 3)/1000;;
+  prefs->set( CODECS_DVD_MAXBITRATE,  br);
+  return 1;
+}
 
 // EOF

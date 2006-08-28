@@ -18,9 +18,10 @@ typedef struct audioQueueMT
   PacketQueue               *packetQueue;
   AVDMGenericAudioStream    *audioEncoder;
   uint32_t                  audioTargetSample;
-  volatile uint32_t                  audioDone;
+  volatile uint32_t         audioDone;
   uint32_t                  feedAudio;
-  volatile uint32_t                  audioAbort;
+  volatile uint32_t         audioAbort;
+  void                      *opaque;
 };
 
 extern int defaultAudioQueueSlave( audioQueueMT *context );

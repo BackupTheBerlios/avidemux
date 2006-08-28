@@ -40,7 +40,6 @@
 extern int A_openAvi (char *name);
 extern int A_Save (const char *name);
 extern int A_appendAvi (char *name);
-extern int A_saveDVDPS(char *name);
 extern uint8_t ogmSave(char *name);
 extern int GUI_GoToFrame(uint32_t frame);
 extern int filterLoadXml(char *docname,uint8_t silent);
@@ -74,8 +73,8 @@ JSFunctionSpec ADM_JSAvidemux::avidemux_methods[] =
 	{ "load", Load, 1, 0, 0 },	// Load movie
 	{ "loadFilters", LoadFilters, 1, 0, 0 },	// Load filters from file
 	{ "save", Save, 1, 0, 0 },	// Save movie
-	{ "saveDVD", SaveDVD, 1, 0, 0 },	// Save movie as DVD
-	{ "saveOGM", SaveOGM, 1, 0, 0 },	// Save movie as OGM
+/*	{ "saveDVD", SaveDVD, 1, 0, 0 },	// Save movie as DVD
+	{ "saveOGM", SaveOGM, 1, 0, 0 },	// Save movie as OGM*/
         { "clearSegments", ClearSegments ,0,0,0}, // Clear all segments
         { "addSegment", AddSegment ,3,0,0}, // Clear all segments
 	{ "goToTime", GoToTime, 3, 0, 0 },	// more current frame to time index
@@ -407,41 +406,6 @@ JSBool ADM_JSAvidemux::Save(JSContext *cx, JSObject *obj, uintN argc,
         return JS_TRUE;
 }// end Save
 
-JSBool ADM_JSAvidemux::SaveDVD(JSContext *cx, JSObject *obj, uintN argc, 
-                                       jsval *argv, jsval *rval)
-{// begin SaveDVD
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
-        // default return value
-        *rval = BOOLEAN_TO_JSVAL(false);
-        if(argc != 1)
-                return JS_FALSE;
-        if(JSVAL_IS_STRING(argv[0]) == false)
-                return JS_FALSE;
-        char *pTempStr = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-        printf("Saving as DVD \"%s\"\n",pTempStr);
-        enterLock();
-        *rval = BOOLEAN_TO_JSVAL(A_saveDVDPS(pTempStr));
-        leaveLock();
-        return JS_TRUE;
-}// end SaveDVD
-
-JSBool ADM_JSAvidemux::SaveOGM(JSContext *cx, JSObject *obj, uintN argc, 
-                                       jsval *argv, jsval *rval)
-{// begin SaveOGM
-        ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
-        // default return value
-        *rval = BOOLEAN_TO_JSVAL(false);
-        if(argc != 1)
-                return JS_FALSE;
-        if(JSVAL_IS_STRING(argv[0]) == false)
-                return JS_FALSE;
-        char *pTempStr = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-        printf("Saving as DVD \"%s\"\n",pTempStr);
-        enterLock();
-        *rval = BOOLEAN_TO_JSVAL(A_saveDVDPS(pTempStr));
-        leaveLock();
-        return JS_TRUE;
-}// end SaveOGM
 static void updateAll(void)
 {
         if(!avifileinfo) return;

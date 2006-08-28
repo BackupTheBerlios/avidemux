@@ -371,7 +371,16 @@ COMPRES_PARAMS ffmpeg2SVCDCodec = {
   sizeof (ffmpeg2SVCDExtra),
   DIA_DVDffParam
 };
+#include "mpeg2enc/ADM_mpeg2enc.h"
 // ************ Mpeg2enc VCD *************
+Mpeg2encParam VCDExtra = {
+  (1152 * 1000) >> 3,		// Max BR
+  18,				// Gop size
+  0,				//int   wideScreen;
+  0,				//int   matrix;
+  0,				//int   interlacingType;
+  0				// bff
+};
 
 
 COMPRES_PARAMS VCDCodec = {
@@ -379,21 +388,21 @@ COMPRES_PARAMS VCDCodec = {
   "VCD",
   "VCD",
   "Mpeg2enc(VCD)",
-  COMPRESS_CQ,
+  COMPRESS_CBR,
   4,
   1500,
   700,
   1000, // AVG
   ADM_ENC_CAP_CBR,
   ADM_EXTRA_PARAM,
-  NULL,
-  0,
+  &VCDExtra,
+  sizeof (VCDExtra),
   NULL
 };
 //************  MPEG2Enc SVCD *******************
 
 
-#include "mpeg2enc/ADM_mpeg2enc.h"
+
 extern uint8_t DIA_SVCDParam (COMPRES_PARAMS * toto);
 
 

@@ -413,9 +413,25 @@ EncoderFFMPEGMpeg1::startPass2 (void)
       return 1;
     }
   // If we use Xvid...
+    uint32_t f;
+    if(_param.mode==COMPRESS_2PASS)
+    {
+     f=_param.finalsize;
+    }else if(_param.mode==COMPRESS_2PASS_BITRATE)
+    {
+      double d;
+      d=_totalframe;
+      d/=_fps;
+      d*=br;
+      d/=8;
+      d/=1024*1024;
+      f=(uint32_t)d;
+    }else ADM_assert(0);
+    //
   _xrc->setVBVInfo (_settings.maxBitrate, _settings.minBitrate,
 		    _settings.bufferSize);
-  _xrc->startPass2 (_param.finalsize, _totalframe);
+  printf("Average bitrate :%u finale size %u\n",br,f);
+  _xrc->startPass2 (f, _totalframe);
 
 
   _codec = new ffmpegEncoderVBRExternal (_w, _h, _id);	//0 -> external 1 -> internal (_w, _h);

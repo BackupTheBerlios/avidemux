@@ -74,7 +74,6 @@ extern void audioFilter_SetBitrate( int i);
 extern void A_Save(const char *name);
 extern void videoCodecSelectByName(const char *name);
 extern int videoCodecConfigure(char *p,uint32_t i, uint8_t  *c);
-#include "oplug_mpeg/op_mpeg.h"
 extern void updateLoaded( void );
 extern void setPostProc(int v,int s);
 extern void HandleAction(Action action) ;
@@ -118,7 +117,6 @@ extern uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo);
 //
 static int call_bframe(void);
 static int call_packedvop(void);
-static int call_saveDVD(char *a);
 static int set_output_format(const char *str);
 static void set_reuse_2pass_log(char *p);
 static void setVar(char *in);
@@ -164,7 +162,6 @@ AUTOMATON reaction_table[]=
 
 		{"begin",		1,"set start frame",			setBegin},
 		{"end",			1,"set end frame",			setEnd},
-		{"save-dvd",		2,"save as dvd ps stream",		(one_arg_type)call_saveDVD},
 		{"save-unpacked-vop",	1,"save avi, unpacking vop",(one_arg_type)A_SaveUnpackedVop},		
 		{"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
 		{"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
@@ -325,11 +322,6 @@ void call_quit        (char *p) { UNUSED_ARG(p); exit(0);                       
 
 
 extern void audioSetResample(uint32_t fq);
-int call_saveDVD(char *a)
-{
-	
-	A_saveDVDPS(a);
-}
 
 void call_normalize   (char *p)
 {

@@ -38,6 +38,8 @@ typedef enum
 } encoderState;
 
 
+
+
 typedef struct entry_s
 	/* max 28 bytes/frame or 5 Mb for 2-hour movie */
 {

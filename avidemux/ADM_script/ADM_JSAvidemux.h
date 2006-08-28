@@ -24,8 +24,8 @@ public:
 	static JSBool Delete(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool Save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool Exit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-	static JSBool SaveDVD(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-	static JSBool SaveOGM(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+/*	static JSBool SaveDVD(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+	static JSBool SaveOGM(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);*/
 	static JSBool GoToTime(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool LoadFilters(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool ClearSegments(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);

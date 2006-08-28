@@ -1,0 +1,443 @@
+/***************************************************************************
+                         
+    copyright            : (C) 2006 by mean
+    email                : fixounet@free.fr
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+#include "config.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <unistd.h>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+
+
+#include "fourcc.h"
+#include "ADM_toolkit/ADM_quota.h"
+#include "avi_vars.h"
+#include "ADM_toolkit/toolkit.hxx"
+#include <ADM_assert.h>
+
+#include "subchunk.h"
+
+#include "ADM_encoder/ADM_vidEncode.hxx"
+
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_encoder/adm_encoder.h"
+#include "ADM_encoder/adm_encConfig.h"
+
+
+
+
+#include "fourcc.h"
+#include "avi_vars.h"
+#include "ADM_toolkit/toolkit.hxx"
+#include "subchunk.h"
+
+
+//#include "aviaudio.hxx"
+#include "ADM_audiofilter/audioprocess.hxx"
+
+#include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_filter/video_filters.h"
+#include "ADM_dialog/DIA_working.h"
+
+
+//#include "oplug_mpeg/op_mpeg_support.h"
+#include "mpeg2enc/ADM_mpeg2enc.h"
+#include "ADM_audiofilter/audioeng_buildfilters.h"
+#include "prefs.h"
+
+
+#include "ADM_dialog/DIA_enter.h"
+
+
+
+#include "ADM_toolkit/ADM_debugID.h"
+#define MODULE_NAME MODULE_ENCODER
+#include "ADM_toolkit/ADM_debug.h"
+
+
+#warning FIXME: Duplicate define with mpeg2enc -> bad
+#define MPEG_PREFILL 5
+
+#include "ADM_encoder/adm_encConfig.h"
+#include "ADM_encoder/ADM_vidEncode.hxx"
+
+#include "adm_encmpeg2enc.h"
+#include "ADM_xvidratectl/ADM_ratecontrol.h"
+static ADM_newXvidRcVBV *_xrc = NULL;
+extern uint32_t ADM_computeBitrate(uint32_t fps1000, uint32_t nbFrame, uint32_t sizeInMB);
+
+
+
+/*_________________________________________________*/
+EncoderMpeg2enc::EncoderMpeg2enc (MPEG2ENC_ID id, COMPRES_PARAMS * config)
+{
+  _frametogo = 0;
+  _pass1Done = 0;
+  _lastQz = 0;
+  _lastBitrate = 0;
+  _totalframe = 0;
+  _id=id;
+  memcpy (&_param, config, sizeof (_param));
+  ADM_assert (config->extraSettingsLen == sizeof (_settings)); //Mpeg2encParam
+  memcpy (&_settings, config->extraSettings, sizeof (_settings));
+
+};
+uint8_t     EncoderMpeg2enc::encode (uint32_t frame, ADMBitstream *out)
+{
+  uint32_t l, f;
+  ADM_assert (_codec);
+  ADM_assert (_in);
+  ADM_rframe rf;
+
+  if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
+  {
+    printf ("\n Error : Cannot read incoming frame !");
+    return 0;
+  }
+  switch (_state)
+  {
+    case enc_CQ:
+    case enc_CBR:
+      return _codec->encode (_vbuffer, out );
+      break;
+    case enc_Pass1:
+      // collect result
+      if (!_codec->encode (_vbuffer, out))
+      {
+        printf ("\n codec error on 1st pass !");
+        return 0;
+      }
+        if (!out->len)
+        {
+          printf ("Skipping delay\n");
+          return 1;
+        }
+        switch (out->flags)
+        {
+          case AVI_KEY_FRAME:
+            rf = RF_I;
+            break;
+          case AVI_B_FRAME:
+            rf = RF_B;
+            break;
+          case 0:
+            rf = RF_P;
+            break;
+          default:
+            ADM_assert (0);
+
+        }
+        _xrc->logPass1 (out->out_quantizer, rf, out->len);
+      _frametogo++;
+      return 1;
+      break;
+    case enc_Pass2:
+
+      uint32_t nq;
+      uint32_t nf;
+      ADM_rframe f;
+
+      _xrc->getQz (&nq, &f);
+
+      switch (f)
+      {
+        case RF_I:
+          nf = AVI_KEY_FRAME;
+          break;
+        default:
+          nf = 0;
+      }
+
+#define MPEG1_MIN_Q 2
+#define MPEG1_MAX_Q 28
+      if (nq < MPEG1_MIN_Q)
+	nq = MPEG1_MIN_Q;
+      if (nq > MPEG1_MAX_Q)
+        nq = MPEG1_MAX_Q;
+
+      //printf("asked :%d ",nq);
+      out->in_quantizer=nq;
+      out->flags=nf;
+      if (!_codec->encode (_vbuffer, out))
+        return 0;
+      if (!out->len)
+      {
+        printf ("Skipping delay\n");
+        return 1;
+      }
+      {
+        switch (out->flags)
+        {
+          case AVI_KEY_FRAME:
+            f = RF_I;
+            break;
+          case AVI_B_FRAME:
+            f = RF_B;
+            break;
+          case 0:
+            f = RF_P;
+            break;
+          default:
+            ADM_assert (0);
+
+        }
+        _xrc->logPass2 (out->out_quantizer, f, out->len);
+      }
+
+      return 1;
+
+      break;
+    default:
+      ADM_assert (0);
+      break;
+  }
+  ADM_assert (0);
+  return 0;
+
+}
+EncoderMpeg2enc::~EncoderMpeg2enc ()
+{
+  stop ();
+};
+
+
+
+//--------------------------------
+uint8_t     EncoderMpeg2enc::configure (AVDMGenericVideoStream * instream)
+{
+
+  ADM_assert (instream);
+  ADV_Info *info;
+  fd = NULL;
+
+  uint32_t flag1, flag2, flag3,qz,br;
+  flag1 = flag2 = flag3 = 0;
+
+  info = instream->getInfo ();
+  _fps1000 = info->fps1000;
+  _w = info->width;
+  _h = info->height;
+
+  _vbuffer = new ADMImage (_w, _h);
+  ADM_assert (_vbuffer);
+  _in = instream;
+
+  uint32_t interlaced=_settings.interlaced;
+  uint32_t bff=_settings.bff;
+  uint32_t widescreen=_settings.widescreen;
+  
+  _codec=NULL;
+  switch (_param.mode)
+  {
+    case COMPRESS_CQ:
+          qz=_param.qz;
+          br=_settings.maxBitrate;
+          _state = enc_CQ;
+      break;
+    case COMPRESS_CBR:
+          qz=0;
+          br=_param.bitrate;
+          _state = enc_CBR;
+          break;
+    case COMPRESS_2PASS:
+    case COMPRESS_2PASS_BITRATE:
+          qz=2;
+          br=_settings.maxBitrate;
+          _state = enc_Pass1;
+          break;
+  }
+  switch(_id)
+  {
+    case MPEG2ENC_VCD:
+      {
+        Mpeg2encVCD *dec;
+        dec = new Mpeg2encVCD (_w, _h);
+        dec->init (1, 0, _fps1000, interlaced, bff, widescreen, 0);
+        _codec = dec;	
+      }
+      break;
+    case MPEG2ENC_SVCD:
+    {
+        Mpeg2encSVCD * dec;
+        dec = new Mpeg2encSVCD (_w, _h);
+        dec->setMatrix (_settings.user_matrix);
+        dec->init (qz, br, _fps1000, interlaced, bff, widescreen, 0);
+        _codec = dec;
+    }
+        break;
+    case MPEG2ENC_DVD:
+      {
+        Mpeg2encDVD *dec;
+        dec = new Mpeg2encDVD (_w, _h);
+        dec->setMatrix (_settings.user_matrix);
+        dec->init (qz, br, _fps1000, interlaced, bff, widescreen, 0);
+        _codec = dec;
+      }
+      break;
+      default:
+        ADM_assert (0);
+    }
+
+  ADM_assert(_codec);
+
+  _in = instream;
+  printf ("\n Mpeg2enc Encoder , w: %lu h:%lu mode:%d", _w, _h, _state);
+  return 1;
+}
+
+
+
+
+uint8_t    EncoderMpeg2enc::startPass1 (void)
+{
+  ADM_assert (_state == enc_Pass1);
+  _frametogo = 0;
+  printf ("\n Starting pass 1\n");
+  printf (" Creating logfile :%s\n", _logname);
+  _pass1Done = 1;
+  {
+    printf ("Using Xvid 2 pass rate control (%s)\n", _logname);
+    _xrc->startPass1 ();
+  }
+  return 1;
+}
+
+
+uint8_t   EncoderMpeg2enc::isDualPass (void)
+{
+  if ((_state == enc_Pass1) || (_state == enc_Pass2))
+  {
+    return 1;
+  }
+  return 0;
+}
+
+uint8_t    EncoderMpeg2enc::setLogFile (const char *lofile, uint32_t nbframe)
+{
+  strcpy (_logname, lofile);
+  _frametogo = nbframe;
+  _totalframe = nbframe;
+  return 1;
+}
+
+//_______________________________
+uint8_t     EncoderMpeg2enc::stop (void)
+{
+  printf ("[Mpeg2enc]Stopping encoder\n");
+  if (_codec)     delete _codec;
+  _codec = NULL;
+    if (_state == enc_Pass1 || _state == enc_Pass2)
+    {
+      if (_xrc)
+      {
+        delete _xrc;
+        _xrc = NULL;
+      }
+
+    }
+  return 1;
+}
+//_______________________________
+
+uint8_t    EncoderMpeg2enc::startPass2 (void)
+{
+  uint32_t br,avg_bitrate,size;
+  
+  ADM_assert (_state == enc_Pass1);
+  printf ("[Mpeg2enc]-------* Starting pass 2*-------------\n");
+
+  if(_param.mode==COMPRESS_2PASS)
+  {
+    br=ADM_computeBitrate( _fps1000,_totalframe,_param.finalsize);
+    size=_param.finalsize;
+    printf("[Mpeg2enc] Final Size: %u MB, avg bitrate %u kb/s \n",size,br/1000);
+  }else if(_param.mode==COMPRESS_2PASS_BITRATE)
+  {
+    double d;
+    d=_totalframe;
+    d/=_fps1000;
+    d*=_param.avg_bitrate*1000;
+    d/=(8*1024*1024);
+    size=(uint32_t )d;
+    printf("[Mpeg2enc]  Final Size: %u MB 2pass avg bitrate %u kb/s\n",size,br/1000);
+    
+  }else ADM_assert(0);
+ 
+
+  
+
+  printf ("[Mpeg2enc] ** Total size     : %lu MBytes \n", _param.finalsize);
+  printf ("[Mpeg2enc] ** Total frame    : %lu  \n", _totalframe);
+
+  printf ("[Mpeg2enc] VBR parameters computed\n");
+  _state = enc_Pass2;
+  // Delete codec and start new one
+  if (_codec)
+  {
+    delete _codec;
+    _codec = NULL;
+  }
+
+  /*********/
+  uint32_t interlaced=_settings.interlaced;
+  uint32_t bff=_settings.bff;
+  uint32_t widescreen=_settings.widescreen;
+  uint32_t vbv;
+  
+  switch(_id)
+  {
+    case MPEG2ENC_SVCD:
+
+      Mpeg2encSVCD * dec;
+      dec = new Mpeg2encSVCD (_w, _h);
+      dec->setMatrix (_settings.user_matrix);
+      dec->init (2, br, _fps1000, interlaced, bff, widescreen, 0);	// WLA
+      _codec = dec;
+      vbv=122*1024;
+      break;
+    case MPEG2ENC_DVD:
+    {
+
+      Mpeg2encDVD *dec;
+      dec = new Mpeg2encDVD (_w, _h);
+      dec->setMatrix (_settings.user_matrix);
+      dec->init (2, br, _fps1000, interlaced, bff, widescreen, 0);	// WLA
+      _codec = dec;
+      vbv=224*1024;
+    }
+    break;
+    default:
+      ADM_assert (0);
+      break;
+  }
+  _xrc->setVBVInfo (_settings.maxBitrate, 0,  vbv);
+  ADM_assert (_xrc->startPass2 (size, _totalframe));
+  
+  printf ("\n XV:ready to encode in 2pass(%s)\n", _logname);
+  _frametogo = 0;
+  return 1;
+
+
+}
+
+////***********************************
+////***********************************
+////***********************************
+////***********************************
+////***********************************
