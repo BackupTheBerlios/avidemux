@@ -96,65 +96,36 @@ EncoderMpeg2enc::EncoderMpeg2enc (MPEG2ENC_ID id, COMPRES_PARAMS * config)
   memcpy (&_param, config, sizeof (_param));
   ADM_assert (config->extraSettingsLen == sizeof (_settings)); //Mpeg2encParam
   memcpy (&_settings, config->extraSettings, sizeof (_settings));
+  _delayed=0;
+  _availableFrames=0;
 
 };
+#define MPEG1_MIN_Q 2
+#define MPEG1_MAX_Q 28
+
 uint8_t     EncoderMpeg2enc::encode (uint32_t frame, ADMBitstream *out)
 {
-  uint32_t l, f;
+  uint32_t l,flags;
   ADM_assert (_codec);
   ADM_assert (_in);
   ADM_rframe rf;
+  uint32_t asked;
+  uint32_t nq;
+  uint32_t nf;
+  ADM_rframe f;
 
-  if (!_in->getFrameNumberNoAlloc (frame, &l, _vbuffer, &f))
+_retry:
+  asked=frame+_delayed;
+  if(asked>=_availableFrames) asked=_availableFrames-1;
+  if (!_in->getFrameNumberNoAlloc (asked, &l, _vbuffer, &flags))
   {
     printf ("\n Error : Cannot read incoming frame !");
     return 0;
   }
-  switch (_state)
+  
+  if(_state==enc_Pass2)
   {
-    case enc_CQ:
-    case enc_CBR:
-      return _codec->encode (_vbuffer, out );
-      break;
-    case enc_Pass1:
-      // collect result
-      if (!_codec->encode (_vbuffer, out))
-      {
-        printf ("\n codec error on 1st pass !");
-        return 0;
-      }
-        if (!out->len)
-        {
-          printf ("Skipping delay\n");
-          return 1;
-        }
-        switch (out->flags)
-        {
-          case AVI_KEY_FRAME:
-            rf = RF_I;
-            break;
-          case AVI_B_FRAME:
-            rf = RF_B;
-            break;
-          case 0:
-            rf = RF_P;
-            break;
-          default:
-            ADM_assert (0);
-
-        }
-        _xrc->logPass1 (out->out_quantizer, rf, out->len);
-      _frametogo++;
-      return 1;
-      break;
-    case enc_Pass2:
-
-      uint32_t nq;
-      uint32_t nf;
-      ADM_rframe f;
-
       _xrc->getQz (&nq, &f);
-
       switch (f)
       {
         case RF_I:
@@ -163,53 +134,68 @@ uint8_t     EncoderMpeg2enc::encode (uint32_t frame, ADMBitstream *out)
         default:
           nf = 0;
       }
-
-#define MPEG1_MIN_Q 2
-#define MPEG1_MAX_Q 28
+  
       if (nq < MPEG1_MIN_Q)
-	nq = MPEG1_MIN_Q;
+        nq = MPEG1_MIN_Q;
       if (nq > MPEG1_MAX_Q)
         nq = MPEG1_MAX_Q;
+  
+        //printf("asked :%d ",nq);
+        out->in_quantizer=nq;
+        out->flags=nf;
+   }
+   if(!_codec->encode (_vbuffer, out ))
+   {
+     printf("[mpeg2enc]Codec error frame %u delay %u\n", frame,_delayed);
+     return 0;
+   }
+   
+   switch (out->flags)
+   {
+     case AVI_KEY_FRAME:
+       rf = RF_I;
+       break;
+     case AVI_B_FRAME:
+       rf = RF_B;
+       break;
+     case 0:
+       rf = RF_P;
+       break;
+     default:
+       ADM_assert (0);
 
-      //printf("asked :%d ",nq);
-      out->in_quantizer=nq;
-      out->flags=nf;
-      if (!_codec->encode (_vbuffer, out))
-        return 0;
-      if (!out->len)
-      {
-        printf ("Skipping delay\n");
-        return 1;
-      }
-      {
-        switch (out->flags)
+   }
+   
+   switch(_state)
+   {
+     case enc_Pass1:
         {
-          case AVI_KEY_FRAME:
-            f = RF_I;
-            break;
-          case AVI_B_FRAME:
-            f = RF_B;
-            break;
-          case 0:
-            f = RF_P;
-            break;
-          default:
-            ADM_assert (0);
-
+          if (!out->len)
+          {
+            printf ("Skipping delay\n");
+            goto _retry;
+          }
+         
+          _xrc->logPass1 (out->out_quantizer, rf, out->len);
+          _frametogo++;
         }
-        _xrc->logPass2 (out->out_quantizer, f, out->len);
-      }
-
-      return 1;
-
-      break;
-    default:
-      ADM_assert (0);
-      break;
-  }
-  ADM_assert (0);
-  return 0;
-
+        break;
+     case enc_Pass2:
+     {
+       if (!out->len)
+       {
+         printf ("Skipping delay\n");
+         goto _retry;
+       }
+       {
+         _xrc->logPass2 (out->out_quantizer, rf, out->len);
+       }
+     }
+     break;
+     default:
+       break;
+   }
+   return 1;
 }
 EncoderMpeg2enc::~EncoderMpeg2enc ()
 {
@@ -238,6 +224,8 @@ uint8_t     EncoderMpeg2enc::configure (AVDMGenericVideoStream * instream)
   ADM_assert (_vbuffer);
   _in = instream;
 
+  _availableFrames=instream->getInfo()->nb_frames;
+  
   uint32_t interlaced=_settings.interlaced;
   uint32_t bff=_settings.bff;
   uint32_t widescreen=_settings.widescreen;

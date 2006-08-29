@@ -180,39 +180,39 @@ mb_per_pict=0;
 
 
 
-	aprintf("Encoding MPEG-%d video \n",param->mpeg);
-	aprintf("Horizontal size: %d pe \nl",opt->horizontal_size);
-	aprintf("Vertical size: %d pel \n",opt->vertical_size);
-	aprintf("Aspect ratio code: %d = %s \n",
+	aprintf("[mpeg2enc]Encoding MPEG-%d video \n",param->mpeg);
+        aprintf("[mpeg2enc]Horizontal size: %d pe \nl",opt->horizontal_size);
+        aprintf("[mpeg2enc]Vertical size: %d pel \n",opt->vertical_size);
+        aprintf("[mpeg2enc]Aspect ratio code: %d = %s \n",
 			param->aspect_ratio,
 			mpeg_aspect_code_definition(param->mpeg,param->aspect_ratio));
-	aprintf("Frame rate code:   %d = %s \n",
+        aprintf("[mpeg2enc]Frame rate code:   %d = %s \n",
 			param->frame_rate,
 			mpeg_framerate_code_definition(param->frame_rate));
 
 	if(param->bitrate)
-		aprintf("Bitrate: %d KBit/s \n",param->bitrate/1000);
+          aprintf("[mpeg2enc]Bitrate: %d KBit/s \n",param->bitrate/1000);
 	else
-		aprintf( "Bitrate: VCD \n");
+          aprintf( "[mpeg2enc]Bitrate: VCD \n");
 	if(param->quant)
-		aprintf("Quality factor: %d (Quantisation = %d) (1=best, 31=worst) \n",
+          aprintf("[mpeg2enc]Quality factor: %d (Quantisation = %d) (1=best, 31=worst) \n",
                    param->quant,
                    (int)(inv_scale_quant( param->mpeg == 1 ? 0 : 1,
                                           param->quant))
             );
 
-	aprintf("Field order for input: %s \n",
+        aprintf("[mpeg2enc]Field order for input: %s \n",
 			   mpeg_interlace_code_definition(param->input_interlacing) );
 
 	if( param->seq_length_limit )
 	{
-		aprintf( "New Sequence every %d Mbytes \n", param->seq_length_limit );
-		aprintf( "Assuming non-video stream of %d Kbps \n", param->nonvid_bitrate );
+          aprintf( "[mpeg2enc]New Sequence every %d Mbytes \n", param->seq_length_limit );
+          aprintf( "[mpeg2enc]Assuming non-video stream of %d Kbps \n", param->nonvid_bitrate );
 	}
 	else
-		aprintf( "Sequence unlimited length \n" );
+          aprintf( "[mpeg2enc]Sequence unlimited length \n" );
 
-	aprintf("Search radius: %d \n",param->searchrad);
+        aprintf("[mpeg2enc]Search radius: %d \n",param->searchrad);
 
 	/* set params */
 	init_mpeg_parms(param,opt);

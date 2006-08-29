@@ -34,6 +34,8 @@ class EncoderMpeg2enc:public Encoder
     Mpeg2encParam _settings;
     Mpeg2enc      *_codec;
     uint32_t      _fps1000;
+    uint32_t      _delayed;
+    uint32_t      _availableFrames;
   public:
 
 

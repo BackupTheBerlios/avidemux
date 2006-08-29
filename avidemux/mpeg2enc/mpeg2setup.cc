@@ -101,6 +101,10 @@ void set_format_presets(mpeg2parm *param,Mpeg2Settings *opt)
 		mjpeg_info("SVCD standard settings selected");
 //		param->bitrate = 2500000;
 		param->min_GOP_size=param->max_GOP_size = param->norm == 'n' ? 18 : 15;
+                if(param->ignore_constraints)
+                {
+                  param->video_buffer_size = 4000;
+                }else
 		param->video_buffer_size = 230;
 
 	case  MPEG_FORMAT_SVCD_NSR :		/* Non-standard data-rate */
@@ -238,7 +242,11 @@ void set_format_presets(mpeg2parm *param,Mpeg2Settings *opt)
 			param->bitrate = 7500000;
 		if( param->fieldenc == -1 )
 			param->fieldenc = 1;
-		param->video_buffer_size = 230;
+                if(param->ignore_constraints)
+                {
+                  param->video_buffer_size = 4000;
+                }else
+		  param->video_buffer_size = 230;
 		param->mpeg = 2;
 		if( param->quant == 0 )
 			param->quant = 8;
@@ -279,8 +287,8 @@ int check_param_constraints(mpeg2parm *param)
 			if( param->frame_rate == 1 || param->frame_rate == 2 )
 			{
 				param->frame_rate += 3;
-				mjpeg_warn("3:2 movie pulldown with frame rate set to decode rate not display rate");
-				mjpeg_warn("3:2 Setting frame rate code to display rate = %d (%2.3f fps)", 
+				mjpeg_info("3:2 movie pulldown with frame rate set to decode rate not display rate");
+				mjpeg_info("3:2 Setting frame rate code to display rate = %d (%2.3f fps)", 
 						   param->frame_rate,
 						   Y4M_RATIO_DBL(mpeg_framerate(param->frame_rate)));
 

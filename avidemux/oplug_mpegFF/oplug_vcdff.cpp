@@ -120,6 +120,7 @@ uint8_t   ret=0;
 uint32_t  sample_target=0;
 uint32_t  total_sample=0;
 ADMBitstream bitstream;
+uint32_t muxerUsed=0;
 	twoPass=new char[strlen(name)+6];
 	twoFake=new char[strlen(name)+6];
 
@@ -219,48 +220,8 @@ ADMBitstream bitstream;
             }
          }        
         // Create muxer
-        switch(type)
-        {
-            case ADM_PS:
-                    muxer=new mplexMuxer;
-                    break;
-            case ADM_TS:
-                    muxer=new tsMuxer;
-                    break;
-            case ADM_ES:
-                    break;
-            default:
-                    ADM_assert(0);
-        
-        
-        }
-        if(muxer)
-        {
-            if(!muxer->open(name,0,mux,avifileinfo,audio->getInfo()))
-            {
-                delete muxer;
-                muxer=NULL;
-                deleteAudioFilter(audio);
-                printf("Muxer init failed\n");
-                return 0 ;
-            }
-                double sample_time;
-
-                sample_time=total;
-                sample_time*=1000;
-                sample_time/=_fps1000; // target_time in second
-                sample_time*=audio->getInfo()->frequency;
-                sample_target=(uint32_t)floor(sample_time);
-        }
-        else
-        {
-            file=fopen(name,"wb");
-            if(!file)
-            {
-              GUI_Error_HIG(_("File error"), _("Cannot open \"%s\" for writing."), name);
-                    return 0 ;
-            }
-        }
+       
+       
 	switch(current_codec)
 	{
 		
@@ -374,6 +335,52 @@ switch(mux)
 				encoder->startPass2();
 				encoding->reset();
 		}
+                
+              switch(type)
+              {
+                case ADM_PS:
+                  muxer=new mplexMuxer;
+                  break;
+                case ADM_TS:
+                  muxer=new tsMuxer;
+                  break;
+                case ADM_ES:
+                  break;
+                default:
+                  ADM_assert(0);
+      
+      
+              }
+              if(muxer)
+              {
+                if(!muxer->open(name,0,mux,avifileinfo,audio->getInfo()))
+                {
+                  delete muxer;
+                  muxer=NULL;
+                  deleteAudioFilter(audio);
+                  printf("Muxer init failed\n");
+                  return 0 ;
+                }
+                double sample_time;
+
+                sample_time=total;
+                sample_time*=1000;
+                sample_time/=_fps1000; // target_time in second
+                sample_time*=audio->getInfo()->frequency;
+                sample_target=(uint32_t)floor(sample_time);
+              }
+              else
+              {
+                file=fopen(name,"wb");
+                if(!file)
+                {
+                  GUI_Error_HIG(_("File error"), _("Cannot open \"%s\" for writing."), name);
+                  return 0 ;
+                }
+              }
+                
+                
+                
 		if(encoder->isDualPass())
 			encoding->setPhasis ("Pass 2/2");
 		else
