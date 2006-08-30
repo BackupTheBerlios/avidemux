@@ -121,31 +121,23 @@ uint32_t  sample_target=0;
 uint32_t  total_sample=0;
 ADMBitstream bitstream;
 uint32_t muxerUsed=0;
-	twoPass=new char[strlen(name)+6];
-	twoFake=new char[strlen(name)+6];
+        twoPass=new char[strlen(name)+6];
+        twoFake=new char[strlen(name)+6];
+  
+        strcpy(twoPass,name);
+        strcat(twoPass,".stat");
+        strcat(twoFake,".fake");
+ 
+        _incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
+        _w=_incoming->getInfo()->width;
+        _h=_incoming->getInfo()->height;
+        _fps1000=_incoming->getInfo()->fps1000;
+        _page=_w*_h;
+        _page+=_page>>1;
 
-	strcpy(twoPass,name);
-	strcat(twoPass,".stat");
-	strcat(twoFake,".fake");
-	
-		
-	_incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
-	_w=_incoming->getInfo()->width;
-	_h=_incoming->getInfo()->height;
-	_fps1000=_incoming->getInfo()->fps1000;
- 	_page=_w*_h;
-	_page+=_page>>1;
-
-
-	
-	total=_incoming->getInfo()->nb_frames;
-	if(!total) return 0;	
-// ________alternate config____________
-	
-
-// override with mpeg1 specific stuff
-
-	// Check if audio
+        total=_incoming->getInfo()->nb_frames;
+        if(!total) return 0;	
+        
         switch(type)
         {
             default:
@@ -222,9 +214,9 @@ uint32_t muxerUsed=0;
         // Create muxer
        
        
-	switch(current_codec)
-	{
-		
+        switch(current_codec)
+        {
+                
                 case CodecXVCD:
                         encoder=new EncoderFFMPEGMpeg1(FF_MPEG1,&ffmpeg1Codec);
                         printf("\n Using ffmpeg mpeg1 encoder\n");
@@ -249,92 +241,101 @@ uint32_t muxerUsed=0;
                   encoder=new EncoderMpeg2enc(MPEG2ENC_VCD,&VCDCodec);
                   printf("\n Using mpeg2enc encoder (VCD)\n");
                   break;
-                        
-		
-		default:
-		ADM_assert(0);
+                default:
+                ADM_assert(0);
+      }
+
+      encoder->setLogFile(twoPass,total);
+      if(!encoder->configure(_incoming))
+      {
+              delete encoder;
+              return 0;
+      }
+
+
+      _buffer=new uint8_t[_page*2]; // Might overflow if _page only
+      _outbuffer=new uint8_t[_page];
+
+      ADM_assert(  _buffer);
+      ADM_assert(  _outbuffer);
+    
+      DIA_encoding  *encoding;
+      encoding =new DIA_encoding(_fps1000);
+      switch(current_codec)
+      {
+          case CodecVCD:
+            encoding->setCodec("libmpeg2enc VCD");
+            break;
+          case CodecSVCD:
+            encoding->setCodec("libmpeg2enc SVCD");
+            break;
+          case CodecDVD:
+            encoding->setCodec("libmpeg2enc DVD");
+            break;
+          case CodecXVCD:
+            encoding->setCodec("FFmpeg Mpeg1 VBR");
+            break;
+          case CodecXSVCD:
+            encoding->setCodec("FFmpeg Mpeg2 SVCD VBR");
+            break;
+          case CodecXDVD:
+            encoding->setCodec("FFmpeg Mpeg2 DVD VBR");
+            break;
+          default:
+            ADM_assert(0);
 	}
-        
-  	encoder->setLogFile(twoPass,total);
-  	if(!encoder->configure(_incoming))
-  	{
-		delete encoder;
-		return 0;
-	}
-
-
-	_buffer=new uint8_t[_page*2]; // Might overflow if _page only
-	_outbuffer=new uint8_t[_page];
-
-	ADM_assert(  _buffer);
-	ADM_assert(  _outbuffer);
- 
-  DIA_encoding				*encoding;
-  encoding =new DIA_encoding(_fps1000);
-  switch(current_codec)
-	{
-		case CodecXVCD:
-  				encoding->setCodec("FFmpeg Mpeg1 VBR");
-				break;
-		case CodecXSVCD:
-  				encoding->setCodec("FFmpeg Mpeg2 SVCD VBR");
-				break;
-		case CodecXDVD:
-  				encoding->setCodec("FFmpeg Mpeg2 DVD VBR");
-				break;
-	}
-switch(mux)
-  {
-    case MUXER_NONE:encoding->setContainer("Mpeg ES");break;
-    case MUXER_TS:  encoding->setContainer("Mpeg TS");break;
-    case MUXER_VCD: encoding->setContainer("Mpeg VCD");break;
-    case MUXER_SVCD:encoding->setContainer("Mpeg SVCD");break;
-    case MUXER_DVD: encoding->setContainer("Mpeg DVD");break;
-    default:
-        ADM_assert(0);
-  }
+        switch(mux)
+          {
+            case MUXER_NONE:encoding->setContainer("Mpeg ES");break;
+            case MUXER_TS:  encoding->setContainer("Mpeg TS");break;
+            case MUXER_VCD: encoding->setContainer("Mpeg VCD");break;
+            case MUXER_SVCD:encoding->setContainer("Mpeg SVCD");break;
+            case MUXER_DVD: encoding->setContainer("Mpeg DVD");break;
+            default:
+                ADM_assert(0);
+          }
 
 
 
-  		// pass 1
-    	if(encoder->isDualPass())
-     	{
-			FILE *fd;
-			uint8_t reuse=0;
-			fd=fopen(twoPass,"rt");
-			if(fd)
-			{
+        // pass 1
+        if(encoder->isDualPass())
+        {
+                        FILE *fd;
+                        uint8_t reuse=0;
+                        fd=fopen(twoPass,"rt");
+                        if(fd)
+                        {
                           if(GUI_Question(_("Reuse log file ?")))
-				{
-					reuse=1;
-				}
-				fclose(fd);
-			}
-			if(!reuse)
-			{
-				encoding->setPhasis ("Pass 1/2");
-				encoder->startPass1();
+                                {
+                                        reuse=1;
+                                }
+                                fclose(fd);
+                        }
+                        if(!reuse)
+                        {
+                                encoding->setPhasis ("Pass 1/2");
+                                encoder->startPass1();
                                 bitstream.data=_buffer;
-				for(uint32_t i=0;i<total;i++)
-				{
+                                for(uint32_t i=0;i<total;i++)
+                                {
                                         bitstream.cleanup(i);
-					encoding->setFrame(i,total);
+                                        encoding->setFrame(i,total);
                                         if(!encoder->encode( i, &bitstream))//&len,(uint8_t *) _buffer,&flags))
-					{
+                                        {
                                           GUI_Error_HIG(_("Error in pass 1"), NULL);
-					}
-					encoding->feedFrame(bitstream.len);
-					encoding->setQuant(bitstream.out_quantizer);
+                                        }
+                                        encoding->feedFrame(bitstream.len);
+                                        encoding->setQuant(bitstream.out_quantizer);
                                         if(!encoding->isAlive())
                                         {
 #warning FIXME                                          
-                                       //FIXME   goto finishvcdff;
+                                      //FIXME   goto finishvcdff;
                                         }
-				}
-			}
-				encoder->startPass2();
-				encoding->reset();
-		}
+                                }
+                        }
+                                encoder->startPass2();
+                                encoding->reset();
+                }
                 
               switch(type)
               {
@@ -378,13 +379,10 @@ switch(mux)
                   return 0 ;
                 }
               }
-                
-                
-                
-		if(encoder->isDualPass())
-			encoding->setPhasis ("Pass 2/2");
-		else
-			encoding->setPhasis ("Encoding");
+          if(encoder->isDualPass())
+                  encoding->setPhasis ("Pass 2/2");
+          else
+                  encoding->setPhasis ("Encoding");
 
          // Set info for audio if any
          if(muxer)
@@ -398,7 +396,7 @@ switch(mux)
          //  In that case we do multithreadedwriting (yes!)
          //**********************************************************
 
-         if(mux==MUXER_DVD || mux==MUXER_SVCD)
+         if(mux==MUXER_DVD || mux==MUXER_SVCD || mux==MUXER_VCD)
          {
            pthread_t audioThread,videoThread,muxerThread;
            muxerMT context;
@@ -470,97 +468,97 @@ switch(mux)
            }
            
          }
-		// 2nd or Uniq Pass
-                bitstream.data=_outbuffer;
-		for(uint32_t i=0;i<total;i++)
-			{
+      // 2nd or Uniq Pass
+      bitstream.data=_outbuffer;
+      for(uint32_t i=0;i<total;i++)
+      {
        	// get frame
-                                bitstream.cleanup(i);
-                                if(!encoder->encode( i,&bitstream))// &len,(uint8_t *) _outbuffer,&flags))
-				{
-                                  GUI_Error_HIG(_("Error in pass 2"), NULL);
-					goto finishvcdff;
-				}
-                                if(!bitstream.len) continue;
-				
-				if(file)
-				{
-                                    fwrite(_outbuffer,bitstream.len,1,file);
-				}
-				else
-				{
-					uint32_t samples; 
-					
-					//printf("%lu %lu\n",i,dts);
-					
-                                        muxer->writeVideoPacket(&bitstream);
-					real_framenum++;
-					// _muxer->writeVideoPacket(len,_buffer_out,
-					//i-MPEG_PREFILL,_codec->getCodedPictureNumber());
-                                        if(total_sample<sample_target)
-                                        {
-					   while(muxer->needAudio() && total_sample<sample_target) 
-					   {				
-						if(!audio->getPacket(audioBuffer, &audioLen, &samples))	
-						{ 
-							break; 
-						}
-						if(audioLen) 
-						{
-							muxer->writeAudioPacket(audioLen,audioBuffer); 
-							encoding->feedAudioFrame(audioLen); 
-                                                        total_sample+=samples;
-						}
-					   }
-                                        }
-				
-				}
-				encoding->setFrame(i,total);
-                                encoding->setQuant(bitstream.out_quantizer);
-                                encoding->feedFrame(bitstream.len);
-					if(!encoding->isAlive ())
-						{
-                                                         ret=0;        
-							 goto finishvcdff;
-						}
-			}
-			ret=1;
-finishvcdff:
-                        printf("[MPEGFF] Finishing..\n");
-			delete encoding;
-		 	end();
-			if(file)
-			{
-				fclose(file);
-				file=NULL;
-			}
-			else
-			{  
-                            if(muxer)
-                            {
-				muxer->close();
-				delete muxer;
-				muxer=NULL;
+                bitstream.cleanup(i);
+                if(!encoder->encode( i,&bitstream))// &len,(uint8_t *) _outbuffer,&flags))
+                {
+                  GUI_Error_HIG(_("Error in pass 2"), NULL);
+                        goto finishvcdff;
+                }
+                if(!bitstream.len) continue;
+                
+                if(file)
+                {
+                    fwrite(_outbuffer,bitstream.len,1,file);
+                }
+                else
+                {
+                        uint32_t samples; 
+                        
+                        //printf("%lu %lu\n",i,dts);
+                        
+                        muxer->writeVideoPacket(&bitstream);
+                        real_framenum++;
+                        // _muxer->writeVideoPacket(len,_buffer_out,
+                        //i-MPEG_PREFILL,_codec->getCodedPictureNumber());
+                        if(total_sample<sample_target)
+                        {
+                            while(muxer->needAudio() && total_sample<sample_target) 
+                            {				
+                                if(!audio->getPacket(audioBuffer, &audioLen, &samples))	
+                                { 
+                                        break; 
+                                }
+                                if(audioLen) 
+                                {
+                                        muxer->writeAudioPacket(audioLen,audioBuffer); 
+                                        encoding->feedAudioFrame(audioLen); 
+                                        total_sample+=samples;
+                                }
                             }
-			}
-			delete encoder;
-			return ret;
+                        }
+                
+                }
+                encoding->setFrame(i,total);
+                encoding->setQuant(bitstream.out_quantizer);
+                encoding->feedFrame(bitstream.len);
+                if(!encoding->isAlive ())
+                        {
+                                  ret=0;        
+                                  goto finishvcdff;
+                        }
+        }
+        ret=1;
+finishvcdff:
+        printf("[MPEGFF] Finishing..\n");
+        delete encoding;
+        end();
+        if(file)
+        {
+                fclose(file);
+                file=NULL;
+        }
+        else
+        {  
+            if(muxer)
+            {
+                muxer->close();
+                delete muxer;
+                muxer=NULL;
+            }
+        }
+        delete encoder;
+        return ret;
 }
 	
 void end (void)
 {
-	
-	delete [] _buffer;
-	delete [] _outbuffer;
+        
+        delete [] _buffer;
+        delete [] _outbuffer;
 
-	_buffer		=NULL;
-	_outbuffer=NULL;
-	
-	if(twoPass) delete [] twoPass;
-	if(twoFake) delete [] twoFake;
-	
-	twoPass=twoFake=NULL;
-	
+        _buffer		=NULL;
+        _outbuffer=NULL;
+        
+        if(twoPass) delete [] twoPass;
+        if(twoFake) delete [] twoFake;
+        
+        twoPass=twoFake=NULL;
+        
 }
 AVDMGenericAudioStream *mpt_getAudioStream (void)
 {
@@ -584,13 +582,5 @@ AVDMGenericAudioStream *mpt_getAudioStream (void)
   }
   return audio;
 }
-/*
-typedef struct muxerMT
-{
-  EncoderFFMPEGMpeg1        *videoEncoder;
-  AVDMGenericAudioStream    *audioEncoder;
-  ADMMpegMuxer              *muxer;
-};
-*/
 #endif	
 // EOF
