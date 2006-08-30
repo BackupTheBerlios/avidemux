@@ -92,7 +92,7 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
 
     llength=_length ;
     
-      DIA_working *windowWorking=new DIA_working(_("Normalize : Scanning"));
+//       DIA_working *windowWorking=new DIA_working(_("Normalize : Scanning"));
 
       for(int i=0;i<_wavHeader.channels;i++) max[i]=0;
       while (1)
@@ -121,20 +121,20 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
             current=fabs(_incomingBuffer[index++]);
             if(current>max[chan]) max[chan]=current;
           }
-	  if(!windowWorking->isAlive() )
-    	  {
-    	    // cannot be aborted
-            delete windowWorking;
-            windowWorking=new DIA_working(_("Normalize : Scanning"));
-          }
+// 	  if(!windowWorking->isAlive() )
+//     	  {
+//     	    // cannot be aborted
+//             delete windowWorking;
+//             windowWorking=new DIA_working(_("Normalize : Scanning"));
+//           }
           scanned+=ready;
           if(scanned<llength)
           {
-            windowWorking->update(scanned,llength);
+//             windowWorking->update(scanned,llength);
           //  printf("%u / %u\n",scanned,llength);
           }
       }
-    delete windowWorking;
+//     delete windowWorking;
 
     _previous->rewind();
     float mx=0;

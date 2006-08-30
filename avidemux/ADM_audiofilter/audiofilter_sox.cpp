@@ -59,52 +59,70 @@ AUDMAudioFilterSox::~AUDMAudioFilterSox()
   }
 };
 
-#define BLK_SIZE 8192 // Block size in sample
-
-
-
+#define BLK_SIZE 500 // Block size in sample
 //_____________________________________________
 uint32_t AUDMAudioFilterSox::fill(uint32_t max,float *output,AUD_Status *status)
 {
 
-  uint32_t nbout,snbout=0,nb_in,onechunk;
-
+  uint32_t nbout,snbout=0,nb_in;
+  uint32_t nbBlockIn,nbi;
+  double d;
+  
   if(!engaged)
   {
     return _previous->fill(max, output,status); 
     
   }
-// Fill incoming buffer
-    shrink();
-    fillIncomingBuffer(status);
+
+    // Compute how much block we want
+    d= _wavHeader.frequency;
+    d/=_previous->getInfo()->frequency;
+    d*=max;
+    d/=BLK_SIZE;
+    nbBlockIn=(uint32_t)floor(d);
+    if(!nbBlockIn)
+    { 
+      printf("[Resampler]Asked less than one block..(%u)\n"),max;
+      return 0;
+    }
     
-    onechunk=BLK_SIZE*_wavHeader.channels;
-    if(max<onechunk) onechunk=max;
-    
-    
-    while(1)
+    for(int j=0;j<nbBlockIn;j++)
     {
-      ADM_assert(_tail>=_head);
-      nb_in=(_tail-_head)/(_wavHeader.channels); // Nb Sample
-      if(nb_in*_wavHeader.channels>onechunk) nb_in=onechunk/_wavHeader.channels;
-      
-      if(!nb_in) break;
-      nbout=BLK_SIZE;
-      uint32_t nbi=nb_in;
-      for(int i=0;i<_wavHeader.channels;i++)
-      {
-        nbout=BLK_SIZE;;
-        if(!sox_run(&(_resamples[i]), _incomingBuffer+i+_head,  output+i,    &nbi, &nbout,_wavHeader.channels-1))
+      // Fill incoming buffer
+        shrink();
+        fillIncomingBuffer(status);
+        if(_head==_tail)
         {
-          printf("[Sox Resample] run error!!\n");
-          return 0;
+          *status=AUD_END_OF_STREAM;
+          return snbout;
         }
-                    
-      }
+        ADM_assert(_tail>=_head);
+        nb_in=(_tail-_head)/(_wavHeader.channels); // Nb Sample
+        if(nb_in>BLK_SIZE) nb_in=BLK_SIZE;
+        if(!nb_in)
+        {
+          printf("[Resampler]Not enough audio\n");
+          break; 
+        }
+        // We have one BLK_SIZE incoming
+        for(int i=0;i<_wavHeader.channels;i++)
+        {
+          nbout=BLK_SIZE*3;;
+          nbi=nb_in;
+          if(!sox_run(&(_resamples[i]), _incomingBuffer+i+_head,  output+i,    &nbi, &nbout,_wavHeader.channels-1))
+          {
+            printf("[Resampler] run error!!\n");
+            return 0;
+          }
+        }
+        if(nbi>nb_in)
+        {
+          printf("[Resampler]%u max %u\n",nbi,nb_in);
+          ADM_assert(0); 
+        }
       _head=_head+(nbi*_wavHeader.channels);
       snbout+=nbout*_wavHeader.channels;
       output+=nbout*_wavHeader.channels;
-      if(!nbout) break;
     }
     return snbout;
 }
