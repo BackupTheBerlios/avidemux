@@ -328,8 +328,8 @@ uint32_t muxerUsed=0;
                                         encoding->setQuant(bitstream.out_quantizer);
                                         if(!encoding->isAlive())
                                         {
-#warning FIXME                                          
-                                      //FIXME   goto finishvcdff;
+
+                                              goto finishvcdff;
                                         }
                                 }
                         }
