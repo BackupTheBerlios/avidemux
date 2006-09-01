@@ -39,6 +39,11 @@ int defaultAudioQueueSlave( audioQueueMT *context )
   while(audioEncoder->getPacket(buffer, &audioLen, &samples) && total_sample<context->audioTargetSample)
   {
     ADM_assert(samples<= QBUFFER);
+    if(queue->isAborted())
+    { 
+        printf("[AudioQueueThread] Aborting..\n");
+        break;
+    }
     total_sample+=samples;
     //printf("Audio %u\n",samples);
     accessMutex.lock();

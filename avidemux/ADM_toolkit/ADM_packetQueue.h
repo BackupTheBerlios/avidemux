@@ -41,6 +41,7 @@ class PacketQueue
             char      *_name;
             uint8_t   _eof;
             uint32_t  availableSpace(void);
+            uint8_t  _aborted;
   public:
           PacketQueue(const char *name,uint32_t nbSlot,uint32_t buffSize);
           ~PacketQueue();
@@ -50,6 +51,7 @@ class PacketQueue
           uint8_t   IsEmpty(void);
           uint8_t   Finished(void);
           uint8_t   Abort(void);
+          uint8_t   isAborted(void) {return _aborted;}
 };
 
 

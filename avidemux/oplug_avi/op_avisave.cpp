@@ -114,6 +114,7 @@ uint8_t GenericAviSave::cleanupAudio (void)
   printf("[AVI] Cleaning audio\n");
   if(_pq)
   {
+    _pq->Abort();
     while(!_context.audioDone)
     {
       printf("Waiting Audio thread\n");
@@ -121,6 +122,11 @@ uint8_t GenericAviSave::cleanupAudio (void)
     }
     if(_pq) delete _pq;
     _pq=NULL;
+  }
+  if(audio_filter)
+  {
+    deleteAudioFilter (audio_filter);
+    audio_filter=NULL;
   }
   return 1;
 }
@@ -144,10 +150,8 @@ uint8_t ret=0;
     {
       guiStop();
       GUI_Error_HIG (_("Error initalizing audio filters"), NULL);
-      deleteAudioFilter (audio_filter);
       delete writter;
       writter = NULL;
-     // guiStop();
       return 0;
     }
    
@@ -155,9 +159,7 @@ uint8_t ret=0;
     {
       guiStop();
       GUI_Error_HIG (_("Error initalizing video filters"), NULL);
-      deleteAudioFilter (audio_filter);
       delete   	writter;
-      
       writter = NULL;
      // guiStop();
       return 0;
@@ -194,7 +196,6 @@ abortme:
   writter->setEnd ();
   delete       writter;
   writter = NULL;
-  deleteAudioFilter (audio_filter);
   // resync GUI
   printf ("\n Saving AVI (v_engine)... done\n");
   return ret;

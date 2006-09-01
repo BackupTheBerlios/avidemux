@@ -43,6 +43,7 @@ PacketQueue::PacketQueue(const char *name,uint32_t nbSlot,uint32_t buffSize)
   _slotQueue=_slotHead=0;
   _bufferQueue=_bufferHead=0;
   _eof=0;
+  _aborted=0;
   printf("PacketQueue %s created\n",_name);
 }
 /*!
@@ -117,7 +118,7 @@ uint8_t   PacketQueue::Push(uint8_t *ptr, uint32_t size,uint32_t sample)
   // Now lets's see if we have enough data in the buffer (we are still under lock)
   while(!_eof)
   {
-      available=availableSpace();
+      available=availableSpace(); 
       if(available>=size)
       {
         
@@ -191,7 +192,12 @@ uint8_t   PacketQueue::Pop(uint8_t *ptr, uint32_t *size,uint32_t *sample)
   sz=*size=_slots[slot].size;
   *sample=_slots[slot].sample;
   //printf("Poping slot %d at %u\n",slot,_bufferQueue,_slots[slot].startAt);
-  ADM_assert(_bufferQueue==_slots[slot].startAt);
+  if(!_bufferQueue==_slots[slot].startAt)
+  {
+    printf("Buffer Q:%u\n",_bufferQueue);
+    printf("Slot :%u\n",_slots[slot].startAt);
+    ADM_assert(0);
+  }
   
   if(_bufferSize>=(_bufferQueue+sz))
   {
@@ -233,7 +239,9 @@ uint8_t PacketQueue::Abort(void)
 {
   
   Finished();
+  
   _mutex->lock();
+  _aborted=1;
   _slotHead=_slotQueue=0;
   _bufferQueue=_bufferHead=0;
   _mutex->unlock();
