@@ -33,7 +33,8 @@ mblock_bsumsq_mmx.cc \
 predict_x86.cc build_sub22_mests.cc build_sub44_mests.cc \
 find_best_one_pel.cc \
 motion.cc \
-mblock_sub44_sads_x86.cc fdct_mmx.cc fdct_x86.cc idct_mmx.cc transfrm_x86.cc
+mblock_sub44_sads_x86.cc fdct_mmx.cc fdct_x86.cc idct_mmx.cc transfrm_x86.cc \
+quantize_x86.cc
 
 
 ####### kdevelop will overwrite this part!!! (end)############

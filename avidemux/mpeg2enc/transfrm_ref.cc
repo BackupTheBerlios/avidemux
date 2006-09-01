@@ -201,7 +201,7 @@ void init_transform(void)
 		  psub_pred = sub_pred_mmx;
 		  pfield_dct_best = field_dct_best_mmx;
                   init_mp2_fdct_sse();
-		  printf("\n SETTINGS  idct/fdct : SSE \n");
+                  printf("[Mpeg2enc] SSE idct/fdct\n");
 		  
                 } else
                 if(CpuCaps::hasMMX())
@@ -211,7 +211,7 @@ void init_transform(void)
 		  padd_pred = add_pred_mmx;
 		  psub_pred = sub_pred_mmx;
 		  pfield_dct_best = field_dct_best_mmx;
-		  printf("\n SETTINGS  idct/fdct : MMX \n");
+                  printf("[Mpeg2enc] MMX idct/fdct\n");
 		  
                 }
                 else
@@ -223,7 +223,7 @@ void init_transform(void)
 		padd_pred = add_pred;
 		psub_pred = sub_pred;
 		pfield_dct_best = field_dct_best;
-                printf("\n SETTINGS  idct/fdct : C \n");
+                printf("[Mpeg2enc] C idct/fdct\n");
 #if !defined( ARCH_X86)  && !defined(ARCH_X86_64)
 		printf("Because not X86 Arch\n");
 #endif

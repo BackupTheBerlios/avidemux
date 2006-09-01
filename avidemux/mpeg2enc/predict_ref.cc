@@ -298,18 +298,18 @@ void init_predict(void)
 	if( cpucap  == 0 )	/* No MMX/SSE etc support available */
 	{
 		ppred_comp = pred_comp;
-		printf("SETTING : NO ACCEL\n");
+                printf("[Mpeg2enc] C predict (NO ACCEL)\n");
 	}
 
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
 	else if(cpucap & ACCEL_X86_MMXEXT ) /* AMD MMX or SSE... */
 	{
-		printf( "SETTING EXTENDED MMX for PREDICTION!\n");
+                printf("[Mpeg2enc] MMXE predict\n");
 		ppred_comp = pred_comp_mmxe;
 	}
     else if(cpucap & ACCEL_X86_MMX ) /* Original MMX... */
 	{
-		printf( "SETTING MMX for PREDICTION!\n");
+                printf("[Mpeg2enc] MMX predict\n");
 		ppred_comp = pred_comp_mmx;
 	}
 #endif

@@ -997,7 +997,7 @@ void init_motion_search(void)
 	psubsample_image = subsample_image;
 
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
-	printf("Enabling mmx motion search\n");
+	printf("[Mpeg2enc]Enabling mmx motion search\n");
 	enable_mmxsse_motion(0);
 #endif
 

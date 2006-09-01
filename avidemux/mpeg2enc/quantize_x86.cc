@@ -28,20 +28,18 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#ifdef HAVE_FENV_H
-#include <fenv.h>
-#endif
-#include "syntaxconsts.h"
+
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+
+#include "syntaxparams.h"
 #include "mjpeg_logging.h"
-#include "fastintfns.h"
-#include "cpu_accel.h"
-#include "simd.h"
+/*#include "fastintfns.h"
+#include "cpu_accel.h"*/
+// #include "simd.h"
 #include "mmx.h"
-#if 0
-#include "xmmintrin.h"
-#endif
+
 #include "tables.h"
-#include "quantize_precomp.h"
+//#include "quantize_precomp.h"
 #include "quantize_ref.h"
 					
 int quant_weight_coeff_sum_mmx (int16_t *blk, uint16_t *i_quant_mat );
@@ -170,14 +168,11 @@ restart:
    8 words are handled per iteration; first four words uses mm0-mm3,
    last four words use mm4-mm7.
 */
-static int quant_non_intra_mmx( struct QuantizerWorkSpace *wsp,
-                                int16_t *src, int16_t *dst,
-                                int q_scale_type,
-                                int satlim,
-                                int *nonsat_mquant)
+int quant_non_intra_mmx( int16_t *src, int16_t *dst,       int q_scale_type,               int *nonsat_mquant)
 {
-    int saturated;
+    int saturated,satlim;
     int mquant = *nonsat_mquant;
+#define BLOCK_COUNT block_count
     int   coeff_count = 64*BLOCK_COUNT;
     uint32_t nzflag, flags;
     int16_t *psrc, *pdst, *pdiv, *pmul, *pdivbase, *pmulbase;
@@ -189,15 +184,15 @@ static int quant_non_intra_mmx( struct QuantizerWorkSpace *wsp,
     pxor_r2r( mm6, mm6 );
     pcmpeqw_r2r( mm6, mm6 );
     movq_r2m( mm6, negone_q );
-
+    satlim=opt->dctsatlim;
     /* Load satlim into satlim_q */
     movd_g2r( satlim, mm7 );
     punpcklwd_r2r( mm7, mm7 );
     punpckldq_r2r( mm7, mm7 );
     movq_r2m( mm7, satlim_q );
 
-    pdivbase = (int16_t *)wsp->i_inter_q_tbl[mquant];
-    pmulbase = (int16_t *)wsp->inter_q_tbl[mquant];
+    pdivbase = (int16_t *)i_inter_q_tbl[mquant];
+    pmulbase = (int16_t *)inter_q_tbl[mquant];
 
  restart:
     flags = 0;
@@ -281,9 +276,8 @@ static int quant_non_intra_mmx( struct QuantizerWorkSpace *wsp,
                 else
                 {
 		    emms();
-                    return quant_non_intra(wsp, src, dst, 
+                    return quant_non_intra( src, dst, 
                                            q_scale_type,
-                                           satlim,
                                            nonsat_mquant);
                 }
             }
@@ -300,7 +294,7 @@ static int quant_non_intra_mmx( struct QuantizerWorkSpace *wsp,
     //nzflag = (nzflag<<1) | (!!flags);
     return nzflag;
 }
-
+#if 0
 
 static void iquant_non_intra_m1_mmx(struct QuantizerWorkSpace *wsp,
 							 int16_t *src, int16_t *dst, int mquant )
@@ -327,7 +321,7 @@ static int quant_weight_coeff_x86_inter( struct QuantizerWorkSpace *wsp,
 }
 
 
-#if 0
+
 extern void iquant_non_intra_m2(struct QuantizerWorkSpace *wsp,
                                 int16_t *src, int16_t *dst, int mquant );
                                 
@@ -381,7 +375,7 @@ static int quant_non_intra_test(struct QuantizerWorkSpace *wsp,
     return rv2;
 }
 #endif
-
+#if 0
 static int quant_non_intra_can_use_mmx(struct QuantizerWorkSpace *wsp)
 {
     int i;
@@ -458,3 +452,5 @@ void init_x86_quantization( struct QuantizerCalls *qcalls,
 	mjpeg_info( "SETTING %s %s for QUANTIZER!", opt_type1, opt_type2);
     }
 }
+#endif
+#endif

@@ -471,42 +471,18 @@ void iquant_non_intra(int16_t *src, int16_t *dst, int mquant )
 
 void init_quantizer(void)
 {
-#warning Quantizer MMX code disabled for now!
-#if 0 && defined(USE_MMX)
-        if(CpuCaps::has3DNOW())
-        {
-                printf("Using 3dnow quantizer\n");
-                pquant_non_intra = quant_non_intra_3dnow;
-        }
-        else
-        if(CpuCaps::hasSSE())
-        {
-                printf("Using SSE quantizer\n");
-                pquant_non_intra = quant_non_intra_sse;
-        }else
+  pquant_weight_coeff_sum = quant_weight_coeff_sum;
+  piquant_non_intra = iquant_non_intra;
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
         if(CpuCaps::hasMMX())
         {
-                printf("Using MMX quantizer\n");
+                printf("[Mpeg2enc]Using MMX quant non intra\n");
                 pquant_non_intra = quant_non_intra_mmx;
-        }       
-        else
-#endif         
-        {       printf("Using MMX quantizer\n");
-                pquant_non_intra = quant_non_intra;	
+                
         }
-#warning MMX code disabled
-#if 0 && defined(USE_MMX)
-        if(CpuCaps::hasMMX())
-        {
-                pquant_weight_coeff_sum = quant_weight_coeff_sum_mmx;
-                piquant_non_intra = iquant_non_intra_mmx;
-        }else
-#endif
-        {
-                pquant_weight_coeff_sum = quant_weight_coeff_sum;
-                piquant_non_intra = iquant_non_intra;
-        
-        }        
+        else
+#endif      
+              printf("[Mpeg2enc]Using C quant non intra\n");   
 }
 
 

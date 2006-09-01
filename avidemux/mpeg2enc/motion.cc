@@ -9,7 +9,7 @@ void enable_mmxsse_motion(int cpucap)
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
 	if(CpuCaps::hasMMXEXT())  /* AMD MMX or SSE... */
 	{
-		printf( "SETTING EXTENDED MMX for MOTION!\n");
+                printf( "[Mpeg2enc] MMXE motion \n");
 		psad_sub22 = sad_sub22_mmxe;
 		psad_sub44 = sad_sub44_mmxe;
 		psad_00 = sad_00_mmxe;
@@ -30,7 +30,7 @@ void enable_mmxsse_motion(int cpucap)
 	}
 	else if(CpuCaps::hasMMX()) /* Ordinary MMX CPU */
 	{
-		printf( "SETTING MMX for MOTION!\n");
+                printf( "[Mpeg2enc] MMX motion \n");
 		psad_sub22 = sad_sub22_mmx;
 		psad_sub44 = sad_sub44_mmx;
 		psad_00 = sad_00_mmx;
@@ -50,7 +50,7 @@ void enable_mmxsse_motion(int cpucap)
 	}
 	else
 	{
-		printf( "SETTING regular ME (non accelerated)!\n");
+		printf( "[Mpeg2enc] C motion (non accelerated)!\n");
 	}
 
 #endif

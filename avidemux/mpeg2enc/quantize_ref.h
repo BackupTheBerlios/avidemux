@@ -58,9 +58,7 @@ void iquant_non_intra_m1(int16_t *src, int16_t *dst, uint16_t *quant_mat);
 int quant_non_intra_sse( int16_t *src, int16_t *dst,
                                      int q_scale_type,
                                      int *nonsat_mquant);
-int quant_non_intra_mmx( int16_t *src, int16_t *dst,
-                                     int q_scale_type,
-                                     int *nonsat_mquant);
+int quant_non_intra_mmx( int16_t *src, int16_t *dst,       int q_scale_type,               int *nonsat_mquant);
 int quant_non_intra_3dnow( int16_t *src, int16_t *dst,
                                      int q_scale_type,
                                      int *nonsat_mquant);    
