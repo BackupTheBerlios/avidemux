@@ -39,6 +39,7 @@ typedef enum gui_act
   A_PREVIEW,
   A_PARTIAL,
   A_SCRIPT,
+  A_CLOSE,
   A_DOUBLECLICK,
   A_END
 };
@@ -191,7 +192,8 @@ on_action (gui_act action)
 
     case A_SVCD:
         setSVCD ();
-        updateFilterList ();        setSelectionNumber(nb_active_filter-1, WID(treeview0), stores[0], nb_active_filter-2);
+        updateFilterList ();
+        setSelectionNumber(nb_active_filter-1, WID(treeview0), stores[0], nb_active_filter-2);
         break;
 
     case A_DVD:
@@ -341,7 +343,10 @@ on_action (gui_act action)
         updateFilterList ();
         setSelectionNumber(nb_active_filter-1, WID(treeview0), stores[0], 0);
         break;
-
+    case A_CLOSE:
+        //gtk_widget_destroy(dialog);
+        
+        break;
     case A_SAVE:
         if (nb_active_filter < 2)
         {
@@ -396,19 +401,23 @@ createFilterDialog (void)
     //connect toolbar
 	#define CALLME(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)),"clicked",  GTK_SIGNAL_FUNC(wrapToolButton), (void *) y);
 	//CALLME (toolbuttonAdd, A_ADD);
-	CALLME (toolbuttonRemove,		A_REMOVE);
-	CALLME (toolbuttonProperties,	A_CONFIGURE);
-	CALLME (toolbuttonUp, 			A_UP);
-	CALLME (toolbuttonDown, 		A_DOWN);
-	CALLME (toolbuttonVCD, 			A_VCD);
-	CALLME (toolbuttonSVCD, 		A_SVCD);
-	CALLME (toolbuttonDVD, 			A_DVD);
-	CALLME (toolbuttonSave, 		A_SAVE);
-	CALLME (toolbuttonOpen, 		A_LOAD);
-	CALLME (toolbuttonPreview, 		A_PREVIEW);
-	CALLME (toolbuttonPartial, 		A_PARTIAL);
-	CALLME (toolbuttonHalfD1, 		A_HALFD1);
-	CALLME (toolbuttonScript, 		A_SCRIPT);
+	CALLME (buttonRemove,		A_REMOVE);
+	CALLME (buttonProperties,	A_CONFIGURE);
+	CALLME (buttonUp, 		A_UP);
+	CALLME (buttonDown, 		A_DOWN);
+	CALLME (toolbuttonVCD, 		A_VCD);
+	CALLME (toolbuttonSVCD, 	A_SVCD);
+	CALLME (toolbuttonDVD, 		A_DVD);
+	CALLME (toolbuttonSave, 	A_SAVE);
+        CALLME (toolbuttonScript, 	A_SAVE);
+	CALLME (toolbuttonOpen, 	A_LOAD);
+	CALLME (buttonPreview, 		A_PREVIEW);
+	CALLME (buttonPartial, 		A_PARTIAL);
+        CALLME (buttonAdd, 		A_ADD);
+	CALLME (toolbuttonHalfD1, 	A_HALFD1);
+	CALLME (toolbuttonScript, 	A_SCRIPT);
+        CALLME (button2,         	A_CLOSE);
+        
 
     //create treeviews
     trees[0]=lookup_widget(dialog,"treeview0");
@@ -537,6 +546,7 @@ on_window1_delete_event(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
     gtk_widget_hide(widget);
     gtk_unregister_dialog(widget);
+    dialog=NULL;
     return TRUE;
 }
 

@@ -16,14 +16,34 @@
 #define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
   g_object_set_data (G_OBJECT (component), name, widget)
 
+#define GLADE_HOOKUP_OBJECT(component,widget,name) \
+  g_object_set_data_full (G_OBJECT (component), name, \
+    gtk_widget_ref (widget), (GDestroyNotify) gtk_widget_unref)
+
+#define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
+  g_object_set_data (G_OBJECT (component), name, widget)
+
+
 GtkWidget*
 create_window1 (void)
 {
   GtkWidget *window1;
-  GtkWidget *hbox3;
-  GtkWidget *alignment3;
+  GtkWidget *vbox1;
+  GtkWidget *vbox3b;
+  GtkWidget *toolbar1;
+  GtkIconSize tmp_toolbar_icon_size;
+  GtkWidget *toolbuttonOpen;
+  GtkWidget *toolbuttonSave;
+  GtkWidget *tmp_image;
+  GtkWidget *toolbuttonScript;
+  GtkWidget *toolbuttonDVD;
+  GtkWidget *toolbuttonHalfD1;
+  GtkWidget *toolbuttonSVCD;
+  GtkWidget *toolbuttonVCD;
+  GtkWidget *hbox11;
   GtkWidget *frame1;
   GtkWidget *alignment1;
+  GtkWidget *vbox2;
   GtkWidget *notebook1;
   GtkWidget *scrolledwindow1;
   GtkWidget *treeview1;
@@ -60,33 +80,36 @@ create_window1 (void)
   GtkWidget *hbox4;
   GtkWidget *image7;
   GtkWidget *label22;
+  GtkWidget *hbox13;
+  GtkWidget *buttonAdd;
+  GtkWidget *image11;
   GtkWidget *label23;
-  GtkWidget *alignment4;
   GtkWidget *frame2;
   GtkWidget *alignment2;
   GtkWidget *hbox1;
+  GtkWidget *vbox3;
   GtkWidget *scrolledwindow9;
   GtkWidget *treeview0;
-  GtkWidget *toolbar1;
-  GtkIconSize tmp_toolbar_icon_size;
-  GtkWidget *tmp_image;
-  GtkWidget *toolbuttonOpen;
-  GtkWidget *toolbuttonSave;
-  GtkWidget *toolbuttonScript;
-  GtkWidget *separatortoolitem1;
-  GtkWidget *toolbutton1;
-  GtkWidget *toolbuttonRemove;
-  GtkWidget *toolbuttonProperties;
-  GtkWidget *toolbuttonPartial;
-  GtkWidget *toolbuttonPreview;
-  GtkWidget *toolbuttonUp;
-  GtkWidget *toolbuttonDown;
-  GtkWidget *separatortoolitem3;
-  GtkWidget *toolbuttonDVD;
-  GtkWidget *toolbuttonHalfD1;
-  GtkWidget *toolbuttonSVCD;
-  GtkWidget *toolbuttonVCD;
+  GtkWidget *hbox14;
+  GtkWidget *buttonRemove;
+  GtkWidget *image15;
+  GtkWidget *buttonDown;
+  GtkWidget *image14;
+  GtkWidget *buttonUp;
+  GtkWidget *image13;
+  GtkWidget *buttonPartial;
+  GtkWidget *buttonProperties;
+  GtkWidget *alignment4;
+  GtkWidget *hbox16;
+  GtkWidget *label25;
   GtkWidget *label2;
+  GtkWidget *hbuttonbox1;
+  GtkWidget *buttonPreview;
+  GtkWidget *alignment3;
+  GtkWidget *hbox15;
+  GtkWidget *image16;
+  GtkWidget *label24;
+  GtkWidget *button2;
   GtkAccelGroup *accel_group;
   GtkTooltips *tooltips;
 
@@ -95,43 +118,133 @@ create_window1 (void)
   accel_group = gtk_accel_group_new ();
 
   window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_container_set_border_width (GTK_CONTAINER (window1), 6);
   gtk_window_set_title (GTK_WINDOW (window1), _("Video Filter Manager"));
   gtk_window_set_position (GTK_WINDOW (window1), GTK_WIN_POS_CENTER_ON_PARENT);
-  gtk_window_set_default_size (GTK_WINDOW (window1), 768, 552);
+  gtk_window_set_default_size (GTK_WINDOW (window1), 736, 542);
   gtk_window_set_destroy_with_parent (GTK_WINDOW (window1), TRUE);
 
-  hbox3 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox3);
-  gtk_container_add (GTK_CONTAINER (window1), hbox3);
+  vbox1 = gtk_vbox_new (FALSE, 12);
+  gtk_widget_show (vbox1);
+  gtk_container_add (GTK_CONTAINER (window1), vbox1);
 
-  alignment3 = gtk_alignment_new (0.5, 0.5, 1, 1);
-  gtk_widget_show (alignment3);
-  gtk_box_pack_start (GTK_BOX (hbox3), alignment3, TRUE, TRUE, 0);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment3), 4, 4, 4, 4);
+  vbox3b = gtk_vbox_new (FALSE, 12);
+  gtk_widget_show (vbox3b);
+  gtk_box_pack_start (GTK_BOX (vbox1), vbox3b, TRUE, TRUE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox3b), 6);
+
+  toolbar1 = gtk_toolbar_new ();
+  gtk_widget_show (toolbar1);
+  gtk_box_pack_start (GTK_BOX (vbox3b), toolbar1, FALSE, FALSE, 0);
+  gtk_toolbar_set_style (GTK_TOOLBAR (toolbar1), GTK_TOOLBAR_BOTH);
+  tmp_toolbar_icon_size = gtk_toolbar_get_icon_size (GTK_TOOLBAR (toolbar1));
+
+  toolbuttonOpen = (GtkWidget*) gtk_tool_button_new_from_stock ("gtk-open");
+  gtk_widget_show (toolbuttonOpen);
+  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonOpen);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonOpen), tooltips, _("Open filter list [Ctrl-O]"), NULL);
+  gtk_widget_add_accelerator (toolbuttonOpen, "clicked", accel_group,
+                              GDK_O, (GdkModifierType) GDK_CONTROL_MASK,
+                              GTK_ACCEL_VISIBLE);
+  gtk_tool_item_set_is_important (GTK_TOOL_ITEM (toolbuttonOpen), TRUE);
+
+  toolbuttonSave = (GtkWidget*) gtk_tool_button_new_from_stock ("gtk-save");
+  gtk_widget_show (toolbuttonSave);
+  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonSave);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonSave), tooltips, _("Save filter list [Ctrl-S]"), NULL);
+  gtk_widget_add_accelerator (toolbuttonSave, "clicked", accel_group,
+                              GDK_S, (GdkModifierType) GDK_CONTROL_MASK,
+                              GTK_ACCEL_VISIBLE);
+  gtk_tool_item_set_is_important (GTK_TOOL_ITEM (toolbuttonSave), TRUE);
+
+  tmp_image = gtk_image_new_from_stock ("gtk-save-as", tmp_toolbar_icon_size);
+  gtk_widget_show (tmp_image);
+  toolbuttonScript = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Save Script"));
+  gtk_widget_show (toolbuttonScript);
+  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonScript);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonScript), tooltips, _("Save as script [Ctrl-J]"), NULL);
+  gtk_widget_add_accelerator (toolbuttonScript, "clicked", accel_group,
+                              GDK_J, (GdkModifierType) GDK_CONTROL_MASK,
+                              GTK_ACCEL_VISIBLE);
+  gtk_tool_item_set_is_important (GTK_TOOL_ITEM (toolbuttonScript), TRUE);
+
+  tmp_image = gtk_image_new_from_stock ("gtk-cdrom", tmp_toolbar_icon_size);
+  gtk_widget_show (tmp_image);
+  toolbuttonDVD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("DVD Res"));
+  gtk_widget_show (toolbuttonDVD);
+  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonDVD);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonDVD), tooltips, _("DVD resolution [Ctrl-1]"), NULL);
+  gtk_widget_add_accelerator (toolbuttonDVD, "clicked", accel_group,
+                              GDK_1, (GdkModifierType) GDK_CONTROL_MASK,
+                              GTK_ACCEL_VISIBLE);
+  gtk_tool_item_set_is_important (GTK_TOOL_ITEM (toolbuttonDVD), TRUE);
+
+  tmp_image = gtk_image_new_from_stock ("gtk-cdrom", tmp_toolbar_icon_size);
+  gtk_widget_show (tmp_image);
+  toolbuttonHalfD1 = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Half D1 Res"));
+  gtk_widget_show (toolbuttonHalfD1);
+  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonHalfD1);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonHalfD1), tooltips, _("Half D1 resolution [Ctrl-2]"), NULL);
+  gtk_widget_add_accelerator (toolbuttonHalfD1, "clicked", accel_group,
+                              GDK_2, (GdkModifierType) GDK_CONTROL_MASK,
+                              GTK_ACCEL_VISIBLE);
+  gtk_tool_item_set_is_important (GTK_TOOL_ITEM (toolbuttonHalfD1), TRUE);
+
+  tmp_image = gtk_image_new_from_stock ("gtk-cdrom", tmp_toolbar_icon_size);
+  gtk_widget_show (tmp_image);
+  toolbuttonSVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("SVCD Res"));
+  gtk_widget_show (toolbuttonSVCD);
+  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonSVCD);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonSVCD), tooltips, _("SVCD resolution [Ctrl-3]"), NULL);
+  gtk_widget_add_accelerator (toolbuttonSVCD, "clicked", accel_group,
+                              GDK_3, (GdkModifierType) GDK_CONTROL_MASK,
+                              GTK_ACCEL_VISIBLE);
+  gtk_tool_item_set_is_important (GTK_TOOL_ITEM (toolbuttonSVCD), TRUE);
+
+  tmp_image = gtk_image_new_from_stock ("gtk-cdrom", tmp_toolbar_icon_size);
+  gtk_widget_show (tmp_image);
+  toolbuttonVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("VCD Res"));
+  gtk_widget_show (toolbuttonVCD);
+  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonVCD);
+  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonVCD), tooltips, _("VCD resolution [Ctrl-4]"), NULL);
+  gtk_widget_add_accelerator (toolbuttonVCD, "clicked", accel_group,
+                              GDK_4, (GdkModifierType) GDK_CONTROL_MASK,
+                              GTK_ACCEL_VISIBLE);
+  gtk_tool_item_set_is_important (GTK_TOOL_ITEM (toolbuttonVCD), TRUE);
+
+  hbox11 = gtk_hbox_new (FALSE, 12);
+  gtk_widget_show (hbox11);
+  gtk_box_pack_start (GTK_BOX (vbox3b), hbox11, TRUE, TRUE, 0);
 
   frame1 = gtk_frame_new (NULL);
   gtk_widget_show (frame1);
-  gtk_container_add (GTK_CONTAINER (alignment3), frame1);
+  gtk_box_pack_start (GTK_BOX (hbox11), frame1, TRUE, TRUE, 0);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_NONE);
 
   alignment1 = gtk_alignment_new (0.5, 0.5, 1, 1);
   gtk_widget_show (alignment1);
   gtk_container_add (GTK_CONTAINER (frame1), alignment1);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment1), 4, 4, 4, 4);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment1), 6, 0, 18, 0);
+
+  vbox2 = gtk_vbox_new (FALSE, 6);
+  gtk_widget_show (vbox2);
+  gtk_container_add (GTK_CONTAINER (alignment1), vbox2);
 
   notebook1 = gtk_notebook_new ();
   gtk_widget_show (notebook1);
-  gtk_container_add (GTK_CONTAINER (alignment1), notebook1);
+  gtk_box_pack_start (GTK_BOX (vbox2), notebook1, TRUE, TRUE, 0);
   gtk_notebook_set_show_border (GTK_NOTEBOOK (notebook1), FALSE);
-  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook1), GTK_POS_RIGHT);
+  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook1), GTK_POS_LEFT);
 
   scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow1);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow1);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   treeview1 = gtk_tree_view_new ();
   gtk_widget_show (treeview1);
   gtk_container_add (GTK_CONTAINER (scrolledwindow1), treeview1);
+  gtk_widget_set_size_request (treeview1, -1, 336);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (treeview1), FALSE);
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview1), TRUE);
   gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview1), FALSE);
@@ -144,7 +257,7 @@ create_window1 (void)
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox5), image1, FALSE, FALSE, 0);
 
-  label11 = gtk_label_new_with_mnemonic (_("_Transform"));
+  label11 = gtk_label_new_with_mnemonic (_("Transform"));
   gtk_widget_show (label11);
   gtk_box_pack_start (GTK_BOX (hbox5), label11, FALSE, FALSE, 4);
   gtk_label_set_use_markup (GTK_LABEL (label11), TRUE);
@@ -169,7 +282,7 @@ create_window1 (void)
   gtk_widget_show (image2);
   gtk_box_pack_start (GTK_BOX (hbox6), image2, FALSE, FALSE, 0);
 
-  label17 = gtk_label_new_with_mnemonic (_("_Interlacing"));
+  label17 = gtk_label_new_with_mnemonic (_("Interlacing"));
   gtk_widget_show (label17);
   gtk_box_pack_start (GTK_BOX (hbox6), label17, FALSE, FALSE, 4);
 
@@ -193,7 +306,7 @@ create_window1 (void)
   gtk_widget_show (image3);
   gtk_box_pack_start (GTK_BOX (hbox7), image3, FALSE, FALSE, 0);
 
-  label18 = gtk_label_new_with_mnemonic (_("_Colors"));
+  label18 = gtk_label_new_with_mnemonic (_("Colors"));
   gtk_widget_show (label18);
   gtk_box_pack_start (GTK_BOX (hbox7), label18, FALSE, FALSE, 4);
 
@@ -217,7 +330,7 @@ create_window1 (void)
   gtk_widget_show (image4);
   gtk_box_pack_start (GTK_BOX (hbox8), image4, FALSE, FALSE, 0);
 
-  label19 = gtk_label_new_with_mnemonic (_("_Denoise"));
+  label19 = gtk_label_new_with_mnemonic (_("Noise"));
   gtk_widget_show (label19);
   gtk_box_pack_start (GTK_BOX (hbox8), label19, FALSE, FALSE, 4);
 
@@ -241,7 +354,7 @@ create_window1 (void)
   gtk_widget_show (image5);
   gtk_box_pack_start (GTK_BOX (hbox9), image5, FALSE, FALSE, 0);
 
-  label20 = gtk_label_new_with_mnemonic (_("_Blur/Sharpen"));
+  label20 = gtk_label_new_with_mnemonic (_("Sharpness"));
   gtk_widget_show (label20);
   gtk_box_pack_start (GTK_BOX (hbox9), label20, FALSE, FALSE, 4);
 
@@ -265,7 +378,7 @@ create_window1 (void)
   gtk_widget_show (image6);
   gtk_box_pack_start (GTK_BOX (hbox10), image6, FALSE, FALSE, 0);
 
-  label21 = gtk_label_new_with_mnemonic (_("S_ubtitles"));
+  label21 = gtk_label_new_with_mnemonic (_("Subtitles"));
   gtk_widget_show (label21);
   gtk_box_pack_start (GTK_BOX (hbox10), label21, FALSE, FALSE, 4);
 
@@ -289,38 +402,51 @@ create_window1 (void)
   gtk_widget_show (image7);
   gtk_box_pack_start (GTK_BOX (hbox4), image7, FALSE, FALSE, 0);
 
-  label22 = gtk_label_new_with_mnemonic (_("_Misc"));
+  label22 = gtk_label_new_with_mnemonic (_("Misc"));
   gtk_widget_show (label22);
   gtk_box_pack_start (GTK_BOX (hbox4), label22, FALSE, FALSE, 4);
 
-  label23 = gtk_label_new (_("<span size=\"larger\" >Available Filters</span>"));
+  hbox13 = gtk_hbox_new (FALSE, 6);
+  gtk_widget_show (hbox13);
+  gtk_box_pack_start (GTK_BOX (vbox2), hbox13, FALSE, FALSE, 0);
+
+  buttonAdd = gtk_button_new ();
+  gtk_widget_show (buttonAdd);
+  gtk_box_pack_end (GTK_BOX (hbox13), buttonAdd, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, buttonAdd, _("Add selected filter to the Active Filters list"), NULL);
+
+  image11 = gtk_image_new_from_stock ("gtk-add", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image11);
+  gtk_container_add (GTK_CONTAINER (buttonAdd), image11);
+
+  label23 = gtk_label_new (_("<b>Available Filters</b>"));
   gtk_widget_show (label23);
   gtk_frame_set_label_widget (GTK_FRAME (frame1), label23);
   gtk_label_set_use_markup (GTK_LABEL (label23), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label23), 1, 1);
 
-  alignment4 = gtk_alignment_new (0.5, 0.5, 1, 1);
-  gtk_widget_show (alignment4);
-  gtk_box_pack_start (GTK_BOX (hbox3), alignment4, TRUE, TRUE, 0);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment4), 4, 4, 4, 4);
-
   frame2 = gtk_frame_new (NULL);
   gtk_widget_show (frame2);
-  gtk_container_add (GTK_CONTAINER (alignment4), frame2);
+  gtk_box_pack_start (GTK_BOX (hbox11), frame2, TRUE, TRUE, 0);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame2), GTK_SHADOW_NONE);
 
   alignment2 = gtk_alignment_new (0.5, 0.5, 1, 1);
   gtk_widget_show (alignment2);
   gtk_container_add (GTK_CONTAINER (frame2), alignment2);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment2), 4, 4, 4, 4);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment2), 6, 0, 18, 0);
 
   hbox1 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox1);
   gtk_container_add (GTK_CONTAINER (alignment2), hbox1);
 
+  vbox3 = gtk_vbox_new (FALSE, 6);
+  gtk_widget_show (vbox3);
+  gtk_box_pack_start (GTK_BOX (hbox1), vbox3, TRUE, TRUE, 0);
+
   scrolledwindow9 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow9);
-  gtk_box_pack_start (GTK_BOX (hbox1), scrolledwindow9, TRUE, TRUE, 0);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow9), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_box_pack_start (GTK_BOX (vbox3), scrolledwindow9, TRUE, TRUE, 0);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow9), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow9), GTK_SHADOW_OUT);
 
   treeview0 = gtk_tree_view_new ();
@@ -330,173 +456,114 @@ create_window1 (void)
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview0), TRUE);
   gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview0), FALSE);
 
-  toolbar1 = gtk_toolbar_new ();
-  gtk_widget_show (toolbar1);
-  gtk_box_pack_start (GTK_BOX (hbox1), toolbar1, FALSE, FALSE, 0);
-  gtk_toolbar_set_style (GTK_TOOLBAR (toolbar1), GTK_TOOLBAR_BOTH_HORIZ);
-  gtk_toolbar_set_orientation (GTK_TOOLBAR (toolbar1), GTK_ORIENTATION_VERTICAL);
-  tmp_toolbar_icon_size = gtk_toolbar_get_icon_size (GTK_TOOLBAR (toolbar1));
+  hbox14 = gtk_hbox_new (FALSE, 6);
+  gtk_widget_show (hbox14);
+  gtk_box_pack_start (GTK_BOX (vbox3), hbox14, FALSE, FALSE, 0);
 
-  tmp_image = gtk_image_new_from_stock ("gtk-open", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonOpen = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Open"));
-  gtk_widget_show (toolbuttonOpen);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonOpen);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonOpen), tooltips, _("Open filter list [Ctrl+O]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonOpen, "clicked", accel_group,
-                              GDK_o, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
+  buttonRemove = gtk_button_new ();
+  gtk_widget_show (buttonRemove);
+  gtk_box_pack_end (GTK_BOX (hbox14), buttonRemove, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, buttonRemove, _("Remove filter"), NULL);
 
-  tmp_image = gtk_image_new_from_stock ("gtk-save", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonSave = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Save"));
-  gtk_widget_show (toolbuttonSave);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonSave);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonSave), tooltips, _("Save filter list [Ctrl+S]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonSave, "clicked", accel_group,
-                              GDK_s, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
+  image15 = gtk_image_new_from_stock ("gtk-remove", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image15);
+  gtk_container_add (GTK_CONTAINER (buttonRemove), image15);
 
-  tmp_image = gtk_image_new_from_stock ("gtk-save-as", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonScript = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Save Script"));
-  gtk_widget_show (toolbuttonScript);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonScript);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonScript), tooltips, _("Save as script [Ctrl+J]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonScript, "clicked", accel_group,
-                              GDK_j, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
+  buttonDown = gtk_button_new ();
+  gtk_widget_show (buttonDown);
+  gtk_box_pack_end (GTK_BOX (hbox14), buttonDown, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, buttonDown, _("Move filter down"), NULL);
 
-  separatortoolitem1 = (GtkWidget*) gtk_separator_tool_item_new ();
-  gtk_widget_show (separatortoolitem1);
-  gtk_container_add (GTK_CONTAINER (toolbar1), separatortoolitem1);
+  image14 = gtk_image_new_from_icon_name ("gtk-go-down", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image14);
+  gtk_container_add (GTK_CONTAINER (buttonDown), image14);
 
-  tmp_image = gtk_image_new_from_stock ("gtk-add", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbutton1 = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Add"));
-  gtk_widget_show (toolbutton1);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbutton1);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbutton1), tooltips, _("Add filter [Ctrl+A]"), NULL);
-  gtk_widget_add_accelerator (toolbutton1, "clicked", accel_group,
-                              GDK_a, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
+  buttonUp = gtk_button_new ();
+  gtk_widget_show (buttonUp);
+  gtk_box_pack_end (GTK_BOX (hbox14), buttonUp, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, buttonUp, _("Move filter up"), NULL);
 
-  tmp_image = gtk_image_new_from_stock ("gtk-remove", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonRemove = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Remove"));
-  gtk_widget_show (toolbuttonRemove);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonRemove);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonRemove), tooltips, _("Remove filter [Del]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonRemove, "clicked", accel_group,
-                              GDK_Delete, (GdkModifierType)0,
-                              GTK_ACCEL_VISIBLE);
+  image13 = gtk_image_new_from_icon_name ("gtk-go-up", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image13);
+  gtk_container_add (GTK_CONTAINER (buttonUp), image13);
 
-  tmp_image = gtk_image_new_from_stock ("gtk-properties", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonProperties = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Configure"));
-  gtk_widget_show (toolbuttonProperties);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonProperties);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonProperties), tooltips, _("Configure filter [Ctrl+F]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonProperties, "clicked", accel_group,
-                              GDK_f, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
+  buttonPartial = gtk_button_new_with_mnemonic (_("P_artial"));
+  gtk_widget_show (buttonPartial);
+  gtk_box_pack_end (GTK_BOX (hbox14), buttonPartial, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, buttonPartial, _("Apply the curent filter only to a part of the file"), NULL);
 
-  tmp_image = gtk_image_new_from_stock ("gtk-dnd-multiple", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonPartial = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Partial"));
-  gtk_widget_show (toolbuttonPartial);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonPartial);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonPartial), tooltips, _("Partial filter [Ctrl+L]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonPartial, "clicked", accel_group,
-                              GDK_l, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
+  buttonProperties = gtk_button_new ();
+  gtk_widget_show (buttonProperties);
+  gtk_box_pack_end (GTK_BOX (hbox14), buttonProperties, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, buttonProperties, _("Configure filter"), NULL);
 
-  tmp_image = gtk_image_new_from_stock ("gtk-print-preview", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonPreview = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Preview"));
-  gtk_widget_show (toolbuttonPreview);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonPreview);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonPreview), tooltips, _("Preview [Ctrl+P]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonPreview, "clicked", accel_group,
-                              GDK_p, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
+  alignment4 = gtk_alignment_new (0.5, 0.5, 0, 0);
+  gtk_widget_show (alignment4);
+  gtk_container_add (GTK_CONTAINER (buttonProperties), alignment4);
 
-  tmp_image = gtk_image_new_from_stock ("gtk-go-up", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonUp = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Up"));
-  gtk_widget_show (toolbuttonUp);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonUp);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonUp), tooltips, _("Move filter up [Ctrl+Up]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonUp, "clicked", accel_group,
-                              GDK_Up, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
+  hbox16 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox16);
+  gtk_container_add (GTK_CONTAINER (alignment4), hbox16);
 
-  tmp_image = gtk_image_new_from_stock ("gtk-go-down", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonDown = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Down"));
-  gtk_widget_show (toolbuttonDown);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonDown);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonDown), tooltips, _("Move filter down [Ctrl+Down]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonDown, "clicked", accel_group,
-                              GDK_Down, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
+  label25 = gtk_label_new_with_mnemonic (_("C_onfigure"));
+  gtk_widget_show (label25);
+  gtk_box_pack_start (GTK_BOX (hbox16), label25, FALSE, FALSE, 0);
 
-  separatortoolitem3 = (GtkWidget*) gtk_separator_tool_item_new ();
-  gtk_widget_show (separatortoolitem3);
-  gtk_container_add (GTK_CONTAINER (toolbar1), separatortoolitem3);
-
-  tmp_image = gtk_image_new_from_stock ("gtk-zoom-fit", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonDVD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("DVD res"));
-  gtk_widget_show (toolbuttonDVD);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonDVD);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonDVD), tooltips, _("DVD resolution [Ctrl+1]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonDVD, "clicked", accel_group,
-                              GDK_1, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
-
-  tmp_image = gtk_image_new_from_stock ("gtk-zoom-fit", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonHalfD1 = (GtkWidget*) gtk_tool_button_new (tmp_image, _("Half D1 res"));
-  gtk_widget_show (toolbuttonHalfD1);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonHalfD1);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonHalfD1), tooltips, _("Half D1 resolution [Ctrl+2]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonHalfD1, "clicked", accel_group,
-                              GDK_2, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
-
-  tmp_image = gtk_image_new_from_stock ("gtk-zoom-fit", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonSVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("SVCD res"));
-  gtk_widget_show (toolbuttonSVCD);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonSVCD);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonSVCD), tooltips, _("SVCD resolution [Ctrl+3]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonSVCD, "clicked", accel_group,
-                              GDK_3, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
-
-  tmp_image = gtk_image_new_from_stock ("gtk-zoom-fit", tmp_toolbar_icon_size);
-  gtk_widget_show (tmp_image);
-  toolbuttonVCD = (GtkWidget*) gtk_tool_button_new (tmp_image, _("VCD res"));
-  gtk_widget_show (toolbuttonVCD);
-  gtk_container_add (GTK_CONTAINER (toolbar1), toolbuttonVCD);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toolbuttonVCD), tooltips, _("VCD resolution [Ctrl+4]"), NULL);
-  gtk_widget_add_accelerator (toolbuttonVCD, "clicked", accel_group,
-                              GDK_4, GDK_CONTROL_MASK,
-                              GTK_ACCEL_VISIBLE);
-
-  label2 = gtk_label_new (_("<span size=\"larger\" >Active Filters</span>"));
+  label2 = gtk_label_new (_("<b >Active Filters</b>"));
   gtk_widget_show (label2);
   gtk_frame_set_label_widget (GTK_FRAME (frame2), label2);
   gtk_label_set_use_markup (GTK_LABEL (label2), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label2), 1, 1);
 
+  hbuttonbox1 = gtk_hbutton_box_new ();
+  gtk_widget_show (hbuttonbox1);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbuttonbox1, FALSE, FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (hbuttonbox1), 6);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox1), GTK_BUTTONBOX_END);
+  gtk_box_set_spacing (GTK_BOX (hbuttonbox1), 10);
+
+  buttonPreview = gtk_button_new ();
+  gtk_widget_show (buttonPreview);
+  gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonPreview);
+  GTK_WIDGET_SET_FLAGS (buttonPreview, GTK_CAN_DEFAULT);
+
+  alignment3 = gtk_alignment_new (0.5, 0.5, 0, 0);
+  gtk_widget_show (alignment3);
+  gtk_container_add (GTK_CONTAINER (buttonPreview), alignment3);
+
+  hbox15 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox15);
+  gtk_container_add (GTK_CONTAINER (alignment3), hbox15);
+
+  image16 = create_pixmap (window1, "preview-button.png");
+  gtk_widget_show (image16);
+  gtk_box_pack_start (GTK_BOX (hbox15), image16, FALSE, FALSE, 0);
+
+  label24 = gtk_label_new_with_mnemonic (_("_Preview"));
+  gtk_widget_show (label24);
+  gtk_box_pack_start (GTK_BOX (hbox15), label24, FALSE, FALSE, 0);
+
+  button2 = gtk_button_new_from_stock ("gtk-close");
+  gtk_widget_show (button2);
+  gtk_container_add (GTK_CONTAINER (hbuttonbox1), button2);
+  GTK_WIDGET_SET_FLAGS (button2, GTK_CAN_DEFAULT);
+
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (window1, window1, "window1");
-  GLADE_HOOKUP_OBJECT (window1, hbox3, "hbox3");
-  GLADE_HOOKUP_OBJECT (window1, alignment3, "alignment3");
+  GLADE_HOOKUP_OBJECT (window1, vbox1, "vbox1");
+  GLADE_HOOKUP_OBJECT (window1, vbox3b, "vbox3b");
+  GLADE_HOOKUP_OBJECT (window1, toolbar1, "toolbar1");
+  GLADE_HOOKUP_OBJECT (window1, toolbuttonOpen, "toolbuttonOpen");
+  GLADE_HOOKUP_OBJECT (window1, toolbuttonSave, "toolbuttonSave");
+  GLADE_HOOKUP_OBJECT (window1, toolbuttonScript, "toolbuttonScript");
+  GLADE_HOOKUP_OBJECT (window1, toolbuttonDVD, "toolbuttonDVD");
+  GLADE_HOOKUP_OBJECT (window1, toolbuttonHalfD1, "toolbuttonHalfD1");
+  GLADE_HOOKUP_OBJECT (window1, toolbuttonSVCD, "toolbuttonSVCD");
+  GLADE_HOOKUP_OBJECT (window1, toolbuttonVCD, "toolbuttonVCD");
+  GLADE_HOOKUP_OBJECT (window1, hbox11, "hbox11");
   GLADE_HOOKUP_OBJECT (window1, frame1, "frame1");
   GLADE_HOOKUP_OBJECT (window1, alignment1, "alignment1");
+  GLADE_HOOKUP_OBJECT (window1, vbox2, "vbox2");
   GLADE_HOOKUP_OBJECT (window1, notebook1, "notebook1");
   GLADE_HOOKUP_OBJECT (window1, scrolledwindow1, "scrolledwindow1");
   GLADE_HOOKUP_OBJECT (window1, treeview1, "treeview1");
@@ -533,31 +600,36 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, hbox4, "hbox4");
   GLADE_HOOKUP_OBJECT (window1, image7, "image7");
   GLADE_HOOKUP_OBJECT (window1, label22, "label22");
+  GLADE_HOOKUP_OBJECT (window1, hbox13, "hbox13");
+  GLADE_HOOKUP_OBJECT (window1, buttonAdd, "buttonAdd");
+  GLADE_HOOKUP_OBJECT (window1, image11, "image11");
   GLADE_HOOKUP_OBJECT (window1, label23, "label23");
-  GLADE_HOOKUP_OBJECT (window1, alignment4, "alignment4");
   GLADE_HOOKUP_OBJECT (window1, frame2, "frame2");
   GLADE_HOOKUP_OBJECT (window1, alignment2, "alignment2");
   GLADE_HOOKUP_OBJECT (window1, hbox1, "hbox1");
+  GLADE_HOOKUP_OBJECT (window1, vbox3, "vbox3");
   GLADE_HOOKUP_OBJECT (window1, scrolledwindow9, "scrolledwindow9");
   GLADE_HOOKUP_OBJECT (window1, treeview0, "treeview0");
-  GLADE_HOOKUP_OBJECT (window1, toolbar1, "toolbar1");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonOpen, "toolbuttonOpen");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonSave, "toolbuttonSave");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonScript, "toolbuttonScript");
-  GLADE_HOOKUP_OBJECT (window1, separatortoolitem1, "separatortoolitem1");
-  GLADE_HOOKUP_OBJECT (window1, toolbutton1, "toolbutton1");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonRemove, "toolbuttonRemove");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonProperties, "toolbuttonProperties");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonPartial, "toolbuttonPartial");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonPreview, "toolbuttonPreview");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonUp, "toolbuttonUp");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonDown, "toolbuttonDown");
-  GLADE_HOOKUP_OBJECT (window1, separatortoolitem3, "separatortoolitem3");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonDVD, "toolbuttonDVD");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonHalfD1, "toolbuttonHalfD1");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonSVCD, "toolbuttonSVCD");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonVCD, "toolbuttonVCD");
+  GLADE_HOOKUP_OBJECT (window1, hbox14, "hbox14");
+  GLADE_HOOKUP_OBJECT (window1, buttonRemove, "buttonRemove");
+  GLADE_HOOKUP_OBJECT (window1, image15, "image15");
+  GLADE_HOOKUP_OBJECT (window1, buttonDown, "buttonDown");
+  GLADE_HOOKUP_OBJECT (window1, image14, "image14");
+  GLADE_HOOKUP_OBJECT (window1, buttonUp, "buttonUp");
+  GLADE_HOOKUP_OBJECT (window1, image13, "image13");
+  GLADE_HOOKUP_OBJECT (window1, buttonPartial, "buttonPartial");
+  GLADE_HOOKUP_OBJECT (window1, buttonProperties, "buttonProperties");
+  GLADE_HOOKUP_OBJECT (window1, alignment4, "alignment4");
+  GLADE_HOOKUP_OBJECT (window1, hbox16, "hbox16");
+  GLADE_HOOKUP_OBJECT (window1, label25, "label25");
   GLADE_HOOKUP_OBJECT (window1, label2, "label2");
+  GLADE_HOOKUP_OBJECT (window1, hbuttonbox1, "hbuttonbox1");
+  GLADE_HOOKUP_OBJECT (window1, buttonPreview, "buttonPreview");
+  GLADE_HOOKUP_OBJECT (window1, alignment3, "alignment3");
+  GLADE_HOOKUP_OBJECT (window1, hbox15, "hbox15");
+  GLADE_HOOKUP_OBJECT (window1, image16, "image16");
+  GLADE_HOOKUP_OBJECT (window1, label24, "label24");
+  GLADE_HOOKUP_OBJECT (window1, button2, "button2");
   GLADE_HOOKUP_OBJECT_NO_REF (window1, tooltips, "tooltips");
 
   gtk_window_add_accel_group (GTK_WINDOW (window1), accel_group);
