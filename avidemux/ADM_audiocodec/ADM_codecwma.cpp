@@ -103,6 +103,7 @@ uint8_t ADM_AudiocodecWMA::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uin
 int out=0;
 int max=0,pout=0;
 int16_t *run16;
+int nbChunk;
 
         *nbOut=0;
         // Shrink
@@ -118,8 +119,10 @@ int16_t *run16;
         _tail+=nbIn;
         while(_tail-_head>=_blockalign)
         {
+          nbChunk=(_tail-_head)/_blockalign;
+          pout=SCRATCH_PAD_SIZE;
           out=avcodec_decode_audio(_context,(int16_t *)scratchPad,
-                                   &pout,_buffer+_head,_tail-_head);
+                                   &pout,_buffer+_head,nbChunk*_blockalign);
                 
           if(out<0)
           {
@@ -127,7 +130,11 @@ int16_t *run16;
             _head+=1; // Try skipping some bytes
             continue;
           }
-          ADM_assert(pout<SCRATCH_PAD_SIZE);
+          if(pout>=SCRATCH_PAD_SIZE)
+          {
+            printf("Produced : %u, buffer %u,in%u\n",pout,SCRATCH_PAD_SIZE,_tail-_head);
+            ADM_assert(0); 
+          }
           _head+=out; // consumed bytes
           pout>>=1;
           *nbOut+=pout;
