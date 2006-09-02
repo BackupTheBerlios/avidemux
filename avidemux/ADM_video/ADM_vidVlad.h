@@ -35,6 +35,19 @@ typedef struct VLAD_PARAM
         			uint64_t		ythresholdMask;
 				uint64_t 		cthresholdMask;
 				uint32_t 		num_frame;
+				void (*ProcessCPlane)(unsigned char *source,
+				                      unsigned char *prev,
+				                      unsigned char* dest,
+				                      unsigned char* mask,
+				                      int width, int height,
+				                      uint64_t  threshold);
+				void (*ProcessYPlane)(unsigned char *source,
+				                      unsigned char *prev,
+				                      unsigned char* dest,
+				                      unsigned char* mask,
+				                      long int width,
+				                      long int height,
+				                      uint64_t  threshold);
  public:
 
 
