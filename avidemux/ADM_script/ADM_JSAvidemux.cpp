@@ -511,7 +511,10 @@ JSBool ADM_JSAvidemux::rebuildIndex(JSContext *cx, JSObject *obj, uintN argc,
         if(argc != 0)
                 return JS_FALSE;
         enterLock();
-        video_body->rebuildFrameType();
+        if(!video_body->isReordered(0)) // already done
+        {
+          video_body->rebuildFrameType();
+        }
  	leaveLock();
        return JS_TRUE;
 }// end GoToTime
