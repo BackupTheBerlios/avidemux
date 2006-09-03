@@ -283,6 +283,12 @@ void ProcessYPlane_mmxe( unsigned char *source,
 	w8 = -(width >> 3);
 	width >>= 1;
 
+__asm__ __volatile__(
+			"movq (%0),%%mm6 \n\t"
+			:
+			: "r"(&threshold)
+		);
+	
 	for (h2 = height >> 1; --h2 >= 0;)
 	{
 		source += 4*width;
@@ -296,13 +302,12 @@ void ProcessYPlane_mmxe( unsigned char *source,
 #define REG_mask "%5"
 #define REG_counter "%0"
 #define REG_counter2 "%1"
-#define REG_threshold "%6"
-#define REG_zero "%7"
 	  
 __asm__ __volatile__(
 "prefetchnta ("REG_source","REG_counter",8) \n\t"
 "prefetchnta ("REG_prev","REG_counter",8) \n\t"
 ".p2align 4\n\t"
+"pxor %%mm7,%%mm7\n\t"
 "HLine%=:  \n\t"
 
 "prefetchnta ("REG_source","REG_counter2",8) \n\t"
@@ -317,8 +322,8 @@ __asm__ __volatile__(
 "por %%mm1,%%mm0 \n\t"                // mm0=mm0 or mm1
 "pavgb %%mm2,%%mm3 \n\t"              // mm3= 'mm2+mm3"/2
 " \n\t"                               // mm0=mm6-mm0 diff to threshold
-"psubusb "REG_threshold",%%mm0 \n\t"  // >0 ?
-"pcmpeqb "REG_zero",%%mm0 \n\t"
+"psubusb %%mm6,%%mm0 \n\t"  // >0 ?
+"pcmpeqb %%mm7,%%mm0 \n\t"
 " \n\t"
 "movq %%mm0,%%mm4 \n\t"               // masked diff >m4
 " \n\t"
@@ -342,8 +347,8 @@ __asm__ __volatile__(
 "por %%mm1,%%mm0 \n\t"                // mm0=mm0 or mm1
 "pavgb %%mm2,%%mm3 \n\t"              // mm3= 'mm2+mm3"/2
 " \n\t"                               // mm0=mm6-mm0 diff to threshold
-"psubusb "REG_threshold",%%mm0 \n\t"  // >0 ?
-"pcmpeqb "REG_zero",%%mm0 \n\t"
+"psubusb %%mm6,%%mm0 \n\t"  // >0 ?
+"pcmpeqb %%mm7,%%mm0 \n\t"
 " \n\t"
 
 "pand %%mm0,%%mm4 \n\t"
@@ -365,8 +370,9 @@ __asm__ __volatile__(
 "jnz HLine%="                         // while !=0
  : "=r"(tmp), "=r"(tmp2)
  : "r"(source), "r"(dest), "r"(prev),
-   "r"(mask), "y"(threshold), "y"(0), "0"(2*w8), "1"(w8)
- : "mm0", "mm1", "mm2", "mm3", "mm4");
+   "r"(mask)
+   , "0"(2*w8), "1"(w8):
+ );
 
 	}
  __asm__ __volatile__("emms \n\t");
@@ -392,11 +398,18 @@ void ProcessCPlane_mmxe(unsigned char *source,
 	mask += w8;
 	w8 = -(w8>>3);
 
+__asm__ __volatile__(
+			"movq (%0),%%mm6 \n\t"
+			:
+			: "r"(&threshold)
+		);
+	
 __asm__ __volatile__ (
 "prefetchnta ("REG_source","REG_counter",8) \n\t"
 "prefetchnta ("REG_prev","REG_counter",8) \n\t"
 "prefetchnta ("REG_mask","REG_counter",8) \n\t"
 ".p2align 4\n\t"
+"pxor %%mm7,%%mm7\n\t"
 "Lfoo%=:  \n\t"
 "prefetchnta 8("REG_source","REG_counter",8) \n\t"
 "prefetchnta 8("REG_prev","REG_counter",8) \n\t"
@@ -410,8 +423,8 @@ __asm__ __volatile__ (
 "por %%mm1,%%mm0 \n\t"
 "pavgb %%mm2,%%mm3 \n\t"
 " \n\t"
-"psubusb "REG_threshold",%%mm0 \n\t"
-"pcmpeqb "REG_zero",%%mm0 \n\t"
+"psubusb %%mm6,%%mm0 \n\t"
+"pcmpeqb %%mm7,%%mm0 \n\t"
 " \n\t"
 "pand ("REG_mask","REG_counter",8),%%mm0 \n\t"
 " \n\t"
@@ -424,8 +437,9 @@ __asm__ __volatile__ (
 "jnz Lfoo%= \n\t"
  : "=r"(tmp)
  : "0"(w8), "r"(source), "r"(dest), "r"(prev),
-   "r"(mask), "y"(threshold), "y"(0)
- : "mm0", "mm1", "mm2", "mm3");
+   "r"(mask)
+ :
+ );
 	__asm__ __volatile__("emms \n\t");
 }
 #endif
