@@ -149,11 +149,14 @@ AVDMVideoVlad::AVDMVideoVlad(  AVDMGenericVideoStream *in,CONFcouple *couples)
 	ProcessYPlane = ProcessYPlane_C;
 	ProcessCPlane = ProcessCPlane_C;
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
+#if 0
+// Check
 	if(CpuCaps::hasMMXEXT() && (_info.width&7) == 0)
 	{
 		ProcessYPlane = ProcessYPlane_mmxe;
 		ProcessCPlane = ProcessCPlane_mmxe;
 	}
+#endif	
 #endif
 }
 
