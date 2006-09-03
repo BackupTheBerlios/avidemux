@@ -374,7 +374,7 @@ __asm__ __volatile__(
  : "=r"(tmp), "=r"(tmp2)
  : "r"(source), "r"(dest), "r"(prev),
    "r"(mask)
-   , "0"(2*w8), "1"(w8):
+   , "0"(2*w8), "1"(w8)
  );
 
 	}
@@ -441,7 +441,7 @@ __asm__ __volatile__ (
  : "=r"(tmp)
  : "0"(w8), "r"(source), "r"(dest), "r"(prev),
    "r"(mask)
- :
+ 
  );
 	__asm__ __volatile__("emms \n\t");
 }
