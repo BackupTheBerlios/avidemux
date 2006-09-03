@@ -41,7 +41,7 @@
 #include "prefs.h"
 #include "ADM_audiodevice/audio_out.h"
 #include "ADM_script/ADM_JSGlobal.h"
-
+#include "ADM_toolkit/ADM_intfloat.h"
 #ifdef USE_XVID_4
 extern void xvid4_init(void);
 #endif
@@ -147,7 +147,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 
    // Start counting memory
   ADM_memStatInit(  );
-
+  ADM_intFloatInit();
     printf("Initializing prefs\n");
     initPrefs();
 
