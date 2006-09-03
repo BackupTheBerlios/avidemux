@@ -20,7 +20,7 @@ class AUDMEncoder_Aften : public AUDMEncoder
 {
 protected:
          void           *_handle;
-         uint8_t        refillBuffer(int minimum);
+         
 public:
                         uint8_t init(ADM_audioEncoderDescriptor *config);
                 virtual ~AUDMEncoder_Aften();

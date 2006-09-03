@@ -46,6 +46,7 @@ AUDMEncoder_Aften::AUDMEncoder_Aften(AUDMAudioFilter * instream)  :AUDMEncoder  
   _handle=(void *)new AftenContext;
   memset(_handle,0,sizeof(AftenContext));
   aften_set_defaults(_HANDLE);
+  _wavheader->encoding=WAV_AC3;
 };
 
 
@@ -74,6 +75,7 @@ uint8_t AUDMEncoder_Aften::init(ADM_audioEncoderDescriptor *config)
 
 
 int ret=0;
+int mask;
 
     _HANDLE->sample_format=A52_SAMPLE_FMT_FLT;
     _HANDLE->channels=_wavheader->channels;
@@ -82,6 +84,17 @@ int ret=0;
     _HANDLE->acmod=0;
     _HANDLE->lfe=0;
     
+    switch(_wavheader->channels)
+    {
+        case 1: mask = 0x04;  break;
+        case 2: mask = 0x03;  break;
+        case 3: mask = 0x07;  break;
+        case 4: mask = 0x107; break;
+        case 5: mask = 0x37;  break;
+        case 6: mask = 0x3F;  break;
+      }
+      aften_wav_chmask_to_acmod(_wavheader->channels, mask, &(_HANDLE->acmod), &(_HANDLE->lfe));
+
     int er= aften_encode_init(_HANDLE);
     if(er<0)
     {
@@ -92,54 +105,6 @@ int ret=0;
     return 1;
 }
 
-//_____________________________________________
-//  Need to multiply the float by 65535, can't use
-//  generic fill buffer
-//----------------------------------------------
-uint8_t AUDMEncoder_Aften::refillBuffer(int minimum)
-{
-  uint32_t filler=_wavheader->frequency*_wavheader->channels;
-  uint32_t nb;
-  AUD_Status status;
-  if(eof_met) return 0;
-  while(1)
-  {
-    ADM_assert(tmptail>=tmphead);
-    if((tmptail-tmphead)>=minimum) return 1;
-  
-    if(tmphead && tmptail>filler/2)
-    {
-      memmove(&tmpbuffer[0],&tmpbuffer[tmphead],(tmptail-tmphead)*sizeof(float)); 
-      tmptail-=tmphead;
-      tmphead=0;
-    }
-    ADM_assert(filler>tmptail);
-    nb=_incoming->fill( (filler-tmptail)/2,&tmpbuffer[tmptail],&status);
-    if(!nb)
-    {
-      if(status!=AUD_END_OF_STREAM) ADM_assert(0);
-      
-      if((tmptail-tmphead)<minimum)
-      {
-        memset(&tmpbuffer[tmptail],0,sizeof(float)*(minimum-(tmptail-tmphead)));
-        tmptail=tmphead+minimum;
-        eof_met=1;  
-        return minimum;
-      }
-      else continue;
-    } else
-    {
-      float *s=&(tmpbuffer[tmptail]);
-      for(int i=0;i<nb;i++)
-      {
-        *s=*s*65535.;
-        s++;
-      }
-      tmptail+=nb;
-    }
-  }
-}
-
 
 //______________________________________________
 uint8_t	AUDMEncoder_Aften::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
@@ -147,9 +112,8 @@ uint8_t	AUDMEncoder_Aften::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sam
   uint32_t count=0;
   int r;
 _again:
-        *samples = _chunk/_wavheader->channels;
         *len = 0;
-
+        _chunk=256*6*_wavheader->channels;
         if(!refillBuffer(_chunk ))
         {
           return 0; 
@@ -163,6 +127,7 @@ _again:
         }
         
         *samples=256*6;
+        *len=r;
         tmphead+=_chunk;
         return 1;
 }
