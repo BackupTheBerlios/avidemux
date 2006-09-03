@@ -31,6 +31,7 @@
 #include "ADM_audiofilter/audioencoder_twolame_param.h"
 #include "ADM_audiofilter/audioencoder_faac_param.h"
 #include "ADM_audiofilter/audioencoder_vorbis_param.h"
+#include "ADM_audiofilter/audioencoder_aften_param.h"
 #include "ADM_audiofilter/audiofilter_normalize_param.h"
 
 #include "audioprocess.hxx"
@@ -48,6 +49,10 @@
 #ifdef USE_VORBIS
 #include "ADM_audiofilter/audioencoder_vorbis.h"
 #endif
+#ifdef USE_AFTEN
+#include "ADM_audiofilter/audioencoder_aften.h"
+#endif
+
 #include "ADM_audiofilter/audioencoder_twolame.h"
 #include "ADM_audiofilter/audioencoder_lavcodec.h"
 
@@ -350,6 +355,15 @@ AVDMGenericAudioStream *buildAudioFilter(AVDMGenericAudioStream *currentaudiostr
                   break;
                 }
 #endif		
+#ifdef USE_AFTEN
+              case AUDIOENC_AFTEN:
+                {
+                  AUDMEncoder_Aften *aften;
+                  aften = new AUDMEncoder_Aften(lastFilter);
+                  tmpfilter=aften;
+                }
+                break;
+#endif
 #ifdef USE_FAAC
     case AUDIOENC_FAAC:
                   {
