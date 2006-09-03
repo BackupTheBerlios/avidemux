@@ -211,6 +211,7 @@ have_amd64=no
 have_ppc=no
 have_x264=yes
 have_libdca=yes
+have_aften=yes
 dnl ____________________ Cygwin / mingwin ? ___________
 use_cygwin=no
 AC_MSG_CHECKING(win32 host)
@@ -268,6 +269,17 @@ fi
 
 
 dnl __________________divx______________
+dnl __________________x264 ______________
+AC_MSG_CHECKING(for aften codec )
+AC_CHECK_HEADER(aften/aften.h,,have_aften=no)
+if test "x$have_aften" = "xyes"; then
+   AC_CHECK_LIB(aften,aften_encode_init,,have_aften=no,-lm )
+fi
+if test "x$have_aften" = "xyes"; then
+	AC_DEFINE(USE_AFTEN,1,[use aften ac3 encoder])
+fi
+
+
 dnl __________________x264 ______________
 AC_MSG_CHECKING(for x264 codec )
 AC_CHECK_HEADER(x264.h,,have_x264=no)
