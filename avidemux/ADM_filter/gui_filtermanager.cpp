@@ -147,8 +147,7 @@ wrapToolButton(GtkWidget * wid, gpointer user_data)
 // Retrieve also the associated filter and handle
 // the action
 //______________________________________________________
-void
-on_action (gui_act action)
+void on_action (gui_act action)
 {
     uint32_t action_parameter;
     VF_FILTERS tag = VF_INVALID;
@@ -345,6 +344,7 @@ on_action (gui_act action)
         break;
     case A_CLOSE:
         //gtk_widget_destroy(dialog);
+      gtk_signal_emit_by_name(GTK_OBJECT(dialog),"delete-event");
         
         break;
     case A_SAVE:
