@@ -26,6 +26,9 @@
 static uint8_t ADM_int2float_C(int16_t *in, float *out,int nb);
 static uint8_t ADM_float2int_C(float *in,int16_t *out,int nb);
 
+ ptr_Int2Float *pADM_int2float;
+ ptr_Float2Int *pADM_float2int;
+
 uint8_t ADM_intFloatInit(void)
 {
   pADM_int2float=&ADM_int2float_C;
