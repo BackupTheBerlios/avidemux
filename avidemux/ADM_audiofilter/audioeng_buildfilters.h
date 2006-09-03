@@ -46,6 +46,9 @@ typedef enum AUDIOENCODER
 	AUDIOENC_VORBIS,
         AUDIOENC_COPY,
         AUDIOENC_LPCM,
+#ifdef USE_AFTEN        
+        AUDIOENC_AFTEN,
+#endif        
 	AUDIOENC_DUMMY
 }AUDIOENCODER;
 

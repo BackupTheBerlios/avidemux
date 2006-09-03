@@ -5,6 +5,8 @@
 #include "audioencoder_lame_param.h"
 #include "audioencoder_twolame_param.h"
 #include "audioencoder_vorbis_param.h"
+#include "audioencoder_aften_param.h"
+
 extern int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor);
 extern int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor);
 extern int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor);
@@ -124,6 +126,23 @@ ADM_audioEncoderDescriptor  lpcmDescriptor=
   0,
   NULL
 };
+#ifdef USE_AFTEN
+AFTEN_encoderParam aftenParam =
+{
+  ADM_STEREO
+};
+
+ADM_audioEncoderDescriptor  aftenDescriptor=
+{
+  AUDIOENC_AFTEN,
+  NULL,
+  "Aften AC3 encoder",
+  128,
+  6,      // Lame can only do stereo
+  sizeof(aftenParam),
+  &aftenParam
+};
+#endif
 ADM_audioEncoderDescriptor *allDescriptors[]=
 {
       &copyDescriptor,
@@ -134,6 +153,9 @@ ADM_audioEncoderDescriptor *allDescriptors[]=
       &vorbisDescriptor ,
       &pcmDescriptor,
       &lpcmDescriptor,
+#ifdef USE_AFTEN
+      &aftenDescriptor,
+#endif      
       &lameDescriptor
 };
 #define NB_AUDIO_DESCRIPTOR (sizeof(allDescriptors)/sizeof(ADM_audioEncoderDescriptor *))

@@ -19,7 +19,9 @@ typedef struct {
 #ifdef USE_VORBIS
                 {"vorbis","Vorbis", AUDIOENC_VORBIS},
 #endif
-
+#ifdef USE_AFTEN
+                {"aften","AFTEN", AUDIOENC_AFTEN},
+#endif
                 {"mp2", "FFm MP2", AUDIOENC_MP2},
                 {"ac3", "FFm AC3",AUDIOENC_AC3},
                 {"twolame","Twolame", AUDIOENC_2LAME},
