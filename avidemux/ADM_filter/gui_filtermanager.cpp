@@ -58,7 +58,7 @@ extern ADM_Composer *video_body;
 //___________________________________________
 static gulong row_inserted_id;
 static gulong row_deleted_id;
-static gboolean on_window1_delete_event(GtkWidget *widget, GdkEvent *event, gpointer user_data);
+
 static void on_treeview0_row_deleted(GtkTreeModel *treemodel, GtkTreePath *arg1, gpointer user_data);
 static void on_treeview0_row_inserted(GtkTreeModel *treemodel, GtkTreePath *arg1, GtkTreeIter *arg2, gpointer user_data);
 static void on_treeview1_size_allocate(GtkWidget *widget, GtkAllocation *allocation, GtkCellRenderer *cell);
@@ -78,7 +78,7 @@ static  GtkCellRenderer *renderers[NB_TREE];
 static  int startFilter[NB_TREE];
 //___________________________________________
 static GtkWidget *createFilterDialog (void);
-extern GtkWidget *create_window1 (void);
+extern GtkWidget *create_dialog1 (void);
 static GtkWidget *dialog = 0;
 //___________________________________________
 
@@ -103,24 +103,24 @@ GUI_handleVFilter (void)
         new AVDMVideoStreamNull (video_body, frameStart,
 				 frameEnd - frameStart);
     }
-    if(!dialog)
-    {
         dialog = createFilterDialog();
         GdkWMDecoration decorations=(GdkWMDecoration)0;
         gtk_widget_realize(dialog);
         gdk_window_set_decorations(dialog->window, (GdkWMDecoration)(GDK_DECOR_ALL | GDK_DECOR_MINIMIZE));
-       // gdk_window_get_decorations(dialog->window,
-                                    //&decorations);
-        //gdk_window_set_decorations(dialog->window, (GdkWMDecoration)(0 | GDK_DECOR_MINIMIZE));
         GdkScreen* screen = gdk_screen_get_default();
         gint width = gdk_screen_get_width(screen);
         if(width>=1024)
             gtk_window_set_default_size(GTK_WINDOW(dialog), 900, 600);
-    }
-    updateFilterList ();
-    gtk_register_dialog (dialog);
-    gtk_widget_show (dialog);
+        updateFilterList ();
+        gtk_register_dialog (dialog);
+        gtk_widget_show (dialog);
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_unregister_dialog (dialog);
+        gtk_widget_destroy(dialog);
+        dialog=NULL;
+        
     return 1;
+    
 }
 
 // gtk_dialog_add_action_widget seems buggy for toolbar button
@@ -390,33 +390,26 @@ getFilterFromSelection (void)
 GtkWidget *
 createFilterDialog (void)
 {
-    dialog = create_window1();
-
-    //to hide
-    g_signal_connect(G_OBJECT(WID(window1)),
-  						"delete-event",
-        				G_CALLBACK(on_window1_delete_event),
-        				(void *)NULL);
+    dialog = create_dialog1();
 
     //connect toolbar
 	#define CALLME(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)),"clicked",  GTK_SIGNAL_FUNC(wrapToolButton), (void *) y);
 	//CALLME (toolbuttonAdd, A_ADD);
-	CALLME (buttonRemove,		A_REMOVE);
-	CALLME (buttonProperties,	A_CONFIGURE);
-	CALLME (buttonUp, 		A_UP);
-	CALLME (buttonDown, 		A_DOWN);
-	CALLME (toolbuttonVCD, 		A_VCD);
-	CALLME (toolbuttonSVCD, 	A_SVCD);
-	CALLME (toolbuttonDVD, 		A_DVD);
-	CALLME (toolbuttonSave, 	A_SAVE);
+        CALLME (buttonRemove,		A_REMOVE);
+        CALLME (buttonProperties,	A_CONFIGURE);
+        CALLME (buttonUp, 		A_UP);
+        CALLME (buttonDown, 		A_DOWN);
+        CALLME (toolbuttonVCD, 		A_VCD);
+        CALLME (toolbuttonSVCD, 	A_SVCD);
+        CALLME (toolbuttonDVD, 		A_DVD);
+        CALLME (toolbuttonSave, 	A_SAVE);
         CALLME (toolbuttonScript, 	A_SAVE);
-	CALLME (toolbuttonOpen, 	A_LOAD);
-	CALLME (buttonPreview, 		A_PREVIEW);
-	CALLME (buttonPartial, 		A_PARTIAL);
+        CALLME (toolbuttonOpen, 	A_LOAD);
+        CALLME (buttonPreview, 		A_PREVIEW);
+        CALLME (buttonPartial, 		A_PARTIAL);
         CALLME (buttonAdd, 		A_ADD);
-	CALLME (toolbuttonHalfD1, 	A_HALFD1);
-	CALLME (toolbuttonScript, 	A_SCRIPT);
-        CALLME (button2,         	A_CLOSE);
+        CALLME (toolbuttonHalfD1, 	A_HALFD1);
+        CALLME (toolbuttonScript, 	A_SCRIPT);
         
 
     //create treeviews
@@ -539,15 +532,6 @@ void
 on_action_double_click_1 (GtkButton * button, gpointer user_data)
 {
     on_action(A_DOUBLECLICK);
-}
-
-gboolean
-on_window1_delete_event(GtkWidget *widget, GdkEvent *event, gpointer user_data)
-{
-    gtk_widget_hide(widget);
-    gtk_unregister_dialog(widget);
-    dialog=NULL;
-    return TRUE;
 }
 
 void

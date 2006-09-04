@@ -25,10 +25,10 @@
 
 
 GtkWidget*
-create_window1 (void)
+create_dialog1 (void)
 {
-  GtkWidget *window1;
-  GtkWidget *vbox1;
+  GtkWidget *dialog1;
+  GtkWidget *dialog_vbox1;
   GtkWidget *vbox3b;
   GtkWidget *toolbar1;
   GtkIconSize tmp_toolbar_icon_size;
@@ -103,13 +103,13 @@ create_window1 (void)
   GtkWidget *hbox16;
   GtkWidget *label25;
   GtkWidget *label2;
-  GtkWidget *hbuttonbox1;
+  GtkWidget *dialog_action_area1;
   GtkWidget *buttonPreview;
-  GtkWidget *alignment3;
-  GtkWidget *hbox15;
-  GtkWidget *image16;
-  GtkWidget *label24;
-  GtkWidget *button2;
+  GtkWidget *alignment5;
+  GtkWidget *hbox17;
+  GtkWidget *image17;
+  GtkWidget *label26;
+  GtkWidget *buttonClose;
   GtkAccelGroup *accel_group;
   GtkTooltips *tooltips;
 
@@ -117,20 +117,18 @@ create_window1 (void)
 
   accel_group = gtk_accel_group_new ();
 
-  window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_container_set_border_width (GTK_CONTAINER (window1), 6);
-  gtk_window_set_title (GTK_WINDOW (window1), _("Video Filter Manager"));
-  gtk_window_set_position (GTK_WINDOW (window1), GTK_WIN_POS_CENTER_ON_PARENT);
-  gtk_window_set_default_size (GTK_WINDOW (window1), 736, 542);
-  gtk_window_set_destroy_with_parent (GTK_WINDOW (window1), TRUE);
+  dialog1 = gtk_dialog_new ();
+  gtk_container_set_border_width (GTK_CONTAINER (dialog1), 6);
+  gtk_window_set_title (GTK_WINDOW (dialog1), _("Video Filter Manager"));
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
+  gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);
 
-  vbox1 = gtk_vbox_new (FALSE, 12);
-  gtk_widget_show (vbox1);
-  gtk_container_add (GTK_CONTAINER (window1), vbox1);
+  dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
+  gtk_widget_show (dialog_vbox1);
 
   vbox3b = gtk_vbox_new (FALSE, 12);
   gtk_widget_show (vbox3b);
-  gtk_box_pack_start (GTK_BOX (vbox1), vbox3b, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox3b, TRUE, TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox3b), 6);
 
   toolbar1 = gtk_toolbar_new ();
@@ -253,7 +251,7 @@ create_window1 (void)
   gtk_widget_show (hbox5);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), hbox5);
 
-  image1 = create_pixmap (window1, "1.png");
+  image1 = create_pixmap (dialog1, "1.png");
   gtk_widget_show (image1);
   gtk_box_pack_start (GTK_BOX (hbox5), image1, FALSE, FALSE, 0);
 
@@ -278,7 +276,7 @@ create_window1 (void)
   gtk_widget_show (hbox6);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), hbox6);
 
-  image2 = create_pixmap (window1, "2.png");
+  image2 = create_pixmap (dialog1, "2.png");
   gtk_widget_show (image2);
   gtk_box_pack_start (GTK_BOX (hbox6), image2, FALSE, FALSE, 0);
 
@@ -302,7 +300,7 @@ create_window1 (void)
   gtk_widget_show (hbox7);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), hbox7);
 
-  image3 = create_pixmap (window1, "4.png");
+  image3 = create_pixmap (dialog1, "4.png");
   gtk_widget_show (image3);
   gtk_box_pack_start (GTK_BOX (hbox7), image3, FALSE, FALSE, 0);
 
@@ -326,7 +324,7 @@ create_window1 (void)
   gtk_widget_show (hbox8);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 3), hbox8);
 
-  image4 = create_pixmap (window1, "5.png");
+  image4 = create_pixmap (dialog1, "5.png");
   gtk_widget_show (image4);
   gtk_box_pack_start (GTK_BOX (hbox8), image4, FALSE, FALSE, 0);
 
@@ -350,7 +348,7 @@ create_window1 (void)
   gtk_widget_show (hbox9);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 4), hbox9);
 
-  image5 = create_pixmap (window1, "3.png");
+  image5 = create_pixmap (dialog1, "3.png");
   gtk_widget_show (image5);
   gtk_box_pack_start (GTK_BOX (hbox9), image5, FALSE, FALSE, 0);
 
@@ -374,7 +372,7 @@ create_window1 (void)
   gtk_widget_show (hbox10);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 5), hbox10);
 
-  image6 = create_pixmap (window1, "7.png");
+  image6 = create_pixmap (dialog1, "7.png");
   gtk_widget_show (image6);
   gtk_box_pack_start (GTK_BOX (hbox10), image6, FALSE, FALSE, 0);
 
@@ -398,7 +396,7 @@ create_window1 (void)
   gtk_widget_show (hbox4);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 6), hbox4);
 
-  image7 = create_pixmap (window1, "6.png");
+  image7 = create_pixmap (dialog1, "6.png");
   gtk_widget_show (image7);
   gtk_box_pack_start (GTK_BOX (hbox4), image7, FALSE, FALSE, 0);
 
@@ -490,7 +488,7 @@ create_window1 (void)
   buttonPartial = gtk_button_new_with_mnemonic (_("P_artial"));
   gtk_widget_show (buttonPartial);
   gtk_box_pack_end (GTK_BOX (hbox14), buttonPartial, FALSE, FALSE, 0);
-  gtk_tooltips_set_tip (tooltips, buttonPartial, _("Apply the curent filter only to a part of the file"), NULL);
+  gtk_tooltips_set_tip (tooltips, buttonPartial, _("Apply the current filter only to a part of the file"), NULL);
 
   buttonProperties = gtk_button_new ();
   gtk_widget_show (buttonProperties);
@@ -515,125 +513,122 @@ create_window1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label2), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label2), 1, 1);
 
-  hbuttonbox1 = gtk_hbutton_box_new ();
-  gtk_widget_show (hbuttonbox1);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbuttonbox1, FALSE, FALSE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (hbuttonbox1), 6);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox1), GTK_BUTTONBOX_END);
-  gtk_box_set_spacing (GTK_BOX (hbuttonbox1), 10);
+  dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
+  gtk_widget_show (dialog_action_area1);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
   buttonPreview = gtk_button_new ();
   gtk_widget_show (buttonPreview);
-  gtk_container_add (GTK_CONTAINER (hbuttonbox1), buttonPreview);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonPreview, GTK_RESPONSE_APPLY);
   GTK_WIDGET_SET_FLAGS (buttonPreview, GTK_CAN_DEFAULT);
 
-  alignment3 = gtk_alignment_new (0.5, 0.5, 0, 0);
-  gtk_widget_show (alignment3);
-  gtk_container_add (GTK_CONTAINER (buttonPreview), alignment3);
+  alignment5 = gtk_alignment_new (0.5, 0.5, 0, 0);
+  gtk_widget_show (alignment5);
+  gtk_container_add (GTK_CONTAINER (buttonPreview), alignment5);
 
-  hbox15 = gtk_hbox_new (FALSE, 2);
-  gtk_widget_show (hbox15);
-  gtk_container_add (GTK_CONTAINER (alignment3), hbox15);
+  hbox17 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox17);
+  gtk_container_add (GTK_CONTAINER (alignment5), hbox17);
 
-  image16 = create_pixmap (window1, "preview-button.png");
-  gtk_widget_show (image16);
-  gtk_box_pack_start (GTK_BOX (hbox15), image16, FALSE, FALSE, 0);
+  image17 = create_pixmap (dialog1, "preview-button.png");
+  gtk_widget_show (image17);
+  gtk_box_pack_start (GTK_BOX (hbox17), image17, FALSE, FALSE, 0);
 
-  label24 = gtk_label_new_with_mnemonic (_("_Preview"));
-  gtk_widget_show (label24);
-  gtk_box_pack_start (GTK_BOX (hbox15), label24, FALSE, FALSE, 0);
+  label26 = gtk_label_new_with_mnemonic (_("_Preview"));
+  gtk_widget_show (label26);
+  gtk_box_pack_start (GTK_BOX (hbox17), label26, FALSE, FALSE, 0);
 
-  button2 = gtk_button_new_from_stock ("gtk-close");
-  gtk_widget_show (button2);
-  gtk_container_add (GTK_CONTAINER (hbuttonbox1), button2);
-  GTK_WIDGET_SET_FLAGS (button2, GTK_CAN_DEFAULT);
+  buttonClose = gtk_button_new_from_stock ("gtk-close");
+  gtk_widget_show (buttonClose);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), buttonClose, GTK_RESPONSE_CLOSE);
+  GTK_WIDGET_SET_FLAGS (buttonClose, GTK_CAN_DEFAULT);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
-  GLADE_HOOKUP_OBJECT_NO_REF (window1, window1, "window1");
-  GLADE_HOOKUP_OBJECT (window1, vbox1, "vbox1");
-  GLADE_HOOKUP_OBJECT (window1, vbox3b, "vbox3b");
-  GLADE_HOOKUP_OBJECT (window1, toolbar1, "toolbar1");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonOpen, "toolbuttonOpen");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonSave, "toolbuttonSave");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonScript, "toolbuttonScript");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonDVD, "toolbuttonDVD");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonHalfD1, "toolbuttonHalfD1");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonSVCD, "toolbuttonSVCD");
-  GLADE_HOOKUP_OBJECT (window1, toolbuttonVCD, "toolbuttonVCD");
-  GLADE_HOOKUP_OBJECT (window1, hbox11, "hbox11");
-  GLADE_HOOKUP_OBJECT (window1, frame1, "frame1");
-  GLADE_HOOKUP_OBJECT (window1, alignment1, "alignment1");
-  GLADE_HOOKUP_OBJECT (window1, vbox2, "vbox2");
-  GLADE_HOOKUP_OBJECT (window1, notebook1, "notebook1");
-  GLADE_HOOKUP_OBJECT (window1, scrolledwindow1, "scrolledwindow1");
-  GLADE_HOOKUP_OBJECT (window1, treeview1, "treeview1");
-  GLADE_HOOKUP_OBJECT (window1, hbox5, "hbox5");
-  GLADE_HOOKUP_OBJECT (window1, image1, "image1");
-  GLADE_HOOKUP_OBJECT (window1, label11, "label11");
-  GLADE_HOOKUP_OBJECT (window1, scrolledwindow2, "scrolledwindow2");
-  GLADE_HOOKUP_OBJECT (window1, treeview2, "treeview2");
-  GLADE_HOOKUP_OBJECT (window1, hbox6, "hbox6");
-  GLADE_HOOKUP_OBJECT (window1, image2, "image2");
-  GLADE_HOOKUP_OBJECT (window1, label17, "label17");
-  GLADE_HOOKUP_OBJECT (window1, scrolledwindow3, "scrolledwindow3");
-  GLADE_HOOKUP_OBJECT (window1, treeview3, "treeview3");
-  GLADE_HOOKUP_OBJECT (window1, hbox7, "hbox7");
-  GLADE_HOOKUP_OBJECT (window1, image3, "image3");
-  GLADE_HOOKUP_OBJECT (window1, label18, "label18");
-  GLADE_HOOKUP_OBJECT (window1, scrolledwindow4, "scrolledwindow4");
-  GLADE_HOOKUP_OBJECT (window1, treeview4, "treeview4");
-  GLADE_HOOKUP_OBJECT (window1, hbox8, "hbox8");
-  GLADE_HOOKUP_OBJECT (window1, image4, "image4");
-  GLADE_HOOKUP_OBJECT (window1, label19, "label19");
-  GLADE_HOOKUP_OBJECT (window1, scrolledwindow5, "scrolledwindow5");
-  GLADE_HOOKUP_OBJECT (window1, treeview5, "treeview5");
-  GLADE_HOOKUP_OBJECT (window1, hbox9, "hbox9");
-  GLADE_HOOKUP_OBJECT (window1, image5, "image5");
-  GLADE_HOOKUP_OBJECT (window1, label20, "label20");
-  GLADE_HOOKUP_OBJECT (window1, scrolledwindow6, "scrolledwindow6");
-  GLADE_HOOKUP_OBJECT (window1, treeview6, "treeview6");
-  GLADE_HOOKUP_OBJECT (window1, hbox10, "hbox10");
-  GLADE_HOOKUP_OBJECT (window1, image6, "image6");
-  GLADE_HOOKUP_OBJECT (window1, label21, "label21");
-  GLADE_HOOKUP_OBJECT (window1, scrolledwindow7, "scrolledwindow7");
-  GLADE_HOOKUP_OBJECT (window1, treeview7, "treeview7");
-  GLADE_HOOKUP_OBJECT (window1, hbox4, "hbox4");
-  GLADE_HOOKUP_OBJECT (window1, image7, "image7");
-  GLADE_HOOKUP_OBJECT (window1, label22, "label22");
-  GLADE_HOOKUP_OBJECT (window1, hbox13, "hbox13");
-  GLADE_HOOKUP_OBJECT (window1, buttonAdd, "buttonAdd");
-  GLADE_HOOKUP_OBJECT (window1, image11, "image11");
-  GLADE_HOOKUP_OBJECT (window1, label23, "label23");
-  GLADE_HOOKUP_OBJECT (window1, frame2, "frame2");
-  GLADE_HOOKUP_OBJECT (window1, alignment2, "alignment2");
-  GLADE_HOOKUP_OBJECT (window1, hbox1, "hbox1");
-  GLADE_HOOKUP_OBJECT (window1, vbox3, "vbox3");
-  GLADE_HOOKUP_OBJECT (window1, scrolledwindow9, "scrolledwindow9");
-  GLADE_HOOKUP_OBJECT (window1, treeview0, "treeview0");
-  GLADE_HOOKUP_OBJECT (window1, hbox14, "hbox14");
-  GLADE_HOOKUP_OBJECT (window1, buttonRemove, "buttonRemove");
-  GLADE_HOOKUP_OBJECT (window1, image15, "image15");
-  GLADE_HOOKUP_OBJECT (window1, buttonDown, "buttonDown");
-  GLADE_HOOKUP_OBJECT (window1, image14, "image14");
-  GLADE_HOOKUP_OBJECT (window1, buttonUp, "buttonUp");
-  GLADE_HOOKUP_OBJECT (window1, image13, "image13");
-  GLADE_HOOKUP_OBJECT (window1, buttonPartial, "buttonPartial");
-  GLADE_HOOKUP_OBJECT (window1, buttonProperties, "buttonProperties");
-  GLADE_HOOKUP_OBJECT (window1, alignment4, "alignment4");
-  GLADE_HOOKUP_OBJECT (window1, hbox16, "hbox16");
-  GLADE_HOOKUP_OBJECT (window1, label25, "label25");
-  GLADE_HOOKUP_OBJECT (window1, label2, "label2");
-  GLADE_HOOKUP_OBJECT (window1, hbuttonbox1, "hbuttonbox1");
-  GLADE_HOOKUP_OBJECT (window1, buttonPreview, "buttonPreview");
-  GLADE_HOOKUP_OBJECT (window1, alignment3, "alignment3");
-  GLADE_HOOKUP_OBJECT (window1, hbox15, "hbox15");
-  GLADE_HOOKUP_OBJECT (window1, image16, "image16");
-  GLADE_HOOKUP_OBJECT (window1, label24, "label24");
-  GLADE_HOOKUP_OBJECT (window1, button2, "button2");
-  GLADE_HOOKUP_OBJECT_NO_REF (window1, tooltips, "tooltips");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox3b, "vbox3b");
+  GLADE_HOOKUP_OBJECT (dialog1, toolbar1, "toolbar1");
+  GLADE_HOOKUP_OBJECT (dialog1, toolbuttonOpen, "toolbuttonOpen");
+  GLADE_HOOKUP_OBJECT (dialog1, toolbuttonSave, "toolbuttonSave");
+  GLADE_HOOKUP_OBJECT (dialog1, toolbuttonScript, "toolbuttonScript");
+  GLADE_HOOKUP_OBJECT (dialog1, toolbuttonDVD, "toolbuttonDVD");
+  GLADE_HOOKUP_OBJECT (dialog1, toolbuttonHalfD1, "toolbuttonHalfD1");
+  GLADE_HOOKUP_OBJECT (dialog1, toolbuttonSVCD, "toolbuttonSVCD");
+  GLADE_HOOKUP_OBJECT (dialog1, toolbuttonVCD, "toolbuttonVCD");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox11, "hbox11");
+  GLADE_HOOKUP_OBJECT (dialog1, frame1, "frame1");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment1, "alignment1");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox2, "vbox2");
+  GLADE_HOOKUP_OBJECT (dialog1, notebook1, "notebook1");
+  GLADE_HOOKUP_OBJECT (dialog1, scrolledwindow1, "scrolledwindow1");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview1, "treeview1");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox5, "hbox5");
+  GLADE_HOOKUP_OBJECT (dialog1, image1, "image1");
+  GLADE_HOOKUP_OBJECT (dialog1, label11, "label11");
+  GLADE_HOOKUP_OBJECT (dialog1, scrolledwindow2, "scrolledwindow2");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview2, "treeview2");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox6, "hbox6");
+  GLADE_HOOKUP_OBJECT (dialog1, image2, "image2");
+  GLADE_HOOKUP_OBJECT (dialog1, label17, "label17");
+  GLADE_HOOKUP_OBJECT (dialog1, scrolledwindow3, "scrolledwindow3");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview3, "treeview3");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox7, "hbox7");
+  GLADE_HOOKUP_OBJECT (dialog1, image3, "image3");
+  GLADE_HOOKUP_OBJECT (dialog1, label18, "label18");
+  GLADE_HOOKUP_OBJECT (dialog1, scrolledwindow4, "scrolledwindow4");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview4, "treeview4");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox8, "hbox8");
+  GLADE_HOOKUP_OBJECT (dialog1, image4, "image4");
+  GLADE_HOOKUP_OBJECT (dialog1, label19, "label19");
+  GLADE_HOOKUP_OBJECT (dialog1, scrolledwindow5, "scrolledwindow5");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview5, "treeview5");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox9, "hbox9");
+  GLADE_HOOKUP_OBJECT (dialog1, image5, "image5");
+  GLADE_HOOKUP_OBJECT (dialog1, label20, "label20");
+  GLADE_HOOKUP_OBJECT (dialog1, scrolledwindow6, "scrolledwindow6");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview6, "treeview6");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox10, "hbox10");
+  GLADE_HOOKUP_OBJECT (dialog1, image6, "image6");
+  GLADE_HOOKUP_OBJECT (dialog1, label21, "label21");
+  GLADE_HOOKUP_OBJECT (dialog1, scrolledwindow7, "scrolledwindow7");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview7, "treeview7");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox4, "hbox4");
+  GLADE_HOOKUP_OBJECT (dialog1, image7, "image7");
+  GLADE_HOOKUP_OBJECT (dialog1, label22, "label22");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox13, "hbox13");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonAdd, "buttonAdd");
+  GLADE_HOOKUP_OBJECT (dialog1, image11, "image11");
+  GLADE_HOOKUP_OBJECT (dialog1, label23, "label23");
+  GLADE_HOOKUP_OBJECT (dialog1, frame2, "frame2");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment2, "alignment2");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox3, "vbox3");
+  GLADE_HOOKUP_OBJECT (dialog1, scrolledwindow9, "scrolledwindow9");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview0, "treeview0");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox14, "hbox14");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonRemove, "buttonRemove");
+  GLADE_HOOKUP_OBJECT (dialog1, image15, "image15");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonDown, "buttonDown");
+  GLADE_HOOKUP_OBJECT (dialog1, image14, "image14");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonUp, "buttonUp");
+  GLADE_HOOKUP_OBJECT (dialog1, image13, "image13");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonPartial, "buttonPartial");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonProperties, "buttonProperties");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment4, "alignment4");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox16, "hbox16");
+  GLADE_HOOKUP_OBJECT (dialog1, label25, "label25");
+  GLADE_HOOKUP_OBJECT (dialog1, label2, "label2");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonPreview, "buttonPreview");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment5, "alignment5");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox17, "hbox17");
+  GLADE_HOOKUP_OBJECT (dialog1, image17, "image17");
+  GLADE_HOOKUP_OBJECT (dialog1, label26, "label26");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonClose, "buttonClose");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, tooltips, "tooltips");
 
-  gtk_window_add_accel_group (GTK_WINDOW (window1), accel_group);
+  gtk_window_add_accel_group (GTK_WINDOW (dialog1), accel_group);
 
-  return window1;
+  return dialog1;
 }
 
