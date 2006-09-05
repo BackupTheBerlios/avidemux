@@ -113,8 +113,17 @@ GUI_handleVFilter (void)
             gtk_window_set_default_size(GTK_WINDOW(dialog), 900, 600);
         updateFilterList ();
         gtk_register_dialog (dialog);
-        gtk_widget_show (dialog);
-        gtk_dialog_run(GTK_DIALOG(dialog));
+        //gtk_widget_show (dialog);
+        int r;
+        while(1)
+        {
+          r=gtk_dialog_run(GTK_DIALOG(dialog));
+          if(r>A_BEGIN && r<A_END)
+          {
+            on_action((gui_act)r);
+          }
+          else break;
+        };
         gtk_unregister_dialog (dialog);
         gtk_widget_destroy(dialog);
         dialog=NULL;
@@ -393,23 +402,26 @@ createFilterDialog (void)
     dialog = create_dialog1();
 
     //connect toolbar
-	#define CALLME(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)),"clicked",  GTK_SIGNAL_FUNC(wrapToolButton), (void *) y);
+#define CALLME_TOOLBAR(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)),"clicked",  GTK_SIGNAL_FUNC(wrapToolButton), (void *) y);
+#define CALLME(x,y) gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x), y)
+
 	//CALLME (toolbuttonAdd, A_ADD);
         CALLME (buttonRemove,		A_REMOVE);
         CALLME (buttonProperties,	A_CONFIGURE);
         CALLME (buttonUp, 		A_UP);
         CALLME (buttonDown, 		A_DOWN);
-        CALLME (toolbuttonVCD, 		A_VCD);
-        CALLME (toolbuttonSVCD, 	A_SVCD);
-        CALLME (toolbuttonDVD, 		A_DVD);
-        CALLME (toolbuttonSave, 	A_SAVE);
-        CALLME (toolbuttonScript, 	A_SAVE);
-        CALLME (toolbuttonOpen, 	A_LOAD);
         CALLME (buttonPreview, 		A_PREVIEW);
         CALLME (buttonPartial, 		A_PARTIAL);
         CALLME (buttonAdd, 		A_ADD);
-        CALLME (toolbuttonHalfD1, 	A_HALFD1);
-        CALLME (toolbuttonScript, 	A_SCRIPT);
+        
+        CALLME_TOOLBAR (toolbuttonHalfD1, 	A_HALFD1);
+        CALLME_TOOLBAR (toolbuttonScript, 	A_SCRIPT);
+        CALLME_TOOLBAR (toolbuttonVCD, 		A_VCD);
+        CALLME_TOOLBAR (toolbuttonSVCD, 	A_SVCD);
+        CALLME_TOOLBAR (toolbuttonDVD, 		A_DVD);
+        CALLME_TOOLBAR (toolbuttonSave, 	A_SAVE);
+        CALLME_TOOLBAR (toolbuttonScript, 	A_SAVE);
+        CALLME_TOOLBAR (toolbuttonOpen, 	A_LOAD);
         
 
     //create treeviews
