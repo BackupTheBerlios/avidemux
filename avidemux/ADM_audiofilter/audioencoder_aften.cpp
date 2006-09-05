@@ -81,9 +81,7 @@ int mask;
     _HANDLE->channels=_wavheader->channels;
     _HANDLE->samplerate=_wavheader->frequency;
     
-    _HANDLE->acmod=0;
-    _HANDLE->lfe=0;
-    
+    _HANDLE->params.bitrate=config->bitrate;
     switch(_wavheader->channels)
     {
         case 1: mask = 0x04;  break;
@@ -102,6 +100,8 @@ int mask;
       return 0;
     }
     _chunk=256*6*_wavheader->channels;
+    printf("[Aften] Initialized with fd %u Channels %u bitrate %u\n",_HANDLE->samplerate,
+                                                                    _HANDLE->channels,_HANDLE->params.bitrate);
     return 1;
 }
 
@@ -111,6 +111,7 @@ uint8_t	AUDMEncoder_Aften::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sam
 {
   uint32_t count=0;
   int r;
+  void *ptr;
 _again:
         *len = 0;
         _chunk=256*6*_wavheader->channels;
@@ -118,8 +119,11 @@ _again:
         {
           return 0; 
         }
+        ptr=(void *)&(tmpbuffer[tmphead]);
         ADM_assert(tmptail>=tmphead);
-        r=aften_encode_frame(_HANDLE, dest,(void *)&(tmpbuffer[tmphead]));
+        aften_remap_wav_to_a52(ptr, 256*6, _wavheader->channels,A52_SAMPLE_FMT_FLT,  (_HANDLE->acmod), (_HANDLE->lfe));
+
+        r=aften_encode_frame(_HANDLE, dest,(void *)ptr);
         if(r<0)
         {
           printf("[Aften] Encoding error %d\n",r);
