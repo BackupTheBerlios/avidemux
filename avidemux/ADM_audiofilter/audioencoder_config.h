@@ -126,6 +126,7 @@ ADM_audioEncoderDescriptor  lpcmDescriptor=
   0,
   NULL
 };
+//---------------- AFTEN ------------------
 #ifdef USE_AFTEN
 AFTEN_encoderParam aftenParam =
 {
@@ -135,7 +136,7 @@ AFTEN_encoderParam aftenParam =
 ADM_audioEncoderDescriptor  aftenDescriptor=
 {
   AUDIOENC_AFTEN,
-  NULL,
+  DIA_defaultSettings,
   "Aften AC3 encoder",
   128,
   6,      // Lame can only do stereo

@@ -47,6 +47,7 @@ AUDMEncoder_Aften::AUDMEncoder_Aften(AUDMAudioFilter * instream)  :AUDMEncoder  
   memset(_handle,0,sizeof(AftenContext));
   aften_set_defaults(_HANDLE);
   _wavheader->encoding=WAV_AC3;
+  
 };
 
 
@@ -76,7 +77,7 @@ uint8_t AUDMEncoder_Aften::init(ADM_audioEncoderDescriptor *config)
 
 int ret=0;
 int mask;
-
+    _wavheader->byterate=(config->bitrate*1000)/8;
     _HANDLE->sample_format=A52_SAMPLE_FMT_FLT;
     _HANDLE->channels=_wavheader->channels;
     _HANDLE->samplerate=_wavheader->frequency;
@@ -92,7 +93,7 @@ int mask;
         case 6: mask = 0x3F;  break;
       }
       aften_wav_chmask_to_acmod(_wavheader->channels, mask, &(_HANDLE->acmod), &(_HANDLE->lfe));
-
+   //   _HANDLE->params.verbose=2;
     int er= aften_encode_init(_HANDLE);
     if(er<0)
     {
