@@ -445,10 +445,12 @@ createFilterDialog (void)
     {
         if (allfilters[i].viewable==1)
         {
-            str = g_strconcat("<span size=\"larger\" weight=\"bold\">",
-                			allfilters[i].name,
-                			"</span>\n",
-                			allfilters[i].description, NULL);
+		
+		 str = g_strconcat(
+				 "<span weight=\"bold\">", allfilters[i].name, "</span>\n",
+                 		//	"", allfilters[i].description, "", NULL);
+                 			"<span size=\"smaller\">", allfilters[i].description, "</span>", NULL);
+				
             gtk_list_store_append (stores[current_tree], &iter);
             gtk_list_store_set (stores[current_tree], &iter, 0, str ,-1);
             g_free(str);

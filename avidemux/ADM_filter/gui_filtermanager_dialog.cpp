@@ -242,7 +242,7 @@ create_dialog1 (void)
   treeview1 = gtk_tree_view_new ();
   gtk_widget_show (treeview1);
   gtk_container_add (GTK_CONTAINER (scrolledwindow1), treeview1);
-  gtk_widget_set_size_request (treeview1, -1, 336);
+  gtk_widget_set_size_request (treeview1, 288, 336);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (treeview1), FALSE);
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview1), TRUE);
   gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview1), FALSE);
@@ -263,7 +263,7 @@ create_dialog1 (void)
   scrolledwindow2 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow2);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow2);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow2), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow2), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   treeview2 = gtk_tree_view_new ();
   gtk_widget_show (treeview2);
@@ -287,7 +287,7 @@ create_dialog1 (void)
   scrolledwindow3 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow3);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow3);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow3), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow3), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   treeview3 = gtk_tree_view_new ();
   gtk_widget_show (treeview3);
@@ -311,7 +311,7 @@ create_dialog1 (void)
   scrolledwindow4 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow4);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow4);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow4), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow4), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   treeview4 = gtk_tree_view_new ();
   gtk_widget_show (treeview4);
@@ -335,7 +335,7 @@ create_dialog1 (void)
   scrolledwindow5 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow5);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow5);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow5), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow5), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   treeview5 = gtk_tree_view_new ();
   gtk_widget_show (treeview5);
@@ -359,7 +359,7 @@ create_dialog1 (void)
   scrolledwindow6 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow6);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow6);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow6), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow6), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   treeview6 = gtk_tree_view_new ();
   gtk_widget_show (treeview6);
@@ -383,7 +383,7 @@ create_dialog1 (void)
   scrolledwindow7 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow7);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow7);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow7), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow7), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
   treeview7 = gtk_tree_view_new ();
   gtk_widget_show (treeview7);
@@ -450,6 +450,7 @@ create_dialog1 (void)
   treeview0 = gtk_tree_view_new ();
   gtk_widget_show (treeview0);
   gtk_container_add (GTK_CONTAINER (scrolledwindow9), treeview0);
+  gtk_widget_set_size_request (treeview0, 288, 336);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (treeview0), FALSE);
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview0), TRUE);
   gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview0), FALSE);

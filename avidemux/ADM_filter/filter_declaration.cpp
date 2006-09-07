@@ -67,7 +67,7 @@ printf(  "*********************\n");
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
 //	REGISTERX("mpivtc","Mplayer ivtc",VF_MPDETC,1,mpdetc_create,mpdetc_script);	
 
-        REGISTERX("mcdeinterlace","mcDeinterlace","Motion Compensation Deinterlaced.\nPort of M. Niedermayer filter present in MPlayer.",VF_MCDEINT,1,mcdeint_create,mcdeint_script);
+        REGISTERX("mcdeinterlace","mcDeinterlace","Motion compensation deinterlacer. Ported from MPlayer.",VF_MCDEINT,1,mcdeint_create,mcdeint_script);
 	REGISTERX("deinterlace","Deinterlace","Mask interlacing artifacts. Port of Smart deinterlace.",VF_DEINTERLACE,1,deinterlace_create,deinterlace_script);
 	REGISTERX("kerneldeint","KernelDeint","Kernel deinterlacer by Donald Graft.",VF_KRNDEINT,1,kerneldeint_create,kerneldeint_script);
         REGISTERX("tdeint","TDeint","Motion adaptative deinterlacer by Tritical.",VF_TDEINT,1,tdeint_create,tdeint_script);
@@ -111,7 +111,7 @@ printf(  "*********************\n");
         REGISTERX("chromavonly","Chroma V only","Convert picture to grey, keeping only chroma V.",VF_CHROMAV,1,chromaV_create,chromaV_script);
        
         REGISTERX("delta","Luma delta","Difference between current and previous picture.",VF_DELTA,1,delta_create,delta_script);
-        REGISTERX("coloryuv","Avisynth ColorYuv","Alter colors (auto white nalance etc...).\n Ported from avisynth.",VF_COLOR_YUV,1,coloryuv_create,coloryuv_script);
+        REGISTERX("coloryuv","Avisynth ColorYUV","Alter colors (auto white balance etc...). Ported from Avisynth.",VF_COLOR_YUV,1,coloryuv_create,coloryuv_script);
                  
 
 
@@ -163,7 +163,7 @@ printf(  "*********************\n");
         REGISTERX("mosaic","Mosaic","Split the picture into tiny thumbnails.",VF_MOSAIC,1,     mosaic_create,mosaic_script);
         REGISTERX("mpdelogo","MPlayer delogo","Blend a logo by interpolating its surrounding box.",VF_MPDELOGO,1,mpdelogo_create,mpdelogo_script);
         REGISTERX("animatedmenu","Animated Menu",
-            "Create a video made of 6 mini window\n, very useful to do DVD menus.",
+            "Create a video made of 6 mini windows, very useful to do DVD menus.",
             VF_ANIMATED,1,animated_create,animated_script);
 
 // Does not work
