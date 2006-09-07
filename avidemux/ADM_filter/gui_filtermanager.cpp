@@ -521,10 +521,10 @@ updateFilterList (void)
     {
         gtk_list_store_append (stores[0], &iter);
         fil=videofilters[i].tag;
-        str = g_strconcat("<span size=\"larger\" weight=\"bold\">",
+        str = g_strconcat("<span  weight=\"bold\">",
                             filterGetNameFromTag(fil),
                             "</span>\n",
-                            videofilters[i].filter->printConf (), NULL);
+                            "<span size=\"smaller\">", videofilters[i].filter->printConf (), "</span>",  NULL);
         gtk_list_store_set (stores[0], &iter,
                             0, str,
                             1, videofilters[i].tag,
