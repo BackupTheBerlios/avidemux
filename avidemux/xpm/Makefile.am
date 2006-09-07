@@ -10,7 +10,8 @@ film13.inc  film9.inc                   play.xpm \
 6.inc          begin.xpm                film23.inc  gnome_calculator.inc        systray2.inc \
 7.inc          end.xpm                  film3.inc   markA.xpm                   systray2.xpm \
 Kbackward.xpm  film1.inc                film5.inc   markB.xpm                   xpm_nextblack.xpm \
-Kforward.xpm   film11.inc               film7.inc   output.inc                  xpm_prevblack.xpm
+Kforward.xpm   film11.inc               film7.inc   output.inc                  xpm_prevblack.xpm \
+preview-button.inc
 
 
 ####### kdevelop will overwrite this part!!! (end)############
