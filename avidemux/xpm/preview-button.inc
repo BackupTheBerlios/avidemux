@@ -1,12 +1,12 @@
 /* GdkPixbuf RGBA C-Source image dump */
 
 #ifdef __SUNPRO_C
-#pragma align 4 (preview-button)
+#pragma align 4 (preview_button)
 #endif
 #ifdef __GNUC__
-static const guint8 preview-button[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 preview_button[] __attribute__ ((__aligned__ (4))) = 
 #else
-static const guint8 preview-button[] = 
+static const guint8 preview_button[] = 
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */
