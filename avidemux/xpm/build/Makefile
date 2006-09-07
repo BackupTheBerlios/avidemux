@@ -26,6 +26,7 @@ TGT=../avidemux_icon_small.inc \
 ../film19.inc \
 ../film21.inc \
 ../film23.inc \
+../preview-button.inc
 
 ../%.inc : %.png	
 	echo $<
