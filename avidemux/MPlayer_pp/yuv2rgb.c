@@ -619,7 +619,10 @@ SwsFunc yuv2rgb_get_func_ptr (SwsContext *c)
     MSG_WARN("No accelerated colorspace conversion found\n");
 
     switch(c->dstFormat){
-	case IMGFMT_RGB32:
+    case IMGFMT_RGB32:
+#ifdef ADM_BIG_ENDIAN    // Solaris  
+    case IMGFMT_BGRA:
+#endif      
     case IMGFMT_BGR32: return yuv2rgb_c_32;
     case IMGFMT_RGB24: return yuv2rgb_c_24_rgb;
     case IMGFMT_BGR24: return yuv2rgb_c_24_bgr;
