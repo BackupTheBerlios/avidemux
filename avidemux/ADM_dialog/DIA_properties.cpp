@@ -115,14 +115,15 @@ void DIA_properties( void )
 		// Duration in seconds too
 		if(currentaudiostream && wavinfo->byterate>1)
 		{
+                        uint32_t l=currentaudiostream->getLength();
 			double du;
-			du=currentaudiostream->getLength();
+			du=l;
 			du*=1000;
 			du/=wavinfo->byterate;
 			ms2time((uint32_t)floor(du),
 				 &hh, &mm, &ss, &ms);
-	      		sprintf(text, "%02d:%02d:%02d.%03d (%lu MBytes)", hh, mm, ss, ms
-				,currentaudiostream->getLength()>>20);
+	      		sprintf(text, "%02d:%02d:%02d.%03d (%u MBytes)", hh, mm, ss, ms
+				,l>>20);
 		}
 		FILL_ENTRY(label_audioduration);
                 if(currentaudiostream->isVBR() ) CHECK_SET(checkbutton_vbr,1);
