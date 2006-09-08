@@ -1509,5 +1509,33 @@ uint8_t         ADM_Composer::tryIndexing(char *name,char *idxname)
                 if(!r) GUI_Error_HIG(_("Indexing failed"), NULL); 
                 return r;
 }
+/**
+      If a parameter has changed, rebuild the duration of the streams
+      It can happen, for example in case of SBR audio such as AAC
+      The demuxer says it is xx kHz, but the codec updates it to 2*xx kHz
+*/
+uint8_t ADM_Composer::rebuildDuration(void)
+{
+  double duration;
+  WAVHeader *wav ;
+  aviInfo    info;
+  printf("[Editor] updating soundtracks duration\n");
+  _videos[   0     ]._aviheader->getVideoInfo (&info);
+  for(int i=0;i<_nb_video;i++)
+  {
+    wav= _videos[i]._aviheader->getAudioInfo ();
+      if(wav)
+      {
+          duration=_videos[i]._nb_video_frames;
+          duration/=info.fps1000;
+          duration*=1000;                 // duration in seconds
+          duration*=wav->frequency;          // In sample
+          _videos[i]._audio_duration=(uint64_t)floor(duration);
+      }
+  }
+  for(int i=0;i<_nb_segment;i++)
+    updateAudioTrack(i);
+  return 1;
+}
 //
 //

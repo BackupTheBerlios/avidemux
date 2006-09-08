@@ -163,6 +163,7 @@ class ADM_Composer
   						uint8_t 	getExtraHeaderData(uint32_t *len, uint8_t **data);
                                                 uint32_t getPARWidth(void);
                                                 uint32_t getPARHeight(void);
+                                                uint8_t  rebuildDuration(void);
   								ADM_Composer();
   				virtual 			~ADM_Composer();
   						void		clean( void );

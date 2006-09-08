@@ -56,7 +56,8 @@ AVDMEditAudioStream::AVDMEditAudioStream (ADM_Composer * father)
 {
   uint32_t l = 0;
   uint8_t *d = NULL;
-
+  uint32_t oldFq;
+  
   _father = father;
   _destroyable = 0;
   _pos = 0;
@@ -68,7 +69,12 @@ AVDMEditAudioStream::AVDMEditAudioStream (ADM_Composer * father)
   video_body->getAudioExtra (&l, &d);
   if (_wavheader)
     {
+      oldFq=_wavheader->frequency;
       _codec = getAudioCodec (_wavheader->encoding, _wavheader, l, d);
+      if(oldFq!=_wavheader->frequency)
+      {
+        father->rebuildDuration(); 
+      }
     }
   else
     _codec = getAudioCodec (0);
