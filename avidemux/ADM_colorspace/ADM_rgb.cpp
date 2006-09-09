@@ -439,6 +439,10 @@ uint8_t COL_Generic2YV12::transform(uint8_t **planes, uint32_t *strides,uint8_t 
         srd[2]=0;
 
         ssrc[0]=mul*w;
+        if(strides)
+        {
+          if(strides[0]>ssrc[0]) ssrc[0]=strides[0]; 
+        }
         ssrc[1]=0;
         ssrc[2]=0;
 
