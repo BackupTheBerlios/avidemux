@@ -23,6 +23,7 @@
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/filesel.h"
+#include "ADM_encoder/ADM_vidEncode.hxx"
 
 
 # include "prefs.h"
@@ -33,87 +34,56 @@ static uint64_t		_init;
 static uint32_t 	_audio;
 static void callback( void );
 
-uint8_t DIA_Requant(float *perce,uint32_t *quality,uint64_t init,uint32_t audio);
-uint8_t DIA_Requant(float *perce,uint32_t *quality, uint64_t init,uint32_t audio)
+uint8_t DIA_requant(COMPRES_PARAMS *incoming)
 {
 uint8_t ret=0;
+uint32_t *pp;
+float   fp;
 char string[1025];
-	
-	dialog=create_dialog1();
-//	gtk_transient(dialog);		
+GtkAdjustment *sliderAdjustment;
+
+        ADM_assert(incoming->extraSettingsLen==sizeof(uint32_t));
+        pp=(uint32_t *)incoming->extraSettings;
+        
+       
+        fp=(*pp);
+        fp/=1000;
+        
+        dialog=create_dialog1();
         gtk_register_dialog(dialog);
-	sprintf(string,"%lu MB",init>>20);
-	_init=init;
-  	gtk_label_set_text(GTK_LABEL(WID(labelVideoIn)),string);
-	
-	sprintf(string,"%lu MB",audio>>20);
-	_audio=audio;
-	gtk_label_set_text(GTK_LABEL(WID(labelAudioIn)),string);
-	
-	gtk_signal_connect(GTK_OBJECT(WID(hscale1)),"value_changed",GTK_SIGNAL_FUNC(callback),0);
-	
+        sliderAdjustment=gtk_range_get_adjustment (GTK_RANGE(WID(hscale1)));
+        gtk_adjustment_set_value( GTK_ADJUSTMENT(sliderAdjustment),(  gdouble  ) fp );
 
-
-
-	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
-	{
-		GtkAdjustment *sliderAdjustment;
-		ret=1;
-		// Read value & speed
-		sliderAdjustment=gtk_range_get_adjustment (GTK_RANGE(WID(hscale1)));
-		*perce=(float)GTK_ADJUSTMENT(sliderAdjustment)->value;
-		*quality=0;		
-	}
+        if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+        {
+                
+                ret=1;
+                // Read value & speed
+                fp=(float)GTK_ADJUSTMENT(sliderAdjustment)->value;
+                *pp=(uint32_t)(1000.*fp);
+        }
         gtk_unregister_dialog(dialog);
-	gtk_widget_destroy(dialog);
-	dialog=NULL;
-	return ret;
-}
-void callback( void )
-{
-float per,current;
-uint64_t final;
-uint32_t mb;
-char string[1024];
-
-		GtkAdjustment *sliderAdjustment;		
-		sliderAdjustment=gtk_range_get_adjustment (GTK_RANGE(WID(hscale1)));
-		per=(float)GTK_ADJUSTMENT(sliderAdjustment)->value;
-		if(per<1.0) per=1.0;
-		current=_init;
-		current/=per;
-		
-		final=(uint64_t)floor(current);
-		final+=_audio;
-		final>>=20;
-		
-		mb=(uint32_t )final;
-		sprintf(string,"%lu MB",mb);		
-  		gtk_label_set_text(GTK_LABEL(WID(labelTotal)),string);		
-	
+        gtk_widget_destroy(dialog);
+        dialog=NULL;
+        return ret;
 }
 
 GtkWidget*
-create_dialog1 (void)
+    create_dialog1 (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox1;
   GtkWidget *label1;
   GtkWidget *hscale1;
-  GtkWidget *table1;
-  GtkWidget *label3;
-  GtkWidget *label4;
-  GtkWidget *label5;
-  GtkWidget *labelVideoIn;
-  GtkWidget *labelAudioIn;
-  GtkWidget *labelTotal;
+  GtkWidget *hseparator1;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
 
   dialog1 = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (dialog1), _("Requantize Option"));
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
@@ -126,56 +96,14 @@ create_dialog1 (void)
   gtk_widget_show (label1);
   gtk_box_pack_start (GTK_BOX (vbox1), label1, FALSE, FALSE, 0);
 
-  hscale1 = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (2, 1, 4, 0.2, 0.2, 0)));
+  hscale1 = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (2.37, 1, 4, 0.2, 0.2, 0)));
   gtk_widget_show (hscale1);
   gtk_box_pack_start (GTK_BOX (vbox1), hscale1, FALSE, FALSE, 0);
   gtk_scale_set_digits (GTK_SCALE (hscale1), 2);
 
-  table1 = gtk_table_new (3, 2, FALSE);
-  gtk_widget_show (table1);
-  gtk_box_pack_start (GTK_BOX (vbox1), table1, FALSE, FALSE, 0);
-
-  label3 = gtk_label_new (_("Initial Video size :"));
-  gtk_widget_show (label3);
-  gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label3), 0, 0.5);
-
-  label4 = gtk_label_new (_("Audio size :"));
-  gtk_widget_show (label4);
-  gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
-
-  label5 = gtk_label_new (_("Final size (audio+video):"));
-  gtk_widget_show (label5);
-  gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
-
-  labelVideoIn = gtk_label_new (_("0"));
-  gtk_widget_show (labelVideoIn);
-  gtk_table_attach (GTK_TABLE (table1), labelVideoIn, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (labelVideoIn), 0, 0.5);
-
-  labelAudioIn = gtk_label_new (_("0"));
-  gtk_widget_show (labelAudioIn);
-  gtk_table_attach (GTK_TABLE (table1), labelAudioIn, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (labelAudioIn), 0, 0.5);
-
-  labelTotal = gtk_label_new (_("0"));
-  gtk_widget_show (labelTotal);
-  gtk_table_attach (GTK_TABLE (table1), labelTotal, 1, 2, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (labelTotal), 0, 0.5);
+  hseparator1 = gtk_hseparator_new ();
+  gtk_widget_show (hseparator1);
+  gtk_box_pack_start (GTK_BOX (vbox1), hseparator1, FALSE, FALSE, 0);
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
@@ -197,18 +125,11 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
   GLADE_HOOKUP_OBJECT (dialog1, hscale1, "hscale1");
-  GLADE_HOOKUP_OBJECT (dialog1, table1, "table1");
-  GLADE_HOOKUP_OBJECT (dialog1, label3, "label3");
-  GLADE_HOOKUP_OBJECT (dialog1, label4, "label4");
-  GLADE_HOOKUP_OBJECT (dialog1, label5, "label5");
-  GLADE_HOOKUP_OBJECT (dialog1, labelVideoIn, "labelVideoIn");
-  GLADE_HOOKUP_OBJECT (dialog1, labelAudioIn, "labelAudioIn");
-  GLADE_HOOKUP_OBJECT (dialog1, labelTotal, "labelTotal");
+  GLADE_HOOKUP_OBJECT (dialog1, hseparator1, "hseparator1");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
 
   return dialog1;
 }
-
 

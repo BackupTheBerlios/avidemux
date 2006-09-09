@@ -5,6 +5,7 @@ uint8_t DIA_DVDffParam (COMPRES_PARAMS * incoming);
 #define REQUANT_AS_CODE
 #include "ADM_vidEncode.hxx"
 // Yv12
+extern uint8_t DIA_requant(COMPRES_PARAMS *incoming);
 
 COMPRES_PARAMS yv12codec = {
   CodecYV12,
@@ -448,7 +449,7 @@ COMPRES_PARAMS RequantCodec = {
     ADM_EXTRA_PARAM,
     &RequantFactorExtra,
     sizeof (RequantFactorExtra),
-    NULL
+    DIA_requant
 };
 #endif
 //********************************************

@@ -56,7 +56,8 @@ EncoderRequant::EncoderRequant (COMPRES_PARAMS * codecconfig)
   ADM_assert(codecconfig->extraSettingsLen==sizeof(uint32_t));
   p=*(uint32_t *)codecconfig->extraSettings;
   fp=p;
-  fp/=10; // 1000 > %100
+  fp/=1000; // 1000 > %100
+  printf("Initializing requant with factor = %f\n",fp);
   Mrequant_init (fp,1);
 
 }
@@ -165,10 +166,14 @@ EncoderRequant::encode (uint32_t frame, ADMBitstream *out)
   
   if (frame >= _total)
     {
-      printf ("EncCopy: Going out of bound %d/%d\n", frame, _total);
-      return 0;
+      printf ("[Requant]: Going out of bound %d/%d\n", frame, _total);
+      // Stuff with emptyness
+      out->len=0;
+      return 1;
     }
     out->flags=0;
+    /* First frame ? */
+    
   // No B frames, take as is
   if (!video_body->isReordered (frameStart + frame))
     {
@@ -221,13 +226,27 @@ EncoderRequant::encode (uint32_t frame, ADMBitstream *out)
         }
       else
 	{
-        aprintf ("\tJust sending it :(%lu)-(%lu)\n", _frameStart + frame,
-                _lastIPFrameSent);
-        ret =code(_frameStart + frame , out->data, &out->len);
-      //  ret=video_body->getFrameNoAlloc (_frameStart+frame, out->data,&out->len,&out->flags);
-        out->ptsFrame  = frame;
-
-	}
+            aprintf ("\tJust sending it :(%lu)-(%lu)\n", _frameStart + frame,
+                    _lastIPFrameSent);
+            ret =code(_frameStart + frame , out->data, &out->len);
+              //  ret=video_body->getFrameNoAlloc (_frameStart+frame, out->data,&out->len,&out->flags);
+            out->ptsFrame  = frame;
+            if(!frame) // First frame ?
+            {
+                  // It does not start by a seqstart, add it if possible
+                  if(!(_buffer[0]==0 && _buffer[1]==0 && _buffer[2]==1 && _buffer[3]==0xb3))
+                  {
+                    uint8_t buf[10*1024];
+                    uint32_t seq;
+                    video_body->getRawStart (frameStart, buf, &seq);	
+                    printf("Adding seq header (%lu)\n",seq);
+                    memmove(_buffer+seq,_buffer,out->len);
+                    memcpy(_buffer,buf,seq);
+                    out->len+=seq;
+        
+                  }
+            }
+        }
     }
   if (!ret)
     printf ("Get frame error for frame %d+%d\n", frameStart, frame);
