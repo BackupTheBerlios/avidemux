@@ -437,7 +437,7 @@ COMPRES_PARAMS SVCDCodec = {
 uint32_t RequantFactorExtra=1000; // 1000* the actual requant factor
 COMPRES_PARAMS RequantCodec = {
     CodecRequant,
-    "REQUANT",
+    "Mpeg2 Requant",
     "REQUANT",
     "Mpeg2 Requantizer",
     COMPRESS_CQ,
