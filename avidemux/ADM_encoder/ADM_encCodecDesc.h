@@ -2,7 +2,7 @@
 #define ADM_CODEC_CONFIG_
 
 uint8_t DIA_DVDffParam (COMPRES_PARAMS * incoming);
-
+#define REQUANT_AS_CODE
 #include "ADM_vidEncode.hxx"
 // Yv12
 
@@ -448,7 +448,7 @@ COMPRES_PARAMS RequantCodec = {
     ADM_EXTRA_PARAM,
     &RequantFactorExtra,
     sizeof (RequantFactorExtra),
-    DIA_Requant
+    NULL
 };
 #endif
 //********************************************
@@ -656,6 +656,7 @@ COMPRES_PARAMS *AllVideoCodec[] = {
   &VCDCodec,
   &SVCDCodec,
   &DVDCodec,
+  &RequantCodec,
 #ifdef USE_XVID_4
   &Xvid4Codec,
 #endif
@@ -666,6 +667,7 @@ COMPRES_PARAMS *AllVideoCodec[] = {
   &ffmpegFFHUFF,
   &ffmpegFFV1,
   &yv12codec,
+  
 //&ffmpegSnow,
   &DUMMYONE
 };

@@ -103,7 +103,7 @@ videoCodecGetFamily (void)
       || current_codec == CodecXDVD)
     return CodecFamilyXVCD;
   if (current_codec == CodecVCD || current_codec == CodecSVCD
-      || current_codec == CodecDVD)
+      || current_codec == CodecDVD || current_codec == CodecRequant)
     return CodecFamilyMpeg;
   return CodecFamilyAVI;
 

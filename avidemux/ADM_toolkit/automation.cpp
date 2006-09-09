@@ -98,9 +98,7 @@ static void call_setPP(char *v,char *s);
 static void call_v2v(char *a,char *b,char *c);
 
 extern void updateLoaded(void );
-extern void A_requantize2( float percent, uint32_t quality, char *out_name );
 static void save(char*name);
-static void call_requant(char *p, char *q, char *n);
 extern void show_info(char *p);
 extern const char *getStrFromAudioCodec( uint32_t codec);
 extern void frame2time(uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm, uint16_t * ss, uint16_t * ms);
@@ -195,8 +193,6 @@ AUTOMATON reaction_table[]=
                 {"vobsub",              3       ,"Create vobsub file (vobfile vosubfile ifofile)",  (one_arg_type ) call_v2v},
 
 		{"autosplit",		1	,"split every N MBytes",call_autosplit},
-		{"requant",		3	,"requantize mpeg2 : percent quality[0..3] output_name",
-										(one_arg_type )call_requant},
 		{"info",		0	,"show information about loaded video and audio streams", show_info},
 		{"autoindex",		0	,"try to generate required index files", set_autoindex},
 		{"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
@@ -487,15 +483,6 @@ void call_help(char *p)
 			}
 	
 			call_quit(NULL);
-}
-void call_requant(char *p, char *q, char *n)
-{
-
-	float f;
-	uint32_t i;
-	f=atof(p);
-	i=atoi(q);
-	A_requantize2( f,i, n )	;
 }
 
 void save(char*name)

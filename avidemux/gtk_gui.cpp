@@ -519,15 +519,6 @@ int nw;
 				
 			}
     			break;
-#ifdef TEST_UNPACK
-    case ACT_Requant:
-    			video_body->unpackPacked();
-			break;
-#else    
-    case ACT_Requant:
-    			A_requantize();
-			break;
-#endif
 			
     case ACT_SaveOGM:
                         GUI_FileSelWrite (_("Select OGM file to write"), (SELFILE_CB *)ogmSave);

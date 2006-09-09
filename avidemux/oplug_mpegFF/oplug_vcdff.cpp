@@ -50,6 +50,7 @@ extern "C" {
 #include "ADM_codecs/ADM_ffmpeg.h"
 #include "ADM_encoder/adm_encffmpeg.h"
 #include "ADM_encoder/adm_encmpeg2enc.h"
+#include "ADM_encoder/adm_encRequant.h"
 #include "oplug_mpegFF/oplug_vcdff.h"
 
 #include "ADM_dialog/DIA_encoding.h"
@@ -71,10 +72,11 @@ static uint8_t *_buffer=NULL,*_outbuffer=NULL;
 static void  end (void);
 extern const char *getStrFromAudioCodec( uint32_t codec);
 
-extern COMPRES_PARAMS ffmpeg1Codec,ffmpeg2DVDCodec,ffmpeg2SVCDCodec;	
+extern COMPRES_PARAMS ffmpeg1Codec,ffmpeg2DVDCodec,ffmpeg2SVCDCodec,RequantCodec;	
 extern FFcodecSetting ffmpeg1Extra,ffmpeg2DVDExtra,ffmpeg2SVCDExtra;
 extern COMPRES_PARAMS SVCDCodec, DVDCodec,VCDCodec;
 
+extern uint8_t    isMpeg12Compatible (uint32_t fourcc);
 
 uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 		   				   uint32_t * br,uint32_t *fsize,FFcodecSetting *conf	);
@@ -233,6 +235,16 @@ uint32_t muxerUsed=0;
                   encoder=new EncoderMpeg2enc(MPEG2ENC_DVD,&DVDCodec);
                   printf("\n Using mpeg2enc encoder (DVD)\n");
                   break;
+                case CodecRequant:
+                  if(!isMpeg12Compatible(avifileinfo->fcc))
+                  {
+                    GUI_Error_HIG("Incompatible Input","The input file must be mpeg2 to be able to use requant!");
+                    return 0; // Fixme, do some cleanup 
+                  }
+                  encoder=new EncoderRequant(&RequantCodec);
+                  printf("\n Using mpeg2 requant\n");
+                  break;
+                break;
                 case CodecSVCD:
                   encoder=new EncoderMpeg2enc(MPEG2ENC_SVCD,&SVCDCodec);
                   printf("\n Using mpeg2enc encoder (SVCD)\n");
@@ -281,6 +293,10 @@ uint32_t muxerUsed=0;
           case CodecXDVD:
             encoding->setCodec("FFmpeg Mpeg2 DVD VBR");
             break;
+          case CodecRequant:
+            encoding->setCodec("Mpeg Requantizer");
+            break;
+          
           default:
             ADM_assert(0);
 	}
