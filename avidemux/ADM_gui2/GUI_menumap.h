@@ -65,7 +65,7 @@ CALLBACK(calculator1                            ,ACT_Bitrate);
  CALLBACK(	check_frames			,ACT_VideoCheck);
  CALLBACK(quit1		   			,ACT_Exit);
  
- CALLBACK(requantize_mpeg1		   	,ACT_Requant);
+ 
  CALLBACK(run_script1		   	        ,ACT_RunScript);
  CALLBACK( ocr_vobsub_2_srt                     ,ACT_Ocr);
 CALLBACK(item1                                 ,ACT_AllBlackFrames);
