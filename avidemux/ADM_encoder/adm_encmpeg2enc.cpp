@@ -143,7 +143,10 @@ _retry:
         //printf("asked :%d ",nq);
         out->in_quantizer=nq;
         out->flags=nf;
-   }
+   }else
+  {
+      out->in_quantizer=0;
+  }
    if(!_codec->encode (_vbuffer, out ))
    {
      printf("[mpeg2enc]Codec error frame %u delay %u\n", frame,_delayed);
