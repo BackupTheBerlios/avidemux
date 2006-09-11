@@ -145,7 +145,7 @@ uint8_t   PacketQueue::Push(uint8_t *ptr, uint32_t size,uint32_t sample)
         // Look if someone was waiting ...
         if(_poperCond->iswaiting())
         {
-          _poperCond->wakeup();
+            _poperCond->wakeup();
         }
         _mutex->unlock();
         return 1;
@@ -215,7 +215,12 @@ uint8_t   PacketQueue::Pop(uint8_t *ptr, uint32_t *size,uint32_t *sample)
   // In case we made some space
   if(_pusherCond->iswaiting())
   {
-    _pusherCond->wakeup();
+    uint32_t third=(2*_bufferSize)/3;
+    uint32_t available=availableSpace(); 
+    // Only wakeup if we go over 1/3 of the buffer
+    ADM_assert(available>=sz);
+    if(available > third)
+        _pusherCond->wakeup();
   }
   _mutex->unlock();
   return 1;
@@ -248,6 +253,14 @@ uint8_t PacketQueue::Abort(void)
   _pusherCond->abort();
   
   return 1;
+}
+uint8_t   PacketQueue::isEof(void)
+{
+uint8_t r=0;
+_mutex->lock();
+    if((_eof||_aborted) && _slotHead==_slotQueue) r=1;
+_mutex->unlock();
+return r;
 }
 //EOF
 

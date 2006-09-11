@@ -51,6 +51,7 @@ class PacketQueue
           uint8_t   IsEmpty(void);
           uint8_t   Finished(void);
           uint8_t   Abort(void);
+          uint8_t   isEof(void);
           uint8_t   isAborted(void) {return _aborted;}
 };
 

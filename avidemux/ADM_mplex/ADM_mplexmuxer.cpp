@@ -79,8 +79,8 @@
 /***************************************************************************/
 
 
-static Transfert        *channelaudio=NULL;
-static Transfert        *channelvideo=NULL;
+static PacketQueue     *channelaudio=NULL;
+static PacketQueue     *channelvideo=NULL;
 static FileOutputStream *outputStream=NULL;
 static IFileBitStream   *audioin=NULL;
 static IFileBitStream   *videoin=NULL;
@@ -115,11 +115,11 @@ mplexMuxer::~mplexMuxer()
 //___________________________________________________________________________
 uint8_t mplexMuxer::audioEof(void)
 {
-        channelaudio->abort();
+        channelaudio->Abort();
 }
 uint8_t mplexMuxer::videoEof(void)
 {
-  channelvideo->abort();
+  channelvideo->Abort();
 }
 
 //___________________________________________________________________________
@@ -127,12 +127,10 @@ uint8_t mplexMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE
 {
         printf("Opening mplex muxer (%s)\n",filename);
         _running=1;
-#define MIN_BUFFER (1024*1024)
-        if(audioheader->encoding==WAV_LPCM)
-            channelaudio=new Transfert(2*MIN_BUFFER);
-        else
-            channelaudio=new Transfert(MIN_BUFFER);
-        channelvideo=new Transfert(0);
+
+        
+        channelaudio=new PacketQueue(  "Mplex audioQ",TRANSFERT_SLOT,TRANSFERT_BUFFER);
+        channelvideo=new PacketQueue(  "Mplex videoQ",TRANSFERT_SLOT,TRANSFERT_BUFFER);
         
         outputStream=new FileOutputStream ( filename );
         
@@ -217,13 +215,13 @@ int slaveThread( WAVHeader *audioheader )
 uint8_t mplexMuxer::writeAudioPacket(uint32_t len, uint8_t *buf)
 {
         
-        return channelaudio->write(buf,len);
+        return channelaudio->Push(buf,len,0);
 }
 //___________________________________________________________________________
 uint8_t mplexMuxer::needAudio( void )
 {
         
-       return channelaudio->needData();
+       return 1;
 }
 static uint8_t seq_start_code [] = {0x00, 0x00, 0x01, 0xB3};
 static uint8_t gop_start_code [] = {0x00, 0x00, 0x01, 0xB8};
@@ -317,16 +315,13 @@ uint16_t a1,a2,a3,a4,ff;
         
                 }
         }
-        r= channelvideo->write(bitstream->data,bitstream->len);
-	if( cond_slaveThread_problem->iswaiting() ){
-                kind_of_slaveThread_problem_rc = DIA_quota(kind_of_slaveThread_problem);
-		cond_slaveThread_problem->wakeup();
-	}
-        if(channelvideo->fillingUp())
+
+        if( cond_slaveThread_problem->iswaiting() )
         {
-                //printf("Output buffer filling up, sleeping a bit\n");
-                channelvideo->clientLock();
-        }                
+               kind_of_slaveThread_problem_rc = DIA_quota(kind_of_slaveThread_problem);
+               cond_slaveThread_problem->wakeup();
+         }
+        r= channelvideo->Push(bitstream->data,bitstream->len,0);
         
         return 1;
 }
@@ -342,8 +337,8 @@ uint8_t mplexMuxer::close( void )
         if(_running)
         {
                 _running=0;
-                channelvideo->abort();
-                channelaudio->abort();
+                channelvideo->Abort();
+                channelaudio->Abort();
                 while(slaveRunning)
                 {
                         printf("Waiting for slave thread to end\n");

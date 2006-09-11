@@ -39,11 +39,11 @@ private:
 class IFileBitStream : public IBitStream
 {
 public:
-        IFileBitStream( Transfert *trans, mplexStreamDescriptor *streamDesc, unsigned int buf_size = BUFFER_SIZE);
+        IFileBitStream( PacketQueue *inQueue, mplexStreamDescriptor *streamDesc, unsigned int buf_size = BUFFER_SIZE);
         ~IFileBitStream();
 
 private:
-        Transfert       *_transfert;
+        PacketQueue       *queue;
         virtual size_t ReadStreamBytes( uint8_t *buf, size_t number ) ;
         virtual bool EndOfStream() ;
         

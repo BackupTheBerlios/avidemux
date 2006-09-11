@@ -36,7 +36,7 @@
 
 //**************** Transfert *******************
 // *** Lot of race here : FIXME
-
+#if 0
 Transfert::Transfert(uint32_t minBuffer)
 {
         cond=new admCond(&mutex);
@@ -233,3 +233,4 @@ uint8_t Transfert::clientLock( void )
         return 1;
 
 }
+#endif

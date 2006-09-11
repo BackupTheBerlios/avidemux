@@ -41,7 +41,7 @@ gui_action.hxx prefs.in
 #avidemux2_LDADD   =    ./ADM_editor/libADM_editor.a  ./ADM_audiocodec/libADM_audiocodec.a ./ADM_audio/libADM_audio.a ./oplug_avi/liboplug_avi.a ./ADM_filter/libADM_filter.a ./ADM_video/libADM_video.a  ./ADM_encoder/libADM_encoder.a  ./ADM_codecs/libADM_codecs.a ./ADM_vp32/libADM_vp32.a   ./ADM_audiofilter/libADM_audiofilter.a ./oplug_mpegFF/liboplug_mpegFF.a  ./oplug_mpeg/liboplug_mpeg.a ./ADM_gui2/libADM_gui2.a  ./ADM_gui/libADM_gui.a ./ADM_inpics/libADM_inpics.a  ./ADM_h263/libADM_h263.a   ./ADM_nuv/libADM_nuv.a  ./ADM_colorspace/libADM_colorspace.a ./ADM_audiodevice/libADM_audiodevice.a ./ADM_toolkit/libADM_toolkit.a ./ADM_mpeg2dec/libADM_mpeg2dec.a ./ADM_mpegindexer/libADM_mpegindexer.a   ./libMpeg2Dec/liblibMpeg2Dec.a    ./ADM_dialog/libADM_dialog.a
 
 
-avidemux2_LDADD   =  \
+avidemux2_LDADD   =  ADM_dialog/DIA_quota.o \
   ADM_lavcodec/libavcodec.a \
   ADM_lavcodec/libpostproc/libpostproc.a \
   ./ADM_script/libADM_script.a \
@@ -80,6 +80,7 @@ avidemux2_LDADD   =  \
 ./ADM_ocr/libADM_ocr.a \
 ./ADM_mpegdemuxer/libADM_mpegdemuxer.a   \
 ./ADM_audio/libADM_audio.a \
+./ADM_toolkit/libADM_toolkit.a  \
 ./ADM_dialog/libADM_dialog.a  \
 ./libMpeg2Dec/liblibMpeg2Dec.a   \
 ./ADM_tray/libADM_tray.a \

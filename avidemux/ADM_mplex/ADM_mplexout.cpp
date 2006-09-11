@@ -53,16 +53,16 @@
 
 bool IFileBitStream::EndOfStream(void) 
 {
-        if(_transfert->eof()) return true;
+        if(queue->isEof()) return true;
         return false;
 
 }
 
-IFileBitStream::IFileBitStream(Transfert *trans,mplexStreamDescriptor *desc,
+IFileBitStream::IFileBitStream(PacketQueue *q,mplexStreamDescriptor *desc,
                                 unsigned int buf_size) :
     IBitStream(desc)
 {
-        _transfert=trans;        
+        queue=q;        
         SetBufSize(buf_size);
         eobs = false;
         byteidx = 0;
@@ -91,7 +91,10 @@ IFileBitStream::~IFileBitStream()
 */
  size_t IFileBitStream::ReadStreamBytes( uint8_t *buf, size_t number )
  {
-        return _transfert->read(buf,number);
+uint32_t s,z;
+        if(!queue->Pop(buf,&z,&s)) return 0;
+      ADM_assert(z);
+        return z;
  }
  //EOF
  

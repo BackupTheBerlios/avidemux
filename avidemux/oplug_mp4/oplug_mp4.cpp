@@ -285,7 +285,7 @@ preFilling:
 //_____________ Start Audio thread _____________________
           if(audio)
           {          
-            pq=new PacketQueue("MP4 audioQ",50,2*1024*1024);
+            pq=new PacketQueue("MP4 audioQ",5000,2*1024*1024);
             memset(&context,0,sizeof(context));
             context.audioEncoder=audio;
             context.audioTargetSample=0xFFFF0000; ; //FIXME

@@ -321,7 +321,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
             uint8_t r;
             
             copy->configure(NULL);
-            pq=new PacketQueue("TS audioQ",50,2*1024*1024);
+            pq=new PacketQueue("TS audioQ",5000,2*1024*1024);
             memset(&context,0,sizeof(context));
             context.audioEncoder=audio;
             context.audioTargetSample=target_sample;

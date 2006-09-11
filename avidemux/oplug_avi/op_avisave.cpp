@@ -238,7 +238,7 @@ GenericAviSave::setupAudio (void)
     }
     /* Setup audioQ */
     pthread_t     audioThread;
-    _pq=new PacketQueue("AVI audioQ",50,2*1024*1024);
+    _pq=new PacketQueue("AVI audioQ",5000,2*1024*1024);
     memset(&_context,0,sizeof(_context));
     _context.audioEncoder=audio_filter;
     _context.audioTargetSample=0xFFFF0000; ; //FIXME
