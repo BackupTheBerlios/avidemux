@@ -122,6 +122,7 @@ uint32_t skipping=1;
 pthread_t     audioThread;
 audioQueueMT context;
 PacketQueue   *pq;//("MP4 audioQ",50,2*1024*1024);
+uint32_t    totalAudioSize=0;
 
            if(type==ADM_PSP)
                muxerType=MUXER_PSP;
@@ -304,7 +305,8 @@ preFilling:
                      if(alen)
                      {
                         muxer->writeAudioPacket(alen,audioBuffer,sample_got);
-                        encoding_gui->feedAudioFrame(alen);
+                        totalAudioSize+=alen;
+                        encoding_gui->setAudioSize(totalAudioSize);
                         sample_got+=sample;
                      }
                     }else break;
@@ -334,9 +336,7 @@ preFilling:
             //    printf("Prefill %u FrameWrite :%u Frame %u PtsFrame :%u\n",prefill,frameWrite,frame,bitstream.ptsFrame);
                 frameWrite++;
                 muxer->writeVideoPacket( &bitstream);
-
-               encoding_gui->setFrame(frame,total);
-               encoding_gui->feedFrame(bitstream.len);
+                encoding_gui->setFrame(frame,bitstream.len,bitstream.out_quantizer,total);
                if(!encoding_gui->isAlive())
                 {
                     
@@ -399,7 +399,7 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
                 bitstream.data=buffer;
                 for (uint32_t cf = 0; cf < total; cf++)
                 {
-                        encoding_gui->setFrame (cf, total);
+//                        encoding_gui->setFrame (cf, total);
                         if (!encoding_gui->isAlive())
                         {
                                 abt:
@@ -412,8 +412,7 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
                                 printf("\n Encoding of frame %lu failed !\n",cf);
                                 return 0;
                         }
-                        encoding_gui->setQuant(bitstream.out_quantizer);
-                        encoding_gui->feedFrame(bitstream.len);                
+                        encoding_gui->setFrame(cf,bitstream.len,bitstream.out_quantizer,total);
                 }
                 encoding_gui->reset();
                 aprintf("**Pass 1:done\n");
