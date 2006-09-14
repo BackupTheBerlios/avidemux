@@ -109,7 +109,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
   encoding_gui->setCodec(_encode->getDisplayName());
   
   // init save avi
-//-----------------------VBR--------------------------------------
+//-----------------------2 Pass--------------------------------------
   if (_encode->isDualPass ())
     {
       uint8_t *buffer;
@@ -144,27 +144,26 @@ _mainaviheader.dwMicroSecPerFrame=0;
       //__________________________________
         
         bitstream.data=buffer;
-      	for (uint32_t cf = 0; cf < frametogo; cf++)
-	{
-	  if (guiUpdate (cf, frametogo))
-	    {
-	    abt:
+        for (uint32_t cf = 0; cf < frametogo; cf++)
+        {
+          if (guiUpdate (cf, frametogo))
+            {
+            abt:
                 GUI_Error_HIG (_("Aborting"), NULL);
-	      delete[]buffer;
-	      return 0;
-	    }
+              delete[]buffer;
+              return 0;
+            }
             
-	//  if (!_encode->encode (cf, &len, buffer, &flag))
             bitstream.cleanup(cf);
             if (!_encode->encode (cf, &bitstream))
-		{
-			printf("\n Encoding of frame %lu failed !\n",cf);
-	    		goto abt;
-		}
-	   encoding_gui->setQuant(bitstream.out_quantizer);
-	   encoding_gui->feedFrame(bitstream.len);		
-	}
-//      guiStop ();
+                {
+                        printf("\n Encoding of frame %lu failed !\n",cf);
+                        goto abt;
+                }
+           encoding_gui->setFrame(cf,bitstream.len,bitstream.out_quantizer,frametogo);
+    
+        }
+
 	encoding_gui->reset();
       	delete[]buffer;	
      	aprintf("**Pass 1:done\n");
@@ -237,24 +236,19 @@ uint8_t
 GenericAviSaveProcess::writeVideoChunk (uint32_t frame)
 {
   uint8_t    	ret1;
-  
-  
-
   // CBR or CQ
-
-
   if (frame == 0)
-	{
-	  encoding_gui->setCodec((char *)_encode->getDisplayName())  ;
-    	if (!_encode->isDualPass ())
-      	{
-				guiSetPhasis ("Encoding");
-	      }
-    	else
-      		{
-				guiSetPhasis ("Encoding, 2nd pass");
-	      }
-	}
+  {
+    encoding_gui->setCodec((char *)_encode->getDisplayName())  ;
+  if (!_encode->isDualPass ())
+  {
+                          guiSetPhasis ("Encoding");
+        }
+  else
+          {
+                          guiSetPhasis ("Encoding, 2nd pass");
+        }
+  }
   // first read
   bitstream.cleanup(frame);
   ret1 = _encode->encode ( frame,&bitstream);// &len1, vbuffer, &_videoFlag);
@@ -265,20 +259,19 @@ GenericAviSaveProcess::writeVideoChunk (uint32_t frame)
      // check for auto split
       // if so, we re-write the last I frame
       if(muxSize)
-      	{
-				 		// we overshot the limit and it is a key frame
-				   	// start a new chunk
-				  	if(handleMuxSize() && (_videoFlag & AVI_KEY_FRAME))
-				   	{		
-					  	uint8_t *data;
-    						uint32_t dataLen=0;
+      {
+              // we overshot the limit and it is a key frame
+              // start a new chunk
+              if(handleMuxSize() && (_videoFlag & AVI_KEY_FRAME))
+              {		
+                      uint8_t *data;
+                      uint32_t dataLen=0;
 
-    							_encode->hasExtraHeaderData( &dataLen,&data);	   
-							if(!reigniteChunk(dataLen,data)) return 0;
-						}
-				 }
-	encoding_gui->feedFrame(bitstream.len);	
-        encoding_gui->setQuant(bitstream.out_quantizer);	
+                      _encode->hasExtraHeaderData( &dataLen,&data);	   
+                      if(!reigniteChunk(dataLen,data)) return 0;
+              }
+        }
+        encoding_gui->setFrame(frame,bitstream.len,bitstream.out_quantizer,frametogo);	
         // If we have several null B frames dont write them
         if(bitstream.len) _notnull=1;
 	else	if( !_notnull)

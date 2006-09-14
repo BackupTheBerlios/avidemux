@@ -52,178 +52,201 @@ DIA_encoding::DIA_encoding( uint32_t fps1000 )
 uint32_t useTray=0;
         if(!prefs->get(FEATURE_USE_SYSTRAY,&useTray)) useTray=0;
 
-	ADM_assert(dialog==NULL);
-	stopReq=0;
-	
-	_totalSize=0;
-	_audioSize=0;
-	_videoSize=0;
-	_current=0;
-	setFps(fps1000);
-	dialog=create_dialog1();
+        ADM_assert(dialog==NULL);
+        stopReq=0;
+        _lastnb=0;
+        _totalSize=0;
+        _audioSize=0;
+        _videoSize=0;
+        _current=0;
+        setFps(fps1000);
+        dialog=create_dialog1();
         
-	gtk_register_dialog(dialog);
-	//gtk_transient(dialog);
-	gtk_signal_connect(GTK_OBJECT(WID(closebutton1)), "clicked",
+        gtk_register_dialog(dialog);
+        //gtk_transient(dialog);
+        gtk_signal_connect(GTK_OBJECT(WID(closebutton1)), "clicked",
                       GTK_SIGNAL_FUNC(DIA_stop),                   NULL);
-	gtk_signal_connect(GTK_OBJECT(dialog), "delete_event",
-		       GTK_SIGNAL_FUNC(on_destroy_abort), NULL);
-	gtk_widget_show(dialog);
+        gtk_signal_connect(GTK_OBJECT(dialog), "delete_event",
+                      GTK_SIGNAL_FUNC(on_destroy_abort), NULL);
+        gtk_widget_show(dialog);
 //	gtk_window_set_modal(GTK_WINDOW(dialog), 1);
         if(useTray)
-	{
-               gtk_window_iconify(GTK_WINDOW(dialog));
-	       UI_iconify();
-	}
-	_lastTime=0;
-	_lastFrame=0;
-	_fps_average=0;
+        {
+              gtk_window_iconify(GTK_WINDOW(dialog));
+              UI_iconify();
+        }
+        _lastTime=0;
+        _lastFrame=0;
+        _fps_average=0;
         tray=NULL;
-        
+        _total=1000;
         if(useTray)
                 tray=new ADM_tray("Encoding");
 
 }
 void DIA_encoding::setFps(uint32_t fps)
 {
-	_roundup=(uint32_t )floor( (fps+999)/1000);
+        _roundup=(uint32_t )floor( (fps+999)/1000);
+        _fps1000=fps;
         ADM_assert(_roundup<MAX_BR_SLOT);
-	for(uint32_t i=0;i<_roundup;i++)
-		_bitrate[i]=0;
-  _bitrate_sum=0;
-	
+        memset(_bitrate,0,sizeof(_bitrate));
+        _bitrate_sum=0;
+        _average_bitrate=0;
+        
 }
 gint on_destroy_abort(GtkObject * object, gpointer user_data)
 {
 
 
-	UNUSED_ARG(object);
-	UNUSED_ARG(user_data);
+      UNUSED_ARG(object);
+      UNUSED_ARG(user_data);
 
-	stopReq=1;
-	return TRUE;
+      stopReq=1;
+      return TRUE;
 
 };
 
 void DIA_stop( void)
 {
-	printf("Stop request\n");
-	stopReq=1;
+        printf("Stop request\n");
+        stopReq=1;
 }
 DIA_encoding::~DIA_encoding( )
 {
         if(tray) delete tray;
         tray=NULL;
-	ADM_assert(dialog);
-	gtk_unregister_dialog(dialog);
-	gtk_widget_destroy(dialog);
-	dialog=NULL;
-	UI_deiconify();
+        ADM_assert(dialog);
+        gtk_unregister_dialog(dialog);
+        gtk_widget_destroy(dialog);
+        dialog=NULL;
+        UI_deiconify();
 
 }
 void DIA_encoding::setPhasis(const char *n)
 {
-	   ADM_assert(dialog);
-  	   gtk_label_set_text(GTK_LABEL(WID(label_phasis)),n);
+          ADM_assert(dialog);
+          gtk_label_set_text(GTK_LABEL(WID(label_phasis)),n);
 
 }
 void DIA_encoding::setAudioCodec(const char *n)
 {
-	   ADM_assert(dialog);
-  	   gtk_label_set_text(GTK_LABEL(WID(label_acodec)),n);
+          ADM_assert(dialog);
+          gtk_label_set_text(GTK_LABEL(WID(label_acodec)),n);
 
 }
 
 void DIA_encoding::setCodec(const char *n)
 {
-	   ADM_assert(dialog);
-  	   gtk_label_set_text(GTK_LABEL(WID(label_vcodec)),n);
+          ADM_assert(dialog);
+          gtk_label_set_text(GTK_LABEL(WID(label_vcodec)),n);
 
 }
-void DIA_encoding::setBitrate(uint32_t br)
+void DIA_encoding::setBitrate(uint32_t br,uint32_t globalbr)
 {
-	   ADM_assert(dialog);
-	   sprintf(string,"%lu kbps",br);
-  	   gtk_label_set_text(GTK_LABEL(WID(label_bitrate)),string);
+          ADM_assert(dialog);
+          sprintf(string,"%u kbps/%u kbps",br,globalbr);
+          gtk_label_set_text(GTK_LABEL(WID(label_bitrate)),string);
 
-}
-void DIA_encoding::setQuant(uint32_t quant)
-{
-	   ADM_assert(dialog);
-	   sprintf(string,"%lu",quant);
-  	   gtk_label_set_text(GTK_LABEL(WID(label_quant)),string);
 }
 void DIA_encoding::reset(void)
 {
-	   ADM_assert(dialog);
-	   _totalSize=0;
-	   _videoSize=0;
-	   _current=0;
+          ADM_assert(dialog);
+          _totalSize=0;
+          _videoSize=0;
+          _current=0;
 }
 void DIA_encoding::setContainer(const char *container)
 {
         ADM_assert(dialog);
         gtk_label_set_text(GTK_LABEL(WID(label_container)),container);
 }
-void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
-{
-	uint32_t tim;
 #define  ETA_SAMPLE_PERIOD 60000 //Use last n millis to calculate ETA
 #define  GUI_UPDATE_RATE 500  
-  static uint32_t _lastnb=0;
+
+void DIA_encoding::setFrame(uint32_t nb,uint32_t size, uint32_t quant,uint32_t total)
+{
+          _total=total;
+          _videoSize+=size;
+          if(nb < _lastnb || _lastnb == 0) // restart ?
+           {
+                _lastnb = nb;
+                clock.reset();
+                _lastTime=clock.getElapsedMS();
+                _lastFrame=0;
+                _fps_average=0;
+                _videoSize=size;
+    
+                _nextUpdate = _lastTime + GUI_UPDATE_RATE;
+                _nextSampleStartTime=_lastTime + ETA_SAMPLE_PERIOD;
+                _nextSampleStartFrame=0;
+          } 
+          _lastnb = nb;
+          _current=nb%_roundup;
+          _bitrate[_current].size=size;
+          _bitrate[_current].quant=quant;
+}
+void DIA_encoding::updateUI(void)
+{
+uint32_t tim;
 
 	   ADM_assert(dialog);
      	   //
            //	nb/total=timestart/totaltime -> total time =timestart*total/nb
            //
            //
-    
-           if(nb < _lastnb || _lastnb == 0) // restart ?
-           {
-             _lastnb = nb;
-                                       
-					clock.reset();
-		_lastTime=clock.getElapsedMS();
-       					_lastFrame=0;
-       					_fps_average=0;
+          if(!_lastnb) return;
+          
+          tim=clock.getElapsedMS();
+          if(_lastTime > tim) return;
+          if( tim < _nextUpdate) return ; 
+          _nextUpdate = tim+GUI_UPDATE_RATE;
+  
+          sprintf(string,"%lu/%lu",_lastnb,_total);
+          gtk_label_set_text(GTK_LABEL(WID(label_frame)),string);
+          // Average bitrate  on the last second
+          uint32_t sum=0,aquant=0,gsum;
+          for(int i=0;i<_roundup;i++)
+          {
+            sum+=_bitrate[i].size;
+            aquant+=_bitrate[i].quant;
+          }
+          
+          aquant/=_roundup;
 
-                _nextUpdate = _lastTime + GUI_UPDATE_RATE;
-                _nextSampleStartTime=_lastTime + ETA_SAMPLE_PERIOD;
-                _nextSampleStartFrame=0;
-                                        if(tray)
-                                                tray->setPercent(0);
-					  UI_purge();
-					  return;
-	  }
-             _lastnb = nb;
+          sum=(sum*8)/1000;
 
-	tim=clock.getElapsedMS();
-	//   printf("%lu / %lu\n",tim,_lastTime);
-	   if(_lastTime > tim) return;
-	   if( tim < _nextUpdate) return ; 
-     _nextUpdate = tim+GUI_UPDATE_RATE;
+          // Now compute global average bitrate
+          float whole=_videoSize,second;
+            second=_lastnb;
+            second/=_fps1000;
+            second*=1000;
+           
+          whole/=second;
+          whole/=1000;
+          whole*=8;
+      
+          gsum=(uint32_t)whole;
 
-	sprintf(string,"%lu/%lu",nb,total);
-	gtk_label_set_text(GTK_LABEL(WID(label_frame)),string);
+          setBitrate(sum,gsum);
+          setQuantIn(aquant);
 
-	   	// compute fps
-		uint32_t deltaFrame, deltaTime;
-		deltaTime=tim-_lastTime;
-		deltaFrame=nb-_lastFrame;
+          // compute fps
+          uint32_t deltaFrame, deltaTime;
+          deltaTime=tim-_lastTime;
+          deltaFrame=_lastnb-_lastFrame;
 
-			sprintf(string,"%lu",(uint32_t)( deltaFrame*1000.0 / deltaTime ));
-   			gtk_label_set_text(GTK_LABEL(WID(label_fps)),string);
-                        
+          _fps_average    =(uint32_t)( deltaFrame*1000.0 / deltaTime ); 
 
-
-
-		uint32_t   hh,mm,ss;
-
-          double framesLeft=(total-nb);
-					ms2time((uint32_t)floor(0.5+deltaTime*framesLeft/deltaFrame),&hh,&mm,&ss);
-					sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
-					gtk_label_set_text(GTK_LABEL(WID(label_eta)),string);
-
+          sprintf(string,"%lu",_fps_average);
+          gtk_label_set_text(GTK_LABEL(WID(label_fps)),string);
+  
+          uint32_t   hh,mm,ss;
+  
+            double framesLeft=(_total-_lastnb);
+                                          ms2time((uint32_t)floor(0.5+deltaTime*framesLeft/deltaFrame),&hh,&mm,&ss);
+                                          sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
+                                          gtk_label_set_text(GTK_LABEL(WID(label_eta)),string);
+  
            // Check if we should move on to the next sample period
           if (tim >= _nextSampleStartTime + ETA_SAMPLE_PERIOD ) {
             _lastTime=_nextSampleStartTime;
@@ -234,79 +257,65 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t total)
             // Store current point for use later as the next sample period.
             //
             _nextSampleStartTime=tim;
-            _nextSampleStartFrame=nb;
+            _nextSampleStartFrame=_lastnb;
           }
-		// update progress bar
-		 float f=nb;
-		 f=f/total;
-                if(tray)
-                        tray->setPercent((int)(f*100.));
-		gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
+          // update progress bar
+            float f=_lastnb;
+            f=f/_total;
+          if(tray)
+                  tray->setPercent((int)(f*100.));
+          gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
-		sprintf(string,"Done : %02d%%",(int)(100*f));
-                if(isQuiet()) printf("[Encoding]%s\n",string);
-		   gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
-		
+          sprintf(string,"Done : %02d%%",(int)(100*f));
+          
+          if(isQuiet()) printf("[Encoding]%s\n",string);
+              gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
+          
+        _totalSize=_audioSize+_videoSize;
+        setSize(_totalSize>>20);
+        setAudioSizeIn((_audioSize>>20));
+        setVideoSizeIn((_videoSize>>20));
+        UI_purge();
 
-	   	UI_purge();
+}
+void DIA_encoding::setQuantIn(int size)
+{
+      ADM_assert(dialog);
+          sprintf(string,"%lu",size);
+          gtk_label_set_text(GTK_LABEL(WID(label_quant)),string);
 
 }
 
 void DIA_encoding::setSize(int size)
 {
-	ADM_assert(dialog);
-	   sprintf(string,"%lu",size);
-  	   gtk_label_set_text(GTK_LABEL(WID(label_size)),string);
+      ADM_assert(dialog);
+          sprintf(string,"%lu",size);
+          gtk_label_set_text(GTK_LABEL(WID(label_size)),string);
 
 }
-void DIA_encoding::setAudioSize(int size)
+void DIA_encoding::setAudioSizeIn(int size)
 {
-	ADM_assert(dialog);
-	   sprintf(string,"%lu",size);
-  	   gtk_label_set_text(GTK_LABEL(WID(label_asize)),string);
+      ADM_assert(dialog);
+          sprintf(string,"%lu",size);
+          gtk_label_set_text(GTK_LABEL(WID(label_asize)),string);
 
 }
-void DIA_encoding::setVideoSize(int size)
+void DIA_encoding::setVideoSizeIn(int size)
 {
-	ADM_assert(dialog);
-	   sprintf(string,"%lu",size);
-  	   gtk_label_set_text(GTK_LABEL(WID(label_vsize)),string);
+      ADM_assert(dialog);
+          sprintf(string,"%lu",size);
+          gtk_label_set_text(GTK_LABEL(WID(label_vsize)),string);
 
 }
-void DIA_encoding::feedFrame(uint32_t size)
+
+void DIA_encoding::setAudioSize(uint32_t size)
 {
-	uint32_t br;
-	ADM_assert(dialog);
-	_totalSize+=size;
-	_videoSize+=size;
-
-  _bitrate_sum += (size - _bitrate[_current]); //Subtract old value and add new one to total
-
-	_bitrate[_current++]=size;
-	_current%=_roundup;
-
-  br=_bitrate_sum;
-
-	br=(br*8)/1000;		
-	setBitrate(br);
-	setSize(_totalSize>>20);
-	setVideoSize(_videoSize>>20);
-	//printf("Bitrate : %lu \n,Size: %lu\n",br,_totalSize);
-
-}
-void DIA_encoding::feedAudioFrame(uint32_t size)
-{
-	uint32_t br;
-	ADM_assert(dialog);
-	_totalSize+=size;
-	_audioSize+=size;
-	setSize(_totalSize>>20);
-	setAudioSize(_audioSize>>20);
-	
-
+      _audioSize=size;
 }
 uint8_t DIA_encoding::isAlive( void )
 {
+     
+        updateUI();
 
 	if(stopReq)
 	{

@@ -97,7 +97,7 @@ uint8_t    GenericAviSaveCopyDualAudio::doOneTrack (uint32_t index,AVDMGenericAu
         writter->saveAudioFrame (packetLen,abuffer);
       else
         writter->saveAudioFrameDual (packetLen,abuffer);
-      encoding_gui->feedAudioFrame(packetLen);
+//      encoding_gui->feedAudioFrame(packetLen);
     }
 	 	
   }
@@ -122,7 +122,7 @@ uint8_t    GenericAviSaveCopyDualAudio::doOneTrack (uint32_t index,AVDMGenericAu
         writter->saveAudioFrame (_audioInBuffer, abuffer);
       else
         writter->saveAudioFrameDual (_audioInBuffer,abuffer);
-      encoding_gui->feedAudioFrame(_audioInBuffer);	  
+//      encoding_gui->feedAudioFrame(_audioInBuffer);	  
     }
   }
   return 1;

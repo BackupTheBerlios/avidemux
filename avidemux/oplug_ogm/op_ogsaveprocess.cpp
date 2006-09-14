@@ -121,9 +121,9 @@ uint32_t w,h,fps1000,fcc;
 					printf("\n Encoding of frame %lu failed !\n",cf);
 	    				return 0;
 				}
-                                encoding_gui->feedFrame(bitstream.len);
-				encoding_gui->setFrame(cf,_togo);
-                                encoding_gui->setQuant(bitstream.out_quantizer);
+//                                encoding_gui->feedFrame(bitstream.len);
+//				encoding_gui->setFrame(cf,_togo);
+//                                encoding_gui->setQuant(bitstream.out_quantizer);
 				if(!encoding_gui->isAlive())
 				{
 					return 0;
@@ -205,8 +205,7 @@ ADMBitstream bitstream;
                         printf("OgmWrite: Error encoding frame %d\n",frame);
                         return 0;
                  }
-                 encoding_gui->feedFrame(bitstream.len);
-                 encoding_gui->setQuant(bitstream.out_quantizer);		 
+                encoding_gui->setFrame(frame,bitstream.len,bitstream.out_quantizer,_togo);
                  return videoStream->write(bitstream.len,_videoBuffer,bitstream.flags,frame);
 }
 //___________________________________________________

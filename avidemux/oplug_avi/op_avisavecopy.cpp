@@ -201,7 +201,7 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
 							if(!reigniteChunk(extraLen,extraData)) return 0;
 						}
 				 }
-  encoding_gui->feedFrame(len);  
+//  encoding_gui->feedFrame(len);  
   if(_needUserDataUpdate)
   	updateUserData(vbuffer,len);
   return writter->saveVideoFrame (len, _videoFlag, vbuffer);

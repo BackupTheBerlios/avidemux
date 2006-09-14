@@ -142,7 +142,6 @@ uint8_t error=0;
                 uint32_t j=0;
 		for( j=0;j<_togo && !error;j++)
 		{
-			encoding_gui->setFrame(j,_togo);
 			if(!encoding_gui->isAlive())
 			{
 				error=1;

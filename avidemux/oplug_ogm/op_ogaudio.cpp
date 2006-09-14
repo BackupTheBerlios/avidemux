@@ -251,7 +251,7 @@ uint32_t header_offset;
 		packets++;
 		len+=packetLen;
 	}
-	encoding_gui->feedAudioFrame(len);
+//	encoding_gui->feedAudioFrame(len);
 	if(totalsample)
 	{
 		audioStream->flush();

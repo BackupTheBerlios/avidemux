@@ -277,8 +277,9 @@ GenericAviSave::writeAudioChunk (uint32_t frame)
                     return 0;
                   }
                   _audioCurrent+=sample;
+                  _audioTotal+=packetLen;
                   writter->saveAudioFrame (packetLen,abuffer);
-                  encoding_gui->feedAudioFrame(packetLen);
+                  encoding_gui->setAudioSize(_audioTotal);
                 }
                 return 1;
         }
@@ -316,7 +317,7 @@ GenericAviSave::writeAudioChunk (uint32_t frame)
       if (_audioInBuffer)
         {
           writter->saveAudioFrame (_audioInBuffer, abuffer);
-          encoding_gui->feedAudioFrame(_audioInBuffer);
+          encoding_gui->setAudioSize(_audioTotal);
           _audioInBuffer=0;
         }
       return 1;
@@ -328,7 +329,7 @@ GenericAviSave::guiStart (void)
 {
       encoding_gui=new DIA_encoding(25000);
       encoding_gui->setCodec("Copy");
-      encoding_gui->setFrame (0, 100);
+      encoding_gui->setFrame (0,0,2 ,100); // FXMe
       encoding_gui->setContainer("Avi");
 
 }
@@ -351,7 +352,7 @@ uint8_t
 GenericAviSave::guiUpdate (uint32_t nb, uint32_t total)
 {
   ADM_assert(encoding_gui);
-  encoding_gui->setFrame (nb, total);
+  //encoding_gui->setFrame (nb, 0,0, total); //FXMe
   if ( encoding_gui->isAlive () == 1)
     return 0;
   return 1;

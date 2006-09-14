@@ -271,6 +271,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
           context.audioTargetSample=target_sample;
           context.audioBuffer=audiobuffer;
           context.bitstream=&bitstream;
+          context.opaque=(void *)work;
 
            // start audio thread
           ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)defaultAudioSlave,&context)); 
@@ -293,12 +294,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
               goto _abt;
             }
              // Update UI
-             
-            work->feedAudioFrame(context.feedAudio);
-            work->setFrame(context.currentVideoFrame,frameEnd-frameStart);
-             //encoding->setQuant(bitstream.out_quantizer);
-            work->feedFrame(context.feedVideo);
-            context.feedAudio=0;
+            work->setAudioSize(context.feedAudio);
             context.feedVideo=0;
             accessMutex.unlock();
             ADM_usleep(1000*1000);
@@ -342,7 +338,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
                   if(audiolen)
                   {
                     muxer->writeAudioPacket(audiolen,audiobuffer);
-                    work->feedAudioFrame(audiolen);
+                    //work->feedAudioFrame(audiolen);
                   }
                 }else break;
               }
@@ -357,8 +353,8 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
               }
               muxer->writeVideoPacket( &bitstream);
 
-              work->setFrame(frame,mx);
-              work->feedFrame(bitstream.len);
+              work->setFrame(frame,bitstream.len,bitstream.out_quantizer,mx);
+//              work->feedFrame(bitstream.len);
               if(!work->isAlive())
               {
                 goto stopit;
@@ -414,19 +410,22 @@ uint8_t lookupSeqEnd(ADMBitstream *bitstream,uint32_t *position)
 //*******************************
 int copyVideoSlave( muxerMT *context )
 {
+DIA_encoding *work=(DIA_encoding *)context->opaque;
+ADMBitstream *bitstream=context->bitstream;
+
   printf("[CopyVideoThread] Starting\n");
   uint32_t position;
   for(uint32_t i=0;i<context->nbVideoFrame;i++)
   {
 
-    context->bitstream->cleanup(i);
+    bitstream->cleanup(i);
     if(context->videoAbort)
     {
       context->videoDone=1;
       context->muxer->audioEof();
       return 1;
     }
-    if(!context->videoEncoder->encode( i,context->bitstream))
+    if(!context->videoEncoder->encode( i,bitstream))
     {
       accessMutex.lock();
       context->videoDone=2;
@@ -435,10 +434,10 @@ int copyVideoSlave( muxerMT *context )
       printf("[CopyVideoThread] Exiting on error\n");
       return 1;
     }
-    if(!context->bitstream->len)
+    if(!bitstream->len)
       continue;
     
-    if(lookupSeqEnd(context->bitstream,&position))
+    if(lookupSeqEnd(bitstream,&position))
     {
         ADMBitstream bs2; 
                 if(position) 
@@ -447,17 +446,18 @@ int copyVideoSlave( muxerMT *context )
                   bs2.len=position;
                   context->muxer->writeVideoPacket(&bs2);
                 }
-                bs2.data=context->bitstream->data+position+4;
-                bs2.len=context->bitstream->len-position-4;
+                bs2.data=bitstream->data+position+4;
+                bs2.len=bitstream->len-position-4;
                 if(bs2.len) context->muxer->writeVideoPacket(&bs2);
     } 
     else 
-      context->muxer->writeVideoPacket(context->bitstream); 
+      context->muxer->writeVideoPacket(bitstream); 
   
 
     accessMutex.lock();
     context->currentVideoFrame=i;
-    context->feedVideo+=context->bitstream->len;
+    context->feedVideo+=bitstream->len;
+    work->setFrame(i,bitstream->len,bitstream->out_quantizer,frameEnd-frameStart);
     accessMutex.unlock();
   }        
   accessMutex.lock();

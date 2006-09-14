@@ -122,7 +122,8 @@ uint8_t   ret=0;
 uint32_t  sample_target=0;
 uint32_t  total_sample=0;
 ADMBitstream bitstream;
-uint32_t muxerUsed=0;
+uint32_t audioSum=0;
+
         twoPass=new char[strlen(name)+6];
         twoFake=new char[strlen(name)+6];
   
@@ -335,13 +336,12 @@ uint32_t muxerUsed=0;
                                 for(uint32_t i=0;i<total;i++)
                                 {
                                         bitstream.cleanup(i);
-                                        encoding->setFrame(i,total);
+                                        
                                         if(!encoder->encode( i, &bitstream))//&len,(uint8_t *) _buffer,&flags))
                                         {
                                           GUI_Error_HIG(_("Error in pass 1"), NULL);
                                         }
-                                        encoding->feedFrame(bitstream.len);
-                                        encoding->setQuant(bitstream.out_quantizer);
+                                        encoding->setFrame(i,bitstream.len,bitstream.out_quantizer,total);
                                         if(!encoding->isAlive())
                                         {
 
@@ -427,6 +427,7 @@ uint32_t muxerUsed=0;
            context.audioTargetSample=sample_target;
            context.audioBuffer=audioBuffer;
            context.bitstream=&bitstream;
+           context.opaque=(void *)encoding;
 
            // start audio thread
            ADM_assert(!pthread_create(&audioThread,NULL,(THRINP)defaultAudioSlave,&context)); 
@@ -470,21 +471,16 @@ uint32_t muxerUsed=0;
                accessMutex.unlock();
                goto finishvcdff;
              }
-             // Update UI
-             
-             encoding->feedAudioFrame(context.feedAudio);
-             encoding->setFrame(context.currentVideoFrame,total);
-             //encoding->setQuant(bitstream.out_quantizer);
-             encoding->feedFrame(context.feedVideo);
-             context.feedAudio=0;
-             context.feedVideo=0;
              accessMutex.unlock();
              ADM_usleep(1000*1000);
              
            }
            
          }
-      // 2nd or Uniq Pass
+         //**********************************************************
+         //  NOT MULTITHREADED
+         //**********************************************************
+
       bitstream.data=_outbuffer;
       for(uint32_t i=0;i<total;i++)
       {
@@ -522,16 +518,15 @@ uint32_t muxerUsed=0;
                                 if(audioLen) 
                                 {
                                         muxer->writeAudioPacket(audioLen,audioBuffer); 
-                                        encoding->feedAudioFrame(audioLen); 
                                         total_sample+=samples;
+                                        audioSum+=audioLen;
                                 }
                             }
                         }
                 
                 }
-                encoding->setFrame(i,total);
-                encoding->setQuant(bitstream.out_quantizer);
-                encoding->feedFrame(bitstream.len);
+                encoding->setFrame(i,bitstream.len,bitstream.out_quantizer,total);
+                encoding->setAudioSize(audioSum);
                 if(!encoding->isAlive ())
                         {
                                   ret=0;        

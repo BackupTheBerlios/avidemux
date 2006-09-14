@@ -39,6 +39,7 @@ typedef struct muxerMT
   uint32_t                  feedVideo;
   uint32_t                  audioAbort;
   uint32_t                  videoAbort;
+  void                      *opaque;
 };
 
 extern int defaultAudioSlave( muxerMT *context );

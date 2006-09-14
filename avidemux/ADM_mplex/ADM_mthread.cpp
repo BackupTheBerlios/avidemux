@@ -47,12 +47,15 @@ admMutex accessMutex("accessMutex_MT_muxer");
 //*******************************************************
 int defaultAudioSlave( muxerMT *context )
 {
+DIA_encoding *work=(DIA_encoding *)context->opaque;
   uint32_t total_sample=0;
+  uint32_t total_size=0;
   uint32_t samples,audioLen;
   printf("[AudioThread] Starting\n");
   while(context->audioEncoder->getPacket(context->audioBuffer, &audioLen, &samples) && total_sample<context->audioTargetSample)
   { 
     total_sample+=samples;
+    total_size+=audioLen;
     accessMutex.lock();
     if(context->audioAbort)
     {
@@ -61,6 +64,7 @@ int defaultAudioSlave( muxerMT *context )
       accessMutex.unlock();
       return 1;
     }
+    work->setAudioSize(total_size);
     accessMutex.unlock();
       
     while(!context->muxer->needAudio()) 
@@ -94,18 +98,21 @@ int defaultAudioSlave( muxerMT *context )
 //*******************************************************
 int defaultVideoSlave( muxerMT *context )
 {
+DIA_encoding *work=(DIA_encoding *)context->opaque;
+ADMBitstream *bitstream=context->bitstream;
+uint32_t mx=context->nbVideoFrame;
   printf("[VideoThread] Starting\n");
-  for(uint32_t i=0;i<context->nbVideoFrame;i++)
+  for(uint32_t i=0;i<mx;i++)
   {
 
-    context->bitstream->cleanup(i);
+    bitstream->cleanup(i);
     if(context->videoAbort)
     {
       context->videoDone=1;
       context->muxer->videoEof();
       return 1;
     }
-    if(!context->videoEncoder->encode( i,context->bitstream))
+    if(!context->videoEncoder->encode( i,bitstream))
     {
       accessMutex.lock();
       context->videoDone=2;
@@ -114,12 +121,12 @@ int defaultVideoSlave( muxerMT *context )
   
       return 1;
     }
-    if(context->bitstream->len)
-      context->muxer->writeVideoPacket(context->bitstream);
-      
+    if(bitstream->len)
+      context->muxer->writeVideoPacket(bitstream);
+    work->setFrame(i,bitstream->len,bitstream->out_quantizer,mx);
     accessMutex.lock();
     context->currentVideoFrame=i;
-    context->feedVideo+=context->bitstream->len;
+    context->feedVideo+=bitstream->len;
     accessMutex.unlock();
           
 

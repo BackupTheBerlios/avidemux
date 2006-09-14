@@ -125,7 +125,7 @@ uint8_t ret1=0;
 
 			if(!  video_body->getFrameNoAlloc (frameStart+frame, _videoBuffer, &len,     &flags)) 
 				return 0;		
-			encoding_gui->feedFrame(len);
+			encoding_gui->setFrame(frame,len,0,_togo);
 			return videoStream->write(len,_videoBuffer,flags,frame);
 		}
 		
@@ -175,7 +175,7 @@ uint8_t ret1=0;
 
 				}
 			}
-		encoding_gui->feedFrame(len);
+                encoding_gui->setFrame(frame,len,0,_togo);
 		return videoStream->write(len,_videoBuffer,flags,frame);
 		return ret1;
 
