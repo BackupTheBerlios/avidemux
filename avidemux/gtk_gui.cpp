@@ -1300,7 +1300,7 @@ A_saveAudio (char *name)
   out = fopen (name, "wb");
   if (!out) return;
   
-  work=new DIA_working("Saving audio");
+  work=new DIA_working(_("Saving audio"));
   
   uint32_t timeEnd,timeStart,sample,hold,len;
   uint64_t tgt_sample,cur_sample;
@@ -1456,7 +1456,7 @@ void A_saveBunchJpg(char *name)
 		codec=new  ffmpegEncoderFFMjpeg( avifileinfo->width,avifileinfo->height,FF_MJPEG)  ;
 		codec->init( 95,25000);
 
-        working=new DIA_working("Saving as set of jpegs");
+        working=new DIA_working(_("Saving as set of jpegs"));
         bitstream.data=	buffer;
 	for(curImg=frameStart;curImg<=frameEnd;curImg++)
 	{	
@@ -1782,7 +1782,7 @@ A_saveAudioDecodedTest (char *name)
 
         saveFilter =  buildAudioFilter (currentaudiostream,video_body->getTime (frameStart));
    
-    	DIA_working *work=new DIA_working("Saving audio");
+    	DIA_working *work=new DIA_working(_("Saving audio"));
 
 
 //
@@ -1983,7 +1983,7 @@ uint8_t ADM_saveRaw (const char *name)
   fi = fopen (idx, "wt");
   if (!fd)
     return 0;
-  work=new DIA_working("Saving raw video stream");
+  work=new DIA_working(_("Saving raw video stream"));
 
   // preamble
 #if 0

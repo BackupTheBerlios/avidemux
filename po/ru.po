@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-08-11 13:29+0300\n"
-"PO-Revision-Date: 2006-08-11 15:29+0300\n"
+"PO-Revision-Date: 2006-09-15 05:52+0300\n"
 "Last-Translator: Mihail Zenkov <kreator@tut.by>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -3741,7 +3741,7 @@ msgstr "Ошибка"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:25
 msgid "Deleted"
-msgstr "Удалён"
+msgstr "Удалено"
 
 #: avidemux/ADM_dialog/DIA_jobs.cpp:25
 msgid "Running"
@@ -4690,13 +4690,12 @@ msgid "End Frame"
 msgstr "Последний кадр:"
 
 #: avidemux/ADM_dialog/DIA_ass.cpp:71
-#, fuzzy
 msgid "Can't read selected file"
-msgstr "Невозможно сохранить файл"
+msgstr "Невозможно прочесть файл"
 
 #: avidemux/ADM_dialog/DIA_ass.cpp:80
 msgid "Can't open selected directory"
-msgstr ""
+msgstr "Невозможно открыть директорию"
 
 #: avidemux/ADM_dialog/DIA_ass.cpp:143
 msgid "Extract embedded fonts to"
@@ -5438,7 +5437,7 @@ msgstr ""
 
 #: avidemux/ADM_mpegdemuxer/dmx_indexer.cpp:151
 msgid "There is several mpeg file, append them ?"
-msgstr ""
+msgstr "Здесь несколько mpeg файлов, хотите объединить их ?"
 
 #: avidemux/ADM_mpegdemuxer/dmx_indexer.cpp:341
 msgid "Can't determine aspect ratio"
@@ -5446,7 +5445,7 @@ msgstr ""
 
 #: avidemux/ADM_mpegdemuxer/dmx_video.cpp:303
 msgid "Out of memory"
-msgstr ""
+msgstr "Нехватка памяти"
 
 #: avidemux/ADM_mpegdemuxer/dmx_video.cpp:476
 msgid "MPEG renumbering error"
@@ -5484,35 +5483,35 @@ msgstr ""
 
 #: avidemux/ADM_toolkit/toolkit_dialog.cpp:708
 msgid "Alert"
-msgstr ""
+msgstr "Внимание"
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:121
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:316
 msgid "Cannot open directory as a file"
-msgstr ""
+msgstr "Невозможно открыть директорию вместо файла"
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:1001
 #, c-format
 msgid "Cannot open \"%s\"."
-msgstr ""
+msgstr "Невозможно открыть \"%s\"."
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:188
 msgid "Overwrite file ?"
-msgstr ""
+msgstr "Заменить файл ?"
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:213
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:227
 msgid "It could be possible that you try to overwrite an input file!"
-msgstr ""
+msgstr "Возможно, вы пытаетесь перезаписать открытый файл!"
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:238 avidemux/gtk_gui.cpp:1494
 msgid "Cannot write the file"
-msgstr ""
+msgstr "Невозможно сохранить файл"
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:238
 #, c-format
 msgid "No write access to \"%s\"."
-msgstr ""
+msgstr "Нет доступа на запись для \"%s\"."
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:576
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:600
@@ -5520,41 +5519,41 @@ msgstr ""
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:627
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:638 avidemux/GUI_jobs.cpp:37
 msgid "Oops"
-msgstr ""
+msgstr "Предупреждение"
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:576
 #, c-format
 msgid "can't create custom directory (%s)."
-msgstr ""
+msgstr "Невозможно создать директорию для предустановок (%s)."
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:600
 #, c-format
 msgid "can't create job directory (%s)."
-msgstr ""
+msgstr "Невозможно создать директорию для заданий (%s)."
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:620
 msgid "can't determine $USERPROFILE."
-msgstr ""
+msgstr "Невозможно определить $USERPROFILE."
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:627
 msgid "can't determine $HOME."
-msgstr ""
+msgstr "Невозможно определить $HOME."
 
 #: avidemux/ADM_toolkit/TLK_filesel.cpp:638
 msgid "Cannot create the .avidemux directory"
-msgstr ""
+msgstr "Невозможно создать директорию .avidemux"
 
 #: avidemux/ADM_filter/filter_saveload.cpp:156
 msgid "Problem reading XML filters"
-msgstr ""
+msgstr "Проблеама при чтении XML файла."
 
 #: avidemux/ADM_filter/filter_saveload.cpp:164
 msgid "No filter found"
-msgstr ""
+msgstr "Фильтры не найдены"
 
 #: avidemux/ADM_filter/filter_saveload.cpp:200
 msgid "Could not find a filter"
-msgstr ""
+msgstr "Невозможно найти фильтр"
 
 #: avidemux/ADM_filter/filter_saveload.cpp:208
 msgid "No tag found"
@@ -5632,7 +5631,7 @@ msgstr "Сохранить настройки фильтров"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:377
 msgid "File type identified but no loader support detected..."
-msgstr ""
+msgstr "Файл идентифицирован, но не поддерживается."
 
 #: avidemux/ADM_editor/ADM_edit.cpp:378
 msgid "May be related to an old index file."
@@ -5641,7 +5640,7 @@ msgstr ""
 #: avidemux/ADM_editor/ADM_edit.cpp:385
 #, c-format
 msgid "Attempt to open %s failed!"
-msgstr ""
+msgstr "Ошибка при открытии %s !"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:409
 msgid ""
@@ -5723,7 +5722,7 @@ msgstr ""
 msgid ""
 "This looks like mpeg\n"
 " Do you want to index it?"
-msgstr "Выглядит как mpeg<br>Хотите индексировать?"
+msgstr "Выглядит как mpeg\nХотите индексировать?"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:1474
 msgid "Indexing failed"
@@ -5735,7 +5734,7 @@ msgstr "Видео не загружено"
 
 #: avidemux/ADM_editor/ADM_edFrameType.cpp:62
 msgid "Not indexable"
-msgstr ""
+msgstr "Невозможно индексировыть файл"
 
 #: avidemux/ADM_editor/ADM_edFrameType.cpp:62
 msgid "DivX 5 + packed?"
@@ -6201,7 +6200,7 @@ msgstr ""
 
 #: avidemux/ADM_ogm/ADM_ogm.cpp:362
 msgid "Take second track ?"
-msgstr ""
+msgstr "Взять вторую аудио дорожку?"
 
 #: avidemux/ADM_ocr/adm_ocr.cpp:211
 msgid "Incorrect output file"

@@ -438,7 +438,7 @@ uint8_t frag, *frags;
 
 OgAudioTrack *track1,*track2;
 
-DIA_working *work=new DIA_working("Scanning OGM");
+DIA_working *work=new DIA_working(_("Scanning OGM"));
 
 	track1=&_audioTracks[0];
 	track2=&_audioTracks[1];

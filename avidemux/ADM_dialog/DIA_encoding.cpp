@@ -266,7 +266,7 @@ uint32_t tim;
                   tray->setPercent((int)(f*100.));
           gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
-          sprintf(string,"Done : %02d%%",(int)(100*f));
+          sprintf(string,_("Done : %02d%%"),(int)(100*f));
           
           if(isQuiet()) printf("[Encoding]%s\n",string);
               gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
@@ -623,7 +623,7 @@ create_dialog1 (void)
   progressbar1 = gtk_progress_bar_new ();
   gtk_widget_show (progressbar1);
   gtk_box_pack_start (GTK_BOX (vbox2), progressbar1, FALSE, FALSE, 0);
-  gtk_progress_bar_set_text (GTK_PROGRESS_BAR (progressbar1), _("00:00:00 Time Left"));
+  gtk_progress_bar_set_text (GTK_PROGRESS_BAR (progressbar1), "");
 
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
