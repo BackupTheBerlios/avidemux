@@ -128,6 +128,19 @@ decoderFF::decoderMultiThread (void)
       _usingMT = 1;
     }
 }
+uint8_t decoderFF::getPARWidth (void)
+{
+  if(!_context->sample_aspect_ratio.num) return 1;
+  return _context->sample_aspect_ratio.num;
+}
+uint8_t decoderFF::getPARHeight (void)
+{
+  if(!_context->sample_aspect_ratio.den) return 1;
+  return _context->sample_aspect_ratio.den;
+
+}
+
+  
 uint8_t decoderFF::isDivxPacked (void)
 {
   int
