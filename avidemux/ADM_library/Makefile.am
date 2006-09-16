@@ -16,7 +16,8 @@ ADM_print.cpp     avifmt2.h       avio.hxx    fourcc.h \
 ADM_bitstream.h    ADM_image.h           ADM_print_priv.h  aviframe.cpp    broken.cpp  indexer.hxx \
 ADM_fileio.cpp     ADM_imageResizer.cpp  avidemutils.cpp \
 aviindexer.cpp  default.h   subchunk.cpp \
-ADM_fileio.h       ADM_imageUtils.cpp    avifmt.h          aviio.cpp       fourcc.cpp  subchunk.h
+ADM_fileio.h       ADM_imageUtils.cpp    avifmt.h          aviio.cpp       fourcc.cpp  subchunk.h \
+avidemutils.h
 
 
 ####### kdevelop will overwrite this part!!! (end)############

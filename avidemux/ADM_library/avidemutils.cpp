@@ -30,6 +30,7 @@
 #include "subchunk.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"
+#include "avidemutils.h"
 char *ADM_escape(const ADM_filename *incoming);
 uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);
 void memcpyswap(uint8_t *dest, uint8_t *src, uint32_t size);
@@ -309,5 +310,41 @@ void printWavHeader(WAVHeader *hdr)
           X_DUMP(blockalign);	/* Bytes per sample block */
           X_DUMP(bitspersample);	/* One of 8, 12, 16, or 4 for ADPCM */
 
+}
+/* Compute aspect ration from common ARWidth / AR Height value */
+typedef struct ARDescriptor
+{
+  int width;
+  int height;
+  ADM_ASPECT ar;
+  const char *string;
+};
+ARDescriptor  allArs[]=
+{
+  {8,9,ADM_ASPECT_4_3,     "NTSC 4:3"},
+  {32,27,ADM_ASPECT_16_9,  "NTSC 16:9"},
+  {128,81,ADM_ASPECT_16_9, "NTSC 16:9"},
+  {16,15,ADM_ASPECT_4_3,   "Pal 4:3"},
+  {64,45,ADM_ASPECT_16_9,  "Pal 16:9"},
+  {1,1,ADM_ASPECT_1_1,     "1:1"},
+};
+const char *unknown="Unknown";
+
+ADM_ASPECT getAspectRatioFromAR(uint32_t width, uint32_t height, const char **string)
+{
+int mx=sizeof(allArs)/sizeof(ARDescriptor);
+ARDescriptor *desc=allArs;
+    for(int i=0;i<mx;i++)
+    {
+      
+      if(width==desc->width && height==desc->height)
+      {
+        *string=desc->string;
+        return desc->ar;
+      }
+      desc++;
+    }
+    *string=unknown;
+    return ADM_ASPECT_1_1;
 }
 //EOF

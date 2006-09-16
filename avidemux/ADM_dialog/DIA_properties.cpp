@@ -20,7 +20,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
-
+#include "ADM_library/avidemutils.h"
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
@@ -89,9 +89,11 @@ void DIA_properties( void )
         SET_YES(labelGMC,gmc);
         SET_YES(labelQP,qpel);
         // Aspect ratio 
+        const char *s;
         war=video_body->getPARWidth();
         har=video_body->getPARHeight();
-        sprintf(text, " %u:%u", war,har);
+        getAspectRatioFromAR(war,har, &s);
+        sprintf(text, " %s (%u:%u)", s,war,har);
         FILL_ENTRY(labelAspectRatio);	
         // Now audio
         WAVHeader *wavinfo=NULL;
