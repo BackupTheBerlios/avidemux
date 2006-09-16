@@ -31,9 +31,10 @@
 
 
 #define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),y);}	
-
+#define FILL_ENTRY(x) gtk_label_set_text((GtkLabel *) lookup_widget(dialog,#x),text);
+#define SET_YES(x,y) gtk_label_set_text((GtkLabel *) lookup_widget(dialog,#x),yesno[y])
 extern const char *getStrFromAudioCodec( uint32_t codec);
-static GtkWidget	*create_dialog (void);
+static GtkWidget	*create_dialog1 (void);
 
 void DIA_properties( void )
 {
@@ -43,113 +44,119 @@ void DIA_properties( void )
  GtkWidget *dialog;
  uint8_t gmc, qpel,vop;
  uint32_t info=0;
- 
-    if (playing)
-	return;
+ char *yesno[2]={" No"," Yes"};
+ uint32_t war,har;
 
+    if (playing)
+        return;
+  
     text[0] = 0;
     if (!avifileinfo)
-	return;
+        return;
+  
+        // Fetch info
+        info=video_body->getSpecificMpeg4Info();
+        vop=info & ADM_VOP_ON;
+        qpel=info & ADM_QPEL_ON;
+        gmc=info & ADM_GMC_ON;
+        
+        dialog = create_dialog1();
 
-	// Fetch info
-	info=video_body->getSpecificMpeg4Info();
-	vop=info & ADM_VOP_ON;
-	qpel=info & ADM_QPEL_ON;
-	gmc=info & ADM_GMC_ON;
-	
-	dialog = create_dialog();
-//	gtk_transient(dialog);
         gtk_register_dialog(dialog);
-#define FILL_ENTRY(x) gtk_label_set_text((GtkLabel *) lookup_widget(dialog,#x),text);
-	sprintf(text, "%lu x %lu  ", avifileinfo->width,		avifileinfo->height);
 
-	FILL_ENTRY(label_size);
+        sprintf(text, "%lu x %lu  ", avifileinfo->width,avifileinfo->height);
+        FILL_ENTRY(label_size);
 
-	sprintf(text, "%2.3f fps", (float) avifileinfo->fps1000 / 1000.F);
-	FILL_ENTRY(label_fps);
-		
-	sprintf(text, "%ld frames", avifileinfo->nb_frames);
-	FILL_ENTRY(label_number);
-		
-      	sprintf(text, "%s ",      fourCC::tostring(avifileinfo->fcc));
-	FILL_ENTRY(label_videofourcc);
+        sprintf(text, "%2.3f fps", (float) avifileinfo->fps1000 / 1000.F);
+        FILL_ENTRY(label_fps);
 
-	if (avifileinfo->nb_frames)
-	  {
-	      	frame2time(avifileinfo->nb_frames, avifileinfo->fps1000,
-			 &hh, &mm, &ss, &ms);
-	      	sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
-	   	FILL_ENTRY(label_duration);	
+        sprintf(text, "%ld frames", avifileinfo->nb_frames);
+        FILL_ENTRY(label_number);
 
-	  }
-	// Fill in vop, gmc & qpel
-	if(vop) CHECK_SET(checkbutton_vop,1);
-	if(gmc) CHECK_SET(checkbutton_gmc,1);
-	if(qpel) CHECK_SET(checkbutton_qpel,1);
-	// Now audio
-	WAVHeader *wavinfo=NULL;
-	if (currentaudiostream) wavinfo=currentaudiostream->getInfo();
-	  if(wavinfo)
-	  {
-	      
-	      switch (wavinfo->channels)
-		{
-		case 1:
-		    sprintf(text, "MONO");
-		    break;
-		case 2:
-		    sprintf(text, "STEREO");
-		    break;
-		default:
-		    sprintf(text, "%d",wavinfo->channels);
-		    break;
-		}
-	     	FILL_ENTRY(label1_audiomode);
-	     
-	      	sprintf(text, "%lu Hz", wavinfo->frequency);
-	     	FILL_ENTRY(label_fq);
-		sprintf(text, "%lu Bps / %lu kbps", wavinfo->byterate,      wavinfo->byterate * 8 / 1000);
-		FILL_ENTRY(label_bitrate);
-		sprintf(text, "%s ", getStrFromAudioCodec(wavinfo->encoding));
-	     	FILL_ENTRY(label1_audiofourcc);
-		// Duration in seconds too
-		if(currentaudiostream && wavinfo->byterate>1)
-		{
+        sprintf(text, "%s ",      fourCC::tostring(avifileinfo->fcc));
+        FILL_ENTRY(label_videofourcc);
+
+        if (avifileinfo->nb_frames)
+          {
+                frame2time(avifileinfo->nb_frames, avifileinfo->fps1000,
+                          &hh, &mm, &ss, &ms);
+                sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
+                FILL_ENTRY(label_duration);	
+  
+          }
+        // Fill in vop, gmc & qpel
+        SET_YES(labelPacked,vop);
+        SET_YES(labelGMC,gmc);
+        SET_YES(labelQP,qpel);
+        // Aspect ratio 
+        war=video_body->getPARWidth();
+        har=video_body->getPARHeight();
+        sprintf(text, " %u:%u", war,har);
+        FILL_ENTRY(labelAspectRatio);	
+        // Now audio
+        WAVHeader *wavinfo=NULL;
+        if (currentaudiostream) wavinfo=currentaudiostream->getInfo();
+          if(wavinfo)
+          {
+              
+              switch (wavinfo->channels)
+                {
+                case 1:
+                    sprintf(text, "MONO");
+                    break;
+                case 2:
+                    sprintf(text, "STEREO");
+                    break;
+                default:
+                    sprintf(text, "%d",wavinfo->channels);
+                    break;
+                }
+                FILL_ENTRY(label1_audiomode);
+              
+                sprintf(text, "%lu Hz", wavinfo->frequency);
+                FILL_ENTRY(label_fq);
+                sprintf(text, "%lu Bps / %lu kbps", wavinfo->byterate,      wavinfo->byterate * 8 / 1000);
+                FILL_ENTRY(label_bitrate);
+                sprintf(text, "%s ", getStrFromAudioCodec(wavinfo->encoding));
+                FILL_ENTRY(label1_audiofourcc);
+                // Duration in seconds too
+                if(currentaudiostream && wavinfo->byterate>1)
+                {
                         uint32_t l=currentaudiostream->getLength();
-			double du;
-			du=l;
-			du*=1000;
-			du/=wavinfo->byterate;
-			ms2time((uint32_t)floor(du),
-				 &hh, &mm, &ss, &ms);
-	      		sprintf(text, "%02d:%02d:%02d.%03d (%u MBytes)", hh, mm, ss, ms
-				,l>>20);
-		}
-		FILL_ENTRY(label_audioduration);
+                        double du;
+                        du=l;
+                        du*=1000;
+                        du/=wavinfo->byterate;
+                        ms2time((uint32_t)floor(du),
+                                  &hh, &mm, &ss, &ms);
+                        sprintf(text, "%02d:%02d:%02d.%03d (%u MBytes)", hh, mm, ss, ms
+                                ,l>>20);
+                }
+                FILL_ENTRY(label_audioduration);
                 if(currentaudiostream->isVBR() ) CHECK_SET(checkbutton_vbr,1);
-	} else
-	  {
-	      sprintf(text, "NONE");
-	      	FILL_ENTRY(label_fq);
-	     	FILL_ENTRY(label1_audiomode);
-	        FILL_ENTRY(label_bitrate);
-	  	FILL_ENTRY(label1_audiofourcc);
-	  }
-
-	gtk_dialog_run(GTK_DIALOG(dialog));	
+        } else
+          {
+              sprintf(text, "NONE");
+                FILL_ENTRY(label_fq);
+                FILL_ENTRY(label1_audiomode);
+                FILL_ENTRY(label_bitrate);
+                FILL_ENTRY(label1_audiofourcc);
+          }
+  
+        gtk_dialog_run(GTK_DIALOG(dialog));	
         gtk_unregister_dialog(dialog);
-	gtk_widget_destroy(dialog);
+        gtk_widget_destroy(dialog);
 		
 }  
 
-
 GtkWidget*
-create_dialog (void)
+create_dialog1 (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
   GtkWidget *vbox1;
   GtkWidget *frame1;
+  GtkWidget *vbox2;
   GtkWidget *table1;
   GtkWidget *label4;
   GtkWidget *label5;
@@ -161,14 +168,20 @@ create_dialog (void)
   GtkWidget *label_number;
   GtkWidget *label_videofourcc;
   GtkWidget *label_duration;
-  GtkWidget *hseparator1;
-  GtkWidget *hseparator2;
-  GtkWidget *label18;
-  GtkWidget *label19;
-  GtkWidget *label20;
-  GtkWidget *checkbutton_vop;
-  GtkWidget *checkbutton_qpel;
-  GtkWidget *checkbutton_gmc;
+  GtkWidget *label35;
+  GtkWidget *labelAspectRatio;
+  GtkWidget *hseparator3;
+  GtkWidget *hseparator4;
+  GtkWidget *frame3;
+  GtkWidget *alignment1;
+  GtkWidget *table3;
+  GtkWidget *label37;
+  GtkWidget *label38;
+  GtkWidget *label39;
+  GtkWidget *labelPacked;
+  GtkWidget *labelQP;
+  GtkWidget *labelGMC;
+  GtkWidget *label43;
   GtkWidget *label1;
   GtkWidget *frame2;
   GtkWidget *table2;
@@ -203,9 +216,13 @@ create_dialog (void)
   gtk_widget_show (frame1);
   gtk_box_pack_start (GTK_BOX (vbox1), frame1, TRUE, TRUE, 0);
 
-  table1 = gtk_table_new (9, 2, FALSE);
+  vbox2 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox2);
+  gtk_container_add (GTK_CONTAINER (frame1), vbox2);
+
+  table1 = gtk_table_new (7, 2, FALSE);
   gtk_widget_show (table1);
-  gtk_container_add (GTK_CONTAINER (frame1), table1);
+  gtk_box_pack_start (GTK_BOX (vbox2), table1, TRUE, TRUE, 0);
 
   label4 = gtk_label_new (_("Frame Rate"));
   gtk_widget_show (label4);
@@ -277,56 +294,92 @@ create_dialog (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_duration), 0, 0.5);
 
-  hseparator1 = gtk_hseparator_new ();
-  gtk_widget_show (hseparator1);
-  gtk_table_attach (GTK_TABLE (table1), hseparator1, 0, 1, 5, 6,
+  label35 = gtk_label_new (_("Aspect Ratio"));
+  gtk_widget_show (label35);
+  gtk_table_attach (GTK_TABLE (table1), label35, 0, 1, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label35), 0, 0.5);
+
+  labelAspectRatio = gtk_label_new (_("-/-"));
+  gtk_widget_show (labelAspectRatio);
+  gtk_table_attach (GTK_TABLE (table1), labelAspectRatio, 1, 2, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelAspectRatio), 0, 0.5);
+
+  hseparator3 = gtk_hseparator_new ();
+  gtk_widget_show (hseparator3);
+  gtk_table_attach (GTK_TABLE (table1), hseparator3, 0, 1, 6, 7,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
 
-  hseparator2 = gtk_hseparator_new ();
-  gtk_widget_show (hseparator2);
-  gtk_table_attach (GTK_TABLE (table1), hseparator2, 1, 2, 5, 6,
+  hseparator4 = gtk_hseparator_new ();
+  gtk_widget_show (hseparator4);
+  gtk_table_attach (GTK_TABLE (table1), hseparator4, 1, 2, 6, 7,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
 
-  label18 = gtk_label_new (_("Vop packed"));
-  gtk_widget_show (label18);
-  gtk_table_attach (GTK_TABLE (table1), label18, 0, 1, 6, 7,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label18), 0, 0.5);
+  frame3 = gtk_frame_new (NULL);
+  gtk_widget_show (frame3);
+  gtk_box_pack_start (GTK_BOX (vbox2), frame3, TRUE, TRUE, 0);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame3), GTK_SHADOW_NONE);
 
-  label19 = gtk_label_new (_("Quarter Pixel"));
-  gtk_widget_show (label19);
-  gtk_table_attach (GTK_TABLE (table1), label19, 0, 1, 7, 8,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label19), 0, 0.5);
+  alignment1 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment1);
+  gtk_container_add (GTK_CONTAINER (frame3), alignment1);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment1), 0, 0, 12, 0);
 
-  label20 = gtk_label_new (_("GMC"));
-  gtk_widget_show (label20);
-  gtk_table_attach (GTK_TABLE (table1), label20, 0, 1, 8, 9,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label20), 0, 0.5);
+  table3 = gtk_table_new (3, 2, FALSE);
+  gtk_widget_show (table3);
+  gtk_container_add (GTK_CONTAINER (alignment1), table3);
 
-  checkbutton_vop = gtk_check_button_new_with_mnemonic ("");
-  gtk_widget_show (checkbutton_vop);
-  gtk_table_attach (GTK_TABLE (table1), checkbutton_vop, 1, 2, 6, 7,
+  label37 = gtk_label_new (_("Packed Bistream"));
+  gtk_widget_show (label37);
+  gtk_table_attach (GTK_TABLE (table3), label37, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label37), 0, 0.5);
 
-  checkbutton_qpel = gtk_check_button_new_with_mnemonic ("");
-  gtk_widget_show (checkbutton_qpel);
-  gtk_table_attach (GTK_TABLE (table1), checkbutton_qpel, 1, 2, 7, 8,
+  label38 = gtk_label_new (_("Quarter Pixel"));
+  gtk_widget_show (label38);
+  gtk_table_attach (GTK_TABLE (table3), label38, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label38), 0, 0.5);
 
-  checkbutton_gmc = gtk_check_button_new_with_mnemonic ("");
-  gtk_widget_show (checkbutton_gmc);
-  gtk_table_attach (GTK_TABLE (table1), checkbutton_gmc, 1, 2, 8, 9,
+  label39 = gtk_label_new (_("GMC "));
+  gtk_widget_show (label39);
+  gtk_table_attach (GTK_TABLE (table3), label39, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label39), 0, 0.5);
+
+  labelPacked = gtk_label_new ("");
+  gtk_widget_show (labelPacked);
+  gtk_table_attach (GTK_TABLE (table3), labelPacked, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelPacked), 0, 0.5);
+
+  labelQP = gtk_label_new ("");
+  gtk_widget_show (labelQP);
+  gtk_table_attach (GTK_TABLE (table3), labelQP, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelQP), 0, 0.5);
+
+  labelGMC = gtk_label_new ("");
+  gtk_widget_show (labelGMC);
+  gtk_table_attach (GTK_TABLE (table3), labelGMC, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelGMC), 0, 0.5);
+
+  label43 = gtk_label_new (_("<b>Extra Properties</b>"));
+  gtk_widget_show (label43);
+  gtk_frame_set_label_widget (GTK_FRAME (frame3), label43);
+  gtk_label_set_use_markup (GTK_LABEL (label43), TRUE);
 
   label1 = gtk_label_new (_("<b>Video</b>"));
   gtk_widget_show (label1);
@@ -443,6 +496,7 @@ create_dialog (void)
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, frame1, "frame1");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox2, "vbox2");
   GLADE_HOOKUP_OBJECT (dialog1, table1, "table1");
   GLADE_HOOKUP_OBJECT (dialog1, label4, "label4");
   GLADE_HOOKUP_OBJECT (dialog1, label5, "label5");
@@ -454,14 +508,20 @@ create_dialog (void)
   GLADE_HOOKUP_OBJECT (dialog1, label_number, "label_number");
   GLADE_HOOKUP_OBJECT (dialog1, label_videofourcc, "label_videofourcc");
   GLADE_HOOKUP_OBJECT (dialog1, label_duration, "label_duration");
-  GLADE_HOOKUP_OBJECT (dialog1, hseparator1, "hseparator1");
-  GLADE_HOOKUP_OBJECT (dialog1, hseparator2, "hseparator2");
-  GLADE_HOOKUP_OBJECT (dialog1, label18, "label18");
-  GLADE_HOOKUP_OBJECT (dialog1, label19, "label19");
-  GLADE_HOOKUP_OBJECT (dialog1, label20, "label20");
-  GLADE_HOOKUP_OBJECT (dialog1, checkbutton_vop, "checkbutton_vop");
-  GLADE_HOOKUP_OBJECT (dialog1, checkbutton_qpel, "checkbutton_qpel");
-  GLADE_HOOKUP_OBJECT (dialog1, checkbutton_gmc, "checkbutton_gmc");
+  GLADE_HOOKUP_OBJECT (dialog1, label35, "label35");
+  GLADE_HOOKUP_OBJECT (dialog1, labelAspectRatio, "labelAspectRatio");
+  GLADE_HOOKUP_OBJECT (dialog1, hseparator3, "hseparator3");
+  GLADE_HOOKUP_OBJECT (dialog1, hseparator4, "hseparator4");
+  GLADE_HOOKUP_OBJECT (dialog1, frame3, "frame3");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment1, "alignment1");
+  GLADE_HOOKUP_OBJECT (dialog1, table3, "table3");
+  GLADE_HOOKUP_OBJECT (dialog1, label37, "label37");
+  GLADE_HOOKUP_OBJECT (dialog1, label38, "label38");
+  GLADE_HOOKUP_OBJECT (dialog1, label39, "label39");
+  GLADE_HOOKUP_OBJECT (dialog1, labelPacked, "labelPacked");
+  GLADE_HOOKUP_OBJECT (dialog1, labelQP, "labelQP");
+  GLADE_HOOKUP_OBJECT (dialog1, labelGMC, "labelGMC");
+  GLADE_HOOKUP_OBJECT (dialog1, label43, "label43");
   GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
   GLADE_HOOKUP_OBJECT (dialog1, frame2, "frame2");
   GLADE_HOOKUP_OBJECT (dialog1, table2, "table2");
