@@ -179,6 +179,7 @@ ADMBitstream bitstream;
 		return 0;
         _videoFlag=bitstream.flags;
 	// 3-write it
+        encoding_gui->setFrame(frame,bitstream.len,bitstream.out_quantizer,frametogo);
 	return writter->saveVideoFrame (bitstream.len, _videoFlag, vbuffer);
 }
 //_________________________________________________________
@@ -245,6 +246,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
 				      &_videoFlag, &seq))
     				return 0;
 			_nextip=nextip;
+                        encoding_gui->setFrame(frame,len,0,frametogo);
 			return writter->saveVideoFrame (len, _videoFlag, vbuffer);
 		}
 		else
@@ -253,6 +255,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
 			if (!video_body->getFrameNoAlloc (frame-1, vbuffer, &len,
 				      &_videoFlag, &seq))
     				return 0;
+                        encoding_gui->setFrame(frame,len,0,frametogo);
 			return writter->saveVideoFrame (len, _videoFlag, vbuffer);
 		}
 	}
@@ -265,6 +268,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
 		if (! video_body->getFrameNoAlloc (frame-1, vbuffer, &len,
 		      &_videoFlag, &seq))
     			return 0;
+                encoding_gui->setFrame(frame,len,0,frametogo);
 		return writter->saveVideoFrame (len, _videoFlag, vbuffer);
 	
 	}
@@ -276,6 +280,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
 			aprintf("Seq broken..\n");
 			compEngaged = 1;
 			initEncoder (_cqReenc);
+                        encoding_gui->setFrame(frame,len,0,frametogo);
 			return writeVideoChunk_recode(frame);
 		}
 	_nextip=frame;
@@ -284,7 +289,7 @@ uint8_t GenericAviSaveSmart::writeVideoChunk_copy (uint32_t frame)
 				      &_videoFlag, &seq)) return 0;
  
 	
-	
+	encoding_gui->setFrame(frame,len,0,frametogo);
 	return writter->saveVideoFrame (len, _videoFlag, vbuffer);
 }
 //_________________________________________________________
