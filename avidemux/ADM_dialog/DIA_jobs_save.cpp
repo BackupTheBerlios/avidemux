@@ -18,6 +18,7 @@
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
+#include "ADM_library/avidemutils.h"
 
 static GtkWidget       *create_dialog1 (void);
 
@@ -44,11 +45,14 @@ char *tmp=NULL,*tmp2=NULL;
                                         {
                                         
                                         int r;
+                                        char *escape=NULL;
                                                 GUI_FileSelWrite(_("Select video to write"),&tmp);
                                                 if(!tmp) continue;
+                                                escape=ADM_escape((ADM_filename *)tmp);
                                                 gtk_editable_delete_text(GTK_EDITABLE(WID(entryOutputFileName)), 0,-1);
-                                                gtk_editable_insert_text(GTK_EDITABLE(WID(entryOutputFileName)), tmp, strlen(tmp), &r);
+                                                gtk_editable_insert_text(GTK_EDITABLE(WID(entryOutputFileName)), escape, strlen(escape), &r);
                                                 ADM_dealloc(tmp);
+                                                delete [] escape;
                                         }
                                         break;
                         case GTK_RESPONSE_OK: 
