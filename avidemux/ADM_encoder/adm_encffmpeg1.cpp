@@ -366,7 +366,8 @@ uint8_t
 EncoderFFMPEGMpeg1::startPass2 (void)
 {
   uint32_t br,avg_bitrate;
-  
+  double d;
+
   ADM_assert (_state == enc_Pass1);
   printf ("\n-------* Starting pass 2*-------------\n");
 
@@ -382,8 +383,8 @@ EncoderFFMPEGMpeg1::startPass2 (void)
  
 
   avg_bitrate = br;
-
-  printf ("\n ** Total size     : %lu MBytes \n", _param.finalsize);
+  if(_param.mode==COMPRESS_2PASS)
+      printf ("\n ** Total size     : %lu MBytes \n", _param.finalsize);
   printf (" ** Total frame    : %lu  \n", _totalframe);
 
   printf ("\n VBR parameters computed\n");
@@ -419,12 +420,14 @@ EncoderFFMPEGMpeg1::startPass2 (void)
      f=_param.finalsize;
     }else if(_param.mode==COMPRESS_2PASS_BITRATE)
     {
-      double d;
+      
       d=_totalframe;
-      d/=_fps;
-      d*=br;
-      d/=8;
-      d/=1024*1024;
+      d*=1000.;
+      d/=_fps;            // D is a duration in second
+      d*=br;              // * bitrate = total bits
+      d/=8;               // Byte
+      d/=1024*1024;       // MB
+      
       f=(uint32_t)d;
     }else ADM_assert(0);
     //

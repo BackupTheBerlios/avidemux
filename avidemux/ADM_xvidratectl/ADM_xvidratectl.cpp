@@ -373,26 +373,44 @@ xvid_plg_data_t  data;
 uint8_t ADM_newXvidRc::getInfo(uint32_t framenum, uint32_t *qz, uint32_t *size,ADM_rframe *type )
 {
 rc_2pass2_t * rc;
-	ADM_assert(framenum<_totalFrame);
-	ADM_assert(_state==RS_PASS2);
-	
-	rc=(rc_2pass2_t *)myHandle;
-	
-	*qz=rc->stats[framenum].quant;
-	*size=rc->stats[framenum].length;
-	if(framenum>=_totalFrame-2)
-	{
-		*type=RF_I;
-	}
-	else
-	 switch(rc->stats[framenum].type)
-	 {
-	 	case XVID_TYPE_IVOP: *type=RF_I; ;break;
-		case XVID_TYPE_PVOP: *type=RF_P; ;break;
-		case XVID_TYPE_BVOP: *type=RF_B; ;break;
-		default:printf("f:%lu Type : %d\n",framenum,rc->stats[framenum].type);ADM_assert(0);
-	}
-	
+int override=0;
+
+        ADM_assert(_state==RS_PASS2);
+        rc=(rc_2pass2_t *)myHandle;
+        ADM_assert(rc);
+
+        ADM_assert(framenum<_totalFrame);
+        if(framenum>=rc->num_frames) // We may have 2 stray frames due to encoder lag
+        {
+              // but only 2
+              ADM_assert(framenum<rc->num_frames+2)
+              override=1;
+        }
+        
+        if(framenum>=_totalFrame-2)
+        {
+                override=1;
+        }
+
+        if(override)
+        {
+          printf("[Xvid rc] Override\n");
+          *type=RF_I;
+          *qz=4;
+          *size=1000;
+          return 1;
+        }
+        *qz=rc->stats[framenum].quant;
+        *size=rc->stats[framenum].length;
+
+        switch(rc->stats[framenum].type)
+        {
+              case XVID_TYPE_IVOP: *type=RF_I; ;break;
+              case XVID_TYPE_PVOP: *type=RF_P; ;break;
+              case XVID_TYPE_BVOP: *type=RF_B; ;break;
+              default:printf("f:%lu Type : %d\n",framenum,rc->stats[framenum].type);ADM_assert(0);
+        }
+        
 	return 1;
 
 }
@@ -413,6 +431,7 @@ xvid_plg_create_t	create;
 		myHandle=NULL;
 	}
 	
+        printf("[Xvid RC] Starting pass2 , %u frames\n",nbFrame);
 	_totalFrame=_nbFrames=nbFrame;
 	memset(&data,0,sizeof(data));
 	memset(&create,0,sizeof(create));
@@ -630,7 +649,7 @@ rc_2pass2_create(xvid_plg_create_t * create, rc_2pass2_t **handle)
 		free(rc);
 		return(XVID_ERR_FAIL);
 	}
-	DPRINTF(XVID_DEBUG_RC,"[xvid rc] -- found %d frames %d keyframes\n",rc->num_frames,rc->num_keyframes);
+	printf("[xvid rc] -- found %d frames %d keyframes\n",rc->num_frames,rc->num_keyframes);
 	/* Allocate the stats' memory */
 	if ((rc->stats =(twopass_stat_t *) malloc(rc->num_frames * sizeof(twopass_stat_t))) == NULL) {
 		free(rc);

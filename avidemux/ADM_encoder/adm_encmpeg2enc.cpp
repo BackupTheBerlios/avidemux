@@ -372,9 +372,19 @@ uint8_t    EncoderMpeg2enc::startPass2 (void)
     printf("[Mpeg2enc]  Final Size: %u MB 2pass avg bitrate %u kb/s\n",size,br/1000);
     
   }else ADM_assert(0);
- 
 
-  
+  uint32_t maxbr;
+
+  maxbr=_settings.maxBitrate*8; // B/s
+
+  printf("[Mpeg2enc] Max bitrate %u kbps\n",maxbr/1000);
+  /* Check Max bitrate */
+  if(br>maxbr)
+  {
+     br=maxbr;
+     printf("[Mpeg2enc] Max bitrate exceeeded, Clipping..\n");
+  }
+
 
   printf ("[Mpeg2enc] ** Total size     : %lu MBytes \n", _param.finalsize);
   printf ("[Mpeg2enc] ** Total frame    : %lu  \n", _totalframe);

@@ -92,13 +92,13 @@ static char *twoFake=NULL;
 void oplug_mpegff_conf( void )
 {
 
-	DIA_XVCDParam("XVCD/XSVCD",&ffmpeg1Codec.mode,
-			&ffmpeg1Codec.qz,
-			&ffmpeg1Codec.bitrate,
-			&ffmpeg1Codec.finalsize,
-			&ffmpeg1Extra
+    DIA_XVCDParam("XVCD/XSVCD",&ffmpeg1Codec.mode,
+                    &ffmpeg1Codec.qz,
+                    &ffmpeg1Codec.bitrate,
+                    &ffmpeg1Codec.finalsize,
+                    &ffmpeg1Extra
 
-			);
+                    );
 }
 
 uint8_t oplug_mpegff(const char *name, ADM_OUT_FORMAT type)
@@ -336,7 +336,6 @@ uint32_t audioSum=0;
                                 for(uint32_t i=0;i<total;i++)
                                 {
                                         bitstream.cleanup(i);
-                                        
                                         if(!encoder->encode( i, &bitstream))//&len,(uint8_t *) _buffer,&flags))
                                         {
                                           GUI_Error_HIG(_("Error in pass 1"), NULL);
@@ -349,8 +348,8 @@ uint32_t audioSum=0;
                                         }
                                 }
                         }
-                                encoder->startPass2();
-                                encoding->reset();
+                        encoder->startPass2();
+                        encoding->reset();
                 }
                 
               switch(type)
