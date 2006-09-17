@@ -261,7 +261,9 @@ char *pth;
   qfprintf(fd,"app.setContainer(\"%s\");\n",getCurrentContainerAsString());
   if(outputname)
   {
-        qfprintf(fd,"setSuccess(app.save(\"%s\"));\n",outputname);
+        char *o=cleanupPath(outputname);
+        qfprintf(fd,"setSuccess(app.save(\"%s\"));\n",o);
+        ADM_dealloc(o);
   }
   else
   {
