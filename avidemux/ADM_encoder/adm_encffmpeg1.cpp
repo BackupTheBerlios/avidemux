@@ -381,7 +381,7 @@ EncoderFFMPEGMpeg1::startPass2 (void)
     printf("[FFmpeg Mpeg1/2] 2pass avg bitrate %u kb/s\n",br/1000);
   }else ADM_assert(0);
  
-
+  printf("[FFmpeg Mpeg1/2] Max bitrate :%u\n", (_settings.maxBitrate*8)/1000);
   avg_bitrate = br;
   if(_param.mode==COMPRESS_2PASS)
       printf ("\n ** Total size     : %lu MBytes \n", _param.finalsize);
@@ -413,13 +413,22 @@ EncoderFFMPEGMpeg1::startPass2 (void)
       _frametogo = 0;
       return 1;
     }
+  // ******************************************
   // If we use Xvid...
+  // ******************************************
     uint32_t f;
-    if(_param.mode==COMPRESS_2PASS)
-    {
+
+   
      f=_param.finalsize;
-    }else if(_param.mode==COMPRESS_2PASS_BITRATE)
+  // Checking against max bitrate
+    uint32_t maxb=_settings.maxBitrate*8;
+
+    printf("[FFmpeg1/2] : %u kbps average, %u max\n",br/1000,maxb/1000);
+    if(br>maxb)
     {
+        printf("[FFmpeg1/2] Max bitrate exceeded, clipping\n");
+        br=maxb;
+    }
       
       d=_totalframe;
       d*=1000.;
@@ -429,8 +438,8 @@ EncoderFFMPEGMpeg1::startPass2 (void)
       d/=1024*1024;       // MB
       
       f=(uint32_t)d;
-    }else ADM_assert(0);
-    //
+   
+  
   _xrc->setVBVInfo (_settings.maxBitrate, _settings.minBitrate,
 		    _settings.bufferSize);
   printf("Average bitrate :%u finale size %u\n",br,f);
