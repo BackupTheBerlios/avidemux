@@ -105,7 +105,7 @@ GtkCellRenderer *renderer;
                                                       NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column2);
         column3 = gtk_tree_view_column_new_with_attributes (_("Finished at"), renderer,
-            "markup", (GdkModifierType) 1,
+            "markup", (GdkModifierType) 2,
             NULL);
         gtk_tree_view_append_column (GTK_TREE_VIEW (WID(treeview1)), column3);
 
@@ -146,6 +146,7 @@ GtkCellRenderer *renderer;
                                         if(parseECMAScript(jobs.name[sel])) jobs.status[sel].status=STATUS_SUCCEED;
                                         else jobs.status[sel].status=STATUS_FAILED;
                                         TLK_getDate(&(jobs.status[sel].endDate));
+                                        updateStatus();
                                         GUI_Verbose();
                                         break;
                         case COMMAND_RUN_ALL: 
@@ -211,29 +212,30 @@ void updateStatus(void)
 GtkTreeIter iter;
 char *str;
 ADM_date  *date;
+char str1[200],str2[200],str3[200];
+
         gtk_list_store_clear (jobs.store);
         for (uint32_t i = 0; i < jobs.nb; i++)
         {
-                str = g_strconcat("<span weight=\"heavy\">", 
-                GetFileName(jobs.name[i]), "</span>\n",  
-               "<span size=\"smaller\" style=\"oblique\" >", 
-                _(StringStatus[jobs.status[i].status]), "</span> ",NULL);
+                sprintf(str1,"<span weight=\"heavy\"> %s </span>\n" 
+               "<span size=\"smaller\" style=\"oblique\" > %s </span> "
+                ,GetFileName(jobs.name[i]),_(StringStatus[jobs.status[i].status]));
 
-                gtk_list_store_append (jobs.store, &iter);
-                gtk_list_store_set (jobs.store, &iter, 0,str,-1);
-                // Start date
                 date=&(jobs.status[i].startDate);
-                sprintf(str,"%02d:%02d:%02d",date->hours,
+                sprintf(str2,"%02d:%02d:%02d",date->hours,
                                           date->minutes,
                                           date->seconds);
-                gtk_list_store_set (jobs.store, &iter, 1,str,-1);
+
                 date=&(jobs.status[i].endDate);
-                sprintf(str,"%02d:%02d:%02d",date->hours,
+                sprintf(str3,"%02d:%02d:%02d",date->hours,
                         date->minutes,
                         date->seconds);
-                gtk_list_store_set (jobs.store, &iter, 2,str,-1);
 
-                g_free(str);
+                gtk_list_store_append (jobs.store, &iter);
+                gtk_list_store_set (jobs.store, &iter, 0,str1,1,str2,2,str3,-1);
+                printf("Start : %s\n",str2);
+                printf("End : %s\n",str3);
+                
         }
 }
 //*************************************
