@@ -35,7 +35,6 @@
 #define MODE_PSP 3 // example working PSP command line:
 // ffmpeg -i testinput.avi  -f psp -r 14.985 -s 320x240 -b 768 -ar 24000 -ab 32 M4V00001.MP4
 #define MODE_3G2 4
-#define MEANX_PUT_MP3_IN_MP4A
 
 typedef struct MOVIentry {
     unsigned int flags, size;
@@ -336,6 +335,7 @@ static const CodecTag codec_movaudio_tags[] = {
     { CODEC_ID_PCM_S24LE, MKTAG('i', 'n', '2', '4') },
     { CODEC_ID_PCM_S32BE, MKTAG('i', 'n', '3', '2') },
     { CODEC_ID_PCM_S32LE, MKTAG('i', 'n', '3', '2') },
+    //{ CODEC_ID_MP3, MKTAG('.', 'm', 'p', '3') },
 // MEANX
 #ifdef MEANX_PUT_MP3_IN_MP4A
     { CODEC_ID_MP3, MKTAG( 'm', 'p', '4','a') },
@@ -399,7 +399,7 @@ static int mov_write_audio_tag(ByteIOContext *pb, MOVTrack* track)
    || track->enc->codec_id == CODEC_ID_MP3
 #endif
 //MEANX
-    
+	    
 		    )
         mov_write_esds_tag(pb, track);
     else if(track->enc->codec_id == CODEC_ID_AMR_NB)
@@ -946,6 +946,7 @@ static int mov_write_edts_tag(ByteIOContext *pb, MOVTrack *track)
 
     put_be32(pb, 0x00000000);
     // /MEANX
+
     put_be32(pb, 0x00010000);
     return 0x24;
 }
@@ -1318,14 +1319,6 @@ static int mov_write_moov_tag(ByteIOContext *pb, MOVContext *mov,
     for (i=0; i<mov->nb_streams; i++) {
         if(mov->tracks[i].entry <= 0) continue;
 
-        if(mov->tracks[i].enc->codec_type == CODEC_TYPE_VIDEO) {
-            mov->tracks[i].timescale = mov->tracks[i].enc->time_base.den;
-            mov->tracks[i].sampleDuration = mov->tracks[i].enc->time_base.num;
-        } else if(mov->tracks[i].enc->codec_type == CODEC_TYPE_AUDIO) {
-            mov->tracks[i].timescale = mov->tracks[i].enc->sample_rate;
-            mov->tracks[i].sampleDuration = mov->tracks[i].enc->frame_size;
-        }
-
         mov->tracks[i].trackDuration =
             (int64_t)mov->tracks[i].sampleCount * mov->tracks[i].sampleDuration;
         mov->tracks[i].time = mov->time;
@@ -1487,11 +1480,19 @@ static int mov_write_header(AVFormatContext *s)
         track->mode = mov->mode;
         if(st->codec->codec_type == CODEC_TYPE_VIDEO){
             track->tag = mov_find_video_codec_tag(s, track);
+            track->timescale = st->codec->time_base.den;
+            track->sampleDuration = st->codec->time_base.num;
             av_set_pts_info(st, 64, 1, st->codec->time_base.den);
         }else if(st->codec->codec_type == CODEC_TYPE_AUDIO){
             track->tag = mov_find_audio_codec_tag(s, track);
+            track->timescale = st->codec->sample_rate;
+            track->sampleDuration = st->codec->frame_size;
             av_set_pts_info(st, 64, 1, st->codec->sample_rate);
             track->sampleSize = (av_get_bits_per_sample(st->codec->codec_id) >> 3) * st->codec->channels;
+        }
+        if (!track->sampleDuration) {
+            av_log(s, AV_LOG_ERROR, "track %d: sample duration is not set\n", i);
+            return -1;
         }
     }
 
