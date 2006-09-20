@@ -24,7 +24,7 @@
 */
 int defaultAudioQueueSlave( audioQueueMT *context )
 {
-#define QBUFFER 4096*4
+#define QBUFFER 4096*8
   uint32_t total_sample=0;
   uint32_t samples,audioLen;
   PacketQueue *queue=context->packetQueue;
@@ -38,7 +38,11 @@ int defaultAudioQueueSlave( audioQueueMT *context )
   printf("[AudioQueueThread] Starting\n");
   while(audioEncoder->getPacket(buffer, &audioLen, &samples) && total_sample<context->audioTargetSample)
   {
-    ADM_assert(samples<= QBUFFER);
+    if(audioLen> QBUFFER)
+    {
+        printf("[AudioQueueThread] BufferOverflow %u/%u\n",audioLen,QBUFFER);
+        ADM_assert(0);
+    }
     if(queue->isAborted())
     { 
         printf("[AudioQueueThread] Aborting..\n");
