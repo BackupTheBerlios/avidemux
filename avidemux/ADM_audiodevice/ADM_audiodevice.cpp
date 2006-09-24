@@ -52,6 +52,10 @@
 #include "ADM_deviceEsd.h"
 #endif
 
+#ifdef CONFIG_DARWIN
+#include "ADM_audiodevice/ADM_deviceAudioCore.h"
+#endif
+
 #include "gui_action.hxx"
 #include "audio_out.h"
 

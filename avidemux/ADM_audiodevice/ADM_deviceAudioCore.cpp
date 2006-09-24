@@ -1,5 +1,5 @@
 /***************************************************************************
-                          ADM_deviceoss.cpp  -  description
+                          ADM_deviceAudioCore.cpp  -  description
                              -------------------
     begin                : Sat Sep 28 2002
     copyright            : (C) 2002 by mean
