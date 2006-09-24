@@ -15,6 +15,7 @@ typedef struct VIDFADE_PARAM
   uint32_t startFade;
   uint32_t endFade;
   uint32_t inOut; //0 Out 1 In
+  uint32_t toBlack; // =1 else fade to endFrame
 }VIDFADE_PARAM;
 
 

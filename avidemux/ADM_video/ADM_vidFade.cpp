@@ -35,7 +35,8 @@ class AVDM_Fade : public AVDMGenericVideoStream
 {
   VideoCache      *vidCache;
   VIDFADE_PARAM   *_param;
-  uint8_t         lookup[256][256];
+  uint16_t         lookupLuma[256][256];
+  uint16_t         lookupChroma[256][256];
   uint8_t         buildLut(void);
   public:
                                 
@@ -49,7 +50,7 @@ class AVDM_Fade : public AVDMGenericVideoStream
     uint8_t         getCoupledConf( CONFcouple **couples);
 };
 
-static FILTER_PARAM fadeParam={3,{"startFade","endFade","inOut"}};
+static FILTER_PARAM fadeParam={4,{"startFade","endFade","inOut","toBlack"}};
 
 BUILD_CREATE(fade_create,AVDM_Fade);
 SCRIPT_CREATE(fade_script,AVDM_Fade,fadeParam);
@@ -92,22 +93,25 @@ AVDM_Fade::AVDM_Fade(AVDMGenericVideoStream *in,CONFcouple *couples)
     GET(startFade);
     GET(endFade);
     GET(inOut);
+    GET(toBlack);
     
   }else
   {
     _param->startFade=0; 
     _param->endFade=_info.nb_frames;
     _param->inOut=0;
+    _param->toBlack=0;
   }
   buildLut();
 }
 //________________________________________________________
 uint8_t AVDM_Fade::getCoupledConf( CONFcouple **couples)
 {
-  *couples=new CONFcouple(3);
+  *couples=new CONFcouple(4);
   CSET(startFade);
   CSET(endFade);
   CSET(inOut);
+  CSET(toBlack);
   return 1;
 }
 //________________________________________________________
@@ -133,18 +137,18 @@ uint8_t AVDM_Fade::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     printf("[Fade] out of bound\n");
     return 0;
   }
-  
-  
 
   src=vidCache->getImage(tgt);
   if(!src) return 0;
   if(tgt>_param->endFade || tgt <_param->startFade ||_param->endFade==_param->startFade )
   {
+    //printf("Cur %u start %u end %u\n",tgt,_param->startFade,_param->endFade);
     data->duplicate(src);
     vidCache->unlockAll();
     return 1;
   }
-  uint8_t *s,*d,*index;
+  uint8_t *s,*d,*s2;
+  uint16_t *index,*invertedIndex;
   uint32_t count=_info.width*_info.height,w;
   float num,den;
   
@@ -155,18 +159,70 @@ uint8_t AVDM_Fade::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
   num*=255.;
   w=(uint32_t)floor(num+0.4);
   
+//printf("w :%u\n",w);
+
   s=src->data;
   d=data->data;
-  
-  index=lookup[w];
-  
-  for(int i=0;i<count;i++)
+  if(_param->toBlack)
   {
-    *d++=index[*s++];
+        index=lookupLuma[w];
+        for(int i=0;i<count;i++)
+        {
+          *d++=(index[*s++]>>8);
+        }
+        // Now do chroma
+        count>>=2;
+        s=UPLANE(src);
+        d=UPLANE(data);
+        index=lookupChroma[w];
+        for(int i=0;i<count;i++)
+        {
+          *d++=(index[*s++]>>8);
+        }
+        s=VPLANE(src);
+        d=VPLANE(data);
+        for(int i=0;i<count;i++)
+        {
+          *d++=(index[*s++]>>8);
+        }
   }
-  
-  memcpy(UPLANE(data),UPLANE(src),count>>2);
-  memcpy(VPLANE(data),VPLANE(src),count>>2);
+  else
+  {
+        uint32_t x,alpha;
+        ADMImage *final;
+
+        final=vidCache->getImage(_param->endFade);
+        ADM_assert(final);
+
+        s2=final->data;
+
+        index=lookupLuma[w];
+        
+        invertedIndex=lookupLuma[255-w];
+        for(int i=0;i<count;i++)
+        {
+          *d++=(index[*s++]+invertedIndex[*s2++])>>8;
+        }
+        // Now do chroma
+        count>>=2;
+        s=UPLANE(src);
+        d=UPLANE(data);
+        s2=UPLANE(final);
+        index=lookupChroma[w];
+        invertedIndex=lookupChroma[255-w];
+        for(int i=0;i<count;i++)
+        {
+            *d++=(index[*s++]+invertedIndex[*s2++]-(128<<8))>>8;
+        }
+        s=VPLANE(src);
+        d=VPLANE(data);
+        s2=VPLANE(final);
+        for(int i=0;i<count;i++)
+        {
+            *d++=(index[*s++]+invertedIndex[*s2++]-(128<<8))>>8;
+            
+        }
+  }
   vidCache->unlockAll();
   return 1;
 }
@@ -178,12 +234,16 @@ uint8_t AVDM_Fade::buildLut(void)
   {
     if(!_param->inOut) ration=255-i;
     else ration=i;
-    ration/=255.;
     for(int r=0;r<256;r++)
     {
       f=r;
       f=f*ration;
-      lookup[i][r]=(uint8_t)(f+0.4);
+      lookupLuma[i][r]=(uint16_t)(f+0.4);
+
+      f=r-128;
+      f=f*ration;
+      lookupChroma[i][r]=(128<<8)+(uint16_t)(f+0.4);
+
     }
     
   }
