@@ -47,6 +47,9 @@
 #define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(x)),(gfloat)param->y) ;}
 #define SGET(x) gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(WID(x))) 
 
+#define CHECK_GET(x,y) {param->y=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(x)));}
+#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),param->y);}	
+
 static GtkWidget        *create_dialog1 (void);
 uint8_t DIA_fade(VIDFADE_PARAM *param)
 {
@@ -59,6 +62,7 @@ uint8_t DIA_fade(VIDFADE_PARAM *param)
   SPIN_SET(spinbuttonStart,startFade);
   SPIN_SET(spinbuttonEnd,endFade);
   gtk_combo_box_set_active(GTK_COMBO_BOX(WID(comboboxinOut)),param->inOut);
+  CHECK_SET(checkbuttonBlack,toBlack);
     // Run
   gtk_register_dialog(dialog);
   while(!done)
@@ -79,6 +83,7 @@ uint8_t DIA_fade(VIDFADE_PARAM *param)
           param->startFade=s;
           param->endFade=e;
           param->inOut=gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxinOut)));
+          CHECK_GET(checkbuttonBlack,toBlack);
           done=1;
           ret=1;
         }
@@ -96,7 +101,7 @@ uint8_t DIA_fade(VIDFADE_PARAM *param)
 }
 
 GtkWidget*
-    create_dialog1 (void)
+create_dialog1 (void)
 {
   GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
@@ -109,6 +114,8 @@ GtkWidget*
   GtkWidget *spinbuttonStart;
   GtkObject *spinbuttonEnd_adj;
   GtkWidget *spinbuttonEnd;
+  GtkWidget *label4;
+  GtkWidget *checkbuttonBlack;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
@@ -120,7 +127,7 @@ GtkWidget*
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
 
-  table1 = gtk_table_new (3, 2, FALSE);
+  table1 = gtk_table_new (4, 2, FALSE);
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), table1, TRUE, TRUE, 0);
 
@@ -169,6 +176,19 @@ GtkWidget*
                     (GtkAttachOptions) (0), 0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonEnd), TRUE);
 
+  label4 = gtk_label_new (_("Fade to black "));
+  gtk_widget_show (label4);
+  gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
+
+  checkbuttonBlack = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkbuttonBlack);
+  gtk_table_attach (GTK_TABLE (table1), checkbuttonBlack, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
   dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
@@ -193,6 +213,8 @@ GtkWidget*
   GLADE_HOOKUP_OBJECT (dialog1, label3, "label3");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonStart, "spinbuttonStart");
   GLADE_HOOKUP_OBJECT (dialog1, spinbuttonEnd, "spinbuttonEnd");
+  GLADE_HOOKUP_OBJECT (dialog1, label4, "label4");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbuttonBlack, "checkbuttonBlack");
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
   GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
