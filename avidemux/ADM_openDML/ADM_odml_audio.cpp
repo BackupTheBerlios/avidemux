@@ -61,7 +61,7 @@ AVDMAviAudioStream::AVDMAviAudioStream(		odmlIndex *idx,
 						)      : AVDMGenericAudioStream()
 {
     UNUSED_ARG(preload);
-
+    if(!wav->channels) wav->channels=2;
    
     _extraLen=extraLen;
     _extraData=extraData;
