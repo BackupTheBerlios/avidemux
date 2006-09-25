@@ -155,7 +155,7 @@ GenericAviSaveSmart::writeVideoChunk (uint32_t frame)
 uint8_t GenericAviSaveSmart::writeVideoChunk_recode (uint32_t frame)
 {
 uint32_t len;
-ADMBitstream bitstream;
+ADMBitstream bitstream(MAXIMUM_SIZE * MAXIMUM_SIZE * 3);
 	aprintf("Frame %lu encoding\n",frame);
 	video_body->getFlags ( frame, &_videoFlag);
 	if (_videoFlag & AVI_KEY_FRAME)

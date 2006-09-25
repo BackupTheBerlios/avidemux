@@ -79,7 +79,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
   uint8_t ret=0;
  
   ADMMpegMuxer *muxer=NULL;
-  ADMBitstream bitstream;
+  ADMBitstream bitstream(0);
   
   	printf("Saving as mpg PS to file %s\n",name);
   
@@ -251,6 +251,7 @@ uint8_t mpeg_passthrough(const char *name,ADM_OUT_FORMAT format )
   uint32_t position;
   EncoderCopy *copy=NULL;
         bitstream.data=buffer;
+        bitstream.bufferSize=avifileinfo->width * avifileinfo->height * 3;
         
      /***************************
       Special case : Multithreaded
@@ -439,7 +440,7 @@ ADMBitstream *bitstream=context->bitstream;
     
     if(lookupSeqEnd(bitstream,&position))
     {
-        ADMBitstream bs2; 
+        ADMBitstream bs2(bitstream->bufferSize); // Mostly correct
                 if(position) 
                 {
                   bs2.data=context->bitstream->data;

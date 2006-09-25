@@ -108,7 +108,7 @@ uint32_t w,h,fps1000,fcc;
       			_encode->startPass1 ();
 			encoding_gui->setCodec((char *)_encode->getCodecName());
 			encoding_gui->setPhasis("Pass one");
-                        ADMBitstream bitstream;
+                        ADMBitstream bitstream(w*h*3);
                         bitstream.data=_videoBuffer;
       			//__________________________________
       			//   now go to main loop.....
@@ -196,7 +196,8 @@ uint8_t	ADM_ogmWriteProcess::writeVideo(uint32_t frame)
 {
 uint32_t len,flags;
 uint8_t ret;
-ADMBitstream bitstream; 
+uint32_t page=_incoming->getInfo ()->width*_incoming->getInfo ()->height;
+ADMBitstream bitstream(page*3); 
                  bitstream.data=_videoBuffer;
                  bitstream.dtsFrame=frame;
                  ret= _encode->encode ( frame, &bitstream);

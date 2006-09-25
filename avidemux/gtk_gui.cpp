@@ -1393,9 +1393,10 @@ uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t h,ADMImage *image)
   FILE *fd;
   uint8_t *buffer=NULL;
   uint32_t sz;
-  ADMBitstream bitstream;
+  
 
         sz = w*h*3;
+  ADMBitstream bitstream(sz);
         buffer=new uint8_t[sz];
         bitstream.data=buffer;
         codec=new  ffmpegEncoderFFMjpeg(w,h,FF_MJPEG)  ;
@@ -1435,7 +1436,6 @@ void A_saveBunchJpg(char *name)
   uint32_t curImg;
   char	 fullName[2048],*ext;
   DIA_working *working;
-  ADMBitstream bitstream;
   	if(frameStart>frameEnd)
 		{
                   GUI_Error_HIG(_("Mark A > B"), _("Set your markers correctly."));
@@ -1457,6 +1457,8 @@ void A_saveBunchJpg(char *name)
 		codec->init( 95,25000);
 
         working=new DIA_working(_("Saving as set of jpegs"));
+        ADMBitstream bitstream(sz);
+
         bitstream.data=	buffer;
 	for(curImg=frameStart;curImg<=frameEnd;curImg++)
 	{	

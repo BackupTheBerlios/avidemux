@@ -77,7 +77,7 @@ static char *twoPass=NULL;
 static char *twoFake=NULL;
 
 extern AVDMGenericAudioStream *mpt_getAudioStream(void);
-uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total);
+uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total);
 uint8_t extractVolHeader(uint8_t *data,uint32_t dataSize,uint32_t *headerSize);
 
 /*
@@ -113,7 +113,7 @@ uint8_t *dummy,err;
 WAVHeader *audioinfo=NULL;
 int prefill=0;
 uint32_t displayFrame=0;
-ADMBitstream    bitstream;
+ADMBitstream    bitstream(0);
 uint32_t        frameWrite=0;
 ADM_MUXER_TYPE muxerType=MUXER_MP4;
 uint8_t dualPass=0;
@@ -145,7 +145,7 @@ uint32_t    totalAudioSize=0;
            total= _incoming->getInfo()->nb_frames;
 
            encoding_gui=new DIA_encoding(_incoming->getInfo()->fps1000);
-
+           bitstream.bufferSize=_incoming->getInfo()->width*_incoming->getInfo()->height*3;
            if (!_encode)
                 {
                   GUI_Error_HIG (_("Cannot initialize the video stream"), NULL);
@@ -174,7 +174,7 @@ uint32_t    totalAudioSize=0;
                 if(dualPass)
                 {
                        
-                        if(!prepareDualPass(videoBuffer,TwoPassLogFile,encoding_gui,_encode,total))
+                        if(!prepareDualPass(bitstream.bufferSize,videoBuffer,TwoPassLogFile,encoding_gui,_encode,total))
                                 goto stopit;
                 }else
                 {
@@ -372,12 +372,12 @@ stopit:
            deleteAudioFilter (audio);
            return ret;
 }
-uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total)
+uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total)
 {
       uint32_t len, flag;
       FILE *tmp;
       uint8_t reuse=0;
-      ADMBitstream bitstream;
+      ADMBitstream bitstream(0);
 
         aprintf("\n** Dual pass encoding**\n");
 
@@ -397,6 +397,7 @@ uint8_t prepareDualPass(uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encod
                 aprintf("**Pass 1:%lu\n",total);
                 _encode->startPass1 ();
                 bitstream.data=buffer;
+                bitstream.bufferSize=bufferSize;
                 for (uint32_t cf = 0; cf < total; cf++)
                 {
 //                        encoding_gui->setFrame (cf, total);

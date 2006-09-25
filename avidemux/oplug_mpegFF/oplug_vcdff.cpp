@@ -121,7 +121,7 @@ uint32_t  real_framenum=0;
 uint8_t   ret=0;
 uint32_t  sample_target=0;
 uint32_t  total_sample=0;
-ADMBitstream bitstream;
+ADMBitstream bitstream(0);
 uint32_t audioSum=0;
 
         twoPass=new char[strlen(name)+6];
@@ -266,7 +266,7 @@ uint32_t audioSum=0;
       }
 
 
-      _buffer=new uint8_t[_page*2]; // Might overflow if _page only
+      _buffer=new uint8_t[_page]; // Might overflow if _page only
       _outbuffer=new uint8_t[_page];
 
       ADM_assert(  _buffer);
@@ -333,6 +333,7 @@ uint32_t audioSum=0;
                                 encoding->setPhasis ("Pass 1/2");
                                 encoder->startPass1();
                                 bitstream.data=_buffer;
+                                bitstream.bufferSize=_page;
                                 for(uint32_t i=0;i<total;i++)
                                 {
                                         bitstream.cleanup(i);
@@ -417,6 +418,7 @@ uint32_t audioSum=0;
            muxerMT context;
            //
            bitstream.data=_outbuffer;
+           bitstream.bufferSize=_page;
            // 
            memset(&context,0,sizeof(context));
            context.videoEncoder=encoder;

@@ -118,9 +118,9 @@ ffmpegEncoder::ffmpegEncoder (uint32_t width, uint32_t height, FF_CODEC_ID id):e
 uint8_t   ffmpegEncoder::encode(ADMImage *in,ADMBitstream *out)
 {
     int32_t sz = 0;
-
+    ADM_assert(out->bufferSize);
     encodePreamble (in->data);
-    if ((sz = avcodec_encode_video (_context, out->data, _w * _h * 3, &_frame)) < 0)
+    if ((sz = avcodec_encode_video (_context, out->data, out->bufferSize, &_frame)) < 0)
         return 0;
     postAmble(out,sz);
     return 1;
@@ -217,11 +217,11 @@ ffmpegEncoder::gopMpeg1 (void)
   printf ("\n Using 2 b frames \n");
   if (_id == FF_MPEG2)
     {
-      _context->mpeg_quant = 1;	//1; // Should be mpeg quant §
+      _context->mpeg_quant = 1;	//1; // Should be mpeg quant 
     }
   else
     {
-      _context->mpeg_quant = 0;	//1; // Should be mpeg quant §
+      _context->mpeg_quant = 0;	//1; // Should be mpeg quant 
     }
   if (_settingsPresence)
     {

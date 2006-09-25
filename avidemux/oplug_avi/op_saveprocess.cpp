@@ -142,7 +142,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
       //__________________________________
       //   now go to main loop.....
       //__________________________________
-        
+        bitstream.bufferSize=_incoming->getInfo ()->width *   _incoming->getInfo ()->height * 3;
         bitstream.data=buffer;
         for (uint32_t cf = 0; cf < frametogo; cf++)
         {
