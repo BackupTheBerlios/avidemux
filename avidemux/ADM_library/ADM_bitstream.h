@@ -3,10 +3,16 @@
 #define ADM_BITSTREAM_H
 #define ADM_NO_TIMING 0xffffffff
 
+/*
+    BIG WARNING : BUFFER SIZE MUST BE SET: SOME CODECS CHECK& USE IT
+    ESPECIALLY LAVCODEC!
+*/
+
 class ADMBitstream
 {
     public:
         uint32_t len;
+        uint32_t bufferSize;
         uint8_t *data;
         uint32_t flags;
         uint32_t in_quantizer;          // Quantizer asked
@@ -16,7 +22,7 @@ class ADMBitstream
         uint64_t pts;			// in ms
         uint64_t dts;			// in ms
 
-        ADMBitstream (void);
+        ADMBitstream (uint32_t buffersize=0);
         ~ADMBitstream ();
         void cleanup (uint32_t dts);
 
