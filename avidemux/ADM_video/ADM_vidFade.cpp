@@ -98,7 +98,7 @@ AVDM_Fade::AVDM_Fade(AVDMGenericVideoStream *in,CONFcouple *couples)
   }else
   {
     _param->startFade=0; 
-    _param->endFade=_info.nb_frames;
+    _param->endFade=_info.nb_frames-1;
     _param->inOut=0;
     _param->toBlack=0;
   }
@@ -128,9 +128,11 @@ uint8_t AVDM_Fade::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
 {
 
   uint32_t num_frames,tgt;
+  
   ADMImage *src;
 
   num_frames=_info.nb_frames;   // ??
+
   tgt=frame+_info.orgFrame;
   if(frame>=num_frames)
   {
@@ -138,7 +140,7 @@ uint8_t AVDM_Fade::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     return 0;
   }
 
-  src=vidCache->getImage(tgt);
+  src=vidCache->getImage(frame);
   if(!src) return 0;
   if(tgt>_param->endFade || tgt <_param->startFade ||_param->endFade==_param->startFade )
   {
@@ -153,6 +155,7 @@ uint8_t AVDM_Fade::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
   float num,den;
   
   den=_param->endFade-_param->startFade;
+  
   num=tgt-_param->startFade;
   
   num=num/den;
@@ -191,8 +194,13 @@ uint8_t AVDM_Fade::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
         uint32_t x,alpha;
         ADMImage *final;
 
-        final=vidCache->getImage(_param->endFade);
-        ADM_assert(final);
+        final=vidCache->getImage(_param->endFade-_info.orgFrame);
+        if(!final)
+        {
+              data->duplicate(src);
+              vidCache->unlockAll();
+              return 1;
+        }
 
         s2=final->data;
 
