@@ -469,7 +469,11 @@ uint8_t EncoderFFMPEG::startPass2 (void)
     vbr= ADM_computeBitrate(_fps, _frametogo,_param.finalsize);
 
   _codec->setLogFile (_logname);
-  _codec->init (vbr, _fps);
+  if(!_codec->init (vbr, _fps))
+  {
+    printf("2 pass start failed!\n");
+    return 0;
+  }
 
   printf ("\n ** Total size     : %lu MBytes \n", _param.finalsize);
 //  printf(" ** Total frame    : %lu  \n",_totalframe);   

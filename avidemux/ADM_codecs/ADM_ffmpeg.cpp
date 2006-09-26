@@ -50,7 +50,7 @@ static char LogName[500];
 AVCodec *codec=avcodec_find_encoder(x);\
 if(!codec) {GUI_Alert(_("Internal error opening codec"#x));ADM_assert(0);} \
   res=avcodec_open(_context, codec); \
-  if(res<0) {GUI_Alert(_("Internal error with context for  codec"#x));ADM_assert(0);} \
+  if(res<0) {GUI_Alert(_("Internal error with context for  codec"#x".\n Did you use too low / too high target for 2 pass ?"));return 0;} \
 }
 /*****************************************/
 uint8_t ffmpegEncoder::stopEncoder(void)
