@@ -124,6 +124,7 @@ audioQueueMT context;
 PacketQueue   *pq;//("MP4 audioQ",50,2*1024*1024);
 uint32_t    totalAudioSize=0;
 
+
            if(type==ADM_PSP)
                muxerType=MUXER_PSP;
            else
@@ -264,7 +265,7 @@ preFilling:
            if(!muxer->open(
                 name,
                 2000000, // Muxrate
-                MUXER_MP4,
+                muxerType,
                 &info,videoExtraDataSize,videoExtraData,
                 audioinfo,extraDataSize,extraData))
                          goto stopit;

@@ -57,6 +57,7 @@ class  ADMVideoResampleFPS:public AVDMGenericVideoStream
   public:
                 
                         ADMVideoResampleFPS(  AVDMGenericVideoStream *in,CONFcouple *setup);
+                        ADMVideoResampleFPS(  AVDMGenericVideoStream *in,uint32_t target1000);
     virtual             ~ADMVideoResampleFPS();
     virtual uint8_t     configure(AVDMGenericVideoStream *in);
     virtual uint8_t     getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
@@ -67,7 +68,12 @@ class  ADMVideoResampleFPS:public AVDMGenericVideoStream
 
 SCRIPT_CREATE(resamplefps_script,ADMVideoResampleFPS,ResampParam);
 BUILD_CREATE(resamplefps_create,ADMVideoResampleFPS);
- 
+
+AVDMGenericVideoStream *createResampleFps(AVDMGenericVideoStream *in,uint32_t targetfps1000)
+{
+  return new ADMVideoResampleFPS(in,targetfps1000);
+}
+
 uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
 {
   uint8_t r=0;
@@ -101,6 +107,28 @@ char *ADMVideoResampleFPS::printConf( void )
   sprintf((char *)buf," Resample to %2.2f fps (blend:%d)",(double)_param->newfps/1000.,
                 _param->use_linear);
   return buf;
+}
+
+ADMVideoResampleFPS::ADMVideoResampleFPS(  AVDMGenericVideoStream *in,uint32_t target)
+{
+
+  _in=in;         
+  memcpy(&_info,_in->getInfo(),sizeof(_info));    
+  _info.encoding=1; 
+  _param=new  FPS_Param;
+   
+    _param->newfps =target;                
+    _param->use_linear=1;
+ 
+  double newlength;
+  
+  newlength=_info.nb_frames;
+  newlength/=_info.fps1000;
+  newlength*=_param->newfps;
+  _info.nb_frames=(uint32_t)floor(newlength);
+  _info.fps1000=_param->newfps;
+  vidCache=new VideoCache(3,_in);
+
 }
 
 ADMVideoResampleFPS::ADMVideoResampleFPS(  AVDMGenericVideoStream *in,CONFcouple *couples)

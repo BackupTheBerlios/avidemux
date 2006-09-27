@@ -99,8 +99,9 @@ uint8_t lavMuxer::open(const char *filename, uint32_t inbitrate,ADM_MUXER_TYPE t
 }
 
 
-uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info,uint32_t videoExtraDataSize,
-                        uint8_t *videoExtraData, WAVHeader *audioheader,uint32_t audioextraSize,uint8_t *audioextraData)
+uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE type, aviInfo *info,
+              uint32_t videoExtraDataSize, uint8_t *videoExtraData, WAVHeader *audioheader,
+              uint32_t audioextraSize,uint8_t *audioextraData)
 {
  AVCodecContext *c;
  	_type=type;
@@ -155,6 +156,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	switch(_type)
 	{
                 case MUXER_MP4:
+                case MUXER_PSP:
                         if(isMpeg4Compatible(info->fcc))
                         {
                                 c->codec_id = CODEC_ID_MPEG4;
@@ -302,6 +304,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 		
 	c = audio_st->codec;
         c->frame_size=1024; //For AAC mainly, sample per frame
+        printf("[LavFormat] Bitrate %u\n",(audioheader->byterate*8)/1000);
         switch(audioheader->encoding)
         {
                 case WAV_AC3: c->codec_id = CODEC_ID_AC3;break;
