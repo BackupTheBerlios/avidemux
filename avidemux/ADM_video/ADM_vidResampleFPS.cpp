@@ -127,6 +127,7 @@ ADMVideoResampleFPS::ADMVideoResampleFPS(  AVDMGenericVideoStream *in,uint32_t t
   newlength*=_param->newfps;
   _info.nb_frames=(uint32_t)floor(newlength);
   _info.fps1000=_param->newfps;
+  printf("[Resample FPS] %u -> %u\n",_in->getInfo()->nb_frames,_info.nb_frames);
   vidCache=new VideoCache(3,_in);
 
 }
@@ -260,27 +261,24 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
   
   if(!_param->use_linear)
   {
-  uint32_t nw;
-  
-  nw=(uint32_t)floor(f+0.4);
-  if(nw>_in->getInfo()->nb_frames-1)
-    nw=_in->getInfo()->nb_frames-1;
- 
-  mysrc1=vidCache->getImage(nw);
-  if(!mysrc1) return 0;
-  
-  memcpy(YPLANE(data),YPLANE(mysrc1),page);
-  memcpy(UPLANE(data),UPLANE(mysrc1),page>>2);
-  memcpy(VPLANE(data),VPLANE(mysrc1),page>>2);
- 
-  vidCache->unlockAll();
-  
-  
-  return 1;
-
-
+      uint32_t nw;
+      
+      nw=(uint32_t)floor(f+0.4);
+      if(nw>_in->getInfo()->nb_frames-1)
+        nw=_in->getInfo()->nb_frames-1;
+    
+      mysrc1=vidCache->getImage(nw);
+      if(!mysrc1) return 0;
+      
+      memcpy(YPLANE(data),YPLANE(mysrc1),page);
+      memcpy(UPLANE(data),UPLANE(mysrc1),page>>2);
+      memcpy(VPLANE(data),VPLANE(mysrc1),page>>2);
+    
+      vidCache->unlockAll();
+      
+      return 1;
   }
-
+  /* With linear blending */
   uint32_t nw;
   uint8_t lowweight;
   uint8_t highweight;
@@ -292,10 +290,11 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
   highweight = (uint8_t)floor(diff*256);
   lowweight = 256 - highweight;
 
-  if(nw>_in->getInfo()->nb_frames-1)
+  if(nw>=_in->getInfo()->nb_frames-1)
     {
+      printf("[ResampleFps] In %u Out %u\n",frame,nw);
       nw=_in->getInfo()->nb_frames-1;
-      diff=0.0;
+      highweight=0;
     }
   //printf("New:%lu old:%lu\n",frame,nw);
 
