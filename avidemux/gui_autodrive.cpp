@@ -69,27 +69,29 @@ uint8_t A_autoDrive(Action action)
                       GUI_Error_HIG(_("Codec Error"),_( "Cannot select mpeg4 sp codec."));
                         return 0;
                     }
-                                // Audio Codec
-                                if((currentaudiostream->getInfo()->frequency==44100)&&
-                                    (currentaudiostream->getInfo()->channels==2)&&
-                                    (currentaudiostream->getInfo()->encoding==WAV_AAC))
-                                {
-                                    audioCodecSetcodec(AUDIOENC_COPY);
-                                }
-                                else
-                                {
+                    // Set mode & bitrate 
+                    setVideoEncoderSettings(COMPRESS_CBR,768,0,NULL);
+                    // Audio Codec
+                    if((currentaudiostream->getInfo()->frequency==44100)&&
+                        (currentaudiostream->getInfo()->channels==2)&&
+                        (currentaudiostream->getInfo()->encoding==WAV_AAC))
+                    {
+                        audioCodecSetcodec(AUDIOENC_COPY);
+                    }
+                    else
+                    {
 #ifdef USE_FAAC
-                                    audioCodecSetcodec(AUDIOENC_FAAC);
+                          audioCodecSetcodec(AUDIOENC_FAAC);
 #else
-                                    GUI_Error_HIG(_("Codec Error"),_( "You don't have FAAC!.\nIt is needed to create PSP compatible video."));
+                          GUI_Error_HIG(_("Codec Error"),_( "You don't have FAAC!.\nIt is needed to create PSP compatible video."));
 #endif
                                     // ? Needed ?
-                                    if(currentaudiostream->getInfo()->frequency!=44100)
-                                    {
-                                        audioFilterResample(44100);
-                                    }
-                                    audioFilter_SetBitrate(160);
-                                }
+                          if(currentaudiostream->getInfo()->frequency!=44100)
+                          {
+                              audioFilterResample(44100);
+                          }
+                          audioFilter_SetBitrate(128);
+                      }
                                 break;
                 case ACT_AUTO_VCD:
                                 // Check video size

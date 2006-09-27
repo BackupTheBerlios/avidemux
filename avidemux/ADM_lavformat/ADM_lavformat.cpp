@@ -185,14 +185,23 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                                 c->extradata=videoExtraData;
                                 c->extradata_size= videoExtraDataSize;
                         }
-                        c->rc_buffer_size=8*1024*224;
-                        c->rc_max_rate=9500*1000;
-                        c->rc_min_rate=0;
-                        if(!inbitrate)
-                                c->bit_rate=9000*1000;
+                        if(MUXER_PSP==_type)
+                        {
+                            c->rc_buffer_size=8*1024*224;
+                            c->rc_max_rate=768*1000;
+                            c->rc_min_rate=0;
+                            c->bit_rate=768*1000;
+                        }
                         else
-                                c->bit_rate=inbitrate;
-        
+                        {
+                            c->rc_buffer_size=8*1024*224;
+                            c->rc_max_rate=9500*1000;
+                            c->rc_min_rate=0;
+                            if(!inbitrate)
+                                    c->bit_rate=9000*1000;
+                            else
+                                    c->bit_rate=inbitrate;
+                        }
                         break;
                 case MUXER_TS:
                         c->codec_id = CODEC_ID_MPEG2VIDEO;
