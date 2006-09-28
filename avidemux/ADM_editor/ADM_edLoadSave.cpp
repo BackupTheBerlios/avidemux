@@ -106,9 +106,15 @@ printf("\n **Saving script project **\n");
   qfprintf (fd,"\n//** Video **\n");
   qfprintf (fd,"// %02ld videos source \n", _nb_video);
   char *nm;
+  uint32_t vop=!!(video_body->getSpecificMpeg4Info()&ADM_VOP_ON);
+
   for (uint32_t i = 0; i < _nb_video; i++)
     {
         nm=cleanupPath(_videos[i]._aviheader->getMyName() );
+        if(vop)
+        {
+          qfprintf(fd,"app.forceUnpack();\n");
+        }
         if(!i)
         {
                 qfprintf (fd, "app.load(\"%s\");\n", nm);
@@ -138,7 +144,7 @@ for (uint32_t i = 0; i < _nb_segment; i++)
         qfprintf(fd,"app.markerA=%d;\n",frameStart);
         qfprintf(fd,"app.markerB=%d;\n",frameEnd);
 // Reordering : Warning works only for video with one source video
-        if(video_body->isReordered(0))
+        if(video_body->isReordered(0) && !vop)
         {
             qfprintf(fd,"app.rebuildIndex();\n");
         }
