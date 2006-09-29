@@ -17,16 +17,15 @@
  *                                                                         *
  ***************************************************************************/
 
-
+#include "config.h"
 #include <stdlib.h>
 #include <glib.h>
 #include <signal.h>
-#include <config.h>
 #include <pthread.h>
 #define WIN32_CLASH
 #include <gtk/gtk.h>
 
-#ifdef HAVE_DCGETTEXT
+#ifdef HAVE_GETTEXT
 #include <libintl.h>
 #include <locale.h>
 #endif
@@ -35,7 +34,6 @@
 
 #define __DECLARE__
 #include "avi_vars.h"
-//#include "ADM_gui/GUI_vars.h"
 
 #include "ADM_encoder/adm_encConfig.h"
 #include "prefs.h"
@@ -106,16 +104,6 @@ int sdl_version=0;
 /*
 	Initialize Gettext if available
 */
-#ifdef HAVE_DCGETTEXT
-  setlocale (LC_ALL, "");
-
-//#define ALOCALES "/usr/local/share/locale"
-  bindtextdomain ("avidemux", ADMLOCALE);
-  bind_textdomain_codeset ("avidemux", "UTF-8");
-  textdomain ("avidemux");
-  printf("Locales for %s appear to be in %s\n","avidemux", ADMLOCALE);
-  printf("\nI18N : %s \n",dgettext("avidemux","_File"));
-#endif
 
 
 
@@ -143,6 +131,24 @@ int sdl_version=0;
 #ifdef   __USE_LARGEFILE64
 printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #endif
+#endif
+#ifdef HAVE_GETTEXT
+  char *local=setlocale (LC_ALL, "");
+  bindtextdomain ("avidemux", ADMLOCALE);
+  bind_textdomain_codeset ("avidemux", "UTF-8");
+  
+  if(local)
+    printf("[Locale] setlocale %s \n",local);
+  local=textdomain(NULL);
+  textdomain ("avidemux");
+  if(local)
+    printf("[Locale] Textdomain was %s \n",local);
+  local=textdomain(NULL);
+  if(local)
+    printf("[Locale] Textdomain is now  %s \n",local);
+  
+  printf("[Locale] Files  for %s appear to be in %s\n","avidemux", ADMLOCALE);
+  printf("[Locale] Test : %s \n",dgettext("avidemux","_File"));
 #endif
 
    // Start counting memory
