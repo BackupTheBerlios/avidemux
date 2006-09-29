@@ -49,9 +49,7 @@ msgstr ""
 #: avidemux/oplug_avi/op_saveprocess.cpp:125
 #: avidemux/oplug_mp4/oplug_mp4.cpp:354
 #: avidemux/oplug_ogm/op_ogsaveprocess.cpp:99
-msgid ""
-"\n"
-" Reuse the existing log-file ?"
+msgid "Reuse the existing log-file ?"
 msgstr ""
 
 #: avidemux/oplug_avi/op_saveprocess.cpp:150
