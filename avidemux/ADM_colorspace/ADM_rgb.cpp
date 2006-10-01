@@ -33,8 +33,8 @@ extern "C" {
 }
 #endif
 
-#include "../MPlayer_pp/img_format.h"
-#include "../MPlayer_pp/swscale.h"
+#include "../ADM_lavutil/avutil.h"
+#include "../ADM_libswscale/swscale.h"
 #include "ADM_rgb.h" 
 
 #define CLEANUP() \
@@ -57,12 +57,12 @@ extern "C" {
 #endif
 
 #ifdef ADM_BIG_ENDIAN
-              #define TARGET_COLORSPACE       IMGFMT_BGRA 
+              #define TARGET_COLORSPACE       PIX_FMT_RGB32 
 //              #define TARGET_COLORSPACE       IMGFMT_ABGR
 //              #define TARGET_COLORSPACE       IMGFMT_RGB32
 //              #define TARGET_COLORSPACE      IMGFMT_BGR32
 #else
-              #define TARGET_COLORSPACE      IMGFMT_RGB32
+              #define TARGET_COLORSPACE      PIX_FMT_RGB32
 #endif
 
 
@@ -107,7 +107,7 @@ void COL_init(void)
     
 	 _context=(void *)sws_getContext(
 				    		ww,hh,
-						IMGFMT_YV12 ,
+						PIX_FMT_YUV420P ,
 		 				ww,hh,
                                                 TARGET_COLORSPACE,
 	    					flags, NULL, NULL,NULL);
@@ -158,9 +158,9 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
    
 	 _context=(void *)sws_getContext(
 				    		ww,hh,
-						IMGFMT_YV12 ,
+						PIX_FMT_YUV420P ,
 		 				ww,hh,
-	   					IMGFMT_RGB24,
+	   					PIX_FMT_RGB24,
 	    					flags, NULL, NULL,NULL);
 
     if(!_context) ADM_assert(0);
@@ -210,16 +210,16 @@ uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
     flags|=SWS_BILINEAR;
     switch(_colorspace)
     {
-                case ADM_COLOR_RGB24:c=IMGFMT_RGB24;break;
+                case ADM_COLOR_RGB24:c=PIX_FMT_RGB24;break;
                 case ADM_COLOR_RGB32A:c=TARGET_COLORSPACE;break;
-                case ADM_COLOR_RGB16:c=IMGFMT_RGB16;break;
+                case ADM_COLOR_RGB16:c=PIX_FMT_RGB565;break;
                 default: ADM_assert(0);
     }
          _context=(void *)sws_getContext(
 				    		ww,hh,
 						c ,
 		 				ww,hh,
-	   					IMGFMT_YV12,
+	   					PIX_FMT_YUV420P,
 	    					flags, NULL, NULL,NULL);
 
     if(!_context) ADM_assert(0);
@@ -355,22 +355,22 @@ int c=0;
     switch(_colorspace)
     {
      
-                case ADM_COLOR_BGR24:c=IMGFMT_BGR24;break;
-                case ADM_COLOR_RGB24:c=IMGFMT_RGB24;break;
-                case ADM_COLOR_RGB555:c=IMGFMT_RGB15;break;
-                case ADM_COLOR_BGR555:c=IMGFMT_BGR15;break;
-                case ADM_COLOR_BGR32A:c=IMGFMT_BGR32;break;
+                case ADM_COLOR_BGR24:c=PIX_FMT_BGR24;break;
+                case ADM_COLOR_RGB24:c=PIX_FMT_RGB24;break;
+                case ADM_COLOR_RGB555:c=PIX_FMT_RGB555;break;
+                case ADM_COLOR_BGR555:c=PIX_FMT_BGR555;break;
+                case ADM_COLOR_BGR32A:c=PIX_FMT_BGR32_1;break;
                 case ADM_COLOR_RGB32A:c=TARGET_COLORSPACE;break;
-                case ADM_COLOR_RGB16:c=IMGFMT_RGB16;break;
-                case ADM_COLOR_YUV422:c=IMGFMT_422P;break;
-                case ADM_COLOR_YUV411:c=IMGFMT_411P;break;
+                case ADM_COLOR_RGB16:c=PIX_FMT_RGB565;break;
+                case ADM_COLOR_YUV422:c=PIX_FMT_YUV422P;break;
+                case ADM_COLOR_YUV411:c=PIX_FMT_YUV411P;break;
                 default: ADM_assert(0);
     }
          _context=(void *)sws_getContext(
                                                 ww,hh,
                                                 c ,
                                                 ww,hh,
-                                                IMGFMT_YV12,
+                                                PIX_FMT_YUV420P,
                                                 flags, NULL, NULL,NULL);
 
     if(!_context) ADM_assert(0);
@@ -451,7 +451,8 @@ uint8_t COL_Generic2YV12::transform(uint8_t **planes, uint32_t *strides,uint8_t 
         dst[2]=target+((page*5)>>2);
         ddst[0]=w;
         ddst[1]=ddst[2]=w>>1;
-        if(_colorspace==ADM_COLOR_BGR24 || _colorspace==ADM_COLOR_BGR32A)
+        if(_colorspace==ADM_COLOR_BGR24 || _colorspace==ADM_COLOR_BGR32A || _colorspace==ADM_COLOR_RGB32A || 
+                    _colorspace==ADM_COLOR_RGB24)
         {
                 ssrc[0]=-mul*w;
                 srd[0]=planes[0]+mul*w*(h-1);

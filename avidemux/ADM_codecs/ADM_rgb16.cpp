@@ -33,9 +33,9 @@
 #include "ADM_codecs/ADM_rgb16.h"
 
 
-decoderRGB16::decoderRGB16 (uint32_t w, uint32_t h):decoders (w, h)
+decoderRGB16::decoderRGB16 (uint32_t w, uint32_t h,uint32_t rgb):decoders (w, h)
 {
-
+  isRgb=rgb;
 }
 decoderRGB16::~decoderRGB16 ()
 {
@@ -55,14 +55,20 @@ uint8_t
 
   // We dont do much here ...
 
-  if (len == (3 * xx))		// rgb 24 ?
+  if (len == (3 * xx))  // rgb 24 ?
     {
-      out->_colorspace = ADM_COLOR_BGR24;
+      if(isRgb)
+        out->_colorspace = ADM_COLOR_RGB24;
+      else
+        out->_colorspace = ADM_COLOR_BGR24;
       out->_planeStride[0] = 3 * _w;
     }
   else if (len == (4 * xx))
     {
-      out->_colorspace = ADM_COLOR_BGR32A;
+      if(isRgb)
+        out->_colorspace = ADM_COLOR_RGB32A;
+      else
+        out->_colorspace = ADM_COLOR_BGR32A;
       out->_planeStride[0] = 4 * _w;
     }
 /*        else if(len==2*xx)

@@ -47,7 +47,7 @@
 
 #include "prefs.h"
 #include "ADM_colorspace/ADM_rgb.h"
-#include "MPlayer_pp/ADM_mp.h"
+#include "ADM_libswscale/ADM_mp.h"
 #include "gtkgui.h"
 
 

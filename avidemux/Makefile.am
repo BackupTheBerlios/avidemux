@@ -18,7 +18,7 @@ SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_toolkit oplug_mpeg xpm ADM_video oplug_avi ADM_audiodevice ADM_vp32 \
 	libMpeg2Dec oplug_mpegFF ADM_h263 ADM_gui2 ADM_dialog \
 	ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame ADM_requant \
-	ADM_script oplug_ogm ADM_xvidratectl ADM_mplex ADM_ocr MPlayer_pp \
+	ADM_script oplug_ogm ADM_xvidratectl ADM_mplex ADM_ocr ADM_libswscale \
 	ADM_mpegdemuxer ADM_tray ADM_lavutil ADM_lavformat ADM_lavcodec oplug_mp4 \
 	ADM_avsproxy  ADM_liba52 ADM_libMad ADM_matroska ADM_asf
 
@@ -65,7 +65,7 @@ avidemux2_LDADD   =  ADM_dialog/DIA_quota.o \
 ./ADM_audiofilter/libADM_audiofilter.a \
 ./libtoolame/liblibtoolame.a \
 ./ADM_gui2/libADM_gui2.a  \
-./MPlayer_pp/libMPlayer_pp.a \
+./ADM_libswscale/libswscale.a \
 ./mpeg2enc/libmpeg2enc.a \
 ./ADM_liba52/libADM_liba52.a \
 ./ADM_libMad/libADM_mad.a \

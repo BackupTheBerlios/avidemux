@@ -14,6 +14,7 @@
 #define REG_a  "rax" 
 #define REGa    rax 
 #define REGb    rbx 
+#define REGc    rcx 
 #define REG_b  "rbx"
 #define REG_c  "rcx" 
 #define REG_d  "rdx" 
@@ -25,6 +26,7 @@
 #else
 #define REGa    eax  
 #define REGb    ebx 
+#define REGc    ecx 
 #define REG_a  "eax"  
 #define REG_b  "ebx" 
 #define REG_c  "ecx" 

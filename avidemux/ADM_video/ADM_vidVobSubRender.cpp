@@ -79,8 +79,8 @@ extern "C" {
 }
 #endif
 
-#include "MPlayer_pp/img_format.h"
-#include "MPlayer_pp/swscale.h"
+#include "../ADM_lavutil/avutil.h"
+#include "ADM_libswscale/swscale.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
 
 #include "ADM_toolkit/ADM_debugID.h"
@@ -601,9 +601,9 @@ uint8_t vobSubBitmap::subResize(vobSubBitmap **tgt,uint32_t newx,uint32_t newy,u
   
   ctx=sws_getContext(
   _width,oldheight,
-  IMGFMT_Y8,
+  PIX_FMT_GRAY8,
   newx,newy,
-  IMGFMT_Y8,
+  PIX_FMT_GRAY8,
   flags,
   NULL, NULL,NULL);
 

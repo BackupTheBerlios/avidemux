@@ -40,8 +40,8 @@ extern "C" {
 }
 #endif
 
-#include "../MPlayer_pp/img_format.h"
-#include "../MPlayer_pp/swscale.h"
+#include "ADM_lavutil/avutil.h"
+#include "../ADM_libswscale/swscale.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
 #include "ADM_filter/video_filters.h"
 
@@ -158,10 +158,10 @@ int                       flags=0;
 
   _context=sws_getContext(
                         _in->getInfo()->width,_in->getInfo()->height,
-                        IMGFMT_YV12,
+                        PIX_FMT_YUV420P,
                         tinyW,
                         tinyH,
-                        IMGFMT_YV12,
+                        PIX_FMT_YUV420P,
                         flags, srcFilter, dstFilter,NULL);
 
         if(!_context) return 0;

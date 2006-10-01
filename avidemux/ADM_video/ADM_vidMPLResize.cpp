@@ -45,8 +45,8 @@ extern "C" {
 }
 #endif
 
-#include "../MPlayer_pp/img_format.h"
-#include "../MPlayer_pp/swscale.h"
+#include "../ADM_lavutil/avutil.h"
+#include "../ADM_libswscale/swscale.h"
 #include "ADM_toolkit/ADM_cpuCap.h"
 #include "ADM_filter/video_filters.h"
 
@@ -198,9 +198,9 @@ uint8_t AVDMVideoStreamMPResize::reset(uint32_t nw, uint32_t old,uint32_t algo)
 #endif
 				    _context=sws_getContext(
 				    		_in->getInfo()->width,_in->getInfo()->height,
-						IMGFMT_YV12,
+						PIX_FMT_YUV420P,
 		 				nw,old,
-	   					IMGFMT_YV12,
+	   					PIX_FMT_YUV420P,
 	    					flags, srcFilter, dstFilter,NULL);
 
 				if(!_context) return 0;

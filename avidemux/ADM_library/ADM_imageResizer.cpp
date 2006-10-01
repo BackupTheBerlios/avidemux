@@ -27,9 +27,8 @@ extern "C" {
 #include "ADM_lavcodec/avcodec.h"
 }
 #endif
-
-#include "MPlayer_pp/img_format.h"
-#include "MPlayer_pp/swscale.h"
+#include "ADM_lavutil/avutil.h"
+#include "ADM_libswscale/swscale.h"
 
 
 ADMImageResizer::ADMImageResizer(uint32_t ow,uint32_t oh, uint32_t dw, uint32_t dh)
@@ -53,9 +52,9 @@ int flags=0;
 #endif
             _context=(void *)sws_getContext(
                         orgWidth,orgHeight,
-                        IMGFMT_YV12,
+                        PIX_FMT_YUV420P,
                         destWidth,destHeight,
-                        IMGFMT_YV12,
+                        PIX_FMT_YUV420P,
                         flags, NULL, NULL,NULL);
             
 }

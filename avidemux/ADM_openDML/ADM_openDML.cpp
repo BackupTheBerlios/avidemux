@@ -480,6 +480,11 @@ uint32_t rd;
                                                 track->extraDataLen,track->extraData);
                         }
                 }
+                if(!_video_bih.biCompression && fourCC::check(_videostream.fccHandler,(uint8_t*)"DIB "))
+                  {
+                        _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t*)"DIB ");
+                  }
+                else
                 _videostream.fccHandler=_video_bih.biCompression;
                 printf("\nOpenDML file successfully read..\n");
                 return ret;
