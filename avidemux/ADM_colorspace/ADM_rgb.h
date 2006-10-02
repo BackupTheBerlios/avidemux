@@ -33,6 +33,8 @@
     ADM_COLOR_YUV422,
     ADM_COLOR_YUV411
  };
+#define ADM_COLOR_BACKWARD 0x8000
+#define ADM_COLOR_MASK     0x7FFF
  /* Convert YV12 to RGB32, the reset must be called at least once before using scale */
  class ColBase
  {
@@ -65,7 +67,8 @@
   {
   protected:
                 int             _bmpMode;
-                ADM_colorspace _colorspace;
+                ADM_colorspace  _colorspace;
+                uint32_t        _backward;
   public:
                 ColRgbToYV12(uint32_t w, uint32_t h,ADM_colorspace col) : ColBase(w,h) 
                     {
@@ -100,6 +103,7 @@ protected:
                 uint32_t    w,h;  
                 uint8_t     clean(void);
                 ADM_colorspace _colorspace;
+                uint32_t       _backward;
     
 public:
         

@@ -284,8 +284,12 @@ uint8_t ColRgbToYV12::setBmpMode(void)
  }
  uint8_t ColRgbToYV12::changeColorSpace(ADM_colorspace col)
  {
-    if(col==_colorspace) return 1;
-    _colorspace=col;
+int z;
+    
+    z=(int)col;
+    _backward=!!(z & ADM_COLOR_BACKWARD);
+    z&=~ADM_COLOR_BACKWARD;
+    _colorspace= (ADM_colorspace) z;
        
  }
  //*************************
@@ -349,7 +353,8 @@ int c=0;
         _context=NULL;
         w=ww;
         h=hh;
-        _colorspace=col;
+        _colorspace=(ADM_colorspace)(col & ADM_COLOR_MASK);
+        _backward= !!(col & ADM_COLOR_BACKWARD);
       
  
     switch(_colorspace)
@@ -359,7 +364,7 @@ int c=0;
                 case ADM_COLOR_RGB24:c=PIX_FMT_RGB24;break;
                 case ADM_COLOR_RGB555:c=PIX_FMT_RGB555;break;
                 case ADM_COLOR_BGR555:c=PIX_FMT_BGR555;break;
-                case ADM_COLOR_BGR32A:c=PIX_FMT_BGR32_1;break;
+                case ADM_COLOR_BGR32A:c=PIX_FMT_BGRA;break;
                 case ADM_COLOR_RGB32A:c=TARGET_COLORSPACE;break;
                 case ADM_COLOR_RGB16:c=PIX_FMT_RGB565;break;
                 case ADM_COLOR_YUV422:c=PIX_FMT_YUV422P;break;
@@ -419,7 +424,7 @@ uint8_t COL_Generic2YV12::transform(uint8_t **planes, uint32_t *strides,uint8_t 
                 return 1;
         }
         // Else RGB like colorspace
-        switch(_colorspace)
+        switch(_colorspace&0x7FFF )
         {
                 case ADM_COLOR_RGB16:  
                 case ADM_COLOR_RGB555:  
@@ -451,8 +456,8 @@ uint8_t COL_Generic2YV12::transform(uint8_t **planes, uint32_t *strides,uint8_t 
         dst[2]=target+((page*5)>>2);
         ddst[0]=w;
         ddst[1]=ddst[2]=w>>1;
-        if(_colorspace==ADM_COLOR_BGR24 || _colorspace==ADM_COLOR_BGR32A || _colorspace==ADM_COLOR_RGB32A || 
-                    _colorspace==ADM_COLOR_RGB24)
+        if(_backward && (_colorspace==ADM_COLOR_BGR24 || _colorspace==ADM_COLOR_BGR32A || _colorspace==ADM_COLOR_RGB32A || 
+                    _colorspace==ADM_COLOR_RGB24))
         {
                 ssrc[0]=-mul*w;
                 srd[0]=planes[0]+mul*w*(h-1);

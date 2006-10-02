@@ -58,17 +58,17 @@ uint8_t
   if (len == (3 * xx))  // rgb 24 ?
     {
       if(isRgb)
-        out->_colorspace = ADM_COLOR_RGB24;
+        out->_colorspace =(ADM_colorspace)( ADM_COLOR_RGB24 | ADM_COLOR_BACKWARD);
       else
-        out->_colorspace = ADM_COLOR_BGR24;
+        out->_colorspace = (ADM_colorspace)( ADM_COLOR_BGR24| ADM_COLOR_BACKWARD);
       out->_planeStride[0] = 3 * _w;
     }
   else if (len == (4 * xx))
     {
       if(isRgb)
-        out->_colorspace = ADM_COLOR_RGB32A;
+        out->_colorspace = (ADM_colorspace)( ADM_COLOR_RGB32A | ADM_COLOR_BACKWARD );
       else
-        out->_colorspace = ADM_COLOR_BGR32A;
+        out->_colorspace = (ADM_colorspace)( ADM_COLOR_BGR32A| ADM_COLOR_BACKWARD);
       out->_planeStride[0] = 4 * _w;
     }
 /*        else if(len==2*xx)

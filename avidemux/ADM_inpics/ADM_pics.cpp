@@ -282,6 +282,8 @@ char realstring[250];
 		    read8(_fd[0]);	// precision
 		    h = read16(_fd[0]);
 		    w = read16(_fd[0]);
+                    if(w&1) w++;
+                    if(h&1) h++;
 		} else {
 
 		    off = read16(_fd[0]);
