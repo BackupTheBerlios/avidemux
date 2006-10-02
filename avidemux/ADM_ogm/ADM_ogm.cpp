@@ -388,15 +388,16 @@ uint32_t nb=0;
         *infos=NULL;
         if(nb)
         {
-                *infos=new audioInfo[nb];
+                audioInfo *ifo=new audioInfo[nb];
+                *infos=ifo;
                 for(int i=0;i<nb;i++)
                 {
 //                    WAV2AudioInfo(&(_audioTracks[i]),infos[i]);
-                    infos[i]->encoding=_audioTracks[i].encoding;
-                    infos[i]->channels=_audioTracks[i].channels;
-                    infos[i]->bitrate=(_audioTracks[i].byterate*8)/1000;
-                    infos[i]->frequency=_audioTracks[i].frequency;
-                    infos[i]->av_sync=0;
+                    ifo[i].encoding=_audioTracks[i].encoding;
+                    ifo[i].channels=_audioTracks[i].channels;
+                    ifo[i].bitrate=(_audioTracks[i].byterate*8)/1000;
+                    ifo[i].frequency=_audioTracks[i].frequency;
+                    ifo[i].av_sync=0;
                 }
                     //(*infos)[i]=_audioTracks[i].encoding;
         }
