@@ -359,7 +359,7 @@ create_dialog1 (void)
   gtk_widget_show (checkbuttonU);
   gtk_box_pack_start (GTK_BOX (vbox2), checkbuttonU, FALSE, FALSE, 0);
 
-  checkbuttonV = gtk_check_button_new_with_mnemonic (_("Chroma v"));
+  checkbuttonV = gtk_check_button_new_with_mnemonic (_("Chroma V"));
   gtk_widget_show (checkbuttonV);
   gtk_box_pack_start (GTK_BOX (vbox2), checkbuttonV, FALSE, FALSE, 0);
 

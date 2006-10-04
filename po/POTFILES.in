@@ -33,10 +33,13 @@
 ./avidemux/ADM_audiofilter/audiofilter_bridge.cpp
 ./avidemux/ADM_audiofilter/audiofilter_vorbis.cpp
 ./avidemux/ADM_audiofilter/audioencoder.cpp
+./avidemux/ADM_audiofilter/audiofilter_dolby.cpp
 ./avidemux/ADM_audiofilter/audioencoder_faac.cpp
 ./avidemux/ADM_audiofilter/audiofilter_buildchain.cpp
 ./avidemux/ADM_audiofilter/audioencoder_lame.cpp
 ./avidemux/ADM_audiofilter/audiofilter_limiter.cpp
+./avidemux/ADM_audiofilter/audiofilter_channel_route.cpp
+./avidemux/ADM_audiofilter/audioencoder_aften.cpp
 ./avidemux/ADM_nuv/ADM_nuvAudio.cpp
 ./avidemux/ADM_nuv/RTjpegN.cpp
 ./avidemux/ADM_nuv/RToldformat.cpp
@@ -166,8 +169,6 @@
 ./avidemux/oplug_ogm/op_ogsavecopy.cpp
 ./avidemux/oplug_ogm/op_ogsave.cpp
 ./avidemux/oplug_ogm/op_ogaudio.cpp
-./avidemux/oplug_mpeg/op_mpegwrite.cpp
-./avidemux/oplug_mpeg/op_mpeg.cpp
 ./avidemux/oplug_mpeg/op_mpegpass.cpp
 ./avidemux/ADM_encoder/adm_encoder.cpp
 ./avidemux/ADM_encoder/adm_encXvid4.cpp
@@ -181,6 +182,8 @@
 ./avidemux/ADM_encoder/adm_encxvid.cpp
 ./avidemux/ADM_encoder/adm_encdivx2p.cpp
 ./avidemux/ADM_encoder/adm_encffmpeg1.cpp
+./avidemux/ADM_encoder/adm_encmpeg2enc.cpp
+./avidemux/ADM_encoder/adm_encRequant.cpp
 ./avidemux/ADM_mpegdemuxer/dmx_demuxerES.cpp
 ./avidemux/ADM_mpegdemuxer/dmx_indexer.cpp
 ./avidemux/ADM_mpegdemuxer/dmx_audio.cpp
@@ -191,6 +194,7 @@
 ./avidemux/ADM_mpegdemuxer/dmx_demuxer.cpp
 ./avidemux/ADM_mpegdemuxer/dmx_identify.cpp
 ./avidemux/ADM_mpegdemuxer/dmx_demuxerTS.cpp
+./avidemux/ADM_mpegdemuxer/dmx_demuxerMSDVR.cpp
 ./avidemux/ADM_inpics/ADM_pics.cpp
 ./avidemux/ADM_xvidratectl/ADM_xvidratectlVBV.cpp
 ./avidemux/ADM_xvidratectl/ADM_oldxvid.cpp
@@ -225,6 +229,9 @@
 ./avidemux/ADM_toolkit/TLK_filesel.cpp
 ./avidemux/ADM_toolkit/ADM_threads.cpp
 ./avidemux/ADM_toolkit/ADM_queue.cpp
+./avidemux/ADM_toolkit/ADM_audioQueue.cpp
+./avidemux/ADM_toolkit/ADM_packetQueue.cpp
+./avidemux/ADM_toolkit/ADM_intfloat.cpp
 ./avidemux/ADM_filter/vidVCD.cpp
 ./avidemux/ADM_filter/filter_declaration.cpp
 ./avidemux/ADM_filter/filter_saveload.cpp
@@ -232,6 +239,8 @@
 ./avidemux/ADM_filter/filter.cpp
 ./avidemux/ADM_filter/gui_filterlist.cpp
 ./avidemux/ADM_filter/gui_filter.cpp
+./avidemux/ADM_filter/gui_filtermanager_dialog.cpp
+./avidemux/ADM_filter/gui_filtermanager.cpp
 ./avidemux/ADM_editor/ADM_edIdentify.cpp
 ./avidemux/ADM_editor/ADM_edSearch.cpp
 ./avidemux/ADM_editor/ADMedAVIAUD.cpp
@@ -411,7 +420,6 @@
 ./avidemux/ADM_audiodevice/ADM_deviceALSA.cpp
 ./avidemux/ADM_audiodevice/ADM_deviceSDL.cpp
 ./avidemux/ADM_audiodevice/oss_out.cpp
-./avidemux/ADM_requantize.cpp
 ./avidemux/ADM_pp.cpp
 ./avidemux/prefs.cpp
 ./avidemux/ADM_guiBitrate.cpp
@@ -428,12 +436,12 @@
 ./avidemux/ADM_ocr/adm_leftturn.cpp
 ./avidemux/ADM_ocr/adm_ocr.cpp
 ./avidemux/ADM_ocr/ADM_vob2vobsub.cpp
-./avidemux/MPlayer_pp/ADM_mp.cpp
 ./avidemux/ADM_avsproxy/ADM_avsproxy_net.cpp
 ./avidemux/ADM_avsproxy/ADM_avsproxy.cpp
 ./avidemux/gui_savenew.cpp
 ./avidemux/guiplay.cpp
 ./avidemux/callbacks.cpp
+./avidemux/ADM_libswscale/ADM_mp.cpp
 ./avidemux/ADM_matroska/ADM_mkv.cpp
 ./avidemux/ADM_matroska/ADM_mkv_audio.cpp
 ./avidemux/ADM_asf/ADM_asfChunk.cpp

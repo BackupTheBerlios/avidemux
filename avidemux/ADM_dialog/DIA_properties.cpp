@@ -44,7 +44,7 @@ void DIA_properties( void )
  GtkWidget *dialog;
  uint8_t gmc, qpel,vop;
  uint32_t info=0;
- char *yesno[2]={" No"," Yes"};
+ char *yesno[2]={_(" No"),_(" Yes")};
  uint32_t war,har;
 
     if (playing)
@@ -138,7 +138,7 @@ void DIA_properties( void )
                 if(currentaudiostream->isVBR() ) CHECK_SET(checkbutton_vbr,1);
         } else
           {
-              sprintf(text, "NONE");
+              sprintf(text, _("NONE"));
                 FILL_ENTRY(label_fq);
                 FILL_ENTRY(label1_audiomode);
                 FILL_ENTRY(label_bitrate);

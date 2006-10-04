@@ -513,7 +513,7 @@ uint8_t         initFileSelector(void)
 
        
         filter_image=gtk_file_filter_new();
-        gtk_file_filter_set_name(filter_image,"Images");
+        gtk_file_filter_set_name(filter_image,_("Images"));
         ADD_PAT(filter_image,png);
         ADD_PAT(filter_image,bmp);
         ADD_PAT(filter_image,jpg);
@@ -525,7 +525,7 @@ uint8_t         initFileSelector(void)
 
         
         filter_all=gtk_file_filter_new();
-        gtk_file_filter_set_name(filter_all,"All");
+        gtk_file_filter_set_name(filter_all,_("All"));
         gtk_file_filter_add_pattern (filter_all, "*");
 
         return 1;
