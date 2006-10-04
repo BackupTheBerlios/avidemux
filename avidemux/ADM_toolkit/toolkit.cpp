@@ -238,21 +238,21 @@ void UI_purge( void )
 			      }
 
 }
-uint64_t swap64(uint64_t in)
+uint64_t ADM_swap64(uint64_t in)
 {
 uint32_t low,high;
 uint64_t out;
 	high=in>>32;
 	low=in&0xffffffff;
-	high=swap32(high);
-	low=swap32(low);
+	high=ADM_swap32(high);
+	low=ADM_swap32(low);
 	out=low;
 	out=(out<<32)+high;
 	return out;
 
 }
 // swap BE/LE : Ugly
-uint32_t swap32( uint32_t in)
+uint32_t ADM_swap32( uint32_t in)
 {
 	uint8_t r[4],u;
 	memcpy(&r[0],&in,4);
@@ -266,7 +266,7 @@ uint32_t swap32( uint32_t in)
 	return in;
 }
 // swap BE/LE : Ugly
-uint16_t swap16( uint16_t in)
+uint16_t ADM_swap16( uint16_t in)
 {
 	return ( (in>>8) & 0xff) + ( (in&0xff)<<8);
 }
