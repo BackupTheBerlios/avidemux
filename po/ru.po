@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-10-04 22:09+0300\n"
-"PO-Revision-Date: 2006-10-04 22:22+0300\n"
+"PO-Revision-Date: 2006-10-05 10:42+0300\n"
 "Last-Translator: Mihail Zenkov <kreator@tut.by>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -162,7 +162,7 @@ msgstr ""
 #: avidemux/ADM_dialog/DIA_coloryuv.cpp:200
 #: avidemux/ADM_dialog/DIA_audio.cpp:327
 msgid "Gain"
-msgstr "Усиление"
+msgstr "Уровень"
 
 #: avidemux/ADM_dialog/DIA_coloryuv.cpp:207
 msgid "Luma Y"
@@ -1635,7 +1635,7 @@ msgstr "Вручную (dB) :"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:357
 msgid "<b>Gain</b>"
-msgstr "<b>Усиление</b>"
+msgstr "<b>Уровень</b>"
 
 #: avidemux/ADM_dialog/DIA_audio.cpp:369
 msgid "No change"
