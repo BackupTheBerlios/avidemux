@@ -72,11 +72,10 @@ static targetFmt VCD={352, 352, 288, 240};
 static targetFmt SVCD={480, 720, 576, 480};
 static targetFmt DVD={720, 720, 576, 480};
 static targetFmt DVDHD1={352, 720, 576, 480};
-static targetFmt PSP={320, 320, 240, 240};
+static targetFmt PSP={368, 368, 208, 208};
 targetFmt *allFormats[5]={&VCD,&SVCD,&DVD,&DVDHD1,&PSP};
 extern AVDMGenericVideoStream *createResampleFps(AVDMGenericVideoStream *in,uint32_t targetfps1000);
 #define ARME(x) format=RESWIZ_##x;
-
 
 uint8_t setVCD (void)
 {

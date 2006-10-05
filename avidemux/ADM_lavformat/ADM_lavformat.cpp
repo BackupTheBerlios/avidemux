@@ -270,7 +270,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 			c->frame_rate_base = 1001;	
 			break;
 */
-                        if(_type==MUXER_MP4)
+                        if(_type==MUXER_MP4 || _type==MUXER_PSP)
                         {
                                  c->time_base= (AVRational){1001,24000};
                                 break;
@@ -281,7 +281,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 			//c->frame_rate_base = 1001;	
 			break;
 		default:
-                        if(_type==MUXER_MP4)
+                        if(_type==MUXER_MP4 || _type==MUXER_PSP)
                         {
                                 c->time_base= (AVRational){1000,_fps1000};
                                 break;
@@ -353,6 +353,7 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 //----------------------
 	switch(_type)
 	{
+                case MUXER_PSP:
                 case MUXER_MP4:
                         oc->mux_rate=10080*1000; // Needed ?
                         break;
@@ -507,7 +508,7 @@ double p,d;
         pkt.data= bitstream->data;
         pkt.size= bitstream->len;
 	// Look if it is a gop start or seq start
-        if(_type==MUXER_MP4)
+        if(_type==MUXER_MP4 || _type==MUXER_PSP)
         {
             if(bitstream->flags & AVI_KEY_FRAME) 
                         pkt.flags |= PKT_FLAG_KEY;

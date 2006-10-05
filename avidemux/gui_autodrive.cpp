@@ -53,7 +53,7 @@ uint8_t A_autoDrive(Action action)
         }
 
       
-        
+#define PSP_AUDIO_FQ 24000        
         switch(action)
         {
                 case ACT_AUTO_PSP:
@@ -72,7 +72,7 @@ uint8_t A_autoDrive(Action action)
                     // Set mode & bitrate 
                     setVideoEncoderSettings(COMPRESS_CBR,768,0,NULL);
                     // Audio Codec
-                    if((currentaudiostream->getInfo()->frequency==44100)&&
+                    if((currentaudiostream->getInfo()->frequency==PSP_AUDIO_FQ)&&
                         (currentaudiostream->getInfo()->channels==2)&&
                         (currentaudiostream->getInfo()->encoding==WAV_AAC))
                     {
@@ -86,11 +86,11 @@ uint8_t A_autoDrive(Action action)
                           GUI_Error_HIG(_("Codec Error"),_( "You don't have FAAC!.\nIt is needed to create PSP compatible video."));
 #endif
                                     // ? Needed ?
-                          if(currentaudiostream->getInfo()->frequency!=44100)
+                          if(currentaudiostream->getInfo()->frequency!=PSP_AUDIO_FQ)
                           {
-                              audioFilterResample(44100);
+                              audioFilterResample(PSP_AUDIO_FQ);
                           }
-                          audioFilter_SetBitrate(128);
+                          audioFilter_SetBitrate(64);
                       }
                                 break;
                 case ACT_AUTO_VCD:
