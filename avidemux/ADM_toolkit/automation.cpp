@@ -144,7 +144,7 @@ typedef struct AUTOMATON
 
 AUTOMATON reaction_table[]=
 {	
-                {"gui",		        0,"don't be in silent mode",		(one_arg_type)GUI_Verbose}   ,
+                {"nogui",               0,"Run in silent mode",		(one_arg_type)GUI_Quiet}   ,
 		{"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
 		{"run",			1,"load and run a script",		(one_arg_type)A_parseECMAScript},
 		{"audio-normalize",	1,"activate normalization",		call_normalize},
@@ -231,7 +231,7 @@ static int index;
 			argc=global_argc;
 			ADM_usleep(100000); // let gtk start
                         gdk_threads_enter();
-			GUI_Quiet();
+			
 			printf("\n *** Automated : %d entries*************\n",NB_AUTO);
 			// we need to process
 			argc-=1;
