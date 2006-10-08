@@ -25,7 +25,7 @@ int CDirectorySearch::_findnext(unsigned long int hDir,_finddata_t *pfdData)
 	if(!pEntry)
 		return -1;
 	std::string sFilePath = "";
-#ifdef __linux__
+#if defined( __linux__) || defined(__maxosx__)
 	strncpy(pfdData->name,pEntry->d_name,pEntry->d_reclen);
 	// append NULL terminator
 	pfdData->name[pEntry->d_reclen] = '\0';

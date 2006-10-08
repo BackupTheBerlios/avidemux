@@ -323,14 +323,14 @@ JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 
         enterLock();
 	// clear file descriptor table of forked process and fork
-#ifdef __linux__
+#if defined( __linux__) || defined(__maxosx__)
 	pid_t pidRtn = fork();
 #elif __FreeBSD__
 	pid_t pidRtn = rfork(RFPROC|RFCFDG);
 #endif
 	if(pidRtn == 0)
 	{// begin child process
-#ifdef __linux__
+#if defined( __linux__) || defined(__maxosx__)
 		close(STDIN_FILENO);
 		close(STDOUT_FILENO);
 		close(STDERR_FILENO);

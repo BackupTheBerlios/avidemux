@@ -77,6 +77,15 @@ OSStatus OverloadListenerProc(	AudioDeviceID			inDevice,
 //
 //_______________________________________________
 
+uint8_t coreAudioDevice::setVolume(int volume)
+{
+	//TODO
+}
+
+//_______________________________________________
+//
+//_______________________________________________
+
 coreAudioDevice::coreAudioDevice(void) 
 {
 	printf("Creating Darwin coreAudio device\n");
