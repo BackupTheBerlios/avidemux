@@ -37,6 +37,7 @@
 #include "ADM_gui2/support.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
+#include "ADM_toolkit/toolkit.hxx"
 
 #include "DIA_busy.h"
 
@@ -48,25 +49,17 @@ extern void UI_NormalCursor( void );
 
 gint on_destroy_abort(GtkObject * object, gpointer user_data)
 {
-	UNUSED_ARG(object);
-	UNUSED_ARG(user_data);
-	return TRUE;
+      UNUSED_ARG(object);
+      UNUSED_ARG(user_data);
+      return TRUE;
 
 };
 
 void DIA_StartBusy( void )
 {
+
 	UI_BusyCursor();
-#if 0	
-	busy=create_dialog1();
-	gtk_window_set_modal(GTK_WINDOW(busy), 1);
-	gtk_transient(busy);
-      // somehow prevent the window from being erased..
-	gtk_signal_connect(GTK_OBJECT(busy), "delete_event",
-		       GTK_SIGNAL_FUNC(on_destroy_abort), (void *) NULL);
-	gtk_widget_show(busy);
-#endif		
-	UI_purge();
+        UI_purge();
 
 	
 }
@@ -74,20 +67,45 @@ void DIA_StartBusy( void )
 void DIA_StopBusy( void )
 {
 	UI_NormalCursor();
-#if 0	
-	if(busy)
-	{
-		gtk_widget_destroy(busy);
-		busy=NULL;
-	}
-	else
-	{
-		printf("\n Busy was not null ???\n");
-	}
-
-#endif
 }
 
+
+void DIA_StartBusyDialog( void )
+{
+        
+        busy=create_dialog1();
+        gtk_signal_connect(GTK_OBJECT(busy), "delete_event",
+                      GTK_SIGNAL_FUNC(on_destroy_abort), (void *) NULL);
+        gtk_register_dialog(busy);
+        gtk_widget_show(busy);
+        
+        UI_purge();
+        
+        ADM_usleep(500);
+	
+}
+
+void DIA_StopBusyDialog( void )
+{
+        if(busy)
+        {
+                
+                gtk_unregister_dialog(busy);
+                gtk_widget_destroy(busy);
+                
+                busy=NULL;
+        }
+        else
+        {
+                printf("\n Busy was null ???\n");
+        }
+
+}
+
+void DIA_runBusy( void )
+{
+  UI_purge();
+}
 
 
 GtkWidget*

@@ -348,7 +348,7 @@
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobuttonGainManualPIN), radiobuttonGainAutoPIN_group);
     radiobuttonGainAutoPIN_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobuttonGainManualPIN));
 
-    spinbutton1_adj = gtk_adjustment_new (-6, -6, 6, 0.10000000149, 1, 1);
+    spinbutton1_adj = gtk_adjustment_new (-20, -20, 20, 0.10000000149, 1, 1);
     spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 1);
     gtk_widget_show (spinbutton1);
     gtk_box_pack_start (GTK_BOX (hbox5), spinbutton1, TRUE, TRUE, 0);
