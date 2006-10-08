@@ -63,7 +63,8 @@ ADM_AudiocodecAC3::ADM_AudiocodecAC3( uint32_t fourcc, WAVHeader *info) :   ADM_
         ADM_assert(0);   
     }
         _downmix=0;
-	_wavHeader = info;
+      _wavHeader = info;
+      ADM_assert(_wavHeader);
 }
 
 ADM_AudiocodecAC3::~ADM_AudiocodecAC3( )

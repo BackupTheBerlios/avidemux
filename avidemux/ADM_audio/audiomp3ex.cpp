@@ -54,7 +54,7 @@ uint8_t AVDMMP3AudioStream::open(char *name)
     _length = ftell(fd);
     //
     //
-      _codec=getAudioCodec(_wavheader->encoding);
+      _codec=getAudioCodec(_wavheader->encoding,_wavheader);
      ADM_assert(_codec);
      _wavheader->blockalign=1;
     return 1;

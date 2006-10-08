@@ -35,7 +35,7 @@ class ADM_Audiocodec
 		virtual	uint8_t isDecompressable(void)=0;
  };
 
-ADM_Audiocodec	*getAudioCodec(uint32_t fourcc, WAVHeader *info=NULL, uint32_t extra=0, uint8_t *extraData=NULL);
+ADM_Audiocodec	*getAudioCodec(uint32_t fourcc, WAVHeader *info, uint32_t extra=0, uint8_t *extraData=NULL);
 
 class ADM_AudiocodecWav : public     ADM_Audiocodec
 {

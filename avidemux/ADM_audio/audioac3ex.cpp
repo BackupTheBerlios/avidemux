@@ -70,7 +70,7 @@ uint32_t syncoff;
     //
     //
 
-       _codec=getAudioCodec(WAV_AC3);
+       _codec=getAudioCodec(WAV_AC3,_wavheader);
      ADM_assert(_codec);
     return 1;
 

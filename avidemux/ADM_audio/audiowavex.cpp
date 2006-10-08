@@ -106,7 +106,7 @@ uint8_t AVDMWavAudioStream::open(char *name)
     _offset = ftell(fd);
     printf("\n %lu offset \n", _offset);
     _wavheader->blockalign=1;
-     _codec=getAudioCodec(WAV_PCM);
+     _codec=getAudioCodec(WAV_PCM,_wavheader);
      ADM_assert(_codec);
     return 1;
   drop:
