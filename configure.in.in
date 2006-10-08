@@ -833,19 +833,25 @@ AC_MSG_CHECKING(spidermonkey engine )
 CPPFLAGS="$CPPFLAGS $SMONKEY_CFLAGS"
 AC_CHECK_HEADER(jsapi.h,,have_sm=no)
 if test "x$have_sm" = "xyes"; then
-   AC_CHECK_LIB(js,JS_Init,,have_sm=no,-lm)
+   AC_CHECK_LIB(js,JS_SuspendRequest,,have_sm=no,-lm)
    if test "x$have_sm" = "xno"; then
 	have_sm="yes"
-     	AC_CHECK_LIB(smjs,JS_Init,,have_sm=no,-lm)
+     	AC_CHECK_LIB(smjs,JS_SuspendRequest,,have_sm=no,-lm)
         if test "x$have_sm" = "xno"; then
              dnl fedora core 3 - firefox/thunderbird/mozilla have this lib
              have_sm="yes"
-             AC_CHECK_LIB(mozjs,JS_Init,,have_sm=no,)
+             AC_CHECK_LIB(mozjs,JS_SuspendRequest,,have_sm=no,)
         fi
    fi
 fi
 if test "x$have_sm" = "xno"; then
-	AC_MSG_ERROR([*** SPIDERMONKEY javascript engine not found !***])
+    	AC_MSG_WARN(I did not find a working copy of jsapi.h and the associated library.)
+    	AC_MSG_WARN(<1>- Not reachable : Make sure you have spidermonkey installed)
+    	AC_MSG_WARN(Then use --with-jsapi-include=/path/to/jsapi.h/)
+    	AC_MSG_WARN(<2>- Make sure the library is in your LD_LIBRARY_PATH and/or LDFLAGS)
+    	AC_MSG_WARN(<3>- Make sure multithreading is enabled in your spidermonkey)
+	AC_MSG_WARN(The ones from mozilla-dev or firefox-dev are ok)
+	AC_MSG_ERROR([*** Working SPIDERMONKEY javascript engine not found !***])
 fi
 CPPFLAGS=$old_flags
 dnl ________/SPIDERMONKEY__________
