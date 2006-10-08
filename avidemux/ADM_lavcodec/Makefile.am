@@ -28,15 +28,12 @@ EXTEND_PPC=ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c ppc/dsputil_altivec.c \
 	ppc/idct_altivec.c \
 	ppc/fdct_altivec.c \
 	ppc/dsputil_h264_altivec.c \
-	ppc/mpegvideo_altivec.c
+	ppc/mpegvideo_altivec.c \
+	ppc/snow_altivec.c
 
 else
 
-if BUILD_PPC
-EXTEND_PPC=ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c 
-else
 EXTEND_PPC=
-endif
 
 endif
 EXTEND_AMR=	amr_float/interf_dec.c amr_float/sp_dec.c \
