@@ -36,7 +36,23 @@
 #include "audiofilter_dolby.h"
 
 #include "ADM_audio/aviaudio.hxx"
+//#include "ADM_dialog/DIA_busy.h" //CANNOT USE IT! We are in another thread!
+
 extern AVDMGenericAudioStream *currentaudiostream;
+
+
+#ifndef CYG_MANGLING
+#ifdef ADM_BSD_FAMILY
+                #define POW10(x) powf(10.0,x)
+#else
+                #define POW10(x)  pow10f(x)
+#endif
+#else
+                #define POW10(x)   pow(10,x)
+#endif
+
+#define LINEAR_TO_DB(x) (20.*log10(x))
+#define DB_TO_LINEAR(x) (POW10((x/20.)))
 
 // Ctor
 //__________
@@ -51,16 +67,8 @@ AUDMAudioFilterNormalize::AUDMAudioFilterNormalize(AUDMAudioFilter * instream,GA
     case ADM_GAIN_AUTOMATIC: _ratio=1;_scanned=0;printf("[Gain] Automatic gain\n");break;
     case ADM_GAIN_MANUAL: 
                 _scanned=1;
-                db_out =  param->gain10/100.0; // Dbout is in DB (!)
-#ifndef CYG_MANGLING
-#ifdef ADM_BSD_FAMILY
-		_ratio = powf(10.0,db_out);
-#else
-                _ratio = pow10f(db_out);
-#endif
-#else
-		_ratio= pow(10,db_out);
-#endif
+                db_out =  param->gain10/10.0; // Dbout is in 10*DB (!)
+                _ratio = DB_TO_LINEAR(db_out);
                 printf("[Gain] %f db (p=%d)\n", (float)(param->gain10)/10.,param->gain10);
                 printf("[Gain] Linear ratio of : %03.3f\n", _ratio);
   }
@@ -92,7 +100,6 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
 
     llength=_length ;
     
-//       DIA_working *windowWorking=new DIA_working(_("Normalize : Scanning"));
 
       for(int i=0;i<_wavHeader.channels;i++) max[i]=0;
       while (1)
@@ -114,6 +121,8 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
           
           int index=0;
           float current;
+          
+        //  printf("*\n");
           int sample= ready /_wavHeader.channels;
           for(int j=0;j<sample;j++)
             for(int chan=0;chan<_wavHeader.channels;chan++)
@@ -121,47 +130,37 @@ uint8_t AUDMAudioFilterNormalize::preprocess(void)
             current=fabs(_incomingBuffer[index++]);
             if(current>max[chan]) max[chan]=current;
           }
-// 	  if(!windowWorking->isAlive() )
-//     	  {
-//     	    // cannot be aborted
-//             delete windowWorking;
-//             windowWorking=new DIA_working(_("Normalize : Scanning"));
-//           }
           scanned+=ready;
-          if(scanned<llength)
-          {
-//             windowWorking->update(scanned,llength);
-          //  printf("%u / %u\n",scanned,llength);
-          }
       }
-//     delete windowWorking;
+      
+      
+      
 
     _previous->rewind();
     float mx=0;
     for(int chan=0;chan<_wavHeader.channels;chan++)
     {
         if(max[chan]>mx) mx=max[chan];
-        printf("\n maximum found for channel %d : %f\n", chan,max[chan]);
+        printf("[Normalize] maximum found for channel %d : %f\n", chan,max[chan]);
     }
-    double db_in, db_out;
-    db_out =  -3;
-    db_in = mx;
-    if (db_in>0.001)
-	db_in = 20 / log(10) * log(db_in);
+    printf("[Normalize] Using : %0.4f as max value \n", mx);
+    double db_in, db_out=-3;
+
+    if (mx>0.001)
+      db_in = LINEAR_TO_DB(mx);
     else
-	db_in = 0;
+      db_in = -20; // We consider -20 DB to be noise
 
     printf("--> %2.2f db / %2.2f \n", db_in, db_out);
 
     // search ratio
     _ratio=1;
-    if(mx)
-    {
 
-    _ratio = expf(db_out * (1.0 / (20.0 / logf(10.0))));
-    _ratio = _ratio / mx;
+    float db_delta=db_out-db_in;
+    printf("[Normalize]Gain %f dB\n",db_delta);
+    _ratio = DB_TO_LINEAR(db_delta);
     printf("\n Using ratio of : %f\n", _ratio);
-     }
+
     _scanned = 1;
     DolbySkip(0);
     _previous->rewind();
