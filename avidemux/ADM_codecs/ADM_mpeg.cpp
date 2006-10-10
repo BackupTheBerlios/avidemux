@@ -205,8 +205,10 @@ uint8_t
   mpeg2_cleanup (MPEG2DEC);
   info = mpeg2_info (MPEG2DEC);
 
-  par_width = info->sequence->pixel_width;
-  par_height = info->sequence->pixel_height;
+  if (info->sequence) {
+    par_width = info->sequence->pixel_width;
+    par_height = info->sequence->pixel_height;
+  }
 
   aprintf("Mpeg  %u * %u\n",par_width,par_height);
   out->_noPicture = 0;		// For mpeg1/2 we ALWAYS have a picture
