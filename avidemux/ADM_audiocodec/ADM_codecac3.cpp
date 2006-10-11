@@ -126,8 +126,31 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
 				*(p_ch_type++) = CH_MONO;
 			break;
 			case A52_STEREO:
+			case A52_DOLBY:
 				*(p_ch_type++) = CH_FRONT_LEFT;
 				*(p_ch_type++) = CH_FRONT_RIGHT;
+			break;
+			case A52_3F:
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_CENTER;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+			break;
+			case A52_2F1R:
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+				*(p_ch_type++) = CH_REAR_CENTER;
+			break;
+			case A52_3F1R:
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_CENTER;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+				*(p_ch_type++) = CH_REAR_CENTER;
+			break;
+			case A52_2F2R:
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+				*(p_ch_type++) = CH_REAR_LEFT;
+				*(p_ch_type++) = CH_REAR_RIGHT;
 			break;
 			case A52_3F2R:
 				*(p_ch_type++) = CH_FRONT_LEFT;

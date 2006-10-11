@@ -119,8 +119,31 @@ uint8_t ADM_AudiocodecDCA::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uin
 				*(p_ch_type++) = CH_MONO;
 			break;
 			case DTS_STEREO:
+			case DTS_DOLBY:
 				*(p_ch_type++) = CH_FRONT_LEFT;
 				*(p_ch_type++) = CH_FRONT_RIGHT;
+			break;
+			case DTS_3F:
+				*(p_ch_type++) = CH_FRONT_CENTER;
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+			break;
+			case DTS_2F1R:
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+				*(p_ch_type++) = CH_REAR_CENTER;
+			break;
+			case DTS_3F1R:
+				*(p_ch_type++) = CH_FRONT_CENTER;
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+				*(p_ch_type++) = CH_REAR_CENTER;
+			break;
+			case DTS_2F2R:
+				*(p_ch_type++) = CH_FRONT_LEFT;
+				*(p_ch_type++) = CH_FRONT_RIGHT;
+				*(p_ch_type++) = CH_REAR_LEFT;
+				*(p_ch_type++) = CH_REAR_RIGHT;
 			break;
 			case DTS_3F2R:
 				*(p_ch_type++) = CH_FRONT_CENTER;
