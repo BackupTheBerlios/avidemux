@@ -224,6 +224,8 @@ void GUI_NextPrevBlackFrame(int dir)
    uint32_t f;
    uint32_t flags;
    uint16_t reresh_count=0;
+   uint32_t orgFrame;
+   uint32_t r=1; 
 
     if (playing)
 		return;
@@ -233,21 +235,25 @@ void GUI_NextPrevBlackFrame(int dir)
    const int darkness=40;
 
    DIA_working *work=new DIA_working("Seeking");
+   orgFrame=curframe;
    while(1)
    {
 
-   	f=curframe+dir;
-   	if(work->update(1)) break;
+      f=curframe+dir;
+      if(work->update(f,avifileinfo->nb_frames)) break;
 
-	if((f==0 && dir==-1)|| (f==avifileinfo->nb_frames-1&&dir==1)) break;
+      if((f==0 && dir==-1)|| (f==avifileinfo->nb_frames-1&&dir==1)) break;
 
      if( !video_body->getUncompressedFrame(f ,rdr_decomp_buffer,&flags))
        {
-       		curframe=0;
-		video_body->getUncompressedFrame(0 ,rdr_decomp_buffer);
-		break;
+          r=0;
+          break;
        }
-
+    if(!work->isAlive())
+    {
+          r=0;
+          break;
+    }
         curframe=f;
 
         if(!fastIsNotBlack(darkness)) break;
@@ -259,6 +265,11 @@ void GUI_NextPrevBlackFrame(int dir)
         }       
    }
    delete work;
+   if(!r)
+   {
+      curframe=orgFrame;
+      video_body->getUncompressedFrame(orgFrame ,rdr_decomp_buffer);
+   }
    renderUpdateImage(rdr_decomp_buffer->data);
    if(mode_preview)
 	 editorUpdatePreview( curframe)     ;
