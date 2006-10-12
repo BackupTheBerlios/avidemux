@@ -76,7 +76,7 @@ nuvAudio::nuvAudio(nuvIndex *idx, uint32_t nbchunk, FILE * fd,uint32_t fq,mythHe
 	_wavheader->bitspersample=hdr->audio_bits_per_sample;;
 	_wavheader->frequency=hdr->audio_sample_rate;
 	_wavheader->channels=hdr->audio_channels;;
-	_wavheader->encoding=0xff; // ??	
+	_wavheader->encoding=WAV_MP3; // ??	
 	_wavheader->byterate=16000;
 
 	}

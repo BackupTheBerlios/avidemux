@@ -493,6 +493,7 @@ uint32_t rcount=0;
 		if(fourCC::check((uint8_t *)head->finfo,(uint8_t *)"Myth"))
 		{
 			_isMyth=1;
+                        printf("IsMyth : yes\n");
 
 		}
 		Dump();
@@ -1313,8 +1314,8 @@ FILE *fd;
 	fscanf(fd,"wh: %" SCNu32 " %" SCNu32 "\n",&w,&h ); // mark it as a avidemux index
 	fscanf(fd,"fps: %" SCNu32 "\n",&fps );
 	fscanf(fd,"Lzo Pos:%" SCNu64 "\n",&_lzo_pos);
-	fscanf(fd,"Lzo Size:%" SCNu64 "\n",&_lzo_size);
-	fgets(str,1000,fd);
+	fscanf(fd,"Lzo Size:%" SCNu64 "\n\n",&_lzo_size);
+	
 	fscanf(fd,"Myth:%"SCNu8"\n",&_isMyth);
 	fscanf(fd,"Xvid:%"SCNu8"\n",&_isXvid);
 	fscanf(fd,"FFV1:%"SCNu8"\n",&_isFFV1);
@@ -1472,7 +1473,16 @@ FILE *fd;
 				);
 				_audioIndex[j]._compression = compress;
 		}
-		_audioTrack=new nuvAudio(_audioIndex,nbc,_fd,_audio_frequency,NULL);
+                // Build a fake audio header...
+                mythHeader hdr;
+                memset(&hdr,0,sizeof(hdr));
+                if(_isPCM) hdr.audio_fourcc=fourCC::get((uint8_t *)"RAWA");
+                  else     hdr.audio_fourcc=WAV_MP3;
+                hdr.audio_bits_per_sample=16;;
+                hdr.audio_sample_rate=_audio_frequency; 
+                hdr.audio_channels=2;;
+                //
+		_audioTrack=new nuvAudio(_audioIndex,nbc,_fd,_audio_frequency,&hdr);
 		_isaudiopresent=1;
 		_isvideopresent=1;
 		_max=DXFIELD(width)*DXFIELD(height);
