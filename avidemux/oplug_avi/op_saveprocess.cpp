@@ -210,6 +210,7 @@ _mainaviheader.dwMicroSecPerFrame=0;
     	}
   aprintf("Setup video done\n");
   bitstream.data=vbuffer;
+  bitstream.bufferSize=MAXIMUM_SIZE * MAXIMUM_SIZE * 3;
   return 1;
   //---------------------
 }
