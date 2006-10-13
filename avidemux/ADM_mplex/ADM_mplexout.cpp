@@ -94,6 +94,7 @@ IFileBitStream::~IFileBitStream()
 uint32_t s,z;
         if(!queue->Pop(buf,&z,&s)) return 0;
       ADM_assert(z);
+      ADM_assert(z<=number);
         return z;
  }
  //EOF

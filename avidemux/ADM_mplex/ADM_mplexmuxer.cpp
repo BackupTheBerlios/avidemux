@@ -321,8 +321,27 @@ uint16_t a1,a2,a3,a4,ff;
                kind_of_slaveThread_problem_rc = DIA_quota(kind_of_slaveThread_problem);
                cond_slaveThread_problem->wakeup();
          }
-        r= channelvideo->Push(bitstream->data,bitstream->len,0);
-        
+        // Check for overflow
+        // Should not happen on audio
+#warning the value is set also in mplex as BitStreamBuffering::BUFFER_SIZE
+#define INPUT_MAX_BLOCK (64*1024-1)
+        uint8_t *ptr=bitstream->data;
+        uint32_t len=bitstream->len;
+
+        while(len)
+        {
+          if(len>INPUT_MAX_BLOCK)
+          {
+              channelvideo->Push(ptr,INPUT_MAX_BLOCK,0);
+              len-=INPUT_MAX_BLOCK;
+              ptr+=INPUT_MAX_BLOCK;
+          }
+          else
+          {
+            channelvideo->Push(ptr,len,0);
+            len=0;
+          }
+        }
         return 1;
 }
 //___________________________________________________________________________
