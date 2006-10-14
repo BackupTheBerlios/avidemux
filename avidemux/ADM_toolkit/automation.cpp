@@ -114,6 +114,7 @@ uint8_t scriptAddVar(char *var,char *value);
 extern uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo);
 //
 static int call_bframe(void);
+static int call_x264(void);
 static int call_packedvop(void);
 static int set_output_format(const char *str);
 static void set_reuse_2pass_log(char *p);
@@ -172,6 +173,7 @@ AUTOMATON reaction_table[]=
 		{"save-workbench",	1,"save workbench file",		(one_arg_type)A_saveWorkbench},
 		
 		{"force-b-frame",	0,"Force detection of bframe in next loaded file", (one_arg_type)call_bframe},
+                {"force-alt-h264",	0,"Force use of alternate read mode for h264", (one_arg_type)call_x264},
 		{"force-unpack",	0,"Force detection of packed vop in next loaded file"
 								,(one_arg_type)call_packedvop},
 		
@@ -549,6 +551,11 @@ void show_info(char *p){
 int call_bframe(void)
 {
 	video_body->setEnv(ENV_EDITOR_BFRAME);
+	return 1;
+}
+int call_x264(void)
+{
+	video_body->setEnv(ENV_EDITOR_X264);
 	return 1;
 }
 
