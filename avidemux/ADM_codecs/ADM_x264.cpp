@@ -321,8 +321,11 @@ uint8_t
 #if X264_BUILD >=48
   param.rc.i_rc_method=X264_RC_CRF;
 #endif
-
+#if X264_BUILD <54
   param.rc.i_rf_constant = val;
+#else
+  param.rc.f_rf_constant = val;
+#endif
   // should be ~ the same as CQ mode (?)
   return preamble (fps1000, &admParam);
 }
