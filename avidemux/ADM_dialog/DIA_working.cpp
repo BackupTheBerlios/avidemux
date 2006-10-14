@@ -127,17 +127,25 @@ uint8_t DIA_working::update(uint32_t percent)
 {
 	#define  GUI_UPDATE_RATE 1000
 
-		if(!_priv) return 1;
-		if(!percent) return 0;
-		if(percent==lastper) return 0;
-		aprintf("DIA_working::update(%lu) called\n", percent);
-		elapsed=_clock.getElapsedMS();
-	if(elapsed<_nextUpdate) return 0;
-	_nextUpdate=elapsed+1000;
-		lastper=percent;
-
-	GtkWidget *dialog;
-	dialog=(GtkWidget *)_priv;
+                if(!_priv) return 1;
+                if(!percent) return 0;
+                if(percent==lastper)
+                {
+                   UI_purge();
+                   return 0;
+                }
+                aprintf("DIA_working::update(%lu) called\n", percent);
+                elapsed=_clock.getElapsedMS();
+                if(elapsed<_nextUpdate) 
+                {
+                  UI_purge();
+                  return 0;
+                }
+                _nextUpdate=elapsed+1000;
+                lastper=percent;
+  
+        GtkWidget *dialog;
+        dialog=(GtkWidget *)_priv;
 
 		//
 		// 100/totalMS=percent/elapsed
