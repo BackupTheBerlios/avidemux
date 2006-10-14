@@ -78,6 +78,9 @@ EncoderXvid4::configure (AVDMGenericVideoStream * instream)
   {
     encparam.par_width=instream->getPARWidth();
     encparam.par_height=instream->getPARHeight();
+  }else
+  {
+      printf("[xvid4]Using %u x %u aspect ratio\n",encparam.par_width,encparam.par_height);
   }
   
   //
