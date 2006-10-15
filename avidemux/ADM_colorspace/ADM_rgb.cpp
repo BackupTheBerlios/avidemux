@@ -303,9 +303,9 @@ void SwapMe(uint8_t *tgt,uint8_t *src,int nb)
        r=*src++;
        g=*src++;
        b=*src++;
-       *tgt++=b;
-       *tgt++=g;
        *tgt++=r;
+       *tgt++=g;
+       *tgt++=b;
        
    }
    return;
