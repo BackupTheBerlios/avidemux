@@ -145,6 +145,23 @@ void COL_init(void)
 			ddst[1]=ddst[2]=0;
 
 			sws_scale((SwsContext *)_context,srd,ssrc,0,h,dst,ddst);
+#if  defined( ADM_BIG_ENDIAN)
+        uint8_t r,g,b,a;
+        uint8_t *ptr=target;
+        int pel=h*w;
+        for(int yy=0;yy<pel;yy++)
+        {
+              r=ptr[0];
+              g=ptr[1];
+              b=ptr[2];
+              a=ptr[3];
+              ptr[0]=a;
+              ptr[1]=b;
+              ptr[2]=g;
+              ptr[3]=r;
+              ptr+=4;
+        }
+#endif
      
         return 1;
  }
