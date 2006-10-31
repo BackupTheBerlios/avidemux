@@ -28,10 +28,9 @@ Split a stream into packet(s)
 #include <io.h>
 #endif
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_editor/ADM_Video.h"
-#include "ADM_library/fourcc.h"
-#include "ADM_openDML/ADM_openDML.h"
+#include "fourcc.h"
 #include "aviaudio.hxx"
 
 #include "ADM_audio/ADM_a52info.h"

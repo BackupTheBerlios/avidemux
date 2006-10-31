@@ -1,7 +1,7 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
 noinst_LIBRARIES = libADM_audio.a
 
-INCLUDES = $(all_includes)
+INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities
 
 libADM_audio_a_METASOURCES = AUTO
 

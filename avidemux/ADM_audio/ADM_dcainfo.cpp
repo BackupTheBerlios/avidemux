@@ -12,13 +12,13 @@
 
 #include "config.h"
 #include <stdio.h>
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_audio/ADM_dcainfo.h"
 #include "ADM_assert.h"
 extern "C"
 {
-#include "common.h"
-#include "bswap.h"
+#include "ADM_lavutil/common.h"
+#include "ADM_lavutil/bswap.h"
 #include "ADM_lavcodec/bitstream.h"
 
 }

@@ -33,7 +33,17 @@
 #include "aviaudio.hxx"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_dialog/DIA_working.h"
+#warning FIXME
+#warning FIXME
+#warning FIXME
+#warning FIXME
+#warning FIXME
+#include "ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_working.h"
+#warning FIXME
+#warning FIXME
+#warning FIXME
+#warning FIXME
+#warning FIXME
 
 #include "ADM_audio/ADM_mp3info.h"
 

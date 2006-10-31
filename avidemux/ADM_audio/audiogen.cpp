@@ -32,7 +32,7 @@
 #include "avio.hxx"
 #include "fourcc.h"
 #include "aviaudio.hxx"
-#include "avilist.h"
+#include "ADM_outputs/oplug_avi/avilist.h"
 #include "ADM_audio/ADM_a52info.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
