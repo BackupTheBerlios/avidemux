@@ -1,0 +1,4 @@
+SUBDIRS=
+if ADM_UI_GTK
+ SUBDIRS += ADM_GTK
+endif
