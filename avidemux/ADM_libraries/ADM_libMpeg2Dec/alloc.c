@@ -25,7 +25,7 @@
 #include <inttypes.h>
 
 #include "mpeg2.h"
-#include "../ADM_assert.h"
+#include "../../ADM_assert.h"
 
 static void * (* malloc_hook) (unsigned size, mpeg2_alloc_t reason) = NULL;
 static int (* free_hook) (void * buf) = NULL;

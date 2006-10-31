@@ -35,7 +35,7 @@ extern "C"
 #undef realloc
 #undef free
 #include <ADM_assert.h>
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_audiofilter/audioprocess.hxx"

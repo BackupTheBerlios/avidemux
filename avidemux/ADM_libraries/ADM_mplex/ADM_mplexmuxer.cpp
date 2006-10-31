@@ -37,15 +37,15 @@
 #undef free
 #include <ADM_assert.h>
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audio/ADM_a52info.h"
 
 //#include "ADM_codecs/ADM_codec.h"
-#include "ADM_library/avifmt.h"
-#include "ADM_library/avifmt2.h"
+#include "avifmt.h"
+#include "avifmt2.h"
 #include "ADM_editor/ADM_Video.h"
 
 #include "ADM_lavformat/ADM_lavformat.h"

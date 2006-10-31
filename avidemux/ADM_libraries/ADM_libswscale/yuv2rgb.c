@@ -48,7 +48,7 @@
 #endif
 // MEANX
 #include "wrapper.h"
-#include "../admmangle.h"
+#include "../../admmangle.h"
 // /MEANX
 
 #define DITHER1XBPP // only for mmx

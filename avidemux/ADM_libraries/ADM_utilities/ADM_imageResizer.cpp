@@ -17,9 +17,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "ADM_assert.h"
-#include "ADM_library/default.h"
+#include "default.h"
 
-#include "ADM_library/ADM_image.h"
+#include "ADM_image.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))

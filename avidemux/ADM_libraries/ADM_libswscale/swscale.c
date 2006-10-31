@@ -79,7 +79,7 @@ untested special converters
 #include "rgb2rgb.h"
 // MEANX
 #include "wrapper.h"
-#include "../admmangle.h"
+#include "../../admmangle.h"
 // /MEANX
 #ifdef USE_FASTMEMCPY
 #include "libvo/fastmemcpy.h"

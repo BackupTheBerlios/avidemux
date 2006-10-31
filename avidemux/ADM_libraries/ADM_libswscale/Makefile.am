@@ -16,5 +16,5 @@ swscale.c yuv2rgb.c
 
 ####### kdevelop will overwrite this part!!! (end)############
 
-INCLUDES= $(all_includes)  -I../ADM_lavutil
+INCLUDES= $(all_includes)  -I../ADM_lavutil -I../ADM_utilities -I..
 noinst_HEADERS = 

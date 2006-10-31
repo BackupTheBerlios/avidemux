@@ -25,7 +25,7 @@
 #include <setjmp.h>
 #include "cpu_accel.h"
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 
 #if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)

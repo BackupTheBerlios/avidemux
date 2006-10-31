@@ -17,8 +17,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "ADM_assert.h"
-#include "ADM_library/default.h"
-#include "ADM_library/ADM_bitstream.h"
+#include "default.h"
+#include "ADM_bitstream.h"
 
 
 

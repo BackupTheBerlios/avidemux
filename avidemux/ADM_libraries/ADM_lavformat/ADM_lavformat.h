@@ -13,7 +13,7 @@
 //
 #ifndef ADM_LAVFORMAT_H
 #define ADM_LAVFORMAT_H
-#include "ADM_library/ADM_bitstream.h"
+#include "ADM_bitstream.h"
 typedef enum
 {
         MUXER_NONE=0,

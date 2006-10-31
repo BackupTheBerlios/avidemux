@@ -12,7 +12,7 @@
 #ifndef _TYPEDEF_H
 #define _TYPEDEF_H
 #include "config.h"
-#include "../../ADM_library/default.h"
+#include "../ADM_utilities/default.h"
 #if 0 //MEANX
 
 #else

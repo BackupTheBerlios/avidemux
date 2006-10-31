@@ -20,7 +20,7 @@
 #include <math.h>
 #include <pthread.h>
 #define WIN32_CLASH
-#include "ADM_library/default.h"
+#include "default.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
@@ -31,8 +31,15 @@
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 #include "ADM_encoder/adm_encoder.h"
-
-#include "ADM_dialog/DIA_encoding.h"
+#warning FIXME
+#warning FIXME
+#warning FIXME
+#warning FIXME
+#include "../../ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_encoding.h"
+#warning FIXME
+#warning FIXME
+#warning FIXME
+#warning FIXME
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 

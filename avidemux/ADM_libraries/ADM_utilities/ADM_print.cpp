@@ -11,7 +11,7 @@
 #include "math.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_library/ADM_image.h"
+#include "ADM_image.h"
 
 #include "ADM_print_priv.h"
 // Borrowed from decomb

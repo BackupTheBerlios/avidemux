@@ -20,11 +20,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <ADM_assert.h>
+#include "../../ADM_assert.h"
 
 #include "fourcc.h"
 #include "avio.hxx"
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
 extern "C" {
@@ -34,7 +34,7 @@ extern "C" {
 
 #include "ADM_lavutil/avutil.h"
 #include "../ADM_libswscale/swscale.h"
-#include "ADM_osSupport/ADM_cpuCap.h"
+#include "../../ADM_osSupport/ADM_cpuCap.h"
 
 #include "ADM_mp.h"
 
