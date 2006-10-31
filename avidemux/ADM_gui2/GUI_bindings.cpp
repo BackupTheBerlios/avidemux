@@ -28,8 +28,6 @@
 
 #include <ADM_assert.h>
 
-#include "interface.h"
-#include "support.h"
 #include "math.h"
 #include "default.h"
 #include "ADM_gui2/GUI_render.h"
