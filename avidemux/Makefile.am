@@ -8,26 +8,25 @@ libmpeg2enc_Altivec = ./mpeg2enc/altivec/libaltivec.la
 endif
 
 avidemux2_SOURCES =   guiplay.cpp  \
-	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp  avilist.cpp \
+	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp   \
 	main.cpp prefs.cpp ADM_pp.cpp \
 	gui_autodrive.cpp GUI_jobs.cpp
-#avidemux_LDADD   = ./ADM_library/libADM_library.a ./ADM_audio/libADM_audio.a ./ADM_audiocodec/libADM_audiocodec.a ./ADM_audiofilter/libADM_audiofilter.a ./ADM_codecs/libADM_codecs.a ./ADM_colorspace/libADM_colorspace.a ./ADM_editor/libADM_editor.a ./ADM_encoder/libADM_encoder.a ./ADM_filter/libADM_filter.a ../ADM_gui2/libADM_gui2.a /ADM_gui/libADM_gui.a ./ADM_inpics/libADM_inpics.a ./ADM_nuv/libADM_nuv.a ./ADM_toolkit/libADM_toolkit.a ./oplug_mpeg/liboplug_mpeg.a ./ADM_video/libADM_video.a ./oplug_avi/liboplug_avi.a ./ADM_audiodevice/libADM_audiodevice.a ./ADM_vp32/libADM_vp32.a ./ADM_mpeg2dec/libADM_mpeg2dec.a ./ADM_mpegindexer/libADM_mpegindexer.a ./libMpeg2Dec/liblibMpeg2Dec.a ./oplug_mpegFF/liboplug_mpegFF.a  -L/usr/X11R6/lib -lm -lXext -lX11
 
-SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
-	ADM_colorspace ADM_editor ADM_encoder ADM_filter  ADM_inpics ADM_nuv \
-	ADM_toolkit oplug_mpeg xpm ADM_video oplug_avi ADM_audiodevice ADM_vp32 \
-	libMpeg2Dec oplug_mpegFF ADM_h263 ADM_gui2 ADM_dialog \
-	ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame ADM_requant \
-	ADM_script oplug_ogm ADM_xvidratectl ADM_mplex ADM_ocr ADM_libswscale \
-	ADM_mpegdemuxer ADM_tray ADM_lavutil ADM_lavformat ADM_lavcodec oplug_mp4 \
-	ADM_avsproxy  ADM_liba52 ADM_libMad ADM_matroska ADM_asf ADM_osSupport
+SUBDIRS = ADM_libraries ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
+	ADM_colorspace ADM_editor ADM_encoder ADM_filter  \
+	ADM_toolkit oplug_mpeg xpm ADM_video ADM_audiodevice ADM_vp32 \
+	\
+	ADM_requant \
+	ADM_script ADM_ocr \
+	ADM_tray \
+	ADM_osSupport \
+	ADM_inputs ADM_outputs \
+	ADM_userInterfaces
+	
 
-if HAVE_FREETYPE
-SUBDIRS += libass
-endif
 
-EXTRA_DIST = ADM_assert.h    ADM_pp.h    avilist.cpp    gtkgui.h         prototype.h \
-avilist.h  gui_autodrive.cpp  main.cpp   \
+EXTRA_DIST = ADM_assert.h    ADM_pp.h    gtkgui.h         \
+h  gui_autodrive.cpp  main.cpp   \
 ADM_lavcodec.h  GUI_jobs.cpp      gui_navigate.cpp   \
 admmangle.h  \
 gui_savenew.cpp    prefs.cpp \
