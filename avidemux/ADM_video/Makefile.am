@@ -166,7 +166,8 @@ ADM_vidTdeint_util.txt ADM_vidASS.h ADM_vidASS.cpp \
 ADM_vidAss_Params.h mmx_macros.h
 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES= $(all_includes) $(FREETYPE_CFLAGS) $(ALTIVEC_SWITCH)
+INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil \
+			 $(FREETYPE_CFLAGS) $(ALTIVEC_SWITCH) -I../ADM_userInterfaces/ADM_GTK
 noinst_HEADERS = ADM_vidlavdeint.h ADM_mpdetc.h ADM_vidKernelDeint.h \
 					ADM_vidForcedPP.h ADM_vidSoften.h ADM_cache.h ADM_vidDecTel_param.h ADM_vidDecDec_param.h \
 					ADM_vidMSmooth_param.h ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \

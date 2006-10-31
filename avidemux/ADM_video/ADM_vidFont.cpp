@@ -20,7 +20,7 @@
 #include <string.h> // thanks !
 #include "config.h"
 #include <errno.h>
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 
  #ifdef USE_FREETYPE
 

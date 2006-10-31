@@ -35,7 +35,7 @@
 #include"ADM_video/ADM_vidAnimated.h"
 
 
-#include "ADM_inpics/ADM_pics.h"
+#include "ADM_inputs/ADM_inpics/ADM_pics.h"
 
 static FILTER_PARAM animated_template={10,
     {"tc0","tc1","tc2",

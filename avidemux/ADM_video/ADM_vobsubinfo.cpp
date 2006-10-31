@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ADM_assert.h>
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 #include "ADM_vobsubinfo.h"
 
 static uint8_t fillLine(char *str,VobSubInfo *sub,uint32_t line);

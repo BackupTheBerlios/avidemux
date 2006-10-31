@@ -36,7 +36,7 @@
 
 #define INT int32_t
 #include "ADM_video/ADM_confCouple.h"
-#include "ADM_library/ADM_image.h"
+#include "ADM_image.h"
 
 
 void GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal);

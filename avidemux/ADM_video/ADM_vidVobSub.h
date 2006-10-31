@@ -10,7 +10,7 @@
 
 #ifndef _VOBSUB_V_
 #define _VOBSUB_V_
-#include "ADM_mpegdemuxer/dmx_demuxerPS.h"
+#include "ADM_inputs/ADM_mpegdemuxer/dmx_demuxerPS.h"
 #define VS_MAXPACKET 128*1024
 
 #define NOSUB 0xffffffff
