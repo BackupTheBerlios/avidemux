@@ -30,11 +30,6 @@
 #include <sys/time.h>
 
 
-
-#include "callbacks.h"
-#include "interface.h"
-#include "support.h"
-
 #include "ADM_lavcodec.h"
 
 #include "fourcc.h"
@@ -45,10 +40,6 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
 #include "ADM_toolkit/bitmap.h"
-//#include "subchunk.h"
-//#include "avilist.h"
-
-
 
 
 #include "ADM_audio/aviaudio.hxx"
@@ -78,9 +69,10 @@
 
 #include "ADM_codecs/ADM_ffmpeg.h"
 
-#include "ADM_gui2/support.h"
-#include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
+
+#include "ADM_toolkit/ADM_gladeSupport.h"
+#include "ADM_toolkit/toolkit_gtk.h"
 
 static GtkWidget	*create_dialog1 (uint32_t max, float *value);
 
