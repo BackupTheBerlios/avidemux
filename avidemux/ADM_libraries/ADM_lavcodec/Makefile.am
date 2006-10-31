@@ -38,11 +38,12 @@ EXTEND_PPC=
 endif
 EXTEND_AMR=	amr_float/interf_dec.c amr_float/sp_dec.c \
 		amr_float/interf_enc.c amr_float/sp_enc.c
+MYCFLAGS= -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -Iamr_float -I../.. -I$(LAVUTIL)
 # for SSE we need special compil flags
 fft_sse.o:i386/fft_sse.c
-	$(CC) -o $@ $< -c $(CFLAGS) $(all_includes) -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -msse -I$(LAVUTIL) -I../..
+	$(CC) -o $@ $< -c $(MYCFLAGS) $(CFLAGS) $(all_includes) -I..   -msse -I$(LAVUTIL) -I../../..
 vp3dsp_sse2.o:i386/vp3dsp_sse2.c
-	$(CC) -o $@ $< -c  $(CFLAGS) $(all_includes) -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -msse -I$(LAVUTIL) -I../..
+	$(CC) -o $@ $< -c  $(MYCFLAGS) $(CFLAGS) $(all_includes) -I..  -msse -I$(LAVUTIL) -I../../..
 
 libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c $(EXTEND_AMR) \
 		adpcm.c 	allcodecs.c 	cyuv.c 	dsputil.c 	dv.c \
@@ -108,6 +109,6 @@ amr_float i386 libpostproc ppc
 	
 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES = $(all_includes) -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -Iamr_float -I../avidemux/ADM_lavutil  -I$(LAVUTIL)
+INCLUDES = $(all_includes) $(MYCFLAGS)
 noinst_HEADERS = 
 
