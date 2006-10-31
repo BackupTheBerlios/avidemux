@@ -14,36 +14,20 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- // This is used to test new features
- // should be commented out for regulat build
-//#define TEST_MP2
-
-#ifdef TEST_MP2
-	#warning TEST_MP2 is ON
-	#warning TEST_MP2 is ON
-	#warning TEST_MP2 is ON
-	#warning TEST_MP2 is ON
-	#warning TEST_MP2 is ON
-#endif
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <unistd.h>
-
-
+//#include <unistd.h>
 
 #include <time.h>
 #include <sys/time.h>
 #include <fcntl.h>	/* O_RDONLY */
 #include <errno.h>
 
-#include "config.h"
-
-#include "callbacks.h"
-#include "interface.h"
-#include "support.h"
-
+#include <gtk/gtk.h>
+    
 #include "ADM_lavcodec.h"
 
 #include "fourcc.h"
@@ -54,10 +38,6 @@
 #include "prototype.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"
-//#include "subchunk.h"
-//#include "avilist.h"
-
-
 
 
 #include "ADM_audio/aviaudio.hxx"
@@ -122,7 +102,7 @@ extern void GUI_setName (char *n);
 extern void DIA_properties( void);
 extern uint8_t DIA_Preferences(void);
 extern void  GUI_displayBitrate( void );
-uint8_t GUI_InitRender (GtkWidget * g, uint32_t w, uint32_t h);
+//uint8_t GUI_InitRender (GtkWidget * g, uint32_t w, uint32_t h);
 void test_mpeg (char *name);
 uint8_t GUI_getDoubleValue (double *valye, float min, float max,
 			    const char *title);
@@ -170,7 +150,7 @@ extern void audioCodecChanged(int newcodec);
 extern void videoCodecChanged(int newcodec);
 extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
 extern uint8_t A_autoDrive(Action action);
-extern int ignore_change;
+int ignore_change;
 
 extern uint8_t ADM_ocr_engine( void);
 uint8_t A_TimeShift(void);
@@ -1057,20 +1037,21 @@ int A_openAvi2 (char *name, uint8_t mode)
 	return 0;
     }
 
-    { int fd,i;
+    { int i;
+      FILE *fd=NULL;
       char magic[4];
 
 	/* check myself it is a project file (transparent detected and read
         ** by video_body->addFile (name);
 	*/
-	if( (fd = open(longname,O_RDONLY)) != -1 ){
-		if( read(fd,magic,4) == 4 ){
+	if( (fd = fopen(longname,"rb"))  ){
+		if( fread(magic,4,1,fd) == 4 ){
 			/* remember a workbench file */
 			if( !strncmp(magic,"ADMW",4) ){
 				actual_workbench_file = ADM_strdup(longname);
 			}
 		}
-		close(fd);
+		fclose(fd);
 	}
 
 	/* remember any video or workbench file to "recent" */
@@ -2504,4 +2485,80 @@ int A_vob2vobsub(void)
         return r;
 
 }
+///
+///	Return the frame # corresponding to the position of the scale/slider
+///	Rougth estimation in fact
+///
+uint32_t GUI_GetScale(void)
+{
+
+    double  percent;
+    float tg;
+
+    percent = UI_readScale();
+    tg= (avifileinfo->nb_frames-1) * percent / 100.;
+    
+    return (uint32_t)floor(tg);;
+
+
+}
+
+
+///
+/// Update all  informations : current frame # and current time, total frame ...
+///_____________________________________________________________
+
+void  update_status_bar(ADMImage *frame)
+{
+    char text[80];
+    double len;
+//    int val;
+
+    //    if(!guiReady) return ;
+    text[0] = 0;
+ 
+	UI_updateFrameCount( curframe);
+	UI_updateTimeCount( curframe,avifileinfo->fps1000);
+        if(frame)
+	       UI_setFrameType(  frame->flags,frame->_Qp);
+    // progress bar
+    len = 100;
+    if(avifileinfo->nb_frames>1)
+    	len=len / (double) (avifileinfo->nb_frames-1);
+    len *= (double) curframe;
+
+   
+
+     UI_setScale(len);
+   	
+}
+
+///
+/// Update some informations : current frame # and current time
+///_____________________________________________________________
+void rebuild_status_bar(void)
+{
+    char text[80];
+    double len;
+//    int val;
+
+    //    if(!guiReady) return ;
+    text[0] = 0;
+ 
+	UI_setFrameCount( curframe, avifileinfo->nb_frames);
+	UI_setTimeCount( curframe, avifileinfo->nb_frames,avifileinfo->fps1000);
+	
+    // progress bar
+    len = 100;
+    if(avifileinfo->nb_frames>1)
+    	len=len / (double) (avifileinfo->nb_frames-1);
+    len *= (double) curframe;
+
+
+
+     UI_setScale(len);
+}
+
+
+
 // EOF

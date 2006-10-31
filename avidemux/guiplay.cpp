@@ -26,16 +26,10 @@
 #include <unistd.h>
 #include <errno.h>
 
-
-
-
-
+#include <glib.h>
 #include <gtk/gtk.h>
 
 #include "config.h"
-#include "callbacks.h"
-#include "interface.h"
-#include "support.h"
 
 #include "fourcc.h"
 #include "avi_vars.h"
@@ -44,7 +38,6 @@
 #include "ADM_toolkit/filesel.h"
 #include "prototype.h"
 #include "ADM_audiodevice/audio_out.h"
-//#include "avdm_mad.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/toolkit_gtk.h"
@@ -71,7 +64,7 @@ static void FillAudio(void);
  extern void  UI_setPreviewToggleStatus( uint8_t status );
  extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
 //___________________________________
-extern uint8_t stop_req;
+uint8_t stop_req;
 static int called = 0;
 static uint32_t vids = 0, auds = 0, dauds = 0;
 static int32_t delta;

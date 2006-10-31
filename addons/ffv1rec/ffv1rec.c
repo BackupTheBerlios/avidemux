@@ -43,7 +43,7 @@
 #include "nuppelvideo.h"
 //#include "avcodec.h"
 #include "../../avidemux/ADM_library/default.h"
-#include "../../avidemux/ADM_toolkit/ADM_cpuCap.h"
+#include "../../avidemux/ADM_osSupport/ADM_cpuCap.h"
 #include "ffv1.h"
 #include "frequencies.h"
 

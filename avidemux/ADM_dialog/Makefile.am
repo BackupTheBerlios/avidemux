@@ -33,7 +33,7 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 	DIA_defaultAudio.cpp \
 	DIA_partial.cpp \
 	DIA_fade.cpp \
-	DIA_ass.cpp
+	DIA_ass.cpp ADM_guiBitrate.cpp
 
 
 

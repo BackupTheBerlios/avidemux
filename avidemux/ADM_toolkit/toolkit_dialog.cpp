@@ -30,11 +30,9 @@
 
 #include "avi_vars.h"
 #include "toolkit.hxx"
-#include "interface.h"
-#include "toolkit.hxx"
 
 # include <config.h>
-#include "ADM_gui2/support.h"
+#include "ADM_toolkit/ADM_gladeSupport.h"
 #include "toolkit_gtk.h"
 #include "ADM_assert.h"
 #include "prefs.h"

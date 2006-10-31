@@ -37,6 +37,7 @@
 #define MODULE_NAME MODULE_UI
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_toolkit/toolkit_gtk.h"
+#include "ADM_toolkit/ADM_gladeSupport.h"
 
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_gui2/GUI_ui.h"

@@ -48,7 +48,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
-#include "ADM_gui2/support.h"
+#include "ADM_toolkit/ADM_gladeSupport.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_filter/vidVCD.h"
 //__________________________________________

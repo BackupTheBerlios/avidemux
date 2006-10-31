@@ -37,7 +37,7 @@ extern "C"
 #include "ADM_tray.h"
 
 
-#include "ADM_gui2/support.h"
+#include "ADM_toolkit/ADM_gladeSupport.h"
 
 static int nbTray=0;
 static  GdkPixbuf   **pixbuf=NULL;

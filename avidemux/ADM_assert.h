@@ -1,6 +1,5 @@
 /*
-
-	Replacement for assert
+	Replacement for assert etc...
 */
 #ifndef ADM_ASSERT_H
 #define ADM_ASSERT_H
@@ -8,9 +7,13 @@
 #include <assert.h>
 #define ADM_assert(x) { if(!(x)) {assert(0);printf("Fatal error :"__FILE__"\n");  }}
 
+/* Functions we want to override to have better os support / debug / error control */
+    
 #ifdef __cplusplus
 extern "C" {
 #endif
+size_t ADM_fread (void *ptr, size_t size, size_t n, FILE *sstream);
+size_t ADM_fwrite (void *ptr, size_t size, size_t n, FILE *sstream);
 extern void *ADM_alloc(size_t size);
 extern void *ADM_realloc(void *in,size_t size);
 extern void ADM_dezalloc(void *ptr);
@@ -23,6 +26,9 @@ extern adm_fast_memcpy myAdmMemcpy;
 
 #define ADM_dealloc(x) ADM_dezalloc( (void *)x)
 #define memcpy myAdmMemcpy
+#define fread ADM_fread
+#define fwrite ADM_fwrite
+
 
 #define malloc #error
 #define realloc #error

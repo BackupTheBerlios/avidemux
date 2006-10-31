@@ -25,7 +25,7 @@
 
 #include "ADM_assert.h" 
 
-#include "ADM_gui2/support.h"
+#include "ADM_toolkit/ADM_gladeSupport.h"
 
 
 

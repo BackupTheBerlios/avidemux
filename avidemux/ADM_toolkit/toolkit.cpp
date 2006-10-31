@@ -29,12 +29,8 @@
 #include <ctype.h>
 #include <sys/time.h>
 
-
-
-
 #include "avi_vars.h"
 #include "toolkit.hxx"
-#include "interface.h"
 #include "toolkit.hxx"
 
 

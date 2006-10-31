@@ -25,7 +25,6 @@
 
 #include "avi_vars.h"
 #include "toolkit.hxx"
-#include "interface.h"
 #include "toolkit.hxx"
 
 static void alert_cb_ok(void);

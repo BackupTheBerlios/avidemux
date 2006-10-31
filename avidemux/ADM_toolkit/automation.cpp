@@ -32,8 +32,7 @@
 #include <ctype.h>
 
 
-#include "interface.h"
-#include "support.h"
+//#include "interface.h"
 #include "avi_vars.h"
 //#include "ADM_gui/GUI_vars.h"
 #include <ADM_assert.h>

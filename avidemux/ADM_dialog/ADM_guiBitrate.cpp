@@ -29,7 +29,8 @@
 #include <time.h>
 #include <sys/time.h>
 
-
+#include <gtk/gtk.h>
+    
 #include "ADM_lavcodec.h"
 
 #include "fourcc.h"

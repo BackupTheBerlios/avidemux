@@ -6,9 +6,9 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include "callbacks.h"
+
 #include "avi_vars.h"
-#include "ADM_gui2/support.h"
+#include "ADM_toolkit/ADM_gladeSupport.h"
 # include <config.h>
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \

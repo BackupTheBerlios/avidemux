@@ -29,8 +29,7 @@
 #include <libintl.h>
 #include <locale.h>
 #endif
-#include "interface.h"
-#include "support.h"
+//#include "interface.h"
 
 #define __DECLARE__
 #include "avi_vars.h"

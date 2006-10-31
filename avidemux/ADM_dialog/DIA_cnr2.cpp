@@ -25,8 +25,8 @@
 #include <gtk/gtk.h>
 # include <math.h>
 
-#include "callbacks.h"
-#include "ADM_gui2/support.h"
+
+#include "ADM_toolkit/ADM_gladeSupport.h"
 #include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_toolkit/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"

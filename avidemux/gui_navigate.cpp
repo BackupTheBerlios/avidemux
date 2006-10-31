@@ -24,11 +24,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-
-#include "callbacks.h"
-#include "interface.h"
-#include "support.h"
-
 #include "fourcc.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/filesel.h"
@@ -43,11 +38,13 @@
 #include "gtkgui.h"
 #include "gui_action.hxx"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/toolkit_gtk.h"
+//#include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_gui2/GUI_render.h"
 #include "ADM_dialog/DIA_working.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
+    
+    extern void    UI_purge(void );
 //____________________________________
 
 uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags)

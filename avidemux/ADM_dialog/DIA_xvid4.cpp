@@ -16,7 +16,7 @@
 #include "default.h"
 
 
-#include "ADM_gui2/support.h"
+#include "ADM_toolkit/ADM_gladeSupport.h"
 #include "ADM_toolkit/filesel.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/toolkit_gtk.h"

@@ -37,7 +37,7 @@
 #include "ADM_library/default.h"
 
 #include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_gui2/support.h"
+#include "ADM_toolkit/ADM_gladeSupport.h"
 
 
 
