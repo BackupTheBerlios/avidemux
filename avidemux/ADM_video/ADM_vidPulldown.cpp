@@ -38,10 +38,10 @@
 #include "ADM_video/ADM_vidFieldUtil.h"
 #include "ADM_video/ADM_vidPulldown.h"
 #include "ADM_video/ADM_interlaced.h"
-#include "ADM_toolkit/TLK_clock.h"
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/TLK_clock.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 #include "ADM_filter/video_filters.h"
 
 

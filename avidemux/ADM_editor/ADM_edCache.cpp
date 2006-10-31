@@ -18,9 +18,9 @@
 #include "ADM_editor/ADM_edCache.h"
 #include "ADM_assert.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_EDITOR
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 	
 EditorCache::EditorCache(uint32_t size,uint32_t w, uint32_t h)
 {

@@ -58,9 +58,9 @@
 #include "../ADM_library/default.h"
 #include "tcrequant.h"
 
-#include "../ADM_toolkit/ADM_debugID.h"
+#include "../ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_TCREQUANT
-#include "../ADM_toolkit/ADM_debug.h"
+#include "../ADM_osSupport/ADM_debug.h"
 #include "../ADM_assert.h"
 
 // / MEANX

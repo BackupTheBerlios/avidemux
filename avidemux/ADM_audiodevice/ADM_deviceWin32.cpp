@@ -45,9 +45,9 @@
 #include <ADM_assert.h>
 #include "ADM_audiodevice.h"
 #include "ADM_audiodevice/ADM_deviceWin32.h"
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_ADEVICE
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 #define BUCKET_SIZE 25000*4   // 1 sec
 #define NB_BUCKET 30

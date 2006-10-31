@@ -31,9 +31,9 @@
 
 
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_MPEG
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 #include "dmx_demuxerPS.h"
 #include "dmx_demuxerTS.h"

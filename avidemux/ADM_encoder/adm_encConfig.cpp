@@ -24,7 +24,7 @@
 
 #include "ADM_assert.h"
 #include "fourcc.h"
-#include "ADM_toolkit/ADM_quota.h"
+#include "ADM_osSupport/ADM_quota.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_toolkit/toolkit.hxx"
 
@@ -32,9 +32,9 @@
 #include "ADM_vidEncode.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_ENCODER
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 #include "ADM_dialog/DIA_enter.h"
 #include "ADM_gui2/GUI_ui.h"

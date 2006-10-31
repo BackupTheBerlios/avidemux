@@ -61,7 +61,7 @@ extern "C" {
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
-#include "ADM_toolkit/ADM_threads.h"
+#include "ADM_osSupport/ADM_threads.h"
 #include "ADM_mplex/ADM_mthread.h"
 #warning REMOVE unistd
 #include "unistd.h"

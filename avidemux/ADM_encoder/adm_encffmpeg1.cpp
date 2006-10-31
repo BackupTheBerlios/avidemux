@@ -41,9 +41,9 @@
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encffmpeg.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_ENCODER
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 #include "adm_encffmatrix.h"
 

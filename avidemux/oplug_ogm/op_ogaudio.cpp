@@ -51,9 +51,9 @@
 // should be enougth, at 500 kbps / 25 fps -> 3kbyte per slice
 #define OGM_AUDIO_BUFFER 64000
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_OGM_WRITE
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 extern const char *getStrFromAudioCodec( uint32_t codec);	
 

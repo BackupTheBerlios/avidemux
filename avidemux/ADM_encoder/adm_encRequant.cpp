@@ -39,9 +39,9 @@ extern "C"
 #include "ADM_requant/tcrequant.h"
 }
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_ENCODER
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 #define REQUANT_BUFFER (3*1024*1024)
 
 static uint32_t searchForward (uint32_t startframe);

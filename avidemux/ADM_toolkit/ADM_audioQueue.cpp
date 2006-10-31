@@ -13,7 +13,7 @@
 #include <string.h>
 #include <ADM_assert.h>
 #include "ADM_library/default.h"
-#include "ADM_toolkit/ADM_threads.h"
+#include "ADM_osSupport/ADM_threads.h"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 

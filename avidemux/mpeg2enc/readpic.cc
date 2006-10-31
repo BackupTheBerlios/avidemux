@@ -80,7 +80,7 @@
 #include "mpegconsts.h"
 #include "yuv4mpeg.h"
  
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 
    /* NOTE: access toframes_read *must* be read-only in other threads
 	  once the chunk-reading worker thread has been started.

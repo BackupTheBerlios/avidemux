@@ -31,10 +31,10 @@
 #include "ADM_video/ADM_vidPartial.h"
 #include "avi_vars.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_PREVIEW
-#include "ADM_toolkit/ADM_debug.h"
-#include "ADM_toolkit/ADM_quota.h"
+#include "ADM_osSupport/ADM_debug.h"
+#include "ADM_osSupport/ADM_quota.h"
 //
 void updateVideoFilters( void );
 // exported vars

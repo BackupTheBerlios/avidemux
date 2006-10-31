@@ -47,9 +47,9 @@
 #include "oplug_avi/op_avisave.h"
 #include "oplug_avi/op_savecopy.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_SAVE_AVI
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 
 static void updateUserData(uint8_t *start, uint32_t len);

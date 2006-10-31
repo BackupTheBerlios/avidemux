@@ -34,9 +34,9 @@
 
 #include "ADM_odml_audio.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_ODML
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 #ifdef ADM_DEBUG
 	//#define OPENDML_VERBOSE
 #endif

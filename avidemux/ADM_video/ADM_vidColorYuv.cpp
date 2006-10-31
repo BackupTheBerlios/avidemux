@@ -61,9 +61,9 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include"ADM_video/ADM_vidField.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 
 

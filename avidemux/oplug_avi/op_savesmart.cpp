@@ -57,9 +57,9 @@ extern "C" {
 #endif
 
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_SAVE_AVI
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 GenericAviSaveSmart::GenericAviSaveSmart(uint32_t qf) : GenericAviSave()
 {
 	_cqReenc=qf;

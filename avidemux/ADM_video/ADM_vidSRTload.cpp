@@ -50,9 +50,9 @@
 #include "ADM_video/ADM_vidSRT.h"
 #include <ADM_assert.h>
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 #define ADM_RAW 1024
 
@@ -84,7 +84,7 @@ uint8_t	ADMVideoSubtitle::loadFont (void)
 //
 //      Load subtitles in .sub format i.e. {xx}{yy} |   |
 //
-// {3610}{3656}Pripravená uvíta» ich|v na¹om dome s primeranou úctou.
+// {3610}{3656}Pripravenï¿½uvï¿½a ich|v naom dome s primeranou ctou.
 //__________________________________________________________________
 uint8_t  ADMVideoSubtitle::loadSubTitle (void)
 {

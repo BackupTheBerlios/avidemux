@@ -24,7 +24,7 @@
 #include "ADM_library/default.h"
 
 
-#include "ADM_toolkit/ADM_threads.h"
+#include "ADM_osSupport/ADM_threads.h"
 #define WIN32_CLASH
 #include "avi_vars.h"
 #include <ADM_assert.h>

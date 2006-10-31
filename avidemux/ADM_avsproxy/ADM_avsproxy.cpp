@@ -24,11 +24,11 @@
 #include "ADM_avsproxy/ADM_avsproxy_internal.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_3GP
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
-#include "ADM_toolkit/TLK_clock.h"
+#include "ADM_osSupport/TLK_clock.h"
 
 
 avsHeader::avsHeader()

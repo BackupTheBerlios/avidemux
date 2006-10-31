@@ -59,9 +59,9 @@
 #include "ADM_assert.h"
 #include "prefs.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_EDITOR
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 #ifdef USE_DIVX
 	#include "ADM_codecs/ADM_divx4.h"

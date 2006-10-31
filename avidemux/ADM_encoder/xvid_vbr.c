@@ -56,10 +56,10 @@
 #define DEFAULT_XVID_DBG_FILE   "xvid.dbg"
 #define DEFAULT_XVID_STATS_FILE "xvid.stats"
 
-//#define aprintf printf
-#include "../ADM_toolkit/ADM_debugID.h"
+#define aprintf printf
+/*#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME 0
-#include "../ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"*/
 /******************************************************************************
  * Local prototypes
  *****************************************************************************/

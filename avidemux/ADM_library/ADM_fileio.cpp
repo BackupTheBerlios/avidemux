@@ -23,7 +23,7 @@
 #include <math.h>
 #include "default.h"
 #include "ADM_fileio.h"
-#include "ADM_toolkit/ADM_quota.h"
+#include "ADM_osSupport/ADM_quota.h"
 
 #define ADM_FILE_BUFFER 4*256*1024 // 256 kB
 //#define ADMF_DEBUG

@@ -20,7 +20,7 @@
 #ifndef ADM_MTHREADS_H
 #define ADM_MTHREADS_H
 typedef  void * (*THRINP)(void *p);
-#include "ADM_toolkit/ADM_threads.h"
+#include "ADM_osSupport/ADM_threads.h"
 extern admMutex accessMutex;
 
 typedef struct muxerMT

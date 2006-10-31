@@ -57,7 +57,7 @@
 #include "transfrm_ref.h"
 #include "cpu_accel.h"
 #include "simd.h"
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 #if defined( HAVE_ALTIVEC ) && defined(USE_ALTIVEC)
 //#include "../utils/altivec/altivec_transform.h"
 #endif

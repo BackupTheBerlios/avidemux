@@ -35,12 +35,13 @@
 
 #include "config.h"
 
-#include "ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_CLOCKnTIMELEFT
-#include "ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 #include "avi_vars.h"
-#include "toolkit.hxx"
+//#include "toolkit.hxx"
+#include "ADM_misc.h"
 #include "TLK_clock.h"
 static uint8_t inited=0;
 static struct timeval _itimev;

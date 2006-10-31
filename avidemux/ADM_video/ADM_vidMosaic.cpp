@@ -42,7 +42,7 @@ extern "C" {
 
 #include "ADM_lavutil/avutil.h"
 #include "../ADM_libswscale/swscale.h"
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 #include "ADM_filter/video_filters.h"
 
 #include "ADM_video/ADM_cache.h"

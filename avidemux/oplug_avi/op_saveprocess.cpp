@@ -48,9 +48,9 @@
 #include "ADM_encoder/adm_encoder.h"
 #include "oplug_avi/op_saveprocess.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_SAVE_AVI
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 GenericAviSaveProcess::GenericAviSaveProcess( void ) 
 {

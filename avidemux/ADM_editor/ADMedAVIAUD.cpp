@@ -32,9 +32,9 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_editor/ADM_edAudio.hxx"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO_EDITOR
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 
 #define AUDIOSEG 	_segments[_audioseg]._reference

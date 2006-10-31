@@ -25,7 +25,7 @@
 #include <math.h>
 
 #include "config.h"
-#include "ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_DEBUG
 #include "ADM_debug.h"
 

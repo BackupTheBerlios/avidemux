@@ -49,15 +49,15 @@ class ADMImage
 {
 public:
         
-	uint8_t		*data;		/// Pointer to actual image data
-	uint32_t	_width;		/// Width of image
-	uint32_t	_height;	/// Height of image
-	uint32_t	_qStride;	/// Stride of Q infos, usually about width/8 <- ***if 0 means no quant usable***
-	uint8_t		*quant;		/// Byte representing quantize used for this block
-	uint32_t	_Qp;		/// Average quantizer for this image, Default=2
-	uint32_t	_qSize;		/// Size of the *quant bitfield
-	ADM_ASPECT	_aspect;	/// Aspect ratio
-	uint32_t	flags;		/// Flags for this image (AVI_KEY_FRAME/AVI_B_FRAME)
+        uint8_t		*data;		/// Pointer to actual image data
+        uint32_t	_width;		/// Width of image
+        uint32_t	_height;	/// Height of image
+        uint32_t	_qStride;	/// Stride of Q infos, usually about width/8 <- ***if 0 means no quant usable***
+        uint8_t		*quant;		/// Byte representing quantize used for this block
+        uint32_t	_Qp;		/// Average quantizer for this image, Default=2
+        uint32_t	_qSize;		/// Size of the *quant field
+        ADM_ASPECT	_aspect;	/// Aspect ratio
+        uint32_t	flags;		/// Flags for this image (AVI_KEY_FRAME/AVI_B_FRAME)
 
 // This 3 fields are only used to convery container (reference to other datas)
 // Between codec & editor

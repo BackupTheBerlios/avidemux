@@ -40,9 +40,9 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_CODEC
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 #include "ADM_divxInc.h"
 //________________________________________________
 void

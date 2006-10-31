@@ -37,7 +37,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidVlad.h"
 #include "ADM_filter/video_filters.h"
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 
 
 

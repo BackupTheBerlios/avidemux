@@ -1,6 +1,6 @@
 // Port of Bach unblend avisynth filter
 //
-//      Copyright by Bach, D Graft, Ernst Peché
+//      Copyright by Bach, D Graft, Ernst Pechï¿½
 //      Probably GPL
 //
 //
@@ -20,9 +20,9 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 #include "ADM_video/ADM_cache.h"
 #include "ADM_filter/video_filters.h"
 #include "ADM_vidUnblend_param.h"
@@ -141,7 +141,7 @@ void vidUnblend::DrawShow(ADMImage *src, int useframe, int blend, int inframe, i
 	{
 		sprintf(buf, "unblend %s", VERSION);
 		DrawString(src, 0, 0, buf);
-		sprintf(buf, "Copyright 2003 Bach, based on source by D.Graft and Ernst Peché");
+		sprintf(buf, "Copyright 2003 Bach, based on source by D.Graft and Ernst Pech");
 		DrawString(src, 0, 1, buf);
 		sprintf(buf,"Using frm %d, instead of frm %d", useframe, useframe-blend);
 		DrawString(src, 0, 2, buf);
@@ -190,7 +190,7 @@ uint8_t vidUnblend::getFrameNumberNoAlloc (uint32_t inframe,
 /*
                 sprintf(buf, "unblend %s", VERSION);
 		DrawString(src, 0, 0, buf);
-		sprintf(buf, "Copyright 2003 Bach, based on source by D.Graft and Ernst Peché");
+		sprintf(buf, "Copyright 2003 Bach, based on source by D.Graft and Ernst Pechï¿½);
 		DrawString(src, 0, 1, buf);
 */
 		sprintf(buf,"Using frm %d, instead of frm %d\n*****************", useframe, useframe-blend);

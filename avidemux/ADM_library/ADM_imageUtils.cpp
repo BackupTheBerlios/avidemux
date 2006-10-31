@@ -21,7 +21,7 @@
 #include "ADM_library/default.h"
 
 #include "ADM_library/ADM_image.h"
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 #include "admmangle.h"
 static uint8_t tinyAverage(uint8_t *dst, uint8_t *src1, uint8_t *src2,uint32_t l)
 {

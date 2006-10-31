@@ -31,9 +31,9 @@
 #include "ADM_audiodevice/ADM_deviceoss.h"
 #include "ADM_audiodevice/ADM_deviceALSA.h"
 #include "ADM_audiodevice/ADM_deviceSDL.h"
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_ADEVICE
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 static int16_t  		*audioBuffer=NULL;
 static uint32_t 		frameCount=0;

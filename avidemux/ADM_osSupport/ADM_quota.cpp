@@ -6,6 +6,7 @@
 #include "ADM_quota.h"
 
 #include "default.h"
+
 extern uint8_t DIA_quota(char *);
 struct qfile_t {
         const char *filename;
@@ -19,8 +20,9 @@ static qfile_t qfile[qfile_len];
 #include <libxml/tree.h>
 int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format);
 
-#include "toolkit.hxx"
-
+#include "ADM_toolkit/toolkit.hxx"
+//#include "ADM_misc.h"
+         
 #ifdef USE_LIBXML2
 int qxmlSaveFormatFile(const char *filename, xmlDocPtr cur, int format){
 	/*

@@ -51,9 +51,9 @@
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_colorspace/colorspace.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 #include "prototype.h"
 #include "prefs.h"

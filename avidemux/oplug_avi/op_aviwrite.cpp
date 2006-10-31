@@ -43,13 +43,13 @@
 #include "avilist.h"
 #include "op_aviwrite.hxx"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/ADM_quota.h"
+#include "ADM_osSupport/ADM_quota.h"
 #include "ADM_library/ADM_fileio.h"
 
 // MOD Feb 2005 by GMV
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_SAVE_AVI
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 #include "prefs.h"
 // END MOD Feb 2005 by GMV
 uint32_t ADM_UsecFromFps1000(uint32_t fps1000);

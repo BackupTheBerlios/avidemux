@@ -23,7 +23,7 @@
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
 
-#include "ADM_toolkit/ADM_queue.h"
+#include "ADM_osSupport/ADM_queue.h"
 #include "ADM_asfPacket.h"
 
 #define ASF_MAX_AUDIO_TRACK 8

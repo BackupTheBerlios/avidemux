@@ -53,7 +53,7 @@
 #include "prototype.h"
 #include "ADM_assert.h"
 
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 
 
 

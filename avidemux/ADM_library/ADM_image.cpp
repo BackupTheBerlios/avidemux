@@ -20,7 +20,7 @@
 #include "ADM_library/default.h"
 
 #include "ADM_library/ADM_image.h"
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 //#include "ADM_assert.h"
 void ADMImage_stat( void );
 

@@ -26,7 +26,7 @@
 
 
 #include "fourcc.h"
-#include "ADM_toolkit/ADM_quota.h"
+#include "ADM_osSupport/ADM_quota.h"
 #include "avi_vars.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
@@ -66,9 +66,9 @@
 
 
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_ENCODER
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 
 #warning FIXME: Duplicate define with mpeg2enc -> bad

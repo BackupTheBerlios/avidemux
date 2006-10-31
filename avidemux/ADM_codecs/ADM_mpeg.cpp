@@ -53,9 +53,9 @@ extern "C"
 #include "libMpeg2Dec/mpeg2.h"
 #include "libMpeg2Dec/mpeg2_internal.h"
 #include <ADM_assert.h>
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_CODEC
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 
   extern void mpeg2_pop (mpeg2dec_t * m);

@@ -38,7 +38,7 @@
 
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encx264.h"
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 
 
 #define aprintf printf

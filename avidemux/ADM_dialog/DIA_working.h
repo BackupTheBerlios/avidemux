@@ -20,7 +20,7 @@
 
 #ifndef __DIA_WK__
 #define __DIA_WK__
-#include "ADM_toolkit/TLK_clock.h"
+#include "ADM_osSupport/TLK_clock.h"
 	class DIA_working
 	{
 		private :

@@ -29,9 +29,9 @@
 #include "ADM_3gp/ADM_3gp.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_3GP
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 extern "C"
 {

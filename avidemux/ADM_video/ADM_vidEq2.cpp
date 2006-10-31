@@ -41,7 +41,7 @@
 #include "ADM_video/ADM_cache.h"
 
 #include "admmangle.h"
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 #include "ADM_vidEq2.h"
 static FILTER_PARAM Eq2Param={8,{"contrast","brightness","saturation",
                                 "gamma","gamma_weight","rgamma","ggamma","bgamma"}};

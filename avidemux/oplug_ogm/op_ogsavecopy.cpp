@@ -42,9 +42,9 @@
 
 #include "oplug_ogm/op_ogsave.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME 0
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 
 uint8_t	ADM_ogmWriteCopy::initVideo(const char *name)

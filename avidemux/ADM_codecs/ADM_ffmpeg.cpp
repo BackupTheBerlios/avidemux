@@ -40,7 +40,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
 #include "ADM_codecs/ADM_ffmpeg.h"
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 //#define TEST_NOB 1
 
 static char LogName[500];

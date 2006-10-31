@@ -25,7 +25,7 @@
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"
 #include "ADM_audiofilter/audiofilter_channel_route.h"
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 #include "prefs.h"
 
 #ifdef USE_LIBDCA

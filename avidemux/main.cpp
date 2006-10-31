@@ -59,8 +59,8 @@ uint8_t lavformat_init(void);
 	#include "SDL/SDL.h"
 	}
 #endif
-#include "ADM_toolkit/ADM_cpuCap.h"
-#include "ADM_toolkit/ADM_threads.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_threads.h"
 void onexit( void );
 //extern void automation(int argc, char **argv);
 extern int automation(void );

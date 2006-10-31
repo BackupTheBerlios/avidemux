@@ -62,9 +62,9 @@ extern "C" {
 #include "ADM_mplex/ADM_mthread.h"
 #include "ADM_toolkit/ADM_audioQueue.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_MP4
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 static uint8_t *_buffer=NULL,*_outbuffer=NULL;
 static void  end (void);

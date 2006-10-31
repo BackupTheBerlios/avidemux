@@ -20,7 +20,7 @@ SUBDIRS = ADM_library ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_ogm ADM_3gp mpeg2enc ADM_openDML ADM_lvemux libtoolame ADM_requant \
 	ADM_script oplug_ogm ADM_xvidratectl ADM_mplex ADM_ocr ADM_libswscale \
 	ADM_mpegdemuxer ADM_tray ADM_lavutil ADM_lavformat ADM_lavcodec oplug_mp4 \
-	ADM_avsproxy  ADM_liba52 ADM_libMad ADM_matroska ADM_asf
+	ADM_avsproxy  ADM_liba52 ADM_libMad ADM_matroska ADM_asf ADM_osSupport
 
 if HAVE_FREETYPE
 SUBDIRS += libass
@@ -81,6 +81,7 @@ avidemux2_LDADD   =  ADM_dialog/DIA_quota.o \
 ./ADM_mpegdemuxer/libADM_mpegdemuxer.a   \
 ./ADM_audio/libADM_audio.a \
 ./ADM_toolkit/libADM_toolkit.a  \
+./ADM_osSupport/libADM_ossupport.a  \
 ./ADM_dialog/libADM_dialog.a  \
 ./libMpeg2Dec/liblibMpeg2Dec.a   \
 ./ADM_tray/libADM_tray.a \
@@ -90,6 +91,7 @@ avidemux2_LDADD   =  ADM_dialog/DIA_quota.o \
 ./ADM_lavcodec/libpostproc/libpostproc.a \
 ./ADM_library/libADM_library.a \
 ./ADM_toolkit/libADM_toolkit.a  \
+./ADM_osSupport/libADM_ossupport.a  \
 ./libass/libass.a \
 $(libmpeg2enc_Altivec) 
 

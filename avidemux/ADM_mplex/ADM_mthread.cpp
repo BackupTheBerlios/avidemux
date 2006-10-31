@@ -38,7 +38,7 @@
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
-#include "ADM_toolkit/ADM_threads.h"
+#include "ADM_osSupport/ADM_threads.h"
 #include "ADM_lavformat/ADM_lavformat.h"
 #include "ADM_mthread.h"
 

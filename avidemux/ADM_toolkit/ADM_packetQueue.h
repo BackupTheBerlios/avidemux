@@ -14,7 +14,7 @@
  ***************************************************************************/
 #ifndef ADM_PACKET_QUEUE_H
 #define ADM_PACKET_QUEUE_H
-#include "ADM_toolkit/ADM_threads.h"
+#include "ADM_osSupport/ADM_threads.h"
 typedef struct  Slots
 {
   uint32_t      size;       //< Size of the packet

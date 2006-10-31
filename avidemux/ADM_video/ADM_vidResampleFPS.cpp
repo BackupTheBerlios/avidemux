@@ -37,7 +37,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_dialog/DIA_enter.h"
 #include "ADM_video/ADM_cache.h"
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 #include "admmangle.h"
 
 static FILTER_PARAM ResampParam={2,{"newfps","use_linear"}};

@@ -35,9 +35,9 @@
 #include "avilist.h"
 #include "ADM_audio/ADM_a52info.h"
 
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_AUDIO
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 extern uint16_t MP1L2Bitrate[2][16];
 extern uint16_t MP2L1Bitrate[2][16];

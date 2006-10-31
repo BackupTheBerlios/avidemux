@@ -35,9 +35,9 @@
 #include <ADM_assert.h>
 #include "ADM_audiodevice.h"
 #include "ADM_audiodevice/ADM_deviceAudioCore.h"
-#include "ADM_toolkit/ADM_debugID.h"
+#include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_ADEVICE
-#include "ADM_toolkit/ADM_debug.h"
+#include "ADM_osSupport/ADM_debug.h"
 
 static Component 		comp=NULL;
 static int16_t  		*audioBuffer=NULL;

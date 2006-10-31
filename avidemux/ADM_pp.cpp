@@ -28,7 +28,7 @@
 
 #include "ADM_library/default.h"
 
-#include "ADM_toolkit/ADM_cpuCap.h"
+#include "ADM_osSupport/ADM_cpuCap.h"
 #include "ADM_pp.h"
 
 
