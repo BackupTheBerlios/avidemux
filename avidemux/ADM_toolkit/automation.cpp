@@ -20,7 +20,7 @@
 #include "config.h"
 
 #include <stdlib.h>
-#include <glib.h>
+//#include <glib.h>
 #include <signal.h>
 #ifndef CYG_MANGLING
 #include <unistd.h>
@@ -28,7 +28,7 @@
 #include <math.h>
 
 
-#include <gtk/gtk.h>
+//#include <gtk/gtk.h>
 #include <ctype.h>
 
 
@@ -231,7 +231,8 @@ static int index;
 			argv=global_argv;
 			argc=global_argc;
 			ADM_usleep(100000); // let gtk start
-                        gdk_threads_enter();
+#warning FIXME
+                        //gdk_threads_enter();
 			
 			printf("\n *** Automated : %d entries*************\n",NB_AUTO);
 			// we need to process
@@ -293,8 +294,9 @@ static int index;
 					} // end while
           GUI_Verbose();
           printf("\n ********** Automation ended***********\n");
-          gdk_threads_leave();
-          return FALSE; // Do not call me anymore
+          //gdk_threads_leave();
+#warning FIXME
+          return 0; // Do not call me anymore
 }
 //_________________________________________________________________________
 

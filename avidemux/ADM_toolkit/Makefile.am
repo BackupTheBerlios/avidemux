@@ -16,5 +16,6 @@ EXTRA_DIST = ADM_audioQueue.h  ADM_packetQueue.h  eggtrayicon.h  systray.h     \
 
 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES= $(all_includes) $(SMONKEY_CFLAGS)
+INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil \
+		 $(SMONKEY_CFLAGS)
 noinst_HEADERS =  

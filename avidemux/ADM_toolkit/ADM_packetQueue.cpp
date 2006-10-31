@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ADM_assert.h>
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 #include "ADM_osSupport/ADM_threads.h"
 
 #include "ADM_packetQueue.h"
