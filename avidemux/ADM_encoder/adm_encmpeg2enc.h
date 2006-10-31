@@ -14,8 +14,8 @@
  ***************************************************************************/
 #ifndef ENC_MPEG2ENC_H
 #define ENC_MPEG2ENC_H
-#include "mpeg2enc/ADM_mpeg2Param.h"
-#include "mpeg2enc/ADM_mpeg2enc.h"
+#include "ADM_libmpeg2enc/ADM_mpeg2Param.h"
+#include "ADM_libmpeg2enc/ADM_mpeg2enc.h"
 typedef enum MPEG2ENC_ID
 {
   MPEG2ENC_INVALID=0,

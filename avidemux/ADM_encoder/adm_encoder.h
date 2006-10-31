@@ -24,8 +24,8 @@
  ***************************************************************************/
 #ifndef __ADM_encoder__
 #define __ADM_encoder__
-#include "ADM_library/ADM_image.h"
-#include "ADM_library/ADM_bitstream.h"
+#include "ADM_image.h"
+#include "ADM_bitstream.h"
 typedef enum
 {
 

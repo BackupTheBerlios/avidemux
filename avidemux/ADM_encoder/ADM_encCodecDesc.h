@@ -372,7 +372,7 @@ COMPRES_PARAMS ffmpeg2SVCDCodec = {
   sizeof (ffmpeg2SVCDExtra),
   DIA_DVDffParam
 };
-#include "mpeg2enc/ADM_mpeg2enc.h"
+#include "ADM_libmpeg2enc/ADM_mpeg2enc.h"
 // ************ Mpeg2enc VCD *************
 Mpeg2encParam VCDExtra = {
   (1152 * 1000) >> 3,		// Max BR

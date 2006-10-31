@@ -36,10 +36,8 @@
 #define MODULE_NAME MODULE_ENCODER
 #include "ADM_osSupport/ADM_debug.h"
 
-#include "ADM_dialog/DIA_enter.h"
-#include "ADM_gui2/GUI_ui.h"
 
-
+void UI_setVideoCodec( int i);
 // Some static stuff
 static COMPRES_PARAMS *videoCodecGetDescriptor (SelectCodecType codec);
 void setVideoEncoderSettings (COMPRESSION_MODE mode, uint32_t param,     uint32_t extraConf, uint8_t * extraData);

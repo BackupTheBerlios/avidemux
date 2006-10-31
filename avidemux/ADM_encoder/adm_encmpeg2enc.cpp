@@ -48,22 +48,15 @@
 #include "subchunk.h"
 
 
-//#include "aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-#include "ADM_dialog/DIA_working.h"
 
 
-//#include "oplug_mpeg/op_mpeg_support.h"
-#include "mpeg2enc/ADM_mpeg2enc.h"
+#include "ADM_libmpeg2enc/ADM_mpeg2enc.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
-
-
-#include "ADM_dialog/DIA_enter.h"
-
 
 
 #include "ADM_osSupport/ADM_debugID.h"
