@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ADM_library/default.h"
-#include "ADM_library/ADM_image.h"
+#include "default.h"
+#include "ADM_image.h"
 #include "ADM_editor/ADM_edCache.h"
 #include "ADM_assert.h"
 

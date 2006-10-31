@@ -49,7 +49,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-#include "ADM_dialog/DIA_working.h"
+//#include "ADM_dialog/DIA_working.h"
 #include "ADM_ogm/ADM_ogm.h"
 #include "ADM_mpegdemuxer/dmx_video.h"
 #include "ADM_mpegdemuxer/dmx_identify.h"
@@ -68,7 +68,7 @@
 #endif
 #include "ADM_mpegdemuxer/dmx_indexer.h"
 #include "ADM_outputfmt.h"
-#include "ADM_gui2/GUI_ui.h"
+//#include "ADM_gui2/GUI_ui.h"
 int DIA_mpegIndexer (char **mpegFile, char **indexFile, int *aid,
 		     int already = 0);
 void DIA_indexerPrefill(char *name);
@@ -76,6 +76,7 @@ extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
 
 extern uint8_t loadVideoCodecConf( char *name);
 extern uint8_t parseScript(char *name);
+uint8_t UI_SetCurrentFormat( ADM_OUT_FORMAT fmt );
 const char *VBR_MSG="Avidemux detected VBR MP3 audio in this file. For keeping audio/video in sync, time map is needed. Build it now?\n\nYou can do it later with \"Audio -> Build VBR Time Map\".";
 //
 //

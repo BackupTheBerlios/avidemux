@@ -11,7 +11,7 @@
 //
 #ifndef EDITOR_CACHE__
 #define EDITOR_CACHE__
-#include "ADM_library/ADM_image.h"
+#include "ADM_image.h"
 typedef struct cacheElem
 {
 	uint32_t lastUse;

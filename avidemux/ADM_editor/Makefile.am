@@ -1,7 +1,10 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
 noinst_LIBRARIES = libADM_editor.a
 
-INCLUDES = $(all_includes)  $(SMONKEY_CFLAGS)
+INCLUDES = $(all_includes)  $(SMONKEY_CFLAGS) \
+	-I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil 	\
+	-I../ADM_inputs
+
 
 libADM_editor_a_METASOURCES = AUTO
 

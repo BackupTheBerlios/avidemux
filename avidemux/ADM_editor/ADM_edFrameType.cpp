@@ -29,7 +29,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "avi_vars.h"
-#include "ADM_dialog/DIA_working.h"
+#include "../ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_working.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 

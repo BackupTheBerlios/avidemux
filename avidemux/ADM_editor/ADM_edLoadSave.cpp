@@ -41,7 +41,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_encoder/adm_encConfig.h"
-#include "ADM_gui2/GUI_ui.h"
+//#include "ADM_gui2/GUI_ui.h"
 #include "ADM_assert.h"
 #include "prefs.h"
 #include "avi_vars.h"
