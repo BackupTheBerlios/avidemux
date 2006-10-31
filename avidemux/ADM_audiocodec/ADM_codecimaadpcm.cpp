@@ -22,7 +22,7 @@
 
 #include "config.h"
 #define always_inline inline
-#include "ADM_library/default.h"
+#include "default.h"
 #include "bswap.h"
 #include "ADM_assert.h"
 #include "ADM_audio/aviaudio.hxx"
