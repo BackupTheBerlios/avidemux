@@ -11,7 +11,7 @@
 
 #include <gtk/gtk.h>
 
-#include "support.h"
+#include "ADM_toolkit/ADM_gladeSupport.h"
 
 #include "ADM_library/default.h"
 #include <ADM_assert.h>
