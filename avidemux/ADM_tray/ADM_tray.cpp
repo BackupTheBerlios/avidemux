@@ -25,8 +25,8 @@ http://savannah.nongnu.org/cvs/?group=mldonkey
 #include <stdio.h>
 
 
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
+/*#include <gdk/gdkkeysyms.h>
+#include <gtk/gtk.h>*/
 
 extern "C"
 {
