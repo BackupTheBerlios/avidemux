@@ -44,7 +44,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_filter/vidVCD.h"
 #include "prefs.h"
-#include "ADM_dialog/DIA_resizeWiz.h"
+#include "../ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_resizeWiz.h"
 //___________________________________________
 extern FILTER_ENTRY allfilters[MAX_FILTER];
 extern uint32_t nb_video_filter;

@@ -15,5 +15,6 @@ filter_declaration.cpp  gui_filter.cpp       gui_filtersub.cpp   vidVCD.h
 
 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES= $(all_includes) $(GTK_CFLAGS)  $(XML_CFLAGS)
+INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil \
+		 $(GTK_CFLAGS)  $(XML_CFLAGS) -I../ADM_userInterfaces/ADM_GTK
 noinst_HEADERS =  vidVCD.h

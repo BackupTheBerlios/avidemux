@@ -33,7 +33,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 
-#include "ADM_toolkit/toolkit_gtk.h"
+#include "../ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/toolkit_gtk.h"
 
 
 
@@ -48,8 +48,8 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
-#include "ADM_toolkit/ADM_gladeSupport.h"
-#include "ADM_toolkit/toolkit_gtk.h"
+#include "../ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_filter/vidVCD.h"
 //__________________________________________
 

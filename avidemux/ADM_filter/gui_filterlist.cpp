@@ -13,7 +13,7 @@
  *                                                                         *
  ***************************************************************************/
  #include "config.h"
-#include "ADM_toolkit/toolkit_gtk_include.h"
+#include "../ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/toolkit_gtk_include.h"
 GtkListStore 	*storeFilterList;
 GtkWidget	*create_dialogList (void)
 {
