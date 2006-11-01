@@ -14,7 +14,7 @@ user_interface = ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
 endif
 avidemux2_SOURCES =   guiplay.cpp  \
 	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp   \
-	main.cpp prefs.cpp ADM_pp.cpp \
+	main.cpp   \
 	gui_autodrive.cpp GUI_jobs.cpp
 
 SUBDIRS = ADM_libraries ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
@@ -29,12 +29,11 @@ SUBDIRS = ADM_libraries ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	
 
 
-EXTRA_DIST = ADM_assert.h    ADM_pp.h    gtkgui.h         \
+EXTRA_DIST = ADM_assert.h       gtkgui.h         \
 h  gui_autodrive.cpp  main.cpp   \
 ADM_lavcodec.h  GUI_jobs.cpp      gui_navigate.cpp   \
-admmangle.h  \
-gui_savenew.cpp    prefs.cpp \
-ADM_pp.cpp      avi_vars.h      gtk_gui.cpp    guiplay.cpp    prefs.h \
+gui_savenew.cpp     \
+     avi_vars.h      gtk_gui.cpp    guiplay.cpp    prefs.h \
 gui_action.hxx prefs.in
 
 ####### kdevelop will overwrite this part!!! (end)############
@@ -102,6 +101,6 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 avidemux2_LDFLAGS = $(all_libraries)  $(SDL_LIBS) $(GTK_LIBS) \
 	$(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) 
 
-noinst_HEADERS = ADM_pp.h admmangle.h
+noinst_HEADERS = 
 AM_CFLAGS = -g
 AM_CXXFLAGS = -g

@@ -38,7 +38,7 @@
 #endif
 // MEANX
 #include "wrapper.h"
-#include "../../admmangle.h"
+#include "admmangle.h"
 // /MEANX
 
 #define FAST_BGR2YV12 // use 7 bit coeffs instead of 15bit
