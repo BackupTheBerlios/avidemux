@@ -36,12 +36,12 @@ gui_action.hxx prefs.in
 
 
 avidemux2_LDADD   =  \
-./ADM_audiocodec/libADM_audiocodec.a			\
 ./ADM_audiofilter/libADM_audiofilter.a			\
 ./ADM_requant/libADM_requant.a				\
 ./ADM_colorspace/libADM_colorspace.a			\
 ./ADM_filter/libADM_filter.a				\
 ./ADM_editor/libADM_editor.a				\
+./ADM_audiocodec/libADM_audiocodec.a			\
 ./ADM_codecs/libADM_codecs.a				\
 ./ADM_audio/libADM_audio.a				\
 ./ADM_script/libADM_script.a				\
