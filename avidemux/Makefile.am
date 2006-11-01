@@ -7,6 +7,11 @@ if BUILD_ALTIVEC
 libmpeg2enc_Altivec = ./mpeg2enc/altivec/libaltivec.la
 endif
 
+if ADM_UI_GTK
+user_interface = ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
+		./ADM_userInterfaces/ADM_GTK/ADM_dialog/libADM_dialog.a	\
+		./ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/libADM_toolkit_gtk.a	
+endif
 avidemux2_SOURCES =   guiplay.cpp  \
 	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp   \
 	main.cpp prefs.cpp ADM_pp.cpp \
@@ -77,10 +82,8 @@ avidemux2_LDADD   =  \
 ./ADM_libraries/ADM_libMpeg2Dec/liblibMpeg2Dec.a	\
 ./ADM_libraries/ADM_libmpeg2enc/libmpeg2enc.a		\
 ./ADM_libraries/ADM_xvidratectl/libADM_xvidratectl.a	\
+$(user_interface) \
 ./ADM_toolkit/libADM_toolkit.a				\
-./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
-./ADM_userInterfaces/ADM_GTK/ADM_dialog/libADM_dialog.a	\
-./ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/libADM_toolkit_gtk.a	\
 ./ADM_libraries/ADM_utilities/libADM_library.a		\
 ./ADM_osSupport/libADM_ossupport.a			\
 ./ADM_libraries/ADM_libswscale/libswscale.a		\
