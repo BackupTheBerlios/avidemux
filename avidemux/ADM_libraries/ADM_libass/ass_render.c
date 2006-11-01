@@ -21,6 +21,11 @@
 #include "ass_utils.h"
 #include "ass_fontconfig.h"
 
+//MEANX
+#define ADM_LEGACY_PROGGY
+#include "../../ADM_assert.h"
+// /MEANX
+
 
 #define MAX_GLYPHS 1000
 #define MAX_LINES 100

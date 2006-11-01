@@ -30,6 +30,12 @@
 #include "sp_enc.h"
 #include "interf_rom.h"
 
+
+//MEANX
+#define ADM_LEGACY_PROGGY
+#include "../../../ADM_assert.h"
+// /MEANX
+
 /*
  * Declare structure types
  */

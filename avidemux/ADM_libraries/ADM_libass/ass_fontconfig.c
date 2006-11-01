@@ -17,7 +17,10 @@
 #ifdef HAVE_FONTCONFIG
 #include <fontconfig/fontconfig.h>
 #endif
-
+//MEANX
+#define ADM_LEGACY_PROGGY
+#include "../../ADM_assert.h"
+// /MEANX
 struct fc_instance_s {
 #ifdef HAVE_FONTCONFIG
 	FcConfig* config;

@@ -22,15 +22,22 @@
  */
 
 #include "config.h"
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 
+//MEANX
+#define ADM_LEGACY_PROGGY
+#include "../../ADM_assert.h"
+// /MEANX
+
+    
 #include "a52.h"
 #include "a52_internal.h"
 #include "bitstream.h"
 #include "tables.h"
+
 
 #ifdef HAVE_MEMALIGN
 /* some systems have memalign() but no declaration for it */
@@ -39,6 +46,8 @@ void * memalign (size_t align, size_t size);
 /* assume malloc alignment is sufficient */
 #define memalign(align,size) malloc (size)
 #endif
+
+
 
 typedef struct {
     sample_t q1[2];

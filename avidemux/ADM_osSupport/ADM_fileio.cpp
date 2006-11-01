@@ -31,3 +31,11 @@ size_t ADM_fwrite (void *ptr, size_t size, size_t n, FILE *sstream)
   return fwrite(ptr,size,n,sstream); 
   
 }
+FILE  *ADM_fopen (const char *file, const char *mode)
+{
+  return fopen(file,mode); 
+}
+int    ADM_fclose (FILE *file)
+{
+  return fclose(file); 
+}

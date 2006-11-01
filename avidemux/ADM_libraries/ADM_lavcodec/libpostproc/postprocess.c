@@ -95,10 +95,15 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #ifdef HAVE_ALTIVEC_H
 #include <altivec.h>
 #endif
-
+    /// MEANX
+#define ADM_LEGACY_PROGGY
+#include "../../../ADM_assert.h"
+    
+    /// /MEANX
+/*    
 #ifndef HAVE_MEMALIGN
 #define memalign(a,b) malloc(b)
-#endif
+#endif*/
 
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
 #define MAX(a,b) ((a) < (b) ? (b) : (a))

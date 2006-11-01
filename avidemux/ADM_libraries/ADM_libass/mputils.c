@@ -11,6 +11,12 @@
 #include <string.h>
 #include <assert.h>
 
+//MEANX
+#define ADM_LEGACY_PROGGY
+#include "../../ADM_assert.h"
+// /MEANX
+
+
 int font_fontconfig = 1;
 char *font_name = NULL;
 

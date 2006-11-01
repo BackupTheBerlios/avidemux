@@ -32,7 +32,10 @@ extern char *sub_cp;
 #define TRACK_TYPE_SSA ass_track_t::TRACK_TYPE_SSA
 #define TRACK_TYPE_ASS ass_track_t::TRACK_TYPE_ASS
 #endif
-
+/// MEANX
+#define ADM_LEGACY_PROGGY
+#include "../../ADM_assert.h"
+/// /MEANX
 char *get_path(char *);
 
 #define ASS_STYLES_ALLOC 20

@@ -44,7 +44,10 @@ static mmx_t RTjpeg_zero;
 
 //#define SHOWBLOCK 1
 #define BETTERCOMPRESSION 1
-
+/// MEANX
+#include "../../ADM_assert.h"
+/// /MEANX
+    
 static const unsigned char RTjpeg_ZZ[64]={
 0,
 8, 1,
@@ -1505,7 +1508,7 @@ void RTjpeg::DctY(uint8_t *idata, int rskip)
 	paddw_r2r(mm4, mm3);						// y5
 
    movq_r2m(mm5, *(dataptr+7)); 			//save y3
-	psubw_r2r(mm2, mm0);						// yè=z11 - z4
+	psubw_r2r(mm2, mm0);						// yï¿½z11 - z4
 
    movq_r2m(mm3, *(dataptr+11)); 		//save y5
 

@@ -31,6 +31,12 @@
 #include "interf_rom.h"
 #include "rom_dec.h"
 
+//MEANX
+#define ADM_LEGACY_PROGGY
+#include "../../../ADM_assert.h"
+// /MEANX
+
+    
 /*
  * definition of constants
  */

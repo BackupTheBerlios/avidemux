@@ -89,7 +89,7 @@ extern "C"
 
 	#define DXFIELD(x) ((rtfileheader *)_nuv_header)->x
 	#define DX(x) printf(" "#x" :%d\n",DXFIELD(x));
-
+#include "ADM_assert.h"
 typedef struct ChaineD
 {
 	struct ChaineD  *_next;

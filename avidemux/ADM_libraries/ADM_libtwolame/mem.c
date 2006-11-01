@@ -38,7 +38,7 @@ void *twolame_malloc (unsigned long block, char *item)
 	
 	void *ptr;
 	
-	ptr = (void *) malloc (block);
+	ptr = (void *) ADM_alloc (block);
 	
 	if (ptr != NULL) {
 		memset (ptr, 0, block);
@@ -61,7 +61,7 @@ void twolame_free (void **ptr_addr)
 {
 
 	if (*ptr_addr != NULL) {
-		free (*ptr_addr);
+		ADM_dezalloc (*ptr_addr);
 		*ptr_addr = NULL;
 	}
 }

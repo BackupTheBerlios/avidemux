@@ -1,5 +1,5 @@
 #include "config.h"
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <sys/time.h>
@@ -11,6 +11,12 @@
 #include "mputils.h"
 #endif
 #include "ass_utils.h"
+
+//MEANX
+#define ADM_LEGACY_PROGGY
+#include "../../ADM_assert.h"
+// /MEANX
+
 
 int mystrtoi(char** p, int base, int* res)
 {

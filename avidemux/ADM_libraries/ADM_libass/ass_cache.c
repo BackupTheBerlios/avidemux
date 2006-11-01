@@ -12,7 +12,10 @@
 #endif
 #include "ass_fontconfig.h"
 #include "ass_cache.h"
-
+/// MEANX
+#define ADM_LEGACY_PROGGY
+#include "../../ADM_assert.h"
+/// /MEANX
 
 typedef struct face_cache_item_s {
 	face_desc_t desc;
