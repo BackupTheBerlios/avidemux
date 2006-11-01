@@ -30,7 +30,7 @@
 #include <ADM_assert.h>
 #include "ADM_audiofilter/audioprocess.hxx"
 
-#include "ADM_dialog/DIA_encoding.h"
+#include "DIA_encoding.h"
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"

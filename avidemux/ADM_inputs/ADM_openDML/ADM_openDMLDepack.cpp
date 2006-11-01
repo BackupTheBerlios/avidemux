@@ -25,7 +25,7 @@
 #include "fourcc.h"
 #include "ADM_openDML/ADM_openDML.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_dialog/DIA_working.h"
+#include "DIA_working.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_UNPACKER

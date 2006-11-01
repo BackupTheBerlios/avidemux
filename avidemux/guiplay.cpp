@@ -40,7 +40,7 @@
 #include "ADM_audiodevice/audio_out.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 

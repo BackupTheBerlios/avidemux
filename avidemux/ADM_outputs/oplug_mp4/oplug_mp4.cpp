@@ -52,7 +52,7 @@ extern "C" {
 #include "ADM_encoder/adm_encffmpeg.h"
 #include "oplug_mpegFF/oplug_vcdff.h"
 
-#include "ADM_dialog/DIA_encoding.h"
+#include "DIA_encoding.h"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "ADM_lavformat/ADM_lavformat.h"

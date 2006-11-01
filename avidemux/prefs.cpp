@@ -6,7 +6,7 @@
 #include <errno.h>	/* errno, ENOENT */
 #include <dirent.h>
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_osSupport/ADM_quota.h"
 

@@ -85,7 +85,7 @@ extern "C"
 #include "ADM_osSupport/ADM_debug.h"
 
 #include "prefs.h"
-#include "ADM_dialog/DIA_working.h"
+#include "DIA_working.h"
 
 	#define DXFIELD(x) ((rtfileheader *)_nuv_header)->x
 	#define DX(x) printf(" "#x" :%d\n",DXFIELD(x));

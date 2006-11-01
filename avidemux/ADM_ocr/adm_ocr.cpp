@@ -46,8 +46,8 @@
 //#include "unistd.h"
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "../ADM_GTK/ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_GTK/ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidFlipV.h"
@@ -68,7 +68,7 @@
 
 #include "ADM_video/ADM_vidVobSub.h"
 #include "ADM_leftturn.h"
-#include "ADM_dialog/DIA_enter.h"
+#include "DIA_enter.h"
 /******************************/
 #define GTK_PURGE {while (gtk_events_pending())                gtk_main_iteration(); }    
 #define TESTSUB "/home/fx/usbstick/subs/vts_01_0.idx"

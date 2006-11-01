@@ -18,8 +18,8 @@
  #define   __AVI_SAVE__
 
  #include "default.h"
- #include "ADM_dialog/DIA_working.h"
- #include "ADM_dialog/DIA_encoding.h"
+ #include "DIA_working.h"
+ #include "DIA_encoding.h"
  #include "ADM_image.h"
  #include "ADM_fileio.h"
 #include "ADM_toolkit/ADM_audioQueue.h"

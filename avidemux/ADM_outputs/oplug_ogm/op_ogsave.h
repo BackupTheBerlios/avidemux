@@ -12,7 +12,7 @@
 #ifndef OP_OGSAVE
 #define OP_OGSAVE
 
-#include "ADM_dialog/DIA_encoding.h"
+#include "DIA_encoding.h"
 #include "oplug_ogm/op_ogpage.h"
 #include "ADM_encoder/adm_encoder.h"
 // Some little / big endian stuff

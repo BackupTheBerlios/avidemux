@@ -5,7 +5,7 @@
 #define ADM_ENCODING_H
 
 #include "ADM_osSupport/TLK_clock.h"
-#include "ADM_tray/ADM_tray.h"
+#include "ADM_tray.h"
 #define MAX_BR_SLOT 200
 
 typedef struct encodingSlice

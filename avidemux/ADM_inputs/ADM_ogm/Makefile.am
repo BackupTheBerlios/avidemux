@@ -14,4 +14,4 @@ ADM_ogm.cpp   ADM_ogmAudio.cpp  ADM_ogmpages.h
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES = $(all_includes) -I../../ADM_libraries -I../../ADM_libraries/ADM_utilities -I../../ADM_libraries/ADM_lavutil \
-		-I../../ADM_userInterfaces/ADM_GTK/ 
+		-I../../ADM_userInterfaces/ADM_commonUI/ 

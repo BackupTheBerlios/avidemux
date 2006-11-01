@@ -31,15 +31,7 @@
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 #include "ADM_encoder/adm_encoder.h"
-#warning FIXME
-#warning FIXME
-#warning FIXME
-#warning FIXME
-#include "../../ADM_userInterfaces/ADM_GTK/ADM_dialog/DIA_encoding.h"
-#warning FIXME
-#warning FIXME
-#warning FIXME
-#warning FIXME
+#include "../../ADM_userInterfaces/ADM_commonUI/DIA_encoding.h"
 #include "ADM_audiofilter/audioprocess.hxx"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 

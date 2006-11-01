@@ -42,7 +42,7 @@
 
 
 #include "ADM_vidSoften.h"
-#include "ADM_dialog/DIA_enter.h"
+#include "DIA_enter.h"
 #include "ADM_filter/video_filters.h"
 
 

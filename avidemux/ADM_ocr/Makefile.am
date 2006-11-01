@@ -2,6 +2,7 @@ noinst_LIBRARIES = libADM_ocr.a
 
 INCLUDES = $(all_includes)  $(GTK_CFLAGS) \
 	 -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil -I../ADM_inputs \
+	-I../ADM_userInterfaces/ADM_commonUI \
 	-I../ADM_userInterfaces/ADM_GTK
 
 libADM_ocr_a_METASOURCES = AUTO

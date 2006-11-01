@@ -44,7 +44,7 @@
 #include "fourcc.h"
 #include "ADM_ogm.h"
 #include "ADM_ogmpages.h"
-#include "ADM_dialog/DIA_working.h"
+#include "DIA_working.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_osSupport/ADM_debugID.h"

@@ -34,7 +34,7 @@
 #include "avi_vars.h"
 #include "ADM_assert.h"
 #include "ADM_toolkit/filesel.h"
-#include "ADM_toolkit/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "prototype.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"
@@ -56,19 +56,19 @@
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_audiodevice/audio_out.h"
 
-#include "ADM_dialog/DIA_busy.h"
-#include "ADM_dialog/DIA_working.h"
+#include "DIA_busy.h"
+#include "DIA_working.h"
 
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-#include "ADM_dialog/DIA_enter.h"
+#include "DIA_enter.h"
 
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 
 #include "ADM_codecs/ADM_ffmpeg.h"
 
-#include "mpeg2enc/ADM_mpeg2enc.h"
+#include "ADM_libmpeg2enc/ADM_mpeg2enc.h"
 
 #include "ADM_filter/video_filters.h"
 #include "ADM_assert.h"

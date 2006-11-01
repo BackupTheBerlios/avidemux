@@ -26,7 +26,7 @@
 #include "ADM_lavcodec.h"
 #include <ADM_assert.h>
 
-#include "ADM_library/default.h"
+#include "default.h"
 
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include "ADM_pp.h"

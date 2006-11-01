@@ -40,7 +40,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 //#include "ADM_toolkit/toolkit_gtk.h"
 #include "ADM_gui2/GUI_render.h"
-#include "ADM_dialog/DIA_working.h"
+#include "DIA_working.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
     

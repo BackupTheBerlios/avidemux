@@ -37,7 +37,7 @@
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_video/ADM_cache.h"
 #include "ADM_filter/video_filters.h"
-#include "ADM_dialog/DIA_enter.h"
+#include "DIA_enter.h"
 
 #define MUL 1
 // Set it to 2 for post separate field

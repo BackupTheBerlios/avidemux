@@ -27,7 +27,7 @@
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
-#include "ADM_dialog/DIA_working.h"
+#include "DIA_working.h"
 
 
 
@@ -39,7 +39,7 @@
 #include "dmx_demuxerTS.h"
 #include "dmx_identify.h"
 #include "dmx_probe.h"
-#include "ADM_dialog/DIA_busy.h"
+#include "DIA_busy.h"
 #include "ADM_audio/ADM_mp3info.h"
 #include "ADM_audio/ADM_a52info.h"
 #include "ADM_audio/ADM_dcainfo.h"
