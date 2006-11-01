@@ -24,9 +24,9 @@
 #include <gtk/gtk.h>
 # include <math.h>
 
-#include "ADM_library/default.h"
-#include "ADM_toolkit/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit_gtk_include.h"
+#include "default.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 

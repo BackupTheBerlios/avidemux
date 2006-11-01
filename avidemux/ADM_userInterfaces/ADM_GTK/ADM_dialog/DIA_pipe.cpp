@@ -11,10 +11,10 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 # include <config.h>
-#include "ADM_library/default.h"
-#include "ADM_toolkit/ADM_gladeSupport.h"
-#include "ADM_toolkit/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit_gtk_include.h"
+#include "default.h"
+#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 
 #include "prefs.h"
 #include "../ADM_assert.h"

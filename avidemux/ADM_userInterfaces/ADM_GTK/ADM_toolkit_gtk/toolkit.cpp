@@ -30,8 +30,7 @@
 #include <sys/time.h>
 
 #include "avi_vars.h"
-#include "toolkit.hxx"
-#include "toolkit.hxx"
+#include "ADM_misc.h"
 
 
 GtkWidget *GUI_PixmapButtonDefault(GdkWindow * window, const gchar ** xpm,

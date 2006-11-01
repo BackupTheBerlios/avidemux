@@ -12,13 +12,13 @@
 #include <gtk/gtk.h>
 # include <math.h>
 # include "config.h"
-#include "ADM_library/default.h"
-#include "ADM_toolkit/ADM_gladeSupport.h"
-#include "ADM_toolkit/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit_gtk_include.h"
+#include "default.h"
+#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
-#include "ADM_library/avidemutils.h"
+#include "avidemutils.h"
 
 static GtkWidget       *create_dialog1 (void);
 

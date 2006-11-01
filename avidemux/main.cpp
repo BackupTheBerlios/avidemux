@@ -79,11 +79,6 @@ extern void AUDMEncoder_initDither(void);
 extern void ADM_memStat( void );
 extern void ADM_memStatInit( void );
 extern void ADM_memStatEnd( void );
-extern "C"
-{
-extern void VPInitLibrary(void);
-extern void VPDeInitLibrary(void);
-};
 
 
 void sig_segfault_handler(int signo);
@@ -156,7 +151,6 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
     printf("Initializing prefs\n");
     initPrefs();
 
-  VPInitLibrary();
   register_Encoders( );
   atexit(onexit);
   
@@ -250,7 +244,6 @@ typedef gboolean GCALL       (void *);
 void onexit( void )
 {
   printf("Cleaning up\n");
-        VPDeInitLibrary();
         delete video_body;
         // wait for thread to finish executing
         printf("Waiting for Spidermonkey to finish...\n");

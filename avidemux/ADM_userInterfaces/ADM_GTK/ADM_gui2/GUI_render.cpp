@@ -43,11 +43,11 @@
 #include "ADM_gui2/GUI_xvDraw.h"
 #include "ADM_gui2/GUI_sdlDraw.h"
 
-#include "ADM_toolkit/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
 
 #include "prefs.h"
-#include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_libswscale/ADM_mp.h"
+#include "../../../ADM_colorspace/ADM_rgb.h"
+#include "../../../ADM_libraries/ADM_libswscale/ADM_mp.h"
 #include "gtkgui.h"
 
 

@@ -11,9 +11,9 @@
 
 #include <gtk/gtk.h>
 
-#include "ADM_toolkit/ADM_gladeSupport.h"
+#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include <ADM_assert.h>
 #include "xpm/play.xpm"
 #include "xpm/stop.xpm"

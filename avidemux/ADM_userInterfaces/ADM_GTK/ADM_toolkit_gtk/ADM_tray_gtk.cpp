@@ -25,20 +25,16 @@ http://savannah.nongnu.org/cvs/?group=mldonkey
 #include <stdio.h>
 
 
-/*#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>*/
 
+#include "default.h"
+#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include <ADM_assert.h>
+#include "ADM_tray.h"
+#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
 extern "C"
 {
-#include "ADM_toolkit/systray.h"
+#include "systray.h"
 }
-#include <ADM_assert.h>
-#include "default.h"
-#include "ADM_tray.h"
-
-
-#include "ADM_toolkit/ADM_gladeSupport.h"
-
 static int nbTray=0;
 static  GdkPixbuf   **pixbuf=NULL;
 

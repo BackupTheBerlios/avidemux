@@ -44,9 +44,9 @@
 #include "ADM_video/ADM_vidFont.h"
 #include "ADM_video/ADM_vidSRT.h"
 
-#include "ADM_toolkit/ADM_gladeSupport.h"
-#include "ADM_toolkit/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit_gtk_include.h"
+#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_colorspace/colorspace.h"

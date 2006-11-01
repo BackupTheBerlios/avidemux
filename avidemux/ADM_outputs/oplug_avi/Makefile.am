@@ -6,7 +6,9 @@ INCLUDES = $(all_includes)  -I../../ADM_libraries -I../../ADM_libraries/ADM_util
 
 liboplug_avi_a_METASOURCES = AUTO
 
-liboplug_avi_a_SOURCES = op_savesmart.cpp op_saveprocess.cpp op_saveproc2pass.cpp op_aviwrite.cpp op_avisavedual.cpp op_avisavecopy.cpp op_avisave.cpp 
+liboplug_avi_a_SOURCES = op_savesmart.cpp op_saveprocess.cpp op_saveproc2pass.cpp op_aviwrite.cpp \
+			 op_avisavedual.cpp op_avisavecopy.cpp op_avisave.cpp  \
+			 avilist.cpp
 
 
 EXTRA_DIST =  GUI_mux.h       op_avisavecopy.cpp  op_aviwrite.hxx    \

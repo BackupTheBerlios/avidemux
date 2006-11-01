@@ -19,9 +19,9 @@
 #include "default.h"
 
 
-#include "ADM_toolkit/ADM_gladeSupport.h"
-#include "ADM_toolkit/toolkit_gtk.h"
-#include "ADM_toolkit/toolkit_gtk_include.h"
+#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include <ADM_assert.h>
 
  #define WID(x) lookup_widget(dialog,#x)

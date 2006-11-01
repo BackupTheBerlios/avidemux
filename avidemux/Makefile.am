@@ -40,8 +40,6 @@ avidemux2_LDADD   =  \
 ./ADM_audiofilter/libADM_audiofilter.a			\
 ./ADM_requant/libADM_requant.a				\
 ./ADM_colorspace/libADM_colorspace.a			\
-./ADM_encoder/libADM_encoder.a				\
-./ADM_toolkit/libADM_toolkit.a				\
 ./ADM_filter/libADM_filter.a				\
 ./ADM_editor/libADM_editor.a				\
 ./ADM_codecs/libADM_codecs.a				\
@@ -55,6 +53,7 @@ avidemux2_LDADD   =  \
 ./ADM_outputs/oplug_mpegFF/liboplug_mpegFF.a		\
 ./ADM_outputs/oplug_ogm/liboplug_ogm.a			\
 ./ADM_outputs/oplug_avi/liboplug_avi.a			\
+./ADM_encoder/libADM_encoder.a				\
 ./ADM_inputs/ADM_3gp/libADM_3gp.a			\
 ./ADM_inputs/ADM_asf/libADM_asf.a			\
 ./ADM_inputs/ADM_h263/libADM_h263.a			\
@@ -79,8 +78,10 @@ avidemux2_LDADD   =  \
 ./ADM_libraries/ADM_libMpeg2Dec/liblibMpeg2Dec.a	\
 ./ADM_libraries/ADM_libmpeg2enc/libmpeg2enc.a		\
 ./ADM_libraries/ADM_xvidratectl/libADM_xvidratectl.a	\
+./ADM_toolkit/libADM_toolkit.a				\
 ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
 ./ADM_userInterfaces/ADM_GTK/ADM_dialog/libADM_dialog.a	\
+./ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/libADM_toolkit_gtk.a	\
 ./ADM_libraries/ADM_utilities/libADM_library.a		\
 ./ADM_osSupport/libADM_ossupport.a			\
 $(libmpeg2enc_Altivec) 

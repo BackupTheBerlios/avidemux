@@ -30,15 +30,16 @@
 #endif
 
 #include "avi_vars.h"
-#include "toolkit.hxx"
+#include "ADM_misc.h"
 #include <ADM_assert.h>
 
-#include "filesel.h"
+#include "ADM_toolkit/filesel.h"
+#include "ADM_toolkit/toolkit.hxx"
 #include "prefs.h"
 #define TH_READ 1
 #define TH_WRITE 2
-#include "ADM_toolkit/toolkit_gtk_include.h"
-#include "ADM_toolkit/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
 uint8_t ADM_mkdir(const char *name);
 extern char * actual_workbench_file;
 

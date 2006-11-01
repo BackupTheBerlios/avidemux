@@ -30,8 +30,8 @@
 #include "avio.hxx"
 
 #include "avi_vars.h"
-#include "ADM_toolkit/toolkit_gtk_include.h"
-#include "ADM_toolkit/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
 #ifdef HAVE_ENCODER
 
 

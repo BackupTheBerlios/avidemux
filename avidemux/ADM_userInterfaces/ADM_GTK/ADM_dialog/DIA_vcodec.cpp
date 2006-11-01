@@ -9,12 +9,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include "ADM_toolkit/toolkit_gtk_include.h"
-#include "ADM_toolkit/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
 
 #include "ADM_assert.h" 
 
-#include "ADM_library/default.h"
+#include "default.h"
 
 //___________________________________
 #include "ADM_editor/ADM_edit.hxx"

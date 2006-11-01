@@ -30,7 +30,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkx.h>
-#include "ADM_toolkit/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
 #else
 #define GtkWidget void
 #endif

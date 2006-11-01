@@ -24,8 +24,7 @@
 #include "config.h"
 
 #include "avi_vars.h"
-#include "toolkit.hxx"
-#include "toolkit.hxx"
+#include "ADM_toolkit/toolkit.hxx"
 
 static void alert_cb_ok(void);
 static void alert_cb_destroyed(void);

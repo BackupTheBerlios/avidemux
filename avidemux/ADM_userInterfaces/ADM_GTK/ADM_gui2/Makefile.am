@@ -15,5 +15,5 @@ GUI_keymap.cpp     GUI_render.cpp  GUI_sdlDraw.h    GUI_xvDraw.h
 
 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES= $(all_includes) $(GTK_CFLAGS)
+INCLUDES= $(all_includes) $(GTK_CFLAGS) -I../../../ -I../../../ADM_libraries/ADM_utilities
 noinst_HEADERS = GUI_accelRender.h GUI_sdlDraw.h
