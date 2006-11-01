@@ -32,9 +32,9 @@ It is an fopen/fwrite lookalike interface to chunks
 #include <io.h>
 #endif
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_editor/ADM_Video.h"
-#include "ADM_library/fourcc.h"
+#include "fourcc.h"
 #include "ADM_openDML/ADM_openDML.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_openDML/ADM_odml_audio.h"

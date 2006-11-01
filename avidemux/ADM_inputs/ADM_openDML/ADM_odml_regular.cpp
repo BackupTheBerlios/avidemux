@@ -26,11 +26,11 @@
 	//#define ODML_INDEX_VERBOSE
 #endif
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_editor/ADM_Video.h"
 
 
-#include "ADM_library/fourcc.h"
+#include "fourcc.h"
 #include "ADM_openDML/ADM_openDML.h"
 #include "ADM_toolkit/toolkit.hxx"
 

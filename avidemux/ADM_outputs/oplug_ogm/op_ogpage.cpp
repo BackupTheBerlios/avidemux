@@ -27,9 +27,9 @@
 
 #include <math.h>
 #include <ADM_assert.h>
-#include "ADM_library/default.h"
-#include "ADM_library/avifmt.h"
-#include "ADM_library/avifmt2.h"
+#include "default.h"
+#include "avifmt.h"
+#include "avifmt2.h"
 #include "oplug_ogm/op_ogpage.h"
 
 #define min(a,b) (a>b)?b:a

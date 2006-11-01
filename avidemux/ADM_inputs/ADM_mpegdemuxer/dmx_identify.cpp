@@ -22,7 +22,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include <ADM_assert.h>
 
 #include "dmx_io.h"

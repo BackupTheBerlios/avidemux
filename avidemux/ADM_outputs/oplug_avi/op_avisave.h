@@ -17,11 +17,11 @@
  #ifndef __AVI_SAVE__
  #define   __AVI_SAVE__
 
- #include "ADM_library/default.h"
+ #include "default.h"
  #include "ADM_dialog/DIA_working.h"
  #include "ADM_dialog/DIA_encoding.h"
- #include "ADM_library/ADM_image.h"
- #include "ADM_library/ADM_fileio.h"
+ #include "ADM_image.h"
+ #include "ADM_fileio.h"
 #include "ADM_toolkit/ADM_audioQueue.h"
 
  class GenericAviSave

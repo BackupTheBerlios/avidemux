@@ -25,8 +25,8 @@
 #include "math.h"
 #include <ADM_assert.h>
 
-#include "ADM_library/default.h"
-#include "ADM_library/fourcc.h"
+#include "default.h"
+#include "fourcc.h"
 
 #include "ADM_ogm.h"
 #include "ADM_ogmpages.h"

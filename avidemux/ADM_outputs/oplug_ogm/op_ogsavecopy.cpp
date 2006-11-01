@@ -38,7 +38,7 @@
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiofilter/audioprocess.hxx"
 
-#include "ADM_library/default.h"
+#include "default.h"
 
 #include "oplug_ogm/op_ogsave.h"
 

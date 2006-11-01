@@ -1,7 +1,9 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
 noinst_LIBRARIES = liboplug_mp4.a
 
-INCLUDES = $(all_includes)
+INCLUDES = $(all_includes)  -I../../ADM_libraries -I../../ADM_libraries/ADM_utilities   -I../../ADM_libraries/ADM_lavutil \
+		-I../../ADM_userInterfaces/ADM_GTK \
+		-I../../ADM_userInterfaces/
 
 liboplug_mp4_a_METASOURCES = AUTO
 
