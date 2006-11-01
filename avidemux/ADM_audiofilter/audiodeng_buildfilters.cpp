@@ -21,7 +21,7 @@
 #include <ADM_assert.h>
 #include <math.h>
 
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 
 #include "ADM_audiofilter/audiofilter_limiter_param.h"
 #include "ADM_audiofilter/audiofilter_normalize_param.h"
@@ -262,7 +262,8 @@ void audioFilterResample(uint32_t onoff)
 
 } 
 //______________________________
-#include "ADM_gui2/GUI_ui.h"
+//#include "ADM_gui2/GUI_ui.h"
+uint8_t UI_setTimeShift(int onoff,int value);
 extern  int DIA_getAudioFilter(GAINparam *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
   			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv,CHANNEL_CONF *channel);
 

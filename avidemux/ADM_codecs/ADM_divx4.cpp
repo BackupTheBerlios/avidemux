@@ -27,7 +27,7 @@
 #ifdef USE_DIVX
 
 #include "ADM_lavcodec.h"
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 #include "ADM_library/fourcc.h"
 
 #include "ADM_colorspace/colorspace.h"

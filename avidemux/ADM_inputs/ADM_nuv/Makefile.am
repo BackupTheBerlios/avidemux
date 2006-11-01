@@ -13,4 +13,4 @@ ADM_nuv.h    ADM_rtGlob.h      RTjpegN.cpp  RToldformat.cpp  minilzo.h  nuppel.h
 
 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES = $(all_includes)  
+INCLUDES = $(all_includes)  -I../../ADM_libraries -I../../ADM_libraries/ADM_utilities   -I../../ADM_libraries/ADM_lavutil

@@ -18,5 +18,6 @@ ADM_deviceALSA.h     ADM_deviceAudioCore.h    ADM_deviceSDL.h    ADM_deviceoss.h
 
 ####### kdevelop will overwrite this part!!! (end)############
 
-INCLUDES = $(all_includes) $(ARTS_CFLAGS)
+INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil \
+		 $(ARTS_CFLAGS)
 noinst_HEADERS = ADM_audiodevice.h ADM_deviceSDL.h ADM_deviceWin32.h

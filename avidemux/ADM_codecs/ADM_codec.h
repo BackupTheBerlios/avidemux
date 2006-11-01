@@ -16,7 +16,7 @@
  ***************************************************************************/
 #ifndef __CODECS__
 #define __CODECS__
-#include "ADM_library/ADM_image.h"
+#include "ADM_utilities/ADM_image.h"
 
 #define AVI_KEY_FRAME	0x10
 #define AVI_B_FRAME	0x4000	// hopefully it is not used..
@@ -31,7 +31,7 @@
 
 */
 
-#include "ADM_library/ADM_bitstream.h"
+#include "ADM_utilities/ADM_bitstream.h"
 class decoders
 {
 protected:

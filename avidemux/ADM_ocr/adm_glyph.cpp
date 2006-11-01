@@ -11,7 +11,7 @@
  #include <stdlib.h>
  #include <string.h>
  #include "ADM_assert.h"
- #include "ADM_library/default.h"
+ #include "default.h"
  #include "adm_glyph.h"
  //*************************************************
 admGlyph::admGlyph(uint32_t w,uint32_t h)

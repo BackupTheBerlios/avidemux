@@ -1,7 +1,7 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
 noinst_LIBRARIES = libADM_audiofilter.a
 
-#INCLUDES = $(all_includes)
+INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil -I../ADM_libraries/ADM_lavcodec
 
 libADM_audiofilter_a_METASOURCES = AUTO
 
@@ -43,4 +43,3 @@ audioencoder_aften.cpp audioencoder_aften.h
 
 ####### kdevelop will overwrite this part!!! (end)############
 
-INCLUDES= $(all_includes) 

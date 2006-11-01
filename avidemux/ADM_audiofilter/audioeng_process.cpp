@@ -20,7 +20,7 @@
 #include <math.h>
 
 #include <ADM_assert.h>
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 
 #include "audioprocess.hxx"
 

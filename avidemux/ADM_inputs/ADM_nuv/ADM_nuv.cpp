@@ -58,12 +58,12 @@
 
 #include "math.h"
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_editor/ADM_Video.h"
 
 #include <ADM_assert.h>
 
-#include "ADM_library/fourcc.h"
+#include "fourcc.h"
 #include "ADM_nuv/ADM_nuv.h"
 #include "ADM_nuv/nuppel.h"
 #include "ADM_nuv/minilzo.h"

@@ -20,13 +20,13 @@
 
 #include "math.h"
 
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 #include "ADM_editor/ADM_Video.h"
 #include <ADM_assert.h>
 
-#include "ADM_library/fourcc.h"
+#include "fourcc.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_dialog/DIA_working.h"
+//#include "DIA_working.h"
 #include "ADM_asf.h"
 #include "ADM_asfPacket.h"
 
@@ -653,7 +653,7 @@ uint8_t asfHeader::buildIndex(void)
   _dataStartOffset=ftello(_fd);
   
   // Here we go
-  DIA_working *working=new DIA_working("indexing asf");
+  //DIA_working *working=new DIA_working("indexing asf");
   asfPacket *aPacket=new asfPacket(_fd,_nbPackets,_packetSize,
                                    &readQueue,_dataStartOffset);
   uint32_t packet=1;
@@ -732,14 +732,14 @@ uint8_t asfHeader::buildIndex(void)
       }
      delete bit;
     }
-    working->update(packet,_nbPackets);
+    //working->update(packet,_nbPackets);
 
     packet++;
     aPacket->nextPacket(0xff); // All packets
     aPacket->skipPacket();
   }
   delete aPacket;
-  delete working;
+  //delete working;
   /* Compact index */
   _index=new asfIndex[nbImage];
   memcpy(_index,tmpIndex,sizeof(asfIndex)*nbImage);

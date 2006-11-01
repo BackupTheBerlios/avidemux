@@ -22,10 +22,10 @@
 
 #include <string.h>
 //#include <math.h>
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 #include "avifmt.h"
 #include "avifmt2.h"
-#include "ADM_library/fourcc.h"
+#include "ADM_utilities/fourcc.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_codecs/ADM_uyvy.h"

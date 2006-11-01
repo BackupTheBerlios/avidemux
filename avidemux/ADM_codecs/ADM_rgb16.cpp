@@ -24,7 +24,7 @@
 
 
 
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 
 #include <ADM_assert.h>
 #include "ADM_colorspace/colorspace.h"

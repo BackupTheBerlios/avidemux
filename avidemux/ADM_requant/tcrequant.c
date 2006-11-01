@@ -55,7 +55,7 @@
 
 
 // MEANX
-#include "../ADM_library/default.h"
+#include "default.h"
 #include "tcrequant.h"
 
 #include "../ADM_osSupport/ADM_debugID.h"

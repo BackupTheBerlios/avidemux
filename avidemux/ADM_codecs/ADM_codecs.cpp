@@ -25,7 +25,6 @@
 #include <math.h>
 
 
-#include "ADM_vp32/ADM_vp3.h"
 
 #ifdef USE_FFMPEG
 extern "C"
@@ -33,7 +32,7 @@ extern "C"
 #include "ADM_lavcodec.h"
 };
 #endif
-#include "ADM_library/default.h"
+#include "ADM_utilities/default.h"
 #ifdef BIG_ENDIAN
 #undef BIG_ENDIAN
 #endif
@@ -52,7 +51,7 @@ extern "C"
 #include "ADM_codecs/ADM_uyvy.h"
 #include "ADM_codecs/ADM_xvideco.h"
 
-#include "ADM_library/fourcc.h"
+#include "ADM_utilities/fourcc.h"
 
 #ifdef USE_FFMPEG
 #include "ADM_codecs/ADM_ffmp43.h"
@@ -66,7 +65,6 @@ extern "C"
 #include "ADM_codecs/ADM_theora_dec.h"
 #endif
 #include "ADM_codecs/ADM_mpeg.h"
-#include "ADM_codecs/ADM_vp3.h"
 #include "ADM_codecs/ADM_png.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>
@@ -344,20 +342,6 @@ if (fourCC::check (fcc, (uint8_t *) "FFV1"))
       return (decoders *) (new decoderRGB16 (w, h,1));
 
     }
-#ifdef USE_THEORA
-
-  if (fourCC::check (fcc, (uint8_t *) "VP31"))
-    {
-      printf ("\n using Theora codec\n");
-      return (decoders *) (new decoderTheora (w, h));
-    }
-#else
-  if (fourCC::check (fcc, (uint8_t *) "VP31"))
-    {
-      printf ("\n using VP3 codec\n");
-      return (decoders *) (new decoderVP3 (w, h));
-    }
-#endif
   if (isMpeg12Compatible (fcc))
     {
       uint32_t lavcodec_mpeg = 0;

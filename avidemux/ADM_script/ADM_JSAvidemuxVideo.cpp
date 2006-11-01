@@ -14,9 +14,9 @@
 #include <stdlib.h>
 #include "ADM_JSAvidemuxVideo.h"
 #include "ADM_JSGlobal.h"
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "ADM_gui2/GUI_ui.h"
+#include "../ADM_userInterfaces/ADM_GTK/ADM_gui2/GUI_ui.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "avi_vars.h"
 #include "gui_action.hxx"
@@ -25,7 +25,7 @@
 #include "ADM_encoder/adm_encoder.h"
 #include "ADM_encoder/adm_encConfig.h"
 #include "ADM_editor/ADM_outputfmt.h"
-#include "ADM_gui2/GUI_ui.h"
+#include "../ADM_userInterfaces/ADM_GTK/ADM_gui2/GUI_ui.h"
 #include "ADM_filter/video_filters.h"
 
 #include "ADM_script/ADM_container.h"

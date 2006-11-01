@@ -11,7 +11,7 @@
 //
 #include "config.h"
 #include <stdio.h>
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include "prefs.h"
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)

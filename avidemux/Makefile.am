@@ -14,11 +14,10 @@ avidemux2_SOURCES =   guiplay.cpp  \
 
 SUBDIRS = ADM_libraries ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_colorspace ADM_editor ADM_encoder ADM_filter  \
-	ADM_toolkit oplug_mpeg xpm ADM_video ADM_audiodevice ADM_vp32 \
+	ADM_toolkit xpm ADM_video ADM_audiodevice \
 	\
 	ADM_requant \
 	ADM_script ADM_ocr \
-	ADM_tray \
 	ADM_osSupport \
 	ADM_inputs ADM_outputs \
 	ADM_userInterfaces

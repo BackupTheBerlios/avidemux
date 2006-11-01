@@ -1,7 +1,7 @@
 /***************************************************************************
-                          ADM_vp3.h  -  description
+                          adm_encdivx.cpp  -  description
                              -------------------
-    begin                : Sat Sep 28 2002
+    begin                : Sun Jul 14 2002
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
@@ -14,23 +14,20 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef __VP3__
-#define __VP3__
 
+#ifndef ADM_TRAY_H
+#define ADM_TRAY_H
 
-class decoderVP3:public decoders
+class ADM_tray
 {
 protected:
-  PB_INSTANCE * _handle;
-
-
+        void    *sys;
 public:
-  decoderVP3 (uint32_t w, uint32_t h);
-  virtual ~ decoderVP3 ();
-  virtual uint8_t uncompress (uint8_t * in, ADMImage * out, uint32_t len,
-			      uint32_t * flag = NULL);
-  virtual void setParam (void);
-
+                ADM_tray(char *name);
+                ~ADM_tray();
+        uint8_t setPercent(int percent);
+        uint8_t setStatus(int working);
 
 };
+
 #endif

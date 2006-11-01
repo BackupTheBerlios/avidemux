@@ -36,7 +36,7 @@
 
 //#define TEST_V2V
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
 

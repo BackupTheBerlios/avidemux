@@ -29,11 +29,11 @@
 #include <string.h>
 #include "math.h"
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_editor/ADM_Video.h"
 
 
-#include "ADM_library/fourcc.h"
+#include "fourcc.h"
 #include "ADM_inpics/ADM_pics.h"
 #include "ADM_inpics/bitmap.h"
 #include "ADM_toolkit/toolkit.hxx"

@@ -18,5 +18,5 @@ EXTRA_DIST = 	ADM_cpuCap.h  ADM_debug.h  ADM_debugID.h  ADM_queue.h  ADM_quota.h
 
 
 ####### kdevelop will overwrite this part!!! (end)############
-INCLUDES= $(all_includes) 
+INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil 
 noinst_HEADERS =  

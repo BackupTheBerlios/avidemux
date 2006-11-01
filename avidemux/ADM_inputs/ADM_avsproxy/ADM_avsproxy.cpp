@@ -15,11 +15,11 @@
 #include <errno.h>
 
 #include <ADM_assert.h>
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_editor/ADM_Video.h"
 
 
-#include "ADM_library/fourcc.h"
+#include "fourcc.h"
 #include "ADM_avsproxy/ADM_avsproxy.h"
 #include "ADM_avsproxy/ADM_avsproxy_internal.h"
 #include "ADM_toolkit/toolkit.hxx"

@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libADM_matroska.a
 
-INCLUDES = $(all_includes) 
+INCLUDES = $(all_includes)  -I../../ADM_libraries -I../../ADM_libraries/ADM_utilities   -I../../ADM_libraries/ADM_lavutil
 
 libADM_matroska_a_METASOURCES = AUTO
 

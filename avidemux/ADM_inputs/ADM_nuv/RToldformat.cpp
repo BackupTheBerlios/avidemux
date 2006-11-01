@@ -19,7 +19,7 @@
 
 
 #if !defined(_I386_TYPES_H) || defined(ADM_BIG_ENDIAN)
-#include "ADM_library/default.h"
+#include "default.h"
 typedef uint8_t __u8;
 typedef uint16_t __u16;
 typedef uint32_t __u32;

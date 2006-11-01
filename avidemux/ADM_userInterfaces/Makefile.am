@@ -1,4 +1,4 @@
-SUBDIRS=
+SUBDIRS=ADM_tray
 if ADM_UI_GTK
  SUBDIRS += ADM_GTK
 endif

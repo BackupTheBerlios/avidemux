@@ -6,11 +6,11 @@ noinst_LIBRARIES = libADM_toolkit.a
 libADM_toolkit_a_METASOURCES = AUTO
 
 libADM_toolkit_a_SOURCES =  \
-	ADM_audioQueue.cpp   automation.cpp  eggtray_win32.c  \
+	ADM_audioQueue.cpp   automation.cpp    \
 	ADM_intfloat.cpp     \
-	ADM_packetQueue.cpp  eggtrayicon.c   
+	ADM_packetQueue.cpp     
 
-EXTRA_DIST = ADM_audioQueue.h  ADM_packetQueue.h  eggtrayicon.h  systray.h     \
+EXTRA_DIST = ADM_audioQueue.h  ADM_packetQueue.h         \
 		ADM_intfloat.h    bitmap.h           \
 		filesel.h       
 

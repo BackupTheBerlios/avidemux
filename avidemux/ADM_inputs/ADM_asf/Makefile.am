@@ -1,6 +1,7 @@
 noinst_LIBRARIES = libADM_asf.a
 
-INCLUDES = $(all_includes) 
+INCLUDES = $(all_includes)  -I../../ADM_libraries -I../../ADM_libraries/ADM_utilities   -I../../ADM_libraries/ADM_lavutil
+ 
 
 libADM_asf_a_METASOURCES = AUTO
 

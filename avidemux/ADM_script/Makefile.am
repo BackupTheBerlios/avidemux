@@ -27,5 +27,6 @@ noinst_HEADERS = ADM_JSGlobal.h ADM_Avidemux.h \
 
 
 
-INCLUDES = -I$(top_srcdir)/avidemux $(SMONKEY_CFLAGS) -DJS_THREADSAFE
+INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil \
+			-I$(top_srcdir)/avidemux $(SMONKEY_CFLAGS) -DJS_THREADSAFE
 

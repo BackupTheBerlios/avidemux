@@ -1,7 +1,7 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
 noinst_LIBRARIES = libADM_avsproxy.a
 
-INCLUDES = $(all_includes)
+INCLUDES = $(all_includes)  -I../../ADM_libraries -I../../ADM_libraries/ADM_utilities   -I../../ADM_libraries/ADM_lavutil
 
 libADM_avsproxy_a_METASOURCES = AUTO
 

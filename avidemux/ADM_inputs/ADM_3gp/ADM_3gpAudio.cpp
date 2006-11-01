@@ -30,9 +30,9 @@
 #include "math.h"
 #include <ADM_assert.h>
 
-#include "ADM_library/default.h"
+#include "default.h"
 #include "ADM_editor/ADM_Video.h"
-#include "ADM_library/fourcc.h"
+#include "fourcc.h"
 #include "ADM_3gp/ADM_3gp.h"
 //_______________________________________________________
 //
