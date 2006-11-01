@@ -10,6 +10,7 @@ endif
 if ADM_UI_GTK
 user_interface = ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
 		./ADM_userInterfaces/ADM_GTK/ADM_dialog/libADM_dialog.a	\
+		./ADM_userInterfaces/ADM_GTK/ADM_filters/libADM_filters.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/libADM_toolkit_gtk.a	
 endif
 avidemux2_SOURCES =   guiplay.cpp  \
@@ -40,6 +41,7 @@ gui_action.hxx prefs.in
 
 
 avidemux2_LDADD   =  \
+ADM_filter/filter_saveload.o 				\
 ./ADM_audiofilter/libADM_audiofilter.a			\
 ./ADM_filter/libADM_filter.a				\
 ./ADM_editor/libADM_editor.a				\
@@ -81,7 +83,7 @@ avidemux2_LDADD   =  \
 ./ADM_libraries/ADM_libMpeg2Dec/liblibMpeg2Dec.a	\
 ./ADM_libraries/ADM_libmpeg2enc/libmpeg2enc.a		\
 ./ADM_libraries/ADM_xvidratectl/libADM_xvidratectl.a	\
-$(user_interface) \
+$(user_interface) 					\
 ./ADM_toolkit/libADM_toolkit.a				\
 ./ADM_libraries/ADM_utilities/libADM_library.a		\
 ./ADM_osSupport/libADM_ossupport.a			\
