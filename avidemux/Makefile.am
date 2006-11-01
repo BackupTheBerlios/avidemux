@@ -9,6 +9,7 @@ endif
 
 if ADM_UI_GTK
 user_interface = ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
+		./ADM_userInterfaces/ADM_GTK/libADM_GTK.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_dialog/libADM_dialog.a	\
 		./ADM_userInterfaces/ADM_GTK/ADM_filters/libADM_filters.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/libADM_toolkit_gtk.a	
@@ -88,6 +89,7 @@ $(user_interface) 					\
 ./ADM_libraries/ADM_utilities/libADM_library.a		\
 ./ADM_osSupport/libADM_ossupport.a			\
 ./ADM_libraries/ADM_libswscale/libswscale.a		\
+./ADM_ocr/libADM_ocr.a					\
 $(libmpeg2enc_Altivec) 
 
 
