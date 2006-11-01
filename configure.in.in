@@ -102,7 +102,6 @@ dnl KDE_PROG_LIBTOOL
 
 dnl KDE_CHECK_EXTRA_LIBS
 all_libraries="$all_libraries $USER_LDFLAGS"
-all_includes="$all_includes $USER_INCLUDES"
 AC_SUBST(all_includes)
 AC_SUBST(all_libraries)
 dnl avoid po mess
@@ -742,7 +741,12 @@ if test "x$with_freetype2" != "xno"; then
 
 	fi
 fi
+dnl --------- UI ----------------------
+dnl ----- Only GTK for now -----------
+AM_CONDITIONAL(ADM_UI_GTK, test "xyes" = "xyes" )
+AC_DEFINE(ADM_UI_GTK,1,"[Use Gtk as user interface]")
 
+dnl -----------------------------
 AC_SUBST(FREETYPE_CFLAGS)
 AC_SUBST(FREETYPE_LIBS)
 
@@ -791,7 +795,7 @@ AC_ARG_WITH(debug, [  debug flag],
   ]
 )
 
-CXXFLAGS="   -I.. -I../ADM_lavutil -IADM_library -I../ADM_library  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 $CXXFLAGS"
+CXXFLAGS="   -I.. -I../ADM_lavutil -IADM_utilities -I../ADM_utilities  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 $CXXFLAGS -I../.."
 CFLAGS=" $CFLAGS"
 
 dnl ___________________profiling _______________________
