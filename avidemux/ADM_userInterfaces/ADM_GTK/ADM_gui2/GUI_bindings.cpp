@@ -1073,4 +1073,33 @@ gboolean UI_SliderReleased(GtkWidget *widget, GdkEventButton *event, gpointer us
 	SliderIsShifted=FALSE;
 	return FALSE;
 }
+int global_argc;
+char **global_argv;
+typedef gboolean GCALL       (void *);
+extern int automation(void );
+int UI_Init(int argc, char **argv)
+{
+    g_thread_init(NULL);
+    gdk_threads_init();
+    gdk_threads_enter();
+    gtk_set_locale();
+    global_argc=argc;
+    global_argv=argv;
+      
+    gtk_init(&global_argc, &global_argv);
+    gdk_rgb_init();
+}
+
+int UI_RunApp(void)
+{
+    if (global_argc >= 2)
+    {
+      g_timeout_add(200,(GCALL *)automation,NULL);
+    }
+    gtk_main();
+    gdk_threads_leave();
+
+}
+
+
 // EOF

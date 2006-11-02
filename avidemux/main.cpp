@@ -21,15 +21,11 @@
 #include <stdlib.h>
 #include <glib.h>
 #include <signal.h>
-#include <pthread.h>
-#define WIN32_CLASH
-#include <gtk/gtk.h>
 
 #ifdef HAVE_GETTEXT
 #include <libintl.h>
 #include <locale.h>
 #endif
-//#include "interface.h"
 
 #define __DECLARE__
 #include "avi_vars.h"
@@ -62,7 +58,7 @@ uint8_t lavformat_init(void);
 #include "ADM_osSupport/ADM_threads.h"
 void onexit( void );
 //extern void automation(int argc, char **argv);
-extern int automation(void );
+
 extern void registerVideoFilters( void );
 extern void filterCleanUp( void );
 extern void register_Encoders( void )  ;
@@ -86,8 +82,9 @@ void sig_segfault_handler(int signo);
 extern uint8_t  quotaInit(void);
 extern void ADMImage_stat( void );
 extern uint8_t win32_netInit(void);
-int global_argc;
-char **global_argv;
+
+extern int UI_Init(int nargc,char **nargv);
+extern int UI_RunApp(void);
 int CpuCaps::myCpuCaps=0;
 
 int main(int argc, char *argv[])
@@ -170,12 +167,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #ifdef CYG_MANGLING    
     win32_netInit();
 #endif
-    g_thread_init(NULL);
-    gdk_threads_init();
-    gdk_threads_enter();
-    gtk_set_locale();
-    gtk_init(&argc, &argv);
-    gdk_rgb_init();
+    UI_Init(argc,argv);
     AUDMEncoder_initDither();
 #ifdef USE_XVID_4
     xvid4_init();
@@ -227,17 +219,9 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
     {
       ADM_assert(0); 
     }
-typedef gboolean GCALL       (void *);
-    if (argc >= 2)
-    {
-      global_argc=argc;
-      global_argv=argv;
-      g_timeout_add(200,(GCALL *)automation,NULL);
-    }
 
-
-    gtk_main();
-    gdk_threads_leave();
+    
+    UI_RunApp();
     printf("Normal exit\n");
     return 0;
 }
