@@ -2,3 +2,6 @@ SUBDIRS=
 if ADM_UI_GTK
  SUBDIRS += ADM_GTK
 endif
+if ADM_UI_NONE
+ SUBDIRS += ADM_NONE
+endif
