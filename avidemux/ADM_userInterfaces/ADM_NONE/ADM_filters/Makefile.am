@@ -1,5 +1,5 @@
 
-noinst_LIBRARIES = libADM_dialog.a 
+noinst_LIBRARIES = libADM_filters.a 
 
 INCLUDES = $(all_includes)  $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@ \
 		-I../../../ADM_libraries/ADM_utilities \
@@ -8,7 +8,7 @@ INCLUDES = $(all_includes)  $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@
 
 libADM_filters_a_METASOURCES = AUTO
 
-libADM_filters_a_SOURCES = 
+libADM_filters_a_SOURCES = filter_none.cpp
 
 
 

@@ -14,6 +14,11 @@ user_interface = ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
 		./ADM_userInterfaces/ADM_GTK/ADM_filters/libADM_filters.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/libADM_toolkit_gtk.a	
 endif
+if ADM_UI_NONE
+user_interface = ./ADM_userInterfaces/ADM_NONE/ADM_gui2/libADM_gui2.a	\
+		./ADM_userInterfaces/ADM_NONE/ADM_dialog/libADM_dialog.a	\
+		./ADM_userInterfaces/ADM_NONE/ADM_filters/libADM_filters.a 
+endif
 avidemux2_SOURCES =   guiplay.cpp  \
 	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp   \
 	main.cpp   \

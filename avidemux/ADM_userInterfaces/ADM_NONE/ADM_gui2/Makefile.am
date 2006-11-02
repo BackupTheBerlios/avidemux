@@ -1,5 +1,5 @@
 
-noinst_LIBRARIES = libADM_dialog.a 
+noinst_LIBRARIES = libADM_gui2.a 
 
 INCLUDES = $(all_includes)  $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@ \
 		-I../../../ADM_libraries/ADM_utilities \
@@ -8,7 +8,7 @@ INCLUDES = $(all_includes)  $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@
 
 libADM_gui2_a_METASOURCES = AUTO
 
-libADM_gui2_a_SOURCES = 
+libADM_gui2_a_SOURCES = gui_none.cpp
 
 
 
