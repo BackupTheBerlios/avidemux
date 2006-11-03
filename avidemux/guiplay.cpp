@@ -47,7 +47,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "gtkgui.h"
-#include "ADM_gui2/GUI_render.h"
+#include "GUI_render.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 
 //___________________________________

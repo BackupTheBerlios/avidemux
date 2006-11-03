@@ -52,7 +52,7 @@
 #include "ADM_filter/video_filters.h"
 
 #include "ADM_toolkit/filesel.h"
-#include "ADM_gui2/GUI_ui.h"
+#include "GUI_ui.h"
 #include "oplug_mpegFF/oplug_vcdff.h"
 
 static uint8_t  A_SaveAudioNVideo(const char *name);

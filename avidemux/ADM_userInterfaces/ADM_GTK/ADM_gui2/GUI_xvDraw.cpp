@@ -43,7 +43,7 @@
 #include "ADM_assert.h"
 
 #include "ADM_colorspace/colorspace.h"
-#include "ADM_gui2/GUI_render.h"
+#include "ADM_commonUI//GUI_render.h"
 
 #include "ADM_gui2/GUI_accelRender.h"
 #include "ADM_gui2/GUI_xvDraw.h"

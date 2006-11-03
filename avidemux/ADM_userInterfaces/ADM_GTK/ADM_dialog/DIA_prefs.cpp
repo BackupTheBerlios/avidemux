@@ -26,7 +26,7 @@
 #include "ADM_audiodevice/audio_out.h"
 
 #include "ADM_assert.h"
-#include "ADM_gui2/GUI_render.h"
+#include "GUI_render.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include "ADM_toolkit/toolkit.hxx"
 

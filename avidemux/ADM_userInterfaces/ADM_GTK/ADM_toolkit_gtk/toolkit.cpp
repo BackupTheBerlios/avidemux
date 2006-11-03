@@ -133,15 +133,6 @@ void changeTextInMenu(GtkWidget *menu,int range,const char *text)
 
 }
 
-/// convert frame number and fps to hour/mn/sec/ms
-void  frame2time(	uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
-                                uint16_t * ss, uint16_t * ms)
-{
-    UNUSED_ARG(fps);
-    uint32_t len2;
-    len2 = video_body->getTime(frame);
-    ms2time(len2,hh,mm,ss,ms);
-}
 void UI_purge( void )
 {
         

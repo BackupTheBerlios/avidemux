@@ -26,7 +26,7 @@
 
 
 #include "avi_vars.h"
-#include "ADM_gui2/GUI_ui.h"
+#include "GUI_ui.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_assert.h"
 

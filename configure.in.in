@@ -742,9 +742,12 @@ if test "x$with_freetype2" != "xno"; then
 	fi
 fi
 dnl --------- UI ----------------------
+dnl gtk/none (/qt)
+selected_ui=gtk
 dnl ----- Only GTK for now -----------
-AM_CONDITIONAL(ADM_UI_GTK, test "xyes" = "xyes" )
-AC_DEFINE(ADM_UI_GTK,1,"[Use Gtk as user interface]")
+AM_CONDITIONAL(ADM_UI_GTK,  test "x$selected_ui" = "xgtk" )
+AM_CONDITIONAL(ADM_UI_NONE, test "x$selected_ui" = "xnone" )
+AM_CONDITIONAL(ADM_UI_QT,   test "x$selected_ui" = "xqt" )
 
 dnl -----------------------------
 AC_SUBST(FREETYPE_CFLAGS)

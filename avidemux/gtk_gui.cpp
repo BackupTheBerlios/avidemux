@@ -51,8 +51,8 @@
 #include "ADM_audiofilter/audioeng_buildfilters.h"
 #include "prefs.h"
 #include "ADM_encoder/adm_encConfig.h"
-#include "ADM_gui2/GUI_render.h"
-#include "ADM_gui2/GUI_ui.h"
+#include "GUI_render.h"
+#include "GUI_ui.h"
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_audiodevice/audio_out.h"
 

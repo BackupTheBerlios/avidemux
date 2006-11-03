@@ -89,6 +89,21 @@ uint32_t getTimeOfTheDay(void)
     return (tt&0xffffff);
 
 }
+/// convert frame number and fps to hour/mn/sec/ms
+void  frame2time(	uint32_t frame, uint32_t fps, uint16_t * hh, uint16_t * mm,
+                                uint16_t * ss, uint16_t * ms)
+{
+    UNUSED_ARG(fps);
+double d;
+    uint32_t len2;
+    d=frame;
+    d=d/fps;
+    d*=1000000.;
+    
+    len2 = (uint32_t)(d); //video_body->getTime(frame);
+    ms2time(len2,hh,mm,ss,ms);
+}
+
 void ms2time(uint32_t len2,uint16_t * hh, uint16_t * mm,
 	 			uint16_t * ss, uint16_t * ms)
 {

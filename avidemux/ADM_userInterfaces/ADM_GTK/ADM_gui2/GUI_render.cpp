@@ -37,7 +37,7 @@
 //#include "ADM_gui/GUI_vars.h"
 
 
-#include "ADM_gui2/GUI_render.h"
+#include "ADM_commonUI//GUI_render.h"
 
 #include "ADM_gui2/GUI_accelRender.h"
 #include "ADM_gui2/GUI_xvDraw.h"
