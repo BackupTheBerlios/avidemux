@@ -59,6 +59,8 @@
 #include "prefs.h"
 #include <ADM_assert.h>
 
+#if 0
+    
 typedef struct unicd
 {
 	char *display,*name;
@@ -121,7 +123,7 @@ static int32_t myY,myU,myV;
 
 extern int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b);
 ColYuvRgb *rgbConv=NULL;
-uint8_t ADMVideoSubtitle::configure(AVDMGenericVideoStream *instream)
+uint8_t ADMVideoSubtitle:: configure(AVDMGenericVideoStream *instream)
 {
 UNUSED_ARG(instream);
 //char c;
@@ -733,3 +735,5 @@ create_dialog1 (void)
 
 #endif
 
+
+#endif

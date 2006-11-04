@@ -34,6 +34,7 @@
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 #ifdef HAVE_ENCODER
 
+#if 0
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
@@ -45,7 +46,7 @@ static GtkWidget	*create_dialog1 (void);
 #define STOGGLE(x)     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (lookup_widget(dialog,#x)), TRUE)
 #define GTOGGLE(x)     gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(dialog,#x)))
 
-uint8_t ADMVideoLargeMedian::configure(AVDMGenericVideoStream * instream)
+uint8_t ADMVideoLargeMedian::  configure(AVDMGenericVideoStream * instream)
 {
     UNUSED_ARG(instream);
     UNUSED_ARG(instream);
@@ -75,7 +76,7 @@ uint8_t ADMVideoLargeMedian::configure(AVDMGenericVideoStream * instream)
 
 
 
-uint8_t AVDMFastVideoConvolution::configure(AVDMGenericVideoStream * instream)
+uint8_t AVDMFastVideoConvolution::  configure(AVDMGenericVideoStream * instream)
 {
     UNUSED_ARG(instream);
     GtkWidget *dialog;
@@ -157,4 +158,5 @@ GtkWidget	*create_dialog1 (void)
 }
 
 
+#endif
 #endif

@@ -67,9 +67,12 @@
 #include "ADM_audiofilter/audioencoder.h"
 #include "ADM_lavcodec.h"
 #include "ADM_codecs/ADM_ffmpegConfig.h"
+
+#include "DIA_resizeWiz.h"
     
 #include "ADM_assert.h"
-    
+int SliderIsShifted=0;
+
 //******************************
 int DIA_coloryuv(COLOR_YUV_PARAM *param){return 0;}
  int DIA_getAudioFilter(GAINparam *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
@@ -144,10 +147,9 @@ uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss){return 0;}
 void DIA_properties( void){return ;}
 void  GUI_displayBitrate( void ){return ;}
 int GUI_handleVFilter (void){return 0;}
-int UI_Init(int nargc,char **nargv){return 0;}
 uint8_t  initFileSelector(void){return 0;}
-uint8_t initGUI( void ){return 0;}
-int UI_RunApp(void){return 0;}
+uint8_t initGUI( void ){return 1;}
+
 uint8_t DIA_job(uint32_t nb,char **name){return 0;}
 uint8_t DIA_lavDecoder(uint32_t *swapUv, uint32_t *showU){return 0;}
 uint8_t DIA_resize(uint32_t *width,uint32_t *height,uint32_t *algo,uint32_t originalw, 
@@ -157,4 +159,32 @@ uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *sharp,
                           uint32_t *twoway, uint32_t *map){return 0;}
 uint8_t DIA_4entries(char *title,uint32_t *left,uint32_t *right,uint32_t *top,uint32_t *bottom) {return 0;}
 uint8_t DIA_videoCodec (SelectCodecType * codec){return 0;}
+uint8_t DIA_getChromaShift( uint8_t *work, uint8_t *rgb,ADMImage *src,ColYuvRgb    *rgbC,uint32_t *u,uint32_t *v ) { return 0;}
+uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
+uint8_t DIA_resizeWiz(RESWIZ_FORMAT *format, RESWIZ_AR *source, RESWIZ_AR *destination) {return 0;}
+uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
+			uint32_t *cthresh, uint32_t *scene) {return 0;}
+			
+			
+			
+			
+			
+extern int global_argc;
+extern char **global_argv;
+int UI_Init(int nargc,char **nargv)
+{
+  global_argc=nargc;
+  global_argv=nargv;
+  return 0;
+}
+extern int automation(void );
+int UI_RunApp(void)
+{
+ if (global_argc >= 2)
+    {
+     automation();
+    }
+    printf("End of program..\n");
+}
+
 //EOF

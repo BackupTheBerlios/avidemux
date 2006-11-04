@@ -123,8 +123,8 @@ uint8_t trueFalse(char *p);
 //_________________________________________________________________________
 
 
-extern int global_argc;
-extern char **global_argv;
+int global_argc;
+char **global_argv;
 extern uint8_t	ADM_saveRaw(const char *name );
 //_________________________________________________________________________
 

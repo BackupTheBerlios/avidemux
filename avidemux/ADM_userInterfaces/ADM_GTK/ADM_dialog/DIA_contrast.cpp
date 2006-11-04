@@ -68,8 +68,8 @@ static uint32_t sw, sh;
 static CONTRAST_PARAM par;
 
 static uint8_t tableluma[256], tablechroma[256];
-
-uint8_t ADMVideoContrast::configure (AVDMGenericVideoStream * instream)
+#if 0
+uint8_t ADMVideoContrast:: configure (AVDMGenericVideoStream * instream)
 {
   uint32_t
     w,
@@ -139,6 +139,7 @@ uint8_t ADMVideoContrast::configure (AVDMGenericVideoStream * instream)
   return r;
 
 }
+#endif
 //
 //      Get crop parameters from GUI
 //                         left, right, top, down , initial size

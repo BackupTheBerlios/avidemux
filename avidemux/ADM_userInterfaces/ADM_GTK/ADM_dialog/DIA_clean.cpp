@@ -49,17 +49,7 @@ static GtkObject *blend_adj;
 static GtkObject *radius_adj;
 
 
-uint8_t AVDMVideoSmooth::configure( AVDMGenericVideoStream *instream)
-{
-UNUSED_ARG(instream);
 
-SMOOTH_PARAMS *par;
-	
-//     	par=_param;
-     	//return((uint8_t)getSmoothParams(&par->radius,&par->blend));
-	return 1;
-#warning FIXME , CODE REMOVED AMD64/GCC4
-}
 
 #if 0
 //

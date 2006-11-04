@@ -375,5 +375,9 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 		_font=NULL;
 	}
 }
+uint8_t ADMVideoSubtitle:: configure(AVDMGenericVideoStream *instream)
+{
+  return 1;
+}
 #endif
 

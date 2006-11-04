@@ -221,5 +221,8 @@ void do_rotate(uint8_t *in, uint32_t in_w, uint32_t in_h, float angle, uint8_t *
       }
   }
 }
-
+uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
+{
+  return 1;
+}
 #endif

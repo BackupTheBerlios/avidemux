@@ -456,6 +456,10 @@ char 							*AVDMFastVideoMedian::printConf(void)
 	*out++=b3;
 	return 1;
 }
+uint8_t AVDMFastVideoConvolution::configure(AVDMGenericVideoStream * instream)
+{
+  return 1; 
+}
 
          
 

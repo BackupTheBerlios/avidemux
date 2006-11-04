@@ -373,5 +373,22 @@ unsigned int d;
 			return 0;
 	
 }
+extern uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
+			uint32_t *cthresh, uint32_t *scene);
+
+
+uint8_t ADMVideoDenoise::configure(AVDMGenericVideoStream * instream)
+{
+  UNUSED_ARG(instream);
+
+    if(DIA_dnr(	&(_param->lumaThreshold),
+    				&(_param->lumaLock),
+				&(_param->chromaThreshold),
+				&(_param->chromaLock),
+				&(_param->sceneChange)
+               						)) return 1;
+
+	return 0;
+}
 
 // EOF

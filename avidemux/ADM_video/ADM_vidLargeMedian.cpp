@@ -299,7 +299,10 @@ uint32_t inbox;
 	return 1;
 }
 
-
+uint8_t ADMVideoLargeMedian::configure(AVDMGenericVideoStream * instream)
+{
+  return 1; 
+}
 
 
 

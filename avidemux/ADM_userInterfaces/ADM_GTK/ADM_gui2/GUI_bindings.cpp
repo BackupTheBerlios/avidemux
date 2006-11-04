@@ -1073,8 +1073,8 @@ gboolean UI_SliderReleased(GtkWidget *widget, GdkEventButton *event, gpointer us
 	SliderIsShifted=FALSE;
 	return FALSE;
 }
-int global_argc;
-char **global_argv;
+extern int global_argc;
+extern char **global_argv;
 typedef gboolean GCALL       (void *);
 extern int automation(void );
 int UI_Init(int argc, char **argv)

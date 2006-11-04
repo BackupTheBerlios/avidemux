@@ -44,7 +44,7 @@
 #include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include <ADM_assert.h>
 
-
+#if 0
 extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 
 
@@ -69,7 +69,7 @@ static ROTATE_PARAM par;
 #define WIDG(widget_name) lookup_widget(dialog,#widget_name)
 
 static ColYuvRgb    *rgbConv=NULL;
-uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
+uint8_t ADMVideoRotate:: configure( AVDMGenericVideoStream *instream)
 
 {
   uint32_t w,h,l,f;
@@ -270,4 +270,5 @@ GtkWidget	*create_dialog1 (void)
 }
 
 
+#endif
 #endif

@@ -214,6 +214,9 @@ uint8_t doContrast(uint8_t *in,uint8_t *out,uint8_t *table,
 	return 1;	  
 	   
 } 
-
+uint8_t ADMVideoContrast::configure (AVDMGenericVideoStream * instream)
+{
+  return 1; 
+}
 
 // EOF

@@ -87,63 +87,18 @@ static gboolean gui_update( void );
 static void update(void);
 
 static ColYuvRgb    *rgbConv=NULL;
-uint8_t ADMVideoChromaShift::configure( AVDMGenericVideoStream *instream)
 
-{
-
-uint8_t ret=0;
-uint32_t l,f;
-
-							video_working=NULL;
-							video_src=NULL;
-
-		                 // Get info from previous filter
-							ww=_in->getInfo()->width;
-							hh= _in->getInfo()->height;
-
-							rgbConv=new ColYuvRgb(ww,hh);
-                            rgbConv->reset(ww,hh);
-							
-							printf("\n Chromashift in : %lu  x %lu\n",ww,hh);
-
-							video_src=new ADMImage(ww,hh);// uint8_t [ww*hh*2];
-							ADM_assert(video_src);
-							video_working=new uint8_t [ww*hh*2];
-							ADM_assert(video_working);
-
-							video_rgb=new uint8_t [ww*hh*4];
-							ADM_assert(video_rgb);
-
-
-							// ask current frame from previous filter
-							ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l,
-          									video_src,&f));
-
-							shift_u=_param->u;
-							shift_v=_param->v;
-
-
-							ret=DIA_getChromaShift();
-							if(ret)
-							{
-								_param->u=shift_u;
-								_param->v=shift_v;
-							}
-
-							delete [] video_working;
-							delete  video_src;
-							delete [] video_rgb;
-							video_working=NULL;
-							video_src=NULL;
-							delete rgbConv;
-							rgbConv=NULL;
-
-					return ret;
-}
-
-uint8_t DIA_getChromaShift( void )
+uint8_t DIA_getChromaShift( uint8_t *work, uint8_t *rgb,ADMImage *src,ColYuvRgb    *rgbC,uint32_t *u,uint32_t *v );
+uint8_t DIA_getChromaShift( uint8_t *work, uint8_t *rgb,ADMImage *src,ColYuvRgb    *rgbC,
+                              uint32_t *u,uint32_t *v )
 {
 	uint8_t ret=0;
+        video_working=work;
+        video_rgb=rgb;
+        video_src=src;
+        rgbConv=rgbC;
+        shift_u=*u;
+        shift_v=*v;
 	dialog=create_ChromaShift();
 	gtk_register_dialog(dialog);
 	gtk_widget_set_usize(WID(drawingarea1), ww,hh);
@@ -170,6 +125,8 @@ uint8_t DIA_getChromaShift( void )
 	if(response==GTK_RESPONSE_OK)
         {
 		read();
+                *u=shift_u;
+                *v=shift_v;
 		ret=1;
 	}
 	gtk_unregister_dialog(dialog);

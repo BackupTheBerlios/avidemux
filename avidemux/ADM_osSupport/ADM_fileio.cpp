@@ -25,12 +25,16 @@
     
 #include "default.h"
 #include "ADM_misc.h"
-#include <ADM_assert.h>
+
 
 #include "ADM_toolkit/filesel.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-
+#include <ADM_assert.h>
+#undef fread
+#undef fwrite
+#undef fopen
+#undef fclose
 
 size_t ADM_fread (void *ptr, size_t size, size_t n, FILE *sstream)
 {
