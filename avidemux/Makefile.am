@@ -1,5 +1,5 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-bin_PROGRAMS = avidemux2
+bin_PROGRAMS = avidemux2_gtk avidemux2_cli
 
 ## INCLUDES were found outside kdevelop specific part
 
@@ -7,22 +7,22 @@ if BUILD_ALTIVEC
 libmpeg2enc_Altivec = ./mpeg2enc/altivec/libaltivec.la
 endif
 
-if ADM_UI_GTK
-user_interface = ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
+user_interface_gtk = ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
 		./ADM_userInterfaces/ADM_GTK/libADM_GTK.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_dialog/libADM_dialog.a	\
 		./ADM_userInterfaces/ADM_GTK/ADM_filters/libADM_filters.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/libADM_toolkit_gtk.a	
-endif
-if ADM_UI_NONE
-user_interface = ./ADM_userInterfaces/ADM_NONE/ADM_gui2/libADM_gui2.a	\
+user_interface_cli = ./ADM_userInterfaces/ADM_NONE/ADM_gui2/libADM_gui2.a	\
 		./ADM_userInterfaces/ADM_NONE/ADM_dialog/libADM_dialog.a	\
 		./ADM_userInterfaces/ADM_NONE/ADM_filters/libADM_filters.a 
-endif
-avidemux2_SOURCES =   guiplay.cpp  \
+
+adm_src =   guiplay.cpp  \
 	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp   \
 	main.cpp   \
 	gui_autodrive.cpp GUI_jobs.cpp
+
+avidemux2_gtk_SOURCES =   $(adm_src)
+avidemux2_cli_SOURCES =   $(adm_src)
 
 SUBDIRS = ADM_libraries ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_colorspace ADM_editor ADM_encoder ADM_filter  \
@@ -45,8 +45,7 @@ gui_action.hxx prefs.in
 
 ####### kdevelop will overwrite this part!!! (end)############
 
-
-avidemux2_LDADD   =  \
+adm_lib= \
 ADM_filter/filter_saveload.o 				\
 ./ADM_audiofilter/libADM_audiofilter.a			\
 ./ADM_filter/libADM_filter.a				\
@@ -88,8 +87,9 @@ ADM_filter/filter_saveload.o 				\
 ./ADM_libraries/ADM_libtwolame/liblibtoolame.a		\
 ./ADM_libraries/ADM_libMpeg2Dec/liblibMpeg2Dec.a	\
 ./ADM_libraries/ADM_libmpeg2enc/libmpeg2enc.a		\
-./ADM_libraries/ADM_xvidratectl/libADM_xvidratectl.a	\
-$(user_interface) 					\
+./ADM_libraries/ADM_xvidratectl/libADM_xvidratectl.a	
+
+adm_postlib= \
 ./ADM_toolkit/libADM_toolkit.a				\
 ./ADM_libraries/ADM_utilities/libADM_library.a		\
 ./ADM_osSupport/libADM_ossupport.a			\
@@ -97,7 +97,16 @@ $(user_interface) 					\
 ./ADM_ocr/libADM_ocr.a					\
 $(libmpeg2enc_Altivec) 
 
-
+avidemux2_gtk_LDADD   =  \
+	$(adm_lib) 					\
+	$(user_interface_gtk)				\
+	$(adm_postlib) 
+	
+avidemux2_cli_LDADD   =  \
+	$(adm_lib) 					\
+	$(user_interface_cli)				\
+	$(adm_postlib) 
+	
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 	$(SMONKEY_CFLAGS) \
 	-DADMLOCALE='"'$(ADM_LOCALEDIR)'"' \
@@ -107,7 +116,10 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 	-IADM_userInterfaces/ADM_GTK
 
 # the library search path.
-avidemux2_LDFLAGS = $(all_libraries)  $(SDL_LIBS) $(GTK_LIBS) \
+avidemux2_gtk_LDFLAGS = $(all_libraries)  $(SDL_LIBS) $(GTK_LIBS) \
+	$(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) 
+
+avidemux2_cli_LDFLAGS = $(all_libraries)  $(SDL_LIBS)  \
 	$(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) 
 
 noinst_HEADERS = 
