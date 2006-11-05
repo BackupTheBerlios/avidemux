@@ -84,7 +84,7 @@ const char *encoderGetIndexedName (uint32_t i);
 
 #include "ADM_encCodecDesc.h"
 
-SelectCodecType current_codec = CodecFF;
+SelectCodecType current_codec = CodecCopy;
 ///////////////////////////////////////////
 
 

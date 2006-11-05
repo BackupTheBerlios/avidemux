@@ -16,11 +16,18 @@
 #include "GUI_ui.h"
 
 static ADM_OUT_FORMAT format=ADM_AVI;
+static int audioCodec=0;
+static int videoCodec=0;
 //**************************************************
 int 	UI_getCurrentACodec(void)
 {
-  return 0; 
+  return audioCodec; 
 }
+void UI_setAudioCodec( int i)
+{
+  audioCodec=i;
+}
+
 //**************************************************
 uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
 {
@@ -34,10 +41,19 @@ ADM_OUT_FORMAT 	UI_GetCurrentFormat( void )
 //**************************************************
 int 	UI_getCurrentVCodec(void)
 {
-  return 0; 
+  return videoCodec; 
 }
+void UI_setVideoCodec( int i)
+{
+  videoCodec=i;
+}
+//**************************************************
+void UI_setAProcessToggleStatus( uint8_t status )
+{}
+void UI_setVProcessToggleStatus( uint8_t status )
+{}
 
-
+//**************************************************
 void UI_updateFrameCount(uint32_t curFrame)
 {}
 void UI_setFrameCount(uint32_t curFrame,uint32_t total)
@@ -73,10 +89,6 @@ uint8_t UI_setOutputToggleStatus( uint8_t status )
 {}
 
 
-void UI_setAProcessToggleStatus( uint8_t status )
-{}
-void UI_setVProcessToggleStatus( uint8_t status )
-{}
 
 void UI_iconify( void )
 {}
@@ -125,10 +137,6 @@ uint8_t UI_arrow_disabled(void)
   return 1;
 }
 void UI_purge( void )
-{}
-void UI_setAudioCodec( int i)
-{}
-void UI_setVideoCodec( int i)
 {}
 
 // EOF

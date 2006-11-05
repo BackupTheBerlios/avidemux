@@ -96,7 +96,7 @@ static Mixer_String Mixer_strings[]=
 
 extern void UI_PrintCurrentACodec( const char *s);
 
-AUDIOENCODER  activeAudioEncoder=  AUDIOENC_NONE;
+AUDIOENCODER  activeAudioEncoder=  AUDIOENC_COPY;
 /*----------------------------------*/
 GAINparam audioGain;
 int  audioFreq=48000;
