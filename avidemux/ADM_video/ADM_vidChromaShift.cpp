@@ -47,8 +47,8 @@ char *ADMVideoChromaShift::printConf( void )
 {
  	static char buf[50];
 
- 	sprintf((char *)buf," Chroma shift U:%ld  V:%ld",
- 				_param->u,_param->v);
+ 	snprintf((char *)buf,50," Chroma shift U:%d  V:%d",
+            _param->u,_param->v);
         return buf;
 }
 
@@ -57,7 +57,7 @@ ADMVideoChromaShift::ADMVideoChromaShift(  AVDMGenericVideoStream *in,CONFcouple
 
  	_in=in;		
    	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
-	 _param=NEW(CHROMASHIFT);
+	 _param=NEW(CHROMASHIFT_PARAM);
 		if(couples)
 		{
 				GET(u);
@@ -244,63 +244,12 @@ uint32_t line;
 		}
 	return 1;
 }
-uint8_t DIA_getChromaShift( uint8_t *work, uint8_t *rgb,ADMImage *src,ColYuvRgb    *rgbC,uint32_t *u,uint32_t *v );
-/* SIMPLIFY !!!! */
+uint8_t DIA_getChromaShift( AVDMGenericVideoStream *instream,CHROMASHIFT_PARAM    *param );
 uint8_t ADMVideoChromaShift::configure( AVDMGenericVideoStream *instream)
 
 {
+    return DIA_getChromaShift(instream,_param);
 
-uint8_t ret=0;
-uint32_t l,f,shift_u,shift_v;
-uint8_t *video_working,*video_rgb;
-ADMImage *video_src;
-uint32_t ww,hh;
-ColYuvRgb    *rgbConv=NULL;
-                      video_working=NULL;
-                      video_src=NULL;
-
-// Get info from previous filter
-                      ww=_in->getInfo()->width;
-                      hh= _in->getInfo()->height;
-
-                      rgbConv=new ColYuvRgb(ww,hh);
-                      rgbConv->reset(ww,hh);
-                      
-                      printf("\n Chromashift in : %lu  x %lu\n",ww,hh);
-
-                      video_src=new ADMImage(ww,hh);// uint8_t [ww*hh*2];
-                      ADM_assert(video_src);
-                      video_working=new uint8_t [ww*hh*2];
-                      ADM_assert(video_working);
-
-                      video_rgb=new uint8_t [ww*hh*4];
-                      ADM_assert(video_rgb);
-
-
-                      // ask current frame from previous filter
-                      ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l,
-                                              video_src,&f));
-
-                      shift_u=_param->u;
-                      shift_v=_param->v;
-
-
-                      ret=DIA_getChromaShift(video_working,video_rgb,video_src,rgbConv,&shift_u,&shift_v);
-                      if(ret)
-                      {
-                              _param->u=shift_u;
-                              _param->v=shift_v;
-                      }
-
-                      delete [] video_working;
-                      delete  video_src;
-                      delete [] video_rgb;
-                      video_working=NULL;
-                      video_src=NULL;
-                      delete rgbConv;
-                      rgbConv=NULL;
-
-      return ret;
 }
 
 #endif
