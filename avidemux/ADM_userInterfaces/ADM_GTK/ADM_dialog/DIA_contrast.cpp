@@ -44,8 +44,10 @@
 #include <ADM_assert.h>
 
 
-#include "prototype.h"
-
+#define CHECKBOX(x,y) if(TRUE==gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(dialog,#x))))  \
+			y=1; else y=0;
+#define SCHECKBOX(x,y) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(dialog,#x)),y)
+void    GUI_RGBDisplay(uint8_t *dis,uint32_t w,uint32_t h,void *widg);
 
 static int getContrastParams (void);
 
@@ -62,161 +64,84 @@ static void gui_update (GtkButton * button, gpointer user_data);
 
 
 // Ugly !
-static uint8_t *video2, *video3;
-static ADMImage *aImage;
-static uint32_t sw, sh;
+static ADMImage *video_src,*video_shifted;
+static AVDMGenericVideoStream *sstream;
+static uint8_t *video_rgb;
+static uint32_t ww, hh;
 static CONTRAST_PARAM par;
 
 static uint8_t tableluma[256], tablechroma[256];
-#if 0
-uint8_t ADMVideoContrast:: configure (AVDMGenericVideoStream * instream)
+
+uint8_t DIA_contrast(AVDMGenericVideoStream *astream,CONTRAST_PARAM *param)
 {
-  uint32_t
-    w,
-    h,
-    l,
-    f;
-  uint8_t
-    r;
+  uint8_t ret=0;
+        sstream=astream;
+        ww=astream->getInfo()->width;
+        hh=astream->getInfo()->height;
+        video_src=new ADMImage(ww,hh);
+        video_shifted=new ADMImage(ww,hh);
+        video_rgb=new uint8_t[ww*hh*4];
+        rgbConv=new ColYuvRgb(ww,hh);
+        rgbConv->reset(ww,hh);
+        
+        dialog=create_dialog1();
+        gtk_register_dialog(dialog);
+        gtk_widget_set_usize (WID (drawingarea1), ww, hh);
+        
+        memcpy(&par,param,sizeof(par));
+        SCHECKBOX (checkLuma, par.doLuma);
+        SCHECKBOX (checkbuttonU, par.doChromaU);
+        SCHECKBOX (checkbuttonV, par.doChromaV);
 
-
-  video2 = video3 = NULL;
-
-  // Get info from previous filter
-  w = _in->getInfo ()->width;
-  h = _in->getInfo ()->height;
-
-  rgbConv=new ColYuvRgb(w,h);
-  rgbConv->reset(w,h);
-
-  
-  aImage = new ADMImage (w, h);
-
-  video2 = (uint8_t *) ADM_alloc (w * h * 4);
-  ADM_assert (video2);
-
-  video3 = (uint8_t *) ADM_alloc (w * h * 4);
-  ADM_assert (video3);
-
-
-  // ask current frame from previous filter
-  ADM_assert (instream->getFrameNumberNoAlloc (curframe, &l, aImage, &f));
-
-  // From now we work in RGB !
-  memcpy (video2, aImage->data, (w * h * 3)>>1);
-
-  //COL_yv12rgb (w, h, video2, video3);
-  rgbConv->scale(video2,video3);
-  
-  ADM_assert (_param);
-  memcpy (&par, _param, sizeof (par));
-  sw = w;
-  sh = h;
-
-  switch (r = getContrastParams ())
-    {
-    case 0:
-      printf ("cancelled\n");
-      break;
-    case 1:
-      memcpy (_param, &par, sizeof (par));
-      break;
-    default:
-      ADM_assert (0);
-    }
-
-  delete
-    aImage;
-  ADM_dealloc (video2);
-  ADM_dealloc (video3);
-
-  video2 = video3 = NULL;
-  aImage = NULL;
-
-  buildContrastTable (_param->coef, _param->offset, _tableFlat, _tableNZ);
-  delete rgbConv;
-  rgbConv=NULL;
-  return r;
-
-}
-#endif
-//
-//      Get crop parameters from GUI
-//                         left, right, top, down , initial size
-//
-int
-getContrastParams (void)
-{
-
-#define WID(x) lookup_widget(dialog,#x)
-#define CHECKBOX(x,y) if(TRUE==gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(dialog,#x))))  \
-			y=1; else y=0;
-#define SCHECKBOX(x,y) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(dialog,#x)),y)
-  int
-    ret = 0;
-
-  dialog = create_dialog1 ();
-  gtk_register_dialog(dialog);
-  gtk_widget_set_usize (WID (drawingarea1), sw, sh);
-
-
-  SCHECKBOX (checkLuma, par.doLuma);
-  SCHECKBOX (checkbuttonU, par.doChromaU);
-  SCHECKBOX (checkbuttonV, par.doChromaV);
-
-  GTK_ADJUSTMENT (adj_offset)->value = par.offset;
-  GTK_ADJUSTMENT (adj_coeff)->value = par.coef;
+        GTK_ADJUSTMENT (adj_offset)->value = par.offset;
+        GTK_ADJUSTMENT (adj_coeff)->value = par.coef;
 
   // add display callback
-  gtk_signal_connect (GTK_OBJECT (WID (drawingarea1)), "expose_event",
-		      GTK_SIGNAL_FUNC (gui_draw), NULL);
+        gtk_signal_connect (GTK_OBJECT (WID (drawingarea1)), "expose_event",
+                            GTK_SIGNAL_FUNC (gui_draw), NULL);
 
   // and value changed
-#define CNX(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)), y, \
-		    					   GTK_SIGNAL_FUNC(gui_update), (void *) (1));
+#define CNX(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)), y, GTK_SIGNAL_FUNC(gui_update), (void *) (1));
 
-  CNX (hscaleContrast, "value_changed");
-  CNX (hscaleContrast, "drag_data_received");
+        CNX (hscaleContrast, "value_changed");
+        CNX (hscaleContrast, "drag_data_received");
+      
+        CNX (hscaleBright, "value_changed");
+        CNX (hscaleBright, "drag_data_received");
 
-  CNX (hscaleBright, "value_changed");
-  CNX (hscaleBright, "drag_data_received");
-
-  //gtk_widget_show (dialog);
-
-  ret = 0;
-  if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
-    {
-      CHECKBOX (checkLuma, par.doLuma);
-      CHECKBOX (checkbuttonU, par.doChromaU);
-      CHECKBOX (checkbuttonV, par.doChromaV);
-
-      par.coef = GTK_ADJUSTMENT (adj_coeff)->value;
-      par.offset = (int8_t) floor (GTK_ADJUSTMENT (adj_offset)->value);
-
-      //  printf("\n Luma : %d,u %d, v:%d",par.doLuma,par.doChromaU,par.doChromaV);
-      //  printf("\n off : %d, coeff %f\n",par.offset,par.coef);
-
-      ret = 1;
-    }
-  gtk_unregister_dialog(dialog);
-  gtk_widget_destroy (dialog);
-  dialog = NULL;
-  adj_coeff = adj_coeff = NULL;
-  return ret;
+        if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
+          {
+            CHECKBOX (checkLuma, par.doLuma);
+            CHECKBOX (checkbuttonU, par.doChromaU);
+            CHECKBOX (checkbuttonV, par.doChromaV);
+      
+            par.coef = GTK_ADJUSTMENT (adj_coeff)->value;
+            par.offset = (int8_t) floor (GTK_ADJUSTMENT (adj_offset)->value);
+      
+            memcpy(param,&par,sizeof(par));
+            ret = 1;
+          }
+              
+        gtk_unregister_dialog(dialog);
+        gtk_widget_destroy(dialog);
+        dialog=NULL;
+        delete video_src;
+        delete video_shifted;
+        delete [] video_rgb;
+        delete rgbConv;
+        return ret;
 }
 //
 //        Check entered values and green-out the selected portion on the screen
 //        Each value must be even
 //
-void
-gui_update (GtkButton * button, gpointer user_data)
+void gui_update (GtkButton * button, gpointer user_data)
 {
   UNUSED_ARG (button);
   UNUSED_ARG (user_data);
-  uint32_t
-    sz;
+  uint32_t    sz;
 
-  sz = sw * sh;
+  sz = ww * hh;
   CHECKBOX (checkLuma, par.doLuma);
   CHECKBOX (checkbuttonU, par.doChromaU);
   CHECKBOX (checkbuttonV, par.doChromaV);
@@ -229,39 +154,33 @@ gui_update (GtkButton * button, gpointer user_data)
 
   buildContrastTable (par.coef, par.offset, tableluma, tablechroma);
 
-  memcpy (video2, aImage->data, (sh * sw * 3)>>1);
+  memcpy (video_shifted->data, video_src->data, (hh * ww * 3)>>1);
   if (par.doLuma)
     {
-      doContrast (aImage->data, video2, tableluma, sw, sh);
-
+      doContrast (YPLANE(video_src), YPLANE(video_shifted), tableluma, ww, hh);
     }
   if (par.doChromaU)
     {
-      doContrast (aImage->data + sz, video2 + sz, tablechroma, sw >> 1,
-		  sh >> 1);
+      doContrast (UPLANE(video_src), UPLANE(video_shifted), tablechroma, ww >> 1, hh >> 1);
     }
 
   if (par.doChromaV)
     {
-      doContrast (aImage->data + sz + (sz >> 2), video2 + sz + (sz >> 2),
-		  tablechroma, sw >> 1, sh >> 1);
+     doContrast (VPLANE(video_src), VPLANE(video_shifted), tablechroma, ww >> 1, hh >> 1);
     }
 
   //COL_yv12rgb (sw, sh, video2, video3);
-  rgbConv->scale(video2,video3);
-  GUI_RGBDisplay (video3, sw, sh, (void *) WID (drawingarea1));
-
-
+  rgbConv->scale(video_shifted->data,video_rgb);
+  GUI_RGBDisplay (video_rgb, ww, hh, (void *) WID (drawingarea1));
 }
 
-gboolean
-gui_draw (GtkWidget * widget, GdkEventExpose * event, gpointer user_data)
+gboolean gui_draw (GtkWidget * widget, GdkEventExpose * event, gpointer user_data)
 {
   UNUSED_ARG (widget);
   UNUSED_ARG (event);
   UNUSED_ARG (user_data);
 
-  GUI_RGBDisplay (video3, sw, sh, (void *) WID (drawingarea1));
+  GUI_RGBDisplay (video_rgb, ww, hh, (void *) WID (drawingarea1));
   return TRUE;
 }
 

@@ -60,6 +60,7 @@
 #include "ADM_video/ADM_vidMPdelogo.h"
 #include "ADM_video/ADM_vidEq2.h"
 #include "ADM_video/ADM_lavpp_deintparam.h"
+#include "ADM_video/ADM_vidContrast.h"
 #include "ADM_audiofilter/audioencoder_vorbis_param.h"    
     
 #include "ADM_audiofilter/audioeng_buildfilters.h"
@@ -160,13 +161,14 @@ uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *sharp,
                           uint32_t *twoway, uint32_t *map){return 0;}
 uint8_t DIA_4entries(char *title,uint32_t *left,uint32_t *right,uint32_t *top,uint32_t *bottom) {return 0;}
 uint8_t DIA_videoCodec (SelectCodecType * codec){return 0;}
-uint8_t DIA_getChromaShift( AVDMGenericVideoStream *instream,CHROMASHIFT_PARAM    *param ){ return 0;}  
+uint8_t DIA_getChromaShift( AVDMGenericVideoStream *instream,CHROMASHIFT_PARAM    *param ){ return 0;}
+uint8_t DIA_contrast(AVDMGenericVideoStream *astream,CONTRAST_PARAM *param)  { return 0;}
 uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
 uint8_t DIA_resizeWiz(RESWIZ_FORMAT *format, RESWIZ_AR *source, RESWIZ_AR *destination) {return 0;}
 uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
 			uint32_t *cthresh, uint32_t *scene) {return 0;}
 			
-			
+uint8_t  DIA_getLumaChroma(uint32_t *doLuma, uint32_t *doChroma) {return 0;}
 			
 			
 			
