@@ -19,24 +19,24 @@
 static int beQuiet=0;
 static void boxStart(void)
 {
-  for(int i=0;i<BOX_SIZE;i++) printf("*");
-  printf("\n"); 
+  for(int i=0;i<BOX_SIZE;i++) fprintf(stderr,"*");
+  fprintf(stderr,"\n"); 
 }
 static void boxEnd(void)
 {
-  for(int i=0;i<BOX_SIZE;i++) printf("*");
-  printf("\n"); 
+  for(int i=0;i<BOX_SIZE;i++) fprintf(stderr,"*");
+  fprintf(stderr,"\n"); 
 }
 static void boxAdd(const char *str)
 {
   int l=strlen(str);
-  printf("* %s",str);
+  fprintf(stderr, "* %s",str);
   if(l+4<BOX_SIZE)
   {
     l=BOX_SIZE-l-4;
-      for(int i=0;i<BOX_SIZE;i++) printf("");
+      for(int i=0;i<BOX_SIZE;i++) fprintf(stderr,"");
   }
-  printf(" *\n"); 
+  fprintf(stderr," *\n"); 
 }
 
 
