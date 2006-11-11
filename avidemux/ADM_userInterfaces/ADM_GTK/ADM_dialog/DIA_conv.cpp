@@ -32,74 +32,41 @@
 #include "avi_vars.h"
 #include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
-#ifdef HAVE_ENCODER
-
-#if 0
-
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidConvolution.hxx"
-#include "ADM_video/ADM_vidLargeMedian.h"
 
 static GtkWidget	*create_dialog1 (void);
 
 #define STOGGLE(x)     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (lookup_widget(dialog,#x)), TRUE)
 #define GTOGGLE(x)     gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(dialog,#x)))
-
-uint8_t ADMVideoLargeMedian::  configure(AVDMGenericVideoStream * instream)
+uint8_t  DIA_getLumaChroma(uint32_t *doLuma, uint32_t *doChroma);
+uint8_t  DIA_getLumaChroma(uint32_t *doLuma, uint32_t *doChroma)
 {
-    UNUSED_ARG(instream);
-    UNUSED_ARG(instream);
     GtkWidget *dialog;
     uint8_t ret=0;
 
-	dialog=create_dialog1();
+    dialog=create_dialog1();
 
-	if(_param->luma) STOGGLE(luma);
-	if(_param->chroma) STOGGLE(chroma);
+    if(*doLuma) STOGGLE(luma);
+    if(*doChroma) STOGGLE(chroma);
 
-	gtk_register_dialog(dialog);
-	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
-	{
+    gtk_register_dialog(dialog);
+    if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
+    {
 
-		_param->luma	= GTOGGLE(luma);
-		_param->chroma= GTOGGLE(chroma);
-		ret=1;
+            *doLuma	= GTOGGLE(luma);
+            *doChroma   = GTOGGLE(chroma);
+            ret=1;
 
-	}
-	gtk_unregister_dialog(dialog);
-	gtk_widget_destroy(dialog);
-	return ret;
+    }
+    gtk_unregister_dialog(dialog);
+    gtk_widget_destroy(dialog);
+    return ret;
 
 }
 
 
 
 
-uint8_t AVDMFastVideoConvolution::  configure(AVDMGenericVideoStream * instream)
-{
-    UNUSED_ARG(instream);
-    GtkWidget *dialog;
-    uint8_t ret=0;
 
-	dialog=create_dialog1();
-	gtk_register_dialog(dialog);
-	if(_param->luma) STOGGLE(luma);
-	if(_param->chroma) STOGGLE(chroma);
-
-	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
-	{
-
-		_param->luma	= GTOGGLE(luma);
-		_param->chroma= GTOGGLE(chroma);
-		ret=1;
-
-	}
-	gtk_unregister_dialog(dialog);
-	gtk_widget_destroy(dialog);
-	return ret;
-
-}
 
 GtkWidget	*create_dialog1 (void)
 {
@@ -158,5 +125,3 @@ GtkWidget	*create_dialog1 (void)
 }
 
 
-#endif
-#endif

@@ -45,46 +45,38 @@ SCRIPT_CREATE(sharpen_script,AVDMVideoSharpen,convParam);
 SCRIPT_CREATE(gaussian_script,AVDMVideoGaussian,convParam);
 
 
-//AVDMGenericVideoStream *sharpen_create(AVDMGenericVideoStream *in, void *param);
-//AVDMGenericVideoStream *(AVDMGenericVideoStream *in, void *param);
-//AVDMGenericVideoStream *Gaussian_create(AVDMGenericVideoStream *in, void *param);
 BUILD_CREATE(median_create,AVDMFastVideoMedian);
-
+uint8_t  DIA_getLumaChroma(uint32_t *doLuma, uint32_t *doChroma);
  char *AVDMVideoConvolution::printConf(void)
 {
- 		ADM_assert(0); // this one is pure
+    ADM_assert(0); // this one is pure
 }
 
 //_______________________________________________________________
 
 AVDMVideoConvolution::AVDMVideoConvolution(
-									AVDMGenericVideoStream *in,CONFcouple *setup)
+                                                                        AVDMGenericVideoStream *in,CONFcouple *setup)
 {
     UNUSED_ARG(setup);
 
-  	_in=in;		
-   	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
-	
-					
-// 	_uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
- 	_uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-  ADM_assert(_uncompressed);
-  _U=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
-  ADM_assert(_U);
-   _V=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
-  ADM_assert(_V);
-  _info.encoding=1;
-
-  	  	
+    _in=in;		
+    memcpy(&_info,_in->getInfo(),sizeof(_info));  		
+    _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
+    ADM_assert(_uncompressed);
+    _U=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
+    ADM_assert(_U);
+    _V=new uint8_t [_in->getInfo()->width*_in->getInfo()->height];
+    ADM_assert(_V);
+    _info.encoding=1;
 }
 
 
 
 AVDMVideoConvolution::~AVDMVideoConvolution()
 {
- 	delete _uncompressed;
- 	delete [] _U;
-  	delete [] _V;
+    delete _uncompressed;
+    delete [] _U;
+    delete [] _V;
 
   _uncompressed=NULL;
   _U=_V=NULL;
@@ -96,72 +88,68 @@ AVDMVideoConvolution::~AVDMVideoConvolution()
 //
 
 uint8_t AVDMVideoConvolution::getFrameNumberNoAlloc(uint32_t frame,
-				uint32_t *len,
-   				ADMImage *data,
-				uint32_t *flags)
+                      uint32_t *len,
+                      ADMImage *data,
+                      uint32_t *flags)
 {
 uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
-			ADM_assert(frame<_info.nb_frames);
-			ADM_assert(_uncompressed);					
-								
-			// read uncompressed frame
-       		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 
-         	
+                ADM_assert(frame<_info.nb_frames);
+                ADM_assert(_uncompressed);
+                        // read uncompressed frame
+                if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
+
                 srcu=_uncompressed->data+( _info.height * _info.width);
                 srcv=srcu+(( _info.height * _info.width)>>2);
                 // expand u & v in buffers
-                 dstu=_U;
-                 dstv=_V;
-              	dst=data->data;
+                dstu=_U;
+                dstv=_V;
+                dst=data->data;
                 for(int32_t y=(int32_t)_info.height>>1;y>0;y--)
                 {
- 	               for(int32_t x=(int32_t)_info.width>>1;x>0;x--)
-                 			{
-                  			   *(dstu+1)=*dstu= *(dstu+1+_info.width)=*(dstu+_info.width)=*srcu++;
-                  			   *(dstv+1)=*dstv=*(dstv+1+_info.width)=*(dstv+_info.width)=*srcv++;
-                  			
+                      for(int32_t x=(int32_t)_info.width>>1;x>0;x--)
+                      {
+                                          *(dstu+1)=*dstu= *(dstu+1+_info.width)=*(dstu+_info.width)=*srcu++;
+                                          *(dstv+1)=*dstv=*(dstv+1+_info.width)=*(dstv+_info.width)=*srcv++;
+                                          dstu+=2;
+                                          dstv+=2;
 
-                        				dstu+=2;
-                        				dstv+=2;
-
-                      	}
-                       dstu+=_info.width;
-                       dstv+=_info.width;
-                 }
+                        }
+                      dstu+=_info.width;
+                      dstv+=_info.width;
+                }
 
 
-               // Luma
+              // Luma
               for(int32_t y=0;y<(int32_t)_info.height;y++)
-  				{
-               	for(int32_t x=0;x<(int32_t)_info.width;x++)
-                	{
-          				*dst++=convolutionKernel(x,y,_uncompressed->data);
-          				
+              {
+                for(int32_t x=0;x<(int32_t)_info.width;x++)
+                {
+                                        *dst++=convolutionKernel(x,y,_uncompressed->data);
 
-              	}
-               }
+                }
+              }
 
                 // Chroma u & v
                 dstu=data->data+( _info.height * _info.width);
-               	dstv=dstu+(( _info.height * _info.width)>>2)  ;
+                dstv=dstu+(( _info.height * _info.width)>>2)  ;
 
-               for(int32_t y=0;y<(int32_t)_info.height>>1;y++)
-  				{
-               	for(int32_t x=0;x<(int32_t)_info.width>>1;x++)
-                	{
-          			*dstu++=(convolutionKernel(2*x,2*y,_U)+convolutionKernel(2*x+1,2*y,_U)+
-              					convolutionKernel(2*x,2*y+1,_U)+convolutionKernel(2*x,2*y+1,_U))>>2;
-          				
-          			*dstv++=(convolutionKernel(2*x,2*y,_V)+convolutionKernel(2*x+1,2*y,_V)+
-              				convolutionKernel(2*x,2*y+1,_V)+convolutionKernel(2*x,2*y+1,_V))>>2;
+              for(int32_t y=0;y<(int32_t)_info.height>>1;y++)
+              {
+                for(int32_t x=0;x<(int32_t)_info.width>>1;x++)
+                 {
+                                *dstu++=(convolutionKernel(2*x,2*y,_U)+convolutionKernel(2*x+1,2*y,_U)+
+                                                convolutionKernel(2*x,2*y+1,_U)+convolutionKernel(2*x,2*y+1,_U))>>2;
+                                        
+                                *dstv++=(convolutionKernel(2*x,2*y,_V)+convolutionKernel(2*x+1,2*y,_V)+
+                                        convolutionKernel(2*x,2*y+1,_V)+convolutionKernel(2*x,2*y+1,_V))>>2;
 
-              	}
-               }
+                }
+              }
 //
-           	  *flags=0;
-       		  *len= _info.width*_info.height+(_info.width*_info.height>>1); 
-		    data->copyInfo(_uncompressed);
+            *flags=0;
+            *len= _info.width*_info.height+(_info.width*_info.height>>1); 
+            data->copyInfo(_uncompressed);
       return 1;
 }
 
@@ -170,15 +158,9 @@ uint8_t *dst,*dstu,*dstv,*srcu,*srcv;
 //_____________________ sharpen__________________
 uint8_t  AVDMVideoSharpen:: convolutionKernel(int32_t x,int32_t y,uint8_t *data )
 {
-//
-//
-//
-//
-
-
-	//         -1 -2 -1
- 	//         -2 16 -2 *1/16
-  	//		    -1 -2 -1
+//         -1 -2 -1
+//         -2 16 -2 *1/16
+//         -1 -2 -1
 
    int32_t o=0;
 
@@ -220,7 +202,7 @@ uint8_t  AVDMVideoSharpen:: convolutionKernel(int32_t x,int32_t y,uint8_t *data 
 }
 char *AVDMVideoSharpen::printConf(void)
 {
- 		return (char *)"Sharpen";; // this one is pure
+  return (char *)"Sharpen";; // this one is pure
 }
 
 
@@ -230,29 +212,26 @@ char *AVDMVideoSharpen::printConf(void)
 uint8_t  AVDMVideoMean:: convolutionKernel(int32_t x,int32_t y,uint8_t *data )
 {
 
-	//   	1 1 1
-   //		1 1 1
-   //		1 1 1
+//    1 1 1
+//    1 1 1
+//    1 1 1
    int32_t o=0;
 
 #define GetPixel(x,y) getPixel(x,y,data)
 
-       		for(int32_t xx=-1;xx<2;xx++)
-         		{
-               	o+=GetPixel(x+xx,y-1);
-               	o+=GetPixel(x+xx,y);
-               	o+=GetPixel(x+xx,y+1);
-
-              }
-              o=o/9;
-
-              return ((uint8_t) o);
-
+      for(int32_t xx=-1;xx<2;xx++)
+      {
+        o+=GetPixel(x+xx,y-1);
+        o+=GetPixel(x+xx,y);
+        o+=GetPixel(x+xx,y+1);
+      }
+      o=o/9;
+      return ((uint8_t) o);
 }
 
 char *AVDMVideoMean::printConf(void)
 {
- 		return (char *)"Mean";; // this one is pure
+          return (char *)"Mean";; // this one is pure
 }
 
 
@@ -268,38 +247,32 @@ uint8_t  AVDMVideoMedian:: convolutionKernel(int32_t x,int32_t y,uint8_t *data )
 
 #define GetPixel(x,y) getPixel(x,y,data)
 
-       		for(int32_t xx=-1;xx<2;xx++)
-         		{
-               	tab[i++]=GetPixel(x+xx,y-1);
-               	tab[i++]=GetPixel(x+xx,y);
-               	tab[i++]=GetPixel(x+xx,y+1);
-              }
-              // sort tab
+      for(int32_t xx=-1;xx<2;xx++)
+      {
+          tab[i++]=GetPixel(x+xx,y-1);
+          tab[i++]=GetPixel(x+xx,y);
+          tab[i++]=GetPixel(x+xx,y+1);
+        }
+        // sort tab
 
-               for(uint32_t bo=0;bo<9;bo++)
-               	{
-                   	for(o=bo;o<9;o++)
-                    		{
-                         	if( tab[bo]>tab[o])
-                          			{
-                                    	i=tab[bo];
-                                       tab[bo]=tab[o];
-                                       tab[o]=i;
-                               		}
-
-                        }
-
+          for(uint32_t bo=0;bo<9;bo++)
+          {
+                  for(o=bo;o<9;o++)
+                  {
+                          if( tab[bo]>tab[o])
+                          {
+                                  i=tab[bo];
+                                  tab[bo]=tab[o];
+                                  tab[o]=i;
+                          }
                   }
-
-
-              return tab[4];
-
-
+            }
+        return tab[4];
 }
 
 char *AVDMVideoMedian::printConf(void)
 {
- 		return (char *)"Median";; // this one is pure
+      return (char *)"Median";; // this one is pure
 }
 
 
@@ -310,38 +283,35 @@ char *AVDMVideoMedian::printConf(void)
 uint8_t  AVDMVideoGaussian:: convolutionKernel(int32_t x,int32_t y,uint8_t *data )
 {
 
-	//         6 10 10
- 	//         10 16 10 *1/80
-  	//		    6 10 6
+//         6 10 10
+//         10 16 10 *1/80
+//          6 10 6
 
    int32_t o=0;
 
 #define GetPixel(x,y) getPixel(x,y,data)
-              o=  10*GetPixel(x,y-1);
-              o+=  16*GetPixel(x,y);
-				o+=  10*GetPixel(x,y+1);
+      o=  10*GetPixel(x,y-1);
+      o+=  16*GetPixel(x,y);
+      o+=  10*GetPixel(x,y+1);
 
-       		
-               	o+=6*GetPixel(x+1,y-1);
-               	o+=10*GetPixel(x+1,y);
-               	o+=6*GetPixel(x+1,y+1);
+      o+=6*GetPixel(x+1,y-1);
+      o+=10*GetPixel(x+1,y);
+      o+=6*GetPixel(x+1,y+1);
 
-               	o+=6*GetPixel(x-1,y-1);
-               	o+=10*GetPixel(x-1,y);
-               	o+=6*GetPixel(x-1,y+1);
+      o+=6*GetPixel(x-1,y-1);
+      o+=10*GetPixel(x-1,y);
+      o+=6*GetPixel(x-1,y+1);
 
-                o+=40;
-                o>>=3;
-                o/=10;
+      o+=40;
+      o>>=3;
+      o/=10;
 
-    			return (uint8_t)(o);
-
-
+    return (uint8_t)(o);
 }
 
 char *AVDMVideoGaussian::printConf(void)
 {
- 		return (char *)"Gaussian Smooth";; // this one is pure
+      return (char *)"Gaussian Smooth";; // this one is pure
 }
 
 
