@@ -26,15 +26,9 @@
 #include <unistd.h>
 #endif
 #include <math.h>
-
-
-//#include <gtk/gtk.h>
 #include <ctype.h>
 
-
-//#include "interface.h"
 #include "avi_vars.h"
-//#include "ADM_gui/GUI_vars.h"
 #include <ADM_assert.h>
 
 #include "gui_action.hxx"
@@ -50,7 +44,6 @@
 
 #include "ADM_filter/vidVCD.h"
 
-//#include "ADM_script/adm_command.h"
 
 extern void filterListAll(void );
 
@@ -128,81 +121,78 @@ char **global_argv;
 extern uint8_t	ADM_saveRaw(const char *name );
 //_________________________________________________________________________
 
-typedef 	void 			(*one_arg_type)(char *arg);
-typedef	void 			(*two_arg_type)(char *arg,char *otherarg);
-typedef	void 			(*three_arg_type)(char *arg,char *otherarg,char *yetother);
+typedef void (*one_arg_type)(char *arg);
+typedef	void (*two_arg_type)(char *arg,char *otherarg);
+typedef	void (*three_arg_type)(char *arg,char *otherarg,char *yetother);
 //_________________________________________________________________________
 
 typedef struct AUTOMATON
 {
-		const char 			*string;
-		uint8_t 	have_arg;
-		const char			*help_string;
-		one_arg_type callback;
+          const char    *string;
+          uint8_t       have_arg;
+          const char    *help_string;
+          one_arg_type callback;
 };
 //_________________________________________________________________________
 
 AUTOMATON reaction_table[]=
 {	
-                {"nogui",               0,"Run in silent mode",		(one_arg_type)GUI_Quiet}   ,
-		{"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
-		{"run",			1,"load and run a script",		(one_arg_type)A_parseECMAScript},
-		{"audio-normalize",	1,"activate normalization",		call_normalize},
-		{"audio-resample",	1,"resample to x hz",			call_resample},
-		
-		{"filters",		1,"load a filter preset",		filterLoadXml}   ,
-		{"codec-conf",		1,"load a codec configuration",		(one_arg_type )loadVideoCodecConf}   ,
-		{"vcd-res",		0,"set VCD resolution",			(one_arg_type)setVCD}              ,
-		{"svcd-res",		0,"set SVCD resolution",		(one_arg_type)setSVCD}              ,
-		{"dvd-res",		0,"set DVD resolution",			(one_arg_type)setDVD}  ,
-		{"halfd1-res",		0,"set 1/2 DVD resolution",		(one_arg_type)setHalfD1} ,  
-		{"save-jpg",		1,"save a jpeg",			(one_arg_type)A_saveJpg}        ,
+        {"nogui",               0,"Run in silent mode",		(one_arg_type)GUI_Quiet}   ,
+        {"listfilters",		0,"list all filters by name",		(one_arg_type)filterListAll}   ,
+        {"run",			1,"load and run a script",		(one_arg_type)A_parseECMAScript},
+        {"audio-normalize",	1,"activate normalization",		call_normalize},
+        {"audio-resample",	1,"resample to x hz",			call_resample},
+        {"filters",		1,"load a filter preset",		filterLoadXml}   ,
+        {"codec-conf",		1,"load a codec configuration",		(one_arg_type )loadVideoCodecConf}   ,
+        {"vcd-res",		0,"set VCD resolution",			(one_arg_type)setVCD}              ,
+        {"svcd-res",		0,"set SVCD resolution",		(one_arg_type)setSVCD}              ,
+        {"dvd-res",		0,"set DVD resolution",			(one_arg_type)setDVD}  ,
+        {"halfd1-res",		0,"set 1/2 DVD resolution",		(one_arg_type)setHalfD1} ,  
+        {"save-jpg",		1,"save a jpeg",			(one_arg_type)A_saveJpg}        ,
+        {"begin",		1,"set start frame",			setBegin},
+        {"end",			1,"set end frame",			setEnd},
+        {"save-unpacked-vop",	1,"save avi, unpacking vop",(one_arg_type)A_SaveUnpackedVop},		
+        {"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
+        {"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
+        {"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	(one_arg_type)ADM_saveRaw},
+        {"save-uncompressed-audio",1,"save uncompressed audio",A_saveAudioDecodedTest},
+        {"load",		1,"load video or workbench",		(one_arg_type )A_openAvi},
+        {"load-workbench",	1,"load workbench file",		(one_arg_type)A_openAvi},
+        {"append",		1,"append video",			(one_arg_type)A_appendAvi},
+        {"save",		1,"save avi",				save},		
+        {"save-workbench",	1,"save workbench file",		(one_arg_type)A_saveWorkbench},
+        
+        {"force-b-frame",	0,"Force detection of bframe in next loaded file", (one_arg_type)call_bframe},
+        {"force-alt-h264",	0,"Force use of alternate read mode for h264", (one_arg_type)call_x264},
+        {"force-unpack",	0,"Force detection of packed vop in next loaded file"       
+                                                          ,(one_arg_type)call_packedvop},
+        {"external-mp3",	1,"load external mpeg audio as audio track",(one_arg_type)A_loadMP3},
+        {"external-ac3",	1,"load external ac3 audio as audio track",(one_arg_type)A_loadAC3},
+        {"external-wav",	1,"load external wav audio as audio track",(one_arg_type)A_loadWave},
+        {"no-audio",		0,"load external wav audio as audio track",(one_arg_type)A_loadNone},
+        {"audio-delay",		1,"set audio time shift in ms (+ or -)",	call_setAudio},
+        {"audio-map",		0,"build audio map (MP3 VBR)",	call_buildtimemap},
+        {"audio-bitrate",	1,"set audio encoding bitrate",	call_audiobitrate},
+        {"fps",	                1,"set frames per second",	call_fps},
+        {"audio-codec",		1,"set audio codec (MP2/MP3/AC3/NONE (WAV PCM)/TWOLAME/COPY)",call_audiocodec},
+        
+        {"video-codec",		1,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD/COPY)",				call_videocodec},
+        {"video-conf",		1	,"set video codec conf (cq=q|cbr=br|2pass=size)[,mbr=br][,matrix=(0|1|2|3)]",				call_videoconf},
+        {"reuse-2pass-log",	0	,"reuse 2pass logfile if it exists",	set_reuse_2pass_log},
+        {"set-pp",		2	,"set post processing default value, value(1=hdeblok|2=vdeblock|4=dering) and strength (0-5)",
+                                              (one_arg_type )	call_setPP},
+        {"vobsub",              3       ,"Create vobsub file (vobfile vosubfile ifofile)",  (one_arg_type ) call_v2v},
 
-		{"begin",		1,"set start frame",			setBegin},
-		{"end",			1,"set end frame",			setEnd},
-		{"save-unpacked-vop",	1,"save avi, unpacking vop",(one_arg_type)A_SaveUnpackedVop},		
-		{"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
-		{"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
-		{"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	(one_arg_type)ADM_saveRaw},
-		{"save-uncompressed-audio",1,"save uncompressed audio",A_saveAudioDecodedTest},
-		{"load",		1,"load video or workbench",		(one_arg_type )A_openAvi},
-		{"load-workbench",	1,"load workbench file",		(one_arg_type)A_openAvi},
-		{"append",		1,"append video",			(one_arg_type)A_appendAvi},
-		{"save",		1,"save avi",				save},		
-		{"save-workbench",	1,"save workbench file",		(one_arg_type)A_saveWorkbench},
-		
-		{"force-b-frame",	0,"Force detection of bframe in next loaded file", (one_arg_type)call_bframe},
-                {"force-alt-h264",	0,"Force use of alternate read mode for h264", (one_arg_type)call_x264},
-		{"force-unpack",	0,"Force detection of packed vop in next loaded file"
-								,(one_arg_type)call_packedvop},
-		
-		
-		{"external-mp3",	1,"load external mpeg audio as audio track",(one_arg_type)A_loadMP3},
-		{"external-ac3",	1,"load external ac3 audio as audio track",(one_arg_type)A_loadAC3},
-		{"external-wav",	1,"load external wav audio as audio track",(one_arg_type)A_loadWave},
-		{"no-audio",		0,"load external wav audio as audio track",(one_arg_type)A_loadNone},
-		{"audio-delay",		1,"set audio time shift in ms (+ or -)",	call_setAudio},
-		{"audio-map",		0,"build audio map (MP3 VBR)",	call_buildtimemap},
-		{"audio-bitrate",	1,"set audio encoding bitrate",	call_audiobitrate},
-		{"fps",	1	,"set frames per second",	call_fps},
-		{"audio-codec",		1,"set audio codec (MP2/MP3/AC3/NONE (WAV PCM)/TWOLAME/COPY)",call_audiocodec},
-		
-		{"video-codec",		1,"set video codec (Divx/Xvid/FFmpeg4/VCD/SVCD/DVD/XVCD/XSVCD/COPY)",				call_videocodec},
-		{"video-conf",		1	,"set video codec conf (cq=q|cbr=br|2pass=size)[,mbr=br][,matrix=(0|1|2|3)]",				call_videoconf},
-		{"reuse-2pass-log",	0	,"reuse 2pass logfile if it exists",	set_reuse_2pass_log},
-		{"set-pp",		2	,"set post processing default value, value(1=hdeblok|2=vdeblock|4=dering) and strength (0-5)",	(one_arg_type )	call_setPP},
-                {"vobsub",              3       ,"Create vobsub file (vobfile vosubfile ifofile)",  (one_arg_type ) call_v2v},
+        {"autosplit",		1	,"split every N MBytes",call_autosplit},
+        {"info",		0	,"show information about loaded video and audio streams", show_info},
+        {"autoindex",		0	,"try to generate required index files", set_autoindex},
+        {"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
+        
+        {"rebuild-index",       0       ,"rebuild index with correct frame type", (one_arg_type)A_rebuildKeyFrame},
 
-		{"autosplit",		1	,"split every N MBytes",call_autosplit},
-		{"info",		0	,"show information about loaded video and audio streams", show_info},
-		{"autoindex",		0	,"try to generate required index files", set_autoindex},
-		{"output-format",	1	,"set output format (AVI|OGM|ES|PS|AVI_DUAL|AVI_UNP|...)", (one_arg_type )set_output_format},
-		
-                {"rebuild-index",       0       ,"rebuild index with correct frame type", (one_arg_type)A_rebuildKeyFrame},
-
-                {"var",                 1       ,"set var (--var myvar=3)", (one_arg_type)setVar},
-		{"help",		0,"print this",		call_help},
-		{"quit",		0,"exit avidemux",	call_quit}
+        {"var",                 1       ,"set var (--var myvar=3)", (one_arg_type)setVar},
+        {"help",		0,"print this",		call_help},
+        {"quit",		0,"exit avidemux",	call_quit}
 
 
 }  ;
@@ -228,86 +218,75 @@ static int myargc;
 static three_arg_type three;
 static two_arg_type two;
 static int index;
-			argv=global_argv;
-			argc=global_argc;
-			ADM_usleep(100000); // let gtk start
-#warning FIXME
-                        //gdk_threads_enter();
-			
-			printf("\n *** Automated : %d entries*************\n",NB_AUTO);
-			// we need to process
-			argc-=1;
-			cur=1;
-			myargc=argc;
-			while(myargc>0)
-			  		{
-							 if(( *argv[cur]!='-') || (*(argv[cur]+1)!='-'))
-								 {
-							     	if(cur==1) 
-								  	{
-										 	A_openAvi(argv[cur]);
-										}
-									 	else
-									  	printf("\n Found garbage %s\n",argv[cur]);
-								  cur+=1;myargc-=1;				
-								  continue;
-								}
-								// else it begins with --
-								
-								
-								index= searchReactionTable(argv[cur]+2);
-								if(index==-1) // not found
-								{
-									 			printf("\n Unknown command :%s\n",argv[cur] );
-												cur+=1;myargc-=1;	
-								}
-								else
-								{
-											printf("%s-->%d\n", reaction_table[index].string,reaction_table[index].have_arg);
-											
-											switch(  reaction_table[index].have_arg)
-											{
-												case 3:
-													        
-													        three=(  three_arg_type) reaction_table[index].callback;
-													        three( argv[cur+1],argv[cur+2],argv[cur+3]);
-																	printf("\n arg: %d index %d\n",myargc,index);																        
-													        break;												
-												case 2:													       
-													        two=(  two_arg_type) reaction_table[index].callback;
-													        two( argv[cur+1],argv[cur+2]);
-													        break;
-												case 1:		
-																	reaction_table[index].callback(argv[cur+1]);
-																	break;
-												case 0:
-																  reaction_table[index].callback(NULL);
-																  break;
-												default:
-																	ADM_assert(0);
-																	break;																  
-												} 
-												cur+=1+reaction_table[index].have_arg;
-												myargc-=1+reaction_table[index].have_arg;		   
-								}				
-												    															
-					} // end while
+          argv=global_argv;
+          argc=global_argc;
+          printf("\n *** Automated : %d entries*************\n",NB_AUTO);
+          // we need to process
+          argc-=1;
+          cur=1;
+          myargc=argc;
+          while(myargc>0)
+          {
+                      if(( *argv[cur]!='-') || (*(argv[cur]+1)!='-'))
+                      {
+                            if(cur==1) 
+                            {
+                                A_openAvi(argv[cur]);
+                            }
+                            else
+                                printf("\n Found garbage %s\n",argv[cur]);
+                            cur+=1;myargc-=1;				
+                            continue;
+                      }
+                      // else it begins with --
+                      index= searchReactionTable(argv[cur]+2);
+                      if(index==-1) // not found
+                      {
+                                                      printf("\n Unknown command :%s\n",argv[cur] );
+                                                      cur+=1;myargc-=1;	
+                      }
+                      else
+                      {
+                          printf("%s-->%d\n", reaction_table[index].string,reaction_table[index].have_arg);
+                          switch(  reaction_table[index].have_arg)
+                          {
+                              case 3:
+                                        three=(  three_arg_type) reaction_table[index].callback;
+                                        three( argv[cur+1],argv[cur+2],argv[cur+3]);
+                                        printf("\n arg: %d index %d\n",myargc,index);
+                                        break;
+                              case 2:
+                                        two=(  two_arg_type) reaction_table[index].callback;
+                                        two( argv[cur+1],argv[cur+2]);
+                                        break;
+                              case 1:		
+                                        reaction_table[index].callback(argv[cur+1]);
+                                        break;
+                              case 0:
+                                        reaction_table[index].callback(NULL);
+                                        break;
+                              default:
+                                        ADM_assert(0);
+                                        break;
+                          } 
+                          cur+=1+reaction_table[index].have_arg;
+                          myargc-=1+reaction_table[index].have_arg;		   
+                      }
+          } // end while
           GUI_Verbose();
           printf("\n ********** Automation ended***********\n");
-          //gdk_threads_leave();
-#warning FIXME
           return 0; // Do not call me anymore
 }
 //_________________________________________________________________________
 
 int searchReactionTable(char *string)
 {
-	   for(unsigned int j=0;j<NB_AUTO;j++)
-	   {
-			 	if(!strcmp(string,reaction_table[j].string))		return j;			 
-			}
-			return -1;
-	
+    for(unsigned int j=0;j<NB_AUTO;j++)
+    {
+            if(!strcmp(string,reaction_table[j].string))
+                  return j;
+    }
+    return -1;
 }
 
 //_________________________________________________________________________
@@ -470,22 +449,22 @@ void setEnd(char *p)
 void call_help(char *p)
 {
     UNUSED_ARG(p);
-	printf("\n Command line possible arguments :");
-		for(unsigned int i=0;i<NB_AUTO;i++)
-			{
-					printf("\n    --%s, %s ", reaction_table[i].string,reaction_table[i].help_string);
-					switch(reaction_table[i].have_arg)
-					{
-						case 0:	 printf(" ( no arg )");break;
-						case 1:	 printf(" (one arg )");break;
-						case 2:	 printf(" (two args )");break;
-						case 3:	 printf(" (three args) ");break;
+    printf("\n Command line possible arguments :");
+    for(unsigned int i=0;i<NB_AUTO;i++)
+      {
+          printf("\n    --%s, %s ", reaction_table[i].string,reaction_table[i].help_string);
+          switch(reaction_table[i].have_arg)
+          {
+                  case 0:	 printf(" ( no arg )");break;
+                  case 1:	 printf(" (one arg )");break;
+                  case 2:	 printf(" (two args )");break;
+                  case 3:	 printf(" (three args) ");break;
 
-					}
+          }
 
-			}
-	
-			call_quit(NULL);
+      }
+    
+                    call_quit(NULL);
 }
 
 void save(char*name)

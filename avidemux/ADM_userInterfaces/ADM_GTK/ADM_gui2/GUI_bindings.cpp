@@ -44,6 +44,7 @@
 
 #include "ADM_toolkit/filesel.h"
 #include "ADM_editor/ADM_Video.h"
+#include "ADM_osSupport/ADM_misc.h"
 #include "prefs.h"
 
 #if (defined( HAVE_LIBESD) && defined(HAVE_ESD_H)) || \
@@ -1079,7 +1080,8 @@ typedef gboolean GCALL       (void *);
 extern int automation(void );
 int UI_Init(int argc, char **argv)
 {
-    g_thread_init(NULL);
+    if(!g_thread_supported())
+        g_thread_init(NULL);
     gdk_threads_init();
     gdk_threads_enter();
     gtk_set_locale();
@@ -1089,17 +1091,23 @@ int UI_Init(int argc, char **argv)
     gtk_init(&global_argc, &global_argv);
     gdk_rgb_init();
 }
-
+static void trampoline(void);
 int UI_RunApp(void)
 {
     if (global_argc >= 2)
     {
-      g_timeout_add(200,(GCALL *)automation,NULL);
+      g_timeout_add(200,(GCALL *)trampoline,NULL);
     }
     gtk_main();
     gdk_threads_leave();
 
 }
-
+void trampoline(void)
+{
+    ADM_usleep(100000); // let gtk start
+    gdk_threads_enter();
+    automation();
+    gdk_threads_leave();
+}
 
 // EOF
