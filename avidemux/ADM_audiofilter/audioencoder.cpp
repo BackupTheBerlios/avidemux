@@ -105,7 +105,7 @@ void AUDMEncoder_initDither(void)
 	for (int c = 0; c < DITHER_CHANNELS; c++) {
 		dp = 0;
 		for (int i = 0; i < DITHER_SIZE-1; i++) {
-			d = rand() / (float)RAND_MAX * 2.0 - 1.0;
+			d = rand() / (float)RAND_MAX - 0.5;
 			rand_table[c][i] = d - dp;
 			dp = d;
 		}
@@ -122,9 +122,10 @@ void dither16(float *start, uint32_t len, uint8_t channels)
 	len /= channels;
 	for (int i = 0; i < len; i++) {
 		for (int c = 0; c < channels; c++) {
-			if (*data > 1) *data = 1;
-			if (*data < -1) *data = -1;
-			*data_int = (int16_t)(*data * 32765 + rand_table[c][nr]);
+			*data = roundf(*data * 32766 + rand_table[c][nr]);
+			if (*data > 32767.0f) *data = 32767;
+			if (*data < -32768.0f) *data = -32768;
+			*data_int = (int16_t) *data;
 			data++;
 			data_int++;
 		}
