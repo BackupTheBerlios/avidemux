@@ -36,7 +36,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidContrast.h"
-
+#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_toolkit_gtk/ADM_gladeSupport.h"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
@@ -61,7 +61,8 @@ static gboolean gui_draw (GtkWidget * widget,
 //static int croplock;
 static ColYuvRgb    *rgbConv=NULL;
 static void gui_update (GtkButton * button, gpointer user_data);
-
+static void draw(void);
+static void calculate(void);
 
 // Ugly !
 static ADMImage *video_src,*video_shifted;
@@ -96,10 +97,7 @@ uint8_t DIA_contrast(AVDMGenericVideoStream *astream,CONTRAST_PARAM *param)
         GTK_ADJUSTMENT (adj_offset)->value = par.offset;
         GTK_ADJUSTMENT (adj_coeff)->value = par.coef;
 
-  // add display callback
-        gtk_signal_connect (GTK_OBJECT (WID (drawingarea1)), "expose_event",
-                            GTK_SIGNAL_FUNC (gui_draw), NULL);
-
+  
   // and value changed
 #define CNX(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)), y, GTK_SIGNAL_FUNC(gui_update), (void *) (1));
 
@@ -108,20 +106,34 @@ uint8_t DIA_contrast(AVDMGenericVideoStream *astream,CONTRAST_PARAM *param)
       
         CNX (hscaleBright, "value_changed");
         CNX (hscaleBright, "drag_data_received");
+        uint32_t curImage=0,len,flags;
+        if(!astream->getFrameNumberNoAlloc(curImage,&len,video_src,&flags))
+        {
+          GUI_Error_HIG("Frame error","Cannnot read frame to display");
 
-        if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
-          {
-            CHECKBOX (checkLuma, par.doLuma);
-            CHECKBOX (checkbuttonU, par.doChromaU);
-            CHECKBOX (checkbuttonV, par.doChromaV);
-      
-            par.coef = GTK_ADJUSTMENT (adj_coeff)->value;
-            par.offset = (int8_t) floor (GTK_ADJUSTMENT (adj_offset)->value);
-      
-            memcpy(param,&par,sizeof(par));
-            ret = 1;
-          }
-              
+        }
+        else
+        {
+          calculate();
+          // add display callback
+          rgbConv->scale(video_src->data,video_rgb);
+          //GUI_RGBDisplay (video_rgb, ww, hh, (void *) WID (drawingarea1));
+          gtk_signal_connect (GTK_OBJECT (WID (drawingarea1)), "expose_event",
+                  GTK_SIGNAL_FUNC (gui_draw), NULL);
+
+          if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
+            {
+              CHECKBOX (checkLuma, par.doLuma);
+              CHECKBOX (checkbuttonU, par.doChromaU);
+              CHECKBOX (checkbuttonV, par.doChromaV);
+
+              par.coef = GTK_ADJUSTMENT (adj_coeff)->value;
+              par.offset = (int8_t) floor (GTK_ADJUSTMENT (adj_offset)->value);
+
+              memcpy(param,&par,sizeof(par));
+              ret = 1;
+            }
+        }
         gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
         dialog=NULL;
@@ -130,6 +142,31 @@ uint8_t DIA_contrast(AVDMGenericVideoStream *astream,CONTRAST_PARAM *param)
         delete [] video_rgb;
         delete rgbConv;
         return ret;
+}
+void calculate(void)
+{
+  buildContrastTable (par.coef, par.offset, tableluma, tablechroma);
+
+  memcpy (video_shifted->data, video_src->data, (hh * ww * 3)>>1);
+  if (par.doLuma)
+    {
+      doContrast (YPLANE(video_src), YPLANE(video_shifted), tableluma, ww, hh);
+    }
+  if (par.doChromaU)
+    {
+      doContrast (UPLANE(video_src), UPLANE(video_shifted), tablechroma, ww >> 1, hh >> 1);
+    }
+
+  if (par.doChromaV)
+    {
+     doContrast (VPLANE(video_src), VPLANE(video_shifted), tablechroma, ww >> 1, hh >> 1);
+    }
+}
+void draw(void)
+{
+  //COL_yv12rgb (sw, sh, video2, video3);
+  rgbConv->scale(video_shifted->data,video_rgb);
+  GUI_RGBDisplay (video_rgb, ww, hh, (void *) WID (drawingarea1));
 }
 //
 //        Check entered values and green-out the selected portion on the screen
@@ -151,27 +188,9 @@ void gui_update (GtkButton * button, gpointer user_data)
 
   // printf("\n Luma : %d,u %d, v:%d",par.doLuma,par.doChromaU,par.doChromaV);
   // printf("\n off : %d, coeff %f\n",par.offset,par.coef);
-
-  buildContrastTable (par.coef, par.offset, tableluma, tablechroma);
-
-  memcpy (video_shifted->data, video_src->data, (hh * ww * 3)>>1);
-  if (par.doLuma)
-    {
-      doContrast (YPLANE(video_src), YPLANE(video_shifted), tableluma, ww, hh);
-    }
-  if (par.doChromaU)
-    {
-      doContrast (UPLANE(video_src), UPLANE(video_shifted), tablechroma, ww >> 1, hh >> 1);
-    }
-
-  if (par.doChromaV)
-    {
-     doContrast (VPLANE(video_src), VPLANE(video_shifted), tablechroma, ww >> 1, hh >> 1);
-    }
-
-  //COL_yv12rgb (sw, sh, video2, video3);
-  rgbConv->scale(video_shifted->data,video_rgb);
-  GUI_RGBDisplay (video_rgb, ww, hh, (void *) WID (drawingarea1));
+  calculate();
+  draw();
+  
 }
 
 gboolean gui_draw (GtkWidget * widget, GdkEventExpose * event, gpointer user_data)

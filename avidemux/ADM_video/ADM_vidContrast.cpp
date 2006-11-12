@@ -235,6 +235,7 @@ ADMVideoContrast::configure (AVDMGenericVideoStream * instream)
   if(DIA_contrast(_in,_param))
   {
     buildContrastTable (_param->coef, _param->offset, _tableFlat, _tableNZ);
+    return 1;
   }
   return 0;
 }

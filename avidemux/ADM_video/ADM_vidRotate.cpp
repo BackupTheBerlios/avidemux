@@ -14,31 +14,28 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
- #include <stdio.h>
+#include "config.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ADM_assert.h>
 
-#include "config.h"
-#include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
-#ifdef HAVE_ENCODER
+#include "default.h"
+#include "ADM_osSupport/ADM_misc.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidRotate.h"
 #include "ADM_filter/video_filters.h"
-
+#include <ADM_assert.h>
 
 static FILTER_PARAM rotpParam={3,{"width","height","angle"}};
 
 
 SCRIPT_CREATE(rotate_script,ADMVideoRotate,rotpParam);
 BUILD_CREATE(rotate_create,ADMVideoRotate);
+
+uint8_t DIA_rotate(AVDMGenericVideoStream *astream,ROTATE_PARAM *param);
 
 char *ADMVideoRotate::printConf( void )
 {
@@ -117,13 +114,7 @@ uint8_t ADMVideoRotate::getFrameNumberNoAlloc(uint32_t frame,
   if(!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags)) return 0;
 
   
-  do_rotate(_uncompressed->data, 
-  	_in->getInfo()->width, 
-  	_in->getInfo()->height, 
-	_param->angle, 
-	data->data, 
-	&_info.width,
-	&_info.height);
+  do_rotate(_uncompressed,data,_param->angle);
 
   //printf("%ld,%ld\n", _info.width, _info.height);
 
@@ -133,15 +124,29 @@ uint8_t ADMVideoRotate::getFrameNumberNoAlloc(uint32_t frame,
   return 1;
 }
 
-void do_rotate(uint8_t *in, uint32_t in_w, uint32_t in_h, float angle, uint8_t *out, uint32_t *out_w, uint32_t *out_h)
+void do_rotate(ADMImage *source,ADMImage *target,float angle)
+    //uint8_t *out, uint32_t *out_w, uint32_t *out_h)
 {
+  uint8_t *in;
+  uint32_t in_w,in_h;
+
+  in=source->data;
+  in_w=source->_width;
+  in_h=source->_height;
+
   uint32_t x, y;
   uint32_t u_offset = (in_w * in_h);
   uint32_t v_offset = u_offset + (in_w/2 * in_h/2);
   uint32_t in_sub_w = in_w/2;
   uint32_t in_sub_h = in_h/2;
   uint32_t out_sub_w, out_sub_h;
-
+  
+  uint8_t *out=target->data;
+  uint32_t *out_w=&(target->_width);
+  uint32_t *out_h=&(target->_height);
+  
+  ADM_assert(in_w*in_h==(*out_w)*(*out_h));
+  
   // In general, for 0 <= i < width and 0 <= j < height, the pixel (x + i, y + j) is colored with red value 
   // red value   rgb_buf[(j * rowstride) + (i * 3) + 0], 
   // green value rgb_buf[(j * rowstride) + (i * 3) + 1], 
@@ -223,6 +228,13 @@ void do_rotate(uint8_t *in, uint32_t in_w, uint32_t in_h, float angle, uint8_t *
 }
 uint8_t ADMVideoRotate::configure( AVDMGenericVideoStream *instream)
 {
-  return 1;
+  uint8_t r;
+  r= DIA_rotate(instream,_param);
+  if(r)
+  {
+    _info.width=_param->width;
+    _info.height=_param->height;
+  }
+  return r;
 }
-#endif
+

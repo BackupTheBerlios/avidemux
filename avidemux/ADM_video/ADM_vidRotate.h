@@ -17,30 +17,19 @@
 #ifndef ROTATE
 #define ROTATE
 
-typedef struct ROTATE_PARAM
-{
-  uint32_t width;
-  uint32_t height;
-  float angle;
-};
-
-void do_rotate(uint8_t *in, uint32_t in_w, uint32_t in_h, float angle, uint8_t *out, uint32_t *out_w, uint32_t *out_h);
+#include "ADM_vidRotate_param.h"
 
 
 class  ADMVideoRotate:public AVDMGenericVideoStream
 {
 
  protected:
-
-  virtual char 			*printConf(void);
-
+  virtual char                  *printConf(void);
   ROTATE_PARAM                  *_param;
 
  public:
- 		
-
-  ADMVideoRotate(AVDMGenericVideoStream *in, CONFcouple *setup);
-  virtual ~ADMVideoRotate();
+                  ADMVideoRotate(AVDMGenericVideoStream *in, CONFcouple *setup);
+  virtual         ~ADMVideoRotate();
   virtual uint8_t configure( AVDMGenericVideoStream *instream) ;
   virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len, ADMImage *data,uint32_t *flags);
   virtual uint8_t	getCoupledConf( CONFcouple **couples)				;

@@ -2,7 +2,7 @@
                           ADM_guiRotate.cpp  -  description
                              -------------------
     begin                : Sat Jan 8 2003
-    copyright            : (C) 2003 by Tracy Harton
+    copyright            : (C) 2003 by Tracy Harton / (c) 2006 Mean
     email                : tracy@amphibious.org
  ***************************************************************************/
 
@@ -31,186 +31,124 @@
 #include "avio.hxx"
 #include "config.h"
 #include "avi_vars.h"
-#ifdef HAVE_ENCODER
-
 
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidRotate.h"
+#include "ADM_video/ADM_vidRotate_param.h"
 
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include <ADM_assert.h>
 
-#if 0
-extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
+void    GUI_RGBDisplay(uint8_t *dis,uint32_t w,uint32_t h,void *widg);
 
+static GtkWidget *create_dialog1 (void);
+static GtkWidget *dialog = NULL;
 
-static GtkWidget*  create_dialog1 (void);
-
-
-static GtkWidget 			*dialog=NULL;
-static  GtkObject 			*adj_angle=NULL;
-
-static int 					getRotateParams(	void);
-static void 				gui_update(GtkButton * button, gpointer user_data);
-static gboolean  			gui_draw(GtkWidget * widget,
-	     							GdkEventExpose * event, gpointer user_data);
+static gboolean gui_draw (GtkWidget * widget,  GdkEventExpose * event, gpointer user_data);
+static void gui_update (GtkButton * button, gpointer user_data);
+static void calculate(void);
+static void draw(void);
 
 
 // Ugly !
-static uint8_t  *video_rgb, *video_yuv;
-static ADMImage *video_yuv_orig;
-static uint32_t orig_w, orig_h;
-static ROTATE_PARAM par;
-
-#define WIDG(widget_name) lookup_widget(dialog,#widget_name)
-
 static ColYuvRgb    *rgbConv=NULL;
-uint8_t ADMVideoRotate:: configure( AVDMGenericVideoStream *instream)
+static ADMImage *video_src,*video_rotated;
+static AVDMGenericVideoStream *sstream;
+static uint8_t *video_rgb;
+static uint32_t ww, hh;
+static ROTATE_PARAM par;
+static GtkObject *adj_angle;
 
+#define CNX(x,y) gtk_signal_connect(GTK_OBJECT(WID(x)), y, GTK_SIGNAL_FUNC(gui_update), (void *) (1));  
+uint8_t DIA_rotate(AVDMGenericVideoStream *astream,ROTATE_PARAM *param)
 {
-  uint32_t w,h,l,f;
-  uint8_t ret;
+  uint8_t ret=0;
+  uint32_t len,flags;
+  uint32_t curImage=0;
+        sstream=astream;
+        memcpy(&par,param,sizeof(par));
+        
+        ww=astream->getInfo()->width;
+        hh=astream->getInfo()->height;
+        video_src=new ADMImage(ww,hh);
+        video_rotated=new ADMImage(par.width,par.height);
+        video_rgb=new uint8_t[ww*hh*4];
+        rgbConv=new ColYuvRgb(par.width,par.height);
+        rgbConv->reset(par.width,par.height);
 
-  printf("\n .. configuring rotate...\n");
-  video_rgb = NULL;
-  video_yuv_orig = NULL;
-  video_yuv = NULL;
+        dialog=create_dialog1();
+        gtk_register_dialog(dialog);
+         if(!astream->getFrameNumberNoAlloc(curImage,&len,video_src,&flags))
+        {
+          GUI_Error_HIG("Frame error","Cannnot read frame to display");
 
-  // Get info from previous filter
-  w= _in->getInfo()->width;
-  h= _in->getInfo()->height;
-        rgbConv=new ColYuvRgb(w,h);
-        rgbConv->reset(w,h);
-
-
-//  video_yuv_orig=(uint8_t *)malloc(w*h*4);
-//  ADM_assert(video_yuv_orig);
-	video_yuv_orig=new ADMImage(w,h);
-	
-  video_rgb=(uint8_t *)ADM_alloc(w*h*4);
-  ADM_assert(video_rgb);
-  video_yuv=(uint8_t *)ADM_alloc(w*h*4);
-  ADM_assert(video_yuv);
-
-  // ask current frame from previous filter
-  ADM_assert(instream->getFrameNumberNoAlloc(curframe, &l, video_yuv_orig, &f));
-
-  memcpy(video_yuv, video_yuv_orig->data, (w*h*3)>>1);
-  //COL_yv12rgb(w, h,video_yuv, video_rgb);
-  rgbConv->scale(video_yuv,video_rgb);
-
-  ADM_assert(_param);
-  memcpy(&par,_param,sizeof(par));
-
-
-  orig_w = par.width = w;
-  orig_h = par.height = h;
-
-  switch(ret=getRotateParams())
-  {
-    case 0:
-    printf("cancelled\n");
-    break;
-    case 1:
-    memcpy(_param,&par,sizeof(par));
-    break;
-    default:
-    ADM_assert(0);
-  }
-
-  _info.width = _param->width;
-  _info.height = _param->height;
-
-  ADM_dealloc(video_rgb);
-  delete video_yuv_orig;
-  ADM_dealloc(video_yuv);
-
-  video_rgb =  video_yuv = NULL;
-  video_yuv_orig =NULL;
-  delete rgbConv;
-  rgbConv=NULL;
-  return ret;
+        }
+        else
+        {
+          calculate ();
+          CNX (hscale1, "value_changed");
+          gtk_signal_connect (GTK_OBJECT (WID (drawingarea1)), "expose_event",
+                            GTK_SIGNAL_FUNC (gui_draw), NULL);
+          if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
+            {
+              memcpy(param,&par,sizeof(par));
+              ret = 1;
+            }
+        }
+        gtk_unregister_dialog(dialog);
+        gtk_widget_destroy(dialog);
+        dialog=NULL;
+        delete video_src;
+        delete video_rotated;
+        delete [] video_rgb;
+        delete rgbConv;
+        return ret;
 }
-
 //
+//        Check entered values and green-out the selected portion on the screen
+//        Each value must be even
 //
-int getRotateParams(	void )
+void calculate( void )
 {
-
-  int 		ret;
-
-	ret=0;
-	dialog=create_dialog1();
-	gtk_register_dialog(dialog);
-       GTK_ADJUSTMENT(adj_angle)->value= par.angle ;
-    	gtk_widget_set_usize(WIDG(drawingarea1), par.width, par.height);
-
-	// add callback for redraw & value changed
-
- 	 gtk_signal_connect(GTK_OBJECT(WIDG(drawingarea1)), "expose_event",
-		       GTK_SIGNAL_FUNC(gui_draw),
-		       NULL);
-
-	#define DRAG(x)   gtk_signal_connect(GTK_OBJECT(WIDG(hscale1)), #x, \
-		       GTK_SIGNAL_FUNC(gui_update), NULL);
-
-	DRAG(drag_data_received);
-	DRAG(drag_motion);
-	DRAG(drag_data_get);
-	DRAG(drag_begin);
-	DRAG(value_changed);
-
-	//
-	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
-	{
-			  par.angle = GTK_ADJUSTMENT(adj_angle)->value;
-			//printf("\n Angle : %3.2f\n", par.angle);
-				ret=1;
-	}
-	gtk_unregister_dialog(dialog);
-	gtk_widget_destroy(dialog);
-
-	return ret;
-
+  do_rotate(video_src,video_rotated, par.angle);
+  par.width=video_rotated->_width;
+  par.height=video_rotated->_height;
+  rgbConv->reset(par.width,par.height);
+  rgbConv->scale(video_rotated->data,video_rgb);
 }
-
-//
-void gui_update(GtkButton * button, gpointer user_data)
+void draw(void)
 {
-  UNUSED_ARG(button);
-  UNUSED_ARG(user_data);
+  GUI_RGBDisplay (video_rgb, par.width, par.height, (void *) WID (drawingarea1));
+  gtk_widget_set_usize (WID (drawingarea1), par.width,par.height);
+}
+void gui_update (GtkButton * button, gpointer user_data)
+{
+  UNUSED_ARG (button);
+  UNUSED_ARG (user_data);
+  uint32_t    sz;
 
   par.angle = GTK_ADJUSTMENT(adj_angle)->value;
-  printf("\n Angle : %3.2f\n", par.angle);
-
-  do_rotate(video_yuv_orig->data, orig_w, orig_h, par.angle, video_yuv, &par.width, &par.height);
-
-  printf("w: %ld, h: %ld\n", par.width, par.height);
-
-  //COL_yv12rgb(par.width, par.height,video_yuv, video_rgb);
-  rgbConv->reset(par.width,par.height);
-  rgbConv->scale(video_yuv,video_rgb);
-
-  gtk_widget_set_usize(WIDG(drawingarea1), par.width, par.height);
-  GUI_RGBDisplay(video_rgb, par.width, par.height,( void *)WIDG(drawingarea1));
+  calculate();
+  draw();
+ 
 }
 
-gboolean  gui_draw(GtkWidget * widget, GdkEventExpose * event, gpointer user_data)
+gboolean gui_draw (GtkWidget * widget, GdkEventExpose * event, gpointer user_data)
 {
-  UNUSED_ARG(widget);
-  UNUSED_ARG(event);
-  UNUSED_ARG(user_data);
-
-  GUI_RGBDisplay(video_rgb, par.width, par.height, (void *)WIDG(drawingarea1));
-
-  return true;
+  UNUSED_ARG (widget);
+  UNUSED_ARG (event);
+  UNUSED_ARG (user_data);
+  
+  gtk_widget_set_usize (WID (drawingarea1), par.width, par.height);
+  GUI_RGBDisplay (video_rgb, par.width, par.height, (void *) WID (drawingarea1));
+  return TRUE;
 }
 
-
+//*****************************************
 GtkWidget	*create_dialog1 (void)
 {
   GtkWidget *dialog1;
@@ -270,5 +208,3 @@ GtkWidget	*create_dialog1 (void)
 }
 
 
-#endif
-#endif
