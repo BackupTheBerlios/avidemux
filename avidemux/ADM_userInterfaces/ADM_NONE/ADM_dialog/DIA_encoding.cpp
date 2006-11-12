@@ -67,18 +67,18 @@ DIA_encoding::~DIA_encoding( )
 }
 void DIA_encoding::setPhasis(const char *n)
 {
-          printf("Phase : %s\n",n);
+            fprintf(stderr,"Encoding Phase        : %s\n",n);
 
 }
 void DIA_encoding::setAudioCodec(const char *n)
 {
-           printf("Audio codec : %s\n",n);
+            fprintf(stderr,"Encoding Audio codec  : %s\n",n);
 
 }
 
 void DIA_encoding::setCodec(const char *n)
 {
-         printf("Video codec : %s\n",n);
+            fprintf(stderr,"Encoding Video codec  : %s\n",n);
 
 }
 void DIA_encoding::setBitrate(uint32_t br,uint32_t globalbr)
@@ -95,7 +95,7 @@ void DIA_encoding::reset(void)
 }
 void DIA_encoding::setContainer(const char *container)
 {
-        printf("Container : %s\n",container);
+        fprintf(stderr,"Encoding Container        : %s\n",container);
 }
 #define  ETA_SAMPLE_PERIOD 60000 //Use last n millis to calculate ETA
 #define  GUI_UPDATE_RATE 500  
@@ -124,10 +124,11 @@ void DIA_encoding::setFrame(uint32_t nb,uint32_t size, uint32_t quant,uint32_t t
 }
 void DIA_encoding::updateUI(void)
 {
-uint32_t tim;
-
-
-     	   //
+uint32_t   tim;
+uint32_t   hh,mm,ss;
+uint32_t   cur,max;
+uint32_t   percent;
+          //
            //	nb/total=timestart/totaltime -> total time =timestart*total/nb
            //
            //
@@ -137,9 +138,6 @@ uint32_t tim;
           if(_lastTime > tim) return;
           if( tim < _nextUpdate) return ; 
           _nextUpdate = tim+GUI_UPDATE_RATE;
-  
-            
-          printf("%lu/%lu",_lastnb,_total);
           // Average bitrate  on the last second
           uint32_t sum=0,aquant=0,gsum;
           for(int i=0;i<_roundup;i++)
@@ -173,16 +171,10 @@ uint32_t tim;
           deltaFrame=_lastnb-_lastFrame;
 
           _fps_average    =(uint32_t)( deltaFrame*1000.0 / deltaTime ); 
-
-          printf("%lu fps",_fps_average);
-          
   
-          uint32_t   hh,mm,ss;
   
             double framesLeft=(_total-_lastnb);
-                                          ms2time((uint32_t)floor(0.5+deltaTime*framesLeft/deltaFrame),&hh,&mm,&ss);
-          printf("%02d:%02d:%02d",hh,mm,ss);
-          
+            ms2time((uint32_t)floor(0.5+deltaTime*framesLeft/deltaFrame),&hh,&mm,&ss);
   
            // Check if we should move on to the next sample period
           if (tim >= _nextSampleStartTime + ETA_SAMPLE_PERIOD ) {
@@ -199,14 +191,14 @@ uint32_t tim;
           // update progress bar
             float f=_lastnb;
             f=f/_total;
-          printf(_("Done : %02d%%"),(int)(100*f));
-          
-          
-        _totalSize=_audioSize+_videoSize;
-        setSize(_totalSize>>20);
-        setAudioSizeIn((_audioSize>>20));
-        setVideoSizeIn((_videoSize>>20));
+            percent=(int)(100*f);
+        
+            _totalSize=_audioSize+_videoSize;
+          setSize(_totalSize>>20);
+          setAudioSizeIn((_audioSize>>20));
+          setVideoSizeIn((_videoSize>>20));
 
+          fprintf(stderr,"Done:%u%% Frames: %u/%u ETA: %02u:%02u:%02u\r",percent,_lastnb,_total,hh,mm,ss);
 
 }
 void DIA_encoding::setQuantIn(int size)
@@ -233,8 +225,6 @@ void DIA_encoding::setAudioSize(uint32_t size)
 }
 uint8_t DIA_encoding::isAlive( void )
 {
-     
-      
-	
-	return 1;
+        updateUI();
+        return 1;
 }
