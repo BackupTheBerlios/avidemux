@@ -59,7 +59,7 @@
 #include "prefs.h"
 #include <ADM_assert.h>
 
-#if 0
+
     
 typedef struct unicd
 {
@@ -123,90 +123,61 @@ static int32_t myY,myU,myV;
 
 extern int DIA_colorSel(uint8_t *r, uint8_t *g, uint8_t *b);
 ColYuvRgb *rgbConv=NULL;
-uint8_t ADMVideoSubtitle:: configure(AVDMGenericVideoStream *instream)
+
+
+uint8_t DIA_srt(ADMImage *source, SUBCONF *param)
 {
-UNUSED_ARG(instream);
+
 //char c;
 uint8_t ret=0;
 int charset=0;
 uint32_t l,f;
 
-		// look up old one
-		if(_conf->_charset)
-		{
-			for(uint32_t j=0;j<sizeof(names)/sizeof(unicd);j++)
-			 if(!strcmp(_conf->_charset,names[j].name)) charset=j;
+          // look up old one
+          if(param->_charset)
+          {
+                  for(uint32_t j=0;j<sizeof(names)/sizeof(unicd);j++)
+                    if(!strcmp(param->_charset,names[j].name)) charset=j;
+          }
+          _w=source->_width;
+          _h=source->_height;
 
-		}
-		_w=_info.width;
-		_h=_info.height;
+          sourceImage     =source;
+          targetImage     =new uint8_t[_w*_h*2];
+          targetImageRGB  =new uint8_t[_w*_h*4];
 
-		sourceImage		=new ADMImage(_w,_h);//uint8_t[_w*_h*2];
-		targetImage		=new uint8_t[_w*_h*2];
-		targetImageRGB		=new uint8_t[_w*_h*4];
-		
-        rgbConv=new ColYuvRgb(_w,_h);
-        rgbConv->reset(_w,_h);
-
-		ADM_assert(instream->getFrameNumberNoAlloc(curframe,
-						&l,
-						sourceImage,
-						&f));
-				
-		 if(GUI_subtitleParam(	
-                        (char *)_conf->_fontname,
-                        (char *)_conf->_subname,
+          rgbConv=new ColYuvRgb(_w,_h);
+          rgbConv->reset(_w,_h);
+          //*****************************
+          ret= GUI_subtitleParam( (char *)param->_fontname,
+                        (char *)param->_subname,
                         &charset,
-                        (int *)&_conf->_fontsize,
-                        &(_conf->_baseLine),
-                        &(_conf->_Y_percent),
-                        &(_conf->_U_percent),
-                        &(_conf->_V_percent),
-                        &(_conf->_selfAdjustable),
-                        &(_conf->_delay),
-                        &(_conf->_useBackgroundColor)
-							))
-		 {
-                    printf("\n Font : %s", _conf->_fontname);
-                    printf("\n Sub  : %s", _conf->_subname);
-                    printf("\n Font size : %ld",_conf->_fontsize);
-                    printf("\n Charset : %d",charset);
-                    printf("\n Y : %ld",_conf->_Y_percent);
-                    printf("\n U : %ld",_conf->_U_percent);
-                    printf("\n V : %ld",_conf->_V_percent);
-                    if(charset<(int)(sizeof(names)/sizeof(unicd)))
-                    {
-                        strcpy(_conf->_charset,names[charset].name    );
-                        printf("\n Charset : %s\n",   names[charset].name    );
-                    }
+                        (int *)&param->_fontsize,
+                        &(param->_baseLine),
+                        &(param->_Y_percent),
+                        &(param->_U_percent),
+                        &(param->_V_percent),
+                        &(param->_selfAdjustable),
+                        &(param->_delay),
+                        &(param->_useBackgroundColor));
 
-                    loadSubtitle();
-                    loadFont();
-				
-                    prefs->set(FILTERS_SUBTITLE_FONTNAME,
-                            (ADM_filename *)_conf->_fontname);
-                    prefs->set(FILTERS_SUBTITLE_CHARSET,
-                            _conf->_charset);
-                    prefs->set(FILTERS_SUBTITLE_FONTSIZE,_conf->_fontsize);
-                    prefs->set(FILTERS_SUBTITLE_YPERCENT,_conf->_Y_percent);
-                    prefs->set(FILTERS_SUBTITLE_UPERCENT,_conf->_U_percent);
-                    prefs->set(FILTERS_SUBTITLE_VPERCENT,_conf->_V_percent);
-                    prefs->set(FILTERS_SUBTITLE_SELFADJUSTABLE,
-                                _conf->_selfAdjustable);
-                    prefs->set(FILTERS_SUBTITLE_USEBACKGROUNDCOLOR,
-                                _conf->_useBackgroundColor);
-                    ret=1;
-		}
-		delete  sourceImage;
-		delete [] targetImage;
-		delete [] targetImageRGB;
+          //*****************************
+          delete [] targetImage;
+          delete [] targetImageRGB;
 
-		sourceImage=NULL;
-		targetImage=targetImageRGB=NULL;
-		delete rgbConv;
-		rgbConv=NULL;
-		return ret;
+          targetImage=targetImageRGB=NULL;
+          delete rgbConv;
+          rgbConv=NULL;
 
+          if(ret==1)
+          {
+            if(charset<(int)(sizeof(names)/sizeof(unicd)))
+            {
+                strcpy(param->_charset,names[charset].name    );
+                printf("\n Charset : %s\n",   names[charset].name    );
+            } 
+          }
+    
 }
 
 int  GUI_subtitleParam(char *font,char *sub,int  *charset,int *size,uint32_t *baseline,
@@ -732,8 +703,4 @@ create_dialog1 (void)
   return dialog1;
 }
 
-
-#endif
-
-
-#endif
+#endif //FREETYPE

@@ -62,6 +62,8 @@
 #include "ADM_video/ADM_vidEq2.h"
 #include "ADM_video/ADM_lavpp_deintparam.h"
 #include "ADM_video/ADM_vidContrast.h"
+#include "ADM_video/ADM_vidFont.h"
+#include "ADM_video/ADM_vidSRT.h"
 #include "ADM_audiofilter/audioencoder_vorbis_param.h"    
     
 #include "ADM_audiofilter/audioeng_buildfilters.h"
@@ -171,7 +173,7 @@ uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
 			uint32_t *cthresh, uint32_t *scene) {return 0;}
 			
 uint8_t  DIA_getLumaChroma(uint32_t *doLuma, uint32_t *doChroma) {return 0;}
-			
+uint8_t DIA_srt(ADMImage *source, SUBCONF *param) {return 0;}			
 			
 			
 extern int global_argc;

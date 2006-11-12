@@ -375,9 +375,54 @@ ADMVideoSubtitle::~ADMVideoSubtitle()
 		_font=NULL;
 	}
 }
-uint8_t ADMVideoSubtitle:: configure(AVDMGenericVideoStream *instream)
+
+uint8_t DIA_srt(ADMImage *source, SUBCONF *param);
+uint8_t ADMVideoSubtitle::configure(AVDMGenericVideoStream *instream)
 {
-  return 1;
+  
+  UNUSED_ARG(instream);
+//char c;
+uint8_t ret=0;
+int charset=0;
+uint32_t l,f;
+
+          ADMImage *sourceImage=new ADMImage(_info.width,_info.height);
+          ADM_assert(instream->getFrameNumberNoAlloc(curframe,
+                                        &l,
+                                        sourceImage,
+                                        &f));
+                        
+          if(DIA_srt(	sourceImage,_conf))
+          {
+            printf("\n Font : %s", _conf->_fontname);
+            printf("\n Sub  : %s", _conf->_subname);
+            printf("\n Font size : %ld",_conf->_fontsize);
+            printf("\n Charset : %d",charset);
+            printf("\n Y : %ld",_conf->_Y_percent);
+            printf("\n U : %ld",_conf->_U_percent);
+            printf("\n V : %ld",_conf->_V_percent);
+
+
+            loadSubtitle();
+            loadFont();
+                        
+            prefs->set(FILTERS_SUBTITLE_FONTNAME,
+                    (ADM_filename *)_conf->_fontname);
+            prefs->set(FILTERS_SUBTITLE_CHARSET,
+                    _conf->_charset);
+            prefs->set(FILTERS_SUBTITLE_FONTSIZE,_conf->_fontsize);
+            prefs->set(FILTERS_SUBTITLE_YPERCENT,_conf->_Y_percent);
+            prefs->set(FILTERS_SUBTITLE_UPERCENT,_conf->_U_percent);
+            prefs->set(FILTERS_SUBTITLE_VPERCENT,_conf->_V_percent);
+            prefs->set(FILTERS_SUBTITLE_SELFADJUSTABLE,
+                        _conf->_selfAdjustable);
+            prefs->set(FILTERS_SUBTITLE_USEBACKGROUNDCOLOR,
+                        _conf->_useBackgroundColor);
+            ret=1;
+        }
+        delete  sourceImage;
+        return ret;
+
 }
 #endif
 
