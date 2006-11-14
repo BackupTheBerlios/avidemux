@@ -49,15 +49,15 @@ ADM_Audiocodec8Bits::~ADM_Audiocodec8Bits( )
 }
 uint8_t ADM_Audiocodec8Bits::run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut)
 {
-	for (int n = 0; n < nbIn; n++) {
-		if(_unsign)
-			*(outptr++) = (*inptr - 128) / 256;
-		else
-			*(outptr++) = *inptr / 256;
-		inptr++;
-	}
-	*nbOut=nbIn;
-
+  float f;
+        for (int n = 0; n < nbIn; n++) {
+                f=(float) *inptr++;
+                if(_unsign)
+                        *(outptr++) = (f - 128.) / 256.;
+                else
+                        *(outptr++) = f / 256.;
+        }
+        *nbOut=nbIn;
 	return 1;
 }
 
