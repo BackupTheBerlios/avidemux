@@ -76,7 +76,7 @@ uint32_t AUDMAudioFilterSox::fill(uint32_t max,float *output,AUD_Status *status)
 
     // Compute how much block we want
     d= _wavHeader.frequency;
-    d/=_previous->getInfo()->frequency;
+    d=_previous->getInfo()->frequency/d;
     d*=max;
     d/=BLK_SIZE;
     nbBlockIn=(uint32_t)floor(d);
@@ -107,7 +107,7 @@ uint32_t AUDMAudioFilterSox::fill(uint32_t max,float *output,AUD_Status *status)
         // We have one BLK_SIZE incoming
         for(int i=0;i<_wavHeader.channels;i++)
         {
-          nbout=BLK_SIZE*3;;
+          nbout=BLK_SIZE*8;;    // 8Khz->48khz worst case ?
           nbi=nb_in;
           if(!sox_run(&(_resamples[i]), _incomingBuffer+i+_head,  output+i,    &nbi, &nbout,_wavHeader.channels-1))
           {

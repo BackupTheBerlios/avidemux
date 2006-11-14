@@ -156,7 +156,7 @@ uint8_t	AUDMEncoder_Lame::isVBR(void )
 
 uint8_t	AUDMEncoder_Lame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
-  uint32_t nbout;
+  int32_t nbout;
   
         *samples = 1152; //FIXME
         *len = 0;
