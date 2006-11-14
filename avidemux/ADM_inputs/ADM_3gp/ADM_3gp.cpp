@@ -955,6 +955,15 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				 _video_bih.biCompression=_videostream.fccHandler;
 				tom.skipAtom();
 				break;
+
+                          case MKFCCR('d','v','c','p'): //'dv':
+                                  
+                                  _video_bih.biWidth=_mainaviheader.dwWidth=_lastW ;
+                                  _video_bih.biHeight=_mainaviheader.dwHeight=_lastH;
+                                  _videostream.fccHandler=fourCC::get((uint8_t *)"DVDS");
+                                  _video_bih.biCompression=_videostream.fccHandler;
+                                  tom.skipAtom();
+                                  break;
                         case MKFCCR('a','v','c','C'): //'avcC':
                                 {
                                         // configuration data for h264

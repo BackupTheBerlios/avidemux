@@ -223,6 +223,7 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
     	fourCC::check(id,(uint8_t *)"pnot") ||
 	fourCC::check(id,(uint8_t *)"mdat") ||
 	fourCC::check(id,(uint8_t *)"moov") ||
+	fourCC::check(id,(uint8_t *)"wide") ||
         fourCC::check(id,(uint8_t *)"skip") 
 	)
     {
