@@ -745,6 +745,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				tom.skipAtom();
 				break;
 			case MKFCCR('t','r','a','k'): //'trak':
+                                printf("**************************************************\n");
 				printf("Track found\n");
 				current=0;
 				nbSz=0;
@@ -814,14 +815,14 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					break;
                                 default : printf("In atom track, the track type is unknown (%d)\n",current);
 				}
-				DEL(Sz);
-				DEL(Co);
-				DEL(Sc);
-				DEL(Sn);
-				DEL(Sync);
-				DEL(SttsC);
-				DEL(SttsN);
-
+                                DEL(Sz);
+                                DEL(Co);
+                                DEL(Sc);
+                                DEL(Sn);
+                                DEL(Sync);
+                                DEL(SttsC);
+                                DEL(SttsN);
+                                printf("**************************************************\n");
 				break;
 		// misc atom that needs special care
 			case MKFCCR('m','d','h','d'): //mdhd
@@ -1118,7 +1119,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				printf("%lu frames /%lu nbsz..\n",n,nbSz);
 				if(n)
 					{
-                                              printf("\t\t%u frames of the same size %u\n",nbSz,SzIndentical);
+                                              printf("\t\t%lu frames of the same size %lu , n=%lu\n",
+                                                  nbSz,SzIndentical,n);
                                               SzIndentical=n;
                                               Sz=NULL;
 					}
@@ -1246,8 +1248,10 @@ uint32_t i,j,cur;
           ADM_assert(Sz);
         }
 	// first set size
-	if(SzIndentical)// in that case they are all the same size, i.e.audio
+	if(SzIndentical && isAudio)// in that case they are all the same size, i.e.audio
 	{
+          
+          
           uint32_t totalBytes=SzIndentical*nbSz;
           printf("All the same size : %u (total size %u bytes)\n",SzIndentical,totalBytes);
               //
@@ -1360,11 +1364,23 @@ uint32_t i,j,cur;
         track->index=new _3gpIndex[nbSz];
         memset(track->index,0,nbSz*sizeof(_3gpIndex));
 
-	for(i=0;i<nbSz;i++)
-	{
-                track->index[i].size=Sz[i];
-		aprintf("\t size : %d : %lu\n",i,Sz[i]);
-	}
+        if(SzIndentical) // Video, all same size (DV ?)
+        {
+            aprintf("\t size for all %lu frames : %lu\n",nbSz,SzIndentical);
+            for(i=0;i<nbSz;i++)
+            {
+                    track->index[i].size=SzIndentical;
+                    
+            }
+          }
+          else // Different size
+          {
+            for(i=0;i<nbSz;i++)
+            {
+                    track->index[i].size=Sz[i];
+                    aprintf("\t size : %d : %lu\n",i,Sz[i]);
+            }
+          }
 	// if no sample to chunk we map directly
 	// first build the # of sample per chunk table
         uint32_t totalchunk=0,max=0;
