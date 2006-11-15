@@ -800,6 +800,19 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					break;
 				case 2:
 					// audio
+                                        
+                                        // Ugly hack !
+                                        // In case of uncompressed audio (LPCM & friends)
+                                        // The size is in sample, not byte
+                                        if(SzIndentical ==1 && (ADIO.encoding==WAV_LPCM || ADIO.encoding==WAV_PCM ))
+                                        {
+                                          printf("Overriding size %lu -> %lu\n", SzIndentical,SzIndentical*2*ADIO.channels);
+                                          SzIndentical=SzIndentical*2*ADIO.channels;
+                                        }
+                                           
+                                  
+                                  
+                                        // 
                                         buildIndex(&_tracks[1+nbAudioTrack],myScale,
 							nbSz,Sz,SzIndentical,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
 							Sn,&nbo,1);
@@ -1262,7 +1275,7 @@ uint32_t i,j,cur;
               {
                   for(int j=Sc[i]-1;j<nbCo;j++)
                   {
-
+                        aprintf("For chunk %lu , %lu samples\n",j,Sn[i]);
                         samplePerChunk[j]=Sn[i];
                   }
               }
