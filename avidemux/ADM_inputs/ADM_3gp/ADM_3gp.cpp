@@ -405,7 +405,8 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 		switch((tom.getFCC()))
 		{
 			default:
-#ifdef _3GP_VERBOSE
+//#ifdef _3GP_VERBOSE
+#if 1
 					for(uint32_t o=0;o<nest;o++) printf("\t");
 					printf("skipping atom ");
 					fourCC::printBE(tom.getFCC());
@@ -432,6 +433,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 			case MKFCCR('M','O','V','I') : //'MOVI':
 				parseAtomTree(&tom);
 				break;
+
 			case MKFCCR('s','m','h','d'): // Track audio header
 					fourCC::printBE(tom.read32());
 					tom.skipAtom();
@@ -564,6 +566,19 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 
 
                                         }
+                    case MKFCCR('u','r','l',' '): // url
+                                      {
+                                        int s;
+                                        tom.read32();
+                                        tom.read32();
+                                        s=tom.read32();
+                                        char str[s+1];
+                                        tom.readPayload((uint8_t *)str,s);
+                                        str[s]=0;
+                                        printf("Url : %s\n",str);
+                                        tom.skipAtom();
+                                        break;
+                                      }                   
                     case MKFCCR('Q','D','M','2'): // QDM2
                                         {
                                         tom.skipBytes(8);
@@ -863,21 +878,35 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				tom.read32();
 				type=tom.read32();
 				switch(type)
-				{	
-				case MKFCCR('v','i','d','e')://'vide':
-					current=1;
-					printf("hdlr video found \n ");
-					break;
-				case MKFCCR('s','o','u','n'): //'soun':
-					current=2;
+                                {	
+                                case MKFCCR('v','i','d','e')://'vide':
+                                        current=1;
+                                        printf("hdlr video found \n ");
+                                        break;
+                                case MKFCCR('s','o','u','n'): //'soun':
+                                        current=2;
                                         _audioDuration=(uint32_t)duration;
-					printf("hdlr audio found (duration %f ms)\n ",duration);
-					break;
-				default:
-					printf("hdlr found but ignored \n");
-					fourCC::print(type);
-					printf("\n");
-				}
+                                        printf("hdlr audio found (duration %f ms)\n ",duration);
+                                        break;
+                                case MKFCCR('u','r','l',' ')://'url ':
+                                    {
+                                        int s;
+                                        tom.read32();
+                                        tom.read32();
+                                        tom.read32();
+                                        s=tom.read();
+                                        char str[s+1];
+                                        tom.readPayload((uint8_t *)str,s);
+                                        str[s]=0;
+                                        printf("Url : <%s>\n",str);
+                                        
+                                      }                   
+                                      break;
+                                default:
+                                        printf("hdlr found but ignored \n");
+                                        fourCC::print(type);
+                                        printf("\n");
+                                }
 				tom.skipAtom();
                                 duration=0;
 				break;
@@ -955,7 +984,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 						//mixDump(_videoExtraData,30);
 						tom.skipAtom();
 				break;
-
+                        case MKFCCR('M','J','P','G'): //'jpeg':
 			case MKFCCR('j','p','e','g'): //'jpeg':
                         case MKFCCR('A','V','D','J'): //'jpeg':
                                 VDEO.extraDataSize=tom.getSize();
