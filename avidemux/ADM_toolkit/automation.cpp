@@ -108,6 +108,7 @@ extern uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo);
 static int call_bframe(void);
 static int call_x264(void);
 static int call_packedvop(void);
+static int call_forcesmart(void);
 static int set_output_format(const char *str);
 static void set_reuse_2pass_log(char *p);
 static void setVar(char *in);
@@ -166,6 +167,8 @@ AUTOMATON reaction_table[]=
         {"force-alt-h264",	0,"Force use of alternate read mode for h264", (one_arg_type)call_x264},
         {"force-unpack",	0,"Force detection of packed vop in next loaded file"       
                                                           ,(one_arg_type)call_packedvop},
+        {"force-smart",   	0,"Engage smart copy mode with CQ=3 at next save"       
+                                                          ,(one_arg_type)call_forcesmart},                                                          
         {"external-mp3",	1,"load external mpeg audio as audio track",(one_arg_type)A_loadMP3},
         {"external-ac3",	1,"load external ac3 audio as audio track",(one_arg_type)A_loadAC3},
         {"external-wav",	1,"load external wav audio as audio track",(one_arg_type)A_loadWave},
@@ -544,7 +547,11 @@ int call_packedvop(void)
 	video_body->setEnv(ENV_EDITOR_PVOP);
 	return 1;
 }
-
+int call_forcesmart(void)
+{
+	video_body->setEnv(ENV_EDITOR_SMART);
+	return 1;
+}
 int set_output_format(const char *str){
   	return A_setContainer(str);
 }

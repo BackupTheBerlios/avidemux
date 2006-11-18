@@ -79,6 +79,7 @@ JSFunctionSpec ADM_JSAvidemux::avidemux_methods[] =
         { "addSegment", AddSegment ,3,0,0}, // Clear all segments
 	{ "goToTime", GoToTime, 3, 0, 0 },	// more current frame to time index
 	{ "forceUnpack", forceUnpack, 0, 0, 0 },
+        { "smartCopyMode", smartcopyMode, 0, 0, 0 },
         { "setContainer", setContainer, 1, 0, 0 },
         { "rebuildIndex", rebuildIndex, 0, 0, 0 },
 
@@ -519,6 +520,22 @@ JSBool ADM_JSAvidemux::rebuildIndex(JSContext *cx, JSObject *obj, uintN argc,
        return JS_TRUE;
 }// end GoToTime
 
+JSBool ADM_JSAvidemux::smartcopyMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+
+ADM_JSAvidemux *p = (ADM_JSAvidemux *)JS_GetPrivate(cx, obj);
+        // default return value
+        printf("[JS]Setting smart copy mode(1)\n");
+        *rval = BOOLEAN_TO_JSVAL(false);
+        if(argc != 0)
+                return JS_FALSE;
+        printf("[JS]Setting smart copy mode (2)\n");
+        enterLock();
+        video_body->setEnv(ENV_EDITOR_SMART);
+        *rval = BOOLEAN_TO_JSVAL( true);
+        leaveLock();
+        return JS_TRUE;
+}
 JSBool ADM_JSAvidemux::setContainer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
 

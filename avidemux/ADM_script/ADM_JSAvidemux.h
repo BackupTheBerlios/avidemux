@@ -33,7 +33,9 @@ public:
         static JSBool forceUnpack(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool setContainer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool rebuildIndex(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        static JSBool smartcopyMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
+        
 
 	static JSPropertySpec avidemux_properties[];
 	static JSFunctionSpec avidemux_methods[];

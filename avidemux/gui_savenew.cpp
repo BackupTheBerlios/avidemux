@@ -274,8 +274,8 @@ int ret;
 //___________________________________
 uint8_t  A_SaveAudioNVideo(const char *name)
 {
-	 uint32_t needSmart=0,fl;
-     GenericAviSave	*nw;
+     uint32_t needSmart=0,fl;
+     GenericAviSave	*nw=NULL;
      aviInfo info;
      uint8_t ret=0;
 
@@ -284,56 +284,48 @@ uint8_t  A_SaveAudioNVideo(const char *name)
      printf("\n video process mode : %d",videoProcessMode());
      if (!videoProcessMode())
      {
-       			if(video_body->isMultiSeg()) needSmart=1;
-          			video_body->getFlags(frameStart,&fl);
-             		if(!(fl&AVI_KEY_FRAME)) needSmart=1;
+          if(video_body->isMultiSeg()) needSmart=1;
+                  video_body->getFlags(frameStart,&fl);
+          if(!(fl&AVI_KEY_FRAME)) needSmart=1;
 
-				if(needSmart) printf("\n probably need smart copy mode\n");
-    	
-    		if( !isMpeg4Compatible(  info.fcc)
-#ifdef USE_FFMPEG
-			  && !isMSMpeg4Compatible(info.fcc)
-
-#endif      
-      			)
+          if(needSmart) printf("\n probably need smart copy mode\n");
+      
+          if( !isMpeg4Compatible(  info.fcc)
+                && !isMSMpeg4Compatible(info.fcc))
              {
-                	printf("\n not encodable, cancelling smart mode\n");
-                 	needSmart=0;
-
+                    printf("\n not encodable, cancelling smart mode\n");
+                    needSmart=0;
                }
-    			
 
-#ifdef HAVE_ENCODER
-			if(needSmart &&
-                        GUI_Question(_("You may need smart copy.\n Enable it ?")))
-             		{
-				int value=4;;
-	 			 if( ! GUI_getIntegerValue(&value, 2, 31, "Q Factor (set 4)"))
-	  					return 0;
 
-                      		nw=new   GenericAviSaveSmart(value);
-                 	}
+               int value=video_body->getEnv(ENV_EDITOR_SMART);
+               nw=NULL;
+               if(needSmart)
+               {
+                  if(value)
+                  {
+                     nw=new   GenericAviSaveSmart(3);
+                  }
                   else
                   {
-                           nw=new   GenericAviSaveCopy;
+                    if(GUI_Question(_("You may need smart copy.\n Enable it ?")))
+                    {
+                        value=4;
+                        if( ! GUI_getIntegerValue(&value, 2, 31, "Q Factor (set 4)"))
+                                      return 0;
+                        nw=new   GenericAviSaveSmart(value);
                     }
-
-
-
-#else
-     		nw=new   GenericAviSaveCopy;
-#endif
+                }
+               }
+              if(!nw)
+                    nw=new   GenericAviSaveCopy;
+               
        }
        else
        {
-#ifdef HAVE_ENCODER
-			printf("\n Process mode\n");
-     		nw=new   GenericAviSaveProcess;
-#else
-			GUI_Error_HIG(_("No encoder"),_( "Cannot save in process mode."));
-   			return ;
-#endif
 
+              printf("\n Process mode\n");
+              nw=new   GenericAviSaveProcess;
         }
      ret=nw->saveAvi(name);
      delete nw;
