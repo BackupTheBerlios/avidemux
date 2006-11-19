@@ -1,5 +1,14 @@
 ####### kdevelop will overwrite this part!!! (begin)##########
-bin_PROGRAMS = avidemux2_gtk avidemux2_cli
+
+ABINS = avidemux2_cli 
+if ADM_UI_GTK
+	ABINS +=avidemux2_gtk
+endif
+if ADM_UI_QT4
+	ABINS +=avidemux2_qt4
+endif
+
+ bin_PROGRAMS=$(ABINS)
 
 ## INCLUDES were found outside kdevelop specific part
 
@@ -12,17 +21,29 @@ user_interface_gtk = ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
 		./ADM_userInterfaces/ADM_GTK/ADM_dialog/libADM_dialog.a	\
 		./ADM_userInterfaces/ADM_GTK/ADM_filters/libADM_filters.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/libADM_toolkit_gtk.a	
+		
 user_interface_cli = ./ADM_userInterfaces/ADM_NONE/ADM_gui2/libADM_gui2.a	\
 		./ADM_userInterfaces/ADM_NONE/ADM_dialog/libADM_dialog.a	\
 		./ADM_userInterfaces/ADM_NONE/ADM_filters/libADM_filters.a 
+		
+		
+user_interface_qt4 = 	./ADM_userInterfaces/ADM_QT4/ADM_gui/libADM_gui2.a	\
+			./ADM_userInterfaces/ADM_QT4/ADM_dialog/libADM_dialog.a	\
+			./ADM_userInterfaces/ADM_QT4/ADM_filters/libADM_filters.a 
 
 adm_src =   guiplay.cpp  \
 	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp   \
 	main.cpp   \
 	gui_autodrive.cpp GUI_jobs.cpp
 
-avidemux2_gtk_SOURCES =   $(adm_src)
+
 avidemux2_cli_SOURCES =   $(adm_src)
+if ADM_UI_GTK
+	avidemux2_gtk_SOURCES =   $(adm_src)
+endif
+if ADM_UI_QT4
+	avidemux2_qt4_SOURCES =   $(adm_src)
+endif
 
 SUBDIRS = ADM_libraries ADM_audio ADM_audiocodec ADM_audiofilter ADM_codecs \
 	ADM_colorspace ADM_editor ADM_encoder ADM_filter  \
@@ -96,16 +117,25 @@ adm_postlib= \
 ./ADM_libraries/ADM_libswscale/libswscale.a		\
 ./ADM_ocr/libADM_ocr.a					\
 $(libmpeg2enc_Altivec) 
+if ADM_UI_GTK
+	avidemux2_gtk_LDADD   =  \
+		$(adm_lib) 					\
+		$(user_interface_gtk)				\
+		$(adm_postlib) 
+endif
 
-avidemux2_gtk_LDADD   =  \
-	$(adm_lib) 					\
-	$(user_interface_gtk)				\
-	$(adm_postlib) 
-	
 avidemux2_cli_LDADD   =  \
 	$(adm_lib) 					\
 	$(user_interface_cli)				\
 	$(adm_postlib) 
+	
+if ADM_UI_QT4	
+	avidemux2_qt4_LDADD   =  \
+		$(adm_lib) 					\
+		$(user_interface_qt4)				\
+		$(adm_postlib) 
+endif
+	
 	
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 	$(SMONKEY_CFLAGS) \
@@ -116,11 +146,18 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 	-IADM_userInterfaces/ADM_GTK
 
 # the library search path.
-avidemux2_gtk_LDFLAGS = $(all_libraries)  $(SDL_LIBS) $(GTK_LIBS) \
-	$(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) 
+if ADM_UI_GTK
+	avidemux2_gtk_LDFLAGS = $(all_libraries)  $(SDL_LIBS) $(GTK_LIBS) \
+		$(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) 
+endif
 
 avidemux2_cli_LDFLAGS = $(all_libraries)  $(SDL_LIBS)  \
 	$(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) 
+
+if ADM_UI_QT4	
+	avidemux2_qt4_LDFLAGS = $(all_libraries)  $(SDL_LIBS) $(ADM_QTLIBS) \
+		$(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) 
+endif
 
 noinst_HEADERS = 
 AM_CFLAGS = -g
