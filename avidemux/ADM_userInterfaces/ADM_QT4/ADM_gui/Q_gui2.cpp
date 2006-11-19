@@ -61,5 +61,7 @@ int UI_RunApp(void)
     {
      automation();
     }*/
+    return 1;
+}
 #include "Q_gui2.moc"
 //EOF
