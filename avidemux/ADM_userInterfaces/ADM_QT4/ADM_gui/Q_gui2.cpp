@@ -11,7 +11,18 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include "config.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "default.h"
+#include "ADM_osSupport/ADM_misc.h"
+
+#include "gui_action.hxx"
+    
+    
+    
 #include "ui_gui2.h"
 
  class MainWindow : public QMainWindow
@@ -20,7 +31,8 @@
 
  public:
      MainWindow();
-
+ public slots:
+     void menuSignal(void); //int menuE);
  private slots:
    
 
@@ -30,12 +42,24 @@
  
 extern int automation(void );
 
-
+extern void HandleAction(Action a);
 
 MainWindow::MainWindow()     : QMainWindow()
  {
      ui.setupUi(this);
+     connect(  (ui.actionOpen),SIGNAL(clicked()),this,SLOT(menuSignal())  );
+     connect(  (ui.actionSave_BMP),SIGNAL(activated()),this,SLOT(menuSignal())  );
+     
+  // Slots and stuff :  connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
  }
+ void MainWindow::menuSignal(void) //int menuSignal)
+ {
+/*    Action action=(Action) menuSignal;
+    printf("Action: %d\n");
+    HandleAction (action);*/
+   printf("Hello!\n");
+ }
+ 
 //*********************************************
 //***** Hook to core                ***********
 //*********************************************
@@ -63,5 +87,7 @@ int UI_RunApp(void)
     }*/
     return 1;
 }
+
+
 #include "Q_gui2.moc"
 //EOF
