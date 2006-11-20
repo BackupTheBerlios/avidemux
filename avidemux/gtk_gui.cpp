@@ -25,8 +25,12 @@
 #include <sys/time.h>
 #include <fcntl.h>	/* O_RDONLY */
 #include <errno.h>
+#warning FIXME : Don't include GLIB!
+#warning FIXME : Don't include GLIB!
+#include <glib.h>
+#warning FIXME : Don't include GLIB!
+#warning FIXME : Don't include GLIB!
 
-#include <gtk/gtk.h>
     
 #include "ADM_lavcodec.h"
 
@@ -34,7 +38,6 @@
 #include "avi_vars.h"
 #include "ADM_assert.h"
 #include "ADM_toolkit/filesel.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "prototype.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/bitmap.h"
