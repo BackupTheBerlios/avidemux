@@ -201,17 +201,12 @@ X264Encoder::~X264Encoder ()
 //************************************
 uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
 {
-  x264_nal_t *
-    nal;
-  int
-    nbNal = 0;
-  int
-    sizemax = 0;
-  x264_picture_t
-    pic_out;
+  x264_nal_t *    nal;
+  int    nbNal = 0;
+  int    sizemax = 0;
+  x264_picture_t    pic_out;
 
   out->flags = 0;
-
   memset (_pic, 0, sizeof (x264_picture_t));
   PICS->img.i_csp = X264_CSP_I420;
   PICS->img.i_plane = 3;
@@ -233,10 +228,8 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
 
   // Write
 
-  uint32_t
-    size = 0, thisnal = 0;
-  uint8_t *
-    dout = out->data;
+  uint32_t    size = 0, thisnal = 0;
+  uint8_t *    dout = out->data;
   for (uint32_t i = 0; i < nbNal; i++)
     {
       sizemax = 0xfffffff;;
@@ -258,10 +251,14 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
 
 
   out->len = size;
-  if(param.i_bframe)
-    out->ptsFrame = (uint32_t) pic_out.i_pts;	// In fact it is the picture number in out case
-  else
-    out->ptsFrame = (uint32_t) pic_out.i_pts;	// In fact it is the picture number in out case
+  out->ptsFrame = (uint32_t) pic_out.i_pts;	// In fact it is the picture number in out case
+// Delay for b-pyramide
+    
+    if(admParam.BasReference)
+    {
+    //  printf("%u +=%u\n",out->ptsFrame,admParam.MaxBFrame);
+      out->ptsFrame+=admParam.MaxBFrame;
+    }
   //printf("Frame :%lld \n",pic_out.i_pts);
   switch (pic_out.i_type)
     {
@@ -284,6 +281,8 @@ uint8_t X264Encoder::encode (ADMImage * in, ADMBitstream * out)
       //ADM_assert(0);
 
     }
+    
+    //
   out->out_quantizer = pic_out.i_qpplus1;
   return 1;
 }
