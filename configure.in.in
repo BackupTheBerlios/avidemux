@@ -132,20 +132,26 @@ dnl#############################################################################
 dnl##############################################################################################"
 dnl##############################################################################################"
 dnl##############################################################################################"
-echo " ------------------- Probing for GTK 2.x ------------------"
+echo " -------------------  for GTK 2.x ------------------"
  AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
  if test "$PKG_CONFIG" = "no" ; then
  	echo "************ pkg-config IS MANDATORY ***************"
- 	AC_MSG_WARN([*** pkg-config not found ! ***])
+ 	AC_MSG_ERROR([*** pkg-config not found ! ***])
         adm_gtk_enabled="no"
  fi
 
 dnl    AC_PATH_PROG(PKG_CONFIG,pkg-config, AC_MSG_ERROR([*** pkg-config not found ! ***]))
    GTK_VERSION=`$PKG_CONFIG  gtk+-2.0 --modversion`
+   GLIB_VERSION=`$PKG_CONFIG  glib-2.0 --modversion`
 
  if test "x$GTK_VERSION" = "x" ; then
  	echo "************ Cannot identify gtk2 version ***************"
  	AC_MSG_WARN([*** pkg-config installed incorrectly or gtk2-dev absent ! ***])
+        adm_gtk_enabled="no"
+ fi
+ if test "x$GLIB_VERSION" = "x" ; then
+ 	echo "************ Cannot identify glib-2.0 version ***************"
+ 	AC_MSG_WARN([*** pkg-config installed incorrectly or glib2-dev absent ! ***])
         adm_gtk_enabled="no"
  fi
  VEROK=`echo "$GTK_VERSION" | perl -ne '@a=split(/\./,$_);
@@ -164,9 +170,13 @@ dnl    AC_PATH_PROG(PKG_CONFIG,pkg-config, AC_MSG_ERROR([*** pkg-config not foun
    GLIB_LIBS=`$PKG_CONFIG  glib-2.0 --libs`
    GTHREAD_LIBS=`$PKG_CONFIG  gthread-2.0  --libs`
 
-   GTK_LIBS="$GTK_LIBS $GLIB_LIBS $GTHREAD_LIBS"
-   GTK_CFLAGS=`$PKG_CONFIG  gtk+-2.0 --cflags` 
-
+   GTK_LIBS="$GTK_LIBS  $GTHREAD_LIBS"
+   GTK_CFLAGS=`$PKG_CONFIG  gtk+-2.0 --cflags`
+   GLIB_CFLAGS=`$PKG_CONFIG  glib-2.0 --cflags`  
+    
+   AC_SUBST(GLIB_LIBS)
+   AC_SUBST(GLIB_CFLAGS)
+    
    AC_SUBST(GTK_CFLAGS)
    AC_SUBST(GTK_LIBS)
    AC_SUBST(GTK_VERSION)
