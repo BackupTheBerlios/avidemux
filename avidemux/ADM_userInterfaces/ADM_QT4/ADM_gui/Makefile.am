@@ -11,11 +11,12 @@ libADM_gui2_a_METASOURCES = AUTO
 
 libADM_gui2_a_SOURCES = Q_gui2.cpp gui_none.cpp file_none.cpp preview_none.cpp
 
-Q_%.moc : Q_%.cpp
-	$(MOC) $< -o $@
+#Q_%.moc : Q_%.cpp
+#	$(MOC) $< -o $@
 ui_%.h: %.ui
 	$(UIC) $< -o $@
+	$(MOC) Q_$*.cpp -o Q_$*.moc
 
-Q_%.cpp : ui_%.h Q_%.moc
+Q_%.cpp : ui_%.h 
 	
 EXTRA_DIST =  
