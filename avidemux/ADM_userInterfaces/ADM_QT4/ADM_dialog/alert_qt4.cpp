@@ -1,5 +1,6 @@
 #include <config.h>
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -10,6 +11,11 @@
 #include <math.h>
 #include "default.h"
 #include "prefs.h"
+#include "default.h"
+
+#include <QDialog>
+#include <QMessageBox>
+
 
 #include "ADM_toolkit/toolkit.hxx"
 
@@ -39,21 +45,21 @@ static void boxAdd(const char *str)
   fprintf(stderr," *\n"); 
 }
 
-
 void            GUI_Alert(const char *alertstring)
 {
-  boxStart();
-  boxAdd("Alert");
-  boxAdd(alertstring);
-  boxEnd();
+    QMessageBox::StandardButton reply;
+              reply = QMessageBox::critical(NULL, "QMessageBoxEx::critical()",
+                                        alertstring,
+                                        QMessageBox::Ok );
 }
 void            GUI_Info(const char *alertstring)
 {
-  boxStart();
-  boxAdd("Alert");
-  boxAdd(alertstring);
-  boxEnd();
+    QMessageBox::StandardButton reply;
+              reply = QMessageBox::information(NULL, "QMessageBoxEx::critical()",
+                                        alertstring,
+                                        QMessageBox::Ok );
 }
+
 
 void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...)
 {
