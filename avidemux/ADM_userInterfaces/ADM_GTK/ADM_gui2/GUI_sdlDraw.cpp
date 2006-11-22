@@ -21,7 +21,7 @@
 #include <math.h>
 #include <string.h>
 
-#include "ADM_library/default.h"
+#include "default.h"
 #ifndef CYG_MANGLING
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -39,7 +39,7 @@
 #include <sys/time.h>
 #include <ADM_assert.h>
 #include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_gui2/GUI_render.h"
+#include "ADM_commonUI/GUI_render.h"
 
 #include "ADM_gui2/GUI_accelRender.h"
 #include "ADM_gui2/GUI_sdlDraw.h"
