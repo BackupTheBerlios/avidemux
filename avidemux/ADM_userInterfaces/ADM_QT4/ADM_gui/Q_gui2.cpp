@@ -80,12 +80,12 @@ int UI_RunApp(void)
     
     a.connect( &a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()) );
     mw->show();
-    return a.exec();
-/* if (global_argc >= 2)
+    
+   if (global_argc >= 2)
     {
      automation();
-    }*/
-    return 1;
+    }
+    return a.exec();
 }
 
 
