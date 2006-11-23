@@ -21,252 +21,202 @@
 
 #include "ADM_assert.h" 
 
-#define BOX_SIZE 80
 static int beQuiet=0;
-static void boxStart(void)
-{
-  for(int i=0;i<BOX_SIZE;i++) fprintf(stderr,"*");
-  fprintf(stderr,"\n"); 
-}
-static void boxEnd(void)
-{
-  for(int i=0;i<BOX_SIZE;i++) fprintf(stderr,"*");
-  fprintf(stderr,"\n"); 
-}
-static void boxAdd(const char *str)
-{
-  int l=strlen(str);
-  fprintf(stderr, "* %s",str);
-  if(l+4<BOX_SIZE)
-  {
-    l=BOX_SIZE-l-4;
-      for(int i=0;i<BOX_SIZE;i++) fprintf(stderr,"");
-  }
-  fprintf(stderr," *\n"); 
-}
+extern QWidget *QuiMainWindows;
 
+//****************************************************************************************************
 void            GUI_Alert(const char *alertstring)
 {
     QMessageBox::StandardButton reply;
-              reply = QMessageBox::critical(NULL, "QMessageBoxEx::critical()",
+              reply = QMessageBox::critical(QuiMainWindows, "Alert",
                                         alertstring,
                                         QMessageBox::Ok );
 }
+//****************************************************************************************************
 void            GUI_Info(const char *alertstring)
 {
     QMessageBox::StandardButton reply;
-              reply = QMessageBox::information(NULL, "QMessageBoxEx::critical()",
+              reply = QMessageBox::information(QuiMainWindows, "Info",
                                         alertstring,
                                         QMessageBox::Ok );
 }
 
-
+//****************************************************************************************************
 void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, const char *secondary_format, ...)
 {
   uint32_t msglvl=2;
+  char *string;
+  char alertstring[1024];
+  char alertstring2[1024];
 
         prefs->get(MESSAGE_LEVEL,&msglvl);
 
-        boxStart();
-        boxAdd("Info");
-        boxAdd(primary);   
-        
-        if(! secondary_format)
+        if(msglvl<level)
         {
-                boxEnd();
+                printf("Info : %s \n",primary);
                 return;
         }
 
-        va_list ap;
-        va_start(ap, secondary_format);
-        
-        
-        char alertstring[1024];
-        
-        vsnprintf(alertstring,1023,secondary_format, ap);
-        va_end(ap);
-        boxAdd(alertstring);
-        boxEnd();
-        
-}
+        if(! secondary_format)
+        {
+            snprintf(alertstring,1024,"<b>%s</b>\n",primary);
+         }else
+         {
+            va_list ap;
+            va_start(ap, secondary_format);
+            vsnprintf(alertstring2,1023,secondary_format, ap);
+            snprintf(alertstring,1024,"<b>%s</b><br>%s",primary,alertstring2);
+            va_end(ap);
+         }
+        QMessageBox::StandardButton reply;
+          reply = QMessageBox::information(QuiMainWindows, "Info",
+                                    alertstring,
+                                    QMessageBox::Ok );
 
+}
+//****************************************************************************************************
 void            GUI_Error_HIG(const char *primary, const char *secondary_format, ...)
 {
-        boxStart();
-        boxAdd("Error");
-        boxAdd(primary);   
-        if(!secondary_format)
-        {
-                boxEnd();
-                return;
-        }else
-        {
-          va_list ap;
-          va_start(ap, secondary_format);
+  uint32_t msglvl=2;
+  char *string;
+  char alertstring[1024];
+  char alertstring2[1024];
+  
+        prefs->get(MESSAGE_LEVEL,&msglvl);
 
-          char alertstring[1024];
-          
-          vsnprintf(alertstring,1023,secondary_format, ap);
-          va_end(ap);
-          boxAdd(alertstring);
-          boxEnd();
+        if(msglvl==ADM_LOG_NONE) 
+        {
+                printf("Error :%s\n",primary);
+                return;
         }
+
+        if(! secondary_format)
+        {
+            snprintf(alertstring,1024,"<b>%s</b>\n",primary);
+         }else
+         {
+            va_list ap;
+            va_start(ap, secondary_format);
+            vsnprintf(alertstring2,1023,secondary_format, ap);
+            snprintf(alertstring,1024,"<b>%s</b><br>%s",primary,alertstring2);
+            va_end(ap);
+         }
+          QMessageBox::StandardButton reply;
+          reply = QMessageBox::critical(QuiMainWindows, "Info",
+                                    alertstring,
+                                    QMessageBox::Ok );
 }
+//****************************************************************************************************
 int             GUI_Confirmation_HIG(const char *button_confirm, const char *primary, const char *secondary_format, ...)
 {
-   uint32_t msglvl=2;
-
-        prefs->get(MESSAGE_LEVEL,&msglvl);
-
-        boxStart();
-        boxAdd("Question");
-
-        boxAdd(button_confirm);
-        if(! secondary_format)
-        {
-                
-                boxEnd();
-        }
-        else
-        {
-            va_list ap;
-            va_start(ap, secondary_format);
-            
-            
-            char alertstring[1024];
-            
-            vsnprintf(alertstring,1023,secondary_format, ap);
-            va_end(ap);
-            boxAdd(alertstring);
-            boxEnd();
-        }
+uint32_t msglvl=2;
+char alertstring[1024];
+char alertstring2[1024];
         if (beQuiet)
+              {
+                      printf("Info: %s\n", primary);
+                      return 0;
+              }
+        
+        if (!secondary_format)
         {
-          boxAdd("--> First one\n");
-          return 0;
+              snprintf(alertstring,1024,"<b>%s</b>\n",primary);
         }
         else
-        {
-          int x;
-          while(1)
-          {
-            printf("Are you sure (Y/y or N/n ):\n");
-            x=tolower(getchar());
-            if(x=='y') return 1;
-            if(x=='n') return 0;
-          }
+        {	
+              va_list ap;
+              va_start(ap, secondary_format);
+              vsnprintf(alertstring2,1023,secondary_format, ap);
+              snprintf(alertstring,1024,"<b>%s</b><br>%s",primary,alertstring2);
+              va_end(ap);
         }
+          QMessageBox::StandardButton reply;
+          reply = QMessageBox::question(QuiMainWindows, "Confirmation",
+                                    alertstring,
+                                    QMessageBox::Yes | QMessageBox::No );
+          if(reply==QMessageBox::Yes) return 1;
         return 0; 
 }
-
+//****************************************************************************************************
 int             GUI_YesNo(const char *primary, const char *secondary_format, ...)
 {
-   uint32_t msglvl=2;
-
-        prefs->get(MESSAGE_LEVEL,&msglvl);
-
-        boxStart();
-        boxAdd("Question");
-        boxAdd(primary);
-
-        
-        if(! secondary_format)
-        {
-                boxEnd();
-        }
-        else
-        {
-            va_list ap;
-            va_start(ap, secondary_format);
-            
-            
-            char alertstring[1024];
-            
-            vsnprintf(alertstring,1023,secondary_format, ap);
-            va_end(ap);
-            boxAdd(alertstring);
-            boxEnd();
-        }
+uint32_t msglvl=2;
+char alertstring[1024];
+char alertstring2[1024];
         if (beQuiet)
+              {
+                      printf("Info: %s\n", primary);
+                      return 0;
+              }
+        
+        if (!secondary_format)
         {
-          boxAdd("--> First one\n");
-          return 0;
+              snprintf(alertstring,1024,"<b>%s</b>\n",primary);
         }
         else
-        {
-          int x;
-          while(1)
-          {
-            printf("Yes or No (Y/y or N/n) :\n");
-            x=tolower(getchar());
-            if(x=='y') return 1;
-            if(x=='n') return 0;
-          }
-          return 0; 
+        {	
+              va_list ap;
+              va_start(ap, secondary_format);
+              vsnprintf(alertstring2,1023,secondary_format, ap);
+              snprintf(alertstring,1024,"<b>%s</b><br>%s",primary,alertstring2);
+              va_end(ap);
         }
+          QMessageBox::StandardButton reply;
+          reply = QMessageBox::question(QuiMainWindows, "Confirmation",
+                                    alertstring,
+                                    QMessageBox::Yes | QMessageBox::No );
+          if(reply==QMessageBox::Yes) return 1;
+        return 0; 
 }
-
+//****************************************************************************************************
 int             GUI_Question(const char *alertstring)
 {
-  
-  boxStart();
-  boxAdd("Question");
-  boxAdd(alertstring);
-  boxEnd();
-  
-  while(1)
-          {
-            printf("Yes or No (Y/y or N/n) :\n");
-            int x=tolower(getchar());
-            if(x=='y') return 1;
-            if(x=='n') return 0;
-          }
+ QMessageBox::StandardButton reply;
+          if (beQuiet)
+              {
+                      printf("Question: %s\n", alertstring);
+                      return 0;
+              }
+          reply = QMessageBox::question(QuiMainWindows, "Question",
+                                    alertstring,
+                                    QMessageBox::Yes | QMessageBox::No );
+          if(reply==QMessageBox::Yes) return 1;
+          return 0;
 }
-
+//****************************************************************************************************
 int      GUI_Alternate(char *title,char *choice1,char *choice2)
 {
-  boxStart();
-  boxAdd("Choice");
-  boxAdd(title);
-  boxEnd();
+   return 0;
   
-  while(1)
-          {
-            printf("0->%s 1->%s :\n",choice1,choice2);
-            int x=tolower(getchar());
-            if(x=='0') return 0;
-            if(x=='1') return 1;
-          }
 }
-
+//****************************************************************************************************
 uint8_t  GUI_getDoubleValue(double *valye, float min, float max, const char *title)
 {
-  boxStart();
-  boxAdd("DOUBLEVALUE stub");
-  boxAdd(title);
-  boxEnd();
+  
   
   return 0; 
 }
+//****************************************************************************************************
 uint8_t  GUI_getIntegerValue(int *valye, int min, int max, const char *title)
 {
- boxStart();
-  boxAdd("INTEGERVALUE stub");
-  boxAdd(title);
-  boxEnd();
+ 
   
   return 0; 
 }
-
+//****************************************************************************************************
 uint8_t		isQuiet(void)
 {
     return beQuiet;
 }
+//****************************************************************************************************
 void            GUI_Verbose(void)
 {
     beQuiet=0;
 }
+//****************************************************************************************************
 void            GUI_Quiet(void)
 {
   beQuiet=1;
 }
+//****************************************************************************************************
+//EOF

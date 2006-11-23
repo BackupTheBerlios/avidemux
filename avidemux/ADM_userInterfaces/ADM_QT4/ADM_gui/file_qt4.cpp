@@ -19,9 +19,12 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 #include "ADM_assert.h"
+    
+extern QWidget *QuiMainWindows;
+//****************************************************************************************************
 void GUI_FileSelRead(const char *label,SELFILE_CB cb) 
 {
-  QString fileName = QFileDialog::getOpenFileName();
+  QString fileName = QFileDialog::getOpenFileName(QuiMainWindows);
   if(!fileName.isNull() )
   {
     char *s=ADM_strdup(fileName.toLatin1()); // Fixme utf8 ?
@@ -31,9 +34,10 @@ void GUI_FileSelRead(const char *label,SELFILE_CB cb)
     ADM_dealloc(s);
   }
 }
+//****************************************************************************************************
 void GUI_FileSelWrite(const char *label,SELFILE_CB cb) 
 {
-  QString fileName = QFileDialog::getSaveFileName();
+  QString fileName = QFileDialog::getSaveFileName(QuiMainWindows);
   if(!fileName.isNull() )
   {
     char *s=ADM_strdup(fileName.toLatin1()); // Fixme utf8 ?
@@ -43,10 +47,11 @@ void GUI_FileSelWrite(const char *label,SELFILE_CB cb)
   }
 
 }
+//****************************************************************************************************
 void GUI_FileSelRead(const char *label, char * * name)
 {
   *name=NULL;
-  QString fileName = QFileDialog::getOpenFileName();
+  QString fileName = QFileDialog::getOpenFileName(QuiMainWindows);
   if(!fileName.isNull() )
   {
     const char *s=fileName.toLatin1(); // Fixme utf8 ?
@@ -54,10 +59,11 @@ void GUI_FileSelRead(const char *label, char * * name)
   }
 
 }
+//****************************************************************************************************
 void GUI_FileSelWrite(const char *label, char * * name)
 {
   *name=NULL;
-  QString fileName = QFileDialog::getSaveFileName();
+  QString fileName = QFileDialog::getSaveFileName(QuiMainWindows);
   if(!fileName.isNull() )
   {
     const char *s=fileName.toLatin1(); // Fixme utf8 ?
@@ -65,3 +71,5 @@ void GUI_FileSelWrite(const char *label, char * * name)
   }
 
 }
+//****************************************************************************************************
+//EOF

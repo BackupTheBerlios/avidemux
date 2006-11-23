@@ -71,7 +71,7 @@ int UI_Init(int nargc,char **nargv)
   global_argv=nargv;
   return 0;
 }
-
+QWidget *QuiMainWindows=NULL;
 int UI_RunApp(void)
 {
 
@@ -80,7 +80,7 @@ int UI_RunApp(void)
     
     a.connect( &a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()) );
     mw->show();
-    
+    QuiMainWindows=(QWidget*)mw;
    if (global_argc >= 2)
     {
      automation();
