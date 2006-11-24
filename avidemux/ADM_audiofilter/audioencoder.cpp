@@ -130,7 +130,7 @@ void dither16(float *start, uint32_t len, uint8_t channels)
 			data_int++;
 		}
 		nr++;
-		if (nr > DITHER_SIZE)
+		if (nr >= DITHER_SIZE)
 			nr = 0;
 	}
 }
