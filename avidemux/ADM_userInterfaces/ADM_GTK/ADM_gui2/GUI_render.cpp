@@ -52,7 +52,7 @@
 
 
 static uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h);
-
+static uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h);
 
 uint8_t  GUI_InitRender (GtkWidget *g, uint32_t w,uint32_t h);
 static renderZoom zoom=ZOOM_1_1;
