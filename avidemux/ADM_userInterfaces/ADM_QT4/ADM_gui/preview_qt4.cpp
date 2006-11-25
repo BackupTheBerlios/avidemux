@@ -111,7 +111,6 @@ class  ADM_Qvideo : public QWidget
           }
           QImage image(rgbDataBuffer,displayW,displayH,QImage::Format_RGB32);
             QPainter painter(this);
-            //painter.initFrom(this);
             painter.drawImage(QPoint(0,0),image);
             painter.end();
         }
@@ -153,7 +152,7 @@ uint8_t renderRefresh(void)
 uint8_t renderExpose(void)
 {
 // TODO   if(videoWindow)
-//     videoWindow->paint();
+     videoWindow->repaint();
   return 1;
 }
 //****************************************************************************************************

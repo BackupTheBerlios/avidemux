@@ -64,12 +64,6 @@ void UI_updateTimeCount(uint32_t curFrame, uint32_t fps)
 void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
 {}
 
-double 	UI_readScale( void )
-{
-  return 0;
-}
-void 	UI_setScale( double  val )
-{}
 void 	UI_setFrameType( uint32_t frametype,uint32_t qp)
 {}
 void 	UI_setMarkers(uint32_t a, uint32_t b )

@@ -41,5 +41,5 @@ PROCESS(actionRebuild_I_B_Frames,ACT_DUMMY) \
 PROCESS(actionBitrate_histogram,ACT_DUMMY) \
 PROCESS(actionScan_for_black_frames,ACT_DUMMY) \
 PROCESS(actionVob_to_vobsub,ACT_DUMMY) \
-PROCESS(actionOCR,ACT_DUMMY) \
+PROCESS(actionOCR,ACT_PlayAvi) \
 

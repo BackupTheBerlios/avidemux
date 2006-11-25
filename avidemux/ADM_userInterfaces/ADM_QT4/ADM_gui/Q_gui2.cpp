@@ -38,6 +38,11 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
+
+extern int automation(void );
+extern void HandleAction(Action a);
+static QSlider *slider=NULL;
+static int _upd_in_progres=0;
 /* Ugly game with macro so that buttons emit their name ...*/
 
 class ADM_Qaction : public QAction 
@@ -54,6 +59,7 @@ class ADM_Qaction : public QAction
             printf("Hello! %s\n",name);
             emit ADM_clicked(name); 
         }
+       
         
   public:
         ADM_Qaction(QMainWindow *z) : QAction(z) 
@@ -103,17 +109,20 @@ static Action searchTranslationTable(const char *name);
      Ui_MainWindow ui;
  public slots:
      void buttonPressed(const char *source);
+      void sliderMoved(int u) 
+        {
+          if(!_upd_in_progres)
+          {
+          //  printf("Slider %d\n",u);
+            HandleAction (ACT_Scale) ;
+          }
+        }
  private slots:
    
 
  private:
      
  };
- 
-extern int automation(void );
-
-extern void HandleAction(Action a);
-
 
 
 MainWindow::MainWindow()     : QMainWindow()
@@ -126,6 +135,12 @@ MainWindow::MainWindow()     : QMainWindow()
      LIST_OF_OBJECTS
 #undef PROCESS
  
+     // Slider
+          slider=ui.horizontalSlider;
+          slider->setMinimum(0);
+          slider->setMaximum(100);
+          connect( slider,SIGNAL(valueChanged(int)),this,SLOT(sliderMoved(int)));
+          //connect( slider,SIGNAL(sliderMoved()),this,SLOT(sliderMoved()));
   
  }
  /*
@@ -187,5 +202,25 @@ Action searchTranslationTable(const char *name)
   printf("WARNING : Signal not found in translation table : %s\n",name);
   return ACT_DUMMY;
 }
+/*
+    Return % of scale (between 0 and 1)
+*/
+double 	UI_readScale( void )
+{
+  double v;
+  if(!slider) v=0;
+  v= (double)(slider->value());
+  printf("GetScale\n");
+  return v;
+}
+void UI_setScale( double val )
+{
+if(_upd_in_progres) return;
+ _upd_in_progres++;
+   slider->setValue( (int)val);
+ _upd_in_progres--;
+   
+}
+//********************************************
 #include "Q_gui2.moc"
 //EOF
