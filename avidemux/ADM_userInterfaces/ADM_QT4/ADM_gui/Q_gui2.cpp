@@ -64,8 +64,10 @@ class ADM_Qaction : public QAction
 
 };
 #define QAction ADM_Qaction
+
 #include "ui_gui2.h"
 #undef QAction
+
 
     
 #define CONNECT(object,zzz) connect( (ui.object),SIGNAL(ADM_clicked(const char *)),this,SLOT(buttonPressed(const char *)));
@@ -98,13 +100,14 @@ static Action searchTranslationTable(const char *name);
 
  public:
      MainWindow();
+     Ui_MainWindow ui;
  public slots:
      void buttonPressed(const char *source);
  private slots:
    
 
  private:
-     Ui_MainWindow ui;
+     
  };
  
 extern int automation(void );
@@ -144,6 +147,7 @@ MainWindow::MainWindow()     : QMainWindow()
 //*********************************************
 extern int global_argc;
 extern char **global_argv;
+extern void UI_QT4VideoWidget(QFrame *frame);
 int UI_Init(int nargc,char **nargv)
 {
   global_argc=nargc;
@@ -151,6 +155,8 @@ int UI_Init(int nargc,char **nargv)
   return 0;
 }
 QWidget *QuiMainWindows=NULL;
+QGraphicsView *drawWindow=NULL;
+
 int UI_RunApp(void)
 {
 
@@ -160,6 +166,7 @@ int UI_RunApp(void)
     a.connect( &a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()) );
     mw->show();
     QuiMainWindows=(QWidget*)mw;
+    UI_QT4VideoWidget(mw->ui.frame_video);  // Add the widget that will handle video display
    if (global_argc >= 2)
     {
      automation();

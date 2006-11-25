@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>997</width>
+    <width>1015</width>
     <height>889</height>
    </rect>
   </property>
@@ -302,42 +302,33 @@
       </layout>
      </item>
      <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Vertical</enum>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>0</number>
        </property>
-       <property name="sizeHint" >
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
+       <property name="spacing" >
+        <number>6</number>
        </property>
-      </spacer>
+      </layout>
      </item>
      <item>
-      <widget class="QGraphicsView" name="graphicsView" />
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QFrame" name="frame_3" >
+      <widget class="QFrame" name="frame_video" >
        <property name="frameShape" >
         <enum>QFrame::StyledPanel</enum>
        </property>
        <property name="frameShadow" >
         <enum>QFrame::Raised</enum>
        </property>
+       <widget class="QWidget" native="1" name="widgetVideo" >
+        <property name="geometry" >
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>120</width>
+          <height>80</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
      </item>
     </layout>
@@ -348,7 +339,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>997</width>
+     <width>1015</width>
      <height>29</height>
     </rect>
    </property>
@@ -688,7 +679,6 @@
    </property>
   </action>
  </widget>
- <includes/>
  <resources/>
  <connections/>
 </ui>

@@ -11,7 +11,10 @@ libADM_gui2_a_METASOURCES = AUTO
 
 libADM_gui2_a_SOURCES = Q_gui2.cpp gui_none.cpp file_qt4.cpp preview_qt4.cpp
 
+
 Q_%.moc : Q_%.cpp
+	$(MOC) $< -o $@
+%.moc : %.cpp
 	$(MOC) $< -o $@
 ui_%.h: %.ui
 	$(UIC) $< -o $@
