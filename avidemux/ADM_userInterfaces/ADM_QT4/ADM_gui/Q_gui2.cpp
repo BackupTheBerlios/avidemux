@@ -71,11 +71,7 @@ class ADM_Qaction : public QAction
 #define CONNECT(object,zzz) connect( (ui.object),SIGNAL(ADM_clicked(const char *)),this,SLOT(buttonPressed(const char *)));
 #define DECLARE_VAR(object,signal_name) {#object,signal_name},
              
-#define LIST_OF_OBJECTS     \
-    PROCESS(actionOpen,ACT_OpenAvi) \
-    PROCESS(actionSave_BMP,ACT_SaveImg) \
-    PROCESS(actionQuit,ACT_Exit) \
-    
+#include "translation_table.h"    
 /*
     Declare the table converting widget name to our internal signal           
 */
