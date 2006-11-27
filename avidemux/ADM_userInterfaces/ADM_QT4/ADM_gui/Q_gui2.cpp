@@ -221,6 +221,11 @@ if(_upd_in_progres) return;
  _upd_in_progres--;
    
 }
+void UI_purge( void )
+{
+
+}
+
 //********************************************
 #include "Q_gui2.moc"
 //EOF
