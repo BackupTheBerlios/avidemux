@@ -69,10 +69,37 @@ class ADM_Qaction : public QAction
         ~ADM_Qaction() {};
 
 };
+class ADM_QToolButton : public QToolButton 
+{
+     Q_OBJECT
+    
+  signals:
+        void ADM_clicked( const char *name );
+        
+   public slots:
+        void ADMTriggered(bool c) 
+        {
+            const char *name=qPrintable(this->objectName());
+            printf("ToolButton! %s\n",name);
+            emit ADM_clicked(name); 
+        }
+       
+        
+  public:
+        ADM_QToolButton(QWidget *z) : QToolButton(z) 
+        {
+          connect( this,SIGNAL(clicked(bool)),this,SLOT(ADMTriggered(bool)));
+        }
+        ~ADM_QToolButton() {};
+
+};
+
 #define QAction ADM_Qaction
+#define QToolButton ADM_QToolButton
 
 #include "ui_gui2.h"
 #undef QAction
+#undef QToolButton
 
 
     
@@ -92,6 +119,7 @@ const adm_qt4_translation myTranslationTable[]=
 {
 #define PROCESS DECLARE_VAR
      LIST_OF_OBJECTS
+     LIST_OF_BUTTONS
 #undef PROCESS
 };
 static Action searchTranslationTable(const char *name);
@@ -133,6 +161,7 @@ MainWindow::MainWindow()     : QMainWindow()
      */
 #define PROCESS CONNECT
      LIST_OF_OBJECTS
+     LIST_OF_BUTTONS
 #undef PROCESS
  
      // Slider

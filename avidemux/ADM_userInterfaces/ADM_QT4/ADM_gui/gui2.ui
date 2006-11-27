@@ -474,7 +474,7 @@
        <number>6</number>
       </property>
       <item row="3" column="0" colspan="2" >
-       <widget class="QToolButton" name="toolButton" >
+       <widget class="QToolButton" name="toolButtonPlay" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>0</hsizetype>
@@ -504,7 +504,7 @@
        </widget>
       </item>
       <item row="3" column="10" >
-       <widget class="QToolButton" name="toolButton_9" >
+       <widget class="QToolButton" name="toolButtonBPrev" >
         <property name="minimumSize" >
          <size>
           <width>34</width>
@@ -544,7 +544,7 @@
        </widget>
       </item>
       <item row="3" column="8" >
-       <widget class="QToolButton" name="toolButton_7" >
+       <widget class="QToolButton" name="toolButtonA" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>0</hsizetype>
@@ -590,7 +590,7 @@
        </spacer>
       </item>
       <item row="3" column="7" >
-       <widget class="QToolButton" name="toolButton_6" >
+       <widget class="QToolButton" name="toolButtonKNext" >
         <property name="minimumSize" >
          <size>
           <width>34</width>
@@ -615,7 +615,7 @@
        </widget>
       </item>
       <item row="3" column="13" >
-       <widget class="QToolButton" name="toolButton_12" >
+       <widget class="QToolButton" name="toolButtonEnd" >
         <property name="minimumSize" >
          <size>
           <width>34</width>
@@ -676,7 +676,7 @@
        </widget>
       </item>
       <item row="3" column="4" >
-       <widget class="QToolButton" name="toolButton_3" >
+       <widget class="QToolButton" name="toolButtonPrev" >
         <property name="minimumSize" >
          <size>
           <width>34</width>
@@ -701,7 +701,7 @@
        </widget>
       </item>
       <item row="3" column="5" >
-       <widget class="QToolButton" name="toolButton_4" >
+       <widget class="QToolButton" name="toolButtonNext" >
         <property name="minimumSize" >
          <size>
           <width>34</width>
@@ -807,7 +807,7 @@
        </widget>
       </item>
       <item row="3" column="12" >
-       <widget class="QToolButton" name="toolButton_11" >
+       <widget class="QToolButton" name="toolButtonBegin" >
         <property name="minimumSize" >
          <size>
           <width>34</width>
@@ -832,7 +832,7 @@
        </widget>
       </item>
       <item row="3" column="11" >
-       <widget class="QToolButton" name="toolButton_10" >
+       <widget class="QToolButton" name="toolButtoBNext" >
         <property name="minimumSize" >
          <size>
           <width>34</width>
@@ -875,7 +875,7 @@
        </widget>
       </item>
       <item row="3" column="9" >
-       <widget class="QToolButton" name="toolButton_8" >
+       <widget class="QToolButton" name="toolButtonB" >
         <property name="minimumSize" >
          <size>
           <width>34</width>
@@ -936,7 +936,7 @@
        </widget>
       </item>
       <item row="3" column="6" >
-       <widget class="QToolButton" name="toolButton_5" >
+       <widget class="QToolButton" name="toolButtonKPrev" >
         <property name="minimumSize" >
          <size>
           <width>34</width>
@@ -961,7 +961,7 @@
        </widget>
       </item>
       <item row="3" column="2" colspan="2" >
-       <widget class="QToolButton" name="toolButton_2" >
+       <widget class="QToolButton" name="toolButtonStop" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>0</hsizetype>
