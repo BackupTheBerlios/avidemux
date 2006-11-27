@@ -62,11 +62,17 @@
          <widget class="QLabel" name="label_3" >
           <property name="sizePolicy" >
            <sizepolicy>
-            <hsizetype>1</hsizetype>
-            <vsizetype>1</vsizetype>
+            <hsizetype>5</hsizetype>
+            <vsizetype>5</vsizetype>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>180</width>
+            <height>16777215</height>
+           </size>
           </property>
           <property name="text" >
            <string>&lt;b>Video&lt;/b></string>
@@ -112,7 +118,7 @@
              <widget class="QComboBox" name="comboBox_3" >
               <property name="sizePolicy" >
                <sizepolicy>
-                <hsizetype>1</hsizetype>
+                <hsizetype>5</hsizetype>
                 <vsizetype>0</vsizetype>
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
@@ -132,7 +138,7 @@
               </property>
               <property name="sizePolicy" >
                <sizepolicy>
-                <hsizetype>1</hsizetype>
+                <hsizetype>5</hsizetype>
                 <vsizetype>0</vsizetype>
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
@@ -150,7 +156,7 @@
               </property>
               <property name="sizePolicy" >
                <sizepolicy>
-                <hsizetype>1</hsizetype>
+                <hsizetype>5</hsizetype>
                 <vsizetype>0</vsizetype>
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
@@ -185,11 +191,17 @@
          <widget class="QLabel" name="label_5" >
           <property name="sizePolicy" >
            <sizepolicy>
-            <hsizetype>1</hsizetype>
+            <hsizetype>4</hsizetype>
             <vsizetype>1</vsizetype>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>180</width>
+            <height>16777215</height>
+           </size>
           </property>
           <property name="text" >
            <string>&lt;b>Audio&lt;/b></string>
@@ -411,41 +423,43 @@
       </item>
       <item>
        <widget class="QWidget" native="1" name="widget" >
-        <widget class="QWidget" name="verticalLayout" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>7</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <widget class="QFrame" name="frame_video" >
          <property name="geometry" >
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>361</width>
-           <height>311</height>
+           <width>261</width>
+           <height>231</height>
           </rect>
          </property>
-         <layout class="QVBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="QFrame" name="frame_video" >
-            <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>7</hsizetype>
-              <vsizetype>7</vsizetype>
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="frameShape" >
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow" >
-             <enum>QFrame::Raised</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <property name="sizePolicy" >
+          <sizepolicy>
+           <hsizetype>7</hsizetype>
+           <vsizetype>7</vsizetype>
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="sizeIncrement" >
+          <size>
+           <width>5</width>
+           <height>5</height>
+          </size>
+         </property>
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Raised</enum>
+         </property>
         </widget>
        </widget>
       </item>
