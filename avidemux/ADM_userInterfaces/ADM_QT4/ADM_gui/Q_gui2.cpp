@@ -45,65 +45,14 @@ static QSlider *slider=NULL;
 static int _upd_in_progres=0;
 /* Ugly game with macro so that buttons emit their name ...*/
 
-class ADM_Qaction : public QAction 
-{
-     Q_OBJECT
-    
-  signals:
-        void ADM_clicked( const char *name );
-        
-   public slots:
-        void ADMTriggered(void) 
-        {
-            const char *name=qPrintable(this->objectName());
-            printf("Hello! %s\n",name);
-            emit ADM_clicked(name); 
-        }
-       
-        
-  public:
-        ADM_Qaction(QMainWindow *z) : QAction(z) 
-        {
-          connect( this,SIGNAL(triggered()),this,SLOT(ADMTriggered()));
-        }
-        ~ADM_Qaction() {};
 
-};
-class ADM_QToolButton : public QToolButton 
-{
-     Q_OBJECT
-    
-  signals:
-        void ADM_clicked( const char *name );
-        
-   public slots:
-        void ADMTriggered(bool c) 
-        {
-            const char *name=qPrintable(this->objectName());
-            printf("ToolButton! %s\n",name);
-            emit ADM_clicked(name); 
-        }
-       
-        
-  public:
-        ADM_QToolButton(QWidget *z) : QToolButton(z) 
-        {
-          connect( this,SIGNAL(clicked(bool)),this,SLOT(ADMTriggered(bool)));
-        }
-        ~ADM_QToolButton() {};
-
-};
-
-#define QAction ADM_Qaction
-#define QToolButton ADM_QToolButton
 
 #include "ui_gui2.h"
-#undef QAction
-#undef QToolButton
 
 
     
-#define CONNECT(object,zzz) connect( (ui.object),SIGNAL(ADM_clicked(const char *)),this,SLOT(buttonPressed(const char *)));
+#define CONNECT(object,zzz) connect( (ui.object),SIGNAL(triggered()),this,SLOT(buttonPressed()));
+#define CONNECT_TB(object,zzz) connect( (ui.object),SIGNAL(clicked(bool)),this,SLOT(toolButtonPressed(bool)));
 #define DECLARE_VAR(object,signal_name) {#object,signal_name},
              
 #include "translation_table.h"    
@@ -136,7 +85,8 @@ static Action searchTranslationTable(const char *name);
      MainWindow();
      Ui_MainWindow ui;
  public slots:
-     void buttonPressed(const char *source);
+     void buttonPressed(void);
+     void toolButtonPressed(bool z);
       void sliderMoved(int u) 
         {
           if(!_upd_in_progres)
@@ -161,6 +111,8 @@ MainWindow::MainWindow()     : QMainWindow()
      */
 #define PROCESS CONNECT
      LIST_OF_OBJECTS
+#undef PROCESS
+#define PROCESS CONNECT_TB
      LIST_OF_BUTTONS
 #undef PROCESS
  
@@ -175,17 +127,23 @@ MainWindow::MainWindow()     : QMainWindow()
  /*
       We receive a button press event
  */
- void MainWindow::buttonPressed(const char *source)
+ void MainWindow::buttonPressed(void)
  {
     // Receveid a key press Event, look into table..
-    printf("Received Key press <%s>\n",source);
+   const char *source=qPrintable(sender()->objectName());
+
+    printf("From : %s\n",source);
     Action action=searchTranslationTable(source);
     if(action!=ACT_DUMMY)
     {
       HandleAction (action) ;
     }
-   
+
  }
+  void MainWindow::toolButtonPressed(bool i)
+  {
+     buttonPressed();
+  }
 //*********************************************
 //***** Hook to core                ***********
 //*********************************************
