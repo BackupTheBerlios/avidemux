@@ -709,7 +709,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/next.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/forward.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
