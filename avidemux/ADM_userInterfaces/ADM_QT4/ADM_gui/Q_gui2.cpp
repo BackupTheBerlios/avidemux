@@ -168,6 +168,7 @@ int UI_RunApp(void)
     a.connect( &a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()) );
     mw->show();
     QuiMainWindows=(QWidget*)mw;
+   Q_INIT_RESOURCE(avidemux);
     UI_QT4VideoWidget(mw->ui.frame_video);  // Add the widget that will handle video display
    if (global_argc >= 2)
     {

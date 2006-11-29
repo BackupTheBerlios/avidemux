@@ -9,7 +9,7 @@ INCLUDES = $(all_includes)  $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@
 
 libADM_gui2_a_METASOURCES = AUTO
 
-libADM_gui2_a_SOURCES = Q_gui2.cpp gui_none.cpp file_qt4.cpp preview_qt4.cpp
+libADM_gui2_a_SOURCES = Q_gui2.cpp gui_none.cpp file_qt4.cpp preview_qt4.cpp avidemux_rsc.cpp
 
 
 Q_%.moc : Q_%.cpp
@@ -21,5 +21,7 @@ ui_%.h: %.ui
 	$(MOC) Q_$*.cpp -o Q_$*.moc
 
 Q_%.cpp : ui_%.h 
-	
+
+avidemux_rsc.cpp : avidemux.qrc
+	rcc  $< -o $@	-name avidemux
 EXTRA_DIST =  

@@ -490,7 +490,7 @@
          </size>
         </property>
         <property name="icon" >
-         <iconset>pics/player_play.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_play.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -511,11 +511,8 @@
           <height>24</height>
          </size>
         </property>
-        <property name="text" >
-         <string>...</string>
-        </property>
         <property name="icon" >
-         <iconset>pics/prev_black.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/prev_black.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -563,7 +560,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset>pics/markA.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/markA.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -601,7 +598,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset>pics/player_fwd.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_fwd.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -626,7 +623,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset>pics/player_end.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_end.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -687,7 +684,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset>pics/back.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/back.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -712,7 +709,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset>pics/forward.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/next.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -818,7 +815,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset>pics/player_start.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_start.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -843,7 +840,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset>pics/next_black.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/next_black.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -886,7 +883,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset>pics/markB.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/markB.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -947,7 +944,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset>pics/player_rew.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_rew.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -980,7 +977,7 @@
          <string>...</string>
         </property>
         <property name="icon" >
-         <iconset>pics/player_stop.png</iconset>
+         <iconset resource="avidemux.qrc" >:/new/prefix1/pics/player_stop.png</iconset>
         </property>
         <property name="iconSize" >
          <size>

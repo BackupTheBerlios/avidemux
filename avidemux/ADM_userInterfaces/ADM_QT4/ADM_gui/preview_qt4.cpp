@@ -44,7 +44,7 @@
 #include <ADM_assert.h>
     
 void UI_QT4VideoWidget(QFrame *host);
-
+static QFrame *hostFrame=NULL;
 //****************************************************************************************************
 void GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal)
 {}
@@ -120,8 +120,11 @@ ADM_Qvideo *videoWindow=NULL;
 void UI_QT4VideoWidget(QFrame *host)
 {
    videoWindow=new ADM_Qvideo(host);
+   hostFrame=host;
+   hostFrame->resize(320,200);
    videoWindow->resize(320,200);
    videoWindow->show();
+   
 }
 uint8_t renderInit( void )
 {
@@ -137,6 +140,7 @@ uint8_t renderResize(uint32_t w, uint32_t h,renderZoom newzoom)
   displayW=w;
   displayH=h;
   rgbConverter.reset(w,h);
+  hostFrame->resize(displayW,displayH);
   videoWindow->resize(displayW,displayH);
   printf("[RDR] Resizing to %u x %u\n",displayW,displayH);
   return 1;
@@ -172,6 +176,7 @@ uint8_t renderStopPlaying( void )
 {
   return 1;
 }
+
 //****************************************************************************************************
 #include "preview_qt4.moc"
 //EOF 
