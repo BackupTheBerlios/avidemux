@@ -35,7 +35,7 @@
    </size>
   </property>
   <widget class="QWidget" name="centralwidget" >
-   <widget class="QWidget" name="" >
+   <widget class="QWidget" name="layoutWidget" >
     <property name="geometry" >
      <rect>
       <x>0</x>
@@ -1098,19 +1098,6 @@
     <addaction name="actionEncoder_2" />
     <addaction name="actionFilters_2" />
    </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>Tools</string>
-    </property>
-    <addaction name="actionCalculator" />
-    <addaction name="separator" />
-    <addaction name="actionRebuild_I_B_Frames" />
-    <addaction name="actionBitrate_histogram" />
-    <addaction name="actionScan_for_black_frames" />
-    <addaction name="separator" />
-    <addaction name="actionVob_to_vobsub" />
-    <addaction name="actionOCR" />
-   </widget>
    <widget class="QMenu" name="menuVideo" >
     <property name="title" >
      <string>Video</string>
@@ -1124,30 +1111,6 @@
     <addaction name="actionFilters" />
     <addaction name="actionFrame_rate" />
     <addaction name="actionEncoder" />
-   </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>File</string>
-    </property>
-    <widget class="QMenu" name="menuSave" >
-     <property name="title" >
-      <string>Save</string>
-     </property>
-     <addaction name="actionSave_video" />
-     <addaction name="actionSave_BMP" />
-     <addaction name="actionSave_jpeg" />
-    </widget>
-    <addaction name="actionOpen" />
-    <addaction name="actionAppend" />
-    <addaction name="menuSave" />
-    <addaction name="separator" />
-    <addaction name="actionProperties" />
-    <addaction name="separator" />
-    <addaction name="actionLoad_run_project" />
-    <addaction name="actionSave_project" />
-    <addaction name="actionSave_project_as" />
-    <addaction name="separator" />
-    <addaction name="actionQuit" />
    </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
@@ -1174,6 +1137,43 @@
     <addaction name="actionZoom_1_1" />
     <addaction name="actionZoom_2_1" />
     <addaction name="actionZoom_4_1" />
+   </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuSave" >
+     <property name="title" >
+      <string>Save</string>
+     </property>
+     <addaction name="actionSave_video" />
+     <addaction name="actionSave_BMP" />
+     <addaction name="actionSave_jpeg" />
+    </widget>
+    <addaction name="actionOpen" />
+    <addaction name="actionAppend" />
+    <addaction name="menuSave" />
+    <addaction name="separator" />
+    <addaction name="actionProperties" />
+    <addaction name="separator" />
+    <addaction name="actionLoad_run_project" />
+    <addaction name="actionSave_project" />
+    <addaction name="actionSave_project_as" />
+    <addaction name="separator" />
+    <addaction name="actionQuit" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>Tools</string>
+    </property>
+    <addaction name="actionCalculator" />
+    <addaction name="separator" />
+    <addaction name="actionRebuild_I_B_Frames" />
+    <addaction name="actionBitrate_histogram" />
+    <addaction name="actionScan_for_black_frames" />
+    <addaction name="separator" />
+    <addaction name="actionVob_to_vobsub" />
+    <addaction name="actionOCR" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -1208,7 +1208,7 @@
   </widget>
   <action name="actionOpen" >
    <property name="icon" >
-    <iconset/>
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/fileopen.png</iconset>
    </property>
    <property name="text" >
     <string>Open</string>
@@ -1261,7 +1261,7 @@
   </action>
   <action name="actionProperties" >
    <property name="icon" >
-    <iconset/>
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/info.png</iconset>
    </property>
    <property name="text" >
     <string>Information</string>
@@ -1269,7 +1269,7 @@
   </action>
   <action name="actionSave_video" >
    <property name="icon" >
-    <iconset/>
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/filesave.png</iconset>
    </property>
    <property name="text" >
     <string>Save video</string>
@@ -1287,7 +1287,7 @@
   </action>
   <action name="actionLoad_run_project" >
    <property name="icon" >
-    <iconset/>
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/project_open.png</iconset>
    </property>
    <property name="text" >
     <string>Load/run project</string>
@@ -1295,13 +1295,16 @@
   </action>
   <action name="actionSave_project" >
    <property name="icon" >
-    <iconset/>
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/filesave.png</iconset>
    </property>
    <property name="text" >
     <string>Save project</string>
    </property>
   </action>
   <action name="actionSave_project_as" >
+   <property name="icon" >
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/filesaveas.png</iconset>
+   </property>
    <property name="text" >
     <string>Save project as</string>
    </property>
@@ -1353,7 +1356,7 @@
   </action>
   <action name="actionPreview" >
    <property name="icon" >
-    <iconset/>
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/thumbnail.png</iconset>
    </property>
    <property name="text" >
     <string>Preview</string>
@@ -1361,7 +1364,7 @@
   </action>
   <action name="actionDisplay_output" >
    <property name="icon" >
-    <iconset/>
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/add_sub_task.png</iconset>
    </property>
    <property name="text" >
     <string>Display output</string>
@@ -1414,7 +1417,7 @@
   </action>
   <action name="actionCalculator" >
    <property name="icon" >
-    <iconset/>
+    <iconset resource="avidemux.qrc" >:/new/prefix1/pics/calc.png</iconset>
    </property>
    <property name="text" >
     <string>Calculator</string>
