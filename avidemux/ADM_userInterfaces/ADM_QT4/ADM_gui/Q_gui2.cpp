@@ -211,7 +211,7 @@ if(_upd_in_progres) return;
 }
 void UI_purge( void )
 {
-
+ QCoreApplication::processEvents ();
 }
 
 //********************************************

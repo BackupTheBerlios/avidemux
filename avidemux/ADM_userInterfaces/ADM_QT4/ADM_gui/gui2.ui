@@ -1067,37 +1067,6 @@
      <height>29</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuAuto" >
-    <property name="title" >
-     <string>Auto</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuHelp" >
-    <property name="title" >
-     <string>Help</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuGo" >
-    <property name="title" >
-     <string>Go</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuCustom" >
-    <property name="title" >
-     <string>Custom</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuAudio" >
-    <property name="title" >
-     <string>Audio</string>
-    </property>
-    <addaction name="actionMain_Track" />
-    <addaction name="actionSecondary_Track" />
-    <addaction name="actionBuild_VBR_time_map" />
-    <addaction name="actionSave_2" />
-    <addaction name="actionEncoder_2" />
-    <addaction name="actionFilters_2" />
-   </widget>
    <widget class="QMenu" name="menuVideo" >
     <property name="title" >
      <string>Video</string>
@@ -1162,6 +1131,17 @@
     <addaction name="separator" />
     <addaction name="actionQuit" />
    </widget>
+   <widget class="QMenu" name="menuAudio" >
+    <property name="title" >
+     <string>Audio</string>
+    </property>
+    <addaction name="actionMain_Track" />
+    <addaction name="actionSecondary_Track" />
+    <addaction name="actionBuild_VBR_time_map" />
+    <addaction name="actionSave_2" />
+    <addaction name="actionEncoder_2" />
+    <addaction name="actionFilters_2" />
+   </widget>
    <widget class="QMenu" name="menuTools" >
     <property name="title" >
      <string>Tools</string>
@@ -1174,6 +1154,41 @@
     <addaction name="separator" />
     <addaction name="actionVob_to_vobsub" />
     <addaction name="actionOCR" />
+   </widget>
+   <widget class="QMenu" name="menuAuto" >
+    <property name="title" >
+     <string>Auto</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>Help</string>
+    </property>
+    <addaction name="actionShow_built_in_support" />
+    <addaction name="actionAbout_avidemux" />
+   </widget>
+   <widget class="QMenu" name="menuCustom" >
+    <property name="title" >
+     <string>Custom</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuGo" >
+    <property name="title" >
+     <string>Go</string>
+    </property>
+    <addaction name="actionPlay_Stop" />
+    <addaction name="actionPrevious_Frame" />
+    <addaction name="actionNext_Frame" />
+    <addaction name="actionPrevious_intra_frame" />
+    <addaction name="actionNext_intra_frame" />
+    <addaction name="actionPrevious_black_frame" />
+    <addaction name="actionNext_blak_frame" />
+    <addaction name="actionFirst_Frame" />
+    <addaction name="actionLast_Frame" />
+    <addaction name="actionGo_to_Marker_A" />
+    <addaction name="actionGo_to_Marker_B" />
+    <addaction name="actionJump_to_Frame" />
+    <addaction name="actionJump_to_Time" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -1194,6 +1209,7 @@
    <attribute name="toolBarArea" >
     <number>4</number>
    </attribute>
+   <addaction name="separator" />
    <addaction name="actionOpen" />
    <addaction name="actionSave_video" />
    <addaction name="actionProperties" />
@@ -1446,6 +1462,81 @@
   <action name="actionOCR" >
    <property name="text" >
     <string>OCR</string>
+   </property>
+  </action>
+  <action name="actionPlay_Stop" >
+   <property name="text" >
+    <string>Play/Stop</string>
+   </property>
+  </action>
+  <action name="actionPrevious_Frame" >
+   <property name="text" >
+    <string>Previous Frame</string>
+   </property>
+  </action>
+  <action name="actionNext_Frame" >
+   <property name="text" >
+    <string>Next Frame</string>
+   </property>
+  </action>
+  <action name="actionPrevious_intra_frame" >
+   <property name="text" >
+    <string>Previous intra frame</string>
+   </property>
+  </action>
+  <action name="actionNext_intra_frame" >
+   <property name="text" >
+    <string>Next intra frame</string>
+   </property>
+  </action>
+  <action name="actionPrevious_black_frame" >
+   <property name="text" >
+    <string>Previous black frame</string>
+   </property>
+  </action>
+  <action name="actionNext_blak_frame" >
+   <property name="text" >
+    <string>Next blak frame</string>
+   </property>
+  </action>
+  <action name="actionFirst_Frame" >
+   <property name="text" >
+    <string>First Frame</string>
+   </property>
+  </action>
+  <action name="actionLast_Frame" >
+   <property name="text" >
+    <string>Last Frame</string>
+   </property>
+  </action>
+  <action name="actionGo_to_Marker_A" >
+   <property name="text" >
+    <string>Go to Marker A</string>
+   </property>
+  </action>
+  <action name="actionGo_to_Marker_B" >
+   <property name="text" >
+    <string>Go to Marker B</string>
+   </property>
+  </action>
+  <action name="actionJump_to_Frame" >
+   <property name="text" >
+    <string>Jump to Frame</string>
+   </property>
+  </action>
+  <action name="actionJump_to_Time" >
+   <property name="text" >
+    <string>Jump to Time</string>
+   </property>
+  </action>
+  <action name="actionShow_built_in_support" >
+   <property name="text" >
+    <string>Show built-in support</string>
+   </property>
+  </action>
+  <action name="actionAbout_avidemux" >
+   <property name="text" >
+    <string>About avidemux</string>
    </property>
   </action>
  </widget>
