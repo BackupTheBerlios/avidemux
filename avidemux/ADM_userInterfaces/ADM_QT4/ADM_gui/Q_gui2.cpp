@@ -16,10 +16,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "default.h"
-#include "ADM_osSupport/ADM_misc.h"
-
-#include "gui_action.hxx"
 
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
@@ -38,9 +34,22 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
+#include "default.h"
+#include "ADM_osSupport/ADM_misc.h"
+#include "ADM_codecs/ADM_codec.h"
+#include "gui_action.hxx"
+#include "ADM_editor/ADM_outputfmt.h"
+    
 
 extern int automation(void );
 extern void HandleAction(Action a);
+extern uint32_t encoderGetNbEncoder (void);
+extern const char *encoderGetIndexedName (uint32_t i);
+extern uint32_t audioFilterGetNbEncoder(void);
+extern const char* audioFilterGetIndexedName(uint32_t i);
+
+static void setupMenus(void);
+
 static QSlider *slider=NULL;
 static int _upd_in_progres=0;
 /* Ugly game with macro so that buttons emit their name ...*/
@@ -49,7 +58,7 @@ static int _upd_in_progres=0;
 
 #include "ui_gui2.h"
 
-
+#define WIDGET(x)  (((MainWindow *)QuiMainWindows)->ui.x)
     
 #define CONNECT(object,zzz) connect( (ui.object),SIGNAL(triggered()),this,SLOT(buttonPressed()));
 #define CONNECT_TB(object,zzz) connect( (ui.object),SIGNAL(clicked(bool)),this,SLOT(toolButtonPressed(bool)));
@@ -170,6 +179,7 @@ int UI_RunApp(void)
     QuiMainWindows=(QWidget*)mw;
    Q_INIT_RESOURCE(avidemux);
     UI_QT4VideoWidget(mw->ui.frame_video);  // Add the widget that will handle video display
+    setupMenus();
    if (global_argc >= 2)
     {
      automation();
@@ -189,6 +199,35 @@ Action searchTranslationTable(const char *name)
   }
   printf("WARNING : Signal not found in translation table : %s\n",name);
   return ACT_DUMMY;
+}
+/** 
+  \fn    setupMenus(void)
+  \brief Fill in video & audio co
+*/
+void setupMenus(void)
+{
+        uint32_t nbVid;
+        const char *name;
+
+                nbVid=encoderGetNbEncoder();
+                printf("Found %d video encoder\n",nbVid);
+                for(uint32_t i=1;i<nbVid;i++)
+                {
+                        name=encoderGetIndexedName(i);
+                        WIDGET(comboBoxVideo)->addItem(name);
+                }
+
+        // And A codec
+        
+        uint32_t nbAud;
+
+                nbAud=audioFilterGetNbEncoder();
+                printf("Found %d audio encoder\n",nbAud);		       
+                for(uint32_t i=1;i<nbAud;i++)
+                {
+                        name=audioFilterGetIndexedName(i);
+                        WIDGET(comboBoxAudio)->addItem(name);
+                }
 }
 /*
     Return % of scale (between 0 and 1)
@@ -214,6 +253,173 @@ void UI_purge( void )
  QCoreApplication::processEvents ();
 }
 
+
+//*******************************************
+
+/**
+    \fn UI_setTitle(char *name)
+    \brief Set the main window title, usually name if the file being edited
+*/
+void UI_setTitle(char *name)
+{
+      char title[1024];
+
+      strcpy(title,"Avidemux 2 ");
+      strncat(title,name,200);
+
+      QuiMainWindows->setWindowTitle( title);
+}
+/**
+    \fn     UI_setFrameType( uint32_t frametype,uint32_t qp)
+    \brief  Display frametype (I/P/B) and associated quantizer
+*/
+
+void UI_setFrameType( uint32_t frametype,uint32_t qp)
+{
+char string[100];
+char	c='?';
+      switch(frametype)
+      {
+              case AVI_KEY_FRAME: c='I';break;
+              case AVI_B_FRAME: c='B';break;
+              case 0: c='P';break;
+              default:c='?';break;
+      
+      }
+      sprintf(string,_("Frame:%c(%02d)"),c,qp);
+      WIDGET(label_8)->setText(string);	
+
+}
+/**
+    \fn     UI_updateFrameCount(uint32_t curFrame)
+    \brief  Display the current displayed frame #
+*/
+
+void UI_updateFrameCount(uint32_t curFrame)
+{
+    char string[30];
+        sprintf(string,"%lu",curFrame);
+	WIDGET(lineEdit)->setText(string);
+    
+}
+/**
+    \fn      UI_setFrameCount(uint32_t curFrame,uint32_t total)
+    \brief  Display the current displayed frame # and total frame #
+*/
+
+void UI_setFrameCount(uint32_t curFrame,uint32_t total)
+{
+    char text[80]; 
+    if(total) total--; // We display from 0 to X  
+    
+    UI_updateFrameCount(curFrame);
+    
+    sprintf(text, "/ %lu ", total);
+    WIDGET(label_2)->setText(text);
+    
+}
+/**
+    \fn     UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
+    \brief  Display the time corresponding to current frame according to fps (fps1000)
+*/
+
+void UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
+{
+ char text[80];   
+ uint16_t mm,hh,ss,ms;
+
+      frame2time(curFrame,fps, &hh, &mm, &ss, &ms);
+      sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
+      WIDGET(lineEdit_2)->setText(text);
+
+}
+/**
+    \fn     UI_updateTimeCount(uint32_t curFrame,uint32_t fps)
+    \brief  Display the time corresponding to current frame according to fps (fps1000) and total duration
+*/
+
+void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
+{
+ char text[80];   
+ uint16_t mm,hh,ss,ms;
+
+        UI_updateTimeCount(curFrame,fps);
+      frame2time(total,fps, &hh, &mm, &ss, &ms);
+      sprintf(text, "/%02d:%02d:%02d.%03d", hh, mm, ss, ms);
+      WIDGET(label_7)->setText(text);
+}
+/**
+    \fn     UI_setMarkers(uint32_t a, uint32_t b )
+    \brief  Display frame # for marker A & B
+*/
+
+void UI_setMarkers(uint32_t a, uint32_t b )
+{
+ char text[80];
+      snprintf(text,79,"%lu",a);
+      WIDGET(label_9)->setText(text);
+      snprintf(text,79,"%lu",b);
+      WIDGET(label_10)->setText(text);
+}
+/**
+    \fn     UI_getCurrentVCodec(void)
+    \brief  Returns the current selected video code in menu, i.e its number (0 being the first)
+*/
+
+int 	UI_getCurrentVCodec(void)
+{
+  int i=WIDGET(comboBoxVideo)->currentIndex();
+  if(i<0) i=0;
+  return i; 
+}
+/**
+    \fn     UI_setVideoCodec( int i)
+    \brief  Select the video codec which is # x in pulldown menu (starts at zero :copy)
+*/
+
+void UI_setVideoCodec( int i)
+{
+    WIDGET(comboBoxVideo)->setCurrentIndex(i);
+}
+/**
+    \fn     UI_getCurrentACodec(void)
+    \brief  Returns the current selected audio code in menu, i.e its number (0 being the first)
+*/
+
+int 	UI_getCurrentACodec(void)
+{
+   int i=WIDGET(comboBoxAudio)->currentIndex();
+  if(i<0) i=0;
+  return i; 
+}
+/**
+    \fn     UI_setAudioCodec( int i)
+    \brief  Select the audio codec which is # x in pulldown menu (starts at zero :copy)
+*/
+
+void UI_setAudioCodec( int i)
+{
+   WIDGET(comboBoxAudio)->setCurrentIndex(i);
+}
+/**
+    \fn     UI_GetCurrentFormat(void)
+    \brief  Returns the current selected output format
+*/
+
+ADM_OUT_FORMAT 	UI_GetCurrentFormat( void )
+{
+    int i=WIDGET(comboBoxFormat)->currentIndex();
+  if(i<0) i=0;
+  return (ADM_OUT_FORMAT)i; 
+}
+/**
+    \fn     UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
+    \brief  Select  output format
+*/
+uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
+{
+    WIDGET(comboBoxFormat)->setCurrentIndex((int)fmt);
+}
 //********************************************
 #include "Q_gui2.moc"
 //EOF
