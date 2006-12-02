@@ -96,11 +96,21 @@ static Action searchTranslationTable(const char *name);
  public slots:
      void buttonPressed(void);
      void toolButtonPressed(bool z);
+     void comboChanged(int z)
+     {
+        const char *source=qPrintable(sender()->objectName());
+
+        printf("From : %s\n",source);
+        if(!strcmp(source,"comboBoxVideo"))  HandleAction (ACT_VideoCodecChanged) ;
+        else if(!strcmp(source,"comboBoxAudio"))  HandleAction (ACT_AudioCodecChanged) ;
+        
+
+        printf("From : %s\n",source);
+     }
       void sliderMoved(int u) 
         {
           if(!_upd_in_progres)
           {
-          //  printf("Slider %d\n",u);
             HandleAction (ACT_Scale) ;
           }
         }
@@ -124,7 +134,10 @@ MainWindow::MainWindow()     : QMainWindow()
 #define PROCESS CONNECT_TB
      LIST_OF_BUTTONS
 #undef PROCESS
- 
+     // ComboBox
+         //ACT_VideoCodecChanged
+         connect( ui.comboBoxVideo,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
+         connect( ui.comboBoxAudio,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
      // Slider
           slider=ui.horizontalSlider;
           slider->setMinimum(0);
