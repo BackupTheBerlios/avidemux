@@ -145,6 +145,26 @@ MainWindow::MainWindow()     : QMainWindow()
           connect( slider,SIGNAL(valueChanged(int)),this,SLOT(sliderMoved(int)));
           //connect( slider,SIGNAL(sliderMoved()),this,SLOT(sliderMoved()));
   
+          // Add a second toolbar
+          QToolBar *toolBarMove;
+            toolBarMove = new QToolBar(this);
+            toolBarMove->setObjectName(QString::fromUtf8("toolBarMove"));
+            toolBarMove->setOrientation(Qt::Horizontal);
+            this->addToolBar(static_cast<Qt::ToolBarArea>(4), toolBarMove);
+          // And actions to it
+#define ADD(x) toolBarMove->addAction(ui.x)
+            ADD(actionPlay);
+            ADD(actionPlay_Stop);
+            ADD(actionPrevious_Frame);
+            ADD(actionNext_Frame);
+            ADD(actionPrevious_intra_frame);
+            ADD(actionNext_intra_frame);
+            ADD(actionSet_marker_A);
+            ADD(actionSet_marker_B);
+            ADD(actionPrevious_black_frame);
+            ADD(actionNext_blak_frame);
+            ADD(actionFirst_Frame);
+            ADD(actionLast_Frame);
  }
  /*
       We receive a button press event

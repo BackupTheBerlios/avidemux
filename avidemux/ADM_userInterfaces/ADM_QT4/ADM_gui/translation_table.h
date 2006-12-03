@@ -32,18 +32,37 @@ PROCESS(actionEncoder,ACT_SelectEncoder) \
 PROCESS(actionFilters,ACT_VideoParameter) \
 PROCESS(actionMain_Track,ACT_SelectTrack1) \
 PROCESS(actionSecondary_Track,ACT_SecondAudioTrack) \
-PROCESS(actionBuild_VBR_time_map,ACT_DUMMY) \
-PROCESS(actionSave_2,ACT_DUMMY) \
-PROCESS(actionEncoder_2,ACT_DUMMY) \
+PROCESS(actionBuild_VBR_time_map,ACT_AudioMap) \
+PROCESS(actionSave_2,ACT_SaveWave) \
+PROCESS(actionEncoder_2,ACT_SelectEncoder) \
 PROCESS(actionFilters_2,ACT_DUMMY) \
 PROCESS(actionCalculator,ACT_DUMMY) \
-PROCESS(actionRebuild_I_B_Frames,ACT_DUMMY) \
+PROCESS(actionRebuild_I_B_Frames,ACT_RebuildKF) \
 PROCESS(actionBitrate_histogram,ACT_DUMMY) \
-PROCESS(actionScan_for_black_frames,ACT_DUMMY) \
+PROCESS(actionScan_for_black_frames,ACT_AllBlackFrames) \
 PROCESS(actionVob_to_vobsub,ACT_DUMMY) \
-PROCESS(actionOCR,ACT_PlayAvi) 
+PROCESS(actionOCR,ACT_Ocr) \
+PROCESS(actionPlay_Stop,ACT_StopAvi) \
+PROCESS(actionPrevious_Frame,ACT_PreviousFrame) \
+PROCESS(actionNext_Frame,ACT_NextFrame) \
+PROCESS(actionPrevious_intra_frame,ACT_PreviousKFrame) \
+PROCESS(actionNext_intra_frame,ACT_NextKFrame) \
+PROCESS(actionPrevious_black_frame,ACT_PrevBlackFrame) \
+PROCESS(actionNext_blak_frame,ACT_PlayAvi) \
+PROCESS(actionFirst_Frame,ACT_Begin) \
+PROCESS(actionLast_Frame,ACT_End) \
+PROCESS(actionGo_to_Marker_A,ACT_GotoMarkA) \
+PROCESS(actionGo_to_Marker_B,ACT_GotoMarkB) \
+PROCESS(actionJump_to_Frame,ACT_Goto) \
+PROCESS(actionJump_to_Time,ACT_GotoTime) \
+PROCESS(actionShow_built_in_support,ACT_BUILT_IN) \
+PROCESS(actionAbout_avidemux,ACT_About) \
+PROCESS(actionPlay,ACT_PlayAvi) 
+
 
 #define LIST_OF_BUTTONS     \
+
+#if 0
 PROCESS(toolButtonPlay , ACT_PlayAvi  ) \
 PROCESS(toolButtonBPrev ,ACT_PrevBlackFrame ) \
 PROCESS(toolButtonA ,    ACT_MarkA) \
@@ -56,3 +75,4 @@ PROCESS(toolButtoBNext,  ACT_NextBlackFrame ) \
 PROCESS(toolButtonB ,    ACT_MarkB) \
 PROCESS(toolButtonKPrev ,ACT_PreviousKFrame ) \
 PROCESS(toolButtonStop , ACT_StopAvi) 
+#endif
