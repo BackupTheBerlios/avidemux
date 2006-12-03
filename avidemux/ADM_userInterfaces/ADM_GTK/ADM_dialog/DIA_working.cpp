@@ -39,7 +39,9 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 # include <config.h>
+
 #include "DIA_working.h"
+
 
 static GtkWidget	*create_dialog1 (void);
 static void on_work_abort(GtkObject * object, gpointer user_data);

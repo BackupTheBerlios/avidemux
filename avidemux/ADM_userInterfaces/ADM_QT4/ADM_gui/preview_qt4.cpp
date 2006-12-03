@@ -79,7 +79,7 @@ void GUI_PreviewShow(uint32_t w, uint32_t h, uint8_t *data)
 */
 static uint8_t *rgbDataBuffer=NULL;
 static uint32_t displayW=0,displayH=0;
-static ColYuvRgb rgbConverter(640,480);
+static ColYuvRgb rgbConverter(640,480,1);
 static uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h);
 //****************************************************************************************************
 /*
