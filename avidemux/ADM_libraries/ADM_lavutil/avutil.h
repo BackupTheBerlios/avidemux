@@ -106,6 +106,9 @@ enum PixelFormat {
 
     PIX_FMT_RGB32_1,   ///< Packed RGB 8:8:8, 32bpp, (msb)8R 8G 8B 8A(lsb), in cpu endianness
     PIX_FMT_BGR32_1,   ///< Packed RGB 8:8:8, 32bpp, (msb)8B 8G 8R 8A(lsb), in cpu endianness
+  
+    PIX_FMT_GRAY16BE,  ///<        Y        , 16bpp, big-endian
+    PIX_FMT_GRAY16LE,  ///<        Y        , 16bpp, little-endian
 
     PIX_FMT_NB,        ///< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
 };

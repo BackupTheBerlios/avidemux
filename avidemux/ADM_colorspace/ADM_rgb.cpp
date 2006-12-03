@@ -56,15 +56,8 @@ extern "C" {
 #endif
 #endif
 
-#ifdef ADM_BIG_ENDIAN
-              #define TARGET_COLORSPACE       PIX_FMT_RGB32 
-//              #define TARGET_COLORSPACE       IMGFMT_ABGR
-//              #define TARGET_COLORSPACE       IMGFMT_RGB32
-//              #define TARGET_COLORSPACE      IMGFMT_BGR32
-#else
-              #define TARGET_COLORSPACE      PIX_FMT_RGB32
-#endif
-
+#define TARGET_COLORSPACE       PIX_FMT_RGB32 
+#define ALTERNATE_COLORSPACE    PIX_FMT_BGR32
 
 void COL_init(void);
 
@@ -104,13 +97,14 @@ void COL_init(void)
 	
     CLEANUP();
     FLAGS();
-    
+    PixelFormat fmt=TARGET_COLORSPACE;
+   
 	 _context=(void *)sws_getContext(
-				    		ww,hh,
-						PIX_FMT_YUV420P ,
-		 				ww,hh,
-                                                TARGET_COLORSPACE,
-	    					flags, NULL, NULL,NULL);
+                      ww,hh,
+                      PIX_FMT_YUV420P ,
+                      ww,hh,
+                      fmt,
+                      flags, NULL, NULL,NULL);
 
     if(!_context) ADM_assert(0);
     w=ww;
@@ -145,6 +139,35 @@ void COL_init(void)
 			ddst[1]=ddst[2]=0;
 
 			sws_scale((SwsContext *)_context,srd,ssrc,0,h,dst,ddst);
+
+        if(_inverted)
+        {
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+            if( 0 && CpuCaps::hasMMX())
+            {
+            }
+            else
+#endif
+            {
+                uint8_t r,g,b,a;
+                uint8_t *ptr=target;
+                int pel=h*w;
+                for(int yy=0;yy<pel;yy++)
+                {
+                      r=ptr[0];
+                      g=ptr[1];
+                      b=ptr[2];
+                      a=ptr[3];
+                      ptr[0]=b;
+                      ptr[1]=g;
+                      ptr[2]=r;
+                      ptr[3]=a;
+                      ptr+=4;
+                }
+            }
+          
+          
+        }
 #if  defined( ADM_BIG_ENDIAN)
         uint8_t r,g,b,a;
         uint8_t *ptr=target;

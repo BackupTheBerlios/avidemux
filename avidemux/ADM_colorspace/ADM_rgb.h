@@ -53,9 +53,9 @@
  class ColYuvRgb : public ColBase
  {
   protected:
-    
+              uint32_t _inverted;
   public:
-                ColYuvRgb(uint32_t w, uint32_t h): ColBase(w,h) {};
+                ColYuvRgb(uint32_t w, uint32_t h,uint32_t inv=0): ColBase(w,h) {_inverted=inv;};
                 ~ColYuvRgb(){clean();};
       virtual  uint8_t reset(uint32_t neww, uint32_t newh);
       virtual  uint8_t scale(uint8_t *src, uint8_t *target);  
