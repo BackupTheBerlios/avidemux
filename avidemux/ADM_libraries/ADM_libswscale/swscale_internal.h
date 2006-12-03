@@ -1,23 +1,22 @@
 /*
-    Copyright (C) 2001-2003 Michael Niedermayer <michaelni@gmx.at>
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-    the C code (not assembly, mmx, ...) of the swscaler which has been written
-    by Michael Niedermayer can be used under the LGPL license too
-*/
+ * Copyright (C) 2001-2003 Michael Niedermayer <michaelni@gmx.at>
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 
 #ifndef SWSCALE_INTERNAL_H
 #define SWSCALE_INTERNAL_H
@@ -179,7 +178,8 @@ char *sws_format_name(int format);
 			|| (x)==PIX_FMT_YUV444P || (x)==PIX_FMT_NV12	\
 			|| (x)==PIX_FMT_NV21)
 #define isYUV(x)       ((x)==PIX_FMT_UYVY422 || (x)==PIX_FMT_YUYV422 || isPlanarYUV(x))
-#define isGray(x)      ((x)==PIX_FMT_GRAY8)
+#define isGray(x)      ((x)==PIX_FMT_GRAY8 || (x)==PIX_FMT_GRAY16BE || (x)==PIX_FMT_GRAY16LE)
+#define isGray16(x)    ((x)==PIX_FMT_GRAY16BE || (x)==PIX_FMT_GRAY16LE)
 #define isRGB(x)       ((x)==PIX_FMT_BGR32 || (x)==PIX_FMT_RGB24	\
 			|| (x)==PIX_FMT_RGB565 || (x)==PIX_FMT_RGB555	\
 			|| (x)==PIX_FMT_RGB8 || (x)==PIX_FMT_RGB4	\
@@ -202,6 +202,8 @@ static inline int fmt_depth(int fmt)
             return 24;
         case PIX_FMT_BGR565:
         case PIX_FMT_RGB565:
+        case PIX_FMT_GRAY16BE:
+        case PIX_FMT_GRAY16LE:
             return 16;
         case PIX_FMT_BGR555:
         case PIX_FMT_RGB555:

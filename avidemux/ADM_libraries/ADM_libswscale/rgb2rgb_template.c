@@ -8,19 +8,24 @@
  *  palette & YUV & runtime CPU stuff by Michael (michaelni@gmx.at)
  *  lot of big-endian byteorder fixes by Alex Beregszaszi
  *
- * This program is free software; you can redistribute it and/or modify
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * 
+ * the C code (not assembly, mmx, ...) of this file can be used
+ * under the LGPL license too
  */
 
 #include <stddef.h>
@@ -58,8 +63,8 @@
 #define PREFETCH "#"
 #define PREFETCHW "#"
 #else
-#define PREFETCH "/nop"
-#define PREFETCHW "/nop"
+#define PREFETCH  " # nop"
+#define PREFETCHW " # nop"
 #endif
 #endif
 
@@ -75,11 +80,7 @@
 #define SFENCE "sfence"
 #else
 #define MOVNTQ "movq"
-#ifdef __APPLE__
-#define SFENCE "#"
-#else
-#define SFENCE "/nop"
-#endif
+#define SFENCE " # nop"
 #endif
 
 static inline void RENAME(rgb24to32)(const uint8_t *src,uint8_t *dst,long src_size)

@@ -1,23 +1,25 @@
 /*
-    Copyright (C) 2001-2003 Michael Niedermayer <michaelni@gmx.at>
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-    the C code (not assembly, mmx, ...) of the swscaler which has been written
-    by Michael Niedermayer can be used under the LGPL license too
-*/
+ * Copyright (C) 2001-2003 Michael Niedermayer <michaelni@gmx.at>
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ *
+ * the C code (not assembly, mmx, ...) of this file can be used
+ * under the LGPL license too
+ */
 
 #undef REAL_MOVNTQ
 #undef MOVNTQ
@@ -41,14 +43,14 @@
 #define PREFETCH "prefetchnta"
 #define PREFETCHW "prefetcht0"
 #else
-#define PREFETCH "/nop"
-#define PREFETCHW "/nop"
+#define PREFETCH  " # nop"
+#define PREFETCHW " # nop"
 #endif
 
 #ifdef HAVE_MMX2
 #define SFENCE "sfence"
 #else
-#define SFENCE "/nop"
+#define SFENCE " # nop"
 #endif
 
 #ifdef HAVE_MMX2
@@ -100,7 +102,7 @@
 			"mov (%%"REG_d"), %%"REG_S"	\n\t"\
 			"jb 1b				\n\t"\
                         :: "r" (&c->redDither),\
-                        "r" (dest), "p" (width)\
+                        "r" (dest), "g" (width)\
                         : "%"REG_a, "%"REG_d, "%"REG_S\
                 );
 
@@ -162,7 +164,7 @@
 			"mov (%%"REG_d"), %%"REG_S"	\n\t"\
 			"jb 1b				\n\t"\
                         :: "r" (&c->redDither),\
-                        "r" (dest), "p" (width)\
+                        "r" (dest), "g" (width)\
                         : "%"REG_a, "%"REG_d, "%"REG_S\
                 );
 
@@ -1035,8 +1037,8 @@ static inline void RENAME(yuv2packedX)(SwsContext *c, int16_t *lumFilter, int16_
 				    int16_t *chrFilter, int16_t **chrSrc, int chrFilterSize,
 			    uint8_t *dest, long dstW, long dstY)
 {
-	long dummy=0;
 #ifdef HAVE_MMX
+    long dummy=0;
     if(c->flags & SWS_ACCURATE_RND){
                 switch(c->dstFormat){
                 case PIX_FMT_RGB32:
@@ -1728,17 +1730,14 @@ static inline void RENAME(yuy2ToY)(uint8_t *dst, uint8_t *src, long width)
 
 static inline void RENAME(yuy2ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, long width)
 {
-#if defined (HAVE_MMX2) || defined (HAVE_3DNOW)
+        assert(src1 == src2);
+#ifdef HAVE_MMX
 	asm volatile(
 		"movq "MANGLE(bm01010101)", %%mm4\n\t"
 		"mov %0, %%"REG_a"		\n\t"
 		"1:				\n\t"
 		"movq (%1, %%"REG_a",4), %%mm0	\n\t"
 		"movq 8(%1, %%"REG_a",4), %%mm1	\n\t"
-		"movq (%2, %%"REG_a",4), %%mm2	\n\t"
-		"movq 8(%2, %%"REG_a",4), %%mm3	\n\t"
-		PAVGB(%%mm2, %%mm0)
-		PAVGB(%%mm3, %%mm1)
 		"psrlw $8, %%mm0		\n\t"
 		"psrlw $8, %%mm1		\n\t"
 		"packuswb %%mm1, %%mm0		\n\t"
@@ -1747,19 +1746,19 @@ static inline void RENAME(yuy2ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1,
 		"pand %%mm4, %%mm1		\n\t"
 		"packuswb %%mm0, %%mm0		\n\t"
 		"packuswb %%mm1, %%mm1		\n\t"
-		"movd %%mm0, (%4, %%"REG_a")	\n\t"
-		"movd %%mm1, (%3, %%"REG_a")	\n\t"
+		"movd %%mm0, (%3, %%"REG_a")	\n\t"
+		"movd %%mm1, (%2, %%"REG_a")	\n\t"
 		"add $4, %%"REG_a"		\n\t"
 		" js 1b				\n\t"
-		: : "g" (-width), "r" (src1+width*4), "r" (src2+width*4), "r" (dstU+width), "r" (dstV+width)
+		: : "g" (-width), "r" (src1+width*4), "r" (dstU+width), "r" (dstV+width)
 		: "%"REG_a
 	);
 #else
 	int i;
 	for(i=0; i<width; i++)
 	{
-		dstU[i]= (src1[4*i + 1] + src2[4*i + 1])>>1;
-		dstV[i]= (src1[4*i + 3] + src2[4*i + 3])>>1;
+		dstU[i]= src1[4*i + 1];
+		dstV[i]= src1[4*i + 3];
 	}
 #endif
 }
@@ -1791,17 +1790,14 @@ static inline void RENAME(uyvyToY)(uint8_t *dst, uint8_t *src, long width)
 
 static inline void RENAME(uyvyToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, long width)
 {
-#if defined (HAVE_MMX2) || defined (HAVE_3DNOW)
+        assert(src1 == src2);
+#ifdef HAVE_MMX
 	asm volatile(
 		"movq "MANGLE(bm01010101)", %%mm4\n\t"
 		"mov %0, %%"REG_a"		\n\t"
 		"1:				\n\t"
 		"movq (%1, %%"REG_a",4), %%mm0	\n\t"
 		"movq 8(%1, %%"REG_a",4), %%mm1	\n\t"
-		"movq (%2, %%"REG_a",4), %%mm2	\n\t"
-		"movq 8(%2, %%"REG_a",4), %%mm3	\n\t"
-		PAVGB(%%mm2, %%mm0)
-		PAVGB(%%mm3, %%mm1)
 		"pand %%mm4, %%mm0		\n\t"
 		"pand %%mm4, %%mm1		\n\t"
 		"packuswb %%mm1, %%mm0		\n\t"
@@ -1810,19 +1806,19 @@ static inline void RENAME(uyvyToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1,
 		"pand %%mm4, %%mm1		\n\t"
 		"packuswb %%mm0, %%mm0		\n\t"
 		"packuswb %%mm1, %%mm1		\n\t"
-		"movd %%mm0, (%4, %%"REG_a")	\n\t"
-		"movd %%mm1, (%3, %%"REG_a")	\n\t"
+		"movd %%mm0, (%3, %%"REG_a")	\n\t"
+		"movd %%mm1, (%2, %%"REG_a")	\n\t"
 		"add $4, %%"REG_a"		\n\t"
 		" js 1b				\n\t"
-		: : "g" (-width), "r" (src1+width*4), "r" (src2+width*4), "r" (dstU+width), "r" (dstV+width)
+		: : "g" (-width), "r" (src1+width*4), "r" (dstU+width), "r" (dstV+width)
 		: "%"REG_a
 	);
 #else
 	int i;
 	for(i=0; i<width; i++)
 	{
-		dstU[i]= (src1[4*i + 0] + src2[4*i + 0])>>1;
-		dstV[i]= (src1[4*i + 2] + src2[4*i + 2])>>1;
+		dstU[i]= src1[4*i + 0];
+		dstV[i]= src1[4*i + 2];
 	}
 #endif
 }
@@ -1843,20 +1839,19 @@ static inline void RENAME(bgr32ToY)(uint8_t *dst, uint8_t *src, int width)
 static inline void RENAME(bgr32ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, int width)
 {
 	int i;
+        assert(src1 == src2);
 	for(i=0; i<width; i++)
 	{
 		const int a= ((uint32_t*)src1)[2*i+0];
 		const int e= ((uint32_t*)src1)[2*i+1];
-		const int c= ((uint32_t*)src2)[2*i+0];
-		const int d= ((uint32_t*)src2)[2*i+1];
-		const int l= (a&0xFF00FF) + (e&0xFF00FF) + (c&0xFF00FF) + (d&0xFF00FF);
-		const int h= (a&0x00FF00) + (e&0x00FF00) + (c&0x00FF00) + (d&0x00FF00);
+		const int l= (a&0xFF00FF) + (e&0xFF00FF);
+		const int h= (a&0x00FF00) + (e&0x00FF00);
  		const int b=  l&0x3FF;
 		const int g=  h>>8;
 		const int r=  l>>16;
 
-		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+2)) + 128;
-		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+2)) + 128;
+		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+1)) + 128;
+		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+1)) + 128;
 	}
 }
 
@@ -1947,9 +1942,10 @@ static inline void RENAME(bgr24ToY)(uint8_t *dst, uint8_t *src, long width)
 
 static inline void RENAME(bgr24ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, long width)
 {
+        assert(src1 == src2);
 #ifdef HAVE_MMX
 	asm volatile(
-		"mov %4, %%"REG_a"		\n\t"
+		"mov %3, %%"REG_a"		\n\t"
 		"movq "MANGLE(w1111)", %%mm5		\n\t"
 		"movq "MANGLE(bgr2UCoeff)", %%mm6		\n\t"
 		"pxor %%mm7, %%mm7		\n\t"
@@ -1958,14 +1954,9 @@ static inline void RENAME(bgr24ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1
 		ASMALIGN(4)
 		"1:				\n\t"
 		PREFETCH" 64(%0, %%"REG_d")	\n\t"
-		PREFETCH" 64(%1, %%"REG_d")	\n\t"
 #if defined (HAVE_MMX2) || defined (HAVE_3DNOW)
 		"movq (%0, %%"REG_d"), %%mm0	\n\t"
-		"movq (%1, %%"REG_d"), %%mm1	\n\t"
 		"movq 6(%0, %%"REG_d"), %%mm2	\n\t"
-		"movq 6(%1, %%"REG_d"), %%mm3	\n\t"
-		PAVGB(%%mm1, %%mm0)
-		PAVGB(%%mm3, %%mm2)
 		"movq %%mm0, %%mm1		\n\t"
 		"movq %%mm2, %%mm3		\n\t"
 		"psrlq $24, %%mm0		\n\t"
@@ -1976,29 +1967,17 @@ static inline void RENAME(bgr24ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1
 		"punpcklbw %%mm7, %%mm2		\n\t"
 #else
 		"movd (%0, %%"REG_d"), %%mm0	\n\t"
-		"movd (%1, %%"REG_d"), %%mm1	\n\t"
 		"movd 3(%0, %%"REG_d"), %%mm2	\n\t"
-		"movd 3(%1, %%"REG_d"), %%mm3	\n\t"
 		"punpcklbw %%mm7, %%mm0		\n\t"
-		"punpcklbw %%mm7, %%mm1		\n\t"
 		"punpcklbw %%mm7, %%mm2		\n\t"
-		"punpcklbw %%mm7, %%mm3		\n\t"
-		"paddw %%mm1, %%mm0		\n\t"
-		"paddw %%mm3, %%mm2		\n\t"
 		"paddw %%mm2, %%mm0		\n\t"
 		"movd 6(%0, %%"REG_d"), %%mm4	\n\t"
-		"movd 6(%1, %%"REG_d"), %%mm1	\n\t"
 		"movd 9(%0, %%"REG_d"), %%mm2	\n\t"
-		"movd 9(%1, %%"REG_d"), %%mm3	\n\t"
 		"punpcklbw %%mm7, %%mm4		\n\t"
-		"punpcklbw %%mm7, %%mm1		\n\t"
 		"punpcklbw %%mm7, %%mm2		\n\t"
-		"punpcklbw %%mm7, %%mm3		\n\t"
-		"paddw %%mm1, %%mm4		\n\t"
-		"paddw %%mm3, %%mm2		\n\t"
 		"paddw %%mm4, %%mm2		\n\t"
-		"psrlw $2, %%mm0		\n\t"
-		"psrlw $2, %%mm2		\n\t"
+		"psrlw $1, %%mm0		\n\t"
+		"psrlw $1, %%mm2		\n\t"
 #endif
 		"movq "MANGLE(bgr2VCoeff)", %%mm1		\n\t"
 		"movq "MANGLE(bgr2VCoeff)", %%mm3		\n\t"
@@ -2022,11 +2001,7 @@ static inline void RENAME(bgr24ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1
 
 #if defined (HAVE_MMX2) || defined (HAVE_3DNOW)
 		"movq 12(%0, %%"REG_d"), %%mm4	\n\t"
-		"movq 12(%1, %%"REG_d"), %%mm1	\n\t"
 		"movq 18(%0, %%"REG_d"), %%mm2	\n\t"
-		"movq 18(%1, %%"REG_d"), %%mm3	\n\t"
-		PAVGB(%%mm1, %%mm4)
-		PAVGB(%%mm3, %%mm2)
 		"movq %%mm4, %%mm1		\n\t"
 		"movq %%mm2, %%mm3		\n\t"
 		"psrlq $24, %%mm4		\n\t"
@@ -2037,26 +2012,14 @@ static inline void RENAME(bgr24ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1
 		"punpcklbw %%mm7, %%mm2		\n\t"
 #else
 		"movd 12(%0, %%"REG_d"), %%mm4	\n\t"
-		"movd 12(%1, %%"REG_d"), %%mm1	\n\t"
 		"movd 15(%0, %%"REG_d"), %%mm2	\n\t"
-		"movd 15(%1, %%"REG_d"), %%mm3	\n\t"
 		"punpcklbw %%mm7, %%mm4		\n\t"
-		"punpcklbw %%mm7, %%mm1		\n\t"
 		"punpcklbw %%mm7, %%mm2		\n\t"
-		"punpcklbw %%mm7, %%mm3		\n\t"
-		"paddw %%mm1, %%mm4		\n\t"
-		"paddw %%mm3, %%mm2		\n\t"
 		"paddw %%mm2, %%mm4		\n\t"
 		"movd 18(%0, %%"REG_d"), %%mm5	\n\t"
-		"movd 18(%1, %%"REG_d"), %%mm1	\n\t"
 		"movd 21(%0, %%"REG_d"), %%mm2	\n\t"
-		"movd 21(%1, %%"REG_d"), %%mm3	\n\t"
 		"punpcklbw %%mm7, %%mm5		\n\t"
-		"punpcklbw %%mm7, %%mm1		\n\t"
 		"punpcklbw %%mm7, %%mm2		\n\t"
-		"punpcklbw %%mm7, %%mm3		\n\t"
-		"paddw %%mm1, %%mm5		\n\t"
-		"paddw %%mm3, %%mm2		\n\t"
 		"paddw %%mm5, %%mm2		\n\t"
 		"movq "MANGLE(w1111)", %%mm5		\n\t"
 		"psrlw $2, %%mm4		\n\t"
@@ -2089,24 +2052,24 @@ static inline void RENAME(bgr24ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1
 		"packsswb %%mm1, %%mm0		\n\t"
 		"paddb "MANGLE(bgr2UVOffset)", %%mm0	\n\t"
 
-		"movd %%mm0, (%2, %%"REG_a")	\n\t"
+		"movd %%mm0, (%1, %%"REG_a")	\n\t"
 		"punpckhdq %%mm0, %%mm0		\n\t"
-		"movd %%mm0, (%3, %%"REG_a")	\n\t"
+		"movd %%mm0, (%2, %%"REG_a")	\n\t"
 		"add $4, %%"REG_a"		\n\t"
 		" js 1b				\n\t"
-		: : "r" (src1+width*6), "r" (src2+width*6), "r" (dstU+width), "r" (dstV+width), "g" (-width)
+		: : "r" (src1+width*6), "r" (dstU+width), "r" (dstV+width), "g" (-width)
 		: "%"REG_a, "%"REG_d
 	);
 #else
 	int i;
 	for(i=0; i<width; i++)
 	{
-		int b= src1[6*i + 0] + src1[6*i + 3] + src2[6*i + 0] + src2[6*i + 3];
-		int g= src1[6*i + 1] + src1[6*i + 4] + src2[6*i + 1] + src2[6*i + 4];
-		int r= src1[6*i + 2] + src1[6*i + 5] + src2[6*i + 2] + src2[6*i + 5];
+		int b= src1[6*i + 0] + src1[6*i + 3];
+		int g= src1[6*i + 1] + src1[6*i + 4];
+		int r= src1[6*i + 2] + src1[6*i + 5];
 
-		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+2)) + 128;
-		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+2)) + 128;
+		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+1)) + 128;
+		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+1)) + 128;
 	}
 #endif
 }
@@ -2128,13 +2091,13 @@ static inline void RENAME(bgr16ToY)(uint8_t *dst, uint8_t *src, int width)
 static inline void RENAME(bgr16ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, int width)
 {
 	int i;
+        assert(src1==src2);
 	for(i=0; i<width; i++)
 	{
 		int d0= ((uint32_t*)src1)[i];
-		int d1= ((uint32_t*)src2)[i];
 		
-		int dl= (d0&0x07E0F81F) + (d1&0x07E0F81F);
-		int dh= ((d0>>5)&0x07C0F83F) + ((d1>>5)&0x07C0F83F);
+		int dl= (d0&0x07E0F81F);
+		int dh= ((d0>>5)&0x07C0F83F);
 
 		int dh2= (dh>>11) + (dh<<21);
 		int d= dh2 + dl;
@@ -2142,8 +2105,8 @@ static inline void RENAME(bgr16ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1
 		int b= d&0x7F;
 		int r= (d>>11)&0x7F;
 		int g= d>>21;
-		dstU[i]= ((2*RU*r + GU*g + 2*BU*b)>>(RGB2YUV_SHIFT+2-2)) + 128;
-		dstV[i]= ((2*RV*r + GV*g + 2*BV*b)>>(RGB2YUV_SHIFT+2-2)) + 128;
+		dstU[i]= ((2*RU*r + GU*g + 2*BU*b)>>(RGB2YUV_SHIFT+1-2)) + 128;
+		dstV[i]= ((2*RV*r + GV*g + 2*BV*b)>>(RGB2YUV_SHIFT+1-2)) + 128;
 	}
 }
 
@@ -2164,13 +2127,13 @@ static inline void RENAME(bgr15ToY)(uint8_t *dst, uint8_t *src, int width)
 static inline void RENAME(bgr15ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, int width)
 {
 	int i;
+        assert(src1==src2);
 	for(i=0; i<width; i++)
 	{
 		int d0= ((uint32_t*)src1)[i];
-		int d1= ((uint32_t*)src2)[i];
 		
-		int dl= (d0&0x03E07C1F) + (d1&0x03E07C1F);
-		int dh= ((d0>>5)&0x03E0F81F) + ((d1>>5)&0x03E0F81F);
+		int dl= (d0&0x03E07C1F);
+		int dh= ((d0>>5)&0x03E0F81F);
 
 		int dh2= (dh>>11) + (dh<<21);
 		int d= dh2 + dl;
@@ -2178,8 +2141,8 @@ static inline void RENAME(bgr15ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1
 		int b= d&0x7F;
 		int r= (d>>10)&0x7F;
 		int g= d>>21;
-		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+2-3)) + 128;
-		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+2-3)) + 128;
+		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+1-3)) + 128;
+		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+1-3)) + 128;
 	}
 }
 
@@ -2200,20 +2163,19 @@ static inline void RENAME(rgb32ToY)(uint8_t *dst, uint8_t *src, int width)
 static inline void RENAME(rgb32ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, int width)
 {
 	int i;
+        assert(src1==src2);
 	for(i=0; i<width; i++)
 	{
 		const int a= ((uint32_t*)src1)[2*i+0];
 		const int e= ((uint32_t*)src1)[2*i+1];
-		const int c= ((uint32_t*)src2)[2*i+0];
-		const int d= ((uint32_t*)src2)[2*i+1];
-		const int l= (a&0xFF00FF) + (e&0xFF00FF) + (c&0xFF00FF) + (d&0xFF00FF);
-		const int h= (a&0x00FF00) + (e&0x00FF00) + (c&0x00FF00) + (d&0x00FF00);
+		const int l= (a&0xFF00FF) + (e&0xFF00FF);
+		const int h= (a&0x00FF00) + (e&0x00FF00);
  		const int r=  l&0x3FF;
 		const int g=  h>>8;
 		const int b=  l>>16;
 
-		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+2)) + 128;
-		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+2)) + 128;
+		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+1)) + 128;
+		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+1)) + 128;
 	}
 }
 
@@ -2233,17 +2195,89 @@ static inline void RENAME(rgb24ToY)(uint8_t *dst, uint8_t *src, int width)
 static inline void RENAME(rgb24ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, int width)
 {
 	int i;
+        assert(src1==src2);
 	for(i=0; i<width; i++)
 	{
-		int r= src1[6*i + 0] + src1[6*i + 3] + src2[6*i + 0] + src2[6*i + 3];
-		int g= src1[6*i + 1] + src1[6*i + 4] + src2[6*i + 1] + src2[6*i + 4];
-		int b= src1[6*i + 2] + src1[6*i + 5] + src2[6*i + 2] + src2[6*i + 5];
+		int r= src1[6*i + 0] + src1[6*i + 3];
+		int g= src1[6*i + 1] + src1[6*i + 4];
+		int b= src1[6*i + 2] + src1[6*i + 5];
 
-		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+2)) + 128;
-		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+2)) + 128;
+		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+1)) + 128;
+		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+1)) + 128;
 	}
 }
 
+static inline void RENAME(rgb16ToY)(uint8_t *dst, uint8_t *src, int width)
+{
+	int i;
+	for(i=0; i<width; i++)
+	{
+		int d= ((uint16_t*)src)[i];
+		int r= d&0x1F;
+		int g= (d>>5)&0x3F;
+		int b= (d>>11)&0x1F;
+
+		dst[i]= ((2*RY*r + GY*g + 2*BY*b)>>(RGB2YUV_SHIFT-2)) + 16;
+	}
+}
+
+static inline void RENAME(rgb16ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, int width)
+{
+	int i;
+        assert(src1 == src2);
+	for(i=0; i<width; i++)
+	{
+		int d0= ((uint32_t*)src1)[i];
+		
+		int dl= (d0&0x07E0F81F);
+		int dh= ((d0>>5)&0x07C0F83F);
+
+		int dh2= (dh>>11) + (dh<<21);
+		int d= dh2 + dl;
+
+		int r= d&0x7F;
+		int b= (d>>11)&0x7F;
+		int g= d>>21;
+		dstU[i]= ((2*RU*r + GU*g + 2*BU*b)>>(RGB2YUV_SHIFT+1-2)) + 128;
+		dstV[i]= ((2*RV*r + GV*g + 2*BV*b)>>(RGB2YUV_SHIFT+1-2)) + 128;
+	}
+}
+
+static inline void RENAME(rgb15ToY)(uint8_t *dst, uint8_t *src, int width)
+{
+	int i;
+	for(i=0; i<width; i++)
+	{
+		int d= ((uint16_t*)src)[i];
+		int r= d&0x1F;
+		int g= (d>>5)&0x1F;
+		int b= (d>>10)&0x1F;
+
+		dst[i]= ((RY*r + GY*g + BY*b)>>(RGB2YUV_SHIFT-3)) + 16;
+	}
+}
+
+static inline void RENAME(rgb15ToUV)(uint8_t *dstU, uint8_t *dstV, uint8_t *src1, uint8_t *src2, int width)
+{
+	int i;
+        assert(src1 == src2);
+	for(i=0; i<width; i++)
+	{
+		int d0= ((uint32_t*)src1)[i];
+		
+		int dl= (d0&0x03E07C1F);
+		int dh= ((d0>>5)&0x03E0F81F);
+
+		int dh2= (dh>>11) + (dh<<21);
+		int d= dh2 + dl;
+
+		int g= d&0x7F;
+		int r= (d>>10)&0x7F;
+		int b= d>>21;
+		dstU[i]= ((RU*r + GU*g + BU*b)>>(RGB2YUV_SHIFT+1-3)) + 128;
+		dstV[i]= ((RV*r + GV*g + BV*b)>>(RGB2YUV_SHIFT+1-3)) + 128;
+	}
+}
 
 // Bilinear / Bicubic scaling
 static inline void RENAME(hScale)(int16_t *dst, int dstW, uint8_t *src, int srcW, int xInc,
@@ -2435,12 +2469,12 @@ static inline void RENAME(hyscale)(uint16_t *dst, long dstWidth, uint8_t *src, i
 				   int srcFormat, uint8_t *formatConvBuffer, int16_t *mmx2Filter,
 				   int32_t *mmx2FilterPos)
 {
-    if(srcFormat==PIX_FMT_YUYV422)
+    if(srcFormat==PIX_FMT_YUYV422 || srcFormat==PIX_FMT_GRAY16BE)
     {
 	RENAME(yuy2ToY)(formatConvBuffer, src, srcW);
 	src= formatConvBuffer;
     }
-    else if(srcFormat==PIX_FMT_UYVY422)
+    else if(srcFormat==PIX_FMT_UYVY422 || srcFormat==PIX_FMT_GRAY16LE)
     {
 	RENAME(uyvyToY)(formatConvBuffer, src, srcW);
 	src= formatConvBuffer;
@@ -2475,6 +2509,16 @@ static inline void RENAME(hyscale)(uint16_t *dst, long dstWidth, uint8_t *src, i
 	RENAME(rgb24ToY)(formatConvBuffer, src, srcW);
 	src= formatConvBuffer;
     }
+    else if(srcFormat==PIX_FMT_RGB565)
+    {
+	RENAME(rgb16ToY)(formatConvBuffer, src, srcW);
+	src= formatConvBuffer;
+    }
+    else if(srcFormat==PIX_FMT_RGB555)
+    {
+	RENAME(rgb15ToY)(formatConvBuffer, src, srcW);
+	src= formatConvBuffer;
+    }
 
 #ifdef HAVE_MMX
 	// use the new MMX scaler if the mmx2 can't be used (its faster than the x86asm one)
@@ -2487,7 +2531,7 @@ static inline void RENAME(hyscale)(uint16_t *dst, long dstWidth, uint8_t *src, i
     }
     else // Fast Bilinear upscale / crap downscale
     {
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 #ifdef HAVE_MMX2
 	int i;
 #if defined(PIC)
@@ -2670,6 +2714,18 @@ inline static void RENAME(hcscale)(uint16_t *dst, long dstWidth, uint8_t *src1, 
 	src1= formatConvBuffer;
 	src2= formatConvBuffer+2048;
     }
+    else if(srcFormat==PIX_FMT_RGB565)
+    {
+	RENAME(rgb16ToUV)(formatConvBuffer, formatConvBuffer+2048, src1, src2, srcW);
+	src1= formatConvBuffer;
+	src2= formatConvBuffer+2048;
+    }
+    else if(srcFormat==PIX_FMT_RGB555)
+    {
+	RENAME(rgb15ToUV)(formatConvBuffer, formatConvBuffer+2048, src1, src2, srcW);
+	src1= formatConvBuffer;
+	src2= formatConvBuffer+2048;
+    }
     else if(isGray(srcFormat))
     {
     	return;
@@ -2687,7 +2743,7 @@ inline static void RENAME(hcscale)(uint16_t *dst, long dstWidth, uint8_t *src1, 
     }
     else // Fast Bilinear upscale / crap downscale
     {
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 #ifdef HAVE_MMX2
 	int i;
 #if defined(PIC)

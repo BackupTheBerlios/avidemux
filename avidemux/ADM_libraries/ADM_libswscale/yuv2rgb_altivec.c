@@ -60,23 +60,27 @@
   NOTE quartz vo driver ARGB32_to_RGB24 consumes 30% of the processor
 
   Integrated luma prescaling adjustment for saturation/contrast/brightness adjustment. 
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 */
-#include <config.h>
+
+/*
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+#include "config.h"
+#ifdef USE_ALTIVEC
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -92,9 +96,7 @@
 
 #undef PROFILE_THE_BEAST
 #undef INC_SCALING
-// MEANX
-#ifdef USE_ALTIVEC
-// /MEANX
+
 typedef unsigned char ubyte;
 typedef signed char   sbyte;
 
@@ -628,7 +630,6 @@ static int altivec_uyvy_rgb32 (SwsContext *c,
   int i,j;
   vector unsigned char uyvy;
   vector signed   short Y,U,V;
-  vector signed   short vx,ux,uvx;
   vector signed   short R0,G0,B0,R1,G1,B1;
   vector unsigned char  R,G,B;
   vector unsigned char *out;
@@ -793,11 +794,10 @@ altivec_yuv2packedX (SwsContext *c,
 		       uint8_t *dest, int dstW, int dstY)
 {
   int i,j;
-  short *f;
   vector signed short X,X0,X1,Y0,U0,V0,Y1,U1,V1,U,V;
   vector signed short R0,G0,B0,R1,G1,B1;
 
-  vector unsigned char R,G,B,pels[3];
+  vector unsigned char R,G,B;
   vector unsigned char *out,*nout;
 
   vector signed short   RND = vec_splat_s16(1<<3);
@@ -962,4 +962,4 @@ altivec_yuv2packedX (SwsContext *c,
   }
 
 }
-#endif
+#endif //MEANX

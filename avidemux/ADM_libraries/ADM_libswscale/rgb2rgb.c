@@ -7,25 +7,29 @@
  *  Written by Nick Kurshev.
  *  palette & YUV & runtime CPU stuff by Michael (michaelni@gmx.at)
  *
- * This program is free software; you can redistribute it and/or modify
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * 
+ * the C code (not assembly, mmx, ...) of this file can be used
+ * under the LGPL license too
  */
 // MEANX
 #include "config.h"
 // /MEANX
-#include <stdio.h>
-#include <stdlib.h>
+
 #include <inttypes.h>
 #include "config.h"
 #include "rgb2rgb.h"
@@ -33,13 +37,10 @@
 #include "swscale_internal.h"
 #include "x86_cpu.h"
 #include "bswap.h"
+
 #ifdef USE_FASTMEMCPY
 #include "libvo/fastmemcpy.h"
 #endif
-// MEANX
-#include "wrapper.h"
-#include "admmangle.h"
-// /MEANX
 
 #define FAST_BGR2YV12 // use 7 bit coeffs instead of 15bit
 
@@ -95,7 +96,7 @@ void (*yvu9_to_yuy2)(const uint8_t *src1, const uint8_t *src2, const uint8_t *sr
 			long srcStride1, long srcStride2,
 			long srcStride3, long dstStride);
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 static const uint64_t mmx_null  __attribute__((aligned(8))) = 0x0000000000000000ULL;
 static const uint64_t mmx_one   __attribute__((aligned(8))) = 0xFFFFFFFFFFFFFFFFULL;
 static const uint64_t mask32b  attribute_used __attribute__((aligned(8))) = 0x000000FF000000FFULL;
@@ -157,7 +158,7 @@ static uint64_t __attribute__((aligned(8))) dither8[2]={
 	0x0602060206020602LL,
 	0x0004000400040004LL,};
 #endif
-#endif /* defined(ARCH_X86) || defined(ARCH_X86_64) */
+#endif /* defined(ARCH_X86) */
 
 #define RGB2YUV_SHIFT 8
 #define BY ((int)( 0.098*(1<<RGB2YUV_SHIFT)+0.5))
@@ -179,7 +180,7 @@ static uint64_t __attribute__((aligned(8))) dither8[2]={
 #define RENAME(a) a ## _C
 #include "rgb2rgb_template.c"
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 
 //MMX versions
 #undef RENAME

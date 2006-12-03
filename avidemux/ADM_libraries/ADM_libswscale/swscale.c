@@ -1,23 +1,25 @@
 /*
-    Copyright (C) 2001-2003 Michael Niedermayer <michaelni@gmx.at>
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-    the C code (not assembly, mmx, ...) of the swscaler which has been written
-    by Michael Niedermayer can be used under the LGPL license too
-*/
+ * Copyright (C) 2001-2003 Michael Niedermayer <michaelni@gmx.at>
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ *
+ * the C code (not assembly, mmx, ...) of this file can be used
+ * under the LGPL license too
+ */
 
 /*
   supported Input formats: YV12, I420/IYUV, YUY2, UYVY, BGR32, BGR24, BGR16, BGR15, RGB32, RGB24, Y8/Y800, YVU9/IF09
@@ -77,10 +79,12 @@ untested special converters
 #include "x86_cpu.h"
 #include "bswap.h"
 #include "rgb2rgb.h"
+    
 // MEANX
 #include "wrapper.h"
 #include "admmangle.h"
 // /MEANX
+    
 #ifdef USE_FASTMEMCPY
 #include "libvo/fastmemcpy.h"
 #endif
@@ -113,13 +117,15 @@ untested special converters
 
 #define isSupportedIn(x)  ((x)==PIX_FMT_YUV420P || (x)==PIX_FMT_YUYV422 || (x)==PIX_FMT_UYVY422\
 			|| (x)==PIX_FMT_RGB32|| (x)==PIX_FMT_BGR24|| (x)==PIX_FMT_BGR565|| (x)==PIX_FMT_BGR555\
-			|| (x)==PIX_FMT_BGR32|| (x)==PIX_FMT_RGB24\
+			|| (x)==PIX_FMT_BGR32|| (x)==PIX_FMT_RGB24|| (x)==PIX_FMT_RGB565|| (x)==PIX_FMT_RGB555\
 			|| (x)==PIX_FMT_GRAY8 || (x)==PIX_FMT_YUV410P\
+			|| (x)==PIX_FMT_GRAY16BE || (x)==PIX_FMT_GRAY16LE\
 			|| (x)==PIX_FMT_YUV444P || (x)==PIX_FMT_YUV422P || (x)==PIX_FMT_YUV411P)
 #define isSupportedOut(x) ((x)==PIX_FMT_YUV420P || (x)==PIX_FMT_YUYV422 || (x)==PIX_FMT_UYVY422\
 			|| (x)==PIX_FMT_YUV444P || (x)==PIX_FMT_YUV422P || (x)==PIX_FMT_YUV411P\
 			|| isRGB(x) || isBGR(x)\
 			|| (x)==PIX_FMT_NV12 || (x)==PIX_FMT_NV21\
+			|| (x)==PIX_FMT_GRAY16BE || (x)==PIX_FMT_GRAY16LE\
 			|| (x)==PIX_FMT_GRAY8 || (x)==PIX_FMT_YUV410P)
 #define isPacked(x)    ((x)==PIX_FMT_YUYV422 || (x)==PIX_FMT_UYVY422 ||isRGB(x) || isBGR(x))
 
@@ -151,7 +157,7 @@ add BGR4 output support
 write special BGR->BGR scaler
 */
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 static uint64_t attribute_used __attribute__((aligned(8))) bF8=       0xF8F8F8F8F8F8F8F8LL;
 static uint64_t attribute_used __attribute__((aligned(8))) bFC=       0xFCFCFCFCFCFCFCFCLL;
 static uint64_t __attribute__((aligned(8))) w10=       0x0010001000100010LL;
@@ -197,7 +203,7 @@ static const uint64_t bgr2VCoeff  attribute_used __attribute__((aligned(8))) = 0
 static const uint64_t bgr2YOffset attribute_used __attribute__((aligned(8))) = 0x1010101010101010ULL;
 static const uint64_t bgr2UVOffset attribute_used __attribute__((aligned(8)))= 0x8080808080808080ULL;
 static const uint64_t w1111       attribute_used __attribute__((aligned(8))) = 0x0001000100010001ULL;
-#endif /* defined(ARCH_X86) || defined(ARCH_X86_64) */
+#endif /* defined(ARCH_X86) */
 
 // clipping helper table for C implementations:
 static unsigned char clip_table[768];
@@ -235,6 +241,10 @@ char *sws_format_name(enum PixelFormat format)
             return "rgb565";
         case PIX_FMT_RGB555:
             return "rgb555";
+        case PIX_FMT_GRAY16BE:
+            return "gray16be";
+        case PIX_FMT_GRAY16LE:
+            return "gray16le";
         case PIX_FMT_GRAY8:
             return "gray8";
         case PIX_FMT_MONOWHITE:
@@ -288,7 +298,7 @@ char *sws_format_name(enum PixelFormat format)
     }
 }
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 void in_asm_used_var_warning_killer()
 {
  volatile int i= bF8+bFC+w10+
@@ -607,8 +617,8 @@ static inline void yuv2nv12XinC(int16_t *lumFilter, int16_t **lumSrc, int lumFil
 					+ (last_new[y][i] - in3)*f/256;\
 				int new= old> 128 ? 255 : 0;\
 \
-				error_new+= ABS(last_new[y][i] - new);\
-				error_in3+= ABS(last_in3[y][i] - in3);\
+				error_new+= FFABS(last_new[y][i] - new);\
+				error_in3+= FFABS(last_in3[y][i] - in3);\
 				f= error_new - error_in3*4;\
 				if(f<0) f=0;\
 				if(f>256) f=256;\
@@ -811,7 +821,7 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 #endif //HAVE_ALTIVEC
 #endif //ARCH_POWERPC
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 
 #if (defined (HAVE_MMX) && !defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
 #define COMPILE_MMX
@@ -848,7 +858,7 @@ static inline void yuv2packedXinC(SwsContext *c, int16_t *lumFilter, int16_t **l
 #endif
 #endif //ARCH_POWERPC
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 
 //X86 versions
 /*
@@ -915,7 +925,7 @@ static inline int initFilter(int16_t **outFilter, int16_t **filterPos, int *outF
 	int minFilterSize;
 	double *filter=NULL;
 	double *filter2=NULL;
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 	if(flags & SWS_CPU_CAPS_MMX)
 		asm volatile("emms\n\t"::: "memory"); //FIXME this shouldnt be required but it IS (even for non mmx versions)
 #endif
@@ -923,7 +933,7 @@ static inline int initFilter(int16_t **outFilter, int16_t **filterPos, int *outF
 	// Note the +1 is for the MMXscaler which reads over the end
 	*filterPos = av_malloc((dstW+1)*sizeof(int16_t));
 
-	if(ABS(xInc - 0x10000) <10) // unscaled
+	if(FFABS(xInc - 0x10000) <10) // unscaled
 	{
 		int i;
 		filterSize= 1;
@@ -973,7 +983,7 @@ static inline int initFilter(int16_t **outFilter, int16_t **filterPos, int *outF
 				//Bilinear upscale / linear interpolate / Area averaging
 				for(j=0; j<filterSize; j++)
 				{
-					double d= ABS((xx<<16) - xDstInSrc)/(double)(1<<16);
+					double d= FFABS((xx<<16) - xDstInSrc)/(double)(1<<16);
 					double coeff= 1.0 - d;
 					if(coeff<0) coeff=0;
 					filter[i*filterSize + j]= coeff;
@@ -1017,7 +1027,7 @@ static inline int initFilter(int16_t **outFilter, int16_t **filterPos, int *outF
 			(*filterPos)[i]= xx;
 			for(j=0; j<filterSize; j++)
 			{
-				double d= ABS(xx - xDstInSrc)/filterSizeInSrc*sizeFactor;
+				double d= FFABS(xx - xDstInSrc)/filterSizeInSrc*sizeFactor;
 				double coeff;
 				if(flags & SWS_BICUBIC)
 				{
@@ -1142,7 +1152,7 @@ static inline int initFilter(int16_t **outFilter, int16_t **filterPos, int *outF
 		for(j=0; j<filter2Size; j++)
 		{
 			int k;
-			cutOff += ABS(filter2[i*filter2Size]);
+			cutOff += FFABS(filter2[i*filter2Size]);
 
 			if(cutOff > SWS_MAX_REDUCE_CUTOFF) break;
 
@@ -1160,7 +1170,7 @@ static inline int initFilter(int16_t **outFilter, int16_t **filterPos, int *outF
 		/* count near zeros on the right */
 		for(j=filter2Size-1; j>0; j--)
 		{
-			cutOff += ABS(filter2[i*filter2Size + j]);
+			cutOff += FFABS(filter2[i*filter2Size + j]);
 
 			if(cutOff > SWS_MAX_REDUCE_CUTOFF) break;
 			min--;
@@ -1469,7 +1479,7 @@ static void globalInit(void){
 static SwsFunc getSwsFunc(int flags){
     
 #ifdef RUNTIME_CPUDETECT
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 	// ordered per speed fasterst first
 	if(flags & SWS_CPU_CAPS_MMX2)
 		return swScale_MMX2;
@@ -1488,7 +1498,7 @@ static SwsFunc getSwsFunc(int flags){
 	  return swScale_C;
 #endif
 	return swScale_C;
-#endif /* defined(ARCH_X86) || defined(ARCH_X86_64) */
+#endif /* defined(ARCH_X86) */
 #else //RUNTIME_CPUDETECT
 #ifdef HAVE_MMX2
 	return swScale_MMX2;
@@ -1682,8 +1692,8 @@ static int simpleCopy(SwsContext *c, uint8_t* src[], int srcStride[], int srcSli
 			int length=0;
 
 			/* universal length finder */
-			while(length+c->srcW <= ABS(dstStride[0]) 
-			   && length+c->srcW <= ABS(srcStride[0])) length+= c->srcW;
+			while(length+c->srcW <= FFABS(dstStride[0]) 
+			   && length+c->srcW <= FFABS(srcStride[0])) length+= c->srcW;
 			ASSERT(length!=0);
 
 			for(i=0; i<srcSliceH; i++)
@@ -1730,6 +1740,72 @@ static int simpleCopy(SwsContext *c, uint8_t* src[], int srcStride[], int srcSli
 	return srcSliceH;
 }
 
+static int gray16togray(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+             int srcSliceH, uint8_t* dst[], int dstStride[]){
+
+	int length= c->srcW;
+	int y=      srcSliceY;
+	int height= srcSliceH;
+	int i, j;
+	uint8_t *srcPtr= src[0];
+	uint8_t *dstPtr= dst[0] + dstStride[0]*y;
+
+	if(!isGray(c->dstFormat)){
+		int height= -((-srcSliceH)>>c->chrDstVSubSample);
+		memset(dst[1], 128, dstStride[1]*height);
+		memset(dst[2], 128, dstStride[2]*height);
+	}
+	if(c->srcFormat == PIX_FMT_GRAY16LE) srcPtr++;
+	for(i=0; i<height; i++)
+	{
+		for(j=0; j<length; j++) dstPtr[j] = srcPtr[j<<1];
+		srcPtr+= srcStride[0];
+		dstPtr+= dstStride[0];
+	}
+	return srcSliceH;
+}
+
+static int graytogray16(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+             int srcSliceH, uint8_t* dst[], int dstStride[]){
+
+	int length= c->srcW;
+	int y=      srcSliceY;
+	int height= srcSliceH;
+	int i, j;
+	uint8_t *srcPtr= src[0];
+	uint8_t *dstPtr= dst[0] + dstStride[0]*y;
+	for(i=0; i<height; i++)
+	{
+		for(j=0; j<length; j++)
+		{
+			dstPtr[j<<1] = srcPtr[j];
+			dstPtr[(j<<1)+1] = srcPtr[j];
+		}
+		srcPtr+= srcStride[0];
+		dstPtr+= dstStride[0];
+	}
+	return srcSliceH;
+}
+
+static int gray16swap(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
+             int srcSliceH, uint8_t* dst[], int dstStride[]){
+
+	int length= c->srcW;
+	int y=      srcSliceY;
+	int height= srcSliceH;
+	int i, j;
+	uint16_t *srcPtr= src[0];
+	uint16_t *dstPtr= dst[0] + dstStride[0]*y/2;
+	for(i=0; i<height; i++)
+	{
+		for(j=0; j<length; j++) dstPtr[j] = bswap_16(srcPtr[j]);
+		srcPtr+= srcStride[0]/2;
+		dstPtr+= dstStride[0]/2;
+	}
+	return srcSliceH;
+}
+
+
 static void getSubSampleFactors(int *h, int *v, int format){
 	switch(format){
 	case PIX_FMT_UYVY422:
@@ -1738,6 +1814,8 @@ static void getSubSampleFactors(int *h, int *v, int format){
 		*v=0;
 		break;
 	case PIX_FMT_YUV420P:
+	case PIX_FMT_GRAY16BE:
+	case PIX_FMT_GRAY16LE:
 	case PIX_FMT_GRAY8: //FIXME remove after different subsamplings are fully implemented
 	case PIX_FMT_NV12:
 	case PIX_FMT_NV21:
@@ -1873,7 +1951,7 @@ SwsContext *sws_getContext(int srcW, int srcH, int srcFormat, int dstW, int dstH
 	int unscaled, needsDither;
 	int srcRange, dstRange;
 	SwsFilter dummyFilter= {NULL, NULL, NULL, NULL};
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 	if(flags & SWS_CPU_CAPS_MMX)
 		asm volatile("emms\n\t"::: "memory");
 #endif
@@ -2049,6 +2127,20 @@ SwsContext *sws_getContext(int srcW, int srcH, int srcFormat, int dstW, int dstH
 			c->swScale= simpleCopy;
 		}
 
+		/* gray16{le,be} conversions */
+		if(isGray16(srcFormat) && (isPlanarYUV(dstFormat) || (dstFormat == PIX_FMT_GRAY8)))
+		{
+			c->swScale= gray16togray;
+		}
+		if((isPlanarYUV(srcFormat) || (srcFormat == PIX_FMT_GRAY8)) && isGray16(dstFormat))
+		{
+			c->swScale= graytogray16;
+		}
+		if(srcFormat != dstFormat && isGray16(srcFormat) && isGray16(dstFormat))
+		{
+			c->swScale= gray16swap;
+		}		
+
 		if(c->swScale){
 			if(flags&SWS_PRINT_INFO)
 				MSG_INFO("SwScaler: using unscaled %s -> %s special converter\n", 
@@ -2213,29 +2305,29 @@ SwsContext *sws_getContext(int srcW, int srcH, int srcFormat, int dstW, int dstH
 		char *dither= "";
 #endif
 		if(flags&SWS_FAST_BILINEAR)
-			MSG_INFO("\nSwScaler: FAST_BILINEAR scaler, ");
+			MSG_INFO("SwScaler: FAST_BILINEAR scaler, ");
 		else if(flags&SWS_BILINEAR)
-			MSG_INFO("\nSwScaler: BILINEAR scaler, ");
+			MSG_INFO("SwScaler: BILINEAR scaler, ");
 		else if(flags&SWS_BICUBIC)
-			MSG_INFO("\nSwScaler: BICUBIC scaler, ");
+			MSG_INFO("SwScaler: BICUBIC scaler, ");
 		else if(flags&SWS_X)
-			MSG_INFO("\nSwScaler: Experimental scaler, ");
+			MSG_INFO("SwScaler: Experimental scaler, ");
 		else if(flags&SWS_POINT)
-			MSG_INFO("\nSwScaler: Nearest Neighbor / POINT scaler, ");
+			MSG_INFO("SwScaler: Nearest Neighbor / POINT scaler, ");
 		else if(flags&SWS_AREA)
-			MSG_INFO("\nSwScaler: Area Averageing scaler, ");
+			MSG_INFO("SwScaler: Area Averageing scaler, ");
 		else if(flags&SWS_BICUBLIN)
-			MSG_INFO("\nSwScaler: luma BICUBIC / chroma BILINEAR scaler, ");
+			MSG_INFO("SwScaler: luma BICUBIC / chroma BILINEAR scaler, ");
 		else if(flags&SWS_GAUSS)
-			MSG_INFO("\nSwScaler: Gaussian scaler, ");
+			MSG_INFO("SwScaler: Gaussian scaler, ");
 		else if(flags&SWS_SINC)
-			MSG_INFO("\nSwScaler: Sinc scaler, ");
+			MSG_INFO("SwScaler: Sinc scaler, ");
 		else if(flags&SWS_LANCZOS)
-			MSG_INFO("\nSwScaler: Lanczos scaler, ");
+			MSG_INFO("SwScaler: Lanczos scaler, ");
 		else if(flags&SWS_SPLINE)
-			MSG_INFO("\nSwScaler: Bicubic spline scaler, ");
+			MSG_INFO("SwScaler: Bicubic spline scaler, ");
 		else
-			MSG_INFO("\nSwScaler: ehh flags invalid?! ");
+			MSG_INFO("SwScaler: ehh flags invalid?! ");
 
 		if(dstFormat==PIX_FMT_BGR555 || dstFormat==PIX_FMT_BGR565)
 			MSG_INFO("from %s to%s %s ", 
@@ -2281,7 +2373,7 @@ SwsContext *sws_getContext(int srcW, int srcH, int srcFormat, int dstW, int dstH
 		}
 		else
 		{
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 			MSG_V("SwScaler: using X86-Asm scaler for horizontal scaling\n");
 #else
 			if(flags & SWS_FAST_BILINEAR)
@@ -2563,7 +2655,7 @@ static SwsVector *sws_diffVec(SwsVector *a, SwsVector *b){
 
 /* shift left / or right if "shift" is negative */
 static SwsVector *sws_getShiftedVec(SwsVector *a, int shift){
-	int length= a->length + ABS(shift)*2;
+	int length= a->length + FFABS(shift)*2;
 	double *coeff= av_malloc(length*sizeof(double));
 	int i;
 	SwsVector *vec= av_malloc(sizeof(SwsVector));
@@ -2718,7 +2810,7 @@ void sws_freeContext(SwsContext *c){
 	av_free(c->hChrFilterPos);
 	c->hChrFilterPos = NULL;
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 #ifdef MAP_ANONYMOUS
 	if(c->funnyYCode) munmap(c->funnyYCode, MAX_FUNNY_CODE_SIZE);
 	if(c->funnyUVCode) munmap(c->funnyUVCode, MAX_FUNNY_CODE_SIZE);
@@ -2728,7 +2820,7 @@ void sws_freeContext(SwsContext *c){
 #endif
 	c->funnyYCode=NULL;
 	c->funnyUVCode=NULL;
-#endif /* defined(ARCH_X86) || defined(ARCH_X86_64) */
+#endif /* defined(ARCH_X86) */
 
 	av_free(c->lumMmx2Filter);
 	c->lumMmx2Filter=NULL;
