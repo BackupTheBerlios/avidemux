@@ -745,20 +745,6 @@
      <height>29</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuVideo" >
-    <property name="title" >
-     <string>Video</string>
-    </property>
-    <addaction name="actionDecoder_options" />
-    <addaction name="actionPostprocessing" />
-    <addaction name="separator" />
-    <addaction name="actionPreview" />
-    <addaction name="actionDisplay_output" />
-    <addaction name="separator" />
-    <addaction name="actionFilters" />
-    <addaction name="actionFrame_rate" />
-    <addaction name="actionEncoder" />
-   </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
      <string>Edit</string>
@@ -796,13 +782,6 @@
     <addaction name="actionEncoder_2" />
     <addaction name="actionFilters_2" />
    </widget>
-   <widget class="QMenu" name="menuHelp" >
-    <property name="title" >
-     <string>Help</string>
-    </property>
-    <addaction name="actionShow_built_in_support" />
-    <addaction name="actionAbout_avidemux" />
-   </widget>
    <widget class="QMenu" name="menuAuto" >
     <property name="title" >
      <string>Auto</string>
@@ -820,30 +799,6 @@
     <addaction name="separator" />
     <addaction name="actionVob_to_vobsub" />
     <addaction name="actionOCR" />
-   </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>File</string>
-    </property>
-    <widget class="QMenu" name="menuSave" >
-     <property name="title" >
-      <string>Save</string>
-     </property>
-     <addaction name="actionSave_video" />
-     <addaction name="actionSave_BMP" />
-     <addaction name="actionSave_jpeg" />
-    </widget>
-    <addaction name="actionOpen" />
-    <addaction name="actionAppend" />
-    <addaction name="menuSave" />
-    <addaction name="separator" />
-    <addaction name="actionProperties" />
-    <addaction name="separator" />
-    <addaction name="actionLoad_run_project" />
-    <addaction name="actionSave_project" />
-    <addaction name="actionSave_project_as" />
-    <addaction name="separator" />
-    <addaction name="actionQuit" />
    </widget>
    <widget class="QMenu" name="menuCustom" >
     <property name="title" >
@@ -867,6 +822,61 @@
     <addaction name="actionGo_to_Marker_B" />
     <addaction name="actionJump_to_Frame" />
     <addaction name="actionJump_to_Time" />
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>Help</string>
+    </property>
+    <addaction name="actionShow_built_in_support" />
+    <addaction name="actionAbout_avidemux" />
+   </widget>
+   <widget class="QMenu" name="menuVideo" >
+    <property name="title" >
+     <string>Video</string>
+    </property>
+    <addaction name="actionDecoder_options" />
+    <addaction name="actionPostprocessing" />
+    <addaction name="separator" />
+    <addaction name="actionPreview" />
+    <addaction name="actionDisplay_output" />
+    <addaction name="separator" />
+    <addaction name="actionFilters" />
+    <addaction name="actionFrame_rate" />
+    <addaction name="actionEncoder" />
+   </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuSave" >
+     <property name="title" >
+      <string>Save</string>
+     </property>
+     <addaction name="actionSave_video" />
+     <addaction name="actionSave_BMP" />
+     <addaction name="actionSave_jpeg" />
+    </widget>
+    <widget class="QMenu" name="menuRecent_Files" >
+     <property name="title" >
+      <string>Recent Files</string>
+     </property>
+     <addaction name="actionRecent0" />
+     <addaction name="actionRecent1" />
+     <addaction name="actionRecent2" />
+     <addaction name="actionRecent3" />
+    </widget>
+    <addaction name="actionOpen" />
+    <addaction name="menuRecent_Files" />
+    <addaction name="actionAppend" />
+    <addaction name="menuSave" />
+    <addaction name="separator" />
+    <addaction name="actionProperties" />
+    <addaction name="separator" />
+    <addaction name="actionLoad_run_project" />
+    <addaction name="actionSave_project" />
+    <addaction name="actionSave_project_as" />
+    <addaction name="separator" />
+    <addaction name="actionQuit" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -1256,6 +1266,26 @@
    </property>
    <property name="text" >
     <string>Play</string>
+   </property>
+  </action>
+  <action name="actionRecent0" >
+   <property name="text" >
+    <string>Recent0</string>
+   </property>
+  </action>
+  <action name="actionRecent1" >
+   <property name="text" >
+    <string>Recent1</string>
+   </property>
+  </action>
+  <action name="actionRecent2" >
+   <property name="text" >
+    <string>Recent2</string>
+   </property>
+  </action>
+  <action name="actionRecent3" >
+   <property name="text" >
+    <string>Recent3</string>
    </property>
   </action>
  </widget>

@@ -39,7 +39,7 @@
 #include "ADM_codecs/ADM_codec.h"
 #include "gui_action.hxx"
 #include "ADM_editor/ADM_outputfmt.h"
-    
+#include "prefs.h"
 
 extern int automation(void );
 extern void HandleAction(Action a);
@@ -200,23 +200,30 @@ int UI_Init(int nargc,char **nargv)
 }
 QWidget *QuiMainWindows=NULL;
 QGraphicsView *drawWindow=NULL;
-
+uint8_t UI_updateRecentMenu( void );
+/**
+    \fn UI_RunApp(void)
+    \brief Main entry point for the GUI application
+*/
 int UI_RunApp(void)
 {
-
+Q_INIT_RESOURCE(avidemux);
    QApplication a( global_argc, global_argv );
    MainWindow * mw = new MainWindow();
     
     a.connect( &a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()) );
+    
     mw->show();
+    
     QuiMainWindows=(QWidget*)mw;
-   Q_INIT_RESOURCE(avidemux);
+   
     UI_QT4VideoWidget(mw->ui.frame_video);  // Add the widget that will handle video display
-    setupMenus();
+    UI_updateRecentMenu(  );
    if (global_argc >= 2)
     {
      automation();
     }
+    setupMenus();
     return a.exec();
 }
 
@@ -232,6 +239,37 @@ Action searchTranslationTable(const char *name)
   }
   printf("WARNING : Signal not found in translation table : %s\n",name);
   return ACT_DUMMY;
+}
+/**
+    \fn     UI_updateRecentMenu( void )
+    \brief  Update the recent submenu with the latest files loaded
+*/
+uint8_t UI_updateRecentMenu( void )
+{
+const char **names;
+uint32_t nb_item=0;
+QAction *actions[4]={WIDGET(actionRecent0),WIDGET(actionRecent1),WIDGET(actionRecent2),WIDGET(actionRecent3)};
+        names=prefs->get_lastfiles();
+        
+        // hide them all
+        for(int i=0;i<4;i++) actions[i]->setVisible(0);
+        // Redraw..
+        for( nb_item=0;nb_item<4;nb_item++)
+        {
+                if(!names[nb_item]) 
+                {
+                   return 1;
+                }
+                else
+                {
+                    //actions[nb_item]->setVisible(1);
+                    // Replace widget ?
+                    actions[nb_item]->setText(names[nb_item]);
+                    actions[nb_item]->setVisible(1);
+                }
+                // Update name
+        }
+        return 1;
 }
 /** 
   \fn    setupMenus(void)
@@ -261,6 +299,7 @@ void setupMenus(void)
                         name=audioFilterGetIndexedName(i);
                         WIDGET(comboBoxAudio)->addItem(name);
                 }
+        
 }
 /*
     Return % of scale (between 0 and 1)
@@ -453,6 +492,7 @@ uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
 {
     WIDGET(comboBoxFormat)->setCurrentIndex((int)fmt);
 }
+
 //********************************************
 #include "Q_gui2.moc"
 //EOF

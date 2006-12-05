@@ -74,10 +74,6 @@ uint8_t UI_setTimeShift(int onoff,int value)
   return 1;
 }
 
-uint8_t UI_updateRecentMenu( void )
-{
-  return 1;
-}
 
 uint8_t UI_shrink(uint32_t w,uint32_t h)
 {

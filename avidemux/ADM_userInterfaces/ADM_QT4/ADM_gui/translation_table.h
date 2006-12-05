@@ -57,7 +57,12 @@ PROCESS(actionJump_to_Frame,ACT_Goto) \
 PROCESS(actionJump_to_Time,ACT_GotoTime) \
 PROCESS(actionShow_built_in_support,ACT_BUILT_IN) \
 PROCESS(actionAbout_avidemux,ACT_About) \
-PROCESS(actionPlay,ACT_PlayAvi) 
+PROCESS(actionPlay,ACT_PlayAvi) \
+PROCESS(actionRecent0,ACT_RECENT0) \
+PROCESS(actionRecent1,ACT_RECENT1) \
+PROCESS(actionRecent2,ACT_RECENT2) \
+PROCESS(actionRecent3,ACT_RECENT3) 
+
 
 
 #define LIST_OF_BUTTONS     \
