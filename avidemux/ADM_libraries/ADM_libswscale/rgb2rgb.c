@@ -37,7 +37,10 @@
 #include "swscale_internal.h"
 #include "x86_cpu.h"
 #include "bswap.h"
-
+// MEANX
+//#include "wrapper.h"
+#include "admmangle.h"
+// /MEANX
 #ifdef USE_FASTMEMCPY
 #include "libvo/fastmemcpy.h"
 #endif
