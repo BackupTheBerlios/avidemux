@@ -178,5 +178,5 @@ uint8_t renderStopPlaying( void )
 }
 
 //****************************************************************************************************
-#include "preview_qt4.moc"
+//#include "Q_preview.moc"
 //EOF 
