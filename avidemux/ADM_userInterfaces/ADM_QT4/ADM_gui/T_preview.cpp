@@ -178,5 +178,5 @@ uint8_t renderStopPlaying( void )
 }
 
 //****************************************************************************************************
-//#include "Q_preview.moc"
+#include "T_preview.moc"
 //EOF 

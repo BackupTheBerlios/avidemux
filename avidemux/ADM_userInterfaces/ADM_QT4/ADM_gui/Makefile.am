@@ -19,10 +19,13 @@ AQ_%.cpp : Q_%.cpp  %.ui
 
 AT_%.cpp : T_%.cpp  
 	$(MOC) T_$*.cpp -o T_$*.moc
-	cp T_$*.cpp T_$*.cpp
+	cp T_$*.cpp AT_$*.cpp
 
 
 
 avidemux_rsc.cpp : avidemux.qrc
 	rcc  $< -o $@	-name avidemux
-EXTRA_DIST =  
+EXTRA_DIST =
+
+qclean:
+	rm -f ui_*.h AT_*.cpp AQ_*.cpp  *.moc
