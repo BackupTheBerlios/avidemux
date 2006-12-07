@@ -59,13 +59,13 @@ void            GUI_Info_HIG(const ADM_LOG_LEVEL level,const char *primary, cons
 
         if(! secondary_format)
         {
-            snprintf(alertstring,1024,"<b>%s</b>\n",primary);
+            snprintf(alertstring,1024,"<big><b>%s</b></big>",primary);
          }else
          {
             va_list ap;
             va_start(ap, secondary_format);
             vsnprintf(alertstring2,1023,secondary_format, ap);
-            snprintf(alertstring,1024,"<b>%s</b><br>%s",primary,alertstring2);
+            snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,alertstring2);
             va_end(ap);
          }
         QMessageBox::StandardButton reply;
@@ -92,13 +92,13 @@ void            GUI_Error_HIG(const char *primary, const char *secondary_format,
 
         if(! secondary_format)
         {
-            snprintf(alertstring,1024,"<b>%s</b>\n",primary);
+            snprintf(alertstring,1024,"<big><b>%s</b></big>",primary);
          }else
          {
             va_list ap;
             va_start(ap, secondary_format);
             vsnprintf(alertstring2,1023,secondary_format, ap);
-            snprintf(alertstring,1024,"<b>%s</b><br>%s",primary,alertstring2);
+            snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,alertstring2);
             va_end(ap);
          }
           QMessageBox::StandardButton reply;
@@ -120,14 +120,14 @@ char alertstring2[1024];
         
         if (!secondary_format)
         {
-              snprintf(alertstring,1024,"<b>%s</b>\n",primary);
+              snprintf(alertstring,1024,"<big><b>%s</b></big>",primary);
         }
         else
         {	
               va_list ap;
               va_start(ap, secondary_format);
               vsnprintf(alertstring2,1023,secondary_format, ap);
-              snprintf(alertstring,1024,"<b>%s</b><br>%s",primary,alertstring2);
+              snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,alertstring2);
               va_end(ap);
         }
           QMessageBox::StandardButton reply;
@@ -151,14 +151,14 @@ char alertstring2[1024];
         
         if (!secondary_format)
         {
-              snprintf(alertstring,1024,"<b>%s</b>\n",primary);
+              snprintf(alertstring,1024,"<big><b>%s</b></big>",primary);
         }
         else
         {	
               va_list ap;
               va_start(ap, secondary_format);
               vsnprintf(alertstring2,1023,secondary_format, ap);
-              snprintf(alertstring,1024,"<b>%s</b><br>%s",primary,alertstring2);
+              snprintf(alertstring,1024,"<big><b>%s</b></big><br><br>%s",primary,alertstring2);
               va_end(ap);
         }
           QMessageBox::StandardButton reply;
