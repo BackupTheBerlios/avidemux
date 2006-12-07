@@ -155,5 +155,4 @@ void DIA_working::closeDialog( void )
 }
 
 //********************************************
-#include "Q_working.moc"
 //EOF

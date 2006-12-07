@@ -494,5 +494,4 @@ uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
 }
 
 //********************************************
-#include "Q_gui2.moc"
 //EOF

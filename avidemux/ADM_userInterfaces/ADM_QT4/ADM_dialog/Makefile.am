@@ -11,18 +11,8 @@ INCLUDES = $(all_includes)  $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@
 libADM_dialog_a_METASOURCES = AUTO
 
 
-AQ_%.cpp : Q_%.cpp %.ui
-	$(UIC) $*.ui -o ui_$*.h
-	$(MOC) Q_$*.cpp -o Q_$*.moc
-	cp Q_$*.cpp AQ_$*.cpp
-
-AT_%.cpp : T_%.cpp  
-	$(MOC) T_$*.cpp -o T_$*.moc
-	cp T_$*.cpp AT_$*.cpp
-
+include ../Makefile.adm
 
 
 EXTRA_DIST =  
-qclean:
-	rm -f ui_*.h AT_*.cpp AQ_*.cpp  *.moc
 

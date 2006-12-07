@@ -12,20 +12,9 @@ libADM_gui2_a_METASOURCES = AUTO
 libADM_gui2_a_SOURCES = gui_none.cpp file_qt4.cpp avidemux_rsc.cpp \
 			AQ_gui2.cpp   AT_preview.cpp 
 
-AQ_%.cpp : Q_%.cpp  %.ui
-	$(UIC) $*.ui -o ui_$*.h 
-	$(MOC) Q_$*.cpp -o Q_$*.moc
-	cp Q_$*.cpp AQ_$*.cpp
-
-AT_%.cpp : T_%.cpp  
-	$(MOC) T_$*.cpp -o T_$*.moc
-	cp T_$*.cpp AT_$*.cpp
-
-
+include ../Makefile.adm
 
 avidemux_rsc.cpp : avidemux.qrc
 	rcc  $< -o $@	-name avidemux
 EXTRA_DIST =
 
-qclean:
-	rm -f ui_*.h AT_*.cpp AQ_*.cpp  *.moc

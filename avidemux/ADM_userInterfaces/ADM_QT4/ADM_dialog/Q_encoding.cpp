@@ -364,5 +364,4 @@ uint8_t DIA_encoding::isAlive( void )
 }
 
 //********************************************
-#include "Q_encoding.moc"
 //EOF

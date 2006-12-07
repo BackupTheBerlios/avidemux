@@ -156,5 +156,4 @@ void DIA_properties( void )
      delete propwindow;
 }  
 //********************************************
-#include "Q_props.moc"
 //EOF
