@@ -163,13 +163,13 @@ uint8_t     OneTrack::dump(uint32_t number,FILE *fdIdx, FILE *fdSub,uint32_t *ou
     fprintf(fdIdx,"# alt: English\n");
     fprintf(fdIdx,"# Vob/Cell ID: 1, 1 (PTS: 0)\n");
     (*out)++;
-    for(int i=1;i<nbLines;i++) // We shift PTS & position by 1 to workaround the display bug
+    for(int i=0;i<nbLines;i++) // We shift PTS & position by 1 to workaround the display bug
     {   
         if(lines[i].pts!=ADM_NO_PTS)
         {     
             timestamp=(uint32_t)floor(lines[i].pts/90.);
             ms2time(timestamp,&hh,&mm,&ss,&ms);
-            position=lines[i-1].start;
+            position=lines[i].start;
             //printf("Stream :%d position :%x offset:%x total:%x\n",i,position,original,original+position);
             position+=original;          
             fprintf(fdIdx,"timestamp: %02d:%02d:%02d:%03d, filepos: %08x\n",hh,mm,ss,ms,position); 
