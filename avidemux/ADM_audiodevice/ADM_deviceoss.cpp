@@ -26,9 +26,14 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
-#if defined(ADM_BSD_FAMILY) && !defined(__FreeBSD__)
+#if defined(ADM_BSD_FAMILY) && !defined(__FreeBSD__) && !defined(__OpenBSD__)
 	#include <soundcard.h>
 	const char *dsp = DEVOSSAUDIO;;
+
+#elif defined(__OpenBSD__)
+	#include <soundcard.h>
+	const char *dsp = "/dev/audio";
+	const char *device_mixer = "/dev/mixer";
 
 #else
 	#include <sys/soundcard.h>

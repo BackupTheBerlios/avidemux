@@ -25,11 +25,11 @@ int CDirectorySearch::_findnext(unsigned long int hDir,_finddata_t *pfdData)
 	if(!pEntry)
 		return -1;
 	std::string sFilePath = "";
-#if defined( __linux__) || defined(__maxosx__)
+#if defined( __linux__) || defined(__macosx__)
 	strncpy(pfdData->name,pEntry->d_name,pEntry->d_reclen);
 	// append NULL terminator
 	pfdData->name[pEntry->d_reclen] = '\0';
-#elif __FreeBSD__
+#elif defined(__FreeBSD__) || defined(__OpenBSD__)
 	strncpy(pfdData->name,pEntry->d_name,pEntry->d_namlen);
 	// append NULL terminator
 	pfdData->name[pEntry->d_namlen] = '\0';

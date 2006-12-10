@@ -14,7 +14,7 @@ at amistry@am-productions.biz
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
-#if !defined( __unix__) && !defined(__maxosx__)
+#if !defined( __unix__) && !defined(__macosx__)
 #include <io.h>
 #else
 #include <sys/types.h>
@@ -26,7 +26,7 @@ at amistry@am-productions.biz
 // create a non file bit for unix
 #define _A_NONFILE	0x03
 
-#if defined( __unix__) && !defined(__maxosx__)
+#if defined( __unix__) && !defined(__macosx__)
 
 // wrap the file mode bits
 #define _A_NORMAL	0x00
