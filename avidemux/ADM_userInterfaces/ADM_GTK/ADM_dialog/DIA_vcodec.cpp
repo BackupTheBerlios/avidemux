@@ -24,228 +24,125 @@
 #include "ADM_encoder/adm_encoder.h"
 
 //___________________________________
-
- static GtkWidget	*create_dialogVideoCodec (void) ;
  
 extern uint32_t encoderGetNbEncoder(void);
 extern const char* encoderGetIndexedName(uint32_t i);
- 
- 
-// static SelectCodecType findCodec( void );
- static GtkWidget *dialog;
- static void okCallback(GtkButton * button, gpointer user_data);
- static void callBackCalc( void );
-extern void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate );
+COMPRES_PARAMS *videoCodecGetDescriptor (SelectCodecType codec);
+COMPRES_PARAMS *videoCodecGetDescriptorByIndex (int index);
+GtkWidget *create_dialog1 (void);
 
-void okCallback(GtkButton * button, gpointer user_data)
-{
-	return ;
-	#if 0
-	SelectCodecType cur;
-
-		UNUSED_ARG(button);
-		UNUSED_ARG(user_data);
-	//	printf("Callback called\n");
-		cur=findCodec();
-		videoCodecSetcodec(cur);
-		videoCodecConfigureUI();
-#endif
-}
-
-//___________________________________________________________
-void callBackCalc( void )
-{
-uint32_t sz,br;
-	DIA_Calculator(&sz,&br);
-}
 //___________________________________________________________
 uint8_t DIA_videoCodec( SelectCodecType *codec )
 {
-
-	uint8_t ret=0;
-	SelectCodecType old=*codec;
-	uint32_t nb;
-	GtkWidget *widget[30];
-
-		nb=encoderGetNbEncoder();
-	
-	dialog=create_dialogVideoCodec();
-	//gtk_transient(dialog);	
-	gtk_register_dialog(dialog);
-
-	
-	// now set the input one
-	for(uint32_t i=0;i<nb;i++)
-	{
-		widget[i]=gtk_menu_item_new_with_mnemonic (encoderGetIndexedName(i));
-  		gtk_widget_show (widget[i]);
-  		gtk_container_add (GTK_CONTAINER (WID(menu1)), widget[i]);
-#if 0  		
-		if(*codec==mycodec[i].type)
-			{
-				// set
-				gtk_option_menu_set_history(GTK_OPTION_MENU(WID(optionmenu_CodecList)), i);
-			}
-#endif			
-	}
-	gtk_signal_connect(GTK_OBJECT(WID(buttonConfigure)), "clicked",
-		       GTK_SIGNAL_FUNC(okCallback), (void *) 0);
-	gtk_signal_connect(GTK_OBJECT(WID(buttonCalc)), "clicked",
-		       GTK_SIGNAL_FUNC(callBackCalc), (void *) 0);
-
-	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_OK)
-	{
-		
-	//		*codec=findCodec();
-			ret=1;
-	
-	}
-	else
-	{
-		*codec=old;
-	}
-	gtk_widget_destroy(dialog);
-	gtk_unregister_dialog(dialog);
-	return ret;
+#define CONFIGURE 99
+        uint8_t ret=0;
+        SelectCodecType old=*codec;
+        uint32_t nb;
+        GtkWidget *widget[30];
+        const char *name[30];
+        GtkWidget *dialog;
+        
+        nb=encoderGetNbEncoder();
+        
+        dialog=create_dialog1();
+        	
+        gtk_register_dialog(dialog);
+        COMPRES_PARAMS *desc=videoCodecGetDescriptor (*codec);
+        if(!desc) return 0;
+        
+        // now set the input one
+        int memo=0;
+        for(uint32_t i=0;i<nb;i++)
+        {
+                name[i]=encoderGetIndexedName(i);
+                gtk_combo_box_append_text      (GTK_COMBO_BOX (WID(combobox1)),name[i]);
+                if(videoCodecGetDescriptorByIndex (i)==desc) memo=i;
+        }
+        gtk_combo_box_set_active(GTK_COMBO_BOX (WID(combobox1)),memo);
+        gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonConf),CONFIGURE);
+        int running=1;
+        while(running)
+          switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+        {
+          case GTK_RESPONSE_OK:
+          	{
+                  ret=1;
+                    int s=gtk_combo_box_get_active(GTK_COMBO_BOX (WID(combobox1)));
+                    COMPRES_PARAMS *nw=videoCodecGetDescriptorByIndex (s);
+                    *codec=nw->codec;
+                    running=0;
+                  break;
+                }
+          case CONFIGURE:
+          {
+            int s=gtk_combo_box_get_active(GTK_COMBO_BOX (WID(combobox1)));
+            COMPRES_PARAMS *nw=videoCodecGetDescriptorByIndex (s);
+            if(nw->configure) nw->configure(nw);
+            break;
+          }
+          default:
+                running=0;
+                break;
+        }
+        gtk_widget_destroy(dialog);
+        gtk_unregister_dialog(dialog);
+        return ret;
 } 
-#if 0
-SelectCodecType findCodec( void )
+
+GtkWidget *create_dialog1 (void)
 {
-uint8_t j;
-			j=getRangeInMenu(WID(optionmenu_CodecList));
-
-			if(j>=sizeof(mycodec)/sizeof(codecEnumByName)) ADM_assert(0);
-			return mycodec[j].type;
-			
-
-}
-
-#endif
-GtkWidget*
-create_dialogVideoCodec (void)
-{
-  GtkWidget *dialogVideoCodec;
+  GtkWidget *dialog1;
   GtkWidget *dialog_vbox1;
-  GtkWidget *vbox1;
-  GtkWidget *hbox2;
-  GtkWidget *optionmenu_CodecList;
-  GtkWidget *menu1;
-#if 0
-  GtkWidget *ffmpeg_mpeg4;
-  GtkWidget *ffmpeg_h263;
-  GtkWidget *ffmpeg_h263p;
-  GtkWidget *ffmpeg_huffyuv;
-  GtkWidget *xvid;
-  GtkWidget *divx;
-  GtkWidget *mjpeg;
-#endif  
-  GtkWidget *buttonConfigure;
   GtkWidget *hbox1;
-  GtkWidget *buttonCalc;
+  GtkWidget *combobox1;
+  GtkWidget *buttonConf;
   GtkWidget *dialog_action_area1;
   GtkWidget *cancelbutton1;
   GtkWidget *okbutton1;
 
-  dialogVideoCodec = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialogVideoCodec), _("VideoCodec"));
+  dialog1 = gtk_dialog_new ();
+  gtk_window_set_title (GTK_WINDOW (dialog1), _("Video encoder"));
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
-  dialog_vbox1 = GTK_DIALOG (dialogVideoCodec)->vbox;
+  dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
   gtk_widget_show (dialog_vbox1);
-
-  vbox1 = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox1);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
-
-  hbox2 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox2);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbox2, FALSE, FALSE, 0);
-
-  optionmenu_CodecList = gtk_option_menu_new ();
-  gtk_widget_show (optionmenu_CodecList);
-  gtk_box_pack_start (GTK_BOX (hbox2), optionmenu_CodecList, FALSE, FALSE, 0);
-
-  menu1 = gtk_menu_new ();
-#if 0
-  ffmpeg_mpeg4 = gtk_menu_item_new_with_mnemonic (_("FFmpeg Mpeg4"));
-  gtk_widget_show (ffmpeg_mpeg4);
-  gtk_container_add (GTK_CONTAINER (menu1), ffmpeg_mpeg4);
-
-  ffmpeg_h263 = gtk_menu_item_new_with_mnemonic (_("FFmpeg H263"));
-  gtk_widget_show (ffmpeg_h263);
-  gtk_container_add (GTK_CONTAINER (menu1), ffmpeg_h263);
-
-  ffmpeg_h263p = gtk_menu_item_new_with_mnemonic (_("FFmpeg H263+"));
-  gtk_widget_show (ffmpeg_h263p);
-  gtk_container_add (GTK_CONTAINER (menu1), ffmpeg_h263p);
-
-  ffmpeg_huffyuv = gtk_menu_item_new_with_mnemonic (_("FFmpeg Huffyuv"));
-  gtk_widget_show (ffmpeg_huffyuv);
-  gtk_container_add (GTK_CONTAINER (menu1), ffmpeg_huffyuv);
-
-  xvid = gtk_menu_item_new_with_mnemonic (_("Xvid"));
-  gtk_widget_show (xvid);
-  gtk_container_add (GTK_CONTAINER (menu1), xvid);
-
-  divx = gtk_menu_item_new_with_mnemonic (_("Divx"));
-  gtk_widget_show (divx);
-  gtk_container_add (GTK_CONTAINER (menu1), divx);
-
-  mjpeg = gtk_menu_item_new_with_mnemonic (_("Mjpeg"));
-  gtk_widget_show (mjpeg);
-  gtk_container_add (GTK_CONTAINER (menu1), mjpeg);
-#endif
-  gtk_option_menu_set_menu (GTK_OPTION_MENU (optionmenu_CodecList), menu1);
-
-  buttonConfigure = gtk_button_new_with_mnemonic (_("Configure Codec"));
-  gtk_widget_show (buttonConfigure);
-  gtk_box_pack_start (GTK_BOX (hbox2), buttonConfigure, FALSE, FALSE, 0);
 
   hbox1 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox1);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox1), hbox1, TRUE, TRUE, 0);
 
-  buttonCalc = gtk_button_new_with_mnemonic (_("Calculator"));
-  gtk_widget_show (buttonCalc);
-  gtk_box_pack_end (GTK_BOX (hbox1), buttonCalc, FALSE, FALSE, 0);
+  combobox1 = gtk_combo_box_new_text ();
+  gtk_widget_show (combobox1);
+  gtk_box_pack_start (GTK_BOX (hbox1), combobox1, TRUE, TRUE, 0);
 
-  dialog_action_area1 = GTK_DIALOG (dialogVideoCodec)->action_area;
+  buttonConf = gtk_button_new_with_mnemonic (_("Configure"));
+  gtk_widget_show (buttonConf);
+  gtk_box_pack_start (GTK_BOX (hbox1), buttonConf, FALSE, FALSE, 0);
+
+  dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
   cancelbutton1 = gtk_button_new_from_stock ("gtk-cancel");
   gtk_widget_show (cancelbutton1);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialogVideoCodec), cancelbutton1, GTK_RESPONSE_CANCEL);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), cancelbutton1, GTK_RESPONSE_CANCEL);
   GTK_WIDGET_SET_FLAGS (cancelbutton1, GTK_CAN_DEFAULT);
 
   okbutton1 = gtk_button_new_from_stock ("gtk-ok");
   gtk_widget_show (okbutton1);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialogVideoCodec), okbutton1, GTK_RESPONSE_OK);
+  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), okbutton1, GTK_RESPONSE_OK);
   GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
-  GLADE_HOOKUP_OBJECT_NO_REF (dialogVideoCodec, dialogVideoCodec, "dialogVideoCodec");
-  GLADE_HOOKUP_OBJECT_NO_REF (dialogVideoCodec, dialog_vbox1, "dialog_vbox1");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, vbox1, "vbox1");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, hbox2, "hbox2");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, optionmenu_CodecList, "optionmenu_CodecList");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, menu1, "menu1");
-#if 0  
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, ffmpeg_mpeg4, "ffmpeg_mpeg4");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, ffmpeg_h263, "ffmpeg_h263");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, ffmpeg_h263p, "ffmpeg_h263p");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, ffmpeg_huffyuv, "ffmpeg_huffyuv");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, xvid, "xvid");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, divx, "divx");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, mjpeg, "mjpeg");
-#endif  
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, buttonConfigure, "buttonConfigure");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, hbox1, "hbox1");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, buttonCalc, "buttonCalc");
-  GLADE_HOOKUP_OBJECT_NO_REF (dialogVideoCodec, dialog_action_area1, "dialog_action_area1");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, cancelbutton1, "cancelbutton1");
-  GLADE_HOOKUP_OBJECT (dialogVideoCodec, okbutton1, "okbutton1");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, combobox1, "combobox1");
+  GLADE_HOOKUP_OBJECT (dialog1, buttonConf, "buttonConf");
+  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
+  GLADE_HOOKUP_OBJECT (dialog1, cancelbutton1, "cancelbutton1");
+  GLADE_HOOKUP_OBJECT (dialog1, okbutton1, "okbutton1");
 
-  return dialogVideoCodec;
+  return dialog1;
 }
-
 
