@@ -29,7 +29,7 @@ extern uint32_t encoderGetNbEncoder(void);
 extern const char* encoderGetIndexedName(uint32_t i);
 COMPRES_PARAMS *videoCodecGetDescriptor (SelectCodecType codec);
 COMPRES_PARAMS *videoCodecGetDescriptorByIndex (int index);
-GtkWidget *create_dialog1 (void);
+static GtkWidget *create_dialog1 (void);
 
 //___________________________________________________________
 uint8_t DIA_videoCodec( SelectCodecType *codec )
