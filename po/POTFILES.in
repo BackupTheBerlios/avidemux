@@ -31,7 +31,6 @@
 ./avidemux/ADM_audiofilter/audiofilter_mixer.cpp
 ./avidemux/ADM_audiofilter/audioeng_process.cpp
 ./avidemux/ADM_audiofilter/audiofilter_bridge.cpp
-./avidemux/ADM_audiofilter/audiofilter_vorbis.cpp
 ./avidemux/ADM_audiofilter/audioencoder.cpp
 ./avidemux/ADM_audiofilter/audiofilter_dolby.cpp
 ./avidemux/ADM_audiofilter/audioencoder_faac.cpp

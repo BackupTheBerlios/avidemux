@@ -231,7 +231,7 @@ void GUI_NextPrevBlackFrame(int dir)
 
    const int darkness=40;
 
-   DIA_working *work=new DIA_working("Seeking");
+   DIA_working *work=new DIA_working(_("Seeking"));
    orgFrame=curframe;
    while(1)
    {
