@@ -1354,7 +1354,7 @@ uint32_t i,j,cur;
                 {
                       // rebuild a new index
                       printf("We have %u chunks that are too big, adjusting..\n",max);
-                      uint32_t newNbCo=track->nbIndex+max;
+                      uint32_t newNbCo=track->nbIndex+max*2; // *2 is enough, should be.
                       uint32_t w=0;
                       uint32_t one_go;
 
@@ -1381,6 +1381,7 @@ uint32_t i,j,cur;
                                 newindex[w].offset=track->index[i].offset+part*one_go;
                                 newindex[w].size=one_go;
                                 newindex[w].time=track->index[i].time+part*time_increment; 
+                                ADM_assert(w<newNbCo);
                                 w++;
                                 part++;
                                 sz-=one_go;
@@ -1393,7 +1394,7 @@ uint32_t i,j,cur;
                     }
                     delete [] track->index;
                     track->index=newindex;
-                    track->nbIndex=newNbCo;
+                    track->nbIndex=w;
                 }
           return 1;
       }
