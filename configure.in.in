@@ -451,18 +451,33 @@ fi
 
 
 dnl __________________divx______________
-dnl __________________x264 ______________
+dnl __________________Aften ______________
+
+AC_ARG_WITH([aften],
+ AC_HELP_STRING([--without-aften], [Force compilation without aften (default: test)]),
+ [with_aften=${withval}], [with_aften=test])
+
+AC_MSG_CHECKING([if aften support is requested])
+AC_MSG_RESULT($with_aften)
+
+if test "x$with_aften" = "xno"; then
+   have_aften=no
+fi
+if test "x$with_aften" != "xno"; then
 AC_MSG_CHECKING(for aften codec )
 AC_CHECK_HEADER(aften/aften.h,,have_aften=no)
 if test "x$have_aften" = "xyes"; then
-   AC_CHECK_LIB(aften,aften_encode_init,,have_aften=no,-lm )
+ AC_CHECK_LIB(aften,aften_encode_init,,have_aften=no,-lm )
 fi
+fi
+
 if test "x$have_aften" = "xyes"; then
-	AC_DEFINE(USE_AFTEN,1,[use aften ac3 encoder])
+AC_DEFINE(USE_AFTEN,1,[use aften ac3 encoder])
 fi
 
 
-dnl __________________x264 ______________
+dnl __________________/aften ______________
+dnl __________________x264_________________
 AC_MSG_CHECKING(for x264 codec )
 AC_CHECK_HEADER(x264.h,,have_x264=no)
 if test "x$have_x264" = "xyes"; then
