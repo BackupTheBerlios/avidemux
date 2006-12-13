@@ -39,12 +39,20 @@
 
 #include "ADM_colorspace/ADM_rgb.h"
 #include "GUI_render.h"
-    
-
+#include "GUI_accelRender.h"
+#if defined(USE_XV)
+#include "T_xvRender.h"
+#endif
+#if defined (USE_SDL)
+#include "T_sdlRender.h"
+#endif
+#include "prefs.h"
 #include <ADM_assert.h>
     
 void UI_QT4VideoWidget(QFrame *host);
 static QFrame *hostFrame=NULL;
+static QTAccelRender *accelRender=NULL;
+static uint8_t *lastImage=NULL;
 //****************************************************************************************************
 void GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal)
 {}
@@ -102,17 +110,30 @@ class  ADM_Qvideo : public QWidget
           
         }
         ~ADM_Qvideo() {};
+        /**
+            \fn paintEvent( QPaintEvent *ev))
+            \brief Repaint our "video" widget, ignore when accelRender is on
+        */
         void paintEvent(QPaintEvent *ev)
         {
-          if(!displayW || !displayH || !rgbDataBuffer)
+          if(!displayW || !displayH || !rgbDataBuffer || accelRender)
           {
             printf("Nothing to draw\n");
             return ;
           }
-          QImage image(rgbDataBuffer,displayW,displayH,QImage::Format_RGB32);
-            QPainter painter(this);
-            painter.drawImage(QPoint(0,0),image);
-            painter.end();
+          if(accelRender) 
+          {
+            if(lastImage)
+            {
+              accelRender->display(lastImage,displayW,displayH);
+            }
+          }else
+          {
+            QImage image(rgbDataBuffer,displayW,displayH,QImage::Format_RGB32);
+              QPainter painter(this);
+              painter.drawImage(QPoint(0,0),image);
+              painter.end();
+          }
         }
 };
 ADM_Qvideo *videoWindow=NULL;
@@ -145,37 +166,149 @@ uint8_t renderResize(uint32_t w, uint32_t h,renderZoom newzoom)
   printf("[RDR] Resizing to %u x %u\n",displayW,displayH);
   return 1;
 }
-//****************************************************************************************************
+/**
+    \fn renderRefresh(void)
+    \brief Force a redraw of the screen
+*/
 uint8_t renderRefresh(void)
 {
   
-  renderExpose();
+        if(accelRender)
+        {
+            if(lastImage)
+                accelRender->display(lastImage, displayW, displayH);
+        }
+        else
+        {
+                renderExpose();
+        }
   return 1;
 }
 //****************************************************************************************************
 uint8_t renderExpose(void)
 {
 // TODO   if(videoWindow)
+  if(!accelRender)
      videoWindow->repaint();
   return 1;
 }
-//****************************************************************************************************
+/**
+      \fn renderUpdateImage(uint8_t *ptr)
+      \brief Update display with the content of the pointer given as arg
+*/
 uint8_t renderUpdateImage(uint8_t *ptr)
 {
-  rgbConverter.scale(ptr,rgbDataBuffer);
-  renderExpose();
+  if(!accelRender) // Only needed for unaccelerated display
+  {
+      rgbConverter.scale(ptr,rgbDataBuffer);
+      renderExpose();
+  }else
+  {
+      accelRender->display(ptr,displayW,displayH);
+      lastImage=ptr;
+  }
   return 1;
 }
-//****************************************************************************************************
-uint8_t renderStartPlaying( void )
+/**
+    \fn renderStartPlaying( void )
+    \brief Start playing, create an alternate renderer (preferably hw accelerated such as Xv or SDL)
+*/
+  uint8_t renderStartPlaying( void )
 {
-  return 1;
+char *displ;
+unsigned int renderI;
+ADM_RENDER_TYPE render;
+        ADM_assert(!accelRender);
+        // First check if local
+        // We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
+        // in that case we do not even try to use accel
+        
+        // Win32 does not have display
+#ifndef CYG_MANGLING	
+        displ=getenv("DISPLAY");
+        if(!displ)
+        {
+                return 0;
+        }
+        if(strcmp(displ,":0") && strcmp(displ,":0.0"))
+        {
+                printf("Looks like remote display, no Xv :%s\n",displ);
+                return 1;
+        }
+#endif	
+ 
+        if(prefs->get(DEVICE_VIDEODEVICE,&renderI)!=RC_OK)
+        {       
+                render=RENDER_GTK;
+        }else
+        {
+                render=(ADM_RENDER_TYPE)renderI;
+        }
+        switch(render)
+        {
+        
+#if defined(USE_XV)
+              case RENDER_XV:
+                accelRender=new XvAccelRender();
+                if(!accelRender->init(videoWindow,displayW,displayH))
+                {
+                        delete accelRender;
+                        accelRender=NULL;
+                        printf("Xv init failed\n");
+                }
+                else
+                {
+                        printf("Xv init ok\n");
+                }
+                break;
+#endif
+#if defined(USE_SDL)
+              case RENDER_SDL:
+                printf("Trying SDL\n");
+                accelRender=new sdlAccelRender();
+                if(!accelRender->init(videoWindow,displayW,displayH))
+                {
+                        delete accelRender;
+                        accelRender=NULL;
+                        printf("sdl init failed\n");
+                }
+                else
+                {
+                        printf("SDL init ok\n");
+                }
+                break;
+#endif
+                default:break;
+        }
+        if(!accelRender)
+        {
+                rgbConverter.reset(displayW,displayH);
+                printf("No accel used for rendering\n");
+        }
+	else printf("Using accelerated rendering\n");
+	return 1;
 }
-//****************************************************************************************************
+
+/**
+    \fn renderStopPlaying(void)
+    \brief Switch back to regular slow display, destroy accelerated renderer if exists
+*/
 uint8_t renderStopPlaying( void )
 {
-  return 1;
+      if(accelRender)
+      {
+            accelRender->end();
+              delete accelRender;
+      }
+      accelRender=NULL;
+      lastImage=NULL;
+      return 1;
 }
+
+QTAccelRender::QTAccelRender( void)
+{
+}
+
 
 //****************************************************************************************************
 //EOF 
