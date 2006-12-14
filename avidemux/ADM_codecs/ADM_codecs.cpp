@@ -112,7 +112,7 @@ isMpeg12Compatible (uint32_t fourcc)
   CHECK ("mpg1");
   CHECK ("mpg2");
   SWAP32 (fourcc);
-  if (fourcc == 0x10000002)
+  if (fourcc == 0x10000002 || fourcc==0x10000001) //Mplayer fourcc
     mpeg = 1;
   return mpeg;
 #undef CHECK
