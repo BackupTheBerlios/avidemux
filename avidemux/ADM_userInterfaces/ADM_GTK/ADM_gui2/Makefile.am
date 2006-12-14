@@ -5,15 +5,15 @@ noinst_LIBRARIES = libADM_gui2.a
 
 libADM_gui2_a_METASOURCES = AUTO
 
-libADM_gui2_a_SOURCES = GUI_main2.cpp GUI_bindings.cpp GUI_render.cpp GUI_xvDraw.cpp GUI_render.h GUI_ui.h GUI_keymap.cpp GUI_xvDraw.h GUI_menumap.h GUI_sdlDraw.cpp
+libADM_gui2_a_SOURCES = GUI_main2.cpp GUI_bindings.cpp GUI_render.cpp  GUI_render.h GUI_ui.h GUI_keymap.cpp GUI_xvDraw.h GUI_menumap.h 
 
 
-EXTRA_DIST = GUI_accelRender.h  GUI_main2.cpp   GUI_render.h  \
+EXTRA_DIST =   GUI_main2.cpp   GUI_render.h  \
 GUI_ui.h         \
-GUI_bindings.cpp   GUI_menumap.h   GUI_sdlDraw.cpp  GUI_xvDraw.cpp   \
-GUI_keymap.cpp     GUI_render.cpp  GUI_sdlDraw.h    GUI_xvDraw.h
+GUI_bindings.cpp   GUI_menumap.h      \
+GUI_keymap.cpp     GUI_render.cpp  
 
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES= $(all_includes) $(GTK_CFLAGS) -I../../../ -I../../../ADM_libraries/ADM_utilities
-noinst_HEADERS = GUI_accelRender.h GUI_sdlDraw.h
+noinst_HEADERS = 

@@ -14,14 +14,14 @@
  ***************************************************************************/
 #ifndef TSDLRENDER_H
 #define TSDLRENDER_H
-class sdlAccelRender: public QTAccelRender
+class sdlAccelRender: public AccelRender
 {
   protected:
               int     useYV12;
               uint8_t *decoded;
       public:
                                 sdlAccelRender( void ) ;
-              virtual	uint8_t init( QWidget * window, uint32_t w, uint32_t h);
+              virtual	uint8_t init( GUI_Info * window, uint32_t w, uint32_t h);
               virtual	uint8_t end(void);
               virtual   uint8_t display(uint8_t *ptr, uint32_t w, uint32_t h);
 };

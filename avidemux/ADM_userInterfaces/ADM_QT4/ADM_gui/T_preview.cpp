@@ -33,7 +33,10 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QImage>
-
+/* Probably on unix/X11 ..*/
+#ifndef CYG_MANGLING
+#include <QX11Info>
+#endif
 #include "fourcc.h"
 #include "avio.hxx"
 
@@ -41,17 +44,17 @@
 #include "GUI_render.h"
 #include "GUI_accelRender.h"
 #if defined(USE_XV)
-#include "T_xvRender.h"
+#include "GUI_xvRender.h"
 #endif
 #if defined (USE_SDL)
-#include "T_sdlRender.h"
+#include "GUI_sdlRender.h"
 #endif
 #include "prefs.h"
 #include <ADM_assert.h>
     
 void UI_QT4VideoWidget(QFrame *host);
 static QFrame *hostFrame=NULL;
-static QTAccelRender *accelRender=NULL;
+static AccelRender *accelRender=NULL;
 static uint8_t *lastImage=NULL;
 //****************************************************************************************************
 void GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal)
@@ -244,13 +247,18 @@ ADM_RENDER_TYPE render;
         {
                 render=(ADM_RENDER_TYPE)renderI;
         }
+        GUI_Info xinfo;
+        const QX11Info &info=videoWindow->x11Info();
+        xinfo.display=info.display();
+        xinfo.window=videoWindow->winId();
+          
         switch(render)
         {
         
 #if defined(USE_XV)
               case RENDER_XV:
                 accelRender=new XvAccelRender();
-                if(!accelRender->init(videoWindow,displayW,displayH))
+                if(!accelRender->init(&xinfo,displayW,displayH))
                 {
                         delete accelRender;
                         accelRender=NULL;
@@ -266,7 +274,7 @@ ADM_RENDER_TYPE render;
               case RENDER_SDL:
                 printf("Trying SDL\n");
                 accelRender=new sdlAccelRender();
-                if(!accelRender->init(videoWindow,displayW,displayH))
+                if(!accelRender->init(&xinfo,displayW,displayH))
                 {
                         delete accelRender;
                         accelRender=NULL;
@@ -305,9 +313,6 @@ uint8_t renderStopPlaying( void )
       return 1;
 }
 
-QTAccelRender::QTAccelRender( void)
-{
-}
 
 
 //****************************************************************************************************

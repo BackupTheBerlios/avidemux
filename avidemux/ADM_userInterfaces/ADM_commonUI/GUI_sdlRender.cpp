@@ -25,11 +25,6 @@
 #include <sys/time.h>
 
 
-#include <QtCore/QVariant>
-#include <QtGui/QApplication>
-#include <QtGui/QWidget>
-
-
 
 extern "C" {
 #include "SDL/SDL.h"
@@ -45,7 +40,7 @@ extern "C" {
 #include "ADM_commonUI//GUI_render.h"
 
 #include "GUI_accelRender.h"
-#include "T_sdlRender.h"
+#include "GUI_sdlRender.h"
 #include "ADM_assert.h"
 
 //******************************************
@@ -88,7 +83,7 @@ uint8_t sdlAccelRender::end( void)
         
         
 }
-uint8_t sdlAccelRender::init( QWidget * window, uint32_t w, uint32_t h)
+uint8_t sdlAccelRender::init( GUI_Info * window, uint32_t w, uint32_t h)
 {
 int bpp;
 int flags;
@@ -109,8 +104,8 @@ int flags;
         /* Hack to get SDL to use GTK window, ugly but works */
 #if !defined(CONFIG_DARWIN) && !defined(CYG_MANGLING)
         { char SDL_windowhack[32];
-                sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",
-                        window->winId());
+          int winid=(int)window->window;
+                sprintf(SDL_windowhack,"SDL_WINDOWID=%ld",winid);
                 putenv(SDL_windowhack);
         }
 #endif

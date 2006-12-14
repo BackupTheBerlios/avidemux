@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -37,11 +38,15 @@
 //#include "ADM_gui/GUI_vars.h"
 
 
-#include "ADM_commonUI//GUI_render.h"
+#include "ADM_commonUI/GUI_render.h"
 
-#include "ADM_gui2/GUI_accelRender.h"
-#include "ADM_gui2/GUI_xvDraw.h"
-#include "ADM_gui2/GUI_sdlDraw.h"
+#include "ADM_commonUI/GUI_accelRender.h"
+#ifdef USE_XV
+#include "ADM_commonUI/GUI_xvRender.h"
+#endif
+#ifdef USE_SDL
+#include "ADM_commonUI/GUI_sdlRender.h"
+#endif
 
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 
@@ -237,13 +242,21 @@ ADM_RENDER_TYPE render;
         {
                 render=(ADM_RENDER_TYPE)renderI;
         }
+        GUI_Info xinfo;
+        GdkWindow *win;
+          
+        win = gtk_widget_get_parent_window(draw);
+
+        xinfo.window=	GDK_WINDOW_XWINDOW(draw->window);
+        xinfo.display= GDK_WINDOW_XDISPLAY(win);
+
         switch(render)
         {
         
 #if defined(USE_XV)
 	       case RENDER_XV:
 		accel_mode=new XvAccelRender();
-		if(!accel_mode->init(draw,renderW,renderH))
+		if(!accel_mode->init(&xinfo,renderW,renderH))
 		{
 			delete accel_mode;
 			accel_mode=NULL;
@@ -259,7 +272,7 @@ ADM_RENDER_TYPE render;
               case RENDER_SDL:
 		printf("Trying SDL\n");
 		accel_mode=new sdlAccelRender();
-		if(!accel_mode->init(draw,renderW,renderH))
+		if(!accel_mode->init(&xinfo,renderW,renderH))
 		{
 			delete accel_mode;
 			accel_mode=NULL;
@@ -325,9 +338,7 @@ uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h)
     return 1;
 }
 
-AccelRender::AccelRender( void)
-{
-}
+
 
 void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg)
 {

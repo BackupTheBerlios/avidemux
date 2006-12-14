@@ -22,10 +22,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "config.h"
+
+//#define VERBOSE_XV
 
 #ifdef USE_XV
-//#define VERBOSE_XV
+
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <sys/ipc.h>
@@ -33,23 +35,19 @@
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/XShm.h>
-#include <gtk/gtk.h>
-#include <gdk/gdk.h>
-#include <gdk/gdkx.h>
-#include <errno.h>
 
 
-#include "avi_vars.h"
-#include "ADM_assert.h"
+#include "default.h"
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_commonUI//GUI_render.h"
 
-#include "ADM_gui2/GUI_accelRender.h"
-#include "ADM_gui2/GUI_xvDraw.h"
+#include "GUI_accelRender.h"
+#include "GUI_xvRender.h"
+#include "ADM_assert.h"
 
 static uint8_t 	GUI_XvList(Display * dis, uint32_t port, uint32_t * fmt);
-static uint8_t 	GUI_XvInit(GtkWidget * window, uint32_t w, uint32_t h);
+static uint8_t 	GUI_XvInit(GUI_Info * window, uint32_t w, uint32_t h);
 static void 	GUI_XvEnd( void );
 static uint8_t 	GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h);
 static uint8_t 	GUI_XvSync(void);
@@ -60,7 +58,7 @@ XvAccelRender::XvAccelRender( void )
 {
 
 }
-uint8_t XvAccelRender::init( GtkWidget * window, uint32_t w, uint32_t h)
+uint8_t XvAccelRender::init( GUI_Info * window, uint32_t w, uint32_t h)
 {
 	printf("Xv start\n");
 	return  GUI_XvInit( window,  w,  h);
@@ -155,20 +153,26 @@ uint8_t GUI_XvSync(void)
 //------------------------------------
 //
 //------------------------------------
-uint8_t GUI_XvInit(GtkWidget * window, uint32_t w, uint32_t h)
+uint8_t GUI_XvInit(GUI_Info * window, uint32_t w, uint32_t h)
 {
 
-    GdkWindow *win;
+
     unsigned int ver, rel, req, ev, err;
     unsigned int port, adaptors;
     static XvAdaptorInfo *ai;
     static XvAdaptorInfo *curai;
-   
-
+    
+#if 0
     win = gtk_widget_get_parent_window(window);
     xv_display = GDK_WINDOW_XDISPLAY(win);
 //      xv_win= RootWindow(xv_display,0);
     xv_win = GDK_WINDOW_XWINDOW(GTK_WIDGET(window)->window);
+#endif    
+
+    xv_display=(Display *)window->display;
+    xv_win=window->window;
+    
+    
 #define WDN xv_display
     xv_port = 0;
 
