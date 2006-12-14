@@ -87,7 +87,7 @@ typedef struct TimeStamp
 }TimeStamp;
 static const char Type[5]={'X','I','P','B','P'};
 
-#define MAX_PUSHED 100
+#define MAX_PUSHED 200
 
 static uint32_t nbPushed,nbGop,nbImage;
 static TimeStamp firstStamp,lastStamp;
@@ -352,10 +352,14 @@ stop_found:
 
          dumpPts(out,demuxer,firstPicPTS,nbTracks);
 
-	if( imageAR == 2 || imageAR == 3 ){
-		qfprintf(out,"# Video Aspect Ratio : %s\n", (imageAR == 2 ? "4:3" : "16:9"));
-	}else{
-          GUI_Error_HIG(_("Can't determine aspect ratio"),NULL);
+         switch(imageAR)
+         {
+           case 1: 	qfprintf(out,"# Video Aspect Ratio : %s\n", "1:1" );break;
+           case 2: 	qfprintf(out,"# Video Aspect Ratio : %s\n", "4:3" );break;
+           case 3: 	qfprintf(out,"# Video Aspect Ratio : %s\n", "16:9" );break;
+           default:
+              printf("imageAR=%u\n",imageAR);
+              GUI_Error_HIG(_("Can't determine aspect ratio"),NULL);
 	}
 
         /* Now update......... */

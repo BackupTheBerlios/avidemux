@@ -387,7 +387,11 @@ char *start;
                 }
                 delete work;
                 fclose(file);
-                
+                if(!_nbFrames)
+                {
+                  printf("No image!\n");
+                  return 0; 
+                }
                         // Drop the last P/B frames as we won't be able to decode them
                         // (last frame must be an I frame for decodeGop to work)
                         uint32_t dropped=0;

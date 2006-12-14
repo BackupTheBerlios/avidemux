@@ -32,7 +32,7 @@
 #include "dmx_identify.h"
 
 #define MAX_PROBE (5*1024*1024)
-#define MIN_DETECT 66
+#define MIN_DETECT 40
 
 static uint8_t probeTs(fileParser *parser);
 
