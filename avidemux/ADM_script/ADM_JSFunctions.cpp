@@ -439,6 +439,9 @@ JSBool pathOnly(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
   char *name=NULL;
   char *orgName = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
   PathStripName(orgName);
+  /* Remove last / or last \ */
+  int l=strlen(orgName);
+  if(l) orgName[l-1]=0;
   *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,orgName));
   return JS_TRUE;
 }// end systemExecute
