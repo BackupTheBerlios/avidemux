@@ -248,10 +248,12 @@ ADM_RENDER_TYPE render;
                 render=(ADM_RENDER_TYPE)renderI;
         }
         GUI_Info xinfo;
+#ifndef CYG_MANGLING
         const QX11Info &info=videoWindow->x11Info();
         xinfo.display=info.display();
         xinfo.window=videoWindow->winId();
-          
+         
+#endif 
         switch(render)
         {
         

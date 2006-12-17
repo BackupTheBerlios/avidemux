@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "config.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <glib.h>
 #include <signal.h>
@@ -25,6 +26,13 @@
 #ifdef HAVE_GETTEXT
 #include <libintl.h>
 #include <locale.h>
+#endif
+#include "default.h"
+
+#ifdef CYG_MANGLING
+#define WIN32_CLASH
+#include "windows.h"
+#include "wingdi.h"
 #endif
 
 #define __DECLARE__

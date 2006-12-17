@@ -25,7 +25,9 @@
 #include <unistd.h>
 
 #include <gtk/gtk.h>
+#ifndef CYG_MANGLING
 #include <gdk/gdkx.h>
+#endif
 #include <time.h>
 #include <sys/time.h>
 
@@ -246,10 +248,10 @@ ADM_RENDER_TYPE render;
         GdkWindow *win;
           
         win = gtk_widget_get_parent_window(draw);
-
+#ifndef CYG_MANGLING
         xinfo.window=	GDK_WINDOW_XWINDOW(draw->window);
         xinfo.display= GDK_WINDOW_XDISPLAY(win);
-
+#endif
         switch(render)
         {
         
