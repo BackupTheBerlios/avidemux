@@ -14,7 +14,7 @@ at amistry@am-productions.biz
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
-
+#include "config.h"
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -23,7 +23,7 @@ at amistry@am-productions.biz
 
 using namespace std;
 
-#ifdef WIN32
+#ifdef CYG_MANGLING
 	const char DIRECTORY_DELIMITOR = '\\';
 #else
 	const char DIRECTORY_DELIMITOR = '/';
