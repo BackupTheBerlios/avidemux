@@ -183,11 +183,42 @@ int             GUI_Question(const char *alertstring)
           if(reply==QMessageBox::Yes) return 1;
           return 0;
 }
-//****************************************************************************************************
+/**
+    \fn GUI_Alternate(char *title,char *choice1,char *choice2)
+    \brief Popup a dialog box name title with 2 buttons (choice1/choice2)
+    \return 0 if first is selected, 1 if second
+*/
 int      GUI_Alternate(char *title,char *choice1,char *choice2)
 {
-   return 0;
-  
+int reply;
+QMessageBox *box;
+    if (beQuiet)
+              {
+                      printf("Alternate<%s>: %s or %s\n", title,choice1,choice2);
+                      return 0;
+              }
+
+char alertstring[1024];
+
+        box=new QMessageBox(QuiMainWindows);
+        box->setWindowTitle("Question ?");
+        box->addButton(choice1,QMessageBox::YesRole);
+        box->addButton(choice2,QMessageBox::NoRole);
+         if (title)
+        {
+              snprintf(alertstring,1024,"%s",title);
+        }else
+        {
+            snprintf(alertstring,1024,"Question");
+        }
+        box->setText(alertstring);
+        box->setIcon(QMessageBox::Question);
+        reply = box->exec();
+        delete box;
+        printf("Reply:%d\n",reply);
+        if(reply==0) return 1;
+        return 0;
+
 }
 //****************************************************************************************************
 uint8_t  GUI_getDoubleValue(double *valye, float min, float max, const char *title)

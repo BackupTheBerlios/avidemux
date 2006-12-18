@@ -25,9 +25,10 @@
 #include "ADM_osSupport/ADM_misc.h"
 #include "DIA_working.h"
 #include "DIA_encoding.h"
-    
-extern void UI_purge(void);
+#include "ADM_toolkit/toolkit.hxx"
 
+extern void UI_purge(void);
+static int stopReq=0;
 class encodingWindow : public QDialog
 {
      Q_OBJECT
@@ -36,6 +37,7 @@ class encodingWindow : public QDialog
      encodingWindow();
      Ui_encodingDialog ui;
  public slots:
+     void buttonPressed(void ) { printf("StopReq\n");stopReq=1;}
  private slots:
  private:
 };
@@ -44,13 +46,13 @@ class encodingWindow : public QDialog
 encodingWindow::encodingWindow()     : QDialog()
  {
      ui.setupUi(this);
+     connect( (ui.pushButton),SIGNAL(pressed()),this,SLOT(buttonPressed()));
  }
 //*******************************************
 #define WIDGET(x) (window->ui.x)
 #define WRITEM(x,y) window->ui.x->setText(y)
 #define WRITE(x) WRITEM(x,string)
 /*************************************/
-static uint8_t stopReq=0;
 static char string[80];
 static encodingWindow *window=NULL;
 DIA_encoding::DIA_encoding( uint32_t fps1000 )
@@ -71,6 +73,7 @@ uint32_t useTray=0;
         _lastFrame=0;
         _fps_average=0;
         _total=1000;
+         window->setModal(TRUE);
          window->show();
 
 }
@@ -354,10 +357,11 @@ uint8_t DIA_encoding::isAlive( void )
 
         if(stopReq)
         {
-//                 if(DIA_Paused(  ))
-//                 {
-//                         stopReq=0;
-//                 }
+          if(GUI_Alternate("The encoding is paused. Do you want to resume or abort ?",
+                              "Resume","Abort"))
+                 {
+                         stopReq=0;
+                 }
         }
         if(!stopReq) return 1;
         return 0;
