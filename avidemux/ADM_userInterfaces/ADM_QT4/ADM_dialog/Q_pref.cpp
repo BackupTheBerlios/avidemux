@@ -26,8 +26,26 @@
 #include "ADM_toolkit/toolkit.hxx"
 
 static void setpp(void);
+/*******************************************************/
+class prefWindow : public QDialog
+{
+     Q_OBJECT
+
+ public:
+     prefWindow();
+     Ui_prefDialog ui;
+ public slots:
+ private slots:
+ private:
+};
 
 
+prefWindow::prefWindow()     : QDialog()
+ {
+     ui.setupUi(this);
+     //connect( (ui.pushButton),SIGNAL(pressed()),this,SLOT(buttonPressed()));
+ }
+/*******************************************************/
 
 extern void 		AVDM_audioPref( void );
 
@@ -77,18 +95,20 @@ uint32_t mthreads=0;
 uint32_t downmix;
 uint32_t mpeg_no_limit=0;
 
-        Ui_prefDialog dialog;
+        prefWindow dialog;
         
-        dialog.setupUi(NULL);
+        //
+#define WIDGET(x) (dialog.ui.x)
 
         if(!prefs->get(FEATURE_USE_SYSTRAY,&useTray)) useTray=0;
-//         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonSystray)),useTray);
+        WIDGET(checkBoxSystray)->setChecked(useTray);
+
         
         if(!prefs->get(FEATURE_MPEG_NO_LIMIT,&mpeg_no_limit)) mpeg_no_limit=0;
-//         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonLimit)),mpeg_no_limit);
-        
+        //?WIDGET(checkBoxSystray)->setChecked(useTray);
 
 //****************************	
+#if 0
 #if 0
 #define SET_CPU(x,y) gtk_widget_set_sensitive(WID(check##x),0); \
         if(CpuCaps::has##y()) gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(check##x)),1);
@@ -100,53 +120,42 @@ uint32_t mpeg_no_limit=0;
         SET_CPU(3DNOW,3DNOW);
         SET_CPU(SSE,SSE);
         SET_CPU(SSE2,SSE2);
-        //gtk_widget_set_sensitive( (WID(checkAltivec)),0);
-//         gtk_widget_set_sensitive( (WID(checkbuttonReuseLog)),0);
+#endif        
 //****************************
 #ifdef HAVE_AUDIO
 	olddevice=newdevice=AVDM_getCurrentDevice();
 #endif
 	
-	#define CONNECT(A,B)  gtk_signal_connect (GTK_OBJECT(lookup_widget(dialog,#A)), "clicked", \
-		      GTK_SIGNAL_FUNC (B), (void *) NULL);
-
-	
-#define SPIN_GET(x,y) {x= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(WID(y))) ;}
-#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(y)),(gfloat)x) ;}
-
 	// Alsa
         if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &str) != RC_OK )
                str = ADM_strdup("plughw:0,0");
-//         gtk_write_entry_string(WID(entryALSADevice), str);
+        WIDGET(lineEditAlsa)->setText(str);
         ADM_dealloc(str);
 	// Multithreads
 	if(!prefs->get(FEATURE_MULTI_THREAD, &mthreads))
 	{
 		mthreads=0;		
 	}
-//         SPIN_SET(mthreads,spinbuttonThread);
+        WIDGET(spinBox)->setValue(mthreads);
+
 	// VCD/SVCD split point		
 	if(!prefs->get(SETTINGS_MPEGSPLIT, &autosplit))
 	{
 		autosplit=690;		
 	}
 	// Fill entry
-//          SPIN_SET(autosplit,spinbuttonMPEGSplit);
-        		
+        WIDGET(spinBoxSplit)->setValue(autosplit);		
 	if(!prefs->get(FEATURE_USE_LAVCODEC_MPEG, &lavcodec_mpeg))
 	{
 		lavcodec_mpeg=0;		
-	}		
-// 	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonLibavcodec)),
-// 			lavcodec_mpeg);
-        
+	}
+        WIDGET(checkBoxLavMpeg)->setChecked(lavcodec_mpeg);		
         // Open DML (Gmv)
         if(!prefs->get(FEATURE_USE_ODML, &use_odml))
         {
           use_odml=0;                
-        }               
-//         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonOpenDML)),
-//                                       use_odml);
+        }   
+        WIDGET(checkBoxopenDML)->setChecked(use_odml);
 
         if(!prefs->get(FEATURE_AUDIOBAR_USES_MASTER, &useMaster))
                 useMaster=0;
@@ -157,17 +166,17 @@ uint32_t mpeg_no_limit=0;
 
         if(!prefs->get(FEATURE_TRYAUTOIDX, &useAutoIndex))
                 useAutoIndex=0;
-//         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonAutoindex)),useAutoIndex);
+        WIDGET(checkBoxAutoIndex)->setChecked(useAutoIndex);
 
         
         if(!prefs->get(FEATURE_SWAP_IF_A_GREATER_THAN_B, &useSwap))
                 useSwap=0;
-//         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonSwapAB)),useSwap);
+        WIDGET(checkBoxSwapAB)->setChecked(useSwap);
 
 
         if(!prefs->get(FEATURE_DISABLE_NUV_RESYNC, &useNuv))
                 useNuv=0;
-//         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonNuvResync)),useNuv);
+        WIDGET(checkBoxNuv)->setChecked(useNuv);
         // _____________Message level_____________
         //________________________________________
 //         GtkComboBox     *combo_box;
@@ -175,11 +184,17 @@ uint32_t mpeg_no_limit=0;
         prefs->get(MESSAGE_LEVEL,&msg);
 //         combo_box=GTK_COMBO_BOX(WID(comboboxMessageLevel));
 //         gtk_combo_box_set_active(combo_box,msg);
+#define NB_MSG 3
+        const char *msgT[NB_MSG]={
+            _("No alerts"),
+            _("Only Errors"),
+            _("All Messages")
+        };
+        for(int i=0;i<NB_MSG;i++)
+          WIDGET(comboBoxMessage)->addItem(msgT[i]);
+         WIDGET(comboBoxMessage)->setCurrentIndex(msg);
         
         // ___________Video accel device ______________________________________________
-        
-        
-//         combo_box=GTK_COMBO_BOX(WID(comboboxVideoOutput));
         int vd=0;
         if(prefs->get(DEVICE_VIDEODEVICE,&renderI)!=RC_OK)
         {       
@@ -194,9 +209,9 @@ uint32_t mpeg_no_limit=0;
                         {
                                 vd=i;
                         }
-//                 gtk_combo_box_append_text      (combo_box,myVideoDevice[i].name);
-        }               
-//         gtk_combo_box_set_active(combo_box,vd);
+                WIDGET(comboBoxVideo)->addItem(myVideoDevice[i].name);
+        }
+               WIDGET(comboBoxVideo)->setCurrentIndex(vd);
 #ifdef HAVE_AUDIO
         // ___________ Downmixing ______________________________________________
         if(prefs->get(DOWNMIXING_PROLOGIC,&downmix)!=RC_OK)
@@ -214,28 +229,27 @@ uint32_t mpeg_no_limit=0;
                 {
                         k=i;
                 }
-//                 gtk_combo_box_append_text      (combo_box,audioDeviceList[i].name);
+                WIDGET(comboBoxAudioDevice)->addItem(audioDeviceList[i].name);
         }
-//         gtk_combo_box_set_active(combo_box,k);
+        WIDGET(comboBoxAudioDevice)->setCurrentIndex(k);
 #endif
         //______________________________________________________
         // Callback for button
 //         gtk_signal_connect(GTK_OBJECT(WID(buttonPostprocLevel)), "clicked",GTK_SIGNAL_FUNC(setpp),   NULL);
 	 // __________ run _____________________
-//        dialog.exec();
-// 	gtk_dialog_run(GTK_DIALOG(dialog));
+        if(QDialog::Accepted==dialog.exec())
 	{
 		ret=1;
 #ifdef HAVE_AUDIO
 		// Limit
-                mpeg_no_limit=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonLimit)));
-		prefs->set(FEATURE_MPEG_NO_LIMIT, mpeg_no_limit);
+//                mpeg_no_limit=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonLimit)));
+//		prefs->set(FEATURE_MPEG_NO_LIMIT, mpeg_no_limit);
                 // Get downmix
 //                 k=gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxDownMix)));
                 prefs->set(DOWNMIXING_PROLOGIC,k);
                 
 		// Get device
-// 		k=gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxAudioOutput)));
+                k= WIDGET(comboBoxAudioDevice)->currentIndex();
 		newdevice=audioDeviceList[k].id;
 		if(newdevice!=olddevice)
 		{
@@ -243,22 +257,22 @@ uint32_t mpeg_no_limit=0;
 		}
                 //
                 //alsa device
-//                 str=gtk_editable_get_chars(GTK_EDITABLE (WID(entryALSADevice)), 0, -1);
+                str=NULL;
+                //str=WIDGET(lineEditAlsa)->text().toAscii();
                 if(str)
                         prefs->set(DEVICE_AUDIO_ALSA_DEVICE, str);
 #endif
                 uint32_t s;
-//                 s=gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxMessageLevel)));
+                s=WIDGET(comboBoxMessage)->currentIndex();
                 prefs->set(MESSAGE_LEVEL,s);
                 // video device
-
-//                 k=gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxVideoOutput)));
+                k=WIDGET(comboBoxVideo)->currentIndex();
                 render=myVideoDevice[k].type;
                 renderI=(int)render;
                 prefs->set(DEVICE_VIDEODEVICE,renderI);
         
                 //**************
-//                 useTray=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonSystray)));
+                useTray=WIDGET(checkBoxSystray)->checkState();
                 prefs->set(FEATURE_USE_SYSTRAY,useTray);
                 
                 //*************
@@ -268,28 +282,27 @@ uint32_t mpeg_no_limit=0;
 //                         prefs->set(FEATURE_AUDIOBAR_USES_MASTER,(uint32_t) 0);
 
                 ///*********
-// 		lavcodec_mpeg=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonLibavcodec)));
-		prefs->set(FEATURE_USE_LAVCODEC_MPEG, lavcodec_mpeg);
+                lavcodec_mpeg=WIDGET(checkBoxLavMpeg)->checkState();		
+                prefs->set(FEATURE_USE_LAVCODEC_MPEG, lavcodec_mpeg);
                 
-//                 use_odml=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonOpenDML)));
+                use_odml=WIDGET(checkBoxopenDML)->checkState();
                 prefs->set(FEATURE_USE_ODML, use_odml);
                 
-//                 SPIN_GET(autosplit,spinbuttonMPEGSplit);
-		prefs->set(SETTINGS_MPEGSPLIT, autosplit);
+                autosplit=WIDGET(spinBoxSplit)->value();		
+                prefs->set(SETTINGS_MPEGSPLIT, autosplit);
                 
                 //
-//                 SPIN_GET(mthreads,spinbuttonThread);
+                mthreads=WIDGET(spinBox)->value();	
                 if(mthreads<2) mthreads=0;
                 prefs->set(FEATURE_MULTI_THREAD, mthreads);
-                //
 
-//                 useAutoIndex=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonAutoindex)));
+                useAutoIndex=WIDGET(checkBoxAutoIndex)->checkState();
                 prefs->set(FEATURE_TRYAUTOIDX, useAutoIndex);
 
-//                 useSwap=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonSwapAB)));
+                useSwap=WIDGET(checkBoxSwapAB)->checkState(); 
                 prefs->set(FEATURE_SWAP_IF_A_GREATER_THAN_B, useSwap);
 
-//                 useNuv=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonNuvResync)));
+                useNuv=WIDGET(checkBoxNuv)->checkState(); 
                 prefs->set(FEATURE_DISABLE_NUV_RESYNC, useNuv);
 		
 	}
