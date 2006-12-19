@@ -147,7 +147,6 @@ uint8_t  DIA_v2v(char **vobname, char **ifoname,char **vobsubname) {return 0;}
 uint8_t DIA_RecentFiles( char **name ){return 0;}
 
 uint8_t DIA_about( void ){return 0;}
-uint8_t DIA_Preferences(void){return 0;}
 void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate ){return ;}
 uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss){return 0;}
 void  GUI_displayBitrate( void ){return ;}
