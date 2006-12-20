@@ -2292,8 +2292,8 @@ void A_audioTrack( void )
                                 delete aviaudiostream;
                                 aviaudiostream=NULL;
                                 video_body->getAudioStream(&aviaudiostream);
-                                A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
                         }
+                        A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
                         break;
                 default:
                         ADM_assert(0);
