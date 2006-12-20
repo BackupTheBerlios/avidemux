@@ -150,7 +150,7 @@ uint8_t DIA_about( void ){return 0;}
 void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate ){return ;}
 uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss){return 0;}
 void  GUI_displayBitrate( void ){return ;}
-int GUI_handleVFilter (void){return 0;}
+//int GUI_handleVFilter (void){return 0;}
 uint8_t  initFileSelector(void){return 0;}
 uint8_t initGUI( void ){return 1;}
 
