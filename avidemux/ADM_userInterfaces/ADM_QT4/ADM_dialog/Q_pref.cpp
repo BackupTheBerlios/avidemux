@@ -19,6 +19,7 @@
 
 # include "prefs.h"
 #include "ADM_audiodevice/audio_out.h"
+#include "ADM_audio/ADM_audiodef.h"
 
 #include "ADM_assert.h"
 #include "GUI_render.h"
@@ -70,7 +71,12 @@ static stVideoDevice myVideoDevice[]
 
 uint8_t DIA_Preferences(void);
 
+/**
+      \fn     DIA_Preferences(void)
+      \brief  Show the preference dialog box
 
+
+*/
 uint8_t DIA_Preferences(void)
 {
 uint8_t ret=0;
@@ -105,7 +111,7 @@ uint32_t mpeg_no_limit=0;
 
         
         if(!prefs->get(FEATURE_MPEG_NO_LIMIT,&mpeg_no_limit)) mpeg_no_limit=0;
-        //?WIDGET(checkBoxSystray)->setChecked(useTray);
+          WIDGET(checkBoxDVDNonStd)->setChecked(mpeg_no_limit);
 
 //****************************	
 #if 0
@@ -126,29 +132,29 @@ uint32_t mpeg_no_limit=0;
 	olddevice=newdevice=AVDM_getCurrentDevice();
 #endif
 	
-	// Alsa
+        // Alsa
         if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &str) != RC_OK )
-               str = ADM_strdup("plughw:0,0");
+                str = ADM_strdup("plughw:0,0");
         WIDGET(lineEditAlsa)->setText(str);
         ADM_dealloc(str);
-	// Multithreads
-	if(!prefs->get(FEATURE_MULTI_THREAD, &mthreads))
-	{
-		mthreads=0;		
-	}
+        // Multithreads
+        if(!prefs->get(FEATURE_MULTI_THREAD, &mthreads))
+        {
+                mthreads=0;		
+        }
         WIDGET(spinBox)->setValue(mthreads);
-
-	// VCD/SVCD split point		
-	if(!prefs->get(SETTINGS_MPEGSPLIT, &autosplit))
-	{
-		autosplit=690;		
-	}
-	// Fill entry
+  
+        // VCD/SVCD split point		
+        if(!prefs->get(SETTINGS_MPEGSPLIT, &autosplit))
+        {
+                autosplit=690;		
+        }
+        // Fill entry
         WIDGET(spinBoxSplit)->setValue(autosplit);		
-	if(!prefs->get(FEATURE_USE_LAVCODEC_MPEG, &lavcodec_mpeg))
-	{
-		lavcodec_mpeg=0;		
-	}
+        if(!prefs->get(FEATURE_USE_LAVCODEC_MPEG, &lavcodec_mpeg))
+        {
+                lavcodec_mpeg=0;		
+        }
         WIDGET(checkBoxLavMpeg)->setChecked(lavcodec_mpeg);		
         // Open DML (Gmv)
         if(!prefs->get(FEATURE_USE_ODML, &use_odml))
@@ -159,7 +165,10 @@ uint32_t mpeg_no_limit=0;
 
         if(!prefs->get(FEATURE_AUDIOBAR_USES_MASTER, &useMaster))
                 useMaster=0;
-        
+        if(useMaster)
+            WIDGET(radioButtonMaster)->setChecked(1);
+          else
+            WIDGET(radioButtonPCM)->setChecked(1);
 //         if(useMaster) RADIO_SET(radiobuttonMaster,1);
 //                 else RADIO_SET(radiobuttonPCM,1);
 
@@ -179,11 +188,9 @@ uint32_t mpeg_no_limit=0;
         WIDGET(checkBoxNuv)->setChecked(useNuv);
         // _____________Message level_____________
         //________________________________________
-//         GtkComboBox     *combo_box;
+
         unsigned int msg=2;
         prefs->get(MESSAGE_LEVEL,&msg);
-//         combo_box=GTK_COMBO_BOX(WID(comboboxMessageLevel));
-//         gtk_combo_box_set_active(combo_box,msg);
 #define NB_MSG 3
         const char *msgT[NB_MSG]={
             _("No alerts"),
@@ -218,8 +225,11 @@ uint32_t mpeg_no_limit=0;
         {       
             downmix=0;
         }
-//         combo_box=GTK_COMBO_BOX(WID(comboboxDownMix));
-//         gtk_combo_box_set_active(combo_box,downmix);
+        for( int i=0;i<NB_LOCAL_DOWNMIX;i++)
+        {
+          WIDGET(comboBoxDownmix)->addItem(localDownmixing[i].desc);
+        }
+        WIDGET(comboBoxDownmix)->setCurrentIndex(downmix);
 	// ___________ Audio accel device ______________________________________________
         
 //         combo_box=GTK_COMBO_BOX(WID(comboboxAudioOutput));
@@ -236,29 +246,29 @@ uint32_t mpeg_no_limit=0;
         //______________________________________________________
         // Callback for button
 //         gtk_signal_connect(GTK_OBJECT(WID(buttonPostprocLevel)), "clicked",GTK_SIGNAL_FUNC(setpp),   NULL);
-	 // __________ run _____________________
+        // __________ run _____________________
         if(QDialog::Accepted==dialog.exec())
-	{
-		ret=1;
+        {
+                ret=1;
 #ifdef HAVE_AUDIO
-		// Limit
-//                mpeg_no_limit=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonLimit)));
-//		prefs->set(FEATURE_MPEG_NO_LIMIT, mpeg_no_limit);
+                // Limit
+                mpeg_no_limit=WIDGET(checkBoxDVDNonStd)->checkState();
+                prefs->set(FEATURE_MPEG_NO_LIMIT, mpeg_no_limit);
                 // Get downmix
-//                 k=gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxDownMix)));
-                prefs->set(DOWNMIXING_PROLOGIC,k);
+                downmix=WIDGET(comboBoxDownmix)->currentIndex();
+                prefs->set(DOWNMIXING_PROLOGIC,downmix);
                 
-		// Get device
+                // Get device
                 k= WIDGET(comboBoxAudioDevice)->currentIndex();
-		newdevice=audioDeviceList[k].id;
-		if(newdevice!=olddevice)
-		{
-			AVDM_switch(newdevice);
-		}
+                newdevice=audioDeviceList[k].id;
+                if(newdevice!=olddevice)
+                {
+                        AVDM_switch(newdevice);
+                }
                 //
                 //alsa device
                 str=NULL;
-                //str=WIDGET(lineEditAlsa)->text().toAscii();
+                str=WIDGET(lineEditAlsa)->text().toAscii().data();
                 if(str)
                         prefs->set(DEVICE_AUDIO_ALSA_DEVICE, str);
 #endif
@@ -276,10 +286,10 @@ uint32_t mpeg_no_limit=0;
                 prefs->set(FEATURE_USE_SYSTRAY,useTray);
                 
                 //*************
-//                 if(RADIO_GET(radiobuttonMaster))
-//                         prefs->set(FEATURE_AUDIOBAR_USES_MASTER,(uint32_t) 1);
-//                 else
-//                         prefs->set(FEATURE_AUDIOBAR_USES_MASTER,(uint32_t) 0);
+                if(WIDGET(radioButtonMaster)->isChecked())
+                            prefs->set(FEATURE_AUDIOBAR_USES_MASTER,(uint32_t) 1);
+                else
+                          prefs->set(FEATURE_AUDIOBAR_USES_MASTER,(uint32_t) 0);
 
                 ///*********
                 lavcodec_mpeg=WIDGET(checkBoxLavMpeg)->checkState();		

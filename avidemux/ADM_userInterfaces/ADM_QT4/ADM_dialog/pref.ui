@@ -90,7 +90,7 @@
      </widget>
      <widget class="QWidget" name="tab_2" >
       <attribute name="title" >
-       <string>Inout</string>
+       <string>Input</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <property name="margin" >

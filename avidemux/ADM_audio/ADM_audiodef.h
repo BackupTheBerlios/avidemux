@@ -31,4 +31,19 @@ typedef enum CHANNEL_CONF
     CHANNEL_DOLBY_PROLOGIC2,
     CHANNEL_LAST
 };
+
+typedef struct
+{
+  const char    *desc;
+  CHANNEL_CONF  conf;
+}AudioChannelDesc;
+const AudioChannelDesc localDownmixing[]=
+{
+  {"No downmixing (multichannel)", CHANNEL_INVALID},
+  {"Stereo", CHANNEL_STEREO},
+  {"Dolby Prologic", CHANNEL_DOLBY_PROLOGIC},
+  {"Dolby Prologic II", CHANNEL_DOLBY_PROLOGIC2}
+  
+};
+#define NB_LOCAL_DOWNMIX (sizeof(localDownmixing)/sizeof(AudioChannelDesc))
 #endif
