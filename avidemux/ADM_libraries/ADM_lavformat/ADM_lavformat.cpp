@@ -157,6 +157,10 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	{
                 case MUXER_MP4:
                 case MUXER_PSP:
+                        strcpy(oc->title,"Avidemux");
+                        strcpy(oc->author,"Avidemux");
+                        c->sample_aspect_ratio.num=4;
+                        c->sample_aspect_ratio.den=3;
                         if(isMpeg4Compatible(info->fcc))
                         {
                                 c->codec_id = CODEC_ID_MPEG4;
@@ -303,49 +307,58 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	//________
         if(audioheader)
         {
-	audio_st = av_new_stream(oc, 1);
-	if (!audio_st) 
-	{
-		printf("Lav: new stream failed\n");
-		return 0;
-	}
-
-		
-	c = audio_st->codec;
-        c->frame_size=1024; //For AAC mainly, sample per frame
-        printf("[LavFormat] Bitrate %u\n",(audioheader->byterate*8)/1000);
-        switch(audioheader->encoding)
-        {
-                case WAV_AC3: c->codec_id = CODEC_ID_AC3;break;
-                case WAV_MP2: c->codec_id = CODEC_ID_MP2;break;
-                case WAV_MP3:
-#warning FIXME : Probe deeper
-                            c->frame_size=1152;
-                            c->codec_id = CODEC_ID_MP3;
-                            break;
-                case WAV_PCM: 
-                                // One chunk is 10 ms (1/100 of fq)
-                                c->frame_size=4;
-                                c->codec_id = CODEC_ID_PCM_S16LE;break;
-                case WAV_AAC: 
-                                c->extradata=audioextraData;
-                                c->extradata_size= audioextraSize;
-                                c->codec_id = CODEC_ID_AAC;
-                                break;
-                default:
-                        printf("Cant mux that ! audio\n"); 
-                        printf("Cant mux that ! audio\n");
-                        c->codec_id = CODEC_ID_MP2;
-                        return 0;
-                        break;
-        }
-	c->codec_type = CODEC_TYPE_AUDIO;
-	
-	c->bit_rate = audioheader->byterate*8;
-        c->rc_buffer_size=(c->bit_rate/(2*8)); // 500 ms worth
-	_audioFq=c->sample_rate = audioheader->frequency;
-	c->channels = audioheader->channels;
-        _audioByterate=audioheader->byterate;
+          audio_st = av_new_stream(oc, 1);
+          if (!audio_st) 
+          {
+                  printf("Lav: new stream failed\n");
+                  return 0;
+          }
+  
+                  
+          c = audio_st->codec;
+          c->frame_size=1024; //For AAC mainly, sample per frame
+          printf("[LavFormat] Bitrate %u\n",(audioheader->byterate*8)/1000);
+          _audioFq=c->sample_rate = audioheader->frequency;
+#if 0
+           if(_type== MUXER_PSP && audioheader->encoding==WAV_AAC)
+            {
+                    _audioFq=c->sample_rate = audioheader->frequency/2;                 //_audioFq*=2; // SBR
+             }
+#endif
+          
+          switch(audioheader->encoding)
+          {
+                  case WAV_AC3: c->codec_id = CODEC_ID_AC3;break;
+                  case WAV_MP2: c->codec_id = CODEC_ID_MP2;break;
+                  case WAV_MP3:
+  #warning FIXME : Probe deeper
+                              c->frame_size=1152;
+                              c->codec_id = CODEC_ID_MP3;
+                              break;
+                  case WAV_PCM: 
+                                  // One chunk is 10 ms (1/100 of fq)
+                                  c->frame_size=4;
+                                  c->codec_id = CODEC_ID_PCM_S16LE;break;
+                  case WAV_AAC: 
+                                  c->extradata=audioextraData;
+                                  c->extradata_size= audioextraSize;
+                                  c->codec_id = CODEC_ID_AAC;
+                                  break;
+                  default:
+                          printf("Cant mux that ! audio\n"); 
+                          printf("Cant mux that ! audio\n");
+                          c->codec_id = CODEC_ID_MP2;
+                          return 0;
+                          break;
+          }
+          c->codec_type = CODEC_TYPE_AUDIO;
+          
+          c->bit_rate = audioheader->byterate*8;
+          c->rc_buffer_size=(c->bit_rate/(2*8)); // 500 ms worth
+          
+          c->channels = audioheader->channels;
+          _audioByterate=audioheader->byterate;
+          
         }
         // /audio
 	

@@ -98,8 +98,9 @@ int ret=0;
     // Set default conf, same as ffmpeg
     cfg->aacObjectType = LOW;
     cfg->mpegVersion = MPEG4;
+    cfg->bandWidth= (_wavheader->frequency*3)/4; // Should be relevant
     cfg->useTns = 0;
-    cfg->allowMidside = 1;
+    cfg->allowMidside = 0;
     cfg->bitRate = (config->bitrate*1000)/_wavheader->channels; // It is per channel
     cfg->outputFormat = 0; // 0 Raw 1 ADTS
     cfg->inputFormat = FAAC_INPUT_FLOAT;
