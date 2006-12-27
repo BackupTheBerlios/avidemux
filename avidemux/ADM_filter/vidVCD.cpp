@@ -72,7 +72,7 @@ static targetFmt VCD={352, 352, 288, 240};
 static targetFmt SVCD={480, 720, 576, 480};
 static targetFmt DVD={720, 720, 576, 480};
 static targetFmt DVDHD1={352, 720, 576, 480};
-static targetFmt PSP={368, 368, 208, 208};
+static targetFmt PSP={320, 320, 240, 240};
 targetFmt *allFormats[5]={&VCD,&SVCD,&DVD,&DVDHD1,&PSP};
 extern AVDMGenericVideoStream *createResampleFps(AVDMGenericVideoStream *in,uint32_t targetfps1000);
 #define ARME(x) format=RESWIZ_##x;
@@ -92,7 +92,7 @@ uint32_t fps1000;
     ARME (PSP);
     r= computeResize();
     if(!r) return r;
-
+#if 0 // Not needed with recent firmware
     // Now change framerate to 29.96
     info=getLastVideoFilter()->getInfo();
     fps1000=info->fps1000;
@@ -106,6 +106,7 @@ uint32_t fps1000;
       videofilters[nb_active_filter].conf = couple;;
       nb_active_filter++;
     }
+#endif    
     return r;
 }
 uint8_t setSVCD (void)

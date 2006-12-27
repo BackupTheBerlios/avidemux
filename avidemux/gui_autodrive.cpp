@@ -90,7 +90,7 @@ uint8_t A_autoDrive(Action action)
                           {
                               audioFilterResample(PSP_AUDIO_FQ);
                           }
-                          audioFilter_SetBitrate(64);
+                          audioFilter_SetBitrate(112);
                       }
                                 break;
                 case ACT_AUTO_VCD:
