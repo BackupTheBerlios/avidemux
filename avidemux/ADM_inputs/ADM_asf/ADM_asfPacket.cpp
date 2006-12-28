@@ -374,6 +374,7 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
    {
      asfBit *bit;
      ADM_assert(queue->pop((void**)&bit));
+     delete bit->data;
      delete bit;
    }
    return 1; 
@@ -388,6 +389,7 @@ uint8_t   asfPacket::nextPacket(uint8_t streamWanted)
      ADM_assert(queue->pop((void**)&bit));
      memcpy(buffer,bit->data,bit->len);
      *len+=bit->len;
+     delete bit->data;
      delete bit;
    }
    return 1;

@@ -272,6 +272,7 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
           {
             aprintf("Dropping seq=%u too old for %u delta %d\n",
                   bit->sequence,_index[framenum].segNb,delta);
+            delete bit->data;
             delete bit;
             if(delta<230)
             {
@@ -287,6 +288,7 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
           curSeq=bit->sequence;
           memcpy(ptr,bit->data,bit->len);
           len=bit->len;
+          delete bit->data;
           delete bit;
           continue;
       }
@@ -657,11 +659,13 @@ uint8_t asfHeader::buildIndex(void)
   asfPacket *aPacket=new asfPacket(_fd,_nbPackets,_packetSize,
                                    &readQueue,_dataStartOffset);
   uint32_t packet=1;
+#define MAXIMAGE (_nbPackets)
   uint32_t sequence=1;
-#define MAXIMAGE (_nbPackets*4)
+  uint32_t ceilImage=MAXIMAGE;
+
   nbImage=0;
-  asfIndex *tmpIndex=new asfIndex[MAXIMAGE];
-  memset(tmpIndex,0,sizeof(asfIndex)*MAXIMAGE);
+  asfIndex *tmpIndex=new asfIndex[ceilImage];
+  memset(tmpIndex,0,sizeof(asfIndex)*ceilImage);
   len=0;
   tmpIndex[0].segNb=1;
   while(packet<_nbPackets)
@@ -670,6 +674,16 @@ uint8_t asfHeader::buildIndex(void)
     {
       asfBit *bit=NULL;
       ADM_assert(readQueue.pop((void**)&bit));
+      if(nbImage>=ceilImage-1)
+      {  // Expand if our first guess was too small
+           uint32_t newceil=ceilImage*2;
+           asfIndex *tmptmpIndex=new asfIndex[newceil];
+           memset(tmptmpIndex,0,sizeof(asfIndex)*newceil);
+           memcpy(tmptmpIndex,tmpIndex,sizeof(asfIndex)*ceilImage);
+           delete [] tmpIndex;
+           tmpIndex=tmptmpIndex;
+           ceilImage=newceil;
+      }
       if(bit->stream==_videoStreamId)
       {
           aprintf(">found packet of size %d seq %d, while curseq =%d\n",bit->len,bit->sequence,curSeq);
@@ -695,7 +709,7 @@ uint8_t asfHeader::buildIndex(void)
     #endif            
             }
             nbImage++;
-            ADM_assert(nbImage<MAXIMAGE);
+            ADM_assert(nbImage<ceilImage);
             tmpIndex[nbImage].frameLen=0;
             tmpIndex[nbImage].segNb=bit->sequence;
             tmpIndex[nbImage].packetNb=bit->packet;
@@ -730,6 +744,7 @@ uint8_t asfHeader::buildIndex(void)
           printf("Unmapped stream %u\n",bit->stream); 
         }
       }
+     delete bit->data;
      delete bit;
     }
     //working->update(packet,_nbPackets);
