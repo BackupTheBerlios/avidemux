@@ -42,7 +42,7 @@ extern "C" {
 
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
-#include "ADM_codecs/ADM_divxEncode.h"
+//#include "ADM_codecs/ADM_divxEncode.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
 
 #include "ADM_assert.h" 

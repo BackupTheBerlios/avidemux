@@ -562,7 +562,7 @@ TryAgain:
 		if( vid->_nb_video_frames >12) // 12
 		{
 				uint8_t 		*bufferin;
-				uint32_t 		len,flags,flag2;
+				uint32_t 		len,flags;
 				uint8_t 		bframe=0, bconsistency=1;
 				uint32_t		scanned=12;
                                 ADMImage                *buffer=NULL;
@@ -578,12 +578,15 @@ TryAgain:
 				// we decode 5 frames..should be enough to get an opinion
 				for(uint32_t i=0;i<scanned;i++)  //10
 				{
-					flags=flag2=0;
+					flags=0;
   					vid->_aviheader->getFrameNoAlloc (i,
 							 bufferin,
 							 &len, &flags);
                                         if(!len) continue;
-					if(!vid->decoder->uncompress( (uint8_t *)bufferin,buffer,len,&flag2 ))
+                                        ADMCompressedImage img;
+                                        img.data=bufferin;
+                                        img.dataLength=len;
+					if(!vid->decoder->uncompress( &img,buffer ))
 					{
 						err++;
 						printf("\n ***oops***\n");
@@ -593,7 +596,7 @@ TryAgain:
 					
 					// check if it is a b-frame
 					//printf(" %lu : %lu \n",i,flag2);
-					if(flag2 & AVI_B_FRAME)
+					if(buffer->flags & AVI_B_FRAME)
 					{
 						printf(" * ");
 					 	bframe=1;

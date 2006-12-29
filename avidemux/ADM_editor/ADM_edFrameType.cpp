@@ -42,7 +42,7 @@
 uint8_t   ADM_Composer::rebuildFrameType ( void)
 {
 _VIDEOS *vi;
-uint32_t len,flags;
+uint32_t len,flags_removed;
 uint32_t frames=0,cur=0;
 uint8_t *compBuffer=NULL;
 //uint8_t *prepBuffer=NULL;
@@ -103,16 +103,18 @@ aviInfo    info;
 				{
 	  				vi->_aviheader->getFrameNoAlloc (j,
 							 compBuffer,
-							 &len, &flags);
+							 &len, &flags_removed);
 					if(len)
                                         {
-                                                
-		    				vi->decoder->uncompress (compBuffer, tmpImage, len, &flags);
+                                                 ADMCompressedImage img;
+                                                  img.data=compBuffer;
+                                                  img.dataLength=len;
+		    				vi->decoder->uncompress (&img, tmpImage);
                                         }
 					else
-						flags=0;
-	  				vi->_aviheader->setFlag(j,flags);
-					if(flags & AVI_B_FRAME)
+						tmpImage->flags=0;
+	  				vi->_aviheader->setFlag(j,tmpImage->flags);
+					if(tmpImage->flags & AVI_B_FRAME)
 						bframe++;
 
 					if(work->update(cur, frames))

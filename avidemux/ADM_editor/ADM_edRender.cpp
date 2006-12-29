@@ -363,16 +363,17 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 uint8_t		ADM_Composer::decodeCache(uint32_t frame,uint32_t seg, ADMImage *image)
 {
 uint32_t len;
-uint32_t flags,sumit;
+uint32_t sumit;
 float	 sum;
 EditorCache *cache=_videos[seg]._videoCache;	
 ADMImage *tmpImage=NULL;
 uint8_t refOnly=0;
-uint32_t left,ww;
-
+uint32_t left,ww,f_to_be_removed;
+ADMCompressedImage img;
+        
 	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,
 						     compBuffer,
-						     &len, &flags))
+						     &len, &f_to_be_removed))
 	{
 	  printf ("\nEditor: last decoding failed.%ld)\n",   frame );
 	  return 0;
@@ -431,7 +432,9 @@ uint32_t left,ww;
        }
 	tmpImage->_colorspace=ADM_COLOR_YV12;
 	// Do pp, and use imageBuffer as intermediate buffer
-	if (!_videos[seg].decoder->uncompress (compBuffer, tmpImage, len, &flags))
+        img.data=compBuffer;
+        img.dataLength=len;
+	if (!_videos[seg].decoder->uncompress (&img, tmpImage))
 	    {
 	      printf ("\nEditor: Last Decoding2 failed for frame %lu\n",frame);
 	       // Try to dupe previous frame

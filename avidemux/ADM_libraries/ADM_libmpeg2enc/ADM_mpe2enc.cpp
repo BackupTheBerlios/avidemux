@@ -36,7 +36,7 @@
 
 #include "ADM_colorspace/colorspace.h"
 #include "ADM_encoder/ADM_vidEncode.hxx"
-#include "ADM_codecs/ADM_divxEncode.h"
+//#include "ADM_codecs/ADM_divxEncode.h"
 #include "ADM_mpeg2enc.h"
 #include "ADM_encoder/adm_encffmatrix.h"
 
