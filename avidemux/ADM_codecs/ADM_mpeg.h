@@ -46,8 +46,7 @@ public:
     decoderMpeg (uint32_t w, uint32_t h,
 		 uint32_t extraLen, uint8_t * extraData);
     virtual ~ decoderMpeg ();
-  virtual uint8_t uncompress (uint8_t * in, ADMImage * out,
-			      uint32_t len, uint32_t * flag = NULL);
+  virtual uint8_t uncompress  (ADMCompressedImage * in, ADMImage * out);
   virtual uint8_t getPARWidth (void)
   {
      return par_width;

@@ -32,8 +32,7 @@ public:
   }
   decoderRGB16 (uint32_t w, uint32_t h, uint32_t fcc=0);
   virtual ~ decoderRGB16 ();
-  virtual uint8_t uncompress (uint8_t * in, ADMImage * out, uint32_t len,
-			      uint32_t * flag = NULL);
+  virtual uint8_t uncompress(ADMCompressedImage * in, ADMImage * out);
 
 };
 

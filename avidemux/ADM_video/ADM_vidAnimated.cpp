@@ -251,7 +251,7 @@ picHeader *pic=NULL;
 decoders *decoder=NULL;
 ADMImage  *fullSize=NULL;
 ADMImageResizer *resizer=NULL;
-uint32_t len=0,flags=0;
+uint32_t len=0,flags_removed=0;
 uint32_t w,h;
 uint8_t *extraData=NULL;
 uint32_t extraDataSize=0;
@@ -297,7 +297,10 @@ uint8_t *rdBuffer=NULL;
         goto skipIt;
     }
     // Decode it
-    if(!decoder->uncompress (rdBuffer, fullSize, len,&flags))
+    ADMCompressedImage img;
+      img.data=rdBuffer;
+      img.dataLength=len;
+    if(!decoder->uncompress (&img, fullSize))
     {
         printf("[Animated]Decoding failed\n");
         goto skipIt;

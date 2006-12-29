@@ -25,15 +25,9 @@ public:
   virtual ~ decoderNull ()
   {
   };
-  virtual uint8_t uncompress (uint8_t * in, ADMImage * out, uint32_t len)
+  virtual uint8_t uncompress (ADMCompressedImage * in, ADMImage * out)
   {
-    memcpy (out->data, in, len);
-    return 1;
-  }
-  virtual uint8_t uncompress (uint8_t * in, ADMImage * out, uint32_t len,
-			      uint32_t * f)
-  {
-    memcpy (out->data, in, len);
+    memcpy (out->data, in->data, in->dataLength);
     return 1;
   }
 };

@@ -181,22 +181,21 @@ decoderMpeg::decoderMpeg (uint32_t w, uint32_t h, uint32_t extraLen, uint8_t * e
 }
 /*------------------------------------------------------------------*/
 uint8_t
-  decoderMpeg::uncompress (uint8_t * in, ADMImage * out, uint32_t len,
-			   uint32_t * flag)
+  decoderMpeg::uncompress  (ADMCompressedImage * in, ADMImage * out)
 {
-  if (flag)
-    *flag = 0;
+  
+    out->flags = 0;
 #if defined( REMOVE_PADDING)
   while (*(in + len - 1) == 0)
     len--;
 #endif
-  if (!len)
+  if (!in->dataLength)
     {
       if (!dontcopy ())
 	return 1;
     }
-  if (len)
-    feedData (len, in);
+  if (in->dataLength)
+    feedData (in->dataLength, in->data);
 
   const mpeg2_info_t *info;
   uint8_t *t;
@@ -258,10 +257,6 @@ uint8_t
       //ADM_assert(0);
       //return 0;
       out->flags = 0;
-    }
-  if (flag)
-    {
-      *flag = out->flags;
     }
   if (MPEG2DEC->ext_state & PIC_FLAG_PROGRESSIVE_FRAME)
     {

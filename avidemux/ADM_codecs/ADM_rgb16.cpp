@@ -44,18 +44,17 @@ decoderRGB16::~decoderRGB16 ()
 
 
 uint8_t
-  decoderRGB16::uncompress (uint8_t * in, ADMImage * out,
-			    uint32_t len, uint32_t * flag)
+  decoderRGB16::uncompress (ADMCompressedImage * in, ADMImage * out)
 {
   int xx;
   xx = _w * _h;
 
-  if (flag)
-    *flag = AVI_KEY_FRAME;
+  
+    out->flags = AVI_KEY_FRAME;
 
   // We dont do much here ...
 
-  if (len == (3 * xx))  // rgb 24 ?
+  if (in->dataLength == (3 * xx))  // rgb 24 ?
     {
       if(isRgb)
         out->_colorspace =(ADM_colorspace)( ADM_COLOR_RGB24 | ADM_COLOR_BACKWARD);
@@ -63,7 +62,7 @@ uint8_t
         out->_colorspace = (ADM_colorspace)( ADM_COLOR_BGR24| ADM_COLOR_BACKWARD);
       out->_planeStride[0] = 3 * _w;
     }
-  else if (len == (4 * xx))
+  else if (in->dataLength  == (4 * xx))
     {
       if(isRgb)
         out->_colorspace = (ADM_colorspace)( ADM_COLOR_RGB32A | ADM_COLOR_BACKWARD );
@@ -77,7 +76,7 @@ uint8_t
     return 0;
 
   ADM_assert (out->_isRef);
-  out->_planes[0] = in;
+  out->_planes[0] = in->data;
   out->_planes[1] = NULL;
   out->_planes[2] = NULL;
   out->_planeStride[1] = 0;

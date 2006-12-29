@@ -32,6 +32,7 @@
 */
 
 #include "ADM_bitstream.h"
+#include "ADM_compressedImage.h"
 class decoders
 {
 protected:
@@ -59,9 +60,7 @@ public:
   virtual void setParam (void)
   {
   };
-  virtual uint8_t uncompress (uint8_t * in, ADMImage * out, uint32_t len,
-			      uint32_t * flagz);
-//                      virtual uint8_t         getLastQ( uint8_t *q) { *q=_lastQ;return 1;}
+  virtual uint8_t uncompress (ADMCompressedImage * in, ADMImage * out)=0;
 
   // does this codec *possibly* can have b-frame ?
   virtual uint8_t dontcopy (void)
@@ -93,6 +92,15 @@ public:
   {
     return 1;
   };
+};
+/* Dummy decoder in case we don't have the desired one */
+class decoderEmpty : public decoders
+{
+protected:
+public:
+    decoderEmpty (uint32_t w, uint32_t h) : decoders(w,h) {};
+    uint8_t uncompress (ADMCompressedImage * in, ADMImage * out) {return 1;}
+
 };
 
 decoders *getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,

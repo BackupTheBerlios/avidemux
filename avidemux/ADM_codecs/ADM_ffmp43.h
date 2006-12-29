@@ -45,8 +45,7 @@ public:
   {
     return 1;
   }
-  virtual uint8_t uncompress (uint8_t * in, ADMImage * out,
-			      uint32_t len, uint32_t * flag = NULL);
+  virtual uint8_t uncompress (ADMCompressedImage * in, ADMImage * out);
   virtual void setParam (void);
   virtual uint8_t bFramePossible (void)
   {

@@ -35,7 +35,7 @@
 
 
 #include "ADM_colorspace/colorspace.h"
-#include "ADM_codecs/ADM_divxEncode.h"
+//#include "ADM_codecs/ADM_divxEncode.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include <ADM_assert.h>

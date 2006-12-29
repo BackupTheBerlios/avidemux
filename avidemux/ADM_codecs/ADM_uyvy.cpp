@@ -31,18 +31,17 @@
 #include "ADM_codecs/ADM_uyvy.h"
 #include <ADM_assert.h>
 uint8_t
-  decoderUYVY::uncompress (uint8_t * in, ADMImage * out, uint32_t len,
-			   uint32_t * flag)
+  decoderUYVY::uncompress (ADMCompressedImage * in, ADMImage * out)
 {
 
-  if (len < _w * _h * 2)
+  if (in->dataLength < _w * _h * 2)
     {
-      printf ("in:%d expected%d\n", len, _w * _h * 2);
+      printf ("in:%d expected%d\n", in->dataLength, _w * _h * 2);
       return 1;
     }
   uint8_t *ptrY, *ptrU, *ptrV, *ptr;
 
-  ptr = in;
+  ptr = in->data;
   ptrY = out->data;
   ptrU = out->data + _w * _h;
   ptrV = ptrU + ((_w * _h) >> 2);
@@ -67,24 +66,23 @@ uint8_t
 	  }
       }
 
-  if (flag)
-    *flag = AVI_KEY_FRAME;
+  
+  out->flags = AVI_KEY_FRAME;
   return 1;
 
 }
 uint8_t
-  decoderYUY2::uncompress (uint8_t * in, ADMImage * out, uint32_t len,
-			   uint32_t * flag)
+  decoderYUY2::uncompress  (ADMCompressedImage * in, ADMImage * out)
 {
 
-  if (len < _w * _h * 2)
+  if (in->dataLength < _w * _h * 2)
     {
-      printf ("in:%d expected%d\n", len, _w * _h * 2);
+      printf ("in:%d expected%d\n", in->dataLength, _w * _h * 2);
       return 1;
     }
   uint8_t *ptrY, *ptrU, *ptrV, *ptr;
 
-  ptr = in;
+  ptr = in->data;
   ptrY = out->data;
   ptrV = out->data + _w * _h;
   ptrU = out->data + ((_w * _h * 5) >> 2);
@@ -111,8 +109,8 @@ uint8_t
 	  }
       }
 
-  if (flag)
-    *flag = AVI_KEY_FRAME;
+
+  out->flags = AVI_KEY_FRAME;
   return 1;
 
 }

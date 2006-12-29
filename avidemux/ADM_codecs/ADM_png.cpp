@@ -93,14 +93,13 @@ decoderPng::~decoderPng ()
 /*
    	Uncompress frame, set flags if needed
 */
-uint8_t decoderPng::uncompress (uint8_t * in, ADMImage * out, uint32_t len,
-			uint32_t * flag)
+uint8_t decoderPng::uncompress(ADMCompressedImage * in, ADMImage * out)
 {
   int bpp;
   int colortype;
 
   // Check if it is png, and fill it
-  if (!!png_sig_cmp (in, 0, 8))
+  if (!!png_sig_cmp (in->data, 0, 8))
 
     {
       printf ("[PNG] wrong sig\n");
@@ -111,8 +110,8 @@ uint8_t decoderPng::uncompress (uint8_t * in, ADMImage * out, uint32_t len,
   //
 gain2:
   Init ();
-  io.data = in;
-  io.size = len;
+  io.data = in->data;
+  io.size = in->dataLength;
   io.cur = 0;
   png_read_png (PNG_PTR, INFO_PTR, PNG_TRANSFORM_IDENTITY, NULL);
 

@@ -20,8 +20,7 @@ public:
   virtual ~ decoderUYVY ()
   {
   };
-  virtual uint8_t uncompress (uint8_t * in, ADMImage * out,
-			      uint32_t len, uint32_t * flag = NULL);
+  virtual uint8_t uncompress (ADMCompressedImage * in, ADMImage * out);
 };
 class decoderYUY2:decoders
 {
@@ -34,6 +33,5 @@ public:
   virtual ~ decoderYUY2 ()
   {
   };
-  virtual uint8_t uncompress (uint8_t * in, ADMImage * out,
-			      uint32_t len, uint32_t * flag = NULL);
+  virtual uint8_t uncompress (ADMCompressedImage * in, ADMImage * out);
 };

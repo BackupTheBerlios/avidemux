@@ -299,9 +299,7 @@ uint8_t decoderFF::decodeFull (void)
   return 1;
 }
 
-uint8_t
-  decoderFF::uncompress (uint8_t * in, ADMImage * out, uint32_t len,
-			 uint32_t * flagz)
+uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
 {
   int got_picture = 0;
   uint8_t *oBuff[3];
@@ -321,18 +319,15 @@ uint8_t
       _context->debug &= ~(FF_DEBUG_VIS_MB_TYPE + FF_DEBUG_VIS_QP);
     }
 
-  if (len == 0 && !_allowNull)	// Null frame, silently skipped
+  if (in->dataLength == 0 && !_allowNull)	// Null frame, silently skipped
     {
-      if (flagz)
-	*flagz = AVI_KEY_FRAME;
+      
       printf ("\n ff4: null frame\n");
       {
 	// search the last image
 	if (_context->coded_frame && _context->coded_frame->data)
 	  {
 	    clonePic (_context->coded_frame, out);
-	    if (flagz)
-	      *flagz = out->flags;
 	  }
 	else
 	  out->_noPicture = 1;
@@ -340,12 +335,12 @@ uint8_t
       return 1;
     }
 
-  ret = avcodec_decode_video (_context, &_frame, &got_picture, in, len);
+  ret = avcodec_decode_video (_context, &_frame, &got_picture, in->data, in->dataLength);
   out->_qStride = 0;		//Default = no quant
   if (0 > ret && !_context->hurry_up)
     {
       printf ("\n error in FFMP43/mpeg4!\n");
-      printf ("Err: %d, size :%d\n", ret, len);
+      printf ("Err: %d, size :%d\n", ret, in->dataLength);
       return 0;
     }
   if (!got_picture && !_context->hurry_up)
@@ -353,15 +348,13 @@ uint8_t
       // Some encoder code a vop header with the 
       // vop flag set to 0
       // it is meant to mean frame skipped but very dubious
-      if (len <= 8 && codecId == CODEC_ID_MPEG4)
+      if (in->dataLength <= 8 && codecId == CODEC_ID_MPEG4)
 	{
 	  printf ("Probably pseudo black frame...\n");
 	  out->_Qp = 2;
 	  out->flags = 0;	// assume P ?
 
 	  clonePic (_context->coded_frame, out);
-	  if (flagz)
-	    *flagz = out->flags;
 	  return 1;
 	}
       // allow null means we allow null frame in and so potentially
@@ -369,8 +362,7 @@ uint8_t
       // in that case silently fill with black and returns it as KF
       if (_allowNull)
 	{
-	  if (flagz)
-	    *flagz = AVI_KEY_FRAME;
+	  out->flags = AVI_KEY_FRAME;
 	  if (!_refCopy)
 	    {
 	      memset (out->data, 0, _w * _h);
@@ -384,7 +376,7 @@ uint8_t
 	  return 1;
 
 	}
-      printf ("Err: %d, size :%d\n", ret, len);
+      printf ("Err: %d, size :%d\n", ret, in->dataLength);
       printf ("\n error in FFMP43/mpeg4!: got picture \n");
       //GUI_Alert("Please retry with misc->Turbo off");
       //return 1;
@@ -392,10 +384,7 @@ uint8_t
     }
   if (_context->hurry_up)
     {
-      if (flagz)
-	{
-	  *flagz = frameType ();
-	}
+      out->flags = frameType ();
       return 1;
     }
 
@@ -429,8 +418,6 @@ uint8_t
       return 0;
     }
   clonePic (&_frame, out);
-  if (flagz)
-    *flagz = out->flags;
   return 1;
 }
 

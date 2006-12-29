@@ -158,13 +158,10 @@ isMSMpeg4Compatible (uint32_t fourcc)
 }
 
 uint8_t
-  decoders::uncompress (uint8_t * in, ADMImage * out, uint32_t len,
-			uint32_t * flag)
+  decoders::uncompress (ADMCompressedImage * in, ADMImage * out)
 {
   UNUSED_ARG (in);
   UNUSED_ARG (out);
-  UNUSED_ARG (len);
-  UNUSED_ARG (flag);
   return 0;
 }
 decoders *
@@ -366,7 +363,7 @@ if (fourCC::check (fcc, (uint8_t *) "FFV1"))
   printf ("\n using invalid codec for \n");
   fourCC::print (fcc);
 
-  return (decoders *) (new decoders (w, h));
+  return (decoders *) (new decoderEmpty (w, h));
 
 
 
