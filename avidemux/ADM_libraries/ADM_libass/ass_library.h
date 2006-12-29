@@ -18,12 +18,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#ifndef __ASS_UTILS_H__
-#define __ASS_UTILS_H__
+#ifndef __ASS_LIBRARY_H__
+#define __ASS_LIBRARY_H__
 
-int mystrtoi(char** p, int base, int* res);
-int mystrtou32(char** p, int base, uint32_t* res);
-int mystrtod(char** p, double* res);
-int strtocolor(char** q, uint32_t* res);
+struct ass_library_s {
+	char* fonts_dir;
+	int extract_fonts;
+	char** style_overrides;
+};
+
 #endif
 

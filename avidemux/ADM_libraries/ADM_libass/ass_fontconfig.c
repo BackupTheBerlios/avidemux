@@ -1,3 +1,23 @@
+// -*- c-basic-offset: 8; indent-tabs-mode: t -*-
+// vim:ts=8:sw=8:noet:ai:
+/*
+  Copyright (C) 2006 Evgeniy Stepanov <eugeni.stepanov@gmail.com>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+*/
+
 #include "config.h"
 
 #include <stdlib.h>
@@ -7,20 +27,17 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef MPLAYER
-#include "mp_msg.h"
-#else
 #include "mputils.h"
-#endif
 #include "ass_fontconfig.h"
 
 #ifdef HAVE_FONTCONFIG
 #include <fontconfig/fontconfig.h>
 #endif
-//MEANX
+
 #define ADM_LEGACY_PROGGY
-#include "../../ADM_assert.h"
-// /MEANX
+#include "ADM_assert.h"
+
+
 struct fc_instance_s {
 #ifdef HAVE_FONTCONFIG
 	FcConfig* config;
@@ -88,7 +105,7 @@ static char* _select_font(fc_instance_t* priv, const char* family, unsigned bold
 		return 0;
 
 	if (strcasecmp((const char*)val_s, family) != 0)
-		mp_msg(MSGT_GLOBAL, MSGL_WARN, "fontconfig: selected font family is not the requested one: '%s' != '%s'\n",
+		mp_msg(MSGT_ASS, MSGL_WARN, "fontconfig: selected font family is not the requested one: '%s' != '%s'\n",
 				(const char*)val_s, family);
 
 	result = FcPatternGetString(rpat, FC_FILE, 0, &val_s);
@@ -115,24 +132,24 @@ char* fontconfig_select(fc_instance_t* priv, const char* family, unsigned bold, 
 	if (!res && priv->family_default) {
 		res = _select_font(priv, priv->family_default, bold, italic, index);
 		if (res && !no_more_font_messages)
-			mp_msg(MSGT_GLOBAL, MSGL_WARN, "fontconfig_select: using default font family: (%s, %d, %d) -> %s, %d\n", 
+			mp_msg(MSGT_ASS, MSGL_WARN, "fontconfig_select: using default font family: (%s, %d, %d) -> %s, %d\n", 
 					family, bold, italic, res, *index);
 	}
 	if (!res && priv->path_default) {
 		res = priv->path_default;
 		*index = priv->index_default;
 		if (!no_more_font_messages)
-			mp_msg(MSGT_GLOBAL, MSGL_WARN, "fontconfig_select: using default font: (%s, %d, %d) -> %s, %d\n",
+			mp_msg(MSGT_ASS, MSGL_WARN, "fontconfig_select: using default font: (%s, %d, %d) -> %s, %d\n",
 					family, bold, italic, res, *index);
 	}
 	if (!res) {
 		res = _select_font(priv, "Arial", bold, italic, index);
 		if (res && !no_more_font_messages)
-			mp_msg(MSGT_GLOBAL, MSGL_WARN, "fontconfig_select: using 'Arial' font family: (%s, %d, %d) -> %s, %d\n",
+			mp_msg(MSGT_ASS, MSGL_WARN, "fontconfig_select: using 'Arial' font family: (%s, %d, %d) -> %s, %d\n",
 					family, bold, italic, res, *index);
 	}
 	if (res)
-		mp_msg(MSGT_GLOBAL, MSGL_V, "fontconfig_select: (%s, %d, %d) -> %s, %d\n", 
+		mp_msg(MSGT_ASS, MSGL_V, "fontconfig_select: (%s, %d, %d) -> %s, %d\n", 
 				family, bold, italic, res, *index);
 	return res;
 }
@@ -148,20 +165,55 @@ fc_instance_t* fontconfig_init(const char* dir, const char* family, const char* 
 {
 	int rc;
 	struct stat st;
-	fc_instance_t* priv = (fc_instance_t*)calloc(1, sizeof(fc_instance_t));
+	fc_instance_t* priv = (fc_instance_t *)calloc(1, sizeof(fc_instance_t));
 	
 	rc = FcInit();
 	assert(rc);
 
 	priv->config = FcConfigGetCurrent();
 	if (!priv->config) {
-		mp_msg(MSGT_GLOBAL, MSGL_FATAL, "FcInitLoadConfigAndFonts failed\n");
+		mp_msg(MSGT_ASS, MSGL_FATAL, "FcInitLoadConfigAndFonts failed\n");
 		return 0;
+	}
+
+	if (FcDirCacheValid((const FcChar8 *)dir) == FcFalse)
+	{
+		mp_msg(MSGT_ASS, MSGL_INFO, "[ass] Updating font cache\n");
+		if (FcGetVersion() >= 20390 && FcGetVersion() < 20400)
+			mp_msg(MSGT_ASS, MSGL_WARN,
+			       "[ass] beta versions of fontconfig are not supported\n"
+			       "      update before reporting any bugs\n");
+		// FontConfig >= 2.4.0 updates cache automatically in FcConfigAppFontAddDir()
+		if (FcGetVersion() < 20390) {
+			FcFontSet* fcs;
+			FcStrSet* fss;
+			fcs = FcFontSetCreate();
+			fss = FcStrSetCreate();
+			rc = FcStrSetAdd(fss, (const FcChar8*)dir);
+			if (!rc) {
+				mp_msg(MSGT_ASS, MSGL_WARN, "FcStrSetAdd failed\n");
+				goto ErrorFontCache;
+			}
+
+			rc = FcDirScan(fcs, fss, NULL, FcConfigGetBlanks(priv->config), (const FcChar8 *)dir, FcFalse);
+			if (!rc) {
+				mp_msg(MSGT_ASS, MSGL_WARN, "FcDirScan failed\n");
+				goto ErrorFontCache;
+			}
+
+			rc = FcDirSave(fcs, fss, (const FcChar8 *)dir);
+			if (!rc) {
+				mp_msg(MSGT_ASS, MSGL_WARN, "FcDirSave failed\n");
+				goto ErrorFontCache;
+			}
+		ErrorFontCache:
+			;
+		}
 	}
 
 	rc = FcConfigAppFontAddDir(priv->config, (const FcChar8*)dir);
 	if (!rc) {
-		mp_msg(MSGT_GLOBAL, MSGL_WARN, "FcConfigAppFontAddDir failed\n");
+		mp_msg(MSGT_ASS, MSGL_WARN, "FcConfigAppFontAddDir failed\n");
 	}
 
 	priv->family_default = family ? strdup(family) : 0;
@@ -186,10 +238,11 @@ char* fontconfig_select(fc_instance_t* priv, const char* family, unsigned bold, 
 
 fc_instance_t* fontconfig_init(const char* dir, const char* family, const char* path)
 {
-	mp_msg(MSGT_GLOBAL, MSGL_WARN, "Fontconfig disabled, only default font will be used\n");
+	fc_instance_t* priv;
+
+	mp_msg(MSGT_ASS, MSGL_WARN, "Fontconfig disabled, only default font will be used\n");
 	
-        fc_instance_t* priv = new fc_instance_t;
-        memset(priv,0,sizeof(fc_instance_t));
+	priv = calloc(1, sizeof(fc_instance_t));
 	
 	priv->path_default = strdup(path);
 	priv->index_default = 0;
@@ -203,7 +256,7 @@ void fontconfig_done(fc_instance_t* priv)
 	// don't call FcFini() here, library can still be used by some code
 	if (priv && priv->path_default) free(priv->path_default);
 	if (priv && priv->family_default) free(priv->family_default);
-	if (priv) delete priv;
+	if (priv) free(priv);
 }
 
 

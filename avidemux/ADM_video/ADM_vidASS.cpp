@@ -79,8 +79,6 @@ ADMVideoSubASS::ADMVideoSubASS(AVDMGenericVideoStream *in, CONFcouple *conf)
         _params = new ASSParams;
         ADM_assert(_params);
         
-        _ass_i = NULL;
-        _ass_t = NULL;
         
         if(conf) {
                 #define _COUPLE_GET(x) conf->getCouple(#x, &(_params->x));
@@ -99,12 +97,6 @@ ADMVideoSubASS::ADMVideoSubASS(AVDMGenericVideoStream *in, CONFcouple *conf)
                 _params->fonts_dir = (ADM_filename*)ADM_alloc(6*sizeof(ADM_filename));
                 strcpy((char*)_params->fonts_dir, "/tmp/");
                 _params->extract_embedded_fonts = 1;
-                
-                #if 0
-                ADM_dealloc(_params->subfile);
-                _params->subfile = (ADM_filename*)ADM_alloc(sizeof(ADM_filename)*21);
-                strcpy((char*)_params->subfile, "/home/moonz/test.ass");
-                #endif
         }
 
         _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
@@ -112,40 +104,59 @@ ADMVideoSubASS::ADMVideoSubASS(AVDMGenericVideoStream *in, CONFcouple *conf)
         _info.encoding=1;
 
         /* ASS initialization */
-        _ass_i = ass_init();
-        ADM_assert(_ass_i);
+        _ass_lib = ass_library_init();
+        _ass_track = NULL;
+        _ass_rend = NULL;
+        ADM_assert(_ass_lib);
         if(_params->subfile)
+        {
               if(!init())
               {
                 GUI_Error_HIG("Format ?","Are you sure this is an ass file ?"); 
               }
+        }
 
 }
 // **********************************
 uint8_t ADMVideoSubASS::init(void)
 {
-  _ass_t = ass_read_file((char*)_params->subfile);
-  if(!_ass_t)
-  {
-    return 0;
-     
-  }
-  else
-  {
-    ass_settings_t settings;
-    memcpy(&_info,_in->getInfo(),sizeof(_info));
-    _info.height += _params->top_margin + _params->bottom_margin;
-    settings.frame_width = _info.width;
-    settings.frame_height = _info.height;
-    settings.font_size_coeff = _params->font_scale;
-    settings.line_spacing = _params->line_spacing;
-    settings.top_margin = _params->top_margin;
-    settings.bottom_margin = _params->bottom_margin;
-    settings.aspect = ((double)_info.width) / ((double)_info.height);
-    ass_configure(_ass_i, &settings);
-  }
-  return 1;
-}
+bool use_margins = ( _params->top_margin | _params->bottom_margin ) != 0;
+
+        memcpy(&_info,_in->getInfo(),sizeof(_info));
+        _info.height += _params->top_margin + _params->bottom_margin;
+
+        ass_set_fonts_dir(_ass_lib, (const char*)_params->fonts_dir);
+        ass_set_extract_fonts(_ass_lib, _params->extract_embedded_fonts);
+        ass_set_style_overrides(_ass_lib, NULL);
+#if ASS_HAS_GLOBAL
+         if(_ass_rend) 
+        {
+              ass_renderer_done(_ass_rend);
+              _ass_rend = NULL;
+         }
+#endif
+        _ass_rend = ass_renderer_init(_ass_lib);
+
+        ADM_assert(_ass_rend);
+ 
+        ass_set_frame_size(_ass_rend, _info.width, _info.height);
+        ass_set_margins(_ass_rend, _params->top_margin, _params->bottom_margin, 0, 0);
+        ass_set_use_margins(_ass_rend, use_margins);
+        ass_set_font_scale(_ass_rend, _params->font_scale);
+        ass_set_fonts(_ass_rend, NULL, "Sans");
+        //~ ass_set_aspect_ratio(_ass_rend, ((double)_info.width) / ((double)_info.height));
+#if ASS_HAS_GLOBAL
+        if(_ass_track) 
+        {
+              ass_free_track(_ass_track);
+              _ass_track = NULL;
+        }
+#endif
+       _ass_track = ass_read_file(_ass_lib, (char*)_params->subfile, NULL);
+
+        ADM_assert(_ass_track);
+        return 1;
+} 
 
 //*******************************************
 ADMVideoSubASS::~ADMVideoSubASS() 
@@ -158,6 +169,24 @@ ADMVideoSubASS::~ADMVideoSubASS()
         DELETE( _params->fonts_dir);
         DELETE(_params);
       }
+#if ASS_HAS_GLOBAL
+        if(_ass_rend) 
+        {
+              ass_renderer_done(_ass_rend);
+              _ass_rend = NULL;
+         }
+
+        if(_ass_track) 
+        {
+              ass_free_track(_ass_track);
+              _ass_track = NULL;
+        }
+        if(_ass_lib) 
+        {
+              ass_library_done(_ass_lib);
+              _ass_lib = NULL;
+        }
+#endif
 }
 //*******************************************
 #define _r(c)  ((c)>>24)
@@ -215,13 +244,14 @@ uint8_t ADMVideoSubASS::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len, ADM
             memset(VPLANE(data)+((page-top)>>2),128,top>>2);
         }
         // Do we have something to render ?
-        if(!_ass_i || !_ass_t)
+        if(!_ass_rend || !_ass_track)
         {
           printf("[Ass] No sub to render\n");
           return 1; 
         }
 
-        ass_image_t *img = ass_render_frame(_ass_i, _ass_t, where);
+        ass_image_t *img = ass_render_frame(_ass_rend, _ass_track, where);
+        
 
         while(img) {
                   y = rgba2y(img->color);

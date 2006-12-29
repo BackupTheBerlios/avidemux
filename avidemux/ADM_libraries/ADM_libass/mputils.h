@@ -7,8 +7,7 @@ void my_mp_msg(int lvl, char *lvl_str, char *fmt, ...);
 
 #define mp_msg(mod, level, args...) my_mp_msg(level, #level, args)
 
-#define MSGT_GLOBAL 0
-#define MSGT_SUBREADER 36
+#define MSGT_ASS 43
 
 #define MSGL_FATAL 0
 #define MSGL_ERR 1
@@ -16,5 +15,13 @@ void my_mp_msg(int lvl, char *lvl_str, char *fmt, ...);
 #define MSGL_INFO 4
 #define MSGL_V 6
 #define MSGL_DBG2 7
+
+void blur(unsigned char *buffer, unsigned short *tmp2, int width, int height,
+          int stride, int *m2, int r, int mwidth);
+
+void* guess_buffer_cp(unsigned char* buffer, int buflen, char *preferred_language, char *fallback);
+
+#define FFMAX(a,b) ((a) > (b) ? (a) : (b))
+#define FFMIN(a,b) ((a) > (b) ? (b) : (a))
 
 #endif

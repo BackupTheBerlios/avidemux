@@ -1,21 +1,39 @@
+// -*- c-basic-offset: 8; indent-tabs-mode: t -*-
+// vim:ts=8:sw=8:noet:ai:
+/*
+  Copyright (C) 2006 Evgeniy Stepanov <eugeni.stepanov@gmail.com>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+*/
+
 #include "config.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include FT_GLYPH_H
 
 #include <assert.h>
 
-#ifdef MPLAYER
-#include "mp_msg.h"
-#else
 #include "mputils.h"
-#endif
 #include "ass_fontconfig.h"
+#include "ass_bitmap.h"
 #include "ass_cache.h"
-/// MEANX
+
 #define ADM_LEGACY_PROGGY
-#include "../../ADM_assert.h"
-/// /MEANX
+#include "ADM_assert.h"
+
 
 typedef struct face_cache_item_s {
 	face_desc_t desc;
@@ -42,6 +60,24 @@ static int font_compare(face_desc_t* a, face_desc_t* b) {
 }
 
 /**
+ * Select Microfost Unicode CharMap, if the font has one.
+ * Otherwise, let FreeType decide.
+ */
+static void charmap_magic(FT_Face face)
+{
+	int i;
+	for (i = 0; i < face->num_charmaps; ++i) {
+		FT_CharMap cmap = face->charmaps[i];
+		unsigned pid = cmap->platform_id;
+		unsigned eid = cmap->encoding_id;
+		if (pid == 3 /*microsoft*/ && (eid == 1 /*unicode bmp*/ || eid == 10 /*full unicode*/)) {
+			FT_Set_Charmap(face, cmap);
+			break;
+		}
+	}
+}
+
+/**
  * \brief Get a face object, either from cache or created through FreeType+FontConfig.
  * \param library FreeType library object
  * \param fontconfig_priv fontconfig private data
@@ -63,19 +99,21 @@ int ass_new_face(FT_Library library, void* fontconfig_priv, face_desc_t* desc, /
 		}
 
 	if (face_cache_size == MAX_FACE_CACHE_SIZE) {
-		mp_msg(MSGT_GLOBAL, MSGL_FATAL, "Too many fonts\n");
+		mp_msg(MSGT_ASS, MSGL_FATAL, "Too many fonts\n");
 		return 1;
 	}
 
-	path = fontconfig_select((fc_instance_t*)fontconfig_priv, desc->family, desc->bold, desc->italic, &index);
+	path = fontconfig_select((fc_instance_t *)fontconfig_priv, desc->family, desc->bold, desc->italic, &index);
 	
 	error = FT_New_Face(library, path, index, face);
 	if (error) {
 		if (!no_more_font_messages)
-			mp_msg(MSGT_GLOBAL, MSGL_WARN, "Error opening font: %s, %d\n", path, index);
+			mp_msg(MSGT_ASS, MSGL_WARN, "Error opening font: %s, %d\n", path, index);
 		no_more_font_messages = 1;
 		return 1;
 	}
+
+	charmap_magic(*face);
 	
 	item = face_cache + face_cache_size;
 	item->path = strdup(path);
@@ -88,13 +126,17 @@ int ass_new_face(FT_Library library, void* fontconfig_priv, face_desc_t* desc, /
 
 void ass_face_cache_init(void)
 {
-	face_cache = (face_cache_item_t*)calloc(MAX_FACE_CACHE_SIZE, sizeof(face_cache_item_t));
+        
+        
+        face_cache = (face_cache_item_t *)calloc(MAX_FACE_CACHE_SIZE, sizeof(face_cache_item_t));
 	face_cache_size = 0;
+        
 }
 
 void ass_face_cache_done(void)
 {
-	int i;
+	
+        int i;
 	for (i = 0; i < face_cache_size; ++i) {
 		face_cache_item_t* item = face_cache + i;
 		if (item->face) FT_Done_Face(item->face);
@@ -103,6 +145,8 @@ void ass_face_cache_done(void)
 	}
 	free(face_cache);
 	face_cache_size = 0;
+        face_cache=NULL; // MEANX
+
 }
 
 //---------------------------------
@@ -136,6 +180,7 @@ static unsigned glyph_hash(glyph_hash_key_t* key) {
 	val <<= 21;
 	
 	if (key->bitmap)   val &= 0x80000000;
+	if (key->be) val &= 0x40000000;
 	val += key->index;
 	val += key->size << 8;
 	val += key->outline << 3;
@@ -161,7 +206,7 @@ void cache_add_glyph(glyph_hash_key_t* key, glyph_hash_val_t* val)
 		next = &((*next)->next);
 		assert(next);
 	}
-	(*next) = (glyph_hash_item_t*)malloc(sizeof(glyph_hash_item_t));
+	(*next) = (glyph_hash_item_t *)malloc(sizeof(glyph_hash_item_t));
 //	(*next)->desc = glyph_key_copy(key, &((*next)->key));
 	memcpy(&((*next)->key), key, sizeof(glyph_hash_key_t));
 	memcpy(&((*next)->val), val, sizeof(glyph_hash_val_t));
@@ -193,8 +238,9 @@ glyph_hash_val_t* cache_find_glyph(glyph_hash_key_t* key)
 
 void ass_glyph_cache_init(void)
 {
-	glyph_hash_root = (glyph_hash_item_p*)calloc(GLYPH_HASH_SIZE, sizeof(glyph_hash_item_p));
+	glyph_hash_root = (glyph_hash_item_p *)calloc(GLYPH_HASH_SIZE, sizeof(glyph_hash_item_p));
 	glyph_hash_size = 0;
+
 }
 
 void ass_glyph_cache_done(void)
@@ -204,13 +250,22 @@ void ass_glyph_cache_done(void)
 		glyph_hash_item_t* item = glyph_hash_root[i];
 		while (item) {
 			glyph_hash_item_t* next = item->next;
-			if (item->val.glyph) FT_Done_Glyph(item->val.glyph);
-			if (item->val.outline_glyph) FT_Done_Glyph(item->val.outline_glyph);
+			if (item->val.bm) ass_free_bitmap(item->val.bm);
+			if (item->val.bm_o) ass_free_bitmap(item->val.bm_o);
+			if (item->val.bm_s) ass_free_bitmap(item->val.bm_s);
 			free(item);
 			item = next;
 		}
 	}
 	free(glyph_hash_root);
+        glyph_hash_root=NULL;
 	glyph_hash_size = 0;
+
+}
+
+void ass_glyph_cache_reset(void)
+{
+	ass_glyph_cache_done();
+	ass_glyph_cache_init();
 }
 

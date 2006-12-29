@@ -1,3 +1,23 @@
+// -*- c-basic-offset: 8; indent-tabs-mode: t -*-
+// vim:ts=8:sw=8:noet:ai:
+/*
+  Copyright (C) 2006 Evgeniy Stepanov <eugeni.stepanov@gmail.com>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+*/
+
 #ifndef __ASS_TYPES_H__
 #define __ASS_TYPES_H__
 
@@ -36,6 +56,8 @@ typedef struct ass_style_s {
 	int Encoding;
 } ass_style_t;
 
+typedef struct render_priv_s render_priv_t;
+
 /// ass_event_t corresponds to a single Dialogue line
 /// Text is stored as-is, style overrides will be parsed later
 typedef struct ass_event_s {
@@ -51,8 +73,20 @@ typedef struct ass_event_s {
 	int MarginV;
 	char* Effect;
 	char* Text;
+
+	render_priv_t* render_priv;
 } ass_event_t;
 
+typedef struct parser_priv_s parser_priv_t;
+
+typedef struct ass_library_s ass_library_t;
+/* MEANX */
+typedef enum TRACK_TYPE
+{
+    TRACK_TYPE_UNKNOWN = 0, 
+    TRACK_TYPE_ASS, 
+    TRACK_TYPE_SSA};
+    /* MEANX */
 /// ass track represent either an external script or a matroska subtitle stream (no real difference between them)
 /// it can be used in rendering after the headers are parsed (i.e. events format line read)
 typedef struct ass_track_s {
@@ -65,8 +99,8 @@ typedef struct ass_track_s {
 
 	char* style_format; // style format line (everything after "Format: ")
 	char* event_format; // event format line
-
-	enum {TRACK_TYPE_ASS, TRACK_TYPE_SSA} track_type;
+ 
+	TRACK_TYPE track_type; /* MEANX */
 	
 	// script header fields
 	int PlayResX;
@@ -77,6 +111,9 @@ typedef struct ass_track_s {
 	
 	int default_style; // index of default style
 	char* name; // file name in case of external subs, 0 for streams
+
+	ass_library_t* library;
+	parser_priv_t* parser_priv;
 } ass_track_t;
 
 #endif

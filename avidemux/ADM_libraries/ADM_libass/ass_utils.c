@@ -1,21 +1,35 @@
+// -*- c-basic-offset: 8; indent-tabs-mode: t -*-
+// vim:ts=8:sw=8:noet:ai:
+/*
+  Copyright (C) 2006 Evgeniy Stepanov <eugeni.stepanov@gmail.com>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+*/
+
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
+#include <inttypes.h>
 #include <sys/time.h>
 #include <time.h>
 
-#ifdef MPLAYER
-#include "mp_msg.h"
-#else
 #include "mputils.h"
-#endif
 #include "ass_utils.h"
 
-//MEANX
 #define ADM_LEGACY_PROGGY
-#include "../../ADM_assert.h"
-// /MEANX
+#include "ADM_assert.h"
 
 
 int mystrtoi(char** p, int base, int* res)
@@ -49,7 +63,7 @@ int strtocolor(char** q, uint32_t* res)
 	char* p = *q;
 	
 	if (*p == '&') ++p; 
-	else mp_msg(MSGT_GLOBAL, MSGL_DBG2, "suspicious color format: \"%s\"\n", p);
+	else mp_msg(MSGT_ASS, MSGL_DBG2, "suspicious color format: \"%s\"\n", p);
 	
 	if (*p == 'H' || *p == 'h') { 
 		++p;

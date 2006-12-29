@@ -68,6 +68,19 @@ void ADM_memStat( void )
 	printf("\tMemory consumed :%lu (MB)\n",ADM_consumed>>20);
 
 }
+/**
+    \fn ADM_calloc(size_t nbElm,size_t elSize);
+    \brief Replacement for system Calloc using our memory management
+    \param nbElem : # of elements to allocate
+    \param elSize : Size of one element in bytes
+    \return pointer 
+*/
+void *ADM_calloc(size_t nbElm,size_t elSize)
+{
+  void *out=ADM_alloc( nbElm*elSize);
+  memset(out,0,nbElm*elSize);
+  return out;
+}
 void *ADM_alloc(size_t size)
 {
 char *c;
