@@ -291,15 +291,14 @@ uint8_t *rdBuffer=NULL;
     fullSize=new ADMImage(w,h);
     fullSize->blacken();
     rdBuffer=new uint8_t[w*h*3];     // Hardcoded!
-    if(!pic->getFrameNoAlloc(0,rdBuffer,&len))
+    ADMCompressedImage img;
+    img.data=rdBuffer;
+    if(!pic->getFrameNoAlloc(0,&img))
     {
         printf("[Animated]Get frame failed\n");
         goto skipIt;
     }
     // Decode it
-    ADMCompressedImage img;
-      img.data=rdBuffer;
-      img.dataLength=len;
     if(!decoder->uncompress (&img, fullSize))
     {
         printf("[Animated]Decoding failed\n");
