@@ -123,13 +123,15 @@ uint8_t GenericAviSaveCopy::setupVideo (char *name)
 uint8_t
 GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
 {
-  uint32_t    len;
+  
   uint8_t    ret1;
-
+ ADMCompressedImage img;
+ 
+ img.data=vbuffer;
 	if(!video_body->isReordered(frameStart+frame))
 	{
-		ret1 = video_body->getFrameNoAlloc (frameStart + frame, vbuffer, &len,
-				      &_videoFlag);
+		ret1 = video_body->getFrameNoAlloc (frameStart + frame,&img);// vbuffer, &len,      &_videoFlag);
+                _videoFlag=img.flags;
 	}
 	else
 	{
@@ -144,9 +146,9 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
 				if(forward!=_lastIPFrameSent)
 				{
 					aprintf("\tP Frame not sent, sending it :%lu\n",forward);
-					ret1 = video_body->getFrameNoAlloc (forward, vbuffer, &len,
-				      		&_videoFlag);
+					ret1 = video_body->getFrameNoAlloc (forward, &img);//vbuffer, &len,&_videoFlag);
 					_lastIPFrameSent=forward;
+                                         _videoFlag=img.flags;
 
 				}
 				else
@@ -154,8 +156,8 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
 					// we already sent it :)
 					// send n-1
 					aprintf("\tP Frame already, sending  :%lu\n",frameStart+frame-1);
-					ret1 = video_body->getFrameNoAlloc (frameStart+frame-1, vbuffer, &len,
-				      	&_videoFlag);
+					ret1 = video_body->getFrameNoAlloc (frameStart+frame-1,&img);// vbuffer, &len,	&_videoFlag);
+                                        _videoFlag=img.flags;
 
 				}
 
@@ -166,16 +168,15 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
 				if((frame+frameStart)==_lastIPFrameSent)
 				{
 					aprintf("\tSending Last B-frame :(%lu)\n",frameStart + frame-1);
-					ret1 = video_body->getFrameNoAlloc (frameStart + frame-1, vbuffer, &len,
-				      		&_videoFlag);
+					ret1 = video_body->getFrameNoAlloc (frameStart + frame-1, &img); //vbuffer, &len, 		&_videoFlag);
+                                         _videoFlag=img.flags;
 
 				}
 				else
 				{
 					aprintf("\tJust sending it :(%lu)-(%lu)\n",frameStart + frame,_lastIPFrameSent);
-					ret1 = video_body->getFrameNoAlloc (frameStart + frame, vbuffer, &len,
-				      		&_videoFlag);
-
+					ret1 = video_body->getFrameNoAlloc (frameStart + frame, &img);//vbuffer, &len,	&_videoFlag);
+                                        _videoFlag=img.flags;
 				}
 			}
 
@@ -203,9 +204,9 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
 				 }
 //  encoding_gui->feedFrame(len);  
   if(_needUserDataUpdate)
-  	updateUserData(vbuffer,len);
-  encoding_gui->setFrame(frame,len,0,frametogo);
-  return writter->saveVideoFrame (len, _videoFlag, vbuffer);
+  	updateUserData(vbuffer,img.dataLength);
+  encoding_gui->setFrame(frame,img.dataLength,0,frametogo);
+  return writter->saveVideoFrame (img.dataLength, img.flags, img.data);
 
 }
 //_____________________________________________________

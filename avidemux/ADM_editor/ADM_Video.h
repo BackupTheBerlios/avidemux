@@ -25,7 +25,7 @@
 #include "avifmt2.h"
 
 #include "ADM_audio/aviaudio.hxx"
-
+#include "ADM_compressedImage.h"
 typedef struct audioInfo
 {
     uint32_t encoding;  // Same as in wavheader
@@ -44,48 +44,52 @@ typedef struct aviInfo
 }  ;
 
 uint8_t WAV2AudioInfo(WAVHeader *hdr,audioInfo *info);
+/*
 
+    The base class for all demuxers
+
+*/
 class vidHeader
 {
 protected:
-		MainAVIHeader 		_mainaviheader;
-  		uint8_t			_isvideopresent;
-    		AVIStreamHeader 	_videostream;
-	  	BITMAPINFOHEADER  	_video_bih;
-  		uint8_t			_isaudiopresent;
-		AVIStreamHeader 	_audiostream;
-	  	void			*_audiostreaminfo;
-		char			*_name;
-		uint32_t		_videoExtraLen;
-		uint8_t			*_videoExtraData;
-                	  
+          MainAVIHeader 	_mainaviheader;
+          uint8_t		_isvideopresent;
+          AVIStreamHeader 	_videostream;
+          BITMAPINFOHEADER  	_video_bih;
+          uint8_t		_isaudiopresent;
+          AVIStreamHeader 	_audiostream;
+          void			*_audiostreaminfo;
+          char			*_name;
+          uint32_t		_videoExtraLen;
+          uint8_t		*_videoExtraData;
+                    
 public:
 //  static int checkFourCC(uint8_t *in, uint8_t *fourcc);
          vidHeader();
 virtual   ~vidHeader() ;
-virtual   void 				Dump(void)=0;
-virtual   uint32_t 			getNbStream(void)=0;
-virtual   uint8_t 			needDecompress(void)=0;
-virtual	  uint8_t			getExtraHeaderData(uint32_t *len, uint8_t **data);
+virtual   void 			Dump(void)=0;
+virtual   uint32_t 		getNbStream(void)=0;
+virtual   uint8_t 		needDecompress(void)=0;
+virtual	  uint8_t		getExtraHeaderData(uint32_t *len, uint8_t **data);
 // AVI io
-virtual 	uint8_t			open(char *name)=0;
-virtual 	uint8_t			close(void)=0;
+virtual 	uint8_t		open(char *name)=0;
+virtual 	uint8_t		close(void)=0;
 virtual	uint8_t			reorder( void ) { return 0;} // by default we don"t do frame re-ordering
 virtual	uint8_t			isReordered( void ) { return 0;} // by default we don"t do frame re-ordering
   //__________________________
   //				 Info
   //__________________________
-  uint8_t					getVideoInfo(aviInfo *info);
-  uint32_t				getWidth( void ) { return _mainaviheader.dwWidth;};
-  uint32_t				getHeight( void ) { return _mainaviheader.dwHeight;};
-  uint8_t					setMyName( char *name);
-  char						*getMyName( void);
+  uint8_t			getVideoInfo(aviInfo *info);
+  uint32_t			getWidth( void ) { return _mainaviheader.dwWidth;};
+  uint32_t			getHeight( void ) { return _mainaviheader.dwHeight;};
+  uint8_t			setMyName( char *name);
+  char				*getMyName( void);
   //__________________________
   //				 Audio
   //__________________________
 
 virtual 	WAVHeader              *getAudioInfo(void ) =0 ;
-virtual 	uint8_t			getAudioStream(AVDMGenericAudioStream **audio)=0;
+virtual 	uint8_t                 getAudioStream(AVDMGenericAudioStream **audio)=0;
 virtual         uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **info);
 virtual         uint8_t                 changeAudioStream(uint32_t newstream);
 virtual         uint32_t                getCurrentAudioStreamNumber(void) { return 0;}
@@ -97,23 +101,26 @@ virtual         uint32_t                getCurrentAudioStreamNumber(void) { retu
 virtual 	uint8_t  setFlag(uint32_t frame,uint32_t flags)=0;
 virtual 	uint8_t  getFrameSize(uint32_t frame,uint32_t *size);
 virtual 	uint32_t getFlags(uint32_t frame,uint32_t *flags)=0;			
-virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
-												uint32_t *flags)=0;
-virtual 	uint8_t  	getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)=0	;
-virtual 	uint8_t  	getRaw(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)													
-						{
-							 return getFrameNoAlloc(framenum,ptr,framelen)	;
-						}
+virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)=0	;
+virtual 	uint8_t  getRaw(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)				
+                            {
+                                    ADMCompressedImage img;
+                                    uint8_t r;
+                                    img.data=ptr;
+                                    r=getFrameNoAlloc(framenum,&img)	;
+                                    *framelen=img.dataLength;
+                                    return r;
+                            }
 virtual 	uint8_t   getRawStart(uint8_t *ptr,uint32_t *len);
-uint32_t 						getTime(uint32_t frame);
+                uint32_t  getTime(uint32_t frame);
 
 
 // index and stuff
 
 // New write avi engine
- 	 AVIStreamHeader *getVideoStreamHeader(void ) { return &_videostream;}
- 	 MainAVIHeader 		*getMainHeader(void ) { return &_mainaviheader;}
- 	 BITMAPINFOHEADER 		*getBIH(void ) { return &_video_bih;}
-	     	 		
+          AVIStreamHeader           *getVideoStreamHeader(void ) { return &_videostream;}
+          MainAVIHeader             *getMainHeader(void ) { return &_mainaviheader;}
+          BITMAPINFOHEADER          *getBIH(void ) { return &_video_bih;}
+
 };
 #endif

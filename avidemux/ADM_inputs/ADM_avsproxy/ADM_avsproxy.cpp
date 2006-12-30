@@ -88,22 +88,21 @@ uint8_t avsHeader::open(char *name)
 
 
 
-uint8_t  avsHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
+uint8_t  avsHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 {
     uint32_t page=(_mainaviheader.dwWidth*_mainaviheader.dwHeight*3)>>1;
-    *framelen=page;
     
     if(framenum>=_mainaviheader.dwTotalFrames)
     {
         printf("Avisynth proxy out of bound %u / %u\n",framenum,_mainaviheader.dwTotalFrames);
         return 0;
     }
-    if(!askFor(AvsCmd_GetFrame,framenum,page,ptr))
+    if(!askFor(AvsCmd_GetFrame,framenum,page,img->data))
     {
         printf("Get frame failed for frame %u\n",framenum);
         return 0;   
     }
-    
+    img->dataLength=page;
     return 1;
 }
 

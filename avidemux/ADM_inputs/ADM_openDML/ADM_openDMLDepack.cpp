@@ -46,7 +46,7 @@ uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode
 static const char *s_voptype[4]={"I frame","P frame","B frame","D frame"};
 uint8_t OpenDMLHeader::unpackPacked( void )
 {
-	uint32_t len,nbFrame;
+	uint32_t nbFrame;
 	uint8_t ret=0;
 	uint32_t firstType, secondType,thirdType;
 	uint32_t targetIndex=0,nbVop;
@@ -74,20 +74,21 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	
 	printf("Trying to unpack the stream\n");
 	DIA_working *working=new DIA_working("Unpacking packed bitstream");
-	
+	ADMCompressedImage image;
+        image.data=buffer;
 	uint32_t img=0;
 	while(img<nbFrame)
 	{
 		working->update(img,nbFrame);
-		if(!getFrameNoAlloc(img,buffer,&len))
+		if(!getFrameNoAlloc(img,&image))
 			{
 				printf("Error could not get frame %lu\n",img);
 				goto _abortUnpack;
 			}
-		aprintf("--Frame:%lu/%lu, len %lu\n",img,nbFrame,len);
+		aprintf("--Frame:%lu/%lu, len %lu\n",img,nbFrame,image.dataLength);
 		
 		
-		if(len<9) // ??
+		if(image.dataLength<9) // ??
 		{
 			if(nbDuped)
 			{
@@ -112,7 +113,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 		// Search first vop
 		
 		uint8_t *lastPos=buffer;
-		uint8_t *endPos=buffer+len;
+		uint8_t *endPos=buffer+image.dataLength;
 		aprintf("Frame :%lu",img);
 		searchVop(buffer,endPos,&nbVop,myVops);
 		
@@ -146,7 +147,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 		// more than one vop, do up to the n-1th
 		// the 1st image starts at 0
 		myVops[0].offset=0;
-		myVops[nbVop].offset=len;
+		myVops[nbVop].offset=image.dataLength;
 				
 		
 		uint32_t place;

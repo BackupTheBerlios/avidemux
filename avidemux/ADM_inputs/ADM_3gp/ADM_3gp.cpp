@@ -129,20 +129,14 @@ uint32_t _3GPHeader::getFlags(uint32_t frame,uint32_t *flags){
 }
 
 
-uint8_t  _3GPHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
-												uint32_t *flags)
-            {
-		    	getFlags(framenum,flags);
-                	return getFrameNoAlloc(  framenum,ptr,framelen);
-              }
-uint8_t  _3GPHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
+uint8_t  _3GPHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 {
     uint32_t offset=VDEO.index[framenum].offset; //+_mdatOffset;
 
 
     fseeko(_fd,offset,SEEK_SET);
-    fread(ptr, VDEO.index[framenum].size, 1, _fd);
-    *framelen=VDEO.index[framenum].size;
+    fread(img->data, VDEO.index[framenum].size, 1, _fd);
+    img->dataLength=VDEO.index[framenum].size;
     return 1;
 }
 _3GPHeader::~_3GPHeader()
@@ -318,13 +312,15 @@ uint8_t    _3GPHeader::open(char *name)
         */
             if(fourCC::check(_videostream.fccHandler,(uint8_t *)"H263"))
             {
-                uint32_t w,h,sz,sz2;
+                uint32_t w,h,sz;
                 uint8_t *bfer=NULL;
                 sz=VDEO.index[0].size;
                 if(sz)
                 {
                         bfer=new uint8_t[sz];
-                        if(getFrameNoAlloc(0,bfer,&sz2))
+                        ADMCompressedImage img;
+                        img.data=bfer;
+                        if(getFrameNoAlloc(0,&img))
                         {
                         if(extractH263Info(bfer,sz,&w,&h))
                         {

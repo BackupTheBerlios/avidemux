@@ -115,9 +115,7 @@ decoders 		*ADM_Composer::rawGetDecoder(uint32_t frame)
 }
 
 uint8_t
-  ADM_Composer::getFrameNoAlloc (uint32_t framenum, uint8_t * ptr,
-				 uint32_t * framelen,
-				 uint32_t * flags, uint8_t * seq)
+  ADM_Composer::getFrameNoAlloc (uint32_t framenum, ADMCompressedImage *img, uint8_t * seq)
 {
   uint32_t relframe;
   uint32_t seg;
@@ -142,8 +140,7 @@ uint8_t
   lastseg = seg;
   lastframe = relframe;
   ref = _segments[seg]._reference;
-  return _videos[ref]._aviheader->getFrameNoAlloc (relframe, ptr,
-						   framelen, flags);
+  return _videos[ref]._aviheader->getFrameNoAlloc (relframe, img);
 }
 // 
 // Check that the 2 frames are sequential with just B frames in between

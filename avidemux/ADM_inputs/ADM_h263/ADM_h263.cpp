@@ -77,18 +77,12 @@ uint32_t h263Header::getFlags(uint32_t frame,uint32_t *flags){
 }
 
 
-uint8_t  h263Header::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
-												uint32_t *flags)
-            {
-		    	getFlags(framenum,flags);
-                	return getFrameNoAlloc(  framenum,ptr,framelen);
-              }
-uint8_t  h263Header::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
+uint8_t  h263Header::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 {
 uint32_t offset=_idx[framenum].offset;
  	fseek(_fd,offset,SEEK_SET);
- 	fread(ptr, _idx[framenum].size, 1, _fd);
-  	*framelen=_idx[framenum].size;
+ 	fread(img->data, _idx[framenum].size, 1, _fd);
+  	img->dataLength=_idx[framenum].size;
  	return 1;
 }
 

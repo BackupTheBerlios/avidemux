@@ -128,10 +128,7 @@ virtual		uint8_t  reorder( void );
 virtual		uint8_t	 isReordered( void ) { return _reordered;} // by default we don"t do frame re-ordering
 virtual 	uint8_t  setFlag(uint32_t frame,uint32_t flags);
 virtual 	uint32_t getFlags(uint32_t frame,uint32_t *flags) ;
-virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
-					uint32_t *flags);
-virtual 	uint8_t  	getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)	;
-	     	 		
+virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img);
 };
 
 

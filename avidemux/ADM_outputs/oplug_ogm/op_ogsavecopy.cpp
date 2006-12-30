@@ -118,15 +118,18 @@ uint8_t	ADM_ogmWriteCopy::writeVideo(uint32_t frame)
 uint32_t len,flags;
 uint32_t forward;
 uint8_t ret1=0;
+ADMCompressedImage img;
+
+              img.data=_videoBuffer;
 
 		// Check for B_frames
 		if(!video_body->isReordered(frameStart+frame))
 		{
 
-			if(!  video_body->getFrameNoAlloc (frameStart+frame, _videoBuffer, &len,     &flags)) 
+			if(!  video_body->getFrameNoAlloc (frameStart+frame,&img))// _videoBuffer, &len,     &flags)) 
 				return 0;		
-			encoding_gui->setFrame(frame,len,0,_togo);
-			return videoStream->write(len,_videoBuffer,flags,frame);
+			encoding_gui->setFrame(frame,img.dataLength,0,_togo);
+			return videoStream->write(img.dataLength,img.data,img.flags,frame);
 		}
 		
 		// we DO have b frame
@@ -141,8 +144,7 @@ uint8_t ret1=0;
 				if(forward!=_lastIPFrameSent)
 				{
 					aprintf("\tP Frame not sent, sending it :%lu\n",forward);
-					ret1 = video_body->getFrameNoAlloc (forward, _videoBuffer, &len,
-				      		&flags);
+					ret1 = video_body->getFrameNoAlloc (forward,&img);// _videoBuffer, &len,&flags);
 					_lastIPFrameSent=forward;
 
 				}
@@ -151,8 +153,7 @@ uint8_t ret1=0;
 					// we already sent it :)
 					// send n-1
 					aprintf("\tP Frame already, sending  :%lu\n",frameStart+frame-1);
-					ret1 = video_body->getFrameNoAlloc (frameStart+frame-1, _videoBuffer, &len,
-				      	&flags);
+					ret1 = video_body->getFrameNoAlloc (frameStart+frame-1,&img);// _videoBuffer, &len,&flags);
 
 				}
 
@@ -163,20 +164,18 @@ uint8_t ret1=0;
 				if((frame+frameStart)==_lastIPFrameSent)
 				{
 					aprintf("\tSending Last B-frame :(%lu)\n",frameStart + frame-1);
-					ret1 = video_body->getFrameNoAlloc (frameStart + frame-1, _videoBuffer, &len,
-				      		&flags);
+					ret1 = video_body->getFrameNoAlloc (frameStart + frame-1, &img);//_videoBuffer, &len,		&flags);
 
 				}
 				else
 				{
 					aprintf("\tJust sending it :(%lu)-(%lu)\n",frameStart + frame,_lastIPFrameSent);
-					ret1 = video_body->getFrameNoAlloc (frameStart + frame, _videoBuffer, &len,
-				      		&flags);
+					ret1 = video_body->getFrameNoAlloc (frameStart + frame,&img);// _videoBuffer, &len, 		&flags);
 
 				}
 			}
-                encoding_gui->setFrame(frame,len,0,_togo);
-		return videoStream->write(len,_videoBuffer,flags,frame);
+                encoding_gui->setFrame(frame,img.dataLength,0,_togo);
+		return videoStream->write(img.dataLength,img.data,img.flags,frame);
 		return ret1;
 
 }

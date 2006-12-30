@@ -189,9 +189,7 @@ class asfHeader         :public vidHeader
 
     virtual uint8_t  setFlag(uint32_t frame,uint32_t flags);
     virtual uint32_t getFlags(uint32_t frame,uint32_t *flags);
-    virtual uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
-                                        uint32_t *flags);
-    virtual uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)	;
+    virtual uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)	;
     //
     //  Multiple audio channels
     //

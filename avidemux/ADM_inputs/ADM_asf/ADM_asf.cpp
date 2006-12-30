@@ -211,12 +211,10 @@ uint32_t asfHeader::getFlags(uint32_t frame,uint32_t *flags)
     __________________________________________________________
 */
 
-uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
-                                     uint32_t *flags)
+uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 {
-  *framelen=0;
-  if(flags)
-    *flags=AVI_KEY_FRAME;
+  img->dataLength=0;
+  img->flags=AVI_KEY_FRAME;
   if(framenum>=nbImage)
   {
     printf("[ASF] Going out of bound %u %u\n",framenum, nbImage);
@@ -286,7 +284,7 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
           }
           // We have found our first chunk
           curSeq=bit->sequence;
-          memcpy(ptr,bit->data,bit->len);
+          memcpy(img->data,bit->data,bit->len);
           len=bit->len;
           delete bit->data;
           delete bit;
@@ -297,13 +295,13 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
       if(bit->sequence!=curSeq )
       {
         aprintf("New sequence %u->%u while loading %u frame\n",curSeq,bit->sequence,framenum);
-        *framelen=len;
+        img->dataLength=len;
         readQueue.pushBack(bit); // don't delete it, we will use it later...
         curSeq=bit->sequence;
         goto gotcha;
       }
       // still same sequence ...add
-      memcpy(ptr+len,bit->data,bit->len);
+      memcpy(img->data+len,bit->data,bit->len);
       len+=bit->len;
       delete bit;
     }
@@ -316,7 +314,7 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
   }
 gotcha:
   
-  *framelen=len;
+  img->dataLength=len;
   if(len!=_index[framenum].frameLen)
   {
     printf("[ASF] Frame=%u :-> Mismatch found len : %u expected %u\n",framenum,len, _index[framenum].frameLen);
@@ -328,11 +326,6 @@ gotcha:
     __________________________________________________________
 */
 
-uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
-{
-  uint32_t flags;
-  return getFrameNoAlloc(framenum,ptr,framelen,&flags); 
-}
 /*******************************************
   Read Headers to collect information 
 ********************************************/

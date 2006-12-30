@@ -196,9 +196,8 @@ class ADM_Composer
 						uint8_t   	getRawStart(uint32_t frame,uint8_t *ptr,uint32_t *len);
 
 
-   						uint8_t 	getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,
-										uint32_t* framelen,
-										uint32_t *flags=0,  uint8_t *seq=0);
+   						uint8_t 	getFrameNoAlloc(uint32_t framenum,
+                                                                    ADMCompressedImage *img,  uint8_t *seq=0);
 	          				uint32_t 	getTime(uint32_t fn);
 						uint32_t 	getFlags(uint32_t frame,uint32_t *flags);
 						uint8_t   	isSequential (uint32_t framenum);

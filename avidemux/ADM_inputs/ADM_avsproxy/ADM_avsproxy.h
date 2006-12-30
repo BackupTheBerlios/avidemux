@@ -54,14 +54,7 @@ class avsHeader         :public vidHeader
         virtual 	uint8_t  setFlag(uint32_t frame,uint32_t flags) {return 1;}
         virtual 	uint32_t getFlags(uint32_t frame,uint32_t *flags) 
                             {*flags=AVI_KEY_FRAME;return AVI_KEY_FRAME;}
-        virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
-                uint32_t *flags)
-        {
-            if(flags) *flags=AVI_KEY_FRAME;
-            return getFrameNoAlloc(framenum,ptr,framelen);
-            
-        };
-        virtual 	uint8_t  	getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)	;
+        virtual 	uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img);
 
 };
 #endif

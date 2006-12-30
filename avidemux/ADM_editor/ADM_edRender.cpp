@@ -362,18 +362,17 @@ uint8_t  ADM_Composer::getUncompressedFrame (uint32_t frame, ADMImage * out,
 
 uint8_t		ADM_Composer::decodeCache(uint32_t frame,uint32_t seg, ADMImage *image)
 {
-uint32_t len;
+
 uint32_t sumit;
 float	 sum;
 EditorCache *cache=_videos[seg]._videoCache;	
 ADMImage *tmpImage=NULL;
 uint8_t refOnly=0;
-uint32_t left,ww,f_to_be_removed;
+uint32_t left,ww;
 ADMCompressedImage img;
         
-	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,
-						     compBuffer,
-						     &len, &f_to_be_removed))
+        img.data=compBuffer;
+	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,&img))
 	{
 	  printf ("\nEditor: last decoding failed.%ld)\n",   frame );
 	  return 0;
@@ -385,7 +384,7 @@ ADMCompressedImage img;
 
         refOnly=_videos[seg].decoder->dontcopy(); // can we skip one memcpy ?
 
-        if(!len & refOnly & !frame)      // Size is null = no image and we only got a pointer
+        if(!img.dataLength & refOnly & !frame)      // Size is null = no image and we only got a pointer
                                 // copy the previous one
         {                
                 // First image
@@ -432,8 +431,6 @@ ADMCompressedImage img;
        }
 	tmpImage->_colorspace=ADM_COLOR_YV12;
 	// Do pp, and use imageBuffer as intermediate buffer
-        img.data=compBuffer;
-        img.dataLength=len;
 	if (!_videos[seg].decoder->uncompress (&img, tmpImage))
 	    {
 	      printf ("\nEditor: Last Decoding2 failed for frame %lu\n",frame);

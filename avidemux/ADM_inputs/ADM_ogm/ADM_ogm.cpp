@@ -162,13 +162,6 @@ uint32_t  oggHeader::getFlags(uint32_t frame,uint32_t *flags)
 	return 1;
 }
 
-uint8_t  oggHeader::  getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
-					uint32_t *flags)
-{
-	getFlags(framenum,flags);
-	return getFrameNoAlloc(framenum,ptr,framelen);
-
-}
 
 
 uint8_t oggHeader::open(char *name)
@@ -574,14 +567,15 @@ OgAudioIndex *tmpaudio[2];
 		or rewind to a fresh page a forward from there
 
 */
-uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
+uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 {
 	uint64_t f;
 	uint32_t findex;
-	
+	uint8_t *ptr=img->data;
 	if(!_index) return 0;
 	if(framenum>(uint32_t)(_videostream.dwLength-1)) return 0;
 
+        getFlags(framenum,&(img->flags));
 	uint32_t size,len,flags,seek,cursize=0;
 	uint8_t bte,frag,*frags;
 	uint32_t red=0;
@@ -589,7 +583,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 	findex=_index[framenum].frame_index;
 	aprintf("****************** frame %lu requested findex=%lu type%lu**************\n",
 			framenum,findex,_index[framenum].flags);
-	len=*framelen=_index[framenum].size;
+	len=img->dataLength=_index[framenum].size;
 	// continue the previously read image ?
 	if((_lastImage+1)==findex)
 	{
@@ -624,7 +618,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 			printf("Len inconsistency : We still have %lu bytes to read and encountered a %lu lace\n",
 				len,cursize);
 				printf("The total frame len is %lu, frame number is %lu, findex=%lu,\n",
-					*framelen,framenum,findex);
+					img->dataLength,framenum,findex);
 				ADM_assert(0);
 			
 			}
@@ -652,7 +646,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 					"%lu we got len to go %lu and reached a new frame, lastFrag=%lu/%u\n",
 										framenum,len,_lastFrag,frag);
 										
-					printf("For information the frame len is %lu, findex=%lu\n",*framelen,findex);
+					printf("For information the frame len is %lu, findex=%lu\n",img->dataLength,findex);
 					ADM_assert(0);
 				}
 
@@ -738,7 +732,7 @@ uint8_t  oggHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 				{
 					printf("\n Inconsistency3 : When requesting frame %lu we got len to go %lu and reached a new frame, lastFrag=%lu/%u\n",
 										framenum,len,_lastFrag,frag);
-					printf("For information the frame len is %lu findex=%lu\n",*framelen,findex);
+					printf("For information the frame len is %lu findex=%lu\n",img->dataLength,findex);
 					ADM_assert(0);
 				}
 				seek++;

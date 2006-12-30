@@ -77,7 +77,12 @@ dmxHeader::~dmxHeader  ()
 }
 uint8_t            dmxHeader::getRaw(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
 {
-        return getFrameNoAlloc(framenum,ptr,framelen);
+  uint8_t r;
+        ADMCompressedImage img;
+        img.data=ptr;
+        r= getFrameNoAlloc(framenum,&img);
+        *framelen=img.dataLength;
+        return r;
 }
 uint8_t            dmxHeader::getRawStart(uint8_t *ptr,uint32_t *len)
 {
@@ -604,17 +609,17 @@ uint8_t  dmxHeader::renumber(void)
 // it is up to the underlying layer to do so (demuxer)
 // Here we look for simplicity
 //__________________________
-uint8_t   dmxHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t *framelen,  uint32_t *flags)
+uint8_t   dmxHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 {
 uint32_t f;
 dmxIndex *idx;
 
         if(framenum>=_nbFrames) return 0;
-        if(flags)
-                *flags=getFlags(framenum,&f);
+        
+        img->flags=getFlags(framenum,&f);
 
         idx=&(_index[framenum]);
-        *framelen=idx->size;
+        img->dataLength=idx->size;
         
         if(!demuxer->setPos(idx->absolute,idx->relative)) 
                 {
@@ -622,17 +627,12 @@ dmxIndex *idx;
                         return 0;
                 }
  
-        if(!demuxer->read(ptr,*framelen))
+        if(!demuxer->read(img->data,img->dataLength))
         {
                 printf("[DMX] Read failed\n");
                 return 0;
         }
         return 1;
-}
-uint8_t    dmxHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t *framelen)     
-{
-        return getFrameNoAlloc(framenum, ptr , framelen,NULL);
-
 }
 /*********************************/
  uint8_t  dmxHeader::changeAudioStream(uint32_t newstream)

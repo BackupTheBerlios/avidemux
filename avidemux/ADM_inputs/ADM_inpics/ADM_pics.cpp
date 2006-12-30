@@ -48,23 +48,15 @@ static uint32_t s32;
 #define MAX_ACCEPTED_OPEN_FILE 99999
 
 //****************************************************************
-uint8_t
-    picHeader::getFrameNoAlloc(uint32_t framenum, uint8_t * ptr,
-			       uint32_t * framelen, uint32_t * flags)
-{
-    *flags = AVI_KEY_FRAME;
-    return getFrameNoAlloc(framenum, ptr, framelen);
-}
 //****************************************************************
 uint8_t
-    picHeader::getFrameNoAlloc(uint32_t framenum, uint8_t * ptr,
-			       uint32_t * framelen)
+    picHeader::getFrameNoAlloc(uint32_t framenum, ADMCompressedImage *img)
 {
     ADM_assert(framenum <= _nb_file);
-
+    img->flags = AVI_KEY_FRAME;
     fseek(_fd[framenum], _offset, SEEK_SET);
-    fread(ptr, _imgSize[framenum] - _offset, 1, _fd[framenum]);
-    *framelen = _imgSize[framenum] - _offset;;
+    fread(img->data, _imgSize[framenum] - _offset, 1, _fd[framenum]);
+    img->dataLength = _imgSize[framenum] - _offset;;
     return 1;
 }
 //****************************************************************

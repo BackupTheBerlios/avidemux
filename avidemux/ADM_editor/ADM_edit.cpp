@@ -576,16 +576,13 @@ TryAgain:
                                 else
 				        buffer=new ADMImage(info.width,info.height);
 				// we decode 5 frames..should be enough to get an opinion
+                                ADMCompressedImage img;
+                                img.data=bufferin;
 				for(uint32_t i=0;i<scanned;i++)  //10
 				{
 					flags=0;
-  					vid->_aviheader->getFrameNoAlloc (i,
-							 bufferin,
-							 &len, &flags);
-                                        if(!len) continue;
-                                        ADMCompressedImage img;
-                                        img.data=bufferin;
-                                        img.dataLength=len;
+  					vid->_aviheader->getFrameNoAlloc (i,&img);
+                                        if(!img.dataLength) continue;
 					if(!vid->decoder->uncompress( &img,buffer ))
 					{
 						err++;

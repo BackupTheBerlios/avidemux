@@ -132,12 +132,7 @@ uint8_t  nuvHeader::getFrameSize(uint32_t frame,uint32_t *size)
    return 1;
 }
 
-uint8_t  nuvHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
-{
-		
-                	return getFrameNoAlloc(framenum,ptr,framelen,NULL);
-}
-uint8_t  nuvHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,uint32_t *flags)
+uint8_t  nuvHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 {
 uint64_t 	off;
 lzo_uint  	len, out,l;
@@ -149,11 +144,11 @@ uint8_t *planes[3];
 	planes[1]=_old+l;
 	planes[2]=_old+((l*5)>>2);
 
-	if(flags) *flags=AVI_KEY_FRAME;
+	img->flags=AVI_KEY_FRAME;
 
-	#define SWAPUV {	memcpy(ptr,_old,l);	\
-					memcpy(ptr+l,_old+l+(l>>2),l>>2); \
-					memcpy(ptr+l+(l>>2),_old+l,l>>2);	}
+	#define SWAPUV {	memcpy(img->data,_old,l);	\
+					memcpy(img->data+l,_old+l+(l>>2),l>>2); \
+					memcpy(img->data+l+(l>>2),_old+l,l>>2);	}
 
 	if((int32_t)framenum>=(int32_t)_mainaviheader.dwTotalFrames)
 	{
@@ -182,7 +177,7 @@ uint8_t *planes[3];
 			case 'L':
 						if(_isXvid)
 							{
-                          					*framelen=0;
+                          					img->dataLength=0;
 								printf("\n Drop !\n");
         							return 1;
 							}
@@ -192,18 +187,18 @@ uint8_t *planes[3];
 			case 'N':
 						if(_isXvid)
 							{
-                          					*framelen=0;
+                          					img->dataLength=0;
 								return 1;
 							}
 				//	printf("\n nuv black frame : Not HANDLED!!!!");
 					uint32_t f;
 						f=DXFIELD(width)*DXFIELD(height);
 						// black out Y
-						memset(ptr,0,f);
+						memset(img->data,0,f);
 						// black out u & v
-						memset(ptr+f,128,f>>1);
-						*framelen=f+(f>>1);
-						if(flags)  *flags=AVI_KEY_FRAME;
+						memset(img->data+f,128,f>>1);
+						img->dataLength=f+(f>>1);
+						img->flags=AVI_KEY_FRAME;
 						return 1;
 						printf("\n Black Frame \n");
 
@@ -218,17 +213,17 @@ uint8_t *planes[3];
 						return 0; \
 					}
 			case '0': // YV12 : just read it sam
-					READNUV(ptr);
+					READNUV(img->data);
 
 					// now swap u & v
 
 
-					*framelen=l+(l>>1);
+					img->dataLength=l+(l>>1);
 
-					memcpy(_vbufjpg,ptr+l,l>>2);
-					memcpy(ptr+l,ptr+l+(l>>2),l>>2);
-					memcpy(ptr+l+(l>>2),_vbufjpg,l>>2);
-						if(flags)  *flags=AVI_KEY_FRAME;
+					memcpy(_vbufjpg,img->data+l,l>>2);
+					memcpy(img->data+l,img->data+l+(l>>2),l>>2);
+					memcpy(img->data+l+(l>>2),_vbufjpg,l>>2);
+					img->flags=AVI_KEY_FRAME;
 #ifdef VERBOSE_FRAME
 						printf("\n YV12 Frame \n");
 #endif
@@ -243,9 +238,9 @@ uint8_t *planes[3];
 				_rtjpeg-> Decompress((int8_t *)_vbuflzo, planes);
 				SWAPUV;
 
-				*framelen=(l*3)>>1;
+				img->dataLength=(l*3)>>1;
 
-				if(flags)  *flags=AVI_KEY_FRAME;
+				img->flags=AVI_KEY_FRAME;
 #ifdef VERBOSE_FRAME
 
 						printf("\n RTJPEG Frame \n");
@@ -263,9 +258,9 @@ uint8_t *planes[3];
 				}
 				SWAPUV;
 
-				*framelen=(l*3)>>1;
+				img->dataLength=(l*3)>>1;
 
-				if(flags)  *flags=AVI_KEY_FRAME;
+				img->flags=AVI_KEY_FRAME;
 #ifdef VERBOSE_FRAME
 
 					printf("\n RTJPEG  Frame \n");
@@ -287,9 +282,9 @@ uint8_t *planes[3];
 				// now swap u & v
 				SWAPUV;
 
-				*framelen=(l*3)>>1;
+				img->dataLength=(l*3)>>1;
 				//printf("\n Lzo  in : %u out: %u\n",len,*framelen);
-					if(flags)  *flags=AVI_KEY_FRAME;
+				img->flags=AVI_KEY_FRAME;
 #ifdef VERBOSE_FRAME
 
 					printf("\n RTJPEG +LZO  Frame \n");
@@ -305,19 +300,16 @@ uint8_t *planes[3];
 							printf("\n Xvid detected WTF ???\n");
 							exit(0);
                          			}
-                         		READNUV(ptr);
-                            		*framelen=  _videoIndex[framenum]._len;
+                         		READNUV(img->data);
+                            		img->dataLength=  _videoIndex[framenum]._len;
 #ifdef DEBUG
 					printf("\n xvid : size : %" PRIu32 ,*framelen);
 #endif
+                                        if(_videoIndex[framenum]._kf)
+                                                        img->flags=AVI_KEY_FRAME;
+                                                else
+                                                        img->flags=0;
 
-					if(flags)
-						{
-                                     			if(_videoIndex[framenum]._kf)
-									*flags=AVI_KEY_FRAME;
-								else
-									*flags=0;
-						}
 #ifdef DEBUG
                              		printf("xvid flags : %" PRIu32 "\n",*flags);
 #endif

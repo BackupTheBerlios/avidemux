@@ -309,8 +309,7 @@ uint32_t mkvHeader::getFlags(uint32_t frame,uint32_t *flags)
     __________________________________________________________
 */
 
-uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
-                                     uint32_t *flags)
+uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 {
   AVPacket pkt1, *pkt = &pkt1;
   int ret;
@@ -328,14 +327,14 @@ uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
       //printf("[MKV] Wrong stream %u %u\n",pkt->stream_index,_videoIndex);
       continue;
     }
-    memcpy(ptr,pkt->data,pkt->size);
-    *framelen=pkt->size;
-    if(flags)
+    memcpy(img->data,pkt->data,pkt->size);
+    img->dataLength=pkt->size;
+    
     {
       if(pkt->flags  &  PKT_FLAG_KEY)
-        *flags=AVI_KEY_FRAME;
+        img->flags=AVI_KEY_FRAME;
       else
-        *flags=0;
+        img->flags=0;
     }
     break;
   }
@@ -344,12 +343,6 @@ uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* fra
 /*
     __________________________________________________________
 */
-
-uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,uint8_t *ptr,uint32_t* framelen)
-{
-  uint32_t flags;
-  return getFrameNoAlloc(framenum,ptr,framelen,&flags); 
-}
 /*
     Read info, fill in mainaviheader & video streamheader
     __________________________________________________________

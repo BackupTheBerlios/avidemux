@@ -42,7 +42,6 @@
 uint8_t   ADM_Composer::rebuildFrameType ( void)
 {
 _VIDEOS *vi;
-uint32_t len,flags_removed;
 uint32_t frames=0,cur=0;
 uint8_t *compBuffer=NULL;
 //uint8_t *prepBuffer=NULL;
@@ -70,7 +69,8 @@ aviInfo    info;
 
 	prepBuffer=new ADMImage(info.width ,info.height);            
         prepBufferNoCopy=new ADMImage(info.width ,info.height);      
-
+        ADMCompressedImage img;
+        img.data=compBuffer;
 	ADM_assert(prepBuffer);
         ADM_assert(prepBufferNoCopy);
 
@@ -101,14 +101,9 @@ aviInfo    info;
 				vi->decoder->decodeHeaderOnly();
 				for(uint32_t j=0;j<vi->_nb_video_frames;j++)
 				{
-	  				vi->_aviheader->getFrameNoAlloc (j,
-							 compBuffer,
-							 &len, &flags_removed);
-					if(len)
+	  				vi->_aviheader->getFrameNoAlloc (j,&img);
+					if(img.dataLength)
                                         {
-                                                 ADMCompressedImage img;
-                                                  img.data=compBuffer;
-                                                  img.dataLength=len;
 		    				vi->decoder->uncompress (&img, tmpImage);
                                         }
 					else
