@@ -48,7 +48,9 @@ typedef enum ADM_PLANE
 class ADMImage
 {
 public:
-        
+        uint32_t        demuxerFrameno;
+  
+        //*****************
         uint8_t		*data;		/// Pointer to actual image data
         uint32_t	_width;		/// Width of image
         uint32_t	_height;	/// Height of image
