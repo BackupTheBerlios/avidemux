@@ -372,6 +372,7 @@ uint32_t left,ww;
 ADMCompressedImage img;
         
         img.data=compBuffer;
+        img.cleanup(frame);
 	 if (!_videos[seg]._aviheader->getFrameNoAlloc (frame,&img))
 	{
 	  printf ("\nEditor: last decoding failed.%ld)\n",   frame );
