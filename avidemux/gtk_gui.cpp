@@ -479,6 +479,7 @@ int nw;
         case ACT_AUTO_SVCD:
         case ACT_AUTO_DVD:
         case ACT_AUTO_PSP:
+        case ACT_AUTO_PSP_H264:
                 A_autoDrive( action);
                 break;
      case ACT_TimeShift:
