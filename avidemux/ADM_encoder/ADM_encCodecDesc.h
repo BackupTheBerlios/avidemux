@@ -218,7 +218,7 @@ FFcodecSetting ffmpeg1Extra = {
   0.5,				//         qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
   (600 * 1000 >> 3),		// min bitrate in kB/S
   (2200 * 1000) >> 3,		// max bitrate
-  0,				// user_matrix 0->default, 1 tmpg, 2 animé , 3 kvcd
+  0,				// user_matrix 0->default, 1 tmpg, 2 animï¿½, 3 kvcd
   12,				// Safe gop size limit
   NULL,				// inter & intra matrix, will be set depending on user_matrix
   NULL,
@@ -278,7 +278,7 @@ FFcodecSetting ffmpeg2DVDExtra = {
   0.5,				//         qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
   0,				// min bitrate in kB/S
   (8000 * 1000) >> 3,		// max bitrate
-  0,				// user_matrix 0->default, 1 tmpg, 2 animé , 3 kvcd
+  0,				// user_matrix 0->default, 1 tmpg, 2 animï¿½, 3 kvcd
   12,				// Safe gop size limit
   NULL,				// inter & intra matrix, will be set depending on user_matrix
   NULL,
@@ -338,7 +338,7 @@ FFcodecSetting ffmpeg2SVCDExtra = {
   0.5,				//         qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
   0,				// min bitrate in kB/S
   (2400 * 1000) >> 3,		// max bitrate
-  0,				// user_matrix 0->default, 1 tmpg, 2 animé , 3 kvcd
+  0,				// user_matrix 0->default, 1 tmpg, 2 animï¿½, 3 kvcd
   12,				// Safe gop size limit
   NULL,				// inter & intra matrix, will be set depending on user_matrix
   NULL,
@@ -614,10 +614,60 @@ NULL,//     char      *logfile;
 1,//     uint32_t Trellis;
 1, //        ChromaME
 0, // Mixed Ref
-0 //NoiseReduction
-  
+0, //NoiseReduction
+51 // level IDC for psp  
 };
-
+/**************************************/
+ADM_x264Param x264ExtraPSP = {
+0,//     uint32_t  globalHeader;
+0,//     uint32_t  nbThreads;
+NULL,//     char      *logfile;
+//     //
+40,//     uint32_t KeyframeBoost;
+30,//     uint32_t BframeReduction;
+60,//     uint32_t BitrateVariability;
+//     //
+10,//     uint32_t  MinQp;
+51,//     uint32_t  MaxQp;
+4,//     uint32_t  QpStep;
+//     //
+1, //     uint32_t maxRefScene
+40,//     uint32_t  SceneCut;
+25,//     uint32_t  MinIdr;
+250,//     uint32_t  MaxIdr;
+//     //
+1,//     uint32_t  _8x8;
+1,//     uint32_t   _8x8P;
+1,//     uint32_t   _8x8B;
+0,//     uint32_t   _4x4;
+1,//     uint32_t   _8X8I;
+0,//     uint32_t   _4x4I;
+//     //
+0,//     uint32_t  MaxBFrame;
+0,//     int32_t   Bias;
+//     //
+0,//     uint32_t BasReference;
+0,//     uint32_t BidirME;
+1,//     uint32_t Adaptative;
+1,//     uint32_t Weighted;
+0,//     uint32_t DirectMode;
+//     //
+4,//     uint32_t PartitionDecision;
+32, //Range
+1,//     uint32_t Method;
+4,//     uint32_t AR_Num;
+3,//     uint32_t AR_Den;
+1,//     uint32_t DeblockingFilter;
+0,//     int32_t  Strength;
+0,//     int32_t  Threshold;
+0,//     uint32_t CABAC;
+0,//     uint32_t Trellis;
+1, //        ChromaME
+0, // Mixed Ref
+0, //NoiseReduction
+30 // level IDC for psp  
+};
+/**************************************/
 ADM_x264Param x264ExtraDefault=x264Extra;
 extern uint8_t DIA_x264 (COMPRES_PARAMS * conf);
 COMPRES_PARAMS x264Codec = {

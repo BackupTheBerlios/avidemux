@@ -949,6 +949,16 @@ uint8_t oplug_mpegInit(void)
   DVDExtra.maxBitrate = (DVDExtra.maxBitrate*1000) >> 3;
   return 1;
 }
+#ifdef USE_X264
+/**
+    \fn     setPSP_X264Preset(void)
+    \brief  set x264 codec conf to the PSP preset
+*/
+void setPSP_X264Preset(void)
+{
+ memcpy(&x264Extra,&x264ExtraPSP,sizeof(x264ExtraPSP)); 
+}
+#endif
 uint8_t oplug_mpegStore(void)
 {
   uint32_t br;

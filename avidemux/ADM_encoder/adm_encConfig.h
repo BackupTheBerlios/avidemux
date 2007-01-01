@@ -15,4 +15,6 @@ uint8_t videoCodecGetConf (uint32_t * nbData, uint8_t ** data);
 const char *videoCodecGetMode (void);
 uint8_t videoCodecSetFinalSize (uint32_t size);
 
+//
+void setPSP_X264Preset(void);
 #endif
