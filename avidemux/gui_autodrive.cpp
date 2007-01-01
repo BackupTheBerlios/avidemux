@@ -57,20 +57,40 @@ uint8_t A_autoDrive(Action action)
         switch(action)
         {
                 case ACT_AUTO_PSP:
-                                // Resize
-                                if(!setPSP()) return 0;
-                                // Video codec
-#ifdef USE_XVID_4
-                    if(!videoCodecSelectByName("XVID4")) 
-#else
-                    if(!videoCodecSelectByName("FFMpeg4"))            
-#endif
+                case ACT_AUTO_PSP_H264:
+                    // Resize
+                    if(!setPSP()) return 0;
+                    // Video codec
+                    switch(action)
                     {
-                      GUI_Error_HIG(_("Codec Error"),_( "Cannot select mpeg4 sp codec."));
-                        return 0;
+                    case ACT_AUTO_PSP:
+                          {
+#ifdef USE_XVID_4
+                            if(!videoCodecSelectByName("XVID4")) 
+#else
+                            if(!videoCodecSelectByName("FFMpeg4"))            
+#endif
+                            {
+                              GUI_Error_HIG(_("Codec Error"),_( "Cannot select mpeg4 sp codec."));
+                                return 0;
+                            }
+                            // Set mode & bitrate 
+                            setVideoEncoderSettings(COMPRESS_CBR,768,0,NULL);
+                          }
+                          break;
+                    case ACT_AUTO_PSP_H264:
+                    {
+#ifdef USE_X264
+                          videoCodecSelectByName("X264"); 
+                          setPSP_X264Preset(); 
+                          setVideoEncoderSettings(COMPRESS_CBR,768,0,NULL);
+#endif
                     }
-                    // Set mode & bitrate 
-                    setVideoEncoderSettings(COMPRESS_CBR,768,0,NULL);
+                    break;
+                    
+                    default:
+                          ADM_assert(0);
+                    }
                     // Audio Codec
                     if((currentaudiostream->getInfo()->frequency==PSP_AUDIO_FQ)&&
                         (currentaudiostream->getInfo()->channels==2)&&
@@ -83,14 +103,15 @@ uint8_t A_autoDrive(Action action)
 #ifdef USE_FAAC
                           audioCodecSetcodec(AUDIOENC_FAAC);
 #else
-                          GUI_Error_HIG(_("Codec Error"),_( "You don't have FAAC!.\nIt is needed to create PSP compatible video."));
+                          GUI_Error_HIG(_("Codec Error"),
+                                        _( "You don't have FAAC!.\nIt is needed to create PSP compatible video."));
 #endif
                                     // ? Needed ?
                           if(currentaudiostream->getInfo()->frequency!=PSP_AUDIO_FQ)
                           {
                               audioFilterResample(PSP_AUDIO_FQ);
                           }
-                          audioFilter_SetBitrate(112);
+                          audioFilter_SetBitrate(128);
                       }
                                 break;
                 case ACT_AUTO_VCD:
@@ -188,11 +209,15 @@ uint8_t A_autoDrive(Action action)
         }
         // Set output format to mpeg PS
         // Except for PSP
-        if(action==ACT_AUTO_PSP)
-          UI_SetCurrentFormat(ADM_PSP);
-        else
-          UI_SetCurrentFormat(ADM_PS);
-        
+        switch(action)
+        {
+          case ACT_AUTO_PSP:
+          case ACT_AUTO_PSP_H264:
+              UI_SetCurrentFormat(ADM_PSP);
+              break;
+          default:
+              UI_SetCurrentFormat(ADM_PS);
+        }
         return 1;
 }
 //EOF

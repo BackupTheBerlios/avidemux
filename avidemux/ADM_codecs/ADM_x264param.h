@@ -60,7 +60,7 @@ typedef struct ADM_x264Param
   uint32_t MixedRefs;
   uint32_t NoiseReduction;
   //
-
+  uint32_t idc;
   //
 
 } ADM_x264Param;
