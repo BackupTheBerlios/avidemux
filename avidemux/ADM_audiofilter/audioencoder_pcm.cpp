@@ -65,7 +65,7 @@ uint8_t AUDMEncoder_PCM::init(ADM_audioEncoderDescriptor *config)
 {
   
   _wavheader->byterate=_wavheader->channels*_wavheader->frequency*2;
-  _chunk = (_wavheader->frequency/10)*_wavheader->channels*2;
+  _chunk = (_wavheader->frequency/100)*_wavheader->channels*2;
   
 
  
