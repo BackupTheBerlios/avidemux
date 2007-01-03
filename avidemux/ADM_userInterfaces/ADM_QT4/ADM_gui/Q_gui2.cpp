@@ -100,12 +100,32 @@ static Action searchTranslationTable(const char *name);
      {
         const char *source=qPrintable(sender()->objectName());
 
-        printf("From : %s\n",source);
-        if(!strcmp(source,"comboBoxVideo"))  HandleAction (ACT_VideoCodecChanged) ;
-        else if(!strcmp(source,"comboBoxAudio"))  HandleAction (ACT_AudioCodecChanged) ;
+        if(!strcmp(source,"comboBoxVideo"))  
+        {
+          bool b=FALSE;;
+          if(ui.comboBoxVideo->currentIndex())
+          {
+             b=TRUE;
+          }
+          ui.pushButtonVideoConf->setEnabled(b);
+          ui.pushButtonVideoFilter->setEnabled(b);
+          HandleAction (ACT_VideoCodecChanged) ;
+        }
+        else 
+          if(!strcmp(source,"comboBoxAudio"))  
+        {
+          bool b=FALSE;
+          if(ui.comboBoxAudio->currentIndex())
+          {
+             b=TRUE;
+          }
+          ui.pushButtonAudioConf->setEnabled(b);
+          ui.pushButtonAudioFilter->setEnabled(b);
+          HandleAction (ACT_AudioCodecChanged) ;
+        }
         
 
-        printf("From : %s\n",source);
+        printf("From +: %s\n",source);
      }
       void sliderMoved(int u) 
         {
@@ -165,6 +185,13 @@ MainWindow::MainWindow()     : QMainWindow()
             ADD(actionNext_blak_frame);
             ADD(actionFirst_Frame);
             ADD(actionLast_Frame);
+            
+            // default state
+            bool b=0;
+          ui.pushButtonVideoConf->setEnabled(b);
+          ui.pushButtonVideoFilter->setEnabled(b);
+          ui.pushButtonAudioConf->setEnabled(b);
+          ui.pushButtonAudioFilter->setEnabled(b);
  }
  /*
       We receive a button press event
@@ -174,7 +201,7 @@ MainWindow::MainWindow()     : QMainWindow()
     // Receveid a key press Event, look into table..
    const char *source=qPrintable(sender()->objectName());
 
-    printf("From : %s\n",source);
+    printf("Button From : %s\n",source);
     Action action=searchTranslationTable(source);
     if(action!=ACT_DUMMY)
     {
@@ -226,7 +253,10 @@ Q_INIT_RESOURCE(avidemux);
     setupMenus();
     return a.exec();
 }
-
+/**
+    \fn searchTranslationTable(const char *name))
+    \brief return the action corresponding to a give button. The translation table is in translation_table.h
+*/
 Action searchTranslationTable(const char *name)
 {
   for(int i=0;i< SIZEOF_MY_TRANSLATION;i++)
@@ -235,7 +265,6 @@ Action searchTranslationTable(const char *name)
     {
       return  myTranslationTable[i].action;
     }
-    
   }
   printf("WARNING : Signal not found in translation table : %s\n",name);
   return ACT_DUMMY;

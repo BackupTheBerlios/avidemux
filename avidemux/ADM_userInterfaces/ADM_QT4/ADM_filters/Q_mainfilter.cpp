@@ -39,7 +39,8 @@ extern FILTER_ENTRY allfilters[MAX_FILTER];
 extern uint32_t nb_video_filter;
 extern FILTER videofilters[MAX_FILTER];
 extern uint32_t nb_active_filter;
-//extern ADM_Composer *video_body;
+extern const char  *filterGetNameFromTag(VF_FILTERS tag);
+extern ADM_Composer *video_body;
 
 /*******************************************************/
 class filtermainWindow : public QDialog
@@ -50,11 +51,14 @@ class filtermainWindow : public QDialog
      filtermainWindow();
  //    virtual ~filtermainWindow();
      void             buildAvailableFilterList(void);
+     void             buildActiveFilterList(void);
      Ui_mainFilterDialog ui;
      
      QStringList      allList[NB_TREE];
      QStringListModel allModel[NB_TREE];
-     QListView        *listView[NB_TREE];
+     
+     QStringList      activeList;
+     QStringListModel activeModel;
      
      
  public slots:
@@ -68,17 +72,18 @@ class filtermainWindow : public QDialog
 void filtermainWindow::buildAvailableFilterList(void)
 {
   int current_tree=-1;
-  char str[1024];
+  
   
   max=0;
   for (uint32_t i = 0; i < nb_video_filter; i++)
     {
       if (allfilters[i].viewable==1)
         {
-          snprintf(str,1023,"<big><b>%s</b></big>\n%s", 
-                allfilters[i].name, allfilters[i].description);
-  
-          allList[current_tree]=allList[current_tree] << str;
+          QString str; //="<b>";
+          str+=allfilters[i].name;
+          str+=":";//"</b><br>";
+          str+=allfilters[i].description;
+          allList[current_tree]+=str;
           max++;
         }else 
         {
@@ -94,23 +99,35 @@ void filtermainWindow::buildAvailableFilterList(void)
     {
       allModel[i].setStringList(allList[i]);
     }
-   
 }
-  
+  /**
+        \fn     buildActiveFilterList(void)
+        \brief  Build and display all active filters (may be empty)
+*/
+void filtermainWindow::buildActiveFilterList(void)
+{
+  VF_FILTERS fil;
+  activeList.clear();
+  for (uint32_t i = 1; i < nb_active_filter; i++)
+    {
+                QString str;
+                fil=videofilters[i].tag;
+
+                 str =filterGetNameFromTag(fil);
+                 str+= videofilters[i].filter->printConf ();
+                 activeList+=str;
+    }
+    activeModel.setStringList(activeList);
+
+}
   /**
   */
 filtermainWindow::filtermainWindow()     : QDialog()
  {
       buildAvailableFilterList();
+      buildActiveFilterList();
       ui.setupUi(this);
       
-    listView[0]=ui.listViewTransform;
-    listView[1]=ui.listViewInterlacing;
-    listView[2]=ui.listViewColors;
-    listView[3]=ui.listViewNoise;
-    listView[4]=ui.listViewSharpness;
-    listView[5]=ui.listViewSubtitles;
-    listView[6]=ui.listViewMisc;
     
     ui.listViewTransform->setModel(&(allModel[0]));
     ui.listViewInterlacing->setModel(&(allModel[1]));
@@ -120,6 +137,7 @@ filtermainWindow::filtermainWindow()     : QDialog()
     ui.listViewSubtitles->setModel(&(allModel[5]));;
     ui.listViewMisc->setModel(&(allModel[6]));;
       
+    ui.listViewActive->setModel(&activeModel);
 
 
  }

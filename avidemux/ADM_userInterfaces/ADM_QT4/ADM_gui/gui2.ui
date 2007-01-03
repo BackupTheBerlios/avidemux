@@ -210,7 +210,7 @@
            <number>6</number>
           </property>
           <item>
-           <widget class="QPushButton" name="pushButton" >
+           <widget class="QPushButton" name="setMarkerA" >
             <property name="sizePolicy" >
              <sizepolicy>
               <hsizetype>1</hsizetype>
@@ -246,7 +246,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_2" >
+           <widget class="QPushButton" name="setMarkerB" >
             <property name="sizePolicy" >
              <sizepolicy>
               <hsizetype>4</hsizetype>
@@ -405,9 +405,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_5" >
+           <widget class="QPushButton" name="pushButtonVideoConf" >
             <property name="enabled" >
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="sizePolicy" >
              <sizepolicy>
@@ -420,12 +420,15 @@
             <property name="text" >
              <string>Configure</string>
             </property>
+            <property name="checkable" >
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_6" >
+           <widget class="QPushButton" name="pushButtonVideoFilter" >
             <property name="enabled" >
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="sizePolicy" >
              <sizepolicy>
@@ -534,9 +537,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_7" >
+           <widget class="QPushButton" name="pushButtonAudioConf" >
             <property name="enabled" >
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="sizePolicy" >
              <sizepolicy>
@@ -552,9 +555,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_8" >
+           <widget class="QPushButton" name="pushButtonAudioFilter" >
             <property name="enabled" >
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="sizePolicy" >
              <sizepolicy>

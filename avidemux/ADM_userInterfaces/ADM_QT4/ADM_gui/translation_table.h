@@ -66,18 +66,10 @@ PROCESS(actionRecent3,ACT_RECENT3)
 
 
 #define LIST_OF_BUTTONS     \
+PROCESS(setMarkerA , ACT_MarkA  ) \
+PROCESS(setMarkerB ,ACT_MarkB )  \
+PROCESS(pushButtonVideoConf ,ACT_VideoConfigure )  \
+PROCESS(pushButtonVideoFilter , ACT_VideoParameter  ) \
+PROCESS(pushButtonAudioConf ,ACT_AudioConfigure ) \
+PROCESS(pushButtonAudioFilter ,ACT_AudioFilters )  
 
-#if 0
-PROCESS(toolButtonPlay , ACT_PlayAvi  ) \
-PROCESS(toolButtonBPrev ,ACT_PrevBlackFrame ) \
-PROCESS(toolButtonA ,    ACT_MarkA) \
-PROCESS(toolButtonKNext ,ACT_NextKFrame ) \
-PROCESS(toolButtonEnd ,  ACT_End ) \
-PROCESS(toolButtonPrev,  ACT_PreviousFrame ) \
-PROCESS(toolButtonNext , ACT_NextFrame ) \
-PROCESS(toolButtonBegin ,ACT_Begin ) \
-PROCESS(toolButtoBNext,  ACT_NextBlackFrame ) \
-PROCESS(toolButtonB ,    ACT_MarkB) \
-PROCESS(toolButtonKPrev ,ACT_PreviousKFrame ) \
-PROCESS(toolButtonStop , ACT_StopAvi) 
-#endif
