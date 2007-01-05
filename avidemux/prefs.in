@@ -85,3 +85,5 @@ feature.multi_thread,                   UINT,   0,      0,      4
 feature.mpeg_no_limit,                  UINT,   0,      0,      1
 # prologic 1/2
 downmixing.prologic,			UINT,	2,	0,	2
+filters.autoload.path,                  STRING, "/tmp/"
+filters.autoload.active,                UINT,   0,      0,      1

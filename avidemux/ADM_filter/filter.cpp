@@ -273,14 +273,29 @@ AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *couple, A
 	 AVDMGenericVideoStream *filter;
 
 			ADM_assert(tag!=VF_INVALID);
-			for(unsigned int i=0;i<nb_video_filter;i++)
-				{
-					if(tag==allfilters[i].tag)
-						{
-	 						filter=allfilters[i].create( in, couple);
-							return filter;
-						}
-				}
+                        if(tag>=VF_EXTERNAL_START)
+                        {
+                          // start from the end, it is an external filter 
+                          for(uint32_t i=nb_video_filter-1;i>=0;i--)
+                          {
+                              if(tag==allfilters[i].tag)
+                                {
+                                        filter=allfilters[i].create( in, couple);
+                                        return filter;
+                                }
+                          }
+                        } // else search forward
+                        else
+                        {
+                          for(unsigned int i=0;i<nb_video_filter;i++)
+                                  {
+                                          if(tag==allfilters[i].tag)
+                                                  {
+                                                          filter=allfilters[i].create( in, couple);
+                                                          return filter;
+                                                  }
+                                  }
+                        }
 			ADM_assert(0);
 			return NULL;                      
 }

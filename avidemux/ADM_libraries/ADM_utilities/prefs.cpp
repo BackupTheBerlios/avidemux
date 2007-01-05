@@ -113,10 +113,12 @@ static opt_def opt_defs [] = {
 	{"feature.audiobar_uses_master",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.multi_thread",		UINT,	"0",	NULL,	"0",	"4"	},
 	{"feature.mpeg_no_limit",		UINT,	"0",	NULL,	"0",	"1"	},
-	{"downmixing.prologic",		UINT,	"2",	NULL,	"0",	"2"	}
+	{"downmixing.prologic",		UINT,	"2",	NULL,	"0",	"2"	},
+	{"filters.autoload.path",		STRING,"/tmp/",NULL, NULL, NULL },
+	{"filters.autoload.active",		UINT,	"0",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 67;
+int num_opts = 69;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

@@ -23,7 +23,6 @@
 #define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
   g_object_set_data (G_OBJECT (component), name, widget)
 
-
 GtkWidget*
 create_dialog1 (void)
 {
@@ -80,6 +79,8 @@ create_dialog1 (void)
   GtkWidget *hbox4;
   GtkWidget *image7;
   GtkWidget *label22;
+  GtkWidget *treeview8;
+  GtkWidget *label28;
   GtkWidget *hbox13;
   GtkWidget *buttonAdd;
   GtkWidget *image11;
@@ -242,7 +243,7 @@ create_dialog1 (void)
   treeview1 = gtk_tree_view_new ();
   gtk_widget_show (treeview1);
   gtk_container_add (GTK_CONTAINER (scrolledwindow1), treeview1);
-  gtk_widget_set_size_request (treeview1, 288, 336);
+  gtk_widget_set_size_request (treeview1, -1, 336);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (treeview1), FALSE);
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview1), TRUE);
   gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview1), FALSE);
@@ -263,7 +264,7 @@ create_dialog1 (void)
   scrolledwindow2 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow2);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow2);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow2), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow2), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   treeview2 = gtk_tree_view_new ();
   gtk_widget_show (treeview2);
@@ -287,7 +288,7 @@ create_dialog1 (void)
   scrolledwindow3 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow3);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow3);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow3), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow3), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   treeview3 = gtk_tree_view_new ();
   gtk_widget_show (treeview3);
@@ -311,7 +312,7 @@ create_dialog1 (void)
   scrolledwindow4 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow4);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow4);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow4), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow4), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   treeview4 = gtk_tree_view_new ();
   gtk_widget_show (treeview4);
@@ -335,7 +336,7 @@ create_dialog1 (void)
   scrolledwindow5 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow5);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow5);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow5), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow5), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   treeview5 = gtk_tree_view_new ();
   gtk_widget_show (treeview5);
@@ -359,7 +360,7 @@ create_dialog1 (void)
   scrolledwindow6 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow6);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow6);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow6), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow6), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   treeview6 = gtk_tree_view_new ();
   gtk_widget_show (treeview6);
@@ -383,7 +384,7 @@ create_dialog1 (void)
   scrolledwindow7 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow7);
   gtk_container_add (GTK_CONTAINER (notebook1), scrolledwindow7);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow7), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow7), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   treeview7 = gtk_tree_view_new ();
   gtk_widget_show (treeview7);
@@ -403,6 +404,17 @@ create_dialog1 (void)
   label22 = gtk_label_new_with_mnemonic (_("Misc"));
   gtk_widget_show (label22);
   gtk_box_pack_start (GTK_BOX (hbox4), label22, FALSE, FALSE, 4);
+
+  treeview8 = gtk_tree_view_new ();
+  gtk_widget_show (treeview8);
+  gtk_container_add (GTK_CONTAINER (notebook1), treeview8);
+  gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (treeview8), FALSE);
+  gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview8), TRUE);
+  gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview8), FALSE);
+
+  label28 = gtk_label_new (_("External"));
+  gtk_widget_show (label28);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 7), label28);
 
   hbox13 = gtk_hbox_new (FALSE, 6);
   gtk_widget_show (hbox13);
@@ -450,7 +462,6 @@ create_dialog1 (void)
   treeview0 = gtk_tree_view_new ();
   gtk_widget_show (treeview0);
   gtk_container_add (GTK_CONTAINER (scrolledwindow9), treeview0);
-  gtk_widget_set_size_request (treeview0, 288, 336);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (treeview0), FALSE);
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview0), TRUE);
   gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview0), FALSE);
@@ -596,6 +607,8 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, hbox4, "hbox4");
   GLADE_HOOKUP_OBJECT (dialog1, image7, "image7");
   GLADE_HOOKUP_OBJECT (dialog1, label22, "label22");
+  GLADE_HOOKUP_OBJECT (dialog1, treeview8, "treeview8");
+  GLADE_HOOKUP_OBJECT (dialog1, label28, "label28");
   GLADE_HOOKUP_OBJECT (dialog1, hbox13, "hbox13");
   GLADE_HOOKUP_OBJECT (dialog1, buttonAdd, "buttonAdd");
   GLADE_HOOKUP_OBJECT (dialog1, image11, "image11");

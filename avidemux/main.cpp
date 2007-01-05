@@ -46,7 +46,7 @@
 #ifdef USE_XVID_4
 extern void xvid4_init(void);
 #endif
-
+extern uint8_t filterDynLoad(const char *path);
 typedef void *FCT_VOID(void *);
 uint8_t lavformat_init(void);
 #ifdef USE_FFMPEG
@@ -198,7 +198,17 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #ifdef HAVE_ENCODER
      registerVideoFilters(  );
 #endif
-
+// Try load load external filter
+     uint32_t loadpref=0;
+     char *dynloadPath=NULL;
+     prefs->get(FILTERS_AUTOLOAD_ACTIVE,&loadpref);
+     prefs->get(FILTERS_AUTOLOAD_PATH,&dynloadPath);
+     
+     if(loadpref && dynloadPath)
+     {
+      filterDynLoad(dynloadPath);
+     }
+// external filter
 #ifdef USE_FFMPEG
     avcodec_init();
     avcodec_register_all();

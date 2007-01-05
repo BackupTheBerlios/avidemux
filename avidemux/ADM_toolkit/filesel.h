@@ -27,7 +27,7 @@ char *ADM_getBaseDir(void);
 char *ADM_getJobDir(void);
 char *ADM_getCustomDir(void);
 
-uint8_t buildDirectoryContent(uint32_t *outnb,const char *base, char *jobName[],int maxElems);
+uint8_t buildDirectoryContent(uint32_t *outnb,const char *base, char *jobName[],int maxElems,const char *ext);
 const char *GetFileName(const char *str);
 uint8_t ADM_mkdir(const char *name);
 #endif

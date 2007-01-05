@@ -1204,7 +1204,7 @@ A_appendAvi (char *name)
   if (!video_body->addFile (name))
     {
       DIA_StopBusy ();
-      GUI_Error_HIG (_("Something failed"), NULL);
+      GUI_Error_HIG (_("Something failed when appending"), NULL);
       return 0;
     }
   DIA_StopBusy ();

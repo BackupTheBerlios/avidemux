@@ -19,12 +19,12 @@
 
  #define MAX_FILTER 80
 #include "ADM_script/adm_scanner.h"
- 	typedef enum
- 	{
-		VF_INVALID=0,
- 	      	VF_RESIZE=1,
- 	      	VF_CROP,
-	      	VF_TELECIDE,
+typedef enum
+{
+                VF_INVALID=0,
+                VF_RESIZE=1,
+                VF_CROP,
+                VF_TELECIDE,
                 VF_BLACKEN,
                 VF_SHARPEN,
                 VF_MEAN,
@@ -46,33 +46,33 @@
                 VF_LARGEMEDIAN,
                 VF_FLUXSMOOTH,
                 VF_SALT,
-		VF_PARTIAL          ,
-		VF_VLADSMOOTH,
-		VF_ROTATE,
-		VF_DROPOUT,
-		VF_SWAPFIELDS,
-		VF_KEEPODD,
-		VF_KEEPEVEN,
-		VF_SEPARATEFIELDS,
-		VF_MERGEFIELDS,
-		VF_CHROMASHIFT,
-		VF_SMARTSWAPFIELDS,
-		VF_MPLAYERRESIZE,
-		VF_IVTC,
-		VF_PULLDOWN,
-		VF_MPLHQD3D,
-		VF_MPLLQD3D,
-		VF_LAVDEINT,
-		VF_MPDETC,
-		VF_KRNDEINT,
-		VF_FORCEDPP,
-		VF_SOFTEN,
-		VF_DECOMB,
-		VF_DECIMATE,
-		VF_MSMOOTH,
-		VF_STACKFIELD,
-		VF_WHIRL,
-		VF_EQUALIZER,
+                VF_PARTIAL          ,
+                VF_VLADSMOOTH,
+                VF_ROTATE,
+                VF_DROPOUT,
+                VF_SWAPFIELDS,
+                VF_KEEPODD,
+                VF_KEEPEVEN,
+                VF_SEPARATEFIELDS,
+                VF_MERGEFIELDS,
+                VF_CHROMASHIFT,
+                VF_SMARTSWAPFIELDS,
+                VF_MPLAYERRESIZE,
+                VF_IVTC,
+                VF_PULLDOWN,
+                VF_MPLHQD3D,
+                VF_MPLLQD3D,
+                VF_LAVDEINT,
+                VF_MPDETC,
+                VF_KRNDEINT,
+                VF_FORCEDPP,
+                VF_SOFTEN,
+                VF_DECOMB,
+                VF_DECIMATE,
+                VF_MSMOOTH,
+                VF_STACKFIELD,
+                VF_WHIRL,
+                VF_EQUALIZER,
                 VF_VOBSUB,
                 VF_CHFPS,
                 VF_RESAMPLE_FPS,
@@ -83,8 +83,8 @@
                 VF_DGBOB,
                 VF_MSHARPEN,
                 VF_ASHARP,
-		VF_CNR2,
-		VF_DELTA,
+                VF_CNR2,
+                VF_DELTA,
                 VF_UNBLEND,
                 VF_HARDIVTC,
                 VF_MOSAIC,
@@ -96,40 +96,45 @@
                 VF_MCDEINT,
                 VF_REVERSE,
                 VF_FADE,
-		VF_ASS,
-		VF_DUMMY
- 	 }VF_FILTERS;
- 	
+                VF_ASS,
+                VF_DUMMY,
+                VF_EXTERNAL_START=0xF0000000
+          }VF_FILTERS;
+
+typedef AVDMGenericVideoStream *(ADM_createT) (AVDMGenericVideoStream *in, CONFcouple *);
+typedef AVDMGenericVideoStream *(ADM_create_from_scriptT) (AVDMGenericVideoStream *in, int n,Arg *args);
+
+         
    typedef struct
    {
-       		const char 		*name;
-		AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *);
-		VF_FILTERS 	tag;
-		uint8_t		viewable;
-		char		*filtername;
-                char            *description;
-		AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args);	
+        const char        *name;
+        ADM_createT       *create;
+        void              *destroy( AVDMGenericVideoStream *old); /* Maybe needed ...*/
+        VF_FILTERS        tag;
+        uint8_t           viewable;
+        char              *filtername;
+        char              *description;
+        ADM_create_from_scriptT *create_from_script;
    }FILTER_ENTRY;
  	
  typedef struct
    {
-   		VF_FILTERS				tag;
-		AVDMGenericVideoStream 	*filter;
-		CONFcouple				*conf;
+          VF_FILTERS              tag;
+          AVDMGenericVideoStream *filter;
+          CONFcouple             *conf;
+   }FILTER;
 
-   }FILTER; 	
-   
    typedef struct
    {
-   		uint32_t nb;
-		const char 	*param[25];
+            uint32_t    nb;
+            const char  *param[25];
    }FILTER_PARAM;
    
-  AVDMGenericVideoStream *getLastVideoFilter( uint32_t frameStart, uint32_t nbFrame);
-    AVDMGenericVideoStream *getLastVideoFilter( void );
- AVDMGenericVideoStream *getFirstVideoFilter( uint32_t frameStart, uint32_t nbFrame);
-  AVDMGenericVideoStream *getFirstVideoFilter( void);
-  AVDMGenericVideoStream *getFirstCurrentVideoFilter( void);
+AVDMGenericVideoStream *getLastVideoFilter( uint32_t frameStart, uint32_t nbFrame);
+AVDMGenericVideoStream *getLastVideoFilter( void );
+AVDMGenericVideoStream *getFirstVideoFilter( uint32_t frameStart, uint32_t nbFrame);
+AVDMGenericVideoStream *getFirstVideoFilter( void);
+AVDMGenericVideoStream *getFirstCurrentVideoFilter( void);
   
   void	filterSetPostProc( void );
   
@@ -145,12 +150,17 @@ int  filterLoadXml(char *name,uint8_t silent);
  void filterSave(char *name,uint8_t silent);
 CONFcouple *filterBuildCouple(FILTER_PARAM *param,uint32_t n,Arg *args);
 void filterSaveScriptJS(FILE *f);
+
 void registerFilter(const char *name,VF_FILTERS tag,uint8_t viewable,
-			AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *),char *fname);
-void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable
-		,AVDMGenericVideoStream *(*create) (AVDMGenericVideoStream *in, CONFcouple *)
-		,char *filtername,AVDMGenericVideoStream *(*create_from_script) (AVDMGenericVideoStream *in, int n,Arg *args),
+                    ADM_createT  *create,
+                    char *fname);
+                    
+void registerFilterEx(const char *name,VF_FILTERS tag,uint8_t viewable,
+                ADM_createT  *create,
+		char *filtername,
+                ADM_create_from_scriptT *create_from_script,
                 char *description);
+                
 void 		filterListAll( void );
 VF_FILTERS 	filterGetTagFromName(char *inname);
 uint8_t 	filterAddScript(VF_FILTERS tags,uint32_t n,Arg *args);

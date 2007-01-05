@@ -124,10 +124,10 @@ if ADM_UI_GTK
 avidemux2_gtk_LDADD=$(adm_lib) $(user_interface_gtk) $(adm_postlib)
 endif
 
-avidemux2_cli_LDADD=$(adm_lib) $(user_interface_cli) $(adm_postlib)
+avidemux2_cli_LDADD=$(adm_lib) $(user_interface_cli) $(adm_postlib) 
 
 if ADM_UI_QT4	
-avidemux2_qt4_LDADD=$(adm_lib) $(user_interface_qt4) $(adm_postlib)
+avidemux2_qt4_LDADD=$(adm_lib) $(user_interface_qt4) $(adm_postlib) 
 endif
 
 
@@ -141,13 +141,13 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 
 # the library search path.
 if ADM_UI_GTK
-avidemux2_gtk_LDFLAGS=$(all_libraries)  $(SDL_LIBS) $(GTK_LIBS) $(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) $(GLIB_LIBS)
+avidemux2_gtk_LDFLAGS=-Wl,--export-dynamic $(all_libraries)  $(SDL_LIBS) $(GTK_LIBS) $(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) $(GLIB_LIBS)
 endif
 
-avidemux2_cli_LDFLAGS = $(all_libraries)  $(SDL_LIBS) $(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS)  $(GLIB_LIBS)
+avidemux2_cli_LDFLAGS =-Wl,--export-dynamic  $(all_libraries)  $(SDL_LIBS) $(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS)  $(GLIB_LIBS)
 
 if ADM_UI_QT4	
-avidemux2_qt4_LDFLAGS=$(all_libraries)  $(SDL_LIBS) $(ADM_QTLIBS) $(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) $(GLIB_LIBS)
+avidemux2_qt4_LDFLAGS= -Wl,--export-dynamic $(all_libraries)  $(SDL_LIBS) $(ADM_QTLIBS) $(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) $(GLIB_LIBS)
 endif
 
 noinst_HEADERS = 

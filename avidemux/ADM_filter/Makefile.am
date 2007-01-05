@@ -5,7 +5,7 @@ noinst_LIBRARIES = libADM_filter.a
 
 libADM_filter_a_METASOURCES = AUTO
 
-libADM_filter_a_SOURCES = vidVCD.cpp  filter_declaration.cpp filter.cpp  filter_saveload.cpp 
+libADM_filter_a_SOURCES = vidVCD.cpp  filter_declaration.cpp filter.cpp  filter_saveload.cpp  filter_dylib.cpp
 
 
 EXTRA_DIST = filter.cpp             \

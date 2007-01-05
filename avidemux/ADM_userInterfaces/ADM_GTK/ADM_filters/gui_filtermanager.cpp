@@ -69,7 +69,7 @@ static void updateFilterList (void);
 static VF_FILTERS getFilterFromSelection (void);
 static void wrapToolButton(GtkWidget * wid, gpointer user_data);
 //___________________________________________
-#define NB_TREE 8
+#define NB_TREE 9
 static  uint32_t max = 0;
 static  GtkWidget *trees[NB_TREE];
 static  GtkListStore *stores[NB_TREE];
@@ -436,6 +436,7 @@ createFilterDialog (void)
     LOOK(5);
     LOOK(6);
     LOOK(7);
+    LOOK(8);
 
     //load stores with filter names, get start filter for each page
     char *str=NULL;

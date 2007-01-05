@@ -32,7 +32,7 @@ uint32_t nb;
 char     *name;
         memset(jobName,0,sizeof(jobName));
 
-        if(!buildDirectoryContent(&nb,ADM_getJobDir(),jobName,MAX_JOBS))
+        if(!buildDirectoryContent(&nb,ADM_getJobDir(),jobName,MAX_JOBS,".js"))
         {
           GUI_Error_HIG(_("Oops"),_("Something very wrong happened when buildint joblist"));
                 return 0;

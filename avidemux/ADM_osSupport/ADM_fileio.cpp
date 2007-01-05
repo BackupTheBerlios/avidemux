@@ -200,12 +200,15 @@ DIR *dir=NULL;
               closedir(dir); 
               return 1;
 }
-uint8_t buildDirectoryContent(uint32_t *outnb,const char *base, char *jobName[],int maxElems)
+uint8_t buildDirectoryContent(uint32_t *outnb,const char *base, char *jobName[],int maxElems,const char *ext)
 {
 
 DIR *dir;
 struct dirent *direntry;
 int dirmax=0,len;
+int extlen=strlen(ext);
+    ADM_assert(extlen);
+    
          dir=opendir(base);
         if(!dir)
         {
@@ -214,8 +217,10 @@ int dirmax=0,len;
         while((direntry=readdir(dir)))
         {
                 len=strlen(direntry->d_name);
-                if(len<4) continue;
-                if(direntry->d_name[len-1]!='s' || direntry->d_name[len-2]!='j' || direntry->d_name[len-3]!='.')
+                if(len<(extlen+1)) continue;
+                int xbase=len-extlen;
+                if(memcmp(direntry->d_name+xbase,ext,extlen))
+                //if(direntry->d_name[len-1]!='s' || direntry->d_name[len-2]!='j' || direntry->d_name[len-3]!='.')
                 {
                         printf("ignored:%s\n",direntry->d_name);
                         continue;

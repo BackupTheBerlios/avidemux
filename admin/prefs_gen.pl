@@ -12,7 +12,7 @@ if(! defined($srcdir))
 
 my $in  = "$srcdir/prefs.in";
 my $h   = "$srcdir/prefs.h";
-my $cpp = "$srcdir/prefs.cpp";
+my $cpp = "$srcdir/ADM_libraries/ADM_utilities/prefs.cpp";
 #print "In:$in\n";
 my $h_str = "typedef enum {\n";
 my $cpp_str = "typedef enum {\n".
@@ -115,7 +115,7 @@ close($fd);
 
 @data = ();
 $flag = 0;
-open($fd,"< $cpp") or die;
+open($fd,"< $cpp") or die($cpp);
 while(<$fd>){
         if( /^\/\/ <\/prefs_gen>/ ){
                 $flag = 2;
