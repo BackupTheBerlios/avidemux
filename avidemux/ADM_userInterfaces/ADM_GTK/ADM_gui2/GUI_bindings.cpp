@@ -444,7 +444,7 @@ void GUI_initCustom(void )
       return;
   }
   /* Collect the name */
-   if(! buildDirectoryContent(&ADM_nbCustom,customdir, customNames,ADM_MAC_CUSTOM_SCRIPT))
+   if(! buildDirectoryContent(&ADM_nbCustom,customdir, customNames,ADM_MAC_CUSTOM_SCRIPT,".js"))
     {
       printf("Failed to build custom dir content");
       return;
