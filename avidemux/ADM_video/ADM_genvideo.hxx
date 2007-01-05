@@ -14,6 +14,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ 
+#define ADM_FILTER_API_VERSION 1
 /**
 	Not for filter writters :
 
