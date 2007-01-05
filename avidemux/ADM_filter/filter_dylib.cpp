@@ -66,6 +66,8 @@ void *loadSym(void *handle,const char *sym)
     \brief try do use the dynlib pointer by handle
 
 */
+typedef uint32_t (ADM_getIntP)(void);
+
 void tryLoading(void *handle)
 {
   ADM_assert(handle);
@@ -74,22 +76,38 @@ void tryLoading(void *handle)
   int success=1;
   ADM_createT *createP;
   ADM_create_from_scriptT *createFromScriptP;
-  ADM_getStringT *nameP;
-  ADM_getStringT *descP;
+  ADM_getStringT  *nameP;
+  ADM_getStringT  *descP;
+  ADM_getIntP     *APIVersionP;
+  ADM_getIntP     *versionP;
+  uint32_t apiV;
+#define LOADSYM(x,y,z) if(success && !(f=loadSym(handle,x))) { success=0;printf("%s",dlerror());}   else {y=(z *)f;}
   
-#define LOADSYM(x,y,z) if(!(f=loadSym(handle,x))) { success=0;printf("%s",dlerror());}   else {y=(z *)f;}
   
-  
-    LOADSYM("FILTER_create",createP,ADM_createT);
+    LOADSYM("FILTER_create",        createP,    ADM_createT);
     LOADSYM("FILTER_create_fromscript",createFromScriptP,ADM_create_from_scriptT);
-    LOADSYM("FILTER_getName",nameP,ADM_getStringT);
-    LOADSYM("FILTER_getDesc",descP,ADM_getStringT);
+    LOADSYM("FILTER_getName",       nameP,      ADM_getStringT);
+    LOADSYM("FILTER_getDesc",       descP,      ADM_getStringT);
+    LOADSYM("FILTER_getVersion",    versionP,   ADM_getIntP);
+    LOADSYM("FILTER_getAPIVersion", APIVersionP,ADM_getIntP);
+    if(success)
+    {
+      apiV=APIVersionP();
+      if(apiV!=ADM_FILTER_API_VERSION)  // Check version did not change -> incompatble filter
+      {
+          printf("Wrong api version :%d expected %d\n",APIVersionP(),ADM_FILTER_API_VERSION);
+          success=0;
+      }
+    }    
+    // Check it is not a dupe ...
     
     if(!success)
     {
       dlclose(handle);
       return;
     }
+    
+    
     
     char *name,*desc;
     
@@ -99,7 +117,16 @@ void tryLoading(void *handle)
     ADM_assert(name);
     ADM_assert(desc);
     
-    printf("Loaded filter %s\n",name);
+    VF_FILTERS id=filterGetTagFromName(name);
+    if(VF_DUMMY!=id)
+    {
+      printf("This filter(%s) is already registered as %u\n", name,id);
+      dlclose(handle);
+      return;
+    }
+
+    
+    printf("Loaded filter %s, version %d\n",name,versionP());
   
    registerFilterEx(name,(VF_FILTERS)dynTag,1,createP,name,createFromScriptP,desc);
 
