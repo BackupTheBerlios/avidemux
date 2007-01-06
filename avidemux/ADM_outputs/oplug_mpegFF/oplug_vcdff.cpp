@@ -129,6 +129,7 @@ uint32_t audioSum=0;
   
         strcpy(twoPass,name);
         strcat(twoPass,".stat");
+        strcpy(twoFake,name);
         strcat(twoFake,".fake");
  
         _incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
