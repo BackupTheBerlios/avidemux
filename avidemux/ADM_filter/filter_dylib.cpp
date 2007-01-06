@@ -38,17 +38,27 @@
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_osSupport/ADM_quota.h"
 
+#ifdef CYG_MANGLING
+#define TYPEOFHANDLE HMODULE
+#else
+#define TYPEOFHANDLE void*
+#endif
+
+
 typedef char *(ADM_getStringT)(void);
 
-static void tryLoading(void *handle);
-static void *loadSym(void *handle,const char *sym);
+static void tryLoading(TYPEOFHANDLE handle);
+static void *loadSym(TYPEOFHANDLE handle,const char *sym);
 static uint32_t dynTag=0xF0000000;
+
+
+
 /**
     \fn  loadSym(void *handle,const char *sym)
     \brief Get a pointer to the function name given as parameter
 
 */
-void *loadSym(void *handle,const char *sym)
+void *loadSym(TYPEOFHANDLE handle,const char *sym)
 {
   void *f;
    
@@ -68,7 +78,7 @@ void *loadSym(void *handle,const char *sym)
 */
 typedef uint32_t (ADM_getIntP)(void);
 
-void tryLoading(void *handle)
+void tryLoading(TYPEOFHANDLE handle)
 {
   ADM_assert(handle);
   
@@ -81,8 +91,11 @@ void tryLoading(void *handle)
   ADM_getIntP     *APIVersionP;
   ADM_getIntP     *versionP;
   uint32_t apiV;
+#ifdef CYG_MANGLING
+  #define LOADSYM(x,y,z) if(success && !(f=GetProcAddress(handle,x))) { success=0;}   else {y=(z *)f;}
+#else
 #define LOADSYM(x,y,z) if(success && !(f=loadSym(handle,x))) { success=0;printf("%s",dlerror());}   else {y=(z *)f;}
-  
+#endif
   
     LOADSYM("FILTER_create",        createP,    ADM_createT);
     LOADSYM("FILTER_create_fromscript",createFromScriptP,ADM_create_from_scriptT);
@@ -121,7 +134,9 @@ void tryLoading(void *handle)
     if(VF_DUMMY!=id)
     {
       printf("This filter(%s) is already registered as %u\n", name,id);
+#ifndef CYG_MANGLING
       dlclose(handle);
+#endif
       return;
     }
 
@@ -153,7 +168,12 @@ uint8_t filterDynLoad(const char *path)
   // Try to dyload them
   for(int i=0;i<nbFile;i++)
   {
-    void *h=dlopen(files[i],RTLD_NOW);
+    TYPEOFHANDLE h;
+#ifdef CYG_MANGLING
+    h= LoadLibrary(files[i]);
+#else
+    h=dlopen(files[i],RTLD_NOW);
+#endif
     if(!h)
     {
         printf("Dlopened failed for %s er:%s\n",files[i],dlerror());
