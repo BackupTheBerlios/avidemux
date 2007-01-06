@@ -18,7 +18,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define WIN32_CLASH
+#ifdef CYG_MANGLING
+#include <windows.h> 
+#else
 #include <dlfcn.h>
+#endif
 
 #include <ADM_assert.h>
 
@@ -39,9 +44,18 @@
 #include "ADM_osSupport/ADM_quota.h"
 
 #ifdef CYG_MANGLING
-#define TYPEOFHANDLE HMODULE
+#define TYPEOFHANDLE     HMODULE
+#define OPENLIB(x)       LoadLibrary(x)
+#define CLOSELIB(x)      FreeLibrary(x)
+#define GETSYMBOL(h,x)   GetProcAddress(h,x)
+#define LIBERROR         "error"
+
 #else
-#define TYPEOFHANDLE void*
+#define TYPEOFHANDLE     void*
+#define OPENLIB(x)       dlopen(x,RTLD_NOW)
+#define CLOSELIB(x)      dlclose(x)
+#define GETSYMBOL(h,x)   loadSym(h,x)
+#define LIBERROR         dlerror()
 #endif
 
 
@@ -61,8 +75,11 @@ static uint32_t dynTag=0xF0000000;
 void *loadSym(TYPEOFHANDLE handle,const char *sym)
 {
   void *f;
-   
+  #ifdef CYG_MANGLING
+  GetProcAddress(handle, sym);
+  #else
   f=dlsym(handle,sym);
+  #endif
   if(!f) 
   {
     printf("\t Symbold %s not found\n",sym); 
@@ -91,11 +108,7 @@ void tryLoading(TYPEOFHANDLE handle)
   ADM_getIntP     *APIVersionP;
   ADM_getIntP     *versionP;
   uint32_t apiV;
-#ifdef CYG_MANGLING
-  #define LOADSYM(x,y,z) if(success && !(f=GetProcAddress(handle,x))) { success=0;}   else {y=(z *)f;}
-#else
-#define LOADSYM(x,y,z) if(success && !(f=loadSym(handle,x))) { success=0;printf("%s",dlerror());}   else {y=(z *)f;}
-#endif
+#define LOADSYM(x,y,z) if(success && !(f=(void *)GETSYMBOL(handle,x))) { success=0;printf("%s",LIBERROR);}   else {y=(z *)f;}
   
     LOADSYM("FILTER_create",        createP,    ADM_createT);
     LOADSYM("FILTER_create_fromscript",createFromScriptP,ADM_create_from_scriptT);
@@ -116,7 +129,7 @@ void tryLoading(TYPEOFHANDLE handle)
     
     if(!success)
     {
-      dlclose(handle);
+      CLOSELIB(handle);
       return;
     }
     
@@ -134,9 +147,7 @@ void tryLoading(TYPEOFHANDLE handle)
     if(VF_DUMMY!=id)
     {
       printf("This filter(%s) is already registered as %u\n", name,id);
-#ifndef CYG_MANGLING
-      dlclose(handle);
-#endif
+      CLOSELIB(handle);
       return;
     }
 
@@ -169,14 +180,11 @@ uint8_t filterDynLoad(const char *path)
   for(int i=0;i<nbFile;i++)
   {
     TYPEOFHANDLE h;
-#ifdef CYG_MANGLING
-    h= LoadLibrary(files[i]);
-#else
-    h=dlopen(files[i],RTLD_NOW);
-#endif
+
+    h=OPENLIB(files[i]);
     if(!h)
     {
-        printf("Dlopened failed for %s er:%s\n",files[i],dlerror());
+        printf("Dlopened failed for %s er:%s\n",files[i],LIBERROR);
         continue;
     }
     tryLoading(h);
