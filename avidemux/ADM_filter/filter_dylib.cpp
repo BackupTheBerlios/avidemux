@@ -15,12 +15,19 @@
  ***************************************************************************/
 #include "config.h"
 
+//#define USE_EDLL
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #define WIN32_CLASH
 #ifdef CYG_MANGLING
 #include <windows.h> 
+#ifdef USE_EDLL
+#include "edll/edll.h"
+#include "edll/ltdl.h"
+#endif
 #else
 #include <dlfcn.h>
 #endif
@@ -44,51 +51,40 @@
 #include "ADM_osSupport/ADM_quota.h"
 
 #ifdef CYG_MANGLING
+#ifdef USE_EDLL
+#define TYPEOFHANDLE     edll_module *
+#define OPENLIB(x)       edll_open(x)
+#define CLOSELIB(x)      edll_close(x)
+#define GETSYMBOL(h,x)   edll_sym(h,x)
+#define PRINTERROR()     printf("Last error %s (edll) \n",edll_strerror()) 
+#define LIB_EXTENSION    ".aplug"
+#define INIT()		 edll_init()
+#else
 #define TYPEOFHANDLE     HMODULE
 #define OPENLIB(x)       LoadLibrary(x)
 #define CLOSELIB(x)      FreeLibrary(x)
 #define GETSYMBOL(h,x)   GetProcAddress(h,x)
-#define LIBERROR         "error"
+#define PRINTERROR()     printf("Last error %d (%x)\n",GetLastError(),GetLastError()) 
 #define LIB_EXTENSION    ".dll"
-
+#define INIT()
+#endif
 #else
 #define TYPEOFHANDLE     void*
 #define OPENLIB(x)       dlopen(x,RTLD_NOW)
 #define CLOSELIB(x)      dlclose(x)
-#define GETSYMBOL(h,x)   loadSym(h,x)
-#define LIBERROR         dlerror()
+#define GETSYMBOL(h,x)   (void *)dlsym(h,x)
+#define PRINTERROR()     printf("Er:%s\n",dlerror())
 #define LIB_EXTENSION    ".so"
+#define INIT()
 #endif
 
 
 typedef char *(ADM_getStringT)(void);
 
 static void tryLoading(TYPEOFHANDLE handle);
-static void *loadSym(TYPEOFHANDLE handle,const char *sym);
 static uint32_t dynTag=0xF0000000;
 
 
-
-/**
-    \fn  loadSym(void *handle,const char *sym)
-    \brief Get a pointer to the function name given as parameter
-
-*/
-void *loadSym(TYPEOFHANDLE handle,const char *sym)
-{
-  void *f;
-  #ifdef CYG_MANGLING
-  GetProcAddress(handle, sym);
-  #else
-  f=dlsym(handle,sym);
-  #endif
-  if(!f) 
-  {
-    printf("\t Symbold %s not found\n",sym); 
-  }
-  return f;
-  
-}
 
 /**
     \fn  tryLoadin(void *handle)
@@ -110,7 +106,7 @@ void tryLoading(TYPEOFHANDLE handle)
   ADM_getIntP     *APIVersionP;
   ADM_getIntP     *versionP;
   uint32_t apiV;
-#define LOADSYM(x,y,z) if(success && !(f=(void *)GETSYMBOL(handle,x))) { success=0;printf("%s",LIBERROR);}   else {y=(z *)f;}
+#define LOADSYM(x,y,z) if(success && !(f=(void *)GETSYMBOL(handle,x))) { success=0;printf("Loading symbol failed for "x"\n");PRINTERROR();}   else {y=(z *)f;}
   
     LOADSYM("FILTER_create",        createP,    ADM_createT);
     LOADSYM("FILTER_create_fromscript",createFromScriptP,ADM_create_from_scriptT);
@@ -171,7 +167,9 @@ uint8_t filterDynLoad(const char *path)
   char *files[MAX_EXTERNAL_FILTER];
   uint32_t nbFile;
   printf("** Registering dynamic filters (%s) **\n",path);
+  INIT();
   memset(files,0,sizeof(char *)*MAX_EXTERNAL_FILTER);
+  printf("Searching for files %s\n",LIB_EXTENSION);
   if(!buildDirectoryContent(&nbFile,path, files,MAX_EXTERNAL_FILTER,LIB_EXTENSION))
   {
       GUI_Error_HIG("External Filter","Loading external filters failed.");
@@ -179,19 +177,34 @@ uint8_t filterDynLoad(const char *path)
   }
   printf("Found %u candidated\n",nbFile);
   // Try to dyload them
+ #if 1
   for(int i=0;i<nbFile;i++)
   {
     TYPEOFHANDLE h;
-
+	printf("Trying %s\n",files[i]);
     h=OPENLIB(files[i]);
     if(!h)
     {
-        printf("Dlopened failed for %s er:%s\n",files[i],LIBERROR);
+        printf("Dlopened failed for %s \n",files[i]);
+	PRINTERROR();
         continue;
     }
     tryLoading(h);
     
   }
+  #else
+TYPEOFHANDLE h;
+char *u="dummy.aplug";
+    h=OPENLIB(u);
+    if(h)
+    {
+    tryLoading(h);
+    }
+    else 
+        printf("Dlopened failed for %s \n",u);
+    
+
+  #endif
   // Cleanup
   for(int i=0;i<nbFile;i++)
   {
