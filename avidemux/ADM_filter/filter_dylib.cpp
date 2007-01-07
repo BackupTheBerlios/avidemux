@@ -49,6 +49,7 @@
 #define CLOSELIB(x)      FreeLibrary(x)
 #define GETSYMBOL(h,x)   GetProcAddress(h,x)
 #define LIBERROR         "error"
+#define LIB_EXTENSION    ".dll"
 
 #else
 #define TYPEOFHANDLE     void*
@@ -56,6 +57,7 @@
 #define CLOSELIB(x)      dlclose(x)
 #define GETSYMBOL(h,x)   loadSym(h,x)
 #define LIBERROR         dlerror()
+#define LIB_EXTENSION    ".so"
 #endif
 
 
@@ -170,7 +172,7 @@ uint8_t filterDynLoad(const char *path)
   uint32_t nbFile;
   printf("** Registering dynamic filters (%s) **\n",path);
   memset(files,0,sizeof(char *)*MAX_EXTERNAL_FILTER);
-  if(!buildDirectoryContent(&nbFile,path, files,MAX_EXTERNAL_FILTER,".so"))
+  if(!buildDirectoryContent(&nbFile,path, files,MAX_EXTERNAL_FILTER,LIB_EXTENSION))
   {
       GUI_Error_HIG("External Filter","Loading external filters failed.");
       return 0;
