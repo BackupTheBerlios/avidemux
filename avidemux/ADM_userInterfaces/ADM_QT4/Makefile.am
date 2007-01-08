@@ -1,4 +1,4 @@
-SUBDIRS= ADM_dialog  ADM_gui  ADM_filters
+SUBDIRS= ADM_dialog  ADM_gui  ADM_filters ADM_dialogFactory
 #SUBDIRS= ADM_gui  
 
 qclean:
