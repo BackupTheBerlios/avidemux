@@ -20,6 +20,7 @@ endif
 user_interface_gtk = ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
 		./ADM_userInterfaces/ADM_GTK/libADM_GTK.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_dialog/libADM_dialog.a	\
+		./ADM_userInterfaces/ADM_GTK/ADM_dialogFactory/libADM_dialogFactory.a	\
 		./ADM_userInterfaces/ADM_commonUI/libADM_CommonUI.a	\
 		./ADM_userInterfaces/ADM_GTK/ADM_filters/libADM_filters.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/libADM_toolkit_gtk.a	
