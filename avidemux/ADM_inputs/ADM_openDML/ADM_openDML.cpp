@@ -97,13 +97,14 @@ uint64_t offset=_idx[framenum].offset; //+_mdatOffset;
 // 	if(_recHack)
 // 	{
 // 		offset=4+4+4;
-// 	}
+// 	} odmlIndex
 // 	
 	
 	
  	fseeko(_fd,offset,SEEK_SET);
  	fread(img->data, _idx[framenum].size, 1, _fd);
   	img->dataLength=_idx[framenum].size;
+        img->flags=_idx[framenum].intra;
 	aprintf("Size: %lu\n",_idx[framenum].size);
 //	if(offset & 1) printf("odd!\n");
  	return 1;

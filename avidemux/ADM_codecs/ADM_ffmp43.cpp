@@ -71,9 +71,7 @@ extern "C"
 
 uint8_t decoderFF::clonePic (AVFrame * src, ADMImage * out)
 {
-  uint32_t
-    u,
-    v;
+  uint32_t    u,v;
   out->_planes[0] = (uint8_t *) src->data[0];
   out->_planeStride[0] = src->linesize[0];
   if (_swapUV)
@@ -109,7 +107,7 @@ uint8_t decoderFF::clonePic (AVFrame * src, ADMImage * out)
       out->_qSize = out->_qStride = 0;
       out->quant = NULL;
     }
-
+  out->demuxerFrameno=(uint32_t) (uint64_t)(src->opaque);
 }
 void
 decoderFF::decoderMultiThread (void)
@@ -334,7 +332,9 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       }
       return 1;
     }
-
+  
+  _frame.opaque=(void *)in->demuxerFrameNo;
+  
   ret = avcodec_decode_video (_context, &_frame, &got_picture, in->data, in->dataLength);
   out->_qStride = 0;		//Default = no quant
   if (0 > ret && !_context->hurry_up)
@@ -417,10 +417,15 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       printf ("\n Unhandled colorspace:%d\n", _context->pix_fmt);
       return 0;
     }
-  clonePic (&_frame, out);
+    clonePic (&_frame, out);
+    printf("Frame bitstream order : %u, display order %u Incoming :%u outgoing :%u\n",_frame.coded_picture_number,_frame.display_picture_number,
+         in->demuxerFrameNo,out->demuxerFrameno);
+    printf("in flags :%x out flags :%x\n",in->flags, out->flags);
+  
   return 1;
 }
 
+#define LOWDELAY() _context->flags |= CODEC_FLAG_LOW_DELAY
 
 
 decoderFFDiv3::decoderFFDiv3 (uint32_t w, uint32_t h):decoderFF (w, h)
@@ -431,8 +436,7 @@ decoderFFDiv3::decoderFFDiv3 (uint32_t w, uint32_t h):decoderFF (w, h)
 decoderFFMpeg4VopPacked::decoderFFMpeg4VopPacked (uint32_t w, uint32_t h):decoderFF (w,
 	   h)
 {
-// force low delay as avidemux don't handle B-frames
-
+/* In that case, we cannot use lowdelay...*/
   _refCopy = 1;			// YUV420 only
   _allowNull = 1;
   decoderMultiThread ();
@@ -442,8 +446,9 @@ decoderFFMpeg4::decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d)
 	   h)
 {
 // force low delay as avidemux don't handle B-frames
+  LOWDELAY();
   printf ("Using %d bytes of extradata for MPEG4 decoder\n", l);
-  _context->flags |= CODEC_FLAG_LOW_DELAY;
+  
   _refCopy = 1;			// YUV420 only
   _context->extradata = (void *) d;
   _context->extradata_size = (int) l;
@@ -470,7 +475,7 @@ decoderFFMpeg12::decoderFFMpeg12 (uint32_t w, uint32_t h, uint32_t extraLen, uin
 {
   int
     got_picture = 0;
-  _context->flags |= CODEC_FLAG_LOW_DELAY;
+  LOWDELAY();
   _refCopy = 1;			// YUV420 only
   decoderMultiThread ();
   WRAP_Open (CODEC_ID_MPEG2VIDEO);
@@ -481,7 +486,7 @@ decoderFFSVQ3::decoderFFSVQ3 (uint32_t w, uint32_t h, uint32_t extraLen, uint8_t
   int
     got_picture = 0;
 
-  _context->flags |= CODEC_FLAG_LOW_DELAY;
+  LOWDELAY();
   _context->extradata = (void *) extraData;
   _context->extradata_size = (int) extraLen;
   WRAP_Open (CODEC_ID_SVQ3);
@@ -515,7 +520,7 @@ decoderFFH264::decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d, u
   _context->extradata = (void *) d;
   _context->extradata_size = (int) l;
   if(lowdelay)
-    _context->flags |= CODEC_FLAG_LOW_DELAY;
+    LOWDELAY();
   printf ("Initializing lavcodec H264 decoder with %d extradata\n", l);
   WRAP_Open (CODEC_ID_H264);
 
