@@ -1,4 +1,4 @@
-SUBDIRS= ADM_dialog  ADM_gui2 ADM_toolkit_gtk ADM_filters
+SUBDIRS= ADM_dialog  ADM_gui2 ADM_toolkit_gtk ADM_filters ADM_dialogFactory
 
 noinst_LIBRARIES = libADM_GTK.a 
 libADM_GTK_a_METASOURCES = AUTO

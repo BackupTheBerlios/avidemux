@@ -26,7 +26,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include"ADM_video/ADM_vidConvolution.hxx"
-
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include <ADM_assert.h>
 
 
@@ -455,7 +455,13 @@ uint8_t  DIA_getLumaChroma(uint32_t *doLuma, uint32_t *doChroma);
 uint8_t AVDMFastVideoConvolution::configure(AVDMGenericVideoStream * instream)
 {
   
-  return DIA_getLumaChroma(&(_param->luma),&(_param->chroma)) ; 
+  //return DIA_getLumaChroma(&(_param->luma),&(_param->chroma)) ; 
+  diaElemToggle luma(&(_param->luma),"Process luma","Process luma plane");
+  diaElemToggle chroma(&(_param->chroma),"Process chroma");
+  
+  diaElem *elems[2]={&luma,&chroma};
+  
+  return diaFactoryRun("Fast Convolution",2,elems);
 }
 
 
