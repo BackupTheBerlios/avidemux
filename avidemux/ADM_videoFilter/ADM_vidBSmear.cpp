@@ -41,6 +41,7 @@
 #include "ADM_video/ADM_vidCommonFilter.h"
 #include "ADM_filter/video_filters.h"
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 static FILTER_PARAM cropParam={4,{"left","right","top","bottom"}};
 
@@ -180,6 +181,52 @@ uint8_t AVDMVideoStreamBSMear::getFrameNumberNoAlloc(uint32_t frame,
        		  	
        		         		       		
       return 1;
+}
+uint8_t AVDMVideoStreamBSMear::configure(AVDMGenericVideoStream *in)
+{
+	_in=in;
+	ADM_assert(_param);
+        uint32_t width,height;
+#define MAKEME(x) uint32_t x=_param->x;
+        while(1)
+        {
+          MAKEME(left);
+          MAKEME(right);
+          MAKEME(top);
+          MAKEME(bottom);
+          
+          width=_in->getInfo()->width;
+          height=_in->getInfo()->height;
+          
+          diaElemUInteger dleft(&left,"Left",       0,width);
+          diaElemUInteger dright(&right,"Right",    0,width);
+          diaElemUInteger dtop(&(top),"Top",          0,height);
+          diaElemUInteger dbottom(&(bottom),"Bottom", 0,height);
+            
+          diaElem *elems[4]={&dleft,&dright,&dtop,&dbottom};
+          if(diaFactoryRun("Blacken Borders",4,elems))
+          {
+            if((left&1) || (right&1)|| (top&1) || (bottom&1) ||
+                     (top+bottom>=height)|| (left+right>width))
+            {
+              GUI_Error_HIG("Incorrect parameters","All parameters must be even and within range"); 
+              continue;
+            }
+            else
+            {
+  #undef MAKEME
+  #define MAKEME(x) _param->x=x;
+                MAKEME(left);
+                MAKEME(right);
+                MAKEME(top);
+                MAKEME(bottom);
+                _info.width=width+left+right;
+                _info.height=height+top+bottom;
+                return 1;
+            }
+          }
+          return 0;
+      }
 }
 
 #endif

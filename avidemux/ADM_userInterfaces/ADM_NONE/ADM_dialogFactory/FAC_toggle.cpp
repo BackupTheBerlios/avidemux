@@ -36,11 +36,73 @@ diaElemToggle::~diaElemToggle()
 {
   
 }
-void diaElemToggle::setMe(void *dialog, void *opaque)
+void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t l)
 {
 }
 void diaElemToggle::getMe(void)
 {
 }
 
+//******************************************************
+diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip)
+  : diaElem(ELEM_TOGGLE)
+{
+ }
+
+diaElemInteger::~diaElemInteger()
+{
+  
+}
+void diaElemInteger::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ 
+}
+void diaElemInteger::getMe(void)
+{
+ 
+}
+
+//******************************************************
+diaElemUInteger::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip)
+  : diaElem(ELEM_TOGGLE)
+{
+ }
+
+diaElemUInteger::~diaElemUInteger()
+{
+  
+}
+void diaElemUInteger::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ 
+}
+void diaElemUInteger::getMe(void)
+{
+ 
+}
+
+//******************************************************
+
+diaElemFloat::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, 
+                            ELEM_TYPE_FLOAT min, ELEM_TYPE_FLOAT max,const char *tip)
+  : diaElem(ELEM_FLOAT)
+{
+}
+
+diaElemFloat::~diaElemFloat()
+{
+  
+}
+void diaElemFloat::setMe(void *dialog, void *opaque,uint32_t line)
+{
+  
+}
+void diaElemFloat::getMe(void)
+{
+ 
+}
+
+
+
+//******************************************************
 //EOF

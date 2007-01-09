@@ -51,6 +51,9 @@
 
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include "ADM_filter/video_filters.h"
+
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
 #ifdef HAVE_ALTIVEC_H
 #include "altivec.h"
 #endif
@@ -188,10 +191,15 @@ uint8_t Msmooth::configure(AVDMGenericVideoStream *in)
 {
 	_in=in;
 	ADM_assert(_param);
-	//return  DIA_getDecombDecimate(_param);
-	//return 1;
-	return DIA_getMSmooth(_param);
-	
+        
+        diaElemToggle toggle(&(_param->highq),"High Quality");
+        diaElemToggle mask(&(_param->showmask),"Show Mask");
+        diaElemUInteger threshold(&(_param->threshold),"Threshold",0,100);
+        diaElemUInteger strength(&(_param->strength),"Filter Strength",0,100);
+	  
+    diaElem *elems[4]={&toggle,&mask,&threshold,&strength};
+  
+    return diaFactoryRun("MSmooth by Donald Graft",4,elems);
 }
 
 //________________________________________________________

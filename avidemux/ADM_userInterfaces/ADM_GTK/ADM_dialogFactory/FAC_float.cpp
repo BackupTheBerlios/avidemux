@@ -1,5 +1,5 @@
 /***************************************************************************
-  FAC_toggle.cpp
+  FAC_float.cpp
   Handle dialog factory element : Toggle
   (C) 2006 Mean Fixounet@free.fr 
 ***************************************************************************/
@@ -21,73 +21,24 @@
 #include <math.h>
 
 #include "default.h"
+#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 
 
 
 
-diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
-  : diaElem(ELEM_TOGGLE)
-{
-}
-
-diaElemToggle::~diaElemToggle()
-{
-  
-}
-void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t l)
-{
-}
-void diaElemToggle::getMe(void)
-{
-}
-
-
-
-//********************************************************************
-diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip)
-  : diaElem(ELEM_TOGGLE)
-{
- }
-
-diaElemInteger::~diaElemInteger()
-{
-  
-}
-void diaElemInteger::setMe(void *dialog, void *opaque,uint32_t line)
-{
- 
-}
-void diaElemInteger::getMe(void)
-{
- 
-}
-//******************************************************
-diaElemUInteger::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip)
-  : diaElem(ELEM_TOGGLE)
-{
- }
-
-diaElemUInteger::~diaElemUInteger()
-{
-  
-}
-void diaElemUInteger::setMe(void *dialog, void *opaque,uint32_t line)
-{
- 
-}
-void diaElemUInteger::getMe(void)
-{
- 
-}
-
-//********************************************************************
-
 diaElemFloat::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, 
                             ELEM_TYPE_FLOAT min, ELEM_TYPE_FLOAT max,const char *tip)
   : diaElem(ELEM_FLOAT)
 {
+  param=(void *)intValue;
+  paramTitle=toggleTitle;
+  this->min=min;
+  this->max=max;
+  this->tip=tip;
 }
 
 diaElemFloat::~diaElemFloat()
@@ -96,11 +47,40 @@ diaElemFloat::~diaElemFloat()
 }
 void diaElemFloat::setMe(void *dialog, void *opaque,uint32_t line)
 {
+  GtkWidget *widget;
+  GtkObject *adj;
+  GtkWidget *label;
+  
+  label = gtk_label_new (paramTitle);
+  gtk_widget_show(label);
+  
+  gtk_table_attach (GTK_TABLE (opaque), label, 0, 1, line, line+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  
+  ELEM_TYPE_FLOAT val=*(ELEM_TYPE_FLOAT *)param;
+  widget = gtk_spin_button_new_with_range(min,max,0.1);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(widget),TRUE);
+  gtk_spin_button_set_digits  (GTK_SPIN_BUTTON(widget),2);
+  
+  
+  gtk_widget_show (widget);
+  
+  gtk_table_attach (GTK_TABLE (opaque), widget, 1, 2, line, line+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  
+  
+  
+  myWidget=(void *)widget;
   
 }
 void diaElemFloat::getMe(void)
 {
- 
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  ELEM_TYPE_FLOAT *val=(ELEM_TYPE_FLOAT *)param;
+  ADM_assert(widget);
+  *(ELEM_TYPE_FLOAT *)param=gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (widget));
 }
 
 //EOF

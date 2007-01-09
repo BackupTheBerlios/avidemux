@@ -20,17 +20,18 @@
  {
 
  protected:
-    		virtual char					*printConf(void);
-    		CROP_PARAMS			*_param;
+              virtual char        *printConf(void);
+              CROP_PARAMS         *_param;
  public:
 
-  							AVDMVideoAddBorder(  AVDMGenericVideoStream *in,CONFcouple *setup);
-							AVDMVideoAddBorder(  AVDMGenericVideoStream *in,uint32_t x,uint32_t x2,uint32_t y,uint32_t y2);
-  			virtual 			~AVDMVideoAddBorder();
-		        virtual 	uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          																	ADMImage *data,uint32_t *flags);
-         				uint8_t 	configure( AVDMGenericVideoStream *instream) ;
-					uint8_t	getCoupledConf( CONFcouple **couples)		;
+                                    AVDMVideoAddBorder(  AVDMGenericVideoStream *in,CONFcouple *setup);
+                                    AVDMVideoAddBorder(  AVDMGenericVideoStream *in,uint32_t x,uint32_t x2,
+                                                              uint32_t y,uint32_t y2);
+            virtual                 ~AVDMVideoAddBorder();
+            virtual 	uint8_t     getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+                                            ADMImage *data,uint32_t *flags);
+                        uint8_t     configure( AVDMGenericVideoStream *instream) ;
+                        uint8_t     getCoupledConf( CONFcouple **couples);
  }     ;
 
 #endif

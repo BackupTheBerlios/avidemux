@@ -8,6 +8,6 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM
 
 libADM_dialogFactory_a_METASOURCES = AUTO
 
-libADM_dialogFactory_a_SOURCES = DIA_dialogFactory.cpp FAC_toggle.cpp
+libADM_dialogFactory_a_SOURCES = DIA_dialogFactory.cpp FAC_toggle.cpp FAC_integer.cpp FAC_float.cpp
 
 

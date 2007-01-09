@@ -17,7 +17,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+#include "config.h" 
  
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,17 +25,24 @@
 #include <ADM_assert.h>
 #include <math.h>
 
-#include "config.h"
+#include "default.h"
 #include "fourcc.h"
 #include "avio.hxx"
 #include "config.h"
-#include "avi_vars.h"
 
 
-#include "ADM_toolkit/toolkit.hxx"
+
+//#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "admmangle.h"
+
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "ADM_vidFlux.h"
+#include "ADM_filter/video_filters.h"
+
+
+#include "ADM_assert.h"
 
 static int16_t scaletab[16];
 static uint64_t scaletab_MMX[65536];
@@ -56,8 +63,6 @@ void initScaleTab( void )
 		}
 }
  
-#include "ADM_video/ADM_vidFlux.h"
-#include "ADM_filter/video_filters.h"
 
 static FILTER_PARAM fluxParam={2,{"temporal_threshold","spatial_threshold"}};
 
@@ -120,19 +125,24 @@ uint8_t	ADMVideoFlux::getCoupledConf( CONFcouple **couples)
 uint8_t ADMVideoFlux::configure(AVDMGenericVideoStream *in)
 {
 UNUSED_ARG(in);
-int i,j;
-		i=_param->temporal_threshold;
-		j=_param->spatial_threshold;
-	  if(GUI_getIntegerValue(&i,0,255,"Temporal  Threshold"))
-			{
-					if(GUI_getIntegerValue(&j,0,255,"Spatial  Threshold"))
-					{
-						_param->temporal_threshold=(uint32_t)i;						
-						_param->spatial_threshold=(uint32_t)j;
-					}	
-					return 1;
-			}		
-			return 0;	
+int32_t temporal,spatial; // diaElem wants int32 not uint32
+uint8_t r;
+    temporal=_param->temporal_threshold;
+    spatial=_param->spatial_threshold;
+
+    diaElemInteger Gtemporal(&temporal,"Temporal  Threshold",0,255);
+    diaElemInteger Gspatial(&spatial,"Spatial  Threshold",0,255);
+	  
+    diaElem *elems[2]={&Gtemporal,&Gspatial};
+  
+    r=diaFactoryRun("Flux Smooth",2,elems);
+    if(r)
+    {
+       _param->temporal_threshold=temporal;
+       _param->spatial_threshold=spatial;
+    }
+    return r;
+    
 }
 ADMVideoFlux::~ADMVideoFlux()
 {

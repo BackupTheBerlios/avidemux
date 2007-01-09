@@ -33,19 +33,10 @@
     @return nothing
 
 */
-void addLine(diaElem *elem, GtkWidget *dialog, GtkWidget *vbox)
+void addLine(diaElem *elem, GtkWidget *dialog, GtkWidget *vbox,uint32_t line)
 {
-  switch(elem->mySelf)
-  {
-    case ELEM_TOGGLE:
-        {
-            diaElemToggle *toggle=(diaElemToggle *)elem;
-            toggle->setMe( (void *)dialog,(void *)vbox);
-        }
-        break;
-    default:
-        ADM_assert(0);  
-  }
+            elem->setMe( (void *)dialog,(void *)vbox,line);
+  
 }
 /**
     \fn getLine(diaElem *elem, GtkDialog *dialog, GtkWidget *vbox)
@@ -53,19 +44,11 @@ void addLine(diaElem *elem, GtkWidget *dialog, GtkWidget *vbox)
     @return nothing
 
 */
-void getLine(diaElem *elem, GtkWidget *dialog, GtkWidget *vbox)
+void getLine(diaElem *elem, GtkWidget *dialog, GtkWidget *vbox,uint32_t line)
 {
-  switch(elem->mySelf)
-  {
-    case ELEM_TOGGLE:
-        {
-            diaElemToggle *toggle=(diaElemToggle *)elem;
-            toggle->getMe();
-        }
-        break;
-    default:
-        ADM_assert(0);  
-  }
+  
+             elem->getMe();
+  
 }
 /**
     \fn diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
@@ -83,19 +66,19 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   /* First there was a dialog ...*/
   GtkWidget *dialog=gtk_dialog_new ();
   GtkWidget *dialog_vbox1;
-  GtkWidget *vbox1;
+  GtkWidget *table1;
   
   gtk_window_set_title (GTK_WINDOW (dialog),title );
   dialog_vbox1 = GTK_DIALOG (dialog)->vbox;
   gtk_widget_show (dialog_vbox1);
   
-  vbox1 = gtk_vbox_new (FALSE, 0);
-  gtk_widget_show (vbox1);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
-
+  table1 = gtk_table_new (nb, 2, FALSE);
+  gtk_widget_show (table1);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox1), table1, TRUE, TRUE, 0);
+  
   for(int i=0;i<nb;i++)
   {
-    addLine(elems[i],dialog,vbox1);
+    addLine(elems[i],dialog,table1,i);
     
   }
   // Add ok & cancel button
@@ -117,7 +100,7 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   {
     for(int i=0;i<nb;i++)
       {
-        getLine(elems[i],dialog,vbox1);
+        getLine(elems[i],dialog,table1,i);
         
       }
     ret=1;  

@@ -42,14 +42,26 @@ diaElemToggle::~diaElemToggle()
 {
   
 }
-void diaElemToggle::setMe(void *dialog, void *opaque)
+void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t line)
 {
   GtkWidget *widget;
+  GtkWidget *label;
   
-  widget = gtk_check_button_new_with_mnemonic (paramTitle);
+  
+  label = gtk_label_new (paramTitle);
+  gtk_widget_show(label);
+  
+  gtk_table_attach (GTK_TABLE (opaque), label, 0, 1, line, line+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  
+  widget = gtk_check_button_new_with_mnemonic ("");
   gtk_widget_show (widget);
   myWidget=(void *)widget;
-  gtk_box_pack_start (GTK_BOX (opaque), widget, FALSE, FALSE, 0);
+  
+  gtk_table_attach (GTK_TABLE (opaque), widget, 1, 2, line, line+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *(uint32_t *)param);
 }
 void diaElemToggle::getMe(void)

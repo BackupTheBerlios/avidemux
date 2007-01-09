@@ -13,12 +13,10 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidLargeMedian.cpp \
  ADM_vidSalt.cpp \
  ADM_vidCached.cpp \
- ADM_vidFlux.cpp \
  ADM_vidPartial.cpp \
  ADM_vidFont.cpp \
  ADM_vidSRT.cpp \
  ADM_vidDenoise.cpp \
- ADM_vidFastConvolution.cpp \
 	ADM_vidFlipV.cpp \
  ADM_vidStabilize.cpp \
  ADM_vidContrast.cpp \
@@ -35,11 +33,7 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidUVSwap.cpp \
 	ADM_vidClean.cpp \
  ADM_vidChroma.cpp \
- ADM_vidBSmear.cpp \
- ADM_vidAddBorder.cpp \
 	ADM_resizebis.cpp \
- ADM_guiBSMear.cpp \
-	ADM_guiAddBorder.cpp \
  ADM_genvideo.cpp \
  ADM_vidRotate.cpp \
  ADM_vidRotate.h \
@@ -73,7 +67,6 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidDecTelecide.cpp \
  ADM_vidDecTelecide.h ADM_cache.cpp \
  ADM_vidDecDec.cpp \
- ADM_vidMsmooth.cpp \
  ADM_vidWirl.cpp \
  ADM_vidEqualizer.cpp \
  ADM_vidVobsub.cpp \
@@ -107,13 +100,13 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
 
 
 EXTRA_DIST =  ADM_cache.cpp  ADM_vidDecDec_param.h ADM_vidMosaic_param.h \
-ADM_cache.h  ADM_vidDecTel_param.h ADM_vidMsmooth.cpp \
+ADM_cache.h  ADM_vidDecTel_param.h \
 ADM_confCouple.h ADM_vidDecTelecide.cpp  ADM_vidNull.cpp \
 ADM_confCouples.cpp  ADM_vidDecTelecide.h  ADM_vidPalShift.cpp \
 ADM_genvideo.cpp ADM_vidDeintASM.cpp ADM_vidPalShift.h \
 ADM_genvideo.hxx ADM_vidDeinterlace.cpp  ADM_vidPartial.cpp \
-ADM_guiAddBorder.cpp ADM_vidDeinterlace.h  ADM_vidPartial.h \
-ADM_guiBSMear.cpp  ADM_vidDelta.cpp  ADM_vidPartial_param.h \
+ADM_vidDeinterlace.h  ADM_vidPartial.h \
+ADM_vidDelta.cpp  ADM_vidPartial_param.h \
 ADM_guiCrop.cpp  ADM_vidDenoise.cpp  ADM_vidPulldown.cpp \
 ADM_guiMedianBig.cpp ADM_vidDenoise.h  ADM_vidPulldown.h \
 ADM_guiResize.cpp  ADM_vidDropOut.cpp  ADM_vidRaw.cpp \
@@ -124,17 +117,17 @@ ADM_lavpp_deintparam.h ADM_vidEqualizer.cpp  ADM_vidReverse.cpp \
 ADM_mpdetc.cpp ADM_vidEqualizer.h  ADM_vidRotate.cpp \
 ADM_mpdetc.h ADM_vidFade.cpp ADM_vidRotate.h \
 ADM_resizebis.cpp  ADM_vidFade_param.h ADM_vidSRT.cpp \
-ADM_resizebis.hxx  ADM_vidFastConvolution.cpp  ADM_vidSRT.h \
+ADM_resizebis.hxx    ADM_vidSRT.h \
 ADM_resizeter.cpp  ADM_vidField.h  ADM_vidSRTRender.cpp \
 ADM_separateField.cpp  ADM_vidFieldUnblend.cpp ADM_vidSRTload.cpp \
 ADM_vidASharp_param.h  ADM_vidFieldUtil.cpp  ADM_vidSalt.cpp \
-ADM_vidAddBorder.cpp ADM_vidFieldUtil.h  ADM_vidSalt.h \
-ADM_vidAddBorder.h ADM_vidFields.cpp ADM_vidSeparateField.cpp \
+ADM_vidFieldUtil.h  ADM_vidSalt.h \
+ADM_vidFields.cpp ADM_vidSeparateField.cpp \
 ADM_vidAnimated.cpp  ADM_vidFlipV.cpp  ADM_vidSeparateField.h \
 ADM_vidAnimated.h  ADM_vidFlipV.h  ADM_vidSoften.cpp \
-ADM_vidAnimated_param.h  ADM_vidFlux.cpp ADM_vidSoften.h \
-ADM_vidAsharp.cpp  ADM_vidFlux.h ADM_vidStabilize.cpp \
-ADM_vidBSmear.cpp  ADM_vidFont.cpp ADM_vidStabilize.h \
+ADM_vidAnimated_param.h   ADM_vidSoften.h \
+ADM_vidAsharp.cpp   ADM_vidStabilize.cpp \
+ADM_vidFont.cpp ADM_vidStabilize.h \
 ADM_vidBlend.cpp ADM_vidFont.h ADM_vidSwapFields.cpp \
 ADM_vidBlendRemoval.cpp  ADM_vidForcedPP.cpp ADM_vidSwapFields.h \
 ADM_vidBlendRemoval_param.h  ADM_vidForcedPP.h ADM_vidSwapSmart.cpp \
