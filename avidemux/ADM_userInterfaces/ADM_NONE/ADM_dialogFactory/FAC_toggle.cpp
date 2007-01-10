@@ -102,6 +102,26 @@ void diaElemFloat::getMe(void)
  
 }
 
+//******************************************************
+
+diaElemMenu::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
+               const diaMenuEntry *menu,const char *tip)
+  : diaElem(ELEM_MENU)
+{
+}
+
+diaElemMenu::~diaElemMenu()
+{
+  
+}
+void diaElemMenu::setMe(void *dialog, void *opaque,uint32_t line)
+{
+  
+}
+void diaElemMenu::getMe(void)
+{
+ 
+}
 
 
 //******************************************************

@@ -31,6 +31,8 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_vidFade_param.h"
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
 class AVDM_Fade : public AVDMGenericVideoStream
 {
   VideoCache      *vidCache;
@@ -56,11 +58,39 @@ BUILD_CREATE(fade_create,AVDM_Fade);
 SCRIPT_CREATE(fade_script,AVDM_Fade,fadeParam);
 
 /*************************************/
-uint8_t DIA_fade(VIDFADE_PARAM *param);
 uint8_t AVDM_Fade::configure(AVDMGenericVideoStream *in)
 {
+  uint32_t mx=_info.nb_frames;
   _in=in;
-  return DIA_fade(_param);
+  
+  diaMenuEntry menuE[2]={{0,_("Out"),_("Fade out")},{1,_("In"),_("Fade in")}};
+  uint32_t start,end;
+  VIDFADE_PARAM param=*_param;
+  
+while(1)
+{
+    diaElemMenu     menu(&(param.inOut),_("Fade Type"), 2,menuE);
+    diaElemUInteger start(&(param.startFade),_("Start frame"),0,mx);
+    diaElemUInteger end(&(param.endFade),_("End frame"),0,mx);
+    diaElemToggle   black(&(param.toBlack),_("Fade to black"));
+    
+    diaElem *elems[4]={&menu,&start,&end,&black};
+  
+    if( diaFactoryRun("Fade",4,elems))
+    {
+      // Check it is consistent
+      if(param.startFade>=param.endFade || (param.startFade>=mx) || (param.endFade>=mx))
+      {
+        GUI_Error_HIG(_("Parameter Error"),_("Start must be before end, and both within video # of frames."));
+        continue; 
+      }
+      //
+      *_param=param;
+      return 1;
+    }else
+        return 0;
+} 
+  return 1;
 }
 
 char *AVDM_Fade::printConf( void )

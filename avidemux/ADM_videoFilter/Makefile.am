@@ -7,6 +7,9 @@ libADM_videoFilter_a_METASOURCES = AUTO
 #INCLUDES = $(all_includes) 
 
 libADM_videoFilter_a_SOURCES =  \
+ ADM_vidFade.cpp \
+ ADM_vidResampleFPS.cpp \
+ ADM_vidSoften.cpp \
  ADM_vidBSmear.cpp \
  ADM_vidAddBorder.cpp \
  ADM_vidFlux.cpp \

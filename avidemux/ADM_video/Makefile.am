@@ -9,7 +9,6 @@ libADM_video_a_METASOURCES = AUTO
 libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidDeintASM.cpp \
  ADM_vidVlad.cpp \
- ADM_guiMedianBig.cpp \
  ADM_vidLargeMedian.cpp \
  ADM_vidSalt.cpp \
  ADM_vidCached.cpp \
@@ -63,7 +62,6 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
 	ADM_mpdetc.cpp \
  ADM_vidKernelDeint.cpp \
  ADM_vidForcedPP.cpp \
- ADM_vidSoften.cpp \
  ADM_vidDecTelecide.cpp \
  ADM_vidDecTelecide.h ADM_cache.cpp \
  ADM_vidDecDec.cpp \
@@ -73,7 +71,6 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vobsubinfo.cpp \
  ADM_vidChangeFPS.cpp \
  ADM_vidVobSubRender.cpp \
- ADM_vidResampleFPS.cpp \
  ADM_lavpp_deint.cpp \
  ADM_vidHue.cpp \
  ADM_vidEq2.cpp \
@@ -93,7 +90,7 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_guiResize.cpp \
  ADM_vidAnimated.cpp \
  ADM_vidMcDeint.cpp \
- ADM_vidReverse.cpp ADM_vidFade.cpp \
+ ADM_vidReverse.cpp  \
  ADM_vidASS.cpp
 
 				
@@ -108,15 +105,15 @@ ADM_genvideo.hxx ADM_vidDeinterlace.cpp  ADM_vidPartial.cpp \
 ADM_vidDeinterlace.h  ADM_vidPartial.h \
 ADM_vidDelta.cpp  ADM_vidPartial_param.h \
 ADM_guiCrop.cpp  ADM_vidDenoise.cpp  ADM_vidPulldown.cpp \
-ADM_guiMedianBig.cpp ADM_vidDenoise.h  ADM_vidPulldown.h \
+ADM_vidDenoise.h  ADM_vidPulldown.h \
 ADM_guiResize.cpp  ADM_vidDropOut.cpp  ADM_vidRaw.cpp \
-ADM_interlaced.cpp ADM_vidDropOut.h  ADM_vidResampleFPS.cpp \
+ADM_interlaced.cpp ADM_vidDropOut.h  \
 ADM_interlaced.h ADM_vidEq2.cpp  ADM_vidResize.cpp \
 ADM_lavpp_deint.cpp  ADM_vidEq2.h  ADM_vidResize25.cpp \
 ADM_lavpp_deintparam.h ADM_vidEqualizer.cpp  ADM_vidReverse.cpp \
 ADM_mpdetc.cpp ADM_vidEqualizer.h  ADM_vidRotate.cpp \
-ADM_mpdetc.h ADM_vidFade.cpp ADM_vidRotate.h \
-ADM_resizebis.cpp  ADM_vidFade_param.h ADM_vidSRT.cpp \
+ADM_mpdetc.h ADM_vidRotate.h \
+ADM_resizebis.cpp   ADM_vidSRT.cpp \
 ADM_resizebis.hxx    ADM_vidSRT.h \
 ADM_resizeter.cpp  ADM_vidField.h  ADM_vidSRTRender.cpp \
 ADM_separateField.cpp  ADM_vidFieldUnblend.cpp ADM_vidSRTload.cpp \
@@ -124,8 +121,8 @@ ADM_vidASharp_param.h  ADM_vidFieldUtil.cpp  ADM_vidSalt.cpp \
 ADM_vidFieldUtil.h  ADM_vidSalt.h \
 ADM_vidFields.cpp ADM_vidSeparateField.cpp \
 ADM_vidAnimated.cpp  ADM_vidFlipV.cpp  ADM_vidSeparateField.h \
-ADM_vidAnimated.h  ADM_vidFlipV.h  ADM_vidSoften.cpp \
-ADM_vidAnimated_param.h   ADM_vidSoften.h \
+ADM_vidAnimated.h  ADM_vidFlipV.h  \
+ADM_vidAnimated_param.h   \
 ADM_vidAsharp.cpp   ADM_vidStabilize.cpp \
 ADM_vidFont.cpp ADM_vidStabilize.h \
 ADM_vidBlend.cpp ADM_vidFont.h ADM_vidSwapFields.cpp \
@@ -162,6 +159,6 @@ ADM_vidAss_Params.h mmx_macros.h
 INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil \
 			 $(FREETYPE_CFLAGS) $(ALTIVEC_SWITCH) -I../ADM_userInterfaces/ADM_commonUI -I../ADM_inputs
 noinst_HEADERS = ADM_vidlavdeint.h ADM_mpdetc.h ADM_vidKernelDeint.h \
-					ADM_vidForcedPP.h ADM_vidSoften.h ADM_cache.h ADM_vidDecTel_param.h ADM_vidDecDec_param.h \
+					ADM_vidForcedPP.h  ADM_cache.h ADM_vidDecTel_param.h ADM_vidDecDec_param.h \
 					ADM_vidMSmooth_param.h ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \
 		ADM_lavpp_deintparam.h ADM_vidEq2.h ADM_vidASS.h

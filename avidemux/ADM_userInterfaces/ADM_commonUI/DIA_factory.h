@@ -22,6 +22,7 @@ typedef enum elemEnum
   ELEM_TOGGLE,
   ELEM_INTEGER,
   ELEM_FLOAT,
+  ELEM_MENU,
   ELEM_MAX=ELEM_TOGGLE
 };
 /*********************************************/
@@ -86,6 +87,29 @@ public:
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
 };
+/*************************************************/
+typedef struct diaMenuEntry
+{
+  uint32_t    val;
+  const char *text;
+  const char *desc;
+}diaMenuEntry;
+
+class diaElemMenu : public diaElem
+{
+const diaMenuEntry *menu;
+uint32_t     nbMenu;
+
+public:
+  diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
+               const diaMenuEntry *menu,const char *tip=NULL);
+  
+  virtual ~diaElemMenu() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+};
+
+/*************************************************/
 /*********************************************/
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems);
 

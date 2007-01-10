@@ -43,7 +43,6 @@
 #include "ADM_video/ADM_vidDecTel_param.h"
 #include "ADM_audiofilter/audioencoder_lame_param.h"
 #include "ADM_video/ADM_vidDGbob_param.h"
-#include "ADM_video/ADM_vidFade_param.h"
 #include "ADM_audiofilter/audioencoder_lame_param.h"
 #include "ADM_video/ADM_vidMcDeint_param.h"
 #include "ADM_encoder/adm_encmjpeg_param.h"
@@ -99,7 +98,6 @@ uint8_t DIA_rotate(AVDMGenericVideoStream *astream,ROTATE_PARAM *param){return 0
 uint8_t  DIA_blendRemoval(BLEND_REMOVER_PARAM *mosaic){return 0;}
 uint8_t DIA_cnr2(CNR2Param *param){return 0;}
 uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming){return 0;}
-uint8_t DIA_fade(VIDFADE_PARAM *param){return 0;}
 uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getDecombDecimate(DECIMATE_PARAM *param){return 0;}
 uint8_t DIA_getDecombTelecide(TelecideParam *param){return 0;}

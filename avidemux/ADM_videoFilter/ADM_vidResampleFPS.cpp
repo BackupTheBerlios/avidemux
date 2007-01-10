@@ -40,6 +40,8 @@
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include "admmangle.h"
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
 static FILTER_PARAM ResampParam={2,{"newfps","use_linear"}};
 typedef struct FPS_Param
 {
@@ -76,29 +78,24 @@ AVDMGenericVideoStream *createResampleFps(AVDMGenericVideoStream *in,uint32_t ta
 
 uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
 {
-  uint8_t r=0;
-  float f=_param->newfps;
-  
+  float f=_param->newfps; 
   f/=1000;
   
-  _in=in;     
-  if(DIA_GetFloatValue(&f, 1.0, 200., "Enter new fps","New fps:"))
-  {
-    f*=1000;
-    _param->newfps=(uint32_t)floor(f+0.4); 
-    _info.fps1000=_param->newfps;   
+  _in=in;
+  
+    diaElemFloat fps(&f,_("New FPS"),1,200.);
+    diaElemToggle blend(&(_param->use_linear),_("Blend"));
     
-    if(GUI_Question(_("Use linear blend ?")))
+    diaElem *elems[2]={&fps,&blend};
+  
+    if( diaFactoryRun("Resample FPS",2,elems))
     {
-        _param->use_linear=1;        
+        f*=1000;
+      _param->newfps=(uint32_t)floor(f+0.4); 
+      _info.fps1000=_param->newfps;
+      return 1;
     }
-    else
-    {
-        _param->use_linear=0;        
-    }
-    r=1;
-  } 
-  return r;        
+    return 0;
 }
 char *ADMVideoResampleFPS::printConf( void )
 {

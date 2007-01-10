@@ -46,6 +46,8 @@
 #include "ADM_filter/video_filters.h"
 
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
 static FILTER_PARAM softParam={3,{"radius","luma","chroma"}};
 
 
@@ -58,27 +60,18 @@ extern uint32_t fixMul[16];
 
 uint8_t ADMVideoMaskedSoften::configure( AVDMGenericVideoStream *instream)
 {
-	_in=instream;
-	int radius, luma, chroma;
-	
-		radius=_param->radius;
-		luma=_param->luma;
-		chroma=_param->chroma;
-		if(DIA_GetIntegerValue(&radius,1,60, "Radius","Radius:"))
-		{
-			if(DIA_GetIntegerValue(&luma,0,255, "Luma Threshold","Luma Threshold:"))
-			{	
-				if(DIA_GetIntegerValue(&chroma,0,255, "Chroma Threshold","Chroma Threshold:"))
-				{
-					_param->radius=radius;
-					_param->luma=luma;
-					_param->chroma=chroma;
-					return 1;
-				}
-			}
-
-		}
-		return 0;
+        _in=instream;
+        /*uint32_t luma,chroma;
+	uint32_t radius;
+	*/
+        
+        diaElemUInteger luma(&(_param->luma),_("Luma Treshold"),0,255);
+        diaElemUInteger chroma(&(_param->chroma),_("Chroma Treshold"),0,255);
+        diaElemUInteger radius(&(_param->radius),_("Radius"),1,60);
+	  
+    diaElem *elems[3]={&luma,&chroma,&radius};
+  
+    return diaFactoryRun("Soften",3,elems);
 }
 uint8_t	ADMVideoMaskedSoften::getCoupledConf( CONFcouple **couples)
 {

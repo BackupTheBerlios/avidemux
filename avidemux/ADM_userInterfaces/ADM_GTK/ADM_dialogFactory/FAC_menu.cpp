@@ -1,6 +1,6 @@
 /***************************************************************************
-  FAC_float.cpp
-  Handle dialog factory element : Toggle
+  FAC_toggle.cpp
+  Handle dialog factory element : Menu
   (C) 2006 Mean Fixounet@free.fr 
 ***************************************************************************/
 
@@ -30,26 +30,28 @@
 
 
 
-diaElemFloat::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, 
-                            ELEM_TYPE_FLOAT min, ELEM_TYPE_FLOAT max,const char *tip)
-  : diaElem(ELEM_FLOAT)
+diaElemMenu::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
+               const diaMenuEntry *menu,const char *tip)
+  : diaElem(ELEM_MENU)
 {
   param=(void *)intValue;
-  paramTitle=toggleTitle;
-  this->min=min;
-  this->max=max;
+  paramTitle=itle;
   this->tip=tip;
+  this->menu=menu;
+  this->nbMenu=nb;
 }
 
-diaElemFloat::~diaElemFloat()
+diaElemMenu::~diaElemMenu()
 {
   
 }
-void diaElemFloat::setMe(void *dialog, void *opaque,uint32_t line)
+void diaElemMenu::setMe(void *dialog, void *opaque,uint32_t line)
 {
   GtkWidget *widget;
-  GtkObject *adj;
   GtkWidget *label;
+  GtkWidget *item;
+  GtkWidget *combo;
+  
   
   label = gtk_label_new (paramTitle);
   gtk_widget_show(label);
@@ -58,29 +60,40 @@ void diaElemFloat::setMe(void *dialog, void *opaque,uint32_t line)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   
-  ELEM_TYPE_FLOAT val=*(ELEM_TYPE_FLOAT *)param;
-  widget = gtk_spin_button_new_with_range(min,max,0.1);
-  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(widget),TRUE);
-  gtk_spin_button_set_digits  (GTK_SPIN_BUTTON(widget),2);
-  gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget),*(ELEM_TYPE_FLOAT *)param);
-  
-  gtk_widget_show (widget);
-  
-  gtk_table_attach (GTK_TABLE (opaque), widget, 1, 2, line, line+1,
+  combo = gtk_combo_box_new_text ();
+  gtk_widget_show (combo);
+  gtk_table_attach (GTK_TABLE (opaque), combo, 1, 2, line, line+1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   
+  for(int i=0;i<nbMenu;i++)
+  {
+    gtk_combo_box_append_text (GTK_COMBO_BOX (combo),this->menu[i].text);
+  }
+  
+  for(int i=0;i<nbMenu;i++)
+  {
+    if(this->menu[i].val==*(uint32_t *)param) 
+    {
+      gtk_combo_box_set_active(GTK_COMBO_BOX(combo),i);
+    }
+  }
   
   
-  myWidget=(void *)widget;
-  
+  myWidget=(void *)combo;
 }
-void diaElemFloat::getMe(void)
+
+void diaElemMenu::getMe(void)
 {
   GtkWidget *widget=(GtkWidget *)myWidget;
-  ELEM_TYPE_FLOAT *val=(ELEM_TYPE_FLOAT *)param;
+  uint32_t *val=(uint32_t *)param;
+  uint32_t rank;
   ADM_assert(widget);
-  *(ELEM_TYPE_FLOAT *)param=gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (widget));
+  
+  
+  rank=gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
+  ADM_assert(rank<this->nbMenu);
+  *(uint32_t *)param=this->menu[rank].val;
 }
 
 //EOF
