@@ -57,7 +57,9 @@
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include "ADM_filter/video_filters.h"
 
-#include "ADM_video/ADM_vidMSharpen_param.h"
+#include "ADM_vidMSharpen_param.h"
+
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 class Msharpen : public AVDMGenericVideoStream
 {
@@ -156,9 +158,25 @@ uint8_t Msharpen::configure(AVDMGenericVideoStream *in)
 uint8_t r=0;
 	_in=in;
 	ADM_assert(_param);
-	if(r= DIA_getMSharpen(_param))
-        invstrength=255-_param->strength;       
-	return r;
+
+#define PX(x) &(_param->x)
+  
+        
+    diaElemToggle    mask(PX(mask),_("Mask"));
+    diaElemToggle    highq(PX(highq),_("High Q"));
+    
+    diaElemUInteger   threshold(PX(threshold),_("Threshold"),1,255);
+    diaElemUInteger   strength(PX(strength),_("Strength"),1,255);
+    
+    
+  diaElem *elems[4]={&mask,&highq,&threshold,&strength};
+
+  if(diaFactoryRun("MSharpen",4,elems))
+  {
+         invstrength=255-_param->strength;
+         return 1;
+  }
+  return 0;
 }
 
 //________________________________________________________

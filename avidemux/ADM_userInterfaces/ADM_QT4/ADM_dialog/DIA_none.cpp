@@ -46,7 +46,6 @@
 #include "ADM_audiofilter/audioencoder_lame_param.h"
 #include "ADM_encoder/adm_encmjpeg_param.h"
 #include "ADM_video/ADM_vidMosaic_param.h"
-#include "ADM_video/ADM_vidMSharpen_param.h"
 #include "ADM_video/ADM_vidMSmooth_param.h"
 #include "ADM_video/ADM_vidPartial_param.h"
 #include "ADM_video/ADM_vidTDeint_param.h"
@@ -106,7 +105,6 @@ uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in){retu
 uint8_t DIA_getHue(Hue_Param *param, ADMImage *image){return 0;}
 uint8_t DIA_getHue(Hue_Param *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in){return 0;}
-uint8_t DIA_getMSharpen(MSHARPEN_PARAM *param){return 0;}
 uint8_t DIA_getMSmooth(MSMOOTH_PARAM *param){return 0;}
 uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous){return 0;}
 uint8_t DIA_mjpegCodecSetting(COMPRES_PARAMS *param){return 0;}

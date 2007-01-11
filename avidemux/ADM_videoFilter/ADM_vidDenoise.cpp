@@ -37,9 +37,11 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidDenoise.h"
+#include "ADM_vidDenoise.h"
 #include "ADM_filter/video_filters.h"
 
+
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 static FILTER_PARAM denoiseParam={5,{"lumaLock","lumaThreshold","chromaLock","chromaThreshold",
 					"sceneChange"}};
@@ -380,15 +382,21 @@ extern uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
 uint8_t ADMVideoDenoise::configure(AVDMGenericVideoStream * instream)
 {
   UNUSED_ARG(instream);
-
-    if(DIA_dnr(	&(_param->lumaThreshold),
-    				&(_param->lumaLock),
-				&(_param->chromaThreshold),
-				&(_param->chromaLock),
-				&(_param->sceneChange)
-               						)) return 1;
-
-	return 0;
+  
+#define PX(x) &(_param->x)
+  
+    diaElemUInteger   lumaLock(PX(lumaLock),_("Luma Lock"),0,255);
+    diaElemUInteger   chromaLock(PX(chromaLock),_("Chroma  Lock"),0,255);
+    diaElemUInteger   lumaThreshold(PX(lumaThreshold),_("Luma Threshold"),0,255);
+    diaElemUInteger   chromaThreshold(PX(chromaThreshold),_("Chroma Threshold"),0,255);
+    
+    diaElemUInteger   sceneChange(PX(sceneChange),_("Scene Change"),0,100);
+    
+    
+    
+       diaElem *elems[5]={&lumaLock,&chromaLock,&lumaThreshold,&chromaThreshold,&sceneChange};
+  
+   return diaFactoryRun("Denoise",5,elems);
 }
 
 // EOF

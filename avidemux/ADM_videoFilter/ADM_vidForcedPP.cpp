@@ -41,6 +41,7 @@
 #include "DIA_enter.h"
 #include "ADM_filter/video_filters.h"
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 static FILTER_PARAM ppParam={3,{"postProcType","postProcStrength","forcedQuant"}};
 
@@ -53,25 +54,43 @@ extern int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *sw
 uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
 {
 	_in=instream;
-	uint32_t postproc, strength,uv;
-	int forced;
-		postproc=_param->postProcType;
-		strength=_param->postProcStrength;
-		forced=_param->forcedQuant;
-		uv=0;
-		if( DIA_getMPParams( &postproc,&strength,&uv))
-		{
+        
+        #define PX(x) &(_param->x)
+  
+        
+    diaElemUInteger   postProcStrength(PX(postProcStrength),_("Filter Strength"),0,5);
+    diaElemUInteger   quant(PX(forcedQuant),_("Quantizer"),1,31);
+    //diaElemToggle     swapuv(PX(swapuv),_("Swap U&V"));
+    
+    uint32_t hzd,vzd,dring;
+    
+#define DOME(x,y) if(_param->postProcType & x) y=1;else y=0;
+    
+    DOME(1,hzd);
+    DOME(2,vzd);
+    DOME(4,dring);
+    
+     diaElemToggle     fhzd(&hzd,_("Horizontal Deblocking"));
+     diaElemToggle     fvzd(&vzd,_("Vertical Deblocking"));
+     diaElemToggle     fdring(&dring,_("Deringing"));
+    
+    
+    
+      diaElem *elems[5]={&postProcStrength,&quant,&fhzd
+                        ,&fvzd,&fdring};
 
-				if( DIA_GetIntegerValue(&forced,2,31, "Quant Value","Enter forced Q:"))
-				{
-					_param->postProcType=postproc;
-					_param->postProcStrength=strength;
-					_param->forcedQuant=forced;
-					updatePostProc(&_postproc );				
-					return 1;
-				}
-		}
-	return 0;	
+   if(diaFactoryRun("Forced PostProcessing",5,elems))
+  {
+#undef DOME
+#define DOME(x,y) if(y) _param->postProcType |=x;
+    _param->postProcType =0;
+    DOME(1,hzd);
+    DOME(2,vzd);
+    DOME(4,dring);
+    updatePostProc(&_postproc );	
+    return 1;
+  }
+  return 0;	
  	
 }
 uint8_t	ADMVideoForcedPP::getCoupledConf( CONFcouple **couples)
@@ -114,7 +133,7 @@ ADMVideoForcedPP::~ADMVideoForcedPP()
 		{
 			
 			_param=NEW(PP_CONF);
-	    		_param->postProcType=5; // Bff=0 / 1=tff
+	    		_param->postProcType=7; // all
 	    		_param->postProcStrength=5;
 			_param->forcedQuant=10;
 			
