@@ -23,9 +23,9 @@ Daniel Moreno <comac@comac.darktech.org>
 #include "ADM_video/ADM_vidCached.h"
 typedef struct MPD3D_PARAM
 {
-	double  param1;
-	double  param2;
-	double  param3;
+	double  param1;  // Luma 
+	double  param2;  // Chroma
+	double  param3;  // Temporal
 }MPD3D_PARAM;
 
 class  ADMVideoMPD3D:public AVDMGenericVideoStream

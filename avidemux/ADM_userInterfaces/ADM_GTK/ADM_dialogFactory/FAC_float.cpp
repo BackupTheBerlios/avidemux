@@ -80,7 +80,9 @@ void diaElemFloat::getMe(void)
   GtkWidget *widget=(GtkWidget *)myWidget;
   ELEM_TYPE_FLOAT *val=(ELEM_TYPE_FLOAT *)param;
   ADM_assert(widget);
-  *(ELEM_TYPE_FLOAT *)param=gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (widget));
+  *val=gtk_spin_button_get_value(GTK_SPIN_BUTTON (widget));
+  if(*val<min) *val=min;
+  if(*val>max) *val=max;
 }
 
 //EOF

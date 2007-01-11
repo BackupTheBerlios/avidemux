@@ -46,6 +46,7 @@
 
 #include "ADM_lavpp_deintparam.h"
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 /*
 {"al", "autolevels",            0, 1, 2, LEVEL_FIX},
 {"lb", "linblenddeint",         1, 1, 4, LINEAR_BLEND_DEINT_FILTER},
@@ -60,7 +61,6 @@
 */
 
 
-extern uint8_t DIA_lavpp_deint(lavc_pp_param *param);
 
 class  ADMVideoLavPPDeint:public AVDMGenericVideoStream
 {
@@ -98,7 +98,25 @@ BUILD_CREATE(lavppdeint_create,ADMVideoLavPPDeint);
 uint8_t ADMVideoLavPPDeint::configure(AVDMGenericVideoStream *in)
 {
 
-  if(DIA_lavpp_deint(_param))
+  #define PX(x) &(_param->x)
+  _in=in;
+  
+  
+   diaMenuEntry menuField[6]={{PP_BM_NONE,        _("None"),NULL},
+                             {PP_BM_LINEAR_BLEND, _("Linear Blend"),NULL},
+                             {PP_BM_LINEAR_INTER, _("Linear Interpolate"),NULL},
+                             {PP_BM_CUBIC_INTER, _("Cubic Interpolate"),NULL},
+                             {PP_BM_MEDIAN_INTER, _("Median Interpolate"),NULL},
+                             {PP_BM_FFMPEG_DEINT, _("FFmpeg deint"),NULL},
+                          };
+  
+    
+    diaElemMenu     menu1(PX(deintType),_("Deinterlacing"), 6,menuField);
+    diaElemToggle   autolevel(PX(autolevel),_("Autolevel"));
+    
+    diaElem *elems[2]={&menu1,&autolevel};
+  
+   if(diaFactoryRun("Lavcodec deinterlacer",2,elems))
   {
     setup();
     return 1; 

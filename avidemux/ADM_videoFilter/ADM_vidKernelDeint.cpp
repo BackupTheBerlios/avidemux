@@ -59,6 +59,8 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_vidKernelDeint.h"
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
 static FILTER_PARAM kdintParam={5,{"order","threshold","sharp","twoway","map"}};
 
 
@@ -68,8 +70,8 @@ BUILD_CREATE(kerneldeint_create,ADMVideoKernelDeint);
 static int PutHintingData(uint8_t *video, unsigned int hint);
 static int GetHintingData(uint8_t *video, unsigned int *hint);
 
-extern uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *sharp, 
-		uint32_t *twoway, uint32_t *map);
+// extern uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *sharp, 
+// 		uint32_t *twoway, uint32_t *map);
 
 #define PROGRESSIVE  0x00000001
 
@@ -79,13 +81,23 @@ extern uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *s
 
 uint8_t ADMVideoKernelDeint::configure( AVDMGenericVideoStream *instream)
 {
-	_in=instream;
-	#define PX(x) &_param->x
-	if(DIA_kerneldeint(PX(order), PX(threshold), PX(sharp), 
-		PX(twoway), PX(map)))
-					return 1;
-	return 0;	
- 	
+  #define PX(x) &(_param->x)
+_in=instream;
+
+   diaMenuEntry menuField[2]={{1,_("Top"),NULL},
+                             {0,_("Bottom"),NULL}
+                          };
+  
+    
+    diaElemMenu     menu1(PX(order),_("Field Order"), 2,menuField);
+    diaElemUInteger threshold(PX(threshold),_("Threshold"),0,100,_("Smaller means more deinterlacing"));
+    diaElemToggle   sharp(PX(sharp),_("Sharp"),_("Sharper Engine"));
+    diaElemToggle   twoway(PX(twoway),_("Twoway"),_("Extrapolate better (better not to use it)"));
+    diaElemToggle   map(PX(map),_("Map"),_("Show interlaced areas (for test!)"));
+    
+    diaElem *elems[5]={&menu1,&threshold,&sharp,&twoway,&map};
+  
+   return  diaFactoryRun("Fade",5,elems);
 }
 uint8_t	ADMVideoKernelDeint::getCoupledConf( CONFcouple **couples)
 {

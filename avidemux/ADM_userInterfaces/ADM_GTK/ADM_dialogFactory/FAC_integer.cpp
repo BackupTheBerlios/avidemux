@@ -79,7 +79,10 @@ void diaElemInteger::getMe(void)
   GtkWidget *widget=(GtkWidget *)myWidget;
   int32_t *val=(int32_t *)param;
   ADM_assert(widget);
-  *(int32_t *)param=gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (widget));
+  *val=gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (widget));
+  if(*val<min) *val=min;
+  if(*val>max) *val=max;
+  
 }
 //**********************************************************************************
 
@@ -132,7 +135,10 @@ void diaElemUInteger::getMe(void)
   GtkWidget *widget=(GtkWidget *)myWidget;
   uint32_t *val=(uint32_t *)param;
   ADM_assert(widget);
-  *(uint32_t *)param=gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (widget));
+  *val=gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (widget));
+  if(*val<min) *val=min;
+  if(*val>max) *val=max;
+
 }
 
 

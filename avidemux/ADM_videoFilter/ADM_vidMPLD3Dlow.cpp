@@ -31,13 +31,14 @@ Daniel Moreno <comac@comac.darktech.org>
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidMPLD3Dlow.h"
+#include "ADM_vidMPLD3Dlow.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_filter/video_filters.h"
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 static FILTER_PARAM mp3Param={3,{"param1","param2","param3"}};
 
@@ -48,7 +49,7 @@ BUILD_CREATE(MPD3Dlow_create,ADMVideoMPD3Dlow);
 #define PARAM1_DEFAULT 4.0
 #define PARAM2_DEFAULT 3.0
 #define PARAM3_DEFAULT 6.0
-uint8_t DIA_d3d(double *luma,double *chroma,double *temporal);
+
  char 	*ADMVideoMPD3Dlow::printConf(void)
  {
 	  	static char buf[50];
@@ -61,15 +62,33 @@ uint8_t DIA_d3d(double *luma,double *chroma,double *temporal);
 uint8_t ADMVideoMPD3Dlow::configure(AVDMGenericVideoStream *instream)
 {
 
-			_in=instream;
-			if(DIA_d3d(&_param->param1,
-					&_param->param2,
-					&_param->param3))
-			{
-				setup();
-				return 1;
-			}
-			return 0;
+        _in=instream;
+        ELEM_TYPE_FLOAT fluma,fchroma,ftemporal;
+#define PX(x) &x
+#define OOP(x,y) f##x=(ELEM_TYPE_FLOAT )_param->y;
+        
+        OOP(luma,param1);
+        OOP(chroma,param2);
+        OOP(temporal,param3);
+        
+    diaElemFloat   luma(PX(fluma),_("Luma Spatial Threshold"),0.,100.);
+    diaElemFloat   chroma(PX(fchroma),_("Chroma Spatial Threshold"),0.,100.);
+    diaElemFloat   temporal(PX(ftemporal),_("Temporal Threshold"),0.,100.);
+    
+       diaElem *elems[3]={&luma,&chroma,&temporal};
+  
+   if(  diaFactoryRun("MPlayer D3D",3,elems))
+        {
+#undef OOP
+#define OOP(x,y) _param->y=(double) f##x
+                OOP(luma,param1);
+                OOP(chroma,param2);
+                OOP(temporal,param3);
+          
+                setup();
+                return 1;
+        }
+        return 0;
 }
 ADMVideoMPD3Dlow::~ADMVideoMPD3Dlow()
 {

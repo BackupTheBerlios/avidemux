@@ -38,7 +38,7 @@ Daniel Moreno <comac@comac.darktech.org>
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_filter/video_filters.h"
 
-
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 static FILTER_PARAM mp3Param={3,{"param1","param2","param3"}};
 
 
@@ -62,16 +62,33 @@ uint8_t DIA_d3d(double *luma,double *chroma,double *temporal);
 uint8_t ADMVideoMPD3D::configure(AVDMGenericVideoStream *instream)
 {
 
-			_in=instream;
-			if(DIA_d3d(&_param->param1,
-					&_param->param2,
-					&_param->param3))
-			{
-				setup();
-				return 1;
-			}
-			return 0;
-}
+        _in=instream;
+        ELEM_TYPE_FLOAT fluma,fchroma,ftemporal;
+#define PX(x) &x
+#define OOP(x,y) f##x=(ELEM_TYPE_FLOAT )_param->y;
+        
+        OOP(luma,param1);
+        OOP(chroma,param2);
+        OOP(temporal,param3);
+        
+    diaElemFloat   luma(PX(fluma),_("Luma Spatial Threshold"),0.,100.);
+    diaElemFloat   chroma(PX(fchroma),_("Chroma Spatial Threshold"),0.,100.);
+    diaElemFloat   temporal(PX(ftemporal),_("Temporal Threshold"),0.,100.);
+    
+       diaElem *elems[3]={&luma,&chroma,&temporal};
+  
+   if(  diaFactoryRun("MPlayer D3D",3,elems))
+        {
+#undef OOP
+#define OOP(x,y) _param->y=(double) f##x
+                OOP(luma,param1);
+                OOP(chroma,param2);
+                OOP(temporal,param3);
+          
+                setup();
+                return 1;
+        }
+        return 0;}
 ADMVideoMPD3D::~ADMVideoMPD3D()
 {
 

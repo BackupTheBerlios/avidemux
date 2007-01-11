@@ -58,7 +58,6 @@
 #include "ADM_video/ADM_vidChromaShift_param.h"
 #include "ADM_video/ADM_vidMPdelogo.h"
 #include "ADM_video/ADM_vidEq2.h"
-#include "ADM_video/ADM_lavpp_deintparam.h"
 #include "ADM_video/ADM_vidContrast.h"
 #include "ADM_video/ADM_vidFont.h"
 #include "ADM_video/ADM_vidSRT.h"
@@ -110,7 +109,6 @@ uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in){return
 uint8_t DIA_getMSharpen(MSHARPEN_PARAM *param){return 0;}
 uint8_t DIA_getMSmooth(MSMOOTH_PARAM *param){return 0;}
 uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous){return 0;}
-uint8_t DIA_lavpp_deint(lavc_pp_param *param){return 0;}
 uint8_t DIA_mjpegCodecSetting(COMPRES_PARAMS *param){return 0;}
 uint8_t  DIA_mosaic(MOSAIC_PARAMS *mosaic){return 0;}
 uint8_t DIA_pipe(char **cmd,char **param){return 0;}
