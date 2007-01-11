@@ -44,7 +44,6 @@
 #include "ADM_audiofilter/audioencoder_lame_param.h"
 #include "ADM_video/ADM_vidDGbob_param.h"
 #include "ADM_audiofilter/audioencoder_lame_param.h"
-#include "ADM_video/ADM_vidMcDeint_param.h"
 #include "ADM_encoder/adm_encmjpeg_param.h"
 #include "ADM_video/ADM_vidMosaic_param.h"
 #include "ADM_video/ADM_vidMSharpen_param.h"
@@ -112,7 +111,6 @@ uint8_t DIA_getMSharpen(MSHARPEN_PARAM *param){return 0;}
 uint8_t DIA_getMSmooth(MSMOOTH_PARAM *param){return 0;}
 uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous){return 0;}
 uint8_t DIA_lavpp_deint(lavc_pp_param *param){return 0;}
-uint8_t DIA_mcDeint(MCDEINT_PARAM *param){return 0;}
 uint8_t DIA_mjpegCodecSetting(COMPRES_PARAMS *param){return 0;}
 uint8_t  DIA_mosaic(MOSAIC_PARAMS *mosaic){return 0;}
 uint8_t DIA_pipe(char **cmd,char **param){return 0;}
