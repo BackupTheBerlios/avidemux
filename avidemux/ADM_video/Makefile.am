@@ -89,7 +89,6 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidColorYuv.cpp  \
  ADM_guiResize.cpp \
  ADM_vidAnimated.cpp \
- ADM_vidMcDeint.cpp \
  ADM_vidReverse.cpp  \
  ADM_vidASS.cpp
 
@@ -149,8 +148,8 @@ ADM_vidContrast.h  ADM_vidMPdelogo.h ADM_vidlavdeint.cpp \
 ADM_vidConvolution.cpp ADM_vidMSharpen.cpp ADM_vidlavdeint.h \
 ADM_vidConvolution.hxx ADM_vidMSharpen_param.h ADM_vobsubinfo.cpp \
 ADM_vidCrop.cpp  ADM_vidMSmooth_param.h  ADM_vobsubinfo.h \
-ADM_vidDGbob.cpp ADM_vidMcDeint.cpp  ASM_vidDenoise.cpp \
-ADM_vidDGbob_param.h ADM_vidMcDeint_param.h  DIA_kerneldeint.cpp \
+ADM_vidDGbob.cpp ASM_vidDenoise.cpp \
+ADM_vidDGbob_param.h   DIA_kerneldeint.cpp \
 ADM_vidDecDec.cpp  ADM_vidMosaic.cpp swscale_internal.h \
 ADM_vidTdeint_util.txt ADM_vidASS.h ADM_vidASS.cpp \
 ADM_vidAss_Params.h mmx_macros.h
