@@ -90,6 +90,7 @@ isMpeg4Compatible (uint32_t fourcc)
   CHECK ("XVID");
   CHECK ("BLZ0");
   CHECK ("M4S2");
+  CHECK ("3IV2");
 
   return divx4;
 
