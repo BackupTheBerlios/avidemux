@@ -26,7 +26,9 @@ typedef enum RESWIZ_FORMAT
         RESWIZ_SVCD,
         RESWIZ_DVD,
         RESWIZ_DVD_HD1,
-        RESWIZ_PSP
+        RESWIZ_PSP,
+        RESWIZ_PSP_FULLRES,
+        
         
 };
 

@@ -49,7 +49,6 @@
 
 extern void UI_setAProcessToggleStatus( uint8_t status );
 extern uint8_t DIA_audioCodec( AUDIOENCODER *codec );
-extern int DIA_audioEncoder(int *pmode, int *pbitrate,const char *title);
 extern void UI_setAudioCodec( int i);
 uint32_t audioFilterGetNbEncoder(void);
 const char* audioFilterGetIndexedName(uint32_t i);

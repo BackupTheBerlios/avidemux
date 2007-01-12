@@ -59,7 +59,14 @@ uint8_t A_autoDrive(Action action)
                 case ACT_AUTO_PSP:
                 case ACT_AUTO_PSP_H264:
                     // Resize
+                  if(action==ACT_AUTO_PSP_H264)
+                  {
+                    if(!setPSPFullRes()) return 0;
+                  }
+                  else
+                  {
                     if(!setPSP()) return 0;
+                  }
                     // Video codec
                     switch(action)
                     {

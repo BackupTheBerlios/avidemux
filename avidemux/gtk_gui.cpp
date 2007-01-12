@@ -2074,8 +2074,6 @@ void A_parseECMAScript(const char *name){
    }
    ADM_dealloc(longname);
 }
-//---------------------
-extern int DIA_audioEncoder(int *pmode, int *pbitrate,const char *title);
 /**---------------------------------------------------
 		Pipe to toolame
 -------------------------------------------------------**/
