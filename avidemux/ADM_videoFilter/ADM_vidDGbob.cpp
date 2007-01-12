@@ -45,6 +45,9 @@
 #include "ADM_filter/video_filters.h"
 
 #include "ADM_vidDGbob_param.h"
+
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
 class DGbob : public AVDMGenericVideoStream
 {
        
@@ -75,8 +78,25 @@ extern uint8_t DIA_getDGbob(DGBobparam *param);
 uint8_t DGbob::configure(AVDMGenericVideoStream *in)
 {
         _in=in;
-        if(DIA_getDGbob(_param))
-        {        
+#define PX(x) &(_param->x)
+  
+     diaMenuEntry menuField[2]={{0,_("Top"),NULL},
+                             {1,_("Bottom"),NULL}
+                          };
+  
+     diaMenuEntry menuMode[3]={{0,_("Keep nb of frames and FPS"),NULL},
+                            {1,_("Double nb of frames and FPS"),NULL},
+                            {2,_("Double nb of frames (slow motion)"),NULL}
+                          };
+                          
+    diaElemMenu     menu1(PX(order),_("Field Order"), 2,menuField);
+    diaElemMenu     menu2(PX(mode),_("Mode"), 3,menuMode);
+    diaElemUInteger threshold(PX(thresh),_("Threshold"),0,255);
+    diaElemToggle  extra(PX(ap),_("Extra"),_("Extra check, avoid using it"));
+    
+      diaElem *elems[4]={&menu1,&menu2,&threshold ,&extra};
+   if(diaFactoryRun("DGBob",4,elems))
+  {
                 update();
                 return 1;
         }
