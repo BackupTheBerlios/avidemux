@@ -31,7 +31,7 @@ Daniel Moreno <comac@comac.darktech.org>
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidMPLD3D.h"
+#include "ADM_vidMPLD3D.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
