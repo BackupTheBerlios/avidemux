@@ -71,9 +71,6 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidCNR2.cpp \
   ADM_vidDelta.cpp \
  ADM_vidUnblend.cpp \
- ADM_vidHardIvtcRemoval.cpp \
-  ADM_vidMosaic.cpp \
- ADM_vidBlendRemoval.cpp \
  ADM_vidTdeint.cpp \
  ADM_vidMPdelogo.cpp \
  ADM_guiCrop.cpp \
@@ -86,7 +83,7 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
 				
 
 
-EXTRA_DIST =  ADM_cache.cpp  ADM_vidDecDec_param.h ADM_vidMosaic_param.h \
+EXTRA_DIST =  ADM_cache.cpp  ADM_vidDecDec_param.h \
 ADM_cache.h  ADM_vidDecTel_param.h \
 ADM_confCouple.h ADM_vidDecTelecide.cpp  ADM_vidNull.cpp \
 ADM_confCouples.cpp  ADM_vidDecTelecide.h  ADM_vidPalShift.cpp \
@@ -116,9 +113,9 @@ ADM_vidAnimated_param.h   \
 ADM_vidAsharp.cpp   ADM_vidStabilize.cpp \
 ADM_vidFont.cpp ADM_vidStabilize.h \
 ADM_vidBlend.cpp ADM_vidFont.h ADM_vidSwapFields.cpp \
-ADM_vidBlendRemoval.cpp  ADM_vidSwapFields.h \
-ADM_vidBlendRemoval_param.h  ADM_vidSwapSmart.cpp \
-ADM_vidCNR2.cpp  ADM_vidHardIvtcRemoval.cpp  ADM_vidSwapSmart.h \
+ADM_vidSwapFields.h \
+ADM_vidSwapSmart.cpp \
+ADM_vidCNR2.cpp  ADM_vidSwapSmart.h \
 ADM_vidCNR2_param.h  ADM_vidHue.cpp  ADM_vidTDeint_param.h \
 ADM_vidCached.cpp  ADM_vidHue.h  ADM_vidTdeint.cpp \
 ADM_vidCached.h  ADM_vidIVTC.cpp ADM_vidTelecide.cpp \
@@ -140,7 +137,7 @@ ADM_vidConvolution.cpp  ADM_vidlavdeint.h \
 ADM_vidConvolution.hxx  ADM_vobsubinfo.cpp \
 ADM_vidCrop.cpp  ADM_vidMSmooth_param.h  ADM_vobsubinfo.h \
 ASM_vidDenoise.cpp \
-ADM_vidDecDec.cpp  ADM_vidMosaic.cpp swscale_internal.h \
+ADM_vidDecDec.cpp  swscale_internal.h \
 ADM_vidTdeint_util.txt ADM_vidASS.h ADM_vidASS.cpp \
 ADM_vidAss_Params.h mmx_macros.h
 

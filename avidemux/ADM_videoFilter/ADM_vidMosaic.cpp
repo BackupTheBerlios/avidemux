@@ -31,7 +31,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
 
-
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 
 #if (defined( ARCH_X86)  || defined(ARCH_X86_64))
@@ -87,8 +87,18 @@ uint8_t ADMVideoMosaic::configure(AVDMGenericVideoStream * instream)
 {
     UNUSED_ARG(instream);
 
-    if(  DIA_mosaic(_param)) 
-    {
+#define PX(x) &(_param->x)
+        
+    diaElemUInteger   hz(PX(hz),_("Horizontal Stacking"),0,10);
+    diaElemUInteger   vz(PX(vz),_("Vertical Stacking"),0,10);
+    diaElemUInteger   shrink(PX(shrink),_("Shrink Factor"),0,10);
+    diaElemToggle     show(PX(show),_("Show frame"));
+    
+    
+       diaElem *elems[]={&hz,&vz,&shrink,&show};
+  
+   if(  diaFactoryRun("Mosaic",sizeof(elems)/sizeof(diaElem *),elems))
+   {
         reset();
         return 1;
     }

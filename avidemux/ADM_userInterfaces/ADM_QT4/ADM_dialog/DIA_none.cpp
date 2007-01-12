@@ -38,13 +38,11 @@
 #include "ADM_audiofilter/audiofilter_normalize_param.h"
 #include "ADM_video/ADM_vidCNR2_param.h"
 #include "ADM_video/ADM_vidColorYuv_param.h"
-#include "ADM_video/ADM_vidBlendRemoval_param.h"
 #include "ADM_video/ADM_vidDecDec_param.h"
 #include "ADM_video/ADM_vidDecTel_param.h"
 #include "ADM_audiofilter/audioencoder_lame_param.h"
 #include "ADM_audiofilter/audioencoder_lame_param.h"
 #include "ADM_encoder/adm_encmjpeg_param.h"
-#include "ADM_video/ADM_vidMosaic_param.h"
 #include "ADM_video/ADM_vidMSmooth_param.h"
 #include "ADM_video/ADM_vidPartial_param.h"
 #include "ADM_video/ADM_vidTDeint_param.h"
@@ -91,7 +89,6 @@ uint8_t DIA_animated(ANIMATED_PARAM *param){return 0;}
 uint8_t DIA_ass(ASSParams *param){return 0;}
 #endif
 uint8_t DIA_rotate(AVDMGenericVideoStream *astream,ROTATE_PARAM *param){return 0;}
-uint8_t  DIA_blendRemoval(BLEND_REMOVER_PARAM *mosaic){return 0;}
 uint8_t DIA_cnr2(CNR2Param *param){return 0;}
 uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming){return 0;}
 uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in){return 0;}
@@ -106,7 +103,6 @@ uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in){return
 uint8_t DIA_getMSmooth(MSMOOTH_PARAM *param){return 0;}
 uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous){return 0;}
 uint8_t DIA_mjpegCodecSetting(COMPRES_PARAMS *param){return 0;}
-uint8_t  DIA_mosaic(MOSAIC_PARAMS *mosaic){return 0;}
 uint8_t DIA_pipe(char **cmd,char **param){return 0;}
 uint8_t DIA_requant(COMPRES_PARAMS *incoming){return 0;}
 uint8_t  DIA_setUserMuxParam( int *mode, int *param, int *muxsize){return 0;}

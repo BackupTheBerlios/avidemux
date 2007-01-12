@@ -39,7 +39,7 @@
 #include "ADM_filter/video_filters.h"
 #include "DIA_enter.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
-
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #include "ADM_vidBlendRemoval_param.h"
 #define MUL 1
 // Set it to 2 for post separate field
@@ -74,11 +74,25 @@ SCRIPT_CREATE (blendremove_script, vidBlendRemoval, field_unblend_template);
 //*************************************
 uint8_t vidBlendRemoval::configure (AVDMGenericVideoStream * in)
 {
-        if(DIA_blendRemoval(_param))
-        {
-                _lastRemoved=0xFFFFFFF;
-                return 1;
-        }
+  
+   _in=in;
+    
+#define PX(x) &(_param->x)
+        
+    diaElemUInteger   thresh(PX(threshold),_("threshold"),0,99,
+        _("If value is smaller than threshold it is considered valid."
+            " Smaller value might mean more false positive"));
+    diaElemUInteger   noise(PX(noise),_("noise"),0,99,_("If pixel are closer than noise, they are considered to be the same"));
+    diaElemUInteger   identical(PX(identical),_("identical"),0,99,_("If metric is less than identical, images are considered identical"));
+    diaElemToggle     show(PX(show),_("identical"),_("Show metric in image (debug)"));
+    
+       diaElem *elems[]={&thresh,&noise,&identical,&show};
+  
+   if(  diaFactoryRun("Blend Removal",sizeof(elems)/sizeof(diaElem *),elems))
+   {
+        _lastRemoved=0xFFFFFFF;
+        return 1;
+    }
         return 0;
 }
 /*************************************/
