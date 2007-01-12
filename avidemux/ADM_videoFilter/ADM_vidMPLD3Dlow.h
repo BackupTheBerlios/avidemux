@@ -21,7 +21,7 @@ Daniel Moreno <comac@comac.darktech.org>
 #ifndef __D3DLOW__
 #define __D3DLOW__
 #include "ADM_video/ADM_vidCached.h"
-#include "ADM_video/ADM_vidMPLD3D.h"
+#include "ADM_vidMPLD3D.h"
 
 class  ADMVideoMPD3Dlow:public AVDMGenericVideoStream
  {
