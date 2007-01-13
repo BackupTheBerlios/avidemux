@@ -49,7 +49,18 @@ size_t ADM_fwrite (void *ptr, size_t size, size_t n, FILE *sstream)
 }
 FILE  *ADM_fopen (const char *file, const char *mode)
 {
+  FILE *f;
+#ifndef CYG_MANGLING
   return fopen(file,mode); 
+#else
+  
+  
+  gchar *retval = g_locale_from_utf8 (file, -1, NULL, NULL, NULL);
+  f=fopen(retval,mode);
+  g_free (retval);
+  return f;
+  
+#endif
 }
 int    ADM_fclose (FILE *file)
 {
