@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 
 #include <unistd.h>
-    
+#include <glib.h>    
 #include "default.h"
 #include "ADM_misc.h"
 
