@@ -125,6 +125,7 @@ create_dialog1 (void)
   gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);
 
   dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
+  gtk_box_set_spacing (GTK_BOX(dialog_vbox1), 12);
   gtk_widget_show (dialog_vbox1);
 
   vbox3b = gtk_vbox_new (FALSE, 12);
@@ -243,7 +244,7 @@ create_dialog1 (void)
   treeview1 = gtk_tree_view_new ();
   gtk_widget_show (treeview1);
   gtk_container_add (GTK_CONTAINER (scrolledwindow1), treeview1);
-  gtk_widget_set_size_request (treeview1, -1, 336);
+  gtk_widget_set_size_request (treeview1, 288, 336);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (treeview1), FALSE);
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview1), TRUE);
   gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview1), FALSE);
@@ -462,6 +463,7 @@ create_dialog1 (void)
   treeview0 = gtk_tree_view_new ();
   gtk_widget_show (treeview0);
   gtk_container_add (GTK_CONTAINER (scrolledwindow9), treeview0);
+  gtk_widget_set_size_request (treeview0, 288, 336);
   gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (treeview0), FALSE);
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview0), TRUE);
   gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview0), FALSE);
