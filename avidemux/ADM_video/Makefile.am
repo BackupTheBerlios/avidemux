@@ -63,7 +63,6 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidEqualizer.cpp \
  ADM_vidVobsub.cpp \
  ADM_vobsubinfo.cpp \
- ADM_vidChangeFPS.cpp \
  ADM_vidVobSubRender.cpp \
  ADM_vidHue.cpp \
  ADM_vidEq2.cpp \
@@ -73,7 +72,6 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidUnblend.cpp \
  ADM_vidTdeint.cpp \
  ADM_vidMPdelogo.cpp \
- ADM_guiCrop.cpp \
  ADM_vidColorYuv.cpp  \
  ADM_guiResize.cpp \
  ADM_vidAnimated.cpp \
@@ -91,7 +89,7 @@ ADM_genvideo.cpp ADM_vidDeintASM.cpp ADM_vidPalShift.h \
 ADM_genvideo.hxx ADM_vidDeinterlace.cpp  ADM_vidPartial.cpp \
 ADM_vidDeinterlace.h  ADM_vidPartial.h \
 ADM_vidDelta.cpp  ADM_vidPartial_param.h \
-ADM_guiCrop.cpp    ADM_vidPulldown.cpp \
+ADM_vidPulldown.cpp \
  ADM_vidPulldown.h \
 ADM_guiResize.cpp  ADM_vidDropOut.cpp  ADM_vidRaw.cpp \
 ADM_interlaced.cpp ADM_vidDropOut.h  \
@@ -103,7 +101,7 @@ ADM_mpdetc.h ADM_vidRotate.h \
 ADM_resizebis.cpp   ADM_vidSRT.cpp \
 ADM_resizebis.hxx    ADM_vidSRT.h \
 ADM_resizeter.cpp  ADM_vidField.h  ADM_vidSRTRender.cpp \
-ADM_separateField.cpp  ADM_vidFieldUnblend.cpp ADM_vidSRTload.cpp \
+ADM_vidFieldUnblend.cpp ADM_vidSRTload.cpp \
 ADM_vidASharp_param.h  ADM_vidFieldUtil.cpp  ADM_vidSalt.cpp \
 ADM_vidFieldUtil.h  ADM_vidSalt.h \
 ADM_vidFields.cpp ADM_vidSeparateField.cpp \
@@ -119,8 +117,8 @@ ADM_vidCNR2.cpp  ADM_vidSwapSmart.h \
 ADM_vidCNR2_param.h  ADM_vidHue.cpp  ADM_vidTDeint_param.h \
 ADM_vidCached.cpp  ADM_vidHue.h  ADM_vidTdeint.cpp \
 ADM_vidCached.h  ADM_vidIVTC.cpp ADM_vidTelecide.cpp \
-ADM_vidChangeFPS.cpp ADM_vidIVTC.h ADM_vidTelecide.h \
-ADM_vidChangeFPS.h ADM_vidTempSmooth.cpp \
+ADM_vidIVTC.h ADM_vidTelecide.h \
+ADM_vidTempSmooth.cpp \
 ADM_vidChroma.cpp  ADM_vidTempSmooth.h \
 ADM_vidChroma.h  ADM_vidLargeMedian.cpp  ADM_vidUVSwap.cpp \
 ADM_vidChromaShift.cpp ADM_vidLargeMedian.h  ADM_vidUVSwap.h \
