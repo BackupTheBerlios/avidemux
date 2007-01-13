@@ -1,7 +1,7 @@
 /***************************************************************************
-                          ADM_vidTempSmooth.h  -  description
+                          ADM_vidPalShift.h  -  description
                              -------------------
-    begin                : Sun Jul 28 2002
+    begin                : Sat Aug 24 2002
     copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
@@ -14,33 +14,29 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
- typedef struct
- {
-	   	uint32_t radius,chroma_threshold,luma_threshold;
-   }TEMPSMOOTH_PARAMS;
-
-
-    class  AVDMVideoTempSmooth:public AVDMGenericVideoStream
+#ifndef PALSHIFT__
+#define PALSHIFT__
+#include "ADM_video/ADM_cache.h" 
+ class  ADMVideoPalShift:public AVDMGenericVideoStream
  {
 
  protected:
+    		
+		VideoCache			*vidCache;
+     virtual 	char 				*printConf(void);
 
-    			uint8_t						*_unpack;
-           virtual 	char 						*printConf(void);
-    			TEMPSMOOTH_PARAMS				*_param;
-			uint8_t						**_ptr_to_screen;
-			uint8_t						*_screen;
+		uint32_t			*_reverse;
+
+
  public:
 
 
+  				ADMVideoPalShift(  AVDMGenericVideoStream *in,CONFcouple *setup);
 
-						AVDMVideoTempSmooth(  AVDMGenericVideoStream *in,CONFcouple *setup);
-  			virtual 		~AVDMVideoTempSmooth();
-		        virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-          						ADMImage *data,uint32_t *flags);
-			virtual uint8_t configure( AVDMGenericVideoStream *instream) ;
-			virtual uint8_t	getCoupledConf( CONFcouple **couples)		;
+  	virtual 		~ADMVideoPalShift();
+	virtual uint8_t 	getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
+          								ADMImage *data,uint32_t *flags);
+	virtual uint8_t configure( AVDMGenericVideoStream *instream) ;
+
  }     ;
-
- AVDMGenericVideoStream *tempsmooth_create(AVDMGenericVideoStream *in, void *param);
+#endif

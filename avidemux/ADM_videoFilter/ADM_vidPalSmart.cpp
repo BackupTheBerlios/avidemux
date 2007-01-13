@@ -32,7 +32,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 
 #include"ADM_video/ADM_vidDeinterlace.h"
-#include"ADM_video/ADM_vidTelecide.h"
+#include"ADM_vidPalSmart.h"
 #include "ADM_filter/video_filters.h"
 
 #define MATCH_THRESH 100

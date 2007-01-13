@@ -36,7 +36,7 @@ Same idea as for avisynth separatefield
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidFieldUtil.h"
-#include "ADM_video/ADM_vidSeparateField.h"
+#include "ADM_vidSeparateField.h"
 #include "ADM_filter/video_filters.h"
 
 

@@ -34,7 +34,7 @@ Swap each line  (shift up for odd, down for even)
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidSwapSmart.h"
+#include "ADM_vidSwapSmart.h"
 #include "ADM_video/ADM_interlaced.h"
 
 #include "ADM_osSupport/ADM_debugID.h"

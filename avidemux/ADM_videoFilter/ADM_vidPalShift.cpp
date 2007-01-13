@@ -30,9 +30,10 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidPalShift.h"
+#include "ADM_vidPalShift.h"
 #include "ADM_filter/video_filters.h"
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 static FILTER_PARAM nullParam={0,{""}};
 
@@ -59,7 +60,7 @@ ADMVideoPalShift::ADMVideoPalShift(  AVDMGenericVideoStream *in,CONFcouple *setu
 	memcpy(&_info,_in->getInfo(),sizeof(_info));  		
 	
 
-	_reverse=new uint8_t;;
+	_reverse=new uint32_t;;
 	*_reverse=1;
 	
   	_info.encoding=1;
@@ -71,15 +72,12 @@ ADMVideoPalShift::ADMVideoPalShift(  AVDMGenericVideoStream *in,CONFcouple *setu
 }
  uint8_t ADMVideoPalShift::configure( AVDMGenericVideoStream *instream) 
 {
-  if(GUI_Question(_("Try reverse ?")))
-	{
-		*_reverse=1;
-	}
-	else
-	{
-		*_reverse=0;
-	}
-	return 1;
+  
+  diaElemToggle chroma(_reverse,_("Try reverse"));
+    
+    diaElem *elems[]={&chroma};
+  
+    return diaFactoryRun("Pal Shift",sizeof(elems)/sizeof(diaElem *),elems);
 
 } 
 ADMVideoPalShift::~ADMVideoPalShift()
