@@ -162,11 +162,11 @@ uint8_t r=0;
 #define PX(x) &(_param->x)
   
         
-    diaElemToggle    mask(PX(mask),_("Mask"));
-    diaElemToggle    highq(PX(highq),_("High Q"));
+    diaElemToggle    mask(PX(mask),_("_Mask"));
+    diaElemToggle    highq(PX(highq),_("_High Q"));
     
-    diaElemUInteger   threshold(PX(threshold),_("Threshold"),1,255);
-    diaElemUInteger   strength(PX(strength),_("Strength"),1,255);
+    diaElemUInteger   threshold(PX(threshold),_("_Threshold:"),1,255);
+    diaElemUInteger   strength(PX(strength),_("_Strength:"),1,255);
     
     
   diaElem *elems[4]={&mask,&highq,&threshold,&strength};

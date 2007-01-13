@@ -69,10 +69,10 @@ uint8_t AVDM_Fade::configure(AVDMGenericVideoStream *in)
   
 while(1)
 {
-    diaElemMenu     menu(&(param.inOut),_("Fade Type"), 2,menuE);
-    diaElemUInteger start(&(param.startFade),_("Start frame"),0,mx);
-    diaElemUInteger end(&(param.endFade),_("End frame"),0,mx);
-    diaElemToggle   black(&(param.toBlack),_("Fade to black"));
+    diaElemMenu     menu(&(param.inOut),_("_Fade type:"), 2,menuE);
+    diaElemUInteger start(&(param.startFade),_("_Start frame:"),0,mx);
+    diaElemUInteger end(&(param.endFade),_("_End frame:"),0,mx);
+    diaElemToggle   black(&(param.toBlack),_("Fade to _black"));
     
     diaElem *elems[4]={&menu,&start,&end,&black};
   

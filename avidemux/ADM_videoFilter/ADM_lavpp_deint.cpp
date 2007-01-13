@@ -103,20 +103,20 @@ uint8_t ADMVideoLavPPDeint::configure(AVDMGenericVideoStream *in)
   
   
    diaMenuEntry menuField[6]={{PP_BM_NONE,        _("None"),NULL},
-                             {PP_BM_LINEAR_BLEND, _("Linear Blend"),NULL},
-                             {PP_BM_LINEAR_INTER, _("Linear Interpolate"),NULL},
-                             {PP_BM_CUBIC_INTER, _("Cubic Interpolate"),NULL},
-                             {PP_BM_MEDIAN_INTER, _("Median Interpolate"),NULL},
+                             {PP_BM_LINEAR_BLEND, _("Linear blend"),NULL},
+                             {PP_BM_LINEAR_INTER, _("Linear interpolate"),NULL},
+                             {PP_BM_CUBIC_INTER, _("Cubic interpolate"),NULL},
+                             {PP_BM_MEDIAN_INTER, _("Median interpolate"),NULL},
                              {PP_BM_FFMPEG_DEINT, _("FFmpeg deint"),NULL},
                           };
   
     
-    diaElemMenu     menu1(PX(deintType),_("Deinterlacing"), 6,menuField);
-    diaElemToggle   autolevel(PX(autolevel),_("Autolevel"));
+    diaElemMenu     menu1(PX(deintType),_("_Deinterlacing:"), 6,menuField);
+    diaElemToggle   autolevel(PX(autolevel),_("_Autolevel"));
     
     diaElem *elems[2]={&menu1,&autolevel};
   
-   if(diaFactoryRun("Lavcodec deinterlacer",2,elems))
+   if(diaFactoryRun("libavcodec deinterlacer",2,elems))
   {
     setup();
     return 1; 

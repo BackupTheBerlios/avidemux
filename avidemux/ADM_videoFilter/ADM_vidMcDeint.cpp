@@ -105,19 +105,19 @@ uint8_t AVDMVideoMCDeint::configure(AVDMGenericVideoStream * instream)
    diaMenuEntry menuMode[4]={{0,_("Fast"),NULL},
                              {1,_("Medium"),NULL},
                              {2,_("Slow iterative motion search"),NULL},
-                             {3,_("Extra Slow (same as 3+multiple reference frame)"),NULL}
+                             {3,_("Extra slow (same as 3+multiple reference frames)"),NULL}
                           };
    diaMenuEntry menuField[2]={{0,_("Top"),NULL},
                              {1,_("Bottom"),NULL}
                           };
   
-    diaElemMenu     menu1(&(_param->mode),_("Mode"), 4,menuMode);
-    diaElemMenu     menu2(&(_param->initial_parity),_("Field Dominance"), 2,menuField);
-    diaElemUInteger qp(&(_param->qp),_("Qp"),1,60);
+    diaElemMenu     menu1(&(_param->mode),_("_Mode:"), 4,menuMode);
+    diaElemMenu     menu2(&(_param->initial_parity),_("_Field dominance:"), 2,menuField);
+    diaElemUInteger qp(&(_param->qp),_("_Qp:"),1,60);
     
     diaElem *elems[3]={&menu1,&menu2,&qp};
   
-    return  diaFactoryRun("Fade",3,elems);
+    return  diaFactoryRun("mcDeinterlace",3,elems);
 
 }
 uint8_t AVDMVideoMCDeint::getCoupledConf( CONFcouple **couples)

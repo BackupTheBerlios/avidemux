@@ -82,12 +82,12 @@ uint8_t ADMVideoResampleFPS::configure(AVDMGenericVideoStream *in)
   
   _in=in;
   
-    diaElemFloat fps(&f,_("New FPS"),1,200.);
-    diaElemToggle blend(&(_param->use_linear),_("Blend"));
+    diaElemFloat fps(&f,_("_New frame rate:"),1,200.);
+    diaElemToggle blend(&(_param->use_linear),_("_Blend"));
     
     diaElem *elems[2]={&fps,&blend};
   
-    if( diaFactoryRun("Resample FPS",2,elems))
+    if( diaFactoryRun("Resample fps",2,elems))
     {
         f*=1000;
       _param->newfps=(uint32_t)floor(f+0.4); 

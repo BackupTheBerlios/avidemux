@@ -71,13 +71,13 @@ uint8_t ADMVideoMPD3D::configure(AVDMGenericVideoStream *instream)
         OOP(chroma,param2);
         OOP(temporal,param3);
         
-    diaElemFloat   luma(PX(fluma),_("Luma Spatial Threshold"),0.,100.);
-    diaElemFloat   chroma(PX(fchroma),_("Chroma Spatial Threshold"),0.,100.);
-    diaElemFloat   temporal(PX(ftemporal),_("Temporal Threshold"),0.,100.);
+    diaElemFloat   luma(PX(fluma),_("_Spatial luma strength:"),0.,100.);
+    diaElemFloat   chroma(PX(fchroma),_("S_patial chroma strength:"),0.,100.);
+    diaElemFloat   temporal(PX(ftemporal),_("_Temporal strength:"),0.,100.);
     
        diaElem *elems[3]={&luma,&chroma,&temporal};
   
-   if(  diaFactoryRun("MPlayer D3D",3,elems))
+   if(  diaFactoryRun("MPlayer hqdn3d",3,elems))
         {
 #undef OOP
 #define OOP(x,y) _param->y=(double) f##x

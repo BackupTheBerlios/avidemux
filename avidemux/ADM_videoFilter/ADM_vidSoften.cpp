@@ -65,9 +65,9 @@ uint8_t ADMVideoMaskedSoften::configure( AVDMGenericVideoStream *instream)
 	uint32_t radius;
 	*/
         
-        diaElemUInteger luma(&(_param->luma),_("Luma Treshold"),0,255);
-        diaElemUInteger chroma(&(_param->chroma),_("Chroma Treshold"),0,255);
-        diaElemUInteger radius(&(_param->radius),_("Radius"),1,60);
+        diaElemUInteger luma(&(_param->luma),_("_Luma threshold:"),0,255);
+        diaElemUInteger chroma(&(_param->chroma),_("C_hroma threshold:"),0,255);
+        diaElemUInteger radius(&(_param->radius),_("_Radius:"),1,60);
 	  
     diaElem *elems[3]={&luma,&chroma,&radius};
   

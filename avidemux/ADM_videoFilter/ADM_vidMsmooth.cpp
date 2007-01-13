@@ -192,14 +192,14 @@ uint8_t Msmooth::configure(AVDMGenericVideoStream *in)
 	_in=in;
 	ADM_assert(_param);
         
-        diaElemToggle toggle(&(_param->highq),"High Quality");
-        diaElemToggle mask(&(_param->showmask),"Show Mask");
-        diaElemUInteger threshold(&(_param->threshold),"Threshold",0,100);
-        diaElemUInteger strength(&(_param->strength),"Filter Strength",0,100);
+        diaElemToggle toggle(&(_param->highq),"_High quality");
+        diaElemToggle mask(&(_param->showmask),"Show _mask");
+        diaElemUInteger threshold(&(_param->threshold),"_Threshold:",0,100);
+        diaElemUInteger strength(&(_param->strength),"_Strength:",0,100);
 	  
     diaElem *elems[4]={&toggle,&mask,&threshold,&strength};
   
-    return diaFactoryRun("MSmooth by Donald Graft",4,elems);
+    return diaFactoryRun("MSmooth",4,elems);
 }
 
 //________________________________________________________

@@ -89,15 +89,15 @@ _in=instream;
                           };
   
     
-    diaElemMenu     menu1(PX(order),_("Field Order"), 2,menuField);
-    diaElemUInteger threshold(PX(threshold),_("Threshold"),0,100,_("Smaller means more deinterlacing"));
-    diaElemToggle   sharp(PX(sharp),_("Sharp"),_("Sharper Engine"));
-    diaElemToggle   twoway(PX(twoway),_("Twoway"),_("Extrapolate better (better not to use it)"));
-    diaElemToggle   map(PX(map),_("Map"),_("Show interlaced areas (for test!)"));
+    diaElemMenu     menu1(PX(order),_("_Field order:"), 2,menuField);
+    diaElemUInteger threshold(PX(threshold),_("_Threshold:"),0,100,_("Smaller means more deinterlacing"));
+    diaElemToggle   sharp(PX(sharp),_("_Sharp"),_("_Sharper engine:"));
+    diaElemToggle   twoway(PX(twoway),_("T_woway"),_("Extrapolate better (better not to use it)"));
+    diaElemToggle   map(PX(map),_("_Map"),_("Show interlaced areas (for test!)"));
     
     diaElem *elems[5]={&menu1,&threshold,&sharp,&twoway,&map};
   
-   return  diaFactoryRun("Fade",5,elems);
+   return  diaFactoryRun("KernelDeint",5,elems);
 }
 uint8_t	ADMVideoKernelDeint::getCoupledConf( CONFcouple **couples)
 {

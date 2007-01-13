@@ -89,10 +89,10 @@ uint8_t ADMVideoMosaic::configure(AVDMGenericVideoStream * instream)
 
 #define PX(x) &(_param->x)
         
-    diaElemUInteger   hz(PX(hz),_("Horizontal Stacking"),0,10);
-    diaElemUInteger   vz(PX(vz),_("Vertical Stacking"),0,10);
-    diaElemUInteger   shrink(PX(shrink),_("Shrink Factor"),0,10);
-    diaElemToggle     show(PX(show),_("Show frame"));
+    diaElemUInteger   hz(PX(hz),_("_Horizontal stacking:"),0,10);
+    diaElemUInteger   vz(PX(vz),_("_Vertical stacking:"),0,10);
+    diaElemUInteger   shrink(PX(shrink),_("_Shrink factor:"),0,10);
+    diaElemToggle     show(PX(show),_("Show _frame"));
     
     
        diaElem *elems[]={&hz,&vz,&shrink,&show};

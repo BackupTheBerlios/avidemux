@@ -58,8 +58,8 @@ uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
         #define PX(x) &(_param->x)
   
         
-    diaElemUInteger   postProcStrength(PX(postProcStrength),_("Filter Strength"),0,5);
-    diaElemUInteger   quant(PX(forcedQuant),_("Quantizer"),1,31);
+    diaElemUInteger   postProcStrength(PX(postProcStrength),_("_Filter strength:"),0,5);
+    diaElemUInteger   quant(PX(forcedQuant),_("_Quantizer:"),1,31);
     //diaElemToggle     swapuv(PX(swapuv),_("Swap U&V"));
     
     uint32_t hzd,vzd,dring;
@@ -70,16 +70,16 @@ uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
     DOME(2,vzd);
     DOME(4,dring);
     
-     diaElemToggle     fhzd(&hzd,_("Horizontal Deblocking"));
-     diaElemToggle     fvzd(&vzd,_("Vertical Deblocking"));
-     diaElemToggle     fdring(&dring,_("Deringing"));
+     diaElemToggle     fhzd(&hzd,_("_Horizontal deblocking"));
+     diaElemToggle     fvzd(&vzd,_("_Vertical deblocking"));
+     diaElemToggle     fdring(&dring,_("_Deringing"));
     
     
     
       diaElem *elems[5]={&postProcStrength,&quant,&fhzd
                         ,&fvzd,&fdring};
 
-   if(diaFactoryRun("Forced PostProcessing",5,elems))
+   if(diaFactoryRun("Forced Postprocessing",5,elems))
   {
 #undef DOME
 #define DOME(x,y) if(y) _param->postProcType |=x;

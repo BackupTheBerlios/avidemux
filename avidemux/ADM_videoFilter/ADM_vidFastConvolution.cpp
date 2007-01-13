@@ -465,8 +465,8 @@ uint8_t AVDMFastVideoConvolution::configure(AVDMGenericVideoStream * instream)
 {
   
   //return DIA_getLumaChroma(&(_param->luma),&(_param->chroma)) ; 
-  diaElemToggle luma(&(_param->luma),"Process luma","Process luma plane");
-  diaElemToggle chroma(&(_param->chroma),"Process chroma");
+  diaElemToggle luma(&(_param->luma),"_Process luma","Process luma plane");
+  diaElemToggle chroma(&(_param->chroma),"P_rocess chroma");
   
   diaElem *elems[2]={&luma,&chroma};
   

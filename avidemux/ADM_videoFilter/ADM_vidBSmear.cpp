@@ -198,10 +198,10 @@ uint8_t AVDMVideoStreamBSMear::configure(AVDMGenericVideoStream *in)
           width=_in->getInfo()->width;
           height=_in->getInfo()->height;
           
-          diaElemUInteger dleft(&left,"Left",       0,width);
-          diaElemUInteger dright(&right,"Right",    0,width);
-          diaElemUInteger dtop(&(top),"Top",          0,height);
-          diaElemUInteger dbottom(&(bottom),"Bottom", 0,height);
+          diaElemUInteger dleft(&left,"_Left border:",       0,width);
+          diaElemUInteger dright(&right,"_Right border:",    0,width);
+          diaElemUInteger dtop(&(top),"_Top border:",          0,height);
+          diaElemUInteger dbottom(&(bottom),"_Bottom border:", 0,height);
             
           diaElem *elems[4]={&dleft,&dright,&dtop,&dbottom};
           if(diaFactoryRun("Blacken Borders",4,elems))
@@ -209,7 +209,7 @@ uint8_t AVDMVideoStreamBSMear::configure(AVDMGenericVideoStream *in)
             if((left&1) || (right&1)|| (top&1) || (bottom&1) ||
                      (top+bottom>=height)|| (left+right>width))
             {
-              GUI_Error_HIG("Incorrect parameters","All parameters must be even and within range"); 
+              GUI_Error_HIG("Incorrect parameters","All parameters must be even and within range."); 
               continue;
             }
             else

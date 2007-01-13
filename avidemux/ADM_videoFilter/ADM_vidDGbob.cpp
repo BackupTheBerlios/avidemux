@@ -84,15 +84,15 @@ uint8_t DGbob::configure(AVDMGenericVideoStream *in)
                              {1,_("Bottom"),NULL}
                           };
   
-     diaMenuEntry menuMode[3]={{0,_("Keep nb of frames and FPS"),NULL},
-                            {1,_("Double nb of frames and FPS"),NULL},
+     diaMenuEntry menuMode[3]={{0,_("Keep nb of frames and fps"),NULL},
+                            {1,_("Double nb of frames and fps"),NULL},
                             {2,_("Double nb of frames (slow motion)"),NULL}
                           };
                           
-    diaElemMenu     menu1(PX(order),_("Field Order"), 2,menuField);
-    diaElemMenu     menu2(PX(mode),_("Mode"), 3,menuMode);
-    diaElemUInteger threshold(PX(thresh),_("Threshold"),0,255);
-    diaElemToggle  extra(PX(ap),_("Extra"),_("Extra check, avoid using it"));
+    diaElemMenu     menu1(PX(order),_("_Field order:"), 2,menuField);
+    diaElemMenu     menu2(PX(mode),_("_Mode:"), 3,menuMode);
+    diaElemUInteger threshold(PX(thresh),_("_Threshold:"),0,255);
+    diaElemToggle  extra(PX(ap),_("_Extra"),_("Extra check, avoid using it"));
     
       diaElem *elems[4]={&menu1,&menu2,&threshold ,&extra};
    if(diaFactoryRun("DGBob",4,elems))
