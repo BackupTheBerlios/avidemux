@@ -38,7 +38,6 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidVlad.h"
 #include "ADM_filter/video_filters.h"
 
 static void Process(uint8_t *src,uint8_t *data, uint32_t width, uint32_t height,double frac);

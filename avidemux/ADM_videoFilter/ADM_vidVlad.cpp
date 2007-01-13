@@ -35,11 +35,11 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidVlad.h"
+#include "ADM_vidVlad.h"
 #include "ADM_filter/video_filters.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 
-
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 #if  defined(ARCH_X86_64)
 #define COUNTER long int
@@ -97,24 +97,23 @@ uint8_t AVDMVideoVlad::configure( AVDMGenericVideoStream *instream)
 {
 UNUSED_ARG(instream);
 int i,j;
-		i=_param->ythresholdMask;
-		j=_param->cthresholdMask;
-	  	if(GUI_getIntegerValue(&i,0,255,"Luma Temporal  Threshold"))
-		{			
-			if(GUI_getIntegerValue(&j,0,255,"Chroma Temporal  Threshold"))
-			{
-				_param->ythresholdMask=i;
-				_param->cthresholdMask=j;
-		 		ythresholdMask = (uint64_t)_param->ythresholdMask;
-	   			cthresholdMask = (uint64_t)_param->cthresholdMask;	   
 
-				EXPAND(	ythresholdMask);
-				EXPAND(	cthresholdMask);					
-				return 1;				
-			}		
-		}
-		return 0;
-}     											
+   diaElemUInteger luma(&(_param->ythresholdMask),_("Luma Temporal Threshold"),0,255);
+   diaElemUInteger chroma(&(_param->cthresholdMask),_("Chroma Temporal Threshold"),0,255);
+    
+    diaElem *elems[]={&luma,&chroma};
+  
+    if(diaFactoryRun("Temporal Cleaner",sizeof(elems)/sizeof(diaElem *),elems))
+    {
+      ythresholdMask = (uint64_t)_param->ythresholdMask;
+      cthresholdMask = (uint64_t)_param->cthresholdMask;	   
+
+      EXPAND(	ythresholdMask);
+      EXPAND(	cthresholdMask);	
+      return 1;
+    }
+    return 0;
+}
 AVDMVideoVlad::AVDMVideoVlad(  AVDMGenericVideoStream *in,CONFcouple *couples)
 		
 

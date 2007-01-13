@@ -31,9 +31,9 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidDropOut.h"
+#include "ADM_vidDropOut.h"
 #include "ADM_filter/video_filters.h"
-
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 static FILTER_PARAM dropParam={1,{"threshold"}};
 
@@ -58,16 +58,12 @@ char  *ADMVideoDropOut::printConf(void)
 uint8_t  GUI_getIntegerValue(int *valye, int min, int max, char *title);	
 uint8_t ADMVideoDropOut::configure(AVDMGenericVideoStream *instream)
 {
-int i;
-
 	_in=instream;
-	i=(int)*_param;
-	if(GUI_getIntegerValue(&i,1,255,"DropOut Threshold"))
-	{
-		*_param=(uint32_t)i;
-		return 1;
-	}
-	return 0;
+        
+         diaElemUInteger chroma(_param,_("DropOut Threshold"),1,255);    
+         diaElem *elems[]={&chroma};
+  
+    return diaFactoryRun("Drop Out",sizeof(elems)/sizeof(diaElem *),elems);
 }
 ADMVideoDropOut::~ADMVideoDropOut()
 {

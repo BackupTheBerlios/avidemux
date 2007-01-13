@@ -36,7 +36,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidFieldUtil.h"
-#include "ADM_video/ADM_vidPulldown.h"
+#include "ADM_vidPulldown.h"
 #include "ADM_video/ADM_interlaced.h"
 #include "ADM_osSupport/TLK_clock.h"
 #include "ADM_osSupport/ADM_debugID.h"

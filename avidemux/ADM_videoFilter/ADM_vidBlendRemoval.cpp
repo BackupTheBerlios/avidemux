@@ -84,7 +84,7 @@ uint8_t vidBlendRemoval::configure (AVDMGenericVideoStream * in)
             " Smaller value might mean more false positive"));
     diaElemUInteger   noise(PX(noise),_("noise"),0,99,_("If pixel are closer than noise, they are considered to be the same"));
     diaElemUInteger   identical(PX(identical),_("identical"),0,99,_("If metric is less than identical, images are considered identical"));
-    diaElemToggle     show(PX(show),_("identical"),_("Show metric in image (debug)"));
+    diaElemToggle     show(PX(show),_("show"),_("Show metric in image (debug)"));
     
        diaElem *elems[]={&thresh,&noise,&identical,&show};
   
