@@ -69,10 +69,17 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   GtkWidget *table1;
   
   gtk_window_set_title (GTK_WINDOW (dialog),title );
+  gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
+  gtk_dialog_set_has_separator (GTK_DIALOG (dialog), FALSE);
   dialog_vbox1 = GTK_DIALOG (dialog)->vbox;
+  gtk_box_set_spacing (GTK_BOX(dialog_vbox1), 12);
   gtk_widget_show (dialog_vbox1);
   
   table1 = gtk_table_new (nb, 2, FALSE);
+  gtk_table_set_col_spacings (GTK_TABLE (table1), 12);
+  gtk_table_set_row_spacings (GTK_TABLE (table1), 6);
+  gtk_container_set_border_width (GTK_CONTAINER (table1), 6);
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), table1, TRUE, TRUE, 0);
   
@@ -81,14 +88,15 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
     addLine(elems[i],dialog,table1,i);
     
   }
-  // Add ok & cancel button
-  GtkWidget *cancelbutton1,*okbutton1;
-  
+  // Add a Close button
+  GtkWidget *okbutton1;
+  GtkWidget *cancelbutton1;
+
   cancelbutton1 = gtk_button_new_from_stock ("gtk-cancel");
   gtk_widget_show (cancelbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), cancelbutton1, GTK_RESPONSE_CANCEL);
   GTK_WIDGET_SET_FLAGS (cancelbutton1, GTK_CAN_DEFAULT);
-
+  
   okbutton1 = gtk_button_new_from_stock ("gtk-ok");
   gtk_widget_show (okbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), okbutton1, GTK_RESPONSE_OK);

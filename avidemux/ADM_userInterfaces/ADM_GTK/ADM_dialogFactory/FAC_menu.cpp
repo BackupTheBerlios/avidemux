@@ -53,11 +53,12 @@ void diaElemMenu::setMe(void *dialog, void *opaque,uint32_t line)
   GtkWidget *combo;
   
   
-  label = gtk_label_new (paramTitle);
+  label = gtk_label_new_with_mnemonic (paramTitle);
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_widget_show(label);
   
   gtk_table_attach (GTK_TABLE (opaque), label, 0, 1, line, line+1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   
   combo = gtk_combo_box_new_text ();
@@ -65,6 +66,8 @@ void diaElemMenu::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_table_attach (GTK_TABLE (opaque), combo, 1, 2, line, line+1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  
+  gtk_label_set_mnemonic_widget (GTK_LABEL(label), combo);
   
   for(int i=0;i<nbMenu;i++)
   {
