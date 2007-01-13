@@ -35,7 +35,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 
-#include"ADM_video/ADM_vidField.h"
+#include"ADM_vidField.h"
 
 #if defined( ARCH_X86)  || defined(ARCH_X86_64)
 //	#define DEBUG_DEINT 1

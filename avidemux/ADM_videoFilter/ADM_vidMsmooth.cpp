@@ -42,7 +42,6 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include"ADM_video/ADM_vidField.h"
 #include"ADM_video/ADM_cache.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
@@ -72,7 +71,7 @@
 
 #include "ADM_video/ADM_vidMSmooth_param.h"
 
-extern uint8_t DIA_getMSmooth(MSMOOTH_PARAM *param);
+
 extern uint8_t 	PutHintingData(unsigned char *video, unsigned int hint);
 extern uint8_t 	GetHintingData(unsigned char *video, unsigned int *hint);
 extern void 	BitBlt(uint8_t * dstp, int dst_pitch, const uint8_t* srcp,

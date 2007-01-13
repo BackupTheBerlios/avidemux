@@ -46,11 +46,9 @@ extern "C" {
 #include "ADM_filter/video_filters.h"
 
 #include "ADM_video/ADM_cache.h"
-#include "DIA_enter.h"
 
 #include "ADM_vidMosaic_param.h"
 
-extern uint8_t  DIA_mosaic(MOSAIC_PARAMS *mosaic);
 
 class  ADMVideoMosaic:public AVDMGenericVideoStream
  {

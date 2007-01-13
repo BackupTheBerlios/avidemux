@@ -1,7 +1,17 @@
 #!/bin/bash
+echo  "*************************"
 echo "Checking malloc..."
-find . -name "*.a" | xargs nm -AC | grep "malloc\|free"| grep   " U " | grep -v ".* U .*_.*"
+echo  "*************************"
+find . -name "*.a" | xargs nm -AC | grep "malloc\|free"| grep   " U " | grep -v ".* U .*_.*" | grep -v "::"
+echo  "*************************"
 echo "Checking fread/fwrite..."
+echo  "*************************"
 find . -name "*.a" | xargs nm -AC | grep "fread\|fwrite"| grep   " U " | grep -v ".* U .*_.*"
+echo  "*************************"
+echo "Checking fopen/close..."
+echo  "*************************"
+find . -name "*.a" | xargs nm -AC | grep "fopen\|fclose"| grep   " U " | grep -v ".* U .*_.*" | grep -v qf
+echo  "*************************"
 echo "Checking GTK..."
+echo  "*************************"
 find . -name "*.a" | grep -vi gtk | xargs nm -AC | grep "gtk_"| grep   " U " 

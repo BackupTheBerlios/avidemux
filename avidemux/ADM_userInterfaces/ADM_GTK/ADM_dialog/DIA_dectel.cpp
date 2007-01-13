@@ -30,7 +30,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 
 
-#include "ADM_video/ADM_vidDecTel_param.h"
+#include "ADM_videoFilter/ADM_vidDecTel_param.h"
 #define MENU_SET(x,y) { gtk_option_menu_set_history (GTK_OPTION_MENU(WID(x)),param->y);}
 #define MENU_GET(x,y) { param->y	= getRangeInMenu(WID(x));}
 

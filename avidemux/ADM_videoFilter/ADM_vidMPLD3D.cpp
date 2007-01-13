@@ -49,7 +49,7 @@ BUILD_CREATE(MPD3D_create,ADMVideoMPD3D);
 #define PARAM1_DEFAULT 4.0
 #define PARAM2_DEFAULT 3.0
 #define PARAM3_DEFAULT 6.0
-uint8_t DIA_d3d(double *luma,double *chroma,double *temporal);
+
  char 	*ADMVideoMPD3D::printConf(void)
  {
 	  	static char buf[50];

@@ -6,8 +6,7 @@ noinst_LIBRARIES = libADM_video.a
 libADM_video_a_METASOURCES = AUTO
 #INCLUDES = $(all_includes) 
 
-libADM_video_a_SOURCES = ADM_vidFields.cpp \
- ADM_vidDeintASM.cpp \
+libADM_video_a_SOURCES = \
  ADM_vidCached.cpp \
  ADM_vidPartial.cpp \
  ADM_vidFont.cpp \
@@ -15,7 +14,6 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidContrast.cpp \
 	ADM_resizeter.cpp \
  ADM_vidCrop.cpp \
- ADM_vidDeinterlace.cpp \
  ADM_vidNull.cpp \
 	ADM_vidResize.cpp \
 	ADM_vidClean.cpp \
@@ -33,14 +31,11 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidIVTC.cpp \
  ADM_vidIVTC.h ADM_interlaced.cpp \
 	ADM_interlaced.h \
- ADM_vidBlend.cpp \
  ADM_vidRaw.cpp \
 	ADM_vidSRTRender.cpp \
  ADM_vidSRTload.cpp \
 	ADM_mpdetc.cpp \
- ADM_vidDecTelecide.cpp \
- ADM_vidDecTelecide.h ADM_cache.cpp \
- ADM_vidDecDec.cpp \
+ ADM_cache.cpp \
  ADM_vidEqualizer.cpp \
  ADM_vidVobsub.cpp \
  ADM_vobsubinfo.cpp \
@@ -61,13 +56,13 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
 				
 
 
-EXTRA_DIST =  ADM_cache.cpp  ADM_vidDecDec_param.h \
-ADM_cache.h  ADM_vidDecTel_param.h \
-ADM_confCouple.h ADM_vidDecTelecide.cpp  ADM_vidNull.cpp \
-ADM_confCouples.cpp  ADM_vidDecTelecide.h  \
-ADM_genvideo.cpp ADM_vidDeintASM.cpp \
-ADM_genvideo.hxx ADM_vidDeinterlace.cpp  ADM_vidPartial.cpp \
-ADM_vidDeinterlace.h  ADM_vidPartial.h \
+EXTRA_DIST =  ADM_cache.cpp  \
+ADM_cache.h  \
+ADM_confCouple.h ADM_vidNull.cpp \
+ADM_confCouples.cpp  \
+ADM_genvideo.cpp \
+ADM_genvideo.hxx ADM_vidPartial.cpp \
+ADM_vidPartial.h \
 ADM_vidDelta.cpp  ADM_vidPartial_param.h \
 ADM_guiResize.cpp   ADM_vidRaw.cpp \
 ADM_interlaced.cpp  \
@@ -82,13 +77,12 @@ ADM_resizeter.cpp  ADM_vidField.h  ADM_vidSRTRender.cpp \
 ADM_vidFieldUnblend.cpp ADM_vidSRTload.cpp \
 ADM_vidASharp_param.h  ADM_vidFieldUtil.cpp  \
 ADM_vidFieldUtil.h  \
-ADM_vidFields.cpp \
 ADM_vidAnimated.cpp  \
 ADM_vidAnimated.h  \
 ADM_vidAnimated_param.h   \
 ADM_vidAsharp.cpp   \
 ADM_vidFont.cpp \
-ADM_vidBlend.cpp ADM_vidFont.h \
+ADM_vidFont.h \
 ADM_vidCNR2.cpp  \
 ADM_vidCNR2_param.h  ADM_vidHue.cpp  ADM_vidTDeint_param.h \
 ADM_vidCached.cpp  ADM_vidHue.h  ADM_vidTdeint.cpp \
@@ -106,7 +100,7 @@ ADM_vidContrast.cpp  ADM_vidMPdelogo.cpp \
 ADM_vidContrast.h  ADM_vidMPdelogo.h \
 ADM_vobsubinfo.cpp \
 ADM_vidCrop.cpp  ADM_vidMSmooth_param.h  ADM_vobsubinfo.h \
-ADM_vidDecDec.cpp  swscale_internal.h \
+swscale_internal.h \
 ADM_vidTdeint_util.txt ADM_vidASS.h ADM_vidASS.cpp \
 ADM_vidAss_Params.h mmx_macros.h
 
@@ -114,6 +108,6 @@ ADM_vidAss_Params.h mmx_macros.h
 INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil \
 			 $(FREETYPE_CFLAGS) $(ALTIVEC_SWITCH) -I../ADM_userInterfaces/ADM_commonUI -I../ADM_inputs
 noinst_HEADERS = ADM_mpdetc.h \
-					  ADM_cache.h ADM_vidDecTel_param.h ADM_vidDecDec_param.h \
+					  ADM_cache.h \
 					ADM_vidMSmooth_param.h ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \
 		ADM_vidEq2.h ADM_vidASS.h

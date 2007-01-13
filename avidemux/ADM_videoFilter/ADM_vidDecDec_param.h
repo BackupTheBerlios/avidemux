@@ -11,6 +11,9 @@
 //
 typedef struct DECIMATE_PARAM
 {
-	uint32_t    	cycle, mode, quality;
-	double 		threshold, threshold2;
+	uint32_t    cycle; // Integer 2..40
+        uint32_t    mode;  // 0..3
+        uint32_t    quality; //0..4
+	double      threshold;
+        double      threshold2;
 };

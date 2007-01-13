@@ -49,7 +49,6 @@ static FILTER_PARAM ppParam={3,{"postProcType","postProcStrength","forcedQuant"}
 SCRIPT_CREATE(forcedpp_script,ADMVideoForcedPP,ppParam);
 BUILD_CREATE(forcedpp_create,ADMVideoForcedPP);
 
-extern int DIA_getMPParams( uint32_t *pplevel, uint32_t *ppstrength,uint32_t *swap);
 
 uint8_t ADMVideoForcedPP::configure( AVDMGenericVideoStream *instream)
 {

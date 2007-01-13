@@ -460,7 +460,6 @@ char 							*AVDMFastVideoMedian::printConf(void)
 	*out++=b3;
 	return 1;
 }
-uint8_t  DIA_getLumaChroma(uint32_t *doLuma, uint32_t *doChroma);
 uint8_t AVDMFastVideoConvolution::configure(AVDMGenericVideoStream * instream)
 {
   

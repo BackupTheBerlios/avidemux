@@ -44,7 +44,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include"ADM_video/ADM_vidField.h"
+
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_FILTER
@@ -66,7 +66,8 @@ extern uint8_t DIA_getDecombTelecide(TelecideParam *param);
 uint8_t Telecide::configure(AVDMGenericVideoStream *in)
 {
 	_in=in;
-	return DIA_getDecombTelecide(_param);
+//	return DIA_getDecombTelecide(_param);
+        return 0;
 	
 }
 

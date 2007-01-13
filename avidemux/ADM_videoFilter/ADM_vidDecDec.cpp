@@ -54,7 +54,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-#include"ADM_video/ADM_vidField.h"
+#include"ADM_vidField.h"
 #include"ADM_video/ADM_cache.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
@@ -62,6 +62,9 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 #include "ADM_osSupport/ADM_cpuCap.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
+
 #define PROGRESSIVE  0x00000001
 #define MAGIC_NUMBER (0xdeadbeef)
 #define IN_PATTERN   0x00000002
@@ -177,9 +180,43 @@ SCRIPT_CREATE(decimate_script,Decimate,decdecParam);
 uint8_t Decimate::configure(AVDMGenericVideoStream *in)
 {
 	_in=in;
-	ADM_assert(_param);
-	return  DIA_getDecombDecimate(_param);
-	
+#define PX(x) &(_param->x)
+#define SZT(x) sizeof(x)/sizeof(diaMenuEntry *)
+        
+    ELEM_TYPE_FLOAT t1=(ELEM_TYPE_FLOAT)_param->threshold;
+    ELEM_TYPE_FLOAT t2=(ELEM_TYPE_FLOAT)_param->threshold2;
+
+         diaMenuEntry tMode[]={
+                             {0, _("Discard Closer"),NULL},
+                             {1, _("Replace (interpolate)"),NULL},
+                             {2, _("Discard longer dupe (animés)"),NULL},
+                             {3, _("PullDown dupe removal"),NULL}
+                          };
+         diaMenuEntry tQuality[]={
+                             {0, _("Fastest (no chroma, partial luma)"),NULL},
+                             {1, _("Fast (parial luma and chroma)"),NULL},
+                             {2, _("Medium (full luma no chroma)"),NULL},
+                             {3, _("Slow (full luma and chroma)"),NULL}
+                          };
+  
+    
+    diaElemMenu menuMode(PX(mode),_("Mode"), 4,tMode);
+    diaElemMenu menuQuality(PX(quality),_("Quality"), 4,tQuality);
+    diaElemFloat menuThresh1(&t1,_("Threshold 1"),0,100.);
+    diaElemFloat menuThresh2(&t2,_("Threshold 2"),0,100.);
+    diaElemUInteger cycle(PX(cycle),"Cycle",2,40);
+    
+    diaElem *elems[]={&cycle,&menuMode,&menuQuality,&menuThresh1,&menuThresh2};
+    
+  if(diaFactoryRun("Decombe Decimate",5,elems))
+  {
+    _param->threshold=(double )t1;
+    _param->threshold2=(double )t2;
+    return 1; 
+  }
+  return 0;        
+        
+        
 }
 
 char *Decimate::printConf( void )

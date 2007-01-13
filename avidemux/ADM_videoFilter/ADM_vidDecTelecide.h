@@ -69,7 +69,7 @@ struct PREDICTION
 };
 
 #define GETFRAME(g, fp) { int GETFRAMEf; uint32_t len,flags;GETFRAMEf = (g); fp=NULL;if (GETFRAMEf < 0) GETFRAMEf = 0; 	else if (GETFRAMEf >= _info.nb_frames) GETFRAMEf = _info.nb_frames - 1; fp=vidCache->getImage(GETFRAMEf); }
-#include "ADM_video/ADM_vidDecTel_param.h"
+#include "ADM_vidDecTel_param.h"
 class Telecide : public AVDMGenericVideoStream
 {
 private:
