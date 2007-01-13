@@ -7,6 +7,10 @@ libADM_videoFilter_a_METASOURCES = AUTO
 #INCLUDES = $(all_includes) 
 
 libADM_videoFilter_a_SOURCES =  \
+ ADM_vidFlipV.cpp \
+ ADM_vidLuma.cpp \
+ ADM_vidLargeMedian.cpp \
+ ADM_vidChroma.cpp \
  ADM_vidMosaic.cpp \
  ADM_vidBlendRemoval.cpp  \
  ADM_vidHardIvtcRemoval.cpp \

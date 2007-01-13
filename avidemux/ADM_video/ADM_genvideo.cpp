@@ -35,7 +35,6 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 
-#include"ADM_video/ADM_vidConvolution.hxx"
 #include"ADM_video/ADM_vidCommonFilter.h"
 uint8_t AVDMGenericVideoStream::getPixel(int32_t x,int32_t y,uint8_t *data)
 {

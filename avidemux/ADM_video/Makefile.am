@@ -9,20 +9,16 @@ libADM_video_a_METASOURCES = AUTO
 libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidDeintASM.cpp \
  ADM_vidVlad.cpp \
- ADM_vidLargeMedian.cpp \
  ADM_vidSalt.cpp \
  ADM_vidCached.cpp \
  ADM_vidPartial.cpp \
  ADM_vidFont.cpp \
  ADM_vidSRT.cpp \
-	ADM_vidFlipV.cpp \
  ADM_vidStabilize.cpp \
  ADM_vidContrast.cpp \
 	ADM_resizeter.cpp \
- ADM_vidConvolution.cpp \
  ADM_vidCrop.cpp \
  ADM_vidDeinterlace.cpp \
-	ADM_vidLuma.cpp \
  ADM_vidNull.cpp \
  ADM_vidPalShift.cpp \
 	ADM_vidResize.cpp \
@@ -30,7 +26,6 @@ libADM_video_a_SOURCES = ADM_vidFields.cpp \
  ADM_vidTempSmooth.cpp \
  ADM_vidUVSwap.cpp \
 	ADM_vidClean.cpp \
- ADM_vidChroma.cpp \
 	ADM_resizebis.cpp \
  ADM_genvideo.cpp \
  ADM_vidRotate.cpp \
@@ -105,8 +100,8 @@ ADM_vidFieldUnblend.cpp ADM_vidSRTload.cpp \
 ADM_vidASharp_param.h  ADM_vidFieldUtil.cpp  ADM_vidSalt.cpp \
 ADM_vidFieldUtil.h  ADM_vidSalt.h \
 ADM_vidFields.cpp ADM_vidSeparateField.cpp \
-ADM_vidAnimated.cpp  ADM_vidFlipV.cpp  ADM_vidSeparateField.h \
-ADM_vidAnimated.h  ADM_vidFlipV.h  \
+ADM_vidAnimated.cpp  ADM_vidSeparateField.h \
+ADM_vidAnimated.h  \
 ADM_vidAnimated_param.h   \
 ADM_vidAsharp.cpp   ADM_vidStabilize.cpp \
 ADM_vidFont.cpp ADM_vidStabilize.h \
@@ -119,11 +114,11 @@ ADM_vidCached.cpp  ADM_vidHue.h  ADM_vidTdeint.cpp \
 ADM_vidCached.h  ADM_vidIVTC.cpp ADM_vidTelecide.cpp \
 ADM_vidIVTC.h ADM_vidTelecide.h \
 ADM_vidTempSmooth.cpp \
-ADM_vidChroma.cpp  ADM_vidTempSmooth.h \
-ADM_vidChroma.h  ADM_vidLargeMedian.cpp  ADM_vidUVSwap.cpp \
-ADM_vidChromaShift.cpp ADM_vidLargeMedian.h  ADM_vidUVSwap.h \
-ADM_vidChromaShift.h ADM_vidLuma.cpp ADM_vidUnblend.cpp \
-ADM_vidClean.cpp ADM_vidLuma.h ADM_vidUnblend_param.h \
+ADM_vidTempSmooth.h \
+ADM_vidUVSwap.cpp \
+ADM_vidChromaShift.cpp ADM_vidUVSwap.h \
+ADM_vidChromaShift.h ADM_vidUnblend.cpp \
+ADM_vidClean.cpp ADM_vidUnblend_param.h \
 ADM_vidClean.h ADM_vidVlad.cpp \
 ADM_vidColorYuv.cpp  ADM_vidVlad.h \
 ADM_vidColorYuv.h  ADM_vidVobSub.h \
@@ -131,8 +126,8 @@ ADM_vidColorYuv_param.h  ADM_vidVobSubRender.cpp \
 ADM_vidCommonFilter.h  ADM_vidMPLResize.cpp  ADM_vidVobsub.cpp \
 ADM_vidContrast.cpp  ADM_vidMPdelogo.cpp ADM_vidWirl.cpp \
 ADM_vidContrast.h  ADM_vidMPdelogo.h ADM_vidlavdeint.cpp \
-ADM_vidConvolution.cpp  ADM_vidlavdeint.h \
-ADM_vidConvolution.hxx  ADM_vobsubinfo.cpp \
+ADM_vidlavdeint.h \
+ADM_vobsubinfo.cpp \
 ADM_vidCrop.cpp  ADM_vidMSmooth_param.h  ADM_vobsubinfo.h \
 ASM_vidDenoise.cpp \
 ADM_vidDecDec.cpp  swscale_internal.h \

@@ -22,68 +22,7 @@
         uint32_t chroma;
   }CONV_PARAM;
  #endif
-class  AVDMVideoConvolution:public AVDMGenericVideoStream
- {
 
- protected:
-
-                 uint8_t		*_U,*_V;
-    virtual	 uint8_t       		convolutionKernel(int32_t x,int32_t y,uint8_t *out)=0;
-           	virtual char 		*printConf(void);
-
- public:
-
-
-                                      AVDMVideoConvolution(  AVDMGenericVideoStream *in,CONFcouple *setup);
-
-                virtual               ~AVDMVideoConvolution();
-                virtual uint8_t       getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-                                                                        ADMImage *data,uint32_t *flags);
-                virtual uint8_t       configure( AVDMGenericVideoStream *instream) { UNUSED_ARG(instream); return 0;};
-
- }     ;
-
-
-   class  AVDMVideoSharpen:public AVDMVideoConvolution
- {
-   protected:
-                    uint8_t  convolutionKernel(int32_t x,int32_t y,uint8_t *data);
- public:
-            virtual char *printConf(void);
-                          AVDMVideoSharpen(  AVDMGenericVideoStream *in,CONFcouple *setup)
-                                          : AVDMVideoConvolution( 	in,setup) {};;
- }     ;
-   class  AVDMVideoMean:public AVDMVideoConvolution
- {
-   protected:
-                    uint8_t  convolutionKernel(int32_t x,int32_t y,uint8_t *data);
- public:
-            virtual char *printConf(void);
-                    AVDMVideoMean(  AVDMGenericVideoStream *in,CONFcouple *setup)
-                      : AVDMVideoConvolution( in,setup) {};
-
- };
- 
-  class  AVDMVideoMedian:public AVDMVideoConvolution
- {
-   protected:
-                    uint8_t  convolutionKernel(int32_t x,int32_t y,uint8_t *data);
- 	public:
-            virtual char *printConf(void);
-                          AVDMVideoMedian(  AVDMGenericVideoStream *in,CONFcouple *setup)
-                                  : AVDMVideoConvolution( 	in,setup) {};
-
- }     ;
-
-  class  AVDMVideoGaussian:public AVDMVideoConvolution
- {
-   protected:
-                    uint8_t  convolutionKernel(int32_t x,int32_t y,uint8_t *data);
- 	public:
-            virtual char *printConf(void);
-                          AVDMVideoGaussian(  AVDMGenericVideoStream *in,CONFcouple *setup)
-                                        : AVDMVideoConvolution( 	in,setup) {};
- }     ;
 //---------------------------------------------------------
  class  AVDMFastVideoConvolution:public AVDMGenericVideoStream
  {

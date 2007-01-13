@@ -24,16 +24,25 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_video/ADM_genvideo.hxx"
 
-#include"ADM_video/ADM_vidConvolution.hxx"
+#include"ADM_filter/video_filters.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "ADM_vidConvolution.hxx"
 #include <ADM_assert.h>
 
 
 BUILD_CREATE(mean_create,AVDMFastVideoMean);
 BUILD_CREATE(sharpen_create,AVDMFastVideoSharpen);
 BUILD_CREATE(Gaussian_create,AVDMFastVideoGauss);
+BUILD_CREATE(median_create,AVDMFastVideoMedian);
 
+static FILTER_PARAM convParam={2,{"luma","chroma"}};
+
+SCRIPT_CREATE(mean_script,AVDMFastVideoMean,convParam);
+SCRIPT_CREATE(sharpen_script,AVDMFastVideoSharpen,convParam);
+SCRIPT_CREATE(gaussian_script,AVDMFastVideoGauss,convParam);
+SCRIPT_CREATE(median_script,AVDMFastVideoMedian,convParam);
 
 
 uint8_t	AVDMFastVideoConvolution::getCoupledConf( CONFcouple **couples)
