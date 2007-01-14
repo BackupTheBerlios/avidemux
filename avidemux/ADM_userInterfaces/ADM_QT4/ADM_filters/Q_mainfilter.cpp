@@ -33,6 +33,7 @@
 /*******************************************************/
 #define NB_TREE 7
 static int startFilter[NB_TREE];
+static int filterSize[NB_TREE];
 static int max=0;
 /******************************************************/
 extern FILTER_ENTRY allfilters[MAX_FILTER];
@@ -41,7 +42,7 @@ extern FILTER videofilters[MAX_FILTER];
 extern uint32_t nb_active_filter;
 extern const char  *filterGetNameFromTag(VF_FILTERS tag);
 extern ADM_Composer *video_body;
-
+extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *conf, AVDMGenericVideoStream *in) ;
 /*******************************************************/
 class filtermainWindow : public QDialog
 {
@@ -54,17 +55,78 @@ class filtermainWindow : public QDialog
      void             buildActiveFilterList(void);
      Ui_mainFilterDialog ui;
      
-     QStringList      allList[NB_TREE];
-     QStringListModel allModel[NB_TREE];
+     QListWidget      *allList[NB_TREE];
+     
      
      QStringList      activeList;
      QStringListModel activeModel;
      
      
  public slots:
+        void add(bool b);
+        void remove(bool b);
+        void configure(bool b);
+        void partial(bool b);
  private slots:
  private:
 };
+
+/**
+
+*/
+void filtermainWindow::add( bool b)
+{
+  
+  /* Get selection if any */
+  int tab=ui.tabWidgetSubtitles->currentIndex();
+  ADM_assert(tab>=0 && tab < NB_TREE);
+  /* Now that we have the tab, get the selection */
+   QListWidgetItem *item=allList[tab]->currentItem();
+   if(item)
+   {
+     int itag=item->type()-1000;
+      printf("Tag : %d\n",itag);
+      VF_FILTERS tag=(VF_FILTERS) itag;
+      // Create our filter...
+      
+       CONFcouple *coup;
+        videofilters[nb_active_filter].filter =
+            filterCreateFromTag (tag, NULL, videofilters[nb_active_filter - 1].filter);
+        if(!videofilters[nb_active_filter].filter->
+                    configure (videofilters[nb_active_filter - 1].filter))
+        {
+            delete videofilters[nb_active_filter].filter;
+            return;
+        }
+        videofilters[nb_active_filter].filter->getCoupledConf (&coup);
+        videofilters[nb_active_filter].tag = tag;
+        videofilters[nb_active_filter].conf = coup;
+        nb_active_filter++;
+        buildActiveFilterList();
+   }
+}
+/**
+
+*/
+void filtermainWindow::remove( bool b)
+{
+  printf("remove\n"); 
+}
+/**
+
+*/
+void filtermainWindow::configure( bool b)
+{
+  printf("configure\n"); 
+}
+/**
+
+*/
+void filtermainWindow::partial( bool b)
+{
+  printf("partial\n"); 
+}
+
 /**
         \fn     buildAvailableFilterList(void)
         \brief  build the internal datas needed to handle the list
@@ -72,7 +134,7 @@ class filtermainWindow : public QDialog
 void filtermainWindow::buildAvailableFilterList(void)
 {
   int current_tree=-1;
-  
+  int current_raw=0;;
   
   max=0;
   for (uint32_t i = 0; i < nb_video_filter; i++)
@@ -83,22 +145,26 @@ void filtermainWindow::buildAvailableFilterList(void)
           str+=allfilters[i].name;
           str+=":";//"</b><br>";
           str+=allfilters[i].description;
-          allList[current_tree]+=str;
           max++;
+          current_raw++;
+          QListWidgetItem *item=new QListWidgetItem(str,allList[current_tree],1000+allfilters[i].tag);
+          allList[current_tree]->addItem(item);
+          
         }else 
         {
                 current_tree++;
+                if(current_tree) filterSize[current_tree-1]=current_raw;
                 if(current_tree>=NB_TREE) break;
+                allList[current_tree]->clear();
                 startFilter[current_tree]=i+1;
+                current_raw=0;
+                
         }
     }
    
     
     ADM_assert(NB_TREE==7);
-    for(int i=0;i<NB_TREE;i++)
-    {
-      allModel[i].setStringList(allList[i]);
-    }
+  
 }
   /**
         \fn     buildActiveFilterList(void)
@@ -124,22 +190,30 @@ void filtermainWindow::buildActiveFilterList(void)
   */
 filtermainWindow::filtermainWindow()     : QDialog()
  {
-      buildAvailableFilterList();
-      buildActiveFilterList();
       ui.setupUi(this);
       
-    
-    ui.listViewTransform->setModel(&(allModel[0]));
-    ui.listViewInterlacing->setModel(&(allModel[1]));
-    ui.listViewColors->setModel(&(allModel[2]));
-    ui.listViewNoise->setModel(&(allModel[3]));;
-    ui.listViewSharpness->setModel(&(allModel[4]));;
-    ui.listViewSubtitles->setModel(&(allModel[5]));;
-    ui.listViewMisc->setModel(&(allModel[6]));;
+#define ASSOCIATE(x,y)   allList[x]=ui.listWidget##y
+      ASSOCIATE(0,Transform);
+      ASSOCIATE(1,Interlacing);
+      ASSOCIATE(2,Colors);
+      ASSOCIATE(3,Noise);
+      ASSOCIATE(4,Sharpness);
+      ASSOCIATE(5,Subtitles);
+      ASSOCIATE(6,Misc);
+      
+      
+      buildAvailableFilterList();
+      buildActiveFilterList();
+      
+      
       
     ui.listViewActive->setModel(&activeModel);
 
+    connect((ui.toolButtonConfigure),SIGNAL(clicked(bool)),this,SLOT(configure(bool)));
+    connect((ui.toolButtonAdd),SIGNAL(clicked(bool)),this,SLOT(add(bool)));
+    connect((ui.pushButtonRemove),SIGNAL(clicked(bool)),this,SLOT(remove(bool)));
 
+    connect(ui.buttonClose, SIGNAL(clicked(bool)), this, SLOT(accept()));
  }
 /*******************************************************/
 

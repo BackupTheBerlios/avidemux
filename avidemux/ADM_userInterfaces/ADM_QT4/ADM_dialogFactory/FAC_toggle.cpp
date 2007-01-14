@@ -24,12 +24,13 @@
 #include <QDialog>
 #include <QMessageBox>
 #include <QGridLayout>
+#include <QCheckBox>
 
 #include "default.h"
 #include "ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 
-#include <QCheckBox>
+
 diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
   : diaElem(ELEM_TOGGLE)
 {

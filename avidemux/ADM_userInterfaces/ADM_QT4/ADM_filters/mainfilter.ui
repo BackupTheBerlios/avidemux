@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>1024</width>
-    <height>682</height>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -55,9 +55,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton" >
+      <widget class="QToolButton" name="toolButtonAdd" >
        <property name="text" >
-        <string>...</string>
+        <string>Add</string>
+       </property>
+       <property name="toolButtonStyle" >
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
       </widget>
      </item>
@@ -129,6 +132,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButtonRemove" >
+       <property name="text" >
+        <string>Remove</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="toolButtonPartial" >
        <property name="text" >
         <string>Partial</string>
@@ -177,7 +187,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" >
-        <widget class="QListView" name="listViewTransform" />
+        <widget class="QListWidget" name="listWidgetTransform" />
        </item>
       </layout>
      </widget>
@@ -193,7 +203,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" >
-        <widget class="QListView" name="listViewInterlacing" />
+        <widget class="QListWidget" name="listWidgetInterlacing" />
        </item>
       </layout>
      </widget>
@@ -209,7 +219,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" >
-        <widget class="QListView" name="listViewColors" />
+        <widget class="QListWidget" name="listWidgetColors" />
        </item>
       </layout>
      </widget>
@@ -225,7 +235,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" >
-        <widget class="QListView" name="listViewNoise" />
+        <widget class="QListWidget" name="listWidgetNoise" />
        </item>
       </layout>
      </widget>
@@ -241,7 +251,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" >
-        <widget class="QListView" name="listViewSharpness" />
+        <widget class="QListWidget" name="listWidgetSharpness" />
        </item>
       </layout>
      </widget>
@@ -257,7 +267,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" >
-        <widget class="QListView" name="listViewSubtitles" />
+        <widget class="QListWidget" name="listWidgetSubtitles" />
        </item>
       </layout>
      </widget>
@@ -273,7 +283,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" >
-        <widget class="QListView" name="listViewMisc" />
+        <widget class="QListWidget" name="listWidgetMisc" />
        </item>
       </layout>
      </widget>
