@@ -22,54 +22,56 @@
 #include <math.h>
 
 #include <QDialog>
-#include <QMessageBox>
+#include <QSpinBox>
 #include <QGridLayout>
+#include <QLabel>
 
 #include "default.h"
 #include "ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 
-#include <QCheckBox>
-diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
+
+
+
+//********************************************************************
+diaElemFloat::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, ELEM_TYPE_FLOAT min, ELEM_TYPE_FLOAT max,const char *tip)
   : diaElem(ELEM_TOGGLE)
 {
-  param=(void *)toggleValue;
+  param=(void *)intValue;
   paramTitle=toggleTitle;
+  this->min=min;
+  this->max=max;
   this->tip=tip;
-  myWidget=NULL;
-}
-
-diaElemToggle::~diaElemToggle()
-{
-  QCheckBox *box=(QCheckBox *)myWidget;
- // if(box) delete box;
-  myWidget=NULL;
-}
-void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t l)
-{
- QCheckBox *box=new QCheckBox(paramTitle,(QWidget *)dialog);
- QGridLayout *layout=(QGridLayout*) opaque;
- myWidget=(void *)box; 
- if( *(uint32_t *)param)
- {
-    box->setCheckState(Qt::Checked); 
  }
- box->show();
-  layout->addWidget(box,l,0);
-}
-void diaElemToggle::getMe(void)
+
+diaElemFloat::~diaElemFloat()
 {
-  QCheckBox *box=(QCheckBox *)myWidget;
-  uint32_t *val=(uint32_t *)param;
-  if(Qt::Checked==box->checkState())
-  {
-    *val=1; 
-  }else
-    *val=0;
 }
-
-
-
-//******************************************************
-
-//EOF
+void diaElemFloat::setMe(void *dialog, void *opaque,uint32_t line)
+{
+  QDoubleSpinBox *box=new QDoubleSpinBox((QWidget *)dialog);
+  QGridLayout *layout=(QGridLayout*) opaque;
+ myWidget=(void *)box; 
+   
+ box->setMinimum(min);
+ box->setMaximum(max);
+ box->setValue(*(ELEM_TYPE_FLOAT *)param);
+ 
+ box->show();
+ 
+ QLabel *text=new QLabel( this->paramTitle,(QWidget *)dialog);
+ 
+ layout->addWidget(text,line,0);
+ layout->addWidget(box,line,1);
+ 
+}
+void diaElemFloat::getMe(void)
+{
+  double val;
+ QDoubleSpinBox *box=(QDoubleSpinBox *)myWidget;
+ val=box->value();
+ if(val<min) val=min;
+ if(val>max) val=max;
+ *(ELEM_TYPE_FLOAT *)param=val;
+ 
+}
