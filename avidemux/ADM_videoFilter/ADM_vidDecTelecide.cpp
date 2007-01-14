@@ -54,6 +54,8 @@
 
 #include "ADM_vidDecTelecide.h"
 #include "ADM_filter/video_filters.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
 static FILTER_PARAM decomb_template={16,{"order","back","guide",
 	 	 	"gthresh","post","chroma","vthresh",
 			"bthresh","dthresh","blend",
@@ -66,8 +68,80 @@ extern uint8_t DIA_getDecombTelecide(TelecideParam *param);
 uint8_t Telecide::configure(AVDMGenericVideoStream *in)
 {
 	_in=in;
-//	return DIA_getDecombTelecide(_param);
-        return 0;
+
+        
+	_in=in;
+#define PX(x) &(_param->x)
+#define SZT(x) sizeof(x)/sizeof(diaMenuEntry )
+        
+    ELEM_TYPE_FLOAT vthresh=(ELEM_TYPE_FLOAT)_param->vthresh;
+    ELEM_TYPE_FLOAT bthresh=(ELEM_TYPE_FLOAT)_param->bthresh;
+    ELEM_TYPE_FLOAT dthresh=(ELEM_TYPE_FLOAT)_param->dthresh;
+    ELEM_TYPE_FLOAT gthresh=(ELEM_TYPE_FLOAT)_param->gthresh;
+
+         diaMenuEntry tStrategy[]={
+                             {GUIDE_NONE,   _("No Strategy"),NULL},
+                             {GUIDE_32,     _("3:2 Pulldown"),NULL},
+                             {GUIDE_22,     _("Pal/Secam"),NULL},
+                             {GUIDE_32322,  _("NTSC converted from PAL"),NULL}
+                          };
+                          
+          diaMenuEntry tField[]={
+                             {1,_("Top"),NULL},
+                             {0,_("Bottom"),NULL}
+          };
+          
+          diaMenuEntry tBackward[]={
+                             {NO_BACK,_("Never"),NULL},
+                             {BACK_ON_COMBED,_("If still combed"),NULL},
+                             {ALWAYS_BACK,_("Always"),NULL}
+          };
+          
+          diaMenuEntry tPostproc[]={
+                             {POST_NONE,      _("None"),NULL},
+                             {POST_METRICS,   _("None but compute"),NULL},
+                             {POST_FULL,      _("Postproc on best match"),NULL},
+                             {POST_FULL_MAP,  _("Full map ??"),NULL},
+                             {POST_FULL_NOMATCH,_("Full no match ??"),NULL},
+                             {POST_FULL_NOMATCH_MAP,_("Full nomatch map ??"),NULL}
+          };
+                             
+          
+    diaElemMenu menuMode(PX(guide),   _("Strategy"), SZT(tStrategy),tStrategy);
+    diaElemMenu menuField(PX(order),  _("Field Order"), SZT(tField),tField);
+    diaElemMenu menuPost(PX(post),    _("Post Processing"), SZT(tPostproc),tPostproc);
+    diaElemMenu menuBackward(PX(back),_("Try backward"), SZT(tBackward),tBackward);
+    
+    diaElemFloat direct(&dthresh,_("Direct Threshold"),0,200. );
+    diaElemFloat backward(&bthresh,_("Backward Threshold"),0,200. );
+    diaElemFloat noise(&gthresh,_("Noise Threshold"),0,200. );
+    diaElemFloat post(&vthresh,_("Post Proc Threshold"),0,200. );
+    
+    diaElemToggle chroma(PX(chroma),_("Use Chroma to decide"));
+    diaElemToggle show(PX(show),_("Show info"));
+    diaElemToggle debug(PX(debug),_("Debug"));
+    diaElemToggle blend(PX(blend),_("Blend"));
+    
+    
+    
+    diaElem *elems[]={&menuMode,&menuField,&menuPost,&menuBackward,
+        &direct,&backward,&noise,&post,&blend,
+        &chroma,&show,&debug    };
+    
+  if(diaFactoryRun("Decombe Telecide",12,elems))
+  {
+    
+      _param->vthresh=(double)vthresh;
+      _param->bthresh=(double)bthresh;
+      _param->dthresh=(double)dthresh;
+      _param->gthresh=(double)gthresh;
+
+    return 1; 
+  }
+  return 0;        
+        
+        
+
 	
 }
 
