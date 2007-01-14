@@ -69,7 +69,7 @@
 	(fp) = vidCache->getImage(GETFRAMEf); \
 }
 
-#include "ADM_video/ADM_vidMSmooth_param.h"
+#include "ADM_vidMSmooth_param.h"
 
 
 extern uint8_t 	PutHintingData(unsigned char *video, unsigned int hint);

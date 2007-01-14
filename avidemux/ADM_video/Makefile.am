@@ -28,8 +28,7 @@ libADM_video_a_SOURCES = \
  ADM_confCouple.h ADM_vidCommonFilter.h \
 	ADM_vidChromaShift.h ADM_vidChromaShift.cpp \
 	ADM_vidMPLResize.cpp \
- ADM_vidIVTC.cpp \
- ADM_vidIVTC.h ADM_interlaced.cpp \
+ ADM_interlaced.cpp \
 	ADM_interlaced.h \
  ADM_vidRaw.cpp \
 	ADM_vidSRTRender.cpp \
@@ -99,7 +98,7 @@ ADM_vidCommonFilter.h  ADM_vidMPLResize.cpp  ADM_vidVobsub.cpp \
 ADM_vidContrast.cpp  ADM_vidMPdelogo.cpp \
 ADM_vidContrast.h  ADM_vidMPdelogo.h \
 ADM_vobsubinfo.cpp \
-ADM_vidCrop.cpp  ADM_vidMSmooth_param.h  ADM_vobsubinfo.h \
+ADM_vidCrop.cpp  ADM_vobsubinfo.h \
 swscale_internal.h \
 ADM_vidTdeint_util.txt ADM_vidASS.h ADM_vidASS.cpp \
 ADM_vidAss_Params.h mmx_macros.h
@@ -108,6 +107,6 @@ ADM_vidAss_Params.h mmx_macros.h
 INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil \
 			 $(FREETYPE_CFLAGS) $(ALTIVEC_SWITCH) -I../ADM_userInterfaces/ADM_commonUI -I../ADM_inputs
 noinst_HEADERS = ADM_mpdetc.h \
-					  ADM_cache.h \
-					ADM_vidMSmooth_param.h ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \
-		ADM_vidEq2.h ADM_vidASS.h
+  ADM_cache.h \
+ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \
+ADM_vidEq2.h ADM_vidASS.h

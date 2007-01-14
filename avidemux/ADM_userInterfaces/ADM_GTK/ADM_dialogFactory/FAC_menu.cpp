@@ -99,4 +99,8 @@ void diaElemMenu::getMe(void)
   *(uint32_t *)param=this->menu[rank].val;
 }
 
+
+
+
+
 //EOF

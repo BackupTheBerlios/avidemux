@@ -44,6 +44,8 @@
 #include "ADM_JSGlobal.h"
 #include "ADM_toolkit/filesel.h"
 
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
 std::vector <std::string> g_vIncludes;
 extern char **environ;
 extern char *script_getVar(char *in, int *r);
@@ -64,6 +66,11 @@ JSBool systemExecute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 JSBool systemInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool pathOnly(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
+JSBool facInt(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facToggle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facMenu(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+
 
 static JSFunctionSpec adm_functions[] = {
   /*    name          native          nargs    */
@@ -79,6 +86,10 @@ static JSFunctionSpec adm_functions[] = {
   {"exec",          systemExecute,        3},
   {"include",          systemInclude,        1},
   {"pathOnly",          pathOnly,        1},
+  {"dialogFactoryInt",          facInt,        0},
+  {"dialogFactoryFloat",        facFloat,        0},
+  {"dialogFactoryToggle",       facToggle,        0},
+  {"dialogFactoryMenu",         facMenu,        0},
   {0}
 };
 
@@ -445,3 +456,72 @@ JSBool pathOnly(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
   *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,orgName));
   return JS_TRUE;
 }// end systemExecute
+
+JSBool facInt(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+  uint32_t tog=0;
+   diaElemUInteger blend(&tog,_("Uinteger"),0,255);
+    diaElem *elems[]={&blend   };
+    
+  if(diaFactoryRun("Test uinteger",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    printf("Value : %u\n",tog);
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  
+  return JS_TRUE;
+}
+JSBool facFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+  ELEM_TYPE_FLOAT tog=0;
+   diaElemFloat blend(&tog,_("Float"),0,255);
+    diaElem *elems[]={&blend   };
+    
+  if(diaFactoryRun("Test float",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    printf("Value : %f\n",(float)tog);
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  
+  
+  return JS_TRUE;
+}
+
+JSBool facToggle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+  uint32_t tog=0;
+   diaElemToggle blend(&tog,_("Toggle"));
+    diaElem *elems[]={&blend   };
+    
+  if(diaFactoryRun("Test Toggle",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    printf("Value : %u\n",tog);
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  return JS_TRUE;
+}
+
+JSBool facMenu(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+   uint32_t tog=0;
+   
+    diaMenuEntry menu[]={
+                             {2,   _("No Strategy"),NULL},
+                             {4,     _("3:2 Pulldown"),NULL},
+                             {6,     _("Pal/Secam"),NULL},
+                             {7,  _("NTSC converted from PAL"),NULL}
+                          };
+   diaElemMenu blend(&tog,_("menu"),4,menu);
+    diaElem *elems[]={&blend   };
+    
+  if(diaFactoryRun("Test Menu",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    printf("Value : %u\n",tog);
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  return JS_TRUE;
+}

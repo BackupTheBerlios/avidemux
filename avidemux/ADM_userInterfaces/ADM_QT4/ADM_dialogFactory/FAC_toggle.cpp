@@ -18,69 +18,56 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
+
+#include <QDialog>
+#include <QMessageBox>
+#include <QGridLayout>
 
 #include "default.h"
 #include "ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 
-
-
-
+#include <QCheckBox>
 diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
   : diaElem(ELEM_TOGGLE)
 {
+  param=(void *)toggleValue;
+  paramTitle=toggleTitle;
+  this->tip=tip;
+  myWidget=NULL;
 }
 
 diaElemToggle::~diaElemToggle()
 {
-  
+  QCheckBox *box=(QCheckBox *)myWidget;
+ // if(box) delete box;
+  myWidget=NULL;
 }
 void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t l)
 {
+ QCheckBox *box=new QCheckBox(paramTitle,(QWidget *)dialog);
+ QGridLayout *layout=(QGridLayout*) opaque;
+ myWidget=(void *)box; 
+ if( *(uint32_t *)param)
+ {
+    box->setCheckState(Qt::Checked); 
+ }
+ box->show();
+  layout->addWidget(box,l,0);
 }
 void diaElemToggle::getMe(void)
 {
+  QCheckBox *box=(QCheckBox *)myWidget;
+  uint32_t *val=(uint32_t *)param;
+  if(Qt::Checked==box->checkState())
+  {
+    *val=1; 
+  }else
+    *val=0;
 }
 
-
-
-//********************************************************************
-diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip)
-  : diaElem(ELEM_TOGGLE)
-{
- }
-
-diaElemInteger::~diaElemInteger()
-{
-  
-}
-void diaElemInteger::setMe(void *dialog, void *opaque,uint32_t line)
-{
- 
-}
-void diaElemInteger::getMe(void)
-{
- 
-}
-//******************************************************
-diaElemUInteger::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip)
-  : diaElem(ELEM_TOGGLE)
-{
- }
-
-diaElemUInteger::~diaElemUInteger()
-{
-  
-}
-void diaElemUInteger::setMe(void *dialog, void *opaque,uint32_t line)
-{
- 
-}
-void diaElemUInteger::getMe(void)
-{
- 
-}
 
 //********************************************************************
 
@@ -103,24 +90,5 @@ void diaElemFloat::getMe(void)
  
 }
 //******************************************************
-
-diaElemMenu::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
-               const diaMenuEntry *menu,const char *tip)
-  : diaElem(ELEM_MENU)
-{
-}
-
-diaElemMenu::~diaElemMenu()
-{
-  
-}
-void diaElemMenu::setMe(void *dialog, void *opaque,uint32_t line)
-{
-  
-}
-void diaElemMenu::getMe(void)
-{
- 
-}
 
 //EOF
