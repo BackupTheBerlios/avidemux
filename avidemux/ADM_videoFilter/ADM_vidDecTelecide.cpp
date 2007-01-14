@@ -101,9 +101,9 @@ uint8_t Telecide::configure(AVDMGenericVideoStream *in)
                              {POST_NONE,      _("None"),NULL},
                              {POST_METRICS,   _("None but compute"),NULL},
                              {POST_FULL,      _("Postproc on best match"),NULL},
-                             {POST_FULL_MAP,  _("Full map ??"),NULL},
-                             {POST_FULL_NOMATCH,_("Full no match ??"),NULL},
-                             {POST_FULL_NOMATCH_MAP,_("Full nomatch map ??"),NULL}
+                             {POST_FULL_MAP,  _("Postproc and show zones(debug)"),NULL},
+                             {POST_FULL_NOMATCH,_("Process image (not fields)"),NULL},
+                             {POST_FULL_NOMATCH_MAP,_("Process image (not fields),debug"),NULL}
           };
                              
           
