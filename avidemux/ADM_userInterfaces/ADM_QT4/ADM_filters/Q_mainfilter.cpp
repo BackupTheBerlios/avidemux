@@ -86,6 +86,8 @@ class filtermainWindow : public QDialog
      
  public slots:
         void add(bool b);
+        void up(bool b);
+        void down(bool b);
         void remove(bool b);
         void configure(bool b);
         void partial(bool b);
@@ -96,7 +98,8 @@ class filtermainWindow : public QDialog
 };
 
 /**
-
+        \fn     add( bool b)
+        \brief  Retrieve the selected filter and add it to the active filters
 */
 void filtermainWindow::add( bool b)
 {
@@ -212,6 +215,69 @@ void filtermainWindow::configure( bool b)
         buildActiveFilterList ();
 }
 /**
+        \fn     up( bool b)
+        \brief  Move selected filter one place up
+*/
+void filtermainWindow::up( bool b)
+{
+   QListWidgetItem *item=activeList->currentItem();
+   if(!item)
+   {
+      printf("No selection\n");
+      return;
+   }
+    
+     int itag=item->type();
+     ADM_assert(itag>ACTIVE_FILTER_BASE);
+     itag-=ACTIVE_FILTER_BASE;
+     /* Filter 0 is the decoder ...*/
+      printf("Rank : %d\n",itag); 
+     ADM_assert(itag);
+     
+     if (itag < 2) return;
+        // swap action parameter & action parameter -1
+        FILTER tmp;
+        memcpy (&tmp, &videofilters[itag - 1], sizeof (FILTER));
+        memcpy (&videofilters[itag - 1],
+            &videofilters[itag], sizeof (FILTER));
+        memcpy (&videofilters[itag], &tmp, sizeof (FILTER));
+        getFirstVideoFilter ();
+        buildActiveFilterList ();   
+}
+/**
+        \fn     down( bool b)
+        \brief  Move selected filter one place down
+*/
+void filtermainWindow::down( bool b)
+{
+   QListWidgetItem *item=activeList->currentItem();
+   if(!item)
+   {
+      printf("No selection\n");
+      return;
+   }
+    
+     int itag=item->type();
+     ADM_assert(itag>ACTIVE_FILTER_BASE);
+     itag-=ACTIVE_FILTER_BASE;
+     /* Filter 0 is the decoder ...*/
+      printf("Rank : %d\n",itag); 
+     ADM_assert(itag);
+     
+    if (((int) itag < (int) (nb_active_filter - 1)) && (itag))
+        {
+            // swap action parameter & action parameter -1
+            FILTER tmp;
+            memcpy (&tmp, &videofilters[itag + 1], sizeof (FILTER));
+            memcpy (&videofilters[itag + 1],
+                        &videofilters[itag], sizeof (FILTER));
+            memcpy (&videofilters[itag], &tmp, sizeof (FILTER));
+            getFirstVideoFilter ();
+             buildActiveFilterList ();   
+        }
+}
+
+/**
         \fn     filtermainWindow::activeDoubleClick( QListWidgetItem  *item)
         \brief  One of the active window has been double clicked, call configure
 */
@@ -239,7 +305,7 @@ void filtermainWindow::partial( bool b)
 
 /**
         \fn     buildAvailableFilterList(void)
-        \brief  build the internal datas needed to handle the list
+        \brief  build the internal datas needed to handle the list. Need to be called only once.
 */
 void filtermainWindow::buildAvailableFilterList(void)
 {
@@ -331,7 +397,8 @@ filtermainWindow::filtermainWindow()     : QDialog()
     connect((ui.toolButtonConfigure),SIGNAL(clicked(bool)),this,SLOT(configure(bool)));
     connect((ui.toolButtonAdd),SIGNAL(clicked(bool)),this,SLOT(add(bool)));
     connect((ui.pushButtonRemove),SIGNAL(clicked(bool)),this,SLOT(remove(bool)));
-
+    connect((ui.toolButtonUp),SIGNAL(clicked(bool)),this,SLOT(up(bool)));
+    connect((ui.toolButtonDown),SIGNAL(clicked(bool)),this,SLOT(down(bool)));
     connect(ui.buttonClose, SIGNAL(clicked(bool)), this, SLOT(accept()));
  }
 /*******************************************************/

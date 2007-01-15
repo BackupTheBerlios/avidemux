@@ -22,14 +22,17 @@
    <item row="0" column="1" >
     <widget class="QLabel" name="label_2" >
      <property name="text" >
-      <string>Active Filters</string>
+      <string>&lt;big>&lt;b>Active Filters&lt;/b>&lt;/big></string>
      </property>
     </widget>
    </item>
    <item row="0" column="0" >
     <widget class="QLabel" name="label" >
      <property name="text" >
-      <string>Available Filters</string>
+      <string>&lt;big>&lt;b>Available Filters&lt;/b>&lt;/big></string>
+     </property>
+     <property name="textFormat" >
+      <enum>Qt::RichText</enum>
      </property>
     </widget>
    </item>
@@ -99,6 +102,9 @@
        <property name="text" >
         <string>Close</string>
        </property>
+       <property name="default" >
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>
@@ -164,20 +170,23 @@
    <item row="1" column="0" >
     <widget class="QTabWidget" name="tabWidgetSubtitles" >
      <property name="tabPosition" >
-      <enum>QTabWidget::West</enum>
+      <enum>QTabWidget::North</enum>
      </property>
      <property name="tabShape" >
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex" >
-      <number>6</number>
+      <number>5</number>
      </property>
      <property name="elideMode" >
       <enum>Qt::ElideLeft</enum>
      </property>
      <widget class="QWidget" name="Transform" >
       <attribute name="title" >
-       <string>Page</string>
+       <string>Transfom</string>
+      </attribute>
+      <attribute name="icon" >
+       <iconset resource="filter.qrc" >:/new/prefix1/icons/1.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <property name="margin" >
@@ -193,7 +202,13 @@
      </widget>
      <widget class="QWidget" name="Interlacing" >
       <attribute name="title" >
-       <string>Page</string>
+       <string>Interlacing</string>
+      </attribute>
+      <attribute name="icon" >
+       <iconset resource="filter.qrc" >:/new/prefix1/icons/2.png</iconset>
+      </attribute>
+      <attribute name="toolTip" >
+       <string>Interlacing</string>
       </attribute>
       <layout class="QGridLayout" >
        <property name="margin" >
@@ -209,7 +224,10 @@
      </widget>
      <widget class="QWidget" name="Colors" >
       <attribute name="title" >
-       <string>Page</string>
+       <string>Colors</string>
+      </attribute>
+      <attribute name="icon" >
+       <iconset resource="filter.qrc" >:/new/prefix1/icons/4.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <property name="margin" >
@@ -225,7 +243,10 @@
      </widget>
      <widget class="QWidget" name="Noise" >
       <attribute name="title" >
-       <string>Page</string>
+       <string>Noise</string>
+      </attribute>
+      <attribute name="icon" >
+       <iconset resource="filter.qrc" >:/new/prefix1/icons/5.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <property name="margin" >
@@ -241,7 +262,13 @@
      </widget>
      <widget class="QWidget" name="Subtitles" >
       <attribute name="title" >
-       <string>Page</string>
+       <string>Sharpness</string>
+      </attribute>
+      <attribute name="icon" >
+       <iconset resource="filter.qrc" >:/new/prefix1/icons/3.png</iconset>
+      </attribute>
+      <attribute name="toolTip" >
+       <string>Sharpness</string>
       </attribute>
       <layout class="QGridLayout" >
        <property name="margin" >
@@ -257,7 +284,13 @@
      </widget>
      <widget class="QWidget" name="Sharpness" >
       <attribute name="title" >
-       <string>Page</string>
+       <string>Subtitles</string>
+      </attribute>
+      <attribute name="icon" >
+       <iconset resource="filter.qrc" >:/new/prefix1/icons/7.png</iconset>
+      </attribute>
+      <attribute name="toolTip" >
+       <string>Subtitles</string>
       </attribute>
       <layout class="QGridLayout" >
        <property name="margin" >
@@ -273,7 +306,10 @@
      </widget>
      <widget class="QWidget" name="Misc" >
       <attribute name="title" >
-       <string>Page</string>
+       <string>Misc</string>
+      </attribute>
+      <attribute name="icon" >
+       <iconset resource="filter.qrc" >:/new/prefix1/icons/6.png</iconset>
       </attribute>
       <layout class="QGridLayout" >
        <property name="margin" >
@@ -294,6 +330,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="filter.qrc" />
+ </resources>
  <connections/>
 </ui>

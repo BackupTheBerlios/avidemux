@@ -235,6 +235,7 @@ uint8_t UI_updateRecentMenu( void );
 int UI_RunApp(void)
 {
 Q_INIT_RESOURCE(avidemux);
+Q_INIT_RESOURCE(filter);
    QApplication a( global_argc, global_argv );
    MainWindow * mw = new MainWindow();
     
