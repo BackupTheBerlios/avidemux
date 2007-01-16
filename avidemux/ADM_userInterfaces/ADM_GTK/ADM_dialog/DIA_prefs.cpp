@@ -225,6 +225,19 @@ uint32_t mpeg_no_limit=0;
         }
         gtk_combo_box_set_active(combo_box,k);
 #endif
+        // _______ External Filter Xfilter__________________
+        uint32_t activeXfilter=0;
+        prefs->get(FILTERS_AUTOLOAD_ACTIVE,&activeXfilter);
+        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(checkbuttonXfilter)),activeXfilter);
+        
+         if( prefs->get(FILTERS_AUTOLOAD_PATH, &str) != RC_OK )
+#ifndef CYG_MANGLING
+               str = ADM_strdup("/tmp");
+#else
+               str = ADM_strdup("c:\\");
+#endif
+        gtk_write_entry_string(WID(entryXfilter), str);
+        ADM_dealloc(str);
         //______________________________________________________
         // Callback for button
         gtk_signal_connect(GTK_OBJECT(WID(buttonPostprocLevel)), "clicked",GTK_SIGNAL_FUNC(setpp),   NULL);
@@ -263,7 +276,15 @@ uint32_t mpeg_no_limit=0;
                 render=myVideoDevice[k].type;
                 renderI=(int)render;
                 prefs->set(DEVICE_VIDEODEVICE,renderI);
-        
+                //************* Xfilter
+                activeXfilter=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonXfilter)));
+                prefs->set(FILTERS_AUTOLOAD_ACTIVE,activeXfilter);
+                
+                 str=gtk_editable_get_chars(GTK_EDITABLE (WID(entryXfilter)), 0, -1);
+                if(str)
+                        prefs->set(FILTERS_AUTOLOAD_PATH, str);
+                
+                
                 //**************
                 useTray=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(checkbuttonSystray)));
                 prefs->set(FEATURE_USE_SYSTRAY,useTray);
@@ -401,6 +422,15 @@ create_dialog1 (void)
   GtkWidget *spinbuttonThread;
   GtkWidget *label28;
   GtkWidget *label26;
+  GtkWidget *table3;
+  GtkWidget *label31;
+  GtkWidget *checkbuttonXfilter;
+  GtkWidget *label32;
+  GtkWidget *hbox7;
+  GtkWidget *entryXfilter;
+  GtkWidget *buttonXfilter;
+  GtkWidget *image1;
+  GtkWidget *label30;
   GtkWidget *dialog_action_area1;
   GtkWidget *okbutton1;
 
@@ -520,7 +550,6 @@ create_dialog1 (void)
   gtk_widget_show (label22);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), label22);
 
-#ifdef HAVE_AUDIO
   table1 = gtk_table_new (4, 3, FALSE);
   gtk_widget_show (table1);
   gtk_container_add (GTK_CONTAINER (notebook1), table1);
@@ -555,9 +584,6 @@ create_dialog1 (void)
   gtk_table_attach (GTK_TABLE (table1), entryALSADevice, 1, 3, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-#ifndef ALSA_SUPPORT
-gtk_widget_set_sensitive(entryALSADevice, 0);
-#endif
 
   radiobuttonMaster = gtk_radio_button_new_with_mnemonic (NULL, _("_Master"));
   gtk_widget_show (radiobuttonMaster);
@@ -595,10 +621,8 @@ gtk_widget_set_sensitive(entryALSADevice, 0);
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("No downmixing (multichannel)"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("Stereo"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("Dolby Prologic"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxDownMix), _("Dolby Prologic 2"));
-#endif
 
   label25 = gtk_label_new (_("Audio"));
   gtk_widget_show (label25);
@@ -621,16 +645,10 @@ gtk_widget_set_sensitive(entryALSADevice, 0);
   gtk_widget_show (label16);
   gtk_box_pack_start (GTK_BOX (hbox5), label16, FALSE, FALSE, 0);
 
-    label24 = gtk_label_new (_("Video"));
-    gtk_widget_show (label24);
-#ifdef HAVE_AUDIO
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 4), label24);
-#else
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 3), label24);
-#endif
   comboboxVideoOutput = gtk_combo_box_new_text ();
   gtk_widget_show (comboboxVideoOutput);
   gtk_box_pack_start (GTK_BOX (hbox5), comboboxVideoOutput, TRUE, TRUE, 0);
+
   label24 = gtk_label_new (_("Video"));
   gtk_widget_show (label24);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 4), label24);
@@ -649,13 +667,6 @@ gtk_widget_set_sensitive(entryALSADevice, 0);
   gtk_box_pack_start (GTK_BOX (hbox6), spinbuttonThread, FALSE, TRUE, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbuttonThread), TRUE);
 
-    label26 = gtk_label_new (_("MultiThread"));
-    gtk_widget_show (label26);
-#ifdef HAVE_AUDIO
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 5), label26);
-#else
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 4), label26);
-#endif
   label28 = gtk_label_new (_("Threads"));
   gtk_widget_show (label28);
   gtk_box_pack_start (GTK_BOX (hbox6), label28, FALSE, FALSE, 0);
@@ -664,71 +675,64 @@ gtk_widget_set_sensitive(entryALSADevice, 0);
   gtk_widget_show (label26);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 5), label26);
 
+  table3 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_show (table3);
+  gtk_container_add (GTK_CONTAINER (notebook1), table3);
+
+  label31 = gtk_label_new (_("Load external filters"));
+  gtk_widget_show (label31);
+  gtk_table_attach (GTK_TABLE (table3), label31, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label31), 0, 0.5);
+
+  checkbuttonXfilter = gtk_check_button_new_with_mnemonic ("");
+  gtk_widget_show (checkbuttonXfilter);
+  gtk_table_attach (GTK_TABLE (table3), checkbuttonXfilter, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  label32 = gtk_label_new (_("Path to external filters"));
+  gtk_widget_show (label32);
+  gtk_table_attach (GTK_TABLE (table3), label32, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label32), 0, 0.5);
+
+  hbox7 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox7);
+  gtk_table_attach (GTK_TABLE (table3), hbox7, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+  entryXfilter = gtk_entry_new ();
+  gtk_widget_show (entryXfilter);
+  gtk_box_pack_start (GTK_BOX (hbox7), entryXfilter, TRUE, TRUE, 0);
+
+  buttonXfilter = gtk_button_new ();
+  gtk_widget_show (buttonXfilter);
+  gtk_box_pack_start (GTK_BOX (hbox7), buttonXfilter, FALSE, FALSE, 0);
+
+  image1 = gtk_image_new_from_stock ("gtk-open", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image1);
+  gtk_container_add (GTK_CONTAINER (buttonXfilter), image1);
+
+  label30 = gtk_label_new (_("External filter"));
+  gtk_widget_show (label30);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 6), label30);
+
   dialog_action_area1 = GTK_DIALOG (Preferences)->action_area;
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
-    gtk_label_set_mnemonic_widget (GTK_LABEL (label13), spinbuttonMPEGSplit);
-#ifdef HAVE_AUDIO
-    gtk_label_set_mnemonic_widget (GTK_LABEL (label19), entryALSADevice);
-    gtk_label_set_mnemonic_widget (GTK_LABEL (label20), radiobuttonPCM);
-#endif
   okbutton1 = gtk_button_new_from_stock ("gtk-close");
   gtk_widget_show (okbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (Preferences), okbutton1, GTK_RESPONSE_CLOSE);
   GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
 
-    /* Store pointers to all widgets, for use by lookup_widget(). */
-    GLADE_HOOKUP_OBJECT_NO_REF (Preferences, Preferences, "Preferences");
-    GLADE_HOOKUP_OBJECT_NO_REF (Preferences, dialog_vbox1, "dialog_vbox1");
-    GLADE_HOOKUP_OBJECT (Preferences, notebook1, "notebook1");
-    GLADE_HOOKUP_OBJECT (Preferences, vbox12, "vbox12");
-    GLADE_HOOKUP_OBJECT (Preferences, hbox3, "hbox3");
-    GLADE_HOOKUP_OBJECT (Preferences, label11, "label11");
-    GLADE_HOOKUP_OBJECT (Preferences, comboboxMessageLevel, "comboboxMessageLevel");
-    GLADE_HOOKUP_OBJECT (Preferences, checkbuttonSwapAB, "checkbuttonSwapAB");
-    GLADE_HOOKUP_OBJECT (Preferences, checkbuttonSystray, "checkbuttonSystray");
-    GLADE_HOOKUP_OBJECT (Preferences, checkbuttonSavePrefs, "checkbuttonSavePrefs");
-    GLADE_HOOKUP_OBJECT (Preferences, label21, "label21");
-    GLADE_HOOKUP_OBJECT (Preferences, vbox16, "vbox16");
-    GLADE_HOOKUP_OBJECT (Preferences, checkbuttonAutoindex, "checkbuttonAutoindex");
-    GLADE_HOOKUP_OBJECT (Preferences, checkbuttonNuvResync, "checkbuttonNuvResync");
-    GLADE_HOOKUP_OBJECT (Preferences, checkbuttonLibavcodec, "checkbuttonLibavcodec");
-    GLADE_HOOKUP_OBJECT (Preferences, buttonPostprocLevel, "buttonPostprocLevel");
-    GLADE_HOOKUP_OBJECT (Preferences, label23, "label23");
-    GLADE_HOOKUP_OBJECT (Preferences, vbox14, "vbox14");
-    GLADE_HOOKUP_OBJECT (Preferences, hbox4, "hbox4");
-    GLADE_HOOKUP_OBJECT (Preferences, label13, "label13");
-    GLADE_HOOKUP_OBJECT (Preferences, spinbuttonMPEGSplit, "spinbuttonMPEGSplit");
-    GLADE_HOOKUP_OBJECT (Preferences, checkbuttonOpenDML, "checkbuttonOpenDML");
-    GLADE_HOOKUP_OBJECT (Preferences, checkbuttonReuseLog, "checkbuttonReuseLog");
-    GLADE_HOOKUP_OBJECT (Preferences, label22, "label22");
-#ifdef HAVE_AUDIO
-    GLADE_HOOKUP_OBJECT (Preferences, table1, "table1");
-    GLADE_HOOKUP_OBJECT (Preferences, label18, "label18");
-    GLADE_HOOKUP_OBJECT (Preferences, label19, "label19");
-    GLADE_HOOKUP_OBJECT (Preferences, comboboxAudioOutput, "comboboxAudioOutput");
-    GLADE_HOOKUP_OBJECT (Preferences, entryALSADevice, "entryALSADevice");
-    GLADE_HOOKUP_OBJECT (Preferences, radiobuttonMaster, "radiobuttonMaster");
-    GLADE_HOOKUP_OBJECT (Preferences, radiobuttonPCM, "radiobuttonPCM");
-    GLADE_HOOKUP_OBJECT (Preferences, label20, "label20");
-    GLADE_HOOKUP_OBJECT (Preferences, label29, "label29");
-    GLADE_HOOKUP_OBJECT (Preferences, comboboxDownMix, "comboboxDownMix");
-    GLADE_HOOKUP_OBJECT (Preferences, label25, "label25");
-#endif
-    GLADE_HOOKUP_OBJECT (Preferences, table2, "table2");
-    GLADE_HOOKUP_OBJECT (Preferences, hbox5, "hbox5");
-    GLADE_HOOKUP_OBJECT (Preferences, label16, "label16");
-    GLADE_HOOKUP_OBJECT (Preferences, comboboxVideoOutput, "comboboxVideoOutput");
-    GLADE_HOOKUP_OBJECT (Preferences, label24, "label24");
-    GLADE_HOOKUP_OBJECT (Preferences, hbox6, "hbox6");
-    GLADE_HOOKUP_OBJECT (Preferences, label27, "label27");
-    GLADE_HOOKUP_OBJECT (Preferences, spinbuttonThread, "spinbuttonThread");
-    GLADE_HOOKUP_OBJECT (Preferences, label28, "label28");
-    GLADE_HOOKUP_OBJECT (Preferences, label26, "label26");
-    GLADE_HOOKUP_OBJECT_NO_REF (Preferences, dialog_action_area1, "dialog_action_area1");
-    GLADE_HOOKUP_OBJECT (Preferences, okbutton1, "okbutton1");
-
+  gtk_label_set_mnemonic_widget (GTK_LABEL (label13), spinbuttonMPEGSplit);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (label19), entryALSADevice);
+  gtk_label_set_mnemonic_widget (GTK_LABEL (label20), radiobuttonPCM);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (Preferences, Preferences, "Preferences");
@@ -777,6 +781,15 @@ gtk_widget_set_sensitive(entryALSADevice, 0);
   GLADE_HOOKUP_OBJECT (Preferences, spinbuttonThread, "spinbuttonThread");
   GLADE_HOOKUP_OBJECT (Preferences, label28, "label28");
   GLADE_HOOKUP_OBJECT (Preferences, label26, "label26");
+  GLADE_HOOKUP_OBJECT (Preferences, table3, "table3");
+  GLADE_HOOKUP_OBJECT (Preferences, label31, "label31");
+  GLADE_HOOKUP_OBJECT (Preferences, checkbuttonXfilter, "checkbuttonXfilter");
+  GLADE_HOOKUP_OBJECT (Preferences, label32, "label32");
+  GLADE_HOOKUP_OBJECT (Preferences, hbox7, "hbox7");
+  GLADE_HOOKUP_OBJECT (Preferences, entryXfilter, "entryXfilter");
+  GLADE_HOOKUP_OBJECT (Preferences, buttonXfilter, "buttonXfilter");
+  GLADE_HOOKUP_OBJECT (Preferences, image1, "image1");
+  GLADE_HOOKUP_OBJECT (Preferences, label30, "label30");
   GLADE_HOOKUP_OBJECT_NO_REF (Preferences, dialog_action_area1, "dialog_action_area1");
   GLADE_HOOKUP_OBJECT (Preferences, okbutton1, "okbutton1");
 
