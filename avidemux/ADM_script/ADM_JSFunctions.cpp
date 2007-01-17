@@ -53,6 +53,7 @@ extern char *script_getVar(char *in, int *r);
 JSBool displayError(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool displayInfo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool fileWriteSelect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool dirSelect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool fileReadSelect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
@@ -78,6 +79,7 @@ static JSFunctionSpec adm_functions[] = {
   {"displayInfo",       displayInfo,        1},
   {"fileReadSelect",    fileReadSelect,        0},
   {"fileWriteSelect",   fileWriteSelect,        0},
+  {"dirSelect",         dirSelect,        0},
   {"print",             print,        1},
   {"allFilesFrom",      allFilesFrom,        0},
   {"nextFile",          nextFile,        0},
@@ -198,7 +200,18 @@ JSBool fileWriteSelect(JSContext *cx, JSObject *obj, uintN argc,
         ADM_dealloc(name);
         return JS_TRUE;
 }// end fileWriteSelect
-
+JSBool dirSelect(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{
+        char name[1024];
+        // default return value
+        if(argc != 0)
+                return JS_FALSE;
+        if(!FileSel_SelectDir(_("Select a directory"),name,1023, NULL))
+         return JS_FALSE;
+        *rval=STRING_TO_JSVAL(JS_NewStringCopyZ(cx,name));
+        return JS_TRUE;
+}
 JSBool print(JSContext *cx, JSObject *obj, uintN argc, 
                                        jsval *argv, jsval *rval)
 {// begin print

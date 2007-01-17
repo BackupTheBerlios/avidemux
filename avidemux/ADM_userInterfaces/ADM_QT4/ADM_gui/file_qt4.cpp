@@ -25,6 +25,13 @@
 extern QWidget *QuiMainWindows;
 static void GUI_FileSelSelect(const char *label, char **name, uint32_t access) ;
 //****************************************************************************************************
+uint8_t FileSel_SelectDir(const char *title,char *target,uint32_t max, const char *source)
+{
+  
+  GUI_Error_HIG("NOT DONE","This function has not been implemented yet.");
+  return 0; 
+}
+//****************************************************************************************************
 void GUI_FileSelRead(const char *label,SELFILE_CB cb) 
 {
   char *name;

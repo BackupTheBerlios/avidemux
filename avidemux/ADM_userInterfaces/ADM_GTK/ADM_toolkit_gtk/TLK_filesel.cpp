@@ -52,14 +52,13 @@ static GtkFileFilter   *filter_avi=NULL,*filter_mpeg=NULL,*filter_image=NULL,*fi
 static uint8_t          setFilter( GtkWidget *dialog);
 
 /**
-	Select a file
-		Target is the string allocated by caller that will receive the resule, maxlen byte
-		Source is a optionnal last file to replace the selector at the last dir used
-	@Title@ is the title of the dialog window
-	
-	Returns : 0 if error, 1 on success
-	
-
+    \fn FileSel_SelectRead(const char *title,char *target,uint32_t max, const char *source)
+    \brief allow to select a file
+    @return 0 on failure, 1 on success
+    @param title : window title 
+    @param target : where to copy the result (must be allocated by caller)
+    @param max : Max # of bytes that target can hold
+    @param source : where we start from
 */
 uint8_t FileSel_SelectRead(const char *title,char *target,uint32_t max, const char *source)
 {
@@ -141,6 +140,80 @@ DIR *dir=NULL;
         gtk_unregister_dialog(dialog);
 	gtk_widget_destroy(dialog);
 	return ret;
+}
+/**
+    \fn FileSel_SelectDir(const char *title,char *target,uint32_t max, const char *source)
+    \brief allow to select a directory
+    @return 0 on failure, 1 on success
+    @param title : window title 
+    @param target : where to copy the result (must be allocated by caller)
+    @param max : Max # of bytes that target can hold
+    @param source : where we start from
+*/
+uint8_t FileSel_SelectDir(const char *title,char *target,uint32_t max, const char *source)
+{
+	
+GtkWidget *dialog;
+uint8_t ret=0;
+gchar *selected_filename;
+gchar last;
+char *dupe=NULL,*tmpname=NULL;
+DIR *dir=NULL;
+	
+        dialog = gtk_file_chooser_dialog_new ("Open File",
+                                      NULL,
+                                      GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                      NULL);
+        gtk_window_set_title (GTK_WINDOW (dialog),title);
+        gtk_register_dialog(dialog);
+        /* Set default dir if provided ..*/
+        if(source)
+        {
+                dupe=PathCanonize(source);
+                PathStripName(dupe);
+                if( (dir=opendir(dupe)) )
+                        {
+                                closedir(dir);
+                                gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)source);
+                        }
+                delete [] dupe;
+        
+        }
+        else	//use pref
+        {
+                if( prefs->get(LASTDIR_READ,(ADM_filename **)&tmpname))
+                {
+                        
+        
+                        dupe=PathCanonize(tmpname);
+                        PathStripName(dupe);
+  
+                        if( (dir=opendir(dupe)) )
+                        {
+                                closedir(dir);
+                                gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)dupe);
+                        }
+                        delete [] dupe;
+                }
+        }
+
+        if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_ACCEPT)
+        {
+          selected_filename= (gchar *) 	gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+          if(strlen(selected_filename))  /* Nothing selected */
+          {
+            /* Check it is a dir ...*/
+            printf("<%s>\n",selected_filename);; 
+            strncpy(target,selected_filename,max);
+            target[max-1]=0;
+            ret=1;
+          }
+        }	
+        gtk_unregister_dialog(dialog);
+        gtk_widget_destroy(dialog);
+        return ret;
 }
 
 void GUI_FileSelWrite(const char *label, SELFILE_CB * cb)

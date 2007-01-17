@@ -16,7 +16,10 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 
-
+uint8_t FileSel_SelectDir(const char *title,char *target,uint32_t max, const char *source)
+{ 
+  return 0;
+}
 void GUI_FileSelRead(const char *label,SELFILE_CB cb) 
 {}
 void GUI_FileSelWrite(const char *label,SELFILE_CB cb) 
