@@ -27,6 +27,7 @@
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
+#include "fourcc.h"
 #include "DIA_working.h"
 
 
@@ -53,7 +54,7 @@ static uint8_t dmx_probePS(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
 static uint8_t dmx_probeTS(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
 static uint8_t dmx_probeTSBruteForce(char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
 static uint8_t dmx_probeMSDVR(char *file, uint32_t *nbTracks,MPEG_TRACK **tracks);
-
+ uint8_t dmx_probeTSPat(const char *file, uint32_t *nbTracks,MPEG_TRACK **tracks);
 
 //****************************************************************************************
 uint8_t dmx_probe(char *file, DMX_TYPE  *type, uint32_t *nbTracks,MPEG_TRACK **tracks)
@@ -524,3 +525,101 @@ uint8_t dmx_probeMSDVR(char *file, uint32_t *nbTracks,MPEG_TRACK **ztracks)
       fclose(fd);
       return 1;
 }
+/**
+      \fn     dmx_probeTSPat(char *file, uint32_t *nbTracks,MPEG_TRACK **tracks)
+      \brief  Try to extract info from a Mpeg TS file using PAT, PMT etc..
+      @return 1 on success, 0 on failure
+      @param file: File to scan
+      @param *nbTrack : number of track found (out)
+      @param **tracks : contains info about the tracks found (out)
+
+*/
+uint8_t dmx_probeTSPat(char *file, uint32_t *nbTracks,MPEG_TRACK **tracks)
+{
+
+
+  //
+  // Build a dummy track
+MPEG_TRACK dummy[TS_ALL_PID];
+fileParser *parser;
+uint32_t   foundPid=0;
+myPid      allPid[MAX_FOUND_PID];
+uint8_t    buffer[BUFFER_SIZE];
+MpegAudioInfo mpegInfo; 
+
+    dummy[0].pid=0x00; // should no be in use
+    dummy[0].pes=0xE0;
+
+        dmx_demuxerTS demuxer(1,dummy,1);
+        if(!demuxer.open(file))
+        {
+          return 0;
+        }
+    // Set probe to 10 Meg
+      demuxer.setProbeSize(10*1024*1024L);
+      parser=demuxer.getParser();
+      
+      // And start looking for pat...
+
+      uint32_t pid,left,isPayloadStart,cc,val;
+      uint64_t abs;
+      uint8_t packet[188];
+      while(demuxer.readPacket(&pid,&left, &isPayloadStart,&abs,&cc))
+        
+      {
+#if 0
+        parser->read32(left,packet);
+        mixDump(packet,left);
+        continue;
+#endif 
+        parser->read8i(); /* Adaptation field, fixme */
+        if(isPayloadStart && left > 8) 
+        {
+              /* Decode PSI header */
+              uint32_t tableId;
+              uint32_t misc;
+              uint32_t sectionLength;
+              uint32_t tId;
+              uint32_t version;
+              uint32_t sectionNumber;
+              uint32_t lastSectionNumber;
+              
+              tableId=parser->read8i();
+              misc=parser->read16i();
+              tId=parser->read16i();
+              version=parser->read8i();
+              sectionNumber=parser->read8i();
+              lastSectionNumber=parser->read8i();
+               
+              
+              
+              printf("******************************************\n");
+              printf("tableId        : %d\n",tableId);
+              sectionLength=misc&0xFFF;
+              printf("sectionLength  : %d\n",sectionLength);
+              printf("0              : %x\n",misc&0x40);
+              printf("section syntax : %x\n",misc&0x80);
+              printf("Transport ID   : 0x%x\n",tId);
+              printf("Version Number : 0x%x\n",(version>>1)&0x1F);
+              printf("CurrentNext    : 0x%x\n",version&1);
+              
+              printf("Section        : %d\n",sectionNumber);
+              printf("LastSection    : %d\n",lastSectionNumber);
+              
+              
+              left-=8;
+        } // End of if ..payloadStart
+_next:
+        parser->forward(left);
+      }
+      parser=NULL;
+      return 0;
+}
+uint8_t runProbe(char *file)
+{
+  uint32_t nb;
+  return  dmx_probeTSPat(file, &nb,NULL);
+  
+}
+
+/****EOF**/

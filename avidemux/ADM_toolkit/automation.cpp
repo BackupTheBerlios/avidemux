@@ -88,7 +88,7 @@ static void call_videoconf(char *p) ;
 static int searchReactionTable(char *string);
 static void call_setPP(char *v,char *s);
 static void call_v2v(char *a,char *b,char *c);
-
+static void call_probePat(char *p);
 extern void updateLoaded(void );
 static void save(char*name);
 extern void show_info(char *p);
@@ -114,6 +114,7 @@ static void set_reuse_2pass_log(char *p);
 static void setVar(char *in);
 //
 uint8_t trueFalse(char *p);
+extern uint8_t runProbe(char *file);
 //_________________________________________________________________________
 
 
@@ -195,7 +196,8 @@ AUTOMATON reaction_table[]=
 
         {"var",                 1       ,"set var (--var myvar=3)", (one_arg_type)setVar},
         {"help",		0,"print this",		call_help},
-        {"quit",		0,"exit avidemux",	call_quit}
+        {"quit",		0,"exit avidemux",	call_quit},
+        {"probePat",		1,"Probe for PAT//PMT..",	(one_arg_type)call_probePat}
 
 
 }  ;
@@ -390,6 +392,10 @@ void call_audiocodec(char *p)
 		audioCodecSetcodec( AUDIOENC_NONE );
 		fprintf(stderr,"audio codec \"%s\" unknown.\n",p);
 	}
+}
+void call_probePat(char *p)
+{
+  runProbe(p); 
 }
 void call_videocodec(char *p)
 {
