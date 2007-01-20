@@ -15,7 +15,7 @@
 #include "ADM_assert.h" 
 #include "DIA_idx_pg.h"
 
-DIA_progressIndexing::DIA_progressIndexing(char *name)
+DIA_progressIndexing::DIA_progressIndexing(const char *name)
 {}
 DIA_progressIndexing::~DIA_progressIndexing()
 {}

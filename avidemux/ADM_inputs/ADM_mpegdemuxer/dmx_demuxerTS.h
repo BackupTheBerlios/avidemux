@@ -70,7 +70,7 @@ class dmx_demuxerTS: public dmx_demuxer
                            dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks,uint32_t psi) ;
                 virtual    ~dmx_demuxerTS();             
                 
-                     uint8_t      open(char *name);
+                     uint8_t      open(const char *name);
                  
                   fileParser      *getParser(void) {return parser;}
                   uint8_t         forward(uint32_t f);

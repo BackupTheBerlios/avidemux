@@ -65,7 +65,7 @@ class dmx_demuxerMSDVR: public dmx_demuxer
                 dmx_demuxerMSDVR(uint32_t nb,MPEG_TRACK *tracks,uint32_t multi) ;
     virtual    ~dmx_demuxerMSDVR();             
                 
-    uint8_t      open(char *name);
+    uint8_t      open(const char *name);
                  
                 
     uint8_t         forward(uint32_t f);

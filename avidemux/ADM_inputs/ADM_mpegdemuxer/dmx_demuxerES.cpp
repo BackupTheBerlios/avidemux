@@ -40,7 +40,7 @@ dmx_demuxerES::~dmx_demuxerES()
         if(parser) delete parser;
         parser=NULL;
 }
-uint8_t dmx_demuxerES::open(char *name)
+uint8_t dmx_demuxerES::open(const char *name)
 {
 FP_TYPE fp=FP_DONT_APPEND;
         if(! parser->open(name,&fp)) return 0;

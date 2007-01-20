@@ -69,7 +69,7 @@ fileParser::~fileParser()
         If multi is set to probe, return value will be APPEND if there is several files, dont_append if one
         if multi is set to dont_append, file won't be auto appended even if they exist
 */
-uint8_t fileParser::open( char *filename,FP_TYPE *multi )
+uint8_t fileParser::open( const char *filename,FP_TYPE *multi )
 {
         char *dot = NULL;                   // pointer to the last dot in filename
         uint8_t decimals = 0;               // number of decimals

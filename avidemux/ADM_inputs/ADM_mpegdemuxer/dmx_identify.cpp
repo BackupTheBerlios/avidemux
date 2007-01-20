@@ -36,7 +36,7 @@
 
 static uint8_t probeTs(fileParser *parser);
 
-DMX_TYPE dmxIdentify(char *name)
+DMX_TYPE dmxIdentify(const char *name)
 {
 DMX_TYPE ret=DMX_MPG_UNKNOWN;
 uint64_t pos;

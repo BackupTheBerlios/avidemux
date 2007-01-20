@@ -112,7 +112,7 @@ uint8_t dmx_demuxerTS::setProbeSize(uint32_t sz)
 		_probeSize=sz;
 		return 1;
 }
-uint8_t dmx_demuxerTS::open(char *name)
+uint8_t dmx_demuxerTS::open(const char *name)
 {
 FP_TYPE fp=FP_DONT_APPEND;
         

@@ -13,5 +13,5 @@ typedef enum
         DMX_MPG_TS,
         DMX_MPG_MSDVR
 }DMX_TYPE;
-DMX_TYPE dmxIdentify(char *name);
+DMX_TYPE dmxIdentify(const char *name);
 #endif

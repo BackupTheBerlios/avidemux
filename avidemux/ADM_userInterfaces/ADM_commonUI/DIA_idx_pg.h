@@ -10,7 +10,7 @@ protected:
 		uint32_t	_nextUpdate;
         
 public:
-                        DIA_progressIndexing(char *name);
+                        DIA_progressIndexing(const char *name);
                         ~DIA_progressIndexing();
           uint8_t       update(uint32_t done,uint32_t total, uint32_t nbImage, uint32_t hh, uint32_t mm, uint32_t ss);
           uint8_t        abortRequest(void);

@@ -114,7 +114,7 @@ static void set_reuse_2pass_log(char *p);
 static void setVar(char *in);
 //
 uint8_t trueFalse(char *p);
-extern uint8_t runProbe(char *file);
+extern uint8_t runProbe(const char *file);
 //_________________________________________________________________________
 
 

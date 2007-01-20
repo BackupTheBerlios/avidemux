@@ -33,7 +33,7 @@ class dmx_demuxer
 	  		   dmx_demuxer();
 		virtual    ~dmx_demuxer();	       
 		
-		virtual    uint8_t   	open(char *name)=0;
+		virtual    uint8_t   	open(const char *name)=0;
 	        virtual    uint8_t      hasAudio(void) { return 0;}                
 		
 		virtual uint8_t 	forward(uint32_t f)=0;

@@ -59,7 +59,7 @@ DIA_progressIndexing *pf;
 };
 
 
-DIA_progressIndexing::DIA_progressIndexing(char *name)
+DIA_progressIndexing::DIA_progressIndexing(const char *name)
 {
         dialog=create_dialog1();
         gtk_register_dialog(dialog);

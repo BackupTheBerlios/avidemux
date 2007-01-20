@@ -49,7 +49,7 @@ typedef enum FP_TYPE
         public:
                                 fileParser(void);
                                 ~fileParser();                                         
-                        uint8_t  open(char *name,FP_TYPE *multi);
+                        uint8_t  open(const char *name,FP_TYPE *multi);
                         uint8_t  forward(uint64_t u);
                         uint8_t  sync(uint8_t *t );
                         uint8_t  getpos(uint64_t *o);

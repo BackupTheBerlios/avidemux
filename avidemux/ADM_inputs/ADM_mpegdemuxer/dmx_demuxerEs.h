@@ -33,7 +33,7 @@ class dmx_demuxerES: public dmx_demuxer
                            dmx_demuxerES() ;
                 virtual    ~dmx_demuxerES();             
                 
-                     uint8_t      open(char *name);
+                     uint8_t      open(const char *name);
                  
                 
                   uint8_t         forward(uint32_t f);

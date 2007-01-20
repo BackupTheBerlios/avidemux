@@ -60,7 +60,7 @@ class dmx_demuxerPS: public dmx_demuxer
                            dmx_demuxerPS(uint32_t nb,MPEG_TRACK *tracks,uint32_t multi) ;
                 virtual    ~dmx_demuxerPS();             
                 
-                     uint8_t      open(char *name);
+                     uint8_t      open(const char *name);
                  
                 
                   uint8_t         forward(uint32_t f);

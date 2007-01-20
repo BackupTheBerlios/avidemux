@@ -373,7 +373,7 @@ uint8_t dmx_demuxerMSDVR::refill(void)
           return 0;
 }
 /***********************************************/
-uint8_t dmx_demuxerMSDVR::open(char *name)
+uint8_t dmx_demuxerMSDVR::open(const char *name)
 {
   int r=5;
   const chunky *id=NULL;

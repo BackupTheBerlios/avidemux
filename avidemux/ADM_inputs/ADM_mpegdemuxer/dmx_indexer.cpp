@@ -52,7 +52,7 @@ static uint8_t Push(uint32_t ftype,dmx_demuxer *demuxer,uint64_t abs,uint64_t re
 static uint8_t gopDump(FILE *fd,dmx_demuxer *demuxer,uint64_t abs,uint64_t rel,uint32_t nbTracks);
 static uint8_t gopUpdate(dmx_demuxer *demuxer);
 uint8_t dumpPts(FILE *fd,dmx_demuxer *demuxer,uint64_t firstPts,uint32_t nbTracks);
-uint8_t dmx_indexer(char *mpeg,char *file);
+uint8_t dmx_indexer(const char *mpeg,char *file);
 
 static const uint32_t FPS[16]={
                 0,                      // 0
@@ -99,7 +99,7 @@ static uint32_t computeTimeDifference(TimeStamp *f,TimeStamp *l);
         Index the incoming mpeg file
 
 */
-uint8_t dmx_indexer(char *mpeg,char *file,uint32_t preferedAudio,uint8_t autosync,uint32_t nbTracks,MPEG_TRACK *tracks)
+uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uint8_t autosync,uint32_t nbTracks,MPEG_TRACK *tracks)
 {
         DIA_progressIndexing *work;
         dmx_demuxer *demuxer;
