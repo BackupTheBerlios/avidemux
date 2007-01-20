@@ -578,6 +578,7 @@ MpegAudioInfo mpegInfo;
         return 0;
       }
       printf("Found %d PMT..\n",nbPmt);
+      demuxer.setProbeSize(40*1024*1024L); // We can can increase the probe size
       for(int i=0;i<nbPmt;i++)
       {
          dmx_probePMT(&demuxer, pmts[i].tid);
@@ -588,6 +589,114 @@ uint8_t runProbe(char *file)
   uint32_t nb;
   return  dmx_probeTSPat(file, &nb,NULL);
   
+}
+/**
+      \fn     dmx_searchAndSkipHeader
+      \brief  Search for a given PSI and skip header
+      @return 1 on success, 0 on failure
+      @param myPid : Pid of the looked for psi
+      @param demuxer: mpegTS demuxer *(input)
+      @param *currentSec : current section (output)
+      @param *maxSec : #of sections (output)
+      @param *leftbyte : Total #of bytes left in the packet
+      @param *payloadSize : #of bytes of usable payload
+
+*/
+uint8_t dmx_searchAndSkipHeader(uint32_t myPid,dmx_demuxerTS *demuxer,uint32_t *currentSec, uint32_t *maxSec,
+                                    uint32_t *leftbyte,uint32_t *payloadSize)
+{
+  
+  uint8_t packet[TS_PACKET_SIZE];
+  uint32_t tableId;
+  uint32_t misc;
+  uint32_t sectionLength;
+  uint32_t tId,pid,left,cc,nbPmt;
+  uint32_t version,isPayloadStart;
+  uint32_t sectionNumber;
+  uint32_t lastSectionNumber;
+  uint32_t programInfoLength;
+  uint32_t crc,crccomputed;
+  uint64_t startPos,endPos,abso;
+  fileParser *parser;
+      demuxer->changePid(myPid,myPid); // Search PAT
+      parser=demuxer->getParser();
+      
+        while(demuxer->readPacket(&pid,&left, &isPayloadStart,&abso,&cc))
+        {
+          if(pid!=myPid)
+          {
+            printf("Wrong Pid %x/%x\n",pid,myPid);
+            parser->forward(left);
+            continue;
+          }
+          if(!isPayloadStart || left <= (9+4))
+          {
+            parser->forward(left);
+            continue;
+          }
+
+          /* Found something that looks good...*/
+            
+            /* Decode PSI header */
+            parser->read8i(); /* Pointer field, can be ignored (?) */
+              
+              parser->getpos(&startPos); /* Memorize beginning */
+              tableId=parser->read8i();
+              misc=parser->read16i(); // +3
+              tId=parser->read16i();  
+              version=parser->read8i(); // +6
+              sectionNumber=parser->read8i();
+              lastSectionNumber=parser->read8i(); // +8
+              
+              sectionLength=misc&0xFFF;
+              
+              if(sectionLength<=9 || left <=9)
+              {
+                printf("SectionLength too short :%d\n", sectionLength);
+                 parser->setpos(startPos-1+left); // skip packet
+                 continue;
+              }
+              
+#ifdef PROBE_TS_VERBOSE
+              printf("******************************************\n");
+              printf("tableId        : %d\n",tableId);
+              
+              printf("sectionLength  : %d\n",sectionLength);
+              printf("0              : %x\n",misc&0x40);
+              printf("section syntax : %x\n",misc&0x80);
+              printf("Transport ID   : 0x%x\n",tId);
+              printf("Version Number : 0x%x\n",(version>>1)&0x1F);
+              printf("CurrentNext    : 0x%x\n",version&1);
+              
+              printf("Section        : %d\n",sectionNumber);
+              printf("LastSection    : %d\n",lastSectionNumber);
+              
+#endif
+              // Check for error FIXME TODO
+              
+              // Check CRC
+              parser->getpos(&endPos); // Here payload begins
+              parser->setpos(startPos);
+              parser->read32(sectionLength-1,packet); // Go back & Read Whole packet +3 for header -4 CRC
+              crc=parser->read32i();
+              crccomputed=mpegTsCRC(packet,sectionLength-1);
+              if(crc!=crccomputed) // Bad CRC, skip packet
+              {
+                printf("Bad CRC\n");
+                parser->setpos( startPos+left-1); // skip
+                continue;
+              }
+              // CRC is ok, go back to interesting place
+              printf("CRC OK\n");
+              parser->setpos(endPos);
+              *currentSec=sectionNumber;
+              *maxSec=lastSectionNumber;
+              
+              *leftbyte=left-9;               // Total bytes left in packet
+              *payloadSize=sectionLength-9; // No CRC, No header
+              return 1;
+          } // /while
+      return 0;
 }
 /**
       \fn     dmx_probePat(dmx_demuxerTS *demuxer, uint32_t *nbPmt,MPEG_PMT *pmts,uint32_t maxPMT)
@@ -602,111 +711,44 @@ uint8_t runProbe(char *file)
 uint8_t dmx_probePat(dmx_demuxerTS *demuxer, uint32_t *nbPmt,MPEG_PMT *pmts,uint32_t maxPmt)
 {
   
-  uint8_t    buffer[BUFFER_SIZE];
   fileParser *parser;
+  uint32_t curSection,maxSection;
+  uint32_t left,toScan;
   
-    
-      demuxer->changePid(0,0); // Search PAT
       parser=demuxer->getParser();
-      
-      // And start looking for pat...
-
-      uint32_t pid,left,isPayloadStart,cc,val;
-      uint64_t abs;
-      uint8_t packet[TS_PACKET_SIZE];
-      while(demuxer->readPacket(&pid,&left, &isPayloadStart,&abs,&cc))
-        
+      *nbPmt=0;
+      if(dmx_searchAndSkipHeader(0,demuxer,&curSection, &maxSection,&left,&toScan))
       {
-        if(isPayloadStart && left > (9+4)) 
-        {
-              /* Decode PSI header */
-              uint32_t tableId;
-              uint32_t misc;
-              uint32_t sectionLength;
-              uint32_t tId;
-              uint32_t version;
-              uint32_t sectionNumber;
-              uint32_t lastSectionNumber;
-              uint32_t programInfoLength;
-              uint32_t crc,crccomputed;
-              uint64_t startPos,endPos;
-              
-              *nbPmt=0;
-              
-              parser->read8i(); /* Pointer field, can be ignored for pat (?) */
-              parser->getpos(&startPos);
-              tableId=parser->read8i();
-              misc=parser->read16i();
-              tId=parser->read16i();
-              version=parser->read8i();
-              sectionNumber=parser->read8i();
-              lastSectionNumber=parser->read8i();
-              
-              sectionLength=misc&0xFFF;
-#ifdef PROBE_TS_VERBOSE
-              printf("******************************************\n");
-              printf("tableId        : %d\n",tableId);
-              
-              printf("sectionLength  : %d\n",sectionLength);
-              printf("0              : %x\n",misc&0x40);
-              printf("section syntax : %x\n",misc&0x80);
-              printf("Transport ID   : 0x%x\n",tId);
-              printf("Version Number : 0x%x\n",(version>>1)&0x1F);
-              printf("CurrentNext    : 0x%x\n",version&1);
-              
-              printf("Section        : %d\n",sectionNumber);
-              printf("LastSection    : %d\n",lastSectionNumber);
-              
-#endif              
-              left-=9;
-              programInfoLength=sectionLength-5;
-              /* Now get the PMT indexes and type */
-              printf("**\n");
-              while(programInfoLength >4 && left>8)
+        
+              while(toScan >=4 && left>=8)
               {
                   printf("**\n");
                   pmts[*nbPmt].programNumber=parser->read16i()&0xFFFF;
                   pmts[*nbPmt].tid=parser->read16i()&0x1FFF;
-                  printf(" Program Number :%03x\n",pmts[*nbPmt].programNumber);
-                  printf(" PID for this   :%03x\n",pmts[*nbPmt].tid);
+                  printf(" [PAT]Program Number :%03x\n",pmts[*nbPmt].programNumber);
+                  printf(" [PAT]PID for this   :%03x\n",pmts[*nbPmt].tid);
                   if((*nbPmt)<maxPmt)
                       (*nbPmt)++;
                   left-=4;
-                  programInfoLength-=4;
+                  toScan-=4;
               }
-              printf("program info :%d left:%d\n",programInfoLength,left);
-              /* Now check CRC */
-              parser->getpos(&endPos);
-              if(programInfoLength==4)
-              {
-                parser->getpos(&endPos);
-                //
-                uint32_t size=(uint32_t)(endPos-startPos);
-                uint8_t data[size+1];
-                parser->setpos(startPos);
-                parser->read32(size,data);
-                parser->setpos(endPos);
-                crc=parser->read32i(); 
-                left-=4;
-
-                crccomputed=mpegTsCRC(data,size);
-                if(crc!=crccomputed)
-                {
-                  printf("Incorrect Checksum %x / %x\n",crc,crccomputed); 
-                  *nbPmt=0;
-                }else
-                {
-                  printf("Crc ok %d pmt\n",*nbPmt); 
-                  return 1;
-                }
-                
-              }
-              /*    Re-read the whole block to check its CRC     */
-        } // End of if ..payloadStart
-_next:
-        parser->forward(left);
+              return 1;
+        
       }
       return 0;
+}
+const char *toString(uint32_t type)
+{
+ switch(type)
+ {
+   case 1:case 2: return "Mpeg Video";
+   case 3:case 4: return "Mpeg Audio";
+   case 0x1B: return "H264";
+   case 0x81: return "Private (AC3?)";
+   
+   default: return "???"; 
+ }
+  return "???";
 }
 /**
       \fn     dmx_probePat(dmx_demuxerTS *demuxer, uint32_t *nbPmt,MPEG_PMT *pmts,uint32_t maxPMT)
@@ -721,129 +763,40 @@ _next:
 uint8_t dmx_probePMT(dmx_demuxerTS *demuxer, uint32_t pmtId)
 {
   
-  uint8_t    buffer[BUFFER_SIZE];
   fileParser *parser;
+  uint32_t curSection,maxSection;
+  uint32_t left,toScan,programInfo;
   
       printf("Searching for PMT, pid=0x%x\n",pmtId);
-      demuxer->changePid(pmtId,pmtId); // Search this PMT
-      parser=demuxer->getParser();
+      demuxer->changePid(pmtId,pmtId); // change pid as setPos will seek for them
       demuxer->setPos(0,0);
-      // And start looking for pat...
-
-      uint32_t pid,left,isPayloadStart,cc,val;
-      uint64_t abs;
-      uint8_t packet[TS_PACKET_SIZE];
-      while(demuxer->readPacket(&pid,&left, &isPayloadStart,&abs,&cc))
-        
+      parser=demuxer->getParser();
+      if(dmx_searchAndSkipHeader(pmtId,demuxer,&curSection, &maxSection,&left,&toScan))
       {
-        if(pid!=pmtId) // Not our Pid..
-        {
-          continue;
-        }
-        if(isPayloadStart && left > (9+4)) 
-        {
-              /* Decode PSI header */
-              uint32_t tableId;
-              uint32_t misc;
-              uint32_t sectionLength;
-              uint32_t tId;
-              uint32_t version;
-              uint32_t sectionNumber;
-              uint32_t lastSectionNumber;
-              uint32_t programInfoLength;
-              uint32_t crc,crccomputed;
-              uint64_t startPos,endPos;
-              uint32_t lenToScan;
-              
-              parser->read8i(); /* Pointer field, can be ignored for pat (?) */
-              parser->getpos(&startPos);
-              tableId=parser->read8i();
-              misc=parser->read16i();
-              tId=parser->read16i();
-              version=parser->read8i();
-              sectionNumber=parser->read8i();
-              lastSectionNumber=parser->read8i();
-              
-              sectionLength=misc&0xFFF;
-#ifdef PROBE_TS_VERBOSE
-              printf("******************************************\n");
-              printf("tableId        : %d\n",tableId);
-              
-              printf("sectionLength  : %d\n",sectionLength);
-              printf("0              : %x\n",misc&0x40);
-              printf("section syntax : %x\n",misc&0x80);
-              printf("Transport ID   : 0x%x\n",tId);
-              printf("Version Number : 0x%x\n",(version>>1)&0x1F);
-              printf("CurrentNext    : 0x%x\n",version&1);
-              
-              printf("Section        : %d\n",sectionNumber);
-              printf("LastSection    : %d\n",lastSectionNumber);
-              
-#endif              
-              left-=9;
-              lenToScan=sectionLength-5;
-              /* Now get the PMT content*/
-              printf("**\n");
-              //_________________________________________________________
-              uint32_t pcr;
-              
-              pcr=parser->read16i() & 0x1fff;
-              programInfoLength=parser->read16i() & 0x0FFF;
-              
-              printf("PCR TID       :0x%x\n",pcr);
-              printf("Length        :%d\n",programInfoLength);
-              // Skip descriptors
-              parser->forward(programInfoLength);
-              left-=(4+programInfoLength);
-              lenToScan-=(4+programInfoLength);
-              
-              // Now loop
-               while(lenToScan >4 && left>8)
+               printf("[PMT]PCR for it    :x%x\n",parser->read16i()&0x1FFF);
+               programInfo=parser->read16i() & 0x0FFF;
+               printf("[PMT]Program Info  :%d\n",programInfo);
+               parser->forward(programInfo);
+               toScan-=(2+programInfo);
+               left-=(2+programInfo);
+               while(toScan >=5 )
               {
                   uint8_t streamType;
                   uint32_t pid,esDescLen;
                   printf("**\n");
                   streamType=parser->read8i();
-                  pid       =parser->read16i()&0x1FFFF;
+                  pid       =parser->read16i()&0x1FFF;
                   esDescLen =parser->read16i()&0x0FFF;
-                  printf("Stream Type :0x%x\n",streamType);
-                  printf("Pid         :0x%x\n",pid);
-                  printf("ES Len      :%d\n",esDescLen);
+                  printf("[PMT]Stream Type :0x%x (%s)\n",streamType,toString(streamType));
+                  printf("[PMT]Pid         :0x%x\n",pid);
+                  printf("[PMT]ES Len      :%d\n",esDescLen);
+                  
                   parser->forward(esDescLen);
                   left-=(5+esDescLen);
-                  lenToScan-=(5+esDescLen);
+                  toScan-=(5+esDescLen);
+                  printf("[PMT]left %u toscan %u\n",left,toScan);
               }
-              //_________________________________________________________
-              /*   And CRC */
-              parser->getpos(&endPos);
-              if(lenToScan==4)
-              {
-                parser->getpos(&endPos);
-                //
-                uint32_t size=(uint32_t)(endPos-startPos);
-                uint8_t data[size+1];
-                parser->setpos(startPos);
-                parser->read32(size,data);
-                parser->setpos(endPos);
-                crc=parser->read32i(); 
-                left-=4;
-
-                crccomputed=mpegTsCRC(data,size);
-                if(crc!=crccomputed)
-                {
-                  printf("Incorrect Checksum %x / %x\n",crc,crccomputed); 
-
-                }else
-                {
-                  printf("Crc ok\n"); 
-                  return 1;
-                }
-                
-              }
-              /*    Re-read the whole block to check its CRC     */
-        } // End of if ..payloadStart
-_next:
-        parser->forward(left);
+              
       }
       return 0;
 }
