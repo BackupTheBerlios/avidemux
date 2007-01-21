@@ -426,13 +426,20 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
         int ret;
         AVPacket pkt;
         double f;
+        int64_t timeInUs;
 
            if(!audio_st) return 0;
            if(!len) return 1;
             av_init_packet(&pkt);
 
-
-            pkt.dts=pkt.pts=(int64_t)sample2time_us(sample);
+            timeInUs=(int64_t)sample2time_us(sample);
+            /* Rescale to ?? */
+            f=timeInUs;
+            f/=1000000.; // In ms seconds 
+            f*=_audioFq;
+            
+            
+            pkt.dts=pkt.pts=(int)f;
 
             pkt.flags |= PKT_FLAG_KEY; 
             pkt.data= buf;
@@ -442,7 +449,7 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             aprintf("A: sample: %d frame_pts: %d fq: %d\n",(int32_t )sample,(int32_t )pkt.dts,audio_st->codec->sample_rate); 
 
             ret = av_write_frame(oc, &pkt);
-            _lastAudioDts=pkt.dts;
+            _lastAudioDts=timeInUs;
             if(ret) 
             {
                         printf("Error writing audio packet\n");
