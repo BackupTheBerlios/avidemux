@@ -418,10 +418,11 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       return 0;
     }
     clonePic (&_frame, out);
+    #if 0
     printf("Frame bitstream order : %u, display order %u Incoming :%u outgoing :%u\n",_frame.coded_picture_number,_frame.display_picture_number,
          in->demuxerFrameNo,out->demuxerFrameno);
     printf("in flags :%x out flags :%x\n",in->flags, out->flags);
-  
+ #endif 
   return 1;
 }
 
@@ -450,7 +451,7 @@ decoderFFMpeg4::decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d)
   printf ("Using %d bytes of extradata for MPEG4 decoder\n", l);
   
   _refCopy = 1;			// YUV420 only
-  _context->extradata = (void *) d;
+  _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
   decoderMultiThread ();
   //  _context->flags|=FF_DEBUG_VIS_MV;
@@ -459,7 +460,7 @@ decoderFFMpeg4::decoderFFMpeg4 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d)
 decoderFFDV::decoderFFDV (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
-  _context->extradata = (void *) d;
+  _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
   WRAP_Open (CODEC_ID_DVVIDEO);
 
@@ -487,7 +488,7 @@ decoderFFSVQ3::decoderFFSVQ3 (uint32_t w, uint32_t h, uint32_t extraLen, uint8_t
     got_picture = 0;
 
   LOWDELAY();
-  _context->extradata = (void *) extraData;
+  _context->extradata = (uint8_t *) extraData;
   _context->extradata_size = (int) extraLen;
   WRAP_Open (CODEC_ID_SVQ3);
 }
@@ -506,7 +507,7 @@ decoderFFV1::decoderFFV1 (uint32_t w, uint32_t h):decoderFF (w, h)
 decoderFF_ffhuff::decoderFF_ffhuff (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
-  _context->extradata = (void *) d;
+  _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
   printf ("FFhuff: We have :%d bytes of extra data\n", l);
   WRAP_Open (CODEC_ID_FFVHUFF);
@@ -517,7 +518,7 @@ decoderFFH264::decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d, u
 {
   _lowDelay=lowdelay;
   _refCopy = 1;			// YUV420 only
-  _context->extradata = (void *) d;
+  _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
   if(lowdelay)
     LOWDELAY();
@@ -528,7 +529,7 @@ decoderFFH264::decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d, u
 decoderFFhuff::decoderFFhuff (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
-  _context->extradata = (void *) d;
+  _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
 
   WRAP_Open (CODEC_ID_HUFFYUV);
@@ -536,7 +537,7 @@ decoderFFhuff::decoderFFhuff (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):d
 decoderFFWMV2::decoderFFWMV2 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
-  _context->extradata = (void *) d;
+  _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
 
   WRAP_Open (CODEC_ID_WMV2);
@@ -545,7 +546,7 @@ decoderFFWMV2::decoderFFWMV2 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):d
 decoderFFWMV1::decoderFFWMV1 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
-  _context->extradata = (void *) d;
+  _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
 
   WRAP_Open (CODEC_ID_WMV1);
@@ -555,7 +556,7 @@ decoderFFWMV1::decoderFFWMV1 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):d
 decoderFFWMV3::decoderFFWMV3 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
-  _context->extradata = (void *) d;
+  _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
 
   WRAP_Open (CODEC_ID_WMV3);
@@ -564,7 +565,7 @@ decoderFFWMV3::decoderFFWMV3 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):d
 decoderFFcyuv::decoderFFcyuv (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
-  _context->extradata = (void *) d;
+  _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
 
   WRAP_Open (CODEC_ID_CYUV);
@@ -576,7 +577,7 @@ decoderFFMJPEG::decoderFFMJPEG (uint32_t w, uint32_t h):decoderFF (w, h)
 decoderFFTheora::decoderFFTheora (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {
-  _context->extradata = (void *) d;
+  _context->extradata = (uint8_t *) d;
   _context->extradata_size = (int) l;
   WRAP_Open (CODEC_ID_THEORA);
 }
