@@ -2,25 +2,29 @@
  * Buffered I/O for ffmpeg system
  * Copyright (c) 2000,2001 Fabrice Bellard
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
 #include "avio.h"
 #include <stdarg.h>
 
 #define IO_BUFFER_SIZE 32768
+
+static void fill_buffer(ByteIOContext *s);
 
 int init_put_byte(ByteIOContext *s,
                   unsigned char *buffer,
@@ -50,11 +54,13 @@ int init_put_byte(ByteIOContext *s,
     s->is_streamed = 0;
     s->max_packet_size = 0;
     s->update_checksum= NULL;
+    if(!read_packet && !write_flag){
+        s->pos = buffer_size;
+        s->buf_end = s->buffer + buffer_size;
+    }
     return 0;
 }
 
-
-#ifdef CONFIG_MUXERS
 static void flush_buffer(ByteIOContext *s)
 {
     if (s->buf_ptr > s->buffer) {
@@ -104,61 +110,47 @@ void put_flush_packet(ByteIOContext *s)
     flush_buffer(s);
     s->must_flush = 0;
 }
-#endif //CONFIG_MUXERS
 
 offset_t url_fseek(ByteIOContext *s, offset_t offset, int whence)
 {
     offset_t offset1;
+    offset_t pos= s->pos - (s->write_flag ? 0 : (s->buf_end - s->buffer));
 
     if (whence != SEEK_CUR && whence != SEEK_SET)
         return -EINVAL;
 
-#ifdef CONFIG_MUXERS
-    if (s->write_flag) {
-        if (whence == SEEK_CUR) {
-            offset1 = s->pos + (s->buf_ptr - s->buffer);
-            if (offset == 0)
-                return offset1;
-            offset += offset1;
-        }
-        offset1 = offset - s->pos;
-        if (!s->must_flush &&
-            offset1 >= 0 && offset1 < (s->buf_end - s->buffer)) {
-            /* can do the seek inside the buffer */
-            s->buf_ptr = s->buffer + offset1;
-        } else {
-            if (!s->seek)
-                return -EPIPE;
+    if (whence == SEEK_CUR) {
+        offset1 = pos + (s->buf_ptr - s->buffer);
+        if (offset == 0)
+            return offset1;
+        offset += offset1;
+    }
+    offset1 = offset - pos;
+    if (!s->must_flush &&
+        offset1 >= 0 && offset1 < (s->buf_end - s->buffer)) {
+        /* can do the seek inside the buffer */
+        s->buf_ptr = s->buffer + offset1;
+    } else if(s->is_streamed && !s->write_flag &&
+              offset1 >= 0 && offset1 < (s->buf_end - s->buffer) + (1<<16)){
+        while(s->pos < offset && !s->eof_reached)
+            fill_buffer(s);
+        s->buf_ptr = s->buf_end + offset - s->pos;
+    } else {
+#if defined(CONFIG_MUXERS) || defined(CONFIG_NETWORK)
+        if (s->write_flag) {
             flush_buffer(s);
             s->must_flush = 1;
-            s->buf_ptr = s->buffer;
-            s->seek(s->opaque, offset, SEEK_SET);
-            s->pos = offset;
-        }
-    } else
-#endif //CONFIG_MUXERS
-    {
-        if (whence == SEEK_CUR) {
-            offset1 = s->pos - (s->buf_end - s->buffer) + (s->buf_ptr - s->buffer);
-            if (offset == 0)
-                return offset1;
-            offset += offset1;
-        }
-        offset1 = offset - (s->pos - (s->buf_end - s->buffer));
-        if (offset1 >= 0 && offset1 <= (s->buf_end - s->buffer)) {
-            /* can do the seek inside the buffer */
-            s->buf_ptr = s->buffer + offset1;
-        } else {
-            if (!s->seek)
-                return -EPIPE;
-            s->buf_ptr = s->buffer;
+        } else
+#endif /* defined(CONFIG_MUXERS) || defined(CONFIG_NETWORK) */
+        {
             s->buf_end = s->buffer;
-            if (s->seek(s->opaque, offset, SEEK_SET) == (offset_t)-EPIPE)
-                return -EPIPE;
-            s->pos = offset;
         }
-        s->eof_reached = 0;
+        s->buf_ptr = s->buffer;
+        if (!s->seek || s->seek(s->opaque, offset, SEEK_SET) == (offset_t)-EPIPE)
+            return -EPIPE;
+        s->pos = offset;
     }
+    s->eof_reached = 0;
     return offset;
 }
 
@@ -178,8 +170,11 @@ offset_t url_fsize(ByteIOContext *s)
 
     if (!s->seek)
         return -EPIPE;
-    size = s->seek(s->opaque, -1, SEEK_END) + 1;
-    s->seek(s->opaque, s->pos, SEEK_SET);
+    size = s->seek(s->opaque, 0, AVSEEK_SIZE);
+    if(size<0){
+        size = s->seek(s->opaque, -1, SEEK_END) + 1;
+        s->seek(s->opaque, s->pos, SEEK_SET);
+    }
     return size;
 }
 
@@ -193,7 +188,6 @@ int url_ferror(ByteIOContext *s)
     return s->error;
 }
 
-#ifdef CONFIG_MUXERS
 void put_le32(ByteIOContext *s, unsigned int val)
 {
     put_byte(s, val);
@@ -242,6 +236,12 @@ void put_be16(ByteIOContext *s, unsigned int val)
     put_byte(s, val);
 }
 
+void put_le24(ByteIOContext *s, unsigned int val)
+{
+    put_le16(s, val & 0xffff);
+    put_byte(s, val >> 16);
+}
+
 void put_be24(ByteIOContext *s, unsigned int val)
 {
     put_be16(s, val >> 8);
@@ -254,7 +254,6 @@ void put_tag(ByteIOContext *s, const char *tag)
         put_byte(s, *tag++);
     }
 }
-#endif //CONFIG_MUXERS
 
 /* Input stream */
 
@@ -295,7 +294,7 @@ unsigned long get_checksum(ByteIOContext *s){
 void init_checksum(ByteIOContext *s, unsigned long (*update_checksum)(unsigned long c, const uint8_t *p, unsigned int len), unsigned long checksum){
     s->update_checksum= update_checksum;
     if(s->update_checksum){
-        s->checksum= s->update_checksum(checksum, NULL, 0);
+        s->checksum= checksum;
         s->checksum_ptr= s->buf_ptr;
     }
 }
@@ -396,6 +395,14 @@ unsigned int get_le16(ByteIOContext *s)
     unsigned int val;
     val = get_byte(s);
     val |= get_byte(s) << 8;
+    return val;
+}
+
+unsigned int get_le24(ByteIOContext *s)
+{
+    unsigned int val;
+    val = get_le16(s);
+    val |= get_byte(s) << 16;
     return val;
 }
 
@@ -616,7 +623,9 @@ int url_fget_max_packet_size(ByteIOContext *s)
     return s->max_packet_size;
 }
 
-#ifdef CONFIG_MUXERS
+/* url_open_dyn_buf and url_close_dyn_buf are used in rtp.c to send a response
+ * back to the server even if CONFIG_MUXERS is not set. */
+#if defined(CONFIG_MUXERS) || defined(CONFIG_NETWORK)
 /* buffer handling */
 int url_open_buf(ByteIOContext *s, uint8_t *buf, int buf_size, int flags)
 {
@@ -779,4 +788,4 @@ int url_close_dyn_buf(ByteIOContext *s, uint8_t **pbuffer)
     av_free(d);
     return size;
 }
-#endif //CONFIG_MUXERS
+#endif /* CONFIG_MUXERS || CONFIG_NETWORK */

@@ -1,23 +1,26 @@
 /*
- * MPEG1/2 mux/demux
+ * MPEG1/2 muxer and demuxer
  * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "avformat.h"
 #include "bitstream.h"
+#include "fifo.h"
 
 #define MAX_PAYLOAD_SIZE 4096
 //#define DEBUG_SEEK
@@ -35,7 +38,7 @@ typedef struct PacketDesc {
 } PacketDesc;
 
 typedef struct {
-    FifoBuffer fifo;
+    AVFifoBuffer fifo;
     uint8_t id;
     int max_buffer_size; /* in bytes */
     int buffer_index;
@@ -45,7 +48,7 @@ typedef struct {
     int packet_number;
     uint8_t lpcm_header[3];
     int lpcm_align;
-    uint8_t *fifo_iframe_ptr;
+    int bytes_to_iframe;
     int align_iframe;
     int64_t vobu_start_pts;
 } StreamInfo;
@@ -108,11 +111,11 @@ typedef struct {
 static const int lpcm_freq_tab[4] = { 48000, 96000, 44100, 32000 };
 
 #ifdef CONFIG_MUXERS
-static AVOutputFormat mpeg1system_mux;
-static AVOutputFormat mpeg1vcd_mux;
-static AVOutputFormat mpeg2vob_mux;
-static AVOutputFormat mpeg2svcd_mux;
-static AVOutputFormat mpeg2dvd_mux;
+AVOutputFormat mpeg1system_muxer;
+AVOutputFormat mpeg1vcd_muxer;
+AVOutputFormat mpeg2vob_muxer;
+AVOutputFormat mpeg2svcd_muxer;
+AVOutputFormat mpeg2dvd_muxer;
 
 static int put_pack_header(AVFormatContext *ctx,
                            uint8_t *buf, int64_t timestamp)
@@ -330,10 +333,10 @@ static int mpeg_mux_init(AVFormatContext *ctx)
     int video_bitrate;
 
     s->packet_number = 0;
-    s->is_vcd = (ctx->oformat == &mpeg1vcd_mux);
-    s->is_svcd = (ctx->oformat == &mpeg2svcd_mux);
-    s->is_mpeg2 = (ctx->oformat == &mpeg2vob_mux || ctx->oformat == &mpeg2svcd_mux || ctx->oformat == &mpeg2dvd_mux);
-    s->is_dvd = (ctx->oformat == &mpeg2dvd_mux);
+    s->is_vcd = (ctx->oformat == &mpeg1vcd_muxer);
+    s->is_svcd = (ctx->oformat == &mpeg2svcd_muxer);
+    s->is_mpeg2 = (ctx->oformat == &mpeg2vob_muxer || ctx->oformat == &mpeg2svcd_muxer || ctx->oformat == &mpeg2dvd_muxer);
+    s->is_dvd = (ctx->oformat == &mpeg2dvd_muxer);
 
     if(ctx->packet_size)
         s->packet_size = ctx->packet_size;
@@ -412,7 +415,7 @@ static int mpeg_mux_init(AVFormatContext *ctx)
         default:
             return -1;
         }
-        fifo_init(&stream->fifo, 16);
+        av_fifo_init(&stream->fifo, 16);
     }
     bitrate = 0;
     audio_bitrate = 0;
@@ -708,14 +711,7 @@ static int flush_packet(AVFormatContext *ctx, int stream_index,
             }
         } else if (s->is_dvd) {
             if (stream->align_iframe || s->packet_number == 0){
-                int bytes_to_iframe;
-                int PES_bytes_to_fill;
-                if (stream->fifo_iframe_ptr >= stream->fifo.rptr) {
-                    bytes_to_iframe = stream->fifo_iframe_ptr - stream->fifo.rptr;
-                } else {
-                    bytes_to_iframe = (stream->fifo.end - stream->fifo.rptr) + (stream->fifo_iframe_ptr - stream->fifo.buffer);
-                }
-                PES_bytes_to_fill = s->packet_size - size - 10;
+                int PES_bytes_to_fill = s->packet_size - size - 10;
 
                 if (pts != AV_NOPTS_VALUE) {
                     if (dts != pts)
@@ -724,7 +720,7 @@ static int flush_packet(AVFormatContext *ctx, int stream_index,
                         PES_bytes_to_fill -= 5;
                 }
 
-                if (bytes_to_iframe == 0 || s->packet_number == 0) {
+                if (stream->bytes_to_iframe == 0 || s->packet_number == 0) {
                     size = put_system_header(ctx, buf_ptr, 0);
                     buf_ptr += size;
                     size = buf_ptr - buffer;
@@ -751,8 +747,8 @@ static int flush_packet(AVFormatContext *ctx, int stream_index,
                     s->last_scr= scr;
                     buf_ptr += size;
                     /* GOP Start */
-                } else if (bytes_to_iframe < PES_bytes_to_fill) {
-                    pad_packet_bytes = PES_bytes_to_fill - bytes_to_iframe;
+                } else if (stream->bytes_to_iframe < PES_bytes_to_fill) {
+                    pad_packet_bytes = PES_bytes_to_fill - stream->bytes_to_iframe;
                 }
             }
         } else {
@@ -824,7 +820,7 @@ static int flush_packet(AVFormatContext *ctx, int stream_index,
             startcode = 0x100 + id;
         }
 
-        stuffing_size = payload_size - fifo_size(&stream->fifo, stream->fifo.rptr);
+        stuffing_size = payload_size - av_fifo_size(&stream->fifo);
 
         // first byte doesnt fit -> reset pts/dts + stuffing
         if(payload_size <= trailer_size && pts != AV_NOPTS_VALUE){
@@ -951,8 +947,9 @@ static int flush_packet(AVFormatContext *ctx, int stream_index,
         }
 
         /* output data */
-        if(put_fifo(&ctx->pb, &stream->fifo, payload_size - stuffing_size, &stream->fifo.rptr) < 0)
+        if(av_fifo_generic_read(&stream->fifo, payload_size - stuffing_size, &put_buffer, &ctx->pb) < 0)
             return -1;
+        stream->bytes_to_iframe -= payload_size - stuffing_size;
     }else{
         payload_size=
         stuffing_size= 0;
@@ -1065,7 +1062,7 @@ retry:
     for(i=0; i<ctx->nb_streams; i++){
         AVStream *st = ctx->streams[i];
         StreamInfo *stream = st->priv_data;
-        const int avail_data=  fifo_size(&stream->fifo, stream->fifo.rptr);
+        const int avail_data=  av_fifo_size(&stream->fifo);
         const int space= stream->max_buffer_size - stream->buffer_index;
         int rel_space= 1024*space / stream->max_buffer_size;
         PacketDesc *next_pkt= stream->premux_packet;
@@ -1125,7 +1122,7 @@ retry:
     st = ctx->streams[best_i];
     stream = st->priv_data;
 
-    assert(fifo_size(&stream->fifo, stream->fifo.rptr) > 0);
+    assert(av_fifo_size(&stream->fifo) > 0);
 
     assert(avail_space >= s->packet_size || ignore_constraints);
 
@@ -1141,7 +1138,7 @@ retry:
 //av_log(ctx, AV_LOG_DEBUG, "dts:%f pts:%f scr:%f stream:%d\n", timestamp_packet->dts/90000.0, timestamp_packet->pts/90000.0, scr/90000.0, best_i);
         es_size= flush_packet(ctx, best_i, timestamp_packet->pts, timestamp_packet->dts, scr, trailer_size);
     }else{
-        assert(fifo_size(&stream->fifo, stream->fifo.rptr) == trailer_size);
+        assert(av_fifo_size(&stream->fifo) == trailer_size);
         es_size= flush_packet(ctx, best_i, AV_NOPTS_VALUE, AV_NOPTS_VALUE, scr, trailer_size);
     }
 
@@ -1204,11 +1201,11 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, AVPacket *pkt)
         stream->predecode_packet= pkt_desc;
     stream->next_packet= &pkt_desc->next;
 
-    fifo_realloc(&stream->fifo, fifo_size(&stream->fifo, NULL) + size + 1);
+    av_fifo_realloc(&stream->fifo, av_fifo_size(&stream->fifo) + size + 1);
 
     if (s->is_dvd){
         if (is_iframe && (s->packet_number == 0 || (pts - stream->vobu_start_pts >= 36000))) { // min VOBU length 0.4 seconds (mpucoder)
-            stream->fifo_iframe_ptr = stream->fifo.wptr;
+            stream->bytes_to_iframe = av_fifo_size(&stream->fifo);
             stream->align_iframe = 1;
             stream->vobu_start_pts = pts;
         } else {
@@ -1216,7 +1213,7 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, AVPacket *pkt)
         }
     }
 
-    fifo_write(&stream->fifo, buf, size, &stream->fifo.wptr);
+    av_fifo_write(&stream->fifo, buf, size);
 
     for(;;){
         int ret= output_packet(ctx, 0);
@@ -1248,8 +1245,8 @@ static int mpeg_mux_end(AVFormatContext *ctx)
     for(i=0;i<ctx->nb_streams;i++) {
         stream = ctx->streams[i]->priv_data;
 
-        assert(fifo_size(&stream->fifo, stream->fifo.rptr) == 0);
-        fifo_free(&stream->fifo);
+        assert(av_fifo_size(&stream->fifo) == 0);
+        av_fifo_free(&stream->fifo);
     }
     return 0;
 }
@@ -1260,33 +1257,60 @@ static int mpeg_mux_end(AVFormatContext *ctx)
 
 #define MAX_SYNC_SIZE 100000
 
+static int cdxa_probe(AVProbeData *p)
+{
+    /* check file header */
+    if (p->buf_size <= 32)
+        return 0;
+    if (p->buf[0] == 'R' && p->buf[1] == 'I' &&
+        p->buf[2] == 'F' && p->buf[3] == 'F' &&
+        p->buf[8] == 'C' && p->buf[9] == 'D' &&
+        p->buf[10] == 'X' && p->buf[11] == 'A')
+        return AVPROBE_SCORE_MAX;
+    else
+        return 0;
+}
+
 static int mpegps_probe(AVProbeData *p)
 {
     uint32_t code= -1;
-    int sys=0, pspack=0, priv1=0, vid=0;
+    int sys=0, pspack=0, priv1=0, vid=0, audio=0;
     int i;
+    int score=0;
 
+    score = cdxa_probe(p);
+    if (score > 0) return score;
+
+    /* Search for MPEG stream */
     for(i=0; i<p->buf_size; i++){
         code = (code<<8) + p->buf[i];
         if ((code & 0xffffff00) == 0x100) {
-            switch(code){
-            case SYSTEM_HEADER_START_CODE:    sys++; break;
-            case         PRIVATE_STREAM_1:  priv1++; break;
-            case          PACK_START_CODE: pspack++; break;
-            case       (VIDEO_ID + 0x100):    vid++; break;
-            }
+            if(code == SYSTEM_HEADER_START_CODE) sys++;
+            else if(code == PRIVATE_STREAM_1)    priv1++;
+            else if(code == PACK_START_CODE)     pspack++;
+            else if((code & 0xf0) == VIDEO_ID)   vid++;
+            else if((code & 0xe0) == AUDIO_ID)   audio++;
         }
     }
+
+    if(vid || audio)            /* invalid VDR files nd short PES streams */
+        score= AVPROBE_SCORE_MAX/4;
+
+//av_log(NULL, AV_LOG_ERROR, "%d %d %d %d %d\n", sys, priv1, pspack,vid, audio);
     if(sys && sys*9 <= pspack*10)
         return AVPROBE_SCORE_MAX/2+2; // +1 for .mpg
-    if((priv1 || vid) && (priv1+vid)*9 <= pspack*10)
+    if((priv1 || vid || audio) && (priv1+vid+audio)*9 <= pspack*10)
         return AVPROBE_SCORE_MAX/2+2; // +1 for .mpg
-    return 0;
+    if((!!vid ^ !!audio) && (audio+vid > 1) && !sys && !pspack) /* PES stream */
+        return AVPROBE_SCORE_MAX/2+2;
+
+    //02-Penguin.flac has sys:0 priv1:0 pspack:0 vid:0 audio:1
+    return score;
 }
 
 
 typedef struct MpegDemuxContext {
-    int header_state;
+    int32_t header_state;
     unsigned char psm_es_type[256];
 } MpegDemuxContext;
 
@@ -1317,7 +1341,7 @@ static int64_t get_pts(ByteIOContext *pb, int c)
 }
 
 static int find_next_start_code(ByteIOContext *pb, int *size_ptr,
-                                uint32_t *header_state)
+                                int32_t *header_state)
 {
     unsigned int state, v;
     int val, n;
@@ -1421,15 +1445,18 @@ static int mpegps_read_pes_header(AVFormatContext *s,
 {
     MpegDemuxContext *m = s->priv_data;
     int len, size, startcode, c, flags, header_len;
-    int64_t pts, dts, last_pos;
+    int64_t pts, dts;
+    int64_t last_sync= url_ftell(&s->pb);
 
-    last_pos = -1;
+ error_redo:
+        url_fseek(&s->pb, last_sync, SEEK_SET);
  redo:
         /* next start code (should be immediately after) */
         m->header_state = 0xff;
         size = MAX_SYNC_SIZE;
         startcode = find_next_start_code(&s->pb, &size, &m->header_state);
-    //printf("startcode=%x pos=0x%Lx\n", startcode, url_ftell(&s->pb));
+        last_sync = url_ftell(&s->pb);
+    //printf("startcode=%x pos=0x%"PRIx64"\n", startcode, url_ftell(&s->pb));
     if (startcode < 0)
         return AVERROR_IO;
     if (startcode == PACK_START_CODE)
@@ -1457,12 +1484,12 @@ static int mpegps_read_pes_header(AVFormatContext *s,
         *ppos = url_ftell(&s->pb) - 4;
     }
     len = get_be16(&s->pb);
-    pts = AV_NOPTS_VALUE;
+    pts =
     dts = AV_NOPTS_VALUE;
     /* stuffing */
     for(;;) {
         if (len < 1)
-            goto redo;
+            goto error_redo;
         c = get_byte(&s->pb);
         len--;
         /* XXX: for mpeg1, should test only bit 7 */
@@ -1471,72 +1498,59 @@ static int mpegps_read_pes_header(AVFormatContext *s,
     }
     if ((c & 0xc0) == 0x40) {
         /* buffer scale & size */
-        if (len < 2)
-            goto redo;
         get_byte(&s->pb);
         c = get_byte(&s->pb);
         len -= 2;
     }
-    if ((c & 0xf0) == 0x20) {
-        if (len < 4)
-            goto redo;
+    if ((c & 0xe0) == 0x20) {
         dts = pts = get_pts(&s->pb, c);
         len -= 4;
-    } else if ((c & 0xf0) == 0x30) {
-        if (len < 9)
-            goto redo;
-        pts = get_pts(&s->pb, c);
-        dts = get_pts(&s->pb, -1);
-        len -= 9;
+        if (c & 0x10){
+            dts = get_pts(&s->pb, -1);
+            len -= 5;
+        }
     } else if ((c & 0xc0) == 0x80) {
         /* mpeg 2 PES */
+#if 0 /* some streams have this field set for no apparent reason */
         if ((c & 0x30) != 0) {
             /* Encrypted multiplex not handled */
             goto redo;
         }
+#endif
         flags = get_byte(&s->pb);
         header_len = get_byte(&s->pb);
         len -= 2;
         if (header_len > len)
-            goto redo;
-        if ((flags & 0xc0) == 0x80) {
-            dts = pts = get_pts(&s->pb, -1);
-            if (header_len < 5)
-                goto redo;
-            header_len -= 5;
-            len -= 5;
-        } if ((flags & 0xc0) == 0xc0) {
-            pts = get_pts(&s->pb, -1);
-            dts = get_pts(&s->pb, -1);
-            if (header_len < 10)
-                goto redo;
-            header_len -= 10;
-            len -= 10;
-        }
+            goto error_redo;
         len -= header_len;
-        while (header_len > 0) {
-            get_byte(&s->pb);
-            header_len--;
+        if (flags & 0x80) {
+            dts = pts = get_pts(&s->pb, -1);
+            header_len -= 5;
+            if (flags & 0x40) {
+                dts = get_pts(&s->pb, -1);
+                header_len -= 5;
+            }
         }
+        if(header_len < 0)
+            goto error_redo;
+        url_fskip(&s->pb, header_len);
     }
     else if( c!= 0xf )
         goto redo;
 
     if (startcode == PRIVATE_STREAM_1 && !m->psm_es_type[startcode & 0xff]) {
-        if (len < 1)
-            goto redo;
         startcode = get_byte(&s->pb);
         len--;
         if (startcode >= 0x80 && startcode <= 0xbf) {
             /* audio: skip header */
-            if (len < 3)
-                goto redo;
             get_byte(&s->pb);
             get_byte(&s->pb);
             get_byte(&s->pb);
             len -= 3;
         }
     }
+    if(len<0)
+        goto error_redo;
     if(dts != AV_NOPTS_VALUE && ppos){
         int i;
         for(i=0; i<s->nb_streams; i++){
@@ -1600,8 +1614,15 @@ static int mpegps_read_packet(AVFormatContext *s,
             goto skip;
         }
     } else if (startcode >= 0x1e0 && startcode <= 0x1ef) {
+        static const unsigned char avs_seqh[4] = { 0, 0, 1, 0xb0 };
+        unsigned char buf[8];
+        get_buffer(&s->pb, buf, 8);
+        url_fseek(&s->pb, -8, SEEK_CUR);
+        if(!memcmp(buf, avs_seqh, 4) && (buf[6] != 0 || buf[7] != 1))
+            codec_id = CODEC_ID_CAVS;
+        else
+            codec_id = CODEC_ID_MPEG2VIDEO;
         type = CODEC_TYPE_VIDEO;
-        codec_id = CODEC_ID_MPEG2VIDEO;
     } else if (startcode >= 0x1c0 && startcode <= 0x1df) {
         type = CODEC_TYPE_AUDIO;
         codec_id = CODEC_ID_MP2;
@@ -1676,7 +1697,7 @@ static int64_t mpegps_read_dts(AVFormatContext *s, int stream_index,
 
     pos = *ppos;
 #ifdef DEBUG_SEEK
-    printf("read_dts: pos=0x%llx next=%d -> ", pos, find_next);
+    printf("read_dts: pos=0x%"PRIx64" next=%d -> ", pos, find_next);
 #endif
     url_fseek(&s->pb, pos, SEEK_SET);
     for(;;) {
@@ -1694,14 +1715,14 @@ static int64_t mpegps_read_dts(AVFormatContext *s, int stream_index,
         url_fskip(&s->pb, len);
     }
 #ifdef DEBUG_SEEK
-    printf("pos=0x%llx dts=0x%llx %0.3f\n", pos, dts, dts / 90000.0);
+    printf("pos=0x%"PRIx64" dts=0x%"PRIx64" %0.3f\n", pos, dts, dts / 90000.0);
 #endif
     *ppos = pos;
     return dts;
 }
 
-#ifdef CONFIG_MUXERS
-static AVOutputFormat mpeg1system_mux = {
+#ifdef CONFIG_MPEG1SYSTEM_MUXER
+AVOutputFormat mpeg1system_muxer = {
     "mpeg",
     "MPEG1 System format",
     "video/mpeg",
@@ -1713,8 +1734,9 @@ static AVOutputFormat mpeg1system_mux = {
     mpeg_mux_write_packet,
     mpeg_mux_end,
 };
-
-static AVOutputFormat mpeg1vcd_mux = {
+#endif
+#ifdef CONFIG_MPEG1VCD_MUXER
+AVOutputFormat mpeg1vcd_muxer = {
     "vcd",
     "MPEG1 System format (VCD)",
     "video/mpeg",
@@ -1726,8 +1748,9 @@ static AVOutputFormat mpeg1vcd_mux = {
     mpeg_mux_write_packet,
     mpeg_mux_end,
 };
-
-static AVOutputFormat mpeg2vob_mux = {
+#endif
+#ifdef CONFIG_MPEG2VOB_MUXER
+AVOutputFormat mpeg2vob_muxer = {
     "vob",
     "MPEG2 PS format (VOB)",
     "video/mpeg",
@@ -1739,9 +1762,11 @@ static AVOutputFormat mpeg2vob_mux = {
     mpeg_mux_write_packet,
     mpeg_mux_end,
 };
+#endif
 
 /* Same as mpeg2vob_mux except that the pack size is 2324 */
-static AVOutputFormat mpeg2svcd_mux = {
+#ifdef CONFIG_MPEG2SVCD_MUXER
+AVOutputFormat mpeg2svcd_muxer = {
     "svcd",
     "MPEG2 PS format (VOB)",
     "video/mpeg",
@@ -1753,9 +1778,11 @@ static AVOutputFormat mpeg2svcd_mux = {
     mpeg_mux_write_packet,
     mpeg_mux_end,
 };
+#endif
 
 /*  Same as mpeg2vob_mux except the 'is_dvd' flag is set to produce NAV pkts */
-static AVOutputFormat mpeg2dvd_mux = {
+#ifdef CONFIG_MPEG2DVD_MUXER
+AVOutputFormat mpeg2dvd_muxer = {
     "dvd",
     "MPEG2 PS format (DVD VOB)",
     "video/mpeg",
@@ -1767,10 +1794,10 @@ static AVOutputFormat mpeg2dvd_mux = {
     mpeg_mux_write_packet,
     mpeg_mux_end,
 };
+#endif
 
-#endif //CONFIG_MUXERS
-
-AVInputFormat mpegps_demux = {
+#ifdef CONFIG_MPEGPS_DEMUXER
+AVInputFormat mpegps_demuxer = {
     "mpeg",
     "MPEG PS format",
     sizeof(MpegDemuxContext),
@@ -1782,16 +1809,4 @@ AVInputFormat mpegps_demux = {
     mpegps_read_dts,
     .flags = AVFMT_SHOW_IDS,
 };
-
-int mpegps_init(void)
-{
-#ifdef CONFIG_MUXERS
-    av_register_output_format(&mpeg1system_mux);
-    av_register_output_format(&mpeg1vcd_mux);
-    av_register_output_format(&mpeg2vob_mux);
-    av_register_output_format(&mpeg2svcd_mux);
-    av_register_output_format(&mpeg2dvd_mux);
-#endif //CONFIG_MUXERS
-    av_register_input_format(&mpegps_demux);
-    return 0;
-}
+#endif

@@ -159,8 +159,8 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                 case MUXER_PSP:
                         strcpy(oc->title,"Avidemux");
                         strcpy(oc->author,"Avidemux");
-                        c->sample_aspect_ratio.num=4;
-                        c->sample_aspect_ratio.den=3;
+                        c->sample_aspect_ratio.num=1;
+                        c->sample_aspect_ratio.den=1;
                         if(isMpeg4Compatible(info->fcc))
                         {
                                 c->codec_id = CODEC_ID_MPEG4;
@@ -191,8 +191,8 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                         }
                         if(MUXER_PSP==_type)
                         {
-                            c->rc_buffer_size=8*1024*224;
-                            c->rc_max_rate=768*1000;
+                            c->rc_buffer_size=0; //8*1024*224;
+                            c->rc_max_rate=0; //768*1000;
                             c->rc_min_rate=0;
                             c->bit_rate=768*1000;
                         }
@@ -438,7 +438,7 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             pkt.data= buf;
             pkt.size= len;
             pkt.stream_index=1;
-
+            //pkt.duration=pkt.dts-_lastAudioDts; // Duration
             aprintf("A: sample: %d frame_pts: %d fq: %d\n",(int32_t )sample,(int32_t )pkt.dts,audio_st->codec->sample_rate); 
 
             ret = av_write_frame(oc, &pkt);
@@ -589,7 +589,7 @@ extern URLProtocol file_protocol ;
 extern AVInputFormat matroska_demuxer;
 uint8_t lavformat_init(void)
 {
-                mpegps_init();
+//                mpegps_init();
                 movenc_init();
                 av_register_input_format(&matroska_demuxer);
                 register_protocol(&file_protocol);
