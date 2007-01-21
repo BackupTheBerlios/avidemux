@@ -1,18 +1,20 @@
 /*
  * copyright (c) 2006 Michael Niedermayer <michaelni@gmx.at>
  *
- * This library is free software; you can redistribute it and/or
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -33,11 +35,12 @@ extern "C" {
 	#define ASMALIGN(ZEROBITS) ".align 1<<" #ZEROBITS "\n\t" 
 /* /MEANX
  */
+
 #define AV_STRINGIFY(s)         AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 
-#define LIBAVUTIL_VERSION_INT   ((49<<16)+(0<<8)+0)
-#define LIBAVUTIL_VERSION       49.0.0
+#define LIBAVUTIL_VERSION_INT   ((49<<16)+(2<<8)+0)
+#define LIBAVUTIL_VERSION       49.2.0
 #define LIBAVUTIL_BUILD         LIBAVUTIL_VERSION_INT
 
 #define LIBAVUTIL_IDENT         "Lavu" AV_STRINGIFY(LIBAVUTIL_VERSION)
@@ -80,7 +83,7 @@ enum PixelFormat {
     PIX_FMT_YUV410P,   ///< Planar YUV 4:1:0,  9bpp, (1 Cr & Cb sample per 4x4 Y samples)
     PIX_FMT_YUV411P,   ///< Planar YUV 4:1:1, 12bpp, (1 Cr & Cb sample per 4x1 Y samples)
     PIX_FMT_RGB565,    ///< Packed RGB 5:6:5, 16bpp, (msb)   5R 6G 5B(lsb), in cpu endianness
-    PIX_FMT_RGB555,    ///< Packed RGB 5:5:5, 16bpp, (msb)1A 5R 5G 5B(lsb), in cpu endianness most significant bit to 1
+    PIX_FMT_RGB555,    ///< Packed RGB 5:5:5, 16bpp, (msb)1A 5R 5G 5B(lsb), in cpu endianness most significant bit to 0
     PIX_FMT_GRAY8,     ///<        Y        ,  8bpp
     PIX_FMT_MONOWHITE, ///<        Y        ,  1bpp, 1 is white
     PIX_FMT_MONOBLACK, ///<        Y        ,  1bpp, 0 is black
@@ -106,10 +109,9 @@ enum PixelFormat {
 
     PIX_FMT_RGB32_1,   ///< Packed RGB 8:8:8, 32bpp, (msb)8R 8G 8B 8A(lsb), in cpu endianness
     PIX_FMT_BGR32_1,   ///< Packed RGB 8:8:8, 32bpp, (msb)8B 8G 8R 8A(lsb), in cpu endianness
-  
+
     PIX_FMT_GRAY16BE,  ///<        Y        , 16bpp, big-endian
     PIX_FMT_GRAY16LE,  ///<        Y        , 16bpp, little-endian
-
     PIX_FMT_NB,        ///< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
 };
 
@@ -118,11 +120,13 @@ enum PixelFormat {
 #define PIX_FMT_BGRA PIX_FMT_BGR32_1
 #define PIX_FMT_ARGB PIX_FMT_RGB32
 #define PIX_FMT_ABGR PIX_FMT_BGR32
+#define PIX_FMT_GRAY16 PIX_FMT_GRAY16BE
 #else
 #define PIX_FMT_RGBA PIX_FMT_BGR32
 #define PIX_FMT_BGRA PIX_FMT_RGB32
 #define PIX_FMT_ARGB PIX_FMT_BGR32_1
 #define PIX_FMT_ABGR PIX_FMT_RGB32_1
+#define PIX_FMT_GRAY16 PIX_FMT_GRAY16LE
 #endif
 
 #if LIBAVUTIL_VERSION_INT < (50<<16)
