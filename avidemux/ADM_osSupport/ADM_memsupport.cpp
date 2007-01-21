@@ -154,11 +154,39 @@ void operator delete[] (void *c)
 //********************************
 // lavcodec wrapper
 //********************************
+extern "C"
+{
 void *av_malloc(unsigned int size)
 {
  	return ADM_alloc(size);
 }
+void av_freep(void *arg)
+{
+    void **ptr= (void**)arg;
+    av_free(*ptr);
+    *ptr = NULL;
+}
 
+void *av_mallocz(unsigned int size)
+{
+    void *ptr;
+
+    ptr = av_malloc(size);
+    if (ptr)
+        memset(ptr, 0, size);
+    return ptr;
+}
+}
+char *av_strdup(const char *s)
+{
+    char *ptr;
+    int len;
+    len = strlen(s) + 1;
+    ptr = (char *)av_malloc(len);
+    if (ptr)
+        memcpy(ptr, s, len);
+    return ptr;
+}
 /**
  * av_realloc semantics (same as glibc): if ptr is NULL and size > 0,
  * identical to malloc(size). If size is zero, it is identical to

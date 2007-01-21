@@ -356,6 +356,7 @@ dnl we force mjpeg as it is now bundled
 AC_DEFINE(USE_MJPEG,1,[MJPEG])
 AC_DEFINE(AMR_NB,1,[AMR_NB])
 AC_DEFINE(CONFIG_AMR_NB,1,[AMR_NB])
+AC_DEFINE(CONFIG_DVVIDEO_ENCODER,1,[DV encoder])
 dnl AC_DEFINE(USE_MP3,0,[libmad])
 dnl AC_DEFINE(USE_MPEG,0,[libmpeg3])
 dnl AC_DEFINE(OSS_SUPPORT,0,[OSS])

@@ -21,8 +21,8 @@
 #include <string.h>
 
 #include "config.h"
-#define always_inline inline
 #include "default.h"
+#include "common.h"
 #include "bswap.h"
 #include "ADM_assert.h"
 #include "ADM_audio/aviaudio.hxx"

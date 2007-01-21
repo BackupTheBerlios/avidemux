@@ -137,6 +137,16 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MES(  _4x4I,  I4x4);
   param.i_log_level=X264_LOG_INFO;
   
+  /*
+     int         i_vbv_max_bitrate;
+        int         i_vbv_buffer_size;
+        float       f_vbv_buffer_init;
+
+  */
+  printf("VBV_max_br         :%d\n", param.rc.i_vbv_max_bitrate);
+  printf("vbv_buffer_size    :%d\n", param.rc.i_vbv_buffer_size);
+  printf("f_vbv_buffer_init  :%f\n", param.rc.f_vbv_buffer_init);
+  
   if(zparam->globalHeader)
       param.b_repeat_headers=0;
   else

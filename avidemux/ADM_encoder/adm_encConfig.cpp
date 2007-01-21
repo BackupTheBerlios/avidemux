@@ -956,7 +956,9 @@ uint8_t oplug_mpegInit(void)
 */
 void setPSP_X264Preset(void)
 {
+  
  memcpy(&x264Extra,&x264ExtraPSP,sizeof(x264ExtraPSP)); 
+ printf("Cabac :%u\n",x264Extra.CABAC);
 }
 #endif
 uint8_t oplug_mpegStore(void)

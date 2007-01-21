@@ -619,7 +619,7 @@ NULL,//     char      *logfile;
 };
 /**************************************/
 ADM_x264Param x264ExtraPSP = {
-0,//     uint32_t  globalHeader;
+1,//     uint32_t  globalHeader;
 0,//     uint32_t  nbThreads;
 NULL,//     char      *logfile;
 //     //
@@ -655,12 +655,12 @@ NULL,//     char      *logfile;
 4,//     uint32_t PartitionDecision;
 32, //Range
 1,//     uint32_t Method;
-4,//     uint32_t AR_Num;
-3,//     uint32_t AR_Den;
+1,//     uint32_t AR_Num;
+1,//     uint32_t AR_Den;
 1,//     uint32_t DeblockingFilter;
 0,//     int32_t  Strength;
 0,//     int32_t  Threshold;
-0,//     uint32_t CABAC;
+1,//     uint32_t CABAC;
 0,//     uint32_t Trellis;
 1, //        ChromaME
 0, // Mixed Ref

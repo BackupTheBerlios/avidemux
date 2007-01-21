@@ -146,6 +146,7 @@ int pid,adapt,start,len;
 		}
 		if(isPMT(pid))
 			{
+				printf("PMT Id: 0x%x\n",pid);
 				decodePMT();
 				continue;
 			}

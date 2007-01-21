@@ -66,7 +66,7 @@ uint8_t scratchPad[SCRATCH_PAD_SIZE];
         _context->codec_id = CODEC_ID_QDM2;
             else ADM_assert(0);
 
-    _context->extradata=(void *)d;
+    _context->extradata=(uint8_t *)d;
     _context->extradata_size=(int)l;
     printf(" Using %ld bytes of extra header data\n",l);
     mixDump((uint8_t *)_context->extradata,_context->extradata_size);
