@@ -1,22 +1,24 @@
 /*
-    Copyright (C) 2001-2003 Michael Niedermayer (michaelni@gmx.at)
-
-    AltiVec optimizations (C) 2004 Romain Dolbeau <romain@dolbeau.org>
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-*/
+ * Copyright (C) 2001-2003 Michael Niedermayer (michaelni@gmx.at)
+ *
+ * AltiVec optimizations (C) 2004 Romain Dolbeau <romain@dolbeau.org>
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 
 /**
  * @file postprocess.c
@@ -72,6 +74,7 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 //Changelog: use the Subversion log
 
 #include "config.h"
+#include "avutil.h"
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,7 +88,7 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 //#undef ARCH_X86
 //#define DEBUG_BRIGHTNESS
 #ifdef USE_FASTMEMCPY
-#include "fastmemcpy.h"
+#include "libvo/fastmemcpy.h"
 #endif
 #include "postprocess.h"
 #include "postprocess_internal.h"
@@ -95,20 +98,6 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #ifdef HAVE_ALTIVEC_H
 #include <altivec.h>
 #endif
-    /// MEANX
-#define ADM_LEGACY_PROGGY
-#include "../../../ADM_assert.h"
-    
-    /// /MEANX
-/*    
-#ifndef HAVE_MEMALIGN
-#define memalign(a,b) malloc(b)
-#endif*/
-
-#define MIN(a,b) ((a) > (b) ? (b) : (a))
-#define MAX(a,b) ((a) < (b) ? (b) : (a))
-#define ABS(a) ((a) > 0 ? (a) : (-(a)))
-#define SIGN(a) ((a) > 0 ? 1 : -1)
 
 #define GET_MODE_BUFFER_SIZE 500
 #define OPTIONS_ARRAY_SIZE 10
@@ -116,15 +105,7 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #define TEMP_STRIDE 8
 //#define NUM_BLOCKS_AT_ONCE 16 //not used yet
 
-#if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
-#    define attribute_used __attribute__((used))
-#    define always_inline __attribute__((always_inline)) inline
-#else
-#    define attribute_used
-#    define always_inline inline
-#endif
-
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 static uint64_t __attribute__((aligned(8))) attribute_used w05= 0x0005000500050005LL;
 static uint64_t __attribute__((aligned(8))) attribute_used w04= 0x0004000400040004LL;
 static uint64_t __attribute__((aligned(8))) attribute_used w20= 0x0020002000200020LL;
@@ -137,8 +118,6 @@ static uint64_t __attribute__((aligned(8))) attribute_used b80= 0x80808080808080
 
 static uint8_t clip_table[3*256];
 static uint8_t * const clip_tab= clip_table + 256;
-
-static const int verbose= 0;
 
 static const int attribute_used deringThreshold= 20;
 
@@ -177,7 +156,7 @@ static const char *replaceTable[]=
 };
 
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 static inline void prefetchnta(void *p)
 {
         asm volatile(   "prefetchnta (%0)\n\t"
@@ -351,17 +330,17 @@ static inline void doHorizDefFilter_C(uint8_t dst[], int stride, PPContext *c)
         {
                 const int middleEnergy= 5*(dst[4] - dst[3]) + 2*(dst[2] - dst[5]);
 
-                if(ABS(middleEnergy) < 8*c->QP)
+                if(FFABS(middleEnergy) < 8*c->QP)
                 {
                         const int q=(dst[3] - dst[4])/2;
                         const int leftEnergy=  5*(dst[2] - dst[1]) + 2*(dst[0] - dst[3]);
                         const int rightEnergy= 5*(dst[6] - dst[5]) + 2*(dst[4] - dst[7]);
 
-                        int d= ABS(middleEnergy) - MIN( ABS(leftEnergy), ABS(rightEnergy) );
-                        d= MAX(d, 0);
+                        int d= FFABS(middleEnergy) - FFMIN( FFABS(leftEnergy), FFABS(rightEnergy) );
+                        d= FFMAX(d, 0);
 
                         d= (5*d + 32) >> 6;
-                        d*= SIGN(-middleEnergy);
+                        d*= FFSIGN(-middleEnergy);
 
                         if(q>0)
                         {
@@ -390,8 +369,8 @@ static inline void doHorizLowPass_C(uint8_t dst[], int stride, PPContext *c)
         int y;
         for(y=0; y<BLOCK_SIZE; y++)
         {
-                const int first= ABS(dst[-1] - dst[0]) < c->QP ? dst[-1] : dst[0];
-                const int last= ABS(dst[8] - dst[7]) < c->QP ? dst[8] : dst[7];
+                const int first= FFABS(dst[-1] - dst[0]) < c->QP ? dst[-1] : dst[0];
+                const int last= FFABS(dst[8] - dst[7]) < c->QP ? dst[8] : dst[7];
 
                 int sums[10];
                 sums[0] = 4*first + dst[0] + dst[1] + dst[2] + 4;
@@ -433,7 +412,7 @@ static inline void horizX1Filter(uint8_t *src, int stride, int QP)
         if(lut==NULL)
         {
                 int i;
-                lut= (uint64_t*)memalign(8, 256*8);
+                lut = av_malloc(256*8);
                 for(i=0; i<256; i++)
                 {
                         int v= i < 128 ? 2*i : 2*(i-256);
@@ -466,11 +445,11 @@ static inline void horizX1Filter(uint8_t *src, int stride, int QP)
                 int b= src[3] - src[4];
                 int c= src[5] - src[6];
 
-                int d= MAX(ABS(b) - (ABS(a) + ABS(c))/2, 0);
+                int d= FFMAX(FFABS(b) - (FFABS(a) + FFABS(c))/2, 0);
 
                 if(d < QP)
                 {
-                        int v = d * SIGN(-b);
+                        int v = d * FFSIGN(-b);
 
                         src[1] +=v/8;
                         src[2] +=v/4;
@@ -487,7 +466,7 @@ static inline void horizX1Filter(uint8_t *src, int stride, int QP)
 /**
  * accurate deblock filter
  */
-static always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, PPContext *c){
+static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, PPContext *c){
         int y;
         const int QP= c->QP;
         const int dcOffset= ((c->nonBQP*c->ppMode.baseDcDiff)>>8) + 1;
@@ -526,8 +505,8 @@ static always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, PPC
                                 }
                         }
                         if(max-min < 2*QP){
-                                const int first= ABS(src[-1*step] - src[0]) < QP ? src[-1*step] : src[0];
-                                const int last= ABS(src[8*step] - src[7*step]) < QP ? src[8*step] : src[7*step];
+                                const int first= FFABS(src[-1*step] - src[0]) < QP ? src[-1*step] : src[0];
+                                const int last= FFABS(src[8*step] - src[7*step]) < QP ? src[8*step] : src[7*step];
 
                                 int sums[10];
                                 sums[0] = 4*first + src[0*step] + src[1*step] + src[2*step] + 4;
@@ -553,17 +532,17 @@ static always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, PPC
                 }else{
                         const int middleEnergy= 5*(src[4*step] - src[3*step]) + 2*(src[2*step] - src[5*step]);
 
-                        if(ABS(middleEnergy) < 8*QP)
+                        if(FFABS(middleEnergy) < 8*QP)
                         {
                                 const int q=(src[3*step] - src[4*step])/2;
                                 const int leftEnergy=  5*(src[2*step] - src[1*step]) + 2*(src[0*step] - src[3*step]);
                                 const int rightEnergy= 5*(src[6*step] - src[5*step]) + 2*(src[4*step] - src[7*step]);
 
-                                int d= ABS(middleEnergy) - MIN( ABS(leftEnergy), ABS(rightEnergy) );
-                                d= MAX(d, 0);
+                                int d= FFABS(middleEnergy) - FFMIN( FFABS(leftEnergy), FFABS(rightEnergy) );
+                                d= FFMAX(d, 0);
 
                                 d= (5*d + 32) >> 6;
-                                d*= SIGN(-middleEnergy);
+                                d*= FFSIGN(-middleEnergy);
 
                                 if(q>0)
                                 {
@@ -602,7 +581,7 @@ static always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, PPC
 #endif //HAVE_ALTIVEC
 #endif //ARCH_POWERPC
 
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
 
 #if (defined (HAVE_MMX) && !defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
 #define COMPILE_MMX
@@ -615,7 +594,7 @@ static always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, PPC
 #if (defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
 #define COMPILE_3DNOW
 #endif
-#endif //ARCH_X86
+#endif /* defined(ARCH_X86) */
 
 #undef HAVE_MMX
 #undef HAVE_MMX2
@@ -683,7 +662,7 @@ static inline void postProcess(uint8_t src[], int srcStride, uint8_t dst[], int 
         // difference wouldnt be messureable here but its much better because
         // someone might exchange the cpu whithout restarting mplayer ;)
 #ifdef RUNTIME_CPUDETECT
-#if defined(ARCH_X86) || defined(ARCH_X86_64)
+#if defined(ARCH_X86)
         // ordered per speed fasterst first
         if(c->cpuCaps & PP_CPU_CAPS_MMX2)
                 postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
@@ -776,7 +755,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
         struct PPMode *ppMode;
         char *filterToken;
 
-        ppMode= memalign(8, sizeof(PPMode));
+        ppMode= av_malloc(sizeof(PPMode));
 
         ppMode->lumMode= 0;
         ppMode->chromMode= 0;
@@ -792,7 +771,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
 
         strncpy(temp, name, GET_MODE_BUFFER_SIZE);
 
-        if(verbose>1) printf("pp: %s\n", name);
+        av_log(NULL, AV_LOG_DEBUG, "pp: %s\n", name);
 
         for(;;){
                 char *filterName;
@@ -810,7 +789,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
                 if(filterToken == NULL) break;
                 p+= strlen(filterToken) + 1; // p points to next filterToken
                 filterName= strtok(filterToken, optionDelimiters);
-                if(verbose>1) printf("pp: %s::%s\n", filterToken, filterName);
+                av_log(NULL, AV_LOG_DEBUG, "pp: %s::%s\n", filterToken, filterName);
 
                 if(*filterName == '-')
                 {
@@ -822,7 +801,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
                         option= strtok(NULL, optionDelimiters);
                         if(option == NULL) break;
 
-                        if(verbose>1) printf("pp: option: %s\n", option);
+                        av_log(NULL, AV_LOG_DEBUG, "pp: option: %s\n", option);
                         if(!strcmp("autoq", option) || !strcmp("a", option)) q= quality;
                         else if(!strcmp("nochrom", option) || !strcmp("y", option)) chrom=0;
                         else if(!strcmp("chrom", option) || !strcmp("c", option)) chrom=1;
@@ -863,7 +842,6 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
 
                 for(i=0; filters[i].shortName!=NULL; i++)
                 {
-//                        printf("Compareing %s, %s, %s\n", filters[i].shortName,filters[i].longName, filterName);
                         if(   !strcmp(filters[i].longName, filterName)
                            || !strcmp(filters[i].shortName, filterName))
                         {
@@ -950,24 +928,23 @@ pp_mode_t *pp_get_mode_by_name_and_quality(char *name, int quality)
                 ppMode->error += numOfUnknownOptions;
         }
 
-        if(verbose>1) printf("pp: lumMode=%X, chromMode=%X\n", ppMode->lumMode, ppMode->chromMode);
+        av_log(NULL, AV_LOG_DEBUG, "pp: lumMode=%X, chromMode=%X\n", ppMode->lumMode, ppMode->chromMode);
         if(ppMode->error)
         {
-                fprintf(stderr, "%d errors in postprocess string \"%s\"\n", ppMode->error, name);
-                free(ppMode);
+                av_log(NULL, AV_LOG_ERROR, "%d errors in postprocess string \"%s\"\n", ppMode->error, name);
+                av_free(ppMode);
                 return NULL;
         }
         return ppMode;
 }
 
 void pp_free_mode(pp_mode_t *mode){
-    if(mode) free(mode);
+    av_free(mode);
 }
 
 static void reallocAlign(void **p, int alignment, int size){
-        if(*p) free(*p);
-        *p= memalign(alignment, size);
-        memset(*p, 0, size);
+        av_free(*p);
+        *p= av_mallocz(size);
 }
 
 static void reallocBuffers(PPContext *c, int width, int height, int stride, int qpStride){
@@ -1006,14 +983,21 @@ static void global_init(void){
         memset(clip_table+512, 0, 256);
 }
 
+static const char * context_to_name(void * ptr) {
+    return "postproc";
+}
+
+static AVClass av_codec_context_class = { "Postproc", context_to_name, NULL };
+
 pp_context_t *pp_get_context(int width, int height, int cpuCaps){
-        PPContext *c= memalign(32, sizeof(PPContext));
+        PPContext *c= av_malloc(sizeof(PPContext));
         int stride= (width+15)&(~15);    //assumed / will realloc if needed
         int qpStride= (width+15)/16 + 2; //assumed / will realloc if needed
 
         global_init();
 
         memset(c, 0, sizeof(PPContext));
+        c->av_class = &av_codec_context_class;
         c->cpuCaps= cpuCaps;
         if(cpuCaps&PP_FORMAT){
                 c->hChromaSubSample= cpuCaps&0x3;
@@ -1034,21 +1018,21 @@ void pp_free_context(void *vc){
         PPContext *c = (PPContext*)vc;
         int i;
 
-        for(i=0; i<3; i++) free(c->tempBlured[i]);
-        for(i=0; i<3; i++) free(c->tempBluredPast[i]);
+        for(i=0; i<3; i++) av_free(c->tempBlured[i]);
+        for(i=0; i<3; i++) av_free(c->tempBluredPast[i]);
 
-        free(c->tempBlocks);
-        free(c->yHistogram);
-        free(c->tempDst);
-        free(c->tempSrc);
-        free(c->deintTemp);
-        free(c->stdQPTable);
-        free(c->nonBQPTable);
-        free(c->forcedQPTable);
+        av_free(c->tempBlocks);
+        av_free(c->yHistogram);
+        av_free(c->tempDst);
+        av_free(c->tempSrc);
+        av_free(c->deintTemp);
+        av_free(c->stdQPTable);
+        av_free(c->nonBQPTable);
+        av_free(c->forcedQPTable);
 
         memset(c, 0, sizeof(PPContext));
 
-        free(c);
+        av_free(c);
 }
 
 void  pp_postprocess(uint8_t * src[3], int srcStride[3],
@@ -1061,14 +1045,14 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
         int mbHeight= (height+15)>>4;
         PPMode *mode = (PPMode*)vm;
         PPContext *c = (PPContext*)vc;
-        int minStride= MAX(ABS(srcStride[0]), ABS(dstStride[0]));
-        int absQPStride = ABS(QPStride);
+        int minStride= FFMAX(FFABS(srcStride[0]), FFABS(dstStride[0]));
+        int absQPStride = FFABS(QPStride);
 
         // c->stride and c->QPStride are always positive
         if(c->stride < minStride || c->qpStride < absQPStride)
                 reallocBuffers(c, width, height,
-                                MAX(minStride, c->stride),
-                                MAX(c->qpStride, absQPStride));
+                                FFMAX(minStride, c->stride),
+                                FFMAX(c->qpStride, absQPStride));
 
         if(QP_store==NULL || (mode->lumMode & FORCE_QUANT))
         {
@@ -1080,7 +1064,6 @@ void  pp_postprocess(uint8_t * src[3], int srcStride[3],
                 else
                         for(i=0; i<mbWidth; i++) QP_store[i]= 1;
         }
-//printf("pict_type:%d\n", pict_type);
 
         if(pict_type & PP_PICT_TYPE_QP2){
                 int i;
@@ -1099,11 +1082,11 @@ if(0){
 int x,y;
 for(y=0; y<mbHeight; y++){
         for(x=0; x<mbWidth; x++){
-                printf("%2d ", QP_store[x + y*QPStride]);
+                av_log(c, AV_LOG_INFO, "%2d ", QP_store[x + y*QPStride]);
         }
-        printf("\n");
+        av_log(c, AV_LOG_INFO, "\n");
 }
-        printf("\n");
+        av_log(c, AV_LOG_INFO, "\n");
 }
 
         if((pict_type&7)!=3)
@@ -1127,10 +1110,8 @@ for(y=0; y<mbHeight; y++){
                 }
         }
 
-        if(verbose>2)
-        {
-                printf("using npp filters 0x%X/0x%X\n", mode->lumMode, mode->chromMode);
-        }
+        av_log(c, AV_LOG_DEBUG, "using npp filters 0x%X/0x%X\n",
+               mode->lumMode, mode->chromMode);
 
         postProcess(src[0], srcStride[0], dst[0], dstStride[0],
                 width, height, QP_store, QPStride, 0, mode, c);

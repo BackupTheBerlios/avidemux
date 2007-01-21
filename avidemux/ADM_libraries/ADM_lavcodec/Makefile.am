@@ -38,7 +38,7 @@ EXTEND_PPC=
 endif
 EXTEND_AMR=	amr_float/interf_dec.c amr_float/sp_dec.c \
 		amr_float/interf_enc.c amr_float/sp_enc.c
-MYCFLAGS= -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -Iamr_float -I../.. -I$(LAVUTIL)
+MYCFLAGS= -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -Iamr_float -I../.. -I$(LAVUTIL) -Drestrict=__restrict__
 # for SSE we need special compil flags
 fft_sse.o:i386/fft_sse.c
 	$(CC) -o $@ $< -c $(MYCFLAGS) $(CFLAGS) $(all_includes) -I..   -msse -I$(LAVUTIL) -I../../..
@@ -58,7 +58,7 @@ libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c $(EXTEND_AMR) \
 		truemotion1.c flac.c g726.c 	qtrle.c lcl.c 	snow.c  \
 		rangecoder.c bitstream.c h264idct.c h261.c amr.c tscc.c \
 		resample2.c imgresample.c pthread.c qdm2.c bitstream_filter.c eval.c \
-		vc1.c vc1dsp.c
+		vc1.c vc1dsp.c vp56.c vp56data.c vp6.c vp5.c indeo2.c indeo3.c  smacker.c  opt.c
 	
 
 EXTRA_DIST = ac3.h    faandct.h      internal.h   \

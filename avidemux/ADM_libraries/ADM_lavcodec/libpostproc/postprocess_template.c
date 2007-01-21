@@ -1,19 +1,21 @@
 /*
-    Copyright (C) 2001-2002 Michael Niedermayer (michaelni@gmx.at)
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Copyright (C) 2001-2002 Michael Niedermayer (michaelni@gmx.at)
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
 /**
@@ -336,8 +338,8 @@ static inline void RENAME(doVertLowPass)(uint8_t *src, int stride, PPContext *c)
         src+= stride*3;
         for(x=0; x<BLOCK_SIZE; x++)
         {
-                const int first= ABS(src[0] - src[l1]) < c->QP ? src[0] : src[l1];
-                const int last= ABS(src[l8] - src[l9]) < c->QP ? src[l9] : src[l8];
+                const int first= FFABS(src[0] - src[l1]) < c->QP ? src[0] : src[l1];
+                const int last= FFABS(src[l8] - src[l9]) < c->QP ? src[l9] : src[l8];
 
                 int sums[10];
                 sums[0] = 4*first + src[l1] + src[l2] + src[l3] + 4;
@@ -458,7 +460,7 @@ static inline void RENAME(vertRK1Filter)(uint8_t *src, int stride, int QP)
         for(x=0; x<BLOCK_SIZE; x++)
         {
                 const int v = (src[x+l5] - src[x+l4]);
-                if(ABS(v) < QP15)
+                if(FFABS(v) < QP15)
                 {
                         src[x+l3] +=v>>3;
                         src[x+l4] +=v>>1;
@@ -587,12 +589,12 @@ static inline void RENAME(vertX1Filter)(uint8_t *src, int stride, PPContext *co)
                 int b= src[l4] - src[l5];
                 int c= src[l5] - src[l6];
 
-                int d= ABS(b) - ((ABS(a) + ABS(c))>>1);
-                d= MAX(d, 0);
+                int d= FFABS(b) - ((FFABS(a) + FFABS(c))>>1);
+                d= FFMAX(d, 0);
 
                 if(d < co->QP*2)
                 {
-                        int v = d * SIGN(-b);
+                        int v = d * FFSIGN(-b);
 
                         src[l2] +=v>>3;
                         src[l3] +=v>>2;
@@ -843,17 +845,17 @@ static inline void RENAME(doVertDefFilter)(uint8_t src[], int stride, PPContext 
         for(x=0; x<BLOCK_SIZE; x++)
         {
                 const int middleEnergy= 5*(src[l5] - src[l4]) + 2*(src[l3] - src[l6]);
-                if(ABS(middleEnergy)< 8*QP)
+                if(FFABS(middleEnergy)< 8*QP)
                 {
                         const int q=(src[l4] - src[l5])/2;
                         const int leftEnergy=  5*(src[l3] - src[l2]) + 2*(src[l1] - src[l4]);
                         const int rightEnergy= 5*(src[l7] - src[l6]) + 2*(src[l5] - src[l8]);
 
-                        int d= ABS(middleEnergy) - MIN( ABS(leftEnergy), ABS(rightEnergy) );
-                        d= MAX(d, 0);
+                        int d= FFABS(middleEnergy) - FFMIN( FFABS(leftEnergy), FFABS(rightEnergy) );
+                        d= FFMAX(d, 0);
 
                         d= (5*d + 32) >> 6;
-                        d*= SIGN(-middleEnergy);
+                        d*= FFSIGN(-middleEnergy);
 
                         if(q>0)
                         {
@@ -878,7 +880,7 @@ src-=8;
                 for(y=4; y<6; y++)
                 {
                         int d= src[x+y*stride] - tmp[x+(y-4)*8];
-                        int ad= ABS(d);
+                        int ad= FFABS(d);
                         static int max=0;
                         static int sum=0;
                         static int num=0;
@@ -894,7 +896,7 @@ src-=8;
                         num++;
                         if(num%1000000 == 0)
                         {
-                                printf(" %d %d %d %d\n", num, sum, max, bias);
+                                av_log(c, AV_LOG_INFO, " %d %d %d %d\n", num, sum, max, bias);
                         }
                 }
         }
@@ -1147,17 +1149,17 @@ src-=8;
         for(x=0; x<BLOCK_SIZE; x++)
         {
                 const int middleEnergy= 5*(src[l5] - src[l4]) + 2*(src[l3] - src[l6]);
-                if(ABS(middleEnergy) < 8*c->QP)
+                if(FFABS(middleEnergy) < 8*c->QP)
                 {
                         const int q=(src[l4] - src[l5])/2;
                         const int leftEnergy=  5*(src[l3] - src[l2]) + 2*(src[l1] - src[l4]);
                         const int rightEnergy= 5*(src[l7] - src[l6]) + 2*(src[l5] - src[l8]);
 
-                        int d= ABS(middleEnergy) - MIN( ABS(leftEnergy), ABS(rightEnergy) );
-                        d= MAX(d, 0);
+                        int d= FFABS(middleEnergy) - FFMIN( FFABS(leftEnergy), FFABS(rightEnergy) );
+                        d= FFMAX(d, 0);
 
                         d= (5*d + 32) >> 6;
-                        d*= SIGN(-middleEnergy);
+                        d*= FFSIGN(-middleEnergy);
 
                         if(q>0)
                         {
@@ -1489,7 +1491,7 @@ DERING_CORE((%0, %1, 8)    ,(%%REGd, %1, 4),%%mm2,%%mm4,%%mm0,%%mm3,%%mm5,%%mm1,
                                         static int worstRange=0;
                                         static int worstDiff=0;
                                         int diff= (f - *p);
-                                        int absDiff= ABS(diff);
+                                        int absDiff= FFABS(diff);
                                         int error= diff*diff;
 
                                         if(x==1 || x==8 || y==1 || y==8) continue;
@@ -1505,7 +1507,7 @@ DERING_CORE((%0, %1, 8)    ,(%%REGd, %1, 4),%%mm2,%%mm4,%%mm0,%%mm3,%%mm5,%%mm1,
 
                                         if(1024LL*1024LL*1024LL % numSkiped == 0)
                                         {
-                                                printf( "sum:%1.3f, skip:%d, wQP:%d, "
+                                                av_log(c, AV_LOG_INFO, "sum:%1.3f, skip:%d, wQP:%d, "
                                                         "wRange:%d, wDiff:%d, relSkip:%1.3f\n",
                                                         (float)errorSum/numSkiped, numSkiped, worstQP, worstRange,
                                                         worstDiff, (float)numSkiped/numPixels);
@@ -1530,7 +1532,7 @@ DERING_CORE((%0, %1, 8)    ,(%%REGd, %1, 4),%%mm2,%%mm4,%%mm0,%%mm3,%%mm5,%%mm1,
                         for(x=1; x<9; x++)
                         {
                                 p++;
-                                *p = MIN(*p + 20, 255);
+                                *p = FFMIN(*p + 20, 255);
                         }
                 }
 //                src[0] = src[7]=src[stride*7]=src[stride*7 + 7]=255;
@@ -2533,7 +2535,6 @@ L2_DIFF_CORE((%0, %%REGc)  , (%1, %%REGc))
                 :: "r" (src), "r" (tempBlured), "r"((long)stride), "m" (tempBluredPast)
                 : "%"REG_a, "%"REG_d, "%"REG_c, "memory"
                 );
-//printf("%d\n", test);
 #else //defined (HAVE_MMX2) || defined (HAVE_3DNOW)
 {
         int y;
@@ -2551,7 +2552,7 @@ L2_DIFF_CORE((%0, %%REGc)  , (%1, %%REGc))
                         int d1=ref - cur;
 //                        if(x==0 || x==7) d1+= d1>>1;
 //                        if(y==0 || y==7) d1+= d1>>1;
-//                        d+= ABS(d1);
+//                        d+= FFABS(d1);
                         d+= d1*d1;
 //                        sysd+= d1;
                 }
@@ -2566,7 +2567,6 @@ L2_DIFF_CORE((%0, %%REGc)  , (%1, %%REGc))
         *tempBluredPast=i;
 //        ((*tempBluredPast)*3 + d + 2)>>2;
 
-//printf("%d %d %d\n", maxNoise[0], maxNoise[1], maxNoise[2]);
 /*
 Switch between
  1  0  0  0  0  0  0  (0)
@@ -2645,7 +2645,7 @@ Switch between
 /**
  * accurate deblock filter
  */
-static always_inline void RENAME(do_a_deblock)(uint8_t *src, int step, int stride, PPContext *c){
+static av_always_inline void RENAME(do_a_deblock)(uint8_t *src, int step, int stride, PPContext *c){
         int64_t dc_mask, eq_mask, both_masks;
         int64_t sums[10*8*2];
         src+= step*3; // src points to begin of the 8x8 Block
@@ -3413,9 +3413,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
                 for(i=0; i<256; i++)
                 {
                         sum+= yHistogram[i];
-//                        printf("%d ", yHistogram[i]);
                 }
-//                printf("\n\n");
 
                 /* we allways get a completly black picture first */
                 maxClipped= (uint64_t)(sum * c.ppMode.maxClippedThreshold);
@@ -3531,7 +3529,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
                         dstBlock+=8;
                         srcBlock+=8;
                 }
-                if(width==ABS(dstStride))
+                if(width==FFABS(dstStride))
                         linecpy(dst, tempDst + 9*dstStride, copyAhead, dstStride);
                 else
                 {
@@ -3543,7 +3541,6 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
                 }
         }
 
-//printf("\n");
         for(y=0; y<height; y+=BLOCK_SIZE)
         {
                 //1% speedup if these are here instead of the inner loop
@@ -3554,7 +3551,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
                 uint8_t *tempBlock2= c.tempBlocks + 8;
 #endif
                 int8_t *QPptr= &QPs[(y>>qpVShift)*QPStride];
-                int8_t *nonBQPptr= &c.nonBQPTable[(y>>qpVShift)*ABS(QPStride)];
+                int8_t *nonBQPptr= &c.nonBQPTable[(y>>qpVShift)*FFABS(QPStride)];
                 int QP=0;
                 /* can we mess with a 8x16 block from srcBlock/dstBlock downwards and 1 line upwards
                    if not than use a temporary buffer */
@@ -3564,23 +3561,22 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
                         /* copy from line (copyAhead) to (copyAhead+7) of src, these will be copied with
                            blockcopy to dst later */
                         linecpy(tempSrc + srcStride*copyAhead, srcBlock + srcStride*copyAhead,
-                                MAX(height-y-copyAhead, 0), srcStride);
+                                FFMAX(height-y-copyAhead, 0), srcStride);
 
                         /* duplicate last line of src to fill the void upto line (copyAhead+7) */
-                        for(i=MAX(height-y, 8); i<copyAhead+8; i++)
-                                memcpy(tempSrc + srcStride*i, src + srcStride*(height-1), ABS(srcStride));
+                        for(i=FFMAX(height-y, 8); i<copyAhead+8; i++)
+                                memcpy(tempSrc + srcStride*i, src + srcStride*(height-1), FFABS(srcStride));
 
                         /* copy up to (copyAhead+1) lines of dst (line -1 to (copyAhead-1))*/
-                        linecpy(tempDst, dstBlock - dstStride, MIN(height-y+1, copyAhead+1), dstStride);
+                        linecpy(tempDst, dstBlock - dstStride, FFMIN(height-y+1, copyAhead+1), dstStride);
 
                         /* duplicate last line of dst to fill the void upto line (copyAhead) */
                         for(i=height-y+1; i<=copyAhead; i++)
-                                memcpy(tempDst + dstStride*i, dst + dstStride*(height-1), ABS(dstStride));
+                                memcpy(tempDst + dstStride*i, dst + dstStride*(height-1), FFABS(dstStride));
 
                         dstBlock= tempDst + dstStride;
                         srcBlock= tempSrc;
                 }
-//printf("\n");
 
                 // From this point on it is guranteed that we can read and write 16 lines downward
                 // finish 1 block before the next otherwise we might have a problem
@@ -3787,7 +3783,7 @@ static void RENAME(postProcess)(uint8_t src[], int srcStride, uint8_t dst[], int
                 if(y+15 >= height)
                 {
                         uint8_t *dstBlock= &(dst[y*dstStride]);
-                        if(width==ABS(dstStride))
+                        if(width==FFABS(dstStride))
                                 linecpy(dstBlock, tempDst + dstStride, height-y, dstStride);
                         else
                         {

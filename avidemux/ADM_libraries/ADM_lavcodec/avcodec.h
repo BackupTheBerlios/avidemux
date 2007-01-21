@@ -1,3 +1,23 @@
+/*
+ * copyright (c) 2001 Fabrice Bellard
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #ifndef AVCODEC_H
 #define AVCODEC_H
 
@@ -17,13 +37,13 @@ extern "C" {
 #define AV_STRINGIFY(s)         AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 
-#define LIBAVCODEC_VERSION_INT  ((51<<16)+(11<<8)+0)
-#define LIBAVCODEC_VERSION      51.11.0
+#define LIBAVCODEC_VERSION_INT  ((51<<16)+(28<<8)+0)
+#define LIBAVCODEC_VERSION      51.28.0
 #define LIBAVCODEC_BUILD        LIBAVCODEC_VERSION_INT
 
 #define LIBAVCODEC_IDENT        "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
 
-#define AV_NOPTS_VALUE          int64_t_C(0x8000000000000000)
+#define AV_NOPTS_VALUE          INT64_C(0x8000000000000000)
 #define AV_TIME_BASE            1000000
 #define AV_TIME_BASE_Q          (AVRational){1, AV_TIME_BASE}
 
@@ -119,6 +139,17 @@ enum CodecID {
     CODEC_ID_KMVC,
     CODEC_ID_FLASHSV,
     CODEC_ID_CAVS,
+    CODEC_ID_JPEG2000,
+    CODEC_ID_VMNC,
+    CODEC_ID_VP5,
+    CODEC_ID_VP6,
+    CODEC_ID_VP6F,
+    CODEC_ID_TARGA,
+    CODEC_ID_DSICINVIDEO,
+    CODEC_ID_TIERTEXSEQVIDEO,
+    CODEC_ID_TIFF,
+    CODEC_ID_GIF,
+    CODEC_ID_FFH264,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE= 0x10000,
@@ -176,7 +207,9 @@ enum CodecID {
     CODEC_ID_MP2= 0x15000,
     CODEC_ID_MP3, /* prefered ID for MPEG Audio layer 1, 2 or3 decoding */
     CODEC_ID_AAC,
+#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
     CODEC_ID_MPEG4AAC,
+#endif
     CODEC_ID_AC3,
     CODEC_ID_DTS,
     CODEC_ID_VORBIS,
@@ -200,6 +233,11 @@ enum CodecID {
     CODEC_ID_TRUESPEECH,
     CODEC_ID_TTA,
     CODEC_ID_SMACKAUDIO,
+    CODEC_ID_QCELP,
+    CODEC_ID_WAVPACK,
+    CODEC_ID_DSICINAUDIO,
+    CODEC_ID_IMC,
+    CODEC_ID_MUSEPACK7,
 
     /* subtitle codecs */
     CODEC_ID_DVD_SUBTITLE= 0x17000,
@@ -329,13 +367,15 @@ typedef struct RcOverride{
 #define CODEC_FLAG2_LOCAL_HEADER  0x00000008 ///< place global headers at every keyframe instead of in extradata
 #define CODEC_FLAG2_BPYRAMID      0x00000010 ///< H.264 allow b-frames to be used as references
 #define CODEC_FLAG2_WPRED         0x00000020 ///< H.264 weighted biprediction for b-frames
-#define CODEC_FLAG2_MIXED_REFS    0x00000040 ///< H.264 multiple references per partition
+#define CODEC_FLAG2_MIXED_REFS    0x00000040 ///< H.264 one reference per partition, as opposed to one reference per macroblock
 #define CODEC_FLAG2_8X8DCT        0x00000080 ///< H.264 high profile 8x8 transform
 #define CODEC_FLAG2_FASTPSKIP     0x00000100 ///< H.264 fast pskip
 #define CODEC_FLAG2_AUD           0x00000200 ///< H.264 access unit delimiters
 #define CODEC_FLAG2_BRDO          0x00000400 ///< b-frame rate-distortion optimization
 #define CODEC_FLAG2_INTRA_VLC     0x00000800 ///< use MPEG-2 intra VLC table
 #define CODEC_FLAG2_MEMC_ONLY     0x00001000 ///< only do ME/MC (I frames -> ref, P frame -> ME+MC)
+#define CODEC_FLAG2_DROP_FRAME_TIMECODE 0x00002000 ///< timecode is in drop frame format
+#define CODEC_FLAG2_SKIP_RD       0x00004000 ///< RD optimal MB level residual skiping
 //MEANX: NEVER EVER USE CLOSED GOP ?
 #define CODEC_FLAG2_32_PULLDOWN   0x80000000 
 
@@ -718,7 +758,7 @@ typedef struct AVCodecContext {
      * - encoding: set/allocated/freed by lavc.
      * - decoding: set/allocated/freed by user.
      */
-    void *extradata;
+    uint8_t *extradata;
     int extradata_size;
 
     /**
@@ -1083,7 +1123,6 @@ typedef struct AVCodecContext {
     int rc_max_rate;
     int rc_max_rate_header; /*< That one is set in the header MEANX */
 
-
     /**
      * minimum bitrate.
      * - encoding: set by user.
@@ -1097,7 +1136,7 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int rc_buffer_size;
-     int rc_buffer_size_header;  /*< That one is set in the header MEANX*/
+    int rc_buffer_size_header;  /*< That one is set in the header MEANX*/
     float rc_buffer_aggressivity;
 
     /**
@@ -1198,6 +1237,7 @@ typedef struct AVCodecContext {
 #define FF_IDCT_IPP          13
 #define FF_IDCT_XVIDMMX      14
 #define FF_IDCT_CAVS         15
+#define FF_IDCT_SIMPLEARMV5TE 16
 
     /**
      * slice count.
@@ -1861,7 +1901,7 @@ typedef struct AVCodecContext {
      * - encoding: set by user.
      * - decoding: unused
      */
-    int crf;
+    float crf;
 
     /**
      * constant quantization parameter rate control method
@@ -2027,6 +2067,13 @@ typedef struct AVCodecContext {
      * - decoding: unused.
      */
     int max_partition_order;
+
+    /**
+     * GOP timecode frame start number, in non drop frame format
+     * - encoding: set by user.
+     * - decoding: unused.
+     */
+    int64_t timecode_frame_start;
 } AVCodecContext;
 
 /**
@@ -2043,9 +2090,6 @@ typedef struct AVCodec {
     int (*decode)(AVCodecContext *, void *outdata, int *outdata_size,
                   uint8_t *buf, int buf_size);
     int capabilities;
-#if LIBAVCODEC_VERSION_INT < ((50<<16)+(0<<8)+0)
-    void *dummy; // FIXME remove next time we break binary compatibility
-#endif
     struct AVCodec *next;
     void (*flush)(AVCodecContext *);
     const AVRational *supported_framerates; ///array of supported framerates, or NULL if any, array is terminated by {0,0}
@@ -2065,6 +2109,7 @@ typedef struct AVPicture {
  * AVPaletteControl
  * This structure defines a method for communicating palette changes
  * between and demuxer and a decoder.
+ * this is totally broken, palette changes should be sent as AVPackets
  */
 #define AVPALETTE_SIZE 1024
 #define AVPALETTE_COUNT 256
@@ -2080,7 +2125,7 @@ typedef struct AVPaletteControl {
      * data is probably 6 bits in size and needs to be scaled */
     unsigned int palette[AVPALETTE_COUNT];
 
-} AVPaletteControl;
+} AVPaletteControl attribute_deprecated;
 
 typedef struct AVSubtitleRect {
     uint16_t x;
@@ -2107,6 +2152,7 @@ extern AVCodec mp3lame_encoder;
 extern AVCodec oggvorbis_encoder;
 extern AVCodec faac_encoder;
 extern AVCodec flac_encoder;
+extern AVCodec gif_encoder;
 extern AVCodec xvid_encoder;
 extern AVCodec mpeg1video_encoder;
 extern AVCodec mpeg2video_encoder;
@@ -2140,6 +2186,7 @@ extern AVCodec asv2_encoder;
 extern AVCodec vcr1_encoder;
 extern AVCodec ffv1_encoder;
 extern AVCodec snow_encoder;
+extern AVCodec vorbis_encoder;
 extern AVCodec mdec_encoder;
 extern AVCodec zlib_encoder;
 extern AVCodec sonic_encoder;
@@ -2147,6 +2194,7 @@ extern AVCodec sonic_ls_encoder;
 extern AVCodec svq1_encoder;
 extern AVCodec x264_encoder;
 
+extern AVCodec gif_decoder;
 extern AVCodec h263_decoder;
 extern AVCodec h261_decoder;
 extern AVCodec mpeg4_decoder;
@@ -2194,6 +2242,9 @@ extern AVCodec h264_decoder;
 extern AVCodec indeo3_decoder;
 extern AVCodec vp3_decoder;
 extern AVCodec theora_decoder;
+extern AVCodec vp5_decoder;
+extern AVCodec vp6_decoder;
+extern AVCodec vp6f_decoder;
 extern AVCodec amr_nb_decoder;
 extern AVCodec amr_nb_encoder;
 extern AVCodec amr_wb_encoder;
@@ -2256,12 +2307,22 @@ extern AVCodec libgsm_decoder;
 extern AVCodec bmp_decoder;
 extern AVCodec mmvideo_decoder;
 extern AVCodec zmbv_decoder;
+extern AVCodec zmbv_encoder;
 extern AVCodec avs_decoder;
 extern AVCodec smacker_decoder;
 extern AVCodec smackaud_decoder;
 extern AVCodec kmvc_decoder;
 extern AVCodec flashsv_decoder;
 extern AVCodec cavs_decoder;
+extern AVCodec vmnc_decoder;
+extern AVCodec wavpack_decoder;
+extern AVCodec targa_decoder;
+extern AVCodec dsicinvideo_decoder;
+extern AVCodec dsicinaudio_decoder;
+extern AVCodec tiertexseqvideo_decoder;
+extern AVCodec tiff_decoder;
+extern AVCodec imc_decoder;
+extern AVCodec mpc7_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -2454,7 +2515,21 @@ int avcodec_default_execute(AVCodecContext *c, int (*func)(AVCodecContext *c2, v
  */
 int avcodec_open(AVCodecContext *avctx, AVCodec *codec);
 
-int avcodec_decode_audio(AVCodecContext *avctx, int16_t *samples,
+
+attribute_deprecated int avcodec_decode_audio(AVCodecContext *avctx, int16_t *samples,
+                         int *frame_size_ptr,
+                         uint8_t *buf, int buf_size);
+/**
+ * Decode an audio frame.
+ *
+ * @param avctx the codec context.
+ * @param samples output buffer, 16 byte aligned
+ * @param frame_size_ptr the output buffer size in bytes (you MUST set this to the allocated size before calling avcodec_decode_audio2()), zero if no frame could be compressed
+ * @param buf input buffer, 16 byte aligned
+ * @param buf_size the input buffer size
+ * @return 0 if successful, -1 if not.
+ */
+int avcodec_decode_audio2(AVCodecContext *avctx, int16_t *samples,
                          int *frame_size_ptr,
                          uint8_t *buf, int buf_size);
 int avcodec_decode_video(AVCodecContext *avctx, AVFrame *picture,
@@ -2596,12 +2671,12 @@ void av_bitstream_filter_close(AVBitStreamFilterContext *bsf);
 extern AVBitStreamFilter dump_extradata_bsf;
 extern AVBitStreamFilter remove_extradata_bsf;
 extern AVBitStreamFilter noise_bsf;
+extern AVBitStreamFilter mp3_header_compress_bsf;
+extern AVBitStreamFilter mp3_header_decompress_bsf;
+extern AVBitStreamFilter mjpega_dump_header_bsf;
 
 
 /* memory */
-void *av_mallocz(unsigned int size);
-char *av_strdup(const char *s);
-void av_freep(void *ptr);
 void *av_fast_realloc(void *ptr, unsigned int *size, unsigned int min_size);
 /* for static data only */
 /* call av_free_static to release all staticaly allocated tables */
@@ -2617,20 +2692,6 @@ int img_crop(AVPicture *dst, const AVPicture *src,
 
 int img_pad(AVPicture *dst, const AVPicture *src, int height, int width, int pix_fmt,
             int padtop, int padbottom, int padleft, int padright, int *color);
-
-/* endian macros */
-#if !defined(BE_16) || !defined(BE_32) || !defined(LE_16) || !defined(LE_32)
-#define BE_16(x)  ((((uint8_t*)(x))[0] << 8) | ((uint8_t*)(x))[1])
-#define BE_32(x)  ((((uint8_t*)(x))[0] << 24) | \
-                   (((uint8_t*)(x))[1] << 16) | \
-                   (((uint8_t*)(x))[2] << 8) | \
-                    ((uint8_t*)(x))[3])
-#define LE_16(x)  ((((uint8_t*)(x))[1] << 8) | ((uint8_t*)(x))[0])
-#define LE_32(x)  ((((uint8_t*)(x))[3] << 24) | \
-                   (((uint8_t*)(x))[2] << 16) | \
-                   (((uint8_t*)(x))[1] << 8) | \
-                    ((uint8_t*)(x))[0])
-#endif
 
 extern unsigned int av_xiphlacing(unsigned char *s, unsigned int v);
 

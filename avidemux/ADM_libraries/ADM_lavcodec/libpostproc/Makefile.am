@@ -11,12 +11,10 @@ libpostproc_a_SOURCES =  postprocess.c
 EXTRA_DIST = 
 
 ####### kdevelop will overwrite this part!!! (end)############
+INCLUDES = $(all_includes)   -I../.. -DHAVE_AV_CONFIG_H  -I../../../ADM_libraries/ADM_lavutil/
 if BUILD_A64
-INCLUDES = $(all_includes)   -I../.. -DHAVE_AV_CONFIG_H -DHAVE_MMX -msse
-else
-INCLUDES = $(all_includes)   -I../.. -DHAVE_AV_CONFIG_H
+INCLUDES +=-DHAVE_MMX -msse 
 endif
-
 noinst_HEADERS =  
 
 
