@@ -356,7 +356,7 @@ uint8_t
 #else
   param.rc.b_cbr = 1;
 #endif
-  param.rc.i_bitrate = val / 1000;
+  param.rc.i_bitrate = val ;
 //  param.rc.i_rc_buffer_size=val/1000;
 //  param.rc.i_rc_init_buffer=(val/1000)>>1;
   return preamble (fps1000, zparam);

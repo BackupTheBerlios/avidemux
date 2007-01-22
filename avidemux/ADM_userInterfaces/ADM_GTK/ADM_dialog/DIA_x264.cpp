@@ -109,7 +109,7 @@ uint8_t DIA_x264(COMPRES_PARAMS *config)
           switch(generic.mode)
           {
             case COMPRESS_CBR:
-              generic.bitrate=b*1000;
+              generic.bitrate=b;
               break;
 
             case COMPRESS_2PASS:              
@@ -148,7 +148,7 @@ void updateMode( void )
   {
     case COMPRESS_CBR:
         COMBO(2);
-      b=generic.bitrate/1000;
+      b=generic.bitrate;
       ENTRY_SET(Target,b);     
       gtk_label_set_text(GTK_LABEL(WID(labelTarget)),"Target bitrate (kb/s):");
       DISABLE(spinbuttonQuantizer);

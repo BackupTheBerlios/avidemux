@@ -632,15 +632,15 @@ NULL,//     char      *logfile;
 4,//     uint32_t  QpStep;
 //     //
 1, //     uint32_t maxRefScene
-40,//     uint32_t  SceneCut;
+0,//     uint32_t  SceneCut;
 25,//     uint32_t  MinIdr;
 250,//     uint32_t  MaxIdr;
 //     //
-1,//     uint32_t  _8x8;
-1,//     uint32_t   _8x8P;
-1,//     uint32_t   _8x8B;
+0,//     uint32_t  _8x8;
+0,//     uint32_t   _8x8P;
+0,//     uint32_t   _8x8B;
 0,//     uint32_t   _4x4;
-1,//     uint32_t   _8X8I;
+0,//     uint32_t   _8X8I;
 0,//     uint32_t   _4x4I;
 //     //
 0,//     uint32_t  MaxBFrame;
@@ -653,16 +653,16 @@ NULL,//     char      *logfile;
 0,//     uint32_t DirectMode;
 //     //
 4,//     uint32_t PartitionDecision;
-32, //Range
+4,//              Range
 1,//     uint32_t Method;
 1,//     uint32_t AR_Num;
 1,//     uint32_t AR_Den;
-1,//     uint32_t DeblockingFilter;
+0,//     uint32_t DeblockingFilter;
 0,//     int32_t  Strength;
 0,//     int32_t  Threshold;
 1,//     uint32_t CABAC;
 0,//     uint32_t Trellis;
-1, //        ChromaME
+0, //        ChromaME
 0, // Mixed Ref
 0, //NoiseReduction
 30 // level IDC for psp  

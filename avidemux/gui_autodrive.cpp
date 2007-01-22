@@ -45,6 +45,7 @@ extern void setVideoEncoderSettings (COMPRESSION_MODE mode, uint32_t param,     
 
 uint8_t A_autoDrive(Action action)
 {
+  uint32_t fq;
         //
         if(!currentaudiostream)
         {
@@ -83,6 +84,7 @@ uint8_t A_autoDrive(Action action)
                             }
                             // Set mode & bitrate 
                             setVideoEncoderSettings(COMPRESS_CBR,768,0,NULL);
+                            fq=24000;
                           }
                           break;
                     case ACT_AUTO_PSP_H264:
@@ -92,6 +94,7 @@ uint8_t A_autoDrive(Action action)
                           setPSP_X264Preset(); 
                           setVideoEncoderSettings(COMPRESS_CBR,768,0,NULL);
 #endif
+                          fq=48000;
                     }
                     break;
                     
@@ -99,7 +102,7 @@ uint8_t A_autoDrive(Action action)
                           ADM_assert(0);
                     }
                     // Audio Codec
-                    if((currentaudiostream->getInfo()->frequency==PSP_AUDIO_FQ)&&
+                    if((currentaudiostream->getInfo()->frequency==fq)&&
                         (currentaudiostream->getInfo()->channels==2)&&
                         (currentaudiostream->getInfo()->encoding==WAV_AAC))
                     {
@@ -114,9 +117,9 @@ uint8_t A_autoDrive(Action action)
                                         _( "You don't have FAAC!.\nIt is needed to create PSP compatible video."));
 #endif
                                     // ? Needed ?
-                          if(currentaudiostream->getInfo()->frequency!=PSP_AUDIO_FQ)
+                          if(currentaudiostream->getInfo()->frequency!=fq)
                           {
-                              audioFilterResample(PSP_AUDIO_FQ);
+                              audioFilterResample(fq);
                           }
                           audioFilter_SetBitrate(128);
                       }
