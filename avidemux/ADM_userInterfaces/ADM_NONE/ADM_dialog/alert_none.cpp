@@ -242,15 +242,6 @@ uint8_t  GUI_getDoubleValue(double *valye, float min, float max, const char *tit
   
   return 0; 
 }
-uint8_t  GUI_getIntegerValue(int *valye, int min, int max, const char *title)
-{
- boxStart();
-  boxAdd("INTEGERVALUE stub");
-  boxAdd(title);
-  boxEnd();
-  
-  return 0; 
-}
 
 uint8_t		isQuiet(void)
 {

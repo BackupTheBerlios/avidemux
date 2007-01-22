@@ -228,13 +228,6 @@ uint8_t  GUI_getDoubleValue(double *valye, float min, float max, const char *tit
   return 0; 
 }
 //****************************************************************************************************
-uint8_t  GUI_getIntegerValue(int *valye, int min, int max, const char *title)
-{
- 
-  
-  return 0; 
-}
-//****************************************************************************************************
 uint8_t		isQuiet(void)
 {
     return beQuiet;

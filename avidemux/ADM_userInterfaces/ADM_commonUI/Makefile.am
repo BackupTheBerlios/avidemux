@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libADM_CommonUI.a 
 libADM_CommonUI_a_METASOURCES = AUTO
-libADM_CommonUI_a_SOURCES = GUI_sdlRender.cpp  GUI_xvRender.cpp  DIA_resizeWiz.cpp DIA_builtin.cpp DIA_postproc.cpp
+libADM_CommonUI_a_SOURCES = GUI_sdlRender.cpp  GUI_xvRender.cpp  DIA_resizeWiz.cpp DIA_builtin.cpp DIA_postproc.cpp DIA_enter.cpp
 
 
 INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@ \

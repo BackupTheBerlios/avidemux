@@ -113,10 +113,6 @@ int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor){return 0;}
 int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor){return 0;}
 uint8_t getFFCompressParams (COMPRES_PARAMS * incoming) {return 0;}
 uint8_t DIA_quota(char *) {return 0;}
-uint8_t  DIA_GetFloatValue(float *value, float min, float max, const char *title, const char *legend){return 0;}
-uint8_t  DIA_GetIntegerValue(int *value, int min, int max, const char *title, const char *legend){return 0;}
-
-uint8_t  DIA_enterString_HIG(const char *title, const char *second, char **outname){return 0;}
 
 uint8_t  DIA_job_select(char **jobname, char **filename) {return 0;}
 uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, audioInfo *infos){return 0;}
