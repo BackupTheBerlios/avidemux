@@ -189,6 +189,67 @@ uint8_t	AUDMEncoder_Lame::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samp
         *len=nbout;
         return 1;
 }
+/**
+      \fn DIA_getLameSettings
+      \brief Dialog to set lame settings
+      @return 1 on success, 0 on failure
 
-
+*/
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor)
+  {
+    int ret=0;
+    char string[400];
+    uint32_t mmode,ppreset;
+#define SZT(x) sizeof(x)/sizeof(diaMenuEntry )
+#define PX(x) &(lameParam->x)
+    
+    
+    LAME_encoderParam *lameParam;
+    ADM_assert(sizeof(LAME_encoderParam)==descriptor->paramSize);
+  
+    lameParam=(LAME_encoderParam*)descriptor->param;
+    mmode=lameParam->mode;
+    ppreset=lameParam->preset;
+    diaMenuEntry channelMode[]={
+                             {ADM_STEREO,      _("Stereo"),NULL},
+                             {ADM_JSTEREO,   _("Joint stereo"),NULL},
+                             {ADM_MONO,      _("Mono"),NULL}};
+          
+    diaElemMenu menuMode(&mmode,   _("Channel Mode"), SZT(channelMode),channelMode);
+    
+    diaMenuEntry encodingMode[]={
+                             {ADM_LAME_PRESET_CBR,      _("CBR"),NULL},
+                             {ADM_LAME_PRESET_ABR,   _("ABR"),NULL},
+                             {ADM_LAME_PRESET_EXTREME,      _("Extreme"),NULL}}; 
+    diaElemMenu Mode(&ppreset,   _("Mode"), SZT(encodingMode),encodingMode);
+#define BITRATE(x) {x,_(#x)}
+    diaMenuEntry bitrateM[]={
+                              BITRATE(56),
+                              BITRATE(64),
+                              BITRATE(80),
+                              BITRATE(96),
+                              BITRATE(112),
+                              BITRATE(128),
+                              BITRATE(160),
+                              BITRATE(192),
+                              BITRATE(224)
+                          };
+    diaElemMenu bitrate(&(descriptor->bitrate),   _("Bitrate"), SZT(bitrateM),bitrateM);
+    
+    
+    
+    
+    diaElemUInteger quality(PX(quality),_("Quality"),0,9);
+  
+      diaElem *elems[]={&menuMode,&Mode,&quality,&bitrate};
+    
+  if( diaFactoryRun("Lame Settings",4,elems))
+  {
+    lameParam->mode=(ADM_mode)mmode; 
+    lameParam->preset=(ADM_LAME_PRESET)ppreset;
+    return 1;
+  }
+  return 0;
+}  
 #endif

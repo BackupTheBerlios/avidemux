@@ -82,6 +82,7 @@ unsigned long int samples_input, max_bytes_output;
 faacEncConfigurationPtr cfg;
 int ret=0;
 
+    printf("[FAAC] Incoming Fq :%u\n",_wavheader->frequency);
      _handle = faacEncOpen(_wavheader->frequency,
                                  _wavheader->channels,
                                  &samples_input,
@@ -220,6 +221,5 @@ _again:
         tmphead+=_chunk;
         return 1;
 }
-
 #endif		
 // EOF

@@ -7,8 +7,8 @@
 #include "audioencoder_vorbis_param.h"
 #include "audioencoder_aften_param.h"
 
-extern int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor);
-extern int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor);
+
+
 extern int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor);
 /**** Copy ****/
 
@@ -23,6 +23,7 @@ ADM_audioEncoderDescriptor copyDescriptor=
   NULL
 };
 /**** FAAC ****/
+#ifdef USE_FAAC
 FAAC_encoderParam aacParam={128};
 ADM_audioEncoderDescriptor aacDescriptor=
 {
@@ -34,6 +35,7 @@ ADM_audioEncoderDescriptor aacDescriptor=
         sizeof(aacParam),
         &aacParam
 };
+#endif
 /**** LAME ****/
 LAME_encoderParam lameParam=
 {
@@ -41,6 +43,8 @@ LAME_encoderParam lameParam=
   ADM_STEREO,
   2
 };
+#ifdef HAVE_LIBMP3LAME
+extern int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor);
 ADM_audioEncoderDescriptor  lameDescriptor=
 {
   AUDIOENC_MP3,
@@ -51,6 +55,7 @@ ADM_audioEncoderDescriptor  lameDescriptor=
   sizeof(lameParam),
   &lameParam
 };
+#endif
 /**** TWOLAME ****/
 TWOLAME_encoderParam twolameParam=
 {
@@ -89,6 +94,8 @@ ADM_audioEncoderDescriptor  lavcodecAC3Descriptor=
 };
 
 /************** Vorbis **************/
+#ifdef USE_VORBIS
+extern int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor);
 VORBIS_encoderParam vorbisParam=
 {
   ADM_VORBIS_VBR,
@@ -105,6 +112,7 @@ ADM_audioEncoderDescriptor  vorbisDescriptor=
   sizeof(vorbisParam),
   &vorbisParam
 };
+#endif
 /********** PCM **************/
 ADM_audioEncoderDescriptor  pcmDescriptor=
 {
@@ -147,17 +155,23 @@ ADM_audioEncoderDescriptor  aftenDescriptor=
 ADM_audioEncoderDescriptor *allDescriptors[]=
 {
       &copyDescriptor,
+#ifdef USE_FAAC
       &aacDescriptor,
+#endif
       &twolameDescriptor,
       &lavcodecAC3Descriptor,
       &lavcodecMP2Descriptor,
+#ifdef USE_VORBIS
       &vorbisDescriptor ,
-      &pcmDescriptor,
-      &lpcmDescriptor,
-#ifdef USE_AFTEN
-      &aftenDescriptor,
 #endif      
-      &lameDescriptor
+      &pcmDescriptor,
+      &lpcmDescriptor
+#ifdef USE_AFTEN
+      ,&aftenDescriptor
+#endif
+#ifdef HAVE_LIBMP3LAME
+      ,&lameDescriptor
+#endif
 };
 #define NB_AUDIO_DESCRIPTOR (sizeof(allDescriptors)/sizeof(ADM_audioEncoderDescriptor *))
 #endif
