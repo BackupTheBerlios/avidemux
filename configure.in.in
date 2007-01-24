@@ -1152,6 +1152,7 @@ case $host_cpu in
                 AC_DEFINE(HAVE_MMX,1,[post proc])       
                 AC_DEFINE(FPM_INTEL,1,[Mad ])       
 		AC_DEFINE(RUNTIME_CPUDETECT,1,"Let ffmpeg decide which is faster")		
+		AC_DEFINE(ARCH_X86_32,1,"X86_32  assembly")
                 use_mmx=1
 		echo "X86 is ON"
 		;;
