@@ -38,7 +38,7 @@ EXTEND_PPC=
 endif
 EXTEND_AMR=	amr_float/interf_dec.c amr_float/sp_dec.c \
 		amr_float/interf_enc.c amr_float/sp_enc.c
-MYCFLAGS= -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -Iamr_float -I../.. -I$(LAVUTIL) -Drestrict=__restrict__
+MYCFLAGS= -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -Iamr_float -I../.. -I$(LAVUTIL) -Drestrict=__restrict__ -fomit-frame-pointer
 # for SSE we need special compil flags
 fft_sse.o:i386/fft_sse.c
 	$(CC) -o $@ $< -c $(MYCFLAGS) $(CFLAGS) $(all_includes) -I..   -msse -I$(LAVUTIL) -I../../..
