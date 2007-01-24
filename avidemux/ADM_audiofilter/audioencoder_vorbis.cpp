@@ -240,5 +240,66 @@ uint8_t	AUDMEncoder_Vorbis::getPacket(uint8_t *dest, uint32_t *len, uint32_t *sa
   return 0;
 	
 }
+/**
+      \fn DIA_getLameSettings
+      \brief Dialog to set lame settings
+      @return 1 on success, 0 on failure
+
+*/
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+int DIA_getVorbisSettings(ADM_audioEncoderDescriptor *descriptor)
+  {
+    int ret=0;
+    char string[400];
+    uint32_t mmode,ppreset;
+    ELEM_TYPE_FLOAT qqual;
+#define SZT(x) sizeof(x)/sizeof(diaMenuEntry )
+#define PX(x) &(lameParam->x)
+    
+    
+   VORBIS_encoderParam *vorbisParam;
+  ADM_assert(sizeof(VORBIS_encoderParam)==descriptor->paramSize);
+  vorbisParam=(VORBIS_encoderParam*)descriptor->param;
+  
+    mmode=vorbisParam->mode;
+    qqual=(ELEM_TYPE_FLOAT)vorbisParam->quality;
+    
+    diaMenuEntry channelMode[]={
+                             {ADM_VORBIS_VBR,      _("VBR"),NULL},
+                             {ADM_VORBIS_QUALITY,   _("Quality Based"),NULL}};
+          
+    diaElemMenu menuMode(&mmode,   _("Mode"), SZT(channelMode),channelMode);
+    
+#define BITRATE(x) {x,_(#x)}
+    diaMenuEntry bitrateM[]={
+                              BITRATE(56),
+                              BITRATE(64),
+                              BITRATE(80),
+                              BITRATE(96),
+                              BITRATE(112),
+                              BITRATE(128),
+                              BITRATE(160),
+                              BITRATE(192),
+                              BITRATE(224)
+                          };
+    diaElemMenu bitrate(&(descriptor->bitrate),   _("Bitrate"), SZT(bitrateM),bitrateM);
+    
+    diaElemFloat quality(&qqual,_("Quality"),-1.,10.);
+    
+    
+    
+  
+      diaElem *elems[]={&menuMode,&bitrate,&quality};
+    
+  if( diaFactoryRun("Vorbis Settings",3,elems))
+  {
+    vorbisParam->mode=(ADM_VORBIS_MODE)mmode;
+    vorbisParam->quality=(float)qqual;
+    
+    return 1;
+  }
+  return 0;
+}  
+
 #endif		
 // EOF
