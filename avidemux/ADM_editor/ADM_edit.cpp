@@ -1447,7 +1447,6 @@ uint8_t r=0;
 //    Try indexing the file, return 1 if file successfully indexed 
 //              0 else
 //_________________________________________
-extern uint8_t DIA_dmx(char *file,DMX_TYPE format,uint32_t nbTracks, MPEG_TRACK *tracks, uint32_t *selectedTracks);
 //
 uint8_t         ADM_Composer::tryIndexing(char *name,char *idxname)
 {

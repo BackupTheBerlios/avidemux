@@ -119,8 +119,8 @@ int sdl_version=0;
     printf(" FreeBSD   : Anish Mistry, amistry@am-productions.biz\n");
 
 
-#if defined( ARCH_X86)  
-      printf("Compiled for X86 Arch.\n");
+#if defined(ARCH_X86_32)
+      printf("Compiled for X86_32 Arch.\n");
 #endif
 #if defined(ARCH_X86_64)
       printf("Compiled for X86_64 Arch.\n");
@@ -133,7 +133,11 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 #endif
 #ifdef HAVE_GETTEXT
   char *local=setlocale (LC_ALL, "");
+#ifndef CYG_MANGLING
   bindtextdomain ("avidemux", ADMLOCALE);
+#else
+  bindtextdomain ("avidemux", "./share/locale");
+#endif
   bind_textdomain_codeset ("avidemux", "UTF-8");
   
   if(local)
