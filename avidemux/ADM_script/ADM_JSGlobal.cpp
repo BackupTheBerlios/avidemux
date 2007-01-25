@@ -83,7 +83,9 @@ bool SpidermonkeyInit()
 
 void SpidermonkeyDestroy()
 {// begin SpidermonkeyDestroy
+#ifdef ADM_JS_THREADSAFE
 	JS_SetContextThread(g_pCx);
+#endif
 	JS_DestroyContext(g_pCx);
 	JS_DestroyRuntime(g_pRt);
 }// end SpidermonkeyDestroy
@@ -98,8 +100,10 @@ void *StartThreadSpidermonkey(void *pData)
         http://archive.gingerall.cz/archives/public/sablot2004/msg00117.html
         */
         // Notify the Spidermonkey that we'll be processing in a thread
+#ifdef ADM_JS_THREADSAFE
         JS_SetContextThread(g_pCx);
         JS_BeginRequest(g_pCx);
+#endif
         bool ret = false;
         const char *pScriptFile = static_cast<const char *>(pData);
         ret = parseECMAScript(pScriptFile);
@@ -110,9 +114,11 @@ void *StartThreadSpidermonkey(void *pData)
                 actual_workbench_file = ADM_strdup(pScriptFile);
         }
         // Notify Spidermonkey that our thread processing has finished
+#ifdef ADM_JS_THREADSAFE
         JS_EndRequest(g_pCx);
         JS_ClearContextThread(g_pCx);
         pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
+#endif
         return NULL;
 }// end StartThreadSpidermonkey
 

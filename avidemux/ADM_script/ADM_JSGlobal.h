@@ -42,7 +42,7 @@ JSVAR( JSClass, g_globalClass,)
         JS_ConvertStub,  JS_FinalizeStub }
 #endif
         ;
-#if 0
+#if !defined(ADM_JS_THREADSAFE)
 #define enterLock() {}
 #define leaveLock() {}
 #else
