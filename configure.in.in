@@ -450,18 +450,6 @@ AC_PATH_PROG(XML_CONFIG, xml2-config, no)
 if test "x$have_xml2" = "xyes"; then
 AC_DEFINE(USE_LIBXML2,1,[LibXML2 is available])
 fi
-dnl ______________ nspr _____________
-AC_CHECK_HEADER(nspr/nspr.h,,have_nspr=no)
-if test "x$have_nspr" = "xno"; then
-        AC_MSG_WARN(I did not find nspr/nspr.h.)
-        AC_MSG_ERROR([** Please install it**])
-fi
-AC_CHECK_LIB(nspr4,PR_JoinThreadPool,,have_nspr=no )
-if test "x$have_nspr" = "xno"; then
-        AC_MSG_WARN(I did not find libnspr4 )
-        AC_MSG_ERROR([** Please install it**])
-fi
-
 dnl __________________divx______________
 dnl __________________Aften ______________
 
