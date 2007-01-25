@@ -41,7 +41,6 @@
 #include "ADM_encoder/adm_encConfig.h"
 #include "prefs.h"
 #include "ADM_audiodevice/audio_out.h"
-#include "ADM_script/ADM_JSGlobal.h"
 #include "ADM_toolkit/ADM_intfloat.h"
 #ifdef USE_XVID_4
 extern void xvid4_init(void);
@@ -93,6 +92,13 @@ extern uint8_t win32_netInit(void);
 
 extern int UI_Init(int nargc,char **nargv);
 extern int UI_RunApp(void);
+
+// Spidermonkey/Scripting stuff  
+bool SpidermonkeyInit(void);
+void SpidermonkeyDestroy(void);
+
+
+extern pthread_mutex_t g_pSpiderMonkeyMutex;
 int CpuCaps::myCpuCaps=0;
 
 int main(int argc, char *argv[])

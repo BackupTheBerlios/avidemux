@@ -38,7 +38,6 @@
 #include "fourcc.h"
 #include "avio.hxx"
 #include "ADM_editor/ADM_edit.hxx"
-#include "ADM_script/ADM_JSGlobal.h"
 #include "ADM_inpics/ADM_pics.h"
 #include "ADM_nuv/ADM_nuv.h"
 #include "ADM_h263/ADM_h263.h"

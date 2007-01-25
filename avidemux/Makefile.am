@@ -81,6 +81,7 @@ ADM_filter/filter_saveload.o 				\
 ./ADM_audiocodec/libADM_audiocodec.a			\
 ./ADM_audio/libADM_audio.a				\
 ./ADM_script/libADM_script.a				\
+./ADM_libraries/ADM_smjs/libADM_smjs.a			\
 ./ADM_videoFilter/libADM_videoFilter.a			\
 ./ADM_video/libADM_video.a				\
 ./ADM_colorspace/libADM_colorspace.a			\

@@ -395,6 +395,7 @@ have_ppc=no
 have_x264=yes
 have_libdca=yes
 have_aften=yes
+have_nspr=yes
 dnl ____________________ Cygwin / mingwin ? ___________
 use_cygwin=no
 AC_MSG_CHECKING(win32 host)
@@ -449,7 +450,17 @@ AC_PATH_PROG(XML_CONFIG, xml2-config, no)
 if test "x$have_xml2" = "xyes"; then
 AC_DEFINE(USE_LIBXML2,1,[LibXML2 is available])
 fi
-
+dnl ______________ nspr _____________
+AC_CHECK_HEADER(nspr/nspr.h,,have_nspr=no)
+if test "x$have_nspr" = "xno"; then
+        AC_MSG_WARN(I did not find nspr/nspr.h.)
+        AC_MSG_ERROR([** Please install it**])
+fi
+AC_CHECK_LIB(nspr4,PR_JoinThreadPool,,have_nspr=no )
+if test "x$have_nspr" = "xno"; then
+        AC_MSG_WARN(I did not find libnspr4 )
+        AC_MSG_ERROR([** Please install it**])
+fi
 
 dnl __________________divx______________
 dnl __________________Aften ______________
@@ -1016,52 +1027,6 @@ CXXFLAGS="$CXXFLAGS -pg "
 CFLAGS="$CFLAGS -pg "
 LDFLAGS="$LDFLAGS -pg "
 fi
-dnl __________________SPIDERMONKEY ______________
-have_sm=yes
-SMONKEY_CFLAGS=""
-AC_MSG_CHECKING(spidermonkey engine )
- AC_ARG_WITH(jsapi-include,
-    [    --with-jsapi-include=PATH       path to jsapi.h],[],[])
-  if test "${with_jsapi_include}" != "no" -a -n "${with_jsapi_include}"
-  then
-    SMONKEY_CFLAGS="-I${with_jsapi_include}"
-    if test "x$use_cygwin" = "xyes"; then
-	SMONKEY_CFLAGS="$SMONKEY_CFLAGS -DXP_WIN"
-    else
-	SMONKEY_CFLAGS="$SMONKEY_CFLAGS -DXP_UNIX"
-    fi
-  fi
- echo "using : $SMONKEY_CFLAGS : as extra flags"
-
- old_flags=$CPPFLAGS
-
-CPPFLAGS="$CPPFLAGS $SMONKEY_CFLAGS"
-AC_CHECK_HEADER(jsapi.h,,have_sm=no)
-if test "x$have_sm" = "xyes"; then
-   AC_CHECK_LIB(js,JS_SuspendRequest,,have_sm=no,-lm)
-   if test "x$have_sm" = "xno"; then
-	have_sm="yes"
-     	AC_CHECK_LIB(smjs,JS_SuspendRequest,,have_sm=no,-lm)
-        if test "x$have_sm" = "xno"; then
-             dnl fedora core 3 - firefox/thunderbird/mozilla have this lib
-             have_sm="yes"
-             AC_CHECK_LIB(mozjs,JS_SuspendRequest,,have_sm=no,)
-        fi
-   fi
-fi
-if test "x$have_sm" = "xno"; then
-    	AC_MSG_WARN(I did not find a working copy of jsapi.h and the associated library.)
-    	AC_MSG_WARN(<1>- Not reachable : Make sure you have spidermonkey installed)
-    	AC_MSG_WARN(Then use --with-jsapi-include=/path/to/jsapi.h/)
-    	AC_MSG_WARN(<2>- Make sure the library is in your LD_LIBRARY_PATH and/or LDFLAGS)
-    	AC_MSG_WARN(<3>- Make sure multithreading is enabled in your spidermonkey)
-	AC_MSG_WARN(The ones from mozilla-dev or firefox-dev are ok)
-	AC_MSG_ERROR([*** Working SPIDERMONKEY javascript engine not found !***])
-fi
-CPPFLAGS=$old_flags
-dnl ________/SPIDERMONKEY__________
-
-
 
 dnl ______________________________
 dnl          Xvideo
