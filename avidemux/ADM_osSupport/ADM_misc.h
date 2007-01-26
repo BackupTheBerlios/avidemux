@@ -55,6 +55,8 @@ uint8_t         ADM_fileExist(char *name);
 #ifdef CYG_MANGLING
 #ifndef HAVE_STRUCT_TIMESPEC
 #define HAVE_STRUCT_TIMESPEC
+extern "C"
+{
 	typedef struct timespec
 	{
 		time_t tv_sec;
@@ -62,6 +64,7 @@ uint8_t         ADM_fileExist(char *name);
 	};
 
 	void gettimeofday(struct timeval *p, void *tz);
+	};
 	#define timezone int
 	#define TIMZ int
 #endif

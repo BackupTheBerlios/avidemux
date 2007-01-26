@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "default.h" 
+#include "ADM_misc.h"
 
 
 #ifdef CYG_MANGLING
