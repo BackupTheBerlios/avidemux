@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "config.h"
-
+#define WIN32_CLASH
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
