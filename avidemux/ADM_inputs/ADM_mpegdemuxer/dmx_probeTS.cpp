@@ -70,6 +70,13 @@ static uint8_t dmx_probePMT(dmx_demuxerTS *demuxer, uint32_t pmtId,MPEG_TRACK *p
  
 extern uint32_t mpegTsCRC(uint8_t *data, uint32_t len);
 
+uint8_t runProbe(const char *file)
+{
+  uint32_t nb;
+  MPEG_TRACK *t;
+  return  dmx_probeTSPat(file, &nb,&t);
+  
+}
 
 uint8_t dmx_probeTS(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks)
 {
@@ -341,12 +348,6 @@ MpegAudioInfo mpegInfo;
       return 1;
       
 }
-uint8_t runProbe(const char *file)
-{
-  uint32_t nb;
-  return  dmx_probeTSPat(file, &nb,NULL);
-  
-}
 /**
       \fn     dmx_searchAndSkipHeader
       \brief  Search for a given PSI and skip header
@@ -407,9 +408,9 @@ uint8_t dmx_searchAndSkipHeader(uint32_t myPid,dmx_demuxerTS *demuxer,uint32_t *
               
               sectionLength=misc&0xFFF;
               
-              if(sectionLength<=9 || left <=9)
+              if(sectionLength<=9 || sectionLength >= (left-4-4) || left<9)
               {
-                printf("SectionLength too short :%d\n", sectionLength);
+                printf("SectionLength too short :%d,left %d\n", sectionLength,left);
                  parser->setpos(startPos-1+left); // skip packet
                  continue;
               }

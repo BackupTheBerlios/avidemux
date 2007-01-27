@@ -85,18 +85,26 @@ dmxAudioStream::open (char *name)
   uint32_t aPid, vPid, aPes,mainAudio;
   uint32_t nbGop, nbFrame,nbAudioStream;
   int multi;
-
+  char payload[MAX_LINE];
+  uint32_t oldIndex=0;
+  
+  
  file=fopen(name,"rt");
  if(!file) return 0;
 
   printf ("\n  opening dmx file for audio track : %s\n", name);
   fgets (string, MAX_LINE, file);	// File header
-  if (strncmp (string, "ADMX", 4))
+  if (strncmp (string, "ADMY", 4))
     {
-      fclose (file);
-      printf ("This is not a mpeg index G2\n");
-      ADM_assert (0);
+       if (strncmp (string, "ADMX", 4))
+       {
+          fclose (file);
+          printf ("This is not a mpeg index G2\n");
+          ADM_assert (0);
+       }
+       oldIndex=1;
     }
+    
 
 
   fgets (string, MAX_LINE, file);
@@ -125,7 +133,12 @@ char *start;
 
   fgets (string, MAX_LINE, file);
   sscanf (string, "Picture  : %u x %u %u fps\n", &w, &h, &fps);	// width...
-
+  if(!oldIndex)
+  {
+   fgets (string, MAX_LINE, file);
+   payload[0]=0;
+   sscanf (string, "Payload  : %s\n",payload);	// FIXME ! overflow possible
+  }
   fgets (string, MAX_LINE, file);
   sscanf (string, "Nb Gop   : %u \n", &nbGop);	// width...
 

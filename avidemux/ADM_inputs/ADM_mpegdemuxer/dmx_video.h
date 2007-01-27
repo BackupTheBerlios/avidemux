@@ -19,6 +19,7 @@ typedef struct dmxIndex
  class dmxHeader : public vidHeader
 {
 protected:
+        dmx_payloadType         _payloadType;
         uint8_t                 asyncJump(uint32_t frame)       ;
         uint8_t                 getFrameMpeg(uint32_t framenum,uint8_t *ptr,uint32_t* framelen,
                                                                                                 uint32_t *flags);

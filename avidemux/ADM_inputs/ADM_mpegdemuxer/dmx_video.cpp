@@ -195,10 +195,12 @@ uint8_t                 dmxHeader::open(char *name)
                 char     realname[1024];
                 uint32_t dummy;
                 uint32_t vPid,vTsId;
+                char     payload[MAX_LINE+1];
                 
                 char string[MAX_LINE+1]; //,str[1024];;
                 uint8_t interlac=0;
                 int multi;
+                uint32_t oldIndex=0;
                         
                 printf("\n  opening d2v file : %s\n",name);
                 file=fopen(name,"rt");
@@ -209,11 +211,15 @@ uint8_t                 dmxHeader::open(char *name)
                         }
                 
                 fgets(string,MAX_LINE,file);        // File header
-                if(strncmp(string,"ADMX",4))
+                if(strncmp(string,"ADMY",4))
                 {
+                    if(strncmp(string,"ADMX",4)) // Older index file ?
+                    {
                         fclose(file);
                         printf("This is not a mpeg index G2\n");
                          return 0;
+                    }
+                    oldIndex=1;
                 }
         
                 
@@ -246,6 +252,37 @@ char *start;
                 fgets(string,MAX_LINE,file);
                 sscanf(string,"Picture  : %u x %u %u fps\n",&w,&h,&fps); // width...
 
+                payload[0]=0;
+                if(!oldIndex)
+                {
+                    fgets(string,MAX_LINE,file);
+                    sscanf (string, "Payload  : %s\n",payload);	// FIXME ! overflow possible
+                    if(!strncmp(payload,"MPEG",4))
+                    {
+                          _payloadType=DMX_PAYLOAD_MPEG2;
+                    }else
+                    {
+                      if(!strncmp(payload,"H264",4))
+                      {
+                            _payloadType=DMX_PAYLOAD_H264;
+                      }else
+                      {
+                        if(!strncmp(payload,"MP_4",4))
+                        {
+                              _payloadType=DMX_PAYLOAD_MPEG4;
+                        }else
+                        {
+                          ADM_assert(0); 
+                        }
+                        
+                      }
+                    }
+                }else
+                {
+                  _payloadType=DMX_PAYLOAD_MPEG2;
+                }
+                
+                
                 fgets(string,MAX_LINE,file);
                 sscanf(string,"Nb Gop   : %u \n",&_nbGop); // width...
 
@@ -476,7 +513,14 @@ char *start;
                         _videostream.fccType=fourCC::get((uint8_t *)"vids");
                         _video_bih.biBitCount=24;
       
-                        _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"MPEG");;
+                        switch(_payloadType)
+                        {
+                          case DMX_PAYLOAD_MPEG2:_videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"MPEG");;break;
+                          case DMX_PAYLOAD_MPEG4:_videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"DX50");;break;
+                          case DMX_PAYLOAD_H264:_videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)"H264");;break;
+                          default: ADM_assert(0);
+                        }
+                        
       
                         _videostream.dwInitialFrames= 0;
                         _videostream.dwStart= 0;

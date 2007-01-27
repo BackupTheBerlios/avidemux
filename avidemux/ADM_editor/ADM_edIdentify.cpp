@@ -209,7 +209,7 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
                 *type=ECMAScript_FileType;
                 return 1;
         }
-        if(fourCC::check(id,(uint8_t *)"ADMX"))
+        if(fourCC::check(id,(uint8_t *)"ADMY") ||fourCC::check(id,(uint8_t *)"ADMX") )
         {
                 printf (" \n New mpeg index file detected..\n");
                 *type=NewMpeg_FileType;

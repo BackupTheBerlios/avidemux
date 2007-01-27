@@ -115,7 +115,7 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
         uint8_t  mpegTypeChar;
         uint32_t multi=0;
         uint64_t firstPicPTS=ADM_NO_PTS;
-        
+        dmx_payloadType payloadType=DMX_PAYLOAD_MPEG2;
         
 
 
@@ -141,7 +141,14 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                                 dmx=new dmx_demuxerTS(nbTracks,tracks,0);
                                 demuxer=dmx;
                                 mpegTypeChar='T';
+                                switch(tracks[0].streamType)
+                                {
+                                  case ADM_STREAM_H264:       payloadType=DMX_PAYLOAD_H264;break;
+                                  case ADM_STREAM_MPEG4:      payloadType=DMX_PAYLOAD_MPEG4;break;
+                                  case ADM_STREAM_MPEG_VIDEO: payloadType=DMX_PAYLOAD_MPEG2;break;
+                                default: ADM_assert(0);
                                 break;
+                                }
                                 }
                 case DMX_MPG_ES:
                                 demuxer=new dmx_demuxerES;
@@ -179,12 +186,13 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                         delete [] realname;
                         return 0;
         }
-        qfprintf(out,"ADMX0003\n");
+        qfprintf(out,"ADMY0003\n");
         qfprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
         qfprintf(out,"File     : %s\n",realname);
         qfprintf(out,"Append   : %d\n",multi);
         qfprintf(out,"Image    : %c\n",'P'); // Progressive
         qfprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",0,0,0); // width...
+        qfprintf(out,"Payload  : %c%c%c%c\n",'M','P','E','G'); // width...
         qfprintf(out,"Nb Gop   : %08lu \n",0); // width...
         qfprintf(out,"Nb Images: %010lu \n",0); // width...
         qfprintf(out,"Nb Audio : %02lu\n",nbTracks-1); 
@@ -406,12 +414,25 @@ stop_found:
 
         // Now dump the delta PTS
         // *****************Update header*************
-        qfprintf(out,"ADMX0003\n");
+        qfprintf(out,"ADMY0003\n");
         qfprintf(out,"Type     : %c\n",mpegTypeChar); // ES for now
         qfprintf(out,"File     : %s\n",realname);
         qfprintf(out,"Append   : %d\n",multi);
         qfprintf(out,"Image    : %c\n",type); // Progressive
         qfprintf(out,"Picture  : %04lu x %04lu %05lu fps\n",imageW,imageH,imageFps); // width...
+        switch(payloadType)
+        {
+          case DMX_PAYLOAD_MPEG2:
+                            qfprintf(out,"Payload  : MPEG"); // MPEG,MP_4,H264
+                            break;
+          case DMX_PAYLOAD_MPEG4:
+                            qfprintf(out,"Payload  : MP_4"); // MPEG,MP_4,H264
+                            break;
+          case DMX_PAYLOAD_H264:
+                            qfprintf(out,"Payload  : H264"); // MPEG,MP_4,H264
+                            break;
+          default: ADM_assert(0);
+        }                            
         qfprintf(out,"Nb Gop   : %08lu \n",nbGop); // width...
         qfprintf(out,"Nb Images: %010lu \n",nbImage); // width...
 
