@@ -70,209 +70,89 @@ static const uint32_t FPS[16]={
         };
 
 
-
-
-
-static uint8_t Push(runData *run,uint32_t ftype,uint64_t abs,uint64_t rel);
-static uint8_t gopDump(runData *run,uint64_t abs,uint64_t rel,uint32_t nbTracks);
-static uint8_t gopUpdate(runData *run);
-uint8_t dumpPts(FILE *fd,dmx_demuxer *demuxer,uint64_t firstPts,uint32_t nbTracks);
-/**** Push a frame
-There is a +- 2 correction when we switch gop
-as in the frame header we read 2 bytes
-Between frames, the error is self cancelling.
-
-**/
-uint8_t Push(runData *run,uint32_t ftype,uint64_t abs,uint64_t rel)
+dmx_videoIndexerMpeg2::dmx_videoIndexerMpeg2(dmx_runData *run) : dmx_videoIndexer(run)
 {
-                                            
-        run->frames[run->nbPushed].type=ftype;
-        
-        if(run->nbPushed)
-        {                
-                run->frames[run->nbPushed-1].size=run->demuxer->elapsed();
-                if(run->nbPushed==1) run->frames[run->nbPushed-1].size-=2;
-                run->frames[run->nbPushed].abs=abs;
-                run->frames[run->nbPushed].rel=rel;        
-                run->demuxer->stamp();
-        
-        }
-        //aprintf("\tpushed %d %"LLX"\n",nbPushed,abs);
-        run->nbPushed++;
-        
-        ADM_assert(run->nbPushed<MAX_PUSHED);
-        return 1;
-
+  _frames=new IndFrame[MAX_PUSHED];
+  firstPicPTS=ADM_NO_PTS;
+  seq_found=0;
+  grabbing=0;
+  
 }
-uint8_t dumpPts(FILE *fd,dmx_demuxer *demuxer,uint64_t firstPts,uint32_t nbTracks)
+dmx_videoIndexerMpeg2::~dmx_videoIndexerMpeg2()
 {
-uint64_t stats[nbTracks],p;
-double d;
-
-        if(!demuxer->getAllPTS(stats)) return 0;
-        qfprintf(fd,"# Video 1st PTS : %07u\n",firstPts);
-        if(firstPts==ADM_NO_PTS) return 1;
-        for(int i=1;i<nbTracks;i++)
-        {
-                p=stats[i];
-                if(p==ADM_NO_PTS)
-                {
-                        qfprintf(fd,"# track %d no pts\n",i);
-                }
-                else
-                {
-                        
-                        d=firstPts; // it is in 90 khz tick
-                        d-=stats[i];
-                        d/=90.;
-                        qfprintf(fd,"# track %d PTS : %07u ",i,stats[i]);
-                        qfprintf(fd," delta=%04d ms\n",(int)d);
-                }
-
-        }
-        return 1;
+          if(_frames) delete [] _frames;
+          _frames=NULL;
 }
-/*** Pop the whold gop ***/
-uint8_t gopDump(runData *run,uint64_t abs,uint64_t rel,uint32_t nbTracks)
-{
-  dmx_demuxer *demuxer=run->demuxer;
-        if(!run->nbPushed && !run->nbImage) demuxer->stamp();
-        if(!run->nbPushed) return 1;
-
-uint64_t stats[nbTracks];
-
-        run->frames[run->nbPushed-1].size=demuxer->elapsed()+2;
-        qfprintf(run->fd,"V %03u %06u %02u ",run->nbGop,run->nbImage,run->nbPushed);
-
-        // For each picture Type : abs position : relat position : size
-        for(uint32_t i=0;i<run->nbPushed;i++) 
-        {
-
-                qfprintf(run->fd,"%c:%08"LLX",%05x",
-                        Type[run->frames[i].type],
-                        run->frames[i].abs,
-                        run->frames[i].rel);
-                qfprintf(run->fd,",%05x ",
-                        run->frames[i].size);
-        }
-        
-        qfprintf(run->fd,"\n");
-
-        // audio if any
-        //*******************************************
-        // Nb image abs_pos audio seen
-        // The Nb image is used to compute a drift
-        //*******************************************
-        if(demuxer->hasAudio() & nbTracks>1)
-        {
-                demuxer->getStats(stats);
-                
-                qfprintf(run->fd,"A %u %"LLX" ",run->nbImage,abs);
-                for(uint32_t i=1;i<nbTracks;i++)
-                {
-                        qfprintf(run->fd,":%"LLX" ",stats[i]);
-                }
-                qfprintf(run->fd,"\n");
-                
-        }
-        // Print some gop stamp infos, does not hurt
-        qfprintf(run->fd,"# Timestamp %02d:%02d:%02d,%03d\n",run->lastStamp.hh,run->lastStamp.mm,run->lastStamp.ss,run->lastStamp.ff);
-        run->nbGop++;
-        run->nbImage+=run->nbPushed;
-        run->nbPushed=0;
-                
-        run->frames[0].abs=abs;
-        run->frames[0].rel=rel;
-        demuxer->stamp();
-        return 1;
-        
-}
-uint8_t gopUpdate(runData *run)
-{
-uint32_t a1,a2,a3,a4;
-uint32_t hh,mm,ss,ff;
-TimeStamp *ts;
-dmx_demuxer *demuxer=run->demuxer;
-
-        a1=demuxer->read8i();
-        a2=demuxer->read8i();
-        a3=demuxer->read8i();
-        a4=demuxer->read8i();
-        hh=(a1>>2)&0x1f;
-        mm=((a1&3)<<4)+(a2>>4);
-        ss=((a2&7)<<3)+(a3>>5);
-        ff=((a3&0x1f)<<1)+(a4>>7);
-        if(!run->nbGop)  ts=&(run->firstStamp);
-                else ts=&(run->lastStamp);
-        
-        ts->hh=hh;
-        ts->mm=mm;
-        ts->ss=ss;
-        ts->ff=ff;
-        if(!run->nbGop) memcpy(&(run->lastStamp),&(run->firstStamp),sizeof(run->firstStamp));
-        return 1;
-}
-/********************************************************************************************/
-/********************************************************************************************/
-/********************************************************************************************/
-/********************************************************************************************/
 /**
-        \fn mainLoopMpeg2
-        \brief Main indexing function for mpeg1/mpeg2 payLoad
+      \fn cleanup
+      \brief do cleanup and purge non processed data at the end of the mpeg2 stream
 */
-uint8_t mainLoopMpeg2(runData *run)
+void dmx_videoIndexerMpeg2::cleanup(void)
 {
-dmx_demuxer *demuxer=run->demuxer;
+  uint64_t lastAbs,lastRel;
+          _run->demuxer->getPos(&lastAbs,&lastRel);
+          if(_run->nbPushed)  gopDump(lastAbs,lastRel);
+          dumpPts(firstPicPTS); 
+          
+}
+
+/**
+      \fn run 
+      \brief main indexing loop for mpeg2 payload
+*/
+uint8_t   dmx_videoIndexerMpeg2::run  (void)
+{
+dmx_demuxer *demuxer=_run->demuxer;
 uint64_t syncAbs,syncRel;
 uint8_t streamid;   
 uint32_t temporal_ref,ftype,val;
 uint64_t pts,dts;
 
-      run->frames=new IndFrame[MAX_PUSHED];
+      
 
       while(1)
       {
 
               if(!demuxer->sync(&streamid,&syncAbs,&syncRel,&pts,&dts)) return 0;   
-              if((run->totalFileSize>>16)>50)
+              if((_run->totalFileSize>>16)>50)
               {
-                    run->work->update(syncAbs>>16,run->totalFileSize>>16,
-                               run->nbImage,run->lastStamp.hh,run->lastStamp.mm,run->lastStamp.ss);
+                    _run->work->update(syncAbs>>16,_run->totalFileSize>>16,
+                               _run->nbImage,_run->lastStamp.hh,_run->lastStamp.mm,_run->lastStamp.ss);
               }else
               {
-                    run->work->update(syncAbs,run->totalFileSize,run->nbImage,
-                            run->lastStamp.hh,run->lastStamp.mm,run->lastStamp.ss);
+                    _run->work->update(syncAbs,_run->totalFileSize,_run->nbImage,
+                            _run->lastStamp.hh,_run->lastStamp.mm,_run->lastStamp.ss);
               }
-              if(run->work->isAborted()) return 0;
+              if(_run->work->isAborted()) return 0;
               switch(streamid)
                       {
                       case 0xB3: // sequence start
-                              aprintf("Seq %d\n",run->nbGop);
-                              if(run->grabbing) continue;
-                              run->grabbing=1;    
+                              aprintf("Seq %d\n",_run->nbGop);
+                              if(grabbing) continue;
+                              grabbing=1;    
                               
-                              gopDump(run,syncAbs,syncRel,run->nbTrack);
-                              if(run->seq_found)
+                              gopDump(syncAbs,syncRel);
+                              if(seq_found)
                               {
                                       demuxer->forward(8);  // Ignore
                                       continue;
                               }
                               // Our firt frame is here
                               // Important to initialize the mpeg decoder !
-                              run->frames[0].abs=syncAbs;
-                              run->frames[0].rel=syncRel;
+                              _frames[0].abs=syncAbs;
+                              _frames[0].rel=syncRel;
                               //
-                              run->seq_found=1;
+                              seq_found=1;
                               val=demuxer->read32i();
-                              run->imageW=val>>20;
-                              run->imageW=((run->imageW+15)&~15);
-                              run->imageH= (((val>>8) & 0xfff)+15)& ~15;
-                              run->imageAR=(val>>4)&0xf;
-                              run->imageFPS= FPS[val & 0xf];
+                              _run->imageW=val>>20;
+                              _run->imageW=((_run->imageW+15)&~15);
+                              _run->imageH= (((val>>8) & 0xfff)+15)& ~15;
+                              _run->imageAR=(val>>4)&0xf;
+                              _run->imageFPS= FPS[val & 0xf];
                               demuxer->forward(4);
                               break;
                       case 0xb8: // GOP
-                              aprintf("GOP %d\n",run->nbGop);
+                              aprintf("GOP %d\n",_run->nbGop);
 #ifdef SHOW_PTS
                               if(pts!=ADM_NO_PTS)
                               {
@@ -280,28 +160,28 @@ uint64_t pts,dts;
                               }
 #endif
                               uint32_t gop;   
-                              if(!run->seq_found) continue;
-                              if(run->grabbing) 
+                              if(!seq_found) continue;
+                              if(grabbing) 
                               {         
-                                      gopUpdate(run);
+                                      gopUpdate();
                                       continue;;
                               }
-                              gopDump(run,syncAbs,syncRel,run->nbTrack);
-                              gopUpdate(run);
+                              gopDump(syncAbs,syncRel);
+                              gopUpdate();
                               
                               break;
                       case 0x00 : // picture
                             
                               aprintf("pic \n");
-                              if(!run->seq_found)
+                              if(!seq_found)
                               { 
                                       continue;
                                       printf("No sequence start yet, skipping..\n");
                               }
-                              if(run->firstPicPTS==ADM_NO_PTS && pts!=ADM_NO_PTS)
-                                      run->firstPicPTS=pts;
-                              run->grabbing=0;
-                              run->totalFrame++;
+                              if(firstPicPTS==ADM_NO_PTS && pts!=ADM_NO_PTS)
+                                      firstPicPTS=pts;
+                              grabbing=0;
+                              _run->totalFrame++;
                               val=demuxer->read16i();
                               temporal_ref=val>>6;
                               ftype=7 & (val>>3);
@@ -341,7 +221,7 @@ uint64_t pts,dts;
                               }
 #endif
                               
-                              Push(run,ftype,syncAbs,syncRel);
+                              Push(ftype,syncAbs,syncRel);
                           
                               break;
                       default:
@@ -350,18 +230,166 @@ uint64_t pts,dts;
       }
                       return 1; 
 }
+
+
+
+/**** Push a frame
+There is a +- 2 correction when we switch gop
+as in the frame header we read 2 bytes
+Between frames, the error is self cancelling.
+
+**/
 /**
-      \fn endLoopMpeg2
-      \brief do cleanup and purge non processed data at the end of the mpeg2 stream
+      \fn Push
+      \brief Add a frame to the current gop
+
 */
-void endLoopMpeg2(runData *run)
+uint8_t dmx_videoIndexerMpeg2::Push(uint32_t ftype,uint64_t abs,uint64_t rel)
 {
-  uint64_t lastAbs,lastRel;
-          run->demuxer->getPos(&lastAbs,&lastRel);
-          if(run->nbPushed)  gopDump(run,lastAbs,lastRel,run->nbTrack);
-          dumpPts(run->fd,run->demuxer,run->firstPicPTS,run->nbTrack); 
-          
-          if(run->frames) delete [] run->frames;
-          run->frames=NULL;
+                                            
+        _frames[_run->nbPushed].type=ftype;
+        
+        if(_run->nbPushed)
+        {                
+                _frames[_run->nbPushed-1].size=_run->demuxer->elapsed();
+                if(_run->nbPushed==1) _frames[_run->nbPushed-1].size-=2;
+                _frames[_run->nbPushed].abs=abs;
+                _frames[_run->nbPushed].rel=rel;        
+                _run->demuxer->stamp();
+        
+        }
+        //aprintf("\tpushed %d %"LLX"\n",nbPushed,abs);
+        _run->nbPushed++;
+        
+        ADM_assert(_run->nbPushed<MAX_PUSHED);
+        return 1;
+
 }
+/**
+    \fn dumpPts
+    \brief
+
+*/
+uint8_t dmx_videoIndexerMpeg2::dumpPts(uint64_t firstPts)
+{
+uint64_t stats[_run->nbTrack],p;
+double d;
+dmx_demuxer *demuxer=_run->demuxer;
+
+        if(!demuxer->getAllPTS(stats)) return 0;
+        qfprintf(_run->fd,"# Video 1st PTS : %07u\n",firstPts);
+        if(firstPts==ADM_NO_PTS) return 1;
+        for(int i=1;i<_run->nbTrack;i++)
+        {
+                p=stats[i];
+                if(p==ADM_NO_PTS)
+                {
+                        qfprintf(_run->fd,"# track %d no pts\n",i);
+                }
+                else
+                {
+                        
+                        d=firstPts; // it is in 90 khz tick
+                        d-=stats[i];
+                        d/=90.;
+                        qfprintf(_run->fd,"# track %d PTS : %07u ",i,stats[i]);
+                        qfprintf(_run->fd," delta=%04d ms\n",(int)d);
+                }
+
+        }
+        return 1;
+}
+/**
+      \fn       gopDump
+      \brief    Dump the content of a gop into the index file
+*/
+uint8_t dmx_videoIndexerMpeg2::gopDump(uint64_t abs,uint64_t rel)
+{
+  dmx_demuxer *demuxer=_run->demuxer;
+        if(!_run->nbPushed && !_run->nbImage) demuxer->stamp();
+        if(!_run->nbPushed) return 1;
+
+uint64_t stats[_run->nbTrack];
+
+        _frames[_run->nbPushed-1].size=demuxer->elapsed()+2;
+        qfprintf(_run->fd,"V %03u %06u %02u ",_run->nbGop,_run->nbImage,_run->nbPushed);
+
+        // For each picture Type : abs position : relat position : size
+        for(uint32_t i=0;i<_run->nbPushed;i++) 
+        {
+
+                qfprintf(_run->fd,"%c:%08"LLX",%05x",
+                        Type[_frames[i].type],
+                        _frames[i].abs,
+                        _frames[i].rel);
+                qfprintf(_run->fd,",%05x ",
+                        _frames[i].size);
+        }
+        
+        qfprintf(_run->fd,"\n");
+
+        // audio if any
+        //*******************************************
+        // Nb image abs_pos audio seen
+        // The Nb image is used to compute a drift
+        //*******************************************
+        if(demuxer->hasAudio() & _run->nbTrack>1)
+        {
+                demuxer->getStats(stats);
+                
+                qfprintf(_run->fd,"A %u %"LLX" ",_run->nbImage,abs);
+                for(uint32_t i=1;i<_run->nbTrack;i++)
+                {
+                        qfprintf(_run->fd,":%"LLX" ",stats[i]);
+                }
+                qfprintf(_run->fd,"\n");
+                
+        }
+        // Print some gop stamp infos, does not hurt
+        qfprintf(_run->fd,"# Timestamp %02d:%02d:%02d,%03d\n",
+                 _run->lastStamp.hh,_run->lastStamp.mm,_run->lastStamp.ss,_run->lastStamp.ff);
+        _run->nbGop++;
+        _run->nbImage+=_run->nbPushed;
+        _run->nbPushed=0;
+                
+        _frames[0].abs=abs;
+        _frames[0].rel=rel;
+        demuxer->stamp();
+        return 1;
+        
+}
+/**
+      \fn gopUpdate( 
+      \brief Update the timecode hh:mm:ss.xx inside a gop header
+*/
+uint8_t dmx_videoIndexerMpeg2::gopUpdate(void)
+{
+uint32_t a1,a2,a3,a4;
+uint32_t hh,mm,ss,ff;
+TimeStamp *ts;
+dmx_demuxer *demuxer=_run->demuxer;
+
+        a1=demuxer->read8i();
+        a2=demuxer->read8i();
+        a3=demuxer->read8i();
+        a4=demuxer->read8i();
+        hh=(a1>>2)&0x1f;
+        mm=((a1&3)<<4)+(a2>>4);
+        ss=((a2&7)<<3)+(a3>>5);
+        ff=((a3&0x1f)<<1)+(a4>>7);
+        if(!_run->nbGop)  ts=&(_run->firstStamp);
+                else ts=&(_run->lastStamp);
+        
+        ts->hh=hh;
+        ts->mm=mm;
+        ts->ss=ss;
+        ts->ff=ff;
+        if(!_run->nbGop) memcpy(&(_run->lastStamp),&(_run->firstStamp),sizeof(_run->firstStamp));
+        return 1;
+}
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
 //

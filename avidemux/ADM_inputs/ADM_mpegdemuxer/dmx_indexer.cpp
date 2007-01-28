@@ -184,27 +184,35 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
         work=new DIA_progressIndexing(mpeg);
 
         printf("*********Indexing started (%d audio tracks)***********\n",nbTracks);
-        runData run;
+        dmx_runData run;
         
-        memset(&run,0,sizeof(runData));
+        memset(&run,0,sizeof(dmx_runData));
         
         run.totalFileSize=demuxer->getSize();
         run.demuxer=demuxer;
         run.work=work;
         run.nbTrack=nbTracks;
         run.fd=out;
-        run.firstPicPTS=ADM_NO_PTS;
+        
+        dmx_videoIndexer *idxer=NULL;
         
         switch(payloadType)
         {
           case DMX_PAYLOAD_MPEG2:
-                            mainLoopMpeg2(&run);
-                            endLoopMpeg2(&run);
+                  {
+                            idxer=new dmx_videoIndexerMpeg2(&run);
                             break;
+                  }
           case DMX_PAYLOAD_MPEG4:
           case DMX_PAYLOAD_H264:
           default: ADM_assert(0);
         }                
+        
+        idxer->run();
+        idxer->cleanup();
+        
+        delete idxer;
+        idxer=NULL;
         
               
         printf("*********Indexing Ended (%d audio tracks)***********\n",nbTracks);
