@@ -157,6 +157,23 @@ isMSMpeg4Compatible (uint32_t fourcc)
 
 #undef CHECK
 }
+uint8_t
+isDVCompatible (uint32_t fourcc)
+{
+#define CHECK(x) if(fourCC::check(fourcc,(uint8_t *)x)) \
+						{dv=1; }
+
+  uint8_t dv = 0;
+
+  CHECK ("dvsd");
+  CHECK ("DVDS");
+  CHECK ("dvpp");
+
+  return dv;
+
+#undef CHECK
+}
+
 
 uint8_t
   decoders::uncompress (ADMCompressedImage * in, ADMImage * out)

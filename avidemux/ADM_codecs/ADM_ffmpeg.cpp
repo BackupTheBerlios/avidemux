@@ -348,6 +348,8 @@ ffmpegEncoder::initContext (void)
       break;
       
     case FF_DV:
+      if(_context->width!=720 || _context->height!=576) 
+            return 0; // should be caught by upper layers before going here...
       WRAP_Open (CODEC_ID_DVVIDEO);
       break;
 

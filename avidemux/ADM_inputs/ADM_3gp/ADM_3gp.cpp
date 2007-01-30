@@ -69,6 +69,7 @@ version 2 media descriptor :
 #include "fourcc.h"
 #include "ADM_3gp/ADM_3gp.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_codecs/ADM_codec.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_3GP
@@ -117,8 +118,7 @@ uint32_t _3GPHeader::getFlags(uint32_t frame,uint32_t *flags){
 	if(frame>= (uint32_t)_videostream.dwLength) return 0;
 #warning FIXME : UGLY
 	if(fourCC::check(_videostream.fccHandler,(uint8_t *)"MJPG")
-        || fourCC::check(_videostream.fccHandler,(uint8_t *)"DVDS") // Fixme should be done on the fly
-        )
+        || isDVCompatible(_videostream.fccHandler)) // Fixme should be done on the fly
 	{
 		*flags=AVI_KEY_FRAME;
 	}
@@ -928,6 +928,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 				printf("tkhd : %ld %ld\n",_lastW,_lastH);
 				break;
                         case MKFCCR('d','v','c',' ') : //'dvc ':
+                        case MKFCCR('d','v','p','p') : //'dvpp':
 /*
                                 tom.skipBytes(24);
                                 wh=tom.read32();

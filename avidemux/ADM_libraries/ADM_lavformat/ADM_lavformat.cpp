@@ -45,6 +45,7 @@ extern "C"
 #include "ADM_editor/ADM_Video.h"
 
 #include "ADM_lavformat.h"
+#include "fourcc.h"
 
 
 #include "ADM_osSupport/ADM_debugID.h"
@@ -177,11 +178,16 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
                                 }
                                 else
                                 {
-                                         c->codec_id = CODEC_ID_MPEG4; // Default value
-                                        printf("Ooops, cant mux that...\n");
-                                        printf("Ooops, cant mux that...\n");
-                                        printf("Ooops, cant mux that...\n");
-                                        //return 0;
+                                        if(isDVCompatible(info->fcc))
+                                        {
+                                          c->codec_id = CODEC_ID_DVVIDEO;
+                                        }else
+                                        {
+                                          c->codec_id = CODEC_ID_MPEG4; // Default value
+                                          printf("Ooops, cant mux that...\n");
+                                          printf("Ooops, cant mux that...\n");
+                                          printf("Ooops, cant mux that...\n");
+                                        }
                                 }
                         }
                         if(videoExtraDataSize)

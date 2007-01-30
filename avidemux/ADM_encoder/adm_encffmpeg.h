@@ -292,7 +292,7 @@ public:
   }
   virtual const char *getFCCHandler (void)
   {
-    return "DVDS";
+    return "dvsd";
   }
   virtual uint8_t hasExtraHeaderData (uint32_t * l, uint8_t ** data);
 
