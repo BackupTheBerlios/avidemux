@@ -114,6 +114,23 @@ COMPRES_PARAMS ffmpegMpeg4 = {
   sizeof (ffmpeg4Extra),
   getFFCompressParams
 };
+COMPRES_PARAMS ffmpegDV = {
+  CodecDV,
+  "DV",
+  "DV",
+  "DV",
+  COMPRESS_CQ,
+  4,
+  1500,
+  700,
+  1000, // AVG
+  ADM_ENC_CAP_CBR + ADM_ENC_CAP_CQ + ADM_ENC_CAP_2PASS,
+  ADM_EXTRA_PARAM,
+  &ffmpeg4Extra,
+  sizeof (ffmpeg4Extra),
+  NULL
+};
+
 COMPRES_PARAMS ffmpegSnow = {
   CodecSnow,
   "Snow (lavc)",
@@ -707,6 +724,7 @@ COMPRES_PARAMS *AllVideoCodec[] = {
   &VCDCodec,
   &SVCDCodec,
   &DVDCodec,
+  &ffmpegDV,
   &RequantCodec,
 #ifdef USE_XVID_4
   &Xvid4Codec,

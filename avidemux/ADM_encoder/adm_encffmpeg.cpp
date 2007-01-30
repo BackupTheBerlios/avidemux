@@ -222,6 +222,47 @@ EncodeFFMPEGSNow::configure (AVDMGenericVideoStream * instream)
 
 }
 
+//*********************DV **********************************************
+EncoderFFMPEGDV::EncoderFFMPEGDV (COMPRES_PARAMS * config):
+EncoderFFMPEG (FF_DV, config)
+{
+  _id = FF_DV;
+  _frametogo = 0;
+
+
+}
+uint8_t
+EncoderFFMPEGDV::hasExtraHeaderData (uint32_t * l, uint8_t ** data)
+{
+  *l = 0;
+  *data = NULL;
+  return 0;
+
+}
+uint8_t
+EncoderFFMPEGDV::configure (AVDMGenericVideoStream * instream)
+{
+  ADM_assert (instream);
+  ADV_Info *info;
+
+
+
+  info = instream->getInfo ();
+  _fps = info->fps1000;
+  _w = info->width;
+  _h = info->height;
+  _vbuffer = new ADMImage (_w, _h);
+  ADM_assert (_vbuffer);
+  _in = instream;
+
+  _codec = new ffmpegEncoderCQ (_w, _h, _id);
+  _codec->init (_param.qz, _fps, 0);
+  _state=enc_CQ;
+  return 1;
+
+
+
+}
 
 //************************* SNOW **************************
 // return codec name as seen in avi header
@@ -231,6 +272,9 @@ EncoderFFMPEG::getCodecName (void)
 {
   switch (_id)
     {
+    case FF_DV:
+        return "dvsd";
+        break;
     case FF_FFHUFF:
       return "FFVH";
       break;

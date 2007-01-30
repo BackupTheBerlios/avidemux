@@ -34,6 +34,7 @@ typedef enum
   FF_MPEG2 = 9,
   FF_SNOW = 10,
   FF_FFHUFF = 11,
+  FF_DV=12,
 } FF_CODEC_ID;
 
 /*

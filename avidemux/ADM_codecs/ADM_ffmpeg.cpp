@@ -346,6 +346,11 @@ ffmpegEncoder::initContext (void)
     case FF_SNOW:
       WRAP_Open (CODEC_ID_SNOW);
       break;
+      
+    case FF_DV:
+      WRAP_Open (CODEC_ID_DVVIDEO);
+      break;
+
     default:
       ADM_assert (0);
     }

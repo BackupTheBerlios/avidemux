@@ -43,6 +43,7 @@ typedef enum SelectCodecType
 #endif
   CodecYV12,
   CodecRequant,
+  CodecDV,
   CodecDummy
 };
 
