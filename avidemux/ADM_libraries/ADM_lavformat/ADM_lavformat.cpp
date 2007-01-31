@@ -459,6 +459,7 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             if(ret) 
             {
                         printf("Error writing audio packet\n");
+                        printf("pts %llu dts %llu\n",pkt.pts,pkt.dts);
                         return 0;
             }
             return 1;

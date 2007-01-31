@@ -1079,7 +1079,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 			case MKFCCR('e','s','d','s'): //'esds':
 					// in case of mpeg4 we only take
 					// the mpeg4 vol header
-					
+					printf("Esds atom found\n");
 
 					tom.skipBytes(4);
 					tag=0xff;
@@ -1101,6 +1101,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                                                 {
                                                                   switch(objectTypeIndication)
                                                                   {
+                                                                      case 0x69:ADIO.encoding=WAV_MP3;break;
                                                                       case 0x6b:ADIO.encoding=WAV_MP3;break;
                                                                       case 0x6d:ADIO.encoding=WAV_MP3;break;
                                                                       case 226:ADIO.encoding=WAV_AC3;break;

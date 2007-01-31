@@ -214,9 +214,7 @@ getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
     }
 
 #ifdef USE_FFMPEG
-  if (fourCC::check (fcc, (uint8_t *) "dvsd")
-      || fourCC::check (fcc, (uint8_t *) "DVDS")
-      || fourCC::check (fcc, (uint8_t *) "CDVC"))
+  if (isDVCompatible(fcc))//"CDVC"))
     {
 
       return (decoders *) (new decoderFFDV (w, h, extraLen, extraData));
