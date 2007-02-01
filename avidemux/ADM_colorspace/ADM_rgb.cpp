@@ -189,6 +189,98 @@ void COL_init(void)
         return 1;
  }
 
+/**
+      \fn scale
+      \brief Change colorspace but and put result in the target image , which is bigger
+
+*/
+ uint8_t ColYuvRgb::scale(uint8_t *src, uint8_t *target,uint32_t startx,uint32_t starty, uint32_t tw,uint32_t th,uint32_t totalW,uint32_t totalH)
+ {
+    uint8_t *srd[3];
+    uint8_t *dst[3];
+    int ssrc[3];
+    int ddst[3];
+
+    ADM_assert(_context);
+    
+    uint32_t page;
+
+    page=tw*th;
+    srd[0]=src;
+    srd[1]=src+page;
+    srd[2]=src+((page*5)>>2);
+
+    ssrc[0]=tw;
+    ssrc[1]=ssrc[2]=tw>>1;
+
+    
+    dst[0]=target+(startx*4)+starty*totalW*4;
+    dst[1]=NULL;
+    dst[2]=NULL;
+    ddst[0]=totalW*4;
+    ddst[1]=ddst[2]=0;
+
+    sws_scale((SwsContext *)_context,srd,ssrc,0,th,dst,ddst);
+
+    if(_inverted)
+    {
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+            if( 0 && CpuCaps::hasMMX())
+            {
+            }
+            else
+#endif
+            {
+                uint8_t r,g,b,a;
+                uint8_t *ptr=NULL;
+                int pel=th;
+                for(int yy=0;yy<th;yy++)
+                {
+                  ptr=target+(startx*4)+(starty+yy)*totalW*4;;
+                  for(int xx=0;xx<tw;xx++)
+                  {
+                      r=ptr[0];
+                      g=ptr[1];
+                      b=ptr[2];
+                      a=ptr[3];
+                      ptr[0]=b;
+                      ptr[1]=g;
+                      ptr[2]=r;
+                      ptr[3]=a;
+                      ptr+=4;
+                  }
+                }
+            }
+          
+          
+        }
+#if  defined( ADM_BIG_ENDIAN)
+        uint8_t r,g,b,a;
+        uint8_t *ptr=target;
+        int pel=h*w;
+        for(int yy=0;yy<th;yy++)
+                {
+                  *ptr=target+(startx*4)+(starty+yy)*totalW*4;;
+                  for(int xx=0;xx<tw;xx++)
+                  {
+                      r=ptr[0];
+                      g=ptr[1];
+                      b=ptr[2];
+                      a=ptr[3];
+                      ptr[0]=a;
+                      ptr[1]=b;
+                      ptr[2]=g;
+                      ptr[3]=r;
+                      ptr+=4;
+                  }
+                }
+        
+#endif
+  return 1;
+ }
+
+ 
+ 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 uint8_t ColYv12Rgb24::reset(uint32_t ww, uint32_t hh)
  {

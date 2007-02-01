@@ -41,7 +41,7 @@ user_interface_qt4 = 	./ADM_userInterfaces/ADM_QT4/ADM_gui/libADM_gui2.a	\
 adm_src =   guiplay.cpp  \
 	gui_savenew.cpp  gui_navigate.cpp gtk_gui.cpp   \
 	main.cpp   \
-	gui_autodrive.cpp GUI_jobs.cpp
+	gui_autodrive.cpp GUI_jobs.cpp ADM_preview.cpp
 
 
 avidemux2_cli_SOURCES=$(adm_src)

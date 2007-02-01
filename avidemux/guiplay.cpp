@@ -60,8 +60,8 @@ static void FillAudio(void);
 
 #define EVEN(x) (x&0xffffffe)
 
+ extern ADMImage *rdr_decomp_buffer;
 
- extern void  UI_setPreviewToggleStatus( uint8_t status );
  extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
 //___________________________________
 uint8_t stop_req;
@@ -109,15 +109,9 @@ void GUI_PlayAvi(void)
   uint32_t remaining=avifileinfo->nb_frames-curframe;
 
 
-    if(guiOutputDisplay)
+    if(getPreviewMode()==ADM_PREVIEW_OUTPUT)
     {
                 filter=getLastVideoFilter(curframe,remaining);
-                if(mode_preview)
-                {
-                      editorKillPreview ();
-                      UI_setPreviewToggleStatus( 0 );
-                      mode_preview=0;
-                }
     }
     else
     {
@@ -155,11 +149,7 @@ void GUI_PlayAvi(void)
     do
     {
         vids++;
-        renderUpdateImage(buffer->data);
-        if(mode_preview&&!guiOutputDisplay)
-        {	
-            editorUpdatePreview(played_frame);
-        }
+        admPreview::update(played_frame,buffer);;
         update_status_bar(buffer);
         if (time_a == 0)
             time_a = getTime(0);
@@ -213,7 +203,7 @@ void GUI_PlayAvi(void)
 	    }
      	//
             UI_purge();
-            if(mode_preview)
+            if(getPreviewMode()==ADM_PREVIEW_SIDE || getPreviewMode()==ADM_PREVIEW_TOP)
             {
               UI_purge();
               UI_purge(); 
@@ -234,13 +224,8 @@ abort_play:
 	   getFirstVideoFilter( );
 	   //video_body->getUncompressedFrame(curframe, rdr_decomp_buffer,&flags);
 	   GUI_getFrame(curframe, rdr_decomp_buffer, &flags);
-	   renderUpdateImage(rdr_decomp_buffer->data);
-	   renderRefresh();
+           admPreview::update(curframe,rdr_decomp_buffer);
      	   update_status_bar(rdr_decomp_buffer);
-	   if(mode_preview)
-	   {
-		editorUpdatePreview(curframe);
-	   }
 #ifdef HAVE_AUDIO
     if (currentaudiostream)
       {
@@ -398,8 +383,6 @@ void ComputePreload(void)
     audio_available = 1;
 }
 
-//
-// Build audio filters
 
 #endif
 // EOF

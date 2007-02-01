@@ -52,25 +52,6 @@ EXTERN uint8_t 	playing
 =0
 #endif
 ;
-EXTERN uint8_t 	mode_preview
-#ifdef __DECLARE__
-=0
-#endif
-;
-
-;
-
-/**
-	This buffer is share for GUI display
-	It leads to the buffer where the last displayed frame has been uncompressed
-
-*/
-EXTERN ADMImage *rdr_decomp_buffer
-#ifdef __DECLARE__
-=NULL
-#endif
-;
-
 
 
 EXTERN AVDMGenericAudioStream *aviaudiostream;
@@ -94,16 +75,6 @@ EXTERN aviInfo   *avifileinfo
 EXTERN WAVHeader *wavinfo
 #ifdef __DECLARE__
 =(WAVHeader *)NULL
-#endif
-;
-/**
-	Output mode : 
-		If 0 display incoming video_body	
-		if 1, display filtered video
-*/
-EXTERN uint8_t guiOutputDisplay
-#ifdef __DECLARE__
-=0
 #endif
 ;
 /**

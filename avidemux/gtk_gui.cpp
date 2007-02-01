@@ -25,11 +25,7 @@
 #include <sys/time.h>
 #include <fcntl.h>	/* O_RDONLY */
 #include <errno.h>
-#warning FIXME : Don't include GLIB!
-#warning FIXME : Don't include GLIB!
 #include <glib.h>
-#warning FIXME : Don't include GLIB!
-#warning FIXME : Don't include GLIB!
 
     
 #include "ADM_lavcodec.h"
@@ -99,13 +95,10 @@ extern void filterCleanUp (void);
 int A_audioSave(char *name);
 static void ReSync (void);
 static void cleanUp (void);
-extern uint8_t getPreviewToggleStatus (void);
-extern void getPreviewToggleStatus (uint8_t y);
 extern void GUI_setName (char *n);
 extern void DIA_properties( void);
 extern uint8_t DIA_Preferences(void);
 extern void  GUI_displayBitrate( void );
-//uint8_t GUI_InitRender (GtkWidget * g, uint32_t w, uint32_t h);
 void test_mpeg (char *name);
 uint8_t GUI_getDoubleValue (double *valye, float min, float max,
 			    const char *title);
@@ -170,6 +163,11 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name);
 uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t,ADMImage *image);
 extern const char * GUI_getCustomScript(uint32_t nb);
 extern gboolean SliderIsShifted;
+
+ADMImage *rdr_decomp_buffer=NULL;
+
+
+
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -295,12 +293,6 @@ int nw;
       ADM_aviUISetMuxer();
       return;
       break;
-    case ACT_OuputToggle:
-        guiOutputDisplay ^= 1;
-        UI_setOutputToggleStatus (guiOutputDisplay);
-        printf ("\n Ouput is now : %d", guiOutputDisplay);
-      return;
-
 #ifdef HAVE_AUDIO      
     	case ACT_SelectDevOSS:
 				   AVDM_switch (DEVICE_OSS);
@@ -466,12 +458,12 @@ int nw;
         case ACT_ZOOM_1_1:
         case ACT_ZOOM_2_1:
         case ACT_ZOOM_4_1:
-
+#if 0
                 currentZoom=(renderZoom)((action-ACT_ZOOM_1_4)+ZOOM_1_4);
                 renderResize (avifileinfo->width, avifileinfo->height,currentZoom);
                 renderUpdateImage (rdr_decomp_buffer->data);
                 renderRefresh ();
-
+#endif
                 break;
 
 
@@ -638,25 +630,21 @@ case ACT_Pipe2Other:
 	}
 //        printf("\n new frame : %lu",nf);
       break;
-    case ACT_PreviewToggle:
-      mode_preview^=1;
-      UI_setPreviewToggleStatus (mode_preview);
-
-      printf ("\n Preview is now : %d", mode_preview);
-      if (mode_preview)
-	{
-
-	  editorReignitPreview ();
-	  video_body->activateCache();
-	  editorUpdatePreview (curframe);
-
-	}
-      else
-      {
-	editorKillPreview ();
-	//video_body->desactivateCache();
+#define TOGGLE_PREVIEW ADM_PREVIEW_OUTPUT
+    case ACT_PreviewChanged:
+    {
+        ADM_PREVIEW_MODE oldpreview=getPreviewMode(),newpreview=(ADM_PREVIEW_MODE)UI_getCurrentPreview();
+          printf("Old preview %d, New preview mode : %d\n",oldpreview,newpreview);
+          
+          if(oldpreview==newpreview)
+          {
+            return;
+          }
+            admPreview::stop();
+            setPreviewMode(newpreview);
+            admPreview::start();
+            admPreview::update(curframe,rdr_decomp_buffer);
       }
-
       break;
     case ACT_StopAvi:
       if (playing)
@@ -894,21 +882,19 @@ case ACT_Pipe2Other:
       break;
     case ACT_VideoParameter:
       // first remove current viewer
-      if (mode_preview)
+      if (getPreviewMode()!=ADM_PREVIEW_NONE)
         {
-                
-	        editorKillPreview ();
+	         admPreview::stop();
         }
       GUI_handleVFilter();
       if( getLastVideoFilter()->getInfo()->width % 8 ){
         GUI_Error_HIG(_("Width is not a multiple of 8"),
                       _("This will make trouble for avi files."));
       }
-      if (mode_preview)
+      if (getPreviewMode()!=ADM_PREVIEW_NONE)
       {
-        editorReignitPreview();
-	editorUpdatePreview (curframe);
-        UI_setPreviewToggleStatus( 1);
+         admPreview::start();
+         admPreview::update (curframe,rdr_decomp_buffer);
       }
       break;
 
@@ -982,8 +968,11 @@ int A_openAvi2 (char *name, uint8_t mode)
   if (avifileinfo)		// already opened ?
     {				// delete everything
       // if preview is on
-      if (mode_preview)
-	GUI_PreviewEnd ();
+      if(getPreviewMode()!=ADM_PREVIEW_NONE)
+      {
+	admPreview::stop();
+        setPreviewMode(ADM_PREVIEW_NONE);
+      }
       delete avifileinfo;
       //delete wavinfo;
       wavinfo = (WAVHeader *) NULL;
@@ -1118,7 +1107,6 @@ void  updateLoaded ()
 
   curframe = 0;
   getFirstVideoFilter(); // reinit first filter
-  video_body->flushCache();
   ADM_assert (rdr_decomp_buffer =new ADMImage(avifileinfo->width,avifileinfo->height));
 
   //frameStart = 0;
@@ -1169,7 +1157,7 @@ void  updateLoaded ()
     }
 
   // Init renderer
-  renderResize (avifileinfo->width, avifileinfo->height,currentZoom);
+    admPreview::setMainDimension(avifileinfo->width, avifileinfo->height);
   curframe = 0;
   
 
@@ -1182,8 +1170,7 @@ void  updateLoaded ()
     }
   else
     {
-      renderUpdateImage (rdr_decomp_buffer->data);
-      renderRefresh ();
+      admPreview::update (curframe,rdr_decomp_buffer);
       update_status_bar(rdr_decomp_buffer);
     }
    
