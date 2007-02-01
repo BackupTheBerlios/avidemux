@@ -26,7 +26,7 @@ uint8_t  	GUI_PreviewRun(uint8_t *data)
 {
   return 1;
 }
-uint8_t GUI_StillAlive( void )
+uint8_t GUI_PreviewStillAlive( void )
 {
   return 1;
 }
@@ -54,7 +54,10 @@ uint8_t renderUpdateImage(uint8_t *ptr)
 {
   return 1;
 }
-
+uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uint32_t w, uint32_t h)
+{
+  return 1; 
+}
 uint8_t renderStartPlaying( void )
 {
   return 1;

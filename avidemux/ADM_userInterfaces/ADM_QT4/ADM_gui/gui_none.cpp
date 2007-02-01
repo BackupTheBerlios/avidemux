@@ -20,6 +20,13 @@ static int audioCodec=0;
 static int videoCodec=0;
 //**************************************************
 //**************************************************
+int    UI_getCurrentPreview(void)
+{
+  return 0; 
+}
+void   UI_setCurrentPreview(int ne)
+{
+}
 
 //**************************************************
 //**************************************************
@@ -29,20 +36,6 @@ void UI_setVProcessToggleStatus( uint8_t status )
 {}
 
 //**************************************************
-
-
-
-
-uint8_t UI_getPreviewToggleStatus( void )
-{}
-uint8_t UI_setPreviewToggleStatus( uint8_t status )
-{}
-
-uint8_t UI_getOutputToggleStatus( void )
-{}
-uint8_t UI_setOutputToggleStatus( uint8_t status )
-{}
-
 
 
 void UI_iconify( void )

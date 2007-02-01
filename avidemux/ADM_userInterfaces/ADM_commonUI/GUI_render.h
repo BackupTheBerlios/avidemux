@@ -16,6 +16,33 @@
 #ifndef GUI_RENDER_H
 #define GUI_RENDER_H
 
+
+#include "ADM_image.h"
+
+typedef enum ADM_PREVIEW_MODE
+{
+    ADM_PREVIEW_NONE, 
+    ADM_PREVIEW_OUTPUT,
+    ADM_PREVIEW_SIDE,
+    ADM_PREVIEW_TOP,
+    ADM_PREVIEW_SEPARATE
+};
+
+ADM_PREVIEW_MODE getPreviewMode(void);
+void             setPreviewMode(ADM_PREVIEW_MODE preview);
+
+class admPreview
+{
+  public:
+      static void update(uint32_t framenum,ADMImage *image);
+      static void start(void);
+      static void stop(void);
+      static void setMainDimension(uint32_t, uint32_t );
+  
+};
+
+
+
 typedef enum renderZoom
 {
         ZOOM_1_4,
@@ -32,6 +59,7 @@ uint8_t renderResize(uint32_t w, uint32_t h,renderZoom newzoom);
 uint8_t renderRefresh(void);
 uint8_t renderExpose(void);
 uint8_t renderUpdateImage(uint8_t *ptr);
+uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uint32_t w, uint32_t);
 
 uint8_t renderStartPlaying( void );
 uint8_t renderStopPlaying( void );

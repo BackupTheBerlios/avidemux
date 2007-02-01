@@ -75,8 +75,8 @@ CALLBACK(last_frame1                           ,ACT_End);
 CALLBACK(filters1                              ,ACT_VideoParameter);
 CALLBACK(toolbar1                              ,ACT_ViewMain);
 CALLBACK(sidebar1                              ,ACT_ViewSide);
-CALLBACK(preview1                              ,ACT_PreviewToggle);
-CALLBACK(display_output1                       ,ACT_OuputToggle);
+//CALLBACK(preview1                              ,ACT_PreviewToggle);
+//CALLBACK(display_output1                       ,ACT_OuputToggle);
 CALLBACK(second_audio_track1                   ,ACT_SecondAudioTrack);
 
 CALLBACK(vcd1                                   ,ACT_AUTO_VCD);

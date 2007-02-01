@@ -66,8 +66,6 @@ static GtkWidget *guiTotalFrame=NULL;
 static GtkWidget *guiCurTime=NULL;
 static GtkWidget *guiTotalTime=NULL;
 
-static GtkWidget *guiPreviewToggle=NULL;
-static GtkWidget *guiOutputToggle=NULL;
 static GtkWidget *guiAudioToggle=NULL;
 static GtkWidget *guiVideoToggle=NULL;
 static GdkCursor *guiCursorBusy=NULL;
@@ -86,6 +84,7 @@ extern void A_appendAvi (char *name);
 
 static void on_audio_change(void);
 static void on_video_change(void);
+static void on_preview_change(void);
 static int update_ui=0;
 
 static void GUI_initCustom(void);
@@ -96,6 +95,7 @@ extern uint8_t AVDM_setVolume(int volume);
 #define AUDIO_WIDGET "comboboxAudio"
 #define VIDEO_WIDGET "comboboxVideo"
 #define FORMAT_WIDGET "comboboxFormat"
+#define PREVIEW_WIDGET "comboboxPreview"
 //
 enum 
 {
@@ -117,7 +117,14 @@ static GtkTargetEntry target_table[] =
 };
 // CYB 2005.02.22: DND (END)
 
-
+static char *previewText[]=
+{
+    "Input",
+    "Output",
+    "Side",
+    "Top",
+    "Separate"
+};
 static void DNDDataReceived( GtkWidget *widget, GdkDragContext *dc,
                              gint x, gint y, GtkSelectionData *selection_data, guint info, guint t);
 
@@ -191,9 +198,6 @@ buttonCallBack_S buttonCallback[]=
 	{"buttonGotoB"			,"clicked"		,ACT_GotoMarkB},	
 	{"toolbuttonCalc"		,"clicked"		,ACT_Bitrate},	
 
-	{"toggletoolbuttonPreview"	,"toggled"		,ACT_PreviewToggle},
-	{"toggletoolbuttonOutput"      ,"toggled"		,ACT_OuputToggle},
-
 	{"boxCurFrame"			,"editing_done"		,ACT_JumpToFrame},
 	{"boxCurFrame"			,"activate"		,ACT_JumpToFrame},
 	{"boxCurTime"			,"editing_done"		,ACT_TimeChanged},
@@ -265,10 +269,10 @@ uint8_t  bindGUI( void )
 	
 	ADM_LOOKUP(guiCurTime,boxCurTime);
 	ADM_LOOKUP(guiTotalTime,labelTotalTime);
-
+#if 0
 	ADM_LOOKUP(guiPreviewToggle,toggletoolbuttonPreview);
 	ADM_LOOKUP(guiOutputToggle,toggletoolbuttonOutput);
-#if 0
+
 	ADM_LOOKUP(guiAudioToggle,togglebuttonAudio);
 	ADM_LOOKUP(guiVideoToggle,togglebuttonVideo);
 #endif
@@ -391,6 +395,17 @@ uint8_t  bindGUI( void )
                 }
         gtk_combo_box_set_active(combo_box,0);
 	on_audio_change();
+        
+        /* File in preview mode combobox */
+
+                combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,PREVIEW_WIDGET));
+                gtk_combo_box_remove_text(combo_box,0);
+                for(uint32_t i=0;i<sizeof(previewText)/sizeof(char*);i++)
+                {
+                        name=previewText[i];
+                        gtk_combo_box_append_text      (combo_box,_(name));	
+                }
+        gtk_combo_box_set_active(combo_box,0);
         // Format
                  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET)),0);
 
@@ -400,6 +415,9 @@ uint8_t  bindGUI( void )
                        NULL);
         gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,AUDIO_WIDGET)), "changed",
                        GTK_SIGNAL_FUNC(on_audio_change),
+                       NULL);
+        gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,PREVIEW_WIDGET)), "changed",
+                       GTK_SIGNAL_FUNC(on_preview_change),
                        NULL);
         
         // Add initial recent files
@@ -679,62 +697,6 @@ char string[500];
 		sprintf(string," %06lu",b);
         	gtk_label_set_text(GTK_LABEL(guiMarkB),string);
 }
-///
-///	Return status of preview button toggle
-///	1-> Activated
-/// 	0-> deActivated
-
-uint8_t UI_getPreviewToggleStatus( void )
-{                         //gtk_toggle_button_get_active
-
-	if(TRUE==gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(guiPreviewToggle))  )
- 		return 1;
-   	else
-    	return 0;
-}
-///
-///	Update the preview button toggle
-///
-uint8_t UI_setPreviewToggleStatus( uint8_t status )
-{
-gint b;
-        update_ui=1;
-	 if(status) b=TRUE;
-  	else			b=FALSE;
-     gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON(guiPreviewToggle),b);
-        // Update checkbox
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(WOD(preview1)),status);
-        update_ui=0;
-
-}
-///
-///     Return status of preview button toggle
-///     1-> Activated
-///     0-> deActivated
-
-uint8_t UI_getOutputToggleStatus( void )
-{                         //gtk_toggle_button_get_active
-
-        if(TRUE==gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(guiOutputToggle))  )
-                return 1;
-        else
-        return 0;
-}
-///
-///     Update the preview button toggle
-///
-uint8_t UI_setOutputToggleStatus( uint8_t status )
-{
-gint b;
-        update_ui=1;
-         if(status) b=TRUE;
-        else                    b=FALSE;
-     gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON(guiOutputToggle),b);
-        // Update checkbox
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(WOD(display_output1)),status);
-        update_ui=0;
-
-}
 
 /**
 	Set/unset the toggle button audio process
@@ -867,6 +829,27 @@ int enable;
         HandleAction(ACT_AudioCodecChanged);
 
 }
+void on_preview_change(void)
+{
+int enable;
+       if(update_ui) return;
+        HandleAction(ACT_PreviewChanged);
+
+}
+
+int  UI_getCurrentPreview(void)
+ {
+       
+        return gtk_combo_box_get_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,PREVIEW_WIDGET)));
+ 
+ }
+void   UI_setCurrentPreview(int ne)
+ {
+       
+        gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(guiRootWindow,PREVIEW_WIDGET)),ne);
+ 
+ }
+
  int 	UI_getCurrentACodec(void)
  {
         //return getRangeInMenu(lookup_widget(guiRootWindow,AUDIO_WIDGET));

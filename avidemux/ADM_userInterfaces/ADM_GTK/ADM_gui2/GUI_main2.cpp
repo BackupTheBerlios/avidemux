@@ -14,13 +14,13 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-/*
+#if 0
 #include "callbacks.h"
 #include "interface.h"
 #include "support.h"
-*/
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-
+#else
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#endif
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
     gtk_widget_ref (widget), (GDestroyNotify) gtk_widget_unref)
@@ -176,8 +176,8 @@ create_mainWindow (void)
   GtkWidget *tmp_image;
   GtkWidget *toolbuttonCalc;
   GtkWidget *separatortoolitem2;
-  GtkWidget *toggletoolbuttonPreview;
-  GtkWidget *toggletoolbuttonOutput;
+  GtkWidget *toolitem12;
+  GtkWidget *comboboxPreview;
   GtkWidget *vbox10;
   GtkWidget *hbox14;
   GtkWidget *alignment19;
@@ -964,23 +964,13 @@ create_mainWindow (void)
   gtk_widget_show (separatortoolitem2);
   gtk_container_add (GTK_CONTAINER (toolbar2), separatortoolitem2);
 
-  toggletoolbuttonPreview = (GtkWidget*) gtk_toggle_tool_button_new ();
-  gtk_tool_button_set_label (GTK_TOOL_BUTTON (toggletoolbuttonPreview), _("Preview"));
-  tmp_image = create_pixmap (mainWindow, "preview.png");
-  gtk_widget_show (tmp_image);
-  gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON (toggletoolbuttonPreview), tmp_image);
-  gtk_widget_show (toggletoolbuttonPreview);
-  gtk_container_add (GTK_CONTAINER (toolbar2), toggletoolbuttonPreview);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toggletoolbuttonPreview), tooltips, _("Preview filtered video in a new window"), NULL);
+  toolitem12 = (GtkWidget*) gtk_tool_item_new ();
+  gtk_widget_show (toolitem12);
+  gtk_container_add (GTK_CONTAINER (toolbar2), toolitem12);
 
-  toggletoolbuttonOutput = (GtkWidget*) gtk_toggle_tool_button_new ();
-  gtk_tool_button_set_label (GTK_TOOL_BUTTON (toggletoolbuttonOutput), _("Output"));
-  tmp_image = create_pixmap (mainWindow, "output.png");
-  gtk_widget_show (tmp_image);
-  gtk_tool_button_set_icon_widget (GTK_TOOL_BUTTON (toggletoolbuttonOutput), tmp_image);
-  gtk_widget_show (toggletoolbuttonOutput);
-  gtk_container_add (GTK_CONTAINER (toolbar2), toggletoolbuttonOutput);
-  gtk_tool_item_set_tooltip (GTK_TOOL_ITEM (toggletoolbuttonOutput), tooltips, _("Display filtered output in the main window"), NULL);
+  comboboxPreview = gtk_combo_box_new_text ();
+  gtk_widget_show (comboboxPreview);
+  gtk_container_add (GTK_CONTAINER (toolitem12), comboboxPreview);
 
   vbox10 = gtk_vbox_new (FALSE, 3);
   gtk_widget_show (vbox10);
@@ -1428,10 +1418,6 @@ create_mainWindow (void)
   GTK_WIDGET_SET_FLAGS (labelFrameType, GTK_CAN_FOCUS);
   gtk_label_set_selectable (GTK_LABEL (labelFrameType), TRUE);
 
-//   g_signal_connect ((gpointer) psp__h264_1, "activate",
-//                     G_CALLBACK (on_psp_h264_activate),
-//                     NULL);
-
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (mainWindow, mainWindow, "mainWindow");
   GLADE_HOOKUP_OBJECT (mainWindow, vbox1, "vbox1");
@@ -1575,8 +1561,8 @@ create_mainWindow (void)
   GLADE_HOOKUP_OBJECT (mainWindow, separatortoolitem1, "separatortoolitem1");
   GLADE_HOOKUP_OBJECT (mainWindow, toolbuttonCalc, "toolbuttonCalc");
   GLADE_HOOKUP_OBJECT (mainWindow, separatortoolitem2, "separatortoolitem2");
-  GLADE_HOOKUP_OBJECT (mainWindow, toggletoolbuttonPreview, "toggletoolbuttonPreview");
-  GLADE_HOOKUP_OBJECT (mainWindow, toggletoolbuttonOutput, "toggletoolbuttonOutput");
+  GLADE_HOOKUP_OBJECT (mainWindow, toolitem12, "toolitem12");
+  GLADE_HOOKUP_OBJECT (mainWindow, comboboxPreview, "comboboxPreview");
   GLADE_HOOKUP_OBJECT (mainWindow, vbox10, "vbox10");
   GLADE_HOOKUP_OBJECT (mainWindow, hbox14, "hbox14");
   GLADE_HOOKUP_OBJECT (mainWindow, alignment19, "alignment19");

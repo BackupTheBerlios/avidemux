@@ -61,7 +61,6 @@ static uint32_t 	uw, uh;
 int 			lock;
 uint8_t		needDestroy=0;
 static int      needResponse=0;
-extern void UI_setPreviewToggleStatus(uint8_t s);
 static ColYuvRgb    rgbConv(100,100);
 
 
@@ -103,7 +102,7 @@ void GUI_PreviewShow(uint32_t w, uint32_t h, uint8_t *data)
 // It is a independant window, so we cannot use gtk_dialog_run
 //
 //*************************************************************
-uint8_t GUI_StillAlive( void )
+uint8_t GUI_PreviewStillAlive( void )
 {
  	if(dialog==NULL) return 0;
   	return 1;
@@ -242,8 +241,6 @@ gboolean preview_exit_short (GtkWidget * widget, GdkEvent * event, gpointer user
 		//printf(">\n");
 		needDestroy=0;
     		GUI_PreviewEnd();
-		//printf("<\n");
-       		UI_setPreviewToggleStatus( 0);
                 printf("Destroyed\n");
                 
     }

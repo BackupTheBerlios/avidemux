@@ -14,7 +14,7 @@ void GUI_GoToKFrame(uint32_t frame); // same as below execpt								            
 int GUI_GoToFrame(uint32_t frame);
 // not in callback.h to avoid importing COMPRESSION MODE in interface.cpp
 
- void updateVideoFilters(void);
+
  //
  //
  //

@@ -1,5 +1,5 @@
-#ifndef ADM_GUI
-#define ADM_GUI
+#ifndef ADM_GUI_UI_H
+#define ADM_GUI_UI_H
 
 #include "ADM_editor/ADM_outputfmt.h"
 
@@ -16,13 +16,6 @@ void 	UI_setMarkers(uint32_t a, uint32_t b );
 void 	UI_setTitle(char *name);
 
 
-uint8_t UI_getPreviewToggleStatus( void );
-uint8_t UI_setPreviewToggleStatus( uint8_t status );
-
-uint8_t UI_getOutputToggleStatus( void );
-uint8_t UI_setOutputToggleStatus( uint8_t status );
-
-
 void UI_setAProcessToggleStatus( uint8_t status );
 void UI_setVProcessToggleStatus( uint8_t status );
 
@@ -31,6 +24,9 @@ void UI_deiconify( void );
 
 uint32_t UI_readCurFrame( void );
 void UI_JumpDone(void);
+
+int    UI_getCurrentPreview(void);
+void   UI_setCurrentPreview(int ne);
 
 int 	UI_getCurrentACodec(void);
 int 	UI_getCurrentVCodec(void);

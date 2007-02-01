@@ -44,7 +44,8 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
     
-    extern void    UI_purge(void );
+extern void    UI_purge(void );
+extern ADMImage *rdr_decomp_buffer;
 //____________________________________
 
 uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags)
@@ -75,16 +76,13 @@ uint32_t flags;
                   GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode next frame."));
            	}
            else
-           {
-		curframe++;
-               	if(mode_preview)
-          			editorUpdatePreview( curframe) ;
-						
-		renderUpdateImage(rdr_decomp_buffer->data);
-     		 update_status_bar(rdr_decomp_buffer);
-
-		UI_purge();
-	  	}
+            {
+                  curframe++;
+                  admPreview::update( curframe,rdr_decomp_buffer) ;
+                  update_status_bar(rdr_decomp_buffer);
+  
+                UI_purge();
+            }
      }
 }
 
@@ -110,18 +108,15 @@ void GUI_NextKeyFrame(void)
            	}
 		else
 		{
-			curframe=f;
-			if( !GUI_getFrame(curframe,rdr_decomp_buffer,&flags))
-        		{
+                        curframe=f;
+                        if( !GUI_getFrame(curframe,rdr_decomp_buffer,&flags))
+                        {
                           GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode keyframe."));
-			}
-			
-			renderUpdateImage(rdr_decomp_buffer->data);
-			if(mode_preview)
-         				editorUpdatePreview( curframe)     ;
-
-			update_status_bar(rdr_decomp_buffer);
-			UI_purge();
+                        }
+                        
+                        admPreview::update( curframe,rdr_decomp_buffer) ;
+                        update_status_bar(rdr_decomp_buffer);
+                        UI_purge();
 		}
 		
   	}
@@ -267,10 +262,8 @@ void GUI_NextPrevBlackFrame(int dir)
       curframe=orgFrame;
       video_body->getUncompressedFrame(orgFrame ,rdr_decomp_buffer);
    }
-   renderUpdateImage(rdr_decomp_buffer->data);
-   if(mode_preview)
-	 editorUpdatePreview( curframe)     ;
-   update_status_bar(rdr_decomp_buffer);
+    admPreview::update( curframe,rdr_decomp_buffer) ;
+    update_status_bar(rdr_decomp_buffer);
 
    return ;
 }
@@ -342,10 +335,8 @@ uint8_t A_ListAllBlackFrames(char *name)
         curframe=0;
         video_body->getUncompressedFrame(0,rdr_decomp_buffer);
     }
-    renderUpdateImage(rdr_decomp_buffer->data);
-    if ( mode_preview )
-        editorUpdatePreview( curframe );
-    update_status_bar(rdr_decomp_buffer);
+     admPreview::update( curframe,rdr_decomp_buffer) ;
+     update_status_bar(rdr_decomp_buffer);
 
     return 1;
 }
@@ -358,18 +349,16 @@ uint8_t A_ListAllBlackFrames(char *name)
 void GUI_GoToKFrame(uint32_t frame)
 {
    uint32_t old=curframe;
-//  uint32_t flags;
 
-        if (playing)
-				return;
 
-	if (avifileinfo)
-	{
-		// curframe=frame;
-		//
-		curframe=frame;
-		GUI_PreviousKeyFrame();	
-     	}
+    if (playing)
+            return;
+
+    if (avifileinfo)
+    {
+            curframe=frame;
+            GUI_PreviousKeyFrame();	
+    }
 }
 
 //_____________________________________________________________
@@ -377,30 +366,25 @@ int GUI_GoToFrame(uint32_t frame)
 {
 uint32_t flags;
 
-	if (playing)
-		return 0;
+      if (playing)
+              return 0;
 
-      if (!avifileinfo)
-      		return 0;
+    if (!avifileinfo)
+              return 0;
+    
+
+      if( !GUI_getFrame(frame ,rdr_decomp_buffer,&flags))
+      {
+        GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode the frame."));
+              return 0;
+      }
+
+      curframe = frame;
+      admPreview::update( curframe,rdr_decomp_buffer) ;
+      update_status_bar(rdr_decomp_buffer);
+      UI_purge();
       
-
-	if( !GUI_getFrame(frame ,rdr_decomp_buffer,&flags))
-	{
-          GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode the frame."));
-		return 0;
-	}
-
-	curframe = frame;
-	renderUpdateImage(rdr_decomp_buffer->data);
-
-	if(mode_preview)
-		editorUpdatePreview( curframe);
-
-	update_status_bar(rdr_decomp_buffer);
-	UI_purge();
-	
-    	return 1;
-
+      return 1;
 }
 
 
@@ -418,27 +402,24 @@ void GUI_PreviousKeyFrame(void)
     f=curframe;
     if (avifileinfo)
       {
-		if(!video_body->getPKFrame(&f)&&curframe)
-		//if( !GUI_getFrameNKF(&f ,rdr_decomp_buffer))
-        	{
-            //	GUI_Error_HIG("Decompressing error", NULL);
-           	}
-		else
-		{
-			curframe=f;
-			if( !GUI_getFrame(curframe,rdr_decomp_buffer,&flags))
-        		{
-                          GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode keyframe."));
-			}
-			
-			renderUpdateImage(rdr_decomp_buffer->data);
-			if(mode_preview)
-         				editorUpdatePreview( curframe)     ;
+            if(!video_body->getPKFrame(&f)&&curframe)
+            {
+                  return;
+            }
+            else
+            {
+                    curframe=f;
+                    if( !GUI_getFrame(curframe,rdr_decomp_buffer,&flags))
+                    {
+                      GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode keyframe."));
+                    }
+                    
+                    admPreview::update( curframe,rdr_decomp_buffer) ;
 
-			update_status_bar(rdr_decomp_buffer);
-			UI_purge();
-		}
-		
+                    update_status_bar(rdr_decomp_buffer);
+                    UI_purge();
+            }
+              
   	}
 };
 

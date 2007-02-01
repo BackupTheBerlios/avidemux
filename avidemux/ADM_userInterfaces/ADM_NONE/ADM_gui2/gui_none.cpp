@@ -52,6 +52,14 @@ void UI_setAProcessToggleStatus( uint8_t status )
 {}
 void UI_setVProcessToggleStatus( uint8_t status )
 {}
+//**************************************************
+int    UI_getCurrentPreview(void)
+{
+  return 0; 
+}
+void   UI_setCurrentPreview(int ne)
+{
+}
 
 //**************************************************
 void UI_updateFrameCount(uint32_t curFrame)
@@ -78,15 +86,7 @@ void 	UI_setTitle(char *name)
 {}
 
 
-uint8_t UI_getPreviewToggleStatus( void )
-{}
-uint8_t UI_setPreviewToggleStatus( uint8_t status )
-{}
 
-uint8_t UI_getOutputToggleStatus( void )
-{}
-uint8_t UI_setOutputToggleStatus( uint8_t status )
-{}
 
 
 

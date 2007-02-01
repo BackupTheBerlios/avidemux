@@ -94,7 +94,6 @@ uint32_t type,value;
   _audioSample=0;
   _lastseg = 99;
   _lastframe = 99;
-  _cached = 1;
   _nb_clipboard=0;
   _haveMarkers=0; // only edl have markers
   // Initialize a default postprocessing (dummy)

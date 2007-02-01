@@ -60,7 +60,7 @@
 
 static uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h);
 static uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h);
-
+static uint8_t GUI_ConvertRGBBlit(uint8_t * in, uint8_t * out,uint32_t totalW,uint32_t totalH, uint32_t startx,uint32_t starty,uint32_t w, uint32_t h);
 uint8_t  GUI_InitRender (GtkWidget *g, uint32_t w,uint32_t h);
 static renderZoom zoom=ZOOM_1_1;
 
@@ -172,6 +172,22 @@ uint8_t renderUpdateImage(uint8_t *ptr)
 
 }
 /**
+      \fn renderUpdateImageBlit
+      \brief Blit the source into destination
+
+*/
+uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uint32_t w, uint32_t h)
+{
+
+        ADM_assert(screenBuffer);
+        lastImage=NULL;
+        if(!accel_mode)
+                GUI_ConvertRGBBlit(ptr,screenBuffer, renderW,renderH,startx,starty,w,h);
+        renderRefresh();
+        return 1;
+}
+
+/**
 	Refresh the image from internal buffer / last image
 	Used for example as call back for X11 events
 
@@ -179,20 +195,21 @@ uint8_t renderUpdateImage(uint8_t *ptr)
 //_______________________________________________
 uint8_t renderRefresh(void)
 {
-	if(!screenBuffer)
-	{
-		if(accel_mode) ADM_assert(0);
-		return 0;
-	}
+      if(!screenBuffer)
+      {
+              if(accel_mode) ADM_assert(0);
+              return 0;
+      }
 
-	if(accel_mode)
-	{
-		accel_mode->display(lastImage, renderW, renderH);
-		//GUI_XvRedraw();
-   	}
-    	else
-		GUI_RGBDisplay(screenBuffer, renderW, renderH,draw);
-    return 1;
+      if(accel_mode)
+      {
+          if(lastImage)
+              accel_mode->display(lastImage, renderW, renderH);
+              //GUI_XvRedraw();
+      }
+      else
+              GUI_RGBDisplay(screenBuffer, renderW, renderH,draw);
+  return 1;
 }
 
 uint8_t renderExpose(void)
@@ -206,6 +223,7 @@ uint8_t renderExpose(void)
 
     if ( accel_mode)
     {	
+        if(lastImage)
 		accel_mode->display(lastImage,renderW,renderH);
     }
     else
@@ -329,14 +347,20 @@ uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h)
      UI_purge();
      */
     gtk_widget_set_usize(win, w, h);
+    rgbConverter.reset(w,h);
     return 1;
 }
 
 uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h)
 {
-    //COL_yv12rgb (w, h,in, out);
     rgbConverter.reset(w,h);
     rgbConverter.scale(in,out);
+    return 1;
+}
+uint8_t GUI_ConvertRGBBlit(uint8_t * in, uint8_t * out,uint32_t totalW,uint32_t totalH, uint32_t startx,uint32_t starty,uint32_t w, uint32_t h)
+{
+    rgbConverter.reset(w,h);
+    rgbConverter.scale(in,out,startx,starty,w,h,renderW,renderH);
     return 1;
 }
 

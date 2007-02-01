@@ -125,7 +125,6 @@ class ADM_Composer
   					uint32_t  _audioseg;
 					int64_t  _audioSample;
   					uint32_t  _audiooffset;
-       					uint8_t    _cached;
 					uint8_t	   _haveMarkers; // used for load/save edl
 
        					uint32_t _lastseg,_lastframe,_lastlen;
@@ -159,9 +158,6 @@ class ADM_Composer
                                                 uint8_t hasVBRVideos(void);
                                                 uint8_t addSegment(uint32_t source,uint32_t start, uint32_t nb);
                                                 uint8_t deleteAllSegments(void);
-  						uint8_t	activateCache( void ){ _cached=1;_lastseg=0xffffff;return 1;}
-						uint8_t	flushCache( void ){ _lastseg=0xffffff;return 1;}
-						uint8_t	desactivateCache( void ){ _cached=0;return 1;}
   						uint8_t 	getExtraHeaderData(uint32_t *len, uint8_t **data);
                                                 uint32_t getPARWidth(void);
                                                 uint32_t getPARHeight(void);

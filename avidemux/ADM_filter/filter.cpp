@@ -29,14 +29,13 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
-#include "avi_vars.h"
+
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_PREVIEW
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_osSupport/ADM_quota.h"
 //
-void updateVideoFilters( void );
 // exported vars
 uint32_t nb_video_filter=0;
 uint32_t nb_active_filter=0;
@@ -49,10 +48,12 @@ extern ADM_Composer *video_body;
 extern AVDMGenericVideoStream *filterCreateFromTag(VF_FILTERS tag,CONFcouple *conf, AVDMGenericVideoStream *in) ;
 extern char *ADM_escape(const ADM_filename *incoming);
 //
-static   AVDMGenericVideoStream *preview=NULL;
+
+static  void updateVideoFilters(void);
+
 // Ugly should be dynamically allocated
 #warning HARDCODEC IMAGE SIZE
-static ADMImage *unpackd;
+
 // dummy constructor used to register the filter
 //____________________________________
 AVDMVideo_FilterDec::AVDMVideo_FilterDec(char *name,
@@ -75,7 +76,6 @@ void filterCleanUp( void )
              videofilters[i].filter=NULL;  		
 	}
    nb_active_filter=0;
-   preview=NULL;
 }
 void filterListAll( void )
 {
@@ -168,7 +168,6 @@ aviInfo info;
   	if(nb_active_filter==0)
   		{
   		 		nb_active_filter=1;
-  		 		preview=videofilters[0].filter=  new AVDMVideoStreamNull(video_body,0,info.nb_frames);
 				aprintf("--preview filter 0\n");
 				return videofilters[  nb_active_filter-1].filter;
   		}
@@ -243,7 +242,6 @@ void updateVideoFilters(void )
   		if(nb_active_filter<=1)
   		{
   		 	nb_active_filter=1;
-			preview=videofilters[0].filter;
 			aprintf("--preview filter %d\n",nb_active_filter-1);
   		 	return;
   		}
@@ -261,7 +259,6 @@ void updateVideoFilters(void )
 
                           delete old;
             	}
-		preview=videofilters[nb_active_filter-1].filter;
 		aprintf("--preview filter %d\n",nb_active_filter-1);
 }
 //
@@ -329,61 +326,7 @@ const char  *filterGetNameFromTag(VF_FILTERS tag)
 
 /*---------------------------------------*/	 
 
-/* if refresh=1 we use the current full filter list
-	else we rebuild a new one */
-void 	editorReignitPreview( void )
-{
-		aprintf("--killing\n");
-            GUI_PreviewEnd();
 
-	    	getFirstVideoFilter();
-	   
-	    preview=videofilters[  nb_active_filter-1].filter;
-	    aprintf("--spawning\n");
-	    if(unpackd)
-	    {
-	    	delete unpackd;
-		unpackd=NULL;		
-	    }
-	    unpackd=new ADMImage(preview->getInfo()->width,preview->getInfo()->height);
-            GUI_PreviewInit(preview->getInfo()->width,preview->getInfo()->height,0);
-}
-
-
-void editorKillPreview( void )
-{
-      GUI_PreviewEnd();
-      if(unpackd)
-      	delete unpackd;
-      unpackd=NULL;
-}
-
-
-
-
-void editorUpdatePreview(uint32_t framenum)
-{
-//
-//
-//
-	uint32_t fl,len;	
- 	ADM_assert(preview);
-	ADM_assert(unpackd);
-
-  if( GUI_StillAlive())
-  {
-  		aprintf("Preview: Ask for frame %lu\n",framenum);
-		if(framenum<=preview->getInfo()->nb_frames-1)
-		{
-			preview->getFrameNumberNoAlloc(framenum,&len,unpackd,&fl);
-			GUI_PreviewUpdate(unpackd->data);
-		}
-  }
-
-//   virtual uint8_t getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
-//          																				uint8_t *data,uint32_t *flags)=0;
-
-}
 //______________________________________________________
 // Check and build a confCouple from the args
 // the filter_param arg is a template for that filter
