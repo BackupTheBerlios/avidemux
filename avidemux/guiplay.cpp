@@ -149,6 +149,7 @@ void GUI_PlayAvi(void)
 // reset timer reference
     resetTime();
     admPreview::deferDisplay(1);
+    admPreview::update(played_frame,buffer);
     do
     {
         vids++;

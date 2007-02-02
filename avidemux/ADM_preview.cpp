@@ -98,7 +98,17 @@ ADM_PREVIEW_MODE getPreviewMode(void)
 */
 void admPreview::deferDisplay(uint32_t onoff)
 {
-      defered_display=onoff;
+      
+      if(onoff)
+      {
+        renderStartPlaying();
+        defered_display=1;
+      }
+      else
+      {
+        renderStopPlaying();
+        defered_display=0;
+      }
   
 }
 /**

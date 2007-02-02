@@ -62,6 +62,9 @@ static uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h);
 static uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h);
 static uint8_t GUI_ConvertRGBBlit(uint8_t * in, uint8_t * out,uint32_t totalW,uint32_t totalH, uint32_t startx,uint32_t starty,uint32_t w, uint32_t h,uint32_t primary);
 uint8_t  GUI_InitRender (GtkWidget *g, uint32_t w,uint32_t h);
+uint8_t BitBlit(uint8_t *dst, uint32_t pitchDest,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height);
+
+
 static renderZoom zoom=ZOOM_1_1;
 
 static ColYuvRgb rgbConverter(640,480);
@@ -70,6 +73,7 @@ static ColYuvRgb rgbConverter2(640,480);
 extern GtkWidget *getDrawWidget( void );
 extern uint8_t UI_shrink(uint32_t w,uint32_t h);
 static AccelRender *accel_mode=NULL;
+static uint8_t *accelSurface=NULL;
 //_______________________________________
 
 static uint8_t 	        *screenBuffer=NULL;
@@ -177,14 +181,31 @@ uint8_t renderUpdateImage(uint8_t *ptr)
       \brief Blit the source into destination
 
 */
+
 uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uint32_t w, uint32_t h,uint32_t primary)
 {
 
         ADM_assert(screenBuffer);
         lastImage=NULL;
         if(!accel_mode)
+        {
                 GUI_ConvertRGBBlit(ptr,screenBuffer, renderW,renderH,startx,starty,w,h,primary);
-        renderRefresh();
+                if(primary) renderRefresh();
+        }
+        else
+        { /* Accel mode, in that case we need to blit our part of the image inside the big image
+              It is assumed the accel render part can work with YV12
+          */
+          /* Luma */
+          uint32_t pageR=(renderW*renderH);
+          uint32_t pageS=(w*h);
+          BitBlit(accelSurface+startx+starty*renderW,renderW,ptr,w,w,h);
+          BitBlit(accelSurface+pageR+(startx>>1)+(starty>>1)*(renderW>>1),renderW>>1,ptr+pageS,w>>1,w>>1,h>>1);
+          BitBlit(accelSurface+(pageR*5)/4+(startx>>1)+(starty>>1)*(renderW>>1),renderW>>1,ptr+(pageS*5)/4,w>>1,w>>1,h>>1);
+
+          lastImage=accelSurface;
+          if(primary) renderRefresh();
+        }
         return 1;
 }
 
@@ -206,7 +227,6 @@ uint8_t renderRefresh(void)
       {
           if(lastImage)
               accel_mode->display(lastImage, renderW, renderH);
-              //GUI_XvRedraw();
       }
       else
               GUI_RGBDisplay(screenBuffer, renderW, renderH,draw);
@@ -312,6 +332,12 @@ ADM_RENDER_TYPE render;
                 rgbConverter.reset(renderW,renderH);
                 printf("No accel used for rendering\n");
         }
+        else
+        {
+           ADM_assert(!accelSurface);
+           accelSurface=new uint8_t[ (renderW*renderH*3)>>1];
+          
+        }
 	
 	return 1;
 }
@@ -322,7 +348,10 @@ uint8_t renderStopPlaying( void )
 	if(accel_mode)
 	{
 		accel_mode->end();
-		delete accel_mode;				
+		delete accel_mode;
+                if(accelSurface) delete [] accelSurface;
+                accelSurface=NULL;
+				
 	}
 	accel_mode=NULL;	
 	return 1;
