@@ -19,6 +19,8 @@
 
 #include "ADM_image.h"
 
+class AVDMGenericVideoStream;
+
 typedef enum ADM_PREVIEW_MODE
 {
     ADM_PREVIEW_NONE, 
@@ -38,6 +40,9 @@ class admPreview
       static void start(void);
       static void stop(void);
       static void setMainDimension(uint32_t, uint32_t );
+      static void updateFilters(AVDMGenericVideoStream *first,AVDMGenericVideoStream *last);
+      static void deferDisplay(uint32_t onoff);
+      static void displayNow(uint32_t framenum,ADMImage *image);
   
 };
 

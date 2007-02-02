@@ -29,7 +29,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
-
+#include "ADM_userInterfaces/ADM_commonUI/GUI_render.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_PREVIEW
@@ -243,23 +243,25 @@ void updateVideoFilters(void )
   		{
   		 	nb_active_filter=1;
 			aprintf("--preview filter %d\n",nb_active_filter-1);
+                        admPreview::updateFilters(videofilters[0].filter,videofilters[nb_active_filter-1].filter);
   		 	return;
   		}
   		// Rebuild other filters
-  		    for(uint32_t i=1;i<nb_active_filter;i++)
-						{
-                   		VF_FILTERS tag;
-                    		AVDMGenericVideoStream *old;
-                   			old= videofilters[i].filter;
-                  			tag=videofilters[i].tag;
-
-                      	videofilters[i].filter=filterCreateFromTag(tag,
-                            			videofilters[i].conf,
-                               			videofilters[i-1].filter);
-
+                for(uint32_t i=1;i<nb_active_filter;i++)
+                {
+                    VF_FILTERS tag;
+                    AVDMGenericVideoStream *old;
+                            old= videofilters[i].filter;
+                            tag=videofilters[i].tag;
+  
+                            videofilters[i].filter=filterCreateFromTag(tag,
+                                                videofilters[i].conf,
+                                                videofilters[i-1].filter);
                           delete old;
-            	}
+                }
 		aprintf("--preview filter %d\n",nb_active_filter-1);
+                ADM_assert(nb_active_filter);
+                admPreview::updateFilters(videofilters[0].filter,videofilters[nb_active_filter-1].filter);
 }
 //
 //	Create a filter from : its tag, its config and an input stream

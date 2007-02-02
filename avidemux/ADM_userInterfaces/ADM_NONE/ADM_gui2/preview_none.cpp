@@ -7,12 +7,15 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "config.h"
+#include <ADM_assert.h>
 #include "fourcc.h"
 #include "avio.hxx"
+#include "ADM_editor/ADM_edit.hxx"
+#include "ADM_video/ADM_genvideo.hxx"
 
-#include <ADM_assert.h>
 #include "GUI_render.h"
+
+
 
 void GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal)
 {}

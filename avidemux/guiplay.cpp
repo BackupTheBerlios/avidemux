@@ -108,8 +108,6 @@ void GUI_PlayAvi(void)
   uint32_t played_frame=0;
   uint32_t remaining=avifileinfo->nb_frames-curframe;
 
-    admPreview::stop();
-    admPreview::start();
     
     if(getPreviewMode()==ADM_PREVIEW_OUTPUT)
     {
@@ -119,6 +117,7 @@ void GUI_PlayAvi(void)
     {
             filter=getFirstVideoFilter(curframe,remaining );
     }
+    
     max=filter->getInfo()->nb_frames;
 
     // compute how much a frame lasts in ms
@@ -149,10 +148,11 @@ void GUI_PlayAvi(void)
      //renderStartPlaying();
 // reset timer reference
     resetTime();
+    admPreview::deferDisplay(1);
     do
     {
         vids++;
-        admPreview::update(played_frame,buffer);;
+        admPreview::displayNow(played_frame,buffer);;
         update_status_bar(buffer);
         if (time_a == 0)
             time_a = getTime(0);
@@ -170,6 +170,7 @@ void GUI_PlayAvi(void)
             printf("\n cannot read frame!\n");
             goto abort_play;
         }
+        admPreview::update(played_frame+1,buffer);;
 	curframe++;
 	played_frame++;
 
@@ -221,13 +222,10 @@ abort_play:
     //____________________________________
     playing = 0;
 	  delete  buffer;
-
-	  // renderStopPlaying();
-	     admPreview::stop();
-             admPreview::start();
+          
 	   getFirstVideoFilter( );
-	   //video_body->getUncompressedFrame(curframe, rdr_decomp_buffer,&flags);
 	   GUI_getFrame(curframe, rdr_decomp_buffer, &flags);
+           admPreview::deferDisplay(0);
            admPreview::update(curframe,rdr_decomp_buffer);
      	   update_status_bar(rdr_decomp_buffer);
 #ifdef HAVE_AUDIO

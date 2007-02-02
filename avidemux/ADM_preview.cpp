@@ -64,6 +64,7 @@ static ADMImage *previewImage;
 static ADM_PREVIEW_MODE previewMode=ADM_PREVIEW_NONE;
 static uint32_t _mainW=0,_mainH=0;
 static uint32_t _displayW=0,_displayH=0;
+static uint32_t defered_display=0;
 /**
       \fn getPreviewMode
       \brief returns current preview mode
@@ -75,6 +76,9 @@ ADM_PREVIEW_MODE getPreviewMode(void)
 {
   return previewMode; 
 }
+
+
+
 /**
       \fn setPreviewMode
       \brief set current preview mode an update UI
@@ -87,8 +91,16 @@ ADM_PREVIEW_MODE getPreviewMode(void)
   previewMode=mode; 
   UI_setCurrentPreview( (int)mode);
 }
+/**
+      \fn deferDisplay
+      \brief Enable or disable defered display
 
-
+*/
+void admPreview::deferDisplay(uint32_t onoff)
+{
+      defered_display=onoff;
+  
+}
 /**
       \fn admPreview::start
       \brief start preview
@@ -163,6 +175,43 @@ void admPreview::stop( void )
       }
 }
 /**
+      \fn admPreview::updateFilters
+      \brief Signal from filter that the filter chain has been updated
+      @param w : width
+      @param h : height
+*/
+
+void admPreview::updateFilters(AVDMGenericVideoStream *first,AVDMGenericVideoStream *last)
+{
+   switch(previewMode)
+            {
+              case  ADM_PREVIEW_SEPARATE:
+                  preview=last;
+                  break;
+                  /* no break here, not a mistake */
+              case  ADM_PREVIEW_NONE:
+                  break;
+              case  ADM_PREVIEW_OUTPUT:
+                preview=last;
+                break;
+              case  ADM_PREVIEW_SIDE:
+              {
+                  
+                  preview=last;
+                  break;
+              }
+              case  ADM_PREVIEW_TOP:
+              {
+                  
+                  preview=last;
+                  break;
+              }
+              default: ADM_assert(0);
+            }
+  
+}
+
+/**
       \fn admPreview::setMainDimension
       \brief Update width & height of input video
       @param w : width
@@ -192,27 +241,27 @@ void admPreview::update(uint32_t framenum,ADMImage *image)
     switch(previewMode)
     {
       case ADM_PREVIEW_NONE:
-        if(image) renderUpdateImage(image->data);
+        if(image && !defered_display) renderUpdateImage(image->data);
         break;
       case ADM_PREVIEW_OUTPUT:
             if(framenum<=preview->getInfo()->nb_frames-1)
                   {
                           preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
-                          renderUpdateImage(previewImage->data);
+                          if(!defered_display) renderUpdateImage(previewImage->data);
                   }
             break;
       case ADM_PREVIEW_SEPARATE:
             ADM_assert(preview);
             ADM_assert(previewImage);
 
-          if(image) renderUpdateImage(image->data);
+          if(image && !defered_display) renderUpdateImage(image->data);
           if( GUI_PreviewStillAlive())
           {
                   aprintf("Preview: Ask for frame %lu\n",framenum);
                   if(framenum<=preview->getInfo()->nb_frames-1)
                   {
                           preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
-                          GUI_PreviewUpdate(previewImage->data);
+                          if(!defered_display) GUI_PreviewUpdate(previewImage->data);
                   }
           }
           break;
@@ -220,8 +269,52 @@ void admPreview::update(uint32_t framenum,ADMImage *image)
               ADM_assert(preview);
               ADM_assert(previewImage);
   
-              renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
+              if(!defered_display) renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
               preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
+              if(!defered_display) 
+                  renderUpdateImageBlit(previewImage->data,_mainW,0,previewImage->_width,previewImage->_height,1);
+              break;
+        
+      case ADM_PREVIEW_TOP:
+              ADM_assert(preview);
+              ADM_assert(previewImage);
+  
+              if(!defered_display) renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
+              preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
+              if(!defered_display)
+                  renderUpdateImageBlit(previewImage->data,0,_mainH,previewImage->_width,previewImage->_height,1);
+              break;
+      default: ADM_assert(0);
+    }
+}
+/**
+      \fn displayNow
+      \brief display on screen immediately
+*/
+
+void admPreview::displayNow(uint32_t framenum,ADMImage *image)
+{
+    uint32_t fl,len;	
+
+    switch(previewMode)
+    {
+      case ADM_PREVIEW_NONE:
+        if(image ) renderUpdateImage(image->data);
+        break;
+      case ADM_PREVIEW_OUTPUT:
+            renderUpdateImage(previewImage->data);
+            break;
+      case ADM_PREVIEW_SEPARATE:
+          if(image) renderUpdateImage(image->data);
+          if( GUI_PreviewStillAlive())
+          {
+              GUI_PreviewUpdate(previewImage->data);
+          }
+          break;
+      case ADM_PREVIEW_SIDE:
+              ADM_assert(preview);
+              ADM_assert(previewImage);
+              renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
               renderUpdateImageBlit(previewImage->data,_mainW,0,previewImage->_width,previewImage->_height,1);
               break;
         
@@ -230,7 +323,6 @@ void admPreview::update(uint32_t framenum,ADMImage *image)
               ADM_assert(previewImage);
   
               renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
-              preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
               renderUpdateImageBlit(previewImage->data,0,_mainH,previewImage->_width,previewImage->_height,1);
               break;
       default: ADM_assert(0);
