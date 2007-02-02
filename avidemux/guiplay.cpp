@@ -108,10 +108,12 @@ void GUI_PlayAvi(void)
   uint32_t played_frame=0;
   uint32_t remaining=avifileinfo->nb_frames-curframe;
 
-
+    admPreview::stop();
+    admPreview::start();
+    
     if(getPreviewMode()==ADM_PREVIEW_OUTPUT)
     {
-                filter=getLastVideoFilter(curframe,remaining);
+            filter=getLastVideoFilter(curframe,remaining);
     }
     else
     {
@@ -142,8 +144,9 @@ void GUI_PlayAvi(void)
 #ifdef HAVE_AUDIO
     ComputePreload();
 #endif
-     renderResize(filter->getInfo()->width,filter->getInfo()->height,currentZoom);
-     renderStartPlaying();
+    
+     
+     //renderStartPlaying();
 // reset timer reference
     resetTime();
     do
@@ -203,7 +206,7 @@ void GUI_PlayAvi(void)
 	    }
      	//
             UI_purge();
-            if(getPreviewMode()==ADM_PREVIEW_SIDE || getPreviewMode()==ADM_PREVIEW_TOP)
+            if(getPreviewMode()==ADM_PREVIEW_SEPARATE )
             {
               UI_purge();
               UI_purge(); 
@@ -219,8 +222,9 @@ abort_play:
     playing = 0;
 	  delete  buffer;
 
-	   renderStopPlaying();
-	   renderResize(avifileinfo->width ,  avifileinfo->height,currentZoom);
+	  // renderStopPlaying();
+	     admPreview::stop();
+             admPreview::start();
 	   getFirstVideoFilter( );
 	   //video_body->getUncompressedFrame(curframe, rdr_decomp_buffer,&flags);
 	   GUI_getFrame(curframe, rdr_decomp_buffer, &flags);

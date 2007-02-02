@@ -60,11 +60,12 @@
 
 static uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h);
 static uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h);
-static uint8_t GUI_ConvertRGBBlit(uint8_t * in, uint8_t * out,uint32_t totalW,uint32_t totalH, uint32_t startx,uint32_t starty,uint32_t w, uint32_t h);
+static uint8_t GUI_ConvertRGBBlit(uint8_t * in, uint8_t * out,uint32_t totalW,uint32_t totalH, uint32_t startx,uint32_t starty,uint32_t w, uint32_t h,uint32_t primary);
 uint8_t  GUI_InitRender (GtkWidget *g, uint32_t w,uint32_t h);
 static renderZoom zoom=ZOOM_1_1;
 
 static ColYuvRgb rgbConverter(640,480);
+static ColYuvRgb rgbConverter2(640,480);
 
 extern GtkWidget *getDrawWidget( void );
 extern uint8_t UI_shrink(uint32_t w,uint32_t h);
@@ -176,13 +177,13 @@ uint8_t renderUpdateImage(uint8_t *ptr)
       \brief Blit the source into destination
 
 */
-uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uint32_t w, uint32_t h)
+uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uint32_t w, uint32_t h,uint32_t primary)
 {
 
         ADM_assert(screenBuffer);
         lastImage=NULL;
         if(!accel_mode)
-                GUI_ConvertRGBBlit(ptr,screenBuffer, renderW,renderH,startx,starty,w,h);
+                GUI_ConvertRGBBlit(ptr,screenBuffer, renderW,renderH,startx,starty,w,h,primary);
         renderRefresh();
         return 1;
 }
@@ -357,10 +358,17 @@ uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h)
     rgbConverter.scale(in,out);
     return 1;
 }
-uint8_t GUI_ConvertRGBBlit(uint8_t * in, uint8_t * out,uint32_t totalW,uint32_t totalH, uint32_t startx,uint32_t starty,uint32_t w, uint32_t h)
+uint8_t GUI_ConvertRGBBlit(uint8_t * in, uint8_t * out,uint32_t totalW,uint32_t totalH, uint32_t startx,uint32_t starty,uint32_t w, uint32_t h,uint32_t primary)
 {
+  if(!primary)
+  {
     rgbConverter.reset(w,h);
     rgbConverter.scale(in,out,startx,starty,w,h,renderW,renderH);
+  }else
+  {
+    rgbConverter2.reset(w,h);
+    rgbConverter2.scale(in,out,startx,starty,w,h,renderW,renderH);
+  }
     return 1;
 }
 

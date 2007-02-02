@@ -212,7 +212,7 @@ uint8_t renderUpdateImage(uint8_t *ptr)
   }
   return 1;
 }
-uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uint32_t w, uint32_t h)
+uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uint32_t w, uint32_t h,uint32_t primary)
 {
   return 1; 
 }

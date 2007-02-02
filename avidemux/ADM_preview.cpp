@@ -156,6 +156,11 @@ void admPreview::stop( void )
           previewImage=NULL;
       }
       renderResize(_mainW,_mainH,ZOOM_1_1);
+      if(previewImage)
+      {
+        delete  previewImage; 
+        previewImage=NULL;
+      }
 }
 /**
       \fn admPreview::setMainDimension
@@ -215,18 +220,18 @@ void admPreview::update(uint32_t framenum,ADMImage *image)
               ADM_assert(preview);
               ADM_assert(previewImage);
   
-              renderUpdateImageBlit(image->data,0,0,_mainW,_mainH); // Main
+              renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
               preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
-              renderUpdateImageBlit(previewImage->data,_mainW,0,previewImage->_width,previewImage->_height);
+              renderUpdateImageBlit(previewImage->data,_mainW,0,previewImage->_width,previewImage->_height,1);
               break;
         
       case ADM_PREVIEW_TOP:
               ADM_assert(preview);
               ADM_assert(previewImage);
   
-              renderUpdateImageBlit(image->data,0,0,_mainW,_mainH); // Main
+              renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
               preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
-              renderUpdateImageBlit(previewImage->data,0,_mainH,previewImage->_width,previewImage->_height);
+              renderUpdateImageBlit(previewImage->data,0,_mainH,previewImage->_width,previewImage->_height,1);
               break;
       default: ADM_assert(0);
     }
