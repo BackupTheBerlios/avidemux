@@ -107,13 +107,14 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                                 demuxer=dmx;
                                 mpegTypeChar='T';
                                 switch(tracks[0].streamType)
-                                {
-                                  case ADM_STREAM_H264:       payloadType=DMX_PAYLOAD_H264;break;
-                                  case ADM_STREAM_MPEG4:      payloadType=DMX_PAYLOAD_MPEG4;break;
-                                  case ADM_STREAM_MPEG_VIDEO: payloadType=DMX_PAYLOAD_MPEG2;break;
-                                default: ADM_assert(0);
+                                  {
+                                    case ADM_STREAM_H264:       payloadType=DMX_PAYLOAD_H264;break;
+                                    case ADM_STREAM_MPEG4:      payloadType=DMX_PAYLOAD_MPEG4;break;
+                                    case ADM_STREAM_MPEG_VIDEO: payloadType=DMX_PAYLOAD_MPEG2;break;
+                                  default: ADM_assert(0);
+  
+                                  }
                                 break;
-                                }
                                 }
                 case DMX_MPG_ES:
                                 demuxer=new dmx_demuxerES;
