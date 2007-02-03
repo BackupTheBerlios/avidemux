@@ -41,8 +41,11 @@ dnl Automake doc recommends to do this only here. (Janos)
 AM_INIT_AUTOMAKE(avidemux,"2.4.0")
 ADM_SUBVERSION="0"
 if [[ -f .svn/entries ]]; then
-   rev=`svnversion . | sed 's/^.*://g' | sed 's/M$//g'`
-   ADM_SUBVERSION="\"$rev\""
+	AC_PATH_PROG(SVNVERSION, svnversion, no)
+	if test "$SVNVERSION" != "no" ; then
+		rev=`svnversion . | sed 's/^.*://g' | sed 's/M$//g'`
+		ADM_SUBVERSION="\"$rev\""
+	fi
 fi
 dnl almost the same like KDE_SET_PEFIX but the path is /usr/local
 dnl
@@ -232,6 +235,7 @@ case $host in
     QTLIBS="-L$QTEXTRALIB -lopengl32 -lglu32 -lgdi32 -luser32 -lmingw32 -lqtmain -lQtOpenGL4 -lQtGui4 -lQtCore4 -mthreads -Wl,-enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc -Wl,-s -Wl,-s -Wl,-subsystem,windows"
     QTINC="-I$QTDIR/include -I$QTDIR/include/QtCore -I$QTDIR/include/QtGui -I$QTDIR/include/QtOpenGL -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_THREAD_SUPPORT -DQT_NEEDS_QMAIN -frtti -fexceptions -I$QTEXTRAINC"
     QTBIN="$QTDIR/bin"
+	QTPOSTFIX=""
     ;;
   *)
     AC_MSG_NOTICE(I'm assuming this is Linux)
@@ -249,6 +253,13 @@ AC_MSG_RESULT($QTINC $QTEXTRAINC)
 ADM_QTLIBS="$QTLIBS"
 ADM_QTINCLUDES="$QTINC"
 ADM_QTCFLAGS="$QTINC"
+
+MOC="$QTBIN/moc$QTPOSTFIX"
+UIC="$QTBIN/uic$QTPOSTFIX"
+RCC="$QTBIN/rcc"
+AC_SUBST(MOC)
+AC_SUBST(UIC)
+AC_SUBST(RCC)
 
 # Now we check whether we can actually build a Qt app.
 cat > myqt.h << EOF
@@ -278,7 +289,7 @@ int main( int argc, char **argv )
 EOF
 
 AC_MSG_CHECKING(does moc work?)
-bnv_try_1="moc$QTPOSTFIX myqt.h -o moc_myqt.cpp"
+bnv_try_1="$MOC myqt.h -o moc_myqt.cpp"
 AC_TRY_EVAL(bnv_try_1)
 if test x"$ac_status" != x0; then
    AC_MSG_WARN(moc doesn't work)
@@ -318,10 +329,7 @@ if test x"$ac_status" != x0; then
 fi
 AC_MSG_RESULT(yes)
 rm -f moc_myqt.cpp myqt.h myqt.cpp myqt.o myqt moc_myqt.o
-MOC="moc$QTPOSTFIX"
-UIC="uic$QTPOSTFIX"
-AC_SUBST(MOC)
-AC_SUBST(UIC)
+
 echo " ------------------- End of UI probe ------------------"
     
 dnl 
@@ -413,45 +421,60 @@ int z=0
 ])
 
 AC_MSG_RESULT($use_cygwin)
+AM_CONDITIONAL(HAVE_CYGWIN, test "x$use_cygwin" = "xyes")
+
+dnl _________ gettimeofday _________
+AC_CHECK_FUNCS(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY,1,"[Use native gettimeofday function]"))
 
 dnl _____________ needed for multithreaded x264 and for mplex_________
 if test "x$use_cygwin" = "xyes"; then
-        LDFLAGS="$LDFLAGS -lpthreadGC1 "
+        LIBS="$LIBS -lpthreadGC1"
 else
         LDFLAGS="$LDFLAGS -lpthread -lX11 -lXext -L/usr/X11R6/lib"
 fi
+
 dnl _________________ malloc.h ___________________
 
 AC_CHECK_HEADERS(malloc.h,have_malloc_h=yes)
 AC_CHECK_HEADERS(malloc/malloc.h,have_malloc_h=yes)
 if test "x$have_malloc_h" = "xyes"; then
 	CPPFLAGS="$CPPFLAGS -I/usr/include/malloc"
-	AC_DEFINE(HAVE_MALLOC_H,1,[have malloc.h])
-	
+	AC_DEFINE(HAVE_MALLOC_H,1,[have malloc.h])	
 fi
 
 dnl ______________ libxml2 _____________
 AC_PATH_PROG(XML_CONFIG, xml2-config, no)
- if test "XML_CONFIG" = "no" ; then
-	   	XML_LIBS=""
-    		XML_CFLAGS=""
-      		have_xml2=no
-	else
-
- 		XML_CFLAGS=`$XML_CONFIG  --cflags`
- 		XML_LIBS=`$XML_CONFIG  --libs`
-    old_flags=$CPPFLAGS
-    CPPFLAGS="$CPPFLAGS $XML_CFLAGS"
-    AC_CHECK_HEADERS(libxml/parser.h,,have_xml2=no)
-    if test "x$have_xml2" = "xno"; then
-    	AC_MSG_WARN(no parser.h valid header found for xml2)
-    fi
- fi
-if test "x$have_xml2" = "xyes"; then
-AC_DEFINE(USE_LIBXML2,1,[LibXML2 is available])
+if test "$XML_CONFIG" = "no" ; then
+ 	XML_LIBS=""
+	XML_CFLAGS=""
+	
+	if test "x$use_cygwin" = "xno"; then
+		have_xml2=no
+	fi
 fi
-dnl __________________divx______________
-dnl __________________Aften ______________
+
+if test "x$have_xml2" = "xyes"; then
+	if test "$XML_CONFIG" = "no" ; then
+		XML_LIBS="-L${libdir} -llibxml2 -lz -liconv -lws2_32"
+		XML_CFLAGS="-I${includedir}/libxml2"
+ 	else
+		XML_CFLAGS=`$XML_CONFIG  --cflags`
+		XML_LIBS=`$XML_CONFIG  --libs`
+	fi
+
+	old_flags=$CPPFLAGS
+	CPPFLAGS="$CPPFLAGS $XML_CFLAGS"
+
+	AC_CHECK_HEADERS(libxml/parser.h,,have_xml2=no)
+	
+	if test "x$have_xml2" = "xyes"; then
+		AC_DEFINE(USE_LIBXML2,1,[LibXML2 is available])		
+	else
+		AC_MSG_WARN(no parser.h valid header found for xml2)
+	fi
+fi
+
+dnl __________________Aften______________
 
 AC_ARG_WITH([aften],
  AC_HELP_STRING([--without-aften], [Force compilation without aften (default: test)]),
@@ -475,8 +498,6 @@ if test "x$have_aften" = "xyes"; then
 AC_DEFINE(USE_AFTEN,1,[use aften ac3 encoder])
 fi
 
-
-dnl __________________/aften ______________
 dnl __________________x264_________________
 AC_MSG_CHECKING(for x264 codec )
 AC_CHECK_HEADER(x264.h,,have_x264=no)
@@ -487,7 +508,7 @@ if test "x$have_x264" = "xyes"; then
 	AC_DEFINE(USE_X264,1,[use x264 encoder])
 fi
 
-dnl __________________xvid 0.9 ______________
+dnl __________________xvid 0.9______________
 AC_MSG_CHECKING(for xvid codec 0.9)
 AC_CHECK_HEADER(xvid.h,,have_xx_xvid=no)
 
@@ -515,7 +536,8 @@ dnl config.h
  if test "x$have_xx_xvid" = "xyes"; then
  	AC_DEFINE(USE_XX_XVID,1,[use xvid api])
  fi
-dnl __________________libpng  ______________
+
+dnl __________________libpng______________
 AC_MSG_CHECKING(for libpng )
 have_png=yes
 AC_CHECK_HEADER(png.h,,have_png=no)
@@ -524,7 +546,8 @@ AC_CHECK_LIB(png,png_malloc,,have_png=no)
 if test "x$have_png" = "xyes"; then
 	AC_DEFINE(USE_PNG,1,[Png is available])
 fi
-dnl __________________xvid 1.0 ______________
+
+dnl __________________xvid 1.0______________
 AC_MSG_CHECKING(for xvid codec 1.0)
 AC_CHECK_HEADER(xvid.h,,have_xvid4=no)
 
