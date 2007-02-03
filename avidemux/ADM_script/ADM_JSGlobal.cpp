@@ -85,8 +85,8 @@ void SpidermonkeyDestroy()
 {// begin SpidermonkeyDestroy
 #ifdef ADM_JS_THREADSAFE
 	JS_SetContextThread(g_pCx);
-#endif
 	JS_DestroyContext(g_pCx);
+#endif
 	JS_DestroyRuntime(g_pRt);
 }// end SpidermonkeyDestroy
 
@@ -117,8 +117,9 @@ void *StartThreadSpidermonkey(void *pData)
 #ifdef ADM_JS_THREADSAFE
         JS_EndRequest(g_pCx);
         JS_ClearContextThread(g_pCx);
-        pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
 #endif
+        pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
+
         return NULL;
 }// end StartThreadSpidermonkey
 
