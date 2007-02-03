@@ -23,7 +23,7 @@
  * internal api header.
  */
 
-#include "avutil.h"
+#include "../../ADM_lavutil/avutil.h"
 
 #define V_DEBLOCK       0x01
 #define H_DEBLOCK       0x02
