@@ -12,7 +12,7 @@ libADM_filters_a_METASOURCES = AUTO
 
 include ../Makefile.adm
 filter_rsc.cpp : filter.qrc
-	rcc  $< -o $@   -name filter
+	$(RCC)  $< -o $@   -name filter
 
 
 EXTRA_DIST =  

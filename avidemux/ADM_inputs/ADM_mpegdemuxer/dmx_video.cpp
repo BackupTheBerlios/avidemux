@@ -34,7 +34,7 @@
 
 
 #include "ADM_toolkit/toolkit.hxx"
-#include "DIA_working.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 
 
 #include "dmx_demuxerEs.h"

@@ -28,7 +28,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 #include "ADM_osSupport/ADM_quota.h"
-#include "DIA_idx_pg.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_idx_pg.h"
 
 
 

@@ -28,7 +28,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit/filesel.h"
 #include "fourcc.h"
-#include "DIA_working.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 
 
 
@@ -40,7 +40,7 @@
 #include "dmx_demuxerTS.h"
 #include "dmx_identify.h"
 #include "dmx_probe.h"
-#include "DIA_busy.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_busy.h"
 #include "ADM_audio/ADM_mp3info.h"
 #include "ADM_audio/ADM_a52info.h"
 #include "ADM_audio/ADM_dcainfo.h"

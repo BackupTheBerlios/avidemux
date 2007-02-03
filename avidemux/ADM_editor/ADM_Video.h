@@ -24,7 +24,7 @@
 #include "avifmt.h"
 #include "avifmt2.h"
 
-#include "ADM_audio/aviaudio.hxx"
+#include "../ADM_audio/aviaudio.hxx"
 #include "ADM_compressedImage.h"
 typedef struct audioInfo
 {

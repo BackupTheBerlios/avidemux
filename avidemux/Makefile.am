@@ -17,6 +17,10 @@ if BUILD_ALTIVEC
 libmpeg2enc_Altivec = ./mpeg2enc/altivec/libaltivec.la
 endif
 
+if HAVE_CYGWIN
+win32_icon = ./xpm/adm.o
+endif
+
 user_interface_gtk = ./ADM_userInterfaces/ADM_GTK/ADM_gui2/libADM_gui2.a	\
 		./ADM_userInterfaces/ADM_GTK/libADM_GTK.a \
 		./ADM_userInterfaces/ADM_GTK/ADM_dialog/libADM_dialog.a	\
@@ -125,7 +129,9 @@ adm_postlib= \
 ./ADM_osSupport/libADM_ossupport.a			\
 ./ADM_libraries/ADM_libswscale/libswscale.a		\
 ./ADM_ocr/libADM_ocr.a					\
-$(libmpeg2enc_Altivec)
+$(libmpeg2enc_Altivec) \
+$(win32_icon)
+
 if ADM_UI_GTK
 avidemux2_gtk_LDADD=$(adm_lib) $(user_interface_gtk) $(adm_postlib) $(all_libraries)  $(SDL_LIBS) $(GTK_LIBS) $(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) $(GLIB_LIBS)
 endif

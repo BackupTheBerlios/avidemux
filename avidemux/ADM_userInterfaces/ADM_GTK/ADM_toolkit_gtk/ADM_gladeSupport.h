@@ -67,4 +67,4 @@ void        glade_set_atk_action_description (AtkAction       *action,
 
  extern void guiCallback(GtkMenuItem *men, gpointer user_data);
  
- #include "gui_action.hxx"
+ //#include "..\gui_action.hxx"

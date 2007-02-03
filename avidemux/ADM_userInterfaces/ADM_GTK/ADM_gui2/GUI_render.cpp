@@ -32,10 +32,10 @@
 #include <sys/time.h>
 
 
-#include "avi_vars.h"
-#include <ADM_assert.h>
+#include "../avi_vars.h"
+#include <../ADM_assert.h>
 
-#include "prototype.h"
+#include "../prototype.h"
 //#include "ADM_colorspace/colorspace.h"
 //#include "ADM_gui/GUI_vars.h"
 
@@ -52,10 +52,10 @@
 
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 
-#include "prefs.h"
+#include "../prefs.h"
 #include "../../../ADM_colorspace/ADM_rgb.h"
 #include "../../../ADM_libraries/ADM_libswscale/ADM_mp.h"
-#include "gtkgui.h"
+#include "../gtkgui.h"
 
 
 static uint8_t	updateWindowSize(GtkWidget * win, uint32_t w, uint32_t h);

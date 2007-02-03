@@ -32,6 +32,8 @@ WSADATA wsaData;
 		printf("WinSock ok\n");
 		return 1;
 }
+
+#ifndef HAVE_GETTIMEOFDAY
 void gettimeofday(struct timeval *p, void *tz)
 {
 unsigned long int sec;
@@ -47,6 +49,8 @@ unsigned long int sec;
   
 	
 }
+#endif
+
 uint64_t ftello_adm(FILE *f)
 {
 	fpos_t pos;

@@ -52,24 +52,24 @@ char 		*ADM_index(const char *s, int c);
 void 		ADM_usleep(unsigned long us);
 uint8_t         ADM_fileExist(char *name);
 
-#ifdef CYG_MANGLING
-#ifndef HAVE_STRUCT_TIMESPEC
-#define HAVE_STRUCT_TIMESPEC
-extern "C"
-{
-	typedef struct timespec
-	{
-		time_t tv_sec;
-		long int tv_nsec;
-	};
-
-	void gettimeofday(struct timeval *p, void *tz);
-	};
-	#define timezone int
-	#define TIMZ int
-#endif
-#else
+#ifdef HAVE_GETTIMEOFDAY
 	#define TIMZ struct timezone
+#else
+	#ifndef HAVE_STRUCT_TIMESPEC
+	#define HAVE_STRUCT_TIMESPEC
+	extern "C"
+	{
+		typedef struct timespec
+		{
+			time_t tv_sec;
+			long int tv_nsec;
+		};
+
+		void gettimeofday(struct timeval *p, void *tz);
+		};
+		#define timezone int
+		#define TIMZ int
+	#endif
 #endif
 
 #define FRAME_PAL 1

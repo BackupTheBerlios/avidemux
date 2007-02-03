@@ -35,7 +35,7 @@
 #include "math.h"
 #include "default.h"
 
-#include "gui_action.hxx"
+#include "../gui_action.hxx"
 extern void HandleAction(Action act);  
 // when keys are pressed
 // We have to duplicate the ALT ... shortcut

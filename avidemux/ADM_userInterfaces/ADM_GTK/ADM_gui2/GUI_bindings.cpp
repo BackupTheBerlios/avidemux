@@ -26,26 +26,26 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include <ADM_assert.h>
+#include <../ADM_assert.h>
 
 #include "math.h"
 #include "default.h"
 #include "ADM_commonUI/GUI_render.h"
-#include "gui_action.hxx"
+#include "../gui_action.hxx"
 
-#include "ADM_osSupport/ADM_debugID.h"
+#include "../ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_UI
-#include "ADM_osSupport/ADM_debug.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "../ADM_osSupport/ADM_debug.h"
+#include "../ADM_toolkit_gtk/toolkit_gtk.h"
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 
-#include "ADM_codecs/ADM_codec.h"
+#include "../ADM_codecs/ADM_codec.h"
 #include "ADM_commonUI/GUI_ui.h"
 
-#include "ADM_toolkit/filesel.h"
-#include "ADM_editor/ADM_Video.h"
-#include "ADM_osSupport/ADM_misc.h"
-#include "prefs.h"
+#include "../ADM_toolkit/filesel.h"
+#include "../ADM_editor/ADM_Video.h"
+#include "../ADM_osSupport/ADM_misc.h"
+#include "../prefs.h"
 
 
 

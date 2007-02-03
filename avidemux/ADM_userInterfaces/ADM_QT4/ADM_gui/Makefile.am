@@ -15,6 +15,6 @@ libADM_gui2_a_SOURCES = gui_none.cpp file_qt4.cpp avidemux_rsc.cpp \
 include ../Makefile.adm
 
 avidemux_rsc.cpp : avidemux.qrc
-	rcc  $< -o $@	-name avidemux
+	$(RCC)  $< -o $@	-name avidemux
 EXTRA_DIST =
 
