@@ -119,7 +119,7 @@ public:
 	virtual		uint8_t startPass2( uint32_t size,uint32_t nbFrame );
 	virtual		uint8_t getQz( uint32_t *qz, ADM_rframe *type );
 	virtual		uint8_t logPass2( uint32_t qz, ADM_rframe ftype,uint32_t size);
-
+        static          uint8_t verifyLog(const char *file,uint32_t nbFrame);
 };
 
 #endif

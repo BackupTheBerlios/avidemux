@@ -160,6 +160,35 @@ uint8_t ADM_newXvidRcVBV::getQz( uint32_t *qz, ADM_rframe *type )
 	
 	return 1;
 }
+
+/**
+      \fn ADM_newXvidRcVBV::verifyLog
+      \brief Verify the file is correct and not corrupted as far as 2pass is concerned
+      @return 1 on success (file not corrupted), 0 else.
+
+  A note of warning, the actual nbFrame can depend on the encoder/codec as there might be some
+  encoder-delay that is more or less ignored
+  Normally nbFrame should be actual nb frame +2 (to compensate for the 2 comment lines in xvid rc file)
+  but as it is, when you use lavc based mpeg codec, the whole process will eat up 2 frames.
+
+*/
+uint8_t ADM_newXvidRcVBV::verifyLog(const char *file,uint32_t nbFrame)
+{
+  FILE *in;
+  char oneLine[1024];
+  uint32_t nb=0;
+        in=fopen(file,"rt");
+        if(!in) return 0;
+        while(fgets(oneLine,1023,in)) nb++;
+        fclose(in);
+        if(nbFrame+1==nb) 
+        {
+            printf("[XvidRC]Logfile Seems ok\n");
+            return 1;
+        }
+        printf("[XvidRC]Logfile Seems corrupted (%u/%u)\n",nb,nbFrame);
+        return 0;
+}
 //
 // Return 1 if the frame and Qz fails the sanity check
 //

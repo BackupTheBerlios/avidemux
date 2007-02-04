@@ -296,7 +296,18 @@ EncoderFFMPEGMpeg1::configure (AVDMGenericVideoStream * instream)
   return 1;
 
 }
-
+uint8_t EncoderFFMPEGMpeg1::verifyLog(const char *file,uint32_t nbFrame)
+{
+  
+  if(_use_xvid_ratecontrol)
+  {
+      return ADM_newXvidRcVBV::verifyLog(file,nbFrame);
+  }else
+  {
+    return 0; // For now assume it is corrupted 
+  }
+  
+}
 
 
 uint8_t

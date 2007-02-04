@@ -75,8 +75,18 @@
 static ADM_newXvidRcVBV *_xrc = NULL;
 extern uint32_t ADM_computeBitrate(uint32_t fps1000, uint32_t nbFrame, uint32_t sizeInMB);
 
+/**
+      \fn verifyLog
+      \brief Ask the RC if the 2pass log file is correct
+      @param file filename
+      @param nb nbFrames expected to be present
+      @return 1 if file is ok, 0 is corrupted
 
-
+*/
+uint8_t EncoderMpeg2enc::verifyLog(const char *file,uint32_t nbFrame)
+{
+      return ADM_newXvidRcVBV::verifyLog(file,nbFrame+2);
+}
 /*_________________________________________________*/
 EncoderMpeg2enc::EncoderMpeg2enc (MPEG2ENC_ID id, COMPRES_PARAMS * config)
 {

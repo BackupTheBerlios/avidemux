@@ -208,6 +208,7 @@ public:
   virtual uint8_t stop (void);
   virtual uint8_t startPass2 (void);
   virtual uint8_t startPass1 (void);
+          uint8_t verifyLog(const char *name,uint32_t nbFrame);
 };
 
 class EncodeFFMPEGSNow:public EncoderFFMPEG

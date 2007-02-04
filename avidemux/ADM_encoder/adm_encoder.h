@@ -95,6 +95,7 @@ public:
   virtual const char *getCodecName (void) = 0;
   virtual const char *getFCCHandler (void) = 0;
   virtual const char *getDisplayName (void) = 0;
+  virtual uint8_t verifyLog(const char *,uint32_t nb) { return 1;} // Verify 1st pass log file..
 
 
 };

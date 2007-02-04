@@ -316,19 +316,17 @@ uint32_t audioSum=0;
 
 
         // pass 1
-        if(encoder->isDualPass())
+        if(encoder->isDualPass()) //Cannot be requant
         {
                         FILE *fd;
                         uint8_t reuse=0;
-                        fd=fopen(twoPass,"rt");
-                        if(fd)
-                        {
+                        
+                        printf("Verifying log file\n");
+                        if(encoder->verifyLog(twoPass,total))
                           if(GUI_Question(_("Reuse log file ?")))
                                 {
                                         reuse=1;
                                 }
-                                fclose(fd);
-                        }
                         if(!reuse)
                         {
                                 encoding->setPhasis ("Pass 1/2");
