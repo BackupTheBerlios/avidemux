@@ -90,8 +90,6 @@ void GUI_PreviewShow(uint32_t w, uint32_t h, uint8_t *data)
 */
 static uint8_t *rgbDataBuffer=NULL;
 static uint32_t displayW=0,displayH=0;
-static ColYuvRgb rgbConverter(640,480,1);
-static uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h);
 //****************************************************************************************************
 /*
   This is the class that will display the video images.
@@ -150,176 +148,52 @@ void UI_QT4VideoWidget(QFrame *host)
    videoWindow->show();
    
 }
-uint8_t renderInit( void )
+//*************************
+/**
+    \brief return pointer to the drawing widget that displays video
+*/
+void *UI_getDrawWidget(void)
 {
-  return 1;
+  return (void *) videoWindow;
 }
-//****************************************************************************************************
-uint8_t renderResize(uint32_t w, uint32_t h,renderZoom newzoom)
+/**
+    \brief Display to widget in RGB32
+*/
+void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr)
 {
-  if(displayW==w && displayH==h && rgbDataBuffer) return 1;
+      memcpy(rgbDataBuffer,ptr,w*h*4);
+      videoWindow->paintEvent(NULL);
+    
+}
+/**
+      \brief Resize the window
+*/
+void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
+{
+  if(displayW==w && displayH==h && rgbDataBuffer) return ;
   if(rgbDataBuffer) delete [] rgbDataBuffer;
   rgbDataBuffer=NULL;
   rgbDataBuffer=new uint8_t [w*h*4]; // 32 bits / color
   displayW=w;
   displayH=h;
-  rgbConverter.reset(w,h);
   hostFrame->resize(displayW,displayH);
   videoWindow->resize(displayW,displayH);
   printf("[RDR] Resizing to %u x %u\n",displayW,displayH);
-  return 1;
+  return ;
 }
 /**
-    \fn renderRefresh(void)
-    \brief Force a redraw of the screen
+      \brief Retrieve info from window, needed for accel layer
 */
-uint8_t renderRefresh(void)
+void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
 {
-  
-        if(accelRender)
-        {
-            if(lastImage)
-                accelRender->display(lastImage, displayW, displayH);
-        }
-        else
-        {
-                renderExpose();
-        }
-  return 1;
-}
-//****************************************************************************************************
-uint8_t renderExpose(void)
-{
-// TODO   if(videoWindow)
-  if(!accelRender)
-     videoWindow->repaint();
-  return 1;
-}
-/**
-      \fn renderUpdateImage(uint8_t *ptr)
-      \brief Update display with the content of the pointer given as arg
-*/
-uint8_t renderUpdateImage(uint8_t *ptr)
-{
-  if(!accelRender) // Only needed for unaccelerated display
-  {
-      rgbConverter.scale(ptr,rgbDataBuffer);
-      renderExpose();
-  }else
-  {
-      accelRender->display(ptr,displayW,displayH);
-      lastImage=ptr;
-  }
-  return 1;
-}
-uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uint32_t w, uint32_t h,uint32_t primary)
-{
-  return 1; 
-}
-
-/**
-    \fn renderStartPlaying( void )
-    \brief Start playing, create an alternate renderer (preferably hw accelerated such as Xv or SDL)
-*/
-  uint8_t renderStartPlaying( void )
-{
-char *displ;
-unsigned int renderI;
-ADM_RENDER_TYPE render;
-        ADM_assert(!accelRender);
-        // First check if local
-        // We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
-        // in that case we do not even try to use accel
-        
-        // Win32 does not have display
-#ifndef CYG_MANGLING	
-        displ=getenv("DISPLAY");
-        if(!displ)
-        {
-                return 0;
-        }
-        if(strcmp(displ,":0") && strcmp(displ,":0.0"))
-        {
-                printf("Looks like remote display, no Xv :%s\n",displ);
-                return 1;
-        }
-#endif	
- 
-        if(prefs->get(DEVICE_VIDEODEVICE,&renderI)!=RC_OK)
-        {       
-                render=RENDER_GTK;
-        }else
-        {
-                render=(ADM_RENDER_TYPE)renderI;
-        }
-        GUI_Info xinfo;
 #ifndef CYG_MANGLING
         const QX11Info &info=videoWindow->x11Info();
-        xinfo.display=info.display();
-        xinfo.window=videoWindow->winId();
+        xinfo->display=info.display();
+        xinfo->window=videoWindow->winId();
          
 #endif 
-        switch(render)
-        {
-        
-#if defined(USE_XV)
-              case RENDER_XV:
-                accelRender=new XvAccelRender();
-                if(!accelRender->init(&xinfo,displayW,displayH))
-                {
-                        delete accelRender;
-                        accelRender=NULL;
-                        printf("Xv init failed\n");
-                }
-                else
-                {
-                        printf("Xv init ok\n");
-                }
-                break;
-#endif
-#if defined(USE_SDL)
-              case RENDER_SDL:
-                printf("Trying SDL\n");
-                accelRender=new sdlAccelRender();
-                if(!accelRender->init(&xinfo,displayW,displayH))
-                {
-                        delete accelRender;
-                        accelRender=NULL;
-                        printf("sdl init failed\n");
-                }
-                else
-                {
-                        printf("SDL init ok\n");
-                }
-                break;
-#endif
-                default:break;
-        }
-        if(!accelRender)
-        {
-                rgbConverter.reset(displayW,displayH);
-                printf("No accel used for rendering\n");
-        }
-	else printf("Using accelerated rendering\n");
-	return 1;
-}
 
-/**
-    \fn renderStopPlaying(void)
-    \brief Switch back to regular slow display, destroy accelerated renderer if exists
-*/
-uint8_t renderStopPlaying( void )
-{
-      if(accelRender)
-      {
-            accelRender->end();
-              delete accelRender;
-      }
-      accelRender=NULL;
-      lastImage=NULL;
-      return 1;
 }
-
 
 
 //****************************************************************************************************
