@@ -162,7 +162,7 @@ void *UI_getDrawWidget(void)
 void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr)
 {
       memcpy(rgbDataBuffer,ptr,w*h*4);
-      videoWindow->paintEvent(NULL);
+      videoWindow->repaint();
     
 }
 /**

@@ -51,7 +51,7 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_PREVIEW
 #include "ADM_osSupport/ADM_debug.h"
-
+#include "ADM_libraries/ADM_libswscale/ADM_mp.h"
 
 #include "GUI_ui.h"
 #define MAX(a,b) ( (a)>(b) ? (a) : (b) )
@@ -59,12 +59,19 @@
 extern FILTER  videofilters[MAX_FILTER];
 extern uint32_t nb_active_filter;
 
+static void previewBlit(ADMImage *from,ADMImage *to,uint32_t startx,uint32_t starty);
+
 static   AVDMGenericVideoStream *preview=NULL;
 static ADMImage *previewImage;
 static ADM_PREVIEW_MODE previewMode=ADM_PREVIEW_NONE;
 static uint32_t _mainW=0,_mainH=0;
 static uint32_t _displayW=0,_displayH=0;
 static uint32_t defered_display=0;
+static renderZoom zoom=ZOOM_1_1;
+static ADMImage             *resized=NULL;
+static ADM_MplayerResize    *resizer=NULL;
+static ADMImage             *original=NULL;
+static uint32_t _resizedW=0,_resizedH=0;
 /**
       \fn getPreviewMode
       \brief returns current preview mode
@@ -77,7 +84,13 @@ ADM_PREVIEW_MODE getPreviewMode(void)
   return previewMode; 
 }
 
-
+void changePreviewZoom(renderZoom nzoom)
+{
+    admPreview::stop();
+    zoom=nzoom;
+    admPreview::start();
+  
+}
 
 /**
       \fn setPreviewMode
@@ -128,7 +141,7 @@ void 	admPreview::start( void )
                 
             previewImage=new ADMImage(preview->getInfo()->width,preview->getInfo()->height);
             
-            
+            ADM_assert(!original);
             switch(previewMode)
             {
               case  ADM_PREVIEW_SEPARATE:
@@ -149,6 +162,7 @@ void 	admPreview::start( void )
                   
                   _displayH=MAX(_mainH,preview->getInfo()->height);
                   _displayW=_mainW+preview->getInfo()->width;
+                  original=new ADMImage(_displayW,_displayH);
                   break;
               }
               case  ADM_PREVIEW_TOP:
@@ -156,11 +170,38 @@ void 	admPreview::start( void )
                   
                   _displayW=MAX(_mainW,preview->getInfo()->width);
                   _displayH=_mainH+preview->getInfo()->height;
+                  original=new ADMImage(_displayW,_displayH);
                   break;
               }
               default: ADM_assert(0);
             }
-            renderResize(_displayW,_displayH,ZOOM_1_1);
+        if(zoom!=ZOOM_1_1)
+        {
+            int mul;
+            switch(zoom)
+            {
+                    case ZOOM_1_4: mul=1;break;
+                    case ZOOM_1_2: mul=2;break;
+                    case ZOOM_1_1: mul=4;break;
+                    case ZOOM_2:   mul=8;break;
+                    case ZOOM_4:   mul=16;break;
+                    default : ADM_assert(0);
+    
+            }
+            _resizedW=(_displayW*mul+3)/4;
+            _resizedH=(_displayH*mul+3)/4;
+    
+            if(_resizedW&1) _resizedW++;
+            if(_resizedH&1) _resizedH++;
+            ADM_assert(!resized);
+            resized=new ADMImage(_resizedW,_resizedH);
+            ADM_assert(!resizer);
+            resizer=new  ADM_MplayerResize(_displayW,_displayH,_resizedW,_resizedH);
+            renderResize(_resizedW,_resizedH);
+        }else
+        {
+             renderResize(_displayW,_displayH);
+        }
 }
 /**
       \fn admPreview::stop
@@ -171,17 +212,25 @@ void admPreview::stop( void )
 {
       if(previewMode==ADM_PREVIEW_SEPARATE)
                 GUI_PreviewEnd();
-      if(previewMode!=ADM_PREVIEW_NONE)
+      if(  previewMode==ADM_PREVIEW_SIDE || previewMode==ADM_PREVIEW_TOP)
       {
-          if(previewImage)
-            delete previewImage;
-          previewImage=NULL;
+        ADM_assert(original);
+        original=NULL; 
       }
-      renderResize(_mainW,_mainH,ZOOM_1_1);
+      renderResize(_mainW,_mainH);
       if(previewImage)
       {
         delete  previewImage; 
         previewImage=NULL;
+      }
+      if(zoom!=ZOOM_1_1)
+      {
+          ADM_assert(resized);
+          ADM_assert(resizer);
+          delete resized;
+          delete resizer;
+          resized=NULL;
+          resizer=NULL;
       }
 }
 /**
@@ -234,7 +283,7 @@ void admPreview::setMainDimension(uint32_t w, uint32_t h)
   _mainH=h;
   _displayW=w;
   _displayH=h;
-  renderResize(w,h,ZOOM_1_1);
+  renderResize(w,h);
   
 }
 /**
@@ -251,20 +300,52 @@ void admPreview::update(uint32_t framenum,ADMImage *image)
     switch(previewMode)
     {
       case ADM_PREVIEW_NONE:
-        if(image && !defered_display) renderUpdateImage(image->data);
+        if(image)
+        {
+            if(zoom==ZOOM_1_1 )
+            {
+               if(!defered_display) 
+                  renderUpdateImage(image->data);
+            }else
+            {
+                ADM_assert(resizer);
+                ADM_assert(resized);
+                resizer->resize(image->data,resized->data);
+                if(!defered_display) 
+                  renderUpdateImage(resized->data);
+            }
+        }
         break;
       case ADM_PREVIEW_OUTPUT:
             if(framenum<=preview->getInfo()->nb_frames-1)
                   {
-                          preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
-                          if(!defered_display) renderUpdateImage(previewImage->data);
+                          if(!preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl)) return;
+                          if(zoom==ZOOM_1_1)
+                          {
+                            if(!defered_display) renderUpdateImage(previewImage->data);
+                          }
+                          else
+                          {
+                             resizer->resize(previewImage->data,resized->data);
+                             if(!defered_display) 
+                                  renderUpdateImage(resized->data);
+                          }
                   }
             break;
       case ADM_PREVIEW_SEPARATE:
             ADM_assert(preview);
             ADM_assert(previewImage);
-
-          if(image && !defered_display) renderUpdateImage(image->data);
+            if(zoom==ZOOM_1_1)
+            {
+              if(image && !defered_display) renderUpdateImage(image->data);
+            }else
+            {
+                ADM_assert(resizer);
+                ADM_assert(resized);
+                resizer->resize(image->data,resized->data);
+                if(!defered_display) 
+                  renderUpdateImage(resized->data);
+            }
           if( GUI_PreviewStillAlive())
           {
                   aprintf("Preview: Ask for frame %lu\n",framenum);
@@ -278,24 +359,60 @@ void admPreview::update(uint32_t framenum,ADMImage *image)
       case ADM_PREVIEW_SIDE:
               ADM_assert(preview);
               ADM_assert(previewImage);
-  
-              if(!defered_display) renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
-              preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
-              if(!defered_display) 
-                  renderUpdateImageBlit(previewImage->data,_mainW,0,previewImage->_width,previewImage->_height,1);
+              ADM_assert(original);
+              
+              
+              previewBlit(image,original,0,0);
+              if(preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl))
+              {
+                previewBlit(previewImage,original,_mainW,0);
+              }
+              if(zoom==ZOOM_1_1)
+              {
+                if(!defered_display)
+                  renderUpdateImage(original->data);
+              }else
+              {
+                resizer->resize(original->data,resized->data);
+                if(!defered_display) 
+                  renderUpdateImage(resized->data);
+              }
               break;
         
       case ADM_PREVIEW_TOP:
               ADM_assert(preview);
               ADM_assert(previewImage);
-  
-              if(!defered_display) renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
-              preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl);
-              if(!defered_display)
-                  renderUpdateImageBlit(previewImage->data,0,_mainH,previewImage->_width,previewImage->_height,1);
+              ADM_assert(original);
+              
+              previewBlit(image,original,0,0);
+              if(preview->getFrameNumberNoAlloc(framenum,&len,previewImage,&fl))
+              {
+                previewBlit(previewImage,original,0,_mainH);
+              }
+              if(zoom==ZOOM_1_1)
+              {
+                if(!defered_display)
+                  renderUpdateImage(original->data);
+              }else
+              {
+                resizer->resize(original->data,resized->data);
+                if(!defered_display) 
+                  renderUpdateImage(resized->data);
+              }
               break;
       default: ADM_assert(0);
     }
+}
+/**
+      \fn previewBlit(ADMImage *from,ADMImage *to,uint32_t startx,uint32_t starty)
+      \brief Blit "from" to "to" at position startx,starty
+*/
+
+void previewBlit(ADMImage *from,ADMImage *to,uint32_t startx,uint32_t starty)
+{
+  
+  from->copyTo(to,startx,starty);
+  
 }
 /**
       \fn displayNow
@@ -309,31 +426,49 @@ void admPreview::displayNow(uint32_t framenum,ADMImage *image)
     switch(previewMode)
     {
       case ADM_PREVIEW_NONE:
-        if(image ) renderUpdateImage(image->data);
+           
+           if(zoom==ZOOM_1_1 )
+            {
+                renderUpdateImage(image->data);
+            }else
+            {
+                ADM_assert(resized);
+                renderUpdateImage(resized->data);
+            }
         break;
       case ADM_PREVIEW_OUTPUT:
-            renderUpdateImage(previewImage->data);
+            if(zoom==ZOOM_1_1 )
+            {
+                renderUpdateImage(previewImage->data);
+            }else
+            {
+                ADM_assert(resized);
+                renderUpdateImage(resized->data);
+            }
             break;
       case ADM_PREVIEW_SEPARATE:
-          if(image) renderUpdateImage(image->data);
-          if( GUI_PreviewStillAlive())
-          {
-              GUI_PreviewUpdate(previewImage->data);
-          }
+            if(zoom==ZOOM_1_1 )
+            {
+                renderUpdateImage(image->data);
+            }else{
+                ADM_assert(resized);
+                renderUpdateImage(resized->data);
+            }
+            if( GUI_PreviewStillAlive())
+            {
+                GUI_PreviewUpdate(previewImage->data);
+            }
           break;
       case ADM_PREVIEW_SIDE:
-              ADM_assert(preview);
-              ADM_assert(previewImage);
-              renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
-              renderUpdateImageBlit(previewImage->data,_mainW,0,previewImage->_width,previewImage->_height,1);
-              break;
-        
       case ADM_PREVIEW_TOP:
-              ADM_assert(preview);
-              ADM_assert(previewImage);
-  
-              renderUpdateImageBlit(image->data,0,0,_mainW,_mainH,0); // Main
-              renderUpdateImageBlit(previewImage->data,0,_mainH,previewImage->_width,previewImage->_height,1);
+            if(zoom==ZOOM_1_1)
+            {
+               renderUpdateImage(original->data);
+            }else
+            {
+              ADM_assert(resized);
+              renderUpdateImage(resized->data);
+            }
               break;
       default: ADM_assert(0);
     }

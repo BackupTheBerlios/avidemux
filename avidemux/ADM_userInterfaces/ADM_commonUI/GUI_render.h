@@ -36,8 +36,20 @@ typedef enum ADM_PREVIEW_MODE
     ADM_PREVIEW_SEPARATE
 };
 
+typedef enum renderZoom
+{
+        ZOOM_1_4,
+        ZOOM_1_2,
+        ZOOM_1_1,
+        ZOOM_2,
+        ZOOM_4,
+        ZOOM_INVALID
+};
+
+
 ADM_PREVIEW_MODE getPreviewMode(void);
 void             setPreviewMode(ADM_PREVIEW_MODE preview);
+void changePreviewZoom(renderZoom nzoom);
 
 class admPreview
 {
@@ -54,19 +66,10 @@ class admPreview
 
 
 
-typedef enum renderZoom
-{
-        ZOOM_1_4,
-        ZOOM_1_2,
-        ZOOM_1_1,
-        ZOOM_2,
-        ZOOM_4,
-        ZOOM_INVALID
-};
 
 
 uint8_t renderInit( void );
-uint8_t renderResize(uint32_t w, uint32_t h,renderZoom newzoom);
+uint8_t renderResize(uint32_t w, uint32_t h);
 uint8_t renderRefresh(void);
 uint8_t renderExpose(void);
 uint8_t renderUpdateImage(uint8_t *ptr);

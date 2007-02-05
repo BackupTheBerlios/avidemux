@@ -47,7 +47,7 @@
 
 #include "../prefs.h"
 #include "../../ADM_colorspace/ADM_rgb.h"
-#include "../../ADM_libraries/ADM_libswscale/ADM_mp.h"
+
 
 extern uint8_t BitBlit(uint8_t *dst, uint32_t pitchDest,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height);
 extern void UI_purge(void);
@@ -62,7 +62,7 @@ static uint8_t  GUI_ConvertRGBBlit(uint8_t * in, uint8_t * out,uint32_t totalW,u
 
 extern uint8_t UI_shrink(uint32_t w,uint32_t h);
 //_____________________________________
-static renderZoom zoom=ZOOM_1_1;
+
 
 static ColYuvRgb rgbConverter(640,480);
 static ColYuvRgb rgbConverter2(640,480);
@@ -73,8 +73,6 @@ static uint8_t        *accelSurface=NULL;
 //_______________________________________
 
 static uint8_t 	            *screenBuffer=NULL;
-static ADMImage             *resized=NULL;
-static ADM_MplayerResize    *resizer=NULL;
 static uint8_t		    *lastImage=NULL;
 static void                 *draw=NULL;
 static uint32_t 	     renderW=0,renderH=0;
@@ -95,7 +93,7 @@ uint8_t renderInit( void )
 
 */
 //----------------------------------------
-uint8_t renderResize(uint32_t w, uint32_t h,renderZoom newzoom)
+uint8_t renderResize(uint32_t w, uint32_t h)
 {
 int mul,xx,yy;
 
@@ -104,42 +102,9 @@ int mul,xx,yy;
 			delete  [] screenBuffer;
 			screenBuffer=NULL;
 		}
-        if(resized)
-        {
-                        delete resized;
-                        resized=NULL;
-        }
-        if(resizer)
-        {
-                delete resizer;
-                resizer=NULL;
-        }
-        zoom=newzoom;
-        switch(zoom)
-        {
-                case ZOOM_1_4: mul=1;break;
-                case ZOOM_1_2: mul=2;break;
-                case ZOOM_1_1: mul=4;break;
-                case ZOOM_2:   mul=8;break;
-                case ZOOM_4:   mul=16;break;
-                default : ADM_assert(0);
+        screenBuffer=new uint8_t[w*h*4];
 
-        }
-        xx=(w*mul+3)/4;
-        yy=(h*mul+3)/4;
-
-        if(xx&1) xx++;
-        if(yy&1) yy++;
-
-        screenBuffer=new uint8_t[xx*yy*4];
-
-        if(zoom!=ZOOM_1_1)
-        {
-                 resizer=new ADM_MplayerResize(w,h,xx,yy);
-                 resized=new ADMImage(xx,yy);
-        }
-
-	updateWindowSize( draw,xx,yy);
+	updateWindowSize( draw,w,h);
 	UI_purge();
 	return 1;
 
@@ -154,18 +119,8 @@ uint8_t renderUpdateImage(uint8_t *ptr)
 {
 	
         ADM_assert(screenBuffer);
-        if(zoom!=ZOOM_1_1)
-        {
-                ADM_assert(resizer);
-                ADM_assert(resized);
-                resizer->resize(ptr,resized->data);
-                lastImage=resized->data;
-                ptr=lastImage;
-        }
-        else
-        {
-                lastImage=ptr;
-        }
+        lastImage=ptr;
+
 	if(!accel_mode)
 	 	GUI_ConvertRGB(ptr,screenBuffer, renderW,renderH);
 	renderRefresh();

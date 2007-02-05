@@ -458,12 +458,8 @@ int nw;
         case ACT_ZOOM_1_1:
         case ACT_ZOOM_2_1:
         case ACT_ZOOM_4_1:
-#if 0
                 currentZoom=(renderZoom)((action-ACT_ZOOM_1_4)+ZOOM_1_4);
-                renderResize (avifileinfo->width, avifileinfo->height,currentZoom);
-                renderUpdateImage (rdr_decomp_buffer->data);
-                renderRefresh ();
-#endif
+                changePreviewZoom(currentZoom);
                 break;
 
 
