@@ -460,6 +460,7 @@ int nw;
         case ACT_ZOOM_4_1:
                 currentZoom=(renderZoom)((action-ACT_ZOOM_1_4)+ZOOM_1_4);
                 changePreviewZoom(currentZoom);
+                admPreview::update(curframe,rdr_decomp_buffer);
                 break;
 
 
