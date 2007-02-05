@@ -11,17 +11,11 @@
 //
 #ifndef GUI_ACCELRENDER_H
 #define GUI_ACCELRENDER_H
-typedef struct
-{
-    void *display;
-    int  window;
-  
-}GUI_Info;
 class AccelRender
 {
       public:
                               AccelRender( void) {};
-              virtual	uint8_t init(GUI_Info * window, uint32_t w, uint32_t h)=0;
+              virtual	uint8_t init(GUI_WindowInfo * window, uint32_t w, uint32_t h)=0;
               virtual	uint8_t end(void)=0;
               virtual uint8_t display(uint8_t *ptr, uint32_t w, uint32_t h)=0;
               

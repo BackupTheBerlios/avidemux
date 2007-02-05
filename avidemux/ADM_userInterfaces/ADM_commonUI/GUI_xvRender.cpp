@@ -47,7 +47,7 @@
 #include "ADM_assert.h"
 
 static uint8_t 	GUI_XvList(Display * dis, uint32_t port, uint32_t * fmt);
-static uint8_t 	GUI_XvInit(GUI_Info * window, uint32_t w, uint32_t h);
+static uint8_t 	GUI_XvInit(GUI_WindowInfo * window, uint32_t w, uint32_t h);
 static void 	GUI_XvEnd( void );
 static uint8_t 	GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h);
 static uint8_t 	GUI_XvSync(void);
@@ -58,7 +58,7 @@ XvAccelRender::XvAccelRender( void )
 {
 
 }
-uint8_t XvAccelRender::init( GUI_Info * window, uint32_t w, uint32_t h)
+uint8_t XvAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 {
 	printf("Xv start\n");
 	return  GUI_XvInit( window,  w,  h);
@@ -153,7 +153,7 @@ uint8_t GUI_XvSync(void)
 //------------------------------------
 //
 //------------------------------------
-uint8_t GUI_XvInit(GUI_Info * window, uint32_t w, uint32_t h)
+uint8_t GUI_XvInit(GUI_WindowInfo * window, uint32_t w, uint32_t h)
 {
 
 

@@ -83,7 +83,7 @@ uint8_t sdlAccelRender::end( void)
         
         
 }
-uint8_t sdlAccelRender::init( GUI_Info * window, uint32_t w, uint32_t h)
+uint8_t sdlAccelRender::init( GUI_WindowInfo * window, uint32_t w, uint32_t h)
 {
 int bpp;
 int flags;

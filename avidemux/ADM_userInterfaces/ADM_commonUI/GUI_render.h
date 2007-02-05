@@ -20,6 +20,12 @@
 #include "ADM_image.h"
 
 class AVDMGenericVideoStream;
+typedef struct
+{
+    void *display;
+    int  window;
+  
+}GUI_WindowInfo;
 
 typedef enum ADM_PREVIEW_MODE
 {
@@ -69,6 +75,11 @@ uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uin
 uint8_t renderStartPlaying( void );
 uint8_t renderStopPlaying( void );
 
+
+void *UI_getDrawWidget(void);
+void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr);
+void UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h);
+void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo);
 
 typedef enum ADM_RENDER_TYPE
 {
