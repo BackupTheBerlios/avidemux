@@ -14,10 +14,12 @@
 #include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "GUI_ui.h"
-
+#include "ADM_colorspace/ADM_rgb.h"
 static ADM_OUT_FORMAT format=ADM_AVI;
 static int audioCodec=0;
 static int videoCodec=0;
+ ColYuvRgb rgbConverter(640,480);
+ ColYuvRgb rgbConverter2(640,480);
 //**************************************************
 int 	UI_getCurrentACodec(void)
 {

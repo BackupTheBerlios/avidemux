@@ -53,6 +53,8 @@
 
 
 extern GtkWidget *getDrawWidget( void );
+ ColYuvRgb rgbConverter(640,480);
+ ColYuvRgb rgbConverter2(640,480);
 
 /**
     \brief return pointer to the drawing widget that displays video

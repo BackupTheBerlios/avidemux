@@ -302,6 +302,35 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QComboBox" name="comboBoxPreview" >
+            <item>
+             <property name="text" >
+              <string>Input</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Output</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Side</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Top</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Separate</string>
+             </property>
+            </item>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>

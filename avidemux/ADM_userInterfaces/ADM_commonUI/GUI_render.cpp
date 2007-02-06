@@ -64,8 +64,8 @@ extern uint8_t UI_shrink(uint32_t w,uint32_t h);
 //_____________________________________
 
 
-static ColYuvRgb rgbConverter(640,480);
-static ColYuvRgb rgbConverter2(640,480);
+extern ColYuvRgb rgbConverter;
+extern ColYuvRgb rgbConverter2;
 
 //_____________________________________
 static AccelRender    *accel_mode=NULL;

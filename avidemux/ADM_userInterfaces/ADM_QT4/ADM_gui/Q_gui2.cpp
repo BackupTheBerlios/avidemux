@@ -122,6 +122,10 @@ static Action searchTranslationTable(const char *name);
           ui.pushButtonAudioConf->setEnabled(b);
           ui.pushButtonAudioFilter->setEnabled(b);
           HandleAction (ACT_AudioCodecChanged) ;
+        }else
+        if(!strcmp(source,"comboBoxPreview"))  
+        {
+          HandleAction (ACT_PreviewChanged) ;
         }
         
 
@@ -158,6 +162,7 @@ MainWindow::MainWindow()     : QMainWindow()
          //ACT_VideoCodecChanged
          connect( ui.comboBoxVideo,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
          connect( ui.comboBoxAudio,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
+         connect( ui.comboBoxPreview,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
      // Slider
           slider=ui.horizontalSlider;
           slider->setMinimum(0);
@@ -228,6 +233,27 @@ int UI_Init(int nargc,char **nargv)
 QWidget *QuiMainWindows=NULL;
 QGraphicsView *drawWindow=NULL;
 uint8_t UI_updateRecentMenu( void );
+
+/**
+    \fn UI_getCurrentPreview(void)
+    \brief Read previewmode from comboxbox 
+*/
+
+int    UI_getCurrentPreview(void)
+{
+  return WIDGET(comboBoxPreview)->currentIndex(); 
+}
+/**
+    \fn UI_setCurrentPreview(int ne)
+    \brief Update comboxbox with previewmode
+*/
+
+void   UI_setCurrentPreview(int ne)
+{
+    WIDGET(comboBoxPreview)->setCurrentIndex(ne); 
+}
+
+
 /**
     \fn UI_RunApp(void)
     \brief Main entry point for the GUI application
