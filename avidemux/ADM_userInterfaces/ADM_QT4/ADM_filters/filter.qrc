@@ -7,5 +7,7 @@
         <file>icons/5.png</file>
         <file>icons/6.png</file>
         <file>icons/7.png</file>
+        <file>icons/down.png</file>
+        <file>icons/up.png</file>
     </qresource>
 </RCC>

@@ -138,7 +138,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButtonRemove" >
+      <widget class="QToolButton" name="pushButtonRemove" >
        <property name="text" >
         <string>Remove</string>
        </property>
@@ -156,12 +156,18 @@
        <property name="text" >
         <string>Up</string>
        </property>
+       <property name="icon" >
+        <iconset resource="filter.qrc" >:/new/prefix1/icons/up.png</iconset>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QToolButton" name="toolButtonDown" >
        <property name="text" >
         <string>Down</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="filter.qrc" >:/new/prefix1/icons/down.png</iconset>
        </property>
       </widget>
      </item>

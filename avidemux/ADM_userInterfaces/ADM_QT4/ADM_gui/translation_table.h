@@ -70,6 +70,7 @@ PROCESS(setMarkerA , ACT_MarkA  ) \
 PROCESS(setMarkerB ,ACT_MarkB )  \
 PROCESS(pushButtonVideoConf ,ACT_VideoConfigure )  \
 PROCESS(pushButtonVideoFilter , ACT_VideoParameter  ) \
-PROCESS(pushButtonAudioConf ,ACT_AudioConfigure ) \
-PROCESS(pushButtonAudioFilter ,ACT_AudioFilters )  
+PROCESS(pushButtonAudioConf ,ACT_AudioCodec ) \
+PROCESS(pushButtonAudioFilter ,ACT_AudioFilters ) 
+
 

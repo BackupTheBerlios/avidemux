@@ -48,6 +48,7 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
+#include "ADM_video/ADM_vidPartial.h"
 /*******************************************************/
 #define NB_TREE 7
 static int startFilter[NB_TREE];
@@ -296,13 +297,52 @@ void filtermainWindow::allDoubleClick( QListWidgetItem  *item)
     add(0);
 }
 /**
-
+        \fn     filtermainWindow::partial( bool b)
+        \brief  Partialize one filter
 */
 void filtermainWindow::partial( bool b)
 {
   printf("partial\n"); 
+   QListWidgetItem *item=activeList->currentItem();
+   if(!item)
+   {
+      printf("No selection\n");
+      return;
+   }
+    
+     int itag=item->type();
+     ADM_assert(itag>ACTIVE_FILTER_BASE);
+     itag-=ACTIVE_FILTER_BASE;
+     /* Filter 0 is the decoder ...*/
+      printf("Rank : %d\n",itag); 
+      ADM_assert(itag);
+     
+        AVDMGenericVideoStream *replace;
+        CONFcouple *conf;
+        conf = videofilters[itag].conf;
+        if (videofilters[itag].tag == VF_PARTIAL)	// cannot recurse
+        {
+            GUI_Error_HIG (_("The filter is already partial"), NULL);
+            return;
+        }
+        replace =new ADMVideoPartial (videofilters[itag - 1].
+                                      filter,
+                                      videofilters[itag].tag,
+                                      conf);
+        if(replace->configure (videofilters[itag - 1].filter))
+        {
+            delete videofilters[itag].filter;
+            if (conf) delete conf;
+            videofilters[itag].filter = replace;
+            replace->getCoupledConf (&conf);
+            videofilters[itag].conf = conf;
+            videofilters[itag].tag = VF_PARTIAL;
+            getFirstVideoFilter ();
+            buildActiveFilterList ();   
+        }
+        else delete replace;
 }
-
+#define myBg 0xF0
 /**
         \fn     buildAvailableFilterList(void)
         \brief  build the internal datas needed to handle the list. Need to be called only once.
@@ -313,19 +353,22 @@ void filtermainWindow::buildAvailableFilterList(void)
   int current_raw=0;;
   
   max=0;
+  QColor colorGrey;
+  colorGrey.setRgb(myBg,myBg,myBg);
+  QBrush brush(colorGrey);
+  QSize sz;
+  
   for (uint32_t i = 0; i < nb_video_filter; i++)
     {
       if (allfilters[i].viewable==1)
         {
           QString str; //="<b>";
           str+=allfilters[i].name;
-          str+=":";//"</b><br>";
-//           str+="<b>";
-          str+=allfilters[i].description; // Mem leak ?
-//           str+="</b>";
           max++;
           
           QListWidgetItem *item=new QListWidgetItem(str,allList[current_tree],ALL_FILTER_BASE+i);
+          item->setToolTip(allfilters[i].description);
+          if(i&1) item->setBackground(brush);
           allList[current_tree]->addItem(item);
           current_raw++;
           
@@ -353,6 +396,10 @@ void filtermainWindow::buildActiveFilterList(void)
 {
   VF_FILTERS fil;
   activeList->clear();
+  QColor colorGrey;
+  colorGrey.setRgb(myBg,myBg,myBg);
+  QBrush brush(colorGrey);
+
   for (uint32_t i = 1; i < nb_active_filter; i++)
     {
                 QString str;
@@ -361,6 +408,7 @@ void filtermainWindow::buildActiveFilterList(void)
                  str =filterGetNameFromTag(fil);
                  str+= videofilters[i].filter->printConf ();
                  QListWidgetItem *item=new QListWidgetItem(str,activeList,ACTIVE_FILTER_BASE+i);
+                 if(i&1) item->setBackground(brush);
                  activeList->addItem(item);
     }
     
@@ -400,6 +448,8 @@ filtermainWindow::filtermainWindow()     : QDialog()
     connect((ui.toolButtonUp),SIGNAL(clicked(bool)),this,SLOT(up(bool)));
     connect((ui.toolButtonDown),SIGNAL(clicked(bool)),this,SLOT(down(bool)));
     connect(ui.buttonClose, SIGNAL(clicked(bool)), this, SLOT(accept()));
+    connect(ui.toolButtonPartial, SIGNAL(clicked(bool)), this, SLOT(partial(bool)));
+    
  }
 /*******************************************************/
 
