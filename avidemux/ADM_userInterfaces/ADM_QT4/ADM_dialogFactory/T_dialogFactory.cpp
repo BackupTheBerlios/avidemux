@@ -96,7 +96,18 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   return 0;
   
 }
-
-
+/**
+    \fn shortkey(const char *in)
+    \brief translate gtk like accelerator (_) to QT4 like accelerator (&)
+*/
+const char *shortkey(const char *in)
+{
+ char *t=ADM_strdup(in);
+ for(int i=0;i<strlen(t);i++)
+ {
+    if(t[i]=='_') t[i]='&'; 
+ }
+  return t;
+}
 
 //EOF

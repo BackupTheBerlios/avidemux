@@ -30,7 +30,7 @@
 #include "ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 
-
+extern const char *shortkey(const char *);
 
 
 //********************************************************************
@@ -38,7 +38,7 @@ diaElemFloat::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, EL
   : diaElem(ELEM_TOGGLE)
 {
   param=(void *)intValue;
-  paramTitle=toggleTitle;
+  paramTitle=shortkey(toggleTitle);
   this->min=min;
   this->max=max;
   this->tip=tip;
@@ -46,6 +46,8 @@ diaElemFloat::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, EL
 
 diaElemFloat::~diaElemFloat()
 {
+  if(paramTitle)
+    delete paramTitle;
 }
 void diaElemFloat::setMe(void *dialog, void *opaque,uint32_t line)
 {
@@ -60,7 +62,7 @@ void diaElemFloat::setMe(void *dialog, void *opaque,uint32_t line)
  box->show();
  
  QLabel *text=new QLabel( this->paramTitle,(QWidget *)dialog);
- 
+ text->setBuddy(box);
  layout->addWidget(text,line,0);
  layout->addWidget(box,line,1);
  

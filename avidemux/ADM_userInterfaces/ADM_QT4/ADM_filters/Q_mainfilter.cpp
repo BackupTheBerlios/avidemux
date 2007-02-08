@@ -96,7 +96,17 @@ class filtermainWindow : public QDialog
         void allDoubleClick( QListWidgetItem  *item);
  private slots:
  private:
+        void setSelected(int sel);
 };
+/**
+        \fn     void setSelected(int sel)
+        \brief  Set the sel line as selected in the active filter window
+*/
+void filtermainWindow::setSelected( int sel)
+{
+  if(!sel) return;
+  activeList->setCurrentRow(sel-1);
+}
 
 /**
         \fn     add( bool b)
@@ -137,6 +147,7 @@ void filtermainWindow::add( bool b)
         videofilters[nb_active_filter].tag = tag;
         videofilters[nb_active_filter].conf = coup;
         nb_active_filter++;
+        setSelected(nb_active_filter);
         buildActiveFilterList();
    }
 }
@@ -182,6 +193,13 @@ void filtermainWindow::remove( bool b)
             videofilters[nb_active_filter - 1].filter = NULL;
             nb_active_filter--;
             buildActiveFilterList ();
+            if(nb_active_filter>1)
+            {
+              if(itag<nb_active_filter-1)
+                  setSelected(itag);
+              else
+                  setSelected(nb_active_filter-1);
+            }
   
 }
 /**
@@ -243,7 +261,8 @@ void filtermainWindow::up( bool b)
             &videofilters[itag], sizeof (FILTER));
         memcpy (&videofilters[itag], &tmp, sizeof (FILTER));
         getFirstVideoFilter ();
-        buildActiveFilterList ();   
+        buildActiveFilterList ();
+        setSelected(itag-1);
 }
 /**
         \fn     down( bool b)
@@ -274,7 +293,8 @@ void filtermainWindow::down( bool b)
                         &videofilters[itag], sizeof (FILTER));
             memcpy (&videofilters[itag], &tmp, sizeof (FILTER));
             getFirstVideoFilter ();
-             buildActiveFilterList ();   
+            buildActiveFilterList ();
+            setSelected(itag+1);
         }
 }
 
@@ -449,6 +469,8 @@ filtermainWindow::filtermainWindow()     : QDialog()
     connect((ui.toolButtonDown),SIGNAL(clicked(bool)),this,SLOT(down(bool)));
     connect(ui.buttonClose, SIGNAL(clicked(bool)), this, SLOT(accept()));
     connect(ui.toolButtonPartial, SIGNAL(clicked(bool)), this, SLOT(partial(bool)));
+    
+    ui.tabWidgetSubtitles->setCurrentIndex(0);
     
  }
 /*******************************************************/

@@ -33,14 +33,14 @@
 #include <QCheckBox>
 
 
-
+extern const char *shortkey(const char *);
 
 diaElemMenu::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
                const diaMenuEntry *menu,const char *tip)
   : diaElem(ELEM_MENU)
 {
   param=(void *)intValue;
-  paramTitle=itle;
+  paramTitle=shortkey(itle);
   this->tip=tip;
   this->menu=menu;
   this->nbMenu=nb;
@@ -48,7 +48,8 @@ diaElemMenu::diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb,
 
 diaElemMenu::~diaElemMenu()
 {
-  
+  if(paramTitle)
+    delete paramTitle;
 }
 void diaElemMenu::setMe(void *dialog, void *opaque,uint32_t line)
 {
@@ -67,6 +68,7 @@ void diaElemMenu::setMe(void *dialog, void *opaque,uint32_t line)
     if( *(uint32_t *)param==entries[i].val) mem=i;
   }
    combo->setCurrentIndex(mem);
+   text->setBuddy(combo);
    layout->addWidget(text,line,0);
    layout->addWidget(combo,line,1);
 }

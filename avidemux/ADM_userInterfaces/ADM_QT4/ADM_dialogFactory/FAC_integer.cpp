@@ -31,7 +31,7 @@
 #include "ADM_assert.h"
 
 
-
+extern const char *shortkey(const char *);
 
 
 
@@ -40,7 +40,7 @@ diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_
   : diaElem(ELEM_TOGGLE)
 {
   param=(void *)intValue;
-  paramTitle=toggleTitle;
+  paramTitle=shortkey(toggleTitle);
   this->min=min;
   this->max=max;
   this->tip=tip;
@@ -48,6 +48,8 @@ diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_
 
 diaElemInteger::~diaElemInteger()
 {
+  if(paramTitle)
+    delete paramTitle;
 }
 void diaElemInteger::setMe(void *dialog, void *opaque,uint32_t line)
 {
@@ -62,7 +64,7 @@ void diaElemInteger::setMe(void *dialog, void *opaque,uint32_t line)
  box->show();
  
  QLabel *text=new QLabel( this->paramTitle,(QWidget *)dialog);
- 
+ text->setBuddy(box);
  layout->addWidget(text,line,0);
  layout->addWidget(box,line,1);
  
@@ -82,7 +84,7 @@ diaElemUInteger::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uin
   : diaElem(ELEM_TOGGLE)
 {
   param=(void *)intValue;
-  paramTitle=toggleTitle;
+  paramTitle=shortkey(toggleTitle);
   this->min=min;
   this->max=max;
   this->tip=tip;
@@ -91,7 +93,8 @@ diaElemUInteger::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uin
 
 diaElemUInteger::~diaElemUInteger()
 {
-  
+  if(paramTitle)
+    delete paramTitle;
 }
 void diaElemUInteger::setMe(void *dialog, void *opaque,uint32_t line)
 {
@@ -106,7 +109,7 @@ void diaElemUInteger::setMe(void *dialog, void *opaque,uint32_t line)
  box->show();
  
  QLabel *text=new QLabel( this->paramTitle,(QWidget *)dialog);
- 
+ text->setBuddy(box);
  layout->addWidget(text,line,0);
  layout->addWidget(box,line,1);
 }

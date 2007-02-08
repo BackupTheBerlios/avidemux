@@ -30,12 +30,13 @@
 #include "ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 
+extern const char *shortkey(const char *);
 
 diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip)
   : diaElem(ELEM_TOGGLE)
 {
   param=(void *)toggleValue;
-  paramTitle=toggleTitle;
+  paramTitle=shortkey(toggleTitle);
   this->tip=tip;
   myWidget=NULL;
 }
@@ -45,6 +46,8 @@ diaElemToggle::~diaElemToggle()
   QCheckBox *box=(QCheckBox *)myWidget;
  // if(box) delete box;
   myWidget=NULL;
+  if(paramTitle)
+    delete paramTitle;
 }
 void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t l)
 {
