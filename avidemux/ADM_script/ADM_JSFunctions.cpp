@@ -71,6 +71,7 @@ JSBool facInt(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 JSBool facFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facToggle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facMenu(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
 
 static JSFunctionSpec adm_functions[] = {
@@ -92,6 +93,7 @@ static JSFunctionSpec adm_functions[] = {
   {"dialogFactoryFloat",        facFloat,        0},
   {"dialogFactoryToggle",       facToggle,        0},
   {"dialogFactoryMenu",         facMenu,        0},
+  {"dialogFactoryFileSel",      facFile,        0},
   {0}
 };
 
@@ -538,3 +540,20 @@ JSBool facMenu(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     *rval = BOOLEAN_TO_JSVAL(0);
   return JS_TRUE;
 }
+JSBool facFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+   uint32_t tog=0;
+   char *test=ADM_strdup("Entry test1");
+    
+      diaElemFileRead fread(&test,"Entry");
+      diaElem *elems[]={&fread   };
+  if(diaFactoryRun("Test FileRead",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    printf("Value : <%s>\n",test);
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  if(test) ADM_dealloc(test);
+  return JS_TRUE;
+}
+//EOF 

@@ -123,6 +123,25 @@ void diaElemMenu::getMe(void)
  
 }
 
+diaElemFileRead::diaElemFileRead(char **filename,const char *toggleTitle,const char *tip)
+  : diaElem(ELEM_FILE_READ)
+{
+ 
+}
+
+diaElemFileRead::~diaElemFileRead()
+{
+  
+}
+void diaElemFileRead::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ 
+  
+}
+void diaElemFileRead::getMe(void)
+{
+ 
+}
 
 //******************************************************
 //EOF

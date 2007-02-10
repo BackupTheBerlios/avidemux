@@ -23,6 +23,7 @@ typedef enum elemEnum
   ELEM_INTEGER,
   ELEM_FLOAT,
   ELEM_MENU,
+  ELEM_FILE_READ,
   ELEM_MAX=ELEM_TOGGLE
 };
 /*********************************************/
@@ -110,6 +111,18 @@ public:
 };
 
 /*************************************************/
+class diaElemFileRead : public diaElem
+{
+
+public:
+  
+  diaElemFileRead(char **filename,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemFileRead() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  
+  void changeFile(void);
+};
 /*********************************************/
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems);
 
