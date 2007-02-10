@@ -80,10 +80,6 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 		      uint32_t * br,uint32_t *fsize,xvidEncParam *param){return 0;}
 #endif
 uint8_t DIA_animated(ANIMATED_PARAM *param){return 0;}
-#ifdef USE_FREETYPE
-#include "ADM_video/ADM_vidAss_Params.h"
-uint8_t DIA_ass(ASSParams *param){return 0;}
-#endif
 uint8_t DIA_rotate(AVDMGenericVideoStream *astream,ROTATE_PARAM *param){return 0;}
 uint8_t DIA_cnr2(CNR2Param *param){return 0;}
 uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming){return 0;}

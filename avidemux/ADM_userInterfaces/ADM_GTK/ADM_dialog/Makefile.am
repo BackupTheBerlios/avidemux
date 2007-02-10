@@ -31,7 +31,7 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 	DIA_quota.cpp \
 	DIA_animated.cpp \
 	DIA_partial.cpp \
-	DIA_ass.cpp DIA_bitrateHisto.cpp
+	DIA_bitrateHisto.cpp
 
 
 
@@ -54,6 +54,6 @@ DIA_preview.cpp     DIA_xvcd.cpp \
 DIA_busy.cpp         DIA_properties.cpp  DIA_xvid.cpp \
 DIA_busy.h           DIA_lavcodec.cpp     DIA_quota.cpp       DIA_xvid4.cpp \
 DIA_calculator.cpp   DIA_encoding.cpp      DIA_lavdecoder.cpp   DIA_recent.cpp \
-DIA_chromaShift.cpp  DIA_encoding.h        DIA_lavpp_deint.cpp  DIA_requant.cpp DIA_ass.cpp
+DIA_chromaShift.cpp  DIA_encoding.h        DIA_lavpp_deint.cpp  DIA_requant.cpp 
 
 

@@ -375,8 +375,6 @@ unsigned int d;
 			return 0;
 	
 }
-extern uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
-			uint32_t *cthresh, uint32_t *scene);
 
 
 uint8_t ADMVideoDenoise::configure(AVDMGenericVideoStream * instream)

@@ -49,8 +49,7 @@ libADM_video_a_SOURCES = \
  ADM_vidMPdelogo.cpp \
  ADM_vidColorYuv.cpp  \
  ADM_guiResize.cpp \
- ADM_vidAnimated.cpp \
- ADM_vidASS.cpp
+ ADM_vidAnimated.cpp 
 
 				
 
@@ -100,8 +99,7 @@ ADM_vidContrast.h  ADM_vidMPdelogo.h \
 ADM_vobsubinfo.cpp \
 ADM_vidCrop.cpp  ADM_vobsubinfo.h \
 swscale_internal.h \
-ADM_vidTdeint_util.txt ADM_vidASS.h ADM_vidASS.cpp \
-ADM_vidAss_Params.h mmx_macros.h
+ADM_vidTdeint_util.txt mmx_macros.h
 
 ####### kdevelop will overwrite this part!!! (end)############
 INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -I../ADM_libraries/ADM_lavutil \
@@ -109,4 +107,4 @@ INCLUDES = $(all_includes) -I../ADM_libraries -I../ADM_libraries/ADM_utilities -
 noinst_HEADERS = ADM_mpdetc.h \
   ADM_cache.h \
 ADM_vidEqualizer.h ADM_vobsubinfo.h ADM_vidVobSub.h \
-ADM_vidEq2.h ADM_vidASS.h
+ADM_vidEq2.h 

@@ -25,10 +25,10 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidCommonFilter.h"
-#include "ADM_video/ADM_vidASS.h"
+#include "ADM_vidASS.h"
 #include "ADM_filter/video_filters.h"
 #include "ADM_colorspace/ADM_rgb.h"
-
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 #ifdef USE_FREETYPE
 
 #ifndef DIR_SEP
@@ -68,6 +68,38 @@ char *ADMVideoSubASS::printConf()
         strcat(buf," (no sub)");       
       }
       return buf;
+}
+
+
+uint8_t ADMVideoSubASS::configure(AVDMGenericVideoStream * instream)
+{
+  UNUSED_ARG(instream);
+  
+#define PX(x) &(_params->x)
+#define MKME(x,y) x=(ELEM_TYPE_FLOAT)_params->y
+  ELEM_TYPE_FLOAT scale,spacing;
+  
+    MKME(scale,font_scale);
+    MKME(spacing,line_spacing);
+    
+    diaElemFileRead   file((char **)PX(subfile),_("_Subtitle file (ass/ssa)"));
+    diaElemFloat      dSpacing(&spacing,_("_Line spacing"),0.10,10.0);
+    diaElemFloat      dScale(&scale,_("_Font scale"),0.10,10.0);
+    diaElemUInteger   dTop(PX(top_margin),_("_Top margin"),0,200);
+    diaElemUInteger   dBottom(PX(bottom_margin),_("_Bottom margin"),0,200);
+    
+       diaElem *elems[5]={&file,&dSpacing,&dScale,&dTop,&dBottom};
+  
+   if( diaFactoryRun("Denoise",5,elems))
+   {
+#undef MKME
+#define MKME(x,y) _params->y=(float)x
+    MKME(scale,font_scale);
+    MKME(spacing,line_spacing);
+
+     return 1;
+   }
+   return 0;
 }
 
 //_______________________________________________________________
@@ -335,16 +367,5 @@ uint8_t	ADMVideoSubASS::getCoupledConf(CONFcouple **conf)
         return 1;
 }
 /************************************************/
-extern uint8_t DIA_ass(ASSParams *param);
-uint8_t ADMVideoSubASS::configure(AVDMGenericVideoStream *instream) 
-{
-  _in=instream;
-  if( DIA_ass(_params))
-  {
-    init();
-    return 1; 
-  }
-  return 0;
-}
 #endif /* HAVE_ENCODER */
 #endif /* USE_FREETYPE */
