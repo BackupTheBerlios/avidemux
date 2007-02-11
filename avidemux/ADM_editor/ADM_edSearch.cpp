@@ -126,7 +126,10 @@ uint8_t
 	{
 	  relframe--;
 	  if (!_videos[ref]._aviheader->getFlags (relframe, &flags))
+          {
 	    relframe = 0xffffffff;
+            break;
+          }
 	}
       // verify it is within the segment
 
