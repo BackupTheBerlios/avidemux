@@ -38,7 +38,7 @@
 
 #include"ADM_vidLargeMedian.h"
 #include "ADM_filter/video_filters.h"
-
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 static FILTER_PARAM nullParam={2,{"chroma","luma"}};
 
@@ -301,7 +301,13 @@ uint32_t inbox;
 
 uint8_t ADMVideoLargeMedian::configure(AVDMGenericVideoStream * instream)
 {
-  return 1; 
+  diaElemToggle luma(&(_param->luma),"_Process luma","Process luma plane");
+  diaElemToggle chroma(&(_param->chroma),"P_rocess chroma");
+  
+  diaElem *elems[2]={&luma,&chroma};
+  
+  return diaFactoryRun("Large Median 5x5",2,elems);
+  
 }
 
 
