@@ -48,7 +48,7 @@ vp3dsp_sse2.o:i386/vp3dsp_sse2.c
 libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c $(EXTEND_AMR) \
 		adpcm.c 	allcodecs.c 	cyuv.c 	dsputil.c 	dv.c \
 		error_resilience.c 		fdctref.c 	fft.c 	h263.c 	h263dec.c 	huffyuv.c 	imgconvert.c \
-		imgresample.c 	jfdctfst.c 	jfdctint.c 	jrevdct.c 	mace.c 	mdct.c 	 	mjpeg.c \
+		jfdctfst.c 	jfdctint.c 	jrevdct.c 	mace.c 	mdct.c 	 	mjpeg.c \
 		motion_est.c 	mpeg12.c 	mpegaudio.c 	mpegaudiodec.c 	mpegvideo.c 	msmpeg4.c 	 \
 		pcm.c 	ratecontrol.c 	raw.c 	resample.c 	rv10.c 	simple_idct.c 	svq1.c \
 		utils.c 	wmadec.c 	indeo3.c 	vp3.c 	vp3dsp.c 	h264.c 	ffv1.c 	ra144.c 	ra288.c \
@@ -57,7 +57,7 @@ libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c $(EXTEND_AMR) \
 		idcinvideo.c 	smc.c 	flicvideo.c 	interplayvideo.c 	dpcm.c 	8bps.c vmdav.c \
 		truemotion1.c flac.c g726.c 	qtrle.c lcl.c 	snow.c  \
 		rangecoder.c bitstream.c h264idct.c h261.c amr.c tscc.c \
-		resample2.c imgresample.c pthread.c qdm2.c bitstream_filter.c eval.c \
+		resample2.c pthread.c qdm2.c bitstream_filter.c eval.c \
 		vc1.c vc1dsp.c vp56.c vp56data.c vp6.c vp5.c indeo2.c indeo3.c  smacker.c  opt.c
 	
 
@@ -101,7 +101,7 @@ cscd.c      h264idct.c    msmpeg4.c      smacker.c  zmbv.c \
 cyuv.c      huffyuv.c     msrle.c      smc.c \
 dct-test.c    idcinvideo.c    msvideo1.c     snow.c \
 dpcm.c      imgconvert.c    nuv.c      sonic.c \
-dsputil.c     imgresample.c   oggtheora.c    svq1.c \
+dsputil.c      oggtheora.c    svq1.c \
 vc1dsp.c \
 amr_float i386 libpostproc ppc 
 
