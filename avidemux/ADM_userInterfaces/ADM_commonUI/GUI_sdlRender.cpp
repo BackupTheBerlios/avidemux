@@ -48,7 +48,9 @@ static uint8_t sdl_running=0;
 static SDL_Overlay *sdl_overlay=NULL;
 static SDL_Surface *sdl_display=NULL;
 static SDL_Rect disp;
-
+#ifdef CYG_MANGLING
+HWND sdlWin32;
+#endif
 static ColBase *color=NULL;
 
 sdlAccelRender::sdlAccelRender( void)
@@ -126,6 +128,13 @@ int flags;
         
         }
         SDL_LockSurface(sdl_display);
+#ifdef CYG_MANGLING
+       if(-1 != SDL_GetWMInfo(&wmInfo))
+       {
+          sdlWin32 = wmInfo.window;
+          SetParent(sdlWin32,(HWND) window->window);
+       }
+#endif
         int cspace;
         
         if(useYV12) cspace=SDL_YV12_OVERLAY;
