@@ -129,10 +129,17 @@ int flags;
         }
         SDL_LockSurface(sdl_display);
 #ifdef CYG_MANGLING
+	struct SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
        if(-1 != SDL_GetWMInfo(&wmInfo))
        {
           sdlWin32 = wmInfo.window;
-          SetParent(sdlWin32,(HWND) window->window);
+          SetParent(sdlWin32,(HWND) window->display);
+	  MoveWindow(sdlWin32,0,0,w,h,0);
+       }
+       else
+       {
+		printf("[SDL] reparenting failed\n");
        }
 #endif
         int cspace;

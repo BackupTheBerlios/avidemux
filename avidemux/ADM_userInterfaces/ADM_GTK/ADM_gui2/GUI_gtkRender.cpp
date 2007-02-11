@@ -24,15 +24,18 @@
 #include <gtk/gtk.h>
 #ifndef CYG_MANGLING
 #include <gdk/gdkx.h>
+#else
+#include <gdk/gdkwin32.h>
 #endif
 #include <time.h>
 #include <sys/time.h>
 
 
-#include "../avi_vars.h"
+//#include "../avi_vars.h"
 #include <../ADM_assert.h>
-
-
+#define WIN32_CLASH
+#include "default.h"
+#include "ADM_osSupport/ADM_misc.h"
 
 #include "ADM_commonUI/GUI_render.h"
 
@@ -100,6 +103,8 @@ void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo)
 #ifndef CYG_MANGLING
         xinfo->window=	GDK_WINDOW_XWINDOW(widget->window);
         xinfo->display= GDK_WINDOW_XDISPLAY(win);
+#else
+        xinfo->display=	(void*)GDK_WINDOW_HWND(widget->window);
 #endif
 }
 #if 0

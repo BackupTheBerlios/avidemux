@@ -15,7 +15,7 @@
 
 #ifndef __ADM_MISC__
 #define __ADM_MISC__
-#include "time.h"
+//#include "time.h"
 
 typedef enum ADM_LOG_LEVEL
 {
