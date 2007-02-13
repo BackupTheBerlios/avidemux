@@ -1091,6 +1091,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 						switch(tag)
 						{
 							case Tag_ES_Desc:
+                                                                printf("\t ES_Desc\n");
 								tom.skipBytes(3);
 								break;
 							case Tag_DecConfigDesc:
@@ -1113,6 +1114,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 								break;
                                                         }
 							case Tag_DecSpecificInfo:
+                                                                printf("\t DecSpecicInfo\n");
                                                                 switch(current)
                                                                 {
                                                                     case 1: // Video

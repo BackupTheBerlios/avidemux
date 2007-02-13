@@ -39,7 +39,11 @@ class AVDMProcessAudio_RawShift : public AVDMBufferedAudioStream
     //
             uint32_t read(uint32_t len,float *buffer) {ADM_assert(0);return 0;}
             uint32_t grab(uint8_t *outbuffer) {ADM_assert(0);return 0;}
-    
+    virtual uint8_t  extraData(uint32_t *l,uint8_t **d)
+    {
+      ADM_assert(_instream);
+      return _instream->extraData(l,d);
+    }
 };
 #endif
 //EOF
