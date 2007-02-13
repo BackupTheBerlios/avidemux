@@ -110,6 +110,8 @@ uint32_t type,value;
   _internalFlags=0;
   // Start with a clean base
   memset (_videos, 0, sizeof (_videos));
+  max_seg = MAX_SEG;
+  _segments = new _SEGMENT[max_seg];
   memset (_segments, 0, sizeof (_segments));
   _scratch=NULL;
   
@@ -258,7 +260,7 @@ uint8_t ADM_Composer::addFile (char *name, uint8_t mode)
 
 UNUSED_ARG(mode);
 	_haveMarkers=0; // by default no markers are present
-  ADM_assert (_nb_segment < MAX_SEG);
+  ADM_assert (_nb_segment < max_seg);
   ADM_assert (_nb_video < MAX_VIDEO);
 
   if (!identify (name, &type))
@@ -826,10 +828,15 @@ uint8_t ADM_Composer::cleanup (void)
 uint8_t ADM_Composer::addSegment(uint32_t source,uint32_t start, uint32_t nb)
 {
         // do some sanity check
-        if(_nb_segment==MAX_SEG-1)
-        {
-                printf("[editor] Too many segments %d\n",_nb_segment);
-                return 0;
+        if(_nb_segment==max_seg-1)
+	{
+	   _SEGMENT *s;
+            max_seg += MAX_SEG;
+            s = new _SEGMENT[max_seg];
+            memset (s, 0, sizeof(_SEGMENT)*max_seg);
+            memcpy(s,_segments,sizeof(_SEGMENT)*(max_seg-MAX_SEG));
+            delete _segments;
+            _segments = s;
         }
         if(_nb_video<=source)
         {

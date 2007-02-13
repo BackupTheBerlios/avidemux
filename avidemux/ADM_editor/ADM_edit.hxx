@@ -129,7 +129,8 @@ class ADM_Composer
 
        					uint32_t _lastseg,_lastframe,_lastlen;
 
-  					_SEGMENT 		_segments[MAX_SEG];
+					uint32_t	max_seg;
+  					_SEGMENT 		*_segments;
 					_SEGMENT 		_clipboard[MAX_SEG];
 					_VIDEOS 		_videos[MAX_VIDEO];
                                         ADMImage                *_scratch;
