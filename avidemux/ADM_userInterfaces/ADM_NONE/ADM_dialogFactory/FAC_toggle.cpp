@@ -143,5 +143,25 @@ void diaElemFileRead::getMe(void)
  
 }
 
+#include "ADM_encoder/ADM_vidEncode.hxx"
+  diaElemBitrate::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip)
+  : diaElem(ELEM_BITRATE)
+{
+  
+}
+diaElemBitrate::~diaElemBitrate()
+{
+  
+}
+void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ 
+  
+}
+void diaElemBitrate::getMe(void)
+{
+ 
+}
+             
 //******************************************************
 //EOF

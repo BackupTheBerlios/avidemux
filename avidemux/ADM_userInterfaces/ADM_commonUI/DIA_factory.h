@@ -24,6 +24,7 @@ typedef enum elemEnum
   ELEM_FLOAT,
   ELEM_MENU,
   ELEM_FILE_READ,
+  ELEM_BITRATE,
   ELEM_MAX=ELEM_TOGGLE
 };
 /*********************************************/
@@ -108,6 +109,22 @@ public:
   virtual ~diaElemMenu() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
+};
+/*************************************************/
+#include "ADM_encoder/ADM_vidEncode.hxx"
+
+class diaElemBitrate : public diaElem
+{
+  protected:
+    COMPRES_PARAMS    copy;
+public:
+  
+  diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemBitrate() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  
+  void updateMe(void);
 };
 
 /*************************************************/

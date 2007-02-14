@@ -72,6 +72,7 @@ JSBool facFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 JSBool facToggle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facMenu(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facBitrate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
 
 static JSFunctionSpec adm_functions[] = {
@@ -94,6 +95,7 @@ static JSFunctionSpec adm_functions[] = {
   {"dialogFactoryToggle",       facToggle,        0},
   {"dialogFactoryMenu",         facMenu,        0},
   {"dialogFactoryFileSel",      facFile,        0},
+  {"dialogFactoryBitrate",      facBitrate,        0},
   {0}
 };
 
@@ -556,4 +558,35 @@ JSBool facFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
   if(test) ADM_dealloc(test);
   return JS_TRUE;
 }
+JSBool facBitrate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+   COMPRES_PARAMS test={
+  CodecYV12,
+  "YV12 (raw)",
+  "YV12",
+  "YV12",
+  COMPRESS_CQ,
+  1,
+  1500,
+  700,
+  1000,
+  ADM_ENC_CAP_CQ,
+  0,
+  NULL,
+  0,
+  NULL
+};
+    
+      diaElemBitrate bt(&test,"Entry");
+      diaElem *elems[]={&bt   };
+  if(diaFactoryRun("Test FileRead",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  
+  return JS_TRUE;
+}
+
 //EOF 
