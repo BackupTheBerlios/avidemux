@@ -281,6 +281,7 @@ static int rc_2pass1_before(rc_2pass1_t * rc, xvid_plg_data_t * data);
 static  int rc_2pass1_destroy(rc_2pass1_t * rc, xvid_plg_destroy_t * destroy);
 static  int rc_2pass1_create(xvid_plg_create_t * create, rc_2pass1_t ** handle);
 
+static void writeQuantStat(rc_2pass2_t * rc);
 
 //****************************************************************************************
 //****************************************************************************************
@@ -298,7 +299,9 @@ xvid_plg_destroy_t data;
 	
 		case RS_IDLE:break;
 		case RS_PASS1:rc_2pass1_destroy((rc_2pass1_t *)myHandle,&data);break;
-		case RS_PASS2:rc_2pass2_destroy((rc_2pass2_t *)myHandle,&data);break;
+		case RS_PASS2:writeQuantStat((rc_2pass2_t *)myHandle);
+                              rc_2pass2_destroy((rc_2pass2_t *)myHandle,&data);
+                              break;
 		default:ADM_assert(0);
 	}
 	_state=RS_IDLE;
@@ -1184,6 +1187,36 @@ rc_2pass2_after(rc_2pass2_t * rc, xvid_plg_data_t * data)
 			rc->overflow);
 
 	return(0);
+}
+
+void writeQuantStat(rc_2pass2_t * rc){
+  unsigned int i,j;
+  unsigned int sum,sum2,frames;
+  char *str = (char*)ADM_alloc( strlen(rc->param.filename) + 4 );
+  char *dot;
+  FILE *fd;
+   strcpy(str,rc->param.filename);
+   if( (dot = rindex(str,'.')) ){
+      *dot = '\0';
+   }
+   strcat(str,".qs");
+   if( (fd=qfopen(str,"wb")) ){
+     sum2=frames=0;
+     for(j=2;j<32;j++){
+        sum=0;
+        qfprintf(fd,"q%02u: ",j);
+        for(i=0;i<3;i++){
+           sum+=rc->quant_count[i][j];
+           qfprintf(fd,"%u: %6u ",i,rc->quant_count[i][j]);
+        }
+        sum2+=sum*j;
+        frames+=sum;
+        qfprintf(fd,"sum: %6u\n",sum);
+     }
+     qfprintf(fd,"\nQuant over all: %2.2f\n",(float)sum2/(float)frames);
+     qfclose(fd);
+   }
+   ADM_dealloc( str );
 }
 
 /*****************************************************************************
