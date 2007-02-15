@@ -13,7 +13,7 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 	DIA_resize.cpp DIA_working.cpp \
 	DIA_working.h DIA_busy.cpp DIA_busy.h DIA_exLame.cpp DIA_pipe.cpp DIA_mpeg2opt.cpp \
 	DIA_xvcd.cpp DIA_muxer.cpp \
-	DIA_xvid.cpp DIA_crop.cpp DIA_color.cpp DIA_encoding.cpp DIA_SVCD.cpp DIA_prefs.cpp \
+	DIA_xvid.cpp DIA_crop.cpp DIA_color.cpp DIA_encoding.cpp  DIA_prefs.cpp \
 	DIA_requant.cpp DIA_xvid4.cpp DIA_lavcodec.cpp \
 	DIA_pause.cpp \
 	DIA_DVDff.cpp DIA_lavdecoder.cpp DIA_calculator.cpp DIA_equalizer.cpp \
@@ -41,7 +41,7 @@ DIA_mcdeint.cpp     DIA_resize.cpp \
 DIA_cnr2.cpp          DIA_mjpeg.cpp       \
 DIA_DVDff.cpp        DIA_color.cpp         DIA_eq2.cpp          \
 DIA_coloryuv.cpp      DIA_equalizer.cpp    DIA_mpdelogo.cpp    DIA_rotate.cpp \
-DIA_SVCD.cpp         DIA_contrast.cpp      DIA_exLame.cpp       DIA_mpeg2opt.cpp    DIA_srt.cpp \
+DIA_contrast.cpp      DIA_exLame.cpp       DIA_mpeg2opt.cpp    DIA_srt.cpp \
 DIA_about.cpp        DIA_tdeint.cpp \
 DIA_acodec.cpp       DIA_crop.cpp          DIA_gototime.cpp     DIA_muxer.cpp       DIA_v2v.cpp \
 DIA_animated.cpp     DIA_hue.cpp          DIA_ocr.cpp         DIA_vcodec.cpp \
