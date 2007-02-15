@@ -30,15 +30,18 @@ typedef enum elemEnum
 /*********************************************/
 class diaElem
 {
-
+  protected:
+    void    setSize(int z) {size=z;};
 public:
   void *param;
   void *myWidget;
   const char *paramTitle;
   const char *tip;
   elemEnum mySelf;
+  int       size; // Size of the widget in line
 
-  diaElem(elemEnum num) {param=NULL;mySelf=num;myWidget=NULL;};
+  diaElem(elemEnum num) {param=NULL;mySelf=num;myWidget=NULL;size=1;};
+  int getSize(void) {return size;};
   virtual ~diaElem() {};
   virtual void setMe(void *dialog, void *opaque,uint32_t line)=0;
   virtual void getMe(void)=0;

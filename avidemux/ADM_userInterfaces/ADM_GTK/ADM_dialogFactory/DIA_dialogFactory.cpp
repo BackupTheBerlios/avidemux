@@ -76,16 +76,23 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   gtk_box_set_spacing (GTK_BOX(dialog_vbox1), 12);
   gtk_widget_show (dialog_vbox1);
   
-  table1 = gtk_table_new (nb, 2, FALSE);
+  int vsize=0;
+  for(int i=0;i<nb;i++)
+      vsize+=elems[i]->getSize();
+  
+  
+  table1 = gtk_table_new (vsize, 2, FALSE);
   gtk_table_set_col_spacings (GTK_TABLE (table1), 12);
   gtk_table_set_row_spacings (GTK_TABLE (table1), 6);
   gtk_container_set_border_width (GTK_CONTAINER (table1), 6);
   gtk_widget_show (table1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), table1, TRUE, TRUE, 0);
   
+  int line=0;
   for(int i=0;i<nb;i++)
   {
-    addLine(elems[i],dialog,table1,i);
+    addLine(elems[i],dialog,table1,line);
+    line+=elems[i]->getSize();
     
   }
   // Add a Close button

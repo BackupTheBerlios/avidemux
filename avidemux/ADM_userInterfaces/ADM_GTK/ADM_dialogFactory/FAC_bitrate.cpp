@@ -37,6 +37,7 @@ static void cb_mod(void *w,void *p);
   memcpy(&copy,p,sizeof(copy));
   paramTitle=toggleTitle;
   this->tip=tip;
+  setSize(2);
 }
 
 diaElemBitrate::~diaElemBitrate()
@@ -55,17 +56,14 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
 {
   GtkWidget *widget;
   GtkObject *adj;
-  GtkWidget *vbox1;
-  GtkWidget *vbox2;
   GtkWidget *label1;
   GtkWidget *label2;
   GtkWidget *combo;
   GtkWidget *spin;
   
-  
-  vbox1 = gtk_vbox_new (FALSE, 2);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 6);
-  gtk_widget_show (vbox1);
+#define PUT_ARRAY(x,y,widget)  gtk_table_attach (GTK_TABLE (opaque), widget, x, x+1, line+y, line+y+1, \
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), \
+                    (GtkAttachOptions) (0), 0, 0);
   
   /* Add text -> encoding mode */
   label1 = gtk_label_new_with_mnemonic ("Encoding mode");
@@ -73,19 +71,19 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show(label1);
   
   /* put entry in hbox */
-  gtk_box_pack_start (GTK_BOX (vbox1), label1, TRUE, TRUE, 0); /* expand fill padding */
+ 
+  PUT_ARRAY(0,0,label1);
+  
+  
   /* Add text -> encoding mode */
   label2 = gtk_label_new_with_mnemonic ("Bitrate (kb/s)");
   gtk_misc_set_alignment (GTK_MISC (label2), 0.0, 0.5);
   gtk_widget_show(label2);
   /* put entry in hbox */
-  gtk_box_pack_start (GTK_BOX (vbox1), label2, TRUE, TRUE, 0); /* expand fill padding */
-  
+  PUT_ARRAY(0,1,label2);
  
   /* Add encoding menu combo */
-  vbox2 = gtk_vbox_new (FALSE, 2);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox2), 6);
-  gtk_widget_show (vbox2);
+  
   
   combo = gtk_combo_box_new_text ();
   gtk_widget_show (combo);
@@ -100,32 +98,21 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
   add(Two pass-filesize);
   add(Two pass-Avg bitrate);
   
-  gtk_box_pack_start (GTK_BOX (vbox2), combo, TRUE, TRUE, 0); /* expand fill padding */
+  PUT_ARRAY(1,0,combo);
+  
   
   /* Now add value */
-   spin = gtk_spin_button_new_with_range(0,10000,1);
+  spin = gtk_spin_button_new_with_range(0,1,1);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(spin),TRUE);
   gtk_spin_button_set_digits  (GTK_SPIN_BUTTON(spin),0);
-  //gtk_spin_button_set_value (GTK_SPIN_BUTTON(spin),val);
   
   gtk_widget_show (spin);
   
-  gtk_box_pack_start (GTK_BOX (vbox2), spin, TRUE, TRUE, 0); /* expand fill padding */
-  
-  gtk_label_set_mnemonic_widget (GTK_LABEL(label2), spin);
-  
-  
+    PUT_ARRAY(1,1,spin);
   /*  add button */
    gtk_label_set_mnemonic_widget (GTK_LABEL(label1), combo);
+   gtk_label_set_mnemonic_widget (GTK_LABEL(label2), spin); 
    
-   gtk_table_attach (GTK_TABLE (opaque), vbox1, 0, 1, line, line+1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-    gtk_table_attach (GTK_TABLE (opaque), vbox2, 1, 2, line, line+1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  
-  
   gtk_signal_connect(GTK_OBJECT(combo), "changed",
                       GTK_SIGNAL_FUNC(cb_mod),
                       (void *) this);
