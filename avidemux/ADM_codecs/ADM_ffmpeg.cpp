@@ -237,7 +237,7 @@ ffmpegEncoder::gopMpeg1 (void)
 	  _context->sample_aspect_ratio.den = 3;
 	}
 
-      _context->rc_max_rate_header = _settings.maxBitrate * 8;	//1800*1000;// 2400 max, 700 min
+      _context->rc_max_rate_header = _settings.maxBitrate * 1000;//1800*1000;// 2400 max, 700 min
       _context->rc_buffer_size_header = _settings.bufferSize * 8 * 1024;
       // If we don't have a maxrate, don't set buffer_size
       if (1 && !_settings.override_ratecontrol)	// FIXME

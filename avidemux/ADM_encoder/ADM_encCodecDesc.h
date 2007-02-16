@@ -233,8 +233,8 @@ FFcodecSetting ffmpeg1Extra = {
   1,
   0.5,				//         qcompress;  /* amount of qscale change between easy & hard scenes (0.0-1.0)*/
   0.5,				//         qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
-  (600 * 1000 >> 3),		// min bitrate in kB/S
-  (2200 * 1000) >> 3,		// max bitrate
+  600 ,   		// min bitrate in kB/S
+  2200 ,		// max bitrate
   0,				// user_matrix 0->default, 1 tmpg, 2 anim�, 3 kvcd
   12,				// Safe gop size limit
   NULL,				// inter & intra matrix, will be set depending on user_matrix
@@ -294,7 +294,7 @@ FFcodecSetting ffmpeg2DVDExtra = {
   0.5,				//         qcompress;  /* amount of qscale change between easy & hard scenes (0.0-1.0)*/
   0.5,				//         qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
   0,				// min bitrate in kB/S
-  (8000 * 1000) >> 3,		// max bitrate
+  8000 ,		// max bitrate
   0,				// user_matrix 0->default, 1 tmpg, 2 anim�, 3 kvcd
   12,				// Safe gop size limit
   NULL,				// inter & intra matrix, will be set depending on user_matrix
@@ -310,7 +310,7 @@ FFcodecSetting ffmpeg2DVDExtra = {
   0.5,				// spatial masking
   0,				// NAQ
   1,				// Use xvid ratecontrol
-  240,				// buffersize 240 KB for Mpeg2 /
+  224,				// buffersize 240 KB for Mpeg2 /
   0				// DUMMY        
 };
 
@@ -354,7 +354,7 @@ FFcodecSetting ffmpeg2SVCDExtra = {
   0.5,				//         qcompress;  /* amount of qscale change between easy & hard scenes (0.0-1.0)*/
   0.5,				//         qblur;      /* amount of qscale smoothing over time (0.0-1.0) */
   0,				// min bitrate in kB/S
-  (2400 * 1000) >> 3,		// max bitrate
+  2400          ,		// max bitrate
   0,				// user_matrix 0->default, 1 tmpg, 2 anim�, 3 kvcd
   12,				// Safe gop size limit
   NULL,				// inter & intra matrix, will be set depending on user_matrix

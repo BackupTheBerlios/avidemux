@@ -32,7 +32,7 @@ ADM_newXvidRcVBV::ADM_newXvidRcVBV(uint32_t fps1000, char *logname) : ADM_rateco
 	rc=new ADM_newXvidRc(fps1000,logname);
 	_state=RS_IDLE; 
 	_minbr=0;
-	_maxbr=2*9*1000*1000/8; // ~ 9MB*2
+	_maxbr=2*9*1000*1000; // ~ 9MB*2
 	_vbvsize=5*224*1024;	// 1MB vbv buffer size
 	_stat=NULL;
 	_lastSize=NULL;
@@ -53,12 +53,12 @@ ADM_newXvidRcVBV::~ADM_newXvidRcVBV()
 }
 uint8_t ADM_newXvidRcVBV::setVBVInfo(uint32_t maxbr,uint32_t minbr, uint32_t vbvsize)
 {
-	_maxbr=maxbr;
-	_minbr=minbr;
+	_maxbr=maxbr*1000; // in b/s
+	_minbr=minbr*1000;
 	_vbvsize=vbvsize*1024;
 	printf("RC: Initializing vbv buffer \n");
-	printf("RC: with min br= %lu kbps\n",(minbr*8)/1000);
-	printf("RC:      max br= %lu kbps\n",(maxbr*8)/1000);
+	printf("RC: with min br= %lu kbps\n",(minbr)/1000);
+	printf("RC:      max br= %lu kbps\n",(maxbr)/1000);
 	printf("Rc:      VBV   = %lu kB\n",_vbvsize/1024);
 
 	return 1;
@@ -88,7 +88,7 @@ uint8_t ADM_newXvidRcVBV::startPass2( uint32_t size,uint32_t nbFrame )
 	_roundup=(uint32_t )floor((_fps1000+500)/1000);
 	// Do so check
 	_vbv_fullness=(_vbvsize*8)/10; // Buffer starts 80% full
-	_byte_per_image=_maxbr/_roundup;
+	_byte_per_image=(_maxbr>>3)/_roundup;
 	_lastSize=new uint32_t[_roundup];
 	memset(_lastSize,0,_roundup*sizeof(uint32_t));
 	_frame=0;

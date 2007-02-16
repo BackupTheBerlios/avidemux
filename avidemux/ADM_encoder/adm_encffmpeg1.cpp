@@ -392,7 +392,7 @@ EncoderFFMPEGMpeg1::startPass2 (void)
     printf("[FFmpeg Mpeg1/2] 2pass avg bitrate %u kb/s\n",br/1000);
   }else ADM_assert(0);
  
-  printf("[FFmpeg Mpeg1/2] Max bitrate :%u\n", (_settings.maxBitrate*8)/1000);
+  printf("[FFmpeg Mpeg1/2] Max bitrate :%u\n", (_settings.maxBitrate));
   avg_bitrate = br;
   if(_param.mode==COMPRESS_2PASS)
       printf ("\n ** Total size     : %lu MBytes \n", _param.finalsize);
@@ -417,8 +417,8 @@ EncoderFFMPEGMpeg1::startPass2 (void)
       _codec->setLogFile (_logname);
       //_codec->setLogFile("/tmp/dummylog.txt");
       if (_settings.maxBitrate)
-	if (avg_bitrate > _settings.maxBitrate)
-	  avg_bitrate = _settings.maxBitrate;
+	if (avg_bitrate > _settings.maxBitrate*1000)
+	  avg_bitrate = _settings.maxBitrate*1000;
       _codec->init (avg_bitrate, _fps);
       printf ("\n FF:ready to encode in 2pass (%s)\n", _logname);
       _frametogo = 0;
@@ -432,7 +432,7 @@ EncoderFFMPEGMpeg1::startPass2 (void)
    
      f=_param.finalsize;
   // Checking against max bitrate
-    uint32_t maxb=_settings.maxBitrate*8;
+    uint32_t maxb=_settings.maxBitrate*1000;
 
     printf("[FFmpeg1/2] : %u kbps average, %u max\n",br/1000,maxb/1000);
     if(br>maxb)

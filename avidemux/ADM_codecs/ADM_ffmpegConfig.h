@@ -44,15 +44,15 @@ typedef struct FFcodecSetting
   int is_dark_masking;		// -1--1
   float qcompress;		// 0.0--1.0
   float qblur;			// 0.0--1.0
-  int minBitrate;
-  int maxBitrate;
-  int user_matrix;		// 0 normal / 1 tmpgenc / 2 anime / 3 kvcd / 4 hr-tmpgenc
-  int gop_size;			// For mpeg1/2 , 12 is good
+  uint32_t minBitrate;          // In kBits/s
+  uint32_t maxBitrate;          // In kBits/s
+  uint32_t user_matrix;		// 0 normal / 1 tmpgenc / 2 anime / 3 kvcd / 4 hr-tmpgenc
+  uint32_t gop_size;			// For mpeg1/2 , 12 is good
   uint16_t *intra_matrix;
   uint16_t *inter_matrix;
-  uint8_t interlaced;
-  uint8_t bff;			// WLA: bottom field first flag
-  uint8_t widescreen;
+  uint32_t interlaced;
+  uint32_t bff;			// WLA: bottom field first flag
+  uint32_t widescreen;          //0 4/3  1 16/9
 
   // new stuff from jakub ui
   int mb_eval;			// Replace hq 0..2
@@ -66,10 +66,10 @@ typedef struct FFcodecSetting
   int _NORMALIZE_AQP;		// normalize adap quantiz
 
   //
-  int use_xvid_ratecontrol;
-  int bufferSize;		// in KBYTES !!!!
-  int override_ratecontrol;
-  int dummy;
+  uint32_t use_xvid_ratecontrol;
+  uint32_t bufferSize;		// in KBYTES !!!!
+  uint32_t override_ratecontrol;
+  uint32_t dummy;
 
 } FFcodecSetting;
 

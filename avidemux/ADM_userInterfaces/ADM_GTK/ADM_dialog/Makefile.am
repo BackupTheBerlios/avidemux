@@ -16,7 +16,7 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 	DIA_xvid.cpp DIA_crop.cpp DIA_color.cpp DIA_encoding.cpp  DIA_prefs.cpp \
 	DIA_requant.cpp DIA_xvid4.cpp DIA_lavcodec.cpp \
 	DIA_pause.cpp \
-	DIA_DVDff.cpp DIA_lavdecoder.cpp DIA_calculator.cpp DIA_equalizer.cpp \
+	DIA_lavdecoder.cpp DIA_calculator.cpp DIA_equalizer.cpp \
 	DIA_vobsub.cpp DIA_x264.cpp DIA_ocr.cpp  DIA_hue.cpp DIA_eq2.cpp \
 	DIA_asharp.cpp  DIA_idx_pg.cpp DIA_gototime.cpp \
 	DIA_audioTrack.cpp DIA_cnr2.cpp DIA_jobs.cpp DIA_jobs_save.cpp  \
@@ -39,7 +39,7 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 EXTRA_DIST =  \
 DIA_mcdeint.cpp     DIA_resize.cpp \
 DIA_cnr2.cpp          DIA_mjpeg.cpp       \
-DIA_DVDff.cpp        DIA_color.cpp         DIA_eq2.cpp          \
+DIA_color.cpp         DIA_eq2.cpp          \
 DIA_coloryuv.cpp      DIA_equalizer.cpp    DIA_mpdelogo.cpp    DIA_rotate.cpp \
 DIA_contrast.cpp      DIA_exLame.cpp       DIA_mpeg2opt.cpp    DIA_srt.cpp \
 DIA_about.cpp        DIA_tdeint.cpp \
