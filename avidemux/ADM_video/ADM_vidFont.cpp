@@ -140,8 +140,10 @@ int kern;
 	//printf("FONT: rendering %d %c\n",c,c);
 	*ww=0;	
 /* Ugly patch t avoid some display problem */	
+#if 0
         if(c=='\'') c='"';
         if(prevchar=='\'') prevchar='"';
+#endif
 /* Ugly patch t avoid some display problem */
 	glyph_index = FT_Get_Char_Index( _face, c );
 	if(prevchar)
