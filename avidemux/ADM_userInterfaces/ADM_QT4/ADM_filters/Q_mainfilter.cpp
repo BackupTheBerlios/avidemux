@@ -6,7 +6,7 @@
     * I.e.
     0--1000 : QT4 internal
     2000-3000: Filters
-    3000-4000  External Filter
+    3000-4000  filterFamilyClick Filter
     8000-9000  Active Filter
     
     
@@ -34,6 +34,7 @@
 #include "ui_mainfilter.h"
 #undef Ui_Dialog
 #include "QStringListModel" 
+#include "QColor" 
 #include "default.h"
 #include "ADM_toolkit/filesel.h"
 
@@ -50,9 +51,9 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
 /*******************************************************/
-#define NB_TREE 7
-static int startFilter[NB_TREE];
-static int filterSize[NB_TREE];
+#define NB_TREE 8
+#define myFg 0xFF
+#define myBg 0xF0
 static int max=0;
 /******************************************************/
 #define ALL_FILTER_BASE       1000
@@ -74,13 +75,12 @@ class filtermainWindow : public QDialog
  public:
      filtermainWindow();
  //    virtual ~filtermainWindow();
-     void             buildAvailableFilterList(void);
      void             buildActiveFilterList(void);
      Ui_mainFilterDialog ui;
      
-     QListWidget      *allList[NB_TREE];
      
      
+     QListWidget      *availableList;
      QListWidget      *activeList;
      
      
@@ -94,9 +94,15 @@ class filtermainWindow : public QDialog
         void partial(bool b);
         void activeDoubleClick( QListWidgetItem  *item);
         void allDoubleClick( QListWidgetItem  *item);
+	void filterFamilyClick(QListWidgetItem *item);
+	void filterFamilyClick(int  item);
  private slots:
  private:
+        int startFilter[NB_TREE];
+        int filterSize[NB_TREE];
         void setSelected(int sel);
+        void displayFamily(uint32_t family);
+        void setupFilters(void);
 };
 /**
         \fn     void setSelected(int sel)
@@ -114,12 +120,8 @@ void filtermainWindow::setSelected( int sel)
 */
 void filtermainWindow::add( bool b)
 {
-  
-  /* Get selection if any */
-  int tab=ui.tabWidgetSubtitles->currentIndex();
-  ADM_assert(tab>=0 && tab < NB_TREE);
   /* Now that we have the tab, get the selection */
-   QListWidgetItem *item=allList[tab]->currentItem();
+   QListWidgetItem *item=availableList->currentItem();
    VF_FILTERS tag;
    if(item)
    {
@@ -150,6 +152,7 @@ void filtermainWindow::add( bool b)
         setSelected(nb_active_filter);
         buildActiveFilterList();
    }
+
 }
 /**
         \fn     remove( bool b)
@@ -297,6 +300,54 @@ void filtermainWindow::down( bool b)
             setSelected(itag+1);
         }
 }
+/**
+        \fn     filtermainWindow::filterFamilyClick( QListWidgetItem  *item)
+        \brief  Select family among color etc... 
+*/
+
+void filtermainWindow::filterFamilyClick(QListWidgetItem *item)
+{
+    int family= ui.listFilterCategory->currentRow();
+    if(family>=0)
+        displayFamily(family);
+}
+void filtermainWindow::filterFamilyClick(int  m)
+{
+        if(m>=0)
+                displayFamily(m);
+}
+void filtermainWindow::displayFamily(uint32_t family)
+{
+  printf("Family :%u\n",family);
+  
+  availableList->clear();
+  QColor colorgrey;
+  colorgrey.setRgb(myBg,myBg,myBg);
+  QBrush brush(colorgrey);
+  QSize sz;
+  
+  for (uint32_t i = 0; i < filterSize[family]; i++)
+    {
+      int r=startFilter[family]+i;
+
+      if (allfilters[r].viewable==1)
+        {
+          QString str; //="<b>";
+          str+=allfilters[r].name;
+         
+          QListWidgetItem *item;
+          if(family==NB_TREE-1)
+                item=new QListWidgetItem(str,availableList,EXTERNAL_FILTER_BASE+i);
+          else
+                item=new QListWidgetItem(str,availableList,ALL_FILTER_BASE+r);
+          item->setToolTip(allfilters[r].description);
+          if(i&1) item->setBackground(brush);
+          availableList->addItem(item);
+          
+        }
+     }
+   
+}
 
 /**
         \fn     filtermainWindow::activeDoubleClick( QListWidgetItem  *item)
@@ -362,34 +413,21 @@ void filtermainWindow::partial( bool b)
         }
         else delete replace;
 }
-#define myBg 0xF0
 /**
-        \fn     buildAvailableFilterList(void)
-        \brief  build the internal datas needed to handle the list. Need to be called only once.
+        \fn setup
+        \brief Prepare 
 */
-void filtermainWindow::buildAvailableFilterList(void)
+void filtermainWindow::setupFilters(void)
 {
   int current_tree=-1;
   int current_raw=0;;
   
   max=0;
-  QColor colorGrey;
-  colorGrey.setRgb(myBg,myBg,myBg);
-  QBrush brush(colorGrey);
-  QSize sz;
   
   for (uint32_t i = 0; i < nb_video_filter; i++)
     {
       if (allfilters[i].viewable==1)
         {
-          QString str; //="<b>";
-          str+=allfilters[i].name;
-          max++;
-          
-          QListWidgetItem *item=new QListWidgetItem(str,allList[current_tree],ALL_FILTER_BASE+i);
-          item->setToolTip(allfilters[i].description);
-          if(i&1) item->setBackground(brush);
-          allList[current_tree]->addItem(item);
           current_raw++;
           
         }else 
@@ -397,28 +435,35 @@ void filtermainWindow::buildAvailableFilterList(void)
                 current_tree++;
                 if(current_tree) filterSize[current_tree-1]=current_raw;
                 if(current_tree>=NB_TREE) break;
-                allList[current_tree]->clear();
                 startFilter[current_tree]=i+1;
                 current_raw=0;
                 
         }
     }
-   
-    
-    ADM_assert(NB_TREE==7);
-  
+    ADM_assert(NB_TREE==8);
+    startFilter[NB_TREE-1]=2000;
+    filterSize[NB_TREE-1]=0;
+    for(int i=0;i<NB_TREE;i++)
+    {
+             printf("%d Start at %d size :%d\n",i,startFilter[i],filterSize[i]);
+    }
 }
-  /**
+
+/**
         \fn     buildActiveFilterList(void)
         \brief  Build and display all active filters (may be empty)
 */
 void filtermainWindow::buildActiveFilterList(void)
 {
   VF_FILTERS fil;
+  
+  
   activeList->clear();
-  QColor colorGrey;
+  QColor colorGrey,colorWhite;
   colorGrey.setRgb(myBg,myBg,myBg);
+  colorWhite.setRgb(myFg,myFg,myFg);
   QBrush brush(colorGrey);
+  QBrush brushW(colorWhite);
 
   for (uint32_t i = 1; i < nb_active_filter; i++)
     {
@@ -429,6 +474,7 @@ void filtermainWindow::buildActiveFilterList(void)
                  str+= videofilters[i].filter->printConf ();
                  QListWidgetItem *item=new QListWidgetItem(str,activeList,ACTIVE_FILTER_BASE+i);
                  if(i&1) item->setBackground(brush);
+                        else item->setBackground(brushW);
                  activeList->addItem(item);
     }
     
@@ -438,40 +484,31 @@ void filtermainWindow::buildActiveFilterList(void)
   */
 filtermainWindow::filtermainWindow()     : QDialog()
  {
-      ui.setupUi(this);
+        memset( startFilter,0,sizeof(int)*NB_TREE);
+        memset( filterSize,0,sizeof(int)*NB_TREE);
+ 
+    ui.setupUi(this);
+    setupFilters();  
       
-#define ASSOCIATE(x,y)   allList[x]=ui.listWidget##y;
-      ASSOCIATE(0,Transform);
-      ASSOCIATE(1,Interlacing);
-      ASSOCIATE(2,Colors);
-      ASSOCIATE(3,Noise);
-      ASSOCIATE(4,Sharpness);
-      ASSOCIATE(5,Subtitles);
-      ASSOCIATE(6,Misc);
-      
-      activeList=ui.listWidgetActive;
-      
-      buildAvailableFilterList();
-      buildActiveFilterList();
-      
-      
-      
-    connect(activeList,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(activeDoubleClick(QListWidgetItem *)));
-    for(int i=0;i<NB_TREE;i++)
-    {
-      connect(allList[i],SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(allDoubleClick(QListWidgetItem *)));
-    }
+    availableList=ui.listWidgetAvailable;
+    activeList=ui.listWidgetActive;
+    connect(ui.listFilterCategory,SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+                this,SLOT(filterFamilyClick(QListWidgetItem *)));
+    connect(ui.listFilterCategory,SIGNAL(itemClicked(QListWidgetItem *)),
+                this,SLOT(filterFamilyClick(QListWidgetItem *)));
 
+    connect(activeList,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(activeDoubleClick(QListWidgetItem *)));
+    connect(availableList,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(allDoubleClick(QListWidgetItem *)));
+    
     connect((ui.toolButtonConfigure),SIGNAL(clicked(bool)),this,SLOT(configure(bool)));
     connect((ui.toolButtonAdd),SIGNAL(clicked(bool)),this,SLOT(add(bool)));
     connect((ui.pushButtonRemove),SIGNAL(clicked(bool)),this,SLOT(remove(bool)));
     connect((ui.toolButtonUp),SIGNAL(clicked(bool)),this,SLOT(up(bool)));
     connect((ui.toolButtonDown),SIGNAL(clicked(bool)),this,SLOT(down(bool)));
     connect(ui.buttonClose, SIGNAL(clicked(bool)), this, SLOT(accept()));
-    connect(ui.toolButtonPartial, SIGNAL(clicked(bool)), this, SLOT(partial(bool)));
-    
-    ui.tabWidgetSubtitles->setCurrentIndex(0);
-    
+   
+    displayFamily(0);
+    buildActiveFilterList(); 
  }
 /*******************************************************/
 
