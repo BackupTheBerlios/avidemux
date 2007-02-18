@@ -35,7 +35,7 @@
 #include <../ADM_assert.h>
 #define WIN32_CLASH
 #include "default.h"
-#include "ADM_osSupport/ADM_misc.h"
+#include "../ADM_osSupport/ADM_misc.h"
 
 #include "ADM_commonUI/GUI_render.h"
 

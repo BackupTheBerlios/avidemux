@@ -156,7 +156,8 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 	-IADM_inputs -IADM_outputs \
 	-IADM_lavutil  -IADM_libraries -IADM_libraries/ADM_utilities -IADM_libraries/ADM_lavutil \
 	-IADM_userInterfaces/ADM_commonUI \
-	-IADM_userInterfaces/ADM_GTK $(GLIB_CFLAGS)
+	-IADM_userInterfaces/ADM_GTK $(GLIB_CFLAGS) \
+	@ADM_QTINCLUDES@
 
 # the library search path.
 if ADM_UI_GTK
