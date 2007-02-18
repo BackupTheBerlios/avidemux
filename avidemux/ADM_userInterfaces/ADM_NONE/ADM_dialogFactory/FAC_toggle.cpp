@@ -101,6 +101,25 @@ void diaElemFloat::getMe(void)
 {
  
 }
+//******************************************************
+
+diaElemBar::diaElemBar(uint32_t percent,const char *toggleTitle)
+  : diaElem(ELEM_BAR)
+{
+}
+
+diaElemBar::~diaElemBar()
+{
+  
+}
+void diaElemBar::setMe(void *dialog, void *opaque,uint32_t line)
+{
+  
+}
+void diaElemBar::getMe(void)
+{
+ 
+}
 
 //******************************************************
 

@@ -25,6 +25,7 @@ typedef enum elemEnum
   ELEM_MENU,
   ELEM_FILE_READ,
   ELEM_BITRATE,
+  ELEM_BAR,
   ELEM_MAX=ELEM_TOGGLE
 };
 /*********************************************/
@@ -75,6 +76,18 @@ public:
   uint32_t min,max;
   diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip=NULL);
   virtual ~diaElemUInteger() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+};
+/*************************************************/
+class diaElemBar : public diaElem
+{
+  protected :
+        uint32_t per;
+public:
+  
+  diaElemBar(uint32_t percent,const char *toggleTitle);
+  virtual ~diaElemBar() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
 };
@@ -145,5 +158,5 @@ public:
 };
 /*********************************************/
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems);
-
+/*********************************************/
 #endif

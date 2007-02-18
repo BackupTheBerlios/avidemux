@@ -153,7 +153,7 @@ void diaElemBitrate::getMe(void)
 #undef S
 #define P(x) 
 #define M(x,y)
-#define S(x)   x=gtk_spin_button_get_value  (GTK_SPIN_BUTTON(spin))
+#define S(x)   x=(uint32_t)gtk_spin_button_get_value  (GTK_SPIN_BUTTON(spin))
   switch(rank)
   {
     case 0: //CBR
@@ -197,6 +197,9 @@ void diaElemBitrate::updateMe(void)
   GtkSpinButton *spin=(GtkSpinButton*)w[3];
   GtkLabel *label=(GtkLabel*)w[1];
   int rank=gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
+#undef P
+#undef M
+#undef S
 #define P(x) gtk_label_set_text(GTK_LABEL(label),_(#x));
 #define M(x,y) gtk_spin_button_set_range  (GTK_SPIN_BUTTON(spin),x,y)
 #define S(x)   gtk_spin_button_set_value  (GTK_SPIN_BUTTON(spin),x)
