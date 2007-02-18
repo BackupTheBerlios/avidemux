@@ -38,7 +38,7 @@ PROCESS(actionEncoder_2,ACT_SelectEncoder) \
 PROCESS(actionFilters_2,ACT_DUMMY) \
 PROCESS(actionCalculator,ACT_DUMMY) \
 PROCESS(actionRebuild_I_B_Frames,ACT_RebuildKF) \
-PROCESS(actionBitrate_histogram,ACT_DUMMY) \
+PROCESS(actionBitrate_histogram,ACT_BitRate) \
 PROCESS(actionScan_for_black_frames,ACT_AllBlackFrames) \
 PROCESS(actionVob_to_vobsub,ACT_DUMMY) \
 PROCESS(actionOCR,ACT_Ocr) \
