@@ -232,7 +232,7 @@ host=`uname -a` # AC_CANONICAL_HOST is broken at the time of this writing.
 case $host in
   MINGW32*)
     AC_MSG_NOTICE(MinGW detected.)
-    QTLIBS="-L$QTEXTRALIB -lopengl32 -lglu32 -lgdi32 -luser32 -lmingw32 -lqtmain -lQtOpenGL4 -lQtGui4 -lQtCore4 -mthreads -Wl,-enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc -Wl,-s -Wl,-s -Wl,-subsystem,windows"
+    QTLIBS="-L$QTEXTRALIB -lopengl32 -lglu32 -lgdi32 -luser32 -lmingw32 -lqtmain -lQtOpenGL4 -lQtGui4 -lQtCore4 -mthreads -Wl,-enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc -Wl,-subsystem,windows"
     QTINC="-I$QTDIR/include -I$QTDIR/include/QtCore -I$QTDIR/include/QtGui -I$QTDIR/include/QtOpenGL -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_THREAD_SUPPORT -DQT_NEEDS_QMAIN -frtti -fexceptions -I$QTEXTRAINC"
     QTBIN="$QTDIR/bin"
 	QTPOSTFIX=""
@@ -428,7 +428,7 @@ AC_CHECK_FUNCS(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY,1,"[Use native gettimeo
 
 dnl _____________ needed for multithreaded x264 and for mplex_________
 if test "x$use_cygwin" = "xyes"; then
-        LIBS="$LIBS -lpthreadGC1"
+        LIBS="$LIBS -lpthreadGC1 -Wl,-s"
 else
         LDFLAGS="$LDFLAGS -lpthread -lX11 -lXext -L/usr/X11R6/lib"
 fi
