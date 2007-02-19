@@ -33,7 +33,7 @@
 #include "ADM_assert.h"
 
 extern const char *shortkey(const char *);
-
+void GUI_FileSelRead(const char *label, char * * name);
 
 class  ADM_Qfilesel : public QWidget
 {
@@ -43,7 +43,17 @@ class  ADM_Qfilesel : public QWidget
         
         
    public slots:
-        
+        void buttonPressed(QAbstractButton *s)
+        { 
+          char *n;
+          GUI_FileSelRead("Select file", &n);
+          if(n)
+          {
+            edit->setText(n);
+            ADM_dealloc(n); 
+          }
+          
+        }
   public:
         QLineEdit *edit;
         QDialogButtonBox *button;
@@ -68,6 +78,7 @@ class  ADM_Qfilesel : public QWidget
           layout->addWidget(edit,line,1);
           layout->addWidget(button,line,2);
           //QObject::connect(&button, SIGNAL(accepted()), NULL, SLOT(accept())); 
+          connect( button,SIGNAL(clicked(QAbstractButton  *)),this,SLOT(buttonPressed(QAbstractButton  *)));
         }
         ~ADM_Qfilesel() 
             {
