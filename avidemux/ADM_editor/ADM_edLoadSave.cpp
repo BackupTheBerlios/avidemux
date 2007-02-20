@@ -210,7 +210,11 @@ char *pth;
         if(!audioName) audioName="";
 
         if(source!=AudioAvi)
+        {
+                char *nm=cleanupPath(audioName);
                 qfprintf(fd,"app.audio.load(\"%s\",\"%s\");\n", audioSourceFromEnum(source),audioName); 
+                ADM_dealloc(nm);
+        }
         else 
         { // Maybe not the 1st track
           int source;
