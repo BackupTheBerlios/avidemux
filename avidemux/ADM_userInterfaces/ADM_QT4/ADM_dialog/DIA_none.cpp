@@ -82,7 +82,6 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 uint8_t DIA_animated(ANIMATED_PARAM *param){return 0;}
 uint8_t DIA_rotate(AVDMGenericVideoStream *astream,ROTATE_PARAM *param){return 0;}
 uint8_t DIA_cnr2(CNR2Param *param){return 0;}
-uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming){return 0;}
 uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getEQ2Param(Eq2_Param *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getEqualizer(EqualizerParam *param, ADMImage *image){return 0;}
@@ -95,7 +94,6 @@ uint8_t DIA_mjpegCodecSetting(COMPRES_PARAMS *param){return 0;}
 uint8_t DIA_pipe(char **cmd,char **param){return 0;}
 uint8_t DIA_requant(COMPRES_PARAMS *incoming){return 0;}
 uint8_t  DIA_setUserMuxParam( int *mode, int *param, int *muxsize){return 0;}
-uint8_t DIA_SVCDParam(COMPRES_PARAMS *incoming){return 0;}
 uint8_t  DIA_tdeint(TDEINT_PARAM *param){return 0;}
 uint8_t DIA_vobsub(vobSubParam *param){return 0;}
 uint8_t DIA_x264(COMPRES_PARAMS *config){return 0;}

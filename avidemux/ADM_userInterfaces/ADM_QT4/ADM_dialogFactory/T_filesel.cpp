@@ -82,9 +82,11 @@ class  ADM_Qfilesel : public QWidget
         }
         ~ADM_Qfilesel() 
             {
+#if 1 //Memleak or autoclean ?
                 if(edit) delete edit;
                 if(button) delete button;
                 if(text) delete text;
+#endif
             };
 };
 

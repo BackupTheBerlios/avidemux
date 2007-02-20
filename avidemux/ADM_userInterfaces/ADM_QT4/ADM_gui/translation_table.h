@@ -68,7 +68,7 @@ PROCESS(actionRecent3,ACT_RECENT3)
 #define LIST_OF_BUTTONS     \
 PROCESS(setMarkerA , ACT_GotoMarkA  ) \
 PROCESS(setMarkerB ,ACT_GotoMarkB )  \
-PROCESS(pushButtonVideoConf ,ACT_VideoConfigure )  \
+PROCESS(pushButtonVideoConf ,ACT_VideoCodec)  \
 PROCESS(pushButtonVideoFilter , ACT_VideoParameter  ) \
 PROCESS(pushButtonAudioConf ,ACT_AudioCodec ) \
 PROCESS(pushButtonAudioFilter ,ACT_AudioFilters ) 

@@ -68,10 +68,20 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   
   QGridLayout layout(&dialog);
   
+  /* First compute the size of our window */
+  int vsize=0;
   for(int i=0;i<nb;i++)
   {
     ADM_assert(elems[i]);
-     elems[i]->setMe( (void *)&dialog,&layout,i); 
+     vsize+=elems[i]->getSize(); 
+  }
+
+ int  v=0;
+  for(int i=0;i<nb;i++)
+  {
+    ADM_assert(elems[i]);
+     elems[i]->setMe( (void *)&dialog,&layout,v); 
+     v+=elems[i]->getSize();
     
   }
   // Add buttons
@@ -80,7 +90,7 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
                             | QDialogButtonBox::Cancel);
      QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
      QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
-     layout.addWidget(&buttonBox,nb,0);
+     layout.addWidget(&buttonBox,vsize,0);
   // run
   dialog.setLayout(&layout);
   if(dialog.exec()==QDialog::Accepted)
