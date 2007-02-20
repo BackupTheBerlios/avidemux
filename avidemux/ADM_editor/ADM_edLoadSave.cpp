@@ -212,7 +212,7 @@ char *pth;
         if(source!=AudioAvi)
         {
                 char *nm=cleanupPath(audioName);
-                qfprintf(fd,"app.audio.load(\"%s\",\"%s\");\n", audioSourceFromEnum(source),audioName); 
+                qfprintf(fd,"app.audio.load(\"%s\",\"%s\");\n", audioSourceFromEnum(source),nm); 
                 ADM_dealloc(nm);
         }
         else 
