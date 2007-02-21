@@ -67,7 +67,7 @@ class  ADM_Qbitrate : public QWidget
            
            text1=new QLabel( "Encoding mode",z);
           text1->setBuddy(combo);
-          
+          text1->show();
           
            box=new QSpinBox(z);
            box->show();
@@ -134,6 +134,17 @@ void ADM_Qbitrate::comboChanged(int i)
     default:ADM_assert(0);
   }
 }
+ADM_Qbitrate::~ADM_Qbitrate()
+{
+#define DEL(x) if(x) {delete x;x=NULL;}
+#if 0 // Automatically deleted
+                 DEL(text1)
+                 DEL(text2)
+                 DEL(box) 
+                 DEL(combo) 
+#endif
+};
+
 //**********************************
 diaElemBitrate::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_BITRATE)
@@ -149,16 +160,18 @@ diaElemBitrate::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const c
 diaElemBitrate::~diaElemBitrate()
 {
   ADM_assert(myWidget);
-
+#if 0 // Automatically deleted as it is a child of main dialog
   ADM_Qbitrate *z=(ADM_Qbitrate *)myWidget;
   
   if(z) delete z;
 
   myWidget=NULL;
+#endif
 }
 void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
 {
   QGridLayout *layout=(QGridLayout*) opaque;
+  
   ADM_Qbitrate *b=new ADM_Qbitrate( (QWidget *)dialog,(COMPRES_PARAMS *)&copy,layout,line);
   myWidget=(void *)b;
   
@@ -167,14 +180,6 @@ void diaElemBitrate::getMe(void)
 {
   //memcpy(param,&copy,sizeof(copy));
 }
-ADM_Qbitrate::~ADM_Qbitrate()
-{
-#define DEL(x) if(x) {delete x;x=NULL;}
-//                 DEL(text1)
-//                 DEL(text2)
-//                 DEL(box) 
-//                 DEL(combo) 
-};
 
 //EOF
 

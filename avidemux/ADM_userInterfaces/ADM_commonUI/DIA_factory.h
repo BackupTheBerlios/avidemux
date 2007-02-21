@@ -41,7 +41,7 @@ public:
   elemEnum mySelf;
   int       size; // Size of the widget in line
 
-  diaElem(elemEnum num) {param=NULL;mySelf=num;myWidget=NULL;size=1;};
+  diaElem(elemEnum num) {paramTitle=NULL;param=NULL;mySelf=num;myWidget=NULL;size=1;};
   int getSize(void) {return size;};
   virtual ~diaElem() {};
   virtual void setMe(void *dialog, void *opaque,uint32_t line)=0;
