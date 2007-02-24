@@ -15,6 +15,7 @@ typedef enum
 {
 	ADM_AVI=0,
         ADM_AVI_UNP,
+        ADM_AVI_PAK,
         ADM_AVI_DUAL,
 	ADM_OGM,
 	ADM_ES,

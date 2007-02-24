@@ -1,14 +1,10 @@
 /***************************************************************************
-                          op_avisavecopy.cpp  -  description
-                             -------------------
-
-	We bypass the use of _incoming to have easy access to furure
-	frame.
-	In fact only the getflags is necessary, other stuff will be done throught
-	incoming.
-
-    begin                : Fri May 3 2002
-    copyright            : (C) 2002 by mean
+        
+    Pack a mpeg4 the divx way
+    Sometimes needed for some DVD/multimedia stuff
+	
+    
+    copyright            : (C) 2007 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -51,10 +47,10 @@
 #define MODULE_NAME MODULE_SAVE_AVI
 #include "ADM_osSupport/ADM_debug.h"
 
-
-static void updateUserData(uint8_t *start, uint32_t len);
+uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h,uint32_t *time_inc);
+static  void updateUserData(uint8_t *start, uint32_t len);
 uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);
-
+static  void putNvop(ADMBitstream *data,uint32_t time_inc);
 
 /**
       \fn  ~GenericAviSaveCopyUnpack
@@ -62,12 +58,15 @@ uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode
 */
 GenericAviSaveCopyPack::~GenericAviSaveCopyPack ()
 {
-      if(lookAhead) 
+      if(lookAhead[0]) 
       {
-          delete [] lookAhead->data;
-          delete lookAhead;
+          delete [] lookAhead[0]->data;
+          delete [] lookAhead[1]->data;
+          delete lookAhead[0];
+          delete lookAhead[1];
       }
-      lookAhead=NULL;
+      lookAhead[0]=NULL;
+      lookAhead[1]=NULL;
 }
 /**
       \fn GenericAviSaveCopyUnpack::setupVideo
@@ -76,6 +75,7 @@ GenericAviSaveCopyPack::~GenericAviSaveCopyPack ()
 */
 uint8_t GenericAviSaveCopyPack::setupVideo (char *name)
 {
+  printf("Setting up bitstream packer\n");
   //  Setup avi file output, all is coming from original avi
   // since we are inc copy mode
   memcpy(&_bih,video_body->getBIH (),sizeof(_bih));
@@ -96,7 +96,16 @@ uint8_t GenericAviSaveCopyPack::setupVideo (char *name)
    uint32_t extraLen;
   _lastIPFrameSent=0xfffffff;
    video_body->getExtraHeaderData(&extraLen,&extraData);
-
+    if(extraLen>3)
+    {
+      uint32_t w,h,ti;
+      if(extractMpeg4Info(extraData,extraLen,&w,&h,&ti) )
+      {
+        time_inc=ti;
+        printf("Found info : %u  x %u, timeinc %u\n",w,h,ti); 
+      }
+    }
+      
   	if (!writter->saveBegin (name,
 			   &_mainaviheader,
 			   frameEnd - frameStart + 1,
@@ -132,12 +141,46 @@ uint8_t GenericAviSaveCopyPack::setupVideo (char *name)
   // Our buffer
 #define LOOK_SIZE 2*3*_incoming->getInfo ()->width *   _incoming->getInfo ()->height * 3
   uint8_t *buf=new uint8_t[LOOK_SIZE];
-           lookAhead=new ADMBitstream(LOOK_SIZE);
-           lookAhead->data=buf;
+           lookAhead[0]=new ADMBitstream(LOOK_SIZE);
+           lookAhead[0]->data=buf;
+            buf=new uint8_t[LOOK_SIZE];
+           lookAhead[1]=new ADMBitstream(LOOK_SIZE);
+           lookAhead[1]->data=buf;
+
   return 1;
 }
+/**
+        \fn prefetch 
+        \brief Read frame FRAME in buffer BUFFER
+*/
 
-
+uint8_t GenericAviSaveCopyPack::prefetch(uint32_t buffer,uint32_t frame)
+{
+  uint8_t r=0;
+  ADM_assert(copy); 
+  ADM_assert(buffer==0 || buffer==1);
+  
+  aprintf("Fetching frame %u buffer%u\n",frame,buffer);
+        r=copy->encode(frame,lookAhead[buffer]);
+        if(!r)
+        {
+            aprintf("Prefetching  frame %u in buffer %u failed\n",frame, buffer);
+        }
+        else
+        {
+          if((lookAhead[buffer]->flags & AVI_KEY_FRAME ) && !time_inc)
+          {
+                uint32_t w,h,ti;
+                if(extractMpeg4Info(lookAhead[buffer]->data,lookAhead[buffer]->len,&w,&h,&ti) )
+                {
+                  time_inc=ti;
+                  printf("Found info : %u  x %u, timeinc %u\n",w,h,ti); 
+                }
+          }
+        }
+      return r;
+  
+}
 // copy mode
 // Basically ask a video frame and send it to writter
 // If it contains b frame and frames have been re-ordered
@@ -152,52 +195,81 @@ uint8_t GenericAviSaveCopyPack::writeVideoChunk (uint32_t frame)
   
   uint8_t    ret1;
  ADMCompressedImage img;
- ADMBitstream bitstream;
  
-      img.data=vbuffer;
-      bitstream.bufferSize=_incoming->getInfo ()->width *   _incoming->getInfo ()->height * 3;
-      bitstream.data=vbuffer;
-      
+      img.data=vbuffer;      
       
        if(!video_body->isReordered(frameStart+frame))
       {
-          ret1 = video_body->getFrameNoAlloc (frameStart + frame,&img);// vbuffer, &len,      &_videoFlag);
+          ret1 = video_body->getFrameNoAlloc (frameStart + frame,&img);
           _videoFlag=img.flags;
       }
       else
       {
-            // We prefectch one frame...
-        
-           ret1=copy->encode(frame,&bitstream);
-           img.dataLength=bitstream.len;
-           _videoFlag=img.flags=bitstream.flags;
-           if(bitstream.flags==AVI_KEY_FRAME)
+            ret1=1;
+            // We prefetch one frame...
+           if(!frame) // First frame.
            {
-            updateUserData(bitstream.data,bitstream.len); 
+                if(!prefetch(0,frame))
+                {
+                  return 0;
+                }
+                curToggle=0;
            }
+           uint32_t len=0;
+            ADMBitstream *current,*next;
+                 current=lookAhead[curToggle];
+                 next=lookAhead[curToggle^1];
+           if(frame+2<_incoming->getInfo()->nb_frames)
+           {
+               
+                 
+                if( !prefetch(curToggle^1,frame+1))
+                    {
+                        return 0; 
+                    }
+                // Curtoggle holds the current frame, curToggle ^1 hold the next frame
+                if(current->flags!=AVI_B_FRAME && next->flags==AVI_B_FRAME)
+                {
+                    aprintf("Packing frame :%u\n",frame);
+                    // We need to pack this
+                    len=current->len;
+                    memcpy(vbuffer,current->data,len);
+                    memcpy(vbuffer+len,next->data,next->len);
+                    len+=next->len;
+                    img.dataLength=len;
+                    // Put nvop in next buffer
+                    putNvop(next,time_inc);
+                }else
+                {
+                    // Just send 
+                    len=current->len;
+                    memcpy(vbuffer,current->data,len);             
+                }
+        
+           }
+           else
+           { 
+              // Last frame
+             aprintf("Last frame\n");
+              len= current->len;
+              memcpy(vbuffer,current->data,len);
+           }
+           img.dataLength=len;
+           _videoFlag=img.flags=current->flags;
+           if(_videoFlag==AVI_KEY_FRAME)
+           {
+            updateUserData(vbuffer,len); 
+           }
+           curToggle^=1;
       }
 
   if (!ret1)
     return 0;
 
-    // check for split
-     // check for auto split
-      // if so, we re-write the last I frame
-      if(muxSize)
-      	{
-                        // we overshot the limit and it is a key frame
-                // start a new chunk
-                if(handleMuxSize() && (_videoFlag & AVI_KEY_FRAME))
-                {		
-                    uint8_t *extraData;
-                    uint32_t extraLen;
+     if(_videoFlag==AVI_KEY_FRAME)
+          newFile();
 
-                  video_body->getExtraHeaderData(&extraLen,&extraData);
-      
-                  if(!reigniteChunk(extraLen,extraData)) return 0;
-                }
-          }
-  
+  aprintf("Writting frame %u size %u flags %x\n",frame,img.dataLength,_videoFlag);  
   encoding_gui->setFrame(frame,img.dataLength,0,frametogo);
   return writter->saveVideoFrame (img.dataLength, img.flags, img.data);
 
@@ -207,6 +279,7 @@ uint8_t GenericAviSaveCopyPack::writeVideoChunk (uint32_t frame)
 // Update the user data field that is used to 
 // detect in windows world if it is packed or not
 //_____________________________________________________
+static char signature[]="DivX999b0000p\0";
 void updateUserData(uint8_t *start, uint32_t len)
 {
       // lookup startcode
@@ -223,34 +296,57 @@ void updateUserData(uint8_t *start, uint32_t len)
       
               printf("User data found\n");
               // looks ok ?
-              if(!strncmp((char *)start,"DivX",4))
+              if(!strncmp((char *)start,"DivX",4) && start[7]=='b'&& rlen>=14)
               {
-
-                  //
-                  start+=4;
-                  rlen-=4; // skip "DivX"
-                              // looks for a p while not null
-                              // if there isnt we will reach a new startcode
-                              // and it will stop
-                              while((*start!='p') && rlen) 
-                              {
-                                      if(!*start)
-                                      {
-                                              rlen=0;
-                                              break;
-                                      }
-                                      rlen--;
-                                      start++;
-                              }
-                              if(!rlen) 
-                                      {
-                                              printf("Unpacketizer:packed marker not found!\n");
-                                      }
-                              else	
-                                      *start='n'; // remove 'p'
-                              return;			
+                memcpy(start,signature,4+3+4+1+1+1); // 14
               }
       }
 }
-
+/**
+        \fn     putNvop
+        \brief  Put a vop non coded bit
+        
+        
+        00 00 01 B6
+        2 bits : B vop : 10
+        1*X : Stuffing
+        1*0 : End of stuffing
+        1*0 : Marker
+        1*time_bit : time
+        1*0 : Marker
+        1*0 : Vop coded
+    
+*/
+extern "C"
+{
+#define av_always_inline inline
+#include "ADM_libraries/ADM_lavutil/bswap.h" 
+#include "ADM_libraries/ADM_lavcodec/bitstream.h" 
+}
+void putNvop(ADMBitstream *data,uint32_t time_inc)
+{
+  ADM_assert(data->data[0]==0);
+  ADM_assert(data->data[1]==0);
+  ADM_assert(data->data[2]==1);
+  ADM_assert(data->data[3]==0xB6); // Vop start
+  
+  
+  ADM_assert(data->len>=6);
+  ADM_assert(time_inc);
+  
+  PutBitContext pbs;
+  init_put_bits(&pbs, data->data+4, data->len-4);
+    
+  put_bits(&pbs, 2,2); // Bvop
+  put_bits(&pbs, 2,2); // Padding
+  put_bits(&pbs, 1,0); // Marker
+  if(time_inc!=0xFFFF)
+    put_bits(&pbs, time_inc,0); // time_inc
+  put_bits(&pbs, 1,0); // Marker
+  put_bits(&pbs, 1,0); // vop not coded
+  
+  flush_put_bits(&pbs);
+  int nb=put_bits_count(&pbs)>>3;
+  data->len=nb;
+}
 //EOF

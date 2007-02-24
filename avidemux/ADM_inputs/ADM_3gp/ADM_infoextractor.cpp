@@ -44,13 +44,13 @@ extern "C"
 
 
 */
-uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h)
+uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h,uint32_t *time_inc)
 {
     // Search startcode
     uint8_t b;
     uint32_t idx=0;
     uint32_t mw,mh;
-    uint32_t time_inc;
+    uint32_t timeVal;
     
     mixDump(data,dataSize);
     printf("\n");
@@ -104,11 +104,14 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
                   }
                  skip_bits(&s,2); //  Shape
                  skip_bits(&s,1); //  Marker
-                 time_inc=get_bits(&s,16); // Time increment
+                 timeVal=get_bits(&s,16); // Time increment
+                 *time_inc = av_log2(timeVal - 1) + 1;
+                 if (*time_inc < 1)
+                    *time_inc = 1;
                  skip_bits(&s,1); //  Marker
                  if(get_bits(&s,1)) // Fixed vop rate, compute how much bits needed
                  {
-                    uint32_t in=time_inc;
+                    uint32_t in=*time_inc;
                     uint32_t i=1;
                     in--;
                     while(in)

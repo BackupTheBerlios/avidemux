@@ -168,8 +168,35 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
                 }
           }
   
+  if(_videoFlag==AVI_KEY_FRAME)
+          newFile();
   encoding_gui->setFrame(frame,img.dataLength,0,frametogo);
   return writter->saveVideoFrame (img.dataLength, img.flags, img.data);
 
 
 }
+/**
+      \fn newFile
+      \brief start a new file, for example if the muxer was setup to split every 700 Meg. Call only on intra!
+
+
+*/
+uint8_t          GenericAviSaveCopy::newFile(void)
+{
+        if(muxSize)
+      	{
+                        // we overshot the limit and it is a key frame
+                // start a new chunk
+                if(handleMuxSize() )
+                {		
+                    uint8_t *extraData;
+                    uint32_t extraLen;
+
+                  video_body->getExtraHeaderData(&extraLen,&extraData);
+      
+                  if(!reigniteChunk(extraLen,extraData)) return 0;
+                }
+          }
+    return 1;
+}
+// EOF

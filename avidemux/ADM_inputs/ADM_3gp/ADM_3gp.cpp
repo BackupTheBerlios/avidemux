@@ -294,8 +294,8 @@ uint8_t    _3GPHeader::open(char *name)
         {
             if(VDEO.extraDataSize)
             {
-                uint32_t w,h;
-                if(extractMpeg4Info(VDEO.extraData,VDEO.extraDataSize,&w,&h))
+                uint32_t w,h,ti;
+                if(extractMpeg4Info(VDEO.extraData,VDEO.extraDataSize,&w,&h,&ti))
                 {
                     printf("MP4 Corrected size : %lu x %lu\n",w,h);
                     _video_bih.biWidth=_mainaviheader.dwWidth=w ;

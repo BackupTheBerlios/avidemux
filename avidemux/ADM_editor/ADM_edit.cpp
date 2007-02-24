@@ -618,10 +618,15 @@ TryAgain:
 					bconsistency=0;
 					
 				}
-				if(bframe)
+                                uint32_t ffcheck=vid->decoder->isDivxPacked ();
+                                if(ffcheck)
+                                {
+                                  printf("[Editor] Decoder says it is vop packed\n");
+                                }
+				if(bframe || ffcheck)
 				{
 					printf("\n Mmm this appear to have b-frame...\n");
-					if(bconsistency)
+					if(bconsistency )
 					{
 						printf("\n And the index is ok\n");
 
@@ -648,15 +653,21 @@ TryAgain:
 					{
 						printf("\n But the  index is not up to date \n");
 						uint32_t ispacked=0;
+                                                
+                                                uint32_t ff=vid->decoder->isDivxPacked ();
+                                                if(ff)
+                                                {
+                                                  printf("[Editor] Decoder says it is vop packed\n");
+                                                }
+                                                
 						// If it is Divx 5.0.xxx use divx decoder
-						if(fourCC::check(info.fcc,(uint8_t *)"DX50")
-						|| fourCC::check(info.fcc,(uint8_t *)"XVID" ))
+						if(isMpeg4Compatible(info.fcc))
 						{
 
 
 							//if(vid->decoder->isDivxPacked())
 							uint8_t forced= getEnv(ENV_EDITOR_PVOP);
-							if(vid->decoder->isDivxPacked() ||forced)
+							if(ff ||forced)
 							{
 								
 								// can only unpack avi

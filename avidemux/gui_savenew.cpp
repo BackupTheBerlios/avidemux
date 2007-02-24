@@ -57,6 +57,7 @@
 
 static uint8_t  A_SaveAudioNVideo(const char *name);
  extern int A_SaveUnpackedVop(const char *name);
+ extern int A_SavePackedVop(const char *name);
  extern uint8_t ogmSave(const char *name);
  extern uint8_t ADM_saveRaw(const char *name);
  uint8_t A_SaveAudioDualAudio(const char *name);
@@ -185,6 +186,10 @@ int ret=0;
 						case ADM_AVI_DUAL:
 								ret=A_SaveAudioDualAudio(name);
 								break;
+                                                case ADM_AVI_PAK:
+								ret=A_SavePackedVop(name);
+								break;
+
 						case ADM_AVI_UNP:
 								ret=A_SaveUnpackedVop(name);
 								break;
@@ -267,6 +272,24 @@ int ret;
         }
 	//
 	nw=new   GenericAviSaveCopyUnpack();
+	ret=nw->saveAvi(name);
+	delete nw;
+	return ret;
+}
+int A_SavePackedVop(const char *name)
+{
+  aviInfo info;
+GenericAviSave	*nw;
+int ret;
+
+	video_body->getVideoInfo(&info);
+	if( !isMpeg4Compatible(  info.fcc))
+	{
+          GUI_Error_HIG(_("This cannot have packed VOP"),_( "It is not MPEG-4 video. File will not be saved."));
+		return 0;
+        }
+	//
+	nw=new   GenericAviSaveCopyPack();
 	ret=nw->saveAvi(name);
 	delete nw;
 	return ret;

@@ -98,6 +98,7 @@ extern uint8_t ADM_aviSetSplitSize(uint32_t size);
 extern uint8_t ogmSave(const char *fd);
 static void set_autoindex(char *p);
 extern int A_SaveUnpackedVop(const char *name);
+extern int A_SavePackedVop(const char *name);
 extern int A_saveDVDPS(char *name);
 extern void A_saveWorkbench (char *name);
 extern uint8_t A_rebuildKeyFrame (void);
@@ -153,7 +154,8 @@ AUTOMATON reaction_table[]=
         {"save-jpg",		1,"save a jpeg",			(one_arg_type)A_saveJpg}        ,
         {"begin",		1,"set start frame",			setBegin},
         {"end",			1,"set end frame",			setEnd},
-        {"save-unpacked-vop",	1,"save avi, unpacking vop",(one_arg_type)A_SaveUnpackedVop},		
+        {"save-unpacked-vop",	1,"save avi, unpacking vop",(one_arg_type)A_SaveUnpackedVop},
+        {"save-packed-vop",	1,"save avi, packing vop",(one_arg_type)A_SavePackedVop},				
         {"save-ogm",		1,"save as ogm file ",			(one_arg_type)ogmSave},
         {"save-raw-audio",	1,"save audio as-is ",			A_saveAudio},
         {"save-raw-video",	1,"save raw video stream (mpeg/... ) ",	(one_arg_type)ADM_saveRaw},

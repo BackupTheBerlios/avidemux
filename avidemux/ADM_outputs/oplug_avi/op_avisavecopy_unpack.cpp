@@ -161,23 +161,9 @@ uint8_t GenericAviSaveCopyUnpack::writeVideoChunk (uint32_t frame)
   if (!ret1)
     return 0;
 
-    // check for split
-     // check for auto split
-      // if so, we re-write the last I frame
-      if(muxSize)
-      	{
-                        // we overshot the limit and it is a key frame
-                // start a new chunk
-                if(handleMuxSize() && (_videoFlag & AVI_KEY_FRAME))
-                {		
-                    uint8_t *extraData;
-                    uint32_t extraLen;
+      if(_videoFlag==AVI_KEY_FRAME)
+          newFile();
 
-                  video_body->getExtraHeaderData(&extraLen,&extraData);
-      
-                  if(!reigniteChunk(extraLen,extraData)) return 0;
-                }
-          }
   
   encoding_gui->setFrame(frame,img.dataLength,0,frametogo);
   return writter->saveVideoFrame (img.dataLength, img.flags, img.data);

@@ -1117,6 +1117,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (alignment14), comboboxFormat);
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("AVI"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("AVI, unp. VOP"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("AVI, pack.VOP"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("AVI, dual audio"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("OGM"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MPEG video"));
