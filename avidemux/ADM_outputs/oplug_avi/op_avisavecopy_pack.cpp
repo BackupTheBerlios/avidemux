@@ -347,6 +347,6 @@ void putNvop(ADMBitstream *data,uint32_t time_inc)
   
   flush_put_bits(&pbs);
   int nb=put_bits_count(&pbs)>>3;
-  data->len=nb;
+  data->len=nb+4;
 }
 //EOF
