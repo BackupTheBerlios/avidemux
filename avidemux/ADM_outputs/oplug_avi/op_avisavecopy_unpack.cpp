@@ -52,17 +52,17 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 
-/**
-      \fn  ~GenericAviSaveCopyUnpack
-      \brief destructor
-*/
-GenericAviSaveCopy::~GenericAviSaveCopy ()
-{
-      if(copy) delete copy;
-      copy=NULL; 
-}
+static void updateUserData(uint8_t *start, uint32_t len);
+uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);
 
-uint8_t GenericAviSaveCopy::setupVideo (char *name)
+
+
+/**
+      \fn GenericAviSaveCopyUnpack::setupVideo
+      \brief init for unpacker code
+
+*/
+uint8_t GenericAviSaveCopyUnpack::setupVideo (char *name)
 {
   //  Setup avi file output, all is coming from original avi
   // since we are inc copy mode
@@ -73,7 +73,9 @@ uint8_t GenericAviSaveCopy::setupVideo (char *name)
   memcpy(&_videostreamheader,video_body->getVideoStreamHeader (),sizeof( _videostreamheader));
   memcpy(&_mainaviheader,video_body->getMainHeader (),sizeof(_mainaviheader));
   
-
+  // Change both to divx/DX50
+  	_videostreamheader.fccHandler=fourCC::get((uint8_t *)"divx");
+	_bih.biCompression=fourCC::get((uint8_t *)"DX50");
   /* update to fix earlier bug */
    _mainaviheader.dwWidth=_bih.biWidth;
    _mainaviheader.dwHeight=_bih.biHeight;
@@ -107,6 +109,7 @@ uint8_t GenericAviSaveCopy::setupVideo (char *name)
  _incoming = getFirstVideoFilter (frameStart,frameEnd-frameStart);
  encoding_gui->setFps(_incoming->getInfo()->fps1000);
  encoding_gui->setPhasis("Saving");
+ 
  // Set up our copy codec ...
   copy=new EncoderCopy(NULL);
   if(!copy->configure(_incoming))
@@ -122,8 +125,12 @@ uint8_t GenericAviSaveCopy::setupVideo (char *name)
 // Basically ask a video frame and send it to writter
 // If it contains b frame and frames have been re-ordered
 // reorder them back ...
-uint8_t
-GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
+/**
+      \fn GenericAviSaveCopyUnpack::setupVideo
+      \brief init for unpacker code
+
+*/
+uint8_t GenericAviSaveCopyUnpack::writeVideoChunk (uint32_t frame)
 {
   
   uint8_t    ret1;
@@ -145,6 +152,10 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
            ret1=copy->encode(frame,&bitstream);
            img.dataLength=bitstream.len;
            _videoFlag=img.flags=bitstream.flags;
+           if(bitstream.flags==AVI_KEY_FRAME)
+           {
+            updateUserData(bitstream.data,bitstream.len); 
+           }
       }
 
   if (!ret1)
@@ -171,5 +182,56 @@ GenericAviSaveCopy::writeVideoChunk (uint32_t frame)
   encoding_gui->setFrame(frame,img.dataLength,0,frametogo);
   return writter->saveVideoFrame (img.dataLength, img.flags, img.data);
 
-
 }
+
+//_____________________________________________________
+// Update the user data field that is used to 
+// detect in windows world if it is packed or not
+//_____________________________________________________
+void updateUserData(uint8_t *start, uint32_t len)
+{
+      // lookup startcode
+      uint32_t sync,off,rlen;
+      uint8_t code;
+      uint8_t *end=start+len;
+      while(ADM_findMpegStartCode(start, end,&code,&off))
+      {
+              // update
+              start+=off;
+              rlen=end-start;
+              if(code!=0xb2 || rlen<4)
+                  continue;
+      
+              printf("User data found\n");
+              // looks ok ?
+              if(!strncmp((char *)start,"DivX",4))
+              {
+
+                  //
+                  start+=4;
+                  rlen-=4; // skip "DivX"
+                              // looks for a p while not null
+                              // if there isnt we will reach a new startcode
+                              // and it will stop
+                              while((*start!='p') && rlen) 
+                              {
+                                      if(!*start)
+                                      {
+                                              rlen=0;
+                                              break;
+                                      }
+                                      rlen--;
+                                      start++;
+                              }
+                              if(!rlen) 
+                                      {
+                                              printf("Unpacketizer:packed marker not found!\n");
+                                      }
+                              else	
+                                      *start='n'; // remove 'p'
+                              return;			
+              }
+      }
+}
+
+//EOF

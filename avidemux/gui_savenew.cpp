@@ -266,7 +266,7 @@ int ret;
 		return 0;
         }
 	//
-	nw=new   GenericAviSaveCopy(1);
+	nw=new   GenericAviSaveCopyUnpack();
 	ret=nw->saveAvi(name);
 	delete nw;
 	return ret;

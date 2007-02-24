@@ -20,6 +20,7 @@
 #ifndef __ADM_encoder_copy__
 #define __ADM_encoder_copy__
 
+#include "ADM_encoder/adm_encoder.h"
 
 class EncoderCopy:public Encoder
 {

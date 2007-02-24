@@ -8,7 +8,7 @@ liboplug_avi_a_METASOURCES = AUTO
 
 liboplug_avi_a_SOURCES = op_savesmart.cpp op_saveprocess.cpp op_aviwrite.cpp \
 			 op_avisavedual.cpp op_avisavecopy.cpp op_avisave.cpp  \
-			 avilist.cpp
+			 avilist.cpp op_avisavecopy_pack.cpp op_avisavecopy_unpack.cpp
 
 
 EXTRA_DIST =  GUI_mux.h       op_avisavecopy.cpp  op_aviwrite.hxx    \

@@ -16,44 +16,60 @@
  ***************************************************************************/
  #ifndef __AVI_SAVECPY__
  #define   __AVI_SAVECPY__
-
+#include "ADM_encoder/adm_encCopy.h"
  class GenericAviSaveCopy : public   GenericAviSave
  {
      protected :
-			
+		                                EncoderCopy          *copy;	
 		          virtual uint8_t 	setupVideo( char *name  );
                           virtual uint8_t 	writeVideoChunk(uint32_t frame );
-			  	  uint8_t	_needUserDataUpdate;
 
      public:
-     						GenericAviSaveCopy()  :     GenericAviSave()
-										{
-											_needUserDataUpdate=0;
-										};
-						GenericAviSaveCopy(uint8_t pack)  :     GenericAviSave()
-										{
-											_needUserDataUpdate=pack;
-										};	
-               //           virtual ~GenericAviSaveCopy();
+                                              GenericAviSaveCopy()  :     GenericAviSave()
+                                                                      {
+                                                                        copy=NULL;
+                                                                      };
+                           virtual ~GenericAviSaveCopy();
    };
 
  class GenericAviSaveCopyDualAudio : public   GenericAviSaveCopy
  {
      protected :
 
-			
+                        
                         char				*_trackname;
-			uint32_t			_audioCurrent2;
+                        uint32_t			_audioCurrent2;
 
                         uint8_t    doOneTrack (uint32_t index,AVDMGenericAudioStream *stream,uint32_t target,uint32_t *current);
-		                   virtual uint8_t setupAudio( void);
-                        	 virtual uint8_t writeAudioChunk(uint32_t frame );
-				 //virtual uint8_t setupVideo (char *name);
+                                    virtual uint8_t setupAudio( void);
+                                  virtual uint8_t writeAudioChunk(uint32_t frame );
+
      public:
                                      GenericAviSaveCopyDualAudio(AVDMGenericAudioStream	*track);
-                          //virtual ~GenericAviSaveCopyDualAudio();
+
    };
-
-
-
+/*            Pack /unpack */
+class GenericAviSaveCopyUnpack : public   GenericAviSaveCopy
+ {
+     protected :
+                          virtual uint8_t 	setupVideo( char *name  );
+                          virtual uint8_t 	writeVideoChunk(uint32_t frame );
+     public:
+  
+ };
+class GenericAviSaveCopyPack : public   GenericAviSaveCopy
+ {
+     protected :
+                          EncoderCopy          *copy;
+                          ADMBitstream         *lookAhead;
+                          virtual uint8_t 	setupVideo( char *name  );
+                          virtual uint8_t 	writeVideoChunk(uint32_t frame );
+     public:
+                          virtual	~GenericAviSaveCopyPack();	
+                                        GenericAviSaveCopyPack()  :     GenericAviSaveCopy()
+                                        {
+                                                lookAhead=NULL;
+                                        };
+  
+ };
   #endif
