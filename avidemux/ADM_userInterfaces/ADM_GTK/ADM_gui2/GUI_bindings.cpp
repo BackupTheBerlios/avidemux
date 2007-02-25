@@ -86,6 +86,7 @@ extern void A_appendAvi (char *name);
 static void on_audio_change(void);
 static void on_video_change(void);
 static void on_preview_change(void);
+static void on_format_change(void);
 static int update_ui=0;
 
 static void GUI_initCustom(void);
@@ -430,6 +431,9 @@ uint8_t  bindGUI( void )
                        NULL);
         gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,PREVIEW_WIDGET)), "changed",
                        GTK_SIGNAL_FUNC(on_preview_change),
+                       NULL);
+        gtk_signal_connect(GTK_OBJECT(lookup_widget(guiRootWindow,FORMAT_WIDGET)), "changed",
+                       GTK_SIGNAL_FUNC(on_format_change),
                        NULL);
         
         // Add initial recent files
@@ -846,6 +850,21 @@ void on_preview_change(void)
 int enable;
        if(update_ui) return;
         HandleAction(ACT_PreviewChanged);
+
+}
+void on_format_change(void)
+{
+int enable;
+       if(update_ui) return;
+        ADM_OUT_FORMAT fmt=UI_GetCurrentFormat();
+        if(fmt==ADM_AVI_UNP || fmt==ADM_AVI_PAK)
+        {
+          gtk_widget_set_sensitive(lookup_widget(guiRootWindow,VIDEO_WIDGET),0);  
+          
+        }else
+        {
+          gtk_widget_set_sensitive(lookup_widget(guiRootWindow,VIDEO_WIDGET),1);  
+        }
 
 }
 
