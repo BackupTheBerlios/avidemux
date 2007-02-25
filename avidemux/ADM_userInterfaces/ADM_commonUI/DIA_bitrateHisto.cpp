@@ -38,7 +38,7 @@
 void GUI_displayBitrate( void )
 {
 
-  int32_t total,max;
+ uint32_t total,max;
  uint32_t len,idx,nb_frame,k,changed;
  uint32_t round,sum,average[60];;
 
@@ -71,6 +71,10 @@ uint32_t maxBFrame=0;
         total=0;
         uint32_t flags;
 	// 1 st pass, compute max
+        /*
+            to do so : We compute the sum of frame size on [changed] frames i.e ~ 1 second
+        
+        */
 	for( k=frameStart;k<frameEnd;k++)
 	{
  		video_body->getFrameSize (k, &len);
@@ -108,15 +112,17 @@ uint32_t maxBFrame=0;
         g*=avifileinfo->fps1000;
         g/=(1000.*1000.);
         medium=(uint32_t)(g*8);
+        
+        max=(max*8)/1000; // Max is now in kByte
+        
         printf("Average :%u max%u\n",medium,max);
-#if 0
-#define ROUNDUP 20*1000
-        uint32_t s;
-	s=(max+ROUNDUP -1)/ROUNDUP;
-	max=s*ROUNDUP;
-#endif
 
-	printf("\n Total : %lu bytes, max br %d bytes round %d\n",total,max,round);
+        /* Round up to the closer 200 kb */
+#define ROUNDUP 200
+        max=(max+ROUNDUP-1)/ROUNDUP;
+        max=max*ROUNDUP;
+        
+
 	if(!max)
 	{
           GUI_Error_HIG(_("No data"), NULL);
@@ -131,8 +137,9 @@ uint32_t maxBFrame=0;
 
 	sum=0;
 	changed=0;
-        uint32_t step=(max*8)/20000;
-
+        uint32_t step=max/20;
+        uint32_t sumkb;
+        
 	for(uint32_t k=frameStart;k<frameEnd;k++)
 	{
 		video_body->getFrameSize (k, &len);
@@ -146,7 +153,7 @@ uint32_t maxBFrame=0;
 		changed++;
 		changed%=round;
 
-		f=sum;
+		f=(sum*8)/1000;
 		f=f/max;
 		f=f*20.;
 		idx=(uint32_t )floor(f+0.5);
@@ -155,23 +162,25 @@ uint32_t maxBFrame=0;
 		display[idx]++;
 	}
 
+        // So now we have a distribution
 
-	for(k=0;k<20;k++) display[k]=(100*display[k])/nb_frame;
-	for(k=0;k<20;k++)
-	{
-		printf(" %d , %04d -- %04d percent -> %02.1f\n",k,(max*k*8)/20000,(8*max*(k+1))/20000,display[k]);
-
-	}
+	for(k=0;k<20;k++) 
+        {
+          printf("%02u %04u %04u\n",k,(uint32_t)display[k],(uint32_t)(100.*display[k])/nb_frame);
+          display[k]=(100*display[k])/nb_frame;
+        }
+	
         
         diaElemBar *bar[20];
         char str[256];
         for(int i=0;i<20;i++)
         {
-          sprintf(str,"%03u--%03u",step*i,step*(i+1));
+          printf("%03u--%03u :%02u\n",step*i,step*(i+1),(uint32_t)display[i]);
+          sprintf(str,"%04u--%04u",step*i,step*(i+1));
           bar[19-i]=new  diaElemBar((uint32_t)display[i],str);
             
         }
-        
+        diaElemUInteger mx(&max,"Max bitrate",0,9999999);
         diaElemUInteger med(&medium,"Average bitrate",0,9999999);
         diaElemUInteger nI(&nbIFrame,"Number of I frames",0,9999999);
         diaElemUInteger nP(&nbPFrame,"Number of P frames",0,9999999);
@@ -180,14 +189,15 @@ uint32_t maxBFrame=0;
         diaElemBar foo(0,"foo");
 #define P(X) bar[X] 
   
-      diaElem *elems[21+4]={
+      diaElem *elems[20+6]={
+            &mx,
             &med,
             &nI,&nP,&nB,&nMB,
             P(0),P(1),P(2),P(3),P(4),P(5),P(6),P(7),P(8),P(9),
             P(10),P(11),P(12),P(13),P(14),P(15),P(16),P(17),P(18),P(19)
           };
     
-        diaFactoryRun(_("Bitrate Histogram"),21,elems);
+        diaFactoryRun(_("Bitrate Histogram"),20+6,elems);
         
         
         for(int i=0;i<20;i++)
