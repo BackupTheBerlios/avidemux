@@ -46,7 +46,11 @@ void GUI_displayBitrate( void )
 
  float display[20];
 uint32_t medium=0;
-
+uint32_t nbIFrame=0;
+uint32_t nbPFrame=0;
+uint32_t nbBFrame=0;
+uint32_t curBFrame=0;
+uint32_t maxBFrame=0;
 	// 1st compute the total
 	
 	max=0;
@@ -65,6 +69,7 @@ uint32_t medium=0;
 	sum=0;
 	changed=0;
         total=0;
+        uint32_t flags;
 	// 1 st pass, compute max
 	for( k=frameStart;k<frameEnd;k++)
 	{
@@ -77,6 +82,25 @@ uint32_t medium=0;
 		if(sum>max) max=sum;
 		changed++;
 		changed%=round;
+                video_body->getFlags (k, &flags);
+                if(!flags) 
+                {
+                  nbPFrame++;
+                  curBFrame=0;
+                }
+                if(flags==AVI_KEY_FRAME) 
+                {
+                  nbIFrame++;
+                  curBFrame=0;
+                }
+                if(flags==AVI_B_FRAME)
+                {
+                  nbBFrame++;
+                  curBFrame++;
+                  if(curBFrame>maxBFrame) 
+                    maxBFrame=curBFrame;
+                  
+                }
 	}
         
         float g=total;
@@ -149,11 +173,16 @@ uint32_t medium=0;
         }
         
         diaElemUInteger med(&medium,"Average bitrate",0,9999999);
+        diaElemUInteger nI(&nbIFrame,"Number of I frames",0,9999999);
+        diaElemUInteger nP(&nbPFrame,"Number of P frames",0,9999999);
+        diaElemUInteger nB(&nbBFrame,"Number of B frames",0,9999999);
+        diaElemUInteger nMB(&maxBFrame,"Max B frames",0,9999999);
         diaElemBar foo(0,"foo");
 #define P(X) bar[X] 
   
-      diaElem *elems[21]={
+      diaElem *elems[21+4]={
             &med,
+            &nI,&nP,&nB,&nMB,
             P(0),P(1),P(2),P(3),P(4),P(5),P(6),P(7),P(8),P(9),
             P(10),P(11),P(12),P(13),P(14),P(15),P(16),P(17),P(18),P(19)
           };
