@@ -19,7 +19,9 @@
 #include "interface.h"
 #include "support.h"
 #else
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "default.h"
+#include "ADM_toolkit_gtk/toolkit_gtk.h"
+#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
 #endif
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
@@ -1115,16 +1117,6 @@ create_mainWindow (void)
   comboboxFormat = gtk_combo_box_new_text ();
   gtk_widget_show (comboboxFormat);
   gtk_container_add (GTK_CONTAINER (alignment14), comboboxFormat);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("AVI"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("AVI, unp. VOP"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("AVI, pack.VOP"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("AVI, dual audio"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("OGM"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MPEG video"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MPEG PS A+V"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MPEG TS A+V"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("MP4"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxFormat), _("PSP"));
 
   guiDrawing = gtk_drawing_area_new ();
   gtk_widget_show (guiDrawing);

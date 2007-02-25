@@ -702,51 +702,6 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <item>
-           <property name="text" >
-            <string>AVI</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>AVI unp vop</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>AVI dual audio</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>OGM</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>Mpeg Video</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>Mpeg PS</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>Mpeg TS</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>MP4</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>PSP (broken)</string>
-           </property>
-          </item>
          </widget>
         </item>
        </layout>

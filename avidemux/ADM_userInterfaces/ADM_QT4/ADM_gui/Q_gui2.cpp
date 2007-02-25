@@ -159,6 +159,9 @@ MainWindow::MainWindow()     : QMainWindow()
      LIST_OF_BUTTONS
 #undef PROCESS
      // ComboBox
+         
+         
+         
          //ACT_VideoCodecChanged
          connect( ui.comboBoxVideo,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
          connect( ui.comboBoxAudio,SIGNAL(activated(int)),this,SLOT(comboChanged(int)));
@@ -354,6 +357,15 @@ void setupMenus(void)
                 {
                         name=audioFilterGetIndexedName(i);
                         WIDGET(comboBoxAudio)->addItem(name);
+                }
+      /*   Fill in output format window */
+        uint32_t nbFormat;
+
+                nbFormat=sizeof(ADM_allOutputFormat)/sizeof(ADM_FORMAT_DESC);
+                printf("Found %d Format \n",nbFormat);
+                for(uint32_t i=0;i<nbFormat;i++)
+                {
+                       WIDGET(comboBoxFormat)->addItem(_(ADM_allOutputFormat[i].text));	
                 }
         
 }

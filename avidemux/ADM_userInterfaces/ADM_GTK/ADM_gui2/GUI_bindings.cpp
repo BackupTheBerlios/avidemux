@@ -45,6 +45,7 @@
 #include "../ADM_toolkit/filesel.h"
 #include "../ADM_editor/ADM_Video.h"
 #include "../ADM_osSupport/ADM_misc.h"
+#include "../ADM_editor/ADM_outputfmt.h"
 #include "../prefs.h"
 
 
@@ -395,7 +396,18 @@ uint8_t  bindGUI( void )
                 }
         gtk_combo_box_set_active(combo_box,0);
 	on_audio_change();
-        
+        /*   Fill in output format window */
+        uint32_t nbFormat;
+
+                nbFormat=sizeof(ADM_allOutputFormat)/sizeof(ADM_FORMAT_DESC);
+                combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,FORMAT_WIDGET));
+                gtk_combo_box_remove_text(combo_box,0);
+                printf("Found %d Format \n",nbFormat);		       
+                for(uint32_t i=0;i<nbFormat;i++)
+                {
+                        gtk_combo_box_append_text      (combo_box,_(ADM_allOutputFormat[i].text));	
+                }
+        gtk_combo_box_set_active(combo_box,0);
         /* File in preview mode combobox */
 
                 combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,PREVIEW_WIDGET));
