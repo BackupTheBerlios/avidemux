@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <glib.h>
-#include <signal.h>
 
 #ifdef HAVE_GETTEXT
 #include <libintl.h>
@@ -42,6 +41,7 @@
 #include "prefs.h"
 #include "ADM_audiodevice/audio_out.h"
 #include "ADM_toolkit/ADM_intfloat.h"
+
 #ifdef USE_XVID_4
 extern void xvid4_init(void);
 #endif
@@ -82,9 +82,7 @@ extern void AUDMEncoder_initDither(void);
 extern void ADM_memStat( void );
 extern void ADM_memStatInit( void );
 extern void ADM_memStatEnd( void );
-
-
-void sig_segfault_handler(int signo);
+extern void installSigHandler(void);
 
 extern uint8_t  quotaInit(void);
 extern void ADMImage_stat( void );
@@ -120,7 +118,8 @@ int sdl_version=0;
 
 
 // thx smurf uk :)
-    signal(11, sig_segfault_handler); // show stacktrace on default
+    installSigHandler();
+
 
     printf("\n*******************\n");
     printf("  Avidemux 2, v  " VERSION "\n");
@@ -277,16 +276,4 @@ void onexit( void )
         ADM_memStat(  );
         ADM_memStatEnd(  );
         printf("\n Goodbye...\n\n");
-}
-void sig_segfault_handler(int signo)
-{
-     ADMImage_stat();
-     g_on_error_stack_trace ("avidemux");
-     printf("Memory stat:\n");
-
-//   g_on_error_query (programname);
-
-
-     signo=0; // will keep GCC happy
-     exit(1); // _exit(1) ???
 }

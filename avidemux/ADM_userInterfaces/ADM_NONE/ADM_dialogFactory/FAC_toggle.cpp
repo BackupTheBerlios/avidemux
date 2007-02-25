@@ -181,6 +181,24 @@ void diaElemBitrate::getMe(void)
 {
  
 }
-             
+//******************************************************
+diaElemReadOnlyText::diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip)
+  : diaElem(ELEM_ROTEXT)
+{
+ 
+} 
+diaElemReadOnlyText::~diaElemReadOnlyText()
+{
+  
+}
+void diaElemReadOnlyText::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ 
+  
+}
+void diaElemReadOnlyText::getMe(void)
+{
+ 
+}            
 //******************************************************
 //EOF

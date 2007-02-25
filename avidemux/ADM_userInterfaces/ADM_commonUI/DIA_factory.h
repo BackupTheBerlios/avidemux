@@ -26,6 +26,7 @@ typedef enum elemEnum
   ELEM_FILE_READ,
   ELEM_BITRATE,
   ELEM_BAR,
+  ELEM_ROTEXT,
   ELEM_MAX=ELEM_TOGGLE
 };
 /*********************************************/
@@ -156,6 +157,20 @@ public:
   
   void changeFile(void);
 };
+/*************************************************/
+class diaElemReadOnlyText : public diaElem
+{
+
+public:
+  
+  diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemReadOnlyText() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  
+  void changeFile(void);
+};
+
 /*********************************************/
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems);
 /*********************************************/

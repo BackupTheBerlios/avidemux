@@ -74,6 +74,8 @@ JSBool facMenu(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 JSBool facFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facBitrate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facBar(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facRoText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
 
 static JSFunctionSpec adm_functions[] = {
@@ -97,7 +99,9 @@ static JSFunctionSpec adm_functions[] = {
   {"dialogFactoryMenu",         facMenu,        0},
   {"dialogFactoryFileSel",      facFile,        0},
   {"dialogFactoryBitrate",      facBitrate,        0},
-  {"dialogFactoryBar",          facBar,        0},
+  {"dialogFactoryBar",        facBar,        0},
+  {"dialogFactoryRoText",     facRoText,        0},
+  {"crashTest",               crashTest,        0},
   {0}
 };
 
@@ -603,6 +607,28 @@ JSBool facBar(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
   }else
     *rval = BOOLEAN_TO_JSVAL(0);
   
+  return JS_TRUE;
+}
+JSBool facRoText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+    
+      diaElemReadOnlyText txt("blah blah","Value:");
+      
+      diaElem *elems[]={&txt   };
+  if(diaFactoryRun("Test FileRead",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  
+  return JS_TRUE;
+}
+JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+  
+  int *foobar=NULL;
+  *foobar=0; // CRASH!
   return JS_TRUE;
 }
 

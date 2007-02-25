@@ -8,7 +8,7 @@ libADM_ossupport_a_METASOURCES = AUTO
 libADM_ossupport_a_SOURCES = \
 ADM_cpuCap.cpp  ADM_memcpy.cpp  ADM_misc.cpp   ADM_quota.cpp    TLK_clock.cpp \
 ADM_debug.cpp   ADM_memory.cpp  ADM_queue.cpp  ADM_threads.cpp  win32.cpp \
-ADM_memsupport.cpp ADM_fileio.cpp
+ADM_memsupport.cpp ADM_fileio.cpp ADM_crashdump.cpp
 
 
 
