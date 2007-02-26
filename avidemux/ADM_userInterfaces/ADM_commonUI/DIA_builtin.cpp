@@ -92,7 +92,7 @@ uint8_t DIA_builtin(void)
 #endif
 
         
-#define CREATE_TOGGLE(x)  diaElemToggle     t##x(&x,_("Option "#x));
+#define CREATE_TOGGLE(x)  diaElemNotch     t##x(x,_("Option "#x));
     
     
     CREATE_TOGGLE(mad)

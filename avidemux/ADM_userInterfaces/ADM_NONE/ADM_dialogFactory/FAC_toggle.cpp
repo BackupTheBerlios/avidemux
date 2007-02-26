@@ -199,6 +199,22 @@ void diaElemReadOnlyText::setMe(void *dialog, void *opaque,uint32_t line)
 void diaElemReadOnlyText::getMe(void)
 {
  
-}            
+}
+//******************************************************
+diaElemNotch::diaElemNotch(uint32_t yes,const char *toggleTitle, const char *tip)
+  : diaElem(ELEM_NOTCH)
+{
+ 
+}
+
+diaElemNotch::~diaElemNotch()
+{
+  
+}
+void diaElemNotch::setMe(void *dialog, void *opaque,uint32_t line)
+{
+  
+}
+            
 //******************************************************
 //EOF

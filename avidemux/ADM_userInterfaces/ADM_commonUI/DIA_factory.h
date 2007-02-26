@@ -27,6 +27,7 @@ typedef enum elemEnum
   ELEM_BITRATE,
   ELEM_BAR,
   ELEM_ROTEXT,
+  ELEM_NOTCH,
   ELEM_MAX=ELEM_TOGGLE
 };
 /*********************************************/
@@ -170,7 +171,17 @@ public:
   
   void changeFile(void);
 };
-
+/*********************************************/
+class diaElemNotch : public diaElem
+{
+  uint32_t yesno;
+public:
+  
+  diaElemNotch(uint32_t yes,const char *toggleTitle, const char *tip=NULL);
+  virtual ~diaElemNotch() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void) {};
+};
 /*********************************************/
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems);
 /*********************************************/
