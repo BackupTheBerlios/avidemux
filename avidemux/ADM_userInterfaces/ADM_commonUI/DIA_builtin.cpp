@@ -27,15 +27,15 @@
 
 #include <string.h>
 #include <stdio.h>
-# include <math.h>
-
+#include <math.h>
 
 #include "default.h"
-#include "default.h"
+#include "ADM_osSupport/ADM_misc.h"
+#include "DIA_factory.h"
 #include "ADM_assert.h"
 
-#include "DIA_factory.h"
-#define CHECK_SET(x) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(x)),1);}
+
+
 /**
     \fn DIA_builtin(void)
     \brief Display component that are built in. They are detected at configure time.

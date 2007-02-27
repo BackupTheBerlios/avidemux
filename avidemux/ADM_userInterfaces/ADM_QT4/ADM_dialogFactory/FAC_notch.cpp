@@ -35,7 +35,9 @@ extern const char *shortkey(const char *);
 diaElemNotch::diaElemNotch(uint32_t yes,const char *toggleTitle, const char *tip)
   : diaElem(ELEM_NOTCH)
 {
- 
+  yesno=yes;
+  paramTitle=toggleTitle;
+  this->tip=tip;
 }
 
 diaElemNotch::~diaElemNotch()
@@ -44,7 +46,15 @@ diaElemNotch::~diaElemNotch()
 }
 void diaElemNotch::setMe(void *dialog, void *opaque,uint32_t line)
 {
-  
+  QCheckBox *box=new QCheckBox(paramTitle,(QWidget *)dialog);
+ QGridLayout *layout=(QGridLayout*) opaque;
+ myWidget=(void *)box; 
+ if( yesno)
+ {
+    box->setCheckState(Qt::Checked); 
+ }
+ box->show();
+ layout->addWidget(box,line,0);
 }
 //******************************************************
 
