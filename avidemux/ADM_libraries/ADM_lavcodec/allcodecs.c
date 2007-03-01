@@ -230,15 +230,15 @@ void avcodec_register_all(void)
     REGISTER_DECODER(VMDAUDIO, vmdaudio);
     REGISTER_ENCDEC (VORBIS, vorbis);
     REGISTER_DECODER(WAVPACK, wavpack);
-    REGISTER_DECODER(WMAV1, wmav1);
-    REGISTER_DECODER(WMAV2, wmav2);
     REGISTER_DECODER(WS_SND1, ws_snd1);
 
 #endif
 #ifdef CONFIG_AMR_WB
     REGISTER_ENCDEC (AMR_WB, amr_wb);
 #endif
-
+    REGISTER_DECODER(WMAV1, wmav1);
+    REGISTER_DECODER(WMAV2, wmav2);
+    
     /* pcm codecs */
     REGISTER_ENCDEC (PCM_ALAW, pcm_alaw);
     REGISTER_ENCDEC (PCM_MULAW, pcm_mulaw);
