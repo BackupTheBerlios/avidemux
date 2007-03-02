@@ -33,6 +33,7 @@ public:
 
 	static JSBool SetFps1000(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool GetFps1000(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        static JSBool GetNbFrames(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool GetWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool GetHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool GetFCC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);

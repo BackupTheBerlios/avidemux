@@ -60,6 +60,7 @@ JSFunctionSpec ADM_JSAvidemuxVideo::avidemuxvideo_methods[] =
 	{ "setPostProc", PostProcess, 3, 0, 0 },	// Postprocess
         { "setFps1000", SetFps1000, 1, 0, 0 },        // Postprocess
         { "getFps1000", GetFps1000, 0, 0, 0 },        // Postprocess
+        { "getNbFrames", GetNbFrames, 0, 0, 0 },        // Postprocess
         { "getWidth", GetWidth, 0, 0, 0 },        // Postprocess
         { "getHeight", GetHeight, 0, 0, 0 },        // Postprocess
         { "getFCC", GetFCC, 0, 0, 0 },        // Postprocess
@@ -371,6 +372,20 @@ aviInfo info;
         leaveLock();
         
         *rval = INT_TO_JSVAL(info.fps1000);
+        return JS_TRUE;
+}// end PostProcess
+JSBool ADM_JSAvidemuxVideo::GetNbFrames(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+aviInfo info;
+        if(argc != 0)
+          return JS_FALSE;
+        
+        enterLock();
+        video_body->getVideoInfo(&info);
+        leaveLock();
+        
+        *rval = INT_TO_JSVAL(info.nb_frames);
         return JS_TRUE;
 }// end PostProcess
 
