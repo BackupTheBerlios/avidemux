@@ -52,7 +52,7 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
     uint32_t mw,mh;
     uint32_t timeVal;
     
-    mixDump(data,dataSize);
+    //mixDump(data,dataSize);
     printf("\n");
     while(1)
     {
@@ -72,7 +72,14 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
                 dataSize--;
                 idx++;
                 printf("VOL Header:\n");
-                mixDump(data+idx,dataSize);printf("\n");
+                if(dataSize<16)
+                {
+                  mixDump(data+idx,dataSize);printf("\n");
+                }
+                else
+                {
+                  mixDump(data+idx,16);printf("\n");
+                }
                 // Here we go !
                 GetBitContext s;
                 init_get_bits( &s,data+idx, dataSize*8);
@@ -111,15 +118,7 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
                  skip_bits(&s,1); //  Marker
                  if(get_bits(&s,1)) // Fixed vop rate, compute how much bits needed
                  {
-                    uint32_t in=*time_inc;
-                    uint32_t i=1;
-                    in--;
-                    while(in)
-                    {
-                        in>>=1;
-                        if(in) i++;
-                    }
-                    skip_bits(&s,i);
+                     get_bits(&s, *time_inc);
                  }
                   skip_bits(&s,1); //  Marker
                   mw=get_bits(&s,13);
@@ -146,6 +145,54 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
     
     return 0;
 }
+/**
+    \fn extractVopInfo
+    \brief extract info from vop : Vop type, module time base, time inc
+    
+    Warning this function expects data to start AFTER startcode, contrarily to other functions here!
+*/
+
+uint8_t extractVopInfo(uint8_t *data, uint32_t len,uint32_t timeincbits,uint32_t *vopType,uint32_t *modulo, uint32_t *time_inc,uint32_t *vopcoded)
+{
+   GetBitContext s;
+   int vop;
+   uint32_t vp,tinc;
+           init_get_bits( &s,data, len*8);
+           vop=get_bits(&s,2);
+           switch(vop)
+           {
+             case 0: vp=AVI_KEY_FRAME;break;
+             case 1: vp=0;break;
+             case 2: vp=AVI_B_FRAME;break;
+             default:
+                printf("Unknown vop type :%d\n",vop);
+                return 0;
+           }
+           /* Read modulo */
+           int imodulo=0;
+           while (get_bits1(&s) != 0)
+                  imodulo++;
+           if(!get_bits1(&s))
+           {
+              printf("Wrong marker1\n");
+              return 0; 
+           }
+           *modulo=imodulo;
+           /* Read time */
+           tinc=get_bits(&s,timeincbits);
+           /* Marker */
+            if(!get_bits1(&s))
+           {
+              printf("Wrong marker2\n");
+              return 0; 
+           }
+           /* Vop coded */
+           *vopcoded=get_bits1(&s);
+           *vopType=vp;
+           *time_inc=tinc;
+           return 1;
+}
+
 /*
         Extract H263 width & height from header
 

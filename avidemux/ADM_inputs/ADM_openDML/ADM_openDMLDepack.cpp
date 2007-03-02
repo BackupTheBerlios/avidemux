@@ -33,15 +33,24 @@
 #ifdef ADM_DEBUG
 	//#define OPENDML_VERBOSE
 #endif
+#define DEPACK_VERBOSE
 
 typedef struct vopS
 {
 	uint32_t offset;
 	uint32_t type;
+        uint32_t vopCoded;
+        uint32_t modulo;
+        uint32_t timeInc;
 }vopS;
 #define MAX_VOP 10
-static uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop);
+
 uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);
+uint8_t extractVopInfo(uint8_t *data, uint32_t len,uint32_t timeincbits,uint32_t *vopType,uint32_t *modulo, uint32_t *time_inc,uint32_t *vopcoded);
+uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h,uint32_t *time_inc);
+
+
+static uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop,uint32_t *timeincbits);
 
 static const char *s_voptype[4]={"I frame","P frame","B frame","D frame"};
 uint8_t OpenDMLHeader::unpackPacked( void )
@@ -51,6 +60,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	uint32_t firstType, secondType,thirdType;
 	uint32_t targetIndex=0,nbVop;
 	uint32_t nbDuped=0;
+        uint32_t timcincbits=16;  /* Nb bits used to code time_inc 16 is a safe default */
 	
 	vopS	myVops[MAX_VOP]; // should be enough
 	// here we got the vidHeader to get the file easily
@@ -61,7 +71,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	// First get a unpack buffe
 	uint8_t *buffer=new uint8_t [2*getWidth()*getHeight()];
 
-	// For each frame we lookup 2 times the VOP header
+	// For each frame we lookup x times the VOP header
 	// the first one become frame n, the second one becomes frame N+1
 	// Image contaning only VOP header are royally ignored
 	// We should get about the same number of in/out frame
@@ -77,73 +87,51 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	ADMCompressedImage image;
         image.data=buffer;
 	uint32_t img=0;
+        uint32_t modulo,time_inc,vopcoded,vopType;
+        uint32_t timeincbits=16;
+        uint32_t oldtimecode=0xffffffff;
 	while(img<nbFrame)
 	{
+                ADM_assert(nbDuped<2);
 		working->update(img,nbFrame);
 		if(!getFrameNoAlloc(img,&image))
 			{
 				printf("Error could not get frame %lu\n",img);
 				goto _abortUnpack;
 			}
-		aprintf("--Frame:%lu/%lu, len %lu\n",img,nbFrame,image.dataLength);
+		aprintf("--Frame:%lu/%lu, len %lu, nbDuped%u\n",img,nbFrame,image.dataLength,nbDuped);
 		
 		
-		if(image.dataLength<9) // ??
+		if(image.dataLength<6) // Too short to contain a valid vop header, just copy
 		{
-			if(nbDuped)
-			{
-                                aprintf(" skipped\n");
-				nbDuped--;
-                                aprintf("At %u, %d duped!\n",img,nbDuped);
-			}
-			else
-			{
-				memcpy(&newIndex[targetIndex],&_idx[img],sizeof(_idx[0]));
+                                memcpy(&newIndex[targetIndex],&_idx[img],sizeof(_idx[0]));
 				aprintf("TOO SMALL\n");
 				targetIndex++;
-			}
-			img++;
-			continue;
-		}
-		if(nbDuped)
-                {
-                        aprintf("At %u, %d duped!\n",img,nbDuped);
+                                img++;
+                                continue;
                 }
-		// now search vop header in this
-		// Search first vop
-		
-		uint8_t *lastPos=buffer;
-		uint8_t *endPos=buffer+image.dataLength;
-		aprintf("Frame :%lu",img);
-		searchVop(buffer,endPos,&nbVop,myVops);
-		
-		
-		if(!nbVop) goto _abortUnpack;
-		
-		if(nbVop==1) // only one vop
-		{
-                        if(myVops[0].type==AVI_KEY_FRAME)
+                /* Cannot find vop, corrupted or WTF ...*/
+                if(!searchVop(buffer,buffer+image.dataLength,&nbVop,myVops,&timcincbits))
+                {
+                    printf("img :%u failed to find vop!\n",img); 
+                    memcpy(&newIndex[targetIndex],&_idx[img],sizeof(_idx[0]));
+                    targetIndex++;
+                    img++;
+                    continue;
+                  
+                }
+                /* We have one or more vop inside it...*/
+                if(nbVop==1) // only one vop, could it be an evil duplicate ?
+                {
+                        if(myVops[0].timeInc==oldtimecode && !myVops[0].vopCoded)
                         {
-                                if(nbDuped)
-                                {
-                                        ADM_assert(targetIndex);
-                                        if(newIndex[targetIndex-1].intra==AVI_B_FRAME)
-                                        {
-                                                printf("Trying to fix wrong vop packed\n");
-                                                targetIndex--;
-                                                nbDuped--;
-                                        }
-                                }
+                          aprintf("Frame has same timecode and is not vop coded; skipping\n");
+                          img++;
+                          nbDuped--;
+                          continue;
                         }
-			memcpy(&newIndex[targetIndex],&_idx[img],sizeof(_idx[0]));
-			newIndex[targetIndex].intra=myVops[0].type;
-			aprintf("Only one frame found\n");
-			targetIndex++;
-			img++;
-			continue;
+                }
 		
-		}
-		nbDuped++;
 		// more than one vop, do up to the n-1th
 		// the 1st image starts at 0
 		myVops[0].offset=0;
@@ -151,24 +139,29 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 				
 		
 		uint32_t place;
-                if(nbVop>2)
+                //if(nbVop>2)
                 {
                         aprintf("At %u, %d vop!\n",img,nbVop);
                 }
-		for(uint32_t j=0;j<nbVop;j++)
-		{
+                /* The 1st one becomes our new timecode reference, a dupe will have the same timebase */
+                if(myVops[0].type!=AVI_B_FRAME)
+                    oldtimecode=myVops[0].timeInc;
 
-			place=targetIndex+j;
-			 if(!j)
-				newIndex[place].intra=myVops[j].type;
-			else
-				newIndex[place].intra=AVI_B_FRAME;
-			newIndex[place].size=myVops[j+1].offset-myVops[j].offset;
-			newIndex[place].offset=_idx[img].offset+myVops[j].offset;
-				
-		}				
-		targetIndex+=nbVop;	
-		img++;
+                for(uint32_t j=0;j<nbVop;j++)
+                {
+  
+                        place=targetIndex+j;
+                          if(!j)
+                                newIndex[place].intra=myVops[j].type;
+                        else
+                                newIndex[place].intra=AVI_B_FRAME;
+                        newIndex[place].size=myVops[j+1].offset-myVops[j].offset;
+                        newIndex[place].offset=_idx[img].offset+myVops[j].offset;
+                                
+                }				
+                targetIndex+=nbVop;	
+                img++;
+                nbDuped+=nbVop-1;;
 		
 	}
 	newIndex[0].intra=AVI_KEY_FRAME; // Force
@@ -202,13 +195,15 @@ _abortUnpack:
 // Search a start vop in it
 // and return also the vop type
 // needed to update the index
-uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop)
+uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop,uint32_t *timeincbits)
 {
 	
 	uint32_t off=0;
 	uint32_t globalOff=0;
 	uint32_t voptype;
 	uint8_t code;
+        uint32_t w,h,t;
+        uint32_t modulo,time_inc,vopcoded,vopType;
 	*nb=0;
 	while(begin<end-3)
 	{
@@ -228,14 +223,34 @@ uint32_t searchVop(uint8_t *begin, uint8_t *end,uint32_t *nb, vopS *vop)
 					case 3: printf("Glouglou\n");voptype=0;break;
 				
 				}
-        	    vop[*nb].offset=globalOff+off-4;
+        	                vop[*nb].offset=globalOff+off-4;
 				vop[*nb].type=voptype;
-				*nb=(*nb)+1;
-				begin+=off+1;
+
+				
+                                
+                                /* Get more info */
+                                if( extractVopInfo(begin+off, end-begin-off, *timeincbits,&vopType,&modulo, &time_inc,&vopcoded))
+                                {
+                                    aprintf(" frame found: vopType:%x modulo:%d time_inc:%d vopcoded:%d\n",vopType,modulo,time_inc,vopcoded);
+                                    vop[*nb].modulo=modulo;
+                                    vop[*nb].timeInc=time_inc;
+                                    vop[*nb].vopCoded=vopcoded;
+                                }
+                                *nb=(*nb)+1;
+                                begin+=off+1;
 				globalOff+=off+1;
 				continue;
 			
-			}	
+			}
+                else if(code==0x20 && off>=4	) // Vol start
+                {
+                  
+                   if(extractMpeg4Info(begin+off-4,end+4-off-begin,&w,&h,timeincbits))
+                   {
+                      aprintf("Found Vol header : w:%d h:%d timeincbits:%d\n",w,h,*timeincbits);
+                   }
+                  
+                }
         	begin+=off;
         	globalOff+=off;
         	continue;

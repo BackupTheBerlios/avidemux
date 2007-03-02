@@ -338,10 +338,10 @@ void putNvop(ADMBitstream *data,uint32_t time_inc)
   init_put_bits(&pbs, data->data+4, data->len-4);
     
   put_bits(&pbs, 2,2); // Bvop
-  put_bits(&pbs, 2,2); // Padding
+  put_bits(&pbs, 1,0); // Time base
   put_bits(&pbs, 1,0); // Marker
   if(time_inc!=0xFFFF)
-    put_bits(&pbs, time_inc,0); // time_inc
+    put_bits(&pbs, time_inc,0); // time_inc, it is somehow wrong
   put_bits(&pbs, 1,0); // Marker
   put_bits(&pbs, 1,0); // vop not coded
   
