@@ -48,10 +48,12 @@
 #include "ADM_osSupport/ADM_debug.h"
 
 uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h,uint32_t *time_inc);
-static  void updateUserData(uint8_t *start, uint32_t len);
 uint8_t ADM_findMpegStartCode(uint8_t *start, uint8_t *end,uint8_t *outstartcode,uint32_t *offset);
-static  void putNvop(ADMBitstream *data,uint32_t time_inc);
-
+uint8_t extractVopInfo(uint8_t *data, uint32_t len,uint32_t timeincbits,uint32_t *vopType,uint32_t *modulo, uint32_t *time_inc,uint32_t *vopcoded);
+    
+static  void updateUserData(uint8_t *start, uint32_t len);
+static  void putNvop(ADMBitstream *data,uint32_t time_incbits,uint32_t timeinc_val);
+ uint8_t getTimeCode(ADMBitstream *stream,uint32_t timebits,uint32_t *timeval);
 /**
       \fn  ~GenericAviSaveCopyUnpack
       \brief destructor
@@ -195,6 +197,7 @@ uint8_t GenericAviSaveCopyPack::writeVideoChunk (uint32_t frame)
   
   uint8_t    ret1;
  ADMCompressedImage img;
+ uint32_t oldtimeinc=0;
  
       img.data=vbuffer;      
       
@@ -219,6 +222,14 @@ uint8_t GenericAviSaveCopyPack::writeVideoChunk (uint32_t frame)
             ADMBitstream *current,*next;
                  current=lookAhead[curToggle];
                  next=lookAhead[curToggle^1];
+                 if(current->flags!=AVI_B_FRAME && current->flags!=1)
+                 {
+                  /* Get its timecode */
+                   if(!getTimeCode(current,time_inc,&oldtimeinc))
+                   {
+                      printf("WARNING cannot get timecode for frame %u\n",frame); 
+                   }
+                 }
            if(frame+2<_incoming->getInfo()->nb_frames)
            {
                
@@ -228,7 +239,7 @@ uint8_t GenericAviSaveCopyPack::writeVideoChunk (uint32_t frame)
                         return 0; 
                     }
                 // Curtoggle holds the current frame, curToggle ^1 hold the next frame
-                if(current->flags!=AVI_B_FRAME && next->flags==AVI_B_FRAME)
+                if(current->flags!=1 && current->flags!=AVI_B_FRAME && next->flags==AVI_B_FRAME)
                 {
                     aprintf("Packing frame :%u\n",frame);
                     // We need to pack this
@@ -238,7 +249,8 @@ uint8_t GenericAviSaveCopyPack::writeVideoChunk (uint32_t frame)
                     len+=next->len;
                     img.dataLength=len;
                     // Put nvop in next buffer
-                    putNvop(next,time_inc);
+                    putNvop(next,time_inc, oldtimeinc);
+                    next->flags=1; // Mark it as P, so that we can identify it later
                 }else
                 {
                     // Just send 
@@ -255,6 +267,7 @@ uint8_t GenericAviSaveCopyPack::writeVideoChunk (uint32_t frame)
               memcpy(vbuffer,current->data,len);
            }
            img.dataLength=len;
+           if(current->flags==1) current->flags=0; // Remove our marker
            _videoFlag=img.flags=current->flags;
            if(_videoFlag==AVI_KEY_FRAME)
            {
@@ -323,7 +336,7 @@ extern "C"
 #include "ADM_libraries/ADM_lavutil/bswap.h" 
 #include "ADM_libraries/ADM_lavcodec/bitstream.h" 
 }
-void putNvop(ADMBitstream *data,uint32_t time_inc)
+void putNvop(ADMBitstream *data,uint32_t timebits, uint32_t timeincval)
 {
   ADM_assert(data->data[0]==0);
   ADM_assert(data->data[1]==0);
@@ -332,21 +345,54 @@ void putNvop(ADMBitstream *data,uint32_t time_inc)
   
   
   ADM_assert(data->len>=6);
-  ADM_assert(time_inc);
+  ADM_assert(timebits);
   
   PutBitContext pbs;
   init_put_bits(&pbs, data->data+4, data->len-4);
-    
-  put_bits(&pbs, 2,2); // Bvop
+  //  printf("Timebits : %u\n",timebits);
+  put_bits(&pbs, 2,2); // It is a B vop so that we can detect it...
   put_bits(&pbs, 1,0); // Time base
-  put_bits(&pbs, 1,0); // Marker
-  if(time_inc!=0xFFFF)
-    put_bits(&pbs, time_inc,0); // time_inc, it is somehow wrong
-  put_bits(&pbs, 1,0); // Marker
+  put_bits(&pbs, 1,1); // Marker
+  put_bits(&pbs, timebits,timeincval); // time_inc, it is somehow wrong
+  put_bits(&pbs, 1,1); // Marker
   put_bits(&pbs, 1,0); // vop not coded
   
   flush_put_bits(&pbs);
   int nb=put_bits_count(&pbs)>>3;
   data->len=nb+4;
+}
+/**
+      \fn getTimeCode
+      \brief Retrieve the timeinc value from the bitstream given. timebits is the #of bits to code it (in vol header)
+*/
+uint8_t getTimeCode(ADMBitstream *stream,uint32_t timebits,uint32_t *timeval)
+{
+uint32_t off=0;
+uint32_t globalOff=0;
+uint8_t code;
+uint32_t modulo,time_inc,vopcoded,vopType;
+uint8_t *begin,*end;
+        begin=stream->data;
+        end=stream->data+stream->len;
+        while(begin<end-3)
+        {
+          if( ADM_findMpegStartCode(begin, end,&code,&off))
+          {
+                  if(code==0xb6)
+                  {
+                        
+                          /* Get more info */
+                          if( extractVopInfo(begin+off, end-begin-off, timebits,&vopType,&modulo, timeval,&vopcoded))
+                          {
+                              aprintf(" frame found: vopType:%x modulo:%d time_inc:%d vopcoded:%d\n",vopType,modulo,time_inc,vopcoded);
+                              return 1;
+                          }
+                          return 0;
+                  }
+                  begin+=off;
+          }
+          else return 0;
+        }
+        return 0;
 }
 //EOF

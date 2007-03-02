@@ -177,7 +177,7 @@ uint8_t extractVopInfo(uint8_t *data, uint32_t len,uint32_t timeincbits,uint32_t
               printf("Wrong marker1\n");
               return 0; 
            }
-           *modulo=imodulo;
+           
            /* Read time */
            tinc=get_bits(&s,timeincbits);
            /* Marker */
@@ -187,6 +187,7 @@ uint8_t extractVopInfo(uint8_t *data, uint32_t len,uint32_t timeincbits,uint32_t
               return 0; 
            }
            /* Vop coded */
+           *modulo=imodulo;
            *vopcoded=get_bits1(&s);
            *vopType=vp;
            *time_inc=tinc;
