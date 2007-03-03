@@ -350,10 +350,17 @@ void		PathStripName(char *str)
 const char *GetFileName(const char *str)
 {
 	char *filename;
+        char *filename2;
 #ifndef CYG_MANGLING		
 	filename = strrchr(str, '/');
+        
 #else
 	filename = strrchr(str, '\\');
+        filename2 = strrchr(str, '/');
+        if(filename2 && filename)
+        {
+          if(filename2>filename) filename=filename2; 
+        }
 #endif
 	if (filename)
 		return filename+1;
