@@ -41,13 +41,13 @@
 static FILTER_PARAM nullParam={0,{""}};
 
 
-SCRIPT_CREATE(telecide_script,ADMVideoTelecide,nullParam);
+
 extern  int32_t _l_w,_l_h;
 extern uint8_t *_l_p,*_l_c,*_l_n;
 extern uint8_t *_l_e,*_l_e2;
 
 BUILD_CREATE(telecide_create,ADMVideoTelecide);
-
+SCRIPT_CREATE(telecide_script,ADMVideoTelecide,nullParam);
 
 char *ADMVideoTelecide::printConf(void)
 {

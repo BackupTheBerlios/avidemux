@@ -79,7 +79,7 @@ printf(  "*********************\n");
 	REGISTERX("dgbob","DGBob","Bobber - convert each field into a full sized frame.",VF_DGBOB,1,dgbob_create,dgbob_script);
 
         REGISTERX("palfieldshift","PAL field shift","Shift fields by one. Useful for some PAL movies.",VF_PALSHIFT,1,addPALShift_create,addPALShift_script);	
-	REGISTER("palsmart","PAL smart","Smartly revert non constant PAL field shift.",VF_TELECIDE,1,telecide_create);
+	REGISTERX("palsmart","PAL smart","Smartly revert non constant PAL field shift.",VF_TELECIDE,1,telecide_create,telecide_script);
 //	REGISTERX("lavdeint","Lavcodec Deinterlacer",VF_LAVDEINT,1,lavdeint_create,lavdeint_script);
         
         
