@@ -201,7 +201,7 @@ uint32_t result=0;
                         "psllq          $48,  %%mm0 \n"
                         "psrlq          $48,  %%mm0 \n"
 
-                        "paddq          %%mm0, %%mm3 \n"
+                        "paddw          %%mm0, %%mm3 \n" /* PADDQ is SSE2 */
 
                 : : "r" (s1),"r" (s2)
                 );
