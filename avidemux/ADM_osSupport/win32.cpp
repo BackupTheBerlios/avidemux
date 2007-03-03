@@ -34,7 +34,7 @@ WSADATA wsaData;
 }
 
 #ifndef HAVE_GETTIMEOFDAY
-+extern "C"
+extern "C"
 {
 void gettimeofday(struct timeval *p, void *tz);
 }
