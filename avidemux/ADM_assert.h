@@ -5,13 +5,15 @@
 #define ADM_ASSERT_H
 
 #include <assert.h>
-#define ADM_assert(x) { if(!(x)) {assert(0);printf("Fatal error :"__FILE__"\n");  }}
+
+#define ADM_assert(x) { if(!(x)) {ADM_backTrack(__LINE__,__FILE__);  }}
 
 /* Functions we want to override to have better os support / debug / error control */
     
 #ifdef __cplusplus
 extern "C" {
 #endif
+void   ADM_backTrack(int lineno,const char *file);
 size_t ADM_fread (void *ptr, size_t size, size_t n, FILE *sstream);
 size_t ADM_fwrite (void *ptr, size_t size, size_t n, FILE *sstream);
 FILE  *ADM_fopen (const char *file, const char *mode);

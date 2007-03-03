@@ -76,6 +76,7 @@ JSBool facBitrate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
 JSBool facBar(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facRoText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool assertTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
 
 static JSFunctionSpec adm_functions[] = {
@@ -102,6 +103,7 @@ static JSFunctionSpec adm_functions[] = {
   {"dialogFactoryBar",        facBar,        0},
   {"dialogFactoryRoText",     facRoText,        0},
   {"crashTest",               crashTest,        0},
+  {"assertTest",               assertTest,        0},
   {0}
 };
 
@@ -629,6 +631,12 @@ JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
   
   int *foobar=NULL;
   *foobar=0; // CRASH!
+  return JS_TRUE;
+}
+JSBool assertTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+  
+  ADM_assert(0);
   return JS_TRUE;
 }
 

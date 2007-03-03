@@ -32,6 +32,14 @@ void installSigHandler()
 {
 
 }
+void ADM_backTrack(int lineno,const char *file)
+{
+ char bfr[1024];
+  
+ snprintf(bfr,1024,"Assert Failed at file %s, line %d\n",file,lineno);
+ GUI_Error_HIG("Fatal Error",bfr);
+ assert(0);
+}
 #else
 #include <signal.h>
 #include <execinfo.h>
@@ -138,9 +146,6 @@ static int demangle(int i,  uint8_t *string)
 void sig_segfault_handler(int signo)
 {
      
-     void *stack[20];
-     char **functions;
-     int count, i;
      static int running=0;
       if(running) 
       {
@@ -148,8 +153,13 @@ void sig_segfault_handler(int signo)
         exit(1);
       }
       running=0; 
-      
-      
+      ADM_backTrack(0,"");
+}
+void ADM_backTrack(int lineno,const char *file)
+{
+     void *stack[20];
+     char **functions;
+     int count, i;
       
       printf("\n*********** BACKTRACK **************\n");
       count = backtrace(stack, 20);
@@ -163,15 +173,21 @@ void sig_segfault_handler(int signo)
          }
       printf("*********** BACKTRACK **************\n");
      // Now use dialogFactory
-      diaElemReadOnlyText *txt[count];
+      char bfr[30];
+      snprintf(bfr,30,"Line:%u",lineno);
+      diaElemReadOnlyText *txt[count+1];
+      txt[0]=new diaElemReadOnlyText(bfr,file);
+      
       for(i=0;i<count;i++)
-          txt[i]=new diaElemReadOnlyText(functions[i],"Function:");
-      diaFactoryRun("BackTrace",count,(diaElem **)txt);
+          txt[i+1]=new diaElemReadOnlyText(functions[i],"Function:");
+      const char *title="Crash BackTrace";
+      if(lineno) title="Assert failed";
+      diaFactoryRun(title,count+1,(diaElem **)txt);
       
       //
      printf("Memory stat:\n");
      ADMImage_stat();
-     signo=0; // will keep GCC happy
+
      exit(1); // _exit(1) ???
 }
 #endif
