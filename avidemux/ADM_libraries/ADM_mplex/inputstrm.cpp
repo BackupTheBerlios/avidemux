@@ -22,6 +22,7 @@
 
 
 #include <config.h>
+#include <limits.h>
 #include <assert.h>
 
 #include "mjpeg_types.h"

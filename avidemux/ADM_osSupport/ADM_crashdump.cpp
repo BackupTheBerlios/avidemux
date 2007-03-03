@@ -25,6 +25,7 @@
 #include <math.h>
 
 #include "default.h"
+#include "ADM_toolkit/toolkit.hxx"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 
 #ifdef CYG_MANGLING

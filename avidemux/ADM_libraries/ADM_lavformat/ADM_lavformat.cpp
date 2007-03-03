@@ -266,11 +266,17 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 	c->flags=CODEC_FLAG_QSCALE;   
 	c->width = info->width;  
 	c->height = info->height; 
-	
+
+       AVRational fps25=(AVRational){1001,25025};
+       AVRational fps24=(AVRational){1001,24000};
+       AVRational fps30= (AVRational){1001,30000};
+       AVRational fpsfree= (AVRational){1000,_fps1000};
+
+        
     	switch(_fps1000)
 	{
 		case 25000:
-			 c->time_base= (AVRational){1001,25025};
+			 c->time_base= fps25; //(AVRational){1001,25025};
 			//c->frame_rate = 25025;  
 			//c->frame_rate_base = 1001;	
 			break;
@@ -282,25 +288,28 @@ uint8_t lavMuxer::open(const char *filename,uint32_t inbitrate, ADM_MUXER_TYPE t
 */
                         if(_type==MUXER_MP4 || _type==MUXER_PSP)
                         {
-                                 c->time_base= (AVRational){1001,24000};
+                                 c->time_base= fps24; //(AVRational){1001,24000};
                                 break;
                         }
 		case  29970:
-			 c->time_base= (AVRational){1001,30000};
+			 c->time_base=fps30;// (AVRational){1001,30000};
 			//c->frame_rate = 30000;  
 			//c->frame_rate_base = 1001;	
 			break;
 		default:
-                        if(_type==MUXER_MP4 || _type==MUXER_PSP)
-                        {
-                                c->time_base= (AVRational){1000,_fps1000};
-                                break;
-                        }
-                        else
-                        {
-                          GUI_Error_HIG(_("Incompatible frame rate"), NULL);
-                            return 0;
-                        }
+                      {
+                            if(_type==MUXER_MP4 || _type==MUXER_PSP)
+                            {
+                                    c->time_base=fpsfree;// (AVRational){1000,_fps1000};
+                                    break;
+                            }
+                            else
+                            {
+                              GUI_Error_HIG(_("Incompatible frame rate"), NULL);
+                                return 0;
+                            }
+                            }
+                        break;
 	}
 
 			
