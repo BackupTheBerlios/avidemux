@@ -27,7 +27,7 @@ typedef struct ADM_audioEncoderDescriptor
   uint32_t  maxChannels;
   uint32_t  paramSize;
   void     *param;
-};
+} ADM_audioEncoderDescriptor;
 
 /*!
   Base class for all audio encoder.It does the reverse of the bridge class and offers a proper GenericAudioStreamAPI

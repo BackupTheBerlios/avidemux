@@ -24,13 +24,13 @@
   This enumerate is used to give a more accurate error when no audio is output from
   an audio filter.
 */
-typedef enum AUD_Status
+typedef enum 
 {
   AUD_OK=1,           ///< No error
   AUD_ERROR,          ///< No data was caused by an error
   AUD_NEED_DATA,      ///< Filter was stalled, should not happend
   AUD_END_OF_STREAM   ///< End of incoming stream, this is the nominal error case
-};
+} AUD_Status;
 /*
     incoming --> incomingBuffer  || Processing  --> fill (into next in chain buffer)
           

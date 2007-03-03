@@ -25,12 +25,12 @@
 #include "../ADM_assert.h"
 #include "../ADM_colorspace/ADM_rgb.h"
 
-typedef enum ADM_ASPECT
+typedef enum 
 {
 	ADM_ASPECT_4_3=1,
 	ADM_ASPECT_16_9,
 	ADM_ASPECT_1_1
-};
+} ADM_ASPECT;
 // Avisynth compatibility layer
 
 //#define vi.num_frames _info.nb_frames
@@ -38,13 +38,13 @@ typedef enum ADM_ASPECT
 #define GetReadPtr GetWritePtr
 #define GetRowSize GetPitch
 
-typedef enum ADM_PLANE
+typedef enum 
 {
         PLANAR_Y=1,
         PLANAR_U=2,
         PLANAR_V=3
         
-};
+} ADM_PLANE;
 class ADMImage
 {
 public:

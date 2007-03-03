@@ -26,22 +26,22 @@
 
 #include "../ADM_audio/aviaudio.hxx"
 #include "ADM_compressedImage.h"
-typedef struct audioInfo
+typedef struct 
 {
     uint32_t encoding;  // Same as in wavheader
     uint32_t bitrate;   // In kbits
     uint32_t channels;  //
     uint32_t frequency; // In hertz
     int32_t  av_sync;   // in ms
-};
+} audioInfo;
 
-typedef struct aviInfo
+typedef struct 
 {
  	uint32_t   width,height;
 	uint32_t   fps1000;
 	uint32_t   nb_frames;
   	uint32_t   fcc;	
-}  ;
+} aviInfo;
 
 uint8_t WAV2AudioInfo(WAVHeader *hdr,audioInfo *info);
 /*

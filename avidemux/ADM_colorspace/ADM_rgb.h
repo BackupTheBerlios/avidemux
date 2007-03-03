@@ -20,7 +20,7 @@
  #define COLYUVRGB_H
 
 #define ADM_COLOR_IS_YUV 0x1000
- typedef enum ADM_colorspace
+ typedef enum 
  {
     ADM_COLOR_RGB24,
     ADM_COLOR_BGR24,
@@ -32,7 +32,7 @@
     ADM_COLOR_YV12 = ADM_COLOR_IS_YUV,
     ADM_COLOR_YUV422,
     ADM_COLOR_YUV411
- };
+ } ADM_colorspace;
 #define ADM_COLOR_BACKWARD 0x8000
 #define ADM_COLOR_MASK     0x7FFF
  /* Convert YV12 to RGB32, the reset must be called at least once before using scale */

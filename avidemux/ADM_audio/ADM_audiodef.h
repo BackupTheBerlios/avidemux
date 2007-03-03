@@ -16,7 +16,7 @@ typedef struct
 } WAVHeader;
 void printWavHeader(WAVHeader *hdr);
 
-typedef enum CHANNEL_CONF
+typedef enum 
 {
     CHANNEL_INVALID=0,
     CHANNEL_MONO,
@@ -30,7 +30,7 @@ typedef enum CHANNEL_CONF
     CHANNEL_DOLBY_PROLOGIC,
     CHANNEL_DOLBY_PROLOGIC2,
     CHANNEL_LAST
-};
+} CHANNEL_CONF;
 
 typedef struct
 {

@@ -17,7 +17,7 @@
 #define         CHECK_Z(x) {return 0;}
 #endif
 
-typedef enum ADM_CPU_CAPS
+typedef enum 
 {
         ADM_CPU_NONE   =1,
         ADM_CPU_MMX    =1<<1,
@@ -26,7 +26,7 @@ typedef enum ADM_CPU_CAPS
         ADM_CPU_SSE    =1<<4,
         ADM_CPU_SSE2   =1<<5,
         ADM_CPU_ALTIVEC=1<<6,
-};
+} ADM_CPU_CAPS;
 
 class CpuCaps
 {

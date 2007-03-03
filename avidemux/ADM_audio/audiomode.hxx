@@ -17,10 +17,10 @@
 
 #ifndef __AUDIOMODE
 #define __AUDIOMODE
-typedef enum  ADM_mode
+typedef enum  
 {
    	ADM_STEREO=1,
    	ADM_JSTEREO,
    	ADM_MONO
-} ;
+} ADM_mode;
 #endif

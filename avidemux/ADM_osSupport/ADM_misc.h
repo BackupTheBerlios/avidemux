@@ -17,18 +17,18 @@
 #define __ADM_MISC__
 //#include "time.h"
 
-typedef enum ADM_LOG_LEVEL
+typedef enum 
 {
         ADM_LOG_NONE=0,
         ADM_LOG_IMPORTANT=1,
         ADM_LOG_INFO=2,
         ADM_LOG_DEBUG=3
   
-};
-typedef struct ADM_date
+} ADM_LOG_LEVEL;
+typedef struct 
 {
   uint32_t hours,minutes,seconds; 
-};
+} ADM_date;
 void            TLK_getDate(ADM_date *date);
 void            PathSplit(char *str, char **root, char **ext);
 void	        PathStripName(char *str);
