@@ -101,7 +101,16 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 			}
 		aprintf("--Frame:%lu/%lu, len %lu, nbDuped%u\n",img,nbFrame,image.dataLength,nbDuped);
 		
-		
+		if(image.dataLength<=2)
+                {
+                  if(nbDuped)
+                  {
+                    aprintf("Skipping null frame\n");
+                    nbDuped--;
+                    img++;
+                    continue;  
+                  }
+                }
 		if(image.dataLength<6) // Too short to contain a valid vop header, just copy
 		{
                                 memcpy(&newIndex[targetIndex],&_idx[img],sizeof(_idx[0]));
@@ -121,7 +130,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
                   
                 }
                 /* We have one or more vop inside it...*/
-                if(nbVop==1) // only one vop, could it be an evil duplicate ?
+                if(nbVop==1 && nbDuped) // only one vop, could it be an evil duplicate ?
                 {
                         if(myVops[0].timeInc==oldtimecode && !myVops[0].vopCoded)
                         {
@@ -150,18 +159,33 @@ uint8_t OpenDMLHeader::unpackPacked( void )
                 for(uint32_t j=0;j<nbVop;j++)
                 {
   
-                        place=targetIndex+j;
+                        
                           if(!j)
-                                newIndex[place].intra=myVops[j].type;
+                                newIndex[targetIndex].intra=myVops[j].type;
                         else
-                                newIndex[place].intra=AVI_B_FRAME;
-                        newIndex[place].size=myVops[j+1].offset-myVops[j].offset;
-                        newIndex[place].offset=_idx[img].offset+myVops[j].offset;
-                                
+                                newIndex[targetIndex].intra=AVI_B_FRAME;
+                        newIndex[targetIndex].size=myVops[j+1].offset-myVops[j].offset;
+                        newIndex[targetIndex].offset=_idx[img].offset+myVops[j].offset;
+                        
+                        if(j)
+                        {
+                          if(nbDuped)
+                          {
+                              printf("WARNING*************** Missing one NVOP, dropping one b frame instead  at image %u\n",img);
+                              nbDuped--; 
+                          }else
+                          {
+                              nbDuped++;
+                              targetIndex++;
+                          }
+                        } else
+                        {
+                         targetIndex++; 
+                        }
                 }				
-                targetIndex+=nbVop;	
+                
                 img++;
-                nbDuped+=nbVop-1;;
+                
 		
 	}
 	newIndex[0].intra=AVI_KEY_FRAME; // Force

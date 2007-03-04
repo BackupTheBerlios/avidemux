@@ -72,6 +72,7 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
                 dataSize--;
                 idx++;
                 printf("VOL Header:\n");
+#if 0
                 if(dataSize<16)
                 {
                   mixDump(data+idx,dataSize);printf("\n");
@@ -80,6 +81,7 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
                 {
                   mixDump(data+idx,16);printf("\n");
                 }
+#endif
                 // Here we go !
                 GetBitContext s;
                 init_get_bits( &s,data+idx, dataSize*8);
@@ -125,7 +127,7 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
                   skip_bits(&s,1); //  Marker
                   mh=get_bits(&s,13);
                 // /Here we go
-                printf("%d x %d \n",mw,mh);
+                //printf("%d x %d \n",mw,mh);
                 *h=mh;
                 *w=mw;
                 return 1;;
