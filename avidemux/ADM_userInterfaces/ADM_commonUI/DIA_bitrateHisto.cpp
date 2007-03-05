@@ -161,15 +161,29 @@ uint32_t maxBFrame=0;
 		if(idx>19) idx=19;
 		display[idx]++;
 	}
+        
+        
+        
 
         // So now we have a distribution
 
 	for(k=0;k<20;k++) 
         {
           printf("%02u %04u %04u\n",k,(uint32_t)display[k],(uint32_t)(100.*display[k])/nb_frame);
-          display[k]=(100*display[k])/nb_frame;
+          display[k]=(1000*display[k])/nb_frame;
         }
 	
+        // Normalize
+        uint32_t mxx=0;
+        for(k=0;k<20;k++)
+        {
+           if(display[k]>mxx) mxx=display[k];
+        }   
+        for(k=0;k<20;k++)
+        {
+           display[k]=(display[k]*80)/mxx;
+        }   
+        
         
         diaElemBar *bar[20];
         char str[256];
@@ -186,6 +200,14 @@ uint32_t maxBFrame=0;
         diaElemUInteger nP(&nbPFrame,"Number of P frames",0,9999999);
         diaElemUInteger nB(&nbBFrame,"Number of B frames",0,9999999);
         diaElemUInteger nMB(&maxBFrame,"Max B frames",0,9999999);
+
+        mx.setRo();
+        med.setRo();
+        nI.setRo();
+        nP.setRo();
+        nB.setRo();
+        nMB.setRo();
+
         diaElemBar foo(0,"foo");
 #define P(X) bar[X] 
   

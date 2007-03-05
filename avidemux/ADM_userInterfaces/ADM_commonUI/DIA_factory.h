@@ -35,6 +35,7 @@ class diaElem
 {
   protected:
     void    setSize(int z) {size=z;};
+    int     readOnly;
 public:
   void *param;
   void *myWidget;
@@ -43,11 +44,13 @@ public:
   elemEnum mySelf;
   int       size; // Size of the widget in line
 
-  diaElem(elemEnum num) {paramTitle=NULL;param=NULL;mySelf=num;myWidget=NULL;size=1;};
-  int getSize(void) {return size;};
+  diaElem(elemEnum num) {paramTitle=NULL;param=NULL;mySelf=num;myWidget=NULL;size=1;readOnly=0;};
+          int getSize(void) {return size;};
   virtual ~diaElem() {};
   virtual void setMe(void *dialog, void *opaque,uint32_t line)=0;
   virtual void getMe(void)=0;
+          void setRo(void) {readOnly=1;}
+          void setRw(void) {readOnly=0;}
 };
 /*********************************************/
 class diaElemToggle : public diaElem
@@ -80,6 +83,7 @@ public:
   virtual ~diaElemUInteger() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
+  
 };
 /*************************************************/
 class diaElemBar : public diaElem

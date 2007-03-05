@@ -31,7 +31,7 @@
 
 
 diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip)
-  : diaElem(ELEM_TOGGLE)
+  : diaElem(ELEM_INTEGER)
 {
   param=(void *)intValue;
   paramTitle=toggleTitle;
@@ -73,7 +73,8 @@ void diaElemInteger::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_label_set_mnemonic_widget (GTK_LABEL(label), widget);
   
   myWidget=(void *)widget;
-  
+  if(readOnly)
+    gtk_widget_set_sensitive(widget,0);
 }
 void diaElemInteger::getMe(void)
 {
@@ -88,7 +89,7 @@ void diaElemInteger::getMe(void)
 //**********************************************************************************
 
 diaElemUInteger::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip)
-  : diaElem(ELEM_TOGGLE)
+  : diaElem(ELEM_INTEGER)
 {
   param=(void *)intValue;
   paramTitle=toggleTitle;
@@ -130,7 +131,10 @@ void diaElemUInteger::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_label_set_mnemonic_widget (GTK_LABEL(label), widget);
   
   myWidget=(void *)widget;
-  
+
+  if(readOnly)
+      gtk_widget_set_sensitive(widget,0);
+
 }
 void diaElemUInteger::getMe(void)
 {
