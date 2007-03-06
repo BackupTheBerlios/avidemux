@@ -974,7 +974,7 @@ static int mov_write_edts_tag(ByteIOContext *pb, MOVTrack *track)
     put_be32(pb, 0x00000000);
     // /MEANX
 
-    put_be32(pb, 0x00010000);
+    put_be32(pb, 0x1); // MEANXput_be32(pb, 0x00010000);
     return 0x24;
 }
 
