@@ -105,6 +105,30 @@ public:
   virtual         ~dmx_videoIndexerMpeg2();
              
 };
+/**************************************************/
+/* Class to index H264 payload in ES/PS/TS/MSDVR */
+/**************************************************/
+class dmx_videoIndexerH264 :public dmx_videoIndexer
+{
+protected:
+          uint64_t firstPicPTS;
+          uint32_t grabbing;
+          uint32_t seq_found;
+          
+          
+          uint8_t gopDump(uint64_t abs,uint64_t rel);
+          uint8_t gopUpdate(void);
+          uint8_t dumpPts(uint64_t firstPts);
+          uint8_t Push(uint32_t ftype,uint64_t abs,uint64_t rel);
+public:
+                  dmx_videoIndexerH264(dmx_runData *run);
+ 
+          uint8_t run(void);
+          void    cleanup(void);
+  virtual         ~dmx_videoIndexerH264();
+             
+};
+
 /********************************************************/
 
 #endif

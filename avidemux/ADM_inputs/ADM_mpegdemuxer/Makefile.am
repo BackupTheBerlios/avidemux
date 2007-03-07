@@ -9,7 +9,7 @@ libADM_mpegdemuxer_a_METASOURCES = AUTO
 libADM_mpegdemuxer_a_SOURCES = dmx_io.cpp dmx_demuxer.cpp dmx_indexer.cpp dmx_demuxerES.cpp \
 dmx_video.cpp dmx_demuxerPS.cpp dmx_identify.cpp dmx_audio.cpp dmx_probe.cpp \
 dmx_probeTS.cpp dmx_demuxerTS.cpp dmx_demuxerMSDVR.cpp dmx_demuxerMSDVR.h \
-dmx_indexer_mpeg2.cpp
+dmx_indexer_mpeg2.cpp dmx_index_h264.cpp
 
 
 EXTRA_DIST = dmx_audio.cpp      dmx_demuxerEs.h  \

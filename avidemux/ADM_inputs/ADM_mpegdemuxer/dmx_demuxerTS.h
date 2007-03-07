@@ -88,7 +88,7 @@ class dmx_demuxerTS: public dmx_demuxer
                 
                   uint32_t        read(uint8_t *w,uint32_t len);
                   uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts, uint64_t *dts);
-
+                  uint8_t         syncH264( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts,uint64_t *dts);
                   uint8_t         hasAudio(void) { return 1;} // MAYBE has audio
                   uint8_t         getStats(uint64_t *stat);
                   uint8_t         changePid(uint32_t newpid,uint32_t newpes);

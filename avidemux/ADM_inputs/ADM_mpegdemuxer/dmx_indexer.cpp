@@ -85,11 +85,16 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
 
 
         mpegType=dmxIdentify(realname);
+#ifndef ADM_DEBUG
         if(mpegType==DMX_MPG_UNKNOWN)
         {
                 delete [] realname;
                 return 0;
         }
+#else
+      mpegType=DMX_MPG_ES;
+      payloadType=DMX_PAYLOAD_H264;
+#endif
         switch(mpegType)
         {
                case DMX_MPG_MSDVR:
@@ -204,8 +209,10 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                             idxer=new dmx_videoIndexerMpeg2(&run);
                             break;
                   }
-          case DMX_PAYLOAD_MPEG4:
+          case DMX_PAYLOAD_MPEG4:ADM_assert(0);
           case DMX_PAYLOAD_H264:
+                            idxer=new dmx_videoIndexerH264(&run);
+                            break;
           default: ADM_assert(0);
         }                
         

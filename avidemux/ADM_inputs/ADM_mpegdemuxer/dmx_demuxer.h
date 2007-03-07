@@ -59,7 +59,9 @@ class dmx_demuxer
                 virtual uint32_t        read(uint8_t *w,uint32_t len)=0;
    	        virtual uint8_t		read8i(void)=0;
    	        virtual uint16_t	read16i(void)=0;
-		virtual uint32_t	read32i(void)=0;                
+		virtual uint32_t	read32i(void)=0;
+                virtual uint8_t         syncH264( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts, uint64_t *dts) {return 0;};
+
 		virtual uint8_t         sync( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts, uint64_t *dts)=0;
 		virtual uint8_t		changePid(uint32_t pid,uint32_t pes) {return 0;}
 };	

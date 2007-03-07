@@ -117,4 +117,51 @@ uint32_t val,hnt;
                 return 1;
 }
 
+/**
+          \fn syncH264
+          \brief search h264 startcode 00 00 00 01
+*/
+uint8_t         dmx_demuxerES::syncH264( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts,uint64_t *dts)
+{
+uint32_t val,hnt;
+         *r=0;
+                *pts=ADM_NO_PTS;
+                *dts=ADM_NO_PTS;
+
+                val=0;
+                hnt=0;                  
+                        
+                // preload
+                hnt=(read8i()<<24)+(read8i()<<16) + (read8i()<<8) +read8i();
+                if(_lastErr)
+                {
+                        _lastErr=0;
+                        printf("\n io error , aborting sync\n");
+                        return 0;       
+                }
+                
+                while((hnt!=1))
+                {
+                                        
+                        hnt<<=8;
+                        val=read8i();                                   
+                        hnt+=val;
+                        
+                                        
+                        if(_lastErr)
+                        {
+                             _lastErr=0;
+                            printf("\n io error , aborting sync\n");
+                            return 0;
+                         }
+                                                                        
+                }
+                                
+                *stream=read8i();
+                parser->getpos(abs);
+                *abs-=5;
+                return 1;
+}
+
+          
           

@@ -706,3 +706,78 @@ uint8_t dmx_demuxerTS::getInfoPSI(uint32_t *oconsumed,uint32_t *olen)
         return 1;
 
 }
+/**
+      \fn    syncH264
+      \brief Search H264 startcode in the stream
+*/
+uint8_t         dmx_demuxerTS::syncH264( uint8_t *stream,uint64_t *abs,uint64_t *r,uint64_t *pts,uint64_t *dts)
+{
+uint32_t val,hnt;
+retry:
+         *r=0;
+
+                val=0;
+                hnt=0;
+
+                // preload
+                hnt=(read8i()<<24) + (read8i()<<16) +(read8i()<<8)+(read8i());
+                if(_lastErr)
+                {
+                        _lastErr=0;
+                        printf("\n io error , aborting sync\n");
+                        return 0;       
+                }
+
+                while((hnt!=1))
+                {
+
+                        hnt<<=8;
+                        val=read8i();
+                        hnt+=val;
+ 
+                        if(_lastErr)
+                        {
+                             _lastErr=0;
+                            printf("\n io error , aborting sync\n");
+                            return 0;
+                         }
+
+                }
+
+                *stream=read8i();
+                // Case 1 : assume we are still in the same packet
+                if(_pesBufferIndex>=5)
+                {
+                        *abs=_pesBufferStart;
+                        *r=_pesBufferIndex-5;
+                        *pts=_pesPTS;
+                        *dts=_pesDTS;
+                }
+                else
+                {       // pick what is needed from oldPesStart etc...
+                        // since the beginning in the previous packet
+                        uint32_t left=5-_pesBufferIndex;
+                                 if(left>_oldPesLen)
+                                 { // previous Packet which len is very shoty
+                                   // Ignore
+                                   _pesBufferIndex=0;
+                                   printf("Ignoring too short packet");
+                                   goto retry;
+                                 }
+                                 left=_oldPesLen-left;
+#if 0
+                                 printf("Next packet : %I64X Len :%lu, using previous packet %I64X len:%u as pos=%lu\n",
+                                 		_pesBufferStart,_pesBufferLen,_oldPesStart,_oldPesLen,_pesBufferIndex);
+#endif
+                                 if(left>_oldPesLen)
+                                {
+                                        printf("Need %lu bytes from previous packet, which len is %lu\n",left,_oldPesLen);
+                                        ADM_assert(0);
+                                }
+                                *abs=_oldPesStart;
+                                *r=left;
+                                *pts=_oldPTS;
+                                *dts=_oldDTS;
+                }
+                return 1;
+}
