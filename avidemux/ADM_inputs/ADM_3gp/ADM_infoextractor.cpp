@@ -37,7 +37,9 @@ extern "C"
 {
 #include "common.h"
 #include "bswap.h"
+#define INT_MAX (0x7FFFFFFF)
 #include "ADM_lavcodec/bitstream.h"
+#include "ADM_lavcodec/golomb.h"
 }
 /*
     Extract width & height from vol header passed as arg
@@ -53,7 +55,7 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
     uint32_t timeVal;
     
     //mixDump(data,dataSize);
-    printf("\n");
+    //printf("\n");
     while(1)
     {
         uint32_t startcode=0xffffffff;
@@ -66,13 +68,14 @@ uint8_t extractMpeg4Info(uint8_t *data,uint32_t dataSize,uint32_t *w,uint32_t *h
         }
         if(dataSize>2)
         {
-            printf("Startcodec:%x\n",data[idx]);
+            //printf("Startcodec:%x\n",data[idx]);
             if((data[idx]&0xF0)==0x20) //VOL start
             {
                 dataSize--;
                 idx++;
-                printf("VOL Header:\n");
 #if 0
+                printf("VOL Header:\n");
+
                 if(dataSize<16)
                 {
                   mixDump(data+idx,dataSize);printf("\n");
@@ -240,4 +243,68 @@ uint32_t val;
                  }
                  return 0;
 }
+/**
+    \fn extractSPSInfo
+    \brief Extract info from H264 SPS
+    See 7.3.2.1 of 14496-10
+*/
+uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hheight)
+{
+   GetBitContext s;
+   
+   uint32_t profile,constraint,level,pic_order_cnt_type,w,h;
+   
+           init_get_bits( &s,data, len*8);
+            
+           profile=get_bits(&s,8);
+           constraint=get_bits(&s,8)>>5;
+           level=get_bits(&s,8);
+           
+           if(profile>100) // ?? Borrowed from H264.C/FFMPEG
+           {
+              printf("Warning : High profile\n");
+              if(get_ue_golomb(&s) == 3) //chroma_format_idc
+                get_bits1(&s);  //residual_color_transform_flag
+            get_ue_golomb(&s);  //bit_depth_luma_minus8
+            get_ue_golomb(&s);  //bit_depth_chroma_minus8
+            get_bits1(&s);
+           }    // /??
+           
+           get_ue_golomb(&s); // Seq parameter set id
+           get_ue_golomb(&s); // log2_max_frame_num_minus4
+           if(!(pic_order_cnt_type=get_ue_golomb(&s))) // pic_order_cnt_type
+           {
+              get_ue_golomb(&s); //log2_max_pic_order_cnt_lsb_minus4
+           }else
+           {
+             if(pic_order_cnt_type==1)
+             {
+                 get_bits1(&s);   //delta_pic_order_always_zero_flag
+                 get_se_golomb(&s);   //offset_for_non_ref_pic
+                 get_se_golomb(&s);  // offset_for_top_to_bottom_field
+                 int i=get_ue_golomb(&s);  //num_ref_frames_in_pic_order_cnt_cycle
+
+                 for(int j=0;j<i;j++)
+                 {
+                      get_se_golomb(&s);
+                 }
+             }else 
+             {
+               printf("Error in SPS\n");
+               return 0;
+             }
+           }
+           get_ue_golomb(&s);     //num_ref_frames
+           get_bits1(&s);         // gaps_in_frame_num_value_allowed_flag
+           w=get_ue_golomb(&s);   //pic_width_in_mbs_minus1
+           h=get_ue_golomb(&s);   //pic_height_in_mbs_minus1
+           printf("%d\n",w); 
+           printf("%d\n", h); 
+            *wwidth=(w+1)*16;
+            *hheight=(h+1)*16*2; /* Fixme : frame_mbs_only_flag in slice header!! */
+
+           
+           return 1;
+}
+
 //EOF

@@ -50,25 +50,8 @@
 #define aprintf printf
 static const char Type[5]={'X','I','P','B','P'};
 
-static const uint32_t FPS[16]={
-                0,                      // 0
-                23976,          // 1 (23.976 fps) - FILM
-                24000,          // 2 (24.000 fps)
-                25000,          // 3 (25.000 fps) - PAL
-                29970,          // 4 (29.970 fps) - NTSC
-                30000,          // 5 (30.000 fps)
-                50000,          // 6 (50.000 fps) - PAL noninterlaced
-                59940,          // 7 (59.940 fps) - NTSC noninterlaced
-                60000,          // 8 (60.000 fps)
-                0,                      // 9
-                0,                      // 10
-                0,                      // 11
-                0,                      // 12
-                0,                      // 13
-                0,                      // 14
-                0                       // 15
-        };
 
+extern uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hheight);
 
 dmx_videoIndexerH264::dmx_videoIndexerH264(dmx_runData *run) : dmx_videoIndexer(run)
 {
@@ -127,7 +110,7 @@ uint8_t pic_started=0;
               //if(streamid>31) continue;
              // printf("Found NAL : %d 0x %x\n",streamid,streamid);
 #define T(x) case NAL_##x: printf(#x" found\n");break;
-#if 1
+#if 0
                 switch(streamid)
                 {
                     T(NON_IDR);
@@ -176,11 +159,22 @@ uint8_t pic_started=0;
                               _frames[0].abs=syncAbs;
                               _frames[0].rel=syncRel;
                               //
-                              seq_found=1;
+                              
                               // FIXME
-                              _run->imageW=1920;
-                              _run->imageH= 1088;
+/*                              _run->imageW=1920;
+                              _run->imageH= 1088;*/
                               _run->imageFPS=25000; 
+                              //
+                              {
+                                uint8_t buffer[60] ; // should be enough
+                                uint64_t xA,xR;
+                                _run->demuxer->getPos(&xA,&xR);
+                                _run->demuxer->read(buffer,60);
+                                if(extractSPSInfo(buffer,60,&( _run->imageW),&( _run->imageH)))
+                                {
+                                    seq_found=1;  
+                                }
+                              }
                               // Fixme w*h*fps
                               break;
                       case NAL_IDR: // IDR
