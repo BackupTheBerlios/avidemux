@@ -110,7 +110,7 @@ uint8_t pic_started=0;
               //if(streamid>31) continue;
              // printf("Found NAL : %d 0x %x\n",streamid,streamid);
 #define T(x) case NAL_##x: printf(#x" found\n");break;
-#if 0
+#if 1
                 switch(streamid)
                 {
                     T(NON_IDR);
@@ -132,79 +132,78 @@ uint8_t pic_started=0;
                     _run->work->update(syncAbs,_run->totalFileSize,_run->nbImage,
                             _run->lastStamp.hh,_run->lastStamp.mm,_run->lastStamp.ss);
               }
+              /* Till we have a SPS no need to continue */
+              if(!seq_found && streamid!=NAL_SPS) continue;
+              if(!seq_found)
+              {
+                    // Our firt frame is here
+                    // Important to initialize the mpeg decoder !
+                    
+                    _run->imageFPS=25000; 
+                    //
+                    
+                      uint8_t buffer[60] ; // should be enough
+                      uint64_t xA,xR;
+                      _run->demuxer->getPos(&xA,&xR);
+                      _run->demuxer->read(buffer,60);
+                      if(extractSPSInfo(buffer,60,&( _run->imageW),&( _run->imageH)))
+                      {
+                          seq_found=1;
+                           Push(1,syncAbs,syncRel);
+                           _frames[0].abs=syncAbs;
+                           _frames[0].rel=syncRel;
+                           _run->demuxer->stamp();
+                      }
+                      _run->demuxer->setPos(xA,xR);
+                      grabbing=1;
+                      continue;
+              }
+              
+              // Ignore multiple chunk of the same pic
+              
+              if((streamid==NAL_NON_IDR || streamid==NAL_IDR)&&pic_started) continue;
               if(_run->work->isAborted()) return 0;
+              
               switch(streamid)
                       {
                       case NAL_AU_DELIMITER:
-                              if(!seq_found) continue;
                               if(pic_started)
-                              {
-                                    
-                              }
-                              pic_started=0;
+                                  pic_started=0;
+                              grabbing=0;
                               break;
                       case NAL_SPS: // 
                               pic_started=0;
+                              grabbing=1;
                               aprintf("Sps %d\n",_run->nbGop);
-                              if(grabbing) continue;
-                              grabbing=1;    
-                              
                               gopDump(syncAbs,syncRel);
-                              if(seq_found)
-                              {
-                                      continue;
-                              }
-                              // Our firt frame is here
-                              // Important to initialize the mpeg decoder !
-                              _frames[0].abs=syncAbs;
-                              _frames[0].rel=syncRel;
-                              //
-                              
-                              // FIXME
-/*                              _run->imageW=1920;
-                              _run->imageH= 1088;*/
-                              _run->imageFPS=25000; 
-                              //
-                              {
-                                uint8_t buffer[60] ; // should be enough
-                                uint64_t xA,xR;
-                                _run->demuxer->getPos(&xA,&xR);
-                                _run->demuxer->read(buffer,60);
-                                if(extractSPSInfo(buffer,60,&( _run->imageW),&( _run->imageH)))
-                                {
-                                    seq_found=1;  
-                                }
-                              }
-                              // Fixme w*h*fps
+                              _run->nbPushed=1;
                               break;
                       case NAL_IDR: // IDR
                               aprintf("IDR %d\n",_run->nbGop);
                               uint32_t gop;   
-                              if(!seq_found) continue;
-                              if(pic_started) break;
+                              if(grabbing) 
+                              {
+                                _frames[_run->nbPushed].type=1;
+                                pic_started=1;
+                                continue;
+                              }
                               gopDump(syncAbs,syncRel);
+                              _frames[0].type=1;
                               if(firstPicPTS==ADM_NO_PTS && pts!=ADM_NO_PTS)
                                       firstPicPTS=pts;
-                              grabbing=0;
                               _run->totalFrame++;
-                              ftype=1; // I frame
-                              Push(ftype,syncAbs,syncRel);
                               pic_started=1;
                               break;
                       case NAL_NON_IDR : // picture
-                              if(pic_started) break;
-                              aprintf("pic \n");
-                              if(!seq_found)
-                              { 
-                                      continue;
-                                      printf("No sequence start yet, skipping..\n");
+                              
+                              if(grabbing) 
+                              {
+                                _frames[_run->nbPushed].type=ftype;
+                                pic_started=1;
+                                continue;
                               }
-                              if(firstPicPTS==ADM_NO_PTS && pts!=ADM_NO_PTS)
-                                      firstPicPTS=pts;
-                              grabbing=0;
                               _run->totalFrame++;
                               ftype=2; // P frame
-#define USING dts
                               Push(ftype,syncAbs,syncRel);
                               pic_started=1;
                               break;
@@ -213,6 +212,7 @@ uint8_t pic_started=0;
                       }
                 
       }
+    _frames[0].type=1;
     return 1; 
 }
 
@@ -237,7 +237,7 @@ uint8_t dmx_videoIndexerH264::Push(uint32_t ftype,uint64_t abs,uint64_t rel)
         if(_run->nbPushed)
         {                
                 _frames[_run->nbPushed-1].size=_run->demuxer->elapsed();
-                if(_run->nbPushed==1) _frames[_run->nbPushed-1].size-=2;
+               // if(_run->nbPushed==1) _frames[_run->nbPushed-1].size-=2;
                 _frames[_run->nbPushed].abs=abs;
                 _frames[_run->nbPushed].rel=rel;        
                 _run->demuxer->stamp();
@@ -291,15 +291,18 @@ dmx_demuxer *demuxer=_run->demuxer;
 uint8_t dmx_videoIndexerH264::gopDump(uint64_t abs,uint64_t rel)
 {
   dmx_demuxer *demuxer=_run->demuxer;
-        if(!_run->nbPushed && !_run->nbImage) demuxer->stamp();
+  
         if(!_run->nbPushed) return 1;
 
 uint64_t stats[_run->nbTrack];
 
-        _frames[_run->nbPushed-1].size=demuxer->elapsed()+2;
+        _frames[_run->nbPushed-1].size=demuxer->elapsed();
         qfprintf(_run->fd,"V %03u %06u %02u ",_run->nbGop,_run->nbImage,_run->nbPushed);
 
         // For each picture Type : abs position : relat position : size
+        
+        // ???? Force 1st frame to be IDR
+        if(!_run->nbGop) _frames[0].type=1;
         for(uint32_t i=0;i<_run->nbPushed;i++) 
         {
 
@@ -339,6 +342,7 @@ uint64_t stats[_run->nbTrack];
                 
         _frames[0].abs=abs;
         _frames[0].rel=rel;
+        _frames[0].type=1;
         demuxer->stamp();
         return 1;
         
