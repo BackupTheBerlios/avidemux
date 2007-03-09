@@ -148,20 +148,24 @@ uint8_t pic_started=0;
                       _run->demuxer->read(buffer,60);
                       if(extractSPSInfo(buffer,60,&( _run->imageW),&( _run->imageH)))
                       {
-                          seq_found=1;
-                           Push(1,syncAbs,syncRel);
-                           _frames[0].abs=syncAbs;
-                           _frames[0].rel=syncRel;
+                            seq_found=1;
+                            startFrame(1,syncAbs,syncRel);
+                           _run->demuxer->setPos(xA,xR);
                            _run->demuxer->stamp();
-                      }
-                      _run->demuxer->setPos(xA,xR);
+                      }else
+                        _run->demuxer->setPos(xA,xR);
+                      
                       grabbing=1;
                       continue;
               }
               
               // Ignore multiple chunk of the same pic
               
-              if((streamid==NAL_NON_IDR || streamid==NAL_IDR)&&pic_started) continue;
+              if((streamid==NAL_NON_IDR || streamid==NAL_IDR)&&pic_started) 
+              {
+                aprintf("Still capturing, ignore\n");
+                continue;
+              }
               if(_run->work->isAborted()) return 0;
               
               switch(streamid)
@@ -176,19 +180,22 @@ uint8_t pic_started=0;
                               grabbing=1;
                               aprintf("Sps %d\n",_run->nbGop);
                               gopDump(syncAbs,syncRel);
-                              _run->nbPushed=1;
                               break;
                       case NAL_IDR: // IDR
                               aprintf("IDR %d\n",_run->nbGop);
                               uint32_t gop;   
                               if(grabbing) 
                               {
-                                _frames[_run->nbPushed].type=1;
+                                aprintf("Grabbing, updating type\n");
+                                updateFrameType(1);
                                 pic_started=1;
+                                grabbing=0;
                                 continue;
                               }
+                              aprintf("Dumping gop-\n");
                               gopDump(syncAbs,syncRel);
-                              _frames[0].type=1;
+                              aprintf("New Frame-\n");
+                              updateFrameType(1);
                               if(firstPicPTS==ADM_NO_PTS && pts!=ADM_NO_PTS)
                                       firstPicPTS=pts;
                               _run->totalFrame++;
@@ -198,13 +205,23 @@ uint8_t pic_started=0;
                               
                               if(grabbing) 
                               {
-                                _frames[_run->nbPushed].type=ftype;
+                                updateFrameType(2);
                                 pic_started=1;
+                                grabbing=0;
+                                aprintf("Grabbing, updating type-2-\n");
                                 continue;
                               }
                               _run->totalFrame++;
-                              ftype=2; // P frame
-                              Push(ftype,syncAbs,syncRel);
+                              if(_run->nbPushed>MAX_PUSHED/2)
+                              {
+                                aprintf("Gop too big, dumping-\n");
+                                gopDump(syncAbs,syncRel);
+                                updateFrameType(2); 
+                              }else
+                              {
+                                aprintf("Staring new frame-\n");
+                                startFrame(2,syncAbs,syncRel);
+                              }
                               pic_started=1;
                               break;
                       default:
@@ -212,43 +229,51 @@ uint8_t pic_started=0;
                       }
                 
       }
-    _frames[0].type=1;
+    _frames[0].type=1; /* Always starts with an infra */
     return 1; 
 }
 
 
 
-/**** Push a frame
-There is a +- 2 correction when we switch gop
-as in the frame header we read 2 bytes
-Between frames, the error is self cancelling.
 
-**/
 /**
       \fn Push
       \brief Add a frame to the current gop
 
 */
-uint8_t dmx_videoIndexerH264::Push(uint32_t ftype,uint64_t abs,uint64_t rel)
+uint8_t dmx_videoIndexerH264::startFrame(uint32_t ftype,uint64_t abs,uint64_t rel)
 {
                                             
         _frames[_run->nbPushed].type=ftype;
         
-        if(_run->nbPushed)
-        {                
+        if(_run->nbPushed) // Update previous if it exists
+        {
+                aprintf("Start frame : empty\n");
                 _frames[_run->nbPushed-1].size=_run->demuxer->elapsed();
-               // if(_run->nbPushed==1) _frames[_run->nbPushed-1].size-=2;
-                _frames[_run->nbPushed].abs=abs;
-                _frames[_run->nbPushed].rel=rel;        
-                _run->demuxer->stamp();
         
+        }else
+        {
+         aprintf("Start frame %u  in gop\n",_run->nbPushed); 
         }
-        //aprintf("\tpushed %d %"LLX"\n",nbPushed,abs);
+        _frames[_run->nbPushed].abs=abs;
+        _frames[_run->nbPushed].rel=rel;        
+        _run->demuxer->stamp();
         _run->nbPushed++;
         
         ADM_assert(_run->nbPushed<MAX_PUSHED);
         return 1;
 
+}
+/**
+    \fn updateFrameType
+    \brief update the current frame type.Needed as we start from SPS if present
+*/
+uint8_t dmx_videoIndexerH264::updateFrameType(uint32_t ftype)
+{
+  ADM_assert(_run->nbPushed);
+  _frames[_run->nbPushed-1].type=ftype;
+  aprintf("updateFrameType %u for frame %u -1 in gop\n",ftype,_run->nbPushed); 
+  return 1;
 }
 /**
     \fn dumpPts
@@ -292,17 +317,17 @@ uint8_t dmx_videoIndexerH264::gopDump(uint64_t abs,uint64_t rel)
 {
   dmx_demuxer *demuxer=_run->demuxer;
   
+        /* No frame */
         if(!_run->nbPushed) return 1;
 
 uint64_t stats[_run->nbTrack];
 
-        _frames[_run->nbPushed-1].size=demuxer->elapsed();
+        _frames[_run->nbPushed-1].size=demuxer->elapsed();    // Update previous frame
         qfprintf(_run->fd,"V %03u %06u %02u ",_run->nbGop,_run->nbImage,_run->nbPushed);
 
-        // For each picture Type : abs position : relat position : size
-        
-        // ???? Force 1st frame to be IDR
+        /* First frame must be IDR */
         if(!_run->nbGop) _frames[0].type=1;
+        
         for(uint32_t i=0;i<_run->nbPushed;i++) 
         {
 
@@ -339,11 +364,7 @@ uint64_t stats[_run->nbTrack];
         _run->nbGop++;
         _run->nbImage+=_run->nbPushed;
         _run->nbPushed=0;
-                
-        _frames[0].abs=abs;
-        _frames[0].rel=rel;
-        _frames[0].type=1;
-        demuxer->stamp();
+        startFrame(2,abs,rel);
         return 1;
         
 }

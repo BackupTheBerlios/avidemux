@@ -119,7 +119,8 @@ protected:
           uint8_t gopDump(uint64_t abs,uint64_t rel);
           uint8_t gopUpdate(void);
           uint8_t dumpPts(uint64_t firstPts);
-          uint8_t Push(uint32_t ftype,uint64_t abs,uint64_t rel);
+          uint8_t startFrame(uint32_t ftype,uint64_t abs,uint64_t rel);
+          uint8_t updateFrameType(uint32_t ftypel);
 public:
                   dmx_videoIndexerH264(dmx_runData *run);
  
