@@ -41,6 +41,9 @@ public:
 	static JSBool isVopPacked(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool hasGmc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 	static JSBool hasQpel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        static JSBool getFrameSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+	static JSBool getFrameType(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+
 
 	static JSPropertySpec avidemuxvideo_properties[];
 	static JSFunctionSpec avidemuxvideo_methods[];

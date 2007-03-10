@@ -67,6 +67,8 @@ JSFunctionSpec ADM_JSAvidemuxVideo::avidemuxvideo_methods[] =
         { "isVopPacked", isVopPacked, 0, 0, 0 },        // Postprocess
         { "hasQpel", hasQpel, 0, 0, 0 },        // Postprocess
         { "hasGmc", hasGmc, 0, 0, 0 },        // Postprocess
+        { "frameSize", getFrameSize, 1, 0, 0 },        // FrameSize
+        { "frameType", getFrameType, 1, 0, 0 },        // Postprocess
 	{ 0 }
 };
 
@@ -514,3 +516,40 @@ uint32_t info;
         if(info & ADM_QPEL_ON) *rval=JS_TRUE;
         return JS_TRUE;
 }// end PostProcess
+
+
+JSBool ADM_JSAvidemuxVideo::getFrameSize(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+uint32_t info;
+uint32_t frame;
+uint32_t sz;
+        if(argc != 1)
+          return JS_FALSE;
+        
+        enterLock();
+        frame=JSVAL_TO_INT(argv[0]);
+        if(!video_body->getFrameSize(frame,&sz)) return JS_FALSE;
+        leaveLock(); 
+        
+        *rval=INT_TO_JSVAL(sz);
+        return JS_TRUE;
+}// end PostProcess
+JSBool ADM_JSAvidemuxVideo::getFrameType(JSContext *cx, JSObject *obj, uintN argc, 
+                                       jsval *argv, jsval *rval)
+{// begin PostProcess
+uint32_t info;
+uint32_t frame;
+uint32_t sz;
+        if(argc != 1)
+          return JS_FALSE;
+        
+        enterLock();
+        frame=JSVAL_TO_INT(argv[0]);
+        if(!video_body->getFlags(frame,&sz)) return JS_FALSE;
+        leaveLock(); 
+        
+        *rval=INT_TO_JSVAL(sz);
+        return JS_TRUE;
+}// end PostProcess
+/* EOF */
