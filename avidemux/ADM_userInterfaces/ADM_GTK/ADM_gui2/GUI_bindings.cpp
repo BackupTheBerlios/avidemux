@@ -48,6 +48,7 @@
 #include "../ADM_editor/ADM_outputfmt.h"
 #include "../prefs.h"
 
+uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h,void *r);
 
 
 #define WOD(x) lookup_widget (guiRootWindow,#x)
@@ -216,6 +217,7 @@ buttonCallBack_S buttonCallback[]=
 uint8_t initGUI( void )
 {
 uint8_t ret=0;
+uint32_t w,h;
 		// create top window
 		guiRootWindow=create_mainWindow();
 		
@@ -230,7 +232,15 @@ uint8_t ret=0;
 		//gtk_window_set_keep_below(GTK_WINDOW(guiRootWindow), 1);
 		renderInit();
 		GUI_initCursor(  );
-
+    
+                
+                UI_getPhysicalScreenSize(&w,&h,NULL); //gtk_widget_get_parent_window (guiRootWindow));
+                printf("The screen seems to be %u x %u px\n",w,h);
+ 
+                gtk_window_set_policy(GTK_WINDOW ( guiRootWindow ),
+                                             0, //gint allow_shrink,
+                                             0, //gint allow_grow,
+                                             1);//gint auto_shrink);
 
                
 	return ret;
@@ -1086,8 +1096,10 @@ extern int global_argc;
 extern char **global_argv;
 typedef gboolean GCALL       (void *);
 extern int automation(void );
+extern uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h,void *root=NULL);
 int UI_Init(int argc, char **argv)
 {
+  uint32_t w,h;
     if(!g_thread_supported())
         g_thread_init(NULL);
     gdk_threads_init();
@@ -1098,6 +1110,8 @@ int UI_Init(int argc, char **argv)
       
     gtk_init(&global_argc, &global_argv);
     gdk_rgb_init();
+    
+    
 }
 static void trampoline(void);
 int UI_RunApp(void)

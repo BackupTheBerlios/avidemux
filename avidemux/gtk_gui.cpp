@@ -154,6 +154,7 @@ uint8_t A_TimeShift(void);
 PARAM_MUX muxMode = MUX_REGULAR;
 int muxParam = 0;
 
+extern uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h,void *r=NULL);
 extern uint8_t GUI_jobs(void);
 extern bool parseECMAScript(const char *name);
 void A_parseECMAScript(const char *name);
@@ -1162,6 +1163,29 @@ void  updateLoaded ()
   // Draw first frame
   rebuild_status_bar (); 
   getFirstVideoFilter(); // Rebuild filter if needed
+  
+  /* Zoom out if needed */
+  uint32_t phyW,phyH;
+  UI_getPhysicalScreenSize(&phyW,&phyH);
+  if(phyW<avifileinfo->width || phyH<avifileinfo->height)
+  {
+      if(phyW<avifileinfo->width/2 || phyH<avifileinfo->height/2)
+      {
+                currentZoom=ZOOM_1_4;
+      }else
+      {
+                currentZoom=ZOOM_1_2;
+      }
+     changePreviewZoom(currentZoom);
+  }
+  else
+  {
+      currentZoom=ZOOM_1_1;
+      changePreviewZoom(currentZoom);
+  }
+        
+  
+  
   if(!GUI_getFrame( curframe, rdr_decomp_buffer,NULL))
   {
     GUI_Error_HIG (_("Could not decode the frame"), NULL);

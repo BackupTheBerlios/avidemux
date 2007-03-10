@@ -188,4 +188,26 @@ gint r;
                 gtk_editable_delete_text(GTK_EDITABLE(entry), 0,-1);
                 gtk_editable_insert_text(GTK_EDITABLE(entry), value, strlen(value), &r);
 }
+
+/**
+    \fn UI_getPhysicalScreenSize
+    \brief return the physical size of display in pixels
+*/
+uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h,void *r)
+{
+  static int inited=0;
+  static int ww,hh;
+    if(!inited)
+    {
+      
+      GdkScreen *sc= gdk_screen_get_default  ();
+      ww=  gdk_screen_get_width(sc);
+      hh=  gdk_screen_get_height(sc);
+      inited=1;
+    }
+    *w=ww;
+    *h=hh;
+    return 1;
+}
+
 //EOF
