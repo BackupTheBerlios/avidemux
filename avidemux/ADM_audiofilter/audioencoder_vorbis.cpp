@@ -104,7 +104,8 @@ uint8_t AUDMEncoder_Vorbis::init(ADM_audioEncoderDescriptor *config)
 
   switch(vorbisConf->mode)
   {
-    case ADM_VORBIS_CBR:
+    
+    case ADM_VORBIS_VBR:
                       err=vorbis_encode_init(&VI,
                               _wavheader->channels,
                               _wavheader->frequency,
@@ -113,13 +114,14 @@ uint8_t AUDMEncoder_Vorbis::init(ADM_audioEncoderDescriptor *config)
                               -1 //long min_bitrate))
                             );
                       break;
-    case  ADM_VORBIS_VBR :
+    case  ADM_VORBIS_QUALITY :
                     err=vorbis_encode_init_vbr(&VI,
                                 _wavheader->channels,
                                 _wavheader->frequency,
                                 vorbisConf->quality/10
                               );
                     break;
+      
     default:
       ADM_assert(0);
   }
@@ -160,10 +162,10 @@ uint8_t AUDMEncoder_Vorbis::init(ADM_audioEncoderDescriptor *config)
   printf("\n[Vorbis]Vorbis encoder initialized\n");
   switch(vorbisConf->mode)
   {
-    case ADM_VORBIS_CBR:
+    case ADM_VORBIS_VBR:
       printf("[Vorbis]CBR Bitrate:%lu\n",config->bitrate);
       break;
-    case ADM_VORBIS_VBR: //FIXME FIXME FIXME
+    case ADM_VORBIS_QUALITY: //FIXME FIXME FIXME
       printf("[Vorbis]VBR Quality:%.1f\n",vorbisConf->quality);
     break;
     default:
