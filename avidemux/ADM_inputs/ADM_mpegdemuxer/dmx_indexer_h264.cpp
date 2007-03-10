@@ -101,6 +101,21 @@ uint32_t temporal_ref,ftype,val;
 uint64_t pts,dts;
 uint8_t pic_started=0;
       
+      
+#if 0
+    FILE *f=fopen("/tmp/foo.h264","wt");
+    uint8_t buffer[80];
+    ADM_assert(f);
+    for(int i=0;i<1024*1024*2;i++)
+    {
+       _run->demuxer->read(buffer,60);
+        fwrite(buffer,60,1,f);
+    }
+    fclose(f);
+    exit(0);  
+
+#endif
+      
       printf("Starting H264 indexer\n");
       while(1)
       {

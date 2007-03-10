@@ -35,7 +35,10 @@
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
+#include "ADM_mpegdemuxer/dmx_identify.h"
 #include "ADM_assert.h"
+
+DMX_TYPE dmxIdentify(const char *name);
 
 /**
 	Read the magic of a file i.e. its 16 first bytes
@@ -240,6 +243,18 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
       return 1;
 
     }    
+    /* Try harder to identify stuff */
+    switch(dmxIdentify(name))
+    {
+      case  DMX_MPG_ES :
+      case  DMX_MPG_H264_ES:
+      case  DMX_MPG_PS :
+      case  DMX_MPG_TS : 
+                          printf("Probe says it is mpeg\n");
+                          *type = Mpeg_FileType;   return 1;
+      case  DMX_MPG_MSDVR  :*type = ASF_FileType; return 1;
+      
+    }
   printf ("\n unrecognized file detected...\n");
   fourCC::print(magic[0]); printf("\n");
   fourCC::print(magic[1]);

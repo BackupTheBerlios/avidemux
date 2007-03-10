@@ -52,6 +52,7 @@ typedef enum FP_TYPE
                         uint8_t  open(const char *name,FP_TYPE *multi);
                         uint8_t  forward(uint64_t u);
                         uint8_t  sync(uint8_t *t );
+                        uint8_t  syncH264(uint8_t *t );
                         uint8_t  getpos(uint64_t *o);
                         uint8_t  setpos(uint64_t o);                
                         uint64_t getSize( void ) ;

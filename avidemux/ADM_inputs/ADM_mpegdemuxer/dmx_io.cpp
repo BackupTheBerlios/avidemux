@@ -331,6 +331,38 @@ uint32_t val,hnt;
         *stream=read8i();
         return 1;
 }
+//
+//      Search packet signature and return packet type
+//_______________________________________
+uint8_t fileParser::syncH264(uint8_t *stream)
+{
+uint32_t val,hnt;
+
+        val=0;
+        hnt=0;                  
+        // preload
+        if((5+_off)>=_size) 
+        {
+                printf("Dmx IO: End of file met (%"LLU" / %"LLU" seg%lu)\n",_off,_size,_nbFd);
+                return 0;
+        }
+        hnt=(read8i()<<24)+(read8i()<<16) + (read8i()<<8) +read8i();
+        
+
+        while((hnt!=0x1))
+        {                                
+                hnt<<=8;
+                val=read8i();                                   
+                hnt+=val;
+                if(_curFd==_nbFd-1)
+                {       
+                                if((5+_off)>=_size) return 0;
+                }
+        }
+                                
+        *stream=read8i();
+        return 1;
+}
 
 uint8_t fileParser::getpos(uint64_t *o)
 {

@@ -81,6 +81,7 @@ uint8_t dmx_probe(const char *file, DMX_TYPE  *type, uint32_t *nbTracks,MPEG_TRA
                   return 1;
                 }
         case DMX_MPG_ES:
+        case DMX_MPG_H264_ES:
                 {
                 *nbTracks=1;
                 *tracks=new MPEG_TRACK;

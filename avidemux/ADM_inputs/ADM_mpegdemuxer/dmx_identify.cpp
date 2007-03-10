@@ -33,8 +33,10 @@
 
 #define MAX_PROBE (5*1024*1024)
 #define MIN_DETECT 40
+#define H264MIN_DETECT 50
 
 static uint8_t probeTs(fileParser *parser);
+uint8_t probeH264(fileParser *parser);
 
 DMX_TYPE dmxIdentify(const char *name)
 {
@@ -104,6 +106,11 @@ _nalyze:
                 {
                         // Try TS here
                         printf("Cannot identify %s as mpeg (%lu/%lu)\n",name,typeES,typePS);
+                        // Try to see if it is H264 ES
+                        if(probeH264(parser))
+                        {                         
+                            ret=DMX_MPG_H264_ES;
+                        }
 
                 }
      
@@ -151,4 +158,47 @@ loop:
 
         return 1;
 }
+/**
+      \fn probeH264
+      \brief Try to identidy H264 streams
+*/
+uint8_t probeH264(fileParser *parser)
+{
+  uint32_t nal=0;
+  uint8_t ret=0;
+  uint64_t size,pos,left;
+  uint8_t stream;
+        parser->setpos(0);
+        while(1)
+        {
+                parser->getpos(&pos);
+                if(pos>MAX_PROBE) goto _nalyze2;
+                if(!parser->syncH264(&stream)) goto _nalyze2;
+
+#define INSIDE(x,y) (stream>=x && stream<y)
+                if(stream==01 || stream==7 || stream==9) 
+                {                        
+                        nal++;
+                        continue;
+                }
+
+
+        }
+_nalyze2:
+                if(nal>H264MIN_DETECT)
+                {
+                        
+                        printf("Identified as H264 ES \n");
+                        ret=1;
+                }
+                else
+                {
+                        // Try TS here
+                        printf("Cannot identify as H264 ES (%lu/%lu)\n",nal,H264MIN_DETECT);
+
+                }
+     
+               return ret;
+}            
+
 // EOF
