@@ -54,6 +54,7 @@
 #include "../../../ADM_libraries/ADM_libswscale/ADM_mp.h"
 #include "../gtkgui.h"
 
+void GUI_gtk_grow_off(int onff);
 
 extern GtkWidget *getDrawWidget( void );
  ColYuvRgb rgbConverter(640,480);
@@ -89,7 +90,10 @@ void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr)
 */
 void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
 {
+    GUI_gtk_grow_off(0);
     gtk_widget_set_usize((GtkWidget *)win, w, h);
+    UI_purge();
+    GUI_gtk_grow_off(1);
 }
 /**
       \brief Retrieve info from window, needed for accel layer

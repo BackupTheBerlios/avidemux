@@ -89,7 +89,7 @@ static void on_video_change(void);
 static void on_preview_change(void);
 static void on_format_change(void);
 static int update_ui=0;
-
+void GUI_gtk_grow_off(int onff);
 static void GUI_initCustom(void);
 const char * GUI_getCustomScript(uint32_t nb);
 #ifdef HAVE_AUDIO
@@ -237,13 +237,21 @@ uint32_t w,h;
                 UI_getPhysicalScreenSize(&w,&h,NULL); //gtk_widget_get_parent_window (guiRootWindow));
                 printf("The screen seems to be %u x %u px\n",w,h);
  
-                gtk_window_set_policy(GTK_WINDOW ( guiRootWindow ),
-                                             0, //gint allow_shrink,
-                                             0, //gint allow_grow,
-                                             1);//gint auto_shrink);
+                 GUI_gtk_grow_off(1);
 
                
 	return ret;
+}
+/**
+    \fn GUI_gtk_grow_off
+    \brief allow main window to grow or not
+*/
+void GUI_gtk_grow_off(int onoff)
+{
+  gtk_window_set_policy(GTK_WINDOW ( guiRootWindow ),
+                                             0, //gint allow_shrink,
+                                             onoff, //gint allow_grow,
+                                             1);//gint auto_shrink);
 }
 /**
     Get the custom entry 
