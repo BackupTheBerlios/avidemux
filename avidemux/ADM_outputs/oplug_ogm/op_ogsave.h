@@ -76,6 +76,8 @@ class ADM_ogmWriteProcess : public ADM_ogmWrite
 protected:
 			AVDMGenericVideoStream  *_incoming;
 			Encoder 		*_encode;
+                        uint32_t                _prestore;
+                        uint32_t                _prestoring;
 			virtual uint8_t	initVideo(const char *name);			
 			virtual uint8_t	writeVideo(uint32_t frame);	
 public:

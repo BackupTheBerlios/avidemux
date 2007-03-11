@@ -55,7 +55,8 @@
 uint8_t	ADM_ogmWriteProcess::initVideo(const char *name)
 {		
 uint32_t w,h,fps1000,fcc;
-		
+        _prestore=0;
+        _prestoring=1;
 	_incoming = getLastVideoFilter (frameStart,frameEnd-frameStart);
  	_togo=_incoming->getInfo()->nb_frames;
   	_encode = getVideoEncoder (_incoming->getInfo()->width,_incoming->getInfo()->height);
@@ -121,9 +122,7 @@ uint32_t w,h,fps1000,fcc;
 					printf("\n Encoding of frame %lu failed !\n",cf);
 	    				return 0;
 				}
-//                                encoding_gui->feedFrame(bitstream.len);
-//				encoding_gui->setFrame(cf,_togo);
-//                                encoding_gui->setQuant(bitstream.out_quantizer);
+                                encoding_gui->setFrame(cf,bitstream.len,bitstream.out_quantizer,_togo);
 				if(!encoding_gui->isAlive())
 				{
 					return 0;
@@ -197,17 +196,25 @@ uint8_t	ADM_ogmWriteProcess::writeVideo(uint32_t frame)
 uint32_t len,flags;
 uint8_t ret;
 uint32_t page=_incoming->getInfo ()->width*_incoming->getInfo ()->height;
-ADMBitstream bitstream(page*3); 
+ADMBitstream bitstream(page*3);
                  bitstream.data=_videoBuffer;
-                 bitstream.dtsFrame=frame;
+                 
                  ret= _encode->encode ( frame, &bitstream);
+                 if(!bitstream.len && _prestoring) 
+                 {
+                   printf("Frame skipped\n");
+                   _prestore++;
+                   return 1;
+                 }
+                 _prestoring=0;
+                 bitstream.dtsFrame=frame-_prestore;
 		 if(!ret)
                  {
                         printf("OgmWrite: Error encoding frame %d\n",frame);
                         return 0;
                  }
                 encoding_gui->setFrame(frame,bitstream.len,bitstream.out_quantizer,_togo);
-                 return videoStream->write(bitstream.len,_videoBuffer,bitstream.flags,frame);
+                return videoStream->write(bitstream.len,_videoBuffer,bitstream.flags,bitstream.dtsFrame);
 }
 //___________________________________________________
 ADM_ogmWriteProcess::ADM_ogmWriteProcess( void)
