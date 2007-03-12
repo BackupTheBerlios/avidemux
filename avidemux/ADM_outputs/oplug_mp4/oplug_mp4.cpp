@@ -123,7 +123,7 @@ pthread_t     audioThread;
 audioQueueMT context;
 PacketQueue   *pq;//("MP4 audioQ",50,2*1024*1024);
 uint32_t    totalAudioSize=0;
-
+uint32_t sent=0;
 
            if(type==ADM_PSP)
                muxerType=MUXER_PSP;
@@ -208,11 +208,13 @@ preFilling:
                         GUI_Error_HIG (_("Error while encoding"), NULL);
                         goto  stopit;
               }
+              sent++;
               if(!bitstream.len)
               {
                 prefill++;
                 goto preFilling;
               }
+              printf("Pass 2 prefill : %u\n",prefill);
               if(!bitstream.flags & AVI_KEY_FRAME)
               {
                 GUI_Error_HIG (_("KeyFrame error"),_( "The beginning frame is not a key frame.\nPlease move the A marker."));
@@ -316,6 +318,7 @@ preFilling:
                bitstream.cleanup(frameWrite);
                if(!prefill || frame+prefill<total) 
                {
+                  
                   r=_encode->encode ( prefill+frame, &bitstream);
                }
                 else
@@ -333,6 +336,7 @@ preFilling:
                     printf("Frame skipped (xvid ?)\n");
                     continue;
                 }
+                sent++;
                 skipping=0;
             //    printf("Prefill %u FrameWrite :%u Frame %u PtsFrame :%u\n",prefill,frameWrite,frame,bitstream.ptsFrame);
                 frameWrite++;
@@ -348,6 +352,7 @@ preFilling:
            ret=1;
            
 stopit:
+    printf("2nd pass, sent %u frames\n",sent);
     // Flush slave Q
     if(audio)
     {
@@ -377,9 +382,11 @@ uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile
 {
       uint32_t len, flag;
       FILE *tmp;
-      uint8_t reuse=0;
+      uint8_t reuse=0,r;
       ADMBitstream bitstream(0);
-
+      uint32_t prefill=0;
+      uint32_t sent=0;
+      
         aprintf("\n** Dual pass encoding**\n");
 
         if((tmp=fopen(TwoPassLogFile,"rt")))
@@ -399,9 +406,25 @@ uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile
                 _encode->startPass1 ();
                 bitstream.data=buffer;
                 bitstream.bufferSize=bufferSize;
-                for (uint32_t cf = 0; cf < total; cf++)
+                
+preFilling2:
+             bitstream.cleanup(0);
+             if(!_encode->encode ( prefill, &bitstream))//&len, videoBuffer, &flags,&displayFrame))
+             {
+                        printf("MP4:First frame error\n");
+                        GUI_Error_HIG (_("Error while encoding"), NULL);
+                        return 0;
+              }
+              sent++;
+              if(!bitstream.len)
+              {
+                prefill++;
+                goto preFilling2;
+              }
+
+                printf("Pass 1 prefill : %u\n",prefill);
+                for (uint32_t cf = 1; cf < total; cf++)
                 {
-//                        encoding_gui->setFrame (cf, total);
                         if (!encoding_gui->isAlive())
                         {
                                 abt:
@@ -409,11 +432,20 @@ uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile
                                 return 0;
                         }
                         bitstream.cleanup(cf);
-                        if (!_encode->encode (cf,&bitstream))// &len, buffer, &flag))
+                        if(!prefill || cf+prefill<total) 
+                        {
+                            r=_encode->encode ( prefill+cf, &bitstream);
+                        }
+                          else
+                          {
+                              r=_encode->encode ( total-1, &bitstream);
+                          }
+                        if (!r)
                         {
                                 printf("\n Encoding of frame %lu failed !\n",cf);
                                 return 0;
                         }
+                        sent++;
                         encoding_gui->setFrame(cf,bitstream.len,bitstream.out_quantizer,total);
                 }
                 encoding_gui->reset();
@@ -425,6 +457,7 @@ uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile
                 printf("Pass2 ignition failed\n");
                 return 0;
         }
+        printf("First pass : send %u frames\n",sent);
         encoding_gui->setPhasis ("2nd Pass");
         return 1;
 }
