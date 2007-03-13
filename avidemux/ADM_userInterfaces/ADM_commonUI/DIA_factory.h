@@ -163,6 +163,7 @@ public:
   void changeFile(void);
 };
 /*************************************************/
+/* The text MUST be copied internally ! */
 class diaElemReadOnlyText : public diaElem
 {
 

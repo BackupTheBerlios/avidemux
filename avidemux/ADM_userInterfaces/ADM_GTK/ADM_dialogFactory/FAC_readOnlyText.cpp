@@ -33,14 +33,14 @@
 diaElemReadOnlyText::diaElemReadOnlyText(char *readyOnly,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_ROTEXT)
 {
-  param=(void *)readyOnly;
+  param=(void *)ADM_strdup(readyOnly);
   paramTitle=toggleTitle;
   this->tip=tip;
 }
 
 diaElemReadOnlyText::~diaElemReadOnlyText()
 {
-  
+  ADM_dealloc(param);
 }
 void diaElemReadOnlyText::setMe(void *dialog, void *opaque,uint32_t line)
 {

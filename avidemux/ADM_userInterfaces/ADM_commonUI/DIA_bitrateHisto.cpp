@@ -194,6 +194,7 @@ uint32_t maxBFrame=0;
           bar[19-i]=new  diaElemBar((uint32_t)display[i],str);
             
         }
+/*
         diaElemUInteger mx(&max,"Max bitrate",0,9999999);
         diaElemUInteger med(&medium,"Average bitrate",0,9999999);
         diaElemUInteger nI(&nbIFrame,"Number of I frames",0,9999999);
@@ -207,7 +208,16 @@ uint32_t maxBFrame=0;
         nP.setRo();
         nB.setRo();
         nMB.setRo();
-
+*/
+#define DOME(a,b,c)       sprintf(bf,"%u",b); diaElemReadOnlyText a(bf,c);
+        char bf[100];
+        DOME(mx,max,"Max bitrate");
+        DOME(med,medium,"Average bitrate");
+        DOME(nI,nbIFrame,"Number of I frames");
+        DOME(nP,nbPFrame,"Number of P frames");
+        DOME(nB,nbBFrame,"Number of B frames");
+        DOME(nMB,maxBFrame,"Max B frames");
+        
         diaElemBar foo(0,"foo");
 #define P(X) bar[X] 
   
