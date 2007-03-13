@@ -38,9 +38,10 @@ class AUDMAudioFilterLimiter : public AUDMAudioFilter
     void               Follow(float x, float *outEnv, int maxBack);
     float              DoCompression(float value, float env);
     void               drc_cleanup(void);
-#define ONE_CHUNK 1000			 
-    float              follow[ONE_CHUNK/2];
-    float              value[ONE_CHUNK/2];
+#define ONE_CHUNK 1000
+#define DELIM_WINDOW_SIZE ONE_CHUNK/2		 
+    float              follow[DELIM_WINDOW_SIZE];
+    float              value[DELIM_WINDOW_SIZE];
 
   public:
                           AUDMAudioFilterLimiter(AUDMAudioFilter *previous, DRCparam *param);

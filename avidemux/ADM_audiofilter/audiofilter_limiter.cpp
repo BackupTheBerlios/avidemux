@@ -110,7 +110,7 @@ uint32_t   AUDMAudioFilterLimiter::fill(uint32_t max,float *output,AUD_Status *s
   
   len=_tail-_head;
   if(len>max) len=max;
-  
+  if(len>=DELIM_WINDOW_SIZE) len=DELIM_WINDOW_SIZE-1;
   // Process..
   if (mLastLevel == 0.0) {
     int preSeed = mCircleSize;
