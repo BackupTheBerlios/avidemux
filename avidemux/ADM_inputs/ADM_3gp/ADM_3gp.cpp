@@ -852,12 +852,14 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 			case MKFCCR('m','d','h','d'): //mdhd
 				//
 				{
-				uint32_t tmpscale;
+				uint32_t tmpscale,version;
 				
 				printf("Decoding mdhd\n");
-				tom.skipBytes(4); // flags + version
+                                version=tom.read();
+				tom.skipBytes(3); // flags + version
 				tom.skipBytes(4); // creation time
 				tom.skipBytes(4); // mod time
+                                if(version==1) tom.skipBytes(8);
 				tmpscale=tom.read32(); //
 				printf("Myscale in mdhd:%lu\n",tmpscale);
 				if(!tmpscale) tmpscale=600; // default
