@@ -79,7 +79,7 @@ static char *twoFake=NULL;
 extern AVDMGenericAudioStream *mpt_getAudioStream(void);
 uint8_t prepareDualPass(uint32_t bufferSize,uint8_t *buffer,char *TwoPassLogFile,DIA_encoding *encoding_gui,Encoder *_encode,uint32_t total);
 uint8_t extractVolHeader(uint8_t *data,uint32_t dataSize,uint32_t *headerSize);
-
+extern void    UI_purge(void );
 /*
 
 
@@ -274,13 +274,13 @@ preFilling:
 //_____________ Loop _____________________
           
           encoding_gui->setContainer("MP4");
-          if(audio)
-                encoding_gui->setAudioCodec(getStrFromAudioCodec(audio->getInfo()->encoding));
+         
           if(!videoProcessMode())
                 encoding_gui->setCodec("Copy");
           else
                 encoding_gui->setCodec(_encode->getDisplayName());
            //
+          UI_purge();
           if(bitstream.len)
           {
             muxer->writeVideoPacket( &bitstream);
@@ -325,7 +325,7 @@ preFilling:
                 {
                     r=_encode->encode ( total-1, &bitstream);
                 }
-               if(!r)
+               if(!r && frame<total-2)
                {
                         printf("MP4:Frame %u error\n",frame);
                         GUI_Error_HIG (_("Error while encoding"), NULL);
