@@ -244,7 +244,7 @@ uint8_t ADMVideoResampleFPS::getFrameNumberNoAlloc(uint32_t frame,
   ADMImage *mysrc1=NULL;
   ADMImage *mysrc2=NULL;
 
-  ADM_assert(frame<_info.nb_frames);
+  if(frame>=_info.nb_frames) return 0;
   // read uncompressed frame
   
   // What frame are we seeking ?
