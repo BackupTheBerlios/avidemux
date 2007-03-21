@@ -221,7 +221,10 @@ int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor)
     diaMenuEntry encodingMode[]={
                              {ADM_LAME_PRESET_CBR,      _("CBR"),NULL},
                              {ADM_LAME_PRESET_ABR,   _("ABR"),NULL},
-                             {ADM_LAME_PRESET_EXTREME,      _("Extreme"),NULL}}; 
+#if 0
+                             {ADM_LAME_PRESET_EXTREME,      _("Extreme"),NULL}
+#endif
+    }; 
     diaElemMenu Mode(&ppreset,   _("Mode"), SZT(encodingMode),encodingMode);
 #define BITRATE(x) {x,_(#x)}
     diaMenuEntry bitrateM[]={
