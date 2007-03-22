@@ -199,7 +199,7 @@ _abortUnpack:
 		printf("%d old:%lu new: %lu \n",_idx[k].size,newIndex[k].size);
 	}	
 #endif	
-	if(ret=1)
+	if(ret==1)
 	{
 		printf("Sucessfully unpacked the bitstream\n");
 		

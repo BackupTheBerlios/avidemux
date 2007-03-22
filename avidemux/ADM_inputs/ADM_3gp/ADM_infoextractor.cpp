@@ -169,6 +169,7 @@ uint8_t extractVopInfo(uint8_t *data, uint32_t len,uint32_t timeincbits,uint32_t
              case 0: vp=AVI_KEY_FRAME;break;
              case 1: vp=0;break;
              case 2: vp=AVI_B_FRAME;break;
+             case 3: vp=0;break;  // D FRAME ????
              default:
                 printf("Unknown vop type :%d\n",vop);
                 return 0;
