@@ -75,6 +75,9 @@ JSBool facFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 JSBool facBitrate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facBar(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facRoText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facTab(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facDirSel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool assertTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
@@ -102,6 +105,9 @@ static JSFunctionSpec adm_functions[] = {
   {"dialogFactoryBitrate",      facBitrate,        0},
   {"dialogFactoryBar",        facBar,        0},
   {"dialogFactoryRoText",     facRoText,        0},
+  {"dialogFactoryText",       facText,        0},
+  {"dialogFactoryTabs",       facTab,        0},
+  {"dialogFactoryDirSel",       facDirSel,        0},
   {"crashTest",               crashTest,        0},
   {"assertTest",               assertTest,        0},
   {0}
@@ -566,6 +572,23 @@ JSBool facFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
   if(test) ADM_dealloc(test);
   return JS_TRUE;
 }
+JSBool facDirSel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+   uint32_t tog=0;
+   char *test=ADM_strdup("Entry test1");
+    
+      diaElemDirSelect fread(&test,"Entry");
+      diaElem *elems[]={&fread   };
+  if(diaFactoryRun("Test DirSel",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    printf("Value : <%s>\n",test);
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  if(test) ADM_dealloc(test);
+  return JS_TRUE;
+}
+
 JSBool facBitrate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
    COMPRES_PARAMS test={
@@ -626,6 +649,52 @@ JSBool facRoText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
   
   return JS_TRUE;
 }
+JSBool facText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+    
+      char *foo=ADM_strdup("blah");
+      diaElemText txt(&foo,"Text",NULL);
+      
+      diaElem *elems[]={&txt   };
+  if(diaFactoryRun("Test FileRead",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  
+  return JS_TRUE;
+}
+
+JSBool facTab(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+    
+      uint32_t test,test2;
+      
+      diaElemReadOnlyText txt("blah blah","Value:");
+      diaElemUInteger     bt(&test,"Entry",0,10);
+      diaElemUInteger     bt2(&test2,"Entry",0,10);
+      
+      
+      diaElem *elems1[]={&txt   };
+      diaElem *elems2[]={&bt,&bt2   };
+      
+      diaElemTabs tab1("T1",1,(diaElem **)elems1);
+      diaElemTabs tab2("T2",2,(diaElem **)elems2);
+      
+      diaElemTabs *tabs[2]={&tab1,&tab2};
+          
+      
+  if(diaFactoryRunTabs("Test FileRead",2,tabs))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  
+  return JS_TRUE;
+}
+    
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
   
