@@ -34,6 +34,10 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   return 0;
   
 }
+uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
+{
+  return 0; 
+}
 
 
 

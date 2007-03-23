@@ -119,5 +119,8 @@ const char *shortkey(const char *in)
  }
   return t;
 }
-
+uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
+{
+  return 0; 
+}
 //EOF
