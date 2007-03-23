@@ -28,6 +28,7 @@ typedef enum elemEnum
   ELEM_BAR,
   ELEM_ROTEXT,
   ELEM_NOTCH,
+  ELEM_DIR_SELECT,
   ELEM_MAX=ELEM_TOGGLE
 };
 /*********************************************/
@@ -163,6 +164,19 @@ public:
   void changeFile(void);
 };
 /*************************************************/
+class diaElemDirSelect : public diaElem
+{
+
+public:
+  
+  diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemDirSelect() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+  
+  void changeFile(void);
+};
+/*************************************************/
 /* The text MUST be copied internally ! */
 class diaElemReadOnlyText : public diaElem
 {
@@ -174,8 +188,20 @@ public:
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
   
-  void changeFile(void);
 };
+/*************************************************/
+/* The text MUST be copied internally ! */
+class diaElemText : public diaElem
+{
+
+public:
+  
+  diaElemText(char **text,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemText() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+};
+
 /*********************************************/
 class diaElemNotch : public diaElem
 {
@@ -188,6 +214,27 @@ public:
   void getMe(void) {};
 };
 /*********************************************/
+class diaElemTabs 
+{
+  public:
+    
+  uint32_t nbElems;
+  diaElem  **dias;
+  const char *title;
+  
+  diaElemTabs(const char *toggleTitle, uint32_t nb, diaElem **content)
+  {
+      nbElems=nb;
+      dias=content; 
+      title=toggleTitle;
+  }
+  virtual ~diaElemTabs() 
+  {
+  }
+};
+
+/*********************************************/
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems);
+uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs);
 /*********************************************/
 #endif
