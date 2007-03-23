@@ -31,10 +31,10 @@
 #include "default.h"
 #include "ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
-
+#include "ADM_toolkit/filesel.h"
 extern const char *shortkey(const char *);
 void GUI_FileSelRead(const char *label, char * * name);
-
+#define MAX_SEL 90
 class  ADM_Qfilesel : public QWidget
 {
      Q_OBJECT
@@ -45,24 +45,29 @@ class  ADM_Qfilesel : public QWidget
    public slots:
         void buttonPressed(QAbstractButton *s)
         { 
-          char *n;
-          GUI_FileSelRead("Select file", &n);
-          if(n)
+          uint8_t r=0;
+          char buffer[MAX_SEL+1],*txt;
+          txt="";
+          if(!directoryMode)
+            r=FileSel_SelectRead(_("Select Directory"),buffer,MAX_SEL,txt);
+          else
+            r=FileSel_SelectDir(_("Select File"),buffer,MAX_SEL,txt);
+            
+          if(r)
           {
-            edit->setText(n);
-            ADM_dealloc(n); 
+            edit->setText(buffer);
           }
-          
         }
   public:
         QLineEdit *edit;
         QDialogButtonBox *button;
         QLabel *text;
+        int directoryMode;
             
-        ADM_Qfilesel(QWidget *z,const char *title,char *entry,QGridLayout *layout,int line) : QWidget(z) 
+        ADM_Qfilesel(QWidget *z,const char *title,char *entry,QGridLayout *layout,int line,int dir) : QWidget(z) 
         {
           
-  
+          directoryMode=dir;
           edit=new QLineEdit(entry,z);
           
           edit->show();
@@ -108,7 +113,7 @@ void diaElemFileRead::setMe(void *dialog, void *opaque,uint32_t line)
 {
  QGridLayout *layout=(QGridLayout*) opaque;
   
-  ADM_Qfilesel *fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line);
+  ADM_Qfilesel *fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,0);
   myWidget=(void *)fs; 
 }
 void diaElemFileRead::getMe(void)
@@ -121,6 +126,35 @@ void diaElemFileRead::getMe(void)
   QString s=(fs->edit)->text();
   *n=ADM_strdup( s.toLatin1() );
 }
-
+//****************************
+diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip)  : diaElem(ELEM_DIR_SELECT) 
+{
+  param=(void *)filename;
+  paramTitle=shortkey(toggleTitle);
+  this->tip=tip;
+}
+diaElemDirSelect::~diaElemDirSelect() 
+{
+if(paramTitle)
+    delete paramTitle;
+}
+void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ QGridLayout *layout=(QGridLayout*) opaque;
+  
+  ADM_Qfilesel *fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,1);
+  myWidget=(void *)fs; 
+}
+void diaElemDirSelect::getMe(void) 
+{
+ char **n=(char **)param;
+  if(*n) ADM_dealloc(*n);
+  *n=NULL;
+  ADM_Qfilesel *fs=(ADM_Qfilesel *)myWidget;
+  QString s=(fs->edit)->text();
+  *n=ADM_strdup( s.toLatin1() );
+}
+  
+void diaElemDirSelect::changeFile(void) {}
 //EOF
 

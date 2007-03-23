@@ -29,6 +29,7 @@ typedef enum elemEnum
   ELEM_ROTEXT,
   ELEM_NOTCH,
   ELEM_DIR_SELECT,
+  ELEM_TEXT,
   ELEM_MAX=ELEM_TOGGLE
 };
 /*********************************************/

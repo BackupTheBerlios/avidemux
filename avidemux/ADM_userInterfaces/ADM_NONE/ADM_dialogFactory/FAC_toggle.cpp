@@ -215,6 +215,20 @@ void diaElemNotch::setMe(void *dialog, void *opaque,uint32_t line)
 {
   
 }
+//******************************************************
+diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip)  : diaElem(ELEM_NOTCH) {}
+diaElemDirSelect::~diaElemDirSelect() {}
+void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line) {}
+void diaElemDirSelect::getMe(void) {}
+  
+void diaElemDirSelect::changeFile(void) {}
+//******************************************************
+diaElemText::diaElemText(char **text,const char *toggleTitle,const char *tip)
+    : diaElem(ELEM_NOTCH) {}
+diaElemText::~diaElemText() {}
+void diaElemText::setMe(void *dialog, void *opaque,uint32_t line) {}
+void diaElemText::getMe(void) {}  
+  
             
 //******************************************************
 //EOF

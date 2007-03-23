@@ -24,13 +24,7 @@
     
 extern QWidget *QuiMainWindows;
 static void GUI_FileSelSelect(const char *label, char **name, uint32_t access) ;
-//****************************************************************************************************
-uint8_t FileSel_SelectDir(const char *title,char *target,uint32_t max, const char *source)
-{
-  
-  GUI_Error_HIG("NOT DONE","This function has not been implemented yet.");
-  return 0; 
-}
+
 //****************************************************************************************************
 void GUI_FileSelRead(const char *label,SELFILE_CB cb) 
 {
@@ -106,5 +100,59 @@ void GUI_FileSelSelect(const char *label, char **name, uint32_t access)
   if(str) delete [] str;
   
 }
+/**
+      \fn FileSel_SelectRead
+      \brief select file, read mode
+      @param title window title
+      @param target where to store result
+      @param max Max buffer size in bytes
+      @param source Original value
+      @return 1 on success, 0 on failure
+
+*/
+uint8_t FileSel_SelectRead(const char *title,char *target,uint32_t max, const char *source)
+{
+  char *dir=NULL,*tmpname=NULL;
+   QString fileName;
+ 
+  fileName=QFileDialog::getOpenFileName(QuiMainWindows,title,source);
+                
+  if(!fileName.isNull() )
+  {
+    const char *s=fileName.toLatin1(); // Fixme utf8 ?
+    strncpy(target,s,max);
+  }
+  
+  
+}
+/**
+      \fn FileSel_SelectDir
+      \brief select directory
+      @param title window title
+      @param target where to store result
+      @param max Max buffer size in bytes
+      @param source Original value
+      @return 1 on success, 0 on failure
+
+*/
+
+uint8_t FileSel_SelectDir(const char *title,char *target,uint32_t max, const char *source)
+{
+   char *dir=NULL,*tmpname=NULL;
+  
+   QString fileName;
+ 
+  fileName=QFileDialog::getExistingDirectory(QuiMainWindows,title,source);
+                
+  if(!fileName.isNull() )
+  {
+    const char *s=fileName.toLatin1(); // Fixme utf8 ?
+    strncpy(target,s,max);
+  }
+  
+}
+
+
+
 //****************************************************************************************************
 //EOF

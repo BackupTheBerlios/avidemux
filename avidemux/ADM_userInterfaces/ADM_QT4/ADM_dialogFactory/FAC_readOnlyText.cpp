@@ -25,6 +25,7 @@
 #include <QSpinBox>
 #include <QGridLayout>
 #include <QLabel>
+#include <QLineEdit>
 
 #include "default.h"
 #include "ADM_commonUI/DIA_factory.h"
@@ -68,4 +69,44 @@ void diaElemReadOnlyText::getMe(void)
 
  
 }
+//*********************************
+
+diaElemText::diaElemText(char **text,const char *toggleTitle,const char *tip)
+    : diaElem(ELEM_TEXT)
+{
+  
+  if(!*text) *text=ADM_strdup("");
+  param=(void *)text;
+  paramTitle=shortkey(toggleTitle);
+  this->tip=tip;
+ }
+
+diaElemText::~diaElemText()
+{
+  if(paramTitle)
+    delete paramTitle;
+}
+void diaElemText::setMe(void *dialog, void *opaque,uint32_t line)
+{
+
+ QGridLayout *layout=(QGridLayout*) opaque;
+ 
+ QLabel *text=new QLabel( this->paramTitle,(QWidget *)dialog);
+ QLineEdit *lineEdit = new QLineEdit( *(char **)param);
+ 
+ text->setBuddy(lineEdit);
+ layout->addWidget(text,line,0);
+ layout->addWidget(lineEdit,line,1);
+ myWidget=(void *)lineEdit;  
+}
+void diaElemText::getMe(void)
+{
+  char **c=(char **)param;
+  QLineEdit *lineEdit=(QLineEdit *)myWidget;
+  if(*c) ADM_dealloc(*c);
+  *c=ADM_strdup(lineEdit->text().toAscii().data());
+ 
+}
+
+
 //EOF

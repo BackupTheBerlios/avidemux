@@ -69,7 +69,7 @@ static stVideoDevice myVideoDevice[]
 
 };
 
-uint8_t DIA_Preferences(void);
+uint8_t DIA_Preferences2(void);
 
 /**
       \fn     DIA_Preferences(void)
@@ -77,7 +77,7 @@ uint8_t DIA_Preferences(void);
 
 
 */
-uint8_t DIA_Preferences(void)
+uint8_t DIA_Preferences2(void)
 {
 uint8_t ret=0;
 int r;
