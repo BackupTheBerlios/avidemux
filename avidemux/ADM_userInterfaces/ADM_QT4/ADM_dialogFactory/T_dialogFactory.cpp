@@ -26,6 +26,7 @@
 #include <QDialogButtonBox>
 #include <QDialogButtonBox>
 #include <QPushButton>
+#include <QTabWidget>
 
 #include "default.h"
 #include "ADM_commonUI/DIA_factory.h"
@@ -42,7 +43,7 @@ class factoryWindow : public QDialog
  private:
 };
 
-
+static void insertTab(uint32_t index, diaElemTabs *tab, QTabWidget *wtab);
 factoryWindow::factoryWindow()     : QDialog()
  {
 //     ui.setupUi(this);
@@ -130,44 +131,57 @@ uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
   dialog.setWindowTitle(title);
   
   QGridLayout layout(&dialog);
-#if 0
-  /* First compute the size of our window */
-  int vsize=0;
-  for(int i=0;i<nb;i++)
-  {
-    ADM_assert(elems[i]);
-     vsize+=elems[i]->getSize(); 
-  }
 
- int  v=0;
-  for(int i=0;i<nb;i++)
-  {
-    ADM_assert(elems[i]);
-     elems[i]->setMe( (void *)&dialog,&layout,v); 
-     v+=elems[i]->getSize();
-    
-  }
+  // Add tabs
+  QTabWidget wtabs((QWidget *)&dialog);
   // Add buttons
    QDialogButtonBox buttonBox((QWidget *)&dialog);
     buttonBox.setStandardButtons(QDialogButtonBox::Ok
                             | QDialogButtonBox::Cancel);
      QObject::connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
      QObject::connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
-     layout.addWidget(&buttonBox,vsize,0);
+     
+     for(int i=0;i<nb;i++)
+     {
+        ADM_assert(tabs[i]);
+        insertTab(i,tabs[i],&wtabs); 
+    
+      }
+     
+     layout.addWidget(&wtabs,0,0);
+     layout.addWidget(&buttonBox,1,0);
   // run
   dialog.setLayout(&layout);
   if(dialog.exec()==QDialog::Accepted)
   {
-     for(int i=0;i<nb;i++)
-     {
-        ADM_assert(elems[i]);
-        elems[i]->getMe(); 
-    
-      }
-    return 1;
+   
   }
-#endif
   return 0;
   
+}
+
+void insertTab(uint32_t index, diaElemTabs *tab, QTabWidget *wtab)
+{
+
+  QWidget *wid=new QWidget;
+  QGridLayout *layout=new QGridLayout(wid);
+  
+  /* First compute the size of our window */
+  int vsize=0;
+  for(int i=0;i<tab->nbElems;i++)
+  {
+    ADM_assert(tab->dias[i]);
+     vsize+=tab->dias[i]->getSize(); 
+  }
+
+ int  v=0;
+  for(int i=0;i<tab->nbElems;i++)
+  {
+     ADM_assert(tab->dias[i]);
+     tab->dias[i]->setMe( wid,layout,v); 
+     v+=tab->dias[i]->getSize();
+    
+  }
+  wtab->addTab(wid,tab->title);
 }
 //EOF
