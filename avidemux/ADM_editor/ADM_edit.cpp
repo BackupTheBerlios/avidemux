@@ -515,7 +515,9 @@ float duration;
         if(_wavinfo)
         if(_wavinfo->encoding==WAV_MP3 && _wavinfo->blockalign==1152)
         {
-          if(GUI_Confirmation_HIG(_("Build Time Map"),_( "Build VBR time map?"), VBR_MSG))
+          uint32_t autovbr=0;
+          prefs->get(FEATURE_AUTO_BUILDMAP,&autovbr);
+          if(autovbr || GUI_Confirmation_HIG(_("Build Time Map"),_( "Build VBR time map?"), VBR_MSG))
                 {
                 _videos[_nb_video]._isAudioVbr=_videos[_nb_video]._audiostream->buildAudioTimeLine ();
                 }
@@ -673,7 +675,9 @@ TryAgain:
 								// can only unpack avi
 								if(!count && type==AVI_FileType)
 								{
-									if( forced || GUI_YesNo(
+                                                                  uint32_t autounpack=0;
+                                                                  prefs->get(FEATURE_AUTO_UNPACK,&autounpack);
+									if( forced || autounpack || GUI_YesNo(
                                                                                 _("Packed Bitstream detected"),
                                                                         _("Do you want me to unpack it ?")))
 									{
@@ -715,7 +719,9 @@ TryAgain:
 						// else warn user
 						if(!ispacked)
                                                 {
-                                                  if(GUI_YesNo(_("Index is not up to date"),_("You should use Tool->Rebuild frame. Do it now ?")))
+                                                   uint32_t reindex=0;
+                                                  prefs->get(FEATURE_AUTO_REBUILDINDEX,&reindex);
+                                                  if(reindex || GUI_YesNo(_("Index is not up to date"),_("You should use Tool->Rebuild frame. Do it now ?")))
                                                         {
                                                                 rebuildFrameType();
 							}

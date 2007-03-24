@@ -68,12 +68,22 @@ uint32_t activeXfilter=0;
 uint32_t mixer=0;
 char     *filterPath=NULL;
 char     *alsaDevice=NULL;
+uint32_t autovbr=0;
+uint32_t autoindex=0;
+uint32_t autounpack=0;
 
 	olddevice=newdevice=AVDM_getCurrentDevice();
 
         // Alsa
         if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &alsaDevice) != RC_OK )
                 alsaDevice = ADM_strdup("plughw:0,0");
+        // autovbr
+        prefs->get(FEATURE_AUTO_BUILDMAP,&autovbr);
+        // autoindex
+        prefs->get(FEATURE_AUTO_REBUILDINDEX,&autoindex);
+         // autoindex
+        prefs->get(FEATURE_AUTO_UNPACK,&autounpack);
+
         // Video renderer
         if(prefs->get(DEVICE_VIDEODEVICE,&render)!=RC_OK)
         {       
@@ -130,7 +140,12 @@ char     *alsaDevice=NULL;
         diaElemToggle autoSwap(&useSwap,_("Automatically swap A and B if A>B"));
         diaElemToggle nuvAudio(&useNuv,_("Disable NUV audio sync"));
         diaElemToggle loadEx(&activeXfilter,_("Load external filters"));
-       
+        
+        diaElemToggle togAutoVbr(&autovbr,_("Automatically build VBR map"));
+        diaElemToggle togAutoIndex(&autoindex,_("Automatically rebuild index"));
+        diaElemToggle togAutoUnpack(&autounpack,_("Automatically remove packed bitstream"));
+        
+               
         diaElemUInteger multiThread(&mthreads,_("Number of threads"),0,10);
         diaElemUInteger autoSplit(&autosplit,_("Split mpegs every (MB)"),10,4096);
         
@@ -214,8 +229,9 @@ char     *alsaDevice=NULL;
         
         /**********************************************************************/
         /* First Tab : user interface */
-        diaElem *diaUser[]={&autoSwap,&useSysTray,&menuMessage};
-        diaElemTabs tabUser("User Interface",3,diaUser);
+        diaElem *diaUser[]={&useSysTray,&menuMessage,&autoSwap,&togAutoVbr,&togAutoIndex,&togAutoUnpack};
+        diaElemTabs tabUser("User Interface",6,diaUser);
+        
         
         /* Second Tab : input */
         diaElem *diaInput[]={&autoIndex,&nuvAudio,&useLavcodec};
@@ -247,6 +263,12 @@ char     *alsaDevice=NULL;
         if( diaFactoryRunTabs(_("Preferences"),7,tabs))
 	{
 		ret=1;
+                //
+                 prefs->set(FEATURE_AUTO_UNPACK,autounpack);
+                 // autovbr
+                prefs->set(FEATURE_AUTO_BUILDMAP,autovbr);
+                // autoindex
+                prefs->set(FEATURE_AUTO_REBUILDINDEX,autoindex);
                 // Alsa
                 if(alsaDevice)
                 {

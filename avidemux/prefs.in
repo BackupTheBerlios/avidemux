@@ -83,6 +83,9 @@ feature.reuse_2pass_log,                UINT,   0,      0,      1
 feature.audiobar_uses_master,           UINT,   0,      0,      1
 feature.multi_thread,                   UINT,   0,      0,      4
 feature.mpeg_no_limit,                  UINT,   0,      0,      1
+feature.auto_buildmap,                  UINT,   0,      0,      1
+feature.auto_rebuildindex,              UINT,   0,      0,      1
+feature.auto_unpack,                    UINT,   0,      0,      1
 # prologic 1/2
 downmixing.prologic,			UINT,	2,	0,	2
 filters.autoload.path,                  STRING, "/tmp/"
