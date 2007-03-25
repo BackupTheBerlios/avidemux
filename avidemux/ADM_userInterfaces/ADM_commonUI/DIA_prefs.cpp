@@ -229,13 +229,16 @@ uint32_t autounpack=0;
         
         /**********************************************************************/
         /* First Tab : user interface */
-        diaElem *diaUser[]={&useSysTray,&menuMessage,&autoSwap,&togAutoVbr,&togAutoIndex,&togAutoUnpack};
-        diaElemTabs tabUser("User Interface",6,diaUser);
+        diaElem *diaUser[]={&useSysTray,&menuMessage};
+        diaElemTabs tabUser("User Interface",2,diaUser);
         
+         /* First Tab bis: user interface : Auto*/
+        diaElem *diaAuto[]={&autoSwap,&togAutoVbr,&togAutoIndex,&togAutoUnpack,&autoIndex,};
+        diaElemTabs tabAuto("Automatically",5,diaAuto);
         
         /* Second Tab : input */
-        diaElem *diaInput[]={&autoIndex,&nuvAudio,&useLavcodec};
-        diaElemTabs tabInput("Input",3,(diaElem **)diaInput);
+        diaElem *diaInput[]={&nuvAudio,&useLavcodec};
+        diaElemTabs tabInput("Input",2,(diaElem **)diaInput);
         
         /* Third Tab : output */
         diaElem *diaOutput[]={&autoSplit,&openDml,&allowAnyMpeg};
@@ -259,8 +262,8 @@ uint32_t autounpack=0;
         diaElemTabs tabXfilter("External Filters",2,(diaElem **)diaXFilter);
                                     
 // SET
-        diaElemTabs *tabs[]={&tabUser,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabMthread,&tabXfilter};
-        if( diaFactoryRunTabs(_("Preferences"),7,tabs))
+        diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabMthread,&tabXfilter};
+        if( diaFactoryRunTabs(_("Preferences"),8,tabs))
 	{
 		ret=1;
                 //
