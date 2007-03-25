@@ -172,12 +172,13 @@ void avcodec_register_all(void)
     //REGISTER_DECODER(WNV1, wnv1);
     
     REGISTER_ENCODER(AC3, ac3);
+    #if defined(CONFIG_AMR_NB) || defined(CONFIG_AMR_NB_FIXED)
+    REGISTER_ENCDEC (AMR_NB, amr_nb);
+    #endif
+
 #if 0
 #ifdef CONFIG_X264
     REGISTER_ENCODER(X264, x264);
-#endif
-#if defined(CONFIG_AMR_NB) || defined(CONFIG_AMR_NB_FIXED)
-    REGISTER_ENCDEC (AMR_NB, amr_nb);
 #endif
 
     /* audio codecs */
