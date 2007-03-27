@@ -41,6 +41,7 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME  MODULE_COMMANDLINE
 #include "ADM_osSupport/ADM_debug.h"
+#include "ADM_utilities/avidemutils.h"
 
 #include "ADM_filter/vidVCD.h"
 
@@ -491,6 +492,8 @@ void set_autoindex(char *p){
 
 void show_info(char *p){
    UNUSED_ARG(p);
+   uint32_t war,har;
+   const char *s;
    
    if (avifileinfo)
     {
@@ -507,6 +510,11 @@ void show_info(char *p){
    }else{
       printf("   Duration: 00:00:00.000\n");
    }
+   war=video_body->getPARWidth();
+   har=video_body->getPARHeight();
+   getAspectRatioFromAR(war,har, &s);
+   printf("   Aspect Ratio: %s (%u:%u)\n", s,war,har);
+
    printf("Audio\n");
    if( wavinfo )
     {
