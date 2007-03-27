@@ -120,14 +120,6 @@ static GtkTargetEntry target_table[] =
 };
 // CYB 2005.02.22: DND (END)
 
-static char *previewText[]=
-{
-    "Input",
-    "Output",
-    "Side",
-    "Top",
-    "Separate"
-};
 static void DNDDataReceived( GtkWidget *widget, GdkDragContext *dc,
                              gint x, gint y, GtkSelectionData *selection_data, guint info, guint t);
 
@@ -428,13 +420,21 @@ uint8_t  bindGUI( void )
                 }
         gtk_combo_box_set_active(combo_box,0);
         /* File in preview mode combobox */
+            const char *previewText[]=
+                {
+                    _("Input"),
+                    _("Output"),
+                    _("Side"),
+                    _("Top"),
+                    _("Separate")
+                };
 
                 combo_box=GTK_COMBO_BOX(lookup_widget(guiRootWindow,PREVIEW_WIDGET));
                 gtk_combo_box_remove_text(combo_box,0);
                 for(uint32_t i=0;i<sizeof(previewText)/sizeof(char*);i++)
                 {
                         name=previewText[i];
-                        gtk_combo_box_append_text      (combo_box,_(name));	
+                        gtk_combo_box_append_text      (combo_box,(name));	
                 }
         gtk_combo_box_set_active(combo_box,0);
         // Format
