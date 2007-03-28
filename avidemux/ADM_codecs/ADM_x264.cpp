@@ -88,7 +88,16 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
   MKPARAMF(rc.f_qcompress,BitrateVariability);
   
   param.i_frame_reference = 1;
+  // update for Sadarax dialog
+  MKPARAM(rc.i_vbv_max_bitrate,vbv_max_bitrate);
+  MKPARAM(rc.i_vbv_buffer_size,vbv_buffer_size);
+  MKPARAMF(rc.f_vbv_buffer_init,vbv_buffer_init);
   
+  MKPARAM (analyse.b_fast_pskip,fastPSkip);
+  MKPARAM (analyse.b_dct_decimate,DCTDecimate);
+  MKPARAM (b_interlaced,interlaced);
+      
+  //
   MKPARAM(analyse.i_direct_mv_pred,DirectMode+1);
   MKPARAM(rc.i_qp_min,MinQp);
   MKPARAM(rc.i_qp_max,MaxQp);

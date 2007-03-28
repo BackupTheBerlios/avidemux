@@ -61,7 +61,14 @@ typedef struct ADM_x264Param
   uint32_t NoiseReduction;
   //
   uint32_t idc;
-  //
+  // Sadarax ui
+  uint32_t fastPSkip;
+  uint32_t DCTDecimate;
+  uint32_t interlaced;
+  
+  uint32_t vbv_max_bitrate;
+  uint32_t vbv_buffer_size;
+  uint32_t vbv_buffer_init; /* In % to be translated to float between 0 and 1 */
 
 } ADM_x264Param;
 

@@ -632,7 +632,14 @@ NULL,//     char      *logfile;
 1, //        ChromaME
 0, // Mixed Ref
 0, //NoiseReduction
-51 // level IDC for psp  
+51, // level IDC for psp  
+0, // fastPSkip;
+0,  //DCTDecimate;
+0,   //interlaced;
+0,    // vbv_max_bitrate;
+0,  // vbv_buffer_size;
+90  // vbv_buffer_init;
+
 };
 /**************************************/
 ADM_x264Param x264ExtraPSP = {
@@ -682,7 +689,13 @@ NULL,//     char      *logfile;
 0, //        ChromaME
 0, // Mixed Ref
 0, //NoiseReduction
-30 // level IDC for psp  
+30, // level IDC for psp  
+0, // fastPSkip;
+0,  //DCTDecimate;
+0,   //interlaced;
+0,    // vbv_max_bitrate;
+0,  // vbv_buffer_size;
+90  // vbv_buffer_init;
 };
 /**************************************/
 ADM_x264Param x264ExtraDefault=x264Extra;
