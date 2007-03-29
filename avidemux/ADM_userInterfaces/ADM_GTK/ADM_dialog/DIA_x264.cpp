@@ -60,7 +60,32 @@ extern ADM_x264Param x264ExtraDefault;
 #define ENTRY_SET(x,y) {gtk_write_entry(WID(entry##x),y);}        
 #define ENTRY_GET(x,y) {y=gtk_read_entry(WID(entry##x));}        
 
+typedef struct X264_AR
+{
+ uint32_t   num,den;
+ const char *symbol; 
+};
 
+#define MKAR(x,y,z) {x,y,#x":"#y"  ("#z")"}
+const X264_AR x264_ar[]=
+{
+  MKAR(1,1,1),
+  MKAR(3,2,1.50),
+  MKAR(4,3,1.33),
+  MKAR(16,9,1.78),
+  MKAR(71,50,1.42),
+  MKAR(107,100,1.07)
+  
+};
+#define NB_X264_AR sizeof(x264_ar)/sizeof(X264_AR)
+/*
+1:1
+3:2 (1.50)
+4:3 (1.33)
+16:9 (1.78)
+71:50 (1.4222:1)
+107:100 (1.0666:1)
+*/
 typedef enum x264_actions
 {
     ACTION_LOAD_DEFAULT=10,
@@ -85,6 +110,13 @@ uint8_t DIA_x264(COMPRES_PARAMS *config)
         
         updateMode();
         
+        // Fill in A/R
+        for(int i=0;i<NB_X264_AR;i++)
+        {
+          gtk_combo_box_append_text(GTK_COMBO_BOX(WID(comboboxentry1)),x264_ar[i].symbol); 
+          
+        }
+        gtk_combo_box_set_active(GTK_COMBO_BOX(WID(comboboxentry1)),0);
         gtk_signal_connect(GTK_OBJECT(WID(comboboxMode)), "changed",
                            GTK_SIGNAL_FUNC(cb_mod), NULL);
         int reply=0;
@@ -299,6 +331,14 @@ void download(GtkWidget *dialog,ADM_x264Param *param)
     LIST_OF_WIDGET
 #undef SPIN
 #undef CHECK
+        
+        /* Extra case for aspect ratio */
+        if(RADIO_GET(radiobuttonPredefinedAR))
+        {
+            int rank=gtk_combo_box_get_active(GTK_COMBO_BOX(WID(comboboxentry1)));
+              param-> AR_Num=x264_ar[rank].num;
+              param-> AR_Den=x264_ar[rank].den;
+        }
 }
 
 GtkWidget*
@@ -347,10 +387,10 @@ create_dialog1 (void)
   GtkWidget *entryAR_Num;
   GtkWidget *label53;
   GtkWidget *entryAR_Den;
-  GtkWidget *comboboxentry1;
   GtkWidget *radiobuttonCustomAR;
   GSList *radiobuttonCustomAR_group = NULL;
   GtkWidget *radiobuttonPredefinedAR;
+  GtkWidget *comboboxentry1;
   GtkWidget *label39;
   GtkWidget *frame7;
   GtkWidget *alignment7;
@@ -759,18 +799,6 @@ create_dialog1 (void)
   gtk_entry_set_text (GTK_ENTRY (entryAR_Den), _("1"));
   gtk_entry_set_width_chars (GTK_ENTRY (entryAR_Den), 3);
 
-  comboboxentry1 = gtk_combo_box_entry_new_text ();
-  gtk_widget_show (comboboxentry1);
-  gtk_table_attach (GTK_TABLE (table35), comboboxentry1, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxentry1), _("1:1"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxentry1), _("3:2 (1.50)"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxentry1), _("4:3 (1.33)"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxentry1), _("16:9 (1.78)"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxentry1), _("71:50 (1.4222:1)"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (comboboxentry1), _("107:100 (1.0666:1)"));
-
   radiobuttonCustomAR = gtk_radio_button_new_with_mnemonic (NULL, _("Custom"));
   gtk_widget_show (radiobuttonCustomAR);
   gtk_table_attach (GTK_TABLE (table35), radiobuttonCustomAR, 0, 1, 1, 2,
@@ -789,6 +817,12 @@ create_dialog1 (void)
   gtk_tooltips_set_tip (tooltips, radiobuttonPredefinedAR, _("Set a common predefined aspect ratio"), NULL);
   gtk_radio_button_set_group (GTK_RADIO_BUTTON (radiobuttonPredefinedAR), radiobuttonCustomAR_group);
   radiobuttonCustomAR_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (radiobuttonPredefinedAR));
+
+  comboboxentry1 = gtk_combo_box_entry_new_text ();
+  gtk_widget_show (comboboxentry1);
+  gtk_table_attach (GTK_TABLE (table35), comboboxentry1, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
 
   label39 = gtk_label_new (_("<b>Sample Aspect Ratio (A/R)</b>"));
   gtk_widget_show (label39);
@@ -1620,9 +1654,9 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, entryAR_Num, "entryAR_Num");
   GLADE_HOOKUP_OBJECT (dialog1, label53, "label53");
   GLADE_HOOKUP_OBJECT (dialog1, entryAR_Den, "entryAR_Den");
-  GLADE_HOOKUP_OBJECT (dialog1, comboboxentry1, "comboboxentry1");
   GLADE_HOOKUP_OBJECT (dialog1, radiobuttonCustomAR, "radiobuttonCustomAR");
   GLADE_HOOKUP_OBJECT (dialog1, radiobuttonPredefinedAR, "radiobuttonPredefinedAR");
+  GLADE_HOOKUP_OBJECT (dialog1, comboboxentry1, "comboboxentry1");
   GLADE_HOOKUP_OBJECT (dialog1, label39, "label39");
   GLADE_HOOKUP_OBJECT (dialog1, frame7, "frame7");
   GLADE_HOOKUP_OBJECT (dialog1, alignment7, "alignment7");
