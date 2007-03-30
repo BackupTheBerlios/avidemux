@@ -162,7 +162,11 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS) \
 
 # the library search path.
 if ADM_UI_GTK
-avidemux2_gtk_LDFLAGS=-Wl,--export-dynamic 
+if HAVE_CYGWIN
+avidemux2_gtk_LDFLAGS=-Wl,--export-all-symbols
+else
+avidemux2_gtk_LDFLAGS=-Wl,--export-dynamic
+endif
 endif
 
 avidemux2_cli_LDFLAGS =-Wl,--export-dynamic  

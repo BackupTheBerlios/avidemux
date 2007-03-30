@@ -1,7 +1,7 @@
 /bin/sh ../libtool --silent --tag=CXX --mode=link i586-mingw32msvc-g++  -I.. -IADM_library -I../ADM_library  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -O -Wnon-virtual-dtor -Wno-long-long -Wundef -Wall -W -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -O2 -mno-cygwin -mms-bitfields -fno-exceptions -fno-check-new -O2   \
 -L/rot2/lib \
  -mwindows \
-/rot2/lib/libpthreadGC1.a \
+/rot2/lib/libpthreadGC2.a \
 ADM_osSupport/libADM_ossupport.a \
 ./ADM_libraries/ADM_lavutil/libADM_lavutil.a \
 ./ADM_libraries/ADM_utilities/libADM_library.a \
@@ -95,7 +95,7 @@ ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/libADM_toolkit_gtk.a \
 -lgtk-win32-2.0 -lgdk-win32-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lpangowin32-1.0 -lgdi32 -lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -lglib-2.0 -lgthread-2.0 \
 -lpng13 \
   -lzdll \
- -lpthreadGC1 \
+ -lpthreadGC2 \
   -lnspr4 \
   -lfontconfig \
   -lmingw32 \

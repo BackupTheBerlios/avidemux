@@ -161,9 +161,10 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
   local=textdomain(NULL);
   if(local)
     printf("[Locale] Textdomain is now  %s \n",local);
-  
-  printf("[Locale] Files  for %s appear to be in %s\n","avidemux", ADMLOCALE);
-  printf("[Locale] Test : %s \n",dgettext("avidemux","_File"));
+#ifndef CYG_MANGLING  
+  printf("[Locale] Files for %s appear to be in %s\n","avidemux", ADMLOCALE);
+#endif
+  printf("[Locale] Test: %s \n",dgettext("avidemux","_File"));
 #endif
 
    // Start counting memory

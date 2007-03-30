@@ -428,7 +428,7 @@ AC_CHECK_FUNCS(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY,1,"[Use native gettimeo
 
 dnl _____________ needed for multithreaded x264 and for mplex_________
 if test "x$use_cygwin" = "xyes"; then
-        LIBS="$LIBS -lpthreadGC1 -Wl,-s"
+        LIBS="$LIBS -lpthreadGC2 -Wl,-s"
 else
         LDFLAGS="$LDFLAGS -lpthread -lX11 -lXext -L/usr/X11R6/lib"
 fi
@@ -958,10 +958,10 @@ if test "x$with_freetype2" != "xno"; then
 
 	if test "x$have_freetype" = "xyes"; then
 		AC_DEFINE(USE_FREETYPE,1,"[Use FreeType2 font rendering]")
-		AM_CONDITIONAL(HAVE_FREETYPE, test "x$have_freetype" = "xyes" )
 
 	fi
 fi
+AM_CONDITIONAL(HAVE_FREETYPE, test "x$have_freetype" = "xyes" )
 dnl --------- UI ----------------------
 dnl gtk/none (/qt)
 dnl ----- Only GTK for now -----------
