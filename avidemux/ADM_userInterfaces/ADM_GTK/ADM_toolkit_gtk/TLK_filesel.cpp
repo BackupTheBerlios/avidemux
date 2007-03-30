@@ -354,6 +354,7 @@ void GUI_FileSel(const char *label, SELFILE_CB * cb, int rw,char **rname)
                                       GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
                                       NULL);
         }
+		gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
         /**********/
         initFileSelector();
         setFilter(dialog);
