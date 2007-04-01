@@ -76,6 +76,7 @@ static uint8_t 	            *screenBuffer=NULL;
 static uint8_t		    *lastImage=NULL;
 static void                 *draw=NULL;
 static uint32_t 	     renderW=0,renderH=0;
+static uint32_t              phyW=0,phyH=0; /* Unzoomed size, only used when accel can do hw resize */
 
 //_______________________________________
 /**
@@ -93,7 +94,7 @@ uint8_t renderInit( void )
 
 */
 //----------------------------------------
-uint8_t renderResize(uint32_t w, uint32_t h)
+uint8_t renderResize(uint32_t w, uint32_t h,uint32_t pw, uint32_t ph)
 {
 int mul,xx,yy;
 
@@ -105,6 +106,8 @@ int mul,xx,yy;
         screenBuffer=new uint8_t[w*h*4];
 
 	updateWindowSize( draw,w,h);
+        phyW=pw;
+        phyH=ph;
 	UI_purge();
 	return 1;
 
@@ -115,51 +118,30 @@ int mul,xx,yy;
 
 */
 //----------------------------------------
-uint8_t renderUpdateImage(uint8_t *ptr)
-{
-	
-        ADM_assert(screenBuffer);
-        lastImage=ptr;
-
-	if(!accel_mode)
-	 	GUI_ConvertRGB(ptr,screenBuffer, renderW,renderH);
-	renderRefresh();
-	return 1;
-
-}
-/**
-      \fn renderUpdateImageBlit
-      \brief Blit the source into destination
-
-*/
-
-uint8_t renderUpdateImageBlit(uint8_t *ptr,uint32_t startx, uint32_t starty, uint32_t w, uint32_t h,uint32_t primary)
+uint8_t renderUpdateImage(uint8_t *ptr,renderZoom zoom)
 {
 
-        ADM_assert(screenBuffer);
-        lastImage=NULL;
-        if(!accel_mode)
+    ADM_assert(screenBuffer);
+    lastImage=ptr;
+
+    if(accel_mode)
+    {
+        if(accel_mode ->hasHwZoom())
         {
-                GUI_ConvertRGBBlit(ptr,screenBuffer, renderW,renderH,startx,starty,w,h,primary);
-                if(primary) renderRefresh();
+           accel_mode->display(lastImage, phyW, phyH,zoom);
+        }else
+        {
+          accel_mode->display(lastImage, renderW, renderH,zoom);
         }
-        else
-        { /* Accel mode, in that case we need to blit our part of the image inside the big image
-              It is assumed the accel render part can work with YV12
-          */
-          /* Luma */
-          uint32_t pageR=(renderW*renderH);
-          uint32_t pageS=(w*h);
-          BitBlit(accelSurface+startx+starty*renderW,renderW,ptr,w,w,h);
-          BitBlit(accelSurface+pageR+(startx>>1)+(starty>>1)*(renderW>>1),renderW>>1,ptr+pageS,w>>1,w>>1,h>>1);
-          BitBlit(accelSurface+(pageR*5)/4+(startx>>1)+(starty>>1)*(renderW>>1),renderW>>1,ptr+(pageS*5)/4,w>>1,w>>1,h>>1);
+      
+    }else
+    {
+      GUI_ConvertRGB(ptr,screenBuffer, renderW,renderH);
+      renderRefresh();
+    }
+  return 1;
 
-          lastImage=accelSurface;
-          if(primary) renderRefresh();
-        }
-        return 1;
 }
-
 /**
 	Refresh the image from internal buffer / last image
 	Used for example as call back for X11 events
@@ -208,6 +190,7 @@ uint8_t renderStartPlaying( void )
 char *displ;
 unsigned int renderI;
 ADM_RENDER_TYPE render;
+uint8_t r=0;
 	ADM_assert(!accel_mode);
 	// First check if local
 	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
@@ -242,7 +225,9 @@ ADM_RENDER_TYPE render;
 #if defined(USE_XV)
 	       case RENDER_XV:
 		accel_mode=new XvAccelRender();
-		if(!accel_mode->init(&xinfo,renderW,renderH))
+                if(accel_mode->hasHwZoom()) r=accel_mode->init(&xinfo,phyW,phyH);
+                else r=accel_mode->init(&xinfo,renderW,renderH);
+                if(!r)
 		{
 			delete accel_mode;
 			accel_mode=NULL;
@@ -258,7 +243,9 @@ ADM_RENDER_TYPE render;
               case RENDER_SDL:
 		printf("Trying SDL\n");
 		accel_mode=new sdlAccelRender();
-		if(!accel_mode->init(&xinfo,renderW,renderH))
+		if(accel_mode->hasHwZoom()) r=accel_mode->init(&xinfo,phyW,phyH);
+                else r=accel_mode->init(&xinfo,renderW,renderH);
+                if(!r)
 		{
 			delete accel_mode;
 			accel_mode=NULL;
@@ -286,7 +273,15 @@ ADM_RENDER_TYPE render;
 	
 	return 1;
 }
-
+/**
+      \fn renderHasAccelZoom
+      \brief returns 1 if accel can do hw zoom
+*/
+uint8_t renderHasAccelZoom(void)
+{
+    if(!accel_mode) return 0;
+    return accel_mode->hasHwZoom(); 
+}
 
 uint8_t renderStopPlaying( void )
 {

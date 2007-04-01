@@ -178,7 +178,7 @@ static void interleave(uint8_t *dst,uint8_t *src,int width, int stride, int line
         dst+=stride;          
     }   
 }
-uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h)
+uint8_t sdlAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h,renderZoom zoom)
 {
 int pitch;
 int page=w*h;

@@ -48,7 +48,7 @@ SCRIPT_CREATE(animated_script,ADMVideoAnimated,animated_template);
 #define LOOKUP 4
 #define CACHE_SIZE (LOOKUP*2+3)
 
-extern uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t,ADMImage *image);
+
 extern uint8_t DIA_animated(ANIMATED_PARAM *param);
 
 uint8_t ADMVideoAnimated::configure(AVDMGenericVideoStream *in)

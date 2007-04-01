@@ -60,9 +60,9 @@ static void FillAudio(void);
 
 #define EVEN(x) (x&0xffffffe)
 
- extern ADMImage *rdr_decomp_buffer;
+ 
 
- extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
+ extern uint8_t GUI_getFrame(uint32_t frameno,  uint32_t *flags);
 //___________________________________
 uint8_t stop_req;
 static int called = 0;
@@ -87,7 +87,6 @@ void GUI_PlayAvi(void)
 
     uint32_t framelen,flags;
     AVDMGenericVideoStream *filter;
-    ADMImage *buffer=NULL;
 
     vids = 0, auds = 0, dauds = 0;
     // check we got everything...
@@ -124,17 +123,10 @@ void GUI_PlayAvi(void)
     one_frame = (uint32_t) floor(1000.*1000.*10. / filter->getInfo()->fps1000);
     err = one_frame % 10;
     one_frame /= 10; // Duration of a frame in ms, err =leftover in 1/10 ms
-    buffer=new ADMImage(filter->getInfo()->width,filter->getInfo()->height);
+    
     // go to RealTime...    
     printf(" One frame : %lu, err=%lu ms\n", one_frame, err);
-    // read frame in chunk
-    if(!filter->getFrameNumberNoAlloc(1,&framelen,buffer,&flags))
-    {
-        printf("\n cannot read frame!\n");
-        goto abort_play;
-    }
-      curframe++;
-      played_frame++;
+    
     // prepare 1st frame
 
     stop_req = 0;
@@ -148,13 +140,13 @@ void GUI_PlayAvi(void)
      //renderStartPlaying();
 // reset timer reference
     resetTime();
-    admPreview::deferDisplay(1);
-    admPreview::update(played_frame,buffer);
+    admPreview::deferDisplay(1,curframe);
+    admPreview::update(played_frame);
     do
     {
         vids++;
-        admPreview::displayNow(played_frame,buffer);;
-        update_status_bar(buffer);
+        admPreview::displayNow(played_frame);;
+        update_status_bar();
         if (time_a == 0)
             time_a = getTime(0);
         // mark !
@@ -166,12 +158,8 @@ void GUI_PlayAvi(void)
             printf("\n End met (%lu  / %lu )\n",played_frame,max);
             goto abort_play;
          }
-        if(!filter->getFrameNumberNoAlloc(played_frame+1,&framelen,buffer,&flags))
-        {
-            printf("\n cannot read frame!\n");
-            goto abort_play;
-        }
-        admPreview::update(played_frame+1,buffer);;
+        
+        admPreview::update(played_frame+1);;
 	curframe++;
 	played_frame++;
 
@@ -222,13 +210,13 @@ abort_play:
     // go back to normal display mode
     //____________________________________
     playing = 0;
-	  delete  buffer;
+    uint32_t f;
           
 	   getFirstVideoFilter( );
-	   GUI_getFrame(curframe, rdr_decomp_buffer, &flags);
-           admPreview::deferDisplay(0);
+	   GUI_getFrame(curframe,&f);
+           admPreview::deferDisplay(0,0);
            // Updated by expose ? admPreview::update(curframe,rdr_decomp_buffer);
-     	   update_status_bar(rdr_decomp_buffer);
+     	   update_status_bar();
 #ifdef HAVE_AUDIO
     if (currentaudiostream)
       {

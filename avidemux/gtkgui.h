@@ -20,7 +20,7 @@ void 			A_saveAudio	(char *name);
 void 			A_saveAudioDecoded	(char *name);
 void 			A_saveAVI		(char *name);
 void 			A_playAvi		(void);
-void 			update_status_bar(ADMImage *image );
+void 			update_status_bar(void );
 void 			rebuild_status_bar(void );
 
 
@@ -35,13 +35,7 @@ uint32_t GUI_GetScale( void );
 void GUI_detransient(void );
 void GUI_retransient(void );
 
-typedef enum pipID
-{
-	P_TOOLAME,
-	P_LAME,
-	P_OTHER
-};
- void A_Pipe(pipID who,char *file=NULL );
+uint8_t GUI_getFrameContent(ADMImage *image, uint32_t frame);
 
 //EOF
 

@@ -49,7 +49,7 @@
 static uint8_t 	GUI_XvList(Display * dis, uint32_t port, uint32_t * fmt);
 static uint8_t 	GUI_XvInit(GUI_WindowInfo * window, uint32_t w, uint32_t h);
 static void 	GUI_XvEnd( void );
-static uint8_t 	GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h);
+static uint8_t 	GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h,renderZoom zoom);
 static uint8_t 	GUI_XvSync(void);
 
 static uint8_t getAtom(char *string);
@@ -70,9 +70,9 @@ uint8_t XvAccelRender::end(void)
 	 return 1;
 }
 
-uint8_t XvAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h)
+uint8_t XvAccelRender::display(uint8_t *ptr, uint32_t w, uint32_t h,renderZoom zoom)
 {
-	return GUI_XvDisplay(ptr, w, h);
+	return GUI_XvDisplay(ptr, w, h,zoom);
 }
 //________________Wrapper around Xv_______________
 
@@ -110,9 +110,9 @@ void GUI_XvEnd( void )
 }
 
 //------------------------------------
-uint8_t GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h)
+uint8_t GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h,renderZoom zoom)
 {
-
+    uint32_t destW,destH;
     if (xvimage)
       {
 
@@ -122,11 +122,24 @@ uint8_t GUI_XvDisplay(uint8_t * src, uint32_t w, uint32_t h)
 	  // total 1.5*
          XLockDisplay (xv_display);
 	  memcpy(xvimage->data, src, (w*h*3)>>1);
-	
+          uint32_t factor=4;
+        switch(zoom)
+        {
+            case ZOOM_1_4: factor=1;break;
+            case ZOOM_1_2: factor=2;break;
+            case ZOOM_1_1: factor=4;break;
+            case ZOOM_2:   factor=8;break;
+            case ZOOM_4:   factor=16;break;
+            default : ADM_assert(0);
+          
+        }
+	destW=(w*factor)/4;
+        destH=(h*factor)/4;
+        //printf("%u x %u => %u x %u\n",w,h,destW,destH);
         // And display it !
 #if 1
 	  XvShmPutImage(xv_display, xv_port, xv_win, xv_gc, xvimage, 0, 0, w, h,	// src
-			0, 0, w, h,	// dst
+			0, 0, destW, destH,	// dst
 			False);
 #else
 	 XvPutImage(xv_display, xv_port, xv_win, xv_gc, xvimage, 0, 0, w, h,	// src

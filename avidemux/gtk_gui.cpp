@@ -139,7 +139,7 @@ static uint8_t A_pass(char *name);
 uint8_t A_jumpToTime(uint32_t hh,uint32_t mm,uint32_t ss);
 //__________
 extern uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss);
-extern uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags);
+extern uint8_t GUI_getFrame(uint32_t frameno,  uint32_t *flags);
 extern int A_SaveUnpackedVop(const char *name);
 extern int A_SavePackedVop(const char *name);
 extern void      videoCodecConfigureUI(void);
@@ -166,7 +166,6 @@ uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t,ADMImage *image);
 extern const char * GUI_getCustomScript(uint32_t nb);
 extern gboolean SliderIsShifted;
 
-ADMImage *rdr_decomp_buffer=NULL;
 
 
 
@@ -462,7 +461,7 @@ int nw;
         case ACT_ZOOM_4_1:
                 currentZoom=(renderZoom)((action-ACT_ZOOM_1_4)+ZOOM_1_4);
                 changePreviewZoom(currentZoom);
-                admPreview::update(curframe,rdr_decomp_buffer);
+                admPreview::update(curframe);
                 break;
 
 
@@ -642,7 +641,7 @@ case ACT_Pipe2Other:
             admPreview::stop();
             setPreviewMode(newpreview);
             admPreview::start();
-            admPreview::update(curframe,rdr_decomp_buffer);
+            admPreview::update(curframe);
       }
       break;
     case ACT_StopAvi:
@@ -893,7 +892,7 @@ case ACT_Pipe2Other:
       if (getPreviewMode()!=ADM_PREVIEW_NONE)
       {
          admPreview::start();
-         admPreview::update (curframe,rdr_decomp_buffer);
+         admPreview::update (curframe);
       }
       break;
 
@@ -982,12 +981,6 @@ int A_openAvi2 (char *name, uint8_t mode)
       A_changeAudioStream (NULL, AudioNone,NULL);
       filterCleanUp ();
 
-
-      if (rdr_decomp_buffer)
-	{
-	  delete  rdr_decomp_buffer;
-	  rdr_decomp_buffer = NULL;
-	}
 
     }
   DIA_StartBusy ();
@@ -1106,7 +1099,7 @@ void  updateLoaded ()
 
   curframe = 0;
   getFirstVideoFilter(); // reinit first filter
-  ADM_assert (rdr_decomp_buffer =new ADMImage(avifileinfo->width,avifileinfo->height));
+
 
   //frameStart = 0;
   //frameEnd = avifileinfo->nb_frames - 1;
@@ -1186,15 +1179,8 @@ void  updateLoaded ()
         
   
   
-  if(!GUI_getFrame( curframe, rdr_decomp_buffer,NULL))
-  {
-    GUI_Error_HIG (_("Could not decode the frame"), NULL);
-    }
-  else
-    {
-      admPreview::update (curframe,rdr_decomp_buffer);
-      update_status_bar(rdr_decomp_buffer);
-    }
+      admPreview::update (curframe);
+      update_status_bar();
    
    printf("\n** conf updated **\n");
 }
@@ -1367,7 +1353,14 @@ A_playAvi (void)
 ________________________________________________________*/
 int A_saveJpg (char *name)
 {
-    return (int) Util_saveJpg (name,avifileinfo->width, avifileinfo->height,rdr_decomp_buffer);
+  uint8_t fl;
+    ADMImage image(avifileinfo->width, avifileinfo->height);
+    if(!GUI_getFrameContent(&image, curframe))
+    {
+      GUI_Error_HIG(_("Get Frame"),_("Cannot get this frame to save"));
+      return 0; 
+    }
+    return (int) Util_saveJpg (name,avifileinfo->width, avifileinfo->height,NULL);
 }
 #else
 
@@ -1457,7 +1450,7 @@ void A_saveBunchJpg(char *name)
 	for(curImg=frameStart;curImg<=frameEnd;curImg++)
 	{	
                 working->update(curImg-frameStart,frameEnd-frameStart);	
-		if (!GUI_getFrame (curImg, src,NULL))
+		if (!GUI_getFrameContent (src,curImg ))
 		{
                   GUI_Error_HIG(_("Cannot decode frame"), _("Aborting."));
 			goto _bunch_abort;
@@ -1530,7 +1523,8 @@ sz = avifileinfo->width* avifileinfo->height * 3;
 	bmph.colorEncoding=0;
 */
 
-
+  ADMImage image(avifileinfo->width,avifileinfo->height);
+  GUI_getFrameContent(&image, curframe);
 
   printf ("\n %u x %u=%u\n", bmph.biWidth, bmph.biHeight, sz);
 
@@ -1543,7 +1537,7 @@ sz = avifileinfo->width* avifileinfo->height * 3;
 		return;
 	}
 
-	 if(!COL_yv12rgbBMP(bmph.biWidth, bmph.biHeight,rdr_decomp_buffer->data, out))
+	 if(!COL_yv12rgbBMP(bmph.biWidth, bmph.biHeight,image.data, out))
 	 {
            GUI_Error_HIG(_("Error converting to BMP"), NULL);
 		return;
@@ -2131,7 +2125,7 @@ DIA_working *work;
   {
 	work->update(i, nb);
       	if(!work->isAlive()) break;
-	if(!GUI_getFrame (i, aImage,NULL))
+	if(!GUI_getFrameContent (aImage,i))
 	{
 		error ++;
 		printf("Frame %u has error\n",i);
@@ -2519,7 +2513,7 @@ uint32_t GUI_GetScale(void)
 /// Update all  informations : current frame # and current time, total frame ...
 ///_____________________________________________________________
 
-void  update_status_bar(ADMImage *frame)
+void  update_status_bar(void)
 {
     char text[80];
     double len;
@@ -2530,8 +2524,7 @@ void  update_status_bar(ADMImage *frame)
  
 	UI_updateFrameCount( curframe);
 	UI_updateTimeCount( curframe,avifileinfo->fps1000);
-        if(frame)
-	       UI_setFrameType(  frame->flags,frame->_Qp);
+       
     // progress bar
     len = 100;
     if(avifileinfo->nb_frames>1)
@@ -2570,6 +2563,15 @@ void rebuild_status_bar(void)
      UI_setScale(len);
 }
 
-
+/**
+      \fn GUI_getFrameContent
+      \brief fill image with content of frame frame
+*/
+uint8_t GUI_getFrameContent(ADMImage *image, uint32_t frame)
+{
+  uint32_t flags;
+  if(!video_body->getUncompressedFrame(frame,image,&flags)) return 0;
+  return 1; 
+}
 
 // EOF

@@ -45,18 +45,17 @@
 #include "ADM_filter/video_filters.h"
     
 extern void    UI_purge(void );
-extern ADMImage *rdr_decomp_buffer;
 //____________________________________
 
-uint8_t GUI_getFrame(uint32_t frameno, ADMImage *image, uint32_t *flags)
+uint8_t GUI_getFrame(uint32_t frameno,  uint32_t *flags)
 {
 uint32_t len;
 
 	//return video_body->getUncompressedFrame(frameno,image,flags);
 	AVDMGenericVideoStream *filter=getFirstCurrentVideoFilter( );
 	ADM_assert(filter);
-	return filter->getFrameNumberNoAlloc(frameno,&len,image,flags);
-	
+	return 1;
+
 
 }
 void GUI_NextFrame(void)
@@ -71,15 +70,15 @@ uint32_t flags;
 
     if (avifileinfo)
       {
-        if( !GUI_getFrame(curframe + 1,rdr_decomp_buffer,&flags))
+        if( !GUI_getFrame(curframe + 1,&flags))
         	{
                   GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode next frame."));
            	}
            else
             {
                   curframe++;
-                  admPreview::update( curframe,rdr_decomp_buffer) ;
-                  update_status_bar(rdr_decomp_buffer);
+                  admPreview::update( curframe) ;
+                  update_status_bar();
   
                 UI_purge();
             }
@@ -109,13 +108,13 @@ void GUI_NextKeyFrame(void)
 		else
 		{
                         curframe=f;
-                        if( !GUI_getFrame(curframe,rdr_decomp_buffer,&flags))
+                        if( !GUI_getFrame(curframe,&flags))
                         {
                           GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode keyframe."));
                         }
                         
-                        admPreview::update( curframe,rdr_decomp_buffer) ;
-                        update_status_bar(rdr_decomp_buffer);
+                        admPreview::update( curframe) ;
+                        update_status_bar();
                         UI_purge();
 		}
 		
@@ -133,6 +132,11 @@ uint8_t  countLightPixels(int darkness)
     uint32_t sz = width * height ;
     const int maxnonb=(width* height)>>8;
 
+    return 0;
+#warning FIXME
+#warning FIXME
+#warning FIXME
+#if 0
     uint8_t *buff;
 
     int cnt4=0;
@@ -146,7 +150,7 @@ uint8_t  countLightPixels(int darkness)
 	if(cnt4>=maxnonb)
 	  return(1);
     }
-
+#endif
     return(0);
 }
 //**********************************************************************
@@ -160,8 +164,11 @@ static const int  sliceOrder[8]={3,4,2,5,1,6,0,7};
 static int sliceScanNotBlack(int darkness, int maxnonb, int sliceNum)
 {
 
-{
-
+  return 0;
+#warning FIXME
+#warning FIXME
+#warning FIXME
+#if 0
     uint32_t width = avifileinfo->width;
     uint32_t height = avifileinfo->height>>3;
     uint32_t sz = width * height ;    
@@ -184,7 +191,7 @@ static int sliceScanNotBlack(int darkness, int maxnonb, int sliceNum)
     }
     //printf("Slice : %d count:%d max:%d\n",sliceNum,cnt4,maxnonb);
     return(0);
-}
+#endif
 
 }
 uint8_t  fastIsNotBlack(int darkness)
@@ -218,7 +225,7 @@ void GUI_NextPrevBlackFrame(int dir)
    uint16_t reresh_count=0;
    uint32_t orgFrame;
    uint32_t r=1; 
-
+#if 0
     if (playing)
 		return;
     if (! avifileinfo)
@@ -266,9 +273,12 @@ void GUI_NextPrevBlackFrame(int dir)
     update_status_bar(rdr_decomp_buffer);
 
    return ;
+#endif
 }
 uint8_t A_ListAllBlackFrames(char *name)
 {
+  return 0;
+#if 0
 // Print a list of all black frames
 //_____________________________________________________________
     uint32_t f;
@@ -339,6 +349,7 @@ uint8_t A_ListAllBlackFrames(char *name)
      update_status_bar(rdr_decomp_buffer);
 
     return 1;
+#endif
 }
 //**********************************************************************
 
@@ -373,15 +384,15 @@ uint32_t flags;
               return 0;
     
 
-      if( !GUI_getFrame(frame ,rdr_decomp_buffer,&flags))
+      if( !GUI_getFrame(frame ,&flags))
       {
         GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode the frame."));
               return 0;
       }
 
       curframe = frame;
-      admPreview::update( curframe,rdr_decomp_buffer) ;
-      update_status_bar(rdr_decomp_buffer);
+      admPreview::update( curframe) ;
+      update_status_bar();
       UI_purge();
       
       return 1;
@@ -409,14 +420,14 @@ void GUI_PreviousKeyFrame(void)
             else
             {
                     curframe=f;
-                    if( !GUI_getFrame(curframe,rdr_decomp_buffer,&flags))
+                    if( !GUI_getFrame(curframe,&flags))
                     {
                       GUI_Error_HIG(_("Decompressing error"),_( "Cannot decode keyframe."));
                     }
                     
-                    admPreview::update( curframe,rdr_decomp_buffer) ;
+                    admPreview::update( curframe) ;
 
-                    update_status_bar(rdr_decomp_buffer);
+                    update_status_bar();
                     UI_purge();
             }
               
