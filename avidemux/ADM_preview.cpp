@@ -270,14 +270,14 @@ void admPreview::stop( void )
       }
       if(zoom!=ZOOM_1_1)
       {
-          ADM_assert(resized);
-          ADM_assert(resizer);
-          delete resized;
-          delete resizer;
+          
+          
+          if(resized) delete resized;
+          if(resizer) delete resizer;
           resized=NULL;
           resizer=NULL;
       }
-  renderUnlock();
+      renderUnlock();
 }
 /**
       \fn admPreview::updateFilters

@@ -58,7 +58,7 @@ void GUI_gtk_grow_off(int onff);
 
 extern GtkWidget *getDrawWidget( void );
  ColYuvRgb rgbConverter(640,480);
-
+uint32_t lastW,lastH;
 /**
     \brief return pointer to the drawing widget that displays video
 */
@@ -74,6 +74,10 @@ void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr)
     GtkWidget *widget;
     widget = (GtkWidget *)widg; 
 
+    if(lastW>w || lastH>h)
+    {
+      printf("[Gtk] Warning window bigger than display %u x %u vs %u x %u\n",w,h,lastW,lastH);
+    }
 
     gdk_draw_rgb_32_image(widget->window, widget->style->fg_gc[GTK_STATE_NORMAL], 0,    // X
                        0,       // y
@@ -93,6 +97,10 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
     gtk_widget_set_usize((GtkWidget *)win, w, h);
     UI_purge();
     GUI_gtk_grow_off(1);
+    lastW=w;
+    lastH=h;
+    printf("[GTK] Changing size to %u %u\n",w,h);
+    UI_purge();
 }
 /**
       \brief Retrieve info from window, needed for accel layer

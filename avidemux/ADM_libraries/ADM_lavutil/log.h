@@ -42,6 +42,8 @@ struct AVCLASS {
 #define AV_LOG_ERROR 0
 #define AV_LOG_INFO 1
 #define AV_LOG_DEBUG 2
+#define AV_LOG_VERBOSE 2
+
 extern int av_log_level;
 
 #ifdef __GNUC__
