@@ -79,6 +79,9 @@ uint8_t renderStartPlaying( void );
 uint8_t renderStopPlaying( void );
 uint8_t renderHasAccelZoom(void);
 
+uint8_t renderLock(void);
+uint8_t renderUnlock(void);
+
 void *UI_getDrawWidget(void);
 void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr);
 void UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h);

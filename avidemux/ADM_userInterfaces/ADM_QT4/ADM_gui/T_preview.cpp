@@ -58,7 +58,6 @@ static AccelRender *accelRender=NULL;
 static uint8_t *lastImage=NULL;
 
  ColYuvRgb rgbConverter(640,480,1);
- ColYuvRgb rgbConverter2(640,480,1);
 
 //****************************************************************************************************
 void GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal)

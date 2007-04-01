@@ -24,15 +24,11 @@
 #include <math.h>
 #include <unistd.h>
 #include <string.h>
-
-
 #include <sys/time.h>
-
 
 #include <../ADM_assert.h>
 
 #include "default.h"
-
 
 #include "ADM_commonUI/GUI_render.h"
 
@@ -50,23 +46,17 @@
 
 
 extern uint8_t BitBlit(uint8_t *dst, uint32_t pitchDest,uint8_t *src,uint32_t pitchSrc,uint32_t width, uint32_t height);
-extern void UI_purge(void);
 
+extern void UI_purge(void);
+extern uint8_t UI_shrink(uint32_t w,uint32_t h);
 
 static uint8_t	updateWindowSize(void * win, uint32_t w, uint32_t h);
-void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 static uint8_t  GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h);
-static uint8_t  GUI_ConvertRGBBlit(uint8_t * in, uint8_t * out,uint32_t totalW,uint32_t totalH, 
-                                  uint32_t startx,uint32_t starty,uint32_t w, uint32_t h,uint32_t primary);
 
+void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 
-extern uint8_t UI_shrink(uint32_t w,uint32_t h);
 //_____________________________________
-
-
-extern ColYuvRgb rgbConverter;
-extern ColYuvRgb rgbConverter2;
-
+extern ColYuvRgb rgbConverter; // Declared in UI_xxx as it is not the same between GTK and QT (RGB vs BGR or whatever)
 //_____________________________________
 static AccelRender    *accel_mode=NULL;
 static uint8_t        *accelSurface=NULL;
@@ -75,9 +65,10 @@ static uint8_t        *accelSurface=NULL;
 static uint8_t 	            *screenBuffer=NULL;
 static uint8_t		    *lastImage=NULL;
 static void                 *draw=NULL;
-static uint32_t 	     renderW=0,renderH=0;
+static uint32_t 	     renderW=0,renderH=0; /* Zoomed/display size */
 static uint32_t              phyW=0,phyH=0; /* Unzoomed size, only used when accel can do hw resize */
-
+static renderZoom            lastZoom;
+static uint8_t               _lock=0;
 //_______________________________________
 /**
 	Render init, initialize internals. Constuctor like function
@@ -88,6 +79,20 @@ uint8_t renderInit( void )
 	draw=UI_getDrawWidget(  );
 	return 1;
 }
+/**
+    \fn renderLock
+    \brief Take the weak lock (i.e. not threadsafe)
+*/
+uint8_t renderLock(void)
+{
+  ADM_assert(!_lock);
+  _lock=1; 
+}
+uint8_t renderUnlock(void)
+{
+  ADM_assert(_lock);
+  _lock=0; 
+}
 
 /**
 	Warn the renderer that the display size is changing
@@ -97,20 +102,18 @@ uint8_t renderInit( void )
 uint8_t renderResize(uint32_t w, uint32_t h,uint32_t pw, uint32_t ph)
 {
 int mul,xx,yy;
-
 	if(screenBuffer) 
-		{
-			delete  [] screenBuffer;
-			screenBuffer=NULL;
-		}
+        {
+                delete  [] screenBuffer;
+                screenBuffer=NULL;
+        }
         screenBuffer=new uint8_t[w*h*4];
-
-	updateWindowSize( draw,w,h);
         phyW=pw;
         phyH=ph;
-	UI_purge();
-	return 1;
-
+  
+        updateWindowSize( draw,w,h);
+        UI_purge();
+        return 1;
 }
 /**
 	Update the image and render it
@@ -123,9 +126,10 @@ uint8_t renderUpdateImage(uint8_t *ptr,renderZoom zoom)
 
     ADM_assert(screenBuffer);
     lastImage=ptr;
-
+    ADM_assert(!_lock);
     if(accel_mode)
     {
+        lastZoom=zoom;
         if(accel_mode ->hasHwZoom())
         {
            accel_mode->display(lastImage, phyW, phyH,zoom);
@@ -150,6 +154,7 @@ uint8_t renderUpdateImage(uint8_t *ptr,renderZoom zoom)
 //_______________________________________________
 uint8_t renderRefresh(void)
 {
+      if(_lock) return 1;
       if(!screenBuffer)
       {
               if(accel_mode) ADM_assert(0);
@@ -159,7 +164,13 @@ uint8_t renderRefresh(void)
       if(accel_mode)
       {
           if(lastImage)
-              accel_mode->display(lastImage, renderW, renderH);
+               if(accel_mode ->hasHwZoom())
+                {
+                  accel_mode->display(lastImage, phyW, phyH,lastZoom);
+                }else
+                {
+                  accel_mode->display(lastImage, renderW, renderH,lastZoom);
+                }
       }
       else
               GUI_RGBDisplay(screenBuffer, renderW, renderH,draw);
@@ -168,22 +179,7 @@ uint8_t renderRefresh(void)
 
 uint8_t renderExpose(void)
 {
-	if(!screenBuffer)
-	{
-		if(accel_mode) ADM_assert(0);
-		return 0;
-	}
-
-
-    if ( accel_mode)
-    {	
-        if(lastImage)
-		accel_mode->display(lastImage,renderW,renderH);
-    }
-    else
-	GUI_RGBDisplay(screenBuffer, renderW, renderH,draw);
-    return 1;
-
+    renderRefresh();
 }
 uint8_t renderStartPlaying( void )
 {
@@ -192,6 +188,7 @@ unsigned int renderI;
 ADM_RENDER_TYPE render;
 uint8_t r=0;
 	ADM_assert(!accel_mode);
+        
 	// First check if local
 	// We do it in a very wrong way : If DISPLAY!=:0.0 we assume remote display
 	// in that case we do not even try to use accel
@@ -285,16 +282,18 @@ uint8_t renderHasAccelZoom(void)
 
 uint8_t renderStopPlaying( void )
 {
-	if(accel_mode)
-	{
-		accel_mode->end();
-		delete accel_mode;
-                if(accelSurface) delete [] accelSurface;
-                accelSurface=NULL;
-				
-	}
-	accel_mode=NULL;	
-	return 1;
+      
+      if(accel_mode)
+      {
+              accel_mode->end();
+              delete accel_mode;
+              if(accelSurface) delete [] accelSurface;
+              accelSurface=NULL;
+                              
+      }
+      accel_mode=NULL;	
+      
+      return 1;
 }
 
 
@@ -308,7 +307,6 @@ uint8_t	updateWindowSize(void * win, uint32_t w, uint32_t h)
     renderH = h;
 
     UI_updateDrawWindowSize(win,w,h);
-    //gtk_widget_set_usize(win, w, h);
     rgbConverter.reset(w,h);
     return 1;
 }
@@ -319,25 +317,9 @@ uint8_t GUI_ConvertRGB(uint8_t * in, uint8_t * out, uint32_t w, uint32_t h)
     rgbConverter.scale(in,out);
     return 1;
 }
-uint8_t GUI_ConvertRGBBlit(uint8_t * in, uint8_t * out,uint32_t totalW,uint32_t totalH, uint32_t startx,uint32_t starty,uint32_t w, uint32_t h,uint32_t primary)
-{
-  if(!primary)
-  {
-    rgbConverter.reset(w,h);
-    rgbConverter.scale(in,out,startx,starty,w,h,renderW,renderH);
-  }else
-  {
-    rgbConverter2.reset(w,h);
-    rgbConverter2.scale(in,out,startx,starty,w,h,renderW,renderH);
-  }
-    return 1;
-}
-
-
-
 void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg)
 {
     
     UI_rgbDraw(widg,w,h,dis);
-
 }
+//EOF

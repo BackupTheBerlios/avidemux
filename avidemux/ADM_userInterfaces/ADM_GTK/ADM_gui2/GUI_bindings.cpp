@@ -532,11 +532,8 @@ gboolean  on_drawingarea1_expose_event(GtkWidget * widget,  GdkEventExpose * eve
 UNUSED_ARG(widget);
 UNUSED_ARG(event);
 UNUSED_ARG(user_data);
-	
-		//renderRefresh();
-		renderExpose();
-		
-    	return true;
+        renderExpose();
+        return true;
 }
 
 ///

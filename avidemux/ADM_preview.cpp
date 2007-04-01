@@ -69,7 +69,7 @@ static uint32_t             defered_display=0;  /* When 1, it means we are in pl
 static uint32_t             playbackOffset=0;   /* in playback mode, frame 0 = playbackOffset compared to real beginning of the file */
 static renderZoom           zoom=ZOOM_1_1;
 static ADMImage             *resized=NULL;
-static ADM_MplayerResize    *resizer=NULL;
+static ADMImageResizer      *resizer=NULL;
 static ADMImage             *original=NULL;
 
 /*************************************/
@@ -85,7 +85,7 @@ static uint32_t  rdrWindowHUnzoomed=0;
 static uint32_t  rdrWindowWZoomed=0;    /* Same but with zoom */
 static uint32_t  rdrWindowHZoomed=0;
 
-static uint32_t  rdrHwZoom=0;           /* Hw can do zoom */
+
 /*************************************/
 extern ADM_Composer *video_body;
 
@@ -103,8 +103,8 @@ void admPreview::setMainDimension(uint32_t w, uint32_t h)
   rdrPhysicalW=w;
   rdrPhysicalH=h;
   
-  rdrWindowWUnzoomed=w;
-  rdrWindowHUnzoomed=h;
+  rdrWindowWZoomed=rdrWindowWUnzoomed=w;
+  rdrWindowHZoomed=rdrWindowHUnzoomed=h;
   
   renderResize(w,h,w,h);
   
@@ -145,7 +145,7 @@ void changePreviewZoom(renderZoom nzoom)
 }
 /**
       \fn deferDisplay
-      \brief Enable or disable defered display
+      \brief Enable or disable defered display. Used by playback mode to have smooth output
 
 */
 void admPreview::deferDisplay(uint32_t onoff,uint32_t startat)
@@ -167,13 +167,14 @@ void admPreview::deferDisplay(uint32_t onoff,uint32_t startat)
 }
 /**
       \fn admPreview::start
-      \brief start preview
+      \brief start preview, reiginite preview with new parameters
 
 */
 
 void 	admPreview::start( void )
 {
             aprintf("--killing\n");
+            renderLock();
             getFirstVideoFilter();
             
             preview=videofilters[  nb_active_filter-1].filter;
@@ -200,9 +201,8 @@ void 	admPreview::start( void )
                   break;
               case  ADM_PREVIEW_SIDE:
               {
-                  
-                  rdrWindowHUnzoomed=MAX(rdrPhysicalH,preview->getInfo()->height);
                   rdrWindowWUnzoomed=rdrPhysicalW+preview->getInfo()->width;
+                  rdrWindowHUnzoomed=MAX(rdrPhysicalH,preview->getInfo()->height);
                   original=new ADMImage(rdrWindowWUnzoomed,rdrWindowHUnzoomed);
                   break;
               }
@@ -238,26 +238,28 @@ void 	admPreview::start( void )
             ADM_assert(!resized);
             resized=new ADMImage(rdrWindowWZoomed,rdrWindowHZoomed);
             ADM_assert(!resizer);
-            resizer=new  ADM_MplayerResize(rdrWindowWUnzoomed,rdrWindowHUnzoomed,rdrWindowWZoomed,rdrWindowHZoomed);
+            resizer=new  ADMImageResizer(rdrWindowWUnzoomed,rdrWindowHUnzoomed,rdrWindowWZoomed,rdrWindowHZoomed);
             renderResize(rdrWindowWZoomed,rdrWindowHZoomed,rdrWindowWUnzoomed,rdrWindowHUnzoomed);
         }else
         {
              renderResize(rdrWindowWUnzoomed,rdrWindowHUnzoomed,rdrWindowWUnzoomed,rdrWindowHUnzoomed);
-             rdrHwZoom=0;
         }
+        renderUnlock();
 }
 /**
       \fn admPreview::stop
-      \brief kill preview window and associated datas
+      \brief kill preview  and associated datas
 */
 
 void admPreview::stop( void )
 {
+  renderLock();
       if(previewMode==ADM_PREVIEW_SEPARATE)
                 GUI_PreviewEnd();
       if(  previewMode==ADM_PREVIEW_SIDE || previewMode==ADM_PREVIEW_TOP)
       {
         ADM_assert(original);
+        delete original;
         original=NULL; 
       }
       renderResize(rdrWindowWUnzoomed,rdrWindowHUnzoomed,rdrWindowWUnzoomed,rdrWindowHUnzoomed);
@@ -275,6 +277,7 @@ void admPreview::stop( void )
           resized=NULL;
           resizer=NULL;
       }
+  renderUnlock();
 }
 /**
       \fn admPreview::updateFilters
@@ -342,9 +345,9 @@ uint8_t admPreview::update(uint32_t framenum)
             {
                 ADM_assert(resizer);
                 ADM_assert(resized);
-                resizer->resize(rdrImage->data,resized->data);
+                resizer->resize(rdrImage,resized);
                 if(!defered_display) 
-                  renderUpdateImage(resized->data,zoom);
+                  renderUpdateImage(resized->data,ZOOM_1_1);
             }
         }
         break;
@@ -358,9 +361,9 @@ uint8_t admPreview::update(uint32_t framenum)
                           }
                           else
                           {
-                             resizer->resize(previewImage->data,resized->data);
+                             resizer->resize(previewImage,resized);
                              if(!defered_display) 
-                                  renderUpdateImage(resized->data,zoom);
+                                  renderUpdateImage(resized->data,ZOOM_1_1);
                           }
                   }
             break;
@@ -379,7 +382,7 @@ uint8_t admPreview::update(uint32_t framenum)
             {
                 ADM_assert(resizer);
                 ADM_assert(resized);
-                resizer->resize(rdrImage->data,resized->data);
+                resizer->resize(rdrImage,resized);
                 if(!defered_display) 
                   renderUpdateImage(resized->data,zoom);
             }
@@ -416,9 +419,9 @@ uint8_t admPreview::update(uint32_t framenum)
                   renderUpdateImage(original->data,zoom);
               }else
               {
-                resizer->resize(original->data,resized->data);
+                resizer->resize(original,resized);
                 if(!defered_display) 
-                  renderUpdateImage(resized->data,zoom);
+                  renderUpdateImage(resized->data,ZOOM_1_1);
               }
               break;
         
@@ -444,9 +447,9 @@ uint8_t admPreview::update(uint32_t framenum)
                   renderUpdateImage(original->data,zoom);
               }else
               {
-                resizer->resize(original->data,resized->data);
+                resizer->resize(original,resized);
                 if(!defered_display) 
-                  renderUpdateImage(resized->data,zoom);
+                  renderUpdateImage(resized->data,ZOOM_1_1);
               }
               break;
       default: ADM_assert(0);
@@ -464,15 +467,15 @@ void previewBlit(ADMImage *from,ADMImage *to,uint32_t startx,uint32_t starty)
   
 }
 /**
-      \fn displayNow
-      \brief display on screen immediately
+      \fn     displayNow
+      \brief  display on screen immediately. The image has been calculated previously by update
 */
 
 void admPreview::displayNow(uint32_t framenum)
 {
 
     uint32_t fl,len;	
-
+    
     switch(previewMode)
     {
       case ADM_PREVIEW_NONE:
@@ -522,5 +525,6 @@ void admPreview::displayNow(uint32_t framenum)
               break;
       default: ADM_assert(0);
     }
-
 }
+
+// EOF
