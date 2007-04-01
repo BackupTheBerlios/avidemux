@@ -81,7 +81,7 @@ int mm_support(void)
         cpuid(1, eax, ebx, ecx, std_caps);
         if (std_caps & (1<<23))
             rval |= MM_MMX;
-#if 0	    
+#if 1	    
         if (std_caps & (1<<25))
             rval |= MM_MMXEXT | MM_SSE;
         if (std_caps & (1<<26))
