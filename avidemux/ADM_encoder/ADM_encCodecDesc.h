@@ -628,13 +628,13 @@ NULL,//     char      *logfile;
 0,//     int32_t  Strength;
 0,//     int32_t  Threshold;
 1,//     uint32_t CABAC;
-1,//     uint32_t Trellis;
+0,//     uint32_t Trellis;
 1, //        ChromaME
 0, // Mixed Ref
 0, //NoiseReduction
 51, // level IDC for psp  
 0, // fastPSkip;
-0,  //DCTDecimate;
+1,  //DCTDecimate;
 0,   //interlaced;
 0,    // vbv_max_bitrate;
 0,  // vbv_buffer_size;
@@ -691,7 +691,7 @@ NULL,//     char      *logfile;
 0, //NoiseReduction
 30, // level IDC for psp  
 0, // fastPSkip;
-0,  //DCTDecimate;
+1,  //DCTDecimate;
 0,   //interlaced;
 0,    // vbv_max_bitrate;
 0,  // vbv_buffer_size;
