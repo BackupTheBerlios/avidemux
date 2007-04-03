@@ -231,4 +231,22 @@ void diaElemText::getMe(void) {}
   
             
 //******************************************************
+diaElemMenuDynamic::diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
+                diaMenuEntryDynamic **menu,const char *tip)
+  : diaElem(ELEM_MENU)
+{
+}
+
+diaElemMenuDynamic::~diaElemMenuDynamic()
+{ 
+}
+void diaElemMenuDynamic::setMe(void *dialog, void *opaque,uint32_t line)
+{
+}
+
+void diaElemMenuDynamic::getMe(void)
+{ 
+}
+//******************************************************
+
 //EOF

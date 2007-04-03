@@ -92,11 +92,82 @@ void diaElemMenu::getMe(void)
   uint32_t *val=(uint32_t *)param;
   uint32_t rank;
   ADM_assert(widget);
-  
+  if(!nbMenu) return;
   
   rank=gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
   ADM_assert(rank<this->nbMenu);
   *(uint32_t *)param=this->menu[rank].val;
+}
+
+//*******************************
+diaElemMenuDynamic::diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
+                diaMenuEntryDynamic **menu,const char *tip)
+  : diaElem(ELEM_MENU)
+{
+  param=(void *)intValue;
+  paramTitle=itle;
+  this->tip=tip;
+  this->menu=menu;
+  this->nbMenu=nb;
+}
+
+diaElemMenuDynamic::~diaElemMenuDynamic()
+{
+  
+}
+void diaElemMenuDynamic::setMe(void *dialog, void *opaque,uint32_t line)
+{
+  GtkWidget *widget;
+  GtkWidget *label;
+  GtkWidget *item;
+  GtkWidget *combo;
+  
+  
+  label = gtk_label_new_with_mnemonic (paramTitle);
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+  gtk_widget_show(label);
+  
+  gtk_table_attach (GTK_TABLE (opaque), label, 0, 1, line, line+1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  
+  combo = gtk_combo_box_new_text ();
+  gtk_widget_show (combo);
+  gtk_table_attach (GTK_TABLE (opaque), combo, 1, 2, line, line+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  
+  gtk_label_set_mnemonic_widget (GTK_LABEL(label), combo);
+  
+  for(int i=0;i<nbMenu;i++)
+  {
+    gtk_combo_box_append_text (GTK_COMBO_BOX (combo),menu[i]->text);
+  }
+  
+  for(int i=0;i<nbMenu;i++)
+  {
+    if(menu[i]->val==*(uint32_t *)param) 
+    {
+      gtk_combo_box_set_active(GTK_COMBO_BOX(combo),i);
+    }
+  }
+  
+  
+  myWidget=(void *)combo;
+}
+
+void diaElemMenuDynamic::getMe(void)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  uint32_t *val=(uint32_t *)param;
+  uint32_t rank;
+  if(!nbMenu) return;
+  ADM_assert(widget);
+  
+  
+  rank=gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
+  ADM_assert(rank<this->nbMenu);
+  *(uint32_t *)param=this->menu[rank]->val;
 }
 
 

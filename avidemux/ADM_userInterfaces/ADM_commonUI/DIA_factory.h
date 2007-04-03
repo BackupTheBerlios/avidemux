@@ -16,6 +16,8 @@
 #ifndef DIA_FACTORY_H
 #define DIA_FACTORY_H
 
+#include "ADM_assert.h"
+
 typedef enum elemEnum
 {
   ELEM_INVALID=0,
@@ -116,11 +118,35 @@ public:
 /*************************************************/
 typedef struct diaMenuEntry
 {
+  public:
   uint32_t    val;
   const char *text;
   const char *desc;
+  public:
+ /*   diaMenuEntry(uint32_t v,const char *t,const char *d) {val=v;t=ADM_strdup(t);desc=ADM_strdup(d);}
+    ~diaMenuEntry() { ADM_dealloc(text);ADM_dealloc(desc);}
+    */
 }diaMenuEntry;
 
+class diaMenuEntryDynamic : public diaMenuEntry
+{
+  public:
+  public:
+    diaMenuEntryDynamic(uint32_t v,const char *t,const char *d) 
+      {
+          val=v;
+          text=ADM_strdup(t);
+          desc=ADM_strdup(d);
+      }
+    ~diaMenuEntryDynamic() 
+      { 
+          ADM_dealloc(text);
+          ADM_dealloc(desc);
+      }
+    
+};
+
+// static (i.e. hardcoded) menu
 class diaElemMenu : public diaElem
 {
 const diaMenuEntry *menu;
@@ -131,6 +157,20 @@ public:
                const diaMenuEntry *menu,const char *tip=NULL);
   
   virtual ~diaElemMenu() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void);
+};
+// Same but for dynamic menus
+class diaElemMenuDynamic : public diaElem
+{
+diaMenuEntryDynamic **menu;
+uint32_t     nbMenu;
+
+public:
+  diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
+               diaMenuEntryDynamic **menu,const char *tip=NULL);
+  
+  virtual ~diaElemMenuDynamic() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
 };

@@ -70,6 +70,9 @@
 #include "ADM_libmpeg2enc/ADM_mpeg2enc.h"
 
 #include "ADM_filter/video_filters.h"
+
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+
 #include "ADM_assert.h"
 void A_handleSecondTrack (int tracktype);
 int A_delete(uint32_t start, uint32_t end);
@@ -119,8 +122,6 @@ extern void mpegToIndex (char *name);
 static void A_mpegIndexer (void);
 extern uint8_t indexMpeg (char *mpeg, char *file, uint8_t aid);
 void ADM_cutWizard (void);
-void computeIT (int size, int nb, int brate, uint32_t * frame,
-		uint32_t * rsize);
 uint8_t  ADM_saveRaw (const char *name);
 char * actual_workbench_file;
 void A_saveWorkbench (char *name);
@@ -162,7 +163,6 @@ static int A_vob2vobsub(void);
 uint8_t DIA_builtin(void);
 renderZoom currentZoom=ZOOM_1_1;
 uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name);
-uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t,ADMImage *image);
 extern const char * GUI_getCustomScript(uint32_t nb);
 extern gboolean SliderIsShifted;
 
@@ -319,73 +319,6 @@ int nw;
       }
       cleanUp (); 
       exit (0);
-#if 0
-    case ACT_AudioModeToggle:
-      if( !recursive )
-      {
-        recursive = 1;
-        UI_setAProcessToggleStatus(audioProcessMode);
-        recursive = 0;
-        printf ("\n audio is now : %d\n", audioProcessMode);
-      }
-      return;
-
-    case ACT_VideoModeToggle:
-      if( !recursive )
-      {
-        videoProcessMode ^= 1;
-        recursive = 1;
-        UI_setVProcessToggleStatus(videoProcessMode);
-        recursive = 0;
-        printf ("\n video is now : %d\n", videoProcessMode);
-      }
-      return;
-
-    case ACT_AudioModeProcess:
-      if( !recursive )
-      {
-        audioProcessMode = 1;
-        recursive = 1;
-        UI_setAProcessToggleStatus(audioProcessMode);
-        recursive = 0;
-        printf ("\n audio is now : %d\n", audioProcessMode);
-      }
-      return;
-      break;
-
-    case ACT_AudioModeCopy:
-      if( !recursive )
-      {
-        audioProcessMode = 0;
-        recursive = 1;
-        UI_setAProcessToggleStatus(audioProcessMode);
-        recursive = 0;
-        printf ("\n audio is now : %d\n", audioProcessMode);
-      }
-      return;
-      break;
-    case ACT_VideoModeCopy:
-      if( !recursive )
-      {
-        videoProcessMode = 0;
-        recursive = 1;
-        UI_setVProcessToggleStatus(videoProcessMode);
-        recursive = 0;
-        printf ("\n video is now : %d\n", videoProcessMode);
-      }
-      return;
-      break;
-    case ACT_VideoModeProcess:
-      if( !recursive )
-      {
-        videoProcessMode = 1;
-        recursive = 1;
-        UI_setVProcessToggleStatus(videoProcessMode);
-        recursive = 0;
-        printf ("\n video is now : %d\n", videoProcessMode);
-      }
-      return;
-#endif
       break;
 /*			case ACT_SelectEncoder:
 				
@@ -504,17 +437,7 @@ int nw;
   	case ACT_TimeChanged:
 			printf("TimeChanged\n");
       			break;			
-#if 0
-    case ACT_Pipe2Lame:
-		 A_Pipe(P_TOOLAME);
-    	break;
- case ACT_PipeLame:
-		 A_Pipe(P_LAME);
-    	break;
-case ACT_Pipe2Other:
-		 A_Pipe(P_OTHER);
-    	break;
-#endif
+
     case ACT_SaveWork:
       GUI_FileSelWrite (_("Select workbench to save "), A_saveWorkbench);
       break;
@@ -1360,10 +1283,14 @@ int A_saveJpg (char *name)
       GUI_Error_HIG(_("Get Frame"),_("Cannot get this frame to save"));
       return 0; 
     }
-    return (int) Util_saveJpg (name,avifileinfo->width, avifileinfo->height,NULL);
+    return (int) image.saveAsJpg (name);
 }
 #else
+/**
+      \fn A_saveJpg
+      \brief Save current image as jpeg 95% qual
 
+*/
 int A_saveJpg (char *name)
 {
 static int b=1;
@@ -1374,215 +1301,70 @@ static int b=1;
 }
 #endif
 
-uint8_t Util_saveJpg (char *name,uint32_t w, uint32_t h,ADMImage *image)
-{
-  ffmpegEncoderFFMjpeg *codec=NULL;
-  FILE *fd;
-  uint8_t *buffer=NULL;
-  uint32_t sz;
-  
 
-        sz = w*h*3;
-  ADMBitstream bitstream(sz);
-        buffer=new uint8_t[sz];
-        bitstream.data=buffer;
-        codec=new  ffmpegEncoderFFMjpeg(w,h,FF_MJPEG)  ;
-        codec->init( 95,25000);
-        if(!codec->encode(image,&bitstream))
-        {
-          GUI_Error_HIG(_("Cannot encode the frame"), NULL);
-                delete [] buffer;
-                delete codec;
-                return 0;
-        }
-        delete codec;
-        fd=fopen(name,"wb");
-        if(!fd)
-        {
-          GUI_Error_HIG(_("File error"),_( "Cannot open \"%s\" for writing."), name);
-                delete [] buffer;
-                return 0;
-        }
-        fwrite (buffer, bitstream.len, 1, fd);
-        fclose(fd);
-        delete [] buffer;
-        return 1;
-}
 /**
-	Save the selection  as a bunch of jpeg 95% qual
-	Used mainly to make animated DVD menu 
+      \fn A_saveBunchJpg
+      \brief Save the selection  as a bunch of jpeg 95% qual
 
 */
 void A_saveBunchJpg(char *name)
 {
-  ffmpegEncoderFFMjpeg *codec=NULL;
-  uint32_t sz,fl;
-  FILE *fd;
-  uint8_t *buffer=NULL;
   ADMImage *src=NULL;
   uint32_t curImg;
   char	 fullName[2048],*ext;
   DIA_working *working;
-  	if(frameStart>frameEnd)
-		{
+  uint8_t success=0;
+  
+        if(frameStart>frameEnd)
+                {
                   GUI_Error_HIG(_("Mark A > B"), _("Set your markers correctly."));
-			return;
-		}
-	// Split name into base + extension
-	PathSplit(name,&name,&ext);
-	
-	
-	sz = avifileinfo->width* avifileinfo->height * 3;
-	buffer=new uint8_t [sz];
-	ADM_assert(buffer);
-	//src=new uint8_t [sz];
-	src=new ADMImage(avifileinfo->width,avifileinfo->height);
-	ADM_assert(src);
-
-
-		codec=new  ffmpegEncoderFFMjpeg( avifileinfo->width,avifileinfo->height,FF_MJPEG)  ;
-		codec->init( 95,25000);
+                        return;
+                }
+        // Split name into base + extension
+        PathSplit(name,&name,&ext);
+        
+        src=new ADMImage(avifileinfo->width,avifileinfo->height);
+        ADM_assert(src);
 
         working=new DIA_working(_("Saving as set of jpegs"));
-        ADMBitstream bitstream(sz);
-
-        bitstream.data=	buffer;
-	for(curImg=frameStart;curImg<=frameEnd;curImg++)
-	{	
+        for(curImg=frameStart;curImg<=frameEnd;curImg++)
+        {	
                 working->update(curImg-frameStart,frameEnd-frameStart);	
-		if (!GUI_getFrameContent (src,curImg ))
-		{
+                if (!GUI_getFrameContent (src,curImg ))
+                {
                   GUI_Error_HIG(_("Cannot decode frame"), _("Aborting."));
-			goto _bunch_abort;
-		}
+                        goto _bunch_abort;
+                }
                 if(!working->isAlive()) goto _bunch_abort;
-		if(!codec->encode(src,&bitstream))
-			{
-                          GUI_Error_HIG(_("Cannot encode frame"),_( "Aborting."));
-				goto _bunch_abort;
-				
-			}
-		sprintf(fullName,"%s%04d.jpg",name,curImg-frameStart);
-		fd=fopen(fullName,"wb");
-		if(!fd)
-		{
-                  GUI_Error_HIG(_("Cannot write the file"), _("Aborting."));
-				goto _bunch_abort;
-
-		}
-		fwrite (buffer, bitstream.len, 1, fd);
-    		fclose(fd);
-	}
-	
-        GUI_Info_HIG(ADM_LOG_INFO,_("Done"),_( "Saved %d images."), curImg-frameStart);
+                sprintf(fullName,"%s%04d.jpg",name,curImg-frameStart);
+                if(!src->saveAsJpg(fullName)) goto _bunch_abort;
+        }
+        success=1;
+        
 _bunch_abort:
+        if(success)
+            GUI_Info_HIG(ADM_LOG_INFO,_("Done"),_( "Saved %d images."), curImg-frameStart);
+        else
+            GUI_Error_HIG(_("Error"),_( "Could not save all images."));
         delete working	;
-    	delete [] buffer;
-	delete src;
-	delete codec;
-	return ;
+        delete src;
+        return ;
 
 
 }
-/**________________________________________________________
- Save a BMP image from current display buffer
-________________________________________________________*/
-
-void
-A_saveImg (char *name)
-{
-  BITMAPFILEHEADER bmfh;
-  BITMAPINFOHEADER bmph;
-  FILE *fd;
-  uint32_t sz;
-  uint16_t s16;
-  uint32_t s32;
-  
-
-sz = avifileinfo->width* avifileinfo->height * 3;
-
-
-  printf ("\n Size : %X\n", bmfh.size);
-  bmfh.xHotspot = bmfh.yHotspot = 0;
-  bmfh.offsetToBits = sizeof (bmfh) + sizeof (bmph);
-//_________________________________________
-  bmph.biSize = sizeof (bmph);
-  bmph.biWidth = avifileinfo->width;
-  bmph.biHeight = avifileinfo->height;
-  bmph.biPlanes = 1;
-  bmph.biBitCount = 24;
-  bmph.biCompression = 0;	// COMPRESSION NONE
-  bmph.biSizeImage = sz;
-  bmph.biXPelsPerMeter = 0;
-  bmph.biYPelsPerMeter = 0;
-  bmph.biClrUsed = 0;
-  bmph.biClrImportant = 0;
-/*
-	bmph.resolutionUnits=0;
-	bmph.origin=0;
-	bmph.colorEncoding=0;
+/**
+      \fn A_saveImg
+      \brief Save current displayed image as a BMP file
 */
-
+void A_saveImg (char *name)
+{
+  
   ADMImage image(avifileinfo->width,avifileinfo->height);
   GUI_getFrameContent(&image, curframe);
-
-  printf ("\n %u x %u=%u\n", bmph.biWidth, bmph.biHeight, sz);
-
-  uint8_t *out;
-
-  	out=(uint8_t *)ADM_alloc(sz);
-	if(!out)
-	{
-          GUI_Error_HIG(_("Memory error"), NULL);
-		return;
-	}
-
-	 if(!COL_yv12rgbBMP(bmph.biWidth, bmph.biHeight,image.data, out))
-	 {
-           GUI_Error_HIG(_("Error converting to BMP"), NULL);
-		return;
- 	}
- 	fd = fopen (name, "wb");
-  	if (!fd)
-    	{
-          GUI_Error_HIG (_("Something bad happened"), NULL);
-		ADM_dealloc(out);
-      		return;
-    	}
-
-	// Bitmpap file header, not using tructure due to gcc padding it
-#ifdef ADM_BIG_ENDIAN
-	s16 = 0x424D;
-#else	
-  	s16 = 0x4D42;
-#endif	
-  	s32 = 14 + sizeof (bmph) + sz;
-#ifdef ADM_BIG_ENDIAN	
-	#define SWAP32(x) x=R32(x)	
-#else
-	#define SWAP32(x) ; 
-#endif
-	SWAP32(s32);	
-  	fwrite (&s16, 2, 1, fd);
-  	fwrite (&s32, 4, 1, fd);
-  	s32 = 0;
-  	fwrite (&s32, 4, 1, fd);
-  	s32 = 14 + sizeof (bmph);
-	SWAP32(s32);
-  	fwrite (&s32, 4, 1, fd);
-#ifdef ADM_BIG_ENDIAN
-//void Endian_BitMapInfo( BITMAPINFOHEADER *b)
-	Endian_BitMapInfo(&bmph);
-#endif
-	fwrite (&bmph, sizeof (bmph), 1, fd);
-      	fwrite (out, sz, 1, fd);
-
-    	fclose(fd);
-    	ADM_dealloc(out);
-
-
+  if(image.saveAsBmp(name))
         GUI_Info_HIG (ADM_LOG_INFO,_("Done"),_( "Saved \"%s\"."), GetFileName(name));
-
+  else
+        GUI_Error_HIG (_("BMP op failed"),_( "Saving %s as a BMP file failed."), GetFileName(name));
 }
 
 //_____________________________________________________________
@@ -1690,13 +1472,17 @@ uint8_t A_changeAudioStream (AVDMGenericAudioStream * newaudio, AudioSource nwso
   if (currentaudiostream)
     {
       if (currentaudiostream->isDestroyable ())
+        
+      {
 	delete currentaudiostream;
+        currentaudiostream=NULL;
+      }
       currentAudioSource=AudioNone;
       if(currentAudioName) ADM_dealloc(currentAudioName);
       currentAudioName=NULL;
     }
   currentaudiostream = newaudio;
-//  GUI_UpdateAudioToggle (nwsource);
+
   if (currentaudiostream)
   {
     wavinfo = currentaudiostream->getInfo ();
@@ -1891,67 +1677,6 @@ ADM_cutWizard (void)
 #endif
 }
 
-void
-computeIT (int size, int nb, int brate, uint32_t * frame, uint32_t * rsize)
-{
-  uint32_t curframe, cursize;
-  uint32_t lastframe, lastsize;
-  uint32_t lsize = size;
-  curframe = cursize = lastframe = lastsize = 0;
-  uint32_t one_audio;
-
-//               uint8_t tmp[768*768*3];
-//               uint32_t len2;
-  uint32_t len, flag;
-
-  uint8_t ret;
-
-  lastframe = frameStart;
-//
-  double fi = brate >> 3;
-  fi = fi / avifileinfo->fps1000;
-  fi *= 1000000.;
-  one_audio = (uint32_t) floor (fi);
-
-  printf ("\n search for %u\n", lsize);
-  printf ("\n one audio  %u\n", one_audio);
-  for (uint32_t f = frameStart; f < avifileinfo->nb_frames; f++)
-    {
-
-      cursize += 32 + 32 + 2 * 32 * nb;	// index + header
-      cursize += one_audio * nb;
-      len = 0;
-      ret = video_body->getFrameSize (f, &len);
-      video_body->getFlags (f, &flag);
-      if (!ret)
-	{
-	  printf ("\n Error!\n");
-	  *frame = lastframe;
-	  *rsize = lastsize;
-	  return;
-	}
-      cursize += len;
-      // check if we went beyonf
-      if (cursize > lsize)
-	{
-	  *frame = lastframe;
-	  *rsize = lastsize;
-	  printf ("\n found : Frame %u  %u\n", lastframe, lastsize);
-	  return;
-	}
-      // if it is a key f we memorize it
-      if (flag & AVI_KEY_FRAME)
-	{
-	  lastframe = f;
-	  lastsize = size;
-	}
-    }
-
-
-  printf ("\n oops\n");
-  *rsize = 0;
-  *frame = 0;
-}
 
 /*
 	Save a raw video stream without any container
@@ -2248,58 +1973,100 @@ uint32_t type,strength,swap;
 
 }
 extern uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, audioInfo *infos);
+extern const char *getStrFromAudioCodec( uint32_t codec);
+/**
+      \fn A_audioTrack
+      \brief Allow to select audio track
+*/
 void A_audioTrack( void )
 {
-    uint32_t nb;
-    audioInfo *infos=NULL;
-        AudioSource old,nw;        
+        uint32_t nb;
+        audioInfo *infos=NULL;
+        
+        uint32_t old,nw;        
         uint8_t r=0;
         uint32_t oldtrack,newtrack;
-
+        char *newtrackname=NULL;
 
         if(!video_body->getAudioStreamsInfo(0,&nb, &infos))
         {
           GUI_Error_HIG(_("Could not get tracks info"), NULL);
                 return ;
         }
-        newtrack=oldtrack=video_body->getCurrentAudioStreamNumber(0);
+        newtrack=oldtrack=(uint32_t)video_body->getCurrentAudioStreamNumber(0);
         nw=old=currentAudioSource;
-        r=DIA_audioTrack(&nw, &newtrack,nb, infos);
-        if(infos) delete [] infos;
-        // Change track here
-        if(old==nw && (nw!=AudioAvi)) return;
-
-        switch( nw)
+        
+        /* Build dialog factory widget */
+        diaMenuEntry sourcesStream[]={
+            {AudioAvi,_("Video"),_("Take audio from video file")},
+            {AudioNone,_("None"),_("No audio")},
+            {AudioAC3,_("External AC3"),_("Take audio from external AC3 file")},
+            {AudioMP3,_("External MP3"),_("Take audio from external MP3 file")},
+            {AudioWav,_("External Wav"),_("Take audio from external WAV file")}
+        };
+        
+        
+        diaElemMenu   sourceMenu(&nw,_("Audio source"),5,sourcesStream,NULL);
+        
+        
+        
+        diaElemFileRead sourceName(&newtrackname,_("External filename"));
+        
+        // Now build the list of embedded track
+#define MAX_AUDIO_TRACK 10
+#define MAX_AUDIO_TRACK_NAME 100
+        diaMenuEntryDynamic *sourceavitracks[MAX_AUDIO_TRACK];
+        char string[MAX_AUDIO_TRACK_NAME];
+        for(int i=0;i<nb;i++)
         {
-                case AudioMP3:
-                  GUI_FileSelRead (_("Select MP3 to load "), (SELFILE_CB *)A_loadMP3);
-                        break;
-                case AudioAC3:
-                  GUI_FileSelRead (_("Select AC3 to load "), (SELFILE_CB *)A_loadAC3);
-                        break;
-                case AudioWav:
-                  GUI_FileSelRead (_("Select WAV to load "),(SELFILE_CB *) A_loadWave);
-                        break;
-                case AudioNone:
-                          A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
-                        break;
-                case AudioAvi:
-                        //printf("New :%d old:%d\n",newtrack,oldtrack);
-                        if(oldtrack!=newtrack)
-                        {
-                                video_body->changeAudioStream(0,newtrack);
-                                //
-                                if(aviaudiostream==currentaudiostream)
-                                        currentaudiostream=NULL;
-                                delete aviaudiostream;
-                                aviaudiostream=NULL;
-                                video_body->getAudioStream(&aviaudiostream);
-                        }
-                        A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
-                        break;
-                default:
-                        ADM_assert(0);
+          sprintf(string,"Audio track %d (%s/%d channels/%d kbit per s/%d ms shift)",i,getStrFromAudioCodec(infos[i].encoding),
+                        infos[i].channels,infos[i].bitrate,infos[i].av_sync);
+           sourceavitracks[i]=new diaMenuEntryDynamic(i,string,NULL);
         }
+         if(infos) delete [] infos;
+         
+         diaElemMenuDynamic   sourceFromVideo(&newtrack,"Track from video",nb,sourceavitracks);
+         diaElem *allWidgets[]={&sourceMenu,&sourceFromVideo,&sourceName};
+         
+         if( diaFactoryRun("Select Main audio Track",3,allWidgets))
+         {
+            switch( nw)
+            {
+                    case AudioMP3:
+                            A_loadMP3(newtrackname);
+                            break;
+                    case AudioAC3:
+                            A_loadAC3(newtrackname);
+                            break;
+                    case AudioWav:
+                            A_loadWave(newtrackname);
+                            break;
+                    case AudioNone:
+                              A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
+                            break;
+                    case AudioAvi:
+                            //printf("New :%d old:%d\n",newtrack,oldtrack);
+                            if(oldtrack!=newtrack)
+                            {
+                                    video_body->changeAudioStream(0,newtrack);
+                                    //
+                                    if(aviaudiostream==currentaudiostream)
+                                            currentaudiostream=NULL;
+                                    delete aviaudiostream;
+                                    aviaudiostream=NULL;
+                                    video_body->getAudioStream(&aviaudiostream);
+                            }
+                            A_changeAudioStream (aviaudiostream, AudioAvi,NULL);
+                            break;
+                    default:
+                            ADM_assert(0);
+        }
+         }
+         /* Clean up */
+         for(int i=0;i<nb;i++)
+            delete sourceavitracks[i];
+        return;
+
 }
 void A_externalAudioTrack( void )
 {
