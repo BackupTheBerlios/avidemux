@@ -81,9 +81,6 @@ uint8_t *dst[3];
 int ssrc[3];
 int ddst[3];
 
-uint32_t page;
-
-                page=orgWidth*orgHeight;
                 src[0]=YPLANE(source);
                 src[1]=UPLANE(source);
                 src[2]=VPLANE(source);
@@ -91,7 +88,7 @@ uint32_t page;
                 ssrc[0]=orgWidth;
                 ssrc[1]=ssrc[2]=orgWidth>>1;
 
-                page=destWidth*destHeight;
+         
                 dst[0]=YPLANE(dest);
                 dst[1]=UPLANE(dest);
                 dst[2]=VPLANE(dest);

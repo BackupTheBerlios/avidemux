@@ -134,6 +134,11 @@ public:
         uint8_t blacken(void);
         uint8_t copyTo(ADMImage *target, uint32_t x, uint32_t y);
         uint8_t pack(uint8_t invertChroma);     /// Transfer data from planes to regular packed space
+        
+        /* Some utilitarian functions */
+        uint8_t  saveAsBmp(const char *filename);
+        uint8_t  saveAsJpg(const char *filename);
+        
 static uint32_t lumaDiff(ADMImage *src1,ADMImage *src2,uint32_t noise);
 };
 void drawString(ADMImage *dst, int x, int y, const char *s) ;

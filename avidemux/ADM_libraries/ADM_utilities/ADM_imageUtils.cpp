@@ -21,7 +21,17 @@
 #include "default.h"
 
 #include "ADM_image.h"
+#include "ADM_toolkit/bitmap.h"
+#include "avifmt.h"
+#include "ADM_utilities/avifmt2.h"
+#include "ADM_utilities/ADM_bitstream.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
+#include "ADM_toolkit/toolkit.hxx"
+#include "ADM_colorspace/colorspace.h"
+#include "ADM_encoder/ADM_vidEncode.hxx"
+
+#include "ADM_codecs/ADM_codec.h"
+#include "ADM_codecs/ADM_ffmpeg.h"
 #include "admmangle.h"
 static uint8_t tinyAverage(uint8_t *dst, uint8_t *src1, uint8_t *src2,uint32_t l)
 {
@@ -336,5 +346,144 @@ uint32_t r1,r2;
 #endif
         return tinySubstract(YPLANE(this),YPLANE(src1),YPLANE(src2),src1->_width*src1->_height);
 }
+ BITMAPFILEHEADER bmfh;
+  BITMAPINFOHEADER bmph;
+  FILE *fd;
+  uint32_t sz;
+  uint16_t s16;
+  uint32_t s32;
+  
 
+/**
+    \fn saveAsBmp
+    \brief save current image into filename, into bmp format
+*/
+uint8_t  ADMImage::saveAsBmp(const char *filename)
+{
+  BITMAPFILEHEADER bmfh;
+  BITMAPINFOHEADER bmph;
+  FILE *fd;
+  uint32_t sz;
+  uint16_t s16;
+  uint32_t s32;
+  
+  sz = _width* _height * 3;
+
+  bmfh.xHotspot = bmfh.yHotspot = 0;
+  bmfh.offsetToBits = sizeof (bmfh) + sizeof (bmph);
+//_________________________________________
+  bmph.biSize = sizeof (bmph);
+  bmph.biWidth = _width;
+  bmph.biHeight = _height;
+  bmph.biPlanes = 1;
+  bmph.biBitCount = 24;
+  bmph.biCompression = 0;	// COMPRESSION NONE
+  bmph.biSizeImage = sz;
+  bmph.biXPelsPerMeter = 0;
+  bmph.biYPelsPerMeter = 0;
+  bmph.biClrUsed = 0;
+  bmph.biClrImportant = 0;
+/*
+	bmph.resolutionUnits=0;
+	bmph.origin=0;
+	bmph.colorEncoding=0;
+*/
+
+  ADMImage image(_width,_height);
+  
+
+  printf ("\n %u x %u=%u\n", bmph.biWidth, bmph.biHeight, sz);
+
+  uint8_t *out;
+
+        out=(uint8_t *)ADM_alloc(sz);
+        if(!out)
+        {
+            GUI_Error_HIG(_("Memory error"), NULL);
+//            ADM_dealloc(out);
+            return 0;
+        }
+
+        if(!COL_yv12rgbBMP(bmph.biWidth, bmph.biHeight,data, out))
+        {
+              GUI_Error_HIG(_("Error converting to BMP"), NULL);
+              ADM_dealloc(out);
+              return 0;
+        }
+        fd = fopen (filename, "wb");
+        if (!fd)
+        {
+                GUI_Error_HIG (_("Something bad happened"), NULL);
+                ADM_dealloc(out);
+                return 0;
+        }
+
+	// Bitmpap file header, not using tructure due to gcc padding it
+#ifdef ADM_BIG_ENDIAN
+	s16 = 0x424D;
+#else	
+  	s16 = 0x4D42;
+#endif	
+  	s32 = 14 + sizeof (bmph) + sz;
+#ifdef ADM_BIG_ENDIAN	
+	#define SWAP32(x) x=R32(x)	
+#else
+	#define SWAP32(x) ; 
+#endif
+        SWAP32(s32);	
+        fwrite (&s16, 2, 1, fd);
+        fwrite (&s32, 4, 1, fd);
+        s32 = 0;
+        fwrite (&s32, 4, 1, fd);
+        s32 = 14 + sizeof (bmph);
+        SWAP32(s32);
+        fwrite (&s32, 4, 1, fd);
+#ifdef ADM_BIG_ENDIAN
+	Endian_BitMapInfo(&bmph);
+#endif
+        fwrite (&bmph, sizeof (bmph), 1, fd);
+        fwrite (out, sz, 1, fd);
+  
+        fclose(fd);
+        ADM_dealloc(out);
+        return 1;
+}
+/**
+    \fn saveAsJpg
+    \brief save current image into filename, into jpg format
+*/
+uint8_t  ADMImage::saveAsJpg(const char *filename)
+{
+ ffmpegEncoderFFMjpeg *codec=NULL;
+  FILE *fd;
+  uint8_t *buffer=NULL;
+  uint32_t sz;
+  
+
+        sz = _width*_height*3;
+        ADMBitstream bitstream(sz);
+        buffer=new uint8_t[sz];
+        bitstream.data=buffer;
+        codec=new  ffmpegEncoderFFMjpeg(_width,_height,FF_MJPEG)  ;
+        codec->init( 95,25000);
+        if(!codec->encode(this,&bitstream))
+        {
+                GUI_Error_HIG(_("Cannot encode the frame"), NULL);
+                delete [] buffer;
+                delete codec;
+                return 0;
+        }
+        delete codec;
+        fd=fopen(filename,"wb");
+        if(!fd)
+        {
+                GUI_Error_HIG(_("File error"),_( "Cannot open \"%s\" for writing."), filename);
+                delete [] buffer;
+                return 0;
+        }
+        fwrite (buffer, bitstream.len, 1, fd);
+        fclose(fd);
+        delete [] buffer;
+        return 1;
+}
 //EOF
