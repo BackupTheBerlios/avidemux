@@ -126,6 +126,10 @@ void diaElemFileRead::getMe(void)
   QString s=(fs->edit)->text();
   *n=ADM_strdup( s.toLatin1() );
 }
+void diaElemFileRead::enable(uint32_t onoff)
+{
+  
+}
 //****************************
 diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip)  : diaElem(ELEM_DIR_SELECT) 
 {
@@ -153,6 +157,10 @@ void diaElemDirSelect::getMe(void)
   ADM_Qfilesel *fs=(ADM_Qfilesel *)myWidget;
   QString s=(fs->edit)->text();
   *n=ADM_strdup( s.toLatin1() );
+}
+void diaElemDirSelect::enable(uint32_t onoff)
+{
+  
 }
   
 void diaElemDirSelect::changeFile(void) {}
