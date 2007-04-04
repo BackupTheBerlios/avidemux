@@ -82,6 +82,10 @@ void diaElemMenu::getMe(void)
   *(uint32_t *)param=menu[r].val;
       
 }
+void diaElemMenu::finalize(void)
+{ 
+}
+
 //*********************************
 diaElemMenuDynamic::diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
                 diaMenuEntryDynamic **menu,const char *tip)
@@ -97,6 +101,9 @@ void diaElemMenuDynamic::setMe(void *dialog, void *opaque,uint32_t line)
 }
 
 void diaElemMenuDynamic::getMe(void)
+{ 
+}
+void diaElemMenuDynamic::finalize(void)
 { 
 }
 

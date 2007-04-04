@@ -141,7 +141,15 @@ void diaElemMenu::getMe(void)
 {
  
 }
-
+uint8_t   diaElemMenu::link(diaMenuEntry *entry,uint32_t onoff,diaElem *w)
+{
+}
+void   diaElemMenu::enable(uint32_t onoff)
+{}
+void diaElemMenu::finalize(void)
+{ 
+}
+//*****************
 diaElemFileRead::diaElemFileRead(char **filename,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_FILE_READ)
 {
@@ -161,7 +169,8 @@ void diaElemFileRead::getMe(void)
 {
  
 }
-
+void   diaElemFileRead::enable(uint32_t onoff)
+{}
 #include "ADM_encoder/ADM_vidEncode.hxx"
   diaElemBitrate::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_BITRATE)
@@ -222,6 +231,7 @@ void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line) {}
 void diaElemDirSelect::getMe(void) {}
   
 void diaElemDirSelect::changeFile(void) {}
+void   diaElemDirSelect::enable(uint32_t onoff){}
 //******************************************************
 diaElemText::diaElemText(char **text,const char *toggleTitle,const char *tip)
     : diaElem(ELEM_NOTCH) {}
@@ -245,6 +255,14 @@ void diaElemMenuDynamic::setMe(void *dialog, void *opaque,uint32_t line)
 }
 
 void diaElemMenuDynamic::getMe(void)
+{ 
+}
+uint8_t   diaElemMenuDynamic::link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w)
+{
+}
+void   diaElemMenuDynamic::enable(uint32_t onoff)
+{}
+void diaElemMenuDynamic::finalize(void)
 { 
 }
 //******************************************************

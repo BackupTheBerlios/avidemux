@@ -2028,6 +2028,13 @@ void A_audioTrack( void )
          diaElemMenuDynamic   sourceFromVideo(&newtrack,"Track from video",nb,sourceavitracks);
          diaElem *allWidgets[]={&sourceMenu,&sourceFromVideo,&sourceName};
          
+         /* Link..*/
+         sourceMenu.link(&(sourcesStream[0]),1,&sourceFromVideo);
+         sourceMenu.link(&(sourcesStream[2]),1,&sourceName);
+         sourceMenu.link(&(sourcesStream[3]),1,&sourceName);
+         sourceMenu.link(&(sourcesStream[4]),1,&sourceName);
+         
+         
          if( diaFactoryRun("Select Main audio Track",3,allWidgets))
          {
             switch( nw)

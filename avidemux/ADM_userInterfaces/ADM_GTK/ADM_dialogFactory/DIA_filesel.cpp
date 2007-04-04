@@ -129,11 +129,19 @@ void diaElemFileRead::changeFile(void)
   
 }
 
+void   diaElemFileRead::enable(uint32_t onoff)
+{
+     gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);  
+}
+
 void fileRead(void *w,void *p)
 {
   diaElemFileRead *me=(diaElemFileRead *)p;
   me->changeFile();
 }
+
+
+
 /*********************************************************************/
 diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_DIR_SELECT)
@@ -231,6 +239,10 @@ void diaElemDirSelect::changeFile(void)
      gtk_entry_set_text (GTK_ENTRY (myWidget), *name);
   }
   
+}
+void   diaElemDirSelect::enable(uint32_t onoff)
+{
+     gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);  
 }
 
 void dirSel(void *w,void *p)

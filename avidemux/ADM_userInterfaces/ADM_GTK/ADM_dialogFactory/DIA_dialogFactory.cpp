@@ -113,6 +113,12 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), okbutton1, GTK_RESPONSE_OK);
   GTK_WIDGET_SET_FLAGS (okbutton1, GTK_CAN_DEFAULT);
   
+  /* Finalize them */
+  for(int i=0;i<nb;i++)
+  {
+    elems[i]->finalize();
+  }
+  
   // Show it & run
   gtk_register_dialog(dialog);
   if(GTK_RESPONSE_OK==gtk_dialog_run(GTK_DIALOG(dialog)))

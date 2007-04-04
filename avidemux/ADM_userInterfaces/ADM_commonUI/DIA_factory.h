@@ -55,6 +55,9 @@ public:
   virtual void getMe(void)=0;
           void setRo(void) {readOnly=1;}
           void setRw(void) {readOnly=0;}
+          
+  virtual void enable(uint32_t onoff) {printf("Enabling %d\n",onoff);}
+  virtual void finalize(void) {} // in case some widget needs some stuff just before using them
 };
 /*********************************************/
 class diaElemToggle : public diaElem
@@ -119,13 +122,10 @@ public:
 typedef struct diaMenuEntry
 {
   public:
-  uint32_t    val;
-  const char *text;
-  const char *desc;
+    uint32_t    val;
+    const char *text;
+    const char *desc;
   public:
- /*   diaMenuEntry(uint32_t v,const char *t,const char *d) {val=v;t=ADM_strdup(t);desc=ADM_strdup(d);}
-    ~diaMenuEntry() { ADM_dealloc(text);ADM_dealloc(desc);}
-    */
 }diaMenuEntry;
 
 class diaMenuEntryDynamic : public diaMenuEntry
@@ -145,12 +145,23 @@ class diaMenuEntryDynamic : public diaMenuEntry
       }
     
 };
-
+//*******************************
 // static (i.e. hardcoded) menu
+//*******************************
+#define MENU_MAX_lINK 10
+typedef struct dialElemLink
+{
+  uint32_t  value;
+  uint32_t  onoff;
+  diaElem  *widget;
+}dialElemLink;
+
 class diaElemMenu : public diaElem
 {
-const diaMenuEntry *menu;
-uint32_t     nbMenu;
+const diaMenuEntry  *menu;
+uint32_t            nbMenu;
+dialElemLink        links[MENU_MAX_lINK];
+uint32_t            nbLink;
 
 public:
   diaElemMenu(uint32_t *intValue,const char *itle, uint32_t nb, 
@@ -159,20 +170,32 @@ public:
   virtual ~diaElemMenu() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
+  uint8_t   link(diaMenuEntry *entry,uint32_t onoff,diaElem *w);
+  void      updateMe(void);
+  void      enable(uint32_t onoff) ;
+  void      finalize(void);;
 };
+//*******************************
 // Same but for dynamic menus
+//*******************************
 class diaElemMenuDynamic : public diaElem
 {
 diaMenuEntryDynamic **menu;
-uint32_t     nbMenu;
+uint32_t            nbMenu;
+dialElemLink        links[MENU_MAX_lINK];
+uint32_t            nbLink;
 
 public:
   diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
                diaMenuEntryDynamic **menu,const char *tip=NULL);
   
-  virtual ~diaElemMenuDynamic() ;
-  void setMe(void *dialog, void *opaque,uint32_t line);
-  void getMe(void);
+  virtual   ~diaElemMenuDynamic() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  uint8_t   link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w);
+  void      updateMe(void);
+  void      enable(uint32_t onoff) ;
+  void      finalize(void);
 };
 /*************************************************/
 #include "ADM_encoder/ADM_vidEncode.hxx"
@@ -203,6 +226,7 @@ public:
   void getMe(void);
   
   void changeFile(void);
+  void   enable(uint32_t onoff);
 };
 /*************************************************/
 class diaElemDirSelect : public diaElem
@@ -216,6 +240,7 @@ public:
   void getMe(void);
   
   void changeFile(void);
+  void   enable(uint32_t onoff);
 };
 /*************************************************/
 /* The text MUST be copied internally ! */
