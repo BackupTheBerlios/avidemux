@@ -404,16 +404,15 @@ have_x264=yes
 have_libdca=yes
 have_aften=yes
 have_nspr=yes
+
 dnl ____________________ Cygwin / mingwin ? ___________
 use_cygwin=no
 AC_MSG_CHECKING(win32 host)
 
-
 AC_TRY_COMPILE([
-	#if !defined(__CYGWIN__) &&!defined(__MINGW32__)
+	#if !defined(__CYGWIN__) && !defined(__MINGW32__)
 		#error
 	#endif
-
 ],
 int z=0
 ,[
@@ -486,16 +485,66 @@ AC_MSG_RESULT($with_aften)
 if test "x$with_aften" = "xno"; then
    have_aften=no
 fi
-if test "x$with_aften" != "xno"; then
-AC_MSG_CHECKING(for aften codec )
-AC_CHECK_HEADER(aften/aften.h,,have_aften=no)
+
 if test "x$have_aften" = "xyes"; then
- AC_CHECK_LIB(aften,aften_encode_init,,have_aften=no,-lm )
-fi
+	AC_MSG_CHECKING([for aften codec])
+	AC_CHECK_HEADER(aften/aften.h,aften_header=aften/aften.h,have_aften=no)
+	
+	if test "x$have_aften" = "xno"; then
+		have_aften=yes
+		AC_CHECK_HEADER(aften.h,aften_header=aften.h,have_aften=no)		
+	fi
 fi
 
 if test "x$have_aften" = "xyes"; then
-AC_DEFINE(USE_AFTEN,1,[use aften ac3 encoder])
+	AC_LANG_PUSH(C++)
+	AC_TRY_RUN([
+		#include "$aften_header"
+
+		int determineVersion(char *version)
+		{
+			if (version == "0.06") { return 6; } else { return 0; }
+		}
+		
+		int determineVersion(double version)
+		{
+			if (version == 0.05) { return 5; } else { return 0; }
+		}
+		
+		int main()
+		{
+			// AFTEN_VERSION is deprecated after v0.06 so if this compiles the version must be <= 0.06
+			return determineVersion(AFTEN_VERSION);
+		}
+	])
+	AC_LANG_POP()
+
+	if test "x$ac_status" = "x5"; then
+		aften_version="0.05"
+		AC_DEFINE(USE_AFTEN_05, 1, [Use Aften 0.05 or earlier])
+		AC_CHECK_LIB(aften,aften_encode_init,,have_aften=no,-lm)
+	else
+		if test "x$ac_status" = "x6"; then
+			aften_version="0.06"
+			AC_DEFINE(USE_AFTEN_06, 1, [Use Aften 0.06])
+			AC_CHECK_LIB(aften,aften_encode_init,,have_aften=no,-lm)
+		else
+			AC_CHECK_LIB(aften,aften_get_version,,have_aften=no,-lm)
+			
+			if test "x$have_aften" = "xno"; then			
+				aften_version="unsupported"
+			else
+				aften_version=">= 0.06"
+			fi
+		fi
+	fi
+
+	AC_MSG_CHECKING([version of Aften])	
+	AC_MSG_RESULT($aften_version)
+fi
+
+if test "x$have_aften" = "xyes"; then
+	AC_DEFINE(USE_AFTEN,1,[use aften ac3 encoder])
 fi
 
 dnl __________________x264_________________
@@ -574,13 +623,9 @@ if test "x$have_xvid4" = "xyes"; then
 	fi
  fi
 
-dnl __________________FFMPEG______________
-
-dnl __________________/FFMPEG______________
 dnl __________________OS dep stuff_____________
 
 dnl __________________Lrintf_____________
-
 have_lrintf=no
 AC_MSG_CHECKING(for lrintf in math.h)
 AC_TRY_COMPILE([
@@ -595,8 +640,8 @@ if test x$have_lrintf = xyes ; then
   AC_DEFINE(HAVE_LRINTF,1,[roundup function])
 fi
 AC_MSG_RESULT($have_lrintf)
-dnl __________________fast int_____________
 
+dnl __________________fast int_____________
 have_fastint=no
 AC_MSG_CHECKING(for fastint)
 AC_TRY_COMPILE([

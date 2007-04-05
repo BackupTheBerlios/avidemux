@@ -33,7 +33,11 @@
 //
 extern "C"
 {
-#include "aften/aften.h"
+#ifdef USE_AFTEN_06
+	#include "aften.h"
+#else
+	#include "aften/aften.h"
+#endif
 };
 #include "ADM_audiofilter/audioencoder_aften_param.h"
 #include "ADM_audiofilter/audioencoder_aften.h"
@@ -76,7 +80,13 @@ uint8_t AUDMEncoder_Aften::init(ADM_audioEncoderDescriptor *config)
 
 
 int ret=0;
+
+#if defined(USE_AFTEN_05) || defined(USE_AFTEN_06)
 int mask;
+#else
+unsigned int mask;
+#endif
+
     _wavheader->byterate=(config->bitrate*1000)/8;
     _HANDLE->sample_format=A52_SAMPLE_FMT_FLT;
     _HANDLE->channels=_wavheader->channels;
@@ -92,7 +102,13 @@ int mask;
         case 5: mask = 0x37;  break;
         case 6: mask = 0x3F;  break;
       }
-      aften_wav_chmask_to_acmod(_wavheader->channels, mask, &(_HANDLE->acmod), &(_HANDLE->lfe));
+
+#if defined(USE_AFTEN_05) || defined(USE_AFTEN_06)
+	aften_wav_chmask_to_acmod(_wavheader->channels, mask, &(_HANDLE->acmod), &(_HANDLE->lfe));
+#else
+	aften_wav_channels_to_acmod(_wavheader->channels, mask, &(_HANDLE->acmod), &(_HANDLE->lfe));
+#endif
+
    //   _HANDLE->params.verbose=2;
     int er= aften_encode_init(_HANDLE);
     if(er<0)
@@ -122,7 +138,12 @@ _again:
         }
         ptr=(void *)&(tmpbuffer[tmphead]);
         ADM_assert(tmptail>=tmphead);
-        aften_remap_wav_to_a52(ptr, 256*6, _wavheader->channels,A52_SAMPLE_FMT_FLT,  (_HANDLE->acmod), (_HANDLE->lfe));
+
+#ifdef USE_AFTEN_05
+		aften_remap_wav_to_a52(ptr, 256*6, _wavheader->channels, A52_SAMPLE_FMT_FLT, (_HANDLE->acmod), (_HANDLE->lfe));
+#else
+		aften_remap_wav_to_a52(ptr, 256*6, _wavheader->channels, A52_SAMPLE_FMT_FLT, (_HANDLE->acmod));
+#endif
 
         r=aften_encode_frame(_HANDLE, dest,(void *)ptr);
         if(r<0)
