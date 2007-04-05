@@ -15,8 +15,10 @@ public:
 	int m_nDelay;
 	bool m_bFilm2PAL;
 	bool m_bPAL2Film;
+        int  m_bDRC;
         int  m_nNormalizeMode;
         int  m_nNormalizeValue;
+        
 };
 
 #endif

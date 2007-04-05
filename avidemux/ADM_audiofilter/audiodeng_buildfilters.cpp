@@ -174,6 +174,10 @@ uint32_t audioGetResample(void)
       return audioFreq;
         
 }
+uint32_t audioGetDrc(void)
+{
+  return audioDRC; 
+}
 uint32_t audioGetDelay(void)
 {
         if(audioShift && audioDelay)
@@ -241,6 +245,11 @@ uint8_t audioFilterFilm2Pal(uint8_t onoff)
 	if(onoff) audioFilmConv=FILMCONV_FILM2PAL;
 	else audioFilmConv=FILMCONV_NONE;
 	return 1;
+}
+uint8_t audioFilterDrc(uint8_t onoff)
+{
+  audioDRC=onoff;
+  return 1; 
 }
 uint8_t audioFilterPal2Film(uint8_t onoff)
 {

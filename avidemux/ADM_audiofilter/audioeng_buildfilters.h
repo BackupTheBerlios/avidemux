@@ -100,7 +100,7 @@ void audioFilterResample(uint32_t onoff);
 uint8_t audioFilterDelay(int32_t delay);
 uint8_t audioFilterFilm2Pal(uint8_t onoff);
 uint8_t audioFilterPal2Film(uint8_t onoff);
-
+uint8_t audioFilterDrc(uint8_t onoff);
 void audioFilter_SetBitrate( int i);
 /* -- Get filter -- */
 uint32_t audioGetBitrate(void);
@@ -109,6 +109,7 @@ int32_t audioGetNormalizeValue(void);
 uint32_t audioGetResample(void);
 uint32_t audioGetDelay(void);
 FILMCONV audioGetFpsConv(void);
+uint32_t audioGetDrc(void);
 RESAMPLING  audioGetResampling(void);
 /*-----*/
 uint8_t                 A_changeAudioStream(AVDMGenericAudioStream *newaudio,AudioSource so,char *name);

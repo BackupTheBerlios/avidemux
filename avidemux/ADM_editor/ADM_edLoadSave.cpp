@@ -264,6 +264,9 @@ char *pth;
                 case RESAMPLING_CUSTOM:        qfprintf(fd,"app.audio.resample=%u;\n",audioGetResample());break;
                 default:ADM_assert(0);
         }
+        if (audioGetDrc()) qfprintf(fd,"app.audio.drc=true;\n");
+        
+        
   // Mixer
 
   // container

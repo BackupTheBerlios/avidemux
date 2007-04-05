@@ -41,7 +41,8 @@ public:
 		film2pal_prop,
 		pal2film_prop,
                 normalizemode_prop,
-                normalizevalue_prop
+                normalizevalue_prop,
+                drc_prop
 	};
 	static JSClass m_classAvidemuxAudio;
         

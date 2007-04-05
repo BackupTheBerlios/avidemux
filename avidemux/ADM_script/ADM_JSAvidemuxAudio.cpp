@@ -46,6 +46,7 @@ JSPropertySpec ADM_JSAvidemuxAudio::avidemuxaudio_properties[] =
         { "film2pal", film2pal_prop, JSPROP_ENUMERATE },	// convert film to pal
         { "pal2film", pal2film_prop, JSPROP_ENUMERATE },	// convert pal to film
         { "normalizeMode", normalizemode_prop, JSPROP_ENUMERATE },	//
+        { "drc", drc_prop, JSPROP_ENUMERATE },	//
         { "normalizeValue", normalizevalue_prop, JSPROP_ENUMERATE },	//
         { 0 }
 };
@@ -149,7 +150,9 @@ JSBool ADM_JSAvidemuxAudio::JSGetProperty(JSContext *cx, JSObject *obj, jsval id
                         case normalizevalue_prop:
                           *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_nNormalizeValue);
                           break;
-
+                        case drc_prop:
+                            *vp = BOOLEAN_TO_JSVAL(priv->getObject()->m_bDRC);
+                            break;
 /*
                         case audio_prop:
                                 *vp = OBJECT_TO_JSVAL(priv->getObject()->m_pAudio);
@@ -175,6 +178,16 @@ JSBool ADM_JSAvidemuxAudio::JSSetProperty(JSContext *cx, JSObject *obj, jsval id
                                 priv->getObject()->m_bNormalize = JSVAL_TO_BOOLEAN(*vp);
                                 enterLock();
                                 UI_setAProcessToggleStatus(priv->getObject()->m_bAudioProcess);
+                                leaveLock();
+                                break;
+                        }
+                        case drc_prop:
+                        {
+                                if(JSVAL_IS_BOOLEAN(*vp) == false)
+                                        break;
+                                priv->getObject()->m_bDRC = JSVAL_TO_BOOLEAN(*vp);
+                                enterLock();
+                                audioFilterDrc(priv->getObject()->m_bDRC);
                                 leaveLock();
                                 break;
                         }
