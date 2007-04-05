@@ -49,7 +49,7 @@
 
 AUDMAudioFilterLimiter::AUDMAudioFilterLimiter(AUDMAudioFilter *previous, DRCparam *param):AUDMAudioFilter (previous)
 {
-
+uint32_t nbChan=previous->getInfo()->channels;
 #define AMP 4
     _previous->rewind();
     memcpy(&_param,param,sizeof(_param));
@@ -58,8 +58,9 @@ AUDMAudioFilterLimiter::AUDMAudioFilterLimiter(AUDMAudioFilter *previous, DRCpar
 //
 
     mCircleSize=DRC_WINDOW;
+    mCircleSize=mCircleSize-(mCircleSize%nbChan);
     drc_cleanup();
-    printf("[DRC] Created\n");
+    printf("[DRC] Created DRC:%u Window:%u nbChan %u\n",mCircleSize,DRC_WINDOW,nbChan);
 
 };
 void AUDMAudioFilterLimiter::drc_cleanup(void)
@@ -111,6 +112,10 @@ uint32_t   AUDMAudioFilterLimiter::fill(uint32_t max,float *output,AUD_Status *s
   len=_tail-_head;
   if(len>max) len=max;
   if(len>=DELIM_WINDOW_SIZE) len=DELIM_WINDOW_SIZE-1;
+  
+  // Count in full sample  i.e. all channels
+  len=len-(len%_wavHeader.channels);
+  
   // Process..
   if (mLastLevel == 0.0) {
     int preSeed = mCircleSize;
