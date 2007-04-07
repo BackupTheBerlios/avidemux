@@ -77,3 +77,4 @@ void diaElemFloat::getMe(void)
  *(ELEM_TYPE_FLOAT *)param=val;
  
 }
+void diaElemFloat::enable(uint32_t onoff) {}

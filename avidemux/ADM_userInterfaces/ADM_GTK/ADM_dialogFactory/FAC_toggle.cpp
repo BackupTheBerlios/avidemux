@@ -62,5 +62,9 @@ void diaElemToggle::getMe(void)
   ADM_assert(widget);
   *(uint32_t *)param=gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
 }
-
+void diaElemToggle::enable(uint32_t onoff)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
+}
 //EOF

@@ -58,13 +58,49 @@ extern int muxParam;
 
 
 #include "ADM_audiofilter/audioeng_buildfilters.h"
-
+#include "DIA_factory.h"
 const char *getStrFromAudioCodec( uint32_t codec);
 //_________________________
 uint8_t ADM_aviUISetMuxer(  void )
 {
-	return DIA_setUserMuxParam ((int *) &muxMode, (int *) &muxParam, (int *) &muxSize);
-}
+  
+//	return DIA_setUserMuxParam ((int *) &muxMode, (int *) &muxParam, (int *) &muxSize);
+  uint32_t mux_n_frame=muxParam;
+  uint32_t mux_size_block=muxParam;
+  uint32_t mux_mode=(uint32_t)muxMode;
+  
+  
+  diaMenuEntry muxingType[]={
+  {MUX_REGULAR,_("Normal")},
+  {MUX_N_FRAMES,_("Mux every N video frames")},
+  {MUX_N_BYTES,_("Mux by packet size")}
+  };
+  
+    diaElemMenu      mux(&(mux_mode),_("Muxing Type"),3,muxingType);
+    diaElemUInteger blockSize(&(muxSize),_("Split every MBytes"),1,9000);
+    
+    diaElemUInteger n_frames(&(mux_n_frame),_("Mux Every x video frames"),1,100);
+    diaElemUInteger n_block(&(mux_size_block),_("Mux with block of size"),1,50000);
+    
+    
+     mux.link(&(muxingType[1]),1,&n_frames);
+     mux.link(&(muxingType[2]),1,&n_block);
+    
+     diaElem *elems[4]={&mux,&n_frames,&n_block,&blockSize};
+     if( diaFactoryRun("Mpeg2 Encoding",4,elems))
+    {
+      muxMode=(PARAM_MUX)mux_mode;
+      switch(muxMode)
+      {
+        case MUX_REGULAR: muxParam=1;break;
+        case MUX_N_FRAMES: muxParam=mux_n_frame;break;
+        case MUX_N_BYTES: muxParam=mux_size_block;break;
+        default: ADM_assert(0);
+      }
+      return 1;
+    }
+    return 0;
+};
 
 
 //_______ set the autosplit size

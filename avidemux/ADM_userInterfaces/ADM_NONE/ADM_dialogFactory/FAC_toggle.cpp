@@ -42,7 +42,7 @@ void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t l)
 void diaElemToggle::getMe(void)
 {
 }
-
+void diaElemToggle::enable(uint32_t onoff) {}
 //******************************************************
 diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip)
   : diaElem(ELEM_TOGGLE)
@@ -61,7 +61,7 @@ void diaElemInteger::getMe(void)
 {
  
 }
-
+void diaElemInteger::enable(uint32_t onoff) {}
 //******************************************************
 diaElemUInteger::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip)
   : diaElem(ELEM_TOGGLE)
@@ -80,7 +80,7 @@ void diaElemUInteger::getMe(void)
 {
  
 }
-
+void diaElemUInteger::enable(uint32_t onoff) {}
 //******************************************************
 
 diaElemFloat::diaElemFloat(ELEM_TYPE_FLOAT *intValue,const char *toggleTitle, 
@@ -101,6 +101,7 @@ void diaElemFloat::getMe(void)
 {
  
 }
+void diaElemFloat::enable(uint32_t onoff) {}
 //******************************************************
 
 diaElemBar::diaElemBar(uint32_t percent,const char *toggleTitle)

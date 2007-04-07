@@ -86,6 +86,13 @@ void diaElemInteger::getMe(void)
   if(*val>max) *val=max;
   
 }
+
+void diaElemInteger::enable(uint32_t onoff)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
+}
+
 //**********************************************************************************
 
 diaElemUInteger::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip)
@@ -145,6 +152,11 @@ void diaElemUInteger::getMe(void)
   if(*val<min) *val=min;
   if(*val>max) *val=max;
 
+}
+void diaElemUInteger::enable(uint32_t onoff)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
 }
 
 

@@ -68,6 +68,7 @@ public:
   virtual ~diaElemToggle() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
+  void      enable(uint32_t onoff) ;
 };
 /*********************************************/
 class diaElemInteger : public diaElem
@@ -79,6 +80,7 @@ public:
   virtual ~diaElemInteger() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
+  void      enable(uint32_t onoff) ;
 };
 /* Same but unsigned */
 class diaElemUInteger : public diaElem
@@ -90,6 +92,7 @@ public:
   virtual ~diaElemUInteger() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
+  void      enable(uint32_t onoff) ;
   
 };
 /*************************************************/
@@ -117,6 +120,7 @@ public:
   virtual ~diaElemFloat() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
+  void      enable(uint32_t onoff) ;
 };
 /*************************************************/
 typedef struct diaMenuEntry

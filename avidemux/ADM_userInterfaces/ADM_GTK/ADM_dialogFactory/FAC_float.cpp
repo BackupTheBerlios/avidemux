@@ -85,5 +85,10 @@ void diaElemFloat::getMe(void)
   if(*val<min) *val=min;
   if(*val>max) *val=max;
 }
+void diaElemFloat::enable(uint32_t onoff)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
+}
 
 //EOF

@@ -79,6 +79,7 @@ void diaElemInteger::getMe(void)
  *(int32_t *)param=val;
  
 }
+void diaElemInteger::enable(uint32_t onoff) {}
 //******************************************************
 diaElemUInteger::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip)
   : diaElem(ELEM_TOGGLE)
@@ -124,6 +125,6 @@ void diaElemUInteger::getMe(void)
 
 }
 
-
+void diaElemUInteger::enable(uint32_t onoff) {}
 
 //EOF

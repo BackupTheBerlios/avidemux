@@ -71,7 +71,7 @@ void diaElemToggle::getMe(void)
   }else
     *val=0;
 }
-
+void diaElemToggle::enable(uint32_t onoff) {}
 
 
 //******************************************************
