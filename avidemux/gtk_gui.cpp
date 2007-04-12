@@ -1407,6 +1407,7 @@ int A_loadNone( void )
 AudioSource currentAudioSource=AudioAvi;
 AudioSource secondAudioSource=AudioNone;
 char *currentAudioName=NULL;
+char *secondAudioName=NULL;
 //_____________________________________________________________
 //
 //              Load MP3 and identify wavfmt infos to fill avi header
@@ -1986,7 +1987,7 @@ void A_audioTrack( void )
         uint32_t old,nw;        
         uint8_t r=0;
         uint32_t oldtrack,newtrack;
-        char *newtrackname=NULL;
+        char *newtrackname=ADM_strdup(currentAudioName);
 
         if(!video_body->getAudioStreamsInfo(0,&nb, &infos))
         {
@@ -2075,33 +2076,48 @@ void A_audioTrack( void )
         return;
 
 }
+/**
+        \fn A_externalAudioTrack
+        \brief Select external audio track (for 2nd track)
+*/
 void A_externalAudioTrack( void )
 {
-        uint32_t nb=0,*infos=NULL;
-        AudioSource old,nw;        
-        uint8_t r=0;
+        uint32_t old,nw;
         uint32_t oldtrack,newtrack;
+        char  *newtrackname=ADM_strdup(secondAudioName);
 
-//secondaudiostream
+   diaMenuEntry sourcesStream[]={
+            {AudioNone,_("None"),_("No audio")},
+            {AudioAC3,_("External AC3"),_("Take audio from external AC3 file")},
+            {AudioMP3,_("External MP3"),_("Take audio from external MP3 file")},
+            {AudioWav,_("External Wav"),_("Take audio from external WAV file")}
+        };
+        
+        old=nw=secondAudioSource;
 
+        diaElemMenu     sourceMenu(&nw,_("Audio source"),4,sourcesStream,NULL);
+        diaElemFileRead sourceName(&newtrackname,_("Filename"));
+        diaElem *allWidgets[]={&sourceMenu,&sourceName};
 
-        nw=secondAudioSource;
-        r=DIA_audioTrack(&nw, NULL,0, NULL);
-        if(!r) return;
+  /* Link..*/
+        
+         sourceMenu.link(&(sourcesStream[2]),1,&sourceName);
+         sourceMenu.link(&(sourcesStream[3]),1,&sourceName);
+         sourceMenu.link(&(sourcesStream[1]),1,&sourceName);
 
+         if( !diaFactoryRun(_("Select 2nd audio Track"),2,allWidgets)) return;
+       
         if(secondAudioSource!=AudioNone)
         {
                  delete secondaudiostream;
                  secondAudioSource=AudioNone;
                  secondaudiostream=NULL;
+                 if(secondAudioName) ADM_dealloc(secondAudioName);
+                 secondAudioName=NULL;
         }
-        char               *name=NULL;
-        if(nw==AudioMP3|| nw==AudioAC3 || nw==AudioWav)
-        {
-          GUI_FileSelRead(_("Select 2nd track"),&name);
-        }
-        A_setSecondAudioTrack(nw,name);
-        if(name) ADM_dealloc(name);
+       secondAudioSource=(AudioSource)nw;
+        A_setSecondAudioTrack(secondAudioSource,newtrackname);
+        if(newtrackname) ADM_dealloc(newtrackname);
 }
 
 uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
@@ -2124,6 +2140,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         {
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioMP3;
+                                secondAudioName=ADM_strdup(name);
                                 printf ("\n MP3 loaded\n");
                                 GUI_Info_HIG(ADM_LOG_INFO,_("Second track loaded"), NULL);
                                 return 1;
@@ -2145,6 +2162,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         {
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioAC3;
+                                secondAudioName=ADM_strdup(name);
                                 printf ("\n AC3 loaded\n");
                                 GUI_Info_HIG(ADM_LOG_INFO,_("Second track loaded"), NULL);
                                 return 1;
@@ -2166,6 +2184,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name)
                         {
                                 secondaudiostream = tmp;     
                                 secondAudioSource=AudioAC3;
+                                secondAudioName=ADM_strdup(name);
                                 printf ("\n AC3 loaded\n");
                                 GUI_Info_HIG(ADM_LOG_INFO,_("Second track loaded"), NULL);
                                 return 1;

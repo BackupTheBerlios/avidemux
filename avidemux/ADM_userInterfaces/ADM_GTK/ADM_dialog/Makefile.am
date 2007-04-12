@@ -26,7 +26,6 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
         DIA_preview.cpp \
         DIA_contrast.cpp \
         DIA_srt.cpp \
-        DIA_rotate.cpp \
 	DIA_coloryuv.cpp \
 	DIA_quota.cpp \
 	DIA_animated.cpp \
@@ -39,7 +38,7 @@ EXTRA_DIST =  \
 DIA_mcdeint.cpp     DIA_resize.cpp \
 DIA_cnr2.cpp          DIA_mjpeg.cpp       \
 DIA_color.cpp         DIA_eq2.cpp          \
-DIA_coloryuv.cpp      DIA_equalizer.cpp    DIA_mpdelogo.cpp    DIA_rotate.cpp \
+DIA_coloryuv.cpp      DIA_equalizer.cpp    DIA_mpdelogo.cpp     \
 DIA_contrast.cpp      DIA_exLame.cpp       DIA_mpeg2opt.cpp    DIA_srt.cpp \
 DIA_about.cpp        DIA_tdeint.cpp \
 DIA_acodec.cpp       DIA_crop.cpp          DIA_gototime.cpp   DIA_v2v.cpp \

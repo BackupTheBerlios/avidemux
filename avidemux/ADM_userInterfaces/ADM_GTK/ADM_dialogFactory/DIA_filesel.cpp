@@ -41,6 +41,12 @@ diaElemFileRead::diaElemFileRead(char **filename,const char *toggleTitle,const c
 
 diaElemFileRead::~diaElemFileRead()
 {
+GtkWidget **wid=(GtkWidget **)myWidget;
+        if(wid)
+        {
+            delete [] wid;
+            myWidget=NULL;
+        }
   
 }
 void diaElemFileRead::setMe(void *dialog, void *opaque,uint32_t line)
@@ -96,27 +102,29 @@ void diaElemFileRead::setMe(void *dialog, void *opaque,uint32_t line)
   g_signal_connect(GTK_OBJECT(button), "clicked",
                     GTK_SIGNAL_FUNC(fileRead),  this);
 
-  
-  myWidget=(void *)entry;
+  GtkWidget **w=new GtkWidget *[2];
+  w[0]=entry;
+  w[1]=button;
+  myWidget=(void *)w;
   
 }
 void diaElemFileRead::getMe(void)
 {
-  GtkWidget *widget=(GtkWidget *)myWidget;
+  GtkWidget **widget=(GtkWidget **)myWidget;
   char **name=(char **)param;
   if(*name) delete [] *name;
   *name=NULL;
-  *name =ADM_strdup(gtk_entry_get_text (GTK_ENTRY (myWidget)));
+  *name =ADM_strdup(gtk_entry_get_text (GTK_ENTRY (widget[0])));
 }
 
 void diaElemFileRead::changeFile(void)
 {
 #define MAX_SEL 200
   char buffer[MAX_SEL+1];
-  
-  GtkWidget *widget=(GtkWidget *)myWidget;
+  GtkWidget **wid=(GtkWidget **)myWidget;
+  GtkWidget *widget=(GtkWidget *)wid[0];
   const char *txt;
-  txt =gtk_entry_get_text (GTK_ENTRY (myWidget));
+  txt =gtk_entry_get_text (GTK_ENTRY (widget));
   
   if(FileSel_SelectRead(paramTitle,buffer,MAX_SEL,txt))
   {
@@ -124,14 +132,16 @@ void diaElemFileRead::changeFile(void)
     if(*name) delete [] *name;
     *name=NULL;
     *name =ADM_strdup(buffer);
-     gtk_entry_set_text (GTK_ENTRY (myWidget), *name);
+     gtk_entry_set_text (GTK_ENTRY (widget), *name);
   }
   
 }
 
 void   diaElemFileRead::enable(uint32_t onoff)
 {
-     gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);  
+GtkWidget **wid=(GtkWidget **)myWidget;
+     gtk_widget_set_sensitive(GTK_WIDGET(wid[0]),onoff);  
+     gtk_widget_set_sensitive(GTK_WIDGET(wid[1]),onoff);  
 }
 
 void fileRead(void *w,void *p)
@@ -153,7 +163,12 @@ diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const
 
 diaElemDirSelect::~diaElemDirSelect()
 {
-  
+  GtkWidget **wid=(GtkWidget **)myWidget;
+        if(wid)
+        {
+            delete [] wid;
+            myWidget=NULL;
+        }
 }
 void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line)
 {
@@ -209,26 +224,32 @@ void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line)
                     GTK_SIGNAL_FUNC(dirSel),  this);
 
   
-  myWidget=(void *)entry;
+   GtkWidget **w=new GtkWidget *[2];
+  w[0]=entry;
+  w[1]=button;
+  myWidget=(void *)w;
   
 }
 void diaElemDirSelect::getMe(void)
 {
-  GtkWidget *widget=(GtkWidget *)myWidget;
+GtkWidget **wid=(GtkWidget **)myWidget;
+  GtkWidget *widget=wid[0];
   char **name=(char **)param;
   if(*name) delete [] *name;
   *name=NULL;
-  *name =ADM_strdup(gtk_entry_get_text (GTK_ENTRY (myWidget)));
+  *name =ADM_strdup(gtk_entry_get_text (GTK_ENTRY (widget)));
 }
 
 void diaElemDirSelect::changeFile(void)
 {
 #define MAX_SEL 200
   char buffer[MAX_SEL+1];
+  GtkWidget **wid=(GtkWidget **)myWidget;
+  GtkWidget *widget=wid[0];
+
   
-  GtkWidget *widget=(GtkWidget *)myWidget;
   const char *txt;
-  txt =gtk_entry_get_text (GTK_ENTRY (myWidget));
+  txt =gtk_entry_get_text (GTK_ENTRY (widget));
   
   if(FileSel_SelectDir(paramTitle,buffer,MAX_SEL,txt))
   {
@@ -236,13 +257,16 @@ void diaElemDirSelect::changeFile(void)
     if(*name) delete [] *name;
     *name=NULL;
     *name =ADM_strdup(buffer);
-     gtk_entry_set_text (GTK_ENTRY (myWidget), *name);
+     gtk_entry_set_text (GTK_ENTRY (widget), *name);
   }
   
 }
 void   diaElemDirSelect::enable(uint32_t onoff)
 {
-     gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);  
+    GtkWidget **wid=(GtkWidget **)myWidget;
+     gtk_widget_set_sensitive(GTK_WIDGET(wid[0]),onoff);  
+     gtk_widget_set_sensitive(GTK_WIDGET(wid[1]),onoff);  
+
 }
 
 void dirSel(void *w,void *p)
