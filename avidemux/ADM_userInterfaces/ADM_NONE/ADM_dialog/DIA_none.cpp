@@ -43,7 +43,6 @@
 #include "ADM_encoder/adm_encmjpeg_param.h"
 #include "ADM_video/ADM_vidPartial_param.h"
 #include "ADM_video/ADM_vidTDeint_param.h"
-#include "ADM_video/ADM_vidRotate_param.h"
 #include "ADM_video/ADM_vidEqualizer.h"
 #include "ADM_video/ADM_vidHue.h"
 #include "ADM_video/ADM_vobsubinfo.h"
@@ -80,7 +79,6 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 		      uint32_t * br,uint32_t *fsize,xvidEncParam *param){return 0;}
 #endif
 uint8_t DIA_animated(ANIMATED_PARAM *param){return 0;}
-uint8_t DIA_rotate(AVDMGenericVideoStream *astream,ROTATE_PARAM *param){return 0;}
 uint8_t DIA_cnr2(CNR2Param *param){return 0;}
 uint8_t DIA_DVDffParam(COMPRES_PARAMS *incoming){return 0;}
 uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in){return 0;}

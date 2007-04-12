@@ -186,7 +186,8 @@ bool use_margins = ( _params->top_margin | _params->bottom_margin ) != 0;
 #endif
        _ass_track = ass_read_file(_ass_lib, (char*)_params->subfile, NULL);
 
-        ADM_assert(_ass_track);
+//        ADM_assert(_ass_track);
+        GUI_Error_HIG("SSA Error","Cannot read_file for *%s*",(char*)_params->subfile);
         return 1;
 } 
 

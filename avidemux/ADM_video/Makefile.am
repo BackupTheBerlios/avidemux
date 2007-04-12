@@ -19,8 +19,6 @@ libADM_video_a_SOURCES = \
 	ADM_vidClean.cpp \
 	ADM_resizebis.cpp \
  ADM_genvideo.cpp \
- ADM_vidRotate.cpp \
- ADM_vidRotate.h \
  ADM_vidResize25.cpp \
  ADM_vidFieldUtil.cpp \
  ADM_vidFieldUtil.h \
@@ -67,8 +65,8 @@ ADM_interlaced.cpp  \
 ADM_interlaced.h ADM_vidEq2.cpp  ADM_vidResize.cpp \
 ADM_vidEq2.h  ADM_vidResize25.cpp \
 ADM_vidEqualizer.cpp  \
-ADM_mpdetc.cpp ADM_vidEqualizer.h  ADM_vidRotate.cpp \
-ADM_mpdetc.h ADM_vidRotate.h \
+ADM_mpdetc.cpp ADM_vidEqualizer.h   \
+ADM_mpdetc.h  \
 ADM_resizebis.cpp   ADM_vidSRT.cpp \
 ADM_resizebis.hxx    ADM_vidSRT.h \
 ADM_resizeter.cpp  ADM_vidField.h  ADM_vidSRTRender.cpp \
