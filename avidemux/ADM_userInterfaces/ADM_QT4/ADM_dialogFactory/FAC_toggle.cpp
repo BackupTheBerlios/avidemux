@@ -71,7 +71,16 @@ void diaElemToggle::getMe(void)
   }else
     *val=0;
 }
-void diaElemToggle::enable(uint32_t onoff) {}
+void diaElemToggle::enable(uint32_t onoff) 
+{
+  QCheckBox *box=(QCheckBox *)myWidget;
+  ADM_assert(box);
+  if(onoff)
+    box->setEnabled(1);
+  else
+    box->setDisabled(1);
+}
+
 
 
 //******************************************************

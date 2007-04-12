@@ -18,8 +18,8 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 	DIA_pause.cpp \
 	DIA_lavdecoder.cpp DIA_calculator.cpp DIA_equalizer.cpp \
 	DIA_vobsub.cpp DIA_x264.cpp DIA_ocr.cpp  DIA_hue.cpp DIA_eq2.cpp \
-	DIA_asharp.cpp  DIA_idx_pg.cpp DIA_gototime.cpp \
-	DIA_audioTrack.cpp DIA_cnr2.cpp DIA_jobs.cpp DIA_jobs_save.cpp  \
+	DIA_asharp.cpp  DIA_idx_pg.cpp  \
+	DIA_cnr2.cpp DIA_jobs.cpp DIA_jobs_save.cpp  \
 	DIA_v2v.cpp DIA_tdeint.cpp DIA_mpdelogo.cpp \
         DIA_chromaShift.cpp \
         \
@@ -41,11 +41,11 @@ DIA_color.cpp         DIA_eq2.cpp          \
 DIA_coloryuv.cpp      DIA_equalizer.cpp    DIA_mpdelogo.cpp     \
 DIA_contrast.cpp      DIA_exLame.cpp       DIA_mpeg2opt.cpp    DIA_srt.cpp \
 DIA_about.cpp        DIA_tdeint.cpp \
-DIA_acodec.cpp       DIA_crop.cpp          DIA_gototime.cpp   DIA_v2v.cpp \
+DIA_acodec.cpp       DIA_crop.cpp         DIA_v2v.cpp \
 DIA_animated.cpp     DIA_hue.cpp          DIA_ocr.cpp         DIA_vcodec.cpp \
 DIA_asharp.cpp       DIA_idx_pg.cpp       DIA_partial.cpp     DIA_vobsub.cpp \
 DIA_audio.cpp        DIA_idx_pg.h         DIA_pause.cpp       \
-DIA_audioTrack.cpp   DIA_pipe.cpp        DIA_working.cpp \
+DIA_pipe.cpp        DIA_working.cpp \
 DIA_defaultAudio.cpp  DIA_jobs.cpp        DIA_working.h \
 DIA_jobs_save.cpp     DIA_x264.cpp \
 DIA_preview.cpp     DIA_xvcd.cpp \

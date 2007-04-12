@@ -2038,16 +2038,25 @@ void A_audioTrack( void )
          
          if( diaFactoryRun("Select Main audio Track",3,allWidgets))
          {
+           if(nw!=AudioNone && nw!=AudioAvi)
+           {
+              if( !ADM_fileExist(newtrackname))
+                GUI_Info_HIG(ADM_LOG_INFO,_("Cannot load"),_("The selected audio file does not exist.")); 
+              goto roger_and_out;
+           }
             switch( nw)
             {
                     case AudioMP3:
-                            A_loadMP3(newtrackname);
+                            if( ADM_fileExist(newtrackname))
+                              A_loadMP3(newtrackname);
                             break;
                     case AudioAC3:
-                            A_loadAC3(newtrackname);
+                            if( ADM_fileExist(newtrackname))
+                              A_loadAC3(newtrackname);
                             break;
                     case AudioWav:
-                            A_loadWave(newtrackname);
+                            if( ADM_fileExist(newtrackname))
+                              A_loadWave(newtrackname);
                             break;
                     case AudioNone:
                               A_changeAudioStream((AVDMGenericAudioStream *) NULL, AudioNone,NULL);
@@ -2070,6 +2079,7 @@ void A_audioTrack( void )
                             ADM_assert(0);
         }
          }
+roger_and_out:         
          /* Clean up */
          for(int i=0;i<nb;i++)
             delete sourceavitracks[i];
@@ -2106,7 +2116,11 @@ void A_externalAudioTrack( void )
          sourceMenu.link(&(sourcesStream[1]),1,&sourceName);
 
          if( !diaFactoryRun(_("Select 2nd audio Track"),2,allWidgets)) return;
-       
+         if(!ADM_fileExist(newtrackname))
+         {
+           GUI_Info_HIG(ADM_LOG_INFO,_("Cannot load"),_("The selected audio file does not exist."));
+           return;
+         }
         if(secondAudioSource!=AudioNone)
         {
                  delete secondaudiostream;

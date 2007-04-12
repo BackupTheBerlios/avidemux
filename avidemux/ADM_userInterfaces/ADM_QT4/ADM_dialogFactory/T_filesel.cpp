@@ -128,7 +128,8 @@ void diaElemFileRead::getMe(void)
 }
 void diaElemFileRead::enable(uint32_t onoff)
 {
-  
+  ADM_Qfilesel *fs=(ADM_Qfilesel *)myWidget;
+  fs->setEnabled(onoff);
 }
 //****************************
 diaElemDirSelect::diaElemDirSelect(char **filename,const char *toggleTitle,const char *tip)  : diaElem(ELEM_DIR_SELECT) 
@@ -163,6 +164,8 @@ void diaElemDirSelect::enable(uint32_t onoff)
   
 }
   
-void diaElemDirSelect::changeFile(void) {}
+void diaElemDirSelect::changeFile(void) 
+{
+}
 //EOF
 

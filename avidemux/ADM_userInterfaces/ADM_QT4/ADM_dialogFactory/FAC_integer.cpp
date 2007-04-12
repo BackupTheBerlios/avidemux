@@ -79,7 +79,15 @@ void diaElemInteger::getMe(void)
  *(int32_t *)param=val;
  
 }
-void diaElemInteger::enable(uint32_t onoff) {}
+void diaElemInteger::enable(uint32_t onoff) 
+{
+ QSpinBox *box=(QSpinBox *)myWidget;
+  ADM_assert(box);
+  if(onoff)
+    box->setEnabled(1);
+  else
+    box->setDisabled(1);
+}
 //******************************************************
 diaElemUInteger::diaElemUInteger(uint32_t *intValue,const char *toggleTitle, uint32_t min, uint32_t max,const char *tip)
   : diaElem(ELEM_TOGGLE)
@@ -125,6 +133,13 @@ void diaElemUInteger::getMe(void)
 
 }
 
-void diaElemUInteger::enable(uint32_t onoff) {}
-
+void diaElemUInteger::enable(uint32_t onoff) 
+{
+ QSpinBox *box=(QSpinBox *)myWidget;
+  ADM_assert(box);
+  if(onoff)
+    box->setEnabled(1);
+  else
+    box->setDisabled(1);
+}
 //EOF

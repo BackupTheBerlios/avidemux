@@ -77,4 +77,12 @@ void diaElemFloat::getMe(void)
  *(ELEM_TYPE_FLOAT *)param=val;
  
 }
-void diaElemFloat::enable(uint32_t onoff) {}
+void diaElemFloat::enable(uint32_t onoff) 
+{
+   QDoubleSpinBox *box=(QDoubleSpinBox *)myWidget;
+  ADM_assert(box);
+  if(onoff)
+    box->setEnabled(1);
+  else
+    box->setDisabled(1);
+}
