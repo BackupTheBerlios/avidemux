@@ -422,9 +422,9 @@ void (*filter_line)(int mode, uint8_t *dst, const uint8_t *prev, const uint8_t *
         }
         memcpy(dst + (h-1)*dst_stride, cur0 + (h-1)*refs, w);
 
-#ifdef __GNUC__
-	if (mmx) 
-		;//asm volatile("emms");
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+	if (CpuCaps::hasMMXEXT()) 
+		asm volatile("emms");
 #endif
 }
 
