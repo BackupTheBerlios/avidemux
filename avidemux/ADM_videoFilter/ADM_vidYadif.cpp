@@ -1,19 +1,25 @@
 /*
-    Copyright (C) 2006 Michael Niedermayer <michaelni@gmx.at>
+	Yadif C-plugin for Avisynth 2.5 - Yet Another DeInterlacing Filter
+	Copyright (C)2007 Alexander G. Balakhnin aka Fizick  http://avisynth.org.ru
+    Port of YADIF filter from MPlayer
+	Copyright (C) 2006 Michael Niedermayer <michaelni@gmx.at>
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+    Avisynth_C plugin
+	Assembler optimized for GNU C compiler
+
 */
 /*
   Ported to avidemux by mean
@@ -49,33 +55,28 @@
 #define MAX3(a,b,c) MAX(MAX(a,b),c)
 
 //===========================================================================//
-
-struct vf_priv_s {
-    int mode;
-    int parity;
-    int buffered_i;
-    int buffered_tff;
-    double buffered_pts;
-    ADMImage *buffered_mpi;
-    int stride[3];
-    uint8_t *ref[4][3];
-    int do_deinterlace;
-};
-
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+extern "C"
+{
+void filter_line_mmx2(int mode, uint8_t *dst, const uint8_t *prev, const uint8_t *cur, const uint8_t *next, int w, int refs, int parity);
+}
+#endif
 //
 typedef struct YADIF_PARAM
 {
     uint32_t mode;
+    uint32_t order;
 }YADIF_PARAM;
 
 class  ADMVideoYadif:public AVDMGenericVideoStream
 {
 
  protected:
-  virtual char                  *printConf(void);
+  virtual char                 *printConf(void);
   YADIF_PARAM                  *_param;
-  ADMImage                     *_images[4];
-  vf_priv_s                    priv;
+   VideoCache                  *vidCache;
+  void                         updateInfo(void);
+
  public:
                   ADMVideoYadif(AVDMGenericVideoStream *in, CONFcouple *setup);
   virtual         ~ADMVideoYadif();
@@ -84,261 +85,245 @@ class  ADMVideoYadif:public AVDMGenericVideoStream
   virtual uint8_t	getCoupledConf( CONFcouple **couples)				;
  }     ;
 
-static FILTER_PARAM yadifParam={1,{"mode","height","angle"}};
+static FILTER_PARAM yadifParam={2,{"mode","order"}};
 
 
 SCRIPT_CREATE(yadif_script,ADMVideoYadif,yadifParam);
 BUILD_CREATE(yadif_create,ADMVideoYadif);
 //
-
+static void filter_plane(int mode, uint8_t *dst, int dst_stride, const uint8_t *prev0, const uint8_t *cur0, const uint8_t *next0, int refs, int w, int h, int parity, int tff, int mmx);
 
 
 //
-static void (*filter_line)(struct vf_priv_s *p, uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next, int w, int refs, int parity);
 
 
-void memcpy_pic(uint8_t *tgt,uint8_t *src, uint32_t w,uint32_t h, uint32_t d_stride,uint32_t s_stride)
+
+//***************************************************
+//***************************************************
+char *ADMVideoYadif::printConf( void )
 {
-    for(int y=0;y<h;y++)
-    {
-      memcpy(tgt,src,w);
-      tgt+=d_stride;
-      src+=s_stride; 
-    }
+  static char buf[50];
+ 	
+  sprintf((char *)buf," Yadif : mode %u order %d",_param->mode, _param->order);
+  return buf;
 }
 
-static void store_ref(struct vf_priv_s *p, uint8_t *src[3], int src_stride[3], int width, int height){
-    int i;
+ADMVideoYadif::ADMVideoYadif(AVDMGenericVideoStream *in, CONFcouple *couples)
+{
+  _in=in;		
 
-    memcpy (p->ref[3], p->ref[0], sizeof(uint8_t *)*3);
-    memmove(p->ref[0], p->ref[1], sizeof(uint8_t *)*3*3);
+  memcpy(&_info,_in->getInfo(),sizeof(_info)); 
+  _info.encoding=1;
 
-    for(i=0; i<3; i++){
-        int is_chroma= !!i;
+ // _uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
+ 
 
-        memcpy_pic(p->ref[2][i], src[i], width>>is_chroma, height>>is_chroma, p->stride[i], src_stride[i]);
-    }
+  if(couples)
+  {
+   	 _param=NEW(YADIF_PARAM);
+	GET(mode);
+        GET(order);
+  }
+  else
+  {
+    _param = NEW( YADIF_PARAM);
+    _param->mode=0;
+    _param->order=1;
+  }
+  _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
+  ADM_assert(_uncompressed);    	  	
+  vidCache = new VideoCache (10, in);
+  updateInfo();
 }
 
-#if defined(HAVE_MMX) && defined(NAMED_ASM_ARGS)
+void ADMVideoYadif::updateInfo(void)
+{
+   memcpy(&_info,_in->getInfo(),sizeof(_info)); 
+  if(_param->mode &1 ) // Bob
+  {
+    _info.nb_frames*=2;
+    _info.fps1000*=2;
+  }
+}
 
-#define LOAD4(mem,dst) \
-            "movd      "mem", "#dst" \n\t"\
-            "punpcklbw %%mm7, "#dst" \n\t"
+uint8_t ADMVideoYadif::configure( AVDMGenericVideoStream *instream) 
+{
+  _in= instream;
+     diaMenuEntry tMode[]={
+                             {0,      _("Temporal & Spatial check"),NULL},
+                             {1,   _("Bob, T+S check"),NULL},
+                             {2,      _("Skip spatial temporal check"),NULL},
+                             {3,  _("Bob, Skip spatial temporal check"),NULL}
+          };
+     diaMenuEntry tOrder[]={
+                             {0,      _("Bottom Field first"),NULL},
+                             {1,   _("Top Field First"),NULL}
+          };
+  
+     diaElemMenu mMode(&(_param->mode),   _("Mode"), 4,tMode);
+     diaElemMenu morder(&(_param->order),   _("Order"), 2,tOrder);
+     
+     diaElem *elems[]={&mMode,&morder};
+     
+     if(diaFactoryRun("Blend Removal",sizeof(elems)/sizeof(diaElem *),elems))
+     {
+        updateInfo();
+        return 1;
+     }
+     return 0;
+}
 
-#define PABS(tmp,dst) \
-            "pxor     "#tmp", "#tmp" \n\t"\
-            "psubw    "#dst", "#tmp" \n\t"\
-            "pmaxsw   "#tmp", "#dst" \n\t"
+uint8_t	ADMVideoYadif::getCoupledConf( CONFcouple **couples)
+{
+#define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
 
-#define CHECK(pj,mj) \
-            "movq "#pj"(%[cur],%[mrefs]), %%mm2 \n\t" /* cur[x-refs-1+j] */\
-            "movq "#mj"(%[cur],%[prefs]), %%mm3 \n\t" /* cur[x+refs-1-j] */\
-            "movq      %%mm2, %%mm4 \n\t"\
-            "movq      %%mm2, %%mm5 \n\t"\
-            "pxor      %%mm3, %%mm4 \n\t"\
-            "pavgb     %%mm3, %%mm5 \n\t"\
-            "pand     %[pb1], %%mm4 \n\t"\
-            "psubusb   %%mm4, %%mm5 \n\t"\
-            "psrlq     $8,    %%mm5 \n\t"\
-            "punpcklbw %%mm7, %%mm5 \n\t" /* (cur[x-refs+j] + cur[x+refs-j])>>1 */\
-            "movq      %%mm2, %%mm4 \n\t"\
-            "psubusb   %%mm3, %%mm2 \n\t"\
-            "psubusb   %%mm4, %%mm3 \n\t"\
-            "pmaxub    %%mm3, %%mm2 \n\t"\
-            "movq      %%mm2, %%mm3 \n\t"\
-            "movq      %%mm2, %%mm4 \n\t" /* ABS(cur[x-refs-1+j] - cur[x+refs-1-j]) */\
-            "psrlq      $8,   %%mm3 \n\t" /* ABS(cur[x-refs  +j] - cur[x+refs  -j]) */\
-            "psrlq     $16,   %%mm4 \n\t" /* ABS(cur[x-refs+1+j] - cur[x+refs+1-j]) */\
-            "punpcklbw %%mm7, %%mm2 \n\t"\
-            "punpcklbw %%mm7, %%mm3 \n\t"\
-            "punpcklbw %%mm7, %%mm4 \n\t"\
-            "paddw     %%mm3, %%mm2 \n\t"\
-            "paddw     %%mm4, %%mm2 \n\t" /* score */
+          ADM_assert(_param);
+          *couples=new CONFcouple(2);
 
-#define CHECK1 \
-            "movq      %%mm0, %%mm3 \n\t"\
-            "pcmpgtw   %%mm2, %%mm3 \n\t" /* if(score < spatial_score) */\
-            "pminsw    %%mm2, %%mm0 \n\t" /* spatial_score= score; */\
-            "movq      %%mm3, %%mm6 \n\t"\
-            "pand      %%mm3, %%mm5 \n\t"\
-            "pandn     %%mm1, %%mm3 \n\t"\
-            "por       %%mm5, %%mm3 \n\t"\
-            "movq      %%mm3, %%mm1 \n\t" /* spatial_pred= (cur[x-refs+j] + cur[x+refs-j])>>1; */
+          CSET(mode);
+          CSET(order);
+          return 1;
 
-#define CHECK2 /* pretend not to have checked dir=2 if dir=1 was bad.\
-                  hurts both quality and speed, but matches the C version. */\
-            "paddw    %[pw1], %%mm6 \n\t"\
-            "psllw     $14,   %%mm6 \n\t"\
-            "paddsw    %%mm6, %%mm2 \n\t"\
-            "movq      %%mm0, %%mm3 \n\t"\
-            "pcmpgtw   %%mm2, %%mm3 \n\t"\
-            "pminsw    %%mm2, %%mm0 \n\t"\
-            "pand      %%mm3, %%mm5 \n\t"\
-            "pandn     %%mm1, %%mm3 \n\t"\
-            "por       %%mm5, %%mm3 \n\t"\
-            "movq      %%mm3, %%mm1 \n\t"
+}
 
-static void filter_line_mmx2(struct vf_priv_s *p, uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next, int w, int refs, int parity){
-    static const uint64_t pw_1 = 0x0001000100010001ULL;
-    static const uint64_t pb_1 = 0x0101010101010101ULL;
-    const int mode = p->mode;
-    uint64_t tmp0, tmp1, tmp2, tmp3;
+
+ADMVideoYadif::~ADMVideoYadif()
+{
+        delete  _uncompressed;
+        _uncompressed=NULL;
+       
+        delete vidCache;
+        vidCache = NULL;
+        
+        delete _param;
+        _param=NULL;
+}
+
+uint8_t ADMVideoYadif::getFrameNumberNoAlloc(uint32_t frame,
+                                              uint32_t *len,
+                                              ADMImage *data,
+                                              uint32_t *flags)
+{
+        int mode;
+        int parity;
+        int tff;
+        int iplane;
+        int cpu;
+        int n;
+        ADMImage *src, *dst, * prev, *next;
+
+    
+        mode = _param->mode;
+
+        if (mode & 1) 
+                n = (frame>>1); // bob
+        else
+                n = frame;
+
+        src = vidCache->getImage(n);
+  // Request frame 'n' from the child (source) clip.
+
+        if (n>0)
+                prev =  vidCache->getImage( n-1); // get previous frame
+        else
+                prev= vidCache->getImage(0); // get very first frame
+
+        if (n< _in->getInfo()->nb_frames)
+                next = vidCache->getImage( n+1); // get next frame
+        else
+                next = vidCache->getImage( _in->getInfo()->nb_frames-1); // get last frame
+
+        dst = data;
+        
+        if(!prev || !src || !next)
+        {
+            printf("Failed to read frame for frame %u\n",frame);
+            vidCache->unlockAll();
+            return 0;
+        }
+        
+  // Construct a frame based on the information of the current frame
+  // contained in the "vi" struct.
+#if 0 //MEANX
+        if (_params->order == -1)
+//		tff = avs_is_tff(&p->vi) == 0 ? 0 : 1; // 0 or 1
+                tff = avs_get_parity(p->child, n) ? 1 : 0; // 0 or 1
+        else
+#endif
+                tff = _param->order;	
+        
+        parity = (mode & 1) ? (frame & 1) ^ (1^tff) : (tff ^ 1);  // 0 or 1
+
+      //MEANX  cpu = avs_get_cpu_flags(p->env);
+
+        for (iplane = 0; iplane<3; iplane++)
+        {
+                ADM_PLANE plane = (iplane==0) ? PLANAR_Y : (iplane==1) ? PLANAR_U : PLANAR_V;
+
+                const unsigned char* srcp = src->GetWritePtr(plane);
+          // Request a Read pointer from the current source frame
+
+                const unsigned char* prevp0 = prev->GetWritePtr( plane);
+                unsigned char* prevp = (unsigned char*) prevp0; // with same pitch
+          // Request a Read pointer from the prev source frame.
+
+                const unsigned char* nextp0 = next->GetWritePtr( plane);
+                unsigned char* nextp = (unsigned char*) nextp0; // with same pitch
+          // Request a Read pointer from the next source frame.
+
+                unsigned char* dstp = dst->GetWritePtr( plane);
+                // Request a Write pointer from the newly created destination image.
+          // You can request a writepointer to images that have just been
+
+                const int dst_pitch = dst->GetPitch( plane);
+          // Requests pitch (length of a line) of the destination image.
+          // For more information on pitch see: http://www.avisynth.org/index.php?page=WorkingWithImages
+                // (short version - pitch is always equal to or greater than width to allow for seriously fast assembly code)
+
+                const int width =dst->GetPitch( plane);
+          // Requests rowsize (number of used bytes in a line.
+          // See the link above for more information.
+
+                const int height = dst->GetHeight( plane);
+          // Requests the height of the destination image.
+
+                const int src_pitch = src->GetPitch(plane);
+                const int prev_pitch = prev->GetPitch(plane);
+                const int next_pitch = next->GetPitch(plane);
+
+                // in v.0.1-0.3  all source pitches are  assumed equal (for simplicity)
+                                // consider other (rare) case
+                if (prev_pitch != src_pitch)
+                {
+                    prevp = (unsigned char *)ADM_alloc(height*src_pitch);
+                    int h;
+                    for (h=0; h<0; h++)
+                      memcpy(prevp+h*src_pitch, prevp0+h*prev_pitch, width);
+                }
+                    
+                if (next_pitch != src_pitch)
+                {
+                    nextp = (unsigned char *)ADM_alloc(height*src_pitch);
+                    int h;
+                    for (h=0; h<0; h++)
+                      memcpy(nextp+h*src_pitch, nextp0+h*next_pitch, width);
+                }
+                    
+                filter_plane(mode, dstp, dst_pitch, prevp, srcp, nextp, src_pitch, width, height, parity, tff, 0);
+                if (prev_pitch != src_pitch)
+                        ADM_dealloc(prevp);
+                if (next_pitch != src_pitch)
+                        ADM_dealloc(nextp);
+        }
+       vidCache->unlockAll();
+      return 1;
+}
+//****************
+
+static void filter_line_c(int mode, uint8_t *dst, const uint8_t *prev, const uint8_t *cur, const uint8_t *next, int w, int refs, int parity){
     int x;
-
-#define FILTER\
-    for(x=0; x<w; x+=4){\
-        asm volatile(\
-            "pxor      %%mm7, %%mm7 \n\t"\
-            LOAD4("(%[cur],%[mrefs])", %%mm0) /* c = cur[x-refs] */\
-            LOAD4("(%[cur],%[prefs])", %%mm1) /* e = cur[x+refs] */\
-            LOAD4("(%["prev2"])", %%mm2) /* prev2[x] */\
-            LOAD4("(%["next2"])", %%mm3) /* next2[x] */\
-            "movq      %%mm3, %%mm4 \n\t"\
-            "paddw     %%mm2, %%mm3 \n\t"\
-            "psraw     $1,    %%mm3 \n\t" /* d = (prev2[x] + next2[x])>>1 */\
-            "movq      %%mm0, %[tmp0] \n\t" /* c */\
-            "movq      %%mm3, %[tmp1] \n\t" /* d */\
-            "movq      %%mm1, %[tmp2] \n\t" /* e */\
-            "psubw     %%mm4, %%mm2 \n\t"\
-            PABS(      %%mm4, %%mm2) /* temporal_diff0 */\
-            LOAD4("(%[prev],%[mrefs])", %%mm3) /* prev[x-refs] */\
-            LOAD4("(%[prev],%[prefs])", %%mm4) /* prev[x+refs] */\
-            "psubw     %%mm0, %%mm3 \n\t"\
-            "psubw     %%mm1, %%mm4 \n\t"\
-            PABS(      %%mm5, %%mm3)\
-            PABS(      %%mm5, %%mm4)\
-            "paddw     %%mm4, %%mm3 \n\t" /* temporal_diff1 */\
-            "psrlw     $1,    %%mm2 \n\t"\
-            "psrlw     $1,    %%mm3 \n\t"\
-            "pmaxsw    %%mm3, %%mm2 \n\t"\
-            LOAD4("(%[next],%[mrefs])", %%mm3) /* next[x-refs] */\
-            LOAD4("(%[next],%[prefs])", %%mm4) /* next[x+refs] */\
-            "psubw     %%mm0, %%mm3 \n\t"\
-            "psubw     %%mm1, %%mm4 \n\t"\
-            PABS(      %%mm5, %%mm3)\
-            PABS(      %%mm5, %%mm4)\
-            "paddw     %%mm4, %%mm3 \n\t" /* temporal_diff2 */\
-            "psrlw     $1,    %%mm3 \n\t"\
-            "pmaxsw    %%mm3, %%mm2 \n\t"\
-            "movq      %%mm2, %[tmp3] \n\t" /* diff */\
-\
-            "paddw     %%mm0, %%mm1 \n\t"\
-            "paddw     %%mm0, %%mm0 \n\t"\
-            "psubw     %%mm1, %%mm0 \n\t"\
-            "psrlw     $1,    %%mm1 \n\t" /* spatial_pred */\
-            PABS(      %%mm2, %%mm0)      /* ABS(c-e) */\
-\
-            "movq -1(%[cur],%[mrefs]), %%mm2 \n\t" /* cur[x-refs-1] */\
-            "movq -1(%[cur],%[prefs]), %%mm3 \n\t" /* cur[x+refs-1] */\
-            "movq      %%mm2, %%mm4 \n\t"\
-            "psubusb   %%mm3, %%mm2 \n\t"\
-            "psubusb   %%mm4, %%mm3 \n\t"\
-            "pmaxub    %%mm3, %%mm2 \n\t"\
-            "pshufw $9,%%mm2, %%mm3 \n\t"\
-            "punpcklbw %%mm7, %%mm2 \n\t" /* ABS(cur[x-refs-1] - cur[x+refs-1]) */\
-            "punpcklbw %%mm7, %%mm3 \n\t" /* ABS(cur[x-refs+1] - cur[x+refs+1]) */\
-            "paddw     %%mm2, %%mm0 \n\t"\
-            "paddw     %%mm3, %%mm0 \n\t"\
-            "psubw    %[pw1], %%mm0 \n\t" /* spatial_score */\
-\
-            CHECK(-2,0)\
-            CHECK1\
-            CHECK(-3,1)\
-            CHECK2\
-            CHECK(0,-2)\
-            CHECK1\
-            CHECK(1,-3)\
-            CHECK2\
-\
-            /* if(p->mode<2) ... */\
-            "movq    %[tmp3], %%mm6 \n\t" /* diff */\
-            "cmp       $2, %[mode] \n\t"\
-            "jge       1f \n\t"\
-            LOAD4("(%["prev2"],%[mrefs],2)", %%mm2) /* prev2[x-2*refs] */\
-            LOAD4("(%["next2"],%[mrefs],2)", %%mm4) /* next2[x-2*refs] */\
-            LOAD4("(%["prev2"],%[prefs],2)", %%mm3) /* prev2[x+2*refs] */\
-            LOAD4("(%["next2"],%[prefs],2)", %%mm5) /* next2[x+2*refs] */\
-            "paddw     %%mm4, %%mm2 \n\t"\
-            "paddw     %%mm5, %%mm3 \n\t"\
-            "psrlw     $1,    %%mm2 \n\t" /* b */\
-            "psrlw     $1,    %%mm3 \n\t" /* f */\
-            "movq    %[tmp0], %%mm4 \n\t" /* c */\
-            "movq    %[tmp1], %%mm5 \n\t" /* d */\
-            "movq    %[tmp2], %%mm7 \n\t" /* e */\
-            "psubw     %%mm4, %%mm2 \n\t" /* b-c */\
-            "psubw     %%mm7, %%mm3 \n\t" /* f-e */\
-            "movq      %%mm5, %%mm0 \n\t"\
-            "psubw     %%mm4, %%mm5 \n\t" /* d-c */\
-            "psubw     %%mm7, %%mm0 \n\t" /* d-e */\
-            "movq      %%mm2, %%mm4 \n\t"\
-            "pminsw    %%mm3, %%mm2 \n\t"\
-            "pmaxsw    %%mm4, %%mm3 \n\t"\
-            "pmaxsw    %%mm5, %%mm2 \n\t"\
-            "pminsw    %%mm5, %%mm3 \n\t"\
-            "pmaxsw    %%mm0, %%mm2 \n\t" /* max */\
-            "pminsw    %%mm0, %%mm3 \n\t" /* min */\
-            "pxor      %%mm4, %%mm4 \n\t"\
-            "pmaxsw    %%mm3, %%mm6 \n\t"\
-            "psubw     %%mm2, %%mm4 \n\t" /* -max */\
-            "pmaxsw    %%mm4, %%mm6 \n\t" /* diff= MAX3(diff, min, -max); */\
-            "1: \n\t"\
-\
-            "movq    %[tmp1], %%mm2 \n\t" /* d */\
-            "movq      %%mm2, %%mm3 \n\t"\
-            "psubw     %%mm6, %%mm2 \n\t" /* d-diff */\
-            "paddw     %%mm6, %%mm3 \n\t" /* d+diff */\
-            "pmaxsw    %%mm2, %%mm1 \n\t"\
-            "pminsw    %%mm3, %%mm1 \n\t" /* d = clip(spatial_pred, d-diff, d+diff); */\
-            "packuswb  %%mm1, %%mm1 \n\t"\
-\
-            :[tmp0]"=m"(tmp0),\
-             [tmp1]"=m"(tmp1),\
-             [tmp2]"=m"(tmp2),\
-             [tmp3]"=m"(tmp3)\
-            :[prev] "r"(prev),\
-             [cur]  "r"(cur),\
-             [next] "r"(next),\
-             [prefs]"r"((long)refs),\
-             [mrefs]"r"((long)-refs),\
-             [pw1]  "m"(pw_1),\
-             [pb1]  "m"(pb_1),\
-             [mode] "g"(mode)\
-        );\
-        asm volatile("movd %%mm1, %0" :"=m"(*dst));\
-        dst += 4;\
-        prev+= 4;\
-        cur += 4;\
-        next+= 4;\
-    }
-
-    if(parity){
-#define prev2 "prev"
-#define next2 "cur"
-        FILTER
-#undef prev2
-#undef next2
-    }else{
-#define prev2 "cur"
-#define next2 "next"
-        FILTER
-#undef prev2
-#undef next2
-    }
-}
-#undef LOAD4
-#undef PABS
-#undef CHECK
-#undef CHECK1
-#undef CHECK2
-#undef FILTER
-
-#endif /* defined(HAVE_MMX) && defined(NAMED_ASM_ARGS) */
-
-static void filter_line_c(struct vf_priv_s *p, uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next, int w, int refs, int parity){
-    int x;
-    uint8_t *prev2= parity ? prev : cur ;
-    uint8_t *next2= parity ? cur  : next;
+    const uint8_t *prev2= parity ? prev : cur ;
+    const uint8_t *next2= parity ? cur  : next;
     for(x=0; x<w; x++){
         int c= cur[-refs];
         int d= (prev2[0] + next2[0])>>1;
@@ -352,17 +337,17 @@ static void filter_line_c(struct vf_priv_s *p, uint8_t *dst, uint8_t *prev, uint
                          + ABS(cur[-refs+1] - cur[+refs+1]) - 1;
 
 #define CHECK(j)\
-    {   int score= ABS(cur[-refs-1+j] - cur[+refs-1-j])\
-                 + ABS(cur[-refs  +j] - cur[+refs  -j])\
-                 + ABS(cur[-refs+1+j] - cur[+refs+1-j]);\
+    {   int score= ABS(cur[-refs-1+ j] - cur[+refs-1- j])\
+                 + ABS(cur[-refs  + j] - cur[+refs  - j])\
+                 + ABS(cur[-refs+1+ j] - cur[+refs+1- j]);\
         if(score < spatial_score){\
             spatial_score= score;\
-            spatial_pred= (cur[-refs  +j] + cur[+refs  -j])>>1;\
+            spatial_pred= (cur[-refs  + j] + cur[+refs  - j])>>1;\
 
         CHECK(-1) CHECK(-2) }} }}
         CHECK( 1) CHECK( 2) }} }}
 
-        if(p->mode<2){
+        if(mode<2){
             int b= (prev2[-2*refs] + next2[-2*refs])>>1;
             int f= (prev2[+2*refs] + next2[+2*refs])>>1;
 #if 0
@@ -394,274 +379,34 @@ static void filter_line_c(struct vf_priv_s *p, uint8_t *dst, uint8_t *prev, uint
     }
 }
 
-static void filter(struct vf_priv_s *p, uint8_t *dst[3], int dst_stride[3], int width, int height, int parity, int tff){
-    int x, y, i;
+void filter_plane(int mode, uint8_t *dst, int dst_stride, const uint8_t *prev0, const uint8_t *cur0, const uint8_t *next0, int refs, int w, int h, int parity, int tff, int mmx)
+{
+void (*filter_line)(int mode, uint8_t *dst, const uint8_t *prev, const uint8_t *cur, const uint8_t *next, int w, int refs, int parity);
+	int y;
+	filter_line = filter_line_c;
+#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
+	if (CpuCaps::hasMMXEXT()) 
+		filter_line = filter_line_mmx2;
+#endif
 
-    for(i=0; i<3; i++){
-        int is_chroma= !!i;
-        int w= width >>is_chroma;
-        int h= height>>is_chroma;
-        int refs= p->stride[i];
-
-        for(y=0; y<h; y++){
-            if((y ^ parity) & 1){
-                uint8_t *prev= &p->ref[0][i][y*refs];
-                uint8_t *cur = &p->ref[1][i][y*refs];
-                uint8_t *next= &p->ref[2][i][y*refs];
-                uint8_t *dst2= &dst[i][y*dst_stride[i]];
-                filter_line(p, dst2, prev, cur, next, w, refs, parity ^ tff);
+        memcpy(dst, cur0, w);
+        memcpy(dst + dst_stride, cur0 + refs, w);
+        for(y=2; y<h-1; y++){
+            if(((y ^ parity) & 1)){
+                const uint8_t *prev= prev0 + y*refs;
+                const uint8_t *cur = cur0 + y*refs;
+                const uint8_t *next= next0 + y*refs;
+                uint8_t *dst2= dst + y*dst_stride;
+                filter_line(mode, dst2, prev, cur, next, w, refs, (parity ^ tff));
             }else{
-                memcpy(&dst[i][y*dst_stride[i]], &p->ref[1][i][y*refs], w);
+                memcpy(dst + y*dst_stride, cur0 + y*refs, w);
             }
         }
-    }
-#if defined(HAVE_MMX) && defined(NAMED_ASM_ARGS)
-    if(CpuCaps::hasMMXEXT()) asm volatile("emms \n\t" : : : "memory");
+        memcpy(dst + (h-1)*dst_stride, cur0 + (h-1)*refs, w);
+
+#ifdef __GNUC__
+	if (mmx) 
+		;//asm volatile("emms");
 #endif
 }
-//***************************************************
-//***************************************************
-char *ADMVideoYadif::printConf( void )
-{
-  static char buf[50];
- 	
-  sprintf((char *)buf," Yadif");
-  return buf;
-}
 
-ADMVideoYadif::ADMVideoYadif(AVDMGenericVideoStream *in, CONFcouple *couples)
-{
-  _in=in;		
-
-  memcpy(&_info,_in->getInfo(),sizeof(_info)); 
-  _info.encoding=1;
-
- // _uncompressed=new uint8_t [3*_in->getInfo()->width*_in->getInfo()->height];
- 
-
-  if(couples)
-  {
-   	 _param=NEW(YADIF_PARAM);
-	GET(mode);
-  }
-  else
-  {
-    _param = NEW( YADIF_PARAM);
-    _param->mode=0;
-  }
- _uncompressed=new ADMImage(_in->getInfo()->width,_in->getInfo()->height);
-  ADM_assert(_uncompressed);    	  	
-
-  // Allocate
-  uint32_t w=(_info.width+31)&(~31);
-  uint32_t h=(_info.height+6+31)&(~31);
-  for(int i=0;i<3;i++)
-  {
-    _images[i]=new ADMImage(w,h); 
-  }
-  memset(&priv,0,sizeof(priv));
-  for(int i=0;i<3;i++)
-  {
-    priv.ref[i][0]=YPLANE(_images[i]);
-    priv.ref[i][1]=UPLANE(_images[i]);
-    priv.ref[i][2]=VPLANE(_images[i]);
-  }
-  
-  
-}
-
-uint8_t ADMVideoYadif::configure( AVDMGenericVideoStream *instream) 
-{
-  _in= instream;
-  return 1;
-}
-
-uint8_t	ADMVideoYadif::getCoupledConf( CONFcouple **couples)
-{
-#define CSET(x)  (*couples)->setCouple((char *)#x,(_param->x))
-
-          ADM_assert(_param);
-          *couples=new CONFcouple(1);
-
-          CSET(mode);
-          return 1;
-
-}
-
-
-ADMVideoYadif::~ADMVideoYadif()
-{
-        delete  _uncompressed;
-        _uncompressed=NULL;
-        DELETE(_param);
-        for(int i=0;i<3;i++)
-            delete _images[i];
-}
-uint8_t ADMVideoYadif::getFrameNumberNoAlloc(uint32_t frame,
-                                              uint32_t *len,
-                                              ADMImage *data,
-                                              uint32_t *flags)
-{
-  ADM_assert(frame<_info.nb_frames);
-                                                                
-  // read uncompressed frame
-  if(!_in->getFrameNumberNoAlloc(frame, len, _uncompressed, flags)) return 0;
-  
-  
-  
-  *len= (_info.width * _info.height*3) >>1;
-  return 1;
-}
-
-//***************************************************
-//***************************************************
-#if OPOPOP
-static int config(struct vf_instance_s* vf,
-        int width, int height, int d_width, int d_height,
-	unsigned int flags, unsigned int outfmt){
-        int i, j;
-
-        for(i=0; i<3; i++){
-            int is_chroma= !!i;
-            int w= ((width   + 31) & (~31))>>is_chroma;
-            int h= ((height+6+ 31) & (~31))>>is_chroma;
-
-            vf->priv->stride[i]= w;
-            for(j=0; j<3; j++)
-                vf->priv->ref[j][i]= malloc(w*h*sizeof(uint8_t))+3*w;
-        }
-
-	return vf_next_config(vf,width,height,d_width,d_height,flags,outfmt);
-}
-
-static int continue_buffered_image(struct vf_instance_s *vf);
-extern int correct_pts;
-
-static int put_image(struct vf_instance_s* vf, mp_image_t *mpi, double pts){
-    int tff;
-
-    if(vf->priv->parity < 0) {
-        if (mpi->fields & MP_IMGFIELD_ORDERED)
-            tff = !!(mpi->fields & MP_IMGFIELD_TOP_FIRST);
-        else
-            tff = 1;
-    }
-    else tff = (vf->priv->parity&1)^1;
-
-    store_ref(vf->priv, mpi->planes, mpi->stride, mpi->w, mpi->h);
-
-    vf->priv->buffered_mpi = mpi;
-    vf->priv->buffered_tff = tff;
-    vf->priv->buffered_i = 0;
-    vf->priv->buffered_pts = pts;
-
-    if(vf->priv->do_deinterlace == 0)
-        return vf_next_put_image(vf, mpi, pts);
-    else if(vf->priv->do_deinterlace == 1){
-        vf->priv->do_deinterlace= 2;
-        return 0;
-    }else
-        return continue_buffered_image(vf);
-}
-
-static int continue_buffered_image(struct vf_instance_s *vf)
-{
-    mp_image_t *mpi = vf->priv->buffered_mpi;
-    int tff = vf->priv->buffered_tff;
-    double pts = vf->priv->buffered_pts;
-    int i;
-    int ret=0;
-    mp_image_t *dmpi;
-
-    pts += vf->priv->buffered_i * .02; // XXX not right
-
-    for(i = vf->priv->buffered_i; i<=(vf->priv->mode&1); i++){
-        dmpi=vf_get_image(vf->next,mpi->imgfmt,
-            MP_IMGTYPE_TEMP,
-            MP_IMGFLAG_ACCEPT_STRIDE|MP_IMGFLAG_PREFER_ALIGNED_STRIDE,
-            mpi->width,mpi->height);
-        vf_clone_mpi_attributes(dmpi, mpi);
-        filter(vf->priv, dmpi->planes, dmpi->stride, mpi->w, mpi->h, i ^ tff ^ 1, tff);
-        if (correct_pts && i < (vf->priv->mode & 1))
-            vf_queue_frame(vf, continue_buffered_image);
-        ret |= vf_next_put_image(vf, dmpi, pts /*FIXME*/);
-        if (correct_pts)
-            break;
-        if(i<(vf->priv->mode&1))
-            vf_next_control(vf, VFCTRL_FLIP_PAGE, NULL);
-    }
-    vf->priv->buffered_i = 1;
-    return ret;
-}
-
-static void uninit(struct vf_instance_s* vf){
-    int i;
-    if(!vf->priv) return;
-
-    for(i=0; i<3*3; i++){
-        uint8_t **p= &vf->priv->ref[i%3][i/3];
-        if(*p) free(*p - 3*vf->priv->stride[i/3]);
-        *p= NULL;
-    }
-    free(vf->priv);
-    vf->priv=NULL;
-}
-
-//===========================================================================//
-static int query_format(struct vf_instance_s* vf, unsigned int fmt){
-    switch(fmt){
-	case IMGFMT_YV12:
-	case IMGFMT_I420:
-	case IMGFMT_IYUV:
-	case IMGFMT_Y800:
-	case IMGFMT_Y8:
-	    return vf_next_query_format(vf,fmt);
-    }
-    return 0;
-}
-
-static int control(struct vf_instance_s* vf, int request, void* data){
-    switch (request){
-      case VFCTRL_GET_DEINTERLACE:
-        *(int*)data = vf->priv->do_deinterlace;
-        return CONTROL_OK;
-      case VFCTRL_SET_DEINTERLACE:
-        vf->priv->do_deinterlace = 2*!!*(int*)data;
-        return CONTROL_OK;
-    }
-    return vf_next_control (vf, request, data);
-}
-
-static int open(vf_instance_t *vf, char* args){
-
-    vf->config=config;
-    vf->put_image=put_image;
-    vf->query_format=query_format;
-    vf->uninit=uninit;
-    vf->priv=malloc(sizeof(struct vf_priv_s));
-    vf->control=control;
-    memset(vf->priv, 0, sizeof(struct vf_priv_s));
-
-    vf->priv->mode=0;
-    vf->priv->parity= -1;
-    vf->priv->do_deinterlace=1;
-
-    if (args) sscanf(args, "%d:%d", &vf->priv->mode, &vf->priv->parity);
-
-    filter_line = filter_line_c;
-#if defined(HAVE_MMX) && defined(NAMED_ASM_ARGS)
-    if(gCpuCaps.hasMMX2) filter_line = filter_line_mmx2;
-#endif
-
-    return 1;
-}
-
-vf_info_t vf_info_yadif = {
-    "Yet Another DeInterlacing Filter",
-    "yadif",
-    "Michael Niedermayer",
-    "",
-    open,
-    NULL
-};
-#endif
