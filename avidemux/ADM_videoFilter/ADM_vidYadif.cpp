@@ -94,10 +94,28 @@ BUILD_CREATE(yadif_create,ADMVideoYadif);
 static void filter_plane(int mode, uint8_t *dst, int dst_stride, const uint8_t *prev0, const uint8_t *cur0, const uint8_t *next0, int refs, int w, int h, int parity, int tff, int mmx);
 
 
-//
-
-
-
+/*   Hook to build it as a dll */
+extern "C"
+{
+SCRIPT_CREATE(FILTER_create_fromscript,ADMVideoYadif,yadifParam);
+BUILD_CREATE(FILTER_create,ADMVideoYadif);
+char *FILTER_getName(void)
+{
+	return "DynYadif";
+}
+char *FILTER_getDesc(void)
+{
+	return "YADIF";
+}
+uint32_t FILTER_getVersion(void)
+{
+  return 1; 
+}
+uint32_t FILTER_getAPIVersion(void)
+{
+  return ADM_FILTER_API_VERSION; 
+}
+}
 //***************************************************
 //***************************************************
 char *ADMVideoYadif::printConf( void )
@@ -120,13 +138,13 @@ ADMVideoYadif::ADMVideoYadif(AVDMGenericVideoStream *in, CONFcouple *couples)
 
   if(couples)
   {
-   	 _param=NEW(YADIF_PARAM);
+   	 _param=new (YADIF_PARAM);
 	GET(mode);
         GET(order);
   }
   else
   {
-    _param = NEW( YADIF_PARAM);
+    _param = new ( YADIF_PARAM);
     _param->mode=0;
     _param->order=1;
   }
