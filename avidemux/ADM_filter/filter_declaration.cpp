@@ -66,7 +66,7 @@ printf(  "*********************\n");
 	registerFilter("----------- Interlacing -------------",VF_INVALID,2,NULL,NULL);
 	// Buggy : Removed REGISTER("IVTC",VF_IVTC,1,ivtc_create);
 //	REGISTERX("mpivtc","Mplayer ivtc",VF_MPDETC,1,mpdetc_create,mpdetc_script);	
-
+        REGISTERX("YADIF","yadif","Yet Another DeInterlacer. Ported from MPlayer.",VF_YADIF,1,yadif_create,yadif_script);
         REGISTERX("mcdeinterlace","mcDeinterlace","Motion compensation deinterlacer. Ported from MPlayer.",VF_MCDEINT,1,mcdeint_create,mcdeint_script);
 	REGISTERX("deinterlace","Deinterlace","Mask interlacing artifacts. Port of Smart deinterlace.",VF_DEINTERLACE,1,deinterlace_create,deinterlace_script);
 	REGISTERX("kerneldeint","KernelDeint","Kernel deinterlacer by Donald Graft.",VF_KRNDEINT,1,kerneldeint_create,kerneldeint_script);

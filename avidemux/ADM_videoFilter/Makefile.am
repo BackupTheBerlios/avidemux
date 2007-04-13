@@ -50,7 +50,8 @@ libADM_videoFilter_a_SOURCES =  \
  ADM_vidFlux.cpp \
  ADM_vidMsmooth.cpp \
  ADM_vidFastConvolution.cpp  \
- ADM_vidRotate.cpp
+ ADM_vidRotate.cpp \
+ ADM_vidYadif.cpp
 			
 
 
