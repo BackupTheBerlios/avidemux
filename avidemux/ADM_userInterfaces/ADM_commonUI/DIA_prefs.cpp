@@ -71,7 +71,7 @@ char     *alsaDevice=NULL;
 uint32_t autovbr=0;
 uint32_t autoindex=0;
 uint32_t autounpack=0;
-
+uint32_t alternate_mp3_tag=1;
 	olddevice=newdevice=AVDM_getCurrentDevice();
 
         // Alsa
@@ -83,7 +83,9 @@ uint32_t autounpack=0;
         prefs->get(FEATURE_AUTO_REBUILDINDEX,&autoindex);
          // autoindex
         prefs->get(FEATURE_AUTO_UNPACK,&autounpack);
-
+        // Alternate mp3 tag (haali)
+        prefs->get(FEATURE_ALTERNATE_MP3_TAG,&alternate_mp3_tag);
+        
         // Video renderer
         if(prefs->get(DEVICE_VIDEODEVICE,&render)!=RC_OK)
         {       
@@ -148,6 +150,8 @@ uint32_t autounpack=0;
                
         diaElemUInteger multiThread(&mthreads,_("Number of threads"),0,10);
         diaElemUInteger autoSplit(&autosplit,_("Split mpegs every (MB)"),10,4096);
+        
+        diaElemToggle   togTagMp3(&alternate_mp3_tag,_("Use alternative tag for mp3 in .mp4"));
         
         diaMenuEntry videoMode[]={
                              {RENDER_GTK,      _("Gtk (Slow)"),NULL}
@@ -241,8 +245,8 @@ uint32_t autounpack=0;
         diaElemTabs tabInput("Input",2,(diaElem **)diaInput);
         
         /* Third Tab : output */
-        diaElem *diaOutput[]={&autoSplit,&openDml,&allowAnyMpeg};
-        diaElemTabs tabOutput("Output",3,(diaElem **)diaOutput);
+        diaElem *diaOutput[]={&autoSplit,&openDml,&allowAnyMpeg,&togTagMp3};
+        diaElemTabs tabOutput("Output",4,(diaElem **)diaOutput);
         
         /* Fourth Tab : audio */
         diaElem *diaAudio[]={&menuMixer,&menuVolume,&menuAudio,&entryAlsaDevice};
@@ -314,6 +318,8 @@ uint32_t autounpack=0;
                 // Filter directory
                 if(filterPath)
                   prefs->set(FILTERS_AUTOLOAD_PATH, filterPath);
+                // Alternate mp3 tag (haali)
+                prefs->set(FEATURE_ALTERNATE_MP3_TAG,alternate_mp3_tag);
 	}
 	return 1;
 }

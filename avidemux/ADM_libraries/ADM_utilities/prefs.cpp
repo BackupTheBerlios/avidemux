@@ -133,10 +133,11 @@ static opt_def opt_defs [] = {
 	{"feature.auto_unpack",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"downmixing.prologic",		UINT,	"2",	NULL,	"0",	"2"	},
 	{"filters.autoload.path",		STRING,"/tmp/",NULL, NULL, NULL },
-	{"filters.autoload.active",		UINT,	"0",	NULL,	"0",	"1"	}
+	{"filters.autoload.active",		UINT,	"0",	NULL,	"0",	"1"	},
+	{"feature.alternate_mp3_tag",		UINT,	"1",	NULL,	"0",	"1"	}
 };
 
-int num_opts = 72;
+int num_opts = 73;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

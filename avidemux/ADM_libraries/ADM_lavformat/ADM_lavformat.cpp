@@ -47,7 +47,7 @@ extern "C"
 #include "ADM_lavformat.h"
 #include "fourcc.h"
 
-
+#include "prefs.h"
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_LAVFORMAT
 #include "ADM_osSupport/ADM_debug.h"
@@ -617,7 +617,19 @@ uint8_t lavformat_init(void)
                 av_register_input_format(&matroska_demuxer);
                 register_protocol(&file_protocol);
 }
-
+extern "C"
+{
+/** 
+    \fn ADM_useAlternateTagging
+    \brief returns 1 if using haali compatible tagging, 0 if normal. For mp3 in mp4ff.
+*/
+int ADM_useAlternateTagging(void)
+{
+  uint32_t v=1;
+  prefs->get(FEATURE_ALTERNATE_MP3_TAG,&v);
+  return v;
+} 
+}
 //___________________________________________________________________________
 //EOF
 

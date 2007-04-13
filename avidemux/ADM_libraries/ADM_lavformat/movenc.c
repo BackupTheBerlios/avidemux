@@ -39,6 +39,10 @@
 // ffmpeg -i testinput.avi  -f psp -r 14.985 -s 320x240 -b 768 -ar 24000 -ab 32 M4V00001.MP4
 #define MODE_3G2 4
 
+// MEANX
+extern int ADM_useAlternateTagging(void);
+// MEANX
+
 typedef struct MOVIentry {
     unsigned int flags, size;
     uint64_t     pos;
@@ -245,6 +249,7 @@ static void putDescr(ByteIOContext *pb, int tag, unsigned int size)
 
 static int mov_write_esds_tag(ByteIOContext *pb, MOVTrack* track) // Basic
 {
+  int codec_id;
     offset_t pos = url_ftell(pb);
     int decoderSpecificInfoLen = track->vosLen ? descrLength(track->vosLen):0;
 
@@ -262,8 +267,11 @@ static int mov_write_esds_tag(ByteIOContext *pb, MOVTrack* track) // Basic
     putDescr(pb, 0x04, 13 + decoderSpecificInfoLen);
 
     // Object type indication
-    put_byte(pb, codec_get_tag(ff_mov_obj_type, track->enc->codec_id));
-
+    // MEANX
+    codec_id=track->enc->codec_id;
+    if(ADM_useAlternateTagging() && codec_id==CODEC_ID_MP3) codec_id=CODEC_ID_MP2;
+    put_byte(pb, codec_get_tag(ff_mov_obj_type, codec_id));
+    // /MEANX
     // the following fields is made of 6 bits to identify the streamtype (4 for video, 5 for audio)
     // plus 1 bit to indicate upstream and 1 bit set to 1 (reserved)
     if(track->enc->codec_type == CODEC_TYPE_AUDIO)

@@ -87,7 +87,7 @@ uint8_t ADM_aviUISetMuxer(  void )
      mux.link(&(muxingType[2]),1,&n_block);
     
      diaElem *elems[4]={&mux,&n_frames,&n_block,&blockSize};
-     if( diaFactoryRun("Mpeg2 Encoding",4,elems))
+     if( diaFactoryRun(_("Avi Muxer Option"),4,elems))
     {
       muxMode=(PARAM_MUX)mux_mode;
       switch(muxMode)
