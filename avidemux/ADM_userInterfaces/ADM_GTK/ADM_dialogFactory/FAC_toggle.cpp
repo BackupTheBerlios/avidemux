@@ -54,6 +54,12 @@ void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t line)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *(uint32_t *)param);
+  if(tip)
+  {
+      GtkTooltips *tooltips= gtk_tooltips_new ();
+      gtk_tooltips_set_tip (tooltips, widget, tip, NULL);
+  }
+
 }
 void diaElemToggle::getMe(void)
 {

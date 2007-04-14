@@ -74,7 +74,12 @@ void diaElemFloat::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_label_set_mnemonic_widget (GTK_LABEL(label), widget);
   
   myWidget=(void *)widget;
-  
+    if(tip)
+  {
+      GtkTooltips *tooltips= gtk_tooltips_new ();
+      gtk_tooltips_set_tip (tooltips, widget, tip, NULL);
+  }
+
 }
 void diaElemFloat::getMe(void)
 {

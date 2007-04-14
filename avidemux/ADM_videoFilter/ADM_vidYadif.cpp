@@ -183,7 +183,7 @@ uint8_t ADMVideoYadif::configure( AVDMGenericVideoStream *instream)
      
      diaElem *elems[]={&mMode,&morder};
      
-     if(diaFactoryRun("Blend Removal",sizeof(elems)/sizeof(diaElem *),elems))
+     if(diaFactoryRun("Yadif  configuration",sizeof(elems)/sizeof(diaElem *),elems))
      {
         updateInfo();
         return 1;
