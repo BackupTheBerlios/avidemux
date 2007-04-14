@@ -1316,7 +1316,7 @@ fi
 
 CFLAGS="$CFLAGS -falign-loops=16"
 CXXFLAGS="$CXXFLAGS -falign-loops=16"
-CXXFLAGS="-I.. -I../ADM_lavutil -IADM_utilities -I../ADM_utilities  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 $CXXFLAGS -I../.."
+CXXFLAGS="$CXXFLAGS -I.. -I../ADM_lavutil -IADM_utilities -I../ADM_utilities  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -I../.."
 
 dnl ________________ lavcodec _________________
 AC_DEFINE(CONFIG_WMV3_DECODER,1,[FFMPEG])
