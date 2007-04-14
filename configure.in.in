@@ -64,6 +64,11 @@ AC_PROG_LIBTOOL
 dnl without this order in this file, automake will be confused!
 AM_CONFIG_HEADER(config.h)
 
+dnl added to ease install in uncommon place
+dnl it has to be done early else it breaks cross compile
+CPPFLAGS="$USER_INCLUDES $CPPFLAGS"
+CFLAGS="$USER_INCLUDES $CFLAGS"
+CXXFLAGS="$USER_INCLUDES $CXXFLAGS"
 # needed for make install
 #inlined, AM_PROG_MKDIR_P, it is not present on some system (fedora)
 
@@ -119,8 +124,6 @@ dnl avoid po mess
 AC_SUBST(AUTODIRS)
 AC_SUBST(ADM_SUBVERSION)
 
-dnl added to ease install in uncommon place
-CPPFLAGS="$USER_INCLUDES $CPPFLAGS"
 
 dnl _________________ gettext _________________
 AM_GNU_GETTEXT([external])
