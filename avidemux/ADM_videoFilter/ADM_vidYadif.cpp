@@ -246,7 +246,7 @@ uint8_t ADMVideoYadif::getFrameNumberNoAlloc(uint32_t frame,
         else
                 prev= vidCache->getImage(0); // get very first frame
 
-        if (n< _in->getInfo()->nb_frames)
+        if (n< _in->getInfo()->nb_frames-1)
                 next = vidCache->getImage( n+1); // get next frame
         else
                 next = vidCache->getImage( _in->getInfo()->nb_frames-1); // get last frame
