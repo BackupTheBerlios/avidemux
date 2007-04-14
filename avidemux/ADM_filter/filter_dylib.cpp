@@ -152,7 +152,7 @@ void tryLoading(TYPEOFHANDLE handle)
     
     printf("Loaded filter %s, version %d\n",name,versionP());
   
-   registerFilterEx(name,(VF_FILTERS)dynTag,1,createP,name,createFromScriptP,desc);
+   registerFilterEx(name,(VF_FILTERS)dynTag++,1,createP,name,createFromScriptP,desc);
 
 }
 
