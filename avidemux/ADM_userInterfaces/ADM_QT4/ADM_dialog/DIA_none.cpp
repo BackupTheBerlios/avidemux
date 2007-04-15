@@ -100,7 +100,7 @@ uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
 uint8_t DIA_xvid4(COMPRES_PARAMS *incoming){return 0;}
 
 //******************************
-uint8_t getFFCompressParams (COMPRES_PARAMS * incoming) {return 0;}
+
 uint8_t DIA_quota(char *) {return 0;}
 
 uint8_t  DIA_job_select(char **jobname, char **filename) {return 0;}
