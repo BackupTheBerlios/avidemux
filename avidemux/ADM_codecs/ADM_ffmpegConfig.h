@@ -24,24 +24,24 @@
 typedef struct FFcodecSetting
 {
   Motion_Est_ID me_method;
-  uint8_t _GMC;
-  uint8_t _4MV;
-  uint8_t _QPEL;
-  uint8_t _TRELLIS_QUANT;
-  int qmin;			// 2-31
-  int qmax;			// 2-31
-  int max_qdiff;		// 1-31
-  int max_b_frames;		// 0-1
-  int mpeg_quant;		// 0-1
-  int is_luma_elim_threshold;
-  int luma_elim_threshold;	// -99--99
-  int is_chroma_elim_threshold;	// -99--99           
-  int chroma_elim_threshold;	// -99--99      
+  uint32_t _GMC;
+  uint32_t _4MV;
+  uint32_t _QPEL;
+  uint32_t _TRELLIS_QUANT;
+  uint32_t qmin;			// 2-31
+  uint32_t qmax;			// 2-31
+  uint32_t max_qdiff;		// 1-31
+  uint32_t max_b_frames;		// 0-1
+  uint32_t mpeg_quant;		// 0-1
+  uint32_t is_luma_elim_threshold;
+  uint32_t luma_elim_threshold;	// -99--99
+  uint32_t is_chroma_elim_threshold;	// -99--99           
+  uint32_t chroma_elim_threshold;	// -99--99      
 
   float lumi_masking;		// -1--1        
-  int is_lumi_masking;		// -1--1
+  int32_t is_lumi_masking;		// -1--1
   float dark_masking;		// -1--1        
-  int is_dark_masking;		// -1--1
+  int32_t is_dark_masking;		// -1--1
   float qcompress;		// 0.0--1.0
   float qblur;			// 0.0--1.0
   uint32_t minBitrate;          // In kBits/s
@@ -55,15 +55,15 @@ typedef struct FFcodecSetting
   uint32_t widescreen;          //0 4/3  1 16/9
 
   // new stuff from jakub ui
-  int mb_eval;			// Replace hq 0..2
-  int vratetol;			// filesize tolerance in kb
+  uint32_t mb_eval;			// Replace hq 0..2
+  uint32_t vratetol;			// filesize tolerance in kb
 
-  int is_temporal_cplx_masking;	// temporal masking 0--1        
+  uint32_t is_temporal_cplx_masking;	// temporal masking 0--1        
   float temporal_cplx_masking;	// temporal masking 0--1
 
-  int is_spatial_cplx_masking;	// spatial masking 0--1
+  uint32_t is_spatial_cplx_masking;	// spatial masking 0--1
   float spatial_cplx_masking;	// spatial masking 0--1
-  int _NORMALIZE_AQP;		// normalize adap quantiz
+  uint32_t _NORMALIZE_AQP;		// normalize adap quantiz
 
   //
   uint32_t use_xvid_ratecontrol;
