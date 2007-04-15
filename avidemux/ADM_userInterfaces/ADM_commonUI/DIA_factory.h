@@ -32,6 +32,7 @@ typedef enum elemEnum
   ELEM_NOTCH,
   ELEM_DIR_SELECT,
   ELEM_TEXT,
+  ELEM_FRAME,
   ELEM_MAX=ELEM_TOGGLE
 };
 /*********************************************/
@@ -307,6 +308,23 @@ class diaElemTabs
   {
   }
 };
+/**********************************************/
+#define DIA_MAX_FRAME 10
+class diaElemFrame : public diaElem
+{
+  uint32_t frameSize;
+  uint32_t nbElems;
+  diaElem  *elems[DIA_MAX_FRAME];
+public:
+  
+  diaElemFrame(const char *toggleTitle, const char *tip=NULL);
+  virtual ~diaElemFrame() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void) ;
+  void swallow(diaElem *widget);
+  void enable(uint32_t onoff);
+};
+/**********************************************/
 
 /*********************************************/
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems);

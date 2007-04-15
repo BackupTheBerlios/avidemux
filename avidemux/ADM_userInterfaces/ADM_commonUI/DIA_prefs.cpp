@@ -72,8 +72,20 @@ uint32_t autovbr=0;
 uint32_t autoindex=0;
 uint32_t autounpack=0;
 uint32_t alternate_mp3_tag=1;
+uint32_t pp_type=3;
+uint32_t pp_value=5;
+uint32_t hzd,vzd,dring;
 	olddevice=newdevice=AVDM_getCurrentDevice();
 
+        // Default pp
+         if(!prefs->get(DEFAULT_POSTPROC_TYPE,&pp_type)) pp_type=3;
+         if(!prefs->get(DEFAULT_POSTPROC_VALUE,&pp_value)) pp_value=3;
+#define DOME(x,y) y=!!(pp_type & x)
+    
+    DOME(1,hzd);
+    DOME(2,vzd);
+    DOME(4,dring);
+     
         // Alsa
         if( prefs->get(DEVICE_AUDIO_ALSA_DEVICE, &alsaDevice) != RC_OK )
                 alsaDevice = ADM_strdup("plughw:0,0");
@@ -221,7 +233,12 @@ uint32_t alternate_mp3_tag=1;
         
         diaElemText entryAlsaDevice(&alsaDevice,"Alsa Device",NULL);
         
-        
+        // default Post proc
+     diaElemToggle     fhzd(&hzd,_("Default Postproc, Horizontal deblocking"));
+     diaElemToggle     fvzd(&vzd,_("Default Potsproc, Vertical deblocking"));
+     diaElemToggle     fdring(&dring,_("Default Postproc, Deringing"));
+     diaElemUInteger   postProcStrength(&pp_value,_("Default Postproc strength:"),0,5);
+     
         // Filter path
         if( prefs->get(FILTERS_AUTOLOAD_PATH, &filterPath) != RC_OK )
 #ifndef CYG_MANGLING
@@ -254,8 +271,8 @@ uint32_t alternate_mp3_tag=1;
         
         /* Fifth Tab : video */
         
-        diaElem *diaVideo[]={&menuVideoMode};
-        diaElemTabs tabVideo("Video",1,(diaElem **)diaVideo);
+        diaElem *diaVideo[]={&menuVideoMode,&fhzd,&fvzd,&fdring,&postProcStrength};
+        diaElemTabs tabVideo("Video",5,(diaElem **)diaVideo);
         
         /* Sixth Tab : mthread */
         diaElem *diaMthread[]={&multiThread};
@@ -270,6 +287,15 @@ uint32_t alternate_mp3_tag=1;
         if( diaFactoryRunTabs(_("Preferences"),8,tabs))
 	{
 		ret=1;
+                // Postproc
+                #undef DOME
+                #define DOME(x,y) if(y) pp_type |=x;
+                pp_type=0;
+                DOME(1,hzd);
+                DOME(2,vzd);
+                DOME(4,dring);
+                prefs->set(DEFAULT_POSTPROC_TYPE,pp_type);
+                prefs->set(DEFAULT_POSTPROC_VALUE,pp_value);
                 //
                  prefs->set(FEATURE_AUTO_UNPACK,autounpack);
                  // autovbr
@@ -334,7 +360,6 @@ void setpp(void)
         {
                 prefs->set(DEFAULT_POSTPROC_TYPE,type);
                 prefs->set(DEFAULT_POSTPROC_VALUE,strength);
-
         }
 //	video_body->setPostProc(type, strength, uv);
 }

@@ -267,5 +267,29 @@ void diaElemMenuDynamic::finalize(void)
 { 
 }
 //******************************************************
+diaElemFrame::diaElemFrame(const char *toggleTitle, const char *tip)
+  : diaElem(ELEM_FRAME)
+{
+  
+}
+void diaElemFrame::swallow(diaElem *widget)
+{
+ 
+}
+diaElemFrame::~diaElemFrame()
+{
+  
+}
+void diaElemFrame::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ 
+}
+void diaElemFrame::getMe(void)
+{
+  
+}
+void diaElemFrame::enable(uint32_t onoff)
+{
 
+}
 //EOF
