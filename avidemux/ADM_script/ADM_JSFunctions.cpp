@@ -77,6 +77,7 @@ JSBool facBar(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 JSBool facRoText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facTab(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facDirSel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool assertTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
@@ -108,6 +109,7 @@ static JSFunctionSpec adm_functions[] = {
   {"dialogFactoryText",       facText,        0},
   {"dialogFactoryTabs",       facTab,        0},
   {"dialogFactoryDirSel",       facDirSel,        0},
+  {"dialogFactoryFrame",       facFrame,        0},
   {"crashTest",               crashTest,        0},
   {"assertTest",               assertTest,        0},
   {0}
@@ -694,7 +696,33 @@ JSBool facTab(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
   
   return JS_TRUE;
 }
+JSBool facFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
     
+      uint32_t test,test2;
+      
+      diaElemReadOnlyText align("*****","Value:");
+      diaElemReadOnlyText txt("blah blah","Value:");
+      diaElemUInteger     bt(&test,"Entry1",0,10);
+      diaElemUInteger     bt2(&test2,"Entry2",0,10);
+      diaElemFrame        frm("Frame1");
+      
+      frm.swallow(&txt);
+      frm.swallow(&bt);
+      frm.swallow(&bt2);
+      
+         diaElem *elems[]={&align,&frm   };
+  if(diaFactoryRun("Test frame",2,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  
+  return JS_TRUE;
+      
+      
+}
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
   

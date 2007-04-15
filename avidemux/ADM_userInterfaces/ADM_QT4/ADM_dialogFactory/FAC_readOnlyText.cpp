@@ -107,6 +107,9 @@ void diaElemText::getMe(void)
   *c=ADM_strdup(lineEdit->text().toAscii().data());
  
 }
-
+void diaElemText::enable(uint32_t onoff)
+{
+  
+}
 
 //EOF

@@ -210,6 +210,7 @@ void diaElemReadOnlyText::getMe(void)
 {
  
 }
+
 //******************************************************
 diaElemNotch::diaElemNotch(uint32_t yes,const char *toggleTitle, const char *tip)
   : diaElem(ELEM_NOTCH)
@@ -239,7 +240,7 @@ diaElemText::diaElemText(char **text,const char *toggleTitle,const char *tip)
 diaElemText::~diaElemText() {}
 void diaElemText::setMe(void *dialog, void *opaque,uint32_t line) {}
 void diaElemText::getMe(void) {}  
-  
+void diaElemText::enable(uint32_t onoff) {};
             
 //******************************************************
 diaElemMenuDynamic::diaElemMenuDynamic(uint32_t *intValue,const char *itle, uint32_t nb, 
@@ -291,5 +292,8 @@ void diaElemFrame::getMe(void)
 void diaElemFrame::enable(uint32_t onoff)
 {
 
+}
+void diaElemFrame::finalize(void)
+{
 }
 //EOF

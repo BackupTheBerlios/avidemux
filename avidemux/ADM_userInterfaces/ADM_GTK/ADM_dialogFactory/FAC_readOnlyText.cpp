@@ -128,4 +128,11 @@ void diaElemText::getMe(void)
   *input=ADM_strdup(gtk_editable_get_chars(GTK_EDITABLE (myWidget), 0, -1));
   
 }
+
+void diaElemText::enable(uint32_t onoff)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
+}
+
 //EOF

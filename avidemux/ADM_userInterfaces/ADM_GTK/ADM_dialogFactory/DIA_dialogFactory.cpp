@@ -173,7 +173,15 @@ uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
     buildOneTab(notebook1,i,tabs[i]); 
   }
   
- 
+  diaElemTabs *itab;
+  for(int i=0;i<nb;i++)
+  {
+    itab=(tabs[i]);
+    for(int j=0;j<itab->nbElems;j++)
+    {
+      itab->dias[j]->finalize();
+    }
+  }
   // Add a Close button
   GtkWidget *okbutton1;
   GtkWidget *cancelbutton1;

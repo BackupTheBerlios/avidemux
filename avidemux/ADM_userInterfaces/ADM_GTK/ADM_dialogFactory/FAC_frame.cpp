@@ -90,6 +90,7 @@ void diaElemFrame::setMe(void *dialog, void *opaque,uint32_t line)
     elems[i]->setMe(dialog,table,v); 
     v+=elems[i]->getSize();
   }
+  myWidget=(void *)table;
 }
 void diaElemFrame::getMe(void)
 {
@@ -98,9 +99,16 @@ void diaElemFrame::getMe(void)
     elems[i]->getMe(); 
   }
 }
+void diaElemFrame::finalize(void)
+{
+   for(int i=0;i<nbElems;i++)
+  {
+    elems[i]->finalize(); 
+  }
+}
 void diaElemFrame::enable(uint32_t onoff)
 {
-//   GtkWidget *widget=(GtkWidget *)myWidget;
-//   gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
+   GtkWidget *widget=(GtkWidget *)myWidget;
+   gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
 }
 //EOF

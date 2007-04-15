@@ -276,6 +276,7 @@ public:
   virtual ~diaElemText() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
+  void enable(uint32_t onoff);
 };
 
 /*********************************************/
@@ -323,6 +324,7 @@ public:
   void getMe(void) ;
   void swallow(diaElem *widget);
   void enable(uint32_t onoff);
+  void finalize(void);
 };
 /**********************************************/
 

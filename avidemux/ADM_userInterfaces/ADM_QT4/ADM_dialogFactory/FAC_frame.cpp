@@ -54,6 +54,9 @@ void diaElemFrame::enable(uint32_t onoff)
 {
 
 }
+void diaElemFrame::finalize(void)
+{
+}
 
 
 //******************************************************

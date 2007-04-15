@@ -232,12 +232,26 @@ uint32_t hzd,vzd,dring;
         diaElemMenu menuAudio(&newdevice,_("Audio output"), sizeof(audioEntries)/sizeof(diaMenuEntry),audioEntries,"");
         
         diaElemText entryAlsaDevice(&alsaDevice,"Alsa Device",NULL);
-        
+#ifdef ALSA_SUPPORT
+          int z,m;
+          m=sizeof(audioEntries)/sizeof(diaMenuEntry);
+          for(z=0;z<m;z++)
+          {
+            if(audioEntries[z].val==DEVICE_ALSA)
+                menuAudio.link(&(audioEntries[z]),1,&entryAlsaDevice);
+          }
+#endif
         // default Post proc
-     diaElemToggle     fhzd(&hzd,_("Default Postproc, Horizontal deblocking"));
-     diaElemToggle     fvzd(&vzd,_("Default Potsproc, Vertical deblocking"));
-     diaElemToggle     fdring(&dring,_("Default Postproc, Deringing"));
-     diaElemUInteger   postProcStrength(&pp_value,_("Default Postproc strength:"),0,5);
+     diaElemToggle     fhzd(&hzd,_("Horizontal deblocking"));
+     diaElemToggle     fvzd(&vzd,_("Vertical deblocking"));
+     diaElemToggle     fdring(&dring,_("Deringing"));
+     diaElemUInteger   postProcStrength(&pp_value,_("Strength:"),0,5);
+     diaElemFrame      framePP(_("Default Postprocessing"));
+     
+     framePP.swallow(&fhzd);
+     framePP.swallow(&fvzd);
+     framePP.swallow(&fdring);
+     framePP.swallow(&postProcStrength);
      
         // Filter path
         if( prefs->get(FILTERS_AUTOLOAD_PATH, &filterPath) != RC_OK )
@@ -271,8 +285,8 @@ uint32_t hzd,vzd,dring;
         
         /* Fifth Tab : video */
         
-        diaElem *diaVideo[]={&menuVideoMode,&fhzd,&fvzd,&fdring,&postProcStrength};
-        diaElemTabs tabVideo("Video",5,(diaElem **)diaVideo);
+        diaElem *diaVideo[]={&menuVideoMode,&framePP};
+        diaElemTabs tabVideo("Video",2,(diaElem **)diaVideo);
         
         /* Sixth Tab : mthread */
         diaElem *diaMthread[]={&multiThread};
