@@ -213,9 +213,12 @@ abort_play:
     uint32_t f;
           
 	   getFirstVideoFilter( );
-	   GUI_getFrame(curframe,&f);
+	   //GUI_getFrame(curframe,&f);
            admPreview::deferDisplay(0,0);
-           // Updated by expose ? admPreview::update(curframe,rdr_decomp_buffer);
+           UI_purge();
+           // Updated by expose ? 
+           admPreview::update(curframe);
+           UI_purge();
      	   update_status_bar();
 #ifdef HAVE_AUDIO
     if (currentaudiostream)
