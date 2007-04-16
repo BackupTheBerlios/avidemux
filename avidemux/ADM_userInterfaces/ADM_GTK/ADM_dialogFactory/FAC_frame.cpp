@@ -56,20 +56,23 @@ void diaElemFrame::setMe(void *dialog, void *opaque,uint32_t line)
   
   GtkWidget *label;
   GtkWidget *table;
+  GtkWidget *alignment;
   char str[200];
-  
-  
+ 
   sprintf(str,"<b>%s</b>",paramTitle);
   label = gtk_label_new (str);
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
   gtk_widget_show(label);
   
+  alignment = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment), 0, 0, 18, 0);
+  
    table = gtk_table_new (frameSize, 2, FALSE);
+   gtk_container_add (GTK_CONTAINER (alignment), table);
    
   gtk_table_set_col_spacings (GTK_TABLE (table), 12);
   gtk_table_set_row_spacings (GTK_TABLE (table), 6);
-  gtk_container_set_border_width (GTK_CONTAINER (table), 6);
-  
    
    gtk_widget_show(table);
    
@@ -79,7 +82,7 @@ void diaElemFrame::setMe(void *dialog, void *opaque,uint32_t line)
 
    gtk_misc_set_alignment (GTK_MISC (label), 0, 1);
 
-   gtk_table_attach (GTK_TABLE (opaque), table, 0, 2, line+1, line+2,
+   gtk_table_attach (GTK_TABLE (opaque), alignment, 0, 2, line+1, line+2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
     

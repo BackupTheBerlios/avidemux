@@ -25,39 +25,80 @@
 #include <QMessageBox>
 #include <QGridLayout>
 #include <QCheckBox>
+#include <QLabel>
 
 #include "default.h"
 #include "ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
+
+extern const char *shortkey(const char *);
+
 diaElemFrame::diaElemFrame(const char *toggleTitle, const char *tip)
   : diaElem(ELEM_FRAME)
 {
-  
+  param=NULL;
+  paramTitle=shortkey(toggleTitle);
+  this->tip=tip;
+   nbElems=0;
+  frameSize=0;
+  setSize(2);
 }
 void diaElemFrame::swallow(diaElem *widget)
 {
- 
+   elems[nbElems]=widget;
+  frameSize+=widget->getSize();
+ // setSize(frameSize);
+  nbElems++;
+  ADM_assert(nbElems<DIA_MAX_FRAME); 
 }
 diaElemFrame::~diaElemFrame()
 {
-  
+  if(paramTitle)
+    delete paramTitle;
 }
 void diaElemFrame::setMe(void *dialog, void *opaque,uint32_t line)
 {
- 
+  
+   QGridLayout *layout=(QGridLayout*) opaque;  
+   QGridLayout *layout2;
+   
+   layout2=new QGridLayout((QWidget *)dialog);
+   myWidget=(void *)layout2; 
+
+    QLabel *text=new QLabel( (QWidget *)dialog);
+    QString string(paramTitle);
+    
+    string="<b>"+string+"</b>";
+    text->setText(string);
+ layout->addWidget(text,line,0);
+ layout->addLayout(layout2,line+1,0);
+ int  v=0;
+  for(int i=0;i<nbElems;i++)
+  {
+    elems[i]->setMe(dialog,layout2,v); 
+    v+=elems[i]->getSize();
+  }
+  myWidget=(void *)layout2;
 }
+//*****************************
 void diaElemFrame::getMe(void)
 {
-  
-}
-void diaElemFrame::enable(uint32_t onoff)
-{
-
+   for(int i=0;i<nbElems;i++)
+  {
+    elems[i]->getMe(); 
+  }
 }
 void diaElemFrame::finalize(void)
 {
+   for(int i=0;i<nbElems;i++)
+  {
+    elems[i]->finalize(); 
+  }
 }
-
+void diaElemFrame::enable(uint32_t onoff)
+{
+  
+}
 
 //******************************************************
 
