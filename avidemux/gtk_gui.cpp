@@ -2041,8 +2041,10 @@ void A_audioTrack( void )
            if(nw!=AudioNone && nw!=AudioAvi)
            {
               if( !ADM_fileExist(newtrackname))
+              {
                 GUI_Info_HIG(ADM_LOG_INFO,_("Cannot load"),_("The selected audio file does not exist.")); 
-              goto roger_and_out;
+                goto roger_and_out;
+              }
            }
             switch( nw)
             {
