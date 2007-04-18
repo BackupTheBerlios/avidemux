@@ -200,7 +200,7 @@ uint32_t hzd,vzd,dring;
                              ,{2,      _("Prologic"),NULL}
                               ,{3,      _("Prologic II"),NULL}
          };
-        diaElemMenu menuMixer(&useMaster,_("Local Playback Downmixing"), sizeof(mixerEntries)/sizeof(diaMenuEntry),mixerEntries,"");
+        diaElemMenu menuMixer(&downmix,_("Local Playback Downmixing"), sizeof(mixerEntries)/sizeof(diaMenuEntry),mixerEntries,"");
 #undef MKADID        
 #define MKADID(x) {DEVICE_##x,_(#x),NULL}
         diaMenuEntry audioEntries[]=
