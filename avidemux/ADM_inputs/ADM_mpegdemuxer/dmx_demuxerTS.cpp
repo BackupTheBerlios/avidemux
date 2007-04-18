@@ -339,8 +339,17 @@ _againBranch:
                         _oldPesStart=_pesBufferStart;
                         _oldPesLen=_pesBufferLen;
                         _pesBufferStart=abs;
-                        _pesBufferLen=left;
+                        
                         parser->read32(left,_pesBuffer);
+                        // FIXME HACK
+                        if(TS_PacketSize==192 && left >4)
+                          {
+                            left-=4; // Remove timestamp of m2ts packet
+                          }
+                       // FIXME HACK
+                        _pesBufferLen=left;
+                        
+                           
                         _pesPTS=ADM_NO_PTS;
                         _pesDTS=ADM_NO_PTS;
                         // If we are in pack mode, cut padding bits
@@ -376,12 +385,19 @@ _againBranch:
                         goto _againBranch;
                 left-=consumed;
                 _pesBufferStart=abs;
-                _pesBufferLen=left;
+
 
                 _pesPTS=ADM_NO_PTS;
                 _pesDTS=ADM_NO_PTS;
 
                 parser->read32(left,_pesBuffer);
+                 // FIXME HACK
+                if(TS_PacketSize==192 && left >4)
+                  {
+                    left-=4; // Remove timestamp of m2ts packet
+                  }
+                _pesBufferLen=left;
+                 // FIXME HACK
                 return 1;
         }
 
@@ -421,12 +437,18 @@ _againBranch:
                 _oldPesLen=_pesBufferLen;
 
                 _pesBufferStart=abs;
-                _pesBufferLen=left;
+                
 
                 _pesPTS=pts;
                 _pesDTS=dts;
 
                 parser->read32(left,_pesBuffer);
+                  // FIXME HACK
+                if(TS_PacketSize==192 && left >4)
+                  {
+                    left-=4; // Remove timestamp of m2ts packet
+                  }
+                _pesBufferLen=left;
                 if(packMode)
                 {
                         if(packLen<left) _pesBufferLen=packLen;
@@ -542,7 +564,6 @@ _again:
                 left-=val;
         }
         // Ok now we got the raw data packet
-        
         *oleft=left;
         *opid=pid;
         *occ=cc;

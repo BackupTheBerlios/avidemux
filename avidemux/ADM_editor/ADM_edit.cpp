@@ -1494,7 +1494,7 @@ uint8_t         ADM_Composer::tryIndexing(char *name,char *idxname)
                 }
 
           
-                if(type==DMX_MPG_PS || type==DMX_MPG_TS)
+                if(type==DMX_MPG_PS || type==DMX_MPG_TS || type==DMX_MPG_TS2)
                 {
                        if(nbTrack>2)
 		       if(autoidx)

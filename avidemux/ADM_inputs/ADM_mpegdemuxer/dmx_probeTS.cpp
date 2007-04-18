@@ -80,8 +80,10 @@ uint8_t runProbe(const char *file)
 
 uint8_t dmx_probeTS(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks,DMX_TYPE type)
 {
+  
     // Try through PMT/PAT first
-      if(! dmx_probeTSPat(file,nbTracks,tracks,type))
+      if(type==DMX_MPG_TS2 || !dmx_probeTSPat(file,nbTracks,tracks,type))
+      //if( !dmx_probeTSPat(file,nbTracks,tracks,type))
       {
         
         printf("PAT/PMT Failed, using brute force\n");
@@ -210,7 +212,7 @@ _next:
 
         if(!id) continue;
 
-        if((code>=0xC0 && code <= 0xC9) || code==0xbd)
+        if((code>=0xC0 && code <= 0xC9) || ((code==0xbd)&& (type==DMX_MPG_TS)) || ((code==0xfd)&& (type==DMX_MPG_TS2)))
         {
             demuxer.changePid(id,code);
             demuxer.setPos(0,0);

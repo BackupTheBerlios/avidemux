@@ -548,7 +548,7 @@ char *start;
                                 return 0;
                         }
                         //Dump();
-                        if(type=='P' || type=='T' || type=='M')
+                        if(type!='E')
                         {
                                 // We have potentially some audio
                                 // Try to get it
