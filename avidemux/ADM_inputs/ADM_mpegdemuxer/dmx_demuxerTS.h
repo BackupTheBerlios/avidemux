@@ -3,12 +3,13 @@
 
  
 #include "dmx_demuxer.h"
-
+#include "dmx_identify.h"
 #define MAX_TS_BUFFER (2*1024*1024) // should be safe enough, 2 MB for a full compressed frame,even for HDTV
 #define MAX_TS_STREAM 50       // should be enough too :)
 
 
 #define TS_PACKET_SIZE       188
+#define TS2_PACKET_SIZE      192 // .m2ts
 #define TS_SYNC_BYTE         0x47
 #define TS_UNIT_START        0x40
 #define TS_UNIT_PAYLOAD_ONLY 0x10
@@ -37,7 +38,7 @@ class dmx_demuxerTS: public dmx_demuxer
                   uint32_t       myPid;           // pid: high part =0xff if private stream, 00 if not
                   uint32_t      isPsi;
                   uint8_t       *_pesBuffer;
-
+                  uint32_t      TS_PacketSize;
                   uint32_t      _pesBufferIndex; // current position in pesBuffer
                   uint64_t      _pesBufferStart;
                   uint32_t      _pesBufferLen;
@@ -67,7 +68,7 @@ class dmx_demuxerTS: public dmx_demuxer
                   uint8_t       updateTracker(uint32_t trackerPid,uint32_t nbData);
                   
           public:
-                           dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks,uint32_t psi) ;
+                           dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks,uint32_t psi,DMX_TYPE muxType) ;
                 virtual    ~dmx_demuxerTS();             
                 
                      uint8_t      open(const char *name);

@@ -51,7 +51,7 @@ uint8_t         dmx_demuxerTS::changePid(uint32_t newpid,uint32_t newpes)
         _pesBufferLen=0;
         _pesBufferIndex=0;
 }
-dmx_demuxerTS::dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks,uint32_t psi)
+dmx_demuxerTS::dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks,uint32_t psi,DMX_TYPE muxType)
 {
         consumed=0;
         parser=new fileParser();
@@ -83,7 +83,13 @@ dmx_demuxerTS::dmx_demuxerTS(uint32_t nb,MPEG_TRACK *tracks,uint32_t psi)
         packMode=0;
         packLen=0;
         isPsi=psi;
-        printf("Creating mpeg TS demuxer  main Pid: %X , pes id :%x\n",myPid,tracks[0].pes);
+        switch(muxType)
+        {
+          case DMX_MPG_TS: TS_PacketSize=TS_PACKET_SIZE;break; 
+          case DMX_MPG_TS2: TS_PacketSize=TS2_PACKET_SIZE;break;
+          default: ADM_assert(0);
+        }
+        printf("Creating mpeg TS demuxer  main Pid: %X , pes id :%x, packet size=%u\n",myPid,tracks[0].pes,TS_PacketSize);
 }
 dmx_demuxerTS::~dmx_demuxerTS()
 {
@@ -453,12 +459,12 @@ _again:
         parser->getpos(&count);
         count=_size-count;
         discarded=0;
-        while(parser->read8i()!=0x47 && count>TS_PACKET_SIZE)
+        while(parser->read8i()!=0x47 && count>TS_PacketSize)
                 {
                         discarded++;
                         count--;
                 }
-        if(count<TS_PACKET_SIZE)
+        if(count<TS_PacketSize)
         {
                 printf("DmxTS: cannot sync (EOF reached) \n");
                 _lastErr=1;
@@ -469,9 +475,9 @@ _again:
         if(discarded) // We did not have a continuous sync, check 2 more packet boundaries..
         {
                 
-                parser->forward(TS_PACKET_SIZE-1);
+                parser->forward(TS_PacketSize-1);
                 byte1=parser->read8i();
-                parser->forward(TS_PACKET_SIZE-1);
+                parser->forward(TS_PacketSize-1);
                 byte2=parser->read8i();
                 parser->setpos(abs);  // The setpos/getpos is mostly free due to the parser large buffer
                 if(byte1!=0x47 || byte2!=0x47) goto _again;
@@ -488,7 +494,7 @@ _again:
         if(discarded)
                 printf("Ts: Discontinuity of %lu at %"LLX" pid:%lx\n",discarded,abs,pid);
         // Start of packet..
-        left=TS_PACKET_SIZE-3;
+        left=TS_PacketSize-3;
         if(_probeSize)
         {
                 if(abs>_probeSize)

@@ -58,7 +58,7 @@ typedef struct MPEG_PMT
 //****************************************************************************************
 
 static uint8_t dmx_probePS(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
-extern uint8_t dmx_probeTS(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
+extern uint8_t dmx_probeTS(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks,DMX_TYPE t);
 static uint8_t dmx_probeMSDVR(const char *file, uint32_t *nbTracks,MPEG_TRACK **tracks);
 
 
@@ -91,7 +91,8 @@ uint8_t dmx_probe(const char *file, DMX_TYPE  *type, uint32_t *nbTracks,MPEG_TRA
                 return 1;
                 }
         case DMX_MPG_TS:
-                return dmx_probeTS(file,nbTracks,tracks);
+        case DMX_MPG_TS2:
+                return dmx_probeTS(file,nbTracks,tracks, *type);
 
         case DMX_MPG_PS:
                 return dmx_probePS(file,nbTracks,tracks);

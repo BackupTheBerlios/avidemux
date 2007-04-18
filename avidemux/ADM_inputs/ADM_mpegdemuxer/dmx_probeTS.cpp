@@ -59,10 +59,10 @@ typedef struct MPEG_PMT
 }MPEG_PMT;
 //****************************************************************************************
 
-uint8_t dmx_probeTS(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
+uint8_t dmx_probeTS(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks,DMX_TYPE t);
 //****************************************************************************************
-static uint8_t dmx_probeTSBruteForce(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks);
-static uint8_t dmx_probeTSPat(const char *file, uint32_t *nbTracks,MPEG_TRACK **tracks);
+static uint8_t dmx_probeTSBruteForce(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks,DMX_TYPE type);
+static uint8_t dmx_probeTSPat(const char *file, uint32_t *nbTracks,MPEG_TRACK **tracks,DMX_TYPE type);
 static uint8_t dmx_probePat(dmx_demuxerTS *demuxer, uint32_t *nbPmt,MPEG_PMT *pmts,uint32_t maxPmt);
 static uint8_t dmx_probePMT(dmx_demuxerTS *demuxer, uint32_t pmtId,MPEG_TRACK *pmts,uint32_t *cur, uint32_t max);
 
@@ -74,18 +74,18 @@ uint8_t runProbe(const char *file)
 {
   uint32_t nb;
   MPEG_TRACK *t;
-  return  dmx_probeTSPat(file, &nb,&t);
+  return  dmx_probeTSPat(file, &nb,&t,DMX_MPG_TS);
   
 }
 
-uint8_t dmx_probeTS(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks)
+uint8_t dmx_probeTS(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks,DMX_TYPE type)
 {
     // Try through PMT/PAT first
-      if(! dmx_probeTSPat(file,nbTracks,tracks))
+      if(! dmx_probeTSPat(file,nbTracks,tracks,type))
       {
         
         printf("PAT/PMT Failed, using brute force\n");
-        return dmx_probeTSBruteForce(file,nbTracks,tracks);
+        return dmx_probeTSBruteForce(file,nbTracks,tracks,type);
       }
       return 1;
 }
@@ -102,7 +102,16 @@ typedef struct myPid
   uint32_t pes;
 
 }myPid;
-uint8_t dmx_probeTSBruteForce(const char *file, uint32_t *nbTracks,MPEG_TRACK **tracks)
+/**
+        \fn dmx_probeTSBruteForce
+        \brief Extract PID by scanning the file and guessing what they are
+        @param file Filename to scan
+        @param *nbTrack # of tracks found
+        @param **tracks Tracks found
+        @param type demuxer type to use (TS or TS2)
+        @return 1 on success, 0 on failure
+*/
+uint8_t dmx_probeTSBruteForce(const char *file, uint32_t *nbTracks,MPEG_TRACK **tracks,DMX_TYPE type)
 {
 
   // Brute force indexing
@@ -118,7 +127,7 @@ MpegAudioInfo mpegInfo;
     dummy[0].pid=0x1; // should no be in use
     dummy[0].pes=0xE0;
 
-        dmx_demuxerTS demuxer(TS_ALL_PID,dummy,0);
+        dmx_demuxerTS demuxer(TS_ALL_PID,dummy,0,type);
         if(!demuxer.open(file))
         {
           return 0;
@@ -251,7 +260,7 @@ _next:
       @param **tracks : contains info about the tracks found (out)
 
 */
-uint8_t dmx_probeTSPat(const char *file, uint32_t *nbTracks,MPEG_TRACK **tracks)
+uint8_t dmx_probeTSPat(const char *file, uint32_t *nbTracks,MPEG_TRACK **tracks,DMX_TYPE type)
 {
 MPEG_TRACK dummy[TS_ALL_PID];
 fileParser *parser;
@@ -264,7 +273,7 @@ MpegAudioInfo mpegInfo;
     dummy[0].pid=0x00; // should no be in use
     dummy[0].pes=0xE0;
 
-        dmx_demuxerTS demuxer(1,dummy,1);
+        dmx_demuxerTS demuxer(1,dummy,1,type);
         if(!demuxer.open(file))
         {
           return 0;
@@ -364,7 +373,7 @@ uint8_t dmx_searchAndSkipHeader(uint32_t myPid,dmx_demuxerTS *demuxer,uint32_t *
                                     uint32_t *leftbyte,uint32_t *payloadSize)
 {
   
-  uint8_t packet[TS_PACKET_SIZE];
+  uint8_t packet[TS_PACKET_SIZE*2];
   uint32_t tableId;
   uint32_t misc;
   uint32_t sectionLength;
@@ -485,6 +494,7 @@ uint8_t dmx_probePat(dmx_demuxerTS *demuxer, uint32_t *nbPmt,MPEG_PMT *pmts,uint
                   pmts[*nbPmt].tid=parser->read16i()&0x1FFF;
                   aprintf(" [PAT]Program Number :%03x\n",pmts[*nbPmt].programNumber);
                   aprintf(" [PAT]PID for this   :%03x\n",pmts[*nbPmt].tid);
+                  aprintf(" toScan :%u left :%u\n",toScan,left);
                   if((*nbPmt)<maxPmt)
                       (*nbPmt)++;
                   left-=4;

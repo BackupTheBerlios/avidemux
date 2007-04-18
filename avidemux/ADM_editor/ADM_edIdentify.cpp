@@ -250,6 +250,7 @@ uint8_t ADM_Composer::identify (char *name, fileType * type)
       case  DMX_MPG_H264_ES:
       case  DMX_MPG_PS :
       case  DMX_MPG_TS : 
+      case  DMX_MPG_TS2 : 
                           printf("Probe says it is mpeg\n");
                           *type = Mpeg_FileType;   return 1;
       case  DMX_MPG_MSDVR  :*type = ASF_FileType; return 1;

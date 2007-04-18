@@ -105,11 +105,17 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
                                   break;
                                 }
                 case DMX_MPG_TS:
+                case DMX_MPG_TS2:
                                 {
                                 dmx_demuxerTS *dmx;
-                                dmx=new dmx_demuxerTS(nbTracks,tracks,0);
+                                dmx=new dmx_demuxerTS(nbTracks,tracks,0,mpegType);
                                 demuxer=dmx;
-                                mpegTypeChar='T';
+                                switch(mpegType)
+                                {
+                                  case DMX_MPG_TS :mpegTypeChar='T';break;
+                                  case DMX_MPG_TS2 :mpegTypeChar='S';break;
+                                  default: ADM_assert(0);
+                                }
                                 switch(tracks[0].streamType)
                                   {
                                     case ADM_STREAM_H264:       payloadType=DMX_PAYLOAD_H264;break;

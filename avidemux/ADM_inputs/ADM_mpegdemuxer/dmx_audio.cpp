@@ -201,8 +201,12 @@ MPEG_TRACK track;
                 demuxer = new dmx_demuxerPS (1,&track,multi);
                 break;
     case 'T':
-                demuxer = new dmx_demuxerTS (1,&track,0);
+                demuxer = new dmx_demuxerTS (1,&track,0,DMX_MPG_TS);
                 break;
+    case 'S':
+                demuxer = new dmx_demuxerTS (1,&track,0,DMX_MPG_TS2);
+                break;
+
     default:
       ADM_assert (0);
     }

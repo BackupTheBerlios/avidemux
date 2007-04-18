@@ -319,10 +319,19 @@ char *start;
                                         MPEG_TRACK track;
                                         track.pid=vTsId;
                                         track.pes=vPid;
-                                        demuxer=new dmx_demuxerTS(1,&track,0);
+                                        demuxer=new dmx_demuxerTS(1,&track,0,DMX_MPG_TS);
                                         break;
 
                                 }
+                        case 'S' :
+                              {
+                                      MPEG_TRACK track;
+                                      track.pid=vTsId;
+                                      track.pes=vPid;
+                                      demuxer=new dmx_demuxerTS(1,&track,0,DMX_MPG_TS2);
+                                      break;
+
+                              }
                         case 'P':
                                 {
                                         MPEG_TRACK track;
