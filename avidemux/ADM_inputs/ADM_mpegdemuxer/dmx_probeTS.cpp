@@ -82,7 +82,7 @@ uint8_t dmx_probeTS(const char *file,  uint32_t *nbTracks,MPEG_TRACK **tracks,DM
 {
   
     // Try through PMT/PAT first
-      if(type==DMX_MPG_TS2 || !dmx_probeTSPat(file,nbTracks,tracks,type))
+      if( type==DMX_MPG_TS2 || !dmx_probeTSPat(file,nbTracks,tracks,type))
       //if( !dmx_probeTSPat(file,nbTracks,tracks,type))
       {
         
@@ -545,6 +545,11 @@ uint8_t dmx_probePMT(dmx_demuxerTS *demuxer, uint32_t pmtId,MPEG_TRACK *pmts,uin
                aprintf("[PMT]PCR for it    :x%x\n",parser->read16i()&0x1FFF);
                programInfo=parser->read16i() & 0x0FFF;
                aprintf("[PMT]Program Info  :%d\n",programInfo);
+               if( (programInfo+2 > left) || (programInfo+2>toScan))
+               {
+                 printf("Program Info too big :%u\n",programInfo);
+                 return 0;
+               }
                parser->forward(programInfo);
                toScan-=(2+programInfo);
                left-=(2+programInfo);
