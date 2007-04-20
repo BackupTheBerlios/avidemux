@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-04 22:09+0300\n"
+"POT-Creation-Date: 2006-12-07 19:20+0100\n"
 "PO-Revision-Date: 2006-11-18 11:22+0100\n"
 "Last-Translator: Jakub Misak <jmisak@centrum.cz>\n"
 "Language-Team:  <cs@li.org>\n"
@@ -86,19 +86,19 @@ msgstr ""
 "Počet kanálů je větší než zvládne zvolený audio kodek.\n"
 "Buď změňte kodek, nebo mixérem v audio filtrech snižte počet kanálů."
 
-#: avidemux/ADM_nuv/ADM_nuv.cpp:567
+#: avidemux/ADM_nuv/ADM_nuv.cpp:568
 msgid "Sure you want to abort ?"
 msgstr "Opravdu chcete přerušit úlohu?"
 
-#: avidemux/ADM_nuv/ADM_nuv.cpp:778
+#: avidemux/ADM_nuv/ADM_nuv.cpp:779
 msgid "Size mismatch"
 msgstr "Neshoda velikosti"
 
-#: avidemux/ADM_nuv/ADM_nuv.cpp:778
+#: avidemux/ADM_nuv/ADM_nuv.cpp:779
 msgid "Expect a crash."
 msgstr "Očekávejte pád programu."
 
-#: avidemux/ADM_nuv/ADM_nuv.cpp:1070
+#: avidemux/ADM_nuv/ADM_nuv.cpp:1071
 msgid "Do you want to save an index ?"
 msgstr "Chcete uložit index?"
 
@@ -509,7 +509,8 @@ msgid "VHQ mode:"
 msgstr "Režim VHQ:"
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:880
-msgid "Higher settings give higher quality results, at the cost of slower encoding"
+msgid ""
+"Higher settings give higher quality results, at the cost of slower encoding"
 msgstr "Vyšší hodnoty znamenají vyšší kvalitu za cenu pomalejšího kódování"
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:884 avidemux/ADM_dialog/DIA_xvid.cpp:357
@@ -589,7 +590,9 @@ msgstr ""
 msgid ""
 "Enable a better prediction of AC component. Turns on Lumi masking - applies "
 "more compression to dark/light areas that the eye cannot notice easily"
-msgstr "Lepší predikce AC komponentu. Zapne maskování luminance - aplikuje větší míru komprese na tmavá/světlá místa, kde to oko tak snadno nepozná."
+msgstr ""
+"Lepší predikce AC komponentu. Zapne maskování luminance - aplikuje větší "
+"míru komprese na tmavá/světlá místa, kde to oko tak snadno nepozná."
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:966
 msgid "I-frame interval - Min:"
@@ -640,7 +643,8 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_xvid4.cpp:1021
 #: avidemux/ADM_dialog/DIA_lavcodec.cpp:792
-msgid "Global Motion Compensation can save bits on camera pans, zooming and rotation"
+msgid ""
+"Global Motion Compensation can save bits on camera pans, zooming and rotation"
 msgstr ""
 "Global Motion Compensation (globální kompenzace pohybu) může ušetřit bity na "
 "přejezdech kamery, přiblížení a rotaci"
@@ -1149,7 +1153,7 @@ msgid "Indexing..."
 msgstr "Indexace..."
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:174
-#: avidemux/ADM_dialog/DIA_working.cpp:249
+#: avidemux/ADM_dialog/DIA_working.cpp:257
 msgid "Time left :"
 msgstr "Zbývající čas:"
 
@@ -1197,7 +1201,7 @@ msgid "label1"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_enter.cpp:223
-#: avidemux/ADM_dialog/DIA_working.cpp:236 avidemux/ADM_dialog/DIA_d3d.cpp:93
+#: avidemux/ADM_dialog/DIA_working.cpp:244 avidemux/ADM_dialog/DIA_d3d.cpp:93
 #: avidemux/ADM_dialog/DIA_4entries.cpp:88
 msgid "dialog1"
 msgstr ""
@@ -1257,11 +1261,16 @@ msgstr "(nepoužívat)"
 msgid "Recent files"
 msgstr "Nedávné soubory"
 
-#: avidemux/ADM_dialog/DIA_working.cpp:254
+#: avidemux/ADM_dialog/DIA_working.cpp:168
+#, c-format
+msgid " %d m %d s left"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_working.cpp:262
 msgid "0:0:0"
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_busy.cpp:102
+#: avidemux/ADM_dialog/DIA_busy.cpp:120
 msgid "Busy"
 msgstr "Zaneprázdněn"
 
@@ -2377,7 +2386,8 @@ msgstr ""
 "nesprávných detekcí"
 
 #: avidemux/ADM_dialog/DIA_deblend.cpp:167
-msgid "If pixels are closer than noise threshold, they are considered identical"
+msgid ""
+"If pixels are closer than noise threshold, they are considered identical"
 msgstr "Pokud jsou pixely blíž než práh šumu, jsou považovány za identické"
 
 #: avidemux/ADM_dialog/DIA_deblend.cpp:176
@@ -2459,7 +2469,9 @@ msgstr "Kvantizér (0-51):"
 msgid ""
 "Constant Quantizer - Each frame will the same compression. Low numbers equal "
 "higher quality while high numbers equal lower quality"
-msgstr "Konstantní kvantizér - každý snímek se stejnou mírou komprese. Nízká čísla znamenají vyšší kvalitu a naopak"
+msgstr ""
+"Konstantní kvantizér - každý snímek se stejnou mírou komprese. Nízká čísla "
+"znamenají vyšší kvalitu a naopak"
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:494
 msgid "Load Defaults"
@@ -2573,7 +2585,9 @@ msgstr "Důkladné vyhledávání"
 msgid ""
 "Set how many previous frames can be referenced by a P/B-frame. Numbers above "
 "5 do not seem to improve quality greatly. Numbers are 3 to 5 are recommended"
-msgstr "Kolik předchozích snímků může být odkazováno z P/B snímků. Hodnoty nad 5 už moc kvalitu nezvyšují. Doporučeno je 3 až 5."
+msgstr ""
+"Kolik předchozích snímků může být odkazováno z P/B snímků. Hodnoty nad 5 už "
+"moc kvalitu nezvyšují. Doporučeno je 3 až 5."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:608
 msgid "Max. Ref. frames"
@@ -2605,7 +2619,9 @@ msgstr "Počítá reference jednotlivě v závislosti na každém rozdělení"
 msgid ""
 "Define how many pixels are analysised. The higher the range the more "
 "accurate the analysis but the slower the encoding time"
-msgstr "Určuje kolik pixelů je analyzováno. Čím vyšší rozsah, tím přesnější analýza, ale pomalejší kódování."
+msgstr ""
+"Určuje kolik pixelů je analyzováno. Čím vyšší rozsah, tím přesnější analýza, "
+"ale pomalejší kódování."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:645
 msgid "<b>Motion Estimation</b>"
@@ -2619,7 +2635,9 @@ msgstr "Poměr stran pixelu"
 msgid ""
 "Enforce the size of a decoded pixel decoded to a certain value. Leave this "
 "at 1:1 for non-anamorphic video"
-msgstr "Nastaví velikost dekódovaného pixelu na určitou hodnotu. Pro neanamorfní video nechte na 1:1."
+msgstr ""
+"Nastaví velikost dekódovaného pixelu na určitou hodnotu. Pro neanamorfní "
+"video nechte na 1:1."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:675 avidemux/ADM_dialog/DIA_x264.cpp:686
 msgid "1"
@@ -2657,7 +2675,9 @@ msgstr ""
 msgid ""
 "Lossless compression method which usually improves the bitrate usage by 15% "
 "(especially on high bitrate). Helps the quality a lot but is slower. "
-msgstr "Bezeztrátová kompresní metoda,která obvykle zlepší datový tok o 15 % (zejména u vysokého datového toku). Výrazně zlepší kvalitu, ale je pomalejší."
+msgstr ""
+"Bezeztrátová kompresní metoda,která obvykle zlepší datový tok o 15 % "
+"(zejména u vysokého datového toku). Výrazně zlepší kvalitu, ale je pomalejší."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:746
 msgid "Trellis"
@@ -2667,7 +2687,9 @@ msgstr ""
 msgid ""
 "Use rate distortion quantization to find optimal encoding for each block. "
 "Level 0 equals disabled, level 1 equals normal and level 2 equals high"
-msgstr "Použít rate distortion kvantizaci k nalezení optimálního zakódování každého bloku. 0 znamená vypnuto, 1 znamená normální úroveň a 2 vysokou."
+msgstr ""
+"Použít rate distortion kvantizaci k nalezení optimálního zakódování každého "
+"bloku. 0 znamená vypnuto, 1 znamená normální úroveň a 2 vysokou."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:757
 msgid "Noise Reduction"
@@ -2741,7 +2763,9 @@ msgstr "Míra B snímků"
 msgid ""
 "Increase / decrease probability for how often B-frames are used. Will not "
 "violate the maximum consecutive frame limit"
-msgstr "Zvýšit/snížit pravděpodobnost jak často jsou použity B snímky. Neporuší limit maxima následných snímků."
+msgstr ""
+"Zvýšit/snížit pravděpodobnost jak často jsou použity B snímky. Neporuší "
+"limit maxima následných snímků."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:869
 msgid "Max Consecutive"
@@ -2752,7 +2776,10 @@ msgid ""
 "Set the maximum number of consecutive B-frames. This defines how many "
 "duplicate frames can be droped. Numbers 2 to 5 are recommended. This greatly "
 "improves the use of bitrate and quality"
-msgstr "Maximální počet po sobě jdoucích B snímků. To určuje kolik duplikovaných snímků lze zahodit. Doporučeno 2 až 5. Toto velmi zlepšuje využití datového toku a kvalitu."
+msgstr ""
+"Maximální počet po sobě jdoucích B snímků. To určuje kolik duplikovaných "
+"snímků lze zahodit. Doporučeno 2 až 5. Toto velmi zlepšuje využití datového "
+"toku a kvalitu."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:889
 msgid "Bidirectional ME"
@@ -2762,7 +2789,9 @@ msgstr "Obousměrný odhad pohybu"
 msgid ""
 "Jointly optimize both Motion Vector's in B-frames. This will improve quality "
 "but take more time for encoding"
-msgstr "Společně optimalizuje vektory pohybu v B snímcích. Zlepší kvalitu, ale zpomalí kódování."
+msgstr ""
+"Společně optimalizuje vektory pohybu v B snímcích. Zlepší kvalitu, ale "
+"zpomalí kódování."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:896
 msgid "Weighted biprediction"
@@ -2780,7 +2809,9 @@ msgstr "Adaptivní DCT"
 msgid ""
 "Use fewer B-frame if needed. This is always recommended. If not enabled, the "
 "codec will always use the maximum number of consecutive B-frames"
-msgstr "Použije méně B snímků když je třeba. Toto je vždy doporučeno. Pokud není aktivováno, kodek vždy použije maximální počet po sobě jdoucích B snímků."
+msgstr ""
+"Použije méně B snímků když je třeba. Toto je vždy doporučeno. Pokud není "
+"aktivováno, kodek vždy použije maximální počet po sobě jdoucích B snímků."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:912
 msgid "Use as reference"
@@ -2790,7 +2821,9 @@ msgstr "Použít jako referenci"
 msgid ""
 "Allow B-frames to make references non-linearly to another B-frame (instead "
 "of creating a duplicate copy)"
-msgstr "Povolí, aby B snímky odkazovaly nelineárně na další B snímky (místo vytvoření kopie)"
+msgstr ""
+"Povolí, aby B snímky odkazovaly nelineárně na další B snímky (místo "
+"vytvoření kopie)"
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:923
 msgid "B-Frame Direct Mode:  "
@@ -2832,14 +2865,18 @@ msgstr "Variabilita datového toku"
 msgid ""
 "Set how much bitrate is deducted from a B-frame as compared to the previous "
 "P-frame"
-msgstr "Kolik datového toku je odečteno z B snímku v porovnání s předchozím P snímkem"
+msgstr ""
+"Kolik datového toku je odečteno z B snímku v porovnání s předchozím P snímkem"
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:1006
 msgid ""
 "Define how much the bitrate can fluctuate over the entire video. 0% results "
 "in a constant bitrate stream, while 100% results in a pure quality based "
 "bitrate stream"
-msgstr "Jak moc může datový tok kolísat přes celé video. Nastavení s 0 % vytvoří video s konstantním datovým tokem, zatímco 100 % znamená video založené čistě na kvalitě."
+msgstr ""
+"Jak moc může datový tok kolísat přes celé video. Nastavení s 0 % vytvoří "
+"video s konstantním datovým tokem, zatímco 100 % znamená video založené "
+"čistě na kvalitě."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:1009
 msgid "<b>Bitrate</b>"
@@ -2866,7 +2903,8 @@ msgid "Enforce a maximum quantizer level"
 msgstr "Nastaví maximální úroveň kvantizace"
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:1073
-msgid "Define how much the quantizer rate can change between two consecutive frames"
+msgid ""
+"Define how much the quantizer rate can change between two consecutive frames"
 msgstr "Jak moc se může kvantizace měnit mezi po sobě jdoucími snímky"
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:1076
@@ -2881,7 +2919,9 @@ msgstr "Práh střihu scény"
 msgid ""
 "Increase / decrease sensitivity for detecting Scene Changes to compensate "
 "for. Improves I-frame usage and helps quality"
-msgstr "Zvýší/sníží citlivost detekce změny scény pro kompenzaci. Zlepšuje využití I snímků a kvalitu."
+msgstr ""
+"Zvýší/sníží citlivost detekce změny scény pro kompenzaci. Zlepšuje využití I "
+"snímků a kvalitu."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:1111
 msgid "Min IDR frame interval"
@@ -2892,14 +2932,20 @@ msgid ""
 "Set minimum frame interval between IDR frames. Defines the minimum amount a "
 "frame can be reused and referenced by other frames before a new clean one is "
 "established"
-msgstr "Minimální interval mezi IDR snímky. Nastaví minimální míru kdy může být snímek znovupoužit a odkazován z jiných snímků předtím, než je vytvořen nový čistý."
+msgstr ""
+"Minimální interval mezi IDR snímky. Nastaví minimální míru kdy může být "
+"snímek znovupoužit a odkazován z jiných snímků předtím, než je vytvořen nový "
+"čistý."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:1133
 msgid ""
 "Set maximum frame interval between IDR frames. Defines the maximum amount a "
 "frame can be reused and referenced by other frames before a new clean one is "
 "established"
-msgstr "Maximální interval mezi IDR snímky. Nastaví maximální míru kdy může být snímek znovupoužit a odkazován z jiných snímků předtím, než je vytvořen nový čistý."
+msgstr ""
+"Maximální interval mezi IDR snímky. Nastaví maximální míru kdy může být "
+"snímek znovupoužit a odkazován z jiných snímků předtím, než je vytvořen nový "
+"čistý."
 
 #: avidemux/ADM_dialog/DIA_x264.cpp:1136
 msgid "Max IDR frame interval"
@@ -3030,6 +3076,7 @@ msgstr "V"
 msgid "Band"
 msgstr "Tloušťka rozmazaného okraje"
 
+#. TRANSLATORS: Replace this string with your names, one name per line.
 #: avidemux/ADM_dialog/DIA_about.cpp:56
 msgid "translator-credits"
 msgstr ""
@@ -3400,11 +3447,13 @@ msgid ""
 "Public License instead of this License."
 msgstr ""
 "Avidemux je svobodný software; můžete jej šířit a modifikovat podle\n"
-"ustanovení GNU General Public License verze 2.\n\n"
+"ustanovení GNU General Public License verze 2.\n"
+"\n"
 "Tento program je rozšiřován v naději, že bude užitečný, avšak BEZ\n"
 "JAKÉKOLI ZÁRUKY; neposkytují se ani odvozené záruky PRODEJNOSTI nebo\n"
 "VHODNOSTI PRO URČITÝ ÚČEL. Další podrobnosti hledejte v GNU General Public\n"
-"License.\n\n"
+"License.\n"
+"\n"
 "Kopii GNU General Public License jste měli obdržet spolu s tímto\n"
 "programem; pokud se tak nestalo, napište o ni Free Software Foundation,\n"
 "Inc., 675 Mass Ave, Cambridge, MA 02139, USA."
@@ -4042,7 +4091,8 @@ msgstr "_Procházet..."
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:153
 msgid "Job name displayed in the job list and used as the script filename"
-msgstr "Název úlohy zobrazený v seznamu úloh a použitý jako název souboru se skriptem"
+msgstr ""
+"Název úlohy zobrazený v seznamu úloh a použitý jako název souboru se skriptem"
 
 #: avidemux/ADM_dialog/DIA_jobs_save.cpp:162
 msgid "Filename of the audio/video output"
@@ -4668,7 +4718,8 @@ msgstr ""
 
 #: avidemux/ADM_dialog/DIA_lavcodec.cpp:1494
 msgid "Filesize tolerance (1 kb = 1000 bits). 1000-100000 is a sane range"
-msgstr "Tolerance velikosti souboru (1 kb = 1000 bitů). 1000-100000 je rozumný rozsah"
+msgstr ""
+"Tolerance velikosti souboru (1 kb = 1000 bitů). 1000-100000 je rozumný rozsah"
 
 #: avidemux/ADM_dialog/DIA_lavcodec.cpp:1495
 msgid "8000"
@@ -5371,7 +5422,8 @@ msgstr "Pro VCD musí být audio 44.1kHz MP2."
 
 #: avidemux/oplug_mpeg/op_mpegpass.cpp:182
 msgid "For DVD, audio must be 48 kHz MP2(stereo), AC3, DTS or LPCM (stereo)."
-msgstr "Pro DVD musí být audio 48kHz MP2 (stereo), AC3, DTS nebo LPCM (stereo)."
+msgstr ""
+"Pro DVD musí být audio 48kHz MP2 (stereo), AC3, DTS nebo LPCM (stereo)."
 
 #: avidemux/ADM_encoder/adm_encConfig.cpp:193
 msgid "Wrong output format"
@@ -5413,15 +5465,15 @@ msgstr "Chyba paměti"
 msgid "MPEG renumbering error"
 msgstr "Chyba přečíslování MPEG souboru"
 
-#: avidemux/ADM_3gp/ADM_3gp.cpp:486
+#: avidemux/ADM_3gp/ADM_3gp.cpp:488
 msgid "Expect troubles"
 msgstr "Očekávejte problémy"
 
-#: avidemux/ADM_3gp/ADM_3gp.cpp:929
+#: avidemux/ADM_3gp/ADM_3gp.cpp:972
 msgid "Problem reading SVQ3 headers"
 msgstr "Chyba čtení hlavičky SVQ3"
 
-#: avidemux/ADM_3gp/ADM_3gp.cpp:1457
+#: avidemux/ADM_3gp/ADM_3gp.cpp:1524
 msgid "No stts table"
 msgstr "Není stts tabulka"
 
@@ -5752,8 +5804,10 @@ msgid ""
 "resolution\n"
 "2.) concatinate them together"
 msgstr ""
-"Zatím nemůžete míchat různé rozměry obrazu. Pozdější použití částečného filtru tento problém obejde. Dočasné řešení tedy je:\n"
-"1) Změna velikosti, přidání černých okrajů nebo ořez každého souboru na stejné rozlišení\n"
+"Zatím nemůžete míchat různé rozměry obrazu. Pozdější použití částečného "
+"filtru tento problém obejde. Dočasné řešení tedy je:\n"
+"1) Změna velikosti, přidání černých okrajů nebo ořez každého souboru na "
+"stejné rozlišení\n"
 "2) Spojit je dohromady"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:517
@@ -5780,8 +5834,10 @@ msgid ""
 "ACCURACY</b>.\n"
 "Do you want to use that mode ?"
 msgstr ""
-"Pokud soubor používá B snímky jako referenci, může to vést k pádu programu nebo trhání.\n"
-"Avidemux může použít jiný režim který je bezpečný, ale <b>přijdete o přesnost na snímky</b>.\n"
+"Pokud soubor používá B snímky jako referenci, může to vést k pádu programu "
+"nebo trhání.\n"
+"Avidemux může použít jiný režim který je bezpečný, ale <b>přijdete o "
+"přesnost na snímky</b>.\n"
 "Chcete použít tento režim?"
 
 #: avidemux/ADM_editor/ADM_edit.cpp:665
@@ -5919,7 +5975,7 @@ msgid "Cannot identify subtitle format"
 msgstr "Nemůžu identifikovat formát titulků"
 
 #: avidemux/gui_navigate.cpp:78 avidemux/gui_navigate.cpp:119
-#: avidemux/gui_navigate.cpp:381 avidemux/gui_navigate.cpp:423
+#: avidemux/gui_navigate.cpp:392 avidemux/gui_navigate.cpp:434
 msgid "Decompressing error"
 msgstr "Dekomprimační chyba"
 
@@ -5927,11 +5983,15 @@ msgstr "Dekomprimační chyba"
 msgid "Cannot decode next frame."
 msgstr "Nelze dekódovat další snímek."
 
-#: avidemux/gui_navigate.cpp:119 avidemux/gui_navigate.cpp:423
+#: avidemux/gui_navigate.cpp:119 avidemux/gui_navigate.cpp:434
 msgid "Cannot decode keyframe."
 msgstr "Nelze dekódovat klíčový snímek."
 
-#: avidemux/gui_navigate.cpp:381
+#: avidemux/gui_navigate.cpp:237
+msgid "Seeking"
+msgstr ""
+
+#: avidemux/gui_navigate.cpp:392
 msgid "Cannot decode the frame."
 msgstr "Nelze dekódovat snímek."
 
@@ -6087,7 +6147,8 @@ msgstr "Nenalezen audio dekodér pro tento soubor"
 
 #: avidemux/gtk_gui.cpp:1181
 msgid "Save (A+V) will generate bad AVI. Save audio will work."
-msgstr "Uložení souboru vytvoří špatný AVI soubor. Uložení zvuku bude fungovat."
+msgstr ""
+"Uložení souboru vytvoří špatný AVI soubor. Uložení zvuku bude fungovat."
 
 #: avidemux/gtk_gui.cpp:1196
 msgid "Could not decode the frame"
@@ -6106,7 +6167,8 @@ msgid "Cannot save the audio in copy mode"
 msgstr "V kopírovacím režimu toto audio nelze uložit"
 
 #: avidemux/gtk_gui.cpp:1295
-msgid "Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."
+msgid ""
+"Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."
 msgstr "Jako audio kodek vyberte WAV PCM, jinak bude zvukový soubor čistý PCM."
 
 #: avidemux/gtk_gui.cpp:1303 avidemux/gtk_gui.cpp:1787
@@ -6258,7 +6320,8 @@ msgstr "Uložení se nezdařilo"
 
 #: avidemux/gtk_gui.cpp:2469
 msgid "Saving the job failed. Maybe you have permission issue with ~/.avidemux"
-msgstr "Selhalo uložení úlohy. Možná je problém s přístupovými právy ~/.avidemux"
+msgstr ""
+"Selhalo uložení úlohy. Možná je problém s přístupovými právy ~/.avidemux"
 
 #: avidemux/gtk_gui.cpp:2481
 #, c-format
@@ -6412,7 +6475,7 @@ msgstr "Toto nemůže mít zabalený VOP"
 msgid "It is not MPEG-4 video. File will not be saved."
 msgstr "Není to MPEG-4 video. Soubor se neuloží."
 
-#: avidemux/gui_savenew.cpp:308
+#: avidemux/gui_savenew.cpp:311
 msgid ""
 "You may need smart copy.\n"
 " Enable it ?"
@@ -6420,15 +6483,12 @@ msgstr ""
 "Možná bude potřeba Smart Copy.\n"
 "Má se aktivovat?"
 
-#: avidemux/gui_savenew.cpp:333
-msgid "No encoder"
-msgstr "Není kodér"
-
-#: avidemux/gui_savenew.cpp:333
-msgid "Cannot save in process mode."
-msgstr "Nelze uložit soubor ve zpracovávacím režimu."
-
 #: avidemux/guiplay.cpp:384
 msgid "Trouble initializing audio device"
 msgstr "Chyba inicializace zvukového zařízení"
 
+#~ msgid "No encoder"
+#~ msgstr "Není kodér"
+
+#~ msgid "Cannot save in process mode."
+#~ msgstr "Nelze uložit soubor ve zpracovávacím režimu."

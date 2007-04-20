@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: klingon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-04 22:09+0300\n"
+"POT-Creation-Date: 2006-12-07 19:20+0100\n"
 "PO-Revision-Date: 2003-03-23 21:15+0000\n"
 "Last-Translator: \n"
 "Language-Team: fr_FR <en@li.org>\n"
@@ -78,19 +78,19 @@ msgid ""
 "Either change codec or use the mixer filter to have less channels."
 msgstr ""
 
-#: avidemux/ADM_nuv/ADM_nuv.cpp:567
+#: avidemux/ADM_nuv/ADM_nuv.cpp:568
 msgid "Sure you want to abort ?"
 msgstr ""
 
-#: avidemux/ADM_nuv/ADM_nuv.cpp:778
+#: avidemux/ADM_nuv/ADM_nuv.cpp:779
 msgid "Size mismatch"
 msgstr ""
 
-#: avidemux/ADM_nuv/ADM_nuv.cpp:778
+#: avidemux/ADM_nuv/ADM_nuv.cpp:779
 msgid "Expect a crash."
 msgstr ""
 
-#: avidemux/ADM_nuv/ADM_nuv.cpp:1070
+#: avidemux/ADM_nuv/ADM_nuv.cpp:1071
 msgid "Do you want to save an index ?"
 msgstr ""
 
@@ -1118,7 +1118,7 @@ msgid "Indexing..."
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_idx_pg.cpp:174
-#: avidemux/ADM_dialog/DIA_working.cpp:249
+#: avidemux/ADM_dialog/DIA_working.cpp:257
 msgid "Time left :"
 msgstr ""
 
@@ -1166,7 +1166,7 @@ msgid "label1"
 msgstr ""
 
 #: avidemux/ADM_dialog/DIA_enter.cpp:223
-#: avidemux/ADM_dialog/DIA_working.cpp:236 avidemux/ADM_dialog/DIA_d3d.cpp:93
+#: avidemux/ADM_dialog/DIA_working.cpp:244 avidemux/ADM_dialog/DIA_d3d.cpp:93
 #: avidemux/ADM_dialog/DIA_4entries.cpp:88
 msgid "dialog1"
 msgstr ""
@@ -1226,11 +1226,16 @@ msgstr ""
 msgid "Recent files"
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_working.cpp:254
+#: avidemux/ADM_dialog/DIA_working.cpp:168
+#, c-format
+msgid " %d m %d s left"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_working.cpp:262
 msgid "0:0:0"
 msgstr ""
 
-#: avidemux/ADM_dialog/DIA_busy.cpp:102
+#: avidemux/ADM_dialog/DIA_busy.cpp:120
 msgid "Busy"
 msgstr ""
 
@@ -2997,6 +3002,7 @@ msgstr ""
 msgid "Band"
 msgstr ""
 
+#. TRANSLATORS: Replace this string with your names, one name per line.
 #: avidemux/ADM_dialog/DIA_about.cpp:56
 msgid "translator-credits"
 msgstr ""
@@ -5360,15 +5366,15 @@ msgstr ""
 msgid "MPEG renumbering error"
 msgstr ""
 
-#: avidemux/ADM_3gp/ADM_3gp.cpp:486
+#: avidemux/ADM_3gp/ADM_3gp.cpp:488
 msgid "Expect troubles"
 msgstr ""
 
-#: avidemux/ADM_3gp/ADM_3gp.cpp:929
+#: avidemux/ADM_3gp/ADM_3gp.cpp:972
 msgid "Problem reading SVQ3 headers"
 msgstr ""
 
-#: avidemux/ADM_3gp/ADM_3gp.cpp:1457
+#: avidemux/ADM_3gp/ADM_3gp.cpp:1524
 msgid "No stts table"
 msgstr ""
 
@@ -5860,7 +5866,7 @@ msgid "Cannot identify subtitle format"
 msgstr ""
 
 #: avidemux/gui_navigate.cpp:78 avidemux/gui_navigate.cpp:119
-#: avidemux/gui_navigate.cpp:381 avidemux/gui_navigate.cpp:423
+#: avidemux/gui_navigate.cpp:392 avidemux/gui_navigate.cpp:434
 msgid "Decompressing error"
 msgstr ""
 
@@ -5868,11 +5874,15 @@ msgstr ""
 msgid "Cannot decode next frame."
 msgstr ""
 
-#: avidemux/gui_navigate.cpp:119 avidemux/gui_navigate.cpp:423
+#: avidemux/gui_navigate.cpp:119 avidemux/gui_navigate.cpp:434
 msgid "Cannot decode keyframe."
 msgstr ""
 
-#: avidemux/gui_navigate.cpp:381
+#: avidemux/gui_navigate.cpp:237
+msgid "Seeking"
+msgstr ""
+
+#: avidemux/gui_navigate.cpp:392
 msgid "Cannot decode the frame."
 msgstr ""
 
@@ -6348,18 +6358,10 @@ msgstr ""
 msgid "It is not MPEG-4 video. File will not be saved."
 msgstr ""
 
-#: avidemux/gui_savenew.cpp:308
+#: avidemux/gui_savenew.cpp:311
 msgid ""
 "You may need smart copy.\n"
 " Enable it ?"
-msgstr ""
-
-#: avidemux/gui_savenew.cpp:333
-msgid "No encoder"
-msgstr ""
-
-#: avidemux/gui_savenew.cpp:333
-msgid "Cannot save in process mode."
 msgstr ""
 
 #: avidemux/guiplay.cpp:384
