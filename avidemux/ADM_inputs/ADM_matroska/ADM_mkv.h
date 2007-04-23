@@ -22,54 +22,39 @@
 
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
-typedef struct mkvAudioTrak
+#include "ADM_inputs/ADM_matroska/ADM_ebml.h"
+typedef struct mkvTrak
 {
+  /* Index in mkv */
   uint32_t  streamIndex;
+  
+  /* Used for audio */
   WAVHeader wavHeader;
-  uint32_t  extraDataLen;
-  uint8_t   *extraData;
   uint32_t  nbPackets;
   uint32_t  length;
-  
+  /* Used for both */
+  uint8_t    *extraData;
+  uint32_t   extraDataLen;
 };
 
-class mkvAudio : public AVDMGenericAudioStream
-{
-  protected:
-    void                    *_context;
-    uint32_t                _trackIndex;
-    WAVHeader               _wavHeader;
-    uint32_t                _extraDataLen;
-    uint8_t                 *_extraData;
-    char                    *myName;
-  public:
-                                mkvAudio(char *name,mkvAudioTrak *track);
-    virtual                     ~mkvAudio();
-    virtual uint32_t            read(uint32_t len,uint8_t *buffer);
-    virtual uint8_t             goTo(uint32_t newoffset);
-    virtual uint8_t             getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
-    virtual uint8_t             goToTime(uint32_t mstime);
-    virtual uint8_t             extraData(uint32_t *l,uint8_t **d);
-};
-
-
+#define ADM_MKV_MAX_TRACKS 20
 
 class mkvHeader         :public vidHeader
 {
   protected:
                                 
     FILE                    *_fd;
-    int32_t                 _audioIndex;
-    int32_t                 _videoIndex;
-    uint8_t                 readVideoInfo( void);
-    uint8_t                 readAudioInfo( uint32_t track);
-    uint8_t                 prebuildIndex(void);
-    uint8_t                 rewind(void);
-    void                    *_context;
+    mkvTrak                 _tracks[ADM_MKV_MAX_TRACKS+1];
+
+    
     uint32_t                _nbAudioTrack;
-    mkvAudioTrak            *_audioTracks;
-    mkvAudio                *_curAudio;
-    char                    *myName;
+    
+    
+    uint8_t                 checkHeader(void *head,uint32_t headlen);
+    uint8_t                 analyzeTracks(void *head,uint32_t headlen);
+    uint8_t                 analyzeOneTrack(void *head,uint32_t headlen);
+    uint8_t                 walk(void *seed);
+    
   public:
 
 
