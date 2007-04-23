@@ -43,6 +43,7 @@ uint8_t mkvHeader::open(char *name)
   ADM_MKV_TYPE type;
   const char *ss;
   
+  _isvideopresent=0;
   if(!ebml.open(name)) 
   {
     printf("[MKV]Failed to open file\n");
@@ -70,7 +71,24 @@ uint8_t mkvHeader::open(char *name)
   {
       printf("[MKV] incorrect tracks\n");
   }
-  return 0;
+  printf("[MKV] Tracks analyzed\n");
+  if(!_isvideopresent)
+  {
+    printf("[MKV] No video\n");
+    return 0;
+  }
+  printf("[MKV] Indexing video\n");
+    if(!videoIndexer(&ebml))
+    {
+      printf("[MKV] Video indexing failed\n");
+      return 0; 
+    }
+  // update some infos
+  _videostream.dwLength= _mainaviheader.dwTotalFrames=_tracks[0]._nbIndex; 
+  printf("Matroska successfully read\n");
+  _parser=new ADM_ebml_file();
+  ADM_assert(_parser->open(name));
+  return 1;
 }
 /**
     \fn checkHeader
@@ -207,7 +225,10 @@ uint32_t mkvHeader::getNbStream(void)
 
 uint8_t mkvHeader::close(void)
 {
-  
+  // CLEANUP!!
+  if(_parser) delete _parser;
+  _parser=NULL;
+  // FIXME Cleanup index!
 }
 /*
     __________________________________________________________
@@ -222,8 +243,8 @@ uint8_t mkvHeader::needDecompress(void)
 */
 
  mkvHeader::mkvHeader( void ) : vidHeader()
-{
-  _fd=NULL;
+{ 
+  _parser=NULL;
   _nbAudioTrack=0;
   memset(_tracks,0,sizeof(_tracks));
 }
@@ -254,7 +275,9 @@ uint8_t mkvHeader::needDecompress(void)
 
 uint32_t mkvHeader::getFlags(uint32_t frame,uint32_t *flags)
 {
-  *flags=AVI_KEY_FRAME;
+  if(frame>=_tracks[0]._nbIndex) return 0;
+  *flags=_tracks[0]._index[frame].flags;
+  if(!frame) *flags=AVI_KEY_FRAME;
   return 1; 
 }
 /*
@@ -263,7 +286,20 @@ uint32_t mkvHeader::getFlags(uint32_t frame,uint32_t *flags)
 
 uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 {
- 
+  ADM_assert(_parser);
+  if(framenum>=_tracks[0]._nbIndex) return 0;
+  
+  mkvIndex *dx=&(_tracks[0]._index[framenum]);
+  
+  _parser->seek(dx->pos);
+  _parser->readBin(img->data,dx->size);
+  img->dataLength=dx->size;
+  
+  img->flags=dx->flags;
+  
+  if(!framenum) img->flags=AVI_KEY_FRAME;
+  
+  
   return 1; 
 }
 

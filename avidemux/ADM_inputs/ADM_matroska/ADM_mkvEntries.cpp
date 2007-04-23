@@ -44,9 +44,6 @@ class entryDesc
           uint32_t defaultDuration;
           float    trackScale;
           uint8_t *extraData;
-         
-          
-          entryDesc(void) {memset(this,0,sizeof(entryDesc));}
           
           void dump(void);
 };
@@ -95,7 +92,8 @@ uint8_t mkvHeader::analyzeOneTrack(void *head,uint32_t headlen)
 {
 
 entryDesc entry;
-
+      memset(&entry,0,sizeof(entry));
+      
       entryWalk(  (ADM_ebml_file *)head,headlen,&entry);
       entry.dump();
       if(entry.trackType==1 &&  !_isvideopresent)
@@ -160,10 +158,13 @@ uint8_t entryWalk(ADM_ebml_file *head,uint32_t headlen,entryDesc *entry)
       }
       switch(id)
       {
+        
         case  MKV_TRACK_NUMBER: entry->trackNo=father.readUnsignedInt(len);break;
         case  MKV_TRACK_TYPE: entry->trackType=father.readUnsignedInt(len);break;
         case  MKV_FRAME_DEFAULT_DURATION:entry->defaultDuration=father.readUnsignedInt(len);break;
-        // FIXME FLOAT case  MKV_AUDIO_FREQUENCY: entry->fq=father.readUnsignedInt(len);break;
+        // FIXME 
+        case  MKV_AUDIO_FREQUENCY: entry->fq=48000;father.skip(len);break;
+        // FIXME
         case  MKV_VIDEO_WIDTH: entry->w=father.readUnsignedInt(len);break;
         case  MKV_VIDEO_HEIGHT: entry->h=father.readUnsignedInt(len);break;
         case  MKV_TRACK_TIMECODESCALE:father.skip(len);break; //FIXME

@@ -183,12 +183,15 @@ ADM_ebml_file::ADM_ebml_file(ADM_ebml_file *father,uint32_t size)
 }
 ADM_ebml_file::ADM_ebml_file(void) : ADM_ebml()
 {
-  
+  _close=0;
 }
 ADM_ebml_file::~ADM_ebml_file()
 {
   ADM_assert(fp);
-  if(_close) fclose(fp);
+  if(_close)
+  {
+    fclose(fp);
+  }
   else fseeko(fp,_begin+_size,SEEK_SET);
   fp=NULL; 
 }
@@ -305,5 +308,14 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len)
     vprintf("[MKV] Failed to locate %llx\n",prim);
     return 0;
 }
-
+/**
+    \fn remaining
+    \brief returns the # of bytes remaining in this atom
+*/
+uint64_t ADM_ebml_file::remaining(void)
+{
+  uint64_t pos=tell();
+  ADM_assert(pos<=(_begin+_size));
+  return (_begin+_size)-pos; 
+}
 //EOF

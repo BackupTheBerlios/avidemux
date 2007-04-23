@@ -23,6 +23,16 @@
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_inputs/ADM_matroska/ADM_ebml.h"
+
+
+typedef struct mkvIndex
+{
+    uint64_t pos;
+    uint32_t size;
+    uint32_t flags;
+    uint32_t timeCode;
+};
+
 typedef struct mkvTrak
 {
   /* Index in mkv */
@@ -35,6 +45,9 @@ typedef struct mkvTrak
   /* Used for both */
   uint8_t    *extraData;
   uint32_t   extraDataLen;
+  mkvIndex  *_index;
+  uint32_t  _nbIndex;  // current size of the index
+  uint32_t  _indexMax; // Max size of the index
 };
 
 #define ADM_MKV_MAX_TRACKS 20
@@ -43,7 +56,7 @@ class mkvHeader         :public vidHeader
 {
   protected:
                                 
-    FILE                    *_fd;
+    ADM_ebml_file           *_parser;
     mkvTrak                 _tracks[ADM_MKV_MAX_TRACKS+1];
 
     
@@ -55,6 +68,9 @@ class mkvHeader         :public vidHeader
     uint8_t                 analyzeOneTrack(void *head,uint32_t headlen);
     uint8_t                 walk(void *seed);
     
+    // Indexers
+    uint8_t                 addVideoEntry(uint64_t where, uint32_t size);
+    uint8_t                 videoIndexer(ADM_ebml_file *parser);
   public:
 
 

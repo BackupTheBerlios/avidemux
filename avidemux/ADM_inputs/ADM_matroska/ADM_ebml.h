@@ -63,6 +63,7 @@ class ADM_ebml_file : public ADM_ebml
                     uint8_t   find(ADM_MKV_SEARCHTYPE search,
                                         MKV_ELEM_ID  prim,MKV_ELEM_ID second,uint32_t *len);
                     uint8_t   simplefind(MKV_ELEM_ID  prim,uint32_t *len);
+                    uint64_t remaining(void);
 };
 
 void bigHexPrint(uint64_t v);
