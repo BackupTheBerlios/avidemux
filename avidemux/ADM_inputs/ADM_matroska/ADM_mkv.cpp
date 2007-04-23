@@ -302,6 +302,14 @@ uint8_t  mkvHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
   
   return 1; 
 }
+/*
+    __________________________________________________________
+*/
 
-
+uint8_t  mkvHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
+{
+                *len=_tracks[0].extraDataLen;
+                *data=_tracks[0].extraData;
+                return 1;            
+}
 //EOF

@@ -104,6 +104,8 @@ class mkvHeader         :public vidHeader
     virtual uint32_t getFlags(uint32_t frame,uint32_t *flags);
     virtual uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img);
 
+            uint8_t  getExtraHeaderData(uint32_t *len, uint8_t **data);
+    
 };
 #endif
 
