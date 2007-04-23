@@ -267,7 +267,9 @@ uint8_t mkvHeader::needDecompress(void)
 
   uint8_t  mkvHeader::setFlag(uint32_t frame,uint32_t flags)
 {
-  return 0; 
+  if(frame>=_tracks[0]._nbIndex) return 0;
+  _tracks[0]._index[frame].flags=flags;
+  return 1; 
 }
 /*
     __________________________________________________________

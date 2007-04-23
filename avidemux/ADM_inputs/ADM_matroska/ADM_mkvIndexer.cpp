@@ -60,9 +60,9 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
   printf("[MKV] Segment found at %llx (size %llx)\n",segment.tell(),vlen);
   
   //while FIXME LOOP ON ALL CLUSTER!
-  if(segment.find(ADM_MKV_PRIMARY,MKV_CLUSTER,MKV_CLUSTER,&alen))
+  while(segment.find(ADM_MKV_PRIMARY,MKV_CLUSTER,MKV_CLUSTER,&alen,0))
   {
-    printf("[MKV] Beginning new cluster at 0x%llx\n",segment.tell());
+  //  printf("[MKV] Beginning new cluster at 0x%llx\n",segment.tell());
    ADM_ebml_file cluster(&segment,alen);
    while(!cluster.finished())
    {
@@ -122,7 +122,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
             break; // Block Group
        }
      }
-    
+   // printf("[MKV] ending cluster at 0x%llx\n",segment.tell());
   }
      printf("Found %lu images in this cluster\n",VIDEO._nbIndex);
      return 1;
@@ -151,6 +151,6 @@ uint8_t mkvHeader::addVideoEntry(uint64_t where, uint32_t size)
   index[x].flags=0;
   index[x].timeCode=0;
   VIDEO._nbIndex++;
-  printf("++\n");
+ // printf("++\n");
   return 1;
 }

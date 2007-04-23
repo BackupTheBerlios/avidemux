@@ -240,20 +240,20 @@ uint8_t ADM_ebml_file::finished(void)
   \fn find
   \brief Search for the tag given and returns the corresponding atom
 */
- uint8_t ADM_ebml_file::find(ADM_MKV_SEARCHTYPE search,MKV_ELEM_ID  prim,MKV_ELEM_ID second,uint32_t *len)
+ uint8_t ADM_ebml_file::find(ADM_MKV_SEARCHTYPE search,MKV_ELEM_ID  prim,MKV_ELEM_ID second,uint32_t *len,uint32_t rewind)
 {
   uint64_t id,pos;
   ADM_MKV_TYPE type;
   const char *ss;
 
     vprintf("[MKV]Searching for tag %llx %llx\n",prim,second);
-    seek(_begin);
+    if(rewind) seek(_begin);
     if(search==ADM_MKV_PRIMARY)
     {
-          return simplefind(prim,len);
+          return simplefind(prim,len,rewind);
       }
     vprintf("[MKV]Searching primary : %llx\n",prim);
-    if(!simplefind(prim,len))
+    if(!simplefind(prim,len,rewind))
     {
       vprintf("[MKV] Primary find failed for %llx\n",prim);
       return 0; 
@@ -277,7 +277,7 @@ uint8_t ADM_ebml_file::finished(void)
   \fn find
   \brief Search for the tag given and returns the corresponding atom
 */
-uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len)
+uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewind)
 {
   uint64_t id,alen;
   ADM_MKV_TYPE type;
@@ -285,7 +285,7 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len)
   uint64_t pos;
 
     vprintf("[MKV] Simple Searching for tag %llx\n",prim);
-    seek(_begin);
+    if(rewind) seek(_begin);
    
       while(!finished())
       {

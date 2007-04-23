@@ -61,8 +61,8 @@ class ADM_ebml_file : public ADM_ebml
                     uint8_t   seek(uint64_t pos);
                     uint8_t   finished(void);
                     uint8_t   find(ADM_MKV_SEARCHTYPE search,
-                                        MKV_ELEM_ID  prim,MKV_ELEM_ID second,uint32_t *len);
-                    uint8_t   simplefind(MKV_ELEM_ID  prim,uint32_t *len);
+                                        MKV_ELEM_ID  prim,MKV_ELEM_ID second,uint32_t *len,uint32_t rewind=1);
+                    uint8_t   simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewind=1);
                     uint64_t remaining(void);
 };
 
