@@ -46,8 +46,11 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
    parser->seek(0);
    
    // Start with a small index, it will grow automatically afterward
-    VIDEO._indexMax=1000;
-    VIDEO._index=new mkvIndex[VIDEO._indexMax];
+   for(int i=0;i<_nbAudioTrack+1;i++)
+   {
+    _tracks[i]._indexMax=1000;
+    _tracks[i]._index=new mkvIndex[_tracks[i]._indexMax];
+   }
     //************
    
    if(!parser->find(ADM_MKV_PRIMARY,MKV_SEGMENT,MKV_CLUSTER,&vlen))
@@ -86,6 +89,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                 {
                         //printf("Block Group\n");
                         ADM_ebml_file blockGroup(parser,len);
+                        uint32_t lacing,nbLaces;
                         while(!blockGroup.finished())
                         {
                                 blockGroup.readElemId(&id,&len);
@@ -104,16 +108,37 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                                   {
                                     // Read Track id 
                                       uint32_t tid=blockGroup.readEBMCode();
+                                      int track=searchTrackFromTid(tid);
                                       //printf("Wanted %u got %u\n",_tracks[0].streamIndex,tid);
-                                      if(_tracks[0].streamIndex!=tid)
+                                      if(track==-1)
                                       {
                                         blockGroup.skip(blockGroup.remaining());
                                         break;  // Not our track
                                       }
                                       // Skip timecode
-                                      blockGroup.skip(3);
-                                      addVideoEntry(blockGroup.tell(),blockGroup.remaining());
-                                      blockGroup.skip(blockGroup.remaining());
+                                      blockGroup.skip(2); // Timecode
+                                      uint8_t flags=blockGroup.readu8();
+                                      uint32_t remaining=blockGroup.remaining();
+                                      lacing=((flags>>1)&3);
+                                      switch(lacing)
+                                      {
+                                        case 0: // No lacing
+                                              addVideoEntry(track,blockGroup.tell(),remaining);
+                                              break;
+                                        case 2 : // Constant size lacing
+                                            {
+                                                    nbLaces=blockGroup.readu8()+1;
+                                                    remaining--;
+                                                    // Only mp3/Ac3 supported, ignore lacing FIXME : Vorbis or AAC will not work
+                                                    addVideoEntry(track,blockGroup.tell(),remaining);
+                                                    //printf("tid:%u track %u Remaining : %llu laces %u blksize %d er%d\n",tid,track,remaining,nbLaces,remaining/nbLaces,remaining-(remaining/nbLaces)*nbLaces);
+                                            } 
+                                        break;
+                                        default: 
+                                            printf("unsupported lacing\n");
+                                            break;
+                                      }
+                                      blockGroup.skip(remaining);
                                       break;
                                   }
                                 }
@@ -131,26 +156,45 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
     \fn addVideoEntry
     \brief add an entry to the video index
 */
-uint8_t mkvHeader::addVideoEntry(uint64_t where, uint32_t size)
+uint8_t mkvHeader::addVideoEntry(uint32_t track,uint64_t where, uint32_t size)
 {
+  //
+  mkvTrak *Track=&(_tracks[track]);
+  
+  
   // Need to grow index ?
-  if(VIDEO._nbIndex==VIDEO._indexMax-1)
+  if(Track->_nbIndex==Track->_indexMax-1)
   {
     // Realloc 
-    mkvIndex *dx=new mkvIndex[VIDEO._indexMax*2];
-    memcpy(dx, _tracks[0]._index,sizeof(mkvIndex)*VIDEO._nbIndex);
-    VIDEO._indexMax*=2;
-    delete [] _tracks[0]._index;
-    _tracks[0]._index=dx;
+    mkvIndex *dx=new mkvIndex[Track->_indexMax*2];
+    memcpy(dx, Track->_index,sizeof(mkvIndex)*Track->_nbIndex);
+    Track->_indexMax*=2;
+    delete [] Track->_index;
+    Track->_index=dx;
   }
   
-  mkvIndex *index=_tracks[0]._index;
-  int x=VIDEO._nbIndex;
+  mkvIndex *index=Track->_index;
+  int x=Track->_nbIndex;
   index[x].pos=where;
   index[x].size=size;
   index[x].flags=0;
   index[x].timeCode=0;
-  VIDEO._nbIndex++;
+  Track->_nbIndex++;
  // printf("++\n");
   return 1;
 }
+
+/**
+  \fn searchTrackFromTid
+  \brief Returns our track number for the stream track number. -1 if the stream is not handled.
+
+*/
+int mkvHeader::searchTrackFromTid(uint32_t tid)
+{
+  for(int i=0;i<1+_nbAudioTrack;i++)
+  {
+    if(tid==_tracks[i].streamIndex) return i;
+  }
+  return -1;
+}
+//EOF

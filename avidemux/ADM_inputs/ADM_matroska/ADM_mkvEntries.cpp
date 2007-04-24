@@ -93,6 +93,9 @@ uint8_t mkvHeader::analyzeOneTrack(void *head,uint32_t headlen)
 
 entryDesc entry;
       memset(&entry,0,sizeof(entry));
+      /* Set some defaults value */
+
+      entry.chan=2;
       
       entryWalk(  (ADM_ebml_file *)head,headlen,&entry);
       entry.dump();
@@ -124,6 +127,7 @@ entryDesc entry;
          t->wavHeader.channels=entry.chan;
          t->wavHeader.frequency=entry.fq;
          t->wavHeader.bitspersample=16;
+         t->wavHeader.byterate=(128000)>>3; //FIXME
          t->streamIndex=entry.trackNo;
          t->extraData=entry.extraData;
          t->extraDataLen=entry.extraDataLen;

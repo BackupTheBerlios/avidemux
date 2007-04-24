@@ -43,6 +43,7 @@ uint8_t mkvHeader::open(char *name)
   ADM_MKV_TYPE type;
   const char *ss;
   
+  
   _isvideopresent=0;
   if(!ebml.open(name)) 
   {
@@ -88,6 +89,7 @@ uint8_t mkvHeader::open(char *name)
   printf("Matroska successfully read\n");
   _parser=new ADM_ebml_file();
   ADM_assert(_parser->open(name));
+  _filename=ADM_strdup(name);
   return 1;
 }
 /**
@@ -191,7 +193,10 @@ uint8_t mkvHeader::walk(void *seed)
 */
 WAVHeader *mkvHeader::getAudioInfo(void )
 {
-
+  if(_nbAudioTrack)
+  {
+    return &(_tracks[1].wavHeader); 
+  }
   return NULL;
 }
 /*
@@ -200,6 +205,11 @@ WAVHeader *mkvHeader::getAudioInfo(void )
 
 uint8_t mkvHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {
+  if(_nbAudioTrack)
+  {
+      *audio=new mkvAudio(_filename,&(_tracks[1]));
+      return 1;
+  }
   *audio=NULL;
   return 0; 
 }
@@ -228,7 +238,32 @@ uint8_t mkvHeader::close(void)
   // CLEANUP!!
   if(_parser) delete _parser;
   _parser=NULL;
-  // FIXME Cleanup index!
+  
+  
+#define FREEIF(i) { if(_tracks[i].extraData) delete [] _tracks[i].extraData; _tracks[i].extraData=0;}
+  if(_isvideopresent)
+  {
+      FREEIF(0); 
+  }
+  for(int i=0;i<_nbAudioTrack;i++)
+  {
+    FREEIF(1+i); 
+  }
+  // Delete index
+  if(_isvideopresent && _tracks[0]._index)
+  {
+    delete []  _tracks[0]._index;
+    _tracks[0]._index=NULL;
+  }
+  for(int i=0;i<_nbAudioTrack;i++)
+  {
+    mkvIndex **dx=&(_tracks[1+1]._index);
+    if(*dx)
+    {
+        delete []  *dx;
+        *dx=NULL;
+    }
+  }
 }
 /*
     __________________________________________________________
@@ -246,6 +281,7 @@ uint8_t mkvHeader::needDecompress(void)
 { 
   _parser=NULL;
   _nbAudioTrack=0;
+  _filename=NULL;
   memset(_tracks,0,sizeof(_tracks));
 }
 /*

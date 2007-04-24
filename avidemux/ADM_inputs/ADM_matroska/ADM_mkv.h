@@ -49,6 +49,23 @@ typedef struct mkvTrak
   uint32_t  _nbIndex;  // current size of the index
   uint32_t  _indexMax; // Max size of the index
 };
+class mkvAudio : public AVDMGenericAudioStream
+{
+  protected:
+    mkvTrak                     *_track;
+    ADM_ebml_file               *_parser;
+    uint32_t                    _index;
+    uint32_t                    _offset;
+  public:
+                                mkvAudio(const char *name,mkvTrak *track);
+    virtual                     ~mkvAudio();
+    virtual uint32_t            read(uint32_t len,uint8_t *buffer);
+    virtual uint8_t             goTo(uint32_t newoffset);
+    virtual uint8_t             getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
+  //  virtual uint8_t             goToTime(uint32_t mstime);
+    virtual uint8_t             extraData(uint32_t *l,uint8_t **d);
+};
+
 
 #define ADM_MKV_MAX_TRACKS 20
 
@@ -57,6 +74,7 @@ class mkvHeader         :public vidHeader
   protected:
                                 
     ADM_ebml_file           *_parser;
+    char                    *_filename;
     mkvTrak                 _tracks[ADM_MKV_MAX_TRACKS+1];
 
     
@@ -67,9 +85,11 @@ class mkvHeader         :public vidHeader
     uint8_t                 analyzeTracks(void *head,uint32_t headlen);
     uint8_t                 analyzeOneTrack(void *head,uint32_t headlen);
     uint8_t                 walk(void *seed);
+    int                     searchTrackFromTid(uint32_t tid);
     
     // Indexers
     uint8_t                 addVideoEntry(uint64_t where, uint32_t size);
+    uint8_t                 addVideoEntry(uint32_t track,uint64_t where, uint32_t size);
     uint8_t                 videoIndexer(ADM_ebml_file *parser);
   public:
 
