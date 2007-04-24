@@ -1,0 +1,6433 @@
+# translation of sr.po to Serbian
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+msgid ""
+msgstr ""
+"Project-Id-Version: sr\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Поповић Милош <gpopac@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%" "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Poedit-Language: Serbian\n"
+
+#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:75
+#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:182
+msgid "Internal error"
+msgstr "Унутарња грешка"
+
+#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:75
+msgid "Cannot open WMA2 codec."
+msgstr "Не могу да отворим WMA2 кодек."
+
+#: avidemux/ADM_audiocodec/ADM_codecwma.cpp:182
+msgid "Cannot open AMR codec."
+msgstr "Не могу да отворим AMR кодек."
+
+#: avidemux/oplug_avi/op_avisavecopy.cpp:94
+#: avidemux/oplug_avi/op_avisave.cpp:410
+msgid "Cannot initiate save"
+msgstr "Не могу да започнем снимање"
+
+#: avidemux/oplug_avi/op_saveprocess.cpp:73
+msgid ""
+"Width is not a multiple of 8\n"
+" continue anyway ?"
+msgstr ""
+"Ширина филма није осми умножак дужине.\n"
+"Да наставим?"
+
+#: avidemux/oplug_avi/op_saveprocess.cpp:93
+#: avidemux/oplug_mp4/oplug_mp4.cpp:170
+#: avidemux/oplug_ogm/op_ogsaveprocess.cpp:75
+msgid "Filter init failed"
+msgstr "Покретање филтера неуспело"
+
+#: avidemux/oplug_avi/op_saveprocess.cpp:127
+#: avidemux/oplug_mp4/oplug_mp4.cpp:388
+#: avidemux/oplug_ogm/op_ogsaveprocess.cpp:99
+msgid ""
+"\n"
+" Reuse the existing log-file ?"
+msgstr ""
+"\n"
+" Да ли да искористим постојећи дневник измена ?"
+
+#: avidemux/oplug_avi/op_saveprocess.cpp:152
+#: avidemux/oplug_mp4/oplug_mp4.cpp:408
+msgid "Aborting"
+msgstr "Обустави"
+
+#: avidemux/oplug_avi/op_avisave.cpp:152
+msgid "Error initalizing audio filters"
+msgstr "Не могу да покренем аудио филтере"
+
+#: avidemux/oplug_avi/op_avisave.cpp:161
+msgid "Error initalizing video filters"
+msgstr "Не могу да покренем видео филтере"
+
+#: avidemux/ADM_audiofilter/audiofilter_buildchain.cpp:322
+#: avidemux/gui_autodrive.cpp:69 avidemux/gui_autodrive.cpp:86
+msgid "Codec Error"
+msgstr "Грешка у кодецима"
+
+#: avidemux/ADM_audiofilter/audiofilter_buildchain.cpp:322
+msgid ""
+"The number of channels is greater than what the selected audio codec can "
+"do.\n"
+"Either change codec or use the mixer filter to have less channels."
+msgstr ""
+"Број аудио канала је већи него што одабрани аудио кодек подржава.\n"
+"Или одаберите други кодек или користите филтер да смањите број канала."
+
+#: avidemux/ADM_nuv/ADM_nuv.cpp:568
+msgid "Sure you want to abort ?"
+msgstr "Да заиста прекинем ?"
+
+#: avidemux/ADM_nuv/ADM_nuv.cpp:779
+msgid "Size mismatch"
+msgstr "Величина се не поклапа"
+
+#: avidemux/ADM_nuv/ADM_nuv.cpp:779
+msgid "Expect a crash."
+msgstr "Очекујем неуспех."
+
+#: avidemux/ADM_nuv/ADM_nuv.cpp:1071
+msgid "Do you want to save an index ?"
+msgstr "Хоћете ли да сачувате индекс ?"
+
+#: avidemux/oplug_mp4/oplug_mp4.cpp:152
+msgid "Cannot initialize the video stream"
+msgstr "Не могу да покренем видео стрим"
+
+#: avidemux/oplug_mp4/oplug_mp4.cpp:208 avidemux/oplug_mp4/oplug_mp4.cpp:328
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:352
+msgid "Error while encoding"
+msgstr "Грешка при енкодирању"
+
+#: avidemux/oplug_mp4/oplug_mp4.cpp:218
+msgid "KeyFrame error"
+msgstr "Грешка у кључном кадру"
+
+#: avidemux/oplug_mp4/oplug_mp4.cpp:218
+msgid ""
+"The beginning frame is not a key frame.\n"
+"Please move the A marker."
+msgstr ""
+"Почетни кадар није кључни кадар.\n"
+"Померите А маркер."
+
+#: avidemux/oplug_mp4/oplug_mp4.cpp:245
+msgid "Cannot initialize the audio stream"
+msgstr "Не могу да покренем аудио стрим."
+
+#: avidemux/ADM_dialog/DIA_chromaShift.cpp:257
+msgid "ChromaShift"
+msgstr "Хрома померај"
+
+#: avidemux/ADM_dialog/DIA_chromaShift.cpp:270
+msgid "U Shift :"
+msgstr "У померај"
+
+#: avidemux/ADM_dialog/DIA_chromaShift.cpp:278
+msgid "V Shift :"
+msgstr "В померај"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:155
+msgid "ColorYuv (From avisynth)"
+msgstr "Yuv боје (из avisynth-а)"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:179
+#: avidemux/ADM_dialog/DIA_contrast.cpp:307
+#: avidemux/ADM_dialog/DIA_contrast.cpp:324
+msgid "Contrast"
+msgstr "Контраст"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:186
+#: avidemux/ADM_dialog/DIA_contrast.cpp:337
+msgid "Brightness"
+msgstr "Осветљеност"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:193
+msgid "Gamma"
+msgstr "Гама"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:200
+#: avidemux/ADM_dialog/DIA_audio.cpp:327
+msgid "Gain"
+msgstr "Постигни"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:207
+msgid "Luma Y"
+msgstr "Лума Y"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:214
+#: avidemux/ADM_dialog/DIA_contrast.cpp:358
+msgid "Chroma U"
+msgstr "Хрома У"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:221
+#: avidemux/ADM_dialog/DIA_contrast.cpp:362
+msgid "Chroma V"
+msgstr "Хрома В"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:324
+msgid "<b>Color Correction Matrix</b>"
+msgstr "<b>Матрица за исправку боја</b>"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:347
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:470
+msgid "Matrix"
+msgstr "Матрица"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:354
+msgid "Opt"
+msgstr "Опције"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:361
+msgid "Level"
+msgstr "Ниво"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:373
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:381
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:389
+#: avidemux/ADM_dialog/DIA_encoding.cpp:420
+#: avidemux/ADM_dialog/DIA_encoding.cpp:518
+#: avidemux/ADM_dialog/DIA_encoding.cpp:526
+#: avidemux/ADM_dialog/DIA_encoding.cpp:612
+#: avidemux/ADM_dialog/DIA_vobsub.cpp:219
+#: avidemux/ADM_dialog/DIA_audio.cpp:257 avidemux/ADM_dialog/DIA_audio.cpp:290
+#: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:133
+msgid "None"
+msgstr "Ништа"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:374
+msgid "Rec.709"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:382
+msgid "Coring"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:390
+msgid "TV->PC"
+msgstr "ТВ->Рачунар"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:391
+msgid "PC->TV"
+msgstr "Рачунар->ТВ"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:392
+msgid "PC->TV.Y"
+msgstr "Рачунар->ТВ.Y"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:398
+msgid ""
+"<b>Matrix Warning :</b>\n"
+"all above values are normalized to 256!"
+msgstr ""
+"<b>Упозорење о матрици :</b>\n"
+"све вредности изнад ће бити уравнотежене на 256!"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:404
+msgid "AutoGain"
+msgstr "Аутоматски постигни"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:408
+msgid "Display Stats"
+msgstr "Прикажи статистику"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:412
+msgid "AutoWhite"
+msgstr "Аутоматски баланс белог"
+
+#: avidemux/ADM_dialog/DIA_coloryuv.cpp:416
+msgid "<b>frame2</b>"
+msgstr "<b>кадар2</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:269
+#, c-format
+msgid "Done : %02d%%"
+msgstr "Завршено : %02d%%"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:377
+msgid "Encoding in Progress"
+msgstr "Енкодирање у току"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:387
+msgid "<b><big>Encoding files</big></b>"
+msgstr "<b><big>Филтери за енкодирање</big></b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:400
+msgid "<b>Phasis:</b>"
+msgstr "<b>Фаза:</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:410
+msgid "<b>Frame:</b>"
+msgstr "<b>Кадар:</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:428
+msgid "00000/00000"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:436
+msgid "<b>Vid codec:</b>"
+msgstr "<b>Видео кодек:</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:447
+msgid "<b>Aud Codec:</b>"
+msgstr "<b>Аудио кодек</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:457
+msgid "<b>FPS:</b>"
+msgstr "<b>Кадрова у секунди:</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:467
+msgid "<b>Vid Bitrate:</b>"
+msgstr "<b>Видео битрејт:</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:477
+msgid "<b>Quantizer:</b>"
+msgstr "Квантизер"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:487
+msgid "<b>Video Size:</b>"
+msgstr "<b>Величина видеа:</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:498
+msgid "<b>Audio Size:</b>"
+msgstr "<b>Величина звука</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:508
+msgid "<b>Total Size:</b>"
+msgstr "<b>Укупна величина:</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:534
+#: avidemux/ADM_dialog/DIA_encoding.cpp:542
+#: avidemux/ADM_dialog/DIA_encoding.cpp:558
+#: avidemux/ADM_dialog/DIA_encoding.cpp:566
+#: avidemux/ADM_dialog/DIA_encoding.cpp:574
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:166
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:206
+#: avidemux/ADM_dialog/DIA_resize.cpp:419
+#: avidemux/ADM_dialog/DIA_resize.cpp:433 avidemux/ADM_dialog/DIA_srt.cpp:649
+#: avidemux/ADM_dialog/DIA_ocr.cpp:148 avidemux/ADM_dialog/DIA_ocr.cpp:156
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:659
+#: avidemux/ADM_dialog/DIA_calculator.cpp:633
+#: avidemux/ADM_dialog/DIA_calculator.cpp:649
+#: avidemux/ADM_dialog/DIA_calculator.cpp:665
+#: avidemux/ADM_dialog/DIA_calculator.cpp:695
+#: avidemux/ADM_gui2/GUI_main2.cpp:1390
+msgid "0"
+msgstr "0"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:550
+msgid "31"
+msgstr "31"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:582
+msgid "<b>ETA:</b>"
+msgstr "<b>Процењено време:</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:592
+msgid "0 h 0 mn 0 s"
+msgstr "0 сата 0 мин 0 сек"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:602
+msgid "<b>Container:</b>"
+msgstr "<b>Контејнер:</b>"
+
+#: avidemux/ADM_dialog/DIA_encoding.cpp:649
+msgid "Pause / Abort"
+msgstr "Пауза / Прекид"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:109
+msgid "Select Xvid matrix file to load"
+msgstr "Одабери датотеку са Xvid матрицом за учитавање"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:121
+msgid "Error Loading"
+msgstr "Грешка приликом учитавања"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:121
+msgid "Error loadind the custom matrix file."
+msgstr "Грешка при учитавању датотеке са матрицом."
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:139
+msgid "Matrix Loaded"
+msgstr "Матрица учитана"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:139
+msgid "The custom matrix file has been successfully loaded."
+msgstr "Датотека са матрицом је успешно учитана."
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:479
+msgid "Select Custom Matrix File to write"
+msgstr "Одабери датотеку за упис матрице"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:484
+msgid "Error Writing"
+msgstr "Грешка при упису"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:484
+msgid "Error writing the custom matrix file."
+msgstr "Грешка при упису матрице у датотеку."
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:700
+msgid "XviD encoding options"
+msgstr "Опције XviD енкодирања"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:734
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:554
+msgid "Encoding type:"
+msgstr "Тип енкодирања"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:739
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:562
+msgid "Bitrate (kb/s):"
+msgstr "Битрејт (кб/сек)"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:744 avidemux/ADM_dialog/DIA_SVCD.cpp:368
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:570
+msgid "Quantizer:"
+msgstr "Квантизер"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:756
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:583
+msgid "Select 1-pass or 2-pass encoding"
+msgstr "Одабери један или два пролаза"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:760
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:587
+msgid "Single pass - bitrate"
+msgstr "Један пролаз - битрејт"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:764
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:591
+msgid "Single pass - quantizer"
+msgstr "Један пролаз - квантизер"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:768
+msgid "Two pass, final size"
+msgstr "Два пролаза - величина датотеке"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:772
+msgid "Two pass, average bitrate"
+msgstr "Два пролаза - средњи битрејт"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:776
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:599
+msgid "Same Qz as input"
+msgstr "Исто као у улазној датотеци"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:785
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:618
+msgid "Target video bitrate"
+msgstr "Битрејт излазног видеа"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:792
+msgid "Constant quantizer - each frame will get the same compression"
+msgstr "Стални квантизер - сваки кадар ће имати исти ниво компресије"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:794
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:621
+msgid "Variable bitrate mode"
+msgstr "Промењљив битрејт"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:806
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:634
+msgid "_Interlaced"
+msgstr "_Испреплетан"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:809
+msgid ""
+"Enables interlaced frame support - use only if your source contains "
+"interlacing artifacts (i.e. fields instead of progressive frames)"
+msgstr ""
+"Омогућава подршку испреплетаних кадрова - користи само уколико изворсадржи "
+"испреплетане делове (на пример поља уместо напредујућих кадрова)"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:811
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:639
+msgid "_Greyscale"
+msgstr "_Црно-бело"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:814
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:642
+msgid "Encode in black & white"
+msgstr "Енкодирај црно-бело"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:820
+msgid "Ca_rtoon mode"
+msgstr "Мод за _цртани филм"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:823
+msgid "Enables special motion estimation features for cartoons/anime"
+msgstr "Омогућава специјалне прорачуне покрета за цртане филмове"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:825
+msgid "C_hroma optimizer"
+msgstr "Хрома оптимизација"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:828
+msgid "Enables a chroma optimizer prefilter"
+msgstr "Омогућава предфилтер за оптимизацију сигнала боје"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:834
+msgid "Turbo Mode"
+msgstr "Брзи мод"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:837
+msgid "Enables fast 1st pass encoding"
+msgstr "Омогући брз први пролаз"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:839
+msgid "Packed bitstream"
+msgstr "Паковани битстрим"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:842
+msgid "Enables Divx like packed vop, DO NOT SET, it is ugly"
+msgstr ""
+"Омогућава VOP паковање слично као код Divx-а.Не користите ово, ружно је"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:844
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:668
+msgid "Main"
+msgstr "Главно"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:863
+msgid "Motion search precision:"
+msgstr "Прецизност тражења кретања"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:867
+msgid "VHQ mode:"
+msgstr "VHQ мод"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:880
+msgid ""
+"Higher settings give higher quality results, at the cost of slower encoding"
+msgstr ""
+"(Видео Високог Квалитета)Више вредности дају бољи квалитет, али је превођење "
+"спорије"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:884 avidemux/ADM_dialog/DIA_xvid.cpp:357
+msgid "0 - None"
+msgstr "0 - Без"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:888
+msgid "1 - Very low"
+msgstr "1 - Веома ниско"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:892
+msgid "2 - Low"
+msgstr "2 - Ниско"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:896
+msgid "3 - Medium"
+msgstr "3 - Средње"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:900
+msgid "4 - High"
+msgstr "4 - Високо"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:904
+msgid "5 - Very high"
+msgstr "5 - Веома високо"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:908
+msgid "6 - Ultra high"
+msgstr "6 - Највише"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:917
+msgid "VHQ enables an additional search process to increase quality"
+msgstr ""
+"VHQ (Видео Високог Квалитета) омогућава додатни ниво претраживањаради "
+"повећање квалитета"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:921
+msgid "0 - Off"
+msgstr "0 - Искључено"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:925
+msgid "1 - Mode decision"
+msgstr "1 - Одређено модом"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:929
+msgid "2 - Limited search"
+msgstr "2 - Ограничено претраживање"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:933
+msgid "3 - Medium search"
+msgstr "3 - Средњи ниво претраживања"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:937
+msgid "4 - Wide search"
+msgstr "4 - Широко претраживање"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:947
+msgid "C_hroma motion"
+msgstr "_Кретање сигнала боје"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:950
+msgid "Use chroma information to estimate motion"
+msgstr "Користи информације о сигналу боје за процену кретања"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:952
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:708
+msgid "_4MV"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:955
+msgid "Use 4 motion vectors per macroblock, might give better compression"
+msgstr ""
+"Користи 4 вектора кретања по макроблоку.Може да резултује бољом компресијом"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:957
+msgid "HQ _AC"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:960
+msgid ""
+"Enable a better prediction of AC component. Turns on Lumi masking - applies "
+"more compression to dark/light areas that the eye cannot notice easily"
+msgstr ""
+"Омогућава боље предвиђање AC компоненте. Укључује маскирање помоћу светла - "
+"примењује више компресије на мрачним/светлим деловима које око не може лако "
+"да примети"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:966
+msgid "I-frame interval - Min:"
+msgstr "Интервал И кадра - Мин"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:974
+msgid "Minimum space between I-frames, 1 will disable forced I-frame spacing"
+msgstr "Минимално места између И кадара. 1 искључује приморано заузеће И кадра"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:976
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1194
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1199
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1204
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1242
+msgid "Max:"
+msgstr "Макс"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:984
+msgid "Maximum number of frames allowed between I-frames"
+msgstr "Највећи број кадрова дозвољених између И кадрова"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:999
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:772
+msgid "Number of B-frames:"
+msgstr "Број Б кадрова"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1007
+msgid ""
+"Maximum number of sequential B-frames (when set to 0, the original I/P "
+"encoder is used)"
+msgstr ""
+"Највећи број одвојених Б кадрова (када је 0, оригинално И/П енкодирањеће "
+"бити примењено)"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1013
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:784
+msgid "_Qpel"
+msgstr "_Qpel"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1016
+msgid "Use Quarter pixel resolution for a more precise motion estimation"
+msgstr "Користи резолуцију четвртине пиксела за прецизнији прорачун покрета"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1018
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:789
+msgid "_GMC"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1021
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:792
+msgid ""
+"Global Motion Compensation can save bits on camera pans, zooming and rotation"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1023
+msgid "_BVHQ"
+msgstr "_BVHQ"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1026
+msgid "Produces nicer-looking B-frames"
+msgstr "Производи лепше Б кадрове"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1028
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:794
+msgid "Advanced Simple Profile"
+msgstr "Напредни прости профил"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1040
+msgid "As input"
+msgstr "Као и улаз"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1043
+msgid "Get PAR from input video file"
+msgstr "Узми PAR из улазне видео датотеке"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1049
+msgid "Pixel Width"
+msgstr "Ширина пиксела"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1051 avidemux/ADM_dialog/DIA_x264.cpp:677
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:658
+msgid ":"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1060
+msgid "Pixel Height"
+msgstr "Висина пиксела"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1061
+msgid "Pixel Aspect Ratio"
+msgstr "Размера пиксела:"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1066 avidemux/ADM_dialog/DIA_x264.cpp:773
+msgid "Motion & Misc"
+msgstr "Кретање и остало"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1079
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1163
+msgid "Quantization type:"
+msgstr "Тип квантизације: "
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1083
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1216
+msgid "_H.263"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1086
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1219
+msgid "H.263 quantizers smooth the picture (useful at lower bitrates)"
+msgstr "H.263 квантизер замућује слику (корисно за ниже битрејтове)"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1090
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1223
+msgid "_MPEG"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1093
+msgid ""
+"MPEG quantizers (slightly slower) produce sharper picture (useful at higher "
+"bitrates)"
+msgstr ""
+"MPEG квантизер (незнатно спорији) производи оштрију слику(корисно за више "
+"битрејтове)"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1097
+msgid "_Custom Matrix"
+msgstr "_Произвољна матрица"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1107
+msgid "Load Custom Matrix:  "
+msgstr "Учитај произвољну матрицу"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1128
+msgid "Open CQM file"
+msgstr "Отцори CQM датотеку"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1136
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1568
+msgid "Edit Custom Matrix"
+msgstr "Измени произвољну матрицу"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1153
+msgid "I-frame quantizer - Min:"
+msgstr "Квантизер И кадра - Мин "
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1158
+msgid "P-frame quantizer - Min:"
+msgstr "Квантизер П кадра - Мин"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1163
+msgid "B-frame quantizer - Min:"
+msgstr "Квантизер Б кадра - Мин"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1176
+msgid "Minimum quantizer allowed for I-frames"
+msgstr "Најмањи квантизер дозвољен за И кадар"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1182
+msgid "Minimum quantizer allowed for P-frames"
+msgstr "Најмањи квантизер дозвољен за П кадар"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1188
+msgid "Minimum quantizer allowed for B-frames"
+msgstr "Најмањи квантизер дозвољен за Б кадар"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1217
+msgid "Maximum quantizer allowed for I-frames"
+msgstr "Највећи квантизер дозвољен за И кадар"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1223
+msgid "Maximum quantizer allowed for P-frames"
+msgstr "Највећи квантизер дозвољен за П кадар"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1229
+msgid "Maximum quantizer allowed for B-frames"
+msgstr "Највећи квантизер дозвољен за Б кадар"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1231
+msgid "Quantizer restrictions"
+msgstr "Ограничења квантизера"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1235
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1254
+msgid "_Trellis quantization"
+msgstr "_Трелис квантизација"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1238
+msgid "Rate distortion quantization, will find optimal encoding for each block"
+msgstr "Rate distortion квантизација ће наћи оптимално превођење за сваки блок"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1240 avidemux/ADM_dialog/DIA_xvid.cpp:309
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1266
+msgid "Quantization"
+msgstr "Квантизација"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1268
+msgid "I-frame boost (%):"
+msgstr "Подизање И кадра (%):"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1273
+msgid "I-frames closer than ... frames..."
+msgstr "И кадрови ближе него... кадрови..."
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1278
+msgid "...are reduced by (%):"
+msgstr "...су смањени за (%):"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1283
+msgid "Max overflow improvement (%):"
+msgstr "Највеће overflow унапређење (%):"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1288
+msgid "Max overflow degradation (%):"
+msgstr "Највеће overflow искварење (%):"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1300
+#, c-format
+msgid "A value of 20 will give 20% more bits to every I-frame"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1306
+msgid ""
+"I-frames appearing in the range below this value will be treated as "
+"consecutive keyframes"
+msgstr ""
+"И кадрови који се појављују у опсегу испод ове вредности ће бититретирани "
+"као consecutive кључни кадрови"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1311
+msgid ""
+"Reduction of bitrate for the first consecutive I-frames. The last I-frame "
+"will get treated normally"
+msgstr ""
+"Смањење битрејта за први consecutive И кадар. Последњи И кадарће бити "
+"третиран нормално"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1316
+msgid ""
+"How much of the overflow the codec can eat into during undersized sections - "
+"larger values will bridge the gap faster"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1321
+msgid ""
+"How much of the overflow the codec can eat into during oversized sections - "
+"larger values will bridge the gap faster"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1323
+msgid "Two pass tuning"
+msgstr "Подешавање другог пролаза"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1340
+msgid "High bitrate scenes (%):"
+msgstr "Сцене са високим витрејтом (%):"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1345
+msgid "Low bitrate scenes (%):"
+msgstr "Сцене са ниским битрејтом (%):"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1350
+msgid "Overflow control strength (%):"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1362
+msgid ""
+"The higher this value, the more bits get taken from frames larger than the "
+"average size, and redistributed to others"
+msgstr ""
+"Што је вредност већа, више више битова ће бити узето из кадрова већих "
+"одпросећне величине и бити дато осталима"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1367
+msgid ""
+"The higher this value, the more bits get assigned to frames below the "
+"average frame size"
+msgstr ""
+"Што је вредност већа, више битова ће бити узето за кадровемање од просечне "
+"величине кадра"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1372
+msgid ""
+"0 = default from core (let XviD decide), else overflow payback percent per "
+"frame"
+msgstr ""
+"0 = подрзумевано из кодека (пусти да XviD одлучи), у супротном "
+"overflowпросто репродукције по кадру"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1374
+msgid "Curve compression"
+msgstr "Компресиона крива"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1378
+msgid "Second Pass"
+msgstr "Други пролаз"
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1591
+msgid "<b>Intra Matrix</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid4.cpp:1609
+msgid "<b>Inter Matrix</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mjpeg.cpp:73
+msgid "Mjpeg Codec settings"
+msgstr "Поставке Mjpeg кодека"
+
+#: avidemux/ADM_dialog/DIA_mjpeg.cpp:82
+msgid "Quality"
+msgstr "Квалитет"
+
+#: avidemux/ADM_dialog/DIA_mjpeg.cpp:93
+#: avidemux/ADM_dialog/DIA_postproc.cpp:131
+msgid "Swap U & V"
+msgstr "Замени У и В"
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:186
+msgid "XVCD encoding"
+msgstr "XVCD енкодирање"
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:195 avidemux/ADM_dialog/DIA_xvid.cpp:250
+msgid "Constant Quantizer"
+msgstr "Константни квантизер"
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:209
+msgid "Constant Bitrate"
+msgstr "Константни битрејт"
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:223
+msgid "Dual pass"
+msgstr "Двоструки пролаз"
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:237
+msgid "Min bitrate (kbps) :"
+msgstr "Најмањи битрејт (кб/сек)"
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:245
+msgid "Max bitrate (kbps) :"
+msgstr "Највећи битрејт (кб/сек)"
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:265
+msgid "Matrices"
+msgstr "Матрице"
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:281
+msgid "Default mpeg"
+msgstr "Подразумевани mpeg"
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:285
+msgid "Tmpeng "
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:289
+msgid "Animé"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:293
+msgid "K-VCD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:299
+msgid "Gop Size  (12):"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvcd.cpp:315
+msgid "Use Xvid ratecontrol"
+msgstr "Користи Xvid контролу протока"
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:144
+msgid "Builtin support for"
+msgstr "Уграђена подршка за"
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:158
+msgid ""
+"If an option is not checked, it means\n"
+"you must RECOMPILE avidemux to have\n"
+"support for it!"
+msgstr ""
+"Уколико ни једна опција није чекирана,\n"
+"морате да поново преведете изворни код\n"
+"Avidemux-а да би била подржана!"
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:171
+msgid "X264"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:178
+msgid "ESD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:185
+msgid "Arts"
+msgstr "aRts"
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:192
+msgid "Vorbis"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:199
+msgid "Altivec"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:206
+msgid "Mad"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:213
+msgid "A52"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:220
+msgid "Win32"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:227
+msgid "Freetype"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:234
+#: avidemux/ADM_dialog/DIA_vcodec.cpp:185
+msgid "Xvid"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:301
+msgid "FAAC"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:308
+msgid "FAAD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_builtin.cpp:327
+msgid "libDCA/libDTS"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:47
+msgid " No"
+msgstr " Не"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:47
+msgid " Yes"
+msgstr " Да"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:141
+#, c-format
+msgid "NONE"
+msgstr "Ништа"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:207
+msgid "Informations"
+msgstr "Информације"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:229
+msgid "Frame Rate"
+msgstr "Учесталост кадрова "
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:236
+msgid "# of frames"
+msgstr "# од кадра"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:243
+msgid "Codec 4CC"
+msgstr "Кодек 4CC"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:250
+msgid "Video Duration  "
+msgstr "Трајање видеа "
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:264
+#: avidemux/ADM_dialog/DIA_properties.cpp:292
+#: avidemux/ADM_dialog/DIA_ocr.cpp:208 avidemux/ADM_dialog/DIA_ocr.cpp:271
+#: avidemux/ADM_dialog/DIA_deblend.cpp:117
+#: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:119
+#: avidemux/ADM_dialog/DIA_asharp.cpp:362
+msgid " "
+msgstr " "
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:271
+msgid "Image size"
+msgstr "Величина слике"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:299
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:438
+msgid "Aspect Ratio"
+msgstr "Размера"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:306
+msgid "-/-"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:339
+msgid "Packed Bistream"
+msgstr "Запаковани битстрим"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:346
+msgid "Quarter Pixel"
+msgstr "Четврт пиксела"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:353
+msgid "GMC "
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:381
+msgid "<b>Extra Properties</b>"
+msgstr "<b>Додатна подешавања</b>"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:386
+#: avidemux/ADM_gui2/GUI_main2.cpp:999
+msgid "<b>Video</b>"
+msgstr "<b>Видео</b>"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:399
+msgid "Codec "
+msgstr "Кодек "
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:406
+msgid "Channels  "
+msgstr "Канали  "
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:413
+msgid "Bitrate "
+msgstr "Битрејт"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:420
+msgid "Frequency"
+msgstr "Учесталост"
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:427
+msgid "Audio duration  "
+msgstr "Трајање аудија "
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:469
+msgid "VBR"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_properties.cpp:482
+#: avidemux/ADM_dialog/DIA_dmx.cpp:222 avidemux/ADM_gui2/GUI_main2.cpp:1039
+msgid "<b>Audio</b>"
+msgstr "<b>Аудио</b>"
+
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:51
+msgid "Continue indexing"
+msgstr "Настави индексирање"
+
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:51
+msgid "Abort Requested"
+msgstr "Откажи захтев"
+
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:51
+msgid "Do you want to abort indexing ?"
+msgstr "Да ли желите да прекинете индексирање?"
+
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:153
+msgid "Indexing..."
+msgstr "Индексирам..."
+
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:174
+#: avidemux/ADM_dialog/DIA_working.cpp:257
+msgid "Time left :"
+msgstr "Преостло време :"
+
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:182
+msgid "Timecode :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:190
+msgid "Nb pictures seen :"
+msgstr "Број приказаних слика :"
+
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:198
+#: avidemux/ADM_dialog/DIA_calculator.cpp:437
+msgid "00:00:00"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:214
+msgid "Indexing :"
+msgstr "Индексирам:"
+
+#: avidemux/ADM_dialog/DIA_idx_pg.cpp:222
+msgid "/dev/null"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_exLame.cpp:80
+msgid "Lame command"
+msgstr "Lame команда"
+
+#: avidemux/ADM_dialog/DIA_exLame.cpp:89
+msgid "Enter parameters (i.e. -b 192 -m s ...)"
+msgstr "Унеси параметре (на пример -b 192 -m s ...)"
+
+#: avidemux/ADM_dialog/DIA_enter.cpp:165
+msgid "Title"
+msgstr "Назив"
+
+#: avidemux/ADM_dialog/DIA_enter.cpp:174 avidemux/ADM_dialog/DIA_enter.cpp:232
+#: avidemux/ADM_dialog/DIA_enter.cpp:297
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:587
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:659
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:721
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:781
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:844
+msgid "label1"
+msgstr "натпис1"
+
+#: avidemux/ADM_dialog/DIA_enter.cpp:223
+#: avidemux/ADM_dialog/DIA_working.cpp:244 avidemux/ADM_dialog/DIA_d3d.cpp:93
+#: avidemux/ADM_dialog/DIA_4entries.cpp:88
+msgid "dialog1"
+msgstr "дијалог1"
+
+#: avidemux/ADM_dialog/DIA_enter.cpp:305
+msgid "label2"
+msgstr "натпис2"
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:113
+msgid "DGbob"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:122
+#: avidemux/ADM_dialog/DIA_dectel.cpp:152
+msgid "Field Order"
+msgstr "Редослед поља"
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:130
+#: avidemux/ADM_dialog/DIA_decimate.cpp:141
+msgid "Mode"
+msgstr "Мод"
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:138
+#: avidemux/ADM_dialog/DIA_msharpen.cpp:141
+msgid "Threshold"
+msgstr "Осетљивост"
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:146
+msgid "Extra check"
+msgstr "Додатна провера"
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:160
+msgid "BFF"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:166
+msgid "TFF"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:180
+msgid "Keep fps and frame #"
+msgstr "Задржи број кадрова по сек и кадар #"
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:184
+msgid "Double fps and frame #"
+msgstr "Удвостручи број кадрова по сек и кадар #"
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:188
+msgid "Double frame # (slow mo)"
+msgstr "Удвостручи кадар # (успорено)"
+
+#: avidemux/ADM_dialog/DIA_dgbob.cpp:200
+msgid "(avoid using it)"
+msgstr "(избегни да користиш)"
+
+#: avidemux/ADM_dialog/DIA_recent.cpp:96
+msgid "Recent files"
+msgstr "Скорашње датотеке"
+
+#: avidemux/ADM_dialog/DIA_working.cpp:168
+#, c-format
+msgid " %d m %d s left"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_working.cpp:262
+msgid "0:0:0"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_busy.cpp:120
+msgid "Busy"
+msgstr "Заузето"
+
+#: avidemux/ADM_dialog/DIA_gototime.cpp:73
+msgid "Go to time"
+msgstr "Скочи на време"
+
+#: avidemux/ADM_dialog/DIA_gototime.cpp:88
+msgid "h"
+msgstr "сат"
+
+#: avidemux/ADM_dialog/DIA_gototime.cpp:98
+msgid "mn"
+msgstr "мин"
+
+#: avidemux/ADM_dialog/DIA_gototime.cpp:108
+msgid "s"
+msgstr "сек"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:159
+msgid "TDeint param"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:173
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:117
+msgid "Field Order :"
+msgstr "Редослед поља"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:185
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:125
+#: avidemux/ADM_dialog/DIA_dectel.cpp:167
+msgid "Bottom Field First"
+msgstr "Најпре доња поља"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:186
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:131
+#: avidemux/ADM_dialog/DIA_dectel.cpp:171
+msgid "Top Field First"
+msgstr "Најпре горња поља"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:188
+msgid "Interpolate :"
+msgstr "Уметни :"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:200
+msgid "Top field (keep bottom)"
+msgstr "Горња поља (сачувај доња)"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:201
+msgid "Bottom field (keep top)"
+msgstr "Доња поља (сачувај горња)"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:203
+msgid "Type"
+msgstr "Тип"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:215
+msgid "Cubic Interpolation"
+msgstr "Кубик интерполација"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:216
+msgid "Modified ELA"
+msgstr "Измењени ELA"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:217
+msgid "Kernerl interpolation"
+msgstr "Кернел интерполација"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:218
+msgid "Modified ELA-2"
+msgstr "Измењени ELA-2"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:220
+msgid "MntMode"
+msgstr "Мnt Мод"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:232
+msgid "4 field check"
+msgstr "Провера на 4 поља"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:233
+msgid "5 field check"
+msgstr "Порвера на 5 поља"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:234
+msgid "4 field check (no average)"
+msgstr "Провера на 4 поља (по просеку)"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:235
+msgid "5 field check (no average)"
+msgstr "Провера на 4 поља (по просеку)"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:237
+msgid "Use Chroma to evalute"
+msgstr "Користи сигнал боје за процену"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:250
+msgid "Try weave "
+msgstr "Прави талас"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:263
+#: avidemux/ADM_filter/gui_filterlist.cpp:173
+msgid "Denoise"
+msgstr "Умањење шума"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:276
+msgid "Link"
+msgstr "Веза"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:288
+msgid "No link"
+msgstr "Без везе"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:289
+msgid "Full linking"
+msgstr "Пуна веза"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:290
+msgid "Y to UV link"
+msgstr "веза Y за UV"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:291
+msgid "UV to Y link"
+msgstr "веза UV за Y"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:293
+msgid "Sharp :"
+msgstr "Оштро :"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:306
+msgid "AP type"
+msgstr "AP тип"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:319
+msgid "Evaluate ALL frames"
+msgstr "Процени све кадрове"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:331
+msgid "0 (read manual)"
+msgstr "0 (прочитај упутство)"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:332
+msgid "1 (read manual)"
+msgstr "1 (прочитај упутство)"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:333
+msgid "2 (read manual)"
+msgstr "2 (прочитај упутство)"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:339
+msgid "motion Threshold, Luma"
+msgstr "осетљивост кретања, осветљеност"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:346
+msgid "motion Threshold, Chroma"
+msgstr "осетљивост кретања, сигнал боја"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:369
+msgid "Area Combing Threshold"
+msgstr "комбиновање осетљивости подручја"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:383
+msgid "Combed Treshold"
+msgstr "Combed осетљивост"
+
+#: avidemux/ADM_dialog/DIA_tdeint.cpp:398
+msgid "Artefact Protection threshold "
+msgstr "Осетљивост за заштиту од артефакта"
+
+#: avidemux/ADM_dialog/DIA_equalizer.cpp:433
+msgid "Equalizer"
+msgstr "Еквилајзер"
+
+#: avidemux/ADM_dialog/DIA_mpeg2opt.cpp:104
+msgid "Mpeg2 options"
+msgstr "Mpeg2 опције"
+
+#: avidemux/ADM_dialog/DIA_mpeg2opt.cpp:113
+msgid "Other arg"
+msgstr "Остали аргументи"
+
+#: avidemux/ADM_dialog/DIA_mpeg2opt.cpp:121
+msgid "Quantisation (2-31)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mpeg2opt.cpp:129
+msgid "Maximum bitrate (kbps)"
+msgstr "Највећи битрејт (кб/сек)"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:304
+msgid "DVD Parameters"
+msgstr "ДВД параметри"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:325
+msgid "Encoding Type:"
+msgstr "Тип енкодирања"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:336
+msgid "Single pass:Bitrate"
+msgstr "Један пролаз: Битрејт"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:340
+msgid "Single pass:Quantizer"
+msgstr "Један пролаз: Квантизер"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:344
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:595
+msgid "Two pass"
+msgstr "Два пролаза"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:354
+msgid "Bitrate (kb/s)"
+msgstr "Битрјт (кб/сек)"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:380
+msgid "Encoding mode"
+msgstr "Режим енкодирања"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:392 avidemux/ADM_dialog/DIA_DVDff.cpp:541
+msgid "Progressive"
+msgstr "Прогресивни"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:398 avidemux/ADM_dialog/DIA_DVDff.cpp:547
+msgid "Interlaced TFF"
+msgstr "Испреплетани TFF"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:404 avidemux/ADM_dialog/DIA_DVDff.cpp:553
+msgid "Interlaced BFF"
+msgstr "Испреплетани BFF"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:410
+#: avidemux/ADM_filter/gui_filterlist.cpp:123
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:283
+msgid "Interlacing"
+msgstr "Испреплетани"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:426 avidemux/ADM_dialog/DIA_resize.cpp:380
+#: avidemux/ADM_dialog/DIA_resize.cpp:402
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:577
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:124
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:141
+msgid "4:3"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:432 avidemux/ADM_dialog/DIA_resize.cpp:384
+#: avidemux/ADM_dialog/DIA_resize.cpp:406
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:583
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:125
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:142
+msgid "16:9"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:452 avidemux/ADM_dialog/DIA_DVDff.cpp:605
+msgid "Default"
+msgstr "Подразумевано"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:456 avidemux/ADM_dialog/DIA_DVDff.cpp:609
+msgid "Tmpgenc"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:460 avidemux/ADM_dialog/DIA_DVDff.cpp:613
+msgid "Anime"
+msgstr "Аниме"
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:464 avidemux/ADM_dialog/DIA_DVDff.cpp:617
+msgid "KVCD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:478 avidemux/ADM_dialog/DIA_DVDff.cpp:637
+msgid "Gop Size:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_SVCD.cpp:494
+msgid "Max Bitrate:"
+msgstr "Највећи битрејт"
+
+#: avidemux/ADM_dialog/DIA_vobsub.cpp:98
+msgid "Select .idx file"
+msgstr "Одабери .idx датотеку"
+
+#: avidemux/ADM_dialog/DIA_vobsub.cpp:196
+msgid "VobSub Settings"
+msgstr "VobSub поставке"
+
+#: avidemux/ADM_dialog/DIA_vobsub.cpp:213
+msgid "Select .idx"
+msgstr "Одабери .idx"
+
+#: avidemux/ADM_dialog/DIA_vobsub.cpp:227
+msgid "Select Language :"
+msgstr "Одабери језик"
+
+#: avidemux/ADM_dialog/DIA_vobsub.cpp:241
+msgid "Select Sub"
+msgstr "Одабери Sub"
+
+#: avidemux/ADM_dialog/DIA_vobsub.cpp:254
+msgid "Extra Shrink Factor :"
+msgstr "Додатни фактор сужења"
+
+#: avidemux/ADM_dialog/DIA_vobsub.cpp:269
+msgid "Shift (ms) :"
+msgstr "Помери (мсек)"
+
+#: avidemux/ADM_dialog/DIA_vobsub.cpp:283
+msgid "Extra Settings"
+msgstr "Додатна подешавања"
+
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:104
+msgid "Kernel Deinterlacer"
+msgstr "Кернелски расплитач"
+
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:141
+#: avidemux/ADM_dialog/DIA_Msmooth.cpp:141
+#: avidemux/ADM_dialog/DIA_deblend.cpp:124
+#: avidemux/ADM_dialog/DIA_asharp.cpp:306
+msgid "Threshold :"
+msgstr "Осетљивост"
+
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:149
+msgid "smaller means deinterlace more!"
+msgstr "мање више расплиће!"
+
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:152
+msgid "Sharp"
+msgstr "Оштрина"
+
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:155
+msgid "Sharper engine"
+msgstr "Изоштривач"
+
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:157
+msgid "Two Way"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:160
+msgid "Extrapolate two ways (better not use it)"
+msgstr "Extrapolate two ways (болје не користи)"
+
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:162
+msgid "Map"
+msgstr "Мапа"
+
+#: avidemux/ADM_dialog/DIA_kerneldeint.cpp:165
+msgid "Show the interlaced areas (test only!)"
+msgstr "Прикажи испреплетана подручја (само за тестирање!)"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:209
+msgid "Audio Processing"
+msgstr "Превођење звука"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:227
+msgid "DRC"
+msgstr "Динамички компресор опсега"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:235
+msgid "Timeshift"
+msgstr "Померај времена"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:244
+msgid "<b>Misc</b>"
+msgstr "<b>Остало</b>"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:267
+msgid "Resample to hz"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:277
+msgid "<b>Resampling</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:296
+msgid "Film -> PAL"
+msgstr "Филм -> ПАЛ"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:302
+msgid "PAL->Film"
+msgstr "ПАЛ -> Филм"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:308
+msgid "<b>Fps convert</b>"
+msgstr "<b>Промена броја кадрова по секунди</b>"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:335
+msgid "Automatic ( max is -3dB)"
+msgstr "Аутоматски (највише до -3dB)"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:345
+msgid "Manual (db) : "
+msgstr "Ручно (dB) :"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:357
+msgid "<b>Gain</b>"
+msgstr "<b>Постигни</b>"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:369
+msgid "No change"
+msgstr "Без измена"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:370 avidemux/ADM_dialog/DIA_lame.cpp:169
+msgid "Mono"
+msgstr "Моно"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:371
+#: avidemux/ADM_dialog/DIA_audiocodec.cpp:160
+#: avidemux/ADM_dialog/DIA_lame.cpp:170 avidemux/ADM_dialog/DIA_prefs.cpp:598
+msgid "Stereo"
+msgstr "Стерео"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:372
+msgid "Stereo+Surround"
+msgstr "Стерео+Сараунд"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:373
+msgid "Stereo+Center"
+msgstr "Стерео+Центар"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:374
+msgid "Stereo+Center+Surround"
+msgstr "Стерео+Центар+Сараунд"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:375
+msgid "Stereo Front+Stero Rear"
+msgstr "Стерео напред+Стерео позади"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:376
+msgid "5 channels"
+msgstr "5 канала"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:377
+msgid "5.1"
+msgstr "5.1"
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:378 avidemux/ADM_dialog/DIA_prefs.cpp:599
+msgid "Dolby Prologic"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:379 avidemux/ADM_dialog/DIA_prefs.cpp:600
+msgid "Dolby Prologic 2"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_audio.cpp:381
+msgid "<b>Mixer</b>"
+msgstr "<b>Миксер</b>"
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:312
+msgid "Resize"
+msgstr "Промени величину"
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:326
+msgid " Width "
+msgstr "Ширина"
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:333
+msgid " Height "
+msgstr "Дужина"
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:356
+msgid "Source :"
+msgstr "Извор"
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:362
+msgid "Destination"
+msgstr "Дестинација"
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:376
+#: avidemux/ADM_dialog/DIA_resize.cpp:398
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:123
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:140
+msgid "1:1"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:412
+msgid " Error X:"
+msgstr " Грешка X:"
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:426
+msgid " Error Y:"
+msgstr " Грешка Y:"
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:440
+msgid "16 round up"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:454
+msgid "Bilinear"
+msgstr "Дволинеарни"
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:458
+msgid "Bicubic"
+msgstr "Двокубик"
+
+#: avidemux/ADM_dialog/DIA_resize.cpp:462
+msgid "Lanczos3"
+msgstr "Ланхоз3"
+
+#: avidemux/ADM_dialog/DIA_crop.cpp:544
+msgid "Crop Settings"
+msgstr "Подешавање исецања"
+
+#: avidemux/ADM_dialog/DIA_crop.cpp:578
+msgid "AutoCrop"
+msgstr "Аутоматски одсеци"
+
+#: avidemux/ADM_dialog/DIA_crop.cpp:600
+msgid "Reset"
+msgstr "Поништи"
+
+#: avidemux/ADM_dialog/DIA_crop.cpp:609
+msgid "Crop Left :"
+msgstr "Исеци лево:"
+
+#: avidemux/ADM_dialog/DIA_crop.cpp:617
+msgid "Crop Top:"
+msgstr "Исеци горе:"
+
+#: avidemux/ADM_dialog/DIA_crop.cpp:625
+msgid "Crop Right:"
+msgstr "Исеци десно:"
+
+#: avidemux/ADM_dialog/DIA_crop.cpp:633
+msgid "Crop Bottom:"
+msgstr "Исеци доле:"
+
+#: avidemux/ADM_dialog/DIA_vcodec.cpp:150
+msgid "VideoCodec"
+msgstr "Видео кодек"
+
+#: avidemux/ADM_dialog/DIA_vcodec.cpp:169
+msgid "FFmpeg Mpeg4"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_vcodec.cpp:173
+msgid "FFmpeg H263"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_vcodec.cpp:177
+msgid "FFmpeg H263+"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_vcodec.cpp:181
+msgid "FFmpeg Huffyuv"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_vcodec.cpp:189
+msgid "Divx"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_vcodec.cpp:193
+msgid "Mjpeg"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_vcodec.cpp:199
+msgid "Configure Codec"
+msgstr "Подешавања кодека"
+
+#: avidemux/ADM_dialog/DIA_vcodec.cpp:207 avidemux/ADM_gui2/GUI_main2.cpp:950
+msgid "Calculator"
+msgstr "Калкулатор"
+
+#: avidemux/ADM_dialog/DIA_pause.cpp:93
+msgid "Paused"
+msgstr "Пауза"
+
+#: avidemux/ADM_dialog/DIA_pause.cpp:109
+msgid ""
+"<b>Encoding is paused.</b>\n"
+"\n"
+"You can either resume or Abort it."
+msgstr ""
+"<b>Енкодирање је заустављено.</b>\n"
+"Можете или наставити или прекинути енкодирање.</b>"
+
+#: avidemux/ADM_dialog/DIA_pause.cpp:136
+msgid "Abort"
+msgstr "Прекини"
+
+#: avidemux/ADM_dialog/DIA_pause.cpp:158
+msgid "Resume"
+msgstr "Настави"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:375
+msgid "Subtitle to load"
+msgstr "Титл за учутавање"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:385
+msgid "TTF font to use"
+msgstr "ТТФ словни лик"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:502
+msgid "Subtitle selector"
+msgstr "Бирање титлова"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:515
+msgid "Subtitle file "
+msgstr "Датотека са титлом"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:522
+msgid "Font (TTF)"
+msgstr "Словни лик (ТТФ)"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:529
+msgid "Encoding "
+msgstr "Енкодирање"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:536
+msgid "Font Size"
+msgstr "Величина слова"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:549
+msgid "sub"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:567
+msgid "font"
+msgstr "Словни лик"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:587
+msgid "Ascii"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:613
+msgid "Select color"
+msgstr "Одабери боју"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:626
+msgid "Select"
+msgstr "Одабери"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:630
+msgid "Auto split"
+msgstr "Аутоматски подели"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:636
+msgid "Delay in ms"
+msgstr "Трајање у мсек"
+
+#: avidemux/ADM_dialog/DIA_srt.cpp:651
+msgid "Force background"
+msgstr "Налепи позадину"
+
+#: avidemux/ADM_dialog/DIA_d3d.cpp:102
+msgid "Spatial Luma Thresh"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_d3d.cpp:110
+msgid "Spatial Chroma Thresh"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_d3d.cpp:118
+msgid "Temporal Thresh"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_color.cpp:71
+msgid "Select Color"
+msgstr "Одабери боју"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:56
+msgid "Select Vob file to scan"
+msgstr "Одабери Vob датотеку за скенирање"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:67
+msgid "Select ifo file to use"
+msgstr "Одабери коју ifo датотеку да користим"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:78
+msgid "Select vobsub to write"
+msgstr "Одабери vobsub за упис"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:92
+msgid "Invalid vobname"
+msgstr "Погрешно vob име"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:92
+msgid "Please select or enter a valid vob name"
+msgstr "Одаберите или упишите исправно vob име"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:98
+msgid "Invalid ifo"
+msgstr "Погрешан ifo"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:98
+msgid "Please select or enter a valid ifo file"
+msgstr "Одаберите или упишите исправну ifo датотеку"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:104
+msgid "Invalid vobsubname"
+msgstr "Погрешно vobsub име"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:104
+msgid "Please select or enter a valid vobsub file"
+msgstr "Одаберите или упишите исправно vobsub име"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:152
+msgid "Vob to Vobsub"
+msgstr "Vob у Vobsub"
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:162
+msgid "Vob :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:169
+msgid "Ifo :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_v2v.cpp:176
+msgid "Output vobsub (.idx) :"
+msgstr "Излазни vobsub (.idx) :"
+
+#: avidemux/ADM_dialog/DIA_preview.cpp:283 avidemux/ADM_gui2/GUI_main2.cpp:961
+#: avidemux/ADM_filter/gui_filtersub.cpp:150
+msgid "Preview"
+msgstr "Преглед"
+
+#: avidemux/ADM_dialog/DIA_preview.cpp:319
+msgid "Stack Field"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_hue.cpp:246
+msgid "Hue/Saturation"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_hue.cpp:260
+msgid "<b>Hue:</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_hue.cpp:268
+msgid "<b>Saturation:</b>"
+msgstr "<b>Засићеност:</b>"
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:92
+msgid "Select background picture"
+msgstr "Одабери позадинску слику"
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:178
+msgid "Animated Menu"
+msgstr "Анимирани мени"
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:202
+msgid "BackGround Image :"
+msgstr "Позадинска слика"
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:209
+msgid "Standard"
+msgstr "Стандардно"
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:216
+msgid "NTSC (default is PAL)"
+msgstr "NTSC (подразумевано је PAL)"
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:236
+msgid "Vignette Width"
+msgstr "Ширина слике"
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:243
+msgid "Vignette Height"
+msgstr "Висина слике"
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:266
+msgid "<b>General</b>"
+msgstr "<b>Опште</b>"
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:285
+msgid "Chapter 1"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:292
+msgid "Chapter 2"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:299
+msgid "Chapter 3"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:306
+msgid "Chapter 4"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:313
+msgid "Chapter 5"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:320
+msgid "Chapter 6"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:333
+#: avidemux/ADM_dialog/DIA_animated.cpp:342
+#: avidemux/ADM_dialog/DIA_animated.cpp:351
+#: avidemux/ADM_dialog/DIA_animated.cpp:360
+#: avidemux/ADM_dialog/DIA_animated.cpp:369
+#: avidemux/ADM_dialog/DIA_animated.cpp:378
+msgid "Start frame for this vignette."
+msgstr "Почетнки кадар за ову слику"
+
+#: avidemux/ADM_dialog/DIA_animated.cpp:381
+msgid "<b>TimeCode</b>"
+msgstr "<b>Временски код</b>"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:85
+msgid "Mini OCR"
+msgstr "Мини ОЦР"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:118
+msgid "<b>Glyphs</b>"
+msgstr "<b>Карактери</b>"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:132
+msgid "# of Glyphs :"
+msgstr "# од карактера"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:140
+msgid "# of lines"
+msgstr "# од линија"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:164
+msgid "<b>Stats</b>"
+msgstr "<b>Статистика</b>"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:186
+msgid "  "
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:195
+msgid "VobSub"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:217
+msgid "Output Srt"
+msgstr "Излазни Srt"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:222
+msgid "<b>Files</b>"
+msgstr "<b>Датотеке</b>"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:228
+msgid "StartOcr"
+msgstr "Почни ОЦР"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:249
+msgid "Current Glyph"
+msgstr "Тренутни карактер"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:263
+msgid " Text:"
+msgstr " Текст:"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:287
+msgid "Calibrate"
+msgstr "Калибрација"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:292
+msgid "Skip all"
+msgstr "Прескочи све"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:297
+msgid "Skip Glyph"
+msgstr "Прескочи карактер"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:302
+msgid "Ignore glyph"
+msgstr "Игнориши карактер"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:307
+msgid "Ok"
+msgstr "У реду"
+
+#: avidemux/ADM_dialog/DIA_ocr.cpp:316
+msgid "<b>Bitmap</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_Msmooth.cpp:116
+msgid "MSmooth settings"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_Msmooth.cpp:125
+msgid "High Quality :"
+msgstr "Висок квалитет"
+
+#: avidemux/ADM_dialog/DIA_Msmooth.cpp:133
+msgid "Show Mask :"
+msgstr "Прикажи маску :"
+
+#: avidemux/ADM_dialog/DIA_Msmooth.cpp:149
+msgid "Filter Strength :"
+msgstr "Јчина филтера :"
+
+#: avidemux/ADM_dialog/DIA_eq2.cpp:330
+msgid "MPlayer eq2"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_eq2.cpp:356
+msgid "Brigh_tness:"
+msgstr "_Осветљеност:"
+
+#: avidemux/ADM_dialog/DIA_eq2.cpp:364
+msgid "_Saturation:"
+msgstr "_Засићење"
+
+#: avidemux/ADM_dialog/DIA_eq2.cpp:399
+msgid "_Contrast:"
+msgstr "Контраст:"
+
+#: avidemux/ADM_dialog/DIA_eq2.cpp:425
+msgid "_Initial:"
+msgstr "_Укупно"
+
+#: avidemux/ADM_dialog/DIA_eq2.cpp:451
+msgid "_Red:"
+msgstr "_Црвено:"
+
+#: avidemux/ADM_dialog/DIA_eq2.cpp:468
+msgid "_Green:"
+msgstr "_Зелено:"
+
+#: avidemux/ADM_dialog/DIA_eq2.cpp:476
+msgid "_Blue:"
+msgstr "_Плаво:"
+
+#: avidemux/ADM_dialog/DIA_eq2.cpp:484
+msgid "_Weight:"
+msgstr "_Количина"
+
+#: avidemux/ADM_dialog/DIA_eq2.cpp:510
+msgid "<b>Gamma</b>"
+msgstr "<b>Гама</b>"
+
+#: avidemux/ADM_dialog/DIA_dmx.cpp:134
+msgid "Mpeg, Select audio"
+msgstr "Mpeg, одабери звук"
+
+#: avidemux/ADM_dialog/DIA_dmx.cpp:151
+msgid "File :"
+msgstr "Датотека :"
+
+#: avidemux/ADM_dialog/DIA_dmx.cpp:159
+msgid "Type :"
+msgstr "Тип :"
+
+#: avidemux/ADM_dialog/DIA_dmx.cpp:167
+msgid "Video stream :"
+msgstr "Видео стрим :"
+
+#: avidemux/ADM_dialog/DIA_dmx.cpp:175
+msgid "label5"
+msgstr "наслов5"
+
+#: avidemux/ADM_dialog/DIA_dmx.cpp:183
+msgid "label6"
+msgstr "наслов6"
+
+#: avidemux/ADM_dialog/DIA_dmx.cpp:191
+msgid "label7"
+msgstr "наслов7"
+
+#: avidemux/ADM_dialog/DIA_dmx.cpp:199
+msgid "<b>Input file</b>"
+msgstr "<b>Улазна датотека</b>"
+
+#: avidemux/ADM_dialog/DIA_dmx.cpp:213
+msgid "Detected Audio :"
+msgstr "Нађени звук :"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:108 avidemux/ADM_dialog/DIA_DVDff.cpp:112
+msgid "Bitrate out of range"
+msgstr "Битрејт ван опсега"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:108
+msgid "choosing maxBitrate instead"
+msgstr "одабирам највећи битрејт уместо"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:112
+msgid "choosing minBitrate instead"
+msgstr "одабитам највећи битрејт уместо"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:359
+msgid "DVD FFmpeg codec settings"
+msgstr "Подешавања DVD FFmpeg кодека"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:376
+msgid "Encoding Type"
+msgstr "Тип енкодирања"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:384
+msgid "Target Bitrate (kb/s)   "
+msgstr "Излазни битрејт (кбит/сек)"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:392 avidemux/ADM_dialog/DIA_xvid.cpp:480
+msgid "Quantizer"
+msgstr "Квантизер"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:408
+msgid "Single Pass - Bitrate"
+msgstr "Један пролаз - Битрејт"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:412
+msgid "Single Pass - Quantizer"
+msgstr "Два пролаза - Квантизер"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:416
+msgid "Two Pass (filesize) "
+msgstr "Два пролаза (величина датотеке) "
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:420
+msgid "Two Pass (bitrate) "
+msgstr "Два пролаза (битрејт) "
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:441
+msgid "<b>Encoding mode </b>"
+msgstr "<b>Тип енкодирања</b>"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:455
+msgid "Minimum Bitrate (kb/s) "
+msgstr "Најмањи битрејт (кбит/сек) "
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:463
+msgid "Maximum Bitrate (kb/s)"
+msgstr "Највећи битрејт (кбит/сек) "
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:483
+msgid "Use Xvid Ratecontrol"
+msgstr "Користи Xvid конторлу протока"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:497
+msgid "VBV buffer size"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:513
+msgid "VCD: 40 kB"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:517
+msgid "SVCD: 112 kB"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:521
+msgid "DVD: 224 kB"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:527
+msgid "<b>RateControl</b>"
+msgstr "<b>Контрола протока</b>"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:559
+msgid "<b>Interlacing</b>"
+msgstr "<b>Испреплетње</b>"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:589
+msgid "<b>Aspect Ratio</b>"
+msgstr "<b>Размера</b>"
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:621
+msgid "HR-Tmpgenc"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:627
+msgid "<b>Matrices</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:654
+msgid "For info, size is : "
+msgstr "За информацију, величина је : "
+
+#: avidemux/ADM_dialog/DIA_DVDff.cpp:664
+msgid "<b>Indicative audio size</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_4entries.cpp:103
+msgid "Left:"
+msgstr "Лево:"
+
+#: avidemux/ADM_dialog/DIA_4entries.cpp:119
+msgid "Right:"
+msgstr "Десно:"
+
+#: avidemux/ADM_dialog/DIA_4entries.cpp:135
+msgid "Top:"
+msgstr "Горе:"
+
+#: avidemux/ADM_dialog/DIA_4entries.cpp:151
+msgid "Bottom:"
+msgstr "Доле:"
+
+#: avidemux/ADM_dialog/DIA_deblend.cpp:86
+msgid "Blend removal / Hard pulldown removal"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_deblend.cpp:96
+#: avidemux/ADM_dialog/DIA_deblend.cpp:103
+#: avidemux/ADM_dialog/DIA_deblend.cpp:110
+msgid "%"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_deblend.cpp:131
+msgid "Noise threshold :"
+msgstr "Осетљивост на шум"
+
+#: avidemux/ADM_dialog/DIA_deblend.cpp:138
+msgid "Identical threshold :"
+msgstr "Иста осетљивост"
+
+#: avidemux/ADM_dialog/DIA_deblend.cpp:145
+msgid "Show metrics"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_deblend.cpp:158
+msgid ""
+"If the image is closer than treshold, is it considered valid, smaller means "
+"more false detection"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_deblend.cpp:167
+msgid ""
+"If pixels are closer than noise threshold, they are considered identical"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_deblend.cpp:176
+msgid ""
+"If the picture are less than identical threshold, they are considered "
+"identical"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_deblend.cpp:184
+msgid "Show metrics in picture (debug only)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_rotate.cpp:226
+msgid "Rotate"
+msgstr "Окрени"
+
+#: avidemux/ADM_dialog/DIA_audiocodec.cpp:112
+msgid "Audio settings"
+msgstr "Подешавање звука"
+
+#: avidemux/ADM_dialog/DIA_audiocodec.cpp:121
+#: avidemux/ADM_dialog/DIA_x264.cpp:530
+msgid "Bitrate"
+msgstr "Битрејт"
+
+#: avidemux/ADM_dialog/DIA_audiocodec.cpp:149
+msgid "Mode (ignored for mono)"
+msgstr "Мод (игнорише за моно)"
+
+#: avidemux/ADM_dialog/DIA_audiocodec.cpp:164
+msgid "Joint Stereo"
+msgstr "Придружени стерео"
+
+#: avidemux/ADM_dialog/DIA_muxer.cpp:125
+msgid "AVI muxer options"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_muxer.cpp:138
+msgid "Mux audio every"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_muxer.cpp:146
+msgid "Split in packets of"
+msgstr "Подели на пакете од"
+
+#: avidemux/ADM_dialog/DIA_muxer.cpp:168
+msgid "video frame(s)"
+msgstr "видео кадар/кадрови"
+
+#: avidemux/ADM_dialog/DIA_muxer.cpp:176
+msgid "bytes"
+msgstr "бајта"
+
+#: avidemux/ADM_dialog/DIA_muxer.cpp:184
+msgid "Autosplit file every"
+msgstr "Подели фајл сваких"
+
+#: avidemux/ADM_dialog/DIA_muxer.cpp:199
+msgid "megabytes"
+msgstr "мегабајта"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:442
+msgid "X264 configuration"
+msgstr "X264 подешавања"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:457
+msgid "Encoding Mode:"
+msgstr "Режим енкодирања:"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:469
+msgid "Entry input for target file size or bitrate"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:471
+msgid "Quantizer (0-51):"
+msgstr "Квантизер (0-51):"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:484
+msgid ""
+"Constant Quantizer - Each frame will the same compression. Low numbers equal "
+"higher quality while high numbers equal lower quality"
+msgstr ""
+"Константни квантизер - Сваки кадар ће имати исту компресију. Ниже "
+"вредностидају виши квалитет док више вредности дају мањи квалитет"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:494
+msgid "Load Defaults"
+msgstr "Учитај подразумевано"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:498
+msgid "Load the stored default settings for the codec"
+msgstr "Учитај сачувана подразумевана подешавања за кодек"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:500
+msgid "Save Defaults"
+msgstr "Сними као подразумевано"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:504
+msgid "Save the current codec configuration as the stored default settings"
+msgstr "Снима тренутна подешавања кодека као подразумеване вредности"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:506
+msgid "Reset Defaults"
+msgstr "Поништи подразумевано"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:510
+msgid "Reload the initial default codec settings"
+msgstr "Поново учитај додатна подразумевана подешавања кодека"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:512
+msgid "Target Size:"
+msgstr "Излазна величина"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:524
+msgid "Single Pass - Quality Quantizer (Average)"
+msgstr "Један пролаз - Квантизер (Просек)"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:525
+msgid "Single Pass - Quality Quantizer (Constant)"
+msgstr "Један пролаз - Квантизер (Константно)"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:526
+msgid "Single Pass - Bitrate (Average)"
+msgstr "Један пролаз - Битрејт (Просек)"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:527
+msgid "Two Pass - File Size"
+msgstr "Два пролаза - Коначна величина"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:528
+msgid "Two Pass - Average bitrate"
+msgstr "Два пролаза - Просечан битрејт"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:556
+msgid "Partition decision"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:563
+msgid "Method"
+msgstr "Метода"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:575
+msgid "1  - Extremely Low (Fastest)"
+msgstr "1 - Најниже (Најбрже)"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:576
+msgid "2  - Very Low"
+msgstr "2 - Веома ниско"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:577
+msgid "3  - Low"
+msgstr "3 - Ниско"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:578
+msgid "4  - Medium"
+msgstr "4 - Средње"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:579
+msgid "5  - High (Default)"
+msgstr "5 - Високо (Подразумевано)"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:580
+msgid "6  - Very High"
+msgstr "6 - Веома високо"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:581
+msgid "6B - Very High (RDO on Bframes)"
+msgstr "6Б - Веома високо (RDO на Б кадровима)"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:582
+msgid "7 - Ultra High"
+msgstr "7 - Највише"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:583
+msgid "7B - Ultra High (RDO on Bframes)"
+msgstr "7Б - Највише (RDO на Б кадровима)"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:590
+msgid "Diamond search"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:591
+msgid "Hexagonal search"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:592
+msgid "Uneven multi hexagon"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:593
+msgid "Exhaustive search"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:605
+msgid ""
+"Set how many previous frames can be referenced by a P/B-frame. Numbers above "
+"5 do not seem to improve quality greatly. Numbers are 3 to 5 are recommended"
+msgstr ""
+"Намести колико претходних кадрова може бити повезано од стране П/Б кадра. "
+"Бројевиизнад 5 изгледа да не унапређују знатно квалитет. Бројеви од 3 до 5 "
+"су препорулјиви"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:608
+msgid "Max. Ref. frames"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:615
+msgid "Range"
+msgstr "Опсег"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:622
+msgid "Chroma ME"
+msgstr "Сигнал боје ME"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:627
+msgid ""
+"Uses chroma (color) components for motion for compression and helps the "
+"quality"
+msgstr ""
+"Користи компоненте за кретање сигнала боје за компресију и помаже квалитету."
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:630
+msgid "Mixed Refs"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:635
+msgid "Calculate referencing individually based on each partition"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:643
+msgid ""
+"Define how many pixels are analysised. The higher the range the more "
+"accurate the analysis but the slower the encoding time"
+msgstr ""
+"Одређује колико пиксела су анализирана. Већи опсег већа прецизност у "
+"анализиали спорије енкодирање"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:645
+msgid "<b>Motion Estimation</b>"
+msgstr "<b>Одређивање покрета</b>"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:667
+msgid "Sample A/R "
+msgstr "Просто A/R"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:674 avidemux/ADM_dialog/DIA_x264.cpp:685
+msgid ""
+"Enforce the size of a decoded pixel decoded to a certain value. Leave this "
+"at 1:1 for non-anamorphic video"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:675 avidemux/ADM_dialog/DIA_x264.cpp:686
+msgid "1"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:692
+msgid "Deblocking Filter :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:695
+msgid "Enable in-loop deblocking to filter the video"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:708
+msgid "Set the amount of blurring to use for block edges when they are found"
+msgstr ""
+"Одреди ниво замућења који да користим за ивице блокова када оне постоје"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:717
+msgid "Define the level for when deblocking is applied"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:720
+msgid "<i>Threshold</i>"
+msgstr "<i>Осетљивост</i>"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:728
+msgid "<i>Strength</i>"
+msgstr "<i>Јачина</i>"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:740
+msgid "CABAC"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:743
+msgid ""
+"Lossless compression method which usually improves the bitrate usage by 15% "
+"(especially on high bitrate). Helps the quality a lot but is slower. "
+msgstr ""
+"Компресија без губљења података која обично унапређује коришћење битрејта за "
+"15%(посебно на високим битрејтовима). Даје много бољи квалитет али је "
+"спорије."
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:746
+msgid "Trellis"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:755
+msgid ""
+"Use rate distortion quantization to find optimal encoding for each block. "
+"Level 0 equals disabled, level 1 equals normal and level 2 equals high"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:757
+msgid "Noise Reduction"
+msgstr "Умањење шума"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:766
+msgid "Set the amount of noise reduction"
+msgstr "Одабери ниво умањења шума"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:768
+msgid "<b>Misc. Options</b>"
+msgstr "<b>Остале опције</b>"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:795
+msgid "8x8 Transform"
+msgstr "8x8 трансформација"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:798
+msgid "General block breakdown transformation"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:801
+msgid "8x8, 8x16 and 16x8 P-frame search"
+msgstr "8x8, 8x16 и 16x8 претрага П кадра"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:804
+msgid "Improve the P-frame quality"
+msgstr "Унапреди квалитет П кадра"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:807
+msgid "8x8, 8x16 and 16x8 B-frame search"
+msgstr "8x8, 8x16 и 16x8 претрага Б кадра"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:810
+msgid "Improve the B-frame quality"
+msgstr "Унапреди квалитет Б кадра"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:813
+msgid "4x4, 4x8 and 8x4 P-frame search"
+msgstr "4x4, 4x8 и 8x4 претрага П кадра"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:816
+msgid "Further improve the P-frame quality"
+msgstr "Још унапреди квлитет П кадра"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:818
+msgid "8x8 Intra search"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:821
+msgid "Enable DCT Intra block search to improve quality"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:824
+msgid "4x4 Intra search"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:827
+msgid "Further enable DCT Intra block search to improve quality"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:830
+msgid "<b>Partition Macroblocks</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:853
+msgid "Bias"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:866
+msgid ""
+"Increase / decrease probability for how often B-frames are used. Will not "
+"violate the maximum consecutive frame limit"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:869
+msgid "Max Consecutive"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:882
+msgid ""
+"Set the maximum number of consecutive B-frames. This defines how many "
+"duplicate frames can be droped. Numbers 2 to 5 are recommended. This greatly "
+"improves the use of bitrate and quality"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:889
+msgid "Bidirectional ME"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:894
+msgid ""
+"Jointly optimize both Motion Vector's in B-frames. This will improve quality "
+"but take more time for encoding"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:896
+msgid "Weighted biprediction"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:901
+msgid "Enables weighting of B-frames to help fades"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:904
+msgid "Adaptative DCT"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:909
+msgid ""
+"Use fewer B-frame if needed. This is always recommended. If not enabled, the "
+"codec will always use the maximum number of consecutive B-frames"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:912
+msgid "Use as reference"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:917
+msgid ""
+"Allow B-frames to make references non-linearly to another B-frame (instead "
+"of creating a duplicate copy)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:923
+msgid "B-Frame Direct Mode:  "
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:931
+msgid "Temporal"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:932
+msgid "Spatial"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:934
+msgid "<b>B-Frames</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:939
+msgid "Partitions & Frames"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:967
+msgid "Set how much \"bitrate bonus\" a keyframe can get"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:970
+msgid "Keyframe boots (%)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:977
+msgid "B-frame reduction (%)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:984
+msgid "Bitrate variability (%)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:997
+msgid ""
+"Set how much bitrate is deducted from a B-frame as compared to the previous "
+"P-frame"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1006
+msgid ""
+"Define how much the bitrate can fluctuate over the entire video. 0% results "
+"in a constant bitrate stream, while 100% results in a pure quality based "
+"bitrate stream"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1009
+msgid "<b>Bitrate</b>"
+msgstr "<b>Битрјт</b>"
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1027
+msgid "Min Qp"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1034
+msgid "Max Qp"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1041
+msgid "Max QP Step"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1055
+msgid "Enforce a minimum quantizer level"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1064
+msgid "Enforce a maximum quantizer level"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1073
+msgid ""
+"Define how much the quantizer rate can change between two consecutive frames"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1076
+msgid "<b>Quantization Limits</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1094
+msgid "Scene Cut Threshold"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1108
+msgid ""
+"Increase / decrease sensitivity for detecting Scene Changes to compensate "
+"for. Improves I-frame usage and helps quality"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1111
+msgid "Min IDR frame interval"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1124
+msgid ""
+"Set minimum frame interval between IDR frames. Defines the minimum amount a "
+"frame can be reused and referenced by other frames before a new clean one is "
+"established"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1133
+msgid ""
+"Set maximum frame interval between IDR frames. Defines the maximum amount a "
+"frame can be reused and referenced by other frames before a new clean one is "
+"established"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1136
+msgid "Max IDR frame interval"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1143
+msgid "<b>More Rate Settings</b>"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_x264.cpp:1148
+msgid "Rate Control"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:137
+msgid "Chroma Noise Reduction 2"
+msgstr "Умањење шума сигнала боје (CNR2)"
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:162
+msgid "<b>Scene change Treshold</b>"
+msgstr "<b>Осетљивост на промену сцене</b>"
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:181
+msgid "Sensibility"
+msgstr "Осетљивост"
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:189
+msgid "Max"
+msgstr "Највише"
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:204
+msgid "Luma :"
+msgstr "Осветљеност :"
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:211
+msgid "Chroma U :"
+msgstr "Сигнал боје U"
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:218
+msgid "Chroma V :"
+msgstr "Сигнал боје V :"
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:261
+msgid "Narrow"
+msgstr "Сужење"
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:286
+msgid "<b>Settings</b>"
+msgstr "<b>Поставке</b>"
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:305
+msgid "Use also chroma to detect scene change"
+msgstr "Такође користи сигнал боја за откривање промене сцене"
+
+#: avidemux/ADM_dialog/DIA_cnr2.cpp:309
+msgid "<b>Mode</b>"
+msgstr "<b>Мод</b>"
+
+#: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:94
+msgid "Lavc PP Deint"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:103
+msgid "Deinterlacing : "
+msgstr "Расплитање :"
+
+#: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:111
+msgid "AutoLevel :"
+msgstr "Аутоматски ниво"
+
+#: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:137
+msgid "Linear Blend"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:141
+msgid "Linear Interpolation"
+msgstr "Линеарна интерполација"
+
+#: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:145
+msgid "Cubic interpolation"
+msgstr "Кубик интерполација"
+
+#: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:149
+msgid "Median Deinterlacer"
+msgstr "Медиан расплитач"
+
+#: avidemux/ADM_dialog/DIA_lavpp_deint.cpp:153
+msgid "FFmpeg Deinterlacer"
+msgstr "FFmpeg расплитач"
+
+#: avidemux/ADM_dialog/DIA_conv.cpp:115
+msgid "Convolution settings"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_conv.cpp:124
+#: avidemux/ADM_dialog/DIA_contrast.cpp:354
+msgid "Luma"
+msgstr "Осветњеност"
+
+#: avidemux/ADM_dialog/DIA_conv.cpp:128 avidemux/ADM_dialog/DIA_dectel.cpp:268
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1018
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1025
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1032
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1039
+msgid "Chroma"
+msgstr "Сигнал боја"
+
+#: avidemux/ADM_dialog/DIA_mpdelogo.cpp:356
+msgid "Mplayer Delogo"
+msgstr "MPlayer уклањање логоа"
+
+#: avidemux/ADM_dialog/DIA_mpdelogo.cpp:374
+msgid "X"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mpdelogo.cpp:381
+msgid "Y"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mpdelogo.cpp:388
+msgid "W"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mpdelogo.cpp:395
+msgid "H"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mpdelogo.cpp:402
+msgid "Band"
+msgstr ""
+
+#. TRANSLATORS: Replace this string with your names, one name per line.
+#: avidemux/ADM_dialog/DIA_about.cpp:56
+msgid "translator-credits"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_about.cpp:71 avidemux/ADM_gui2/GUI_main2.cpp:260
+msgid "Avidemux"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_about.cpp:72
+msgid "© 2001-2006 Mean"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_about.cpp:73
+msgid "Multiplatform video editor"
+msgstr "Мултиплатформски видео уређивач"
+
+#: avidemux/ADM_dialog/DIA_about.cpp:74
+msgid ""
+"Avidemux is free software; you can redistribute it and/or modify it \n"
+"under the terms of the GNU General Public License version 2 \n"
+"as published by the Free Software Foundation.\n"
+"\n"
+"\t\t    GNU GENERAL PUBLIC LICENSE\n"
+"\t\t       Version 2, June 1991\n"
+"\n"
+" Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n"
+"                       51 Franklin St, Fifth Floor, Boston, MA  02110-1301  "
+"USA\n"
+" Everyone is permitted to copy and distribute verbatim copies\n"
+" of this license document, but changing it is not allowed.\n"
+"\n"
+"\t\t\t    Preamble\n"
+"\n"
+"  The licenses for most software are designed to take away your\n"
+"freedom to share and change it.  By contrast, the GNU General Public\n"
+"License is intended to guarantee your freedom to share and change free\n"
+"software--to make sure the software is free for all its users.  This\n"
+"General Public License applies to most of the Free Software\n"
+"Foundation's software and to any other program whose authors commit to\n"
+"using it.  (Some other Free Software Foundation software is covered by\n"
+"the GNU Library General Public License instead.)  You can apply it to\n"
+"your programs, too.\n"
+"\n"
+"  When we speak of free software, we are referring to freedom, not\n"
+"price.  Our General Public Licenses are designed to make sure that you\n"
+"have the freedom to distribute copies of free software (and charge for\n"
+"this service if you wish), that you receive source code or can get it\n"
+"if you want it, that you can change the software or use pieces of it\n"
+"in new free programs; and that you know you can do these things.\n"
+"\n"
+"  To protect your rights, we need to make restrictions that forbid\n"
+"anyone to deny you these rights or to ask you to surrender the rights.\n"
+"These restrictions translate to certain responsibilities for you if you\n"
+"distribute copies of the software, or if you modify it.\n"
+"\n"
+"  For example, if you distribute copies of such a program, whether\n"
+"gratis or for a fee, you must give the recipients all the rights that\n"
+"you have.  You must make sure that they, too, receive or can get the\n"
+"source code.  And you must show them these terms so they know their\n"
+"rights.\n"
+"\n"
+"  We protect your rights with two steps: (1) copyright the software, and\n"
+"(2) offer you this license which gives you legal permission to copy,\n"
+"distribute and/or modify the software.\n"
+"\n"
+"  Also, for each author's protection and ours, we want to make certain\n"
+"that everyone understands that there is no warranty for this free\n"
+"software.  If the software is modified by someone else and passed on, we\n"
+"want its recipients to know that what they have is not the original, so\n"
+"that any problems introduced by others will not reflect on the original\n"
+"authors' reputations.\n"
+"\n"
+"  Finally, any free program is threatened constantly by software\n"
+"patents.  We wish to avoid the danger that redistributors of a free\n"
+"program will individually obtain patent licenses, in effect making the\n"
+"program proprietary.  To prevent this, we have made it clear that any\n"
+"patent must be licensed for everyone's free use or not licensed at all.\n"
+"\n"
+"  The precise terms and conditions for copying, distribution and\n"
+"modification follow.\n"
+"\n"
+"\t\t    GNU GENERAL PUBLIC LICENSE\n"
+"   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION\n"
+"\n"
+"  0. This License applies to any program or other work which contains\n"
+"a notice placed by the copyright holder saying it may be distributed\n"
+"under the terms of this General Public License.  The \"Program\", below,\n"
+"refers to any such program or work, and a \"work based on the Program\"\n"
+"means either the Program or any derivative work under copyright law:\n"
+"that is to say, a work containing the Program or a portion of it,\n"
+"either verbatim or with modifications and/or translated into another\n"
+"language.  (Hereinafter, translation is included without limitation in\n"
+"the term \"modification\".)  Each licensee is addressed as \"you\".\n"
+"\n"
+"Activities other than copying, distribution and modification are not\n"
+"covered by this License; they are outside its scope.  The act of\n"
+"running the Program is not restricted, and the output from the Program\n"
+"is covered only if its contents constitute a work based on the\n"
+"Program (independent of having been made by running the Program).\n"
+"Whether that is true depends on what the Program does.\n"
+"\n"
+"  1. You may copy and distribute verbatim copies of the Program's\n"
+"source code as you receive it, in any medium, provided that you\n"
+"conspicuously and appropriately publish on each copy an appropriate\n"
+"copyright notice and disclaimer of warranty; keep intact all the\n"
+"notices that refer to this License and to the absence of any warranty;\n"
+"and give any other recipients of the Program a copy of this License\n"
+"along with the Program.\n"
+"\n"
+"You may charge a fee for the physical act of transferring a copy, and\n"
+"you may at your option offer warranty protection in exchange for a fee.\n"
+"\n"
+"  2. You may modify your copy or copies of the Program or any portion\n"
+"of it, thus forming a work based on the Program, and copy and\n"
+"distribute such modifications or work under the terms of Section 1\n"
+"above, provided that you also meet all of these conditions:\n"
+"\n"
+"    a) You must cause the modified files to carry prominent notices\n"
+"    stating that you changed the files and the date of any change.\n"
+"\n"
+"    b) You must cause any work that you distribute or publish, that in\n"
+"    whole or in part contains or is derived from the Program or any\n"
+"    part thereof, to be licensed as a whole at no charge to all third\n"
+"    parties under the terms of this License.\n"
+"\n"
+"    c) If the modified program normally reads commands interactively\n"
+"    when run, you must cause it, when started running for such\n"
+"    interactive use in the most ordinary way, to print or display an\n"
+"    announcement including an appropriate copyright notice and a\n"
+"    notice that there is no warranty (or else, saying that you provide\n"
+"    a warranty) and that users may redistribute the program under\n"
+"    these conditions, and telling the user how to view a copy of this\n"
+"    License.  (Exception: if the Program itself is interactive but\n"
+"    does not normally print such an announcement, your work based on\n"
+"    the Program is not required to print an announcement.)\n"
+"\n"
+"These requirements apply to the modified work as a whole.  If\n"
+"identifiable sections of that work are not derived from the Program,\n"
+"and can be reasonably considered independent and separate works in\n"
+"themselves, then this License, and its terms, do not apply to those\n"
+"sections when you distribute them as separate works.  But when you\n"
+"distribute the same sections as part of a whole which is a work based\n"
+"on the Program, the distribution of the whole must be on the terms of\n"
+"this License, whose permissions for other licensees extend to the\n"
+"entire whole, and thus to each and every part regardless of who wrote it.\n"
+"\n"
+"Thus, it is not the intent of this section to claim rights or contest\n"
+"your rights to work written entirely by you; rather, the intent is to\n"
+"exercise the right to control the distribution of derivative or\n"
+"collective works based on the Program.\n"
+"\n"
+"In addition, mere aggregation of another work not based on the Program\n"
+"with the Program (or with a work based on the Program) on a volume of\n"
+"a storage or distribution medium does not bring the other work under\n"
+"the scope of this License.\n"
+"\n"
+"  3. You may copy and distribute the Program (or a work based on it,\n"
+"under Section 2) in object code or executable form under the terms of\n"
+"Sections 1 and 2 above provided that you also do one of the following:\n"
+"\n"
+"    a) Accompany it with the complete corresponding machine-readable\n"
+"    source code, which must be distributed under the terms of Sections\n"
+"    1 and 2 above on a medium customarily used for software interchange; "
+"or,\n"
+"\n"
+"    b) Accompany it with a written offer, valid for at least three\n"
+"    years, to give any third party, for a charge no more than your\n"
+"    cost of physically performing source distribution, a complete\n"
+"    machine-readable copy of the corresponding source code, to be\n"
+"    distributed under the terms of Sections 1 and 2 above on a medium\n"
+"    customarily used for software interchange; or,\n"
+"\n"
+"    c) Accompany it with the information you received as to the offer\n"
+"    to distribute corresponding source code.  (This alternative is\n"
+"    allowed only for noncommercial distribution and only if you\n"
+"    received the program in object code or executable form with such\n"
+"    an offer, in accord with Subsection b above.)\n"
+"\n"
+"The source code for a work means the preferred form of the work for\n"
+"making modifications to it.  For an executable work, complete source\n"
+"code means all the source code for all modules it contains, plus any\n"
+"associated interface definition files, plus the scripts used to\n"
+"control compilation and installation of the executable.  However, as a\n"
+"special exception, the source code distributed need not include\n"
+"anything that is normally distributed (in either source or binary\n"
+"form) with the major components (compiler, kernel, and so on) of the\n"
+"operating system on which the executable runs, unless that component\n"
+"itself accompanies the executable.\n"
+"\n"
+"If distribution of executable or object code is made by offering\n"
+"access to copy from a designated place, then offering equivalent\n"
+"access to copy the source code from the same place counts as\n"
+"distribution of the source code, even though third parties are not\n"
+"compelled to copy the source along with the object code.\n"
+"\n"
+"  4. You may not copy, modify, sublicense, or distribute the Program\n"
+"except as expressly provided under this License.  Any attempt\n"
+"otherwise to copy, modify, sublicense or distribute the Program is\n"
+"void, and will automatically terminate your rights under this License.\n"
+"However, parties who have received copies, or rights, from you under\n"
+"this License will not have their licenses terminated so long as such\n"
+"parties remain in full compliance.\n"
+"\n"
+"  5. You are not required to accept this License, since you have not\n"
+"signed it.  However, nothing else grants you permission to modify or\n"
+"distribute the Program or its derivative works.  These actions are\n"
+"prohibited by law if you do not accept this License.  Therefore, by\n"
+"modifying or distributing the Program (or any work based on the\n"
+"Program), you indicate your acceptance of this License to do so, and\n"
+"all its terms and conditions for copying, distributing or modifying\n"
+"the Program or works based on it.\n"
+"\n"
+"  6. Each time you redistribute the Program (or any work based on the\n"
+"Program), the recipient automatically receives a license from the\n"
+"original licensor to copy, distribute or modify the Program subject to\n"
+"these terms and conditions.  You may not impose any further\n"
+"restrictions on the recipients' exercise of the rights granted herein.\n"
+"You are not responsible for enforcing compliance by third parties to\n"
+"this License.\n"
+"\n"
+"  7. If, as a consequence of a court judgment or allegation of patent\n"
+"infringement or for any other reason (not limited to patent issues),\n"
+"conditions are imposed on you (whether by court order, agreement or\n"
+"otherwise) that contradict the conditions of this License, they do not\n"
+"excuse you from the conditions of this License.  If you cannot\n"
+"distribute so as to satisfy simultaneously your obligations under this\n"
+"License and any other pertinent obligations, then as a consequence you\n"
+"may not distribute the Program at all.  For example, if a patent\n"
+"license would not permit royalty-free redistribution of the Program by\n"
+"all those who receive copies directly or indirectly through you, then\n"
+"the only way you could satisfy both it and this License would be to\n"
+"refrain entirely from distribution of the Program.\n"
+"\n"
+"If any portion of this section is held invalid or unenforceable under\n"
+"any particular circumstance, the balance of the section is intended to\n"
+"apply and the section as a whole is intended to apply in other\n"
+"circumstances.\n"
+"\n"
+"It is not the purpose of this section to induce you to infringe any\n"
+"patents or other property right claims or to contest validity of any\n"
+"such claims; this section has the sole purpose of protecting the\n"
+"integrity of the free software distribution system, which is\n"
+"implemented by public license practices.  Many people have made\n"
+"generous contributions to the wide range of software distributed\n"
+"through that system in reliance on consistent application of that\n"
+"system; it is up to the author/donor to decide if he or she is willing\n"
+"to distribute software through any other system and a licensee cannot\n"
+"impose that choice.\n"
+"\n"
+"This section is intended to make thoroughly clear what is believed to\n"
+"be a consequence of the rest of this License.\n"
+"\n"
+"  8. If the distribution and/or use of the Program is restricted in\n"
+"certain countries either by patents or by copyrighted interfaces, the\n"
+"original copyright holder who places the Program under this License\n"
+"may add an explicit geographical distribution limitation excluding\n"
+"those countries, so that distribution is permitted only in or among\n"
+"countries not thus excluded.  In such case, this License incorporates\n"
+"the limitation as if written in the body of this License.\n"
+"\n"
+"  9. The Free Software Foundation may publish revised and/or new versions\n"
+"of the General Public License from time to time.  Such new versions will\n"
+"be similar in spirit to the present version, but may differ in detail to\n"
+"address new problems or concerns.\n"
+"\n"
+"Each version is given a distinguishing version number.  If the Program\n"
+"specifies a version number of this License which applies to it and \"any\n"
+"later version\", you have the option of following the terms and conditions\n"
+"either of that version or of any later version published by the Free\n"
+"Software Foundation.  If the Program does not specify a version number of\n"
+"this License, you may choose any version ever published by the Free "
+"Software\n"
+"Foundation.\n"
+"\n"
+"  10. If you wish to incorporate parts of the Program into other free\n"
+"programs whose distribution conditions are different, write to the author\n"
+"to ask for permission.  For software which is copyrighted by the Free\n"
+"Software Foundation, write to the Free Software Foundation; we sometimes\n"
+"make exceptions for this.  Our decision will be guided by the two goals\n"
+"of preserving the free status of all derivatives of our free software and\n"
+"of promoting the sharing and reuse of software generally.\n"
+"\n"
+"\t\t\t    NO WARRANTY\n"
+"\n"
+"  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY\n"
+"FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN\n"
+"OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES\n"
+"PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY OF ANY KIND, EITHER "
+"EXPRESSED\n"
+"OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF\n"
+"MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS\n"
+"TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE\n"
+"PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,\n"
+"REPAIR OR CORRECTION.\n"
+"\n"
+"  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING\n"
+"WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR\n"
+"REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,\n"
+"INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING\n"
+"OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED\n"
+"TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY\n"
+"YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER\n"
+"PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE\n"
+"POSSIBILITY OF SUCH DAMAGES.\n"
+"\n"
+"\t\t     END OF TERMS AND CONDITIONS\n"
+"\n"
+"\t    How to Apply These Terms to Your New Programs\n"
+"\n"
+"  If you develop a new program, and you want it to be of the greatest\n"
+"possible use to the public, the best way to achieve this is to make it\n"
+"free software which everyone can redistribute and change under these terms.\n"
+"\n"
+"  To do so, attach the following notices to the program.  It is safest\n"
+"to attach them to the start of each source file to most effectively\n"
+"convey the exclusion of warranty; and each file should have at least\n"
+"the \"copyright\" line and a pointer to where the full notice is found.\n"
+"\n"
+"    <one line to give the program's name and a brief idea of what it does.>\n"
+"    Copyright (C) <year>  <name of author>\n"
+"\n"
+"    This program is free software; you can redistribute it and/or modify\n"
+"    it under the terms of the GNU General Public License as published by\n"
+"    the Free Software Foundation; either version 2 of the License, or\n"
+"    (at your option) any later version.\n"
+"\n"
+"    This program is distributed in the hope that it will be useful,\n"
+"    but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"    GNU General Public License for more details.\n"
+"\n"
+"    You should have received a copy of the GNU General Public License\n"
+"    along with this program; if not, write to the Free Software\n"
+"    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  "
+"USA\n"
+"\n"
+"\n"
+"Also add information on how to contact you by electronic and paper mail.\n"
+"\n"
+"If the program is interactive, make it output a short notice like this\n"
+"when it starts in an interactive mode:\n"
+"\n"
+"    Gnomovision version 69, Copyright (C) year name of author\n"
+"    Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show "
+"w'.\n"
+"    This is free software, and you are welcome to redistribute it\n"
+"    under certain conditions; type `show c' for details.\n"
+"\n"
+"The hypothetical commands `show w' and `show c' should show the appropriate\n"
+"parts of the General Public License.  Of course, the commands you use may\n"
+"be called something other than `show w' and `show c'; they could even be\n"
+"mouse-clicks or menu items--whatever suits your program.\n"
+"\n"
+"You should also get your employer (if you work as a programmer) or your\n"
+"school, if any, to sign a \"copyright disclaimer\" for the program, if\n"
+"necessary.  Here is a sample; alter the names:\n"
+"\n"
+"  Yoyodyne, Inc., hereby disclaims all copyright interest in the program\n"
+"  `Gnomovision' (which makes passes at compilers) written by James Hacker.\n"
+"\n"
+"  <signature of Ty Coon>, 1 April 1989\n"
+"  Ty Coon, President of Vice\n"
+"\n"
+"This General Public License does not permit incorporating your program into\n"
+"proprietary programs.  If your program is a subroutine library, you may\n"
+"consider it more useful to permit linking proprietary applications with the\n"
+"library.  If this is what you want to do, use the GNU Library General\n"
+"Public License instead of this License."
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_about.cpp:76
+msgid "http://www.avidemux.org"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:237
+msgid "Xvid Encoder"
+msgstr "Xvid енкодер"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:258
+msgid "Constant Bitrate (kbps)"
+msgstr "Константни битрејт (кбит/sek)"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:266
+msgid "Dual pass (MBytes)"
+msgstr "Два пролаза (мегабајта)"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:292
+msgid "Basic"
+msgstr "Основно"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:301
+msgid "Motion Search"
+msgstr "Претрага за покретом"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:317
+msgid "Max I frame interval "
+msgstr "Највећи интервал И кадра"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:333
+msgid "Min I frame interval"
+msgstr "Најмањи интервал И кадра"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:361
+msgid "1- Very low"
+msgstr "1 - Веома ниско"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:365
+msgid "2- Low"
+msgstr "2 - Ниско"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:369
+msgid "3- Medium"
+msgstr "3 - Средње"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:373
+msgid "4- High"
+msgstr "4 - Високо"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:377
+msgid "5- Very High"
+msgstr "5 - Веома високо"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:381
+msgid "6- Ultra High"
+msgstr "6 - Највише"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:395
+msgid "H263 Quantizer"
+msgstr "H263 квантизер"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:400
+msgid "MPEG Quantizer"
+msgstr "MPEG квантизер"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:407
+msgid "Advanced"
+msgstr "Напредније"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:416
+msgid "Min I Frame Qzer"
+msgstr "Најмањи квантизер И кадра"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:424
+msgid "Max I Frame Qzer"
+msgstr "Мајвећи квантизер И кадра"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:432
+msgid "Min P Frame Qzer"
+msgstr "Најмањи квантизер П кадра"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:440
+msgid "Max P Frame Qzer"
+msgstr "Највећи квантизер П кадра"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:485
+msgid "Not Yet!"
+msgstr "Још увек недоступно!"
+
+#: avidemux/ADM_dialog/DIA_xvid.cpp:490
+msgid "B Frames"
+msgstr "Б кадрови"
+
+#: avidemux/ADM_dialog/DIA_mosaic.cpp:79
+msgid "Mosaic"
+msgstr "Мозаичан"
+
+#: avidemux/ADM_dialog/DIA_mosaic.cpp:89
+msgid "Horizontal stacking :"
+msgstr "HХоризонтални удео :"
+
+#: avidemux/ADM_dialog/DIA_mosaic.cpp:96
+msgid "Vertical stacking : "
+msgstr "Вертикални удео :"
+
+#: avidemux/ADM_dialog/DIA_mosaic.cpp:103
+msgid "Shrink factor :"
+msgstr "Фактор сужења"
+
+#: avidemux/ADM_dialog/DIA_mosaic.cpp:110
+msgid "Show frame # :"
+msgstr "Прикажи кадар # :"
+
+#: avidemux/ADM_dialog/DIA_msharpen.cpp:120
+msgid "Donal Graft MSharpen"
+msgstr "MSharpen изоштравање написао Donal Graft"
+
+#: avidemux/ADM_dialog/DIA_msharpen.cpp:129
+msgid "Show Mask"
+msgstr "Прикажи маску"
+
+#: avidemux/ADM_dialog/DIA_msharpen.cpp:135
+msgid "HighQ"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_msharpen.cpp:149
+msgid "Strength"
+msgstr "Јачина"
+
+#: avidemux/ADM_dialog/DIA_asharp.cpp:293
+msgid "ASharp by MarcFD"
+msgstr "ASharp изоштравање написао MarcFD"
+
+#: avidemux/ADM_dialog/DIA_asharp.cpp:314
+msgid "Strength :"
+msgstr "Јачина"
+
+#: avidemux/ADM_dialog/DIA_asharp.cpp:322
+msgid "Block Adaptative :"
+msgstr "Прилагођава се блоку :"
+
+#: avidemux/ADM_dialog/DIA_asharp.cpp:330
+msgid "Unknown flag :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_requant.cpp:85
+msgid "Requantize Option"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_requant.cpp:95
+msgid "Shrink factor"
+msgstr "Фактор сужења"
+
+#: avidemux/ADM_dialog/DIA_dnr.cpp:87
+msgid "Dynamic Noise Reduction"
+msgstr "Динамичко уклањање шума"
+
+#: avidemux/ADM_dialog/DIA_dnr.cpp:96
+msgid "Luma Lock"
+msgstr "Закључај осветљење"
+
+#: avidemux/ADM_dialog/DIA_dnr.cpp:104
+msgid "Luma Threshold"
+msgstr "Осетљивост осветљења"
+
+#: avidemux/ADM_dialog/DIA_dnr.cpp:112
+msgid "Chroma Lock"
+msgstr "Закључај сигнал боје"
+
+#: avidemux/ADM_dialog/DIA_dnr.cpp:120
+msgid "Chroma Threshold"
+msgstr "Осетљивост осветљења"
+
+#: avidemux/ADM_dialog/DIA_dnr.cpp:128
+msgid "Scene change detect"
+msgstr "Детекција промене сцена"
+
+#: avidemux/ADM_dialog/DIA_audioTrack.cpp:133
+msgid "Audio selector"
+msgstr "Одабир звука"
+
+#: avidemux/ADM_dialog/DIA_audioTrack.cpp:142
+msgid "Select audio track"
+msgstr "Одабери звучну траку"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:403
+msgid "Bitrate Calculator"
+msgstr "Битрејт калкулатор "
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:431
+msgid "Duration:"
+msgstr "Трајање:"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:451
+msgid "_Medium:"
+msgstr "Средње:"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:462
+msgid "_Format:"
+msgstr "Формат:"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:473
+#: avidemux/ADM_dialog/DIA_calculator.cpp:531
+msgid "Total size (custom)"
+msgstr "Укупна величина (насумично)"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:483
+msgid "_Custom size (MB):"
+msgstr "Одабрана величина (MB):"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:497
+msgid "Output container format"
+msgstr "Излазни формат"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:501
+#: avidemux/ADM_gui2/GUI_main2.cpp:1121
+msgid "AVI"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:505
+#: avidemux/ADM_gui2/GUI_main2.cpp:1124
+msgid "OGM"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:509
+msgid "MPEG"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:524
+msgid "Total size"
+msgstr "Укупна величина"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:528
+msgid "1x 80 min. CD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:533
+msgid "2x 80 min. CD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:537
+msgid "1x 74 min. CD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:541
+msgid "2x 74 min. CD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:545
+msgid "DVD5"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:549
+#: avidemux/ADM_gui2/GUI_main2.cpp:893
+msgid "Custom"
+msgstr "Насумично"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:555
+msgid "<b>Target</b>"
+msgstr "<b>Мета</b>"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:575
+msgid "Track _1:"
+msgstr "Трака _1:"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:583
+msgid "Audio bitrate in kb/s for track 1 (0 for no audio)"
+msgstr "Битрејт авука (кбит/сек) за траку 1 (0 за без звука)"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:591
+msgid "Track _2: "
+msgstr "Трака _2:"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:599
+msgid "Audio bitrate in kb/s for track 2 (optional)"
+msgstr "Битрејт авука (кбит/сек) за траку 2 (опционо)"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:603
+msgid "<b>Audio Bitrate</b>"
+msgstr "<b>Битрејт звука</b>"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:625
+msgid "Audio size (MB):"
+msgstr "Величина звука (MB):"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:641
+msgid "Video size (MB):"
+msgstr "Величина видеа (MB)"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:657
+msgid "Total size (MB):"
+msgstr "Укупна величина (MB):"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:679
+msgid "Video bitrate:"
+msgstr "Видео битрејт:"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:687
+msgid "Bits per pixel:"
+msgstr "Бита по пикселу:"
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:703
+msgid "0.0"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_calculator.cpp:711
+msgid "<b>Result</b>"
+msgstr "<b>Резултат</b>"
+
+#: avidemux/ADM_dialog/DIA_quota.cpp:90
+msgid "Filesystem full / quota exceeded"
+msgstr "Систем датотека препун"
+
+#: avidemux/ADM_dialog/DIA_quota.cpp:133
+msgid "Ignore"
+msgstr "Игнориши"
+
+#: avidemux/ADM_dialog/DIA_quota.cpp:155
+msgid "Retry"
+msgstr "Поново пробај"
+
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:93
+msgid "Resize for VCD/SVCD/...."
+msgstr "Промени величину за VCD/SVCD/...."
+
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:103
+msgid "Target type : "
+msgstr "Излазни тип:"
+
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:110
+msgid "Source Aspect Ratio :"
+msgstr "Размера улаза:"
+
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:127
+msgid "Destination Aspect Ratio :"
+msgstr "Размера излаза:"
+
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:150
+msgid "VCD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:151
+msgid "SVCD"
+msgstr "SVCD"
+
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:152
+msgid "DVD"
+msgstr "DVD"
+
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:153
+msgid "DVD, half D1"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_resizeWiz.cpp:154
+#: avidemux/ADM_gui2/GUI_main2.cpp:751
+msgid "PSP"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_pipe.cpp:95
+msgid "Pipe to"
+msgstr "Проследи у"
+
+#: avidemux/ADM_dialog/DIA_pipe.cpp:104
+msgid "Application path/name (/usr/bin/sox...)"
+msgstr "Путања/име до програма (/usr/bin/sox...)"
+
+#: avidemux/ADM_dialog/DIA_pipe.cpp:113
+msgid "Full parameter line"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Ready"
+msgstr "Спремно"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Succeeded"
+msgstr "Успешно"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25 avidemux/gtk_gui.cpp:2485
+msgid "Failed"
+msgstr "Неуспело"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Deleted"
+msgstr "Уклоњено"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:25
+msgid "Running"
+msgstr "У току"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:98
+msgid "  Job Name  "
+msgstr " Име задатка "
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:103
+msgid "Started at"
+msgstr "Започето у"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:107
+msgid "Finished at"
+msgstr "Завршено у"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:134 avidemux/ADM_dialog/DIA_jobs.cpp:172
+msgid "Sure!"
+msgstr "Да"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:134
+msgid "Delete ALL jobs"
+msgstr "Уклони све задатке"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:134
+msgid "Are you sure you want to delete all jobs ?"
+msgstr "Да ли сте сигурни да желите да уклоните све задатке?"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:172
+msgid "Delete job"
+msgstr "Уклони задатак"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:172
+#, c-format
+msgid "Are you sure you want to delete %s job ?"
+msgstr "Да ли сте сигури да желите да уклоните задатак %s ?"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:181
+msgid "Unknown event"
+msgstr "Непознат догађај"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:261
+msgid "Jobs"
+msgstr "Задаци"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:287
+msgid "Delete All Jobs"
+msgstr "Уклони све задатке"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:292
+msgid "Delete Job"
+msgstr "Уклони задатак"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:297
+msgid "Run all jobs"
+msgstr "Покрени свезадатке"
+
+#: avidemux/ADM_dialog/DIA_jobs.cpp:302
+msgid "Run Job"
+msgstr "Покрени задатак"
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:142
+msgid "Decomb Telecide"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:177
+msgid "Try backward field"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:192
+msgid "Never"
+msgstr "Никада"
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:196
+msgid "When forward is still combed"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:200
+msgid "Always try"
+msgstr "Увек покушај"
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:214
+msgid "No strategy"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:218
+msgid "Telecine 3:2"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:222
+msgid "Pal/Secam"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:226
+msgid "NTSC converted from Pal"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:232
+msgid "Decomb strategy"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:239
+msgid "Postprocessing"
+msgstr "Накнадно процесирање"
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:254
+msgid "No postprocessing"
+msgstr "Без накнадног процесирања"
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:258
+msgid "No postproc, but compute"
+msgstr "Без накнадног процесирања, али прорачунај"
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:262
+msgid "Postproc on best match"
+msgstr "Накнадно процесирање на најбољем поклапању"
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:283
+msgid "Ignore chroma to decide"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:287
+msgid "Use chroma to decide"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:293
+msgid "Blend or interpolate"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:308
+msgid "Interpolate"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:312
+msgid "Blend"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:318
+msgid "Backward thresh"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:331
+msgid "Direct thresh"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:344
+msgid "Postproc thresh"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:357
+msgid "Noise Threshold"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_dectel.cpp:370
+msgid "Show"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_vorbis.cpp:162
+msgid "Vorbis encoder settings"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_vorbis.cpp:172
+msgid "<b>Mode :</b>"
+msgstr "<b>Мод:</b>"
+
+#: avidemux/ADM_dialog/DIA_vorbis.cpp:180
+#: avidemux/ADM_dialog/DIA_defaultAudio.cpp:109
+msgid "<b>Bitrate :</b>"
+msgstr "<b>Битрејт :</b>"
+
+#: avidemux/ADM_dialog/DIA_vorbis.cpp:188
+msgid "<b>Quality :</b>"
+msgstr "<b>Квалитет :</b>"
+
+#: avidemux/ADM_dialog/DIA_vorbis.cpp:202
+msgid "CBR (bitrate based)"
+msgstr "CBR (константни битрејт)"
+
+#: avidemux/ADM_dialog/DIA_vorbis.cpp:208
+msgid "VBR (Quality based)"
+msgstr "VBR (промењљиви битрејт)"
+
+#: avidemux/ADM_dialog/DIA_lavdecoder.cpp:79
+msgid "Libavcodec Decoder Option"
+msgstr "Опције libavcodec"
+
+#: avidemux/ADM_dialog/DIA_lavdecoder.cpp:88
+msgid "Swap UV"
+msgstr "Замени UV"
+
+#: avidemux/ADM_dialog/DIA_lavdecoder.cpp:92
+msgid "Show motion Vectors"
+msgstr "Прикажи векторе покрета"
+
+#: avidemux/ADM_dialog/DIA_postproc.cpp:90
+msgid "Mplayer PostProc options"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_postproc.cpp:99
+msgid "Horizontal Deblocking"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_postproc.cpp:103
+msgid "Vertical Deblocking"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_postproc.cpp:107
+msgid "Deringing"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_postproc.cpp:136
+msgid "Filter Strength"
+msgstr "Јачина филтера"
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:49
+msgid "Select video to write"
+msgstr "Одабери видео за упис"
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:63
+msgid "Invalid filename"
+msgstr "Погрешно име датотеке"
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:63
+msgid "Please select or enter a valid filename"
+msgstr "Одаберите или упишите исправно име датотеке"
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:69
+msgid "Invalid jobname"
+msgstr "Погрешно име задатка"
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:69
+msgid "Please select or enter a valid jobname"
+msgstr "Одаберите или упишите исправно име задатка"
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:111
+msgid "Save Job"
+msgstr "Сачувај задатак"
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:130
+msgid "Select the output file"
+msgstr "Одабери излазну датотеку"
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:144
+msgid "_Browse..."
+msgstr "_Изабери..."
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:153
+msgid "Job name displayed in the job list and used as the script filename"
+msgstr "Име задатка приказано у листи задатака и коришћено као име скрипте."
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:162
+msgid "Filename of the audio/video output"
+msgstr "Име датотеке са звук/видео илазом"
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:165
+msgid "_Job name:"
+msgstr "_Име задатка:"
+
+#: avidemux/ADM_dialog/DIA_jobs_save.cpp:172
+msgid "Output _file:"
+msgstr "Излазна _датотека:"
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:116
+msgid "Decomb Decimate"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:125
+msgid "Cycle"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:157
+msgid "Discard Closer"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:161
+msgid "Replace by interpolate"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:165
+msgid "Discard from longest dups (animés)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:169
+msgid "Pulldown dups removal"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:175
+msgid "Threshold "
+msgstr "Осетљивост"
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:189
+msgid "Threshold2 "
+msgstr "Осетљивост2"
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:203
+msgid "Quality "
+msgstr "Квалитет"
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:219
+msgid "Fastest (no chroma,partial luma)"
+msgstr "Најбрже (без сигнала боје, половично осветљење)"
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:223
+msgid "Fast (partial luma and chroma)"
+msgstr "Брзо (половично осветљење и сигнл боје)"
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:227
+msgid "Medium (full luma not chroma)"
+msgstr "Стедње (пуно осветљење, без сигнала боје)"
+
+#: avidemux/ADM_dialog/DIA_decimate.cpp:231
+msgid "Slow (full luma and chroma)"
+msgstr "Споро (пуно осветљење и сигнал боје)"
+
+#: avidemux/ADM_dialog/DIA_lame.cpp:147
+msgid "Lame Encoder Settings"
+msgstr "Поставке Lame enkodera"
+
+#: avidemux/ADM_dialog/DIA_lame.cpp:171
+msgid "Joint-Stereo"
+msgstr "Продружени стерео"
+
+#: avidemux/ADM_dialog/DIA_lame.cpp:185
+msgid "<b>Channel Mode:</b>"
+msgstr "<b>Мод канала:</b>"
+
+#: avidemux/ADM_dialog/DIA_lame.cpp:193
+msgid "<b>Bitrate:</b>"
+msgstr "<b>Битрејт:</b>"
+
+#: avidemux/ADM_dialog/DIA_lame.cpp:201
+msgid "<b>Mode:</b>"
+msgstr "<b>Мод:</b>"
+
+#: avidemux/ADM_dialog/DIA_lame.cpp:209
+msgid "<b>Quality:</b>"
+msgstr "<b>Квалитет:</b>"
+
+#: avidemux/ADM_dialog/DIA_acodec.cpp:138
+msgid "AudioCodec"
+msgstr "Звучни кодек"
+
+#: avidemux/ADM_dialog/DIA_acodec.cpp:163
+msgid "Configure codec"
+msgstr "Подешавања кодека"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:409
+msgid "Preferences"
+msgstr "Поставке"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:433
+msgid "_Message level:"
+msgstr "Ниво _упозоравања:"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:440
+msgid "No alerts"
+msgstr "Без упозорења"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:441
+msgid "Display only error alerts"
+msgstr "Прикажи само упосорења при грешкама"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:442
+msgid "Display all alerts"
+msgstr "Прикажи сва упозорења"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:444
+msgid "_Swap marks A and B if A > B"
+msgstr "_Замени ознаке A и B ако је A > B"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:448
+msgid "_Go to systray when encoding"
+msgstr "_Смести у системску фијоку приликом енкодирања"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:452
+msgid "S_ave preferences on exit"
+msgstr "_Сачувај поставке и изађи"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:456
+msgid "User Interface"
+msgstr "Корисничко окружење"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:467
+msgid "_Automatically index MPEG files"
+msgstr "_Аутоматски индексирај MPEG датотеке"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:471
+msgid "_Disable NuppelVideo resync"
+msgstr "_Искључи NuppelVideo усклађивање"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:475
+msgid "_Use libavcodec MPEG decoder"
+msgstr "_Користи libavcodec MPEG декодер"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:479
+msgid "_Set Default Postprocessing Level"
+msgstr "_Одабери подразумевани ниво накнадног процесирања"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:483
+msgid "Input"
+msgstr "Улаз"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:498
+msgid "_MPEG auto split (MB):"
+msgstr "Утоматско MPEG _дељење (MB):"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:507
+msgid "_Use OpenDML (don't split large AVI files)"
+msgstr "_Користи OpenDML (не дели велике AVI датотеке)"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:511
+msgid "_Reuse 2-pass log"
+msgstr "_Поново употреби дневник другог пролаза"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:515
+msgid "Allow non standard audio frequency for DVD output"
+msgstr "Дозволи нестандардне фреквенције звука за DVD излаз"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:519 avidemux/ADM_gui2/GUI_main2.cpp:970
+msgid "Output"
+msgstr "Излаз"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:533
+msgid "_Audio output:"
+msgstr "Излазни _звук:"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:540
+msgid "ALSA _device:"
+msgstr "ALSA уређај"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:562
+msgid "_Master"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:570
+msgid "_PCM"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:578
+msgid "_Volume bar controls:"
+msgstr "Клизачи за контролу _јачине звука:"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:585
+msgid "Local Playback Downmixing"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:597
+msgid "No downmixing (multichannel)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:603
+msgid "Audio"
+msgstr "Звук"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:620
+msgid "_Video output:"
+msgstr "Излазни _видео:"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:624 avidemux/ADM_dialog/DIA_prefs.cpp:634
+msgid "Video"
+msgstr "Видео"
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:642
+msgid "Enable multithreading : "
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:652 avidemux/ADM_dialog/DIA_prefs.cpp:663
+msgid "MultiThread"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_prefs.cpp:659
+msgid "Threads"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:527
+msgid "FFmpeg encoding options"
+msgstr "Подешавања FFmpeg енкодера"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:611
+msgid "Set quantizer for a constant quantizer/quality encoding"
+msgstr "Одабери квантизер за константно квантизер/квалитет енкодирање"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:637
+msgid "Enable interlaced encoding"
+msgstr "Укључи испреплетано енкодирање"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:648
+msgid "_Aspect ratio"
+msgstr "_Размера"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:651
+msgid ""
+"Set MPEG-4 aspect ratio (warning: MPlayer supports it, but most other "
+"players don't)"
+msgstr ""
+"Одабери MPEG-4 размеру (упозорење: MPlayer је подржава, али већинаосталих "
+"плејера не)"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:686
+msgid "ME method:"
+msgstr "ME метода"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:694
+msgid "Max I-frame interval:"
+msgstr "Највећи интервал И кадра"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:711
+msgid "Allow 4 motion vectors per macroblock (slightly better quality)"
+msgstr "Дозволи 4 вектора покрета по макроблоку (нешто бољи квалитет)"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:714
+msgid "MV0"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:717
+msgid "Try  to encode each MB with MV=<0,0> and choose the better one"
+msgstr "Покушај енкодирање сваког MB са MV=<0,0> и изабери бољи"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:725
+msgid ""
+"Motion estimation method, 0-3 currently ignores the amount of bits spent, so "
+"quality may be low"
+msgstr ""
+"Начин процене покрета, 0-3 још увек игноришу количину потрошених битова, па "
+"квалитет може бити низак"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:729
+msgid "0: None"
+msgstr "0: Без"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:733
+msgid "1: Full"
+msgstr "1: Пуно"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:737
+msgid "2: Log"
+msgstr "2: Дневник"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:741
+msgid "3: Phods"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:745
+msgid "4: EPZS"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:749
+msgid "5: X1"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:761
+msgid "Maximum interval between keyframes in frames"
+msgstr "Највећи интервал између кључних кадрова у кадровима"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:782
+msgid "Maximum number of B-frames between non B-frames, 0-2 is a sane range"
+msgstr "Највећи број Б кадрова између не-Б кадрова, 0-2 је разумна вредност"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:787
+msgid "Use quarter pixel motion compensation (useful at higher bitrates)"
+msgstr ""
+"Користи компензацију покрета у четврт пиксела (корисно за више битрејтове)"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:814
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1062
+msgid "Prepass:"
+msgstr "Пред пролаз:"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:827
+msgid ""
+"Comparison function for motion estimation pre pass. Tip: SAD is fast, SATD "
+"is good"
+msgstr ""
+"Функција поређења за процену покрета пред пролаза. SAD је брзо, SADT је добро"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:831
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:882
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:933
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:984
+msgid "0: SAD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:835
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:886
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:937
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:988
+msgid "1: SSE"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:839
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:890
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:941
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:992
+msgid "2: SATD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:843
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:894
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:945
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:996
+msgid "3: DCT"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:847
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:898
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:949
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1000
+msgid "4: PSNR"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:851
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:902
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:953
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1004
+msgid "5: BIT"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:855
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:906
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:957
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1008
+msgid "6: RD"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:859
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:910
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:961
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1012
+msgid "7: ZERO"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:865
+msgid "Full pixel:"
+msgstr "Цео пиксел"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:878
+msgid "Comparison function for full pel motion estimation"
+msgstr "Функција поређења за процену покрета целим пикселима"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:916
+msgid "Subpixel:"
+msgstr "Под пиксел"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:929
+msgid "Comparison function for sub pel motion estimation"
+msgstr "Функција поређења за процену покрета под пикселима"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:967
+msgid "Macroblock:"
+msgstr "Макроблок"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:980
+msgid ""
+"Comparison  function for the macroblock decision, used only when macroblock "
+"decision is set to 0"
+msgstr ""
+"Функција поређења за за одлуке о макроблоку, користи се само када је одлукао "
+"макроблоку постављена на 0"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1023
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1030
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1037
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1044
+msgid "Use chroma, too, currently doesn't work (correctly) with B-frames"
+msgstr ""
+"Користи сигнал боје, такође, тренутно је ради (исправно) за Б кадровима"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1046
+msgid "ME comparison function"
+msgstr "ME функција поређења"
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1070
+msgid "ME:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1083
+msgid "Diamond type and size for motion estimation pre pass"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1087
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1118
+msgid "adaptive, size 3"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1091
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1122
+msgid "adaptive, size 2"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1095
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1126
+msgid "experimental"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1099
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1130
+msgid "normal, size 1"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1103
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1134
+msgid "normal, size 2"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1114
+msgid "Diamond type and size for motion estimation"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1140
+msgid "Diamond type and size"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1145
+msgid "Motion Estimation"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1171
+msgid "Macroblock decision:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1179
+msgid "Quantizer range - Min:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1192
+msgid ""
+"Macroblock decision algorithm (high quality mode), encode each macroblock in "
+"all modes and choose the best"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1196
+msgid "0: MB comparison"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1200
+msgid "1: Fewest bits (vhq)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1204
+msgid "2: Rate distortion"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1226
+msgid "MPEG quantizers produce sharper picture (useful at higher bitrates)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1240
+msgid ""
+"Minimum quantizer, 1 is not recommended, should be 2 for normal MPEG-4 "
+"encoding"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1252
+msgid "Maximum quantizer, 10-31 should be a sane range"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1257
+msgid ""
+"Trellis searched quantization will find the optimal encoding for each 8x8 "
+"block"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1260
+msgid "Rate distorted CBP"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1263
+msgid "Rate distorted optimal coded block pattern"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1290
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1298
+msgid ""
+"Sane range: 0-0.3. Large values might look good on some monitors, but "
+"horrible on others (TV, LCD...)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1306
+msgid ""
+"Sane range: 0-0.5. Large values help against blockiness, but may introduce "
+"ringing/mosquito noise artifacts on sharp edges"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1315
+msgid "Darkness masking:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1322
+msgid "Spatial complexity masking:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1329
+msgid "Temporal complexity masking:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1335
+msgid "Lumi masking:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1349
+msgid "P block masking:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1355
+msgid "Normalize adaptive quantization"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1358
+msgid ""
+"Attempt  to adjust the per-MB quantizers to maintain the proper average when "
+"using adaptive quantization (*masking)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1386
+msgid "Luminance:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1393
+msgid "Chrominance:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1400
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1408
+msgid "DC"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1405
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1413
+msgid "Consider also the dc coefficient"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1415
+msgid "Single coefficient elimination threshold"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1420
+msgid "Masking"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1434
+msgid "Filesize tolerance (kb):"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1442
+msgid "Quantizer compression:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1450
+msgid "Quantizer blur:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1458
+msgid "Max quantizer difference:"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1472
+msgid "Maximum  quantizer difference between I or P frames"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1480
+msgid ""
+"Quantizer  gaussian blur, larger values will average the quantizer more over "
+"time (slower change)"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1494
+msgid "Filesize tolerance (1 kb = 1000 bits). 1000-100000 is a sane range"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1495
+msgid "8000"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_lavcodec.cpp:1497
+msgid "Ratecontrol"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mcdeint.cpp:79
+msgid "MC Deint"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mcdeint.cpp:89
+msgid "Mode :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mcdeint.cpp:96
+msgid "Field Dominance :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mcdeint.cpp:103
+msgid "Qp :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mcdeint.cpp:115
+msgid "0- Fast"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mcdeint.cpp:116
+msgid "1- Medium"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mcdeint.cpp:117
+msgid "2- Slow, iterative motion estimation"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mcdeint.cpp:118
+msgid "3- Extra slow, same as [2] + multiple reference frame"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mcdeint.cpp:125
+msgid "Top"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_mcdeint.cpp:126
+msgid "Bottom"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_defaultAudio.cpp:99
+msgid "Audio Encoder Settings"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_partial.cpp:123
+#: avidemux/ADM_filter/gui_filtersub.cpp:144
+msgid "Partial"
+msgstr "Делимично"
+
+#: avidemux/ADM_dialog/DIA_partial.cpp:137
+msgid "Start frame for partial :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_partial.cpp:144
+msgid "End frame for partial :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_partial.cpp:167
+msgid "Configure partialized filter"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:124
+msgid "Fade Filter"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:134
+msgid "Fade Type"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:146
+#, fuzzy
+msgid "Out"
+msgstr "Излаз"
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:147
+msgid "In"
+msgstr "Улаз"
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:149
+msgid "Start Frame"
+msgstr "Почетни кадар"
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:156
+msgid "End Frame"
+msgstr "Крајњи кадар"
+
+#: avidemux/ADM_dialog/DIA_fade.cpp:179
+msgid "Fade to black "
+msgstr "Затамни до црног"
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:138
+msgid "ASS/SSA Subtitle"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:148
+msgid "Subtitle file (ass/ssa) :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:155
+msgid "Font scale :"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:162
+msgid "Line spacing"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:169
+msgid "Top margin"
+msgstr ""
+
+#: avidemux/ADM_dialog/DIA_ass.cpp:176
+msgid "Bottom margin"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_bindings.cpp:562
+#, c-format
+msgid "Frame:%c(%02d)"
+msgstr "Кадар:%c(%02d)"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:277 avidemux/main.cpp:151
+msgid "_File"
+msgstr "_Датотека"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:284
+msgid "_Open..."
+msgstr "_Отвори..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:295
+msgid "_Append..."
+msgstr "_Додај..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:306
+msgid "_Save"
+msgstr "_Сачувај"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:317
+msgid "Save _Video..."
+msgstr "Сачувај _видео..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:329
+msgid "Save _BMP Image..."
+msgstr "Сачувај BMP слику"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:333
+msgid "Save _JPEG Image..."
+msgstr "Сачувај JPEG слику"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:337
+msgid "Save _Selection as JPEG images..."
+msgstr "Сачувај маркирано као JPEG слике"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:346
+msgid "Save _Project"
+msgstr "Сачувај _пројекат"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:354
+msgid "Save P_roject As..."
+msgstr "Сачувај пројекат _као..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:362
+msgid "_Load/Run Project..."
+msgstr "_Учитај/Покрени пројекат..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:370
+msgid "A_dd to Joblist..."
+msgstr "Дода_ј у листу послова..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:374
+msgid "Show _Joblist"
+msgstr "Прикажи _листу послова"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:386
+msgid "Proper_ties"
+msgstr "Oсо_бине"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:397
+msgid "AVI _Muxer Options"
+msgstr "AVI _Muxer Options"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:406
+msgid "_Quit"
+msgstr "_Изађи"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:417
+msgid "_Edit"
+msgstr "_Уређивање"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:424
+msgid "_Reset Edits"
+msgstr "Поништи уре_ђивања"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:437
+msgid "Cu_t"
+msgstr "_Исеци"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:448
+msgid "_Copy"
+msgstr "_Умножи"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:459
+msgid "_Paste"
+msgstr "У_баци"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:470
+msgid "_Delete"
+msgstr "_Обриши"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:486
+msgid "Set Marker _A"
+msgstr "Постави маркер _А"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:493
+msgid "Set Marker _B"
+msgstr "Постави маркер _Б"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:505
+msgid "Pre_ferences"
+msgstr "_Поставке"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:513
+msgid "_View"
+msgstr "П_реглед"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:520
+msgid "_Main Toolbar"
+msgstr "_Главна трака са алатима"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:525
+msgid "_A/V Sidebar"
+msgstr "А/В _трака"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:535
+msgid "_Zoom 1:4"
+msgstr "Увећање 1:_4"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:542
+msgid "Z_oom 1:2"
+msgstr "Увећање 1:_2"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:549
+msgid "Zoom _1:1"
+msgstr "Увећање 1:_1"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:556
+msgid "Zoom _2:1"
+msgstr "Увећање 2:1"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:563
+msgid "Zoom _4:1"
+msgstr "Увећање 4:1"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:570
+msgid "Vi_deo"
+msgstr "_Видео"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:577
+msgid "_Decoder Options"
+msgstr "_Опције декодера"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:584
+msgid "_Postprocessing"
+msgstr "_Накнадно процесирање"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:587
+msgid "Select postprocessing level"
+msgstr "Одабери ниво накнадног процесирања"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:597
+msgid "P_review"
+msgstr "П_реглед"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:604
+msgid "Display _Output"
+msgstr "Прикажи _излаз"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:616
+msgid "_Frame Rate"
+msgstr "_Учесталост кадрова"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:620 avidemux/ADM_gui2/GUI_main2.cpp:669
+msgid "_Encoder"
+msgstr "_Енкодер"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:627
+msgid "Fil_ters"
+msgstr "_Филтери"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:634
+msgid "_Audio"
+msgstr "_Аудио"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:641
+msgid "_Main Track"
+msgstr "_Главна трака"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:645
+msgid "_Second Track"
+msgstr "_Споредна трака"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:649
+msgid "_Build VBR Time Map"
+msgstr "Изгради VBR _мапу времена"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:658
+msgid "S_ave..."
+msgstr "_Сачувај..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:676
+msgid "_Filters"
+msgstr "_Филтери"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:680
+msgid "_Tools"
+msgstr "Ала_ти"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:687
+msgid "_Calculator"
+msgstr "_Калкулатор"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:703
+msgid "_Rebuild Frames (I & B)"
+msgstr "_Ре-изгради кадрове (И и Б)"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:707
+msgid "C_heck Frames (slow)"
+msgstr "_Провери кадрове (споро)"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:711
+msgid "_Bitrate Histogram"
+msgstr "_Хистограм битрејта"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:715
+msgid "_Scan for Black Frames..."
+msgstr "Нађи _црне кадрове..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:724
+msgid "_VOB -> VobSub"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:728
+msgid "_OCR (VobSub -> srt)"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:732
+msgid "A_uto"
+msgstr "Аут_о"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:739
+msgid "_VCD"
+msgstr "_ВЦД"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:743
+msgid "_SVCD"
+msgstr "_СВЦД"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:747
+msgid "_DVD"
+msgstr "_ДВД"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:755
+msgid "_Go"
+msgstr "Иди _на"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:762
+msgid "_Play/Stop"
+msgstr "_Пусти/Заустави"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:773
+msgid "P_revious Frame"
+msgstr "Прет_ходни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:784
+msgid "_Next Frame"
+msgstr "Наре_дни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:795
+msgid "Pr_evious Intra Frame"
+msgstr "Претходни _Intra кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:806
+msgid "Next _Intra Frame"
+msgstr "Наредни I_ntra кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:817
+msgid "Previou_s Black Frame"
+msgstr "Претходни _црни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:821
+msgid "Ne_xt Black Frame"
+msgstr "Наредни ц_рни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:825
+msgid "_First Frame"
+msgstr "_Први кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:836
+msgid "_Last Frame"
+msgstr "По_следњи кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:852
+msgid "Go to Marker _A"
+msgstr "Иди на маркер _А"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:859
+msgid "Go to Marker _B"
+msgstr "Иди на маркер _Б"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:871
+msgid "_Jump to Frame..."
+msgstr "Скочи на _кадар..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:882
+msgid "Jump to _Time..."
+msgstr "Скочи на _време..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:897
+msgid "_Help"
+msgstr "_Помоћ"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:904
+msgid "_About"
+msgstr "_О програму"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:912
+msgid "Show builtin support"
+msgstr "_Испиши подржано..."
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:926
+msgid "Open a file"
+msgstr "Отвори датотеку"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:936
+msgid "Save the file"
+msgstr "Сачувај датотеку"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:942
+msgid "Audio/video file information"
+msgstr "Информација о Аудио/Видео датотеци"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:953
+msgid "Bitrate/size calculator"
+msgstr "Калкулатор битрејт/величина"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:967
+msgid "Preview filtered video in a new window"
+msgstr "Прегледај филтрирани видео у новом прозору"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:976
+msgid "Display filtered output in the main window"
+msgstr "Прегледај филтрирани видео у главном прозору"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1017 avidemux/ADM_gui2/GUI_main2.cpp:1057
+msgid "Copy"
+msgstr "Без измене"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1019 avidemux/ADM_gui2/GUI_main2.cpp:1059
+msgid "Configure"
+msgstr "Поставке"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1022
+msgid "Configure video encoder"
+msgstr "Подеси видео енкодер"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1027 avidemux/ADM_gui2/GUI_main2.cpp:1083
+msgid "Filters"
+msgstr "Филтери"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1030
+msgid "Video filters"
+msgstr "Видео филтери"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1062
+msgid "Configure audio encoder"
+msgstr "Подеси аудио енкодер"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1070
+msgid "Audio filters"
+msgstr "Аудио филтери"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1091
+msgid "Shift:"
+msgstr "Помери:"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1094
+msgid "Enable time shift"
+msgstr "Омогући померај времена"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1100
+msgid "Audio/video time shift (ms)"
+msgstr "Аудио/видео временки померај (мсек)"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1107
+msgid "<b>Format</b>"
+msgstr "<b>Формат</b>"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1122
+msgid "AVI, unp. VOP"
+msgstr "AVI распак. VOP"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1123
+msgid "AVI, dual audio"
+msgstr "AVI два аудија"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1125
+msgid "MPEG video"
+msgstr "MPEG видео"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1126
+msgid "MPEG PS A+V"
+msgstr "MPEG PS А+В"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1127
+msgid "MPEG TS A+V"
+msgstr "MPEG TS А+В"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1128
+msgid "MP4"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1129
+msgid "PSP (broken)"
+msgstr "PSP (не ради)"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1149
+msgid "<b>Selection</b>"
+msgstr "<b>Обележено</b>"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1166 avidemux/ADM_gui2/GUI_main2.cpp:1174
+msgid " 0000000"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1182
+msgid "A:"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1189
+msgid "Go to marker A"
+msgstr "Иди на маркер А"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1191
+msgid "B:"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1198
+msgid "Go to marker B"
+msgstr "Иди на маркер Б"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1210
+msgid "Play"
+msgstr "Пусти"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1224
+msgid "Stop"
+msgstr "Заустави"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1236
+msgid "Previous frame"
+msgstr "Претходни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1251
+msgid "Next frame"
+msgstr "Наредни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1266
+msgid "Previous keyframe"
+msgstr "Претходни кључни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1281
+msgid "Next keyframe"
+msgstr "Наредни кључни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1295
+msgid "Selection: start"
+msgstr "Овележавање: почетак"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1306
+msgid "Selection: end"
+msgstr "Овележавање: крај"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1317
+msgid "Previous black frame"
+msgstr "Претходни црни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1328
+msgid "Next black frame"
+msgstr "Наредни црни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1339
+msgid "First frame"
+msgstr "Први кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1350
+msgid "Last frame"
+msgstr "Последњи кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1381
+msgid "Frame: "
+msgstr "Кадар: "
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1388
+msgid "Current frame"
+msgstr "Тренутни кадар"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1393
+msgid "/0000000"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1400
+msgid "Time: "
+msgstr "Време: "
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1407
+msgid "Current time"
+msgstr "Тренутно време"
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1408
+msgid "00:00:00.000"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1411
+msgid "/00:00:00,000"
+msgstr ""
+
+#: avidemux/ADM_gui2/GUI_main2.cpp:1418
+msgid "Frame: ?"
+msgstr "Кадар: ?"
+
+#: avidemux/ADM_gui2/support.cpp:251 avidemux/ADM_gui2/support.cpp:275
+#, c-format
+msgid "Couldn't find pixmap file: %s"
+msgstr ""
+
+#: avidemux/oplug_ogm/op_ogsave.cpp:112
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:394
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:989
+#: avidemux/gtk_gui.cpp:1415 avidemux/gtk_gui.cpp:1755
+msgid "File error"
+msgstr ""
+
+#: avidemux/oplug_ogm/op_ogsave.cpp:112
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:394 avidemux/gtk_gui.cpp:1415
+#: avidemux/gtk_gui.cpp:1755
+#, c-format
+msgid "Cannot open \"%s\" for writing."
+msgstr ""
+
+#: avidemux/oplug_ogm/op_ogsave.cpp:126
+msgid "Could not initialize video"
+msgstr ""
+
+#: avidemux/oplug_ogm/op_ogsave.cpp:134
+msgid "Could not initialize audio"
+msgstr ""
+
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:89
+msgid "This is not MPEG compatible"
+msgstr ""
+
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:89
+msgid "You can't use the Copy codec."
+msgstr ""
+
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:94
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:155
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:166
+msgid "There is no audio track"
+msgstr ""
+
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:101
+msgid "The first frame is not intra frame"
+msgstr ""
+
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:101
+msgid "Use the &lt;&lt; and the &gt;&gt; buttons to move using Intra frames."
+msgstr ""
+
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:113
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:176
+msgid "Audio track is not suitable"
+msgstr ""
+
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:153
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:208
+#: avidemux/ADM_lvemux/ADM_muxer.cpp:85
+msgid "Incompatible audio"
+msgstr ""
+
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:153
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:186
+msgid "For VCD, audio must be 44.1 kHz MP2."
+msgstr ""
+
+#: avidemux/oplug_mpeg/op_mpegpass.cpp:182
+msgid "For DVD, audio must be 48 kHz MP2(stereo), AC3, DTS or LPCM (stereo)."
+msgstr ""
+
+#: avidemux/ADM_encoder/adm_encConfig.cpp:193
+msgid "Wrong output format"
+msgstr ""
+
+#: avidemux/ADM_encoder/adm_encConfig.cpp:193
+msgid "Select MPEG as the output."
+msgstr ""
+
+#: avidemux/ADM_encoder/adm_encConfig.cpp:198
+msgid "Wrong video codec"
+msgstr ""
+
+#: avidemux/ADM_encoder/adm_encConfig.cpp:199
+msgid "Select DVD as the video codec for MPEG TS output."
+msgstr ""
+
+#: avidemux/ADM_encoder/adm_encConfig.cpp:712
+msgid "Only QCIF and subQCIF are allowed for H.263"
+msgstr ""
+
+#: avidemux/ADM_encoder/adm_encConfig.cpp:891
+msgid "Fatal error"
+msgstr ""
+
+#: avidemux/ADM_mpegdemuxer/dmx_indexer.cpp:160
+msgid "There is several mpeg file, append them ?"
+msgstr ""
+
+#: avidemux/ADM_mpegdemuxer/dmx_indexer.cpp:358
+msgid "Can't determine aspect ratio"
+msgstr ""
+
+#: avidemux/ADM_mpegdemuxer/dmx_video.cpp:312
+msgid "Out of memory"
+msgstr ""
+
+#: avidemux/ADM_mpegdemuxer/dmx_video.cpp:485
+msgid "MPEG renumbering error"
+msgstr ""
+
+#: avidemux/ADM_3gp/ADM_3gp.cpp:488
+msgid "Expect troubles"
+msgstr ""
+
+#: avidemux/ADM_3gp/ADM_3gp.cpp:972
+msgid "Problem reading SVQ3 headers"
+msgstr ""
+
+#: avidemux/ADM_3gp/ADM_3gp.cpp:1524
+msgid "No stts table"
+msgstr ""
+
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:208
+msgid "For DVD, audio must be 48 kHz MP2, AC3 or LPCM."
+msgstr ""
+
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:325
+msgid "Reuse log file ?"
+msgstr ""
+
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:342
+msgid "Error in pass 1"
+msgstr ""
+
+#: avidemux/oplug_mpegFF/oplug_vcdff.cpp:492
+msgid "Error in pass 2"
+msgstr ""
+
+#: avidemux/ADM_openDML/ADM_openDML.cpp:290
+#: avidemux/ADM_openDML/ADM_openDML.cpp:375
+#: avidemux/ADM_openDML/ADM_openDML.cpp:510
+msgid "Malformed header"
+msgstr ""
+
+#: avidemux/ADM_lvemux/ADM_muxer.cpp:85
+msgid "For DVD, audio must be MP2 or AC3."
+msgstr ""
+
+#: avidemux/ADM_lvemux/ADM_muxer.cpp:92
+msgid "lvemux init failed"
+msgstr ""
+
+#: avidemux/ADM_toolkit/toolkit_dialog.cpp:708
+msgid "Alert"
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:121
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:316
+msgid "Cannot open directory as a file"
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:178 avidemux/gtk_gui.cpp:986
+#, c-format
+msgid "Cannot open \"%s\"."
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:188
+msgid "Overwrite file ?"
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:213
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:227
+msgid "It could be possible that you try to overwrite an input file!"
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:238 avidemux/gtk_gui.cpp:1482
+msgid "Cannot write the file"
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:238
+#, c-format
+msgid "No write access to \"%s\"."
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:516
+msgid "Images"
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:528
+msgid "All"
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:576
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:600
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:620
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:627
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:638 avidemux/GUI_jobs.cpp:37
+msgid "Oops"
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:576
+#, c-format
+msgid "can't create custom directory (%s)."
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:600
+#, c-format
+msgid "can't create job directory (%s)."
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:620
+msgid "can't determine $USERPROFILE."
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:627
+msgid "can't determine $HOME."
+msgstr ""
+
+#: avidemux/ADM_toolkit/TLK_filesel.cpp:638
+msgid "Cannot create the .avidemux directory"
+msgstr ""
+
+#: avidemux/ADM_filter/filter_saveload.cpp:156
+msgid "Problem reading XML filters"
+msgstr ""
+
+#: avidemux/ADM_filter/filter_saveload.cpp:164
+msgid "No filter found"
+msgstr ""
+
+#: avidemux/ADM_filter/filter_saveload.cpp:200
+msgid "Could not find a filter"
+msgstr ""
+
+#: avidemux/ADM_filter/filter_saveload.cpp:208
+msgid "No tag found"
+msgstr ""
+
+#: avidemux/ADM_filter/filter_saveload.cpp:288
+msgid "Node not found"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtersub.cpp:52
+msgid "Video Filters"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtersub.cpp:112
+msgid "VCD res"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtersub.cpp:118
+msgid "SVCD res"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtersub.cpp:124
+msgid "DVD res"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtersub.cpp:130
+msgid "Half D1 res"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtersub.cpp:156
+msgid "Save as script"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filterlist.cpp:64
+msgid "Add Video Filter"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filterlist.cpp:98
+msgid "Transformation"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filterlist.cpp:148
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:307
+msgid "Colors"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filterlist.cpp:198
+msgid "Sharpen/Blur"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filterlist.cpp:223
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:379
+msgid "Subtitles"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filterlist.cpp:248
+msgid "Miscellaneous"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filter.cpp:327
+#: avidemux/ADM_filter/gui_filtermanager.cpp:241
+msgid "The filter is already partial"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filter.cpp:455
+#: avidemux/ADM_filter/gui_filter.cpp:457
+#: avidemux/ADM_filter/gui_filtermanager.cpp:347
+#: avidemux/ADM_filter/gui_filtermanager.cpp:349
+msgid "Load set of filters"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filter.cpp:464
+#: avidemux/ADM_filter/gui_filtermanager.cpp:362
+msgid "Nothing to save"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filter.cpp:468
+#: avidemux/ADM_filter/gui_filter.cpp:470
+#: avidemux/ADM_filter/gui_filtermanager.cpp:366
+#: avidemux/ADM_filter/gui_filtermanager.cpp:368
+msgid "Save set of filters"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:122
+msgid "Video Filter Manager"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:143
+msgid "Open filter list [Ctrl-O]"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:152
+msgid "Save filter list [Ctrl-S]"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:160
+msgid "Save Script"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:163
+msgid "Save as script [Ctrl-J]"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:171
+msgid "DVD Res"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:174
+msgid "DVD resolution [Ctrl-1]"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:182
+msgid "Half D1 Res"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:185
+msgid "Half D1 resolution [Ctrl-2]"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:193
+msgid "SVCD Res"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:196
+msgid "SVCD resolution [Ctrl-3]"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:204
+msgid "VCD Res"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:207
+msgid "VCD resolution [Ctrl-4]"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:258
+msgid "Transform"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:331
+msgid "Noise"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:355
+msgid "Sharpness"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:403
+msgid "Misc"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:414
+msgid "Add selected filter to the Active Filters list"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:420
+msgid "<b>Available Filters</b>"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:465
+msgid "Remove filter"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:474
+msgid "Move filter down"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:483
+msgid "Move filter up"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:489
+msgid "P_artial"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:492
+msgid "Apply the current filter only to a part of the file"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:497
+msgid "Configure filter"
+msgstr "Подеси филтер"
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:507
+msgid "C_onfigure"
+msgstr "_Подеси"
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:511
+msgid "<b >Active Filters</b>"
+msgstr ""
+
+#: avidemux/ADM_filter/gui_filtermanager_dialog.cpp:538
+msgid "_Preview"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:388
+msgid "File type identified but no loader support detected..."
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:389
+msgid "May be related to an old index file."
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:396
+#, c-format
+msgid "Attempt to open %s failed!"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:420
+msgid ""
+"You cannot mix different video dimensions yet. Using the partial video "
+"filter later, will not work around this problem. The workaround is:\n"
+"1.) \"resize\" / \"add border\" / \"crop\" each stream to the same "
+"resolution\n"
+"2.) concatinate them together"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:517
+msgid "Build Time Map"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:517
+msgid "Build VBR time map?"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:551
+msgid "Use that mode"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:551
+msgid "H264 detected"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:551
+msgid ""
+"If the file is using bframe as reference, it can lead to crash or "
+"stutteting.\n"
+"Avidemux can use another mode which is safed but <b>YOU WILL LOOSE FRAME "
+"ACCURACY</b>.\n"
+"Do you want to use that mode ?"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:665
+msgid "Packed Bitstream detected"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:666
+msgid "Do you want me to unpack it ?"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:686
+msgid "Could not unpack the video"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:686
+msgid "Using backup decoder - not frame accurate."
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:691
+msgid "Weird"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:691
+msgid "The unpacking succeedeed but the index is still not up to date."
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:697
+msgid "Troubles ahead"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:697
+msgid "This a VOP packed AVI."
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:706
+msgid "Index is not up to date"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:706
+msgid "You should use Tool->Rebuild frame. Do it now ?"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:1457
+msgid ""
+"This looks like mpeg\n"
+" Do you want to index it?"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edit.cpp:1509
+msgid "Indexing failed"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edFrameType.cpp:57
+msgid "No video loaded"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edFrameType.cpp:62
+msgid "Not indexable"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edFrameType.cpp:62
+msgid "DivX 5 + packed?"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edFrameType.cpp:122
+msgid "Aborted"
+msgstr "Прекинуто"
+
+#: avidemux/ADM_editor/ADM_edLoadSave.cpp:75
+msgid "Unsupported"
+msgstr "Није подржано"
+
+#: avidemux/ADM_editor/ADM_edLoadSave.cpp:294
+msgid "Old format project file"
+msgstr ""
+
+#: avidemux/ADM_editor/ADM_edLoadSave.cpp:294
+msgid "No more supported."
+msgstr ""
+
+#: avidemux/ADM_lavformat/ADM_lavformat.cpp:291
+msgid "Incompatible frame rate"
+msgstr ""
+
+#: avidemux/ADM_codecs/ADM_ffmp43.cpp:51
+msgid "Internal error finding codec"
+msgstr ""
+
+#: avidemux/ADM_codecs/ADM_ffmpeg.cpp:51
+msgid "Internal error opening codec"
+msgstr ""
+
+#: avidemux/ADM_codecs/ADM_ffmpeg.cpp:53
+msgid "Internal error with context for  codec"
+msgstr ""
+
+#: avidemux/ADM_codecs/ADM_ffmpeg.cpp:53
+msgid ""
+".\n"
+" Did you use too low / too high target for 2 pass ?"
+msgstr ""
+
+#: avidemux/ADM_video/ADM_vidFieldUnblend.cpp:81
+msgid "Metrics"
+msgstr ""
+
+#: avidemux/ADM_video/ADM_vidFieldUnblend.cpp:81
+msgid "Do you want to print metrics on screen ?"
+msgstr ""
+
+#: avidemux/ADM_video/ADM_vidPalShift.cpp:74
+msgid "Try reverse ?"
+msgstr ""
+
+#: avidemux/ADM_video/ADM_vidMPLResize.cpp:143
+#: avidemux/ADM_video/ADM_guiResize.cpp:96
+msgid "Width and height cannot be 0"
+msgstr ""
+
+#: avidemux/ADM_video/ADM_vidMPLResize.cpp:145
+#: avidemux/ADM_video/ADM_guiResize.cpp:98
+msgid "Width and height cannot be odd"
+msgstr ""
+
+#: avidemux/ADM_video/ADM_vidResampleFPS.cpp:91
+msgid "Use linear blend ?"
+msgstr ""
+
+#: avidemux/ADM_video/ADM_vidSRT.cpp:215
+msgid "Could not open subtitle file"
+msgstr ""
+
+#: avidemux/ADM_video/ADM_vidSRT.cpp:238
+msgid "Cannot identify subtitle format"
+msgstr ""
+
+#: avidemux/gui_navigate.cpp:78 avidemux/gui_navigate.cpp:119
+#: avidemux/gui_navigate.cpp:392 avidemux/gui_navigate.cpp:434
+msgid "Decompressing error"
+msgstr ""
+
+#: avidemux/gui_navigate.cpp:78
+msgid "Cannot decode next frame."
+msgstr ""
+
+#: avidemux/gui_navigate.cpp:119 avidemux/gui_navigate.cpp:434
+msgid "Cannot decode keyframe."
+msgstr ""
+
+#: avidemux/gui_navigate.cpp:237
+msgid "Seeking"
+msgstr ""
+
+#: avidemux/gui_navigate.cpp:392
+msgid "Cannot decode the frame."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:261
+msgid "Select ecmascript to run "
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:308 avidemux/gtk_gui.cpp:420
+msgid "Obsolete"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:448
+msgid "Not coded in this version"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:461 avidemux/gtk_gui.cpp:466 avidemux/gtk_gui.cpp:590
+#: avidemux/gtk_gui.cpp:593
+msgid "Select AVI file..."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:516
+msgid ""
+"This is to be used to undo packed vop on mpeg4.\n"
+"Continue ?"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:518
+msgid "Select Avi file to write"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:524
+msgid "Select OGM file to write"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:545 avidemux/gtk_gui.cpp:556
+msgid "Select workbench to save "
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:580
+msgid "Select raw file to save "
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:596
+msgid "Select AVI file to append..."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:600
+msgid "Select file to save audio"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:634
+msgid "Select Jpeg sequence to save "
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:637
+msgid "Select BMP to save "
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:641
+msgid "Select Jpeg to save "
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:698
+msgid "Select file to save"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:750 avidemux/gtk_gui.cpp:2289
+msgid "Select MP3 to load "
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:753 avidemux/gtk_gui.cpp:2292
+msgid "Select AC3 to load "
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:756 avidemux/gtk_gui.cpp:2295
+msgid "Select WAV to load "
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:804
+msgid "Out of bounds"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:810
+msgid "Select  file to save "
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:815 avidemux/gtk_gui.cpp:2201
+msgid "Marker A > B"
+msgstr "Ознака A > B"
+
+#: avidemux/gtk_gui.cpp:815
+msgid "Cannot copy."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:827
+msgid "Something bad happened (II))"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:841
+msgid "Are you sure ?"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:920
+msgid "Width is not a multiple of 8"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:921
+msgid "This will make trouble for avi files."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:932
+msgid "Rebuild all Keyframes?"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:986
+msgid "Permission error"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:989
+#, c-format
+msgid "\"%s\" does not exist."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1052
+msgid "Cannot open project using the video loader."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1053
+msgid "Try 'File' -> 'Load/Run Project...'"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1055
+msgid "Could not open the file"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1089
+msgid "Multiple Audio Tracks"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1089
+msgid ""
+"The file you just loaded contains several audio tracks.\n"
+"Go to Audio->MainTrack to select the active one."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1180
+msgid "No audio decoder found for this file"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1181
+msgid "Save (A+V) will generate bad AVI. Save audio will work."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1196
+msgid "Could not decode the frame"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1222
+msgid "Something failed"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1231 avidemux/gtk_gui.cpp:2220
+msgid "Something bad happened (II)"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1295
+msgid "Cannot save the audio in copy mode"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1295
+msgid ""
+"Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1303 avidemux/gtk_gui.cpp:1787
+msgid "Saving audio"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1406
+msgid "Cannot encode the frame"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1441
+msgid "Mark A > B"
+msgstr "Ознака A > B"
+
+#: avidemux/gtk_gui.cpp:1441
+msgid "Set your markers correctly."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1459
+msgid "Saving as set of jpegs"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1468
+msgid "Cannot decode frame"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1468 avidemux/gtk_gui.cpp:1474
+#: avidemux/gtk_gui.cpp:1482
+msgid "Aborting."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1474
+msgid "Cannot encode frame"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1490 avidemux/gtk_gui.cpp:1596
+#: avidemux/gtk_gui.cpp:2481
+msgid "Done"
+msgstr "Завршено"
+
+#: avidemux/gtk_gui.cpp:1490
+#, c-format
+msgid "Saved %d images."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1548
+msgid "Memory error"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1554
+msgid "Error converting to BMP"
+msgstr "Ошибка при конвертации в BMP"
+
+#: avidemux/gtk_gui.cpp:1560 avidemux/gtk_gui.cpp:2213
+msgid "Something bad happened"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1596
+#, c-format
+msgid "Saved \"%s\"."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1617 avidemux/gtk_gui.cpp:1682
+msgid "Failed to open the file"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1617 avidemux/gtk_gui.cpp:1682
+msgid "Not a WAV file?"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1618
+#, c-format
+msgid "WAV open file failed..."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1748
+msgid "Cannot decompress audio frame"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1762
+msgid "Memory Error"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1808
+msgid "No frames to encode"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1808
+msgid "Please check markers. Is \"A>\" == \">B\"?"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:1988
+msgid "Saving raw video stream"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:2152
+msgid "No error found"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:2156
+#, c-format
+msgid "Errors found in %u frames"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:2174
+msgid "Cannot decompress the audio stream"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:2174
+msgid "Switch audio codec to Copy."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:2201
+msgid "Cannot delete the selection."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:2206
+msgid "You can't remove all frames"
+msgstr "Не можете да уклоните све кадрове"
+
+#: avidemux/gtk_gui.cpp:2276
+msgid "Could not get tracks info"
+msgstr "Не могу да нађем информације о тракама."
+
+#: avidemux/gtk_gui.cpp:2341
+msgid "Select 2nd track"
+msgstr "Одабери другу траку"
+
+#: avidemux/gtk_gui.cpp:2360
+msgid "Error loading the MP3 file"
+msgstr "Грешка при учитавању MP3 датотеке"
+
+#: avidemux/gtk_gui.cpp:2368 avidemux/gtk_gui.cpp:2389
+#: avidemux/gtk_gui.cpp:2410
+msgid "Second track loaded"
+msgstr "Друга трака учитана"
+
+#: avidemux/gtk_gui.cpp:2382
+msgid "Error loading the AC3 file"
+msgstr "Грешка при учитавању AC3 датотеке"
+
+#: avidemux/gtk_gui.cpp:2403
+msgid "Error loading the WAV file"
+msgstr "Грешка при учитавању WAV датотеке"
+
+#: avidemux/gtk_gui.cpp:2469
+msgid "Saving failed"
+msgstr "Грешка при снимању"
+
+#: avidemux/gtk_gui.cpp:2469
+msgid "Saving the job failed. Maybe you have permission issue with ~/.avidemux"
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:2481
+#, c-format
+msgid "File %s has been successfully saved."
+msgstr ""
+
+#: avidemux/gtk_gui.cpp:2485
+#, c-format
+msgid "File %s was NOT saved correctly."
+msgstr ""
+
+#: avidemux/GUI_jobs.cpp:37
+msgid "Something very wrong happened when buildint joblist"
+msgstr ""
+
+#: avidemux/GUI_jobs.cpp:42
+msgid "Nothing to do."
+msgstr ""
+
+#: avidemux/GUI_jobs.cpp:42
+msgid "There is no jobs stored, nothing to do"
+msgstr ""
+
+#: avidemux/ADM_audiodevice/ADM_deviceoss.cpp:113
+msgid "Could not open OSS audio device"
+msgstr ""
+
+#: avidemux/ADM_audiodevice/ADM_deviceoss.cpp:113
+msgid "Check the permissions for /dev/dsp."
+msgstr ""
+
+#: avidemux/ADM_guiBitrate.cpp:104 avidemux/ADM_guiBitrate.cpp:136
+msgid "No data"
+msgstr ""
+
+#: avidemux/gui_autodrive.cpp:51
+msgid "No audio track"
+msgstr ""
+
+#: avidemux/gui_autodrive.cpp:51
+msgid "An audio track is necessary to create such file"
+msgstr ""
+
+#: avidemux/gui_autodrive.cpp:69
+msgid "Cannot select mpeg4 sp codec."
+msgstr "Ме могу да одаберем mpeg4 sp кодек."
+
+#: avidemux/gui_autodrive.cpp:86
+msgid ""
+"You don't have FAAC!.\n"
+"It is needed to create PSP compatible video."
+msgstr ""
+
+#: avidemux/ADM_h263/ADM_h263.cpp:263
+msgid "Size is not (s)QCIF"
+msgstr ""
+
+#: avidemux/ADM_ogm/ADM_ogm.cpp:362
+msgid "Take second track ?"
+msgstr "Да узмем другу траку ?"
+
+#: avidemux/ADM_ogm/ADM_ogm.cpp:442
+msgid "Scanning OGM"
+msgstr ""
+
+#: avidemux/ADM_ocr/adm_ocr.cpp:211
+msgid "Incorrect output file"
+msgstr ""
+
+#: avidemux/ADM_ocr/adm_ocr.cpp:217
+msgid "Output file error"
+msgstr ""
+
+#: avidemux/ADM_ocr/adm_ocr.cpp:217
+#, c-format
+msgid "Could not open \"%s\" for writing."
+msgstr ""
+
+#: avidemux/ADM_ocr/adm_ocr.cpp:226
+msgid "Problem loading sub"
+msgstr ""
+
+#: avidemux/ADM_ocr/adm_ocr.cpp:591
+msgid "Sure ?"
+msgstr "Сигурно ?"
+
+#: avidemux/ADM_ocr/adm_ocr.cpp:754
+msgid "Select SRT to save"
+msgstr ""
+
+#: avidemux/ADM_ocr/adm_ocr.cpp:766
+msgid "Select Glyoh to save"
+msgstr ""
+
+#: avidemux/ADM_ocr/adm_ocr.cpp:780
+msgid "No glyphs to save"
+msgstr ""
+
+#: avidemux/ADM_ocr/ADM_vob2vobsub.cpp:244
+msgid "Ifo error"
+msgstr "Ifo грешка"
+
+#: avidemux/ADM_ocr/ADM_vob2vobsub.cpp:244
+msgid "Error reading ifo file, aborting."
+msgstr "Грешка при читању ifo датотеке, прекидам."
+
+#: avidemux/ADM_ocr/ADM_vob2vobsub.cpp:252
+msgid "Cannot write .idx"
+msgstr "Не могу да упишем .idx"
+
+#: avidemux/ADM_ocr/ADM_vob2vobsub.cpp:265
+msgid "Cannot write .sub"
+msgstr "Не могу да упишем .sub"
+
+#: avidemux/ADM_ocr/ADM_vob2vobsub.cpp:277
+msgid "Problem opening the mpeg files"
+msgstr "Проблем при отварању mpeg датотеке."
+
+#: avidemux/gui_savenew.cpp:86
+msgid "Dual audio can only be used in copy mode"
+msgstr "Две звучне траке могу бити коришћене само у моду за кпирање."
+
+#: avidemux/gui_savenew.cpp:86
+msgid "Select Copy as the video codec."
+msgstr "Одабери копирање као видео кодек."
+
+#: avidemux/gui_savenew.cpp:192 avidemux/gui_savenew.cpp:208
+#: avidemux/gui_savenew.cpp:221
+msgid "Incompatible output format"
+msgstr "Не компатибилан узлазни формат"
+
+#: avidemux/gui_savenew.cpp:239
+msgid "There is no second track"
+msgstr "Не постоји друга трака"
+
+#: avidemux/gui_savenew.cpp:239
+msgid "Select a second audio track in the Audio menu."
+msgstr "Одаберите другу аудио траку из менија 'Звук'"
+
+#: avidemux/gui_savenew.cpp:243
+msgid "Select dual audio AVI to write"
+msgstr "Одаберите AVI датотеку за упис са два звучна канала"
+
+#: avidemux/gui_savenew.cpp:265
+msgid "This cannot have packed VOP"
+msgstr "Не можете запаковати VOP"
+
+#: avidemux/gui_savenew.cpp:265
+msgid "It is not MPEG-4 video. File will not be saved."
+msgstr "Ово није MPEG-4 видео. Датотека неће бити сачувана."
+
+#: avidemux/gui_savenew.cpp:311
+msgid ""
+"You may need smart copy.\n"
+" Enable it ?"
+msgstr ""
+"Можда је потребно паметно копирање.\n"
+"Да ли да омогућим ?"
+
+#: avidemux/guiplay.cpp:384
+msgid "Trouble initializing audio device"
+msgstr "Проблеми при покретању звучне картице."
+
+#~ msgid "No encoder"
+#~ msgstr "Нема енкодера."
+
+#~ msgid "Cannot save in process mode."
+#~ msgstr "Не могу да снимим у моду са превођењем."
