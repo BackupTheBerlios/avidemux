@@ -14,16 +14,16 @@
 typedef enum 
 {
 	ADM_AVI=0,
-        ADM_AVI_UNP,
-        ADM_AVI_PAK,
-        ADM_AVI_DUAL,
+	ADM_AVI_UNP,
+	ADM_AVI_PAK,
+	ADM_AVI_DUAL,
 	ADM_OGM,
 	ADM_ES,
 	ADM_PS,
-        ADM_TS,
-        ADM_MP4,
-        ADM_PSP,
-        ADM_FORMAT_MAX,
+	ADM_TS,
+	ADM_MP4,
+	ADM_PSP,
+	ADM_FORMAT_MAX,
 	ADM_FMT_DUMMY=ADM_FORMAT_MAX
 }ADM_OUT_FORMAT;
 
@@ -35,17 +35,16 @@ typedef struct
 
 const ADM_FORMAT_DESC ADM_allOutputFormat[]=
 {
-  {     ADM_AVI,"Avi"},
-  {     ADM_AVI_UNP,"Avi,unp. vop"},
-  {     ADM_AVI_PAK,"Avi,Pack vop"},
-  {     ADM_AVI_DUAL,"Avi,dual audio"},
-  {	ADM_OGM,"OGM"},
-  {	ADM_ES,"Mpeg Video"},
-  {	ADM_PS,"Mpeg PS (A+V"},
-  {     ADM_TS,"Mpeg TS (A+V"},
-  {     ADM_MP4,"MP4"},
-  {     ADM_PSP,"PSP"},
-  
+  {ADM_AVI,_("AVI")},
+  {ADM_AVI_DUAL,_("AVI, dual audio")},
+  {ADM_AVI_PAK,_("AVI, pack VOP")},
+  {ADM_AVI_UNP,_("AVI, unp. VOP")},  
+  {ADM_PS,_("MPEG-PS (A+V)")},
+  {ADM_TS,_("MPEG-TS (A+V)")},
+  {ADM_ES,_("MPEG Video")},
+  {ADM_MP4,_("MP4")},
+  {ADM_OGM,_("OGM")},
+  {ADM_PSP,_("PSP")},
 };
 
 #endif

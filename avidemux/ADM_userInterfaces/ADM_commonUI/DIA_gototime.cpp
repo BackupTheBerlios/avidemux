@@ -26,7 +26,7 @@ uint32_t h=*hh,m=*mm,s=*ss;
 
 diaElemUInteger   eh(&h,_("Hour"),0,24);
 diaElemUInteger   em(&m,_("Minutes"),0,59);
-diaElemUInteger   es(&s,_("Secons"),0,59);
+diaElemUInteger   es(&s,_("Seconds"),0,59);
         diaElem *allWidgets[]={&eh,&em,&es};
 
   if(!diaFactoryRun("Go to time",3,allWidgets)) return 0;
