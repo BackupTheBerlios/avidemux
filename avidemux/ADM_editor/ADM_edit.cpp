@@ -427,6 +427,19 @@ thisIsMpeg:
   // else update info
   _videos[_nb_video]._aviheader->getVideoInfo (&info);
   _videos[_nb_video]._aviheader->setMyName (name);
+  
+  // Printf some info about extradata
+  {
+    uint32_t l=0;
+    uint8_t *d=NULL;
+    _videos[_nb_video]._aviheader->getExtraHeaderData(&l,&d);
+    if(l && d)
+    {
+        printf("The video codec has some extradata (%d bytes)\n",l);
+        mixDump(d,l);
+        printf("\n");
+    }
+  }
   // 1st if it is our first video we update postproc
  if(!_nb_video)
  {
