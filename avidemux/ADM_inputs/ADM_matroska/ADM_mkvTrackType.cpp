@@ -42,10 +42,11 @@ typedef struct MKVCC
 MKVCC mkvCC[]=
 {
   {"A_MPEG/L3",0,WAV_MP3,""},
+  {"A_AC3",0,WAV_AC3,""},
   
   // Video
   {"V_MPEG4/ISO/AVC",1,0,"AVC1"}, //H264
-  {"V_MS/VFW/FOURCC",1,0,"DIV3"}, // Divx 2.
+  {"V_MS/VFW/FOURCC",1,0,"DIVX"}, // Divx 2.
   
   
   // Filler
