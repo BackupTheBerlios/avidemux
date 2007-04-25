@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = -Wno-portability
+
 AQ_%.cpp : Q_%.cpp %.ui
 	$(UIC) $*.ui -o ui_$*.h
 	$(MOC) Q_$*.cpp -o Q_$*.moc

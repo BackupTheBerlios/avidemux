@@ -56,6 +56,8 @@ unset CDPATH
 dnl make /usr/local the default for the installation
 AC_PREFIX_DEFAULT(/usr/local)
 
+AM_PROG_AS
+
 dnl Ranlib
 AC_PROG_RANLIB
 AC_PROG_CXX

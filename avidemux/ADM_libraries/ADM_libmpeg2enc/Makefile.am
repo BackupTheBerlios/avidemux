@@ -40,6 +40,7 @@ quantize_x86.cc
 ####### kdevelop will overwrite this part!!! (end)############
 
 INCLUDES = $(all_includes)
+AUTOMAKE_OPTIONS = -Wno-portability
 #
 # From mpeg2enc 's Makefile.am
 %.o: %.s ; 	$(AS) $(ASFLAGS) -o $@ $<
