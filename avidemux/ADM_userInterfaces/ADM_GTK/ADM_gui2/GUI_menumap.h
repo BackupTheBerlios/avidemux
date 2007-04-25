@@ -6,6 +6,7 @@
 
 
 */
+CALLBACK( see_hex1                              ,ACT_HEX_DUMP);
 CALLBACK( show_builtin_support1                 ,ACT_BUILT_IN);
 CALLBACK( open_video1         			,ACT_OpenAvi); 
 CALLBACK( append_video1     			,ACT_AppendAvi);

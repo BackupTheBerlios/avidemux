@@ -91,6 +91,7 @@ class mkvHeader         :public vidHeader
     uint8_t                 addVideoEntry(uint64_t where, uint32_t size);
     uint8_t                 addVideoEntry(uint32_t track,uint64_t where, uint32_t size);
     uint8_t                 videoIndexer(ADM_ebml_file *parser);
+    uint8_t                 readCue(ADM_ebml_file *parser);
   public:
 
 

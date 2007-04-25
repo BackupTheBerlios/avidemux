@@ -203,4 +203,90 @@ int mkvHeader::searchTrackFromTid(uint32_t tid)
   }
   return -1;
 }
+
+/**
+  \fn readCue
+  \brief Update index with cue content
+
+*/
+uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
+{
+  uint64_t fileSize,len,bsize;
+  uint32_t alen,vlen;
+  uint64_t id;
+  ADM_MKV_TYPE type;
+  const char *ss;
+  uint64_t time;
+  
+   parser->seek(0);
+   
+   if(!parser->find(ADM_MKV_PRIMARY,MKV_SEGMENT,MKV_CLUSTER,&vlen))
+   {
+     printf("[MKV] Cannot find CLUSTER atom\n");
+     return 0;
+   }
+   ADM_ebml_file segment(parser,vlen);
+   
+   while(segment.find(ADM_MKV_PRIMARY,MKV_CUES,MKV_CLUSTER,&alen,0))
+  {
+   ADM_ebml_file cues(&segment,alen);
+   while(!cues.finished())
+   {
+      cues.readElemId(&id,&len);
+      if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
+      {
+        printf("[MKV] Tag 0x%x not found (len %llu)\n",id,len);
+        cues.skip(len);
+        continue;
+      }
+      if(id!=MKV_CUE_POINT)
+      {
+        printf("Found %s in CUES, ignored \n",ss); 
+        cues.skip(len);
+        continue;
+      }
+      ADM_ebml_file cue(&cues,len);
+      // Cue TIME normally
+       cue.readElemId(&id,&len);
+       if(id!=MKV_CUE_TIME)
+       {
+          ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type);
+          printf("Found %s(0x%x), expected CUE_TIME  (0x%x)\n", ss,id,MKV_CUE_TIME);
+          cue.skip(cue.remaining());
+          continue;
+       }
+       time=cue.readUnsignedInt(len);
+       
+       
+       cue.readElemId(&id,&len);
+       if(id!=MKV_CUE_TRACK_POSITION)
+       {
+          ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type);
+          printf("Found %s (0x%x), expected MKV_CUE_TRACK_POSITION (0x%x)\n", ss,id,MKV_CUE_TRACK_POSITION);
+          cue.skip(cues.remaining());
+          continue;
+       }
+       ADM_ebml_file trackPos(&cue,len);
+       uint64_t tid=0;
+       uint64_t cluster_position=0;
+       while(!trackPos.finished())
+       {
+         trackPos.readElemId(&id,&len);
+         switch(id)
+         {
+           case MKV_CUE_TRACK: tid=trackPos.readUnsignedInt(len);break;
+           case MKV_CUE_CLUSTER_POSITION: cluster_position=trackPos.readUnsignedInt(len);break;
+           default: 
+                 ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type);
+                 printf("[MKV] in cluster position found tag %s (0x%x)\n",ss,id);
+                 trackPos.skip(len);
+                 continue;
+         }
+       }
+       printf("Track %u Position 0x%llx time %llu\n",tid,cluster_position,time);
+     }
+   }
+   printf("[MKV] Cues updated\n");
+   return 1;  
+}
 //EOF

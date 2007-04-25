@@ -86,10 +86,15 @@ uint8_t mkvHeader::open(char *name)
     }
   // update some infos
   _videostream.dwLength= _mainaviheader.dwTotalFrames=_tracks[0]._nbIndex; 
-  printf("Matroska successfully read\n");
+  
   _parser=new ADM_ebml_file();
   ADM_assert(_parser->open(name));
   _filename=ADM_strdup(name);
+  
+  // Finaly update index with queue
+  readCue(&ebml);
+  printf("[MKV]Matroska successfully read\n");
+  
   return 1;
 }
 /**

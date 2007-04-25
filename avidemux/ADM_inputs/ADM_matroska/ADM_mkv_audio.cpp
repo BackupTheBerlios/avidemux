@@ -83,6 +83,20 @@ uint32_t    mkvAudio::read(uint32_t len,uint8_t *buffer)
 */
 uint8_t             mkvAudio::goTo(uint32_t newoffset)
 {
+  uint32_t cumul=0;
+  for(int i=0;i<_track->_nbIndex;i++)
+  {
+    if(newoffset>=cumul && newoffset<=cumul+_track->_index[i].size)
+    {
+      _offset=0;
+      _index=i;
+      _parser->seek(_track->_index[_index].pos);
+      return 1;
+    }
+    cumul+=_track->_index[i].size;
+  }
+  // 
+  printf("[Mkv audio] Goto failed\n");
   _parser->seek(_track->_index[0].pos);
     _offset=0;
     _index=0;

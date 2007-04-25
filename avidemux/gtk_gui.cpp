@@ -166,7 +166,7 @@ uint8_t A_setSecondAudioTrack(const AudioSource nw,char *name);
 extern const char * GUI_getCustomScript(uint32_t nb);
 extern gboolean SliderIsShifted;
 
-
+void GUI_showCurrentFrameHex(void);
 
 
 //___________________________________________
@@ -827,6 +827,10 @@ int nw;
 	}
       break;
 
+   case ACT_HEX_DUMP:
+      GUI_showCurrentFrameHex();
+      break;
+      
     default:
       printf ("\n unhandled action %d\n", action);
       ADM_assert (0);
@@ -2381,6 +2385,44 @@ uint8_t GUI_getFrameContent(ADMImage *image, uint32_t frame)
   uint32_t flags;
   if(!video_body->getUncompressedFrame(frame,image,&flags)) return 0;
   return 1; 
+}
+
+/**
+      \fn GUI_showCurrentFrameHex
+      \brief Display the first 32 bytes of the current frame in hex
+*/
+
+void GUI_showCurrentFrameHex(void)
+{
+#define DISPLAY_HEX 32
+ uint8_t *buffer;
+ uint32_t len,fullLen;
+ char     string[DISPLAY_HEX*3+6],*s;
+ char     title[80];
+ 
+ if (!avifileinfo) return;
+ 
+ buffer=new uint8_t [avifileinfo->width*avifileinfo->height*3];
+ video_body->getRaw (curframe, buffer, &fullLen);  
+ 
+ len=fullLen;
+ if(len>DISPLAY_HEX) len=DISPLAY_HEX;
+ s=string;
+ for(int i=0;i<len;i++)
+ {
+    sprintf(s,"%02x ",buffer[i]); 
+    s+=3;
+    if(i%8==7)
+    {
+      *s++='\n'; 
+    }
+    
+ }
+ *s=0;
+ sprintf(title,"Len: %u bytes\n",fullLen);
+ 
+ GUI_Info_HIG( ADM_LOG_IMPORTANT,title, string);
+ delete [] buffer;
 }
 
 // EOF
