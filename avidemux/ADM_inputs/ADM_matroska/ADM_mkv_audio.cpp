@@ -27,24 +27,8 @@
 #include "fourcc.h"
 #include "ADM_toolkit/toolkit.hxx"
 
-
 #include "ADM_mkv.h"
-#if 0
-class mkvAudio : public AVDMGenericAudioStream
-{
-  protected:
-    mkvTrak                     *_track;
-    
-  public:
-                                mkvAudio(mkvTrak *track);
-    virtual                     ~mkvAudio();
-    virtual uint32_t            read(uint32_t len,uint8_t *buffer);
-    virtual uint8_t             goTo(uint32_t newoffset);
-    virtual uint8_t             getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
-    virtual uint8_t             goToTime(uint32_t mstime);
-    virtual uint8_t             extraData(uint32_t *l,uint8_t **d);
-};
-#endif
+
 
 /**
     \fn ~mkvAudio
@@ -66,14 +50,15 @@ uint32_t    mkvAudio::read(uint32_t len,uint8_t *buffer)
     //********************************************
     if(_index>=_track->_nbIndex)
     {
-      return 0; 
+      return red; 
     }
     //********************************************
     if(len+_offset <=_track->_index[_index].size)
     {
       _parser->readBin(buffer,len);
       _offset+=len;
-      return len; 
+      red+=len;
+      return red; 
     }
     // empty...
     //********************************************

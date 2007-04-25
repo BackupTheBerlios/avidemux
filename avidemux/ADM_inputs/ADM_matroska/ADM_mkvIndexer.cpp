@@ -131,6 +131,12 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                                                     remaining--;
                                                     // Only mp3/Ac3 supported, ignore lacing FIXME : Vorbis or AAC will not work
                                                     addVideoEntry(track,blockGroup.tell(),remaining);
+                                                    int bsize=remaining/nbLaces;
+                                                    if(bsize*nbLaces!=remaining)
+                                                    {
+                                                      printf("Warning not multiple bsize=%d total=%u  nbLaces=%u\n",bsize,remaining,nbLaces);
+                                                    }
+                                                    if(!track) printf("Warning lacing on video track\n");
                                                     //printf("tid:%u track %u Remaining : %llu laces %u blksize %d er%d\n",tid,track,remaining,nbLaces,remaining/nbLaces,remaining-(remaining/nbLaces)*nbLaces);
                                             } 
                                         break;
