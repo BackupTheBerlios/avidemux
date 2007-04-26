@@ -321,14 +321,14 @@ typedef struct ARDescriptor
 };
 ARDescriptor  allArs[]=
 {
-  {8,9,ADM_ASPECT_4_3,     "NTSC 4:3"},
-  {32,27,ADM_ASPECT_16_9,  "NTSC 16:9"},
-  {128,81,ADM_ASPECT_16_9, "NTSC 16:9"},
-  {16,15,ADM_ASPECT_4_3,   "Pal 4:3"},
-  {64,45,ADM_ASPECT_16_9,  "Pal 16:9"},
-  {1,1,ADM_ASPECT_1_1,     "1:1"},
+  {8,9,ADM_ASPECT_4_3,     _("NTSC 4:3")},
+  {32,27,ADM_ASPECT_16_9,  _("NTSC 16:9")},
+  {128,81,ADM_ASPECT_16_9, _("NTSC 16:9")},
+  {16,15,ADM_ASPECT_4_3,   _("PAL 4:3")},
+  {64,45,ADM_ASPECT_16_9,  _("PAL 16:9")},
+  {1,1,ADM_ASPECT_1_1,     _("1:1")},
 };
-const char *unknown="Unknown";
+const char *unknown=_("Unknown");
 
 ADM_ASPECT getAspectRatioFromAR(uint32_t width, uint32_t height, const char **string)
 {
