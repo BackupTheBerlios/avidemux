@@ -13,6 +13,7 @@
 #include "config.h"
 #include <stdio.h>
 #include "default.h"
+#include <ADM_assert.h>
 #include "ADM_audio/ADM_a52info.h"
 
 #define A52_CHANNEL 0
@@ -120,28 +121,33 @@ uint32_t of=0;
 		}
 		printf("Sync found at offset %lu\n",of);
 		*syncoff=of;
-       		*fq=(uint32_t)ifq;
-       		*br=(uint32_t)ibr>>3;
-       		*chan=2;
-                if(flags == A52_3F2R+A52_LFE)
-                {
-                  *chan=6;
-                  return 1;
-                }
-                else
-                {
-                    flags=flags & A52_CHANNEL_MASK;
-                    #define LOOK(x,y) if(flags ==x) *chan=y;       
-          
-                    LOOK(A52_MONO,1);
-                    LOOK(A52_STEREO ,2);
-                    LOOK(A52_3F  ,3);
-                    LOOK(A52_2F1R,3);
-                    LOOK(A52_3F1R,4);
-                    LOOK(A52_2F2R,4);
-                    LOOK(A52_3F2R,5);
-                    return 1;
-                }
+		*fq=(uint32_t)ifq;
+		*br=(uint32_t)ibr>>3;
+		switch (flags & A52_CHANNEL_MASK) {
+			case A52_MONO:
+				*chan = 1;
+			break;
+			case A52_STEREO:
+			case A52_DOLBY:
+				*chan = 2;
+			break;
+			case A52_3F:
+			case A52_2F1R:
+				*chan = 3;
+			break;
+			case A52_3F1R:
+			case A52_2F2R:
+				*chan = 4;
+			break;
+			case A52_3F2R:
+				*chan = 5;
+			break;
+			default:
+				ADM_assert(0);
+		}
+		if (flags & A52_LFE)
+			(*chan)++;
+		return 1;
 	}
 	return 0;
 }
