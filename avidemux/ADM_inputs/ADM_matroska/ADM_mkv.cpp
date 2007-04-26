@@ -93,6 +93,7 @@ uint8_t mkvHeader::open(char *name)
   
   // Finaly update index with queue
   readCue(&ebml);
+    
   printf("[MKV]Matroska successfully read\n");
   
   return 1;
@@ -288,6 +289,7 @@ uint8_t mkvHeader::needDecompress(void)
   _nbAudioTrack=0;
   _filename=NULL;
   memset(_tracks,0,sizeof(_tracks));
+  _reordered=0;
 }
 /*
     __________________________________________________________
@@ -354,5 +356,30 @@ uint8_t  mkvHeader::getExtraHeaderData(uint32_t *len, uint8_t **data)
                 *len=_tracks[0].extraDataLen;
                 *data=_tracks[0].extraData;
                 return 1;            
+}
+/*
+    __________________________________________________________
+*/
+uint8_t			mkvHeader::isReordered( void )
+{ 
+ 	return _reordered;
+}
+/*
+    __________________________________________________________
+*/
+uint8_t mkvHeader::reorder( void )
+{
+  
+#define INDEX_TMPL        mkvIndex
+#define INDEX_ARRAY_TMPL  (_tracks[0]._index)
+#define FRAMETYPE_TMPL    flags
+  
+#include "ADM_video/ADM_reorderTemplate.cpp"
+
+#undef INDEX_TMPL       
+#undef INDEX_ARRAY_TMPL 
+#undef FRAMETYPE_TMPL   
+     _tracks[0]._nbIndex=_videostream.dwLength;
+         return 1;
 }
 //EOF

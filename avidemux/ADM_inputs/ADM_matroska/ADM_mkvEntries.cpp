@@ -113,9 +113,25 @@ entryDesc entry;
         _video_bih.biWidth=_mainaviheader.dwWidth=entry.w;
         _video_bih.biHeight=_mainaviheader.dwHeight=entry.h;
         _videostream.fccHandler=_video_bih.biCompression=entry.fcc;
+        
+        // if it is vfw...
+        if(fourCC::check(entry.fcc,(uint8_t *)"VFWX") && entry.extraData && entry.extraDataLen>=sizeof(BITMAPINFOHEADER))
+        {
+          memcpy(& _video_bih,entry.extraData,sizeof(BITMAPINFOHEADER));
+          delete [] _tracks[0].extraData;
+          entry.extraData=NULL;
+          entry.extraDataLen=0;
+          
+          _videostream.fccHandler=_video_bih.biCompression;
+          _mainaviheader.dwWidth=  _video_bih.biWidth;
+          _mainaviheader.dwHeight= _video_bih.biHeight;    
+          
+        } // FIXME there can be real extradata after bitmapinfoheader
+        
         _tracks[0].extraData=entry.extraData; 
         _tracks[0].extraDataLen=entry.extraDataLen;       
         _tracks[0].streamIndex=entry.trackNo;
+        
         return 1;
       }
       if(entry.trackType==2 && _nbAudioTrack<ADM_MKV_MAX_TRACKS)

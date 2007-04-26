@@ -108,7 +108,7 @@ uint8_t ADM_AudiocodecAC3::run(uint8_t *inptr, uint32_t nbIn, float *outptr,   u
         if(length==0)
         {
             printf("[a52] No startcode found\n");
-            ADM_assert(0); 
+            break;
         }
         if(length>nbIn)
         {

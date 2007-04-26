@@ -79,7 +79,7 @@ class mkvHeader         :public vidHeader
 
     
     uint32_t                _nbAudioTrack;
-    
+    uint32_t                _reordered;
     
     uint8_t                 checkHeader(void *head,uint32_t headlen);
     uint8_t                 analyzeTracks(void *head,uint32_t headlen);
@@ -126,7 +126,9 @@ class mkvHeader         :public vidHeader
     virtual uint8_t  getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img);
 
             uint8_t  getExtraHeaderData(uint32_t *len, uint8_t **data);
-    
+            uint8_t  isReordered( void );
+            uint8_t  reorder( void );
+
 };
 #endif
 
