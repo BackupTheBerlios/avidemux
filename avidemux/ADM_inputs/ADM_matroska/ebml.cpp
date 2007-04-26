@@ -32,6 +32,13 @@
 #else
 #define vprintf(...) {}
 #endif
+
+extern "C"
+{
+  double av_int2dbl(int64_t v);
+  float av_int2flt(int32_t v);
+}
+
 /*
   It is slow , optimize later
 */  
@@ -161,6 +168,29 @@ uint16_t ADM_ebml::readu16(void)
     readBin(v,2);
     return (uint16_t)(v[0]<<8)+v[1];
 }
+/**
+*/
+float       ADM_ebml::readFloat(uint32_t n)
+{
+  if(n!=4 && n!=8) ADM_assert(0);
+  
+  switch(n)
+  {
+    case 4:
+    {
+        uint32_t u4=readUnsignedInt(4);
+        return av_int2flt(u4);
+      }
+    case 8:
+    {
+        uint64_t u8=readUnsignedInt(8);
+        return  av_int2dbl(u8);
+    }
+    default:
+        ADM_assert(0);
+  }
+}
+
 ADM_ebml::ADM_ebml(void)
 {
   
@@ -282,14 +312,13 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewin
   uint64_t id,alen;
   ADM_MKV_TYPE type;
   const char *ss;
-  uint64_t pos;
+  
 
     vprintf("[MKV] Simple Searching for tag %llx\n",prim);
     if(rewind) seek(_begin);
    
       while(!finished())
       {
-          
           readElemId(&id,&alen);
           if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
           {

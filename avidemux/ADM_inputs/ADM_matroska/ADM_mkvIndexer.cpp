@@ -217,17 +217,19 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
   ADM_MKV_TYPE type;
   const char *ss;
   uint64_t time;
+  uint64_t segmentPos;
   
    parser->seek(0);
    
-   if(!parser->find(ADM_MKV_PRIMARY,MKV_SEGMENT,MKV_CLUSTER,&vlen))
+   if(!parser->simplefind(MKV_SEGMENT,&vlen,1))
    {
      printf("[MKV] Cannot find CLUSTER atom\n");
      return 0;
    }
    ADM_ebml_file segment(parser,vlen);
+   segmentPos=segment.tell();
    
-   while(segment.find(ADM_MKV_PRIMARY,MKV_CUES,MKV_CLUSTER,&alen,0))
+   while(segment.simplefind(MKV_CUES,&alen,0))
   {
    ADM_ebml_file cues(&segment,alen);
    while(!cues.finished())
@@ -283,7 +285,8 @@ uint8_t                 mkvHeader::readCue(ADM_ebml_file *parser)
                  continue;
          }
        }
-       printf("Track %u Position 0x%llx time %llu\n",tid,cluster_position,time);
+       printf("Track %u Position 0x%llx time %llu final pos:%llx \n",tid,cluster_position,time,
+             cluster_position+segmentPos );
      }
    }
    printf("[MKV] Cues updated\n");
