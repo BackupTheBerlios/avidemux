@@ -102,7 +102,18 @@ int64_t    ADM_ebml::readEBMCode_Signed(void)
     val=(val<<8)+readu8(); 
   }
   // Signed !
-  //FIXME
+
+  switch(more)
+  {
+    case 0: val-=63;break; 
+    case 1: val-=8191;break;
+    case 2: val-=1048575L;break;  
+    default: 
+        ADM_assert(0);
+        return 0;
+    
+  }
+
   return val;
 }
 /**

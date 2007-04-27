@@ -78,6 +78,12 @@ uint8_t mkvHeader::open(char *name)
     printf("[MKV] No video\n");
     return 0;
   }
+  printf("[MKV] Indexing clusters\n");
+  if(!indexClusters(&ebml))
+  {
+    printf("[MKV] Cluster indexing failed\n");
+    return 0;
+  }
   printf("[MKV] Indexing video\n");
     if(!videoIndexer(&ebml))
     {
@@ -92,7 +98,7 @@ uint8_t mkvHeader::open(char *name)
   _filename=ADM_strdup(name);
   
   // Finaly update index with queue
-  readCue(&ebml);
+  // Useless.....readCue(&ebml);
     
   printf("[MKV]Matroska successfully read\n");
   
@@ -213,7 +219,7 @@ uint8_t mkvHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {
   if(_nbAudioTrack)
   {
-      *audio=new mkvAudio(_filename,&(_tracks[1]));
+      *audio=new mkvAudio(_filename,&(_tracks[1]),_clusters,_nbClusters);
       return 1;
   }
   *audio=NULL;
@@ -241,6 +247,11 @@ uint32_t mkvHeader::getNbStream(void)
 
 uint8_t mkvHeader::close(void)
 {
+  if(_clusters)
+  {
+    delete [] _clusters;
+    _clusters=NULL; 
+  }
   // CLEANUP!!
   if(_parser) delete _parser;
   _parser=NULL;
@@ -290,6 +301,10 @@ uint8_t mkvHeader::needDecompress(void)
   _filename=NULL;
   memset(_tracks,0,sizeof(_tracks));
   _reordered=0;
+  
+  _clusters=NULL;
+  _clustersCeil=0;
+  _nbClusters=0;
 }
 /*
     __________________________________________________________

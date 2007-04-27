@@ -32,7 +32,7 @@ typedef struct mkvIndex
     uint32_t flags;
     uint32_t timeCode;
 };
-
+//**********************************************
 typedef struct mkvTrak
 {
   /* Index in mkv */
@@ -48,16 +48,31 @@ typedef struct mkvTrak
   mkvIndex  *_index;
   uint32_t  _nbIndex;  // current size of the index
   uint32_t  _indexMax; // Max size of the index
+  uint32_t  _sizeInBytes; // Approximate size in bytes of that stream
 };
+
+#define MKV_MAX_LACES 20 // ?
+//**********************************************
 class mkvAudio : public AVDMGenericAudioStream
 {
   protected:
     mkvTrak                     *_track;
     ADM_ebml_file               *_parser;
-    uint32_t                    _index;
-    uint32_t                    _offset;
+    ADM_ebml_file               *_clusterParser;
+    mkvIndex                    *_clusters;
+    uint32_t                    _nbClusters;
+    uint32_t                    _currentCluster;
+    
+    uint32_t                    _currentLace;
+    uint32_t                    _maxLace;
+    uint32_t                    _Laces[MKV_MAX_LACES];
+
+    uint8_t                     goToCluster(uint32_t x);
+    
   public:
-                                mkvAudio(const char *name,mkvTrak *track);
+                                mkvAudio(const char *name,mkvTrak *track,mkvIndex *clust,uint32_t nbClusters);
+                                
+                                
     virtual                     ~mkvAudio();
     virtual uint32_t            read(uint32_t len,uint8_t *buffer);
     virtual uint8_t             goTo(uint32_t newoffset);
@@ -77,7 +92,10 @@ class mkvHeader         :public vidHeader
     char                    *_filename;
     mkvTrak                 _tracks[ADM_MKV_MAX_TRACKS+1];
 
-    
+    mkvIndex                    *_clusters;
+    uint32_t                    _nbClusters;
+    uint32_t                    _clustersCeil;
+ 
     uint32_t                _nbAudioTrack;
     uint32_t                _reordered;
     
@@ -88,10 +106,12 @@ class mkvHeader         :public vidHeader
     int                     searchTrackFromTid(uint32_t tid);
     
     // Indexers
-    uint8_t                 addVideoEntry(uint64_t where, uint32_t size);
-    uint8_t                 addVideoEntry(uint32_t track,uint64_t where, uint32_t size);
+    
+    uint8_t                 addIndexEntry(uint32_t track,uint64_t where, uint32_t size,uint32_t flags);
     uint8_t                 videoIndexer(ADM_ebml_file *parser);
     uint8_t                 readCue(ADM_ebml_file *parser);
+    uint8_t                 indexClusters(ADM_ebml_file *parser);
+    uint8_t                 indexBlock(ADM_ebml_file *parser,uint32_t count);
   public:
 
 

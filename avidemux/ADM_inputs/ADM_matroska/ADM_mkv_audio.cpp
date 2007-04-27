@@ -29,6 +29,7 @@
 
 #include "ADM_mkv.h"
 
+#define vprintf(...) {}
 
 /**
     \fn ~mkvAudio
@@ -38,68 +39,24 @@
 {
   if(_parser) delete _parser;
   _parser=NULL; 
-  _offset=0;
-  _index=0;
+  if(_clusterParser)  delete _clusterParser;
+  _clusterParser=NULL;
 }
 
 uint32_t    mkvAudio::read(uint32_t len,uint8_t *buffer)
 {
-  uint32_t red=0;
-  while(1)
-  {
-    //********************************************
-    if(_index>=_track->_nbIndex)
-    {
-      return red; 
-    }
-    //********************************************
-    if(len+_offset <=_track->_index[_index].size)
-    {
-      _parser->readBin(buffer,len);
-      _offset+=len;
-      red+=len;
-      return red; 
-    }
-    // empty...
-    //********************************************
-    int32_t remaining=_track->_index[_index].size-_offset;
-    ADM_assert(remaining>=0);
-    
-    _parser->readBin(buffer,remaining);
-    red+=remaining;
-    len-=remaining;
-    buffer+=remaining;
-    _index++;
-    if(_index>=_track->_nbIndex)
-    {
-      return red; 
-    }
-    _parser->seek(_track->_index[_index].pos);
-    _offset=0;
-  }
+  uint32_t l,sam;
+  if(!getPacket(buffer, &l, &sam)) return 0;
+  return l;
 }
 /**
       \fn goTo
 */
 uint8_t             mkvAudio::goTo(uint32_t newoffset)
 {
-  uint32_t cumul=0;
-  for(int i=0;i<_track->_nbIndex;i++)
-  {
-    if(newoffset>=cumul && newoffset<=cumul+_track->_index[i].size)
-    {
-      _offset=0;
-      _index=i;
-      _parser->seek(_track->_index[_index].pos);
-      return 1;
-    }
-    cumul+=_track->_index[i].size;
-  }
-  // 
-  printf("[Mkv audio] Goto failed\n");
-  _parser->seek(_track->_index[0].pos);
-    _offset=0;
-    _index=0;
+  goToCluster(0);
+  _currentCluster=0;
+  return 1;
 }
 /**
       \fn extraData
@@ -112,30 +69,187 @@ uint8_t             mkvAudio::extraData(uint32_t *l,uint8_t **d)
 /**
     \fn getPacket
 */
-uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
+uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples)
 {
-    *samples=1152;
-    *len=read(384,dest);
-    if(*len) return 1;
-    return 0;
+  uint64_t fileSize,len,bsize,pos;
+  uint32_t alen,vlen;
+  uint64_t id;
+  ADM_MKV_TYPE type;
+  const char *ss;
+  vprintf("Enter: Currently at :%llx\n",_clusterParser->tell());
+    // Have we still lace to go ?
+    if(_currentLace<_maxLace)
+    {
+      _clusterParser->readBin(dest,_Laces[_currentLace]);
+      *packlen= _Laces[_currentLace];
+      vprintf("Continuing lacing : %u bytes, lacing %u/%u\n",*packlen,_currentLace,_maxLace);
+      _currentLace++;
+      *samples=1024; // FIXME
+      
+      return 1;
+    }
+    while(1)
+    {
+        vprintf("While: Currently at :%llx\n",_clusterParser->tell());
+        // need to switch cluster ?
+        if(_clusterParser->finished())
+        {
+          if(!goToCluster(_currentCluster+1))
+          {
+            printf("[MKVAUDIO] cannot go to next cluster\n");
+            return 0; 
+          }
+          _currentCluster++;
+        }
+        // Ok read a new block
+        while(!_clusterParser->finished())
+        {
+          
+            _clusterParser->readElemId(&id,&len);
+            pos=_clusterParser->tell();
+            if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
+            {
+              vprintf("[MKVAUDIO] unknown tag %x\n",id);
+              _clusterParser->skip(len);
+              continue;
+            }
+            
+            vprintf("[MKVAudio]Found tag %x (%s) at 0x%llx len %u\n",id,ss,_clusterParser->tell(),len);
+            
+            switch(id)
+            {
+              default:
+              case MKV_TIMECODE:     _clusterParser->skip(len);  break;
+              case MKV_BLOCK_GROUP:    break;
+              case MKV_BLOCK: 
+              {
+                  uint32_t tid=_clusterParser->readEBMCode();
+                  len--; // ASSUME TRACK FITS ON 1 BYTE!
+                    vprintf("Tid = %u, my tid=%u\n",tid,_track->streamIndex);
+                  if(tid!=_track->streamIndex)
+                    {
+                      _clusterParser->skip(len); // skip this block
+                      break; // not our track
+                    }
+                    // Skip timecode
+                    _clusterParser->skip(2); // Timecode FIXME Timecode
+                    len-=2;
+                    uint8_t flags=_clusterParser->readu8();
+                    len--;
+                    uint32_t remaining=len;
+                    uint32_t lacing=((flags>>1)&3);
+                    switch(lacing)
+                    {
+                      case 0 : // no lacing 
+                          
+                              vprintf("No lacing :%d bytes\n",remaining);
+                              _clusterParser->readBin(dest,remaining);
+                              *packlen=remaining; 
+                              *samples=1024; // FIXME
+                              _currentLace=_maxLace=0;
+                              return 1;
+                      case 2 : // constant size lacing
+                              {
+                                int nbLaces=_clusterParser->readu8()+1;
+                                
+                                remaining--;
+                                int bsize=remaining/nbLaces;
+                                vprintf("NbLaces :%u lacesize:%u\n",nbLaces,bsize);
+                                ADM_assert(nbLaces<MKV_MAX_LACES);
+                                for(int i=0;i<nbLaces;i++)
+                                {
+                                  _Laces[i]=bsize; 
+                                }
+                                _currentLace=0;
+                                _maxLace=nbLaces;
+                                return getPacket(dest, packlen, samples);
+                              }
+                      case 3: // Ebml lacing
+                        {
+                                int nbLaces=_clusterParser->readu8()+1;
+                                int32_t curSize=_clusterParser->readEBMCode();
+                                int32_t delta;
+                                printf("Ebml nbLaces :%u lacesize(0):%u\n",nbLaces,curSize);
+                                _Laces[0]=curSize;
+                                len-=curSize;
+                                ADM_assert(nbLaces<MKV_MAX_LACES);
+                                for(int i=1;i<nbLaces-1;i++)
+                                {
+                                  delta=_clusterParser->readEBMCode_Signed();
+                                  printf("Ebml delta :%d lacesize[%d]->:%d\n",delta,i,curSize+delta);
+                                  curSize+=delta;
+                                  ADM_assert(curSize>0);
+                                  _Laces[i]=curSize; 
+                                  len-=curSize;
+                                }
+                                int64_t d=pos+len-_clusterParser->tell();
+                                _Laces[nbLaces-1]=(uint32_t)d; 
+                                _currentLace=0;
+                                _maxLace=nbLaces;
+                                return getPacket(dest, packlen, samples);
+                              }
+                      default:
+                            printf("Unsupported lacing %u\n",lacing);
+                            _clusterParser->seek(pos+len);
+                    }
+                
+              }
+              break;
+            }
+        }
+  }
+  return 0;
 }
 /**
-      \fn mkvAudio
+      \fn mkvAudio 
 */
- mkvAudio::mkvAudio(const char *name,mkvTrak *track) : AVDMGenericAudioStream()
+ mkvAudio::mkvAudio(const char *name,mkvTrak *track,mkvIndex *clust,uint32_t nbClusters) 
+  : AVDMGenericAudioStream()
 {
+  _nbClusters=nbClusters;
+  _clusters=clust;
+  ADM_assert(_clusters);
+  
    _parser=new ADM_ebml_file();
    ADM_assert(_parser->open(name));
   _track=track; 
+  ADM_assert(_track);
+  
   
   // Compute total length in byte
-  _length=0;
-  for(int i=0;i<track->_nbIndex;i++)
-  {
-    _length+=track->_index[i].size; 
-  }
+  _length=_track->_sizeInBytes; // FIXME
+  
+  
   _wavheader=new WAVHeader;
   memcpy(_wavheader,&(_track->wavHeader),sizeof(WAVHeader));
   printf("[MKVAUDIO] found %lu bytes\n",_length);
+  _currentLace=_maxLace=0;
+  _clusterParser=NULL;
+  goToCluster(0);
 }
+/**
+    \fn goToCluster
+    \brief Change the cluster parser...
+*/
+uint8_t mkvAudio::goToCluster(uint32_t x)
+{
+  ADM_assert(_nbClusters);
+  
+  if(x>=_nbClusters)
+  {
+    printf("Exceeding max cluster : asked: %u max :%u\n",x,_nbClusters); 
+    return 0;  // FIXME
+  }
+  
+  if( _clusterParser) delete _clusterParser;
+  _clusterParser=NULL;
+  
+  //************/
+  _parser->seek(_clusters[x].pos);
+  _clusterParser=new ADM_ebml_file(_parser,_clusters[x].size);
+  _currentLace=_maxLace=0;
+  printf("switching to cluster :%u/%u\n",x,_nbClusters);
+  return 1;
+}
+
 //EOF
