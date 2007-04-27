@@ -51,6 +51,7 @@ typedef struct ADM_x264Param
   uint32_t Method;
   uint32_t AR_Num;
   uint32_t AR_Den;
+  uint8_t  AR_AsInput;
   uint32_t DeblockingFilter;
   int32_t  Strength;
   int32_t  Threshold;

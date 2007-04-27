@@ -321,6 +321,7 @@ void upload(GtkWidget *dialog,ADM_x264Param *param)
 #undef CHECK
 #undef ENTRY
 #undef PSEUDO
+	RADIO_SET(radiobuttonAsInputAR, param->AR_AsInput);
 }
 void download(GtkWidget *dialog,ADM_x264Param *param)
 {
@@ -341,11 +342,7 @@ void download(GtkWidget *dialog,ADM_x264Param *param)
               param-> AR_Num=x264_ar[rank].num;
               param-> AR_Den=x264_ar[rank].den;
         }
-        if(RADIO_GET(radiobuttonAsInputAR))
-        {
-              param-> AR_Num=video_body->getPARWidth();
-              param-> AR_Den=video_body->getPARHeight();
-        }
+        param->AR_AsInput = RADIO_GET(radiobuttonAsInputAR);
 }
 
 GtkWidget*

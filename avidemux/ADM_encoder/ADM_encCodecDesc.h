@@ -624,6 +624,7 @@ NULL,//     char      *logfile;
 1,//     uint32_t Method;
 1,//     uint32_t AR_Num;
 1,//     uint32_t AR_Den;
+0,//     uint8_t AR_AsInput;
 1,//     uint32_t DeblockingFilter;
 0,//     int32_t  Strength;
 0,//     int32_t  Threshold;

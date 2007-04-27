@@ -31,6 +31,7 @@ extern "C"
 };
 #include "ADM_osSupport/ADM_cpuCap.h"
 #include <ADM_assert.h>
+#include "avi_vars.h"
 
 #define HANDLE ((x264_t *)_handle)
 #define PICS ((x264_picture_t *)_pic)
@@ -75,9 +76,14 @@ uint8_t X264Encoder::preamble (uint32_t fps1000, ADM_x264Param * zparam)
 
 #define MKPARAM(x,y) {param.x = zparam->y;printf(#x" = %d\n",param.x);}
 #define MKPARAMF(x,y) {param.x = (float)zparam->y / 100; printf(#x" = %.2f\n",param.x);}
-  
-  MKPARAM(vui.i_sar_width , AR_Num);	// FIXME
-  MKPARAM(vui.i_sar_height, AR_Den);
+
+  if (zparam->AR_AsInput) {
+    param.vui.i_sar_width = video_body->getPARWidth();
+    param.vui.i_sar_height = video_body->getPARHeight();
+  } else {
+    MKPARAM(vui.i_sar_width , AR_Num);	// FIXME
+    MKPARAM(vui.i_sar_height, AR_Den);
+  }
 
   param.i_fps_num = fps1000;
   param.i_fps_den = 1000;
