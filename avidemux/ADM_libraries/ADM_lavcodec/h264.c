@@ -8075,7 +8075,10 @@ static int decode_nal_units(H264Context *h, uint8_t *buf, int buf_size){
         int i, nalsize = 0;
 
       if(h->is_avc) {
-        if(buf_index >= buf_size) break;
+        /*** MEANX: The nal size must fit in the buffer and not just begin in it ****/
+        // if(buf_index >= buf_size) break;
+        if(buf_index +h->nal_length_size>= buf_size) break;
+        // /MEANX
         nalsize = 0;
         for(i = 0; i < h->nal_length_size; i++)
             nalsize = (nalsize << 8) | buf[buf_index++];
