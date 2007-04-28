@@ -68,7 +68,8 @@ class mkvAudio : public AVDMGenericAudioStream
     uint32_t                    _Laces[MKV_MAX_LACES];
 
     uint8_t                     goToCluster(uint32_t x);
-    
+    uint8_t                     getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples,uint32_t *timecode);
+    uint32_t                    _curTimeCode;
   public:
                                 mkvAudio(const char *name,mkvTrak *track,mkvIndex *clust,uint32_t nbClusters);
                                 
@@ -76,6 +77,7 @@ class mkvAudio : public AVDMGenericAudioStream
     virtual                     ~mkvAudio();
     virtual uint32_t            read(uint32_t len,uint8_t *buffer);
     virtual uint8_t             goTo(uint32_t newoffset);
+            uint8_t	        goToTime(uint32_t mstime);
     virtual uint8_t             getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples);
   //  virtual uint8_t             goToTime(uint32_t mstime);
     virtual uint8_t             extraData(uint32_t *l,uint8_t **d);

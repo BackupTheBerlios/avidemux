@@ -71,6 +71,11 @@ uint8_t             mkvAudio::extraData(uint32_t *l,uint8_t **d)
 */
 uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples)
 {
+  uint32_t t;
+  return  getPacket(dest, packlen,samples,&t);
+}
+uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32_t *samples,uint32_t *timecode)
+{
   uint64_t fileSize,len,bsize,pos;
   uint32_t alen,vlen;
   uint64_t id;
@@ -85,6 +90,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
       vprintf("Continuing lacing : %u bytes, lacing %u/%u\n",*packlen,_currentLace,_maxLace);
       _currentLace++;
       *samples=1024; // FIXME
+      *timecode=_curTimeCode;
       
       return 1;
     }
@@ -136,8 +142,11 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
                       break; // not our track
                     }
                     // Skip timecode
-                    _clusterParser->skip(2); // Timecode FIXME Timecode
+                    int tc=_clusterParser->readUnsignedInt(2); // FIXME Should be signed
+                    if(tc<0) tc=0;
+                    _curTimeCode=(uint32_t )tc;
                     len-=2;
+                    *timecode=_curTimeCode;
                     uint8_t flags=_clusterParser->readu8();
                     len--;
                     uint32_t remaining=len;
@@ -151,6 +160,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
                               *packlen=remaining; 
                               *samples=1024; // FIXME
                               _currentLace=_maxLace=0;
+                              
                               return 1;
                       case 2 : // constant size lacing
                               {
@@ -265,5 +275,56 @@ uint8_t mkvAudio::goToCluster(uint32_t x)
   printf("switching to cluster :%u/%u\n",x,_nbClusters);
   return 1;
 }
+/**
+      \fn goToTime
+      \brief seek in the current track until we meet the time give (in ms)
+*/
+ uint8_t	mkvAudio::goToTime(uint32_t mstime)
+{
+uint64_t target=mstime;
 
+      // First identify the cluster...
+      int clus=-1;
+            for(int i=0;i<_nbClusters-1;i++)
+            {
+              if(target>=_clusters[i].timeCode && target<_clusters[i+1].timeCode)
+              {
+                clus=i;
+                i=_nbClusters; 
+              }
+            }
+            if(clus==-1) clus=_nbClusters-1; // Hopefully in the last one
+            
+            target-=_clusters[clus].timeCode; // now the time is relative
+            goToCluster(clus);
+            _currentCluster=clus;
+            _curTimeCode=_clusters[clus].timeCode;
+            
+            printf("[MKVAUDIO] Asked for %u ms, go to cluster %u which starts at %u\n",mstime,clus,_curTimeCode);
+            if(clus<_nbClusters-1)
+              printf("[MKVAUDIO] next cluster starts at %u\n",_clusters[clus+1].timeCode);
+#if 1
+            // Now seek more finely
+            // will be off by one frame
+#define MAX_SEEK_BUFFER 20000
+            uint8_t buffer[MAX_SEEK_BUFFER];
+            uint32_t len,samples,timecode;
+            while(getPacket(buffer, &len, &samples,&timecode))
+            {
+              uint32_t curTime=_clusters[_currentCluster].timeCode;
+              vprintf("Wanted: %u clus : %u Timecode:%u=> %u\n",mstime,curTime,timecode,timecode+curTime);
+              ADM_assert(len<MAX_SEEK_BUFFER); 
+              
+              if(timecode+curTime>=mstime) 
+              {
+                printf("[MKV audio] fine seek to %u (clu)+%u=%u\n",curTime,timecode,timecode+curTime);
+                return 1;
+              }
+            }
+            printf("Failed to seek to %u mstime\n");
+            return 0;
+#else
+            return 1;
+#endif
+}
 //EOF
