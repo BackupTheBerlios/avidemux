@@ -49,6 +49,7 @@ typedef struct mkvTrak
   uint32_t  _nbIndex;  // current size of the index
   uint32_t  _indexMax; // Max size of the index
   uint32_t  _sizeInBytes; // Approximate size in bytes of that stream
+  uint32_t  _defaultFrameDuration; // in us!
 };
 
 #define MKV_MAX_LACES 20 // ?
@@ -62,6 +63,8 @@ class mkvAudio : public AVDMGenericAudioStream
     mkvIndex                    *_clusters;
     uint32_t                    _nbClusters;
     uint32_t                    _currentCluster;
+    
+    uint32_t                    _frameDurationInSample; // Nb Samples per frame
     
     uint32_t                    _currentLace;
     uint32_t                    _maxLace;

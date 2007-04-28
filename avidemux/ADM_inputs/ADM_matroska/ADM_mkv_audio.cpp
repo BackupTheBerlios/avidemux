@@ -89,7 +89,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
       *packlen= _Laces[_currentLace];
       vprintf("Continuing lacing : %u bytes, lacing %u/%u\n",*packlen,_currentLace,_maxLace);
       _currentLace++;
-      *samples=1024; // FIXME
+      *samples=_frameDurationInSample;
       *timecode=_curTimeCode;
       
       return 1;
@@ -158,7 +158,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
                               vprintf("No lacing :%d bytes\n",remaining);
                               _clusterParser->readBin(dest,remaining);
                               *packlen=remaining; 
-                              *samples=1024; // FIXME
+                              *samples=_frameDurationInSample;
                               _currentLace=_maxLace=0;
                               
                               return 1;
@@ -243,10 +243,15 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
   // Compute total length in byte
   _length=_track->_sizeInBytes; // FIXME
   
+  float f=_track->wavHeader.frequency;
+  f*=_track->_defaultFrameDuration;
+  f=f/1000000.;
+  
+  _frameDurationInSample=(uint32_t)floor(f+0.5);
   
   _wavheader=new WAVHeader;
   memcpy(_wavheader,&(_track->wavHeader),sizeof(WAVHeader));
-  printf("[MKVAUDIO] found %lu bytes\n",_length);
+  printf("[MKVAUDIO] found %lu bytes, %u samples per frame\n",_length,_frameDurationInSample);
   _currentLace=_maxLace=0;
   _clusterParser=NULL;
   goToCluster(0);

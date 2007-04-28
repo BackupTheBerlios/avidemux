@@ -104,6 +104,7 @@ entryDesc entry;
         _isvideopresent=1; 
         if(entry.defaultDuration)
         {
+            _tracks[0]._defaultFrameDuration=entry.defaultDuration;
             double inv=entry.defaultDuration; // in us
             inv=1/inv;
             inv*=1000.;
@@ -161,7 +162,10 @@ entryDesc entry;
          t->streamIndex=entry.trackNo;
          t->extraData=entry.extraData;
          t->extraDataLen=entry.extraDataLen;
-                  
+         if(entry.defaultDuration)
+          t->_defaultFrameDuration=entry.defaultDuration;
+         else
+           t->_defaultFrameDuration=24000;
         _nbAudioTrack++;
         return 1;
       }
