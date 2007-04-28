@@ -102,8 +102,22 @@ entryDesc entry;
       if(entry.trackType==1 &&  !_isvideopresent)
       {
         _isvideopresent=1; 
-        _videostream.dwScale=1000;
-        _videostream.dwRate=25000;
+        if(entry.defaultDuration)
+        {
+            double inv=entry.defaultDuration; // in us
+            inv=1/inv;
+            inv*=1000.;
+            inv*=1000.;
+            inv*=1000.;
+            _videostream.dwScale=1000;
+            _videostream.dwRate=(uint32_t)inv;
+        }else
+        {
+          printf("[MKV] No duration, assuming 25 fps\n"); 
+          _videostream.dwScale=1000;
+          _videostream.dwRate=25000;
+
+        }
     
         _mainaviheader.dwMicroSecPerFrame=(uint32_t)floor(50);;     
         _videostream.fccType=fourCC::get((uint8_t *)"vids");
@@ -181,7 +195,6 @@ uint8_t entryWalk(ADM_ebml_file *head,uint32_t headlen,entryDesc *entry)
         
         case  MKV_TRACK_NUMBER: entry->trackNo=father.readUnsignedInt(len);break;
         case  MKV_TRACK_TYPE: entry->trackType=father.readUnsignedInt(len);break;
-        case  MKV_FRAME_DEFAULT_DURATION:entry->defaultDuration=father.readUnsignedInt(len);break;
 
         case  MKV_AUDIO_FREQUENCY: entry->fq=(uint32_t)floor(father.readFloat(len));break;
 
@@ -189,7 +202,7 @@ uint8_t entryWalk(ADM_ebml_file *head,uint32_t headlen,entryDesc *entry)
         case  MKV_VIDEO_HEIGHT: entry->h=father.readUnsignedInt(len);break;
         case  MKV_TRACK_TIMECODESCALE:father.skip(len);break; //FIXME
 
-        
+        case  MKV_FRAME_DEFAULT_DURATION: entry->defaultDuration=father.readUnsignedInt(len)/1000; break; // In us
         case  MKV_CODEC_EXTRADATA:
         {
               uint8_t *data=new uint8_t[len];

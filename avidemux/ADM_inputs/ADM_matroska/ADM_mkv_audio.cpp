@@ -124,8 +124,12 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
               case MKV_BLOCK: 
               {
                   uint32_t tid=_clusterParser->readEBMCode();
-                  len--; // ASSUME TRACK FITS ON 1 BYTE!
-                    vprintf("Tid = %u, my tid=%u\n",tid,_track->streamIndex);
+                  uint64_t tail=pos+len;
+                  uint64_t head=pos;
+                  
+                  // FIXME WARNING ASSUME TRACK FITS ON 1 BYTE!
+                  len--; 
+                  vprintf("Tid = %u, my tid=%u\n",tid,_track->streamIndex);
                   if(tid!=_track->streamIndex)
                     {
                       _clusterParser->skip(len); // skip this block
@@ -166,23 +170,33 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
                               }
                       case 3: // Ebml lacing
                         {
+                                
                                 int nbLaces=_clusterParser->readu8()+1;
                                 int32_t curSize=_clusterParser->readEBMCode();
                                 int32_t delta;
-                                printf("Ebml nbLaces :%u lacesize(0):%u\n",nbLaces,curSize);
+                                
+                                vprintf("Ebml nbLaces :%u lacesize(0):%u\n",nbLaces,curSize);
+                                
                                 _Laces[0]=curSize;
-                                len-=curSize;
                                 ADM_assert(nbLaces<MKV_MAX_LACES);
                                 for(int i=1;i<nbLaces-1;i++)
                                 {
                                   delta=_clusterParser->readEBMCode_Signed();
-                                  printf("Ebml delta :%d lacesize[%d]->:%d\n",delta,i,curSize+delta);
+                                  vprintf("Ebml delta :%d lacesize[%d]->:%d\n",delta,i,curSize+delta);
                                   curSize+=delta;
                                   ADM_assert(curSize>0);
                                   _Laces[i]=curSize; 
-                                  len-=curSize;
+                                 
                                 }
-                                int64_t d=pos+len-_clusterParser->tell();
+                                uint64_t d=_clusterParser->tell();
+                                
+                                d=tail-d;
+                                /* We have the remaining size after laces, substract the already known lace size */
+                                for(int i=0;i<nbLaces-1;i++)
+                                {
+                                  d-=_Laces[i]; 
+                                }
+                                // What is left is the sift of the last lace
                                 _Laces[nbLaces-1]=(uint32_t)d; 
                                 _currentLace=0;
                                 _maxLace=nbLaces;
