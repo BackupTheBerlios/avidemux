@@ -8075,19 +8075,21 @@ static int decode_nal_units(H264Context *h, uint8_t *buf, int buf_size){
         int i, nalsize = 0;
 
       if(h->is_avc) {
-        /*** MEANX: The nal size must fit in the buffer and not just begin in it ****/
-        // if(buf_index >= buf_size) break;
-        if(buf_index +h->nal_length_size>= buf_size) break;
-        // /MEANX
+        if(buf_index==buf_size) break;
+        if(buf_index +h->nal_length_size>= buf_size) 
+        {
+          av_log(h->s.avctx, AV_LOG_ERROR, "AVC: nal_size does not fit in buffer (need %d bytes, only %d available)\n",h->nal_length_size,buf_size-buf_index);
+          break;
+        }
         nalsize = 0;
         for(i = 0; i < h->nal_length_size; i++)
             nalsize = (nalsize << 8) | buf[buf_index++];
-        if(nalsize <= 1 || nalsize > buf_size){
+        if(nalsize <= 1 || (nalsize+buf_index > buf_size)){
             if(nalsize == 1){
                 buf_index++;
                 continue;
             }else{
-                av_log(h->s.avctx, AV_LOG_ERROR, "AVC: nal size %d\n", nalsize);
+                av_log(h->s.avctx, AV_LOG_ERROR, "AVC: nal does not fit in buffer, need %d\n", nalsize);
                 break;
             }
         }
