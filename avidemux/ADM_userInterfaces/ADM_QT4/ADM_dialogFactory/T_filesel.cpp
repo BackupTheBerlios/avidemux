@@ -34,7 +34,7 @@
 #include "ADM_toolkit/filesel.h"
 extern const char *shortkey(const char *);
 void GUI_FileSelRead(const char *label, char * * name);
-#define MAX_SEL 90
+#define MAX_SEL 2040
 class  ADM_Qfilesel : public QWidget
 {
      Q_OBJECT

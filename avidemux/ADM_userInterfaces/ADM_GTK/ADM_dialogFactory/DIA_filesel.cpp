@@ -119,7 +119,7 @@ void diaElemFileRead::getMe(void)
 
 void diaElemFileRead::changeFile(void)
 {
-#define MAX_SEL 200
+#define MAX_SEL 2040
   char buffer[MAX_SEL+1];
   GtkWidget **wid=(GtkWidget **)myWidget;
   GtkWidget *widget=(GtkWidget *)wid[0];
@@ -242,7 +242,7 @@ GtkWidget **wid=(GtkWidget **)myWidget;
 
 void diaElemDirSelect::changeFile(void)
 {
-#define MAX_SEL 200
+#define MAX_SEL 2040
   char buffer[MAX_SEL+1];
   GtkWidget **wid=(GtkWidget **)myWidget;
   GtkWidget *widget=wid[0];
