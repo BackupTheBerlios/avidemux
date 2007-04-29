@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "POT-Creation-Date: 2007-03-24 15:57+0100\n"
-"PO-Revision-Date: 2007-04-23 21:53+0900\n"
+"PO-Revision-Date: 2007-04-28 04:45+0900\n"
 "Last-Translator: tetsuro\n"
 "Language-Team: Japan\n"
 "MIME-Version: 1.0\n"
@@ -224,6 +224,9 @@ msgstr "<b>エンコード モード </b>"
 msgid "<b>Extra Properties</b>"
 msgstr "<b>特別プロパティ</b>"
 
+msgid "<b>Extra Video Properties</b>"
+msgstr "特別映像プロパティ"
+
 msgid "<b>Files</b>"
 msgstr "<b>ファイル</b>"
 
@@ -402,6 +405,9 @@ msgstr "DVDに標準でない音声周波数を受け付ける"
 msgid "Adaptative DCT"
 msgstr "適応型DCT"
 
+msgid "Add selected filter to the Active Filters list"
+msgstr "選択したフィルタを有効なフィルタのリストに加える"
+
 msgid "Advanced Simple Profile"
 msgstr "拡張サンプルプロフィール"
 
@@ -430,6 +436,9 @@ msgstr ""
 msgid "Always"
 msgstr "必ず"
 
+msgid "Apply the current filter only to a part of the file"
+msgstr "現在のフィルタをファイルの一部のみに適用する"
+
 msgid "Are you sure you want to delete %s job ?"
 msgstr "本当に %s ジョブを削除しますか ?"
 
@@ -447,6 +456,9 @@ msgstr "入力として"
 
 msgid "Aspect Ratio"
 msgstr "アスペクト比"
+
+msgid "Aspect Ratio:"
+msgstr "アスペクト比:"
 
 msgid "Audio"
 msgstr "音声"
@@ -583,6 +595,9 @@ msgstr "ビットレート可変性 (%)"
 msgid "Bitrate/size calculator"
 msgstr "ビットレート/サイズ計算"
 
+msgid "Bitrate:"
+msgstr "ビットレート:"
+
 msgid "Bits per pixel:"
 msgstr "ビット/ピクセル:"
 
@@ -636,6 +651,9 @@ msgstr "彩度動き(_H)"
 
 msgid "C_hroma optimizer"
 msgstr "彩度最適化(_H)"
+
+msgid "C_onfigure"
+msgstr "構成(_O)"
 
 msgid "Ca_rtoon mode"
 msgstr "漫画モード(_R)"
@@ -712,6 +730,9 @@ msgstr "チャンネルモード"
 msgid "Channels  "
 msgstr "チャンネル"
 
+msgid "Channels:"
+msgstr "チャンネル:"
+
 msgid "Chapter 1"
 msgstr "チャプター1"
 
@@ -763,8 +784,14 @@ msgstr "コーデック"
 msgid "Codec 4CC"
 msgstr "コーデック4CC"
 
+msgid "Codec 4CC:"
+msgstr "コーデック4CC:"
+
 msgid "Codec Error"
 msgstr "コーデックエラー"
+
+msgid "Codec:"
+msgstr "コーデック:"
 
 msgid "ColorYuv (From avisynth)"
 msgstr "ColorYuv (avisynthから)"
@@ -783,6 +810,12 @@ msgstr "コーデックを構成"
 
 msgid "Configure audio encoder"
 msgstr "音声エンコーダを構成"
+
+msgid "Configure filter"
+msgstr "フィルタを構成する"
+
+msgid "Configure partialized filter"
+msgstr "部分適用するフィルタの構成"
 
 msgid "Configure video encoder"
 msgstr "映像エンコーダを構成"
@@ -1067,6 +1100,9 @@ msgstr "エンコードモード"
 msgid "Encoding type:"
 msgstr "エンコードタイプ:"
 
+msgid "End frame for partial :"
+msgstr "部分適用のための終了フレーム :"
+
 msgid "Enforce a maximum quantizer level"
 msgstr "最大の量子化レベルを敷く"
 
@@ -1130,6 +1166,9 @@ msgstr "全フレームを評価"
 
 msgid "Exhaustive search"
 msgstr "徹底検索"
+
+msgid "Expect a crash."
+msgstr "クラッシュするかも."
 
 msgid "External"
 msgstr "外部"
@@ -1209,6 +1248,9 @@ msgstr "ファイル %s を無事に保存しました."
 msgid "File :"
 msgstr "ファイル :"
 
+msgid "File Size:"
+msgstr "ファイルサイズ:"
+
 msgid "File error"
 msgstr "ファイルエラー"
 
@@ -1254,8 +1296,14 @@ msgstr "フォントサイズ"
 msgid "Force background"
 msgstr "強制背景"
 
+msgid "Frame Count:"
+msgstr "フレーム数:"
+
 msgid "Frame Rate"
 msgstr "フレームレート"
+
+msgid "Frame Rate:"
+msgstr "フレームレート:"
 
 msgid "Frame: "
 msgstr "フレーム: "
@@ -1268,6 +1316,9 @@ msgstr "フレーム:%c(%02d)"
 
 msgid "Frequency"
 msgstr "周波数"
+
+msgid "Frequency:"
+msgstr "周波数:"
 
 msgid "Full linking"
 msgstr "完全リンク"
@@ -1294,6 +1345,9 @@ msgid ""
 "Global Motion Compensation can save bits on camera pans, zooming and rotation"
 msgstr ""
 "グローバル動き圧縮(GMC)はカメラパン、ズーム、回転の際のビットを節約する"
+
+msgid "Global Motion Compensation:"
+msgstr "グローバル動き補償:"
 
 msgid "Go to Marker _A"
 msgstr "マーカーAに移動(_A)"
@@ -1411,6 +1465,9 @@ msgstr "無視"
 
 msgid "Ignore glyph"
 msgstr "glyphを無視"
+
+msgid "Image Size:"
+msgstr "画像サイズ:"
 
 msgid "Image size"
 msgstr "画像サイズ"
@@ -1762,6 +1819,12 @@ msgstr "動き予測"
 msgid "Motion search precision:"
 msgstr "動き検索精度:"
 
+msgid "Move filter down"
+msgstr "フィルタを下に移動する"
+
+msgid "Move filter up"
+msgstr "フィルタを上に移動する"
+
 msgid "MultiThreading"
 msgstr "マルチスレッド"
 
@@ -1812,6 +1875,9 @@ msgstr "次のフレーム"
 
 msgid "Next keyframe"
 msgstr "次のキーフレーム"
+
+msgid "No"
+msgstr "いいえ"
 
 msgid "No Strategy"
 msgstr "ストラテジなし"
@@ -1930,6 +1996,9 @@ msgstr "ファイルを上書きしますか ?"
 msgid "P-frame quantizer - Min:"
 msgstr "P-フレーム量子化度 - 最小:"
 
+msgid "P_artial"
+msgstr "部分的(_A)"
+
 msgid "P_review"
 msgstr "プレビュー(_R)"
 
@@ -1942,8 +2011,14 @@ msgstr "パックドビットストリーム"
 msgid "Packed Bitstream detected"
 msgstr "パックドビットストリームを検出しました"
 
+msgid "Packed Bitstream:"
+msgstr "パックドビットストリーム:"
+
 msgid "Packed bitstream"
 msgstr "パックドビットストリーム"
+
+msgid "Partial"
+msgstr "部分適用"
 
 msgid "Partition decision"
 msgstr "区分決定"
@@ -2029,6 +2104,9 @@ msgstr "プログレッシブ"
 msgid "Proper_ties"
 msgstr "プロパティ"
 
+msgid "Properties"
+msgstr "プロパティ"
+
 msgid "PullDown dupe removal"
 msgstr "プルダウンdupe除去"
 
@@ -2086,6 +2164,9 @@ msgstr "量子化度:"
 msgid "Quarter Pixel"
 msgstr "1/4 ピクセル"
 
+msgid "Quarter Pixel:"
+msgstr "1/4 ピクセル:"
+
 msgid "Range"
 msgstr "範囲"
 
@@ -2112,6 +2193,9 @@ msgid ""
 "will get treated normally"
 msgstr ""
 "最初の連続I-フレームのビットレート削減. 最後のI-フレームは普通に処理する"
+
+msgid "Remove filter"
+msgstr "フィルタを削除する"
 
 msgid "Replace (interpolate)"
 msgstr "置換(補間)"
@@ -2202,6 +2286,9 @@ msgstr "２回目のパス"
 
 msgid "Second track loaded"
 msgstr "第２トラックを読込みました"
+
+msgid "See Hex"
+msgstr "16進表記を見る"
 
 msgid "Seeking"
 msgstr "シーク中"
@@ -2484,6 +2571,9 @@ msgstr "MPEGを分割 (MB)"
 msgid "Standard"
 msgstr "標準"
 
+msgid "Start frame for partial :"
+msgstr "部分適用のための開始フレーム :"
+
 msgid "Start frame for this vignette."
 msgstr "このビネット用にフレームを開始する"
 
@@ -2680,6 +2770,9 @@ msgstr "トップフィールド(ボトムを保つ)"
 msgid "Top:"
 msgstr "上:"
 
+msgid "Total Duration:"
+msgstr "合計時間:"
+
 msgid "Total size"
 msgstr "合計サイズ"
 
@@ -2843,6 +2936,9 @@ msgstr "VHQ は拡張検索処理を有効にして品質を高める"
 msgid "VHQ mode:"
 msgstr "VHQ モード:"
 
+msgid "Variable Bitrate:"
+msgstr "可変ビットレート:"
+
 msgid "Variable bitrate mode"
 msgstr "可変ビットレートモード"
 
@@ -2930,6 +3026,9 @@ msgstr "XviDエンコードオプション"
 
 msgid "Y to UV link"
 msgstr "YをUVにリンク"
+
+msgid "Yes"
+msgstr "はい"
 
 msgid "You should use Tool->Rebuild frame. Do it now ?"
 msgstr "ツール->フレームを再構築 を使うべきです. 今実行しますか ?"
