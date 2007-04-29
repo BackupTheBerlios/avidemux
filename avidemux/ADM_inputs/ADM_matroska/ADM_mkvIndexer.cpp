@@ -80,7 +80,6 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                 {
                         //printf("Block Group\n");
                         ADM_ebml_file blockGroup(parser,len);
-                        uint32_t lacing,nbLaces;
                         while(!blockGroup.finished())
                         {
                                 blockGroup.readElemId(&id,&len);
@@ -97,7 +96,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                                   default: blockGroup.skip(len);
                                   case MKV_BLOCK : 
                                   {
-                                    indexBlock(&blockGroup,thiscluster);
+                                    indexBlock(&blockGroup,len);
                                     
                                   }         
                                 }
@@ -117,54 +116,89 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
       \fn indexBlock
       \brief index a block, identify it and update index
 */
-uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t count)
+uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len)
 {
   int lacing,nbLaces,entryFlags;
+  //
+  uint64_t tail=parser->tell()+len;
   // Read Track id 
   uint32_t tid=parser->readEBMCode();
   int track=searchTrackFromTid(tid);
+  
       //printf("Wanted %u got %u\n",_tracks[0].streamIndex,tid);
-      if(track!=0)
+      if(track==-1) //dont care track
       {
-        uint32_t remaining=parser->remaining();
-        if(track!=-1)
-        {
-          _tracks[track]._sizeInBytes+=remaining; // keep some stat, useful for audio
-        }
-        parser->skip(remaining);
+        
+        parser->seek(tail);
         return 1; // we do only video here...
       }
       // Skip timecode
       parser->skip(2); // Timecode FIXME Timecode
       uint8_t flags=parser->readu8();
-      uint32_t remaining=parser->remaining();
+      uint32_t remaining=tail-parser->tell();
       lacing=((flags>>1)&3);
       switch(lacing)
       {
         case 0: // No lacing
-              
-              addIndexEntry(track,parser->tell(),remaining,entryFlags);
+              if(!track) // Video
+              {    
+                  addIndexEntry(track,parser->tell(),remaining,entryFlags);
+              }
+              else
+              {
+                _tracks[track]._sizeInBytes+=remaining; // keep some stat, useful for audio 
+              }
               break;
         case 2 : // Constant size lacing
             {
                     nbLaces=parser->readu8()+1;
                     remaining--;
                     // Only mp3/Ac3 supported, ignore lacing FIXME : Vorbis or AAC will not work
-                    addIndexEntry(track,parser->tell(),remaining,0);
+                    
+                    
                     int bsize=remaining/nbLaces;
                     if(bsize*nbLaces!=remaining)
                     {
                       printf("Warning not multiple bsize=%d total=%u  nbLaces=%u\n",bsize,remaining,nbLaces);
                     }
-                    if(!track) printf("Warning lacing on video track\n");
+                    if(!track) 
+                    {
+                      addIndexEntry(track,parser->tell(),remaining,0);
+                      printf("Warning lacing on video track\n");
+                    }
+                    else
+                    {
+                       _tracks[track]._sizeInBytes+=remaining;
+                    }
                     //printf("tid:%u track %u Remaining : %llu laces %u blksize %d er%d\n",tid,track,remaining,nbLaces,remaining/nbLaces,remaining-(remaining/nbLaces)*nbLaces);
-            } 
+            }
             break;
+#if 1
+        case 3: // Ebml lacing
+          {
+                                
+                                int nbLaces=parser->readu8()+1;
+                                int32_t curSize=parser->readEBMCode();
+                                int32_t delta,sum;
+                                int64_t tail;
+                                
+                                sum=curSize;
+                                for(int i=1;i<nbLaces-1;i++)
+                                {
+                                  delta=parser->readEBMCode_Signed();
+                                  curSize+=delta;
+                                }
+                                ADM_assert(track); // Not video!
+                                _tracks[track]._sizeInBytes+=tail-parser->tell();
+                                
+                              }
+            break;
+#endif
         default: 
             printf("unsupported lacing\n");
             break;
       }
-      parser->skip(remaining);
+      parser->seek(tail);
       return 1;
 }
 
