@@ -44,6 +44,7 @@
 #include "ADM_osSupport/ADM_debug.h"
 #include "ADM_osSupport/ADM_cpuCap.h"
 
+#include "ADM_video/ADM_videoInfoExtractor.h"
 //****************************
 #define WRAP_Open(x) \
 {\
@@ -317,6 +318,8 @@ uint8_t   decoderFF::uncompress (ADMCompressedImage * in, ADMImage * out)
       _context->debug &= ~(FF_DEBUG_VIS_MB_TYPE + FF_DEBUG_VIS_QP);
     }
 
+    
+    
   if (in->dataLength == 0 && !_allowNull)	// Null frame, silently skipped
     {
       
@@ -526,6 +529,24 @@ decoderFFH264::decoderFFH264 (uint32_t w, uint32_t h, uint32_t l, uint8_t * d, u
   WRAP_Open (CODEC_ID_H264);
 
 }
+//*********************
+extern "C" {int av_getAVCStreamInfo(AVCodecContext *avctx, uint32_t  *nalSize, uint32_t *isAvc);}
+
+uint8_t   decoderFFH264::uncompress (ADMCompressedImage * in, ADMImage * out)
+{
+  if(!_context->hurry_up) return decoderFF::uncompress (in, out);
+  
+  uint32_t nalSize, isAvc;
+  av_getAVCStreamInfo(_context,&nalSize,&isAvc);
+  if(isAvc)
+  {
+      return extractH264FrameType(nalSize, in->data,in->dataLength,&(out->flags));
+  }else
+  {
+    return extractH264FrameType_startCode(nalSize, in->data,in->dataLength,&(out->flags));
+  }
+}
+//*********************
 decoderFFhuff::decoderFFhuff (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,
 	   h)
 {

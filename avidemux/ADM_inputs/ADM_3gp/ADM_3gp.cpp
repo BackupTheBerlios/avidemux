@@ -71,6 +71,8 @@ version 2 media descriptor :
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_codecs/ADM_codec.h"
 
+#include "ADM_video/ADM_videoInfoExtractor.h"
+
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_3GP
 #include "ADM_osSupport/ADM_debug.h"

@@ -168,6 +168,7 @@ public:
   {
       return _lowDelay;
   }
+  uint8_t   uncompress (ADMCompressedImage * in, ADMImage * out);
 
 };
 class decoderFFhuff:public decoderFF

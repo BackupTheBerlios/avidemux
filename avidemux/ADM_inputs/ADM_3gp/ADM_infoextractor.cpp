@@ -307,5 +307,105 @@ uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hh
            
            return 1;
 }
+/**
+      \fn extractH264FrameType
+      \brief return frametype in flags (KEY_FRAME or 0). To be used only with  mkv/mp4 nal type (i.e. no startcode)
+      
+*/
+uint8_t extractH264FrameType(uint32_t nalSize,uint8_t *buffer,uint32_t len,uint32_t *flags)
+{
+  uint8_t *head=buffer, *tail=buffer+len;
+  uint8_t stream;
+#define NAL_NON_IDR       1
+#define NAL_IDR           5
+
+  uint32_t val,hnt;  
+  
+// FIXME :  no startcode only !
+  
+  while(head+4<tail)
+  {
+    
+              uint32_t length=(head[0]<<24) + (head[1]<<16) +(head[2]<<8)+(head[3]);
+              if(length>len)
+              {
+                printf("Warning , incomplete nal (%u/%u)\n",length,len); 
+              }
+              head+=4; // Skip nal lenth
+              length-=4;
+              stream=*(head++)&0x1F;
+                switch(stream)
+                {
+                  case NAL_IDR: 
+                                  *flags=AVI_KEY_FRAME;
+                                //  printf("IDR\n");
+                                  return 1;
+                                  break; 
+                  case NAL_NON_IDR: 
+                                  *flags=0;
+                                //  printf("NON IDR\n");
+                                  return 1;
+                                  break;
+                  default:
+                          printf("??0x%x\n",stream);
+                          head+=length+1;
+                          continue;
+                }
+  }
+  printf("No stream\n");
+  return 0;
+}
+
+/**
+      \fn extractH264FrameType_startCode
+      \brief return frametype in flags (KEY_FRAME or 0). To be used only with  avi / mpeg TS nal type (i.e. with startcode)
+      
+*/
+uint8_t extractH264FrameType_startCode(uint32_t nalSize,uint8_t *buffer,uint32_t len,uint32_t *flags)
+{
+  uint8_t *head=buffer, *tail=buffer+len;
+  uint8_t stream;
+#define NAL_NON_IDR       1
+#define NAL_IDR           5
+
+  uint32_t val,hnt;  
+  
+// FIXME :  no startcode only !
+  
+  while(head+4<tail)
+  {
+          // Search startcode
+      
+                hnt=(head[0]<<24) + (head[1]<<16) +(head[2]<<8)+(head[3]);
+                head+=4;
+                while((hnt!=1) && head<tail)
+                {
+
+                        hnt<<=8;
+                        val=*head++;
+                        hnt+=val;
+                }
+                if(head>=tail) break;
+                stream=*(head++) &0x1f;
+                switch(stream)
+                {
+                  case NAL_IDR: 
+                                  *flags=AVI_KEY_FRAME;
+                                 // printf("IDR\n");
+                                  return 1;
+                                  break; 
+                  case NAL_NON_IDR: 
+                                  *flags=0;
+                                //  printf("NON IDR\n");
+                                  return 1;
+                                  break;
+                  default:
+                          printf("??0x%x\n",stream);
+                          continue;
+                }
+  }
+  printf("No stream\n");
+  return 0;
+}
 
 //EOF
