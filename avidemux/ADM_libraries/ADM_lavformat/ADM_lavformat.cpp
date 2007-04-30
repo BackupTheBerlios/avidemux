@@ -453,9 +453,11 @@ uint8_t lavMuxer::writeAudioPacket(uint32_t len, uint8_t *buf,uint32_t sample)
             f/=1000000.; // In ms seconds 
             f*=_audioFq;
             
-            
-            pkt.dts=pkt.pts=(int)f;
+            f=floor(f+0.4);
+            pkt.dts=pkt.pts=(int)(f);
 
+            //printf("F:%f Q:%u D=%u\n",f,pkt.pts,timeInUs-_lastAudioDts);
+            
             pkt.flags |= PKT_FLAG_KEY; 
             pkt.data= buf;
             pkt.size= len;
