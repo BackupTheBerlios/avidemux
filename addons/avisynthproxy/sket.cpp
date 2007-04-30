@@ -58,10 +58,7 @@ uint8_t Sket::waitConnexion(void)
 	{
 		printf("Error in lisent\n");
 	}
-	
-   sockaddr_in service;
-   int slen;
-   
+
   while(1) 
   {
 		printf("Waiting for client to connect...\n");

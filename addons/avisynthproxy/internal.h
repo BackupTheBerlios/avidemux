@@ -62,7 +62,7 @@ typedef	long			PixOffset;
 struct AVSFunction {
   const char* name;
   const char* param_types;
-  AVSValue __cdecl (*apply)(AVSValue args, void* user_data, IScriptEnvironment* env);
+  AVSValue (__cdecl *apply)(AVSValue args, void* user_data, IScriptEnvironment* env);
   void* user_data;
 };
 
