@@ -167,8 +167,8 @@ extern const char * GUI_getCustomScript(uint32_t nb);
 extern gboolean SliderIsShifted;
 
 void GUI_showCurrentFrameHex(void);
-
-
+void GUI_avsProxy(void);
+uint8_t GUI_close(void);
 //___________________________________________
 // serialization of user event throught gui
 //
@@ -196,6 +196,9 @@ int nw;
   }
   switch (action)
     {
+        case ACT_AVS_PROXY:
+                                GUI_avsProxy();
+                                return;
         case ACT_BUILT_IN:
                                 DIA_builtin();
                                 return;
@@ -2386,7 +2389,63 @@ uint8_t GUI_getFrameContent(ADMImage *image, uint32_t frame)
   if(!video_body->getUncompressedFrame(frame,image,&flags)) return 0;
   return 1; 
 }
+/**
+    \fn GUI_close
+    \brief Close opened file and cleanup filters etc..
+*/
+uint8_t GUI_close(void)
+{
+  if (avifileinfo)		// already opened ?
+    {				// delete everything
+      // if preview is on
+      if(getPreviewMode()!=ADM_PREVIEW_NONE)
+      {
+	admPreview::stop();
+        setPreviewMode(ADM_PREVIEW_NONE);
+      }
+      delete avifileinfo;
+      //delete wavinfo;
+      wavinfo = (WAVHeader *) NULL;
+      avifileinfo = (aviInfo *) NULL;
+      video_body->cleanup ();
+      curframe = 0;
+      currentaudiostream = NULL;
+      A_changeAudioStream (NULL, AudioNone,NULL);
+      filterCleanUp ();
+      return 1;
+    }
+    return 0;
+}
+/**
+      \fn GUI_avsProxy
+      \brief Shortcut to connect to avsProxy
+*/
 
+void GUI_avsProxy(void)
+{
+  uint8_t res;
+
+
+  GUI_close();
+  res = video_body->addFile ("avsproxy.avs",0,AvsProxy_FileType);
+  // forget last project file
+  if( actual_workbench_file ){
+     ADM_dealloc(actual_workbench_file);
+     actual_workbench_file = NULL;
+  }
+
+  if (res!=ADM_OK)			// an error occured
+    {
+        currentaudiostream = NULL;
+        avifileinfo = NULL;
+        GUI_Error_HIG (_("AvsProxy"), _("Failed to connect to avsproxy.\nIs it running ?"));
+        return ;
+    }
+
+       updateLoaded ();
+       UI_setTitle("avsproxy");
+       return ;
+}
 /**
       \fn GUI_showCurrentFrameHex
       \brief Display the first 32 bytes of the current frame in hex
@@ -2394,7 +2453,7 @@ uint8_t GUI_getFrameContent(ADMImage *image, uint32_t frame)
 
 void GUI_showCurrentFrameHex(void)
 {
-#define DISPLAY_HEX 32
+#define DISPLAY_HEX 32*3
  uint8_t *buffer;
  uint32_t len,fullLen;
  char     string[DISPLAY_HEX*3+6],*s;

@@ -177,7 +177,7 @@ class ADM_Composer
   				//_______________________
   				// specific to composer
   				//_______________________
-  						uint8_t 	addFile(char *name,uint8_t mode=0);
+  						uint8_t 	addFile (char *name, uint8_t mode=0,fileType forcedType=Unknown_FileType);
   						uint8_t 	cleanup( void);
 			   			uint8_t 	isMultiSeg( void) { if(_nb_segment>1) return 1; else return 0;}
   						uint8_t 	removeFrames(uint32_t start,uint32_t end);

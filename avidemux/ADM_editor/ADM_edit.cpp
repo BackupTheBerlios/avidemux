@@ -245,26 +245,36 @@ ADM_Composer::~ADM_Composer ()
 */
 
 /**
-	Load or append a file.
-	The file type is determined automatically and the ad-hoc video decoder is spawned
+    \fn addFile
+    \brief	Load or append a file.	The file type is determined automatically and the ad-hoc video decoder is spawned
+    
+    @param name: filename
+    @param mode: 0 open, 1 append
+    @param forcedType : if !=Unknown_FileType, it enables to force the file type
 
+    @return 1 on success, 0 on failure
+        
 
 */
-uint8_t ADM_Composer::addFile (char *name, uint8_t mode)
+uint8_t ADM_Composer::addFile (char *name, uint8_t mode,fileType forcedType)
 {
   uint8_t    ret =    0;
   aviInfo    info;
   WAVHeader *    _wavinfo;
 //  aviHeader *    tmp;
-  fileType    type =    Unknown_FileType;
+  fileType    type =    forcedType;
 
 UNUSED_ARG(mode);
 	_haveMarkers=0; // by default no markers are present
   ADM_assert (_nb_segment < max_seg);
   ADM_assert (_nb_video < MAX_VIDEO);
 
-  if (!identify (name, &type))
-    return 0;
+  // Autodetect file type ?
+  if(Unknown_FileType==type)
+  {
+      if (!identify (name, &type))
+        return 0;
+  }
 
 
 #define OPEN_AS(x,y) case x:\

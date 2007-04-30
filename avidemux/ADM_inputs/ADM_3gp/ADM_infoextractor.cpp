@@ -41,6 +41,7 @@ extern "C"
 #include "ADM_lavcodec/bitstream.h"
 #include "ADM_lavcodec/golomb.h"
 }
+static void refineH264FrameType(uint8_t *head,uint8_t *tail,uint32_t *flags);
 /*
     Extract width & height from vol header passed as arg
 
@@ -318,7 +319,7 @@ uint8_t extractH264FrameType(uint32_t nalSize,uint8_t *buffer,uint32_t len,uint3
   uint8_t stream;
 #define NAL_NON_IDR       1
 #define NAL_IDR           5
-
+  
   uint32_t val,hnt;  
   
 // FIXME :  no startcode only !
@@ -338,12 +339,11 @@ uint8_t extractH264FrameType(uint32_t nalSize,uint8_t *buffer,uint32_t len,uint3
                 {
                   case NAL_IDR: 
                                   *flags=AVI_KEY_FRAME;
-                                //  printf("IDR\n");
+                                  
                                   return 1;
                                   break; 
                   case NAL_NON_IDR: 
-                                  *flags=0;
-                                //  printf("NON IDR\n");
+                                  refineH264FrameType(head,tail,flags);
                                   return 1;
                                   break;
                   default:
@@ -395,8 +395,7 @@ uint8_t extractH264FrameType_startCode(uint32_t nalSize,uint8_t *buffer,uint32_t
                                   return 1;
                                   break; 
                   case NAL_NON_IDR: 
-                                  *flags=0;
-                                //  printf("NON IDR\n");
+                                  refineH264FrameType(head,tail,flags);
                                   return 1;
                                   break;
                   default:
@@ -407,5 +406,25 @@ uint8_t extractH264FrameType_startCode(uint32_t nalSize,uint8_t *buffer,uint32_t
   printf("No stream\n");
   return 0;
 }
-
+/**
+    \fn refineH264FrameType
+    \brief Try to detect B slice, warning the stream is not escaped!
+*/
+void refineH264FrameType(uint8_t *head,uint8_t *tail,uint32_t *flags)
+{
+GetBitContext s;
+uint32_t sliceType;
+            *flags=0;
+            init_get_bits(&s,head, (tail-head)*8);
+            get_ue_golomb(&s);
+            sliceType= get_ue_golomb(&s);
+            if(sliceType > 9) 
+            {
+              printf("Weird Slice %d\n",sliceType);
+              return ;
+            }
+            if(sliceType > 4)
+                sliceType -= 5;
+            if(sliceType==3) *flags=AVI_B_FRAME;  
+}
 //EOF

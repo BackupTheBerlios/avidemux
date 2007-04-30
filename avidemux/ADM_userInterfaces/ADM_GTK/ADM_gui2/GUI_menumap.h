@@ -6,6 +6,8 @@
 
 
 */
+
+CALLBACK( connect_to_avsproxy1                  ,ACT_AVS_PROXY);
 CALLBACK( see_hex1                              ,ACT_HEX_DUMP);
 CALLBACK( show_builtin_support1                 ,ACT_BUILT_IN);
 CALLBACK( open_video1         			,ACT_OpenAvi); 
