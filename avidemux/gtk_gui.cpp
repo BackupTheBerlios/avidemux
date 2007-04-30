@@ -389,6 +389,9 @@ int nw;
   // we have an AVI loaded
   switch (action)
     {
+       case ACT_CLOSE:
+              GUI_close();
+              break;
 
         case ACT_ZOOM_1_4:
         case ACT_ZOOM_1_2:
@@ -893,26 +896,8 @@ int A_openAvi2 (char *name, uint8_t mode)
   fclose (fd);
 
 
-  if (avifileinfo)		// already opened ?
-    {				// delete everything
-      // if preview is on
-      if(getPreviewMode()!=ADM_PREVIEW_NONE)
-      {
-	admPreview::stop();
-        setPreviewMode(ADM_PREVIEW_NONE);
-      }
-      delete avifileinfo;
-      //delete wavinfo;
-      wavinfo = (WAVHeader *) NULL;
-      avifileinfo = (aviInfo *) NULL;
-      video_body->cleanup ();
-      curframe = 0;
-      currentaudiostream = NULL;
-      A_changeAudioStream (NULL, AudioNone,NULL);
-      filterCleanUp ();
-
-
-    }
+  GUI_close(); // Cleanup
+  
   DIA_StartBusy ();
   /*
   ** we may get a relative path by cmdline

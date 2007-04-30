@@ -20,10 +20,12 @@
 #define ADM_MAC_CUSTOM_SCRIPT 10
 typedef enum
 {
+  
   ACT_OpenAvi = 1,
   ACT_AppendAvi,
   ACT_BrokenAvi ,
   ACT_AviInfo,
+  ACT_CLOSE,
   ACT_Exit,
   ACT_PlayAvi,
   ACT_StopAvi,
