@@ -96,7 +96,7 @@ uint8_t decoderFF::clonePic (AVFrame * src, ADMImage * out)
   out->flags = frameType ();
 
   // Quant ?
-  if (src->qstride && src->qscale_table)
+  if (src->qstride && src->qscale_table && codecId != CODEC_ID_H264)
     {
       out->quant = (uint8_t *) src->qscale_table;
       out->_qStride = src->qstride;
