@@ -359,7 +359,7 @@ uint8_t   mkvHeader::indexClusters(ADM_ebml_file *parser)
   
   // Search segment
    
-   parser->seek(0x7000000000); //Hackish, fixme
+   parser->seek(0x7000000000LL); //Hackish, fixme
    fileSize=parser->tell();
    parser->seek(0);
    
