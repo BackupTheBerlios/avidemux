@@ -102,6 +102,7 @@ class mkvHeader         :public vidHeader
     uint32_t                    _clustersCeil;
  
     uint32_t                _nbAudioTrack;
+    uint32_t                _currentAudioTrack;
     uint32_t                _reordered;
     
     uint8_t                 checkHeader(void *head,uint32_t headlen);
@@ -117,6 +118,11 @@ class mkvHeader         :public vidHeader
     uint8_t                 readCue(ADM_ebml_file *parser);
     uint8_t                 indexClusters(ADM_ebml_file *parser);
     uint8_t                 indexBlock(ADM_ebml_file *parser,uint32_t count);
+    
+    uint8_t                 changeAudioStream(uint32_t newstream);
+    uint32_t                getCurrentAudioStreamNumber(void);
+    uint8_t                 getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos);
+    
   public:
 
 

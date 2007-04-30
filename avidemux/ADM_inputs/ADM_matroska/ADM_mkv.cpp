@@ -207,7 +207,7 @@ WAVHeader *mkvHeader::getAudioInfo(void )
 {
   if(_nbAudioTrack)
   {
-    return &(_tracks[1].wavHeader); 
+    return &(_tracks[1+_currentAudioTrack].wavHeader); 
   }
   return NULL;
 }
@@ -219,7 +219,7 @@ uint8_t mkvHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {
   if(_nbAudioTrack)
   {
-      *audio=new mkvAudio(_filename,&(_tracks[1]),_clusters,_nbClusters);
+      *audio=new mkvAudio(_filename,&(_tracks[_currentAudioTrack+1]),_clusters,_nbClusters);
       return 1;
   }
   *audio=NULL;
@@ -274,7 +274,7 @@ uint8_t mkvHeader::close(void)
   }
   for(int i=0;i<_nbAudioTrack;i++)
   {
-    mkvIndex **dx=&(_tracks[1+1]._index);
+    mkvIndex **dx=&(_tracks[1+i]._index);
     if(*dx)
     {
         delete []  *dx;
@@ -305,6 +305,7 @@ uint8_t mkvHeader::needDecompress(void)
   _clusters=NULL;
   _clustersCeil=0;
   _nbClusters=0;
+  _currentAudioTrack=0;
 }
 /*
     __________________________________________________________
@@ -397,4 +398,49 @@ uint8_t mkvHeader::reorder( void )
      _tracks[0]._nbIndex=_videostream.dwLength;
          return 1;
 }
+/*
+    __________________________________________________________
+*/
+uint8_t  mkvHeader::changeAudioStream(uint32_t newstream)
+{
+    ADM_assert(_currentAudioTrack<_nbAudioTrack);
+    _currentAudioTrack=newstream;
+    return 1;
+}
+/*
+    __________________________________________________________
+*/
+uint32_t  mkvHeader::getCurrentAudioStreamNumber(void)
+{
+  return _currentAudioTrack;
+}
+/**
+    \fn getAudioStreamsInfo
+    \brief returns infos about audio streams (code,...)
+    @param nbStreams (out) nb audio streams
+    @param infos (out) pointer to streams info. It is up to the caller to free them.
+*/
+uint8_t  mkvHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
+{
+    if(!_nbAudioTrack)
+    {
+        *nbStreams=0;
+        *infos=NULL;
+        return 1;
+    }
+    *nbStreams=_nbAudioTrack;
+    *infos=new audioInfo[_nbAudioTrack];
+    memset(*infos,0,sizeof(audioInfo)*_nbAudioTrack);
+    for(int i=0;i<_nbAudioTrack;i++)
+    {
+      audioInfo *inf=&((*infos)[i]);
+      WAVHeader *head=&(_tracks[i+1].wavHeader);
+      inf->encoding=head->encoding;
+      inf->bitrate=(head->byterate*8)/1000;
+      inf->channels=head->channels;
+      inf->frequency=head->frequency;
+    }
+    return 1;
+}
+
 //EOF
