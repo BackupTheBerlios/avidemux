@@ -30,6 +30,8 @@ public:
         static JSBool lamePreset(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool mixer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
         static JSBool secondAudioTrack(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        static JSBool getNbChannels(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+        static JSBool getBitrate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
 	static JSPropertySpec avidemuxaudio_properties[];
 	static JSFunctionSpec avidemuxaudio_methods[];

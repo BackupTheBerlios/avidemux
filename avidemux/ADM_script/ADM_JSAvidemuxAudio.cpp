@@ -62,6 +62,8 @@ JSFunctionSpec ADM_JSAvidemuxAudio::avidemuxaudio_methods[] =
         { "setTrack", setTrack, 1, 0, 0 },    // set output codec
         { "secondAudioTrack", secondAudioTrack, 2, 0, 0 },    // set audio track
         { "mixer", mixer, 1, 0, 0 },    // set mixer configuration
+        { "getNbChannels", getNbChannels, 1, 0, 0 },
+        { "getBitrate", getBitrate, 1, 0, 0 },
         { 0 }
 };
 
@@ -489,5 +491,53 @@ uint32_t *infos=NULL;
         leaveLock()
         return JS_TRUE;
 
+}// end Codec
+
+JSBool ADM_JSAvidemuxAudio::getNbChannels(JSContext *cx, JSObject *obj, uintN argc, 
+                                      jsval *argv, jsval *rval)
+{
+uint32_t nb=0, nw=0;
+audioInfo *infos=NULL;
+        // default return value
+        ADM_JSAvidemuxAudio *p = (ADM_JSAvidemuxAudio *)JS_GetPrivate(cx, obj);
+        if(argc != 1)
+                return JS_FALSE;
+        // default return value
+      
+        if(JSVAL_IS_INT(argv[0]) == false)
+                return JS_FALSE;
+        enterLock();
+        video_body->getAudioStreamsInfo(0,&nb, &infos);
+        leaveLock()
+        nw=(JSVAL_TO_INT(argv[0]));
+        if(nw>nb)
+                return JS_FALSE;
+        *rval = INT_TO_JSVAL(infos[nw].channels);
+        delete [] infos;
+        return JS_TRUE;
+}// end Codec
+
+JSBool ADM_JSAvidemuxAudio::getBitrate(JSContext *cx, JSObject *obj, uintN argc, 
+                                      jsval *argv, jsval *rval)
+{
+uint32_t nb=0, nw=0;
+audioInfo *infos=NULL;
+        // default return value
+        ADM_JSAvidemuxAudio *p = (ADM_JSAvidemuxAudio *)JS_GetPrivate(cx, obj);
+        if(argc != 1)
+                return JS_FALSE;
+        // default return value
+      
+        if(JSVAL_IS_INT(argv[0]) == false)
+                return JS_FALSE;
+        enterLock();
+        video_body->getAudioStreamsInfo(0,&nb, &infos);
+        leaveLock()
+        nw=(JSVAL_TO_INT(argv[0]));
+        if(nw>nb)
+                return JS_FALSE;
+        *rval = INT_TO_JSVAL(infos[nw].bitrate);
+        delete [] infos;
+        return JS_TRUE;
 }// end Codec
 
