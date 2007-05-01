@@ -140,6 +140,7 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len)
       uint8_t flags=parser->readu8();
       uint32_t remaining=tail-parser->tell();
       lacing=((flags>>1)&3);
+      //if(track) printf("This round %lld total:%lld\n",tail-parser->tell(),    _tracks[track]._sizeInBytes);
       switch(lacing)
       {
         case 0: // No lacing
@@ -180,25 +181,45 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len)
         case 3: // Ebml lacing
           {
                                 
-                                int nbLaces=parser->readu8()+1;
-                                int32_t curSize=parser->readEBMCode();
-                                int32_t delta,sum;
-                                int64_t tail;
-                                
-                                sum=curSize;
-                                for(int i=1;i<nbLaces-1;i++)
+                                int nbLaces=parser->readu8();
+                                for(int i=1;i<nbLaces;i++)
                                 {
-                                  delta=parser->readEBMCode_Signed();
-                                  curSize+=delta;
+                                  parser->readEBMCode_Signed();
                                 }
                                 ADM_assert(track); // Not video!
-                                _tracks[track]._sizeInBytes+=tail-parser->tell();
+                                if(parser->tell()>=tail)
+                                {
+                                  printf("[MKVINDEXER]OOps overflow for EBML(track %u tid%u) at 0x%llx\n",track,tid,parser->tell()); 
+                                  break;
+                                }else
+                                {
+                                    _tracks[track]._sizeInBytes+=tail-parser->tell();
+                                }
                                 
                               }
             break;
 #endif
+        case 1: //Xiph lacing
+        {
+                                // Skip header to get the data size...
+                                int nbLaces=parser->readu8();
+                                for(int i=0;i<nbLaces;i++)
+                                {
+                                  while( parser->readu8()==0xFF);
+                                }
+                                if(parser->tell()>=tail)
+                                {
+                                  printf("[MKVINDEXER]OOps overflow for XIPH(track %u tid%u) at 0x%llx\n",track,tid,parser->tell()); 
+                                  break;
+                                }
+                                ADM_assert(track); // Not video!
+                                _tracks[track]._sizeInBytes+=(tail-parser->tell());
+                                //printf("This round %lld total:%lld\n",tail-parser->tell(),    _tracks[track]._sizeInBytes);
+                                break;
+          
+        }
         default: 
-            printf("unsupported lacing\n");
+            printf("unsupported lacing Track:%d (%d)\n",track,lacing);
             break;
       }
       parser->seek(tail);

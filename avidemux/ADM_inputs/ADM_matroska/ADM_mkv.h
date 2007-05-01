@@ -110,7 +110,8 @@ class mkvHeader         :public vidHeader
     uint8_t                 analyzeOneTrack(void *head,uint32_t headlen);
     uint8_t                 walk(void *seed);
     int                     searchTrackFromTid(uint32_t tid);
-    
+    //
+    uint8_t                 reformatVorbisHeader(mkvTrak *trk);  
     // Indexers
     
     uint8_t                 addIndexEntry(uint32_t track,uint64_t where, uint32_t size,uint32_t flags);

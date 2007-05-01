@@ -99,7 +99,14 @@ uint8_t mkvHeader::open(char *name)
   
   // Finaly update index with queue
   // Useless.....readCue(&ebml);
-    
+  for(int i=0;i<_nbAudioTrack;i++)
+  {
+    if(_tracks[1+i].wavHeader.encoding==WAV_OGG)
+    {
+        printf("[MKV] Reformatting vorbis header for track %u\n",i);
+        reformatVorbisHeader(&(_tracks[1+i]));  
+    }
+  }
   printf("[MKV]Matroska successfully read\n");
   
   return 1;
@@ -442,5 +449,54 @@ uint8_t  mkvHeader::getAudioStreamsInfo(uint32_t *nbStreams, audioInfo **infos)
     }
     return 1;
 }
-
+/**
+    \fn mkreformatVorbisHeader
+    \brief reformat oggvorbis header to avidemux style
+*/
+uint8_t mkvHeader::reformatVorbisHeader(mkvTrak *trk)
+{
+  /*
+  The private data contains the first three Vorbis packet in order. The lengths of the packets precedes them. The actual layout is:
+Byte 1: number of distinct packets '#p' minus one inside the CodecPrivate block. This should be '2' for current Vorbis headers.
+Bytes 2..n: lengths of the first '#p' packets, coded in Xiph-style lacing. The length of the last packet is the length of the CodecPrivate block minus the lengths coded in these bytes minus one.
+Bytes n+1..: The Vorbis identification header, followed by the Vorbis comment header followed by the codec setup header.
+  */
+  uint8_t *oldata=trk->extraData;
+  uint32_t oldlen=trk->extraDataLen;
+  uint32_t len1,len2,len3;
+  uint8_t *head;
+      if(*oldata!=2) {printf("[MKV] weird audio, expect problems\n");return 0;}
+      // First packet length
+      head=oldata+1;
+#define READ_LEN(x) \
+      x=0; \
+      while(*head==0xff)  \
+      { \
+        x+=0xff; \
+        head++; \
+      } \
+      x+=*head++;
+  
+      READ_LEN(len1);
+      READ_LEN(len2);
+      len3=oldata+oldlen-head;
+      printf("Found packet len : %u %u %u, total size %u\n",len1,len2,len3,oldlen);
+      // Now build our own packet...
+      uint8_t *nwdata=new uint8_t[len1+len2+len3+sizeof(uint32_t)*3];
+      uint32_t nwlen=len1+len2+len3+sizeof(uint32_t)*3;
+      uint8_t *cp=nwdata+sizeof(uint32_t)*3;
+      memcpy(cp,head,len1);
+      memcpy(cp+len1,head+len1,len2);
+      memcpy(cp+len1+len2,head+len1+len2,len3);
+      
+      uint32_t *h=(uint32_t *)nwdata;
+      h[0]=len1;
+      h[1]=len2;
+      h[2]=len3;
+      // Destroy old datas
+      delete [] oldata;
+      trk->extraData=nwdata;
+      trk->extraDataLen=nwlen;
+  return 1; 
+}
 //EOF

@@ -45,6 +45,7 @@ MKVCC mkvCC[]=
   {"A_AC3",0,WAV_AC3,""}, 
   {"A_AAC/MPEG2/LC",0,WAV_AAC,""},
   {"A_AAC",0,WAV_AAC,""},
+  {"A_VORBIS",0,WAV_OGG,""},
   
   // Video
   {"V_MPEG4/ISO/AVC",1,0,"AVC1"}, //H264

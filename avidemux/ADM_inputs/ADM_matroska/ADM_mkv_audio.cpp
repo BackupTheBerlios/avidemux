@@ -162,6 +162,43 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
                               _currentLace=_maxLace=0;
                               
                               return 1;
+                      case 1: //Xiph lacing
+                        {
+                                int nbLaces=_clusterParser->readu8()+1;
+                                
+                                ADM_assert(nbLaces<MKV_MAX_LACES);
+                                for(int i=0;i<nbLaces-1;i++)
+                                {
+                                  int v=0;
+                                  int lce=0;
+                                  while(  (v=_clusterParser->readu8())==0xff) lce+=v;
+                                  lce+=v;
+                                  _Laces[i]=lce;
+                                }
+                                int64_t d=_clusterParser->tell();
+                                
+                                d=tail-d;
+                                /* We have the remaining size after laces, substract the already known lace size */
+                                for(int i=0;i<nbLaces-1;i++)
+                                {
+                                  d-=_Laces[i]; 
+                                }
+                                // What is left is the sift of the last lace
+                                if(d>0)
+                                  _Laces[nbLaces-1]=(uint32_t)d; 
+                                else
+                                {
+                                  printf("[MKVAUDIO] OOps overflow on Xiph\n");
+                                  nbLaces--; 
+                                }
+
+                                
+                                _currentLace=0;
+                                _maxLace=nbLaces;
+                                return getPacket(dest, packlen, samples);
+                              }
+                              
+                              break;
                       case 2 : // constant size lacing
                               {
                                 int nbLaces=_clusterParser->readu8()+1;
@@ -178,6 +215,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
                                 _maxLace=nbLaces;
                                 return getPacket(dest, packlen, samples);
                               }
+                              break;
                       case 3: // Ebml lacing
                         {
                                 
@@ -198,7 +236,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
                                   _Laces[i]=curSize; 
                                  
                                 }
-                                uint64_t d=_clusterParser->tell();
+                                int64_t d=_clusterParser->tell();
                                 
                                 d=tail-d;
                                 /* We have the remaining size after laces, substract the already known lace size */
@@ -207,11 +245,18 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
                                   d-=_Laces[i]; 
                                 }
                                 // What is left is the sift of the last lace
-                                _Laces[nbLaces-1]=(uint32_t)d; 
+                                if(d>0)
+                                  _Laces[nbLaces-1]=(uint32_t)d; 
+                                else
+                                {
+                                  printf("[MKVAUDIO] OOps overflow on ebml\n");
+                                  nbLaces--; 
+                                }
                                 _currentLace=0;
                                 _maxLace=nbLaces;
                                 return getPacket(dest, packlen, samples);
                               }
+                              break;
                       default:
                             printf("Unsupported lacing %u\n",lacing);
                             _clusterParser->seek(pos+len);
@@ -332,4 +377,5 @@ uint64_t target=mstime;
             return 1;
 #endif
 }
+
 //EOF
