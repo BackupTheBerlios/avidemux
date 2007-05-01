@@ -1599,78 +1599,22 @@ uint8_t                 _3GPHeader::isReordered( void )
 /***************************************/
 uint8_t _3GPHeader::reorder( void )
 {
-_3gpIndex *index;
-uint8_t ret=1;
-uint32_t nbFrame= _videostream.dwLength;
-        // already done..
+
         if( _reordered) return 1;
         printf("Reordering...\n");
-        _3gpIndex *old,*nw;
+#define INDEX_TMPL        _3gpIndex
+#define INDEX_ARRAY_TMPL  (VDEO.index)
+#define FRAMETYPE_TMPL    intra
+  
+#include "ADM_video/ADM_reorderTemplate.cpp"
 
-        old=VDEO.index;
-        ADM_assert(old);
-        
-        index=new _3gpIndex[nbFrame];
-        // clear B frame flag for last frames
-        old[nbFrame-1].intra &=~AVI_B_FRAME;
-
-                        //__________________________________________
-                        // the direct index is in DTS time (i.e. decoder time)
-                        // we will now do the PTS index, so that frame numbering is done
-                        // according to the frame # as they are seen by editor / user
-                        // I1 P0 B0 B1 P1 B2 B3 I2 B7 B8
-                        // xx I1 B0 B1 P0 B2 B3 P1 B7 B8
-                        //__________________________________________
-                        uint32_t forward=0;
-                        uint32_t curPTS=0;
-                        uint32_t dropped=0;
-
-                        for(uint32_t c=1;c<nbFrame;c++)
-                        {
-                                if(!(old[c].intra & AVI_B_FRAME))
-                                        {
-                                                                memcpy(&index[curPTS],
-                                                                                &old[forward],
-                                                                                sizeof(_3gpIndex));
-                                                                forward=c;
-                                                                curPTS++;
-                                                                dropped++;
-                                        }
-                                        else
-                                        {// we need  at lest 2 i/P frames to start decoding B frames
-                                                if(dropped>=1)
-                                                {
-                                                        memcpy(&index[curPTS],
-                                                                &old[c],
-                                                                sizeof(_3gpIndex));
-                                                        curPTS++;
-                                                }
-                                                else
-                                                {
-                                                printf("We dropped a frame (%d/%d).\n",dropped,c);
-                                                }
-                                        }
-                        }
-
-                        uint32_t last;
-
-
-                        // put back last I/P we had in store
-                        memcpy(&index[curPTS],
-                                &old[forward],
-                                sizeof(_3gpIndex));
-                        last=curPTS;
-
-                        _videostream.dwLength= _mainaviheader.dwTotalFrames=nbFrame=last+1;
-                        // last frame is always I
-
-                        delete [] old;
-
-                        VDEO.index=index;;
-                        VDEO.nbIndex= _mainaviheader.dwTotalFrames;
-                        // last frame cannot be B frame
-                        index[last].intra&=~AVI_B_FRAME;
-                         _reordered=ret;
-                        return ret;
+#undef INDEX_TMPL       
+#undef INDEX_ARRAY_TMPL 
+#undef FRAMETYPE_TMPL   
+        VDEO.nbIndex= _mainaviheader.dwTotalFrames;
+        // last frame cannot be B frame
+        index[last].intra&=~AVI_B_FRAME;
+          _reordered=ret;
+        return ret;
 
 }

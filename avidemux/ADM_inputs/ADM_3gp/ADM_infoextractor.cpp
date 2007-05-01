@@ -328,9 +328,11 @@ uint8_t extractH264FrameType(uint32_t nalSize,uint8_t *buffer,uint32_t len,uint3
   {
     
               uint32_t length=(head[0]<<24) + (head[1]<<16) +(head[2]<<8)+(head[3]);
-              if(length>len)
+              if(length>len||length<6)
               {
-                printf("Warning , incomplete nal (%u/%u)\n",length,len); 
+                printf("Warning , incomplete nal (%u/%u),(%0x/%0x)\n",length,len,length,len);
+                *flags=0;
+                return 0;
               }
               head+=4; // Skip nal lenth
               length-=4;
@@ -348,7 +350,7 @@ uint8_t extractH264FrameType(uint32_t nalSize,uint8_t *buffer,uint32_t len,uint3
                                   break;
                   default:
                           printf("??0x%x\n",stream);
-                          head+=length+1;
+                          head+=length-5;
                           continue;
                 }
   }
@@ -367,6 +369,7 @@ uint8_t extractH264FrameType_startCode(uint32_t nalSize,uint8_t *buffer,uint32_t
   uint8_t stream;
 #define NAL_NON_IDR       1
 #define NAL_IDR           5
+#define NAL_SEI           6
 
   uint32_t val,hnt;  
   

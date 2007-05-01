@@ -2440,7 +2440,7 @@ void GUI_showCurrentFrameHex(void)
 {
 #define DISPLAY_HEX 32*3
  uint8_t *buffer;
- uint32_t len,fullLen;
+ uint32_t len,fullLen,flags;
  char     string[DISPLAY_HEX*3+6],*s;
  char     title[80];
  
@@ -2463,7 +2463,16 @@ void GUI_showCurrentFrameHex(void)
     
  }
  *s=0;
- sprintf(title,"Len: %u bytes\n",fullLen);
+ video_body->getFlags (curframe, &flags);
+ char Type='?';
+ switch(flags)
+ {
+   case 0: Type='P'; break;
+   case AVI_KEY_FRAME: Type='I'; break;
+   case AVI_B_FRAME: Type='B'; break;
+   default : Type='?'; break;
+ }
+ sprintf(title,"Len: %u bytes %c\n",fullLen,Type);
  
  GUI_Info_HIG( ADM_LOG_IMPORTANT,title, string);
  delete [] buffer;

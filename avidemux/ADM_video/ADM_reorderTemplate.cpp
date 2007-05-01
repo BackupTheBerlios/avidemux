@@ -79,4 +79,6 @@ uint32_t nbFrame= _videostream.dwLength;
 			INDEX_ARRAY_TMPL=index;;
 			// last frame cannot be B frame
 			INDEX_ARRAY_TMPL[last].FRAMETYPE_TMPL&=~AVI_B_FRAME;
+                        // And first is an intra
+                        INDEX_ARRAY_TMPL[0].FRAMETYPE_TMPL=AVI_KEY_FRAME;
 			 _reordered=ret;
