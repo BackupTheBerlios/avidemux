@@ -78,6 +78,7 @@ JSBool facRoText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 JSBool facText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facTab(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facHex(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facDirSel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool assertTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
@@ -110,6 +111,7 @@ static JSFunctionSpec adm_functions[] = {
   {"dialogFactoryTabs",       facTab,        0},
   {"dialogFactoryDirSel",       facDirSel,        0},
   {"dialogFactoryFrame",       facFrame,        0},
+  {"dialogFactoryHex",       facHex,        0},
   {"crashTest",               crashTest,        0},
   {"assertTest",               assertTest,        0},
   {0}
@@ -723,6 +725,30 @@ JSBool facFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
       
       
 }
+
+
+JSBool facHex(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+    
+      uint8_t data[100];
+      for(int i=0;i<100;i++) data[i]=i;
+      
+      diaElemHex binhex("*****",100,data);
+      
+      
+         diaElem *elems[]={&binhex   };
+  if(diaFactoryRun("Test binHex",1,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  
+  return JS_TRUE;
+      
+      
+}
+
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
   

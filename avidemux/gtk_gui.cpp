@@ -2441,40 +2441,27 @@ void GUI_showCurrentFrameHex(void)
 #define DISPLAY_HEX 32*3
  uint8_t *buffer;
  uint32_t len,fullLen,flags;
- char     string[DISPLAY_HEX*3+6],*s;
- char     title[80];
+ char sType[5];
+ char sSize[15];
  
  if (!avifileinfo) return;
  
  buffer=new uint8_t [avifileinfo->width*avifileinfo->height*3];
  video_body->getRaw (curframe, buffer, &fullLen);  
- 
- len=fullLen;
- if(len>DISPLAY_HEX) len=DISPLAY_HEX;
- s=string;
- for(int i=0;i<len;i++)
- {
-    sprintf(s,"%02x ",buffer[i]); 
-    s+=3;
-    if(i%8==7)
-    {
-      *s++='\n'; 
-    }
-    
- }
- *s=0;
  video_body->getFlags (curframe, &flags);
- char Type='?';
- switch(flags)
- {
-   case 0: Type='P'; break;
-   case AVI_KEY_FRAME: Type='I'; break;
-   case AVI_B_FRAME: Type='B'; break;
-   default : Type='?'; break;
- }
- sprintf(title,"Len: %u bytes %c\n",fullLen,Type);
  
- GUI_Info_HIG( ADM_LOG_IMPORTANT,title, string);
+ diaElemHex binhex("*****",fullLen,buffer);
+      
+ if(flags==AVI_KEY_FRAME) sprintf(sType,"I");
+  else if(flags==AVI_B_FRAME) sprintf(sType,"B");
+    else sprintf(sType,"P");
+ sprintf(sSize,"%d bytes",fullLen);
+ 
+ diaElemReadOnlyText Type(sType,_("Frame Type:"));
+ diaElemReadOnlyText Size(sSize,_("Frame Size:"));
+ diaElem *elems[]={&Type,&Size,&binhex   };
+ if(diaFactoryRun("Frame HexDump",3,elems))
+ 
  delete [] buffer;
 }
 

@@ -18,6 +18,7 @@ FAC_bitrate.cpp \
 FAC_bar.cpp \
 FAC_readOnlyText.cpp \
 FAC_notch.cpp \
-FAC_frame.cpp
+FAC_frame.cpp \
+FAC_hex.cpp
 
 

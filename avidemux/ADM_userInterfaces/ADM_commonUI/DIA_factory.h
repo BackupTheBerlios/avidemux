@@ -33,6 +33,7 @@ typedef enum elemEnum
   ELEM_DIR_SELECT,
   ELEM_TEXT,
   ELEM_FRAME,
+  ELEM_HEXDUMP,
   ELEM_MAX=ELEM_TOGGLE
 };
 /*********************************************/
@@ -327,7 +328,20 @@ public:
   void finalize(void);
 };
 /**********************************************/
-
+class diaElemHex : public diaElem
+{
+  uint32_t dataSize;
+  uint8_t  *data;
+  
+public:
+  
+  diaElemHex(const char *toggleTitle, uint32_t dataSize,uint8_t *data);
+  virtual ~diaElemHex() ;
+  void setMe(void *dialog, void *opaque,uint32_t line);
+  void getMe(void) ;
+  void finalize(void);
+};
+/**********************************************/
 /*********************************************/
 uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems);
 uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs);

@@ -296,4 +296,13 @@ void diaElemFrame::enable(uint32_t onoff)
 void diaElemFrame::finalize(void)
 {
 }
+//**************************
+
+  
+  diaElemHex::diaElemHex(const char *toggleTitle, uint32_t dataSize,uint8_t *data) :diaElem(ELEM_HEXDUMP){};
+  diaElemHex::~diaElemHex() {};
+  void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line) {};
+  void diaElemHex::getMe(void) {} ;
+  void diaElemHex::finalize(void) {};
+
 //EOF
