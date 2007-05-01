@@ -18,14 +18,24 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
-#define ADM_assert assert
 #include "ADM_ebml.h"
 #define aprintf(...) {}
+#define ADM_assert assert
+#if 0
+#define vprintf printf
+#else
+#define vprintf(...) {}
+#endif
+
+extern "C"
+{
+  double av_int2dbl(int64_t v);
+  float av_int2flt(int32_t v);
+}
 
 /*
   It is slow , optimize later
@@ -90,7 +100,18 @@ int64_t    ADM_ebml::readEBMCode_Signed(void)
     val=(val<<8)+readu8(); 
   }
   // Signed !
-  //FIXME
+
+  switch(more)
+  {
+    case 0: val-=63;break; 
+    case 1: val-=8191;break;
+    case 2: val-=1048575L;break;  
+    default: 
+        ADM_assert(0);
+        return 0;
+    
+  }
+
   return val;
 }
 /**
@@ -156,6 +177,29 @@ uint16_t ADM_ebml::readu16(void)
     readBin(v,2);
     return (uint16_t)(v[0]<<8)+v[1];
 }
+/**
+*/
+float       ADM_ebml::readFloat(uint32_t n)
+{
+  if(n!=4 && n!=8) ADM_assert(0);
+  
+  switch(n)
+  {
+    case 4:
+    {
+        uint32_t u4=readUnsignedInt(4);
+        return av_int2flt(u4);
+      }
+    case 8:
+    {
+        uint64_t u8=readUnsignedInt(8);
+        return  av_int2dbl(u8);
+    }
+    default:
+        ADM_assert(0);
+  }
+}
+
 ADM_ebml::ADM_ebml(void)
 {
   
@@ -178,12 +222,15 @@ ADM_ebml_file::ADM_ebml_file(ADM_ebml_file *father,uint32_t size)
 }
 ADM_ebml_file::ADM_ebml_file(void) : ADM_ebml()
 {
-  
+  _close=0;
 }
 ADM_ebml_file::~ADM_ebml_file()
 {
   ADM_assert(fp);
-  if(_close) fclose(fp);
+  if(_close)
+  {
+    fclose(fp);
+  }
   else fseeko(fp,_begin+_size,SEEK_SET);
   fp=NULL; 
 }
@@ -227,5 +274,86 @@ uint8_t ADM_ebml_file::finished(void)
 {
   if(tell()>(_begin+_size-4)) return 1;
   return 0; 
+}
+/** 
+  \fn find
+  \brief Search for the tag given and returns the corresponding atom
+*/
+ uint8_t ADM_ebml_file::find(ADM_MKV_SEARCHTYPE search,MKV_ELEM_ID  prim,MKV_ELEM_ID second,uint32_t *len,uint32_t rewind)
+{
+  uint64_t id,pos;
+  ADM_MKV_TYPE type;
+  const char *ss;
+
+    vprintf("[MKV]Searching for tag %llx %llx\n",prim,second);
+    if(rewind) seek(_begin);
+    if(search==ADM_MKV_PRIMARY)
+    {
+          return simplefind(prim,len,rewind);
+      }
+    vprintf("[MKV]Searching primary : %llx\n",prim);
+    if(!simplefind(prim,len,rewind))
+    {
+      vprintf("[MKV] Primary find failed for %llx\n",prim);
+      return 0; 
+    }
+    // Now we have the father, go inside
+    ADM_ebml_file *son=new ADM_ebml_file(this,*len);
+    vprintf("[MKV]Searching secondary : %llx\n",second);
+    if(!son->simplefind(second,len))
+    {
+      vprintf("[MKV] secondary find failed for secondary %llx\n",second);
+      delete son;
+      return 0; 
+    }
+    pos=son->tell();
+    delete son;
+    seek(pos);
+    return 1;
+}
+
+/** 
+  \fn find
+  \brief Search for the tag given and returns the corresponding atom
+*/
+uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewind)
+{
+  uint64_t id,alen;
+  ADM_MKV_TYPE type;
+  const char *ss;
+  
+
+    vprintf("[MKV] Simple Searching for tag %llx\n",prim);
+    if(rewind) seek(_begin);
+   
+      while(!finished())
+      {
+          readElemId(&id,&alen);
+          if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
+          {
+              vprintf("[MKV] Tag 0x%x not found\n",id);
+              skip(alen);
+              continue;
+           }
+          vprintf("Found Tag : %x (%s)\n",id,ss);
+          if(id==prim)
+          {
+            *len=(uint32_t )alen;
+            return 1;
+          }else
+            skip(alen);
+      }
+    vprintf("[MKV] Failed to locate %llx\n",prim);
+    return 0;
+}
+/**
+    \fn remaining
+    \brief returns the # of bytes remaining in this atom
+*/
+uint64_t ADM_ebml_file::remaining(void)
+{
+  uint64_t pos=tell();
+  ADM_assert(pos<=(_begin+_size));
+  return (_begin+_size)-pos; 
 }
 //EOF

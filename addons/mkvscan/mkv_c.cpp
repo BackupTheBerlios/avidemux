@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
+#include <math.h>
 #define ADM_assert assert
 #include "ADM_ebml.h"
 #include "mkv_tags.h"
@@ -97,6 +98,9 @@ void ADM_mkvWalk(ADM_ebml_file *working, uint32_t size)
                   val=son.readUnsignedInt(len);
                   recTab();printf("\tval uint: %llu (0x%llx) \n",val,val);
                   break;
+        case ADM_MKV_TYPE_FLOAT:
+                  recTab();printf("\tval float: %f \n",son.readFloat(len));
+                  break;
         case ADM_MKV_TYPE_INTEGER:
                   recTab();printf("\tval int: %lld \n",son.readSignedInt(len));
                   break;
@@ -109,7 +113,31 @@ void ADM_mkvWalk(ADM_ebml_file *working, uint32_t size)
                   break;
         }
         default:
-                son.skip(len);
+                if(id==MKV_BLOCK)
+                {
+                        recTab();printf("\t\tTrack :%u",son.readu8()-128); // Assume 1 byte code
+                        //printf(" Timecode:%d",son.reads16());
+                        son.skip(2);
+                        int lacing=son.readu8();
+                        printf(" Lacing :%x ");
+                        if(lacing&1) printf(" keyframe ");
+                        lacing=(lacing>>1)&3;
+                        switch(lacing)
+                        {
+                                       case 0:printf("No lacing\n");break;
+                                       case 1:printf("Xiph lacing\n");break;
+                                       case 3:printf("Ebml lacing\n");break;
+                                       case 2:printf("Fixed lacing :%u remaining:%u\n",son.readu8()+1,len-5);len--;break;
+
+                        }
+                        son.skip(len-4);
+
+                }
+                else
+                {
+                        recTab();printf("Skipping %s\n",ss);
+                        son.skip(len);
+                }
                 break;
       }
    }
@@ -135,5 +163,21 @@ void bigHexPrint(uint64_t v)
     s-=8;
   }
   printf("\n"); 
+}
+extern "C"
+{
+double av_int2dbl(int64_t v)
+{
+    if(v+v > 0xFFEULL<<52)
+            return 0;
+    return ldexp(((v&((1LL<<52)-1)) + (1LL<<52)) * (v>>63|1), (v>>52&0x7FF)-1075);
+}
+
+float av_int2flt(int32_t v)
+{
+    if(v+v > 0xFF000000U)
+            return 0;
+return ldexp(((v&0x7FFFFF) + (1<<23)) * (v>>31|1), (v>>23&0xFF)-150);
+}
 }
 //EOF
