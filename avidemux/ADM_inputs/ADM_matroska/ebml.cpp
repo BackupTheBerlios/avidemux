@@ -232,6 +232,7 @@ ADM_ebml_file::ADM_ebml_file(ADM_ebml_file *father,uint32_t size)
   _close=0;
   _size=size;
   fp=father->fp;
+  _fileSize=father->_fileSize;
    _begin=ftello(fp);
 }
 ADM_ebml_file::ADM_ebml_file(void) : ADM_ebml()
@@ -259,7 +260,7 @@ uint8_t ADM_ebml_file::open(const char *name)
   }
   fseeko(fp,0,SEEK_END);
   _begin=0;
-  _size=ftello(fp);
+  _fileSize=_size=ftello(fp);
   fseeko(fp,0,SEEK_SET);
   return 1;
 }
@@ -286,6 +287,7 @@ uint8_t ADM_ebml_file::seek(uint64_t pos)
 }
 uint8_t ADM_ebml_file::finished(void)
 {
+  if(tell()>(_fileSize-4)) return 1;
   if(tell()>(_begin+_size-4)) return 1;
   return 0; 
 }
@@ -337,7 +339,7 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewin
   const char *ss;
   
 
-    vprintf("[MKV] Simple Searching for tag %llx\n",prim);
+    printf("[MKV] Simple Searching for tag %llx\n",prim);
     if(rewind) seek(_begin);
    
       while(!finished())
@@ -349,6 +351,11 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewin
               skip(alen);
               continue;
            }
+          if(!alen)
+          {
+            printf("[MKV] WARNING ZERO SIZED ATOM %s %llu/%llu\n",ss,tell(),_fileSize);
+            continue; 
+          }
           vprintf("Found Tag : %x (%s)\n",id,ss);
           if(id==prim)
           {

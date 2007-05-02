@@ -13,8 +13,7 @@
 class ADM_ebml
 {
   protected:
-    
-    
+        uint64_t  _fileSize;
   public:
                     ADM_ebml(void);
         virtual     ~ADM_ebml();
