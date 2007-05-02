@@ -97,6 +97,7 @@ _3gpTrack::_3gpTrack(void)
     nbIndex=0;
     id=0;
     memset(&_rdWav,0,sizeof(_rdWav));
+
 }
 _3gpTrack::~_3gpTrack()
 {
@@ -183,7 +184,7 @@ _3GPHeader::_3GPHeader(void)
         nbAudioTrack=0;
         _currentAudioTrack=0;
         _reordered=0;
-
+        _videoScale=1;
 }
 uint8_t	_3GPHeader::getAudioStream(AVDMGenericAudioStream **audio)
 {  
@@ -358,11 +359,40 @@ uint8_t    _3GPHeader::open(char *name)
         {
             uint32_t scope=nbCtts;
             if(scope>_videostream.dwLength) scope=_videostream.dwLength;
+            
+            // Search floor value
+            uint32_t  flor=0xFFFFFFFFF;
+            uint32_t  cel=0;
             for(uint32_t i=0;i<scope;i++)
             {
-                if( _tracks[0].index[i].intra!=AVI_KEY_FRAME && 
-                    (10>Ctts[i] )) //|| Ctts[i]>0xfffff000))
-                    _tracks[0].index[i].intra=AVI_B_FRAME;
+              if(Ctts[i]>4294967290) 
+              {
+                if(i)
+                  Ctts[i]=Ctts[0];
+                else
+                  Ctts[i]=Ctts[1];
+              }
+              if(Ctts[i] >cel) cel=Ctts[i];
+              if(Ctts[i]<flor) flor=Ctts[i];
+            }
+            printf("[3GP] Ctts min %u max %u\n",flor,cel);
+            for(uint32_t i=0;i<scope;i++)
+            {
+              int floops=Ctts[i]-flor;
+               float f=floops;
+               aprintf("Frame %u ctts %u scale:%u\n",i,floops,_videoScale);
+                uint32_t delta;
+                f*=_videostream.dwRate;
+                f/=1000. ;; // in frame
+                f/=_videoScale;
+                floops=1+(uint32_t)floor(f+0.49);
+                aprintf(">Frame :%u delta=%d\n",i,floops);
+              if(floops<0)
+              {
+                printf("[3GPP] CTTS negative for frame %u : %d\n",i,floops); 
+                floops=0;
+              }
+              _tracks[0].index[i].deltaPtsDts=floops;
                 
             }
             
@@ -695,12 +725,14 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
                                     {
                                         j=tom.read32();
                                         v=tom.read32();
+#if 0
                                         if(j>10)
                                         {
-                                            printf("Too much element %u\n",j);
+                                          //  printf("Too much element %u\n",j);
                                             nbCtts=0;
                                             break;
                                         }
+#endif
                                         if(i<20)
                                         {
                                             printf("Ctts: nb: %u (%x) val:%u (%x)\n",j,j,v,v);   
@@ -776,7 +808,7 @@ uint8_t _3GPHeader::parseAtomTree(adm_atom *atom)
 					{
                                         // If we already built video track, ignore
 					if(_tracks[0].nbIndex) break;
-
+                                        _videoScale=myScale;
 					buildIndex(&_tracks[0],myScale,
 							nbSz,Sz,SzIndentical,nbCo,Co,nbSc,Sc,nbStts,SttsN,SttsC,
 							Sn,&nbo,0);
@@ -1561,7 +1593,11 @@ uint8_t 	_3GPHeader::sync(_3gpIndex *idx,uint32_t index_size, uint32_t sync_size
 	return 1;
 
 }
-
+uint32_t              _3GPHeader::ptsDtsDelta(uint32_t frame)
+{
+   if(frame >= _videostream.dwLength) return 0;
+   return VDEO.index[frame].deltaPtsDts;
+}
 uint8_t _3GPHeader::getFrameSize (uint32_t frame, uint32_t * size){
   if(frame >= _videostream.dwLength) return 0;
   *size = VDEO.index[frame].size;

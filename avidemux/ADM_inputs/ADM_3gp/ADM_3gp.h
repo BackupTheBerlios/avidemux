@@ -32,6 +32,7 @@ typedef struct _3gpIndex
 	uint64_t size;
 	uint32_t intra;
 	uint64_t time;
+        uint32_t deltaPtsDts;
 
 }_3gpIndex;
 class _3gpTrack
@@ -99,7 +100,7 @@ protected:
 	 uint32_t *Sz,*Co,*Sc;
 	 uint32_t *Sn,*Sync;
 	 uint32_t *SttsN,*SttsC,*Ctts,nbCtts;
-
+         uint32_t _videoScale;
 
 	uint8_t		buildIndex(	_3gpTrack *track,
 					uint32_t scale,
@@ -113,7 +114,8 @@ protected:
 	uint32_t 		readPackedLen(adm_atom *tom );
 	
 public:
-
+        uint8_t               hasPtsDts(void) {return 1;} // Return 1 if the container gives PTS & DTS info
+        uint32_t              ptsDtsDelta(uint32_t framenum);
 virtual   void 				Dump(void) {};
 virtual   uint32_t 			getNbStream(void) ;
 virtual   uint8_t 			needDecompress(void) { return 1;};
