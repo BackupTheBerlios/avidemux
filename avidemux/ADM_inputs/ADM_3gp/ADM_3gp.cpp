@@ -361,7 +361,7 @@ uint8_t    _3GPHeader::open(char *name)
             if(scope>_videostream.dwLength) scope=_videostream.dwLength;
             
             // Search floor value
-            uint32_t  flor=0xFFFFFFFFF;
+            uint32_t  flor=0xFFFFFFFF;
             uint32_t  cel=0;
             for(uint32_t i=0;i<scope;i++)
             {
