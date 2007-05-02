@@ -208,6 +208,8 @@ class ADM_Composer
 						uint8_t  	getFrameSize(uint32_t frame,uint32_t *size) ;
 						uint8_t		sanityCheckRef(uint32_t start, uint32_t end,
 									uint32_t *fatal);
+                                                uint8_t         hasPtsDts(uint32_t ); // Return 1 if the container gives PTS & DTS info
+                                                uint32_t        ptsDtsDelta(uint32_t framenum) ;
 					//*******************************************	
 						uint32_t 	getSpecificMpeg4Info( void );
 					//______________________________

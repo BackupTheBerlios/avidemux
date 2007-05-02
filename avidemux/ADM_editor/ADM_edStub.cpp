@@ -246,14 +246,42 @@ uint32_t ADM_Composer::getFlagsAndSeg (uint32_t frame, uint32_t * flags,uint32_t
     *segs=seg;
     return _videos[ref]._aviheader->getFlags (relframe, flags);  
 }
+/** 
+      \fn hasPtsDts
+      \brief returns 1 if the frame has pts/dts
+      
+*/
+uint8_t         ADM_Composer::hasPtsDts(uint32_t frame)
+{
+  uint32_t    relframe;
+  uint32_t    seg,    ref;
+  if (!convFrame2Seg (frame, &seg, &relframe))
+    return 0;
+
+  ref = _segments[seg]._reference;
+  return _videos[ref]._aviheader->hasPtsDts();
+  
+}
+/**
+      \fn ptsDtsDelta
+      \brief returns pts/dts delta for the framenum (as seen by editor)
+*/
+uint32_t       ADM_Composer::ptsDtsDelta(uint32_t frame)
+{
+  uint32_t    relframe;
+  uint32_t    seg,    ref;
+  if (!convFrame2Seg (frame, &seg, &relframe))
+    return 0;
+
+  ref = _segments[seg]._reference;
+  return _videos[ref]._aviheader->ptsDtsDelta(relframe);
+  
+}
 
 uint8_t ADM_Composer::getFrameSize (uint32_t frame, uint32_t * size)
 {
-  uint32_t
-    relframe;
-  uint32_t
-    seg,
-    ref;
+  uint32_t    relframe;
+  uint32_t    seg,    ref;
   if (!convFrame2Seg (frame, &seg, &relframe))
     return 0;
 

@@ -499,4 +499,14 @@ Bytes n+1..: The Vorbis identification header, followed by the Vorbis comment he
       trk->extraDataLen=nwlen;
   return 1; 
 }
+//****************************************
+/**
+      \fn ptsDtsDelta
+      \brief returns delta between presentation time & decoder time
+*/
+uint32_t              mkvHeader::ptsDtsDelta(uint32_t framenum)
+{
+    ADM_assert(framenum<_tracks[0]._nbIndex);
+    return _tracks[0]._index[framenum].timeCode;
+}
 //EOF

@@ -155,7 +155,11 @@ EncoderCopy::encode (uint32_t frame, ADMBitstream *out)
       ret =video_body->getFrameNoAlloc (_frameStart + frame, &img);
       out->len=img.dataLength;
       out->flags=img.flags;
-      out->ptsFrame = frame;
+      if(video_body->hasPtsDts(frameStart+frame))
+      {
+        out->ptsFrame = frame+video_body->ptsDtsDelta(frameStart+frame);
+      }else
+        out->ptsFrame = frame;
       return ret;
     }
   // it has PTS/DTS stuff so we need to reorder it

@@ -30,7 +30,7 @@ typedef struct mkvIndex
     uint64_t pos;
     uint32_t size;
     uint32_t flags;
-    uint32_t timeCode;
+    uint32_t timeCode;  // In fact it is delta between DTS and PTS for audio...
 };
 //**********************************************
 typedef struct mkvTrak
@@ -114,11 +114,12 @@ class mkvHeader         :public vidHeader
     uint8_t                 reformatVorbisHeader(mkvTrak *trk);  
     // Indexers
     
-    uint8_t                 addIndexEntry(uint32_t track,uint64_t where, uint32_t size,uint32_t flags);
+    uint8_t                 addIndexEntry(uint32_t track,uint64_t where, uint32_t size,uint32_t flags,
+                                            uint32_t timecodeMS);
     uint8_t                 videoIndexer(ADM_ebml_file *parser);
     uint8_t                 readCue(ADM_ebml_file *parser);
     uint8_t                 indexClusters(ADM_ebml_file *parser);
-    uint8_t                 indexBlock(ADM_ebml_file *parser,uint32_t count);
+    uint8_t                 indexBlock(ADM_ebml_file *parser,uint32_t count,uint32_t timecodeMS);
     
     uint8_t                 changeAudioStream(uint32_t newstream);
     uint32_t                getCurrentAudioStreamNumber(void);
@@ -126,6 +127,8 @@ class mkvHeader         :public vidHeader
     
   public:
 
+      uint8_t               hasPtsDts(void) {return 1;} // Return 1 if the container gives PTS & DTS info
+      uint32_t              ptsDtsDelta(uint32_t framenum);
 
     virtual   void          Dump(void);
     virtual   uint32_t      getNbStream(void) ;

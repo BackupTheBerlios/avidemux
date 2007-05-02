@@ -67,6 +67,8 @@ public:
 //  static int checkFourCC(uint8_t *in, uint8_t *fourcc);
          vidHeader();
 virtual   ~vidHeader() ;
+virtual   uint8_t               hasPtsDts(void) {return 0;}; // Return 1 if the container gives PTS & DTS info
+virtual   uint32_t              ptsDtsDelta(uint32_t framenum) ;
 virtual   void 			Dump(void)=0;
 virtual   uint32_t 		getNbStream(void)=0;
 virtual   uint8_t 		needDecompress(void)=0;

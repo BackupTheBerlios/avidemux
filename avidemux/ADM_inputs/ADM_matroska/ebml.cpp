@@ -149,7 +149,19 @@ uint64_t    ADM_ebml::readUnsignedInt(uint32_t nb)
 }
 int64_t    ADM_ebml::readSignedInt(uint32_t nb) 
 {
-  return 0;
+  int64_t val=0;
+  uint8_t r=0;
+  r=readu8();
+  if(r&0x80) // sign
+      val=-1;
+  val=(val<<8)+r; 
+  for(int i=0;i<nb-1;i++)
+  {
+    r=readu8();
+    val=(val<<8)+r; 
+  }
+  return val;
+  
 }
 uint8_t     ADM_ebml::readString(char *string, uint32_t maxLen)
 {

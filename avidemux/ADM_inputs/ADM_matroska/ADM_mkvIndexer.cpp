@@ -98,7 +98,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                                   default: blockGroup.skip(len);
                                   case MKV_BLOCK : 
                                   {
-                                    indexBlock(&blockGroup,len);
+                                    indexBlock(&blockGroup,len,_clusters[clusters].timeCode);
                                     
                                   }         
                                 }
@@ -119,7 +119,7 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
       \fn indexBlock
       \brief index a block, identify it and update index
 */
-uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len)
+uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len,uint32_t clusterTimeCodeMs)
 {
   int lacing,nbLaces,entryFlags;
   //
@@ -136,7 +136,8 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len)
         return 1; // we do only video here...
       }
       // Skip timecode
-      parser->skip(2); // Timecode FIXME Timecode
+      int16_t timecode=parser->readSignedInt(2); 
+      //if(!track) printf("TC: %d\n",timecode);
       uint8_t flags=parser->readu8();
       uint32_t remaining=tail-parser->tell();
       lacing=((flags>>1)&3);
@@ -146,7 +147,7 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len)
         case 0: // No lacing
               if(!track) // Video
               {    
-                  addIndexEntry(track,parser->tell(),remaining,entryFlags);
+                  addIndexEntry(track,parser->tell(),remaining,entryFlags,clusterTimeCodeMs+timecode);
               }
               else
               {
@@ -167,7 +168,7 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len)
                     }
                     if(!track) 
                     {
-                      addIndexEntry(track,parser->tell(),remaining,0);
+                      addIndexEntry(track,parser->tell(),remaining,0,clusterTimeCodeMs+timecode);
                       printf("Warning lacing on video track\n");
                     }
                     else
@@ -229,8 +230,9 @@ uint8_t mkvHeader::indexBlock(ADM_ebml_file *parser,uint32_t len)
 /**
     \fn addVideoEntry
     \brief add an entry to the video index
+    @param timecodeMS PTS of the frame in ms!
 */
-uint8_t mkvHeader::addIndexEntry(uint32_t track,uint64_t where, uint32_t size,uint32_t flags)
+uint8_t mkvHeader::addIndexEntry(uint32_t track,uint64_t where, uint32_t size,uint32_t flags,uint32_t timecodeMS)
 {
   //
   mkvTrak *Track=&(_tracks[track]);
@@ -251,7 +253,24 @@ uint8_t mkvHeader::addIndexEntry(uint32_t track,uint64_t where, uint32_t size,ui
   index[x].size=size;
   index[x].flags=flags;
   index[x].timeCode=0;
+  
+  float f=timecodeMS;
+  uint32_t delta;
+  f*=_videostream.dwRate;
+  f/=1000. ;; // in frame
+  f/=1000. ;; // in seconds
+  delta=(uint32_t)floor(f+0.49);
+  //printf("Frame :%u rawTimeCode:%u convertedtoframe:%u \n",Track->_nbIndex,timecodeMS,delta);
+  if(delta+1<Track->_nbIndex)
+  {
+    printf("[MKV] WARNING DELTA PTS/DTS is negative for frame %u (delta:%u)\n",Track->_nbIndex,delta); 
+    index[x].timeCode=0;
+  }else
+  {
+    index[x].timeCode=delta+1-Track->_nbIndex;
+  }
   Track->_nbIndex++;
+  
  // printf("++\n");
   return 1;
 }

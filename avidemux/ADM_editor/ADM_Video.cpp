@@ -54,7 +54,11 @@ vidHeader::vidHeader (void)
   _videoExtraData = NULL;
   _videoExtraLen = 0;
 }
-
+uint32_t             vidHeader::ptsDtsDelta(uint32_t framenum)
+{
+  ADM_assert(0);
+  return 0; 
+}
 uint32_t vidHeader::getTime (uint32_t frame)
 {
 
