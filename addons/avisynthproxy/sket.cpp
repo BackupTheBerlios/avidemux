@@ -29,12 +29,14 @@ Sket::Sket(void)
    if (bind( mySocket,   (SOCKADDR*) &service,  sizeof(service)) == SOCKET_ERROR) 
    {
     printf("bind() failed to port %u \n",port);
+	fflush(stdout);
     closesocket(mySocket);
 	mySocket=0;
     exit(-1);
   }
    // Set high buffer + low delay
   printf("Socket bound to port %u\n",port);
+  fflush(stdout);
 }
 Sket::~Sket()
 {
@@ -57,17 +59,20 @@ uint8_t Sket::waitConnexion(void)
 	if(er==SOCKET_ERROR)
 	{
 		printf("Error in lisent\n");
+		fflush(stdout);
 	}
 
   while(1) 
   {
 		printf("Waiting for client to connect...\n");
+		fflush(stdout);
 		workSocket = (SOCKET)SOCKET_ERROR;
 		while( workSocket == SOCKET_ERROR ) 
 		{
 			workSocket = accept( mySocket, NULL, NULL );
 		}
-		printf("Client connected.\n");   
+		printf("Client connected.\n");
+		fflush(stdout);
 		break;
   }
   return 1;
@@ -81,6 +86,7 @@ uint8_t Sket::receive(uint32_t *cmd, uint32_t *frame,uint32_t *payload_size,uint
 	if( sizeof(header)!=recv(workSocket,(char *)&header,sizeof(header),0))
 	{
 		printf("Error in receivedata: header\n");
+		fflush(stdout);
 		exit(-1);
 	}
 	*cmd=header.cmd;
@@ -89,6 +95,7 @@ uint8_t Sket::receive(uint32_t *cmd, uint32_t *frame,uint32_t *payload_size,uint
 	if(header.magic!=(uint32_t)MAGGIC)
 	{
 		printf("Wrong magic\n");
+		fflush(stdout);
 		exit(-1);
 	}
 	if(header.payloadLen)
@@ -101,6 +108,7 @@ uint8_t Sket::receive(uint32_t *cmd, uint32_t *frame,uint32_t *payload_size,uint
 			if(chunk<0)
 			{
 				printf("Error in senddata: body\n");
+				fflush(stdout);
 				exit(-1);
 			}
 			togo-=chunk;
@@ -124,6 +132,7 @@ uint8_t Sket::sendData(uint32_t cmd,uint32_t frame, uint32_t payload_size,uint8_
 	if(sizeof(header)!= send(workSocket,(char *)&header,sizeof(header),0))
 	{
 		printf("Error in senddata: header\n");
+		fflush(stdout);
 		exit(-1);
 	}
 	int togo=payload_size;
@@ -134,6 +143,7 @@ uint8_t Sket::sendData(uint32_t cmd,uint32_t frame, uint32_t payload_size,uint8_
 		if(chunk<0)
 		{
 			printf("Error in senddata: body\n");
+			fflush(stdout);
 			exit(-1);
 		}
 		togo-=chunk;

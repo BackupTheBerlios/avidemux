@@ -51,6 +51,7 @@ int __cdecl main(int argc, const char* argv[])
 	
 
 	printf("AvsSocket Proxy, derivated from avs2yuv by  Loren Merritt \n");
+	fflush(stdout);
 	
 	
 		if(argc>=2)
@@ -60,6 +61,7 @@ int __cdecl main(int argc, const char* argv[])
 			if(!dot || strcmp(".avs", dot))
 			{
 				fprintf(stderr, "infile (%s) doesn't look like an avisynth script\n", infile);
+				fflush(stderr);
 				infile=NULL;
 			}
 		}
@@ -70,11 +72,13 @@ int __cdecl main(int argc, const char* argv[])
 	if(!infile) {
 		fprintf(stderr, MY_VERSION "\n"
 		"Usage: avs2yuv  in.avs \n");
+		fflush(stderr);
 		return 2;
 	}
 	if(!initAvisynth(infile))
 	{
 		printf("Avisynth initfailed\n");
+		fflush(stdout);
 		handleError();
 		exit (-2);
 	}
@@ -83,14 +87,17 @@ int __cdecl main(int argc, const char* argv[])
 	WSADATA wsaData;
 	int iResult;
 		printf("Initializing WinSock\n");
+		fflush(stdout);
 		iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 		if (iResult != NO_ERROR)
 		{
 			printf("Error at WSAStartup()\n");
+			fflush(stdout);
 			handleError();
 			exit(-1);
 		}	
 		printf("WinSock ok\n");
+		fflush(stdout);
 		SetLastError(0);
 		
 	//********************************
@@ -104,6 +111,7 @@ int __cdecl main(int argc, const char* argv[])
 		if(!sket->waitConnexion())
 		{
 			printf("Accept/listen error\n");
+			fflush(stdout);
 			handleError();
 			exit(-1);
 		}
@@ -117,6 +125,7 @@ int __cdecl main(int argc, const char* argv[])
 			if(!sket->receive(&cmd,&frame,&len,payload))
 			{
 				printf("Error in receive\n");
+				fflush(stdout);
 				handleError();
 				exit(-1);
 			}
@@ -124,6 +133,7 @@ int __cdecl main(int argc, const char* argv[])
 			{
 					case AvsCmd_GetInfo:
 							printf("Received get info...\n");
+							fflush(stdout);
 							sket->sendData(AvsCmd_SendInfo,0,sizeof(info),(uint8_t *)&info);
 							break;
 					case AvsCmd_GetFrame:
@@ -132,6 +142,7 @@ int __cdecl main(int argc, const char* argv[])
 								
 							try{
 								printf("Get frame %u (old:%u)\n",frame,currentFrame);
+								fflush(stdout);
 								Aframe= clip->GetFrame(frame, env);
 								framePack(Aframe);	
 								currentFrame=frame;
@@ -139,6 +150,7 @@ int __cdecl main(int argc, const char* argv[])
 								catch(AvisynthError err) 
 								{		
 									fprintf(stderr, "\nAvisynth error:\n%s\n", err.msg);
+									fflush(stderr);
 									handleError();
 									return 1;
 								}
@@ -155,6 +167,7 @@ int __cdecl main(int argc, const char* argv[])
 							break;
 					default:
 							printf("Unknown command\n");
+							fflush(stdout);
 							handleError();
 							exit(-1);
 
@@ -214,6 +227,7 @@ void handleError(void)
 {
 	DWORD er=GetLastError();
 	printf("Err: %d\n",er);
+	fflush(stdout);
 	exit(-1);
 
 }
@@ -226,26 +240,31 @@ uint8_t initAvisynth(const char *infile)
 		DLLFUNC *CreateScriptEnvironment=NULL;
 
 		printf("Loading Avisynth.dll \n");
+		fflush(stdout);
 		instance= LoadLibrary("avisynth.dll");
 		if(!instance) 
 		{
 			handleError();
 			fprintf(stderr, "failed to load avisynth.dll\n"); 
+			fflush(stderr);
 			return 2;
 		}
 		printf("Avisynth.dll loaded\n");
+		fflush(stdout);
 		CreateScriptEnvironment			= (DLLFUNC *) GetProcAddress(instance, "CreateScriptEnvironment");
 		printf("Env created\n");
+		fflush(stdout);
 		if(!CreateScriptEnvironment)
-			{fprintf(stderr, "failed to load CreateScriptEnvironment()\n"); return 1;}
+			{fprintf(stderr, "failed to load CreateScriptEnvironment()\n"); fflush(stderr); return 1;}
 try{
 		env = CreateScriptEnvironment(AVISYNTH_INTERFACE_VERSION);
 		if(!env)
 		{
-			{fprintf(stderr, "Env failed\n"); return 1;}
+			{fprintf(stderr, "Env failed\n"); fflush(stderr); return 1;}
 		}
 		AVSValue args[]={infile};
 		printf("Importing..\n");
+		fflush(stdout);
 		PClip dummy(env->Invoke("Import", AVSValue(args, 1)).AsClip());
 		clip=dummy;
 
@@ -255,6 +274,7 @@ try{
 		info.height=vid_height=inf.height;
 		info.fps1000=vid_fps1000=(inf.fps_numerator*1000)/inf.fps_denominator;
 		printf("%d / %d\n",inf.fps_numerator,inf.fps_denominator);
+		fflush(stdout);
 		float f=(float)inf.fps_numerator;
 		f*=1000;
 		f/=inf.fps_denominator;
@@ -264,12 +284,13 @@ try{
 		if(!inf.IsYV12()) 
 		{
 			printf("Only yv12!\n");
+			fflush(stdout);
 			handleError();
 		}
 		if(!inf.IsYV12())
-			{fprintf(stderr, "Couldn't convert input to YV12\n"); return 1;}
+			{fprintf(stderr, "Couldn't convert input to YV12\n"); fflush(stderr); return 1;}
 		if(inf.IsFieldBased())
-			{fprintf(stderr, "Needs progressive input\n"); return 1;}
+			{fprintf(stderr, "Needs progressive input\n"); fflush(stderr); return 1;}
 
 	
 		// Incoming ready
@@ -278,10 +299,12 @@ try{
 		printf("Height  :%d \n",vid_height);
 		printf("Fps1K   :%d \n",vid_fps1000);
 		printf("NbFrame :%d \n",vid_nbFrame);
+		fflush(stdout);
 }
 catch(AvisynthError err) {
 		
 			fprintf(stderr, "\nAvisynth error:\n%s\n", err.msg);
+			fflush(stderr);
 		return 1;
 	}
 
