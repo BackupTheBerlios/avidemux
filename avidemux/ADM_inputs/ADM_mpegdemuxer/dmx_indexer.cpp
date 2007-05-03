@@ -22,6 +22,7 @@
 #include <math.h>
 
 #include "default.h"
+#include "prefs.h"
 #include <ADM_assert.h>
 
 
@@ -29,7 +30,7 @@
 #include "ADM_toolkit/filesel.h"
 #include "ADM_osSupport/ADM_quota.h"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_idx_pg.h"
-
+#include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 
 #include "ADM_osSupport/ADM_debugID.h"
@@ -195,7 +196,11 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
         
         uint32_t total_frame=0,val;
 
-        
+		uint32_t originalPriority = getpriority(PRIO_PROCESS, 0);
+		uint32_t priorityLevel;
+
+		prefs->get(PRIORITY_INDEXING,&priorityLevel);
+		setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
 
         work=new DIA_progressIndexing(mpeg);
 
@@ -321,6 +326,9 @@ uint8_t dmx_indexer(const char *mpeg,const char *file,uint32_t preferedAudio,uin
 
           delete demuxer;
           delete [] realname;
+
+		  setpriority(PRIO_PROCESS, 0, originalPriority);
+
           return 1;
 }
 uint32_t computeTimeDifference(TimeStamp *f,TimeStamp *l)

@@ -347,4 +347,27 @@ ARDescriptor *desc=allArs;
     *string=unknown;
     return ADM_ASPECT_1_1;
 }
+
+// Get nice value for a priority level (0 - 4).
+int32_t ADM_getNiceValue(uint32_t priorityLevel)
+{
+	switch (priorityLevel)
+	{
+		case 0:	// High
+			return -18;
+			break;
+		case 1: // Above Normal
+			return -10;			
+			break;
+		case 2: // Normal
+			return 0;
+			break;
+		case 3: // Below Normal
+			return 10;
+			break;
+		case 4: // Low
+			return 18;
+			break;
+	}
+}
 //EOF

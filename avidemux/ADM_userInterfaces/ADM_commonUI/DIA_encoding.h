@@ -23,7 +23,7 @@ private:
                 uint32_t  _nextSampleStartTime; // Next start time to be used for ETA
                 uint32_t  _nextSampleStartFrame; // Next start frame for ETA
                 uint32_t  _nextUpdate;           // Next time to update the GUI
-                uint32_t _fps_average;
+                float _fps_average;
                 uint32_t _average_bitrate;
                 uint64_t _totalSize;
                 uint64_t _audioSize;
@@ -35,6 +35,7 @@ private:
                 uint32_t _total;
                 uint32_t _lastnb;
                 uint32_t _fps1000;
+				uint32_t _originalPriority;
         
                 void setBitrate(uint32_t br,uint32_t globalbr);
                 void setSize(int size);

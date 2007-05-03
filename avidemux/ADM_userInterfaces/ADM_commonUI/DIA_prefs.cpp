@@ -60,7 +60,9 @@ uint32_t useMaster=0;
 uint32_t useAutoIndex=0;
 uint32_t useSwap=0;
 uint32_t useNuv=0;
-uint32_t mthreads=0;	
+uint32_t mthreads=0;
+uint32_t encodePriority=2;
+uint32_t indexPriority=2;
 uint32_t downmix;
 uint32_t mpeg_no_limit=0;
 uint32_t msglevel=2;
@@ -110,8 +112,14 @@ uint32_t hzd,vzd,dring;
         if(!prefs->get(FEATURE_MPEG_NO_LIMIT,&mpeg_no_limit)) mpeg_no_limit=0;
         // Multithreads
         if(!prefs->get(FEATURE_MULTI_THREAD, &mthreads))
-                mthreads=0;		
-  
+                mthreads=0;
+		// Encoding priority
+		if(!prefs->get(PRIORITY_ENCODING, &encodePriority))
+                encodePriority=2;
+		// Indexing / unpacking priority
+		if(!prefs->get(PRIORITY_INDEXING, &indexPriority))
+                indexPriority=2;
+
         // VCD/SVCD split point		
         if(!prefs->get(SETTINGS_MPEGSPLIT, &autosplit))
                 autosplit=690;		
@@ -147,7 +155,7 @@ uint32_t hzd,vzd,dring;
         // Audio device
         /************************ Build diaelems ****************************************/
         diaElemToggle useSysTray(&useTray,_("Use systray while encoding"));
-        diaElemToggle allowAnyMpeg(&mpeg_no_limit,_("Accept non standard audio frequency for DVD"));
+        diaElemToggle allowAnyMpeg(&mpeg_no_limit,_("Accept non-standard audio frequency for DVD"));
         diaElemToggle useLavcodec(&lavcodec_mpeg,_("Use lavcodec mpeg2 decoder"));
         diaElemToggle openDml(&use_odml,_("Create openDML file"));
         diaElemToggle autoIndex(&useAutoIndex,_("Automatically index mpeg files"));
@@ -158,9 +166,19 @@ uint32_t hzd,vzd,dring;
         diaElemToggle togAutoVbr(&autovbr,_("Automatically build VBR map"));
         diaElemToggle togAutoIndex(&autoindex,_("Automatically rebuild index"));
         diaElemToggle togAutoUnpack(&autounpack,_("Automatically remove packed bitstream"));
-        
-               
+                       
         diaElemUInteger multiThread(&mthreads,_("Number of threads"),0,10);
+
+		diaMenuEntry priorityEntries[] = {
+                             {0,       _("High"),NULL}
+                             ,{1,      _("Above Normal"),NULL}
+                             ,{2,      _("Normal"),NULL}
+							 ,{3,      _("Below Normal"),NULL}
+							 ,{4,      _("Low"),NULL}
+        };
+		diaElemMenu menuEncodePriority(&encodePriority,_("Encoding priority"), sizeof(priorityEntries)/sizeof(diaMenuEntry),priorityEntries,"");
+		diaElemMenu menuIndexPriority(&indexPriority,_("Indexing / unpacking priority"), sizeof(priorityEntries)/sizeof(diaMenuEntry),priorityEntries,"");
+
         diaElemUInteger autoSplit(&autosplit,_("Split mpegs every (MB)"),10,4096);
         
         diaElemToggle   togTagMp3(&alternate_mp3_tag,_("Use alternative tag for mp3 in .mp4"));
@@ -289,15 +307,15 @@ uint32_t hzd,vzd,dring;
         diaElemTabs tabVideo("Video",2,(diaElem **)diaVideo);
         
         /* Sixth Tab : mthread */
-        diaElem *diaMthread[]={&multiThread};
-        diaElemTabs tabMthread("MultiThreading",1,(diaElem **)diaMthread);
+        diaElem *diaCpu[]={&multiThread, &menuEncodePriority, &menuIndexPriority};
+        diaElemTabs tabCpu("CPU",3,(diaElem **)diaCpu);
         
         /* seventh Tab : Xfilter */
         diaElem *diaXFilter[]={&loadEx,&entryFilterPath};
         diaElemTabs tabXfilter("External Filters",2,(diaElem **)diaXFilter);
                                     
 // SET
-        diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabMthread,&tabXfilter};
+        diaElemTabs *tabs[]={&tabUser,&tabAuto,&tabInput,&tabOutput,&tabAudio,&tabVideo,&tabCpu,&tabXfilter};
         if( diaFactoryRunTabs(_("Preferences"),8,tabs))
 	{
 		ret=1;
@@ -340,12 +358,17 @@ uint32_t hzd,vzd,dring;
                 prefs->set(FEATURE_USE_LAVCODEC_MPEG, lavcodec_mpeg);
                 // Odml
                 prefs->set(FEATURE_USE_ODML, use_odml);
-		// Split
+				// Split
                 prefs->set(SETTINGS_MPEGSPLIT, autosplit);
                 
-                //
+                // number of threads
                 if(mthreads<2) mthreads=0;
                 prefs->set(FEATURE_MULTI_THREAD, mthreads);
+				// Encoding priority
+				prefs->set(PRIORITY_ENCODING, encodePriority);
+				// Indexing / unpacking priority
+				prefs->set(PRIORITY_INDEXING, indexPriority);
+
                 // Auto index mpeg
                 prefs->set(FEATURE_TRYAUTOIDX, useAutoIndex);
                 // Auto swap A/B

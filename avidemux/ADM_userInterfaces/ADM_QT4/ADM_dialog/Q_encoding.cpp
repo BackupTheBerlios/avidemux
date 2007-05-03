@@ -21,11 +21,13 @@
 #undef Ui_Dialog 
 
 #include "default.h"
+#include "prefs.h"
 #include "ADM_assert.h"
 #include "ADM_osSupport/ADM_misc.h"
 #include "DIA_working.h"
 #include "DIA_encoding.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 extern void UI_purge(void);
 static int stopReq=0;
@@ -37,7 +39,13 @@ class encodingWindow : public QDialog
      encodingWindow();
      Ui_encodingDialog ui;
  public slots:
-     void buttonPressed(void ) { printf("StopReq\n");stopReq=1;}
+	void buttonPressed(void ) { printf("StopReq\n");stopReq=1;}
+
+	void priorityChanged(int priorityLevel)
+	{
+		setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
+	}
+
  private slots:
  private:
 };
@@ -45,8 +53,15 @@ class encodingWindow : public QDialog
 
 encodingWindow::encodingWindow()     : QDialog()
  {
-     ui.setupUi(this);
-     connect( (ui.pushButton),SIGNAL(pressed()),this,SLOT(buttonPressed()));
+	ui.setupUi(this);
+
+	connect( (ui.pushButton),SIGNAL(pressed()),this,SLOT(buttonPressed()));
+	connect(ui.comboBoxPriority, SIGNAL(currentIndexChanged(int)), this, SLOT(priorityChanged(int)));
+
+	uint32_t priority;
+
+	prefs->get(PRIORITY_ENCODING,&priority);
+	ui.comboBoxPriority->setCurrentIndex(priority);
  }
 //*******************************************
 #define WIDGET(x) (window->ui.x)
@@ -69,10 +84,12 @@ uint32_t useTray=0;
         _current=0;
         window=new encodingWindow();
         setFps(fps1000);
+		_originalPriority=getpriority(PRIO_PROCESS, 0);
         _lastTime=0;
         _lastFrame=0;
         _fps_average=0;
         _total=1000;
+
          window->setModal(TRUE);
          window->show();
 
@@ -142,7 +159,7 @@ void DIA_encoding::setCodec(const char *n)
 void DIA_encoding::setBitrate(uint32_t br,uint32_t globalbr)
 {
           ADM_assert(window);
-          snprintf(string,79,"%lu / %lu",br,globalbr);
+          snprintf(string,79,"%lu kB/s",br,globalbr);
           WRITE(labelVidBitrate);
 
 }
@@ -220,8 +237,15 @@ uint32_t tim;
           if( tim < _nextUpdate) return ; 
           _nextUpdate = tim+GUI_UPDATE_RATE;
   
-          snprintf(string,79,"%lu/%lu",_lastnb,_total);
+          snprintf(string,79,"%lu",_lastnb);
           WIDGET(labelFrame)->setText(string);
+
+          snprintf(string,79,"%lu",_total);
+          WIDGET(labelTotalFrame)->setText(string);
+
+		  snprintf(string,79,"%lu",_total);
+          WIDGET(labelTotalFrame)->setText(string);
+
           // Average bitrate  on the last second
           uint32_t sum=0,aquant=0,gsum;
           for(int i=0;i<_roundup;i++)
@@ -254,17 +278,20 @@ uint32_t tim;
           deltaTime=tim-_lastTime;
           deltaFrame=_lastnb-_lastFrame;
 
-          _fps_average    =(uint32_t)( deltaFrame*1000.0 / deltaTime ); 
+          _fps_average    =(float)( deltaFrame*1000.0F / deltaTime ); 
 
-          snprintf(string,79,"%lu",_fps_average);
+          snprintf(string,79,"%.2f",_fps_average);
           WIDGET(labelFps)->setText(string);
   
           uint32_t   hh,mm,ss;
   
             double framesLeft=(_total-_lastnb);
-          ms2time((uint32_t)floor(0.5+deltaTime*framesLeft/deltaFrame),&hh,&mm,&ss);
-          snprintf(string,79,"%02d:%02d:%02d",hh,mm,ss);
-          WIDGET(labelETA)->setText(string);
+
+			ms2time(deltaTime,&hh,&mm,&ss);
+			snprintf(string,79,"%02d:%02d:%02d",hh,mm,ss);
+			WIDGET(labelElapsed)->setText(string);
+
+            WIDGET(labelETA)->setText(ms2timedisplay((uint32_t) floor(0.5 + deltaTime * framesLeft / deltaFrame)));
   
            // Check if we should move on to the next sample period
           if (tim >= _nextSampleStartTime + ETA_SAMPLE_PERIOD ) {
@@ -310,7 +337,7 @@ void DIA_encoding::setQuantIn(int size)
 void DIA_encoding::setSize(int size)
 {
           ADM_assert(window);
-          sprintf(string,"%lu",size);
+          sprintf(string,"%lu MB",size);
           WRITE(labelTotalSize);
 
 }
@@ -322,7 +349,7 @@ void DIA_encoding::setSize(int size)
 void DIA_encoding::setAudioSizeIn(int size)
 {
           ADM_assert(window);
-          sprintf(string,"%lu",size);
+          sprintf(string,"%lu MB",size);
           WRITE(labelAudioSize);
 
 }
@@ -334,7 +361,7 @@ void DIA_encoding::setAudioSizeIn(int size)
 void DIA_encoding::setVideoSizeIn(int size)
 {
           ADM_assert(window);
-          sprintf(string,"%lu",size);
+          sprintf(string,"%lu MB",size);
           WRITE(labelVideoSize);
 
 }
@@ -363,7 +390,11 @@ uint8_t DIA_encoding::isAlive( void )
                          stopReq=0;
                  }
         }
+
         if(!stopReq) return 1;
+
+		setpriority(PRIO_PROCESS, 0, _originalPriority);
+
         return 0;
 }
 

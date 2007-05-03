@@ -24,6 +24,7 @@
 #include "config.h"
 #include "fourcc.h"
 #include "avio.hxx"
+#include "prefs.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_codecs/ADM_codec.h"
 #include "ADM_video/ADM_genvideo.hxx"
@@ -31,6 +32,7 @@
 #include "avi_vars.h"
 #include "../ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 #include "ADM_toolkit/toolkit.hxx"
+#include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 
 /**
@@ -61,18 +63,26 @@ aviInfo    info;
           GUI_Error_HIG(_("Not indexable"),_( "DivX 5 + packed?"));
 		return 0;
 	}
-                        vi=&(_videos[0]);
-                        vi->_aviheader->getVideoInfo (&info);
+
+	uint32_t originalPriority = getpriority(PRIO_PROCESS, 0);
+	uint32_t priorityLevel;
+
+	prefs->get(PRIORITY_INDEXING,&priorityLevel);
+	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
+
+	vi=&(_videos[0]);
+	vi->_aviheader->getVideoInfo (&info);
                         
 	compBuffer=new uint8_t[(info.width * info.height * 3)>>1];
 	ADM_assert(compBuffer);
 
 	prepBuffer=new ADMImage(info.width ,info.height);            
-        prepBufferNoCopy=new ADMImage(info.width ,info.height);      
-        ADMCompressedImage img;
-        img.data=compBuffer;
+    prepBufferNoCopy=new ADMImage(info.width ,info.height);      
+    ADMCompressedImage img;
+    img.data=compBuffer;
+
 	ADM_assert(prepBuffer);
-        ADM_assert(prepBufferNoCopy);
+    ADM_assert(prepBufferNoCopy);
 
 	for(uint32_t i=0;i<_nb_video;i++)
 	{
@@ -80,7 +90,7 @@ aviInfo    info;
 	}
 	DIA_working *work;
         uint8_t nocopy;
-	work=new DIA_working("Rebuilding Frames");
+	work=new DIA_working(_("Rebuilding Frames"));
 
 
 	for(uint32_t vid=0;vid<_nb_video;vid++)
@@ -114,14 +124,16 @@ aviInfo    info;
 
 					if(work->update(cur, frames))
 	  				{
-       						delete work;
+						delete work;
 						vi->decoder->decodeFull();
-                                                GUI_Error_HIG(_("Aborted"), NULL);
+						GUI_Error_HIG(_("Aborted"), NULL);
 						delete [] compBuffer;
 						delete  prepBuffer;
-                                                delete  prepBufferNoCopy;
-             					return 0;
-       					}
+						delete  prepBufferNoCopy;
+
+						setpriority(PRIO_PROCESS, 0, originalPriority);
+						return 0;
+       				}
 					cur++;
 				}
 				vi->decoder->decodeFull();
@@ -135,7 +147,10 @@ aviInfo    info;
 	delete work;
 	delete [] compBuffer;
 	delete  prepBuffer;
-        delete  prepBufferNoCopy;
+    delete  prepBufferNoCopy;
+
+	setpriority(PRIO_PROCESS, 0, originalPriority);
+
 	return 1;
 }
 

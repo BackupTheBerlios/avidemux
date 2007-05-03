@@ -88,7 +88,73 @@ int fseeko_adm(FILE *f,fpos_t off,int whence)
 	return 0;
  }
 
+int getpriority(int which, int who)
+{
+	unsigned int priorityClass;
 
+	ADM_assert(which == PRIO_PROCESS);
+	ADM_assert(who == 0);
+
+	priorityClass = GetPriorityClass(GetCurrentProcess());
+
+	switch (priorityClass)
+	{
+		case HIGH_PRIORITY_CLASS:
+			return -18;
+			break;
+		case ABOVE_NORMAL_PRIORITY_CLASS:
+			return -10;
+			break;
+		case NORMAL_PRIORITY_CLASS:
+			return 0;
+			break;
+		case BELOW_NORMAL_PRIORITY_CLASS:
+			return 10;
+			break;
+		case IDLE_PRIORITY_CLASS:
+			return 18;
+			break;
+		default:
+			ADM_assert(0);
+	}
+}
+
+int setpriority(int which, int who, int value)
+{
+	unsigned int priorityClass;
+
+	ADM_assert(which == PRIO_PROCESS);
+	ADM_assert(who == 0);
+	ADM_assert(value >= PRIO_MIN && value <= PRIO_MAX);
+
+	if (value >= -20 && value <= -16)
+	{
+		priorityClass = HIGH_PRIORITY_CLASS;
+	}
+	else if (value >= -15 && value <= -6)
+	{
+		priorityClass = ABOVE_NORMAL_PRIORITY_CLASS;
+	}
+	else if (value >= -5 && value <= 4)
+	{
+		priorityClass = NORMAL_PRIORITY_CLASS;
+	}
+	else if (value >= 6 && value <= 15)
+	{
+		priorityClass = BELOW_NORMAL_PRIORITY_CLASS;
+	}
+	else if (value >= 16 && value <= 20)
+	{
+		priorityClass = IDLE_PRIORITY_CLASS;
+	}
+
+	if (!SetPriorityClass(GetCurrentProcess(), priorityClass))
+	{
+		return -1;
+	}
+
+	return 0;
+}
 
 #endif
 

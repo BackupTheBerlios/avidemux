@@ -7,7 +7,7 @@
  *                                                                         *
  ***************************************************************************/
 
-# include <config.h>
+#include <config.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -19,11 +19,8 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
-
-
 
 #include "default.h"
 #include "prefs.h"
@@ -32,6 +29,7 @@
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit_gtk/toolkit_gtk_include.h"
+#include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 #include "ADM_assert.h" 
 
@@ -45,6 +43,7 @@ extern void UI_deiconify( void );
 extern void UI_iconify( void );
 static gint on_destroy_abort(GtkObject * object, gpointer user_data);
 static void DIA_stop( void);
+static void change_priority(void);
 
 static uint8_t stopReq=0;
 DIA_encoding::DIA_encoding( uint32_t fps1000 )
@@ -60,14 +59,23 @@ uint32_t useTray=0;
         _videoSize=0;
         _current=0;
         setFps(fps1000);
+		_originalPriority=getpriority(PRIO_PROCESS, 0);
         dialog=create_dialog1();
         
         gtk_register_dialog(dialog);
         //gtk_transient(dialog);
+        gtk_signal_connect(GTK_OBJECT(WID(combobox_priority)), "changed",
+                      GTK_SIGNAL_FUNC(change_priority), NULL);
         gtk_signal_connect(GTK_OBJECT(WID(closebutton1)), "clicked",
                       GTK_SIGNAL_FUNC(DIA_stop),                   NULL);
         gtk_signal_connect(GTK_OBJECT(dialog), "delete_event",
                       GTK_SIGNAL_FUNC(on_destroy_abort), NULL);
+
+		uint32_t priority;
+
+		prefs->get(PRIORITY_ENCODING,&priority);
+		gtk_combo_box_set_active(GTK_COMBO_BOX(WID(combobox_priority)),priority);
+
         gtk_widget_show(dialog);
 //	gtk_window_set_modal(GTK_WINDOW(dialog), 1);
         if(useTray)
@@ -108,9 +116,19 @@ gint on_destroy_abort(GtkObject * object, gpointer user_data)
 
 void DIA_stop( void)
 {
-        printf("Stop request\n");
-        stopReq=1;
+	printf("Stop request\n");
+	stopReq=1;
 }
+
+void change_priority(void)
+{
+	uint32_t priorityLevel;
+
+	priorityLevel = gtk_combo_box_get_active(GTK_COMBO_BOX(WID(combobox_priority)));
+	
+	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
+}
+
 DIA_encoding::~DIA_encoding( )
 {
         if(tray) delete tray;
@@ -144,7 +162,7 @@ void DIA_encoding::setCodec(const char *n)
 void DIA_encoding::setBitrate(uint32_t br,uint32_t globalbr)
 {
           ADM_assert(dialog);
-          sprintf(string,"%u kbps/%u kbps",br,globalbr);
+          sprintf(string,"%u kB/s",globalbr);
           gtk_label_set_text(GTK_LABEL(WID(label_bitrate)),string);
 
 }
@@ -201,8 +219,12 @@ uint32_t tim;
           if( tim < _nextUpdate) return ; 
           _nextUpdate = tim+GUI_UPDATE_RATE;
   
-          sprintf(string,"%lu/%lu",_lastnb,_total);
+          sprintf(string,"%lu",_lastnb);
           gtk_label_set_text(GTK_LABEL(WID(label_frame)),string);
+
+		  sprintf(string,"%lu",_total);
+		  gtk_label_set_text(GTK_LABEL(WID(label_totalframe)),string);
+
           // Average bitrate  on the last second
           uint32_t sum=0,aquant=0,gsum;
           for(int i=0;i<_roundup;i++)
@@ -235,18 +257,21 @@ uint32_t tim;
           deltaTime=tim-_lastTime;
           deltaFrame=_lastnb-_lastFrame;
 
-          _fps_average    =(uint32_t)( deltaFrame*1000.0 / deltaTime ); 
+          _fps_average    =(float)( deltaFrame*1000.0F / deltaTime ); 
 
-          sprintf(string,"%lu",_fps_average);
+          sprintf(string,"%.2f",_fps_average);
           gtk_label_set_text(GTK_LABEL(WID(label_fps)),string);
   
           uint32_t   hh,mm,ss;
   
             double framesLeft=(_total-_lastnb);
-                                          ms2time((uint32_t)floor(0.5+deltaTime*framesLeft/deltaFrame),&hh,&mm,&ss);
-                                          sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
-                                          gtk_label_set_text(GTK_LABEL(WID(label_eta)),string);
-  
+
+			ms2time(deltaTime,&hh,&mm,&ss);
+			sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
+			gtk_label_set_text(GTK_LABEL(WID(label_elapsed)),string);
+
+			gtk_label_set_text(GTK_LABEL(WID(label_eta)), ms2timedisplay((uint32_t) floor(0.5 + deltaTime * framesLeft / deltaFrame)));
+ 
            // Check if we should move on to the next sample period
           if (tim >= _nextSampleStartTime + ETA_SAMPLE_PERIOD ) {
             _lastTime=_nextSampleStartTime;
@@ -266,7 +291,7 @@ uint32_t tim;
                   tray->setPercent((int)(f*100.));
           gtk_progress_set_percentage(GTK_PROGRESS(WID(progressbar1)),(gfloat)f);
 
-          sprintf(string,_("Done : %02d%%"),(int)(100*f));
+          sprintf(string,_("%d%%"),(int)(100*f));
           
           if(isQuiet()) printf("[Encoding]%s\n",string);
               gtk_progress_bar_set_text       (GTK_PROGRESS_BAR(WID(progressbar1)), string);
@@ -289,21 +314,21 @@ void DIA_encoding::setQuantIn(int size)
 void DIA_encoding::setSize(int size)
 {
       ADM_assert(dialog);
-          sprintf(string,"%lu",size);
+          sprintf(string,_("%lu MB"),size);
           gtk_label_set_text(GTK_LABEL(WID(label_size)),string);
 
 }
 void DIA_encoding::setAudioSizeIn(int size)
 {
       ADM_assert(dialog);
-          sprintf(string,"%lu",size);
+          sprintf(string,_("%lu MB"),size);
           gtk_label_set_text(GTK_LABEL(WID(label_asize)),string);
 
 }
 void DIA_encoding::setVideoSizeIn(int size)
 {
       ADM_assert(dialog);
-          sprintf(string,"%lu",size);
+          sprintf(string,_("%lu MB"),size);
           gtk_label_set_text(GTK_LABEL(WID(label_vsize)),string);
 
 }
@@ -326,6 +351,9 @@ uint8_t DIA_encoding::isAlive( void )
 	}
 
 	if(!stopReq) return 1;
+
+	setpriority(PRIO_PROCESS, 0, _originalPriority);
+
 	return 0;
 }
 
@@ -335,359 +363,515 @@ GtkWidget*
 create_dialog1 (void)
 {
   GtkWidget *dialog1;
-  GtkWidget *dialog_vbox1;
-  GtkWidget *vbox2;
-  GtkWidget *label24;
-  GtkWidget *table4;
-  GtkWidget *label25;
-  GtkWidget *label26;
+  GtkWidget *vbox3;
+  GtkWidget *table5;
+  GtkWidget *frame1;
+  GtkWidget *alignment2;
+  GtkWidget *table6;
+  GtkWidget *label39;
   GtkWidget *label_phasis;
-  GtkWidget *label_frame;
-  GtkWidget *label10;
-  GtkWidget *label12;
-  GtkWidget *label21;
-  GtkWidget *label23;
-  GtkWidget *Quantizer;
-  GtkWidget *label15;
-  GtkWidget *label17;
-  GtkWidget *label19;
+  GtkWidget *label41;
   GtkWidget *label_vcodec;
+  GtkWidget *label43;
   GtkWidget *label_acodec;
-  GtkWidget *label_fps;
+  GtkWidget *label45;
+  GtkWidget *label_container;
+  GtkWidget *label35;
+  GtkWidget *frame2;
+  GtkWidget *alignment3;
+  GtkWidget *table7;
+  GtkWidget *label47;
+  GtkWidget *label48;
+  GtkWidget *label49;
+  GtkWidget *label50;
   GtkWidget *label_bitrate;
   GtkWidget *label_quant;
-  GtkWidget *label_vsize;
-  GtkWidget *label_asize;
+  GtkWidget *label_totalframe;
+  GtkWidget *label_frame;
+  GtkWidget *label36;
+  GtkWidget *frame3;
+  GtkWidget *alignment4;
+  GtkWidget *table8;
+  GtkWidget *label55;
+  GtkWidget *label56;
+  GtkWidget *label57;
   GtkWidget *label_size;
-  GtkWidget *label34;
+  GtkWidget *label_asize;
+  GtkWidget *label_vsize;
+  GtkWidget *label37;
+  GtkWidget *frame4;
+  GtkWidget *alignment5;
+  GtkWidget *table9;
+  GtkWidget *label61;
+  GtkWidget *label62;
+  GtkWidget *label63;
+  GtkWidget *label_fps;
   GtkWidget *label_eta;
+  GtkWidget *label_elapsed;
+  GtkWidget *label38;
+  GtkWidget *alignment8;
+  GtkWidget *vbox4;
   GtkWidget *progressbar1;
-  GtkWidget *dialog_action_area1;
+  GtkWidget *hbox2;
+  GtkWidget *table10;
+  GtkWidget *label68;
+  GtkWidget *combobox_priority;
+  GtkWidget *label69;
   GtkWidget *closebutton1;
-  GtkWidget *alignment1;
-  GtkWidget *hbox1;
-  GtkWidget *image1;
-  GtkWidget *label33;
-  
-   GtkWidget *label_c1,*label_container,*label90;
+  GtkWidget *alignment9;
+  GtkWidget *hbox3;
+  GtkWidget *image2;
+  GtkWidget *label67;
 
-  dialog1 = gtk_dialog_new ();
+  dialog1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_set_size_request (dialog1, 500, -1);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog1), 13);
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("Encoding in Progress"));
-  gtk_dialog_set_has_separator (GTK_DIALOG (dialog1), FALSE);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog1), 12);
+  gtk_window_set_title (GTK_WINDOW (dialog1), _("Encoding..."));
+  gtk_window_set_position (GTK_WINDOW (dialog1), GTK_WIN_POS_CENTER_ON_PARENT);
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
-  dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
-  gtk_widget_show (dialog_vbox1);
+  vbox3 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox3);
+  gtk_container_add (GTK_CONTAINER (dialog1), vbox3);
 
-  vbox2 = gtk_vbox_new (FALSE, 12);
-  gtk_widget_show (vbox2);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox2, TRUE, TRUE, 0);
+  table5 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_show (table5);
+  gtk_box_pack_start (GTK_BOX (vbox3), table5, TRUE, FALSE, 0);
+  gtk_table_set_row_spacings (GTK_TABLE (table5), 12);
+  gtk_table_set_col_spacings (GTK_TABLE (table5), 12);
 
-  label24 = gtk_label_new (_("<b><big>Encoding files</big></b>"));
-  gtk_widget_show (label24);
-  gtk_box_pack_start (GTK_BOX (vbox2), label24, FALSE, FALSE, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label24), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label24), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label24), 0, 0.5);
+  frame1 = gtk_frame_new (NULL);
+  gtk_widget_show (frame1);
+  gtk_table_attach (GTK_TABLE (table5), frame1, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
 
-  table4 = gtk_table_new (11, 2, FALSE);
-  gtk_widget_show (table4);
-  gtk_box_pack_start (GTK_BOX (vbox2), table4, TRUE, TRUE, 0);
-  gtk_table_set_row_spacings (GTK_TABLE (table4), 3);
-  gtk_table_set_col_spacings (GTK_TABLE (table4), 5);
+  alignment2 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment2);
+  gtk_container_add (GTK_CONTAINER (frame1), alignment2);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment2), 4, 10, 12, 12);
 
-  label25 = gtk_label_new (_("<b>Phasis:</b>"));
-  gtk_widget_show (label25);
-  gtk_table_attach (GTK_TABLE (table4), label25, 0, 1, 0, 1,
+  table6 = gtk_table_new (4, 2, FALSE);
+  gtk_widget_show (table6);
+  gtk_container_add (GTK_CONTAINER (alignment2), table6);
+  gtk_table_set_row_spacings (GTK_TABLE (table6), 8);
+  gtk_table_set_col_spacings (GTK_TABLE (table6), 14);
+
+  label39 = gtk_label_new (_("<b>Phase:</b>"));
+  gtk_widget_show (label39);
+  gtk_table_attach (GTK_TABLE (table6), label39, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label25), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label25), GTK_JUSTIFY_RIGHT);
-  gtk_misc_set_alignment (GTK_MISC (label25), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label25), 12, 0);
-
-  label26 = gtk_label_new (_("<b>Frame:</b>"));
-  gtk_widget_show (label26);
-  gtk_table_attach (GTK_TABLE (table4), label26, 0, 1, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label26), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label26), GTK_JUSTIFY_RIGHT);
-  gtk_misc_set_alignment (GTK_MISC (label26), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label26), 12, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label39), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label39), 0, 0.5);
 
   label_phasis = gtk_label_new (_("None"));
   gtk_widget_show (label_phasis);
-  gtk_table_attach (GTK_TABLE (table4), label_phasis, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+  gtk_table_attach (GTK_TABLE (table6), label_phasis, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_phasis), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label_phasis), 0, 0.5);
 
-  label_frame = gtk_label_new (_("00000/00000"));
-  gtk_widget_show (label_frame);
-  gtk_table_attach (GTK_TABLE (table4), label_frame, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_frame), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label_frame), 0, 0.5);
-
-  label10 = gtk_label_new (_("<b>Vid codec:</b>"));
-  gtk_widget_show (label10);
-  gtk_table_attach (GTK_TABLE (table4), label10, 0, 1, 2, 3,
+  label41 = gtk_label_new (_("<b>Video Codec:</b>"));
+  gtk_widget_show (label41);
+  gtk_table_attach (GTK_TABLE (table6), label41, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_widget_set_size_request (label10, 75, -1);
-  gtk_label_set_use_markup (GTK_LABEL (label10), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label10), 12, 0);
-
-  label12 = gtk_label_new (_("<b>Aud Codec:</b>"));
-  gtk_widget_show (label12);
-  gtk_table_attach (GTK_TABLE (table4), label12, 0, 1, 3, 4,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label12), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label12), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label12), 12, 0);
-
-  label21 = gtk_label_new (_("<b>FPS:</b>"));
-  gtk_widget_show (label21);
-  gtk_table_attach (GTK_TABLE (table4), label21, 0, 1, 4, 5,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label21), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label21), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label21), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label21), 12, 0);
-
-  label23 = gtk_label_new (_("<b>Vid Bitrate:</b>"));
-  gtk_widget_show (label23);
-  gtk_table_attach (GTK_TABLE (table4), label23, 0, 1, 5, 6,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label23), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label23), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label23), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label23), 12, 0);
-
-  Quantizer = gtk_label_new (_("<b>Quantizer:</b>"));
-  gtk_widget_show (Quantizer);
-  gtk_table_attach (GTK_TABLE (table4), Quantizer, 0, 1, 6, 7,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_use_markup (GTK_LABEL (Quantizer), TRUE);
-  gtk_label_set_justify (GTK_LABEL (Quantizer), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (Quantizer), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (Quantizer), 12, 0);
-
-  label15 = gtk_label_new (_("<b>Video Size:</b>"));
-  gtk_widget_show (label15);
-  gtk_table_attach (GTK_TABLE (table4), label15, 0, 1, 7, 8,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_widget_set_size_request (label15, 75, -1);
-  gtk_label_set_use_markup (GTK_LABEL (label15), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label15), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label15), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label15), 12, 0);
-
-  label17 = gtk_label_new (_("<b>Audio Size:</b>"));
-  gtk_widget_show (label17);
-  gtk_table_attach (GTK_TABLE (table4), label17, 0, 1, 8, 9,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label17), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label17), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label17), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label17), 12, 0);
-
-  label19 = gtk_label_new (_("<b>Total Size:</b>"));
-  gtk_widget_show (label19);
-  gtk_table_attach (GTK_TABLE (table4), label19, 0, 1, 9, 10,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label19), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label19), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label19), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label19), 12, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label41), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label41), 0, 0.5);
 
   label_vcodec = gtk_label_new (_("None"));
   gtk_widget_show (label_vcodec);
-  gtk_table_attach (GTK_TABLE (table4), label_vcodec, 1, 2, 2, 3,
+  gtk_table_attach (GTK_TABLE (table6), label_vcodec, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_vcodec), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label_vcodec), 0, 0.5);
+
+  label43 = gtk_label_new (_("<b>Audio Codec:</b>"));
+  gtk_widget_show (label43);
+  gtk_table_attach (GTK_TABLE (table6), label43, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label43), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label43), 0, 0.5);
 
   label_acodec = gtk_label_new (_("None"));
   gtk_widget_show (label_acodec);
-  gtk_table_attach (GTK_TABLE (table4), label_acodec, 1, 2, 3, 4,
+  gtk_table_attach (GTK_TABLE (table6), label_acodec, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_acodec), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label_acodec), 0, 0.5);
+
+  label45 = gtk_label_new (_("<b>Container:</b>"));
+  gtk_widget_show (label45);
+  gtk_table_attach (GTK_TABLE (table6), label45, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label45), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label45), 0, 0.5);
+
+  label_container = gtk_label_new (_("Unknown"));
+  gtk_widget_show (label_container);
+  gtk_table_attach (GTK_TABLE (table6), label_container, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label_container), 0, 0.5);
+
+  label35 = gtk_label_new ("");
+  gtk_widget_show (label35);
+  gtk_frame_set_label_widget (GTK_FRAME (frame1), label35);
+  gtk_label_set_use_markup (GTK_LABEL (label35), TRUE);
+
+  frame2 = gtk_frame_new (NULL);
+  gtk_widget_show (frame2);
+  gtk_table_attach (GTK_TABLE (table5), frame2, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+  alignment3 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment3);
+  gtk_container_add (GTK_CONTAINER (frame2), alignment3);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment3), 4, 10, 12, 12);
+
+  table7 = gtk_table_new (4, 2, FALSE);
+  gtk_widget_show (table7);
+  gtk_container_add (GTK_CONTAINER (alignment3), table7);
+  gtk_table_set_row_spacings (GTK_TABLE (table7), 8);
+  gtk_table_set_col_spacings (GTK_TABLE (table7), 14);
+
+  label47 = gtk_label_new (_("<b>Processed Frames:</b>"));
+  gtk_widget_show (label47);
+  gtk_table_attach (GTK_TABLE (table7), label47, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label47), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label47), 0, 0.5);
+
+  label48 = gtk_label_new (_("<b>Total Frames:</b>"));
+  gtk_widget_show (label48);
+  gtk_table_attach (GTK_TABLE (table7), label48, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label48), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label48), 0, 0.5);
+
+  label49 = gtk_label_new (_("<b>Quantiser:</b>"));
+  gtk_widget_show (label49);
+  gtk_table_attach (GTK_TABLE (table7), label49, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label49), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label49), 0, 0.5);
+
+  label50 = gtk_label_new (_("<b>Average Bitrate:</b>"));
+  gtk_widget_show (label50);
+  gtk_table_attach (GTK_TABLE (table7), label50, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label50), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label50), 0, 0.5);
+
+  label_bitrate = gtk_label_new (_("0 kB/s"));
+  gtk_widget_show (label_bitrate);
+  gtk_table_attach (GTK_TABLE (table7), label_bitrate, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label_bitrate), 0, 0.5);
+
+  label_quant = gtk_label_new (_("0"));
+  gtk_widget_show (label_quant);
+  gtk_table_attach (GTK_TABLE (table7), label_quant, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label_quant), 0, 0.5);
+
+  label_totalframe = gtk_label_new (_("0"));
+  gtk_widget_show (label_totalframe);
+  gtk_table_attach (GTK_TABLE (table7), label_totalframe, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label_totalframe), 0, 0.5);
+
+  label_frame = gtk_label_new (_("0"));
+  gtk_widget_show (label_frame);
+  gtk_table_attach (GTK_TABLE (table7), label_frame, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label_frame), 0, 0.5);
+
+  label36 = gtk_label_new ("");
+  gtk_widget_show (label36);
+  gtk_frame_set_label_widget (GTK_FRAME (frame2), label36);
+  gtk_label_set_use_markup (GTK_LABEL (label36), TRUE);
+
+  frame3 = gtk_frame_new (NULL);
+  gtk_widget_show (frame3);
+  gtk_table_attach (GTK_TABLE (table5), frame3, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+
+  alignment4 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment4);
+  gtk_container_add (GTK_CONTAINER (frame3), alignment4);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment4), 4, 10, 12, 12);
+
+  table8 = gtk_table_new (3, 2, FALSE);
+  gtk_widget_show (table8);
+  gtk_container_add (GTK_CONTAINER (alignment4), table8);
+  gtk_table_set_row_spacings (GTK_TABLE (table8), 8);
+  gtk_table_set_col_spacings (GTK_TABLE (table8), 14);
+
+  label55 = gtk_label_new (_("<b>Video Size:</b>"));
+  gtk_widget_show (label55);
+  gtk_table_attach (GTK_TABLE (table8), label55, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label55), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label55), 0, 0.5);
+
+  label56 = gtk_label_new (_("<b>Audio Size:</b>"));
+  gtk_widget_show (label56);
+  gtk_table_attach (GTK_TABLE (table8), label56, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label56), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label56), 0, 0.5);
+
+  label57 = gtk_label_new (_("<b>Total Size:</b>"));
+  gtk_widget_show (label57);
+  gtk_table_attach (GTK_TABLE (table8), label57, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label57), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label57), 0, 0.5);
+
+  label_size = gtk_label_new (_("0 MB"));
+  gtk_widget_show (label_size);
+  gtk_table_attach (GTK_TABLE (table8), label_size, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label_size), 0, 0.5);
+  gtk_label_set_width_chars (GTK_LABEL (label_size), 10);
+
+  label_asize = gtk_label_new (_("0 MB"));
+  gtk_widget_show (label_asize);
+  gtk_table_attach (GTK_TABLE (table8), label_asize, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label_asize), 0, 0.5);
+  gtk_label_set_width_chars (GTK_LABEL (label_asize), 10);
+
+  label_vsize = gtk_label_new (_("0 MB"));
+  gtk_widget_show (label_vsize);
+  gtk_table_attach (GTK_TABLE (table8), label_vsize, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label_vsize), 0, 0.5);
+  gtk_label_set_width_chars (GTK_LABEL (label_vsize), 10);
+
+  label37 = gtk_label_new ("");
+  gtk_widget_show (label37);
+  gtk_frame_set_label_widget (GTK_FRAME (frame3), label37);
+  gtk_label_set_use_markup (GTK_LABEL (label37), TRUE);
+
+  frame4 = gtk_frame_new (NULL);
+  gtk_widget_show (frame4);
+  gtk_table_attach (GTK_TABLE (table5), frame4, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+  alignment5 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment5);
+  gtk_container_add (GTK_CONTAINER (frame4), alignment5);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment5), 4, 10, 12, 12);
+
+  table9 = gtk_table_new (3, 2, FALSE);
+  gtk_widget_show (table9);
+  gtk_container_add (GTK_CONTAINER (alignment5), table9);
+  gtk_table_set_row_spacings (GTK_TABLE (table9), 8);
+  gtk_table_set_col_spacings (GTK_TABLE (table9), 14);
+
+  label61 = gtk_label_new (_("<b>Elapsed:</b>"));
+  gtk_widget_show (label61);
+  gtk_table_attach (GTK_TABLE (table9), label61, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label61), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label61), 0, 0.5);
+
+  label62 = gtk_label_new (_("<b>Time Remaining:</b>"));
+  gtk_widget_show (label62);
+  gtk_table_attach (GTK_TABLE (table9), label62, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label62), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label62), 0, 0.5);
+
+  label63 = gtk_label_new (_("<b>Frames/sec:</b>"));
+  gtk_widget_show (label63);
+  gtk_table_attach (GTK_TABLE (table9), label63, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label63), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label63), 0, 0.5);
 
   label_fps = gtk_label_new (_("0"));
   gtk_widget_show (label_fps);
-  gtk_table_attach (GTK_TABLE (table4), label_fps, 1, 2, 4, 5,
+  gtk_table_attach (GTK_TABLE (table9), label_fps, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_fps), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label_fps), 0, 0.5);
 
-  label_bitrate = gtk_label_new (_("0"));
-  gtk_widget_show (label_bitrate);
-  gtk_table_attach (GTK_TABLE (table4), label_bitrate, 1, 2, 5, 6,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_bitrate), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label_bitrate), 0, 0.5);
-
-  label_quant = gtk_label_new (_("31"));
-  gtk_widget_show (label_quant);
-  gtk_table_attach (GTK_TABLE (table4), label_quant, 1, 2, 6, 7,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_quant), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label_quant), 0, 0.5);
-
-  label_vsize = gtk_label_new (_("0"));
-  gtk_widget_show (label_vsize);
-  gtk_table_attach (GTK_TABLE (table4), label_vsize, 1, 2, 7, 8,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_vsize), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label_vsize), 0, 0.5);
-
-  label_asize = gtk_label_new (_("0"));
-  gtk_widget_show (label_asize);
-  gtk_table_attach (GTK_TABLE (table4), label_asize, 1, 2, 8, 9,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_asize), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label_asize), 0, 0.5);
-
-  label_size = gtk_label_new (_("0"));
-  gtk_widget_show (label_size);
-  gtk_table_attach (GTK_TABLE (table4), label_size, 1, 2, 9, 10,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_size), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label_size), 0, 0.5);
-
-  label34 = gtk_label_new (_("<b>ETA:</b>"));
-  gtk_widget_show (label34);
-  gtk_table_attach (GTK_TABLE (table4), label34, 0, 1, 10, 11,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label34), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label34), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label34), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label34), 12, 0);
-
-  label_eta = gtk_label_new (_("0 h 0 mn 0 s"));
+  label_eta = gtk_label_new (_("Unknown"));
   gtk_widget_show (label_eta);
-  gtk_table_attach (GTK_TABLE (table4), label_eta, 1, 2, 10, 11,
+  gtk_table_attach (GTK_TABLE (table9), label_eta, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_eta), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label_eta), 0, 0.5);
-/*
 
-*/
-  label90 = gtk_label_new (_("<b>Container:</b>"));
-  gtk_widget_show (label90);
-  gtk_table_attach (GTK_TABLE (table4), label90, 0, 1, 11, 12,
+  label_elapsed = gtk_label_new (_("00:00:00"));
+  gtk_widget_show (label_elapsed);
+  gtk_table_attach (GTK_TABLE (table9), label_elapsed, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_use_markup (GTK_LABEL (label90), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label90), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label90), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label90), 12, 0);
+  gtk_misc_set_alignment (GTK_MISC (label_elapsed), 0, 0.5);
 
-  label_container = gtk_label_new (_("None"));
-  gtk_widget_show (label_container);
-  gtk_table_attach (GTK_TABLE (table4), label_container, 1, 2, 11, 12,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_label_set_justify (GTK_LABEL (label_container), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label_container), 0, 0.5);
-/*
+  label38 = gtk_label_new ("");
+  gtk_widget_show (label38);
+  gtk_frame_set_label_widget (GTK_FRAME (frame4), label38);
+  gtk_label_set_use_markup (GTK_LABEL (label38), TRUE);
 
-*/  
+  alignment8 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment8);
+  gtk_box_pack_start (GTK_BOX (vbox3), alignment8, FALSE, FALSE, 0);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment8), 15, 30, 0, 0);
+
+  vbox4 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_show (vbox4);
+  gtk_container_add (GTK_CONTAINER (alignment8), vbox4);
 
   progressbar1 = gtk_progress_bar_new ();
   gtk_widget_show (progressbar1);
-  gtk_box_pack_start (GTK_BOX (vbox2), progressbar1, FALSE, FALSE, 0);
-  gtk_progress_bar_set_text (GTK_PROGRESS_BAR (progressbar1), "");
+  gtk_box_pack_start (GTK_BOX (vbox4), progressbar1, FALSE, FALSE, 4);
 
-  dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
-  gtk_widget_show (dialog_action_area1);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
+  hbox2 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox2);
+  gtk_box_pack_start (GTK_BOX (vbox3), hbox2, FALSE, TRUE, 0);
+
+  table10 = gtk_table_new (1, 2, FALSE);
+  gtk_widget_show (table10);
+  gtk_box_pack_start (GTK_BOX (hbox2), table10, TRUE, TRUE, 0);
+  gtk_table_set_row_spacings (GTK_TABLE (table10), 5);
+
+  label68 = gtk_label_new (_("Priority:"));
+  gtk_widget_show (label68);
+  gtk_table_attach (GTK_TABLE (table10), label68, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label68), 0, 0.5);
+
+  combobox_priority = gtk_combo_box_new_text ();
+  gtk_widget_show (combobox_priority);
+  gtk_table_attach (GTK_TABLE (table10), combobox_priority, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 10, 0);
+  GTK_WIDGET_SET_FLAGS (combobox_priority, GTK_CAN_FOCUS);
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("High"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Above Normal"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Normal"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Below Normal"));
+  gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Low"));
+
+  label69 = gtk_label_new ("");
+  gtk_widget_show (label69);
+  gtk_box_pack_start (GTK_BOX (hbox2), label69, FALSE, FALSE, 0);
+  gtk_misc_set_padding (GTK_MISC (label69), 36, 0);
 
   closebutton1 = gtk_button_new ();
   gtk_widget_show (closebutton1);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), closebutton1, GTK_RESPONSE_CLOSE);
+  gtk_box_pack_start (GTK_BOX (hbox2), closebutton1, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (closebutton1, GTK_CAN_DEFAULT);
 
-  alignment1 = gtk_alignment_new (0.5, 0.5, 0, 0);
-  gtk_widget_show (alignment1);
-  gtk_container_add (GTK_CONTAINER (closebutton1), alignment1);
+  alignment9 = gtk_alignment_new (0.5, 0.5, 0, 0);
+  gtk_widget_show (alignment9);
+  gtk_container_add (GTK_CONTAINER (closebutton1), alignment9);
 
-  hbox1 = gtk_hbox_new (FALSE, 2);
-  gtk_widget_show (hbox1);
-  gtk_container_add (GTK_CONTAINER (alignment1), hbox1);
+  hbox3 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox3);
+  gtk_container_add (GTK_CONTAINER (alignment9), hbox3);
 
-  image1 = gtk_image_new_from_stock ("gtk-cancel", GTK_ICON_SIZE_BUTTON);
-  gtk_widget_show (image1);
-  gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
+  image2 = gtk_image_new_from_stock ("gtk-cancel", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image2);
+  gtk_box_pack_start (GTK_BOX (hbox3), image2, FALSE, FALSE, 0);
 
-  label33 = gtk_label_new_with_mnemonic (_("Pause / Abort"));
-  gtk_widget_show (label33);
-  gtk_box_pack_start (GTK_BOX (hbox1), label33, FALSE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label33), GTK_JUSTIFY_LEFT);
+  label67 = gtk_label_new_with_mnemonic (_("Pause / Abort"));
+  gtk_widget_show (label67);
+  gtk_box_pack_start (GTK_BOX (hbox3), label67, FALSE, FALSE, 0);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
-  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, vbox2, "vbox2");
-  GLADE_HOOKUP_OBJECT (dialog1, label24, "label24");
-  GLADE_HOOKUP_OBJECT (dialog1, table4, "table4");
-  GLADE_HOOKUP_OBJECT (dialog1, label25, "label25");
-  GLADE_HOOKUP_OBJECT (dialog1, label26, "label26");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox3, "vbox3");
+  GLADE_HOOKUP_OBJECT (dialog1, table5, "table5");
+  GLADE_HOOKUP_OBJECT (dialog1, frame1, "frame1");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment2, "alignment2");
+  GLADE_HOOKUP_OBJECT (dialog1, table6, "table6");
+  GLADE_HOOKUP_OBJECT (dialog1, label39, "label39");
   GLADE_HOOKUP_OBJECT (dialog1, label_phasis, "label_phasis");
-  GLADE_HOOKUP_OBJECT (dialog1, label_frame, "label_frame");
-  GLADE_HOOKUP_OBJECT (dialog1, label10, "label10");
-  GLADE_HOOKUP_OBJECT (dialog1, label12, "label12");
-  GLADE_HOOKUP_OBJECT (dialog1, label21, "label21");
-  GLADE_HOOKUP_OBJECT (dialog1, label23, "label23");
-  GLADE_HOOKUP_OBJECT (dialog1, Quantizer, "Quantizer");
-  GLADE_HOOKUP_OBJECT (dialog1, label15, "label15");
-  GLADE_HOOKUP_OBJECT (dialog1, label17, "label17");
-  GLADE_HOOKUP_OBJECT (dialog1, label19, "label19");
+  GLADE_HOOKUP_OBJECT (dialog1, label41, "label41");
   GLADE_HOOKUP_OBJECT (dialog1, label_vcodec, "label_vcodec");
+  GLADE_HOOKUP_OBJECT (dialog1, label43, "label43");
   GLADE_HOOKUP_OBJECT (dialog1, label_acodec, "label_acodec");
-  GLADE_HOOKUP_OBJECT (dialog1, label_fps, "label_fps");
+  GLADE_HOOKUP_OBJECT (dialog1, label45, "label45");
+  GLADE_HOOKUP_OBJECT (dialog1, label_container, "label_container");
+  GLADE_HOOKUP_OBJECT (dialog1, label35, "label35");
+  GLADE_HOOKUP_OBJECT (dialog1, frame2, "frame2");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment3, "alignment3");
+  GLADE_HOOKUP_OBJECT (dialog1, table7, "table7");
+  GLADE_HOOKUP_OBJECT (dialog1, label47, "label47");
+  GLADE_HOOKUP_OBJECT (dialog1, label48, "label48");
+  GLADE_HOOKUP_OBJECT (dialog1, label49, "label49");
+  GLADE_HOOKUP_OBJECT (dialog1, label50, "label50");
   GLADE_HOOKUP_OBJECT (dialog1, label_bitrate, "label_bitrate");
   GLADE_HOOKUP_OBJECT (dialog1, label_quant, "label_quant");
-  GLADE_HOOKUP_OBJECT (dialog1, label_vsize, "label_vsize");
-  GLADE_HOOKUP_OBJECT (dialog1, label_asize, "label_asize");
+  GLADE_HOOKUP_OBJECT (dialog1, label_totalframe, "label_totalframe");
+  GLADE_HOOKUP_OBJECT (dialog1, label_frame, "label_frame");
+  GLADE_HOOKUP_OBJECT (dialog1, label36, "label36");
+  GLADE_HOOKUP_OBJECT (dialog1, frame3, "frame3");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment4, "alignment4");
+  GLADE_HOOKUP_OBJECT (dialog1, table8, "table8");
+  GLADE_HOOKUP_OBJECT (dialog1, label55, "label55");
+  GLADE_HOOKUP_OBJECT (dialog1, label56, "label56");
+  GLADE_HOOKUP_OBJECT (dialog1, label57, "label57");
   GLADE_HOOKUP_OBJECT (dialog1, label_size, "label_size");
-  GLADE_HOOKUP_OBJECT (dialog1, label34, "label34");
+  GLADE_HOOKUP_OBJECT (dialog1, label_asize, "label_asize");
+  GLADE_HOOKUP_OBJECT (dialog1, label_vsize, "label_vsize");
+  GLADE_HOOKUP_OBJECT (dialog1, label37, "label37");
+  GLADE_HOOKUP_OBJECT (dialog1, frame4, "frame4");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment5, "alignment5");
+  GLADE_HOOKUP_OBJECT (dialog1, table9, "table9");
+  GLADE_HOOKUP_OBJECT (dialog1, label61, "label61");
+  GLADE_HOOKUP_OBJECT (dialog1, label62, "label62");
+  GLADE_HOOKUP_OBJECT (dialog1, label63, "label63");
+  GLADE_HOOKUP_OBJECT (dialog1, label_fps, "label_fps");
   GLADE_HOOKUP_OBJECT (dialog1, label_eta, "label_eta");
+  GLADE_HOOKUP_OBJECT (dialog1, label_elapsed, "label_elapsed");
+  GLADE_HOOKUP_OBJECT (dialog1, label38, "label38");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment8, "alignment8");
+  GLADE_HOOKUP_OBJECT (dialog1, vbox4, "vbox4");
   GLADE_HOOKUP_OBJECT (dialog1, progressbar1, "progressbar1");
-  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox2, "hbox2");
+  GLADE_HOOKUP_OBJECT (dialog1, table10, "table10");
+  GLADE_HOOKUP_OBJECT (dialog1, label68, "label68");
+  GLADE_HOOKUP_OBJECT (dialog1, combobox_priority, "combobox_priority");
+  GLADE_HOOKUP_OBJECT (dialog1, label69, "label69");
   GLADE_HOOKUP_OBJECT (dialog1, closebutton1, "closebutton1");
-  GLADE_HOOKUP_OBJECT (dialog1, alignment1, "alignment1");
-  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, image1, "image1");
-  GLADE_HOOKUP_OBJECT (dialog1, label33, "label33");
-  GLADE_HOOKUP_OBJECT (dialog1, label_container, "label_container");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment9, "alignment9");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox3, "hbox3");
+  GLADE_HOOKUP_OBJECT (dialog1, image2, "image2");
+  GLADE_HOOKUP_OBJECT (dialog1, label67, "label67");
 
+  gtk_widget_grab_focus (closebutton1);
+  gtk_widget_grab_default (closebutton1);
   return dialog1;
 }
 

@@ -202,6 +202,39 @@ uint8_t ms2time(uint32_t ms, uint32_t *h,uint32_t *m, uint32_t *s)
                               *s=ss;
       return 1;
 }
+
+char* ms2timedisplay(uint32_t ms)
+{
+	uint32_t mm, ss;
+	static char string[20];
+
+	mm = (uint32_t)floor(ms / 60000.);
+	
+	if (mm > 1)
+	{
+		sprintf(string, _("%lu minutes"), mm);
+	}
+	else if (mm == 1)
+	{
+		sprintf(string, _("%lu minute"), mm);
+	}
+	else
+	{
+		ss = (uint32_t)floor(ms / 1000.);
+
+		if (ss == 1)
+		{
+			sprintf(string, _("%lu second"), ss);
+		}
+		else
+		{
+			sprintf(string, _("%lu seconds"), ss);
+		}
+	}
+
+	return string;
+}
+
 // Convert everything to lowercase
 void  LowerCase(char *string)
 {

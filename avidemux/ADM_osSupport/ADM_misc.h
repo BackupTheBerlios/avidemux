@@ -42,6 +42,7 @@ void            time2frame(uint32_t *frame, uint32_t fps, uint32_t hh, uint32_t 
                                 uint32_t ss, uint32_t ms);
 void            ms2time(uint32_t len2,uint16_t * hh, uint16_t * mm,
                                 uint16_t * ss, uint16_t * ms);				
+char*			ms2timedisplay(uint32_t ms);
 uint32_t 		getTimeOfTheDay(void);
 uint64_t 	ADM_swap64(uint64_t in);
 uint32_t 	ADM_swap32(uint32_t in);
@@ -70,6 +71,17 @@ uint8_t         ADM_fileExist(char *name);
 		#define timezone int
 		#define TIMZ int
 	#endif
+#endif
+
+#ifdef CYG_MANGLING
+	#define PRIO_MIN -20
+	#define PRIO_MAX 20
+	#define PRIO_PROCESS 0
+
+	int getpriority(int which, int who);
+	int setpriority(int which, int who, int value);
+#else
+	#include <sys/resource.h>
 #endif
 
 #define FRAME_PAL 1

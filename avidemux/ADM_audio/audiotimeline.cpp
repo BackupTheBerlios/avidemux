@@ -31,9 +31,11 @@
 #include "avio.hxx"
 #include "fourcc.h"
 #include "aviaudio.hxx"
+#include "prefs.h"
 
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
+#include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 #include "ADM_audio/ADM_mp3info.h"
 
@@ -57,6 +59,11 @@ uint32_t retry=50;
       // for a 2 hour movie
       // should be acceptable
 
+	  uint32_t originalPriority = getpriority(PRIO_PROCESS, 0);
+	  uint32_t priorityLevel;
+
+	  prefs->get(PRIORITY_INDEXING,&priorityLevel);
+	  setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
 
       goTo(0);  //rewind
       printf("\n scanning timeline\n");
@@ -73,7 +80,7 @@ uint32_t retry=50;
      
       DIA_working *work;
 
-      work=new DIA_working("Building VBR map");
+      work=new DIA_working(_("Building VBR map"));
 
       goTo(0);
       uint32_t Mul=2*_wavheader->channels;
@@ -84,7 +91,7 @@ uint32_t retry=50;
 				if(!work->isAlive())
 				{
 					delete work;
-					work=new DIA_working("Building VBR map");
+					work=new DIA_working(_("Building VBR map"));
 					work->update(offset,_length);
 				}
                 
@@ -105,7 +112,9 @@ uint32_t retry=50;
       				_audioMap[index++].woffset=rd;
          }
 
-end:         
+end:
+		setpriority(PRIO_PROCESS, 0, originalPriority);
+
         if(!index)
         {
             delete [] _audioMap;

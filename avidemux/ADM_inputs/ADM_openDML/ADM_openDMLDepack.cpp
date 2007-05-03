@@ -20,12 +20,13 @@
 #include <ADM_assert.h>
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
-
+#include "prefs.h"
 
 #include "fourcc.h"
 #include "ADM_openDML/ADM_openDML.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "DIA_working.h"
+#include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_UNPACKER
@@ -81,9 +82,15 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	odmlIndex *newIndex=new odmlIndex[nbFrame+MAX_VOP]; // Due to the packed vop, we may end up with more images
 							// Assume MAX_VOP Bframes maximum
 	ADM_assert(newIndex);
-	
+
+	uint32_t originalPriority = getpriority(PRIO_PROCESS, 0);
+	uint32_t priorityLevel;
+
+	prefs->get(PRIORITY_INDEXING,&priorityLevel);
+	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
+
 	printf("Trying to unpack the stream\n");
-	DIA_working *working=new DIA_working("Unpacking packed bitstream");
+	DIA_working *working=new DIA_working(_("Unpacking packed bitstream"));
 	ADMCompressedImage image;
         image.data=buffer;
 	uint32_t img=0;
@@ -214,6 +221,8 @@ _abortUnpack:
 	printf("Initial # of images : %lu, now we have %lu \n",nbFrame,targetIndex);
 	nbFrame=targetIndex;
 	
+	setpriority(PRIO_PROCESS, 0, originalPriority);
+
 	return ret;
 }
 // Search a start vop in it
