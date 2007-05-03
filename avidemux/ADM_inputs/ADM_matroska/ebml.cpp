@@ -244,6 +244,7 @@ ADM_ebml_file::~ADM_ebml_file()
   ADM_assert(fp);
   if(_close)
   {
+    ADM_assert(!_begin);
     fclose(fp);
   }
   else fseeko(fp,_begin+_size,SEEK_SET);
