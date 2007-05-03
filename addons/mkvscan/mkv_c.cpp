@@ -32,31 +32,31 @@ void ADM_mkvWalk(ADM_ebml_file *working, uint32_t size);
 
 int main(int argc, char *argv[])
 {
-  ADM_ebml_file ebml;
+  ADM_ebml_file *ebml=new ADM_ebml_file ;
   uint64_t id,len;
   ADM_MKV_TYPE type;
   const char *ss;
   
-  if(!ebml.open(argv[1])) ADM_assert(0);
+  if(!ebml->open(argv[1])) ADM_assert(0);
   
   // Read level 1 stuff
-  while(!ebml.finished())
+  while(!ebml->finished())
   {
-      ebml.readElemId(&id,&len);
+      ebml->readElemId(&id,&len);
       if(!ADM_searchMkvTag( (MKV_ELEM_ID)id,&ss,&type))
       {
         printf("[MKV] Tag 0x%x not found\n",id);
-        ebml.skip(len);
+        ebml->skip(len);
         continue;
       }
       printf("Found Tag : %x (%s)\n",id,ss);
       if(type==ADM_MKV_TYPE_CONTAINER)
       {
-        uint64_t w=ebml.tell();
-        ADM_mkvWalk(&ebml,len);
-        ebml.seek(w+len);
+        uint64_t w=ebml->tell();
+        ADM_mkvWalk(ebml,len);
+        ebml->seek(w+len);
       }else
-        ebml.skip(len);
+        ebml->skip(len);
   }
   return 0;
 }
@@ -90,7 +90,13 @@ void ADM_mkvWalk(ADM_ebml_file *working, uint32_t size)
       {
         case ADM_MKV_TYPE_CONTAINER:
                   //if(id!=MKV_CLUSTER)
+                  if(len)
                     ADM_mkvWalk(&son,len);
+                    else
+                    {
+                                printf("******************************* WARNING ZERO SIZE ******************\n");
+                    }
+
                   //else
                   //    son.skip(len);
                   break;

@@ -21,9 +21,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <assert.h>
 #include "ADM_ebml.h"
 #define aprintf(...) {}
+
+#include "assert.h"
 #define ADM_assert assert
 #if 0
 #define vprintf printf
@@ -147,7 +148,19 @@ uint64_t    ADM_ebml::readUnsignedInt(uint32_t nb)
 }
 int64_t    ADM_ebml::readSignedInt(uint32_t nb) 
 {
-  return 0;
+  int64_t val=0;
+  uint8_t r=0;
+  r=readu8();
+  if(r&0x80) // sign
+      val=-1;
+  val=(val<<8)+r; 
+  for(int i=0;i<nb-1;i++)
+  {
+    r=readu8();
+    val=(val<<8)+r; 
+  }
+  return val;
+  
 }
 uint8_t     ADM_ebml::readString(char *string, uint32_t maxLen)
 {
@@ -213,12 +226,13 @@ ADM_ebml::~ADM_ebml()
 //*******************************************
 //***********FILE IO PART *******************
 //*******************************************
-ADM_ebml_file::ADM_ebml_file(ADM_ebml_file *father,uint32_t size)
+ADM_ebml_file::ADM_ebml_file(ADM_ebml_file *father,uint32_t size) : ADM_ebml()
 {
   _close=0;
   _size=size;
   fp=father->fp;
-   _begin=ftello(fp);
+  _fileSize=father->_fileSize;
+  _begin=ftello(fp);
 }
 ADM_ebml_file::ADM_ebml_file(void) : ADM_ebml()
 {
@@ -227,11 +241,13 @@ ADM_ebml_file::ADM_ebml_file(void) : ADM_ebml()
 ADM_ebml_file::~ADM_ebml_file()
 {
   ADM_assert(fp);
-  if(_close)
+  if(_close )
   {
+    ADM_assert(!_begin);
     fclose(fp);
   }
-  else fseeko(fp,_begin+_size,SEEK_SET);
+  else 
+    fseeko(fp,_begin+_size,SEEK_SET);
   fp=NULL; 
 }
 uint8_t ADM_ebml_file::open(const char *name)
@@ -245,7 +261,7 @@ uint8_t ADM_ebml_file::open(const char *name)
   }
   fseeko(fp,0,SEEK_END);
   _begin=0;
-  _size=ftello(fp);
+  _fileSize=_size=ftello(fp);
   fseeko(fp,0,SEEK_SET);
   return 1;
 }
@@ -258,20 +274,24 @@ uint8_t  ADM_ebml_file::readBin(uint8_t *whereto,uint32_t len)
 
 uint8_t ADM_ebml_file::skip(uint32_t vv)
 {
+  ADM_assert(fp);
   fseeko(fp,vv,SEEK_CUR);
   return 1; 
 }
 uint64_t ADM_ebml_file::tell(void)
 {
+  ADM_assert(fp);
   return ftello(fp);
 }
 uint8_t ADM_ebml_file::seek(uint64_t pos)
 {
+  ADM_assert(fp);
   fseeko(fp,pos,SEEK_SET);
   return 1;
 }
 uint8_t ADM_ebml_file::finished(void)
 {
+  if(tell()>(_fileSize-4)) return 1;
   if(tell()>(_begin+_size-4)) return 1;
   return 0; 
 }
@@ -323,7 +343,7 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewin
   const char *ss;
   
 
-    vprintf("[MKV] Simple Searching for tag %llx\n",prim);
+    printf("[MKV] Simple Searching for tag %llx\n",prim);
     if(rewind) seek(_begin);
    
       while(!finished())
@@ -335,6 +355,11 @@ uint8_t ADM_ebml_file::simplefind(MKV_ELEM_ID  prim,uint32_t *len,uint32_t rewin
               skip(alen);
               continue;
            }
+          if(!alen)
+          {
+            printf("[MKV] WARNING ZERO SIZED ATOM %s %llu/%llu\n",ss,tell(),_fileSize);
+            continue; 
+          }
           vprintf("Found Tag : %x (%s)\n",id,ss);
           if(id==prim)
           {
