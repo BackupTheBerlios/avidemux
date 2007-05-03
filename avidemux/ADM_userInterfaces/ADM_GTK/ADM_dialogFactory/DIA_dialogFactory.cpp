@@ -218,35 +218,50 @@ uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
 */
 uint8_t  buildOneTab(GtkWidget *nb,int index, diaElemTabs *tab)
 {
-  GtkWidget *table1,*label;
-  uint32_t vsize=0;
+  GtkWidget *table1,*vbox1,*label;
   
   ADM_assert(tab);
-  /* Compute vertical size of our elems */
-    for(int i=0;i<tab->nbElems;i++)
+  vbox1 = gtk_vbox_new (0, 18);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 12);
+  gtk_container_add (GTK_CONTAINER (nb), vbox1);
+  gtk_widget_show (vbox1);
+
+  int line=0;
+  int i=0;
+  while (i<tab->nbElems)
   {
-    vsize+=tab->dias[i]->getSize();
+	  if (tab->dias[i]->mySelf == ELEM_FRAME)
+	  {
+		  addLine(tab->dias[i],nb,vbox1,line);
+		  i++;
+	  }
+	  else
+	  {
+		  line = 0;
+		  table1 = gtk_table_new (0, 2, FALSE);
+		  gtk_table_set_col_spacings (GTK_TABLE (table1), 12);
+		  gtk_table_set_row_spacings (GTK_TABLE (table1), 6);
+		  gtk_box_pack_start (GTK_BOX(vbox1), table1, FALSE, FALSE, 0);
+
+		  while (i<tab->nbElems && tab->dias[i]->mySelf != ELEM_FRAME)
+		  {
+			  line+=tab->dias[i]->getSize();
+			  gtk_table_resize  (GTK_TABLE (table1), line, 2);
+			  gtk_widget_show (table1);
+			  addLine(tab->dias[i],nb,table1,line-1);
+			  i++;
+		  }
+	  }
   }
   
-  
-  table1 = gtk_table_new (vsize, 2, FALSE);
-  gtk_table_set_col_spacings (GTK_TABLE (table1), 12);
-  gtk_table_set_row_spacings (GTK_TABLE (table1), 6);
-  gtk_container_add (GTK_CONTAINER (nb), table1);
-  gtk_container_set_border_width (GTK_CONTAINER (table1), 6);
-  gtk_widget_show (table1);
+
   
   label = gtk_label_new (_(tab->title));
   gtk_widget_show (label);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (nb), gtk_notebook_get_nth_page (GTK_NOTEBOOK (nb), index), label);
 
   
-  int line=0;
-  for(int i=0;i<tab->nbElems;i++)
-  {
-    addLine(tab->dias[i],nb,table1,line);
-    line+=tab->dias[i]->getSize();
-  }
+
   return 1; 
 }
 /**
