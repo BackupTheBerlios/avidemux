@@ -920,7 +920,7 @@ videoCodecSetConf (char *name, uint32_t extraLen, uint8_t * extraData)
     }
 
 }
-
+/*
 uint8_t oplug_mpegInit(void)
 {
 		// Init from prefs
@@ -951,7 +951,7 @@ uint8_t oplug_mpegInit(void)
   prefs->get( CODECS_DVD_MAXBITRATE, &DVDExtra.maxBitrate);
   DVDExtra.maxBitrate = (DVDExtra.maxBitrate*1000) >> 3;
   return 1;
-}
+} */
 #ifdef USE_X264
 /**
     \fn     setPSP_X264Preset(void)
@@ -964,6 +964,7 @@ void setPSP_X264Preset(void)
  printf("Cabac :%u\n",x264Extra.CABAC);
 }
 #endif
+/*
 uint8_t oplug_mpegStore(void)
 {
   uint32_t br;
@@ -999,6 +1000,6 @@ uint8_t oplug_mpegStore(void)
   br=(DVDExtra.maxBitrate<< 3)/1000;;
   prefs->set( CODECS_DVD_MAXBITRATE,  br);
   return 1;
-}
+} */
 
 // EOF

@@ -75,7 +75,6 @@ extern uint8_t dloadXvidCVS( void );
 extern void  buildDistMatrix( void );
 extern void initScaleTab( void );
 extern uint8_t initGUI( void );
-extern uint8_t oplug_mpegInit(void);
 extern void     COL_init(void);
 extern uint8_t  initFileSelector(void);
 extern void AUDMEncoder_initDither(void);
@@ -247,7 +246,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
     SDL_Init(0); //SDL_INIT_AUDIO+SDL_INIT_VIDEO);
   }
 #endif
-    oplug_mpegInit();
+
     if(SpidermonkeyInit() == true)
         printf("Spidermonkey initialized.\n");
     else
