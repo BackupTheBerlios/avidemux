@@ -131,6 +131,8 @@ void change_priority(void)
 
 DIA_encoding::~DIA_encoding( )
 {
+		setpriority(PRIO_PROCESS, 0, _originalPriority);
+
         if(tray) delete tray;
         tray=NULL;
         ADM_assert(dialog);
@@ -138,8 +140,8 @@ DIA_encoding::~DIA_encoding( )
         gtk_widget_destroy(dialog);
         dialog=NULL;
         UI_deiconify();
-
 }
+
 void DIA_encoding::setPhasis(const char *n)
 {
           ADM_assert(dialog);
@@ -350,9 +352,7 @@ uint8_t DIA_encoding::isAlive( void )
 		}		
 	}
 
-	if(!stopReq) return 1;
-
-	setpriority(PRIO_PROCESS, 0, _originalPriority);
+	if(!stopReq) return 1;	
 
 	return 0;
 }
