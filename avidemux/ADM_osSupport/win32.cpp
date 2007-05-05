@@ -14,10 +14,12 @@
 #define WIN32_CLASH
 #include "ADM_assert.h" 
 uint8_t win32_netInit(void);
+
 void ADM_usleep(unsigned long us)
 {
 	Sleep(us/1000);
 }
+
 uint8_t win32_netInit(void)
 {
 WSADATA wsaData;
@@ -156,5 +158,38 @@ int setpriority(int which, int who, int value)
 	return 0;
 }
 
+int shutdown_win32(void)
+{
+	HANDLE hToken;
+	TOKEN_PRIVILEGES tkp;
+
+	// Get a token for this process. 
+	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
+	{
+		return -1;
+	}
+
+	// Get the LUID for the shutdown privilege.
+	LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[0].Luid);
+
+	tkp.PrivilegeCount = 1;  // one privilege to set
+	tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+	// Get the shutdown privilege for this process.
+	AdjustTokenPrivileges(hToken, FALSE, &tkp, 0, (PTOKEN_PRIVILEGES)NULL, 0);
+
+	if (GetLastError() != ERROR_SUCCESS)
+	{
+		return -1;
+	}
+
+	// Shut down the system and force all applications to close.
+	if (!ExitWindowsEx(EWX_POWEROFF | EWX_FORCE, SHTDN_REASON_FLAG_PLANNED))
+	{
+		return -1;
+	}
+
+	return 0;
+}
 #endif
 

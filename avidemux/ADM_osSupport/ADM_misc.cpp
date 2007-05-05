@@ -322,4 +322,12 @@ void TLK_getDate(ADM_date *date)
   
 }
 
+bool shutdown(void)
+{
+#ifdef CYG_MANGLING
+	return (shutdown_win32() == 0);
+#else
+	return (system("shutdown -P 0") == 0);
+#endif
+}
 //EOF

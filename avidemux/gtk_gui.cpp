@@ -243,7 +243,7 @@ int nw;
 		return;
     
     case ACT_RunScript:
-                GUI_FileSelRead (_("Select ecmascript to run "),(SELFILE_CB *) A_parseECMAScript);
+                GUI_FileSelRead (_("Select ECMAScript to run "),(SELFILE_CB *) A_parseECMAScript);
                         
                         //
     		return;
@@ -426,9 +426,9 @@ int nw;
 			}
     			break;
     case ACT_SaveUnpackedMpeg4:
-      if(GUI_Question(_("This is to be used to undo packed vop on mpeg4.\nContinue ?")))
+      if(GUI_Question(_("This is to be used to undo packed VOP on MPEG-4.\nContinue ?")))
 			{ 
-                          GUI_FileSelWrite (_("Select Avi file to write"), (SELFILE_CB *)A_SaveUnpackedVop);
+                          GUI_FileSelWrite (_("Select AVI file to write"), (SELFILE_CB *)A_SaveUnpackedVop);
 				
 			}
     			break;
@@ -445,7 +445,7 @@ int nw;
       			break;			
 
     case ACT_SaveWork:
-      GUI_FileSelWrite (_("Select workbench to save "), A_saveWorkbench);
+      GUI_FileSelWrite (_("Select workbench to save"), A_saveWorkbench);
       break;
     case ACT_ADD_JOB:
         A_addJob();
@@ -456,7 +456,7 @@ int nw;
          A_saveWorkbench( tmp ); // will write "actual_workbench_file" itself
          ADM_dealloc(tmp);
       }else{
-        GUI_FileSelWrite (_("Select workbench to save "), A_saveWorkbench);
+        GUI_FileSelWrite (_("Select workbench to save"), A_saveWorkbench);
       }
       break;
         case ACT_JumpToFrame: 
@@ -480,7 +480,7 @@ int nw;
                 }
                 break;
     case ACT_SaveRaw:
-      GUI_FileSelWrite (_("Select raw file to save "), (SELFILE_CB *)ADM_saveRaw);
+      GUI_FileSelWrite (_("Select raw file to save"), (SELFILE_CB *)ADM_saveRaw);
       break;
     case ACT_CutWizard:
       ADM_cutWizard ();
@@ -534,14 +534,14 @@ int nw;
       break;
 
     case ACT_SaveBunchJPG:
-      GUI_FileSelWrite (_("Select Jpeg sequence to save "), A_saveBunchJpg);      
+      GUI_FileSelWrite (_("Select JPEG sequence to save"), A_saveBunchJpg);      
     	break;
     case ACT_SaveImg:
-      GUI_FileSelWrite (_("Select BMP to save "), A_saveImg);
+      GUI_FileSelWrite (_("Select BMP to save"), A_saveImg);
       //GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       break;
     case ACT_SaveJPG :
-      GUI_FileSelWrite (_("Select Jpeg to save "), (SELFILE_CB *)A_saveJpg);
+      GUI_FileSelWrite (_("Select JPEG to save"), (SELFILE_CB *)A_saveJpg);
       	//GUI_FileSelWrite ("Select Jpg to save ", A_saveJpg);
       	break;
     
@@ -646,13 +646,13 @@ int nw;
       break;
 
     case ACT_AudioSourceMP3:
-      GUI_FileSelRead (_("Select MP3 to load "), (SELFILE_CB *)A_loadMP3);
+      GUI_FileSelRead (_("Select MP3 to load"), (SELFILE_CB *)A_loadMP3);
       break;
     case ACT_AudioSourceAC3:
-      GUI_FileSelRead (_("Select AC3 to load "), (SELFILE_CB *)A_loadAC3);
+      GUI_FileSelRead (_("Select AC3 to load"), (SELFILE_CB *)A_loadAC3);
       break;
     case ACT_AudioSourceWAV:
-      GUI_FileSelRead (_("Select WAV to load "),(SELFILE_CB *) A_loadWave);
+      GUI_FileSelRead (_("Select WAV to load"),(SELFILE_CB *) A_loadWave);
       break;
     case ACT_AudioSourceNone:
       //currentaudiostream=(AVDMGenericAudioStream *)NULL;
@@ -706,7 +706,7 @@ int nw;
       break;
 //----------------------test-----------------------
     case ACT_SaveAvi:
-      GUI_FileSelWrite (_("Select  file to save "),(SELFILE_CB *)A_SaveWrapper); // A_SaveAudioNVideo);
+      GUI_FileSelWrite (_("Select file to save"),(SELFILE_CB *)A_SaveWrapper); // A_SaveAudioNVideo);
       break;
 //---------------------------------------------------
     case ACT_Copy:
@@ -737,7 +737,7 @@ int nw;
 		break;
     case ACT_ResetSegments:
        if(avifileinfo)
-         if(GUI_Question(_("Are you sure ?")))
+         if(GUI_Question(_("Are you sure?")))
 	{
 		video_body->resetSeg();
   		video_body->getVideoInfo (avifileinfo);
@@ -792,7 +792,7 @@ int nw;
 	fps/=1000.;
 
 
-      	if (DIA_GetFloatValue (&fps, 1., 60., "Change Frame per Second","New FPS ?"))
+      	if (DIA_GetFloatValue (&fps, 1., 60., _("Change Frames per Second"),_("New FPS?")))
 	{
 	
 	  info.fps1000 = (uint32_t) (floor (fps * 1000.+0.49));
@@ -816,7 +816,7 @@ int nw;
       GUI_handleVFilter();
       if( getLastVideoFilter()->getInfo()->width % 8 ){
         GUI_Error_HIG(_("Width is not a multiple of 8"),
-                      _("This will make trouble for avi files."));
+                      _("This will make trouble for AVI files."));
       }
       if (getPreviewMode()!=ADM_PREVIEW_NONE)
       {
@@ -1837,7 +1837,7 @@ ADMImage *aImage;
 DIA_working *work;
 
 	nb = avifileinfo->nb_frames;
-	work=new DIA_working("Checking video");
+	work=new DIA_working(_("Checking video"));
 	aImage=new ADMImage(avifileinfo->width,avifileinfo->height);
   for(uint32_t i=0;i<nb;i++)
   {
@@ -2018,7 +2018,7 @@ void A_audioTrack( void )
         }
          if(infos) delete [] infos;
          
-         diaElemMenuDynamic   sourceFromVideo(&newtrack,"Track from video",nb,sourceavitracks);
+         diaElemMenuDynamic   sourceFromVideo(&newtrack,_("Track from video"),nb,sourceavitracks);
          diaElem *allWidgets[]={&sourceMenu,&sourceFromVideo,&sourceName};
          
          /* Link..*/
@@ -2028,7 +2028,7 @@ void A_audioTrack( void )
          sourceMenu.link(&(sourcesStream[4]),1,&sourceName);
          
          
-         if( diaFactoryRun("Select Main audio Track",3,allWidgets))
+         if( diaFactoryRun(_("Select Main audio Track"),3,allWidgets))
          {
            if(nw!=AudioNone && nw!=AudioAvi)
            {
@@ -2428,7 +2428,7 @@ void GUI_avsProxy(void)
     }
 
        updateLoaded ();
-       UI_setTitle("avsproxy");
+       UI_setTitle(_("avsproxy"));
        return ;
 }
 /**
@@ -2460,7 +2460,7 @@ void GUI_showCurrentFrameHex(void)
  diaElemReadOnlyText Type(sType,_("Frame Type:"));
  diaElemReadOnlyText Size(sSize,_("Frame Size:"));
  diaElem *elems[]={&Type,&Size,&binhex   };
- if(diaFactoryRun("Frame HexDump",3,elems))
+ if(diaFactoryRun(_("Frame HexDump"),3,elems))
  
  delete [] buffer;
 }

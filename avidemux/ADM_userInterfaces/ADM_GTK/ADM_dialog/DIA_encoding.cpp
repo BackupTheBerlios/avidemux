@@ -19,9 +19,6 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-
 #include "default.h"
 #include "prefs.h"
 
@@ -30,6 +27,7 @@
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_libraries/ADM_utilities/avidemutils.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_working.h"
 
 #include "ADM_assert.h" 
 
@@ -44,6 +42,10 @@ extern void UI_iconify( void );
 static gint on_destroy_abort(GtkObject * object, gpointer user_data);
 static void DIA_stop( void);
 static void change_priority(void);
+
+#ifndef CYG_MANGLING
+static void shutdown_toggled(void);
+#endif
 
 static uint8_t stopReq=0;
 DIA_encoding::DIA_encoding( uint32_t fps1000 )
@@ -63,21 +65,44 @@ uint32_t useTray=0;
         dialog=create_dialog1();
         
         gtk_register_dialog(dialog);
-        //gtk_transient(dialog);
+
+	#ifndef CYG_MANGLING
+		// check for root privileges
+		if (getuid() != 0)
+		{
+			// set priority to normal, regardless of preferences
+			gtk_combo_box_set_active(GTK_COMBO_BOX(WID(combobox_priority)), 2);
+		}
+
+        gtk_signal_connect(GTK_OBJECT(WID(checkbutton_shutdown)), "toggled",
+                      GTK_SIGNAL_FUNC(shutdown_toggled), NULL);
+	#endif
+
         gtk_signal_connect(GTK_OBJECT(WID(combobox_priority)), "changed",
-                      GTK_SIGNAL_FUNC(change_priority), NULL);
+              GTK_SIGNAL_FUNC(change_priority), NULL);
+
         gtk_signal_connect(GTK_OBJECT(WID(closebutton1)), "clicked",
                       GTK_SIGNAL_FUNC(DIA_stop),                   NULL);
         gtk_signal_connect(GTK_OBJECT(dialog), "delete_event",
                       GTK_SIGNAL_FUNC(on_destroy_abort), NULL);
 
+		// set priority
 		uint32_t priority;
 
 		prefs->get(PRIORITY_ENCODING,&priority);
+
+	#ifndef CYG_MANGLING
+		// check for root privileges
+		if (getuid() == 0)
+		{
+			gtk_combo_box_set_active(GTK_COMBO_BOX(WID(combobox_priority)),priority);
+		}
+	#else
 		gtk_combo_box_set_active(GTK_COMBO_BOX(WID(combobox_priority)),priority);
+	#endif
 
         gtk_widget_show(dialog);
-//	gtk_window_set_modal(GTK_WINDOW(dialog), 1);
+
         if(useTray)
         {
               gtk_window_iconify(GTK_WINDOW(dialog));
@@ -122,6 +147,19 @@ void DIA_stop( void)
 
 void change_priority(void)
 {
+#ifndef CYG_MANGLING
+	if (getuid() != 0)
+	{
+		gtk_signal_disconnect_by_func(GTK_OBJECT(WID(combobox_priority)), GTK_SIGNAL_FUNC(change_priority), NULL);
+		gtk_combo_box_set_active(GTK_COMBO_BOX(WID(combobox_priority)), 2);
+		gtk_signal_connect(GTK_OBJECT(WID(combobox_priority)), "changed", GTK_SIGNAL_FUNC(change_priority), NULL);
+
+		GUI_Error_HIG(_("Privileges Required"), _( "Root privileges are required to perform this operation."));
+		
+		return;
+	}
+#endif
+
 	uint32_t priorityLevel;
 
 	priorityLevel = gtk_combo_box_get_active(GTK_COMBO_BOX(WID(combobox_priority)));
@@ -129,17 +167,60 @@ void change_priority(void)
 	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
 }
 
+#ifndef CYG_MANGLING
+void shutdown_toggled(void)
+{
+	if (getuid() != 0)
+	{
+		gtk_signal_disconnect_by_func(GTK_OBJECT(WID(checkbutton_shutdown)), GTK_SIGNAL_FUNC(shutdown_toggled), NULL);
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(WID(checkbutton_shutdown)), false);
+		gtk_signal_connect(GTK_OBJECT(WID(checkbutton_shutdown)), "toggled", GTK_SIGNAL_FUNC(shutdown_toggled), NULL);
+
+		GUI_Error_HIG(_("Privileges Required"), _( "Root privileges are required to perform this operation."));
+	}
+}
+#endif
+
 DIA_encoding::~DIA_encoding( )
 {
-		setpriority(PRIO_PROCESS, 0, _originalPriority);
+	bool shutdownRequired = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(WID(checkbutton_shutdown)));
 
-        if(tray) delete tray;
-        tray=NULL;
-        ADM_assert(dialog);
-        gtk_unregister_dialog(dialog);
-        gtk_widget_destroy(dialog);
-        dialog=NULL;
-        UI_deiconify();
+	setpriority(PRIO_PROCESS, 0, _originalPriority);
+
+	if(tray) delete tray;
+	tray=NULL;
+	ADM_assert(dialog);
+	gtk_unregister_dialog(dialog);
+	gtk_widget_destroy(dialog);
+	dialog=NULL;
+	UI_deiconify();
+
+	if (shutdownRequired)
+	{
+		DIA_working *work=new DIA_working(_("Shutting down"));
+		bool performShutdown=true;
+
+		for(int i = 0; i <= 30; i++)
+		{
+			if (work->isAlive())
+			{
+				GUI_Sleep(1000);
+				work->update(i, 30);
+			}
+			else
+			{
+				performShutdown=false;
+				break;
+			}
+		}
+
+		if (performShutdown && shutdown())
+		{
+			GUI_Sleep(5000);
+		}
+
+		delete work;
+	}
 }
 
 void DIA_encoding::setPhasis(const char *n)
@@ -376,7 +457,6 @@ create_dialog1 (void)
   GtkWidget *label_acodec;
   GtkWidget *label45;
   GtkWidget *label_container;
-  GtkWidget *label35;
   GtkWidget *frame2;
   GtkWidget *alignment3;
   GtkWidget *table7;
@@ -388,7 +468,6 @@ create_dialog1 (void)
   GtkWidget *label_quant;
   GtkWidget *label_totalframe;
   GtkWidget *label_frame;
-  GtkWidget *label36;
   GtkWidget *frame3;
   GtkWidget *alignment4;
   GtkWidget *table8;
@@ -398,7 +477,6 @@ create_dialog1 (void)
   GtkWidget *label_size;
   GtkWidget *label_asize;
   GtkWidget *label_vsize;
-  GtkWidget *label37;
   GtkWidget *frame4;
   GtkWidget *alignment5;
   GtkWidget *table9;
@@ -408,15 +486,18 @@ create_dialog1 (void)
   GtkWidget *label_fps;
   GtkWidget *label_eta;
   GtkWidget *label_elapsed;
-  GtkWidget *label38;
   GtkWidget *alignment8;
   GtkWidget *vbox4;
   GtkWidget *progressbar1;
-  GtkWidget *hbox2;
-  GtkWidget *table10;
+  GtkWidget *hbox4;
+  GtkWidget *checkbutton_shutdown;
+  GtkWidget *label69;
   GtkWidget *label68;
   GtkWidget *combobox_priority;
-  GtkWidget *label69;
+  GtkWidget *alignment11;
+  GtkWidget *hseparator1;
+  GtkWidget *hbox2;
+  GtkWidget *table10;
   GtkWidget *closebutton1;
   GtkWidget *alignment9;
   GtkWidget *hbox3;
@@ -517,11 +598,6 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_container), 0, 0.5);
 
-  label35 = gtk_label_new ("");
-  gtk_widget_show (label35);
-  gtk_frame_set_label_widget (GTK_FRAME (frame1), label35);
-  gtk_label_set_use_markup (GTK_LABEL (label35), TRUE);
-
   frame2 = gtk_frame_new (NULL);
   gtk_widget_show (frame2);
   gtk_table_attach (GTK_TABLE (table5), frame2, 1, 2, 0, 1,
@@ -599,11 +675,6 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_frame), 0, 0.5);
 
-  label36 = gtk_label_new ("");
-  gtk_widget_show (label36);
-  gtk_frame_set_label_widget (GTK_FRAME (frame2), label36);
-  gtk_label_set_use_markup (GTK_LABEL (label36), TRUE);
-
   frame3 = gtk_frame_new (NULL);
   gtk_widget_show (frame3);
   gtk_table_attach (GTK_TABLE (table5), frame3, 0, 1, 1, 2,
@@ -669,11 +740,6 @@ create_dialog1 (void)
   gtk_misc_set_alignment (GTK_MISC (label_vsize), 0, 0.5);
   gtk_label_set_width_chars (GTK_LABEL (label_vsize), 10);
 
-  label37 = gtk_label_new ("");
-  gtk_widget_show (label37);
-  gtk_frame_set_label_widget (GTK_FRAME (frame3), label37);
-  gtk_label_set_use_markup (GTK_LABEL (label37), TRUE);
-
   frame4 = gtk_frame_new (NULL);
   gtk_widget_show (frame4);
   gtk_table_attach (GTK_TABLE (table5), frame4, 1, 2, 1, 2,
@@ -736,15 +802,10 @@ create_dialog1 (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label_elapsed), 0, 0.5);
 
-  label38 = gtk_label_new ("");
-  gtk_widget_show (label38);
-  gtk_frame_set_label_widget (GTK_FRAME (frame4), label38);
-  gtk_label_set_use_markup (GTK_LABEL (label38), TRUE);
-
   alignment8 = gtk_alignment_new (0.5, 0.5, 1, 1);
   gtk_widget_show (alignment8);
   gtk_box_pack_start (GTK_BOX (vbox3), alignment8, FALSE, FALSE, 0);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment8), 15, 30, 0, 0);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment8), 10, 15, 0, 0);
 
   vbox4 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox4);
@@ -754,27 +815,26 @@ create_dialog1 (void)
   gtk_widget_show (progressbar1);
   gtk_box_pack_start (GTK_BOX (vbox4), progressbar1, FALSE, FALSE, 4);
 
-  hbox2 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox2);
-  gtk_box_pack_start (GTK_BOX (vbox3), hbox2, FALSE, TRUE, 0);
+  hbox4 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox4);
+  gtk_box_pack_start (GTK_BOX (vbox3), hbox4, TRUE, TRUE, 0);
 
-  table10 = gtk_table_new (1, 2, FALSE);
-  gtk_widget_show (table10);
-  gtk_box_pack_start (GTK_BOX (hbox2), table10, TRUE, TRUE, 0);
-  gtk_table_set_row_spacings (GTK_TABLE (table10), 5);
+  checkbutton_shutdown = gtk_check_button_new_with_mnemonic (_("Shut down computer when finished"));
+  gtk_widget_show (checkbutton_shutdown);
+  gtk_box_pack_start (GTK_BOX (hbox4), checkbutton_shutdown, FALSE, FALSE, 0);
+
+  label69 = gtk_label_new ("");
+  gtk_widget_show (label69);
+  gtk_box_pack_start (GTK_BOX (hbox4), label69, TRUE, FALSE, 0);
 
   label68 = gtk_label_new (_("Priority:"));
   gtk_widget_show (label68);
-  gtk_table_attach (GTK_TABLE (table10), label68, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
+  gtk_box_pack_start (GTK_BOX (hbox4), label68, FALSE, FALSE, 6);
   gtk_misc_set_alignment (GTK_MISC (label68), 0, 0.5);
 
   combobox_priority = gtk_combo_box_new_text ();
   gtk_widget_show (combobox_priority);
-  gtk_table_attach (GTK_TABLE (table10), combobox_priority, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 10, 0);
+  gtk_box_pack_start (GTK_BOX (hbox4), combobox_priority, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (combobox_priority, GTK_CAN_FOCUS);
   gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("High"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Above Normal"));
@@ -782,10 +842,23 @@ create_dialog1 (void)
   gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Below Normal"));
   gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_priority), _("Low"));
 
-  label69 = gtk_label_new ("");
-  gtk_widget_show (label69);
-  gtk_box_pack_start (GTK_BOX (hbox2), label69, FALSE, FALSE, 0);
-  gtk_misc_set_padding (GTK_MISC (label69), 36, 0);
+  alignment11 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment11);
+  gtk_box_pack_start (GTK_BOX (vbox3), alignment11, TRUE, TRUE, 0);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment11), 6, 30, 0, 0);
+
+  hseparator1 = gtk_hseparator_new ();
+  gtk_widget_show (hseparator1);
+  gtk_container_add (GTK_CONTAINER (alignment11), hseparator1);
+
+  hbox2 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox2);
+  gtk_box_pack_start (GTK_BOX (vbox3), hbox2, FALSE, TRUE, 0);
+
+  table10 = gtk_table_new (1, 1, FALSE);
+  gtk_widget_show (table10);
+  gtk_box_pack_start (GTK_BOX (hbox2), table10, TRUE, TRUE, 0);
+  gtk_table_set_row_spacings (GTK_TABLE (table10), 5);
 
   closebutton1 = gtk_button_new ();
   gtk_widget_show (closebutton1);
@@ -823,7 +896,6 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, label_acodec, "label_acodec");
   GLADE_HOOKUP_OBJECT (dialog1, label45, "label45");
   GLADE_HOOKUP_OBJECT (dialog1, label_container, "label_container");
-  GLADE_HOOKUP_OBJECT (dialog1, label35, "label35");
   GLADE_HOOKUP_OBJECT (dialog1, frame2, "frame2");
   GLADE_HOOKUP_OBJECT (dialog1, alignment3, "alignment3");
   GLADE_HOOKUP_OBJECT (dialog1, table7, "table7");
@@ -835,7 +907,6 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, label_quant, "label_quant");
   GLADE_HOOKUP_OBJECT (dialog1, label_totalframe, "label_totalframe");
   GLADE_HOOKUP_OBJECT (dialog1, label_frame, "label_frame");
-  GLADE_HOOKUP_OBJECT (dialog1, label36, "label36");
   GLADE_HOOKUP_OBJECT (dialog1, frame3, "frame3");
   GLADE_HOOKUP_OBJECT (dialog1, alignment4, "alignment4");
   GLADE_HOOKUP_OBJECT (dialog1, table8, "table8");
@@ -845,7 +916,6 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, label_size, "label_size");
   GLADE_HOOKUP_OBJECT (dialog1, label_asize, "label_asize");
   GLADE_HOOKUP_OBJECT (dialog1, label_vsize, "label_vsize");
-  GLADE_HOOKUP_OBJECT (dialog1, label37, "label37");
   GLADE_HOOKUP_OBJECT (dialog1, frame4, "frame4");
   GLADE_HOOKUP_OBJECT (dialog1, alignment5, "alignment5");
   GLADE_HOOKUP_OBJECT (dialog1, table9, "table9");
@@ -855,15 +925,18 @@ create_dialog1 (void)
   GLADE_HOOKUP_OBJECT (dialog1, label_fps, "label_fps");
   GLADE_HOOKUP_OBJECT (dialog1, label_eta, "label_eta");
   GLADE_HOOKUP_OBJECT (dialog1, label_elapsed, "label_elapsed");
-  GLADE_HOOKUP_OBJECT (dialog1, label38, "label38");
   GLADE_HOOKUP_OBJECT (dialog1, alignment8, "alignment8");
   GLADE_HOOKUP_OBJECT (dialog1, vbox4, "vbox4");
   GLADE_HOOKUP_OBJECT (dialog1, progressbar1, "progressbar1");
-  GLADE_HOOKUP_OBJECT (dialog1, hbox2, "hbox2");
-  GLADE_HOOKUP_OBJECT (dialog1, table10, "table10");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox4, "hbox4");
+  GLADE_HOOKUP_OBJECT (dialog1, checkbutton_shutdown, "checkbutton_shutdown");
+  GLADE_HOOKUP_OBJECT (dialog1, label69, "label69");
   GLADE_HOOKUP_OBJECT (dialog1, label68, "label68");
   GLADE_HOOKUP_OBJECT (dialog1, combobox_priority, "combobox_priority");
-  GLADE_HOOKUP_OBJECT (dialog1, label69, "label69");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment11, "alignment11");
+  GLADE_HOOKUP_OBJECT (dialog1, hseparator1, "hseparator1");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox2, "hbox2");
+  GLADE_HOOKUP_OBJECT (dialog1, table10, "table10");
   GLADE_HOOKUP_OBJECT (dialog1, closebutton1, "closebutton1");
   GLADE_HOOKUP_OBJECT (dialog1, alignment9, "alignment9");
   GLADE_HOOKUP_OBJECT (dialog1, hbox3, "hbox3");

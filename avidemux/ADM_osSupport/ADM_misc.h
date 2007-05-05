@@ -80,9 +80,16 @@ uint8_t         ADM_fileExist(char *name);
 
 	int getpriority(int which, int who);
 	int setpriority(int which, int who, int value);
+
+	#define RB_POWER_OFF 0x4321fedc
+	#define SHTDN_REASON_FLAG_PLANNED 0x80000000
+
+	int shutdown_win32(void);
 #else
 	#include <sys/resource.h>
 #endif
+
+bool shutdown(void);
 
 #define FRAME_PAL 1
 #define FRAME_FILM 2
