@@ -44,7 +44,7 @@
 #define TRACK_VIDEO 2
 
 #define MAX_CHUNK_SIZE (3*1024)
-
+uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 // 14496-1 / 8.2.1
 typedef enum MP4_Tag
 {
@@ -196,6 +196,7 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
   ADMAtoms id;
   uint32_t container;
   uint32_t trackScale=_videoScale;
+  uint32_t trackDuration;
   *trackType=TRACK_OTHER;
   uint8_t r=0;
   printf("<<Parsing Mdia>>\n");
@@ -224,6 +225,7 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
                 adm_printf(ADM_PRINT_DEBUG,"MDHD,duration in mdhd:%u (unscaled)\n",duration);
                 duration=(uint32_t)((duration*1000.)/trackScale);
                 adm_printf(ADM_PRINT_DEBUG,"MDHD,duration in mdhd:%u (scaled ms)\n",duration);
+                trackDuration=duration;
                 printf("MDHD,Track duration :%s, trackScale :%u\n",ms2timedisplay(duration),trackScale);
                 break;
        }
@@ -240,6 +242,7 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
                 case MKFCCR('v','i','d','e')://'vide':
                         *trackType=TRACK_VIDEO;
                         printf("hdlr video found \n ");
+                        _movieDuration=trackDuration;
                         break;
                 case MKFCCR('s','o','u','n'): //'soun':
                         *trackType=TRACK_AUDIO;
@@ -742,13 +745,21 @@ foundit: // HACK FIXME
   switch(trackType)
   {
     case TRACK_VIDEO:
+        {
           if(_tracks[0].index)
           {
               printf("Already got a video track\n");
               return 1;
           }
           r=indexify(&(_tracks[0]),trackScale,&info,0,&nbo);
+          
           _videostream.dwLength= _mainaviheader.dwTotalFrames=_tracks[0].nbIndex;
+          // update fps
+          float f=_videostream.dwLength;
+          if(_movieDuration) f=1000000.*f/_movieDuration;
+              else  f=25000;
+          _videostream.dwRate=(uint32_t)floor(f);
+           _mainaviheader.dwMicroSecPerFrame=ADM_UsecFromFps1000(_videostream.dwRate);
           // if we have a sync atom ???
           if(info.nbSync)
           {
@@ -768,6 +779,7 @@ foundit: // HACK FIXME
             
           }
            VDEO.index[0].intra=AVI_KEY_FRAME;
+        }
           break;
     case TRACK_AUDIO:
           printf("Cur audio track :%u\n",nbAudioTrack);

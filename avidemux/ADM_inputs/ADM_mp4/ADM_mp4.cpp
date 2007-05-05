@@ -219,7 +219,9 @@ uint8_t    MP4Header::open(char *name)
         CLR( _videostream);
         CLR(  _mainaviheader);
 
-        
+        _videostream.dwScale=1000;
+        _videostream.dwRate=10000;
+        _mainaviheader.dwMicroSecPerFrame=100000;;     // 10 fps hard coded
         
         adm_atom *atom=new adm_atom(_fd);
         if(!lookupMainAtoms((void*) atom))
@@ -232,9 +234,7 @@ uint8_t    MP4Header::open(char *name)
         
 	      _isvideopresent=1;
 	      _isaudiopresent=0;
-    	      _videostream.dwScale=1000;
-              _videostream.dwRate=10000;
-              _mainaviheader.dwMicroSecPerFrame=100000;;     // 10 fps hard coded
+    	     
               _videostream.fccType=fourCC::get((uint8_t *)"vids");
               _video_bih.biBitCount=24;
               _videostream.dwInitialFrames= 0;
