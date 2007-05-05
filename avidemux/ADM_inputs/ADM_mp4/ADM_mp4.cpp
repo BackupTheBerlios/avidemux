@@ -252,7 +252,7 @@ uint8_t    MP4Header::open(char *name)
         // If it is mpeg4 and we have extra data
         // Decode vol header to get the real width/height
         // The mpeg4/3GP/Mov header is often misleading
-#if 0
+
         if(fourCC::check(_videostream.fccHandler,(uint8_t *)"DIVX"))
         {
             if(VDEO.extraDataSize)
@@ -300,10 +300,7 @@ uint8_t    MP4Header::open(char *name)
                         delete [] bfer;
                 }
             }
-
-        
         }
-#endif
         /*
                 Now build audio tracks
         */
@@ -314,55 +311,6 @@ uint8_t    MP4Header::open(char *name)
             
         }
         fseek(_fd,0,SEEK_SET);
-#if 0
-        /* Do we have a ctts atom ? if so it contains B frame and we can guesstimate them */
-        if(Ctts)
-        {
-            uint32_t scope=nbCtts;
-            if(scope>_videostream.dwLength) scope=_videostream.dwLength;
-            
-            // Search floor value
-            uint32_t  flor=0xFFFFFFFF;
-            uint32_t  cel=0;
-            for(uint32_t i=0;i<scope;i++)
-            {
-              if(Ctts[i]>4294967290) 
-              {
-                if(i)
-                  Ctts[i]=Ctts[0];
-                else
-                  Ctts[i]=Ctts[1];
-              }
-              if(Ctts[i] >cel) cel=Ctts[i];
-              if(Ctts[i]<flor) flor=Ctts[i];
-            }
-            printf("[3GP] Ctts min %u max %u\n",flor,cel);
-            for(uint32_t i=0;i<scope;i++)
-            {
-              int floops=Ctts[i]-flor;
-               float f=floops;
-               aprintf("Frame %u ctts %u scale:%u\n",i,floops,_videoScale);
-                uint32_t delta;
-                f*=_videostream.dwRate;
-                f/=1000. ;; // in frame
-                f/=_videoScale;
-                floops=1+(uint32_t)floor(f+0.49);
-                aprintf(">Frame :%u delta=%d\n",i,floops);
-              if(floops<0)
-              {
-                printf("[3GPP] CTTS negative for frame %u : %d\n",i,floops); 
-                floops=0;
-              }
-              _tracks[0].index[i].deltaPtsDts=floops;
-                
-            }
-            
-            
-        }
-        _tracks[0].index[0].intra=AVI_KEY_FRAME;
-        // Update usec per frame
-#endif
-        _mainaviheader.dwMicroSecPerFrame=ADM_UsecFromFps1000( _videostream.dwRate);;;   
         printf("3gp/mov file successfully read..\n");
         return 1;
 }

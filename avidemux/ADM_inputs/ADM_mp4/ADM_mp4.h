@@ -36,6 +36,7 @@ class MPsampleinfo
       uint32_t nbSc;
       uint32_t nbStts;
       uint32_t nbSync;
+      uint32_t nbCtts;
       
       uint32_t *Co;
       uint32_t *Sz;
@@ -44,6 +45,7 @@ class MPsampleinfo
       uint32_t *SttsN;
       uint32_t *SttsC;
       uint32_t *Sync; 
+      uint32_t *Ctts;
   
       MPsampleinfo(void);
       ~MPsampleinfo(void);
@@ -121,6 +123,7 @@ protected:
           uint8_t                       parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t h);
           uint8_t                       parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint32_t h,uint32_t trackScale);
           uint8_t                       decodeEsds(void *ztom,uint32_t trackType);
+          uint8_t                       updateCtts(MPsampleinfo *info );
           uint32_t                      _videoScale;
           uint32_t                      _movieDuration; // in ms
           uint32_t                      _videoFound;

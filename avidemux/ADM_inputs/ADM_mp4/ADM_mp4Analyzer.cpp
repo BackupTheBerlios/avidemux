@@ -43,7 +43,6 @@
 #define TRACK_AUDIO 1
 #define TRACK_VIDEO 2
 
-#define MAX_CHUNK_SIZE (3*1024)
 uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 // 14496-1 / 8.2.1
 typedef enum MP4_Tag
@@ -243,6 +242,7 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
                         *trackType=TRACK_VIDEO;
                         printf("hdlr video found \n ");
                         _movieDuration=trackDuration;
+                        _videoScale=trackScale;
                         break;
                 case MKFCCR('s','o','u','n'): //'soun':
                         *trackType=TRACK_AUDIO;
@@ -405,6 +405,36 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
               }
           }
           break;
+           case ADM_MP4_CTTS: // Composition time to sample             
+            {
+                uint32_t n,i,j,k,v;
+                  printf("ctts:%lu\n",son.read32()); // version & flags
+                  n=son.read32();
+            
+                info.Ctts=new uint32_t[n*4]; // keep a safe margin
+            
+                for(i=0;i<n;i++)
+                {
+                    j=son.read32();
+                    v=son.read32();
+                    if(i<20)
+                    {
+                        adm_printf(ADM_PRINT_VERY_VERBOSE,"Ctts: nb: %u (%x) val:%u (%x)\n",j,j,v,v);   
+                    }
+                    for(k=0;k<j;k++)
+                    {
+                        info.Ctts[info.nbCtts++]=v;
+                    }
+                }
+                if(!info.nbCtts)
+                {
+                    delete [] info.Ctts;
+                    info.Ctts=NULL;
+                    printf("Destroying Ctts, seems invalid\n");
+                }
+                printf("Found %u elements\n",info.nbCtts);
+            }
+            break;  
        case ADM_MP4_STCO:
        {
           son.read32();
@@ -770,14 +800,21 @@ foundit: // HACK FIXME
               if(sync) sync--;
               _tracks[0].index[sync].intra=AVI_KEY_FRAME;
             }
-          }else
+          }
+          else
           { // All frames are kf
             for(int i=0;i<_tracks[0].nbIndex;i++)
             {
               _tracks[0].index[i].intra=AVI_KEY_FRAME;
             }
-            
           }
+          // Now do the CTTS thing
+          if(info.Ctts)
+          {
+            updateCtts(&info);
+          }
+
+          
            VDEO.index[0].intra=AVI_KEY_FRAME;
         }
           break;
@@ -807,274 +844,6 @@ foundit: // HACK FIXME
         break;
   }
   return r;
-}
-/**
-        \fn indexify
-        \brief build the index from the stxx atoms
-*/
-uint8_t	MP4Header::indexify(
-                          MP4Track *track,   
-                          uint32_t trackScale,
-                         MPsampleinfo *info,
-                         uint32_t isAudio,
-                         uint32_t *outNbChunk)
-
-{
-
-uint32_t i,j,cur;
-
-        printf("Build Track index\n");
-	*outNbChunk=0;
-	aprintf("+_+_+_+_+_+\n");
-	aprintf("co : %lu sz: %lu sc: %lu co[0]%lu \n",info->nbCo,info->nbSz,info->nbSc,info->Co[0]);
-	aprintf("+_+_+_+_+_+\n");
-
-	ADM_assert(info->Sc);
-	ADM_assert(info->Sn);
-	ADM_assert(info->Co);
-	if(!info->SzIndentical)
-        {
-          ADM_assert(info->Sz);
-        }
-	// first set size
-	if(info->SzIndentical && isAudio)// in that case they are all the same size, i.e.audio
-	{
-          
-          
-          uint32_t totalBytes=info->SzIndentical*info->nbSz;
-          printf("All the same size : %u (total size %u bytes)\n",info->SzIndentical,totalBytes);
-              //
-              // Each chunk contains N samples=N bytes
-              int samplePerChunk[info->nbCo];
-              memset(samplePerChunk,0,info->nbCo*sizeof(int));
-              for( i=0;i<info->nbSc;i++)
-              {
-                  for(int j=info->Sc[i]-1;j<info->nbCo;j++)
-                  {
-                        adm_printf(ADM_PRINT_VERY_VERBOSE,"For chunk %lu , %lu samples\n",j,info->Sn[i]);
-                        samplePerChunk[j]=info->Sn[i];
-                  }
-              }
-              int total=0;
-              for( i=0;i<info->nbCo;i++)
-              {
-                  adm_printf(ADM_PRINT_VERY_VERBOSE,"%u -> %u samples %u bytes\n",i,samplePerChunk[i],samplePerChunk[i]*info->SzIndentical);
-                  total+=samplePerChunk[i];
-              }
-              printf("Total size in byte : %u\n",total*info->SzIndentical);
-              track->index=new MP4Index[info->nbCo];
-              memset(track->index,0,info->nbCo*sizeof(MP4Index));
-              track->nbIndex=info->nbCo;;
-              int max=0;
-              totalBytes=0;
-              for(i=0;i<info->nbCo;i++)
-              {
-                  uint32_t sz;
-
-                  track->index[i].offset=info->Co[i];
-                  sz=samplePerChunk[i]*info->SzIndentical;
-                  track->index[i].size=sz;
-                  track->index[i].time=0; // No seek
-                  if(sz>MAX_CHUNK_SIZE)
-                  {
-                      max+=sz/MAX_CHUNK_SIZE;
-                  }
-                  
-                  totalBytes+=track->index[i].size;
-              }
-              // Now time to update the time...
-              // Normally they have all the same duration
-              if(info->nbStts!=1) printf("WARNING: Same size, different duration\n");
-
-              float sampleDuration,totalDuration=0;
-              
-                sampleDuration=info->SttsC[0];
-                sampleDuration*=1000.*1000.;
-                sampleDuration/=trackScale;    // Duration of one sample
-                for(i=0;i<info->nbCo;i++)
-                {
-                        track->index[i].time=(uint64_t)floor(totalDuration);
-                        totalDuration+=sampleDuration*samplePerChunk[i];
-                        adm_printf(ADM_PRINT_VERY_VERBOSE,"Audio chunk : %lu time :%lu\n",i,track->index[i].time);
-                }
-                if(max && isAudio) // We have some big chunks we need to split them
-                {
-                      // rebuild a new index
-                      printf("We have %u chunks that are too big, adjusting..\n",max);
-                      uint32_t newNbCo=track->nbIndex+max*2; // *2 is enough, should be.
-                      uint32_t w=0;
-                      uint32_t one_go;
-
-                        one_go=MAX_CHUNK_SIZE/info->SzIndentical;
-                        one_go=one_go*info->SzIndentical;
-
-                     MP4Index *newindex=new MP4Index[newNbCo];
-
-                    int64_t time_increment=(int64_t)((one_go/info->SzIndentical)*sampleDuration);  // Nb sample*duration of one sample
-                    for(i=0;i<track->nbIndex;i++)
-                    {
-                      uint32_t sz;
-                          sz=track->index[i].size;
-                          if(sz<MAX_CHUNK_SIZE)
-                          {
-                              memcpy(&(newindex[w]),&(track->index[i]),sizeof(MP4Index));
-                              w++;
-                              continue;
-                          }
-                          // We have to split it...
-                          int part=0;
-                          while(sz>one_go)
-                          {
-                                newindex[w].offset=track->index[i].offset+part*one_go;
-                                newindex[w].size=one_go;
-                                newindex[w].time=track->index[i].time+part*time_increment; 
-                                ADM_assert(w<newNbCo);
-                                w++;
-                                part++;
-                                sz-=one_go;
-                          }
-                          // The last one...
-                                newindex[w].offset=track->index[i].offset+part*one_go;
-                                newindex[w].size=sz;
-                                newindex[w].time=track->index[i].time+part*time_increment+((time_increment*sz)/one_go); 
-                                w++;
-                    }
-                    delete [] track->index;
-                    track->index=newindex;
-                    track->nbIndex=w;
-                }
-          printf("Index done\n");
-          return 1;
-      }
-          // Else we build an index per sample
-          //
-	
-		
-	// We have different packet size
-	// Probably video
-        track->index=new MP4Index[info->nbSz];
-        memset(track->index,0,info->nbSz*sizeof(MP4Index));
-
-        if(info->SzIndentical) // Video, all same size (DV ?)
-        {
-            adm_printf(ADM_PRINT_VERY_VERBOSE,"\t size for all %lu frames : %lu\n",info->nbSz,info->SzIndentical);
-            for(i=0;i<info->nbSz;i++)
-            {
-                    track->index[i].size=info->SzIndentical;
-                    
-            }
-          }
-          else // Different size
-          {
-            for(i=0;i<info->nbSz;i++)
-            {
-                    track->index[i].size=info->Sz[i];
-                    adm_printf(ADM_PRINT_VERY_VERBOSE,"\t size : %d : %lu\n",i,info->Sz[i]);
-            }
-          }
-	// if no sample to chunk we map directly
-	// first build the # of sample per chunk table
-        uint32_t totalchunk=0,max=0;
-
-        // Search the maximum
-        for(i=0;i<info->nbSc-1;i++)
-        {
-                totalchunk+=(info->Sc[i+1]-info->Sc[i])*info->Sn[i];
-        }
-        totalchunk+=(info->nbCo-info->Sc[info->nbSc-1]+1)*info->Sn[info->nbSc-1];
-
-        adm_printf(ADM_PRINT_VERY_VERBOSE,"#of chunk %d max per chunk %d Max # of sample %d\n",info->nbCo,max,totalchunk);
-
-        uint32_t chunkCount[totalchunk+1];
-	for(i=0;i<info->nbSc;i++)
-	{
-		for(j=info->Sc[i]-1;j<info->nbCo;j++)
-		{
-			chunkCount[j]=info->Sn[i];
-                        ADM_assert(j<=totalchunk);
-		}
-		adm_printf(ADM_PRINT_VERY_VERBOSE,"(%d) sc: %lu sn:%lu\n",i,info->Sc[i],info->Sn[i]);
-	}
-/*			for(j=0;j<nbSc;j++)
-			{
-				aprintf("\n count number : %d - %lu\n",j,Sn[j]);
-			}*/
-	// now we have for each chunk the number of sample in it
-	cur=0;
-	for(j=0;j<info->nbCo;j++)
-	{
-		int tail=0;
-		adm_printf(ADM_PRINT_VERY_VERBOSE,"--starting at %lu , %lu to go\n",info->Co[j],chunkCount[j]);
-		for(uint32_t k=0;k<chunkCount[j];k++)
-		{
-                        track->index[cur].offset=info->Co[j]+tail;
-                        tail+=track->index[cur].size;
-                        adm_printf(ADM_PRINT_VERY_VERBOSE," sample : %d offset : %lu\n",cur,track->index[cur].offset);
-			adm_printf(ADM_PRINT_VERY_VERBOSE,"Tail : %lu\n",tail);
-			cur++;
-		}
-
-
-	}
-        
-        
-        track->nbIndex=cur;;
-	
-	
-	// Now deal with duration
-	// the unit is us FIXME, probably said in header
-	// we put each sample duration in the time entry
-	// then sum them up to get the absolute time position
-
-        uint32_t nbChunk=track->nbIndex;
-	if(info->nbStts)		//uint32_t nbStts,	uint32_t *SttsN,uint32_t SttsC,
-	{
-		uint32_t start=0;
-		if(info->nbStts>1)
-		{
-			for(uint32_t i=0;i<info->nbStts;i++)
-			{
-				for(uint32_t j=0;j<info->SttsN[i];j++)
-				{
-                                        track->index[start].time=(uint64_t)info->SttsC[i];
-					start++;
-					ADM_assert(start<=nbChunk);
-				}	
-			}
-		}
-		else
-		{
-			// All same duration
-			for(uint32_t i=0;i<nbChunk;i++)
-                                track->index[i].time=(uint64_t)info->SttsC[0]; // this is not an error!
-		
-		}
-		// now collapse
-		uint64_t total=0;
-		float    ftot;
-		uint32_t thisone;
-		
-		for(uint32_t i=0;i<nbChunk;i++)
-		{
-                        thisone=track->index[i].time;
-			ftot=total;
-			ftot*=1000.*1000.;
-			ftot/=trackScale;
-                        track->index[i].time=(uint64_t)floor(ftot);
-			total+=thisone;
-                        adm_printf(ADM_PRINT_VERY_VERBOSE,"Audio chunk : %lu time :%lu\n",i,track->index[i].time);
-		}
-		// Time is now built, it is in us
-	
-	
-	}
-	else // there is not ssts
-	{
-          GUI_Error_HIG(_("No stts table"), NULL);
-		ADM_assert(0);	
-	}
-        printf("Index done\n");
-	return 1;
 }
 /**
       \fn decodeEsds
@@ -1147,6 +916,52 @@ int tag,l;
     tom->skipAtom();
     return 1;
 }
+/**
+    \fn updateCtts
+    \brief compute deltaPtsDts from ctts, needed to create valid mp4 when copying
+*/
+uint8_t MP4Header::updateCtts(MPsampleinfo *info )
+{
+    uint32_t scope=info->nbCtts;
+            
+            if(scope>_videostream.dwLength) scope=_videostream.dwLength;
+            
+            // Search floor value
+            uint32_t  flor=0xFFFFFFFF;
+            uint32_t  cel=0;
+            for(uint32_t i=0;i<scope;i++)
+            {
+              if(info->Ctts[i]>4294967290) 
+              {
+                if(i)
+                  info->Ctts[i]=info->Ctts[0];
+                else
+                  info->Ctts[i]=info->Ctts[1];
+              }
+              if(info->Ctts[i] >cel) cel=info->Ctts[i];
+              if(info->Ctts[i]<flor) flor=info->Ctts[i];
+            }
+            printf("[3GP] Ctts min %u max %u\n",flor,cel);
+            for(uint32_t i=0;i<scope;i++)
+            {
+              int floops=info->Ctts[i]-flor;
+               float f=floops;
+               aprintf("Frame %u ctts %u scale:%u dwRate:%u\n",i,floops,_videoScale,_videostream.dwRate);
+                uint32_t delta;
+                f*=_videostream.dwRate;
+                f/=1000. ;; // in frame
+                f/=_videoScale;
+                floops=1+(uint32_t)floor(f+0.49);
+                aprintf(">Frame :%u delta=%d\n",i,floops);
+              if(floops<0)
+              {
+                printf("[3GPP] CTTS negative for frame %u : %d\n",i,floops); 
+                floops=0;
+              }
+              _tracks[0].index[i].deltaPtsDts=floops;
+            } // scope
+  return 1;
+}
 //***********************************
 MPsampleinfo::MPsampleinfo(void)
 {
@@ -1162,6 +977,7 @@ MPsampleinfo::~MPsampleinfo()
       MPCLEAR (SttsN);
       MPCLEAR (SttsC);
       MPCLEAR (Sync);
+      MPCLEAR (Ctts);
 }
 
 // EOF
