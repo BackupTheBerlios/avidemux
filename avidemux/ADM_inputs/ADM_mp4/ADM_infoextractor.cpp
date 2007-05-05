@@ -26,7 +26,7 @@
 
 
 #include "fourcc.h"
-#include "ADM_3gp/ADM_3gp.h"
+#include "ADM_mp4/ADM_mp4.h"
 #include "ADM_toolkit/toolkit.hxx"
 
 #include "ADM_osSupport/ADM_debugID.h"

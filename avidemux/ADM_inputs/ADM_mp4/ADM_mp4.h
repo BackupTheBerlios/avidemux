@@ -24,34 +24,58 @@
 
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
-#include "ADM_3gp/ADM_atom.h"
+#include "ADM_mp4/ADM_atom.h"
 
-typedef struct _3gpIndex
+
+class MPsampleinfo
 {
-	uint64_t offset;
-	uint64_t size;
-	uint32_t intra;
-	uint64_t time;
-        uint32_t deltaPtsDts;
+  public:
+      uint32_t nbCo;
+      uint32_t SzIndentical;
+      uint32_t nbSz;
+      uint32_t nbSc;
+      uint32_t nbStts;
+      uint32_t nbSync;
+      
+      uint32_t *Co;
+      uint32_t *Sz;
+      uint32_t *Sc;
+      uint32_t *Sn;
+      uint32_t *SttsN;
+      uint32_t *SttsC;
+      uint32_t *Sync; 
+  
+      MPsampleinfo(void);
+      ~MPsampleinfo(void);
+};
 
-}_3gpIndex;
-class _3gpTrack
+typedef struct MP4Index
+{
+	uint64_t offset; // Offset in file to get frame
+	uint64_t size;   // Size of frame in bytes
+	uint32_t intra;  // Flags associated with frame
+	uint64_t time;   // Decoder time in ms
+        uint32_t deltaPtsDts; // Delta in frame between pts & dts
+
+}MP4Index;
+class MP4Track
 {
 public:
-    _3gpIndex   *index;
+    MP4Index   *index;
     uint32_t    id;
+    uint32_t    scale;
     uint32_t    nbIndex;
     uint32_t    extraDataSize;
     uint8_t     *extraData;
     WAVHeader   _rdWav;
-                _3gpTrack(void);
-                ~_3gpTrack();
+                MP4Track(void);
+                ~MP4Track();
 };
 
 //
 //	Audio track
 //
-class _3gpAudio : public AVDMGenericAudioStream
+class MP4Audio : public AVDMGenericAudioStream
 {
 protected:
 
@@ -60,7 +84,7 @@ protected:
 		uint32_t					_rel_position;
 
               	uint32_t 					_current_index;
-	    	_3gpIndex 					*_index;
+	    	MP4Index 					*_index;
 		FILE						*_fd;
 		uint32_t					_extraLen;
 		uint8_t						*_extraData;
@@ -68,11 +92,11 @@ protected:
 		
 		
 public:
-					_3gpAudio(FILE *fd,_3gpTrack *trak);
-// _3gpIndex *idx,
+					MP4Audio(FILE *fd,MP4Track *trak);
+// MP4Index *idx,
 // 						uint32_t nbchunk, FILE * fd,WAVHeader *incoming,
 // 						uint32_t extraLen,uint8_t *extraData,uint32_t duration);
-	virtual				~_3gpAudio();
+	virtual				~MP4Audio();
         virtual uint32_t 		read(uint32_t len,uint8_t *buffer);
         virtual uint8_t  		goTo(uint32_t newoffset);
 		   uint8_t			getNbChunk(uint32_t *ch);
@@ -85,46 +109,51 @@ public:
 #define _3GP_MAX_TRACKS 8
 #define VDEO _tracks[0]
 #define ADIO _tracks[nbAudioTrack+1]._rdWav
-class _3GPHeader         :public vidHeader
+
+class MP4Header         :public vidHeader
 {
 protected:
-          uint8_t                       _reordered;		
-	  FILE 				*_fd;
-          _3gpTrack                     _tracks[_3GP_MAX_TRACKS];
-	  uint32_t                      _audioDuration;
-          uint32_t                      _currentAudioTrack;
-	uint8_t 			parseAtomTree(adm_atom *atom);
-	  _3gpAudio			*_audioTracks[_3GP_MAX_TRACKS-1];
-	uint8_t 			sync(_3gpIndex *idx,uint32_t index_size, uint32_t sync_size,uint32_t *sync);
-         uint32_t  nbAudioTrack;
-	 uint32_t *Sz,*Co,*Sc;
-	 uint32_t *Sn,*Sync;
-	 uint32_t *SttsN,*SttsC,*Ctts,nbCtts;
-         uint32_t _videoScale;
-
-	uint8_t		buildIndex(	_3gpTrack *track,
-					uint32_t scale,
-					uint32_t nbSz,		uint32_t *Sz, uint32_t szIndentical,
-					uint32_t nbChunk ,	uint32_t *Chunk,
-					uint32_t nbSc,		uint32_t *Sc,
-					uint32_t nbStts,uint32_t *SttsN,uint32_t *SttsC,
-					uint32_t *Sn,			uint32_t *outNbChunk,
-                                            uint32_t isAudio
-					);
-	uint32_t 		readPackedLen(adm_atom *tom );
+          /*****************************/
+          uint8_t                       lookupMainAtoms(void *tom);
+          void                          parseMvhd(void *tom);
+          uint8_t                       parseTrack(void *ztom);
+          uint8_t                       decodeVideoAtom(void *ztom);
+          uint8_t                       parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t h);
+          uint8_t                       parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint32_t h,uint32_t trackScale);
+          uint8_t                       decodeEsds(void *ztom,uint32_t trackType);
+          uint32_t                      _videoScale;
+          uint32_t                      _movieDuration; // in ms
+          uint32_t                      _videoFound;
+          uint8_t	                indexify(
+                                                MP4Track *track,   
+                                                uint32_t trackScale,
+                                              MPsampleinfo *info,
+                                              uint32_t isAudio,
+                                              uint32_t *outNbChunk);
+          /*****************************/
+        uint8_t                       _reordered;		
+        FILE                          *_fd;
+        MP4Track                      _tracks[_3GP_MAX_TRACKS];
+        uint32_t                      _audioDuration;
+        uint32_t                      _currentAudioTrack;
+        uint8_t                       parseAtomTree(adm_atom *atom);
+        MP4Audio                      *_audioTracks[_3GP_MAX_TRACKS-1];
+        uint32_t                      nbAudioTrack;
+         /*********************************/
+	uint32_t                         readPackedLen(adm_atom *tom );
 	
 public:
-        uint8_t               hasPtsDts(void) {return 1;} // Return 1 if the container gives PTS & DTS info
-        uint32_t              ptsDtsDelta(uint32_t framenum);
-virtual   void 				Dump(void) {};
-virtual   uint32_t 			getNbStream(void) ;
-virtual   uint8_t 			needDecompress(void) { return 1;};
+          uint8_t               hasPtsDts(void) {return 1;} // Return 1 if the container gives PTS & DTS info
+          uint32_t              ptsDtsDelta(uint32_t framenum);
+virtual   void 	                Dump(void) {};
+virtual   uint32_t              getNbStream(void) ;
+virtual   uint8_t               needDecompress(void) { return 1;};
 
-			_3GPHeader( void ) ;
-                        virtual	~_3GPHeader(  ) ;
+                                MP4Header( void ) ;
+virtual	                        ~MP4Header(  ) ;
 // AVI io
-virtual 	uint8_t			open(char *name);
-virtual 	uint8_t			close(void) ;
+virtual 	uint8_t	       open(char *name);
+virtual 	uint8_t	       close(void) ;
   //__________________________
   //				 Info
   //__________________________

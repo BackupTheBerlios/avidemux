@@ -1,11 +1,8 @@
 /***************************************************************************
-                          ADM_Aton  -  description
+                          ADM_mp4Tree.h  -  description
                              -------------------
-
-	Helper class to deal with atom
-
-    begin                : Mon Jul 21 2003
-    copyright            : (C) 2001 by mean
+    begin                : Mon Jun 3 2002
+    copyright            : (C) 2002 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -17,33 +14,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#ifndef _ADM_ATOM
-#define _ADM_ATOM
-class adm_atom
+#ifndef ADM_MP4_TREE_H
+#define ADM_MP4_TREE_H
+
+typedef enum ADMAtoms
 {
-private:
-		FILE 		*_fd;
-		uint32_t	_atomStart,_atomSize;
-		uint32_t	_atomFCC;
-		uint8_t		dumpAtom( void );
-public:
-				adm_atom(FILE *fd);
-				adm_atom(adm_atom *tm,int duplicate);
-				adm_atom(adm_atom *atom);
-		uint8_t	        skipAtom( void );
-                uint32_t        getStartPos(void) {return _atomStart;}
-		uint32_t	getFCC( void );
-		uint32_t	getSize( void );
-                uint32_t        getRemainingSize( void );
-		uint8_t		readPayload( uint8_t *whereto, uint32_t rd );
-		uint8_t		isDone(void );
-		uint8_t		skipBytes(uint32_t nb );
-
-		uint32_t	read32( void );
-		uint16_t	read16( void );
-		uint8_t	        read( void );
-
-
+#include "ADM_mp4Leaf.h"
 };
 
+uint8_t ADM_mp4SearchAtomName(uint32_t atom, ADMAtoms *atomId,uint32_t *isContainer);
+uint8_t ADM_mp4SimpleSearchAtom(adm_atom *rootAtom, ADMAtoms atomToFind,adm_atom **atomFound);
 #endif

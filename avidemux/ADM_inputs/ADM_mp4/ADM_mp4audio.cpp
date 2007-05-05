@@ -33,14 +33,14 @@
 #include "default.h"
 #include "ADM_editor/ADM_Video.h"
 #include "fourcc.h"
-#include "ADM_3gp/ADM_3gp.h"
+#include "ADM_mp4/ADM_mp4.h"
 //_______________________________________________________
 //
 //
 //_______________________________________________________
 
-// _3gpAudio::_3gpAudio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *incoming,uint32_t extraLen,uint8_t *extraData,uint32_t duration)
-_3gpAudio::_3gpAudio(FILE *fd,_3gpTrack *track)
+// MP4Audio::MP4Audio(_3gpIndex *idx, uint32_t nbchunk, FILE * fd,WAVHeader *incoming,uint32_t extraLen,uint8_t *extraData,uint32_t duration)
+MP4Audio::MP4Audio(FILE *fd,MP4Track *track)
 {
 	_nb_chunks=track->nbIndex;
 	_fd=fd;
@@ -77,7 +77,7 @@ _3gpAudio::_3gpAudio(FILE *fd,_3gpTrack *track)
        // _wavheader->frequency=48000;
     	goToTime(0);
 }
- uint8_t	_3gpAudio::goToTime(uint32_t mstime)
+ uint8_t	MP4Audio::goToTime(uint32_t mstime)
 {
 uint64_t target=mstime;
 		target*=1000; // us
@@ -105,13 +105,13 @@ uint64_t target=mstime;
 //
 //
 //_______________________________________________________
-uint8_t _3gpAudio::goTo(uint32_t newoffset)
+uint8_t MP4Audio::goTo(uint32_t newoffset)
 {
    ADM_assert(0);
     return 1;
 }
 //______________________________________
-uint8_t _3gpAudio::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
+uint8_t MP4Audio::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 {
 
 uint32_t r=0;
@@ -161,7 +161,7 @@ double delta;
 //
 //_______________________________________________________
 
-uint8_t	_3gpAudio::extraData(uint32_t *l,uint8_t **d)
+uint8_t	MP4Audio::extraData(uint32_t *l,uint8_t **d)
 {
 	if(_extraLen && _extraData)
 	{
@@ -179,7 +179,7 @@ uint8_t	_3gpAudio::extraData(uint32_t *l,uint8_t **d)
 //
 //
 //_______________________________________________________
-uint32_t _3gpAudio::read(uint32_t len,uint8_t *buffer)
+uint32_t MP4Audio::read(uint32_t len,uint8_t *buffer)
 {
     uint32_t size,samples;
     if(!getPacket(buffer,&size,&samples)) return 0;
@@ -193,14 +193,14 @@ uint32_t _3gpAudio::read(uint32_t len,uint8_t *buffer)
 //_______________________________________________________
 
 
-_3gpAudio::~_3gpAudio()
+MP4Audio::~MP4Audio()
 {
 	// nothing special to do...
 	delete _wavheader;
 	_wavheader=NULL;
 }
 //_______________________________________________________
-uint8_t _3gpAudio::getNbChunk(uint32_t *ch)
+uint8_t MP4Audio::getNbChunk(uint32_t *ch)
 {
 	*ch=_nb_chunks;
 	return 1;

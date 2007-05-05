@@ -31,10 +31,11 @@
 
 
 #include "fourcc.h"
-#include "ADM_3gp/ADM_atom.h"
-//#define _3G_LOGO
-#define aprintf printf
-//#define ATOM_DEBUG
+#include "ADM_mp4/ADM_atom.h"
+#include "ADM_osSupport/ADM_debugID.h"
+#define MODULE_NAME MODULE_3GP
+#include "ADM_osSupport/ADM_debug.h"
+
 adm_atom::adm_atom(adm_atom *atom)
 {
 	_fd=atom->_fd;
@@ -54,7 +55,14 @@ adm_atom::adm_atom(adm_atom *atom)
 #ifdef ATOM_DEBUG
 	dumpAtom();
 #endif
-
+}
+/**
+    \fn duplicate constructor
+    \brief returns a copy of the current atom
+*/
+adm_atom::adm_atom(adm_atom *atom,int duplicate)
+{
+   memcpy(this,atom,sizeof(adm_atom));
 }
 adm_atom::adm_atom(FILE *fd )
 {
