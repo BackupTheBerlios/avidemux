@@ -40,7 +40,7 @@
 #define AUDIOSEG 	_segments[_audioseg]._reference
 #define SEG 		_segments[seg]._reference
 
-
+extern char* ms2timedisplay(uint32_t ms);
 
 uint8_t		 ADM_Composer::audioFlushPacket(void)
 {
@@ -112,7 +112,9 @@ _VIDEOS *currentVideo;
 	if(_audioseg == (_nb_segment - 1))
 	{
 		
-		printf("EditorPacket : End of stream\n");
+		printf("EditorPacket : End of stream Segment :%u/%u \n",_audioseg,_nb_segment);
+                printf("This sample : %s ",ms2timedisplay(1000*_audioSample/currentVideo->_audiostream->getInfo()->frequency));
+                printf("total :%s\n" ,ms2timedisplay(1000*_segments[_audioseg]._audio_duration/currentVideo->_audiostream->getInfo()->frequency));
 		return 0;
 	}
 	// switch segment

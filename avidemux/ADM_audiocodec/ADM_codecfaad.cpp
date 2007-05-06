@@ -55,20 +55,21 @@ unsigned char chan;
                    conf->defObjectType =HE_AAC;
                 }
 		faacDecSetConfiguration(_instance, conf);
+                printf("[FAAD] using %u bytes of extradata\n",l);
 		// if we have some extra data, it means we can init it from it
 		if(l)
 		{
 			_inited = 1;
 			faacDecInit2(_instance, d,l, &srate,&chan);
-			printf("Found :%d rate %d channels\n",srate,chan);
+			printf("[FAAD]Found :%d rate %d channels\n",srate,chan);
                         if(srate!=info->frequency)
                         {
-                            printf("Frequency mismatch!!! %d to %d (SBR ?)\n",info->frequency,srate);
+                            printf("[FAAD]Frequency mismatch!!! %d to %d (SBR ?)\n",info->frequency,srate);
                             info->frequency=srate;
                         }	
                         if(chan!=info->channels) // Ask for stereo !
                         {
-                             printf("channel mismatch!!! %d to %d \n",info->channels,chan);
+                             printf("[FAAD]channel mismatch!!! %d to %d \n",info->channels,chan);
                             info->channels=chan;
                         }
 		}
@@ -86,7 +87,7 @@ unsigned char chan;
 	ch_route.input_type[4] = CH_REAR_RIGHT;
 	ch_route.input_type[5] = CH_LFE;
 
-		printf("Faad decoder created\n");
+		printf("[FAAD]Faad decoder created\n");
 }
 
 ADM_faad::~ADM_faad()
