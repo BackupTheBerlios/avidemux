@@ -71,6 +71,7 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   GtkWidget *dialog=gtk_dialog_new ();
   GtkWidget *dialog_vbox1;
   GtkWidget *table1;
+  GtkWidget *vbox1;
   
   gtk_window_set_title (GTK_WINDOW (dialog),title );
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
@@ -80,25 +81,41 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
   gtk_box_set_spacing (GTK_BOX(dialog_vbox1), 12);
   gtk_widget_show (dialog_vbox1);
   
-  int vsize=0;
-  for(int i=0;i<nb;i++)
-      vsize+=elems[i]->getSize();
-  
-  
-  table1 = gtk_table_new (vsize, 2, FALSE);
-  gtk_table_set_col_spacings (GTK_TABLE (table1), 12);
-  gtk_table_set_row_spacings (GTK_TABLE (table1), 6);
-  gtk_container_set_border_width (GTK_CONTAINER (table1), 6);
-  gtk_widget_show (table1);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox1), table1, TRUE, TRUE, 0);
+  vbox1 = gtk_vbox_new (0, 18);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 6);
+  gtk_container_add (GTK_CONTAINER (dialog_vbox1), vbox1);
+  gtk_widget_show (vbox1);
   
   int line=0;
-  for(int i=0;i<nb;i++)
+  int i=0;  
+  while (i<nb)
   {
-    addLine(elems[i],dialog,table1,line);
-    line+=elems[i]->getSize();
-    
+	  if (elems[i]->mySelf == ELEM_FRAME)
+	  {
+		  addLine(elems[i],dialog,vbox1,line);
+		  i++;
+	  }
+	  else
+	  {
+		  line = 0;
+		  int nbLine=0;
+		  while (i+nbLine<nb && elems[i+nbLine]->mySelf != ELEM_FRAME) 
+			  nbLine++;
+		  table1 = gtk_table_new (nbLine, 2, FALSE);
+		  gtk_table_set_col_spacings (GTK_TABLE (table1), 12);
+		  gtk_table_set_row_spacings (GTK_TABLE (table1), 6);
+		  gtk_box_pack_start (GTK_BOX(vbox1), table1, FALSE, FALSE, 0);
+		  gtk_widget_show (table1);
+                  
+		  while (i<nb && elems[i]->mySelf != ELEM_FRAME)
+		  {
+			  addLine(elems[i],dialog,table1,line);
+			  line+=elems[i]->getSize();
+			  i++;
+		  }
+	  }
   }
+  
   // Add a Close button
   GtkWidget *okbutton1;
   GtkWidget *cancelbutton1;
@@ -249,9 +266,9 @@ uint8_t  buildOneTab(GtkWidget *nb,int index, diaElemTabs *tab)
                   
                   while (i<tab->nbElems && tab->dias[i]->mySelf != ELEM_FRAME)
                   {
-                          line+=tab->dias[i]->getSize();
-                          addLine(tab->dias[i],nb,table1,line-1);
-                          i++;
+                          addLine(tab->dias[i],nb,table1,line);
+						  line+=tab->dias[i]->getSize();
+						  i++;
                   }
 	  }
   }
