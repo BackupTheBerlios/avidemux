@@ -66,10 +66,10 @@ static uint8_t dmx_probeTSPat(const char *file, uint32_t *nbTracks,MPEG_TRACK **
 static uint8_t dmx_probePat(dmx_demuxerTS *demuxer, uint32_t *nbPmt,MPEG_PMT *pmts,uint32_t maxPmt);
 static uint8_t dmx_probePMT(dmx_demuxerTS *demuxer, uint32_t pmtId,MPEG_TRACK *pmts,uint32_t *cur, uint32_t max);
 
-
+static const char *dmx_streamTypeAsString(ADM_STREAM_TYPE st);
  
 extern uint32_t mpegTsCRC(uint8_t *data, uint32_t len);
-
+//*********************************************************
 uint8_t runProbe(const char *file)
 {
   uint32_t nb;
@@ -306,7 +306,8 @@ MpegAudioInfo mpegInfo;
       printf("***********************\n");
       for(int i=0;i<cur;i++)
       {
-        printf("Tid : %04x Type :%d %s\n", xtracks[i].pid,xtracks[i].streamType,"?");
+        printf("Tid : %04x Type :%d %s\n", xtracks[i].pid,xtracks[i].streamType,
+               dmx_streamTypeAsString(xtracks[i].streamType));
       }
       printf("******************************\n");
       printf("******************************\n");
@@ -341,11 +342,15 @@ MpegAudioInfo mpegInfo;
       {
          MPEG_TRACK *t=&(xtracks[j]);
          ADM_STREAM_TYPE type=t->streamType;
-          if(type!=ADM_STREAM_MPEG_AUDIO && type!=ADM_STREAM_AC3) continue; // Only mpega & AC3 for now
+          if(type!=ADM_STREAM_MPEG_AUDIO && type!=ADM_STREAM_AC3
+            &&type!=ADM_STREAM_AAC) continue; // Only mpega & AC3 for now
           switch(type)
           {
+            case ADM_STREAM_AAC:
+                  t->pes=0xb0;
             case ADM_STREAM_MPEG_AUDIO:
             case ADM_STREAM_AC3:
+            
               memcpy(&((*tracks)[*nbTracks]),t,sizeof(MPEG_TRACK));
               ADM_assert(*nbTracks<cur);
               (*nbTracks)++;
@@ -513,6 +518,8 @@ const char *dmx_streamType(uint32_t type,ADM_STREAM_TYPE *streamType)
  {
    case 1:case 2: *streamType=ADM_STREAM_MPEG_VIDEO;return "Mpeg Video";
    case 3:case 4: *streamType=ADM_STREAM_MPEG_AUDIO;return "Mpeg Audio";
+   case 0x11: case 0xF:        *streamType=ADM_STREAM_AAC;return "AAC  Audio";
+   case 0x10:        *streamType=ADM_STREAM_MPEG4;return "MP4 Video";
    case 0x1B: *streamType=ADM_STREAM_H264;return "H264";
    case 0x81: *streamType=ADM_STREAM_AC3;return "Private (AC3?)";
  }
@@ -587,5 +594,26 @@ uint8_t dmx_probePMT(dmx_demuxerTS *demuxer, uint32_t pmtId,MPEG_TRACK *pmts,uin
       }
       return 0;
 }
-
+/**
+      \fn dmx_streamTypeAsSTring
+      \brief returns stream type as a printable string
+*/
+static const char *dmx_streamTypeAsString(ADM_STREAM_TYPE st)
+{
+#define MST(x,y) case x: return #y;
+  switch(st)
+  {
+  MST(ADM_STREAM_UNKNOWN,UNKNOWN)
+  MST(ADM_STREAM_MPEG_VIDEO,MPEG12VIDEO)
+  MST(ADM_STREAM_MPEG_AUDIO,MPEG12AUDIO)
+  MST(ADM_STREAM_AC3,AC3)
+  MST(ADM_STREAM_DTS,DTS)
+  MST(ADM_STREAM_H264,H264)
+  MST(ADM_STREAM_MPEG4,MPEG4)
+  MST(ADM_STREAM_AAC,AAC)
+    
+  }
+  return "???";
+  
+}
 /****EOF**/

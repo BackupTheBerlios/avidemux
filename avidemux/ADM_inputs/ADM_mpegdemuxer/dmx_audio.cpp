@@ -41,8 +41,9 @@
 #include "ADM_audio/ADM_mp3info.h"
 #include "ADM_audio/ADM_a52info.h"
 #include "ADM_audio/ADM_dcainfo.h"
+#include "ADM_audio/ADM_aacinfo.h"
 #define MAX_LINE 4096
-#define PROBE_SIZE (4096*2)
+#define PROBE_SIZE (4096*4)
 
 //___________________________________________________
 //___________________________________________________
@@ -468,6 +469,35 @@ WAVHeader *hdr;
                 hdr->frequency=48000;                                
                 hdr->encoding=WAV_LPCM;
                 hdr->channels=2;
+                continue;
+        }
+         //AAC, can happen in TS file with H264
+        if(myPes>=0xB0 && myPes<0xB9)
+        {
+          AacAudioInfo info;
+          if(!getAACFrameInfo(buffer,blocksize, &info,NULL,&offset))
+          {
+            printf("\n Cannot get AAC sync info (not ADTS ?)\n");
+                hdr->byterate=(128000)>>3;
+                hdr->frequency=44100;
+                hdr->encoding=WAV_AAC;
+                hdr->channels=2;
+                continue;
+          }
+          /*
+          uint32_t layer;		// 0 mpeg4, 1 mpeg2 
+	uint32_t profile;	// 0 Main/1 LC
+	uint32_t samplerate;	// i.e. Frequency
+	uint32_t channels;	// # channels
+	uint32_t nbBlock;	// Packet size including header
+	uint32_t size;		// size of complete frame
+	uint32_t samples;	// # of sample in this packet
+          */
+              
+                hdr->byterate=(128000)>>3;
+                hdr->frequency=info.samplerate;                                
+                hdr->encoding=WAV_AAC;
+                hdr->channels=info.channels;
                 continue;
         }
   }
