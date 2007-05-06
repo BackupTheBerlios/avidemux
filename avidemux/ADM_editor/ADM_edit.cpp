@@ -41,7 +41,8 @@
 #include "ADM_inpics/ADM_pics.h"
 #include "ADM_nuv/ADM_nuv.h"
 #include "ADM_h263/ADM_h263.h"
-#include "ADM_3gp/ADM_3gp.h"
+//#include "ADM_3gp/ADM_3gp.h"
+#include "ADM_mp4/ADM_mp4.h"
 #include "ADM_openDML/ADM_openDML.h"
 #include "ADM_avsproxy/ADM_avsproxy.h"
 #include "ADM_toolkit/toolkit.hxx"
@@ -327,7 +328,7 @@ UNUSED_ARG(mode);
       OPEN_AS (BMP_FileType, picHeader);
       OPEN_AS (Matroska_FileType, mkvHeader);
       OPEN_AS (AvsProxy_FileType, avsHeader);
-      OPEN_AS (_3GPP_FileType, _3GPHeader);
+      OPEN_AS (_3GPP_FileType, MP4Header);
        OPEN_AS (Ogg_FileType, oggHeader);
 
     case Mpeg_FileType:
