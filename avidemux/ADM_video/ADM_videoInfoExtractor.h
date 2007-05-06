@@ -23,3 +23,4 @@ uint8_t extractH264FrameType(uint32_t nalSize,uint8_t *buffer,uint32_t len,uint3
 uint8_t extractH264FrameType_startCode(uint32_t nalSize,uint8_t *buffer,uint32_t len,uint32_t *flags);
 
 #endif
+//EOF
