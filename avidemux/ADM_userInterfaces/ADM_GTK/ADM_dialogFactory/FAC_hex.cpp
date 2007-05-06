@@ -67,7 +67,9 @@ diaElemHex::~diaElemHex()
 }
 void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
 {
-  GtkWidget *hexTable,*buttonP,*buttonN;
+  GtkWidget *hexTable;
+  GtkWidget *buttonP, *alignment1, *hbox1, *image1, *label1;
+  GtkWidget *buttonN, *alignment2, *hbox2, *image2, *label2;
   uint8_t *tail=data+dataSize;
   
   hexTable=gtk_table_new(1,HEX_NB_LINE,0);
@@ -93,22 +95,60 @@ void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line)
   }
   myWidget=(void *)s;
   //*************************
-  buttonP = gtk_button_new_from_stock ("gtk-previous");
+
+  buttonP = gtk_button_new ();
   gtk_widget_show (buttonP);
+  gtk_box_pack_start (GTK_BOX (hbox1), buttonP, FALSE, FALSE, 0);
+  GTK_WIDGET_SET_FLAGS (buttonP, GTK_CAN_DEFAULT);
+
+  alignment1 = gtk_alignment_new (0.5, 0.5, 0, 0);
+  gtk_widget_show (alignment1);
+  gtk_container_add (GTK_CONTAINER (buttonP), alignment1);
+
+  hbox1 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox1);
+  gtk_container_add (GTK_CONTAINER (alignment1), hbox1);
+
+  image1 = gtk_image_new_from_stock ("gtk-go-back", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image1);
+  gtk_box_pack_start (GTK_BOX (hbox1), image1, FALSE, FALSE, 0);
+
+  label1 = gtk_label_new_with_mnemonic (_("_Previous"));
+  gtk_widget_show (label1);
+  gtk_box_pack_start (GTK_BOX (hbox1), label1, FALSE, FALSE, 0);
+
   gtk_table_attach (GTK_TABLE (opaque), buttonP, 0, 1, line+1, line+2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   g_signal_connect(GTK_OBJECT(buttonP), "clicked",
-                    GTK_SIGNAL_FUNC(prev),  s);
-  
-  buttonN = gtk_button_new_from_stock ("gtk-next");
+                    GTK_SIGNAL_FUNC(prev), s);
+
+  buttonN = gtk_button_new ();
   gtk_widget_show (buttonN);
+  gtk_box_pack_start (GTK_BOX (hbox2), buttonN, FALSE, FALSE, 0);
+  GTK_WIDGET_SET_FLAGS (buttonN, GTK_CAN_DEFAULT);
+
+  alignment2 = gtk_alignment_new (0.5, 0.5, 0, 0);
+  gtk_widget_show (alignment2);
+  gtk_container_add (GTK_CONTAINER (buttonN), alignment2);
+
+  hbox2 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox2);
+  gtk_container_add (GTK_CONTAINER (alignment2), hbox2);
+
+  image2 = gtk_image_new_from_stock ("gtk-go-forward", GTK_ICON_SIZE_BUTTON);
+  gtk_widget_show (image2);
+  gtk_box_pack_start (GTK_BOX (hbox2), image2, FALSE, FALSE, 0);
+
+  label2 = gtk_label_new_with_mnemonic (_("_Next"));
+  gtk_widget_show (label2);
+  gtk_box_pack_start (GTK_BOX (hbox2), label2, FALSE, FALSE, 0);
+
   gtk_table_attach (GTK_TABLE (opaque), buttonN, 0, 1, line+2, line+3,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   g_signal_connect(GTK_OBJECT(buttonN), "clicked",
                     GTK_SIGNAL_FUNC(next),  s);
-  
   
   updateMe(s);
 }
@@ -142,17 +182,16 @@ void updateMe(hexStruct *s)
        if(cur<tail)
        {
           sprintf(ptr,"%02X ",*cur++);
-          ptr+=3;
-       }else 
-       {
-          *ptr++='X';
-          *ptr++='X';
-          *ptr++=' ';
        }
+	   else
+       {
+		  sprintf(ptr,"XX ");
+       }
+
+	   ptr+=3;
      }
-     ptr[2999]=0;
-     gtk_label_set_text(GTK_LABEL(s->entry[i]),string);
-     
+
+     gtk_label_set_text(GTK_LABEL(s->entry[i]),string);     
   }
 }
 void diaElemHex::getMe(void)

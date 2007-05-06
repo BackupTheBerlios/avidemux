@@ -2438,9 +2438,8 @@ void GUI_avsProxy(void)
 
 void GUI_showCurrentFrameHex(void)
 {
-#define DISPLAY_HEX 32*3
  uint8_t *buffer;
- uint32_t len,fullLen,flags;
+ uint32_t fullLen,flags;
  char sType[5];
  char sSize[15];
  
@@ -2460,7 +2459,7 @@ void GUI_showCurrentFrameHex(void)
  diaElemReadOnlyText Type(sType,_("Frame Type:"));
  diaElemReadOnlyText Size(sSize,_("Frame Size:"));
  diaElem *elems[]={&Type,&Size,&binhex   };
- if(diaFactoryRun(_("Frame HexDump"),3,elems))
+ if(diaFactoryRun(_("Frame Hex Dump"),3,elems))
  
  delete [] buffer;
 }
