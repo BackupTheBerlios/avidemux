@@ -107,7 +107,7 @@ ADM_filter/filter_saveload.o 				\
 ./ADM_encoder/libADM_encoder.a				\
 ./ADM_codecs/libADM_codecs.a				\
 ./ADM_requant/libADM_requant.a				\
-./ADM_inputs/ADM_3gp/libADM_3gp.a			\
+./ADM_inputs/ADM_mp4/libADM_mp4.a			\
 ./ADM_inputs/ADM_asf/libADM_asf.a			\
 ./ADM_inputs/ADM_h263/libADM_h263.a			\
 ./ADM_inputs/ADM_inpics/libADM_inpics.a			\
