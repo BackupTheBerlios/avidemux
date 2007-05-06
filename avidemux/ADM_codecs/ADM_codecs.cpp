@@ -245,7 +245,11 @@ getDecoder (uint32_t fcc, uint32_t w, uint32_t h, uint32_t extraLen,
       return (decoders *) (new decoderPng (w, h));
     }
 #endif
+ if (fourCC::check (fcc, (uint8_t *) "cvid"))
+    {
 
+      return (decoders *) (new decoderFFCinepak (w, h, extraLen, extraData));
+    }
   if (fourCC::check (fcc, (uint8_t *) "FFVH"))
     {
 

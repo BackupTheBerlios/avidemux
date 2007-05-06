@@ -606,11 +606,17 @@ decoderSnow::decoderSnow (uint32_t w, uint32_t h):decoderFF (w, h)
 {
   WRAP_Open (CODEC_ID_SNOW);
 }
+//*************
 decoderCamtasia::decoderCamtasia (uint32_t w, uint32_t h, uint32_t bpp):decoderFF (w,
 	   h)
 {
   _context->bits_per_sample = bpp;
   WRAP_Open (CODEC_ID_TSCC);
+}
+//*************
+decoderFFCinepak::decoderFFCinepak (uint32_t w, uint32_t h, uint32_t l, uint8_t * d):decoderFF (w,	   h)
+{
+  WRAP_Open (CODEC_ID_CINEPAK);
 }
 
 

@@ -67,7 +67,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER(AVS, avs);
     REGISTER_DECODER(BMP, bmp);
     REGISTER_DECODER(CAVS, cavs);
-    REGISTER_DECODER(CINEPAK, cinepak);
+    
     REGISTER_DECODER(CLJR, cljr);
     REGISTER_DECODER(CSCD, cscd);
     REGISTER_DECODER(CYUV, cyuv);
@@ -116,6 +116,7 @@ void avcodec_register_all(void)
 #endif
 
 #endif
+    REGISTER_DECODER(CINEPAK, cinepak);
     REGISTER_ENCDEC (DVVIDEO, dvvideo);
     
     REGISTER_ENCDEC (FFV1, ffv1);
