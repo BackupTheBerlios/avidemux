@@ -65,7 +65,7 @@ MP4Audio::MP4Audio(FILE *fd,MP4Track *track)
 		{
 			_length+=track->index[i].size;
 		}
-	printf("\n 3gp audio : %lu bytes (%lu chunks)\n",_length,_nb_chunks);
+	printf("\n [MP4 audio] : %lu bytes (%lu chunks)\n",_length,_nb_chunks);
 
 	printf("Byterate     :%d\n",_wavheader->byterate);
 	printf("Frequency :%d\n",_wavheader->frequency);
@@ -116,13 +116,20 @@ uint8_t MP4Audio::getPacket(uint8_t *dest, uint32_t *len, uint32_t *samples)
 
 uint32_t r=0;
 double delta;
-	if(_current_index>=_nb_chunks)  return 0;
-	
+	if(_current_index>=_nb_chunks)  
+        {
+              printf("MP4Audio : index max :%u/%u\n",_current_index,_nb_chunks);
+              return 0;
+        }
 	  fseeko(_fd,_index[_current_index].offset,SEEK_SET);
 	  r=fread(dest,1,_index[_current_index].size,_fd);
           if(!r)
           {
             printf("[MP4 Audio] Cannot read \n"); 
+          }
+          else
+          {
+            
           }
 	  if(_current_index==_nb_chunks-1)
 	  {
@@ -139,7 +146,7 @@ double delta;
                         delta/=1000.; // mss -> second
                         *samples=(uint32_t)floor(delta);
                 }else *samples=1024;
-                printf("3gp: Last sample %d current chunk %d nb chunk %d\n",
+                printf("[MP4Audio]: Last sample %d current chunk %d nb chunk %d\n",
                                 *samples,_current_index,_nb_chunks);
                 
 	  }
@@ -154,6 +161,10 @@ double delta;
 		*samples=(uint32_t)floor(delta);
 	  
 	  }
+#if 0
+          printf("[MP4Audio]Read %u bytes\n", r);
+            printf("MP4Audio : index  :%u/%u sample : %u\n",_current_index,_nb_chunks,*samples);
+#endif
 	  _current_index++;
 	  *len=r;
 	  

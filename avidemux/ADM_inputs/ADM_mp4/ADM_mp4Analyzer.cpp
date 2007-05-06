@@ -225,7 +225,7 @@ uint8_t MP4Header::parseMdia(void *ztom,uint32_t *trackType,uint32_t w, uint32_t
                 duration=(uint32_t)((duration*1000.)/trackScale);
                 adm_printf(ADM_PRINT_DEBUG,"MDHD,duration in mdhd:%u (scaled ms)\n",duration);
                 trackDuration=duration;
-                printf("MDHD,Track duration :%s, trackScale :%u\n",ms2timedisplay(duration),trackScale);
+                printf("MDHD,Track duration :%s, trackScale :%u\n",ms2timedisplay((1000*duration)/trackScale),trackScale);
                 break;
        }
        case ADM_MP4_HDLR:  
