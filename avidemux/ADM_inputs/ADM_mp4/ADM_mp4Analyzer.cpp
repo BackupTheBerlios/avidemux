@@ -448,6 +448,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
           }
 
        }
+       break;
        case ADM_MP4_STCO64:
        {
          printf("Incomplete support for 64 bits quicktime!!\n");
