@@ -147,7 +147,7 @@ int ret=0;
 }
 
 //_____________________________________________
-//  Need to multiply the float by 65535, can't use
+//  Need to multiply the float by 32767, can't use
 //  generic fill buffer
 //----------------------------------------------
 uint8_t AUDMEncoder_Faac::refillBuffer(int minimum)
@@ -186,7 +186,7 @@ uint8_t AUDMEncoder_Faac::refillBuffer(int minimum)
       float *s=&(tmpbuffer[tmptail]);
       for(int i=0;i<nb;i++)
       {
-        *s=*s*65535.;
+        *s=*s*32767.;
         s++;
       }
       tmptail+=nb;
