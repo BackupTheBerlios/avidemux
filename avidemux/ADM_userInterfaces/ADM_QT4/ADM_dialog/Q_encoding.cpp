@@ -43,8 +43,36 @@ class encodingWindow : public QDialog
 
 	void priorityChanged(int priorityLevel)
 	{
+	#ifndef CYG_MANGLING
+		if (getuid() != 0)
+		{
+			ui.comboBoxPriority->disconnect(SIGNAL(currentIndexChanged(int)));
+			ui.comboBoxPriority->setCurrentIndex(2);
+			connect(ui.checkBoxShutdown, SIGNAL(currentIndexChanged(int)), this, SLOT(priorityChanged(int)));
+
+			GUI_Error_HIG(_("Privileges Required"), _( "Root privileges are required to perform this operation."));
+
+			return;
+		}
+	#endif
+
 		setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
 	}
+
+	void shutdownChanged(int state)
+	{
+	#ifndef CYG_MANGLING
+		if (getuid() != 0)
+		{
+			ui.checkBoxShutdown->disconnect(SIGNAL(stateChanged(int)));
+			ui.checkBoxShutdown->setCheckState(Qt::Unchecked);
+			connect(ui.checkBoxShutdown, SIGNAL(stateChanged(int)), this, SLOT(shutdownChanged(int)));
+
+			GUI_Error_HIG(_("Privileges Required"), _( "Root privileges are required to perform this operation."));
+		}
+	#endif
+	}
+
 
  private slots:
  private:
@@ -55,13 +83,33 @@ encodingWindow::encodingWindow()     : QDialog()
  {
 	ui.setupUi(this);
 
+#ifndef CYG_MANGLING
+	//check for root privileges
+	if (getuid() == 0)
+	{
+		// set priority to normal, regardless of preferences
+		ui.comboBoxPriority->setCurrentIndex(2);
+	}
+#endif
+
+	connect(ui.checkBoxShutdown, SIGNAL(stateChanged(int)), this, SLOT(shutdownChanged(int)));
 	connect( (ui.pushButton),SIGNAL(pressed()),this,SLOT(buttonPressed()));
 	connect(ui.comboBoxPriority, SIGNAL(currentIndexChanged(int)), this, SLOT(priorityChanged(int)));
 
+	// set priority
 	uint32_t priority;
 
-	prefs->get(PRIORITY_ENCODING,&priority);
+	prefs->get(PRIORITY_ENCODING,&priority);	
+
+#ifndef CYG_MANGLING
+	// check for root privileges
+	if (getuid() == 0)
+	{
+		ui.comboBoxPriority->setCurrentIndex(priority);
+	}
+#else
 	ui.comboBoxPriority->setCurrentIndex(priority);
+#endif
  }
 //*******************************************
 #define WIDGET(x) (window->ui.x)
@@ -117,8 +165,39 @@ void DIA_stop( void)
 }
 DIA_encoding::~DIA_encoding( )
 {
-  if(window) delete window;
-  window=NULL;
+	bool shutdownRequired = (window->ui.checkBoxShutdown->checkState() == Qt::Checked);
+
+	setpriority(PRIO_PROCESS, 0, _originalPriority);
+
+	if(window) delete window;
+	window=NULL;
+
+	if (shutdownRequired && !stopReq)
+	{
+		DIA_working *work=new DIA_working(_("Shutting down"));
+		bool performShutdown=true;
+
+		for(int i = 0; i <= 30; i++)
+		{
+			if (work->isAlive())
+			{
+				GUI_Sleep(1000);
+				work->update(i, 30);
+			}
+			else
+			{
+				performShutdown=false;
+				break;
+			}
+		}
+
+		if (performShutdown && shutdown())
+		{
+			GUI_Sleep(5000);
+		}
+
+		delete work;
+	}
 }
 /**
     \fn setPhasis(const char *n)
@@ -391,9 +470,7 @@ uint8_t DIA_encoding::isAlive( void )
                  }
         }
 
-        if(!stopReq) return 1;
-
-		setpriority(PRIO_PROCESS, 0, _originalPriority);
+        if(!stopReq) return 1;		
 
         return 0;
 }

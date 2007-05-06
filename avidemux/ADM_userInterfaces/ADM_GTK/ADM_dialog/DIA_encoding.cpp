@@ -195,7 +195,7 @@ DIA_encoding::~DIA_encoding( )
 	dialog=NULL;
 	UI_deiconify();
 
-	if (shutdownRequired)
+	if (shutdownRequired && !stopReq)
 	{
 		DIA_working *work=new DIA_working(_("Shutting down"));
 		bool performShutdown=true;
