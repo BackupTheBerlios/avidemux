@@ -444,12 +444,12 @@ uint8_t		AVDMGenericAudioStream::getPacketAAC(uint8_t *dest, uint32_t *len,
 			{
 				// Error decoding mpeg
 				printf("AACInfo:** CANNOT FIND AAC/ADTS START CODE**\n");
-				packetHead+=8;
+				packetHead+=1;
 				return 0;
 			}
 			if(packetHead+startOffset+mpegInfo.size>packetTail)
 			{
-				printf("AAC packetizer: not enough data\n");
+				printf("AAC packetizer: not enough data (need %u, got %u)\n",mpegInfo.size,packetTail-packetHead-startOffset);
 				return 0;
 			}
 			memcpy(dest,&packetBuffer[packetHead+startOffset],

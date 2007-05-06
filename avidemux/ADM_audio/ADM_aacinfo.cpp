@@ -40,27 +40,38 @@ static 	uint32_t aacBitrate[16]=
 	0,     0,     0,     0 
 };
 /*
+[0]
 	12 bits 111111	0xFC Sync tag
-	1		1 Mpeg2 0 Mpeg4
+	
+	1		layer 1 Mpeg2 0 Mpeg4
 	2		00
 	1		prot : 1 absent 0 present
 	
-	
+[2]/16 bits	
 	2		profile  00 main/01 LC
 	4		sampling index
 	1		private
 	
-	3		channel
+	1		channel
+[3]/24 bits
+	2               channel (cont'ed)
+	
 	1		original
 	1		Home
-	
-	28 bits
+-------------------------------------	
+	Sum=28 bits
 	
 	
 	1		copyriht
 	1		copyright id 
-	13		*** AAC frame length (including headers)
-	11		Buffer fullness 0x7FF = vbr
+	2               *** AAC frame length (including headers)
+[4]
+        8		*** AAC frame length (including headers)
+[5]
+        3		*** AAC frame length (including headers)
+	5		Buffer fullness 0x7FF = vbr
+[6]
+	6		Buffer fullness 0x7FF = vbr
 	2		nb raw frame
 	
 	28 bits
@@ -73,9 +84,9 @@ static 	uint32_t aacBitrate[16]=
 
 uint8_t	getAACFrameInfo(uint8_t *stream,uint32_t maxSearch, AacAudioInfo *mpegInfo,AacAudioInfo *templ,uint32_t *offset)
 {
-uint32_t start=0,found=0;
+uint32_t start=0,found=0,part;
 uint8_t  a[8];
-uint32_t nfq,fqindex,brindex,index,nbframe;
+uint32_t nfq,fqindex,brindex,index,nbframe=0;
 			memset(mpegInfo,0,sizeof(*mpegInfo));
 			memcpy(a+1,stream,7);
 			do
@@ -88,17 +99,18 @@ uint32_t nfq,fqindex,brindex,index,nbframe;
 				if(a[0]==0xff && ((a[1]&0xF0)==0xF0))
 				{
 					// Layer
-					mpegInfo->layer=(a[1]>>3)&1;	
-					if((a[1]>>1) & 3) continue;
+                                        part=a[1]&0xf;
+					mpegInfo->layer=(part>>3);	
+					if(part & 0x6) continue;
 					
 					mpegInfo->profile=a[2]>>6;
 					mpegInfo->samplerate=aacBitrate[(a[2]>>2) & 0xF];
-					mpegInfo->channels=(a[3]>>5);
-					nbframe=(a[7]>>6)&3;
+					mpegInfo->channels=((a[2]&1)<<2)+(a[3]>>6);
+					nbframe=(a[6]>>6)&3;
 					nbframe++;
-					mpegInfo->size=((a[4]&3)<<11)
-							+((a[5])<<3)
-							+((a[6]>>5));
+					mpegInfo->size=((a[3]&3)<<11)
+							+((a[4])<<3)
+							+((a[5]>>5));
 						
 					if(!mpegInfo->samplerate) continue;
 					
@@ -111,7 +123,7 @@ uint32_t nfq,fqindex,brindex,index,nbframe;
 					return 0;
 				}
 			*offset=start-1;
-			printf("AAC Frame found at offset :%lu layer:%lu profile:%lu samperate:%lu channels:%lu size:%lu nbBlock:%lu\n",
+			printf("AAC Frame found at offset :%u layer:%u profile:%u samperate:%u channels:%u size:%u nbBlock:%u\n",
 					*offset,
 					mpegInfo->layer,
 					mpegInfo->profile, 
