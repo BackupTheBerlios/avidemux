@@ -30,7 +30,7 @@
 #include "faad.h"
 
 
-ADM_faad::ADM_faad( uint32_t fourcc ,WAVHeader *info,uint32_t l,uint8_t *d) :   ADM_Audiocodec(fourcc)
+ADM_faad::ADM_faad( uint32_t fourcc ,uint32_t highEfficiency,WAVHeader *info,uint32_t l,uint8_t *d) :   ADM_Audiocodec(fourcc)
 {
 faacDecConfigurationPtr conf;
 #ifdef OLD_FAAD_PROTO
@@ -47,7 +47,13 @@ unsigned char chan;
 		// Update the field we know about
 		conf->outputFormat=FAAD_FMT_16BIT;
 		conf->defSampleRate=info->frequency;
-		conf->defObjectType =LC;
+                if(!highEfficiency)
+                {
+		  conf->defObjectType =LC;
+                }else
+                {
+                   conf->defObjectType =HE_AAC;
+                }
 		faacDecSetConfiguration(_instance, conf);
 		// if we have some extra data, it means we can init it from it
 		if(l)
