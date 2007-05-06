@@ -35,7 +35,7 @@
 #define MODULE_NAME MODULE_3GP
 #include "ADM_osSupport/ADM_debug.h"
 
-
+uint32_t sample2byte(WAVHeader *hdr,uint32_t sample);
 
 #define MAX_CHUNK_SIZE (4*1024)
 /**
@@ -66,7 +66,9 @@ uint32_t i,j,cur;
         {
           ADM_assert(info->Sz);
         }
-	// first set size
+        //*********************************************************
+	// in that case they are all the same size, i.e.audio
+        //*********************************************************
 	if(info->SzIndentical && isAudio)// in that case they are all the same size, i.e.audio
 	{
           
@@ -77,20 +79,21 @@ uint32_t i,j,cur;
               // Each chunk contains N samples=N bytes
               int samplePerChunk[info->nbCo];
               memset(samplePerChunk,0,info->nbCo*sizeof(int));
+              int total=0;
               for( i=0;i<info->nbSc;i++)
               {
+
                   for(int j=info->Sc[i]-1;j<info->nbCo;j++)
                   {
+                    uint32_t mx;
                         adm_printf(ADM_PRINT_VERY_VERBOSE,"For chunk %lu , %lu samples\n",j,info->Sn[i]);
                         samplePerChunk[j]=info->Sn[i];
                   }
               }
-              int total=0;
-              for( i=0;i<info->nbCo;i++)
-              {
-                  adm_printf(ADM_PRINT_VERY_VERBOSE,"%u -> %u samples %u bytes\n",i,samplePerChunk[i],samplePerChunk[i]*info->SzIndentical);
-                  total+=samplePerChunk[i];
-              }
+              /**/
+              for(i=0;i<info->nbCo;i++)
+                total+=samplePerChunk[i];
+              
               printf("Total size in byte : %u\n",total*info->SzIndentical);
               track->index=new MP4Index[info->nbCo];
               memset(track->index,0,info->nbCo*sizeof(MP4Index));
@@ -100,9 +103,19 @@ uint32_t i,j,cur;
               for(i=0;i<info->nbCo;i++)
               {
                   uint32_t sz;
-
+#define PACK_SIZE info->bytePerFrame // perPacket ??
+                  
                   track->index[i].offset=info->Co[i];
-                  sz=samplePerChunk[i]*info->SzIndentical;
+                  sz=samplePerChunk[i];
+                  /* Sz is in sample, convert it to bytes */
+                  sz/=info->samplePerPacket;
+                  if(sz*info->samplePerPacket!=samplePerChunk[i])
+                  {
+                    printf("Warning sample per packet not divider of sample per chunk (per packet :%u , chunk :%u)\n",
+                              info->samplePerPacket, samplePerChunk[i]); 
+                  }
+                  sz*=PACK_SIZE;
+                  /* */
                   track->index[i].size=sz;
                   track->index[i].time=0; // No seek
                   if(sz>MAX_CHUNK_SIZE)
@@ -112,6 +125,7 @@ uint32_t i,j,cur;
                   
                   totalBytes+=track->index[i].size;
               }
+              printf("Found %u bytes\n",totalBytes);
               // Now time to update the time...
               // Normally they have all the same duration
               if(info->nbStts!=1) printf("WARNING: Same size, different duration\n");
@@ -173,6 +187,10 @@ uint32_t i,j,cur;
                     delete [] track->index;
                     track->index=newindex;
                     track->nbIndex=w;
+                    total=0;
+                    for(int i=0;i<track->nbIndex;i++)
+                        total+=track->index[i].size;
+                    printf("After split, we have %u bytes\n",total);
                 }
           printf("Index done\n");
           return 1;
@@ -307,5 +325,16 @@ uint32_t i,j,cur;
         printf("Index done\n");
 	return 1;
 }
-
+/**
+      \fn sample2byte
+      \brief Convert the # of samples into the # of bytes needed
+*/
+uint32_t sample2byte(WAVHeader *hdr,uint32_t sample)
+{
+  float f;
+        f=hdr->frequency; // 1 sec worth of data
+        f=sample/f;       // in seconds
+        f*=hdr->byterate; // in byte
+    return (uint32_t)floor(f);
+}
 // EOF

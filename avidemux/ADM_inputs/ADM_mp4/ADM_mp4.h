@@ -47,6 +47,10 @@ class MPsampleinfo
       uint32_t *Sync; 
       uint32_t *Ctts;
   
+      uint32_t samplePerPacket;
+      uint32_t bytePerPacket;
+      uint32_t bytePerFrame;
+      
       MPsampleinfo(void);
       ~MPsampleinfo(void);
 };

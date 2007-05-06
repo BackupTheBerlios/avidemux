@@ -673,25 +673,35 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                 left-=2;
                                 printf("[STSD]Packet size    :%d\n",encoding);
                                 
-                                printf("[STSD]Left           :%d\n",left);
-                                if(atomVersion<2)
-                                {
-                                        fq=ADIO.frequency=son.read16();
-                                        printf("Fq:%u\n",fq);
-                                        if(ADIO.frequency<6000) ADIO.frequency=48000;
-                                        printf("[STSD]Fq       :%d\n",ADIO.frequency); // Bps
+                              
+                                fq=ADIO.frequency=son.read16();
+                                printf("[STSD]Fq:%u\n",fq);
+                                if(ADIO.frequency<6000) ADIO.frequency=48000;
+                                printf("[STSD]Fq       :%d\n",ADIO.frequency); // Bps
                                         son.skipBytes(2); // Fixed point
-                                        left-=4;
+                                left-=4;
+                                if(atomVersion)
+                                {
+                                    info.samplePerPacket=son.read32();
+                                    info.bytePerPacket=son.read32();
+                                    info.bytePerFrame=son.read32();
+                                    printf("[STSD] Sample per packet %u\n",info.samplePerPacket);
+                                    printf("[STSD] Bytes per packet  %u\n",info.bytePerPacket);
+                                    printf("[STSD] Bytes per frame   %u\n",info.bytePerFrame);
+                                    printf("[STSD] Bytes per sample   %u\n",son.read32());
+                                    left-=16;
+                                }else
+                                {
+                                  info.samplePerPacket=1;
+                                  info.bytePerPacket=1;
+                                  info.bytePerFrame=1;
                                 }
                                 switch(atomVersion)
                                 {
                                   case 0:break;
-                                  case 1:son.skipBytes(16);  // sample per frame etc..
-                                          left-=16;
-                                          break;
+                                  case 1: break;
                                   case 2:
                                           ADIO.frequency=44100; // FIXME
-                                          son.skipBytes(16);
                                           ADIO.channels=son.read32();
                                           printf("Channels            :%d\n",ADIO.channels); // Channels
                                           printf("Tak(7F000)          :%x\n",son.read32()); // Channels
@@ -881,6 +891,7 @@ foundit: // HACK FIXME
                 else
                     _tracks[1+nbAudioTrack].nbIndex=info.nbSz;
                 printf("Indexed audio, nb blocks:%u (final)\n",_tracks[1+nbAudioTrack].nbIndex);
+                _tracks[1+nbAudioTrack].scale=trackScale;
                 nbAudioTrack++;
             }
             
