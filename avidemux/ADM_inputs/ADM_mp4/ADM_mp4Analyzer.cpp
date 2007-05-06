@@ -448,6 +448,21 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
           }
 
        }
+       case ADM_MP4_STCO64:
+       {
+         printf("Incomplete support for 64 bits quicktime!!\n");
+          son.read32();
+          info.nbCo=son.read32();
+          printf("\t\tnbCo:%u\n",info.nbCo);
+          info.Co=new uint32_t[info.nbCo];
+          for(int j=0;j< info.nbCo;j++)
+          {
+                  son.read32(); // Ignore MSB
+                  info.Co[j]=son.read32();
+                  adm_printf(ADM_PRINT_VERY_VERBOSE,"Chunk offset : %lu / %lu  : %lu\n",  j,info.nbCo,info.Co[j]);
+          }
+
+       }
        break;
        case ADM_MP4_STSD:
        {
@@ -464,6 +479,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                    {
                     son.skipBytes(left); 
                     printf("[STSD] ignoring %s, size %u\n",fourCC::tostringBE(entryName),entrySize);
+                    if(trackType==TRACK_OTHER) printf("[STSD] because track=other\n");
                     continue;
                    }
                    switch(trackType)
@@ -554,8 +570,12 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                             left=0;
                                   }
                                             break;
-                                  case MKFCCR('d','v','c','p'): //'dv':
+                                  case MKFCCR('d','v','c',' ') : //'dvc ':
+                                  case MKFCCR('d','v','c','p'): //'dvcp':
                                           commonPart(DVDS);
+                                          break;
+                                  case MKFCCR('c','v','i','d'): //'cvid'
+                                          commonPart(cvid);
                                           break;
                                   case MKFCCR('h','2','6','3'): //'dv':
                                           commonPart(H263);
@@ -624,7 +644,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                 ADIO.channels=2;
                                 ADIO.bitspersample=16;
                         
-                                printf("[STSD] AUDIO %s, size %u\n",fourCC::tostringBE(entryName),entrySize);
+                                printf("[STSD] AUDIO <%s>, 0x%08x, size %u\n",fourCC::tostringBE(entryName),entryName,entrySize);
                                 son.skipBytes(8);  // reserved etc..
                                 left-=8;
                                 
@@ -706,6 +726,8 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                             audioCodec(8BITS_UNSIGNED);
                                             ADIO.byterate=ADIO.frequency*ADIO.channels;
                                             break;
+                                    
+                                    case MKFCCR('m','s',0,0x55): // why 55 ???
                                     case MKFCCR('m','p','4','a'):
                                     {
                                             audioCodec(AAC);
@@ -723,7 +745,8 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                                  while(!wave.isDone())
                                                  {
                                                      adm_atom item(&wave);
-                                                     printf("parsing wave, got %s\n",fourCC::tostringBE(item.getFCC()));
+                                                     printf("parsing wave, got %s,0x%x\n",fourCC::tostringBE(item.getFCC()),
+                                                                  item.getFCC());
                                                      switch(item.getFCC())
                                                      {
                                                        case MKFCCR('f','r','m','a'):
@@ -731,7 +754,21 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                                           uint32_t codecid=item.read32();
                                                           printf("frma Codec Id :%s\n",fourCC::tostringBE(codecid));
                                                           }
-                                                          break; 
+                                                          break;
+                                                       case MKFCCR('m','s',0,0x55):
+                                                        {
+                                                          // We have a waveformat here
+                                                          printf("[STSD]Found MS audio header:\n");
+                                                          ADIO.encoding=ADM_swap16(item.read16());
+                                                          ADIO.channels=ADM_swap16(item.read16());
+                                                          ADIO.frequency=ADM_swap32(item.read32());
+                                                          ADIO.byterate=ADM_swap32(item.read32());
+                                                          ADIO.blockalign=ADM_swap16(item.read16());
+                                                          ADIO.bitspersample=ADM_swap16(item.read16());
+                                                          printWavHeader(&(ADIO));
+                                                          
+                                                        }
+                                                       break;
                                                         case MKFCCR('m','p','4','a'):
                                                           break; 
                                                         case MKFCCR('e','s','d','s'):

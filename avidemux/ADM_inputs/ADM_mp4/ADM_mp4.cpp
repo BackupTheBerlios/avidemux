@@ -224,6 +224,31 @@ uint8_t    MP4Header::open(char *name)
         _mainaviheader.dwMicroSecPerFrame=100000;;     // 10 fps hard coded
         
         adm_atom *atom=new adm_atom(_fd);
+        // Some mp4/mov files have the data at the end but do start properly
+        // detect and workaround...
+        // Check it is not mdat start(ADM_memcpy_0)     
+        uint8_t check[4];
+        fseeko(_fd,4,SEEK_SET);
+        fread(check,4,1,_fd);
+        fseeko(_fd,0,SEEK_SET);
+        if(check[0]=='m' && check[1]=='d' &&check[2]=='a' && check[3]=='t')
+        {
+                        uint32_t of;
+                                        printf("Data first, header later...\n");
+                                        of=atom->read32();
+                                        if(of==1)
+                                        {
+                                          atom->read32();
+                                          atom->read32();
+                                          of=atom->read32();
+                                        }
+                                        fseeko(_fd,of,SEEK_SET);        
+                                        printf("Header starts at %x\n",of);
+                                        delete atom;
+                                        atom=new adm_atom(_fd);
+        }
+        //**************
+        
         if(!lookupMainAtoms((void*) atom))
         {
           printf("Cannot find needed atom\n");
