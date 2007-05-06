@@ -179,7 +179,7 @@ class ADM_faad : public     ADM_Audiocodec
 		uint32_t _inbuffer;	
 
 	public:
-		ADM_faad(uint32_t fourcc, WAVHeader *info, uint32_t l, uint8_t *d);
+		ADM_faad(uint32_t fourcc, uint32_t highEfficiency,WAVHeader *info, uint32_t l, uint8_t *d);
 		virtual	~ADM_faad();
 		virtual	void purge(void);
 		virtual	uint8_t run(uint8_t *inptr, uint32_t nbIn, float *outptr, uint32_t *nbOut);
