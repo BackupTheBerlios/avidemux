@@ -375,7 +375,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                         info.Sc[j]=son.read32();
                         info.Sn[j]=son.read32();
                         son.read32();
-                        adm_printf(ADM_PRINT_VERY_VERBOSE,"\t sc  %d : sc start:%lu sc count: %lu\n",j,info.Sc[j],info.Sn[j]);
+                        adm_printf(ADM_PRINT_VERY_VERBOSE,"\t sc  %d : sc start:%u sc count: %u\n",j,info.Sc[j],info.Sn[j]);
                 }
 
             }
@@ -444,7 +444,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
           for(int j=0;j< info.nbCo;j++)
           {
                   info.Co[j]=son.read32();
-                  adm_printf(ADM_PRINT_VERY_VERBOSE,"Chunk offset : %lu / %lu  : %lu\n",  j,info.nbCo,info.Co[j]);
+                  adm_printf(ADM_PRINT_VERY_VERBOSE,"Chunk offset : %u / %u  : %u\n",  j,info.nbCo,info.Co[j]);
           }
 
        }
@@ -460,7 +460,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
           {
                   son.read32(); // Ignore MSB
                   info.Co[j]=son.read32();
-                  adm_printf(ADM_PRINT_VERY_VERBOSE,"Chunk offset : %lu / %lu  : %lu\n",  j,info.nbCo,info.Co[j]);
+                  adm_printf(ADM_PRINT_VERY_VERBOSE,"Chunk offset : %u / %u  : %lu\n",  j,info.nbCo,info.Co[j]);
           }
 
        }
@@ -786,7 +786,15 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                                    
                                                  }  // Wave iddone
                                               }  // if ==wave
-                                              
+                                              else
+                                              {
+                                                if(wave.getFCC()==MKFCCR('e','s','d','s'))
+                                                          {
+                                                               decodeEsds(&wave,TRACK_AUDIO);
+                                                               goto foundit; // FIXME!!!
+                                                          } 
+                                                
+                                              }
                                             } // if left > 10
 foundit: // HACK FIXME     
                                             left=0;
@@ -893,7 +901,7 @@ adm_atom *tom=(adm_atom *)ztom;
 int tag,l;
             // in case of mpeg4 we only take
             // the mpeg4 vol header
-            printf("Esds atom found\n");
+            printf("[MP4]Esds atom found\n");
 
             tom->skipBytes(4);
             tag=0xff;

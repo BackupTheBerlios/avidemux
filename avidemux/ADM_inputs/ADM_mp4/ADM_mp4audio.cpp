@@ -120,6 +120,10 @@ double delta;
 	
 	  fseeko(_fd,_index[_current_index].offset,SEEK_SET);
 	  r=fread(dest,1,_index[_current_index].size,_fd);
+          if(!r)
+          {
+            printf("[MP4 Audio] Cannot read \n"); 
+          }
 	  if(_current_index==_nb_chunks-1)
 	  {
 	  	

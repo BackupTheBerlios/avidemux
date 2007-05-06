@@ -37,7 +37,7 @@
 
 
 
-#define MAX_CHUNK_SIZE (3*1024)
+#define MAX_CHUNK_SIZE (4*1024)
 /**
         \fn indexify
         \brief build the index from the stxx atoms
@@ -130,14 +130,15 @@ uint32_t i,j,cur;
                 if(max && isAudio) // We have some big chunks we need to split them
                 {
                       // rebuild a new index
-                      printf("We have %u chunks that are too big, adjusting..\n",max);
+                      printf("We have %u chunks but it should be split into \n",info->nbCo);
+                      printf("around %u chunks. adjusting..(SzIdentical %u)\n",info->nbCo+max,info->SzIndentical);
                       uint32_t newNbCo=track->nbIndex+max*2; // *2 is enough, should be.
                       uint32_t w=0;
                       uint32_t one_go;
 
                         one_go=MAX_CHUNK_SIZE/info->SzIndentical;
                         one_go=one_go*info->SzIndentical;
-
+                        printf("One go :%u\n",one_go);
                      MP4Index *newindex=new MP4Index[newNbCo];
 
                     int64_t time_increment=(int64_t)((one_go/info->SzIndentical)*sampleDuration);  // Nb sample*duration of one sample
@@ -187,7 +188,7 @@ uint32_t i,j,cur;
 
         if(info->SzIndentical) // Video, all same size (DV ?)
         {
-            adm_printf(ADM_PRINT_VERY_VERBOSE,"\t size for all %lu frames : %lu\n",info->nbSz,info->SzIndentical);
+            adm_printf(ADM_PRINT_VERY_VERBOSE,"\t size for all %u frames : %u\n",info->nbSz,info->SzIndentical);
             for(i=0;i<info->nbSz;i++)
             {
                     track->index[i].size=info->SzIndentical;
@@ -199,7 +200,7 @@ uint32_t i,j,cur;
             for(i=0;i<info->nbSz;i++)
             {
                     track->index[i].size=info->Sz[i];
-                    adm_printf(ADM_PRINT_VERY_VERBOSE,"\t size : %d : %lu\n",i,info->Sz[i]);
+                    adm_printf(ADM_PRINT_VERY_VERBOSE,"\t size : %d : %u\n",i,info->Sz[i]);
             }
           }
 	// if no sample to chunk we map directly
