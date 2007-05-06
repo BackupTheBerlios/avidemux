@@ -30,6 +30,7 @@
 #include <gtk/gtk.h>
 
 #include "config.h"
+#include "prefs.h"
 
 #include "fourcc.h"
 #include "avi_vars.h"
@@ -49,6 +50,7 @@
 #include "gtkgui.h"
 #include "GUI_render.h"
 #include "ADM_audiofilter/audioeng_buildfilters.h"
+#include "ADM_libraries/ADM_utilities/avidemutils.h"
 
 //___________________________________
 #define AUDIO_PRELOAD 150
@@ -104,6 +106,13 @@ void GUI_PlayAvi(void)
         stop_req = 1;
         return;
       }
+
+	uint32_t priorityLevel;
+
+	originalPriority = getpriority(PRIO_PROCESS, 0);
+	prefs->get(PRIORITY_PLAYBACK,&priorityLevel);
+	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
+
   uint32_t played_frame=0;
   uint32_t remaining=avifileinfo->nb_frames-curframe;
 
@@ -232,6 +241,8 @@ abort_play:
       }
 #endif
     // done.
+
+	setpriority(PRIO_PROCESS, 0, originalPriority);
 };
 
 // return time in ms

@@ -92,5 +92,6 @@ filters.autoload.path,                  STRING, "/tmp/"
 filters.autoload.active,                UINT,   0,      0,      1
 feature.alternate_mp3_tag,              UINT,   1,      0,      1
 # priority
-priority.encoding,          UINT,   2,      0,      4
-priority.indexing,          UINT,   2,      0,      4
+priority.encoding,          UINT,   3,      0,      4
+priority.indexing,          UINT,   3,      0,      4
+priority.playback,          UINT,   0,      0,      4

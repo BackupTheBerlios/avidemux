@@ -63,6 +63,7 @@ uint32_t useNuv=0;
 uint32_t mthreads=0;
 uint32_t encodePriority=2;
 uint32_t indexPriority=2;
+uint32_t playbackPriority=0;
 uint32_t downmix;
 uint32_t mpeg_no_limit=0;
 uint32_t msglevel=2;
@@ -110,6 +111,7 @@ uint32_t hzd,vzd,dring;
                 useTray=0;
         // Accept mpeg for DVD when fq!=48 kHz
         if(!prefs->get(FEATURE_MPEG_NO_LIMIT,&mpeg_no_limit)) mpeg_no_limit=0;
+
         // Multithreads
         if(!prefs->get(FEATURE_MULTI_THREAD, &mthreads))
                 mthreads=0;
@@ -119,6 +121,9 @@ uint32_t hzd,vzd,dring;
 		// Indexing / unpacking priority
 		if(!prefs->get(PRIORITY_INDEXING, &indexPriority))
                 indexPriority=2;
+		// Playback priority
+		if(!prefs->get(PRIORITY_PLAYBACK, &playbackPriority))
+                playbackPriority=0;
 
         // VCD/SVCD split point		
         if(!prefs->get(SETTINGS_MPEGSPLIT, &autosplit))
@@ -176,8 +181,9 @@ uint32_t hzd,vzd,dring;
 							 ,{3,      _("Below Normal"),NULL}
 							 ,{4,      _("Low"),NULL}
         };
-		diaElemMenu menuEncodePriority(&encodePriority,_("Encoding priority"), sizeof(priorityEntries)/sizeof(diaMenuEntry),priorityEntries,"");
-		diaElemMenu menuIndexPriority(&indexPriority,_("Indexing / unpacking priority"), sizeof(priorityEntries)/sizeof(diaMenuEntry),priorityEntries,"");
+		diaElemMenu menuEncodePriority(&encodePriority,_("Encoding priority"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
+		diaElemMenu menuIndexPriority(&indexPriority,_("Indexing / unpacking priority"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
+		diaElemMenu menuPlaybackPriority(&playbackPriority,_("Playback priority"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
 
         diaElemUInteger autoSplit(&autosplit,_("Split mpegs every (MB)"),10,4096);
         
@@ -307,8 +313,8 @@ uint32_t hzd,vzd,dring;
         diaElemTabs tabVideo("Video",2,(diaElem **)diaVideo);
         
         /* Sixth Tab : mthread */
-        diaElem *diaCpu[]={&multiThread, &menuEncodePriority, &menuIndexPriority};
-        diaElemTabs tabCpu("CPU",3,(diaElem **)diaCpu);
+        diaElem *diaCpu[]={&multiThread, &menuEncodePriority, &menuIndexPriority, &menuPlaybackPriority};
+        diaElemTabs tabCpu("CPU",4,(diaElem **)diaCpu);
         
         /* seventh Tab : Xfilter */
         diaElem *diaXFilter[]={&loadEx,&entryFilterPath};
@@ -368,6 +374,8 @@ uint32_t hzd,vzd,dring;
 				prefs->set(PRIORITY_ENCODING, encodePriority);
 				// Indexing / unpacking priority
 				prefs->set(PRIORITY_INDEXING, indexPriority);
+				// Playback priority
+				prefs->set(PRIORITY_PLAYBACK, playbackPriority);
 
                 // Auto index mpeg
                 prefs->set(FEATURE_TRYAUTOIDX, useAutoIndex);

@@ -135,11 +135,12 @@ static opt_def opt_defs [] = {
 	{"filters.autoload.path",		STRING,"/tmp/",NULL, NULL, NULL },
 	{"filters.autoload.active",		UINT,	"0",	NULL,	"0",	"1"	},
 	{"feature.alternate_mp3_tag",		UINT,	"1",	NULL,	"0",	"1"	},
-	{"priority.encoding",		UINT,	"2",	NULL,	"0",	"4"	},
-	{"priority.indexing",		UINT,	"2",	NULL,	"0",	"4"	}
+	{"priority.encoding",		UINT,	"3",	NULL,	"0",	"4"	},
+	{"priority.indexing",		UINT,	"3",	NULL,	"0",	"4"	},
+	{"priority.playback",		UINT,	"0",	NULL,	"0",	"4"	}
 };
 
-int num_opts = 75;
+int num_opts = 76;
 // </prefs_gen>
 
 #ifdef USE_LIBXML2

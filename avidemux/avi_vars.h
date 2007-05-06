@@ -47,6 +47,7 @@ EXTERN ADM_Composer *video_body
 
 EXTERN uint32_t  curframe;
 EXTERN uint32_t verbose;
+EXTERN uint32_t originalPriority;
 EXTERN uint8_t 	playing
 #ifdef __DECLARE__
 =0
