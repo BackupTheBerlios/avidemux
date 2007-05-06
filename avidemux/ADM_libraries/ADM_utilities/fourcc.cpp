@@ -58,7 +58,17 @@ char *fourCC::tostring(uint32_t fourcc)
     *(uint32_t *) s = fourcc;
     return s;
 }
-
+char *fourCC::tostringBE(uint32_t fourcc)
+{
+    static char s[5];
+    s[4] = 0;
+    uint8_t *p=(uint8_t *)&fourcc;
+    s[0]=p[3];
+    s[1]=p[2];
+    s[2]=p[1];
+    s[3]=p[0];
+    return s;
+}
 //_____________________________________
 int fourCC::check(uint8_t * in, uint8_t * cc)
 {

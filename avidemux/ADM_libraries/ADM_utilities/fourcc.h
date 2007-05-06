@@ -27,6 +27,7 @@ public:
 	static int  			check(uint8_t *cc,uint32_t in);
 	static  uint32_t 	get(uint8_t *in)   ;
 	static char 		  *tostring(uint32_t fourcc);
+        static char               *tostringBE(uint32_t fourcc);
 
 };
 void mixDump(uint8_t *ptr, uint32_t len);
