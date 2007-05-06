@@ -349,7 +349,7 @@ uint32_t tim;
   
             double framesLeft=(_total-_lastnb);
 
-			ms2time(deltaTime,&hh,&mm,&ss);
+			ms2time(tim,&hh,&mm,&ss);
 			sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
 			gtk_label_set_text(GTK_LABEL(WID(label_elapsed)),string);
 
@@ -530,7 +530,7 @@ create_dialog1 (void)
   alignment2 = gtk_alignment_new (0.5, 0.5, 1, 1);
   gtk_widget_show (alignment2);
   gtk_container_add (GTK_CONTAINER (frame1), alignment2);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment2), 4, 10, 12, 12);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment2), 10, 10, 12, 12);
 
   table6 = gtk_table_new (4, 2, FALSE);
   gtk_widget_show (table6);
@@ -607,7 +607,7 @@ create_dialog1 (void)
   alignment3 = gtk_alignment_new (0.5, 0.5, 1, 1);
   gtk_widget_show (alignment3);
   gtk_container_add (GTK_CONTAINER (frame2), alignment3);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment3), 4, 10, 12, 12);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment3), 10, 10, 12, 12);
 
   table7 = gtk_table_new (4, 2, FALSE);
   gtk_widget_show (table7);
@@ -684,7 +684,7 @@ create_dialog1 (void)
   alignment4 = gtk_alignment_new (0.5, 0.5, 1, 1);
   gtk_widget_show (alignment4);
   gtk_container_add (GTK_CONTAINER (frame3), alignment4);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment4), 4, 10, 12, 12);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment4), 10, 10, 12, 12);
 
   table8 = gtk_table_new (3, 2, FALSE);
   gtk_widget_show (table8);
@@ -749,7 +749,7 @@ create_dialog1 (void)
   alignment5 = gtk_alignment_new (0.5, 0.5, 1, 1);
   gtk_widget_show (alignment5);
   gtk_container_add (GTK_CONTAINER (frame4), alignment5);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment5), 4, 10, 12, 12);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment5), 10, 10, 12, 12);
 
   table9 = gtk_table_new (3, 2, FALSE);
   gtk_widget_show (table9);
@@ -947,4 +947,3 @@ create_dialog1 (void)
   gtk_widget_grab_default (closebutton1);
   return dialog1;
 }
-

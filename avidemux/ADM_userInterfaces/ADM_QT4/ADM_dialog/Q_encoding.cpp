@@ -366,7 +366,7 @@ uint32_t tim;
   
             double framesLeft=(_total-_lastnb);
 
-			ms2time(deltaTime,&hh,&mm,&ss);
+			ms2time(tim,&hh,&mm,&ss);
 			snprintf(string,79,"%02d:%02d:%02d",hh,mm,ss);
 			WIDGET(labelElapsed)->setText(string);
 
