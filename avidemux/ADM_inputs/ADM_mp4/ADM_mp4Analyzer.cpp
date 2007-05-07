@@ -725,6 +725,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
 #define audioCodec(x) ADIO.encoding=WAV_##x;
                                 switch(entryName)
                                 {
+                                    
                                     case MKFCCR('t','w','o','s'):
                                             audioCodec(LPCM);
                                             ADIO.byterate=ADIO.frequency*ADIO.bitspersample*ADIO.channels/8;
@@ -761,11 +762,21 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                             }
                                     }
                                             break;
-                                    
+                                    case MKFCCR('Q','D','M','2'):
+                                        {
+                                            uint32_t sz;
+                                              audioCodec(QDM2);
+                                              sz=son.getRemainingSize();
+                                              _tracks[1+nbAudioTrack].extraDataSize=sz;
+                                              _tracks[1+nbAudioTrack].extraData=new uint8_t[sz];
+                                              son.readPayload(_tracks[1+nbAudioTrack].extraData,sz);
+                                              left=0;
+                                        }
+                                        break;
                                     case MKFCCR('m','s',0,0x55): // why 55 ???
                                     case MKFCCR('m','p','4','a'):
                                     {
-                                            audioCodec(AAC);
+                                              audioCodec(AAC);
                                             if(left>10)
                                             {
                                               adm_atom wave(&son);
@@ -819,6 +830,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                                      item.skipAtom();
                                                    
                                                  }  // Wave iddone
+                                                 left=0;
                                               }  // if ==wave
                                               else
                                               {
