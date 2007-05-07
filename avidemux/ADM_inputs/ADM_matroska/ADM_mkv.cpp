@@ -480,6 +480,12 @@ Bytes n+1..: The Vorbis identification header, followed by the Vorbis comment he
       READ_LEN(len1);
       READ_LEN(len2);
       len3=oldata+oldlen-head;
+      if(len3<=len1+len2)
+      {
+        printf("Error in vorbis header, len3 too small %u %u / %u\n",len1,len2,len3);
+        return 0; 
+      }
+      len3-=(len1+len2);
       printf("Found packet len : %u %u %u, total size %u\n",len1,len2,len3,oldlen);
       // Now build our own packet...
       uint8_t *nwdata=new uint8_t[len1+len2+len3+sizeof(uint32_t)*3];

@@ -251,7 +251,7 @@ uint8_t mkvHeader::addIndexEntry(uint32_t track,uint64_t where, uint32_t size,ui
   int x=Track->_nbIndex;
   index[x].pos=where;
   index[x].size=size;
-  index[x].flags=flags;
+  index[x].flags=AVI_KEY_FRAME;
   index[x].timeCode=0;
   
   float f=timecodeMS;

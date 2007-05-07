@@ -14,7 +14,10 @@ class ADM_ebml
 {
   protected:
         uint64_t  _fileSize;
+        
   public:
+        ADM_ebml  *_root;
+        uint32_t  _refCount;                
                     ADM_ebml(void);
         virtual     ~ADM_ebml();
         int64_t     readSignedInt(uint32_t nb);

@@ -234,31 +234,52 @@ ADM_ebml_file::ADM_ebml_file(ADM_ebml_file *father,uint32_t size)
   fp=father->fp;
   _fileSize=father->_fileSize;
    _begin=ftello(fp);
+   _root=father->_root;
+   ADM_assert(_root);
+   _root->_refCount++;
 }
 ADM_ebml_file::ADM_ebml_file(void) : ADM_ebml()
 {
   _close=0;
+  fp=NULL;
+  _fileSize=0;
+  _begin=0;
+  _root=NULL;
+  _refCount=0;
 }
 ADM_ebml_file::~ADM_ebml_file()
 {
   ADM_assert(fp);
-  if(_close)
+  if(_close)  // We are the 1st one
   {
     ADM_assert(!_begin);
-    fclose(fp);
+    if(!_refCount)
+    {
+      fclose(fp);
+    }else
+    {
+      printf("WARNING: EBML killing father with non empty refcount : %u\n",_refCount); 
+    }
   }
-  else fseeko(fp,_begin+_size,SEEK_SET);
+  else 
+  {
+    fseeko(fp,_begin+_size,SEEK_SET);
+    ADM_assert(_root);
+    _root->_refCount--;
+  }
   fp=NULL; 
 }
 uint8_t ADM_ebml_file::open(const char *name)
 {
-  _close=1;
+  
   fp=fopen(name,"rb");
   if(!fp) 
   {
     aprintf("[EBML FILE] Failed to open <%s>\n",name);
     return 0;
   }
+  _root=this;
+  _close=1;
   fseeko(fp,0,SEEK_END);
   _begin=0;
   _fileSize=_size=ftello(fp);

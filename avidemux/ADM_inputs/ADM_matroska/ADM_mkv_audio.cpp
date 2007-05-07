@@ -37,10 +37,11 @@
 */
  mkvAudio ::~mkvAudio()
 {
-  if(_parser) delete _parser;
-  _parser=NULL; 
   if(_clusterParser)  delete _clusterParser;
   _clusterParser=NULL;
+    if(_parser) delete _parser;
+  _parser=NULL; 
+
 }
 
 uint32_t    mkvAudio::read(uint32_t len,uint8_t *buffer)
@@ -278,6 +279,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
   _nbClusters=nbClusters;
   _clusters=clust;
   ADM_assert(_clusters);
+  _destroyable = 1;
   
    _parser=new ADM_ebml_file();
    ADM_assert(_parser->open(name));
