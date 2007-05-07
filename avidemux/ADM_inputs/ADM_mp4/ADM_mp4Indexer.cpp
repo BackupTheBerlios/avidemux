@@ -94,36 +94,60 @@ uint32_t i,j,cur;
               for(i=0;i<info->nbCo;i++)
                 total+=samplePerChunk[i];
               
-              printf("Total size in byte : %u\n",total*info->SzIndentical);
+              printf("Total size in sample : %u\n",total);
+              printf("Sample size          : %u\n",info->SzIndentical);
               track->index=new MP4Index[info->nbCo];
               memset(track->index,0,info->nbCo*sizeof(MP4Index));
               track->nbIndex=info->nbCo;;
               int max=0;
               totalBytes=0;
-              for(i=0;i<info->nbCo;i++)
+              if(info->SzIndentical!=1)
               {
-                  uint32_t sz;
-#define PACK_SIZE info->bytePerFrame // perPacket ??
-                  
-                  track->index[i].offset=info->Co[i];
-                  sz=samplePerChunk[i];
-                  /* Sz is in sample, convert it to bytes */
-                  sz/=info->samplePerPacket;
-                  if(sz*info->samplePerPacket!=samplePerChunk[i])
-                  {
-                    printf("Warning sample per packet not divider of sample per chunk (per packet :%u , chunk :%u)\n",
-                              info->samplePerPacket, samplePerChunk[i]); 
-                  }
-                  sz*=PACK_SIZE;
-                  /* */
-                  track->index[i].size=sz;
-                  track->index[i].time=0; // No seek
-                  if(sz>MAX_CHUNK_SIZE)
-                  {
-                      max+=sz/MAX_CHUNK_SIZE;
-                  }
-                  
-                  totalBytes+=track->index[i].size;
+                 for(i=0;i<info->nbCo;i++)
+                    {
+                        uint32_t sz;
+                        track->index[i].offset=info->Co[i];
+                        sz=samplePerChunk[i];
+                        /* Sz is in sample, convert it to bytes */
+                        sz=sz*info->SzIndentical;
+                        /* */
+                        track->index[i].size=sz;
+                        track->index[i].time=0; // No seek
+                        if(sz>MAX_CHUNK_SIZE)
+                        {
+                            max+=sz/MAX_CHUNK_SIZE;
+                        }
+                        
+                        totalBytes+=track->index[i].size;
+                    }
+              }
+              else
+              {
+                    for(i=0;i<info->nbCo;i++)
+                    {
+                        uint32_t sz;
+      #define PACK_SIZE info->bytePerFrame // perPacket ??
+                        
+                        track->index[i].offset=info->Co[i];
+                        sz=samplePerChunk[i];
+                        /* Sz is in sample, convert it to bytes */
+                        sz/=info->samplePerPacket;
+                        if(sz*info->samplePerPacket!=samplePerChunk[i])
+                        {
+                          printf("Warning sample per packet not divider of sample per chunk (per packet :%u , chunk :%u)\n",
+                                    info->samplePerPacket, samplePerChunk[i]); 
+                        }
+                        sz*=PACK_SIZE;
+                        /* */
+                        track->index[i].size=sz;
+                        track->index[i].time=0; // No seek
+                        if(sz>MAX_CHUNK_SIZE)
+                        {
+                            max+=sz/MAX_CHUNK_SIZE;
+                        }
+                        
+                        totalBytes+=track->index[i].size;
+                    }
               }
               printf("Found %u bytes\n",totalBytes);
               // Now time to update the time...

@@ -541,7 +541,15 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                 //
                                 switch(entryName)
                                 {
-                                  case MKFCCR('m','p','4','v'):  //mp4v
+                                  case MKFCCR('s','2','6','3'):  //s263 d263
+                                  {
+                                        commonPart(H263);
+                                         adm_atom d263(&son);
+                                         printf("Reading s253, got %s\n",fourCC::tostringBE(d263.getFCC()));
+                                          left=0;
+                                  }
+                                  break;
+                                   case MKFCCR('m','p','4','v'):  //mp4v
                                   {
                                         commonPart(DIVX);
                                          adm_atom esds(&son);
@@ -628,6 +636,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                             {
                                                 adm_atom avcc(&son);
                                                 printf("Reading , got %s\n",fourCC::tostringBE(avcc.getFCC()));
+                                                left=0;
                                                 
                                             }
                                             break;
@@ -737,6 +746,21 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                             audioCodec(8BITS_UNSIGNED);
                                             ADIO.byterate=ADIO.frequency*ADIO.channels;
                                             break;
+                                    case MKFCCR('s','a','m','r'):
+                                    {
+                                            audioCodec(AMRNB);
+                                            ADIO.frequency=8000;
+                                            ADIO.channels=1;
+                                            ADIO.bitspersample=16;
+                                            ADIO.byterate=12000/8;
+                                            if(left>10)
+                                            {
+                                               adm_atom amr(&son);
+                                              printf("Reading wave, got %s\n",fourCC::tostringBE(amr.getFCC()));
+                                              left=0;
+                                            }
+                                    }
+                                            break;
                                     
                                     case MKFCCR('m','s',0,0x55): // why 55 ???
                                     case MKFCCR('m','p','4','a'):
@@ -803,7 +827,10 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
                                                                decodeEsds(&wave,TRACK_AUDIO);
                                                                goto foundit; // FIXME!!!
                                                           } 
-                                                
+                                                else
+                                                {
+                                                  printf("UNHANDLED ATOM : %s\n",fourCC::tostringBE(wave.getFCC())); 
+                                                }
                                               }
                                             } // if left > 10
 foundit: // HACK FIXME     
