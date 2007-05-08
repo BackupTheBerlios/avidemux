@@ -128,7 +128,7 @@ uint8_t
   //uint32_t x,w;
 
   ADM_assert (_param);
-  ADM_assert (frame < _info.nb_frames);
+ if(frame>= _info.nb_frames) return 0;
 
 
   if (!_in->getFrameNumberNoAlloc (frame, len, _uncompressed, flags))

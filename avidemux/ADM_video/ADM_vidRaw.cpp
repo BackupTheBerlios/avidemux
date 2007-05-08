@@ -68,6 +68,7 @@ uint8_t AVDMVideoStreamRaw::getFrameNumberNoAlloc(uint32_t frame,
 {
         UNUSED_ARG(len);
     	UNUSED_ARG(flags);
+                if(frame>= _info.nb_frames) return 0;
 		*len=(_info.width*_info.height*3)>>1;
 		if(!(frame<_info.nb_frames))
 		{

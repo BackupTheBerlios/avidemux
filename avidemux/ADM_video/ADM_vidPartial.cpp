@@ -138,7 +138,7 @@ uint8_t ADMVideoPartial::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 		ADM_assert(_son);
-		
+		if(frame>= _info.nb_frames) return 0;
 		if((frame+_info.orgFrame>=_param->_start) && (frame+_info.orgFrame)<=_param->_end) // 
 		{
 				return _son->getFrameNumberNoAlloc(frame,len,data,flags);

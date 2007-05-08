@@ -377,7 +377,7 @@ uint8_t ADMVideoVobSub::getFrameNumberNoAlloc(uint32_t frame,
 uint64_t time;
 uint32_t sub;
 
-        ADM_assert(frame<_info.nb_frames);
+        if(frame>= _info.nb_frames) return 0;
         // read uncompressed frame
         if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
 

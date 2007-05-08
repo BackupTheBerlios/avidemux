@@ -104,6 +104,7 @@ uint8_t vidEqualizer::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 
+        if(frame>= _info.nb_frames) return 0;
 	if(!_in->getFrameNumberNoAlloc(frame,len,_uncompressed,flags)) return 0;
 	
 	uint8_t *src,*dst;

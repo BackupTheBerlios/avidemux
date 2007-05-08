@@ -399,7 +399,7 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
 	ADMImage *srcP,*srcN,*srcNN,*src,*final,*display;
         float distMerged, distN,distP,distM,distR;
         char txt[255];
-
+        if(frame>= _info.nb_frames) return 0;
         if(inframe<1 || inframe>inframe>_info.nb_frames-2 )
         {
                 data->duplicate(vidCache->getImage(inframe));

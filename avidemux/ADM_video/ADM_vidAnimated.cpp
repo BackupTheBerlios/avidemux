@@ -173,6 +173,8 @@ uint8_t ADMVideoAnimated::getFrameNumberNoAlloc(uint32_t frame,
     ADMImage *in;
     uint32_t offset,pool;
 
+    if(frame>= _info.nb_frames) return 0;
+    
     // Clean the image
     if(_BkgGnd)
         data ->duplicate(_BkgGnd);

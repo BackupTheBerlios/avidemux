@@ -178,7 +178,7 @@ uint8_t AVDMVideoStreamMPResize::getFrameNumberNoAlloc(uint32_t frame,
    																	uint32_t *flags)
 {
 static Image in,out;
-			assert(frame<_info.nb_frames);
+			if(frame>= _info.nb_frames) return 0;
 			assert(_param);	
 	
    			

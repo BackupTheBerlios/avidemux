@@ -160,7 +160,7 @@ uint8_t vidUnblend::getFrameNumberNoAlloc (uint32_t inframe,
 	int blend=0, useframe;
 	ADMImage *src;
 	char buf[255];
-
+        if(frame>= _info.nb_frames) return 0;
         if(!inframe || inframe>_info.nb_frames-5)
         {
                 data->duplicate(vidCache->getImage(inframe));

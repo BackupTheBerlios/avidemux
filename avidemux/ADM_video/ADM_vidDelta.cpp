@@ -99,6 +99,7 @@ ADMImage *cur,*prev,*next;
         w=_info.width;
         h=_info.height;
         page=w*h;
+  if(frame>= _info.nb_frames) return 0;
   if(!frame || frame>=_info.nb_frames-1)
   {
         memset(YPLANE(data),0,page);

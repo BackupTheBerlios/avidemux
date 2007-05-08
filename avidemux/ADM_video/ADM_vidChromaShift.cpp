@@ -100,7 +100,7 @@ uint8_t ADMVideoChromaShift::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 
-		ADM_assert(frame<_info.nb_frames);
+		if(frame>= _info.nb_frames) return 0;
 		ADM_assert(_param);									
 								
 		// read uncompressed frame

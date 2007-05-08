@@ -440,7 +440,7 @@ uint8_t vidTDeint::getFrameNumberNoAlloc (uint32_t n,
         float distMerged, distN,distP,distM,distR,skip=0;
         char txt[255];
 
-        
+        if(frame>= _info.nb_frames) return 0;
         if(n<1 || n>_info.nb_frames-3 )
         {
                 skip=1;
