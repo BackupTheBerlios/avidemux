@@ -368,8 +368,6 @@ AC_SUBST(CCASFLAGS)
 
 AC_DEFINE(USE_FFMPEG,1,[FFmpeg])
 AC_DEFINE(USE_MJPEG,1,[MJPEG])
-AC_DEFINE(AMR_NB,1,[AMR_NB])
-AC_DEFINE(CONFIG_AMR_NB,1,[AMR_NB])
 AC_DEFINE(CONFIG_DVVIDEO_ENCODER,1,[DV encoder])
 
 have_alsa=yes
@@ -387,6 +385,7 @@ have_amd64=no
 have_ppc=no
 have_x264=yes
 have_aften=yes
+have_libamrnb=yes
 
 dnl ____________ Cygwin / MinGW ? _____________
 use_cygwin=no
@@ -562,6 +561,22 @@ fi
 if test "x$have_x264" = "xyes"; then
 	AC_DEFINE(USE_X264,1,[use x264 encoder])
 fi
+dnl ___________________ libamrnb __________________
+AC_MSG_CHECKING(for libamrnb codec)
+AC_CHECK_HEADER(amrnb/interf_dec.h,,have_libamrnb=no)
+
+if test "x$have_libamrnb" = "xyes"; then
+   AC_CHECK_LIB(amrnb,GP3Decoder_Interface_Decode,,have_libamrnb=no,-lm )
+fi
+
+if test "x$have_libamrnb" = "xyes"; then
+        AC_DEFINE(AMR_NB,1,[AMR_NB])
+        AC_DEFINE(CONFIG_AMR_NB,1,[AMR_NB])
+        AC_DEFINE(USE_AMR_NB,1,[Tell avidemux to use libamrnb])
+else
+        AC_MSG_WARN(libamr not found, you can download it there : ftp://ftp.penguin.cz/pub/users/utx/amr/)
+fi
+
 
 dnl _________________ Xvid 0.9 ________________
 AC_MSG_CHECKING(for Xvid 0.9 codec)
@@ -1328,8 +1343,6 @@ AC_DEFINE(CONFIG_ENCODERS,1,[FFMPEG])
 AC_DEFINE(CONFIG_DECODERS,1,[FFMPEG])
 AC_DEFINE(CONFIG_QDM2_DECODER,1,[FFMPEG])
 AC_DEFINE(CONFIG_MPEGAUDIO_HP,1,[FFMPEG])
-AC_DEFINE(AMR_NB,1,[AMR_NB])
-AC_DEFINE(CONFIG_AMR_NB_DECODER,1,[AMR_NB])
 
 dnl bunch of new stuff
 AC_DEFINE(CONFIG_SNOW_ENCODER,1,[CONFIG_SNOW_ENCODER])

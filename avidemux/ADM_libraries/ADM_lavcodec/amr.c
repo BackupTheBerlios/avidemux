@@ -35,7 +35,7 @@
 
     The float version (default) can be downloaded from:
     http://www.3gpp.org/ftp/Specs/archive/26_series/26.104/26104-510.zip
-    Extract the soure into ffmpeg/libavcodec/amr_float
+    Extract the soure into ffmpeg/libavcodec/amrnb
 
     The specification for amr-nb can be found in TS 26.071
     (http://www.3gpp.org/ftp/Specs/html-info/26071.htm) and some other
@@ -54,6 +54,10 @@
     from: http://www.3gpp.org/ftp/Specs/archive/26_series/26.173/26173-571.zip
 
  */
+ /* MEANX */
+#include "config.h"
+#ifdef USE_AMR_NB
+ /* MEANX */
 
 #include "avcodec.h"
 
@@ -69,8 +73,8 @@
 #include "amr/e_homing.h"
 
 #else
-#include "amr_float/interf_dec.h"
-#include "amr_float/interf_enc.h"
+#include "amrnb/interf_dec.h"
+#include "amrnb/interf_enc.h"
 #endif
 
 /* Common code for fixed and float version*/
@@ -689,3 +693,6 @@ AVCodec amr_wb_encoder =
 };
 
 #endif //CONFIG_AMR_WB
+ /* MEANX */
+ #endif
+ /* MEANX */

@@ -238,6 +238,7 @@ void avcodec_register_all(void)
 #ifdef CONFIG_AMR_WB
     REGISTER_ENCDEC (AMR_WB, amr_wb);
 #endif
+    REGISTER_DECODER(QDM2, qdm2);
     REGISTER_DECODER(WMAV1, wmav1);
     REGISTER_DECODER(WMAV2, wmav2);
     

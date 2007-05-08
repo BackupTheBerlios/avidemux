@@ -150,6 +150,7 @@ int nbChunk;
         return 1;
 }
 ///************************************************
+#ifdef USE_AMR_NB
   uint8_t ADM_AudiocodecAMR::beginDecompress( void ) 
    {
             _tail=_head=0;
@@ -240,5 +241,5 @@ int16_t *run16;
 
         return 1;
 }
-
+#endif
 //---

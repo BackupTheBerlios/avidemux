@@ -36,16 +36,14 @@ else
 EXTEND_PPC=
 
 endif
-EXTEND_AMR=	amr_float/interf_dec.c amr_float/sp_dec.c \
-		amr_float/interf_enc.c amr_float/sp_enc.c
-MYCFLAGS= -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -Iamr_float -I../.. -I$(LAVUTIL) -Drestrict=__restrict__ -fomit-frame-pointer
+MYCFLAGS= -I.. -DHAVE_AV_CONFIG_H $(X_MMX_FLAGS) -O3 -I../.. -I$(LAVUTIL) -Drestrict=__restrict__ -fomit-frame-pointer
 # for SSE we need special compil flags
 fft_sse.o:i386/fft_sse.c
 	$(CC) -o $@ $< -c $(MYCFLAGS) $(CFLAGS) $(all_includes) -I..   -msse -I$(LAVUTIL) -I../../..
 vp3dsp_sse2.o:i386/vp3dsp_sse2.c
 	$(CC) -o $@ $< -c  $(MYCFLAGS) $(CFLAGS) $(all_includes) -I..  -msse -I$(LAVUTIL) -I../../..
 
-libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c $(EXTEND_AMR) \
+libavcodec_a_SOURCES = $(EXTEND_PPC) $(EXTEND_MMX) ac3enc.c  \
 		adpcm.c 	allcodecs.c 	cyuv.c 	dsputil.c 	dv.c \
 		error_resilience.c 		fdctref.c 	fft.c 	h263.c 	h263dec.c 	huffyuv.c 	imgconvert.c \
 		jfdctfst.c 	jfdctint.c 	jrevdct.c 	mace.c 	mdct.c 	 	mjpeg.c \
@@ -103,7 +101,7 @@ dct-test.c    idcinvideo.c    msvideo1.c     snow.c \
 dpcm.c      imgconvert.c    nuv.c      sonic.c \
 dsputil.c      oggtheora.c    svq1.c \
 vc1dsp.c \
-amr_float i386 libpostproc ppc 
+i386 libpostproc ppc 
 
 	
 	
