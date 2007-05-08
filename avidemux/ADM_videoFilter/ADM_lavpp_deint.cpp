@@ -242,7 +242,7 @@ uint8_t ADMVideoLavPPDeint::getFrameNumberNoAlloc(uint32_t frame,
 {
 
  
-  ADM_assert(frame<_info.nb_frames);
+  if(frame>= _info.nb_frames) return 0;
         // read uncompressed frame
   if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 

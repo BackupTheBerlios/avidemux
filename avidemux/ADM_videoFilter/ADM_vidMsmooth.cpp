@@ -218,7 +218,7 @@ uint8_t Msmooth::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
     ADMImage *src = vidCache->getImage(frame);
    
     ADMImage * deliver;
-
+        if(frame>= _info.nb_frames) return 0;
 	const unsigned char *srcpY = YPLANE(src) ;
 	const unsigned char *srcp_savedY = srcpY;
     	int src_pitchY = _info.width;

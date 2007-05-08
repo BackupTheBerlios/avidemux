@@ -241,6 +241,7 @@ uint8_t ADMVideoSubASS::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len, ADM
         if(frame>=_info.nb_frames)
         {
           printf("[SubAss] out of bound %u/%u\n",frame,_info.nb_frames); 
+          return 0;
         }
         ADM_assert(_params);
 

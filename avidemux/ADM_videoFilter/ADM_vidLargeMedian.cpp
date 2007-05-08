@@ -112,7 +112,7 @@ uint8_t ADMVideoLargeMedian::getFrameNumberNoAlloc(uint32_t frame,
 uint8_t *x1,*x2,*x3,*x4,*x5,*o1;
 uint32_t stride,page;
 
-	ADM_assert(frame<_info.nb_frames);
+	if(frame>= _info.nb_frames) return 0;
 	ADM_assert(_uncompressed);					
 	stride=_info.width;
 	page=(stride*_info.height)>>2;

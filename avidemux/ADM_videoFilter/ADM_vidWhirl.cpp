@@ -122,7 +122,7 @@ uint8_t AVDMVideoWhirl::getFrameNumberNoAlloc(uint32_t frame,
 	uint32_t page=_info.width*_info.height;
 	ADMImage *cur,*prev;
 	double frac;
-	
+	        if(frame>= _info.nb_frames) return 0;
 		if(frame>STEP_SIZE)
 			frac=1;
 		else

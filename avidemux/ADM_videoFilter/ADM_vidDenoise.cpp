@@ -183,7 +183,7 @@ uint8_t ADMVideoDenoise::getFrameNumberNoAlloc(uint32_t frame,
    //uint32_t x,w;
   	uint32_t page; 
    		ADM_assert(_param);
-		ADM_assert(frame<_info.nb_frames);
+		if(frame>= _info.nb_frames) return 0;
 								
 			
        		if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;

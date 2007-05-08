@@ -82,7 +82,7 @@ ADMVideoChromaU::~ADMVideoChromaU()
 {				
 uint32_t w,x;
 uint32_t page;
-		ADM_assert(frame<_info.nb_frames);
+		if(frame>= _info.nb_frames) return 0;
        		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
 		
 		page= _info.width*_info.height;
@@ -166,7 +166,7 @@ ADMVideoChromaV::~ADMVideoChromaV()
 {
 uint32_t w,x;
 uint32_t page;
-		ADM_assert(frame<_info.nb_frames);
+		if(frame>= _info.nb_frames) return 0;
        		if(!_in->getFrameNumberNoAlloc(frame, len,data,flags)) return 0;
 		
 		page= _info.width*_info.height;

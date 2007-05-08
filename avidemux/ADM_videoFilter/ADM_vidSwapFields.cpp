@@ -164,6 +164,7 @@ uint8_t AVDMVideoKeepOdd::getFrameNumberNoAlloc(uint32_t frame,
 				uint32_t *flags)
 {
 //static Image in,out;
+                if(frame>= _info.nb_frames) return 0;
 			if(!_in->getFrameNumberNoAlloc(frame, len,_uncompressed,flags)) return 0;
 
 

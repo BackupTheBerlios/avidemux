@@ -170,7 +170,7 @@ uint32_t dlen,dflags;
 uint32_t plane=_info.width*_info.height;
 ADMImage	*image,*next,*prev;
 
-
+                        if(frame>= _info.nb_frames) return 0;
 			*len=(plane*3)>>1;
 			
 			size=(_info.width*_info.height*3)>>1;

@@ -196,6 +196,8 @@ uint8_t DGbob::getFrameNumberNoAlloc(uint32_t frame, uint32_t *len,
         ADMImage *src,*prv,*prvprv,*nxt,*nxtnxt,*dst;
 	uint32_t n,num_frames;
 
+        if(frame>=_info.nb_frames) return 0;
+        
         num_frames=_in->getInfo()->nb_frames;   // ??
 
 	if (_param->mode == 0) n = frame;
