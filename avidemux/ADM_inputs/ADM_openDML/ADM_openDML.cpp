@@ -99,7 +99,7 @@ uint64_t offset=_idx[framenum].offset; //+_mdatOffset;
 // 		offset=4+4+4;
 // 	} odmlIndex
 // 	
-	if(frame>= (uint32_t)_videostream.dwLength) return 0;
+	if(framenum>= (uint32_t)_videostream.dwLength) return 0;
 	
  	fseeko(_fd,offset,SEEK_SET);
  	fread(img->data, _idx[framenum].size, 1, _fd);

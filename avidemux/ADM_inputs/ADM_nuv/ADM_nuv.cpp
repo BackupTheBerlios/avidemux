@@ -137,7 +137,7 @@ uint8_t  nuvHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 uint64_t 	off;
 lzo_uint  	len, out,l;
 uint8_t *planes[3];
-        if(frame>= (uint32_t)_videostream.dwLength) return 0;
+        if(framenum>= (uint32_t)_videostream.dwLength) return 0;
 	l=DXFIELD(width)*DXFIELD(height);
 
 	planes[0]=_old;

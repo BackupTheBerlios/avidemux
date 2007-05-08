@@ -319,7 +319,7 @@ uint8_t vidHardPDRemoval::getFrameNumberNoAlloc (uint32_t inframe,
         float distMerged, distN,distP,distM,distR,skip=0;
         char txt[255];
 
-        if(frame>= _info.nb_frames) return 0;
+        if(inframe>= _info.nb_frames) return 0;
         if(inframe<1 || inframe>inframe>_info.nb_frames-3 )
         {
                 skip=1;
