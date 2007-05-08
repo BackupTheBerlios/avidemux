@@ -218,6 +218,7 @@ uint8_t  asfHeader::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
   if(framenum>=nbImage)
   {
     printf("[ASF] Going out of bound %u %u\n",framenum, nbImage);
+    return 0;
   }
   if(!_index[framenum].frameLen)
   {

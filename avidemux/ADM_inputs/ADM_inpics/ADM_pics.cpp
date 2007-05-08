@@ -52,7 +52,7 @@ static uint32_t s32;
 uint8_t
     picHeader::getFrameNoAlloc(uint32_t framenum, ADMCompressedImage *img)
 {
-    ADM_assert(framenum <= _nb_file);
+    if(frame>= (uint32_t)_videostream.dwLength) return 0;
     img->flags = AVI_KEY_FRAME;
     fseek(_fd[framenum], _offset, SEEK_SET);
     fread(img->data, _imgSize[framenum] - _offset, 1, _fd[framenum]);

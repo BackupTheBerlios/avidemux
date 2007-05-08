@@ -80,6 +80,7 @@ uint32_t h263Header::getFlags(uint32_t frame,uint32_t *flags){
 uint8_t  h263Header::getFrameNoAlloc(uint32_t framenum,ADMCompressedImage *img)
 {
 uint32_t offset=_idx[framenum].offset;
+        if(frame>= (uint32_t)_videostream.dwLength) return 0;
  	fseek(_fd,offset,SEEK_SET);
  	fread(img->data, _idx[framenum].size, 1, _fd);
   	img->dataLength=_idx[framenum].size;
