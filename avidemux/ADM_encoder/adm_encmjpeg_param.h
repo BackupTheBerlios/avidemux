@@ -21,8 +21,8 @@
 typedef struct MJPEGConfig
 {
 
-  int qual;
-  int swapped;
+  uint32_t qual;
+  uint32_t swapped;
 } MJPEGConfig;
 
 #endif
