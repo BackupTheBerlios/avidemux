@@ -9,7 +9,7 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM
 libADM_dialog_a_METASOURCES = AUTO
 
 libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
-	DIA_properties.cpp DIA_mjpeg.cpp DIA_about.cpp DIA_recent.cpp \
+	DIA_properties.cpp  DIA_about.cpp DIA_recent.cpp \
 	DIA_resize.cpp DIA_working.cpp \
 	DIA_working.h DIA_busy.cpp DIA_busy.h DIA_exLame.cpp DIA_pipe.cpp DIA_mpeg2opt.cpp \
 	DIA_xvcd.cpp  \
@@ -36,7 +36,7 @@ libADM_dialog_a_SOURCES = DIA_audio.cpp DIA_vcodec.cpp DIA_acodec.cpp \
 
 EXTRA_DIST =  \
 DIA_mcdeint.cpp     DIA_resize.cpp \
-DIA_cnr2.cpp          DIA_mjpeg.cpp       \
+DIA_cnr2.cpp          \
 DIA_color.cpp         DIA_eq2.cpp          \
 DIA_coloryuv.cpp      DIA_equalizer.cpp    DIA_mpdelogo.cpp     \
 DIA_contrast.cpp      DIA_exLame.cpp       DIA_mpeg2opt.cpp    DIA_srt.cpp \
