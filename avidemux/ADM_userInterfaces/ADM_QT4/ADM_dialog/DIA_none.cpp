@@ -89,7 +89,6 @@ uint8_t DIA_getHue(Hue_Param *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getMPdelogo(MPDELOGO_PARAM *param,AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous){return 0;}
 uint8_t DIA_pipe(char **cmd,char **param){return 0;}
-uint8_t DIA_requant(COMPRES_PARAMS *incoming){return 0;}
 uint8_t  DIA_setUserMuxParam( int *mode, int *param, int *muxsize){return 0;}
 uint8_t  DIA_tdeint(TDEINT_PARAM *param){return 0;}
 uint8_t DIA_vobsub(vobSubParam *param){return 0;}
