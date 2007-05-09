@@ -1995,15 +1995,15 @@ void A_audioTrack( void )
             {AudioNone,_("None"),_("No audio")},
             {AudioAC3,_("External AC3"),_("Take audio from external AC3 file")},
             {AudioMP3,_("External MP3"),_("Take audio from external MP3 file")},
-            {AudioWav,_("External Wav"),_("Take audio from external WAV file")}
+            {AudioWav,_("External WAV"),_("Take audio from external WAV file")}
         };
         
         
-        diaElemMenu   sourceMenu(&nw,_("Audio source"),5,sourcesStream,NULL);
+        diaElemMenu   sourceMenu(&nw,_("_Audio source:"),5,sourcesStream,NULL);
         
         
         
-        diaElemFileRead sourceName(&newtrackname,_("External filename"));
+        diaElemFileRead sourceName(&newtrackname,_("_External file:"));
         
         // Now build the list of embedded track
 #define MAX_AUDIO_TRACK 10
@@ -2018,7 +2018,7 @@ void A_audioTrack( void )
         }
          if(infos) delete [] infos;
          
-         diaElemMenuDynamic   sourceFromVideo(&newtrack,_("Track from video"),nb,sourceavitracks);
+         diaElemMenuDynamic   sourceFromVideo(&newtrack,_("_Track from video:"),nb,sourceavitracks);
          diaElem *allWidgets[]={&sourceMenu,&sourceFromVideo,&sourceName};
          
          /* Link..*/
@@ -2028,7 +2028,7 @@ void A_audioTrack( void )
          sourceMenu.link(&(sourcesStream[4]),1,&sourceName);
          
          
-         if( diaFactoryRun(_("Select Main audio Track"),3,allWidgets))
+         if( diaFactoryRun(_("Main Audio Track"),3,allWidgets))
          {
            if(nw!=AudioNone && nw!=AudioAvi)
            {
@@ -2094,13 +2094,13 @@ void A_externalAudioTrack( void )
             {AudioNone,_("None"),_("No audio")},
             {AudioAC3,_("External AC3"),_("Take audio from external AC3 file")},
             {AudioMP3,_("External MP3"),_("Take audio from external MP3 file")},
-            {AudioWav,_("External Wav"),_("Take audio from external WAV file")}
+            {AudioWav,_("External WAV"),_("Take audio from external WAV file")}
         };
         
         old=nw=secondAudioSource;
 
-        diaElemMenu     sourceMenu(&nw,_("Audio source"),4,sourcesStream,NULL);
-        diaElemFileRead sourceName(&newtrackname,_("Filename"));
+        diaElemMenu     sourceMenu(&nw,_("_Audio source:"),4,sourcesStream,NULL);
+        diaElemFileRead sourceName(&newtrackname,_("_External file:"));
         diaElem *allWidgets[]={&sourceMenu,&sourceName};
 
   /* Link..*/
@@ -2109,7 +2109,7 @@ void A_externalAudioTrack( void )
          sourceMenu.link(&(sourcesStream[3]),1,&sourceName);
          sourceMenu.link(&(sourcesStream[1]),1,&sourceName);
 
-         if( !diaFactoryRun(_("Select 2nd audio Track"),2,allWidgets)) return;
+         if( !diaFactoryRun(_("Second Audio Track"),2,allWidgets)) return;
          if(!ADM_fileExist(newtrackname))
          {
            GUI_Info_HIG(ADM_LOG_INFO,_("Cannot load"),_("The selected audio file does not exist."));
@@ -2456,8 +2456,8 @@ void GUI_showCurrentFrameHex(void)
     else sprintf(sType,"P");
  sprintf(sSize,"%d bytes",fullLen);
  
- diaElemReadOnlyText Type(sType,_("Frame Type:"));
- diaElemReadOnlyText Size(sSize,_("Frame Size:"));
+ diaElemReadOnlyText Type(sType,_("Frame type:"));
+ diaElemReadOnlyText Size(sSize,_("Frame size:"));
  diaElem *elems[]={&Type,&Size,&binhex   };
  if(diaFactoryRun(_("Frame Hex Dump"),3,elems))
  

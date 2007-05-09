@@ -56,11 +56,11 @@ int DIA_defaultSettings(ADM_audioEncoderDescriptor *descriptor)
                               BITRATE(224),
                               BITRATE(384)
                           };
-    diaElemMenu bitrate(&(descriptor->bitrate),   _("Bitrate"), SZT(bitrateM),bitrateM);
+    diaElemMenu bitrate(&(descriptor->bitrate),   _("_Bitrate:"), SZT(bitrateM),bitrateM);
   
       diaElem *elems[]={&bitrate};
     
-  return ( diaFactoryRun("Audio Settings",1,elems));
+  return ( diaFactoryRun("Audio Configuration",1,elems));
 
 } 
 //EOF 

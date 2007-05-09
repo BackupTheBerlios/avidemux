@@ -50,7 +50,7 @@
 		      <accelerator key="O" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8096">
+			<widget class="GtkImage" id="image8196">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-open</property>
 			  <property name="icon_size">1</property>
@@ -71,7 +71,7 @@
 		      <accelerator key="A" modifiers="GDK_CONTROL_MASK | GDK_MOD1_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8097">
+			<widget class="GtkImage" id="image8197">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-add</property>
 			  <property name="icon_size">1</property>
@@ -91,7 +91,7 @@
 		      <property name="use_underline">True</property>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8098">
+			<widget class="GtkImage" id="image8198">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-save</property>
 			  <property name="icon_size">1</property>
@@ -139,7 +139,7 @@
 			  <child>
 			    <widget class="GtkMenuItem" id="save_selection_as_jpegs1">
 			      <property name="visible">True</property>
-			      <property name="label" translatable="yes">Save _Selection as JPEG images...</property>
+			      <property name="label" translatable="yes">Save _Selection as JPEG Images...</property>
 			      <property name="use_underline">True</property>
 			    </widget>
 			  </child>
@@ -169,7 +169,7 @@
 		      <property name="use_underline">True</property>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8099">
+			<widget class="GtkImage" id="image8199">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-save</property>
 			  <property name="icon_size">1</property>
@@ -189,7 +189,7 @@
 		      <property name="use_underline">True</property>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8100">
+			<widget class="GtkImage" id="image8200">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-save-as</property>
 			  <property name="icon_size">1</property>
@@ -209,7 +209,7 @@
 		      <property name="use_underline">True</property>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8101">
+			<widget class="GtkImage" id="image8201">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-execute</property>
 			  <property name="icon_size">1</property>
@@ -248,7 +248,7 @@
 		  <child>
 		    <widget class="GtkMenuItem" id="connect_to_avsproxy1">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Connect to avsproxy</property>
+		      <property name="label" translatable="yes">Co_nnect to avsproxy</property>
 		      <property name="use_underline">True</property>
 		    </widget>
 		  </child>
@@ -267,7 +267,7 @@
 		      <accelerator key="Return" modifiers="GDK_MOD1_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8102">
+			<widget class="GtkImage" id="image8202">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-properties</property>
 			  <property name="icon_size">1</property>
@@ -302,7 +302,7 @@
 		      <accelerator key="Q" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8103">
+			<widget class="GtkImage" id="image8203">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-quit</property>
 			  <property name="icon_size">1</property>
@@ -335,7 +335,7 @@
 		      <property name="use_underline">True</property>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8104">
+			<widget class="GtkImage" id="image8204">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-undo</property>
 			  <property name="icon_size">1</property>
@@ -362,7 +362,7 @@
 		      <accelerator key="X" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8105">
+			<widget class="GtkImage" id="image8205">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-cut</property>
 			  <property name="icon_size">1</property>
@@ -383,7 +383,7 @@
 		      <accelerator key="C" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8106">
+			<widget class="GtkImage" id="image8206">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-copy</property>
 			  <property name="icon_size">1</property>
@@ -404,7 +404,7 @@
 		      <accelerator key="V" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8107">
+			<widget class="GtkImage" id="image8207">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-paste</property>
 			  <property name="icon_size">1</property>
@@ -425,7 +425,7 @@
 		      <accelerator key="Delete" modifiers="0" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8108">
+			<widget class="GtkImage" id="image8208">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-remove</property>
 			  <property name="icon_size">1</property>
@@ -475,7 +475,7 @@
 		      <property name="use_underline">True</property>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8109">
+			<widget class="GtkImage" id="image8209">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-preferences</property>
 			  <property name="icon_size">1</property>
@@ -711,7 +711,7 @@
 		      <accelerator key="S" modifiers="GDK_CONTROL_MASK | GDK_MOD1_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8110">
+			<widget class="GtkImage" id="image8210">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-save-as</property>
 			  <property name="icon_size">1</property>
@@ -762,7 +762,7 @@
 		      <accelerator key="F7" modifiers="0" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8111">
+			<widget class="GtkImage" id="image8211">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">gnome-calculator_small.xpm</property>
 			  <property name="xalign">0.5</property>
@@ -843,7 +843,7 @@
 		  <child>
 		    <widget class="GtkMenuItem" id="see_hex1">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">See Hex</property>
+		      <property name="label" translatable="yes">_Frame Hex Dump</property>
 		      <property name="use_underline">True</property>
 		    </widget>
 		  </child>
@@ -888,7 +888,7 @@
 		  <child>
 		    <widget class="GtkMenuItem" id="psp1">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">PSP</property>
+		      <property name="label" translatable="yes">_PSP</property>
 		      <property name="use_underline">True</property>
 		    </widget>
 		  </child>
@@ -896,7 +896,7 @@
 		  <child>
 		    <widget class="GtkMenuItem" id="psp_(h264)1">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">PSP (H264)</property>
+		      <property name="label" translatable="yes">PSP (_H.264)</property>
 		      <property name="use_underline">True</property>
 		    </widget>
 		  </child>
@@ -922,7 +922,7 @@
 		      <accelerator key="P" modifiers="0" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8112">
+			<widget class="GtkImage" id="image8212">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-media-play</property>
 			  <property name="icon_size">1</property>
@@ -943,7 +943,7 @@
 		      <accelerator key="KP_4" modifiers="0" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8113">
+			<widget class="GtkImage" id="image8213">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-media-previous</property>
 			  <property name="icon_size">1</property>
@@ -964,7 +964,7 @@
 		      <accelerator key="KP_6" modifiers="0" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8114">
+			<widget class="GtkImage" id="image8214">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-media-next</property>
 			  <property name="icon_size">1</property>
@@ -985,7 +985,7 @@
 		      <accelerator key="KP_2" modifiers="0" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8115">
+			<widget class="GtkImage" id="image8215">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-media-rewind</property>
 			  <property name="icon_size">1</property>
@@ -1006,7 +1006,7 @@
 		      <accelerator key="KP_8" modifiers="0" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8116">
+			<widget class="GtkImage" id="image8216">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-media-forward</property>
 			  <property name="icon_size">1</property>
@@ -1043,7 +1043,7 @@
 		      <accelerator key="Home" modifiers="0" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8117">
+			<widget class="GtkImage" id="image8217">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-goto-first</property>
 			  <property name="icon_size">1</property>
@@ -1064,7 +1064,7 @@
 		      <accelerator key="End" modifiers="0" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8118">
+			<widget class="GtkImage" id="image8218">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-goto-last</property>
 			  <property name="icon_size">1</property>
@@ -1115,7 +1115,7 @@
 		      <accelerator key="F" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8119">
+			<widget class="GtkImage" id="image8219">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-jump-to</property>
 			  <property name="icon_size">1</property>
@@ -1136,7 +1136,7 @@
 		      <accelerator key="T" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8120">
+			<widget class="GtkImage" id="image8220">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-jump-to</property>
 			  <property name="icon_size">1</property>
@@ -1156,7 +1156,7 @@
 	  <child>
 	    <widget class="GtkMenuItem" id="custom1">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Custom</property>
+	      <property name="label" translatable="yes">_Custom</property>
 	      <property name="use_underline">True</property>
 	    </widget>
 	  </child>
@@ -1171,13 +1171,21 @@
 		<widget class="GtkMenu" id="help2_menu">
 
 		  <child>
+		    <widget class="GtkMenuItem" id="show_builtin_support1">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Built-in Support</property>
+		      <property name="use_underline">True</property>
+		    </widget>
+		  </child>
+
+		  <child>
 		    <widget class="GtkImageMenuItem" id="about1">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">_About</property>
 		      <property name="use_underline">True</property>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image8121">
+			<widget class="GtkImage" id="image8221">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-about</property>
 			  <property name="icon_size">1</property>
@@ -1187,14 +1195,6 @@
 			  <property name="ypad">0</property>
 			</widget>
 		      </child>
-		    </widget>
-		  </child>
-
-		  <child>
-		    <widget class="GtkMenuItem" id="show_builtin_support1">
-		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Show builtin support</property>
-		      <property name="use_underline">True</property>
 		    </widget>
 		  </child>
 		</widget>

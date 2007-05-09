@@ -131,7 +131,7 @@ uint8_t DIA_builtin(void)
     CREATE_TOGGLE(win32)
       
       };
-    diaFactoryRun("Component built in",sizeof(elems)/sizeof(diaElem *),elems);
+    diaFactoryRun("Built-in Support",sizeof(elems)/sizeof(diaElem *),elems);
 
     return 1;
 

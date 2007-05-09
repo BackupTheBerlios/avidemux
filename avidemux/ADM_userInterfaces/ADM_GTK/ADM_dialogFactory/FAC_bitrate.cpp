@@ -66,7 +66,7 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
                     (GtkAttachOptions) (0), 0, 0);
   
   /* Add text -> encoding mode */
-  label1 = gtk_label_new_with_mnemonic ("Encoding mode");
+  label1 = gtk_label_new_with_mnemonic ("_Encoding mode:");
   gtk_misc_set_alignment (GTK_MISC (label1), 0.0, 0.5);
   gtk_widget_show(label1);
   
@@ -76,7 +76,7 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
   
   
   /* Add text -> encoding mode */
-  label2 = gtk_label_new_with_mnemonic ("Bitrate (kb/s)");
+  label2 = gtk_label_new_with_mnemonic ("_Bitrate (kb/s):");
   gtk_misc_set_alignment (GTK_MISC (label2), 0.0, 0.5);
   gtk_widget_show(label2);
   /* put entry in hbox */
@@ -93,10 +93,10 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
   
 #define add(x) gtk_combo_box_append_text (GTK_COMBO_BOX (combo),_(#x));
   
-  add(Constant Bitrate);
-  add(Constant Quality);
-  add(Two pass-filesize);
-  add(Two pass-Avg bitrate);
+  add(Single pass - bitrate);
+  add(Single pass - constant quality);
+  add(Two pass - video size);
+  add(Two pass - average bitrate);
   
   PUT_ARRAY(1,0,combo);
   
@@ -157,25 +157,25 @@ void diaElemBitrate::getMe(void)
   switch(rank)
   {
     case 0: //CBR
-          P(Bitrate (kb/s));
+          P(_Bitrate (kb/s):);
           M(0,20000);
           S(copy.bitrate);
           copy.mode=COMPRESS_CBR;
           break; 
     case 1:// CQ
-          P(Quantizer);
+          P(_Quantizer:);
           M(2,31);
           S(copy.qz);
           copy.mode=COMPRESS_CQ;
           break;
     case 2 : // 2pass Filesize
-          P(FileSize (MB));
+          P(_Video size (MB):);
           M(1,8000);
           S(copy.finalsize);
           copy.mode=COMPRESS_2PASS;
           break;
     case 3 : // 2pass Avg
-          P(Average Br (kb/s));
+          P(_Average bitrate (kb/s):);
           M(0,20000);
           S(copy.avg_bitrate);
           copy.mode=COMPRESS_2PASS_BITRATE;
@@ -200,28 +200,28 @@ void diaElemBitrate::updateMe(void)
 #undef P
 #undef M
 #undef S
-#define P(x) gtk_label_set_text(GTK_LABEL(label),_(#x));
+#define P(x) gtk_label_set_text_with_mnemonic(GTK_LABEL(label),_(#x));
 #define M(x,y) gtk_spin_button_set_range  (GTK_SPIN_BUTTON(spin),x,y)
 #define S(x)   gtk_spin_button_set_value  (GTK_SPIN_BUTTON(spin),x)
   switch(rank)
   {
     case 0: //CBR
-          P(Bitrate (kb/s));
+          P(_Bitrate (kb/s):);
           M(0,20000);
           S(copy.bitrate);
           break; 
     case 1:// CQ
-          P(Quantizer);
+          P(_Quantizer:);
           M(2,31);
           S(copy.qz);
           break;
     case 2 : // 2pass Filesize
-          P(FileSize (MB));
+          P(_Video size (MB):);
           M(1,8000);
           S(copy.finalsize);
           break;
     case 3 : // 2pass Avg
-          P(Average Br (kb/s));
+          P(_Average bitrate (kb/s):);
           M(0,20000);
           S(copy.avg_bitrate);
           break;

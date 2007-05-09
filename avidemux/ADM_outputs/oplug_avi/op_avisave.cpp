@@ -76,18 +76,18 @@ uint8_t ADM_aviUISetMuxer(  void )
   {MUX_N_BYTES,_("Mux by packet size")}
   };
   
-    diaElemMenu      mux(&(mux_mode),_("Muxing Type"),3,muxingType);
-    diaElemUInteger blockSize(&(muxSize),_("Split every MBytes"),1,9000);
+    diaElemMenu      mux(&(mux_mode),_("Muxing _type:"),3,muxingType);
+    diaElemUInteger blockSize(&(muxSize),_("_Split every MB:"),1,9000);
     
-    diaElemUInteger n_frames(&(mux_n_frame),_("Mux Every x video frames"),1,100);
-    diaElemUInteger n_block(&(mux_size_block),_("Mux with block of size"),1,50000);
+    diaElemUInteger n_frames(&(mux_n_frame),_("Mux _every x video frames:"),1,100);
+    diaElemUInteger n_block(&(mux_size_block),_("Mux in _blocks of x bytes:"),1,50000);
     
     
      mux.link(&(muxingType[1]),1,&n_frames);
      mux.link(&(muxingType[2]),1,&n_block);
     
      diaElem *elems[4]={&mux,&n_frames,&n_block,&blockSize};
-     if( diaFactoryRun(_("Avi Muxer Option"),4,elems))
+     if( diaFactoryRun(_("AVI Muxer Options"),4,elems))
     {
       muxMode=(PARAM_MUX)mux_mode;
       switch(muxMode)

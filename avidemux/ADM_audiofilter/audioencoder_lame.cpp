@@ -216,7 +216,7 @@ int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor)
                              {ADM_JSTEREO,   _("Joint stereo"),NULL},
                              {ADM_MONO,      _("Mono"),NULL}};
           
-    diaElemMenu menuMode(&mmode,   _("Channel Mode"), SZT(channelMode),channelMode);
+    diaElemMenu menuMode(&mmode,   _("C_hannel mode:"), SZT(channelMode),channelMode);
     
     diaMenuEntry encodingMode[]={
                              {ADM_LAME_PRESET_CBR,      _("CBR"),NULL},
@@ -225,7 +225,7 @@ int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor)
                              {ADM_LAME_PRESET_EXTREME,      _("Extreme"),NULL}
 #endif
     }; 
-    diaElemMenu Mode(&ppreset,   _("Mode"), SZT(encodingMode),encodingMode);
+    diaElemMenu Mode(&ppreset,   _("Bit_rate mode:"), SZT(encodingMode),encodingMode);
 #define BITRATE(x) {x,_(#x)}
     diaMenuEntry bitrateM[]={
                               BITRATE(56),
@@ -238,16 +238,16 @@ int DIA_getLameSettings(ADM_audioEncoderDescriptor *descriptor)
                               BITRATE(192),
                               BITRATE(224)
                           };
-    diaElemMenu bitrate(&(descriptor->bitrate),   _("Bitrate"), SZT(bitrateM),bitrateM);
+    diaElemMenu bitrate(&(descriptor->bitrate),   _("_Bitrate:"), SZT(bitrateM),bitrateM);
     
     
     
     
-    diaElemUInteger quality(PX(quality),_("Quality"),0,9);
+    diaElemUInteger quality(PX(quality),_("_Quality:"),0,9);
   
       diaElem *elems[]={&menuMode,&Mode,&quality,&bitrate};
     
-  if( diaFactoryRun("Lame Settings",4,elems))
+  if( diaFactoryRun("LAME Configuration",4,elems))
   {
     lameParam->mode=(ADM_mode)mmode; 
     lameParam->preset=(ADM_LAME_PRESET)ppreset;

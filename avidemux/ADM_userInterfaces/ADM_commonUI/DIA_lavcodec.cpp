@@ -57,12 +57,12 @@ diaMenuEntry meE[]={
 };       
 
 diaMenuEntry qzE[]={
-  {0,_("H263")},
+  {0,_("H.263")},
   {1,_("MPEG")}
 };       
 
 diaMenuEntry rdE[]={
-  {0,_("MB Comparison")},
+  {0,_("MB comparison")},
   {1,_("Fewest bits (vhq)")},
   {2,_("Rate distortion")}
 };     
@@ -71,26 +71,26 @@ uint32_t me=(uint32_t)conf->me_method;
 
          diaElemBitrate bitrate(incoming,NULL);
          diaElemMenu      meM(&me,_("Matrices"),4,meE);
-         diaElemUInteger  qminM(PX(qmin),_("Min Qz"),1,31);
-         diaElemUInteger  qmaxM(PX(qmax),_("Max Qz"),1,31);
-         diaElemUInteger  qdiffM(PX(max_qdiff),_("Max QDiff"),1,31);
+         diaElemUInteger  qminM(PX(qmin),_("Mi_n. quantizer:"),1,31);
+         diaElemUInteger  qmaxM(PX(qmax),_("Ma_x. quantizer:"),1,31);
+         diaElemUInteger  qdiffM(PX(max_qdiff),_("Max. quantizer _difference:"),1,31);
          
-         diaElemToggle    fourMv(PX(_4MV),_("4MV"));
-         diaElemToggle    trellis(PX(_TRELLIS_QUANT),_("Trellis"));
+         diaElemToggle    fourMv(PX(_4MV),_("4_MV"));
+         diaElemToggle    trellis(PX(_TRELLIS_QUANT),_("_Trellis quantization"));
          
-         diaElemToggle    qpel(PX(_QPEL),_("Quarter Pel"));
-         diaElemToggle    gmc(PX(_GMC),_("GMC"));
+         diaElemToggle    qpel(PX(_QPEL),_("_Quarter pixel"));
+         diaElemToggle    gmc(PX(_GMC),_("_GMC"));
 
          
-         diaElemUInteger  max_b_frames(PX(max_b_frames),_("Number of BFrames"),0,32);
-         diaElemMenu     qzM(PX(mpeg_quant),_("Quantization type"),2,qzE);
+         diaElemUInteger  max_b_frames(PX(max_b_frames),_("_Number of B frames:"),0,32);
+         diaElemMenu     qzM(PX(mpeg_quant),_("_Quantization type:"),2,qzE);
          
-         diaElemMenu     rdM(PX(mb_eval),_("Macroblock decision"),3,rdE);
+         diaElemMenu     rdM(PX(mb_eval),_("_Macroblock decision:"),3,rdE);
          
-         diaElemUInteger filetol(PX(vratetol),_("Filesize tolerance (kb"),0,100000);
+         diaElemUInteger filetol(PX(vratetol),_("_Filesize tolerance (kb):"),0,100000);
          
-         diaElemFloat    qzComp(PX(qcompress),_("Quantize compression"),0,1);
-         diaElemFloat    qzBlur(PX(qblur),_("Quantize blur"),0,1);
+         diaElemFloat    qzComp(PX(qcompress),_("_Quantizer compression:"),0,1);
+         diaElemFloat    qzBlur(PX(qblur),_("Quantizer _blur:"),0,1);
          
          
           /* First Tab : encoding mode */
@@ -117,7 +117,7 @@ uint32_t me=(uint32_t)conf->me_method;
         diaElemTabs tabRC(_("Rate Control"),3,diaRC);
         
          diaElemTabs *tabs[]={&tabMode,&tabME,&tabQz,&tabRC};
-        if( diaFactoryRunTabs(_("Lavcodec Mpeg4 configuration"),4,tabs))
+        if( diaFactoryRunTabs(_("libavcodec MPEG-4 configuration"),4,tabs))
 	{
           conf->me_method=(Motion_Est_ID)me;
           return 1;

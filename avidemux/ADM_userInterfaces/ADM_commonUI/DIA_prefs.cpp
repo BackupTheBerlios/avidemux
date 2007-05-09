@@ -159,46 +159,46 @@ uint32_t hzd,vzd,dring;
         olddevice=newdevice=AVDM_getCurrentDevice();
         // Audio device
         /************************ Build diaelems ****************************************/
-        diaElemToggle useSysTray(&useTray,_("Use systray while encoding"));
-        diaElemToggle allowAnyMpeg(&mpeg_no_limit,_("Accept non-standard audio frequency for DVD"));
-        diaElemToggle useLavcodec(&lavcodec_mpeg,_("Use lavcodec mpeg2 decoder"));
-        diaElemToggle openDml(&use_odml,_("Create openDML file"));
-        diaElemToggle autoIndex(&useAutoIndex,_("Automatically index mpeg files"));
-        diaElemToggle autoSwap(&useSwap,_("Automatically swap A and B if A>B"));
-        diaElemToggle nuvAudio(&useNuv,_("Disable NUV audio sync"));
-        diaElemToggle loadEx(&activeXfilter,_("Load external filters"));
+        diaElemToggle useSysTray(&useTray,_("_Use systray while encoding"));
+        diaElemToggle allowAnyMpeg(&mpeg_no_limit,_("_Accept non-standard audio frequency for DVD"));
+        diaElemToggle useLavcodec(&lavcodec_mpeg,_("_Use libavcodec MPEG-2 decoder"));
+        diaElemToggle openDml(&use_odml,_("Create _OpenDML files"));
+        diaElemToggle autoIndex(&useAutoIndex,_("Automatically _index MPEG files"));
+        diaElemToggle autoSwap(&useSwap,_("Automatically _swap A and B if A>B"));
+        diaElemToggle nuvAudio(&useNuv,_("_Disable NUV audio sync"));
+        diaElemToggle loadEx(&activeXfilter,_("_Load external filters"));
         
-        diaElemToggle togAutoVbr(&autovbr,_("Automatically build VBR map"));
-        diaElemToggle togAutoIndex(&autoindex,_("Automatically rebuild index"));
-        diaElemToggle togAutoUnpack(&autounpack,_("Automatically remove packed bitstream"));
+        diaElemToggle togAutoVbr(&autovbr,_("Automatically _build VBR map"));
+        diaElemToggle togAutoIndex(&autoindex,_("Automatically _rebuild index"));
+        diaElemToggle togAutoUnpack(&autounpack,_("Automatically remove _packed bitstream"));
                        
-        diaElemUInteger multiThread(&mthreads,_("Number of threads"),0,10);
+        diaElemUInteger multiThread(&mthreads,_("_Number of threads:"),0,10);
 
 		diaMenuEntry priorityEntries[] = {
                              {0,       _("High"),NULL}
-                             ,{1,      _("Above Normal"),NULL}
+                             ,{1,      _("Above normal"),NULL}
                              ,{2,      _("Normal"),NULL}
-							 ,{3,      _("Below Normal"),NULL}
+							 ,{3,      _("Below normal"),NULL}
 							 ,{4,      _("Low"),NULL}
         };
-		diaElemMenu menuEncodePriority(&encodePriority,_("Encoding priority"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
-		diaElemMenu menuIndexPriority(&indexPriority,_("Indexing / unpacking priority"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
-		diaElemMenu menuPlaybackPriority(&playbackPriority,_("Playback priority"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
+		diaElemMenu menuEncodePriority(&encodePriority,_("_Encoding priority:"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
+		diaElemMenu menuIndexPriority(&indexPriority,_("_Indexing/unpacking priority:"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
+		diaElemMenu menuPlaybackPriority(&playbackPriority,_("_Playback priority:"), sizeof(priorityEntries)/sizeof(diaMenuEntry), priorityEntries,"");
 
-        diaElemUInteger autoSplit(&autosplit,_("Split mpegs every (MB)"),10,4096);
+        diaElemUInteger autoSplit(&autosplit,_("_Split MPEG files every (MB):"),10,4096);
         
-        diaElemToggle   togTagMp3(&alternate_mp3_tag,_("Use alternative tag for mp3 in .mp4"));
+        diaElemToggle   togTagMp3(&alternate_mp3_tag,_("_Use alternative tag for MP3 in .mp4"));
         
         diaMenuEntry videoMode[]={
-                             {RENDER_GTK,      _("Gtk (Slow)"),NULL}
+                             {RENDER_GTK,      _("GTK+ (slow)"),NULL}
 #ifdef USE_XV
-                             ,{RENDER_XV,   _("Xv (Best)"),NULL}
+                             ,{RENDER_XV,   _("XVideo (best)"),NULL}
 #endif
 #ifdef USE_SDL
-                             ,{RENDER_SDL,      _("SDL (Good)"),NULL}
+                             ,{RENDER_SDL,      _("SDL (good)"),NULL}
 #endif
         };        
-        diaElemMenu menuVideoMode(&render,_("Video Display"), sizeof(videoMode)/sizeof(diaMenuEntry),videoMode,"");
+        diaElemMenu menuVideoMode(&render,_("Video _display:"), sizeof(videoMode)/sizeof(diaMenuEntry),videoMode,"");
         
         
         
@@ -207,24 +207,24 @@ uint32_t hzd,vzd,dring;
                              ,{1,      _("Display only error alerts"),NULL}
                              ,{2,      _("Display all alerts"),NULL}
         };
-        diaElemMenu menuMessage(&msglevel,_("Message level"), sizeof(msgEntries)/sizeof(diaMenuEntry),msgEntries,"");
+        diaElemMenu menuMessage(&msglevel,_("_Message level:"), sizeof(msgEntries)/sizeof(diaMenuEntry),msgEntries,"");
         
         
         
         diaMenuEntry volumeEntries[]={
                              {0,       _("PCM"),NULL}
                              ,{1,      _("Master"),NULL}};
-        diaElemMenu menuVolume(&useMaster,_("Volume control"), sizeof(volumeEntries)/sizeof(diaMenuEntry),volumeEntries,"");
+        diaElemMenu menuVolume(&useMaster,_("_Volume control:"), sizeof(volumeEntries)/sizeof(diaMenuEntry),volumeEntries,"");
         
         
         
          diaMenuEntry mixerEntries[]={
                              {0,       _("No downmixing"),NULL}
                              ,{1,       _("Stereo"),NULL}
-                             ,{2,      _("Prologic"),NULL}
-                              ,{3,      _("Prologic II"),NULL}
+                             ,{2,      _("Pro Logic"),NULL}
+                              ,{3,      _("Pro Logic II"),NULL}
          };
-        diaElemMenu menuMixer(&downmix,_("Local Playback Downmixing"), sizeof(mixerEntries)/sizeof(diaMenuEntry),mixerEntries,"");
+        diaElemMenu menuMixer(&downmix,_("_Local playback downmixing:"), sizeof(mixerEntries)/sizeof(diaMenuEntry),mixerEntries,"");
 #undef MKADID        
 #define MKADID(x) {DEVICE_##x,_(#x),NULL}
         diaMenuEntry audioEntries[]=
@@ -253,9 +253,9 @@ uint32_t hzd,vzd,dring;
 #endif	
         MKADID(DUMMY)
 };
-        diaElemMenu menuAudio(&newdevice,_("Audio output"), sizeof(audioEntries)/sizeof(diaMenuEntry),audioEntries,"");
+        diaElemMenu menuAudio(&newdevice,_("_Audio output:"), sizeof(audioEntries)/sizeof(diaMenuEntry),audioEntries,"");
         
-        diaElemText entryAlsaDevice(&alsaDevice,"Alsa Device",NULL);
+        diaElemText entryAlsaDevice(&alsaDevice,"ALSA _device:",NULL);
 #ifdef ALSA_SUPPORT
           int z,m;
           m=sizeof(audioEntries)/sizeof(diaMenuEntry);
@@ -266,10 +266,10 @@ uint32_t hzd,vzd,dring;
           }
 #endif
         // default Post proc
-     diaElemToggle     fhzd(&hzd,_("Horizontal deblocking"));
-     diaElemToggle     fvzd(&vzd,_("Vertical deblocking"));
-     diaElemToggle     fdring(&dring,_("Deringing"));
-     diaElemUInteger   postProcStrength(&pp_value,_("Strength:"),0,5);
+     diaElemToggle     fhzd(&hzd,_("_Horizontal deblocking"));
+     diaElemToggle     fvzd(&vzd,_("_Vertical deblocking"));
+     diaElemToggle     fdring(&dring,_("De_ringing"));
+     diaElemUInteger   postProcStrength(&pp_value,_("_Strength:"),0,5);
      diaElemFrame      framePP(_("Default Postprocessing"));
      
      framePP.swallow(&fhzd);
@@ -284,7 +284,7 @@ uint32_t hzd,vzd,dring;
 #else
                filterPath = ADM_strdup("c:\\");
 #endif
-        diaElemDirSelect  entryFilterPath(&filterPath,_("Filter directory"),"");
+        diaElemDirSelect  entryFilterPath(&filterPath,_("_Filter directory:"),"");
         
         /**********************************************************************/
         /* First Tab : user interface */
@@ -293,7 +293,7 @@ uint32_t hzd,vzd,dring;
         
          /* First Tab bis: user interface : Auto*/
         diaElem *diaAuto[]={&autoSwap,&togAutoVbr,&togAutoIndex,&togAutoUnpack,&autoIndex,};
-        diaElemTabs tabAuto("Automatically",5,diaAuto);
+        diaElemTabs tabAuto("Automation",5,diaAuto);
         
         /* Second Tab : input */
         diaElem *diaInput[]={&nuvAudio,&useLavcodec};

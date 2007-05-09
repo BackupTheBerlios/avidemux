@@ -43,31 +43,31 @@ diaMenuEntry wideM[]={
   {1,_("16:9")}};
 diaMenuEntry matrixM[]={
   {0,_("Default")},
-  {1,_("Tmpgenc")},
+  {1,_("TMPGEnc")},
   {2,_("Anime")},
   {3,_("KVCD")}
 };
 diaMenuEntry interM[]={
   {0,_("Progressive")},
-  {1,_("Int. TFF")},
-  {2,_("Int. BFF")}
+  {1,_("Interlaced TFF")},
+  {2,_("Interlaced BFF")}
 };
                       
          diaElemBitrate bitrate(incoming,NULL);
-         diaElemMenu      widescreen(&(conf->widescreen),_("Aspect Ratio"),2,wideM);
-         diaElemMenu      matrix(&(conf->user_matrix),_("Matrices"),4,matrixM);
-         diaElemUInteger gop(&(conf->gop_size),_("Gop Size"),1,30);
-         diaElemUInteger maxb(&(conf->maxBitrate),_("Max Bitrate"),100,9000);
+         diaElemMenu      widescreen(&(conf->widescreen),_("Aspect _ratio:"),2,wideM);
+         diaElemMenu      matrix(&(conf->user_matrix),_("_Matrices:"),4,matrixM);
+         diaElemUInteger gop(&(conf->gop_size),_("_GOP size:"),1,30);
+         diaElemUInteger maxb(&(conf->maxBitrate),_("Ma_x. bitrate:"),100,9000);
 
 uint32_t inter;
           if(!conf->interlaced) inter=0;
             else if(conf->bff) inter=2;
                 else inter=1;
-         diaElemMenu      interW(&inter,_("Interlacing"),3,interM);
+         diaElemMenu      interW(&inter,_("_Interlacing:"),3,interM);
   
       diaElem *elems[6]={&bitrate,&widescreen,&interW,&matrix,&gop,&maxb};
     
-  if( diaFactoryRun("Mpeg2 Encoding",6,elems))
+  if( diaFactoryRun("MPEG-2 Configuration",6,elems))
   {
     switch(inter)
     {

@@ -340,7 +340,7 @@ create_mainWindow (void)
   gtk_widget_show (save_jpg_image1);
   gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_jpg_image1);
 
-  save_selection_as_jpegs1 = gtk_menu_item_new_with_mnemonic (_("Save _Selection as JPEG images..."));
+  save_selection_as_jpegs1 = gtk_menu_item_new_with_mnemonic (_("Save _Selection as JPEG Images..."));
   gtk_widget_show (save_selection_as_jpegs1);
   gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_selection_as_jpegs1);
 
@@ -393,7 +393,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), separator16);
   gtk_widget_set_sensitive (separator16, FALSE);
 
-  connect_to_avsproxy1 = gtk_menu_item_new_with_mnemonic (_("Connect to avsproxy"));
+  connect_to_avsproxy1 = gtk_menu_item_new_with_mnemonic (_("Co_nnect to avsproxy"));
   gtk_widget_show (connect_to_avsproxy1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), connect_to_avsproxy1);
 
@@ -753,7 +753,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (tools1_menu), separator17);
   gtk_widget_set_sensitive (separator17, FALSE);
 
-  see_hex1 = gtk_menu_item_new_with_mnemonic (_("See Hex"));
+  see_hex1 = gtk_menu_item_new_with_mnemonic (_("_Frame Hex Dump"));
   gtk_widget_show (see_hex1);
   gtk_container_add (GTK_CONTAINER (tools1_menu), see_hex1);
 
@@ -776,11 +776,11 @@ create_mainWindow (void)
   gtk_widget_show (dvd1);
   gtk_container_add (GTK_CONTAINER (help1_menu), dvd1);
 
-  psp1 = gtk_menu_item_new_with_mnemonic (_("PSP"));
+  psp1 = gtk_menu_item_new_with_mnemonic (_("_PSP"));
   gtk_widget_show (psp1);
   gtk_container_add (GTK_CONTAINER (help1_menu), psp1);
 
-  psp__h264_1 = gtk_menu_item_new_with_mnemonic (_("PSP (H264)"));
+  psp__h264_1 = gtk_menu_item_new_with_mnemonic (_("PSP (_H.264)"));
   gtk_widget_show (psp__h264_1);
   gtk_container_add (GTK_CONTAINER (help1_menu), psp__h264_1);
 
@@ -922,7 +922,7 @@ create_mainWindow (void)
   gtk_widget_show (image8120);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (jump_to_time1), image8120);
 
-  custom1 = gtk_menu_item_new_with_mnemonic (_("Custom"));
+  custom1 = gtk_menu_item_new_with_mnemonic (_("_Custom"));
   gtk_widget_show (custom1);
   gtk_container_add (GTK_CONTAINER (menuBar), custom1);
 
@@ -933,6 +933,10 @@ create_mainWindow (void)
   help2_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (help2), help2_menu);
 
+  show_builtin_support1 = gtk_menu_item_new_with_mnemonic (_("_Built-in Support"));
+  gtk_widget_show (show_builtin_support1);
+  gtk_container_add (GTK_CONTAINER (help2_menu), show_builtin_support1);
+  
   about1 = gtk_image_menu_item_new_with_mnemonic (_("_About"));
   gtk_widget_show (about1);
   gtk_container_add (GTK_CONTAINER (help2_menu), about1);
@@ -940,10 +944,6 @@ create_mainWindow (void)
   image8121 = gtk_image_new_from_stock ("gtk-about", GTK_ICON_SIZE_MENU);
   gtk_widget_show (image8121);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (about1), image8121);
-
-  show_builtin_support1 = gtk_menu_item_new_with_mnemonic (_("Show builtin support"));
-  gtk_widget_show (show_builtin_support1);
-  gtk_container_add (GTK_CONTAINER (help2_menu), show_builtin_support1);
 
   toolbar2 = gtk_toolbar_new ();
   gtk_widget_show (toolbar2);
