@@ -47,7 +47,7 @@ extern uint32_t encoderGetNbEncoder (void);
 extern const char *encoderGetIndexedName (uint32_t i);
 extern uint32_t audioFilterGetNbEncoder(void);
 extern const char* audioFilterGetIndexedName(uint32_t i);
-
+extern void checkCrashFile(void);
 static void setupMenus(void);
 
 static QSlider *slider=NULL;
@@ -281,6 +281,7 @@ Q_INIT_RESOURCE(filter);
      automation();
     }
     setupMenus();
+    checkCrashFile();
     return a.exec();
 }
 /**

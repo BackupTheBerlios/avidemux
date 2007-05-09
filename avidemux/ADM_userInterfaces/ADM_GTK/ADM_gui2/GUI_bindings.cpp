@@ -95,6 +95,7 @@ const char * GUI_getCustomScript(uint32_t nb);
 #ifdef HAVE_AUDIO
 extern uint8_t AVDM_setVolume(int volume);
 #endif
+extern void checkCrashFile(void);
 #define AUDIO_WIDGET "comboboxAudio"
 #define VIDEO_WIDGET "comboboxVideo"
 #define FORMAT_WIDGET "comboboxFormat"
@@ -1125,6 +1126,7 @@ int UI_RunApp(void)
     {
       g_timeout_add(200,(GCALL *)trampoline,NULL);
     }
+    checkCrashFile();
     gtk_main();
     gdk_threads_leave();
 

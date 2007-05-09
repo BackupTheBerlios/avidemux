@@ -21,13 +21,22 @@
 #include <stdarg.h>
 #include <string.h>
 #include <default.h>
-#include <ADM_assert.h>
+#include <unistd.h>
+
 #include <math.h>
+#include <ADM_assert.h>
 
 #include "default.h"
 #include "ADM_toolkit/toolkit.hxx"
 #include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
+#include "ADM_editor/ADM_edit.hxx"
+extern ADM_Composer *video_body;
 
+#define CRASH_FILE "crash.js"
+
+static void saveCrashProject(void);
+extern char *ADM_getBaseDir(void);
+extern void A_parseECMAScript(const char *name);
 #ifdef CYG_MANGLING
 void installSigHandler()
 {
@@ -36,7 +45,7 @@ void installSigHandler()
 void ADM_backTrack(int lineno,const char *file)
 {
  char bfr[1024];
-  
+  saveCrashProject();
  snprintf(bfr,1024,"Assert Failed at file %s, line %d\n",file,lineno);
  GUI_Error_HIG("Fatal Error",bfr);
  assert(0);
@@ -162,6 +171,7 @@ void ADM_backTrack(int lineno,const char *file)
      char **functions;
      int count, i;
       
+     saveCrashProject();
       printf("\n*********** BACKTRACK **************\n");
       count = backtrace(stack, 20);
       functions = backtrace_symbols(stack, count);
@@ -192,4 +202,50 @@ void ADM_backTrack(int lineno,const char *file)
      exit(1); // _exit(1) ???
 }
 #endif
+/**
+    \fn saveCrashProject
+    \brief Try to save the current project, useful in case of crash
+*/
+void saveCrashProject(void)
+{
+  char *baseDir=ADM_getBaseDir();
+  char *name=CRASH_FILE;
+  static int crashCount=0;
+  if(crashCount) return ; // avoid endless looping
+  crashCount++;
+  char *where=new char[strlen(baseDir)+strlen(name)+2];
+  strcpy(where,baseDir);
+  strcat(where,"/");
+  strcat(where,name);
+  printf("Saving crash file to %s\n",where);
+  video_body->saveAsScript (where, NULL);
+}
+/**
+    \fn checkCrashFile
+    \brief Check if there i a crash file
+*/
+
+void checkCrashFile(void)
+{
+  char *baseDir=ADM_getBaseDir();
+  char *name=CRASH_FILE;
+  static int crashCount=0;
+  char *where=new char[strlen(baseDir)+strlen(name)+2];
+  strcpy(where,baseDir);
+  strcat(where,"/");
+  strcat(where,name);
+  if(ADM_fileExist(where))
+  {
+    if(GUI_Confirmation_HIG(_("Load it"),_("Crash file"),
+       _("I have detected a crash file. \nDo you want to load it  ?\n(It will be deleted in all cases, you should save it if you want to keep it)")))
+    {
+       A_parseECMAScript(where);
+    }
+    unlink(where);
+  }else
+  {
+    printf("No crash file (%s)\n",where); 
+  }
+  delete [] where;
+}
 //EOF
