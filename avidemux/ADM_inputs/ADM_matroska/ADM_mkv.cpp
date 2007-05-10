@@ -84,6 +84,7 @@ uint8_t mkvHeader::open(char *name)
     printf("[MKV] Cluster indexing failed\n");
     return 0;
   }
+  printf("[MKV]Found %u clusters\n",_nbClusters);
   printf("[MKV] Indexing video\n");
     if(!videoIndexer(&ebml))
     {

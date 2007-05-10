@@ -128,6 +128,7 @@ uint8_t             mkvAudio::getPacket(uint8_t *dest, uint32_t *packlen, uint32
               default:
               case MKV_TIMECODE:     _clusterParser->skip(len);  break;
               case MKV_BLOCK_GROUP:    break;
+              case MKV_SIMPLE_BLOCK: 
               case MKV_BLOCK: 
               {
                   uint32_t tid=_clusterParser->readEBMCode();

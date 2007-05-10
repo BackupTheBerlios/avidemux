@@ -77,7 +77,11 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                   //printf("Skipping %s\n",ss);
                   cluster.skip(len);
                   break;
-                
+                case MKV_SIMPLE_BLOCK:
+                    {
+                      indexBlock(parser,len,_clusters[clusters].timeCode);
+                    }
+                    break;
                 case MKV_BLOCK_GROUP:
                 {
                         //printf("Block Group\n");
@@ -97,10 +101,11 @@ uint8_t mkvHeader::videoIndexer(ADM_ebml_file *parser)
                                 {
                                   default: blockGroup.skip(len);
                                   case MKV_BLOCK : 
+                                  case MKV_SIMPLE_BLOCK:
                                   {
                                     indexBlock(&blockGroup,len,_clusters[clusters].timeCode);
-                                    
-                                  }         
+                                  }
+                                  break;
                                 }
                           }
                           thiscluster++;
