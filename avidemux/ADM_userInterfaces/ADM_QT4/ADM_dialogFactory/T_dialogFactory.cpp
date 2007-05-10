@@ -154,7 +154,18 @@ uint8_t diaFactoryRunTabs(const char *title,uint32_t nb,diaElemTabs **tabs)
   dialog.setLayout(&layout);
   if(dialog.exec()==QDialog::Accepted)
   {
-   
+      // Read tabs
+       for(int tab=0;tab<nb;tab++)
+     {
+        ADM_assert(tabs[tab]);
+        diaElemTabs *myTab=tabs[tab];
+        for(int i=0;i<myTab->nbElems;i++)
+        {
+          myTab->dias[i]->getMe();
+        }
+    
+      }
+      return 1;
   }
   return 0;
   

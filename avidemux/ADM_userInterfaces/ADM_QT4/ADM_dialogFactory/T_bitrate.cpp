@@ -91,14 +91,30 @@ class  ADM_Qbitrate : public QWidget
             case  COMPRESS_2PASS_BITRATE:i=3;break;
             default: ADM_assert(0);
           }
+          combo->setCurrentIndex(i);
           comboChanged(i);        
           QObject::connect(combo, SIGNAL(currentIndexChanged(int )), this, SLOT(comboChanged(int )));
           
           
         }
         virtual ~ADM_Qbitrate() ;
-            
+        void readBack(void);
 };
+void ADM_Qbitrate::readBack(void)
+{
+#define Mx(x) compress->mode=x
+#define Vx(x) compress->x=box->value();
+  switch(combo->currentIndex())
+  {
+    case 0: Mx(COMPRESS_CBR);Vx(bitrate);break;
+    case 1: Mx(COMPRESS_CQ);Vx(qz);break;
+    case 2: Mx(COMPRESS_2PASS);Vx(finalsize);break;
+    case 3: Mx(COMPRESS_2PASS_BITRATE);Vx(bitrate);break;
+    case 4: Mx(COMPRESS_SAME);break;
+    default :
+          ADM_assert(0);
+  }
+}
 void ADM_Qbitrate::comboChanged(int i)
 {
   printf("Changed\n"); 
@@ -178,7 +194,8 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
 }
 void diaElemBitrate::getMe(void)
 {
-  //memcpy(param,&copy,sizeof(copy));
+  ((ADM_Qbitrate *)myWidget)->readBack();
+  memcpy(param,&copy,sizeof(copy));
 }
 
 //EOF

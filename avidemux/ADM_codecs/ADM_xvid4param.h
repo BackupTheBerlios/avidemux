@@ -21,55 +21,55 @@
 typedef struct xvid4EncParam
 {
 
-  int guiLevel;			// equivalent to divx level : Fast/medium/insane
+  uint32_t guiLevel;			// equivalent to divx level : Fast/medium/insane
 
-  int min_key_interval;
-  int max_key_interval;
-  int bframes;
+  uint32_t min_key_interval;
+  uint32_t max_key_interval;
+  uint32_t bframes;
 
-  int mpegQuantizer;		// 0 h263/ 1 Mpeg quantizer
-  int interlaced;
-  int inter4mv;
-  int trellis;
-  int cartoon;
-  int greyscale;
+  uint32_t mpegQuantizer;		// 0 h263/ 1 Mpeg quantizer
+  uint32_t interlaced;
+  uint32_t inter4mv;
+  uint32_t trellis;
+  uint32_t cartoon;
+  uint32_t greyscale;
 
-  int qpel;
-  int gmc;
-  int bvhq;
-  int hqac;
+  uint32_t qpel;
+  uint32_t gmc;
+  uint32_t bvhq;
+  uint32_t hqac;
 
-  int chroma_opt;
-  int qmin[3];			// IPB
-  int qmax[3];			// IPB
+  uint32_t   chroma_opt;
+  uint32_t qmin[3];			// IPB
+  uint32_t qmax[3];			// IPB
 
-  uint8_t par_as_input;
-  uint8_t par_width;
-  uint8_t par_height;
+  uint32_t par_as_input;
+  uint32_t par_width;
+  uint32_t par_height;
 
 
   // This if for 2 pass   
-  int keyframe_boost;
-  int curve_compression_high;
-  int curve_compression_low;
-  int overflow_control_strength;
-  int max_overflow_improvement;
-  int max_overflow_degradation;
-  int kfreduction;
-  int kfthreshold;
+  uint32_t keyframe_boost;
+  uint32_t curve_compression_high;
+  uint32_t curve_compression_low;
+  uint32_t overflow_control_strength;
+  uint32_t max_overflow_improvement;
+  uint32_t max_overflow_degradation;
+  uint32_t kfreduction;
+  uint32_t kfthreshold;
 
   int container_frame_overhead;
   //
-  int bquant_ratio;
-  int bquant_offset;
-  int vhqmode;
-  int chroma_me;
-  int turbo;
-  int packed;
-  int closed_gop;
-  int bframe_threshold;
-  int useCustomIntra;
-  int useCustomInter;
+  uint32_t bquant_ratio;
+  uint32_t bquant_offset;
+  uint32_t vhqmode;
+  uint32_t chroma_me;
+  uint32_t turbo;
+  uint32_t packed;
+  uint32_t closed_gop;
+  uint32_t bframe_threshold;
+  uint32_t useCustomIntra;
+  uint32_t useCustomInter;
   uint8_t  intraMatrix[64];
   uint8_t  interMatrix[64];
   char logName[200];
