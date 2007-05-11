@@ -26,11 +26,11 @@
 #include "ADM_audio/aviaudio.hxx"
 #include "ADM_audiocodec/ADM_audiocodec.h"
 #include "ADM_audiofilter/audiofilter_channel_route.h"
-
+#include "ADM_libraries/ADM_libwrapper/libwrapper_global.h"
 
 ADM_Audiocodec	*getAudioCodec(uint32_t fourcc,WAVHeader *info,uint32_t extra,uint8_t *extraData)
 {
-ADM_Audiocodec *out;
+ADM_Audiocodec *out = NULL;
 
 		// fake codec for 8 bits
 		if(fourcc==WAV_PCM)
@@ -86,10 +86,14 @@ ADM_Audiocodec *out;
                   break;
 #endif
 #ifdef USE_LIBDCA
-                                case WAV_DTS:
-                                    printf("\n Audio codec:  DTS\n");
-                                    out= (ADM_Audiocodec *) new ADM_AudiocodecDCA(fourcc, info);
-                                    break;
+                case WAV_DTS:
+					if (dca->isAvialable())
+					{
+						printf("\n Audio codec:  DTS\n");
+						out= (ADM_Audiocodec *) new ADM_AudiocodecDCA(fourcc, info);						
+					}
+
+					break;
 #endif
 #ifdef USE_MP3
 				case WAV_MP3:
@@ -133,15 +137,18 @@ ADM_Audiocodec *out;
                 printf("\n Audio codec:  ffQDM2\n");
                 out= (ADM_Audiocodec *) new ADM_AudiocodecWMA(fourcc,info,extra,extraData);
                 break;
-            default:
-             			printf("\n Unknown codec : %lu",fourcc);
-             			out= (ADM_Audiocodec *) new ADM_AudiocodecUnknown(fourcc);
         	}
+
+	if (out == NULL)
+	{
+		printf("\n Unknown codec : %lu",fourcc);
+		out = (ADM_Audiocodec *) new ADM_AudiocodecUnknown(fourcc);
+	}
 
 	ch_route.input_type[0] = CH_FRONT_LEFT;
 	ch_route.input_type[1] = CH_FRONT_RIGHT;
 
-         return out;
+	return out;
 }
 
 ADM_Audiocodec::ADM_Audiocodec( uint32_t fourcc ) {

@@ -86,6 +86,7 @@ gui_action.hxx prefs.in
 ####### kdevelop will overwrite this part!!! (end)############
 
 adm_lib= \
+./ADM_libraries/ADM_libwrapper/libADM_libwrapper.a	\
 ADM_filter/filter_saveload.o 				\
 ./ADM_audiofilter/libADM_audiofilter.a			\
 ./ADM_filter/libADM_filter.a				\
@@ -129,7 +130,7 @@ ADM_filter/filter_saveload.o 				\
 ./ADM_libraries/ADM_libtwolame/liblibtoolame.a		\
 ./ADM_libraries/ADM_libMpeg2Dec/liblibMpeg2Dec.a	\
 ./ADM_libraries/ADM_libmpeg2enc/libmpeg2enc.a		\
-./ADM_libraries/ADM_xvidratectl/libADM_xvidratectl.a	
+./ADM_libraries/ADM_xvidratectl/libADM_xvidratectl.a
 
 adm_postlib= \
 ./ADM_toolkit/libADM_toolkit.a				\

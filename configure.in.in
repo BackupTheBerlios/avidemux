@@ -427,6 +427,15 @@ else
 	LDFLAGS="$LDFLAGS -lpthread -lX11 -lXext -L/usr/X11R6/lib"
 fi
 
+dnl _______________ Late Binding ______________
+AC_ARG_ENABLE([late-binding],
+	[AC_HELP_STRING([--enable-late-binding], [enable late binding of selected libraries [default=no]])],
+	[use_late_binding=${enableval}], [use_late_binding=no])
+
+if test "x$use_late_binding" = "xyes"; then
+	AC_DEFINE(USE_LATE_BINDING, 1, "[use late binding of selected libraries]")
+fi
+
 dnl _________________ malloc.h ________________
 AC_CHECK_HEADERS(malloc.h,have_malloc_h=yes)
 AC_CHECK_HEADERS(malloc/malloc.h,have_malloc_h=yes)
@@ -886,9 +895,11 @@ if test "x$with_libdca" != "xno"; then
     	AC_CHECK_HEADERS([dts_internal.h], , have_libdca=no)
     	
     	if test "x$have_libdca" = "xyes"; then
-            AC_CHECK_LIB(dts, dts_init, , have_libdca=no)
+    		if test "x$use_late_binding" = "xno"; then
+				AC_CHECK_LIB(dts, dts_init, , have_libdca=no)
+			fi
 		else
-    		AC_MSG_WARN(dts.h is there but i also need dts_internal.h to compile libdca/libdts. Please copy dts_internal.h where dts.h is)
+    		AC_MSG_WARN(dts.h is there but I also need dts_internal.h to compile libdca/libdts. Please copy dts_internal.h where dts.h is)
     	fi
     fi
     

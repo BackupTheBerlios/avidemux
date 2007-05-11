@@ -41,6 +41,7 @@
 #include "prefs.h"
 #include "ADM_audiodevice/audio_out.h"
 #include "ADM_toolkit/ADM_intfloat.h"
+#include "ADM_libraries/ADM_libwrapper/libwrapper_global.h"
 
 #ifdef USE_XVID_4
 extern void xvid4_init(void);
@@ -238,6 +239,7 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
     initScaleTab();
 
     COL_init();
+	initLibWrappers();
 
 #ifdef USE_SDL
   if(sdl_version<=1209)
@@ -261,19 +263,20 @@ printf("\n LARGE FILE AVAILABLE : %d offset\n",  __USE_FILE_OFFSET64	);
 }
 void onexit( void )
 {
-  printf("Cleaning up\n");
-        delete video_body;
-        // wait for thread to finish executing
-        printf("Waiting for Spidermonkey to finish...\n");
-        pthread_mutex_lock(&g_pSpiderMonkeyMutex);
-        printf("Cleaning up Spidermonkey.\n");
-        SpidermonkeyDestroy();
-        pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
-        destroyPrefs();
-        filterCleanUp();
-        printf("End of cleanup\n");
-        ADMImage_stat();
-        ADM_memStat(  );
-        ADM_memStatEnd(  );
-        printf("\n Goodbye...\n\n");
+	printf("Cleaning up\n");
+    delete video_body;	
+    // wait for thread to finish executing
+    printf("Waiting for Spidermonkey to finish...\n");
+    pthread_mutex_lock(&g_pSpiderMonkeyMutex);
+    printf("Cleaning up Spidermonkey.\n");
+    SpidermonkeyDestroy();
+    pthread_mutex_unlock(&g_pSpiderMonkeyMutex);
+    destroyPrefs();
+    filterCleanUp();
+	destroyLibWrappers();
+    printf("End of cleanup\n");
+    ADMImage_stat();
+    ADM_memStat(  );
+    ADM_memStatEnd(  );
+    printf("\nGoodbye...\n\n");
 }

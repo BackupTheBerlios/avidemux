@@ -33,8 +33,7 @@
 #include "ADM_osSupport/ADM_misc.h"
 #include "DIA_factory.h"
 #include "ADM_assert.h"
-
-
+#include "ADM_libraries/ADM_libwrapper/libwrapper_global.h"
 
 /**
     \fn DIA_builtin(void)
@@ -45,7 +44,7 @@
 uint8_t DIA_builtin(void)
 {
   uint32_t altivec=0,mad=0,a52dec=0,xvid4=0,X264=0,freetype=0,esd=0,arts=0,vorbis=0,win32=0;
-  uint32_t faac=0,faad=0,dca=0,aften=0;
+  uint32_t faac=0,faad=0,libdca=0,aften=0;
   
 #ifdef USE_ALTIVEC
         altivec=1;
@@ -84,7 +83,8 @@ uint8_t DIA_builtin(void)
         faad=1;
 #endif
 #ifdef USE_LIBDCA
-        dca=1;
+	if (dca->isAvialable())
+        libdca=1;
 #endif
 
 #ifdef USE_AFTEN
@@ -106,7 +106,7 @@ uint8_t DIA_builtin(void)
     CREATE_TOGGLE(faac)
     CREATE_TOGGLE(faad)
     
-    CREATE_TOGGLE(dca)
+    CREATE_TOGGLE(libdca)
     CREATE_TOGGLE(altivec)
     CREATE_TOGGLE(win32)
     CREATE_TOGGLE(aften)
@@ -126,12 +126,12 @@ uint8_t DIA_builtin(void)
     CREATE_TOGGLE(faad)
     
     CREATE_TOGGLE(aften)
-    CREATE_TOGGLE(dca)
+    CREATE_TOGGLE(libdca)
     CREATE_TOGGLE(altivec)
     CREATE_TOGGLE(win32)
       
       };
-    diaFactoryRun("Built-in Support",sizeof(elems)/sizeof(diaElem *),elems);
+    diaFactoryRun(_("Built-in Support"),sizeof(elems)/sizeof(diaElem *),elems);
 
     return 1;
 
