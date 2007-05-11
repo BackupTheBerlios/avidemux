@@ -32,7 +32,7 @@
   
  static GtkWidget	*create_dialogAudio (void);
  
- int DIA_getAudioFilter(GAINparam *gain, 
+ int DIA_getAudioFilterxx(GAINparam *gain, 
                         RESAMPLING *downsamplingmethod, 
                         int *tshifted,
                         int *shiftvalue, 
@@ -41,7 +41,7 @@
                         FILMCONV *filmconv,
                         CHANNEL_CONF *channel);
 			 
- int DIA_getAudioFilter(GAINparam *gain,
+ int DIA_getAudioFilterxx(GAINparam *gain,
                         RESAMPLING *downsamplingmethod, 
                         int *tshifted,
                         int *shiftvalue, 

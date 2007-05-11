@@ -69,8 +69,6 @@ int SliderIsShifted=0;
 
 //******************************
 int DIA_coloryuv(COLOR_YUV_PARAM *param){return 0;}
- int DIA_getAudioFilter(GAINparam *normalized, RESAMPLING *downsamplingmethod, int *tshifted,
-  			 int *shiftvalue, int *drc,int *freqvalue,FILMCONV *filmconv,CHANNEL_CONF *channel) {return 0;}
 
 int DIA_getCropParams(  char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in){return 0;}
 #ifdef USE_XX_XVID 
