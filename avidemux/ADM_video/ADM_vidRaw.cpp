@@ -28,6 +28,7 @@
 #include "config.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_video/ADM_videoNull.h"
 
 
 
