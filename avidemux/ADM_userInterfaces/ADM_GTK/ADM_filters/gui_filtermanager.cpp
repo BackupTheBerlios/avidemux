@@ -15,6 +15,7 @@
 #include <ADM_assert.h>
 #include "ADM_toolkit/filesel.h"
 #include "ADM_video/ADM_genvideo.hxx"
+#include "ADM_video/ADM_videoNull.h"
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
 #include "ADM_toolkit_gtk/ADM_gladeSupport.h"

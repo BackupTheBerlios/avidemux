@@ -7,7 +7,7 @@
 			     +Autocrop now in RGB space (more accurate)
 
     begin                : Fri May 3 2002
-    copyright            : (C) 2002 by mean
+    copyright            : (C) 2002/2007 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -20,14 +20,9 @@
  *                                                                         *
  ***************************************************************************/
 
-
-
 #include <config.h>
-
-
 #include <string.h>
 #include <stdio.h>
-
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -45,201 +40,140 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_colorspace/ADM_rgb.h"
 #include "ADM_assert.h"
+#include "DIA_flyDialog.h"
+#include "DIA_flyCrop.h"
 
 static GtkWidget	*create_dialog1 (void);
+static void 		draw (GtkWidget *dialog,uint32_t w,uint32_t h );
+
+
+/* Link between UI and core */
+static gboolean 	ui_draw( void );
+static void 		ui_autocrop (void );
+static void 		ui_reset( void );
+static void 		ui_upload(void);
 static void  		ui_read ( void);
 static void  		ui_update ( void);
-static void 		draw (GtkWidget *dialog,uint32_t w,uint32_t h );
-static gboolean 	gui_draw( void );
-static void 		autocrop (void );
-static void 		reset( void );
-static void 		ui_upload(void);
-static gboolean		ui_changed(void);
+static void 		ui_frame_changed( void );
 
-static uint8_t 		Metrics( uint8_t *in, uint32_t width,uint32_t *avg, uint32_t *eqt);
-static uint8_t 		MetricsV( uint8_t *in, uint32_t width,uint32_t *avg, uint32_t *eqt);
-
-static void		prepare(uint32_t img);
-static void 		frame_changed( void );
-
-extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
-
-static ColYuvRgb    *rgbConv=NULL;
-static uint8_t *working=NULL;
-static uint8_t *original=NULL;
 static GtkWidget *dialog=NULL;
-static uint32_t left,right,top,bottom,width,height;
 
-static AVDMGenericVideoStream *incoming=NULL;
-static ADMImage *imgsrc=NULL;
+/* Prevent loop when updating value */
 
 static int lock=0;
-/*
-	W: Left
-	W2: Right
-	h: Top
-	h2: Bottom
-	Th: total height
-	TW: total width
-
-	video : Incoming video in RGB colorspace
-
-
-*/
-
-
-
+static flyCrop *myCrop=NULL;
 //
 //	Video is in YV12 Colorspace
 //
 //
 int DIA_getCropParams(	char *name,CROP_PARAMS *param,AVDMGenericVideoStream *in)
 {
-	// Allocate space for green-ised video
-	width=in->getInfo()->width;
-	height=in->getInfo()->height;
-	
-	
-	working=new uint8_t [width*height*4];	
-	original=NULL;
-
-	uint8_t ret=0;
-
-	dialog=create_dialog1();
-//	gtk_transient(dialog);
+  uint32_t width,height;
+        // Allocate space for green-ised video
+        width=in->getInfo()->width;
+        height=in->getInfo()->height;
+        
+        
+  
+        uint8_t ret=0;
+  
+        dialog=create_dialog1();
         gtk_register_dialog(dialog);
-	
-	left=param->left;
-	right=param->right;
-	top=param->top;
-	bottom=param->bottom;
-	
-	imgsrc=new ADMImage(width,height);
-	incoming=in;
-	
-	 rgbConv=new ColYuvRgb(width,height);
-     rgbConv->reset(width,height);
-	
-	gtk_widget_set_usize(WID(drawingarea1), width,height);
-	gtk_window_set_title (GTK_WINDOW (dialog), name);
-	prepare(0);
-	gtk_widget_show(dialog);
-	
-
-	ui_upload();
-
-	ui_update();
+        
+        gtk_widget_set_usize(WID(drawingarea1), width,height);
+        gtk_window_set_title (GTK_WINDOW (dialog), name);
+        gtk_widget_show(dialog);
 	
 #define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y,GTK_SIGNAL_FUNC(z),   NULL);
 
-	CONNECT(drawingarea1,expose_event,gui_draw);
-	CONNECT(buttonAutocrop,clicked,autocrop);
-	CONNECT(buttonReset,clicked,reset);
-	CONNECT(scale,value_changed,frame_changed);
-			      
-	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonCancel), GTK_RESPONSE_CANCEL);
-	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonOk),      GTK_RESPONSE_OK);
-	  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonApply),  GTK_RESPONSE_APPLY);
-		      
-#define CONNECT_SPIN(x) CONNECT(spinbutton##x, value_changed,ui_changed)
-      	  
-	  CONNECT_SPIN(Top);
-	  CONNECT_SPIN(Left);
-	  CONNECT_SPIN(Right);
-	  CONNECT_SPIN(Bottom);
-	  
-	  
-	draw(dialog,width,height);
+        CONNECT(drawingarea1,expose_event,ui_draw);
+        CONNECT(buttonAutocrop,clicked,ui_autocrop);
+        CONNECT(buttonReset,clicked,ui_reset);
+        CONNECT(scale,value_changed,ui_frame_changed);
+                              
+          gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonCancel), GTK_RESPONSE_CANCEL);
+          gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonOk),      GTK_RESPONSE_OK);
+          gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonApply),  GTK_RESPONSE_APPLY);
 
-	ret=0;
-	int response;
-	while( (response=gtk_dialog_run(GTK_DIALOG(dialog)))==GTK_RESPONSE_APPLY)
-	{
-		ui_changed();
-		
-	}
-	if(response==GTK_RESPONSE_OK)
+#define CONNECT_SPIN(x) CONNECT(spinbutton##x, value_changed,ui_update)
+          
+          CONNECT_SPIN(Top);
+          CONNECT_SPIN(Left);
+          CONNECT_SPIN(Right);
+          CONNECT_SPIN(Bottom);
+          
+        myCrop=new flyCrop( width, height,in,WID(drawingarea1),WID(scale));
+        myCrop->left=param->left;
+        myCrop->right=param->right;
+        myCrop->top=param->top;
+        myCrop->bottom=param->bottom;
+        myCrop->upload();
+        myCrop->sliderChanged();
+        ret=0;
+        int response;
+        while( (response=gtk_dialog_run(GTK_DIALOG(dialog)))==GTK_RESPONSE_APPLY)
         {
-		ui_read( );
-		param->left=left;
-		param->right=right;
-		param->top=top;
-		param->bottom=bottom;
-		ret=1;
-	}
+          ui_update();
+        }
+        if(response==GTK_RESPONSE_OK)
+        {
+                ui_read( );
+                param->left=myCrop->left;
+                param->right=myCrop->right;
+                param->top=myCrop->top;
+                param->bottom=myCrop->bottom;
+                ret=1;
+        }
         gtk_unregister_dialog(dialog);
-	gtk_widget_destroy(dialog);
-	delete working;	
-	delete imgsrc;
-	delete rgbConv;
-	working=NULL;
-	dialog=NULL;
-	original=NULL;
-	imgsrc=NULL;
-	return ret;
+        gtk_widget_destroy(dialog);
+        delete myCrop;
+        return ret;
 }
-void frame_changed( void )
+/*
+      Link GTK dialog and core
+*/
+void ui_frame_changed( void )
 {
-uint32_t new_frame,max,l,f;
-double   percent;
-GtkWidget *wid;	
-GtkAdjustment *adj;
-	
-	max=incoming->getInfo()->nb_frames;
-	wid=WID(scale);
-	adj=gtk_range_get_adjustment (GTK_RANGE(wid));
-	new_frame=0;
-	
-	percent=(double)GTK_ADJUSTMENT(adj)->value;
-	percent*=max;
-	percent/=100.;
-	new_frame=(uint32_t)floor(percent);
-	
-	if(new_frame>=max) new_frame=max-1;
-	
-	prepare(new_frame);
-	ui_update();
-	gui_draw();
-	
-
+  myCrop->sliderChanged();
 }
-void prepare(uint32_t img)
+void ui_update(void)
 {
-	uint32_t l,f;
-	
-	ADM_assert(incoming->getFrameNumberNoAlloc(img,&l,imgsrc,&f));
-	original=imgsrc->data;
-	
-
+  if(lock) return;
+  myCrop->download();
+  myCrop->process();
+  myCrop->display();
 }
-gboolean ui_changed(void)
-{
-	if(!lock)
-	{
-		ui_read();
-		memcpy(working,original,(width*height*3)>>1);
-		ui_update();
-		draw(dialog,width,height);
-	}
-		return true;
-}
-
-
 /*---------------------------------------------------------------------------
 	Actually draw the working frame on screen
 */
-gboolean gui_draw( void )
+gboolean ui_draw( void )
 {
-	draw(dialog,width,height);
-	return true;
+        myCrop->display();
 }
-void draw (GtkWidget *dialog,uint32_t w,uint32_t h )
+void ui_read (void )
 {
-	GtkWidget *draw;
-	draw=WID(drawingarea1);
+        myCrop->download();
+}
+void ui_upload(void)
+{
+    myCrop->upload();
+}
+void ui_autocrop( void )
+{
+  myCrop->autocrop();
+}
+void ui_reset( void )
+{
+        myCrop->left=0;
+        myCrop->right=0;
+        myCrop->bottom=0;
+        myCrop->top=0;
+        
+	myCrop->upload();
+        myCrop->process();
+        myCrop->display();
+}
 
-	GUI_RGBDisplay(working, w,h, (void *)draw);
-}
 /*---------------------------------------------------------------------------
 	Read entried from dialog box
 */
@@ -248,263 +182,47 @@ void draw (GtkWidget *dialog,uint32_t w,uint32_t h )
 #define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(spinbutton##y)),(gfloat)x) ;}
 
 
-void ui_read (void )
-{
-	int reject=0;
-	
-			SPIN_GET(left,Left);
-			SPIN_GET(right,Right);
-			SPIN_GET(top,Top);
-			SPIN_GET(bottom,Bottom);
-			
-			printf("%d %d %d %d\n",left,right,top,bottom);
-			
-			left&=0xffffe;
-			right&=0xffffe;
-			top&=0xffffe;
-			bottom&=0xffffe;
-			
-			if((top+bottom)>height)
-				{
-					top=bottom=0;
-					reject=1;
-				}
-			if((left+right)>width)
-				{
-					left=right=0;
-					reject=1;
-				}
-			if(reject)
-				ui_upload();
-}
-
-void ui_upload(void)
-{
-	lock++;
-	SPIN_SET(left,Left);
-	SPIN_SET(right,Right);
-	SPIN_SET(top,Top);
-	SPIN_SET(bottom,Bottom);
-	lock--;
-}
 //____________________________________
-void reset( void )
+uint8_t flyCrop::upload(void)
 {
-	
-	top=bottom=left=right=0;
-	ui_upload();
-	ui_update();
-	gui_draw();
-	
-
+        lock++;
+        SPIN_SET(left,Left);
+        SPIN_SET(right,Right);
+        SPIN_SET(top,Top);
+        SPIN_SET(bottom,Bottom);
+        lock--;
+        return 1;
 }
-/*---------------------------------------------------------------------------
-	Green-ify the displayed frame on cropped parts
-*/
-void ui_update( )
+uint8_t flyCrop::download(void)
 {
-	uint32_t x,y;
-	uint8_t  *in;
-	uint32_t w=width,h=height;
-	uint8_t *buffer=working;
-	
-	//
-	//COL_yv12rgb(  w,   h,original,buffer );
-	rgbConv->scale(original,buffer);
-	// do top
-	in=buffer;
-	for(y=0;y<top;y++)
-	{
-		for(x=0;x<w;x++)
-		{
-			*in++=0;
-			
-			
-			*in++=0xff;
-			
-			*in++=0;
-			*in++=0;
-		}
-	}
-	// bottom
-	in=buffer+(w*4)*(h-bottom);
-	for(y=0;y<bottom;y++)
-	{
-		for(x=0;x<w;x++)
-		{
-			*in++=0;
-			
-			
-			*in++=0xff;
-			*in++=0;
-			*in++=0;
-		}
-	}
-	// left
-	in=buffer;
-	uint32_t stride=4*w-4;
-	for(y=0;y<h;y++)
-	{
-		for(x=0;x<left;x++)
-		{
-			*(in+4*x)=0;
-			
-			
-			*(in+4*x+1)=0xff;
-			*(in+4*x+2)=0;
-			*(in+4*x+3)=0;
-		}
-		for(x=0;x<right;x++)
-		{
-			*(in-4*x+stride-4)=0;
-			
-			
-			*(in-4*x+stride-3)=0xff;
-			*(in-4*x+stride-2)=0;
-			*(in-4*x+stride-1)=0;
-			
-		}
-		in+=4*w;
-
-	}
-
-	//right
+        int reject=0;
+        
+                        SPIN_GET(left,Left);
+                        SPIN_GET(right,Right);
+                        SPIN_GET(top,Top);
+                        SPIN_GET(bottom,Bottom);
+                        
+                        printf("%d %d %d %d\n",left,right,top,bottom);
+                        
+                        left&=0xffffe;
+                        right&=0xffffe;
+                        top&=0xffffe;
+                        bottom&=0xffffe;
+                        
+                        if((top+bottom)>_h)
+                                {
+                                        top=bottom=0;
+                                        reject=1;
+                                }
+                        if((left+right)>_w)
+                                {
+                                        left=right=0;
+                                        reject=1;
+                                }
+                        if(reject)
+                                upload();
 }
-
-/*----------------------------------
-  autocrop
------------------------------------*/
-void autocrop( void )
-{
-uint8_t *in;
-uint32_t y,avg,eqt;
-	// Top
-	
-#define THRESH_AVG   30
-#define THRESH_EQT   50
-	
-	in=original;
-	for(y=0;y<((height>>1)-2);y++)	
-	{
-		Metrics(in,width,&avg,&eqt);
-		in+=width;
-		//printf("LineT :%d avg: %d eqt: %d\n",y,avg,eqt);
-		if(avg> THRESH_AVG || eqt > THRESH_EQT)
-			break;
-	}
-//gotcha_:	
-	if(y)
-		top=y-1;
-	else 
-		top=0;
-		
-	in=original+width*(height-1);
-	for(y=0;y<((height>>1)-2);y++)	
-	{
-		Metrics(in,width,&avg,&eqt);
-		in-=width;
-		//printf("Line B :%d avg: %d eqt: %d\n",y,avg,eqt);
-		if(avg> THRESH_AVG || eqt > THRESH_EQT)
-				break;
-	}
-//gotcha_:	
-	if(y)
-		bottom=y-1;
-	else
-		bottom=0;
-
-		
-// Left
-	in=original;
-	for(y=0;y<((width>>1)-2);y++)	
-	{
-		MetricsV(in,height,&avg,&eqt);
-		in++;
-		//printf("Line L :%d avg: %d eqt: %d\n",y,avg,eqt);
-		if(avg> THRESH_AVG || eqt > THRESH_EQT)
-				break;
-	}
-//gotcha_:	
-	if(y)
-		left=y-1;
-	else
-		left=0;		
-// Right
-	in=original+width-1;
-	for(y=0;y<((width>>1)-2);y++)	
-	{
-		MetricsV(in,height,&avg,&eqt);
-		in--;
-		//printf("Line R :%d avg: %d eqt: %d\n",y,avg,eqt);
-		if(avg> THRESH_AVG || eqt > THRESH_EQT)
-				break;
-	}
-//gotcha_:	
-	if(y)
-		right=y-1;
-	else
-		right=0;
-
-		
-	// Update display
-	top=top & 0xfffe;
-	bottom=bottom & 0xfffe;
-	ui_upload();
-	ui_update();
-	draw(dialog,width,height);
-	
-	
-}
-/*---------------------------------------------
-	Compute the average value of pixels
-	and eqt is the "ecart type"
-*/
-uint8_t Metrics( uint8_t *in, uint32_t width,uint32_t *avg, uint32_t *eqt)
-{
-
-uint32_t x;
-uint32_t sum=0,eq=0;
-uint8_t v;
-		for(x=0;x<width;x++)
-		{
-			sum+=*(in+x);
-		}
-		sum=sum/width;
-		*avg=sum;
-		for(x=0;x<width;x++)
-		{
-			v=*(in+x)-sum;
-			eq+=v*v;
-		}
-		eq=eq/(width*width);
-		*eqt=eq;
-		return 1;
-}
-/*---------------------------------------------
-	Compute the average value of pixels
-	and eqt is the "ecart type"
-*/
-uint8_t MetricsV( uint8_t *in, uint32_t height,uint32_t *avg, uint32_t *eqt)
-{
-
-uint32_t x;
-uint32_t sum=0,eq=0;
-uint8_t v;
-		for(x=0;x<height;x++)
-		{
-			sum+=*(in+x*width);
-		}
-		sum=sum/height;
-		*avg=sum;
-		for(x=0;x<height;x++)
-		{
-			v=*(in+x*width)-sum;
-			eq+=v*v;
-		}
-		eq=eq/(height*height);
-		*eqt=eq;
-		return 1;
-}
+// End common part
 //--------------------------------------------
 GtkWidget*
 create_dialog1 (void)

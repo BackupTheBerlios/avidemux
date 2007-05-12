@@ -32,7 +32,7 @@
 #include "avi_vars.h"
 #include "ADM_editor/ADM_edit.hxx"
 #include "ADM_video/ADM_genvideo.hxx"
-
+#include "ADM_video/ADM_videoNull.h"
 #include "../ADM_userInterfaces/ADM_GTK/ADM_toolkit_gtk/toolkit_gtk.h"
 
 
