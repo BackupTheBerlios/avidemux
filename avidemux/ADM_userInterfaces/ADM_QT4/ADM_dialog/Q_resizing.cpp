@@ -151,6 +151,7 @@ resizeWindow::resizeWindow(resParam *param)     : QDialog()
         //
         ui.spinBoxWidth->setValue(xx);
         ui.spinBoxHeight->setValue(yy);
+
    
 }
 /**

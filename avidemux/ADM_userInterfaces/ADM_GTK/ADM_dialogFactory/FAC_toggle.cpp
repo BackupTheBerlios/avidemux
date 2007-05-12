@@ -27,6 +27,7 @@
 #include "ADM_commonUI/DIA_factory.h"
 #include "ADM_assert.h"
 
+static void cb_menu(void *w,void *p);
 
 
 
@@ -36,11 +37,20 @@ diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, cons
   param=(void *)toggleValue;
   paramTitle=toggleTitle;
   this->tip=tip;
+  nbLink=0;
 }
 
 diaElemToggle::~diaElemToggle()
 {
   
+}
+uint8_t   diaElemToggle::link(uint32_t onoff,diaElem *w)
+{
+    ADM_assert(nbLink<MENU_MAX_lINK);
+    links[nbLink].onoff=onoff;
+    links[nbLink].widget=w;
+    nbLink++;
+    return 1;
 }
 void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t line)
 {
@@ -59,7 +69,9 @@ void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t line)
       GtkTooltips *tooltips= gtk_tooltips_new ();
       gtk_tooltips_set_tip (tooltips, widget, tip, NULL);
   }
-
+  gtk_signal_connect(GTK_OBJECT(widget), "toggled",
+                      GTK_SIGNAL_FUNC(cb_menu),
+                      (void *) this);
 }
 void diaElemToggle::getMe(void)
 {
@@ -68,9 +80,45 @@ void diaElemToggle::getMe(void)
   ADM_assert(widget);
   *(uint32_t *)param=gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
 }
-void diaElemToggle::enable(uint32_t onoff)
+void   diaElemToggle::finalize(void)
+{
+  updateMe(); 
+}
+void   diaElemToggle::updateMe(void)
 {
   GtkWidget *widget=(GtkWidget *)myWidget;
-  gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
+  uint32_t val;
+  uint32_t rank;
+  if(!nbLink) return;
+  ADM_assert(widget);
+  
+  
+  rank=gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
+  /* Now search through the linked list to see if something happens ...*/
+  
+   /* 1 disable everything */
+  for(int i=0;i<nbLink;i++)
+  {
+    dialElemLink *l=&(links[i]);
+    l->widget->enable(0);
+  }
+  /* Then enable */
+  for(int i=0;i<nbLink;i++)
+  {
+      dialElemLink *l=&(links[i]);
+      if(l->onoff==rank)  l->widget->enable(1);
+  }
 }
+void   diaElemToggle::enable(uint32_t onoff)
+{
+  gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);  
+}
+
+//** C callback **
+void cb_menu(void *w,void *p)
+{
+  diaElemToggle *me=(diaElemToggle *)p;
+  me->updateMe();
+}
+
 //EOF

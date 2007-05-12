@@ -36,6 +36,7 @@ typedef enum elemEnum
   ELEM_HEXDUMP,
   ELEM_MAX=ELEM_TOGGLE
 };
+
 /*********************************************/
 class diaElem
 {
@@ -62,15 +63,29 @@ public:
   virtual void finalize(void) {} // in case some widget needs some stuff just before using them
 };
 /*********************************************/
+#define MENU_MAX_lINK 10
+typedef struct dialElemLink
+{
+  uint32_t  value;
+  uint32_t  onoff;
+  diaElem  *widget;
+}dialElemLink;
+/*********************************************/
 class diaElemToggle : public diaElem
 {
-
+  protected:
+    dialElemLink        links[MENU_MAX_lINK];
+    uint32_t            nbLink;
+    
 public:
-  diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip=NULL);
-  virtual ~diaElemToggle() ;
-  void setMe(void *dialog, void *opaque,uint32_t line);
-  void getMe(void);
+            diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, const char *tip=NULL);
+  virtual   ~diaElemToggle() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
   void      enable(uint32_t onoff) ;
+  void      finalize(void);
+  void      updateMe();
+  uint8_t   link(uint32_t onoff,diaElem *w);
 };
 /*********************************************/
 class diaElemInteger : public diaElem
@@ -154,13 +169,7 @@ class diaMenuEntryDynamic : public diaMenuEntry
 //*******************************
 // static (i.e. hardcoded) menu
 //*******************************
-#define MENU_MAX_lINK 10
-typedef struct dialElemLink
-{
-  uint32_t  value;
-  uint32_t  onoff;
-  diaElem  *widget;
-}dialElemLink;
+
 
 
 //*******************************

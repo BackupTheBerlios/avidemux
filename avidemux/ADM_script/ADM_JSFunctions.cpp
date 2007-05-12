@@ -527,10 +527,15 @@ JSBool facFloat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 JSBool facToggle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
   uint32_t tog=0;
+  uint32_t test=0;
    diaElemToggle blend(&tog,_("Toggle"));
-    diaElem *elems[]={&blend   };
+    diaElemUInteger     bt(&test,"Entry",0,10);
+    diaElemUInteger     bt2(&test,"Entry",0,10);
+    diaElem *elems[]={&blend,&bt,&bt2   };
+    blend.link(1,&bt);
+    blend.link(0,&bt2);
     
-  if(diaFactoryRun("Test Toggle",1,elems))
+  if(diaFactoryRun("Test Toggle",3,elems))
   {
     *rval = BOOLEAN_TO_JSVAL(1);
     printf("Value : %u\n",tog);

@@ -63,23 +63,21 @@ int DIA_getAudioFilter(GAINparam *gain,
   {1,_("TimeShift activated")}};
        
    diaElemToggle    eDRC(&vDRC,_("_Dynamic Range Compression:"));
-   diaElemMenu      eTimeShift(&vTshift,_("_TimeShift:"),2,menuTimeShift);
+   diaElemToggle    eTimeShift(&vTshift,_("_TimeShift:"));
    diaElemInteger  eShift(&vTshiftValue,_("TimeShift _Value:"),-10000,10000);
    
-   eTimeShift.link(&(menuTimeShift[1]),1,&eShift);
+   eTimeShift.link(1,&eShift);
   
     diaElemFrame frameMisc(_("Misc"));
     frameMisc.swallow(&eDRC);
     frameMisc.swallow(&eTimeShift);
     frameMisc.swallow(&eShift);
     //**********************************
-    diaMenuEntry menuResample[]={
-  {0,_("No Resampling")},
-  {1,_("Resampling activated")}};
-    diaElemMenu      eResample(&vDownsample,_("_Resampling:"),2,menuResample);
+   
+    diaElemToggle      eResample(&vDownsample,_("_Resampling:"));
     diaElemUInteger  eResampleValue(&vFreq,_("New Frequency:"),6000,64000);
   
-    eResample.link(&(menuResample[1]),1,&eResampleValue);
+    eResample.link(1,&eResampleValue);
     
        diaElemFrame frameResampling(_("Resampling"));
     frameResampling.swallow(&eResample);
@@ -97,10 +95,10 @@ int DIA_getAudioFilter(GAINparam *gain,
    //**********************************
     diaMenuEntry menuGain[]={
   {ADM_NO_GAIN,       _("None")},
-  {ADM_GAIN_AUTOMATIC,_("Automatic (max -3 dB")},
+  {ADM_GAIN_AUTOMATIC,_("Automatic (max -3 dB)")},
   {ADM_GAIN_MANUAL,   _("Manual")}};
   
-   diaElemMenu      eGain(&vGainMode,_("_Fps convert:"),3,menuGain);
+   diaElemMenu      eGain(&vGainMode,_("Gain Mode:"),3,menuGain);
    
     diaElemFloat  eGainValue(&vGainValue,_("_Gain Value:"),-10,10);
      eGain.link(&(menuGain[2]),1,&eGainValue);

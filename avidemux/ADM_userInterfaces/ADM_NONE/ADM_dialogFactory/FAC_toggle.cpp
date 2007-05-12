@@ -43,6 +43,15 @@ void diaElemToggle::getMe(void)
 {
 }
 void diaElemToggle::enable(uint32_t onoff) {}
+void   diaElemToggle::finalize(void)
+{
+  updateMe(); 
+}
+void   diaElemToggle::updateMe(void)
+{
+
+}
+
 //******************************************************
 diaElemInteger::diaElemInteger(int32_t *intValue,const char *toggleTitle, int32_t min, int32_t max,const char *tip)
   : diaElem(ELEM_TOGGLE)
@@ -60,6 +69,10 @@ void diaElemInteger::setMe(void *dialog, void *opaque,uint32_t line)
 void diaElemInteger::getMe(void)
 {
  
+}
+uint8_t   diaElemToggle::link(uint32_t onoff,diaElem *w)
+{
+  
 }
 void diaElemInteger::enable(uint32_t onoff) {}
 //******************************************************

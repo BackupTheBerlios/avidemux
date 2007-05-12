@@ -39,6 +39,7 @@ diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, cons
   paramTitle=shortkey(toggleTitle);
   this->tip=tip;
   myWidget=NULL;
+  nbLink=0;
 }
 
 diaElemToggle::~diaElemToggle()
@@ -59,7 +60,7 @@ void diaElemToggle::setMe(void *dialog, void *opaque,uint32_t l)
     box->setCheckState(Qt::Checked); 
  }
  box->show();
-  layout->addWidget(box,l,0);
+ layout->addWidget(box,l,0);
 }
 void diaElemToggle::getMe(void)
 {
@@ -81,7 +82,48 @@ void diaElemToggle::enable(uint32_t onoff)
     box->setDisabled(1);
 }
 
+void   diaElemToggle::finalize(void)
+{
+  updateMe(); 
+}
+void   diaElemToggle::updateMe(void)
+{
+ 
+  uint32_t val;
+  uint32_t rank=0;
+  if(!nbLink) return;
+  ADM_assert(myWidget);
+  
+  QCheckBox *box=(QCheckBox *)myWidget;
+  
+  if(Qt::Checked==box->checkState())
+  {
+    rank=1;
+  }
+  /* Now search through the linked list to see if something happens ...*/
+  
+   /* 1 disable everything */
+  for(int i=0;i<nbLink;i++)
+  {
+    dialElemLink *l=&(links[i]);
+    l->widget->enable(0);
+  }
+  /* Then enable */
+  for(int i=0;i<nbLink;i++)
+  {
+      dialElemLink *l=&(links[i]);
+      if(l->onoff==rank)  l->widget->enable(1);
+  }
+}
 
+uint8_t   diaElemToggle::link(uint32_t onoff,diaElem *w)
+{
+    ADM_assert(nbLink<MENU_MAX_lINK);
+    links[nbLink].onoff=onoff;
+    links[nbLink].widget=w;
+    nbLink++;
+    return 1;
+}
 
 //******************************************************
 
