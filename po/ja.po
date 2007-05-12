@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "POT-Creation-Date: 2007-03-24 15:57+0100\n"
-"PO-Revision-Date: 2007-04-28 04:45+0900\n"
+"PO-Revision-Date: 2007-05-10 17:45+0900\n"
 "Last-Translator: tetsuro\n"
 "Language-Team: Japan\n"
 "MIME-Version: 1.0\n"
@@ -19,8 +19,17 @@ msgstr ""
 "\n"
 " 既存のログファイルを再利用しますか ?"
 
+msgid " "
+msgstr " "
+
+msgid "  "
+msgstr "  "
+
 msgid "  Job Name  "
 msgstr "  ジョブ名  "
+
+msgid " 0000000"
+msgstr " 0000000"
 
 msgid " Error X:"
 msgstr " 誤差 X:"
@@ -32,7 +41,7 @@ msgid " Height "
 msgstr "高さ"
 
 msgid " No"
-msgstr "いいえ"
+msgstr " いいえ"
 
 msgid " Text:"
 msgstr "テキスト:"
@@ -41,13 +50,13 @@ msgid " Width "
 msgstr "幅"
 
 msgid " Yes"
-msgstr "はい"
+msgstr " はい"
 
 msgid "\"%s\" does not exist."
 msgstr "\"%s\" がありません."
 
 msgid "# of Glyphs :"
-msgstr "Glyphs数 :"
+msgstr "グリフ数 :"
 
 msgid "# of frames"
 msgstr "フレーム数"
@@ -55,11 +64,23 @@ msgstr "フレーム数"
 msgid "# of lines"
 msgstr "行数"
 
+msgid "-/-"
+msgstr "-/-"
+
 msgid "...are reduced by (%):"
 msgstr "...を (%) だけ減らす:"
 
+msgid "/0000000"
+msgstr "/0000000"
+
+msgid "/00:00:00,000"
+msgstr "/00:00:00,000"
+
 msgid "/dev/null"
 msgstr "NUL"
+
+msgid "0 (read manual)"
+msgstr "0 (マニュアル参照)"
 
 msgid "0 - None"
 msgstr "0 - なし"
@@ -71,11 +92,23 @@ msgid ""
 "0 = default from core (let XviD decide), else overflow payback percent per "
 "frame"
 msgstr ""
-"0 = コアからのデフォルト(XviDに決定させる)、そ例外 = フレーム当りのオーバフ"
+"0 = コアからのデフォルト(XviDに決定させる)、その外 = フレーム当りのオーバフ"
 "ロー再生パーセント"
+
+msgid "00:00:00.000"
+msgstr "00:00:00.000"
+
+msgid "0:0:0"
+msgstr "0:0:0"
+
+msgid "1"
+msgstr "1"
 
 msgid "1  - Extremely Low (Fastest)"
 msgstr "1  - 極めて低い (最速)"
+
+msgid "1 (read manual)"
+msgstr "1 (マニュアル参照)"
 
 msgid "1 - Mode decision"
 msgstr "1 - モード決定"
@@ -83,17 +116,35 @@ msgstr "1 - モード決定"
 msgid "1 - Very low"
 msgstr "1 - 非常に低い"
 
+msgid "1- Very low"
+msgstr "1 - 非常に低い"
+
 msgid "16 round up"
 msgstr "16で丸める"
 
+msgid "180 degrees"
+msgstr "180 度"
+
+msgid "1:1"
+msgstr "1:1"
+
 msgid "2  - Very Low"
 msgstr "2  - 非常に低い"
+
+msgid "2 (read manual)"
+msgstr "2 (マニュアル参照)"
 
 msgid "2 - Limited search"
 msgstr "2 - 限定検索"
 
 msgid "2 - Low"
 msgstr "2 - 低い"
+
+msgid "2- Low"
+msgstr "2 - 低い"
+
+msgid "270 degrees"
+msgstr "270 度"
 
 msgid "3  - Low"
 msgstr "3  - 低い"
@@ -103,6 +154,9 @@ msgstr "3 - 中くらい"
 
 msgid "3 - Medium search"
 msgstr "3 - 中間検索"
+
+msgid "3- Medium"
+msgstr "3 - 中くらい"
 
 msgid "3:2 Pulldown"
 msgstr "3:2 プルダウン"
@@ -121,6 +175,9 @@ msgstr "4フィールドチェック"
 
 msgid "4 field check (no average)"
 msgstr "4フィールドチェック(平均なし)"
+
+msgid "4- High"
+msgstr "4 - 高い"
 
 msgid "4x4 Intra search"
 msgstr "4x4 イントラ検索"
@@ -143,11 +200,17 @@ msgstr "5フィールドチェック"
 msgid "5 field check (no average)"
 msgstr "5フィールドチェック(平均なし)"
 
+msgid "5- Very High"
+msgstr "5 - 非常に高い"
+
 msgid "6  - Very High"
 msgstr "6  - 非常に高い"
 
 msgid "6 - Ultra high"
-msgstr "6 - 超高い"
+msgstr "6 - 超高"
+
+msgid "6- Ultra High"
+msgstr "6 - 超高"
 
 msgid "6B - Very High (RDO on Bframes)"
 msgstr "6B - 非常に高い (RDO on Bframes)"
@@ -170,6 +233,12 @@ msgstr "8x8, 8x16 と 16x8 B-フレーム検索"
 msgid "8x8, 8x16 and 16x8 P-frame search"
 msgstr "8x8, 8x16 と 16x8 P-フレーム検索"
 
+msgid "90 degrees"
+msgstr "90 度"
+
+msgid ":"
+msgstr " :"
+
 msgid "<b >Active Filters</b>"
 msgstr "<b >有効なフィルタ</b>"
 
@@ -185,6 +254,9 @@ msgstr "<b>音声コーデック:</b>"
 msgid "<b>Audio Bitrate</b>"
 msgstr "<b>音声ビットレート</b>"
 
+msgid "<b>Audio Codec:</b>"
+msgstr "<b>音声コーデック:</b>"
+
 msgid "<b>Audio Size:</b>"
 msgstr "<b>音声サイズ:</b>"
 
@@ -193,6 +265,9 @@ msgstr "<b>音声</b>"
 
 msgid "<b>Available Filters</b>"
 msgstr "<b>利用できるフィルタ</b>"
+
+msgid "<b>Average Bitrate:</b>"
+msgstr "<b>平均ビットレート:</b>"
 
 msgid "<b>B-Frames</b>"
 msgstr "<b>B-フレーム</b>"
@@ -218,6 +293,18 @@ msgstr "<b>色訂正マトリックス</b>"
 msgid "<b>Container:</b>"
 msgstr "<b>コンテナ:</b>"
 
+msgid "<b>Elapsed:</b>"
+msgstr "<b>経過時間:</b>"
+
+msgid ""
+"<b>Encoding is paused.</b>\n"
+"\n"
+"You can either resume or Abort it."
+msgstr ""
+"<b>エンコードは休止した.</b>\n"
+"\n"
+"再開するか中止して下さい."
+
 msgid "<b>Encoding mode </b>"
 msgstr "<b>エンコード モード </b>"
 
@@ -234,10 +321,13 @@ msgid "<b>Format</b>"
 msgstr "<b>形式</b>"
 
 msgid "<b>Fps convert</b>"
-msgstr "<b>Fps 変換</b>"
+msgstr "<b>FPS 変換</b>"
 
 msgid "<b>Frame:</b>"
 msgstr "<b>フレーム:</b>"
+
+msgid "<b>Frames/sec:</b>"
+msgstr "<b>フレーム/秒:</b>"
 
 msgid "<b>Gain</b>"
 msgstr "<b>利得</b>"
@@ -247,6 +337,9 @@ msgstr "<b>ガンマ</b>"
 
 msgid "<b>General</b>"
 msgstr "<b>一般</b>"
+
+msgid "<b>Glyphs</b>"
+msgstr "<b>グリフ</b>"
 
 msgid "<b>Hue:</b>"
 msgstr "<b>色相:</b>"
@@ -294,14 +387,26 @@ msgstr "<b>動き予測</b>"
 msgid "<b>Partition Macroblocks</b>"
 msgstr "<b>マクロブロック区分</b>"
 
+msgid "<b>Phase:</b>"
+msgstr "<b>フェーズ:</b>"
+
 msgid "<b>Phasis:</b>"
 msgstr "<b>フェーズ:</b>"
+
+msgid "<b>Preview</b>"
+msgstr "<b>プレビュー</b>"
+
+msgid "<b>Processed Frames:</b>"
+msgstr "<b>処理フレーム数:</b>"
 
 msgid "<b>Quality :</b>"
 msgstr "<b>品質 :</b>"
 
 msgid "<b>Quality:</b>"
 msgstr "<b>品質:</b>"
+
+msgid "<b>Quantiser:</b>"
+msgstr "<b>量子化度:</b>"
 
 msgid "<b>Quantization Limits</b>"
 msgstr "<b>量子化制限</b>"
@@ -345,8 +450,14 @@ msgstr "<b>ステータス</b>"
 msgid "<b>Target</b>"
 msgstr "<b>目標</b>"
 
+msgid "<b>Time Remaining:</b>"
+msgstr "<b>残り時間:</b>"
+
 msgid "<b>TimeCode</b>"
 msgstr "<b>タイムコード</b>"
+
+msgid "<b>Total Frames:</b>"
+msgstr "<b>合計フレーム数:</b>"
 
 msgid "<b>Total Size:</b>"
 msgstr "<b>合計サイズ:</b>"
@@ -359,6 +470,9 @@ msgstr "<b>映像コーデック:</b>"
 
 msgid "<b>Video Buffer Verifier</b>"
 msgstr "<b>映像バッファ検証</b>"
+
+msgid "<b>Video Codec:</b>"
+msgstr "<b>映像コーデック:</b>"
 
 msgid "<b>Video Size:</b>"
 msgstr "<b>映像サイズ:</b>"
@@ -378,14 +492,26 @@ msgstr "<i>閾値</i>"
 msgid "A value of 20 will give 20% more bits to every I-frame"
 msgstr "20の値は各I-フレームに20%大きなビットを与える"
 
+msgid "A:"
+msgstr "A :"
+
+msgid "ALSA _device:"
+msgstr "ALSA デバイス(_D):"
+
 msgid "AP type"
 msgstr "APタイプ"
 
 msgid "ASharp by MarcFD"
 msgstr "MarcFDによるASharp"
 
+msgid "AVI Muxer Options"
+msgstr "AVI多重化オプション"
+
 msgid "AVI _Muxer Options"
 msgstr "AVI多重化オプション(_M)"
+
+msgid "AVI, dual audio"
+msgstr "AVI, 2音声"
 
 msgid "A_dd to Joblist..."
 msgstr "ジョブリストに追加(_D)"
@@ -396,20 +522,50 @@ msgstr "自動(_U)"
 msgid "Abort"
 msgstr "中止"
 
+msgid "Abort Requested"
+msgstr "中止が要求された"
+
+msgid "Aborted"
+msgstr "中止しました"
+
 msgid "Aborting"
 msgstr "中止"
+
+msgid "Aborting."
+msgstr "中止しています."
+
+msgid "Above Normal"
+msgstr "普通以上"
+
+msgid "Above normal"
+msgstr "普通以上"
 
 msgid "Accept non standard audio frequency for DVD"
 msgstr "DVDに標準でない音声周波数を受け付ける"
 
+msgid "Accept non-standard audio frequency for DVD"
+msgstr "DVD用に非標準の音声周波数を受け入れる"
+
 msgid "Adaptative DCT"
 msgstr "適応型DCT"
+
+msgid "Add Video Filter"
+msgstr "映像フィルタを追加"
 
 msgid "Add selected filter to the Active Filters list"
 msgstr "選択したフィルタを有効なフィルタのリストに加える"
 
+msgid "Advanced"
+msgstr "拡張"
+
 msgid "Advanced Simple Profile"
 msgstr "拡張サンプルプロフィール"
+
+msgid "Alert"
+msgstr "警告"
+
+msgid "All"
+msgstr "すべて"
 
 msgid ""
 "Allow B-frames to make references non-linearly to another B-frame (instead "
@@ -436,8 +592,20 @@ msgstr ""
 msgid "Always"
 msgstr "必ず"
 
+msgid "An audio track is necessary to create such file"
+msgstr "そういうファイルを作成するには音声トラックが必要"
+
+msgid "Angle"
+msgstr "角度"
+
+msgid "Animé"
+msgstr "Anime"
+
 msgid "Apply the current filter only to a part of the file"
 msgstr "現在のフィルタをファイルの一部のみに適用する"
+
+msgid "Are you sure ?"
+msgstr "本当ですか ?"
 
 msgid "Are you sure you want to delete %s job ?"
 msgstr "本当に %s ジョブを削除しますか ?"
@@ -454,11 +622,23 @@ msgstr "作為保護閾値"
 msgid "As input"
 msgstr "入力として"
 
+msgid "Ascii"
+msgstr "ASCII"
+
 msgid "Aspect Ratio"
 msgstr "アスペクト比"
 
 msgid "Aspect Ratio:"
 msgstr "アスペクト比:"
+
+msgid "Aspect _ratio:"
+msgstr "アスペクト比(_R):"
+
+msgid "At the moment, the DV codec only accepts 720*576@25"
+msgstr "今のところ、DVコーデックは720*576@25のみを受付ます"
+
+msgid "Attempt to open %s failed!"
+msgstr "%s を開く試みは失敗しました!"
 
 msgid "Audio"
 msgstr "音声"
@@ -505,6 +685,9 @@ msgstr "音声/映像時間ずれ (ms)"
 msgid "AudioCodec"
 msgstr "音声コーデック"
 
+msgid "Auto"
+msgstr "自動"
+
 msgid "Auto split"
 msgstr "自動分割"
 
@@ -518,10 +701,22 @@ msgid "AutoWhite"
 msgstr "自動白色調整"
 
 msgid "Automatic ( max is -3dB)"
-msgstr "自動 ( 最大は -3dB)"
+msgstr "自動 (最大は -3dB)"
 
 msgid "Automatically"
 msgstr "自動"
+
+msgid "Automatically _build VBR map"
+msgstr "自動的にVBRマップを構築する(_B)"
+
+msgid "Automatically _index MPEG files"
+msgstr "自動的にMPEGファイルのインデックスを作成する(_I)"
+
+msgid "Automatically _rebuild index"
+msgstr "自動的にインデックスを再構築する(_R)"
+
+msgid "Automatically _swap A and B if A>B"
+msgstr "A>Bなら自動的にAとBを交換する(_S)"
 
 msgid "Automatically build VBR map"
 msgstr "自動的にVBRマップを作成する"
@@ -532,17 +727,29 @@ msgstr "自動的にMPEGファイルのインデックスを作成する"
 msgid "Automatically rebuild index"
 msgstr "自動的にインデックスを再構築する"
 
+msgid "Automatically remove _packed bitstream"
+msgstr "自動的にパックドビットストリームを削除する(_P)"
+
 msgid "Automatically remove packed bitstream"
 msgstr "自動的にパックドビットストリームを削除する"
 
 msgid "Automatically swap A and B if A>B"
 msgstr "A > B ならマークAとBを交換する"
 
+msgid "Automation"
+msgstr "自動化"
+
 msgid "Average Br (kb/s)"
 msgstr "平均ビットレート(kb/s)"
 
+msgid "Average bitrate (kb/s):"
+msgstr "平均ビットレート(kb/s):"
+
 msgid "Avi Muxer Option"
 msgstr "AVI多重化オプション"
+
+msgid "B Frames"
+msgstr "B-フレーム"
 
 msgid "B-Frame Direct Mode:  "
 msgstr "B-フレーム検出モード:"
@@ -553,17 +760,41 @@ msgstr "B-フレーム量子化度 - 最小:"
 msgid "B-frame reduction (%)"
 msgstr "B-フレーム低減 (%)"
 
+msgid "B:"
+msgstr "B :"
+
+msgid "BMP op failed"
+msgstr "BMP op 失敗"
+
 msgid "BackGround Image :"
 msgstr "背景画像 :"
 
 msgid "Backward Threshold"
 msgstr "逆方向閾値"
 
+msgid "Basic"
+msgstr "基本"
+
+msgid "Below Normal"
+msgstr "普通以下"
+
+msgid "Below normal"
+msgstr "普通以下"
+
 msgid "Bias"
 msgstr "バイアス"
 
+msgid "Bicubic"
+msgstr "Bicubic"
+
 msgid "Bidirectional ME"
 msgstr "双方向ME"
+
+msgid "Bilinear"
+msgstr "Bilinear"
+
+msgid "Bit_rate mode:"
+msgstr "ビットレートモード(_R):"
 
 msgid "Bitrate"
 msgstr "ビットレート"
@@ -637,8 +868,20 @@ msgstr "明るさ"
 msgid "Buffer Size"
 msgstr "バッファサイズ"
 
+msgid "Build Time Map"
+msgstr "タイムマップを作成する"
+
+msgid "Build VBR time map?"
+msgstr "VBR タイムマップを作成しますか ?"
+
+msgid "CABAC"
+msgstr "CABAC"
+
 msgid "CBR (bitrate based)"
 msgstr "CBR (ビットレートに基づく)"
+
+msgid "C_hannel mode:"
+msgstr "チャンネルモード(_H):"
 
 msgid "C_heck Frames (slow)"
 msgstr "フレーム検査 (遅い)"
@@ -651,6 +894,9 @@ msgstr "彩度動き(_H)"
 
 msgid "C_hroma optimizer"
 msgstr "彩度最適化(_H)"
+
+msgid "C_hroma threshold:"
+msgstr "彩度閾値(_H) :"
 
 msgid "C_onfigure"
 msgstr "構成(_O)"
@@ -670,6 +916,12 @@ msgstr "較正"
 msgid "Can't determine aspect ratio"
 msgstr "アスペクト比を決定できません"
 
+msgid "Cannot copy."
+msgstr "コピーできません."
+
+msgid "Cannot create the .avidemux directory"
+msgstr ".avidemux フォルダを作成できません."
+
 msgid "Cannot decode frame"
 msgstr "フレームをデコードできません"
 
@@ -682,6 +934,21 @@ msgstr "次のフレームをデコードできません"
 msgid "Cannot decode the frame."
 msgstr "フレームをデコードできません"
 
+msgid "Cannot decompress audio frame"
+msgstr "音声フレームを解凍できません"
+
+msgid "Cannot decompress the audio stream"
+msgstr "音声ストリームを解凍できません"
+
+msgid "Cannot delete the selection."
+msgstr "選択を削除できません."
+
+msgid "Cannot encode the frame"
+msgstr "フレームをエンコードできません"
+
+msgid "Cannot get this frame to save"
+msgstr "保存するフレームを得られません"
+
 msgid "Cannot identify subtitle format"
 msgstr "字幕形式を特定できません"
 
@@ -693,6 +960,9 @@ msgstr "映像ストリームを初期化できません"
 
 msgid "Cannot initiate save"
 msgstr "保存を開始できません"
+
+msgid "Cannot load"
+msgstr "読込めません"
 
 msgid "Cannot open \"%s\" for writing."
 msgstr "書込み用に \"%s\" を開けません."
@@ -711,6 +981,12 @@ msgstr "フォルダをファイルとして開けません"
 
 msgid "Cannot open project using the video loader."
 msgstr "映像ローダーを使っているプロジェクトを開けません."
+
+msgid "Cannot save the audio in copy mode"
+msgstr "音声をコピーモードで保存できません"
+
+msgid "Cannot select mpeg4 sp codec."
+msgstr "MPEG4 sp コーデックを選択できません."
 
 msgid "Cannot write .idx"
 msgstr ".idxを書込めません"
@@ -763,6 +1039,9 @@ msgstr "彩度ノイズ低減 2"
 msgid "Chroma QP Offset"
 msgstr "彩度QPオフセット"
 
+msgid "Chroma Temporal Threshold"
+msgstr "彩度時間的閾値"
+
 msgid "Chroma U"
 msgstr "彩度 U"
 
@@ -777,6 +1056,9 @@ msgstr "彩度 V :"
 
 msgid "Chrominance:"
 msgstr "彩度:"
+
+msgid "Co_nnect to avsproxy"
+msgstr "avsproxyに接続(_N)"
 
 msgid "Codec "
 msgstr "コーデック"
@@ -794,7 +1076,7 @@ msgid "Codec:"
 msgstr "コーデック:"
 
 msgid "ColorYuv (From avisynth)"
-msgstr "ColorYuv (avisynthから)"
+msgstr "ColorYuv (Avisynthから)"
 
 msgid "Colors"
 msgstr "色"
@@ -811,6 +1093,9 @@ msgstr "コーデックを構成"
 msgid "Configure audio encoder"
 msgstr "音声エンコーダを構成"
 
+msgid "Configure codec"
+msgstr "コーデックを構成"
+
 msgid "Configure filter"
 msgstr "フィルタを構成する"
 
@@ -819,6 +1104,9 @@ msgstr "部分適用するフィルタの構成"
 
 msgid "Configure video encoder"
 msgstr "映像エンコーダを構成"
+
+msgid "Connect to avsproxy"
+msgstr "avsproxyへの接続"
 
 msgid "Constant Bitrate"
 msgstr "一定ビットレート"
@@ -842,11 +1130,20 @@ msgstr ""
 msgid "Constant quantizer - each frame will get the same compression"
 msgstr "一定量子化度 - 各フレームを同圧縮率にする"
 
+msgid "Continue indexing"
+msgstr "インデックス付けを続ける"
+
 msgid "Contrast"
 msgstr "コントラスト"
 
 msgid "Copy"
 msgstr "コピー"
+
+msgid "Could not find a filter"
+msgstr "フィルタが見付かりません"
+
+msgid "Could not get tracks info"
+msgstr "トラック情報を得られません"
 
 msgid "Could not initialize audio"
 msgstr "音声を初期化できません"
@@ -854,14 +1151,35 @@ msgstr "音声を初期化できません"
 msgid "Could not initialize video"
 msgstr "映像を初期化できません"
 
+msgid "Could not open \"%s\" for writing."
+msgstr "書込み用に \"%s\" を開けません"
+
+msgid "Could not open OSS audio device"
+msgstr "OSS 音声デバイスを開けません"
+
 msgid "Could not open subtitle file"
 msgstr "字幕ファイルを開けません"
 
 msgid "Could not open the file"
 msgstr "ファイルを開けません"
 
+msgid "Could not read \"%s\"."
+msgstr "\"%s\" を読めません."
+
+msgid "Could not save all images."
+msgstr "全画像を保存できません"
+
 msgid "Could not unpack the video"
 msgstr "映像をアンパックできません"
+
+msgid "Could not write the file"
+msgstr "ファイルを書込めません"
+
+msgid "Couldn't find pixmap file: %s"
+msgstr "pixmapファイル: %s が見付かりません"
+
+msgid "Create _OpenDML files"
+msgstr "OpenDMLファイルを作成する(_O)"
 
 msgid "Create openDML file"
 msgstr "openDML ファイルを作成する"
@@ -884,8 +1202,14 @@ msgstr "上を切取る:"
 msgid "Cu_t"
 msgstr "カット(_T)"
 
+msgid "Cubic Interpolation"
+msgstr "Cubic 補間"
+
+msgid "Cubic interpolate"
+msgstr "Cubic 補間"
+
 msgid "Current Glyph"
-msgstr "現在のGlyph"
+msgstr "現在のグリフ"
 
 msgid "Current frame"
 msgstr "現在のフレーム"
@@ -905,8 +1229,14 @@ msgstr "カスタムマトリックス"
 msgid "Cycle"
 msgstr "サイクル"
 
+msgid "DRC"
+msgstr "DRC"
+
 msgid "DVD resolution [Ctrl-1]"
 msgstr "DVD 解像度 [Ctrl-1]"
+
+msgid "De_ringing"
+msgstr "デリング(_R)"
 
 msgid "Deblocking Filter :"
 msgstr "デブロック フィルタ :"
@@ -914,11 +1244,20 @@ msgstr "デブロック フィルタ :"
 msgid "Debug"
 msgstr "デバッグ"
 
+msgid "Decompressing error"
+msgstr "解凍(decompression)エラー"
+
 msgid "Default"
 msgstr "デフォルト"
 
+msgid "Default Postprocessing"
+msgstr "デフォルトの後処理"
+
 msgid "Default mpeg"
 msgstr "デフォルトMPEG"
+
+msgid "Defaults"
+msgstr "デフォルト"
 
 msgid ""
 "Define how many pixels are analysised. The higher the range the more "
@@ -956,6 +1295,9 @@ msgstr "ジョブを削除"
 
 msgid "Delete job"
 msgstr "ジョブを削除"
+
+msgid "Deleted"
+msgstr "削除した"
 
 msgid "Denoise"
 msgstr "ノイズ除去"
@@ -1002,6 +1344,12 @@ msgstr "エラーの警告のみ表示する"
 msgid "Do you want me to unpack it ?"
 msgstr "それをアンパックしますか ?"
 
+msgid "Do you want to abort indexing ?"
+msgstr "インデックス付けを中止しますか ?"
+
+msgid "Do you want to print metrics on screen ?"
+msgstr "画面上のマトリックスを印刷しますか ?"
+
 msgid "Do you want to save an index ?"
 msgstr "インデックスを保存しますか ?"
 
@@ -1009,7 +1357,7 @@ msgid "Dolby Prologic"
 msgstr "ドルビープロロジック"
 
 msgid "Dolby Prologic 2"
-msgstr "ドルビープロロジック2"
+msgstr "ドルビープロロジック 2"
 
 msgid "Done"
 msgstr "完了"
@@ -1023,11 +1371,20 @@ msgstr "フレーム数を２倍にする(スローモーション)"
 msgid "Double nb of frames and fps"
 msgstr "フレーム数とFPSを２倍にする"
 
+msgid "DropOut Threshold"
+msgstr "ドロップアウト閾値"
+
+msgid "Dual audio can only be used in copy mode"
+msgstr "２つの音声はコピーモードで使えるだけです"
+
 msgid "Dual pass"
 msgstr "二重パス"
 
 msgid "Dual pass (MBytes)"
 msgstr "二重パス (MBytes)"
+
+msgid "Dual pass, avg bitate (kb/s):"
+msgstr "2パス、平均ビットレート(kb/s):"
 
 msgid "Duration:"
 msgstr "再生時間:"
@@ -1097,6 +1454,9 @@ msgstr "エンコード タイプ:"
 msgid "Encoding mode"
 msgstr "エンコードモード"
 
+msgid "Encoding priority"
+msgstr "エンコードの優先度:"
+
 msgid "Encoding type:"
 msgstr "エンコードタイプ:"
 
@@ -1113,17 +1473,29 @@ msgid ""
 "Enforce the size of a decoded pixel decoded to a certain value. Leave this "
 "at 1:1 for non-anamorphic video"
 msgstr ""
-"デコードされたピクセルのサイズを或る値にデコードする. アナモルフィックな映像"
-"には1:1のままにして下さい"
+"デコードされたピクセルのサイズを或る値にデコードする. 非アナモルフィックな映"
+"像には1:1のままにして下さい"
+
+msgid "Enter parameters (i.e. -b 192 -m s ...)"
+msgstr "パラメータを入力 (例: -b 192 -ms ...)"
 
 msgid "Entry input for target file size or bitrate"
 msgstr "目標ファイルサイズまたはビットレートを入力して下さい"
+
+msgid "Equalizer"
+msgstr "イコライザ"
+
+msgid "Erase current glyphs ?"
+msgstr "現在のグリフを消去する ?"
 
 msgid "Error Loading"
 msgstr "読込みエラー"
 
 msgid "Error Writing"
 msgstr "書込みエラー"
+
+msgid "Error converting to BMP"
+msgstr "BMPへの変換エラー"
 
 msgid "Error in pass 1"
 msgstr "パス 1 中エラー"
@@ -1132,10 +1504,10 @@ msgid "Error in pass 2"
 msgstr "パス 2 中エラー"
 
 msgid "Error initalizing audio filters"
-msgstr "音声ファイル初期化エラー"
+msgstr "音声フィルタ初期化エラー"
 
 msgid "Error initalizing video filters"
-msgstr "映像ファイル初期化エラー"
+msgstr "映像フィルタ初期化エラー"
 
 msgid "Error loadind the custom matrix file."
 msgstr "カスタムマトリックスファイル読込みエラー"
@@ -1170,6 +1542,9 @@ msgstr "徹底検索"
 msgid "Expect a crash."
 msgstr "クラッシュするかも."
 
+msgid "Expect troubles"
+msgstr "トラブルを予期する"
+
 msgid "External"
 msgstr "外部"
 
@@ -1181,6 +1556,9 @@ msgstr "外部フィルタ"
 
 msgid "External MP3"
 msgstr "外部MP3"
+
+msgid "External WAV"
+msgstr "外部WAV"
 
 msgid "External Wav"
 msgstr "外部WAV"
@@ -1203,6 +1581,9 @@ msgstr "特別低速 (低速+複数参照フレーム)"
 msgid "Extrapolate better (better not to use it)"
 msgstr "より良く外挿する (better not to use it)"
 
+msgid "FFmpeg deint"
+msgstr "FFmpeg デインタレース"
+
 msgid "FFmpeg encoding options"
 msgstr "FFmpegエンコードオプション"
 
@@ -1212,8 +1593,20 @@ msgstr "I と P フレーム量子間の因子"
 msgid "Factor between P and B frame Quants"
 msgstr "P と B フレーム量子間の因子"
 
+msgid "Fade in"
+msgstr "フェードイン"
+
+msgid "Fade out"
+msgstr "フェードアウト"
+
 msgid "Fade to _black"
 msgstr "黒にフェード(_B)"
+
+msgid "Failed"
+msgstr "失敗した"
+
+msgid "Failed to open the file"
+msgstr "ファイルを開くのに失敗"
 
 msgid "Fast"
 msgstr "高速"
@@ -1245,6 +1638,9 @@ msgstr "フィルタ(_T)"
 msgid "File %s has been successfully saved."
 msgstr "ファイル %s を無事に保存しました."
 
+msgid "File %s was NOT saved correctly."
+msgstr "ファイル %s は正しく保存されなかった."
+
 msgid "File :"
 msgstr "ファイル :"
 
@@ -1253,6 +1649,9 @@ msgstr "ファイルサイズ:"
 
 msgid "File error"
 msgstr "ファイルエラー"
+
+msgid "File type identified but no loader support detected..."
+msgstr "ファイルタイプは特定されますが読取りサポートを見付けられません..."
 
 msgid "FileSize (MB)"
 msgstr "ファイルサイズ(MB)"
@@ -1293,17 +1692,46 @@ msgstr "フォント(TTF)"
 msgid "Font Size"
 msgstr "フォントサイズ"
 
+msgid "For DVD, audio must be 48 kHz MP2(stereo), AC3, DTS or LPCM (stereo)."
+msgstr ""
+"DVD用には、音声は 48 kHz MP2(ステレオ), AC3, DTS または LPCM (ステレオ)でなけ"
+"ればならない."
+
+msgid "For DVD, audio must be 48 kHz MP2, AC3 or LPCM."
+msgstr "DVD用には、音声は 48 kHz MP2, AC3 または LPCMでなければならない."
+
+msgid "For DVD, audio must be MP2 or AC3."
+msgstr "DVD用には、音声は MP2 または AC3 でなければならない."
+
+msgid "For VCD, audio must be 44.1 kHz MP2."
+msgstr "VCD用には、音声は 44.1 kHz MP2 でなければならない."
+
 msgid "Force background"
 msgstr "強制背景"
 
 msgid "Frame Count:"
 msgstr "フレーム数:"
 
+msgid "Frame Hex Dump"
+msgstr "フレーム16進ダンプ"
+
 msgid "Frame Rate"
 msgstr "フレームレート"
 
 msgid "Frame Rate:"
 msgstr "フレームレート:"
+
+msgid "Frame Size:"
+msgstr "フレームサイズ:"
+
+msgid "Frame Type:"
+msgstr "フレームタイプ:"
+
+msgid "Frame size:"
+msgstr "フレームサイズ:"
+
+msgid "Frame type:"
+msgstr "フレームタイプ:"
 
 msgid "Frame: "
 msgstr "フレーム: "
@@ -1329,6 +1757,9 @@ msgstr "さらにDCTイントラブロック検索を有効にして品質を高
 msgid "Further improve the P-frame quality"
 msgstr "P-フレーム品質をさらに高める"
 
+msgid "GMC "
+msgstr "GMC "
+
 msgid "Gain"
 msgstr "利得"
 
@@ -1337,6 +1768,9 @@ msgstr "ガンマ"
 
 msgid "General block breakdown transformation"
 msgstr "一般的なブロック分割変換"
+
+msgid "Get Frame"
+msgstr "フレームを得る"
 
 msgid "Get PAR from input video file"
 msgstr "入力映像ファイルからPARを得る"
@@ -1373,14 +1807,23 @@ msgstr "GOPサイズ (12):"
 msgid "H.263 quantizers smooth the picture (useful at lower bitrates)"
 msgstr "H.263 量子化度は画像をなめらかにする (低ビットレートで有用)"
 
+msgid "H263 Quantizer"
+msgstr "H263 量子化度"
+
 msgid "H264 detected"
 msgstr "H264を検出しました"
+
+msgid "HQ _AC"
+msgstr "HQ _AC"
 
 msgid "Half D1 resolution [Ctrl-2]"
 msgstr "Half D1 解像度 [Ctrl-2]"
 
 msgid "Hexagonal search"
 msgstr "六角形検索"
+
+msgid "High"
+msgstr "高い"
 
 msgid "High bitrate scenes (%):"
 msgstr "高ビットレートシーン (%):"
@@ -1394,6 +1837,9 @@ msgstr "高い設定ほど高い品質となるが、エンコード時間がか
 
 msgid "Horizontal deblocking"
 msgstr "水平デブロック"
+
+msgid "Hour"
+msgstr "時"
 
 msgid ""
 "How much of the overflow the codec can eat into during oversized sections - "
@@ -1457,6 +1903,9 @@ msgid ""
 msgstr ""
 "値が閾値より小さいなら有効とみなす. 小さな値はより偽りのポジを意味するかも"
 
+msgid "Ifo :"
+msgstr "IFO :"
+
 msgid "Ifo error"
 msgstr "IFO エラー"
 
@@ -1464,13 +1913,16 @@ msgid "Ignore"
 msgstr "無視"
 
 msgid "Ignore glyph"
-msgstr "glyphを無視"
+msgstr "グリフを無視"
 
 msgid "Image Size:"
 msgstr "画像サイズ:"
 
 msgid "Image size"
 msgstr "画像サイズ"
+
+msgid "Images"
+msgstr "画像"
 
 msgid "Improve the B-frame quality"
 msgstr "B-フレーム品質を高める"
@@ -1490,6 +1942,9 @@ msgstr "互換性のないフレームレート"
 msgid "Incompatible output format"
 msgstr "互換性のない出力形式"
 
+msgid "Incompatible settings"
+msgstr "互換性のない設定"
+
 msgid "Incorrect output file"
 msgstr "正しくない出力ファイル"
 
@@ -1508,6 +1963,18 @@ msgstr ""
 
 msgid "Index is not up to date"
 msgstr "インデックスが最新ではありません"
+
+msgid "Indexing / unpacking priority"
+msgstr "インデックス付/アンパックの優先度:"
+
+msgid "Indexing :"
+msgstr "インデックス付け :"
+
+msgid "Indexing failed"
+msgstr "インデックス付けに失敗"
+
+msgid "Indexing..."
+msgstr "インデックスを付けています..."
 
 msgid "Informations"
 msgstr "情報"
@@ -1551,8 +2018,23 @@ msgstr "補間 :"
 msgid "Invalid filename"
 msgstr "無効なファイル名"
 
+msgid "Invalid ifo"
+msgstr "無効なIFO"
+
 msgid "Invalid jobname"
 msgstr "無効なジョブ名"
+
+msgid "Invalid vobname"
+msgstr "無効なVOB名"
+
+msgid "Invalid vobsubname"
+msgstr "無効なVobSub名"
+
+msgid "It could be possible that you try to overwrite an input file!"
+msgstr "入力ファイルを上書きしようとしています!"
+
+msgid "It is not MPEG-4 video. File will not be saved."
+msgstr "MPEG-4映像ではない. ファイルは保存されません."
 
 msgid "JVT matrix"
 msgstr "JVTマトリックス"
@@ -1579,8 +2061,14 @@ msgstr ""
 msgid "Jump to _Time..."
 msgstr "時間に移動(_T)"
 
+msgid "K-VCD"
+msgstr "K-VCD"
+
 msgid "Keep nb of frames and fps"
 msgstr "フレーム数とFPSを保つ"
+
+msgid "Kernerl interpolation"
+msgstr "Kernerl 補間"
 
 msgid "KeyFrame error"
 msgstr "キーフレーム エラー"
@@ -1591,8 +2079,17 @@ msgstr "キーフレーム増強 (%)"
 msgid "L_uma threshold:"
 msgstr "輝度閾値(_U):"
 
+msgid "Lame command"
+msgstr "Lame コマンド"
+
+msgid "Lanczos3"
+msgstr "Lanczos3"
+
 msgid "Last frame"
 msgstr "最後のフレーム"
+
+msgid "Lavcodec Mpeg4 configuration"
+msgstr "Lavcodex Mpeg4 構成"
 
 msgid "Left:"
 msgstr "左:"
@@ -1603,6 +2100,9 @@ msgstr "レベル"
 msgid "Libavcodec Decoder Option"
 msgstr "Libavcodec デコーダ オプション"
 
+msgid "Linear interpolate"
+msgstr "Linear 補間"
+
 msgid "Link"
 msgstr "リンク"
 
@@ -1612,8 +2112,14 @@ msgstr "カスタムマトリックスを読込む:"
 msgid "Load external filters"
 msgstr "外部フィルタを読込む"
 
+msgid "Load set of filters"
+msgstr "フィルタの組を読込む"
+
 msgid "Local Playback Downmixing"
 msgstr "ローカル再生ダウンミックス"
+
+msgid "Log"
+msgstr "ログ"
 
 msgid ""
 "Lossless compression method which usually improves the bitrate usage by 15% "
@@ -1621,6 +2127,9 @@ msgid ""
 msgstr ""
 "通常ビットレート使用率(特に高ビットレートで)を15%改善するロスレス圧縮. 品質を"
 "大いに助けるが遅い."
+
+msgid "Low"
+msgstr "低い"
 
 msgid "Low bitrate scenes (%):"
 msgstr "低ビットレートシーン (%):"
@@ -1631,6 +2140,9 @@ msgstr "輝度"
 msgid "Luma :"
 msgstr "輝度 :"
 
+msgid "Luma Temporal Threshold"
+msgstr "輝度時間的閾値"
+
 msgid "Luma Y"
 msgstr "輝度 Y"
 
@@ -1640,11 +2152,29 @@ msgstr "輝度:"
 msgid "MB Comparison"
 msgstr "MB 比較"
 
+msgid "MB comparison"
+msgstr "MB 比較"
+
+msgid "MPEG Quantizer"
+msgstr "MPEG 量子化度"
+
+msgid "MPEG Video"
+msgstr "MPEG 映像"
+
 msgid ""
 "MPEG quantizers (slightly slower) produce sharper picture (useful at higher "
 "bitrates)"
 msgstr ""
 "MPEG 量子化度 (少し遅い) はより鮮やかな画像を作る (高ビットレートで有用)"
+
+msgid "MPEG renumbering error"
+msgstr "MPEGの再番号付けエラー"
+
+msgid "Ma_x. bitrate:"
+msgstr "最大ビットレート(_X):"
+
+msgid "Ma_x. quantizer:"
+msgstr "最大量子化度(_N):"
 
 msgid "Macroblock decision"
 msgstr "マクロブロック決定"
@@ -1658,8 +2188,20 @@ msgstr "マクロブロック:"
 msgid "Main"
 msgstr "主要"
 
+msgid "Main Audio Track"
+msgstr "主音声トラック"
+
+msgid "Malformed header"
+msgstr "誤ったヘッダ"
+
 msgid "Manual (db) : "
-msgstr "手動 (db) : "
+msgstr "手動 (dB) : "
+
+msgid "Mark A > B"
+msgstr "マーク A > B"
+
+msgid "Marker A > B"
+msgstr "マーカー A > B"
 
 msgid "Matrices"
 msgstr "マトリックス"
@@ -1679,8 +2221,17 @@ msgstr "最大ビットレート"
 msgid "Max Consecutive"
 msgstr "最大連続数"
 
+msgid "Max I Frame Qzer"
+msgstr "最大I-フレーム Qzer"
+
+msgid "Max I frame interval "
+msgstr "最大I-フレーム間隔"
+
 msgid "Max IDR frame interval"
 msgstr "最大IDRフレーム間隔"
+
+msgid "Max P Frame Qzer"
+msgstr "最大P-フレーム Qzer"
 
 msgid "Max QDiff"
 msgstr "最大 QDiff"
@@ -1706,11 +2257,17 @@ msgstr "最大オーバフロー改善 (%):"
 msgid "Max. Ref. frames"
 msgstr "最大参照フレーム数"
 
+msgid "Max. quantizer _difference:"
+msgstr "最大量子化度差(_D):"
+
 msgid "Max:"
 msgstr "最大:"
 
 msgid "Maximum Bitrate (kb/s)"
 msgstr "最大ビットレート (kb/s)"
+
+msgid "Maximum bitrate (kbps)"
+msgstr "最大ビットレート (kbps)"
 
 msgid "Maximum local bitrate"
 msgstr "最大局地ビットレート"
@@ -1732,11 +2289,20 @@ msgstr "I-フレームに許される最大量子化度"
 msgid "Maximum quantizer allowed for P-frames"
 msgstr "P-フレームに許される最大量子化度"
 
+msgid "May be related to an old index file."
+msgstr "古いインデックスファイルに関係するかもしれません."
+
+msgid "Median interpolate"
+msgstr "Median 補間"
+
 msgid "Medium"
 msgstr "中くらい"
 
 msgid "Medium (full luma no chroma)"
 msgstr "中くらい(完全輝度, 彩度なし)"
+
+msgid "Memory Error"
+msgstr "メモリエラー"
 
 msgid "Memory error"
 msgstr "メモリエラー"
@@ -1750,11 +2316,26 @@ msgstr "方法"
 msgid "Metrics"
 msgstr "マトリックス"
 
+msgid "Mi_n. bitrate:"
+msgstr "最小ビットレート(_N):"
+
+msgid "Mi_n. quantizer:"
+msgstr "最小量子化度(_N):"
+
 msgid "Min Bitrate"
 msgstr "最小ビットレート"
 
+msgid "Min I Frame Qzer"
+msgstr "最小I-フレーム Qzer"
+
+msgid "Min I frame interval"
+msgstr "最小I-フレーム間隔"
+
 msgid "Min IDR frame interval"
 msgstr "最小IDRフレーム間隔"
+
+msgid "Min P Frame Qzer"
+msgstr "最小P-フレーム Qzer"
 
 msgid "Min Qp"
 msgstr "最小 Qp"
@@ -1782,6 +2363,9 @@ msgstr "P-フレームに許される最小量子化度"
 
 msgid "Minimum space between I-frames, 1 will disable forced I-frame spacing"
 msgstr "I-フレーム間の最小間隔、1 は強制I-フレームスペーシングを無効にする"
+
+msgid "Minutes"
+msgstr "分"
 
 msgid "Misc"
 msgstr "雑多"
@@ -1816,6 +2400,9 @@ msgstr "動きと雑多"
 msgid "Motion Estimation"
 msgstr "動き予測"
 
+msgid "Motion Search"
+msgstr "動き検索"
+
 msgid "Motion search precision:"
 msgstr "動き検索精度:"
 
@@ -1825,8 +2412,17 @@ msgstr "フィルタを下に移動する"
 msgid "Move filter up"
 msgstr "フィルタを上に移動する"
 
+msgid "Mpeg2 options"
+msgstr "MPEG2 オプション"
+
+msgid "Mplayer Delogo"
+msgstr "MPlayer Delogo"
+
 msgid "MultiThreading"
 msgstr "マルチスレッド"
+
+msgid "Multiplatform video editor"
+msgstr "マルチプラットフォーム ビデオ エディタ"
 
 msgid "Multiple Audio Tracks"
 msgstr "複数の音声トラック"
@@ -1834,11 +2430,17 @@ msgstr "複数の音声トラック"
 msgid "Mux Every x video frames"
 msgstr "N個の映像フレーム毎に多重化"
 
+msgid "Mux _every x video frames:"
+msgstr "N個の映像フレーム毎に多重化(_E):"
+
 msgid "Mux by packet size"
 msgstr "パケットサイズ毎に"
 
 msgid "Mux every N video frames"
 msgstr "N個の映像フレーム毎に"
+
+msgid "Mux in _blocks of x bytes:"
+msgstr "xバイトのブロック毎に多重化(_B):"
 
 msgid "Mux with block of size"
 msgstr "次のサイズのブロック毎に多重化"
@@ -1846,17 +2448,23 @@ msgstr "次のサイズのブロック毎に多重化"
 msgid "Muxing Type"
 msgstr "多重化タイプ"
 
+msgid "Muxing _type:"
+msgstr "多重化タイプ(_T):"
+
 msgid "NONE"
 msgstr "なし"
 
 msgid "NTSC (default is PAL)"
-msgstr "NTSC (デフォルトは PAL)"
+msgstr "NTSC (デフォルトはPAL)"
 
 msgid "NTSC converted from PAL"
 msgstr "PALから変換したNTSC"
 
 msgid "Narrow"
 msgstr "狭い"
+
+msgid "Nb pictures seen :"
+msgstr "見れる画像がありません :"
 
 msgid "Ne_xt Black Frame"
 msgstr "次の黒フレーム(_X)"
@@ -1885,6 +2493,12 @@ msgstr "ストラテジなし"
 msgid "No alerts"
 msgstr "警告しない"
 
+msgid "No audio"
+msgstr "音声なし"
+
+msgid "No audio decoder found for this file"
+msgstr "このファイル用の音声デコーダが見付かりません"
+
 msgid "No audio track"
 msgstr "音声トラックなし"
 
@@ -1900,14 +2514,35 @@ msgstr "ダウンミックスなし"
 msgid "No error found"
 msgstr "エラーは見付かりません"
 
+msgid "No filter found"
+msgstr "フィルタがありません"
+
+msgid "No frames to encode"
+msgstr "エンコードするフレームがありません"
+
+msgid "No glyphs to save"
+msgstr "保存するグリフがありません"
+
 msgid "No link"
 msgstr "リンクなし"
 
 msgid "No more supported."
 msgstr "もはやサポートされません"
 
+msgid "No stts table"
+msgstr "stts テーブルがない"
+
+msgid "No tag found"
+msgstr "タグがありません"
+
 msgid "No video loaded"
 msgstr "読込む映像がありません"
+
+msgid "No write access to \"%s\"."
+msgstr "\"%s\" に書込みアクセスがありません."
+
+msgid "Node not found"
+msgstr "ノードがありません"
 
 msgid "Noise"
 msgstr "ノイズ"
@@ -1927,8 +2562,17 @@ msgstr "なし、計算だけする"
 msgid "Normal"
 msgstr "普通"
 
+msgid "Not Yet!"
+msgstr "まだない!"
+
+msgid "Not a WAV file?"
+msgstr "WAVファイルではない ?"
+
 msgid "Not coded in this version"
 msgstr "このバージョンではコード化されていません"
+
+msgid "Not indexable"
+msgstr "インデックスを付けれません"
 
 msgid "Nothing to do."
 msgstr "することがない."
@@ -1951,6 +2595,12 @@ msgstr "旧式"
 msgid "Old format project file"
 msgstr "古い形式のプロジェクトファイル"
 
+msgid "Only QCIF and subQCIF are allowed for H.263"
+msgstr "QCIFとsubQCIFのみが H.263 で許されます"
+
+msgid "Oops"
+msgstr "しまった"
+
 msgid "Open CQM file"
 msgstr "CQMファイルを開く"
 
@@ -1960,11 +2610,17 @@ msgstr "ファイルを開く"
 msgid "Open filter list [Ctrl-O]"
 msgstr "フィルタリストを開く [Ctrl-O]"
 
+msgid "Option "
+msgstr "オプション "
+
 msgid "Order"
 msgstr "オーダー"
 
 msgid "Out"
 msgstr "アウト"
+
+msgid "Out of bounds"
+msgstr "境界外"
 
 msgid "Out of memory"
 msgstr "メモリ範囲外"
@@ -1996,6 +2652,12 @@ msgstr "ファイルを上書きしますか ?"
 msgid "P-frame quantizer - Min:"
 msgstr "P-フレーム量子化度 - 最小:"
 
+msgid "PAL->Film"
+msgstr "PAL -> Film"
+
+msgid "PSP (H264)"
+msgstr "PSP (H264)"
+
 msgid "P_artial"
 msgstr "部分的(_A)"
 
@@ -2017,6 +2679,9 @@ msgstr "パックドビットストリーム:"
 msgid "Packed bitstream"
 msgstr "パックドビットストリーム"
 
+msgid "Parameter Error"
+msgstr "パラメータエラー"
+
 msgid "Partial"
 msgstr "部分適用"
 
@@ -2028,6 +2693,12 @@ msgstr "区分とフレーム"
 
 msgid "Pause / Abort"
 msgstr "休止 / 中止"
+
+msgid "Paused"
+msgstr "休止した"
+
+msgid "Permission error"
+msgstr "パーミッション エラー"
 
 msgid "Pixel Aspect Ratio"
 msgstr "ピクセルアスペクト比"
@@ -2041,8 +2712,26 @@ msgstr "ピクセル幅"
 msgid "Play"
 msgstr "再生"
 
+msgid "Playback priority"
+msgstr "再生の優先度"
+
+msgid "Please check markers. Is \"A>\" == \">B\"?"
+msgstr "マーカーを確認して下さい. \"A>\" == \">B\" ですか ?"
+
 msgid "Please select or enter a valid filename"
 msgstr "有効なファイル名を選択または記入して下さい"
+
+msgid "Please select or enter a valid ifo file"
+msgstr "有効なIFOファイルを選択するか記入して下さい"
+
+msgid "Please select or enter a valid jobname"
+msgstr "有効なジョブ名を選択または記入して下さい"
+
+msgid "Please select or enter a valid vob name"
+msgstr "有効なVOB名を選択するか記入して下さい"
+
+msgid "Please select or enter a valid vobsub file"
+msgstr "有効なVobSubファイルを選択するか記入して下さい"
 
 msgid "Post Proc Threshold"
 msgstr "後処理閾値"
@@ -2071,6 +2760,9 @@ msgstr "事前定義アスペクト比"
 msgid "Preferences"
 msgstr "設定"
 
+msgid "Preview"
+msgstr "プレビュー"
+
 msgid "Previou_s Black Frame"
 msgstr "前の黒フレーム(_S)"
 
@@ -2083,11 +2775,20 @@ msgstr "前のフレーム"
 msgid "Previous keyframe"
 msgstr "前のキーフレーム"
 
+msgid "Priority:"
+msgstr "優先度:"
+
 msgid "Problem loading sub"
 msgstr "字幕読込みエラー"
 
 msgid "Problem opening the mpeg files"
 msgstr "MPEGファイルを開くのに問題"
+
+msgid "Problem reading SVQ3 headers"
+msgstr "SVQ3ヘッダ読取りに問題"
+
+msgid "Problem reading XML filters"
+msgstr "XMLフィルタ読取りに問題"
 
 msgid "Process image (not fields)"
 msgstr "画像を処理(フィールドではない)"
@@ -2101,8 +2802,14 @@ msgstr "より良い見掛けのB-フレームを作る"
 msgid "Progressive"
 msgstr "プログレッシブ"
 
+msgid "Prologic"
+msgstr "ドルビープロロジック"
+
+msgid "Prologic II"
+msgstr "ドルビープロロジック 2"
+
 msgid "Proper_ties"
-msgstr "プロパティ"
+msgstr "プロパティ(_T)"
 
 msgid "Properties"
 msgstr "プロパティ"
@@ -2117,6 +2824,9 @@ msgid "Quality "
 msgstr "品質"
 
 msgid "Quality Based"
+msgstr "品質に基づく"
+
+msgid "Quality based"
 msgstr "品質に基づく"
 
 msgid "Quantisation (2-31)"
@@ -2155,11 +2865,17 @@ msgstr "量子化度 (0-51):"
 msgid "Quantizer Compression"
 msgstr "量子化圧縮"
 
+msgid "Quantizer _blur:"
+msgstr "量子化ぼかし(_B):"
+
 msgid "Quantizer restrictions"
 msgstr "量子化度の制限"
 
 msgid "Quantizer:"
 msgstr "量子化度:"
+
+msgid "Quarter Pel"
+msgstr "1/4 ピクセル"
 
 msgid "Quarter Pixel"
 msgstr "1/4 ピクセル"
@@ -2181,6 +2897,12 @@ msgstr "レートひずみ量子化は各ブロックに最適なエンコード
 
 msgid "Ratecontrol"
 msgstr "レート制御"
+
+msgid "Rebuild all Keyframes?"
+msgstr "全てのキーフレームを再構築しますか ?"
+
+msgid "Recent files"
+msgstr "最近使ったファイル"
 
 msgid "Reduce fluctuations in QP (after curve compression)"
 msgstr "(曲線圧縮の後の)QPのばらつきの低減"
@@ -2221,11 +2943,17 @@ msgstr "ログファイルを再利用しますか ?"
 msgid "Right:"
 msgstr "右:"
 
+msgid "Rotate Params"
+msgstr "回転パラメータ"
+
 msgid "Run Job"
 msgstr "ジョブを起動"
 
 msgid "Run all jobs"
 msgstr "全ジョブを起動"
+
+msgid "Running"
+msgstr "稼動中"
 
 msgid "SVCD resolution [Ctrl-3]"
 msgstr "SVCD 解像度 [Ctrl-3]"
@@ -2242,11 +2970,17 @@ msgstr "入力と同じ量子化"
 msgid "Sample A/R "
 msgstr "サンプル A/R"
 
+msgid "Save (A+V) will generate bad AVI. Save audio will work."
+msgstr "(A+V)保存は悪いAVIを作り出します. 音声保存は動作します."
+
 msgid "Save Job"
 msgstr "ジョブを保存"
 
 msgid "Save P_roject As..."
 msgstr "名前を付けてプロジェクトを保存(_R)"
+
+msgid "Save Script"
+msgstr "スクリプト保存"
 
 msgid "Save _BMP Image..."
 msgstr "BMP画像を保存(_B)"
@@ -2263,17 +2997,47 @@ msgstr "選択をJPEG画像として保存(_S)"
 msgid "Save _Video..."
 msgstr "映像を保存(_V)"
 
+msgid "Save as script"
+msgstr "スクリプトとして保存"
+
 msgid "Save as script [Ctrl-J]"
 msgstr "スクリプトとして保存 [Ctrl-J]"
 
 msgid "Save filter list [Ctrl-S]"
 msgstr "フィルタリストを保存 [Ctrl-S]"
 
+msgid "Save set of filters"
+msgstr "フィルタの組を保存"
+
 msgid "Save the file"
 msgstr "ファイルを保存する"
 
+msgid "Saved \"%s\"."
+msgstr "\"%s\" を保存."
+
+msgid "Saved %d images."
+msgstr "%d 画像を保存."
+
+msgid "Saving %s as a BMP file failed."
+msgstr "%s をBMPファイルとしての保存は失敗しました."
+
+msgid "Saving as set of jpegs"
+msgstr "JPEGの組を保存中"
+
+msgid "Saving audio"
+msgstr "音声保存中"
+
 msgid "Saving failed"
 msgstr "保存に失敗"
+
+msgid "Saving raw video stream"
+msgstr "raw 映像ストリームを保存中"
+
+msgid "Saving the job failed. Maybe you have permission issue with ~/.avidemux"
+msgstr "ジョブの保存に失敗. ~/.avidemux でのパーミッション問題かも"
+
+msgid "Scanning OGM"
+msgstr "OGMをスキャン中"
 
 msgid "Scene Cut Threshold"
 msgstr "シーンカット閾値"
@@ -2281,11 +3045,17 @@ msgstr "シーンカット閾値"
 msgid "Scene change detect"
 msgstr "シーン変化検出"
 
+msgid "Second Audio Track"
+msgstr "第２音声トラック"
+
 msgid "Second Pass"
 msgstr "２回目のパス"
 
 msgid "Second track loaded"
 msgstr "第２トラックを読込みました"
+
+msgid "Seconds"
+msgstr "秒"
 
 msgid "See Hex"
 msgstr "16進表記を見る"
@@ -2308,6 +3078,9 @@ msgstr ".idxファイルの選択"
 msgid "Select 1-pass or 2-pass encoding"
 msgstr "1-パスか2-パスエンコードかを選択"
 
+msgid "Select 2nd audio Track"
+msgstr "第２音声トラックの選択"
+
 msgid "Select AC3 to load "
 msgstr "読込むAC3の選択"
 
@@ -2326,8 +3099,29 @@ msgstr "保存するBMPの選択"
 msgid "Select Color"
 msgstr "色の選択"
 
+msgid "Select Copy as the video codec."
+msgstr "コピーを映像コーデックとして選択."
+
 msgid "Select Custom Matrix File to write"
 msgstr "書込むカスタムマトリックスファイルの選択"
+
+msgid "Select DVD as the video codec for MPEG TS output."
+msgstr "DVDをMPEG TS出力用映像コーデックとして選択"
+
+msgid "Select Directory"
+msgstr "フォルダの選択"
+
+msgid "Select ECMAScript to run "
+msgstr "起動するECMAスクリプトの選択"
+
+msgid "Select File"
+msgstr "ファイルの選択"
+
+msgid "Select Glyoh to save"
+msgstr "保存するグリフの選択"
+
+msgid "Select Glyphfile to save to"
+msgstr "保存するグリフファイルを選択"
 
 msgid "Select Jpeg sequence to save "
 msgstr "保存するJPEG順序の選択"
@@ -2341,6 +3135,9 @@ msgstr "言語選択 :"
 msgid "Select MP3 to load "
 msgstr "読込むMP3の選択"
 
+msgid "Select MPEG as the output."
+msgstr "MPEGを出力として選択する"
+
 msgid "Select OGM file to write"
 msgstr "書込むOGMファイルの選択"
 
@@ -2351,19 +3148,34 @@ msgid "Select Sub"
 msgstr "字幕の選択"
 
 msgid "Select Vob file to scan"
-msgstr "スキャンするVobファイルの選択"
+msgstr "スキャンするVOBファイルの選択"
+
+msgid ""
+"Select WAV PCM as the audio codec, otherwise the audio file would be raw PCM."
+msgstr ""
+"WAV PCMを音声コーデックとして選んで下さい. そうしないと、音声ファイルはraw "
+"PCMとなります."
 
 msgid "Select WAV to load "
 msgstr "読込むWAVの選択"
 
 msgid "Select Xvid matrix file to load"
-msgstr "読込むXvidマトリックスファイルの選択"
+msgstr "読込むXviDマトリックスファイルの選択"
+
+msgid "Select a directory"
+msgstr "フォルダの選択"
+
+msgid "Select a second audio track in the Audio menu."
+msgstr "音声メニュー中第２音声トラックを選択."
 
 msgid "Select background picture"
 msgstr "背景画像の選択"
 
 msgid "Select color"
 msgstr "色選択"
+
+msgid "Select dual audio AVI to write"
+msgstr "書き込む２音声AVIを選択"
 
 msgid "Select ecmascript to run "
 msgstr "起動するECMAスクリプトの選択"
@@ -2375,7 +3187,7 @@ msgid "Select file to save audio"
 msgstr "音声を保存するファイルの選択"
 
 msgid "Select ifo file to use"
-msgstr "使うifoファイルの選択"
+msgstr "使うIFOファイルの選択"
 
 msgid "Select postprocessing level"
 msgstr "後処理レベルの選択"
@@ -2386,11 +3198,17 @@ msgstr "保存するrawファイルの選択"
 msgid "Select the output file"
 msgstr "出力ファイルを選択"
 
+msgid "Select video to write"
+msgstr "書込む映像を選択"
+
 msgid "Select vobsub to write"
 msgstr "書込むVobSubの選択"
 
+msgid "Select workbench to save"
+msgstr "保存するプロジェクトの選択"
+
 msgid "Select workbench to save "
-msgstr "保存するworkbench選択"
+msgstr "保存するプロジェクトの選択"
 
 msgid "Selection: end"
 msgstr "選択: 終点"
@@ -2463,8 +3281,14 @@ msgstr ""
 "連続B-フレーム数の最大値を設定して下さい. これは落とせる重複フレーム数を決め"
 "ます. 2から5の値を推奨. ビットレートと利用と品質を大きく改善します"
 
+msgid "Set your markers correctly."
+msgstr "マーカーを正しく設定して下さい."
+
 msgid "Sharp :"
 msgstr "シャープ :"
+
+msgid "Sharpen/Blur"
+msgstr "シャープ/ぼかし"
 
 msgid "Sharpness"
 msgstr "シャープさ"
@@ -2502,6 +3326,9 @@ msgstr "動きベクトルを示す"
 msgid "Shrink factor"
 msgstr "圧縮度"
 
+msgid "Shut down computer when finished"
+msgstr "終了したらコンピュータをシャットダウンする"
+
 msgid "Side"
 msgstr "サイド"
 
@@ -2523,17 +3350,23 @@ msgstr "1-パス - 量子化度"
 msgid "Single pass - bitrate"
 msgstr "1-パス - ビットレート"
 
+msgid "Single pass - constant quality"
+msgstr "1-パス - 一定品質"
+
 msgid "Single pass - quantizer"
 msgstr "1-パス - 量子化度"
 
 msgid "Single pass:Quantizer"
 msgstr "1-パス: 量子化度"
 
+msgid "Size is not (s)QCIF"
+msgstr "サイズが(s)QCIFではない"
+
 msgid "Size mismatch"
 msgstr "サイズが合いません"
 
 msgid "Skip Glyph"
-msgstr "Glyphをスキップ"
+msgstr "グリフをスキップ"
 
 msgid "Skip all"
 msgstr "全てをスキップ"
@@ -2550,8 +3383,23 @@ msgstr "低速, 繰返し動き検索"
 msgid "Smaller means more deinterlacing"
 msgstr "小さな値ほどより大きなデインタレースを意味する"
 
+msgid "Something bad happened"
+msgstr "何か悪いことが起きました"
+
+msgid "Something bad happened (II)"
+msgstr "何か悪いことが起きました (II)"
+
+msgid "Something bad happened (II))"
+msgstr "何か悪いことが起きました (II)"
+
 msgid "Something failed"
 msgstr "なにか失敗しました"
+
+msgid "Something failed when appending"
+msgstr "追加時に何かが失敗しました"
+
+msgid "Something very wrong happened when buildint joblist"
+msgstr "ジョブリストを構築中に何か非常に悪いことが起きました"
 
 msgid "Source :"
 msgstr "入力元 :"
@@ -2568,6 +3416,9 @@ msgstr "MBytes毎に分割"
 msgid "Split mpegs every (MB)"
 msgstr "MPEGを分割 (MB)"
 
+msgid "Stabilize Threshold"
+msgstr "安定化閾値"
+
 msgid "Standard"
 msgstr "標準"
 
@@ -2576,6 +3427,11 @@ msgstr "部分適用のための開始フレーム :"
 
 msgid "Start frame for this vignette."
 msgstr "このビネット用にフレームを開始する"
+
+msgid "Start must be before end, and both within video # of frames."
+msgstr ""
+"始点は終点より前でなければならないし、両点とも映像フレーム数内でなれなならな"
+"い"
 
 msgid "StartOcr"
 msgstr "OCR開始"
@@ -2622,6 +3478,9 @@ msgstr "読込む字幕"
 msgid "Subtitles"
 msgstr "字幕"
 
+msgid "Succeeded"
+msgstr "成功した"
+
 msgid "Sure ?"
 msgstr "本当?"
 
@@ -2640,17 +3499,44 @@ msgstr "UとVを交換"
 msgid "Swap UV"
 msgstr "UVを交換する"
 
+msgid "Switch audio codec to Copy."
+msgstr "音声コーデックをコピーに切り替える."
+
+msgid "TDeint param"
+msgstr "TDeint パラメータ"
+
 msgid "TTF font to use"
 msgstr "使用するTTFフォント"
 
 msgid "T_woway"
 msgstr "２方向(_W)"
 
+msgid "Take audio from external AC3 file"
+msgstr "外部AC3ファイルから音声を取る"
+
+msgid "Take audio from external MP3 file"
+msgstr "外部MP3ファイルから音声を取る"
+
+msgid "Take audio from external WAV file"
+msgstr "外部WAVファイルから音声を取る"
+
+msgid "Take audio from video file"
+msgstr "映像ファイルから音声を取る"
+
 msgid "Target Bitrate (kb/s)   "
 msgstr "目標ビットレート (kb/s)"
 
+msgid "Target FinalSize (MB):"
+msgstr "目標最終サイズ(MB):"
+
 msgid "Target Size:"
 msgstr "目標サイズ:"
+
+msgid "Target bitrate (kb/s):"
+msgstr "目標ビットレート(kb/s):"
+
+msgid "Target size (MBytes):"
+msgstr "目標サイズ(MBytes):"
 
 msgid "Target type"
 msgstr "目標タイプ"
@@ -2687,6 +3573,12 @@ msgstr ""
 "読込んだファイルには複数の音声トラックが含まれています.\n"
 "音声->主トラック でアクティブにするものを選択して下さい."
 
+msgid "The filter is already partial"
+msgstr "フィルタは既に部分的です"
+
+msgid "The first frame is not intra frame"
+msgstr "最初のフレームは I-フレームではありません"
+
 msgid ""
 "The higher this value, the more bits get assigned to frames below the "
 "average frame size"
@@ -2709,6 +3601,12 @@ msgstr ""
 "コーデックを変更するか、チャンネル数を減らすようミキサーフィルタを使ってくだ"
 "さい."
 
+msgid "The selected audio file does not exist."
+msgstr "選択した音声ファイルは存在しません"
+
+msgid "The unpacking succeedeed but the index is still not up to date."
+msgstr "アンパックは成功しましたが、インデックスはまだ更新されてません."
+
 msgid "There is no audio track"
 msgstr "音声トラックがありません"
 
@@ -2721,8 +3619,21 @@ msgstr "第２トラックがありません"
 msgid "There is several mpeg file, append them ?"
 msgstr "複数のmpegファイルがあります. それを追加しますか ?"
 
+msgid "This a VOP packed AVI."
+msgstr "これはVOPパックドAVIです."
+
+msgid "This cannot have packed VOP"
+msgstr "これはパックドVOPを持てない"
+
 msgid "This is not MPEG compatible"
 msgstr "これはMPEG互換性がありません"
+
+msgid ""
+"This is to be used to undo packed vop on mpeg4.\n"
+"Continue ?"
+msgstr ""
+"これはMPEG4のパックドvopを戻すのに使われます.\n"
+"続けますか ?"
 
 msgid ""
 "This looks like mpeg\n"
@@ -2730,6 +3641,9 @@ msgid ""
 msgstr ""
 "これは mpeg のようです\n"
 " それのインデックスを作成しますか ?"
+
+msgid "This will make trouble for avi files."
+msgstr "これはAVIファイルではトラブルになる."
 
 msgid "Threshold"
 msgstr "閾値"
@@ -2747,13 +3661,19 @@ msgid "Time left :"
 msgstr "残り時間 :"
 
 msgid "Time: "
-msgstr "時間:"
+msgstr "時間: "
 
 msgid "Timecode :"
 msgstr "タイムコード :"
 
 msgid "Timeshift"
 msgstr "時間ずれ"
+
+msgid "Tmpeng "
+msgstr "TMPGEnc "
+
+msgid "Tmpgenc"
+msgstr "TMPGEnc"
 
 msgid "Top"
 msgstr "トップ"
@@ -2791,6 +3711,12 @@ msgstr "トラック _2: "
 msgid "Transform"
 msgstr "変換"
 
+msgid "Transformation"
+msgstr "変換"
+
+msgid "Trouble initializing audio device"
+msgstr "音声デバイス初期化トラブル"
+
 msgid "Try 'File' -> 'Load/Run Project...'"
 msgstr "'ファイル' -> 'プロジェクトを読込む/起動'を試してみて下さい"
 
@@ -2814,6 +3740,12 @@ msgstr "2-パス - ファイルサイズ"
 
 msgid "Two pass"
 msgstr "2-パス"
+
+msgid "Two pass - average bitrate"
+msgstr "2-パス - 平均ビットレート"
+
+msgid "Two pass - video size"
+msgstr "2-パス - 映像サイズ"
 
 msgid "Two pass tuning"
 msgstr "2パス調整"
@@ -2848,6 +3780,9 @@ msgstr "チェックを外すと高速P-スキップを有効にする"
 msgid "Uneven multi hexagon"
 msgstr "不均一複数六角形"
 
+msgid "Unknown event"
+msgstr "不明なイベント"
+
 msgid "Unknown flag :"
 msgstr "不明フラグ :"
 
@@ -2867,10 +3802,10 @@ msgid "Use Quarter pixel resolution for a more precise motion estimation"
 msgstr "より正確な動き予測に1/4 ピクセル解像度を使う"
 
 msgid "Use Xvid Rate Control"
-msgstr "Xvidレート制御を使う"
+msgstr "XviDレート制御を使う"
 
 msgid "Use Xvid ratecontrol"
-msgstr "Xvidレート制御を使う"
+msgstr "XviDレート制御を使う"
 
 msgid "Use also chroma to detect scene change"
 msgstr "シーン変化を検出するのに彩度も使う"
@@ -2910,6 +3845,10 @@ msgstr "エンコード中システムトレーを使う"
 msgid "Use that mode"
 msgstr "そのモードを使う"
 
+msgid "Use the &lt;&lt; and the &gt;&gt; buttons to move using Intra frames."
+msgstr ""
+"I-フレームを使って移動するには &lt;&lt; と &gt;&gt; ボタンを使って下さい."
+
 msgid "User Interface"
 msgstr "ユーザインタフェース"
 
@@ -2918,8 +3857,14 @@ msgid ""
 "quality"
 msgstr "動きの彩度(色)コンポーネントを圧縮に利用し品質を助ける"
 
+msgid "Using backup decoder - not frame accurate."
+msgstr "バックアップでコーダを使う - フレームに正確ではない."
+
 msgid "V Shift :"
 msgstr "V シフト:"
+
+msgid "VBR"
+msgstr "VBR"
 
 msgid "VBR (Quality based)"
 msgstr "VBR (品質に基づく)"
@@ -2960,6 +3905,12 @@ msgstr "映像時間"
 msgid "Video Filter Manager"
 msgstr "映像 フィルタ マネージャ"
 
+msgid "Video Filters"
+msgstr "映像フィルタ"
+
+msgid "Video _display:"
+msgstr "映像表示(_D):"
+
 msgid "Video bitrate:"
 msgstr "映像ビットレート:"
 
@@ -2984,6 +3935,9 @@ msgstr "ビネット高さ"
 msgid "Vignette Width"
 msgstr "ビネット幅"
 
+msgid "Vob :"
+msgstr "VOB :"
+
 msgid "Vob to Vobsub"
 msgstr "VobをVobSubへ"
 
@@ -2993,6 +3947,9 @@ msgstr "VobSubの設定"
 msgid "Volume control"
 msgstr "音量制御"
 
+msgid "WAV open file failed..."
+msgstr "WAVファイルを開くのに失敗..."
+
 msgid "Weighted biprediction"
 msgstr "重み付け二予測"
 
@@ -3001,6 +3958,9 @@ msgstr "幅や高さは 0 にはできません"
 
 msgid "Width and height cannot be odd"
 msgstr "幅や高さは 奇数にはできません"
+
+msgid "Width is not a multiple of 8"
+msgstr "幅が 8 の倍数ではありません"
 
 msgid ""
 "Width is not a multiple of 8\n"
@@ -3024,11 +3984,47 @@ msgstr "XVCD エンコード"
 msgid "XviD encoding options"
 msgstr "XviDエンコードオプション"
 
+msgid "Xvid Encoder"
+msgstr "XviD エンコーダ"
+
 msgid "Y to UV link"
 msgstr "YをUVにリンク"
 
 msgid "Yes"
 msgstr "はい"
+
+msgid "You can't remove all frames"
+msgstr "全フレームを削除できません"
+
+msgid "You can't use the Copy codec."
+msgstr "そのコピーコーデックを使えません."
+
+msgid ""
+"You cannot mix different video dimensions yet. Using the partial video "
+"filter later, will not work around this problem. The workaround is:\n"
+"1.) \"resize\" / \"add border\" / \"crop\" each stream to the same "
+"resolution\n"
+"2.) concatinate them together"
+msgstr ""
+"異なる映像次元をまだ混合できません. 部分的な映像フィルタの後での使用はこの問"
+"題に対処しないでしょう. 対策は:\n"
+"1.) 各ストリームを \"resize\" / \"add border\" / \"crop\" を行って同じ解像度"
+"にし、\n"
+"2.) それらを連結すること"
+
+msgid ""
+"You don't have FAAC!.\n"
+"It is needed to create PSP compatible video."
+msgstr ""
+"FAACがないよ!\n"
+"PSP互換映像を作成するにはそれが必要."
+
+msgid ""
+"You may need smart copy.\n"
+" Enable it ?"
+msgstr ""
+"スマートコピーが必要かも.\n"
+"それを有効にしますか ?"
 
 msgid "You should use Tool->Rebuild frame. Do it now ?"
 msgstr "ツール->フレームを再構築 を使うべきです. 今実行しますか ?"
@@ -3045,11 +4041,17 @@ msgstr "ズーム 2:1 (_2)"
 msgid "Zoom _4:1"
 msgstr "ズーム 4:1 (_4)"
 
+msgid "_4MV"
+msgstr "_4MV"
+
 msgid "_A/V Sidebar"
 msgstr "A/Vスライドバー(_A)"
 
 msgid "_About"
 msgstr "Avidemuxについて(_A)"
+
+msgid "_Accept non-standard audio frequency for DVD"
+msgstr "DVD用に非標準な音声周波数を受け付ける(_A)"
 
 msgid "_Append..."
 msgstr "追加(_A)"
@@ -3060,11 +4062,32 @@ msgstr "アスペクト比(_A)"
 msgid "_Audio"
 msgstr "音声(_A)"
 
+msgid "_Audio output:"
+msgstr "音声出力(_A):"
+
+msgid "_Audio source:"
+msgstr "音声ソース(_A):"
+
 msgid "_Autolevel"
 msgstr "自動レベル(_A)"
 
+msgid "_Average bitrate (kb/s):"
+msgstr "平均ビットレート(kb/s) (_A):"
+
+msgid "_BVHQ"
+msgstr "_BVHQ"
+
+msgid "_Bitrate (kb/s):"
+msgstr "ビットレート(kb/s):"
+
 msgid "_Bitrate Histogram"
 msgstr "ビットレート ヒストグラム(_B)"
+
+msgid "_Bitrate:"
+msgstr "ビットレート(_B):"
+
+msgid "_Blend"
+msgstr "ブレンド(_B)"
 
 msgid "_Blue:"
 msgstr "青(_B):"
@@ -3075,8 +4098,14 @@ msgstr "下余白(_B)"
 msgid "_Browse..."
 msgstr "閲覧(_B)"
 
+msgid "_Buffer size:"
+msgstr "バッファサイズ(_B):"
+
 msgid "_Build VBR Time Map"
 msgstr "VBRタイムマップを作成(_B)"
+
+msgid "_Built-in Support"
+msgstr "内蔵サポート(_B)"
 
 msgid "_Calculator"
 msgstr "計算(_C)"
@@ -3087,11 +4116,17 @@ msgstr "コントラスト(_C):"
 msgid "_Copy"
 msgstr "コピー(_C)"
 
+msgid "_Custom"
+msgstr "カスタム(_C)"
+
 msgid "_Custom Matrix"
 msgstr "カスタムマトリックス(_C)"
 
 msgid "_Custom size (MB):"
 msgstr "カスタムサイズ(_C) (MB):"
+
+msgid "_DVD"
+msgstr "_DVD"
 
 msgid "_Decoder Options"
 msgstr "デコーダオプション(_D)"
@@ -3105,14 +4140,26 @@ msgstr "削除(_D)"
 msgid "_Deringing"
 msgstr "デリング(_D)"
 
+msgid "_Disable NUV audio sync"
+msgstr "NUV 音声同期を無効にする(_D)"
+
 msgid "_Edit"
 msgstr "編集(_E)"
 
 msgid "_Encoder"
 msgstr "エンコーダ(_E)"
 
+msgid "_Encoding mode:"
+msgstr "エンコードモード(_E):"
+
+msgid "_Encoding priority:"
+msgstr "エンコードの優先度(_E):"
+
 msgid "_End frame:"
 msgstr "終了フレーム(_E):"
+
+msgid "_External file:"
+msgstr "外部ファイル(_E):"
 
 msgid "_Extra"
 msgstr "特別(_E)"
@@ -3129,6 +4176,12 @@ msgstr "フィールドオーダー(_F):"
 msgid "_File"
 msgstr "ファイル(_F)"
 
+msgid "_Filesize tolerance (kb):"
+msgstr "ファイルサイズ耐性(kb) (_F):"
+
+msgid "_Filter directory:"
+msgstr "フィルタのフォルダ(_F):"
+
 msgid "_Filter strength:"
 msgstr "フィルタの強さ(_F):"
 
@@ -3144,8 +4197,17 @@ msgstr "フォントスケール(_F)"
 msgid "_Format:"
 msgstr "形式(_F):"
 
+msgid "_Frame Hex Dump"
+msgstr "フレーム16進ダンプ(&F)"
+
 msgid "_Frame Rate"
 msgstr "フレームレート(_F)"
+
+msgid "_GMC"
+msgstr "_GMC"
+
+msgid "_GOP size:"
+msgstr "GOPサイズ(_G):"
 
 msgid "_Go"
 msgstr "移動(_G)"
@@ -3171,11 +4233,17 @@ msgstr "水平スタック(_H):"
 msgid "_Identical:"
 msgstr "同一(_I):"
 
+msgid "_Indexing/unpacking priority:"
+msgstr "インデックス付け/アンパックの優先度(_I):"
+
 msgid "_Initial:"
 msgstr "初期(_I):"
 
 msgid "_Interlaced"
 msgstr "インタレース(_I)"
+
+msgid "_Interlacing:"
+msgstr "インタレース(_I):"
 
 msgid "_Job name:"
 msgstr "ジョブ名(_J)"
@@ -3189,11 +4257,23 @@ msgstr "最後のフレーム(_L)"
 msgid "_Line spacing"
 msgstr "行スペーシング(_L)"
 
+msgid "_Load external filters"
+msgstr "外部フィルタを読込む(_L)"
+
 msgid "_Load/Run Project..."
 msgstr "プロジェクトを読込む/起動(_L)"
 
+msgid "_Local playback downmixing:"
+msgstr "ローカル再生ダウンミックス(_L):"
+
 msgid "_Luma lock:"
 msgstr "輝度ロック(_L):"
+
+msgid "_Luma threshold:"
+msgstr "輝度閾値(_L) :"
+
+msgid "_Macroblock decision:"
+msgstr "マクロブロック決定(_M):"
 
 msgid "_Main Toolbar"
 msgstr "主ツールバー(_M)"
@@ -3207,17 +4287,38 @@ msgstr "マップ(_M)"
 msgid "_Mask"
 msgstr "マスク (_M)"
 
+msgid "_Matrices:"
+msgstr "マトリックス(_M):"
+
 msgid "_Medium:"
 msgstr "メディア(_M):"
 
+msgid "_Message level:"
+msgstr "メッセージレベル(_M):"
+
 msgid "_Mode:"
 msgstr "モード(_M):"
+
+msgid "_New frame rate:"
+msgstr "新規フレームレート(_N)"
+
+msgid "_Next"
+msgstr "次へ(_N)"
 
 msgid "_Next Frame"
 msgstr "次のフレーム(_N)"
 
 msgid "_Noise:"
 msgstr "ノイズ(_N):"
+
+msgid "_Number of B frames:"
+msgstr "B-フレーム数:"
+
+msgid "_Number of threads:"
+msgstr "スレッド数(_N):"
+
+msgid "_OCR (VobSub -> srt)"
+msgstr "_OCR (VobSub -> srt)"
 
 msgid "_Open..."
 msgstr "開く(_O)"
@@ -3228,17 +4329,41 @@ msgstr "ペースト(_P)"
 msgid "_Play/Stop"
 msgstr "再生/停止(_P)"
 
+msgid "_Playback priority:"
+msgstr "再生の優先度(_P):"
+
 msgid "_Postprocessing"
 msgstr "後処理(_P)"
 
 msgid "_Preview"
 msgstr "プレビュー(_P)"
 
+msgid "_Previous"
+msgstr "前へ(_P)"
+
+msgid "_Qpel"
+msgstr "_Qpel"
+
+msgid "_Quality:"
+msgstr "品質(_Q):"
+
+msgid "_Quantization type:"
+msgstr "量子化タイプ(_Q):"
+
+msgid "_Quantizer compression:"
+msgstr "量子化圧縮(_Q):"
+
 msgid "_Quantizer:"
 msgstr "量子化度(_Q):"
 
+msgid "_Quarter pixel"
+msgstr "1/4 ピクセル(_Q)"
+
 msgid "_Quit"
 msgstr "終了(_Q)"
+
+msgid "_Radius:"
+msgstr "半径(_R):"
 
 msgid "_Rebuild Frames (I & B)"
 msgstr "フレーム(IとB)を再構築(_R)"
@@ -3248,6 +4373,9 @@ msgstr "赤(_R):"
 
 msgid "_Reset Edits"
 msgstr "編集をリセット(_R)"
+
+msgid "_SVCD"
+msgstr "_SVCD"
 
 msgid "_Saturation:"
 msgstr "飽和度(_S):"
@@ -3273,11 +4401,20 @@ msgstr "よりシャープにするエンジン"
 msgid "_Show metrics"
 msgstr "計測値を表示(_S)"
 
+msgid "_Shrink Factor:"
+msgstr "圧縮度(_S):"
+
 msgid "_Shrink factor:"
 msgstr "圧縮度(_S):"
 
 msgid "_Spatial luma strength:"
 msgstr "空間的輝度の強さ(_S):"
+
+msgid "_Split MPEG files every (MB):"
+msgstr "次のMB毎にMPEGファイルを分割する(_S):"
+
+msgid "_Split every MB:"
+msgstr "次のMB毎に分割(_S):"
 
 msgid "_Start frame:"
 msgstr "開始フレーム(_S):"
@@ -3287,6 +4424,9 @@ msgstr "強さ(_S):"
 
 msgid "_Subtitle file (ass/ssa)"
 msgstr "字幕ファイル(_S) (ass/ssa)"
+
+msgid "_Swap U&V:"
+msgstr "UとVを交換(_S):"
 
 msgid "_Temporal strength:"
 msgstr "時間的強さ(_T):"
@@ -3300,8 +4440,29 @@ msgstr "ツール(_T)"
 msgid "_Top margin"
 msgstr "上余白(_T)"
 
+msgid "_Track from video:"
+msgstr "映像からのトラック(_T):"
+
 msgid "_Trellis quantization"
 msgstr "_Trellis 量子化"
+
+msgid "_Use Xvid rate control"
+msgstr "XviD レート制御を使う(_U)"
+
+msgid "_Use alternative tag for MP3 in .mp4"
+msgstr ".mp4にmp3の代替タグを使う(_U)"
+
+msgid "_Use libavcodec MPEG-2 decoder"
+msgstr "libavcodec MPEG-2 デコーダを使う(_U)"
+
+msgid "_Use systray while encoding"
+msgstr "エンコード中シストレーを使う(_U)"
+
+msgid "_VCD"
+msgstr "_VCD"
+
+msgid "_VOB -> VobSub"
+msgstr "_VOB -> VobSub"
 
 msgid "_Vertical deblocking"
 msgstr "垂直デブロック(_V)"
@@ -3309,14 +4470,32 @@ msgstr "垂直デブロック(_V)"
 msgid "_Vertical stacking:"
 msgstr "垂直スタック(_V):"
 
+msgid "_Video size (MB):"
+msgstr "映像サイズ(MB) (_V):"
+
 msgid "_View"
 msgstr "表示(_V)"
+
+msgid "_Volume control:"
+msgstr "音量制御(_V):"
 
 msgid "_Weight:"
 msgstr "重み(_W):"
 
 msgid "_Zoom 1:4"
 msgstr "ズーム 1:4 (_Z)"
+
+msgid "can't create custom directory (%s)."
+msgstr "カスタムフォルダ (%s) を作成できません."
+
+msgid "can't create job directory (%s)."
+msgstr "ジョブフォルダ (%s) を作成できません."
+
+msgid "can't determine $HOME."
+msgstr "$HOME を決定できません."
+
+msgid "can't determine $USERPROFILE."
+msgstr "$USERPROFILE を決定できません."
 
 msgid "font"
 msgstr "フォント"
@@ -3333,6 +4512,12 @@ msgstr "レベル6"
 msgid "label7"
 msgstr "レベル7"
 
+msgid "lvemux init failed"
+msgstr "lvemux処理化失敗"
+
+msgid "menu"
+msgstr "メニュー"
+
 msgid "motion Threshold, Chroma"
 msgstr "動き閾値, 彩度"
 
@@ -3344,6 +4529,9 @@ msgstr "ノイズ"
 
 msgid "show"
 msgstr "表示"
+
+msgid "sub"
+msgstr "sub"
 
 msgid "threshold"
 msgstr "閾値"
