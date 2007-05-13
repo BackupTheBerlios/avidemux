@@ -117,7 +117,7 @@ uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *sharp,
 //uint8_t DIA_4entries(char *title,uint32_t *left,uint32_t *right,uint32_t *top,uint32_t *bottom) {return 0;}
 uint8_t DIA_videoCodec (SelectCodecType * codec){return 0;}
 //uint8_t DIA_getChromaShift( AVDMGenericVideoStream *instream,CHROMASHIFT_PARAM    *param ){ return 0;}
-uint8_t DIA_contrast(AVDMGenericVideoStream *astream,CONTRAST_PARAM *param)  { return 0;}
+//uint8_t DIA_contrast(AVDMGenericVideoStream *astream,CONTRAST_PARAM *param)  { return 0;}
 uint8_t DIA_audioCodec( AUDIOENCODER *codec ) {return 0;}
 uint8_t DIA_dnr(uint32_t *llock,uint32_t *lthresh, uint32_t *clock,
 			uint32_t *cthresh, uint32_t *scene) {return 0;}
