@@ -12,55 +12,58 @@
 *                                                                         *
 ***************************************************************************///
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 #include <stdio.h>
-
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
+#include <stdlib.h>
 
 
-#include <gdk/gdkkeysyms.h>
-#include <gtk/gtk.h>
-# include <math.h>
+
+#include <QtGui/QGraphicsView>
+#include <QtGui/QSlider>
 
 #include "default.h"
-
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
-#include "ADM_toolkit_gtk/toolkit_gtk.h"
-#include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "default.h"
-
 #include "ADM_colorspace/ADM_rgb.h"
 
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "DIA_flyDialog.h"
+#include "DIA_flyDialogQt4.h"
 #include "ADM_assert.h"
-extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
+
+
+//***************************************
 uint8_t  ADM_flyDialog::display(void)
 {
-  ADM_assert(_canvas);
-  ADM_assert(_rgbBufferOut);
-  GUI_RGBDisplay(_rgbBufferOut,_w,_h,_canvas);
+   ADM_QCanvas *view=(ADM_QCanvas *)_canvas;
+   ADM_assert(view);
+   view->dataBuffer=_rgbBufferOut;
+   if(!_rgbBufferOut)
+   {
+      printf("flyDialog: No rgbuffer ??\n"); 
+   } 
+   view->repaint();
   return 1; 
 }
 uint32_t ADM_flyDialog::sliderGet(void)
 {
-  ADM_assert(_slider);
-  GtkAdjustment *adj=gtk_range_get_adjustment (GTK_RANGE(_slider));
-  return (uint32_t)GTK_ADJUSTMENT(adj)->value;
+  QSlider  *slide=(QSlider *)_slider;
+  ADM_assert(slide);
+  return slide->value();
+  
 }
 uint8_t     ADM_flyDialog::sliderSet(uint32_t value)
 {
-  ADM_assert(_slider);
+  QSlider  *slide=(QSlider *)_slider;
+  ADM_assert(slide);
+  slide->setValue(value);
   return 1; 
 }
 uint8_t  ADM_flyDialog::isRgbInverted(void)
 {
-  return 0; 
+  return 1; 
 }
 
 //EOF

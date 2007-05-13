@@ -36,6 +36,7 @@ class ADM_flyDialog
           uint8_t  *_rgbBufferOut;
           uint8_t  _isYuvProcessing;
   public:
+          void    *_cookie; // whatever
           void    *_slider; // widget
           void    *_canvas; // Drawing zone
           ColYuvRgb *_rgb;
@@ -50,7 +51,8 @@ class ADM_flyDialog
           
           uint8_t  display(void);
           uint32_t sliderGet(void);
-          uint8_t     sliderSet(uint32_t value);
+          uint8_t  sliderSet(uint32_t value);
+          uint8_t  isRgbInverted(void);
           
           uint8_t     cleanup(void);
          /*                               */

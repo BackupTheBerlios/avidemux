@@ -41,7 +41,12 @@
   _h=height;
   _isYuvProcessing=yuv;
   _in=in;
-  _rgb=new ColYuvRgb(_w,_h);
+    if(isRgbInverted())
+    {
+        _rgb=new ColYuvRgb(_w,_h,1);
+    }
+    else
+    _rgb=new ColYuvRgb(_w,_h);
   _rgb->reset(_w,_h);
   ADM_assert(in);
   _yuvBuffer=new ADMImage(_w,_h);

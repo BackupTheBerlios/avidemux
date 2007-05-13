@@ -62,7 +62,7 @@ void diaElemFloat::setMe(void *dialog, void *opaque,uint32_t line)
   ELEM_TYPE_FLOAT val=*(ELEM_TYPE_FLOAT *)param;
   widget = gtk_spin_button_new_with_range(min,max,0.1);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(widget),TRUE);
-  gtk_spin_button_set_digits  (GTK_SPIN_BUTTON(widget),2);
+  gtk_spin_button_set_digits  (GTK_SPIN_BUTTON(widget),3);
   gtk_spin_button_set_value (GTK_SPIN_BUTTON(widget),*(ELEM_TYPE_FLOAT *)param);
   
   gtk_widget_show (widget);
