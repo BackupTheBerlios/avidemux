@@ -77,7 +77,6 @@ int  DIA_getXvidCompressParams(COMPRESSION_MODE * mode, uint32_t * qz,
 #endif
 uint8_t DIA_animated(ANIMATED_PARAM *param){return 0;}
 uint8_t DIA_cnr2(CNR2Param *param){return 0;}
-uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getEQ2Param(Eq2_Param *param, AVDMGenericVideoStream *in){return 0;}
 uint8_t DIA_getEqualizer(EqualizerParam *param, ADMImage *image){return 0;}
 uint8_t DIA_getEqualizer(EqualizerParam *param, AVDMGenericVideoStream *in){return 0;}
@@ -105,17 +104,17 @@ uint8_t DIA_RecentFiles( char **name ){return 0;}
 
 uint8_t DIA_about( void ){return 0;}
 void DIA_Calculator(uint32_t *sizeInMeg, uint32_t *avgBitrate ){return ;}
-uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss){return 0;}
+//uint8_t DIA_gotoTime(uint16_t *hh, uint16_t *mm, uint16_t *ss){return 0;}
 //int GUI_handleVFilter (void){return 0;}
 uint8_t  initFileSelector(void){return 0;}
 uint8_t initGUI( void ){return 1;}
 
 uint8_t DIA_job(uint32_t nb,char **name){return 0;}
 uint8_t DIA_lavDecoder(uint32_t *swapUv, uint32_t *showU){return 0;}
-uint8_t DIA_d3d(double *luma,double *chroma,double *temporal){return 0;}
+//uint8_t DIA_d3d(double *luma,double *chroma,double *temporal){return 0;}
 uint8_t DIA_kerneldeint(uint32_t *order, uint32_t *threshold, uint32_t *sharp, 
                           uint32_t *twoway, uint32_t *map){return 0;}
-uint8_t DIA_4entries(char *title,uint32_t *left,uint32_t *right,uint32_t *top,uint32_t *bottom) {return 0;}
+//uint8_t DIA_4entries(char *title,uint32_t *left,uint32_t *right,uint32_t *top,uint32_t *bottom) {return 0;}
 uint8_t DIA_videoCodec (SelectCodecType * codec){return 0;}
 uint8_t DIA_getChromaShift( AVDMGenericVideoStream *instream,CHROMASHIFT_PARAM    *param ){ return 0;}
 uint8_t DIA_contrast(AVDMGenericVideoStream *astream,CONTRAST_PARAM *param)  { return 0;}
