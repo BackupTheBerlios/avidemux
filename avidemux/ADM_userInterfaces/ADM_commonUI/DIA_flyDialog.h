@@ -53,8 +53,8 @@ class ADM_flyDialog
           uint32_t sliderGet(void);
           uint8_t  sliderSet(uint32_t value);
           uint8_t  isRgbInverted(void);
-          
-          uint8_t     cleanup(void);
+  virtual uint8_t  update(void) {};
+          uint8_t  cleanup(void);
          /*                               */
                   ADM_flyDialog(uint32_t width,uint32_t height,AVDMGenericVideoStream *in,
                                     void *canvas, void *slider,int yuv);

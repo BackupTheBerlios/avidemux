@@ -37,65 +37,42 @@
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidASharp_param.h"
+#include "DIA_flyDialog.h"
+#include "DIA_flyAsharp.h"
 #include "ADM_assert.h"
 
 uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in);
 
 static GtkWidget        *create_dialog1 (void);
-static void             update ( void);
 static gboolean         draw (void );
 static void             upload(void);
 static void             download(void);
-static void             read ( void );
-static void             recalc( void );
 static void             frame_changed( void );
 static void             hue_changed( void);
-extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 
-static ADMImage *imgsrc,*imgdst,*imgdisplay;
+static int lock=0;
 static GtkWidget *dialog=NULL;
-static uint32_t w,h;
-static uint32_t *rgbbuffer=NULL;
-static AVDMGenericVideoStream *incoming;
-static ASHARP_PARAM  myHue;
-static float      hue,sat;
-static ColYuvRgb    *rgbConv=NULL;
+static flyASharp *myCrop=NULL;
 //
 //      Video is in YV12 Colorspace
 //
 //
 uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in)
 {
-        int ret;
-        uint32_t l,f;
-        uint32_t max=in->getInfo()->nb_frames;
-        
-        incoming=in;
+      uint32_t width,height;
+      uint8_t ret=0;
         // Allocate space for green-ised video
-        w=in->getInfo()->width;
-        h=in->getInfo()->height;
-        rgbConv=new ColYuvRgb(w,h);
-        rgbConv->reset(w,h);
-        rgbbuffer=new uint32_t[w*h];
+        width=in->getInfo()->width;
+        height=in->getInfo()->height;
 
-        imgdst=new ADMImage(w,h);
-        imgsrc=new ADMImage(w,h);
-        imgdisplay=new ADMImage(w,h);
-
-        if(curframe<max) max=curframe;
-        
-        ADM_assert(in->getFrameNumberNoAlloc(max, &l, imgsrc,&f));
-        // chroma is not changed by this filter
-        
-        memcpy(UPLANE(imgdisplay),UPLANE(imgsrc),(w*h)>>2);
-        memcpy(VPLANE(imgdisplay),VPLANE(imgsrc),(w*h)>>2);
-        memcpy(&myHue,param,sizeof(myHue));
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
-
-        gtk_widget_set_usize(WID(drawingarea1), w,h);
-
-        upload();
+        
+        gtk_widget_set_usize(WID(drawingarea1), width,height);
+        gtk_window_set_title (GTK_WINDOW (dialog), _("ASHARP"));
+        gtk_widget_show(dialog);
+	
+        
         gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
             GTK_SIGNAL_FUNC(draw),
             NULL);
@@ -104,156 +81,82 @@ uint8_t DIA_getASharp(ASHARP_PARAM *param, AVDMGenericVideoStream *in)
         gtk_signal_connect(GTK_OBJECT(WID(spinbuttonT)), "value_changed",GTK_SIGNAL_FUNC(hue_changed),   NULL);
         gtk_signal_connect(GTK_OBJECT(WID(spinbuttonD)), "value_changed",GTK_SIGNAL_FUNC(hue_changed),   NULL);
         gtk_signal_connect(GTK_OBJECT(WID(spinbuttonB)), "value_changed",GTK_SIGNAL_FUNC(hue_changed),   NULL);
-     //   gtk_signal_connect(GTK_OBJECT(WID(checkbuttonBF)), "value_changed",GTK_SIGNAL_FUNC(hue_changed),   NULL);
         gtk_widget_show(dialog);
 
-        update();
-        draw();
+          
+        myCrop=new flyASharp( width, height,in,WID(drawingarea1),WID(hscale1));
+        memcpy(&(myCrop->param),param,sizeof(ASHARP_PARAM));
+        myCrop->upload();
+        myCrop->sliderChanged();
         ret=0;
         int response;
         response=gtk_dialog_run(GTK_DIALOG(dialog));
 
         if(response==GTK_RESPONSE_OK)
         {
-            memcpy(param,&myHue,sizeof(myHue));
+            myCrop->download();
+            memcpy(param,&(myCrop->param),sizeof(ASHARP_PARAM));
             ret=1;
         }
         gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
-    
-        delete imgdst;
-        delete imgsrc;
-        delete imgdisplay;
-        delete [] rgbbuffer;
-        delete rgbConv;
-        rgbConv=NULL;
-
-        rgbbuffer=NULL;
-        imgdst=NULL;
-        imgsrc=NULL;
-        dialog=NULL;
-        imgdisplay=NULL;
+        delete myCrop;
         return ret;
 }
 void hue_changed( void)
 {
-    download();
-    update();
-    draw();
+  if(lock) return;
+  
+   myCrop->update();
+  
 }
 void frame_changed( void )
 {
-uint32_t new_frame,max,l,f;
-double   percent;
-GtkWidget *wid; 
-GtkAdjustment *adj;
-        
-        max=incoming->getInfo()->nb_frames;
-        wid=WID(hscale1);
-        adj=gtk_range_get_adjustment (GTK_RANGE(wid));
-        new_frame=0;
-        
-        percent=(double)GTK_ADJUSTMENT(adj)->value;
-        percent*=max;
-        percent/=100.;
-        new_frame=(uint32_t)floor(percent);
-        
-        if(new_frame>=max) new_frame=max-1;
-        
-        ADM_assert(incoming->getFrameNumberNoAlloc(new_frame, &l, imgsrc,&f));
-        memcpy(UPLANE(imgdisplay),UPLANE(imgsrc),(w*h)>>2);
-        memcpy(VPLANE(imgdisplay),VPLANE(imgsrc),(w*h)>>2);
-        update();
-        draw();
-
+  myCrop->sliderChanged();
 }
 gboolean draw (void)
 {
-    GtkWidget *draw;
-        draw=WID(drawingarea1);
-        GUI_RGBDisplay((uint8_t *)rgbbuffer, w,h, (void *)draw);
-        return true;
+    myCrop->display();
 }
 //
-#define SPIN_GET(x,y) {myHue.x= gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(y))) ;}
-#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(y)),(gfloat)myHue.x) ;}
+#define SPIN_GET(x,y) {param.x= gtk_spin_button_get_value(GTK_SPIN_BUTTON(WID(y))) ;}
+#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(WID(y)),(gfloat)param.x) ;}
 
-#define CHECK_GET(x,y) {myHue.x=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(y)));}
-#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(y)),myHue.x);}
+#define CHECK_GET(x,y) {param.x=gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(WID(y)));}
+#define CHECK_SET(x,y) {gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(WID(y)),param.x);}
 
 void upload( void)
 {
-//
+    myCrop->upload();
+}
+void download (void)
+{
+     myCrop->download();
+}
+/**************************************/
+uint8_t flyASharp::upload(void)
+{
+    lock++;
         SPIN_SET(t,spinbuttonT);
         SPIN_SET(d,spinbuttonD);
         SPIN_SET(b,spinbuttonB);
 
         CHECK_SET(bf,checkbuttonBF);
+    lock--;
+        return 1;
 }
-void download (void)
+uint8_t flyASharp::download (void)
 {
+    
         SPIN_GET(t,spinbuttonT);
         SPIN_GET(d,spinbuttonD);
         SPIN_GET(b,spinbuttonB);
 
         CHECK_GET(bf,checkbuttonBF);
-}
-void update(void )
-{
-uint8_t *src,*dst;
-uint32_t stride;
-int32_t T,D,B,B2;   
-ASHARP_PARAM *_param=&myHue;
-uint32_t ww,hh;
-
-                download();
-                ww=incoming->getInfo()->width;
-                hh=incoming->getInfo()->height;
-                // parameters floating point to fixed point convertion
-                T = (int)(_param->t*(4<<7));
-                D = (int)(_param->d*(4<<7));
-                B = (int)(256-_param->b*64);
-                B2= (int)(256-_param->b*48);
-
-                // clipping (recommended for SIMD code)
-
-                if (T<-(4<<7)) T = -(4<<7); // yes, negatives values are accepted
-                if (D<0) D = 0;
-                if (B<0) B = 0;
-                if (B2<0) B2 = 0;
-
-                if (T>(32*(4<<7))) T = (32*(4<<7));
-                if (D>(16*(4<<7))) D = (16*(4<<7));
-                if (B>256) B = 256;
-                if (B2>256) B2 = 256;
-
-
-                memcpy(YPLANE(imgdisplay),YPLANE(imgsrc),ww*hh);
-                asharp_run_c(     imgdisplay->GetWritePtr(PLANAR_Y),
-                        imgdisplay->GetPitch(PLANAR_Y), 
-                        hh,
-                        ww,
-                        T,
-                        D,
-                        B,
-                        B2,
-                        myHue.bf);
-    
-    // Copy half source to display
-    dst=imgdisplay->data;
-    src=imgsrc->data;
-    stride=ww;
-    for(uint32_t y=0;y<hh;y++)   // We do both u & v!
-    {
-        memcpy(dst,src,stride>>1);
-        dst+=stride;
-        src+=stride;
-    }
-    //
-    //COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
-    rgbConv->scale(imgdisplay->data,(uint8_t *)rgbbuffer);
+        return 1;
 }
 
+/**************************************************/
 GtkWidget*
 create_dialog1 (void)
 {
