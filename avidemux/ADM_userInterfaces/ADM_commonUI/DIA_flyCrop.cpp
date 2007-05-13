@@ -179,7 +179,9 @@ uint32_t y,avg,eqt;
         // Update display
         top=top & 0xfffe;
         bottom=bottom & 0xfffe;
-      
+        upload();
+        process();
+        display();
         return 1;
 }
 /*---------------------------------------------

@@ -39,7 +39,6 @@
 #include "DIA_flyDialogQt4.h"
 #include "DIA_flyCrop.h"
 
-
 //
 //	Video is in YV12 Colorspace
 //
@@ -48,7 +47,7 @@ class Ui_cropWindow : public QDialog
  {
      Q_OBJECT
  protected : 
-      
+    int lock;
  public:
      flyCrop *myCrop;
      ADM_QCanvas *canvas;
@@ -71,7 +70,7 @@ class Ui_cropWindow : public QDialog
   {
     uint32_t width,height;
         ui.setupUi(this);
-        
+        lock=0;
         // Allocate space for green-ised video
         width=in->getInfo()->width;
         height=in->getInfo()->height;
@@ -120,14 +119,19 @@ Ui_cropWindow::~Ui_cropWindow()
 }
 void Ui_cropWindow::valueChanged( int f )
 {
+  if(lock) return;
+  lock++;
   myCrop->download();
   myCrop->process();
   myCrop->display();
+  lock--;
 }
 
 void Ui_cropWindow::autoCrop( bool f )
 {
+  lock++;
   myCrop->autocrop();
+  lock--;
 }
 void Ui_cropWindow::reset( bool f )
 {
@@ -135,20 +139,23 @@ void Ui_cropWindow::reset( bool f )
          myCrop->right=0;
          myCrop->bottom=0;
          myCrop->top=0;
+         lock++;
          myCrop->upload();
          myCrop->process();
          myCrop->display();
+         lock--;
 }
 
 //************************
 uint8_t flyCrop::upload(void)
 {
       Ui_cropDialog *w=(Ui_cropDialog *)_cookie;
-      
+        
         w->spinBoxLeft->setValue(left);
         w->spinBoxRight->setValue(right);
         w->spinBoxTop->setValue(top);
         w->spinBoxBottom->setValue(bottom);
+        
         return 1;
 }
 uint8_t flyCrop::download(void)

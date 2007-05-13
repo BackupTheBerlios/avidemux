@@ -66,7 +66,7 @@
   
   ADM_assert(_slider);
   ADM_assert(_canvas);
-  
+  _cookie=NULL;
 }
 /**
     \fn cleanup

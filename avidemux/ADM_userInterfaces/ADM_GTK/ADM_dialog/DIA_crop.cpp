@@ -161,6 +161,7 @@ void ui_upload(void)
 void ui_autocrop( void )
 {
   myCrop->autocrop();
+ 
 }
 void ui_reset( void )
 {
