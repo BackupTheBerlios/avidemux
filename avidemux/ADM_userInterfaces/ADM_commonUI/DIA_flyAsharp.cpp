@@ -44,6 +44,7 @@ uint8_t  flyASharp::update(void)
     process();
     _rgb->scale(_yuvBufferOut->data,_rgbBufferOut);
     display();
+    return 1;
 }
 uint8_t flyASharp::process(void)
 {
@@ -97,5 +98,6 @@ uint32_t ww,hh;
         dst+=stride;
         src+=stride;
     }
+    return 1;
 }
 //EOF

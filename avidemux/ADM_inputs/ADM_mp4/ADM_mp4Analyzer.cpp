@@ -173,11 +173,6 @@ uint8_t MP4Header::parseTrack(void *ztom)
             parseMdia(&son,&trackType,w,h);
             break;
         }
-        case ADM_MP4_STBL:
-        {
-            parseMdia(&son,&trackType,w,h);
-            break;
-        }
        default:
           adm_printf(ADM_PRINT_DEBUG,"Unprocessed atom\n");
      }

@@ -51,6 +51,8 @@ int mm_support(void)
     int max_std_level, max_ext_level, std_caps=0, ext_caps=0;
     long a, c;
 
+    
+    
     __asm__ __volatile__ (
                           /* See if CPUID instruction is supported ... */
                           /* ... Get copies of EFLAGS into eax and ecx */
@@ -81,7 +83,7 @@ int mm_support(void)
         cpuid(1, eax, ebx, ecx, std_caps);
         if (std_caps & (1<<23))
             rval |= MM_MMX;
-#if 1	    
+#if 0	    
         if (std_caps & (1<<25))
             rval |= MM_MMXEXT | MM_SSE;
         if (std_caps & (1<<26))

@@ -49,7 +49,7 @@ ADMVideoContrast::printConf (void)
   static char buf[50];
 
   ADM_assert (_param);
-  sprintf ((char *) buf, " contrast : %1.2f %lu", _param->coef,
+  sprintf ((char *) buf, " contrast : %1.2f %d", _param->coef,
 	   _param->offset);
   return buf;
 }
