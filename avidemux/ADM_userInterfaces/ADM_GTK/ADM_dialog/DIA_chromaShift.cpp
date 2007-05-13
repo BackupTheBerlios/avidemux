@@ -14,28 +14,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
+#include <config.h>
 #include <string.h>
-
-#include <gtk/gtk.h>
-#include <time.h>
-#include <sys/time.h>
-
-
-#include "fourcc.h"
-#include "avio.hxx"
-#include "config.h"
-#include "avi_vars.h"
-#include <ADM_assert.h>
-
-
-#include "ADM_editor/ADM_edit.hxx"
-#include "ADM_video/ADM_genvideo.hxx"
-#include "ADM_video/ADM_vidCommonFilter.h"
-
+#include <stdio.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -44,79 +25,62 @@
 #include <gtk/gtk.h>
 # include <math.h>
 
-
-#include "avi_vars.h"
-#include "ADM_toolkit_gtk/ADM_gladeSupport.h"
+#include "default.h"
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_toolkit_gtk/toolkit_gtk_include.h"
 #include "ADM_toolkit/toolkit.hxx"
-#include "default.h"
 
-
+#include "ADM_image.h"
+#include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_colorspace/ADM_rgb.h"
-#include "ADM_video/ADM_vidChromaShift.h"
+#include "ADM_assert.h"
+#include "DIA_flyDialog.h"
 #include "ADM_video/ADM_vidChromaShift_param.h"
+#include "DIA_flyChromaShift.h"
 
-#include "ADM_osSupport/ADM_debugID.h"
-#define MODULE_NAME MODULE_FILTER
-#include "ADM_osSupport/ADM_debug.h"
-
-
-
-#include "prototype.h"
-
-#define SPIN_GET(x,y) {y= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(dialog,#x))) ;\
-				printf(#x":%d\n", y);}
-
-#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(lookup_widget(dialog,#x)),(gfloat)y) ; printf(#x":%d\n", y);}
-
-
-static int32_t shift_u, shift_v;
-static uint32_t ww,hh;
+static int lock=0;
 
 static GtkWidget *dialog;
 static GtkWidget *create_ChromaShift( void );
 
 
-static void chromadraw (GtkWidget *dialog,uint32_t w,uint32_t h );
 static void read( void );
 static void upload ( void );
 static gboolean gui_draw( void );
 static gboolean gui_update( void );
 static gboolean slider_update( void );
 static void update(void);
-static int curImage=0;
+
+static flyChromaShift *myCrop=NULL;
 //**************************************
-static ADMImage   *video_src=NULL;
-static ADMImage   *video_shifted=NULL;
-static uint8_t    *video_rgb=NULL;
-static ColYuvRgb  *rgbConv=NULL;
-AVDMGenericVideoStream *sstream=NULL;
 
 uint8_t DIA_getChromaShift( AVDMGenericVideoStream *instream,CHROMASHIFT_PARAM    *param );
-uint8_t DIA_getChromaShift( AVDMGenericVideoStream *instream,CHROMASHIFT_PARAM    *param )
+uint8_t DIA_getChromaShift( AVDMGenericVideoStream *in,CHROMASHIFT_PARAM    *param )
 {
 uint8_t ret=0;
-        sstream=instream;
-        ww=instream->getInfo()->width;
-        hh=instream->getInfo()->height;
-        video_src=new ADMImage(ww,hh);
-        video_shifted=new ADMImage(ww,hh);
-        video_rgb=new uint8_t[ww*hh*4];
-        rgbConv=new ColYuvRgb(ww,hh);
-        rgbConv->reset(ww,hh);
-        shift_u=param->u;
-        shift_v=param->v;
-	dialog=create_ChromaShift();
-	gtk_register_dialog(dialog);
-        curImage=0;
+  
+        uint32_t width,height;
+
+        // Allocate space for green-ised video
+        width=in->getInfo()->width;
+        height=in->getInfo()->height;
+
+        dialog=create_ChromaShift();
+        gtk_register_dialog(dialog);
         
-        gtk_widget_set_usize(WID(drawingarea1), ww,hh);
+        gtk_widget_set_usize(WID(drawingarea1), width,height);
+        gtk_window_set_title (GTK_WINDOW (dialog), _("ASHARP"));
         gtk_widget_show(dialog);
-        upload();
+	
+        myCrop=new flyChromaShift( width, height,in,WID(drawingarea1),WID(hscale));
+        memcpy(&(myCrop->param),param,sizeof(CHROMASHIFT_PARAM));
+        myCrop->upload();
+        myCrop->sliderChanged();
+        
         gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
-                        GTK_SIGNAL_FUNC(gui_draw),
-                        NULL);
+            GTK_SIGNAL_FUNC(gui_draw),
+            NULL);
+        
         gtk_signal_connect (GTK_OBJECT(WID( spinbutton_U)), "value_changed",
                     GTK_SIGNAL_FUNC (gui_update),
                     NULL);
@@ -129,112 +93,73 @@ uint8_t ret=0;
          gtk_signal_connect (GTK_OBJECT(WID( hscale)), "value_changed",
                     GTK_SIGNAL_FUNC (slider_update),
                     NULL);
-        uint32_t len,flags;
-        if(!instream->getFrameNumberNoAlloc(curImage,&len,video_src,&flags))
-        {
-          GUI_Error_HIG("Frame error","Cannnot read frame to display");
-          return 0;
-        }
-         
-        update();
-  
+
+          
+       
+        ret=0;
         int response;
-        while( (response=gtk_dialog_run(GTK_DIALOG(dialog)))==GTK_RESPONSE_APPLY)
-        {
-                read();
-                update();
-        }
+        response=gtk_dialog_run(GTK_DIALOG(dialog));
+
         if(response==GTK_RESPONSE_OK)
         {
-                read();
-                param->u=shift_u;
-                param->v=shift_v;
-                ret=1;
+            myCrop->download();
+            memcpy(param,&(myCrop->param),sizeof(CHROMASHIFT_PARAM));
+            ret=1;
         }
         gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
-        dialog=NULL;
-        delete video_src;
-        delete video_shifted;
-        delete [] video_rgb;
-        delete rgbConv;
+        delete myCrop;
         return ret;
-
 }
+      
+/**********************************/
 void read( void )
 {
-	SPIN_GET(spinbutton_U,shift_u);
-	SPIN_GET(spinbutton_V,shift_v);
+	myCrop->download();
 }
 void upload ( void )
 {
-	SPIN_SET(spinbutton_U,shift_u);
-	SPIN_SET(spinbutton_V,shift_v);
-}
-/*---------------------------------------------------------------------------
-	Green-ify the displayed frame on cropped parts
-*/
-void update( void)
-{
-
-        // First copy Y
-        memcpy(video_shifted->data,video_src->data,(ww*hh));
-        // then shift u
-
-         ADMVideoChromaShift::shift(video_shifted->data+ww*hh,
-                                    video_src->data+ww*hh, ww>>1,hh>>1,shift_u);
-        ADMVideoChromaShift::shift(video_shifted->data+((5*ww*hh)>>2),
-                                    video_src->data+((5*ww*hh)>>2), ww>>1,hh>>1,shift_v);
-        if(shift_u)
-                ADMVideoChromaShift::fixup(video_shifted->data,ww,hh,shift_u*2);
-        if(shift_v)
-                ADMVideoChromaShift::fixup(video_shifted->data,ww,hh,shift_v*2);
-
-        rgbConv->scale(video_shifted->data,video_rgb);
-        chromadraw(dialog,ww,hh);
-}
-gboolean gui_update( void )
-{
-	//printf(" GUI !\n");
-	read();
-	update();
-	return true;
+	myCrop->upload();
 }
 gboolean slider_update( void )
 {
-  GtkAdjustment *adj;   
-        printf("Slider update\n");
-        adj=gtk_range_get_adjustment (GTK_RANGE(WID(hscale)));
-        double val=(double)GTK_ADJUSTMENT(adj)->value;
-        
-        val=(val*sstream->getInfo()->nb_frames)/100.;
-        curImage=(uint32_t)floor(val);
-        
-        uint32_t len,flags;
-        if(!sstream->getFrameNumberNoAlloc(curImage,&len,video_src,&flags))
-        {
-          printf("Frame %u / %u\n",curImage,sstream->getInfo()->nb_frames);
-          GUI_Error_HIG("Frame error","Cannnot read frame to display");
-          return true;
-        }
-        gui_update();
+        myCrop->sliderChanged();
         return true;
 }
-
-/*---------------------------------------------------------------------------
-	Actually draw the working frame on screen
-*/
+gboolean gui_update( void)
+{
+  if(lock) return true;
+      myCrop->update();
+  return true;
+}
 gboolean gui_draw( void )
 {
-	chromadraw(dialog,ww,hh);
+	myCrop->display();
 	return true;
 }
-void chromadraw (GtkWidget *dialog,uint32_t w,uint32_t h )
+
+/******************************/
+#define SPIN_GET(x,y) {y= gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(dialog,#x))) ;\
+				printf(#x":%d\n", y);}
+
+#define SPIN_SET(x,y)  {gtk_spin_button_set_value(GTK_SPIN_BUTTON(lookup_widget(dialog,#x)),(gfloat)y) ; printf(#x":%d\n", y);}
+
+
+uint8_t    flyChromaShift::upload(void)
 {
-	GtkWidget *draw;
-	draw=WID(drawingarea1);
-	GUI_RGBDisplay(video_rgb, w,h, (void *)draw);
+        SPIN_SET(spinbutton_U,param.u);
+        SPIN_SET(spinbutton_V,param.v);
+  return 1;
 }
+uint8_t    flyChromaShift::download(void)
+{
+        SPIN_GET(spinbutton_U,param.u);
+        SPIN_GET(spinbutton_V,param.v);
+  
+  return 1;
+}
+
+
 /*----------------------------------------------------------------*/
 
 GtkWidget*

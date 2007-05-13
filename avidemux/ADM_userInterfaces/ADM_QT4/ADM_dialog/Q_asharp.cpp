@@ -121,13 +121,14 @@ void Ui_asharpWindow::valueChanged( int f )
 uint8_t flyASharp::upload(void)
 {
       Ui_asharpDialog *w=(Ui_asharpDialog *)_cookie;
-        
+
         MYSPIN(Treshold)->setValue(param.t);
         MYSPIN(Strength)->setValue(param.d);
         MYSPIN(Block)->setValue(param.b);
         
         //w->bf->w->checkBox->isChecked();
         w->checkBox->setChecked(param.bf);
+
         return 1;
 }
 uint8_t flyASharp::download(void)
