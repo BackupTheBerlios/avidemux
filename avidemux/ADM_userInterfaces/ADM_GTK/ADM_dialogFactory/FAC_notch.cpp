@@ -55,7 +55,7 @@ void diaElemNotch::setMe(void *dialog, void *opaque,uint32_t line)
   myWidget=(void *)widget;
   
   gtk_table_attach (GTK_TABLE (opaque), widget, 0, 1, line, line+1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   
   GtkWidget *label;
@@ -65,7 +65,7 @@ void diaElemNotch::setMe(void *dialog, void *opaque,uint32_t line)
   gtk_widget_show(label);
   
   gtk_table_attach (GTK_TABLE (opaque), label, 1, 2, line, line+1,
-                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   
 }

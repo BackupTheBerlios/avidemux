@@ -44,7 +44,8 @@
 uint8_t DIA_builtin(void)
 {
   uint32_t altivec=0,mad=0,a52dec=0,xvid4=0,X264=0,freetype=0,esd=0,arts=0,vorbis=0,win32=0;
-  uint32_t faac=0,faad=0,libdca=0,aften=0,libamrnb=0;
+  uint32_t faac=0,faad=0,libdca=0,aften=0,libamrnb=0,lame=0,sdl=0,oss=0,xvideo=0,x86=0,x86_64=0;
+  uint32_t powerpc=0,gettext=0;
   
 #ifdef USE_ALTIVEC
         altivec=1;
@@ -93,51 +94,96 @@ uint8_t DIA_builtin(void)
 	if (amrnb->isAvailable())
 		libamrnb=1;
 #endif
+#ifdef HAVE_LIBMP3LAME
+	lame=1;
+#endif
+#ifdef USE_SDL
+	sdl=1;
+#endif
+#ifdef OSS_SUPPORT
+	oss=1;
+#endif
+#ifdef USE_XV
+	xvideo=1;
+#endif
+#ifdef ARCH_X86
+	x86=1;
+#endif
+#ifdef ARCH_X86_64
+	x86-64=1;
+#endif
+#ifdef ARCH_POWERPC
+	powerpc=1;
+#endif
+#ifdef HAVE_GETTEXT
+	gettext=1;
+#endif
+    
+	diaElemFrame videoFrame(_("Video codecs:"));
+	diaElemNotch tXvid4(xvid4, _("Xvid"));
+	diaElemNotch tX264(X264, _("x264"));
 
-        
-#define CREATE_TOGGLE(x)  diaElemNotch     t##x(x,_("Option "#x));
+	videoFrame.swallow(&tXvid4);
+	videoFrame.swallow(&tX264);
+
+	diaElemFrame audioFrame(_("Audio codecs:"));	
+	diaElemNotch tAften(aften, _("Aften"));	
+	diaElemNotch tLibamrnb(libamrnb, _("amrnb"));
+    diaElemNotch tFaac(faac, _("FAAC"));
+    diaElemNotch tFaad(faad, _("FAAD2"));
+	diaElemNotch tLame(lame, _("LAME"));
+	diaElemNotch tA52dec(a52dec, _("liba52"));
+	diaElemNotch tLibdca(libdca, _("libdca"));
+	diaElemNotch tMad(mad, _("MAD"));
+	diaElemNotch tVorbis(vorbis, _("Ogg Vorbis"));
+
+	audioFrame.swallow(&tAften);
+	audioFrame.swallow(&tLibamrnb);	
+	audioFrame.swallow(&tFaac);
+	audioFrame.swallow(&tFaad);
+	audioFrame.swallow(&tLame);
+	audioFrame.swallow(&tA52dec);
+	audioFrame.swallow(&tLibdca);
+	audioFrame.swallow(&tMad);
+	audioFrame.swallow(&tVorbis);
+
+	diaElemFrame miscFrame(_("Miscellaneous libraries:"));
+	diaElemNotch tArts(arts, _("aRts"));
+	diaElemNotch tEsd(esd, _("ESD"));
+	diaElemNotch tFreetype(freetype, _("FreeType 2"));
+	diaElemNotch tGettext(gettext, _("gettext"));
+	diaElemNotch tOss(oss, _("OSS"));
+	diaElemNotch tSdl(sdl, _("SDL"));
+	diaElemNotch tXvideo(xvideo, _("XVideo"));
+
+	miscFrame.swallow(&tArts);
+	miscFrame.swallow(&tEsd);
+	miscFrame.swallow(&tFreetype);
+	miscFrame.swallow(&tGettext);
+	miscFrame.swallow(&tOss);
+	miscFrame.swallow(&tSdl);
+	miscFrame.swallow(&tXvideo);
     
-    
-    CREATE_TOGGLE(mad)
-    CREATE_TOGGLE(a52dec)
-    CREATE_TOGGLE(xvid4)
-    CREATE_TOGGLE(X264)
-    CREATE_TOGGLE(freetype)
-    CREATE_TOGGLE(esd)
-    CREATE_TOGGLE(arts)
-    CREATE_TOGGLE(vorbis)
-    CREATE_TOGGLE(faac)
-    CREATE_TOGGLE(faad)
-    
-    CREATE_TOGGLE(libdca)
-    CREATE_TOGGLE(altivec)
-    CREATE_TOGGLE(win32)
-    CREATE_TOGGLE(aften)
-	CREATE_TOGGLE(libamrnb)
-    
-      diaElem *elems[]={
-#undef CREATE_TOGGLE
-#define CREATE_TOGGLE(x) &(t##x),
-    CREATE_TOGGLE(mad)
-    CREATE_TOGGLE(a52dec)
-    CREATE_TOGGLE(xvid4)
-    CREATE_TOGGLE(X264)
-    CREATE_TOGGLE(freetype)
-    CREATE_TOGGLE(esd)
-    CREATE_TOGGLE(arts)
-    CREATE_TOGGLE(vorbis)
-    CREATE_TOGGLE(faac)
-    CREATE_TOGGLE(faad)
-    
-    CREATE_TOGGLE(aften)
-    CREATE_TOGGLE(libdca)
-    CREATE_TOGGLE(altivec)
-    CREATE_TOGGLE(win32)
-	CREATE_TOGGLE(libamrnb)
-      
-      };
-    diaFactoryRun(_("Built-in Support"),sizeof(elems)/sizeof(diaElem *),elems);
+	diaElemFrame systemFrame(_("CPU:"));
+    diaElemNotch tAltivec(altivec, _("AltiVec"));
+	diaElemNotch tPowerPc(powerpc, _("PowerPC"));
+	diaElemNotch tX86(x86, _("x86"));
+	diaElemNotch tX86_64(x86_64, _("x86-64"));
+
+	systemFrame.swallow(&tAltivec);
+	systemFrame.swallow(&tPowerPc);
+	systemFrame.swallow(&tX86);
+	systemFrame.swallow(&tX86_64);
+
+	diaElem *codecElems[] = {&videoFrame, &audioFrame};
+	diaElem *miscElems[] = {&miscFrame, &systemFrame};
+
+	diaElemTabs tabCodec(_("Codecs"), 2, codecElems);
+	diaElemTabs tabMisc(_("Miscellaneous"), 2, miscElems);
+
+	diaElemTabs *tabs[] = {&tabCodec, &tabMisc};
+
+    diaFactoryRunTabs(_("Built-in Support"), 2, tabs);
 
     return 1;
-
 }
