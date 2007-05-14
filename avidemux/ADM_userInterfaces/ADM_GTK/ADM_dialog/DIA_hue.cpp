@@ -6,7 +6,7 @@
 			   Ui for hue & sat
 
     begin                : 08 Apr 2005
-    copyright            : (C) 2004/5 by mean
+    copyright            : (C) 2004/7 by mean
     email                : fixounet@free.fr
  ***************************************************************************/
 
@@ -47,185 +47,123 @@
 #include "ADM_image.h"
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_video/ADM_vidHue.h"
-#include "ADM_assert.h"
+#include "DIA_flyDialog.h"
+#include "DIA_flyHue.h"
 
-uint8_t DIA_getHue(Hue_Param *param, ADMImage *image);
+#include "ADM_assert.h"
 
 static GtkWidget	*create_dialog1 (void);
 static void  		update ( void);
 static gboolean 	draw (void );
 static void 		upload(void);
 static void 		download(void);
-static void  		read ( void );
-static void		recalc( void );
 static void 		frame_changed( void );
 static void             hue_changed( void);
-extern void GUI_RGBDisplay(uint8_t * dis, uint32_t w, uint32_t h, void *widg);
 
-static ADMImage *imgsrc,*imgdst,*imgdisplay;
+static int lock=0;
 static GtkWidget *dialog=NULL;
-static uint32_t w,h;
-static uint32_t *rgbbuffer=NULL;
-static AVDMGenericVideoStream *incoming;
-static Hue_Param  myHue;
-static float      hue,sat;
-static ColYuvRgb    *rgbConv=NULL;
-//
-//	Video is in YV12 Colorspace
-//
-//
+static flyHue *myCrop=NULL;
+
+
+/**
+      \fn DIA_getHue
+      \brief Handle Hue (fly)Dialog
+*/
 uint8_t DIA_getHue(Hue_Param *param, AVDMGenericVideoStream *in)
 {
-        int ret;
-        uint32_t l,f;
-        uint32_t max=in->getInfo()->nb_frames;
-        
-        incoming=in;
+      uint32_t width,height;
+      uint8_t ret=0;
         // Allocate space for green-ised video
-        w=in->getInfo()->width;
-        h=in->getInfo()->height;
-        
-        rgbConv=new ColYuvRgb(w,h);
-        rgbConv->reset(w,h);
-        
-        rgbbuffer=new uint32_t[w*h];
+        width=in->getInfo()->width;
+        height=in->getInfo()->height;
 
-        imgdst=new ADMImage(w,h);
-        imgsrc=new ADMImage(w,h);
-        imgdisplay=new ADMImage(w,h);
-
-        if(curframe<max) max=curframe;
-        
-        ADM_assert(in->getFrameNumberNoAlloc(max, &l, imgsrc,&f));
-        // Luma is not changed by this filter
-        memcpy(YPLANE(imgdisplay),YPLANE(imgsrc),w*h);
-        memcpy(&myHue,param,sizeof(myHue));
         dialog=create_dialog1();
         gtk_register_dialog(dialog);
-
-        gtk_widget_set_usize(WID(drawingarea1), w,h);
-
-
-
-        upload();
+        
+        gtk_widget_set_usize(WID(drawingarea1), width,height);
+        gtk_window_set_title (GTK_WINDOW (dialog), _("Hue"));
+        gtk_widget_show(dialog);
+	
+        
         gtk_signal_connect(GTK_OBJECT(WID(drawingarea1)), "expose_event",
             GTK_SIGNAL_FUNC(draw),
             NULL);
-
+//
         gtk_signal_connect(GTK_OBJECT(WID(hscale1)), "value_changed",GTK_SIGNAL_FUNC(frame_changed),   NULL);
         gtk_signal_connect(GTK_OBJECT(WID(hscaleHue)), "value_changed",GTK_SIGNAL_FUNC(hue_changed),   NULL);
         gtk_signal_connect(GTK_OBJECT(WID(hscaleSaturation)), "value_changed",GTK_SIGNAL_FUNC(hue_changed),   NULL);
         gtk_widget_show(dialog);
 
-        update();
-        draw();
+          
+        myCrop=new flyHue( width, height,in,WID(drawingarea1),WID(hscale1));
+        memcpy(&(myCrop->param),param,sizeof(Hue_Param));
+        myCrop->upload();
+        myCrop->sliderChanged();
         ret=0;
         int response;
         response=gtk_dialog_run(GTK_DIALOG(dialog));
 
         if(response==GTK_RESPONSE_OK)
         {
-	    memcpy(param,&myHue,sizeof(myHue));
+            myCrop->download();
+            memcpy(param,&(myCrop->param),sizeof(Hue_Param));
             ret=1;
         }
         gtk_unregister_dialog(dialog);
         gtk_widget_destroy(dialog);
-    
-        delete imgdst;
-        delete imgsrc;
-        delete imgdisplay;
-        delete [] rgbbuffer;
-        delete rgbConv;
-        rgbConv=NULL;
-
-        rgbbuffer=NULL;
-        imgdst=NULL;
-        imgsrc=NULL;
-        dialog=NULL;
-        imgdisplay=NULL;
+        delete myCrop;
         return ret;
 }
 void hue_changed( void)
 {
-    download();
-    update();
-    draw();
+  if(lock) return;
+  
+   myCrop->update();
+  
 }
 void frame_changed( void )
 {
-uint32_t new_frame,max,l,f;
-double   percent;
-GtkWidget *wid;	
-GtkAdjustment *adj;
-	
-	max=incoming->getInfo()->nb_frames;
-	wid=WID(hscale1);
-	adj=gtk_range_get_adjustment (GTK_RANGE(wid));
-	new_frame=0;
-	
-	percent=(double)GTK_ADJUSTMENT(adj)->value;
-	percent*=max;
-	percent/=100.;
-	new_frame=(uint32_t)floor(percent);
-	
-	if(new_frame>=max) new_frame=max-1;
-	
-	ADM_assert(incoming->getFrameNumberNoAlloc(new_frame, &l, imgsrc,&f));
-        memcpy(YPLANE(imgdisplay),YPLANE(imgsrc),w*h);
-        update();
-        draw();
-
+  myCrop->sliderChanged();
 }
 gboolean draw (void)
 {
-    GtkWidget *draw;
-        draw=WID(drawingarea1);
-        GUI_RGBDisplay((uint8_t *)rgbbuffer, w,h, (void *)draw);
-        return true;
+    myCrop->display();
 }
+//
 void upload( void)
 {
-    gtk_range_set_value (GTK_RANGE(WID(hscaleHue)),(gdouble)myHue.hue);
-    gtk_range_set_value (GTK_RANGE(WID(hscaleSaturation)),(gdouble)myHue.saturation);
+    myCrop->upload();
 }
 void download (void)
 {
-    GtkAdjustment *adj;	
+     myCrop->download();
+}
+/**************************************/
+uint8_t flyHue::upload(void)
+{
+    lock++;
+      gtk_range_set_value (GTK_RANGE(WID(hscaleHue)),(gdouble)param.hue);
+      gtk_range_set_value (GTK_RANGE(WID(hscaleSaturation)),(gdouble)param.saturation);
+    lock--;
+        return 1;
+}
+uint8_t flyHue::download (void)
+{
+    
+       GtkAdjustment *adj;	
 
         adj=gtk_range_get_adjustment (GTK_RANGE(WID(hscaleHue)));
-        myHue.hue=(float)GTK_ADJUSTMENT(adj)->value;
+        param.hue=(float)GTK_ADJUSTMENT(adj)->value;
         
         adj=gtk_range_get_adjustment (GTK_RANGE(WID(hscaleSaturation)));
-        myHue.saturation=(float)GTK_ADJUSTMENT(adj)->value;
+        param.saturation=(float)GTK_ADJUSTMENT(adj)->value;
+        return 1;
 }
-void update(void )
-{
-uint8_t *src,*dst;
-uint32_t stride;
-    hue=myHue.hue*M_PI/180.;
-    sat=(100+myHue.saturation)/100;
-    // Do it!
-    HueProcess_C(VPLANE(imgdisplay), UPLANE(imgdisplay),
-        VPLANE(imgsrc), UPLANE(imgsrc),
-        w>>1,w>>1,
-        w>>1,h>>1, 
-        hue, sat);
-    // Prepare RGB buffer
-    
-    // Copy half source to display
-    dst=imgdisplay->data+w*h;
-    src=imgsrc->data+w*h;
-    stride=w>>1;
-    for(uint32_t y=0;y<h;y++)   // We do both u & v!
-    {
-        memcpy(dst,src,stride>>1);
-        dst+=stride;
-        src+=stride;
-    }
-    //
-    //COL_yv12rgb(  w,   h,imgdisplay->data,(uint8_t *)rgbbuffer );
-    rgbConv->scale(imgdisplay->data,(uint8_t *)rgbbuffer );
-}
+
+
+
+
+//******************
 GtkWidget   *create_dialog1 (void)
 {
   GtkWidget *dialog1;
