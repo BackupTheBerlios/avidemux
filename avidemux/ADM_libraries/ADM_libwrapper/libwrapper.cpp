@@ -13,6 +13,7 @@
 ADM_LibWrapper::ADM_LibWrapper()
 {
 	initialised = false;
+	hinstLib = NULL;
 }
 
 ADM_LibWrapper::~ADM_LibWrapper()
