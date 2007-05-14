@@ -12,6 +12,7 @@ SetCompressorDictSize 96
 # Defines
 !define INTERNALNAME "Avidemux 2.4"
 !define REGKEY "SOFTWARE\${INTERNALNAME}"
+!define UNINST_REGKEY "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${INTERNALNAME}"
 !define VERSION 2.4.0.${REVISION}
 !define COMPANY "Free Software Foundation"
 !define URL "http://www.avidemux.org"
@@ -38,7 +39,6 @@ Var CreateDesktopIcon
 Var CreateStartMenuGroup
 Var CreateQuickLaunchIcon
 Var StartMenuGroup
-Var ShortcutGtkExeName
 
 # Installer pages
 !insertmacro MUI_PAGE_WELCOME
@@ -273,19 +273,6 @@ Section "-Spanish GTK" SecLangSpanishGtk
     WriteRegStr HKLM "${REGKEY}\Components" SpanishGtk 1
 SectionEnd
 
-Section "ADM Tools" SecAdmTools
-    SectionIn 2
-    SetOutPath $INSTDIR
-    SetOverwrite on
-    File /r ..\..\..\avidemux_2.4_build\adm_tools.exe
-    File /r ..\..\..\avidemux_2.4_build\adm_tools.txt
-    File /r ..\..\..\avidemux_2.4_build\adm_tools_de.reg
-    File /r ..\..\..\avidemux_2.4_build\adm_tools_en.reg
-    File /r ..\..\..\avidemux_2.4_build\adm_tools_es.reg
-    File /r ..\..\..\avidemux_2.4_build\adm_tools_fr.reg
-    WriteRegStr HKLM "${REGKEY}\Components" "ADM Tools" 1
-SectionEnd
-
 Section "AvsProxy" SecAvsProxy
     SectionIn 2
     SetOutPath $INSTDIR
@@ -316,7 +303,7 @@ Section "-Start menu GTK+" SecStartMenuGtk
     CreateDirectory $SMPROGRAMS\$StartMenuGroup
     !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     SetOutPath $INSTDIR
-    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\${INTERNALNAME} GTK+.lnk" $INSTDIR\$ShortcutGtkExeName
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\${INTERNALNAME} GTK+.lnk" $INSTDIR\avidemux2_gtk.exe
     !insertmacro MUI_STARTMENU_WRITE_END
     WriteRegStr HKLM "${REGKEY}\Components" "Start menu" 1
 SectionEnd
@@ -330,9 +317,18 @@ Section "-Start menu Qt4" SecStartMenuQt4
     WriteRegStr HKLM "${REGKEY}\Components" "Start menu" 1
 SectionEnd
 
+Section "-Start menu AVS Proxy GUI" SecStartMenuAvsProxyGui
+    CreateDirectory $SMPROGRAMS\$StartMenuGroup
+    !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+    SetOutPath $INSTDIR
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\AVS Proxy GUI.lnk" "$INSTDIR\avsproxy_gui.exe"
+    !insertmacro MUI_STARTMENU_WRITE_END
+    WriteRegStr HKLM "${REGKEY}\Components" "Start menu" 1
+SectionEnd
+
 Section "-Quick Launch GTK+" SecQuickLaunchGtk
     SetOutPath $INSTDIR
-    CreateShortcut "$QUICKLAUNCH\${INTERNALNAME} GTK+.lnk" $INSTDIR\$ShortcutGtkExeName
+    CreateShortcut "$QUICKLAUNCH\${INTERNALNAME} GTK+.lnk" $INSTDIR\avidemux2_gtk.exe
     WriteRegStr HKLM "${REGKEY}\Components" "Quick Launch" 1
 SectionEnd
 
@@ -344,7 +340,7 @@ SectionEnd
 
 Section "-Desktop GTK+" SecDesktopGtk
     SetOutPath $INSTDIR
-    CreateShortcut "$DESKTOP\${INTERNALNAME} GTK+.lnk" $INSTDIR\$ShortcutGtkExeName
+    CreateShortcut "$DESKTOP\${INTERNALNAME} GTK+.lnk" $INSTDIR\avidemux2_gtk.exe
     WriteRegStr HKLM "${REGKEY}\Components" "Desktop" 1
 SectionEnd
 
@@ -359,12 +355,12 @@ Section -post SecUninstaller
     WriteRegStr HKLM "${REGKEY}" Path $INSTDIR
     SetOutPath $INSTDIR
     WriteUninstaller $INSTDIR\uninstall.exe
-    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${INTERNALNAME}" DisplayName "${INTERNALNAME}"
-    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${INTERNALNAME}" DisplayVersion "${VERSION}"
-    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${INTERNALNAME}" DisplayIcon $INSTDIR\uninstall.exe
-    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${INTERNALNAME}" UninstallString $INSTDIR\uninstall.exe
-    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${INTERNALNAME}" NoModify 1
-    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${INTERNALNAME}" NoRepair 1
+    WriteRegStr HKLM "${UNINST_REGKEY}" DisplayName "${INTERNALNAME}"
+    WriteRegStr HKLM "${UNINST_REGKEY}" DisplayVersion "${VERSION}"
+    WriteRegStr HKLM "${UNINST_REGKEY}" DisplayIcon $INSTDIR\uninstall.exe
+    WriteRegStr HKLM "${UNINST_REGKEY}" UninstallString $INSTDIR\uninstall.exe
+    WriteRegDWORD HKLM "${UNINST_REGKEY}" NoModify 1
+    WriteRegDWORD HKLM "${UNINST_REGKEY}" NoRepair 1
 SectionEnd
 
 # Macro for selecting sections based on registry setting
@@ -390,16 +386,6 @@ Section /o "un.AvsProxy" UnSecAvsProxy
     Delete /REBOOTOK $INSTDIR\avsproxy.exe
     Delete /REBOOTOK $INSTDIR\avsproxy_gui.exe
     DeleteRegValue HKLM "${REGKEY}\Components" "AvsProxy"
-SectionEnd
-
-Section /o "un.ADM Tools" UnSecAdmTools
-    Delete /REBOOTOK $INSTDIR\adm_tools.exe
-    Delete /REBOOTOK $INSTDIR\adm_tools.txt
-    Delete /REBOOTOK $INSTDIR\adm_tools_de.reg
-    Delete /REBOOTOK $INSTDIR\adm_tools_en.reg
-    Delete /REBOOTOK $INSTDIR\adm_tools_es.reg
-    Delete /REBOOTOK $INSTDIR\adm_tools_fr.reg    
-    DeleteRegValue HKLM "${REGKEY}\Components" "ADM Tools"
 SectionEnd
 
 Section /o un.SpanishGtk UnSecLangSpanishGtk
@@ -540,6 +526,7 @@ Section /o "un.Start menu" UnSecStartMenu
     Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Change Log.lnk"
     Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\${INTERNALNAME} GTK+.lnk"
     Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\${INTERNALNAME} Qt4.lnk"
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\AVS Proxy GUI.lnk"
 SectionEnd
 
 Section /o "un.Quick Launch" UnSecQuickLaunch
@@ -558,7 +545,7 @@ Section un.post UnSecUninstaller
     RmDir /REBOOTOK $INSTDIR\share\locale
     RmDir /REBOOTOK $INSTDIR\share
     
-    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${INTERNALNAME}"
+    DeleteRegKey HKLM "${UNINST_REGKEY}"
     Delete /REBOOTOK $INSTDIR\uninstall.exe
     DeleteRegValue HKLM "${REGKEY}" StartMenuGroup
     DeleteRegValue HKLM "${REGKEY}" Path
@@ -575,11 +562,20 @@ SectionEnd
 
 # Installer functions
 Function .onInit
+    ReadRegStr $R0  HKLM "${UNINST_REGKEY}" "UninstallString"
+    StrCmp $R0 "" startInstall
+ 
+    MessageBox MB_YESNO|MB_ICONEXCLAMATION "${INTERNALNAME} has already been installed. $\n$\nDo you want to remove \
+      the previous version before installing $(^Name)?" IDNO startInstall
+  
+    # Run the uninstaller
+    ClearErrors
+    ExecWait '$R0 _?=$INSTDIR' ; Do not copy the uninstaller to a temp file
+
+startInstall:
     InitPluginsDir
     
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "${INSTALL_OPTS_INI}"
-
-    StrCpy $ShortcutGtkExeName "avidemux2_gtk.exe"
 
     # Make sure a User Interface is selected in previous install preferences
     ReadRegStr $0 HKLM "${REGKEY}\Components" "Command line"
@@ -606,7 +602,6 @@ populate:
     !insertmacro SELECT_SECTION Serbian ${SecLangSerbian}
     !insertmacro SELECT_SECTION Spanish ${SecLangSpanish}
     !insertmacro SELECT_SECTION "Sample external filter" ${SecFilter}
-    !insertmacro SELECT_SECTION "ADM Tools" ${SecAdmTools}
     !insertmacro SELECT_SECTION "AvsProxy" ${SecAvsProxy}
 
     #startMenu:
@@ -621,21 +616,6 @@ populate:
     ReadRegStr $0 HKLM "${REGKEY}\Components" "Quick Launch"
     !insertmacro MUI_INSTALLOPTIONS_WRITE "${INSTALL_OPTS_INI}" "Field 4" "State" $0
     
-end:
-FunctionEnd
-
-Function .onSelChange
-    SectionGetFlags ${SecUiGtk} $0
-    IntOp $0 $0 & ${SF_SELECTED}
-    
-    StrCmp $0 ${SF_SELECTED} turnOffRo
-        SectionSetFlags ${SecAdmTools} ${SF_RO}
-        Goto end
-
-turnOffRo:    
-    SectionGetFlags ${SecAdmTools} $0
-    IntOp $0 $0 & 0xFFFFFFEF
-    SectionSetFlags ${SecAdmTools} $0
 end:
 FunctionEnd
 
@@ -691,15 +671,16 @@ Function IsStartMenuRequired
 FunctionEnd
 
 Function ActivateInternalSections
+    #AVS Proxy GUI shortcut:
+    SectionGetFlags ${SecAvsProxy} $0
+    IntOp $0 $0 & ${SF_SELECTED}
+    IntOp $0 $0 & $CreateStartMenuGroup
+    SectionSetFlags ${SecStartMenuAvsProxyGui} $0
+    
     #Change Log shortcut:
     SectionSetFlags ${SecStartMenuChangeLog} $CreateStartMenuGroup
 
     #GTK shortcuts:
-    SectionGetFlags ${SecAdmTools} $0
-    IntOp $0 $0 & ${SF_SELECTED}
-    StrCmp $0 ${SF_SELECTED} 0 +2
-    StrCpy $ShortcutGtkExeName "adm_tools.exe"
-    
     SectionGetFlags ${SecUiGtk} $0
     IntOp $0 $0 & ${SF_SELECTED}
 
@@ -791,7 +772,7 @@ Function RunAvidemux
     IntOp $0 $0 & ${SF_SELECTED}
     
     StrCmp $0 ${SF_SELECTED} 0 Qt4
-        Exec "$INSTDIR\$ShortcutGtkExeName"
+        Exec "$INSTDIR\avidemux2_gtk.exe"
 
     Goto end
     
@@ -827,7 +808,6 @@ Function un.onInit
     !insertmacro SELECT_SECTION RussianGtk ${UnSecLangRussianGtk}
     !insertmacro SELECT_SECTION SerbianGtk ${UnSecLangSerbianGtk}
     !insertmacro SELECT_SECTION SpanishGtk ${UnSecLangSpanishGtk}
-    !insertmacro SELECT_SECTION "ADM Tools" ${UnSecAdmTools}
     !insertmacro SELECT_SECTION "AvsProxy" ${UnSecAvsProxy}
     !insertmacro SELECT_SECTION "Sample external filter" ${UnSecFilter}
     !insertmacro SELECT_SECTION "Start menu" ${UnSecStartMenu}
