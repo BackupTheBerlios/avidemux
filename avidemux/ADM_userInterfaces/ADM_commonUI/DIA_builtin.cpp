@@ -44,7 +44,7 @@
 uint8_t DIA_builtin(void)
 {
   uint32_t altivec=0,mad=0,a52dec=0,xvid4=0,X264=0,freetype=0,esd=0,arts=0,vorbis=0,win32=0;
-  uint32_t faac=0,faad=0,libdca=0,aften=0;
+  uint32_t faac=0,faad=0,libdca=0,aften=0,libamrnb=0;
   
 #ifdef USE_ALTIVEC
         altivec=1;
@@ -83,12 +83,15 @@ uint8_t DIA_builtin(void)
         faad=1;
 #endif
 #ifdef USE_LIBDCA
-	if (dca->isAvialable())
+	if (dca->isAvailable())
         libdca=1;
 #endif
-
 #ifdef USE_AFTEN
         aften=1;
+#endif
+#ifdef USE_AMR_NB
+	if (amrnb->isAvailable())
+		libamrnb=1;
 #endif
 
         
@@ -110,6 +113,7 @@ uint8_t DIA_builtin(void)
     CREATE_TOGGLE(altivec)
     CREATE_TOGGLE(win32)
     CREATE_TOGGLE(aften)
+	CREATE_TOGGLE(libamrnb)
     
       diaElem *elems[]={
 #undef CREATE_TOGGLE
@@ -129,6 +133,7 @@ uint8_t DIA_builtin(void)
     CREATE_TOGGLE(libdca)
     CREATE_TOGGLE(altivec)
     CREATE_TOGGLE(win32)
+	CREATE_TOGGLE(libamrnb)
       
       };
     diaFactoryRun(_("Built-in Support"),sizeof(elems)/sizeof(diaElem *),elems);

@@ -18,7 +18,7 @@ class ADM_LibWrapper
 		virtual bool getSymbols(int symCount, ...);
 
 	public:
-		virtual bool isAvialable();
+		virtual bool isAvailable();
 };
 
 #endif

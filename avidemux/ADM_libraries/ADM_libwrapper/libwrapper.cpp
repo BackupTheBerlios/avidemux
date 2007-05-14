@@ -29,7 +29,7 @@ ADM_LibWrapper::~ADM_LibWrapper()
 	}
 }
 
-bool ADM_LibWrapper::isAvialable()
+bool ADM_LibWrapper::isAvailable()
 {
 	return initialised;
 }

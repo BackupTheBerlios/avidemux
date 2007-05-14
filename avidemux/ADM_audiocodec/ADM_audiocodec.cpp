@@ -57,10 +57,14 @@ ADM_Audiocodec *out = NULL;
 #endif					
                   			break;
 #ifdef USE_AMR_NB
-                                case WAV_AMRNB:
-                                        printf("\n AMR narrow band codec\n");
-                                        out=(ADM_Audiocodec *)new ADM_AudiocodecAMR(fourcc,info);
-                                        break;
+				case WAV_AMRNB:
+					if (amrnb->isAvailable())
+					{
+						printf("\n AMR narrow band codec\n");
+						out=(ADM_Audiocodec *)new ADM_AudiocodecAMR(fourcc,info);
+					}
+
+					break;
 #endif
 				case WAV_8BITS:
 					printf("\n 8 BIts pseudo codec\n");
@@ -87,7 +91,7 @@ ADM_Audiocodec *out = NULL;
 #endif
 #ifdef USE_LIBDCA
                 case WAV_DTS:
-					if (dca->isAvialable())
+					if (dca->isAvailable())
 					{
 						printf("\n Audio codec:  DTS\n");
 						out= (ADM_Audiocodec *) new ADM_AudiocodecDCA(fourcc, info);						
