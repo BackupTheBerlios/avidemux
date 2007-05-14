@@ -35,6 +35,14 @@
 extern const char *shortkey(const char *);
 void GUI_FileSelRead(const char *label, char * * name);
 #define MAX_SEL 2040
+
+typedef enum ADM_fileMode
+{
+    ADM_FILEMODE_DIR,
+    ADM_FILEMODE_READ,
+    ADM_FILEMODE_WRITE
+};
+
 class  ADM_Qfilesel : public QWidget
 {
      Q_OBJECT
@@ -48,11 +56,20 @@ class  ADM_Qfilesel : public QWidget
           uint8_t r=0;
           char buffer[MAX_SEL+1],*txt;
           txt="";
-          if(!directoryMode)
-            r=FileSel_SelectRead(_("Select Directory"),buffer,MAX_SEL,txt);
-          else
-            r=FileSel_SelectDir(_("Select File"),buffer,MAX_SEL,txt);
-            
+          switch(fileMode)
+          {
+            case ADM_FILEMODE_READ:
+                r=FileSel_SelectRead(_("Select File to Read"),buffer,MAX_SEL,txt);
+                break;
+            case ADM_FILEMODE_WRITE:
+                r=FileSel_SelectWrite(_("Select File to Write"),buffer,MAX_SEL,txt);
+                break;
+
+            case ADM_FILEMODE_DIR:
+                r=FileSel_SelectDir(_("Select Directory"),buffer,MAX_SEL,txt);
+                break;
+            default: ADM_assert(0);
+          }
           if(r)
           {
             edit->setText(buffer);
@@ -62,12 +79,12 @@ class  ADM_Qfilesel : public QWidget
         QLineEdit *edit;
         QDialogButtonBox *button;
         QLabel *text;
-        int directoryMode;
+        ADM_fileMode fileMode;
             
-        ADM_Qfilesel(QWidget *z,const char *title,char *entry,QGridLayout *layout,int line,int dir) : QWidget(z) 
+        ADM_Qfilesel(QWidget *z,const char *title,char *entry,QGridLayout *layout,int line, ADM_fileMode mode) : QWidget(z) 
         {
           
-          directoryMode=dir;
+          fileMode=mode;
           edit=new QLineEdit(entry,z);
           
           edit->show();
@@ -96,27 +113,31 @@ class  ADM_Qfilesel : public QWidget
 };
 
 
-diaElemFileRead::diaElemFileRead(char **filename,const char *toggleTitle,const char *tip)
+diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_FILE_READ)
 {
   param=(void *)filename;
   paramTitle=shortkey(toggleTitle);
   this->tip=tip;
+  _write=writemode;
 }
 
-diaElemFileRead::~diaElemFileRead()
+diaElemFile::~diaElemFile()
 {
   if(paramTitle)
     delete paramTitle;
 }
-void diaElemFileRead::setMe(void *dialog, void *opaque,uint32_t line)
+void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
 {
  QGridLayout *layout=(QGridLayout*) opaque;
-  
-  ADM_Qfilesel *fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,0);
+ ADM_Qfilesel *fs;
+  if(_write)
+      fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_WRITE);
+  else
+      fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_READ);
   myWidget=(void *)fs; 
 }
-void diaElemFileRead::getMe(void)
+void diaElemFile::getMe(void)
 {
   
   char **n=(char **)param;
@@ -126,7 +147,7 @@ void diaElemFileRead::getMe(void)
   QString s=(fs->edit)->text();
   *n=ADM_strdup( s.toLatin1() );
 }
-void diaElemFileRead::enable(uint32_t onoff)
+void diaElemFile::enable(uint32_t onoff)
 {
   ADM_Qfilesel *fs=(ADM_Qfilesel *)myWidget;
   fs->setEnabled(onoff);
@@ -147,7 +168,7 @@ void diaElemDirSelect::setMe(void *dialog, void *opaque,uint32_t line)
 {
  QGridLayout *layout=(QGridLayout*) opaque;
   
-  ADM_Qfilesel *fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,1);
+  ADM_Qfilesel *fs=new ADM_Qfilesel((QWidget *)dialog,paramTitle,*(char **)param,layout, line,ADM_FILEMODE_DIR);
   myWidget=(void *)fs; 
 }
 void diaElemDirSelect::getMe(void) 

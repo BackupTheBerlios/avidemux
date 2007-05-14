@@ -2003,7 +2003,7 @@ void A_audioTrack( void )
         
         
         
-        diaElemFileRead sourceName(&newtrackname,_("_External file:"));
+        diaElemFile  sourceName(0,&newtrackname,_("_External file:"));
         
         // Now build the list of embedded track
 #define MAX_AUDIO_TRACK 10
@@ -2100,7 +2100,7 @@ void A_externalAudioTrack( void )
         old=nw=secondAudioSource;
 
         diaElemMenu     sourceMenu(&nw,_("_Audio source:"),4,sourcesStream,NULL);
-        diaElemFileRead sourceName(&newtrackname,_("_External file:"));
+        diaElemFile     sourceName(0,&newtrackname,_("_External file:"));
         diaElem *allWidgets[]={&sourceMenu,&sourceName};
 
   /* Link..*/

@@ -235,17 +235,17 @@ public:
 };
 
 /*************************************************/
-class diaElemFileRead : public diaElem
+class diaElemFile : public diaElem
 {
 
 public:
   
-  diaElemFileRead(char **filename,const char *toggleTitle,const char *tip=NULL);
-  virtual ~diaElemFileRead() ;
+  diaElemFile(uint32_t writeMode,char **filename,const char *toggleTitle,const char *tip=NULL);
+  virtual ~diaElemFile() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
-  
-  void changeFile(void);
+  uint32_t _write;
+  void   changeFile(void);
   void   enable(uint32_t onoff);
 };
 /*************************************************/

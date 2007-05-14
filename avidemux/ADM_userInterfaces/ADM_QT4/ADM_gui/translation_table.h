@@ -40,7 +40,7 @@ PROCESS(actionCalculator,ACT_DUMMY) \
 PROCESS(actionRebuild_I_B_Frames,ACT_RebuildKF) \
 PROCESS(actionBitrate_histogram,ACT_BitRate) \
 PROCESS(actionScan_for_black_frames,ACT_AllBlackFrames) \
-PROCESS(actionVob_to_vobsub,ACT_DUMMY) \
+PROCESS(actionVob_to_vobsub,ACT_V2V) \
 PROCESS(actionOCR,ACT_Ocr) \
 PROCESS(actionPlay_Stop,ACT_StopAvi) \
 PROCESS(actionPrevious_Frame,ACT_PreviousFrame) \

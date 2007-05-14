@@ -26,7 +26,7 @@ uint8_t  DIA_v2v(char **vobname, char **ifoname,char **vobsubname);
 #define actionVOBSUB    33
 
 
-uint8_t  DIA_v2v(char **vobname, char **ifoname,char **vobsubname)
+uint8_t  DIA_v2vx(char **vobname, char **ifoname,char **vobsubname)
 {
 uint8_t ret=0;
 char *tmp=NULL,*tmp2=NULL,*tmp3=NULL;

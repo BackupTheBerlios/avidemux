@@ -142,6 +142,89 @@ DIR *dir=NULL;
 	return ret;
 }
 /**
+    \fn FileSel_SelectWrite(const char *title,char *target,uint32_t max, const char *source)
+    \brief allow to select a file
+    @return 0 on failure, 1 on success
+    @param title : window title 
+    @param target : where to copy the result (must be allocated by caller)
+    @param max : Max # of bytes that target can hold
+    @param source : where we start from
+*/
+uint8_t FileSel_SelectWrite(const char *title,char *target,uint32_t max, const char *source)
+{
+	
+GtkWidget *dialog;
+uint8_t ret=0;
+gchar *selected_filename;
+gchar last;
+char *dupe=NULL,*tmpname=NULL;
+DIR *dir=NULL;
+	
+	dialog = gtk_file_chooser_dialog_new ("Open File",
+                                      NULL,
+                                      GTK_FILE_CHOOSER_ACTION_SAVE,
+                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                      NULL);
+	gtk_window_set_title (GTK_WINDOW (dialog),title);
+        initFileSelector();
+        setFilter(dialog);
+        gtk_register_dialog(dialog);
+//	gtk_transient(dialog);
+	if(source)
+	{
+		dupe=PathCanonize(source);
+		PathStripName(dupe);
+		if( (dir=opendir(dupe)) )
+			{
+				closedir(dir);
+				gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)source);
+			}
+		delete [] dupe;
+	
+	}
+	else	//use pref
+	{
+		if( prefs->get(LASTDIR_WRITE,(ADM_filename **)&tmpname))
+		{
+			
+	
+			dupe=PathCanonize(tmpname);
+			PathStripName(dupe);
+
+			if( (dir=opendir(dupe)) )
+			{
+				closedir(dir);
+				gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog),(gchar *)dupe);
+			}
+			delete [] dupe;
+		}
+	}
+	if(gtk_dialog_run(GTK_DIALOG(dialog))==GTK_RESPONSE_ACCEPT)
+	{
+			selected_filename= (gchar *) 	gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+			if(strlen(selected_filename))
+			{
+			last=selected_filename[strlen(selected_filename) - 1]; 
+			 if (last == '/' || last =='\\' )
+			 {
+                           GUI_Error_HIG(_("Cannot open directory as a file"), NULL);
+						return 0;
+			}
+			else
+			{
+                              strncpy(target,(char *)selected_filename,max);
+                              // Finally we accept it :)
+                              ret=1;
+					
+			}
+			}
+	}	
+        gtk_unregister_dialog(dialog);
+	gtk_widget_destroy(dialog);
+	return ret;
+}
+/**
     \fn FileSel_SelectDir(const char *title,char *target,uint32_t max, const char *source)
     \brief allow to select a directory
     @return 0 on failure, 1 on success

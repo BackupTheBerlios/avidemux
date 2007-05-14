@@ -101,6 +101,31 @@ void GUI_FileSelSelect(const char *label, char **name, uint32_t access)
   
 }
 /**
+      \fn FileSel_SelectWrite
+      \brief select file, write mode
+      @param title window title
+      @param target where to store result
+      @param max Max buffer size in bytes
+      @param source Original value
+      @return 1 on success, 0 on failure
+
+*/
+uint8_t FileSel_SelectWrite(const char *title,char *target,uint32_t max, const char *source)
+{
+  char *dir=NULL,*tmpname=NULL;
+   QString fileName;
+ 
+  fileName=QFileDialog::getSaveFileName(QuiMainWindows,title,source);
+                
+  if(!fileName.isNull() )
+  {
+    const char *s=fileName.toLatin1(); // Fixme utf8 ?
+    strncpy(target,s,max);
+  }
+  
+  
+}
+/**
       \fn FileSel_SelectRead
       \brief select file, read mode
       @param title window title

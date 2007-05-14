@@ -31,15 +31,16 @@ static void fileRead(void *w,void *p);
 static void dirSel(void *w,void *p);
 
 
-diaElemFileRead::diaElemFileRead(char **filename,const char *toggleTitle,const char *tip)
+diaElemFile::diaElemFile(uint32_t writemode,char **filename,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_FILE_READ)
 {
   param=(void *)filename;
   paramTitle=toggleTitle;
   this->tip=tip;
+  _write=writemode;
 }
 
-diaElemFileRead::~diaElemFileRead()
+diaElemFile::~diaElemFile()
 {
 GtkWidget **wid=(GtkWidget **)myWidget;
         if(wid)
@@ -49,7 +50,7 @@ GtkWidget **wid=(GtkWidget **)myWidget;
         }
   
 }
-void diaElemFileRead::setMe(void *dialog, void *opaque,uint32_t line)
+void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
 {
   GtkObject *adj;
   GtkWidget *label;
@@ -108,7 +109,7 @@ void diaElemFileRead::setMe(void *dialog, void *opaque,uint32_t line)
   myWidget=(void *)w;
   
 }
-void diaElemFileRead::getMe(void)
+void diaElemFile::getMe(void)
 {
   GtkWidget **widget=(GtkWidget **)myWidget;
   char **name=(char **)param;
@@ -117,16 +118,19 @@ void diaElemFileRead::getMe(void)
   *name =ADM_strdup(gtk_entry_get_text (GTK_ENTRY (widget[0])));
 }
 
-void diaElemFileRead::changeFile(void)
+void diaElemFile::changeFile(void)
 {
 #define MAX_SEL 2040
   char buffer[MAX_SEL+1];
+  uint8_t t=0;
   GtkWidget **wid=(GtkWidget **)myWidget;
   GtkWidget *widget=(GtkWidget *)wid[0];
   const char *txt;
   txt =gtk_entry_get_text (GTK_ENTRY (widget));
   
-  if(FileSel_SelectRead(paramTitle,buffer,MAX_SEL,txt))
+  if(_write) t=FileSel_SelectWrite(paramTitle,buffer,MAX_SEL,txt);
+      else t= t=FileSel_SelectRead(paramTitle,buffer,MAX_SEL,txt);
+  if(t)
   {
     char **name=(char **)param;
     if(*name) delete [] *name;
@@ -137,7 +141,7 @@ void diaElemFileRead::changeFile(void)
   
 }
 
-void   diaElemFileRead::enable(uint32_t onoff)
+void   diaElemFile::enable(uint32_t onoff)
 {
 GtkWidget **wid=(GtkWidget **)myWidget;
      gtk_widget_set_sensitive(GTK_WIDGET(wid[0]),onoff);  
@@ -146,7 +150,7 @@ GtkWidget **wid=(GtkWidget **)myWidget;
 
 void fileRead(void *w,void *p)
 {
-  diaElemFileRead *me=(diaElemFileRead *)p;
+  diaElemFile *me=(diaElemFile *)p;
   me->changeFile();
 }
 

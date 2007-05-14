@@ -164,26 +164,26 @@ void diaElemMenu::finalize(void)
 { 
 }
 //*****************
-diaElemFileRead::diaElemFileRead(char **filename,const char *toggleTitle,const char *tip)
+diaElemFile::diaElemFile(uint32_t write,char **filename,const char *toggleTitle,const char *tip)
   : diaElem(ELEM_FILE_READ)
 {
  
 }
 
-diaElemFileRead::~diaElemFileRead()
+diaElemFile::~diaElemFile()
 {
   
 }
-void diaElemFileRead::setMe(void *dialog, void *opaque,uint32_t line)
+void diaElemFile::setMe(void *dialog, void *opaque,uint32_t line)
 {
  
   
 }
-void diaElemFileRead::getMe(void)
+void diaElemFile::getMe(void)
 {
  
 }
-void   diaElemFileRead::enable(uint32_t onoff)
+void   diaElemFile::enable(uint32_t onoff)
 {}
 #include "ADM_encoder/ADM_vidEncode.hxx"
   diaElemBitrate::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip)

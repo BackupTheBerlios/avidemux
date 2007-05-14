@@ -570,7 +570,7 @@ JSBool facFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
    uint32_t tog=0;
    char *test=ADM_strdup("Entry test1");
     
-      diaElemFileRead fread(&test,"Entry");
+      diaElemFile fread(0,&test,"Entry");
       diaElem *elems[]={&fread   };
   if(diaFactoryRun("Test FileRead",1,elems))
   {

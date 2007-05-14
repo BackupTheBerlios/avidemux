@@ -82,7 +82,7 @@ uint8_t ADMVideoSubASS::configure(AVDMGenericVideoStream * instream)
     MKME(scale,font_scale);
     MKME(spacing,line_spacing);
     
-    diaElemFileRead   file((char **)PX(subfile),_("_Subtitle file (ass/ssa)"));
+    diaElemFile       file(0,(char **)PX(subfile),_("_Subtitle file (ass/ssa)"));
     diaElemFloat      dSpacing(&spacing,_("_Line spacing"),0.10,10.0);
     diaElemFloat      dScale(&scale,_("_Font scale"),0.10,10.0);
     diaElemUInteger   dTop(PX(top_margin),_("_Top margin"),0,200);
