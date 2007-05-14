@@ -219,7 +219,7 @@ vidTDeint::vidTDeint (AVDMGenericVideoStream * in, CONFcouple * couples)
                 _param->link=2;
                 _param->denoise=true;
                 _param->AP=254;
-                _param->APType=254;
+                _param->APType=1;
   }
   else
   {

@@ -14,7 +14,7 @@ typedef struct TDEINT_PARAM
 
       default -  0  (int)  >>>>>>>FOR AVIDEMUX ONLY 0 IS SUPPORTED <<<<
 */
-	int mode;
+	int32_t mode; //int
 	
 /*
       Sets the field order of the video.
@@ -25,7 +25,7 @@ typedef struct TDEINT_PARAM
      
       default -  -1  (int)
       */
-	int order;
+	int32_t order; // int
 
 
 /*
@@ -39,7 +39,7 @@ typedef struct TDEINT_PARAM
       default -  -1  (int)
 
 */
-	int field;
+	int32_t field; //int
 /*
    mthreshL/mthreshC:
 
@@ -56,7 +56,7 @@ typedef struct TDEINT_PARAM
 
 
 		*/
-	int mthreshL,mthreshC;
+	uint32_t mthreshL,mthreshC; //int
 /*
 	 map:
 
@@ -83,7 +83,7 @@ typedef struct TDEINT_PARAM
 
       default - 0  (int)
 */
-	int map;
+	uint32_t map; //int
 	/*
 	   type:
 
@@ -100,7 +100,7 @@ typedef struct TDEINT_PARAM
 
       default - 2  (int)
       */
-	int type;
+	uint32_t type; //
 /*
 	  debug:
 
@@ -113,7 +113,7 @@ typedef struct TDEINT_PARAM
 
       default - false  (bool)
       */
-	int debug;
+	uint32_t debug; // int
 	/*
  mtnmode:
 
@@ -131,7 +131,7 @@ typedef struct TDEINT_PARAM
 
       default - 1  (int)
 */
-	int mtnmode;
+	uint32_t mtnmode;
 /*
    sharp:
 
@@ -144,7 +144,7 @@ typedef struct TDEINT_PARAM
 
       default - true  (bool)
 */
-	int sharp;
+	uint32_t sharp;
 	/*
 	  full:
 
@@ -159,7 +159,7 @@ typedef struct TDEINT_PARAM
   
       default - true  (bool)
       */
-	int full;
+	uint32_t full;
 	/*
  cthresh:
 
@@ -172,7 +172,7 @@ typedef struct TDEINT_PARAM
 
       default - 6  (int)
 */
-	int cthresh;
+	uint32_t cthresh;
 /*
    blockx -
 
@@ -184,7 +184,7 @@ typedef struct TDEINT_PARAM
 
       Default:  16  (int)
 */
-	int blockx;
+	uint32_t blockx;
 /*
    blocky -
 
@@ -196,7 +196,7 @@ typedef struct TDEINT_PARAM
 
       Default:  16  (int)
 */
-	int blocky;
+	uint32_t blocky;
  /* 
    chroma:
 
@@ -210,7 +210,7 @@ typedef struct TDEINT_PARAM
  
       default - false  (bool)
       */
-	int chroma;
+	uint32_t chroma;
 /*
 	 MI:
 
@@ -222,7 +222,7 @@ typedef struct TDEINT_PARAM
 
       default - 64  (int)
 */
-	int MI;
+	uint32_t MI;
 /*
    tryWeave:
 
@@ -235,7 +235,7 @@ typedef struct TDEINT_PARAM
 
       default - false  (bool)
 */
-	int tryWeave;
+	uint32_t tryWeave;
   /* 
    link:
 
@@ -249,7 +249,7 @@ typedef struct TDEINT_PARAM
 
       default - 2  (int)
 */
-	int link;
+	uint32_t link;
 /*
    denoise:
 
@@ -257,7 +257,7 @@ typedef struct TDEINT_PARAM
 
       default - true  (bool)
 */
-	int denoise;
+	uint32_t denoise;
 /*
    AP:
 
@@ -275,7 +275,7 @@ typedef struct TDEINT_PARAM
       default - -1 (disabled)  (int)
 
 */
-	int AP;
+	int32_t AP;
 	/*
    APType
 
@@ -299,7 +299,7 @@ typedef struct TDEINT_PARAM
 
       default -  1  (int)
          */
-	int APType;
+	uint32_t APType;
 
 }TDEINT_PARAM;
 #endif
