@@ -78,8 +78,6 @@ extern COMPRES_PARAMS SVCDCodec, DVDCodec,VCDCodec;
 
 extern uint8_t    isMpeg12Compatible (uint32_t fourcc);
 
-uint8_t DIA_XVCDParam(char *title,COMPRESSION_MODE * mode, uint32_t * qz,
-		   				   uint32_t * br,uint32_t *fsize,FFcodecSetting *conf	);
 
 extern SelectCodecType  current_codec;
 
@@ -89,17 +87,6 @@ static char *twoFake=NULL;
 
 
 
-void oplug_mpegff_conf( void )
-{
-
-    DIA_XVCDParam("XVCD/XSVCD",&ffmpeg1Codec.mode,
-                    &ffmpeg1Codec.qz,
-                    &ffmpeg1Codec.bitrate,
-                    &ffmpeg1Codec.finalsize,
-                    &ffmpeg1Extra
-
-                    );
-}
 
 uint8_t oplug_mpegff(const char *name, ADM_OUT_FORMAT type)
 {
