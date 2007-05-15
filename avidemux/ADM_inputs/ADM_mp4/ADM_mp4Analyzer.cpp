@@ -526,7 +526,7 @@ uint8_t       MP4Header::parseStbl(void *ztom,uint32_t trackType,uint32_t w,uint
 //                                  decodeVideoAtom(&son); 
                                 }
                                 //
-#define commonPart(x)             _videostream.fccHandler=fourCC::get((uint8_t *)#x); 
+#define commonPart(x)             _videostream.fccHandler=_video_bih.biCompression=fourCC::get((uint8_t *)#x);
                       
 
                                  _video_bih.biWidth=_mainaviheader.dwWidth=lw ; 
