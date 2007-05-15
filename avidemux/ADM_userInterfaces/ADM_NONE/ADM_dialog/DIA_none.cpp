@@ -116,7 +116,7 @@ uint8_t  initFileSelector(void){return 0;}
 uint8_t initGUI( void ){return 1;}
 
 uint8_t DIA_job(uint32_t nb,char **name){return 0;}
-uint8_t DIA_lavDecoder(uint32_t *swapUv, uint32_t *showU){return 0;}
+//uint8_t DIA_lavDecoder(uint32_t *swapUv, uint32_t *showU){return 0;}
 uint8_t DIA_resize(uint32_t *width,uint32_t *height,uint32_t *algo,uint32_t originalw, 
                         uint32_t originalh,uint32_t fps) {return 0;}
 uint8_t DIA_d3d(double *luma,double *chroma,double *temporal){return 0;}
