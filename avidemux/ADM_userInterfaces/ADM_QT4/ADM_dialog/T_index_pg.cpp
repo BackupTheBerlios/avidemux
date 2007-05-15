@@ -30,6 +30,9 @@ Indexer progress dialog
 #include <QtGui/QDialog>
 #include <QtGui/QLabel>
 #include <QtGui/QProgressBar>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QWidget>
+
 
 
 #include "default.h"
@@ -43,6 +46,68 @@ Indexer progress dialog
 
 extern void UI_purge( void );
 
+class Ui_iDialog
+{
+public:
+    QWidget *verticalLayout;
+    QVBoxLayout *vboxLayout;
+    QLabel *labelTimeLeft;
+    QLabel *labelImages;
+    QProgressBar *progressBar;
+
+    void setupUi(QDialog *Dialog)
+    {
+    Dialog->setObjectName(QString::fromUtf8("Dialog"));
+    verticalLayout = new QWidget(Dialog);
+    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+    verticalLayout->setGeometry(QRect(9, 9, 215, 89));
+    vboxLayout = new QVBoxLayout(verticalLayout);
+    vboxLayout->setSpacing(6);
+    vboxLayout->setMargin(0);
+    vboxLayout->setObjectName(QString::fromUtf8("vboxLayout"));
+    labelTimeLeft = new QLabel(verticalLayout);
+    labelTimeLeft->setObjectName(QString::fromUtf8("labelTimeLeft"));
+    vboxLayout->addWidget(labelTimeLeft);
+    
+    labelImages = new QLabel(verticalLayout);
+    labelImages->setObjectName(QString::fromUtf8("labelImages"));
+    vboxLayout->addWidget(labelImages);
+
+    progressBar = new QProgressBar(verticalLayout);
+    progressBar->setObjectName(QString::fromUtf8("progressBar"));
+    progressBar->setValue(0);
+    progressBar->setOrientation(Qt::Horizontal);
+
+    vboxLayout->addWidget(progressBar);
+
+
+    retranslateUi(Dialog);
+
+    QSize size(236, 111);
+    size = size.expandedTo(Dialog->minimumSizeHint());
+    Dialog->resize(size);
+
+
+    QMetaObject::connectSlotsByName(Dialog);
+    } // setupUi
+
+    void retranslateUi(QDialog *Dialog)
+    {
+    Dialog->setWindowTitle(QApplication::translate("Dialog", "Indexing", 0, QApplication::UnicodeUTF8));
+    labelTimeLeft->setText(QApplication::translate("Dialog", "Time Left : Infinity", 0, QApplication::UnicodeUTF8));
+    labelImages->setText(QApplication::translate("Dialog", "# Images :", 0, QApplication::UnicodeUTF8));
+    
+    Q_UNUSED(Dialog);
+    } // retranslateUi
+
+};
+
+namespace Ui {
+    class Dialog: public Ui_iDialog {};
+} // namespace Ui
+
+
+
 class Ui_indexingDialog : public QDialog
  {
      Q_OBJECT
@@ -51,7 +116,7 @@ class Ui_indexingDialog : public QDialog
     
  public:
    int abted;
-   
+   Ui_iDialog ui;
      Ui_indexingDialog(const char *name);
      ~Ui_indexingDialog();
     void setTime(const char *f);
@@ -91,6 +156,8 @@ DIA_progressIndexing::DIA_progressIndexing(const char *name)
         clock.reset();
         aborted=0;
 	_nextUpdate=0;
+        dialog->show();
+        UI_purge();
 
 }
 DIA_progressIndexing::~DIA_progressIndexing()
@@ -128,7 +195,7 @@ uint8_t       DIA_progressIndexing::update(uint32_t done,uint32_t total, uint32_
         dialog->setTime(string);
         
 
-        sprintf(string,"%0lu",nbImage);
+        sprintf(string,_("# Images :%0lu"),nbImage);
         dialog->setImage(string);
 
         f=done;
@@ -146,7 +213,7 @@ uint8_t       DIA_progressIndexing::update(uint32_t done,uint32_t total, uint32_
         if(tim>tom) return 1;
         tom=tom-tim;
         ms2time(tom,&zhh,&zmm,&zss);
-        sprintf(string,"%02d:%02d:%02d",zhh,zmm,zss);
+        sprintf(string,_("Time Left :%02d:%02d:%02d"),zhh,zmm,zss);
         dialog->setETA(string);
         UI_purge();
         }
@@ -156,22 +223,30 @@ uint8_t       DIA_progressIndexing::update(uint32_t done,uint32_t total, uint32_
 Ui_indexingDialog::Ui_indexingDialog(const char *name)
 {
       abted=0;
+      ui.setupUi(this);
 }
 Ui_indexingDialog::~Ui_indexingDialog()
 {
-  
+    
 }
 void Ui_indexingDialog::setTime(const char *f)
 {
-    printf("Time:%s\n",f);
+    //printf("Time:%s\n",f);
 }
+void Ui_indexingDialog::setImage(const char *f)
+{
+    dialog->ui.labelImages->setText(f);
+}
+
 void Ui_indexingDialog::setETA(const char *f)
 {
-    printf("Eta:%s\n",f);
+   // printf("Eta:%s\n",f);
+  dialog->ui.labelTimeLeft->setText(f);
 }
 void Ui_indexingDialog::setPercent(float f)
 {
-    printf("Eta:%f\n",f);
+    dialog->ui.progressBar->setValue((int)(100.*f));
+    
 }
 
 
