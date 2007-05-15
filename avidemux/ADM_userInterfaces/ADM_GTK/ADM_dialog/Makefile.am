@@ -12,7 +12,6 @@ libADM_dialog_a_SOURCES =  DIA_vcodec.cpp DIA_acodec.cpp \
 	DIA_properties.cpp  DIA_about.cpp DIA_recent.cpp \
 	DIA_resize.cpp DIA_working.cpp \
 	DIA_working.h DIA_busy.cpp DIA_busy.h DIA_exLame.cpp DIA_pipe.cpp  \
-	DIA_xvcd.cpp  \
 	DIA_xvid.cpp DIA_crop.cpp DIA_color.cpp DIA_encoding.cpp   \
 	DIA_xvid4.cpp  \
 	DIA_pause.cpp \
@@ -49,7 +48,7 @@ DIA_idx_pg.h         DIA_pause.cpp       \
 DIA_pipe.cpp        DIA_working.cpp \
 DIA_defaultAudio.cpp  DIA_jobs.cpp        DIA_working.h \
 DIA_jobs_save.cpp     DIA_x264.cpp \
-DIA_preview.cpp     DIA_xvcd.cpp \
+DIA_preview.cpp     \
 DIA_busy.cpp         DIA_properties.cpp  DIA_xvid.cpp \
 DIA_busy.h            DIA_quota.cpp       DIA_xvid4.cpp \
 DIA_calculator.cpp   DIA_encoding.cpp      DIA_recent.cpp \

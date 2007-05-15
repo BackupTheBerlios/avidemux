@@ -100,7 +100,7 @@ uint8_t DIA_xvid4(COMPRES_PARAMS *incoming){return 0;}
 uint8_t DIA_quota(char *) {return 0;}
 
 uint8_t  DIA_job_select(char **jobname, char **filename) {return 0;}
-uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, audioInfo *infos){return 0;}
+//uint8_t DIA_audioTrack(AudioSource *source, uint32_t *track,uint32_t nbTrack, audioInfo *infos){return 0;}
 const char * GUI_getCustomScript(uint32_t nb) {return 0;}
 uint8_t DIA_builtin(void){return 0;}
 uint8_t  DIA_v2v(char **vobname, char **ifoname,char **vobsubname) {return 0;}
