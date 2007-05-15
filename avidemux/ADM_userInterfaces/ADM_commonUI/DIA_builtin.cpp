@@ -110,7 +110,7 @@ uint8_t DIA_builtin(void)
 	x86=1;
 #endif
 #ifdef ARCH_X86_64
-	x86-64=1;
+	x86_64=1;
 #endif
 #ifdef ARCH_POWERPC
 	powerpc=1;
