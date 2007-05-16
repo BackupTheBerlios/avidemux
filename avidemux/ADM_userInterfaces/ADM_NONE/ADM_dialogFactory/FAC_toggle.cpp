@@ -317,5 +317,56 @@ void diaElemFrame::finalize(void)
   void diaElemHex::setMe(void *dialog, void *opaque,uint32_t line) {};
   void diaElemHex::getMe(void) {} ;
   void diaElemHex::finalize(void) {};
+//**************************
+diaElemToggleUint::diaElemToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval, const char *name,uint32_t min,uint32_t max,const char *tip)
+  : diaElem(ELEM_TOGGLE_UINT)
+{
+ 
+}
+diaElemToggleUint::~diaElemToggleUint()
+{
+  
+}
+void diaElemToggleUint::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ 
+  
+}
+void diaElemToggleUint::getMe(void)
+{
+  
+}
+void   diaElemToggleUint::finalize(void)
+{
+  updateMe();
+}
+void   diaElemToggleUint::updateMe(void)
+{
+  
+    
+}
+void   diaElemToggleUint::enable(uint32_t onoff)
+{
+   
+}
+//**************************
+diaElemToggleInt::diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval, const char *name,int32_t min,int32_t max,const char *tip)
+  :diaElemToggleUint(toggleValue,toggleTitle, NULL, name,0,0,tip)
+{
+ 
+}
+diaElemToggleInt::~diaElemToggleInt()
+{
+  
+}
+void diaElemToggleInt::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ 
+  
+}
+void diaElemToggleInt::getMe(void)
+{
+  
+}
 
 //EOF

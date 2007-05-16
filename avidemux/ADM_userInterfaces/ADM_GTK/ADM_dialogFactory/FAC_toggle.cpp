@@ -28,6 +28,7 @@
 #include "ADM_assert.h"
 
 static void cb_menu(void *w,void *p);
+static void cb_menu2(void *w,void *p);
 
 
 
@@ -38,6 +39,7 @@ diaElemToggle::diaElemToggle(uint32_t *toggleValue,const char *toggleTitle, cons
   paramTitle=toggleTitle;
   this->tip=tip;
   nbLink=0;
+  
 }
 
 diaElemToggle::~diaElemToggle()
@@ -118,6 +120,171 @@ void   diaElemToggle::enable(uint32_t onoff)
 void cb_menu(void *w,void *p)
 {
   diaElemToggle *me=(diaElemToggle *)p;
+  me->updateMe();
+}
+//*************************************************************************
+diaElemToggleUint::diaElemToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval, const char *name,uint32_t min,uint32_t max,const char *tip)
+  : diaElem(ELEM_TOGGLE_UINT)
+{
+  param=(void *)toggleValue;
+  paramTitle=toggleTitle;
+  this->tip=tip;
+  embName=name;
+  emb=uintval;
+  widgetUint=NULL;
+  _min=min;
+  _max=max;
+}
+
+diaElemToggleUint::~diaElemToggleUint()
+{
+  
+}
+void diaElemToggleUint::setMe(void *dialog, void *opaque,uint32_t line)
+{
+  GtkWidget *widget,*widuint;
+  
+  widget = gtk_check_button_new_with_mnemonic (paramTitle);
+  gtk_widget_show (widget);
+  myWidget=(void *)widget;
+  
+  gtk_table_attach (GTK_TABLE (opaque), widget, 0, 1, line, line+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *(uint32_t *)param);
+  if(tip)
+  {
+      GtkTooltips *tooltips= gtk_tooltips_new ();
+      gtk_tooltips_set_tip (tooltips, widget, tip, NULL);
+  }
+  gtk_signal_connect(GTK_OBJECT(widget), "toggled",
+                      GTK_SIGNAL_FUNC(cb_menu2),
+                      (void *) this);
+  /* Now put uint */
+  widuint = gtk_spin_button_new_with_range(_min,_max,1);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(widuint),TRUE);
+  gtk_spin_button_set_digits  (GTK_SPIN_BUTTON(widuint),0);
+  gtk_spin_button_set_value (GTK_SPIN_BUTTON(widuint),*emb);
+  
+  gtk_widget_show (widuint);
+  
+  gtk_table_attach (GTK_TABLE (opaque), widuint, 1, 2, line, line+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  
+  widgetUint=widuint;
+  
+}
+void diaElemToggleUint::getMe(void)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  uint32_t *val=(uint32_t *)param;
+  ADM_assert(widget);
+  *(uint32_t *)param=gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
+  *emb=gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON ((GtkWidget *)widgetUint));
+  if(*emb<_min) *emb=_min;
+  if(*emb>_max) *emb=_max;
+}
+void   diaElemToggleUint::finalize(void)
+{
+  updateMe();
+}
+void   diaElemToggleUint::updateMe(void)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  GtkWidget *wuint=(GtkWidget *)widgetUint;
+  uint32_t val;
+  uint32_t rank;
+  ADM_assert(widget);
+  
+  
+  rank=gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
+  gtk_widget_set_sensitive(GTK_WIDGET(wuint),rank);
+    
+}
+void   diaElemToggleUint::enable(uint32_t onoff)
+{
+   GtkWidget *widget=(GtkWidget *)myWidget;
+  GtkWidget *wuint=(GtkWidget *)widgetUint;
+  
+  gtk_widget_set_sensitive(GTK_WIDGET(widget),onoff);
+  gtk_widget_set_sensitive(GTK_WIDGET(wuint),onoff);
+}
+
+//** C callback **
+void cb_menu2(void *w,void *p)
+{
+  diaElemToggleUint *me=(diaElemToggleUint *)p;
+  me->updateMe();
+}
+//*************************************************************************
+diaElemToggleInt::diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval, const char *name,int32_t min,int32_t max,const char *tip)
+  : diaElemToggleUint(toggleValue,toggleTitle, NULL, name,0,0,tip)
+{
+  param=(void *)toggleValue;
+  paramTitle=toggleTitle;
+  this->tip=tip;
+  embName=name;
+  emb=uintval;
+  widgetUint=NULL;
+  _min=min;
+  _max=max;
+}
+
+diaElemToggleInt::~diaElemToggleInt()
+{
+  
+}
+void diaElemToggleInt::setMe(void *dialog, void *opaque,uint32_t line)
+{
+  GtkWidget *widget,*widuint;
+  
+  widget = gtk_check_button_new_with_mnemonic (paramTitle);
+  gtk_widget_show (widget);
+  myWidget=(void *)widget;
+  
+  gtk_table_attach (GTK_TABLE (opaque), widget, 0, 1, line, line+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), *(uint32_t *)param);
+  if(tip)
+  {
+      GtkTooltips *tooltips= gtk_tooltips_new ();
+      gtk_tooltips_set_tip (tooltips, widget, tip, NULL);
+  }
+  gtk_signal_connect(GTK_OBJECT(widget), "toggled",
+                      GTK_SIGNAL_FUNC(cb_menu2),
+                      (void *) this);
+  /* Now put uint */
+  widuint = gtk_spin_button_new_with_range(_min,_max,1);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON(widuint),TRUE);
+  gtk_spin_button_set_digits  (GTK_SPIN_BUTTON(widuint),0);
+  gtk_spin_button_set_value (GTK_SPIN_BUTTON(widuint),*emb);
+  
+  gtk_widget_show (widuint);
+  
+  gtk_table_attach (GTK_TABLE (opaque), widuint, 1, 2, line, line+1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  
+  widgetUint=widuint;
+  
+}
+void diaElemToggleInt::getMe(void)
+{
+  GtkWidget *widget=(GtkWidget *)myWidget;
+  uint32_t *val=(uint32_t *)param;
+  ADM_assert(widget);
+  *(uint32_t *)param=gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
+  *emb=gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON ((GtkWidget *)widgetUint));
+  if(*emb<_min) *emb=_min;
+  if(*emb>_max) *emb=_max;
+}
+
+//** C callback **
+void cb_menu3(void *w,void *p)
+{
+  diaElemToggleInt *me=(diaElemToggleInt *)p;
   me->updateMe();
 }
 

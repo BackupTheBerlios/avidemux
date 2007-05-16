@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QGridLayout>
 #include <QCheckBox>
+#include <QSpinBox>
 
 #include "default.h"
 #include "ADM_commonUI/DIA_factory.h"
@@ -124,7 +125,156 @@ uint8_t   diaElemToggle::link(uint32_t onoff,diaElem *w)
     nbLink++;
     return 1;
 }
+//******************************************************
+diaElemToggleUint::diaElemToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval, const char *name,uint32_t min,uint32_t max,const char *tip)
+  : diaElem(ELEM_TOGGLE_UINT)
+{
+  param=(void *)toggleValue;
+  paramTitle=shortkey(toggleTitle);
+  this->tip=tip;
+  embName=name;
+  emb=uintval;
+  widgetUint=NULL;
+  _min=min;
+  _max=max;
+}
 
+diaElemToggleUint::~diaElemToggleUint()
+{
+   if(paramTitle)
+    delete paramTitle;
+}
+void diaElemToggleUint::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ QCheckBox *box=new QCheckBox(paramTitle,(QWidget *)dialog);
+ QGridLayout *layout=(QGridLayout*) opaque;
+ myWidget=(void *)box; 
+ if( *(uint32_t *)param)
+ {
+    box->setCheckState(Qt::Checked); 
+ }
+ box->show();
+ layout->addWidget(box,line,0);
+ // Now add spin
+ QSpinBox *spin=new QSpinBox((QWidget *)dialog);
+ widgetUint=(void *)spin; 
+   
+ spin->setMinimum(_min);
+ spin->setMaximum(_max);
+ spin->setValue(*(uint32_t *)emb);
+ spin->show();
+ layout->addWidget(spin,line,1);
+}
+void diaElemToggleUint::getMe(void)
+{
+  QCheckBox *box=(QCheckBox *)myWidget;
+  uint32_t *val=(uint32_t *)param;
+  if(Qt::Checked==box->checkState())
+  {
+    *val=1; 
+  }else
+    *val=0;
+  //
+    uint32_t u;
+  QSpinBox *spin=(QSpinBox *)widgetUint;
+  u=spin->value();
+ if(u<_min) u=_min;
+ if(u>_max) u=_max;
+ *emb=u;
+}
+void   diaElemToggleUint::finalize(void)
+{
+  updateMe();
+}
+void   diaElemToggleUint::updateMe(void)
+{
+  uint32_t val;
+  uint32_t rank=0;
+  ADM_assert(myWidget);
+  
+  QCheckBox *box=(QCheckBox *)myWidget;
+  QSpinBox *spin=(QSpinBox *)widgetUint;
+  
+  if(Qt::Checked==box->checkState())
+  {
+    rank=1;
+  }
+  spin->setEnabled(rank);
+}
+void   diaElemToggleUint::enable(uint32_t onoff)
+{
+    QCheckBox *box=(QCheckBox *)myWidget;
+      QSpinBox *spin=(QSpinBox *)widgetUint;
+  ADM_assert(box);
+  if(onoff)
+  {
+    box->setEnabled(1);
+    spin->setEnabled(1);
+  }
+  else
+  {
+    box->setDisabled(1);
+    spin->setDisabled(1);
+  }
+}
+
+//******************************************************
+diaElemToggleInt::diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval, const char *name,int32_t min,int32_t max,const char *tip)
+  : diaElemToggleUint(toggleValue,toggleTitle, NULL, name,0,0,tip)
+{
+   param=(void *)toggleValue;
+  paramTitle=shortkey(toggleTitle);
+  this->tip=tip;
+  embName=name;
+  emb=uintval;
+  widgetUint=NULL;
+  _min=min;
+  _max=max;
+}
+
+diaElemToggleInt::~diaElemToggleInt()
+{
+  
+}
+void diaElemToggleInt::setMe(void *dialog, void *opaque,uint32_t line)
+{
+ QCheckBox *box=new QCheckBox(paramTitle,(QWidget *)dialog);
+ QGridLayout *layout=(QGridLayout*) opaque;
+ myWidget=(void *)box; 
+ if( *(uint32_t *)param)
+ {
+    box->setCheckState(Qt::Checked); 
+ }
+ box->show();
+ layout->addWidget(box,line,0);
+ // Now add spin
+ QSpinBox *spin=new QSpinBox((QWidget *)dialog);
+ widgetUint=(void *)spin; 
+   
+ spin->setMinimum(_min);
+ spin->setMaximum(_max);
+ spin->setValue(*emb);
+ spin->show();
+ layout->addWidget(spin,line,1);
+}
+
+void diaElemToggleInt::getMe(void)
+{
+  QCheckBox *box=(QCheckBox *)myWidget;
+  uint32_t *val=(uint32_t *)param;
+  if(Qt::Checked==box->checkState())
+  {
+    *val=1; 
+  }else
+    *val=0;
+  //
+    int32_t u;
+  QSpinBox *spin=(QSpinBox *)widgetUint;
+  u=spin->value();
+ if(u<_min) u=_min;
+ if(u>_max) u=_max;
+ *emb=u;
+}
 //******************************************************
 
 //EOF

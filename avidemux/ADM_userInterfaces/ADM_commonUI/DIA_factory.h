@@ -34,6 +34,8 @@ typedef enum elemEnum
   ELEM_TEXT,
   ELEM_FRAME,
   ELEM_HEXDUMP,
+  ELEM_TOGGLE_UINT,
+  ELEM_TOGGLE_INT,
   ELEM_MAX=ELEM_TOGGLE
 };
 
@@ -86,6 +88,34 @@ public:
   void      finalize(void);
   void      updateMe();
   uint8_t   link(uint32_t onoff,diaElem *w);
+};
+/*********************************************/
+class diaElemToggleUint : public diaElem
+{
+  protected:
+        uint32_t *emb;
+        const char *embName;
+        void *widgetUint;
+        uint32_t _min,_max;
+public:
+            diaElemToggleUint(uint32_t *toggleValue,const char *toggleTitle, uint32_t *uintval, const char *name,uint32_t min,uint32_t max,const char *tip=NULL);
+  virtual   ~diaElemToggleUint() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+  void      finalize(void);
+  void      updateMe();
+};
+class diaElemToggleInt : public diaElemToggleUint
+{
+  protected:
+        int32_t *emb;
+        int32_t _min,_max;
+public:
+            diaElemToggleInt(uint32_t *toggleValue,const char *toggleTitle, int32_t *uintval, const char *name,int32_t min,int32_t max,const char *tip=NULL);
+  virtual   ~diaElemToggleInt() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
 };
 /*********************************************/
 class diaElemInteger : public diaElem
