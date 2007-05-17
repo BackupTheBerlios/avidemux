@@ -99,13 +99,6 @@ void SpidermonkeyDestroy(void);
 extern pthread_mutex_t g_pSpiderMonkeyMutex;
 int CpuCaps::myCpuCaps=0;
 
-#ifdef QT_NEEDS_QMAIN
-int qMain(int argc, char *argv[])
-{
-	return main(argc, argv);
-}
-#endif	// QT_NEEDS_QMAIN
-
 int main(int argc, char *argv[])
 {
 // Check for big files

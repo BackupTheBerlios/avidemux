@@ -148,7 +148,7 @@ endif
 avidemux2_cli_LDADD=$(adm_lib) $(user_interface_cli) $(adm_postlib) $(all_libraries)  $(SDL_LIBS) $(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS)  $(GLIB_LIBS)
 
 if ADM_UI_QT4	
-avidemux2_qt4_LDADD=$(adm_lib) $(user_interface_qt4) $(adm_postlib) $(all_libraries)  $(SDL_LIBS) $(ADM_QTLIBS) $(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) $(GLIB_LIBS)
+avidemux2_qt4_LDADD=$(adm_lib) $(user_interface_qt4) $(adm_postlib) $(all_libraries) $(ADM_QTLIBS) $(SDL_LIBS) $(FREETYPE_LIBS) $(FC_LIBS) $(ARTS_LIBS) $(XML_LIBS) $(GLIB_LIBS)
 endif
 
 
