@@ -501,7 +501,7 @@ float duration;
 	duration*=1000;			// duration in seconds
 	duration*=_wavinfo->frequency;  	// In sample
 	_videos[_nb_video]._audio_duration=(uint64_t)floor(duration);
-       
+        printf("[Editor] Duration in seconds : %u , in samples : %u\n",_videos[_nb_video]._audio_duration/_wavinfo->frequency,_videos[_nb_video]._audio_duration);
 
     }
 
