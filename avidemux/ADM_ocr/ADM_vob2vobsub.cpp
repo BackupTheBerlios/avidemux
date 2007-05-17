@@ -287,7 +287,7 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
     int display=0;
     
    dumpHeader(indexFile,0,width,height,palette);
-   working=new DIA_working("Generating VobSub file");
+   working=new DIA_working(_("Generating VobSub file"));
    
    //*** Main Loop ***
    uint32_t startPts=0,lastPts=0;

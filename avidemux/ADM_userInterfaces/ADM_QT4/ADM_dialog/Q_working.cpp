@@ -70,8 +70,10 @@ void DIA_working :: postCtor( void )
 }
 uint8_t DIA_working::update(uint32_t percent)
 {
-#define  GUI_UPDATE_RATE 1000
+		#define GUI_UPDATE_RATE 1000
+
         UI_purge();
+
         if(!_priv) return 1;
         if(!percent) return 0;
         if(percent==lastper)
@@ -79,44 +81,31 @@ uint8_t DIA_working::update(uint32_t percent)
 
             return 0;
         }
+
         elapsed=_clock.getElapsedMS();
+
         if(elapsed<_nextUpdate) 
         {
-
           return 0;
         }
+
         _nextUpdate=elapsed+1000;
         lastper=percent;
 
+		uint32_t hh,mm,ss;
+		char string[9];
 
-        //
-        // 100/totalMS=percent/elapsed
-        // totalM=100*elapsed/percent
+		ms2time(elapsed,&hh,&mm,&ss);
+		sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
 
-        double f;
-        f=100.;
-        f*=elapsed;
-        f/=percent;
-
-        f-=elapsed;
-        f/=1000;
-
-        uint32_t sectogo=(uint32_t)floor(f);
-
-        char b[300];
-        int  mm,ss;
-        mm=sectogo/60;
-        ss=sectogo%60;
-        snprintf(b,299,"Time Left: %d mn %02d s", mm,ss);
-        
         workWindow *wind=(workWindow *)_priv; ADM_assert(wind);
-        wind->ui.labelTimeLeft->setText(b);
+        wind->ui.labelTimeLeft->setText(ms2timedisplay((uint32_t) floor(((elapsed * 100.) / percent) - elapsed)));
+		wind->ui.labelElapsed->setText(string);
         wind->ui.progressBar->setValue(percent);
        
         return 0;
-
-
 }
+
 uint8_t DIA_working::update(uint32_t cur, uint32_t total)
 {
         double d,n;

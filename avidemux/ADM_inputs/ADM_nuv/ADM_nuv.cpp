@@ -552,7 +552,7 @@ uint32_t rcount=0;
 		_rtjpeg->SetFormat(&fmt);
 		_rtjpeg->SetSize(&w,&h);
 
-    		DIA_working *work=new DIA_working ("Opening nuppel video");
+    		DIA_working *work=new DIA_working (_("Opening Nuppel video"));
 		while(  (next<_filesize) && cont )
 		{
 			if(work->update(  (uint32_t)( next>>8),(uint32_t)(_filesize>>8))) /* 2 Gb * 256 should be enough ... */
@@ -581,7 +581,7 @@ uint32_t rcount=0;
 				else
 				{
 					delete work;
-					work=new DIA_working("Opening nuppel video");
+					work=new DIA_working(_("Opening Nuppel video"));
 				}
 
 

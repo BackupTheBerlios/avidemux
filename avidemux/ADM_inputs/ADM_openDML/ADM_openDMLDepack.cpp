@@ -90,7 +90,7 @@ uint8_t OpenDMLHeader::unpackPacked( void )
 	setpriority(PRIO_PROCESS, 0, ADM_getNiceValue(priorityLevel));
 
 	printf("Trying to unpack the stream\n");
-	DIA_working *working=new DIA_working(_("Unpacking packed bitstream"));
+	DIA_working *working=new DIA_working(_("Unpacking bitstream"));
 	ADMCompressedImage image;
         image.data=buffer;
 	uint32_t img=0;

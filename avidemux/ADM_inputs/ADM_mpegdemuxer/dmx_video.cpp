@@ -375,7 +375,7 @@ char *start;
                 uint64_t imgrel,imgabs;
                 char *str,*needle;
                 
-                DIA_working *work=new DIA_working("Opening mpeg..");
+                DIA_working *work=new DIA_working(_("Opening MPEG"));
                 while(read<_nbGop)
                 {
                         if(!fgets(string,MAX_LINE,file)) break;

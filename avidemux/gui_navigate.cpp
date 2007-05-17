@@ -311,7 +311,7 @@ uint8_t A_ListAllBlackFrames(char *name)
     const int darkness=40;
 
     startframe=curframe;
-    DIA_working *work=new DIA_working("Finding black frames");
+    DIA_working *work=new DIA_working(_("Finding black frames"));
     printf("\n** Listing all black frames **\n");
 
     for (f=0; f<avifileinfo->nb_frames; f++) {

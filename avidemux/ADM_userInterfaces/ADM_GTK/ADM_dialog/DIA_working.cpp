@@ -37,8 +37,7 @@
 #include "ADM_osSupport/ADM_debugID.h"
 #define MODULE_NAME MODULE_CLOCKnTIMELEFT
 #include "ADM_osSupport/ADM_debug.h"
-
-# include <config.h>
+#include "ADM_osSupport/ADM_misc.h"
 
 #include "DIA_working.h"
 
@@ -61,52 +60,40 @@ GtkWidget *dialog;
 	UI_purge();
 
 };
+
 gint on_destroy_abort(GtkObject * object, gpointer user_data)
 {
-
-
 	UNUSED_ARG(object);
 	UNUSED_ARG(user_data);
 
-/*DIA_working *dial;
-GtkWidget *dialog;
-
-	dial=(DIA_working *)user_data;
-	dialog=(GtkWidget *)dial->_priv;
-	dial->_priv=NULL;
-	printf("destroyed\n");
-	gtk_purge();
-	*/
 	return TRUE;
-
 };
-
-
 
 DIA_working::DIA_working( void )
 {
 	GtkWidget *dialog;
 
 	dialog=create_dialog1();
-//	gtk_transient(dialog);
-        gtk_register_dialog(dialog);
+    gtk_register_dialog(dialog);
 	_priv=(void *)_priv;
 	postCtor();
 }
 DIA_working::DIA_working( const char *title )
 {
-GtkWidget *dialog;
+	GtkWidget *dialog;
 
 	dialog=create_dialog1();
-	//gtk_transient(dialog);
-        gtk_register_dialog(dialog);
-	_priv=(void *)dialog;;
-	gtk_window_set_title (GTK_WINDOW (dialog), title);
+
+    gtk_register_dialog(dialog);
+	_priv=(void *)dialog;
+
+	gtk_window_set_title(GTK_WINDOW(dialog), title);
 	postCtor();
 }
+
 void DIA_working :: postCtor( void )
 {
-GtkWidget 	*dialog;
+		GtkWidget 	*dialog;
 
 		dialog=(GtkWidget *)_priv;
 		//gtk_window_set_modal(GTK_WINDOW(dialog), 1);
@@ -117,9 +104,6 @@ GtkWidget 	*dialog;
 		gtk_signal_connect(GTK_OBJECT(dialog), "delete_event",
 		       GTK_SIGNAL_FUNC(on_destroy_abort), (void *) this);
 
-
-
-
 		gtk_widget_show(dialog);
 		UI_purge();
 		lastper=0;
@@ -127,61 +111,49 @@ GtkWidget 	*dialog;
 }
 uint8_t DIA_working::update(uint32_t percent)
 {
-	#define  GUI_UPDATE_RATE 1000
+	#define GUI_UPDATE_RATE 1000
 
-                if(!_priv) return 1;
-                if(!percent) return 0;
-                if(percent==lastper)
-                {
-                   UI_purge();
-                   return 0;
-                }
-                aprintf("DIA_working::update(%lu) called\n", percent);
-                elapsed=_clock.getElapsedMS();
-                if(elapsed<_nextUpdate) 
-                {
-                  UI_purge();
-                  return 0;
-                }
-                _nextUpdate=elapsed+1000;
-                lastper=percent;
-  
-        GtkWidget *dialog;
-        dialog=(GtkWidget *)_priv;
+	if(!_priv) return 1;
+	if(!percent) return 0;
 
-		//
-		// 100/totalMS=percent/elapsed
-		// totalM=100*elapsed/percent
+	if(percent==lastper)
+	{
+	   UI_purge();
+	   return 0;
+	}
 
-		double f;
-		f=100.;
-		f*=elapsed;
-		f/=percent;
+	aprintf("DIA_working::update(%lu) called\n", percent);
+	elapsed=_clock.getElapsedMS();
 
-		f-=elapsed;
-		f/=1000;
+	if(elapsed<_nextUpdate) 
+	{
+	  UI_purge();
+	  return 0;
+	}
 
-		uint32_t sectogo=(uint32_t)floor(f);
+	_nextUpdate=elapsed+1000;
+	lastper=percent;
 
-	char b[300];
-   		int  mm,ss;
-    			mm=sectogo/60;
-      			ss=sectogo%60;
-    			sprintf(b, " %d m %d s left", mm,ss);
-			aprintf("DIA_working::update(%lu): new time left: %s\n"
-				"\tf=%f sectogo=%lu\n", percent,b,f,sectogo);
-    			gtk_label_set_text(GTK_LABEL(lookup_widget(dialog,"label_time")), b);
+	GtkWidget *dialog;
+	dialog=(GtkWidget *)_priv;
 
-		double p;
-			p=percent;
-			p=p/100.;
-       			gtk_progress_set_percentage(GTK_PROGRESS(lookup_widget(dialog,"progressbar1")),(gfloat)p);
+	uint32_t hh,mm,ss;
+	char string[9];
 
-		UI_purge();
-		return 0;
+	ms2time(elapsed,&hh,&mm,&ss);
+	sprintf(string,"%02d:%02d:%02d",hh,mm,ss);
+	gtk_label_set_text(GTK_LABEL(WID(labelElapsed)),string);
 
+	gtk_label_set_text(GTK_LABEL(lookup_widget(dialog,"labelRemaining")), ms2timedisplay((uint32_t) floor(((elapsed * 100.) / percent) - elapsed)));
+	gtk_progress_set_percentage(GTK_PROGRESS(lookup_widget(dialog,"progressbar1")),(gfloat)(percent / 100.));
 
+	sprintf(string, _("%d%%"), percent);
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(lookup_widget(dialog, "progressbar1")), string);
+
+	UI_purge();
+	return 0;
 }
+
 uint8_t DIA_working::update(uint32_t cur, uint32_t total)
 {
 		double d,n;
@@ -219,77 +191,122 @@ void DIA_working::closeDialog( void )
 	GtkWidget *dialog;
 
 	dialog=(GtkWidget *)_priv;
+
 	if(dialog)
 	{
-                gtk_unregister_dialog(dialog);
+		gtk_unregister_dialog(dialog);
 		gtk_widget_destroy(dialog);
 		_priv=NULL;
 	}
-
-
 }
 
 //-------------------------------------------------------------
-GtkWidget	*create_dialog1 (void)
+GtkWidget*
+create_dialog1 (void)
 {
   GtkWidget *dialog1;
-  GtkWidget *dialog_vbox1;
   GtkWidget *vbox1;
-  GtkWidget *hbox1;
-  GtkWidget *label1;
-  GtkWidget *label_time;
+  GtkWidget *alignment1;
+  GtkWidget *table1;
+  GtkWidget *label2;
+  GtkWidget *labelElapsed;
+  GtkWidget *label4;
+  GtkWidget *labelRemaining;
   GtkWidget *progressbar1;
-  GtkWidget *dialog_action_area1;
+  GtkWidget *alignment2;
+  GtkWidget *hbox1;
+  GtkWidget *label5;
   GtkWidget *closebutton1;
 
-  dialog1 = gtk_dialog_new ();
-  gtk_window_set_title (GTK_WINDOW (dialog1), _("dialog1"));
-
-  dialog_vbox1 = GTK_DIALOG (dialog1)->vbox;
-  gtk_widget_show (dialog_vbox1);
+  dialog1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_widget_set_size_request (dialog1, 250, -1);
+  gtk_window_set_title (GTK_WINDOW (dialog1), _("Processing"));
+  gtk_window_set_position (GTK_WINDOW (dialog1), GTK_WIN_POS_CENTER_ON_PARENT);
+  gtk_window_set_type_hint (GTK_WINDOW (dialog1), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   vbox1 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox1);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox1, TRUE, TRUE, 0);
+  gtk_container_add (GTK_CONTAINER (dialog1), vbox1);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 12);
 
-  hbox1 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_show (hbox1);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, TRUE, TRUE, 0);
+  alignment1 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment1);
+  gtk_box_pack_start (GTK_BOX (vbox1), alignment1, FALSE, FALSE, 0);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment1), 0, 12, 0, 0);
 
-  label1 = gtk_label_new (_("Time left :"));
-  gtk_widget_show (label1);
-  gtk_box_pack_start (GTK_BOX (hbox1), label1, TRUE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
+  table1 = gtk_table_new (2, 2, FALSE);
+  gtk_widget_show (table1);
+  gtk_container_add (GTK_CONTAINER (alignment1), table1);
+  gtk_table_set_row_spacings (GTK_TABLE (table1), 4);
+  gtk_table_set_col_spacings (GTK_TABLE (table1), 12);
 
-  label_time = gtk_label_new (_("0:0:0"));
-  gtk_widget_show (label_time);
-  gtk_box_pack_start (GTK_BOX (hbox1), label_time, TRUE, TRUE, 0);
-  gtk_label_set_justify (GTK_LABEL (label_time), GTK_JUSTIFY_LEFT);
+  label2 = gtk_label_new (_("<b>Elasped:</b>"));
+  gtk_widget_show (label2);
+  gtk_table_attach (GTK_TABLE (table1), label2, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label2), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label2), 0, 0.5);
+
+  labelElapsed = gtk_label_new ("00:00:00");
+  gtk_widget_show (labelElapsed);
+  gtk_table_attach (GTK_TABLE (table1), labelElapsed, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelElapsed), 0, 0.5);
+
+  label4 = gtk_label_new (_("<b>Time Remaining:</b>"));
+  gtk_widget_show (label4);
+  gtk_table_attach (GTK_TABLE (table1), label4, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label4), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (label4), 0, 0.5);
+
+  labelRemaining = gtk_label_new ("");
+  gtk_widget_show (labelRemaining);
+  gtk_table_attach (GTK_TABLE (table1), labelRemaining, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (labelRemaining), 0, 0.5);
 
   progressbar1 = gtk_progress_bar_new ();
   gtk_widget_show (progressbar1);
   gtk_box_pack_start (GTK_BOX (vbox1), progressbar1, FALSE, FALSE, 0);
+  gtk_progress_bar_set_text (GTK_PROGRESS_BAR (progressbar1), "0%");
 
-  dialog_action_area1 = GTK_DIALOG (dialog1)->action_area;
-  gtk_widget_show (dialog_action_area1);
-  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
+  alignment2 = gtk_alignment_new (0.5, 0.5, 1, 1);
+  gtk_widget_show (alignment2);
+  gtk_box_pack_start (GTK_BOX (vbox1), alignment2, FALSE, FALSE, 0);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment2), 24, 0, 0, 0);
+
+  hbox1 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_show (hbox1);
+  gtk_container_add (GTK_CONTAINER (alignment2), hbox1);
+
+  label5 = gtk_label_new ("");
+  gtk_widget_show (label5);
+  gtk_box_pack_start (GTK_BOX (hbox1), label5, TRUE, TRUE, 0);
 
   closebutton1 = gtk_button_new_from_stock ("gtk-cancel");
   gtk_widget_show (closebutton1);
-  gtk_dialog_add_action_widget (GTK_DIALOG (dialog1), closebutton1, GTK_RESPONSE_CANCEL);
+  gtk_box_pack_start (GTK_BOX (hbox1), closebutton1, FALSE, FALSE, 0);
   GTK_WIDGET_SET_FLAGS (closebutton1, GTK_CAN_DEFAULT);
 
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog1, "dialog1");
-  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_vbox1, "dialog_vbox1");
   GLADE_HOOKUP_OBJECT (dialog1, vbox1, "vbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
-  GLADE_HOOKUP_OBJECT (dialog1, label1, "label1");
-  GLADE_HOOKUP_OBJECT (dialog1, label_time, "label_time");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment1, "alignment1");
+  GLADE_HOOKUP_OBJECT (dialog1, table1, "table1");
+  GLADE_HOOKUP_OBJECT (dialog1, label2, "label2");
+  GLADE_HOOKUP_OBJECT (dialog1, labelElapsed, "labelElapsed");
+  GLADE_HOOKUP_OBJECT (dialog1, label4, "label4");
+  GLADE_HOOKUP_OBJECT (dialog1, labelRemaining, "labelRemaining");
   GLADE_HOOKUP_OBJECT (dialog1, progressbar1, "progressbar1");
-  GLADE_HOOKUP_OBJECT_NO_REF (dialog1, dialog_action_area1, "dialog_action_area1");
+  GLADE_HOOKUP_OBJECT (dialog1, alignment2, "alignment2");
+  GLADE_HOOKUP_OBJECT (dialog1, hbox1, "hbox1");
+  GLADE_HOOKUP_OBJECT (dialog1, label5, "label5");
   GLADE_HOOKUP_OBJECT (dialog1, closebutton1, "closebutton1");
 
   return dialog1;
 }
-
