@@ -56,9 +56,9 @@ void UI_QT4VideoWidget(QFrame *host);
 static QFrame *hostFrame=NULL;
 static AccelRender *accelRender=NULL;
 static uint8_t *lastImage=NULL;
-
+extern QWidget *QuiMainWindows;
  ColYuvRgb rgbConverter(640,480,1);
-
+extern void UI_purge( void );
 //****************************************************************************************************
 void GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal)
 {}
@@ -168,6 +168,9 @@ void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr)
       videoWindow->repaint();
     
 }
+
+#define ADM_RSZ(a,x,y) {a->resize(x,y);a->setMinimumSize(x,y);}
+#define ADM_RSZ_MAX(a,x,y) {a->resize(x,y);a->setMinimumSize(x,y);a->setMaximumSize(x,y);}
 /**
       \brief Resize the window
 */
@@ -179,8 +182,19 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
   rgbDataBuffer=new uint8_t [w*h*4]; // 32 bits / color
   displayW=w;
   displayH=h;
-  hostFrame->resize(displayW,displayH);
-  videoWindow->resize(displayW,displayH);
+  // Resize Host window
+  // It depends on where the frame start
+  printf("[RDR] %d x %d\n",hostFrame->x(),hostFrame->y());
+  uint32_t totalw=displayW+hostFrame->x();
+  uint32_t totalh=displayH+hostFrame->y()+50;
+  ADM_RSZ(QuiMainWindows,totalw,totalh);
+  // And resize child windows
+  
+  ADM_RSZ_MAX(hostFrame,displayW,displayH);
+  ADM_RSZ_MAX(videoWindow,displayW,displayH);
+  UI_purge();
+  
+
   printf("[RDR] Resizing to %u x %u\n",displayW,displayH);
   return ;
 }
