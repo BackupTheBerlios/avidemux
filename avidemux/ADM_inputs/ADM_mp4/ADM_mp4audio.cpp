@@ -137,10 +137,11 @@ double delta;
                 // Assume the last sample is the same size as the previous one
 	  	//*samples=1024;
                 delta=_index[_nb_chunks-1].time;
-                delta=delta/1000;
+                
                 if(_audioDuration>delta)
                 {
                         delta=_audioDuration-delta;
+                        delta/=1000;
                         // delta is the duration of the current chunk in us
                         delta*=_wavheader->frequency;
                         delta/=1000.; // mss -> second
@@ -159,9 +160,9 @@ double delta;
 		delta*=_wavheader->frequency;
 		delta/=1000.*1000.; // us -> second
 		*samples=(uint32_t)floor(delta);
-	  
+	     
 	  }
-#if 0
+#if 1
           printf("[MP4Audio]Read %u bytes\n", r);
             printf("MP4Audio : index  :%u/%u sample : %u\n",_current_index,_nb_chunks,*samples);
 #endif
