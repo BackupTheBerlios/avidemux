@@ -287,7 +287,7 @@ JSBool ADM_JSAvidemuxAudio::Save(JSContext *cx, JSObject *obj, uintN argc,
         printf("Saving Audio \"%s\"\n",pTempStr);
         enterLock();
         *rval = INT_TO_JSVAL(A_audioSave(pTempStr));
-        leaveLock()
+        leaveLock();
         return JS_TRUE;
 }// end Save
 
@@ -401,7 +401,7 @@ JSBool ADM_JSAvidemuxAudio::Codec(JSContext *cx, JSObject *obj, uintN argc,
 
                 *rval = BOOLEAN_TO_JSVAL(true);
         }// end set bitrate
-        leaveLock()
+        leaveLock();
         return JS_TRUE;
 }// end Codec
 JSBool ADM_JSAvidemuxAudio::getNbTracks(JSContext *cx, JSObject *obj, uintN argc, 
@@ -417,7 +417,7 @@ audioInfo *infos=NULL;
       
         enterLock();
         video_body->getAudioStreamsInfo(0,&nb, &infos);
-        leaveLock()
+        leaveLock();
         if(infos)
                 delete [] infos;
         *rval = INT_TO_JSVAL(nb);
@@ -442,7 +442,7 @@ audioInfo *infos=NULL;
         if(nw>nb) return JS_FALSE;
         enterLock();
         video_body->changeAudioStream(0,nw);
-        leaveLock()
+        leaveLock();
         return JS_TRUE;
 }// end Codec
 JSBool ADM_JSAvidemuxAudio::secondAudioTrack(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
@@ -464,10 +464,10 @@ JSBool ADM_JSAvidemuxAudio::secondAudioTrack(JSContext *cx, JSObject *obj, uintN
         enterLock();
         if(A_setSecondAudioTrack(source,name))
         {
-                leaveLock()
+                leaveLock();
                 return JS_TRUE;
         }
-        leaveLock()
+        leaveLock();
       return JS_FALSE;
 }
 JSBool ADM_JSAvidemuxAudio::mixer(JSContext *cx, JSObject *obj, uintN argc, 
@@ -488,7 +488,7 @@ uint32_t *infos=NULL;
                 *rval=BOOLEAN_TO_JSVAL(true);
         else
                 *rval=BOOLEAN_TO_JSVAL(false);
-        leaveLock()
+        leaveLock();
         return JS_TRUE;
 
 }// end Codec
