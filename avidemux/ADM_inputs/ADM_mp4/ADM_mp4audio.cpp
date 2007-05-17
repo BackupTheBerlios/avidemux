@@ -162,7 +162,7 @@ double delta;
 		*samples=(uint32_t)floor(delta);
 	     
 	  }
-#if 1
+#if 0
           printf("[MP4Audio]Read %u bytes\n", r);
             printf("MP4Audio : index  :%u/%u sample : %u\n",_current_index,_nb_chunks,*samples);
 #endif
