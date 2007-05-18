@@ -85,6 +85,11 @@ uint8_t diaFactoryRun(const char *title,uint32_t nb,diaElem **elems)
      v+=elems[i]->getSize();
     
   }
+   for(int i=0;i<nb;i++)
+  {
+    ADM_assert(elems[i]);
+     elems[i]->finalize(); 
+  }
   // Add buttons
    QDialogButtonBox buttonBox((QWidget *)&dialog);
     buttonBox.setStandardButtons(QDialogButtonBox::Ok
@@ -193,6 +198,11 @@ void insertTab(uint32_t index, diaElemTabs *tab, QTabWidget *wtab)
      v+=tab->dias[i]->getSize();
     
   }
+  
   wtab->addTab(wid,tab->title);
+  for(int i=0;i<tab->nbElems;i++)
+  {
+    tab->dias[i]->finalize(); 
+  }
 }
 //EOF

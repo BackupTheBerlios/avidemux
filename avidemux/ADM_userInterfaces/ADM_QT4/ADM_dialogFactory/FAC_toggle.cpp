@@ -78,9 +78,9 @@ void diaElemToggle::enable(uint32_t onoff)
   QCheckBox *box=(QCheckBox *)myWidget;
   ADM_assert(box);
   if(onoff)
-    box->setEnabled(1);
+    box->setEnabled(TRUE);
   else
-    box->setDisabled(1);
+    box->setDisabled(TRUE);
 }
 
 void   diaElemToggle::finalize(void)
@@ -189,7 +189,7 @@ void   diaElemToggleUint::finalize(void)
 void   diaElemToggleUint::updateMe(void)
 {
   uint32_t val;
-  uint32_t rank=0;
+  uint32_t rank=FALSE;
   ADM_assert(myWidget);
   
   QCheckBox *box=(QCheckBox *)myWidget;
@@ -197,7 +197,7 @@ void   diaElemToggleUint::updateMe(void)
   
   if(Qt::Checked==box->checkState())
   {
-    rank=1;
+    rank=TRUE;
   }
   spin->setEnabled(rank);
 }
@@ -208,13 +208,13 @@ void   diaElemToggleUint::enable(uint32_t onoff)
   ADM_assert(box);
   if(onoff)
   {
-    box->setEnabled(1);
-    spin->setEnabled(1);
+    box->setEnabled(TRUE);
+    spin->setEnabled(TRUE);
   }
   else
   {
-    box->setDisabled(1);
-    spin->setDisabled(1);
+    box->setEnabled(FALSE);
+    spin->setEnabled(FALSE);
   }
 }
 
@@ -276,5 +276,8 @@ void diaElemToggleInt::getMe(void)
  *emb=u;
 }
 //******************************************************
+
+
+
 
 //EOF

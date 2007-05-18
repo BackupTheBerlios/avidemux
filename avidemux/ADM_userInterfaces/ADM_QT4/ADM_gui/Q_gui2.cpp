@@ -12,7 +12,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-
+//#define CUSTOM_SLIDER
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -33,6 +33,7 @@
 #include <QtGui/QToolButton>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
+#include <ADM_qslider.h>
 
 #include "default.h"
 #include "ADM_osSupport/ADM_misc.h"
@@ -50,7 +51,11 @@ extern const char* audioFilterGetIndexedName(uint32_t i);
 extern void checkCrashFile(void);
 static void setupMenus(void);
 
+#ifdef CUSTOM_SLIDER
+static ADM_QSlider *slider=NULL;
+#else
 static QSlider *slider=NULL;
+#endif
 static int _upd_in_progres=0;
 /* Ugly game with macro so that buttons emit their name ...*/
 
@@ -193,7 +198,9 @@ MainWindow::MainWindow()     : QMainWindow()
             ADD(actionNext_blak_frame);
             ADD(actionFirst_Frame);
             ADD(actionLast_Frame);
-            
+            //** Add shortcuts **//
+            QKeySequence seqFilter("CTRL+Alt+F");
+            ui.actionFilters->setShortcut(seqFilter);
             // default state
             bool b=0;
           ui.pushButtonVideoConf->setEnabled(b);
@@ -276,12 +283,13 @@ Q_INIT_RESOURCE(filter);
    
     UI_QT4VideoWidget(mw->ui.frame_video);  // Add the widget that will handle video display
     UI_updateRecentMenu(  );
+    setupMenus();
+    checkCrashFile();
+    
    if (global_argc >= 2)
     {
      automation();
     }
-    setupMenus();
-    checkCrashFile();
     return a.exec();
 }
 /**
@@ -488,6 +496,9 @@ void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
       frame2time(total,fps, &hh, &mm, &ss, &ms);
       sprintf(text, "/%02d:%02d:%02d.%03d", hh, mm, ss, ms);
       WIDGET(label_7)->setText(text);
+#ifdef CUSTOM_SLIDER
+      slider->setNbFrames(total);
+#endif
 }
 /**
     \fn     UI_setMarkers(uint32_t a, uint32_t b )
@@ -501,6 +512,11 @@ void UI_setMarkers(uint32_t a, uint32_t b )
       WIDGET(label_9)->setText(text);
       snprintf(text,79,"%lu",b);
       WIDGET(label_10)->setText(text);
+      //
+#ifdef CUSTOM_SLIDER
+      slider->setA(a);
+      slider->setB(b);
+#endif
 }
 /**
     \fn     UI_getCurrentVCodec(void)
@@ -520,7 +536,11 @@ int 	UI_getCurrentVCodec(void)
 
 void UI_setVideoCodec( int i)
 {
+  int b=!!i;
     WIDGET(comboBoxVideo)->setCurrentIndex(i);
+    
+     WIDGET(pushButtonVideoConf)->setEnabled(b);
+     WIDGET(pushButtonVideoFilter)->setEnabled(b);
 }
 /**
     \fn     UI_getCurrentACodec(void)
@@ -539,8 +559,10 @@ int 	UI_getCurrentACodec(void)
 */
 
 void UI_setAudioCodec( int i)
-{
+{ int b=!!i;
    WIDGET(comboBoxAudio)->setCurrentIndex(i);
+    WIDGET(pushButtonAudioConf)->setEnabled(b);
+    WIDGET(pushButtonAudioFilter)->setEnabled(b);
 }
 /**
     \fn     UI_GetCurrentFormat(void)

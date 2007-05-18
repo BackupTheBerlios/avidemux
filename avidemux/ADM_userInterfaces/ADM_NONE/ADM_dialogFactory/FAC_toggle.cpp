@@ -368,5 +368,27 @@ void diaElemToggleInt::getMe(void)
 {
   
 }
+//*********************************************************
+diaElemButton:: diaElemButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip)
+  : diaElem(ELEM_BUTTON)
+{
+}
 
+diaElemButton::~diaElemButton()
+{
+  
+}
+
+void diaElemButton::setMe(void *dialog, void *opaque,uint32_t line)
+{
+  
+}
+void diaElemButton::getMe(void)
+{
+  
+}
+void   diaElemButton::enable(uint32_t onoff)
+{
+
+}
 //EOF

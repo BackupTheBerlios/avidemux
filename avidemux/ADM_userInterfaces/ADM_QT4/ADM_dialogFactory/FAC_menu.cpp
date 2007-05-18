@@ -164,10 +164,10 @@ void diaElemMenuDynamic::finalize(void)
     dialElemLink *l=&(links[i]);
     if(l->value==val)
     {
-      if(!l->onoff)  l->widget->enable(0);
+      if(!l->onoff)  l->widget->enable(FALSE);
     }else
     {
-       if(l->onoff)  l->widget->enable(0);
+       if(l->onoff)  l->widget->enable(FALSE);
     }
     
   }
@@ -177,10 +177,10 @@ void diaElemMenuDynamic::finalize(void)
     dialElemLink *l=&(links[i]);
     if(l->value==val)
     {
-      if(l->onoff)  l->widget->enable(1);
+      if(l->onoff)  l->widget->enable(TRUE);
     }else
     {
-       if(!l->onoff)  l->widget->enable(1);
+       if(!l->onoff)  l->widget->enable(TRUE);
     }
     
   }
@@ -190,9 +190,9 @@ void diaElemMenuDynamic::enable(uint32_t onoff)
    QComboBox *combo=(QComboBox *)myWidget;
   ADM_assert(combo);
   if(onoff)
-    combo->setEnabled(1);
+    combo->setEnabled(true);
   else
-    combo->setDisabled(1);
+    combo->setDisabled(true);
 }
 
 uint8_t   diaElemMenuDynamic::link(diaMenuEntryDynamic *entry,uint32_t onoff,diaElem *w)

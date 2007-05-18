@@ -50,6 +50,7 @@
 #include "ADM_video/ADM_genvideo.hxx"
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
+#include "ADM_filter/vidVCD.h"
 /*******************************************************/
 #define NB_TREE 8
 #define myFg 0xFF
@@ -86,6 +87,10 @@ class filtermainWindow : public QDialog
      
      
  public slots:
+        void VCD(bool b);
+        void DVD(bool b);
+        void SVCD(bool b);
+        void halfD1(bool b);
         void add(bool b);
         void up(bool b);
         void down(bool b);
@@ -205,6 +210,17 @@ void filtermainWindow::remove( bool b)
             }
   
 }
+#define MAKE_BUTTON(button,call) \
+void filtermainWindow::button( bool b) \
+{ \
+    call(); \
+    getFirstVideoFilter (); \
+    buildActiveFilterList ();  \
+}
+MAKE_BUTTON(DVD,setDVD)
+MAKE_BUTTON(VCD,setVCD)
+MAKE_BUTTON(SVCD,setSVCD)
+MAKE_BUTTON(halfD1,setHalfD1)
 /**
         \fn     configure( bool b)
         \brief  Configure the selected active filter
@@ -506,6 +522,10 @@ filtermainWindow::filtermainWindow()     : QDialog()
     connect((ui.toolButtonUp),SIGNAL(clicked(bool)),this,SLOT(up(bool)));
     connect((ui.toolButtonDown),SIGNAL(clicked(bool)),this,SLOT(down(bool)));
     connect(ui.buttonClose, SIGNAL(clicked(bool)), this, SLOT(accept()));
+    connect(ui.pushButtonDVD, SIGNAL(clicked(bool)), this, SLOT(DVD(bool)));
+    connect(ui.pushButtonVCD, SIGNAL(clicked(bool)), this, SLOT(VCD(bool)));
+    connect(ui.pushButtonSVCD, SIGNAL(clicked(bool)), this, SLOT(SVCD(bool)));
+    connect(ui.pushButtonHalfDVD, SIGNAL(clicked(bool)), this, SLOT(halfD1(bool)));
    
     displayFamily(0);
     buildActiveFilterList(); 
