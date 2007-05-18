@@ -51,6 +51,7 @@
 #include "ADM_filter/video_filters.h"
 #include "ADM_video/ADM_vidPartial.h"
 #include "ADM_filter/vidVCD.h"
+#include "ADM_userInterfaces/ADM_commonUI/DIA_factory.h"
 /*******************************************************/
 #define NB_TREE 8
 #define myFg 0xFF
@@ -521,6 +522,7 @@ filtermainWindow::filtermainWindow()     : QDialog()
     connect((ui.pushButtonRemove),SIGNAL(clicked(bool)),this,SLOT(remove(bool)));
     connect((ui.toolButtonUp),SIGNAL(clicked(bool)),this,SLOT(up(bool)));
     connect((ui.toolButtonDown),SIGNAL(clicked(bool)),this,SLOT(down(bool)));
+    connect((ui.toolButtonPartial),SIGNAL(clicked(bool)),this,SLOT(partial(bool)));
     connect(ui.buttonClose, SIGNAL(clicked(bool)), this, SLOT(accept()));
     connect(ui.pushButtonDVD, SIGNAL(clicked(bool)), this, SLOT(DVD(bool)));
     connect(ui.pushButtonVCD, SIGNAL(clicked(bool)), this, SLOT(VCD(bool)));
@@ -549,6 +551,38 @@ int GUI_handleVFilter(void)
         }
 	return 0;
 }
+/** 
+    \fn partialCb
+    \brief Partial callback to configure the swallowed filter
+    
+*/
+static void partialCb(void *cookie);
+void partialCb(void *cookie)
+{
+  void **params=(void **)cookie;
+  AVDMGenericVideoStream *son=(AVDMGenericVideoStream *)params[0];
+  AVDMGenericVideoStream *previous=(AVDMGenericVideoStream *)params[1];
+  son->configure(previous);
+}
+/** 
+    \fn DIA_getPartial
+    \brief Partial dialog
+    
+*/
 
+uint8_t DIA_getPartial(PARTIAL_CONFIG *param,AVDMGenericVideoStream *son,AVDMGenericVideoStream *previous)
+{
+#define PX(x) &(param->x)
+  void *params[2]={son,previous};
+         uint32_t fmax=previous->getInfo()->nb_frames;
+         if(fmax) fmax--;
+         
+         diaElemUInteger  start(PX(_start),_("Partial Start Frame:"),0,fmax);
+         diaElemUInteger  end(PX(_end),_("Partial End Frame:"),0,fmax);
+         diaElemButton    button(_("Configure child"), partialCb,params);
+         
+         diaElem *tabs[]={&start,&end,&button};
+        return diaFactoryRun(_("Partial Video Filter"),3,tabs);
+}
 //EOF
 
