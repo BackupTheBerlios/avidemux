@@ -48,7 +48,7 @@ PROCESS(actionNext_Frame,ACT_NextFrame) \
 PROCESS(actionPrevious_intra_frame,ACT_PreviousKFrame) \
 PROCESS(actionNext_intra_frame,ACT_NextKFrame) \
 PROCESS(actionPrevious_black_frame,ACT_PrevBlackFrame) \
-PROCESS(actionNext_blak_frame,ACT_PlayAvi) \
+PROCESS(actionNext_blak_frame,ACT_NextBlackFrame) \
 PROCESS(actionFirst_Frame,ACT_Begin) \
 PROCESS(actionLast_Frame,ACT_End) \
 PROCESS(actionGo_to_Marker_A,ACT_GotoMarkA) \

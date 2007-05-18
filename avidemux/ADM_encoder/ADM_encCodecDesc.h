@@ -100,7 +100,7 @@ COMPRES_PARAMS ffmpegH263PCodec = {
 };
 COMPRES_PARAMS ffmpegMpeg4 = {
   CodecFF,
-  "Mpeg4 (lavc)",
+  "Mpeg4 ASP (lavc)",
   "FFMpeg4",
   "Lavcodec Mpeg4",
   COMPRESS_CQ,
@@ -563,7 +563,7 @@ xvid4EncParam xvid4Extra = {
 extern uint8_t DIA_xvid4 (COMPRES_PARAMS * incoming);
 COMPRES_PARAMS Xvid4Codec = {
   CodecXvid4,
-  "Xvid4",
+  "Mpeg4 ASP (Xvid4)",
   "XVID4",
   "XVID 4 mpeg4",
   COMPRESS_CQ,
@@ -703,7 +703,7 @@ ADM_x264Param x264ExtraDefault=x264Extra;
 extern uint8_t DIA_x264 (COMPRES_PARAMS * conf);
 COMPRES_PARAMS x264Codec = {
   CodecX264,
-  "x264",
+  "MPEG4 AVC (x264)",
   "X264",
   "x264 h264 encoder",
   COMPRESS_AQ,
@@ -728,9 +728,12 @@ COMPRES_PARAMS CopyCodec =
 
 COMPRES_PARAMS *AllVideoCodec[] = {
   &CopyCodec,
-  &ffmpegH263Codec,
-  &MjpegCodec,
-//ffmpegH263PCodec,
+#ifdef USE_XVID_4
+  &Xvid4Codec,
+#endif
+#ifdef USE_X264
+  &x264Codec,
+#endif
   &ffmpegMpeg4,
   &ffmpeg1Codec,
   &ffmpeg2DVDCodec,
@@ -738,20 +741,14 @@ COMPRES_PARAMS *AllVideoCodec[] = {
   &VCDCodec,
   &SVCDCodec,
   &DVDCodec,
-  &ffmpegDV,
   &RequantCodec,
-#ifdef USE_XVID_4
-  &Xvid4Codec,
-#endif
-#ifdef USE_X264
-  &x264Codec,
-#endif
+  &ffmpegDV,
   &ffmpegHUFF,
   &ffmpegFFHUFF,
   &ffmpegFFV1,
   &yv12codec,
-  
-//&ffmpegSnow,
+  &ffmpegH263Codec,
+  &MjpegCodec,  
   &DUMMYONE
 };
 #endif
