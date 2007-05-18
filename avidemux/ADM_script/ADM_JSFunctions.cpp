@@ -80,6 +80,7 @@ JSBool facTab(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 JSBool facFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facHex(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool facDirSel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+JSBool facButton(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool crashTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 JSBool assertTest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
@@ -112,6 +113,7 @@ static JSFunctionSpec adm_functions[] = {
   {"dialogFactoryDirSel",       facDirSel,        0},
   {"dialogFactoryFrame",       facFrame,        0},
   {"dialogFactoryHex",       facHex,        0},
+  {"dialogFactoryButton",       facButton,        0},
   {"crashTest",               crashTest,        0},
   {"assertTest",               assertTest,        0},
   {0}
@@ -635,6 +637,24 @@ JSBool facBar(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
       diaElemBar bar2(65,"65");
       diaElem *elems[]={&bar1,&bar2   };
   if(diaFactoryRun("Test FileRead",2,elems))
+  {
+    *rval = BOOLEAN_TO_JSVAL(1);
+    
+  }else
+    *rval = BOOLEAN_TO_JSVAL(0);
+  
+  return JS_TRUE;
+}
+void clickMe(void *cookie)
+{
+  GUI_Error_HIG("Button","Button pressed!"); 
+}
+JSBool facButton(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+    
+      diaElemButton bar1("Button",clickMe,NULL);
+      diaElem *elems[]={&bar1   };
+  if(diaFactoryRun("Test Button",1,elems))
   {
     *rval = BOOLEAN_TO_JSVAL(1);
     
