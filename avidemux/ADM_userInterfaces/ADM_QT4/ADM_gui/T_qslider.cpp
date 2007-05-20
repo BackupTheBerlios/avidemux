@@ -124,6 +124,10 @@ ADM_QSlider::ADM_QSlider(QWidget *father) : QWidget(father)
   _max=_A=_B=0;
   paintCount=0;
   _slider=new QSlider(this);
+  _slider->setTickInterval(1);
+  _slider->setSingleStep(1);
+
+  
   _slider->show();
   connect( _slider,SIGNAL(valueChanged(int)),this,SLOT(sliderMoved(int)));
   
@@ -145,7 +149,7 @@ void ADM_QSlider::paintEvent(QPaintEvent *ev)
     zprintf("[*********************************PAINT************************]\n");
     paintCount++;
     //_slider->repaint();
-    if(_A && _B && _max)
+    if( _max)
     {
       if(_A>_B)
       {

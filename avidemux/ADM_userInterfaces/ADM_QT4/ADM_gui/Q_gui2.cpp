@@ -174,7 +174,7 @@ MainWindow::MainWindow()     : QMainWindow()
      // Slider
           slider=ui.horizontalSlider;
           slider->setMinimum(0);
-          slider->setMaximum(100);
+          slider->setMaximum(1000);
           connect( slider,SIGNAL(valueChanged(int)),this,SLOT(sliderMoved(int)));
           //connect( slider,SIGNAL(sliderMoved()),this,SLOT(sliderMoved()));
   
@@ -386,6 +386,7 @@ double 	UI_readScale( void )
   double v;
   if(!slider) v=0;
   v= (double)(slider->value());
+  v/=10;
   printf("GetScale\n");
   return v;
 }
@@ -393,7 +394,7 @@ void UI_setScale( double val )
 {
 if(_upd_in_progres) return;
  _upd_in_progres++;
-   slider->setValue( (int)val);
+   slider->setValue( (int)val*10);
  _upd_in_progres--;
    
 }
