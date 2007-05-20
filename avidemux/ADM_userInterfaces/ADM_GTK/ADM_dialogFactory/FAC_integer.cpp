@@ -171,5 +171,26 @@ void diaElemUInteger::enable(uint32_t onoff)
   gtk_widget_set_sensitive(GTK_WIDGET(myWidget),onoff);
 }
 
+//****************************************************
+diaElemSlider::diaElemSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,const char *tip)
+  : diaElem(ELEM_SLIDER)
+{
+ }
+ 
+
+diaElemSlider::~diaElemSlider()
+{
+}
+void diaElemSlider::setMe(void *dialog, void *opaque,uint32_t line)
+{
+}
+void diaElemSlider::getMe(void)
+{
+
+}
+
+void diaElemSlider::enable(uint32_t onoff) 
+{
+}
 
 //EOF

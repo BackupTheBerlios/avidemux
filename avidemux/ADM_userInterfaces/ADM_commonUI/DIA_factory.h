@@ -37,6 +37,7 @@ typedef enum elemEnum
   ELEM_TOGGLE_UINT,
   ELEM_TOGGLE_INT,
   ELEM_BUTTON,
+  ELEM_SLIDER,
   ELEM_MAX=ELEM_TOGGLE
 };
 typedef void ADM_FAC_CALLBACK(void *cookie);
@@ -84,6 +85,19 @@ class diaElemButton : public diaElem
 public:
             diaElemButton(const char *toggleTitle, ADM_FAC_CALLBACK *cb,void *cookie,const char *tip=NULL);
   virtual   ~diaElemButton() ;
+  void      setMe(void *dialog, void *opaque,uint32_t line);
+  void      getMe(void);
+  void      enable(uint32_t onoff) ;
+};
+/************************************/
+class diaElemSlider : public diaElem
+{
+  protected:
+    
+    uint32_t _min,_max;
+public:
+            diaElemSlider(uint32_t *value,const char *toggleTitle, uint32_t min,uint32_t max,const char *tip=NULL);
+  virtual   ~diaElemSlider() ;
   void      setMe(void *dialog, void *opaque,uint32_t line);
   void      getMe(void);
   void      enable(uint32_t onoff) ;
