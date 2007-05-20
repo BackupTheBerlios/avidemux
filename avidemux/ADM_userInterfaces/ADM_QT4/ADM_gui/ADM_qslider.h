@@ -10,7 +10,9 @@ protected:
         QSlider *_slider;
         uint32_t _max,_A,_B;
         void paintEvent(QPaintEvent *ev);
-        
+        int paintCount;
+        void resizeEvent ( QResizeEvent * event ) ;
+
 public:
         ADM_QSlider(QWidget *father); 
         ~ADM_QSlider(); 
@@ -26,6 +28,14 @@ public:
 
     void setMaximum(int);
     int maximum() const;
+    
+    QSize sizeHint() const;
+    QSize minimumSizeHint() const;
+ //   bool event(QEvent *event);
+    void setSizePolicy ( QSizePolicy horizontal);
+    QSizePolicy sizePolicy () const;
+    void setMaximumSize ( const QSize & );
+    QSize maximumSize () const;
 
 public Q_SLOTS:
     void setValue(int);

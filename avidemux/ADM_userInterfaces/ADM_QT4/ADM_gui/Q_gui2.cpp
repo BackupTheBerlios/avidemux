@@ -12,7 +12,7 @@
  *                                                                         *
  ***************************************************************************/
 #include "config.h"
-//#define CUSTOM_SLIDER
+#define CUSTOM_SLIDER
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -583,6 +583,11 @@ uint8_t 	UI_SetCurrentFormat( ADM_OUT_FORMAT fmt )
 {
     WIDGET(comboBoxFormat)->setCurrentIndex((int)fmt);
 }
-
+uint8_t UI_sliderResize(uint32_t w)
+{
+  printf("sliderResize %u\n",w);
+  slider->resize(w,w);
+  return 1; 
+}
 //********************************************
 //EOF

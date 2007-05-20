@@ -59,6 +59,7 @@ static uint8_t *lastImage=NULL;
 extern QWidget *QuiMainWindows;
  ColYuvRgb rgbConverter(640,480,1);
 extern void UI_purge( void );
+extern uint8_t UI_sliderResize(uint32_t w);;
 //****************************************************************************************************
 void GUI_PreviewInit(uint32_t w , uint32_t h, uint32_t modal)
 {}
@@ -192,6 +193,9 @@ void  UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h)
   
   ADM_RSZ_MAX(hostFrame,displayW,displayH);
   ADM_RSZ_MAX(videoWindow,displayW,displayH);
+  
+  UI_sliderResize(w);
+  
   UI_purge();
   
 
