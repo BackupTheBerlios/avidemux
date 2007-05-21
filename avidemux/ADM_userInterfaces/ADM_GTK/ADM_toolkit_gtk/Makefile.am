@@ -9,7 +9,7 @@ INCLUDES = $(all_includes) $(GTK_CFLAGS) $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM
 libADM_toolkit_gtk_a_METASOURCES = AUTO
 
 libADM_toolkit_gtk_a_SOURCES = ADM_gladeSupport.cpp  ADM_tray_gtk.cpp  choice.cpp  TLK_filesel.cpp  toolkit.cpp  toolkit_dialog.cpp \
-					eggtrayicon.c eggtray_win32.c 
+					eggtrayicon.c eggtray_win32.c gtkmarkscale.c
 
 
 EXTRA_DIST = 
