@@ -284,12 +284,14 @@ class diaElemBitrate : public diaElem
 {
   protected:
     COMPRES_PARAMS    copy;
+    uint32_t maxQ;
 public:
   
   diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const char *tip=NULL);
   virtual ~diaElemBitrate() ;
   void setMe(void *dialog, void *opaque,uint32_t line);
   void getMe(void);
+  void setMaxQz(uint32_t qz);
   
   void updateMe(void);
 };

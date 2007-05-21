@@ -5,7 +5,7 @@ AQ_props.cpp AQ_working.cpp AQ_encoding.cpp  DIA_xvid4.cpp AQ_resizing.cpp AT_fl
 AQ_crop.cpp AT_QCanvas.cpp \
 AQ_asharp.cpp AQ_chromashift.cpp \
 AQ_contrast.cpp AQ_hue.cpp \
-AT_index_pg.cpp
+AT_index_pg.cpp DIA_x264.cpp
 
 INCLUDES = $(all_includes)  $(XML_CFLAGS)  $(FREETYPE_CFLAGS) -DADM_SUBVERSION=@ADM_SUBVERSION@ \
 		-I../../../ADM_libraries/ADM_utilities \

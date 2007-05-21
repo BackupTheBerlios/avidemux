@@ -49,19 +49,22 @@ class  ADM_Qbitrate : public QWidget
         QLabel          *text1;
         QLabel          *text2;
         COMPRES_PARAMS  *compress;
-        
-        ADM_Qbitrate(QWidget *z,COMPRES_PARAMS *p,QGridLayout *layout,int line) : QWidget(z) 
+        uint32_t        maxQ;
+        ADM_Qbitrate(QWidget *z,COMPRES_PARAMS *p,uint32_t mq,QGridLayout *layout,int line) : QWidget(z) 
         {
           
            compress=p;
            combo=new QComboBox(z);
-           
+           maxQ=mq;
 #define add(x) combo->addItem(#x)
   
   add(Constant Bitrate);
   add(Constant Quality);
   add(Two pass-filesize);
   add(Two pass-Avg bitrate);
+  add(Same Quantizer as input);
+  // FIXME UGLY!
+  if(maxQ==51) add(Average Quantizer);
   
            combo->show();
            
@@ -88,6 +91,7 @@ class  ADM_Qbitrate : public QWidget
             case  COMPRESS_CBR:i=0;break;
             case  COMPRESS_2PASS:i=2;break;
             case  COMPRESS_SAME:i=4;break;
+            case  COMPRESS_AQ:i=5;break;
             case  COMPRESS_2PASS_BITRATE:i=3;break;
             default: ADM_assert(0);
           }
@@ -111,6 +115,7 @@ void ADM_Qbitrate::readBack(void)
     case 2: Mx(COMPRESS_2PASS);Vx(finalsize);break;
     case 3: Mx(COMPRESS_2PASS_BITRATE);Vx(bitrate);break;
     case 4: Mx(COMPRESS_SAME);break;
+    case 5: Mx(COMPRESS_AQ);break;
     default :
           ADM_assert(0);
   }
@@ -130,7 +135,7 @@ void ADM_Qbitrate::comboChanged(int i)
           break; 
     case 1:// CQ
           P(Quantizer);
-          M(2,31);
+          M(2,maxQ);
           S(compress->qz);
           break;
     case 2 : // 2pass Filesize
@@ -146,6 +151,11 @@ void ADM_Qbitrate::comboChanged(int i)
     case 4 : // Same Qz as input
           P(-);
           M(0,0);
+          break;
+    case 5 : // AQ
+          P(Quantizer);
+          M(2,maxQ);
+          S(compress->qz);
           break;
     default:ADM_assert(0);
   }
@@ -171,6 +181,11 @@ diaElemBitrate::diaElemBitrate(COMPRES_PARAMS *p,const char *toggleTitle,const c
   paramTitle=NULL;
   this->tip=tip;
   setSize(2);
+  maxQ=31;
+}
+void diaElemBitrate::setMaxQz(uint32_t qz)
+{
+  maxQ=qz; 
 }
 
 diaElemBitrate::~diaElemBitrate()
@@ -188,7 +203,7 @@ void diaElemBitrate::setMe(void *dialog, void *opaque,uint32_t line)
 {
   QGridLayout *layout=(QGridLayout*) opaque;
   
-  ADM_Qbitrate *b=new ADM_Qbitrate( (QWidget *)dialog,(COMPRES_PARAMS *)&copy,layout,line);
+  ADM_Qbitrate *b=new ADM_Qbitrate( (QWidget *)dialog,(COMPRES_PARAMS *)&copy,maxQ,layout,line);
   myWidget=(void *)b;
   
 }

@@ -38,8 +38,12 @@ static void cb_mod(void *w,void *p);
   paramTitle=toggleTitle;
   this->tip=tip;
   setSize(2);
+  maxQ=31;
 }
-
+void diaElemBitrate::setMaxQz(uint32_t qz)
+{
+  maxQ=qz; 
+}
 diaElemBitrate::~diaElemBitrate()
 {
   GtkWidget *w=(GtkWidget *)myWidget;
@@ -212,7 +216,7 @@ void diaElemBitrate::updateMe(void)
           break; 
     case 1:// CQ
           P(_Quantizer:);
-          M(2,31);
+          M(2,maxQ);
           S(copy.qz);
           break;
     case 2 : // 2pass Filesize
