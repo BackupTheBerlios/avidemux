@@ -12,12 +12,12 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
-
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#include "../ADM_toolkit_gtk/ADM_gladeSupport.h"
 
+#include "../ADM_toolkit_gtk/gtkmarkscale.h"
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
@@ -340,7 +340,7 @@ create_mainWindow (void)
   gtk_widget_show (save_jpg_image1);
   gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_jpg_image1);
 
-  save_selection_as_jpegs1 = gtk_menu_item_new_with_mnemonic (_("Save _Selection as JPEG Images..."));
+  save_selection_as_jpegs1 = gtk_menu_item_new_with_mnemonic (_("Save _Selection as JPEG images..."));
   gtk_widget_show (save_selection_as_jpegs1);
   gtk_container_add (GTK_CONTAINER (save_stuff_menu), save_selection_as_jpegs1);
 
@@ -393,7 +393,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), separator16);
   gtk_widget_set_sensitive (separator16, FALSE);
 
-  connect_to_avsproxy1 = gtk_menu_item_new_with_mnemonic (_("Co_nnect to avsproxy"));
+  connect_to_avsproxy1 = gtk_menu_item_new_with_mnemonic (_("Connect to avsproxy"));
   gtk_widget_show (connect_to_avsproxy1);
   gtk_container_add (GTK_CONTAINER (menuitem1_menu), connect_to_avsproxy1);
 
@@ -753,7 +753,7 @@ create_mainWindow (void)
   gtk_container_add (GTK_CONTAINER (tools1_menu), separator17);
   gtk_widget_set_sensitive (separator17, FALSE);
 
-  see_hex1 = gtk_menu_item_new_with_mnemonic (_("_Frame Hex Dump"));
+  see_hex1 = gtk_menu_item_new_with_mnemonic (_("See Hex"));
   gtk_widget_show (see_hex1);
   gtk_container_add (GTK_CONTAINER (tools1_menu), see_hex1);
 
@@ -776,11 +776,11 @@ create_mainWindow (void)
   gtk_widget_show (dvd1);
   gtk_container_add (GTK_CONTAINER (help1_menu), dvd1);
 
-  psp1 = gtk_menu_item_new_with_mnemonic (_("_PSP"));
+  psp1 = gtk_menu_item_new_with_mnemonic (_("PSP"));
   gtk_widget_show (psp1);
   gtk_container_add (GTK_CONTAINER (help1_menu), psp1);
 
-  psp__h264_1 = gtk_menu_item_new_with_mnemonic (_("PSP (_H.264)"));
+  psp__h264_1 = gtk_menu_item_new_with_mnemonic (_("PSP (H264)"));
   gtk_widget_show (psp__h264_1);
   gtk_container_add (GTK_CONTAINER (help1_menu), psp__h264_1);
 
@@ -922,7 +922,7 @@ create_mainWindow (void)
   gtk_widget_show (image8120);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (jump_to_time1), image8120);
 
-  custom1 = gtk_menu_item_new_with_mnemonic (_("_Custom"));
+  custom1 = gtk_menu_item_new_with_mnemonic (_("Custom"));
   gtk_widget_show (custom1);
   gtk_container_add (GTK_CONTAINER (menuBar), custom1);
 
@@ -933,10 +933,6 @@ create_mainWindow (void)
   help2_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (help2), help2_menu);
 
-  show_builtin_support1 = gtk_menu_item_new_with_mnemonic (_("_Built-in Support"));
-  gtk_widget_show (show_builtin_support1);
-  gtk_container_add (GTK_CONTAINER (help2_menu), show_builtin_support1);
-  
   about1 = gtk_image_menu_item_new_with_mnemonic (_("_About"));
   gtk_widget_show (about1);
   gtk_container_add (GTK_CONTAINER (help2_menu), about1);
@@ -944,6 +940,10 @@ create_mainWindow (void)
   image8121 = gtk_image_new_from_stock ("gtk-about", GTK_ICON_SIZE_MENU);
   gtk_widget_show (image8121);
   gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (about1), image8121);
+
+  show_builtin_support1 = gtk_menu_item_new_with_mnemonic (_("Show builtin support"));
+  gtk_widget_show (show_builtin_support1);
+  gtk_container_add (GTK_CONTAINER (help2_menu), show_builtin_support1);
 
   toolbar2 = gtk_toolbar_new ();
   gtk_widget_show (toolbar2);
@@ -1368,8 +1368,8 @@ create_mainWindow (void)
   gtk_widget_show (image2245);
   gtk_container_add (GTK_CONTAINER (buttonEnd), image2245);
 
-  sliderNavigate = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 99.99, 0.01, 1, 0)));
-  gtk_widget_show (sliderNavigate);
+  sliderNavigate = gtk_markscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 99.99, 0.01, 1, 0)));
+  gtk_widget_show (sliderNavigate);gtk_scale_set_draw_value (GTK_SCALE (sliderNavigate), FALSE);
   gtk_table_attach (GTK_TABLE (table2), sliderNavigate, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);

@@ -47,6 +47,7 @@
 #include "../ADM_osSupport/ADM_misc.h"
 #include "../ADM_editor/ADM_outputfmt.h"
 #include "../prefs.h"
+#include "../ADM_toolkit_gtk/gtkmarkscale.h"
 
 uint8_t UI_getPhysicalScreenSize(uint32_t *w,uint32_t *h,void *r);
 
@@ -661,7 +662,7 @@ void UI_setTimeCount(uint32_t curFrame,uint32_t total, uint32_t fps)
  	frame2time(total,fps, &hh, &mm, &ss, &ms);
   	sprintf(text, "%02d:%02d:%02d.%03d", hh, mm, ss, ms);
      	gtk_label_set_text((GtkLabel *) guiTotalTime, text);     
-     
+		gtk_markscale_setNbFrames(guiSlider, total);
 
 }
 ///
@@ -728,6 +729,8 @@ char string[500];
         	gtk_label_set_text(GTK_LABEL(guiMarkA),string);
 		sprintf(string," %06lu",b);
         	gtk_label_set_text(GTK_LABEL(guiMarkB),string);
+			gtk_markscale_setA(guiSlider, a);
+			gtk_markscale_setB(guiSlider, b);
 }
 
 /**
