@@ -111,7 +111,45 @@ void COL_init(void)
     h=hh;
     return 1;
 }
+/**
+      \fn invertRGB
+      \brief Do RGBA->BGRA swap
+      howmuch is in pixel, i.e. you have to multiply it by 4 to get the nb of bytes!
+*/
+static void ADM_RGBA2BGRA(uint8_t *ptr, uint32_t howmuch)
+{
+#if ((defined( ARCH_X86)  || defined(ARCH_X86_64)))
+    __asm__(
+                        "1: mov            (%0),%%eax \n"
+                        "bswap          %%eax \n"
+                        "rorl           $8,%%eax \n"
+                        "mov            %%eax,(%0) \n"
+                        "add            $4,%0 \n"
+                        "dec            %1 \n"
+                        "jne            1b\n"
+                : : "r" (ptr),"r" (howmuch)
+                );
+#else
+uint8_t r,g,b,a;
+                  for(int xx=0;xx<howmuch;xx++)
+                  {
+                      r=ptr[0];
+                      g=ptr[1];
+                      b=ptr[2];
+                      a=ptr[3];
+                      ptr[0]=b;
+                      ptr[1]=g;
+                      ptr[2]=r;
+                      ptr[3]=a;
+                      ptr+=4;
+                  }
+#endif
+}
+/**
+      \fn scale
+      \brief Do the actual colorconversion
 
+*/
  uint8_t ColYuvRgb::scale(uint8_t *src, uint8_t *target)
  {
     uint8_t *srd[3];
@@ -142,31 +180,10 @@ void COL_init(void)
 
         if(_inverted)
         {
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
-            if( 0 && CpuCaps::hasMMX())
-            {
-            }
-            else
-#endif
-            {
                 uint8_t r,g,b,a;
                 uint8_t *ptr=target;
                 int pel=h*w;
-                for(int yy=0;yy<pel;yy++)
-                {
-                      r=ptr[0];
-                      g=ptr[1];
-                      b=ptr[2];
-                      a=ptr[3];
-                      ptr[0]=b;
-                      ptr[1]=g;
-                      ptr[2]=r;
-                      ptr[3]=a;
-                      ptr+=4;
-                }
-            }
-          
-          
+                ADM_RGBA2BGRA(ptr,pel);
         }
 #if  defined( ADM_BIG_ENDIAN)
         uint8_t r,g,b,a;
@@ -192,7 +209,7 @@ void COL_init(void)
 /**
       \fn scale
       \brief Change colorspace but and put result in the target image , which is bigger
-
+        Normally not used !
 */
  uint8_t ColYuvRgb::scale(uint8_t *src, uint8_t *target,uint32_t startx,uint32_t starty, uint32_t tw,uint32_t th,uint32_t totalW,uint32_t totalH)
  {
@@ -224,36 +241,15 @@ void COL_init(void)
 
     if(_inverted)
     {
-#if (defined( ARCH_X86)  || defined(ARCH_X86_64))
-            if( 0 && CpuCaps::hasMMX())
+            uint8_t r,g,b,a;
+            uint8_t *ptr=NULL;
+            int pel=th;
+            for(int yy=0;yy<th;yy++)
             {
+              ptr=target+(startx*4)+(starty+yy)*totalW*4;;
+              ADM_RGBA2BGRA(ptr,tw);
             }
-            else
-#endif
-            {
-                uint8_t r,g,b,a;
-                uint8_t *ptr=NULL;
-                int pel=th;
-                for(int yy=0;yy<th;yy++)
-                {
-                  ptr=target+(startx*4)+(starty+yy)*totalW*4;;
-                  for(int xx=0;xx<tw;xx++)
-                  {
-                      r=ptr[0];
-                      g=ptr[1];
-                      b=ptr[2];
-                      a=ptr[3];
-                      ptr[0]=b;
-                      ptr[1]=g;
-                      ptr[2]=r;
-                      ptr[3]=a;
-                      ptr+=4;
-                  }
-                }
-            }
-          
-          
-        }
+     }
 #if  defined( ADM_BIG_ENDIAN)
         uint8_t r,g,b,a;
         uint8_t *ptr=target;
@@ -261,18 +257,7 @@ void COL_init(void)
         for(int yy=0;yy<th;yy++)
                 {
                   *ptr=target+(startx*4)+(starty+yy)*totalW*4;;
-                  for(int xx=0;xx<tw;xx++)
-                  {
-                      r=ptr[0];
-                      g=ptr[1];
-                      b=ptr[2];
-                      a=ptr[3];
-                      ptr[0]=a;
-                      ptr[1]=b;
-                      ptr[2]=g;
-                      ptr[3]=r;
-                      ptr+=4;
-                  }
+                  invertRGB(ptr,tw);
                 }
         
 #endif
