@@ -334,11 +334,12 @@ uint32_t extraLen=0;
 		  mp3vbr.ncodecdelay = 0;
 		  
 		  wav.bitspersample = 0;
-		  mp3vbr.nblocksize=R16(0x180); //383; // ??
+		  mp3vbr.nblocksize=R16(0x180); //384; // ??
     
 		  header->dwScale = 1;
 	  	  header->dwInitialFrames = 1;
-    
+                  extra=(uint8_t *)&mp3vbr;
+		  extraLen=sizeof(mp3vbr);
 		  if (stream->isVBR()) //wav->blockalign ==1152)	// VBR audio
 			{			// We do like nandub do
 		  	//ADM_assert (audiostream->asTimeTrack ());
@@ -356,10 +357,14 @@ uint32_t extraLen=0;
 		  	//		
 		  	//
 			mp3vbr.nblocksize=1152;	
-			extra=(uint8_t *)&mp3vbr;
-			extraLen=sizeof(mp3vbr);
+			
 		   }	
-		   else wav.blockalign=1;
+		   else 
+                   {
+                     wav.blockalign=1;
+                     
+                     
+                   }
 
 			
 
