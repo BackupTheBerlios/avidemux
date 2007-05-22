@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "default.h"
 #ifdef CYG_MANGLING
 #include <windows.h>
 #else
