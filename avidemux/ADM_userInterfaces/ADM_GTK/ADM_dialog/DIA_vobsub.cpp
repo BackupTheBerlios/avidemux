@@ -46,7 +46,7 @@
 #include "ADM_video/ADM_vobsubinfo.h"
 #include "ADM_video/ADM_vidVobSub.h"
 
-#define MAX_INDECES 16
+#define MAX_INDECES ADM_MAX_LANGUAGE
 
 static GtkWidget        *create_dialog1 (void);
 static GtkWidget        **fq;
@@ -76,7 +76,7 @@ uint8_t DIA_vobsub(vobSubParam *param)
     gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(buttonSelect), GTK_RESPONSE_APPLY);
     
     
-    fq=new GtkWidget*[20];
+    fq=new GtkWidget*[ADM_MAX_LANGUAGE];
   
         // Upload if any
         if(name)

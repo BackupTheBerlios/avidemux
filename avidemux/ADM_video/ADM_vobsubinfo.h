@@ -19,7 +19,7 @@
  ***************************************************************************/
 #ifndef _VOBSUB_INFO_
 #define _VOBSUB_INFO_
-
+#define ADM_MAX_LANGUAGE 33
 typedef struct vobSubLine
 {
         uint32_t        startTime;      /// Starting time in ms
@@ -35,7 +35,7 @@ typedef struct vobSubOneLang
 typedef struct vobSubLanguage
 {
         uint32_t        nbLanguage; 
-        vobSubOneLang   language[20];  
+        vobSubOneLang   language[ADM_MAX_LANGUAGE];  
 }vobSubLanguage;
 
 typedef struct VobSubInfo
