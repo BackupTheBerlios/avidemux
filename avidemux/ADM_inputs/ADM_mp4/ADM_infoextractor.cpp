@@ -246,6 +246,36 @@ uint32_t val;
                  return 0;
 }
 /**
+    \fn unescapeH264
+    \brief Remove escape stuff
+
+*/
+static uint32_t unescapeH264(uint32_t len,uint8_t *in, uint8_t *out)
+{
+  uint32_t outlen=0;
+  uint8_t *tail=in+len;
+    if(len<3) return 0;
+    while(in<tail-3)
+    {
+      if(!in[0]  && !in[1] && in[2]==3)
+      {
+        out[0]=0;
+        out[1]=0;
+        out+=2;
+        outlen+=2;
+        in+=3; 
+      }
+      *out++=*in++;
+      outlen++;
+    }
+    // copy last bytes
+    uint32_t left=tail-in;
+    memcpy(out,in,left);
+    outlen+=left;
+    return outlen;
+    
+}
+/**
     \fn extractSPSInfo
     \brief Extract info from H264 SPS
     See 7.3.2.1 of 14496-10
@@ -254,29 +284,39 @@ uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hh
 {
    GetBitContext s;
    
-   uint32_t profile,constraint,level,pic_order_cnt_type,w,h;
+   uint32_t profile,constraint,level,pic_order_cnt_type,w,h,z;
+   uint8_t buf[len];
+   uint32_t outlen;
+   uint32_t id,dum;
    
-           init_get_bits( &s,data, len*8);
+           outlen=unescapeH264(len,data,buf);
+           init_get_bits( &s,buf, outlen*8);
             
            profile=get_bits(&s,8);
            constraint=get_bits(&s,8)>>5;
            level=get_bits(&s,8);
-           
-           if(profile>100) // ?? Borrowed from H264.C/FFMPEG
+           id=get_ue_golomb(&s); // Seq parameter set id           
+           printf("[H264]Profile : %u, Level :%u, SPSid:%u\n",profile,level,id);
+           if(profile>=100) // ?? Borrowed from H264.C/FFMPEG
            {
-              printf("Warning : High profile\n");
+              printf("[H264]Warning : High profile\n");
               if(get_ue_golomb(&s) == 3) //chroma_format_idc
                 get_bits1(&s);  //residual_color_transform_flag
             get_ue_golomb(&s);  //bit_depth_luma_minus8
             get_ue_golomb(&s);  //bit_depth_chroma_minus8
             get_bits1(&s);
+            get_bits1(&s); //incomplete FIXME
            }    // /??
            
-           get_ue_golomb(&s); // Seq parameter set id
-           get_ue_golomb(&s); // log2_max_frame_num_minus4
-           if(!(pic_order_cnt_type=get_ue_golomb(&s))) // pic_order_cnt_type
+
+           dum=get_ue_golomb(&s); // log2_max_frame_num_minus4
+           printf("[H264]Log2maxFrame-4:%u\n",dum);
+           pic_order_cnt_type=get_ue_golomb(&s);
+           printf("[H264]Pic Order Cnt Type:%u\n",pic_order_cnt_type);
+           if(!pic_order_cnt_type) // pic_order_cnt_type
            {
-              get_ue_golomb(&s); //log2_max_pic_order_cnt_lsb_minus4
+              dum=get_ue_golomb(&s); //log2_max_pic_order_cnt_lsb_minus4
+              printf("[H264]Log2maxPix-4:%u\n",dum);
            }else
            {
              if(pic_order_cnt_type==1)
@@ -296,12 +336,15 @@ uint8_t extractSPSInfo(uint8_t *data, uint32_t len,uint32_t *wwidth,uint32_t *hh
                return 0;
              }
            }
-           get_ue_golomb(&s);     //num_ref_frames
+           dum=get_ue_golomb(&s);     //num_ref_frames
+           printf("[H264] # of ref frames : %u\n",dum);
            get_bits1(&s);         // gaps_in_frame_num_value_allowed_flag
            w=get_ue_golomb(&s);   //pic_width_in_mbs_minus1
            h=get_ue_golomb(&s);   //pic_height_in_mbs_minus1
-           printf("%d\n",w); 
-           printf("%d\n", h); 
+           z=get_ue_golomb(&s); 
+           printf("[H264] Width in mb -1  :%d\n",w); 
+           printf("[H264] Height in mb -1 :%d\n", h);
+           printf("[H264] z               :%d\n", z);  
             *wwidth=(w+1)*16;
             *hheight=(h+1)*16*2; /* Fixme : frame_mbs_only_flag in slice header!! */
 

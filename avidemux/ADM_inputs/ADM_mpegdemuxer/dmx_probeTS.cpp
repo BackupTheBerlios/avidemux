@@ -424,7 +424,7 @@ uint8_t dmx_searchAndSkipHeader(uint32_t myPid,dmx_demuxerTS *demuxer,uint32_t *
               
               sectionLength=misc&0xFFF;
               
-              if(sectionLength<=9 || sectionLength >= (left-4-4) || left<9)
+              if(sectionLength<=9 || sectionLength > (left-4) || left<9)
               {
                 printf("SectionLength too short :%d,left %d\n", sectionLength,left);
                  parser->setpos(startPos-1+left); // skip packet
