@@ -117,11 +117,14 @@ int sdl_version=0;
     printf("\n*******************\n");
     printf("  Avidemux 2, v  " VERSION "\n");
     printf("*******************\n");
-    printf(" http://fixounet.free.fr/avidemux\n");
-    printf(" Code      : Mean & JSC \n");
+    printf(" http://www.avidemux.org\n");
+    printf(" Code      : Mean, JSC, Gruntster \n");
     printf(" GFX       : Nestor Di , nestordi@augcyl.org\n");
-    printf(" Testing   : Jakub Misak\n");
+    printf(" Design    : Jakub Misak\n");
     printf(" FreeBSD   : Anish Mistry, amistry@am-productions.biz\n");
+    printf(" Audio     : Mihail Zenkov\n");
+    printf(" MacOsX    : Kuisathaverat\n");
+    printf(" Win32     : Gruntster\n");
 
 
 #if defined(ARCH_X86_32)
