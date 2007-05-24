@@ -61,11 +61,11 @@
 #include "xpm/film23.inc"
 #include "xpm/preview-button.inc"
 
-typedef enum ADM_Icon
+typedef enum 
 {
         A_ICON_XPM,
         A_ICON_PNG
-};
+}ADM_Icon;
 
 typedef struct name2xpm
 {

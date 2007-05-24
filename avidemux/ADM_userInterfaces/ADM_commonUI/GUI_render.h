@@ -27,16 +27,16 @@ typedef struct
   
 }GUI_WindowInfo;
 
-typedef enum ADM_PREVIEW_MODE
+typedef enum 
 {
     ADM_PREVIEW_NONE, 
     ADM_PREVIEW_OUTPUT,
     ADM_PREVIEW_SIDE,
     ADM_PREVIEW_TOP,
     ADM_PREVIEW_SEPARATE
-};
+}ADM_PREVIEW_MODE;
 
-typedef enum renderZoom
+typedef enum 
 {
         ZOOM_1_4,
         ZOOM_1_2,
@@ -44,7 +44,7 @@ typedef enum renderZoom
         ZOOM_2,
         ZOOM_4,
         ZOOM_INVALID
-};
+}renderZoom;
 
 
 ADM_PREVIEW_MODE getPreviewMode(void);
@@ -87,7 +87,7 @@ void UI_rgbDraw(void *widg,uint32_t w, uint32_t h,uint8_t *ptr);
 void UI_updateDrawWindowSize(void *win,uint32_t w,uint32_t h);
 void UI_getWindowInfo(void *draw, GUI_WindowInfo *xinfo);
 
-typedef enum ADM_RENDER_TYPE
+typedef enum 
 {
         RENDER_GTK=0,
 #ifdef USE_XV
@@ -99,6 +99,6 @@ typedef enum ADM_RENDER_TYPE
         RENDER_LAST       
 
 
-};
+}ADM_RENDER_TYPE;
 
 #endif

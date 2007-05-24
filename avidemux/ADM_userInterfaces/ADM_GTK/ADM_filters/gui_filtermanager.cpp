@@ -22,7 +22,7 @@
 #include "ADM_toolkit_gtk/toolkit_gtk.h"
 #include "ADM_filter/vidVCD.h"
 //___________________________________________
-typedef enum gui_act
+typedef enum 
 {
   A_BEGIN = 10,
   A_ADD,
@@ -43,7 +43,7 @@ typedef enum gui_act
   A_CLOSE,
   A_DOUBLECLICK,
   A_END
-};
+}gui_act;
 //___________________________________________
 extern AVDMGenericVideoStream *filterCreateFromTag (VF_FILTERS tag,
 						    CONFcouple * conf,

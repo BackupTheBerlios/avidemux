@@ -88,11 +88,11 @@ const X264_AR x264_ar[]=
 71:50 (1.4222:1)
 107:100 (1.0666:1)
 */
-typedef enum x264_actions
+typedef enum 
 {
     ACTION_LOAD_DEFAULT=10,
     ACTION_LOAD_INVALID
-};
+}x264_actions;
 uint8_t DIA_x264(COMPRES_PARAMS *config)
 {
   

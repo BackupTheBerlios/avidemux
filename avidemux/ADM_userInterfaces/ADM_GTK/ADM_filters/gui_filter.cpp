@@ -59,7 +59,7 @@ extern AVDMGenericVideoStream *filterCreateFromTag (VF_FILTERS tag,
 						    in);
 
 extern const char  *filterGetNameFromTag(VF_FILTERS tag);
-typedef enum gui_act
+typedef enum 
 {
   A_BEGIN = 10,
   A_ADD,
@@ -79,7 +79,7 @@ typedef enum gui_act
   A_SCRIPT,
   A_DOUBLECLICK,
   A_END
-};
+}gui_act;
 //_______________________________________
 
 

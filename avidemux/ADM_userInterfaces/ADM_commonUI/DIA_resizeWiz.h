@@ -20,7 +20,7 @@
 #ifndef DIA_RES_WIZ_H
 #define DIA_RES_WIZ_H
 
-typedef enum RESWIZ_FORMAT
+typedef enum 
 {
         RESWIZ_VCD,
         RESWIZ_SVCD,
@@ -30,14 +30,14 @@ typedef enum RESWIZ_FORMAT
         RESWIZ_PSP_FULLRES,
         
         
-};
+}RESWIZ_FORMAT;
 
-typedef enum RESWIZ_AR
+typedef enum 
 {
         RESWIZ_AR_1_1,
         RESWIZ_AR_4_3,
         RESWIZ_AR_16_9
-};
+}RESWIZ_AR;
 
 uint8_t DIA_resizeWiz(RESWIZ_FORMAT *format, RESWIZ_AR *source, RESWIZ_AR *destination);
 

@@ -36,12 +36,12 @@ extern const char *shortkey(const char *);
 void GUI_FileSelRead(const char *label, char * * name);
 #define MAX_SEL 2040
 
-typedef enum ADM_fileMode
+typedef enum 
 {
     ADM_FILEMODE_DIR,
     ADM_FILEMODE_READ,
     ADM_FILEMODE_WRITE
-};
+}ADM_fileMode;
 
 class  ADM_Qfilesel : public QWidget
 {

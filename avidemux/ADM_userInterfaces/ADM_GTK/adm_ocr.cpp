@@ -73,14 +73,14 @@
 #define CONNECT(x,y,z) 	gtk_signal_connect(GTK_OBJECT(WID(x)), #y,GTK_SIGNAL_FUNC(z),   NULL);
 #define SUB_THRESH minThreshold
 
-typedef enum ReplyType
+typedef enum 
 {
         ReplyOk=1,
         ReplyClose=0,
         ReplyCalibrate=2,
         ReplySkip=3,
         ReplySkipAll=4
-};
+}ReplyType;
 
 static uint8_t mergeBitmap(uint8_t *bitin, uint8_t *bitout, uint8_t *maskin,uint32_t w, uint32_t h);
 static ReplyType ocrBitmap(uint8_t *data,uint32_t w,uint32_t h);

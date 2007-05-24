@@ -49,14 +49,14 @@ static int ch_par_asinput(GtkObject * object, gpointer user_data);
 
 #define CALL_Z(x,y)  gtk_dialog_add_action_widget (GTK_DIALOG (dialog), WID(x),XVID4_RESPONSE_##y);
 
-typedef enum XVID4_CODE
+typedef enum 
 {
     XVID4_RESPONSE_MODE_CHANGED,
     XVID4_RESPONSE_EDIT_MATRIX,
     XVID4_RESPONSE_LOAD_MATRIX,
     XVID4_RESPONSE_SAVE_MATRIX,
     XVID4_RESPONSE_LAST,
-};
+}XVID4_CODE;
 uint8_t DIA_xvid4(COMPRES_PARAMS *incoming)
 {
 int b;

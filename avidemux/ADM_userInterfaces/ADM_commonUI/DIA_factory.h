@@ -18,7 +18,7 @@
 
 #include "ADM_assert.h"
 
-typedef enum elemEnum
+typedef enum 
 {
   ELEM_INVALID=0,
   ELEM_TOGGLE,
@@ -39,7 +39,7 @@ typedef enum elemEnum
   ELEM_BUTTON,
   ELEM_SLIDER,
   ELEM_MAX=ELEM_TOGGLE
-};
+}elemEnum;
 typedef void ADM_FAC_CALLBACK(void *cookie);
 /*********************************************/
 class diaElem

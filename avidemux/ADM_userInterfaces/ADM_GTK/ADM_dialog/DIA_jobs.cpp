@@ -25,14 +25,14 @@ extern bool parseECMAScript(const char *name);
 static const char *StringStatus[]={_("Ready"),_("Succeeded"),_("Failed"),_("Deleted"),_("Running")};
 
 
-typedef enum JOB_STATUS
+typedef enum 
 {
         STATUS_READY=0,
         STATUS_SUCCEED,
         STATUS_FAILED,
         STATUS_DELETED,
         STATUS_RUNNING
-};
+}JOB_STATUS;
 
 
 typedef struct ADM_Job_Descriptor
