@@ -17,7 +17,7 @@
 #ifndef _CONTRAST_
 #define _CONTRAST_
 
-typedef struct CONTRAST_PARAM
+typedef struct 
 {
 		float 	coef;
 		int32_t  offset;
@@ -26,7 +26,7 @@ typedef struct CONTRAST_PARAM
 		uint32_t	doChromaV;
 		
 	
-	};
+	}CONTRAST_PARAM;
 	
   uint8_t buildContrastTable( float coef,int8_t off,	
   								uint8_t *tableFlat,uint8_t *tableNZ);

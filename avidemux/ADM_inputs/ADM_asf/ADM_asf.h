@@ -28,14 +28,14 @@
 
 #define ASF_MAX_AUDIO_TRACK 8
 
-typedef struct asfIndex
+typedef struct 
 {
   uint32_t packetNb;
   uint32_t frameLen;
   uint32_t segNb;
   uint32_t flags;
   uint32_t audioSeen[ASF_MAX_AUDIO_TRACK];
-};
+}asfIndex;
 
 typedef enum 
 {
@@ -51,13 +51,13 @@ typedef enum
   ADM_CHUNK_EXTENDED_STREAM_PROP,
   ADM_CHUNK_UNKNOWN_CHUNK
 }ADM_KNOWN_CHUNK;
-typedef struct chunky
+typedef struct 
 {
   const char *name;
   uint32_t len;
   uint8_t val[16];
   ADM_KNOWN_CHUNK id; 
-};
+}chunky;
 class asfChunk
 {
   protected:

@@ -25,12 +25,12 @@
 
 
 */
-typedef enum FP_TYPE
+typedef enum 
 {
         FP_PROBE=1,
         FP_DONT_APPEND=2,
         FP_APPEND=3
-};
+}FP_TYPE;
 
  class fileParser
 {
