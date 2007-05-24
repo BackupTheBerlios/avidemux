@@ -31,13 +31,13 @@
 
 #include "mkv_tags.h"
 
-typedef struct MKVCC
+typedef struct 
 {
     const char *name;
     uint32_t isVideo;
     uint32_t audioCC;
     const char *videoCC;
-};
+}MKVCC;
 
 MKVCC mkvCC[]=
 {

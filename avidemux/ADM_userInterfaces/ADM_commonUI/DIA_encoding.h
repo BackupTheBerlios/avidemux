@@ -8,11 +8,11 @@
 #include "ADM_tray.h"
 #define MAX_BR_SLOT 200
 
-typedef struct encodingSlice
+typedef struct 
 {
   uint32_t size;
   uint32_t quant;
-};
+}encodingSlice;
 
 class DIA_encoding
 {

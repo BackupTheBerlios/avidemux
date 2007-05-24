@@ -25,7 +25,7 @@
 #include "ADM_editor/ADM_Video.h"
 #include "ADM_audio/aviaudio.hxx"
 
-typedef enum
+enum
 {
 	PIC_BMP=1,
 	PIC_JPEG=2,

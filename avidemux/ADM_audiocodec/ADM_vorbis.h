@@ -1,6 +1,6 @@
 
 
-typedef struct oggVorbis
+typedef struct 
 {
 
  ogg_sync_state    osync;  // sync and verify incoming physical bitstream
@@ -13,4 +13,4 @@ typedef struct oggVorbis
  vorbis_block      vblock;  // local working space for packet->PCM decode
  float		   ampscale;
 
- };
+ }oggVorbis;

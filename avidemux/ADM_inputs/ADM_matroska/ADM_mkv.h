@@ -25,15 +25,15 @@
 #include "ADM_inputs/ADM_matroska/ADM_ebml.h"
 
 
-typedef struct mkvIndex
+typedef struct 
 {
     uint64_t pos;
     uint32_t size;
     uint32_t flags;
     uint32_t timeCode;  // In fact it is delta between DTS and PTS for audio...
-};
+}mkvIndex;
 //**********************************************
-typedef struct mkvTrak
+typedef struct 
 {
   /* Index in mkv */
   uint32_t  streamIndex;
@@ -50,7 +50,7 @@ typedef struct mkvTrak
   uint32_t  _indexMax; // Max size of the index
   uint32_t  _sizeInBytes; // Approximate size in bytes of that stream
   uint32_t  _defaultFrameDuration; // in us!
-};
+}mkvTrak;
 
 #define MKV_MAX_LACES 20 // ?
 //**********************************************

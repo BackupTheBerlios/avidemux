@@ -23,7 +23,7 @@ typedef  void * (*THRINP)(void *p);
 #include "ADM_osSupport/ADM_threads.h"
 extern admMutex accessMutex;
 
-typedef struct muxerMT
+typedef struct 
 {
   Encoder                   *videoEncoder;
   AVDMGenericAudioStream    *audioEncoder;
@@ -40,7 +40,7 @@ typedef struct muxerMT
   uint32_t                  audioAbort;
   uint32_t                  videoAbort;
   void                      *opaque;
-};
+}muxerMT;
 
 extern int defaultAudioSlave( muxerMT *context );
 extern int defaultVideoSlave( muxerMT *context );

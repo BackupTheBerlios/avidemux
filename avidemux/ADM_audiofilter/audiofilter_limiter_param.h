@@ -11,7 +11,7 @@
 #ifndef LIMITER_PARAM_H
 #define LIMITER_PARAM_H
 #define DRC_WINDOW 100
-typedef struct DRCparam
+typedef struct 
 {
   uint32_t mUseGain;
   double   mFloor;
@@ -20,6 +20,6 @@ typedef struct DRCparam
   double   mRatio;
   double   mThresholdDB;
    // double   mGainDB;  
-};
+}DRCparam;
 
 #endif

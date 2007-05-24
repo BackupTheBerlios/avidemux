@@ -19,7 +19,7 @@ typedef struct queueElem
 {
   queueElem   *next;
   void        *data;
-};
+}queueElem;
 
 class ADM_queue
 {

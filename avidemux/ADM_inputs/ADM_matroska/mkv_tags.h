@@ -23,7 +23,7 @@
 #define ADM_MKV_TAGS
 
 
-typedef enum ADM_MKV_TYPE
+typedef enum 
 {
     ADM_MKV_TYPE_UNKNOWN,
     ADM_MKV_TYPE_CONTAINER,
@@ -34,18 +34,18 @@ typedef enum ADM_MKV_TYPE
     ADM_MKV_TYPE_UINTEGER,
     ADM_MKV_TYPE_INTEGER,
     ADM_MKV_TYPE_BINARY
-};
+}ADM_MKV_TYPE;
 
-typedef enum ADM_MKV_SEARCHTYPE
+typedef enum 
 {
   ADM_MKV_PRIMARY, 
   ADM_MKV_SECONDARY
-};
+}ADM_MKV_SEARCHTYPE;
 
-typedef enum MKV_ELEM_ID
+typedef enum 
 {
 #include "mkv_tagenum.h"
-};
+}MKV_ELEM_ID;
 
 
 uint8_t ADM_searchMkvTag(MKV_ELEM_ID tag,const char **asString,ADM_MKV_TYPE *type);

@@ -15,12 +15,12 @@
 #ifndef ADM_PACKET_QUEUE_H
 #define ADM_PACKET_QUEUE_H
 #include "ADM_osSupport/ADM_threads.h"
-typedef struct  Slots
+typedef struct  
 {
   uint32_t      size;       //< Size of the packet
   uint32_t      sample;
   uint32_t      startAt;    //< Index in the buffer where the packet start
-};
+}Slots;
 /*!
   This class defines an packetQueue. The big buffer is split into slots
   (dynamically allocated).

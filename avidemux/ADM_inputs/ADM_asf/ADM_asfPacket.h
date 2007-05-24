@@ -19,7 +19,7 @@
 
 #include "ADM_osSupport/ADM_queue.h"
 
-typedef struct asfBit
+typedef struct 
 {
   uint32_t sequence;
   uint32_t offset;
@@ -28,7 +28,7 @@ typedef struct asfBit
   uint32_t packet;
   uint32_t flags;
   uint8_t  *data;
-};
+}asfBit;
 
 class asfPacket
 {

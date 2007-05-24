@@ -8,7 +8,7 @@ typedef enum
   ADM_LAME_PRESET_EXTREME
 }ADM_LAME_PRESET;
 
-typedef struct ADM_PRESET_DEFINITION
+typedef struct 
 {
   ADM_LAME_PRESET preset;
   const char	*name;
@@ -20,11 +20,11 @@ static const ADM_PRESET_DEFINITION      presetDefinition[]=
   {ADM_LAME_PRESET_EXTREME,"Extreme"}
 };    
 
-typedef struct LAME_encoderParam
+typedef struct 
 {
   ADM_LAME_PRESET preset;
   ADM_mode        mode;
   uint32_t        quality;
-};
+}LAME_encoderParam;
 
 #endif

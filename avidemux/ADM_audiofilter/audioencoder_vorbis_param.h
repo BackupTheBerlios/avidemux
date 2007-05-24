@@ -9,9 +9,9 @@ typedef enum
   
 }ADM_VORBIS_MODE;
 
-typedef struct VORBIS_encoderParam
+typedef struct 
 {
   ADM_VORBIS_MODE    mode;   // 0 cbr 1 vbr 2 quality
   float              quality;
-};
+}VORBIS_encoderParam;
 #endif

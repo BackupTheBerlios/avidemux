@@ -31,11 +31,11 @@ typedef enum
     DEVICE_ESD
 }AUDIO_DEVICE;
 
-typedef struct DEVICELIST
+typedef struct 
 {
 	AUDIO_DEVICE id;
 	char	     *name;
-};
+}DEVICELIST;
 #define MKADID(x) {DEVICE_##x,#x}
 static const DEVICELIST audioDeviceList[]=
 {

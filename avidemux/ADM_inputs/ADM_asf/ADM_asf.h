@@ -84,7 +84,7 @@ class asfChunk
   uint8_t   skip(uint32_t skip);
 };
 
-typedef struct asfAudioTrak
+typedef struct 
 {
   uint32_t     streamIndex;
   uint32_t     extraDataLen;
@@ -93,7 +93,7 @@ typedef struct asfAudioTrak
   uint32_t     length;
   WAVHeader    wavHeader;
   
-};
+}asfAudioTrak;
 
 class asfAudio : public AVDMGenericAudioStream
 {

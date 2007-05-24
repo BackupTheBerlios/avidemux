@@ -2,9 +2,9 @@
 #define AUDM_TWOLAME_PARAM_H
 
 
-typedef struct TWOLAME_encoderParam
+typedef struct 
 {
   ADM_mode        mode;
-};
+}TWOLAME_encoderParam;
 
 #endif

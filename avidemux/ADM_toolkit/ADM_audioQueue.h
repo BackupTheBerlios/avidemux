@@ -13,7 +13,7 @@ typedef  void * (*THRINP)(void *p);
 #include "ADM_toolkit/ADM_packetQueue.h"
 extern admMutex accessMutex;
 
-typedef struct audioQueueMT
+typedef struct 
 {
   PacketQueue               *packetQueue;
   AVDMGenericAudioStream    *audioEncoder;
@@ -22,7 +22,7 @@ typedef struct audioQueueMT
   uint32_t                  feedAudio;
   volatile uint32_t         audioAbort;
   void                      *opaque;
-};
+}audioQueueMT;
 
 extern int defaultAudioQueueSlave( audioQueueMT *context );
 

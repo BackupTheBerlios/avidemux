@@ -25,12 +25,12 @@
 
 #define DMX_MAX_TRACK 16
 
- typedef struct dmxAudioIndex
+ typedef struct 
  {
                 uint32_t img;                      // Corresponding image
                 uint64_t start;                    // Start of packet
                 uint64_t count[DMX_MAX_TRACK];         // Size of audio seen
-};
+}dmxAudioIndex;
 class dmxAudioTrack
 {
 public:
