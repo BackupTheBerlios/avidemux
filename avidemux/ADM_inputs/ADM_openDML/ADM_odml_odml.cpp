@@ -45,7 +45,7 @@
 	#define PPACKED 
 #endif
 
-typedef struct OPENDML_INDEX
+struct OPENDML_INDEX
 {
 	//uint32_t	fcc;
 	//uint32_t 	cb: // ?
@@ -55,15 +55,18 @@ typedef struct OPENDML_INDEX
 	uint32_t	nbEntryInUse;
 	uint32_t	chunkId;
 	uint32_t	reserver[3];
-} OPENDML_INDEX PPACKED;
-typedef struct OPENDML_ENTRY
+}  PPACKED;
+typedef struct OPENDML_INDEX;
+
+struct OPENDML_ENTRY
 {
 	uint64_t 	offset;
 	uint32_t	size;
 	uint32_t	duration;
-}OPENDML_ENTRY PPACKED;
-
-typedef struct OPENML_SECONDARY_INDEX
+} PPACKED;
+typedef struct OPENDML_ENTRY;
+    
+struct OPENML_SECONDARY_INDEX
 {
 	uint16_t 	longsPerEntry;
 	uint8_t		indexSubType;
@@ -72,8 +75,8 @@ typedef struct OPENML_SECONDARY_INDEX
 	uint32_t	chunkId;
 	uint64_t	base;
 	uint32_t	reserver;
-}OPENML_SECONDARY_INDEX PPACKED;
-
+} PPACKED;
+typedef struct OPENML_SECONDARY_INDEX;
 
  static int readMasterIndex(OPENDML_INDEX *index,FILE *fd);
  static int readSuperEntries(OPENDML_ENTRY *entries,int count,FILE *fd);
