@@ -9,7 +9,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-typedef enum 
+enum 
 {
   PP_BM_NONE           =0x0000,
   PP_BM_LINEAR_BLEND   =0x0001, 
@@ -19,7 +19,7 @@ typedef enum
   PP_BM_FFMPEG_DEINT   =0x0005,  
 };
 
-typedef struct lavc_pp_param
+typedef struct 
 {
   uint32_t      deintType;
   uint32_t       autolevel;
