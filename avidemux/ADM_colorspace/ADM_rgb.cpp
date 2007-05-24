@@ -127,7 +127,10 @@ static void ADM_RGBA2BGRA(uint8_t *ptr, uint32_t howmuch)
                         "add            $4,%0 \n"
                         "dec            %1 \n"
                         "jne            1b\n"
-                : : "r" (ptr),"r" (howmuch)
+                :  :"r" (ptr),"r" (howmuch)
+                : "%eax"
+                
+      
                 );
 #else
 uint8_t r,g,b,a;
