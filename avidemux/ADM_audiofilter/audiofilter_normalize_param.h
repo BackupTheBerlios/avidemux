@@ -11,18 +11,18 @@
 #ifndef GAIN_PARAM_H
 #define GAIN_PARAM_H
 
-typedef enum ADM_GAINMode
+typedef enum 
 {
   ADM_NO_GAIN,
   ADM_GAIN_AUTOMATIC,
   ADM_GAIN_MANUAL
   
-};
+}ADM_GAINMode;
 
 typedef struct GAINparam
 {
   ADM_GAINMode mode;
   int32_t gain10;
-};
+}GAINparam;
 
 #endif

@@ -35,7 +35,7 @@ void audioFilter_configureFilters( void );
 void audioCodecConfigure( void );
 void audioCodecSelect( void );
 
-typedef enum AUDIOENCODER
+typedef enum 
 {
 	AUDIOENC_NONE,
 	AUDIOENC_MP3,
@@ -52,14 +52,14 @@ typedef enum AUDIOENCODER
 	AUDIOENC_DUMMY
 }AUDIOENCODER;
 
-typedef enum RESAMPLING
+typedef enum 
 {
 	RESAMPLING_NONE=0,
 	RESAMPLING_CUSTOM=1,
 	RESAMPLING_LAST
 }RESAMPLING;
 
-typedef enum FILMCONV
+typedef enum 
 {
 	FILMCONV_NONE=0,
 	FILMCONV_FILM2PAL=1,

@@ -14,7 +14,7 @@
 
 #define MAX_CHANNELS 9
 
-typedef enum CHANNEL_TYPE
+typedef enum 
 {
 	CH_INVALID=0,
 	CH_MONO,
@@ -27,7 +27,7 @@ typedef enum CHANNEL_TYPE
 	CH_SIDE_LEFT,
 	CH_SIDE_RIGHT,
 	CH_LFE
-};
+}CHANNEL_TYPE;
 
 class ChannelRoute
 {

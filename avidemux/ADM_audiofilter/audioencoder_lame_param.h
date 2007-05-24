@@ -1,12 +1,12 @@
 #ifndef AUDM_LAME_PARAM_H
 #define AUDM_LAME_PARAM_H
 
-typedef enum ADM_LAME_PRESET
+typedef enum 
 {
   ADM_LAME_PRESET_CBR,
   ADM_LAME_PRESET_ABR,
   ADM_LAME_PRESET_EXTREME
-};
+}ADM_LAME_PRESET;
 
 typedef struct ADM_PRESET_DEFINITION
 {
