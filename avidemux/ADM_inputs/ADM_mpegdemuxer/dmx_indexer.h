@@ -18,7 +18,7 @@
  #ifndef DMX_INDX
  #define DMX_INDX
  
-typedef enum ADM_STREAM_TYPE
+typedef enum 
 {
   ADM_STREAM_UNKNOWN=0,
   ADM_STREAM_MPEG_VIDEO, 
@@ -28,7 +28,7 @@ typedef enum ADM_STREAM_TYPE
   ADM_STREAM_H264,
   ADM_STREAM_MPEG4,
   ADM_STREAM_AAC
-};
+}ADM_STREAM_TYPE;
 
 typedef struct MPEG_TRACK
 {

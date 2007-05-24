@@ -3,14 +3,14 @@
 (c) Mean 2006
 */
 #ifndef AVS_PROXY_INTERNAL_H
-typedef enum AvsEnum
+typedef enum 
 {
     AvsCmd_GetInfo=1,
     AvsCmd_SendInfo,
     AvsCmd_GetFrame,
     AvsCmd_SendFrame,
     AvsCmd_Quit
-};
+}AvsEnum;
 
 typedef struct avsInfo
 {

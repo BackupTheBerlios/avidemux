@@ -17,10 +17,10 @@
 #ifndef ADM_MP4_TREE_H
 #define ADM_MP4_TREE_H
 
-typedef enum ADMAtoms
+typedef enum 
 {
 #include "ADM_mp4Leaf.h"
-};
+}ADMAtoms;
 
 uint8_t ADM_mp4SearchAtomName(uint32_t atom, ADMAtoms *atomId,uint32_t *isContainer);
 uint8_t ADM_mp4SimpleSearchAtom(adm_atom *rootAtom, ADMAtoms atomToFind,adm_atom **atomFound);

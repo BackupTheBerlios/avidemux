@@ -37,7 +37,7 @@ typedef struct asfIndex
   uint32_t audioSeen[ASF_MAX_AUDIO_TRACK];
 };
 
-typedef enum ADM_KNOWN_CHUNK
+typedef enum 
 {
   ADM_CHUNK_HEADER_CHUNK ,
   ADM_CHUNK_FILE_HEADER_CHUNK,
@@ -50,7 +50,7 @@ typedef enum ADM_KNOWN_CHUNK
   ADM_CHUNK_LANGUAGE_LIST_EX,
   ADM_CHUNK_EXTENDED_STREAM_PROP,
   ADM_CHUNK_UNKNOWN_CHUNK
-};
+}ADM_KNOWN_CHUNK;
 typedef struct chunky
 {
   const char *name;

@@ -23,13 +23,13 @@
 #define ADM_NO_PTS 0xFFFFFFFFFFFFFFFFLL
 #include "dmx_indexer.h"
 
-typedef enum dmx_payloadType
+typedef enum 
 {
   DMX_PAYLOAD_ERROR=0,
   DMX_PAYLOAD_MPEG2=1,
   DMX_PAYLOAD_MPEG4,
   DMX_PAYLOAD_H264
-};
+}dmx_payloadType;
 
 class dmx_demuxer
  {

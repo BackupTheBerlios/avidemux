@@ -45,13 +45,13 @@
 
 uint32_t ADM_UsecFromFps1000(uint32_t fps1000);
 // 14496-1 / 8.2.1
-typedef enum MP4_Tag
+typedef enum 
 {
 	Tag_InitialObjDesc	=0x02,
 	Tag_ES_Desc		=0x03,
 	Tag_DecConfigDesc 	=0x04,
 	Tag_DecSpecificInfo 	=0x05
-};
+}MP4_Tag;
 
 extern char* ms2timedisplay(uint32_t ms);
 
