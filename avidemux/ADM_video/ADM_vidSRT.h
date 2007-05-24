@@ -38,12 +38,12 @@ typedef struct subLine
 	
 }subLine;
 
-typedef enum BlendMode
+typedef enum 
 {
         BLEND_SOLID=1,
         BLEND_DOTTED,
         BLEND_DIMMER
-};
+}BlendMode;
 
 typedef struct SUBCONF
 {

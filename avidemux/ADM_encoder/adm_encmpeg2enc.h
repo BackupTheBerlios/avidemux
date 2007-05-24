@@ -16,13 +16,13 @@
 #define ENC_MPEG2ENC_H
 #include "ADM_libmpeg2enc/ADM_mpeg2Param.h"
 #include "ADM_libmpeg2enc/ADM_mpeg2enc.h"
-typedef enum MPEG2ENC_ID
+typedef enum 
 {
   MPEG2ENC_INVALID=0,
   MPEG2ENC_VCD=1,
   MPEG2ENC_SVCD=2,
   MPEG2ENC_DVD=3
-};
+}MPEG2ENC_ID;
 
 class EncoderMpeg2enc:public Encoder
 {

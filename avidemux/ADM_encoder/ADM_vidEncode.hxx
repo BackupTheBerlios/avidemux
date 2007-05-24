@@ -17,7 +17,7 @@
 #ifndef ADM_VIDENCODE
 #define ADM_VIDENCODE
 
-typedef enum SelectCodecType
+typedef enum 
 {
   CodecCopy,
   CodecDivx,
@@ -45,7 +45,7 @@ typedef enum SelectCodecType
   CodecRequant,
   CodecDV,
   CodecDummy
-};
+}SelectCodecType;
 
 typedef enum
 {
