@@ -247,6 +247,7 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
 {        
         odd=even=0;
         aprintf("**Cur: A:%llx R:%llx next:%llx\n",posA,posR,_vobSubInfo->lines[idx+1].fileOffset);
+        
         _subSize=_parser->read16i();
         if(!_subSize)
         {
@@ -270,6 +271,11 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
         // We got the full packet
         // now scan it
         _curOffset=2;
+        if(_subSize<4)
+        {
+          printf("[handleSub] Packet too short!\n");
+          return 1; 
+        }
         _dataSize=readword();
         aprintf("data block=%lu\n",_dataSize);
         if(_dataSize<=4)
@@ -290,8 +296,11 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
                 
                 while(_curOffset<next)
                 {
+                      
+                      
                         command=readbyte();
                         aprintf("vobsub:Command : %d date:%d next:%d cur:%lu\n",command,date,next,_curOffset);
+                        int left=next-_curOffset;
                         switch(command)
                         {
                                 case 00: _displaying=1;
@@ -318,6 +327,11 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
 #endif                                        
                                         break;
                                 case 03: // Pallette 4 nibble= 16 bits
+                                         if(left<2)
+                                         {
+                                            printf("Command 3: Palette: Not enough bytes left\n");
+                                            return 1; 
+                                         }
                                          dum=readword();
                                         _colors[0]=dum>>12;
                                         _colors[1]=0xf & (dum>>8);
@@ -328,6 +342,12 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
                                         break;
                                 case 04: // alpha channel
                                          //4 nibble= 16 bits
+                                        if(left<2)
+                                         {
+                                            printf("Command 4: Alpha: Not enough bytes left\n");
+                                            return 1; 
+                                         }
+
                                         dum=readword();
                                         _alpha[0]=dum>>12;
                                         _alpha[1]=0xf & (dum>>8);
@@ -340,6 +360,11 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
                                         {
                                                 uint16_t a,b,c;
                                                 uint32_t nx1,nx2,ny1,ny2;
+                                                if(left<6)
+                                                {
+                                                    printf("Command 5: Coord: Not enough bytes left\n");
+                                                    return 1; 
+                                                }
                                                 if(doneA) return 1;
                                                 doneA++;
                                                 a=readword();
@@ -377,7 +402,11 @@ while(posA<_vobSubInfo->lines[idx+1].fileOffset)
                                         {
                                                 if(doneB) return 1;
                                                 doneB++;
-
+                                                if(left<4)
+                                                {
+                                                    printf("Command 6: RLE: Not enough bytes left\n");
+                                                    return 1; 
+                                                }
                                         odd=readword();                                        
                                         even=readword();
  
