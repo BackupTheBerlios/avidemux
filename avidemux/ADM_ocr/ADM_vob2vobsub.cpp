@@ -59,7 +59,7 @@ static uint8_t  *padder;
 
 #define PADDER_SIZE 0x800
 
-#define MAX_LINE        2000
+#define MAX_LINE        5000
 #define MAX_BUFFER      (1*1024)
 #define MAX_LANGUAGE    10
 
@@ -190,6 +190,16 @@ uint32_t padding;
         currentPTS=pts;
         runCode=twofirst-usableSize;
         addLine(pts,index);
+#if 0
+        {
+        uint16_t hh,mm,ss,ms;
+        uint32_t timestamp;
+
+              timestamp=pts/90;
+              ms2time(timestamp,&hh,&mm,&ss,&ms);
+              printf("Line : %03u  at %02d:%02d:%02d \n",nbLines,hh,mm,ss);
+        }
+#endif
         addData(data,size);
         if(runCode<0) runCode=0;
         return 1; 
@@ -291,6 +301,8 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
    
    //*** Main Loop ***
    uint32_t startPts=0,lastPts=0;
+   uint16_t hh,mm,ss,ms;
+   uint32_t timestamp;
    while(1)
    {
        if(!demuxer->forceRefill(&stream)) goto _abt;
@@ -316,13 +328,12 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
                                 {
                                         if(lastPts-pts>MIN_WRAP_VALUE)
                                         {
-                                                uint16_t hh,mm,ss,ms;
-                                                uint32_t timestamp;
+                                                
                                                 printf("Wrapping at %u ",lastPts);
                                                 startPts+=lastPts;
                                                 timestamp=startPts/90;
                                                 ms2time(timestamp,&hh,&mm,&ss,&ms);
-                                                printf("%02d:%02d:%02d ",hh,mm,ss);
+                                                printf("%02d:%02d:%02d \n",hh,mm,ss);
                                         }
                                 }
                         }
@@ -330,6 +341,14 @@ uint8_t ADM_vob2vobsub(char *nameVob, char *nameVobSub, char *nameIfo)
                         lastPts=pts;
                         pts+=startPts;
             }
+#if 0
+            if(pts!=ADM_NO_PTS)
+            {
+              timestamp=pts/90;
+              ms2time(timestamp,&hh,&mm,&ss,&ms);
+              printf("%02d:%02d:%02d \n",hh,mm,ss);
+            }
+#endif
             blockSize=demuxer->read16i();
             allIndex[stream-0x20].run(blockSize,data,packetLen,usedLen, pts)  ;
        }
